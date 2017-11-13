@@ -1,0 +1,70 @@
+---
+BasedOnStyle: Chromium
+AlignAfterOpenBracket: AlwaysBreak
+AlignConsecutiveAssignments: 'false'
+AlignConsecutiveDeclarations: 'false'
+AlignEscapedNewlines: 'DontAlign'
+AlignOperands: 'false'
+AlignTrailingComments: 'false'
+AllowAllParametersOfDeclarationOnNextLine: 'false'
+AllowShortBlocksOnASingleLine: 'false'
+AllowShortCaseLabelsOnASingleLine: 'false'
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: 'false'
+AllowShortLoopsOnASingleLine: 'false'
+AlwaysBreakAfterDefinitionReturnType: None
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: 'true'
+BinPackArguments: 'false'
+BinPackParameters: 'false'
+BreakBeforeBinaryOperators: None
+BreakBeforeBraces: WebKit
+BreakBeforeTernaryOperators: 'false'
+ColumnLimit: '80'
+ContinuationIndentWidth: '4'
+Cpp11BracedListStyle: 'false'
+DerivePointerAlignment: 'false'
+DisableFormat: 'false'
+IncludeCategories:
+- Regex: '^<internal/(.+)\.h>$'
+  Priority: -2
+- Regex: '^<mod_(.+)_private\.h>$'
+  Priority: -1
+- Regex: '^<mod_(.+)\.h>$'
+  Priority: 0
+- Regex: '^<fwk_(.+)\.h>$'
+  Priority: 1
+- Regex: '^<fmw_(.+)\.h>$'
+  Priority: 2
+- Regex: '^<((std.+)|assert|complex|ctype|errno|fenv|float|inttypes|iso646|limits|locale|math|setjmp|signal|string|tgmath|threads|time|uchar|wchar|wctype)\.h>$'
+  Priority: 3
+- Regex: '^".+"$'
+  Priority: -4
+- Regex: '^<.+>$'
+  Priority: -3
+IndentCaseLabels: 'false'
+IndentPPDirectives: 'AfterHash'
+IndentWidth: '4'
+IndentWrappedFunctionNames: 'true'
+KeepEmptyLinesAtTheStartOfBlocks: 'false'
+Language: Cpp
+MaxEmptyLinesToKeep: '1'
+PenaltyBreakBeforeFirstCallParameter: '0'
+PenaltyBreakComment: '300'
+PenaltyBreakFirstLessLess: '120'
+PenaltyBreakString: '1000'
+PenaltyExcessCharacter: '1000000'
+PenaltyReturnTypeOnItsOwnLine: '500000'
+PointerAlignment: Right
+SpaceAfterCStyleCast: 'false'
+SpaceBeforeAssignmentOperators: 'true'
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: 'false'
+SpacesBeforeTrailingComments: '1'
+SpacesInCStyleCastParentheses: 'false'
+SpacesInParentheses: 'false'
+SpacesInSquareBrackets: 'false'
+TabWidth: '4'
+UseTab: Never
+
+...

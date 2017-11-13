@@ -11,11 +11,11 @@
 #ifndef <DEVICE>_H
 #define <DEVICE>_H
 
-#    include <fwk_macros.h>
+#include <fwk_macros.h>
 
-#    include <stdint.h>
+#include <stdint.h>
 
-typedef struct {
+struct device_reg {
     /* Readable and writable register */
     FWK_RW uint32_t <REGISTER NAME>;
            uint32_t RESERVED1;
@@ -26,10 +26,10 @@ typedef struct {
     /* Read-only register */
     FWK_R  uint32_t <REGISTER NAME>;
            uint32_t RESERVED2[0x40];
-} <DEVICE NAME>_reg_t;
+};
 
 /* Register bit definitions */
-#define <REGISTER NAME>_<FIELD> UINT32_C(0x00000001)
-#define <REGISTER NAME>_<FIELD> UINT32_C(0x00000002)
+#define <DEVICE>_<REGISTER NAME>_<FIELD> UINT32_C(0x00000001)
+#define <DEVICE>_<REGISTER NAME>_<FIELD> UINT32_C(0x00000002)
 
 #endif /* <DEVICE>_H */
