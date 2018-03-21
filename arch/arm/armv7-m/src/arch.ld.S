@@ -8,7 +8,7 @@
  *      GNU LD linker script.
  */
 
-#include "scatter.h"
+#include <arch_scatter.h>
 
 ENTRY(arch_exception_reset)
 

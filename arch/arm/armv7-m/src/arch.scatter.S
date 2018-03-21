@@ -8,7 +8,7 @@
  *      Arm Compiler 6 scatter file.
  */
 
-#include "scatter.h"
+#include <arch_scatter.h>
 
 #if FMW_MEM_MODE == ARCH_MEM_MODE_SINGLE_REGION
 /*

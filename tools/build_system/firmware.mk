@@ -93,9 +93,9 @@ goal: $(TARGET_BIN)
 
 ifneq ($(BS_ARCH_CPU),host)
     ifeq ($(BS_LINKER),ARM)
-        SCATTER_SRC = $(ARCH_DIR)/src/$(BS_ARCH_ARCH)/scatter.S
+        SCATTER_SRC = $(ARCH_DIR)/$(BS_ARCH_VENDOR)/$(BS_ARCH_ARCH)/src/arch.scatter.S
     else
-        SCATTER_SRC = $(ARCH_DIR)/src/$(BS_ARCH_ARCH)/ld.S
+        SCATTER_SRC = $(ARCH_DIR)/$(BS_ARCH_VENDOR)/$(BS_ARCH_ARCH)/src/arch.ld.S
     endif
 
     SCATTER_PP = $(OBJ_DIR)/ld_preproc.s
@@ -179,14 +179,6 @@ HEADER_PRODUCT_MODULES := $(filter $(BS_FIRMWARE_MODULE_HEADERS_ONLY), \
 ifeq ($(BS_FIRMWARE_HAS_MULTITHREADING),yes)
     BUILD_SUFFIX := $(MULTHREADING_SUFFIX)
     BUILD_HAS_MULTITHREADING := yes
-
-    ifneq ($(BS_ARCH_ARCH),host)
-        ifeq ($(BS_COMPILER),ARM)
-            LIBS_y += $(OS_DIR)/RTX/Library/ARM/RTX_CM3.lib
-        else
-            LIBS_y += $(OS_DIR)/RTX/Library/GCC/libRTX_CM3.a
-        endif
-    endif
 
     INCLUDES += $(OS_DIR)/RTX/Source
     INCLUDES += $(OS_DIR)/RTX/Include
@@ -277,6 +269,14 @@ ifeq ($(BUILD_HAS_DEBUGGER),yes)
     LIB_TARGETS_y += $(DBG_DIR)/src
     LIBS_y += $(call lib_path,debugger$(BUILD_SUFFIX))
 endif
+
+#
+# Additional library dependencies
+#
+
+include $(ARCH_DIR)/$(BS_ARCH_VENDOR)/vendor.mk
+
+LIBS_y += $(BS_LIB_DEPS)
 
 SOURCES += $(BUILD_FIRMWARE_DIR)/fwk_module_list.c
 $(BUILD_FIRMWARE_DIR)/fwk_module_list.c: gen_module

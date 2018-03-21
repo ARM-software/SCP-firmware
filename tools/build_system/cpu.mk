@@ -16,8 +16,9 @@ BS_ARCH_CPU := $(BS_FIRMWARE_CPU)
 ARMV7M_CPUS := cortex-m3 cortex-m7
 
 ifneq ($(findstring $(BS_FIRMWARE_CPU),$(ARMV7M_CPUS)),)
+    BS_ARCH_VENDOR := arm
     BS_ARCH_ARCH := armv7-m
-    BS_ARCH_ISA := thumb
+    BS_ARCH_MODE := thumb
 
     LDFLAGS_GCC += --specs=nano.specs
     LDFLAGS_ARM += --target=arm-arm-none-eabi
@@ -25,8 +26,8 @@ ifneq ($(findstring $(BS_FIRMWARE_CPU),$(ARMV7M_CPUS)),)
 
     CFLAGS += -mfloat-abi=soft # No hardware floating point support
 else ifeq ($(BS_FIRMWARE_CPU),host)
+    BS_ARCH_VENDOR := none
     BS_ARCH_ARCH := host
-
 else
     $(erro "$(BS_FIRMWARE_CPU) is not a supported CPU. Aborting...")
 endif

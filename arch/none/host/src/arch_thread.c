@@ -176,7 +176,9 @@ uint32_t osThreadFlagsClear(uint32_t flags)
     return old_flags;
 }
 
-osThreadId_t osThreadNew(osThreadFunc_t func, void *argument,
+osThreadId_t osThreadNew(
+    osThreadFunc_t func,
+    void *argument,
     const osThreadAttr_t *attr)
 {
     int status;

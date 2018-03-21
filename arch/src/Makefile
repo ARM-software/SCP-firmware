@@ -10,29 +10,20 @@ include $(BS_DIR)/toolchain.mk
 
 BS_LIB_NAME = arch
 
-BS_LIB_SOURCES_armv7-m += armv7-m/exceptions.c
-BS_LIB_SOURCES_armv7-m += armv7-m/handlers.c
-BS_LIB_SOURCES_armv7-m += arm_nvic.c
-BS_LIB_SOURCES_armv7-m += arm_main.c
-BS_LIB_SOURCES_armv7-m += arm_mm.c
-
-BS_LIB_INCLUDES_armv7-m += $(TOP_DIR)/cmsis/CMSIS/Core/Include/
-
-BS_LIB_SOURCES_host += host.c
-BS_LIB_SOURCES_host += host_interrupt.c
-ifeq ($(BUILD_HAS_MULTITHREADING),yes)
-    BS_LIB_SOURCES_host += host_thread.c
-endif
-
-BS_LIB_INCLUDES += $(ARCH_DIR)/include
-BS_LIB_INCLUDES += $(FWK_DIR)/include
+include $(ARCH_DIR)/$(BS_ARCH_VENDOR)/vendor.mk
 
 #
 # Select arch-specific sources and includes
 #
-BS_LIB_SOURCES += $(BS_LIB_SOURCES_$(BS_ARCH_CPU))
+
+BS_LIB_SOURCES += $(BS_LIB_SOURCES_$(BS_ARCH_VENDOR))
 BS_LIB_SOURCES += $(BS_LIB_SOURCES_$(BS_ARCH_ARCH))
-BS_LIB_INCLUDES += $(BS_LIB_INCLUDES_$(BS_ARCH_CPU))
+
+BS_LIB_INCLUDES += $(BS_LIB_INCLUDES_$(BS_ARCH_VENDOR))
 BS_LIB_INCLUDES += $(BS_LIB_INCLUDES_$(BS_ARCH_ARCH))
+
+BS_LIB_INCLUDES += $(ARCH_DIR)/include
+BS_LIB_INCLUDES += $(ARCH_DIR)/$(BS_ARCH_VENDOR)/include
+BS_LIB_INCLUDES += $(ARCH_DIR)/$(BS_ARCH_VENDOR)/$(BS_ARCH_ARCH)/include
 
 include $(BS_DIR)/lib.mk

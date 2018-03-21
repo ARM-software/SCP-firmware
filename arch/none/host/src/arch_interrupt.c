@@ -31,38 +31,38 @@ static int is_enabled(unsigned int interrupt, bool *state)
 
 static int enable(unsigned int interrupt)
 {
-   return FWK_E_SUPPORT;
+    return FWK_E_SUPPORT;
 }
 
 static int disable(unsigned int interrupt)
 {
-   return FWK_E_SUPPORT;
+    return FWK_E_SUPPORT;
 }
 
 static int is_pending(unsigned int interrupt, bool *state)
 {
-   return FWK_E_SUPPORT;
+    return FWK_E_SUPPORT;
 }
 
 static int set_pending(unsigned int interrupt)
 {
-   return FWK_E_SUPPORT;
+    return FWK_E_SUPPORT;
 }
 
 static int clear_pending(unsigned int interrupt)
 {
-   return FWK_E_SUPPORT;
+    return FWK_E_SUPPORT;
 }
 
-static int set_isr_irq(unsigned int interrupt,
-                           void (*isr)(void))
+static int set_isr_irq(unsigned int interrupt, void (*isr)(void))
 {
-   return FWK_E_SUPPORT;
+    return FWK_E_SUPPORT;
 }
 
-static int set_isr_irq_param(unsigned int interrupt,
-                             void (*isr)(uintptr_t param),
-                             uintptr_t parameter)
+static int set_isr_irq_param(
+    unsigned int interrupt,
+    void (*isr)(uintptr_t param),
+    uintptr_t parameter)
 {
     return FWK_E_SUPPORT;
 }
@@ -79,29 +79,29 @@ static int set_isr_nmi_param(void (*isr)(uintptr_t param), uintptr_t parameter)
 
 static int set_isr_fault(void (*isr)(void))
 {
-   return FWK_E_SUPPORT;
+    return FWK_E_SUPPORT;
 }
 
 static int get_current(unsigned int *interrupt)
 {
-   return FWK_E_SUPPORT;
+    return FWK_E_SUPPORT;
 }
 
 static const struct fwk_arch_interrupt_driver driver = {
-    .global_enable  = global_enable,
+    .global_enable = global_enable,
     .global_disable = global_disable,
-    .is_enabled     = is_enabled,
-    .enable         = enable,
-    .disable        = disable,
-    .is_pending     = is_pending,
-    .set_pending    = set_pending,
-    .clear_pending  = clear_pending,
-    .set_isr_irq    = set_isr_irq,
+    .is_enabled = is_enabled,
+    .enable = enable,
+    .disable = disable,
+    .is_pending = is_pending,
+    .set_pending = set_pending,
+    .clear_pending = clear_pending,
+    .set_isr_irq = set_isr_irq,
     .set_isr_irq_param = set_isr_irq_param,
-    .set_isr_nmi    = set_isr_nmi,
+    .set_isr_nmi = set_isr_nmi,
     .set_isr_nmi_param = set_isr_nmi_param,
-    .set_isr_fault  = set_isr_fault,
-    .get_current    = get_current,
+    .set_isr_fault = set_isr_fault,
+    .get_current = get_current,
 };
 
 int arch_interrupt_init(const struct fwk_arch_interrupt_driver **_driver)
