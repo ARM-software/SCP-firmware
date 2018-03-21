@@ -28,7 +28,6 @@ ifeq ($(BUILD_HAS_NOTIFICATION),yes)
 endif
 BS_LIB_SOURCES += fwk_status.c
 
-BS_LIB_INCLUDES += $(ARCH_DIR)/include
 BS_LIB_INCLUDES += $(FWK_DIR)/include
 
 include $(BS_DIR)/lib.mk

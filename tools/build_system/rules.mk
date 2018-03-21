@@ -81,12 +81,12 @@ else
     LDFLAGS_GCC += -mcpu=$(BS_ARCH_CPU)
     LDFLAGS_ARM += -mcpu=$(BS_ARCH_CPU)
 
-    # Optional ISA ("sub-arch") parameter
-    ifneq ($(BS_ARCH_ISA),)
-        CFLAGS  += -m$(BS_ARCH_ISA)
-        ASFLAGS_GCC += -m$(BS_ARCH_ISA)
-        LDFLAGS_GCC += -m$(BS_ARCH_ISA)
-        LDFLAGS_ARM += -m$(BS_ARCH_ISA)
+    # Optional architectural mode parameter
+    ifneq ($(BS_ARCH_MODE),)
+        CFLAGS  += -m$(BS_ARCH_MODE)
+        ASFLAGS_GCC += -m$(BS_ARCH_MODE)
+        LDFLAGS_GCC += -m$(BS_ARCH_MODE)
+        LDFLAGS_ARM += -m$(BS_ARCH_MODE)
     endif
 endif
 
@@ -168,6 +168,14 @@ DEFINES += FWK_LOG_LEVEL=FWK_LOG_LEVEL_$(LOG_LEVEL)
 ifeq ($(BUILD_HAS_DEBUGGER),yes)
     DEFINES += BUILD_HAS_DEBUGGER
 endif
+
+#
+# Always include the architecture librarie
+#
+
+INCLUDES += $(ARCH_DIR)/include
+INCLUDES += $(ARCH_DIR)/$(BS_ARCH_VENDOR)/include
+INCLUDES += $(ARCH_DIR)/$(BS_ARCH_VENDOR)/$(BS_ARCH_ARCH)/include
 
 #
 # Always include the framework library

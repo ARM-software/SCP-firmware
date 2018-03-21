@@ -8,6 +8,7 @@
 ifndef BS_LIB_MK
 BS_LIB_MK := 1
 
+include $(BS_DIR)/cpu.mk
 include $(BS_DIR)/defs.mk
 
 $(info == Building $(BS_LIB_NAME) for $(BS_FIRMWARE_CPU))
@@ -58,6 +59,9 @@ goal: $(LIB)
 
 INCLUDES += $(shell pwd)
 INCLUDES += $(TOP_DIR)/$(LIB_BASE)/include
+
+INCLUDES += $(ARCH_DIR)/$(BS_ARCH_VENDOR)/include
+INCLUDES += $(ARCH_DIR)/$(BS_ARCH_VENDOR)/$(BS_ARCH_ARCH)/include
 
 include $(BS_DIR)/rules.mk
 

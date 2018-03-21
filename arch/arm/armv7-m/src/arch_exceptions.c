@@ -8,7 +8,7 @@
  *      ARMv7-M exception handlers.
  */
 
-#include "exceptions.h"
+#include <arch_exceptions.h>
 
 #include <fmw_cmsis.h>
 
