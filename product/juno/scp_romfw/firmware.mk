@@ -19,13 +19,15 @@ BS_FIRMWARE_MODULES := \
     clock \
     pl011 \
     log \
-    gtimer
+    gtimer \
+    sds
 
 BS_FIRMWARE_SOURCES := \
     juno_utils.c \
     juno_id.c \
     config_clock.c \
     config_log.c \
-    config_timer.c
+    config_timer.c \
+    config_sds.c
 
 include $(BS_DIR)/firmware.mk
