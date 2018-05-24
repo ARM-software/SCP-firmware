@@ -28,14 +28,99 @@ static struct {
     const struct mod_juno_ppu_rom_api *ppu_api;
     struct mod_log_api *log_api;
     unsigned int notification_count;
+    unsigned int boot_map_little;
+    unsigned int boot_map_big;
 } ctx;
 
+static const fwk_id_t little_cluster_ppu =
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_PPU, JUNO_PPU_DEV_IDX_LITTLE_SSTOP);
+
+static const fwk_id_t big_cluster_ppu =
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_PPU, JUNO_PPU_DEV_IDX_BIG_SSTOP);
+
+static const fwk_id_t core_ppu_table_little[] = {
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_PPU, JUNO_PPU_DEV_IDX_LITTLE_CPU0),
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_PPU, JUNO_PPU_DEV_IDX_LITTLE_CPU1),
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_PPU, JUNO_PPU_DEV_IDX_LITTLE_CPU2),
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_PPU, JUNO_PPU_DEV_IDX_LITTLE_CPU3),
+};
+
+static const fwk_id_t core_ppu_table_big[] = {
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_PPU, JUNO_PPU_DEV_IDX_BIG_CPU0),
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_PPU, JUNO_PPU_DEV_IDX_BIG_CPU1),
+};
+
+static int power_cluster_and_cores_from_boot_map(
+    unsigned int boot_map,
+    fwk_id_t cluster_ppu,
+    const fwk_id_t *core_ppu_table,
+    unsigned int core_ppu_table_size)
+{
+    int status;
+    unsigned int i;
+
+    fwk_assert(core_ppu_table != NULL);
+
+    if (boot_map == 0)
+        return FWK_SUCCESS;
+
+    /* Turn on the cluster */
+    status = ctx.ppu_api->set_state_and_wait(cluster_ppu, MOD_PD_STATE_ON);
+    if (status != FWK_SUCCESS)
+        return FWK_E_DEVICE;
+
+    /*
+     * Turn on the cores using its boot map. (If bit N is set in the boot map,
+     * core N must be powered on)
+     */
+    for (i = 0; i < core_ppu_table_size; ++i) {
+        if (boot_map & (1 << i)) {
+            status = ctx.ppu_api->set_state_and_wait(
+                core_ppu_table[i],
+                MOD_PD_STATE_ON);
+
+            if (status != FWK_SUCCESS)
+                return FWK_E_DEVICE;
+        }
+    }
+
+    return FWK_SUCCESS;
+}
 /*
  * Static helpers
  */
 
 static int deferred_setup(void)
 {
+    int status;
+
+    /* Turn on the required cluster(s) and core(s) using the boot maps */
+    status = power_cluster_and_cores_from_boot_map(
+        ctx.boot_map_little,
+        little_cluster_ppu,
+        core_ppu_table_little,
+        FWK_ARRAY_SIZE(core_ppu_table_little));
+
+    if (status != FWK_SUCCESS) {
+        ctx.log_api->log(
+            MOD_LOG_GROUP_ERROR,
+            "[ROM] ERROR: Failed to turn on LITTLE cluster.\n");
+        return FWK_E_DEVICE;
+    }
+
+    status = power_cluster_and_cores_from_boot_map(
+        ctx.boot_map_big,
+        big_cluster_ppu,
+        core_ppu_table_big,
+        FWK_ARRAY_SIZE(core_ppu_table_big));
+
+    if (status != FWK_SUCCESS) {
+        ctx.log_api->log(
+            MOD_LOG_GROUP_ERROR,
+            "[ROM] ERROR: Failed to turn on big cluster.\n");
+        return FWK_E_DEVICE;
+    }
+
     return FWK_SUCCESS;
 }
 
@@ -100,7 +185,17 @@ static int juno_rom_process_event(
     struct mod_pd_power_state_transition_notification_params
         *notification_params;
 
-    fwk_assert((SCC->GPR1 & SCC_GPR1_BOOT_MAP_ENABLE) == 0);
+    /* Configure the boot maps to power on LITTLE_CPU0 by default */
+    ctx.boot_map_little = 1;
+    ctx.boot_map_big = 0;
+
+    /* If the SCC provides boot maps, use them instead */
+    if (SCC->GPR1 & SCC_GPR1_BOOT_MAP_ENABLE) {
+        ctx.boot_map_little = (SCC->GPR1 & SCC_GPR1_BOOT_MAP_LITTLE) >>
+            SCC_GPR1_BOOT_MAP_LITTLE_POS;
+        ctx.boot_map_big = (SCC->GPR1 & SCC_GPR1_BOOT_MAP_BIG) >>
+            SCC_GPR1_BOOT_MAP_BIG_POS;
+    }
 
     /* Set cryptographic extensions state */
     if (SCC->GPR1 & SCC_GPR1_CRYPTO_DISABLE) {
