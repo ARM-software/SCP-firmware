@@ -296,13 +296,6 @@ static const unsigned int mod_pd_cs_level_state_shift[MOD_PD_LEVEL_COUNT] = {
 static struct mod_pd_ctx mod_pd_ctx;
 static const char driver_error_msg[] = "[PD] Driver error %s (%d) in %s @%d\n";
 
-static const unsigned int tree_pos_level_shift[MOD_PD_LEVEL_COUNT] = {
-    MOD_PD_TREE_POS_LEVEL_0_SHIFT,
-    MOD_PD_TREE_POS_LEVEL_1_SHIFT,
-    MOD_PD_TREE_POS_LEVEL_2_SHIFT,
-    MOD_PD_TREE_POS_LEVEL_3_SHIFT
-};
-
 static const char * const default_state_name_table[] = {
     "OFF", "ON", "SLEEP", "3", "4", "5", "6", "7",
     "8", "9", "10", "11", "12", "13", "14", "15"
@@ -326,14 +319,22 @@ static enum mod_pd_level get_level_from_tree_pos(uint64_t tree_pos)
 
 static uint64_t compute_parent_tree_pos_from_tree_pos(uint64_t tree_pos)
 {
+    unsigned int parent_level;
+    uint64_t tree_pos_mask;
     uint64_t parent_tree_pos;
-    unsigned int level;
 
-    level = get_level_from_tree_pos(tree_pos);
+    parent_level = get_level_from_tree_pos(tree_pos) + 1;
 
-    parent_tree_pos = (tree_pos &
-                       (~((((uint64_t)1) << tree_pos_level_shift[level+1])-1)))
-                      + (((uint64_t)1) << MOD_PD_TREE_POS_LEVEL_SHIFT);
+    /*
+     * Create a mask of bits for levels strictly lower than 'parent_level'. We
+     * use this mask below for clearing off in 'tree_pos' the levels strictly
+     * lower than 'parent_level'.
+     */
+    tree_pos_mask = (UINT64_C(1) <<
+                     (parent_level * MOD_PD_TREE_POS_BITS_PER_LEVEL)) - 1;
+
+    parent_tree_pos = (tree_pos & (~tree_pos_mask)) +
+                      (UINT64_C(1) << MOD_PD_TREE_POS_LEVEL_SHIFT);
 
     return parent_tree_pos;
 }
