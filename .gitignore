@@ -1,0 +1,45 @@
+# Default output directory
+/build/
+
+# Backup and Temporary Files
+*.bak
+*~
+*.swp
+
+# C Object Files
+*.o
+*.a
+*.d
+
+# Ctags Index
+tags
+
+# Eclipse IDE
+.cproject
+.project
+.settings
+.externalToolBuilders
+*.pydevproject
+
+# Git
+*.orig
+
+# Intellij IDE
+.idea
+
+# Python Bytecode
+*.pyc
+
+# QtCreator IDE
+*.config
+*.creator
+*.creator.user*
+*.files
+*.includes
+
+# Sublime Text Editor
+*.sublime-project
+*.sublime-workspace
+
+# Visual Studio Code IDE
+.vscode/
