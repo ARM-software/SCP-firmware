@@ -1,0 +1,191 @@
+/*
+ * Arm SCP/MCP Software
+ * Copyright (c) 2015-2018, Arm Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Description:
+ *      SCMI Clock Management Protocol Support
+ */
+
+#ifndef SCMI_CLOCK_H
+#define SCMI_CLOCK_H
+
+#define SCMI_PROTOCOL_ID_CLOCK      UINT32_C(0x14)
+#define SCMI_PROTOCOL_VERSION_CLOCK UINT32_C(0x10000)
+
+/*
+ * Identifiers of the SCMI Clock Management Protocol commands
+ */
+enum scmi_clock_command_id {
+    SCMI_CLOCK_ATTRIBUTES =     0x003,
+    SCMI_CLOCK_DESCRIBE_RATES = 0x004,
+    SCMI_CLOCK_RATE_SET =       0x005,
+    SCMI_CLOCK_RATE_GET =       0x006,
+    SCMI_CLOCK_CONFIG_SET =     0x007,
+};
+
+/*
+ * Protocol Attributes
+ */
+
+#define SCMI_CLOCK_PROTOCOL_ATTRIBUTES_MAX_PENDING_TRANSITIONS_POS  16
+#define SCMI_CLOCK_PROTOCOL_ATTRIBUTES_CLOCK_COUNT_POS              0
+
+#define SCMI_CLOCK_PROTOCOL_ATTRIBUTES_MAX_PENDING_TRANSITIONS_MASK \
+    (UINT32_C(0xFF) << \
+    SCMI_CLOCK_PROTOCOL_ATTRIBUTES_MAX_PENDING_TRANSITIONS_POS)
+#define SCMI_CLOCK_PROTOCOL_ATTRIBUTES_CLOCK_COUNT_MASK   \
+    (UINT32_C(0xFFFF) << SCMI_CLOCK_PROTOCOL_ATTRIBUTES_CLOCK_COUNT_POS)
+
+#define SCMI_CLOCK_PROTOCOL_ATTRIBUTES(MAX_PENDING_TRANSACTIONS, CLOCK_COUNT) \
+    ( \
+        ((MAX_PENDING_TRANSACTIONS << \
+            SCMI_CLOCK_PROTOCOL_ATTRIBUTES_MAX_PENDING_TRANSITIONS_POS) & \
+            SCMI_CLOCK_PROTOCOL_ATTRIBUTES_MAX_PENDING_TRANSITIONS_MASK) | \
+        (((CLOCK_COUNT) << SCMI_CLOCK_PROTOCOL_ATTRIBUTES_CLOCK_COUNT_POS) & \
+            SCMI_CLOCK_PROTOCOL_ATTRIBUTES_CLOCK_COUNT_MASK) \
+    )
+
+/*
+ * Clock Attributes
+ */
+
+#define SCMI_CLOCK_ATTRIBUTES_ENABLED_POS    0
+
+#define SCMI_CLOCK_ATTRIBUTES_ENABLED_MASK   \
+    (UINT32_C(0x1) << SCMI_CLOCK_ATTRIBUTES_ENABLED_POS)
+
+#define SCMI_CLOCK_ATTRIBUTES(ENABLED) \
+    ( \
+        (((ENABLED) << SCMI_CLOCK_ATTRIBUTES_ENABLED_POS) & \
+            SCMI_CLOCK_ATTRIBUTES_ENABLED_MASK) \
+    )
+
+struct __attribute((packed)) scmi_clock_attributes_a2p {
+    uint32_t clock_id;
+};
+
+#define SCMI_CLOCK_NAME_LENGTH_MAX 16
+
+struct __attribute((packed)) scmi_clock_attributes_p2a {
+    int32_t status;
+    uint32_t attributes;
+    char clock_name[SCMI_CLOCK_NAME_LENGTH_MAX];
+};
+
+/*
+ * Clock Rate Get
+ */
+
+struct __attribute((packed)) scmi_clock_rate_get_a2p {
+    uint32_t clock_id;
+};
+
+struct __attribute((packed)) scmi_clock_rate_get_p2a {
+    int32_t status;
+    uint32_t rate[2];
+};
+
+/*
+ * Clock Rate Set
+ */
+
+/* If set, set the new clock rate asynchronously */
+#define SCMI_CLOCK_RATE_SET_ASYNC_POS                0
+/* If set, do not send a delayed asynchronous response */
+#define SCMI_CLOCK_RATE_SET_NO_DELAYED_RESPONSE_POS  1
+/* Round up, if set, otherwise round down */
+#define SCMI_CLOCK_RATE_SET_ROUND_UP_POS           2
+/* If set, the platform chooses the appropriate rounding mode */
+#define SCMI_CLOCK_RATE_SET_ROUND_AUTO_POS           3
+
+#define SCMI_CLOCK_RATE_SET_ASYNC_MASK \
+    (UINT32_C(0x1) << SCMI_CLOCK_RATE_SET_ASYNC_POS)
+#define SCMI_CLOCK_RATE_SET_NO_DELAYED_RESPONSE_MASK \
+    (UINT32_C(0x1) << SCMI_CLOCK_RATE_SET_NO_DELAYED_RESPONSE_POS)
+#define SCMI_CLOCK_RATE_SET_ROUND_UP_MASK \
+    (UINT32_C(0x1) << SCMI_CLOCK_RATE_SET_ROUND_UP_POS)
+#define SCMI_CLOCK_RATE_SET_ROUND_AUTO_MASK \
+    (UINT32_C(0x1) << SCMI_CLOCK_RATE_SET_ROUND_AUTO_POS)
+
+struct __attribute((packed)) scmi_clock_rate_set_a2p {
+    uint32_t flags;
+    uint32_t clock_id;
+    uint32_t rate[2];
+};
+
+struct __attribute((packed)) scmi_clock_rate_set_p2a {
+    int32_t status;
+};
+
+/*
+ * Clock Config Set
+ */
+
+#define SCMI_CLOCK_CONFIG_SET_ENABLE_POS    0
+
+#define SCMI_CLOCK_CONFIG_SET_ENABLE_MASK \
+    (UINT32_C(0x1) << SCMI_CLOCK_CONFIG_SET_ENABLE_POS)
+
+struct __attribute((packed)) scmi_clock_config_set_a2p {
+    uint32_t clock_id;
+    uint32_t attributes;
+};
+
+struct __attribute((packed)) scmi_clock_config_set_p2a {
+    int32_t status;
+};
+
+/*
+ * Clock Describe Rates
+ */
+
+#define SCMI_CLOCK_RATE_FORMAT_RANGE 1
+#define SCMI_CLOCK_RATE_FORMAT_LIST  0
+
+#define SCMI_CLOCK_DESCRIBE_RATES_REMAINING_POS    16
+#define SCMI_CLOCK_DESCRIBE_RATES_FORMAT_POS       12
+#define SCMI_CLOCK_DESCRIBE_RATES_COUNT_POS        0
+
+#define SCMI_CLOCK_DESCRIBE_RATES_NUM_RATES_FLAGS( \
+    RATE_COUNT, RETURN_FORMAT, REMAINING_RATES) \
+    ( \
+        ((RATE_COUNT << \
+            SCMI_CLOCK_DESCRIBE_RATES_COUNT_POS) & \
+            SCMI_CLOCK_DESCRIBE_RATES_COUNT_MASK) | \
+        ((REMAINING_RATES << SCMI_CLOCK_DESCRIBE_RATES_REMAINING_POS) & \
+            SCMI_CLOCK_DESCRIBE_RATES_REMAINING_MASK) | \
+        ((RETURN_FORMAT << SCMI_CLOCK_DESCRIBE_RATES_FORMAT_POS) & \
+            SCMI_CLOCK_DESCRIBE_RATES_FORMAT_MASK) \
+    )
+
+#define SCMI_CLOCK_DESCRIBE_RATES_REMAINING_MASK \
+    (UINT32_C(0xFFFF) << SCMI_CLOCK_DESCRIBE_RATES_REMAINING_POS)
+#define SCMI_CLOCK_DESCRIBE_RATES_FORMAT_MASK \
+    (UINT32_C(0x1) << SCMI_CLOCK_DESCRIBE_RATES_FORMAT_POS)
+#define SCMI_CLOCK_DESCRIBE_RATES_COUNT_MASK \
+    (UINT32_C(0xFFF) << SCMI_CLOCK_DESCRIBE_RATES_COUNT_POS)
+
+#define SCMI_CLOCK_RATES_MAX(MAILBOX_SIZE) \
+    ((sizeof(struct scmi_clock_describe_rates_p2a) < (MAILBOX_SIZE))  ? \
+     (((MAILBOX_SIZE) - sizeof(struct scmi_clock_describe_rates_p2a))   \
+        / sizeof(struct scmi_clock_rate)) : 0)
+
+struct __attribute((packed)) scmi_clock_rate {
+    uint32_t low;
+    uint32_t high;
+};
+
+struct __attribute((packed)) scmi_clock_describe_rates_a2p {
+    uint32_t clock_id;
+    uint32_t rate_index;
+};
+
+struct __attribute((packed)) scmi_clock_describe_rates_p2a {
+    int32_t status;
+    uint32_t num_rates_flags;
+    struct scmi_clock_rate rates[];
+};
+
+#endif /* SCMI_CLOCK_H */

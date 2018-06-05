@@ -69,6 +69,12 @@ def main():
     result = subprocess.call(cmd, shell=True)
     results.append(('Product host build', result))
 
+    banner('Test building sgm775 product')
+
+    cmd = 'CROSS_COMPILE=arm-none-eabi- PRODUCT=sgm775 make'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product sgm775 build', result))
+
     banner('Tests summary')
 
     total_success = 0
