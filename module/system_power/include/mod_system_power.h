@@ -95,16 +95,19 @@ struct mod_system_power_driver_api {
  * \brief API indices.
  */
 enum mod_system_power_api_idx {
+#if BUILD_HAS_MOD_SYSTEM_POWER
     /*! API index for the power domain driver API */
     MOD_SYSTEM_POWER_API_IDX_PD_DRIVER,
 
     /*! API index for the power domain driver input API */
     MOD_SYSTEM_POWER_API_IDX_PD_DRIVER_INPUT,
+#endif
 
     /*! Number of exposed APIs */
     MOD_SYSTEM_POWER_API_COUNT
 };
 
+#if BUILD_HAS_MOD_SYSTEM_POWER
 /*! Identifier of the power domain driver API */
 static const fwk_id_t mod_system_power_api_id_pd_driver =
     FWK_ID_API_INIT(FWK_MODULE_IDX_SYSTEM_POWER,
@@ -114,6 +117,7 @@ static const fwk_id_t mod_system_power_api_id_pd_driver =
 static const fwk_id_t mod_system_power_api_id_pd_driver_input =
     FWK_ID_API_INIT(FWK_MODULE_IDX_SYSTEM_POWER,
                     MOD_SYSTEM_POWER_API_IDX_PD_DRIVER_INPUT);
+#endif
 
 /*!
  * \}
