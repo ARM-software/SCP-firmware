@@ -7,4 +7,5 @@
 
 BS_PRODUCT_NAME := juno
 BS_FIRMWARE_LIST := scp_romfw \
-                    scp_romfw_bypass
+                    scp_romfw_bypass \
+                    scp_ramfw
