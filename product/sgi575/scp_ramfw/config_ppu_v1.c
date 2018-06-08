@@ -14,10 +14,12 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <mod_cmn600.h>
+#include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
 #include <scp_sgi575_irq.h>
 #include <scp_sgi575_mmap.h>
 #include <sgi575_core.h>
+#include <config_power_domain.h>
 
 /* Maximum PPU core name size including the null terminator */
 #define PPU_CORE_NAME_SIZE 12
@@ -27,6 +29,13 @@
 
 /* Lookup table for translating cluster indexes into CMN600 node IDs */
 static const unsigned int cluster_idx_to_node_id[] = {44, 64};
+
+/* Module configuration data */
+static struct mod_ppu_v1_config ppu_v1_config_data = {
+    .pd_notification_id = FWK_ID_NOTIFICATION_INIT(
+        FWK_MODULE_IDX_POWER_DOMAIN,
+        MOD_PD_NOTIFICATION_IDX_POWER_STATE_TRANSITION),
+};
 
 static struct fwk_element ppu_v1_system_element_table[] = {
     [0] = {
@@ -132,6 +141,14 @@ static const struct fwk_element *ppu_v1_get_element_table(fwk_id_t module_id)
            ppu_v1_system_element_table,
            sizeof(ppu_v1_system_element_table));
 
+    /*
+     * Configure pd_source_id with the SYSTOP identifier from the power domain
+     * module which is dynamically defined based on the number of cores.
+     */
+    ppu_v1_config_data.pd_source_id = fwk_id_build_element_id(
+        fwk_module_id_power_domain,
+        core_count + PD_STATIC_DEV_IDX_SYSTOP);
+
     return element_table;
 }
 
@@ -140,4 +157,5 @@ static const struct fwk_element *ppu_v1_get_element_table(fwk_id_t module_id)
  */
 const struct fwk_module_config config_ppu_v1 = {
     .get_element_table = ppu_v1_get_element_table,
+    .data = &ppu_v1_config_data,
 };
