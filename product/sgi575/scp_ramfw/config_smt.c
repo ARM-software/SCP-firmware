@@ -14,6 +14,8 @@
 #include <scp_software_mmap.h>
 #include <scp_sgi575_mhu.h>
 #include <scp_sgi575_scmi.h>
+#include <sgi575_core.h>
+#include <config_power_domain.h>
 
 static const struct fwk_element smt_element_table[] = {
     [SCP_SGI575_SCMI_SERVICE_IDX_PSCI] = {
@@ -45,6 +47,15 @@ static const struct fwk_element smt_element_table[] = {
 
 static const struct fwk_element *smt_get_element_table(fwk_id_t module_id)
 {
+    unsigned int idx;
+    struct mod_smt_channel_config *config;
+
+    for (idx = 0; idx < SCP_SGI575_SCMI_SERVICE_IDX_COUNT; idx++) {
+        config = (struct mod_smt_channel_config *)(smt_element_table[idx].data);
+        config->pd_source_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN,
+            sgi575_core_get_core_count() + PD_STATIC_DEV_IDX_SYSTOP);
+    }
+
     return smt_element_table;
 }
 
