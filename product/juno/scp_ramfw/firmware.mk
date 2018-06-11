@@ -30,6 +30,7 @@ BS_FIRMWARE_MODULES := \
     mhu \
     smt \
     scmi \
+    scmi_power_domain \
     sds
 
 BS_FIRMWARE_SOURCES := \
