@@ -13,7 +13,8 @@ BS_FIRMWARE_HAS_MULTITHREADING := yes
 BS_FIRMWARE_HAS_NOTIFICATION := yes
 
 BS_FIRMWARE_MODULE_HEADERS_ONLY := \
-    power_domain
+    power_domain \
+    system_power
 
 BS_FIRMWARE_MODULES := \
     log \
@@ -21,6 +22,7 @@ BS_FIRMWARE_MODULES := \
     clock \
     gtimer \
     timer \
+    juno_ppu \
     sds
 
 BS_FIRMWARE_SOURCES := \
@@ -30,6 +32,7 @@ BS_FIRMWARE_SOURCES := \
     config_log.c \
     config_clock.c \
     juno_id.c \
-    config_timer.c
+    config_timer.c \
+    config_juno_ppu.c
 
 include $(BS_DIR)/firmware.mk
