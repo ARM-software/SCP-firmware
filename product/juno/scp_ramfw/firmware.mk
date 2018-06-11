@@ -31,6 +31,7 @@ BS_FIRMWARE_MODULES := \
     smt \
     scmi \
     scmi_power_domain \
+    scmi_system_power \
     sds
 
 BS_FIRMWARE_SOURCES := \
@@ -49,6 +50,7 @@ BS_FIRMWARE_SOURCES := \
     config_power_domain.c \
     config_mhu.c \
     config_smt.c \
-    config_scmi.c
+    config_scmi.c \
+    config_scmi_system_power.c
 
 include $(BS_DIR)/firmware.mk
