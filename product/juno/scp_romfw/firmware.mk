@@ -22,6 +22,7 @@ BS_FIRMWARE_MODULES := \
     gtimer
 
 BS_FIRMWARE_SOURCES := \
+    juno_id.c \
     config_clock.c \
     config_log.c \
     config_timer.c
