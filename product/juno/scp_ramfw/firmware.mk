@@ -26,6 +26,7 @@ BS_FIRMWARE_SOURCES := \
     juno_utils.c \
     config_sds.c \
     config_log.c \
-    config_clock.c
+    config_clock.c \
+    juno_id.c
 
 include $(BS_DIR)/firmware.mk
