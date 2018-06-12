@@ -282,8 +282,14 @@ static int smt_slave_handler(struct smt_channel_ctx *channel_ctx)
     out = channel_ctx->out;
 
     /* Check we have ownership of the mailbox */
-    if (memory->status & MOD_SMT_MAILBOX_STATUS_FREE_MASK)
+    if (memory->status & MOD_SMT_MAILBOX_STATUS_FREE_MASK) {
+        smt_ctx.log_api->log(
+            MOD_LOG_GROUP_ERROR,
+            "[SMT] Mailbox ownership error on channel %u\n",
+            fwk_id_get_element_idx(channel_ctx->id));
+
         return FWK_E_STATE;
+    }
 
     /* Commit to sending a response */
     channel_ctx->locked = true;
