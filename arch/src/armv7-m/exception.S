@@ -32,8 +32,7 @@ exceptions:
 
     .global exception_invalid
     .thumb_func
-    .func exception_invalid
+    .type exception_invalid, %function
 exception_invalid:
     wfi
     b       exception_invalid
-    .endfunc
