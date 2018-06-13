@@ -11,7 +11,7 @@
 
     .global start
     .thumb_func
-    .func start
+    .type start, %function
 start:
     /* Load .data, which is 4-byte aligned */
     ldr     r1, =__DATA_SIZE__
@@ -47,4 +47,3 @@ start:
     wfi
     b 9b
     .pool
-    .endfunc

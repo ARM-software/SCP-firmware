@@ -11,7 +11,7 @@
 
     .global exception_reset
     .thumb_func
-    .func exception_reset
+    .type exception_reset, %function
 exception_reset:
     /*
      * Set up the Configuration Control Register (CCR) in the System Control
@@ -34,4 +34,3 @@ exception_reset:
 
     bl      start
     .pool
-    .endfunc
