@@ -11,9 +11,9 @@
 #ifndef FWK_EVENT_H
 #define FWK_EVENT_H
 
-#include <stdalign.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <fwk_align.h>
 #include <fwk_id.h>
 #include <fwk_list.h>
 

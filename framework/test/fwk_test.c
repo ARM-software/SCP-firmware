@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <fwk_errno.h>
+#include <fwk_noreturn.h>
 #include <fwk_test.h>
 
 /* Test information provided by the test suite */
@@ -16,7 +17,7 @@ extern struct fwk_test_suite_desc test_suite;
 
 static jmp_buf test_buf_context;
 
-__attribute__((noreturn)) void __assert_fail(const char *assertion,
+noreturn void __assert_fail(const char *assertion,
     const char *file, unsigned int line, const char *function)
 {
     printf("Assertion failed: %s\n", assertion);

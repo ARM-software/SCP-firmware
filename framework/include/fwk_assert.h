@@ -10,7 +10,11 @@
 
 #include <assert.h>
 #include <stdbool.h>
-#include <stdnoreturn.h>
+#include <fwk_noreturn.h>
+
+#ifndef static_assert
+#   define static_assert _Static_assert
+#endif
 
 /*!
  * \addtogroup GroupLibFramework

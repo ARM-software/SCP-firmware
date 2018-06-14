@@ -11,13 +11,13 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdnoreturn.h>
 #include <string.h>
 #include <fwk_assert.h>
 #include <fwk_errno.h>
 #include <fwk_interrupt.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+#include <fwk_noreturn.h>
 #include <fwk_notification.h>
 #include <fwk_thread.h>
 #include <mod_bootloader.h>

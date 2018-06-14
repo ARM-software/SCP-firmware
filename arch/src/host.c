@@ -9,13 +9,14 @@
 #include <stdlib.h>
 #include <fwk_arch.h>
 #include <fwk_errno.h>
+#include <fwk_noreturn.h>
 
 extern int host_interrupt_init(struct fwk_arch_interrupt_driver **driver);
 
 /*
  * Catches early failures in the initialization.
  */
-static void __attribute__((noreturn)) panic(void)
+static noreturn void panic(void)
 {
     printf("Panic!\n");
     exit(1);

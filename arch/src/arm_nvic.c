@@ -11,12 +11,12 @@
 #include <limits.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <stdnoreturn.h>
 #include <fwk_arch.h>
 #include <fwk_errno.h>
 #include <fwk_interrupt.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
+#include <fwk_noreturn.h>
 #include <cmsis_compiler.h>
 
 #ifdef BUILD_HAS_MULTITHREADING
