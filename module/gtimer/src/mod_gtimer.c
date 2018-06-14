@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <fwk_errno.h>
 #include <fwk_id.h>
+#include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_notification.h>
@@ -20,6 +21,7 @@
 
 #define GTIMER_FREQUENCY_MIN_HZ  UINT32_C(1)
 #define GTIMER_FREQUENCY_MAX_HZ  UINT32_C(1000000000)
+#define GTIMER_MIN_TIMESTAMP 2000
 
 /* Device content */
 struct dev_ctx {
@@ -70,14 +72,59 @@ static int disable(fwk_id_t dev_id)
     return FWK_SUCCESS;
 }
 
+static int get_counter(fwk_id_t dev_id, uint64_t *value)
+{
+    const struct dev_ctx *ctx;
+    int status;
+    uint32_t counter_low;
+    uint32_t counter_high;
+
+    status = fwk_module_check_call(dev_id);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    ctx = ctx_table + fwk_id_get_element_idx(dev_id);
+
+    /*
+     * To avoid race conditions where the high half of the counter increments
+     * after it has been sampled but before the low half is sampled, the values
+     * are resampled until the high half has stabilized. This assumes that the
+     * loop is faster than the high half incrementation.
+     */
+    do {
+        counter_high = ctx->hw_timer->PCTH;
+        counter_low = ctx->hw_timer->PCTL;
+    } while (counter_high != ctx->hw_timer->PCTH);
+
+    *value = ((uint64_t)counter_high << 32) | counter_low;
+
+    return FWK_SUCCESS;
+}
+
 static int set_timer(fwk_id_t dev_id, uint64_t timestamp)
 {
     struct dev_ctx *ctx;
+    uint64_t counter;
     int status;
 
     status = fwk_module_check_call(dev_id);
     if (status != FWK_SUCCESS)
         return status;
+
+    status = get_counter(dev_id, &counter);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    /*
+     * If an alarm's period is very small, the timer device could be configured
+     * to interrupt on a timestamp that is "in the past". In this case, with the
+     * current FVP implementation an interrupt will not be generated. To avoid
+     * this issue, the minimum timestamp is GTIMER_MIN_TIMESTAMP ticks from now.
+     *
+     * It is assumed here that the 64-bit counter will never loop back during
+     * the course of the execution (@1GHz it would loop back after ~585 years).
+     */
+    timestamp = FWK_MAX(counter + GTIMER_MIN_TIMESTAMP, timestamp);
 
     ctx = ctx_table + fwk_id_get_element_idx(dev_id);
 
@@ -108,32 +155,6 @@ static int get_timer(fwk_id_t dev_id, uint64_t *timestamp)
     value.high = ctx->hw_timer->P_CVALH;
 
     *timestamp = *(uint64_t *)&value;
-    return FWK_SUCCESS;
-}
-
-static int get_counter(fwk_id_t dev_id, uint64_t *value)
-{
-    struct dev_ctx *ctx;
-    int status;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
-    ctx = ctx_table + fwk_id_get_element_idx(dev_id);
-
-    struct {
-        uint32_t low;
-        uint32_t high;
-    } counter;
-
-    /* Read 64-bit counter value */
-    do {
-        counter.high = ctx->hw_timer->PCTH;
-        counter.low = ctx->hw_timer->PCTL;
-    } while (counter.high != ctx->hw_timer->PCTH);
-
-    *value = *(uint64_t *)&counter;
     return FWK_SUCCESS;
 }
 
