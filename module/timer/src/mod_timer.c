@@ -546,7 +546,7 @@ static int timer_bind(fwk_id_t id, unsigned int round)
 {
     int status;
     struct dev_ctx *ctx;
-    struct mod_timer_driver_api *driver;
+    struct mod_timer_driver_api *driver = NULL;
     unsigned int driver_module_idx;
 
     /* Nothing to do after the initial round. */

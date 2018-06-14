@@ -327,7 +327,7 @@ static int log_init(fwk_id_t module_id, unsigned int element_count,
 static int log_bind(fwk_id_t id, unsigned int round)
 {
     int status;
-    struct mod_log_driver_api *driver;
+    struct mod_log_driver_api *driver = NULL;
 
     /* Skip second round */
     if (round == 1)

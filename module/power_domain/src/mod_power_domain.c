@@ -1714,7 +1714,7 @@ static int pd_bind(fwk_id_t id, unsigned int round)
     int status;
     struct pd_ctx *pd;
     const struct mod_power_domain_element_config *config;
-    struct mod_pd_driver_api *driver_api;
+    struct mod_pd_driver_api *driver_api = NULL;
 
     /* Nothing to do but during the first round of calls */
     if (round != 0)

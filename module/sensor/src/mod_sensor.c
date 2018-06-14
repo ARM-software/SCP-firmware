@@ -128,7 +128,7 @@ static int sensor_bind(fwk_id_t id, unsigned int round)
 {
     struct sensor_dev_ctx *ctx;
     int status;
-    struct mod_sensor_driver_api *driver;
+    struct mod_sensor_driver_api *driver = NULL;
 
     if ((round > 0) || fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         /*
