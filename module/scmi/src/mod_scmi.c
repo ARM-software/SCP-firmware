@@ -620,10 +620,10 @@ static int scmi_bind(fwk_id_t id, unsigned int round)
 {
     int status;
     struct scmi_service_ctx *ctx;
-    const struct mod_scmi_to_transport_api *transport_api;
+    const struct mod_scmi_to_transport_api *transport_api = NULL;
     unsigned int protocol_idx;
     struct scmi_protocol *protocol;
-    struct mod_scmi_to_protocol_api *protocol_api;
+    struct mod_scmi_to_protocol_api *protocol_api = NULL;
     uint8_t scmi_protocol_id;
 
     if (round == 0) {
