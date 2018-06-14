@@ -11,6 +11,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <fwk_assert.h>
 #include <fwk_element.h>
 #include <fwk_errno.h>
 #include <fwk_event.h>
@@ -115,6 +116,29 @@ static int _timestamp_from_now(struct dev_ctx *ctx,
         return status;
 
     *timestamp += counter;
+
+    return FWK_SUCCESS;
+}
+
+static int _remaining(const struct dev_ctx *ctx,
+                      uint64_t timestamp,
+                      uint64_t *remaining_ticks)
+{
+    int status;
+    uint64_t counter;
+
+    fwk_assert(ctx != NULL);
+    fwk_assert(remaining_ticks != NULL);
+
+    status = ctx->driver->get_counter(ctx->driver_dev_id, &counter);
+    if (!fwk_expect(status == FWK_SUCCESS))
+        return status;
+
+    /* If timestamp is in the past, remaining_ticks is set to zero. */
+    if (timestamp < counter)
+        *remaining_ticks = 0;
+    else
+        *remaining_ticks = timestamp - counter;
 
     return FWK_SUCCESS;
 }
@@ -309,7 +333,6 @@ static int remaining(fwk_id_t dev_id,
 {
     struct dev_ctx *ctx;
     int status;
-    uint64_t counter;
 
     status = fwk_module_check_call(dev_id);
     if (status != FWK_SUCCESS)
@@ -320,16 +343,48 @@ static int remaining(fwk_id_t dev_id,
     if (remaining_ticks == NULL)
         return FWK_E_PARAM;
 
-    status = ctx->driver->get_counter(ctx->driver_dev_id, &counter);
+    return _remaining(ctx, timestamp, remaining_ticks);
+}
+
+static int get_next_alarm_remaining(fwk_id_t dev_id,
+                                    bool *has_alarm,
+                                    uint64_t *remaining_ticks)
+{
+    int status;
+    const struct dev_ctx *ctx;
+    const struct alarm_ctx *alarm_ctx;
+    const struct fwk_dlist_node *alarm_ctx_node;
+
+    status = fwk_module_check_call(dev_id);
     if (status != FWK_SUCCESS)
         return status;
 
-    if (timestamp <= counter)
-        *remaining_ticks = 0;
-    else
-        *remaining_ticks = timestamp - counter;
+    if (has_alarm == NULL)
+        return FWK_E_PARAM;
 
-    return FWK_SUCCESS;
+    if (remaining_ticks == NULL)
+        return FWK_E_PARAM;
+
+    ctx = &ctx_table[fwk_id_get_element_idx(dev_id)];
+
+    /*
+     * The timer interrupt is disabled to ensure that the alarm list is not
+     * modified while we are trying to read it below.
+     */
+    ctx->driver->disable(ctx->driver_dev_id);
+
+    *has_alarm = !fwk_list_is_empty(&ctx->alarms_active);
+
+    if (*has_alarm) {
+        alarm_ctx_node = fwk_list_head(&ctx->alarms_active);
+        alarm_ctx = FWK_LIST_GET(alarm_ctx_node, struct alarm_ctx, node);
+
+        status = _remaining(ctx, alarm_ctx->timestamp, remaining_ticks);
+    }
+
+    ctx->driver->enable(ctx->driver_dev_id);
+
+    return status;
 }
 
 static const struct mod_timer_api timer_api = {
@@ -339,6 +394,7 @@ static const struct mod_timer_api timer_api = {
     .delay = delay,
     .wait = wait,
     .remaining = remaining,
+    .get_next_alarm_remaining = get_next_alarm_remaining,
 };
 
 /*

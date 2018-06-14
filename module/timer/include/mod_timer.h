@@ -223,6 +223,27 @@ struct mod_timer_api {
     int (*remaining)(fwk_id_t dev_id,
                      uint64_t timestamp,
                      uint64_t *remaining_ticks);
+
+    /*!
+     * \brief Get the number of ticks before the next alarm trigger of a given
+     *      timer.
+     *
+     * \warning If the timer has no active alarm, \p remaining_ticks is not
+     *      initialized.
+     *
+     * \param dev_id Element identifier that identifies the timer device.
+     * \param [out] has_alarm \c true if the timer has an active alarm,
+     *      otherwise \c false.
+     * \param [out] remaining_ticks Number of ticks between now and the next
+     *      alarm trigger of the timer identified by \p dev_id.
+     *
+     * \retval FWK_SUCCESS Operation succeeded.
+     * \retval FWK_E_PARAM One of the parameters is invalid.
+     * \return One of the other specific error codes described by the framework.
+     */
+    int (*get_next_alarm_remaining)(fwk_id_t dev_id,
+                                    bool *has_alarm,
+                                    uint64_t *remaining_ticks);
 };
 
 /*!
