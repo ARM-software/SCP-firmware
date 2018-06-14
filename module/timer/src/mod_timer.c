@@ -146,28 +146,11 @@ static int _remaining(const struct dev_ctx *ctx,
 static void _configure_timer_with_next_alarm(struct dev_ctx *ctx)
 {
     struct alarm_ctx *alarm_head;
-    uint64_t counter = 0;
-    int status;
 
     assert(ctx != NULL);
 
     alarm_head = (struct alarm_ctx *)fwk_list_head(&ctx->alarms_active);
     if (alarm_head != NULL) {
-        /*
-         * If an alarm's period is very small, the timer device could be
-         * configured to interrupt on a timestamp that is "in the past" by the
-         * time interrupts are enabled. In this case, the interrupt will not be
-         * generated due to a model bug. This code can be deleted once this bug
-         * has been fixed.
-         *
-         * If this alarm occurs very soon, process it immediately to avoid
-         * potentially missing the interrupt and waiting forever.
-         */
-        status = ctx->driver->get_counter(ctx->driver_dev_id, &counter);
-        if ((status == FWK_SUCCESS) &&
-            (counter + 2000 >= alarm_head->timestamp))
-            timer_isr((uintptr_t)ctx);
-
         /* Configure timer device */
         ctx->driver->set_timer(ctx->driver_dev_id, alarm_head->timestamp);
         ctx->driver->enable(ctx->driver_dev_id);
@@ -486,10 +469,8 @@ static void timer_isr(uintptr_t ctx_ptr)
 {
     int status;
     struct alarm_ctx *alarm;
-    struct alarm_ctx *alarm_head;
     struct dev_ctx *ctx = (struct dev_ctx *)ctx_ptr;
     uint64_t timestamp = 0;
-    uint64_t counter = 0;
     struct fwk_event event;
 
     assert(ctx != NULL);
@@ -498,7 +479,6 @@ static void timer_isr(uintptr_t ctx_ptr)
     ctx->driver->disable(ctx->driver_dev_id);
     fwk_interrupt_clear_pending(ctx->config->timer_irq);
 
-process_alarm:
     alarm = (struct alarm_ctx *)fwk_list_pop_head(&ctx->alarms_active);
 
     if (alarm == NULL) {
@@ -535,28 +515,7 @@ process_alarm:
                          "back into queue.\n");
     }
 
-    alarm_head = FWK_LIST_GET(fwk_list_head(&ctx->alarms_active),
-                              struct alarm_ctx,
-                              node);
-    if (alarm_head != NULL) {
-        /*
-         * If successive alarm item timestamps are very close together, the
-         * timer device could be configured to interrupt on a timestamp that is
-         * "in the past". In this case, the interrupt will not be generated due
-         * to a model bug. This code can be deleted once this bug has been
-         * fixed.
-         *
-         * If the next alarm occurs very soon, process it immidiately to avoid
-         * potentially missing the interrupt and waiting forever.
-         */
-        status = ctx->driver->get_counter(ctx->driver_dev_id, &counter);
-        if ((status == FWK_SUCCESS) &&
-            (counter + 2000 >= alarm_head->timestamp))
-            goto process_alarm;
-
-        ctx->driver->set_timer(ctx->driver_dev_id, alarm_head->timestamp);
-        ctx->driver->enable(ctx->driver_dev_id);
-    }
+    _configure_timer_with_next_alarm(ctx);
 }
 
 /*
