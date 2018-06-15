@@ -12,15 +12,18 @@ BS_FIRMWARE_CPU := cortex-m3
 BS_FIRMWARE_HAS_MULTITHREADING := no
 BS_FIRMWARE_HAS_NOTIFICATION := yes
 BS_FIRMWARE_MODULE_HEADERS_ONLY := \
-    power_domain
+    power_domain \
+    timer
 
 BS_FIRMWARE_MODULES := \
     clock \
     pl011 \
-    log
+    log \
+    gtimer
 
 BS_FIRMWARE_SOURCES := \
     config_clock.c \
-    config_log.c
+    config_log.c \
+    config_timer.c
 
 include $(BS_DIR)/firmware.mk
