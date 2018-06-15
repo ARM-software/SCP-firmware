@@ -58,6 +58,17 @@ static const fwk_id_t mod_juno_rom_notification_id_systop =
         MOD_JUNO_ROM_NOTIFICATION_IDX_SYSTOP);
 
 /*!
+ * \brief Module configuration.
+ */
+struct mod_juno_rom_config {
+    /*! Base address of the AP context area */
+    uintptr_t ap_context_base;
+
+    /*! Size of the AP context area */
+    size_t ap_context_size;
+};
+
+/*!
  * \}
  */
 
