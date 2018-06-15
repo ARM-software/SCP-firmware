@@ -9,10 +9,12 @@
 #include <fwk_assert.h>
 #include <fwk_errno.h>
 #include <fwk_id.h>
+#include <fwk_interrupt.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_thread.h>
+#include <mod_bootloader.h>
 #include <mod_juno_ppu.h>
 #include <mod_juno_rom.h>
 #include <mod_log.h>
@@ -27,6 +29,7 @@ static struct {
     const struct mod_juno_rom_config *config;
     const struct mod_juno_ppu_rom_api *ppu_api;
     struct mod_log_api *log_api;
+    struct mod_bootloader_api *bootloader_api;
     unsigned int notification_count;
     unsigned int boot_map_little;
     unsigned int boot_map_big;
@@ -49,6 +52,10 @@ static const fwk_id_t core_ppu_table_big[] = {
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_PPU, JUNO_PPU_DEV_IDX_BIG_CPU0),
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_PPU, JUNO_PPU_DEV_IDX_BIG_CPU1),
 };
+
+/*
+ * Static helpers
+ */
 
 static int power_cluster_and_cores_from_boot_map(
     unsigned int boot_map,
@@ -86,9 +93,25 @@ static int power_cluster_and_cores_from_boot_map(
 
     return FWK_SUCCESS;
 }
+
 /*
- * Static helpers
+ * This function assumes that the RAM firmware image is located at the beginning
+ * of the SCP SRAM. The reset handler will be at offset 0x4.
  */
+static noreturn void jump_to_ramfw(void)
+{
+    uintptr_t *reset_base = NULL;
+    void (*ramfw_reset_handler)(void);
+
+    fwk_interrupt_global_disable();
+
+    reset_base = (uintptr_t *)(ctx.config->ramfw_base + 0x4);
+    ramfw_reset_handler = (void (*)(void))*reset_base;
+    ramfw_reset_handler();
+
+    while (true)
+        continue;
+}
 
 static int deferred_setup(void)
 {
@@ -120,6 +143,15 @@ static int deferred_setup(void)
             "[ROM] ERROR: Failed to turn on big cluster.\n");
         return FWK_E_DEVICE;
     }
+
+    status = ctx.bootloader_api->load_image();
+    if (status != FWK_SUCCESS) {
+        ctx.log_api->log(MOD_LOG_GROUP_ERROR,
+                         "[ROM] ERROR: Failed to load RAM firmware image\n");
+        return FWK_E_DATA;
+    }
+
+    jump_to_ramfw();
 
     return FWK_SUCCESS;
 }
@@ -159,6 +191,13 @@ static int juno_rom_bind(fwk_id_t id, unsigned int round)
         return FWK_E_PANIC;
 
     status = fwk_module_bind(fwk_module_id_log, MOD_LOG_API_ID, &ctx.log_api);
+    if (!fwk_expect(status == FWK_SUCCESS))
+        return FWK_E_PANIC;
+
+    status = fwk_module_bind(
+        fwk_module_id_bootloader,
+        FWK_ID_API(FWK_MODULE_IDX_BOOTLOADER, 0),
+        &ctx.bootloader_api);
     if (!fwk_expect(status == FWK_SUCCESS))
         return FWK_E_PANIC;
 
