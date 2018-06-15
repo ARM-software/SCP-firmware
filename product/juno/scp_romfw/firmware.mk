@@ -11,11 +11,15 @@
 BS_FIRMWARE_CPU := cortex-m3
 BS_FIRMWARE_HAS_MULTITHREADING := no
 BS_FIRMWARE_HAS_NOTIFICATION := yes
+
 BS_FIRMWARE_MODULE_HEADERS_ONLY := \
     power_domain \
+    system_power \
+    psu \
     timer
 
 BS_FIRMWARE_MODULES := \
+    juno_ppu \
     clock \
     pl011 \
     log \
@@ -26,6 +30,7 @@ BS_FIRMWARE_MODULES := \
 BS_FIRMWARE_SOURCES := \
     juno_utils.c \
     juno_id.c \
+    config_juno_ppu.c \
     config_clock.c \
     config_log.c \
     config_timer.c \
