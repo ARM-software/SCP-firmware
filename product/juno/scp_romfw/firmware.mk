@@ -20,6 +20,7 @@ BS_FIRMWARE_MODULE_HEADERS_ONLY := \
 
 BS_FIRMWARE_MODULES := \
     juno_ppu \
+    juno_rom \
     clock \
     pl011 \
     log \
@@ -31,6 +32,7 @@ BS_FIRMWARE_SOURCES := \
     juno_utils.c \
     juno_id.c \
     config_juno_ppu.c \
+    config_juno_rom.c \
     config_clock.c \
     config_log.c \
     config_timer.c \
