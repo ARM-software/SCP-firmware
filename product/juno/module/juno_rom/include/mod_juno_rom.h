@@ -66,6 +66,9 @@ struct mod_juno_rom_config {
 
     /*! Size of the AP context area */
     size_t ap_context_size;
+
+    /*! Base address of the RAM firmware image */
+    uintptr_t ramfw_base;
 };
 
 /*!
