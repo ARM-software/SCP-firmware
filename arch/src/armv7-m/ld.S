@@ -165,23 +165,25 @@ SECTIONS {
         . = . + STACK_SIZE;
     } > stack
 
-    __TEXT_START__ = LOADADDR(.text);
-    __TEXT_SIZE__ = SIZEOF(.text);
-    __TEXT_END__ = __TEXT_START__ + __TEXT_SIZE__;
+    __text_start__ = LOADADDR(.text);
+    __text_size__ = SIZEOF(.text);
+    __text_end__ = __text_start__ + __text_size__;
 
-    __STACK_START__ = LOADADDR(.stack);
-    __STACK_SIZE__ = SIZEOF(.stack);
-    __STACK_END__ = __STACK_START__ + __STACK_SIZE__;
+    __stack_start__ = LOADADDR(.stack);
+    __stack_size__ = SIZEOF(.stack);
+    __stack_end__ = __stack_start__ + __stack_size__;
 
-    __DATA_LMA_START__ = LOADADDR(.data);
-    __DATA_START__ = ADDR(.data);
-    __DATA_SIZE__ = SIZEOF(.data);
+    __data_lma_start__ = LOADADDR(.data);
+    __data_start__ = ADDR(.data);
+    __data_size__ = SIZEOF(.data);
 
-    __BSS_START__ = ADDR(.bss);
-    __BSS_SIZE__ = SIZEOF(.bss);
-    __BSS_END__ = __BSS_START__ + __BSS_SIZE__;
+    __bss_start__ = ADDR(.bss);
+    __bss_size__ = SIZEOF(.bss);
+    __bss_end__ = __bss_start__ + __bss_size__;
 
-    __HEAP_START__ = __BSS_START__ + __BSS_SIZE__;
-    __HEAP_END__ = __STACK_START__;
-    __HEAP_SIZE__ = __HEAP_END__ - __HEAP_START__;
+    __heap_start__ = __bss_start__ + __bss_size__;
+    __heap_end__ = __stack_start__;
+    __heap_size__ = __heap_end__ - __heap_start__;
+
+    __stack = __stack_end__;
 }

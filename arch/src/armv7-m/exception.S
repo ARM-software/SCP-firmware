@@ -11,7 +11,7 @@
 
     .global exceptions
 exceptions:
-    .word __STACK_END__
+    .word __stack
     .word exception_reset   /* Reset */
     .word exception_invalid /* NMI */
     .word exception_invalid /* HardFault */

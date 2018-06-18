@@ -14,7 +14,6 @@ BS_LIB_SOURCES_armv7-m += armv7-m/reset.S
 BS_LIB_SOURCES_armv7-m += arm_nvic.c
 BS_LIB_SOURCES_armv7-m += arm_main.c
 BS_LIB_SOURCES_armv7-m += arm_mm.c
-BS_LIB_SOURCES_armv7-m += arm_crt0.S
 
 BS_LIB_INCLUDES_armv7-m += $(TOP_DIR)/cmsis/CMSIS/Core/Include/
 

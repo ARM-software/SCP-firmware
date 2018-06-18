@@ -87,8 +87,6 @@ CFLAGS_GCC += -g
 CFLAGS_GCC += -std=c11
 
 CFLAGS_GCC += -fno-exceptions
-CFLAGS_GCC += -ffunction-sections
-CFLAGS_GCC += -fdata-sections
 
 DEP_CFLAGS_GCC = -MD -MP
 
@@ -99,7 +97,6 @@ ASFLAGS_GCC += -g
 ARFLAGS_GCC = -rc
 
 LDFLAGS_GCC += -Wl,--cref
-LDFLAGS_GCC += -Wl,--gc-sections
 
 # Force an undefined reference to the exceptions table so that it is included
 # even if no code refers to it.
