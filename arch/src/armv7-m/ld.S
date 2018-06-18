@@ -130,40 +130,43 @@ MEMORY {
     stack (rw):  ORIGIN = STACK_BASE, LENGTH = STACK_SIZE
 }
 
+#if FIRMWARE_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
+    REGION_ALIAS("mem1", mem0);
+#endif
+
+REGION_ALIAS("vtext", mem0);
+REGION_ALIAS("vdata", mem1);
+REGION_ALIAS("vbss", mem1);
+REGION_ALIAS("vstack", stack);
+
+#if FIRMWARE_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION
+    REGION_ALIAS("ldata", mem1); /* .data is loaded into mem1 by a loader */
+#else
+    REGION_ALIAS("ldata", mem0); /* .data is loaded into mem1 by crt0 */
+#endif
+
 SECTIONS {
     .text : {
         KEEP(*(.exception))
         *(.text*)
         *(.rodata*)
-    } > mem0
+    } > vtext
 
     .data : {
         . = ALIGN(4);
         *(.data*)
         . = ALIGN(4);
-#if FIRMWARE_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
-    } > mem0 /* .data follows .text in mem0 */
-#elif FIRMWARE_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION
-    } > mem1 /* .data is the first section in mem1 */
-#elif FIRMWARE_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_RELOCATION
-    } > mem1 AT>mem0  /* Run-time image is at mem1, but loaded from mem0 */
-#else
-    ASSERT(0, "Unrecognized FIRMWARE_MEM_MODE")
-#endif
+    } > vdata AT>ldata
 
     .bss : {
         . = ALIGN(4);
         *(.bss*)
         . = ALIGN(4);
-#if FIRMWARE_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
-    } > mem0  /* Run-time image is at mem1, but loaded from mem0 */
-#else
-    } > mem1 /* .bss follows .data in mem1 */
-#endif
+    } > vbss
 
     .stack : {
         . = . + STACK_SIZE;
-    } > stack
+    } > vstack
 
     __text_start__ = LOADADDR(.text);
     __text_size__ = SIZEOF(.text);
