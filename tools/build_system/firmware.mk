@@ -6,6 +6,7 @@
 #
 
 include $(BS_DIR)/defs.mk
+include $(BS_DIR)/toolchain.mk
 
 $(info == Building firmware $(FIRMWARE))
 
@@ -88,7 +89,12 @@ vpath %.S $(PRODUCT_DIR)/src
 goal: $(TARGET_BIN)
 
 ifneq ($(BS_ARCH_CPU),host)
-    SCATTER_SRC = $(ARCH_DIR)/src/$(BS_ARCH_ARCH)/ld.S
+    ifeq ($(BS_LINKER),ARM)
+        SCATTER_SRC = $(ARCH_DIR)/src/$(BS_ARCH_ARCH)/scatter.S
+    else
+        SCATTER_SRC = $(ARCH_DIR)/src/$(BS_ARCH_ARCH)/ld.S
+    endif
+
     SCATTER_PP = $(OBJ_DIR)/ld_preproc.s
 endif
 
@@ -137,7 +143,11 @@ ifeq ($(BS_FIRMWARE_HAS_MULTITHREADING),yes)
     BUILD_HAS_MULTITHREADING := yes
 
     ifneq ($(BS_ARCH_ARCH),host)
-      LIBS_y += $(OS_DIR)/RTX/Library/GCC/libRTX_CM3.a
+        ifeq ($(BS_COMPILER),ARM)
+            LIBS_y += $(OS_DIR)/RTX/Library/ARM/RTX_CM3.lib
+        else
+            LIBS_y += $(OS_DIR)/RTX/Library/GCC/libRTX_CM3.a
+        endif
     endif
 
     INCLUDES += $(OS_DIR)/RTX/Source
@@ -213,16 +223,24 @@ ifneq ($(BS_ARCH_CPU),host)
     LDFLAGS_GCC += -Wl,-n
 endif
 
+LDFLAGS_GCC +=  \
+    -Wl,--start-group \
+        $(BUILTIN_LIBS) \
+        $(MODULE_LIBS_y) \
+        $(LIBS_y) \
+        $(OBJECTS) \
+    -Wl,--end-group
+
+LDFLAGS_ARM += \
+    $(BUILTIN_LIBS) \
+    $(MODULE_LIBS) \
+    $(MODULE_LIBS_y) \
+    $(LIBS_y) \
+    $(OBJECTS)
+
 $(TARGET_ELF): $(LIB_TARGETS_y) $(SCATTER_PP) $(OBJECTS) | $(targetdir)
 	$(call show-action,LD,$@)
-	$(LD) $(LDFLAGS) \
-	     -Wl,--start-group \
-	        $(BUILTIN_LIBS) \
-	        $(MODULE_LIBS_y) \
-	        $(LIBS_y) \
-	        $(OBJECTS) \
-	    -Wl,--end-group \
-	    -o $@
+	$(LD) $(LDFLAGS) -o $@
 	$(SIZE) $@
 
 $(SCATTER_PP): $(SCATTER_SRC) | $(targetdir)
@@ -231,4 +249,4 @@ $(SCATTER_PP): $(SCATTER_SRC) | $(targetdir)
 
 $(TARGET_BIN): $(TARGET_ELF)
 	$(call show-action,BIN,$@)
-	$(OBJCOPY) -O binary $< $@
+	$(OBJCOPY) $< $(OCFLAGS) $@

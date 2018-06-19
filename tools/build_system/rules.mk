@@ -18,15 +18,20 @@ ifeq ($(BUILD_HAS_NOTIFICATION),yes)
     DEFINES += BUILD_HAS_NOTIFICATION
 endif
 
-#
-# GCC-specific flags
-#
-export CC := $(CROSS_COMPILE)gcc
-export AS := $(CROSS_COMPILE)gcc
-export LD := $(CROSS_COMPILE)gcc
-export AR := $(CROSS_COMPILE)gcc-ar
-export OBJCOPY := $(CROSS_COMPILE)objcopy
-export SIZE := $(CROSS_COMPILE)size
+export AS := $(CC)
+export LD := $(CC)
+
+include $(BS_DIR)/toolchain.mk
+
+ifeq ($(BS_LINKER),ARM)
+    export AR := $(shell $(CC) --print-prog-name armar)
+    export OBJCOPY := $(shell $(CC) --print-prog-name fromelf)
+    export SIZE := $(shell $(CC) --print-prog-name size)
+else
+    export AR := $(shell $(CC) --print-prog-name ar)
+    export OBJCOPY := $(shell $(CC) --print-prog-name objcopy)
+    export SIZE := $(shell $(CC) --print-prog-name size)
+endif
 
 #
 # GCC-specific optimization levels for debug and release modes
@@ -52,17 +57,20 @@ ifeq ($(BS_ARCH_ARCH),host)
 # Compiler options used when cross compiling
 #
 else
+    LDFLAGS_ARM += -Wl,--scatter=$(SCATTER_PP)
     LDFLAGS_GCC += -Wl,--script=$(SCATTER_PP)
 
     CFLAGS_GCC  += -mcpu=$(BS_ARCH_CPU)
     ASFLAGS_GCC += -mcpu=$(BS_ARCH_CPU)
     LDFLAGS_GCC += -mcpu=$(BS_ARCH_CPU)
+    LDFLAGS_ARM += -mcpu=$(BS_ARCH_CPU)
 
     # Optional ISA ("sub-arch") parameter
     ifneq ($(BS_ARCH_ISA),)
         CFLAGS_GCC  += -m$(BS_ARCH_ISA)
         ASFLAGS_GCC += -m$(BS_ARCH_ISA)
         LDFLAGS_GCC += -m$(BS_ARCH_ISA)
+        LDFLAGS_ARM += -m$(BS_ARCH_ISA)
     endif
 endif
 
@@ -83,8 +91,15 @@ CFLAGS_GCC += -Wno-unused-parameter
 # without it.
 CFLAGS_GCC += -Wno-missing-field-initializers
 
+# Clang picks up a number of situations that GCC does not with this warning
+# enabled. Most of them do not have easy fixes, and are valid C, so this flag
+# should remain unless we move to a version of Clang/Arm Compiler that does not
+# warn about the situations that have not already been fixed.
+CFLAGS_CLANG += -Wno-missing-braces
+
 CFLAGS_GCC += -g
 CFLAGS_GCC += -std=c11
+CFLAGS_CLANG += -fshort-enums # Required by RTX
 
 CFLAGS_GCC += -fno-exceptions
 
@@ -101,6 +116,10 @@ LDFLAGS_GCC += -Wl,--cref
 # Force an undefined reference to the exceptions table so that it is included
 # even if no code refers to it.
 LDFLAGS_GCC += -Wl,--undefined=exceptions
+LDFLAGS_ARM += -Wl,--undefined=exceptions
+
+# Ensure main() is not removed by the linker
+LDFLAGS_ARM += -Wl,--undefined=main
 
 BUILTIN_LIBS_GCC := -lc -lgcc
 
@@ -134,9 +153,19 @@ ASFLAGS += $(addprefix -I,$(INCLUDES)) $(addprefix -D,$(DEFINES))
 CFLAGS += $(CFLAGS_GCC)
 ASFLAGS += $(ASFLAGS_GCC)
 ARFLAGS = $(ARFLAGS_GCC)
-LDFLAGS += $(LDFLAGS_GCC)
+LDFLAGS += $(LDFLAGS_$(BS_LINKER))
 DEP_CFLAGS = $(DEP_CFLAGS_GCC)
-BUILTIN_LIBS = $(BUILTIN_LIBS_GCC)
+BUILTIN_LIBS = $(BUILTIN_LIBS_$(BS_LINKER))
+
+ifeq ($(BS_COMPILER),CLANG)
+    CFLAGS += $(CFLAGS_CLANG)
+endif
+
+ifeq ($(BS_LINKER),ARM)
+    OCFLAGS += --bin --output
+else
+    OCFLAGS += -O binary
+endif
 
 #
 # Variables for targets

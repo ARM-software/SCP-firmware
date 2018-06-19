@@ -54,11 +54,3 @@ void fwk_assert(bool condition)
     if (!condition)
         fwk_unreachable();
 }
-
-#ifdef __NEWLIB__
-void __assert_func(const char *file, int line,
-    const char *function, const char *assertion)
-{
-    fwk_trap();
-}
-#endif

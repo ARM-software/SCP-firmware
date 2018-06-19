@@ -28,6 +28,8 @@ $(call add_once,DEFINES,BUILD_VERSION_STRING=\"$(VERSION_STRING)\")
 $(call add_once,DEFINES, \
     BUILD_VERSION_DESCRIBE_STRING=\"$(VERSION_DESCRIBE_STRING)\")
 
+$(call add_once,DEFINES,RTX_NO_MULTITHREAD_CLIB)
+
 #
 # Returns a path relative to the top directory
 #

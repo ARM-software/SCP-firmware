@@ -48,31 +48,46 @@ def main():
     banner('Test building the framework library')
 
     cmd = \
-        'CC=gcc CROSS_COMPILE= BS_FIRMWARE_CPU=host ' \
+        'CC=gcc ' \
+        'BS_FIRMWARE_CPU=host ' \
         'make clean lib-framework'
     result = subprocess.call(cmd, shell=True)
     results.append(('Framework build (Host, GCC)', result))
 
     cmd = \
-        'CC=arm-none-eabi-gcc CROSS_COMPILE=arm-none-eabi- ' \
+        'CC=arm-none-eabi-gcc ' \
         'BS_FIRMWARE_CPU=cortex-m3 ' \
         'make clean lib-framework'
     result = subprocess.call(cmd, shell=True)
     results.append(('Framework build (Cortex-M3, GCC)', result))
 
+    cmd = \
+        'CC=armclang ' \
+        'BS_FIRMWARE_CPU=cortex-m3 ' \
+        'make clean lib-framework'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Framework build (Cortex-M3, ARM)', result))
+
     banner('Test building arch library')
 
     cmd = \
-        'CC=arm-none-eabi-gcc CROSS_COMPILE=arm-none-eabi- ' \
+        'CC=arm-none-eabi-gcc ' \
         'BS_FIRMWARE_CPU=cortex-m3 ' \
         'make clean lib-arch'
     result = subprocess.call(cmd, shell=True)
     results.append(('Arch build (Cortex-M3, GCC)', result))
 
+    cmd = \
+        'CC=armclang ' \
+        'BS_FIRMWARE_CPU=cortex-m3 ' \
+        'make clean lib-arch'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Arch build (Cortex-M3, ARM)', result))
+
     banner('Test building host product')
 
     cmd = \
-        'CC=gcc CROSS_COMPILE= ' \
+        'CC=gcc ' \
         'PRODUCT=host ' \
         'make clean all'
     result = subprocess.call(cmd, shell=True)
@@ -81,11 +96,18 @@ def main():
     banner('Test building sgm775 product')
 
     cmd = \
-        'CC=arm-none-eabi-gcc CROSS_COMPILE=arm-none-eabi- ' \
+        'CC=arm-none-eabi-gcc ' \
         'PRODUCT=sgm775 ' \
         'make clean all'
     result = subprocess.call(cmd, shell=True)
     results.append(('Product sgm775 build (GCC)', result))
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=sgm775 ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product sgm775 build (ARM)', result))
 
     banner('Tests summary')
 

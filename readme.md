@@ -43,8 +43,13 @@ To properly build SCP/MCP firmware for a target product, the following tools are
 required:
 
 - Git
-- [GNU Arm Embedded Toolchain ("6-2017-q2-update" or later)](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
-- GNU Make
+- Either of:
+    - [GNU Arm Embedded Toolchain ("6-2017-q2-update" or later)]
+          (https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
+    - [Arm Compiler 6]
+          (https://developer.arm.com/products/software-development-tools/compilers/arm-compiler)
+
+- GNU Make (4.2 or later)
 - Python 3 (3.5.0 or later)
 
 In addition, the following tools are recommended:
