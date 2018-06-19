@@ -6,14 +6,21 @@
 #
 
 include $(BS_DIR)/cpu.mk
+include $(BS_DIR)/toolchain.mk
 
 BS_LIB_NAME = arch
 
 BS_LIB_SOURCES_armv7-m += armv7-m/exception.S
-BS_LIB_SOURCES_armv7-m += armv7-m/reset.S
+BS_LIB_SOURCES_armv7-m += armv7-m/config.S
 BS_LIB_SOURCES_armv7-m += arm_nvic.c
 BS_LIB_SOURCES_armv7-m += arm_main.c
 BS_LIB_SOURCES_armv7-m += arm_mm.c
+
+ifeq ($(BS_LINKER),ARM)
+    BS_LIB_SOURCES_armv7-m += armv7-m/reset_arm.S
+else
+    BS_LIB_SOURCES_armv7-m += armv7-m/reset_newlib.S
+endif
 
 BS_LIB_INCLUDES_armv7-m += $(TOP_DIR)/cmsis/CMSIS/Core/Include/
 

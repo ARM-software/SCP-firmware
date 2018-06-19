@@ -1,11 +1,11 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2018, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
- *      GNU LD linker script.
+ *      Arm Compiler 6 scatter file.
  *
  * There are three supported memory layouts for the ARMv7-M architecture:
  *
@@ -49,12 +49,6 @@
 
 #include <fmw_memory.ld.S>
 
-/* Align the stack on an 8-byte boundary as CCR.STKALIGN is enabled */
-#define STACK_ALIGNMENT 8
-
-/* Align the heap on a 4-byte boundary to avoid unaligned accesses */
-#define HEAP_ALIGNMENT 4
-
 /*
  * Input validation
  */
@@ -87,71 +81,29 @@
     #endif
 #endif
 
-ENTRY(exception_reset)
-
-MEMORY {
-#if FIRMWARE_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
-    mem0 : ORIGIN = FIRMWARE_MEM0_BASE, LENGTH = FIRMWARE_MEM0_SIZE
-#else
-    mem0 (rx) : ORIGIN = FIRMWARE_MEM0_BASE, LENGTH = FIRMWARE_MEM0_SIZE
-    mem1 (!rx) : ORIGIN = FIRMWARE_MEM1_BASE, LENGTH = FIRMWARE_MEM1_SIZE
-#endif
-}
+#define FIRMWARE_MEM0_LIMIT (FIRMWARE_MEM0_BASE + FIRMWARE_MEM0_SIZE)
 
 #if FIRMWARE_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
-    REGION_ALIAS("mem1", mem0);
-#endif
-
-REGION_ALIAS("vexception", mem0);
-REGION_ALIAS("vtext", mem0);
-REGION_ALIAS("vrodata", mem0);
-REGION_ALIAS("vdata", mem1);
-REGION_ALIAS("vbss", mem1);
-REGION_ALIAS("vstackheap", mem1);
-
-#if FIRMWARE_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION
-    REGION_ALIAS("ldata", mem1); /* .data is loaded into mem1 by a loader */
+    #define FIRMWARE_MEM1_BASE +0
+    #define FIRMWARE_MEM1_LIMIT (FIRMWARE_MEM0_BASE + FIRMWARE_MEM0_SIZE)
+    #define FIRMWARE_MEM1_SIZE (FIRMWARE_MEM1_LIMIT - ImageLimit(ER_RODATA))
 #else
-    REGION_ALIAS("ldata", mem0); /* .data is loaded into mem1 by crt0 */
+    #define FIRMWARE_MEM1_LIMIT (FIRMWARE_MEM1_BASE + FIRMWARE_MEM1_SIZE)
 #endif
 
-SECTIONS {
-    .exception : {
-        LONG(__stack)
-        LONG(exception_reset | 1) /* The LSB must be set for Thumb functions */
-        KEEP(*(.exception))
-    } > vexception
+LR_MEM0 FIRMWARE_MEM0_BASE FIRMWARE_MEM0_SIZE {
+    ER_EXCEPTION +0 {
+        *(:gdef:__vectab_stack_and_reset, +FIRST)
+        *(.exception)
+    }
 
-    .text : {
-        *(.text .text.*)
-    } > vtext
+    ER_RODATA +0 {
+        *(+RO)
+    }
 
-    .rodata : {
-        *(.rodata .rodata.*)
-    } > vrodata
+    ER_RWDATA FIRMWARE_MEM1_BASE {
+        *(+RW, +ZI)
+    }
 
-    .data : {
-        *(.data .data.*)
-    } > vdata AT>ldata
-
-    .bss : {
-        *(.bss .bss.*)
-    } > vbss
-
-    .stackheap ALIGN(HEAP_ALIGNMENT) : {
-        . = ORIGIN(vstackheap) + LENGTH(vstackheap) - (STACK_ALIGNMENT - 1);
-        . = ALIGN(STACK_ALIGNMENT);
-    } > vstackheap
-
-    __stackheap_start__ = ADDR(.stackheap);
-    __stackheap_size__ = SIZEOF(.stackheap);
-
-    __data_start_vma__ = ADDR(.data);
-    __data_start_lma__ = LOADADDR(.data);
-    __data_size__ = SIZEOF(.data);
-
-    __bss_start__ = ADDR(.bss);
-    __bss_end__ = __bss_start__ + SIZEOF(.bss);
-
-    __stack = __stackheap_start__ + __stackheap_size__;
+    ARM_LIB_STACKHEAP +0 EMPTY (FIRMWARE_MEM1_LIMIT - ImageLimit(ER_RWDATA)) { }
 }

@@ -15,8 +15,12 @@ ARMV7M_CPUS := cortex-m3 cortex-m7
 ifneq ($(findstring $(BS_FIRMWARE_CPU),$(ARMV7M_CPUS)),)
     BS_ARCH_ARCH := armv7-m
     BS_ARCH_ISA := thumb
-    $(call add_once,LDFLAGS_GCC,--specs=nano.specs)
 
+    $(call add_once,LDFLAGS_GCC,--specs=nano.specs)
+    $(call add_once,LDFLAGS_ARM,--target=arm-arm-none-eabi)
+    $(call add_once,CFLAGS_CLANG,--target=arm-arm-none-eabi)
+
+    CFLAGS += -mfloat-abi=soft # No hardware floating point support
 else ifeq ($(BS_FIRMWARE_CPU),host)
     BS_ARCH_ARCH := host
 

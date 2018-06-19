@@ -15,13 +15,12 @@
  * "exceptions" symbol is given the same ELF attributes as a standard C
  * structure (allocatable object) in order to ensure it is properly exported
  * or loaded. See the GNU assembler documentation for the exact meaning behind
- * the directives provided here.
+ * the directives provided here. See the .exception section described in the GNU
+ * linker script for the first two entries of the exception table.
  */
 
     .global exceptions
 exceptions:
-    .word __stack
-    .word exception_reset   /* Reset */
     .word exception_invalid /* NMI */
     .word exception_invalid /* HardFault */
     .word exception_invalid /* MemManage */
@@ -45,6 +44,7 @@ exceptions:
     .global exception_invalid
     .thumb_func
     .type exception_invalid, %function
+    .eabi_attribute Tag_ABI_align_preserved, 1
 exception_invalid:
     wfi
     b       exception_invalid
