@@ -130,7 +130,7 @@ enum ppu_v1_opmode ppu_v1_get_operating_mode(struct ppu_v1_reg *ppu)
     assert(ppu != NULL);
 
     return (enum ppu_v1_opmode)
-        (ppu->PWSR & PPU_V1_PWSR_OP_STATUS) >> PPU_V1_PWSR_OP_STATUS_POS;
+        ((ppu->PWSR & PPU_V1_PWSR_OP_STATUS) >> PPU_V1_PWSR_OP_STATUS_POS);
 }
 
 enum ppu_v1_opmode ppu_v1_get_programmed_operating_mode(struct ppu_v1_reg *ppu)
@@ -138,7 +138,7 @@ enum ppu_v1_opmode ppu_v1_get_programmed_operating_mode(struct ppu_v1_reg *ppu)
     assert(ppu != NULL);
 
     return (enum ppu_v1_opmode)
-        (ppu->PWPR & PPU_V1_PWPR_OP_POLICY) >> PPU_V1_PWPR_OP_POLICY_POS;
+        ((ppu->PWPR & PPU_V1_PWPR_OP_POLICY) >> PPU_V1_PWPR_OP_POLICY_POS);
 }
 
 bool ppu_v1_is_dynamic_enabled(struct ppu_v1_reg *ppu)
