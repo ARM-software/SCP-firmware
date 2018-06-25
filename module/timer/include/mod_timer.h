@@ -171,7 +171,7 @@ struct mod_timer_api {
      * \param microseconds The amount of time, given in microseconds, to delay.
      *
      * \retval FWK_SUCCESS Operation succeeded.
-     * \retval One of the other specific error codes described by the module.
+     * \retval One of the other specific error codes described by the framework.
      */
     int (*delay)(fwk_id_t dev_id, uint32_t microseconds);
 
@@ -194,7 +194,7 @@ struct mod_timer_api {
      *      elapsed.
      * \retval FWK_E_TIMEOUT The timeout period elapsed before the condition was
      *      met.
-     * \retval One of the other specific error codes described by the module.
+     * \retval One of the other specific error codes described by the framework.
      */
     int (*wait)(fwk_id_t dev_id,
                 uint32_t microseconds,
@@ -216,7 +216,7 @@ struct mod_timer_api {
      *
      * \retval FWK_SUCCESS Operation succeeded.
      * \retval FWK_E_PARAM The remaining_ticks pointer was invalid.
-     * \retval One of the other specific error codes described by the module.
+     * \retval One of the other specific error codes described by the framework.
      *
      * \note remaining_ticks is also a timestamp.
      */
