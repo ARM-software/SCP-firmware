@@ -9,11 +9,11 @@
  *     firmware.
  */
 
-#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdnoreturn.h>
 #include <string.h>
+#include <fwk_assert.h>
 #include <fwk_errno.h>
 #include <fwk_interrupt.h>
 #include <fwk_module.h>

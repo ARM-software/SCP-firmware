@@ -8,8 +8,8 @@
  *     Identifiers.
  */
 
-#include <assert.h>
 #include <stdio.h>
+#include <fwk_assert.h>
 #include <fwk_id.h>
 
 struct __fwk_id_fmt __fwk_id_str(fwk_id_t id)

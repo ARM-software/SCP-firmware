@@ -8,7 +8,6 @@
  *    Implementation of Timer module
  */
 
-#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <fwk_assert.h>

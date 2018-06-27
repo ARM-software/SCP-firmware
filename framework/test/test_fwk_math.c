@@ -7,6 +7,7 @@
 
 #include <limits.h>
 #include <stdint.h>
+#include <fwk_assert.h>
 #include <fwk_macros.h>
 #include <fwk_math.h>
 #include <fwk_test.h>

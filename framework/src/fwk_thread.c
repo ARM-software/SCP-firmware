@@ -8,9 +8,9 @@
  *     Single-thread facilities.
  */
 
-#include <assert.h>
 #include <stdbool.h>
 #include <string.h>
+#include <fwk_assert.h>
 #include <fwk_element.h>
 #include <fwk_errno.h>
 #include <fwk_host.h>

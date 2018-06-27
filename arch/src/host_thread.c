@@ -8,7 +8,6 @@
  *     CMSIS-RTOS2 functions are mapped to POSIX functions to run on the host.
  */
 
-#include <assert.h>
 #include <cmsis_os2.h>
 #include <pthread.h>
 #include <stdbool.h>

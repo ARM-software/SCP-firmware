@@ -8,9 +8,9 @@
  *     Memory initialization.
  */
 
-#include <assert.h>
 #include <stdint.h>
 #include <fwk_arch.h>
+#include <fwk_assert.h>
 #include <fwk_errno.h>
 #include <fwk_macros.h>
 #include <section.h>

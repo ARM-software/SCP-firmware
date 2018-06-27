@@ -8,7 +8,6 @@
  *     Module facilities.
  */
 
-#include <assert.h>
 #include <string.h>
 #include <fwk_errno.h>
 #include <fwk_host.h>

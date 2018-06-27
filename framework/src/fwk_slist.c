@@ -8,7 +8,6 @@
  *     Intrusive circular singly-linked list.
  */
 
-#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <fwk_assert.h>

@@ -5,12 +5,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <assert.h>
 #include <setjmp.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+#include <fwk_assert.h>
 #include <fwk_element.h>
 #include <fwk_errno.h>
 #include <fwk_event.h>

@@ -8,6 +8,7 @@
 #include <setjmp.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <fwk_assert.h>
 #include <fwk_errno.h>
 #include <fwk_id.h>
 #include <fwk_list.h>
