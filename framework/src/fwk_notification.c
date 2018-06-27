@@ -8,7 +8,7 @@
  *     Notification facilities.
  */
 
-#include <assert.h>
+#include <fwk_assert.h>
 #include <fwk_host.h>
 #include <fwk_interrupt.h>
 #include <fwk_list.h>

@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_test.h>

@@ -8,8 +8,8 @@
  *     SCMI Clock Management Protocol Support.
  */
 
-#include <assert.h>
 #include <string.h>
+#include <fwk_assert.h>
 #include <fwk_errno.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>

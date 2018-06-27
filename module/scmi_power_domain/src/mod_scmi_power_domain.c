@@ -8,8 +8,8 @@
  *     SCMI power domain management protocol support.
  */
 
-#include <assert.h>
 #include <string.h>
+#include <fwk_assert.h>
 #include <fwk_element.h>
 #include <fwk_errno.h>
 #include <fwk_id.h>

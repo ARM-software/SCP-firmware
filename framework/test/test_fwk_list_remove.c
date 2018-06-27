@@ -7,6 +7,7 @@
 
 #include <stddef.h>
 #include <string.h>
+#include <fwk_assert.h>
 #include <fwk_list.h>
 #include <fwk_macros.h>
 #include <fwk_test.h>

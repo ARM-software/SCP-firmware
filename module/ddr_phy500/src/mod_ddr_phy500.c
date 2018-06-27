@@ -8,7 +8,7 @@
  *     DDR-PHY500 driver
  */
 
-#include <assert.h>
+#include <fwk_assert.h>
 #include <fwk_errno.h>
 #include <fwk_id.h>
 #include <fwk_mm.h>

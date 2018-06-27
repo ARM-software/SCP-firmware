@@ -8,8 +8,6 @@
 #ifndef FWK_TEST_H
 #define FWK_TEST_H
 
-#include <assert.h>
-
 /*!
  * \addtogroup GroupLibFramework Framework
  * @{

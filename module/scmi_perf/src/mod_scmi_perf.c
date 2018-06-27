@@ -8,8 +8,8 @@
  *     SCMI performance domain management protocol support.
  */
 
-#include <assert.h>
 #include <string.h>
+#include <fwk_assert.h>
 #include <fwk_errno.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>

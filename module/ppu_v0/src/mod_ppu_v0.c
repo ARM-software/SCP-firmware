@@ -8,9 +8,9 @@
  *     Power State Management PPU v0 driver.
  */
 
-#include <assert.h>
 #include <stdint.h>
 #include <fwk_id.h>
+#include <fwk_assert.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>

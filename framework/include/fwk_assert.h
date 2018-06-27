@@ -8,6 +8,7 @@
 #ifndef FWK_ASSERT_H
 #define FWK_ASSERT_H
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stdnoreturn.h>
 

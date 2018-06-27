@@ -8,7 +8,6 @@
  *     Intrusive circular doubly-linked list.
  */
 
-#include <assert.h>
 #include <stddef.h>
 #include <fwk_assert.h>
 #include <fwk_list.h>
