@@ -58,8 +58,8 @@ hardware_init_hook:
     .thumb_func
     .type software_init_hook, %function
 software_init_hook:
-    ldr r0, =__data_start__
-    ldr r1, =__data_lma_start__
+    ldr r0, =__data_start_vma__
+    ldr r1, =__data_start_lma__
     ldr r2, =__data_size__
 
     cmp r0, r1
