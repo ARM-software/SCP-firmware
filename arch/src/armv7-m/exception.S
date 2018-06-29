@@ -7,7 +7,16 @@
 
     .syntax unified
 
-    .section .exception
+    .section .exception, "a", %progbits
+
+/*
+ * We set up the exception table here. The table is put inside the ".exception"
+ * section, which is marked as PROGBITS (takes up space in the binary). The
+ * "exceptions" symbol is given the same ELF attributes as a standard C
+ * structure (allocatable object) in order to ensure it is properly exported
+ * or loaded. See the GNU assembler documentation for the exact meaning behind
+ * the directives provided here.
+ */
 
     .global exceptions
 exceptions:
@@ -27,6 +36,9 @@ exceptions:
     .word exception_invalid /* Reserved */
     .word exception_invalid /* PendSV */
     .word exception_invalid /* SysTick */
+
+    .type exceptions, %object
+    .size exceptions, . - exceptions
 
     .section .text
 
