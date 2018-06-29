@@ -46,7 +46,11 @@
 
 #include <fmw_memory.ld.S>
 
+/* Align the stack on an 8-byte boundary as CCR.STKALIGN is enabled */
 #define STACK_ALIGNMENT 8
+
+/* Align the heap on a 4-byte boundary to avoid unaligned accesses */
+#define HEAP_ALIGNMENT 4
 
 /*
  * Input validation
@@ -54,10 +58,6 @@
 
 #ifndef FIRMWARE_MEM_MODE
     #error "FIRMWARE_MEM_MODE has not been configured"
-#endif
-
-#ifndef FIRMWARE_STACK_SIZE
-    #error "FIRMWARE_STACK_SIZE has not been configured"
 #endif
 
 #ifndef FIRMWARE_MEM0_BASE
@@ -84,60 +84,27 @@
     #endif
 #endif
 
-/*
- * Calculate stack region in the data memory.
- */
-
-#if FIRMWARE_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
-    ASSERT(FIRMWARE_STACK_SIZE < FIRMWARE_MEM0_SIZE,
-        "FIRMWARE_STACK_SIZE does not fit in MEM0")
-    #define UNALIGNED_STACK_BASE \
-        (FIRMWARE_MEM0_BASE + FIRMWARE_MEM0_SIZE - FIRMWARE_STACK_SIZE)
-#else
-    ASSERT(FIRMWARE_STACK_SIZE < FIRMWARE_MEM1_SIZE,
-        "FIRMWARE_STACK_SIZE does not fit in MEM1")
-    #define UNALIGNED_STACK_BASE \
-        (FIRMWARE_MEM1_BASE + FIRMWARE_MEM1_SIZE - FIRMWARE_STACK_SIZE)
-#endif
-
-#define STACK_BASE \
-    ( \
-        ((UNALIGNED_STACK_BASE + STACK_ALIGNMENT - 1) / STACK_ALIGNMENT) \
-            * STACK_ALIGNMENT \
-    )
-
-#define STACK_SIZE \
-    (( \
-        ((STACK_BASE + FIRMWARE_STACK_SIZE) / STACK_ALIGNMENT) \
-            * STACK_ALIGNMENT \
-    ) - STACK_BASE)
-
-ASSERT(STACK_SIZE > 0, "FIRMWARE_STACK_SIZE is too small")
-
 ENTRY(exception_reset)
 
 MEMORY {
 #if FIRMWARE_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
-    /* Only one memory region with read, execute and write attributes */
-    mem0 (rxw): ORIGIN = FIRMWARE_MEM0_BASE, LENGTH = FIRMWARE_MEM0_SIZE - \
-                                                      FIRMWARE_STACK_SIZE
+    mem0 : ORIGIN = FIRMWARE_MEM0_BASE, LENGTH = FIRMWARE_MEM0_SIZE
 #else
-    mem0 (rx):  ORIGIN = FIRMWARE_MEM0_BASE, LENGTH = FIRMWARE_MEM0_SIZE
-    mem1 (rxw): ORIGIN = FIRMWARE_MEM1_BASE, LENGTH = FIRMWARE_MEM1_SIZE - \
-                                                      FIRMWARE_STACK_SIZE
+    mem0 (rx) : ORIGIN = FIRMWARE_MEM0_BASE, LENGTH = FIRMWARE_MEM0_SIZE
+    mem1 (!rx) : ORIGIN = FIRMWARE_MEM1_BASE, LENGTH = FIRMWARE_MEM1_SIZE
 #endif
-
-    stack (rw):  ORIGIN = STACK_BASE, LENGTH = STACK_SIZE
 }
 
 #if FIRMWARE_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
     REGION_ALIAS("mem1", mem0);
 #endif
 
+REGION_ALIAS("vexception", mem0);
 REGION_ALIAS("vtext", mem0);
+REGION_ALIAS("vrodata", mem0);
 REGION_ALIAS("vdata", mem1);
 REGION_ALIAS("vbss", mem1);
-REGION_ALIAS("vstack", stack);
+REGION_ALIAS("vstackheap", mem1);
 
 #if FIRMWARE_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION
     REGION_ALIAS("ldata", mem1); /* .data is loaded into mem1 by a loader */
@@ -146,47 +113,40 @@ REGION_ALIAS("vstack", stack);
 #endif
 
 SECTIONS {
-    .text : {
+    .exception : {
         KEEP(*(.exception))
-        *(.text*)
-        *(.rodata*)
+    } > vexception
+
+    .text : {
+        *(.text .text.*)
     } > vtext
 
+    .rodata : {
+        *(.rodata .rodata.*)
+    } > vrodata
+
     .data : {
-        . = ALIGN(4);
-        *(.data*)
-        . = ALIGN(4);
+        *(.data .data.*)
     } > vdata AT>ldata
 
     .bss : {
-        . = ALIGN(4);
-        *(.bss*)
-        . = ALIGN(4);
+        *(.bss .bss.*)
     } > vbss
 
-    .stack : {
-        . = . + STACK_SIZE;
-    } > vstack
+    .stackheap ALIGN(HEAP_ALIGNMENT) : {
+        . = ORIGIN(vstackheap) + LENGTH(vstackheap) - (STACK_ALIGNMENT - 1);
+        . = ALIGN(STACK_ALIGNMENT);
+    } > vstackheap
 
-    __text_start__ = LOADADDR(.text);
-    __text_size__ = SIZEOF(.text);
-    __text_end__ = __text_start__ + __text_size__;
+    __stackheap_start__ = ADDR(.stackheap);
+    __stackheap_size__ = SIZEOF(.stackheap);
 
-    __stack_start__ = LOADADDR(.stack);
-    __stack_size__ = SIZEOF(.stack);
-    __stack_end__ = __stack_start__ + __stack_size__;
-
-    __data_lma_start__ = LOADADDR(.data);
-    __data_start__ = ADDR(.data);
+    __data_start_vma__ = ADDR(.data);
+    __data_start_lma__ = LOADADDR(.data);
     __data_size__ = SIZEOF(.data);
 
     __bss_start__ = ADDR(.bss);
-    __bss_size__ = SIZEOF(.bss);
-    __bss_end__ = __bss_start__ + __bss_size__;
+    __bss_end__ = __bss_start__ + SIZEOF(.bss);
 
-    __heap_start__ = __bss_start__ + __bss_size__;
-    __heap_end__ = __stack_start__;
-    __heap_size__ = __heap_end__ - __heap_start__;
-
-    __stack = __stack_end__;
+    __stack = __stackheap_start__ + __stackheap_size__;
 }
