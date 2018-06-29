@@ -74,10 +74,6 @@ file:
     - FWK_MEM_MODE_SINGLE_REGION
     - FWK_MEM_MODE_DUAL_REGION_RELOCATION
     - FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION
-- FIRMWARE_STACK_SIZE: The size of the stacks. For a firmware with
-    multithreading support this is the size of the stack for each thread. For
-    a firmware without multithreading this is the size of the stack for the
-    primary, and only, thread.
 - FIRMWARE_MEM0_BASE: The base address of the MEM0 region, which is always
     used regardless of the memory region configuration given by
     *FIRMWARE_MEM_MODE*.
