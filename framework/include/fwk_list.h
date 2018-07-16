@@ -61,9 +61,11 @@
  */
 #define fwk_list_head(list) \
     ((void *)_Generic((list), \
+        const struct fwk_slist * : __fwk_slist_head, \
+        const struct fwk_dlist * : __fwk_slist_head, \
         struct fwk_slist * : __fwk_slist_head, \
         struct fwk_dlist * : __fwk_slist_head \
-    )((struct fwk_slist *)list))
+    )((const struct fwk_slist *)list))
 
 /*!
  * \brief Test whether a linked list is empty or not.
@@ -79,7 +81,7 @@
         const struct fwk_dlist * : __fwk_slist_is_empty, \
         struct fwk_slist * : __fwk_slist_is_empty, \
         struct fwk_dlist * : __fwk_slist_is_empty \
-    )((struct fwk_slist *)list)
+    )((const struct fwk_slist *)list)
 
 /*!
  * \brief Add a new node to the head of a linked list.
@@ -141,9 +143,11 @@
  */
 #define fwk_list_next(list, node) \
     ((void *) _Generic((list), \
+        const struct fwk_slist * : __fwk_slist_next, \
+        const struct fwk_dlist * : __fwk_slist_next, \
         struct fwk_slist * : __fwk_slist_next, \
         struct fwk_dlist * : __fwk_slist_next \
-    )((struct fwk_slist *)list, (struct fwk_slist_node *)node))
+    )((const struct fwk_slist *)list, (const struct fwk_slist_node *)node))
 
 /*!
  * \brief Remove a node from a linked list.
@@ -191,9 +195,11 @@
  */
 #define fwk_list_contains(list, node) \
     _Generic((list), \
+        const struct fwk_slist * : __fwk_slist_contains, \
+        const struct fwk_dlist * : __fwk_slist_contains, \
         struct fwk_slist * : __fwk_slist_contains, \
         struct fwk_dlist * : __fwk_slist_contains \
-    )((struct fwk_slist *)list, (struct fwk_slist_node *)node)
+    )((const struct fwk_slist *)list, (const struct fwk_slist_node *)node)
 
 /*!
  * @}
