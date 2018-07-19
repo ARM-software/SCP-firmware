@@ -11,6 +11,7 @@ BS_FIRMWARE_HAS_NOTIFICATION := yes
 BS_FIRMWARE_MODULE_HEADERS_ONLY :=
 
 BS_FIRMWARE_MODULES := \
+    armv7m_mpu \
     pl011 \
     log \
     cmn600 \
@@ -31,6 +32,7 @@ BS_FIRMWARE_MODULES := \
 BS_FIRMWARE_SOURCES := \
     rtx_config.c \
     sgi575_core.c \
+    config_armv7m_mpu.c \
     config_log.c \
     config_cmn600.c \
     config_power_domain.c \
