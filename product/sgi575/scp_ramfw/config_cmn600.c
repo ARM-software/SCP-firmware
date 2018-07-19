@@ -10,6 +10,7 @@
 #include <fwk_module_idx.h>
 #include <mod_cmn600.h>
 #include <scp_sgi575_mmap.h>
+#include <config_clock.h>
 
 /*
  * CMN600 nodes
@@ -99,5 +100,7 @@ const struct fwk_module_config config_cmn600 = {
         .snf_count = FWK_ARRAY_SIZE(snf_table),
         .mmap_table = mmap,
         .mmap_count = FWK_ARRAY_SIZE(mmap),
+        .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
+            CLOCK_IDX_INTERCONNECT),
     }),
 };

@@ -18,6 +18,7 @@
 #include <scp_system_mmap.h>
 #include <sgi575_sds.h>
 #include <sgi575_ssc.h>
+#include <config_clock.h>
 
 static const uint32_t version_packed = FWK_BUILD_VERSION;
 static const uint32_t feature_flags = (SGI575_SDS_FEATURE_FIRMWARE_MASK |
@@ -27,6 +28,8 @@ static const uint32_t feature_flags = (SGI575_SDS_FEATURE_FIRMWARE_MASK |
 const struct mod_sds_config sds_module_config = {
     .region_base_address = SCP_SDS_MEM_BASE,
     .region_size = SCP_SDS_MEM_SIZE,
+    .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
+        CLOCK_IDX_INTERCONNECT)
 };
 
 static struct sgi575_sds_platid platid;
