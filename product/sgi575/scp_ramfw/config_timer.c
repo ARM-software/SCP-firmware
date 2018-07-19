@@ -13,6 +13,7 @@
 #include <scp_sgi575_irq.h>
 #include <scp_sgi575_mmap.h>
 #include <system_clock.h>
+#include <config_clock.h>
 
 /*
  * Generic timer driver config
@@ -25,6 +26,8 @@ static const struct fwk_element gtimer_dev_table[] = {
             .hw_counter = SCP_REFCLK_CNTCTL_BASE,
             .control    = SCP_REFCLK_CNTCONTROL_BASE,
             .frequency  = CLOCK_RATE_REFCLK,
+            .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
+                CLOCK_IDX_INTERCONNECT)
         })
     },
     [1] = { 0 },
