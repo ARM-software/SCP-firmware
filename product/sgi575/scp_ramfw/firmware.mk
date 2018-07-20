@@ -24,6 +24,9 @@ BS_FIRMWARE_MODULES := \
     ppu_v1 \
     system_power \
     sgi575_system \
+    mhu \
+    smt \
+    scmi \
     system_pll \
     pik_clock \
     css_clock \
@@ -43,6 +46,9 @@ BS_FIRMWARE_SOURCES := \
     config_ppu_v0.c \
     config_ppu_v1.c \
     config_system_power.c \
+    config_mhu.c \
+    config_smt.c \
+    config_scmi.c \
     config_system_pll.c \
     config_pik_clock.c \
     config_css_clock.c \
