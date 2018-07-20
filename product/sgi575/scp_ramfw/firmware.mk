@@ -27,6 +27,7 @@ BS_FIRMWARE_MODULES := \
     mhu \
     smt \
     scmi \
+    sds \
     system_pll \
     pik_clock \
     css_clock \
@@ -49,6 +50,7 @@ BS_FIRMWARE_SOURCES := \
     config_mhu.c \
     config_smt.c \
     config_scmi.c \
+    config_sds.c \
     config_system_pll.c \
     config_pik_clock.c \
     config_css_clock.c \
