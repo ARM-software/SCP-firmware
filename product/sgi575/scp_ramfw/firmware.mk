@@ -15,6 +15,9 @@ BS_FIRMWARE_MODULES := \
     pl011 \
     log \
     clock \
+    system_pll \
+    pik_clock \
+    css_clock \
     gtimer \
     timer
 
@@ -22,6 +25,9 @@ BS_FIRMWARE_SOURCES := \
     rtx_config.c \
     config_log.c \
     config_clock.c \
+    config_system_pll.c \
+    config_pik_clock.c \
+    config_css_clock.c \
     config_timer.c
 
 include $(BS_DIR)/firmware.mk

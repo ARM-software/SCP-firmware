@@ -5,6 +5,51 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <fwk_element.h>
 #include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <mod_clock.h>
+#include <mod_css_clock.h>
+#include <mod_pik_clock.h>
+#include <system_clock.h>
+#include <config_clock.h>
 
-const struct fwk_module_config config_clock = { 0 };
+static const struct fwk_element clock_dev_desc_table[] = {
+    [CLOCK_IDX_INTERCONNECT] = {
+        .name = "Interconnect",
+        .data = &((struct mod_clock_dev_config) {
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK,
+                CLOCK_PIK_IDX_INTERCONNECT),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PIK_CLOCK,
+                MOD_PIK_CLOCK_API_TYPE_CLOCK),
+        }),
+    },
+    [CLOCK_IDX_CPU_GROUP0] = {
+        .name = "CPU_GROUP0",
+        .data = &((struct mod_clock_dev_config) {
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CSS_CLOCK,
+                CLOCK_CSS_IDX_CPU_GROUP0),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_CSS_CLOCK,
+                MOD_CSS_CLOCK_API_TYPE_CLOCK),
+        }),
+    },
+    [CLOCK_IDX_CPU_GROUP1] = {
+        .name = "CPU_GROUP1",
+        .data = &((struct mod_clock_dev_config) {
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CSS_CLOCK,
+                CLOCK_CSS_IDX_CPU_GROUP1),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_CSS_CLOCK,
+                MOD_CSS_CLOCK_API_TYPE_CLOCK),
+        }),
+    },
+    { 0 }, /* Termination description. */
+};
+
+static const struct fwk_element *clock_get_dev_desc_table(fwk_id_t module_id)
+{
+    return clock_dev_desc_table;
+}
+
+const struct fwk_module_config config_clock = {
+    .get_element_table = clock_get_dev_desc_table,
+};
