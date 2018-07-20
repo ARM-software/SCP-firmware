@@ -16,11 +16,13 @@ BS_FIRMWARE_MODULES := \
     pl011 \
     clock \
     log \
-    sgi575_rom
+    sgi575_rom \
+    gtimer
 
 BS_FIRMWARE_SOURCES := \
     config_log.c \
     config_clock.c \
-    config_sgi575_rom.c
+    config_sgi575_rom.c \
+    config_gtimer.c
 
 include $(BS_DIR)/firmware.mk
