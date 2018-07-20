@@ -15,6 +15,8 @@ BS_FIRMWARE_MODULES := \
     pl011 \
     log \
     clock \
+    dmc620 \
+    ddr_phy500 \
     system_pll \
     pik_clock \
     css_clock \
@@ -25,6 +27,8 @@ BS_FIRMWARE_SOURCES := \
     rtx_config.c \
     config_log.c \
     config_clock.c \
+    config_dmc620.c \
+    config_ddr_phy500.c \
     config_system_pll.c \
     config_pik_clock.c \
     config_css_clock.c \
