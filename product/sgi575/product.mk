@@ -6,4 +6,5 @@
 #
 
 BS_PRODUCT_NAME := sgi575
-BS_FIRMWARE_LIST := scp_romfw
+BS_FIRMWARE_LIST := scp_romfw \
+                    scp_ramfw
