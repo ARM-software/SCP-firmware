@@ -35,7 +35,11 @@ BS_FIRMWARE_MODULES := \
     timer \
     sensor \
     reg_sensor \
-    scmi_sensor
+    scmi_sensor \
+    mock_psu \
+    psu \
+    dvfs \
+    scmi_perf
 
 BS_FIRMWARE_SOURCES := \
     rtx_config.c \
@@ -59,6 +63,10 @@ BS_FIRMWARE_SOURCES := \
     config_css_clock.c \
     config_timer.c \
     config_sensor.c \
+    config_mock_psu.c \
+    config_psu.c \
+    config_dvfs.c \
+    config_scmi_perf.c \
     config_apcontext.c
 
 include $(BS_DIR)/firmware.mk
