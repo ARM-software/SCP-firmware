@@ -32,7 +32,10 @@ BS_FIRMWARE_MODULES := \
     pik_clock \
     css_clock \
     gtimer \
-    timer
+    timer \
+    sensor \
+    reg_sensor \
+    scmi_sensor
 
 BS_FIRMWARE_SOURCES := \
     rtx_config.c \
@@ -55,6 +58,7 @@ BS_FIRMWARE_SOURCES := \
     config_pik_clock.c \
     config_css_clock.c \
     config_timer.c \
+    config_sensor.c \
     config_apcontext.c
 
 include $(BS_DIR)/firmware.mk
