@@ -39,7 +39,8 @@ BS_FIRMWARE_MODULES := \
     mock_psu \
     psu \
     dvfs \
-    scmi_perf
+    scmi_perf \
+    scmi_apcore
 
 BS_FIRMWARE_SOURCES := \
     rtx_config.c \
@@ -67,6 +68,7 @@ BS_FIRMWARE_SOURCES := \
     config_psu.c \
     config_dvfs.c \
     config_scmi_perf.c \
+    config_scmi_apcore.c \
     config_apcontext.c
 
 include $(BS_DIR)/firmware.mk
