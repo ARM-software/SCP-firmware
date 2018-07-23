@@ -9,11 +9,13 @@ BS_FIRMWARE_CPU := cortex-m7
 BS_FIRMWARE_HAS_MULTITHREADING := yes
 BS_FIRMWARE_HAS_NOTIFICATION := yes
 BS_FIRMWARE_MODULE_HEADERS_ONLY := \
-    power_domain
+    power_domain \
+    ppu_v1
 
 BS_FIRMWARE_MODULES := \
     pl011 \
     log \
+    cmn600 \
     clock \
     dmc620 \
     ddr_phy500 \
@@ -26,6 +28,7 @@ BS_FIRMWARE_MODULES := \
 BS_FIRMWARE_SOURCES := \
     rtx_config.c \
     config_log.c \
+    config_cmn600.c \
     config_clock.c \
     config_dmc620.c \
     config_ddr_phy500.c \
