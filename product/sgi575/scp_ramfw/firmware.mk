@@ -40,6 +40,8 @@ BS_FIRMWARE_MODULES := \
     psu \
     dvfs \
     scmi_perf \
+    scmi_power_domain \
+    scmi_system_power \
     scmi_apcore
 
 BS_FIRMWARE_SOURCES := \
@@ -68,6 +70,7 @@ BS_FIRMWARE_SOURCES := \
     config_psu.c \
     config_dvfs.c \
     config_scmi_perf.c \
+    config_scmi_system_power.c \
     config_scmi_apcore.c \
     config_apcontext.c
 
