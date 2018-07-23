@@ -8,6 +8,9 @@
 #ifndef SGI575_CORE_H
 #define SGI575_CORE_H
 
+#define SGI575_CORE_PER_CLUSTER0_MAX 4
+#define SGI575_CORE_PER_CLUSTER1_MAX 4
+
 unsigned int sgi575_core_get_core_per_cluster_count(unsigned int cluster);
 unsigned int sgi575_core_get_core_count(void);
 unsigned int sgi575_core_get_cluster_count(void);
