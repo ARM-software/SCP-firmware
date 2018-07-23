@@ -15,6 +15,7 @@ BS_FIRMWARE_MODULES := \
     pl011 \
     log \
     cmn600 \
+    apcontext \
     power_domain \
     clock \
     dmc620 \
@@ -45,6 +46,7 @@ BS_FIRMWARE_SOURCES := \
     config_system_pll.c \
     config_pik_clock.c \
     config_css_clock.c \
-    config_timer.c
+    config_timer.c \
+    config_apcontext.c
 
 include $(BS_DIR)/firmware.mk
