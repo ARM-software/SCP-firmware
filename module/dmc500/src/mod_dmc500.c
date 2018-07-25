@@ -16,7 +16,7 @@
 #include <mod_dmc500.h>
 
 static struct mod_log_api *log_api;
-static struct mod_dmc500_ddr_phy_api *ddr_phy_api;
+static struct mod_dmc_ddr_phy_api *ddr_phy_api;
 static struct mod_timer_api *timer_api;
 
 static int dmc500_config(struct mod_dmc500_reg *dmc, fwk_id_t ddr_phy_id);

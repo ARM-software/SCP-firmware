@@ -10,6 +10,7 @@
 #ifndef MOD_DDR_PHY500_H
 #define MOD_DDR_PHY500_H
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
@@ -43,20 +44,20 @@ struct mod_ddr_phy500_reg {
     FWK_RW  uint32_t      T_WRLAT;
     FWK_RW  uint32_t      T_RDDATA_EN;
     FWK_RW  uint32_t      T_RDLAT;
-    FWK_RW  uint32_t      RESERVED1;
-    FWK_R   uint32_t      RESERVED2;
-    FWK_R   uint32_t      LP_REQ;
-    FWK_RW  uint32_t      LP_ACK;
-    FWK_RW  uint32_t      RDLVL_REQ;
-    FWK_R   uint32_t      RDLVL_EN;
-    FWK_RW  uint32_t      WRLVL_REQ;
-    FWK_RW  uint32_t      WRLVL_EN;
-    FWK_RW  uint32_t      MSTR_REQ;
-    FWK_RW  uint32_t      MSTR_ACK;
+    FWK_RW  uint32_t      DFI_PHYUPD_REQ;
+    FWK_R   uint32_t      DFI_PHYUPD_ACK;
+    FWK_R   uint32_t      DFI_LP_REQ;
+    FWK_RW  uint32_t      DFI_LP_ACK;
+    FWK_RW  uint32_t      DFI_RDLVL_REQ;
+    FWK_R   uint32_t      DFI_RDLVL_EN;
+    FWK_RW  uint32_t      DFI_WRLVL_REQ;
+    FWK_R   uint32_t      DFI_WRLVL_EN;
+    FWK_RW  uint32_t      DFI_PHYMSTR_REQ;
+    FWK_RW  uint32_t      DFI_PHYMSTR_ACK;
     FWK_RW  uint32_t      DFI_WR_PREMBL;
-    FWK_R   uint8_t       RESERVED3[0x820 - 0x50];
+            uint8_t       RESERVED[0x820 - 0x50];
     FWK_RW  uint32_t      DELAY_SEL;
-    FWK_R   uint32_t      RESERVED4;
+    FWK_RW  uint32_t      REF_EN;
     FWK_RW  uint32_t      T_CTRL_UPD_MIN;
     /*!
      * \endcond
@@ -82,6 +83,18 @@ struct mod_ddr_phy500_module_config {
     * represented by elements in the module's element table.
     */
     const struct mod_ddr_phy500_reg *ddr_reg_val;
+
+    /*!
+     * Indicate whether the \c INIT_COMPLETE register of the peripheral needs to
+     * be initialized.
+     */
+    bool initialize_init_complete;
+
+    /*!
+     * Indicate whether the \c REF_EN register of the peripheral needs to be
+     * initialized.
+     */
+    bool initialize_ref_en;
 };
 
 /*!

@@ -15,7 +15,14 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <mod_ddr_phy500.h>
-#include <mod_dmc500.h>
+
+#ifdef BUILD_HAS_MOD_DMC500
+    #include <mod_dmc500.h>
+#endif
+
+#ifdef BUILD_HAS_MOD_DMC620
+    #include <mod_dmc620.h>
+#endif
 
 static struct mod_log_api *log_api;
 
@@ -44,6 +51,9 @@ static int ddr_phy500_config(fwk_id_t element_id)
     if (status != FWK_SUCCESS)
         return status;
 
+    if (module_config->initialize_init_complete)
+        ddr->INIT_COMPLETE = module_config->ddr_reg_val->INIT_COMPLETE;
+
     ddr->T_CTRL_DELAY   = module_config->ddr_reg_val->T_CTRL_DELAY;
     ddr->READ_DELAY     = module_config->ddr_reg_val->READ_DELAY;
     ddr->T_CTRL_UPD_MIN = module_config->ddr_reg_val->T_CTRL_UPD_MIN;
@@ -55,12 +65,15 @@ static int ddr_phy500_config(fwk_id_t element_id)
     ddr->T_WRLAT       = module_config->ddr_reg_val->T_WRLAT;
     ddr->DFI_WR_PREMBL = module_config->ddr_reg_val->DFI_WR_PREMBL;
 
-    ddr->LP_ACK        = module_config->ddr_reg_val->LP_ACK;
+    ddr->DFI_LP_ACK    = module_config->ddr_reg_val->DFI_LP_ACK;
+
+    if (module_config->initialize_ref_en)
+        ddr->REF_EN = module_config->ddr_reg_val->REF_EN;
 
     return FWK_SUCCESS;
 }
 
-static struct mod_dmc500_ddr_phy_api ddr_phy500_api = {
+static struct mod_dmc_ddr_phy_api ddr_phy500_api = {
     .configure = ddr_phy500_config,
 };
 

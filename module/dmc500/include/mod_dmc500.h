@@ -521,11 +521,11 @@ struct mod_dmc500_element_config {
 };
 
 /*!
- * \brief API of the DDR PHY associate to the DMC
+ * \brief API of the DDR PHY associated to the DMC
  */
-struct mod_dmc500_ddr_phy_api {
+struct mod_dmc_ddr_phy_api {
     /*!
-     * \brief Configure a DDR PHY500 device
+     * \brief Configure a DDR physical device
      *
      * \param element_id Element identifier corresponding to the device to
      *      configure.

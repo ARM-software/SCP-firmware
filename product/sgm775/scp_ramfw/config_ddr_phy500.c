@@ -4,6 +4,8 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+
+#include <stdbool.h>
 #include <fwk_element.h>
 #include <fwk_module.h>
 #include <mod_ddr_phy500.h>
@@ -20,7 +22,7 @@ static const struct mod_ddr_phy500_reg ddr_reg_val = {
     .T_RDLAT = 0x00000016,
     .T_WRLAT = 0x01000000,
     .DFI_WR_PREMBL = 0x00000002,
-    .LP_ACK = 0x00641300,
+    .DFI_LP_ACK = 0x00641300,
 };
 
 /* Table of DDR PHY500 element descriptions. */
@@ -59,5 +61,7 @@ struct fwk_module_config config_ddr_phy500 = {
     .get_element_table = ddr_phy500_get_element_table,
     .data = &((struct mod_ddr_phy500_module_config) {
             .ddr_reg_val = &ddr_reg_val,
+            .initialize_init_complete = false,
+            .initialize_ref_en = false,
         }),
 };
