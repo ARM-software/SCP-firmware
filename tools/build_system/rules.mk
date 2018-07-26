@@ -66,17 +66,29 @@ else
     endif
 endif
 
+#
+# Warning flags
+#
+
+CFLAGS_GCC += -Werror
+CFLAGS_GCC += -Wall
+CFLAGS_GCC += -Wextra
+CFLAGS_GCC += -pedantic
+CFLAGS_GCC += -pedantic-errors
+
+CFLAGS_GCC += -Wno-unused-parameter
+
+# GCC is not currently consistent in how it applies this warning, but this flag
+# should be removed should we move to a version that can build the firmware
+# without it.
+CFLAGS_GCC += -Wno-missing-field-initializers
+
 CFLAGS_GCC += -g
+CFLAGS_GCC += -std=c11
+
 CFLAGS_GCC += -fno-exceptions
 CFLAGS_GCC += -ffunction-sections
 CFLAGS_GCC += -fdata-sections
-CFLAGS_GCC += -Wall
-CFLAGS_GCC += -Wextra
-CFLAGS_GCC += -Werror
-CFLAGS_GCC += -Wno-missing-field-initializers
-CFLAGS_GCC += -Wno-unused-parameter
-CFLAGS_GCC += -Wno-strict-aliasing
-CFLAGS_GCC += -std=c11
 
 DEP_CFLAGS_GCC = -MD -MP
 
