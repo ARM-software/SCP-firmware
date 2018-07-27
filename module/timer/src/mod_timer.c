@@ -48,11 +48,9 @@ struct alarm_ctx {
     uint32_t microseconds;
     /* Timestamp of the time this alarm will trigger */
     uint64_t timestamp;
-    /* Identifier of the entity to send the alarm event to */
-    fwk_id_t listener;
-    /* Identifier of the event the listener is expecting to receive */
-    fwk_id_t event_id;
-    /* Parameter of the event */
+    /* Pointer to the callback function */
+    void (*callback)(uintptr_t param);
+    /* Parameter of the callback function */
     uintptr_t param;
     /* Flag indicating if this alarm if periodic */
     bool periodic;
@@ -416,7 +414,7 @@ static int alarm_stop(fwk_id_t alarm_id)
 static int alarm_start(fwk_id_t alarm_id,
                        unsigned int milliseconds,
                        enum mod_timer_alarm_type type,
-                       fwk_id_t event_id,
+                       void (*callback)(uintptr_t param),
                        uintptr_t param)
 {
     int status;
@@ -439,7 +437,7 @@ static int alarm_start(fwk_id_t alarm_id,
     milliseconds = FWK_MIN(milliseconds, UINT32_MAX / 1000);
 
     /* Populate alarm item */
-    alarm->event_id = event_id;
+    alarm->callback = callback;
     alarm->param = param;
     alarm->periodic =
         (type == MOD_TIMER_ALARM_TYPE_PERIODIC ? true : false);
@@ -471,7 +469,6 @@ static void timer_isr(uintptr_t ctx_ptr)
     struct alarm_ctx *alarm;
     struct dev_ctx *ctx = (struct dev_ctx *)ctx_ptr;
     uint64_t timestamp = 0;
-    struct fwk_event event;
 
     assert(ctx != NULL);
 
@@ -489,19 +486,8 @@ static void timer_isr(uintptr_t ctx_ptr)
 
     alarm->started = false;
 
-    event = (struct fwk_event) {
-        .source_id = fwk_module_id_timer,
-        .target_id = alarm->listener,
-        .id = alarm->event_id,
-    };
-
-    memcpy(event.params, &alarm->param, sizeof(alarm->param));
-
-    status = fwk_thread_put_event(&event);
-    if (status != FWK_SUCCESS)
-        log_api->log(MOD_LOG_GROUP_WARNING,
-                     "[Timer] Warning: Alarm was triggered but event could not "
-                     "be pushed. Error code: %i\n", status);
+    /* Execute the callback function */
+    alarm->callback(alarm->param);
 
     if (alarm->periodic) {
         /* Put this alarm back into the active queue */
@@ -631,7 +617,6 @@ static int timer_process_bind_request(fwk_id_t requester_id,
     }
 
     alarm_ctx->bound = true;
-    alarm_ctx->listener = requester_id;
 
     *api = &alarm_api;
     return FWK_SUCCESS;
