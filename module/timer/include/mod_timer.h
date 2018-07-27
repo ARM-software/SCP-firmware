@@ -253,9 +253,7 @@ struct mod_timer_alarm_api {
     /*!
      * \brief Start an alarm so it will trigger after a specified time.
      *
-     * \details When an alarm is triggered, an event with identifier
-     *      \p event_id will be sent to the entity that is bound to the alarm.
-     *      The first word of the event's parameter will be set to \p param.
+     * \details When an alarm is triggered, \p callback is called.
      *
      *     If the alarm is periodic, it will automatically be started again
      *     with the same time delay after it triggers.
@@ -264,13 +262,16 @@ struct mod_timer_alarm_api {
      *     case, internally, the alarm will be stopped then started again with
      *     the new configuration.
      *
+     * \warning \p callback will be called from within an interrupt service
+     *      routine.
+     *
      * \param alarm_id Sub-element identifier of the alarm.
-     * \param event_id Identifier of the event the caller is expecting.
      * \param milliseconds The time delay, given in milliseconds, until the
      *     alarm should trigger.
      * \param type \ref MOD_TIMER_ALARM_TYPE_ONCE or
      *     \ref MOD_TIMER_ALARM_TYPE_PERIODIC.
-     * \param param Word-size parameter for the event.
+     * \param callback Pointer to the callback function.
+     * \param param Parameter given to the callback function when called.
      *
      * \pre \p alarm_id must be a valid sub-element alarm identifier that has
      *     previously been bound to.
@@ -280,7 +281,7 @@ struct mod_timer_alarm_api {
     int (*start)(fwk_id_t alarm_id,
                  unsigned int milliseconds,
                  enum mod_timer_alarm_type type,
-                 fwk_id_t event_id,
+                 void (*callback)(uintptr_t param),
                  uintptr_t param);
 
     /*!
@@ -289,9 +290,6 @@ struct mod_timer_alarm_api {
      * \details Stop an alarm that was previously started. This will prevent the
      *     alarm from triggering. This does not undo the binding of the alarm
      *     and it can be started again afterwards.
-     *
-     *     Any pending alarm events associated with the alarm are not cancelled
-     *      or removed when the alarm is stopped.
      *
      * \param alarm_id Sub-element identifier of the alarm item.
      *
