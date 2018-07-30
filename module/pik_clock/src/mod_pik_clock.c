@@ -107,6 +107,7 @@ struct pik_clock_dev_ctx {
 struct pik_clock_ctx {
     struct pik_clock_dev_ctx *dev_ctx_table;
     unsigned int dev_count;
+    unsigned int divider_max;
 };
 
 static struct pik_clock_ctx module_ctx;
@@ -152,7 +153,7 @@ static int ssclock_set_div(struct pik_clock_dev_ctx *ctx, uint32_t divider,
 
     if (divider == 0)
         return FWK_E_PARAM;
-    if (divider > 16)
+    if (divider > module_ctx.divider_max)
         return FWK_E_PARAM;
     if (ctx == NULL)
         return FWK_E_PARAM;
@@ -188,7 +189,7 @@ static int msclock_set_div(struct pik_clock_dev_ctx *ctx,
         return FWK_E_PARAM;
     if (divider == 0)
         return FWK_E_PARAM;
-    if (divider > 16)
+    if (divider > module_ctx.divider_max)
         return FWK_E_PARAM;
     if (ctx->config->type == MOD_PIK_CLOCK_TYPE_SINGLE_SOURCE)
         return FWK_E_PARAM;
@@ -663,10 +664,16 @@ static const struct mod_css_clock_direct_api api_direct = {
 static int pik_clock_init(fwk_id_t module_id, unsigned int element_count,
                           const void *data)
 {
+    struct mod_pik_clock_module_config *config =
+        (struct mod_pik_clock_module_config *)data;
     module_ctx.dev_count = element_count;
 
     if (element_count == 0)
         return FWK_SUCCESS;
+
+    module_ctx.divider_max = ((config == NULL) ?
+        (1 << MOD_PIK_CLOCK_DIVIDER_BITFIELD_WIDTH_5BITS) :
+        config->divider_max);
 
     module_ctx.dev_ctx_table = fwk_mm_calloc(element_count,
                                              sizeof(struct pik_clock_dev_ctx));
