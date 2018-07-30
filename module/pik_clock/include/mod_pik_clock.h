@@ -195,6 +195,25 @@ enum mod_pik_clock_dmcclk_source {
 };
 
 /*!
+ * \brief Divider bitfield width.
+ */
+enum mod_pik_clock_divider_bitfield_width {
+    /*! PIK clock with 4-bit divider. */
+    MOD_PIK_CLOCK_DIVIDER_BITFIELD_WIDTH_4BITS = 4,
+    /*! PIK clock with 5-bit divider. */
+    MOD_PIK_CLOCK_DIVIDER_BITFIELD_WIDTH_5BITS = 5,
+};
+
+/*!
+ * \brief PIK clock module configuration.
+ */
+struct mod_pik_clock_module_config {
+    /*! The maximum divider value. */
+    unsigned int divider_max;
+};
+
+
+/*!
  * \brief Rate lookup entry.
  */
 struct mod_pik_clock_rate {
