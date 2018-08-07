@@ -37,43 +37,55 @@ def main():
     result = check_doc.main()
     results.append(('Check doc', result))
 
-    result = subprocess.call('pep8 tools/', shell=True)
-    results.append(('PEP8', result))
+    result = subprocess.call('python -m pycodestyle tools/', shell=True)
+    results.append(('PyCodeStyle', result))
 
     banner('Build and run framework tests')
 
-    result = subprocess.call('make clean test', shell=True)
+    result = subprocess.call('CC=gcc make clean test', shell=True)
     results.append(('Framework tests', result))
 
     banner('Test building the framework library')
 
-    cmd = 'CROSS_COMPILE= BS_FIRMWARE_CPU=host make lib-framework'
+    cmd = \
+        'CC=gcc CROSS_COMPILE= BS_FIRMWARE_CPU=host ' \
+        'make clean lib-framework'
     result = subprocess.call(cmd, shell=True)
-    results.append(('Framework build (host)', result))
+    results.append(('Framework build (Host, GCC)', result))
 
-    cmd = 'CROSS_COMPILE=arm-none-eabi- BS_FIRMWARE_CPU=cortex-m3 make '\
-          'lib-framework'
+    cmd = \
+        'CC=arm-none-eabi-gcc CROSS_COMPILE=arm-none-eabi- ' \
+        'BS_FIRMWARE_CPU=cortex-m3 ' \
+        'make clean lib-framework'
     result = subprocess.call(cmd, shell=True)
-    results.append(('Framework build (Cortex-M3)', result))
+    results.append(('Framework build (Cortex-M3, GCC)', result))
 
     banner('Test building arch library')
 
-    cmd = 'CROSS_COMPILE=arm-none-eabi- BS_FIRMWARE_CPU=cortex-m3 make '\
-          'lib-arch'
+    cmd = \
+        'CC=arm-none-eabi-gcc CROSS_COMPILE=arm-none-eabi- ' \
+        'BS_FIRMWARE_CPU=cortex-m3 ' \
+        'make clean lib-arch'
     result = subprocess.call(cmd, shell=True)
-    results.append(('Arch build (Cortex-M3)', result))
+    results.append(('Arch build (Cortex-M3, GCC)', result))
 
     banner('Test building host product')
 
-    cmd = 'CROSS_COMPILE= PRODUCT=host make '
+    cmd = \
+        'CC=gcc CROSS_COMPILE= ' \
+        'PRODUCT=host ' \
+        'make clean all'
     result = subprocess.call(cmd, shell=True)
-    results.append(('Product host build', result))
+    results.append(('Product host build (GCC)', result))
 
     banner('Test building sgm775 product')
 
-    cmd = 'CROSS_COMPILE=arm-none-eabi- PRODUCT=sgm775 make'
+    cmd = \
+        'CC=arm-none-eabi-gcc CROSS_COMPILE=arm-none-eabi- ' \
+        'PRODUCT=sgm775 ' \
+        'make clean all'
     result = subprocess.call(cmd, shell=True)
-    results.append(('Product sgm775 build', result))
+    results.append(('Product sgm775 build (GCC)', result))
 
     banner('Tests summary')
 
