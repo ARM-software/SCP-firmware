@@ -123,8 +123,8 @@ The software is provided under a [BSD-3-Clause license](https://spdx.org/license
 Feedback and Support
 --------------------
 
-Arm welcomes any feedback on SCP-firmware. Please contact the maintainers (
-see [maintainers.md](./maintainers.md)).
+Arm welcomes any feedback on SCP-firmware. Please contact the maintainers (see
+maintainers.md).
 
 To request support please contact Arm by email at support@arm.com. Arm licensees
 may also contact Arm via their partner managers.
