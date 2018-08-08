@@ -46,8 +46,8 @@ struct fwk_module_config config_pl011 = {
  * Log module
  */
 static const struct mod_log_config log_data = {
-    .device_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_PL011, 0),
-    .api_id = FWK_ID_API(FWK_MODULE_IDX_PL011, 0),
+    .device_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PL011, 0),
+    .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PL011, 0),
     .log_groups = MOD_LOG_GROUP_ERROR |
                   MOD_LOG_GROUP_INFO |
                   MOD_LOG_GROUP_WARNING |

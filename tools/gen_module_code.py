@@ -70,8 +70,9 @@ def generate_header(path, modules):
     for module in modules:
         enum += "    FWK_MODULE_IDX_{},\n".format(module.upper())
         const += "static const fwk_id_t fwk_module_id_{} = " \
-                 "FWK_ID_MODULE(FWK_MODULE_IDX_{});\n".format(module,
-                                                              module.upper())
+                 "FWK_ID_MODULE_INIT(FWK_MODULE_IDX_{});\n".format(module,
+                                                                   module
+                                                                   .upper())
 
     content = TEMPLATE_H.format(sys.argv[0], enum, const)
     generate_file(path, FILENAME_H, content)

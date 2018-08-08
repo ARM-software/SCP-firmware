@@ -172,29 +172,29 @@ static const struct mod_css_clock_rate rate_table_vpu[] = {
 };
 
 static const fwk_id_t member_table_cpu_group_big[] = {
-    FWK_ID_ELEMENT(FWK_MODULE_IDX_PIK_CLOCK, 4),
-    FWK_ID_ELEMENT(FWK_MODULE_IDX_PIK_CLOCK, 5),
-    FWK_ID_ELEMENT(FWK_MODULE_IDX_PIK_CLOCK, 6),
-    FWK_ID_ELEMENT(FWK_MODULE_IDX_PIK_CLOCK, 7),
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, 4),
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, 5),
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, 6),
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, 7),
 };
 
 static const fwk_id_t member_table_cpu_group_little[] = {
-    FWK_ID_ELEMENT(FWK_MODULE_IDX_PIK_CLOCK, 0),
-    FWK_ID_ELEMENT(FWK_MODULE_IDX_PIK_CLOCK, 1),
-    FWK_ID_ELEMENT(FWK_MODULE_IDX_PIK_CLOCK, 2),
-    FWK_ID_ELEMENT(FWK_MODULE_IDX_PIK_CLOCK, 3),
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, 0),
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, 1),
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, 2),
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, 3),
 };
 
 static const fwk_id_t member_table_gpu[] = {
-    FWK_ID_ELEMENT(FWK_MODULE_IDX_PIK_CLOCK, 8),
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, 8),
 };
 
 static const fwk_id_t member_table_vpu[] = {
-    FWK_ID_ELEMENT(FWK_MODULE_IDX_PIK_CLOCK, 9),
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, 9),
 };
 
 static const fwk_id_t member_table_dpu[] = {
-    FWK_ID_ELEMENT(FWK_MODULE_IDX_PIK_CLOCK, 11),
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, 11),
 };
 
 static const struct fwk_element css_clock_element_table[] = {
