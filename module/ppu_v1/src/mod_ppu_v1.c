@@ -621,7 +621,7 @@ static void ppu_interrupt_handler(uintptr_t pd_ctx_param)
         core_pd_ppu_interrupt_handler(pd_ctx);
     else
         cluster_pd_ppu_interrupt_handler(pd_ctx);
-};
+}
 
 static void ppu_isr_api_interrupt_handler(fwk_id_t pd_id)
 {
