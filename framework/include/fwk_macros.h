@@ -150,10 +150,10 @@
  * \return The smallest value from a and b. If both are equal, b is returned.
  */
 #define FWK_MIN(a, b) \
-    ({ \
-    __auto_type _a = (a); \
-    __auto_type _b = (b); \
-    _a < _b ? _a : _b; \
+    __extension__({ \
+        __auto_type _a = (a); \
+        __auto_type _b = (b); \
+        _a < _b ? _a : _b; \
     })
 
 /*!
@@ -169,10 +169,10 @@
  * \return The largest value from a and b. If both are equal, b is returned.
  */
 #define FWK_MAX(a, b) \
-    ({ \
-    __auto_type _a = (a); \
-    __auto_type _b = (b); \
-    _a > _b ? _a : _b; \
+    __extension__({ \
+        __auto_type _a = (a); \
+        __auto_type _b = (b); \
+        _a > _b ? _a : _b; \
     })
 
 /*!
