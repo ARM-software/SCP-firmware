@@ -89,7 +89,7 @@ static int system_state_get(enum scmi_system_state *system_state)
     }
 
     return FWK_SUCCESS;
-};
+}
 
 /*
  * PROTOCOL_VERSION

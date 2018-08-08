@@ -37,7 +37,7 @@ static const struct fwk_element gtimer_dev_table[] = {
 static const struct fwk_element *gtimer_get_dev_table(fwk_id_t module_id)
 {
     return gtimer_dev_table;
-};
+}
 
 struct fwk_module_config config_gtimer = {
     .get_element_table = gtimer_get_dev_table,
