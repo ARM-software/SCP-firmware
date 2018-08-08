@@ -45,8 +45,8 @@ struct fwk_module_config config_reg_sensor = {
  * Sensor module config
  */
 static const struct mod_sensor_dev_config soctemp_config = {
-    .driver_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_REG_SENSOR,
-                                REG_SENSOR_DEV_SOC_TEMP),
+    .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_REG_SENSOR,
+                                     REG_SENSOR_DEV_SOC_TEMP),
     .info = &((struct mod_sensor_info) {
         .type = MOD_SENSOR_TYPE_DEGREES_C,
         .update_interval = 0,

@@ -47,7 +47,7 @@ struct fwk_module_config config_gtimer = {
  * Timer HAL config
  */
 static const struct mod_timer_dev_config refclk_config = {
-    .id = FWK_ID_ELEMENT(FWK_MODULE_IDX_GTIMER, 0),
+    .id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_GTIMER, 0),
 };
 
 static const struct fwk_element timer_dev_table[] = {
