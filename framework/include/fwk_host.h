@@ -21,10 +21,12 @@
  * \return On failure, a negative number containing the error code as per the
  *      printf() specification.
  */
-#define FWK_HOST_PRINT(fmt, ...)  printf(fmt, ##__VA_ARGS__)
+#define FWK_HOST_PRINT printf
 
 #else
-#define FWK_HOST_PRINT(fmt, ...)  do {} while (0)
+#define FWK_HOST_PRINT(...) \
+    do { \
+    } while (0)
 #endif
 
 #endif /* FWK_HOST_H */
