@@ -107,7 +107,7 @@ static const struct fwk_element clock_dev_desc_table[] = {
             .pd_source_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_MSYS_ROM),
         }),
     },
-    [CLOCK_DEV_IDX_COUNT] = { }, /* Termination description. */
+    [CLOCK_DEV_IDX_COUNT] = { 0 }, /* Termination description. */
 };
 
 static const struct fwk_element *clock_get_dev_desc_table(fwk_id_t module_id)

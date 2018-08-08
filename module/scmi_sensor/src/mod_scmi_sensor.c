@@ -132,7 +132,7 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
     size_t max_payload_size;
     const struct scmi_sensor_protocol_description_get_a2p *parameters =
                (const struct scmi_sensor_protocol_description_get_a2p *)payload;
-    struct scmi_sensor_desc desc = {};
+    struct scmi_sensor_desc desc = { 0 };
     unsigned int num_descs, desc_index, desc_index_max;
     struct mod_sensor_info sensor_info;
     struct scmi_sensor_protocol_description_get_p2a return_values = {
@@ -459,4 +459,4 @@ const struct fwk_module module_scmi_sensor = {
 };
 
 /* No elements, no module configuration data */
-struct fwk_module_config config_scmi_sensor = {};
+struct fwk_module_config config_scmi_sensor = { 0 };

@@ -173,7 +173,7 @@ static struct fwk_element dmc500_element_table[] = {
                 .ddr_phy_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_DDR_PHY500, 3),
         }),
     },
-    [4] = { }, /* Termination description. */
+    [4] = { 0 }, /* Termination description. */
 };
 
 static const struct fwk_element *dmc500_get_element_table(fwk_id_t module_id)

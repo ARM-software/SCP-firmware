@@ -900,7 +900,7 @@ static int complete_system_suspend(struct pd_ctx *target_pd)
     enum mod_pd_level level;
     unsigned int composite_state = 0;
     struct pd_ctx *pd = target_pd;
-    struct fwk_event resp_event = { };
+    struct fwk_event resp_event;
     struct pd_set_state_response *resp_params =
         (struct pd_set_state_response *)(&resp_event.params);
 
@@ -922,6 +922,8 @@ static int complete_system_suspend(struct pd_ctx *target_pd)
      * state.
      */
     composite_state |= (--level) << MOD_PD_CS_LEVEL_SHIFT;
+
+    resp_event = (struct fwk_event) { 0 };
 
     process_set_state_request(target_pd,
         &((struct pd_set_state_request){
@@ -1257,7 +1259,7 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
     int status;
     struct pd_ctx *pd;
     enum mod_pd_level level;
-    struct fwk_event req = { };
+    struct fwk_event req;
     struct fwk_event resp;
     struct pd_set_state_request *req_params =
         (struct pd_set_state_request *)(&req.params);
@@ -1275,8 +1277,11 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
 
     level = get_level_from_tree_pos(pd->config->tree_pos);
 
-    req.target_id = pd_id;
-    req.id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_SET_STATE);
+    req = (struct fwk_event) {
+        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_SET_STATE),
+        .target_id = pd_id,
+    };
+
     req_params->composite_state = (level << MOD_PD_CS_LEVEL_SHIFT) |
                                   (state << mod_pd_cs_level_state_shift[level]);
 
@@ -1293,7 +1298,7 @@ static int pd_set_state_async(fwk_id_t pd_id,
     int status;
     struct pd_ctx *pd;
     enum mod_pd_level level;
-    struct fwk_event req = { };
+    struct fwk_event req;
     struct pd_set_state_request *req_params =
         (struct pd_set_state_request *)(&req.params);
 
@@ -1308,10 +1313,13 @@ static int pd_set_state_async(fwk_id_t pd_id,
 
     level = get_level_from_tree_pos(pd->config->tree_pos);
 
-    req.source_id = pd->driver_id;
-    req.target_id = pd_id;
-    req.id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_SET_STATE);
-    req.response_requested = response_requested;
+    req = (struct fwk_event) {
+        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_SET_STATE),
+        .source_id = pd->driver_id,
+        .target_id = pd_id,
+        .response_requested = response_requested,
+    };
+
     req_params->composite_state = (level << MOD_PD_CS_LEVEL_SHIFT) |
                                   (state << mod_pd_cs_level_state_shift[level]);
 
@@ -1322,7 +1330,7 @@ static int pd_set_composite_state(fwk_id_t pd_id, uint32_t composite_state)
 {
     int status;
     struct pd_ctx *pd;
-    struct fwk_event req = { };
+    struct fwk_event req;
     struct fwk_event resp;
     struct pd_set_state_request *req_params =
         (struct pd_set_state_request *)(&req.params);
@@ -1338,9 +1346,12 @@ static int pd_set_composite_state(fwk_id_t pd_id, uint32_t composite_state)
     if (!is_valid_composite_state(pd, composite_state))
         return FWK_E_PARAM;
 
-    req.source_id = pd->driver_id;
-    req.target_id = pd_id;
-    req.id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_SET_STATE);
+    req = (struct fwk_event) {
+        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_SET_STATE),
+        .source_id = pd->driver_id,
+        .target_id = pd_id,
+    };
+
     req_params->composite_state = composite_state;
 
     status = fwk_thread_put_event_and_wait(&req, &resp);
@@ -1356,7 +1367,7 @@ static int pd_set_composite_state_async(fwk_id_t pd_id,
 {
     int status;
     struct pd_ctx *pd;
-    struct fwk_event req = { };
+    struct fwk_event req;
     struct pd_set_state_request *req_params =
                                (struct pd_set_state_request *)(&req.params);
 
@@ -1369,10 +1380,13 @@ static int pd_set_composite_state_async(fwk_id_t pd_id,
     if (!is_valid_composite_state(pd, composite_state))
         return FWK_E_PARAM;
 
-    req.source_id = pd->driver_id;
-    req.target_id = pd_id;
-    req.id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_SET_STATE);
-    req.response_requested = response_requested;
+    req = (struct fwk_event) {
+        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_SET_STATE),
+        .source_id = pd->driver_id,
+        .target_id = pd_id,
+        .response_requested = response_requested,
+    };
+
     req_params->composite_state = composite_state;
 
     return fwk_thread_put_event(&req);
@@ -1381,7 +1395,7 @@ static int pd_set_composite_state_async(fwk_id_t pd_id,
 static int pd_get_state(fwk_id_t pd_id, unsigned int *state)
 {
     int status;
-    struct fwk_event req = { };
+    struct fwk_event req;
     struct fwk_event resp;
     struct pd_get_state_request *req_params =
         (struct pd_get_state_request *)(&req.params);
@@ -1395,8 +1409,11 @@ static int pd_get_state(fwk_id_t pd_id, unsigned int *state)
     if (state == NULL)
         return FWK_E_PARAM;
 
-    req.target_id = pd_id;
-    req.id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_GET_STATE);
+    req = (struct fwk_event) {
+        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_GET_STATE),
+        .target_id = pd_id,
+    };
+
     req_params->composite = false;
 
     status = fwk_thread_put_event_and_wait(&req, &resp);
@@ -1414,7 +1431,7 @@ static int pd_get_state(fwk_id_t pd_id, unsigned int *state)
 static int pd_get_composite_state(fwk_id_t pd_id, unsigned int *composite_state)
 {
     int status;
-    struct fwk_event req = { };
+    struct fwk_event req;
     struct fwk_event resp;
     struct pd_get_state_request *req_params =
         (struct pd_get_state_request *)(&req.params);
@@ -1428,8 +1445,11 @@ static int pd_get_composite_state(fwk_id_t pd_id, unsigned int *composite_state)
     if (composite_state == NULL)
         return FWK_E_PARAM;
 
-    req.target_id = pd_id;
-    req.id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_GET_STATE);
+    req = (struct fwk_event) {
+        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_GET_STATE),
+        .target_id = pd_id,
+    };
+
     req_params->composite = true;
 
     status = fwk_thread_put_event_and_wait(&req, &resp);
@@ -1447,7 +1467,7 @@ static int pd_get_composite_state(fwk_id_t pd_id, unsigned int *composite_state)
 static int pd_reset(fwk_id_t pd_id)
 {
     int status;
-    struct fwk_event req = { };
+    struct fwk_event req;
     struct fwk_event resp;
     struct pd_response *resp_params = (struct pd_response *)(&resp.params);
 
@@ -1455,8 +1475,10 @@ static int pd_reset(fwk_id_t pd_id)
     if (status != FWK_SUCCESS)
         return status;
 
-    req.target_id = pd_id;
-    req.id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_RESET);
+    req = (struct fwk_event) {
+        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_RESET),
+        .target_id = pd_id,
+    };
 
     status = fwk_thread_put_event_and_wait(&req, &resp);
     if (status != FWK_SUCCESS)
@@ -1468,7 +1490,7 @@ static int pd_reset(fwk_id_t pd_id)
 static int pd_system_suspend(unsigned int state)
 {
     int status;
-    struct fwk_event req = { };
+    struct fwk_event req;
     struct fwk_event resp;
     struct pd_system_suspend_request *req_params =
         (struct pd_system_suspend_request *)(&req.params);
@@ -1478,9 +1500,12 @@ static int pd_system_suspend(unsigned int state)
     if (status != FWK_SUCCESS)
         return status;
 
-    req.target_id = fwk_module_id_power_domain;
-    req.id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
-                          PD_EVENT_IDX_SYSTEM_SUSPEND);
+    req = (struct fwk_event) {
+        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
+                           PD_EVENT_IDX_SYSTEM_SUSPEND),
+        .target_id = fwk_module_id_power_domain,
+    };
+
     req_params->state = state;
 
     status = fwk_thread_put_event_and_wait(&req, &resp);
@@ -1493,7 +1518,7 @@ static int pd_system_suspend(unsigned int state)
 static int pd_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
 {
     int status;
-    struct fwk_event req = { };
+    struct fwk_event req;
     struct fwk_event resp;
     struct pd_system_shutdown_request *req_params =
         (struct pd_system_shutdown_request *)(&req.params);
@@ -1503,9 +1528,12 @@ static int pd_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
     if (status != FWK_SUCCESS)
         return status;
 
-    req.target_id = fwk_module_id_power_domain;
-    req.id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
-                          PD_EVENT_IDX_SYSTEM_SHUTDOWN);
+    req = (struct fwk_event) {
+        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
+                           PD_EVENT_IDX_SYSTEM_SHUTDOWN),
+        .target_id = fwk_module_id_power_domain,
+    };
+
     req_params->system_shutdown = system_shutdown;
 
     status = fwk_thread_put_event_and_wait(&req, &resp);
@@ -1520,7 +1548,7 @@ static int pd_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
 static int pd_reset_async(fwk_id_t pd_id, bool response_requested)
 {
     int status;
-    struct fwk_event req = { };
+    struct fwk_event req;
     struct pd_ctx *pd;
 
     status = fwk_module_check_call(pd_id);
@@ -1529,10 +1557,12 @@ static int pd_reset_async(fwk_id_t pd_id, bool response_requested)
 
     pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
 
-    req.source_id = pd->driver_id;
-    req.target_id = pd_id;
-    req.id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_RESET);
-    req.response_requested = response_requested;
+    req = (struct fwk_event) {
+        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_RESET),
+        .source_id = pd->driver_id,
+        .target_id = pd_id,
+        .response_requested = response_requested,
+    };
 
     return fwk_thread_put_event(&req);
 }

@@ -59,4 +59,4 @@ const struct fwk_module module_host_console = {
     .process_bind_request = process_bind_request,
 };
 
-const struct fwk_module_config config_host_console = { };
+const struct fwk_module_config config_host_console = { 0 };

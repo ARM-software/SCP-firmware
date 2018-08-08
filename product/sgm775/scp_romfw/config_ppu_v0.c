@@ -30,7 +30,7 @@ static struct fwk_element sgm775_ppu_v0_element_table[] = {
             .default_power_on = true,
         }),
     },
-    {}, /* Termination entry */
+    { 0 }, /* Termination entry */
 };
 
 

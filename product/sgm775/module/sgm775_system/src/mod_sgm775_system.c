@@ -56,4 +56,4 @@ const struct fwk_module module_sgm775_system = {
 };
 
 /* No elements, no module configuration data */
-struct fwk_module_config config_sgm775_system = {};
+struct fwk_module_config config_sgm775_system = { 0 };

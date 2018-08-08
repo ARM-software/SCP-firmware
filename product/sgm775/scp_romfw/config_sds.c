@@ -99,7 +99,7 @@ static const struct fwk_element sds_element_table[] = {
         }),
     },
 #endif
-    {}, /* Termination description. */
+    { 0 }, /* Termination description. */
 };
 
 static const struct fwk_element *sds_get_element_table(fwk_id_t module_id)

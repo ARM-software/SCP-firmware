@@ -63,7 +63,7 @@ static const uint32_t core_pd_allowed_state_mask_table[] = {
 };
 
 /* Power module specific configuration data (none) */
-static const struct mod_power_domain_config sgm775_power_domain_config = { };
+static const struct mod_power_domain_config sgm775_power_domain_config = { 0 };
 
 static struct fwk_element sgm775_power_domain_static_element_table[] = {
     [CONFIG_POWER_DOMAIN_SYSTOP_CHILD_CLUSTER0] = {

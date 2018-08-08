@@ -30,7 +30,7 @@ static const struct fwk_element pl011_element_desc_table[] = {
                             CLOCK_DEV_IDX_SYS_FCMCLK),
             }),
     },
-    [1] = {},
+    [1] = { 0 },
 };
 
 static const struct fwk_element *get_pl011_table(fwk_id_t module_id)

@@ -103,7 +103,7 @@ static const struct fwk_element system_pll_element_table[] = {
             .defer_initialization = false,
         }),
     },
-    { }, /* Termination description. */
+    { 0 }, /* Termination description. */
 };
 
 static const struct fwk_element *system_pll_get_element_table

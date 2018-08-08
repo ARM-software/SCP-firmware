@@ -44,7 +44,7 @@ static const struct fwk_element element_table[] = {
                                              MOD_MOCK_PSU_API_IDX_PSU_DRIVER)
         },
     },
-    { }
+    { 0 }
 };
 
 static const struct fwk_element *psu_get_element_table(fwk_id_t module_id)

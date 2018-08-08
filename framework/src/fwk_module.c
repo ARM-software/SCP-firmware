@@ -453,7 +453,7 @@ int __fwk_module_get_state(fwk_id_t id, enum fwk_module_state *state)
 
 void __fwk_module_reset(void)
 {
-    ctx = (struct context){ };
+    ctx = (struct context){ 0 };
 }
 
 /*

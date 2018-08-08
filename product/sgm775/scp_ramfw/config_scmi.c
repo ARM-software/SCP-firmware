@@ -46,7 +46,7 @@ static const struct fwk_element service_table[] = {
             .scmi_agent_id = SCMI_AGENT_ID_OSPM,
         }),
     },
-    [SGM775_SCMI_SERVICE_IDX_COUNT] = {}
+    [SGM775_SCMI_SERVICE_IDX_COUNT] = { 0 }
 };
 
 static const struct fwk_element *get_service_table(fwk_id_t module_id)

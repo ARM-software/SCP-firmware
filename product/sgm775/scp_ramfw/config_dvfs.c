@@ -38,7 +38,7 @@ static const struct mod_dvfs_domain_config cpu_group_little = {
             .frequency = 1596 * FWK_MHZ,
             .voltage = 500,
         },
-        { }
+        { 0 }
     }
 };
 
@@ -68,7 +68,7 @@ static const struct mod_dvfs_domain_config cpu_group_big = {
             .frequency = 2450 * FWK_MHZ,
             .voltage = 500,
         },
-        { }
+        { 0 }
     }
 };
 
@@ -98,7 +98,7 @@ static const struct mod_dvfs_domain_config gpu = {
             .frequency = 600 * FWK_MHZ,
             .voltage = 500,
         },
-        { }
+        { 0 }
     }
 };
 
@@ -115,7 +115,7 @@ static const struct fwk_element element_table[] = {
         .name = "GPU",
         .data = &gpu,
     },
-    { }
+    { 0 }
 };
 
 static const struct fwk_element *dvfs_get_element_table(fwk_id_t module_id)

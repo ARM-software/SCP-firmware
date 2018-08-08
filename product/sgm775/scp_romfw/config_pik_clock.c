@@ -292,7 +292,7 @@ static const struct fwk_element pik_clock_element_table[] = {
             .defer_initialization = true,
      }),
     },
-    { }, /* Termination description. */
+    { 0 }, /* Termination description. */
 };
 
 static const struct fwk_element *pik_clock_get_element_table

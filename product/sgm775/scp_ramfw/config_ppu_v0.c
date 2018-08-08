@@ -73,7 +73,7 @@ static struct fwk_element sgm775_ppu_v0_element_table[] = {
             .ppu.irq = PPU_SYS1_IRQ
         }),
     },
-    [PPU_V0_ELEMENT_IDX_COUNT] = { }, /* Termination entry */
+    [PPU_V0_ELEMENT_IDX_COUNT] = { 0 }, /* Termination entry */
 };
 
 
