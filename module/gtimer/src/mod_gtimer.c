@@ -138,6 +138,8 @@ static int get_timer(fwk_id_t dev_id, uint64_t *timestamp)
 {
     struct dev_ctx *ctx;
     int status;
+    uint32_t counter_low;
+    uint32_t counter_high;
 
     status = fwk_module_check_call(dev_id);
     if (status != FWK_SUCCESS)
@@ -145,16 +147,12 @@ static int get_timer(fwk_id_t dev_id, uint64_t *timestamp)
 
     ctx = ctx_table + fwk_id_get_element_idx(dev_id);
 
-    struct {
-        uint32_t low;
-        uint32_t high;
-    } value;
-
     /* Read 64-bit timer value */
-    value.low = ctx->hw_timer->P_CVALL;
-    value.high = ctx->hw_timer->P_CVALH;
+    counter_low = ctx->hw_timer->P_CVALL;
+    counter_high = ctx->hw_timer->P_CVALH;
 
-    *timestamp = *(uint64_t *)&value;
+    *timestamp = ((uint64_t)counter_high << 32) | counter_low;
+
     return FWK_SUCCESS;
 }
 
