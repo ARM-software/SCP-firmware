@@ -97,8 +97,11 @@ void __fwk_dlist_insert(
     fwk_expect(new->next == NULL);
     fwk_expect(new->prev == NULL);
 
-    if (node == NULL)
-        return __fwk_dlist_push_tail(list, new);
+    if (node == NULL) {
+        __fwk_dlist_push_tail(list, new);
+
+        return;
+    }
 
     assert(node->prev != NULL);
     assert(node->next != NULL);
