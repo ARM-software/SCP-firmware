@@ -602,4 +602,4 @@ const struct fwk_module module_scmi_power_domain = {
 };
 
 /* No elements, no module configuration data */
-struct fwk_module_config config_scmi_power_domain = {};
+struct fwk_module_config config_scmi_power_domain = { 0 };

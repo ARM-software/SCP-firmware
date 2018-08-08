@@ -31,7 +31,7 @@ static const struct fwk_element gtimer_dev_table[] = {
                             CLOCK_DEV_IDX_SYS_FCMCLK),
         })
     },
-    [1] = {},
+    [1] = { 0 },
 };
 
 static const struct fwk_element *gtimer_get_dev_table(fwk_id_t module_id)
@@ -55,7 +55,7 @@ static const struct fwk_element timer_dev_table[] = {
         .name = "REFCLK",
         .data = &refclk_config,
     },
-    [1] = {},
+    [1] = { 0 },
 };
 
 static const struct fwk_element *timer_get_dev_table(fwk_id_t module_id)

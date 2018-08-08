@@ -172,7 +172,7 @@ int __fwk_notification_init(size_t notification_count)
 
 void __fwk_notification_reset(void)
 {
-    ctx = (struct notification_ctx){ };
+    ctx = (struct notification_ctx){ 0 };
 }
 
 /*

@@ -287,7 +287,7 @@ static const struct fwk_element css_clock_element_table[] = {
             .modulation_supported = false,
      }),
     },
-    { }, /* Termination description. */
+    { 0 }, /* Termination description. */
 };
 
 static const struct fwk_element *css_clock_get_element_table

@@ -56,7 +56,7 @@ static const struct fwk_element smt_element_table[] = {
             .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MHU, 0),
         })
     },
-    [SGM775_SCMI_SERVICE_IDX_COUNT] = {},
+    [SGM775_SCMI_SERVICE_IDX_COUNT] = { 0 },
 };
 
 static const struct fwk_element *smt_get_element_table(fwk_id_t module_id)

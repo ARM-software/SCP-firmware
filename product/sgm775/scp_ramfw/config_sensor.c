@@ -28,7 +28,7 @@ static const struct fwk_element reg_sensor_element_table[] = {
             .reg = (uintptr_t)(SENSOR_SOC_TEMP),
         }),
     },
-    [REG_SENSOR_DEV_COUNT] = {},
+    [REG_SENSOR_DEV_COUNT] = { 0 },
 };
 
 static const struct fwk_element *get_reg_sensor_element_table(fwk_id_t id)
@@ -60,7 +60,7 @@ static const struct fwk_element sensor_element_table[] = {
         .name = "Soc Temperature",
         .data = &soctemp_config,
     },
-    [1] = {},
+    [1] = { 0 },
 };
 
 static const struct fwk_element *get_sensor_element_table(fwk_id_t module_id)

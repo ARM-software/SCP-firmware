@@ -83,7 +83,7 @@ static struct fwk_element clock_dev_desc_table[] = {
                                       MOD_PIK_CLOCK_API_TYPE_CLOCK),
         }),
     },
-    [CLOCK_DEV_IDX_COUNT] = { }, /* Termination description. */
+    [CLOCK_DEV_IDX_COUNT] = { 0 }, /* Termination description. */
 };
 
 static const struct fwk_element *clock_get_dev_desc_table(fwk_id_t module_id)

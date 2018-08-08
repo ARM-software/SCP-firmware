@@ -144,15 +144,17 @@ static uint8_t read_protocol_id(uint32_t message_header)
 static int signal_message(fwk_id_t service_id)
 {
     int32_t status;
-    struct fwk_event event = { };
+    struct fwk_event event;
 
     status = fwk_module_check_call(service_id);
     if (status != FWK_SUCCESS)
         return status;
 
-    event.source_id = FWK_ID_MODULE(FWK_MODULE_IDX_SCMI);
-    event.target_id = service_id;
-    event.id = FWK_ID_EVENT(FWK_MODULE_IDX_SCMI, 0);
+    event = (struct fwk_event) {
+        .id = FWK_ID_EVENT(FWK_MODULE_IDX_SCMI, 0),
+        .source_id = FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
+        .target_id = service_id,
+    };
 
     return fwk_thread_put_event(&event);
 }

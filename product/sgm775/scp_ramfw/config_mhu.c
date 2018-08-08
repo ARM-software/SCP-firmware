@@ -41,7 +41,7 @@ static const struct fwk_element mhu_element_table[] = {
             .out = MHU_SCP_INTR_L_BASE,
         })
     },
-    [SGM775_MHU_DEVICE_IDX_COUNT] = {},
+    [SGM775_MHU_DEVICE_IDX_COUNT] = { 0 },
 };
 
 static const struct fwk_element *mhu_get_element_table(fwk_id_t module_id)

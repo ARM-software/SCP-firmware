@@ -38,7 +38,7 @@ static const struct fwk_element element_table[] = {
             .default_voltage = 100,
         },
     },
-    { }
+    { 0 }
 };
 
 static const struct fwk_element *get_element_table(fwk_id_t module_id)

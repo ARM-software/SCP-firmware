@@ -45,7 +45,7 @@ static struct fwk_element ddr_phy500_element_table[] = {
                 .ddr = DDR_PHY3,
         }),
     },
-    [4] = { }, /* Termination description. */
+    [4] = { 0 }, /* Termination description. */
 };
 
 static const struct fwk_element *ddr_phy500_get_element_table

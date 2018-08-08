@@ -36,7 +36,7 @@ static struct fwk_element sgm775_ppu_v1_element_table[] = {
             .observer_id = FWK_ID_NONE_INIT,
         }),
     },
-    {}, /* Termination entry */
+    { 0 }, /* Termination entry */
 };
 
 static const struct fwk_element *sgm775_ppu_v1_get_element_table(
