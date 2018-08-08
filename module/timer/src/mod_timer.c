@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 #include <fwk_assert.h>
 #include <fwk_element.h>
 #include <fwk_errno.h>
@@ -493,7 +494,8 @@ static void timer_isr(uintptr_t ctx_ptr)
         .target_id = alarm->listener,
         .id = alarm->event_id,
     };
-    *(uintptr_t *)event.params = alarm->param; /* Word-size parameter */
+
+    memcpy(event.params, &alarm->param, sizeof(alarm->param));
 
     status = fwk_thread_put_event(&event);
     if (status != FWK_SUCCESS)
