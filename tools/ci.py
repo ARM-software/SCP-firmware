@@ -170,6 +170,40 @@ def main():
     result = subprocess.call(cmd, shell=True)
     results.append(('Product n1sdp build (GCC)', result))
 
+    banner('Test building clark product')
+
+    cmd = \
+        'CC=arm-none-eabi-gcc ' \
+        'PRODUCT=clark ' \
+        'MODE=release ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product clark release build (GCC)', result))
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=clark ' \
+        'MODE=release ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product clark release build (ARM)', result))
+
+    cmd = \
+        'CC=arm-none-eabi-gcc ' \
+        'PRODUCT=clark ' \
+        'MODE=debug ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product clark debug build (GCC)', result))
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=clark ' \
+        'MODE=debug ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product clark debug build (ARM)', result))
+
     banner('Tests summary')
 
     total_success = 0
