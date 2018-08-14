@@ -120,7 +120,7 @@ def main(argv=[], prog_name=''):
 
         for keyword in KEYWORDS:
             regex_patterns[keyword] = re.compile(
-                '(.*\W)(%s)(\s*)(\(.*)' % keyword)
+                '(.*\\W)(%s)(\\s*)(\\(.*)' % keyword)
         #
         # Check files
         #

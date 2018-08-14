@@ -16,7 +16,7 @@ def main():
         cmd = 'git describe --tags --dirty --always'
         output = subprocess.check_output(cmd.split())
         git_string = output.decode('utf-8').strip()
-    except:
+    except BaseException:
         git_string = 'Unknown'
 
     print("{}-{}".format(datetime.now().strftime('%Y-%m-%d_%H-%M-%S'),
