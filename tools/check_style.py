@@ -166,5 +166,6 @@ def main(argv=[], prog_name=''):
     print('PASSED: No files contained coding style errors.')
     return 0
 
+
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:], sys.argv[0]))

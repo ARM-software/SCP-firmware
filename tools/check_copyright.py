@@ -47,15 +47,15 @@ FILE_TYPES = [
 #
 # Supported comment styles (Python regex)
 #
-COMMENT_PATTERN = '^(( \*)|(;)|(\#))'
+COMMENT_PATTERN = '^(( \\*)|(;)|(\\#))'
 
 #
 # License pattern to match
 #
 LICENSE_PATTERN = \
     '{0} Arm SCP/MCP Software$\n'\
-    '{0} Copyright \(c\) (?P<years>[0-9]{{4}}(-[0-9]{{4}})?), Arm Limited and'\
-    ' Contributors. All rights reserved.$\n'\
+    '{0} Copyright \\(c\\) (?P<years>[0-9]{{4}}(-[0-9]{{4}})?), Arm Limited '\
+    'and Contributors. All rights reserved.$\n'\
     '{0}$\n'\
     '{0} SPDX-License-Identifier: BSD-3-Clause$\n'\
     .format(COMMENT_PATTERN)
