@@ -11,7 +11,7 @@
 
 void fwk_trap(void)
 {
-    #ifdef MODE_DEBUG
+    #ifdef BUILD_MODE_DEBUG
         /*
          * Disable interrupts to ensure the program state cannot be disturbed by
          * interrupt handlers.
@@ -27,7 +27,7 @@ void fwk_trap(void)
 
 void fwk_unreachable(void)
 {
-    #ifdef MODE_DEBUG
+    #ifdef BUILD_MODE_DEBUG
         fwk_trap();
     #else
         /*
@@ -40,7 +40,7 @@ void fwk_unreachable(void)
 bool fwk_expect(bool condition)
 {
     /* Failed expectations are potentially recoverable */
-    #if defined(MODE_DEBUG) && !defined(BUILD_TESTS)
+    #if defined(BUILD_MODE_DEBUG) && !defined(BUILD_TESTS)
         if (!condition)
             fwk_trap();
     #endif
