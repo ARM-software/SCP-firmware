@@ -189,7 +189,7 @@ and assembly units:
 * __BUILD_STRING__ - A string containing build information (date, time and git
   commit). The string is assembled using the tool build_string.py.
 * __BUILD_TESTS__ - Set when building the framework unit tests.
-* __MODE_DEBUG__ - Set when building in debug mode.
+* __BUILD_MODE_DEBUG__ - Set when building in debug mode.
 * __NDEBUG__ - Set when building in release mode. This definition is used by the
   standard C library to disable the assert() support.
 * __BUILD_VERSION_MAJOR__ - Major version number.

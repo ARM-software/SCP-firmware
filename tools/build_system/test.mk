@@ -23,7 +23,7 @@ CFLAGS += -Wno-strict-aliasing
 CFLAGS += -std=c11
 CFLAGS += $(addprefix -I,$(INCLUDES))
 
-DEFINES += MODE_DEBUG
+DEFINES += BUILD_MODE_DEBUG
 DEFINES += BUILD_TESTS
 
 # Search path for C sources

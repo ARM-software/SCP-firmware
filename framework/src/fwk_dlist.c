@@ -56,7 +56,7 @@ struct fwk_dlist_node *__fwk_dlist_pop_head(struct fwk_dlist *list)
     popped = (struct fwk_dlist_node *)__fwk_slist_pop_head(
         (struct fwk_slist *)list);
 
-#ifdef MODE_DEBUG
+#ifdef BUILD_MODE_DEBUG
     if (popped != NULL)
         popped->prev = NULL;
 #endif
@@ -81,7 +81,7 @@ void __fwk_dlist_remove(
     node->prev->next = node->next;
     node->next->prev = node->prev;
 
-#ifdef MODE_DEBUG
+#ifdef BUILD_MODE_DEBUG
     node->prev = NULL;
     node->next = NULL;
 #endif

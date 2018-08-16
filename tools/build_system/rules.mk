@@ -104,7 +104,7 @@ ifeq ($(MODE),release)
 else
     O ?= $(DEFAULT_OPT_GCC_DEBUG)
 
-    DEFINES += MODE_DEBUG
+    DEFINES += BUILD_MODE_DEBUG
 endif
 
 #
