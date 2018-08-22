@@ -41,6 +41,7 @@ EXCLUDE = [
     '*.pyc',
     '.gitmodules',
     '*.svg',
+    '*.a',
 ]
 
 
