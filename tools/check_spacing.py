@@ -40,6 +40,7 @@ EXCLUDE = [
     '*.jar',
     '*.md',
     '*.swp',
+    '*.a',
 ]
 
 KEYWORDS = [
