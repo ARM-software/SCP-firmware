@@ -397,11 +397,13 @@ static int alarm_stop(fwk_id_t alarm_id)
     ctx = &ctx_table[fwk_id_get_element_idx(alarm_id)];
     alarm = &ctx->alarm_pool[fwk_id_get_sub_element_idx(alarm_id)];
 
-    if (!alarm->started)
-        return FWK_E_STATE;
-
-    /* Disable timer interrupts to work with the active queue */
+    /* Prevent possible data races with the timer interrupt */
     ctx->driver->disable(ctx->driver_dev_id);
+
+    if (!alarm->started) {
+        ctx->driver->enable(ctx->driver_dev_id);
+        return FWK_E_STATE;
+    }
 
     fwk_list_remove(&ctx->alarms_active, (struct fwk_dlist_node *)alarm);
     alarm->started = false;
