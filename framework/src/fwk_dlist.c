@@ -49,11 +49,10 @@ struct fwk_dlist_node *__fwk_dlist_pop_head(struct fwk_dlist *list)
 
     assert(list != NULL);
 
-    if (list->tail == list->head->next)
-        list->head->next->prev = (struct fwk_dlist_node *)list;
-
     popped = (struct fwk_dlist_node *)__fwk_slist_pop_head(
         (struct fwk_slist *)list);
+
+    list->head->prev = (struct fwk_dlist_node *)list;
 
 #ifdef BUILD_MODE_DEBUG
     if (popped != NULL)
