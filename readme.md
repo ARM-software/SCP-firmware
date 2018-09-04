@@ -36,94 +36,16 @@ SCP-firmware provides a software reference implementation for the System Control
 Processor (SCP) and Manageability Control Processor (MCP) components found in
 several Arm Compute Sub-Systems.
 
-Prerequisites (Tools)
----------------------
-
-To properly build SCP/MCP firmware for a target product, the following tools are
-required:
-
-- Git
-- Either of:
-    - [GNU Arm Embedded Toolchain ("6-2017-q2-update" or later)]
-          (https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
-    - [Arm Compiler 6]
-          (https://developer.arm.com/products/software-development-tools/compilers/arm-compiler)
-
-- GNU Make (4.2 or later)
-- Python 3 (3.5.0 or later)
-
-In addition, the following tools are recommended:
-
-- Doxygen (1.8.0 or later): Required to build supporting documentation
-- GCC (6.0 or later): Required to build framework tests that run on the build
-    host
-
-Prerequisites (CMSIS Libraries)
--------------------------------
-
-SCP-firmware requires the use of components from the Cortex Microcontroller
-System Interface Standard (CMSIS) Software Pack, specifically the CMSIS Core
-and CMSIS Real-Time Operating System (RTOS) components. The CMSIS Software pack
-is included as a Git submodule.
-
-To retrieve the CMSIS Software pack, just initialize and update the submodule
-of the repository.
-
-    $> git submodule update --init
-
-The required CMSIS components are now present and the correct version has been
-selected.
-
-Documentation
--------------
-
-If Doxygen is available on the system containing SCP-firmware then comprehensive
-documentation can be generated. The complete set of documentation is compiled
-into bundles in HTML, LaTeX, and XML formats and placed in the *build/doc*
-directory. This documentation includes:
-
-- A *Readme* section (the content of this file)
-- The BSD-3-Clause license under which this software and supporting files are
-    distributed
-- An overview of the framework on which SCP-firmware is written,
-    including information on how components of the software must interact with
-    the framework and with each other.
-- An overview of the build system and the project directory structure
-- The project's coding style
-- Source documentation for the SCP-firmware framework
-- Source documentation for modules that are distributed as part of the product
-
-From within the SCP-firmware root directory Doxygen can be invoked using the
-top-level Makefile:
-
-    $> make doc
-
-Building Products
------------------
-To build a product the basic command format for invoking 'make' is:
-
-    $> make [TARGET] <PRODUCT=<name>> [OPTIONS]
-
-It is not necessary to provide a target since the default target for the product
-will build all the firmware contained within the product.
-
-The 'help' target provides further information on the arguments that can be
-given:
-
-    $> make help
-
-The framework includes a suite of tests that validate its core functionality.
-These can be run on the build host using:
-
-    $> make test
-
-For more guidance on the build system, refer to the full set of documentation
-that includes the 'Build System' chapter.
-
 License
 -------
 
 The software is provided under a [BSD-3-Clause license](https://spdx.org/licenses/BSD-3-Clause.html).
+
+Getting started
+---------------
+
+See user_guide.md for instructions on how to get, install, build and use
+SCP-firmware on supported Arm platforms.
 
 Feedback and Support
 --------------------
