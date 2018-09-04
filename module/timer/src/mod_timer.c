@@ -405,6 +405,17 @@ static int alarm_stop(fwk_id_t alarm_id)
         return FWK_E_STATE;
     }
 
+    /*
+     * If the alarm is stopped while the interrupts are globally disabled, an
+     * interrupt may be pending because the alarm being stopped here has
+     * triggered. If the interrupt is not cleared then when the interrupts are
+     * re-enabled, the timer ISR will be executed but the alarm, cause of the
+     * interrupt, will have disappeared. To avoid that, the timer interrupt is
+     * cleared here. If the interrupt was triggered by another alarm, it will be
+     * re-triggered when the timer interrupt is re-enabled.
+     */
+    fwk_interrupt_clear_pending(ctx->config->timer_irq);
+
     fwk_list_remove(&ctx->alarms_active, (struct fwk_dlist_node *)alarm);
     alarm->started = false;
 
