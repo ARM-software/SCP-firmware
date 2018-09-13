@@ -7,7 +7,7 @@
 #
 # Description:
 #   This tool takes a list of module names and generates two files:
-#   * fwk_modules_id.h: Contains an enumeration giving the modules' indices.
+#   * fwk_modules_idx.h: Contains an enumeration giving the modules' indices.
 #   * fwk_modules_list.c: Contains a table of pointers to a module descriptor.
 #
 # Note: The files are updated only if their contents will differ, relative to
