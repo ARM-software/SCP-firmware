@@ -48,7 +48,7 @@ ifeq ($(BS_ARCH_ARCH),host)
     LDFLAGS_GCC += -mtune=native
 
     ifeq ($(BUILD_HAS_MULTITHREADING),yes)
-      LDFLAGS_GCC += -pthread
+        LDFLAGS_GCC += -pthread
     endif
 
     DEFINES += BUILD_HOST
@@ -193,7 +193,8 @@ GENERATED_DIRS := $(sort $(BUILD_DIR) \
 #
 .PHONY: gen_module
 gen_module: $(TOOLS_DIR)/gen_module_code.py $(BUILD_FIRMWARE_DIR)
-	$(TOOLS_DIR)/gen_module_code.py --path $(BUILD_FIRMWARE_DIR) $(FIRMWARE_MODULES_LIST)
+	$(TOOLS_DIR)/gen_module_code.py --path $(BUILD_FIRMWARE_DIR) \
+	    $(FIRMWARE_MODULES_LIST)
 
 # Include BUILD_FIRMWARE_DIR in the compilation
 export INCLUDES += $(BUILD_FIRMWARE_DIR)
