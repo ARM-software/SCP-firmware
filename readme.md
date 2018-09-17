@@ -6,7 +6,7 @@ Copyright (c) 2011-2018, Arm Limited. All rights reserved.
 References
 ----------
 
-[1] Power Control System Architecture - DEN0050B (Please contact Arm directly to
+[1] Power Control System Architecture - DEN0050C (Please contact Arm directly to
 obtain a copy of this document)
 
 [2] [System Control and Management Interface - DEN0056A](http://infocenter.arm.com/help/topic/com.arm.doc.den0056a/DEN0056A_System_Control_and_Management_Interface.pdf)
