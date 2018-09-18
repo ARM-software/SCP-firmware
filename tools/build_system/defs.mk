@@ -82,6 +82,3 @@ endef
 define to_upper
 $(shell echo $(1) | tr '[:lower:]' '[:upper:]')
 endef
-
-.SECONDEXPANSION:
-targetdir := $$(dir $$@)

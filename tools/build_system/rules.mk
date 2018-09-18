@@ -179,20 +179,11 @@ OBJECTS := $(addprefix $(OBJ_DIR)/, \
            $(patsubst %.c,%.o, \
            $(SOURCES)))))
 
-GENERATED_DIRS := $(sort $(BUILD_DIR) \
-                         $(BUILD_DOC_DIR) \
-                         $(BUILD_FIRMWARE_DIR) \
-                         $(dir $(LIB) \
-                               $(OBJECTS) \
-                               $(SCATTER_PP) \
-                               $(SCATTER_SRC) \
-                               $(TARGET_BIN)))
-
 #
 # Module code generation
 #
 .PHONY: gen_module
-gen_module: $(TOOLS_DIR)/gen_module_code.py $(BUILD_FIRMWARE_DIR)
+gen_module: $(TOOLS_DIR)/gen_module_code.py | $(BUILD_FIRMWARE_DIR)/
 	$(TOOLS_DIR)/gen_module_code.py --path $(BUILD_FIRMWARE_DIR) \
 	    $(FIRMWARE_MODULES_LIST)
 
@@ -203,32 +194,34 @@ export INCLUDES += $(BUILD_FIRMWARE_DIR)
 # Targets
 #
 
+.SECONDEXPANSION:
+
 .PHONY: $(LIB_TARGETS_y)
 $(LIB_TARGETS_y):
 	$(MAKE) -C $@
 
-$(LIB): $(OBJECTS) | $(targetdir)
+$(LIB): $(OBJECTS) | $$(@D)/
 	$(call show-action,AR,$@)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
-$(OBJ_DIR)/%.o: %.c $(EXTRA_DEP) | $(targetdir)
+$(OBJ_DIR)/%.o: %.c $(EXTRA_DEP) | $$(@D)/
 	$(call show-action,CC,$<)
 	$(CC) -c $(CFLAGS) $(DEP_CFLAGS)  $< -o $@
 
-$(OBJ_DIR)/%.o: %.s | $(targetdir)
+$(OBJ_DIR)/%.o: %.s | $$(@D)/
 	$(call show-action,AS,$<)
 	$(AS) -c $(ASFLAGS) $(DEP_CFLAGS) $< -o $@
 
-$(OBJ_DIR)/%.o: %.S | $(targetdir)
+$(OBJ_DIR)/%.o: %.S | $$(@D)/
 	$(call show-action,AS,$<)
 	$(AS) -c $(CFLAGS) $(DEP_CFLAGS) $< -o $@
 
-$(GENERATED_DIRS):
+$(BUILD_PATH)/%/:
 	$(call show-action,MD,$@)
 	$(MD) $@
 
 .PHONY: doc
-doc: | $(BUILD_DOC_DIR)
+doc: | $(BUILD_DOC_DIR)/
 	$(call show-action,DOC,)
 	$(DOC) $(DOC_DIR)/config.dxy
 
