@@ -238,15 +238,17 @@ LDFLAGS_ARM += \
     $(LIBS_y) \
     $(OBJECTS)
 
-$(TARGET_ELF): $(LIB_TARGETS_y) $(SCATTER_PP) $(OBJECTS) | $(targetdir)
+.SECONDEXPANSION:
+
+$(TARGET_ELF): $(LIB_TARGETS_y) $(SCATTER_PP) $(OBJECTS) | $$(@D)/
 	$(call show-action,LD,$@)
 	$(LD) $(LDFLAGS) -o $@
 	$(SIZE) $@
 
-$(SCATTER_PP): $(SCATTER_SRC) | $(targetdir)
+$(SCATTER_PP): $(SCATTER_SRC) | $$(@D)/
 	$(call show-action,GEN,$@)
 	$(CC) $(CFLAGS) -E -P -C $< -o $@
 
-$(TARGET_BIN): $(TARGET_ELF)
+$(TARGET_BIN): $(TARGET_ELF) | $$(@D)/
 	$(call show-action,BIN,$@)
 	$(OBJCOPY) $< $(OCFLAGS) $@
