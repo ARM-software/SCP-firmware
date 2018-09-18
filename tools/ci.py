@@ -98,16 +98,34 @@ def main():
     cmd = \
         'CC=arm-none-eabi-gcc ' \
         'PRODUCT=sgm775 ' \
+        'MODE=release ' \
         'make clean all'
     result = subprocess.call(cmd, shell=True)
-    results.append(('Product sgm775 build (GCC)', result))
+    results.append(('Product sgm775 release build (GCC)', result))
 
     cmd = \
         'CC=armclang ' \
         'PRODUCT=sgm775 ' \
+        'MODE=release ' \
         'make clean all'
     result = subprocess.call(cmd, shell=True)
-    results.append(('Product sgm775 build (ARM)', result))
+    results.append(('Product sgm775 release build (ARM)', result))
+
+    cmd = \
+        'CC=arm-none-eabi-gcc ' \
+        'PRODUCT=sgm775 ' \
+        'MODE=debug ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product sgm775 debug build (GCC)', result))
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=sgm775 ' \
+        'MODE=debug ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product sgm775 debug build (ARM)', result))
 
     banner('Tests summary')
 
