@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
+ifndef BS_TEST_MK
+BS_TEST_MK := 1
+
 # Include folders
 INCLUDES := $(FWK_DIR)/include
 INCLUDES += $(FWK_DIR)/src
@@ -65,3 +68,5 @@ $(TEST_DIR):
 $(TEST_DIR)/%.o: %.c | $(TEST_DIR)
 	$(call show-action,CC,$@)
 	$(CC) $(CFLAGS) $^ -c -o $@
+
+endif

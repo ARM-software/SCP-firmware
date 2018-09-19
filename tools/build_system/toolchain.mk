@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
+ifndef BS_TOOLCHAIN_MK
+BS_TOOLCHAIN_MK := 1
+
 _compiler_version ?= $(shell $(CC) --version)
 
 ifneq ($(findstring armclang,$(_compiler_version)),)
@@ -13,4 +16,6 @@ ifneq ($(findstring armclang,$(_compiler_version)),)
 else
     BS_COMPILER := GCC
     BS_LINKER := GCC
+endif
+
 endif

@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
+ifndef BS_RULES_MK
+BS_RULES_MK := 1
+
 include $(BS_DIR)/defs.mk
 include $(BS_DIR)/cpu.mk
 
@@ -227,3 +230,5 @@ doc: | $(BUILD_DOC_DIR)/
 
 # Include dependency files
 -include $(OBJECTS:%.o=%.d)
+
+endif
