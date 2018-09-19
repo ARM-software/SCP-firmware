@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
+ifndef BS_FIRMWARE_MK
+BS_FIRMWARE_MK := 1
+
 include $(BS_DIR)/defs.mk
 include $(BS_DIR)/toolchain.mk
 
@@ -252,3 +255,5 @@ $(SCATTER_PP): $(SCATTER_SRC) | $$(@D)/
 $(TARGET_BIN): $(TARGET_ELF) | $$(@D)/
 	$(call show-action,BIN,$@)
 	$(OBJCOPY) $< $(OCFLAGS) $@
+
+endif

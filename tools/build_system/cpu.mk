@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
+ifndef BS_CPU_MK
+BS_CPU_MK := 1
+
 include $(BS_DIR)/defs.mk
 
 BS_ARCH_CPU := $(BS_FIRMWARE_CPU)
@@ -16,9 +19,9 @@ ifneq ($(findstring $(BS_FIRMWARE_CPU),$(ARMV7M_CPUS)),)
     BS_ARCH_ARCH := armv7-m
     BS_ARCH_ISA := thumb
 
-    $(call add_once,LDFLAGS_GCC,--specs=nano.specs)
-    $(call add_once,LDFLAGS_ARM,--target=arm-arm-none-eabi)
-    $(call add_once,CFLAGS_CLANG,--target=arm-arm-none-eabi)
+    LDFLAGS_GCC += --specs=nano.specs
+    LDFLAGS_ARM += --target=arm-arm-none-eabi
+    CFLAGS_CLANG += --target=arm-arm-none-eabi
 
     CFLAGS += -mfloat-abi=soft # No hardware floating point support
     CFLAGS += -mno-unaligned-access # Disable unaligned access code generation
@@ -29,3 +32,4 @@ else
     $(erro "$(BS_FIRMWARE_CPU) is not a supported CPU. Aborting...")
 endif
 
+endif

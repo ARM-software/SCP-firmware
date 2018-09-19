@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
+ifndef BS_DEFS_MK
+BS_DEFS_MK := 1
+
 # Escape comma character
 comma = ,
 
@@ -21,14 +24,14 @@ NOTIFICATION_SUFFIX := _nt
 #
 # SCP/MCP Software Version
 #
-$(call add_once,DEFINES,BUILD_VERSION_MAJOR=$(VERSION_MAJOR))
-$(call add_once,DEFINES,BUILD_VERSION_MINOR=$(VERSION_MINOR))
-$(call add_once,DEFINES,BUILD_VERSION_PATCH=$(VERSION_PATCH))
-$(call add_once,DEFINES,BUILD_VERSION_STRING=\"$(VERSION_STRING)\")
-$(call add_once,DEFINES, \
-    BUILD_VERSION_DESCRIBE_STRING=\"$(VERSION_DESCRIBE_STRING)\")
 
-$(call add_once,DEFINES,RTX_NO_MULTITHREAD_CLIB)
+DEFINES += BUILD_VERSION_MAJOR=$(VERSION_MAJOR)
+DEFINES += BUILD_VERSION_MINOR=$(VERSION_MINOR)
+DEFINES += BUILD_VERSION_PATCH=$(VERSION_PATCH)
+DEFINES += BUILD_VERSION_STRING=\"$(VERSION_STRING)\"
+DEFINES += BUILD_VERSION_DESCRIBE_STRING=\"$(VERSION_DESCRIBE_STRING)\"
+
+DEFINES += RTX_NO_MULTITHREAD_CLIB
 
 #
 # Returns a path relative to the top directory
@@ -58,23 +61,6 @@ define lib_path
 endef
 
 #
-# Adds a value to a list variable only once.
-#
-# Param $1 Variable name to receive the value
-# Param $2 Value to be added to the list. If the value is already in the list
-#   then no action is performed.
-# Return None.
-define add_once
-    $(eval $(call _add_once,$1,$2))
-endef
-
-define _add_once
-    ifeq ($$(findstring $2,$($1)),)
-        $1 += $2
-    endif
-endef
-
-#
 # Converts input string to uppercase
 #
 # Param $1 String
@@ -82,3 +68,5 @@ endef
 define to_upper
 $(shell echo $(1) | tr '[:lower:]' '[:upper:]')
 endef
+
+endif

@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
+ifndef BS_LIB_MK
+BS_LIB_MK := 1
+
 include $(BS_DIR)/defs.mk
 
 $(info == Building $(BS_LIB_NAME) for $(BS_FIRMWARE_CPU))
@@ -57,3 +60,5 @@ INCLUDES += $(shell pwd)
 INCLUDES += $(TOP_DIR)/$(LIB_BASE)/include
 
 include $(BS_DIR)/rules.mk
+
+endif
