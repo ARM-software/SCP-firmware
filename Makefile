@@ -9,7 +9,7 @@
 # Version
 #
 export VERSION_MAJOR := 2
-export VERSION_MINOR := 3
+export VERSION_MINOR := 4
 export VERSION_PATCH := 0
 
 #
