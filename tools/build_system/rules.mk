@@ -116,13 +116,7 @@ ARFLAGS_GCC = -rc
 
 LDFLAGS_GCC += -Wl,--cref
 
-# Force an undefined reference to the exceptions table so that it is included
-# even if no code refers to it.
-LDFLAGS_GCC += -Wl,--undefined=exceptions
-LDFLAGS_ARM += -Wl,--undefined=exceptions
-
-# Ensure main() is not removed by the linker
-LDFLAGS_ARM += -Wl,--undefined=main
+LDFLAGS_ARM += -Wl,--undefined=arm_exception_reset
 
 BUILTIN_LIBS_GCC := -lc -lgcc
 
