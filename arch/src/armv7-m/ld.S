@@ -116,10 +116,8 @@ REGION_ALIAS("vstackheap", mem1);
 #endif
 
 SECTIONS {
-    .exception : {
-        LONG(__stack)
-        LONG(arm_exception_reset | 1) /* LSB must be set for Thumb functions */
-        KEEP(*(.exception))
+    .exceptions : {
+        KEEP(*(.exceptions))
     } > vexception
 
     .text : {

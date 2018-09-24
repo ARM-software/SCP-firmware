@@ -93,8 +93,7 @@
 
 LR_MEM0 FIRMWARE_MEM0_BASE FIRMWARE_MEM0_SIZE {
     ER_EXCEPTION +0 {
-        *(:gdef:__vectab_stack_and_reset, +FIRST)
-        *(.exception)
+        *(.exceptions)
     }
 
     ER_RODATA +0 {
