@@ -1,5 +1,5 @@
-Readme
-======
+SCP-firmware - version 2.4
+==========================
 
 Copyright (c) 2011-2018, Arm Limited. All rights reserved.
 
@@ -35,6 +35,26 @@ Chip (SoC) where manageability is required, such as on a SoC targeting servers.
 SCP-firmware provides a software reference implementation for the System Control
 Processor (SCP) and Manageability Control Processor (MCP) components found in
 several Arm Compute Sub-Systems.
+
+Functionality
+-------------
+
+- Initialization of the system to enable application core boot
+- Power domain management
+- System power management
+- Dynamic voltage and frequency scaling (DVFS)
+- Sensor management
+- System Control and Management Interface (SCMI, platform-side)
+- Support for the GNU Arm Embedded and Arm Compiler 6 toolchains
+- Support for platforms with several control processors
+
+Platforms
+---------
+
+Various builds of the release have been tested on the following ARM Fixed
+Virtual Platforms (FVPs):
+
+- System Guidance for Mobile platform SGM-775 (Version 11.1 Build 30)
 
 License
 -------
