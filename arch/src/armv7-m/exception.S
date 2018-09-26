@@ -21,30 +21,30 @@
 
     .global exceptions
 exceptions:
-    .word exception_invalid /* NMI */
-    .word exception_invalid /* HardFault */
-    .word exception_invalid /* MemManage */
-    .word exception_invalid /* Bus Fault */
-    .word exception_invalid /* UsageFault */
-    .word exception_invalid /* Reserved */
-    .word exception_invalid /* Reserved */
-    .word exception_invalid /* Reserved */
-    .word exception_invalid /* Reserved */
-    .word exception_invalid /* SVCall */
-    .word exception_invalid /* DebugMonitor */
-    .word exception_invalid /* Reserved */
-    .word exception_invalid /* PendSV */
-    .word exception_invalid /* SysTick */
+    .word arm_exception_invalid /* NMI */
+    .word arm_exception_invalid /* HardFault */
+    .word arm_exception_invalid /* MemManage */
+    .word arm_exception_invalid /* Bus Fault */
+    .word arm_exception_invalid /* UsageFault */
+    .word arm_exception_invalid /* Reserved */
+    .word arm_exception_invalid /* Reserved */
+    .word arm_exception_invalid /* Reserved */
+    .word arm_exception_invalid /* Reserved */
+    .word arm_exception_invalid /* SVCall */
+    .word arm_exception_invalid /* DebugMonitor */
+    .word arm_exception_invalid /* Reserved */
+    .word arm_exception_invalid /* PendSV */
+    .word arm_exception_invalid /* SysTick */
 
     .type exceptions, %object
     .size exceptions, . - exceptions
 
     .section .text
 
-    .global exception_invalid
+    .global arm_exception_invalid
     .thumb_func
-    .type exception_invalid, %function
+    .type arm_exception_invalid, %function
     .eabi_attribute Tag_ABI_align_preserved, 1
-exception_invalid:
+arm_exception_invalid:
     wfi
-    b       exception_invalid
+    b       arm_exception_invalid
