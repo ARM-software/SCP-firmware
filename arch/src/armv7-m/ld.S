@@ -87,7 +87,7 @@
     #endif
 #endif
 
-ENTRY(exception_reset)
+ENTRY(arm_exception_reset)
 
 MEMORY {
 #if FIRMWARE_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
@@ -118,7 +118,7 @@ REGION_ALIAS("vstackheap", mem1);
 SECTIONS {
     .exception : {
         LONG(__stack)
-        LONG(exception_reset | 1) /* The LSB must be set for Thumb functions */
+        LONG(arm_exception_reset | 1) /* LSB must be set for Thumb functions */
         KEEP(*(.exception))
     } > vexception
 

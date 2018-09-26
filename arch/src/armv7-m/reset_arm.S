@@ -12,10 +12,10 @@
 
     .text
 
-    .global exception_reset
+    .global arm_exception_reset
     .thumb_func
-    .type exception_reset, %function
-exception_reset:
+    .type arm_exception_reset, %function
+arm_exception_reset:
     bl  arm_init_ccr /* Initialize the CCR register */
     b   __main /* Enter Arm Compiler 6's crt0 */
     .pool

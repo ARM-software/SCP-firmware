@@ -23,7 +23,7 @@
     #include <rtx_os.h>
 #endif
 
-extern noreturn void exception_invalid(void);
+extern noreturn void arm_exception_invalid(void);
 
 struct nvic;
 
@@ -310,14 +310,14 @@ int arm_nvic_init(const struct fwk_arch_interrupt_driver **driver)
         return FWK_E_NOMEM;
 
     /*
-     * Initialize all exception entries to point to the exception_invalid()
+     * Initialize all exception entries to point to the arm_exception_invalid()
      * handler.
      *
      * Note: Initialization starts from entry 1 since entry 0 is not an
      * exception pointer but the default stack pointer.
      */
     for (i = 1; i < EXCEPTION_NUM_COUNT; i++)
-        vector[i] = exception_invalid;
+        vector[i] = arm_exception_invalid;
 
     /* Initialize IRQs */
     for (i = 0; i < irq_count; i++) {

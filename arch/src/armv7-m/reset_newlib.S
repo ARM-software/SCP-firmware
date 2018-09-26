@@ -12,10 +12,10 @@
 
     .text
 
-    .global exception_reset
+    .global arm_exception_reset
     .thumb_func
-    .type exception_reset, %function
-exception_reset:
+    .type arm_exception_reset, %function
+arm_exception_reset:
     b       _start /* Enter Newlib's crt0 */
     .pool
 
