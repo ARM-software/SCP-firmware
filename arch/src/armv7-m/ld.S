@@ -14,28 +14,56 @@ ENTRY(arm_exception_reset)
 
 MEMORY {
 #if FIRMWARE_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
-    mem0 : ORIGIN = FIRMWARE_MEM0_BASE, LENGTH = FIRMWARE_MEM0_SIZE
-#else
+    /*
+     * Single region memory layout:
+     *  - MEM0 accepts:
+     *      - Read-only sections
+     *      - Read-write sections
+     *      - Executable sections
+     */
+
+    mem0 (rwx) : ORIGIN = FIRMWARE_MEM0_BASE, LENGTH = FIRMWARE_MEM0_SIZE
+#elif FIRMWARE_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_RELOCATION
+    /*
+     * Dual region memory layout with initialized data relocation:
+     *  - MEM0 accepts:
+     *      - Read-only sections
+     *      - Executable sections
+     *
+     *  - MEM1 accepts:
+     *      - Read-write sections
+     */
+
     mem0 (rx) : ORIGIN = FIRMWARE_MEM0_BASE, LENGTH = FIRMWARE_MEM0_SIZE
-    mem1 (!rx) : ORIGIN = FIRMWARE_MEM1_BASE, LENGTH = FIRMWARE_MEM1_SIZE
+    mem1 (w) : ORIGIN = FIRMWARE_MEM1_BASE, LENGTH = FIRMWARE_MEM1_SIZE
+#elif FIRMWARE_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION
+    /*
+     * Dual region memory layout without initialized data relocation:
+     *  - MEM0 accepts:
+     *      - Executable sections
+     *
+     *  - MEM1 accepts:
+     *      - Read-only sections
+     *      - Read-write sections
+     */
+
+    mem0 (x) : ORIGIN = FIRMWARE_MEM0_BASE, LENGTH = FIRMWARE_MEM0_SIZE
+    mem1 (rw) : ORIGIN = FIRMWARE_MEM1_BASE, LENGTH = FIRMWARE_MEM1_SIZE
 #endif
 }
 
 #if FIRMWARE_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
-    REGION_ALIAS("mem1", mem0);
-#endif
-
-REGION_ALIAS("vexception", mem0);
-REGION_ALIAS("vtext", mem0);
-REGION_ALIAS("vrodata", mem0);
-REGION_ALIAS("vdata", mem1);
-REGION_ALIAS("vbss", mem1);
-REGION_ALIAS("vstackheap", mem1);
-
-#if FIRMWARE_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION
-    REGION_ALIAS("ldata", mem1); /* .data is loaded into mem1 by a loader */
-#else
-    REGION_ALIAS("ldata", mem0); /* .data is loaded into mem1 by crt0 */
+    REGION_ALIAS("r", mem0);
+    REGION_ALIAS("w", mem0);
+    REGION_ALIAS("x", mem0);
+#elif FIRMWARE_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_RELOCATION
+    REGION_ALIAS("r", mem0);
+    REGION_ALIAS("w", mem1);
+    REGION_ALIAS("x", mem0);
+#elif FIRMWARE_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION
+    REGION_ALIAS("r", mem1);
+    REGION_ALIAS("w", mem1);
+    REGION_ALIAS("x", mem0);
 #endif
 
 SECTIONS {
@@ -53,28 +81,28 @@ SECTIONS {
 
     .exceptions : {
         KEEP(*(.exceptions))
-    } > vexception
+    } > x
 
     .text : {
         *(.text .text.*)
-    } > vtext
+    } > x
 
     .rodata : {
         *(.rodata .rodata.*)
-    } > vrodata
+    } > r
 
     .data : {
         *(.data .data.*)
-    } > vdata AT>ldata
+    } > w AT> r
 
     .bss : {
         *(.bss .bss.*)
-    } > vbss
+    } > w
 
     .stackheap ALIGN(HEAP_ALIGNMENT) : {
-        . = ORIGIN(vstackheap) + LENGTH(vstackheap) - (STACK_ALIGNMENT - 1);
+        . = ORIGIN(w) + LENGTH(w) - (STACK_ALIGNMENT - 1);
         . = ALIGN(STACK_ALIGNMENT);
-    } > vstackheap
+    } > w
 
     __data_load__ = LOADADDR(.data);
     __data_start__ = ADDR(.data);

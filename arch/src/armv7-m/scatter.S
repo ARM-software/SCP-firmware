@@ -11,25 +11,75 @@
 #include "scatter.h"
 
 #if FIRMWARE_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
-    #define FIRMWARE_MEM1_BASE +0
-    #define FIRMWARE_MEM1_LIMIT (FIRMWARE_MEM0_BASE + FIRMWARE_MEM0_SIZE)
-    #define FIRMWARE_MEM1_SIZE (FIRMWARE_MEM1_LIMIT - ImageLimit(ER_RODATA))
-#else
-    #define FIRMWARE_MEM1_LIMIT (FIRMWARE_MEM1_BASE + FIRMWARE_MEM1_SIZE)
+    /*
+     * Single region memory layout:
+     *  - MEM0 accepts:
+     *      - Read-only sections
+     *      - Read-write sections
+     *      - Executable sections
+     */
+
+    #define FIRMWARE_X_BASE +0
+    #define FIRMWARE_R_BASE +0
+    #define FIRMWARE_W_BASE +0
+#elif FIRMWARE_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_RELOCATION
+    /*
+     * Dual region memory layout with initialized data relocation:
+     *  - MEM0 accepts:
+     *      - Read-only sections
+     *      - Executable sections
+     *
+     *  - MEM1 accepts:
+     *      - Read-write sections
+     */
+
+    #define FIRMWARE_X_BASE +0
+    #define FIRMWARE_R_BASE +0
+
+    #define FIRMWARE_W_BASE FIRMWARE_MEM1_BASE
+#elif FIRMWARE_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION
+    /*
+     * Dual region memory layout without initialized data relocation:
+     *  - MEM0 accepts:
+     *      - Executable sections
+     *
+     *  - MEM1 accepts:
+     *      - Read-only sections
+     *      - Read-write sections
+     */
+
+    #define FIRMWARE_X_BASE +0
+
+    #define FIRMWARE_R_BASE FIRMWARE_MEM1_BASE
+    #define FIRMWARE_W_BASE +0
 #endif
 
-LR_MEM0 FIRMWARE_MEM0_BASE FIRMWARE_MEM0_SIZE {
-    ER_EXCEPTION +0 {
+#if FIRMWARE_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
+    #define FIRMWARE_W_LIMIT FIRMWARE_MEM0_LIMIT
+#else
+    #define FIRMWARE_W_LIMIT FIRMWARE_MEM1_LIMIT
+#endif
+
+LR_FIRMWARE FIRMWARE_MEM0_BASE {
+    ER_EXCEPTIONS FIRMWARE_X_BASE {
         *(.exceptions)
     }
 
-    ER_RODATA +0 {
-        *(+RO)
+    ER_TEXT +0 {
+        *(+CODE)
     }
 
-    ER_RWDATA FIRMWARE_MEM1_BASE {
-        *(+RW, +ZI)
+    ER_RODATA FIRMWARE_R_BASE {
+        *(+CONST)
     }
 
-    ARM_LIB_STACKHEAP +0 EMPTY (FIRMWARE_MEM1_LIMIT - ImageLimit(ER_RWDATA)) { }
+    ER_DATA FIRMWARE_W_BASE {
+        *(+DATA)
+    }
+
+    ER_BSS +0 {
+        *(+BSS)
+    }
+
+    ARM_LIB_STACKHEAP +0 EMPTY (FIRMWARE_W_LIMIT - +0) { }
 }
