@@ -87,32 +87,56 @@ SECTIONS {
         *(.text .text.*)
     } > x
 
+    /*
+     * .init and .fini below refer to sections containing functions meant to
+     * run before program startup and after program shutdown. While we don't use
+     * these functions, Newlib refers to them unconditionally and they are,
+     * perhaps counterintuitively, stripped from the binary unless marked as
+     * KEEP.
+     */
+
+    .init : {
+        KEEP(*(.init))
+    } > x
+
+    .fini : {
+        KEEP(*(.fini))
+    } > x
+
     .rodata : {
         *(.rodata .rodata.*)
     } > r
 
     .data : {
+        __data_load__ = LOADADDR(.data);
+        __data_start__ = ABSOLUTE(.);
+
         *(.data .data.*)
     } > w AT> r
 
-    .bss : {
+    .bss (NOLOAD) : {
+        __bss_start__ = ABSOLUTE(.);
+
         *(.bss .bss.*)
     } > w
 
-    .stackheap ALIGN(HEAP_ALIGNMENT) : {
-        . = ORIGIN(w) + LENGTH(w) - (STACK_ALIGNMENT - 1);
-        . = ALIGN(STACK_ALIGNMENT);
+    .stackheap (NOLOAD) : {
+        __stackheap_start__ = ABSOLUTE(.);
+
+        . = ORIGIN(w) + LENGTH(w);
+
+        __stackheap_end__ = ABSOLUTE(.);
     } > w
 
-    __data_load__ = LOADADDR(.data);
-    __data_start__ = ADDR(.data);
-    __data_end__ = ADDR(.data) + SIZEOF(.data);
+    /*
+     * By default the linker places orphan sections after the section with the
+     * closest matching attributes. Calculating the end of a section based on
+     * the beginning of the next one that we know about means we can include BSS
+     * and DATA sections that we don't know about in these values.
+     */
 
-    __bss_start__ = ADDR(.bss);
-    __bss_end__ = ADDR(.bss) + SIZEOF(.bss);
-
-    __stackheap_start__ = ADDR(.stackheap);
-    __stackheap_end__ = ADDR(.stackheap) + SIZEOF(.stackheap);
+    __data_end__ = __bss_start__;
+    __bss_end__ = __stackheap_start__;
 
     __stack = __stackheap_end__;
 }

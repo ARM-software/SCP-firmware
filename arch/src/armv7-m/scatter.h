@@ -68,9 +68,3 @@
 
     #define FIRMWARE_MEM1_LIMIT (FIRMWARE_MEM1_BASE + FIRMWARE_MEM1_SIZE)
 #endif
-
-/* Alignment of the heap */
-#define HEAP_ALIGNMENT 4
-
-/* Alignment of the stack (CCR.STKALIGN is enabled) */
-#define STACK_ALIGNMENT 8
