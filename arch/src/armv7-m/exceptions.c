@@ -21,16 +21,16 @@
  */
 void software_init_hook(void)
 {
-    extern char __data_start_lma__;
-    extern char __data_start_vma__;
-    extern char __data_size__;
+    extern char __data_load__;
+    extern char __data_start__;
+    extern char __data_end__;
 
-    char *load = &__data_start_lma__;
-    char *start = &__data_start_vma__;
-    unsigned int size = (unsigned int)(&__data_size__);
+    char *load = &__data_load__;
+    char *start = &__data_start__;
+    char *end = &__data_end__;
 
     if (load != start)
-        memcpy(start, load, size);
+        memcpy(start, load, end - start);
 }
 #endif
 
@@ -89,9 +89,9 @@ extern char Image$$ARM_LIB_STACKHEAP$$ZI$$Limit;
 
 #   define arm_exception_stack (&Image$$ARM_LIB_STACKHEAP$$ZI$$Limit)
 #else
-extern char __stack;
+extern char __stackheap_end__;
 
-#   define arm_exception_stack (&__stack)
+#   define arm_exception_stack (&__stackheap_end__)
 #endif
 
 /*

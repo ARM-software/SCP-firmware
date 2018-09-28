@@ -25,11 +25,14 @@ int arm_mm_init(struct fwk_arch_mm_data *data)
     data->start = (uintptr_t)(&Image$$ARM_LIB_STACKHEAP$$ZI$$Base);
     data->size = (size_t)(&Image$$ARM_LIB_STACKHEAP$$ZI$$Length);
 #else
-    extern unsigned int __stackheap_start__;
-    extern unsigned int __stackheap_size__;
+    extern char __stackheap_start__;
+    extern char __stackheap_end__;
 
-    data->start = (uintptr_t)(&__stackheap_start__);
-    data->size = (size_t)(&__stackheap_size__);
+    uintptr_t start = (uintptr_t)(&__stackheap_start__);
+    uintptr_t end = (uintptr_t)(&__stackheap_end__);
+
+    data->start = start;
+    data->size = end - start;
 #endif
 
     return FWK_SUCCESS;

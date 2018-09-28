@@ -116,6 +116,18 @@ REGION_ALIAS("vstackheap", mem1);
 #endif
 
 SECTIONS {
+    /*
+     * Variables defined here:
+     *   - __data_load__: Load address of .data
+     *   - __data_start__: Start address of .data
+     *   - __data_end__: End address of .data and .data-like orphans
+     *   - __bss_start__: Start address of .bss
+     *   - __bss_end__: End address of .bss and .bss-like orphans
+     *   - __stackheap_start__: Start address of .stackheap
+     *   - __stackheap_end__: End address of .stackheap
+     *   - __stack: Initial stack pointer
+     */
+
     .exceptions : {
         KEEP(*(.exceptions))
     } > vexception
@@ -141,15 +153,15 @@ SECTIONS {
         . = ALIGN(STACK_ALIGNMENT);
     } > vstackheap
 
-    __stackheap_start__ = ADDR(.stackheap);
-    __stackheap_size__ = SIZEOF(.stackheap);
-
-    __data_start_vma__ = ADDR(.data);
-    __data_start_lma__ = LOADADDR(.data);
-    __data_size__ = SIZEOF(.data);
+    __data_load__ = LOADADDR(.data);
+    __data_start__ = ADDR(.data);
+    __data_end__ = ADDR(.data) + SIZEOF(.data);
 
     __bss_start__ = ADDR(.bss);
-    __bss_end__ = __bss_start__ + SIZEOF(.bss);
+    __bss_end__ = ADDR(.bss) + SIZEOF(.bss);
 
-    __stack = __stackheap_start__ + __stackheap_size__;
+    __stackheap_start__ = ADDR(.stackheap);
+    __stackheap_end__ = ADDR(.stackheap) + SIZEOF(.stackheap);
+
+    __stack = __stackheap_end__;
 }
