@@ -37,7 +37,7 @@ endif
 # GCC-specific optimization levels for debug and release modes
 #
 DEFAULT_OPT_GCC_DEBUG := g
-DEFAULT_OPT_GCC_RELEASE := 3
+DEFAULT_OPT_GCC_RELEASE := 2
 
 #
 # Compiler options used when building for the host
