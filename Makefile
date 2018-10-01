@@ -144,7 +144,7 @@ clean:
 help:
 	@echo "Arm SCP/MCP Software build system"
 	@echo ""
-	@echo "Usage: make [TARGET] [PRODUCT=<name>] [OPTIONS]"
+	@echo "Usage: make [PRODUCT=<name>] [OPTIONS] [TARGET]"
 	@echo ""
 	@echo "--------------------------------------------------------------------"
 	@echo "| Available Targets                                                |"
