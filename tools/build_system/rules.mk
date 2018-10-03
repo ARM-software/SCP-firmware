@@ -97,6 +97,9 @@ CFLAGS_GCC += -Wno-missing-field-initializers
 # warn about the situations that have not already been fixed.
 CFLAGS_CLANG += -Wno-missing-braces
 
+# Arm Compiler 6 uses dollar symbols in its linker-defined symbol names
+CFLAGS_CLANG += -Wno-dollar-in-identifier-extension
+
 CFLAGS_GCC += -g
 CFLAGS_GCC += -std=c11
 CFLAGS_CLANG += -fshort-enums # Required by RTX
