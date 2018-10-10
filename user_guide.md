@@ -103,10 +103,10 @@ These can be run on the host system using:
 
     $> make test
 
-For all products other than 'host', the code needs to be compiled by a cross-
-compiler. The toolchain is derived from the CC parameter, which should point to
-the cross-compiler. It can be set as an environment variable before invoking
-'make', or provided as part of the build command:
+For all products other than 'host', the code needs to be compiled by a
+cross-compiler. The toolchain is derived from the CC parameter, which should
+point to the cross-compiler. It can be set as an environment variable before
+invoking 'make', or provided as part of the build command:
 
     $> make CC=<path to the cross compiler> ...
 
@@ -115,6 +115,9 @@ documentation included in the 'Build System' chapter of the documentation.
 
 Running the SCP firmware on System Guidance for Mobile (SGM) platforms
 ----------------------------------------------------------------------
+
+For an introduction to the System Guidance for Mobile (SGM) platforms, please
+refer to [System Guidance for Mobile (SGM)](https://community.arm.com/dev-platforms/w/docs/388/system-guidance-for-mobile-sgm).
 
 The build system generates the list of firmware images as defined by the
 product.mk file associated with the product. For SGM platforms, two firmware
@@ -148,7 +151,7 @@ available to their respective loaders, they must be packaged in a Firmware
 Image Package (FIP). Please refer to the Arm Trusted Firmware-A user guide for
 instructions on building FIP packages.
 
-To run the boot flow described above, use:
+To run the boot flow described above on an SGM platform FVP, use:
 
     $> <path to the SGM platform FVP> \
         -C soc.pl011_uart0.out_file=./ap.txt \
@@ -160,22 +163,30 @@ To run the boot flow described above, use:
         -C soc.pl011_uart0.unbuffered_output=1
 
 Note:
-    - The application processor firmware images can be built using the [Arm
-Platforms deliverables](https://community.arm.com/dev-platforms/w/docs/304/arm-platforms-deliverables).
-See the following section.
+    - SGM platform FVPs are available on
+        [the Fixed Virtual Platforms product page](https://developer.arm.com/products/system-design/fixed-virtual-platforms).
+    - The application processor firmware images can be built using the
+        [Arm Platforms deliverables](https://community.arm.com/dev-platforms/w/docs/304/arm-platforms-deliverables).
+        See the following section.
 
 Booting up to the Linux prompt on Arm platforms
 -----------------------------------------------
 
-The [Arm Platforms deliverables](https://community.arm.com/dev-platforms/w/docs/304/arm-platforms-deliverables)
+The [Arm Reference Platforms deliverables](https://community.arm.com/dev-platforms/w/docs/304/arm-reference-platforms-deliverables)
 provide a set of source code bases and prebuilt binaries of a fully bootable
 Linux software stack on supported Arm platforms.
 
 This section explains how to update the SCP-firmware binaries once the full
-software stack has been fully built for a given configuration.
+software stack has been fully built from source for a given configuration.
 
-To retrieve, build and run the software stack for a given Arm platform, please
-refer to the [Linaro instructions](https://community.arm.com/dev-platforms/w/docs/304/linaro-software-deliverables)
+To retrieve, build and run the software stack from source for a given Arm
+platform, please refer to [Run the Arm Platforms deliverables on an FVP](https://community.arm.com/dev-platforms/w/docs/392/run-the-arm-platforms-deliverables-on-an-fvp).
+
+Note that the script initializing the workspace does not currently download the
+gcc-arm-none-eabi-5_4-2016q3 toolchain needed to build SCP-firmware. As
+such, you will need to download it from [here](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads)
+and extract it into the workspace/tools/gcc/gcc-arm-none-eabi-5_4-2016q3
+directory.
 
 Once the software stack has been retrieved, the SCP/MCP source code can be found
 in the 'scp' directory at the root of the workspace.
@@ -183,15 +194,18 @@ in the 'scp' directory at the root of the workspace.
 To rebuild the SCP-firmware binaries without rebuilding the whole software
 stack, at the root of the framework, use:
 
-    $> ./build_scripts/build-scp.sh build
+    $> ./build-scripts/build-scp.sh build
 
 Once the software stack has been fully built, use the following to update the
 SCP binaries in the software package to be run:
 
-    $> ./build_scripts/build-all.sh package
+    $> ./build-scripts/build-all.sh package
 
 As an example, to run the software stack, on the SGM-775 FVP:
 
     $> export MODEL=/path/to/where/you/separately/installed/FVP_CSS_SGM-775
     $> cd ./model-scripts/sgm775
     $> ./run_model.sh -t sgm775
+
+The SCP ROM/RAM firmware logs are written to the FVP terminal_s1 window, where
+the firmware tag or commit identifier can also be found.

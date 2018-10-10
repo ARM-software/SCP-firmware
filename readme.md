@@ -21,7 +21,7 @@ Introduction
 
 There is a strong trend in the industry to provide microcontrollers in systems
 to abstract various power, or other system management tasks, away from
-application processors (AP). The Power Control System Architecture (PCSA) [1]
+Application Processors (APs). The Power Control System Architecture (PCSA) [1]
 describes how systems can be built following this approach.
 
 The PCSA defines the concept of the System Control Processor (SCP), a dedicated
