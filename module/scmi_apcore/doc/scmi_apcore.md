@@ -1,3 +1,5 @@
+\ingroup GroupSCMI_APCORE
+
 SCMI AP Core Configuration Protocol v1.0
 ========================================
 
