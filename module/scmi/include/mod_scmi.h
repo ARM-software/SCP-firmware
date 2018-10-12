@@ -315,7 +315,8 @@ struct mod_scmi_from_protocol_api {
      * \retval FWK_SUCCESS The agent identifier was returned.
      * \retval FWK_E_PARAM The service identifier is not valid.
      * \retval FWK_E_PARAM The parameter 'agent_id' is equal to NULL.
-     * \retval FWK_E_STATE The service is not initialized.
+     * \retval FWK_E_INIT The service is not initialized.
+     * \retval FWK_E_STATE The service is in an invalid state.
      */
      int (*get_agent_id)(fwk_id_t service_id, unsigned int *agent_id);
 
@@ -331,7 +332,6 @@ struct mod_scmi_from_protocol_api {
      * \retval FWK_SUCCESS The agent identifier was returned.
      * \retval FWK_E_PARAM The agent identifier is not valid.
      * \retval FWK_E_PARAM The parameter 'agent_type' is equal to NULL.
-     * \retval FWK_E_STATE The component is not initialized.
      */
      int (*get_agent_type)(uint32_t agent_id,
                            enum scmi_agent_type *agent_type);
@@ -346,7 +346,8 @@ struct mod_scmi_from_protocol_api {
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The service_id parameter is invalid.
      * \retval FWK_E_PARAM The size parameter is NULL.
-     * \retval FWK_E_STATE The service is not initialized.
+     * \retval FWK_E_INIT The service is not initialized.
+     * \retval FWK_E_STATE The service is in an invalid sate.
      * \return One of the standard error codes for implementation-defined
      * errors.
      */

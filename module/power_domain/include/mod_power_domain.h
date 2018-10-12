@@ -480,7 +480,8 @@ struct mod_pd_public_api {
      * \param type Pointer to storage for the type of the power domain.
      *
      * \retval FWK_SUCCESS The type of the power domain was returned.
-     * \retval FWK_E_STATE The module has not been initialized.
+     * \retval FWK_E_INIT The module has not been initialized.
+     * \retval FWK_E_STATE The power domain module is in an invalid state.
      * \retval FWK_E_PARAM The power domain identifier is unknown.
      * \retval FWK_E_PARAM The pointer 'type' is equal to NULL.
      */
@@ -498,7 +499,8 @@ struct mod_pd_public_api {
      *
      * \retval FWK_SUCCESS The identifier of the parent power domain was
      *      returned.
-     * \retval FWK_E_STATE The component has not been initialized.
+     * \retval FWK_E_INIT The module has not been initialized.
+     * \retval FWK_E_STATE The power domain module is in an invalid state.
      * \retval FWK_E_PARAM The power domain identifier is unknown.
      * \retval FWK_E_PARAM The pointer 'parent_pd_id' is equal to NULL.
      */
@@ -522,7 +524,8 @@ struct mod_pd_restricted_api {
      * \param type Pointer to storage for the type of the power domain.
      *
      * \retval FWK_SUCCESS The type of the power domain was returned.
-     * \retval FWK_E_STATE The module has not been initialized.
+     * \retval FWK_E_INIT The module has not been initialized.
+     * \retval FWK_E_STATE The power domain module is in an invalid state.
      * \retval FWK_E_PARAM The power domain identifier is unknown.
      * \retval FWK_E_PARAM The pointer 'type' is equal to NULL.
      */
@@ -540,7 +543,8 @@ struct mod_pd_restricted_api {
      *
      * \retval FWK_SUCCESS The identifier of the parent power domain was
      *      returned.
-     * \retval FWK_E_STATE The component has not been initialized.
+     * \retval FWK_E_INIT The module has not been initialized.
+     * \retval FWK_E_STATE The power domain module is in an invalid state.
      * \retval FWK_E_PARAM The power domain identifier is unknown.
      * \retval FWK_E_PARAM The pointer 'parent_pd_id' is equal to NULL.
      */
