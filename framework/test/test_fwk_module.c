@@ -367,10 +367,10 @@ static void test_fwk_module_check_call_failed(void)
     result = fwk_module_check_call(id);
     assert(result == FWK_E_PARAM);
 
-    /* Module 0 state is not FWK_MODULE_STATE_INITIALIZED */
+    /* Module 0 is not initialized */
     id = MODULE0_ID;
     result = fwk_module_check_call(id);
-    assert(result == FWK_E_STATE);
+    assert(result == FWK_E_INIT);
 }
 
 static void test___fwk_module_init_module_desc_bad_params(void)

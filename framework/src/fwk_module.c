@@ -613,8 +613,12 @@ int fwk_module_check_call(fwk_id_t id)
     if (status != FWK_SUCCESS)
         goto error;
 
-    if ((state == FWK_MODULE_STATE_UNINITIALIZED) ||
-        (state == FWK_MODULE_STATE_SUSPENDED)) {
+    if (state == FWK_MODULE_STATE_UNINITIALIZED) {
+        status = FWK_E_INIT;
+        goto error;
+    }
+
+    if (state == FWK_MODULE_STATE_SUSPENDED) {
         status = FWK_E_STATE;
         goto error;
     }
