@@ -114,6 +114,7 @@ WARN_LOGFILE           =
 INPUT                  = $(TOP_DIR)/readme.md \
                          $(TOP_DIR)/license.md \
                          $(TOP_DIR)/user_guide.md \
+                         $(TOP_DIR)/change_log.md \
                          $(BS_DIR)/doc.md \
                          $(DOC_DIR)/code_style.md \
                          $(DOC_DIR)/framework.md \
