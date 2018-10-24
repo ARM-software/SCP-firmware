@@ -40,10 +40,12 @@ Functionality
 -------------
 
 - Initialization of the system to enable application core boot
-- Power domain management
-- System power management
-- Dynamic voltage and frequency scaling (DVFS)
-- Sensor management
+- Runtime services:
+    - Power domain management
+    - System power management
+    - Performance domain management (Dynamic voltage and frequency scaling)
+    - Clock management
+    - Sensor management
 - System Control and Management Interface (SCMI, platform-side)
 - Support for the GNU Arm Embedded and Arm Compiler 6 toolchains
 - Support for platforms with several control processors
