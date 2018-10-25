@@ -204,7 +204,7 @@ static void direct_ddr_cmd(struct mod_dmc620_reg *dmc)
 
 }
 
-/* Configuration of the DMC500 module. */
+/* Configuration of the DMC620 module. */
 const struct fwk_module_config config_dmc620 = {
     .get_element_table = dmc620_get_element_table,
     .data = &((struct mod_dmc620_module_config) {
