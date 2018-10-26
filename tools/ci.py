@@ -136,6 +136,15 @@ def main():
     result = subprocess.call(cmd, shell=True)
     results.append(('Product sgi575 build (GCC)', result))
 
+    banner('Test building n1sdp product')
+
+    cmd = \
+        'CC=arm-none-eabi-gcc CROSS_COMPILE=arm-none-eabi- ' \
+        'PRODUCT=n1sdp ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product n1sdp build (GCC)', result))
+
     banner('Tests summary')
 
     total_success = 0
