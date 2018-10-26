@@ -19,3 +19,8 @@ export MODULE_INCLUDES
 export MODULE_DOCS
 
 include $(BS_DIR)/rules.mk
+
+.PHONY: doc
+doc: | $(BUILD_DOC_DIR)/
+	$(call show-action,DOC,)
+	$(DOC) $(DOC_DIR)/config.dxy
