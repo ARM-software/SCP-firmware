@@ -223,11 +223,6 @@ $(BUILD_PATH)/%/:
 	$(call show-action,MD,$@)
 	$(MD) $@
 
-.PHONY: doc
-doc: | $(BUILD_DOC_DIR)/
-	$(call show-action,DOC,)
-	$(DOC) $(DOC_DIR)/config.dxy
-
 # Include dependency files
 -include $(OBJECTS:%.o=%.d)
 
