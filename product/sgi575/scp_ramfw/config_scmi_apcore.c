@@ -18,7 +18,7 @@ static const struct mod_scmi_apcore_reset_register_group
             .base_register =
                 (uintptr_t)&PIK_CLUSTER(0)->STATIC_CONFIG[0].RVBARADDR_LW,
             .register_count =
-                (SGI575_CORE_PER_CLUSTER0_MAX + SGI575_CORE_PER_CLUSTER1_MAX),
+                (SGI575_CORES_PER_CLUSTER_MAX * SGI575_CLUSTERS_MAX),
         },
     };
 

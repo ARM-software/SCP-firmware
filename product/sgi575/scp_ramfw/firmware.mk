@@ -46,7 +46,6 @@ BS_FIRMWARE_MODULES := \
 
 BS_FIRMWARE_SOURCES := \
     rtx_config.c \
-    sgi575_core.c \
     config_armv7m_mpu.c \
     config_log.c \
     config_cmn600.c \

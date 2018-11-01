@@ -8,11 +8,29 @@
 #ifndef SGI575_CORE_H
 #define SGI575_CORE_H
 
-#define SGI575_CORE_PER_CLUSTER0_MAX 4
-#define SGI575_CORE_PER_CLUSTER1_MAX 4
+#include <fwk_assert.h>
 
-unsigned int sgi575_core_get_core_per_cluster_count(unsigned int cluster);
-unsigned int sgi575_core_get_core_count(void);
-unsigned int sgi575_core_get_cluster_count(void);
+/* SGI575 only has one configuration, hence the constant values */
+
+#define SGI575_CLUSTERS_MAX 2
+#define SGI575_CORES_PER_CLUSTER_MAX 4
+
+static inline unsigned int sgi575_core_get_cluster_count(void)
+{
+    return SGI575_CLUSTERS_MAX;
+}
+
+static inline unsigned int sgi575_core_get_core_per_cluster_count(
+    unsigned int cluster)
+{
+    fwk_assert(cluster < sgi575_core_get_cluster_count());
+
+    return SGI575_CORES_PER_CLUSTER_MAX;
+}
+
+static inline unsigned int sgi575_core_get_core_count(void)
+{
+    return SGI575_CLUSTERS_MAX * SGI575_CORES_PER_CLUSTER_MAX;
+}
 
 #endif /* SGI575_CORE_H */
