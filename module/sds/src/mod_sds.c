@@ -14,6 +14,7 @@
 #include <fwk_errno.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
+#include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <mod_clock.h>
 #include <mod_sds.h>
@@ -440,6 +441,34 @@ static int struct_init(const struct mod_sds_structure_desc *struct_desc)
     return status;
 }
 
+static int init_sds(void)
+{
+    int status;
+    int element_idx;
+    int element_count;
+    const struct mod_sds_structure_desc *struct_desc;
+
+    /* Either reinitialize the memory region, or create it for the first time */
+    status = reinitialize_memory_region();
+    if (status != FWK_SUCCESS) {
+        status = create_memory_region();
+        if (status != FWK_SUCCESS)
+            return status;
+    }
+
+    element_count = fwk_module_get_element_count(fwk_module_id_sds);
+    for (element_idx = 0; element_idx < element_count; ++element_idx) {
+        struct_desc = fwk_module_get_data(
+            fwk_id_build_element_id(fwk_module_id_sds, element_idx));
+
+        status = struct_init(struct_desc);
+        if (status != FWK_SUCCESS)
+            return status;
+    }
+
+    return FWK_SUCCESS;
+}
+
 /*
  * Module API
  */
@@ -561,22 +590,21 @@ static int sds_start(fwk_id_t id)
     if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
         return FWK_SUCCESS;
 
-    /* Register the module for clock state notifications */
-    return fwk_notification_subscribe(
-        mod_clock_notification_id_state_changed,
-        ctx.module_config->clock_id,
-        id);
+    if (!fwk_id_is_equal(ctx.module_config->clock_id, FWK_ID_NONE)) {
+        /* Register for clock state notifications */
+        return fwk_notification_subscribe(
+            mod_clock_notification_id_state_changed,
+            ctx.module_config->clock_id,
+            id);
+    } else
+        return init_sds();
 }
 
 static int sds_process_notification(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
 {
-    int status;
     struct clock_notification_params *params;
-    int element_idx;
-    int element_count;
-    const struct mod_sds_structure_desc *struct_desc;
 
     assert(fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed));
     assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
@@ -585,25 +613,7 @@ static int sds_process_notification(
     if (params->new_state != MOD_CLOCK_STATE_RUNNING)
         return FWK_SUCCESS;
 
-    /* Either reinitialize the memory region, or create it for the first time */
-    status = reinitialize_memory_region();
-    if (status != FWK_SUCCESS) {
-        status = create_memory_region();
-        if (status != FWK_SUCCESS)
-            return status;
-    }
-
-    element_count = fwk_module_get_element_count(event->target_id);
-    for (element_idx = 0; element_idx < element_count; ++element_idx) {
-        struct_desc = fwk_module_get_data(
-            fwk_id_build_element_id(event->target_id, element_idx));
-
-        status = struct_init(struct_desc);
-        if (status != FWK_SUCCESS)
-            return status;
-    }
-
-    return FWK_SUCCESS;
+    return init_sds();
 }
 
 /* Module descriptor */
