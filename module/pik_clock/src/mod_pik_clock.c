@@ -554,6 +554,7 @@ static const struct mod_clock_drv_api api_clock = {
  * Direct driver API functions
  */
 
+#if BUILD_HAS_MOD_CSS_CLOCK
 static int pik_clock_direct_set_div(fwk_id_t clock_id, uint32_t divider_type,
                                     uint32_t divider)
 {
@@ -656,6 +657,7 @@ static const struct mod_css_clock_direct_api api_direct = {
     .set_mod = pik_clock_direct_set_mod,
     .process_power_transition = pik_clock_direct_power_state_change,
 };
+#endif
 
 /*
  * Framework handler functions
