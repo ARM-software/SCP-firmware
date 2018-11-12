@@ -37,7 +37,7 @@ static uintptr_t heap_end;
 int fwk_mm_init(uintptr_t start, size_t size)
 {
     if (initialized)
-        return FWK_E_INIT;
+        return FWK_E_STATE;
 
     if ((start == 0) || (size == 0))
         return FWK_E_RANGE;

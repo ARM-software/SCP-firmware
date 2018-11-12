@@ -88,7 +88,7 @@ static void test_fwk_mm_init(void)
     assert(result == FWK_SUCCESS);
 
     result = fwk_mm_init((uintptr_t)&start, SIZE_MEM);
-    assert(result == FWK_E_INIT);
+    assert(result == FWK_E_STATE);
 }
 
 static void test_fwk_mm_alloc(void)
