@@ -33,12 +33,12 @@ static const ARM_MPU_Region_t regions[] = {
             1, ARM_MPU_AP_PRIV, 0, 1, 1, 1, 0, ARM_MPU_REGION_SIZE_4KB),
     },
     { /* 0x6540_0000 - 0x6540_00FF */
-        .RBAR = ARM_MPU_RBAR(4, SCP_MHU_SECURE_RAM),
+        .RBAR = ARM_MPU_RBAR(4, SCP_AP_SHARED_SECURE_RAM),
         .RASR = ARM_MPU_RASR(
             1, ARM_MPU_AP_PRIV, 0, 1, 1, 1, 0, ARM_MPU_REGION_SIZE_256B),
     },
     { /* 0x6520_0000 - 0x6520_00FF */
-        .RBAR = ARM_MPU_RBAR(5, SCP_MHU_NONSECURE_RAM),
+        .RBAR = ARM_MPU_RBAR(5, SCP_AP_SHARED_NONSECURE_RAM),
         .RASR = ARM_MPU_RASR(
             1, ARM_MPU_AP_PRIV, 0, 1, 1, 1, 0, ARM_MPU_REGION_SIZE_256B),
     },

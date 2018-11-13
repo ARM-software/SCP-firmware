@@ -24,7 +24,7 @@ static const struct fwk_element smt_element_table[] = {
         .data = &((struct mod_smt_channel_config) {
             .type = MOD_SMT_CHANNEL_TYPE_SLAVE,
             .policies = MOD_SMT_POLICY_INIT_MAILBOX | MOD_SMT_POLICY_SECURE,
-            .mailbox_address = SCP_MHU_SECURE_RAM,
+            .mailbox_address = SCP_AP_SHARED_SECURE_RAM,
             .mailbox_size = SCP_SCMI_PAYLOAD_SIZE,
             .driver_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_MHU,
                 N1SDP_MHU_DEVICE_IDX_S_CLUS0, 0),
@@ -36,7 +36,7 @@ static const struct fwk_element smt_element_table[] = {
         .data = &((struct mod_smt_channel_config) {
             .type = MOD_SMT_CHANNEL_TYPE_SLAVE,
             .policies = MOD_SMT_POLICY_INIT_MAILBOX,
-            .mailbox_address = SCP_MHU_NONSECURE_RAM,
+            .mailbox_address = SCP_AP_SHARED_NONSECURE_RAM,
             .mailbox_size = SCP_SCMI_PAYLOAD_SIZE,
             .driver_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_MHU,
                  N1SDP_MHU_DEVICE_IDX_NS_CLUS0, 0),
