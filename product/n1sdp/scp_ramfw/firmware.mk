@@ -37,6 +37,7 @@ BS_FIRMWARE_MODULES := \
     timer \
     scmi_power_domain \
     scmi_system_power \
+    scmi_management \
     n1sdp_flash \
     n1sdp_system
 
