@@ -20,13 +20,20 @@ BS_FIRMWARE_MODULES := \
     pl011 \
     log \
     pik_clock \
-    clock
+    clock \
+    n1sdp_mhu \
+    n1sdp_smt \
+    scmi_agent \
+    n1sdp_mcp_system
 
 BS_FIRMWARE_SOURCES := \
     rtx_config.c \
     config_armv7m_mpu.c \
     config_log.c \
     config_pik_clock.c \
-    config_clock.c
+    config_clock.c \
+    config_mhu.c \
+    config_smt.c \
+    config_scmi_agent.c
 
 include $(BS_DIR)/firmware.mk
