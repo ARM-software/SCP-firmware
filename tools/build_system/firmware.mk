@@ -80,7 +80,7 @@ OBJ_DIR := $(BUILD_FIRMWARE_DIR)/$(MODE)/obj
 PRODUCT_MODULES_DIR := $(PRODUCT_DIR)/module
 FIRMWARE_DIR := $(PRODUCT_DIR)/$(FIRMWARE)
 
-TARGET := $(BIN_DIR)/firmware
+TARGET := $(BIN_DIR)/$(FIRMWARE)
 TARGET_BIN := $(TARGET).bin
 TARGET_ELF := $(TARGET).elf
 
@@ -297,5 +297,5 @@ $(SCATTER_PP): $(SCATTER_SRC) | $$(@D)/
 $(TARGET_BIN): $(TARGET_ELF) | $$(@D)/
 	$(call show-action,BIN,$@)
 	$(OBJCOPY) $< $(OCFLAGS) $@
-
+	cp $@ $(BIN_DIR)/firmware.bin
 endif
