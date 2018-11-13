@@ -40,6 +40,18 @@ static const struct fwk_element service_table[] = {
             .scmi_agent_id = SCP_SCMI_AGENT_ID_OSPM,
         }),
     },
+    [SCP_N1SDP_SCMI_SERVICE_IDX_MCP] = {
+        .name = "SERVICE2",
+        .data = &((struct mod_scmi_service_config) {
+            .transport_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_SMT,
+                SCP_N1SDP_SCMI_SERVICE_IDX_MCP),
+            .transport_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_SMT,
+                MOD_SMT_API_IDX_SCMI_TRANSPORT),
+            .scmi_agent_id = SCP_SCMI_AGENT_ID_MCP,
+        }),
+    },
     [SCP_N1SDP_SCMI_SERVICE_IDX_COUNT] = { 0 }
 };
 
@@ -56,6 +68,10 @@ static struct mod_scmi_agent agent_table[] = {
     [SCP_SCMI_AGENT_ID_PSCI] = {
         .type = SCMI_AGENT_TYPE_PSCI,
         .name = "PSCI",
+    },
+    [SCP_SCMI_AGENT_ID_MCP] = {
+        .type = SCMI_AGENT_TYPE_MANAGEMENT,
+        .name = "MANAGEMENT",
     },
 };
 

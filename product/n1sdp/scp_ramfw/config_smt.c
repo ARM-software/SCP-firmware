@@ -43,6 +43,18 @@ static const struct fwk_element smt_element_table[] = {
             .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MHU, 0),
         })
     },
+    [SCP_N1SDP_SCMI_SERVICE_IDX_MCP] = {
+        .name = "MCP",
+        .data = &((struct mod_smt_channel_config) {
+            .type = MOD_SMT_CHANNEL_TYPE_SLAVE,
+            .policies = MOD_SMT_POLICY_SECURE,
+            .mailbox_address = SCP_MCP_SHARED_SECURE_RAM,
+            .mailbox_size = SCP_SCMI_PAYLOAD_SIZE,
+            .driver_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_MHU,
+                 N1SDP_MHU_DEVICE_IDX_S_MCP, 0),
+            .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MHU, 0),
+        })
+    },
     [SCP_N1SDP_SCMI_SERVICE_IDX_COUNT] = { 0 },
 };
 
