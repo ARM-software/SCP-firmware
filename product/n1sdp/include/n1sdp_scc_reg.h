@@ -197,4 +197,12 @@ struct scc_reg {
     const struct scc_pcid_registers PCID;
 };
 
+#define SCC_PLATFORM_CTRL_MULTI_CHIP_MODE_POS 8
+#define SCC_PLATFORM_CTRL_CHIPID_POS          0
+
+#define SCC_PLATFORM_CTRL_MULTI_CHIP_MODE_MASK \
+    (UINT32_C(0x1) << SCC_PLATFORM_CTRL_MULTI_CHIP_MODE_POS)
+#define SCC_PLATFORM_CTRL_CHIPID_MASK \
+    (UINT32_C(0x3F) << SCC_PLATFORM_CTRL_CHIPID_POS)
+
 #endif /* N1SDP_SCC_REG_H */
