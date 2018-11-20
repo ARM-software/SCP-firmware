@@ -4,6 +4,9 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
+# The order of the modules in the BS_FIRMWARE_MODULES list is the order in which
+# the modules are initialized, bound, started during the pre-runtime phase.
+#
 
 BS_FIRMWARE_CPU := host
 BS_FIRMWARE_HAS_MULTITHREADING := yes
