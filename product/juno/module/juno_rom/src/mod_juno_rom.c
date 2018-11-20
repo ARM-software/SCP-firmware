@@ -25,6 +25,22 @@
 #include <juno_utils.h>
 #include <scp_config.h>
 
+/* Values for cluster configuration */
+#define CLUSTERCLK_CONTROL_CLKDIVSYS        UINT32_C(0x000000F0)
+#define CLUSTERCLK_CONTROL_CLKDIVEXT        UINT32_C(0x00000F00)
+#define CLUSTERCLK_CONTROL_CRNTCLKDIVSYS    UINT32_C(0x000F0000)
+#define CLUSTERCLK_CONTROL_CRNTCLKDIVEXT    UINT32_C(0x00F00000)
+#define CLUSTERCLK_CONTROL_CLKSEL           UINT32_C(0x0000000F)
+#define CLUSTERCLK_CONTROL_CRNTCLK          UINT32_C(0x0000F000)
+#define CLUSTERCLK_CONTROL_CLKSEL_PRIVCLK   UINT32_C(0x00000004)
+
+/* Cluster clock fields */
+#define CLK_DIVIDER_SYS_POS         4
+#define CLK_DIVIDER_EXT_POS         8
+#define CRNT_CLK_DIV_POS            12
+#define CRNT_CLK_DIV_SYS_POS        16
+#define CRNT_CLK_DIV_EXT_POS        20
+
 static struct {
     const struct mod_juno_rom_config *config;
     const struct mod_juno_ppu_rom_api *ppu_api;
@@ -65,6 +81,7 @@ static int power_cluster_and_cores_from_boot_map(
 {
     int status;
     unsigned int i;
+    volatile uint32_t *snoop_ctrl;
 
     fwk_assert(core_ppu_table != NULL);
 
@@ -75,6 +92,18 @@ static int power_cluster_and_cores_from_boot_map(
     status = ctx.ppu_api->set_state_and_wait(cluster_ppu, MOD_PD_STATE_ON);
     if (status != FWK_SUCCESS)
         return FWK_E_DEVICE;
+
+    /* Assign the specified snoop for this cluster */
+    if (fwk_id_get_element_idx(cluster_ppu) ==
+        fwk_id_get_element_idx(little_cluster_ppu))
+        snoop_ctrl = &SCP_CONFIG->LITTLE_SNOOP_CONTROL;
+    else if (fwk_id_get_element_idx(cluster_ppu) ==
+        fwk_id_get_element_idx(big_cluster_ppu))
+        snoop_ctrl = &SCP_CONFIG->BIG_SNOOP_CONTROL;
+    else
+        return FWK_E_PANIC;
+
+    juno_utils_open_snoop_gate_and_wait(snoop_ctrl);
 
     /*
      * Turn on the cores using its boot map. (If bit N is set in the boot map,
@@ -92,6 +121,47 @@ static int power_cluster_and_cores_from_boot_map(
     }
 
     return FWK_SUCCESS;
+}
+
+static void css_clock_cluster_div_set(volatile uint32_t *clk,
+                                      uint32_t sys_divider,
+                                      uint32_t ext_divider,
+                                      bool wait)
+{
+    uint32_t div_set;
+    uint32_t div_set_mask;
+    uint32_t div_check;
+    uint32_t div_check_mask;
+
+    div_set = ((sys_divider - 1) << CLK_DIVIDER_SYS_POS) |
+              ((ext_divider - 1) << CLK_DIVIDER_EXT_POS);
+    div_set_mask =
+        (CLUSTERCLK_CONTROL_CLKDIVSYS | CLUSTERCLK_CONTROL_CLKDIVEXT);
+
+    div_check = ((sys_divider - 1) << CRNT_CLK_DIV_SYS_POS) |
+                ((ext_divider - 1) << CRNT_CLK_DIV_EXT_POS);
+    div_check_mask =
+        (CLUSTERCLK_CONTROL_CRNTCLKDIVSYS | CLUSTERCLK_CONTROL_CRNTCLKDIVEXT);
+
+    *clk = (*clk & ~(div_set_mask)) | div_set;
+
+    if (wait) {
+        while ((*clk & div_check_mask) != div_check)
+            continue;
+    }
+}
+
+static void css_clock_cluster_sel_set(volatile uint32_t *clk,
+                                      uint32_t source,
+                                      bool wait)
+{
+    *clk = (*clk & ~CLUSTERCLK_CONTROL_CLKSEL) | source;
+
+    if (wait) {
+        while ((*clk & CLUSTERCLK_CONTROL_CRNTCLK) !=
+            (source << CRNT_CLK_DIV_POS))
+            continue;
+    }
 }
 
 /*
@@ -142,6 +212,20 @@ static int deferred_setup(void)
             MOD_LOG_GROUP_ERROR,
             "[ROM] ERROR: Failed to turn on big cluster.\n");
         return FWK_E_DEVICE;
+    }
+
+    if (ctx.boot_map_little) {
+        /* Switch clock source to the private PLL */
+        css_clock_cluster_div_set(&SCP_CONFIG->LITTLECLK_CONTROL, 1, 1, true);
+        css_clock_cluster_sel_set(&SCP_CONFIG->LITTLECLK_CONTROL,
+                                  CLUSTERCLK_CONTROL_CLKSEL_PRIVCLK, true);
+    }
+
+    if (ctx.boot_map_big) {
+        /* Switch clock source to the private PLL */
+        css_clock_cluster_div_set(&SCP_CONFIG->BIGCLK_CONTROL, 1, 1, true);
+        css_clock_cluster_sel_set(&SCP_CONFIG->BIGCLK_CONTROL,
+                                  CLUSTERCLK_CONTROL_CLKSEL_PRIVCLK, true);
     }
 
     status = ctx.bootloader_api->load_image();
@@ -268,7 +352,7 @@ static int juno_rom_process_event(
             ctx.log_api->log(
                 MOD_LOG_GROUP_ERROR,
                 "[ROM] ERROR: Alternative AP ROM address does not have 4 byte "
-                "alignment.\n");
+                "alignment\n");
             return FWK_E_ALIGN;
         }
 
