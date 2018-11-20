@@ -184,12 +184,12 @@ NULL then the framework assumes that no elements will be provided.
 
 Each of the entries in the element table is a pointer to a *struct fwk_element*
 structure. Elements are made available to the module during the *element
-initialization* phase.
+initialization* stage.
 
 The second member of the structure is an optional void pointer that points to
 module-specific configuration data. The format of this configuration data
 is defined by the module itself. This data is made available to the module
-during the *module initialization* phase.
+during the *module initialization* stage.
 
 ### Elements
 
@@ -378,6 +378,10 @@ order:
 - Bind
 - Start
 
+Each stage is executed for each module before moving onto the next stage, and
+modules are processed in the order they are given in the *BS_FIRMWARE_MODULES*
+list.
+
 Once these stages have all been completed the firmware as a whole is considered
 to be fully initialized and execution enters the *runtime phase*. The stages are
 described in the following sub-sections.
@@ -514,7 +518,7 @@ functionality of the framework.
 If this driver module requires configuration data to be used in the log driver
 functions, the usual method of module configuration will not suffice. This is
 because the log driver functions could be called before the module receives its
-configuration data in the initialization phase of the framework. To allow the
+configuration data in the initialization stage of the framework. To allow the
 passing of configuration data to this module, the log component in the framework
 externally declares a pointer to configuration data: (fwk_log.h)
 
