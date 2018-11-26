@@ -27,16 +27,6 @@ static const ARM_MPU_Region_t regions[] = {
         .RASR = ARM_MPU_RASR(
             1, ARM_MPU_AP_PRIV, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_256KB),
     },
-    { /* 0x4562_0000 - 0x4562_00FF */
-        .RBAR = ARM_MPU_RBAR(3, MCP_SCP_SHARED_SECURE_RAM),
-        .RASR = ARM_MPU_RASR(
-            1, ARM_MPU_AP_PRIV, 0, 1, 1, 1, 0, ARM_MPU_REGION_SIZE_256B),
-    },
-    { /* 0x4561_0000 - 0x4561_00FF */
-        .RBAR = ARM_MPU_RBAR(4, MCP_SCP_SHARED_NONSECURE_RAM),
-        .RASR = ARM_MPU_RASR(
-            1, ARM_MPU_AP_PRIV, 0, 1, 1, 1, 0, ARM_MPU_REGION_SIZE_256B),
-    },
 };
 
 const struct fwk_module_config config_armv7m_mpu = {
