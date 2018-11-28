@@ -39,6 +39,7 @@ BS_FIRMWARE_MODULES := \
     scmi_system_power \
     scmi_management \
     n1sdp_flash \
+    n1sdp_pcie \
     n1sdp_system
 
 BS_FIRMWARE_SOURCES := \
@@ -64,6 +65,7 @@ BS_FIRMWARE_SOURCES := \
     config_css_clock.c \
     config_clock.c \
     config_n1sdp_flash.c \
+    config_n1sdp_pcie.c \
     config_apcontext.c
 
 include $(BS_DIR)/firmware.mk
