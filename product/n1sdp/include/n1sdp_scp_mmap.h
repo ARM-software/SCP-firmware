@@ -99,6 +99,12 @@
 #define CCIX_AXI_SLAVE_SCP_BASE      UINT32_C(0x88000000)
 
 /*
+ * PCIe and CCIX Slave AXI in 64-bit space visible to AP
+ */
+#define PCIE_AXI64_SLAVE_AP_BASE     UINT64_C(0x900000000)
+#define CCIX_AXI64_SLAVE_AP_BASE     UINT64_C(0x2900000000)
+
+/*
  * 1MB window into AP memory space
  * This region enables SCP to access AP's memory region
  * in terms of 1MB windows.
