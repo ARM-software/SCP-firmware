@@ -27,6 +27,9 @@ BS_FIRMWARE_MODULES := \
     juno_system \
     system_power \
     power_domain \
+    mhu \
+    smt \
+    scmi \
     sds
 
 BS_FIRMWARE_SOURCES := \
@@ -42,6 +45,9 @@ BS_FIRMWARE_SOURCES := \
     config_juno_ram.c \
     config_juno_ppu.c \
     config_system_power.c \
-    config_power_domain.c
+    config_power_domain.c \
+    config_mhu.c \
+    config_smt.c \
+    config_scmi.c
 
 include $(BS_DIR)/firmware.mk
