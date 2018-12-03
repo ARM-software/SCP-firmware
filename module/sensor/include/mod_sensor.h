@@ -162,8 +162,6 @@ struct mod_sensor_dev_config {
     /*! Module or element id of the driver */
     fwk_id_t driver_id;
 
-    /*! Sensor information */
-    struct mod_sensor_info *info;
 };
 
 /*!
@@ -195,7 +193,7 @@ struct mod_sensor_driver_api {
      * \return One of the standard framework error codes.
      */
     int (*get_info)(fwk_id_t id, struct mod_sensor_info *info);
- };
+};
 
 /*!
  * \brief Sensor API.
@@ -224,6 +222,7 @@ struct mod_sensor_api {
      * \param info Pointer to storage for the info struct.
      *
      * \retval FWK_SUCCESS Operation succeeded.
+     * \retval FWK_E_DEVICE Driver error.
      * \return One of the standard framework error codes.
      */
     int (*get_info)(fwk_id_t id, struct mod_sensor_info *info);
