@@ -70,7 +70,9 @@ static int get_info(fwk_id_t id, struct mod_sensor_info *info)
     if (status != FWK_SUCCESS)
         return status;
 
-    *info = *ctx->config->info;
+    status = ctx->driver_api->get_info(ctx->config->driver_id, info);
+    if (!fwk_expect(status == FWK_SUCCESS))
+        return FWK_E_DEVICE;
 
     return FWK_SUCCESS;
 }
@@ -104,11 +106,6 @@ static int sensor_dev_init(fwk_id_t element_id,
 
     ctx = ctx_table + fwk_id_get_element_idx(element_id);
     config = (struct mod_sensor_dev_config*)data;
-
-    /* Validate device */
-    if ((config->info == NULL) ||
-       (config->info->type >= MOD_SENSOR_TYPE_COUNT))
-        return FWK_E_DATA;
 
     ctx->config = config;
 
