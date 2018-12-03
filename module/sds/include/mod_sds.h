@@ -89,8 +89,10 @@ struct mod_sds_config {
      */
     size_t region_size;
 
+#if BUILD_HAS_MOD_CLOCK
     /*! Identifier of the clock that this module depends on */
     fwk_id_t clock_id;
+#endif
 };
 
 /*!
