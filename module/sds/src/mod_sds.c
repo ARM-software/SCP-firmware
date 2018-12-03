@@ -16,8 +16,11 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
-#include <mod_clock.h>
 #include <mod_sds.h>
+
+#if BUILD_HAS_MOD_CLOCK
+#include <mod_clock.h>
+#endif
 
 /* Arbitrary, 16 bit value that indicates a valid SDS Memory Region */
 #define REGION_SIGNATURE 0xAA7A
@@ -590,16 +593,20 @@ static int sds_start(fwk_id_t id)
     if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
         return FWK_SUCCESS;
 
+#if BUILD_HAS_MOD_CLOCK
     if (!fwk_id_is_equal(ctx.module_config->clock_id, FWK_ID_NONE)) {
         /* Register for clock state notifications */
         return fwk_notification_subscribe(
             mod_clock_notification_id_state_changed,
             ctx.module_config->clock_id,
             id);
-    } else
-        return init_sds();
+    }
+#endif
+
+    return init_sds();
 }
 
+#if BUILD_HAS_MOD_CLOCK
 static int sds_process_notification(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
@@ -615,6 +622,7 @@ static int sds_process_notification(
 
     return init_sds();
 }
+#endif
 
 /* Module descriptor */
 const struct fwk_module module_sds = {
@@ -626,5 +634,7 @@ const struct fwk_module module_sds = {
     .element_init = sds_element_init,
     .process_bind_request = sds_process_bind_request,
     .start = sds_start,
+#if BUILD_HAS_MOD_CLOCK
     .process_notification = sds_process_notification
+#endif
 };
