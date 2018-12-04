@@ -132,9 +132,6 @@ struct mod_sensor_info {
     /*! SCMI sensor type */
     enum mod_sensor_type type;
 
-    /*! Pointer to NULL-terminated name string */
-    const char *name;
-
     /*! Time (in seconds) between sensor updates. Set this field to 0 to
      *  indicate that the sensor does not have a minimum update interval. This
      *  field is used with \ref update_interval_multiplier to calculate the
