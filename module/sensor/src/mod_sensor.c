@@ -116,9 +116,6 @@ static int sensor_dev_init(fwk_id_t element_id,
         return FWK_E_DATA;
     }
 
-    /* Link info->name to framework element name */
-    config->info->name = fwk_module_get_name(element_id);
-
     ctx->config = config;
 
     return FWK_SUCCESS;

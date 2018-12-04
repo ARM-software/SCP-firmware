@@ -219,7 +219,7 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
         if (sensor_info.update_interval >=
             SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_UPDATE_INTERVAL_MASK) {
 
-            /* Update interval is too big to fit in it's mask */
+            /* Update interval is too big to fit in its mask */
             assert(false);
             goto exit;
         }
@@ -234,7 +234,8 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
          * Copy sensor name into description struct. Copy n-1 chars to ensure a
          * NULL terminator at the end. (struct has been zeroed out)
          */
-        strncpy(desc.sensor_name, sensor_info.name,
+        strncpy(desc.sensor_name,
+                fwk_module_get_name(sensor_id),
                 sizeof(desc.sensor_name) - 1);
 
         status = scmi_sensor_ctx.scmi_api->write_payload(service_id,
