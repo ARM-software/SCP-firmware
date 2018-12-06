@@ -184,7 +184,18 @@ struct mod_sensor_driver_api {
      * \return One of the standard framework error codes.
      */
     int (*get_value)(fwk_id_t id, uint64_t *value);
-};
+
+    /*!
+     * \brief Read sensor information.
+     *
+     * \param id Specific sensor device id.
+     * \param info Pointer to storage for the sensor information.
+     *
+     * \retval FWK_SUCCESS The information was read successfully.
+     * \return One of the standard framework error codes.
+     */
+    int (*get_info)(fwk_id_t id, struct mod_sensor_info *info);
+ };
 
 /*!
  * \brief Sensor API.
