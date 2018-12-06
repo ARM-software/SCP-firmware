@@ -9,6 +9,7 @@
 #define MOD_REG_SENSOR_H
 
 #include <stdint.h>
+#include <mod_sensor.h>
 
 /*!
  * \addtogroup GroupModules Modules
@@ -24,7 +25,11 @@
 
 /*! \brief Element configuration */
 struct mod_reg_sensor_dev_config {
-    uintptr_t reg; /*!< Address of the sensor register */
+    /*! Address of the sensor register */
+    uintptr_t reg;
+
+    /*! Auxiliary sensor information */
+    struct mod_sensor_info *info;
 };
 
 /*!

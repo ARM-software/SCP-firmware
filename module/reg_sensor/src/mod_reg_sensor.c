@@ -42,8 +42,29 @@ static int get_value(fwk_id_t id, uint64_t *value)
     return FWK_SUCCESS;
 }
 
+static int get_info(fwk_id_t id, struct mod_sensor_info *info)
+{
+    int status;
+    struct mod_reg_sensor_dev_config *config;
+
+    status = fwk_module_check_call(id);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    config = config_table[fwk_id_get_element_idx(id)];
+    fwk_assert(config != NULL);
+
+    if (info == NULL)
+        return FWK_E_PARAM;
+
+    *info = *(config->info);
+
+    return FWK_SUCCESS;
+}
+
 static const struct mod_sensor_driver_api reg_sensor_api = {
     .get_value = get_value,
+    .get_info = get_info,
 };
 
 /*
