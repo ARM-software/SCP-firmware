@@ -30,7 +30,18 @@
 #include <n1sdp_scp_pik.h>
 #include <n1sdp_scp_irq.h>
 #include <n1sdp_scp_mmap.h>
+#include <n1sdp_ssc.h>
 #include <config_clock.h>
+
+/* Coresight counter register definitions */
+struct cs_cnt_ctrl_reg {
+    FWK_RW uint32_t CS_CNTCR;
+    FWK_R  uint32_t CS_CNTSR;
+    FWK_RW uint32_t CS_CNTCVLW;
+    FWK_RW uint32_t CS_CNTCVUP;
+};
+
+#define CS_CNTCONTROL ((struct cs_cnt_ctrl_reg *)SCP_CS_CNTCONTROL_BASE)
 
 /* Module context */
 struct n1sdp_system_ctx {
@@ -239,6 +250,29 @@ exit:
     return status;
 }
 
+void cdbg_pwrupreq_handler(void)
+{
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[N1SDP SYSTEM] Received debug power up request interrupt\n");
+
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[N1SDP SYSTEM] Power on Debug PIK\n");
+
+    /* Clear interrupt */
+    PIK_DEBUG->DEBUG_CTRL |= (0x1 << 1);
+    fwk_interrupt_disable(CDBG_PWR_UP_REQ_IRQ);
+}
+
+void csys_pwrupreq_handler(void)
+{
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[N1SDP SYSTEM] Received system power up request interrupt\n");
+
+    /* Clear interrupt */
+    PIK_DEBUG->DEBUG_CTRL |= (0x1 << 2);
+    fwk_interrupt_disable(CSYS_PWR_UP_REQ_IRQ);
+}
+
 /*
  * Functions fulfilling the framework's module interface
  */
@@ -315,6 +349,32 @@ static int n1sdp_system_start(fwk_id_t id)
         id);
     if (status != FWK_SUCCESS)
         return status;
+
+    status = fwk_interrupt_set_isr(CDBG_PWR_UP_REQ_IRQ, cdbg_pwrupreq_handler);
+    if (status == FWK_SUCCESS) {
+        fwk_interrupt_enable(CDBG_PWR_UP_REQ_IRQ);
+
+        status = fwk_interrupt_set_isr(CSYS_PWR_UP_REQ_IRQ,
+            csys_pwrupreq_handler);
+        if (status == FWK_SUCCESS) {
+            fwk_interrupt_enable(CSYS_PWR_UP_REQ_IRQ);
+
+            PIK_CLUSTER(0)->CLKFORCE_SET = 0x00000004;
+            PIK_CLUSTER(1)->CLKFORCE_SET = 0x00000004;
+
+            /* Enable debugger access in SSC */
+            SSC->SSC_DBGCFG_SET = 0x000000FF;
+
+            /* Setup CoreSight counter */
+            CS_CNTCONTROL->CS_CNTCR |= (1 << 0);
+            CS_CNTCONTROL->CS_CNTCVLW = 0x00000000;
+            CS_CNTCONTROL->CS_CNTCVUP = 0x0000FFFF;
+        } else
+            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+                "[N1SDP SYSTEM] CSYS PWR UP REQ IRQ register failed\n");
+    } else
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+            "[N1SDP SYSTEM] CDBG PWR UP REQ IRQ register failed\n");
 
     n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
         "[N1SDP SYSTEM] Requesting SYSTOP initialization...\n");

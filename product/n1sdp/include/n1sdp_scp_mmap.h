@@ -32,6 +32,10 @@
 #define SCP_REFCLK_CNTCTL_BASE       (SCP_PERIPHERAL_BASE + 0x0000)
 #define SCP_REFCLK_CNTBASE0_BASE     (SCP_PERIPHERAL_BASE + 0x1000)
 #define SCP_WDOG_BASE                (SCP_PERIPHERAL_BASE + 0x6000)
+
+/*
+ * CoreSight control base
+ */
 #define SCP_CS_CNTCONTROL_BASE       (SCP_PERIPHERAL_BASE + 0xA000)
 
 /*
