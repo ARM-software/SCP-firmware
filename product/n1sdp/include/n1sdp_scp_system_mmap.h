@@ -29,4 +29,13 @@
 #define SCP_RAM0_SIZE                (512 * 1024)
 #define SCP_RAM1_SIZE                (256 * 1024)
 
+/*
+ * SCP_BACKUP_DDR3 memory area where the SCP ROM
+ * bypass firmware should be placed. The SCP would
+ * be programmed to boot at this address by programming
+ * it in the SCP_BOOT_ADR SCC register.
+ */
+#define SCP_BACKUP_DDR3_BASE          0x14000000
+#define SCP_BACKUP_DDR3_SIZE          (32 * 1024 * 1024)
+
 #endif /* N1SDP_SCP_SYSTEM_MMAP_H*/
