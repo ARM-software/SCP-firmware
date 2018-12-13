@@ -6,4 +6,4 @@
 #
 
 BS_PRODUCT_NAME := n1sdp
-BS_FIRMWARE_LIST := scp_ramfw mcp_ramfw
+BS_FIRMWARE_LIST := scp_ramfw mcp_ramfw scp_romfw
