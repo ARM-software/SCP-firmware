@@ -203,13 +203,17 @@ struct mod_sensor_api {
     /*!
      * \brief Read sensor value.
      *
+     * \details Read current sensor value.
+     *
      * \param id Specific sensor device id.
      * \param[out] value The sensor value.
      *
      * \retval FWK_SUCCESS Operation succeeded.
      * \retval FWK_E_DEVICE Driver error.
-     * \retval FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
-     *      supported.
+     * \retval FWK_E_BUSY At least one reading of the sensor value is already
+     *      on-going.
+     * \retval FWK_PENDING The request is pending. The requested value will be
+     *      provided via a response event.
      * \return One of the standard framework error codes.
      */
     int (*get_value)(fwk_id_t id, uint64_t *value);
@@ -290,6 +294,31 @@ static const fwk_id_t mod_sensor_api_id_sensor =
  */
 static const fwk_id_t mod_sensor_api_id_driver_response =
     FWK_ID_API_INIT(FWK_MODULE_IDX_SENSOR, MOD_SENSOR_API_IDX_DRIVER_RESPONSE);
+
+/*!
+ * \brief Shared event parameters.
+ */
+struct mod_sensor_event_params {
+    /*! Sensor value */
+    uint64_t value;
+
+    /*! Status of the response event */
+    int status;
+};
+
+/*!
+ * Sensor module read request event index
+ */
+#define MOD_SENSOR_EVENT_IDX_READ_REQUEST    0
+
+ /*!
+ * \brief Read request event identifier.
+ *
+ * \details Clients which expect to receive a response event from this module
+ *      should use this identifier to properly identify the response.
+ */
+static const fwk_id_t mod_sensor_event_id_read_request =
+    FWK_ID_EVENT_INIT(FWK_MODULE_IDX_SENSOR, MOD_SENSOR_EVENT_IDX_READ_REQUEST);
 
 /*!
  * @}
