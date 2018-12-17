@@ -55,10 +55,12 @@ static int get_value(fwk_id_t id, uint64_t *value)
         return status;
 
     status = ctx->driver_api->get_value(ctx->config->driver_id, value);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (status == FWK_PENDING)
+        return FWK_E_SUPPORT;
+    else if (status == FWK_SUCCESS)
+        return FWK_SUCCESS;
+    else
         return FWK_E_DEVICE;
-
-    return FWK_SUCCESS;
 }
 
 static int get_info(fwk_id_t id, struct mod_sensor_info *info)
@@ -89,7 +91,7 @@ static int sensor_init(fwk_id_t module_id,
                        unsigned int element_count,
                        const void *unused)
 {
-    ctx_table = fwk_mm_alloc(element_count, sizeof(ctx_table[0]));
+    ctx_table = fwk_mm_calloc(element_count, sizeof(ctx_table[0]));
 
     if (ctx_table == NULL)
         return FWK_E_NOMEM;
@@ -146,16 +148,24 @@ static int sensor_bind(fwk_id_t id, unsigned int round)
 
 static int sensor_process_bind_request(fwk_id_t source_id,
                                        fwk_id_t target_id,
-                                       fwk_id_t api_type,
+                                       fwk_id_t api_id,
                                        const void **api)
 {
-    *api = &sensor_api;
-    return FWK_SUCCESS;
+    if (fwk_id_is_equal(api_id, mod_sensor_api_id_sensor)) {
+        *api = &sensor_api;
+
+        return FWK_SUCCESS;
+    }
+
+    if (fwk_id_is_equal(api_id, mod_sensor_api_id_driver_response))
+        return FWK_E_SUPPORT;
+
+    return FWK_E_PARAM;
 }
 
 const struct fwk_module module_sensor = {
     .name = "SENSOR",
-    .api_count = 1,
+    .api_count = MOD_SENSOR_API_IDX_COUNT,
     .event_count = 0,
     .type = FWK_MODULE_TYPE_HAL,
     .init = sensor_init,

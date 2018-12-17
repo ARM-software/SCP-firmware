@@ -8,9 +8,10 @@
 #ifndef MOD_SENSOR_H
 #define MOD_SENSOR_H
 
-#include <fwk_id.h>
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <fwk_id.h>
+#include <fwk_module_idx.h>
 
 /*!
  * \addtogroup GroupModules Modules
@@ -171,20 +172,20 @@ struct mod_sensor_dev_config {
  */
 struct mod_sensor_driver_api {
     /*!
-     * \brief Read sensor value.
-     *
-     * \details Synchronously read current sensor value.
+     * \brief Get sensor value.
      *
      * \param id Specific sensor device id.
-     * \param[out] value The sensor value.
+     * \param[out] value Sensor value.
      *
+     * \retval FWK_PENDING The request is pending. The driver will provide the
+     *      requested value later through the driver response API.
      * \retval FWK_SUCCESS Value was read successfully.
      * \return One of the standard framework error codes.
      */
     int (*get_value)(fwk_id_t id, uint64_t *value);
 
     /*!
-     * \brief Read sensor information.
+     * \brief Get sensor information.
      *
      * \param id Specific sensor device id.
      * \param[out] info The sensor information.
@@ -202,13 +203,13 @@ struct mod_sensor_api {
     /*!
      * \brief Read sensor value.
      *
-     * \details Synchronously read current sensor value.
-     *
      * \param id Specific sensor device id.
      * \param[out] value The sensor value.
      *
      * \retval FWK_SUCCESS Operation succeeded.
      * \retval FWK_E_DEVICE Driver error.
+     * \retval FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
+     *      supported.
      * \return One of the standard framework error codes.
      */
     int (*get_value)(fwk_id_t id, uint64_t *value);
@@ -227,6 +228,68 @@ struct mod_sensor_api {
      */
     int (*get_info)(fwk_id_t id, struct mod_sensor_info *info);
 };
+
+/*!
+ * \brief Driver response parameters.
+ */
+struct mod_sensor_driver_resp_params {
+    /*! Status of the requested operation */
+    int status;
+
+    /*! Value requested */
+    uint64_t value;
+};
+
+/*!
+ * \brief Driver response API.
+ *
+ * \details API used by the driver to notify the HAL when a pending request
+ *      has completed.
+ */
+struct mod_sensor_driver_response_api {
+    /*!
+     * \brief Inform the completion of a sensor reading.
+     *
+     * \param id Specific sensor device identifier.
+     * \param[out] response The response data structure.
+     */
+    void (*reading_complete)(fwk_id_t id,
+                             struct mod_sensor_driver_resp_params *response);
+};
+
+/*!
+ * \brief API indices.
+ */
+enum mod_sensor_api_idx {
+    /*!
+     * \brief Driver API index.
+     *
+     * \note This API implements the ::mod_sensor_api interface.
+     */
+    MOD_SENSOR_API_IDX_SENSOR,
+
+    /*!
+     * \brief Driver response API.
+     */
+    MOD_SENSOR_API_IDX_DRIVER_RESPONSE,
+
+    /*!
+     * \brief Number of defined APIs.
+     */
+    MOD_SENSOR_API_IDX_COUNT,
+};
+
+/*!
+ * \brief Module API identifier.
+ */
+static const fwk_id_t mod_sensor_api_id_sensor =
+    FWK_ID_API_INIT(FWK_MODULE_IDX_SENSOR, MOD_SENSOR_API_IDX_SENSOR);
+
+/*!
+ * \brief Driver input API identifier.
+ */
+static const fwk_id_t mod_sensor_api_id_driver_response =
+    FWK_ID_API_INIT(FWK_MODULE_IDX_SENSOR, MOD_SENSOR_API_IDX_DRIVER_RESPONSE);
 
 /*!
  * @}
