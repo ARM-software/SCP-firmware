@@ -199,6 +199,7 @@ struct mod_sensor_api {
      * \param value Pointer to storage for the sensor value.
      *
      * \retval FWK_SUCCESS Operation succeeded.
+     * \retval FWK_E_DEVICE Driver error.
      * \return One of the standard framework error codes.
      */
     int (*get_value)(fwk_id_t id, uint64_t *value);
