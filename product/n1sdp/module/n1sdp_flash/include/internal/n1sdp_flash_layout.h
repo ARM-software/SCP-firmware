@@ -32,7 +32,7 @@ struct n1sdp_flash_toc_entry {
     uint32_t size;
     uint32_t flags:16;
     uint32_t checksum:16;
-} __packed;
+} __attribute__((packed));
 
 /* Flash Table of contents (TOC) */
 struct n1sdp_flash_memory_toc {
@@ -45,7 +45,7 @@ struct n1sdp_flash_memory_toc {
     uint32_t entry_count:16;
     uint32_t checksum:16;
     struct n1sdp_flash_toc_entry entry[];
-} __packed;
+} __attribute__((packed));
 
 
 /*
@@ -77,7 +77,7 @@ struct n1sdp_fip_toc_entry {
     uint32_t flags;
     uint32_t image_checksum:16;
     uint32_t checksum:16;
-} __packed;
+} __attribute__((packed));
 
 /* NFIP Table of contents (TOC) */
 struct n1sdp_fip_memory_toc {
@@ -90,6 +90,6 @@ struct n1sdp_fip_memory_toc {
     uint32_t entry_count:16;
     uint32_t checksum:16;
     struct n1sdp_fip_toc_entry entry[];
-} __packed;
+} __attribute__((packed));
 
 #endif /* N1SDP_FLASH_LAYOUT_H */
