@@ -60,6 +60,7 @@ IGNORED_TYPES = [
     'LINE_SPACING',  # We don't require a blank line after declarations
     'SPLIT_STRING',  # We allow strings to be split across lines
     'FILE_PATH_CHANGES',  # Specific to the kernel development process
+    'PREFER_PACKED',  # __packed is not available in Arm Compiler 6
 ]
 
 error_count = 0
