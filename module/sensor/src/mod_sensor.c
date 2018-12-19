@@ -27,18 +27,15 @@ static int get_ctx_if_valid_call(fwk_id_t id,
 {
     int status;
 
-    if (data == NULL) {
-        /* Invalid pointer */
-        assert(false);
+    fwk_assert(fwk_module_is_valid_element_id(id));
+    fwk_assert(ctx != NULL);
+
+    if (!fwk_expect(data != NULL))
         return FWK_E_PARAM;
-    }
 
     status = fwk_module_check_call(id);
-    if (status != FWK_SUCCESS) {
-        /* Module is in invalid state or ID is invalid */
-        assert(false);
+    if (status != FWK_SUCCESS)
         return status;
-    }
 
     *ctx = ctx_table + fwk_id_get_element_idx(id);
 
@@ -57,7 +54,11 @@ static int get_value(fwk_id_t id, uint64_t *value)
     if (status != FWK_SUCCESS)
         return status;
 
-    return ctx->driver_api->get_value(ctx->config->driver_id, value);
+    status = ctx->driver_api->get_value(ctx->config->driver_id, value);
+    if (!fwk_expect(status == FWK_SUCCESS))
+        return FWK_E_DEVICE;
+
+    return FWK_SUCCESS;
 }
 
 static int get_info(fwk_id_t id, struct mod_sensor_info *info)
@@ -88,11 +89,8 @@ static int sensor_init(fwk_id_t module_id,
 {
     ctx_table = fwk_mm_alloc(element_count, sizeof(ctx_table[0]));
 
-    if (ctx_table == NULL) {
-        /* Unable to allocate device context memory */
-        assert(false);
+    if (ctx_table == NULL)
         return FWK_E_NOMEM;
-    }
 
     return FWK_SUCCESS;
 }
@@ -107,14 +105,10 @@ static int sensor_dev_init(fwk_id_t element_id,
     ctx = ctx_table + fwk_id_get_element_idx(element_id);
     config = (struct mod_sensor_dev_config*)data;
 
-    /* Validate config */
+    /* Validate device */
     if ((config->info == NULL) ||
-        (config->info->type >= MOD_SENSOR_TYPE_COUNT)) {
-
-        /* Invalid config */
-        assert(false);
+       (config->info->type >= MOD_SENSOR_TYPE_COUNT))
         return FWK_E_DATA;
-    }
 
     ctx->config = config;
 
@@ -141,17 +135,12 @@ static int sensor_bind(fwk_id_t id, unsigned int round)
     status = fwk_module_bind(ctx->config->driver_id,
         FWK_ID_API(fwk_id_get_module_idx(ctx->config->driver_id), 0),
         &driver);
-    if (status != FWK_SUCCESS) {
-        /* Unable to bind to driver */
-        assert(false);
+    if (status != FWK_SUCCESS)
         return status;
-    }
 
-    if (driver->get_value == NULL) {
-        /* Incomplete driver API */
-        assert(false);
+    /* Validate driver API */
+    if ((driver == NULL) || (driver->get_value == NULL))
         return FWK_E_DATA;
-    }
 
     ctx->driver_api = driver;
 
