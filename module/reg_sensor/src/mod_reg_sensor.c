@@ -72,15 +72,12 @@ static const struct mod_sensor_driver_api reg_sensor_api = {
  */
 static int reg_sensor_init(fwk_id_t module_id,
                            unsigned int element_count,
-                           const void *data)
+                           const void *unused)
 {
     config_table = fwk_mm_alloc(element_count, sizeof(*config_table));
 
-    if (config_table == NULL) {
-        /* Unable to allocate device context memory */
-        assert(false);
+    if (config_table == NULL)
         return FWK_E_NOMEM;
-    }
 
     return FWK_SUCCESS;
 }
@@ -92,11 +89,8 @@ static int reg_sensor_element_init(fwk_id_t element_id,
     struct mod_reg_sensor_dev_config *config =
         (struct mod_reg_sensor_dev_config *)data;
 
-    if (config->reg == 0) {
-        /* Invalid element configuration */
-        assert(false);
-        return FWK_E_PARAM;
-    }
+    if (config->reg == 0)
+        return FWK_E_DATA;
 
     config_table[fwk_id_get_element_idx(element_id)] = config;
 
