@@ -9,6 +9,7 @@
  */
 
 #include <string.h>
+#include <fwk_assert.h>
 #include <fwk_errno.h>
 #include <fwk_host.h>
 #include <fwk_mm.h>
@@ -95,7 +96,7 @@ static int init_elements(struct fwk_module_ctx *module_ctx,
     const struct fwk_element *element;
 
     module = module_ctx->desc;
-    if (module->element_init == NULL)
+    if (!fwk_expect(module->element_init != NULL))
         return FWK_E_PARAM;
 
     module_ctx->element_ctx_table =
@@ -113,7 +114,7 @@ static int init_elements(struct fwk_module_ctx *module_ctx,
         ctx.bind_id = element_id;
 
         /* Each element must have a valid pointer to specific data */
-        if (element->data == NULL) {
+        if (!fwk_expect(element->data != NULL)) {
             FWK_HOST_PRINT(err_msg_line, FWK_E_DATA, __func__, __LINE__);
             return FWK_E_DATA;
         }
@@ -126,14 +127,14 @@ static int init_elements(struct fwk_module_ctx *module_ctx,
         if (module->notification_count) {
             status = init_notification_dlist_table(module->notification_count,
                 &element_ctx->subscription_dlist_table);
-            if (status != FWK_SUCCESS)
+            if (!fwk_expect(status == FWK_SUCCESS))
                 return status;
         }
         #endif
 
         status = module->element_init(
             element_id, element->sub_element_count, element->data);
-        if (status != FWK_SUCCESS) {
+        if (!fwk_expect(status == FWK_SUCCESS)) {
             FWK_HOST_PRINT(err_msg_func, status, __func__);
             return status;
         }
@@ -156,8 +157,10 @@ static int init_module(struct fwk_module_ctx *module_ctx,
         (module->type >= FWK_MODULE_TYPE_COUNT) ||
         (module->init == NULL) ||
         (module_config == NULL) ||
-        ((module->api_count > 0) && (module->process_bind_request == NULL)))
+        ((module->api_count > 0) && (module->process_bind_request == NULL))) {
+        fwk_expect(false);
         return FWK_E_PARAM;
+    }
 
     module_ctx->desc = module;
     module_ctx->config = module_config;
@@ -168,14 +171,14 @@ static int init_module(struct fwk_module_ctx *module_ctx,
     if (module->notification_count) {
         status = init_notification_dlist_table(module->notification_count,
             &module_ctx->subscription_dlist_table);
-        if (status != FWK_SUCCESS)
+        if (!fwk_expect(status == FWK_SUCCESS))
             return status;
     }
     #endif
 
     if (module_config->get_element_table != NULL) {
         element_table = module_config->get_element_table(module_ctx->id);
-        if (element_table == NULL)
+        if (!fwk_expect(element_table != NULL))
             return FWK_E_PARAM;
 
         for (count = 0; element_table[count].name != NULL; count++)
@@ -186,7 +189,7 @@ static int init_module(struct fwk_module_ctx *module_ctx,
 
     status = module->init(module_ctx->id, module_ctx->element_count,
                           module_config->data);
-    if (status != FWK_SUCCESS) {
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         FWK_HOST_PRINT(err_msg_line, status, __func__, __LINE__);
         return status;
     }
@@ -201,7 +204,7 @@ static int init_module(struct fwk_module_ctx *module_ctx,
 
     if (module->post_init != NULL) {
         status = module->post_init(module_ctx->id);
-        if (status != FWK_SUCCESS) {
+        if (!fwk_expect(status == FWK_SUCCESS)) {
             FWK_HOST_PRINT(err_msg_line, status, __func__, __LINE__);
             return status;
         }
@@ -256,7 +259,7 @@ static int bind_elements(struct fwk_module_ctx *module_ctx,
 
         ctx.bind_id = fwk_id_build_element_id(module_ctx->id, element_idx);
         status = module->bind(ctx.bind_id, round);
-        if (status != FWK_SUCCESS) {
+        if (!fwk_expect(status == FWK_SUCCESS)) {
             FWK_HOST_PRINT(err_msg_func, status, __func__);
             return status;
         }
@@ -284,7 +287,7 @@ static int bind_module(struct fwk_module_ctx *module_ctx,
 
     ctx.bind_id = module_ctx->id;
     status = module->bind(module_ctx->id, round);
-    if (status != FWK_SUCCESS) {
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         FWK_HOST_PRINT(err_msg_func, status, __func__);
         return status;
     }
@@ -324,7 +327,7 @@ static int start_elements(struct fwk_module_ctx *module_ctx)
         if (module->start != NULL) {
             status = module->start(
                 fwk_id_build_element_id(module_ctx->id, element_idx));
-            if (status != FWK_SUCCESS) {
+            if (!fwk_expect(status == FWK_SUCCESS)) {
                 FWK_HOST_PRINT(err_msg_func, status, __func__);
                 return status;
             }
@@ -346,7 +349,7 @@ static int start_module(struct fwk_module_ctx *module_ctx)
 
     if (module->start != NULL) {
         status = module->start(module_ctx->id);
-        if (status != FWK_SUCCESS) {
+        if (!fwk_expect(status == FWK_SUCCESS)) {
             FWK_HOST_PRINT(err_msg_func, status, __func__);
             return status;
         }
@@ -660,7 +663,7 @@ int fwk_module_bind(fwk_id_t target_id, fwk_id_t api_id, const void *api)
 
     status = module_ctx->desc->process_bind_request(ctx.bind_id, target_id,
                                                     api_id, (const void **)api);
-    if (status != FWK_SUCCESS) {
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         FWK_HOST_PRINT(err_msg_line, status, __func__, __LINE__);
         return status;
     }
@@ -673,6 +676,7 @@ int fwk_module_bind(fwk_id_t target_id, fwk_id_t api_id, const void *api)
     return FWK_SUCCESS;
 
 error:
+    fwk_expect(false);
     FWK_HOST_PRINT(err_msg_func, status, __func__);
     return status;
 }
