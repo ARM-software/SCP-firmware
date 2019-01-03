@@ -1,7 +1,7 @@
 SCP-firmware - version 2.4
 ==========================
 
-Copyright (c) 2011-2018, Arm Limited. All rights reserved.
+Copyright (c) 2011-2019, Arm Limited. All rights reserved.
 
 References
 ----------
