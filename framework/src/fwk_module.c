@@ -645,6 +645,9 @@ int fwk_module_bind(fwk_id_t target_id, fwk_id_t api_id, const void *api)
         fwk_id_get_module_idx(api_id))
         goto error;
 
+    if (api == NULL)
+        goto error;
+
     module_ctx = __fwk_module_get_ctx(target_id);
 
     if (((ctx.stage != MODULE_STAGE_INITIALIZE) ||
