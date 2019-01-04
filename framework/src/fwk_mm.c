@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fwk_assert.h>
 #include <fwk_errno.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
@@ -67,31 +68,35 @@ void *fwk_mm_alloc_aligned(size_t num, size_t size, unsigned int alignment)
     bool overflow;
 
     if (mm_locked || !num || !size || !alignment || !initialized)
-        return NULL;
+        goto error;
 
     /* Ensure 'alignment' is a power of two */
     if (alignment & (alignment - 1))
-        return NULL;
+        goto error;
 
     overflow = __builtin_mul_overflow(num, size, &total_size);
 
     /* Ensure the computation of 'total_size' has not overflowed */
     if (overflow)
-        return NULL;
+        goto error;
 
     start = FWK_ALIGN_NEXT(heap_free, alignment);
 
     /* Ensure there is no overflow during the alignment */
     if (start < heap_free)
-        return NULL;
+        goto error;
 
     /* Ensure 'total_size' fits in the remaining heap area */
     if (total_size > (heap_end - start))
-        return NULL;
+        goto error;
 
     heap_free = start + total_size;
 
     return (void *)start;
+
+error:
+    fwk_expect(false);
+    return NULL;
 }
 
 void *fwk_mm_calloc(size_t num, size_t size)
