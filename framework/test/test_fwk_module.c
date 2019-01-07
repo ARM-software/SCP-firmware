@@ -884,6 +884,23 @@ static void test_fwk_module_is_valid_notification_id(void)
     assert(!result);
 }
 
+static void test_fwk_module_get_element_count(void)
+{
+    int element_count;
+
+    /* Valid module ID with 2 elements */
+    element_count = fwk_module_get_element_count(MODULE0_ID);
+    assert(element_count == 2);
+
+    /* Invalid module ID */
+    element_count = fwk_module_get_element_count(FWK_ID_MODULE(5));
+    assert(element_count == FWK_E_PARAM);
+
+    /* The function should fails as it expects a module ID */
+    element_count = fwk_module_get_element_count(ELEM0_ID);
+    assert(element_count == FWK_E_PARAM);
+}
+
 static void test_fwk_module_get_name(void)
 {
     fwk_id_t id;
@@ -1097,6 +1114,7 @@ static const struct fwk_test_case_desc test_case_table[] = {
     FWK_TEST_CASE(test_fwk_module_is_valid_api_id),
     FWK_TEST_CASE(test_fwk_module_is_valid_event_id),
     FWK_TEST_CASE(test_fwk_module_is_valid_notification_id),
+    FWK_TEST_CASE(test_fwk_module_get_element_count),
     FWK_TEST_CASE(test_fwk_module_get_name),
     FWK_TEST_CASE(test_fwk_module_get_data),
     FWK_TEST_CASE(test_fwk_module_check_call_failed),
