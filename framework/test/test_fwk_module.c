@@ -288,6 +288,9 @@ static void test_case_setup(void)
     module_config_table[0] = &fake_module_config0;
     module_config_table[1] = &fake_module_config1;
     module_config_table[2] = NULL;
+
+    __fwk_module_reset();
+    __fwk_module_init();
 }
 
 static void test___fwk_module_init_memory_allocation_failure(void)
@@ -602,6 +605,8 @@ static void test___fwk_module_init_succeed(void)
     /* Module 1 has no element */
     fake_module_config1.get_element_table = NULL;
 
+    bind_count_call = 0;
+    start_count_call = 0;
     __fwk_module_reset();
     result = __fwk_module_init();
     assert(result == FWK_SUCCESS);
@@ -952,9 +957,6 @@ static void test_fwk_module_check_call_failed(void)
     int result;
     fwk_id_t id;
     struct fwk_module_ctx *module_ctx;
-
-    __fwk_module_reset();
-    __fwk_module_init();
 
     /* The ID is invalid, so that __fwk_module_get_state fails */
     id = FWK_ID_ELEMENT(0xEF, 0xDBE);
