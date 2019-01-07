@@ -743,6 +743,39 @@ static void test_fwk_module_is_valid_sub_element_id(void)
     assert(!result);
 }
 
+static void test_fwk_module_is_valid_entity_id(void)
+{
+    bool result;
+
+    /* Valid module ID */
+    result = fwk_module_is_valid_entity_id(MODULE0_ID);
+    assert(result);
+
+    /* Invalid module ID */
+    result = fwk_module_is_valid_entity_id(FWK_ID_MODULE(5));
+    assert(!result);
+
+    /* Valid element ID */
+    result = fwk_module_is_valid_entity_id(ELEM0_ID);
+    assert(result);
+
+    /* Invalid element ID */
+    result = fwk_module_is_valid_entity_id(FWK_ID_ELEMENT(5, 5));
+    assert(!result);
+
+    /* Valid sub-element ID */
+    result = fwk_module_is_valid_entity_id(SUB_ELEM0_ID);
+    assert(result);
+
+    /* Invalid sub-element ID */
+    result = fwk_module_is_valid_sub_element_id(FWK_ID_SUB_ELEMENT(5, 5, 5));
+    assert(!result);
+
+    /* Invalid entity as a notification is not an entity */
+    result = fwk_module_is_valid_entity_id(NOTIFICATION0_ID);
+    assert(!result);
+}
+
 static void test_fwk_module_is_valid_api_id(void)
 {
     fwk_id_t id;
@@ -1060,6 +1093,7 @@ static const struct fwk_test_case_desc test_case_table[] = {
     FWK_TEST_CASE(test_fwk_module_is_valid_module_id),
     FWK_TEST_CASE(test_fwk_module_is_valid_element_id),
     FWK_TEST_CASE(test_fwk_module_is_valid_sub_element_id),
+    FWK_TEST_CASE(test_fwk_module_is_valid_entity_id),
     FWK_TEST_CASE(test_fwk_module_is_valid_api_id),
     FWK_TEST_CASE(test_fwk_module_is_valid_event_id),
     FWK_TEST_CASE(test_fwk_module_is_valid_notification_id),
