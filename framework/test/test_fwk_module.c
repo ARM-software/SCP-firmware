@@ -4,7 +4,6 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-
 #include <string.h>
 #include <fwk_assert.h>
 #include <fwk_errno.h>
@@ -87,6 +86,7 @@ static int bind_count_call;
 static int start_return_val;
 static int start_count_call;
 static int process_bind_request_return_val;
+static bool process_bind_request_return_api;
 static bool get_element_table0_return_val;
 static bool get_element_table1_return_val;
 static int process_event_return_val;
@@ -141,7 +141,8 @@ static int process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
     (void) source_id;
     (void) target_id;
     (void) api_id;
-    *api = &fake_api;
+    if (process_bind_request_return_api)
+        *api = &fake_api;
 
     return process_bind_request_return_val;
 }
@@ -215,6 +216,7 @@ static void test_case_setup(void)
     bind_return_val = FWK_SUCCESS;
     start_return_val = FWK_SUCCESS;
     process_bind_request_return_val = FWK_SUCCESS;
+    process_bind_request_return_api = true;
     process_event_return_val = FWK_SUCCESS;
     thread_init_return_val = FWK_SUCCESS;
 
@@ -481,24 +483,6 @@ static void test___fwk_module_init_failure(void)
     assert(state == FWK_MODULE_STATE_UNINITIALIZED);
 }
 
-static void test_fwk_module_bind_failure(void)
-{
-    int result;
-    struct fake_api fake_api;
-
-    /* Start function failure */
-    start_return_val = FWK_E_PARAM;
-    __fwk_module_reset();
-    result = __fwk_module_init();
-    assert(result == FWK_E_PARAM);
-    start_return_val = FWK_SUCCESS;
-
-    /* The framework is not in the good stage for binding */
-    process_bind_request_return_val = FWK_SUCCESS;
-    result = fwk_module_bind(MODULE0_ID, API1_ID, &fake_api);
-    assert(result == FWK_E_STATE);
-}
-
 static void test___fwk_module_init_bind_failure(void)
 {
     int result;
@@ -531,27 +515,6 @@ static void test___fwk_module_init_bind_failure(void)
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_INITIALIZED);
 
-}
-
-static void test_fwk_module_bind(void)
-{
-    int result;
-    struct fake_api *fake_api;
-
-    /* The framework component is in the bound stage */
-    result = fwk_module_bind(FWK_ID_MODULE(2), API0_ID, &fake_api);
-    assert(result == FWK_E_PARAM);
-
-    result = fwk_module_bind(MODULE1_ID, FWK_ID_API(1, 0), &fake_api);
-    assert(result == FWK_E_PARAM);
-
-    process_bind_request_return_val = FWK_E_PARAM;
-    result = fwk_module_bind(MODULE0_ID, API1_ID, &fake_api);
-    assert(result == FWK_E_PARAM);
-
-    process_bind_request_return_val = FWK_SUCCESS;
-    result = fwk_module_bind(MODULE0_ID, API1_ID, &fake_api);
-    assert(result == FWK_SUCCESS);
 }
 
 static void test___fwk_module_init_start_failure(void)
@@ -936,14 +899,111 @@ static void test_fwk_module_get_data(void)
     assert(result == NULL);
 }
 
+static void test_fwk_module_bind_stage_failure(void)
+{
+    int result;
+    struct fake_api api;
+
+    /*
+     * The framework is forced into the initialization stage
+     */
+    __fwk_module_reset();
+    init_return_val = FWK_E_PARAM;
+    result = __fwk_module_init();
+    assert(result == FWK_E_PARAM);
+    init_return_val = FWK_SUCCESS;
+
+    /*
+     * The binding request should fail because the framework is in
+     * MODULE_STAGE_INITIALIZE and the module is in
+     * FWK_MODULE_STATE_UNINITIALIZED state.
+     */
+    result = fwk_module_bind(MODULE0_ID, API1_ID, &api);
+    assert(result == FWK_E_STATE);
+
+    /*
+     * The framework is forced into the start stage
+     */
+    start_return_val = FWK_E_PARAM;
+    __fwk_module_reset();
+    result = __fwk_module_init();
+    assert(result == FWK_E_PARAM);
+    start_return_val = FWK_SUCCESS;
+
+    /*
+     * The binding request should fail because it cannot be called when the
+     * framework is in MODULE_STAGE_START stage.
+     */
+    process_bind_request_return_val = FWK_SUCCESS;
+    result = fwk_module_bind(MODULE0_ID, API1_ID, &api);
+    assert(result == FWK_E_STATE);
+}
+
+static void test_fwk_module_bind(void)
+{
+    int result;
+    struct fake_api *api;
+    void *null_api = NULL;
+
+    /* The framework component is forced into the bound stage */
+    __fwk_module_reset();
+    bind_return_val = FWK_E_PARAM;
+    result = __fwk_module_init();
+    assert(result == FWK_E_PARAM);
+    bind_return_val = FWK_SUCCESS;
+
+    /* The binding request should fail because the target ID is not valid */
+    result = fwk_module_bind(FWK_ID_MODULE(2), API0_ID, &api);
+    assert(result == FWK_E_PARAM);
+
+    /* The binding request should fail because the API ID is not valid */
+    result = fwk_module_bind(MODULE1_ID, FWK_ID_API(1, 0), &api);
+    assert(result == FWK_E_PARAM);
+
+    /*
+     * The binding request should fail because API0_ID does not belong to
+     * MODULE1_ID.
+     */
+    result = fwk_module_bind(MODULE1_ID, API0_ID, &api);
+    assert(result == FWK_E_PARAM);
+
+    /*
+     * The binding request should fail because the API address pointer is NULL
+     */
+    result = fwk_module_bind(MODULE0_ID, API1_ID, NULL);
+    assert(result == FWK_E_PARAM);
+
+    /*
+     * The binding request should fail because the process_bind_request function
+     * associated with the module fails.
+     */
+    process_bind_request_return_val = FWK_E_PARAM;
+    result = fwk_module_bind(MODULE0_ID, API1_ID, &api);
+    assert(result == FWK_E_PARAM);
+    process_bind_request_return_val = FWK_SUCCESS;
+
+    /*
+     * The binding request should fail because the address of the API is
+     * initially NULL and is not modified by the module process_bind_request()
+     * function.
+     */
+    process_bind_request_return_api = false;
+    result = fwk_module_bind(MODULE0_ID, API1_ID, &null_api);
+    assert(result == FWK_E_HANDLER);
+    assert(null_api == NULL);
+    process_bind_request_return_api = true;
+
+    /* The binding request should return successfully */
+    result = fwk_module_bind(MODULE0_ID, API1_ID, &api);
+    assert(result == FWK_SUCCESS);
+}
+
 static const struct fwk_test_case_desc test_case_table[] = {
     FWK_TEST_CASE(test___fwk_module_init_memory_allocation_failure),
     FWK_TEST_CASE(test_fwk_module_check_call_failed),
     FWK_TEST_CASE(test___fwk_module_init_module_desc_bad_params),
     FWK_TEST_CASE(test___fwk_module_init_failure),
-    FWK_TEST_CASE(test_fwk_module_bind_failure),
     FWK_TEST_CASE(test___fwk_module_init_bind_failure),
-    FWK_TEST_CASE(test_fwk_module_bind),
     FWK_TEST_CASE(test___fwk_module_init_start_failure),
     FWK_TEST_CASE(test_fwk_check_call_succeed),
     FWK_TEST_CASE(test_fwk_thread_failure),
@@ -955,7 +1015,9 @@ static const struct fwk_test_case_desc test_case_table[] = {
     FWK_TEST_CASE(test_fwk_module_is_valid_event_id),
     FWK_TEST_CASE(test_fwk_module_is_valid_notification_id),
     FWK_TEST_CASE(test_fwk_module_get_name),
-    FWK_TEST_CASE(test_fwk_module_get_data)
+    FWK_TEST_CASE(test_fwk_module_get_data),
+    FWK_TEST_CASE(test_fwk_module_bind_stage_failure),
+    FWK_TEST_CASE(test_fwk_module_bind)
 };
 
 struct fwk_test_suite_desc test_suite = {
