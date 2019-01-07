@@ -16,6 +16,7 @@
 #define ELEM0_IDX          0
 #define ELEM1_IDX          1
 #define ELEM2_IDX          0
+#define SUB_ELEM0_IDX      0
 #define API0_IDX           0
 #define API1_IDX           1
 #define EVENT0_IDX         0
@@ -30,6 +31,9 @@
 #define ELEM0_ID          FWK_ID_ELEMENT(MODULE0_IDX, ELEM0_IDX)
 #define ELEM1_ID          FWK_ID_ELEMENT(MODULE0_IDX, ELEM1_IDX)
 #define ELEM2_ID          FWK_ID_ELEMENT(MODULE1_IDX, ELEM2_IDX)
+#define SUB_ELEM0_ID      FWK_ID_SUB_ELEMENT(MODULE0_IDX, \
+                                             ELEM0_IDX, \
+                                             SUB_ELEM0_IDX)
 #define API0_ID           FWK_ID_API(MODULE0_IDX, API0_IDX)
 #define API1_ID           FWK_ID_API(MODULE0_IDX, API1_IDX)
 #define EVENT0_ID         FWK_ID_EVENT(MODULE1_IDX, EVENT0_IDX)
@@ -260,6 +264,7 @@ static void test_case_setup(void)
 
     fake_element_desc_table0[0].name = "FAKE ELEM 0";
     fake_element_desc_table0[0].data = &config_elem0;
+    fake_element_desc_table0[0].sub_element_count = 1;
     fake_element_desc_table0[1].name = "FAKE ELEM 1";
     fake_element_desc_table0[1].data = &config_elem1;
     fake_element_desc_table0[2].name = NULL;
@@ -710,6 +715,34 @@ static void test_fwk_module_is_valid_element_id(void)
     assert(!result);
 }
 
+static void test_fwk_module_is_valid_sub_element_id(void)
+{
+    bool result;
+
+    /* Valid sub-element ID */
+    result = fwk_module_is_valid_sub_element_id(SUB_ELEM0_ID);
+    assert(result);
+
+    /* Invalid type */
+    result = fwk_module_is_valid_sub_element_id(NOTIFICATION0_ID);
+    assert(!result);
+
+    /* Invalid module IDX */
+    result = fwk_module_is_valid_sub_element_id(FWK_ID_SUB_ELEMENT(5, ELEM0_IDX,
+        SUB_ELEM0_IDX));
+    assert(!result);
+
+    /* Invalid element IDX */
+    result = fwk_module_is_valid_sub_element_id(FWK_ID_SUB_ELEMENT(MODULE0_IDX,
+        5, SUB_ELEM0_IDX));
+    assert(!result);
+
+    /* Invalid sub-element ID */
+    result = fwk_module_is_valid_sub_element_id(FWK_ID_SUB_ELEMENT(MODULE0_IDX,
+        ELEM0_IDX, 5));
+    assert(!result);
+}
+
 static void test_fwk_module_is_valid_api_id(void)
 {
     fwk_id_t id;
@@ -1026,6 +1059,7 @@ static const struct fwk_test_case_desc test_case_table[] = {
     FWK_TEST_CASE(test___fwk_module_get_state),
     FWK_TEST_CASE(test_fwk_module_is_valid_module_id),
     FWK_TEST_CASE(test_fwk_module_is_valid_element_id),
+    FWK_TEST_CASE(test_fwk_module_is_valid_sub_element_id),
     FWK_TEST_CASE(test_fwk_module_is_valid_api_id),
     FWK_TEST_CASE(test_fwk_module_is_valid_event_id),
     FWK_TEST_CASE(test_fwk_module_is_valid_notification_id),
