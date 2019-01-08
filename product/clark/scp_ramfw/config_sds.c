@@ -68,7 +68,7 @@ static struct fwk_element sds_element_table[] = {
             .finalize = true,
         }),
     },
-#ifdef MODE_DEBUG
+#ifdef BUILD_MODE_DEBUG
     {
         .name = "Boot Counters",
         .data = &((struct mod_sds_structure_desc) {
