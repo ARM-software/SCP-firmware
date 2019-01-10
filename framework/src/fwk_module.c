@@ -587,6 +587,14 @@ int fwk_module_get_element_count(fwk_id_t id)
         return FWK_E_PARAM;
 }
 
+int fwk_module_get_sub_element_count(fwk_id_t element_id)
+{
+    if (fwk_module_is_valid_element_id(element_id))
+        return __fwk_module_get_element_ctx(element_id)->sub_element_count;
+    else
+        return FWK_E_PARAM;
+}
+
 const char *fwk_module_get_name(fwk_id_t id)
 {
     if (fwk_module_is_valid_element_id(id))

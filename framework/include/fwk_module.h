@@ -396,6 +396,16 @@ bool fwk_module_is_valid_notification_id(fwk_id_t id);
 int fwk_module_get_element_count(fwk_id_t module_id);
 
 /*!
+ * \brief Get the number of sub-elements within an element.
+ *
+ * \param element_id Identifier of the element.
+ *
+ * \retval FWK_E_PARAM The identifier of the element is invalid.
+ * \return Number of sub-elements.
+ */
+int fwk_module_get_sub_element_count(fwk_id_t element_id);
+
+/*!
  * \brief Get the name of a module or element.
  *
  * \param id Identifier of the module or element.
