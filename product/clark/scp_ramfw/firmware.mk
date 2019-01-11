@@ -50,7 +50,6 @@ BS_FIRMWARE_SOURCES := \
     config_system_power.c \
     config_sid.c \
     rtx_config.c \
-    clark_core.c \
     config_armv7m_mpu.c \
     config_log.c \
     config_power_domain.c \
