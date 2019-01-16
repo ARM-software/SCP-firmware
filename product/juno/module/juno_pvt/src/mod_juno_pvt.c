@@ -90,6 +90,18 @@ struct pvt_dev_ctx {
 
     /* Tracker to Power Domain ON state */
     bool pd_state_on;
+
+    /* Cookie of the notification to respond to */
+    uint32_t cookie;
+
+    /*
+     * Power Domain notification delayed flag
+     *
+     * If a pre-state notification is received when the sensor reading is in
+     * progress, the response to the notification is delayed until the sensor
+     * reading is completed.
+     */
+    bool pd_notification_delayed;
 };
 
 /* Sensor (sub-element) context */
@@ -651,9 +663,14 @@ static int pvt_process_event(const struct fwk_event *event,
     struct pvt_sub_dev_ctx *sensor_ctx;
     struct mod_sensor_driver_resp_params *isr_params =
         (struct mod_sensor_driver_resp_params *)event->params;
+    struct fwk_event resp_notif;
     uint8_t elt_idx = fwk_id_get_element_idx(event->target_id);
     unsigned int sub_elt_idx;
     unsigned int sensor_count;
+    struct mod_pd_power_state_pre_transition_notification_resp_params
+        *pd_resp_params =
+        (struct mod_pd_power_state_pre_transition_notification_resp_params *)
+            resp_notif.params;
 
     fwk_assert(fwk_module_is_valid_element_id(event->target_id));
 
@@ -720,6 +737,22 @@ static int pvt_process_event(const struct fwk_event *event,
                 sensor_ctx->sensor_hal_id,
                 isr_params);
 
+            /* Respond to the Power Domain notification */
+            if (group_ctx->pd_notification_delayed) {
+                group_ctx->pd_notification_delayed = false;
+                status = fwk_thread_get_delayed_response(event->target_id,
+                                                         group_ctx->cookie,
+                                                         &resp_notif);
+                if (status != FWK_SUCCESS)
+                    return FWK_E_PANIC;
+
+                status = fwk_thread_put_event(&resp_notif);
+                if (status != FWK_SUCCESS)
+                    return FWK_E_PANIC;
+
+                pd_resp_params->status = FWK_SUCCESS;
+            }
+
             return FWK_SUCCESS;
         }
         /* Fall-through */
@@ -737,6 +770,8 @@ static int pvt_process_notification(const struct fwk_event *event,
         *pre_state_params;
     struct mod_pd_power_state_transition_notification_params
         *post_state_params;
+    struct mod_pd_power_state_pre_transition_notification_resp_params
+        *resp_params;
 
     group_ctx = &dev_ctx[fwk_id_get_element_idx(event->target_id)];
 
@@ -747,6 +782,25 @@ static int pvt_process_notification(const struct fwk_event *event,
                 event->params;
         if (pre_state_params->target_state == MOD_PD_STATE_OFF)
             group_ctx->pd_state_on = false;
+
+        if (!fwk_id_is_equal(group_ctx->sensor_read_id, FWK_ID_NONE)) {
+            /* Read request ongoing, delay the response */
+            group_ctx->cookie = event->cookie;
+            group_ctx->pd_notification_delayed = true;
+
+            /*
+            * The response to Power Domain is delayed so we can process the
+            * sensor reading within a defined power state.
+            */
+            resp_event->is_delayed_response = true;
+        } else {
+            resp_params =
+            (struct
+                mod_pd_power_state_pre_transition_notification_resp_params *)
+                resp_event->params;
+
+            resp_params->status = FWK_SUCCESS;
+        }
 
     } else if (fwk_id_is_equal(event->id,
                         mod_pd_notification_id_power_state_transition)) {
