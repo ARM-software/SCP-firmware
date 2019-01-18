@@ -131,6 +131,7 @@ static int n1sdp_pcie_setup(struct n1sdp_pcie_dev_ctx *dev_ctx)
 
     /* PHY initialization */
     pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "[PCIe] Initializing PHY...");
+    pcie_phy_init(dev_ctx->phy_apb);
     status = pcie_init(dev_ctx->ctrl_apb,
                        pcie_ctx.timer_api,
                        PCIE_INIT_STAGE_PHY);
