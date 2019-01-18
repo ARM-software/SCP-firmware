@@ -27,7 +27,7 @@ static const struct fwk_element pl011_element_desc_table[] = {
         .name = "MCP UART",
         .data = &((struct mod_pl011_device_config) {
             .reg_base = MCP_UART0_BASE,
-            .baud_rate_bps = BAUD_RATE_19200,
+            .baud_rate_bps = 115200,
             .clock_rate_hz = CLOCK_RATE_REFCLK,
             .clock_id = FWK_ID_NONE_INIT,
             }),
