@@ -14,16 +14,22 @@
 #include <mod_n1sdp_pcie.h>
 #include <mod_timer.h>
 #include <n1sdp_pcie.h>
+#include <n1sdp_scp_pik.h>
 
-static bool wait_condition(void *data)
+bool pcie_wait_condition(void *data)
 {
     assert(data != NULL);
 
-    struct wait_condition_data *wait_data = (struct wait_condition_data *)data;
+    struct pcie_wait_condition_data *wait_data =
+        (struct pcie_wait_condition_data *)data;
     struct pcie_ctrl_apb_reg *ctrl_apb =
         (struct pcie_ctrl_apb_reg *)(wait_data->ctrl_apb);
 
     switch (wait_data->stage) {
+    case PCIE_INIT_STAGE_PCIE_POWER_ON:
+        return ((SCC->PCIE_PM_CTRL & SCC_PCIE_PM_CTRL_PWR_ACK_MASK) != 0);
+    case PCIE_INIT_STAGE_CCIX_POWER_ON:
+        return ((SCC->CCIX_PM_CTRL & SCC_CCIX_PM_CTRL_PWR_ACK_MASK) != 0);
     case PCIE_INIT_STAGE_PHY:
         return ((ctrl_apb->RESET_STATUS &
                  RESET_STATUS_PHY_REL_ST_MASK) != 0);
@@ -46,7 +52,7 @@ int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
     assert(timer_api != NULL);
     assert(stage < PCIE_INIT_STAGE_COUNT);
 
-    struct wait_condition_data wait_data;
+    struct pcie_wait_condition_data wait_data;
     int status;
 
     wait_data.ctrl_apb = ctrl_apb;
@@ -58,7 +64,7 @@ int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
         ctrl_apb->RESET_CTRL = RESET_CTRL_PHY_REL_MASK;
         status = timer_api->wait(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
                                  PCIE_PHY_PLL_LOCK_TIMEOUT,
-                                 wait_condition,
+                                 pcie_wait_condition,
                                  &wait_data);
         if (status != FWK_SUCCESS)
             return status;
@@ -69,10 +75,12 @@ int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
         /* Clear ARI & SR_IOV bits */
         ctrl_apb->RP_CONFIG_IN &= ~RP_CONFIG_IN_ARI_EN_MASK;
         ctrl_apb->RP_CONFIG_IN &= ~RP_CONFIG_IN_SR_IOV_EN_MASK;
+        ctrl_apb->RP_CONFIG_IN = (0x4 << RP_CONFIG_IN_LANE_CNT_IN_POS) |
+                                 (0x1 << RP_CONFIG_IN_PCIE_GEN_SEL_POS);
         ctrl_apb->RESET_CTRL = RESET_CTRL_RC_REL_MASK;
         status = timer_api->wait(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
                                  PCIE_CTRL_RC_RESET_TIMEOUT,
-                                 wait_condition,
+                                 pcie_wait_condition,
                                  &wait_data);
         if (status != FWK_SUCCESS)
             return status;
@@ -83,7 +91,7 @@ int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
         ctrl_apb->RP_CONFIG_IN |= RP_CONFIG_IN_LINK_TRNG_EN_MASK;
         status = timer_api->wait(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
                                  PCIE_LINK_TRAINING_TIMEOUT,
-                                 wait_condition,
+                                 pcie_wait_condition,
                                  &wait_data);
         if (status != FWK_SUCCESS)
             return status;

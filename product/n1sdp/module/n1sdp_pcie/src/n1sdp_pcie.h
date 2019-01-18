@@ -66,13 +66,27 @@
  */
 #define PCIE_PHY_PLL_LOCK_TIMEOUT      UINT32_C(100)
 #define PCIE_CTRL_RC_RESET_TIMEOUT     UINT32_C(100)
-#define PCIE_LINK_TRAINING_TIMEOUT     UINT32_C(20000)
+#define PCIE_LINK_TRAINING_TIMEOUT     UINT32_C(50000)
+
+/* PCIe controller power on timeout (in microseconds) */
+#define PCIE_POWER_ON_TIMEOUT          UINT32_C(10)
 
 /* PCIe configuration space offset definitions */
 #define PCIE_CLASS_CODE_OFFSET         0x8
 
 /* PCIe class code for PCI bridge */
 #define PCIE_CLASS_CODE_PCI_BRIDGE     UINT32_C(0x06040000)
+
+/* PCIe controller local management (LM) register offsets */
+#define PCIE_LM_RC_BAR_CONFIG_REG      UINT32_C(0x300)
+
+/* PCIe LM root complex bar configuration register bit masks */
+#define TYPE1_PREF_MEM_BAR_ENABLE_MASK      (1U << 17)
+#define TYPE1_PREF_MEM_BAR_SIZE_32BIT_MASK  (0U << 18)
+#define TYPE1_PREF_MEM_BAR_SIZE_64BIT_MASK  (1U << 18)
+#define TYPE1_PREF_IO_BAR_ENABLE_MASK       (1U << 19)
+#define TYPE1_PREF_IO_BAR_SIZE_32BIT_MASK   (0U << 20)
+#define TYPE1_PREF_IO_BAR_SIZE_64BIT_MASK   (1U << 20)
 
 /*
  * Root port's config space cannot be written directly with its base address.
@@ -90,7 +104,7 @@
 
 /* Maximum bus levels for type 0 and type 1 transactions */
 #define MAX_TYPE0_BUS_LEVELS           2
-#define MAX_TYPE1_BUS_LEVELS           8
+#define MAX_TYPE1_BUS_LEVELS           16
 
 /* Maximum AXI space for type 0 and type 1 transactions */
 #define AXI_ECAM_TYPE0_SIZE            (MAX_TYPE0_BUS_LEVELS * \
@@ -114,7 +128,7 @@
 /*
  * CCIX AXI slave ECAM memory mapping
  */
-#define CCIX_AXI_ECAM_TYPE0_OFFSET     (16 * FWK_MIB)
+#define CCIX_AXI_ECAM_TYPE0_OFFSET     (32 * FWK_MIB)
 
 #define CCIX_AXI_ECAM_TYPE1_OFFSET     (CCIX_AXI_ECAM_TYPE0_OFFSET + \
                                            AXI_ECAM_TYPE0_SIZE)
@@ -326,6 +340,12 @@ struct axi_ob_config {
  * Identifiers of PCIe initialization stages
  */
 enum pcie_init_stage {
+    /* PCIe controller power ON stage */
+    PCIE_INIT_STAGE_PCIE_POWER_ON,
+
+    /* CCIX controller power ON stage */
+    PCIE_INIT_STAGE_CCIX_POWER_ON,
+
     /* PHY initialization stage */
     PCIE_INIT_STAGE_PHY,
 
@@ -342,7 +362,7 @@ enum pcie_init_stage {
 /*
  * Structure defining data to be passed to timer API
  */
-struct wait_condition_data {
+struct pcie_wait_condition_data {
     void *ctrl_apb;
     enum pcie_init_stage stage;
 };
@@ -385,6 +405,16 @@ int axi_inbound_region_setup(uint32_t axi_config_base_addr,
                              uint64_t axi_base_addr,
                              uint32_t region_size,
                              uint8_t bar);
+
+/*
+ * Brief - Function to check PCIe status in various initialization stages.
+ *
+ * param - data - Pointer to wait condition data
+ *
+ * retval - true - if the condition is met
+ *          false - if the condition is not met
+ */
+bool pcie_wait_condition(void *data);
 
 /*
  * Brief - Function to initialize different stages of PCIe module.
