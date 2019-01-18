@@ -16,6 +16,56 @@
 #include <n1sdp_pcie.h>
 #include <n1sdp_scp_pik.h>
 
+void pcie_phy_init(uint32_t phy_apb_base)
+{
+
+    uint32_t j;
+
+    for (j = 0; j < 16; j++)
+        *((unsigned int *)((j << 11) | 0x1000C | phy_apb_base)) = 0x00004900;
+
+    *((unsigned int *)(0x00188 | phy_apb_base)) = 0x00001B26;
+    for (j = 0; j < 16; j++) {
+        *((unsigned int *)((j << 11) | 0x00204 | phy_apb_base)) = 0x0000813E;
+        *((unsigned int *)((j << 11) | 0x00220 | phy_apb_base)) = 0x00000094;
+        *((unsigned int *)((j << 11) | 0x00244 | phy_apb_base)) = 0x00000314;
+    }
+
+    for (j = 0; j < 16; j++)
+        *((unsigned int *)((j << 11) | 0x105a8 | phy_apb_base)) = 0x00002E31;
+
+    *((unsigned int *)(0x30008 | phy_apb_base)) = 0x00004010;
+    *((unsigned int *)(0x3000c | phy_apb_base)) = 0x00000810;
+    *((unsigned int *)(0x30010 | phy_apb_base)) = 0x00001101;
+    *((unsigned int *)(0x30018 | phy_apb_base)) = 0x0000000A;
+
+    for (j = 0; j < 16; j++) {
+        *((unsigned int *)((j << 11) | 0x10320 | phy_apb_base)) = 0x00000500;
+        *((unsigned int *)((j << 11) | 0x10328 | phy_apb_base)) = 0x0000A990;
+        *((unsigned int *)((j << 11) | 0x10540 | phy_apb_base)) = 0x00005008;
+        *((unsigned int *)((j << 11) | 0x10560 | phy_apb_base)) = 0x00007425;
+        *((unsigned int *)((j << 11) | 0x10580 | phy_apb_base)) = 0x000000AC;
+    }
+
+    for (j = 0; j < 16; j++) {
+        *((unsigned int *)((j << 11) | 0x10110 | phy_apb_base)) = 0x00000000;
+        *((unsigned int *)((j << 11) | 0x10258 | phy_apb_base)) = 0x00000000;
+        *((unsigned int *)((j << 11) | 0x10324 | phy_apb_base)) = 0x00005664;
+        *((unsigned int *)((j << 11) | 0x101c4 | phy_apb_base)) = 0x00000002;
+        *((unsigned int *)((j << 11) | 0x10320 | phy_apb_base)) = 0x00000100;
+        *((unsigned int *)((j << 11) | 0x10328 | phy_apb_base)) = 0x00008190;
+        *((unsigned int *)((j << 11) | 0x10334 | phy_apb_base)) = 0x0000008a;
+        *((unsigned int *)((j << 11) | 0x1034c | phy_apb_base)) = 0x0000000a;
+        *((unsigned int *)((j << 11) | 0x1053c | phy_apb_base)) = 0x00005008;
+        *((unsigned int *)((j << 11) | 0x10540 | phy_apb_base)) = 0x00005008;
+        *((unsigned int *)((j << 11) | 0x10560 | phy_apb_base)) = 0x00003783;
+        *((unsigned int *)((j << 11) | 0x1060c | phy_apb_base)) = 0x00001002;
+        *((unsigned int *)((j << 11) | 0x10610 | phy_apb_base)) = 0x00002004;
+        *((unsigned int *)((j << 11) | 0x107bc | phy_apb_base)) = 0x00001002;
+        *((unsigned int *)((j << 11) | 0x107c0 | phy_apb_base)) = 0x00002004;
+    }
+}
+
 bool pcie_wait_condition(void *data)
 {
     assert(data != NULL);

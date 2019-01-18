@@ -431,6 +431,13 @@ int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
               enum pcie_init_stage stage);
 
 /*
+ * Brief - Function to initialize PCIe PHY layer.
+ *
+ * param - pcie_phy_base - Base address of the PHY layer registers
+ */
+void pcie_phy_init(uint32_t phy_apb_base);
+
+/*
  * Brief - Function to write to Root Port's/End Point's configuration space.
  *
  * param - base - Base address of RP/EP's configuration memory
