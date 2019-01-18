@@ -35,7 +35,10 @@ BS_FIRMWARE_MODULES := \
     clock \
     gtimer \
     timer \
+    n1sdp_sensor \
+    sensor \
     scmi_power_domain \
+    scmi_sensor \
     scmi_system_power \
     scmi_management \
     n1sdp_flash \
@@ -66,6 +69,7 @@ BS_FIRMWARE_SOURCES := \
     config_clock.c \
     config_n1sdp_flash.c \
     config_n1sdp_pcie.c \
+    config_sensor.c \
     config_apcontext.c
 
 include $(BS_DIR)/firmware.mk
