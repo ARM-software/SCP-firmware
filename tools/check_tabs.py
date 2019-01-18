@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2015-2018, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2015-2019, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -41,6 +41,7 @@ EXCLUDE = [
     '*.pyc',
     '.gitmodules',
     '*.svg',
+    '*.a',
 ]
 
 

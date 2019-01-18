@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2019, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -18,6 +18,7 @@ static struct fwk_element ppu_v0_element_table[] = {
         .data = &((struct mod_ppu_v0_pd_config) {
             .pd_type = MOD_PD_TYPE_DEVICE_DEBUG,
             .ppu.reg_base = SCP_PPU_DEBUG_BASE,
+            .default_power_on = true,
         }),
     },
     [PPU_V0_ELEMENT_IDX_COUNT] = { 0 }, /* Termination entry */

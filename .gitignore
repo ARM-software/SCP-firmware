@@ -11,6 +11,9 @@
 *.a
 *.d
 
+# Inclusions for libraries
+!module/*/lib/mod_*.a
+
 # Ctags Index
 tags
 

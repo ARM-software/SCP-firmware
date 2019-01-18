@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2019, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -26,16 +26,6 @@ static const ARM_MPU_Region_t regions[] = {
         .RBAR = ARM_MPU_RBAR(2, MCP_RAM1_BASE),
         .RASR = ARM_MPU_RASR(
             1, ARM_MPU_AP_PRIV, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_256KB),
-    },
-    { /* 0x4562_0000 - 0x4562_00FF */
-        .RBAR = ARM_MPU_RBAR(3, MCP_SCP_SHARED_SECURE_RAM),
-        .RASR = ARM_MPU_RASR(
-            1, ARM_MPU_AP_PRIV, 0, 1, 1, 1, 0, ARM_MPU_REGION_SIZE_256B),
-    },
-    { /* 0x4561_0000 - 0x4561_00FF */
-        .RBAR = ARM_MPU_RBAR(4, MCP_SCP_SHARED_NONSECURE_RAM),
-        .RASR = ARM_MPU_RASR(
-            1, ARM_MPU_AP_PRIV, 0, 1, 1, 1, 0, ARM_MPU_REGION_SIZE_256B),
     },
 };
 

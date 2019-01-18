@@ -101,11 +101,10 @@ BUILD_DISABLE_API_BAR
 Module
 ======
 
-Modules are the building blocks of a firmware product and are built as
-libraries. Modules can be implemented under the modules/ directory at the root
-of the project, or they can be product-specific and implemented under the
-product/\<product\>/modules directory. In either case, modules have the
-following directory structure:
+Modules are the building blocks of a product firmware. Modules can be
+implemented under the modules/ directory at the root of the project, or they
+can be product-specific and implemented under the product/\<product\>/modules
+directory. In either case, modules have the following directory structure:
 
     <module root>
      └── <module>
@@ -114,8 +113,16 @@ following directory structure:
           ├── src
           │    ├── Makefile
           │    └── <source files...>
+          ├── lib
+          │    └── mod_<module>.a
           └── doc
                └── <documentation files...>
+
+Only one of the 'src' or 'lib' directories is required. When building a
+firmware, if the 'src' directory is present then the module library is built
+from the module source code and the 'lib' directory, if present, is ignored.
+When only the 'lib' directory is supplied, the module's pre-built static library
+is used when building a firmware.
 
 __Note:__ The name of the \<module\> directory must not contain spaces.
 

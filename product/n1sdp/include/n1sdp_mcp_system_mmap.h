@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2019, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -28,5 +28,14 @@
 #define MCP_ROM_SIZE                 (128 * 1024)
 #define MCP_RAM0_SIZE                (512 * 1024)
 #define MCP_RAM1_SIZE                (256 * 1024)
+
+/*
+ * MCP_BACKUP_DDR3 memory area where the MCP ROM
+ * bypass firmware should be placed. The MCP would
+ * be programmed to boot at this address by programming
+ * it in the MCP_BOOT_ADR SCC register.
+ */
+#define MCP_BACKUP_DDR3_BASE          0x16000000
+#define MCP_BACKUP_DDR3_SIZE          (32 * 1024 * 1024)
 
 #endif /* N1SDP_MCP_SYSTEM_MMAP_H */

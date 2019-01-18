@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2019, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -22,7 +22,7 @@ static const struct fwk_element pl011_element_desc_table[] = {
         .name = "MCP-UART",
         .data = &((struct mod_pl011_device_config) {
             .reg_base = MCP_UART0_BASE,
-            .baud_rate_bps = 38400,
+            .baud_rate_bps = BAUD_RATE_19200,
             .clock_rate_hz = CLOCK_RATE_REFCLK,
             .clock_id = FWK_ID_NONE_INIT,
             }),

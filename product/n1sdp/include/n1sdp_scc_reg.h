@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2019, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -196,5 +196,19 @@ struct scc_reg {
     /* PID/CID Magic Registers */
     const struct scc_pcid_registers PCID;
 };
+
+#define SCC_PLATFORM_CTRL_MULTI_CHIP_MODE_POS 8
+#define SCC_PLATFORM_CTRL_CHIPID_POS          0
+
+#define SCC_PLATFORM_CTRL_MULTI_CHIP_MODE_MASK \
+    (UINT32_C(0x1) << SCC_PLATFORM_CTRL_MULTI_CHIP_MODE_POS)
+#define SCC_PLATFORM_CTRL_CHIPID_MASK \
+    (UINT32_C(0x3F) << SCC_PLATFORM_CTRL_CHIPID_POS)
+
+#define SCC_CCIX_PM_CTRL_PWR_REQ_POS     UINT32_C(1)
+#define SCC_PCIE_PM_CTRL_PWR_REQ_POS     UINT32_C(1)
+
+#define SCC_SYS_MAN_RESET_CCIX_POS       UINT32_C(11)
+#define SCC_SYS_MAN_RESET_PCIE_POS       UINT32_C(10)
 
 #endif /* N1SDP_SCC_REG_H */

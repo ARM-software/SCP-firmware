@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2019, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -27,20 +27,20 @@ static const ARM_MPU_Region_t regions[] = {
         .RASR = ARM_MPU_RASR(
             1, ARM_MPU_AP_PRIV, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_256KB),
     },
-    { /* 0xA400_0000 - 0xA400_0FFF*/
+    { /* 0xA400_0000 - 0xA407_FFFF*/
         .RBAR = ARM_MPU_RBAR(3, SCP_TRUSTED_RAM_BASE),
         .RASR = ARM_MPU_RASR(
-            1, ARM_MPU_AP_PRIV, 0, 1, 1, 1, 0, ARM_MPU_REGION_SIZE_4KB),
+            1, ARM_MPU_AP_PRIV, 0, 1, 1, 1, 0, ARM_MPU_REGION_SIZE_512KB),
     },
     { /* 0x6540_0000 - 0x6540_00FF */
-        .RBAR = ARM_MPU_RBAR(4, SCP_MHU_SECURE_RAM),
+        .RBAR = ARM_MPU_RBAR(4, SCP_AP_SHARED_SECURE_RAM),
         .RASR = ARM_MPU_RASR(
             1, ARM_MPU_AP_PRIV, 0, 1, 1, 1, 0, ARM_MPU_REGION_SIZE_256B),
     },
-    { /* 0x6520_0000 - 0x6520_00FF */
-        .RBAR = ARM_MPU_RBAR(5, SCP_MHU_NONSECURE_RAM),
+    { /* 0x6520_0000 - 0x6520_FFFF */
+        .RBAR = ARM_MPU_RBAR(5, SCP_AP_SHARED_NONSECURE_RAM),
         .RASR = ARM_MPU_RASR(
-            1, ARM_MPU_AP_PRIV, 0, 1, 1, 1, 0, ARM_MPU_REGION_SIZE_256B),
+            1, ARM_MPU_AP_PRIV, 0, 1, 1, 1, 0, ARM_MPU_REGION_SIZE_64KB),
     },
 };
 

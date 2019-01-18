@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2018, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2018-2019, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -37,7 +37,9 @@ BS_FIRMWARE_MODULES := \
     timer \
     scmi_power_domain \
     scmi_system_power \
+    scmi_management \
     n1sdp_flash \
+    n1sdp_pcie \
     n1sdp_system
 
 BS_FIRMWARE_SOURCES := \
@@ -63,6 +65,7 @@ BS_FIRMWARE_SOURCES := \
     config_css_clock.c \
     config_clock.c \
     config_n1sdp_flash.c \
+    config_n1sdp_pcie.c \
     config_apcontext.c
 
 include $(BS_DIR)/firmware.mk

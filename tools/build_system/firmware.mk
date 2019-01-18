@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2015-2018, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2015-2019, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -80,7 +80,7 @@ OBJ_DIR := $(BUILD_FIRMWARE_DIR)/$(MODE)/obj
 PRODUCT_MODULES_DIR := $(PRODUCT_DIR)/module
 FIRMWARE_DIR := $(PRODUCT_DIR)/$(FIRMWARE)
 
-TARGET := $(BIN_DIR)/firmware
+TARGET := $(BIN_DIR)/$(FIRMWARE)
 TARGET_BIN := $(TARGET).bin
 TARGET_ELF := $(TARGET).elf
 
@@ -109,8 +109,10 @@ SOURCES = $(BS_FIRMWARE_SOURCES)
 #
 # Modules
 #
-ALL_STANDARD_MODULES := $(shell ls $(MODULES_DIR) 2>/dev/null)
-ALL_PRODUCT_MODULES := $(shell ls $(PRODUCT_MODULES_DIR) 2>/dev/null)
+ALL_STANDARD_MODULES := $(patsubst $(MODULES_DIR)/%,%, \
+    $(wildcard $(MODULES_DIR)/*))
+ALL_PRODUCT_MODULES := $(patsubst $(PRODUCT_MODULES_DIR)/%,%, \
+    $(wildcard $(PRODUCT_MODULES_DIR)/*))
 
 # Check for conflicts between module names
 CONFLICTING_MODULES := $(filter $(ALL_PRODUCT_MODULES), $(ALL_STANDARD_MODULES))
@@ -127,11 +129,44 @@ ifneq ($(MISSING_MODULES),)
     $(error "Missing or invalid module(s): $(MISSING_MODULES). Aborting...")
 endif
 
+# Collect both the product and non product-specific module directory paths
+MODULE_PATHS := $(wildcard $(MODULES_DIR)/* $(PRODUCT_MODULES_DIR)/*)
+
+# Filter out the module src/lib directory paths
+SOURCE_MODULE_PATHS := $(wildcard $(addsuffix /src,$(MODULE_PATHS)))
+LIBRARY_MODULE_PATHS := $(wildcard $(addsuffix /lib,$(MODULE_PATHS)))
+
+# Pull the module names from the module source directory paths
+SOURCE_MODULES := \
+    $(patsubst $(MODULES_DIR)/%/src,%,$(SOURCE_MODULE_PATHS))
+SOURCE_MODULES := \
+    $(patsubst $(PRODUCT_MODULES_DIR)/%/src,%,$(SOURCE_MODULES))
+
+# Select the source modules for the current firmware
+SOURCE_MODULES := $(filter $(FIRMWARE_MODULES_LIST),$(SOURCE_MODULES))
+
+# Pull the module names from the module library directory paths
+LIBRARY_MODULES := \
+    $(patsubst $(MODULES_DIR)/%/lib,%,$(LIBRARY_MODULE_PATHS))
+LIBRARY_MODULES := \
+    $(patsubst $(PRODUCT_MODULES_DIR)/%/lib,%,$(LIBRARY_MODULES))
+
+# Prefer sources over pre-built libraries for modules that provide both
+LIBRARY_MODULES := \
+    $(filter-out $(SOURCE_MODULES),$(LIBRARY_MODULES))
+
+# Select the library modules for the current firmware
+LIBRARY_MODULES := $(filter $(FIRMWARE_MODULES_LIST),$(LIBRARY_MODULES))
+
+# Divide libraries into two groups
+LIBRARY_MODULES_STANDARD := $(filter $(LIBRARY_MODULES),$(ALL_STANDARD_MODULES))
+LIBRARY_MODULES_PRODUCT := $(filter $(LIBRARY_MODULES),$(ALL_PRODUCT_MODULES))
+
 # Modules selected to be built into the firmware
 BUILD_STANDARD_MODULES := $(filter $(ALL_STANDARD_MODULES), \
-                                   $(FIRMWARE_MODULES_LIST))
+                                   $(SOURCE_MODULES))
 BUILD_PRODUCT_MODULES := $(filter $(ALL_PRODUCT_MODULES), \
-                                  $(FIRMWARE_MODULES_LIST))
+                                  $(SOURCE_MODULES))
 
 # Module selected to have their headers made available for inclusion by other
 # modules and their configuration files. These modules are not built into the
@@ -169,7 +204,6 @@ else
 endif
 export BUILD_HAS_NOTIFICATION
 
-
 # Add directories to the list of targets to build
 LIB_TARGETS_y += $(patsubst %,$(MODULES_DIR)/%/src, \
                             $(BUILD_STANDARD_MODULES))
@@ -181,11 +215,19 @@ MODULE_LIBS_y += $(patsubst %, \
     $(BUILD_FIRMWARE_DIR)/module/%$(BUILD_SUFFIX)/$(MODE)/lib/lib.a, \
     $(BUILD_STANDARD_MODULES) $(BUILD_PRODUCT_MODULES))
 
-# Create a list of include directories from the selected modules
+# Add path for libraries
+MODULE_LIBS_y += $(foreach module,$(LIBRARY_MODULES_STANDARD), \
+    $(MODULES_DIR)/$(module)/lib/mod_$(module).a)
+MODULE_LIBS_y += $(foreach module,$(LIBRARY_MODULES_PRODUCT), \
+    $(PRODUCT_MODULES_DIR)/$(module)/lib/mod_$(module).a)
+
+# Create a list of include directories from the selected modules and libraries
 MODULE_INCLUDES += $(patsubst %,$(MODULES_DIR)/%/include, \
-                              $(BUILD_STANDARD_MODULES))
+                              $(BUILD_STANDARD_MODULES) \
+                              $(LIBRARY_MODULES_STANDARD))
 MODULE_INCLUDES += $(patsubst %,$(PRODUCT_MODULES_DIR)/%/include, \
-                              $(BUILD_PRODUCT_MODULES))
+                              $(BUILD_PRODUCT_MODULES) \
+                              $(LIBRARY_MODULES_PRODUCT))
 MODULE_INCLUDES += $(patsubst %,$(MODULES_DIR)/%/include, \
                               $(HEADER_STANDARD_MODULES))
 MODULE_INCLUDES += $(patsubst %,$(PRODUCT_MODULES_DIR)/%/include, \
@@ -198,7 +240,7 @@ PRODUCT_INCLUDES += $(PRODUCT_DIR)/include
 # Add the firmware directory to the main INCLUDES list
 INCLUDES += $(FIRMWARE_DIR)
 
-# Add module and product includes to the main INCLUDES list
+# Add module, product and library includes to the main INCLUDES list
 export INCLUDES += $(MODULE_INCLUDES) $(PRODUCT_INCLUDES)
 
 #
@@ -255,5 +297,5 @@ $(SCATTER_PP): $(SCATTER_SRC) | $$(@D)/
 $(TARGET_BIN): $(TARGET_ELF) | $$(@D)/
 	$(call show-action,BIN,$@)
 	$(OBJCOPY) $< $(OCFLAGS) $@
-
+	cp $@ $(BIN_DIR)/firmware.bin
 endif

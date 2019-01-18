@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2019, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -32,6 +32,10 @@
 #define SCP_REFCLK_CNTCTL_BASE       (SCP_PERIPHERAL_BASE + 0x0000)
 #define SCP_REFCLK_CNTBASE0_BASE     (SCP_PERIPHERAL_BASE + 0x1000)
 #define SCP_WDOG_BASE                (SCP_PERIPHERAL_BASE + 0x6000)
+
+/*
+ * CoreSight control base
+ */
 #define SCP_CS_CNTCONTROL_BASE       (SCP_PERIPHERAL_BASE + 0xA000)
 
 /*
@@ -99,6 +103,12 @@
 #define CCIX_AXI_SLAVE_SCP_BASE      UINT32_C(0x88000000)
 
 /*
+ * PCIe and CCIX Slave AXI in 64-bit space visible to AP
+ */
+#define PCIE_AXI64_SLAVE_AP_BASE     UINT64_C(0x900000000)
+#define CCIX_AXI64_SLAVE_AP_BASE     UINT64_C(0x2900000000)
+
+/*
  * 1MB window into AP memory space
  * This region enables SCP to access AP's memory region
  * in terms of 1MB windows.
@@ -127,8 +137,10 @@
 #define CMN600_ROOT_NODE_OFFSET   0xD00000
 #define CMN600_ROOTNODE_BASE      (SCP_CMN600_BASE + CMN600_ROOT_NODE_OFFSET)
 
-#define SCP_MHU_SECURE_RAM        (SCP_SYS0_BASE + 0x05400000)
-#define SCP_MHU_NONSECURE_RAM     (SCP_SYS0_BASE + 0x05200000)
+#define SCP_AP_SHARED_SECURE_RAM     (SCP_SYS0_BASE + 0x05400000)
+#define SCP_AP_SHARED_NONSECURE_RAM  (SCP_SYS0_BASE + 0x05200000)
+#define SCP_MCP_SHARED_SECURE_RAM    (SCP_PERIPHERAL_BASE + 0x01620000)
+#define SCP_MCP_SHARED_NONSECURE_RAM (SCP_PERIPHERAL_BASE + 0x01610000)
 
 /*
  * System access port 1

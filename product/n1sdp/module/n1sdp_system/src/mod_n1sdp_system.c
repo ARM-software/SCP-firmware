@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2019, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -30,7 +30,18 @@
 #include <n1sdp_scp_pik.h>
 #include <n1sdp_scp_irq.h>
 #include <n1sdp_scp_mmap.h>
+#include <n1sdp_ssc.h>
 #include <config_clock.h>
+
+/* Coresight counter register definitions */
+struct cs_cnt_ctrl_reg {
+    FWK_RW uint32_t CS_CNTCR;
+    FWK_R  uint32_t CS_CNTSR;
+    FWK_RW uint32_t CS_CNTCVLW;
+    FWK_RW uint32_t CS_CNTCVUP;
+};
+
+#define CS_CNTCONTROL ((struct cs_cnt_ctrl_reg *)SCP_CS_CNTCONTROL_BASE)
 
 /* Module context */
 struct n1sdp_system_ctx {
@@ -157,9 +168,35 @@ struct mod_n1sdp_system_ap_memory_access_api
         .disable_ap_memory_access = n1sdp_system_disable_ap_memory_access,
 };
 
-static int n1sdp_system_copy_to_ap_memory(uint64_t dram_address,
-                                         uint32_t spi_address,
-                                         uint32_t size)
+/*
+ * Function to copy into AP SRAM.
+ */
+static int n1sdp_system_copy_to_ap_sram(uint64_t sram_address,
+                                        uint32_t spi_address,
+                                        uint32_t size)
+{
+    uint32_t target_addr = (uint32_t)sram_address;
+
+    memcpy((void *)target_addr, (void *)spi_address, size);
+
+    if (memcmp((void *)target_addr, (void *)spi_address, size) != 0) {
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[N1SDP SYSTEM] Copy failed at destination address: 0x%08x\n",
+            target_addr);
+            return FWK_E_DATA;
+    }
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[N1SDP SYSTEM] Copied binary to SRAM address: 0x%08x\n",
+        sram_address);
+    return FWK_SUCCESS;
+}
+
+/*
+ * Function to copy into DRAM location
+ */
+static int n1sdp_system_copy_to_ap_ddr(uint64_t dram_address,
+                                       uint32_t spi_address,
+                                       uint32_t size)
 {
     uint32_t scp_address = 0;
     uint32_t copy_size = 0;
@@ -179,9 +216,9 @@ static int n1sdp_system_copy_to_ap_memory(uint64_t dram_address,
         /* Get the size for this copy operation. */
         if (size > (SCP_AP_1MB_WINDOW_SIZE - addr_offset)) {
             /*
-             * If the copy operation will wrap around the end of the 1MB window
-             * we need to cut it off at the wrap around point and change the
-             * the window address.
+             * If the copy operation will wrap around the end of the
+             * 1MB window we need to cut it off at the wrap around
+             * point and change the window address.
              */
             copy_size = (uint32_t)(SCP_AP_1MB_WINDOW_SIZE - addr_offset);
         } else {
@@ -211,6 +248,29 @@ exit:
     n1sdp_system_disable_ap_memory_access();
 
     return status;
+}
+
+void cdbg_pwrupreq_handler(void)
+{
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[N1SDP SYSTEM] Received debug power up request interrupt\n");
+
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[N1SDP SYSTEM] Power on Debug PIK\n");
+
+    /* Clear interrupt */
+    PIK_DEBUG->DEBUG_CTRL |= (0x1 << 1);
+    fwk_interrupt_disable(CDBG_PWR_UP_REQ_IRQ);
+}
+
+void csys_pwrupreq_handler(void)
+{
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[N1SDP SYSTEM] Received system power up request interrupt\n");
+
+    /* Clear interrupt */
+    PIK_DEBUG->DEBUG_CTRL |= (0x1 << 2);
+    fwk_interrupt_disable(CSYS_PWR_UP_REQ_IRQ);
 }
 
 /*
@@ -290,6 +350,32 @@ static int n1sdp_system_start(fwk_id_t id)
     if (status != FWK_SUCCESS)
         return status;
 
+    status = fwk_interrupt_set_isr(CDBG_PWR_UP_REQ_IRQ, cdbg_pwrupreq_handler);
+    if (status == FWK_SUCCESS) {
+        fwk_interrupt_enable(CDBG_PWR_UP_REQ_IRQ);
+
+        status = fwk_interrupt_set_isr(CSYS_PWR_UP_REQ_IRQ,
+            csys_pwrupreq_handler);
+        if (status == FWK_SUCCESS) {
+            fwk_interrupt_enable(CSYS_PWR_UP_REQ_IRQ);
+
+            PIK_CLUSTER(0)->CLKFORCE_SET = 0x00000004;
+            PIK_CLUSTER(1)->CLKFORCE_SET = 0x00000004;
+
+            /* Enable debugger access in SSC */
+            SSC->SSC_DBGCFG_SET = 0x000000FF;
+
+            /* Setup CoreSight counter */
+            CS_CNTCONTROL->CS_CNTCR |= (1 << 0);
+            CS_CNTCONTROL->CS_CNTCVLW = 0x00000000;
+            CS_CNTCONTROL->CS_CNTCVUP = 0x0000FFFF;
+        } else
+            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+                "[N1SDP SYSTEM] CSYS PWR UP REQ IRQ register failed\n");
+    } else
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+            "[N1SDP SYSTEM] CDBG PWR UP REQ IRQ register failed\n");
+
     n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
         "[N1SDP SYSTEM] Requesting SYSTOP initialization...\n");
 
@@ -366,9 +452,9 @@ static int n1sdp_system_process_notification(const struct fwk_event *event,
 
         n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
             "[N1SDP SYSTEM] Copying AP BL31 to address 0x%x...\n",
-            AP_CPU_RESET_ADDR);
+            AP_CORE_RESET_ADDR);
 
-        status = n1sdp_system_copy_to_ap_memory(AP_CPU_RESET_ADDR,
+        status = n1sdp_system_copy_to_ap_sram(AP_CORE_RESET_ADDR,
                      fip_desc_table[fip_index_bl31].address,
                      fip_desc_table[fip_index_bl31].size);
         if (status != FWK_SUCCESS)
@@ -378,7 +464,7 @@ static int n1sdp_system_process_notification(const struct fwk_event *event,
             "[N1SDP SYSTEM] Copying AP BL33 to address 0x%x...\n",
             AP_BL33_BASE_ADDR);
 
-        status = n1sdp_system_copy_to_ap_memory(AP_BL33_BASE_ADDR,
+        status = n1sdp_system_copy_to_ap_ddr(AP_BL33_BASE_ADDR,
                      fip_desc_table[fip_index_bl33].address,
                      fip_desc_table[fip_index_bl33].size);
         if (status != FWK_SUCCESS)
@@ -388,17 +474,18 @@ static int n1sdp_system_process_notification(const struct fwk_event *event,
 
         n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
             "[N1SDP SYSTEM] Setting AP Reset Address to 0x%x\n",
-            AP_CPU_RESET_ADDR);
+            AP_CORE_RESET_ADDR);
 
         cluster_count = n1sdp_core_get_cluster_count();
         for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
             for (core_idx = 0;
-                 core_idx < n1sdp_core_get_core_per_cluster_count(cluster_idx);
-                 core_idx++) {
+                core_idx < n1sdp_core_get_core_per_cluster_count(cluster_idx);
+                core_idx++) {
                 PIK_CLUSTER(cluster_idx)->STATIC_CONFIG[core_idx].RVBARADDR_LW
-                    = (uint32_t)(AP_CPU_RESET_ADDR);
+                    = (uint32_t)(AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET);
                 PIK_CLUSTER(cluster_idx)->STATIC_CONFIG[core_idx].RVBARADDR_UP
-                    = (uint32_t)(AP_CPU_RESET_ADDR >> 32);
+                    = (uint32_t)
+                    ((AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET) >> 32);
             }
         }
 

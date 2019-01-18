@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2015-2018, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2015-2019, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -130,11 +130,36 @@ def main():
     banner('Test building sgi575 product')
 
     cmd = \
-        'CC=arm-none-eabi-gcc CROSS_COMPILE=arm-none-eabi- ' \
+        'CC=arm-none-eabi-gcc ' \
         'PRODUCT=sgi575 ' \
+        'MODE=release ' \
         'make clean all'
     result = subprocess.call(cmd, shell=True)
-    results.append(('Product sgi575 build (GCC)', result))
+    results.append(('Product sgi575 release build (GCC)', result))
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=sgi575 ' \
+        'MODE=release ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product sgi575 release build (ARM)', result))
+
+    cmd = \
+        'CC=arm-none-eabi-gcc ' \
+        'PRODUCT=sgi575 ' \
+        'MODE=debug ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product sgi575 debug build (GCC)', result))
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=sgi575 ' \
+        'MODE=debug ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product sgi575 debug build (ARM)', result))
 
     banner('Test building n1sdp product')
 
@@ -144,6 +169,40 @@ def main():
         'make clean all'
     result = subprocess.call(cmd, shell=True)
     results.append(('Product n1sdp build (GCC)', result))
+
+    banner('Test building clark product')
+
+    cmd = \
+        'CC=arm-none-eabi-gcc ' \
+        'PRODUCT=clark ' \
+        'MODE=release ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product clark release build (GCC)', result))
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=clark ' \
+        'MODE=release ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product clark release build (ARM)', result))
+
+    cmd = \
+        'CC=arm-none-eabi-gcc ' \
+        'PRODUCT=clark ' \
+        'MODE=debug ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product clark debug build (GCC)', result))
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=clark ' \
+        'MODE=debug ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product clark debug build (ARM)', result))
 
     banner('Tests summary')
 
