@@ -24,8 +24,8 @@ BS_FIRMWARE_MODULES := \
     ppu_v0 \
     system_power \
     n1sdp_pll \
-    dmc620 \
-    ddr_phy500 \
+    n1sdp_dmc620 \
+    n1sdp_ddr_phy \
     mhu \
     smt \
     scmi \
@@ -54,8 +54,8 @@ BS_FIRMWARE_SOURCES := \
     config_power_domain.c \
     config_ppu_v0.c \
     config_ppu_v1.c \
-    config_dmc620.c \
-    config_ddr_phy500.c \
+    config_n1sdp_dmc620.c \
+    config_n1sdp_ddr_phy.c \
     config_mhu.c \
     config_smt.c \
     config_scmi.c \
