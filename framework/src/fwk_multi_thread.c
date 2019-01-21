@@ -770,6 +770,7 @@ int fwk_thread_create(fwk_id_t id)
 
 error:
     FWK_HOST_PRINT(err_msg_func, status, __func__);
+    fwk_expect(false);
     return status;
 }
 
@@ -823,17 +824,22 @@ int fwk_thread_put_event(struct fwk_event *event)
         }
     }
 
-    /* Call from a thread */
     if (fwk_interrupt_get_current(&interrupt) != FWK_SUCCESS) {
+        /* Call from a thread */
         event->is_delayed_response = event->is_response;
-        return put_event(thread_ctx, event);
-    }
+        status = put_event(thread_ctx, event);
+    } else
+        /* Call from an ISR */
+        status = put_isr_event(event);
 
-    /* Call from an ISR */
-    return put_isr_event(event);
+    if (status != FWK_SUCCESS)
+        goto error;
+
+    return FWK_SUCCESS;
 
 error:
     FWK_HOST_PRINT(err_msg_func, status, __func__);
+    fwk_expect(false);
     return status;
 }
 
@@ -880,7 +886,7 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
     event->is_notification = false;
     status = put_event(target_thread_ctx, event);
     if (status != FWK_SUCCESS)
-        return status;
+        goto error;
 
     resp_event->cookie = event->cookie;
     ctx.current_thread_ctx->response_event = resp_event;
@@ -915,6 +921,7 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
 
 error:
     FWK_HOST_PRINT(err_msg_func, status, __func__);
+    fwk_expect(false);
     return status;
 }
 
@@ -951,5 +958,6 @@ int fwk_thread_get_delayed_response(fwk_id_t id, uint32_t cookie,
 
 error:
     FWK_HOST_PRINT(err_msg_func, status, __func__);
+    fwk_expect(false);
     return status;
 }

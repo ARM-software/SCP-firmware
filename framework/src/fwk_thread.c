@@ -237,5 +237,6 @@ int fwk_thread_put_event(struct fwk_event *event)
 
 error:
     FWK_HOST_PRINT(err_msg_func, status, __func__);
+    fwk_expect(false);
     return status;
 }
