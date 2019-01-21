@@ -71,4 +71,8 @@ struct pik_system_reg {
     FWK_R   uint32_t        ID3;
 };
 
+#define PIK_SYSTEM_DMCCLK_CTRL_DIV2_BYPASS_POS  16
+#define PIK_SYSTEM_DMCCLK_CTRL_DIV2_BYPASS_MASK \
+    (UINT32_C(1) << PIK_SYSTEM_DMCCLK_CTRL_DIV2_BYPASS_POS)
+
 #endif  /* N1SDP_PIK_SYSTEM_H */
