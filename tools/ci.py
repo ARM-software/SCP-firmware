@@ -164,11 +164,36 @@ def main():
     banner('Test building n1sdp product')
 
     cmd = \
-        'CC=arm-none-eabi-gcc CROSS_COMPILE=arm-none-eabi- ' \
+        'CC=arm-none-eabi-gcc ' \
         'PRODUCT=n1sdp ' \
+        'MODE=debug ' \
         'make clean all'
     result = subprocess.call(cmd, shell=True)
-    results.append(('Product n1sdp build (GCC)', result))
+    results.append(('Product n1sdp debug build (GCC)', result))
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=n1sdp ' \
+        'MODE=debug ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product n1sdp debug build (ARM)', result))
+
+    cmd = \
+        'CC=arm-none-eabi-gcc ' \
+        'PRODUCT=n1sdp ' \
+        'MODE=release ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product n1sdp release build (GCC)', result))
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=n1sdp ' \
+        'MODE=release ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product n1sdp release build (ARM)', result))
 
     banner('Test building clark product')
 

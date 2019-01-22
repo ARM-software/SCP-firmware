@@ -28,7 +28,7 @@
  */
 
 /*!
- * \brief Sensor types as defined by SCMI
+ * \brief Sensor types as defined by SCMI.
  */
 enum mod_sensor_type {
     MOD_SENSOR_TYPE_NONE = 0,
@@ -123,7 +123,7 @@ enum mod_sensor_type {
 };
 
 /*!
- * \brief Structure containing all sensor information
+ * \brief Structure containing all sensor information.
  *
  * \details Sensor information structure used to configure the sensor and serve
  *     SCMI requests.
@@ -131,9 +131,6 @@ enum mod_sensor_type {
 struct mod_sensor_info {
     /*! SCMI sensor type */
     enum mod_sensor_type type;
-
-    /*! Pointer to NULL-terminated name string */
-    const char *name;
 
     /*! Time (in seconds) between sensor updates. Set this field to 0 to
      *  indicate that the sensor does not have a minimum update interval. This
@@ -157,68 +154,76 @@ struct mod_sensor_info {
 };
 
 /*!
- * \brief Sensor device configuration
+ * \brief Sensor device configuration.
  *
- * \details Configuration structure for individual sensors
+ * \details Configuration structure for individual sensors.
  */
 struct mod_sensor_dev_config {
     /*! Module or element id of the driver */
     fwk_id_t driver_id;
 
-    /*! Sensor information */
-    struct mod_sensor_info *info;
 };
 
 /*!
- * \brief Sensor driver API
+ * \brief Sensor driver API.
  *
- * \details Api used by this module to interface with the driver
+ * \details Api used by this module to interface with the driver.
  */
 struct mod_sensor_driver_api {
     /*!
-     * \brief Read sensor value
+     * \brief Read sensor value.
      *
-     * \details Synchronously read current sensor value
+     * \details Synchronously read current sensor value.
      *
-     * \param id Specific sensor device id
-     * \param value Pointer to storage for the sensor value
+     * \param id Specific sensor device id.
+     * \param value Pointer to storage for the sensor value.
      *
-     * \retval FWK_SUCCESS Value was read successfully
-     *
-     * One of the other specific error codes described by the module.
+     * \retval FWK_SUCCESS Value was read successfully.
+     * \return One of the standard framework error codes.
      */
     int (*get_value)(fwk_id_t id, uint64_t *value);
+
+    /*!
+     * \brief Read sensor information.
+     *
+     * \param id Specific sensor device id.
+     * \param info Pointer to storage for the sensor information.
+     *
+     * \retval FWK_SUCCESS The information was read successfully.
+     * \return One of the standard framework error codes.
+     */
+    int (*get_info)(fwk_id_t id, struct mod_sensor_info *info);
 };
 
 /*!
- * \brief Sensor API
+ * \brief Sensor API.
  */
 struct mod_sensor_api {
     /*!
-     * \brief Read sensor value
+     * \brief Read sensor value.
      *
-     * \details Synchronously read current sensor value
+     * \details Synchronously read current sensor value.
      *
-     * \param id Specific sensor device id
-     * \param value Pointer to storage for the sensor value
+     * \param id Specific sensor device id.
+     * \param value Pointer to storage for the sensor value.
      *
-     * \retval FWK_SUCCESS Operation succeeded
-     *
-     * One of the other specific error codes described by the module.
+     * \retval FWK_SUCCESS Operation succeeded.
+     * \retval FWK_E_DEVICE Driver error.
+     * \return One of the standard framework error codes.
      */
     int (*get_value)(fwk_id_t id, uint64_t *value);
 
     /*!
-     * \brief Get sensor information
+     * \brief Get sensor information.
      *
-     * \details Get a pointer to the sensor_info structure of a specific sensor
+     * \details Get a pointer to the sensor_info structure of a specific sensor.
      *
-     * \param id Specific sensor device id
-     * \param value Pointer to storage for the info struct
+     * \param id Specific sensor device id.
+     * \param info Pointer to storage for the info struct.
      *
-     * \retval FWK_SUCCESS Operation succeeded
-     *
-     * One of the other specific error codes described by the module.
+     * \retval FWK_SUCCESS Operation succeeded.
+     * \retval FWK_E_DEVICE Driver error.
+     * \return One of the standard framework error codes.
      */
     int (*get_info)(fwk_id_t id, struct mod_sensor_info *info);
 };
