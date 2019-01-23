@@ -250,6 +250,8 @@ struct mod_clock_drv_api {
      * \param round_mode The type of rounding to perform, if required, to
      *      achieve the given rate.
      *
+     * \retval FWK_PENDING The request is pending. The driver will provide the
+     *      requested value later through the driver response API.
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
@@ -261,8 +263,10 @@ struct mod_clock_drv_api {
      *
      * \param clock_id Clock device identifier.
      *
-     * \param [out] rate The current clock rate in Hertz.
+     * \param[out] rate The current clock rate in Hertz.
      *
+     * \retval FWK_PENDING The request is pending. The driver will provide the
+     *      requested value later through the driver response API.
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
@@ -290,6 +294,8 @@ struct mod_clock_drv_api {
      *
      * \param state One of the valid clock states.
      *
+     * \retval FWK_PENDING The request is pending. The driver will provide the
+     *      requested value later through the driver response API.
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
@@ -302,6 +308,8 @@ struct mod_clock_drv_api {
      *
      * \param[out] state The current clock state.
      *
+     * \retval FWK_PENDING The request is pending. The driver will provide the
+     *      requested value later through the driver response API.
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
@@ -388,6 +396,8 @@ struct mod_clock_api {
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The clock identifier was invalid.
+     * \retval FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
+     *      supported.
      * \return One of the standard framework error codes.
      */
     int (*set_rate)(fwk_id_t clock_id, uint64_t rate,
@@ -403,6 +413,8 @@ struct mod_clock_api {
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The clock identifier was invalid.
      * \retval FWK_E_PARAM The rate pointer was NULL.
+     * \retval FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
+     *      supported.
      * \return One of the standard framework error codes.
      */
     int (*get_rate)(fwk_id_t clock_id, uint64_t *rate);
@@ -433,6 +445,8 @@ struct mod_clock_api {
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The clock identifier was invalid.
+     * \retval FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
+     *      supported.
      * \return One of the standard framework error codes.
      */
     int (*set_state)(fwk_id_t clock_id, enum mod_clock_state state);
@@ -447,6 +461,8 @@ struct mod_clock_api {
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The clock identifier was invalid.
      * \retval FWK_E_PARAM The state pointer was NULL.
+     * \retval FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
+     *      supported.
      * \return One of the standard framework error codes.
      */
     int (*get_state)(fwk_id_t clock_id, enum mod_clock_state *state);
