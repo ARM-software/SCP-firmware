@@ -19,21 +19,51 @@
 
 /* Device context */
 struct clock_dev_ctx {
+    /* Pointer to the element configuration data */
     const struct mod_clock_dev_config *config;
+
+    /* Driver API */
     struct mod_clock_drv_api *api;
+
+    /* Cookie for the pre-transition notification response */
     unsigned int pd_pre_power_transition_notification_cookie;
+
+    /* Counter of notifications sent */
     unsigned int transition_pending_notifications_sent;
+
+    /* Status of the pending transition */
     unsigned int transition_pending_response_status;
 };
 
 /* Module context */
 struct clock_ctx {
+    /* Pointer to the module configuration data */
     const struct mod_clock_config *config;
+
+    /* Table of elements context */
     struct clock_dev_ctx *dev_ctx_table;
-    unsigned int dev_count;
 };
 
 static struct clock_ctx module_ctx;
+
+/*
+ * Utility functions
+ */
+
+static int get_ctx(fwk_id_t clock_id, struct clock_dev_ctx **ctx)
+{
+    int status;
+
+    fwk_assert(fwk_module_is_valid_element_id(clock_id));
+
+    status = fwk_module_check_call(clock_id);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    *ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(clock_id)];
+
+    return FWK_SUCCESS;
+}
 
 /*
  * Module API functions
@@ -45,11 +75,9 @@ static int clock_set_rate(fwk_id_t clock_id, uint64_t rate,
     int status;
     struct clock_dev_ctx *ctx;
 
-    status = fwk_module_check_call(clock_id);
+    status = get_ctx(clock_id, &ctx);
     if (status != FWK_SUCCESS)
         return status;
-
-    ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(clock_id);
 
     return ctx->api->set_rate(ctx->config->driver_id, rate, round_mode);
 }
@@ -59,14 +87,12 @@ static int clock_get_rate(fwk_id_t clock_id, uint64_t *rate)
     int status;
     struct clock_dev_ctx *ctx;
 
-    status = fwk_module_check_call(clock_id);
+    status = get_ctx(clock_id, &ctx);
     if (status != FWK_SUCCESS)
         return status;
 
     if (rate == NULL)
         return FWK_E_PARAM;
-
-    ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(clock_id);
 
     return ctx->api->get_rate(ctx->config->driver_id, rate);
 }
@@ -77,14 +103,12 @@ static int clock_get_rate_from_index(fwk_id_t clock_id, unsigned int rate_index,
     int status;
     struct clock_dev_ctx *ctx;
 
-    status = fwk_module_check_call(clock_id);
+    status = get_ctx(clock_id, &ctx);
     if (status != FWK_SUCCESS)
         return status;
 
     if (rate == NULL)
         return FWK_E_PARAM;
-
-    ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(clock_id);
 
     return ctx->api->get_rate_from_index(ctx->config->driver_id, rate_index,
                                          rate);
@@ -95,11 +119,9 @@ static int clock_set_state(fwk_id_t clock_id, enum mod_clock_state state)
     int status;
     struct clock_dev_ctx *ctx;
 
-    status = fwk_module_check_call(clock_id);
+    status = get_ctx(clock_id, &ctx);
     if (status != FWK_SUCCESS)
         return status;
-
-    ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(clock_id);
 
     return ctx->api->set_state(ctx->config->driver_id, state);
 }
@@ -109,14 +131,12 @@ static int clock_get_state(fwk_id_t clock_id, enum mod_clock_state *state)
     int status;
     struct clock_dev_ctx *ctx;
 
-    status = fwk_module_check_call(clock_id);
+    status = get_ctx(clock_id, &ctx);
     if (status != FWK_SUCCESS)
         return status;
 
     if (state == NULL)
         return FWK_E_PARAM;
-
-    ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(clock_id);
 
     return ctx->api->get_state(ctx->config->driver_id, state);
 }
@@ -126,14 +146,12 @@ static int clock_get_info(fwk_id_t clock_id, struct mod_clock_info *info)
     int status;
     struct clock_dev_ctx *ctx;
 
-    status = fwk_module_check_call(clock_id);
+    status = get_ctx(clock_id, &ctx);
     if (status != FWK_SUCCESS)
         return status;
 
     if (info == NULL)
         return FWK_E_PARAM;
-
-    ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(clock_id);
 
     status = ctx->api->get_range(ctx->config->driver_id, &info->range);
     if (status != FWK_SUCCESS)
@@ -162,8 +180,6 @@ static int clock_init(fwk_id_t module_id, unsigned int element_count,
 {
     const struct mod_clock_config *config = data;
 
-    module_ctx.dev_count = element_count;
-
     if (element_count == 0)
         return FWK_SUCCESS;
 
@@ -185,7 +201,7 @@ static int clock_dev_init(fwk_id_t element_id, unsigned int sub_element_count,
     struct clock_dev_ctx *ctx;
     const struct mod_clock_dev_config *dev_config = data;
 
-    ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(element_id);
+    ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(element_id)];
     ctx->config = dev_config;
 
     return FWK_SUCCESS;
@@ -203,12 +219,11 @@ static int clock_bind(fwk_id_t id, unsigned int round)
         return FWK_SUCCESS;
     }
 
-    ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(id);
+    ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(id)];
 
     return fwk_module_bind(ctx->config->driver_id,
                            ctx->config->api_id,
                            &ctx->api);
-
 }
 
 static int clock_start(fwk_id_t id)
@@ -220,7 +235,7 @@ static int clock_start(fwk_id_t id)
     if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT))
         return FWK_SUCCESS;
 
-    ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(id);
+    ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(id)];
 
     if (fwk_id_is_type(ctx->config->pd_source_id, FWK_ID_TYPE_NONE))
          return FWK_SUCCESS;
@@ -285,7 +300,7 @@ static int clock_process_pd_pre_transition_notification(
         (struct mod_pd_power_state_pre_transition_notification_resp_params *)
             resp_event->params;
 
-    assert(ctx->api->process_pending_power_transition != NULL);
+    fwk_assert(ctx->api->process_pending_power_transition != NULL);
     status = ctx->api->process_pending_power_transition(
         ctx->config->driver_id,
         pd_params->current_state,
@@ -348,7 +363,7 @@ static int clock_process_pd_transition_notification(
         (struct mod_pd_power_state_transition_notification_params *)event
             ->params;
 
-    assert(ctx->api->process_power_transition != NULL);
+    fwk_assert(ctx->api->process_power_transition != NULL);
     status = ctx->api->process_power_transition(
         ctx->config->driver_id, pd_params->state);
 
@@ -384,14 +399,12 @@ static int clock_process_notification_response(
         .is_delayed_response = true,
     };
 
-    assert(fwk_id_is_equal(event->id,
-                           mod_clock_notification_id_state_change_pending));
+    fwk_assert(fwk_id_is_equal(event->id,
+                               mod_clock_notification_id_state_change_pending));
 
     /* At least one notification response must be outstanding */
-    if (ctx->transition_pending_notifications_sent == 0) {
-        assert(false);
+    if (!fwk_expect(ctx->transition_pending_notifications_sent != 0))
         return FWK_E_PANIC;
-    }
 
     resp_params =
         (struct clock_state_change_pending_resp_params *)event->params;
@@ -431,7 +444,7 @@ static int clock_process_notification(
         /* Only elements should be registered for notifications */
         return FWK_E_PARAM;
 
-    ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(event->target_id);
+    ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(event->target_id)];
 
     if (event->is_response)
         return clock_process_notification_response(ctx, event);
