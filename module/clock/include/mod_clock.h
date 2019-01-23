@@ -20,7 +20,7 @@
 /*!
  * \defgroup GroupClock Clock HAL
  *
- * \details A Hardware Abstraction Library for configuring clock devices.
+ * \details A Hardware Abstraction Layer for configuring clock devices.
  *
  * @{
  */
@@ -104,6 +104,8 @@ struct clock_state_change_pending_resp_params {
 enum mod_clock_api_type {
     /*! Clock HAL */
     MOD_CLOCK_API_TYPE_HAL,
+
+    /*! Number of defined APIs */
     MOD_CLOCK_API_COUNT,
 };
 
