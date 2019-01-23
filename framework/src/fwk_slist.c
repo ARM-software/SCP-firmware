@@ -89,9 +89,7 @@ struct fwk_slist_node *__fwk_slist_pop_head(struct fwk_slist *list)
 
     list->head = popped->next;
 
-#ifdef BUILD_MODE_DEBUG
     popped->next = NULL;
-#endif
 
     return popped;
 }
@@ -121,11 +119,12 @@ void __fwk_slist_remove(
     while (node_iter->next != (struct fwk_slist_node *)list) {
         if (node_iter->next == node) {
             node_iter->next = node->next;
+
             if (node->next == (struct fwk_slist_node *)list)
                 list->tail = (struct fwk_slist_node *)node_iter;
-        #ifdef BUILD_MODE_DEBUG
+
             node->next = NULL;
-        #endif
+
             return;
         }
         node_iter = node_iter->next;
