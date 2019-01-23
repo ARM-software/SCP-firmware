@@ -98,6 +98,9 @@ static struct fwk_event *duplicate_event(struct fwk_event *event)
 
     if (allocated_event != NULL) {
         *allocated_event = *event;
+
+        allocated_event->slist_node = (struct fwk_slist_node) { 0 };
+
         return allocated_event;
     }
 
