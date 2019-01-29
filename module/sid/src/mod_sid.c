@@ -74,8 +74,11 @@ static int sid_init(
 
     info.soc_part_number = sid_reg->SOC_ID & SID_SYS_SOC_ID_PART_NUMBER_MASK;
 
+    info.multi_chip_mode = (sid_reg->NODE_ID & SID_SYS_MULTI_CHIP_MODE_MASK)
+                            >> SID_SYS_MULTI_CHIP_MODE_POS;
+    info.node_number = sid_reg->NODE_ID & SID_SYS_NODE_NUMBER_MASK;
+
     info.config_number = sid_reg->SYSTEM_CFG;
-    info.node_id = sid_reg->NODE_ID & SID_SYS_NODE_ID_IDENTIFIER_MASK;
 
     return FWK_SUCCESS;
 }
