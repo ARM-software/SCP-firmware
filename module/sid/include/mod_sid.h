@@ -55,8 +55,11 @@ struct mod_sid_info {
     /*! Part number of the SoC */
     unsigned int soc_part_number;
 
-    /*! ID for the node when there are multiple sockets */
-    unsigned int node_id;
+    /*! Multi-chip mode tie-off value - enabled or disabled */
+    bool multi_chip_mode;
+
+    /*! Node number indicating the chip id in multi socket system */
+    uint8_t node_number;
 
     /*! Configuration number of the subsystem */
     unsigned int config_number;
