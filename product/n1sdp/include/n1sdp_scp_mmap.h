@@ -186,8 +186,8 @@
 /*
  * DDR PHY base address
  */
-#define SCP_DDR_PHY0                 (SCP_SYS0_BASE + 0x3FB60000)
-#define SCP_DDR_PHY1                 (SCP_SYS0_BASE + 0x3FB70000)
+#define SCP_DDR_PHY0                 (0x50604000)
+#define SCP_DDR_PHY1                 (0x50614000)
 
 /*
  * DMC-620 controller base address
