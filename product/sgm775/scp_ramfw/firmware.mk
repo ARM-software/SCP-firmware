@@ -17,8 +17,8 @@ BS_FIRMWARE_MODULES := \
     log \
     gtimer \
     timer \
-    ddr_phy500 \
-    dmc500 \
+    sgm775_ddr_phy500 \
+    sgm775_dmc500 \
     pik_clock \
     clock \
     system_pll \
@@ -49,8 +49,8 @@ BS_FIRMWARE_SOURCES := \
     sgm775_core.c \
     config_log.c \
     config_timer.c \
-    config_ddr_phy500.c \
-    config_dmc500.c \
+    config_sgm775_ddr_phy500.c \
+    config_sgm775_dmc500.c \
     config_sds.c \
     config_pik_clock.c \
     config_clock.c \
