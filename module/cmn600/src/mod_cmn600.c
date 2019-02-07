@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <stdbool.h>
 #include <string.h>
 #include <fwk_assert.h>
 #include <fwk_errno.h>
@@ -53,19 +54,9 @@ struct cmn600_ctx {
     struct cmn600_rnsam_reg **internal_rnsam_table;
 
     struct mod_log_api *log_api;
+
+    bool initialized;
 } *ctx;
-
-static void process_external_node(unsigned int node_id, void *node)
-{
-    static unsigned int entry = 0;
-
-    assert(entry < ctx->external_rnsam_count);
-
-    ctx->external_rnsam_table[entry].node_id = node_id;
-    ctx->external_rnsam_table[entry].node = node;
-
-    entry++;
-}
 
 static void process_node_hnf(struct cmn600_hnf_reg *hnf)
 {
@@ -115,29 +106,6 @@ static void process_node_hnf(struct cmn600_hnf_reg *hnf)
     hnf->PPU_PWPR = CMN600_PPU_PWPR_POLICY_ON |
                     CMN600_PPU_PWPR_OPMODE_FAM |
                     CMN600_PPU_PWPR_DYN_EN;
-}
-
-static void process_internal_node(void *node)
-{
-    static unsigned int rnsam_entry = 0;
-    enum node_type node_type;
-
-    node_type = get_node_type(node);
-
-    switch (node_type) {
-    case NODE_TYPE_HN_F:
-        process_node_hnf(node);
-        break;
-
-    case NODE_TYPE_RN_SAM:
-        assert(rnsam_entry < ctx->internal_rnsam_count);
-        ctx->internal_rnsam_table[rnsam_entry++] = node;
-        break;
-
-    default:
-        /* Nothing to be done for other node types */
-        break;
-    }
 }
 
 /*
@@ -228,29 +196,49 @@ static void cmn600_configure(void)
     unsigned int xp_idx;
     unsigned int node_count;
     unsigned int node_idx;
+    unsigned int xrnsam_entry;
+    unsigned int irnsam_entry;
     struct cmn600_mxp_reg *xp;
-    struct node_header *node;
+    void *node;
+    enum node_type node_type;
     const struct mod_cmn600_config *config = ctx->config;
 
     assert(get_node_type(ctx->root) == NODE_TYPE_CFG);
 
+    xrnsam_entry = 0;
+    irnsam_entry = 0;
+
     /* Traverse cross points (XP) */
     xp_count = get_node_child_count(ctx->root);
     for (xp_idx = 0; xp_idx < xp_count; xp_idx++) {
-
         xp = get_child_node(config->base, ctx->root, xp_idx);
         assert(get_node_type(xp) == NODE_TYPE_XP);
 
         /* Traverse nodes */
         node_count = get_node_child_count(xp);
         for (node_idx = 0; node_idx < node_count; node_idx++) {
-
             node = get_child_node(config->base, xp, node_idx);
+            node_type = get_node_type(node);
 
-            if (is_child_external(xp, node_idx))
-                process_external_node(get_child_node_id(xp, node_idx), node);
-            else
-                process_internal_node(node);
+            if (node_type == NODE_TYPE_RN_SAM) {
+                if (is_child_external(xp, node_idx)) {
+                    unsigned int node_id = get_child_node_id(xp, node_idx);
+
+                    fwk_assert(xrnsam_entry < ctx->external_rnsam_count);
+
+                    ctx->external_rnsam_table[xrnsam_entry].node_id = node_id;
+                    ctx->external_rnsam_table[xrnsam_entry].node = node;
+
+                    xrnsam_entry++;
+                } else {
+                    fwk_assert(irnsam_entry < ctx->internal_rnsam_count);
+
+                    ctx->internal_rnsam_table[irnsam_entry] = node;
+
+                    irnsam_entry++;
+                }
+            } else if (node_type == NODE_TYPE_HN_F)
+                process_node_hnf(node);
         }
     }
 }
@@ -354,39 +342,41 @@ static int cmn600_setup(void)
 {
     unsigned int rnsam_idx;
 
-    cmn600_discovery();
+    if (!ctx->initialized) {
+        cmn600_discovery();
 
-    /*
-     * Allocate resources based on the discovery
-     */
-
-    /* Pointers for the internal RN-SAM nodes */
-    if (ctx->internal_rnsam_count != 0) {
-        ctx->internal_rnsam_table = fwk_mm_calloc(ctx->internal_rnsam_count,
-            sizeof(*ctx->internal_rnsam_table));
-        if (ctx->internal_rnsam_table == NULL)
-            return FWK_E_NOMEM;
-    }
-
-    /* Tuples for the external RN-RAM nodes (including their node IDs) */
-    if (ctx->external_rnsam_count != 0) {
-        ctx->external_rnsam_table = fwk_mm_calloc(ctx->external_rnsam_count,
-            sizeof(*ctx->external_rnsam_table));
-        if (ctx->external_rnsam_table == NULL)
-            return FWK_E_NOMEM;
-    }
-
-    /* Cache groups */
-    if (ctx->hnf_count != 0) {
         /*
-         * Allocate enough group descriptors to accommodate all expected HN-F
-         * nodes in the system
+         * Allocate resources based on the discovery
          */
-        ctx->hnf_cache_group = fwk_mm_calloc(ctx->hnf_count /
-                               CMN600_HNF_CACHE_GROUP_ENTRIES_PER_GROUP,
-                               sizeof(*ctx->hnf_cache_group));
-        if (ctx->hnf_cache_group == NULL)
-            return FWK_E_NOMEM;
+
+        /* Pointers for the internal RN-SAM nodes */
+        if (ctx->internal_rnsam_count != 0) {
+            ctx->internal_rnsam_table = fwk_mm_calloc(
+                ctx->internal_rnsam_count, sizeof(*ctx->internal_rnsam_table));
+            if (ctx->internal_rnsam_table == NULL)
+                return FWK_E_NOMEM;
+        }
+
+        /* Tuples for the external RN-RAM nodes (including their node IDs) */
+        if (ctx->external_rnsam_count != 0) {
+            ctx->external_rnsam_table = fwk_mm_calloc(
+                ctx->external_rnsam_count, sizeof(*ctx->external_rnsam_table));
+            if (ctx->external_rnsam_table == NULL)
+                return FWK_E_NOMEM;
+        }
+
+        /* Cache groups */
+        if (ctx->hnf_count != 0) {
+            /*
+             * Allocate enough group descriptors to accommodate all expected
+             * HN-F nodes in the system.
+             */
+            ctx->hnf_cache_group = fwk_mm_calloc(
+                ctx->hnf_count / CMN600_HNF_CACHE_GROUP_ENTRIES_PER_GROUP,
+                sizeof(*ctx->hnf_cache_group));
+            if (ctx->hnf_cache_group == NULL)
+                return FWK_E_NOMEM;
+        }
     }
 
     cmn600_configure();
@@ -396,6 +386,8 @@ static int cmn600_setup(void)
         cmn600_setup_sam(ctx->internal_rnsam_table[rnsam_idx]);
 
     ctx->log_api->log(MOD_LOG_GROUP_DEBUG, MOD_NAME "Done\n");
+
+    ctx->initialized = true;
 
     return FWK_SUCCESS;
 }
