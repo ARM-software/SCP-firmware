@@ -20,11 +20,13 @@ BS_FIRMWARE_MODULES := \
     clock \
     gtimer \
     timer \
+    juno_ddr_phy400 \
+    juno_dmc400 \
+    juno_ram \
     juno_ppu \
     juno_system \
     system_power \
     power_domain \
-    juno_ram \
     sds
 
 BS_FIRMWARE_SOURCES := \
@@ -35,9 +37,11 @@ BS_FIRMWARE_SOURCES := \
     config_clock.c \
     juno_id.c \
     config_timer.c \
+    config_juno_ddr_phy400.c \
+    config_juno_dmc400.c \
+    config_juno_ram.c \
     config_juno_ppu.c \
     config_system_power.c \
-    config_power_domain.c \
-    config_juno_ram.c
+    config_power_domain.c
 
 include $(BS_DIR)/firmware.mk
