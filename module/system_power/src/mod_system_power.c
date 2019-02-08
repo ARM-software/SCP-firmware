@@ -32,7 +32,7 @@ struct system_power_ctx {
     const struct mod_pd_driver_api *sys1_api;
 
     /* Pointer to array of extended PPU power domain driver APIs */
-    const struct mod_pd_driver_api *ext_ppu_apis;
+    const struct mod_pd_driver_api **ext_ppu_apis;
 
     /* Power domain module restricted API pointer */
     const struct mod_pd_restricted_api *mod_pd_restricted_api;
@@ -65,7 +65,7 @@ static void ext_ppus_set_state(enum mod_pd_state state)
     unsigned int i;
 
     for (i = 0; i < system_power_ctx.config->ext_ppus_count; i++) {
-        system_power_ctx.ext_ppu_apis[i].set_state(
+        system_power_ctx.ext_ppu_apis[i]->set_state(
             system_power_ctx.config->ext_ppus[i].ppu_id,
             state);
     }
