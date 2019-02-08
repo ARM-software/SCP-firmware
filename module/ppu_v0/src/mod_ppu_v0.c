@@ -109,6 +109,8 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
 
     pd_ctx = ppu_v0_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
 
+    fwk_assert(pd_ctx->pd_driver_input_api != NULL);
+
     switch (state) {
     case MOD_PD_STATE_ON:
         ppu_v0_set_power_mode(pd_ctx->ppu, PPU_V0_MODE_ON);
@@ -290,6 +292,7 @@ static int ppu_v0_process_bind_request(fwk_id_t source_id,
         #endif
         #if BUILD_HAS_MOD_SYSTEM_POWER
         if (fwk_id_get_module_idx(source_id) == FWK_MODULE_IDX_SYSTEM_POWER) {
+            pd_ctx->bound_id = source_id;
             *api = &pd_driver;
             break;
         }
