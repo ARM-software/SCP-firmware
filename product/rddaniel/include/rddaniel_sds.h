@@ -25,6 +25,11 @@ enum rddaniel_sds_struct_id {
     RDDANIEL_SDS_CPU_FLAGS =            7 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
 };
 
+enum rddaniel_sds_region_idx {
+    RDDANIEL_SDS_REGION_SECURE,
+    RDDANIEL_SDS_REGION_COUNT,
+};
+
 /*
  * Structure sizes.
  */

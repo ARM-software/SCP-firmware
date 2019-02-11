@@ -26,11 +26,22 @@
 static const uint32_t version_packed = FWK_BUILD_VERSION;
 static const uint32_t feature_flags = 0x00000000;
 
-const struct mod_sds_config sds_module_config = {
-    .region_base_address = SCP_SDS_MEM_BASE,
-    .region_size = SCP_SDS_MEM_SIZE,
+static const struct mod_sds_region_desc sds_module_regions[] = {
+    [N1SDP_SDS_REGION_SECURE] = {
+        .base = (void*)SCP_SDS_SECURE_BASE,
+        .size = SCP_SDS_SECURE_SIZE,
+    },
+};
+
+static_assert(FWK_ARRAY_SIZE(sds_module_regions) == N1SDP_SDS_REGION_COUNT,
+              "Mismatch between number of SDS regions and number of regions "
+              "provided by the SDS configuration.");
+
+static const struct mod_sds_config sds_module_config = {
+    .regions = sds_module_regions,
+    .region_count = N1SDP_SDS_REGION_COUNT,
     .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
-        CLOCK_IDX_INTERCONNECT)
+                                    CLOCK_IDX_INTERCONNECT)
 };
 
 static struct fwk_element sds_element_table[] = {
@@ -39,6 +50,7 @@ static struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc) {
             .id = N1SDP_SDS_CPU_INFO,
             .size = N1SDP_SDS_CPU_INFO_SIZE,
+            .region_id = N1SDP_SDS_REGION_SECURE,
             .finalize = true,
         }),
     },
@@ -47,6 +59,7 @@ static struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc) {
             .id = N1SDP_SDS_FIRMWARE_VERSION,
             .size = N1SDP_SDS_FIRMWARE_VERSION_SIZE,
+            .region_id = N1SDP_SDS_REGION_SECURE,
             .payload = &version_packed,
             .finalize = true,
         }),
@@ -56,6 +69,7 @@ static struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc) {
             .id = N1SDP_SDS_RESET_SYNDROME,
             .size = N1SDP_SDS_RESET_SYNDROME_SIZE,
+            .region_id = N1SDP_SDS_REGION_SECURE,
             .payload = (void *)(&PIK_SCP->RESET_SYNDROME),
             .finalize = true,
         }),
@@ -65,6 +79,7 @@ static struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc) {
             .id = N1SDP_SDS_FEATURE_AVAILABILITY,
             .size = N1SDP_SDS_FEATURE_AVAILABILITY_SIZE,
+            .region_id = N1SDP_SDS_REGION_SECURE,
             .payload = &feature_flags,
             .finalize = true,
         }),
@@ -74,6 +89,7 @@ static struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc) {
             .id = N1SDP_SDS_PLATFORM_INFO,
             .size = N1SDP_SDS_PLATFORM_INFO_SIZE,
+            .region_id = N1SDP_SDS_REGION_SECURE,
             .finalize = true,
         }),
     },
@@ -82,6 +98,7 @@ static struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc) {
             .id = N1SDP_SDS_BL33_INFO,
             .size = N1SDP_SDS_BL33_INFO_SIZE,
+            .region_id = N1SDP_SDS_REGION_SECURE,
             .finalize = true,
         }),
     },
@@ -91,6 +108,7 @@ static struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc) {
             .id = N1SDP_SDS_CPU_BOOTCTR,
             .size = N1SDP_SDS_CPU_BOOTCTR_SIZE,
+            .region_id = N1SDP_SDS_REGION_SECURE,
             .finalize = true,
         }),
     },
@@ -99,6 +117,7 @@ static struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc) {
             .id = N1SDP_SDS_CPU_FLAGS,
             .size = N1SDP_SDS_CPU_FLAGS_SIZE,
+            .region_id = N1SDP_SDS_REGION_SECURE,
             .finalize = true,
         }),
     },

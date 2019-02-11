@@ -30,6 +30,11 @@ enum rddanielxlr_sds_struct_id {
                                     7 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
 };
 
+enum rddanielxlr_sds_region_idx {
+    RDDANIELXLR_SDS_REGION_SECURE,
+    RDDANIELXLR_SDS_REGION_COUNT,
+};
+
 /*
  * Structure sizes.
  */

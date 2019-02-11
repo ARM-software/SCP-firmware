@@ -118,13 +118,10 @@ static struct sds_ctx ctx;
  * Perform some tests to determine whether any of the fields within a Structure
  * Header contain obviously invalid data.
  */
-static bool header_is_valid(volatile struct structure_header *header)
+static bool header_is_valid(const volatile struct region_descriptor *region,
+                            const volatile struct structure_header *header)
 {
-    const struct mod_sds_config *config;
-
-    config = fwk_module_get_data(fwk_module_id_sds);
-    if (config == NULL)
-        return false;
+    const volatile char *region_tail, *struct_tail;
 
     if (header->id == 0)
         return false; /* Zero is not a valid identifier */
@@ -135,7 +132,11 @@ static bool header_is_valid(volatile struct structure_header *header)
     if (header->size < FWK_ALIGN_NEXT(MIN_STRUCT_SIZE, MIN_STRUCT_ALIGNMENT))
         return false; /* Padded structure size is less than the minimum */
 
-    if (header->size > (config->region_size - sizeof(struct structure_header)))
+    region_tail = (const volatile char *)region + region->region_size;
+    struct_tail = (const volatile char *)header
+        + sizeof(struct structure_header)
+        + header->size;
+    if (struct_tail > region_tail)
         /* Structure exceeds the capacity of the SDS Memory Region */
         return false;
 
@@ -158,14 +159,14 @@ static bool validate_structure_access(uint32_t structure_size, uint32_t offset,
 }
 
 /*
- * Search the SDS Memory Region for a given structure ID and return a
+ * Search the SDS Memory Region(s) for a given structure ID and return a
  * copy of the Structure Header that holds its information. Optionally, a
  * char pointer pointer may be provided to retrieve a pointer to the base
  * address of the structure content.
  *
  * The validity of the header is checked before its contents are returned. These
  * tests check that the structure size is sane, and that the entire contents of
- * the structure are contained within the SDS Memory Region.
+ * the structure are contained within its SDS Memory Region.
  *
  * If the address of the structure header in the SDS Memory Region is needed
  * (as opposed to a copy of the header contents) then this can be calculated by
@@ -178,44 +179,47 @@ static int get_structure_info(uint32_t structure_id,
                               struct structure_header *header,
                               volatile char **structure_base)
 {
-    unsigned int struct_idx;
-    struct structure_header current_header;
-    uint32_t offset;
-    const struct mod_sds_config *config;
-    const volatile struct region_descriptor *region_desc;
+   volatile struct structure_header *current_header;
+   size_t offset, region_size, struct_count, region_idx, struct_idx;
+   const struct mod_sds_config *config;
+   volatile struct region_descriptor *region_desc;
+   volatile char *region_base;
 
     config = fwk_module_get_data(fwk_module_id_sds);
     fwk_assert(config != NULL);
 
-    region_desc = (const volatile struct region_descriptor *)(
-        config->region_base_address);
-    offset = sizeof(struct region_descriptor);
+   for (region_idx = 0; region_idx < config->region_count; region_idx++) {
+       region_base = (volatile char *)config->regions[region_idx].base;
+       region_desc = (volatile struct region_descriptor *)region_base;
+       region_size = region_desc->region_size;
+       struct_count = region_desc->structure_count;
 
-    /* Iterate over structure headers to find one with a matching ID */
-    for (struct_idx = 0; struct_idx < region_desc->structure_count;
-            struct_idx++) {
-        current_header = *(volatile struct structure_header *)(
-                config->region_base_address + offset);
-        if (!header_is_valid(&current_header))
-            return FWK_E_DATA;
+       offset = sizeof(struct region_descriptor);
+       /* Iterate over structure headers to find one with a matching ID */
+       for (struct_idx = 0; struct_idx < struct_count; struct_idx++) {
+           current_header = (volatile struct structure_header *)(
+                region_base + offset);
+           if (!header_is_valid(region_desc, current_header))
+               return FWK_E_DATA;
 
-        if (current_header.id == structure_id) {
-            if (structure_base != NULL) {
-                *structure_base = (volatile char *)config->region_base_address
-                    + offset + sizeof(struct structure_header);
-            }
+           if (current_header->id == structure_id) {
+               if (structure_base != NULL) {
+                   *structure_base = ((volatile char *)current_header
+                                      + sizeof(struct structure_header));
+               }
 
-            *header = current_header;
-            return FWK_SUCCESS;
-        }
+               *header = *current_header;
+               return FWK_SUCCESS;
+           }
 
-        offset += current_header.size;
-        offset += sizeof(struct structure_header);
-        if (offset >= region_desc->region_size)
-            return FWK_E_RANGE;
-    }
+           offset += current_header->size;
+           offset += sizeof(struct structure_header);
+           if (offset >= region_size)
+               return FWK_E_RANGE;
+       }
+   }
 
-    return FWK_E_PARAM;
+   return FWK_E_PARAM;
 }
 
 /*
@@ -231,7 +235,7 @@ static bool structure_exists(uint32_t structure_id)
     return status == FWK_SUCCESS;
 }
 
-static int struct_alloc(uint32_t structure_id, size_t size)
+static int struct_alloc(const struct mod_sds_structure_desc *struct_desc)
 {
     const struct mod_sds_config *config;
     volatile struct structure_header *header = NULL;
@@ -240,20 +244,21 @@ static int struct_alloc(uint32_t structure_id, size_t size)
     int status = FWK_SUCCESS;
     size_t *free_mem_size;
     volatile char **free_mem_base;
-    const size_t region_idx = 0;
+    const size_t region_idx = struct_desc->region_id;
 
-    if (size < MIN_STRUCT_SIZE) {
+    if (struct_desc->size < MIN_STRUCT_SIZE) {
         status = FWK_E_PARAM;
         goto exit;
     }
 
     config = fwk_module_get_data(fwk_module_id_sds);
     fwk_assert(config != NULL);
+    fwk_assert(region_idx < config->region_count);
 
-    padded_size = FWK_ALIGN_NEXT(size, MIN_STRUCT_ALIGNMENT);
+    padded_size = FWK_ALIGN_NEXT(struct_desc->size, MIN_STRUCT_ALIGNMENT);
 
     region_desc = (volatile struct region_descriptor *)(
-        config->region_base_address);
+        config->regions[region_idx].base);
     free_mem_base = &(ctx.regions[region_idx].free_mem_base);
     free_mem_size = &(ctx.regions[region_idx].free_mem_size);
 
@@ -262,14 +267,14 @@ static int struct_alloc(uint32_t structure_id, size_t size)
         goto exit;
     }
 
-    if (structure_exists(structure_id)) {
+    if (structure_exists(struct_desc->id)) {
         status = FWK_E_RANGE;
         goto exit;
     }
 
     /* Create the Structure Header */
     header = (volatile struct structure_header *)(*free_mem_base);
-    header->id = structure_id;
+    header->id = struct_desc->id;
     header->size = padded_size;
     header->valid = false;
     *free_mem_base += sizeof(*header);
@@ -305,21 +310,15 @@ exit:
  * is subtracted from the size of the memory region to determine the amount
  * of free memory that remains.
  */
-static int reinitialize_memory_region(void)
+static int reinitialize_memory_region(
+    const struct mod_sds_region_desc *region_config, unsigned int region_idx)
 {
-    const struct mod_sds_config *config;
     unsigned int struct_idx;
     uint32_t mem_used;
     volatile struct structure_header *header;
     volatile struct region_descriptor *region_desc;
-    const size_t region_idx = 0;
 
-    config = fwk_module_get_data(fwk_module_id_sds);
-    if (config == NULL)
-        return FWK_E_DATA;
-
-    region_desc = (volatile struct region_descriptor *)(
-        config->region_base_address);
+    region_desc = (volatile struct region_descriptor *)(region_config->base);
     if (region_desc->signature != REGION_SIGNATURE)
         return FWK_E_DATA;
 
@@ -327,13 +326,12 @@ static int reinitialize_memory_region(void)
         return FWK_E_DATA;
 
     mem_used = sizeof(struct region_descriptor);
-
     for (struct_idx = 0; struct_idx < region_desc->structure_count;
         struct_idx++) {
         header = (volatile struct structure_header *)(
-                 (volatile char *)config->region_base_address + mem_used);
+            (volatile char *)region_config->base + mem_used);
 
-        if (!header_is_valid(header))
+        if (!header_is_valid(region_desc, header))
             return FWK_E_DATA; /* Unexpected invalid header */
 
         mem_used += header->size;
@@ -342,20 +340,21 @@ static int reinitialize_memory_region(void)
             return FWK_E_SIZE;
     }
 
-    if (mem_used > config->region_size)
+    if (mem_used > region_config->size)
         return FWK_E_SIZE;
 
     /*
      * The SDS memory region size might differ between ROM and RAM images. In
      * that case, as ctx has been loaded by the RAM image while the SDS region
      * was setup by the ROM image:
-     *   - config->region_size is the new size expected by the RAM image;
+     *   - region_config->region_size is the new size expected by the RAM
+     *     image;
      *   - region_desc->region_size is the old size from the ROM image;
      */
-    region_desc->region_size = config->region_size;
-    ctx.regions[region_idx].free_mem_size = config->region_size - mem_used;
+    region_desc->region_size = region_config->size;
+    ctx.regions[region_idx].free_mem_size = region_config->size - mem_used;
     ctx.regions[region_idx].free_mem_base =
-        (volatile char *)config->region_base_address + mem_used;
+        (volatile char *)region_config->base + mem_used;
 
     return FWK_SUCCESS;
 }
@@ -363,40 +362,28 @@ static int reinitialize_memory_region(void)
 /*
  * Initialize an empty SDS Memory Region so that it is ready for use.
  */
-static int create_memory_region(void)
+static int create_memory_region(const struct mod_sds_region_desc* region_config,
+                                unsigned int region_idx)
 {
-    const struct mod_sds_config *config;
     unsigned int min_storage;
     volatile struct region_descriptor *region_desc;
-    const size_t region_idx = 0;
 
-    config = fwk_module_get_data(fwk_module_id_sds);
-    if (config == NULL)
-        return FWK_E_PARAM;
-
-    /*
-     * Check that the SDS Memory Region is large enough to support both the
-     * Region Descriptor and a single Shared Data Structure of the minimum
-     * permitted size.
-     */
     min_storage = sizeof(struct region_descriptor) +
         FWK_ALIGN_NEXT(MIN_STRUCT_SIZE, MIN_STRUCT_ALIGNMENT);
-    if (config->region_size < min_storage)
+    if (region_config->size < min_storage)
         return FWK_E_NOMEM;
 
-    region_desc = (volatile struct region_descriptor *)(
-        config->region_base_address);
+    region_desc = (volatile struct region_descriptor *)region_config->base;
     region_desc->signature = REGION_SIGNATURE;
     region_desc->structure_count = 0;
     region_desc->version_major = SUPPORTED_VERSION_MAJOR;
     region_desc->version_minor = SUPPORTED_VERSION_MINOR;
-    region_desc->region_size = config->region_size;
+    region_desc->region_size = region_config->size;
 
-    ctx.regions[region_idx].free_mem_size = config->region_size
+    ctx.regions[region_idx].free_mem_size = region_config->size
         - sizeof(struct region_descriptor);
     ctx.regions[region_idx].free_mem_base =
-        (volatile char *)config->region_base_address
-        + sizeof(struct region_descriptor);
+        (volatile char *)region_config->base + sizeof(struct region_descriptor);
     fwk_assert(((uintptr_t)ctx.regions[region_idx].free_mem_base %
         MIN_STRUCT_ALIGNMENT) == 0);
 
@@ -454,7 +441,7 @@ static int struct_init(const struct mod_sds_structure_desc *struct_desc)
 
     /* If the structure does not already exist, allocate it. */
     if (!structure_exists(struct_desc->id)) {
-        status = struct_alloc(struct_desc->id, struct_desc->size);
+        status = struct_alloc(struct_desc);
         if (status != FWK_SUCCESS)
             return status;
     }
@@ -475,22 +462,33 @@ static int struct_init(const struct mod_sds_structure_desc *struct_desc)
 
 static int init_sds(void)
 {
+    const struct mod_sds_config *config;
     int status;
     int element_idx;
     int element_count;
     const struct mod_sds_structure_desc *struct_desc;
+    unsigned int region_idx;
+    const struct mod_sds_region_desc *region_config;
     unsigned int notification_count;
     struct fwk_event notification_event = {
         .id = mod_sds_notification_id_initialized,
         .source_id = fwk_module_id_sds,
     };
 
-    /* Either reinitialize the memory region, or create it for the first time */
-    status = reinitialize_memory_region();
-    if (status != FWK_SUCCESS) {
-        status = create_memory_region();
-        if (status != FWK_SUCCESS)
-            return status;
+    config = fwk_module_get_data(fwk_module_id_sds);
+
+    for (region_idx = 0; region_idx < config->region_count; region_idx++) {
+        region_config = &(config->regions[region_idx]);
+        /*
+         * Either reinitialize the memory region,
+         * or create it for the first time
+         */
+        status = reinitialize_memory_region(region_config, region_idx);
+        if (status != FWK_SUCCESS) {
+            status = create_memory_region(region_config, region_idx);
+            if (status != FWK_SUCCESS)
+                return status;
+        }
     }
 
     element_count = fwk_module_get_element_count(fwk_module_id_sds);
@@ -570,6 +568,8 @@ static int sds_init(fwk_id_t module_id, unsigned int element_count,
                     const void *data)
 {
     const struct mod_sds_config *config;
+    void *region_base;
+    unsigned int region_idx;
 
     if (data == NULL)
         return FWK_E_PANIC;
@@ -578,13 +578,15 @@ static int sds_init(fwk_id_t module_id, unsigned int element_count,
 
     fwk_assert((MIN_STRUCT_ALIGNMENT % MIN_FIELD_ALIGNMENT) == 0);
 
-    if (config->region_base_address == 0)
-        return FWK_E_PARAM;
-    if (((uintptr_t)config->region_base_address % MIN_STRUCT_ALIGNMENT) > 0)
-        return FWK_E_PARAM;
+    for (region_idx = 0; region_idx < config->region_count; region_idx++) {
+        region_base = config->regions[region_idx].base;
+        if (region_base == NULL)
+            return FWK_E_PARAM;
+        if (((uintptr_t)region_base % MIN_STRUCT_ALIGNMENT) > 0)
+            return FWK_E_PARAM;
+    }
 
-    /* We only have 1 region so only allocating one element: */
-    ctx.regions = fwk_mm_alloc(1, sizeof(ctx.regions[0]));
+    ctx.regions = fwk_mm_alloc(config->region_count, sizeof(ctx.regions[0]));
     if (ctx.regions == NULL)
         return FWK_E_NOMEM;
 
@@ -611,7 +613,7 @@ static int sds_start(fwk_id_t id)
 {
 #if BUILD_HAS_MOD_CLOCK
     const struct mod_sds_config *config;
- #endif
+#endif
 
     if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
         return FWK_SUCCESS;
