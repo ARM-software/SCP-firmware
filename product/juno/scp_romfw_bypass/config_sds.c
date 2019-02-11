@@ -30,12 +30,30 @@ static struct juno_sds_platid platid;
 static uint32_t reset_syndrome;
 static uint32_t primary_cpu;
 
+static const struct mod_sds_region_desc sds_module_regions[] = {
+    [JUNO_SDS_REGION_SECURE] = {
+        .base = (void*)SCP_SDS_SECURE_BASE,
+        .size = SCP_SDS_SECURE_SIZE,
+    },
+};
+
+static_assert(FWK_ARRAY_SIZE(sds_module_regions) == JUNO_SDS_REGION_COUNT,
+              "Mismatch between number of SDS regions and number of regions "
+              "provided by the SDS configuration.");
+
+static const struct mod_sds_config sds_module_config = {
+    .regions = sds_module_regions,
+    .region_count = JUNO_SDS_REGION_COUNT,
+    .clock_id = FWK_ID_NONE_INIT,
+};
+
 static const struct fwk_element element_table[] = {
     {
         .name = "CPU Info",
         .data = &(struct mod_sds_structure_desc) {
             .id = JUNO_SDS_CPU_INFO,
             .size = JUNO_SDS_CPU_INFO_SIZE,
+            .region_id = JUNO_SDS_REGION_SECURE,
             .payload = &primary_cpu,
             .finalize = true,
         },
@@ -46,6 +64,7 @@ static const struct fwk_element element_table[] = {
         .data = &(struct mod_sds_structure_desc) {
             .id = JUNO_SDS_ROM_VERSION,
             .size = JUNO_SDS_ROM_VERSION_SIZE,
+            .region_id = JUNO_SDS_REGION_SECURE,
             .payload = &version_packed,
             .finalize = true,
         },
@@ -56,6 +75,7 @@ static const struct fwk_element element_table[] = {
         .data = &(struct mod_sds_structure_desc) {
             .id = JUNO_SDS_PLATFORM_ID,
             .size = JUNO_SDS_PLATFORM_ID_SIZE,
+            .region_id = JUNO_SDS_REGION_SECURE,
             .payload = &platid,
             .finalize = true,
         },
@@ -66,6 +86,7 @@ static const struct fwk_element element_table[] = {
         .data = &(struct mod_sds_structure_desc) {
             .id = JUNO_SDS_RESET_SYNDROME,
             .size = JUNO_SDS_RESET_SYNDROME_SIZE,
+            .region_id = JUNO_SDS_REGION_SECURE,
             .payload = &reset_syndrome,
             .finalize = true,
         },
@@ -76,6 +97,7 @@ static const struct fwk_element element_table[] = {
         .data = &(struct mod_sds_structure_desc) {
             .id = JUNO_SDS_BOOTLOADER,
             .size = JUNO_SDS_BOOTLOADER_SIZE,
+            .region_id = JUNO_SDS_REGION_SECURE,
             .finalize = true,
         },
     },
@@ -85,6 +107,7 @@ static const struct fwk_element element_table[] = {
         .data = &(struct mod_sds_structure_desc) {
             .id = JUNO_SDS_FEATURE_AVAILABILITY,
             .size = JUNO_SDS_FEATURE_AVAILABILITY_SIZE,
+            .region_id = JUNO_SDS_REGION_SECURE,
             .finalize = true,
         },
     },
@@ -95,6 +118,7 @@ static const struct fwk_element element_table[] = {
         .data = &(struct mod_sds_structure_desc) {
             .id = JUNO_SDS_CPU_BOOTCTR,
             .size = JUNO_SDS_CPU_BOOTCTR_SIZE,
+            .region_id = JUNO_SDS_REGION_SECURE,
             .finalize = true,
         },
     },
@@ -104,6 +128,7 @@ static const struct fwk_element element_table[] = {
         .data = &(struct mod_sds_structure_desc) {
             .id = JUNO_SDS_CPU_FLAGS,
             .size = JUNO_SDS_CPU_FLAGS_SIZE,
+            .region_id = JUNO_SDS_REGION_SECURE,
             .finalize = true,
         },
     },
@@ -165,9 +190,5 @@ static const struct fwk_element *get_element_table(fwk_id_t module_id)
 
 struct fwk_module_config config_sds = {
     .get_element_table = get_element_table,
-    .data = &(struct mod_sds_config) {
-        .region_base_address = SDS_SHARED_MEM_BASE,
-        .region_size = SDS_SHARED_MEM_SIZE,
-        .clock_id = FWK_ID_NONE_INIT,
-    },
+    .data = &sds_module_config,
 };

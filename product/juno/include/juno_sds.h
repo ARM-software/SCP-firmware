@@ -28,6 +28,11 @@ enum juno_sds_struct_id {
     JUNO_SDS_BOOTLOADER =           9 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
 };
 
+enum juno_sds_region_idx {
+    JUNO_SDS_REGION_SECURE,
+    JUNO_SDS_REGION_COUNT,
+};
+
 /*
  * Structure sizes.
  */

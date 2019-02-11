@@ -75,8 +75,8 @@
                                        SCMI_PAYLOAD_SIZE)
 
 /* SDS Memory Region */
-#define SDS_SHARED_MEM_BASE           (CONTEXT_REGION_BASE)
-#define SDS_SHARED_MEM_SIZE           (SCMI_PAYLOAD_S_BASE - \
+#define SCP_SDS_SECURE_BASE           (CONTEXT_REGION_BASE)
+#define SCP_SDS_SECURE_SIZE           (SCMI_PAYLOAD_S_BASE - \
                                        CONTEXT_REGION_BASE)
 
 /* SCMI Payload Areas */

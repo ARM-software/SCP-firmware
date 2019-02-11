@@ -26,6 +26,11 @@ enum sgi575_sds_struct_id {
     SGI575_SDS_CPU_FLAGS = 7 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
 };
 
+enum sgi575_sds_region_idx {
+    SGI575_SDS_REGION_SECURE,
+    SGI575_SDS_REGION_COUNT,
+};
+
 /*
  * Structure sizes.
  */

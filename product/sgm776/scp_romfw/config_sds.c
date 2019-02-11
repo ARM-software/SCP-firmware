@@ -11,6 +11,7 @@
 #include "sgm776_pik_scp.h"
 #include "sgm776_sds.h"
 #include "system_mmap.h"
+#include "software_mmap.h"
 
 #include <mod_sds.h>
 #include <mod_sid.h>
@@ -29,9 +30,20 @@
 static const uint32_t version_packed = FWK_BUILD_VERSION;
 static struct sgm776_sds_platid platid;
 
+static const struct mod_sds_region_desc sds_module_regions[] = {
+    [SGM776_SDS_REGION_SECURE] = {
+        .base = (void*)SDS_SECURE_BASE,
+        .size = SDS_SECURE_SIZE,
+    },
+};
+
+static_assert(FWK_ARRAY_SIZE(sds_module_regions) == SGM776_SDS_REGION_COUNT,
+              "Mismatch between number of SDS regions and number of regions "
+              "provided by the SDS configuration.");
+
 static const struct mod_sds_config sds_module_config = {
-    .region_base_address = TRUSTED_RAM_BASE,
-    .region_size = 3520,
+    .regions = sds_module_regions,
+    .region_count = SGM776_SDS_REGION_COUNT,
     .clock_id = FWK_ID_ELEMENT_INIT(
                     FWK_MODULE_IDX_CLOCK,
                     CLOCK_DEV_IDX_SYS_NOCMEMCLK),
@@ -43,6 +55,7 @@ static const struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc) {
             .id = SGM776_SDS_CPU_INFO,
             .size = SGM776_SDS_CPU_INFO_SIZE,
+            .region_id = SGM776_SDS_REGION_SECURE,
             .finalize = true,
         }),
     },
@@ -52,6 +65,7 @@ static const struct fwk_element sds_element_table[] = {
             .id = SGM776_SDS_ROM_VERSION,
             .size = SGM776_SDS_ROM_VERSION_SIZE,
             .payload = &version_packed,
+            .region_id = SGM776_SDS_REGION_SECURE,
             .finalize = true,
         }),
     },
@@ -61,6 +75,7 @@ static const struct fwk_element sds_element_table[] = {
             .id = SGM776_SDS_PLATFORM_ID,
             .size = SGM776_SDS_PLATFORM_ID_SIZE,
             .payload = &platid,
+            .region_id = SGM776_SDS_REGION_SECURE,
             .finalize = true,
         }),
     },
@@ -70,6 +85,7 @@ static const struct fwk_element sds_element_table[] = {
             .id = SGM776_SDS_RESET_SYNDROME,
             .size = SGM776_SDS_RESET_SYNDROME_SIZE,
             .payload = (const void *)&PIK_SCP->RESET_SYNDROME,
+            .region_id = SGM776_SDS_REGION_SECURE,
             .finalize = true,
         }),
     },
@@ -78,6 +94,7 @@ static const struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc) {
             .id = SGM776_SDS_BOOTLOADER,
             .size = SGM776_SDS_BOOTLOADER_SIZE,
+            .region_id = SGM776_SDS_REGION_SECURE,
             .finalize = true,
         }),
     },
@@ -86,6 +103,7 @@ static const struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc) {
             .id = SGM776_SDS_FEATURE_AVAILABILITY,
             .size = SGM776_SDS_FEATURE_AVAILABILITY_SIZE,
+            .region_id = SGM776_SDS_REGION_SECURE,
             .finalize = true,
         }),
     },
@@ -95,6 +113,7 @@ static const struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc) {
             .id = SGM776_SDS_CPU_BOOTCTR,
             .size = SGM776_SDS_CPU_BOOTCTR_SIZE,
+            .region_id = SGM776_SDS_REGION_SECURE,
             .finalize = true,
         }),
     },
@@ -103,6 +122,7 @@ static const struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc) {
             .id = SGM776_SDS_CPU_FLAGS,
             .size = SGM776_SDS_CPU_FLAGS_SIZE,
+            .region_id = SGM776_SDS_REGION_SECURE,
             .finalize = true,
         }),
     },

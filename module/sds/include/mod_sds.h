@@ -55,14 +55,42 @@
 #define MOD_SDS_ID_VERSION_MAJOR_MASK 0xFF000000
 
 /*!
+ * \brief Element descriptor that describes an SDS region that will be
+ *      automatically created during module initialization.
+ */
+struct mod_sds_region_desc {
+    /*!
+     * \brief Base address of the SDS region.
+     */
+    void *base;
+
+    /*!
+     * \brief Size in bytes of the SDS Memory Region.
+     *
+     * \note If the SDS module is initialized and a region already exists then
+     *       the region will be resized to match the size given here. The
+     *       existing region may be increased or shrunk, as required. In the
+     *       latter case the new size must be sufficient to hold the existing
+     *       contents and if it is not then the initialization process will
+     *       fail.
+     */
+    size_t size;
+};
+
+/*!
  * \brief Element descriptor that describes an SDS structure that will be
  *      automatically created during element initialization.
  */
 struct mod_sds_structure_desc {
     /*! Identifier of the structure to be created. */
     uint32_t id;
+
+    /*! Identifier of the SDS region containing the structure. */
+    uint32_t region_id;
+
     /*! Size, in bytes, of the structure. */
     size_t size;
+
     /*!
      *  Payload of the structure. If not equal to NULL, as part of the
      *  initialization of the module's elements, the payload of the structure
@@ -70,6 +98,7 @@ struct mod_sds_structure_desc {
      *  'payload'.
      */
     const void *payload;
+
     /*! Set the valid flag in the structure if true. */
     bool finalize;
 };
@@ -78,18 +107,15 @@ struct mod_sds_structure_desc {
  * \brief Module configuration.
  */
 struct mod_sds_config {
-    /*! Base address of the region used for shared data storage */
-    uintptr_t region_base_address;
+    /*!
+     * Descriptors of all the SDS regions the module will use.
+     */
+    const struct mod_sds_region_desc *regions;
 
     /*!
-     * Size, in bytes, of the SDS Memory Region. If the SDS module is
-     *      initialized and a region already exists then the region will be
-     *      resized to match the size given here. The existing region may be
-     *      grown or shrunk, as required. In the latter case the new size must
-     *      be sufficient to hold the existing contents and if it is not then
-     *      the initialization process will fail.
+     * Number of SDS regions managed by the module.
      */
-    size_t region_size;
+    unsigned int region_count;
 
 #if BUILD_HAS_MOD_CLOCK
     /*! Identifier of the clock that this module depends on */

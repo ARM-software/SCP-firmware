@@ -27,6 +27,11 @@ enum n1sdp_sds_struct_id {
     N1SDP_SDS_BL33_INFO =            9 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
 };
 
+enum n1sdp_sds_region_idx {
+    N1SDP_SDS_REGION_SECURE,
+    N1SDP_SDS_REGION_COUNT,
+};
+
 /*
  * Structure sizes.
  */
