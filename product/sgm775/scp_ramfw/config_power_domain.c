@@ -45,11 +45,14 @@ static const uint32_t toplevel_allowed_state_mask_table[] = {
 /*
  * Mask of the allowed states for the cluster power domain depending on the
  * system states.
+ *
+ * While the clusters may reach a SLEEP state, SLEEP does not appear in this
+ * table. This is because the PPU driver backing the clusters will not accept a
+ * manual SLEEP request, but will transition to it automatically when possible.
  */
 static const uint32_t cluster_pd_allowed_state_mask_table[] = {
     [MOD_PD_STATE_OFF] = MOD_PD_STATE_OFF_MASK,
-    [MOD_PD_STATE_ON] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK |
-        MOD_PD_STATE_SLEEP_MASK,
+    [MOD_PD_STATE_ON] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK,
     [MOD_SYSTEM_POWER_POWER_STATE_SLEEP0] = MOD_PD_STATE_OFF_MASK,
     [MOD_SYSTEM_POWER_POWER_STATE_SLEEP1] = MOD_PD_STATE_OFF_MASK
 };
