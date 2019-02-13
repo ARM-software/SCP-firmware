@@ -32,7 +32,9 @@ BS_FIRMWARE_MODULES := \
     scmi \
     scmi_power_domain \
     scmi_system_power \
-    sds
+    sds \
+    i2c \
+    dw_apb_i2c
 
 BS_FIRMWARE_SOURCES := \
     rtx_config.c \
@@ -51,6 +53,7 @@ BS_FIRMWARE_SOURCES := \
     config_mhu.c \
     config_smt.c \
     config_scmi.c \
-    config_scmi_system_power.c
+    config_scmi_system_power.c \
+    config_i2c.c
 
 include $(BS_DIR)/firmware.mk
