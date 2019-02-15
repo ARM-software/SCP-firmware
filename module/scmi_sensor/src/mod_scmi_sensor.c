@@ -426,7 +426,7 @@ static int scmi_sensor_bind(fwk_id_t id, unsigned int round)
     }
 
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_SENSOR),
-                             FWK_ID_API(FWK_MODULE_IDX_SENSOR, 0),
+                             mod_sensor_api_id_sensor,
                              &scmi_sensor_ctx.sensor_api);
     if (status != FWK_SUCCESS) {
         /* Failed to bind to sensor module */
