@@ -17,7 +17,7 @@ static const struct fwk_element element_table[] = {
         .data = &(const struct mod_psu_element_cfg) {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MOCK_PSU, 0),
             .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MOCK_PSU,
-                                             MOD_MOCK_PSU_API_IDX_PSU_DRIVER)
+                                             MOD_MOCK_PSU_API_IDX_DRIVER)
         },
     },
     {
@@ -25,7 +25,7 @@ static const struct fwk_element element_table[] = {
         .data = &(const struct mod_psu_element_cfg){
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MOCK_PSU, 1),
             .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MOCK_PSU,
-                                             MOD_MOCK_PSU_API_IDX_PSU_DRIVER)
+                                             MOD_MOCK_PSU_API_IDX_DRIVER)
         },
     },
     { 0 }

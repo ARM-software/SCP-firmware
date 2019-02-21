@@ -8,24 +8,33 @@
 #ifndef MOD_MOCK_PSU_H
 #define MOD_MOCK_PSU_H
 
+#include <fwk_module_idx.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <fwk_module_idx.h>
 
 /*!
  * \ingroup GroupModules
  * \defgroup GroupMockPsu Mock Power Supply Driver
+ *
+ * \details The `mock_psu` module provides a mock power supply driver for use
+ *      alongside the `psu` interface on systems that do not provide a real
+ *      power supply.
+ *
  * \{
  */
 
 /*!
  * \brief Element configuration.
  */
-struct mod_mock_psu_device_config {
-    /*! Default state of the mock device's supply (enabled or disabled) */
+struct mod_mock_psu_element_cfg {
+    /*!
+     * \brief Default state of the mock device's supply (enabled or disabled).
+     */
     bool default_enabled;
 
-    /*! Default voltage, in millivolts (mV), of the device's supply */
+    /*!
+     * \brief Default voltage, in millivolts (mV), of the device's supply.
+     */
     uint64_t default_voltage;
 };
 
@@ -33,16 +42,30 @@ struct mod_mock_psu_device_config {
  * \brief API indices.
  */
 enum mod_mock_psu_api_idx {
-    /*! API index for PSU driver API */
-    MOD_MOCK_PSU_API_IDX_PSU_DRIVER,
+    /*!
+     * \brief Driver API index.
+     *
+     * \note This API implements the ::mod_psu_driver_api interface.
+     *
+     * \warning Binding to this API must occur through an element of this
+     *      module.
+     */
+    MOD_MOCK_PSU_API_IDX_DRIVER,
 
-    /*! Number of defined APIs */
-    MOD_MOCK_PSU_API_COUNT
+    /*!
+     * \brief Number of defined APIs.
+     */
+    MOD_MOCK_PSU_API_IDX_COUNT
 };
 
-/*! Driver API identifier */
-static const fwk_id_t mod_mock_psu_api_id_psu_driver =
-    FWK_ID_API_INIT(FWK_MODULE_IDX_MOCK_PSU, MOD_MOCK_PSU_API_IDX_PSU_DRIVER);
+/*!
+ * \brief Driver API identifier.
+ *
+ * \note This identifier corresponds to the ::MOD_MOCK_PSU_API_IDX_DRIVER API
+ *      index.
+ */
+static const fwk_id_t mod_mock_psu_api_id_driver =
+    FWK_ID_API_INIT(FWK_MODULE_IDX_MOCK_PSU, MOD_MOCK_PSU_API_IDX_DRIVER);
 
 /*!
  * \}
