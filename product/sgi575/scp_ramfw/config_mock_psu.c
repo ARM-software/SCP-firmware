@@ -13,7 +13,7 @@ static const struct fwk_element element_table[] = {
     {
         .name = "DVFS_GROUP0",
         .data =
-            &(const struct mod_mock_psu_device_config){
+            &(const struct mod_mock_psu_element_cfg){
                 .default_enabled = true,
                 .default_voltage = 100,
             },
@@ -21,7 +21,7 @@ static const struct fwk_element element_table[] = {
     {
         .name = "DVFS_GROUP1",
         .data =
-            &(const struct mod_mock_psu_device_config){
+            &(const struct mod_mock_psu_element_cfg){
                 .default_enabled = true,
                 .default_voltage = 100,
             },
