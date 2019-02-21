@@ -20,11 +20,6 @@
  */
 
 /*!
- * \defgroup GroupPsuApis APIs
- * \{
- */
-
-/*!
  * \brief Device API.
  */
 struct mod_psu_device_api {
@@ -133,30 +128,12 @@ struct mod_psu_driver_api {
 };
 
 /*!
- * \}
- */
-
-/*!
- * \defgroup GroupPsuConfig Configuration
- * \{
- */
-
-/*!
  * \brief Device configuration.
  */
 struct mod_psu_device_config {
     fwk_id_t driver_id; /*!< Driver identifier */
     fwk_id_t driver_api_id; /*!< Driver API identifier */
 };
-
-/*!
- * \}
- */
-
-/*!
- * \defgroup GroupPsuIds Identifiers
- * \{
- */
 
 /*!
  * \brief API indices.
@@ -172,10 +149,6 @@ enum mod_psu_api_idx {
 /*! Device API identifier */
 static const fwk_id_t mod_psu_api_id_psu_device =
     FWK_ID_API_INIT(FWK_MODULE_IDX_PSU, MOD_PSU_API_IDX_PSU_DEVICE);
-
-/*!
- * \}
- */
 
 /*!
  * \}
