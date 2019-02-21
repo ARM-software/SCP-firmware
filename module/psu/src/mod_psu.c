@@ -5,250 +5,211 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <mod_psu.h>
 #include <fwk_assert.h>
 #include <fwk_event.h>
-#include <fwk_id.h>
 #include <fwk_macros.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
 #include <fwk_mm.h>
-#include <mod_psu.h>
+#include <fwk_module.h>
 
-/* Device context */
-struct mod_psu_device_ctx {
-    /* Device configuration */
-    const struct mod_psu_device_config *config;
-
-    struct {
-        /* Driver API */
+static struct mod_psu_ctx {
+    struct mod_psu_element_ctx {
         const struct mod_psu_driver_api *driver;
-    } apis;
-};
+    } *elements;
+} mod_psu_ctx;
 
-/* Device context table */
-static struct mod_psu_device_ctx (*device_ctx)[];
-
-static struct mod_psu_device_ctx *mod_psu_get_device_ctx(fwk_id_t device_id)
+static struct mod_psu_element_ctx *mod_psu_get_element_ctx(fwk_id_t element_id)
 {
-    unsigned int element_idx = fwk_id_get_element_idx(device_id);
+    unsigned int element_idx = fwk_id_get_element_idx(element_id);
 
-    return &(*device_ctx)[element_idx];
+    return &mod_psu_ctx.elements[element_idx];
 }
 
-static struct mod_psu_device_ctx *mod_psu_get_valid_device_ctx(
-    fwk_id_t device_id)
+static int mod_psu_check_call(fwk_id_t element_id)
 {
-    if (fwk_module_check_call(device_id) != FWK_SUCCESS)
-        return NULL;
+    int status = FWK_E_PARAM;
 
-    return mod_psu_get_device_ctx(device_id);
-}
+    if (fwk_id_get_module_idx(element_id) != FWK_MODULE_IDX_PSU)
+        goto exit;
 
-static int api_get_enabled(fwk_id_t device_id, bool *enabled)
-{
-    int status;
-    const struct mod_psu_device_ctx *ctx;
-
-    /* This API call cannot target another module */
-    if (fwk_id_get_module_idx(device_id) != FWK_MODULE_IDX_PSU)
-        return FWK_E_PARAM;
-
-    /* Ensure the identifier refers to a valid element */
-    if (!fwk_module_is_valid_element_id(device_id))
-        return FWK_E_PARAM;
-
-    /* Validate the API call */
-    status = fwk_module_check_call(device_id);
+    status = fwk_module_check_call(element_id);
     if (status != FWK_SUCCESS)
-        return FWK_E_STATE;
+        status = FWK_E_STATE;
 
-    ctx = mod_psu_get_valid_device_ctx(device_id);
-    if (ctx == NULL)
-        return FWK_E_PARAM;
-
-    /* Get the enabled state from the driver */
-    status = ctx->apis.driver->get_enabled(ctx->config->driver_id, enabled);
-    if (status != FWK_SUCCESS)
-        return FWK_E_HANDLER;
-
-    return FWK_SUCCESS;
+exit:
+    return status;
 }
 
-static int api_set_enabled(fwk_id_t device_id, bool enable)
+static int mod_psu_get_cfg_ctx(
+    fwk_id_t element_id,
+    const struct mod_psu_element_cfg **cfg,
+    struct mod_psu_element_ctx **ctx)
 {
     int status;
-    const struct mod_psu_device_ctx *ctx;
 
-    /* This API call cannot target another module */
-    if (fwk_id_get_module_idx(device_id) != FWK_MODULE_IDX_PSU)
-        return FWK_E_PARAM;
-
-    /* Ensure the identifier refers to a valid element */
-    if (!fwk_module_is_valid_element_id(device_id))
-        return FWK_E_PARAM;
-
-    /* Validate the API call */
-    status = fwk_module_check_call(device_id);
+    status = mod_psu_check_call(element_id);
     if (status != FWK_SUCCESS)
-        return FWK_E_STATE;
+        goto exit;
 
-    ctx = mod_psu_get_valid_device_ctx(device_id);
-    if (ctx == NULL)
-        return FWK_E_PARAM;
+    if (ctx != NULL)
+        *ctx = mod_psu_get_element_ctx(element_id);
 
-    /* Set the enabled state through the driver */
-    status = ctx->apis.driver->set_enabled(ctx->config->driver_id, enable);
-    if (status != FWK_SUCCESS)
-        return FWK_E_HANDLER;
+    if (cfg != NULL)
+        *cfg = fwk_module_get_data(element_id);
 
-    return FWK_SUCCESS;
+exit:
+    return status;
 }
 
-static int api_get_voltage(fwk_id_t device_id, uintmax_t *voltage)
+static int mod_psu_get_enabled(fwk_id_t element_id, bool *enabled)
 {
-    int status;
-    const struct mod_psu_device_ctx *ctx;
+    int status = FWK_E_STATE;
 
-    /* This API call cannot target another module */
-    if (fwk_id_get_module_idx(device_id) != FWK_MODULE_IDX_PSU)
-        return FWK_E_PARAM;
+    const struct mod_psu_element_cfg *cfg;
+    struct mod_psu_element_ctx *ctx;
 
-    /* Ensure the identifier refers to a valid element */
-    if (!fwk_module_is_valid_element_id(device_id))
-        return FWK_E_PARAM;
-
-    /* Validate the API call */
-    status = fwk_module_check_call(device_id);
+    status = mod_psu_get_cfg_ctx(element_id, &cfg, &ctx);
     if (status != FWK_SUCCESS)
-        return FWK_E_STATE;
+        goto exit;
 
-    ctx = mod_psu_get_valid_device_ctx(device_id);
-    if (ctx == NULL)
-        return FWK_E_PARAM;
+    status = ctx->driver->get_enabled(cfg->driver_id, enabled);
 
-    /* Get the voltage from the driver */
-    status = ctx->apis.driver->get_voltage(ctx->config->driver_id, voltage);
-    if (status != FWK_SUCCESS)
-        return FWK_E_HANDLER;
-
-    return FWK_SUCCESS;
+exit:
+    return status;
 }
 
-static int api_set_voltage(fwk_id_t device_id, uintmax_t voltage)
+static int mod_psu_set_enabled(fwk_id_t element_id, bool enabled)
 {
-    int status;
-    const struct mod_psu_device_ctx *ctx;
+    int status = FWK_E_STATE;
 
-    /* This API call cannot target another module */
-    if (fwk_id_get_module_idx(device_id) != FWK_MODULE_IDX_PSU)
-        return FWK_E_PARAM;
+    const struct mod_psu_element_cfg *cfg;
+    struct mod_psu_element_ctx *ctx;
 
-    /* Ensure the identifier refers to a valid element */
-    if (!fwk_module_is_valid_element_id(device_id))
-        return FWK_E_PARAM;
-
-    /* Validate the API call */
-    status = fwk_module_check_call(device_id);
+    status = mod_psu_get_cfg_ctx(element_id, &cfg, &ctx);
     if (status != FWK_SUCCESS)
-        return FWK_E_STATE;
+        goto exit;
 
-    ctx = mod_psu_get_valid_device_ctx(device_id);
-    if (ctx == NULL)
-        return FWK_E_PARAM;
+    status = ctx->driver->set_enabled(cfg->driver_id, enabled);
 
-    /* Set the voltage state through the driver */
-    status = ctx->apis.driver->set_voltage(ctx->config->driver_id, voltage);
-    if (status != FWK_SUCCESS)
-        return FWK_E_HANDLER;
-
-    return FWK_SUCCESS;
+exit:
+    return status;
 }
 
-/* Module API implementation */
+static int mod_psu_get_voltage(fwk_id_t element_id, uintmax_t *voltage)
+{
+    int status = FWK_E_STATE;
+
+    const struct mod_psu_element_cfg *cfg;
+    struct mod_psu_element_ctx *ctx;
+
+    status = mod_psu_get_cfg_ctx(element_id, &cfg, &ctx);
+    if (status != FWK_SUCCESS)
+        goto exit;
+
+    status = ctx->driver->get_voltage(cfg->driver_id, voltage);
+
+exit:
+    return status;
+}
+
+static int mod_psu_set_voltage(fwk_id_t element_id, uintmax_t voltage)
+{
+    int status = FWK_E_STATE;
+
+    const struct mod_psu_element_cfg *cfg;
+    struct mod_psu_element_ctx *ctx;
+
+    status = mod_psu_get_cfg_ctx(element_id, &cfg, &ctx);
+    if (status != FWK_SUCCESS)
+        goto exit;
+
+    status = ctx->driver->set_voltage(cfg->driver_id, voltage);
+
+exit:
+    return status;
+}
+
 static const struct mod_psu_device_api mod_psu_device_api = {
-    .get_enabled = api_get_enabled,
-    .set_enabled = api_set_enabled,
-    .get_voltage = api_get_voltage,
-    .set_voltage = api_set_voltage,
+    .get_enabled = mod_psu_get_enabled,
+    .set_enabled = mod_psu_set_enabled,
+    .get_voltage = mod_psu_get_voltage,
+    .set_voltage = mod_psu_set_voltage,
 };
 
-static int psu_init(
+static int mod_psu_init(
     fwk_id_t module_id,
     unsigned int element_count,
     const void *data)
 {
-    device_ctx = fwk_mm_calloc(
-        element_count,
-        sizeof((*device_ctx)[0]));
-    if (device_ctx == NULL)
+    fwk_expect(data == NULL);
+
+    mod_psu_ctx.elements =
+        fwk_mm_calloc(element_count, sizeof(mod_psu_ctx.elements[0]));
+    if (mod_psu_ctx.elements == NULL)
         return FWK_E_NOMEM;
 
     return FWK_SUCCESS;
 }
 
-static int psu_element_init(
-    fwk_id_t device_id,
+static int mod_psu_element_init(
+    fwk_id_t element_id,
     unsigned int sub_element_count,
     const void *data)
 {
-    assert(sub_element_count == 0);
-
-    mod_psu_get_device_ctx(device_id)->config = data;
+    fwk_expect(sub_element_count == 0);
 
     return FWK_SUCCESS;
 }
 
-static int psu_bind_element(fwk_id_t device_id, unsigned int round)
+static int mod_psu_bind_element(fwk_id_t element_id, unsigned int round)
 {
-    int status;
-    const struct mod_psu_device_ctx *ctx;
+    int status = FWK_SUCCESS;
 
-    /* Only handle the first round */
+    const struct mod_psu_element_ctx *ctx;
+    const struct mod_psu_element_cfg *cfg;
+
     if (round > 0)
-        return FWK_SUCCESS;
+        goto exit;
 
-    ctx = mod_psu_get_device_ctx(device_id);
+    ctx = mod_psu_get_element_ctx(element_id);
+    cfg = fwk_module_get_data(element_id);
 
-    /* Bind to the driver */
-    status = fwk_module_bind(
-        ctx->config->driver_id,
-        ctx->config->driver_api_id,
-        &ctx->apis.driver);
-    if (status != FWK_SUCCESS) {
-        assert(false);
+    fwk_assert(ctx != NULL);
+    fwk_assert(cfg != NULL);
 
-        return FWK_E_PANIC;
+    status = fwk_module_bind(cfg->driver_id, cfg->driver_api_id, &ctx->driver);
+    if (status != FWK_SUCCESS)
+        goto exit;
+
+    if ((ctx->driver->set_enabled == NULL) ||
+        (ctx->driver->get_enabled == NULL) ||
+        (ctx->driver->set_voltage == NULL) ||
+        (ctx->driver->get_voltage == NULL)) {
+        status = FWK_E_PANIC;
     }
 
-    assert(ctx->apis.driver->set_enabled != NULL);
-    assert(ctx->apis.driver->get_enabled != NULL);
-    assert(ctx->apis.driver->set_voltage != NULL);
-    assert(ctx->apis.driver->get_voltage != NULL);
-
-    return FWK_SUCCESS;
+exit:
+    return status;
 }
 
-static int psu_bind(fwk_id_t id, unsigned int round)
+static int mod_psu_bind(fwk_id_t id, unsigned int round)
 {
-    /* We only need to handle element binding */
     if (fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT))
-        return psu_bind_element(id, round);
+        return mod_psu_bind_element(id, round);
 
     return FWK_SUCCESS;
 }
 
-static int psu_process_bind_request(
+static int mod_psu_process_bind_request(
     fwk_id_t source_id,
     fwk_id_t target_id,
     fwk_id_t api_id,
     const void **api)
 {
-    /* Only accept binds to the elements */
     if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT))
         return FWK_E_PARAM;
 
-    /* Only expose the device API */
-    if (!fwk_id_is_equal(api_id, mod_psu_api_id_psu_device))
+    if (!fwk_id_is_equal(api_id, mod_psu_api_id_device))
         return FWK_E_PARAM;
 
     *api = &mod_psu_device_api;
@@ -258,11 +219,13 @@ static int psu_process_bind_request(
 
 /* Module description */
 const struct fwk_module module_psu = {
-    .name = "PSU",
+    .name = "psu",
     .type = FWK_MODULE_TYPE_HAL,
-    .init = psu_init,
-    .element_init = psu_element_init,
-    .bind = psu_bind,
-    .process_bind_request = psu_process_bind_request,
+
+    .init = mod_psu_init,
+    .element_init = mod_psu_element_init,
+    .bind = mod_psu_bind,
+
     .api_count = MOD_PSU_API_IDX_COUNT,
+    .process_bind_request = mod_psu_process_bind_request,
 };
