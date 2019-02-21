@@ -19,11 +19,6 @@
  */
 
 /*!
- * \defgroup GroupMockPsuConfig Configuration
- * \{
- */
-
-/*!
  * \brief Element configuration.
  */
 struct mod_mock_psu_device_config {
@@ -33,15 +28,6 @@ struct mod_mock_psu_device_config {
     /*! Default voltage, in millivolts (mV), of the device's supply */
     uint64_t default_voltage;
 };
-
-/*!
- * \}
- */
-
-/*!
- * \defgroup GroupMockPsuIds Identifiers
- * \{
- */
 
 /*!
  * \brief API indices.
@@ -57,10 +43,6 @@ enum mod_mock_psu_api_idx {
 /*! Driver API identifier */
 static const fwk_id_t mod_mock_psu_api_id_psu_driver =
     FWK_ID_API_INIT(FWK_MODULE_IDX_MOCK_PSU, MOD_MOCK_PSU_API_IDX_PSU_DRIVER);
-
-/*!
- * \}
- */
 
 /*!
  * \}
