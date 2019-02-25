@@ -30,6 +30,8 @@ BS_FIRMWARE_MODULES := \
     juno_ppu \
     juno_system \
     system_power \
+    juno_debug \
+    debug \
     power_domain \
     mhu \
     smt \
@@ -68,6 +70,8 @@ BS_FIRMWARE_SOURCES := \
     config_juno_ram.c \
     config_juno_ppu.c \
     config_system_power.c \
+    config_juno_debug.c \
+    config_debug.c \
     config_power_domain.c \
     config_mhu.c \
     config_smt.c \
