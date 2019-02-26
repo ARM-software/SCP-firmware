@@ -9,6 +9,7 @@
 #define MOD_N1SDP_SENSOR_H
 
 #include <stdint.h>
+#include <fwk_id.h>
 #include <mod_sensor.h>
 
 /*!
@@ -84,6 +85,23 @@ struct mod_n1sdp_temp_sensor_config {
 struct mod_n1sdp_volt_sensor_config {
     /*! Auxiliary sensor information */
     struct mod_sensor_info *info;
+};
+
+/*!
+ * \brief N1SDP sensor - Module configuration.
+ */
+struct mod_n1sdp_sensor_config {
+    /*! Identifier of timer alarm element */
+    fwk_id_t alarm_id;
+
+    /*! Identifier of timer alarm API */
+    fwk_id_t alarm_api;
+
+    /*! Temperature sensor count */
+    uint8_t t_sensor_count;
+
+    /*! Voltage sensor count */
+    uint8_t v_sensor_count;
 };
 
 /*!
