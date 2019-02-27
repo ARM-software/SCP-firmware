@@ -195,39 +195,39 @@ def main():
     result = subprocess.call(cmd, shell=True)
     results.append(('Product n1sdp release build (ARM)', result))
 
-    banner('Test building clark product')
+    banner('Test building rdn1e1 product')
 
     cmd = \
         'CC=arm-none-eabi-gcc ' \
-        'PRODUCT=clark ' \
+        'PRODUCT=rdn1e1 ' \
         'MODE=release ' \
         'make clean all'
     result = subprocess.call(cmd, shell=True)
-    results.append(('Product clark release build (GCC)', result))
+    results.append(('Product rdn1e1 release build (GCC)', result))
 
     cmd = \
         'CC=armclang ' \
-        'PRODUCT=clark ' \
+        'PRODUCT=rdn1e1 ' \
         'MODE=release ' \
         'make clean all'
     result = subprocess.call(cmd, shell=True)
-    results.append(('Product clark release build (ARM)', result))
+    results.append(('Product rdn1e1 release build (ARM)', result))
 
     cmd = \
         'CC=arm-none-eabi-gcc ' \
-        'PRODUCT=clark ' \
+        'PRODUCT=rdn1e1 ' \
         'MODE=debug ' \
         'make clean all'
     result = subprocess.call(cmd, shell=True)
-    results.append(('Product clark debug build (GCC)', result))
+    results.append(('Product rdn1e1 debug build (GCC)', result))
 
     cmd = \
         'CC=armclang ' \
-        'PRODUCT=clark ' \
+        'PRODUCT=rdn1e1 ' \
         'MODE=debug ' \
         'make clean all'
     result = subprocess.call(cmd, shell=True)
-    results.append(('Product clark debug build (ARM)', result))
+    results.append(('Product rdn1e1 debug build (ARM)', result))
 
     banner('Tests summary')
 
