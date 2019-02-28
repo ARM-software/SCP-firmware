@@ -28,20 +28,6 @@
  */
 
 /*!
- * \brief Module API indicies.
- */
-enum mod_sid_api_idx {
-    MOD_SID_API_IDX_INFO, /*!< Index of the info api. */
-    MOD_SID_API_COUNT,    /*!< Number of apis. */
-};
-
-/*!
- * \brief Info API id.
- */
-static const fwk_id_t mod_sid_api_id_info =
-    FWK_ID_API_INIT(FWK_MODULE_IDX_SID, MOD_SID_API_IDX_INFO);
-
-/*!
  * \brief System information
  */
 struct mod_sid_info {
@@ -103,14 +89,16 @@ struct mod_sid_subsystem_config {
 /*!
  * \brief Module interface.
  */
-struct mod_sid_api_info {
-    /*!
-     * \brief Get a pointer to the structure holding the system information.
-     *
-     * \return Pointer to system information structure.
-     */
-    const struct mod_sid_info * (*get_system_info)(void);
-};
+
+/*!
+ * \brief Get a pointer to the structure holding the system information.
+ *
+ * \param[out] system_info Pointer to the system information data.
+ *
+ * \retval FWK_SUCCESS The pointer was returned successfully.
+ * \retval FWK_E_INIT The system information is not initialized.
+ */
+int mod_sid_get_system_info(const struct mod_sid_info **system_info);
 
 /*!
  * @}
