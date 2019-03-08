@@ -200,7 +200,6 @@ static void cmn600_configure(void)
     unsigned int irnsam_entry;
     struct cmn600_mxp_reg *xp;
     void *node;
-    enum node_type node_type;
     const struct mod_cmn600_config *config = ctx->config;
 
     assert(get_node_type(ctx->root) == NODE_TYPE_CFG);
@@ -218,27 +217,28 @@ static void cmn600_configure(void)
         node_count = get_node_child_count(xp);
         for (node_idx = 0; node_idx < node_count; node_idx++) {
             node = get_child_node(config->base, xp, node_idx);
-            node_type = get_node_type(node);
 
-            if (node_type == NODE_TYPE_RN_SAM) {
-                if (is_child_external(xp, node_idx)) {
-                    unsigned int node_id = get_child_node_id(xp, node_idx);
+            if (is_child_external(xp, node_idx)) {
+                unsigned int node_id = get_child_node_id(xp, node_idx);
 
-                    fwk_assert(xrnsam_entry < ctx->external_rnsam_count);
+                fwk_assert(xrnsam_entry < ctx->external_rnsam_count);
 
-                    ctx->external_rnsam_table[xrnsam_entry].node_id = node_id;
-                    ctx->external_rnsam_table[xrnsam_entry].node = node;
+                ctx->external_rnsam_table[xrnsam_entry].node_id = node_id;
+                ctx->external_rnsam_table[xrnsam_entry].node = node;
 
-                    xrnsam_entry++;
-                } else {
+                xrnsam_entry++;
+            } else {
+                enum node_type node_type = get_node_type(node);
+
+                if (node_type == NODE_TYPE_RN_SAM) {
                     fwk_assert(irnsam_entry < ctx->internal_rnsam_count);
 
                     ctx->internal_rnsam_table[irnsam_entry] = node;
 
                     irnsam_entry++;
-                }
-            } else if (node_type == NODE_TYPE_HN_F)
-                process_node_hnf(node);
+                } else if (node_type == NODE_TYPE_HN_F)
+                    process_node_hnf(node);
+            }
         }
     }
 }
