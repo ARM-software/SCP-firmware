@@ -34,7 +34,8 @@ BS_FIRMWARE_MODULES := \
     scmi_system_power \
     sds \
     i2c \
-    dw_apb_i2c
+    dw_apb_i2c \
+    juno_xrp7724
 
 BS_FIRMWARE_SOURCES := \
     rtx_config.c \
@@ -54,6 +55,7 @@ BS_FIRMWARE_SOURCES := \
     config_smt.c \
     config_scmi.c \
     config_scmi_system_power.c \
-    config_i2c.c
+    config_i2c.c \
+    config_juno_xrp7724.c
 
 include $(BS_DIR)/firmware.mk
