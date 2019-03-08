@@ -14,6 +14,7 @@ BS_FIRMWARE_HAS_NOTIFICATION := yes
 BS_FIRMWARE_MODULES :=
 
 BS_FIRMWARE_SOURCES := \
-    rtx_config.c
+    rtx_config.c \
+    juno_utils.c
 
 include $(BS_DIR)/firmware.mk
