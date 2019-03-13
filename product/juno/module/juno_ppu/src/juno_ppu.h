@@ -19,7 +19,9 @@ struct ppu_reg {
     FWK_RW uint32_t POWER_CONFIG;
 };
 
-#define PPU_REG_PPR_PSR UINT32_C(0x0000001F)
+#define PPU_REG_PPR_PSR         UINT32_C(0x0000001F)
+#define PPU_PPR_POLICY_OFF      UINT32_C(0x00000001)
+#define PPU_PPR_POLICY_ON       UINT32_C(0x00000010)
 
 enum ppu_mode {
     PPU_MODE_OFF = 0x01,
@@ -42,15 +44,22 @@ struct ppu_ctx {
     /* Timer API */
     const struct mod_timer_api *timer_api;
 
-    /* Power domain API */
+    /* Power domain driver input API */
     const struct mod_pd_driver_input_api *pd_api;
-
-    /* PSU API */
-    const struct mod_psu_device_api *psu_api;
 };
 
 struct module_ctx {
+    /* Table of element context structures */
     struct ppu_ctx *ppu_ctx_table;
+
+    /* Log module API */
+    const struct mod_log_api *log_api;
+
+    /* CSS power state */
+    unsigned int css_state;
+
+    /* DBGSYS power state */
+    unsigned int dbgsys_state;
 };
 
 #endif /* JUNO_PPU_H */
