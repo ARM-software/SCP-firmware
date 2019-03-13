@@ -69,7 +69,7 @@ struct mod_juno_ppu_element_config {
     uintptr_t reg_base;
 
     /*!
-     * \brief Identifier of the timer alarm.
+     * \brief Identifier of the timer.
      *
      * \details Used for time-out when operating the PPU.
      */
@@ -79,6 +79,21 @@ struct mod_juno_ppu_element_config {
      * \brief Power domain type.
      */
     enum mod_pd_type pd_type;
+
+    /*!
+     * \brief Wakeup IRQ number.
+     */
+    unsigned int wakeup_irq;
+
+    /*!
+     * \brief Wakeup FIQ number.
+     */
+    unsigned int wakeup_fiq;
+
+    /*!
+     * \brief Warm reset request IRQ number.
+     */
+    unsigned int warm_reset_irq;
 };
 
 /*!
