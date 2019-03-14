@@ -18,12 +18,12 @@
 #include <mod_timer.h>
 
 /*!
- * \addtogroup GroupModules Modules
+ * \addtogroup GroupSGM775Module SGM775 Product Modules
  * @{
  */
 
 /*!
- * \addtogroup GroupSGM775_DMC DMC-500 Driver
+ * \addtogroup GroupSGM775_DMC SGM775 DMC-500 Driver
  * @{
  */
 

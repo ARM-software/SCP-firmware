@@ -15,12 +15,12 @@
 #include <fwk_module.h>
 
 /*!
- * \addtogroup GroupModules Modules
+ * \addtogroup GroupSGM775Module SGM775 Product Modules
  * @{
  */
 
 /*!
- * \addtogroup GROUPSGM775_DDR SGM775 DDR PHY500 Driver
+ * \addtogroup GroupSGM775_DDR SGM775 DDR PHY500 Driver
  * @{
  */
 

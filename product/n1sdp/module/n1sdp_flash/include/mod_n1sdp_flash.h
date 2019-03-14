@@ -17,7 +17,7 @@
 #include <fwk_id.h>
 
 /*!
- * \addtogroup GroupModules Modules
+ * \addtogroup GroupN1SDPModule N1SDP Product Modules
  * @{
  */
 
