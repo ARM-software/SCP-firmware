@@ -11,10 +11,21 @@
 BS_FIRMWARE_CPU := cortex-m3
 BS_FIRMWARE_HAS_MULTITHREADING := yes
 BS_FIRMWARE_HAS_NOTIFICATION := yes
-BS_FIRMWARE_MODULES :=
+
+BS_FIRMWARE_MODULE_HEADERS_ONLY := \
+    power_domain
+
+BS_FIRMWARE_MODULES := \
+    log \
+    pl011 \
+    clock \
+    sds
 
 BS_FIRMWARE_SOURCES := \
     rtx_config.c \
-    juno_utils.c
+    juno_utils.c \
+    config_sds.c \
+    config_log.c \
+    config_clock.c
 
 include $(BS_DIR)/firmware.mk
