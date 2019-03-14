@@ -17,7 +17,7 @@
  */
 
 /*!
- * \defgroup GroupN1SDPPLL PLL Driver
+ * \defgroup GroupN1SDPPLL N1SDP PLL Driver
  *
  * \details A driver for PLL hardware in N1SDP product.
  *
