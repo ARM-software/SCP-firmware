@@ -179,9 +179,10 @@ static int juno_soc_clock_init(fwk_id_t module_id, unsigned int clock_count,
     set_div(&SCC->HDLCDCLK, CLOCK_RATE_SYSCLK / HDLCDCLK_CLOCK);
     set_source(&SCC->HDLCDCLK, CLKSEL_SYSCLK);
 
-    set_source(&SCC->TMIF2XCLK, CLKSEL_SYSCLK);
-
-    set_source(&SCC->TSIF2XCLK, CLKSEL_SYSCLK);
+    if ((SCC->GPR0 & SCC_GPR0_SKIP_TLX_CLK_SETTING) == 0) {
+        set_source(&SCC->TMIF2XCLK, CLKSEL_SYSCLK);
+        set_source(&SCC->TSIF2XCLK, CLKSEL_SYSCLK);
+    }
 
     set_source(&SCC->USBHCLK, CLKSEL_SYSCLK);
 
