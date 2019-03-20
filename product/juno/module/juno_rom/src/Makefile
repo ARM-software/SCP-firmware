@@ -6,6 +6,6 @@
 #
 
 BS_LIB_NAME := "Juno ROM"
-BS_LIB_SOURCES = mod_juno_rom.c
+BS_LIB_SOURCES = juno_wdog_rom.c mod_juno_rom.c
 
 include $(BS_DIR)/lib.mk

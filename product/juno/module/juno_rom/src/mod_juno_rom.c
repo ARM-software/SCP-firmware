@@ -23,6 +23,7 @@
 #include <juno_ppu_idx.h>
 #include <juno_scc.h>
 #include <juno_utils.h>
+#include <juno_wdog_rom.h>
 #include <scp_config.h>
 
 /* Values for cluster configuration */
@@ -228,12 +229,20 @@ static int deferred_setup(void)
                                   CLUSTERCLK_CONTROL_CLKSEL_PRIVCLK, true);
     }
 
+    #ifndef BUILD_MODE_DEBUG
+    juno_wdog_rom_reload();
+    #endif
+
     status = ctx.bootloader_api->load_image();
     if (status != FWK_SUCCESS) {
         ctx.log_api->log(MOD_LOG_GROUP_ERROR,
                          "[ROM] ERROR: Failed to load RAM firmware image\n");
         return FWK_E_DATA;
     }
+
+    #ifndef BUILD_MODE_DEBUG
+    juno_wdog_rom_reload();
+    #endif
 
     jump_to_ramfw();
 
@@ -295,6 +304,10 @@ static int juno_rom_start(fwk_id_t id)
         .target_id = fwk_module_id_juno_rom,
         .id = mod_juno_rom_event_id_run,
     };
+
+    #ifndef BUILD_MODE_DEBUG
+    juno_wdog_rom_enable();
+    #endif
 
     return fwk_thread_put_event(&event);
 }
