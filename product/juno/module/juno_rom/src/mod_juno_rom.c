@@ -19,6 +19,7 @@
 #include <mod_juno_rom.h>
 #include <mod_log.h>
 #include <mod_power_domain.h>
+#include <juno_debug_rom.h>
 #include <juno_nic400.h>
 #include <juno_ppu_idx.h>
 #include <juno_scc.h>
@@ -299,6 +300,8 @@ static int juno_rom_bind(fwk_id_t id, unsigned int round)
 
 static int juno_rom_start(fwk_id_t id)
 {
+    int status;
+
     struct fwk_event event = {
         .source_id = fwk_module_id_juno_rom,
         .target_id = fwk_module_id_juno_rom,
@@ -306,8 +309,13 @@ static int juno_rom_start(fwk_id_t id)
     };
 
     #ifndef BUILD_MODE_DEBUG
+    juno_wdog_rom_halt_on_debug_config();
     juno_wdog_rom_enable();
     #endif
+
+    status = juno_debug_rom_init(ctx.ppu_api);
+    if (status != FWK_SUCCESS)
+        return status;
 
     return fwk_thread_put_event(&event);
 }

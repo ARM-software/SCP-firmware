@@ -10,7 +10,9 @@
 
 #include <stdint.h>
 
+void juno_wdog_rom_halt_on_debug_config(void);
 void juno_wdog_rom_enable(void);
 void juno_wdog_rom_reload(void);
+void juno_wdog_rom_halt_on_debug_enable(bool enable);
 
 #endif /* JUNO_WDOG_ROM_H */
