@@ -16,6 +16,7 @@
 #include <juno_pcie.h>
 #include <juno_scc.h>
 #include <juno_utils.h>
+#include <juno_wdog_ram.h>
 #include <nic400_gpv.h>
 #include <pl35x.h>
 #include <xpressrich3.h>
@@ -302,6 +303,15 @@ static int juno_ram_start(fwk_id_t id)
 {
     int status;
     enum juno_idx_platform platform_id = JUNO_IDX_PLATFORM_COUNT;
+
+    /*
+     * The watchdog should not be enabled when the RAM firmware is executing.
+     * If the ROM firmware ran in release mode then the watchdog will have been
+     * left running and it must be disabled.
+     */
+    #ifndef BUILD_MODE_DEBUG
+    juno_wdog_ram_disable();
+    #endif
 
     status = juno_id_get_platform(&platform_id);
     if (!fwk_expect(status == FWK_SUCCESS))
