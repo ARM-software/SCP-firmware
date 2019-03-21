@@ -6,6 +6,6 @@
 #
 
 BS_LIB_NAME := "Juno RAM"
-BS_LIB_SOURCES = mod_juno_ram.c
+BS_LIB_SOURCES = juno_wdog_ram.c mod_juno_ram.c
 
 include $(BS_DIR)/lib.mk
