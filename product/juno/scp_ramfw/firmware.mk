@@ -48,7 +48,8 @@ BS_FIRMWARE_MODULES := \
     reg_sensor \
     psu \
     mock_psu \
-    juno_pvt
+    juno_pvt \
+    juno_thermal
 
 BS_FIRMWARE_SOURCES := \
     rtx_config.c \
@@ -81,6 +82,7 @@ BS_FIRMWARE_SOURCES := \
     config_reg_sensor.c \
     config_psu.c \
     config_mock_psu.c \
-    config_juno_pvt.c
+    config_juno_pvt.c \
+    config_juno_thermal.c
 
 include $(BS_DIR)/firmware.mk

@@ -34,7 +34,13 @@ enum juno_ppu_alarm_idx {
     JUNO_PPU_ALARM_IDX_COUNT,
 };
 
+/* Alarm indices for Thermal Protection */
+enum juno_thermal_alarm_idx {
+    JUNO_THERMAL_ALARM_IDX = JUNO_PPU_ALARM_IDX_COUNT,
+    JUNO_THERMAL_ALARM_IDX_COUNT,
+};
+
 /* Total count of alarms */
-#define JUNO_ALARM_IDX_COUNT    JUNO_PPU_ALARM_IDX_COUNT
+#define JUNO_ALARM_IDX_COUNT    JUNO_THERMAL_ALARM_IDX_COUNT
 
 #endif /* JUNO_ALARM_IDX_H */
