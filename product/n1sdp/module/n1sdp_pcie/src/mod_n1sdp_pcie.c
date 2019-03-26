@@ -276,7 +276,7 @@ static int n1sdp_pcie_setup(struct n1sdp_pcie_dev_ctx *dev_ctx)
         "[PCIe] Enable inbound region in BAR 2...");
     status = axi_inbound_region_setup(dev_ctx->rc_axi_config_apb,
                  AXI_IB_REGION_BASE,
-                 __builtin_ctz(AXI_IB_REGION_SIZE), 2);
+                 AXI_IB_REGION_SIZE_MSB, 2);
     if (status != FWK_SUCCESS) {
         pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Error!\n");
         return status;
