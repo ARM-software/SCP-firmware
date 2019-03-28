@@ -451,6 +451,11 @@ static int init_sds(void)
     int element_idx;
     int element_count;
     const struct mod_sds_structure_desc *struct_desc;
+    unsigned int notification_count;
+    struct fwk_event notification_event = {
+        .id = mod_sds_notification_id_initialized,
+        .source_id = fwk_module_id_sds,
+    };
 
     /* Either reinitialize the memory region, or create it for the first time */
     status = reinitialize_memory_region();
@@ -470,7 +475,7 @@ static int init_sds(void)
             return status;
     }
 
-    return FWK_SUCCESS;
+    return fwk_notification_notify(&notification_event, &notification_count);
 }
 
 /*
@@ -630,6 +635,7 @@ const struct fwk_module module_sds = {
     .type = FWK_MODULE_TYPE_SERVICE,
     .api_count = 1,
     .event_count = 0,
+    .notification_count = MOD_SDS_NOTIFICATION_IDX_COUNT,
     .init = sds_init,
     .element_init = sds_element_init,
     .process_bind_request = sds_process_bind_request,

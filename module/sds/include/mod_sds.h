@@ -12,6 +12,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <fwk_element.h>
+#include <fwk_module_idx.h>
 #include <fwk_id.h>
 
 /*!
@@ -94,6 +95,26 @@ struct mod_sds_config {
     fwk_id_t clock_id;
 #endif
 };
+
+/*!
+ * \brief SDS notification indices.
+ */
+enum mod_sds_notification_idx {
+    /*! The SDS region has been initialized */
+    MOD_SDS_NOTIFICATION_IDX_INITIALIZED,
+
+    /*! Number of defined notifications */
+    MOD_SDS_NOTIFICATION_IDX_COUNT
+};
+
+/*!
+ * \brief Identifier for the ::MOD_SDS_NOTIFICATION_IDX_INITIALIZED
+ *     notification.
+ */
+static const fwk_id_t mod_sds_notification_id_initialized =
+    FWK_ID_NOTIFICATION_INIT(
+        FWK_MODULE_IDX_SDS,
+        MOD_SDS_NOTIFICATION_IDX_INITIALIZED);
 
 /*!
  * \brief Module interface.
