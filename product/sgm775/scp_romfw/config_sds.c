@@ -128,6 +128,19 @@ static const struct fwk_element sds_element_table[] = {
     { 0 }, /* Termination description. */
 };
 
+static_assert(SDS_SECURE_SIZE >
+                    SGM775_SDS_CPU_INFO_SIZE +
+                    SGM775_SDS_ROM_VERSION_SIZE +
+                    SGM775_SDS_PLATFORM_ID_SIZE +
+                    SGM775_SDS_RESET_SYNDROME_SIZE +
+                    SGM775_SDS_BOOTLOADER_SIZE +
+#ifdef BUILD_MODE_DEBUG
+                    SGM775_SDS_CPU_BOOTCTR_SIZE +
+                    SGM775_SDS_CPU_FLAGS_SIZE +
+#endif
+                    SGM775_SDS_FEATURE_AVAILABILITY_SIZE,
+            "SDS structures too large for SDS S-RAM.\n");
+
 static const struct fwk_element *sds_get_element_table(fwk_id_t module_id)
 {
     struct ssc_reg *ssc_regs = ((struct ssc_reg *)(SSC_BASE));
