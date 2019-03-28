@@ -67,6 +67,11 @@ static const struct fwk_element sds_element_table[] = {
     { 0 }, /* Termination description. */
 };
 
+static_assert(SDS_SECURE_SIZE >
+                    SGM775_SDS_RAM_VERSION_SIZE +
+                    sizeof(feature_flags),
+            "SDS structures too large for SDS S-RAM.\n");
+
 static const struct fwk_element *sds_get_element_table(fwk_id_t module_id)
 {
     static_assert(BUILD_VERSION_MAJOR < UINT8_MAX, "Invalid version size");
