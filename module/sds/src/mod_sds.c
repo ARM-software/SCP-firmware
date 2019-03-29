@@ -37,6 +37,12 @@
 #define MIN_STRUCT_ALIGNMENT 8
 /* Minimum structure size in bytes */
 #define MIN_STRUCT_SIZE 4
+/* Minimum structure size (including padding) in bytes */
+#define MIN_ALIGNED_STRUCT_SIZE \
+    FWK_ALIGN_NEXT(MIN_STRUCT_SIZE, MIN_STRUCT_ALIGNMENT)
+/* Minimum region size in bytes */
+#define MIN_REGION_SIZE (sizeof(struct region_descriptor) + \
+                         MIN_ALIGNED_STRUCT_SIZE)
 
 /* Header containing Shared Data Structure metadata */
 struct structure_header {
@@ -129,7 +135,7 @@ static bool header_is_valid(const volatile struct region_descriptor *region,
     if ((header->id >> MOD_SDS_ID_VERSION_MAJOR_POS) == 0)
         return false; /* 0 is not a valid major version */
 
-    if (header->size < FWK_ALIGN_NEXT(MIN_STRUCT_SIZE, MIN_STRUCT_ALIGNMENT))
+    if (header->size < MIN_ALIGNED_STRUCT_SIZE)
         return false; /* Padded structure size is less than the minimum */
 
     region_tail = (const volatile char *)region + region->region_size;
@@ -365,12 +371,9 @@ static int reinitialize_memory_region(
 static int create_memory_region(const struct mod_sds_region_desc* region_config,
                                 unsigned int region_idx)
 {
-    unsigned int min_storage;
     volatile struct region_descriptor *region_desc;
 
-    min_storage = sizeof(struct region_descriptor) +
-        FWK_ALIGN_NEXT(MIN_STRUCT_SIZE, MIN_STRUCT_ALIGNMENT);
-    if (region_config->size < min_storage)
+    if (region_config->size < MIN_REGION_SIZE)
         return FWK_E_NOMEM;
 
     region_desc = (volatile struct region_descriptor *)region_config->base;
