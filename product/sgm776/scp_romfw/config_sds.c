@@ -119,7 +119,7 @@ static const struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc) {
             .id = SGM776_SDS_CPU_BOOTCTR,
             .size = SGM776_SDS_CPU_BOOTCTR_SIZE,
-            .region_id = SGM776_SDS_REGION_SECURE,
+            .region_id = SGM776_SDS_REGION_NONSECURE,
             .finalize = true,
         }),
     },
@@ -128,7 +128,7 @@ static const struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc) {
             .id = SGM776_SDS_CPU_FLAGS,
             .size = SGM776_SDS_CPU_FLAGS_SIZE,
-            .region_id = SGM776_SDS_REGION_SECURE,
+            .region_id = SGM776_SDS_REGION_NONSECURE,
             .finalize = true,
         }),
     },
@@ -142,16 +142,15 @@ static_assert(SDS_SECURE_SIZE >
                     SGM776_SDS_PLATFORM_ID_SIZE +
                     SGM776_SDS_RESET_SYNDROME_SIZE +
                     SGM776_SDS_BOOTLOADER_SIZE +
-#ifdef BUILD_MODE_DEBUG
                     SGM776_SDS_CPU_BOOTCTR_SIZE +
                     SGM776_SDS_CPU_FLAGS_SIZE +
-#endif
                     SGM776_SDS_FEATURE_AVAILABILITY_SIZE,
             "SDS structures too large for SDS S-RAM.\n");
 
 #ifdef BUILD_MODE_DEBUG
     static_assert(SDS_NONSECURE_SIZE >
-                        -1,
+                        SGM776_SDS_CPU_BOOTCTR_SIZE +
+                        SGM776_SDS_CPU_FLAGS_SIZE,
                 "SDS structures too large for SDS NS-RAM.\n");
 #endif
 

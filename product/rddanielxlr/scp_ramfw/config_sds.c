@@ -95,7 +95,7 @@ static struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc) {
             .id = RDDANIELXLR_SDS_CPU_BOOTCTR,
             .size = RDDANIELXLR_SDS_CPU_BOOTCTR_SIZE,
-            .region_id = RDDANIELXLR_SDS_REGION_SECURE,
+            .region_id = RDDANIELXLR_SDS_REGION_NONSECURE,
             .finalize = true,
         }),
     },
@@ -104,7 +104,7 @@ static struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc) {
             .id = RDDANIELXLR_SDS_CPU_FLAGS,
             .size = RDDANIELXLR_SDS_CPU_FLAGS_SIZE,
-            .region_id = RDDANIELXLR_SDS_REGION_SECURE,
+            .region_id = RDDANIELXLR_SDS_REGION_NONSECURE,
             .finalize = true,
         }),
     },
@@ -116,15 +116,12 @@ static_assert(SCP_SDS_SECURE_SIZE >
                     RDDANIELXLR_SDS_CPU_INFO_SIZE +
                     RDDANIELXLR_SDS_FIRMWARE_VERSION_SIZE +
                     RDDANIELXLR_SDS_RESET_SYNDROME_SIZE +
-#ifdef BUILD_MODE_DEBUG
-                    RDDANIELXLR_SDS_CPU_BOOTCTR_SIZE +
-                    RDDANIELXLR_SDS_CPU_FLAGS_SIZE +
-#endif
                     RDDANIELXLR_SDS_FEATURE_AVAILABILITY_SIZE,
               "SDS structures too large for SDS S-RAM.\n");
 #ifdef BUILD_MODE_DEBUG
     static_assert(SCP_SDS_NONSECURE_SIZE >
-                        -1,
+                        RDDANIELXLR_SDS_CPU_BOOTCTR_SIZE +
+                        RDDANIELXLR_SDS_CPU_FLAGS_SIZE,
                 "SDS structures too large for SDS NS-RAM.\n");
 #endif
 
