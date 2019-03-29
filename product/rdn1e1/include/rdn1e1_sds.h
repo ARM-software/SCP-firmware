@@ -28,6 +28,9 @@ enum rdn1e1_sds_struct_id {
 
 enum rdn1e1_sds_region_idx {
     RDN1E1_SDS_REGION_SECURE,
+#ifdef BUILD_MODE_DEBUG
+    RDN1E1_SDS_REGION_NONSECURE,
+#endif
     RDN1E1_SDS_REGION_COUNT,
 };
 

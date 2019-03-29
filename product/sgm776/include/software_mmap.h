@@ -81,11 +81,21 @@
  * The 4KiB AP/SCP Shared memory at the base of Non-trusted SRAM is used for the
  * SCMI non-secure payload areas.
  *
+ * Shared Data Storage (SDS) Memory Region: Used for structured storage of data
+ * that is shared between SCP Firmware and Application Processor firmware. It
+ * exists along the SDS region in secure RAM so that AP code unable to access
+ * the secure RAM is still able to use SDS, if required.
+ *
  * Two SCMI non-Secure Payload Areas: Storage for SCMI message contents in both
  * the Agent->Platform and Platform->Agent directions.
  *
  *       +-----------------------+ 4096
- * 3584B |        Unused         |
+ * 2560B |        Unused         |
+ *       +-----------------------+
+ *       |                       |
+ * 1024B |  Non-Sec. SDS memory  |
+ *       |        region         |
+ *       |                       |
  *       +-----------------------+
  *       |                       |
  *       |  Non-Sec. Channel 1   |
@@ -125,5 +135,10 @@
                                    SCMI_PAYLOAD_SIZE)
 #define SCMI_PAYLOAD1_NS_P2A_BASE (SCMI_PAYLOAD1_NS_A2P_BASE + \
                                    SCMI_PAYLOAD_SIZE)
+
+/* SDS Memory Region */
+#define SDS_NONSECURE_BASE        (SCMI_PAYLOAD1_NS_P2A_BASE + \
+                                   SCMI_PAYLOAD_SIZE)
+#define SDS_NONSECURE_SIZE        (1024)
 
 #endif /* SOFTWARE_MMAP_H */

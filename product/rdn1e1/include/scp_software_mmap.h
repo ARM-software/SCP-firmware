@@ -48,4 +48,8 @@
 #define SCP_SCMI_PAYLOAD_NS_P2A_BASE        (SCP_SCMI_PAYLOAD_NS_A2P_BASE + \
                                             SCP_SCMI_PAYLOAD_SIZE)
 
+#define SCP_SDS_NONSECURE_BASE              (SCP_SCMI_PAYLOAD_NS_P2A_BASE + \
+                                             SCP_SCMI_PAYLOAD_SIZE)
+#define SCP_SDS_NONSECURE_SIZE              (1024)
+
 #endif /* SCP_SOFTWARE_MMAP_H */

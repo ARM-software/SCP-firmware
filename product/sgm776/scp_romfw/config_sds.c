@@ -35,6 +35,12 @@ static const struct mod_sds_region_desc sds_module_regions[] = {
         .base = (void*)SDS_SECURE_BASE,
         .size = SDS_SECURE_SIZE,
     },
+#ifdef BUILD_MODE_DEBUG
+    [SGM776_SDS_REGION_NONSECURE] = {
+        .base = (void *)SDS_NONSECURE_BASE,
+        .size = SDS_NONSECURE_SIZE,
+    },
+#endif
 };
 
 static_assert(FWK_ARRAY_SIZE(sds_module_regions) == SGM776_SDS_REGION_COUNT,
@@ -107,7 +113,7 @@ static const struct fwk_element sds_element_table[] = {
             .finalize = true,
         }),
     },
-#ifdef MODE_DEBUG
+#ifdef BUILD_MODE_DEBUG
     {
         .name = "Boot Counters",
         .data = &((struct mod_sds_structure_desc) {
@@ -142,6 +148,12 @@ static_assert(SDS_SECURE_SIZE >
 #endif
                     SGM776_SDS_FEATURE_AVAILABILITY_SIZE,
             "SDS structures too large for SDS S-RAM.\n");
+
+#ifdef BUILD_MODE_DEBUG
+    static_assert(SDS_NONSECURE_SIZE >
+                        -1,
+                "SDS structures too large for SDS NS-RAM.\n");
+#endif
 
 static const struct fwk_element *sds_get_element_table(fwk_id_t module_id)
 {
