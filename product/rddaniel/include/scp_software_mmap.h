@@ -31,6 +31,12 @@
 #define SCP_AP_SHARED_SECURE_BASE          (SCP_TRUSTED_RAM_BASE)
 #define SCP_AP_SHARED_SECURE_SIZE          (4 * FWK_KIB)
 
+/*
+ * Non-trusted shared SRAM region
+ */
+#define SCP_AP_SHARED_NONSECURE_BASE       (SCP_NONTRUSTED_RAM_BASE)
+#define SCP_AP_SHARED_NONSECURE_SIZE       (4 * FWK_KIB)
+
 /* AP Context Area */
 #define SCP_AP_CONTEXT_BASE                (SCP_AP_SHARED_SECURE_BASE + \
                                            SCP_AP_SHARED_SECURE_SIZE - \
@@ -47,5 +53,15 @@
                                            SCP_SDS_SECURE_SIZE)
 #define SCP_SCMI_PAYLOAD_S_P2A_BASE        (SCP_SCMI_PAYLOAD_S_A2P_BASE + \
                                            SCP_SCMI_PAYLOAD_SIZE)
+
+/* SCMI Non-Secure Payload Areas */
+#define SCP_SCMI_PAYLOAD_NS_A2P_BASE       (SCP_AP_SHARED_NONSECURE_BASE)
+#define SCP_SCMI_PAYLOAD_NS_P2A_BASE       (SCP_SCMI_PAYLOAD_NS_A2P_BASE + \
+                                            SCP_SCMI_PAYLOAD_SIZE)
+
+/* SDS non secure region */
+#define SCP_SDS_NONSECURE_BASE             (SCP_SCMI_PAYLOAD_NS_P2A_BASE + \
+                                            SCP_SCMI_PAYLOAD_SIZE)
+#define SCP_SDS_NONSECURE_SIZE             (1024)
 
 #endif /* SCP_SOFTWARE_MMAP_H */

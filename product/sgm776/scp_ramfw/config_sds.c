@@ -30,6 +30,12 @@ static const struct mod_sds_region_desc sds_module_regions[] = {
         .base = (void*)SDS_SECURE_BASE,
         .size = SDS_SECURE_SIZE,
     },
+#ifdef BUILD_MODE_DEBUG
+    [SGM776_SDS_REGION_NONSECURE] = {
+        .base = (void *)SDS_NONSECURE_BASE,
+        .size = SDS_NONSECURE_SIZE,
+    },
+#endif
 };
 
 static_assert(FWK_ARRAY_SIZE(sds_module_regions) == SGM776_SDS_REGION_COUNT,

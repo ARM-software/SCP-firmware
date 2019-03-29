@@ -28,6 +28,9 @@ enum sgi575_sds_struct_id {
 
 enum sgi575_sds_region_idx {
     SGI575_SDS_REGION_SECURE,
+#ifdef BUILD_MODE_DEBUG
+    SGI575_SDS_REGION_NONSECURE,
+#endif
     SGI575_SDS_REGION_COUNT,
 };
 

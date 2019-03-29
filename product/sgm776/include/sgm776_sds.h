@@ -27,6 +27,9 @@ enum sgm776_sds_struct_id {
 
 enum sgm776_sds_region_idx {
     SGM776_SDS_REGION_SECURE,
+#ifdef BUILD_MODE_DEBUG
+    SGM776_SDS_REGION_NONSECURE,
+#endif
     SGM776_SDS_REGION_COUNT,
 };
 

@@ -27,6 +27,9 @@ enum rddaniel_sds_struct_id {
 
 enum rddaniel_sds_region_idx {
     RDDANIEL_SDS_REGION_SECURE,
+#ifdef BUILD_MODE_DEBUG
+    RDDANIEL_SDS_REGION_NONSECURE,
+#endif
     RDDANIEL_SDS_REGION_COUNT,
 };
 

@@ -30,6 +30,12 @@ static const struct mod_sds_region_desc sds_module_regions[] = {
         .base = (void*)SCP_SDS_SECURE_BASE,
         .size = SCP_SDS_SECURE_SIZE,
     },
+#ifdef BUILD_MODE_DEBUG
+    [RDDANIEL_SDS_REGION_NONSECURE] = {
+        .base = (void *)SCP_SDS_NONSECURE_BASE,
+        .size = SCP_SDS_NONSECURE_SIZE,
+    },
+#endif
 };
 
 static_assert(FWK_ARRAY_SIZE(sds_module_regions) == RDDANIEL_SDS_REGION_COUNT,
@@ -116,6 +122,12 @@ static_assert(SCP_SDS_SECURE_SIZE >
 #endif
                     RDDANIEL_SDS_FEATURE_AVAILABILITY_SIZE,
               "SDS structures too large for SDS S-RAM.\n");
+
+#ifdef BUILD_MODE_DEBUG
+    static_assert(SCP_SDS_NONSECURE_SIZE >
+                        -1,
+                "SDS structures too large for SDS NS-RAM.\n");
+#endif
 
 static const struct fwk_element *sds_get_element_table(fwk_id_t module_id)
 {

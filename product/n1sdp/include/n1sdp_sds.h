@@ -29,6 +29,9 @@ enum n1sdp_sds_struct_id {
 
 enum n1sdp_sds_region_idx {
     N1SDP_SDS_REGION_SECURE,
+#ifdef BUILD_MODE_DEBUG
+    N1SDP_SDS_REGION_NONSECURE,
+#endif
     N1SDP_SDS_REGION_COUNT,
 };
 
