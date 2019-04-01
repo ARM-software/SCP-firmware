@@ -67,9 +67,9 @@ static const struct mod_pik_clock_rate rate_table_scpi2cclk[] = {
 static const struct mod_pik_clock_rate rate_table_scpqspiclk[] = {
     {
         .rate = SCC_CLK_RATE_SCPQSPICLK,
-        .source = MOD_PIK_CLOCK_MSCLOCK_SOURCE_SYSPLLCLK,
+        .source = MOD_PIK_CLOCK_MSCLOCK_SOURCE_SYSREFCLK,
         .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_SYS,
-        .divider = CLOCK_RATE_SYSPLLCLK / SCC_CLK_RATE_SCPQSPICLK,
+        .divider = 1,
     },
 };
 
@@ -103,9 +103,9 @@ static const struct mod_pik_clock_rate rate_table_mcpi2cclk[] = {
 static const struct mod_pik_clock_rate rate_table_mcpqspiclk[] = {
     {
         .rate = SCC_CLK_RATE_MCPQSPICLK,
-        .source = MOD_PIK_CLOCK_MSCLOCK_SOURCE_SYSPLLCLK,
+        .source = MOD_PIK_CLOCK_MSCLOCK_SOURCE_SYSREFCLK,
         .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_SYS,
-        .divider = CLOCK_RATE_SYSPLLCLK / SCC_CLK_RATE_MCPQSPICLK,
+        .divider = 1,
     },
 };
 
@@ -346,9 +346,9 @@ static const struct mod_pik_clock_rate rate_table_sysperclk[] = {
 static const struct mod_pik_clock_rate rate_table_uart[] = {
     {
         .rate = PIK_CLK_RATE_UART,
-        .source = MOD_PIK_CLOCK_MSCLOCK_SOURCE_SYSPLLCLK,
+        .source = MOD_PIK_CLOCK_MSCLOCK_SOURCE_SYSREFCLK,
         .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_SYS,
-        .divider = CLOCK_RATE_SYSPLLCLK / PIK_CLK_RATE_UART,
+        .divider = 1,
     },
 };
 
