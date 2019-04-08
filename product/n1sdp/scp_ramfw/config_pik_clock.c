@@ -157,7 +157,7 @@ static struct mod_pik_clock_rate rate_table_cpu_group_0[] = {
 static struct mod_pik_clock_rate rate_table_cpu_group_1[] = {
     {
         .rate = PIK_CLK_RATE_CLUS1_CPU,
-        .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL1,
+        .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
         .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .divider = 1,
     },
@@ -166,7 +166,7 @@ static struct mod_pik_clock_rate rate_table_cpu_group_1[] = {
 static struct mod_pik_clock_rate rate_table_clus_0[] = {
     {
         .rate = PIK_CLK_RATE_CLUS0,
-        .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
+        .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL1,
         .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .divider = 1,
     },
@@ -175,7 +175,7 @@ static struct mod_pik_clock_rate rate_table_clus_0[] = {
 static struct mod_pik_clock_rate rate_table_clus_1[] = {
     {
         .rate = PIK_CLK_RATE_CLUS1,
-        .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
+        .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL1,
         .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .divider = 1,
     },
