@@ -42,6 +42,7 @@ BS_FIRMWARE_MODULES := \
     scmi_sensor \
     scmi_system_power \
     scmi_management \
+    scmi_ccix_config \
     n1sdp_flash \
     n1sdp_pcie \
     n1sdp_system
