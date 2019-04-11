@@ -531,6 +531,7 @@ static int smt_process_notification(
 {
     struct mod_pd_power_state_transition_notification_params *params;
     struct smt_channel_ctx *channel_ctx;
+    unsigned int notifications_sent;
 
     assert(fwk_id_is_equal(event->id,
         mod_pd_notification_id_power_state_transition));
@@ -551,6 +552,14 @@ static int smt_process_notification(
             (struct mod_smt_memory) {
             .status = (1 << MOD_SMT_MAILBOX_STATUS_FREE_POS)
         };
+
+        /* Notify that this mailbox is initialized */
+        struct fwk_event smt_channels_initialized_notification = {
+            .id = mod_smt_notification_id_initialized,
+        };
+
+        return fwk_notification_notify(&smt_channels_initialized_notification,
+            &notifications_sent);
     }
 
     return FWK_SUCCESS;
@@ -560,6 +569,7 @@ const struct fwk_module module_smt = {
     .name = "smt",
     .type = FWK_MODULE_TYPE_SERVICE,
     .api_count = MOD_SMT_API_IDX_COUNT,
+    .notification_count = MOD_SMT_NOTIFICATION_IDX_COUNT,
     .init = smt_init,
     .element_init = smt_channel_init,
     .bind = smt_bind,

@@ -120,4 +120,24 @@ enum mod_smt_api_idx {
     MOD_SMT_API_IDX_COUNT,
 };
 
+/*!
+ * \brief SMT notification indices.
+ */
+enum mod_smt_notification_idx {
+    /*! The SMT channel has been initialized */
+    MOD_SMT_NOTIFICATION_IDX_INITIALIZED,
+
+    /*! Number of defined notifications */
+    MOD_SMT_NOTIFICATION_IDX_COUNT
+};
+
+/*!
+ * \brief Identifier for the MOD_SMT_NOTIFICATION_IDX_INITIALIZED
+ *     notification.
+ */
+static const fwk_id_t mod_smt_notification_id_initialized =
+    FWK_ID_NOTIFICATION_INIT(
+        FWK_MODULE_IDX_SMT,
+        MOD_SMT_NOTIFICATION_IDX_INITIALIZED);
+
 #endif /* MOD_SMT_H */
