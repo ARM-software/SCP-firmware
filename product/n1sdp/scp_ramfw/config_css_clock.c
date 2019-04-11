@@ -74,7 +74,7 @@ static const struct mod_css_clock_rate rate_table_cpu_group_1[] = {
         /* Super Underdrive */
         .rate = CSS_CLK_RATE_CPU_GRP1_SUPER_UNDERDRIVE,
         .pll_rate = CSS_CLK_RATE_CPU_GRP1_SUPER_UNDERDRIVE,
-        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL1,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
         .clock_mod_numerator = 1,
@@ -84,7 +84,7 @@ static const struct mod_css_clock_rate rate_table_cpu_group_1[] = {
         /* Underdrive */
         .rate = CSS_CLK_RATE_CPU_GRP1_UNDERDRIVE,
         .pll_rate = CSS_CLK_RATE_CPU_GRP1_UNDERDRIVE,
-        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL1,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
         .clock_mod_numerator = 1,
@@ -94,7 +94,7 @@ static const struct mod_css_clock_rate rate_table_cpu_group_1[] = {
         /* Nominal */
         .rate = CSS_CLK_RATE_CPU_GRP1_NOMINAL,
         .pll_rate = CSS_CLK_RATE_CPU_GRP1_NOMINAL,
-        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL1,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
         .clock_mod_numerator = 1,
@@ -104,7 +104,7 @@ static const struct mod_css_clock_rate rate_table_cpu_group_1[] = {
         /* Overdrive */
         .rate = CSS_CLK_RATE_CPU_GRP1_OVERDRIVE,
         .pll_rate = CSS_CLK_RATE_CPU_GRP1_OVERDRIVE,
-        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL1,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
         .clock_mod_numerator = 1,
@@ -114,7 +114,7 @@ static const struct mod_css_clock_rate rate_table_cpu_group_1[] = {
         /* Super Overdrive */
         .rate = CSS_CLK_RATE_CPU_GRP1_SUPER_OVERDRIVE,
         .pll_rate = CSS_CLK_RATE_CPU_GRP1_SUPER_OVERDRIVE,
-        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL1,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
         .clock_mod_numerator = 1,
