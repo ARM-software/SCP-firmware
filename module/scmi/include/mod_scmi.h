@@ -118,6 +118,12 @@ struct mod_scmi_service_config {
     fwk_id_t transport_api_id;
 
     /*!
+     * \brief Identifier of the notification indicating the transport has been
+     *      initialized.
+     */
+    fwk_id_t transport_notification_init_id;
+
+    /*!
      *  \brief Identifier of the agent.
      *
      *  \details An SCMI channel is the communication channel between an agent
