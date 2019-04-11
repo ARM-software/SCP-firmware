@@ -18,10 +18,12 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_multi_thread.h>
+#include <fwk_notification.h>
 #include <internal/mod_scmi.h>
 #include <internal/scmi.h>
 #include <internal/scmi_base.h>
 #include <mod_log.h>
+#include <mod_smt.h>
 
 struct scmi_protocol {
     /* SCMI protocol message handler */
@@ -782,6 +784,40 @@ static int scmi_process_event(const struct fwk_event *event,
     return FWK_SUCCESS;
 }
 
+static int scmi_start(fwk_id_t id)
+{
+    const struct mod_scmi_service_config *config;
+
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+        return FWK_SUCCESS;
+
+    config = fwk_module_get_data(id);
+
+    if (fwk_id_is_equal(config->transport_notification_init_id, FWK_ID_NONE))
+        return FWK_SUCCESS;
+
+    return fwk_notification_subscribe(config->transport_notification_init_id,
+                                      config->transport_id,
+                                      id);
+}
+
+static int scmi_process_notification(const struct fwk_event *event,
+                                     struct fwk_event *resp_event)
+{
+    const struct mod_scmi_service_config *config;
+
+    fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT));
+
+    config = fwk_module_get_data(event->target_id);
+    if (config == NULL)
+        return FWK_E_PARAM;
+
+    fwk_assert(fwk_id_is_equal(event->id,
+                               config->transport_notification_init_id));
+
+    return FWK_SUCCESS;
+}
+
 /* SCMI module definition */
 const struct fwk_module module_scmi = {
     .name = "SCMI",
@@ -791,6 +827,8 @@ const struct fwk_module module_scmi = {
     .init = scmi_init,
     .element_init = scmi_service_init,
     .bind = scmi_bind,
+    .start = scmi_start,
     .process_bind_request = scmi_process_bind_request,
-    .process_event = scmi_process_event
+    .process_event = scmi_process_event,
+    .process_notification = scmi_process_notification,
 };

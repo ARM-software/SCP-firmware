@@ -23,6 +23,9 @@ static const struct fwk_element service_table[] = {
                                                 SGM775_SCMI_SERVICE_IDX_PSCI),
             .transport_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SMT,
                                                 MOD_SMT_API_IDX_SCMI_TRANSPORT),
+            .transport_notification_init_id =
+                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
+                    MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCMI_AGENT_ID_PSCI,
         }),
     },
@@ -33,6 +36,9 @@ static const struct fwk_element service_table[] = {
                                                 SGM775_SCMI_SERVICE_IDX_OSPM_0),
             .transport_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SMT,
                                                 MOD_SMT_API_IDX_SCMI_TRANSPORT),
+            .transport_notification_init_id =
+                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
+                    MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCMI_AGENT_ID_OSPM,
         }),
     },
@@ -43,6 +49,9 @@ static const struct fwk_element service_table[] = {
                                                 SGM775_SCMI_SERVICE_IDX_OSPM_1),
             .transport_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SMT,
                                                 MOD_SMT_API_IDX_SCMI_TRANSPORT),
+            .transport_notification_init_id =
+                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
+                    MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCMI_AGENT_ID_OSPM,
         }),
     },
