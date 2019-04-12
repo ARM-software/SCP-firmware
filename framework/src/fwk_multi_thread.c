@@ -358,7 +358,7 @@ static void process_event_requiring_response(struct fwk_event *event)
     resp_event.is_delayed_response = false;
 
     status = process_event(event, &resp_event);
-    if (status != FWK_SUCCESS)
+    if (!fwk_expect(status == FWK_SUCCESS))
         FWK_HOST_PRINT(err_msg_line, status, __LINE__);
 
     resp_event.is_response = true;
@@ -411,7 +411,7 @@ static void process_next_thread_event(struct __fwk_thread_ctx *thread_ctx)
             status = module->process_notification(event, &async_resp_event);
         else
             status = module->process_event(event, &async_resp_event);
-        if (status != FWK_SUCCESS)
+        if (!fwk_expect(status == FWK_SUCCESS))
             FWK_HOST_PRINT(err_msg_line, status, __LINE__);
     }
 
