@@ -30,6 +30,7 @@
 #include <scp_sgi575_scmi.h>
 #include <sgi575_core.h>
 #include <sgi575_pik_scp.h>
+#include <sgi575_sds.h>
 #include <config_clock.h>
 
 /* SCMI services required to enable the messaging stack */
@@ -51,6 +52,9 @@ struct sgi575_system_ctx {
 
     /* Power domain module restricted API pointer */
     struct mod_pd_restricted_api *mod_pd_restricted_api;
+
+    /* SDS API pointer */
+    const struct mod_sds_api *sds_api;
 };
 
 struct sgi575_system_isr {
@@ -60,6 +64,30 @@ struct sgi575_system_isr {
 
 static struct sgi575_system_ctx sgi575_system_ctx;
 const struct fwk_module_config config_sgi575_system = { 0 };
+
+static const uint32_t feature_flags = (SGI575_SDS_FEATURE_FIRMWARE_MASK |
+                                       SGI575_SDS_FEATURE_DMC_MASK |
+                                       SGI575_SDS_FEATURE_MESSAGING_MASK);
+
+static fwk_id_t sds_feature_availability_id =
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, 4);
+
+/*
+ *  SCMI Messaging stack
+ */
+
+static int messaging_stack_ready(void)
+{
+    const struct mod_sds_structure_desc *sds_structure_desc =
+        fwk_module_get_data(sds_feature_availability_id);
+
+    /*
+     * Write SDS Feature Availability to signal the completion of the messaging
+     * stack
+     */
+    return sgi575_system_ctx.sds_api->struct_write(sds_structure_desc->id,
+        0, (void *)(&feature_flags), sds_structure_desc->size);
+}
 
 /*
  *  PPU Interrupt Service Routines for cluster and core power domains
@@ -196,9 +224,15 @@ static int sgi575_system_bind(fwk_id_t id, unsigned int round)
     if (status != FWK_SUCCESS)
         return status;
 
-    return fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_PPU_V1),
+    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_PPU_V1),
         FWK_ID_API(FWK_MODULE_IDX_PPU_V1, MOD_PPU_V1_API_IDX_ISR),
         &sgi575_system_ctx.ppu_v1_isr_api);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    return fwk_module_bind(fwk_module_id_sds,
+        FWK_ID_API(FWK_MODULE_IDX_SDS, 0),
+        &sgi575_system_ctx.sds_api);
 }
 
 static int sgi575_system_process_bind_request(fwk_id_t requester_id,
@@ -263,6 +297,8 @@ int sgi575_system_process_notification(const struct fwk_event *event,
     int status;
     struct clock_notification_params *params;
     struct mod_pd_restricted_api *mod_pd_restricted_api;
+    static unsigned int scmi_notification_count = 0;
+    static bool sds_notification_received = false;
 
     assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
 
@@ -295,13 +331,22 @@ int sgi575_system_process_notification(const struct fwk_event *event,
         return FWK_SUCCESS;
     } else if (fwk_id_is_equal(event->id,
                                mod_scmi_notification_id_initialized)) {
-        return FWK_SUCCESS;
+        scmi_notification_count++;
     } else if (fwk_id_is_equal(event->id,
                                mod_sds_notification_id_initialized)) {
-        return FWK_SUCCESS;
+        sds_notification_received = true;
+    } else
+        return FWK_E_PARAM;
+
+    if ((scmi_notification_count == FWK_ARRAY_SIZE(scmi_notification_table)) &&
+        sds_notification_received) {
+        messaging_stack_ready();
+
+        scmi_notification_count = 0;
+        sds_notification_received = false;
     }
 
-    return FWK_E_PARAM;
+    return FWK_SUCCESS;
 }
 
 const struct fwk_module module_sgi575_system = {

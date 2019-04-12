@@ -19,9 +19,7 @@
 #include <config_clock.h>
 
 static const uint32_t version_packed = FWK_BUILD_VERSION;
-static const uint32_t feature_flags = (N1SDP_SDS_FEATURE_FIRMWARE_MASK |
-                                       N1SDP_SDS_FEATURE_DMC_MASK |
-                                       N1SDP_SDS_FEATURE_MESSAGING_MASK);
+static const uint32_t feature_flags = 0x00000000;
 
 const struct mod_sds_config sds_module_config = {
     .region_base_address = SCP_SDS_MEM_BASE,
