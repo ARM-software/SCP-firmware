@@ -9,9 +9,12 @@
 #include <fwk_id.h>
 #include <fwk_math.h>
 #include <fwk_module.h>
+#include <fwk_notification.h>
 #include <fwk_status.h>
 #include <mod_juno_ram.h>
+#include <mod_system_power.h>
 #include <mod_timer.h>
+#include <config_power_domain.h>
 #include <juno_id.h>
 #include <juno_pcie.h>
 #include <juno_scc.h>
@@ -30,9 +33,21 @@
 #define PCIE_ATR_IMPL               UINT32_C(0x00000001)
 
 static struct {
+    /* Module configuration */
     const struct mod_juno_ram_config *config;
+
+    /* Timer module API */
     const struct mod_timer_api *timer_api;
+
+    /* Running platform */
+    enum juno_idx_platform platform;
+
+    /* Whether power domain-sensitive peripherals are initialized */
+    bool periph_initialized;
 } ctx;
+
+static const fwk_id_t pd_source_id =
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN, POWER_DOMAIN_IDX_SYSTOP);
 
 /*
  * Utility Functions
@@ -275,6 +290,23 @@ static int pcie_configure(void)
     return FWK_SUCCESS;
 }
 
+static int initialize_peripherals(void)
+{
+    int status = FWK_SUCCESS;
+
+    if (ctx.periph_initialized)
+        return status;
+
+    if (ctx.platform == JUNO_IDX_PLATFORM_RTL)
+        status = pcie_configure();
+
+    smc_configure();
+
+    ctx.periph_initialized = true;
+
+    return status;
+}
+
 /*
  * Framework API
  */
@@ -302,7 +334,6 @@ static int juno_ram_bind(fwk_id_t id, unsigned int round)
 static int juno_ram_start(fwk_id_t id)
 {
     int status;
-    enum juno_idx_platform platform_id = JUNO_IDX_PLATFORM_COUNT;
 
     /*
      * The watchdog should not be enabled when the RAM firmware is executing.
@@ -313,23 +344,55 @@ static int juno_ram_start(fwk_id_t id)
     juno_wdog_ram_disable();
     #endif
 
-    status = juno_id_get_platform(&platform_id);
+    fwk_assert(fwk_module_is_valid_module_id(id));
+
+    status = juno_id_get_platform(&ctx.platform);
     if (!fwk_expect(status == FWK_SUCCESS))
         return FWK_E_PANIC;
 
-    if (platform_id == JUNO_IDX_PLATFORM_RTL) {
+    if (ctx.platform == JUNO_IDX_PLATFORM_RTL) {
         nic400_configure();
 
         pcsm_configure();
-
-        pcie_configure();
     }
-
-    smc_configure();
 
     scc_configure();
 
-    return FWK_SUCCESS;
+    /* Register for Power Domain state transition notifications */
+    status = fwk_notification_subscribe(
+        mod_pd_notification_id_power_state_transition,
+        pd_source_id,
+        id);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    return initialize_peripherals();
+}
+
+static int juno_ram_process_notification(
+    const struct fwk_event *event,
+    struct fwk_event *resp_event)
+{
+    struct mod_pd_power_state_transition_notification_params *pd_params;
+    int status = FWK_SUCCESS;
+
+    if (fwk_id_is_equal(event->id,
+                        mod_pd_notification_id_power_state_transition)) {
+        pd_params =
+            (struct mod_pd_power_state_transition_notification_params *)
+                event->params;
+
+        if ((pd_params->state == MOD_PD_STATE_OFF) ||
+            (pd_params->state == MOD_SYSTEM_POWER_POWER_STATE_SLEEP0)) {
+            /* PD-sensitive peripherals will require re-init */
+            ctx.periph_initialized = false;
+        } else if (pd_params->state == MOD_PD_STATE_ON)
+            status = initialize_peripherals();
+
+    } else
+        status = FWK_E_PARAM;
+
+    return status;
 }
 
 const struct fwk_module module_juno_ram = {
@@ -338,4 +401,5 @@ const struct fwk_module module_juno_ram = {
     .init = juno_ram_init,
     .bind = juno_ram_bind,
     .start = juno_ram_start,
+    .process_notification = juno_ram_process_notification,
 };
