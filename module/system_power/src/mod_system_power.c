@@ -20,6 +20,18 @@
 #include <mod_system_power.h>
 #include <mod_power_domain.h>
 
+/* SoC wakeup composite state */
+#define MOD_SYSTEM_POWER_SOC_WAKEUP_STATE \
+    MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, \
+                           0, \
+                           MOD_PD_STATE_ON, \
+                           MOD_PD_STATE_ON, \
+                           MOD_PD_STATE_ON)
+
+/* SoC wakeup Power Domain Identifier */
+static const fwk_id_t mod_system_power_soc_wakeup_pd_id =
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN, 0);
+
 /* Module context */
 struct system_power_ctx {
     /* Log API pointer */
@@ -53,12 +65,11 @@ struct system_power_ctx {
     const struct mod_system_power_config *config;
 };
 
-struct system_power_isr {
-    unsigned int interrupt;
-    void (*handler)(void);
-};
-
 static struct system_power_ctx system_power_ctx;
+
+/*
+ * Static helpers
+ */
 
 static void ext_ppus_set_state(enum mod_pd_state state)
 {
@@ -159,18 +170,12 @@ static int system_power_shutdown(fwk_id_t pd_id,
 static void soc_wakeup_handler(void)
 {
     int status;
-    fwk_id_t pd_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0);
-    uint32_t state = MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2,
-                                            0,
-                                            MOD_PD_STATE_ON,
-                                            MOD_PD_STATE_ON,
-                                            MOD_PD_STATE_ON);
+    uint32_t state = MOD_SYSTEM_POWER_SOC_WAKEUP_STATE;
 
     status =
         system_power_ctx.mod_pd_restricted_api->set_composite_state_async(
-            pd_id, false, state);
-    assert(status == FWK_SUCCESS);
-    (void)status;
+            mod_system_power_soc_wakeup_pd_id, false, state);
+    fwk_expect(status == FWK_SUCCESS);
 }
 
 static const struct mod_pd_driver_api system_power_power_domain_driver_api = {
@@ -206,8 +211,7 @@ static int system_power_report_power_state_transition(fwk_id_t module_id,
     status =
         system_power_ctx.mod_pd_driver_input_api->report_power_state_transition(
             system_power_ctx.mod_pd_system_id, system_power_ctx.state);
-    assert(status == FWK_SUCCESS);
-    (void)status;
+    fwk_expect(status == FWK_SUCCESS);
 
     return FWK_SUCCESS;
 }
@@ -225,7 +229,7 @@ static int system_power_mod_init(fwk_id_t module_id,
                                 unsigned int unused,
                                 const void *data)
 {
-    assert(data != NULL);
+    fwk_assert(data != NULL);
 
     system_power_ctx.config = data;
     system_power_ctx.mod_pd_system_id = FWK_ID_NONE;
@@ -241,8 +245,9 @@ static int system_power_mod_init(fwk_id_t module_id,
     if (system_power_ctx.config->soc_wakeup_irq != FWK_INTERRUPT_NONE) {
         return fwk_interrupt_set_isr(system_power_ctx.config->soc_wakeup_irq,
                                      soc_wakeup_handler);
-    } else
-        return FWK_SUCCESS;
+    }
+
+    return FWK_SUCCESS;
 }
 
 static int system_power_bind(fwk_id_t id, unsigned int round)
