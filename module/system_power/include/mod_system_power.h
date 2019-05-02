@@ -37,19 +37,25 @@ struct mod_system_power_ext_ppu_config {
     fwk_id_t api_id;
 };
 
+/*! Element configuration */
+struct mod_system_power_dev_config {
+    /*! Identifier of the system PPU */
+    fwk_id_t sys_ppu_id;
+
+    /*! System PPU API identifier */
+    fwk_id_t api_id;
+
+    /*!
+     * \brief Pointer to a table defining the power states this system PPU will
+     *      be set for each system state.
+     */
+    const uint8_t *sys_state_table;
+};
+
 /*! Module configuration */
 struct mod_system_power_config {
     /*! SoC wakeup IRQ number */
     unsigned int soc_wakeup_irq;
-
-    /*! System 0 PPU element ID */
-    fwk_id_t ppu_sys0_id;
-
-    /*! System 1 PPU element ID */
-    fwk_id_t ppu_sys1_id;
-
-    /*! System PPUs API ID */
-    fwk_id_t ppu_sys_api_id;
 
     /*! Number of extended PPUs */
     size_t ext_ppus_count;
@@ -67,6 +73,9 @@ struct mod_system_power_config {
 
     /*! System shutdown driver API identifier */
     fwk_id_t driver_api_id;
+
+    /*! Initial System Power state after power-on */
+    enum mod_pd_state initial_system_power_state;
 };
 
 /*! Platform-specific interrupt commands indices */
