@@ -69,6 +69,15 @@ struct mod_system_power_config {
     fwk_id_t driver_api_id;
 };
 
+/*! Platform-specific interrupt commands indices */
+enum mod_system_power_platform_interrupt_cmd {
+    MOD_SYSTEM_POWER_PLATFORM_INTERRUPT_CMD_INIT,
+    MOD_SYSTEM_POWER_PLATFORM_INTERRUPT_CMD_ENABLE,
+    MOD_SYSTEM_POWER_PLATFORM_INTERRUPT_CMD_DISABLE,
+    MOD_SYSTEM_POWER_PLATFORM_INTERRUPT_CMD_CLEAR_PENDING,
+    MOD_SYSTEM_POWER_PLATFORM_INTERRUPT_CMD_COUNT,
+};
+
 /*!
  * \brief Driver interface.
  */
@@ -84,6 +93,23 @@ struct mod_system_power_driver_api {
      * \retval One of the driver-defined error code.
      */
     int (*system_shutdown)(enum mod_pd_system_shutdown system_shutdown);
+
+    /*!
+     * \brief Pointer to the platform interrupt management function.
+     *
+     * \details This function allows the driver to manage additional
+     *      platform-specific interrupts.
+     *
+     * \note This function is \b optional.
+     *
+     * \param isr_cmd Type of command requested.
+     *
+     * \retval ::FWK_E_PARAM The interrupt command is not valid.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \return One of the standard framework error codes.
+     */
+    int (*platform_interrupts)(enum mod_system_power_platform_interrupt_cmd
+                               isr_cmd);
 };
 
 /*!
