@@ -89,14 +89,17 @@ static void ext_ppus_set_state(enum mod_pd_state state)
 static int system_power_set_state(fwk_id_t pd_id, unsigned int state)
 {
     int status;
+    unsigned int soc_wakeup_irq;
 
     status = fwk_module_check_call(pd_id);
     if (status != FWK_SUCCESS)
         return status;
 
+    soc_wakeup_irq = system_power_ctx.config->soc_wakeup_irq;
+
     switch (state) {
     case MOD_PD_STATE_ON:
-        fwk_interrupt_disable(system_power_ctx.config->soc_wakeup_irq);
+        fwk_interrupt_disable(soc_wakeup_irq);
 
         system_power_ctx.sys0_api->set_state(
             system_power_ctx.config->ppu_sys0_id, MOD_PD_STATE_ON);
@@ -110,17 +113,19 @@ static int system_power_set_state(fwk_id_t pd_id, unsigned int state)
     case MOD_SYSTEM_POWER_POWER_STATE_SLEEP0:
         ext_ppus_set_state(MOD_PD_STATE_OFF);
 
+        fwk_interrupt_clear_pending(soc_wakeup_irq);
+
         system_power_ctx.sys0_api->set_state(
             system_power_ctx.config->ppu_sys0_id, MOD_PD_STATE_OFF);
         system_power_ctx.sys0_api->set_state(
             system_power_ctx.config->ppu_sys1_id, MOD_PD_STATE_ON);
 
-        fwk_interrupt_enable(system_power_ctx.config->soc_wakeup_irq);
+        fwk_interrupt_enable(soc_wakeup_irq);
 
         break;
 
     case MOD_PD_STATE_OFF:
-        fwk_interrupt_disable(system_power_ctx.config->soc_wakeup_irq);
+        fwk_interrupt_disable(soc_wakeup_irq);
         ext_ppus_set_state(MOD_PD_STATE_OFF);
 
         system_power_ctx.sys0_api->set_state(
