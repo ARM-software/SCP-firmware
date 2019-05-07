@@ -101,6 +101,13 @@ static int system_power_set_state(fwk_id_t pd_id, unsigned int state)
     case MOD_PD_STATE_ON:
         fwk_interrupt_disable(soc_wakeup_irq);
 
+        if (system_power_ctx.driver_api->platform_interrupts != NULL) {
+            status = system_power_ctx.driver_api->platform_interrupts(
+                MOD_SYSTEM_POWER_PLATFORM_INTERRUPT_CMD_DISABLE);
+            if (status != FWK_SUCCESS)
+                return FWK_E_DEVICE;
+        }
+
         system_power_ctx.sys0_api->set_state(
             system_power_ctx.config->ppu_sys0_id, MOD_PD_STATE_ON);
         system_power_ctx.sys0_api->set_state(
@@ -115,6 +122,14 @@ static int system_power_set_state(fwk_id_t pd_id, unsigned int state)
 
         fwk_interrupt_clear_pending(soc_wakeup_irq);
 
+        if (system_power_ctx.driver_api->platform_interrupts != NULL) {
+            status =
+                system_power_ctx.driver_api->platform_interrupts(
+                    MOD_SYSTEM_POWER_PLATFORM_INTERRUPT_CMD_CLEAR_PENDING);
+            if (status != FWK_SUCCESS)
+                return FWK_E_DEVICE;
+        }
+
         system_power_ctx.sys0_api->set_state(
             system_power_ctx.config->ppu_sys0_id, MOD_PD_STATE_OFF);
         system_power_ctx.sys0_api->set_state(
@@ -122,10 +137,25 @@ static int system_power_set_state(fwk_id_t pd_id, unsigned int state)
 
         fwk_interrupt_enable(soc_wakeup_irq);
 
+        if (system_power_ctx.driver_api->platform_interrupts != NULL) {
+            status = system_power_ctx.driver_api->platform_interrupts(
+                MOD_SYSTEM_POWER_PLATFORM_INTERRUPT_CMD_ENABLE);
+            if (status != FWK_SUCCESS)
+                return FWK_E_DEVICE;
+        }
+
         break;
 
     case MOD_PD_STATE_OFF:
         fwk_interrupt_disable(soc_wakeup_irq);
+
+        if (system_power_ctx.driver_api->platform_interrupts != NULL) {
+            status = system_power_ctx.driver_api->platform_interrupts(
+                MOD_SYSTEM_POWER_PLATFORM_INTERRUPT_CMD_DISABLE);
+            if (status != FWK_SUCCESS)
+                return FWK_E_DEVICE;
+        }
+
         ext_ppus_set_state(MOD_PD_STATE_OFF);
 
         system_power_ctx.sys0_api->set_state(
@@ -341,6 +371,13 @@ static int system_power_start(fwk_id_t id)
 {
     int status;
     unsigned int state;
+
+    if (system_power_ctx.driver_api->platform_interrupts != NULL) {
+        status = system_power_ctx.driver_api->platform_interrupts(
+            MOD_SYSTEM_POWER_PLATFORM_INTERRUPT_CMD_INIT);
+        if (status != FWK_SUCCESS)
+            return status;
+    }
 
     status = system_power_ctx.sys1_api->get_state
         (system_power_ctx.config->ppu_sys1_id, &state);
