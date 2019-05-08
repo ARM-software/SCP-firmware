@@ -8,20 +8,29 @@
 #include <stdint.h>
 #include <fmw_cmsis.h>
 #include <fwk_assert.h>
+#include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+#include <fwk_multi_thread.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
 #include <mod_juno_system.h>
 #include <mod_juno_xrp7724.h>
+#include <mod_power_domain.h>
+#include <mod_psu.h>
 #include <mod_scmi.h>
 #include <mod_sds.h>
 #include <mod_system_power.h>
+#include <config_power_domain.h>
 #include <juno_id.h>
+#include <juno_irq.h>
+#include <juno_ppu_idx.h>
 #include <juno_scmi.h>
 #include <juno_sds.h>
+#include <juno_system.h>
+#include <system_mmap.h>
 
 static fwk_id_t sds_feature_availability_id =
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, JUNO_SDS_RAM_FEATURES_IDX);
@@ -42,6 +51,17 @@ struct juno_system_ctx {
 
     /* Running platform identifier */
     enum juno_idx_platform platform_id;
+
+    struct psu_ctx {
+        /* PSU API */
+        const struct mod_psu_device_api *api;
+
+        /* Cookie to respond to pre-state notification */
+        uint32_t cookie;
+
+        /* Whether the pre-state notification response is delayed */
+        bool response_delayed;
+    } psu_ctx;
 };
 
 static struct juno_system_ctx juno_system_ctx;
@@ -63,6 +83,28 @@ static int messaging_stack_ready(void)
      */
     return juno_system_ctx.sds_api->struct_write(sds_structure_desc->id,
         0, (void *)(&feature_flags), sds_structure_desc->size);
+}
+
+static int process_gpu_power_state(
+    const struct fwk_event *event,
+    struct fwk_event *resp_event,
+    bool enable)
+{
+    int status = juno_system_ctx.psu_ctx.api->set_enabled(gpu_psu_id, enable);
+
+    if (status == FWK_PENDING) {
+        if (enable) {
+            /* For OFF->ON transition, delay the notification response */
+            resp_event->is_delayed_response = true;
+            juno_system_ctx.psu_ctx.response_delayed = true;
+
+            juno_system_ctx.psu_ctx.cookie = event->cookie;
+        }
+
+        status = FWK_SUCCESS;
+    }
+
+    return status;
 }
 
 /*
@@ -131,9 +173,17 @@ static int juno_system_bind(fwk_id_t id, unsigned int round)
     if (juno_system_ctx.platform_id != JUNO_IDX_PLATFORM_RTL)
         return FWK_SUCCESS;
     else {
-        return fwk_module_bind(fwk_module_id_juno_xrp7724,
-            mod_juno_xrp7724_api_id_system_mode,
-            &juno_system_ctx.juno_xrp7724_api);
+
+    status = fwk_module_bind(
+        gpu_psu_id,
+        psu_api_id,
+        &juno_system_ctx.psu_ctx.api);
+    if (status != FWK_SUCCESS)
+        return FWK_E_PANIC;
+
+    return fwk_module_bind(fwk_module_id_juno_xrp7724,
+        mod_juno_xrp7724_api_id_system_mode,
+        &juno_system_ctx.juno_xrp7724_api);
     }
 }
 
@@ -151,6 +201,23 @@ static int juno_system_start(fwk_id_t id)
 {
     int status;
     unsigned int i;
+
+    /*
+     * Subscribe to GPU Power Domain notifications.
+     */
+    status = fwk_notification_subscribe(
+        mod_pd_notification_id_power_state_pre_transition,
+        gpu_pd_id,
+        id);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    status = fwk_notification_subscribe(
+        mod_pd_notification_id_power_state_transition,
+        gpu_pd_id,
+        id);
+    if (status != FWK_SUCCESS)
+        return status;
 
     /*
      * Subscribe to these SCMI channels in order to know when they have all
@@ -183,18 +250,64 @@ static int juno_system_process_notification(const struct fwk_event *event,
 {
     static unsigned int scmi_notification_count = 0;
     static bool sds_notification_received = false;
+    int status = FWK_E_PARAM;
+
+    struct mod_pd_power_state_pre_transition_notification_params
+        *state_pre_params;
+    struct mod_pd_power_state_transition_notification_params *params;
+    struct mod_pd_power_state_pre_transition_notification_resp_params
+        *pd_resp_params;
 
     if (!fwk_expect(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE)))
-        return FWK_E_PARAM;
+        goto exit;
 
-    if (fwk_id_is_equal(event->id,
-                        mod_scmi_notification_id_initialized)) {
+    if (fwk_id_is_equal(event->id, mod_scmi_notification_id_initialized))
         scmi_notification_count++;
-    } else if (fwk_id_is_equal(event->id,
-                               mod_sds_notification_id_initialized)) {
+    else if (fwk_id_is_equal(event->id, mod_sds_notification_id_initialized))
         sds_notification_received = true;
-    } else
-        return FWK_E_PARAM;
+    else if (fwk_id_is_equal(
+                 event->id,
+                 mod_pd_notification_id_power_state_pre_transition)) {
+        state_pre_params =
+            (struct mod_pd_power_state_pre_transition_notification_params *)
+                event->params;
+        pd_resp_params =
+        (struct mod_pd_power_state_pre_transition_notification_resp_params *)
+            resp_event->params;
+
+        if (state_pre_params->target_state != MOD_PD_STATE_ON) {
+            status = FWK_SUCCESS;
+            pd_resp_params->status = status;
+            goto exit;
+        }
+
+        if (fwk_id_is_equal(event->source_id, gpu_pd_id)) {
+            /* Power domain is about to be turned ON, turn on VGPU first */
+            status = process_gpu_power_state(event, resp_event, true);
+        }
+
+        pd_resp_params->status = status;
+        goto exit;
+
+    } else if (fwk_id_is_equal(
+                   event->id, mod_pd_notification_id_power_state_transition)) {
+        params = (struct mod_pd_power_state_transition_notification_params *)
+            event->params;
+
+        if (params->state != MOD_PD_STATE_OFF) {
+            status = FWK_SUCCESS;
+            goto exit;
+        }
+
+        if (fwk_id_is_equal(event->source_id, gpu_pd_id)) {
+            /* Power domain has been turned OFF, turn off VGPU */
+            status = process_gpu_power_state(event, resp_event, false);
+        }
+
+        goto exit;
+    } else {
+        goto exit;
+    }
 
     if ((scmi_notification_count == FWK_ARRAY_SIZE(scmi_notification_table)) &&
         sds_notification_received) {
@@ -204,7 +317,46 @@ static int juno_system_process_notification(const struct fwk_event *event,
         sds_notification_received = false;
     }
 
-    return FWK_SUCCESS;
+exit:
+    return status;
+}
+
+static int juno_system_process_event(
+    const struct fwk_event *event,
+    struct fwk_event *resp_event)
+{
+    struct mod_psu_driver_response *psu_params;
+    struct mod_pd_power_state_pre_transition_notification_resp_params
+        *pd_resp_params;
+    struct fwk_event resp;
+    int status;
+
+    if (fwk_id_is_equal(event->id, mod_psu_event_id_set_enabled)) {
+        /* Response event from the PSU module */
+        psu_params = (struct mod_psu_driver_response *)event->params;
+
+        if (!juno_system_ctx.psu_ctx.response_delayed)
+            return psu_params->status;
+
+        juno_system_ctx.psu_ctx.response_delayed = false;
+
+        pd_resp_params =
+        (struct mod_pd_power_state_pre_transition_notification_resp_params *)
+            resp.params;
+
+        /*
+         * Respond to the notification so the GPU power domain can be turned on
+         */
+        status = fwk_thread_get_delayed_response(
+            fwk_module_id_juno_system, juno_system_ctx.psu_ctx.cookie, &resp);
+        if (status != FWK_SUCCESS)
+            return status;
+
+        pd_resp_params->status = psu_params->status;
+        return fwk_thread_put_event(&resp);
+    }
+
+    return FWK_E_PARAM;
 }
 
 const struct fwk_module module_juno_system = {
@@ -216,7 +368,11 @@ const struct fwk_module module_juno_system = {
     .process_bind_request = juno_system_process_bind_request,
     .start = juno_system_start,
     .process_notification = juno_system_process_notification,
+    .process_event = juno_system_process_event,
 };
 
-/* No elements, no module configuration data */
-struct fwk_module_config config_juno_system = { 0 };
+/* No elements, no configuration data */
+struct fwk_module_config config_juno_system = {
+    .get_element_table = NULL,
+    .data = NULL,
+};
