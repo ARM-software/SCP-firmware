@@ -6,6 +6,7 @@
  */
 
 #include <stdint.h>
+#include <fmw_cmsis.h>
 #include <fwk_assert.h>
 #include <fwk_errno.h>
 #include <fwk_id.h>
@@ -14,9 +15,11 @@
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <mod_juno_system.h>
+#include <mod_juno_xrp7724.h>
 #include <mod_scmi.h>
 #include <mod_sds.h>
 #include <mod_system_power.h>
+#include <juno_id.h>
 #include <juno_scmi.h>
 #include <juno_sds.h>
 
@@ -33,6 +36,12 @@ static unsigned int scmi_notification_table[] = {
 struct juno_system_ctx {
     /* SDS API */
     struct mod_sds_api *sds_api;
+
+    /* XRP7724 PMIC API */
+    const struct mod_juno_xrp7724_api_system_mode *juno_xrp7724_api;
+
+    /* Running platform identifier */
+    enum juno_idx_platform platform_id;
 };
 
 static struct juno_system_ctx juno_system_ctx;
@@ -61,7 +70,26 @@ static int messaging_stack_ready(void)
  */
 static int juno_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
 {
-    return FWK_E_SUPPORT;
+    if (juno_system_ctx.platform_id == JUNO_IDX_PLATFORM_FVP) {
+        NVIC_SystemReset();
+
+        fwk_unreachable();
+    }
+
+    switch (system_shutdown) {
+    case MOD_PD_SYSTEM_SHUTDOWN:
+        juno_system_ctx.juno_xrp7724_api->shutdown();
+        break;
+
+    case MOD_PD_SYSTEM_COLD_RESET:
+        juno_system_ctx.juno_xrp7724_api->reset();
+        break;
+
+    default:
+        return FWK_E_SUPPORT;
+    }
+
+    return FWK_SUCCESS;
 }
 
 static const struct mod_system_power_driver_api
@@ -83,8 +111,15 @@ static int juno_system_module_init(fwk_id_t module_id,
 
 static int juno_system_bind(fwk_id_t id, unsigned int round)
 {
+    int status;
+
     if (round > 0)
         return FWK_SUCCESS;
+
+    status = fwk_module_bind(fwk_module_id_juno_xrp7724,
+        mod_juno_xrp7724_api_id_system_mode, &juno_system_ctx.juno_xrp7724_api);
+    if (status != FWK_SUCCESS)
+        return FWK_E_HANDLER;
 
     return fwk_module_bind(fwk_module_id_sds,
                            FWK_ID_API(FWK_MODULE_IDX_SDS, 0),
@@ -105,6 +140,10 @@ static int juno_system_start(fwk_id_t id)
 {
     int status;
     unsigned int i;
+
+    status = juno_id_get_platform(&juno_system_ctx.platform_id);
+    if (!fwk_expect(status == FWK_SUCCESS))
+        return FWK_E_PANIC;
 
     /*
      * Subscribe to these SCMI channels in order to know when they have all
