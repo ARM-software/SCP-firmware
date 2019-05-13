@@ -49,39 +49,52 @@ int juno_id_get_revision(enum juno_idx_revision *revision)
     static enum juno_idx_revision revision_cached = JUNO_IDX_REVISION_COUNT;
     enum juno_idx_platform platform;
     unsigned int board_rev;
-    int status;
+    int status = FWK_SUCCESS;
 
-    if (!fwk_expect(revision != NULL))
-        return FWK_E_PARAM;
+    if (revision == NULL) {
+        status = FWK_E_PARAM;
+        goto exit;
+    }
 
     if (revision_cached != JUNO_IDX_REVISION_COUNT) {
         *revision = revision_cached;
-        return FWK_SUCCESS;
+
+        goto exit;
     }
 
     status = juno_id_get_platform(&platform);
     if (status != FWK_SUCCESS)
-        return FWK_E_PANIC;
+        goto exit;
 
     if (platform != JUNO_IDX_PLATFORM_RTL) {
         revision_cached = JUNO_IDX_REVISION_R0;
         *revision = revision_cached;
-        return FWK_SUCCESS;
+
+        goto exit;
     }
 
     /* NOTE: SYSTOP must be powered ON for this register to be accessible. */
     board_rev = V2M_SYS_REGS->ID >> V2M_SYS_REGS_ID_REV_POS;
 
-    if (board_rev == JUNO_BOARD_REV_A_SOC_R0)
-        return FWK_E_SUPPORT;
+    if (board_rev == JUNO_BOARD_REV_A_SOC_R0) {
+        status = FWK_E_SUPPORT;
 
-    if (board_rev >= JUNO_BOARD_REV_COUNT)
-        return FWK_E_PANIC;
+        goto exit;
+    }
+
+    if (board_rev >= JUNO_BOARD_REV_COUNT) {
+        status = FWK_E_PANIC;
+
+        goto exit;
+    }
 
     revision_cached = (enum juno_idx_revision)(board_rev - 1);
     *revision = revision_cached;
 
-    return FWK_SUCCESS;
+exit:
+    fwk_expect(status == FWK_SUCCESS);
+
+    return status;
 }
 
 int juno_id_get_variant(enum juno_idx_variant *variant)
