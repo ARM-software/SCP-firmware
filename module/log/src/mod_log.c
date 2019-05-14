@@ -199,9 +199,9 @@ next_symbol:
 
             case 'u':
                 if (bit64)
-                    return FWK_E_DATA;
-
-                unum = va_arg(*args, uint32_t);
+                    unum = va_arg(*args, uint64_t);
+                else
+                    unum = va_arg(*args, uint32_t);
 
                 status = print_uint64(unum, 10, fill);
                 if (status != FWK_SUCCESS)
