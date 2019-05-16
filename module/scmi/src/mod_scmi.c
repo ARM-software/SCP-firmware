@@ -787,14 +787,23 @@ static int scmi_process_event(const struct fwk_event *event,
 static int scmi_start(fwk_id_t id)
 {
     const struct mod_scmi_service_config *config;
+    unsigned int notifications_sent;
 
     if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
         return FWK_SUCCESS;
 
     config = fwk_module_get_data(id);
 
-    if (fwk_id_is_equal(config->transport_notification_init_id, FWK_ID_NONE))
-        return FWK_SUCCESS;
+    if (fwk_id_is_equal(config->transport_notification_init_id, FWK_ID_NONE)) {
+        /* Notify that the service is immediately ready */
+        struct fwk_event scmi_services_initialized_notification = {
+            .id = mod_scmi_notification_id_initialized,
+            .source_id = id,
+        };
+
+        return fwk_notification_notify(&scmi_services_initialized_notification,
+            &notifications_sent);
+    }
 
     return fwk_notification_subscribe(config->transport_notification_init_id,
                                       config->transport_id,
@@ -805,6 +814,7 @@ static int scmi_process_notification(const struct fwk_event *event,
                                      struct fwk_event *resp_event)
 {
     const struct mod_scmi_service_config *config;
+    unsigned int notifications_sent;
 
     fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT));
 
@@ -815,7 +825,13 @@ static int scmi_process_notification(const struct fwk_event *event,
     fwk_assert(fwk_id_is_equal(event->id,
                                config->transport_notification_init_id));
 
-    return FWK_SUCCESS;
+    /* Notify that this service is ready */
+    struct fwk_event scmi_services_initialized_notification = {
+        .id = mod_scmi_notification_id_initialized,
+    };
+
+    return fwk_notification_notify(&scmi_services_initialized_notification,
+        &notifications_sent);
 }
 
 /* SCMI module definition */
@@ -823,6 +839,7 @@ const struct fwk_module module_scmi = {
     .name = "SCMI",
     .api_count = MOD_SCMI_API_IDX_COUNT,
     .event_count = 1,
+    .notification_count = MOD_SCMI_NOTIFICATION_IDX_COUNT,
     .type = FWK_MODULE_TYPE_SERVICE,
     .init = scmi_init,
     .element_init = scmi_service_init,
