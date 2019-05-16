@@ -47,6 +47,9 @@ struct smt_channel_ctx {
 
     /* SCMI service API */
     struct mod_scmi_from_transport_api *scmi_api;
+
+    /* Flag indicating the mailbox is ready */
+    bool smt_mailbox_ready;
 };
 
 struct smt_ctx {
@@ -343,6 +346,13 @@ static int smt_signal_message(fwk_id_t channel_id)
     channel_ctx =
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
 
+    if (!channel_ctx->smt_mailbox_ready) {
+        /* Discard any message in the mailbox when not ready */
+        smt_ctx.log_api->log(MOD_LOG_GROUP_ERROR, "[SMT] Message not valid\n");
+
+        return FWK_SUCCESS;
+    }
+
     switch (channel_ctx->config->type) {
     case MOD_SMT_CHANNEL_TYPE_MASTER:
         /* Not supported yet */
@@ -532,6 +542,7 @@ static int smt_process_notification(
     struct mod_pd_power_state_transition_notification_params *params;
     struct smt_channel_ctx *channel_ctx;
     unsigned int notifications_sent;
+    int status;
 
     assert(fwk_id_is_equal(event->id,
         mod_pd_notification_id_power_state_transition));
@@ -540,11 +551,15 @@ static int smt_process_notification(
     params = (struct mod_pd_power_state_transition_notification_params *)
         event->params;
 
-    if (params->state != MOD_PD_STATE_ON)
-        return FWK_SUCCESS;
-
     channel_ctx =
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(event->target_id)];
+
+    if (params->state != MOD_PD_STATE_ON) {
+        if (params->state == MOD_PD_STATE_OFF)
+            channel_ctx->smt_mailbox_ready = false;
+
+        return FWK_SUCCESS;
+    }
 
     if (channel_ctx->config->policies & MOD_SMT_POLICY_INIT_MAILBOX) {
         /* Initialize mailbox */
@@ -558,8 +573,12 @@ static int smt_process_notification(
             .id = mod_smt_notification_id_initialized,
         };
 
-        return fwk_notification_notify(&smt_channels_initialized_notification,
+        channel_ctx->smt_mailbox_ready = true;
+
+        status = fwk_notification_notify(&smt_channels_initialized_notification,
             &notifications_sent);
+        if (status != FWK_SUCCESS)
+            return status;
     }
 
     return FWK_SUCCESS;
