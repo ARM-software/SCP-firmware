@@ -422,6 +422,26 @@ static inline bool mod_scmi_is_slave(enum scmi_channel_type type,
 }
 
 /*!
+ * \brief SCMI notification indices.
+ */
+enum mod_scmi_notification_idx {
+    /*! The SCMI service has been initialized */
+    MOD_SCMI_NOTIFICATION_IDX_INITIALIZED,
+
+    /*! Number of defined notifications */
+    MOD_SCMI_NOTIFICATION_IDX_COUNT
+};
+
+/*!
+ * \brief Identifier for the MOD_SCMI_NOTIFICATION_IDX_INITIALIZED
+ *     notification.
+ */
+static const fwk_id_t mod_scmi_notification_id_initialized =
+    FWK_ID_NOTIFICATION_INIT(
+        FWK_MODULE_IDX_SCMI,
+        MOD_SCMI_NOTIFICATION_IDX_INITIALIZED);
+
+/*!
  * @}
  */
 
