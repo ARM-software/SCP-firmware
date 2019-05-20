@@ -161,7 +161,7 @@ static int n1sdp_pcie_setup(struct n1sdp_pcie_dev_ctx *dev_ctx)
                        PCIE_INIT_STAGE_LINK_TRNG);
     if (status != FWK_SUCCESS) {
         pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Timeout!\n");
-        return status;
+        return dev_ctx->config->ccix_capable ? FWK_SUCCESS : status;
     }
     pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
 
