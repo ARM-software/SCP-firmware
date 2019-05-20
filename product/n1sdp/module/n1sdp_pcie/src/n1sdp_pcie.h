@@ -128,7 +128,7 @@
 /*
  * CCIX AXI slave ECAM memory mapping
  */
-#define CCIX_AXI_ECAM_TYPE0_OFFSET     (32 * FWK_MIB)
+#define CCIX_AXI_ECAM_TYPE0_OFFSET     UINT32_C(0)
 
 #define CCIX_AXI_ECAM_TYPE1_OFFSET     (CCIX_AXI_ECAM_TYPE0_OFFSET + \
                                            AXI_ECAM_TYPE0_SIZE)
@@ -142,7 +142,8 @@
 /* CCIX AXI slave MMIO32 & IO offset addresses */
 #define CCIX_AXI_MMIO32_OFFSET         (CCIX_AXI_ECAM_TYPE1_OFFSET + \
                                             AXI_ECAM_TYPE1_SIZE)
-#define CCIX_AXI_IO_OFFSET             UINT32_C(0)
+#define CCIX_AXI_IO_OFFSET             (CCIX_AXI_MMIO32_OFFSET + \
+                                            AXI_MMIO32_SIZE)
 
 /* AXI inbound region data */
 #define AXI_IB_REGION_BASE             UINT64_C(0)
