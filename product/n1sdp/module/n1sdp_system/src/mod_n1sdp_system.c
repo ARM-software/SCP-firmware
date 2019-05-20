@@ -25,11 +25,14 @@
 #include <mod_log.h>
 #include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
+#include <mod_scmi.h>
+#include <mod_sds.h>
 #include <mod_system_power.h>
 #include <n1sdp_core.h>
 #include <n1sdp_scp_pik.h>
 #include <n1sdp_scp_irq.h>
 #include <n1sdp_scp_mmap.h>
+#include <n1sdp_scp_scmi.h>
 #include <n1sdp_ssc.h>
 #include <config_clock.h>
 
@@ -42,6 +45,12 @@ struct cs_cnt_ctrl_reg {
 };
 
 #define CS_CNTCONTROL ((struct cs_cnt_ctrl_reg *)SCP_CS_CNTCONTROL_BASE)
+
+/* SCMI Services used by software on the AP cores */
+static unsigned int scmi_notification_table[] = {
+    SCP_N1SDP_SCMI_SERVICE_IDX_PSCI,
+    SCP_N1SDP_SCMI_SERVICE_IDX_OSPM,
+};
 
 /* Module context */
 struct n1sdp_system_ctx {
@@ -274,6 +283,113 @@ void csys_pwrupreq_handler(void)
 }
 
 /*
+ * Initialize primary core during system initialization
+ */
+static int n1sdp_system_init_primary_core(void)
+{
+    int status;
+    struct mod_pd_restricted_api *mod_pd_restricted_api = NULL;
+    struct mod_n1sdp_fip_descriptor *fip_desc_table = NULL;
+    unsigned int fip_count;
+    unsigned int i;
+    unsigned int core_idx;
+    unsigned int cluster_idx;
+    unsigned int cluster_count;
+    int fip_index_bl31 = -1;
+    int fip_index_bl33 = -1;
+
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[N1SDP SYSTEM] Looking for AP firmware in flash memory...\n");
+
+    status = n1sdp_system_ctx.flash_api->get_n1sdp_fip_descriptor_count(
+        FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SYSTEM), &fip_count);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    status = n1sdp_system_ctx.flash_api->get_n1sdp_fip_descriptor_table(
+        FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SYSTEM), &fip_desc_table);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    for (i = 0; i < fip_count; i++) {
+        if (fip_desc_table[i].type == MOD_N1SDP_FIP_TYPE_TF_BL31) {
+            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                "[N1SDP SYSTEM] Found BL31 at address: 0x%08x,"
+                " size: %u, flags: 0x%x\n",
+                fip_desc_table[i].address, fip_desc_table[i].size,
+                fip_desc_table[i].flags);
+            fip_index_bl31 = i;
+        } else if (fip_desc_table[i].type == MOD_N1SDP_FIP_TYPE_NS_BL33) {
+            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                "[N1SDP SYSTEM] Found BL33 at address: 0x%08x,"
+                " size: %u, flags: 0x%x\n",
+                fip_desc_table[i].address, fip_desc_table[i].size,
+                fip_desc_table[i].flags);
+            fip_index_bl33 = i;
+        }
+    }
+
+    if ((fip_index_bl31 < 0) || (fip_index_bl33 < 0)) {
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[N1SDP SYSTEM] Error! "
+            "FIP does not have all required binaries\n");
+        return FWK_E_PANIC;
+    }
+
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[N1SDP SYSTEM] Copying AP BL31 to address 0x%x...\n",
+        AP_CORE_RESET_ADDR);
+
+    status = n1sdp_system_copy_to_ap_sram(AP_CORE_RESET_ADDR,
+                 fip_desc_table[fip_index_bl31].address,
+                 fip_desc_table[fip_index_bl31].size);
+    if (status != FWK_SUCCESS)
+        return FWK_E_PANIC;
+
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[N1SDP SYSTEM] Copying AP BL33 to address 0x%x...\n",
+        AP_BL33_BASE_ADDR);
+
+    status = n1sdp_system_copy_to_ap_ddr(AP_BL33_BASE_ADDR,
+                 fip_desc_table[fip_index_bl33].address,
+                 fip_desc_table[fip_index_bl33].size);
+    if (status != FWK_SUCCESS)
+        return FWK_E_PANIC;
+
+    mod_pd_restricted_api = n1sdp_system_ctx.mod_pd_restricted_api;
+
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[N1SDP SYSTEM] Setting AP Reset Address to 0x%x\n",
+        AP_CORE_RESET_ADDR);
+
+    cluster_count = n1sdp_core_get_cluster_count();
+    for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
+        for (core_idx = 0;
+            core_idx < n1sdp_core_get_core_per_cluster_count(cluster_idx);
+            core_idx++) {
+            PIK_CLUSTER(cluster_idx)->STATIC_CONFIG[core_idx].RVBARADDR_LW
+                = (uint32_t)(AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET);
+            PIK_CLUSTER(cluster_idx)->STATIC_CONFIG[core_idx].RVBARADDR_UP
+                = (uint32_t)
+                ((AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET) >> 32);
+        }
+    }
+
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+        "[N1SDP SYSTEM] Switching ON primary core...\n");
+
+    status = mod_pd_restricted_api->set_composite_state_async(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
+        false,
+        MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
+            MOD_PD_STATE_ON, MOD_PD_STATE_ON));
+    if (status != FWK_SUCCESS)
+        return status;
+
+    return FWK_SUCCESS;
+}
+
+/*
  * Functions fulfilling the framework's module interface
  */
 
@@ -343,6 +459,7 @@ static int n1sdp_system_process_bind_request(fwk_id_t requester_id,
 static int n1sdp_system_start(fwk_id_t id)
 {
     int status;
+    unsigned int i;
 
     status = fwk_notification_subscribe(
         mod_clock_notification_id_state_changed,
@@ -380,6 +497,33 @@ static int n1sdp_system_start(fwk_id_t id)
     n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
         "[N1SDP SYSTEM] Requesting SYSTOP initialization...\n");
 
+    /*
+     * Subscribe to these SCMI channels in order to know when they have all
+     * initialized.
+     * At that point we can consider the SCMI stack to be initialized from
+     * the point of view of the PSCI agent.
+     */
+    for (i = 0; i < FWK_ARRAY_SIZE(scmi_notification_table); i++) {
+        status = fwk_notification_subscribe(
+            mod_scmi_notification_id_initialized,
+            fwk_id_build_element_id(fwk_module_id_scmi,
+                scmi_notification_table[i]),
+            id);
+        if (status != FWK_SUCCESS)
+            return status;
+    }
+
+    /*
+     * Subscribe to the SDS initialized notification so we can correctly let the
+     * PSCI agent know that the SCMI stack is initialized.
+     */
+    status = fwk_notification_subscribe(
+        mod_sds_notification_id_initialized,
+        fwk_module_id_sds,
+        id);
+    if (status != FWK_SUCCESS)
+        return status;
+
     return n1sdp_system_ctx.mod_pd_restricted_api->set_composite_state_async(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0), false,
             MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
@@ -390,126 +534,41 @@ static int n1sdp_system_process_notification(const struct fwk_event *event,
     struct fwk_event *resp_event)
 {
     struct clock_notification_params *params = NULL;
-    struct mod_pd_restricted_api *mod_pd_restricted_api = NULL;
-    struct mod_n1sdp_fip_descriptor *fip_desc_table = NULL;
-    unsigned int fip_count;
-    unsigned int i;
-    unsigned int core_idx;
-    unsigned int cluster_idx;
-    unsigned int cluster_count;
-    int fip_index_bl31 = -1;
-    int fip_index_bl33 = -1;
     int status;
 
-    assert(fwk_id_is_equal(event->id,
-                           mod_clock_notification_id_state_changed));
     assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
 
     params = (struct clock_notification_params *)event->params;
 
-    /*
-     * Initialize primary core when the system is initialized for the
-     * first time only.
-     */
-    if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
-
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-            "[N1SDP SYSTEM] Looking for AP firmware in flash memory...\n");
-
-        status = n1sdp_system_ctx.flash_api->get_n1sdp_fip_descriptor_count(
-            FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SYSTEM), &fip_count);
-        if (status != FWK_SUCCESS)
-            return status;
-
-        status = n1sdp_system_ctx.flash_api->get_n1sdp_fip_descriptor_table(
-            FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SYSTEM), &fip_desc_table);
-        if (status != FWK_SUCCESS)
-            return status;
-
-        for (i = 0; i < fip_count; i++) {
-            if (fip_desc_table[i].type == MOD_N1SDP_FIP_TYPE_TF_BL31) {
-                n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                    "[N1SDP SYSTEM] Found BL31 at address: 0x%08x,"
-                    " size: %u, flags: 0x%x\n",
-                    fip_desc_table[i].address, fip_desc_table[i].size,
-                    fip_desc_table[i].flags);
-                fip_index_bl31 = i;
-            } else if (fip_desc_table[i].type == MOD_N1SDP_FIP_TYPE_NS_BL33) {
-                n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                    "[N1SDP SYSTEM] Found BL33 at address: 0x%08x,"
-                    " size: %u, flags: 0x%x\n",
-                    fip_desc_table[i].address, fip_desc_table[i].size,
-                    fip_desc_table[i].flags);
-                fip_index_bl33 = i;
-            }
-        }
-
-        if ((fip_index_bl31 < 0) || (fip_index_bl33 < 0)) {
-            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                "[N1SDP SYSTEM] Error! "
-                "FIP does not have all required binaries\n");
-            return FWK_E_PANIC;
-        }
-
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-            "[N1SDP SYSTEM] Copying AP BL31 to address 0x%x...\n",
-            AP_CORE_RESET_ADDR);
-
-        status = n1sdp_system_copy_to_ap_sram(AP_CORE_RESET_ADDR,
-                     fip_desc_table[fip_index_bl31].address,
-                     fip_desc_table[fip_index_bl31].size);
-        if (status != FWK_SUCCESS)
-            return FWK_E_PANIC;
-
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-            "[N1SDP SYSTEM] Copying AP BL33 to address 0x%x...\n",
-            AP_BL33_BASE_ADDR);
-
-        status = n1sdp_system_copy_to_ap_ddr(AP_BL33_BASE_ADDR,
-                     fip_desc_table[fip_index_bl33].address,
-                     fip_desc_table[fip_index_bl33].size);
-        if (status != FWK_SUCCESS)
-            return FWK_E_PANIC;
-
-        mod_pd_restricted_api = n1sdp_system_ctx.mod_pd_restricted_api;
-
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-            "[N1SDP SYSTEM] Setting AP Reset Address to 0x%x\n",
-            AP_CORE_RESET_ADDR);
-
-        cluster_count = n1sdp_core_get_cluster_count();
-        for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
-            for (core_idx = 0;
-                core_idx < n1sdp_core_get_core_per_cluster_count(cluster_idx);
-                core_idx++) {
-                PIK_CLUSTER(cluster_idx)->STATIC_CONFIG[core_idx].RVBARADDR_LW
-                    = (uint32_t)(AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET);
-                PIK_CLUSTER(cluster_idx)->STATIC_CONFIG[core_idx].RVBARADDR_UP
-                    = (uint32_t)
-                    ((AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET) >> 32);
-            }
-        }
-
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
-            "[N1SDP SYSTEM] Switching ON primary core...\n");
-
-        status = mod_pd_restricted_api->set_composite_state_async(
-            FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
-            false,
-            MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
-                MOD_PD_STATE_ON, MOD_PD_STATE_ON));
-        if (status != FWK_SUCCESS)
-            return status;
+    if (fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed)) {
 
         /*
-         * Unsubscribe to interconnect clock state change notification as
-         * it has to be processed only once during system startup.
+         * Initialize primary core when the system is initialized for the
+         * first time only.
          */
-        return fwk_notification_unsubscribe(event->id, event->source_id,
-                                            event->target_id);
+        if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
+            status = n1sdp_system_init_primary_core();
+            if (status != FWK_SUCCESS)
+                return status;
+
+            /*
+             * Unsubscribe to interconnect clock state change notification as
+             * it has to be processed only once during system startup.
+             */
+            return fwk_notification_unsubscribe(event->id, event->source_id,
+                                                event->target_id);
+        }
+
+        return FWK_SUCCESS;
+    } else if (fwk_id_is_equal(event->id,
+                               mod_scmi_notification_id_initialized)) {
+        return FWK_SUCCESS;
+    } else if (fwk_id_is_equal(event->id,
+                               mod_sds_notification_id_initialized)) {
+        return FWK_SUCCESS;
     }
 
-    return FWK_SUCCESS;
+    return FWK_E_PARAM;
 }
 
 const struct fwk_module module_n1sdp_system = {

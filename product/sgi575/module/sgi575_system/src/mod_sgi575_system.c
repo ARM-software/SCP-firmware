@@ -21,13 +21,22 @@
 #include <mod_log.h>
 #include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
+#include <mod_scmi.h>
+#include <mod_sds.h>
 #include <mod_sgi575_system.h>
 #include <mod_system_power.h>
 #include <scp_sgi575_irq.h>
 #include <scp_sgi575_mmap.h>
+#include <scp_sgi575_scmi.h>
 #include <sgi575_core.h>
 #include <sgi575_pik_scp.h>
 #include <config_clock.h>
+
+/* SCMI services required to enable the messaging stack */
+static unsigned int scmi_notification_table[] = {
+    SCP_SGI575_SCMI_SERVICE_IDX_PSCI,
+    SCP_SGI575_SCMI_SERVICE_IDX_OSPM,
+};
 
 /* Module context */
 struct sgi575_system_ctx {
@@ -202,6 +211,7 @@ static int sgi575_system_process_bind_request(fwk_id_t requester_id,
 static int sgi575_system_start(fwk_id_t id)
 {
     int status;
+    unsigned int i;
 
     status = fwk_notification_subscribe(
         mod_clock_notification_id_state_changed,
@@ -212,6 +222,33 @@ static int sgi575_system_start(fwk_id_t id)
 
     sgi575_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
         "[SGI575 SYSTEM] Requesting SYSTOP initialization...\n");
+
+    /*
+     * Subscribe to these SCMI channels in order to know when they have all
+     * initialized.
+     * At that point we can consider the SCMI stack to be initialized from
+     * the point of view of the PSCI agent.
+     */
+    for (i = 0; i < FWK_ARRAY_SIZE(scmi_notification_table); i++) {
+        status = fwk_notification_subscribe(
+            mod_scmi_notification_id_initialized,
+            fwk_id_build_element_id(fwk_module_id_scmi,
+                scmi_notification_table[i]),
+            id);
+        if (status != FWK_SUCCESS)
+            return status;
+    }
+
+    /*
+     * Subscribe to the SDS initialized notification so we can correctly let the
+     * PSCI agent know that the SCMI stack is initialized.
+     */
+    status = fwk_notification_subscribe(
+        mod_sds_notification_id_initialized,
+        fwk_module_id_sds,
+        id);
+    if (status != FWK_SUCCESS)
+        return status;
 
     return
         sgi575_system_ctx.mod_pd_restricted_api->set_composite_state_async(
@@ -227,35 +264,44 @@ int sgi575_system_process_notification(const struct fwk_event *event,
     struct clock_notification_params *params;
     struct mod_pd_restricted_api *mod_pd_restricted_api;
 
-    assert(fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed));
     assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
 
-    params = (struct clock_notification_params *)event->params;
+    if (fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed)) {
+        params = (struct clock_notification_params *)event->params;
 
-    /*
-     * Initialize primary core when the system is initialized for the first time
-     * only
-     */
-    if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
-        sgi575_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
-            "[SGI575 SYSTEM] Initializing the primary core...\n");
+        /*
+         * Initialize primary core when the system is initialized for the first
+         * time only
+         */
+        if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
+            sgi575_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+                "[SGI575 SYSTEM] Initializing the primary core...\n");
 
-        mod_pd_restricted_api = sgi575_system_ctx.mod_pd_restricted_api;
+            mod_pd_restricted_api = sgi575_system_ctx.mod_pd_restricted_api;
 
-        status =  mod_pd_restricted_api->set_composite_state_async(
-            FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
-            false,
-            MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
-                MOD_PD_STATE_ON, MOD_PD_STATE_ON));
-        if (status != FWK_SUCCESS)
-            return status;
+            status =  mod_pd_restricted_api->set_composite_state_async(
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
+                false,
+                MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
+                    MOD_PD_STATE_ON, MOD_PD_STATE_ON));
+            if (status != FWK_SUCCESS)
+                return status;
 
-        /* Unsubscribe to the notification */
-        return fwk_notification_unsubscribe(event->id, event->source_id,
-                                            event->target_id);
+            /* Unsubscribe to the notification */
+            return fwk_notification_unsubscribe(event->id, event->source_id,
+                                                event->target_id);
+        }
+
+        return FWK_SUCCESS;
+    } else if (fwk_id_is_equal(event->id,
+                               mod_scmi_notification_id_initialized)) {
+        return FWK_SUCCESS;
+    } else if (fwk_id_is_equal(event->id,
+                               mod_sds_notification_id_initialized)) {
+        return FWK_SUCCESS;
     }
 
-    return FWK_SUCCESS;
+    return FWK_E_PARAM;
 }
 
 const struct fwk_module module_sgi575_system = {
