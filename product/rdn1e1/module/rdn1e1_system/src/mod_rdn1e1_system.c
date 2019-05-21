@@ -173,12 +173,13 @@ static int rdn1e1_system_bind(fwk_id_t id, unsigned int round)
 {
     int status;
 
-    if (round == 0) {
-        status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
-            FWK_ID_API(FWK_MODULE_IDX_LOG, 0), &rdn1e1_system_ctx.log_api);
-        if (status != FWK_SUCCESS)
-            return status;
-    }
+    if (round > 0)
+        return FWK_SUCCESS;
+
+    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
+        FWK_ID_API(FWK_MODULE_IDX_LOG, 0), &rdn1e1_system_ctx.log_api);
+    if (status != FWK_SUCCESS)
+        return status;
 
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_POWER_DOMAIN),
         FWK_ID_API(FWK_MODULE_IDX_POWER_DOMAIN, MOD_PD_API_IDX_RESTRICTED),
