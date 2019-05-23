@@ -16,28 +16,38 @@
 #include <n1sdp_pcie.h>
 #include <n1sdp_scp_pik.h>
 
-void pcie_phy_init(uint32_t phy_apb_base)
+void pcie_phy_init(uint32_t phy_apb_base, enum pcie_gen gen)
 {
 
     uint32_t j;
 
-    for (j = 0; j < 16; j++)
-        *((unsigned int *)((j << 11) | 0x1000C | phy_apb_base)) = 0x00004900;
-
-    *((unsigned int *)(0x00188 | phy_apb_base)) = 0x00001B26;
     for (j = 0; j < 16; j++) {
-        *((unsigned int *)((j << 11) | 0x00204 | phy_apb_base)) = 0x0000813E;
-        *((unsigned int *)((j << 11) | 0x00220 | phy_apb_base)) = 0x00000094;
-        *((unsigned int *)((j << 11) | 0x00244 | phy_apb_base)) = 0x00000314;
+        *((unsigned int *)((j << 11) | 0x1000C | phy_apb_base)) = 0x0000E900;
+
+        switch (gen) {
+        case PCIE_GEN_1:
+            *((unsigned int *)((j << 11) | 0x10220 | phy_apb_base)) = 0x0343;
+            break;
+        case PCIE_GEN_2:
+            *((unsigned int *)((j << 11) | 0x1021C | phy_apb_base)) = 0x0342;
+            break;
+        case PCIE_GEN_3:
+            *((unsigned int *)((j << 11) | 0x10218 | phy_apb_base)) = 0x0381;
+            break;
+        case PCIE_GEN_4:
+            *((unsigned int *)((j << 11) | 0x10214 | phy_apb_base)) = 0x0180;
+            break;
+        default:
+            return;
+        }
     }
 
-    for (j = 0; j < 16; j++)
-        *((unsigned int *)((j << 11) | 0x105a8 | phy_apb_base)) = 0x00002E31;
+    *((unsigned int *)(0x30038 | phy_apb_base)) = 0x00000013;
+    *((unsigned int *)(0x0010C | phy_apb_base)) = 0x0000002D;
+    *((unsigned int *)(0x00138 | phy_apb_base)) = 0x00001005;
+    *((unsigned int *)(0x00260 | phy_apb_base)) = 0x00002100;
 
-    *((unsigned int *)(0x30008 | phy_apb_base)) = 0x00004010;
-    *((unsigned int *)(0x3000c | phy_apb_base)) = 0x00000810;
-    *((unsigned int *)(0x30010 | phy_apb_base)) = 0x00001101;
-    *((unsigned int *)(0x30018 | phy_apb_base)) = 0x0000000A;
+    *((unsigned int *)(0x180EC | phy_apb_base)) = 0x00000055;
 
     for (j = 0; j < 16; j++) {
         *((unsigned int *)((j << 11) | 0x10320 | phy_apb_base)) = 0x00000500;
@@ -49,20 +59,37 @@ void pcie_phy_init(uint32_t phy_apb_base)
 
     for (j = 0; j < 16; j++) {
         *((unsigned int *)((j << 11) | 0x10110 | phy_apb_base)) = 0x00000000;
-        *((unsigned int *)((j << 11) | 0x10258 | phy_apb_base)) = 0x00000000;
-        *((unsigned int *)((j << 11) | 0x10324 | phy_apb_base)) = 0x00005664;
-        *((unsigned int *)((j << 11) | 0x101c4 | phy_apb_base)) = 0x00000002;
+        *((unsigned int *)((j << 11) | 0x10258 | phy_apb_base)) = 0x00008000;
+        *((unsigned int *)((j << 11) | 0x10324 | phy_apb_base)) = 0x0000D664;
+        *((unsigned int *)((j << 11) | 0x101C4 | phy_apb_base)) = 0x00000002;
         *((unsigned int *)((j << 11) | 0x10320 | phy_apb_base)) = 0x00000100;
         *((unsigned int *)((j << 11) | 0x10328 | phy_apb_base)) = 0x00008190;
-        *((unsigned int *)((j << 11) | 0x10334 | phy_apb_base)) = 0x0000008a;
-        *((unsigned int *)((j << 11) | 0x1034c | phy_apb_base)) = 0x0000000a;
-        *((unsigned int *)((j << 11) | 0x1053c | phy_apb_base)) = 0x00005008;
+        *((unsigned int *)((j << 11) | 0x10334 | phy_apb_base)) = 0x0000008A;
+        *((unsigned int *)((j << 11) | 0x1034C | phy_apb_base)) = 0x0000000A;
+        *((unsigned int *)((j << 11) | 0x1053C | phy_apb_base)) = 0x00005008;
         *((unsigned int *)((j << 11) | 0x10540 | phy_apb_base)) = 0x00005008;
         *((unsigned int *)((j << 11) | 0x10560 | phy_apb_base)) = 0x00003783;
-        *((unsigned int *)((j << 11) | 0x1060c | phy_apb_base)) = 0x00001002;
+        *((unsigned int *)((j << 11) | 0x1060C | phy_apb_base)) = 0x00001002;
         *((unsigned int *)((j << 11) | 0x10610 | phy_apb_base)) = 0x00002004;
-        *((unsigned int *)((j << 11) | 0x107bc | phy_apb_base)) = 0x00001002;
-        *((unsigned int *)((j << 11) | 0x107c0 | phy_apb_base)) = 0x00002004;
+        *((unsigned int *)((j << 11) | 0x107BC | phy_apb_base)) = 0x00001002;
+        *((unsigned int *)((j << 11) | 0x107C0 | phy_apb_base)) = 0x00002004;
+    }
+
+    for (j = 0; j < 16; j++) {
+        *((unsigned int *)((j << 11) | 0x1023C | phy_apb_base)) = 0x00008003;
+        *((unsigned int *)((j << 11) | 0x10340 | phy_apb_base)) = 0x00004A4A;
+        *((unsigned int *)((j << 11) | 0x10324 | phy_apb_base)) = 0x00005864;
+        *((unsigned int *)((j << 11) | 0x10330 | phy_apb_base)) = 0x000001FF;
+        *((unsigned int *)((j << 11) | 0x10334 | phy_apb_base)) = 0x0000000F;
+        *((unsigned int *)((j << 11) | 0x10338 | phy_apb_base)) = 0x000000FF;
+        *((unsigned int *)((j << 11) | 0x10360 | phy_apb_base)) = 0x000068F8;
+        *((unsigned int *)((j << 11) | 0x10368 | phy_apb_base)) = 0x000000F8;
+        *((unsigned int *)((j << 11) | 0x10500 | phy_apb_base)) = 0x0000009B;
+        *((unsigned int *)((j << 11) | 0x10504 | phy_apb_base)) = 0x0000C0C0;
+        *((unsigned int *)((j << 11) | 0x10508 | phy_apb_base)) = 0x0000818F;
+        *((unsigned int *)((j << 11) | 0x1053C | phy_apb_base)) = 0x00002401;
+        *((unsigned int *)((j << 11) | 0x10540 | phy_apb_base)) = 0x00003C03;
+        *((unsigned int *)((j << 11) | 0x10544 | phy_apb_base)) = 0x00000A0A;
     }
 }
 
@@ -96,7 +123,8 @@ bool pcie_wait_condition(void *data)
 
 int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
               struct mod_timer_api *timer_api,
-              enum pcie_init_stage stage)
+              enum pcie_init_stage stage,
+              enum pcie_gen gen)
 {
     assert(ctrl_apb != NULL);
     assert(timer_api != NULL);
@@ -125,8 +153,13 @@ int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
         /* Clear ARI & SR_IOV bits */
         ctrl_apb->RP_CONFIG_IN &= ~RP_CONFIG_IN_ARI_EN_MASK;
         ctrl_apb->RP_CONFIG_IN &= ~RP_CONFIG_IN_SR_IOV_EN_MASK;
-        ctrl_apb->RP_CONFIG_IN = (0x4 << RP_CONFIG_IN_LANE_CNT_IN_POS) |
-                                 (0x1 << RP_CONFIG_IN_PCIE_GEN_SEL_POS);
+
+        /* Clear the bits before writing to it */
+        ctrl_apb->RP_CONFIG_IN &= ~RP_CONFIG_IN_PCIE_GEN_SEL_MASK;
+        ctrl_apb->RP_CONFIG_IN &= ~RP_CONFIG_IN_LANE_CNT_IN_MASK;
+
+        ctrl_apb->RP_CONFIG_IN |= (0x4 << RP_CONFIG_IN_LANE_CNT_IN_POS) |
+                                  (gen << RP_CONFIG_IN_PCIE_GEN_SEL_POS);
         ctrl_apb->RESET_CTRL = RESET_CTRL_RC_REL_MASK;
         status = timer_api->wait(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
                                  PCIE_CTRL_RC_RESET_TIMEOUT,
@@ -241,5 +274,36 @@ int pcie_rp_ep_config_read_word(uint32_t base,
 
     *value = *(uint32_t *)(base + offset);
 
+    return FWK_SUCCESS;
+}
+
+int pcie_set_gen_tx_preset(uint32_t rp_ep_config_apb_base,
+                           uint32_t preset,
+                           enum pcie_gen gen)
+{
+    uint32_t i;
+    uint32_t offset;
+    uint32_t reg_value;
+    uint32_t preset_reg = 0;
+    uint32_t offset_min;
+    uint32_t offset_max;
+    uint32_t nibble;
+
+    assert((gen == PCIE_GEN_3) || (gen == PCIE_GEN_4));
+
+    offset_min = (gen == PCIE_GEN_3) ? GEN3_OFFSET_MIN : GEN4_OFFSET_MIN;
+    offset_max = (gen == PCIE_GEN_3) ? GEN3_OFFSET_MAX : GEN4_OFFSET_MAX;
+    nibble = (gen == PCIE_GEN_3) ? GEN3_PRESET : GEN4_PRESET;
+
+    for (i = 0; i < 32; i += nibble)
+        preset_reg |= (preset << i);
+
+    for (offset = offset_min; offset < offset_max; offset += 0x4) {
+        pcie_rp_ep_config_write_word(rp_ep_config_apb_base, offset, preset_reg);
+        pcie_rp_ep_config_read_word(rp_ep_config_apb_base, offset, &reg_value);
+
+        if (reg_value != preset_reg)
+            return FWK_E_DATA;
+    }
     return FWK_SUCCESS;
 }

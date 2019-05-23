@@ -228,6 +228,15 @@
 #define AXI_HIGH_ADDR_BIT_POS          32
 #define AXI_ADDR_NUM_BITS_MAX          ((1 << 6) - 1)
 
+#define TX_PRESET_VALUE         0x4
+
+#define GEN3_OFFSET_MIN         0x30C
+#define GEN3_OFFSET_MAX         0x32C
+#define GEN3_PRESET             0x8
+
+#define GEN4_OFFSET_MIN         0x9E0
+#define GEN4_OFFSET_MAX         0x9EC
+#define GEN4_PRESET             0x4
 /*
  * AXI outbound region register set definitions
  */
@@ -361,6 +370,15 @@ enum pcie_init_stage {
 };
 
 /*
+ * Identifiers of PCIe Generation
+ */
+enum pcie_gen {
+    PCIE_GEN_1,
+    PCIE_GEN_2,
+    PCIE_GEN_3,
+    PCIE_GEN_4,
+};
+/*
  * Structure defining data to be passed to timer API
  */
 struct pcie_wait_condition_data {
@@ -423,20 +441,23 @@ bool pcie_wait_condition(void *data);
  * param - ctrl_apb - Pointer to APB controller register space
  * param - timer_api - Pointer to timer API used for timeout detection
  * param - stage - Identifier of current PCIe initialization stage
+ * param - gen - PCIe Generation
  *
  * retval - FWK_SUCCESS - if the operation is succeeded
  *          FWK_E_TIMEOUT - if initialization times out
  */
 int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
               struct mod_timer_api *timer_api,
-              enum pcie_init_stage stage);
+              enum pcie_init_stage stage,
+              enum pcie_gen gen);
 
 /*
  * Brief - Function to initialize PCIe PHY layer.
  *
  * param - pcie_phy_base - Base address of the PHY layer registers
+ * param - gen - PCIe Generation
  */
-void pcie_phy_init(uint32_t phy_apb_base);
+void pcie_phy_init(uint32_t phy_apb_base, enum pcie_gen gen);
 
 /*
  * Brief - Function to write to Root Port's/End Point's configuration space.
@@ -465,5 +486,21 @@ int pcie_rp_ep_config_write_word(uint32_t base,
 int pcie_rp_ep_config_read_word(uint32_t base,
                                 uint32_t offset,
                                 uint32_t *value);
+
+/*
+ * Brief - TX Equalization Preset function.
+ *
+ * param - rp_ep_config_apb_base - Base address of the PCIe configuration
+ *                                 APB registers.
+ * param - preset - Preset Value
+ * param - gen - PCIe generation
+ *
+ * retval - FWK_SUCCESS - if the operation is succeeded
+ *          FWK_E_DATA - if there is a mismatch between value written
+ *                       to and read from the register.
+ */
+int pcie_set_gen_tx_preset(uint32_t rp_ep_config_apb_base,
+                           uint32_t preset,
+                           enum pcie_gen gen);
 
 #endif /* N1SDP_PCIE_H */

@@ -96,6 +96,9 @@ static int n1sdp_pcie_setup(struct n1sdp_pcie_dev_ctx *dev_ctx)
     uint8_t neg_config;
     struct pcie_wait_condition_data wait_data;
     int status;
+    enum pcie_gen gen_speed;
+
+    gen_speed = dev_ctx->config->ccix_capable ? PCIE_GEN_4 : PCIE_GEN_3;
 
     /* Enable the CCIX/PCIe controller */
     wait_data.ctrl_apb = NULL;
@@ -131,10 +134,12 @@ static int n1sdp_pcie_setup(struct n1sdp_pcie_dev_ctx *dev_ctx)
 
     /* PHY initialization */
     pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "[PCIe] Initializing PHY...");
-    pcie_phy_init(dev_ctx->phy_apb);
+
+    pcie_phy_init(dev_ctx->phy_apb, gen_speed);
     status = pcie_init(dev_ctx->ctrl_apb,
                        pcie_ctx.timer_api,
-                       PCIE_INIT_STAGE_PHY);
+                       PCIE_INIT_STAGE_PHY,
+                       gen_speed);
     if (status != FWK_SUCCESS) {
         pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Timeout!\n");
         return status;
@@ -146,19 +151,29 @@ static int n1sdp_pcie_setup(struct n1sdp_pcie_dev_ctx *dev_ctx)
                           "[PCIe] Initializing controller...");
     status = pcie_init(dev_ctx->ctrl_apb,
                        pcie_ctx.timer_api,
-                       PCIE_INIT_STAGE_CTRL);
+                       PCIE_INIT_STAGE_CTRL,
+                       gen_speed);
     if (status != FWK_SUCCESS) {
         pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Timeout!\n");
         return status;
     }
     pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
 
+    status = pcie_set_gen_tx_preset(dev_ctx->rp_ep_config_apb,
+                                    TX_PRESET_VALUE,
+                                    gen_speed);
+    if (status != FWK_SUCCESS) {
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Equalization failed!\n");
+        return status;
+    }
+
     /* Link training */
     pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
                           "[PCIe] Starting link training...");
     status = pcie_init(dev_ctx->ctrl_apb,
                        pcie_ctx.timer_api,
-                       PCIE_INIT_STAGE_LINK_TRNG);
+                       PCIE_INIT_STAGE_LINK_TRNG,
+                       gen_speed);
     if (status != FWK_SUCCESS) {
         pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Timeout!\n");
         return dev_ctx->config->ccix_capable ? FWK_SUCCESS : status;
