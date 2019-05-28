@@ -822,6 +822,7 @@ static int scmi_process_notification(const struct fwk_event *event,
     /* Notify that this service is ready */
     struct fwk_event scmi_services_initialized_notification = {
         .id = mod_scmi_notification_id_initialized,
+        .source_id = FWK_ID_NONE
     };
 
     return fwk_notification_notify(&scmi_services_initialized_notification,

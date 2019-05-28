@@ -164,6 +164,7 @@ static int msys_rom_process_event(const struct fwk_event *event,
     struct fwk_event systop_on_event = {
         .response_requested = true,
         .id = mod_msys_rom_notification_id_systop,
+        .source_id = FWK_ID_NONE
     };
 
     /* Notify any subscribers of the SYSTOP power domain state change */

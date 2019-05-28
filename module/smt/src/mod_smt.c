@@ -523,6 +523,7 @@ static int smt_process_notification(
         /* Notify that this mailbox is initialized */
         struct fwk_event smt_channels_initialized_notification = {
             .id = mod_smt_notification_id_initialized,
+            .source_id = FWK_ID_NONE
         };
 
         channel_ctx->smt_mailbox_ready = true;
