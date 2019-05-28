@@ -355,8 +355,8 @@ static void test_fwk_notification_notify(void)
 
     /* Call from a thread, current event, incompatible notification and
        source identifier. */
-    current_event.target_id = FWK_ID_ELEMENT(0x1, 0x9);
-    notification_event.source_id = FWK_ID_ELEMENT(0x2, 0x9);
+    current_event.target_id = FWK_ID_ELEMENT(0x2, 0x9);
+    notification_event.source_id = FWK_ID_ELEMENT(0x3, 0x9);
     notification_event.id = FWK_ID_NOTIFICATION(0x2, 0x1);
     get_current_event_return_val = &current_event;
     result = fwk_notification_notify(&notification_event, &count);
@@ -428,8 +428,8 @@ static void test_fwk_notification_notify(void)
 
     current_event.target_id = FWK_ID_MODULE(0x2);
     get_current_event_return_val = &current_event;
-    notification_event.source_id = FWK_ID_ELEMENT(0x2, 0x9);
     notification_event.id = FWK_ID_NOTIFICATION(0x2, 0x1);
+    is_valid_entity_id_return_val = false;
     result = fwk_notification_notify(&notification_event, &count);
     assert(result == FWK_SUCCESS);
     assert(count == 1);

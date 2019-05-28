@@ -58,9 +58,11 @@ int fwk_notification_unsubscribe(fwk_id_t notification_id, fwk_id_t source_id,
 /*!
  * \brief Send a notification to all entities that are subscribed to it.
  *
- * \note During the runtime phase, if called from a thread, the
- *      identifier of the event source is populated automatically with the
- *      identifier of the calling entity.
+ * \note During the runtime phase, if called from a thread and if the source
+ *      identifier of the notification event is not a valid entity identifier,
+ *      the event source identifier is populated automatically by the framework
+ *      with the identifier of the entity target of the event being currently
+ *      processed.
  *
  * \param notification_event Pointer to the notification event. Must not be
  *      \c NULL.
