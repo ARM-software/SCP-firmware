@@ -305,8 +305,15 @@ int fwk_notification_notify(struct fwk_event *notification_event,
         }
     } else {
         current_event = __fwk_thread_get_current_event();
-        if (current_event != NULL)
+
+        if ((current_event != NULL) &&
+            (!fwk_module_is_valid_entity_id(notification_event->source_id))) {
+            /*
+             * The source_id provided is not valid, use the identifier of the
+             * target for the current event.
+             */
             notification_event->source_id = current_event->target_id;
+        }
     }
 
     if (!fwk_module_is_valid_notification_id(notification_event->id) ||
