@@ -441,6 +441,7 @@ static int clock_process_pd_pre_transition_notification(
     struct fwk_event outbound_event = {
         .response_requested = true,
         .id = mod_clock_notification_id_state_change_pending,
+        .source_id = FWK_ID_NONE
     };
 
     pd_params = (struct mod_pd_power_state_pre_transition_notification_params *)
@@ -506,6 +507,7 @@ static int clock_process_pd_transition_notification(
     struct fwk_event outbound_event = {
         .response_requested = false,
         .id = mod_clock_notification_id_state_changed,
+        .source_id = FWK_ID_NONE
     };
 
     pd_params =
