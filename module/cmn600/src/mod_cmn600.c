@@ -10,6 +10,7 @@
 #include <fwk_assert.h>
 #include <fwk_errno.h>
 #include <fwk_macros.h>
+#include <fwk_math.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -19,44 +20,13 @@
 #include <mod_log.h>
 #include <mod_power_domain.h>
 #include <cmn600.h>
+#include <internal/cmn600_ccix.h>
+#include <internal/cmn600_ctx.h>
 #include <mod_ppu_v1.h>
 
 #define MOD_NAME "[CMN600] "
 
-/* External nodes that require RN-SAM mapping during run-time */
-struct external_rnsam_tuple {
-    unsigned int node_id;
-    struct cmn600_rnsam_reg *node;
-};
-
-struct cmn600_ctx {
-    const struct mod_cmn600_config *config;
-
-    struct cmn600_cfgm_reg *root;
-
-    /* Number of HN-F (system cache) nodes in the system */
-    unsigned int hnf_count;
-    uint64_t *hnf_cache_group;
-
-    /*
-     * External RN-SAMs. The driver keeps a list of tuples (node identifier and
-     * node pointers). The configuration of these nodes is via the SAM API.
-     */
-    unsigned int external_rnsam_count;
-    struct external_rnsam_tuple *external_rnsam_table;
-
-    /*
-     * Internal RN-SAMs. The driver keeps a list of RN-SAM pointers to
-     * configure them once the system has been fully discovered and all
-     * parameters are known
-     */
-    unsigned int internal_rnsam_count;
-    struct cmn600_rnsam_reg **internal_rnsam_table;
-
-    struct mod_log_api *log_api;
-
-    bool initialized;
-} *ctx;
+struct cmn600_ctx *ctx;
 
 static void process_node_hnf(struct cmn600_hnf_reg *hnf)
 {
@@ -114,7 +84,7 @@ static void process_node_hnf(struct cmn600_hnf_reg *hnf)
  * - Number of internal RN-SAM nodes
  * - Number of HN-F nodes (cache)
  */
-static void cmn600_discovery(void)
+static int cmn600_discovery(void)
 {
     unsigned int xp_count;
     unsigned int xp_idx;
@@ -152,7 +122,11 @@ static void cmn600_discovery(void)
             /* External nodes */
             if (is_child_external(xp, node_idx)) {
                 ctx->external_rnsam_count++;
-                ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
+
+            if (get_child_node_id(xp, node_idx) == config->cxgla_node_id)
+                ctx->cxla_reg = (void *)node;
+
+            ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
                     MOD_NAME "  Found external node ID:%d\n",
                     get_child_node_id(xp, node_idx));
 
@@ -160,11 +134,46 @@ static void cmn600_discovery(void)
             } else {
                 switch (get_node_type(node)) {
                 case NODE_TYPE_HN_F:
-                    ctx->hnf_count++;
+                    if ((ctx->hnf_count++) >= MAX_HNF_COUNT) {
+                        ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
+                                MOD_NAME "  hnf count %d >= max limit (%d)\n",
+                                ctx->hnf_count, MAX_HNF_COUNT);
+                        return FWK_E_DATA;
+                    }
+                    ctx->hnf_offset[ctx->hnf_count] = (uint32_t)node;
                     break;
 
                 case NODE_TYPE_RN_SAM:
                     ctx->internal_rnsam_count++;
+                    break;
+
+                case NODE_TYPE_RN_D:
+                    if ((ctx->rnd_count++) >= MAX_RND_COUNT) {
+                        ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
+                                MOD_NAME "  rnd count %d >= max limit (%d)\n",
+                                ctx->rnd_count, MAX_RND_COUNT);
+                        return FWK_E_DATA;
+                    }
+                    ctx->rnd_ldid[ctx->rnd_count] = get_node_logical_id(node);
+                    break;
+
+                case NODE_TYPE_RN_I:
+                    if ((ctx->rni_count++) >= MAX_RNI_COUNT) {
+                        ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
+                                MOD_NAME "  rni count %d >= max limit (%d)\n",
+                                ctx->rni_count, MAX_RNI_COUNT);
+                        return FWK_E_DATA;
+                    }
+                    ctx->rni_ldid[ctx->rni_count] = get_node_logical_id(node);
+                    break;
+
+                case NODE_TYPE_CXRA:
+                    ctx->cxg_ra_reg = (struct cmn600_cxg_ra_reg *)node;
+                    break;
+
+                case NODE_TYPE_CXHA:
+                    ctx->cxg_ha_reg = (struct cmn600_cxg_ha_reg *)node;
+                    ctx->ccix_host_info.host_ha_count++;
                     break;
 
                 default:
@@ -184,10 +193,31 @@ static void cmn600_discovery(void)
     ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
         MOD_NAME "Total internal RN-SAM nodes: %d\n"
         MOD_NAME "Total external RN-SAM nodes: %d\n"
-        MOD_NAME "Total HN-F nodes: %d\n",
+        MOD_NAME "Total HN-F nodes: %d\n"
+        MOD_NAME "Total RN-D nodes: %d\n"
+        MOD_NAME "Total RN-I nodes: %d\n",
         ctx->internal_rnsam_count,
         ctx->external_rnsam_count,
-        ctx->hnf_count);
+        ctx->hnf_count,
+        ctx->rnd_count,
+        ctx->rni_count);
+
+    if (ctx->cxla_reg) {
+        ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
+            MOD_NAME "CCIX CXLA node at: 0x%08x\n",
+            (uint32_t)ctx->cxla_reg);
+    }
+    if (ctx->cxg_ra_reg) {
+        ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
+            MOD_NAME "CCIX CXRA node at: 0x%08x\n",
+            (uint32_t)ctx->cxg_ra_reg);
+    }
+    if (ctx->cxg_ha_reg) {
+        ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
+            MOD_NAME "CCIX CXHA node at: 0x%08x\n",
+            (uint32_t)ctx->cxg_ha_reg);
+    }
+    return FWK_SUCCESS;
 }
 
 static void cmn600_configure(void)
@@ -247,9 +277,10 @@ static const char * const mmap_type_name[] = {
     [MOD_CMN600_MEMORY_REGION_TYPE_IO] = "I/O",
     [MOD_CMN600_MEMORY_REGION_TYPE_SYSCACHE] = "System Cache",
     [MOD_CMN600_REGION_TYPE_SYSCACHE_SUB] = "Sub-System Cache",
+    [MOD_CMN600_REGION_TYPE_CCIX] = "CCIX",
 };
 
-static int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
+int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
 {
     unsigned int region_idx;
     unsigned int region_io_count = 0;
@@ -258,6 +289,7 @@ static int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
     unsigned int bit_pos;
     unsigned int group;
     unsigned int group_count;
+    enum sam_node_type sam_node_type;
 
     ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
         MOD_NAME "Configuring SAM for node %d\n",
@@ -277,15 +309,18 @@ static int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
 
         switch (region->type) {
         case MOD_CMN600_MEMORY_REGION_TYPE_IO:
+        case MOD_CMN600_REGION_TYPE_CCIX:
             /*
              * Configure memory region
              */
+            sam_node_type =
+                (region->type == MOD_CMN600_MEMORY_REGION_TYPE_IO) ?
+                    SAM_NODE_TYPE_HN_I : SAM_NODE_TYPE_CXRA;
             configure_region(&rnsam->NON_HASH_MEM_REGION[group],
                 bit_pos,
                 region->base,
                 region->size,
-                SAM_NODE_TYPE_HN_I);
-
+                sam_node_type);
             /*
              * Configure target node
              */
@@ -340,11 +375,13 @@ static int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
 
 static int cmn600_setup(void)
 {
-    unsigned int rnsam_idx;
+    unsigned int rnsam_idx, i, ccix_mmap_idx;
+    int status = FWK_SUCCESS;
 
     if (!ctx->initialized) {
-        cmn600_discovery();
-
+        status = cmn600_discovery();
+        if (status != FWK_SUCCESS)
+            return status;
         /*
          * Allocate resources based on the discovery
          */
@@ -385,6 +422,21 @@ static int cmn600_setup(void)
     for (rnsam_idx = 0; rnsam_idx < ctx->internal_rnsam_count; rnsam_idx++)
         cmn600_setup_sam(ctx->internal_rnsam_table[rnsam_idx]);
 
+    /* Capture CCIX Host Topology */
+    for (i = 0; i < ctx->config->mmap_count; i++) {
+        if (ctx->config->mmap_table[i].type == MOD_CMN600_REGION_TYPE_CCIX) {
+            ccix_mmap_idx = ctx->ccix_host_info.ccix_host_mmap_count;
+            if (ccix_mmap_idx >= MAX_HA_MMAP_ENTRIES)
+                return FWK_E_DATA;
+
+            ctx->ccix_host_info.ccix_host_mmap[ccix_mmap_idx].base =
+                ctx->config->mmap_table[i].base;
+            ctx->ccix_host_info.ccix_host_mmap[ccix_mmap_idx].size =
+                ctx->config->mmap_table[i].size;
+            ctx->ccix_host_info.ccix_host_mmap_count++;
+        }
+    }
+
     ctx->log_api->log(MOD_LOG_GROUP_DEBUG, MOD_NAME "Done\n");
 
     ctx->initialized = true;
@@ -424,6 +476,84 @@ static void post_ppu_on(void *data)
 static const struct mod_ppu_v1_power_state_observer_api cmn600_observer_api = {
     .post_ppu_on = post_ppu_on,
 };
+
+/*
+ * CCIX configuration APIs invoked by SCMI
+ */
+
+static int cmn600_ccix_config_get(
+    struct mod_cmn600_ccix_host_node_config *config)
+{
+    int status;
+    status = fwk_module_check_call(fwk_module_id_cmn600);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    if (ctx->external_rnsam_count == 0)
+        return FWK_E_DATA;
+
+    ctx->ccix_host_info.host_ra_count = ctx->external_rnsam_count - 1;
+    ctx->ccix_host_info.host_sa_count = ctx->config->sa_count;
+
+    memcpy((void *)config, (void *)&ctx->ccix_host_info,
+        sizeof(struct mod_cmn600_ccix_host_node_config));
+    return FWK_SUCCESS;
+}
+
+
+static int cmn600_ccix_config_set(
+    struct mod_cmn600_ccix_remote_node_config *config)
+{
+    unsigned int i;
+    int status;
+
+    status = fwk_module_check_call(fwk_module_id_cmn600);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    status = ccix_setup(ctx, config);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    for (i = 0; i < ctx->config->mmap_count; i++) {
+        if (ctx->config->mmap_table[i].type == MOD_CMN600_REGION_TYPE_CCIX)
+            cmn600_setup_rnsam(ctx->config->mmap_table[i].node_id);
+    }
+    return FWK_SUCCESS;
+}
+
+static int cmn600_ccix_exchange_protocol_credit(uint8_t link_id)
+{
+    int status;
+
+    status = fwk_module_check_call(fwk_module_id_cmn600);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    status = ccix_exchange_protocol_credit(ctx, link_id);
+    return status;
+}
+
+static int cmn600_ccix_enter_system_coherency(uint8_t link_id)
+{
+    int status;
+
+    status = fwk_module_check_call(fwk_module_id_cmn600);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    status = ccix_enter_system_coherency(ctx, link_id);
+    return status;
+
+}
+
+static const struct mod_cmn600_ccix_config_api cmn600_ccix_config_api = {
+    .get_config = cmn600_ccix_config_get,
+    .set_config = cmn600_ccix_config_set,
+    .exchange_protocol_credit = cmn600_ccix_exchange_protocol_credit,
+    .enter_system_coherency = cmn600_ccix_enter_system_coherency
+};
+
 
 /*
  * Framework handlers
@@ -477,6 +607,14 @@ static int cmn600_bind(fwk_id_t id, unsigned int round)
 
         if (status != FWK_SUCCESS)
             return FWK_E_PANIC;
+
+        /* Bind to the timer component */
+        status = fwk_module_bind(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                                 FWK_ID_API(FWK_MODULE_IDX_TIMER,
+                                            MOD_TIMER_API_IDX_TIMER),
+                                 &ctx->timer_api);
+        if (status != FWK_SUCCESS)
+            return FWK_E_PANIC;
     }
 
     return FWK_SUCCESS;
@@ -485,7 +623,16 @@ static int cmn600_bind(fwk_id_t id, unsigned int round)
 static int cmn600_process_bind_request(fwk_id_t requester_id,
     fwk_id_t target_id, fwk_id_t api_id, const void **api)
 {
-    *api = &cmn600_observer_api;
+    switch (fwk_id_get_api_idx(api_id)) {
+    case MOD_CMN600_API_IDX_PPU_OBSERVER:
+        *api = &cmn600_observer_api;
+        break;
+
+    case MOD_CMN600_API_IDX_CCIX_CONFIG:
+        *api = &cmn600_ccix_config_api;
+        break;
+    }
+
     return FWK_SUCCESS;
 }
 
