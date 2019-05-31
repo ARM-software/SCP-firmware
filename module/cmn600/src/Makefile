@@ -8,6 +8,6 @@
 BS_LIB_NAME := CMN600
 
 BS_LIB_SOURCES = mod_cmn600.c
-BS_LIB_SOURCES += cmn600.c
+BS_LIB_SOURCES += cmn600.c cmn600_ccix.c
 
 include $(BS_DIR)/lib.mk

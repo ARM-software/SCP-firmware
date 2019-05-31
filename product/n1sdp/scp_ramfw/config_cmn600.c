@@ -19,6 +19,9 @@
 #define DMC1_ID          0x6C
 #define NODE_ID_HND      0x68
 #define NODE_ID_SBSX     0x64
+#define NODE_ID_CCIX     0x0
+#define NODE_ID_CXGLA    0x2
+
 
 static const unsigned int snf_table[] = {
     DMC0_ID, /* Maps to HN-F logical node 0 */
@@ -137,6 +140,16 @@ static const struct mod_cmn600_memory_region_map mmap[] = {
         .type = MOD_CMN600_MEMORY_REGION_TYPE_IO,
         .node_id = NODE_ID_HND,
     },
+    {
+        /*
+         * Peripherals
+         * Map: 0x400_0000_0000 - 0x7FF_FFFF_FFFF (4 TB)
+         */
+        .base = UINT64_C(0x40000000000),
+        .size = UINT64_C(4) * FWK_TIB,
+        .type = MOD_CMN600_REGION_TYPE_CCIX,
+        .node_id = NODE_ID_CCIX,
+    },
 };
 
 const struct fwk_module_config config_cmn600 = {
@@ -148,6 +161,8 @@ const struct fwk_module_config config_cmn600 = {
         .hnd_node_id = NODE_ID_HND,
         .snf_table = snf_table,
         .snf_count = FWK_ARRAY_SIZE(snf_table),
+        .sa_count  = 2,
+        .cxgla_node_id = NODE_ID_CXGLA,
         .mmap_table = mmap,
         .mmap_count = FWK_ARRAY_SIZE(mmap),
         .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
