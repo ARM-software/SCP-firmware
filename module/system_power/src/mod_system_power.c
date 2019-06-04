@@ -28,10 +28,6 @@
                            MOD_PD_STATE_ON, \
                            MOD_PD_STATE_ON)
 
-/* SoC wakeup Power Domain Identifier */
-static const fwk_id_t mod_system_power_soc_wakeup_pd_id =
-    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN, 0);
-
 /* Element context */
 struct system_power_dev_ctx {
     /* Element configuration data pointer */
@@ -75,6 +71,12 @@ struct system_power_ctx {
 
     /* Pointer to module config */
     const struct mod_system_power_config *config;
+
+    /*
+     * Identifier of the power domain of the last standing core before system
+     * suspend.
+     */
+    fwk_id_t last_core_pd_id;
 };
 
 static struct system_power_ctx system_power_ctx;
@@ -249,6 +251,12 @@ static int system_power_set_state(fwk_id_t pd_id, unsigned int state)
         if (status != FWK_SUCCESS)
             return status;
 
+        /* Store the identifier of the power domain of the last standing core */
+        status = system_power_ctx.mod_pd_driver_input_api->
+            get_last_core_pd_id(&system_power_ctx.last_core_pd_id);
+        if (status != FWK_SUCCESS)
+            return status;
+
         fwk_interrupt_enable(soc_wakeup_irq);
 
         if (system_power_ctx.driver_api->platform_interrupts != NULL) {
@@ -315,7 +323,7 @@ static void soc_wakeup_handler(void)
 
     status =
         system_power_ctx.mod_pd_restricted_api->set_composite_state_async(
-            mod_system_power_soc_wakeup_pd_id, false, state);
+            system_power_ctx.last_core_pd_id, false, state);
     fwk_expect(status == FWK_SUCCESS);
 }
 
