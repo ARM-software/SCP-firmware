@@ -66,7 +66,7 @@
  */
 #define PCIE_PHY_PLL_LOCK_TIMEOUT      UINT32_C(100)
 #define PCIE_CTRL_RC_RESET_TIMEOUT     UINT32_C(100)
-#define PCIE_LINK_TRAINING_TIMEOUT     UINT32_C(50000)
+#define PCIE_LINK_TRAINING_TIMEOUT     UINT32_C(100000)
 
 /* PCIe controller power on timeout (in microseconds) */
 #define PCIE_POWER_ON_TIMEOUT          UINT32_C(10)
