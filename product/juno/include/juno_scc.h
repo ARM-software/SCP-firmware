@@ -26,7 +26,7 @@ enum pll_idx {
 
 struct pll_reg {
     FWK_RW  uint32_t  REG0;
-            uint32_t  RESERVED;
+    FWK_RW  uint32_t  REG1;
 };
 
 #define PLL_REG0_HARD_BYPASS       UINT32_C(0x00000001)
@@ -53,6 +53,10 @@ struct pll_reg {
 #define PLL_REG1_CLKOD             UINT32_C(0x00000F00)
 #define PLL_REG1_BWADJ             UINT32_C(0x00FFF000)
 #define PLL_REG1_LOCK_STATUS       UINT32_C(0x80000000)
+
+#define PLL_NF_MAX  UINT16_C(4096)
+#define PLL_NR_MAX  UINT8_C(64)
+#define PLL_OD_MAX  UINT8_C(16)
 
 enum pcsm_idx {
     PCSM_IDX_BIG_0,
@@ -83,13 +87,19 @@ struct scc_reg {
     FWK_RW  uint32_t  USBHCLK;
     FWK_RW  uint32_t  PCIEACLK;
     FWK_RW  uint32_t  PCIETLCLK;
-            uint8_t   RESERVED1[0x34 - 0x20];
+    FWK_RW  uint32_t  RESERVED1;
+    FWK_RW  uint32_t  PXLCLK;
+            uint8_t   RESERVED2[0x30 - 0x28];
+    FWK_RW  uint32_t  SYSTEM_CLK_FORCE;
     FWK_RW  uint32_t  VSYS_MANUAL_RESET;
-            uint8_t   RESERVED2[0x40 - 0x38];
+            uint8_t   RESERVED3[0x40 - 0x38];
     FWK_RW  uint32_t  SMC_MASK[4];
     FWK_RW  uint32_t  NIC400_TLX;
     FWK_RW  uint32_t  DMA_CONTROL0;
-            uint8_t   RESERVED3[0xF0 - 0x58];
+            uint8_t   RESERVED4[0x68 - 0x58];
+    FWK_RW  uint32_t  HDLCD0_CONTROL;
+    FWK_RW  uint32_t  HDLCD1_CONTROL;
+            uint8_t   RESERVED5[0xF0 - 0x70];
     FWK_R   uint32_t  GPR0;
     FWK_R   uint32_t  GPR1;
     FWK_R   uint32_t  APP_ALT_BOOT;
@@ -97,12 +107,12 @@ struct scc_reg {
     struct pll_reg    PLL[PLL_IDX_COUNT];
     FWK_RW  uint32_t  DDR_PHY0_PLL;
     FWK_RW  uint32_t  DDR_PHY1_PLL;
-            uint8_t   RESERVED4[0x200 - 0x130];
+            uint8_t   RESERVED6[0x200 - 0x130];
     struct pcsm_reg   PCSM[PCSM_IDX_COUNT];
-            uint8_t   RESERVED5[0xA04 - 0xA00];
+            uint8_t   RESERVED7[0xA04 - 0xA00];
     FWK_RW  uint32_t  DDR_PHY0_RETNCTRL;
     FWK_RW  uint32_t  DDR_PHY1_RETNCTRL;
-            uint8_t   RESERVED6[0x1000 - 0xA0C];
+            uint8_t   RESERVED8[0x1000 - 0xA0C];
 };
 
 #define SCC ((struct scc_reg *) SCC_BASE)
@@ -113,6 +123,10 @@ struct scc_reg {
 #define SCC_TLX_MST_PWRDNREQ                UINT32_C(0x00000008)
 #define SCC_TLX_MST_PWRDNACK                UINT32_C(0x00000010)
 
+#define SCC_HDLCD_CONTROL_PXLCLK_SEL        UINT32_C(0x00000001)
+#define SCC_HDLCD_CONTROL_PXLCLK_SEL_PLL    UINT32_C(0x00000000)
+#define SCC_HDLCD_CONTROL_PXLCLK_SEL_CLKIN  UINT32_C(0x00000001)
+
 #define SCC_GPR0_SKIP_TLX_CLK_SETTING       UINT32_C(0x00400000)
 #define SCC_GPR0_PCIE_AP_MANAGED            UINT32_C(0x00800000)
 #define SCC_GPR0_PLATFORM_ID_PLAT           UINT32_C(0x0F000000)
@@ -121,7 +135,6 @@ struct scc_reg {
 #define SCC_GPR0_HIGH_PXLCLK_ENABLE         UINT32_C(0x20000000)
 #define SCC_GPR0_DDR_DISABLE                UINT32_C(0x40000000)
 #define SCC_GPR0_CALIBRATION_ENABLE         UINT32_C(0x80000000)
-
 #define SCC_GPR1_CRYPTO_DISABLE             UINT32_C(0x00000001)
 #define SCC_GPR1_CFGTE                      UINT32_C(0x00000002)
 #define SCC_GPR1_CFGEE                      UINT32_C(0x00000004)
@@ -168,5 +181,4 @@ struct scc_reg {
 #define SCC_SYSTEM_CLK_EN_USBHCLKEN         UINT32_C(0x00000020)
 #define SCC_SYSTEM_CLK_EN_PICEACCLKEN       UINT32_C(0x00000040)
 #define SCC_SYSTEM_CLK_EN_PICETLCLKEN       UINT32_C(0x00000080)
-
 #endif /* JUNO_SCC_H */
