@@ -19,4 +19,8 @@
 /* Default for Juno SoC */
 #define SYSINCLK            (1600UL * FWK_MHZ)
 
+/* Pixel clocks default values for Juno HDLCD */
+#define PXL_CLK_IN_RATE     (47500000)
+#define PXL_REF_CLK_RATE    (50UL * FWK_MHZ)
+
 #endif /* SYSTEM_CLOCK_H */
