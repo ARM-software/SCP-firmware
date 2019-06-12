@@ -45,8 +45,8 @@ void juno_utils_atclk_clock_div_set(uint32_t divider)
     fwk_assert(divider != 0);
 
     SCP_CONFIG->ATCLK_CONTROL =
-        (SCP_CONFIG->ATCLK_CONTROL & ~SCP_CONFIG_STDCLK_CONTROL_CLKDIV) |
-        ((divider - 1) << 4);
+        (SCP_CONFIG->ATCLK_CONTROL & ~SCP_CONFIG_STDCLK_CONTROL_CLKDIV_MASK) |
+        ((divider - 1) << SCP_CONFIG_STDCLK_CONTROL_CLKDIV_POS);
 }
 
 bool juno_utils_atclk_clock_div_set_check(uint32_t divider)
@@ -55,8 +55,8 @@ bool juno_utils_atclk_clock_div_set_check(uint32_t divider)
     fwk_assert(divider != 0);
 
     return
-        ((SCP_CONFIG->ATCLK_CONTROL & SCP_CONFIG_STDCLK_CONTROL_CRNTCLKDIV) ==
-        ((divider - 1) << 12));
+        ((SCP_CONFIG->ATCLK_CONTROL & SCP_CONFIG_STDCLK_CONTROL_CRNTCLKDIV_MASK)
+        == ((divider - 1) << SCP_CONFIG_STDCLK_CONTROL_CRNTCLKDIV_POS));
 }
 
 void juno_utils_atclk_clock_sel_set(uint32_t source)
@@ -64,8 +64,8 @@ void juno_utils_atclk_clock_sel_set(uint32_t source)
     fwk_assert(source <= 2);
 
     SCP_CONFIG->ATCLK_CONTROL =
-        (SCP_CONFIG->ATCLK_CONTROL & ~SCP_CONFIG_STDCLK_CONTROL_CLKSEL) |
-        source;
+        (SCP_CONFIG->ATCLK_CONTROL & ~SCP_CONFIG_STDCLK_CONTROL_CLKSEL_MASK) |
+        (source << SCP_CONFIG_STDCLK_CONTROL_CLKSEL_POS);
 }
 
 bool juno_utils_atclk_clock_sel_set_check(uint32_t source)
@@ -73,8 +73,8 @@ bool juno_utils_atclk_clock_sel_set_check(uint32_t source)
     fwk_assert(source <= 2);
 
     return
-        ((SCP_CONFIG->ATCLK_CONTROL & SCP_CONFIG_STDCLK_CONTROL_CRNTCLK) ==
-        (source << 8));
+        ((SCP_CONFIG->ATCLK_CONTROL & SCP_CONFIG_STDCLK_CONTROL_CRNTCLK_MASK) ==
+        (source << SCP_CONFIG_STDCLK_CONTROL_CRNTCLK_POS));
 }
 
 void juno_utils_traceclk_clock_div_set(uint32_t divider)
@@ -83,8 +83,9 @@ void juno_utils_traceclk_clock_div_set(uint32_t divider)
     fwk_assert(divider != 0);
 
     SCP_CONFIG->TRACECLKIN_CONTROL =
-        (SCP_CONFIG->TRACECLKIN_CONTROL & ~SCP_CONFIG_STDCLK_CONTROL_CLKDIV) |
-        ((divider - 1) << 4);
+        (SCP_CONFIG->TRACECLKIN_CONTROL &
+        ~SCP_CONFIG_STDCLK_CONTROL_CLKDIV_MASK) |
+        ((divider - 1) << SCP_CONFIG_STDCLK_CONTROL_CLKDIV_POS);
 }
 
 bool juno_utils_traceclk_clock_div_set_check(uint32_t divider)
@@ -93,7 +94,8 @@ bool juno_utils_traceclk_clock_div_set_check(uint32_t divider)
     fwk_assert(divider != 0);
 
     return ((SCP_CONFIG->TRACECLKIN_CONTROL &
-             SCP_CONFIG_STDCLK_CONTROL_CRNTCLKDIV) == ((divider - 1) << 12));
+        SCP_CONFIG_STDCLK_CONTROL_CRNTCLKDIV_MASK) ==
+        ((divider - 1) << SCP_CONFIG_STDCLK_CONTROL_CRNTCLKDIV_POS));
 }
 
 void juno_utils_traceclk_clock_sel_set(uint32_t source)
@@ -101,8 +103,9 @@ void juno_utils_traceclk_clock_sel_set(uint32_t source)
     fwk_assert(source <= 2);
 
     SCP_CONFIG->TRACECLKIN_CONTROL =
-        (SCP_CONFIG->TRACECLKIN_CONTROL & ~SCP_CONFIG_STDCLK_CONTROL_CLKSEL) |
-        source;
+        (SCP_CONFIG->TRACECLKIN_CONTROL &
+        ~SCP_CONFIG_STDCLK_CONTROL_CLKSEL_MASK) |
+        (source << SCP_CONFIG_STDCLK_CONTROL_CLKSEL_POS);
 }
 
 bool juno_utils_traceclk_clock_sel_set_check(uint32_t source)
@@ -110,7 +113,8 @@ bool juno_utils_traceclk_clock_sel_set_check(uint32_t source)
     fwk_assert(source <= 2);
 
     return ((SCP_CONFIG->TRACECLKIN_CONTROL &
-             SCP_CONFIG_STDCLK_CONTROL_CRNTCLK) == (source << 8));
+        SCP_CONFIG_STDCLK_CONTROL_CRNTCLK_MASK) ==
+        (source << SCP_CONFIG_STDCLK_CONTROL_CRNTCLK_POS));
 }
 
 void juno_utils_pclkdbg_clock_div_set(uint32_t divider)
@@ -119,8 +123,8 @@ void juno_utils_pclkdbg_clock_div_set(uint32_t divider)
     fwk_assert(divider != 0);
 
     SCP_CONFIG->PCLKDBG_CONTROL =
-        (SCP_CONFIG->PCLKDBG_CONTROL & ~SCP_CONFIG_STDCLK_CONTROL_CLKDIV) |
-        ((divider - 1) << 4);
+        (SCP_CONFIG->PCLKDBG_CONTROL & ~SCP_CONFIG_STDCLK_CONTROL_CLKDIV_MASK) |
+        ((divider - 1) << SCP_CONFIG_STDCLK_CONTROL_CLKDIV_POS);
 }
 
 bool juno_utils_pclkdbg_clock_div_set_check(uint32_t divider)
@@ -129,7 +133,8 @@ bool juno_utils_pclkdbg_clock_div_set_check(uint32_t divider)
     fwk_assert(divider != 0);
 
     return ((SCP_CONFIG->PCLKDBG_CONTROL &
-             SCP_CONFIG_STDCLK_CONTROL_CRNTCLKDIV) == ((divider - 1) << 12));
+        SCP_CONFIG_STDCLK_CONTROL_CRNTCLKDIV_MASK) ==
+        ((divider - 1) << SCP_CONFIG_STDCLK_CONTROL_CRNTCLKDIV_POS));
 }
 
 void juno_utils_system_clock_enable(uint32_t mask)
