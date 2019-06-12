@@ -13,7 +13,7 @@
 #include <juno_sds.h>
 #include <software_mmap.h>
 
-static const uint32_t feature_flags = JUNO_SDS_FEATURE_FIRMWARE_MASK;
+static const uint32_t feature_flags = 0x00000000;
 static const uint32_t version_packed = FWK_BUILD_VERSION;
 
 static const struct fwk_element element_table[] = {
