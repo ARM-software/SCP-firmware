@@ -307,3 +307,34 @@ int pcie_set_gen_tx_preset(uint32_t rp_ep_config_apb_base,
     }
     return FWK_SUCCESS;
 }
+
+int pcie_skip_ext_cap(uint32_t base, uint16_t ext_cap_id)
+{
+    uint32_t cap_hdr_now;
+    uint32_t cap_hdr_next;
+    uint32_t offset;
+    uint32_t offset_next;
+    uint32_t offset_target;
+
+    offset = EXT_CAP_START_OFFSET;
+    cap_hdr_now = 0;
+    cap_hdr_next = 0;
+
+    do {
+        pcie_rp_ep_config_read_word(base, offset, &cap_hdr_now);
+        offset_next = (cap_hdr_now >> EXT_CAP_NEXT_CAP_POS);
+        pcie_rp_ep_config_read_word(base, offset_next, &cap_hdr_next);
+        if (((uint16_t)(cap_hdr_next & EXT_CAP_ID_MASK)) == ext_cap_id) {
+            offset_target = (cap_hdr_next &
+                (EXT_CAP_NEXT_CAP_MASK << EXT_CAP_NEXT_CAP_POS));
+            cap_hdr_now = (cap_hdr_now &
+                ~(EXT_CAP_NEXT_CAP_MASK << EXT_CAP_NEXT_CAP_POS)) |
+                    offset_target;
+            pcie_rp_ep_config_write_word(base, offset, cap_hdr_now);
+            return FWK_SUCCESS;
+        }
+        offset = offset_next;
+    } while ((offset != 0));
+
+    return FWK_E_SUPPORT;
+}

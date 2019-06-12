@@ -228,15 +228,28 @@
 #define AXI_HIGH_ADDR_BIT_POS          32
 #define AXI_ADDR_NUM_BITS_MAX          ((1 << 6) - 1)
 
-#define TX_PRESET_VALUE         0x4
+#define TX_PRESET_VALUE                0x4
 
-#define GEN3_OFFSET_MIN         0x30C
-#define GEN3_OFFSET_MAX         0x32C
-#define GEN3_PRESET             0x8
+#define GEN3_OFFSET_MIN                0x30C
+#define GEN3_OFFSET_MAX                0x32C
+#define GEN3_PRESET                    0x8
 
-#define GEN4_OFFSET_MIN         0x9E0
-#define GEN4_OFFSET_MAX         0x9EC
-#define GEN4_PRESET             0x4
+#define GEN4_OFFSET_MIN                0x9E0
+#define GEN4_OFFSET_MAX                0x9EC
+#define GEN4_PRESET                    0x4
+
+/*
+ * PCI express extended capability header definitions
+ */
+#define EXT_CAP_ID_MASK                UINT32_C(0xFFFF)
+#define EXT_CAP_ID_POS                 UINT32_C(0)
+#define EXT_CAP_NEXT_CAP_MASK          UINT32_C(0xFFF)
+#define EXT_CAP_NEXT_CAP_POS           UINT32_C(20)
+#define EXT_CAP_START_OFFSET           UINT32_C(0x100)
+
+#define EXT_CAP_ID_ATS                 UINT16_C(0x0F)
+#define EXT_CAP_ID_PRI                 UINT16_C(0x13)
+
 /*
  * AXI outbound region register set definitions
  */
@@ -502,5 +515,18 @@ int pcie_rp_ep_config_read_word(uint32_t base,
 int pcie_set_gen_tx_preset(uint32_t rp_ep_config_apb_base,
                            uint32_t preset,
                            enum pcie_gen gen);
+
+/*
+ * Brief - Function to skip an extended capability from capability
+ *         linked list.
+ *
+ * param - base - Base address of RP/EP's configuration memory
+ * param - ext_cap_id - Extended capability ID to be skipped
+ *
+ * retval - FWK_SUCCESS - if the operation is succeeded
+ *          FWK_E_SUPPORT - if the specified capability is not present in the
+ *                          linked list
+ */
+int pcie_skip_ext_cap(uint32_t base, uint16_t ext_cap_id);
 
 #endif /* N1SDP_PCIE_H */

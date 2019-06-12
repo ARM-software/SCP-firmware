@@ -306,6 +306,22 @@ static int n1sdp_pcie_setup(struct n1sdp_pcie_dev_ctx *dev_ctx)
          TYPE1_PREF_IO_BAR_ENABLE_MASK |
          TYPE1_PREF_IO_BAR_SIZE_32BIT_MASK);
 
+    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[PCIe] Skipping ATS capability...");
+    status = pcie_skip_ext_cap(dev_ctx->rp_ep_config_apb, EXT_CAP_ID_ATS);
+    if (status != FWK_SUCCESS)
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Not found!\n");
+    else
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+
+    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[PCIe] Skipping PRI capability...");
+    status = pcie_skip_ext_cap(dev_ctx->rp_ep_config_apb, EXT_CAP_ID_PRI);
+    if (status != FWK_SUCCESS)
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Not found!\n");
+    else
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+
     return FWK_SUCCESS;
 }
 
