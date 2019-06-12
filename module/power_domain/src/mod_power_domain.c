@@ -697,10 +697,10 @@ static int initiate_power_state_transition(struct pd_ctx *pd)
 
     if ((pd->driver_api->deny != NULL) &&
         pd->driver_api->deny(pd->driver_id, state)) {
-        mod_pd_ctx.log_api->log(MOD_LOG_GROUP_ERROR,
+        mod_pd_ctx.log_api->log(MOD_LOG_GROUP_WARNING,
             "[PD] Transition of %s to state <%s>,\n",
             fwk_module_get_name(pd->id), get_state_name(pd, state));
-        mod_pd_ctx.log_api->log(MOD_LOG_GROUP_ERROR,
+        mod_pd_ctx.log_api->log(MOD_LOG_GROUP_WARNING,
             "\tdenied by driver.\n");
         return FWK_E_DEVICE;
     }
