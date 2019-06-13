@@ -28,7 +28,7 @@ static uint32_t reset_syndrome;
 static uint32_t primary_cpu;
 
 static const struct fwk_element element_table[] = {
-    {
+    [JUNO_SDS_ROM_CPU_INFO_IDX] = {
         .name = "CPU Info",
         .data = &(struct mod_sds_structure_desc) {
             .id = JUNO_SDS_CPU_INFO,
@@ -38,7 +38,7 @@ static const struct fwk_element element_table[] = {
         },
     },
 
-    {
+    [JUNO_SDS_ROM_VERSION_IDX] = {
         .name = "ROM Version",
         .data = &(struct mod_sds_structure_desc) {
             .id = JUNO_SDS_ROM_VERSION,
@@ -48,7 +48,7 @@ static const struct fwk_element element_table[] = {
         },
     },
 
-    {
+    [JUNO_SDS_ROM_PLATFORM_ID_IDX] = {
         .name = "Platform ID",
         .data = &(struct mod_sds_structure_desc) {
             .id = JUNO_SDS_PLATFORM_ID,
@@ -58,7 +58,7 @@ static const struct fwk_element element_table[] = {
         },
     },
 
-    {
+    [JUNO_SDS_ROM_RESET_SYNDROME_IDX] = {
         .name = "Reset Syndrome",
         .data = &(struct mod_sds_structure_desc) {
             .id = JUNO_SDS_RESET_SYNDROME,
@@ -68,7 +68,7 @@ static const struct fwk_element element_table[] = {
         },
     },
 
-    {
+    [JUNO_SDS_ROM_BOOTLOADER_IDX] = {
         .name = "Bootloader",
         .data = &(struct mod_sds_structure_desc) {
             .id = JUNO_SDS_BOOTLOADER,
@@ -77,7 +77,7 @@ static const struct fwk_element element_table[] = {
         },
     },
 
-    {
+    [JUNO_SDS_ROM_FEATURES_IDX] = {
         .name = "Features",
         .data = &(struct mod_sds_structure_desc) {
             .id = JUNO_SDS_FEATURE_AVAILABILITY,
@@ -87,7 +87,7 @@ static const struct fwk_element element_table[] = {
     },
 
     #ifdef BUILD_MODE_DEBUG
-    {
+    [JUNO_SDS_ROM_BOOT_COUNTER_IDX] = {
         .name = "Boot Counters",
         .data = &(struct mod_sds_structure_desc) {
             .id = JUNO_SDS_CPU_BOOTCTR,
@@ -96,7 +96,7 @@ static const struct fwk_element element_table[] = {
         },
     },
 
-    {
+    [JUNO_SDS_ROM_CPU_FLAGS_IDX] = {
         .name = "CPU Flags",
         .data = &(struct mod_sds_structure_desc) {
             .id = JUNO_SDS_CPU_FLAGS,
@@ -106,7 +106,7 @@ static const struct fwk_element element_table[] = {
     },
     #endif
 
-    { 0 }, /* Termination description */
+    [JUNO_SDS_ROM_IDX_COUNT] = { 0 }, /* Termination description */
 };
 
 static const struct fwk_element *get_element_table(fwk_id_t module_id)

@@ -17,7 +17,7 @@ static const uint32_t feature_flags = JUNO_SDS_FEATURE_FIRMWARE_MASK;
 static const uint32_t version_packed = FWK_BUILD_VERSION;
 
 static const struct fwk_element element_table[] = {
-    {
+    [JUNO_SDS_RAM_VERSION_IDX] = {
         .name = "RAM Version",
         .data = &(struct mod_sds_structure_desc) {
             .id = JUNO_SDS_RAM_VERSION,
@@ -26,7 +26,7 @@ static const struct fwk_element element_table[] = {
             .finalize = true,
         },
     },
-    {
+    [JUNO_SDS_RAM_FEATURES_IDX] = {
         .name = "Feature Availability",
         .data = &(struct mod_sds_structure_desc) {
             .id = JUNO_SDS_FEATURE_AVAILABILITY,
@@ -35,7 +35,7 @@ static const struct fwk_element element_table[] = {
             .finalize = true,
         },
     },
-    { 0 },
+    [JUNO_SDS_RAM_IDX_COUNT] = { 0 },
 };
 
 static const struct fwk_element *get_element_table(fwk_id_t module_id)
