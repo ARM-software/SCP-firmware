@@ -1570,6 +1570,16 @@ static int pd_report_power_state_transition(fwk_id_t pd_id, unsigned int state)
     return report_power_state_transition(pd, state);
 }
 
+static int pd_get_last_core_pd_id(fwk_id_t *last_core_pd_id)
+{
+    if (last_core_pd_id == NULL)
+        return FWK_E_PARAM;
+
+    *last_core_pd_id = mod_pd_ctx.system_suspend.last_core_pd->id;
+
+    return FWK_SUCCESS;
+}
+
 /* Module APIs */
 
 static const struct mod_pd_public_api pd_public_api = {
@@ -1597,6 +1607,7 @@ static const struct mod_pd_driver_input_api pd_driver_input_api = {
     .set_composite_state_async = pd_set_composite_state_async,
     .reset_async = pd_reset_async,
     .report_power_state_transition = pd_report_power_state_transition,
+    .get_last_core_pd_id = pd_get_last_core_pd_id,
 };
 
 /*

@@ -816,6 +816,28 @@ struct mod_pd_driver_input_api {
      * \retval FWK_E_PARAM The power domain identifier is unknown.
      */
     int (*report_power_state_transition)(fwk_id_t pd_id, unsigned int state);
+
+    /*!
+     * \brief Get the power domain identifier of the last core online before or
+     *      during system suspend.
+     *
+     * \details When an agent calls for system suspend, the power domain module
+     *      ensures that all cores are turned off except for one, which is the
+     *      calling entity. Because any core can call system suspend, it may be
+     *      necessary for a driver to know which core called system suspend.
+     *      With this information the driver can, for example, safely resume the
+     *      system from the same core which was turned off lastly.
+     *
+     * \note The power domain module does not perform any checks to ensure that
+     *      this function is called during a system suspend sequence.
+     *
+     * \param[out] last_core_pd_id Identifier of the last core.
+     *
+     * \retval FWK_E_PARAM The pointer to the identifier is not valid.
+     * \retval FWK_SUCCESS The request was successful.
+     * \return One of the standard framework error codes.
+     */
+    int (*get_last_core_pd_id)(fwk_id_t *last_core_pd_id);
 };
 
 /*!
