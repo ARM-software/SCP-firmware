@@ -12,18 +12,7 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_mm.h>
-#include <fwk_thread.h>
 #include <mod_psu.h>
-
-/* "Set enabled" event */
-struct mod_psu_event_params_set_enabled {
-    bool enable;
-};
-
-/* "Set voltage" event */
-struct mod_psu_event_params_set_voltage {
-    uintmax_t voltage;
-};
 
 /* Device context */
 struct mod_psu_device_ctx {
@@ -53,92 +42,6 @@ static struct mod_psu_device_ctx *mod_psu_get_valid_device_ctx(
         return NULL;
 
     return mod_psu_get_device_ctx(device_id);
-}
-
-int mod_psu_event_set_enabled(
-    const struct fwk_event *event,
-    struct fwk_event *response)
-{
-    const struct mod_psu_device_ctx *ctx;
-    const struct mod_psu_event_params_set_enabled *params;
-    struct mod_psu_event_params_set_enabled_response *response_params;
-
-    /* These conditions were checked when we submitted the event */
-    assert(fwk_id_get_module_idx(event->target_id) == FWK_MODULE_IDX_PSU);
-    assert(fwk_module_is_valid_element_id(event->target_id));
-
-    /* Explicitly cast to our parameter types */
-    params = (void *)&event->params;
-    response_params = (void *)&response->params;
-
-    ctx = mod_psu_get_device_ctx(event->target_id);
-
-    /* Set the enabled state through the driver */
-    response_params->status = ctx->apis.driver->set_enabled(
-        ctx->config->driver_id,
-        params->enable);
-
-    return FWK_SUCCESS;
-}
-
-int mod_psu_event_set_voltage(
-    const struct fwk_event *event,
-    struct fwk_event *response)
-{
-    const struct mod_psu_device_ctx *ctx;
-    const struct mod_psu_event_params_set_voltage *params;
-    struct mod_psu_event_params_set_voltage_response *response_params;
-
-    /* These conditions were checked when we submitted the event */
-    assert(fwk_id_get_module_idx(event->target_id) == FWK_MODULE_IDX_PSU);
-    assert(fwk_module_is_valid_element_id(event->target_id));
-
-    /* Explicitly cast to our parameter types */
-    params = (void *)&event->params;
-    response_params = (void *)&response->params;
-
-    ctx = mod_psu_get_device_ctx(event->target_id);
-
-    /* Set the voltage through the driver */
-    response_params->status = ctx->apis.driver->set_voltage(
-        ctx->config->driver_id,
-        params->voltage);
-
-    return FWK_SUCCESS;
-}
-
-static int mod_psu_process_event(
-    const struct fwk_event *event,
-    struct fwk_event *response)
-{
-    typedef int (*handler_t)(
-        const struct fwk_event *event,
-        struct fwk_event *response);
-
-    static const handler_t handlers[] = {
-        [MOD_PSU_EVENT_IDX_SET_ENABLED] = mod_psu_event_set_enabled,
-        [MOD_PSU_EVENT_IDX_SET_VOLTAGE] = mod_psu_event_set_voltage,
-    };
-
-    unsigned int event_idx;
-    handler_t handler;
-
-    /* We only handle the events defined by us */
-    if (fwk_id_get_module_idx(event->id) != FWK_MODULE_IDX_PSU)
-        return FWK_E_PARAM;
-
-    /* Ensure the event index is within bounds we can handle */
-    event_idx = fwk_id_get_event_idx(event->id);
-    if (event_idx >= FWK_ARRAY_SIZE(handlers))
-        return FWK_E_PARAM;
-
-    /* Ensure we have an implemented handler for this event */
-    handler = handlers[event_idx];
-    if (handler == NULL)
-        return FWK_E_PARAM;
-
-    /* Delegate event handling to the relevant handler */
-    return handler(event, response);
 }
 
 static int api_get_enabled(fwk_id_t device_id, bool *enabled)
@@ -197,47 +100,6 @@ static int api_set_enabled(fwk_id_t device_id, bool enable)
     status = ctx->apis.driver->set_enabled(ctx->config->driver_id, enable);
     if (status != FWK_SUCCESS)
         return FWK_E_HANDLER;
-
-    return FWK_SUCCESS;
-}
-
-static int api_set_enabled_async(fwk_id_t device_id, bool enable)
-{
-    int status;
-    struct fwk_event event;
-    struct mod_psu_event_params_set_enabled *params;
-
-    /* This API call cannot target another module */
-    if (fwk_id_get_module_idx(device_id) != FWK_MODULE_IDX_PSU)
-        return FWK_E_PARAM;
-
-    /* Ensure the identifier refers to an existing element */
-    if (fwk_module_is_valid_element_id(device_id))
-        return FWK_E_PARAM;
-
-    /* Validate the API call */
-    status = fwk_module_check_call(device_id);
-    if (status != FWK_SUCCESS)
-        return FWK_E_STATE;
-
-    /* Build and submit the event */
-    event = (struct fwk_event) {
-        .id = mod_psu_event_id_set_enabled,
-        .target_id = device_id,
-        .response_requested = true,
-    };
-
-    params = (void *)&event.params;
-    *params = (struct mod_psu_event_params_set_enabled) {
-        .enable = enable,
-    };
-
-    /* Submit the event for processing */
-    status = fwk_thread_put_event(&event);
-    if (status == FWK_E_NOMEM)
-        return FWK_E_NOMEM;
-    else if (status != FWK_SUCCESS)
-        return FWK_E_PANIC;
 
     return FWK_SUCCESS;
 }
@@ -302,54 +164,12 @@ static int api_set_voltage(fwk_id_t device_id, uintmax_t voltage)
     return FWK_SUCCESS;
 }
 
-static int api_set_voltage_async(fwk_id_t device_id, uintmax_t voltage)
-{
-    int status;
-    struct fwk_event event;
-    struct mod_psu_event_params_set_voltage *params;
-
-    /* This API call cannot target another module */
-    if (fwk_id_get_module_idx(device_id) != FWK_MODULE_IDX_PSU)
-        return FWK_E_PARAM;
-
-    /* Ensure the identifier refers to an existing element */
-    if (fwk_module_is_valid_element_id(device_id))
-        return FWK_E_PARAM;
-
-    /* Validate the API call */
-    status = fwk_module_check_call(device_id);
-    if (status != FWK_SUCCESS)
-        return FWK_E_STATE;
-
-    /* Build and submit the event */
-    event = (struct fwk_event) {
-        .id = mod_psu_event_id_set_enabled,
-        .target_id = device_id,
-        .response_requested = true,
-    };
-
-    params = (void *)&event.params;
-    *params = (struct mod_psu_event_params_set_voltage) {
-        .voltage = voltage,
-    };
-
-    status = fwk_thread_put_event(&event);
-    if (status == FWK_E_NOMEM)
-        return FWK_E_NOMEM;
-    else if (status != FWK_SUCCESS)
-        return FWK_E_PANIC;
-
-    return FWK_SUCCESS;
-}
-
 /* Module API implementation */
 static const struct mod_psu_device_api mod_psu_device_api = {
     .get_enabled = api_get_enabled,
     .set_enabled = api_set_enabled,
-    .set_enabled_async = api_set_enabled_async,
     .get_voltage = api_get_voltage,
     .set_voltage = api_set_voltage,
-    .set_voltage_async = api_set_voltage_async,
 };
 
 static int psu_init(
@@ -444,7 +264,5 @@ const struct fwk_module module_psu = {
     .element_init = psu_element_init,
     .bind = psu_bind,
     .process_bind_request = psu_process_bind_request,
-    .process_event = mod_psu_process_event,
     .api_count = MOD_PSU_API_IDX_COUNT,
-    .event_count = MOD_PSU_EVENT_IDX_COUNT,
 };
