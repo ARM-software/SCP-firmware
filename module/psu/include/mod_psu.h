@@ -56,20 +56,6 @@ struct mod_psu_device_api {
     int (*set_enabled)(fwk_id_t device_id, bool enable);
 
     /*!
-     * \brief Set the enabled state of a device.
-     *
-     * \param device_id Identifier of the device to set the state of.
-     * \param enable \c true to enable the device, or \c false to disable it.
-     *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
-     * \retval FWK_E_STATE The element cannot accept the request.
-     * \retval FWK_E_NOMEM The event queue is full.
-     * \retval FWK_E_PANIC An error in the framework occurred.
-     */
-    int (*set_enabled_async)(fwk_id_t device_id, bool enable);
-
-    /*!
      * \brief Get the voltage of a device.
      *
      * \param device_id Identifier of the device to get the voltage of.
@@ -94,20 +80,6 @@ struct mod_psu_device_api {
      * \retval FWK_E_HANDLER An error occurred in the device driver.
      */
     int (*set_voltage)(fwk_id_t device_id, uintmax_t voltage);
-
-    /*!
-     * \brief Set the voltage of a device.
-     *
-     * \param device_id Identifier of the device to set the voltage of.
-     * \param voltage New voltage in mV.
-     *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
-     * \retval FWK_E_STATE The element cannot accept the request.
-     * \retval FWK_E_NOMEM The event queue is full.
-     * \retval FWK_E_PANIC An error in the framework occurred.
-     */
-    int (*set_voltage_async)(fwk_id_t device_id, uintmax_t voltage);
 };
 
 /*!
@@ -182,29 +154,6 @@ struct mod_psu_device_config {
  */
 
 /*!
- * \defgroup GroupPsuEvents Events
- * \{
- */
-
-/*!
- * \brief <tt>Set enabled</tt> event response parameters.
- */
-struct mod_psu_event_params_set_enabled_response {
-    int status; /*!< Status of the request */
-};
-
-/*!
- * \brief <tt>Set voltage</tt> event response parameters.
- */
-struct mod_psu_event_params_set_voltage_response {
-    int status; /*!< Status of the request */
-};
-
-/*!
- * \}
- */
-
-/*!
  * \defgroup GroupPsuIds Identifiers
  * \{
  */
@@ -223,28 +172,6 @@ enum mod_psu_api_idx {
 /*! Device API identifier */
 static const fwk_id_t mod_psu_api_id_psu_device =
     FWK_ID_API_INIT(FWK_MODULE_IDX_PSU, MOD_PSU_API_IDX_PSU_DEVICE);
-
-/*!
- * \brief Event indices.
- */
-enum mod_psu_event_idx {
-    /*! Event index for mod_psu_event_id_set_enabled */
-    MOD_PSU_EVENT_IDX_SET_ENABLED,
-
-    /*! Event index for mod_psu_event_id_set_voltage */
-    MOD_PSU_EVENT_IDX_SET_VOLTAGE,
-
-    /*! Number of defined events */
-    MOD_PSU_EVENT_IDX_COUNT
-};
-
-/*! <tt>Set enabled</tt> event identifier */
-static const fwk_id_t mod_psu_event_id_set_enabled =
-    FWK_ID_EVENT_INIT(FWK_MODULE_IDX_PSU, MOD_PSU_EVENT_IDX_SET_ENABLED);
-
-/*! <tt>Set voltage</tt> event identifier */
-static const fwk_id_t mod_psu_event_id_set_voltage =
-    FWK_ID_EVENT_INIT(FWK_MODULE_IDX_PSU, MOD_PSU_EVENT_IDX_SET_VOLTAGE);
 
 /*!
  * \}
