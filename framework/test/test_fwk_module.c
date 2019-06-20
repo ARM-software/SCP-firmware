@@ -969,8 +969,19 @@ static void test_fwk_module_get_data(void)
     assert(result != NULL);
     assert(result == (void *)(&config_elem0));
 
-    /* Invalid ID */
-    id = FWK_ID_ELEMENT(0xEF, 0xDBE);
+    /* Valid sub-element ID */
+    id = SUB_ELEM0_ID;
+    result = fwk_module_get_data(id);
+    assert(result != NULL);
+    assert(result == (void *)(&config_elem0));
+
+    /* Invalid element ID */
+     id = FWK_ID_ELEMENT(0xEF, 0xDBE);
+     result = fwk_module_get_data(id);
+     assert(result == NULL);
+
+    /* Invalid sub-element ID */
+    id = FWK_ID_SUB_ELEMENT(0xDE, 0xAA7, 9);
     result = fwk_module_get_data(id);
     assert(result == NULL);
 }

@@ -607,7 +607,8 @@ const char *fwk_module_get_name(fwk_id_t id)
 
 const void *fwk_module_get_data(fwk_id_t id)
 {
-    if (fwk_module_is_valid_element_id(id))
+    if (fwk_module_is_valid_element_id(id) ||
+        fwk_module_is_valid_sub_element_id(id))
         return __fwk_module_get_element_ctx(id)->desc->data;
     else if (fwk_module_is_valid_module_id(id))
         return __fwk_module_get_ctx(id)->config->data;
