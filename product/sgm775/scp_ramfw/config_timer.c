@@ -13,6 +13,7 @@
 #include <mod_timer.h>
 #include <sgm775_mmap.h>
 #include <sgm775_irq.h>
+#include <config_timer.h>
 #include <clock_devices.h>
 #include <system_clock.h>
 
@@ -53,12 +54,12 @@ static const struct mod_timer_dev_config refclk_config = {
 };
 
 static const struct fwk_element timer_dev_table[] = {
-    [0] = {
+    [CONFIG_TIMER_ELEMENT_IDX_REFCLK] = {
         .name = "REFCLK",
         .data = &refclk_config,
-        .sub_element_count = 8, /* Number of alarms */
+        .sub_element_count = CONFIG_TIMER_REFCLK_SUB_ELEMENT_IDX_COUNT,
     },
-    [1] = { 0 },
+    [CONFIG_TIMER_ELEMENT_IDX_COUNT] = { 0 },
 };
 
 static const struct fwk_element *timer_get_dev_table(fwk_id_t module_id)
