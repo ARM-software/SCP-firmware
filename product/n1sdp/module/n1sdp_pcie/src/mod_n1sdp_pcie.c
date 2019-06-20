@@ -90,6 +90,43 @@ struct n1sdp_pcie_ctx pcie_ctx;
 /*
  * Module functions
  */
+static int n1sdp_pcie_ccix_enable_opt_tlp(bool enable)
+{
+    uint32_t value;
+    unsigned int i;
+    struct n1sdp_pcie_dev_ctx *dev_ctx = NULL;
+    struct n1sdp_pcie_dev_config *config = NULL;
+
+    for (i = 0; i <= pcie_ctx.pcie_instance_count; i++) {
+        dev_ctx = &pcie_ctx.device_ctx_table[i];
+        if (dev_ctx->config->ccix_capable) {
+            config = dev_ctx->config;
+            break;
+        }
+    }
+
+    if (config == NULL)
+        return FWK_E_DATA;
+
+    /* Configure for the optimized header or pcie compatible header*/
+    if (enable)
+        value = (CCIX_CTRL_CAW | CCIX_CTRL_EN_OPT_TLP | CCIX_CTRL_CSTT_V0_V1 |
+                 CCIX_VENDER_ID);
+    else
+        value = (CCIX_CTRL_CAW | CCIX_VENDER_ID);
+
+    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                          "[PCIE] CCIX_CONTROL: 0x%08x\n", value);
+
+    *(uint32_t *)(dev_ctx->lm_apb + PCIE_LM_RC_CCIX_CTRL_REG) = value;
+
+    if (enable)
+        dev_ctx->ctrl_apb->CCIX_CTRL = 0x1;
+
+    return FWK_SUCCESS;
+}
+
+
 static int n1sdp_pcie_setup(struct n1sdp_pcie_dev_ctx *dev_ctx)
 {
     uint32_t ecam_base_addr;
@@ -334,6 +371,11 @@ static int n1sdp_pcie_setup(struct n1sdp_pcie_dev_ctx *dev_ctx)
     return FWK_SUCCESS;
 }
 
+static const struct n1sdp_pcie_ccix_config_api pcie_ccix_config_api = {
+    .enable_opt_tlp = n1sdp_pcie_ccix_enable_opt_tlp,
+};
+
+
 /*
  * Framework handlers
  */
@@ -427,6 +469,15 @@ static int n1sdp_pcie_start(fwk_id_t id)
         id);
 }
 
+static int n1sdp_pcie_process_bind_request(fwk_id_t requester_id,
+    fwk_id_t target_id, fwk_id_t api_id, const void **api)
+{
+    *api = &pcie_ccix_config_api;
+
+    return FWK_SUCCESS;
+}
+
+
 static int n1sdp_pcie_process_notification(const struct fwk_event *event,
                                           struct fwk_event *resp)
 {
@@ -443,10 +494,11 @@ static int n1sdp_pcie_process_notification(const struct fwk_event *event,
 const struct fwk_module module_n1sdp_pcie = {
     .name = "N1SDP PCIe",
     .type = FWK_MODULE_TYPE_DRIVER,
-    .api_count = 0,
+    .api_count = N1SDP_PCIE_API_COUNT,
     .init = n1sdp_pcie_init,
     .element_init = n1sdp_pcie_element_init,
     .bind = n1sdp_pcie_bind,
     .start = n1sdp_pcie_start,
+    .process_bind_request = n1sdp_pcie_process_bind_request,
     .process_notification = n1sdp_pcie_process_notification,
 };

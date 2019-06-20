@@ -79,6 +79,22 @@
 
 /* PCIe controller local management (LM) register offsets */
 #define PCIE_LM_RC_BAR_CONFIG_REG      UINT32_C(0x300)
+#define PCIE_LM_RC_CCIX_CTRL_REG       UINT32_C(0xCA4)
+
+/* CCIX CONTROL Values */
+#define CCIX_CTRL_EN_OPT_TLP           (1U << 16)
+#define CCIX_CTRL_CSTT_V0_V1           (1U << 17)
+#define CCIX_CTRL_CAW                  (8U << 24)
+
+/*
+ * CCIX Consortium defined Vendor ID. This vendor id is embedded in
+ * the tlp packets.
+ * Non Compliance to this value would cause the CCIX capable PCIe
+ * controllers to drop the incoming packet.
+ * This value is same as what Xilinx Hood FPGA expects.
+ * To be revisited after consortium finalizes the value.
+ */
+#define CCIX_VENDER_ID                 (0x2692)
 
 /* PCIe LM root complex bar configuration register bit masks */
 #define TYPE1_PREF_MEM_BAR_ENABLE_MASK      (1U << 17)
