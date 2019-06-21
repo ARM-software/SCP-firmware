@@ -137,7 +137,7 @@ struct mod_scmi_to_transport_api {
      * \brief Check whether a channel is secure or non-secure.
      *
      * \param channel_id Channel identifier.
-     * \param secure Pointer to storage for the channel security state. True
+     * \param[out] secure The channel security state. True
      * if the channel is secure, or false if it is non-secure.
      *
      * \retval FWK_SUCCESS The operation succeeded.
@@ -152,7 +152,7 @@ struct mod_scmi_to_transport_api {
      * \brief Get the maximum permitted payload size of a channel.
      *
      * \param channel_id Channel identifier.
-     * \param size Pointer to storage for the maximum payload size in bytes.
+     * \param[out] size The maximum payload size in bytes.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The channel_id parameter is invalid.
@@ -166,7 +166,7 @@ struct mod_scmi_to_transport_api {
      * \brief Get the SCMI message header from a channel.
      *
      * \param channel_id Channel identifier.
-     * \param message_header Pointer to storage for the SCMI message header.
+     * \param[out] message_header The SCMI message header.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The channel_id parameter is invalid.
@@ -181,9 +181,9 @@ struct mod_scmi_to_transport_api {
      * \brief Get the SCMI payload from a channel.
      *
      * \param channel_id Channel identifier.
-     * \param payload Pointer to storage for the pointer to the payload.
-     * \param size Pointer to storage for the payload size. May be NULL, in
-     * which case the parameter should be ignored.
+     * \param[out] payload The pointer to the payload.
+     * \param[out] size The payload size. May be NULL, in which case the
+     * parameter should be ignored.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The channel_id parameter is invalid.
@@ -264,9 +264,9 @@ struct mod_scmi_agent_to_transport_api {
      * \brief Get the SCMI payload from a channel.
      *
      * \param channel_id Channel identifier.
-     * \param payload Pointer to storage for the pointer to the payload.
-     * \param size Pointer to storage for the payload size. May be NULL, in
-     * which case the parameter should be ignored.
+     * \param[out] payload The pointer to the payload.
+     * \param[out] size The payload size. May be NULL, in which case the
+     * parameter should be ignored.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard error codes for implementation-defined

@@ -639,7 +639,7 @@ uint64_t sam_encode_region_size(uint64_t size);
 /*
  * Configure a memory region
  *
- * \param reg Pointer to the region group descriptor to be configured
+ * \param[out] reg Region group descriptor to be configured
  *      \pre Must be a valid pointer
  * \param region Region entry in the region group descriptor
  * \param bit_offset Bit offset of the memory region in the group descriptor

@@ -259,7 +259,7 @@ struct mod_clock_drv_api {
      *
      * \param clock_id Clock device identifier.
      *
-     * \param rate Pointer to storage for the current clock rate in Hertz.
+     * \param [out] rate The current clock rate in Hertz.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
@@ -273,8 +273,7 @@ struct mod_clock_drv_api {
      *
      * \param rate_index The index into the clock's range to get the rate of.
      *
-     * \param rate Pointer to storage for the rate, in Hertz,
-     *     corresponding to the index.
+     * \param[out] rate The rate, in Hertz, corresponding to the index.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
@@ -299,7 +298,7 @@ struct mod_clock_drv_api {
      *
      * \param clock_id Clock device identifier.
      *
-     * \param state Pointer to storage for the current clock state.
+     * \param[out] state The current clock state.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
@@ -311,7 +310,7 @@ struct mod_clock_drv_api {
      *
      * \param clock_id Clock device identifier.
      *
-     * \param state Pointer to storage for the clock range structure.
+     * \param[out] state The clock range structure.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
@@ -397,7 +396,7 @@ struct mod_clock_api {
      *
      * \param clock_id Clock device identifier.
      *
-     * \param rate Pointer to storage for the current clock rate in Hertz.
+     * \param[out] rate The current clock rate in Hertz.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The clock identifier was invalid.
@@ -413,8 +412,7 @@ struct mod_clock_api {
      *
      * \param rate_index The index into the clock's range to get the rate of.
      *
-     * \param rate Pointer to storage for the rate, in Hertz,
-     *     corresponding to the index.
+     * \param[out] rate The rate, in Hertz, corresponding to the index.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The clock identifier was invalid.
@@ -442,7 +440,7 @@ struct mod_clock_api {
      *
      * \param clock_id Clock device identifier.
      *
-     * \param state Pointer to storage for the current clock state.
+     * \param[out] state The current clock state.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The clock identifier was invalid.
@@ -456,7 +454,7 @@ struct mod_clock_api {
      *
      * \param clock_id Clock device identifier.
      *
-     * \param info Pointer to storage for the clock device properties.
+     * \param[out] info The clock device properties.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The clock identifier was invalid.

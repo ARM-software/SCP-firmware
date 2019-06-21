@@ -377,7 +377,7 @@ struct mod_pd_driver_api {
      *      <tt>get state</tt> or <tt>get composite state</tt> request.
      *
      * \param dev_id Driver identifier of the power domain.
-     * \param state Pointer to storage for the power state of the power domain.
+     * \param[out] state Power state of the power domain.
      *
      * \retval FWK_SUCCESS The power state was successfully returned.
      * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
@@ -477,7 +477,7 @@ struct mod_pd_public_api {
      *
      * \param pd_id Identifier of the power domain that the type is being
      *      queried for.
-     * \param type Pointer to storage for the type of the power domain.
+     * \param[out] type Type of the power domain.
      *
      * \retval FWK_SUCCESS The type of the power domain was returned.
      * \retval FWK_E_INIT The module has not been initialized.
@@ -494,8 +494,7 @@ struct mod_pd_public_api {
      *      domain which does not have any parent.
      *
      * \param pd_id Identifier of the power domain.
-     * \param parent_pd_id Pointer to storage for the identifier of the parent
-     *      power domain.
+     * \param[out] parent_pd_id Identifier of the parent power domain.
      *
      * \retval FWK_SUCCESS The identifier of the parent power domain was
      *      returned.
@@ -521,7 +520,7 @@ struct mod_pd_restricted_api {
      *
      * \param pd_id Identifier of the power domain that the type is being
      *     queried for.
-     * \param type Pointer to storage for the type of the power domain.
+     * \param[out] type Type of the power domain.
      *
      * \retval FWK_SUCCESS The type of the power domain was returned.
      * \retval FWK_E_INIT The module has not been initialized.
@@ -538,8 +537,7 @@ struct mod_pd_restricted_api {
      *      domain which does not have any parent.
      *
      * \param pd_id Identifier of the power domain.
-     * \param parent_pd_id Pointer to storage for the identifier of the parent
-     *      power domain.
+     * \param[out] parent_pd_id The identifier of the parent power domain.
      *
      * \retval FWK_SUCCESS The identifier of the parent power domain was
      *      returned.
@@ -642,7 +640,7 @@ struct mod_pd_restricted_api {
      *
      * \param pd_id Identifier of the power domain whose state has to be
      *      retrieved.
-     * \param state Pointer to storage for the power domain state.
+     * \param[out] state The power domain state.
      *
      * \retval FWK_SUCCESS The power state was returned.
      * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
@@ -663,8 +661,7 @@ struct mod_pd_restricted_api {
      *
      * \param pd_id Identifier of the power domain whose composite state has to
      *      be retrieved.
-     * \param composite_state Pointer to storage for the power domain composite
-     *      state.
+     * \param[out] composite_state The power domain composite state.
      *
      * \retval FWK_SUCCESS The composite state was returned.
      * \retval FWK_E_ACCESS Invalid access, the framework has rejected the

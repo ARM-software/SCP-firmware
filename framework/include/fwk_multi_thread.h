@@ -67,8 +67,7 @@ int fwk_thread_create(fwk_id_t id);
  *      belong to the same module.
  *
  * \param event Event to put into the queue for processing. Must not be \c NULL.
- * \param resp_event Pointer to storage for the response event. Must not be \c
- *      NULL.
+ * \param[out] resp_event The response event. Must not be \c NULL.
  *
  * \retval FWK_SUCCESS The event was successfully processed.
  * \retval FWK_E_STATE The execution is not started.
