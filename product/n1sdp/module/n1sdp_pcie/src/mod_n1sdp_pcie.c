@@ -322,6 +322,13 @@ static int n1sdp_pcie_setup(struct n1sdp_pcie_dev_ctx *dev_ctx)
     else
         pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
 
+    /*
+     * Wait until devices connected in downstream ports
+     * finish link training before doing bus enumeration
+     */
+    pcie_ctx.timer_api->delay(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                                 PCIE_LINK_TRAINING_TIMEOUT);
+
     return FWK_SUCCESS;
 }
 
