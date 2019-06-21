@@ -9,6 +9,7 @@
  */
 
 #include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
 #include <fwk_assert.h>
 #include <fwk_errno.h>
@@ -504,8 +505,13 @@ static int scmi_base_discover_agent_handler(fwk_id_t service_id,
     return_values.status = SCMI_SUCCESS;
 
     if (parameters->agent_id == SCMI_PLATFORM_ID) {
-        strcpy(return_values.name, "platform");
-        goto exit;
+       static const char name[] = "platform";
+
+       static_assert(sizeof(return_values.name) >= sizeof(name),
+              "return_values.name is not large enough to contain name");
+
+       memcpy(return_values.name, name, sizeof(name));
+       goto exit;
     }
 
     agent = &scmi_ctx.config->agent_table[parameters->agent_id];
