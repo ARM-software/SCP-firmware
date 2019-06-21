@@ -71,8 +71,7 @@ struct mod_scmi_agent_api {
      * \brief Get the management protocol version from SCP
      *
      * \param agent_id Agent identifier
-     * \param version Pointer to location where protocol version will be
-     *                updated
+     * \param[out] version Protocol version.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard error codes for implementation-defined
@@ -84,8 +83,7 @@ struct mod_scmi_agent_api {
      * \brief Get the PLL clock status from SCP
      *
      * \param agent_id Agent identifier
-     * \param clock_status Pointer to location where SCP clock status will be
-     *                     updated
+     * \param[out] clock_status SCP clock status.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard error codes for implementation-defined
@@ -97,9 +95,8 @@ struct mod_scmi_agent_api {
      * \brief Get the chip ID information from SCP
      *
      * \param agent_id Agent identifier
-     * \param multichip_mode Pointer to location where multichip mode value
-     *                       will be updated
-     * \param chipid Pointer to location where chip ID value will be updated
+     * \param[out] multichip_mode Multi-chip mode value.
+     * \param[out] chipid Chip ID value.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard error codes for implementation-defined

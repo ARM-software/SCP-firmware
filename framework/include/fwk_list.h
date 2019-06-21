@@ -41,7 +41,7 @@
 /*!
  * \brief Initialize a linked list.
  *
- * \param list Pointer to the list to initialize. Must not be \c NULL.
+ * \param[out] list List to initialize. Must not be \c NULL.
  *
  * \return None.
  */

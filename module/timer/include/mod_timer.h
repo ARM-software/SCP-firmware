@@ -119,7 +119,7 @@ struct mod_timer_api {
      * \details Get the frequency in Hertz (Hz) that a timer is running at.
      *
      * \param dev_id Element identifier that identifies the timer device.
-     * \param frequency Pointer to storage for the timer frequency.
+     * \param[out] frequency The timer frequency.
      *
      * \retval FWK_SUCCESS Operation succeeded.
      * \retval FWK_E_PARAM The frequency pointer was invalid.
@@ -136,7 +136,7 @@ struct mod_timer_api {
      *
      * \param dev_id Element identifier that identifies the timer device.
      * \param microseconds Period, in microseconds.
-     * \param timestamp Pointer to storage for the resulting counter timestamp.
+     * \param[out] timestamp The resulting counter timestamp.
      *
      * \retval FWK_SUCCESS Operation succeeded.
      * \retval FWK_E_PARAM The timestamp pointer was invalid.
@@ -153,7 +153,7 @@ struct mod_timer_api {
      *      moment.
      *
      * \param dev_id Element identifier that identifies the timer device.
-     * \param counter Pointer to storage for the counter value.
+     * \param[out] counter The counter value.
      *
      * \retval FWK_SUCCESS Operation succeeded.
      * \retval FWK_E_PARAM The counter pointer was invalid.
@@ -211,8 +211,8 @@ struct mod_timer_api {
      *
      * \param dev_id Element identifier that identifies the timer device.
      * \param timestamp Timestamp to compare to the current timer value.
-     * \param remaining_ticks Pointer to storage for the remaining number of
-     *      ticks before the timer value reaches the given timestamp.
+     * \param[out] remaining_ticks The remaining number of ticks before
+     * the timer value reaches the given timestamp.
      *
      * \retval FWK_SUCCESS Operation succeeded.
      * \retval FWK_E_PARAM The remaining_ticks pointer was invalid.

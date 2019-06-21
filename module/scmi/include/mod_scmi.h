@@ -145,8 +145,8 @@ struct mod_scmi_to_transport_api {
      * \brief Check whether a channel is secure or non-secure.
      *
      * \param channel_id Channel identifier.
-     * \param secure Pointer to storage for the channel security state. True
-     * if the channel is secure, or false if it is non-secure.
+     * \param[out] secure Channel security state. True if the channel
+     * is secure, or false if it is non-secure.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The channel_id parameter is invalid.
@@ -160,7 +160,7 @@ struct mod_scmi_to_transport_api {
      * \brief Get the maximum permitted payload size of a channel.
      *
      * \param channel_id Channel identifier.
-     * \param size Pointer to storage for the maximum payload size in bytes.
+     * \param[out] size Maximum payload size in bytes.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The channel_id parameter is invalid.
@@ -174,7 +174,7 @@ struct mod_scmi_to_transport_api {
      * \brief Get the SCMI message header from a channel.
      *
      * \param channel_id Channel identifier.
-     * \param message_header Pointer to storage for the SCMI message header.
+     * \param[out] message_header SCMI message header.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The channel_id parameter is invalid.
@@ -189,9 +189,9 @@ struct mod_scmi_to_transport_api {
      * \brief Get the SCMI payload from a channel.
      *
      * \param channel_id Channel identifier.
-     * \param payload Pointer to storage for the pointer to the payload.
-     * \param size Pointer to storage for the payload size. May be NULL, in
-     * which case the parameter should be ignored.
+     * \param[out] payload Pointer to the payload.
+     * \param[out] size Payload size. May be NULL, in which case the
+     * parameter should be ignored.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The channel_id parameter is invalid.
@@ -316,7 +316,7 @@ struct mod_scmi_from_protocol_api {
      * \brief Get the identifier of the agent associated with a service
      *
      * \param service_id Identifier of the service.
-     * \param agent_id Pointer to storage for the agent identifier.
+     * \param[out] agent_id Agent identifier.
      *
      * \retval FWK_SUCCESS The agent identifier was returned.
      * \retval FWK_E_PARAM The service identifier is not valid.
@@ -333,7 +333,7 @@ struct mod_scmi_from_protocol_api {
      *          of an agent identifier.
      *
      * \param agent_id Identifier of the agent.
-     * \param agent_type Pointer to storage for the agent type.
+     * \param[out] agent_type Agent type.
      *
      * \retval FWK_SUCCESS The agent identifier was returned.
      * \retval FWK_E_PARAM The agent identifier is not valid.
@@ -347,7 +347,7 @@ struct mod_scmi_from_protocol_api {
      *        with a service.
      *
      * \param service_id Service identifier.
-     * \param size Pointer to storage for the maximum payload size in bytes.
+     * \param[out] size Maximum payload size in bytes.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The service_id parameter is invalid.

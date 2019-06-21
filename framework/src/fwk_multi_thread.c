@@ -37,7 +37,7 @@ static const char err_msg_func[] = "[THR] Error %d in %s\n";
 /*
  * Initialize the attributes of thread.
  *
- * \param attr Pointer to thread's attributes.
+ * \param[out] attr Thread's attributes.
  *
  * \retval FWK_SUCCESS The initialization succeeded.
  * \retval FWK_E_NOMEM A memory allocation failed.

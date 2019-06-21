@@ -172,7 +172,7 @@ struct mod_sds_api {
      * \param offset The offset, in bytes, of the field within the Shared Data
      *      Structure.
      *
-     * \param data Pointer to storage for the field data that will be read.
+     * \param[out] data The field data that will be read.
      *
      * \param size Size, in bytes, of the storage pointed to by the data
      *       parameter.

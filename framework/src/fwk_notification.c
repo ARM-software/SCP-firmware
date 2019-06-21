@@ -108,7 +108,7 @@ static struct __fwk_notification_subscription *search_subscription(
  *      function is a sub-routine of 'fwk_notification_notify'.
  *
  * \param notification_event Pointer to the notification event.
- * \param count Pointer to storage for the number of notifications being sent.
+ * \param[out] count The number of notifications being sent.
  */
 static void send_notifications(struct fwk_event *notification_event,
                                unsigned int *count)

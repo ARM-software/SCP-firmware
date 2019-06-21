@@ -121,7 +121,7 @@ struct mod_juno_ppu_rom_api {
      * \brief Get the current policy of a PPU.
      *
      * \param ppu_id Element identifier of the PPU.
-     * \param state Pointer to storage for the policy.
+     * \param[out] state Policy.
      *
      * \retval FWK_SUCCESS Operation succeeded.
      * \retval FWK_E_PARAM The \p state parameter was \c NULL.

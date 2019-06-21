@@ -176,7 +176,7 @@ struct mod_sensor_driver_api {
      * \details Synchronously read current sensor value.
      *
      * \param id Specific sensor device id.
-     * \param value Pointer to storage for the sensor value.
+     * \param[out] value The sensor value.
      *
      * \retval FWK_SUCCESS Value was read successfully.
      * \return One of the standard framework error codes.
@@ -187,7 +187,7 @@ struct mod_sensor_driver_api {
      * \brief Read sensor information.
      *
      * \param id Specific sensor device id.
-     * \param info Pointer to storage for the sensor information.
+     * \param[out] info The sensor information.
      *
      * \retval FWK_SUCCESS The information was read successfully.
      * \return One of the standard framework error codes.
@@ -205,7 +205,7 @@ struct mod_sensor_api {
      * \details Synchronously read current sensor value.
      *
      * \param id Specific sensor device id.
-     * \param value Pointer to storage for the sensor value.
+     * \param[out] value The sensor value.
      *
      * \retval FWK_SUCCESS Operation succeeded.
      * \retval FWK_E_DEVICE Driver error.
@@ -219,7 +219,7 @@ struct mod_sensor_api {
      * \details Get a pointer to the sensor_info structure of a specific sensor.
      *
      * \param id Specific sensor device id.
-     * \param info Pointer to storage for the info struct.
+     * \param[out] info The information structure.
      *
      * \retval FWK_SUCCESS Operation succeeded.
      * \retval FWK_E_DEVICE Driver error.

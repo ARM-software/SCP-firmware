@@ -74,7 +74,7 @@ int fwk_thread_put_event(struct fwk_event *event);
  * \param cookie Cookie of the event which the response has been delayed
  *      for. The cookie identifies the response event among the response events
  *      the entity \p id may have delayed.
- * \param event Pointer to storage for the copy of the response event.
+ * \param[out] event The copy of the response event.
  *
  * \retval FWK_SUCCESS The event copy was returned.
  * \retval FWK_E_INIT The thread framework component is not initialized.
