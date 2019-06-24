@@ -24,6 +24,7 @@ BS_FIRMWARE_MODULES := \
     ppu_v0 \
     system_power \
     n1sdp_pll \
+    n1sdp_i2c \
     n1sdp_dmc620 \
     n1sdp_ddr_phy \
     mhu \
@@ -54,6 +55,7 @@ BS_FIRMWARE_SOURCES := \
     config_power_domain.c \
     config_ppu_v0.c \
     config_ppu_v1.c \
+    config_n1sdp_i2c.c \
     config_n1sdp_dmc620.c \
     config_n1sdp_ddr_phy.c \
     config_mhu.c \
