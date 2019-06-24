@@ -17,7 +17,8 @@ Making Changes
 - Make commits of logical units. See these general
   [Git guidelines](http://git-scm.com/book/ch5-2.html) for contributing to a
   project.
-- Follow the [SCP coding style](./doc/code_style.md).
+- Follow the project [coding style](./doc/code_style.md) and
+  [coding rules](./doc/code_rules.md).
 - Keep the commits on topic. If you need to fix another bug or make another
   enhancement, please address it on a separate topic branch.
 - Avoid long commit series. If you do have a long series, consider whether
