@@ -42,7 +42,7 @@
  * Peripherals - Serial communication
  */
 #define SCP_UART_BASE                (SCP_PERIPHERAL_BASE + 0x2000)
-#define SCP_I2C0_BASE                (0x3FFFA000)
+#define SCP_I2C0_BASE                (0xBC040000)
 #define SCP_I2C1_BASE                (0x3FFFB000)
 #define SCP_I2C2_BASE                (0x3FFFC000)
 
