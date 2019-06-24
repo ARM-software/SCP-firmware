@@ -26,14 +26,13 @@ static int get_value(fwk_id_t id, uint64_t *value)
 
     status = fwk_module_check_call(id);
     if (status != FWK_SUCCESS) {
-        assert(false);
-        return status;
+        return FWK_E_STATE;
     }
 
     config = config_table[fwk_id_get_element_idx(id)];
+    fwk_assert(config != NULL);
 
     if (value == NULL) {
-        assert(false);
         return FWK_E_PARAM;
     }
 
