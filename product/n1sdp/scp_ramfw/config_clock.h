@@ -86,7 +86,7 @@
 #define CSS_CLK_RATE_CPU_GRP1_OVERDRIVE         (2900 * FWK_MHZ)
 #define CSS_CLK_RATE_CPU_GRP1_SUPER_OVERDRIVE   (3000 * FWK_MHZ)
 
-
+#define OSC_FREQ_HZ                             (24 * FWK_MHZ)
 /*
  * Clock indexes.
  */
