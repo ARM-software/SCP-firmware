@@ -36,6 +36,18 @@ static void direct_ddr_cmd(struct mod_dmc620_reg *dmc);
 static int enable_dimm_refresh(struct mod_dmc620_reg *dmc);
 static int dmc620_config_interrupt(fwk_id_t ddr_id);
 
+/* Memory Information API */
+
+static void dmc620_get_mem_size_gb(uint32_t *size)
+{
+    fwk_assert(size != NULL);
+    *size = 16;
+}
+
+struct mod_dmc620_mem_info_api ddr_mem_info_api = {
+    .get_mem_size_gb = dmc620_get_mem_size_gb,
+};
+
 /* Framework API */
 static int mod_dmc620_init(fwk_id_t module_id, unsigned int element_count,
                            const void *config)
@@ -82,6 +94,20 @@ static int mod_dmc620_bind(fwk_id_t id, unsigned int round)
         &timer_api);
     if (status != FWK_SUCCESS)
         return status;
+
+    return FWK_SUCCESS;
+}
+
+static int mod_dmc620_process_bind_request(fwk_id_t requester_id,
+    fwk_id_t id, fwk_id_t api_id, const void **api)
+{
+    switch (fwk_id_get_api_idx(api_id)) {
+    case MOD_DMC620_API_IDX_MEM_INFO:
+        *api = &ddr_mem_info_api;
+        break;
+    default:
+        return FWK_E_PARAM;
+    }
 
     return FWK_SUCCESS;
 }
@@ -142,7 +168,8 @@ const struct fwk_module module_n1sdp_dmc620 = {
     .bind = mod_dmc620_bind,
     .start = mod_dmc620_start,
     .process_notification = mod_dmc620_process_notification,
-    .api_count = 0,
+    .process_bind_request = mod_dmc620_process_bind_request,
+    .api_count = MOD_DMC620_API_COUNT,
     .event_count = 0,
 };
 
