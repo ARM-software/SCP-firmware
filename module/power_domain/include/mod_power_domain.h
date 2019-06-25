@@ -449,14 +449,12 @@ struct mod_pd_driver_api {
      * \note This function is optional (may be \c NULL).
      *
      * \details The power domain module calls this function when processing a
-     *      <tt>shutdown</tt> request. The power domain must be in the
-     *      \ref MOD_PD_STATE_OFF state when it returns.
+     *      <tt>shutdown</tt> request.
      *
      * \param dev_id Driver identifier of the power domain.
-     * \param state State the system will be suspended to. The definition
-     *      of those states is platform specific.
+     * \param system_shutdown Type of system shutdown.
      *
-     * \retval FWK_SUCCESS The core has been successfully shutdown.
+     * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
      *      call to the API.
      */
