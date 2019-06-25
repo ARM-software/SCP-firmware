@@ -20,6 +20,7 @@
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <mod_clock.h>
+#include <mod_n1sdp_dmc620.h>
 #include <mod_n1sdp_flash.h>
 #include <mod_n1sdp_system.h>
 #include <mod_log.h>
@@ -36,6 +37,26 @@
 #include <n1sdp_sds.h>
 #include <n1sdp_ssc.h>
 #include <config_clock.h>
+
+/*
+ * DDR memory information structure used by BL31
+ */
+struct n1sdp_ddr_mem_info {
+    /* DDR memory size in GigaBytes */
+    uint32_t ddr_size_gb;
+};
+
+/*
+ * BL33 image information structure used by BL31
+ */
+struct n1sdp_bl33_info {
+    /* Source address of BL33 image */
+    uint32_t bl33_src_addr;
+    /* Load address of BL33 image */
+    uint32_t bl33_dst_addr;
+    /* BL33 image size */
+    uint32_t bl33_size;
+};
 
 /* Coresight counter register definitions */
 struct cs_cnt_ctrl_reg {
@@ -58,7 +79,18 @@ static const uint32_t feature_flags = (N1SDP_SDS_FEATURE_FIRMWARE_MASK |
                                        N1SDP_SDS_FEATURE_DMC_MASK |
                                        N1SDP_SDS_FEATURE_MESSAGING_MASK);
 static fwk_id_t sds_feature_availability_id =
-    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, 3);
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS,
+                            SDS_ELEMENT_IDX_FEATURE_AVAILABILITY);
+
+/* SDS DDR memory information */
+static struct n1sdp_ddr_mem_info sds_ddr_mem_info;
+static fwk_id_t sds_ddr_mem_info_id =
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, SDS_ELEMENT_IDX_DDR_MEM_INFO);
+
+/* SDS BL33 image information */
+static struct n1sdp_bl33_info sds_bl33_info;
+static fwk_id_t sds_bl33_info_id =
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, SDS_ELEMENT_IDX_BL33_INFO);
 
 /* Module context */
 struct n1sdp_system_ctx {
@@ -74,6 +106,9 @@ struct n1sdp_system_ctx {
 
     /* Pointer to N1SDP Flash APIs */
     const struct mod_n1sdp_flash_api *flash_api;
+
+    /* Pointer to DMC620 memory information API */
+    const struct mod_dmc620_mem_info_api *dmc620_api;
 
     /* Pointer to SDS */
     const struct mod_sds_api *sds_api;
@@ -235,6 +270,37 @@ void csys_pwrupreq_handler(void)
 }
 
 /*
+ * Function to fill platform information structure.
+ */
+static int n1sdp_system_fill_mem_info(void)
+{
+    uint32_t ddr_size_gb;
+    const struct mod_sds_structure_desc *sds_structure_desc =
+        fwk_module_get_data(sds_ddr_mem_info_id);
+
+    ddr_size_gb = 0;
+    n1sdp_system_ctx.dmc620_api->get_mem_size_gb(&ddr_size_gb);
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "    Total DDR Size: %d GB\n", ddr_size_gb);
+
+    sds_ddr_mem_info.ddr_size_gb = ddr_size_gb;
+    return n1sdp_system_ctx.sds_api->struct_write(sds_structure_desc->id,
+        0, (void *)(&sds_ddr_mem_info), sds_structure_desc->size);
+}
+
+static int n1sdp_system_fill_bl33_info(void)
+{
+    const struct mod_sds_structure_desc *sds_structure_desc =
+        fwk_module_get_data(sds_bl33_info_id);
+
+    sds_bl33_info.bl33_src_addr = BL33_SRC_BASE_ADDR;
+    sds_bl33_info.bl33_dst_addr = BL33_DST_BASE_ADDR;
+    sds_bl33_info.bl33_size = BL33_SIZE;
+    return n1sdp_system_ctx.sds_api->struct_write(sds_structure_desc->id,
+        0, (void *)(&sds_bl33_info), sds_structure_desc->size);
+}
+
+/*
  * Initialize primary core during system initialization
  */
 static int n1sdp_system_init_primary_core(void)
@@ -290,6 +356,20 @@ static int n1sdp_system_init_primary_core(void)
                  fip_desc_table[fip_index_bl31].size);
     if (status != FWK_SUCCESS)
         return FWK_E_PANIC;
+
+    /* Fill memory information structure */
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[N1SDP SYSTEM] Collecting memory information...\n");
+    status = n1sdp_system_fill_mem_info();
+    if (status != FWK_SUCCESS)
+        return status;
+
+    /* Fill BL33 image information structure */
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[N1SDP SYSTEM] Collecting memory information...\n");
+    status = n1sdp_system_fill_bl33_info();
+    if (status != FWK_SUCCESS)
+        return status;
 
     mod_pd_restricted_api = n1sdp_system_ctx.mod_pd_restricted_api;
 
@@ -373,6 +453,12 @@ static int n1sdp_system_bind(fwk_id_t id, unsigned int round)
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_FLASH),
          FWK_ID_API(FWK_MODULE_IDX_N1SDP_FLASH, 0),
          &n1sdp_system_ctx.flash_api);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_DMC620),
+         FWK_ID_API(FWK_MODULE_IDX_N1SDP_DMC620, MOD_DMC620_API_IDX_MEM_INFO),
+         &n1sdp_system_ctx.dmc620_api);
     if (status != FWK_SUCCESS)
         return status;
 

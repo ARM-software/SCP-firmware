@@ -44,6 +44,15 @@
 /*! Address translation enable bit */
 #define ADDR_TRANS_EN                 UINT32_C(0x1)
 
+/*! Source address of BL33 image to be used by BL31 */
+#define BL33_SRC_BASE_ADDR            UINT32_C(0x14200000)
+
+/*! Destination address of BL33 image to be used by BL31 */
+#define BL33_DST_BASE_ADDR            UINT32_C(0xE0000000)
+
+/*! Size of BL33 image to be used by BL31 */
+#define BL33_SIZE                     UINT32_C(0x00200000)
+
 /*!
  * \brief API indices.
  */
