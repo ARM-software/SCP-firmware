@@ -21,6 +21,8 @@ enum n1sdp_sds_struct_id {
     N1SDP_SDS_FEATURE_AVAILABILITY = 5 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
     N1SDP_SDS_CPU_BOOTCTR =          6 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
     N1SDP_SDS_CPU_FLAGS =            7 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
+    N1SDP_SDS_DDR_MEM_INFO =         8 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
+    N1SDP_SDS_BL33_INFO =            9 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
 };
 
 /*
@@ -33,6 +35,8 @@ enum n1sdp_sds_struct_id {
 #define N1SDP_SDS_FEATURE_AVAILABILITY_SIZE  4
 #define N1SDP_SDS_CPU_BOOTCTR_SIZE           256
 #define N1SDP_SDS_CPU_FLAGS_SIZE             256
+#define N1SDP_SDS_DDR_MEM_INFO_SIZE          4
+#define N1SDP_SDS_BL33_INFO_SIZE             12
 
 /*
  * Field masks and offsets for the N1SDP_SDS_AP_CPU_INFO structure.
@@ -60,5 +64,12 @@ struct n1sdp_sds_platid {
 #define N1SDP_SDS_FEATURE_FIRMWARE_POS    0
 #define N1SDP_SDS_FEATURE_DMC_POS         1
 #define N1SDP_SDS_FEATURE_MESSAGING_POS   2
+
+/*
+ * Element identifiers for SDS structures
+ */
+#define SDS_ELEMENT_IDX_FEATURE_AVAILABILITY  3
+#define SDS_ELEMENT_IDX_DDR_MEM_INFO          4
+#define SDS_ELEMENT_IDX_BL33_INFO             5
 
 #endif /* N1SDP_SDS_H */

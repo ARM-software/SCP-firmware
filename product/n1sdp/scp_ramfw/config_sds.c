@@ -64,6 +64,22 @@ static struct fwk_element sds_element_table[] = {
             .finalize = true,
         }),
     },
+    {
+        .name = "DDR Memory Info",
+        .data = &((struct mod_sds_structure_desc) {
+            .id = N1SDP_SDS_DDR_MEM_INFO,
+            .size = N1SDP_SDS_DDR_MEM_INFO_SIZE,
+            .finalize = true,
+        }),
+    },
+    {
+        .name = "BL33 Image Info",
+        .data = &((struct mod_sds_structure_desc) {
+            .id = N1SDP_SDS_BL33_INFO,
+            .size = N1SDP_SDS_BL33_INFO_SIZE,
+            .finalize = true,
+        }),
+    },
 #ifdef BUILD_HAS_MOD_TEST
     {
         .name = "Boot Counters",
