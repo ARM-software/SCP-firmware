@@ -709,6 +709,31 @@ struct mod_dmc_ddr_phy_api {
 };
 
 /*!
+ * \brief API to expose DDR memory size.
+ */
+struct mod_dmc620_mem_info_api {
+    /*!
+     * \brief Pointer to function that sets DDR memory size in GB.
+     *
+     * \param size Pointer where memory size will be stored.
+     *
+     * \retval void.
+     */
+    void (*get_mem_size_gb)(uint32_t *size);
+};
+
+/*!
+ * \brief API indices.
+ */
+enum mod_dmc620_api_idx {
+    /*! API index for getting memory information */
+    MOD_DMC620_API_IDX_MEM_INFO,
+
+    /*! Number of exposed interfaces */
+    MOD_DMC620_API_COUNT,
+};
+
+/*!
  * \brief DMC-620 module configuration.
  */
 struct mod_dmc620_module_config {
