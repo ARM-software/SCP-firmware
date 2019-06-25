@@ -6,7 +6,6 @@
  */
 
 #include <stdint.h>
-#include <stdlib.h>
 #include <fwk_element.h>
 #include <fwk_errno.h>
 #include <fwk_macros.h>

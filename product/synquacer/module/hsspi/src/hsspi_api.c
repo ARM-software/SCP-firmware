@@ -7,7 +7,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <synquacer_debug.h>
 #include <synquacer_mmap.h>
 #include <low_level_access.h>

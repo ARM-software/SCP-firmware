@@ -8,7 +8,8 @@
  *     Interrupt management.
  */
 
-#include <stdlib.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <fwk_arch.h>
 #include <fwk_errno.h>
 

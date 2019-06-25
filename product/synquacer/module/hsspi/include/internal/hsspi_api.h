@@ -10,7 +10,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <internal/hsspi_driver.h>
 
 struct HSSPI_clk_config {

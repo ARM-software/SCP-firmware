@@ -6,7 +6,6 @@
  */
 
 #include <stdint.h>
-#include <stdlib.h>
 #include <synquacer_mmap.h>
 #include <low_level_access.h>
 #include <ppu_v0.h>

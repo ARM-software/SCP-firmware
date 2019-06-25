@@ -7,7 +7,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <string.h>
 #include <fwk_errno.h>
 #include <mod_f_i2c.h>

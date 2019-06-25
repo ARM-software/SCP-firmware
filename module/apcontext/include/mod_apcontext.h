@@ -10,7 +10,7 @@
 #define MOD_APCONTEXT_H
 
 #include <stdint.h>
-#include <stdlib.h>
+#include <stddef.h>
 
 /*!
  * \ingroup GroupModules Modules
