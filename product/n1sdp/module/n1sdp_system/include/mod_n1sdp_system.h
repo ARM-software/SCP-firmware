@@ -41,17 +41,8 @@
 /*! AP Cores Reset Address in SCP Address Space */
 #define AP_CORE_RESET_ADDR            UINT64_C(0xA4040000)
 
-/*! DDR Base address where AP BL33 (UEFI) will be copied to. */
-#define AP_BL33_BASE_ADDR             UINT64_C(0xE0000000)
-
 /*! Address translation enable bit */
 #define ADDR_TRANS_EN                 UINT32_C(0x1)
-
-/*!
- * Number of bits to shift in AP's memory map address to map to SCP's
- * 1MB window.
- */
-#define SCP_AP_1MB_WINDOW_ADDR_SHIFT 20
 
 /*!
  * \brief API indices.
