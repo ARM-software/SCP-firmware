@@ -211,65 +211,6 @@ static int n1sdp_system_copy_to_ap_sram(uint64_t sram_address,
     return FWK_SUCCESS;
 }
 
-/*
- * Function to copy into DRAM location
- */
-static int n1sdp_system_copy_to_ap_ddr(uint64_t dram_address,
-                                       uint32_t spi_address,
-                                       uint32_t size)
-{
-    uint32_t scp_address = 0;
-    uint32_t copy_size = 0;
-    uint32_t addr_offset = 0;
-    int status = FWK_SUCCESS;
-
-    while (size != 0) {
-        addr_offset = (uint32_t)(dram_address & SCP_AP_1MB_WINDOW_ADDR_MASK);
-
-        /* Map 1MB window to corresponding address in AP memory map. */
-        n1sdp_system_enable_ap_memory_access(
-            dram_address >> SCP_AP_1MB_WINDOW_ADDR_SHIFT);
-
-        /* Get destination for this copy in SCP address space. */
-        scp_address = SCP_AP_1MB_WINDOW_BASE | addr_offset;
-
-        /* Get the size for this copy operation. */
-        if (size > (SCP_AP_1MB_WINDOW_SIZE - addr_offset)) {
-            /*
-             * If the copy operation will wrap around the end of the
-             * 1MB window we need to cut it off at the wrap around
-             * point and change the window address.
-             */
-            copy_size = (uint32_t)(SCP_AP_1MB_WINDOW_SIZE - addr_offset);
-        } else {
-            /* All remaining data is within the current 1MB window. */
-            copy_size = size;
-        }
-
-        /* Copy the data into the selected 1MB window. */
-        memcpy((void *)scp_address, (void *)spi_address, copy_size);
-
-        if (memcmp((void *)spi_address, (void *)scp_address, copy_size) != 0) {
-            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                "[N1SDP SYSTEM] Copy failed at destination address: 0x%08x\n",
-                scp_address);
-            status = FWK_E_DATA;
-            goto exit;
-        }
-
-        /* Update variables before starting over. */
-        dram_address = dram_address + copy_size;
-        spi_address = spi_address + copy_size;
-        size = size - copy_size;
-    }
-
-exit:
-    /* Disable the 1MB window. */
-    n1sdp_system_disable_ap_memory_access();
-
-    return status;
-}
-
 void cdbg_pwrupreq_handler(void)
 {
     n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
@@ -307,7 +248,6 @@ static int n1sdp_system_init_primary_core(void)
     unsigned int cluster_idx;
     unsigned int cluster_count;
     int fip_index_bl31 = -1;
-    int fip_index_bl33 = -1;
 
     n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
         "[N1SDP SYSTEM] Looking for AP firmware in flash memory...\n");
@@ -330,20 +270,14 @@ static int n1sdp_system_init_primary_core(void)
                 fip_desc_table[i].address, fip_desc_table[i].size,
                 fip_desc_table[i].flags);
             fip_index_bl31 = i;
-        } else if (fip_desc_table[i].type == MOD_N1SDP_FIP_TYPE_NS_BL33) {
-            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                "[N1SDP SYSTEM] Found BL33 at address: 0x%08x,"
-                " size: %u, flags: 0x%x\n",
-                fip_desc_table[i].address, fip_desc_table[i].size,
-                fip_desc_table[i].flags);
-            fip_index_bl33 = i;
+            break;
         }
     }
 
-    if ((fip_index_bl31 < 0) || (fip_index_bl33 < 0)) {
+    if (fip_index_bl31 < 0) {
         n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
             "[N1SDP SYSTEM] Error! "
-            "FIP does not have all required binaries\n");
+            "FIP does not have BL31 binary\n");
         return FWK_E_PANIC;
     }
 
@@ -354,16 +288,6 @@ static int n1sdp_system_init_primary_core(void)
     status = n1sdp_system_copy_to_ap_sram(AP_CORE_RESET_ADDR,
                  fip_desc_table[fip_index_bl31].address,
                  fip_desc_table[fip_index_bl31].size);
-    if (status != FWK_SUCCESS)
-        return FWK_E_PANIC;
-
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-        "[N1SDP SYSTEM] Copying AP BL33 to address 0x%x...\n",
-        AP_BL33_BASE_ADDR);
-
-    status = n1sdp_system_copy_to_ap_ddr(AP_BL33_BASE_ADDR,
-                 fip_desc_table[fip_index_bl33].address,
-                 fip_desc_table[fip_index_bl33].size);
     if (status != FWK_SUCCESS)
         return FWK_E_PANIC;
 
