@@ -7,7 +7,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdlib.h>
 
 #include <fwk_errno.h>
 

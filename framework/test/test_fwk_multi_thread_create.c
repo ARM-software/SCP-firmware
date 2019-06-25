@@ -9,6 +9,7 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 #include <fwk_assert.h>
 #include <fwk_element.h>

@@ -9,7 +9,6 @@
 #define HSSPI_DRIVER_H
 
 #include <stdint.h>
-#include <stdlib.h>
 #include <synquacer_mmap.h>
 #include <internal/reg_HSSPI.h>
 

@@ -10,7 +10,6 @@
 
 #include <limits.h>
 #include <stdbool.h>
-#include <stdlib.h>
 #include <fwk_arch.h>
 #include <fwk_errno.h>
 #include <fwk_interrupt.h>

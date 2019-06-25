@@ -13,7 +13,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <fwk_element.h>
 #include <fwk_event.h>
 #include <fwk_id.h>

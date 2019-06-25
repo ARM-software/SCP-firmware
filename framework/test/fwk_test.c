@@ -6,8 +6,8 @@
  */
 #include <setjmp.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <fwk_errno.h>
 #include <fwk_noreturn.h>
 #include <fwk_test.h>
