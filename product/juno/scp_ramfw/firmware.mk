@@ -47,7 +47,8 @@ BS_FIRMWARE_MODULES := \
     juno_xrp7724 \
     reg_sensor \
     psu \
-    mock_psu
+    mock_psu \
+    juno_pvt
 
 BS_FIRMWARE_SOURCES := \
     rtx_config.c \
@@ -79,6 +80,7 @@ BS_FIRMWARE_SOURCES := \
     config_sensor.c \
     config_reg_sensor.c \
     config_psu.c \
-    config_mock_psu.c
+    config_mock_psu.c \
+    config_juno_pvt.c
 
 include $(BS_DIR)/firmware.mk
