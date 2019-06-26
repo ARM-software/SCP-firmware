@@ -39,4 +39,19 @@
 /*! Step size for the PLL. */
 #define MOD_N1SDP_PLL_STEP_SIZE      UINT64_C(1000)
 
+/*! The minimum feedback divider value */
+#define MOD_N1SDP_PLL_FBDIV_MIN      16
+/*! The maximum feedback divider value */
+#define MOD_N1SDP_PLL_FBDIV_MAX      1600
+
+/*! The minimum reference clock divider value */
+#define MOD_N1SDP_PLL_REFDIV_MIN     1
+/*! The maximum reference clock divider value */
+#define MOD_N1SDP_PLL_REFDIV_MAX     63
+
+/*! The minimum post divider value */
+#define MOD_N1SDP_PLL_POSTDIV_MIN    1
+/*! The maximum post divider value */
+#define MOD_N1SDP_PLL_POSTDIV_MAX    7
+
 #endif /* N1SDP_PLL_H */
