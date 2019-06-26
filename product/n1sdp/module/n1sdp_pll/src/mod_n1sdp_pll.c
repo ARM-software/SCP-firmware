@@ -10,6 +10,7 @@
 #include <fwk_assert.h>
 #include <fwk_element.h>
 #include <fwk_errno.h>
+#include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <mod_clock.h>
@@ -34,6 +35,9 @@ struct n1sdp_pll_dev_ctx {
 
 /* Module context */
 struct n1sdp_pll_ctx {
+    /* Pointer to module configuration data */
+    const struct n1sdp_pll_module_config *mod_config;
+
     /* List of device contexts of all PLLs */
     struct n1sdp_pll_dev_ctx *dev_ctx_table;
 
@@ -52,10 +56,16 @@ static int pll_set_rate(struct n1sdp_pll_dev_ctx *ctx, uint64_t rate,
 {
     uint64_t rounded_rate;
     uint16_t fbdiv;
+    uint8_t refdiv;
+    uint8_t postdiv;
     uint32_t wait_cycles;
+    uint16_t rate_val_mhz;
     const struct mod_n1sdp_pll_dev_config *config = NULL;
+    struct n1sdp_pll_custom_freq_param_entry *freq_entry = NULL;
+    size_t i;
 
-    assert(ctx != NULL);
+    fwk_assert(ctx != NULL);
+    fwk_assert(rate <= (UINT16_MAX * FWK_MHZ));
 
     config = ctx->config;
 
@@ -65,12 +75,37 @@ static int pll_set_rate(struct n1sdp_pll_dev_ctx *ctx, uint64_t rate,
     if ((rate < MOD_N1SDP_PLL_RATE_MIN) || (rate > MOD_N1SDP_PLL_RATE_MAX))
         return FWK_E_RANGE;
 
+    /* Assume initial refdiv and postdiv to be 1 */
+    refdiv = MOD_N1SDP_PLL_REFDIV_MIN;
+    postdiv = MOD_N1SDP_PLL_POSTDIV_MIN;
     fbdiv = rate / config->ref_rate;
     rounded_rate = fbdiv * config->ref_rate;
 
+    /*
+     * If required output value is not exact multiplication of reference
+     * clock value then look for the frequency in custom frequencies table.
+     */
+    if (rounded_rate != rate) {
+        rate_val_mhz = (uint16_t)(rate / FWK_MHZ);
+        for (i = 0; i < module_ctx.mod_config->custom_freq_table_size; i++) {
+            freq_entry = &module_ctx.mod_config->custom_freq_table[i];
+            if (freq_entry->freq_value_mhz == rate_val_mhz) {
+                fbdiv = freq_entry->fbdiv;
+                refdiv = freq_entry->refdiv;
+                postdiv = freq_entry->postdiv;
+                goto result;
+            }
+        }
+        /* Custom frequency table does not have matching frequency */
+        return FWK_E_RANGE;
+    }
+
+result:
     /* Configure PLL settings */
     *config->control_reg0 = (fbdiv << PLL_FBDIV_BIT_POS) |
-                            (1 << PLL_REFDIV_POS);
+                            (refdiv << PLL_REFDIV_POS);
+    *config->control_reg1 = (postdiv << PLL_POSTDIV1_POS) |
+                            (1 << PLL_POSTDIV2_POS);
 
     /* Enable PLL settings */
     *config->control_reg0 |= (1 << PLL_PLLEN_POS);
@@ -83,17 +118,8 @@ static int pll_set_rate(struct n1sdp_pll_dev_ctx *ctx, uint64_t rate,
             return FWK_E_TIMEOUT;
     }
 
-    /*
-     * The multiply factor for a PLL is calculated by dividing the required
-     * output clock frequency by the reference clock frequency. This integer
-     * division may leave out remainder value, if any, and hence the actual
-     * output frequency may not be exactly same as the required output
-     * frequency. For example, if the required output frequency is 120MHz and
-     * ref_rate is 50MHz, then the division generates a multiply factor of 2
-     * (120/50 = 2, integer division). Now the actual PLL output will be
-     * (50MHz * 2 = 100MHz).
-     */
-    ctx->current_rate = rounded_rate;
+    /* Store the current configured PLL rate */
+    ctx->current_rate = rate;
 
     return FWK_SUCCESS;
 }
@@ -276,9 +302,12 @@ static const struct mod_clock_drv_api n1sdp_pll_api = {
  */
 
 static int n1sdp_pll_init(fwk_id_t module_id, unsigned int element_count,
-                             const void *unused)
+                             const void *config)
 {
-    if (element_count == 0)
+    size_t i;
+    struct n1sdp_pll_custom_freq_param_entry *freq_entry;
+
+    if ((element_count == 0) || (config == NULL))
         return FWK_E_PARAM;
 
     module_ctx.dev_count = element_count;
@@ -287,6 +316,19 @@ static int n1sdp_pll_init(fwk_id_t module_id, unsigned int element_count,
                                              sizeof(struct n1sdp_pll_dev_ctx));
     if (module_ctx.dev_ctx_table == NULL)
         return FWK_E_NOMEM;
+
+    module_ctx.mod_config = config;
+    /* Validate custom frequency table entries */
+    for (i = 0; i < module_ctx.mod_config->custom_freq_table_size; i++) {
+        freq_entry = &module_ctx.mod_config->custom_freq_table[i];
+        if ((freq_entry->fbdiv < MOD_N1SDP_PLL_FBDIV_MIN) ||
+            (freq_entry->fbdiv > MOD_N1SDP_PLL_FBDIV_MAX) ||
+            (freq_entry->refdiv < MOD_N1SDP_PLL_REFDIV_MIN) ||
+            (freq_entry->refdiv > MOD_N1SDP_PLL_REFDIV_MAX) ||
+            (freq_entry->postdiv < MOD_N1SDP_PLL_POSTDIV_MIN) ||
+            (freq_entry->postdiv > MOD_N1SDP_PLL_POSTDIV_MAX))
+            return FWK_E_RANGE;
+    }
 
     return FWK_SUCCESS;
 }

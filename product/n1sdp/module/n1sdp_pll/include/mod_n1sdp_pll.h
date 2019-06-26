@@ -66,6 +66,34 @@ struct mod_n1sdp_pll_dev_config {
 };
 
 /*!
+ * \brief PLL parameter values for non-absolute frequencies.
+ */
+struct n1sdp_pll_custom_freq_param_entry {
+    /*! Required output frequency value in MHz */
+    uint16_t freq_value_mhz;
+
+    /*! Feedback divider value for this frequency */
+    uint16_t fbdiv;
+
+    /*! Reference clock divider value for this frequency */
+    uint8_t refdiv;
+
+    /*! Post divider 1 value for this frequency */
+    uint8_t postdiv;
+};
+
+/*!
+ * \brief N1SDP PLL module configuration.
+ */
+struct n1sdp_pll_module_config {
+    /*! Pointer to custom frequency table */
+    struct n1sdp_pll_custom_freq_param_entry *custom_freq_table;
+
+    /*! Size of custom frequency table */
+    size_t custom_freq_table_size;
+};
+
+/*!
  * @}
  */
 
