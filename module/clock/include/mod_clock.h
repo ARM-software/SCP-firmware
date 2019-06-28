@@ -310,7 +310,7 @@ struct mod_clock_drv_api {
      *
      * \param clock_id Clock device identifier.
      *
-     * \param[out] state The clock range structure.
+     * \param[out] range The clock range structure.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
