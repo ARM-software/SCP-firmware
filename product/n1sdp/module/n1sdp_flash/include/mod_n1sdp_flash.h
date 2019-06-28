@@ -165,7 +165,7 @@ struct mod_n1sdp_flash_api {
      *     memory.
      *
      * \param id Module identifier.
-     * \param[out] count The descriptor table.
+     * \param[out] table The descriptor table.
      *
      * \retval FWK_SUCCESS Operation succeeded.
      * \retval FWK_E_PARAM The \p table parameter was invalid.
@@ -191,7 +191,7 @@ struct mod_n1sdp_flash_api {
      *     memory.
      *
      * \param id Module identifier.
-     * \param[out] count The descriptor table.
+     * \param[out] table The descriptor table.
      *
      * \retval FWK_SUCCESS Operation succeeded.
      * \retval FWK_E_PARAM The \p table parameter was invalid.
