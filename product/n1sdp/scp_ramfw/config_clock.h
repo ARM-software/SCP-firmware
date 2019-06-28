@@ -11,6 +11,11 @@
 #include <fwk_macros.h>
 
 /*
+ * DDR Subsystem clock in MHz
+ */
+#define DDR_CLOCK_MHZ                  1333
+
+/*
  * SCC & PIK clock rates.
  */
 #define SCC_CLK_RATE_IOFPGA_TMIF2XCLK  (120 * FWK_MHZ)
@@ -59,7 +64,7 @@
 #define PIK_CLK_RATE_ATCLKDBG          (600 * FWK_MHZ)
 #define PIK_CLK_RATE_PCLKDBG           (300 * FWK_MHZ)
 #define PIK_CLK_RATE_TRACECLK          (300 * FWK_MHZ)
-#define PIK_CLK_RATE_DMC               (800 * FWK_MHZ)
+#define PIK_CLK_RATE_DMC               (DDR_CLOCK_MHZ * FWK_MHZ)
 
 /*
  * N1SDP PLL clock rates.
@@ -69,7 +74,7 @@
 #define N1SDP_PLL_RATE_CLUSTER_PLL      (1600 * FWK_MHZ)
 #define N1SDP_PLL_RATE_INTERCONNECT_PLL (1600 * FWK_MHZ)
 #define N1SDP_PLL_RATE_SYSTEM_PLL       (2400 * FWK_MHZ)
-#define N1SDP_PLL_RATE_DMC_PLL          (800 * FWK_MHZ)
+#define N1SDP_PLL_RATE_DMC_PLL          (DDR_CLOCK_MHZ * FWK_MHZ)
 
 /*
  * CSS clock rates.

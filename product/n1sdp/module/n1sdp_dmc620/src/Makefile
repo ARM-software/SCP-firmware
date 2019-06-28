@@ -6,6 +6,6 @@
 #
 
 BS_LIB_NAME := N1SDP DMC620
-BS_LIB_SOURCES += mod_n1sdp_dmc620.c
+BS_LIB_SOURCES += mod_n1sdp_dmc620.c dimm_spd.c
 
 include $(BS_DIR)/lib.mk

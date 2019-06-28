@@ -670,6 +670,26 @@ struct mod_dmc620_element_config {
 };
 
 /*!
+ * \brief Structure defining the connected DIMM's parameters.
+ */
+struct dimm_info {
+    /*! Current speed at which the DIMMs are configured & trained */
+    uint16_t speed;
+
+    /*! Number of ranks in DIMM */
+    uint8_t number_of_ranks;
+
+    /*! Number of ranks to train */
+    uint8_t ranks_to_train;
+
+    /*! DIMM memory width */
+    uint8_t dimm_mem_width;
+
+    /*! CAS Write Latency value */
+    uint32_t cwl_value;
+};
+
+/*!
  * \brief API of the DDR PHY associated to the DMC
  */
 struct mod_dmc_ddr_phy_api {
@@ -682,7 +702,7 @@ struct mod_dmc_ddr_phy_api {
      * \retval FWK_SUCCESS if the operation succeed.
      * \return one of the error code otherwise.
      */
-    int (*configure)(fwk_id_t element_id);
+    int (*configure)(fwk_id_t element_id, struct dimm_info *info);
 
     /*!
      * \brief Post training setting for DDR physical device
@@ -693,7 +713,8 @@ struct mod_dmc_ddr_phy_api {
      * \retval FWK_SUCCESS if the operation succeed.
      * \return one of the error code otherwise.
      */
-    int (*post_training_configure)(fwk_id_t element_id);
+    int (*post_training_configure)(fwk_id_t element_id,
+                                   struct dimm_info *info);
 
     /*!
      * \brief API to verify DDR PHY status at different training stage
@@ -705,7 +726,51 @@ struct mod_dmc_ddr_phy_api {
      * \retval FWK_SUCCESS if the operation succeed.
      * \return one of the error code otherwise.
      */
-    int (*verify_phy_status)(fwk_id_t element_id, uint8_t training_type);
+    int (*verify_phy_status)(fwk_id_t element_id,
+                             uint8_t training_type,
+                             struct dimm_info *info);
+
+    /*!
+     * \brief API to tune write leveling registers
+     *
+     * \param element_id Element identifier corresponding to the device to
+     *      configure.
+     * \param rank The rank number to perform the tuning.
+     *
+     * \retval FWK_SUCCESS if the operation succeed.
+     * \return one of the error code otherwise.
+     */
+    int (*wrlvl_phy_obs_regs)(fwk_id_t element_id,
+                              uint32_t rank,
+                              struct dimm_info *info);
+
+    /*!
+     * \brief API to tune read leveling registers
+     *
+     * \param element_id Element identifier corresponding to the device to
+     *      configure.
+     * \param rank The rank number to perform the tuning.
+     *
+     * \retval FWK_SUCCESS if the operation succeed.
+     * \return one of the error code otherwise.
+     */
+    int (*read_gate_phy_obs_regs)(fwk_id_t element_id,
+                                  uint32_t rank,
+                                  struct dimm_info *info);
+
+    /*!
+     * \brief API to tune PHY training registers
+     *
+     * \param element_id Element identifier corresponding to the device to
+     *      configure.
+     * \param rank The rank number to perform the tuning.
+     *
+     * \retval FWK_SUCCESS if the operation succeed.
+     * \return one of the error code otherwise.
+     */
+    int (*phy_obs_regs)(fwk_id_t element_id,
+                        uint32_t rank,
+                        struct dimm_info *info);
 };
 
 /*!
@@ -741,6 +806,8 @@ struct mod_dmc620_module_config {
     fwk_id_t ddr_module_id;
     /*! DDR PHY API ID */
     fwk_id_t ddr_api_id;
+    /*! DDR operating frequency */
+    uint16_t ddr_speed;
 };
 
 /*!
