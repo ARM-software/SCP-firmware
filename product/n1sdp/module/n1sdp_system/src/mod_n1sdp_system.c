@@ -8,10 +8,10 @@
  *     N1SDP System Support.
  */
 
-#include <assert.h>
 #include <stdint.h>
 #include <string.h>
 #include <fmw_cmsis.h>
+#include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
 #include <fwk_macros.h>
