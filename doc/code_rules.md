@@ -1,8 +1,52 @@
 Coding Rules
 ============
 
-To maintain consistency within the SCP/MCP software source code a series of
-rules and guidelines have been created; these form the project's coding rules.
+To maintain consistency within the SCP/MCP software source code and to reduce
+the risk of bugs, a series of rules and guidelines have been created; these form
+the project's coding rules.
+
+General Considerations
+----------------------
+The software follows the ISO/IEC 9899:2011 standard (C11). This is enforced
+through the use of compilation flags and all warnings being considered as
+errors. Compilation flags are also used to avoid constructs usually considered
+questionable, and that are easy to avoid.
+
+For robustness and reliability reasons, dynamic memory allocation is allocate-
+only and must be done through the facilities provided by the firmware framework.
+The intent is for memory allocations to be done during the pre-runtime phase or
+early in the runtime phase based on configuration data or hardware detection.
+Allocated memory cannot be freed or reallocated.
+
+The framework provides an optional multi-threading runtime, contingent on a
+CMSIS-RTOS-based RTOS. Interaction with the RTOS happens exclusively through the
+framework.
+
+C Standard Library
+------------------
+When developing a module, only the following headers of the C standard library
+are allowed to be included:
+`<limits.h>`, `<stdarg.h>`, `<stdbool.h>`, `<stddef.h>`, `<stdint.h>`,
+`<stdio.h>`, `<stdlib.h>` and `<string.h>`.
+
+Concerning the library functions defined in `<stdio.h>`, only `snprintf()` may
+be used.
+
+Concerning the library functions defined in `<stdlib.h>`, only `bsearch()`,
+`qsort()`, `abs()` and `rand()` may be used.
+
+Concerning the library functions defined in `<string.h>`, `strcat()` and
+`strcpy()` cannot be used. Use `strncat()` and `strncpy()` instead.
+
+If not already defined by another standard library header, include `<stddef.h>`
+and not `<stdlib.h>` to define `size_t`.
+
+Additionally, the framework wraps the following standard library header files:
+`<stdalign.h>`, `<stdnoreturn.h>`, `<assert.h>` and `<errno.h>`. These header
+files must not be directly included in module code. This is because certain
+compilers, while themselves C11-compliant, do not provide a full C11 standard
+library implementation. In this situation, the framework provides a custom
+implementation through these headers.
 
 Header Files
 ------------
@@ -31,11 +75,13 @@ includes.
 
 Types
 -----
-Import "stdint.h" (part of the C Standard Library) for exact-width integer types
-(uint8_t, uint16_t, etc). These types can be used wherever the width of an
-integer needs to be specified explicitly.
+Import `<stdint.h>` (part of the C Standard Library) for exact-width integer
+types (`uint8_t`, `uint16_t`, etc). These types can be used wherever the width
+of an integer needs to be specified explicitly.
 
-Import "stdbool.h" (also part of the C Standard Library) whenever a "boolean"
+Use `uintptr_t` to handle addresses as integers.
+
+Import `<stdbool.h>` (also part of the C Standard Library) whenever a "boolean"
 type is needed.
 
 Avoid defining custom types with the "typedef" keyword where possible.
@@ -56,6 +102,27 @@ unsigned int counter;
 /* Preferred over sizeof(int) */
 size = sizeof(counter);
 \endcode
+
+Use the `const` type qualifier as appropriate to specify values that cannot be
+modified. Quick reminder:
+
+- `const xyz_t object`, `object` is an object of type xyz_t which value cannot
+be modified.
+- `const xyz_t *ptr` or `xyz_t const *ptr`, `ptr` is a pointer to a constant
+object of type xyz_t. The value of the object cannot be modified, the value of
+the pointer can be modified.
+- `xyz_t * const ptr`, `ptr` is a constant pointer to an object of type xyz_t.
+The value of the object can be modified, the value of the pointer cannot be
+modified.
+- `const xyz_t * const ptr` or `xyz_t const * const ptr`, `ptr` is a constant
+pointer to a constant object of type xyz_t. The value of the object and the
+pointer cannot be modified.
+
+https://cdecl.org may help if in doubt.
+
+Static storage qualifier
+------------------------
+Declare functions and variables private to a C file as static.
 
 Operator Precedence
 -------------------
@@ -127,17 +194,32 @@ struct clock clock_cpu = {
 };
 \endcode
 
+Integers
+--------
+To mitigate the risk of integer wrap-around, conversion or truncation errors:
+
+- represent integer values that should never be negative with the `unsigned`
+type that you expect to hold all possible values.
+
+- represent integer values that may be negative with the `signed` type that you
+expect to hold all possible values.
+
+- when taking untrusted integer input, ensure you check them against the lower
+and upper bound of the integer type you store them in.
+
 Device Register Definitions
 ---------------------------
 The format for structures representing memory-mapped device registers is
 standardized.
 
-- The file containing the device structure must include stdint.h to gain access
-to the uintxx_t and UINTxx_C definitions.
-- The file containing the device structure must include fwk_macros.h to gain
-access to the FWK_R, FWK_W and FWK_RW macros.
+- The file containing the device structure must include `<stdint.h>` to gain
+access to the uintxx_t and UINTxx_C definitions.
+- The file containing the device structure must include `<fwk_macros.h>` to
+gain access to the FWK_R, FWK_W and FWK_RW macros.
 - All non-reserved structure fields must be prefixed with one of the above
 macros, defining the read/write access level.
+- Avoid C structure bit-fields when representing hardware registers - how
+bit-fields are represented in memory is implementation-defined.
 - Bit definitions should be declared via UINTxx_C macros.
 - Bit definitions must be prefixed by the register name it relates to. If bit
 definitions apply to multiple registers, then the name must be as common as
