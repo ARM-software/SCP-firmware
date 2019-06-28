@@ -641,7 +641,6 @@ uint64_t sam_encode_region_size(uint64_t size);
  *
  * \param[out] reg Region group descriptor to be configured
  *      \pre Must be a valid pointer
- * \param region Region entry in the region group descriptor
  * \param bit_offset Bit offset of the memory region in the group descriptor
  * \param base Region base address
  * \param size Region size
