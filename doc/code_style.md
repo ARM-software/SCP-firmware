@@ -25,7 +25,25 @@ Avoid using:
 Functions, macros, types and defines must have the "fwk_" prefix (upper case for
 macros and defines) to identify framework API.
 
-It is fine and encouraged to use a variable named "i" (index) for loops.
+Non-static names should be prefixed with the name of their translation unit to
+avoid name collisions.
+
+It is acceptable to use the following common placeholder names for loop indices:
+ - `i`
+ - `j`
+ - `k`
+
+`xyz_idx` names are commonly used for indices that live longer than a single
+loop.
+
+License
+-------
+All files must begin with a license header of the following form:
+
+Arm SCP/MCP Software
+Copyright (c) 2015-2019, Arm Limited and Contributors. All rights reserved.
+
+SPDX-License-Identifier: BSD-3-Clause
 
 Inclusions
 ----------
@@ -36,6 +54,12 @@ Header file inclusions should follow a consistent sequence, defined as:
 - Modules
 
 For each group, order the individual headers alphabetically.
+
+Header files (`.h` files) should include the headers needed for them to compile
+and only these ones.
+
+Translation units (`.c` files) should not rely on indirect inclusion to provide
+names they have otherwise not included themselves.
 
 Indentation and Scope
 ---------------------
@@ -230,7 +254,8 @@ The project APIs are documented using Doxygen comments.
 
 It is mandatory to document every API exposed to other elements of the project.
 By default, the provided Doxygen configuration omits undocumented elements from
-the compiled documentation.
+the compiled documentation. APIs are documented in the header files exposing
+them.
 
 At a minimum:
 - All functions and structures must have at least a "\brief" tag.
