@@ -48,5 +48,6 @@ const struct fwk_module_config config_n1sdp_dmc620 = {
                 FWK_MODULE_IDX_N1SDP_DDR_PHY),
             .ddr_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_DDR_PHY,
                 0),
+            .ddr_speed = DDR_CLOCK_MHZ,
         }),
 };
