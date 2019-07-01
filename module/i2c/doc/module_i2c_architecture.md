@@ -30,8 +30,10 @@ The following features are unsupported. Support may be added in the future.
 
 # Flow                                           {#module_i2c_architecture_flow}
 
+## Asynchronous API
+
 The following schematic describes the transaction flow for an I2C master
-transmission. The flow for a reception is similar.
+asynchronous transmission. The flow for an asynchronous reception is similar.
 
     Client             I2C         I2C Driver     I2C ISR (Driver)
       |                 |               |               |
