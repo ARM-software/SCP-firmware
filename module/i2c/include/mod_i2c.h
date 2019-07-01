@@ -106,9 +106,10 @@ struct mod_i2c_driver_api {
      * \param dev_id Identifier of the I2C device
      * \param transmit_request Request information for the I2C transmission
      *
-     * \retval FWK_SUCCESS The request was submitted.
+     * \retval FWK_PENDING The request was submitted.
+     * \retval FWK_SUCCESS The request was successfully completed.
      * \retval FWK_E_PARAM One or more parameters were invalid.
-     * \return One of the standard framework error codes.
+     * \return One of the standard framework status codes.
      */
     int (*transmit_as_master)(
         fwk_id_t dev_id, struct mod_i2c_request *transmit_request);
@@ -124,9 +125,10 @@ struct mod_i2c_driver_api {
      * \param dev_id Identifier of the I2C device
      * \param receive_request Request information for the I2C reception
      *
-     * \retval FWK_SUCCESS The request was submitted.
+     * \retval FWK_PENDING The request was submitted.
+     * \retval FWK_SUCCESS The request was successfully completed.
      * \retval FWK_E_PARAM One or more parameters were invalid.
-     * \return One of the standard framework error codes.
+     * \return One of the standard framework status codes.
      */
     int (*receive_as_master)(
         fwk_id_t dev_id, struct mod_i2c_request *receive_request);
@@ -140,21 +142,21 @@ struct mod_i2c_api {
      * \brief Request transmission of data as Master to a selected slave.
      *
      * \details When the function returns the transmission is not completed,
-     *      not even started. The data buffer must stay allocated and its
-     *      content must not be modified until the transmission is completed or
-     *      aborted. When the transmission operation has finished a response
-     *      event is sent to the client.
+     *      possibly not even started. The data buffer must stay allocated
+     *      and its content must not be modified until the transmission is
+     *      completed or aborted. When the transmission operation has finished
+     *      a response event is sent to the client.
      *
      * \param dev_id Identifier of the I2C device
      * \param slave_address Address of the slave on the I2C bus
      * \param data Pointer to the data bytes to transmit to the slave
      * \param byte_count Number of data bytes to transmit
      *
-     * \retval FWK_SUCCESS The request was submitted.
+     * \retval FWK_PENDING The request was submitted.
      * \retval FWK_E_PARAM One or more parameters were invalid.
      * \retval FWK_E_BUSY An I2C transaction is already on-going.
      * \retval FWK_E_DEVICE The transmission is aborted due to a device error.
-     * \return One of the standard framework error codes.
+     * \return One of the standard framework status codes.
      */
     int (*transmit_as_master)(fwk_id_t dev_id, uint8_t slave_address,
         uint8_t *data, uint8_t byte_count);
@@ -163,21 +165,21 @@ struct mod_i2c_api {
      * \brief Request reception of data as Master from a selected slave.
      *
      * \details When the function returns the reception is not completed,
-     *      not even started. The data buffer must stay allocated and its
-     *      content must not be modified until the reception is completed or
-     *      aborted. When the reception operation has finished a response event
-     *      is sent to the client.
+     *      possibly not even started. The data buffer must stay allocated
+     *      and its content must not be modified until the reception is
+     *      completed or aborted. When the reception operation has finished
+     *      a response event is sent to the client.
      *
      * \param dev_id Identifier of the I2C device
      * \param slave_address Address of the slave on the I2C bus
      * \param data Pointer to the buffer to receive data from the slave
      * \param byte_count Number of data bytes to receive
      *
-     * \retval FWK_SUCCESS The request was submitted.
+     * \retval FWK_PENDING The request was submitted.
      * \retval FWK_E_PARAM One or more parameters were invalid.
      * \retval FWK_E_BUSY An I2C transaction is already on-going.
      * \retval FWK_E_DEVICE The reception is aborted due to a device error.
-     * \return One of the standard framework error codes.
+     * \return One of the standard framework status codes.
      */
     int (*receive_as_master)(fwk_id_t dev_id, uint8_t slave_address,
         uint8_t *data, uint8_t byte_count);
@@ -186,11 +188,11 @@ struct mod_i2c_api {
      * \brief Request the transmission followed by the reception of data as
      *      Master to/from a selected slave.
      *
-     * \details When the function returns the transaction is not completed, not
-     *      even started. The data buffers must stay allocated and their content
-     *      must not be modified until the transaction is completed or aborted.
-     *      When the transaction has finished a response event is sent to the
-     *      client.
+     * \details When the function returns the transaction is not completed,
+     *      possibly not even started. The data buffer must stay allocated
+     *      and its content must not be modified until the transaction is
+     *      completed or aborted. When the transaction operation has finished
+     *      a response event is sent to the client.
      *
      * \param dev_id Identifier of the I2C device
      * \param slave_address Address of the slave on the I2C bus
@@ -199,15 +201,15 @@ struct mod_i2c_api {
      * \param receive_data Pointer to the buffer to receive the data in the
      *      second phase.
      * \param transmit_byte_count Number of data bytes to transmit in the first
-     *      phase
+     *      phase.
      * \param receive_byte_count Number of data bytes to receive in the second
-     *      phase
+     *      phase.
      *
-     * \retval FWK_SUCCESS The request was submitted.
+     * \retval FWK_PENDING The request was submitted.
      * \retval FWK_E_PARAM One or more parameters were invalid.
      * \retval FWK_E_BUSY An I2C transaction is already on-going.
      * \retval FWK_E_DEVICE The reception is aborted due to a device error.
-     * \return One of the standard framework error codes.
+     * \return One of the standard framework status codes.
      */
     int (*transmit_then_receive_as_master)(fwk_id_t dev_id,
         uint8_t slave_address, uint8_t *transmit_data, uint8_t *receive_data,
@@ -258,18 +260,23 @@ static const fwk_id_t mod_i2c_api_id_driver_response =
  * \brief Event indices
  */
 enum mod_i2c_event_idx {
-    MOD_I2C_EVENT_IDX_REQUEST,
-    MOD_I2C_EVENT_IDX_REQUEST_COMPLETED,
+    MOD_I2C_EVENT_IDX_REQUEST_TRANSMIT,
+    MOD_I2C_EVENT_IDX_REQUEST_RECEIVE,
+    MOD_I2C_EVENT_IDX_REQUEST_TRANSMIT_THEN_RECEIVE,
     MOD_I2C_EVENT_IDX_COUNT,
 };
 
-/*! Request event identifier */
-static const fwk_id_t mod_i2c_event_id_request = FWK_ID_EVENT_INIT(
-    FWK_MODULE_IDX_I2C, MOD_I2C_EVENT_IDX_REQUEST);
+/*! Transmit request event identifier */
+static const fwk_id_t mod_i2c_event_id_request_tx = FWK_ID_EVENT_INIT(
+    FWK_MODULE_IDX_I2C, MOD_I2C_EVENT_IDX_REQUEST_TRANSMIT);
 
-/*! Request completed event identifier */
-static const fwk_id_t mod_i2c_event_id_request_completed = FWK_ID_EVENT_INIT(
-    FWK_MODULE_IDX_I2C, MOD_I2C_EVENT_IDX_REQUEST_COMPLETED);
+/*! Receive request event identifier */
+static const fwk_id_t mod_i2c_event_id_request_rx = FWK_ID_EVENT_INIT(
+    FWK_MODULE_IDX_I2C, MOD_I2C_EVENT_IDX_REQUEST_RECEIVE);
+
+/*! Transmit then receive request event identifier */
+static const fwk_id_t mod_i2c_event_id_request_tx_rx = FWK_ID_EVENT_INIT(
+    FWK_MODULE_IDX_I2C, MOD_I2C_EVENT_IDX_REQUEST_TRANSMIT_THEN_RECEIVE);
 
 /*!
  * \}

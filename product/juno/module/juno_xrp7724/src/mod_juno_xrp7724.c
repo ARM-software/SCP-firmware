@@ -100,10 +100,12 @@ static int set_gpio(fwk_id_t id, struct juno_xrp7724_dev_ctx *ctx)
     status = module_ctx.i2c_api->transmit_as_master(
         module_ctx.config->i2c_hal_id, module_ctx.config->slave_address,
         ctx->transmit_data, GPIO_WRITE_TRANSMIT_LENGTH);
-    if (status != FWK_SUCCESS)
-        return FWK_E_DEVICE;
+    if (status == FWK_PENDING)
+        status = FWK_SUCCESS;
+    else
+        status = FWK_E_DEVICE;
 
-    return FWK_SUCCESS;
+    return status;
 }
 
 /* Helper function for the sensor API */
@@ -456,8 +458,8 @@ static int juno_xrp7724_sensor_process_request(fwk_id_t id, int status)
                 module_config->i2c_hal_id, module_config->slave_address,
                 ctx->transmit_data, ctx->receive_data, SENSOR_WRITE_LENGTH,
                 SENSOR_READ_LENGTH);
-        if (request_status == FWK_SUCCESS)
-            return FWK_SUCCESS;
+            if (request_status == FWK_PENDING)
+                return FWK_SUCCESS;
 
         break;
 

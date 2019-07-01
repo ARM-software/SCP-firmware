@@ -162,7 +162,13 @@ static int transmit_as_master(fwk_id_t dev_id,
 
     fwk_interrupt_global_enable();
 
-    return FWK_SUCCESS;
+    /*
+     * The data has been pushed to the I2C FIFO for transmission to the
+     * target device. An interrupt will signal the completion of the
+     * transfer. The i2c_isr() interrupt handler will be invoked to notify
+     * the caller.
+     */
+    return FWK_PENDING;
 }
 
 static int receive_as_master(fwk_id_t dev_id,
@@ -201,7 +207,13 @@ static int receive_as_master(fwk_id_t dev_id,
 
     fwk_interrupt_global_enable();
 
-    return FWK_SUCCESS;
+    /*
+     * The command has been sent to the I2C for requesting data from
+     * the target device. An interrupt will signal the completion of the
+     * transfer. The i2c_isr() interrupt handler will be invoked to notify
+     * the caller.
+     */
+    return FWK_PENDING;
 }
 
 static const struct mod_i2c_driver_api driver_api = {
