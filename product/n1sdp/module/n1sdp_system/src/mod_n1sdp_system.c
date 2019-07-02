@@ -374,8 +374,8 @@ static int n1sdp_system_init_primary_core(void)
     mod_pd_restricted_api = n1sdp_system_ctx.mod_pd_restricted_api;
 
     n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-        "[N1SDP SYSTEM] Setting AP Reset Address to 0x%x\n",
-        AP_CORE_RESET_ADDR);
+        "[N1SDP SYSTEM] Setting AP Reset Address to 0x%08x\n",
+        AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET);
 
     cluster_count = n1sdp_core_get_cluster_count();
     for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
@@ -391,7 +391,8 @@ static int n1sdp_system_init_primary_core(void)
     }
 
     n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
-        "[N1SDP SYSTEM] Switching ON primary core...\n");
+        "[N1SDP SYSTEM] Booting primary core at %d MHz...\n",
+        PIK_CLK_RATE_CLUS0_CPU / FWK_MHZ);
 
     status = mod_pd_restricted_api->set_composite_state_async(
         FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
