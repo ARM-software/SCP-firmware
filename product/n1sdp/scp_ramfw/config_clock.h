@@ -60,6 +60,8 @@
 #define PIK_CLK_RATE_UART              (50 * FWK_MHZ)
 #define PIK_CLK_RATE_TCU0              (1200 * FWK_MHZ)
 #define PIK_CLK_RATE_TCU1              (1200 * FWK_MHZ)
+#define PIK_CLK_RATE_TCU2              (1200 * FWK_MHZ)
+#define PIK_CLK_RATE_TCU3              (1200 * FWK_MHZ)
 
 #define PIK_CLK_RATE_ATCLKDBG          (600 * FWK_MHZ)
 #define PIK_CLK_RATE_PCLKDBG           (300 * FWK_MHZ)
@@ -154,6 +156,8 @@ enum clock_pik_idx {
     CLOCK_PIK_IDX_UART,
     CLOCK_PIK_IDX_TCU0,
     CLOCK_PIK_IDX_TCU1,
+    CLOCK_PIK_IDX_TCU2,
+    CLOCK_PIK_IDX_TCU3,
     /* Debug element clocks */
     CLOCK_PIK_IDX_ATCLKDBG,
     CLOCK_PIK_IDX_PCLKDBG,

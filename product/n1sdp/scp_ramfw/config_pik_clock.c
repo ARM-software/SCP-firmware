@@ -370,6 +370,24 @@ static const struct mod_pik_clock_rate rate_table_tcu1[] = {
     },
 };
 
+static const struct mod_pik_clock_rate rate_table_tcu2[] = {
+    {
+        .rate = PIK_CLK_RATE_TCU2,
+        .source = MOD_PIK_CLOCK_MSCLOCK_SOURCE_SYSPLLCLK,
+        .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_SYS,
+        .divider = CLOCK_RATE_SYSPLLCLK / PIK_CLK_RATE_TCU2,
+    },
+};
+
+static const struct mod_pik_clock_rate rate_table_tcu3[] = {
+    {
+        .rate = PIK_CLK_RATE_TCU3,
+        .source = MOD_PIK_CLOCK_MSCLOCK_SOURCE_SYSPLLCLK,
+        .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_SYS,
+        .divider = CLOCK_RATE_SYSPLLCLK / PIK_CLK_RATE_TCU3,
+    },
+};
+
 static const struct mod_pik_clock_rate rate_table_atclkdbg[] = {
     {
         .rate = PIK_CLK_RATE_ATCLKDBG,
@@ -893,6 +911,30 @@ static const struct fwk_element pik_clock_element_table[] = {
             .rate_table = rate_table_tcu1,
             .rate_count = FWK_ARRAY_SIZE(rate_table_tcu1),
             .initial_rate = PIK_CLK_RATE_TCU1,
+        }),
+    },
+    [CLOCK_PIK_IDX_TCU2] = {
+        .name = "TCU2",
+        .data = &((struct mod_pik_clock_dev_config) {
+            .type = MOD_PIK_CLOCK_TYPE_MULTI_SOURCE,
+            .is_group_member = false,
+            .control_reg = &PIK_SYSTEM->TCUCLK[2].TCUCLK_CTRL,
+            .divsys_reg = &PIK_SYSTEM->TCUCLK[2].TCUCLK_DIV1,
+            .rate_table = rate_table_tcu2,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_tcu2),
+            .initial_rate = PIK_CLK_RATE_TCU2,
+        }),
+    },
+    [CLOCK_PIK_IDX_TCU3] = {
+        .name = "TCU3",
+        .data = &((struct mod_pik_clock_dev_config) {
+            .type = MOD_PIK_CLOCK_TYPE_MULTI_SOURCE,
+            .is_group_member = false,
+            .control_reg = &PIK_SYSTEM->TCUCLK[3].TCUCLK_CTRL,
+            .divsys_reg = &PIK_SYSTEM->TCUCLK[3].TCUCLK_DIV1,
+            .rate_table = rate_table_tcu3,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_tcu3),
+            .initial_rate = PIK_CLK_RATE_TCU3,
         }),
     },
     [CLOCK_PIK_IDX_ATCLKDBG] = {
