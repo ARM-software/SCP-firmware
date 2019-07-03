@@ -251,6 +251,12 @@
 #define EXT_CAP_ID_PRI                 UINT16_C(0x13)
 
 /*
+ * AXI override values for PCIe & CCIX root ports
+ */
+#define AXI_OVRD_VAL_PCIE              UINT32_C(0x00303F3B)
+#define AXI_OVRD_VAL_CCIX              UINT32_C(0x00303F3B)
+
+/*
  * AXI outbound region register set definitions
  */
 

@@ -103,6 +103,7 @@ static int n1sdp_pcie_setup(struct n1sdp_pcie_dev_ctx *dev_ctx)
     /* Enable the CCIX/PCIe controller */
     wait_data.ctrl_apb = NULL;
     if (dev_ctx->config->ccix_capable) {
+        SCC->AXI_OVRD_CCIX = AXI_OVRD_VAL_CCIX;
         SCC->CCIX_PM_CTRL = SCC_CCIX_PM_CTRL_PWR_REQ_POS;
         wait_data.stage = PCIE_INIT_STAGE_CCIX_POWER_ON;
         status = pcie_ctx.timer_api->wait(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER,
@@ -117,6 +118,7 @@ static int n1sdp_pcie_setup(struct n1sdp_pcie_dev_ctx *dev_ctx)
         }
         SCC->SYS_MAN_RESET &= ~(1 << SCC_SYS_MAN_RESET_CCIX_POS);
     } else {
+        SCC->AXI_OVRD_PCIE = AXI_OVRD_VAL_PCIE;
         SCC->PCIE_PM_CTRL = SCC_PCIE_PM_CTRL_PWR_REQ_POS;
         wait_data.stage = PCIE_INIT_STAGE_PCIE_POWER_ON;
         status = pcie_ctx.timer_api->wait(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER,
