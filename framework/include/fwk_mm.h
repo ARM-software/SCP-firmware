@@ -25,10 +25,10 @@
  */
 
 /*!
- * \brief Default allocation alignment based on the alignment of uintmax_t
+ * \brief Default allocation alignment based on the alignment of max_align_t
  *      on the platform the software is built for.
  */
-#define FWK_MM_DEFAULT_ALIGNMENT (alignof(uintmax_t))
+#define FWK_MM_DEFAULT_ALIGNMENT (alignof(max_align_t))
 
 /*!
  * \brief Allocate a block of memory.
