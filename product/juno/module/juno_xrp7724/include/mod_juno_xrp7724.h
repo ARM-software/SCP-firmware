@@ -22,7 +22,7 @@
  */
 
 /*!
- * \brief Module configuration
+ * \brief Module configuration.
  */
 struct mod_juno_xrp7724_config {
     /*! Slave address of the I2C device */
@@ -38,17 +38,31 @@ struct mod_juno_xrp7724_config {
 };
 
 /*!
- * \brief Element type
+ * \brief Element type.
  */
 enum mod_juno_xrp7724_element_type {
     MOD_JUNO_XRP7724_ELEMENT_TYPE_GPIO,
+    MOD_JUNO_XRP7724_ELEMENT_TYPE_SENSOR,
     MOD_JUNO_XRP7724_ELEMENT_TYPE_COUNT,
 };
 
 /*!
- * \brief Element configuration
+ * \brief Element configuration.
  */
 struct mod_juno_xrp7724_dev_config {
+    /*! Identifier of the element for the driver response */
+    fwk_id_t driver_response_id;
+
+    /*! Identifier of the driver response API */
+    fwk_id_t driver_response_api_id;
+
+    /*!
+     * \brief Sensor information.
+     *
+     * \note Only provided for a sensor element
+     */
+    struct mod_sensor_info *sensor_info;
+
     /*! Element type */
     enum mod_juno_xrp7724_element_type type;
 };
@@ -74,6 +88,7 @@ struct mod_juno_xrp7724_api_system_mode {
 
 /*! Index of the available APIs */
 enum mod_juno_xrp7724_api_idx {
+    MOD_JUNO_XRP7724_API_IDX_SENSOR,
     MOD_JUNO_XRP7724_API_IDX_SYSTEM_MODE,
     MOD_JUNO_XRP7724_API_IDX_COUNT,
 };
@@ -81,6 +96,10 @@ enum mod_juno_xrp7724_api_idx {
 /*! Identifier of the system mode API */
 static const fwk_id_t mod_juno_xrp7724_api_id_system_mode = FWK_ID_API_INIT(
     FWK_MODULE_IDX_JUNO_XRP7724, MOD_JUNO_XRP7724_API_IDX_SYSTEM_MODE);
+
+/*! Identifier of the sensor driver API */
+static const fwk_id_t mod_juno_xrp7724_api_id_sensor = FWK_ID_API_INIT(
+    FWK_MODULE_IDX_JUNO_XRP7724, MOD_JUNO_XRP7724_API_IDX_SENSOR);
 
 /*!
  * \}
