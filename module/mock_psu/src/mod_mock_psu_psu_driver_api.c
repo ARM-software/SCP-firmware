@@ -37,7 +37,7 @@ static int api_get_enabled(fwk_id_t device_id, bool *enabled)
     return FWK_SUCCESS;
 }
 
-static int api_set_voltage(fwk_id_t device_id, uintmax_t voltage)
+static int api_set_voltage(fwk_id_t device_id, uint64_t voltage)
 {
     struct mod_mock_psu_device_ctx *ctx;
 
@@ -50,7 +50,7 @@ static int api_set_voltage(fwk_id_t device_id, uintmax_t voltage)
     return FWK_SUCCESS;
 }
 
-static int api_get_voltage(fwk_id_t device_id, uintmax_t *voltage)
+static int api_get_voltage(fwk_id_t device_id, uint64_t *voltage)
 {
     struct mod_mock_psu_device_ctx *ctx;
 

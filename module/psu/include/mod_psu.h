@@ -74,7 +74,7 @@ struct mod_psu_device_api {
      *
      * \return Status code representing the result of the operation.
      */
-    int (*get_voltage)(fwk_id_t device_id, uintmax_t *voltage);
+    int (*get_voltage)(fwk_id_t device_id, uint64_t *voltage);
 
     /*!
      * \brief Set the voltage of a device.
@@ -89,7 +89,7 @@ struct mod_psu_device_api {
      *
      * \return Status code representing the result of the operation.
      */
-    int (*set_voltage)(fwk_id_t device_id, uintmax_t voltage);
+    int (*set_voltage)(fwk_id_t device_id, uint64_t voltage);
 };
 
 /*!
@@ -138,7 +138,7 @@ struct mod_psu_driver_api {
      *
      * \return Status code representing the result of the operation.
      */
-    int (*get_voltage)(fwk_id_t id, uintmax_t *voltage);
+    int (*get_voltage)(fwk_id_t id, uint64_t *voltage);
 
     /*!
      * \brief Set the voltage of a device.
@@ -151,7 +151,7 @@ struct mod_psu_driver_api {
      *
      * \return Status code representing the result of the operation.
      */
-    int (*set_voltage)(fwk_id_t id, uintmax_t voltage);
+    int (*set_voltage)(fwk_id_t id, uint64_t voltage);
 };
 
 /*!
