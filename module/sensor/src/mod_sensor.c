@@ -184,7 +184,7 @@ static int sensor_bind(fwk_id_t id, unsigned int round)
 
     /* Bind to driver */
     status = fwk_module_bind(ctx->config->driver_id,
-        FWK_ID_API(fwk_id_get_module_idx(ctx->config->driver_id), 0),
+        ctx->config->driver_api_id,
         &driver);
     if (status != FWK_SUCCESS)
         return status;

@@ -160,9 +160,11 @@ struct mod_sensor_info {
  * \details Configuration structure for individual sensors.
  */
 struct mod_sensor_dev_config {
-    /*! Module or element id of the driver */
+    /*! Module or element identifier of the driver */
     fwk_id_t driver_id;
 
+    /*! API identifier of the driver */
+    fwk_id_t driver_api_id;
 };
 
 /*!
