@@ -114,6 +114,7 @@ static const struct fwk_element sensor_element_table[] = {
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_N1SDP_SENSOR,
                              MOD_N1SDP_TEMP_SENSOR_IDX_CLUSTER0),
+            .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_SENSOR, 0),
         }),
     },
     [MOD_N1SDP_TEMP_SENSOR_IDX_CLUSTER1] = {
@@ -121,6 +122,7 @@ static const struct fwk_element sensor_element_table[] = {
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_N1SDP_SENSOR,
                              MOD_N1SDP_TEMP_SENSOR_IDX_CLUSTER1),
+            .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_SENSOR, 0),
         }),
     },
     [MOD_N1SDP_TEMP_SENSOR_IDX_SYSTEM] = {
@@ -128,6 +130,7 @@ static const struct fwk_element sensor_element_table[] = {
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_N1SDP_SENSOR,
                              MOD_N1SDP_TEMP_SENSOR_IDX_SYSTEM),
+            .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_SENSOR, 0),
         }),
     },
     [MOD_N1SDP_VOLT_SENSOR_IDX_CLUS0CORE0] = {
@@ -135,6 +138,7 @@ static const struct fwk_element sensor_element_table[] = {
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_N1SDP_SENSOR,
                              MOD_N1SDP_VOLT_SENSOR_IDX_CLUS0CORE0),
+            .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_SENSOR, 0),
         }),
     },
     [MOD_N1SDP_VOLT_SENSOR_IDX_CLUS0CORE1] = {
@@ -142,6 +146,7 @@ static const struct fwk_element sensor_element_table[] = {
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_N1SDP_SENSOR,
                              MOD_N1SDP_VOLT_SENSOR_IDX_CLUS0CORE1),
+            .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_SENSOR, 0),
         }),
     },
     [MOD_N1SDP_VOLT_SENSOR_IDX_CLUS1CORE0] = {
@@ -149,6 +154,7 @@ static const struct fwk_element sensor_element_table[] = {
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_N1SDP_SENSOR,
                              MOD_N1SDP_VOLT_SENSOR_IDX_CLUS1CORE0),
+            .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_SENSOR, 0),
         }),
     },
     [MOD_N1SDP_VOLT_SENSOR_IDX_CLUS1CORE1] = {
@@ -156,6 +162,7 @@ static const struct fwk_element sensor_element_table[] = {
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_N1SDP_SENSOR,
                              MOD_N1SDP_VOLT_SENSOR_IDX_CLUS1CORE1),
+            .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_SENSOR, 0),
         }),
     },
     [MOD_N1SDP_VOLT_SENSOR_IDX_SYSTEM] = {
@@ -163,6 +170,7 @@ static const struct fwk_element sensor_element_table[] = {
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_N1SDP_SENSOR,
                              MOD_N1SDP_VOLT_SENSOR_IDX_SYSTEM),
+            .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_SENSOR, 0),
         }),
     },
     [MOD_N1SDP_VOLT_SENSOR_COUNT] = { 0 },

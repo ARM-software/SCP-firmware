@@ -56,6 +56,7 @@ static const struct fwk_element sensor_element_table[] = {
         .data = &((const struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_REG_SENSOR,
                                              REG_SENSOR_DEV_SOC_TEMP),
+            .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_REG_SENSOR, 0),
         }),
     },
     [1] = { 0 },
