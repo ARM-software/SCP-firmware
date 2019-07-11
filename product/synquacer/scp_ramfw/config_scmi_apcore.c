@@ -16,7 +16,7 @@ static const struct mod_scmi_apcore_reset_register_group
     reset_reg_group_table[] = {
         {
             .base_register = (uintptr_t)&PIK_CLUSTER(0)->RVBARADDR0_LW,
-            .register_count = SYNQUACER_CSS_CPUS_MAX,
+            .register_count = SYNQUACER_CSS_CPUS,
         },
     };
 

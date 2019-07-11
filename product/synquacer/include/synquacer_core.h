@@ -11,17 +11,28 @@
 #include <stdint.h>
 
 /* Maximum number of clusters */
-#define SYNQUACER_CSS_CPUS_CLUSTER_MAX UINT32_C(12)
+#define SYNQUACER_CSS_CPUS_CLUSTER UINT32_C(12)
 
 /* Maximum number of CPUs per cluster */
-#define SYNQUACER_CSS_CPUS_PER_CLUSTER_MAX UINT32_C(2)
+#define SYNQUACER_CSS_CPUS_PER_CLUSTER UINT32_C(2)
 
 /* Maximum number of CPUs */
-#define SYNQUACER_CSS_CPUS_MAX \
-    (SYNQUACER_CSS_CPUS_CLUSTER_MAX * SYNQUACER_CSS_CPUS_PER_CLUSTER_MAX)
+#define SYNQUACER_CSS_CPUS \
+    (SYNQUACER_CSS_CPUS_CLUSTER * SYNQUACER_CSS_CPUS_PER_CLUSTER)
 
-uint32_t synquacer_core_get_core_count(void);
-uint32_t synquacer_core_get_cluster_count(void);
-uint32_t synquacer_core_get_core_per_cluster_count(void);
+static inline uint32_t synquacer_core_get_cluster_count(void)
+{
+    return SYNQUACER_CSS_CPUS_CLUSTER;
+}
+
+static inline uint32_t synquacer_core_get_core_per_cluster_count(void)
+{
+    return SYNQUACER_CSS_CPUS_PER_CLUSTER;
+}
+
+static inline uint32_t synquacer_core_get_core_count(void)
+{
+    return SYNQUACER_CSS_CPUS;
+}
 
 #endif /* SYNQUACER_CORE_H */
