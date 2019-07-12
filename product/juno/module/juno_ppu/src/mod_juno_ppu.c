@@ -28,6 +28,8 @@
 
 #define PPU_SET_STATE_AND_WAIT_TIMEOUT_US   (100 * 1000)
 
+#define PPU_ALARM_TIMEOUT_SUSPEND_MS        5
+
 #define CPU_WAKEUP_COMPOSITE_STATE  MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, \
                                                            0, \
                                                            MOD_PD_STATE_ON, \
@@ -211,6 +213,42 @@ static int ppu_get_state(struct ppu_reg *reg, enum ppu_mode *mode)
     return FWK_SUCCESS;
 }
 
+static int get_state(struct ppu_ctx *ppu_ctx, unsigned int *state)
+{
+    enum ppu_mode mode = ppu_ctx->reg->POWER_STATUS & PPU_REG_PPR_PSR;
+
+    if (!check_mode(mode))
+        return FWK_E_DEVICE;
+
+    *state = ppu_mode_to_pd_state[mode];
+
+    return FWK_SUCCESS;
+}
+
+static void juno_ppu_alarm_callback(uintptr_t param)
+{
+    int status;
+    unsigned int state = 0;
+    struct ppu_ctx *ppu_ctx = (struct ppu_ctx *)param;
+    const struct mod_juno_ppu_config *config;
+
+    status = get_state(ppu_ctx, &state);
+    fwk_assert(status == FWK_SUCCESS);
+
+    if (state == MOD_PD_STATE_OFF) {
+        config = fwk_module_get_data(fwk_module_id_juno_ppu);
+        fwk_assert(config != NULL);
+
+        status = ppu_ctx->pd_api->report_power_state_transition(
+            ppu_ctx->bound_id,
+            MOD_PD_STATE_OFF);
+        fwk_assert(status == FWK_SUCCESS);
+
+        status = juno_ppu_ctx.alarm_api->stop(config->timer_alarm_id);
+        fwk_assert(status == FWK_SUCCESS);
+    }
+}
+
 /*
  * Power Domain driver API
  */
@@ -253,7 +291,6 @@ static int pd_get_state(fwk_id_t ppu_id, unsigned int *state)
 {
     int status;
     struct ppu_ctx *ppu_ctx;
-    enum ppu_mode mode;
 
     if (!fwk_expect(state != NULL))
         return FWK_E_PARAM;
@@ -262,14 +299,7 @@ static int pd_get_state(fwk_id_t ppu_id, unsigned int *state)
     if (status != FWK_SUCCESS)
         return status;
 
-    mode = ppu_ctx->reg->POWER_STATUS & PPU_REG_PPR_PSR;
-
-    if (!check_mode(mode))
-        return FWK_E_DEVICE;
-
-    *state = ppu_mode_to_pd_state[mode];
-
-    return FWK_SUCCESS;
+    return get_state(ppu_ctx, state);
 }
 
 static int pd_reset(fwk_id_t ppu_id)
@@ -631,6 +661,7 @@ static int core_prepare_core_for_system_suspend(fwk_id_t ppu_id)
     struct ppu_ctx *ppu_ctx;
     int status;
     const struct mod_juno_ppu_element_config *dev_config;
+    const struct mod_juno_ppu_config *config;
 
     status = get_ctx(ppu_id, &ppu_ctx);
     if (status != FWK_SUCCESS)
@@ -646,7 +677,20 @@ static int core_prepare_core_for_system_suspend(fwk_id_t ppu_id)
     if (status != FWK_SUCCESS)
         return status;
 
-    return ppu_request_state(ppu_ctx, PPU_MODE_OFF);
+    status = ppu_request_state(ppu_ctx, PPU_MODE_OFF);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    config = fwk_module_get_data(fwk_module_id_juno_ppu);
+    fwk_assert(config != NULL);
+
+    /* Start the timer alarm to poll for the power policy change */
+    return juno_ppu_ctx.alarm_api->start(
+        config->timer_alarm_id,
+        PPU_ALARM_TIMEOUT_SUSPEND_MS,
+        MOD_TIMER_ALARM_TYPE_PERIODIC,
+        juno_ppu_alarm_callback,
+        (uintptr_t)ppu_ctx);
 }
 
 static const struct mod_pd_driver_api core_pd_driver_api = {
@@ -753,6 +797,10 @@ static int juno_ppu_module_init(fwk_id_t module_id,
 
     juno_ppu_ctx.dbgsys_state = MOD_PD_STATE_OFF;
 
+    #if BUILD_HAS_MOD_TIMER
+    fwk_assert(data != NULL);
+    #endif
+
     return FWK_SUCCESS;
 }
 
@@ -791,7 +839,9 @@ static int juno_ppu_bind(fwk_id_t id, unsigned int round)
     int status;
     struct ppu_ctx *ppu_ctx;
     const struct mod_juno_ppu_element_config *dev_config;
+    const struct mod_juno_ppu_config *config;
 
+    (void)config;
     (void)dev_config;
     (void)status;
 
@@ -804,6 +854,17 @@ static int juno_ppu_bind(fwk_id_t id, unsigned int round)
                                  MOD_LOG_API_ID, &juno_ppu_ctx.log_api);
         if (status != FWK_SUCCESS)
             return FWK_E_HANDLER;
+
+        #if BUILD_HAS_MOD_TIMER
+        config = fwk_module_get_data(fwk_module_id_juno_ppu);
+
+        status = fwk_module_bind(
+            config->timer_alarm_id,
+            MOD_TIMER_API_ID_ALARM,
+            &juno_ppu_ctx.alarm_api);
+        if (status != FWK_SUCCESS)
+            return FWK_E_HANDLER;
+        #endif
 
         return FWK_SUCCESS;
     }
