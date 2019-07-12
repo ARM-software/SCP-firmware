@@ -9,6 +9,7 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <mod_juno_ppu.h>
+#include <juno_alarm_idx.h>
 #include <juno_irq.h>
 #include <juno_ppu_idx.h>
 #include <system_clock.h>
@@ -131,5 +132,9 @@ static const struct fwk_element *get_element_table(fwk_id_t module_id)
 
 struct fwk_module_config config_juno_ppu = {
     .get_element_table = get_element_table,
-    .data = NULL,
+    .data = &((struct mod_juno_ppu_config) {
+        .timer_alarm_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER,
+                                                  0,
+                                                  JUNO_PPU_ALARM_IDX),
+    }),
 };

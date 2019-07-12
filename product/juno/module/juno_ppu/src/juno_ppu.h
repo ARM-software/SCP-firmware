@@ -55,6 +55,9 @@ struct module_ctx {
     /* Log module API */
     const struct mod_log_api *log_api;
 
+    /* Timer alarm API */
+    const struct mod_timer_alarm_api *alarm_api;
+
     /* CSS power state */
     unsigned int css_state;
 

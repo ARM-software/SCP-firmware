@@ -58,6 +58,18 @@ static const fwk_id_t mod_juno_ppu_api_id_rom =
     FWK_ID_API_INIT(FWK_MODULE_IDX_JUNO_PPU, MOD_JUNO_PPU_API_IDX_ROM);
 
 /*!
+ * \brief Module configuration.
+ */
+struct mod_juno_ppu_config {
+    /*!
+     * \brief Identifier of the timer alarm.
+     *
+     * \details Used for polling a core PPU state during system suspend.
+     */
+    fwk_id_t timer_alarm_id;
+};
+
+/*!
  * \brief Element configuration.
  *
  * \details This is the configuration struct for an individal PPU.
