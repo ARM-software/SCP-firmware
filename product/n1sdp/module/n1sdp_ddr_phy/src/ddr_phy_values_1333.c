@@ -126,21 +126,16 @@ void ddr_phy_config_1333(struct mod_n1sdp_ddr_phy_reg *ddr_phy,
     ddr_phy->DENALI_PHY_79_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_80_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_81_DATA = 0x04000000;
-    if ((info->number_of_ranks == 1) && (dmc_id == 0)) {
+    if (dmc_id == 0) {
         ddr_phy->DENALI_PHY_82_DATA = 0x02400240;
         ddr_phy->DENALI_PHY_83_DATA = 0x02400240;
         ddr_phy->DENALI_PHY_84_DATA = 0x02400240;
         ddr_phy->DENALI_PHY_85_DATA = 0x02400240;
-    } else if ((info->number_of_ranks == 1) && (dmc_id == 1)) {
+    } else if (dmc_id == 1) {
         ddr_phy->DENALI_PHY_82_DATA = 0x02500250;
         ddr_phy->DENALI_PHY_83_DATA = 0x02500250;
         ddr_phy->DENALI_PHY_84_DATA = 0x02500250;
         ddr_phy->DENALI_PHY_85_DATA = 0x02500250;
-    } else {
-        ddr_phy->DENALI_PHY_82_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_83_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_84_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_85_DATA = 0x02800280;
     }
     ddr_phy->DENALI_PHY_86_DATA = 0x00000280;
     ddr_phy->DENALI_PHY_87_DATA = 0x00000000;
@@ -290,21 +285,16 @@ void ddr_phy_config_1333(struct mod_n1sdp_ddr_phy_reg *ddr_phy,
     ddr_phy->DENALI_PHY_335_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_336_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_337_DATA = 0x04000000;
-    if ((info->number_of_ranks == 1) && (dmc_id == 0))  {
+    if (dmc_id == 0)  {
         ddr_phy->DENALI_PHY_338_DATA = 0x02800280;
         ddr_phy->DENALI_PHY_339_DATA = 0x02800280;
         ddr_phy->DENALI_PHY_340_DATA = 0x02800280;
         ddr_phy->DENALI_PHY_341_DATA = 0x02800280;
-    } else if ((info->number_of_ranks == 1) && (dmc_id == 1)) {
+    } else if (dmc_id == 1) {
         ddr_phy->DENALI_PHY_338_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_339_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_340_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_341_DATA = 0x02700270;
-    } else {
-        ddr_phy->DENALI_PHY_338_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_339_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_340_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_341_DATA = 0x02800280;
     }
     ddr_phy->DENALI_PHY_342_DATA = 0x00000280;
     ddr_phy->DENALI_PHY_343_DATA = 0x00000000;
@@ -454,21 +444,16 @@ void ddr_phy_config_1333(struct mod_n1sdp_ddr_phy_reg *ddr_phy,
     ddr_phy->DENALI_PHY_591_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_592_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_593_DATA = 0x04000000;
-    if ((info->number_of_ranks == 1) && (dmc_id == 0)) {
+    if (dmc_id == 0) {
         ddr_phy->DENALI_PHY_594_DATA = 0x02800280;
         ddr_phy->DENALI_PHY_595_DATA = 0x02800280;
         ddr_phy->DENALI_PHY_596_DATA = 0x02800280;
         ddr_phy->DENALI_PHY_597_DATA = 0x02800280;
-    } else if ((info->number_of_ranks == 1) && (dmc_id == 1)) {
+    } else if (dmc_id == 1) {
         ddr_phy->DENALI_PHY_594_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_595_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_596_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_597_DATA = 0x02700270;
-    } else {
-        ddr_phy->DENALI_PHY_594_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_595_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_596_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_597_DATA = 0x02800280;
     }
     ddr_phy->DENALI_PHY_598_DATA = 0x00000280;
     ddr_phy->DENALI_PHY_599_DATA = 0x00000000;
@@ -618,21 +603,16 @@ void ddr_phy_config_1333(struct mod_n1sdp_ddr_phy_reg *ddr_phy,
     ddr_phy->DENALI_PHY_847_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_848_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_849_DATA = 0x04000000;
-    if ((info->number_of_ranks == 1) && (dmc_id == 0)) {
+    if (dmc_id == 0) {
         ddr_phy->DENALI_PHY_850_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_851_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_852_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_853_DATA = 0x02700270;
-    } else  if ((info->number_of_ranks == 1) && (dmc_id == 1)) {
+    } else  if (dmc_id == 1) {
         ddr_phy->DENALI_PHY_850_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_851_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_852_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_853_DATA = 0x02700270;
-    } else {
-        ddr_phy->DENALI_PHY_850_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_851_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_852_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_853_DATA = 0x02800280;
     }
     ddr_phy->DENALI_PHY_854_DATA = 0x00000280;
     ddr_phy->DENALI_PHY_855_DATA = 0x00000000;
@@ -782,21 +762,16 @@ void ddr_phy_config_1333(struct mod_n1sdp_ddr_phy_reg *ddr_phy,
     ddr_phy->DENALI_PHY_1103_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1104_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1105_DATA = 0x04000000;
-    if ((info->number_of_ranks == 1) && (dmc_id == 0)) {
+    if (dmc_id == 0) {
         ddr_phy->DENALI_PHY_1106_DATA = 0x02100210;
         ddr_phy->DENALI_PHY_1107_DATA = 0x02100210;
         ddr_phy->DENALI_PHY_1108_DATA = 0x02100210;
         ddr_phy->DENALI_PHY_1109_DATA = 0x02100210;
-    } else  if ((info->number_of_ranks == 1) && (dmc_id == 1)) {
+    } else  if (dmc_id == 1) {
         ddr_phy->DENALI_PHY_1106_DATA = 0x02500250;
         ddr_phy->DENALI_PHY_1107_DATA = 0x02500250;
         ddr_phy->DENALI_PHY_1108_DATA = 0x02500250;
         ddr_phy->DENALI_PHY_1109_DATA = 0x02500250;
-    } else {
-        ddr_phy->DENALI_PHY_1106_DATA = 0x02600260;
-        ddr_phy->DENALI_PHY_1107_DATA = 0x02600260;
-        ddr_phy->DENALI_PHY_1108_DATA = 0x02600260;
-        ddr_phy->DENALI_PHY_1109_DATA = 0x02600260;
     }
     ddr_phy->DENALI_PHY_1110_DATA = 0x00000280;
     ddr_phy->DENALI_PHY_1111_DATA = 0x00000000;
@@ -946,21 +921,16 @@ void ddr_phy_config_1333(struct mod_n1sdp_ddr_phy_reg *ddr_phy,
     ddr_phy->DENALI_PHY_1359_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1360_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1361_DATA = 0x04000000;
-    if ((info->number_of_ranks == 1) && (dmc_id == 0)) {
+    if (dmc_id == 0) {
         ddr_phy->DENALI_PHY_1362_DATA = 0x02600260;
         ddr_phy->DENALI_PHY_1363_DATA = 0x02600260;
         ddr_phy->DENALI_PHY_1364_DATA = 0x02600260;
         ddr_phy->DENALI_PHY_1365_DATA = 0x02600260;
-    } else if ((info->number_of_ranks == 1) && (dmc_id == 1)) {
+    } else if (dmc_id == 1) {
         ddr_phy->DENALI_PHY_1362_DATA = 0x02500250;
         ddr_phy->DENALI_PHY_1363_DATA = 0x02500250;
         ddr_phy->DENALI_PHY_1364_DATA = 0x02500250;
         ddr_phy->DENALI_PHY_1365_DATA = 0x02500250;
-    } else {
-        ddr_phy->DENALI_PHY_1362_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_1363_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_1364_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_1365_DATA = 0x02800280;
     }
     ddr_phy->DENALI_PHY_1366_DATA = 0x00000280;
     ddr_phy->DENALI_PHY_1367_DATA = 0x00000000;
@@ -1110,21 +1080,16 @@ void ddr_phy_config_1333(struct mod_n1sdp_ddr_phy_reg *ddr_phy,
     ddr_phy->DENALI_PHY_1615_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1616_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1617_DATA = 0x04000000;
-    if ((info->number_of_ranks == 1) && (dmc_id == 0)) {
+    if (dmc_id == 0) {
         ddr_phy->DENALI_PHY_1618_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_1619_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_1620_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_1621_DATA = 0x02700270;
-    } else if ((info->number_of_ranks == 1) && (dmc_id == 1)) {
+    } else if (dmc_id == 1) {
         ddr_phy->DENALI_PHY_1618_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_1619_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_1620_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_1621_DATA = 0x02700270;
-    } else {
-        ddr_phy->DENALI_PHY_1618_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_1619_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_1620_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_1621_DATA = 0x02800280;
     }
     ddr_phy->DENALI_PHY_1622_DATA = 0x00000280;
     ddr_phy->DENALI_PHY_1623_DATA = 0x00000000;
@@ -1274,21 +1239,16 @@ void ddr_phy_config_1333(struct mod_n1sdp_ddr_phy_reg *ddr_phy,
     ddr_phy->DENALI_PHY_1871_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1872_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1873_DATA = 0x04000000;
-    if ((info->number_of_ranks == 1) && (dmc_id == 0)) {
+    if (dmc_id == 0) {
         ddr_phy->DENALI_PHY_1874_DATA = 0x02800280;
         ddr_phy->DENALI_PHY_1875_DATA = 0x02800280;
         ddr_phy->DENALI_PHY_1876_DATA = 0x02800280;
         ddr_phy->DENALI_PHY_1877_DATA = 0x02800280;
-    } else if ((info->number_of_ranks == 1) && (dmc_id == 1)) {
+    } else if (dmc_id == 1) {
         ddr_phy->DENALI_PHY_1874_DATA = 0x02500250;
         ddr_phy->DENALI_PHY_1875_DATA = 0x02500250;
         ddr_phy->DENALI_PHY_1876_DATA = 0x02500250;
         ddr_phy->DENALI_PHY_1877_DATA = 0x02500250;
-    } else {
-        ddr_phy->DENALI_PHY_1874_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_1875_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_1876_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_1877_DATA = 0x02800280;
     }
     ddr_phy->DENALI_PHY_1878_DATA = 0x00000280;
     ddr_phy->DENALI_PHY_1879_DATA = 0x00000000;
@@ -1438,21 +1398,16 @@ void ddr_phy_config_1333(struct mod_n1sdp_ddr_phy_reg *ddr_phy,
     ddr_phy->DENALI_PHY_2127_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_2128_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_2129_DATA = 0x04000000;
-    if ((info->number_of_ranks == 1) && (dmc_id == 0)) {
+    if (dmc_id == 0) {
         ddr_phy->DENALI_PHY_2130_DATA = 0x02600260;
         ddr_phy->DENALI_PHY_2131_DATA = 0x02600260;
         ddr_phy->DENALI_PHY_2132_DATA = 0x02600260;
         ddr_phy->DENALI_PHY_2133_DATA = 0x02600260;
-    } else if ((info->number_of_ranks == 1) && (dmc_id == 1)) {
+    } else if (dmc_id == 1) {
         ddr_phy->DENALI_PHY_2130_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_2131_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_2132_DATA = 0x02700270;
         ddr_phy->DENALI_PHY_2133_DATA = 0x02700270;
-    } else {
-        ddr_phy->DENALI_PHY_2130_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_2131_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_2132_DATA = 0x02800280;
-        ddr_phy->DENALI_PHY_2133_DATA = 0x02800280;
     }
     ddr_phy->DENALI_PHY_2134_DATA = 0x00000280;
     ddr_phy->DENALI_PHY_2135_DATA = 0x00000000;

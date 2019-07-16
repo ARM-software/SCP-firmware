@@ -1055,13 +1055,13 @@ static int dmc620_config(struct mod_dmc620_reg *dmc, fwk_id_t ddr_id)
 
     switch (ddr_info.speed) {
     case 800:
-        dmc->T_RDDATA_EN_NEXT = 0x00000007;
+        dmc->T_RDDATA_EN_NEXT = 0x00070007;
         break;
     case 1200:
-        dmc->T_RDDATA_EN_NEXT = 0x0000000E;
+        dmc->T_RDDATA_EN_NEXT = 0x000E000E;
         break;
     case 1333:
-        dmc->T_RDDATA_EN_NEXT = 0x0000000E;
+        dmc->T_RDDATA_EN_NEXT = 0x000E000E;
         break;
     default:
         fwk_assert(false);
@@ -1072,13 +1072,13 @@ static int dmc620_config(struct mod_dmc620_reg *dmc, fwk_id_t ddr_id)
 
     switch (ddr_info.speed) {
     case 800:
-        dmc->T_PHYWRLAT_NEXT = 0x011F0009;
+        dmc->T_PHYWRLAT_NEXT = 0x01050009;
         break;
     case 1200:
-        dmc->T_PHYWRLAT_NEXT = 0x011F000C;
+        dmc->T_PHYWRLAT_NEXT = 0x0105000C;
         break;
     case 1333:
-        dmc->T_PHYWRLAT_NEXT = 0x011F000E;
+        dmc->T_PHYWRLAT_NEXT = 0x010A000E;
         break;
     default:
         fwk_assert(false);
