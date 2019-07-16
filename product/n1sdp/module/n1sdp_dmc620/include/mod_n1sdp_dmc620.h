@@ -782,9 +782,10 @@ struct mod_dmc620_mem_info_api {
      *
      * \param size Pointer where memory size will be stored.
      *
-     * \retval void.
+     * \retval FWK_SUCCESS if the operation succeed.
+     * \retval one of the error code otherwise.
      */
-    void (*get_mem_size_gb)(uint32_t *size);
+    int (*get_mem_size_gb)(uint32_t *size);
 };
 
 /*!

@@ -1198,10 +1198,20 @@ static int dmc620_config(struct mod_dmc620_reg *dmc, fwk_id_t ddr_id)
 
 /* Memory Information API */
 
-static void dmc620_get_mem_size_gb(uint32_t *size)
+static int dmc620_get_mem_size_gb(uint32_t *size)
 {
+    uint32_t size_gb;
+    int status;
+
     fwk_assert(size != NULL);
-    *size = 16;
+
+    size_gb = 0;
+    status = dimm_spd_calculate_dimm_size_gb(&size_gb);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    *size = size_gb * 2;
+    return FWK_SUCCESS;
 }
 
 struct mod_dmc620_mem_info_api ddr_mem_info_api = {
