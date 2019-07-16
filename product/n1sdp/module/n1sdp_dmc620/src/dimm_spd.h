@@ -128,6 +128,10 @@
 #define SPD_BANK_BITS_2           0x00
 #define SPD_BANK_BITS_3           0x10
 
+/* SDRAM die capacity definition */
+#define SPD_SDRAM_DENSITY_MASK    0xF
+#define SPD_SDRAM_DENSITY_POS     0
+
 /* Number of Package Ranks per DIMM supported */
 #define SPD_PKG_RANK_BITS_MASK    0x38
 #define SPD_PKG_RANK_BITS_OFFSET  3
@@ -156,6 +160,7 @@
 
 /* SDRAM Primary bus width */
 #define SPD_PRI_BUS_WIDTH_BITS_MASK   0x07
+#define SPD_PRI_BUS_WIDTH_BITS_POS    0
 #define SPD_PRI_BUS_WIDTH_BITS_8      0x00
 #define SPD_PRI_BUS_WIDTH_BITS_16     0x01
 #define SPD_PRI_BUS_WIDTH_BITS_32     0x02
@@ -163,6 +168,7 @@
 
 /* SDRAM Device width */
 #define SDRAM_DEVICE_WIDTH_MASK   0x07
+#define SDRAM_DEVICE_WIDTH_POS    0
 #define SDRAM_DEVICE_WIDTH_0      0x00
 #define SDRAM_DEVICE_WIDTH_1      0x01
 #define SDRAM_DEVICE_WIDTH_2      0x02
@@ -478,5 +484,15 @@ int dimm_spd_t_wtr(uint32_t *value, struct dimm_info *info);
  *          FWK_E_DATA - if the value cannot be calculated
  */
 int dimm_spd_t_act_window(uint32_t *value);
+
+/*
+ * Brief - Function to calculate total DIMM size
+ *
+ * param - size_gb - Pointer to variable where calculated value is saved
+ *
+ * retval - FWK_SUCCESS - if the operation is succeeded
+ *          FWK_E_DEVICE - if the SPD value is invalid
+ */
+int dimm_spd_calculate_dimm_size_gb(uint32_t *size_gb);
 
 #endif /* DIMM_SPD_H */

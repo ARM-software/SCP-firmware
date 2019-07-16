@@ -274,12 +274,18 @@ void csys_pwrupreq_handler(void)
  */
 static int n1sdp_system_fill_mem_info(void)
 {
+    int status;
     uint32_t ddr_size_gb;
     const struct mod_sds_structure_desc *sds_structure_desc =
         fwk_module_get_data(sds_ddr_mem_info_id);
 
     ddr_size_gb = 0;
-    n1sdp_system_ctx.dmc620_api->get_mem_size_gb(&ddr_size_gb);
+    status = n1sdp_system_ctx.dmc620_api->get_mem_size_gb(&ddr_size_gb);
+    if (status != FWK_SUCCESS) {
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "Error calculating DDR memory size!\n");
+        return status;
+    }
     n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
         "    Total DDR Size: %d GB\n", ddr_size_gb);
 

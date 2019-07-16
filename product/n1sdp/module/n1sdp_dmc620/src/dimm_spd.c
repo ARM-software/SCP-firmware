@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <fwk_assert.h>
+#include <fwk_macros.h>
 #include <fwk_id.h>
 #include <fwk_module_idx.h>
 #include <mod_log.h>
@@ -726,5 +727,49 @@ int dimm_spd_t_act_window(uint32_t *temp_reg)
       return FWK_E_PARAM;
     }
 
+    return FWK_SUCCESS;
+}
+
+int dimm_spd_calculate_dimm_size_gb(uint32_t *size_gb)
+{
+    uint64_t size;
+    uint8_t temp;
+
+    size = 0;
+    temp = ddr4_dimm0.dram_param.sdram_density_banks;
+    temp = (temp & SPD_SDRAM_DENSITY_MASK) >> SPD_SDRAM_DENSITY_POS;
+
+    if (temp <= 7)
+        size = (uint64_t)(1 << temp) * 256UL * FWK_MIB;
+    else if (temp == 0x8)
+        size = 12UL * FWK_GIB;
+    else if (temp == 0x9)
+        size = 24UL * FWK_GIB;
+    else
+        return FWK_E_DEVICE;
+
+    size = size / 8UL;
+    temp = ddr4_dimm0.dram_param.mod_mem_bus_width;
+    temp = (temp & SPD_PRI_BUS_WIDTH_BITS_MASK) >> SPD_PRI_BUS_WIDTH_BITS_POS;
+    if (temp <= 3)
+        size = size * (uint64_t)((1 << temp) * 8UL);
+    else
+        return FWK_E_DEVICE;
+
+    temp = ddr4_dimm0.dram_param.mod_org;
+    temp = (temp & SDRAM_DEVICE_WIDTH_MASK) >> SDRAM_DEVICE_WIDTH_POS;
+    if (temp <= 3)
+        size = size / (uint64_t)((1 << temp) * 4);
+    else
+        return FWK_E_DEVICE;
+
+    temp = ddr4_dimm0.dram_param.mod_org;
+    temp = (temp & SPD_PKG_RANK_BITS_MASK) >> SPD_PKG_RANK_BITS_OFFSET;
+    if (temp <= 7)
+        size = size * (uint64_t)(temp + 1);
+    else
+        return FWK_E_DEVICE;
+
+    *size_gb = size / FWK_GIB;
     return FWK_SUCCESS;
 }
