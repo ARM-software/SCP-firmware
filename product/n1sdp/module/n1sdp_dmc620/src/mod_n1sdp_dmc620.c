@@ -1028,9 +1028,7 @@ static int dmc620_config(struct mod_dmc620_reg *dmc, fwk_id_t ddr_id)
     }
     dmc->T_ACT_WINDOW_NEXT = value;
 
-    if (ddr_info.speed == 1333)
-        dmc->T_RTR_NEXT = 0x24090909;
-    else if (ddr_info.speed == 1200)
+    if ((ddr_info.speed == 1333) || (ddr_info.speed == 1200))
         dmc->T_RTR_NEXT = 0x24090805;
     else
         dmc->T_RTR_NEXT = 0x14060604;
@@ -1040,9 +1038,7 @@ static int dmc620_config(struct mod_dmc620_reg *dmc, fwk_id_t ddr_id)
     dmc->T_WR_NEXT = 0x00000029;
     dmc->T_WTR_NEXT = 0x001B1B1B;
 
-    if (ddr_info.speed == 1333)
-        dmc->T_WTW_NEXT = 0x24090909;
-    else if (ddr_info.speed == 1200)
+    if ((ddr_info.speed == 1333) || (ddr_info.speed == 1200))
         dmc->T_WTW_NEXT = 0x24090805;
     else
         dmc->T_WTW_NEXT = 0x14060604;
