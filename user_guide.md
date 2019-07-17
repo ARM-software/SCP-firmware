@@ -121,33 +121,33 @@ refer to [System Guidance for Mobile (SGM)](https://community.arm.com/dev-platfo
 
 The build system generates the list of firmware images as defined by the
 product.mk file associated with the product. For SGM platforms, two firmware
-images are built, referred to as 'scp_romfw' and 'scp_ramfw' below.
+images are built: scp_romfw.bin and scp_ramfw.bin.
 
-The scp_romfw firmware image exists in the ROM of the system. It is the first
-firmware image executed when booting an SGM platform. It does the minimal setup
-and initialization of the system, and powers on the primary application core.
-Then, it waits for the primary core to load the scp_ramfw image into secure RAM
-before handing over execution to it.
+The scp_romfw.bin firmware image exists in the ROM of the system. It is the
+first firmware image executed when booting an SGM platform. It does the minimal
+setup and initialization of the system, and powers on the primary application
+core. Then, it waits for the primary core to load the scp_ramfw.bin image into
+secure RAM before handing over execution to it.
 
-The scp_ramfw firmware image provides all the runtime services delegated to the
-SCP as a part of the system. It is loaded by the primary core and not the
-scp_romfw firmware to leverage the processing power of the application processor
-for image authentication.
+The scp_ramfw.bin firmware image provides all the runtime services delegated to
+the SCP as a part of the system. It is loaded by the primary core and not the
+scp_romfw.bin firmware to leverage the processing power of the application
+processor for image authentication.
 
-In order for the scp_ramfw firmware image to be loaded per the boot flow
+In order for the scp_ramfw.bin firmware image to be loaded per the boot flow
 described above, a minimal application processor firmware needs to be available.
 This typically consists of at least two images:
 
 - bl1: First-stage bootloader stored in the system ROM
 - bl2: Second-stage bootloader loaded by bl1, responsible for loading the
-    scp_ramfw firmware image and other application processor firmware images
+    scp_ramfw.bin firmware image and other application processor firmware images
     into system RAM
 
 For more information about application processor firmware images and how to
-build them, please refer to the [Arm Trusted Firmware-A user guide](https://github.com/ARM-software/arm-trusted-firmware/blob/master/docs/user-guide.rst).
+build them, please refer to the [Arm Trusted Firmware-A user guide](https://github.com/ARM-software/arm-trusted-firmware/blob/master/docs/getting_started/user-guide.rst).
 
-In order for the bl2 firmware image and the scp_ramfw firmware image to be made
-available to their respective loaders, they must be packaged in a Firmware
+In order for the bl2 firmware image and the scp_ramfw.bin firmware image to be
+made available to their respective loaders, they must be packaged in a Firmware
 Image Package (FIP). Please refer to the Arm Trusted Firmware-A user guide for
 instructions on building FIP packages.
 
@@ -156,7 +156,7 @@ To run the boot flow described above on an SGM platform FVP, use:
     $> <path to the SGM platform FVP> \
         -C soc.pl011_uart0.out_file=./ap.txt \
         -C soc.pl011_uart1.out_file=./scp.txt \
-        -C css.scp.ROMloader.fname=<path to scp_romfw firmware image> \
+        -C css.scp.ROMloader.fname=<path to scp_romfw.bin firmware image> \
         -C css.trustedBootROMloader.fname=<path to bl1 firmware image> \
         -C board.flashloader0.fname=<path to FIP> \
         -C soc.pl011_uart1.unbuffered_output=1 \
@@ -168,6 +168,106 @@ Note:
     - The application processor firmware images can be built using the
         [Arm Platforms deliverables](https://community.arm.com/dev-platforms/w/docs/304/arm-platforms-deliverables).
         See the following section.
+
+Running the SCP/MCP firmware on System Guidance for Infrastructure platforms
+----------------------------------------------------------------------------
+
+For an introduction to the System Guidance for Infrastructure (SGI) platforms,
+please refer to [System Guidance for Infrastructure (SGI)](https://community.arm.com/developer/tools-software/oss-platforms/w/docs/387/system-guidance-for-infrastructure-sgi).
+
+The build system generates the list of firmware images as defined by the
+product.mk file associated with the product. For SGI platforms, three firmware
+images are built: scp_romfw.bin, mcp_romfw.bin and scp_ramfw.bin.
+
+The scp_romfw.bin and mcp_romfw.bin firmware images exist in the ROM of the
+system. They are the first firmware images executed when booting an SGI
+platform.
+
+The scp_romfw.bin image does the minimal setup and initialization of the system
+and then loads from the flash the scp_ramfw.bin image into secure RAM before
+handing over execution to it.
+
+The scp_ramfw.bin firmware image provides all the runtime services delegated to
+the SCP as a part of the system.
+
+The mcp_romfw.bin image initializes the MCP.
+
+To run the boot flow described above on an SGI platform FVP, use:
+
+    $> <path to the SGI platform FVP> \
+        -C css.scp.pl011_uart_scp.out_file=./scp.txt \
+        -C css.mcp.pl011_uart0_mcp.out_file=./mcp.txt \
+        -C css.scp.ROMloader.fname=<path to scp_romfw.bin firmware image> \
+        -C board.flashloader0.fname=<path to nor.bin file (see below)> \
+        -C css.mcp.ROMloader.fname=<path to mcp_romfw.bin firmware image> \
+        -C css.mcp.pl011_uart0_mcp.unbuffered_output=1 \
+        -C css.scp.pl011_uart_scp.unbuffered_output=1
+
+Note:
+    - SGI platform FVPs are available on
+        [the Fixed Virtual Platforms product page](https://developer.arm.com/products/system-design/fixed-virtual-platforms).
+    - The scp_romfw.bin image expects the scp_ramfw.bin image to be located at
+      the offset 0x03D80000 in the NOR flash. The content of the NOR flash is
+      passed to the model as a nor.bin binary file. The nor.bin file can be
+      build in the current working directory as follow:
+
+      $> dd if=/dev/zero of=nor.bin bs=1024 count=62976
+      $> cat <path to scp_ramfw.bin image> >> nor.bin
+
+      The first command creates a nor.bin file of size 0x3D80000 filed in with
+      zeroes. The second command appends the scp_ramfw.bin image to the nor.bin
+      file.
+
+Running the SCP/MCP firmware on Neoverse reference designs
+----------------------------------------------------------
+
+For an introduction to the Neoverse reference designs,
+please refer to [Neoverse reference designs](https://community.arm.com/developer/tools-software/oss-platforms/w/docs/443/neoverse-reference-designs).
+
+The build system generates the list of firmware images as defined by the
+product.mk file associated with the product. For Neoverse reference designs,
+three firmware images are built: scp_romfw.bin, mcp_romfw.bin and
+scp_ramfw.bin.
+
+The scp_romfw.bin and mcp_romfw.bin firmware image exist in the ROM of the
+system. They are the first firmware images executed when booting a Neoverse
+reference design.
+
+The scp_romfw.bin image does the minimal setup and initialization of the system
+and then loads the scp_ramfw.bin image into secure RAM before handing over
+execution to it.
+
+The scp_ramfw.bin firmware image provides all the runtime services delegated to
+the SCP as a part of the system.
+
+The mcp_romfw.bin image initializes the MCP.
+
+To run the boot flow described above on an Neoverse reference design FVP, use:
+
+    $> <path to the Neoverse reference design FVP> \
+        -C css.scp.pl011_uart_scp.out_file=./scp.txt \
+        -C css.mcp.pl011_uart0_mcp.out_file=./mcp.txt \
+        -C css.scp.ROMloader.fname=<path to scp_romfw.bin firmware image> \
+        -C board.flashloader0.fname=<path to nor.bin file (see below)> \
+        -C css.mcp.ROMloader.fname=<path to mcp_romfw.bin firmware image> \
+        -C css.mcp.pl011_uart0_mcp.unbuffered_output=1 \
+        -C css.scp.pl011_uart_scp.unbuffered_output=1
+
+Note:
+    - Neoverse reference designs FVPs are available on
+        [the Fixed Virtual Platforms product page](https://developer.arm.com/products/system-design/fixed-virtual-platforms).
+
+    - The scp_romfw.bin image expects the scp_ramfw.bin image to be located at
+      the offset 0x03D80000 in the NOR flash. The content of the NOR flash is
+      passed to the model as a nor.bin binary file. The nor.bin file can be
+      build in the current working directory as follow:
+
+      $> dd if=/dev/zero of=nor.bin bs=1024 count=62976
+      $> cat <path to scp_ramfw.bin image> >> nor.bin
+
+      The first command creates a nor.bin file of size 0x3D80000 filed in with
+      zeroes. The second command appends the scp_ramfw.bin image to the nor.bin
+      file.
 
 Booting up to the Linux prompt on Arm platforms
 -----------------------------------------------

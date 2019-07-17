@@ -56,7 +56,9 @@ Platforms
 Various builds of the release have been tested on the following ARM Fixed
 Virtual Platforms (FVPs):
 
-- System Guidance for Mobile platform SGM-775 (Version 11.1 Build 30)
+- System Guidance for Mobile platform SGM-775 (Version 11.3 Build 42)
+- System Guidance for Infrastruture SGI-575 (Version 11.3 Build 42)
+- Neoverse N1 reference design (Version 11.6 Build 45)
 
 License
 -------
