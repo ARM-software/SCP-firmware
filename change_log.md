@@ -61,3 +61,69 @@ Known issues
   word or halfword accesses, this can result in hardware exceptions.
   [This patch](https://github.com/ARM-software/SCP-firmware/commit/d2a77e0d4d0d369f7504c032a380578a4d145438)
   fixes this issue.
+
+
+SCP-firmware - version 2.5.0
+============================
+
+New features
+------------
+
+- Modules:
+    - CMN600 support
+    - DMC620 support
+    - apcontext: New module to zero the AP context area
+
+- Platforms:
+    - Support for the SGI-575 platform
+    - Support for the Neoverse N1 reference design
+
+Note: Juno, Neoverse N1 SDP, Neoverse E1 reference design and SynQuacer products
+are NOT part of this release.
+
+Changed
+-------
+
+- Build System:
+    - Name firmware bin and elf file by the name of the firmware
+
+- Documentation:
+    - Emphasized that the order of the modules in the BS_FIRMWARE_MODULES list
+      in the firmware definition makefiles is the order in which the modules
+      are initialized, bound and started during the pre-runtime phase.
+    - Expand Doxygen use of param [out]
+    - Improve coding style and rules
+
+- Framework:
+    - Improve error codes and their documentation
+    - Add fwk_module_get_sub_element_count API
+    - Improve unit testing of fwk_module.c
+    - Replace base alignment reference type with `max_align_t`
+
+- Modules:
+    - sds: Make initialization deferring optional
+    - sds: Send notification once SDS is initialized
+    - scmi: Subscribe to SMT ready notifications and send notification when
+      service is initialized
+    - smt: Add logging on mailbox ownership error
+    - smt: Send notification when each SMT mailbox is initialized
+    - sid: Move to an always available interface
+    - system_power: Introduce platform interrupts and enable a configurable
+      number of system PPUs
+    - cmn600: Add the ccix programming for cmn600
+
+Resolved issues
+---------------
+
+- Build System:
+    - Disable generation of unaligned accesses
+
+- Framework:
+    - list: Always zero list nodes when removed from a list
+    - Zero event list node when duplicating an event
+
+- Modules:
+    - cmn600: Fix inappropriately-initialised global state
+    - cmn600: Stop checking type of external nodes
+    - ppu_v0: Ensure bound_id is set when bound by system_power
+    - system_power: Fix extented PPU support

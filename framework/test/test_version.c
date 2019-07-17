@@ -14,13 +14,13 @@
 static void test_version(void)
 {
     assert(BUILD_VERSION_MAJOR == 2);
-    assert(BUILD_VERSION_MINOR == 4);
+    assert(BUILD_VERSION_MINOR == 5);
     assert(BUILD_VERSION_PATCH == 0);
 }
 
 static void test_version_string(void)
 {
-    const char *result_string = "v2.4.0";
+    const char *result_string = "v2.5.0";
 
     assert(strcmp(BUILD_VERSION_STRING, result_string) == 0);
 }
