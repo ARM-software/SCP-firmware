@@ -19,6 +19,7 @@
 #include <mod_juno_dmc400.h>
 #include <mod_log.h>
 #include <mod_power_domain.h>
+#include <mod_system_power.h>
 #include <cmsis_compiler.h>
 #include <juno_id.h>
 #include <juno_irq.h>
@@ -985,10 +986,13 @@ static int juno_dmc400_process_notification(const struct fwk_event *event,
                                             struct fwk_event *resp_event)
 {
     const struct mod_juno_dmc400_element_config *element_config;
-    struct mod_pd_power_state_transition_notification_params
+    const struct mod_pd_power_state_transition_notification_params
         *pd_transition_params;
-    struct mod_pd_power_state_pre_transition_notification_params
+    const struct mod_pd_power_state_pre_transition_notification_params
         *pd_pre_transition_params;
+    int status;
+    struct mod_pd_power_state_pre_transition_notification_resp_params
+        *pd_resp_params;
 
     if (!fwk_module_is_valid_element_id(event->target_id))
         return FWK_E_PARAM;
@@ -998,8 +1002,8 @@ static int juno_dmc400_process_notification(const struct fwk_event *event,
     if (fwk_id_is_equal(event->id,
         mod_pd_notification_id_power_state_transition)) {
         pd_transition_params =
-            (struct mod_pd_power_state_transition_notification_params *)event
-                ->params;
+            (const struct mod_pd_power_state_transition_notification_params *)
+                event->params;
         if (pd_transition_params->state != MOD_PD_STATE_ON)
             return FWK_SUCCESS;
         else
@@ -1007,10 +1011,21 @@ static int juno_dmc400_process_notification(const struct fwk_event *event,
     } else if (fwk_id_is_equal(event->id,
         mod_pd_notification_id_power_state_pre_transition)) {
         pd_pre_transition_params =
-        (struct mod_pd_power_state_pre_transition_notification_params *)event
-            ->params;
-        if (pd_pre_transition_params->target_state == MOD_PD_STATE_OFF)
-            return ddr_suspend(element_config, event->target_id);
+        (const struct mod_pd_power_state_pre_transition_notification_params *)
+            event->params;
+        pd_resp_params =
+        (struct mod_pd_power_state_pre_transition_notification_resp_params *)
+            resp_event->params;
+
+        if ((pd_pre_transition_params->target_state == MOD_PD_STATE_OFF) ||
+            (pd_pre_transition_params->target_state ==
+                MOD_SYSTEM_POWER_POWER_STATE_SLEEP0)) {
+            status = ddr_suspend(element_config, event->target_id);
+
+            pd_resp_params->status = status;
+
+            return status;
+        }
         else
             return FWK_SUCCESS;
     } else
