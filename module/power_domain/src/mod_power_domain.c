@@ -676,6 +676,8 @@ static bool initiate_power_state_pre_transition_notification(struct pd_ctx *pd)
         notification_event.params;
     params->current_state = pd->current_state;
     params->target_state = state;
+
+    notification_event.source_id = pd->id;
     fwk_notification_notify(&notification_event,
         &pd->power_state_pre_transition_notification_ctx.pending_responses);
 
