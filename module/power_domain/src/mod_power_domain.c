@@ -1104,6 +1104,8 @@ static void process_power_state_transition_report(struct pd_ctx *pd,
         (pd == mod_pd_ctx.system_suspend.last_core_pd)) {
         mod_pd_ctx.system_suspend.last_core_off_ongoing = false;
         complete_system_suspend(pd);
+
+        return;
     }
 
     /*
