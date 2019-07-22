@@ -36,6 +36,7 @@ BS_FIRMWARE_MODULES := \
     clock \
     gtimer \
     timer \
+    n1sdp_scp2pcc \
     n1sdp_sensor \
     sensor \
     scmi_power_domain \
@@ -72,6 +73,7 @@ BS_FIRMWARE_SOURCES := \
     config_clock.c \
     config_n1sdp_flash.c \
     config_n1sdp_pcie.c \
+    config_n1sdp_scp2pcc.c \
     config_sensor.c \
     config_apcontext.c
 
