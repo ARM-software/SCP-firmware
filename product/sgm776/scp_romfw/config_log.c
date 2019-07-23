@@ -27,6 +27,7 @@ static const struct fwk_element pl011_element_desc_table[] = {
             .clock_rate_hz = 24 * FWK_MHZ,
             .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
                             CLOCK_DEV_IDX_SYS_NOCMEMCLK),
+            .pd_id = FWK_ID_NONE_INIT,
             }),
     },
     [1] = { 0 },
