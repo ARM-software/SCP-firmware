@@ -42,6 +42,9 @@ struct mod_pl011_device_config {
 
     /*! Identifier of the clock that this device depends on */
     fwk_id_t clock_id;
+
+    /*! Identifier of the power domain that this device depends on */
+    fwk_id_t pd_id;
 };
 
 /*!

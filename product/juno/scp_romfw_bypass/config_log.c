@@ -29,6 +29,7 @@ static const struct fwk_element pl011_element_desc_table[] = {
              * locked.
              */
             .clock_id = FWK_ID_NONE_INIT,
+            .pd_id = FWK_ID_NONE_INIT,
         },
     },
     [1] = {0},

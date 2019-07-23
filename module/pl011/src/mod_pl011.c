@@ -188,6 +188,25 @@ static int pl011_start(fwk_id_t id)
 
     config = device_config_table[fwk_id_get_element_idx(id)];
 
+    /*
+     * Subscribe to power domain pre-state change notifications when identifier
+     * is provided.
+     */
+    #if BUILD_HAS_MOD_POWER_DOMAIN
+    int status;
+    if (!fwk_id_is_type(config->pd_id, FWK_ID_TYPE_NONE)) {
+        status = fwk_notification_subscribe(
+            mod_pd_notification_id_power_state_pre_transition,
+            config->pd_id,
+            id);
+        if (status != FWK_SUCCESS)
+            return status;
+    }
+    #endif
+
+    /*
+     * Subscribe to clock state change notifications if identifier is provided
+     */
     if (fwk_id_is_type(config->clock_id, FWK_ID_TYPE_NONE))
         return FWK_SUCCESS;
 
@@ -197,18 +216,12 @@ static int pl011_start(fwk_id_t id)
         id);
 }
 
-int pl011_process_notification(
+static int process_clock_notification(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
 {
     struct clock_notification_params *params;
     struct clock_state_change_pending_resp_params *resp_params;
-
-    assert(
-        fwk_id_is_equal(
-            event->id,
-            mod_clock_notification_id_state_change_pending));
-    assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT));
 
     resp_params =
         (struct clock_state_change_pending_resp_params *)resp_event->params;
@@ -220,6 +233,83 @@ int pl011_process_notification(
         return do_flush(event->target_id);
 
     return FWK_SUCCESS;
+}
+
+#if BUILD_HAS_MOD_POWER_DOMAIN
+static int pl011_powerdown(fwk_id_t id)
+{
+    int status;
+
+    const struct mod_pl011_device_config *config =
+        device_config_table[fwk_id_get_element_idx(id)];
+
+    status = fwk_notification_unsubscribe(
+        mod_pd_notification_id_power_state_pre_transition,
+        config->pd_id,
+        id);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    status = fwk_notification_subscribe(
+        mod_pd_notification_id_power_state_transition,
+        config->pd_id,
+        id);
+    return status;
+}
+
+static int pl011_powerup(fwk_id_t id)
+{
+    int status;
+
+    const struct mod_pl011_device_config *config =
+        device_config_table[fwk_id_get_element_idx(id)];
+
+    status = fwk_notification_unsubscribe(
+        mod_pd_notification_id_power_state_transition,
+        config->pd_id,
+        id);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    status = fwk_notification_subscribe(
+        mod_pd_notification_id_power_state_pre_transition,
+        config->pd_id,
+        id);
+    return status;
+}
+#endif
+
+int pl011_process_notification(
+    const struct fwk_event *event,
+    struct fwk_event *resp_event)
+{
+    fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT));
+
+    if (fwk_id_is_equal(
+        event->id,
+        mod_clock_notification_id_state_change_pending)) {
+        /*
+         * Clock notification
+         */
+        return process_clock_notification(event, resp_event);
+    #if BUILD_HAS_MOD_POWER_DOMAIN
+    } else if (fwk_id_is_equal(
+        event->id,
+        mod_pd_notification_id_power_state_pre_transition)) {
+        /*
+         * Power domain pre-transition notification
+         */
+        return pl011_powerdown(event->target_id);
+    } else if (fwk_id_is_equal(
+        event->id,
+        mod_pd_notification_id_power_state_transition)) {
+        /*
+         * Power domain post-transition notification
+         */
+        return pl011_powerup(event->target_id);
+    #endif
+    } else
+        return FWK_E_PARAM;
 }
 
 const struct fwk_module module_pl011 = {
