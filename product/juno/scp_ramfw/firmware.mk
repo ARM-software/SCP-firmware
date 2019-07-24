@@ -33,6 +33,7 @@ BS_FIRMWARE_MODULES := \
     mhu \
     smt \
     scmi \
+    scmi_clock \
     scmi_power_domain \
     scmi_system_power \
     sds \
@@ -63,6 +64,7 @@ BS_FIRMWARE_SOURCES := \
     config_mhu.c \
     config_smt.c \
     config_scmi.c \
+    config_scmi_clock.c \
     config_scmi_system_power.c \
     config_i2c.c \
     config_juno_adc.c \
