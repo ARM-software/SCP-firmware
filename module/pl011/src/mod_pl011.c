@@ -14,11 +14,20 @@
 #include <mod_log.h>
 #include <mod_pl011.h>
 #include <mod_power_domain.h>
+#if BUILD_HAS_MOD_POWER_DOMAIN
+#include <mod_system_power.h>
+#endif
 #include <pl011.h>
 
 struct pl011_device_ctx {
     /* Pointer to configuration data */
     const struct mod_pl011_device_config *config;
+
+    /*
+     * Flags indicating whether the device is available.
+     * Such availability depends on the power domain.
+     */
+    bool available;
 };
 
 static struct pl011_device_ctx *dev_ctx_table;
@@ -95,8 +104,14 @@ static int set_baud_rate(unsigned int baud_rate_bps, uint64_t clock_rate_hz,
 static int do_putchar(fwk_id_t device_id, char c)
 {
     struct pl011_reg *reg;
+    struct pl011_device_ctx *dev_ctx;
 
     reg = get_device_reg(device_id);
+
+    dev_ctx = &dev_ctx_table[fwk_id_get_element_idx(device_id)];
+
+    if (!dev_ctx->available)
+        return FWK_SUCCESS;
 
     while (reg->FR & PL011_FR_TXFF)
         continue;
@@ -109,8 +124,14 @@ static int do_putchar(fwk_id_t device_id, char c)
 static int do_flush(fwk_id_t device_id)
 {
     struct pl011_reg *reg;
+    struct pl011_device_ctx *dev_ctx;
 
     reg = get_device_reg(device_id);
+
+    dev_ctx = &dev_ctx_table[fwk_id_get_element_idx(device_id)];
+
+    if (!dev_ctx->available)
+        return FWK_SUCCESS;
 
     while (reg->FR & PL011_FR_BUSY)
         continue;
@@ -170,6 +191,8 @@ static int pl011_element_init(fwk_id_t element_id, unsigned int unused,
 
     dev_ctx = &dev_ctx_table[fwk_id_get_element_idx(element_id)];
     dev_ctx->config = config;
+
+    dev_ctx->available = true;
 
     return FWK_SUCCESS;
 }
@@ -248,6 +271,9 @@ static int pl011_powerdown(fwk_id_t id)
 
     dev_ctx = &dev_ctx_table[fwk_id_get_element_idx(id)];
 
+    /* The device is silently made not available */
+    dev_ctx->available = false;
+
     status = fwk_notification_unsubscribe(
         mod_pd_notification_id_power_state_pre_transition,
         dev_ctx->config->pd_id,
@@ -268,6 +294,9 @@ static int pl011_powerup(fwk_id_t id)
     struct pl011_device_ctx *dev_ctx;
 
     dev_ctx = &dev_ctx_table[fwk_id_get_element_idx(id)];
+
+    /* The device is available back again */
+    dev_ctx->available = true;
 
     status = fwk_notification_unsubscribe(
         mod_pd_notification_id_power_state_transition,
@@ -304,13 +333,41 @@ static int pl011_process_notification(
         /*
          * Power domain pre-transition notification
          */
-        return pl011_powerdown(event->target_id);
+        int status = FWK_E_PARAM;
+        struct mod_pd_power_state_pre_transition_notification_params
+            *pd_pre_transition_params;
+        struct mod_pd_power_state_pre_transition_notification_resp_params
+            *pd_resp_params;
+
+        pd_pre_transition_params =
+        (struct mod_pd_power_state_pre_transition_notification_params *)event
+            ->params;
+        pd_resp_params =
+        (struct mod_pd_power_state_pre_transition_notification_resp_params *)
+            resp_event->params;
+
+        if ((pd_pre_transition_params->target_state == MOD_PD_STATE_OFF) ||
+            (pd_pre_transition_params->target_state ==
+                MOD_SYSTEM_POWER_POWER_STATE_SLEEP0)) {
+
+            status = pl011_powerdown(event->target_id);
+            pd_resp_params->status = status;
+        }
+
+        return status;
     } else if (fwk_id_is_equal(
         event->id,
         mod_pd_notification_id_power_state_transition)) {
         /*
          * Power domain post-transition notification
          */
+        struct mod_pd_power_state_transition_notification_params *params =
+            (struct mod_pd_power_state_transition_notification_params *)
+                event->params;
+
+        if (params->state != MOD_PD_STATE_ON)
+            return FWK_SUCCESS;
+
         return pl011_powerup(event->target_id);
     #endif
     } else
