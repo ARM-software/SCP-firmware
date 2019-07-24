@@ -16,14 +16,20 @@
 #include <mod_power_domain.h>
 #include <pl011.h>
 
-static const struct mod_pl011_device_config **device_config_table;
+struct pl011_device_ctx {
+    /* Pointer to configuration data */
+    const struct mod_pl011_device_config *config;
+};
+
+static struct pl011_device_ctx *dev_ctx_table;
 
 static struct pl011_reg *get_device_reg(fwk_id_t device_id)
 {
-    unsigned int device_idx;
+    struct pl011_device_ctx *dev_ctx;
 
-    device_idx = fwk_id_get_element_idx(device_id);
-    return (struct pl011_reg *)device_config_table[device_idx]->reg_base;
+    dev_ctx = &dev_ctx_table[fwk_id_get_element_idx(device_id)];
+
+    return (struct pl011_reg *)dev_ctx->config->reg_base;
 }
 
 /*
@@ -127,13 +133,8 @@ static int pl011_init(fwk_id_t module_id, unsigned int element_count,
     if (element_count == 0)
         return FWK_E_DATA;
 
-    /*
-     * Create an array of pointers used to store the configuration data pointer
-     * of each element.
-     */
-    device_config_table = fwk_mm_calloc(element_count,
-                                        sizeof(*device_config_table));
-    if (device_config_table == NULL)
+    dev_ctx_table = fwk_mm_calloc(element_count, sizeof(dev_ctx_table[0]));
+    if (dev_ctx_table == NULL)
         return FWK_E_NOMEM;
 
     return FWK_SUCCESS;
@@ -145,6 +146,7 @@ static int pl011_element_init(fwk_id_t element_id, unsigned int unused,
     struct pl011_reg *reg;
     const struct mod_pl011_device_config *config = data;
     int status;
+    struct pl011_device_ctx *dev_ctx;
 
     reg = (struct pl011_reg *)config->reg_base;
     if (reg == NULL)
@@ -166,7 +168,8 @@ static int pl011_element_init(fwk_id_t element_id, unsigned int unused,
               PL011_CR_RXE |
               PL011_CR_TXE;
 
-    device_config_table[fwk_id_get_element_idx(element_id)] = config;
+    dev_ctx = &dev_ctx_table[fwk_id_get_element_idx(element_id)];
+    dev_ctx->config = config;
 
     return FWK_SUCCESS;
 }
@@ -182,11 +185,13 @@ static int pl011_process_bind_request(fwk_id_t requester_id, fwk_id_t target_id,
 static int pl011_start(fwk_id_t id)
 {
     const struct mod_pl011_device_config *config;
+    struct pl011_device_ctx *dev_ctx;
 
-    if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT))
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
         return FWK_SUCCESS;
 
-    config = device_config_table[fwk_id_get_element_idx(id)];
+    dev_ctx = &dev_ctx_table[fwk_id_get_element_idx(id)];
+    config = dev_ctx->config;
 
     /*
      * Subscribe to power domain pre-state change notifications when identifier
@@ -239,20 +244,20 @@ static int process_clock_notification(
 static int pl011_powerdown(fwk_id_t id)
 {
     int status;
+    struct pl011_device_ctx *dev_ctx;
 
-    const struct mod_pl011_device_config *config =
-        device_config_table[fwk_id_get_element_idx(id)];
+    dev_ctx = &dev_ctx_table[fwk_id_get_element_idx(id)];
 
     status = fwk_notification_unsubscribe(
         mod_pd_notification_id_power_state_pre_transition,
-        config->pd_id,
+        dev_ctx->config->pd_id,
         id);
     if (status != FWK_SUCCESS)
         return status;
 
     status = fwk_notification_subscribe(
         mod_pd_notification_id_power_state_transition,
-        config->pd_id,
+        dev_ctx->config->pd_id,
         id);
     return status;
 }
@@ -260,26 +265,26 @@ static int pl011_powerdown(fwk_id_t id)
 static int pl011_powerup(fwk_id_t id)
 {
     int status;
+    struct pl011_device_ctx *dev_ctx;
 
-    const struct mod_pl011_device_config *config =
-        device_config_table[fwk_id_get_element_idx(id)];
+    dev_ctx = &dev_ctx_table[fwk_id_get_element_idx(id)];
 
     status = fwk_notification_unsubscribe(
         mod_pd_notification_id_power_state_transition,
-        config->pd_id,
+        dev_ctx->config->pd_id,
         id);
     if (status != FWK_SUCCESS)
         return status;
 
     status = fwk_notification_subscribe(
         mod_pd_notification_id_power_state_pre_transition,
-        config->pd_id,
+        dev_ctx->config->pd_id,
         id);
     return status;
 }
 #endif
 
-int pl011_process_notification(
+static int pl011_process_notification(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
 {
