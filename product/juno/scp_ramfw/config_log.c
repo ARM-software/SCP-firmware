@@ -12,6 +12,7 @@
 #include <mod_clock.h>
 #include <mod_log.h>
 #include <mod_pl011.h>
+#include <config_power_domain.h>
 #include <juno_mmap.h>
 
 static const struct fwk_element pl011_element_desc_table[] = {
@@ -22,7 +23,8 @@ static const struct fwk_element pl011_element_desc_table[] = {
             .baud_rate_bps = 115200,
             .clock_rate_hz = 24 * FWK_MHZ,
             .clock_id = FWK_ID_NONE_INIT,
-            .pd_id = FWK_ID_NONE_INIT,
+            .pd_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN,
+                POWER_DOMAIN_IDX_SYSTOP),
         },
     },
     [1] = {0},
