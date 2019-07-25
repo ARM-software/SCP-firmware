@@ -159,6 +159,20 @@ struct system_suspend_ctx {
     unsigned int state;
 };
 
+struct system_shutdown_ctx {
+    /* Flag indicating if a system shutdown is ongoing */
+    bool ongoing;
+
+    /* Total count of notifications sent for system shutdown */
+    unsigned int notifications_count;
+
+    /* Type of system shutdown */
+    enum mod_pd_system_shutdown system_shutdown;
+
+    /* Cookie of the event to respond to */
+    uint32_t cookie;
+};
+
 struct mod_pd_ctx {
     /* Module configuration data */
     struct mod_power_domain_config *config;
@@ -177,6 +191,9 @@ struct mod_pd_ctx {
 
     /* System suspend context */
     struct system_suspend_ctx system_suspend;
+
+    /* System shutdown context */
+    struct system_shutdown_ctx system_shutdown;
 };
 
 /*
@@ -1202,21 +1219,16 @@ static void process_system_suspend_request(
     resp_params->status = status;
 }
 
-/*
- * Process a 'system shutdown' request
- *
- * req_params Parameters of the 'system shutdown' request
- * resp_params Parameters of the 'system shutdown' request response to be filled
- *     in
- */
-static void process_system_shutdown_request(
-    const struct pd_system_shutdown_request *req_params,
-    struct pd_response *resp_params)
+void perform_shutdown(
+    enum mod_pd_system_shutdown system_shutdown,
+    struct fwk_event *resp)
 {
-    int status;
-    unsigned int pd_idx;
     struct pd_ctx *pd;
+    unsigned int pd_idx;
     fwk_id_t pd_id;
+    int status;
+    struct fwk_event delayed_resp;
+    struct pd_response *resp_params;
 
     for (pd_idx = 0; pd_idx < mod_pd_ctx.pd_count; pd_idx++) {
         pd = &mod_pd_ctx.pd_ctx_table[pd_idx];
@@ -1226,8 +1238,7 @@ static void process_system_shutdown_request(
             "[PD] Shutting down %s\n", fwk_module_get_name(pd_id));
 
         if (pd->driver_api->shutdown != NULL) {
-            status = pd->driver_api->shutdown(pd->driver_id,
-                                              req_params->system_shutdown);
+            status = pd->driver_api->shutdown(pd->driver_id, system_shutdown);
         } else
             status = pd->driver_api->set_state(pd->driver_id, MOD_PD_STATE_OFF);
 
@@ -1243,6 +1254,88 @@ static void process_system_shutdown_request(
             pd->state_requested_to_driver =
             pd->current_state = MOD_PD_STATE_OFF;
     }
+
+    /*
+     * At this time, the system is already down or will be down soon.
+     * Regardless, we tentatively send the response event to the caller, should
+     * the system fail to complete the shutdown process, the agent may want to
+     * be notified.
+     */
+    if (resp == NULL) {
+        status = fwk_thread_get_delayed_response(fwk_module_id_power_domain,
+            mod_pd_ctx.system_shutdown.cookie, &delayed_resp);
+        fwk_assert(status == FWK_SUCCESS);
+
+        delayed_resp.source_id = fwk_module_id_power_domain;
+
+        resp_params = (struct pd_response *)delayed_resp.params;
+        resp_params->status = FWK_E_PANIC;
+
+        status = fwk_thread_put_event(&delayed_resp);
+    } else {
+        resp_params = (struct pd_response *)resp->params;
+        resp_params->status = FWK_E_PANIC;
+
+        status = fwk_thread_put_event(resp);
+    }
+
+    fwk_assert(status == FWK_SUCCESS);
+
+    return;
+}
+
+static bool check_and_notify_system_shutdown(
+    enum mod_pd_system_shutdown system_shutdown)
+{
+    struct mod_pd_pre_shutdown_notif_params *params;
+
+    struct fwk_event notification = {
+        .id = mod_pd_notification_id_pre_shutdown,
+        .source_id = fwk_module_id_power_domain,
+        .response_requested = true
+    };
+
+    params = (struct mod_pd_pre_shutdown_notif_params *)notification.params;
+    params->system_shutdown = system_shutdown;
+
+    fwk_notification_notify(
+        &notification,
+        &mod_pd_ctx.system_shutdown.notifications_count);
+
+    return (mod_pd_ctx.system_shutdown.notifications_count != 0);
+}
+
+/*
+ * Process a 'system shutdown' request
+ */
+static void process_system_shutdown_request(
+    const struct fwk_event *event,
+    struct fwk_event *resp)
+{
+    enum mod_pd_system_shutdown system_shutdown;
+
+    const struct pd_system_shutdown_request *req_params =
+        (struct pd_system_shutdown_request *)event->params;
+    struct pd_response *resp_params = (struct pd_response *)resp->params;
+
+    system_shutdown = req_params->system_shutdown;
+
+    /* Check and send pre-shutdown notifications */
+    if (check_and_notify_system_shutdown(system_shutdown)) {
+        mod_pd_ctx.system_shutdown.ongoing = true;
+        mod_pd_ctx.system_shutdown.system_shutdown = system_shutdown;
+
+        mod_pd_ctx.system_shutdown.cookie = event->cookie;
+        resp->is_delayed_response = true;
+
+        /*
+         * The shutdown procedure will be completed once all the notification
+         * responses have been received.
+         */
+        return;
+    }
+
+    perform_shutdown(system_shutdown, resp);
 
     resp_params->status = FWK_E_PANIC;
 }
@@ -1526,6 +1619,7 @@ static int pd_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
         .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
                            PD_EVENT_IDX_SYSTEM_SHUTDOWN),
         .target_id = fwk_module_id_power_domain,
+        .response_requested = true,
     };
 
     req_params->system_shutdown = system_shutdown;
@@ -1880,9 +1974,7 @@ static int pd_process_event(const struct fwk_event *event,
         return FWK_SUCCESS;
 
     case PD_EVENT_IDX_SYSTEM_SHUTDOWN:
-        process_system_shutdown_request(
-            (struct pd_system_shutdown_request *)event->params,
-            (struct pd_response *)resp->params);
+        process_system_shutdown_request(event, resp);
 
         return FWK_SUCCESS;
 
@@ -1892,6 +1984,21 @@ static int pd_process_event(const struct fwk_event *event,
             "[PD] Invalid power state request: <%d>.\n",
             event->id);
 
+        return FWK_E_PARAM;
+    }
+}
+
+static int process_pre_shutdown_notification_response(void)
+{
+    if (mod_pd_ctx.system_shutdown.ongoing) {
+        mod_pd_ctx.system_shutdown.notifications_count--;
+
+        if (mod_pd_ctx.system_shutdown.notifications_count == 0) {
+            /* All notifications for system shutdown have been received */
+            perform_shutdown(mod_pd_ctx.system_shutdown.system_shutdown, NULL);
+        }
+        return FWK_SUCCESS;
+    } else {
         return FWK_E_PARAM;
     }
 }
@@ -1941,7 +2048,6 @@ static int process_power_state_pre_transition_notification_response(
 
     return FWK_SUCCESS;
 }
-
 static int process_power_state_transition_notification_response(
     struct pd_ctx *pd)
 {
@@ -2006,6 +2112,9 @@ static int pd_process_notification(const struct fwk_event *event,
         assert(false);
         return FWK_E_SUPPORT;
     }
+
+    if (fwk_id_is_equal(event->id, mod_pd_notification_id_pre_shutdown))
+        return process_pre_shutdown_notification_response();
 
     if (!fwk_module_is_valid_element_id(event->target_id)) {
         assert(false);

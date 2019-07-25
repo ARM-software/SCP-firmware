@@ -873,6 +873,22 @@ struct mod_pd_power_state_transition_notification_params {
 };
 
 /*!
+ * \brief Parameters of a pre-shutdown transition notification.
+ */
+struct mod_pd_pre_shutdown_notif_params {
+    /*! System shutdown type the system is transitioning to */
+    enum mod_pd_system_shutdown system_shutdown;
+};
+
+/*!
+ * \brief Parameters of the response to a pre-shutdown transition notification.
+ */
+struct mod_pd_pre_shutdown_notif_resp_params {
+    /*! Status of the operation from the entity being notified */
+    int status;
+};
+
+/*!
  * \defgroup GroupPowerDomainIds Identifiers
  * \{
  */
@@ -911,6 +927,9 @@ enum mod_pd_notification_idx {
     /*! Power state pre-transition */
     MOD_PD_NOTIFICATION_IDX_POWER_STATE_PRE_TRANSITION,
 
+    /*! Broadcast notification before shutdown starts */
+    MOD_PD_NOTIFICATION_IDX_PRE_SHUTDOWN,
+
     /*! Number of notifications defined by the power domain module */
     MOD_PD_NOTIFICATION_COUNT,
 };
@@ -928,6 +947,16 @@ static const fwk_id_t mod_pd_notification_id_power_state_transition =
 static const fwk_id_t mod_pd_notification_id_power_state_pre_transition =
     FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_POWER_DOMAIN,
         MOD_PD_NOTIFICATION_IDX_POWER_STATE_PRE_TRANSITION);
+
+/*!
+ * Identifier of the pre-shutdown notification.
+ *
+ * \note This notification will be broadcast with module identifier only.
+ */
+static const fwk_id_t mod_pd_notification_id_pre_shutdown =
+    FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_POWER_DOMAIN,
+        MOD_PD_NOTIFICATION_IDX_PRE_SHUTDOWN);
+
 #endif
 
 /*!
