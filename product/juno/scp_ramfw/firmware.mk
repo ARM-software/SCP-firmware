@@ -17,7 +17,10 @@ BS_FIRMWARE_MODULE_HEADERS_ONLY :=
 BS_FIRMWARE_MODULES := \
     log \
     pl011 \
+    juno_soc_clock_ram \
     clock \
+    juno_cdcel937 \
+    juno_hdlcd \
     gtimer \
     timer \
     juno_ddr_phy400 \
@@ -45,7 +48,10 @@ BS_FIRMWARE_SOURCES := \
     juno_utils.c \
     config_sds.c \
     config_log.c \
+    config_juno_soc_clock_ram.c \
     config_clock.c \
+    config_juno_cdcel937.c \
+    config_juno_hdlcd.c \
     juno_id.c \
     config_timer.c \
     config_juno_ddr_phy400.c \
