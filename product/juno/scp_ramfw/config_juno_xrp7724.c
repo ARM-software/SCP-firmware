@@ -11,10 +11,13 @@
 #include <fwk_module_idx.h>
 #include <mod_i2c.h>
 #include <mod_juno_xrp7724.h>
+#include <mod_psu.h>
 #include <mod_sensor.h>
 #include <mod_timer.h>
+#include <juno_alarm_idx.h>
 #include <config_sensor.h>
 #include <config_juno_xrp7724.h>
+#include <config_psu.h>
 
 enum mod_juno_xrp7724_gpio_idx  {
     MOD_JUNO_XRP7724_GPIO_IDX_ASSERT,
@@ -50,7 +53,59 @@ static const struct fwk_element juno_xrp7724_element_table[] = {
         .data = &(const struct mod_juno_xrp7724_dev_config) {
             .type = MOD_JUNO_XRP7724_ELEMENT_TYPE_GPIO,
         },
-     },
+    },
+    [MOD_JUNO_XRP7724_ELEMENT_IDX_PSU_VSYS] = {
+        .name = "VSYS",
+        .data = &(const struct mod_juno_xrp7724_dev_config) {
+            .driver_response_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU,
+                MOD_PSU_ELEMENT_IDX_VSYS),
+            .driver_response_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PSU,
+                MOD_PSU_API_IDX_DRIVER_RESPONSE),
+            .psu_adc_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SENSOR,
+                MOD_JUNO_SENSOR_VOLT_SYS_IDX),
+            .psu_bus_idx = 0,
+            .type = MOD_JUNO_XRP7724_ELEMENT_TYPE_PSU,
+        },
+    },
+    [MOD_JUNO_XRP7724_ELEMENT_IDX_PSU_VBIG] = {
+        .name = "VBIG",
+        .data = &(const struct mod_juno_xrp7724_dev_config) {
+            .driver_response_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU,
+                MOD_PSU_ELEMENT_IDX_VBIG),
+            .driver_response_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PSU,
+                MOD_PSU_API_IDX_DRIVER_RESPONSE),
+            .psu_adc_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SENSOR,
+                MOD_JUNO_SENSOR_VOLT_BIG_IDX),
+            .psu_bus_idx = 1,
+            .type = MOD_JUNO_XRP7724_ELEMENT_TYPE_PSU,
+        },
+    },
+    [MOD_JUNO_XRP7724_ELEMENT_IDX_PSU_VLITTLE] = {
+        .name = "VLITTLE",
+        .data = &(const struct mod_juno_xrp7724_dev_config) {
+            .driver_response_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU,
+                MOD_PSU_ELEMENT_IDX_VLITTLE),
+            .driver_response_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PSU,
+                MOD_PSU_API_IDX_DRIVER_RESPONSE),
+            .psu_adc_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SENSOR,
+                 MOD_JUNO_SENSOR_VOLT_LITTLE_IDX),
+            .psu_bus_idx = 2,
+            .type = MOD_JUNO_XRP7724_ELEMENT_TYPE_PSU,
+        },
+    },
+    [MOD_JUNO_XRP7724_ELEMENT_IDX_PSU_VGPU] = {
+        .name = "VGPU",
+        .data = &(const struct mod_juno_xrp7724_dev_config) {
+            .driver_response_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU,
+                MOD_PSU_ELEMENT_IDX_VGPU),
+            .driver_response_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PSU,
+                MOD_PSU_API_IDX_DRIVER_RESPONSE),
+            .psu_adc_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SENSOR,
+                MOD_JUNO_SENSOR_VOLT_GPU_IDX),
+            .psu_bus_idx = 3,
+            .type = MOD_JUNO_XRP7724_ELEMENT_TYPE_PSU,
+        },
+    },
 
     [MOD_JUNO_XRP7724_ELEMENT_IDX_COUNT] = { 0 },
 };
@@ -67,6 +122,8 @@ const struct fwk_module_config config_juno_xrp7724 = {
         .slave_address = 0x28,
         .i2c_hal_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_I2C, 0),
         .timer_hal_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
+        .alarm_hal_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0,
+            JUNO_XRP7724_ALARM_IDX),
         .gpio_assert_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_XRP7724,
             MOD_JUNO_XRP7724_ELEMENT_IDX_GPIO,
             MOD_JUNO_XRP7724_GPIO_IDX_ASSERT),
