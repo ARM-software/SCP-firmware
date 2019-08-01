@@ -42,7 +42,8 @@ BS_FIRMWARE_MODULES := \
     juno_adc \
     juno_xrp7724 \
     sensor \
-    reg_sensor
+    reg_sensor \
+    psu
 
 BS_FIRMWARE_SOURCES := \
     rtx_config.c \
@@ -70,6 +71,7 @@ BS_FIRMWARE_SOURCES := \
     config_juno_adc.c \
     config_juno_xrp7724.c \
     config_sensor.c \
-    config_reg_sensor.c
+    config_reg_sensor.c \
+    config_psu.c
 
 include $(BS_DIR)/firmware.mk
