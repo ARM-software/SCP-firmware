@@ -18,7 +18,7 @@
 static const uint8_t system_power_to_sys_ppu_state[] = {
     [MOD_PD_STATE_ON]                     = (uint8_t)MOD_PD_STATE_ON,
     [MOD_SYSTEM_POWER_POWER_STATE_SLEEP0] =
-        (uint8_t)JUNO_POWER_DOMAIN_CSS_SLEEP0,
+        (uint8_t)MOD_SYSTEM_POWER_POWER_STATE_SLEEP0,
     [MOD_PD_STATE_OFF]                    = (uint8_t)MOD_PD_STATE_OFF,
 };
 
