@@ -19,8 +19,7 @@
 /* Masks of the allowed states for the systop power domain */
 static const uint32_t systop_pd_allowed_state_mask_table[] = {
     [0] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK |
-        JUNO_POWER_DOMAIN_CSS_SLEEP0_MASK |
-        JUNO_POWER_DOMAIN_CSS_SLEEP0_EMU_MASK
+        (1 << MOD_SYSTEM_POWER_POWER_STATE_SLEEP0)
 };
 
 /*
@@ -30,9 +29,7 @@ static const uint32_t systop_pd_allowed_state_mask_table[] = {
 static const uint32_t toplevel_pd_allowed_state_mask_table[] = {
     [MOD_PD_STATE_OFF] = MOD_PD_STATE_OFF_MASK,
     [MOD_PD_STATE_ON] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK,
-    [JUNO_POWER_DOMAIN_CSS_SLEEP0] = MOD_PD_STATE_OFF_MASK,
-    [JUNO_POWER_DOMAIN_CSS_SLEEP0_EMU] =
-        MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK,
+    [MOD_SYSTEM_POWER_POWER_STATE_SLEEP0] = MOD_PD_STATE_OFF_MASK,
 };
 
 /*
@@ -42,16 +39,13 @@ static const uint32_t toplevel_pd_allowed_state_mask_table[] = {
 static const uint32_t cluster_pd_allowed_state_mask_table[] = {
     [MOD_PD_STATE_OFF] = MOD_PD_STATE_OFF_MASK,
     [MOD_PD_STATE_ON] = JUNO_CLUSTER_VALID_STATE_MASK,
-    [JUNO_POWER_DOMAIN_CSS_SLEEP0] =
-        MOD_PD_STATE_OFF_MASK | JUNO_POWER_DOMAIN_MEM_RET_MASK,
-    [JUNO_POWER_DOMAIN_CSS_SLEEP0_EMU] = JUNO_CLUSTER_VALID_STATE_MASK,
+    [MOD_SYSTEM_POWER_POWER_STATE_SLEEP0] = MOD_PD_STATE_OFF_MASK,
 };
 
 /* Masks of the allowed states for a core depending on the cluster states. */
 static const uint32_t core_pd_allowed_state_mask_table[] = {
     [MOD_PD_STATE_OFF] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_SLEEP_MASK,
     [MOD_PD_STATE_ON] = JUNO_CORE_VALID_STATE_MASK,
-    [JUNO_POWER_DOMAIN_MEM_RET] = MOD_PD_STATE_OFF_MASK,
 };
 
 /* Tree indices for children of a cluster power domain */
