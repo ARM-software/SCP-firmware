@@ -317,7 +317,6 @@ static const struct mod_pd_driver_api pd_driver_api = {
     .get_state = pd_get_state,
     .reset = pd_reset,
     .prepare_core_for_system_suspend = pd_prepare_core_for_system_suspend,
-    .shutdown = pd_shutdown,
 };
 
 /*
@@ -442,7 +441,6 @@ static const struct mod_pd_driver_api css_pd_driver_api = {
     .set_state = css_set_state,
     .get_state = css_get_state,
     .reset = css_reset,
-    .shutdown = pd_shutdown,
 };
 
 /*
@@ -527,7 +525,6 @@ static const struct mod_pd_driver_api cluster_pd_driver_api = {
     .get_state = pd_get_state,
     .reset = pd_reset,
     .deny = cluster_deny,
-    .shutdown = pd_shutdown,
 };
 
 /*
@@ -668,7 +665,6 @@ static const struct mod_pd_driver_api core_pd_driver_api = {
     .get_state = pd_get_state,
     .reset = core_reset,
     .prepare_core_for_system_suspend = core_prepare_core_for_system_suspend,
-    .shutdown = pd_shutdown,
 };
 
 /*
