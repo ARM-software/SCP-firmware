@@ -1650,7 +1650,7 @@ static int pd_init(fwk_id_t module_id, unsigned int dev_count,
     mod_pd_ctx.pd_count = dev_count;
     mod_pd_ctx.system_pd_ctx = &mod_pd_ctx.pd_ctx_table[dev_count - 1];
 
-    return FWK_SUCCESS;
+    return fwk_thread_create(module_id);
 }
 
 static int pd_power_domain_init(fwk_id_t pd_id, unsigned int unused,
