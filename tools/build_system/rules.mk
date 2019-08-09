@@ -129,7 +129,8 @@ ARFLAGS_GCC = -rc
 
 LDFLAGS_GCC += -Wl,--cref
 
-LDFLAGS_ARM += -Wl,--undefined=arm_exception_reset
+LDFLAGS_GCC += -Wl,--undefined=arm_exceptions
+LDFLAGS_ARM += -Wl,--undefined=arm_exceptions
 
 BUILTIN_LIBS_GCC := -lc -lgcc
 
