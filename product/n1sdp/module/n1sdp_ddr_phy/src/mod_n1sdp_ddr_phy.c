@@ -488,6 +488,7 @@ static int write_eye_detect_single_rank(fwk_id_t element_id,
                     }
                 }
 
+                delay_ms(wait_ms);
                 sc_phy_manual_update_reg_val |= 1;
                 *(uint32_t *)(ddr_phy_base +
                               (4 * SC_PHY_MANUAL_UPDATE_REG_IDX)) =
@@ -681,6 +682,7 @@ static int write_eye_detect_single_rank(fwk_id_t element_id,
             }
         }
 
+        delay_ms(wait_ms);
         sc_phy_manual_update_reg_val |= 1;
         *(uint32_t *)(ddr_phy_base + (4 * SC_PHY_MANUAL_UPDATE_REG_IDX)) =
             sc_phy_manual_update_reg_val;
