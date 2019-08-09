@@ -59,22 +59,6 @@
 #define HDLCDCLK_CLOCK              (400 * FWK_MHZ)
 
 /*
- * This function is executed before the C main() function.
- * This needs to happen as the PLLs must be released from reset very shortly
- * after the SCP is released from reset, otherwise the motherboard
- * microcontroller will kill the SCP and error out.
- */
-
-static void __attribute((constructor, used)) init_pll_early(void)
-{
-    unsigned int pll_idx;
-
-    /* Release All system PLLs from reset */
-    for (pll_idx = 0; pll_idx < PLL_IDX_COUNT; pll_idx++)
-        SCC->PLL[pll_idx].REG0 &= ~PLL_REG0_PLL_RESET;
-}
-
-/*
  * Static helper functions
  */
 

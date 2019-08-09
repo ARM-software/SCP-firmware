@@ -41,6 +41,9 @@ BS_FIRMWARE_SOURCES := \
     config_log.c \
     config_timer.c \
     config_sds.c \
-    config_bootloader.c
+    config_bootloader.c \
+    juno_pll_workaround.c
+
+LDFLAGS_GCC += -Wl,--wrap=arm_exception_reset
 
 include $(BS_DIR)/firmware.mk
