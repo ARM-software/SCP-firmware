@@ -11,6 +11,7 @@ include $(BS_DIR)/toolchain.mk
 BS_LIB_NAME = arch
 
 BS_LIB_SOURCES_armv7-m += armv7-m/exceptions.c
+BS_LIB_SOURCES_armv7-m += armv7-m/handlers.c
 BS_LIB_SOURCES_armv7-m += arm_nvic.c
 BS_LIB_SOURCES_armv7-m += arm_main.c
 BS_LIB_SOURCES_armv7-m += arm_mm.c

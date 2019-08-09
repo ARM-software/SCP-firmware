@@ -13,6 +13,7 @@
 #include <string.h>
 #include <fwk_noreturn.h>
 #include <cmsis_compiler.h>
+#include "exceptions.h"
 
 #ifdef __NEWLIB__
 /*
@@ -33,38 +34,6 @@ void software_init_hook(void)
         memcpy(start, load, end - start);
 }
 #endif
-
-noreturn void arm_exception_reset(void)
-{
-    /*
-     * When entering the firmware, before the framework is entered the following
-     * things happen:
-     *  1. The toolchain-specific C runtime is initialized
-     *     For Arm Compiler:
-     *       1. Zero-initialized data is zeroed
-     *       2. Initialized data is decompressed and copied
-     *     For GCC/Newlib:
-     *       1. Zero-initialized data is zeroed
-     *       2. Initialized data is copied by software_init_hook()
-     * 2. The main() function is called by the C runtime
-     */
-
-#ifdef __ARMCC_VERSION
-    extern noreturn void __main(void);
-
-    __main();
-#else
-    extern noreturn void _start(void);
-
-    _start();
-#endif
-}
-
-noreturn void arm_exception_invalid(void)
-{
-    while (true)
-        __WFI();
-}
 
 enum {
     EXCEPTION_RESET,
@@ -95,17 +64,15 @@ extern char __stackheap_end__;
 #endif
 
 /*
- * Set up the exception table. The structure below is marked as static because
- * it doesn't need to be visible outside of this translation unit, but it is
- * marked as used to ensure it is not removed by the compiler. It is added to
- * the .exceptions section which will be explicitly placed at the beginning of
- * the binary by the linker script.
+ * Set up the exception table. The structure below is is added to the
+ * .exceptions section which will be explicitly placed at the beginning of the
+ * binary by the linker script.
  */
 
-static const struct {
+const struct {
     uintptr_t stack;
     uintptr_t exceptions[15];
-} exceptions __attribute__((used, section(".exceptions"))) = {
+} arm_exceptions __attribute__((section(".exceptions"))) = {
     .stack = (uintptr_t)(arm_exception_stack),
     .exceptions = {
         [EXCEPTION_RESET] = (uintptr_t)(arm_exception_reset),
