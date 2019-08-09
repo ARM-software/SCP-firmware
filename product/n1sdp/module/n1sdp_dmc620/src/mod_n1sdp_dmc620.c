@@ -910,8 +910,8 @@ static int dmc620_config(struct mod_dmc620_reg *dmc, fwk_id_t ddr_id)
             status);
         return status;
     }
-    dmc->ADDRESS_CONTROL_NEXT = value;
-    dmc->DECODE_CONTROL_NEXT = 0x001C2800;
+    dmc->ADDRESS_CONTROL_NEXT = value | DMC_ADDR_CTLR_BANK_HASH_ENABLE;
+    dmc->DECODE_CONTROL_NEXT = 0x00142C10;
 
     value = 0;
     status = dimm_spd_format_control(&value);

@@ -623,6 +623,11 @@ struct mod_dmc620_reg {
 #define DMC_ERR0CTRL0_CFI_ENABLE           UINT32_C(0x00000100)
 
 /*!
+ * \brief DMC Bank Hash enable bit in ADDRESS_CONTROL register
+ */
+#define DMC_ADDR_CTLR_BANK_HASH_ENABLE     UINT32_C(0x10000000)
+
+/*!
  * \brief DDR training timeout in microseconds
  */
 #define DMC_TRAINING_TIMEOUT               UINT32_C(5000)
