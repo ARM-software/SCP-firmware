@@ -16,15 +16,18 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
+#include <fwk_thread.h>
 #include <internal/scmi.h>
 #include <internal/scmi_sensor.h>
-#include <mod_sensor.h>
 #include <mod_scmi.h>
+#include <mod_sensor.h>
 
 struct scmi_sensor_ctx {
     unsigned int sensor_count;
     const struct mod_scmi_from_protocol_api *scmi_api;
     const struct mod_sensor_api *sensor_api;
+    bool request_pending;
+    fwk_id_t service_id;
 };
 
 static int scmi_sensor_protocol_version_handler(fwk_id_t service_id,
@@ -37,6 +40,14 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
     const uint32_t *payload);
 static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
     const uint32_t *payload);
+
+struct scmi_sensor_event_parameters {
+    fwk_id_t sensor_id;
+};
+
+static const fwk_id_t mod_scmi_sensor_event_id_get_request =
+    FWK_ID_EVENT_INIT(FWK_MODULE_IDX_SCMI_SENSOR,
+                      SCMI_SENSOR_EVENT_IDX_REQUEST);
 
 /*
  * Internal variables.
@@ -65,6 +76,20 @@ static unsigned int payload_size_table[] = {
     [SCMI_SENSOR_READING_GET] =
                        sizeof(struct scmi_sensor_protocol_reading_get_a2p),
 };
+
+/*
+ * Static helper for responding to SCMI.
+ */
+static void scmi_sensor_respond(
+    struct scmi_sensor_protocol_reading_get_p2a *return_values)
+{
+    scmi_sensor_ctx.scmi_api->respond(scmi_sensor_ctx.service_id,
+        return_values,
+        (return_values->status == SCMI_SUCCESS) ?
+        sizeof(*return_values) : sizeof(return_values->status));
+
+    scmi_sensor_ctx.request_pending = false;
+}
 
 /*
  * Sensor management protocol implementation
@@ -273,9 +298,8 @@ static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
 {
     const struct scmi_sensor_protocol_reading_get_a2p *parameters;
     struct scmi_sensor_protocol_reading_get_p2a return_values;
-    uint64_t sensor_value;
+    struct scmi_sensor_event_parameters *params;
     uint32_t flags;
-    fwk_id_t sensor_id;
     int status;
 
     parameters = (const struct scmi_sensor_protocol_reading_get_a2p *)payload;
@@ -296,24 +320,34 @@ static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    sensor_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR,
-                               parameters->sensor_id);
-
-    status = scmi_sensor_ctx.sensor_api->get_value(sensor_id, &sensor_value);
-    if (status == FWK_SUCCESS) {
-        return_values = (struct scmi_sensor_protocol_reading_get_p2a) {
-            .status = SCMI_SUCCESS,
-            .sensor_value_low = (uint32_t)sensor_value,
-            .sensor_value_high = (uint32_t)(sensor_value >> 32),
-        };
-    } else if (status == FWK_E_PWRSTATE) {
-        /* The sensor is currently unpowered */
+    if (scmi_sensor_ctx.request_pending) {
+        return_values.status = SCMI_BUSY;
         status = FWK_SUCCESS;
-        return_values.status = SCMI_HARDWARE_ERROR;
-    } else {
-        /* Unable to read sensor */
-        assert(false);
+
+        goto exit;
     }
+
+    /* The get_value request is processed within the event being generated */
+    struct fwk_event event = {
+        .target_id = fwk_module_id_scmi_sensor,
+        .id = mod_scmi_sensor_event_id_get_request,
+    };
+
+    params = (struct scmi_sensor_event_parameters *)event.params;
+    params->sensor_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR,
+                                       parameters->sensor_id);
+
+    status = fwk_thread_put_event(&event);
+    if (status != FWK_SUCCESS) {
+        return_values.status = SCMI_GENERIC_ERROR;
+
+        goto exit;
+    }
+
+    scmi_sensor_ctx.request_pending = true;
+    scmi_sensor_ctx.service_id = service_id;
+
+    return FWK_SUCCESS;
 
 exit:
     scmi_sensor_ctx.scmi_api->respond(service_id, &return_values,
@@ -450,13 +484,71 @@ static int scmi_sensor_process_bind_request(fwk_id_t source_id,
     return FWK_SUCCESS;
 }
 
+static int scmi_sensor_process_event(const struct fwk_event *event,
+                                     struct fwk_event *resp_event)
+{
+    int status;
+    uint64_t sensor_value;
+    struct scmi_sensor_event_parameters *params;
+    struct scmi_sensor_protocol_reading_get_p2a return_values;
+
+    /* Request event to sensor HAL */
+    if (fwk_id_is_equal(event->id, mod_scmi_sensor_event_id_get_request)) {
+        params = (struct scmi_sensor_event_parameters *)event->params;
+
+        status = scmi_sensor_ctx.sensor_api->get_value(params->sensor_id,
+                                                       &sensor_value);
+        if (status == FWK_SUCCESS) {
+            /* Sensor value is ready */
+            return_values = (struct scmi_sensor_protocol_reading_get_p2a) {
+                .status = SCMI_SUCCESS,
+                .sensor_value_low = (uint32_t)sensor_value,
+                .sensor_value_high = (uint32_t)(sensor_value >> 32),
+            };
+
+            scmi_sensor_respond(&return_values);
+
+            return status;
+        } else if (status == FWK_PENDING) {
+            /* Sensor value will be provided through a response event */
+            return FWK_SUCCESS;
+        } else {
+            return_values = (struct scmi_sensor_protocol_reading_get_p2a) {
+                .status = SCMI_HARDWARE_ERROR,
+            };
+
+            scmi_sensor_respond(&return_values);
+
+            return FWK_E_PANIC;
+        }
+    }
+
+    /* Response event from sensor HAL */
+    if (fwk_id_is_equal(event->id, mod_sensor_event_id_read_request)) {
+        struct mod_sensor_event_params *params =
+            (struct mod_sensor_event_params *)event->params;
+
+        return_values = (struct scmi_sensor_protocol_reading_get_p2a) {
+            .status = SCMI_SUCCESS,
+            .sensor_value_low = (uint32_t)params->value,
+            .sensor_value_high = (uint32_t)(params->value >> 32),
+        };
+
+        scmi_sensor_respond(&return_values);
+    }
+
+    return FWK_SUCCESS;
+}
+
 const struct fwk_module module_scmi_sensor = {
     .name = "SCMI sensor management",
     .api_count = 1,
+    .event_count = SCMI_SENSOR_EVENT_IDX_COUNT,
     .type = FWK_MODULE_TYPE_PROTOCOL,
     .init = scmi_sensor_init,
     .bind = scmi_sensor_bind,
     .process_bind_request = scmi_sensor_process_bind_request,
+    .process_event = scmi_sensor_process_event,
 };
 
 /* No elements, no module configuration data */
