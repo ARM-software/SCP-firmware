@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef REG_DMA330_H
-#define REG_DMA330_H
+#ifndef INTERNAL_REG_DMA330_H
+#define INTERNAL_REG_DMA330_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -199,4 +199,4 @@ typedef struct {
 
 } REG_ST_DMA330_NS_t;
 
-#endif /* REG_DMA330_H */
+#endif /* INTERNAL_REG_DMA330_H */

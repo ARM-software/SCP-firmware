@@ -8,8 +8,8 @@
  *      System Control and Management Interface (SCMI) support.
  */
 
-#ifndef SCMI_VENDOR_EXT_H
-#define SCMI_VENDOR_EXT_H
+#ifndef INTERNAL_SCMI_VENDOR_EXT_H
+#define INTERNAL_SCMI_VENDOR_EXT_H
 
 /*!
  * \addtogroup GroupSYNQUACERModule SYNQUACER Product Modules
@@ -102,4 +102,4 @@ struct scmi_vendor_ext_memory_info_get_resp {
  * @}
  */
 
-#endif /* SCMI_VENDOR_EXT_H */
+#endif /* INTERNAL_SCMI_VENDOR_EXT_H */

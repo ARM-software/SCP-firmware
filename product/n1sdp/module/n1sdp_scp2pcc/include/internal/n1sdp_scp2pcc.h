@@ -8,8 +8,8 @@
  *      N1SDP SCP to PCC message transfer prototypes.
  */
 
-#ifndef N1SDP_SCP2PCC_H
-#define N1SDP_SCP2PCC_H
+#ifndef INTERNAL_N1SDP_SCP2PCC_H
+#define INTERNAL_N1SDP_SCP2PCC_H
 
 #include <stdint.h>
 
@@ -31,4 +31,4 @@ struct mem_msg_packet_st {
     uint8_t payload[MSG_PAYLOAD_SIZE];
 } __attribute__((packed));
 
-#endif /* N1SDP_SCP2PCC_H */
+#endif /* INTERNAL_N1SDP_SCP2PCC_H */

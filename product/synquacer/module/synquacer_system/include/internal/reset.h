@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef RESET_H
-#define RESET_H
+#ifndef INTERNAL_RESET_H
+#define INTERNAL_RESET_H
 
 typedef enum { RST_TYPE_ALL = 0, RST_TYPE_WO_BUS, RST_TYPE_BUS } RST_TYPE_t;
 
@@ -110,4 +110,4 @@ typedef enum {
 void lpcm_sysoc_reset(RST_TYPE_t type, RST_BLOCK block);
 void lpcm_sysoc_reset_clear(RST_TYPE_t type, RST_BLOCK block);
 
-#endif /* RESET_H */
+#endif /* INTERNAL_RESET_H */

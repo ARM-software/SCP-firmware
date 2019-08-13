@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef CCN512_H
-#define CCN512_H
+#ifndef INTERNAL_CCN512_H
+#define INTERNAL_CCN512_H
 
 #include <stdint.h>
 #include <fwk_macros.h>
@@ -262,4 +262,4 @@ typedef struct {
     uint8_t RESERVED1[0xF8];
 } ccn5xx_region_t;
 
-#endif /* CCN512_H */
+#endif /* INTERNAL_CCN512_H */

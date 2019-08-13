@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef I2C_REG_H
-#define I2C_REG_H
+#ifndef INTERNAL_I2C_REG_H
+#define INTERNAL_I2C_REG_H
 
 #include <stdint.h>
 
@@ -280,4 +280,4 @@ typedef union {
 #define I2C_SP1_REG_ADDR_TSHRH ((0x16U) << 2)
 #define I2C_SP1_REG_ADDR_TPSRH ((0x17U) << 2)
 
-#endif /* I2C_REG_H */
+#endif /* INTERNAL_I2C_REG_H */

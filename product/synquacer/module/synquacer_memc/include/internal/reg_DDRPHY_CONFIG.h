@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef REG_DDRPHY_CONFIG_H
-#define REG_DDRPHY_CONFIG_H
+#ifndef INTERNAL_REG_DDRPHY_CONFIG_H
+#define INTERNAL_REG_DDRPHY_CONFIG_H
 
 #include <stdint.h>
 
@@ -1037,4 +1037,4 @@ typedef volatile struct {
     uint32_t __Reserved_3FF__; // 0x3FF
 } REG_ST_DDRPHY_CONFIG_t;
 
-#endif // REG_DDRPHY_CONFIG_H
+#endif // INTERNAL_REG_DDRPHY_CONFIG_H

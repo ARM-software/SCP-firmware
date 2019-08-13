@@ -8,8 +8,8 @@
  *      SCMI Core Configuration Protocol Support
  */
 
-#ifndef SCMI_APCORE_H
-#define SCMI_APCORE_H
+#ifndef INTERNAL_SCMI_APCORE_H
+#define INTERNAL_SCMI_APCORE_H
 
 #include <stdint.h>
 
@@ -68,4 +68,4 @@ struct __attribute((packed)) scmi_apcore_reset_address_get_p2a {
     uint32_t attributes;
 };
 
-#endif /* SCMI_APCORE_H */
+#endif /* INTERNAL_SCMI_APCORE_H */

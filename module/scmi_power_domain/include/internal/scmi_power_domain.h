@@ -8,8 +8,8 @@
  *      System Control and Management Interface (SCMI) support.
  */
 
-#ifndef SCMI_POWER_H
-#define SCMI_POWER_H
+#ifndef INTERNAL_SCMI_POWER_H
+#define INTERNAL_SCMI_POWER_H
 
 /*!
  * \addtogroup GroupModules Modules
@@ -118,4 +118,4 @@ struct __attribute((packed)) scmi_pd_power_state_notify_p2a {
  * @}
  */
 
-#endif /* SCMI_POWER_DOMAIN_H */
+#endif /* INTERNAL_SCMI_POWER_DOMAIN_H */

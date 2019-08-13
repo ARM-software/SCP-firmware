@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef CRG11_H
-#define CRG11_H
+#ifndef INTERNAL_CRG11_H
+#define INTERNAL_CRG11_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -33,4 +33,4 @@ typedef struct crg11_state_s {
     unsigned int ap_change_allowed_flag : 1;
 } crg11_state_t;
 
-#endif /* CRG11_H */
+#endif /* INTERNAL_CRG11_H */

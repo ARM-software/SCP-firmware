@@ -9,8 +9,8 @@
  *      CMN600 Context structure Interface
  */
 
-#ifndef CMN600_CTX_H
-#define CMN600_CTX_H
+#ifndef INTERNAL_CMN600_CTX_H
+#define INTERNAL_CMN600_CTX_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -95,4 +95,4 @@ struct cmn600_ctx {
 
 int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam);
 
-#endif /* CMN600_CTX_H */
+#endif /* INTERNAL_CMN600_CTX_H */

@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef HSSPI_API_H
-#define HSSPI_API_H
+#ifndef INTERNAL_HSSPI_API_H
+#define INTERNAL_HSSPI_API_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -27,4 +27,4 @@ void HSSPI_init(void);
  */
 void HSSPI_exit(void);
 
-#endif /* HSSPI_API_H */
+#endif /* INTERNAL_HSSPI_API_H */

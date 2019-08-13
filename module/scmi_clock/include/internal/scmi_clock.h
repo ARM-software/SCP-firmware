@@ -8,8 +8,8 @@
  *      SCMI Clock Management Protocol Support
  */
 
-#ifndef SCMI_CLOCK_H
-#define SCMI_CLOCK_H
+#ifndef INTERNAL_SCMI_CLOCK_H
+#define INTERNAL_SCMI_CLOCK_H
 
 #define SCMI_PROTOCOL_ID_CLOCK      UINT32_C(0x14)
 #define SCMI_PROTOCOL_VERSION_CLOCK UINT32_C(0x10000)
@@ -188,4 +188,4 @@ struct __attribute((packed)) scmi_clock_describe_rates_p2a {
     struct scmi_clock_rate rates[];
 };
 
-#endif /* SCMI_CLOCK_H */
+#endif /* INTERNAL_SCMI_CLOCK_H */

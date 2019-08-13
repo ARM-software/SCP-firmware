@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef I2C_DEPEND_H
-#define I2C_DEPEND_H
+#ifndef INTERNAL_I2C_DEPEND_H
+#define INTERNAL_I2C_DEPEND_H
 
 #include <stdint.h>
 #include <internal/i2c_driver.h>
@@ -23,4 +23,4 @@ I2C_ERR_t f_i2c_api_initialize(
     I2C_TYPE type,
     const I2C_PARAM_t *param);
 
-#endif /* I2C_DEPEND_H */
+#endif /* INTERNAL_I2C_DEPEND_H */

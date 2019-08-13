@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef THERMAL_SENSOR_H
-#define THERMAL_SENSOR_H
+#ifndef INTERNAL_THERMAL_SENSOR_H
+#define INTERNAL_THERMAL_SENSOR_H
 
 #define THERMAL_BASE_ADDRESS 0x48190000
 #define THERMAL_INDIVIDUAL_BASE_OFFSET 0x800
@@ -66,4 +66,4 @@
 
 int thermal_enable(void);
 
-#endif /* THERMAL_SENSOR_H */
+#endif /* INTERNAL_THERMAL_SENSOR_H */

@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef SMMU_WRAPPER_H
-#define SMMU_WRAPPER_H
+#ifndef INTERNAL_SMMU_WRAPPER_H
+#define INTERNAL_SMMU_WRAPPER_H
 
 #include <synquacer_debug.h>
 #include <synquacer_mmap.h>
@@ -30,4 +30,4 @@ void smmu_wrapper_initialize(uint8_t mir_id, uint8_t mav_id);
 void smmu_wrapper_initialize(void);
 #endif /* CONFIG_SCB_USE_PCIE_INTERCONNECT */
 
-#endif /* SMMU_WRAPPER_H */
+#endif /* INTERNAL_SMMU_WRAPPER_H */
