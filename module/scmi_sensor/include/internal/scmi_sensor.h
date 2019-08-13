@@ -153,6 +153,12 @@ struct __attribute((packed)) scmi_sensor_protocol_description_get_p2a {
     struct scmi_sensor_desc sensor_desc[];
 };
 
+/* Event indices */
+enum scmi_sensor_api_idx {
+    SCMI_SENSOR_EVENT_IDX_REQUEST,
+    SCMI_SENSOR_EVENT_IDX_COUNT,
+};
+
 /*!
  * @}
  */
