@@ -8,8 +8,8 @@
  *      System Control and Management Interface (SCMI) support.
  */
 
-#ifndef SCMI_SENSOR_H
-#define SCMI_SENSOR_H
+#ifndef INTERNAL_SCMI_SENSOR_H
+#define INTERNAL_SCMI_SENSOR_H
 
 /*!
  * \addtogroup GroupModules Modules
@@ -167,4 +167,4 @@ enum scmi_sensor_api_idx {
  * @}
  */
 
-#endif /* SCMI_SENSOR_H */
+#endif /* INTERNAL_SCMI_SENSOR_H */

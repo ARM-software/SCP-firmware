@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef TRANSACTION_SW_H
-#define TRANSACTION_SW_H
+#ifndef INTERNAL_TRANSACTION_SW_H
+#define INTERNAL_TRANSACTION_SW_H
 
 void set_transactionsw_off(
     uint32_t transactionsw_reg_addr,
@@ -14,4 +14,4 @@ void set_transactionsw_off(
 
 void set_transactionsw_on(uint32_t transactionsw_reg_addr, uint32_t enable_bit);
 
-#endif /* TRANSACTION_SW_H */
+#endif /* INTERNAL_TRANSACTION_SW_H */

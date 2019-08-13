@@ -8,8 +8,8 @@
  *      System Control and Management Interface (SCMI) support.
  */
 
-#ifndef SCMI_CCIX_CONFIG_H
-#define SCMI_CCIX_CONFIG_H
+#ifndef INTERNAL_SCMI_CCIX_CONFIG_H
+#define INTERNAL_SCMI_CCIX_CONFIG_H
 
 /*
  * SCMI CCIX config ID definition.
@@ -126,4 +126,4 @@ struct __attribute((packed)) scmi_ccix_config_protocol_sys_coherency_a2p {
 };
 
 
-#endif /* SCMI_CCIX_CONFIG_H */
+#endif /* INTERNAL_SCMI_CCIX_CONFIG_H */

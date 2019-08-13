@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef SYSOC_H
-#define SYSOC_H
+#ifndef INTERNAL_SYSOC_H
+#define INTERNAL_SYSOC_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -22,4 +22,4 @@ int sysoc_wait_status_change(
     bool reset_set_flag,
     uint32_t set_bit);
 
-#endif /* SYSOC_H */
+#endif /* INTERNAL_SYSOC_H */

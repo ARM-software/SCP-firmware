@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef MHU_H
-#define MHU_H
+#ifndef INTERNAL_MHU_H
+#define INTERNAL_MHU_H
 
 #include <stdint.h>
 #include <fwk_macros.h>
@@ -26,4 +26,4 @@ struct mhu_reg {
     FWK_W  uint32_t CLEAR;
 };
 
-#endif /* MHU_H */
+#endif /* INTERNAL_MHU_H */

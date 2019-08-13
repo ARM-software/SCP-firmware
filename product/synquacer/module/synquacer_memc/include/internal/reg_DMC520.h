@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef REG_DMC520_H
-#define REG_DMC520_H
+#ifndef INTERNAL_REG_DMC520_H
+#define INTERNAL_REG_DMC520_H
 
 #include <stdint.h>
 
@@ -424,4 +424,4 @@ typedef volatile struct {
     uint32_t component_id_3; // 0x1FFC
 } REG_ST_DMC520;
 
-#endif /* REG_DMC520_H */
+#endif /* INTERNAL_REG_DMC520_H */

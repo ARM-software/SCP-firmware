@@ -8,8 +8,8 @@
  *     N1SDP DDR PHY configuration registers.
  */
 
-#ifndef N1SDP_DDR_PHY_H
-#define N1SDP_DDR_PHY_H
+#ifndef INTERNAL_N1SDP_DDR_PHY_H
+#define INTERNAL_N1SDP_DDR_PHY_H
 
 #include <stdint.h>
 #include <fwk_macros.h>
@@ -2446,4 +2446,4 @@ struct mod_n1sdp_ddr_phy_reg {
     FWK_RW uint32_t DENALI_PHY_2425_DATA;
 };
 
-#endif  /* N1SDP_DDR_PHY_H */
+#endif  /* INTERNAL_N1SDP_DDR_PHY_H */

@@ -8,8 +8,8 @@
  *      N1SDP PLL register definitions
  */
 
-#ifndef N1SDP_PLL_H
-#define N1SDP_PLL_H
+#ifndef INTERNAL_N1SDP_PLL_H
+#define INTERNAL_N1SDP_PLL_H
 
 #include <fwk_macros.h>
 
@@ -54,4 +54,4 @@
 /*! The maximum post divider value */
 #define MOD_N1SDP_PLL_POSTDIV_MAX    7
 
-#endif /* N1SDP_PLL_H */
+#endif /* INTERNAL_N1SDP_PLL_H */

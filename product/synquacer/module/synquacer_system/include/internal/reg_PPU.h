@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef REG_PPU_H
-#define REG_PPU_H
+#ifndef INTERNAL_REG_PPU_H
+#define INTERNAL_REG_PPU_H
 
 #define PPU_BASE_AP 0x54120000
 #define PPU_BASE_SCP 0x48120000
@@ -66,4 +66,4 @@
 #define PPU_COMP_ID2 (PPU_BASE + 0xFF8)
 #define PPU_COMP_ID3 (PPU_BASE + 0xFFC)
 
-#endif /* REG_PPU_H */
+#endif /* INTERNAL_REG_PPU_H */

@@ -8,8 +8,8 @@
  *     PCIe controller configuration registers.
  */
 
-#ifndef PCIE_CTRL_APB_REG_H
-#define PCIE_CTRL_APB_REG_H
+#ifndef INTERNAL_PCIE_CTRL_APB_REG_H
+#define INTERNAL_PCIE_CTRL_APB_REG_H
 
 #include <stdint.h>
 #include <fwk_macros.h>
@@ -187,4 +187,4 @@ struct pcie_ctrl_apb_reg {
 #define EP_MISC_CTRL_CONFIG_EN_MASK \
         (0x1 << EP_MISC_CTRL_CONFIG_EN_POS)
 
-#endif  /* PCIE_CTRL_APB_REG_H */
+#endif  /* INTERNAL_PCIE_CTRL_APB_REG_H */

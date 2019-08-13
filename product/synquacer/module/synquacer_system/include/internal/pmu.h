@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef PMU_H
-#define PMU_H
+#ifndef INTERNAL_PMU_H
+#define INTERNAL_PMU_H
 
 #include <stdint.h>
 
@@ -31,4 +31,4 @@ void pmu_write_power_on_priority(uint8_t pd_no, uint8_t value);
 void pmu_write_pwr_cyc_sel(uint32_t value);
 uint32_t pmu_read_pwr_cyc_sel(void);
 
-#endif /* PMU_H */
+#endif /* INTERNAL_PMU_H */

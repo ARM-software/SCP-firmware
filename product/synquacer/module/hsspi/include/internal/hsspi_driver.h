@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef HSSPI_DRIVER_H
-#define HSSPI_DRIVER_H
+#ifndef INTERNAL_HSSPI_DRIVER_H
+#define INTERNAL_HSSPI_DRIVER_H
 
 #include <stdint.h>
 #include <synquacer_mmap.h>
@@ -86,4 +86,4 @@ void hsspi_set_window_size(
 
 void hsspi_init(volatile REG_ST_HSSPI_t *reg_hsspi);
 
-#endif /* HSSPI_DRIVER_H */
+#endif /* INTERNAL_HSSPI_DRIVER_H */

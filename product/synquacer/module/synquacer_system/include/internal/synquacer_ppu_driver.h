@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef SYNQUACER_PPU_DRIVER_H
-#define SYNQUACER_PPU_DRIVER_H
+#ifndef INTERNAL_SYNQUACER_PPU_DRIVER_H
+#define INTERNAL_SYNQUACER_PPU_DRIVER_H
 
 #include <internal/reg_PPU.h>
 
@@ -39,4 +39,4 @@ int change_power_state(
     int reten);
 int read_power_status(int domain);
 
-#endif /* SYNQUACER_PPU_DRIVER_H */
+#endif /* INTERNAL_SYNQUACER_PPU_DRIVER_H */

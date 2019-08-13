@@ -10,8 +10,8 @@
  *     the firmware package.
  */
 
-#ifndef UUID_H
-#define UUID_H
+#ifndef INTERNAL_UUID_H
+#define INTERNAL_UUID_H
 
 /* Length of a node address (an IEEE 802 address). */
 #define _UUID_NODE_LEN 6
@@ -35,4 +35,4 @@ struct uuid_t {
     uint8_t node[_UUID_NODE_LEN];
 };
 
-#endif /* UUID_H */
+#endif /* INTERNAL_UUID_H */

@@ -10,8 +10,8 @@
  *     and UUID values of binary images within the firmware package.
  */
 
-#ifndef N1SDP_FLASH_LAYOUT_H
-#define N1SDP_FLASH_LAYOUT_H
+#ifndef INTERNAL_N1SDP_FLASH_LAYOUT_H
+#define INTERNAL_N1SDP_FLASH_LAYOUT_H
 
 #include <stdint.h>
 #include "uuid.h"
@@ -92,4 +92,4 @@ struct n1sdp_fip_memory_toc {
     struct n1sdp_fip_toc_entry entry[];
 } __attribute__((packed));
 
-#endif /* N1SDP_FLASH_LAYOUT_H */
+#endif /* INTERNAL_N1SDP_FLASH_LAYOUT_H */

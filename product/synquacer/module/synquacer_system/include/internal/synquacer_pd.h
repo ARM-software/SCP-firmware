@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef SYNQUACER_PD_H
-#define SYNQUACER_PD_H
+#ifndef INTERNAL_SYNQUACER_PD_H
+#define INTERNAL_SYNQUACER_PD_H
 
 #include <internal/reset.h>
 #include <ppu_v0.h>
@@ -281,4 +281,4 @@ uint32_t pmu_wait(uint32_t pmu_bitmap, bool on);
 void power_domain_coldboot(void);
 void power_domain_reboot(void);
 
-#endif /* SYNQUACER_PD_H */
+#endif /* INTERNAL_SYNQUACER_PD_H */

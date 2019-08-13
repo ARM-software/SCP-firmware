@@ -8,8 +8,8 @@
  *      N1SDP I2C register definitions
  */
 
-#ifndef N1SDP_I2C_H
-#define N1SDP_I2C_H
+#ifndef INTERNAL_N1SDP_I2C_H
+#define INTERNAL_N1SDP_I2C_H
 
 #include <fwk_macros.h>
 
@@ -206,4 +206,4 @@ struct i2c_reg {
 
 #define I2C_TSR_TANSFER_SIZE 0xF
 
-#endif /* N1SDP_I2C_H */
+#endif /* INTERNAL_N1SDP_I2C_H */

@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef REG_HSSPI_H
-#define REG_HSSPI_H
+#ifndef INTERNAL_REG_HSSPI_H
+#define INTERNAL_REG_HSSPI_H
 
 #ifdef RESERVED_AREA_BYTE
 #undef RESERVED_AREA_BYTE
@@ -425,4 +425,4 @@ typedef struct {
     unsigned int MID;
 } REG_ST_HSSPI_t;
 
-#endif /* REG_HSSPI_H */
+#endif /* INTERNAL_REG_HSSPI_H */

@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef I2C_REG_ACCESS_H
-#define I2C_REG_ACCESS_H
+#ifndef INTERNAL_I2C_REG_ACCESS_H
+#define INTERNAL_I2C_REG_ACCESS_H
 
 #include <stdint.h>
 #include <internal/i2c_driver.h>
@@ -146,4 +146,4 @@ struct I2C_REG_FUNC_TABLE {
     uint8_t (*get_FSR)(I2C_ST_PACKET_INFO_t *packet_info);
 };
 
-#endif /* I2C_REG_ACCESS_H */
+#endif /* INTERNAL_I2C_REG_ACCESS_H */

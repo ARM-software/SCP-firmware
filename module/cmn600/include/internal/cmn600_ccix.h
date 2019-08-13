@@ -9,8 +9,8 @@
  *      CMN600 CCIX Configuration Interface
  */
 
-#ifndef CMN600_CCIX_H
-#define CMN600_CCIX_H
+#ifndef INTERNAL_CMN600_CCIX_H
+#define INTERNAL_CMN600_CCIX_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -222,4 +222,4 @@ struct cxg_wait_condition_data {
 #define CTL_NUM_SNPCRDS_MASK                      (0xF << 4)
 #define CCIX_VENDER_ID                            (0x2692)
 
-#endif /* CMN600_CCIX_H */
+#endif /* INTERNAL_CMN600_CCIX_H */

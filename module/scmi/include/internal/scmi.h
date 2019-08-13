@@ -9,8 +9,8 @@
  *      definitions.
  */
 
-#ifndef SCMI_H
-#define SCMI_H
+#ifndef INTERNAL_SCMI_H
+#define INTERNAL_SCMI_H
 
 #include <stdint.h>
 
@@ -168,4 +168,4 @@ struct __attribute((packed)) scmi_protocol_message_attributes_p2a {
  * @}
  */
 
-#endif /* SCMI_H */
+#endif /* INTERNAL_SCMI_H */

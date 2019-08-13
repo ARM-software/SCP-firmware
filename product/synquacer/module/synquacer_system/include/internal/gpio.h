@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef GPIO_H
-#define GPIO_H
+#ifndef INTERNAL_GPIO_H
+#define INTERNAL_GPIO_H
 
 #include <stdint.h>
 #include <synquacer_mmap.h>
@@ -23,4 +23,4 @@ uint8_t gpio_get_direction(void *gpio_base_addr, uint32_t idx);
 void gpio_set_function(void *gpio_base_addr, uint32_t idx, uint8_t value);
 uint8_t gpio_get_function(void *gpio_base_addr, uint32_t idx);
 
-#endif /* GPIO_H */
+#endif /* INTERNAL_GPIO_H */
