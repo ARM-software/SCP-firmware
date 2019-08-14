@@ -33,7 +33,7 @@ struct clock_ctx {
     unsigned int dev_count;
 };
 
-struct clock_ctx module_ctx;
+static struct clock_ctx module_ctx;
 
 /*
  * Module API functions
@@ -198,9 +198,10 @@ static int clock_bind(fwk_id_t id, unsigned int round)
     if (round == 1)
         return FWK_SUCCESS;
 
-    if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT))
+    if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
         /* Only element binding is supported */
         return FWK_SUCCESS;
+    }
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(id);
 
@@ -254,9 +255,10 @@ static int clock_start(fwk_id_t id)
 static int clock_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
                                       fwk_id_t api_id, const void **api)
 {
-    if (fwk_id_get_api_idx(api_id) != MOD_CLOCK_API_TYPE_HAL)
+    if (fwk_id_get_api_idx(api_id) != MOD_CLOCK_API_TYPE_HAL) {
         /* The requested API is not supported. */
         return FWK_E_ACCESS;
+    }
 
     *api = &clock_api;
     return FWK_SUCCESS;
