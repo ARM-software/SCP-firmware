@@ -17,6 +17,9 @@
 # Ctags Index
 tags
 
+# Cscope Index
+cscope.*
+
 # Eclipse IDE
 .cproject
 .project
@@ -26,6 +29,7 @@ tags
 
 # Git
 *.orig
+*.patch
 
 # Intellij IDE
 .idea
