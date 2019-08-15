@@ -47,6 +47,9 @@ struct power_state_transition_notification_ctx {
      * Power state the power domain has transitioned to.
      */
     unsigned int state;
+
+    /* Storage for pre-transition power state */
+    unsigned int previous_state;
 };
 
 /* Context for the power state pre-transition notification */
@@ -1091,6 +1094,22 @@ static void process_power_state_transition_report(struct pd_ctx *pd,
         complete_system_suspend(pd);
     }
 
+    /*
+     * If notifications are pending, the transition report is delayed until all
+     * the state change notifications responses have arrived.
+     */
+    if (pd->power_state_transition_notification_ctx.pending_responses > 0) {
+         /*
+          * Save previous state which will be used once all the notifications
+          * have arrived to continue for deeper or shallower state for the next
+          * power domain.
+          */
+         pd->power_state_transition_notification_ctx.previous_state =
+            previous_state;
+
+         return;
+    }
+
     if (is_deeper_state(new_state, previous_state))
         process_power_state_transition_report_deeper_state(pd);
     else if (is_shallower_state(new_state, previous_state))
@@ -1964,8 +1983,25 @@ static int process_power_state_transition_notification_response(
     if (pd->power_state_transition_notification_ctx.pending_responses != 0)
         return FWK_SUCCESS;
 
-    if (pd->power_state_transition_notification_ctx.state == pd->current_state)
+    if (pd->power_state_transition_notification_ctx.state ==
+        pd->current_state) {
+        /* All notifications received, complete the transition report */
+
+        unsigned int previous_state =
+            pd->power_state_transition_notification_ctx.previous_state;
+
+        pd->power_state_transition_notification_ctx.previous_state =
+            pd->current_state;
+        /*
+         * Complete the report state change now that we have all notifications
+         */
+        if (is_deeper_state(pd->current_state, previous_state))
+            process_power_state_transition_report_deeper_state(pd);
+        else if (is_shallower_state(pd->current_state, previous_state))
+            process_power_state_transition_report_shallower_state(pd);
+
         return FWK_SUCCESS;
+    }
 
     /*
      * While receiving the responses, the power state of the power domain
