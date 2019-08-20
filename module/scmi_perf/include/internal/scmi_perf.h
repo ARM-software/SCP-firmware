@@ -243,6 +243,4 @@ struct __attribute((packed)) scmi_perf_notify_level_p2a {
     int32_t status;
 };
 
-extern struct scp_scmi_protocol scmi_perf_protocol;
-
 #endif /* SCMI_PERF_H */
