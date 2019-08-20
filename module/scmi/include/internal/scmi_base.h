@@ -85,6 +85,4 @@ struct __attribute((packed)) scmi_base_discover_agent_p2a {
     char name[16];
 };
 
-extern struct scp_scmi_protocol scmi_base_protocol;
-
 #endif /* SCMI_BASE_H */
