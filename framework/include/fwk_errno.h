@@ -21,8 +21,11 @@
  * @{
  */
 
+/*! Success, request is pending */
+#define FWK_PENDING         1
+
 /*! Success */
-#define FWK_SUCCESS          0
+#define FWK_SUCCESS         0
 
 /*! Invalid parameter(s) */
 #define FWK_E_PARAM         -1
