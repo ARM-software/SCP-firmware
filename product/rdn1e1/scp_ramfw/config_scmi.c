@@ -17,7 +17,7 @@
 
 static const struct fwk_element service_table[] = {
     [SCP_RDN1E1_SCMI_SERVICE_IDX_PSCI] = {
-        .name = "SERVICE0",
+        .name = "PSCI",
         .data = &((struct mod_scmi_service_config) {
             .transport_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_SMT,
@@ -32,7 +32,7 @@ static const struct fwk_element service_table[] = {
         }),
     },
     [SCP_RDN1E1_SCMI_SERVICE_IDX_OSPM] = {
-        .name = "SERVICE1",
+        .name = "OSPM",
         .data = &((struct mod_scmi_service_config) {
             .transport_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_SMT,

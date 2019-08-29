@@ -53,6 +53,9 @@ struct scmi_service_ctx {
     /* Copy of the pointer to the 'respond' function within the transport API */
     int (*respond)(fwk_id_t transport_id, const void *payload, size_t size);
 
+    /* SCMI message token, used by the agent to identify individual messages */
+    uint16_t scmi_token;
+
     /* SCMI identifier of the protocol processing the current message */
     unsigned int scmi_protocol_id;
 
