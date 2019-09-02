@@ -127,7 +127,7 @@ static const struct mod_cmn600_memory_region_map mmap[] = {
          */
         .base = UINT64_C(0x2000000000),
         .size = UINT64_C(128) * FWK_GIB,
-        .type = MOD_CMN600_MEMORY_REGION_TYPE_IO,
+        .type = MOD_CMN600_REGION_TYPE_SYSCACHE_NONHASH,
         .node_id = NODE_ID_HND,
     },
     {
@@ -137,7 +137,17 @@ static const struct mod_cmn600_memory_region_map mmap[] = {
          */
         .base = UINT64_C(0x4000000000),
         .size = UINT64_C(256) * FWK_GIB,
-        .type = MOD_CMN600_MEMORY_REGION_TYPE_IO,
+        .type = MOD_CMN600_REGION_TYPE_SYSCACHE_NONHASH,
+        .node_id = NODE_ID_HND,
+    },
+    {
+        /*
+         * Peripherals
+         * Map: 0x80_0000_0000 - 0x80_7FFF_FFFF (512 GB - 514 GB)
+         */
+        .base = UINT64_C(0x8000000000),
+        .size = UINT64_C(2) * FWK_GIB,
+        .type = MOD_CMN600_REGION_TYPE_SYSCACHE_NONHASH,
         .node_id = NODE_ID_HND,
     },
     {
