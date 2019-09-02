@@ -278,12 +278,14 @@ static const char * const mmap_type_name[] = {
     [MOD_CMN600_MEMORY_REGION_TYPE_SYSCACHE] = "System Cache",
     [MOD_CMN600_REGION_TYPE_SYSCACHE_SUB] = "Sub-System Cache",
     [MOD_CMN600_REGION_TYPE_CCIX] = "CCIX",
+    [MOD_CMN600_REGION_TYPE_SYSCACHE_NONHASH] = "System Cache Non-hash",
 };
 
 int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
 {
     unsigned int region_idx;
     unsigned int region_io_count = 0;
+    unsigned int region_sys_count = 1;
     const struct mod_cmn600_memory_region_map *region;
     const struct mod_cmn600_config *config = ctx->config;
     unsigned int bit_pos;
@@ -348,6 +350,32 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
                 region->size,
                 SAM_NODE_TYPE_HN_F);
            break;
+
+        case MOD_CMN600_REGION_TYPE_SYSCACHE_NONHASH:
+            group = region_sys_count / CMN600_RNSAM_REGION_ENTRIES_PER_GROUP;
+            bit_pos = (region_sys_count %
+                       CMN600_RNSAM_REGION_ENTRIES_PER_GROUP) *
+                      CMN600_RNSAM_REGION_ENTRY_BITS_WIDTH;
+            /*
+             * Configure memory region
+             */
+            configure_region(&rnsam->SYS_CACHE_GRP_REGION[group],
+                bit_pos,
+                region->base,
+                region->size,
+                SAM_NODE_TYPE_HN_I);
+
+            rnsam->SYS_CACHE_GRP_REGION[group] |= (UINT64_C(0x2) << bit_pos);
+            bit_pos = CMN600_RNSAM_NON_HASH_TGT_NODEID_ENTRY_BITS_WIDTH *
+                  ((region_sys_count - 1) %
+                  CMN600_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP);
+            rnsam->SYS_CACHE_GRP_NOHASH_NODEID &=
+                ~(CMN600_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK << bit_pos);
+            rnsam->SYS_CACHE_GRP_NOHASH_NODEID |= (region->node_id &
+                CMN600_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK) << bit_pos;
+
+            region_sys_count++;
+            break;
 
         case MOD_CMN600_REGION_TYPE_SYSCACHE_SUB:
             /* Do nothing. System cache sub-regions are handled by HN-Fs */
