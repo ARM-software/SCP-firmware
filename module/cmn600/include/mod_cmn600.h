@@ -62,7 +62,7 @@ enum mod_cmn600_memory_region_type {
 
     /*!
      * Sub region of the system cache for non-hashed access (serviced by
-     * dedicated SN-F nodes).
+     * HN-F nodes).
      */
     MOD_CMN600_REGION_TYPE_SYSCACHE_SUB,
 
@@ -70,6 +70,11 @@ enum mod_cmn600_memory_region_type {
      * Region used for CCIX access.
      */
     MOD_CMN600_REGION_TYPE_CCIX,
+
+    /*!
+     * Non-hash regions in SYSCACHE group.
+     */
+    MOD_CMN600_REGION_TYPE_SYSCACHE_NONHASH,
 };
 
 /*!
