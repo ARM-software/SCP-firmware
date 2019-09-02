@@ -134,13 +134,13 @@ static int cmn600_discovery(void)
             } else {
                 switch (get_node_type(node)) {
                 case NODE_TYPE_HN_F:
-                    if ((ctx->hnf_count++) >= MAX_HNF_COUNT) {
+                    if (ctx->hnf_count >= MAX_HNF_COUNT) {
                         ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
                                 MOD_NAME "  hnf count %d >= max limit (%d)\n",
                                 ctx->hnf_count, MAX_HNF_COUNT);
                         return FWK_E_DATA;
                     }
-                    ctx->hnf_offset[ctx->hnf_count] = (uint32_t)node;
+                    ctx->hnf_offset[ctx->hnf_count++] = (uint32_t)node;
                     break;
 
                 case NODE_TYPE_RN_SAM:
@@ -148,23 +148,23 @@ static int cmn600_discovery(void)
                     break;
 
                 case NODE_TYPE_RN_D:
-                    if ((ctx->rnd_count++) >= MAX_RND_COUNT) {
+                    if (ctx->rnd_count >= MAX_RND_COUNT) {
                         ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
                                 MOD_NAME "  rnd count %d >= max limit (%d)\n",
                                 ctx->rnd_count, MAX_RND_COUNT);
                         return FWK_E_DATA;
                     }
-                    ctx->rnd_ldid[ctx->rnd_count] = get_node_logical_id(node);
+                    ctx->rnd_ldid[ctx->rnd_count++] = get_node_logical_id(node);
                     break;
 
                 case NODE_TYPE_RN_I:
-                    if ((ctx->rni_count++) >= MAX_RNI_COUNT) {
+                    if (ctx->rni_count >= MAX_RNI_COUNT) {
                         ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
                                 MOD_NAME "  rni count %d >= max limit (%d)\n",
                                 ctx->rni_count, MAX_RNI_COUNT);
                         return FWK_E_DATA;
                     }
-                    ctx->rni_ldid[ctx->rni_count] = get_node_logical_id(node);
+                    ctx->rni_ldid[ctx->rni_count++] = get_node_logical_id(node);
                     break;
 
                 case NODE_TYPE_CXRA:
