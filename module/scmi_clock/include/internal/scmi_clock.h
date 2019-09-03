@@ -11,8 +11,63 @@
 #ifndef INTERNAL_SCMI_CLOCK_H
 #define INTERNAL_SCMI_CLOCK_H
 
+#include <mod_clock.h>
+
 #define SCMI_PROTOCOL_ID_CLOCK      UINT32_C(0x14)
 #define SCMI_PROTOCOL_VERSION_CLOCK UINT32_C(0x10000)
+
+/*
+ * Identifiers for the type of request being processed
+ */
+enum scmi_clock_request_type {
+    SCMI_CLOCK_REQUEST_GET_STATE,
+    SCMI_CLOCK_REQUEST_GET_RATE,
+    SCMI_CLOCK_REQUEST_SET_RATE,
+    SCMI_CLOCK_REQUEST_SET_STATE,
+    SCMI_CLOCK_REQUEST_COUNT,
+};
+
+/*
+ * Identifiers of the internal events
+ */
+enum scmi_clock_event_idx {
+    SCMI_CLOCK_EVENT_IDX_GET_STATE,
+    SCMI_CLOCK_EVENT_IDX_GET_RATE,
+    SCMI_CLOCK_EVENT_IDX_SET_RATE,
+    SCMI_CLOCK_EVENT_IDX_SET_STATE,
+    SCMI_CLOCK_EVENT_IDX_COUNT,
+};
+
+/*
+ * Container for the data when 'set_rate' operation is requested
+ */
+struct event_set_rate_request_data {
+    uint32_t rate[2];
+    enum mod_clock_round_mode round_mode;
+};
+
+/*
+ * Container for the data when 'set_state' operation is requested
+ */
+struct event_set_state_request_data {
+    enum mod_clock_state state;
+};
+
+/*
+ * Container for the data when 'set_' operation is requested
+ */
+union event_request_data {
+    struct event_set_rate_request_data set_rate_data;
+    struct event_set_state_request_data set_state_data;
+};
+
+/*
+ * Parameters of the event being processed
+ */
+struct event_request_params {
+    fwk_id_t clock_dev_id;
+    union event_request_data request_data;
+};
 
 /*
  * Identifiers of the SCMI Clock Management Protocol commands
@@ -23,6 +78,13 @@ enum scmi_clock_command_id {
     SCMI_CLOCK_RATE_SET =       0x005,
     SCMI_CLOCK_RATE_GET =       0x006,
     SCMI_CLOCK_CONFIG_SET =     0x007,
+};
+
+/*
+ * Generic p2a
+ */
+struct __attribute((packed)) scmi_clock_generic_p2a {
+    int32_t status;
 };
 
 /*
