@@ -76,14 +76,8 @@ int fwk_thread_put_event(struct fwk_event *event);
  *      the entity \p id may have delayed.
  * \param[out] event The copy of the response event.
  *
- * \retval FWK_SUCCESS The event copy was returned.
- * \retval FWK_E_INIT The thread framework component is not initialized.
- * \retval FWK_E_ACCESS The API is called from an ISR.
- * \retval FWK_E_PARAM The identifier \p id is not a module or element
- *      identifier.
- * \retval FWK_E_PARAM The cookie parameter does not match one of the cookies
- *      of the response events delayed by the module or element \p id.
- * \retval FWK_E_PARAM The pointer \p event is equal to NULL.
+ * \retval FWK_E_SUPPORT Not supported.
+ * \return One of the standard framework error codes.
  */
 int fwk_thread_get_delayed_response(fwk_id_t id, uint32_t cookie,
                                     struct fwk_event *event);
