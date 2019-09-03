@@ -239,3 +239,9 @@ error:
     FWK_HOST_PRINT(err_msg_func, status, __func__);
     return status;
 }
+
+int fwk_thread_get_delayed_response(fwk_id_t id, uint32_t cookie,
+                                    struct fwk_event *event)
+{
+    return FWK_E_SUPPORT;
+}
