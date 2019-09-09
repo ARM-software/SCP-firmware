@@ -104,7 +104,13 @@ static int juno_system_module_init(fwk_id_t module_id,
                                    unsigned int element_count,
                                    const void *data)
 {
+    int status;
+
     fwk_assert(element_count == 0);
+
+    status = juno_id_get_platform(&juno_system_ctx.platform_id);
+    if (!fwk_expect(status == FWK_SUCCESS))
+        return FWK_E_PANIC;
 
     return FWK_SUCCESS;
 }
@@ -116,14 +122,19 @@ static int juno_system_bind(fwk_id_t id, unsigned int round)
     if (round > 0)
         return FWK_SUCCESS;
 
-    status = fwk_module_bind(fwk_module_id_juno_xrp7724,
-        mod_juno_xrp7724_api_id_system_mode, &juno_system_ctx.juno_xrp7724_api);
+    status = fwk_module_bind(fwk_module_id_sds,
+                             FWK_ID_API(FWK_MODULE_IDX_SDS, 0),
+                             &juno_system_ctx.sds_api);
     if (status != FWK_SUCCESS)
         return FWK_E_HANDLER;
 
-    return fwk_module_bind(fwk_module_id_sds,
-                           FWK_ID_API(FWK_MODULE_IDX_SDS, 0),
-                           &juno_system_ctx.sds_api);
+    if (juno_system_ctx.platform_id != JUNO_IDX_PLATFORM_RTL)
+        return FWK_SUCCESS;
+    else {
+        return fwk_module_bind(fwk_module_id_juno_xrp7724,
+            mod_juno_xrp7724_api_id_system_mode,
+            &juno_system_ctx.juno_xrp7724_api);
+    }
 }
 
 static int juno_system_process_bind_request(fwk_id_t source_id,
@@ -140,10 +151,6 @@ static int juno_system_start(fwk_id_t id)
 {
     int status;
     unsigned int i;
-
-    status = juno_id_get_platform(&juno_system_ctx.platform_id);
-    if (!fwk_expect(status == FWK_SUCCESS))
-        return FWK_E_PANIC;
 
     /*
      * Subscribe to these SCMI channels in order to know when they have all
