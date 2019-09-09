@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_macros.h>
+#include <fwk_status.h>
 #include <fwk_test.h>
 #include <internal/fwk_module.h>
 

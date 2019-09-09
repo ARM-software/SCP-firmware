@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-#include <fwk_errno.h>
+#include <fwk_status.h>
 #include <mod_f_i2c.h>
 #include <synquacer_config.h>
 #include <synquacer_ddr.h>

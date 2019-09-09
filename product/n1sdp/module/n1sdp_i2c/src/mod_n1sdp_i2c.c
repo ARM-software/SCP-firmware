@@ -9,9 +9,9 @@
  */
 
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
+#include <fwk_status.h>
 #include <internal/n1sdp_i2c.h>
 #include <mod_log.h>
 #include <mod_n1sdp_i2c.h>

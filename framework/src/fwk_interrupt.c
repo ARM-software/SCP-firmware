@@ -11,9 +11,9 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <fwk_arch.h>
-#include <fwk_errno.h>
 #include <fwk_interrupt.h>
 #include <fwk_mm.h>
+#include <fwk_status.h>
 
 static bool initialized;
 static const struct fwk_arch_interrupt_driver *driver;

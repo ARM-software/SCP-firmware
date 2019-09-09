@@ -7,11 +7,11 @@
 
 #include <stdint.h>
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_id.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_multi_thread.h>
+#include <fwk_status.h>
 #include <mod_i2c.h>
 #include <mod_juno_xrp7724.h>
 #include <mod_timer.h>

@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_errno.h>
+#include <fwk_status.h>
 #include <cmsis_os2.h>
 
 #include <synquacer_debug.h>

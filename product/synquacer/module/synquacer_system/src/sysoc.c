@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <fwk_errno.h>
+#include <fwk_status.h>
 
 #include <synquacer_debug.h>
 #include <synquacer_mmap.h>

@@ -10,9 +10,9 @@
 
 #include <string.h>
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_host.h>
 #include <fwk_mm.h>
+#include <fwk_status.h>
 #include <internal/fwk_module.h>
 #include <internal/fwk_thread.h>
 #ifdef BUILD_HAS_NOTIFICATION

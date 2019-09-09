@@ -6,9 +6,9 @@
  */
 
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_interrupt.h>
 #include <fwk_module_idx.h>
+#include <fwk_status.h>
 #include <mod_juno_ppu.h>
 #include <juno_irq.h>
 #include <juno_ppu_idx.h>

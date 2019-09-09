@@ -6,9 +6,9 @@
  */
 
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+#include <fwk_status.h>
 #include <mod_log.h>
 #include <mod_synquacer_memc.h>
 #include <synquacer_ddr.h>

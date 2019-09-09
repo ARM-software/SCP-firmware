@@ -13,10 +13,10 @@
 #include <string.h>
 #include <fwk_assert.h>
 #include <fwk_element.h>
-#include <fwk_errno.h>
 #include <fwk_event.h>
 #include <fwk_list.h>
 #include <fwk_macros.h>
+#include <fwk_status.h>
 #include <fwk_test.h>
 #include <internal/fwk_id.h>
 #include <internal/fwk_module.h>

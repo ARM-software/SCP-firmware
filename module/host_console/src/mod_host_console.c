@@ -7,8 +7,8 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include <fwk_errno.h>
 #include <fwk_module.h>
+#include <fwk_status.h>
 #include <mod_log.h>
 
 /*

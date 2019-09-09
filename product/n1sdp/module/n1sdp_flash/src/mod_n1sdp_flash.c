@@ -11,10 +11,10 @@
 
 #include <string.h>
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_id.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
+#include <fwk_status.h>
 #include <mod_n1sdp_flash.h>
 #include <internal/n1sdp_flash_layout.h>
 

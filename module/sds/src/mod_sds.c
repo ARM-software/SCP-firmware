@@ -11,11 +11,11 @@
 #include <string.h>
 #include <fwk_assert.h>
 #include <fwk_element.h>
-#include <fwk_errno.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
+#include <fwk_status.h>
 #include <mod_sds.h>
 
 #if BUILD_HAS_MOD_CLOCK

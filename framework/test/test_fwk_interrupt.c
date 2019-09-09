@@ -8,9 +8,9 @@
 #include <stdint.h>
 #include <fwk_assert.h>
 #include <fwk_arch.h>
-#include <fwk_errno.h>
 #include <fwk_interrupt.h>
 #include <fwk_macros.h>
+#include <fwk_status.h>
 #include <fwk_test.h>
 
 #define INTERRUPT_ID 42

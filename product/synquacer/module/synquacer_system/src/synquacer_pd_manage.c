@@ -9,7 +9,7 @@
 #include <stdint.h>
 
 #include <fmw_cmsis.h>
-#include <fwk_errno.h>
+#include <fwk_status.h>
 
 #include <synquacer_core.h>
 #include <synquacer_debug.h>

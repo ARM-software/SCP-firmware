@@ -8,8 +8,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <fwk_errno.h>
 #include <fwk_noreturn.h>
+#include <fwk_status.h>
 #include <fwk_test.h>
 
 /* Test information provided by the test suite */

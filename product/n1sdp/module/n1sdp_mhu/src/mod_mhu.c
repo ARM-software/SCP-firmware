@@ -10,12 +10,12 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include <fwk_errno.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+#include <fwk_status.h>
 #include <internal/mhu.h>
 #include <mod_smt.h>
 

@@ -9,10 +9,10 @@
 #include <stdint.h>
 #include <fmw_cmsis.h>
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_notification.h>
+#include <fwk_status.h>
 #include <mod_clock.h>
 #include <mod_hsspi.h>
 #include <mod_log.h>

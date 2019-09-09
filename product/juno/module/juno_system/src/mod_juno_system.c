@@ -8,12 +8,12 @@
 #include <stdint.h>
 #include <fmw_cmsis.h>
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
+#include <fwk_status.h>
 #include <mod_juno_system.h>
 #include <mod_juno_xrp7724.h>
 #include <mod_scmi.h>

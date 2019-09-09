@@ -9,9 +9,9 @@
  */
 
 #include <fwk_arch.h>
-#include <fwk_errno.h>
 #include <fwk_host.h>
 #include <fwk_mm.h>
+#include <fwk_status.h>
 #include <internal/fwk_module.h>
 
 extern int fwk_mm_init(uintptr_t start, size_t size);

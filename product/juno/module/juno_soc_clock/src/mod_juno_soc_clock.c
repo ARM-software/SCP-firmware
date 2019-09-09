@@ -10,8 +10,8 @@
 
 #include <stdint.h>
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_module.h>
+#include <fwk_status.h>
 #include <mod_juno_soc_clock.h>
 #include <juno_id.h>
 #include <juno_scc.h>
