@@ -7,11 +7,11 @@
 
 #include <fwk_assert.h>
 #include <fwk_element.h>
-#include <fwk_errno.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+#include <fwk_status.h>
 #include <internal/scmi.h>
 #include <internal/scmi_system_power.h>
 #include <mod_power_domain.h>

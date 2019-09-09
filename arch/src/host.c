@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <fwk_arch.h>
-#include <fwk_errno.h>
 #include <fwk_noreturn.h>
+#include <fwk_status.h>
 
 extern int host_interrupt_init(struct fwk_arch_interrupt_driver **driver);
 

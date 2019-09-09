@@ -6,10 +6,10 @@
  */
 
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_id.h>
 #include <fwk_math.h>
 #include <fwk_module.h>
+#include <fwk_status.h>
 #include <mod_juno_ram.h>
 #include <mod_timer.h>
 #include <juno_id.h>

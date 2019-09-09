@@ -11,7 +11,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <fwk_arch.h>
-#include <fwk_errno.h>
+#include <fwk_status.h>
 
 static int global_enable(void)
 {

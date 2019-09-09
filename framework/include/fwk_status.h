@@ -8,8 +8,8 @@
  *     Standard return codes.
  */
 
-#ifndef FWK_ERRNO_H
-#define FWK_ERRNO_H
+#ifndef FWK_STATUS_H
+#define FWK_STATUS_H
 
 /*!
  * \addtogroup GroupLibFramework Framework
@@ -17,7 +17,7 @@
  */
 
 /*!
- * \defgroup GroupErrno Return Codes
+ * \defgroup GroupStatus Return Codes
  * @{
  */
 
@@ -89,4 +89,4 @@
  * @}
  */
 
-#endif /* FWK_ERRNO_H */
+#endif /* FWK_STATUS_H */

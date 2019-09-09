@@ -6,10 +6,10 @@
  */
 
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+#include <fwk_status.h>
 #include <mod_ccn512.h>
 #include <mod_log.h>
 #include <synquacer_ddr.h>

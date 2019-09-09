@@ -8,11 +8,11 @@
 #include <string.h>
 #include <fwk_assert.h>
 #include <fwk_element.h>
-#include <fwk_errno.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+#include <fwk_status.h>
 #include <mod_log.h>
 #include <mod_scmi.h>
 #include <ddr_init.h>

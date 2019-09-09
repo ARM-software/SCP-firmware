@@ -7,11 +7,11 @@
 
 #include <stdbool.h>
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_id.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+#include <fwk_status.h>
 #include <mod_sensor.h>
 
 struct sensor_dev_ctx {

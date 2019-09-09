@@ -8,7 +8,7 @@
 #include <stddef.h>
 #include <ppu_v0.h>
 #include <fwk_assert.h>
-#include <fwk_errno.h>
+#include <fwk_status.h>
 
 void ppu_v0_init(struct ppu_v0_reg *ppu)
 {
