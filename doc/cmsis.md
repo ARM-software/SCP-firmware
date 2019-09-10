@@ -1,7 +1,7 @@
 CMSIS Support and Integration
 =============================
 
-Overview                                                             {#overview}
+Overview                                                       {#cmsis_overview}
 ========
 
 Firmware using components with a dependency on the CMSIS library will need to
@@ -13,7 +13,7 @@ in the directory of the firmware.
 While the build system does not enforce this strategy, for consistency it is
 recommended that new architectures, products and firmwares follow it.
 
-Example                                                               {#example}
+Example                                                         {#cmsis_example}
 =======
 
 The example below configures CMSIS to run on an Arm Cortex-M3 r2p1 with an MPU
@@ -44,7 +44,7 @@ CMSIS, and are described in the CMSIS 5 documentation.
 
     #endif /* FMW_CMSIS_H */
 
-Sharing Configurations                                         {#shared_configs}
+Sharing Configurations                                   {#cmsis_shared_configs}
 ======================
 
 In some cases, it may be desirable to use the same CMSIS configuration for more
