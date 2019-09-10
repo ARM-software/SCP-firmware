@@ -1,4 +1,6 @@
-\ingroup GroupI2C
+\ingroup GroupModules Modules
+\defgroup GroupI2C I2C HAL
+
 Module I2C Architecture
 =======================
 

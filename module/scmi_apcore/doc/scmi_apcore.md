@@ -1,4 +1,5 @@
-\ingroup GroupSCMI_APCORE
+\ingroup GroupModules Modules
+\defgroup GroupSCMI_APCORE SCMI Core Configuration Protocol
 
 SCMI AP Core Configuration Protocol v1.0
 ========================================
