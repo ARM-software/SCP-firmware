@@ -120,6 +120,7 @@ INPUT                  = $(TOP_DIR)/readme.md \
                          $(DOC_DIR)/code_rules.md \
                          $(DOC_DIR)/framework.md \
                          $(DOC_DIR)/cmsis.md \
+                         $(DOC_DIR)/glossary.md \
                          $(FWK_DIR)/include \
                          $(FWK_DIR)/test/fwk_test.h \
                          $(MODULE_INCLUDES) \

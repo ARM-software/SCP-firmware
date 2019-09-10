@@ -16,7 +16,7 @@ __DVFS__
     Dynamic Voltage and Frequency Scaling
 
 __IRQ__
-    Interrupt ReQuest
+    Interrupt Request
 
 __ISA__
     Instruction Set Architecture
