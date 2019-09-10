@@ -17,14 +17,17 @@
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+#ifdef BUILD_HAS_MULTITHREADING
 #include <fwk_multi_thread.h>
+#else
+#include <fwk_thread.h>
+#endif
 #include <fwk_notification.h>
 #include <fwk_status.h>
 #include <internal/mod_scmi.h>
 #include <internal/scmi.h>
 #include <internal/scmi_base.h>
 #include <mod_log.h>
-#include <mod_smt.h>
 
 struct scmi_protocol {
     /* SCMI protocol message handler */
@@ -621,7 +624,11 @@ static int scmi_service_init(fwk_id_t service_id, unsigned int unused,
     ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(service_id)];
     ctx->config = config;
 
+#ifdef BUILD_HAS_MULTITHREADING
     return fwk_thread_create(service_id);
+#else
+    return FWK_SUCCESS;
+#endif
 }
 
 static int scmi_bind(fwk_id_t id, unsigned int round)
@@ -792,6 +799,7 @@ static int scmi_process_event(const struct fwk_event *event,
 
 static int scmi_start(fwk_id_t id)
 {
+#ifdef BUILD_HAS_NOTIFICATION
     const struct mod_scmi_service_config *config;
     unsigned int notifications_sent;
 
@@ -814,8 +822,12 @@ static int scmi_start(fwk_id_t id)
     return fwk_notification_subscribe(config->transport_notification_init_id,
                                       config->transport_id,
                                       id);
+#else
+    return FWK_SUCCESS;
+#endif
 }
 
+#ifdef BUILD_HAS_NOTIFICATION
 static int scmi_process_notification(const struct fwk_event *event,
                                      struct fwk_event *resp_event)
 {
@@ -839,13 +851,16 @@ static int scmi_process_notification(const struct fwk_event *event,
     return fwk_notification_notify(&scmi_services_initialized_notification,
         &notifications_sent);
 }
+#endif
 
 /* SCMI module definition */
 const struct fwk_module module_scmi = {
     .name = "SCMI",
     .api_count = MOD_SCMI_API_IDX_COUNT,
     .event_count = 1,
+    #ifdef BUILD_HAS_NOTIFICATION
     .notification_count = MOD_SCMI_NOTIFICATION_IDX_COUNT,
+    #endif
     .type = FWK_MODULE_TYPE_SERVICE,
     .init = scmi_init,
     .element_init = scmi_service_init,
@@ -853,5 +868,7 @@ const struct fwk_module module_scmi = {
     .start = scmi_start,
     .process_bind_request = scmi_process_bind_request,
     .process_event = scmi_process_event,
+    #ifdef BUILD_HAS_NOTIFICATION
     .process_notification = scmi_process_notification,
+    #endif
 };
