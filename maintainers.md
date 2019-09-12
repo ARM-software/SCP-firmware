@@ -35,11 +35,11 @@ maintainers. The platforms listed here represent the exceptions to this rule.
 
 #### N1SDP (n1sdp)
 
-- [Manoj Kumar](manojkumar-arm) (manoj.kumar3@arm.com)
-- [Sudipto Paul](sudpau01) (sudipto.paul@arm.com)
+- [Manoj Kumar](https://github.com/manojkumar-arm) (manoj.kumar3@arm.com)
+- [Sudipto Paul](https://github.com/sudpau01) (sudipto.paul@arm.com)
 
 ### Socionext Platform Maintainers
 
 #### SynQuacer (synquacer)
 
-- [Masahisa Kojima](masahisak) (masahisa.kojima@linaro.org)
+- [Masahisa Kojima](https://github.com/masahisak) (masahisa.kojima@linaro.org)
