@@ -2053,7 +2053,9 @@ const struct fwk_module module_power_domain = {
     .type = FWK_MODULE_TYPE_HAL,
     .api_count = MOD_PD_API_IDX_COUNT,
     .event_count = PD_EVENT_COUNT,
+#ifdef BUILD_HAS_NOTIFICATION
     .notification_count = MOD_PD_NOTIFICATION_COUNT,
+#endif
     .init = pd_init,
     .element_init = pd_power_domain_init,
     .post_init = pd_post_init,
