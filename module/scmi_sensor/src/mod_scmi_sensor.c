@@ -13,6 +13,7 @@
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
+#include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
@@ -22,12 +23,26 @@
 #include <mod_scmi.h>
 #include <mod_sensor.h>
 
-struct scmi_sensor_ctx {
-    unsigned int sensor_count;
-    const struct mod_scmi_from_protocol_api *scmi_api;
-    const struct mod_sensor_api *sensor_api;
-    bool request_pending;
+struct sensor_operations {
+    /*
+     * Service identifier currently requesting operation from this sensor.
+     * A 'none' value means that there is no pending request.
+     */
     fwk_id_t service_id;
+};
+
+struct scmi_sensor_ctx {
+    /* Number of sensors */
+    unsigned int sensor_count;
+
+    /* SCMI protocol module to SCMI module API */
+    const struct mod_scmi_from_protocol_api *scmi_api;
+
+    /* Sensor module API */
+    const struct mod_sensor_api *sensor_api;
+
+    /* Pointer to a table of sensor operations */
+    struct sensor_operations *sensor_ops_table;
 };
 
 static int scmi_sensor_protocol_version_handler(fwk_id_t service_id,
@@ -81,14 +96,29 @@ static unsigned int payload_size_table[] = {
  * Static helper for responding to SCMI.
  */
 static void scmi_sensor_respond(
-    struct scmi_sensor_protocol_reading_get_p2a *return_values)
+    struct scmi_sensor_protocol_reading_get_p2a *return_values,
+    fwk_id_t sensor_id)
 {
-    scmi_sensor_ctx.scmi_api->respond(scmi_sensor_ctx.service_id,
+    unsigned int sensor_idx;
+    fwk_id_t service_id;
+
+    /*
+     * The service identifier used for the response is retrieved from the
+     * sensor operations table.
+     */
+    sensor_idx = fwk_id_get_element_idx(sensor_id);
+    service_id = scmi_sensor_ctx.sensor_ops_table[sensor_idx].service_id;
+
+    scmi_sensor_ctx.scmi_api->respond(service_id,
         return_values,
         (return_values->status == SCMI_SUCCESS) ?
         sizeof(*return_values) : sizeof(return_values->status));
 
-    scmi_sensor_ctx.request_pending = false;
+    /*
+     * Set the service identifier to 'none' to indicate the sensor is
+     * available again.
+     */
+    scmi_sensor_ctx.sensor_ops_table[sensor_idx].service_id = FWK_ID_NONE;
 }
 
 /*
@@ -299,6 +329,7 @@ static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
     const struct scmi_sensor_protocol_reading_get_a2p *parameters;
     struct scmi_sensor_protocol_reading_get_p2a return_values;
     struct scmi_sensor_event_parameters *params;
+    unsigned int sensor_idx;
     uint32_t flags;
     int status;
 
@@ -320,7 +351,12 @@ static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    if (scmi_sensor_ctx.request_pending) {
+    sensor_idx = parameters->sensor_id;
+
+    /* Check if there is already a request pending for this sensor */
+    if (!fwk_id_is_equal(
+            scmi_sensor_ctx.sensor_ops_table[sensor_idx].service_id,
+            FWK_ID_NONE)){
         return_values.status = SCMI_BUSY;
         status = FWK_SUCCESS;
 
@@ -335,7 +371,7 @@ static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
 
     params = (struct scmi_sensor_event_parameters *)event.params;
     params->sensor_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR,
-                                       parameters->sensor_id);
+                                       sensor_idx);
 
     status = fwk_thread_put_event(&event);
     if (status != FWK_SUCCESS) {
@@ -344,8 +380,8 @@ static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    scmi_sensor_ctx.request_pending = true;
-    scmi_sensor_ctx.service_id = service_id;
+    /* Store service identifier to indicate there is a pending request */
+    scmi_sensor_ctx.sensor_ops_table[sensor_idx].service_id = service_id;
 
     return FWK_SUCCESS;
 
@@ -439,6 +475,17 @@ static int scmi_sensor_init(fwk_id_t module_id,
     if (scmi_sensor_ctx.sensor_count > UINT16_MAX)
         scmi_sensor_ctx.sensor_count = UINT16_MAX;
 
+    /* Allocate a table for the sensors state */
+    scmi_sensor_ctx.sensor_ops_table =
+        fwk_mm_calloc(scmi_sensor_ctx.sensor_count,
+        sizeof(struct sensor_operations));
+    if (scmi_sensor_ctx.sensor_ops_table == NULL)
+        return FWK_E_NOMEM;
+
+    /* Initialize the service identifier for each sensor to 'available' */
+    for (unsigned int i = 0; i < scmi_sensor_ctx.sensor_count; i++)
+        scmi_sensor_ctx.sensor_ops_table[i].service_id = FWK_ID_NONE;
+
     return FWK_SUCCESS;
 }
 
@@ -506,7 +553,7 @@ static int scmi_sensor_process_event(const struct fwk_event *event,
                 .sensor_value_high = (uint32_t)(sensor_value >> 32),
             };
 
-            scmi_sensor_respond(&return_values);
+            scmi_sensor_respond(&return_values, params->sensor_id);
 
             return status;
         } else if (status == FWK_PENDING) {
@@ -517,7 +564,7 @@ static int scmi_sensor_process_event(const struct fwk_event *event,
                 .status = SCMI_HARDWARE_ERROR,
             };
 
-            scmi_sensor_respond(&return_values);
+            scmi_sensor_respond(&return_values, params->sensor_id);
 
             return FWK_E_PANIC;
         }
@@ -534,7 +581,7 @@ static int scmi_sensor_process_event(const struct fwk_event *event,
             .sensor_value_high = (uint32_t)(params->value >> 32),
         };
 
-        scmi_sensor_respond(&return_values);
+        scmi_sensor_respond(&return_values, event->source_id);
     }
 
     return FWK_SUCCESS;
