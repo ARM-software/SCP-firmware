@@ -21,6 +21,7 @@ BS_FIRMWARE_MODULES := \
     clock \
     juno_cdcel937 \
     juno_hdlcd \
+    dvfs \
     gtimer \
     timer \
     juno_ddr_phy400 \
@@ -34,6 +35,7 @@ BS_FIRMWARE_MODULES := \
     smt \
     scmi \
     scmi_clock \
+    scmi_perf \
     scmi_power_domain \
     scmi_system_power \
     sds \
@@ -52,6 +54,7 @@ BS_FIRMWARE_SOURCES := \
     config_log.c \
     config_juno_soc_clock_ram.c \
     config_clock.c \
+    config_dvfs.c \
     config_juno_cdcel937.c \
     config_juno_hdlcd.c \
     juno_id.c \
@@ -66,6 +69,7 @@ BS_FIRMWARE_SOURCES := \
     config_smt.c \
     config_scmi.c \
     config_scmi_clock.c \
+    config_scmi_perf.c \
     config_scmi_system_power.c \
     config_i2c.c \
     config_juno_adc.c \
