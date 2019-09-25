@@ -58,6 +58,16 @@ struct n1sdp_bl33_info {
     uint32_t bl33_size;
 };
 
+/* MultiChip information */
+struct n1sdp_multichip_info {
+    /* If multichip mode */
+    bool mode;
+    /* Total number of slave chips  */
+    uint8_t slave_count;
+    /* Remote ddr size in GB */
+    uint8_t remote_ddr_size;
+};
+
 /* Coresight counter register definitions */
 struct cs_cnt_ctrl_reg {
     FWK_RW uint32_t CS_CNTCR;
@@ -91,6 +101,10 @@ static fwk_id_t sds_ddr_mem_info_id =
 static struct n1sdp_bl33_info sds_bl33_info;
 static fwk_id_t sds_bl33_info_id =
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, SDS_ELEMENT_IDX_BL33_INFO);
+
+static struct n1sdp_multichip_info sds_multichip_info;
+static fwk_id_t sds_multichip_info_id =
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, SDS_ELEMENT_IDX_MULTICHIP_INFO);
 
 /* Module context */
 struct n1sdp_system_ctx {
@@ -306,6 +320,22 @@ static int n1sdp_system_fill_bl33_info(void)
         0, (void *)(&sds_bl33_info), sds_structure_desc->size);
 }
 
+static int n1sdp_system_fill_multichip_info(void)
+{
+    const struct mod_sds_structure_desc *sds_structure_desc =
+        fwk_module_get_data(sds_multichip_info_id);
+
+    /*
+     * TODO: Add mechanism to update multichip information provided
+     * by I2C/C2C module.
+     */
+    sds_multichip_info.mode = false;
+    sds_multichip_info.slave_count = 0;
+    sds_multichip_info.remote_ddr_size = 0;
+    return n1sdp_system_ctx.sds_api->struct_write(sds_structure_desc->id,
+        0, (void *)(&sds_multichip_info), sds_structure_desc->size);
+}
+
 /*
  * Initialize primary core during system initialization
  */
@@ -376,6 +406,16 @@ static int n1sdp_system_init_primary_core(void)
     status = n1sdp_system_fill_bl33_info();
     if (status != FWK_SUCCESS)
         return status;
+
+    /* Fill multichip mode information structure */
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[N1SDP SYSTEM] Filling Multichip information...");
+    status = n1sdp_system_fill_multichip_info();
+    if (status != FWK_SUCCESS) {
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Failed\n");
+        return status;
+    }
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
 
     mod_pd_restricted_api = n1sdp_system_ctx.mod_pd_restricted_api;
 
