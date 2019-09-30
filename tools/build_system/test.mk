@@ -26,8 +26,8 @@ CFLAGS += -Wno-strict-aliasing
 CFLAGS += -std=c11
 CFLAGS += $(addprefix -I,$(INCLUDES))
 
-DEFINES += BUILD_MODE_DEBUG
-DEFINES += BUILD_TESTS
+CFLAGS += -DBUILD_MODE_DEBUG
+CFLAGS += -DBUILD_TESTS
 
 # Search path for C sources
 VPATH := $(FWK_DIR)/test:$(FWK_DIR)/src
@@ -36,7 +36,7 @@ VPATH := $(FWK_DIR)/test:$(FWK_DIR)/src
 TEST_DIR := $(BUILD_DIR)/test
 
 # Create list of test targets
-TEST_TARGETS = $(addprefix $(TEST_DIR)/, $(TESTS))
+TEST_TARGETS = $(foreach test,$(TESTS),$(addprefix $(TEST_DIR)/$(test)/,$(test)))
 
 # Import utilities
 include $(BS_DIR)/defs.mk
@@ -44,10 +44,14 @@ include $(BS_DIR)/defs.mk
 # Template for the test rule
 define TEST_template
 $(1)_LDFLAGS := $(addprefix -Wl$(comma)-wrap=, $($(1)_WRAP))
-$(1)_OBJ := $(patsubst %.c, $(TEST_DIR)/%.o, $(COMMON_SRC) $($(1)_SRC))
+$(1)_OBJ := $(patsubst %.c, $(TEST_DIR)/$(1)/%.o, $(COMMON_SRC) $($(1)_SRC) $(1).c)
 
-.PRECIOUS: $(TEST_DIR)/$(1)
-$(TEST_DIR)/$(1): $$($(1)_OBJ) | $(TEST_DIR)
+$(TEST_DIR)/$(1)/%.o: %.c | $(TEST_DIR)/$(1)/
+	$$(call show-action,CC,$$@)
+	$$(CC) $$(CFLAGS) $$($(1)_CFLAGS) $$^ -c -o $$@
+
+.PRECIOUS: $(TEST_DIR)/$(1)/$(1)
+$(TEST_DIR)/$(1)/$(1): $$($(1)_OBJ) | $(TEST_DIR)/$(1)/
 	$$(call show-action,LD,$$@)
 	$$(CC) -o $$@ $$^ $$($(1)_LDFLAGS)
 	$$(call show-action,RUN,$$@)
@@ -60,13 +64,7 @@ $(foreach test,$(TESTS),$(eval $(call TEST_template,$(test))))
 all: $(TEST_TARGETS)
 
 # Create output directory
-$(TEST_DIR):
+$(TEST_DIR)/%/:
 	$(call show-action,MD,$@)
 	$(MD) $@
-
-# Build C files
-$(TEST_DIR)/%.o: %.c | $(TEST_DIR)
-	$(call show-action,CC,$@)
-	$(CC) $(CFLAGS) $^ -c -o $@
-
 endif

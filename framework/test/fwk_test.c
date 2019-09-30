@@ -17,6 +17,9 @@ extern struct fwk_test_suite_desc test_suite;
 
 static jmp_buf test_buf_context;
 
+__attribute((weak)) struct fwk_module *module_table[1];
+__attribute((weak)) struct fwk_module_config *module_config_table[1];
+
 noreturn void __assert_fail(const char *assertion,
     const char *file, unsigned int line, const char *function)
 {

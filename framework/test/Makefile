@@ -6,172 +6,211 @@
 #
 
 include $(BS_DIR)/defs.mk
-CFLAGS += $(addprefix -D,$(DEFINES)) -DBUILD_HAS_NOTIFICATION
 
-#
-# List of test c and dependencies
-#
-
-COMMON_SRC := fwk_assert.c fwk_interrupt.c
-
-TESTS += test_fwk_macros
-test_fwk_macros_SRC := test_fwk_macros.c fwk_test.c
-
-TESTS += test_fwk_list_get
-test_fwk_list_get_SRC := test_fwk_list_get.c fwk_test.c fwk_dlist.c \
-    fwk_slist.c
-
-TESTS += test_fwk_list_init
-test_fwk_list_init_SRC := test_fwk_list_init.c fwk_test.c fwk_dlist.c \
-	fwk_slist.c
-
-TESTS += test_fwk_list_head
-test_fwk_list_head_SRC := test_fwk_list_head.c fwk_test.c fwk_dlist.c \
-    fwk_slist.c
-
-TESTS += test_fwk_list_push
-test_fwk_list_push_SRC := test_fwk_list_push.c fwk_test.c fwk_dlist.c \
-    fwk_slist.c
-
-TESTS += test_fwk_list_pop
-test_fwk_list_pop_SRC := test_fwk_list_pop.c fwk_test.c fwk_dlist.c \
-    fwk_slist.c
-
-TESTS += test_fwk_list_next
-test_fwk_list_next_SRC := test_fwk_list_next.c fwk_test.c fwk_dlist.c \
-    fwk_slist.c
-
-TESTS += test_fwk_list_remove
-test_fwk_list_remove_SRC := test_fwk_list_remove.c fwk_test.c fwk_dlist.c \
-    fwk_slist.c
-
-TESTS += test_fwk_list_empty
-test_fwk_list_empty_SRC := test_fwk_list_empty.c fwk_test.c fwk_dlist.c \
-    fwk_slist.c
-
-TESTS += test_fwk_list_insert
-test_fwk_list_insert_SRC := test_fwk_list_insert.c fwk_test.c \
-    fwk_dlist.c fwk_slist.c
-
-TESTS += test_fwk_list_contains
-test_fwk_list_contains_SRC := test_fwk_list_contains.c fwk_test.c \
-    fwk_dlist.c fwk_slist.c
-
-TESTS += test_fwk_mm
-test_fwk_mm_SRC := test_fwk_mm.c fwk_mm.c fwk_test.c
-
-TESTS += test_fwk_arch
-test_fwk_arch_SRC := test_fwk_arch.c fwk_arch.c fwk_test.c
-test_fwk_arch_WRAP := fwk_interrupt_init
-
-TESTS += test_fwk_interrupt
-test_fwk_interrupt_SRC := test_fwk_interrupt.c fwk_test.c
-
-TESTS += test_version
-test_version_SRC := test_version.c fwk_test.c
-
+TESTS := test_fwk_arch
 TESTS += test_fwk_id_build
-test_fwk_id_build_SRC := test_fwk_id_build.c fwk_test.c fwk_id.c
-
-TESTS += test_fwk_id_type
-test_fwk_id_type_SRC := test_fwk_id_type.c fwk_test.c fwk_id.c
-
-TESTS += test_fwk_id_format
-test_fwk_id_format_SRC := test_fwk_id_format.c fwk_test.c fwk_id.c
-
-TESTS += test_fwk_id_get_idx
-test_fwk_id_get_idx_SRC := test_fwk_id_get_idx.c fwk_test.c fwk_id.c
-
 TESTS += test_fwk_id_equality
-test_fwk_id_equality_SRC := test_fwk_id_equality.c fwk_test.c fwk_id.c
-
-TESTS += test_fwk_module
-test_fwk_module_SRC := test_fwk_module.c fwk_module.c fwk_test.c fwk_id.c \
-    fwk_slist.c fwk_dlist.c
-test_fwk_module_WRAP := fwk_mm_calloc __fwk_thread_init __fwk_thread_run \
-__fwk_notification_init
-
-TESTS += test_fwk_thread
-test_fwk_thread_SRC := test_fwk_thread.c fwk_thread.c fwk_test.c fwk_slist.c \
-    fwk_id.c fwk_thread_delayed_resp.c
-test_fwk_thread_WRAP := fwk_mm_calloc fwk_module_is_valid_entity_id \
-    fwk_module_is_valid_event_id __fwk_slist_push_tail __fwk_module_get_ctx \
-    fwk_interrupt_global_enable fwk_interrupt_global_disable \
-    fwk_interrupt_get_current fwk_module_is_valid_notification_id \
-    __fwk_module_get_element_ctx
-
-TESTS += test_fwk_notification
-test_fwk_notification_SRC := test_fwk_notification.c fwk_notification.c \
-    fwk_test.c fwk_dlist.c fwk_slist.c fwk_id.c
-test_fwk_notification_WRAP := fwk_mm_calloc fwk_module_is_valid_entity_id \
-    fwk_module_is_valid_notification_id __fwk_module_get_ctx \
-    __fwk_module_get_element_ctx fwk_interrupt_global_enable \
-    fwk_interrupt_global_disable fwk_interrupt_get_current \
-    __fwk_thread_put_notification __fwk_thread_get_current_event
-
-# Multi-thread tests
-TESTS += test_fwk_multi_thread_init
-test_fwk_multi_thread_init_SRC := test_fwk_multi_thread_init.c \
-    fwk_multi_thread.c fwk_test.c fwk_slist.c fwk_id.c fwk_thread_delayed_resp.c
-test_fwk_multi_thread_init_WRAP := fwk_mm_calloc fwk_interrupt_get_current \
-    osThreadFlagsWait osThreadFlagsSet osThreadNew __fwk_module_get_ctx \
-    fwk_interrupt_global_disable fwk_interrupt_global_enable \
-    fwk_module_is_valid_element_id __fwk_module_get_element_ctx \
-    __fwk_module_get_element_ctx  __fwk_module_get_state \
-    fwk_module_is_valid_module_id osKernelStart osKernelInitialize \
-    fwk_module_is_valid_entity_id fwk_module_is_valid_event_id \
-    fwk_module_is_valid_notification_id
-
-TESTS += test_fwk_multi_thread_create
-test_fwk_multi_thread_create_SRC := test_fwk_multi_thread_create.c \
-    fwk_multi_thread.c fwk_test.c fwk_slist.c fwk_id.c fwk_thread_delayed_resp.c
-test_fwk_multi_thread_create_WRAP := fwk_mm_calloc fwk_interrupt_get_current \
-    osThreadFlagsWait osThreadFlagsSet osThreadNew __fwk_module_get_ctx \
-    fwk_interrupt_global_disable fwk_interrupt_global_enable \
-    fwk_module_is_valid_element_id __fwk_module_get_element_ctx \
-    __fwk_module_get_element_ctx __fwk_module_get_state \
-    fwk_module_is_valid_module_id osKernelStart osKernelInitialize \
-    fwk_module_is_valid_entity_id fwk_module_is_valid_event_id \
-    fwk_module_is_valid_notification_id
-
-TESTS += test_fwk_multi_thread_common_thread
-test_fwk_multi_thread_common_thread_SRC := fwk_multi_thread.c fwk_test.c \
-    test_fwk_multi_thread_common_thread.c fwk_slist.c fwk_id.c \
-    fwk_thread_delayed_resp.c
-test_fwk_multi_thread_common_thread_WRAP := fwk_mm_calloc \
-    osThreadFlagsWait osThreadFlagsSet osThreadNew __fwk_module_get_ctx \
-    fwk_interrupt_global_disable fwk_interrupt_global_enable \
-    fwk_module_is_valid_element_id __fwk_module_get_element_ctx \
-    __fwk_module_get_state fwk_module_is_valid_module_id osKernelStart \
-    osKernelInitialize fwk_module_is_valid_entity_id \
-    fwk_module_is_valid_event_id fwk_module_is_valid_notification_id \
-    fwk_interrupt_get_current
-
-TESTS += test_fwk_multi_thread_put_event
-test_fwk_multi_thread_put_event_SRC := test_fwk_multi_thread_put_event.c \
-    fwk_multi_thread.c fwk_test.c fwk_slist.c fwk_id.c fwk_thread_delayed_resp.c
-test_fwk_multi_thread_put_event_WRAP := fwk_mm_calloc __fwk_module_get_state \
-    fwk_interrupt_get_current osThreadFlagsWait osThreadFlagsSet osThreadNew \
-    fwk_interrupt_global_disable fwk_interrupt_global_enable \
-    fwk_module_is_valid_element_id __fwk_module_get_element_ctx \
-    __fwk_module_get_element_ctx __fwk_module_get_ctx \
-    fwk_module_is_valid_module_id osKernelStart osKernelInitialize \
-    fwk_module_is_valid_entity_id fwk_module_is_valid_event_id \
-    fwk_module_is_valid_notification_id
-
-TESTS += test_fwk_multi_thread_util
-test_fwk_multi_thread_util_SRC := test_fwk_multi_thread_util.c \
-    fwk_multi_thread.c fwk_test.c fwk_slist.c fwk_id.c fwk_thread_delayed_resp.c
-test_fwk_multi_thread_util_WRAP := fwk_mm_calloc __fwk_module_get_state \
-    fwk_interrupt_get_current osThreadFlagsWait osThreadFlagsSet osThreadNew \
-    fwk_interrupt_global_disable fwk_interrupt_global_enable \
-    fwk_module_is_valid_element_id __fwk_module_get_element_ctx \
-    __fwk_module_get_element_ctx __fwk_module_get_ctx \
-    fwk_module_is_valid_module_id osKernelStart osKernelInitialize \
-    fwk_module_is_valid_entity_id fwk_module_is_valid_event_id \
-    fwk_module_is_valid_notification_id
-
+TESTS += test_fwk_id_format
+TESTS += test_fwk_id_get_idx
+TESTS += test_fwk_id_type
+TESTS += test_fwk_interrupt
+TESTS += test_fwk_list_contains
+TESTS += test_fwk_list_empty
+TESTS += test_fwk_list_get
+TESTS += test_fwk_list_head
+TESTS += test_fwk_list_init
+TESTS += test_fwk_list_insert
+TESTS += test_fwk_list_next
+TESTS += test_fwk_list_pop
+TESTS += test_fwk_list_push
+TESTS += test_fwk_list_remove
+TESTS += test_fwk_macros
 TESTS += test_fwk_math
-test_fwk_math_SRC := test_fwk_math.c fwk_test.c
+TESTS += test_fwk_mm
+TESTS += test_fwk_module
+TESTS += test_fwk_multi_thread_common_thread
+TESTS += test_fwk_multi_thread_create
+TESTS += test_fwk_multi_thread_init
+TESTS += test_fwk_multi_thread_put_event
+TESTS += test_fwk_multi_thread_util
+TESTS += test_fwk_notification
+TESTS += test_fwk_thread
+
+COMMON_SRC := fwk_arch.c
+COMMON_SRC += fwk_assert.c
+COMMON_SRC += fwk_dlist.c
+COMMON_SRC += fwk_id.c
+COMMON_SRC += fwk_interrupt.c
+COMMON_SRC += fwk_mm.c
+COMMON_SRC += fwk_module.c
+COMMON_SRC += fwk_slist.c
+COMMON_SRC += fwk_test.c
+COMMON_SRC += fwk_thread_delayed_resp.c
+
+test_fwk_arch_SRC += fwk_thread.c
+test_fwk_id_build_SRC += fwk_thread.c
+test_fwk_id_equality_SRC += fwk_thread.c
+test_fwk_id_format_SRC += fwk_thread.c
+test_fwk_id_get_idx_SRC += fwk_thread.c
+test_fwk_id_type_SRC += fwk_thread.c
+test_fwk_interrupt_SRC += fwk_thread.c
+test_fwk_list_contains_SRC += fwk_thread.c
+test_fwk_list_empty_SRC += fwk_thread.c
+test_fwk_list_get_SRC += fwk_thread.c
+test_fwk_list_head_SRC += fwk_thread.c
+test_fwk_list_init_SRC += fwk_thread.c
+test_fwk_list_insert_SRC += fwk_thread.c
+test_fwk_list_next_SRC += fwk_thread.c
+test_fwk_list_pop_SRC += fwk_thread.c
+test_fwk_list_push_SRC += fwk_thread.c
+test_fwk_list_remove_SRC += fwk_thread.c
+test_fwk_macros_SRC += fwk_thread.c
+test_fwk_math_SRC += fwk_thread.c
+test_fwk_mm_SRC += fwk_thread.c
+test_fwk_module_SRC += fwk_thread.c
+test_fwk_multi_thread_common_thread_SRC += fwk_multi_thread.c
+test_fwk_multi_thread_create_SRC += fwk_multi_thread.c
+test_fwk_multi_thread_init_SRC += fwk_multi_thread.c
+test_fwk_multi_thread_put_event_SRC += fwk_multi_thread.c
+test_fwk_multi_thread_util_SRC += fwk_multi_thread.c
+test_fwk_notification_SRC += fwk_thread.c
+test_fwk_thread_SRC += fwk_thread.c
+
+test_fwk_module_SRC += fwk_notification.c
+test_fwk_notification_SRC += fwk_notification.c
+test_fwk_thread_SRC += fwk_notification.c
+
+test_fwk_module_CFLAGS += -DBUILD_HAS_NOTIFICATION
+test_fwk_notification_CFLAGS += -DBUILD_HAS_NOTIFICATION
+test_fwk_thread_CFLAGS += -DBUILD_HAS_NOTIFICATION
+
+test_fwk_arch_WRAP := __fwk_module_init
+test_fwk_arch_WRAP += fwk_interrupt_init
+test_fwk_arch_WRAP += fwk_mm_init
+
+test_fwk_module_WRAP := __fwk_notification_init
+test_fwk_module_WRAP += __fwk_thread_init
+test_fwk_module_WRAP += __fwk_thread_run
+test_fwk_module_WRAP += fwk_mm_calloc
+
+test_fwk_thread_WRAP := __fwk_module_get_ctx
+test_fwk_thread_WRAP += __fwk_module_get_element_ctx
+test_fwk_thread_WRAP += __fwk_slist_push_tail
+test_fwk_thread_WRAP += fwk_interrupt_get_current
+test_fwk_thread_WRAP += fwk_interrupt_global_disable
+test_fwk_thread_WRAP += fwk_interrupt_global_enable
+test_fwk_thread_WRAP += fwk_mm_calloc
+test_fwk_thread_WRAP += fwk_module_is_valid_entity_id
+test_fwk_thread_WRAP += fwk_module_is_valid_event_id
+test_fwk_thread_WRAP += fwk_module_is_valid_notification_id
+
+test_fwk_notification_WRAP := __fwk_module_get_ctx
+test_fwk_notification_WRAP += __fwk_module_get_element_ctx
+test_fwk_notification_WRAP += __fwk_thread_get_current_event
+test_fwk_notification_WRAP += __fwk_thread_put_notification
+test_fwk_notification_WRAP += fwk_interrupt_get_current
+test_fwk_notification_WRAP += fwk_interrupt_global_disable
+test_fwk_notification_WRAP += fwk_interrupt_global_enable
+test_fwk_notification_WRAP += fwk_mm_calloc
+test_fwk_notification_WRAP += fwk_module_is_valid_entity_id
+test_fwk_notification_WRAP += fwk_module_is_valid_notification_id
+
+test_fwk_multi_thread_init_WRAP := __fwk_module_get_ctx
+test_fwk_multi_thread_init_WRAP += __fwk_module_get_element_ctx
+test_fwk_multi_thread_init_WRAP += __fwk_module_get_element_ctx
+test_fwk_multi_thread_init_WRAP += __fwk_module_get_state
+test_fwk_multi_thread_init_WRAP += fwk_interrupt_get_current
+test_fwk_multi_thread_init_WRAP += fwk_interrupt_global_disable
+test_fwk_multi_thread_init_WRAP += fwk_interrupt_global_enable
+test_fwk_multi_thread_init_WRAP += fwk_mm_calloc
+test_fwk_multi_thread_init_WRAP += fwk_module_is_valid_element_id
+test_fwk_multi_thread_init_WRAP += fwk_module_is_valid_entity_id
+test_fwk_multi_thread_init_WRAP += fwk_module_is_valid_event_id
+test_fwk_multi_thread_init_WRAP += fwk_module_is_valid_module_id
+test_fwk_multi_thread_init_WRAP += fwk_module_is_valid_notification_id
+test_fwk_multi_thread_init_WRAP += osKernelInitialize
+test_fwk_multi_thread_init_WRAP += osKernelStart
+test_fwk_multi_thread_init_WRAP += osThreadFlagsSet
+test_fwk_multi_thread_init_WRAP += osThreadFlagsWait
+test_fwk_multi_thread_init_WRAP += osThreadNew
+
+test_fwk_multi_thread_create_WRAP := __fwk_module_get_ctx
+test_fwk_multi_thread_create_WRAP += __fwk_module_get_element_ctx
+test_fwk_multi_thread_create_WRAP += __fwk_module_get_element_ctx
+test_fwk_multi_thread_create_WRAP += __fwk_module_get_state
+test_fwk_multi_thread_create_WRAP += fwk_interrupt_get_current
+test_fwk_multi_thread_create_WRAP += fwk_interrupt_global_disable
+test_fwk_multi_thread_create_WRAP += fwk_interrupt_global_enable
+test_fwk_multi_thread_create_WRAP += fwk_mm_calloc
+test_fwk_multi_thread_create_WRAP += fwk_module_is_valid_element_id
+test_fwk_multi_thread_create_WRAP += fwk_module_is_valid_entity_id
+test_fwk_multi_thread_create_WRAP += fwk_module_is_valid_event_id
+test_fwk_multi_thread_create_WRAP += fwk_module_is_valid_module_id
+test_fwk_multi_thread_create_WRAP += fwk_module_is_valid_notification_id
+test_fwk_multi_thread_create_WRAP += osKernelInitialize
+test_fwk_multi_thread_create_WRAP += osKernelStart
+test_fwk_multi_thread_create_WRAP += osThreadFlagsSet
+test_fwk_multi_thread_create_WRAP += osThreadFlagsWait
+test_fwk_multi_thread_create_WRAP += osThreadNew
+
+test_fwk_multi_thread_common_thread_WRAP := __fwk_module_get_ctx
+test_fwk_multi_thread_common_thread_WRAP += __fwk_module_get_element_ctx
+test_fwk_multi_thread_common_thread_WRAP += __fwk_module_get_state
+test_fwk_multi_thread_common_thread_WRAP += fwk_interrupt_get_current
+test_fwk_multi_thread_common_thread_WRAP += fwk_interrupt_global_disable
+test_fwk_multi_thread_common_thread_WRAP += fwk_interrupt_global_enable
+test_fwk_multi_thread_common_thread_WRAP += fwk_mm_calloc
+test_fwk_multi_thread_common_thread_WRAP += fwk_module_is_valid_element_id
+test_fwk_multi_thread_common_thread_WRAP += fwk_module_is_valid_entity_id
+test_fwk_multi_thread_common_thread_WRAP += fwk_module_is_valid_event_id
+test_fwk_multi_thread_common_thread_WRAP += fwk_module_is_valid_module_id
+test_fwk_multi_thread_common_thread_WRAP += fwk_module_is_valid_notification_id
+test_fwk_multi_thread_common_thread_WRAP += osKernelInitialize
+test_fwk_multi_thread_common_thread_WRAP += osKernelStart
+test_fwk_multi_thread_common_thread_WRAP += osThreadFlagsSet
+test_fwk_multi_thread_common_thread_WRAP += osThreadFlagsWait
+test_fwk_multi_thread_common_thread_WRAP += osThreadNew
+
+test_fwk_multi_thread_put_event_WRAP := __fwk_module_get_ctx
+test_fwk_multi_thread_put_event_WRAP += __fwk_module_get_element_ctx
+test_fwk_multi_thread_put_event_WRAP += __fwk_module_get_element_ctx
+test_fwk_multi_thread_put_event_WRAP += __fwk_module_get_state
+test_fwk_multi_thread_put_event_WRAP += fwk_interrupt_get_current
+test_fwk_multi_thread_put_event_WRAP += fwk_interrupt_global_disable
+test_fwk_multi_thread_put_event_WRAP += fwk_interrupt_global_enable
+test_fwk_multi_thread_put_event_WRAP += fwk_mm_calloc
+test_fwk_multi_thread_put_event_WRAP += fwk_module_is_valid_element_id
+test_fwk_multi_thread_put_event_WRAP += fwk_module_is_valid_entity_id
+test_fwk_multi_thread_put_event_WRAP += fwk_module_is_valid_event_id
+test_fwk_multi_thread_put_event_WRAP += fwk_module_is_valid_module_id
+test_fwk_multi_thread_put_event_WRAP += fwk_module_is_valid_notification_id
+test_fwk_multi_thread_put_event_WRAP += osKernelInitialize
+test_fwk_multi_thread_put_event_WRAP += osKernelStart
+test_fwk_multi_thread_put_event_WRAP += osThreadFlagsSet
+test_fwk_multi_thread_put_event_WRAP += osThreadFlagsWait
+test_fwk_multi_thread_put_event_WRAP += osThreadNew
+
+test_fwk_multi_thread_util_WRAP := __fwk_module_get_ctx
+test_fwk_multi_thread_util_WRAP += __fwk_module_get_element_ctx
+test_fwk_multi_thread_util_WRAP += __fwk_module_get_element_ctx
+test_fwk_multi_thread_util_WRAP += __fwk_module_get_state
+test_fwk_multi_thread_util_WRAP += fwk_interrupt_get_current
+test_fwk_multi_thread_util_WRAP += fwk_interrupt_global_disable
+test_fwk_multi_thread_util_WRAP += fwk_interrupt_global_enable
+test_fwk_multi_thread_util_WRAP += fwk_mm_calloc
+test_fwk_multi_thread_util_WRAP += fwk_module_is_valid_element_id
+test_fwk_multi_thread_util_WRAP += fwk_module_is_valid_entity_id
+test_fwk_multi_thread_util_WRAP += fwk_module_is_valid_event_id
+test_fwk_multi_thread_util_WRAP += fwk_module_is_valid_module_id
+test_fwk_multi_thread_util_WRAP += fwk_module_is_valid_notification_id
+test_fwk_multi_thread_util_WRAP += osKernelInitialize
+test_fwk_multi_thread_util_WRAP += osKernelStart
+test_fwk_multi_thread_util_WRAP += osThreadFlagsSet
+test_fwk_multi_thread_util_WRAP += osThreadFlagsWait
+test_fwk_multi_thread_util_WRAP += osThreadNew
+
+$(foreach test, $(TESTS), \
+    $(if $(filter fwk_multi_thread.c, $($(test)_SRC)), \
+		$(eval $(test)_CFLAGS += -DBUILD_HAS_MULTITHREADING)))
 
 include $(BS_DIR)/test.mk
