@@ -70,7 +70,7 @@ unsigned int get_child_node_id(void *node_base,
 bool is_child_external(void *node_base, unsigned int child_index)
 {
     struct node_header *node = node_base;
-    return !!(node->CHILD_POINTER[child_index] & (1 << 31));
+    return !!(node->CHILD_POINTER[child_index] & (UINT64_C(1) << 31));
 }
 
 uint64_t sam_encode_region_size(uint64_t size)
