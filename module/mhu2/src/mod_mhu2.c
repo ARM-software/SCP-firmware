@@ -195,7 +195,7 @@ static int mhu2_bind(fwk_id_t id, unsigned int round)
         channel_ctx = &ctx.channel_ctx_table[fwk_id_get_element_idx(id)];
 
         for (slot = 0; slot < MHU_SLOT_COUNT_MAX; slot++) {
-            if (!(channel_ctx->bound_slots & (1 << slot)))
+            if (!(channel_ctx->bound_slots & (UINT32_C(1) << slot)))
                 continue;
 
             smt_channel = &channel_ctx->smt_channel_table[slot];
