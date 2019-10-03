@@ -732,7 +732,7 @@ static void test_put_event_and_wait_wait_flags_failed(void)
 
 static void test_put_event_and_wait_thread_ready_queue_not_empty(void)
 {
-    int status;
+    volatile int status = FWK_SUCCESS;
 
     ctx->running = true;
     ctx->event_cookie_counter = 11;
