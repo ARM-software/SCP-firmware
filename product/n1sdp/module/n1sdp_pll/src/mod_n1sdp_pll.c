@@ -108,11 +108,12 @@ result:
                             (1 << PLL_POSTDIV2_POS);
 
     /* Enable PLL settings */
-    *config->control_reg0 |= (1 << PLL_PLLEN_POS);
+    *config->control_reg0 |= (UINT32_C(1) << PLL_PLLEN_POS);
 
     wait_cycles = MOD_N1SDP_PLL_LOCK_TIMEOUT;
     /* Wait until the PLL has locked */
-    while ((*config->control_reg1 & (1 << PLL_LOCK_STATUS_POS)) == 0) {
+    while ((*config->control_reg1 &
+           (UINT32_C(1) << PLL_LOCK_STATUS_POS)) == 0) {
         wait_cycles--;
         if (wait_cycles == 0)
             return FWK_E_TIMEOUT;
