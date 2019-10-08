@@ -498,7 +498,7 @@ static int clock_process_pd_pre_transition_notification(
         ctx->pd_pre_power_transition_notification_cookie = event->cookie;
     }
 
-    return FWK_SUCCESS;
+    return status;
 }
 
 static int clock_process_pd_transition_notification(
@@ -535,7 +535,7 @@ static int clock_process_pd_transition_notification(
     status = fwk_notification_notify(
         &outbound_event, &(transition_notifications_sent));
 
-    return FWK_SUCCESS;
+    return status;
 }
 
 static int clock_process_notification_response(
