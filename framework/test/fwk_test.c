@@ -23,7 +23,7 @@ noreturn void __assert_fail(const char *assertion,
     printf("Assertion failed: %s\n", assertion);
     printf("    Function: %s\n", function);
     printf("    File: %-66s\n", file);
-    printf("    Line: %d\n", line);
+    printf("    Line: %u\n", line);
     longjmp(test_buf_context, !FWK_SUCCESS);
 }
 
