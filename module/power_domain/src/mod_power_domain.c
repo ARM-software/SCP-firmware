@@ -1016,10 +1016,12 @@ static void process_power_state_transition_report_deeper_state(
     struct pd_ctx *pd)
 {
     struct pd_ctx *parent = pd->parent;
-    unsigned int requested_state = parent->requested_state;
+    unsigned int requested_state;
 
     if (parent == NULL)
         return;
+
+    requested_state = parent->requested_state;
 
     if (parent->state_requested_to_driver == requested_state)
         return;
