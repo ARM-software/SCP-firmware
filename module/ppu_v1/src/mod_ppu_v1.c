@@ -157,7 +157,7 @@ static int ppu_v1_pd_set_state(fwk_id_t pd_id, unsigned int state)
         return FWK_E_PARAM;
     }
 
-    return FWK_SUCCESS;
+    return status;
 }
 
 static int ppu_v1_pd_get_state(fwk_id_t pd_id, unsigned int *state)
@@ -287,7 +287,7 @@ static int ppu_v1_core_pd_set_state(fwk_id_t core_pd_id, unsigned int state)
         return FWK_E_PARAM;
     }
 
-    return FWK_SUCCESS;
+    return status;
 }
 
 static int ppu_v1_core_pd_reset(fwk_id_t core_pd_id)
@@ -537,7 +537,7 @@ static int ppu_v1_cluster_pd_set_state(fwk_id_t cluster_pd_id,
         status = pd_ctx->pd_driver_input_api->report_power_state_transition(
             pd_ctx->bound_id, MOD_PD_STATE_OFF);
         assert(status == FWK_SUCCESS);
-        return FWK_SUCCESS;
+        return status;
 
     default:
         ppu_v1_ctx.log_api->log(MOD_LOG_GROUP_ERROR,
