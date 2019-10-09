@@ -132,7 +132,7 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
         return FWK_E_PARAM;
     }
 
-    return FWK_SUCCESS;
+    return status;
 }
 
 static int pd_get_state(fwk_id_t pd_id, unsigned int *state)
