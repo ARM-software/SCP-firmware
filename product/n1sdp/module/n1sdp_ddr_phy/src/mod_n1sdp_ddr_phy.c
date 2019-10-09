@@ -433,7 +433,7 @@ static int write_eye_detect_single_rank(fwk_id_t element_id,
     speed = info->speed;
     range = 1;
     tccd_l =
-        (speed == 800) ? 1 : (speed == 1200) ? 2 : (speed == 1333) ? 3 : 3;
+        (speed == 800) ? 1 : (speed == 1200) ? 2 : 3;
     direct_addr = (tccd_l << 10) | (1 << 7) | (range - 1) << 6;
     direct_cmd = ((1 << rank) << 16) | (0x6 << 8) | 1;
 
