@@ -48,8 +48,8 @@ static void test_list_insert_empty(void)
     assert(list.head == &node[0]);
     assert(list.tail == &node[0]);
 
-    assert(node[0].next = (struct fwk_dlist_node *)&list);
-    assert(node[0].prev = (struct fwk_dlist_node *)&list);
+    assert(node[0].next == (struct fwk_dlist_node *)&list);
+    assert(node[0].prev == (struct fwk_dlist_node *)&list);
 }
 
 static void test_list_insert_tail_implicit(void)
