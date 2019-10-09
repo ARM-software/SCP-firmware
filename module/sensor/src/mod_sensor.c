@@ -23,7 +23,6 @@ static int get_ctx_if_valid_call(fwk_id_t id,
 {
     int status;
 
-    fwk_assert(fwk_module_is_valid_element_id(id));
     fwk_assert(ctx != NULL);
 
     if (!fwk_expect(data != NULL))
@@ -108,13 +107,16 @@ static struct mod_sensor_api sensor_api = {
 static void reading_complete(fwk_id_t dev_id,
                              struct mod_sensor_driver_resp_params *response)
 {
-    int status;
+    int status = FWK_SUCCESS;
     struct fwk_event event;
     struct sensor_dev_ctx *ctx;
     struct mod_sensor_event_params *event_params =
         (struct mod_sensor_event_params *)event.params;
 
-    status = get_ctx_if_valid_call(dev_id, response, &ctx);
+    if (!fwk_expect(fwk_id_get_module_idx(dev_id) == FWK_MODULE_IDX_SENSOR))
+        return;
+
+    ctx = &ctx_table[fwk_id_get_element_idx(dev_id)];
 
     event = (struct fwk_event) {
         .id = mod_sensor_event_id_read_complete,
@@ -122,7 +124,7 @@ static void reading_complete(fwk_id_t dev_id,
         .target_id = dev_id,
     };
 
-    if (status == FWK_SUCCESS) {
+    if (response != NULL) {
         event_params->status = response->status;
         event_params->value = response->value;
     } else
