@@ -67,12 +67,26 @@
 #define PCIE_PHY_PLL_LOCK_TIMEOUT      UINT32_C(100)
 #define PCIE_CTRL_RC_RESET_TIMEOUT     UINT32_C(100)
 #define PCIE_LINK_TRAINING_TIMEOUT     UINT32_C(100000)
+#define PCIE_LINK_RE_TRAINING_TIMEOUT  UINT32_C(1000000)
 
 /* PCIe controller power on timeout (in microseconds) */
 #define PCIE_POWER_ON_TIMEOUT          UINT32_C(10)
 
 /* PCIe configuration space offset definitions */
 #define PCIE_CLASS_CODE_OFFSET         0x8
+#define PCIE_LINK_CTRL_STATUS_OFFSET   0xD0
+#define PCIE_LINK_CTRL_STATUS_2_OFFSET 0xF0
+
+/* PCIe configuration space link control status register definitions */
+#define PCIE_LINK_CTRL_LINK_RETRAIN_MASK    0x20
+#define PCIE_LINK_CTRL_NEG_SPEED_MASK       0xF
+#define PCIE_LINK_CTRL_NEG_WIDTH_MASK       0x3F
+#define PCIE_LINK_CTRL_NEG_SPEED_POS        16
+#define PCIE_LINK_CTRL_NEG_WIDTH_POS        20
+
+/* PCIe configuration space link control status register 2 definitions */
+#define PCIE_LINK_CTRL_2_TARGET_SPEED_MASK  0xF
+#define PCIE_LINK_CTRL_2_TARGET_SPEED_GEN4  0x4
 
 /* PCIe class code for PCI bridge */
 #define PCIE_CLASS_CODE_PCI_BRIDGE     UINT32_C(0x06040000)
@@ -251,7 +265,7 @@
 #define GEN3_PRESET                    0x8
 
 #define GEN4_OFFSET_MIN                0x9E0
-#define GEN4_OFFSET_MAX                0x9EC
+#define GEN4_OFFSET_MAX                0x9F0
 #define GEN4_PRESET                    0x4
 
 /*
@@ -400,6 +414,9 @@ enum pcie_init_stage {
     /* Link training stage */
     PCIE_INIT_STAGE_LINK_TRNG,
 
+    /* Link re-training stage for GEN4 speed */
+    PCIE_INIT_STAGE_LINK_RE_TRNG,
+
     /* PCIe initialization stages */
     PCIE_INIT_STAGE_COUNT,
 };
@@ -485,6 +502,21 @@ int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
               struct mod_timer_api *timer_api,
               enum pcie_init_stage stage,
               enum pcie_gen gen);
+
+
+/*
+ * Brief - Function to re-train PCIe link to GEN4 speed.
+ *
+ * param - ctrl_apb - Pointer to APB controller register space
+ * param - rp_ep_config_base - Root port configuration space base address
+ * param - timer_api - Pointer to timer API used for timeout detection
+ *
+ * retval - FWK_SUCCESS - if the operation is succeeded
+ *          FWK_E_TIMEOUT - if initialization times out
+ */
+int pcie_link_retrain(struct pcie_ctrl_apb_reg *ctrl_apb,
+                      uint32_t rp_ep_config_base,
+                      struct mod_timer_api *timer_api);
 
 /*
  * Brief - Function to initialize PCIe PHY layer.
