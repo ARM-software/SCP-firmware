@@ -134,6 +134,7 @@ static int n1sdp_pcie_setup(struct n1sdp_pcie_dev_ctx *dev_ctx)
     struct pcie_wait_condition_data wait_data;
     int status;
     enum pcie_gen gen_speed;
+    uint32_t reg_val;
 
     gen_speed = dev_ctx->config->ccix_capable ? PCIE_GEN_4 : PCIE_GEN_3;
 
@@ -198,6 +199,8 @@ static int n1sdp_pcie_setup(struct n1sdp_pcie_dev_ctx *dev_ctx)
     }
     pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
 
+    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[PCIe] Setting TX preset for GEN%d...", gen_speed);
     status = pcie_set_gen_tx_preset(dev_ctx->rp_ep_config_apb,
                                     TX_PRESET_VALUE,
                                     gen_speed);
@@ -229,6 +232,43 @@ static int n1sdp_pcie_setup(struct n1sdp_pcie_dev_ctx *dev_ctx)
         RP_CONFIG_OUT_NEGOTIATED_LINK_WIDTH_POS;
     pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
         "[PCIe] Negotiated link width: x%d\n", fwk_math_pow2(neg_config));
+
+
+    if (dev_ctx->config->ccix_capable) {
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[PCIe] Re-training link to GEN4 speed...");
+        /* Set GEN4 as target speed */
+        pcie_rp_ep_config_read_word(dev_ctx->rp_ep_config_apb,
+                                    PCIE_LINK_CTRL_STATUS_2_OFFSET, &reg_val);
+        reg_val &= ~PCIE_LINK_CTRL_2_TARGET_SPEED_MASK;
+        reg_val |= PCIE_LINK_CTRL_2_TARGET_SPEED_GEN4;
+        pcie_rp_ep_config_write_word(dev_ctx->rp_ep_config_apb,
+                                     PCIE_LINK_CTRL_STATUS_2_OFFSET, reg_val);
+
+        /* Start link retraining */
+        status = pcie_link_retrain(dev_ctx->ctrl_apb,
+                                   dev_ctx->rp_ep_config_apb,
+                                   pcie_ctx.timer_api);
+        if (status != FWK_SUCCESS) {
+            pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "TIMEOUT\n");
+            goto ctrl_plane_init;
+        }
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+
+        pcie_rp_ep_config_read_word(dev_ctx->rp_ep_config_apb,
+                                    PCIE_LINK_CTRL_STATUS_OFFSET, &reg_val);
+        neg_config = (reg_val >> PCIE_LINK_CTRL_NEG_SPEED_POS) &
+                     PCIE_LINK_CTRL_NEG_SPEED_MASK;
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[PCIe] Re-negotiated speed: GEN%d\n", neg_config);
+
+        neg_config = (reg_val >> PCIE_LINK_CTRL_NEG_WIDTH_POS) &
+                     PCIE_LINK_CTRL_NEG_WIDTH_MASK;
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[PCIe] Re-negotiated link width: x%d\n", neg_config);
+    }
+
+ctrl_plane_init:
 
     /* Root Complex setup */
     pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,

@@ -21,75 +21,244 @@ void pcie_phy_init(uint32_t phy_apb_base, enum pcie_gen gen)
 
     uint32_t j;
 
-    for (j = 0; j < 16; j++) {
-        *((unsigned int *)((j << 11) | 0x1000C | phy_apb_base)) = 0x0000E900;
-
-        switch (gen) {
-        case PCIE_GEN_1:
-            *((unsigned int *)((j << 11) | 0x10220 | phy_apb_base)) = 0x0343;
-            break;
-        case PCIE_GEN_2:
-            *((unsigned int *)((j << 11) | 0x1021C | phy_apb_base)) = 0x0342;
-            break;
-        case PCIE_GEN_3:
-            *((unsigned int *)((j << 11) | 0x10218 | phy_apb_base)) = 0x0381;
-            break;
-        case PCIE_GEN_4:
-            *((unsigned int *)((j << 11) | 0x10214 | phy_apb_base)) = 0x0180;
-            break;
-        default:
-            return;
-        }
-    }
-
     *((unsigned int *)(0x30038 | phy_apb_base)) = 0x00000013;
     *((unsigned int *)(0x0010C | phy_apb_base)) = 0x0000002D;
     *((unsigned int *)(0x00138 | phy_apb_base)) = 0x00001005;
     *((unsigned int *)(0x00260 | phy_apb_base)) = 0x00002100;
 
-    *((unsigned int *)(0x180EC | phy_apb_base)) = 0x00000055;
-
     for (j = 0; j < 16; j++) {
-        *((unsigned int *)((j << 11) | 0x10320 | phy_apb_base)) = 0x00000500;
-        *((unsigned int *)((j << 11) | 0x10328 | phy_apb_base)) = 0x0000A990;
-        *((unsigned int *)((j << 11) | 0x10540 | phy_apb_base)) = 0x00005008;
-        *((unsigned int *)((j << 11) | 0x10560 | phy_apb_base)) = 0x00007425;
-        *((unsigned int *)((j << 11) | 0x10580 | phy_apb_base)) = 0x000000AC;
-    }
+        *((unsigned int *)((j << 11) | 0x1000C | phy_apb_base)) = 0x00006910;
+        *((unsigned int *)((j << 11) | 0x100EC | phy_apb_base)) = 0x00000055;
 
-    for (j = 0; j < 16; j++) {
-        *((unsigned int *)((j << 11) | 0x10110 | phy_apb_base)) = 0x00000000;
-        *((unsigned int *)((j << 11) | 0x10258 | phy_apb_base)) = 0x00008000;
-        *((unsigned int *)((j << 11) | 0x10324 | phy_apb_base)) = 0x0000D664;
-        *((unsigned int *)((j << 11) | 0x101C4 | phy_apb_base)) = 0x00000002;
-        *((unsigned int *)((j << 11) | 0x10320 | phy_apb_base)) = 0x00000100;
-        *((unsigned int *)((j << 11) | 0x10328 | phy_apb_base)) = 0x00008190;
-        *((unsigned int *)((j << 11) | 0x10334 | phy_apb_base)) = 0x0000008A;
-        *((unsigned int *)((j << 11) | 0x1034C | phy_apb_base)) = 0x0000000A;
-        *((unsigned int *)((j << 11) | 0x1053C | phy_apb_base)) = 0x00005008;
-        *((unsigned int *)((j << 11) | 0x10540 | phy_apb_base)) = 0x00005008;
-        *((unsigned int *)((j << 11) | 0x10560 | phy_apb_base)) = 0x00003783;
-        *((unsigned int *)((j << 11) | 0x1060C | phy_apb_base)) = 0x00001002;
-        *((unsigned int *)((j << 11) | 0x10610 | phy_apb_base)) = 0x00002004;
-        *((unsigned int *)((j << 11) | 0x107BC | phy_apb_base)) = 0x00001002;
-        *((unsigned int *)((j << 11) | 0x107C0 | phy_apb_base)) = 0x00002004;
-    }
+        *((unsigned int *)((j << 11) | 0x100FC | phy_apb_base)) = 0x00003222;
+        *((unsigned int *)((j << 11) | 0x10214 | phy_apb_base)) = 0x00000180;
+        *((unsigned int *)((j << 11) | 0x10218 | phy_apb_base)) = 0x00000381;
+        *((unsigned int *)((j << 11) | 0x1021C | phy_apb_base)) = 0x00000342;
+        *((unsigned int *)((j << 11) | 0x10220 | phy_apb_base)) = 0x00000384;
 
-    for (j = 0; j < 16; j++) {
-        *((unsigned int *)((j << 11) | 0x1023C | phy_apb_base)) = 0x00008003;
-        *((unsigned int *)((j << 11) | 0x10340 | phy_apb_base)) = 0x00004A4A;
+        *((unsigned int *)((j << 11) | 0x1023C | phy_apb_base)) = 0x00000000;
+
         *((unsigned int *)((j << 11) | 0x10324 | phy_apb_base)) = 0x00005864;
         *((unsigned int *)((j << 11) | 0x10330 | phy_apb_base)) = 0x000001FF;
         *((unsigned int *)((j << 11) | 0x10334 | phy_apb_base)) = 0x0000000F;
         *((unsigned int *)((j << 11) | 0x10338 | phy_apb_base)) = 0x000000FF;
+        *((unsigned int *)((j << 11) | 0x10340 | phy_apb_base)) = 0x00004A4A;
         *((unsigned int *)((j << 11) | 0x10360 | phy_apb_base)) = 0x000068F8;
         *((unsigned int *)((j << 11) | 0x10368 | phy_apb_base)) = 0x000000F8;
         *((unsigned int *)((j << 11) | 0x10500 | phy_apb_base)) = 0x0000009B;
         *((unsigned int *)((j << 11) | 0x10504 | phy_apb_base)) = 0x0000C0C0;
         *((unsigned int *)((j << 11) | 0x10508 | phy_apb_base)) = 0x0000818F;
+
         *((unsigned int *)((j << 11) | 0x1053C | phy_apb_base)) = 0x00002401;
         *((unsigned int *)((j << 11) | 0x10540 | phy_apb_base)) = 0x00003C03;
         *((unsigned int *)((j << 11) | 0x10544 | phy_apb_base)) = 0x00000A0A;
+        *((unsigned int *)((j << 11) | 0x10588 | phy_apb_base)) = 0x00000012;
+
+        *((unsigned int *)((j << 11) | (0x40DF * 4) | phy_apb_base)) =
+            0x00000A92;
+        *((unsigned int *)((j << 11) | (0x40E4 * 4) | phy_apb_base)) =
+            0x00000020;
+        *((unsigned int *)((j << 11) | (0x40E5 * 4) | phy_apb_base)) =
+            0x00007C10;
+        *((unsigned int *)((j << 11) | (0x40E6 * 4) | phy_apb_base)) =
+            0x00000020;
+        *((unsigned int *)((j << 11) | (0x40E7 * 4) | phy_apb_base)) =
+            0x00007C10;
+        *((unsigned int *)((j << 11) | (0x40E8 * 4) | phy_apb_base)) =
+            0x00005300;
+        *((unsigned int *)((j << 11) | (0x40E9 * 4) | phy_apb_base)) =
+            0x00001C91;
+        *((unsigned int *)((j << 11) | (0x40EA * 4) | phy_apb_base)) =
+            0x00005300;
+        *((unsigned int *)((j << 11) | (0x40EB * 4) | phy_apb_base)) =
+            0x00002890;
+        *((unsigned int *)((j << 11) | (0x40EC * 4) | phy_apb_base)) =
+            0x00002300;
+        *((unsigned int *)((j << 11) | (0x40ED * 4) | phy_apb_base)) =
+            0x00001C91;
+        *((unsigned int *)((j << 11) | (0x40EE * 4) | phy_apb_base)) =
+            0x00002300;
+        *((unsigned int *)((j << 11) | (0x40EF * 4) | phy_apb_base)) =
+            0x00002890;
+        *((unsigned int *)((j << 11) | (0x40F0 * 4) | phy_apb_base)) =
+            0x00002280;
+        *((unsigned int *)((j << 11) | (0x40F1 * 4) | phy_apb_base)) =
+            0x00003EAE;
+        *((unsigned int *)((j << 11) | (0x40F2 * 4) | phy_apb_base)) =
+            0x00002200;
+        *((unsigned int *)((j << 11) | (0x40F3 * 4) | phy_apb_base)) =
+            0x0000489E;
+        *((unsigned int *)((j << 11) | (0x40F4 * 4) | phy_apb_base)) =
+            0x00002200;
+        *((unsigned int *)((j << 11) | (0x40F5 * 4) | phy_apb_base)) =
+            0x00004F73;
+        *((unsigned int *)((j << 11) | (0x40F6 * 4) | phy_apb_base)) =
+            0x00002200;
+        *((unsigned int *)((j << 11) | (0x40F7 * 4) | phy_apb_base)) =
+            0x00004C68;
+        *((unsigned int *)((j << 11) | (0x40F8 * 4) | phy_apb_base)) =
+            0x0000221C;
+        *((unsigned int *)((j << 11) | (0x40F9 * 4) | phy_apb_base)) =
+            0x00006A6F;
+        *((unsigned int *)((j << 11) | (0x40FA * 4) | phy_apb_base)) =
+            0x0000221C;
+        *((unsigned int *)((j << 11) | (0x40FB * 4) | phy_apb_base)) =
+            0x00006B6E;
+        *((unsigned int *)((j << 11) | (0x40FC * 4) | phy_apb_base)) =
+            0x0000221C;
+        *((unsigned int *)((j << 11) | (0x40FD * 4) | phy_apb_base)) =
+            0x00006831;
+        *((unsigned int *)((j << 11) | (0x40FE * 4) | phy_apb_base)) =
+            0x0000221C;
+        *((unsigned int *)((j << 11) | (0x40FF * 4) | phy_apb_base)) =
+            0x00006F34;
+        *((unsigned int *)((j << 11) | (0x4100 * 4) | phy_apb_base)) =
+            0x0000221C;
+        *((unsigned int *)((j << 11) | (0x4101 * 4) | phy_apb_base)) =
+            0x00007A34;
+        *((unsigned int *)((j << 11) | (0x4102 * 4) | phy_apb_base)) =
+            0x00002228;
+        *((unsigned int *)((j << 11) | (0x4103 * 4) | phy_apb_base)) =
+            0x00007B25;
+        *((unsigned int *)((j << 11) | (0x4104 * 4) | phy_apb_base)) =
+            0x0000222F;
+        *((unsigned int *)((j << 11) | (0x4105 * 4) | phy_apb_base)) =
+            0x00007E25;
+        *((unsigned int *)((j << 11) | (0x4106 * 4) | phy_apb_base)) =
+            0x0000222F;
+        *((unsigned int *)((j << 11) | (0x4107 * 4) | phy_apb_base)) =
+            0x00007F21;
+        *((unsigned int *)((j << 11) | (0x4108 * 4) | phy_apb_base)) =
+            0x0000222C;
+        *((unsigned int *)((j << 11) | (0x4109 * 4) | phy_apb_base)) =
+            0x00007C21;
+        *((unsigned int *)((j << 11) | (0x410A * 4) | phy_apb_base)) =
+            0x00002222;
+        *((unsigned int *)((j << 11) | (0x410B * 4) | phy_apb_base)) =
+            0x00007224;
+        *((unsigned int *)((j << 11) | (0x410C * 4) | phy_apb_base)) =
+            0x00002222;
+        *((unsigned int *)((j << 11) | (0x410D * 4) | phy_apb_base)) =
+            0x00008E3F;
+        *((unsigned int *)((j << 11) | (0x410E * 4) | phy_apb_base)) =
+            0x00002223;
+        *((unsigned int *)((j << 11) | (0x410F * 4) | phy_apb_base)) =
+            0x00009A3F;
+        *((unsigned int *)((j << 11) | (0x4110 * 4) | phy_apb_base)) =
+            0x00002220;
+        *((unsigned int *)((j << 11) | (0x4111 * 4) | phy_apb_base)) =
+            0x00008C2C;
+        *((unsigned int *)((j << 11) | (0x4112 * 4) | phy_apb_base)) =
+            0x00002220;
+        *((unsigned int *)((j << 11) | (0x4113 * 4) | phy_apb_base)) =
+            0x00009828;
+        *((unsigned int *)((j << 11) | (0x4114 * 4) | phy_apb_base)) =
+            0x00002220;
+        *((unsigned int *)((j << 11) | (0x4115 * 4) | phy_apb_base)) =
+            0x00009F2F;
+        *((unsigned int *)((j << 11) | (0x4116 * 4) | phy_apb_base)) =
+            0x0000223C;
+        *((unsigned int *)((j << 11) | (0x4117 * 4) | phy_apb_base)) =
+            0x0000AB2F;
+        *((unsigned int *)((j << 11) | (0x4118 * 4) | phy_apb_base)) =
+            0x0000223C;
+        *((unsigned int *)((j << 11) | (0x4119 * 4) | phy_apb_base)) =
+            0x0000A81C;
+        *((unsigned int *)((j << 11) | (0x411A * 4) | phy_apb_base)) =
+            0x0000223C;
+        *((unsigned int *)((j << 11) | (0x411B * 4) | phy_apb_base)) =
+            0x0000BA22;
+        *((unsigned int *)((j << 11) | (0x411C * 4) | phy_apb_base)) =
+            0x0000223C;
+        *((unsigned int *)((j << 11) | (0x411D * 4) | phy_apb_base)) =
+            0x0000BB13;
+        *((unsigned int *)((j << 11) | (0x411E * 4) | phy_apb_base)) =
+            0x0000223C;
+        *((unsigned int *)((j << 11) | (0x411F * 4) | phy_apb_base)) =
+            0x0000B800;
+        *((unsigned int *)((j << 11) | (0x4120 * 4) | phy_apb_base)) =
+            0x00002232;
+        *((unsigned int *)((j << 11) | (0x4121 * 4) | phy_apb_base)) =
+            0x0000BF00;
+        *((unsigned int *)((j << 11) | (0x4122 * 4) | phy_apb_base)) =
+            0x00002233;
+        *((unsigned int *)((j << 11) | (0x4123 * 4) | phy_apb_base)) =
+            0x0000B200;
+        *((unsigned int *)((j << 11) | (0x4124 * 4) | phy_apb_base)) =
+            0x00002233;
+        *((unsigned int *)((j << 11) | (0x4125 * 4) | phy_apb_base)) =
+            0x0000B300;
+        *((unsigned int *)((j << 11) | (0x4126 * 4) | phy_apb_base)) =
+            0x00002230;
+        *((unsigned int *)((j << 11) | (0x4127 * 4) | phy_apb_base)) =
+            0x0000B000;
+
+        *((unsigned int *)((j << 11) | (0x4099 * 4) | phy_apb_base)) =
+            0x00008000;
+        *((unsigned int *)((j << 11) | (0x409A * 4) | phy_apb_base)) =
+            0x00007777;
+        *((unsigned int *)((j << 11) | (0x409B * 4) | phy_apb_base)) =
+            0x00000100;
+        *((unsigned int *)((j << 11) | (0x409C * 4) | phy_apb_base)) =
+            0x00007777;
+        *((unsigned int *)((j << 11) | (0x409D * 4) | phy_apb_base)) =
+            0x00000101;
+        *((unsigned int *)((j << 11) | (0x409E * 4) | phy_apb_base)) =
+            0x00007777;
+        *((unsigned int *)((j << 11) | (0x409F * 4) | phy_apb_base)) =
+            0x00000102;
+        *((unsigned int *)((j << 11) | (0x40A0 * 4) | phy_apb_base)) =
+            0x00007777;
+        *((unsigned int *)((j << 11) | (0x40A1 * 4) | phy_apb_base)) =
+            0x00000002;
+        *((unsigned int *)((j << 11) | (0x40A2 * 4) | phy_apb_base)) =
+            0x00007777;
+        *((unsigned int *)((j << 11) | (0x40A3 * 4) | phy_apb_base)) =
+            0x00001002;
+        *((unsigned int *)((j << 11) | (0x40A4 * 4) | phy_apb_base)) =
+            0x00003777;
+        *((unsigned int *)((j << 11) | (0x40A5 * 4) | phy_apb_base)) =
+            0x00001003;
+        *((unsigned int *)((j << 11) | (0x40A6 * 4) | phy_apb_base)) =
+            0x00003777;
+        *((unsigned int *)((j << 11) | (0x40A7 * 4) | phy_apb_base)) =
+            0x00001004;
+        *((unsigned int *)((j << 11) | (0x40A8 * 4) | phy_apb_base)) =
+            0x00003777;
+        *((unsigned int *)((j << 11) | (0x40A9 * 4) | phy_apb_base)) =
+            0x00002004;
+        *((unsigned int *)((j << 11) | (0x40AA * 4) | phy_apb_base)) =
+            0x00003777;
+        *((unsigned int *)((j << 11) | (0x40AB * 4) | phy_apb_base)) =
+            0x00002005;
+        *((unsigned int *)((j << 11) | (0x40AC * 4) | phy_apb_base)) =
+            0x00003777;
+        *((unsigned int *)((j << 11) | (0x40AD * 4) | phy_apb_base)) =
+            0x00002006;
+        *((unsigned int *)((j << 11) | (0x40AE * 4) | phy_apb_base)) =
+            0x00003777;
+        *((unsigned int *)((j << 11) | (0x40AF * 4) | phy_apb_base)) =
+            0x00002007;
+        *((unsigned int *)((j << 11) | (0x40B0 * 4) | phy_apb_base)) =
+            0x00003777;
+        *((unsigned int *)((j << 11) | (0x40B1 * 4) | phy_apb_base)) =
+            0x00002008;
+        *((unsigned int *)((j << 11) | (0x40B2 * 4) | phy_apb_base)) =
+            0x00003777;
+        *((unsigned int *)((j << 11) | (0x40B3 * 4) | phy_apb_base)) =
+            0x00002009;
+        *((unsigned int *)((j << 11) | (0x40B4 * 4) | phy_apb_base)) =
+            0x00003777;
+        *((unsigned int *)((j << 11) | (0x40B5 * 4) | phy_apb_base)) =
+            0x0000200B;
+        *((unsigned int *)((j << 11) | (0x40B6 * 4) | phy_apb_base)) =
+            0x00003777;
+        *((unsigned int *)((j << 11) | (0x40B7 * 4) | phy_apb_base)) =
+            0x0000200D;
+        *((unsigned int *)((j << 11) | (0x40B8 * 4) | phy_apb_base)) =
+            0x00003777;
+        *((unsigned int *)((j << 11) | (0x40B9 * 4) | phy_apb_base)) =
+            0x0000200F;
     }
 }
 
@@ -114,6 +283,7 @@ bool pcie_wait_condition(void *data)
         return ((ctrl_apb->RESET_STATUS &
                  RESET_STATUS_RC_REL_ST_MASK) != 0);
     case PCIE_INIT_STAGE_LINK_TRNG:
+    case PCIE_INIT_STAGE_LINK_RE_TRNG:
         return ((ctrl_apb->RP_LTSSM_STATE & RP_LTSSM_STATE_MASK) == 0x10);
     default:
         assert(false);
@@ -185,6 +355,32 @@ int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
         return FWK_E_PARAM;
     }
     return FWK_SUCCESS;
+}
+
+int pcie_link_retrain(struct pcie_ctrl_apb_reg *ctrl_apb,
+                      uint32_t rp_ep_config_base,
+                      struct mod_timer_api *timer_api)
+{
+    uint32_t reg_val = 0;
+    struct pcie_wait_condition_data wait_data;
+
+    assert(ctrl_apb != NULL);
+    assert(rp_ep_config_base != 0x0);
+    assert(timer_api != NULL);
+
+    wait_data.ctrl_apb = ctrl_apb;
+    wait_data.stage = PCIE_INIT_STAGE_LINK_RE_TRNG;
+
+    pcie_rp_ep_config_read_word(rp_ep_config_base,
+                                PCIE_LINK_CTRL_STATUS_OFFSET, &reg_val);
+    reg_val |= PCIE_LINK_CTRL_LINK_RETRAIN_MASK;
+    pcie_rp_ep_config_write_word(rp_ep_config_base,
+                                 PCIE_LINK_CTRL_STATUS_OFFSET, reg_val);
+
+    return timer_api->wait(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                           PCIE_LINK_RE_TRAINING_TIMEOUT,
+                           pcie_wait_condition,
+                           &wait_data);
 }
 
 int axi_outbound_region_setup(uint32_t axi_config_base_addr,
