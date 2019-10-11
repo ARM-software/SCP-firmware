@@ -112,25 +112,21 @@ static void ppu_cores_isr(unsigned int first, uint32_t status)
 static void ppu_cores_isr_0(void)
 {
     ppu_cores_isr(0, sgi575_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[0]);
-    ppu_cores_isr(128, sgi575_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[4]);
 }
 
 static void ppu_cores_isr_1(void)
 {
     ppu_cores_isr(32, sgi575_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[1]);
-    ppu_cores_isr(160, sgi575_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[5]);
 }
 
 static void ppu_cores_isr_2(void)
 {
     ppu_cores_isr(64, sgi575_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[2]);
-    ppu_cores_isr(192, sgi575_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[6]);
 }
 
 static void ppu_cores_isr_3(void)
 {
     ppu_cores_isr(96, sgi575_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[3]);
-    ppu_cores_isr(224, sgi575_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[7]);
 }
 
 static void ppu_clusters_isr(void)
