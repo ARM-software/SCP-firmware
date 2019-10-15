@@ -25,6 +25,9 @@ static const struct fwk_element service_table[] = {
             .transport_api_id = FWK_ID_API_INIT(
                 FWK_MODULE_IDX_SMT,
                 MOD_SMT_API_IDX_SCMI_TRANSPORT),
+            .transport_notification_init_id = FWK_ID_NOTIFICATION_INIT(
+                FWK_MODULE_IDX_SMT,
+                MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCP_SCMI_AGENT_ID_PSCI,
         }),
     },
@@ -37,6 +40,9 @@ static const struct fwk_element service_table[] = {
             .transport_api_id = FWK_ID_API_INIT(
                 FWK_MODULE_IDX_SMT,
                 MOD_SMT_API_IDX_SCMI_TRANSPORT),
+            .transport_notification_init_id = FWK_ID_NOTIFICATION_INIT(
+                FWK_MODULE_IDX_SMT,
+                MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCP_SCMI_AGENT_ID_OSPM,
         }),
     },
@@ -49,6 +55,7 @@ static const struct fwk_element service_table[] = {
             .transport_api_id = FWK_ID_API_INIT(
                 FWK_MODULE_IDX_SMT,
                 MOD_SMT_API_IDX_SCMI_TRANSPORT),
+            .transport_notification_init_id = FWK_ID_NONE_INIT,
             .scmi_agent_id = SCP_SCMI_AGENT_ID_MCP,
         }),
     },

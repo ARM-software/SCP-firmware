@@ -12,6 +12,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <fwk_element.h>
+#include <fwk_module_idx.h>
 #include <fwk_id.h>
 
 /*!
@@ -89,9 +90,31 @@ struct mod_sds_config {
      */
     size_t region_size;
 
+#if BUILD_HAS_MOD_CLOCK
     /*! Identifier of the clock that this module depends on */
     fwk_id_t clock_id;
+#endif
 };
+
+/*!
+ * \brief SDS notification indices.
+ */
+enum mod_sds_notification_idx {
+    /*! The SDS region has been initialized */
+    MOD_SDS_NOTIFICATION_IDX_INITIALIZED,
+
+    /*! Number of defined notifications */
+    MOD_SDS_NOTIFICATION_IDX_COUNT
+};
+
+/*!
+ * \brief Identifier for the ::MOD_SDS_NOTIFICATION_IDX_INITIALIZED
+ *     notification.
+ */
+static const fwk_id_t mod_sds_notification_id_initialized =
+    FWK_ID_NOTIFICATION_INIT(
+        FWK_MODULE_IDX_SDS,
+        MOD_SDS_NOTIFICATION_IDX_INITIALIZED);
 
 /*!
  * \brief Module interface.
@@ -149,7 +172,7 @@ struct mod_sds_api {
      * \param offset The offset, in bytes, of the field within the Shared Data
      *      Structure.
      *
-     * \param data Pointer to storage for the field data that will be read.
+     * \param[out] data The field data that will be read.
      *
      * \param size Size, in bytes, of the storage pointed to by the data
      *       parameter.

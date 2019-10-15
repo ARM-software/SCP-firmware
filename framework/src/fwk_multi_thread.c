@@ -9,11 +9,11 @@
 #include <stdint.h>
 #include <string.h>
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_host.h>
 #include <fwk_interrupt.h>
 #include <fwk_element.h>
 #include <fwk_mm.h>
+#include <fwk_status.h>
 #include <internal/fwk_module.h>
 #include <internal/fwk_notification.h>
 #include <internal/fwk_multi_thread.h>
@@ -37,7 +37,7 @@ static const char err_msg_func[] = "[THR] Error %d in %s\n";
 /*
  * Initialize the attributes of thread.
  *
- * \param attr Pointer to thread's attributes.
+ * \param[out] attr Thread's attributes.
  *
  * \retval FWK_SUCCESS The initialization succeeded.
  * \retval FWK_E_NOMEM A memory allocation failed.
@@ -98,6 +98,9 @@ static struct fwk_event *duplicate_event(struct fwk_event *event)
 
     if (allocated_event != NULL) {
         *allocated_event = *event;
+
+        allocated_event->slist_node = (struct fwk_slist_node) { 0 };
+
         return allocated_event;
     }
 

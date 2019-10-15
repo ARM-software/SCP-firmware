@@ -81,6 +81,10 @@ endif
 # Warning flags
 #
 
+# The following flags are enforced to minimise unwitting uses of undefined
+# behaviour in the code base, which can open security holes. Each flag applies a
+# set of warnings, and any warnings that do occur are upgraded to errors to
+# prevent the firmware from building.
 CFLAGS_GCC += -Werror
 CFLAGS_GCC += -Wall
 CFLAGS_GCC += -Wextra
@@ -125,7 +129,8 @@ ARFLAGS_GCC = -rc
 
 LDFLAGS_GCC += -Wl,--cref
 
-LDFLAGS_ARM += -Wl,--undefined=arm_exception_reset
+LDFLAGS_GCC += -Wl,--undefined=arm_exceptions
+LDFLAGS_ARM += -Wl,--undefined=arm_exceptions
 
 BUILTIN_LIBS_GCC := -lc -lgcc
 

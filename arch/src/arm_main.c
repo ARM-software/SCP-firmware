@@ -8,8 +8,8 @@
 #include <stdbool.h>
 #include <fwk_arch.h>
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_macros.h>
+#include <fwk_status.h>
 #include <cmsis_compiler.h>
 
 #define SCB_CCR ((FWK_RW uint32_t *)(0xE000ED14))

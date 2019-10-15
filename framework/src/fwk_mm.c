@@ -12,13 +12,11 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
+#include <fwk_status.h>
 
 static bool initialized;
 static bool mm_locked;

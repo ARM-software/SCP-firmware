@@ -4,14 +4,13 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-
 #include <stdbool.h>
 #include <stdint.h>
 #include <fwk_assert.h>
 #include <fwk_arch.h>
-#include <fwk_errno.h>
 #include <fwk_interrupt.h>
 #include <fwk_macros.h>
+#include <fwk_status.h>
 #include <fwk_test.h>
 
 #define INTERRUPT_ID 42
@@ -34,6 +33,8 @@ static int set_isr_nmi_return_val;
 static int set_isr_nmi_param_return_val;
 static int set_isr_fault_return_val;
 static int get_current_return_val;
+static unsigned int global_enable_call_count;
+static unsigned int global_disable_call_count;
 
 static void fake_isr(void)
 {
@@ -47,11 +48,13 @@ static void fake_isr_param(uintptr_t param)
 
 static int global_enable(void)
 {
+    global_enable_call_count++;
     return FWK_SUCCESS;
 }
 
 static int global_disable(void)
 {
+    global_disable_call_count++;
     return FWK_SUCCESS;
 }
 
@@ -150,6 +153,8 @@ static void test_case_setup(void)
     set_isr_nmi_param_return_val = FWK_E_HANDLER;
     set_isr_fault_return_val = FWK_E_HANDLER;
     get_current_return_val = FWK_E_HANDLER;
+    global_disable_call_count = 0;
+    global_enable_call_count = 0;
 }
 
 static void test_fwk_interrupt_before_init(void)
@@ -210,20 +215,13 @@ static void test_fwk_interrupt_init(void)
     assert(result == FWK_SUCCESS);
 }
 
-static void test_fwk_interrupt_global_enable(void)
+static void test_fwk_interrupt_critical_section(void)
 {
-    int result;
+    fwk_interrupt_global_disable();
+    assert(global_disable_call_count == 1);
 
-    result = fwk_interrupt_global_enable();
-    assert(result == FWK_SUCCESS);
-}
-
-static void test_fwk_interrupt_global_disable(void)
-{
-    int result;
-
-    result = fwk_interrupt_global_disable();
-    assert(result == FWK_SUCCESS);
+    fwk_interrupt_global_enable();
+    assert(global_enable_call_count == 1);
 }
 
 static void test_fwk_interrupt_is_enabled(void)
@@ -347,11 +345,31 @@ static void test_fwk_interrupt_get_current(void)
     assert(result == FWK_SUCCESS);
 }
 
+static void test_fwk_interrupt_nested_critical_section(void)
+{
+    fwk_interrupt_global_disable();
+    assert(global_disable_call_count == 1);
+
+    fwk_interrupt_global_disable();
+    assert(global_disable_call_count == 1);
+
+    fwk_interrupt_global_disable();
+    assert(global_disable_call_count == 1);
+
+    fwk_interrupt_global_enable();
+    assert(global_enable_call_count == 0);
+
+    fwk_interrupt_global_enable();
+    assert(global_enable_call_count == 0);
+
+    fwk_interrupt_global_enable();
+    assert(global_enable_call_count == 1);
+}
+
 static const struct fwk_test_case_desc test_case_table[] = {
     FWK_TEST_CASE(test_fwk_interrupt_before_init),
     FWK_TEST_CASE(test_fwk_interrupt_init),
-    FWK_TEST_CASE(test_fwk_interrupt_global_enable),
-    FWK_TEST_CASE(test_fwk_interrupt_global_disable),
+    FWK_TEST_CASE(test_fwk_interrupt_critical_section),
     FWK_TEST_CASE(test_fwk_interrupt_is_enabled),
     FWK_TEST_CASE(test_fwk_interrupt_enable),
     FWK_TEST_CASE(test_fwk_interrupt_disable),
@@ -361,7 +379,8 @@ static const struct fwk_test_case_desc test_case_table[] = {
     FWK_TEST_CASE(test_fwk_interrupt_set_isr),
     FWK_TEST_CASE(test_fwk_interrupt_set_isr_param),
     FWK_TEST_CASE(test_fwk_interrupt_set_isr_fault),
-    FWK_TEST_CASE(test_fwk_interrupt_get_current)
+    FWK_TEST_CASE(test_fwk_interrupt_get_current),
+    FWK_TEST_CASE(test_fwk_interrupt_nested_critical_section),
 };
 
 struct fwk_test_suite_desc test_suite = {

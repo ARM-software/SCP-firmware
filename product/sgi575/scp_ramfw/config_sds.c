@@ -21,9 +21,7 @@
 #include <config_clock.h>
 
 static const uint32_t version_packed = FWK_BUILD_VERSION;
-static const uint32_t feature_flags = (SGI575_SDS_FEATURE_FIRMWARE_MASK |
-                                       SGI575_SDS_FEATURE_DMC_MASK |
-                                       SGI575_SDS_FEATURE_MESSAGING_MASK);
+static const uint32_t feature_flags = 0x00000000;
 
 const struct mod_sds_config sds_module_config = {
     .region_base_address = SCP_SDS_MEM_BASE,
@@ -79,7 +77,7 @@ static struct fwk_element sds_element_table[] = {
             .finalize = true,
         }),
     },
-#ifdef MODE_DEBUG
+#ifdef BUILD_HAS_MOD_TEST
     {
         .name = "Boot Counters",
         .data = &((struct mod_sds_structure_desc) {

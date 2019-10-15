@@ -8,8 +8,8 @@
  *      N1SDP PLL register definitions
  */
 
-#ifndef N1SDP_PLL_H
-#define N1SDP_PLL_H
+#ifndef INTERNAL_N1SDP_PLL_H
+#define INTERNAL_N1SDP_PLL_H
 
 #include <fwk_macros.h>
 
@@ -39,4 +39,19 @@
 /*! Step size for the PLL. */
 #define MOD_N1SDP_PLL_STEP_SIZE      UINT64_C(1000)
 
-#endif /* N1SDP_PLL_H */
+/*! The minimum feedback divider value */
+#define MOD_N1SDP_PLL_FBDIV_MIN      16
+/*! The maximum feedback divider value */
+#define MOD_N1SDP_PLL_FBDIV_MAX      1600
+
+/*! The minimum reference clock divider value */
+#define MOD_N1SDP_PLL_REFDIV_MIN     1
+/*! The maximum reference clock divider value */
+#define MOD_N1SDP_PLL_REFDIV_MAX     63
+
+/*! The minimum post divider value */
+#define MOD_N1SDP_PLL_POSTDIV_MIN    1
+/*! The maximum post divider value */
+#define MOD_N1SDP_PLL_POSTDIV_MAX    7
+
+#endif /* INTERNAL_N1SDP_PLL_H */

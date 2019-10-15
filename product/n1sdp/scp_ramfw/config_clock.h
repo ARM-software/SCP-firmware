@@ -11,65 +11,72 @@
 #include <fwk_macros.h>
 
 /*
+ * DDR Subsystem clock in MHz
+ */
+#define DDR_CLOCK_MHZ                  1333
+
+/*
  * SCC & PIK clock rates.
  */
-#define SCC_CLK_RATE_IOFPGA_TMIF2XCLK  (200 * FWK_MHZ)
-#define SCC_CLK_RATE_IOFPGA_TSIF2XCLK  (200 * FWK_MHZ)
+#define SCC_CLK_RATE_IOFPGA_TMIF2XCLK  (120 * FWK_MHZ)
+#define SCC_CLK_RATE_IOFPGA_TSIF2XCLK  (120 * FWK_MHZ)
 #define SCC_CLK_RATE_SYSAPBCLK         (120 * FWK_MHZ)
 #define SCC_CLK_RATE_SCPNICCLK         (300 * FWK_MHZ)
 #define SCC_CLK_RATE_SCPI2CCLK         (100 * FWK_MHZ)
-#define SCC_CLK_RATE_SCPQSPICLK        (480 * FWK_MHZ)
+#define SCC_CLK_RATE_SCPQSPICLK        (50 * FWK_MHZ)
 #define SCC_CLK_RATE_SENSORCLK         (100 * FWK_MHZ)
 #define SCC_CLK_RATE_MCPNICCLK         (300 * FWK_MHZ)
 #define SCC_CLK_RATE_MCPI2CCLK         (100 * FWK_MHZ)
-#define SCC_CLK_RATE_MCPQSPICLK        (480 * FWK_MHZ)
+#define SCC_CLK_RATE_MCPQSPICLK        (50 * FWK_MHZ)
 #define SCC_CLK_RATE_PCIEAXICLK        (1200 * FWK_MHZ)
 #define SCC_CLK_RATE_CCIXAXICLK        (1200 * FWK_MHZ)
 #define SCC_CLK_RATE_PCIEAPBCLK        (200 * FWK_MHZ)
 #define SCC_CLK_RATE_CCIXAPBCLK        (200 * FWK_MHZ)
 
-#define PIK_CLK_RATE_CLUS0_CPU         (3000 * FWK_MHZ)
-#define PIK_CLK_RATE_CLUS1_CPU         (3000 * FWK_MHZ)
-#define PIK_CLK_RATE_CLUS0             (2000 * FWK_MHZ)
-#define PIK_CLK_RATE_CLUS1             (2000 * FWK_MHZ)
+#define PIK_CLK_RATE_CLUS0_CPU         (2600 * FWK_MHZ)
+#define PIK_CLK_RATE_CLUS1_CPU         (2600 * FWK_MHZ)
+#define PIK_CLK_RATE_CLUS0             (1600 * FWK_MHZ)
+#define PIK_CLK_RATE_CLUS1             (1600 * FWK_MHZ)
 #define PIK_CLK_RATE_CLUS0_PPU         (300 * FWK_MHZ)
 #define PIK_CLK_RATE_CLUS1_PPU         (300 * FWK_MHZ)
-#define PIK_CLK_RATE_CLUS0_PCLK        (1000 * FWK_MHZ)
-#define PIK_CLK_RATE_CLUS0_ATCLK       (1000 * FWK_MHZ)
-#define PIK_CLK_RATE_CLUS0_GIC         (1000 * FWK_MHZ)
-#define PIK_CLK_RATE_CLUS0_AMBACLK     (1000 * FWK_MHZ)
-#define PIK_CLK_RATE_CLUS1_PCLK        (1000 * FWK_MHZ)
-#define PIK_CLK_RATE_CLUS1_ATCLK       (1000 * FWK_MHZ)
-#define PIK_CLK_RATE_CLUS1_GIC         (1000 * FWK_MHZ)
-#define PIK_CLK_RATE_CLUS1_AMBACLK     (1000 * FWK_MHZ)
+#define PIK_CLK_RATE_CLUS0_PCLK        (900 * FWK_MHZ)
+#define PIK_CLK_RATE_CLUS0_ATCLK       (900 * FWK_MHZ)
+#define PIK_CLK_RATE_CLUS0_GIC         (900 * FWK_MHZ)
+#define PIK_CLK_RATE_CLUS0_AMBACLK     (900 * FWK_MHZ)
+#define PIK_CLK_RATE_CLUS1_PCLK        (900 * FWK_MHZ)
+#define PIK_CLK_RATE_CLUS1_ATCLK       (900 * FWK_MHZ)
+#define PIK_CLK_RATE_CLUS1_GIC         (900 * FWK_MHZ)
+#define PIK_CLK_RATE_CLUS1_AMBACLK     (900 * FWK_MHZ)
 
 #define PIK_CLK_RATE_SCP_CORECLK       (300 * FWK_MHZ)
 #define PIK_CLK_RATE_SCP_AXICLK        (300 * FWK_MHZ)
 
-#define PIK_CLK_RATE_SYS_PPU           (1200 * FWK_MHZ)
-#define PIK_CLK_RATE_INTERCONNECT      (2000 * FWK_MHZ)
+#define PIK_CLK_RATE_SYS_PPU           (300 * FWK_MHZ)
+#define PIK_CLK_RATE_INTERCONNECT      (1600 * FWK_MHZ)
 #define PIK_CLK_RATE_PCLKSCP           (300 * FWK_MHZ)
 #define PIK_CLK_RATE_SYS_GIC           (800 * FWK_MHZ)
 #define PIK_CLK_RATE_SYSPCLKDBG        (300 * FWK_MHZ)
 #define PIK_CLK_RATE_SYSPERCLK         (600 * FWK_MHZ)
-#define PIK_CLK_RATE_UART              (240 * FWK_MHZ)
+#define PIK_CLK_RATE_UART              (50 * FWK_MHZ)
 #define PIK_CLK_RATE_TCU0              (1200 * FWK_MHZ)
 #define PIK_CLK_RATE_TCU1              (1200 * FWK_MHZ)
+#define PIK_CLK_RATE_TCU2              (1200 * FWK_MHZ)
+#define PIK_CLK_RATE_TCU3              (1200 * FWK_MHZ)
 
 #define PIK_CLK_RATE_ATCLKDBG          (600 * FWK_MHZ)
 #define PIK_CLK_RATE_PCLKDBG           (300 * FWK_MHZ)
 #define PIK_CLK_RATE_TRACECLK          (300 * FWK_MHZ)
-#define PIK_CLK_RATE_DMC               (1600 * FWK_MHZ)
+#define PIK_CLK_RATE_DMC               (DDR_CLOCK_MHZ * FWK_MHZ)
 
 /*
  * N1SDP PLL clock rates.
  */
-#define N1SDP_PLL_RATE_CPU_PLL0         (3000 * FWK_MHZ)
-#define N1SDP_PLL_RATE_CPU_PLL1         (3000 * FWK_MHZ)
-#define N1SDP_PLL_RATE_CLUSTER_PLL      (2000 * FWK_MHZ)
-#define N1SDP_PLL_RATE_INTERCONNECT_PLL (2000 * FWK_MHZ)
+#define N1SDP_PLL_RATE_CPU_PLL0         (2600 * FWK_MHZ)
+#define N1SDP_PLL_RATE_CPU_PLL1         (2600 * FWK_MHZ)
+#define N1SDP_PLL_RATE_CLUSTER_PLL      (1600 * FWK_MHZ)
+#define N1SDP_PLL_RATE_INTERCONNECT_PLL (1600 * FWK_MHZ)
 #define N1SDP_PLL_RATE_SYSTEM_PLL       (2400 * FWK_MHZ)
-#define N1SDP_PLL_RATE_DMC_PLL          (1600 * FWK_MHZ)
+#define N1SDP_PLL_RATE_DMC_PLL          (DDR_CLOCK_MHZ * FWK_MHZ)
 
 /*
  * CSS clock rates.
@@ -86,7 +93,7 @@
 #define CSS_CLK_RATE_CPU_GRP1_OVERDRIVE         (2900 * FWK_MHZ)
 #define CSS_CLK_RATE_CPU_GRP1_SUPER_OVERDRIVE   (3000 * FWK_MHZ)
 
-
+#define OSC_FREQ_HZ                             (24 * FWK_MHZ)
 /*
  * Clock indexes.
  */
@@ -149,6 +156,8 @@ enum clock_pik_idx {
     CLOCK_PIK_IDX_UART,
     CLOCK_PIK_IDX_TCU0,
     CLOCK_PIK_IDX_TCU1,
+    CLOCK_PIK_IDX_TCU2,
+    CLOCK_PIK_IDX_TCU3,
     /* Debug element clocks */
     CLOCK_PIK_IDX_ATCLKDBG,
     CLOCK_PIK_IDX_PCLKDBG,

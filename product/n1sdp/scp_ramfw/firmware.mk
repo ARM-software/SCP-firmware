@@ -24,8 +24,9 @@ BS_FIRMWARE_MODULES := \
     ppu_v0 \
     system_power \
     n1sdp_pll \
-    dmc620 \
-    ddr_phy500 \
+    n1sdp_i2c \
+    n1sdp_dmc620 \
+    n1sdp_ddr_phy \
     mhu \
     smt \
     scmi \
@@ -35,9 +36,14 @@ BS_FIRMWARE_MODULES := \
     clock \
     gtimer \
     timer \
+    n1sdp_scp2pcc \
+    n1sdp_sensor \
+    sensor \
     scmi_power_domain \
+    scmi_sensor \
     scmi_system_power \
     scmi_management \
+    scmi_ccix_config \
     n1sdp_flash \
     n1sdp_pcie \
     n1sdp_system
@@ -51,8 +57,9 @@ BS_FIRMWARE_SOURCES := \
     config_power_domain.c \
     config_ppu_v0.c \
     config_ppu_v1.c \
-    config_dmc620.c \
-    config_ddr_phy500.c \
+    config_n1sdp_i2c.c \
+    config_n1sdp_dmc620.c \
+    config_n1sdp_ddr_phy.c \
     config_mhu.c \
     config_smt.c \
     config_scmi.c \
@@ -66,6 +73,8 @@ BS_FIRMWARE_SOURCES := \
     config_clock.c \
     config_n1sdp_flash.c \
     config_n1sdp_pcie.c \
+    config_n1sdp_scp2pcc.c \
+    config_sensor.c \
     config_apcontext.c
 
 include $(BS_DIR)/firmware.mk

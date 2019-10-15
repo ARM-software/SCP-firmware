@@ -10,11 +10,7 @@
 
 #include <fwk_macros.h>
 
-#define CLOCK_RATE_REFCLK       (100UL * FWK_MHZ)
+#define CLOCK_RATE_REFCLK       (50UL * FWK_MHZ)
 #define CLOCK_RATE_SYSPLLCLK    (2400UL * FWK_MHZ)
-
-#define BAUD_RATE_19200         (19200)
-#define BAUD_RATE_38400         (38400)
-#define BAUD_RATE_115200        (115200)
 
 #endif /* N1SDP_SYSTEM_CLOCK_H */

@@ -14,16 +14,19 @@
 #include <mod_sid.h>
 #include <sid_reg.h>
 
+static bool initialized;
 static struct mod_sid_info info;
 
-static const struct mod_sid_info* get_system_info(void)
+int mod_sid_get_system_info(const struct mod_sid_info **system_info)
 {
-    return &info;
-}
+    if (initialized) {
+        *system_info = &info;
 
-static const struct mod_sid_api_info info_api = {
-    .get_system_info = get_system_info,
-};
+        return FWK_SUCCESS;
+    }
+
+    return FWK_E_INIT;
+}
 
 static int sid_init(
     fwk_id_t module_id,
@@ -91,26 +94,16 @@ static int sid_subsystem_init(
         info.system_idx = fwk_id_get_element_idx(subsystem_id);
         info.name = fwk_module_get_name(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_SID, info.system_idx));
+
+        initialized = true;
     }
 
-    return FWK_SUCCESS;
-}
-
-static int sid_proc_bind_req(
-    fwk_id_t requester_id,
-    fwk_id_t id,
-    fwk_id_t api_id,
-    const void **api)
-{
-    *api = &info_api;
     return FWK_SUCCESS;
 }
 
 const struct fwk_module module_sid = {
     .name = "SID",
     .type = FWK_MODULE_TYPE_DRIVER,
-    .api_count = MOD_SID_API_COUNT,
     .init = sid_init,
     .element_init = sid_subsystem_init,
-    .process_bind_request = sid_proc_bind_req,
 };

@@ -17,7 +17,7 @@
 #include <fwk_id.h>
 
 /*!
- * \addtogroup GroupModules Modules
+ * \addtogroup GroupN1SDPModule N1SDP Product Modules
  * @{
  */
 
@@ -152,7 +152,7 @@ struct mod_n1sdp_flash_api {
      * \brief Get the total number of flash descriptors.
      *
      * \param id Module identifier.
-     * \param count Pointer to storage for the descriptor count.
+     * \param[out] count The descriptor count.
      *
      * \retval FWK_SUCCESS Operation succeeded.
      * \retval FWK_E_PARAM The \p count parameter was invalid.
@@ -165,7 +165,7 @@ struct mod_n1sdp_flash_api {
      *     memory.
      *
      * \param id Module identifier.
-     * \param count Pointer to storage for the descriptor table.
+     * \param[out] table The descriptor table.
      *
      * \retval FWK_SUCCESS Operation succeeded.
      * \retval FWK_E_PARAM The \p table parameter was invalid.
@@ -178,7 +178,7 @@ struct mod_n1sdp_flash_api {
      * \brief Get the total number of NFIP descriptors.
      *
      * \param id Module identifier.
-     * \param count Pointer to storage for the descriptor count.
+     * \param[out] count The descriptor count.
      *
      * \retval FWK_SUCCESS Operation succeeded.
      * \retval FWK_E_PARAM The \p count parameter was invalid.
@@ -191,7 +191,7 @@ struct mod_n1sdp_flash_api {
      *     memory.
      *
      * \param id Module identifier.
-     * \param count Pointer to storage for the descriptor table.
+     * \param[out] table The descriptor table.
      *
      * \retval FWK_SUCCESS Operation succeeded.
      * \retval FWK_E_PARAM The \p table parameter was invalid.

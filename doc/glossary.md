@@ -1,7 +1,7 @@
 Glossary
 ========
 
-Copyright (c) 2011-2017, Arm Limited. All rights reserved.
+Copyright (c) 2011-2019, Arm Limited. All rights reserved.
 
 __AP__
     Application Processor
@@ -16,7 +16,7 @@ __DVFS__
     Dynamic Voltage and Frequency Scaling
 
 __IRQ__
-    Interrupt ReQuest
+    Interrupt Request
 
 __ISA__
     Instruction Set Architecture

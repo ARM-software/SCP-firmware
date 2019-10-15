@@ -6,10 +6,10 @@
  */
 #include <setjmp.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <fwk_errno.h>
+#include <stdio.h>
 #include <fwk_noreturn.h>
+#include <fwk_status.h>
 #include <fwk_test.h>
 
 /* Test information provided by the test suite */

@@ -12,6 +12,7 @@
 #define FWK_EVENT_H
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <fwk_align.h>
 #include <fwk_id.h>
@@ -91,7 +92,7 @@ struct fwk_event {
     fwk_id_t id;
 
     /*! Table of event parameters */
-    alignas(uintmax_t) uint8_t params[FWK_EVENT_PARAMETERS_SIZE];
+    alignas(max_align_t) uint8_t params[FWK_EVENT_PARAMETERS_SIZE];
 };
 
 /*!

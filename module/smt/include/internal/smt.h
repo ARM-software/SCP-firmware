@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef SMT_H
-#define SMT_H
+#ifndef INTERNAL_SMT_H
+#define INTERNAL_SMT_H
 
 struct __attribute((packed)) mod_smt_memory {
     uint32_t reserved0;
@@ -38,4 +38,4 @@ struct __attribute((packed)) mod_smt_memory {
 #define MOD_SMT_MIN_MAILBOX_SIZE \
     (sizeof(struct mod_smt_memory) + MOD_SMT_MIN_PAYLOAD_SIZE)
 
-#endif /* SMT_H */
+#endif /* INTERNAL_SMT_H */

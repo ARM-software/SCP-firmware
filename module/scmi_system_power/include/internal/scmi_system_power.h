@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef SCMI_SYSTEM_POWER_H
-#define SCMI_SYSTEM_POWER_H
+#ifndef INTERNAL_SCMI_SYSTEM_POWER_H
+#define INTERNAL_SCMI_SYSTEM_POWER_H
 
 #define SCMI_PROTOCOL_ID_SYS_POWER      UINT32_C(0x12)
 #define SCMI_PROTOCOL_VERSION_SYS_POWER UINT32_C(0x10000)
@@ -83,4 +83,4 @@ struct __attribute((packed)) scmi_sys_power_state_notifier_p2a {
     uint32_t system_state;
 };
 
-#endif
+#endif /* INTERNAL_SCMI_SYSTEM_POWER_H */

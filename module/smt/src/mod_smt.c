@@ -8,12 +8,12 @@
 #include <stdbool.h>
 #include <string.h>
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_interrupt.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
+#include <fwk_status.h>
 #include <mod_log.h>
 #include <mod_power_domain.h>
 #include <mod_scmi.h>
@@ -47,6 +47,9 @@ struct smt_channel_ctx {
 
     /* SCMI service API */
     struct mod_scmi_from_transport_api *scmi_api;
+
+    /* Flag indicating the mailbox is ready */
+    bool smt_mailbox_ready;
 };
 
 struct smt_ctx {
@@ -282,8 +285,14 @@ static int smt_slave_handler(struct smt_channel_ctx *channel_ctx)
     out = channel_ctx->out;
 
     /* Check we have ownership of the mailbox */
-    if (memory->status & MOD_SMT_MAILBOX_STATUS_FREE_MASK)
+    if (memory->status & MOD_SMT_MAILBOX_STATUS_FREE_MASK) {
+        smt_ctx.log_api->log(
+            MOD_LOG_GROUP_ERROR,
+            "[SMT] Mailbox ownership error on channel %u\n",
+            fwk_id_get_element_idx(channel_ctx->id));
+
         return FWK_E_STATE;
+    }
 
     /* Commit to sending a response */
     channel_ctx->locked = true;
@@ -336,6 +345,13 @@ static int smt_signal_message(fwk_id_t channel_id)
 
     channel_ctx =
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
+
+    if (!channel_ctx->smt_mailbox_ready) {
+        /* Discard any message in the mailbox when not ready */
+        smt_ctx.log_api->log(MOD_LOG_GROUP_ERROR, "[SMT] Message not valid\n");
+
+        return FWK_SUCCESS;
+    }
 
     switch (channel_ctx->config->type) {
     case MOD_SMT_CHANNEL_TYPE_MASTER:
@@ -525,6 +541,8 @@ static int smt_process_notification(
 {
     struct mod_pd_power_state_transition_notification_params *params;
     struct smt_channel_ctx *channel_ctx;
+    unsigned int notifications_sent;
+    int status;
 
     assert(fwk_id_is_equal(event->id,
         mod_pd_notification_id_power_state_transition));
@@ -533,11 +551,15 @@ static int smt_process_notification(
     params = (struct mod_pd_power_state_transition_notification_params *)
         event->params;
 
-    if (params->state != MOD_PD_STATE_ON)
-        return FWK_SUCCESS;
-
     channel_ctx =
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(event->target_id)];
+
+    if (params->state != MOD_PD_STATE_ON) {
+        if (params->state == MOD_PD_STATE_OFF)
+            channel_ctx->smt_mailbox_ready = false;
+
+        return FWK_SUCCESS;
+    }
 
     if (channel_ctx->config->policies & MOD_SMT_POLICY_INIT_MAILBOX) {
         /* Initialize mailbox */
@@ -545,6 +567,18 @@ static int smt_process_notification(
             (struct mod_smt_memory) {
             .status = (1 << MOD_SMT_MAILBOX_STATUS_FREE_POS)
         };
+
+        /* Notify that this mailbox is initialized */
+        struct fwk_event smt_channels_initialized_notification = {
+            .id = mod_smt_notification_id_initialized,
+        };
+
+        channel_ctx->smt_mailbox_ready = true;
+
+        status = fwk_notification_notify(&smt_channels_initialized_notification,
+            &notifications_sent);
+        if (status != FWK_SUCCESS)
+            return status;
     }
 
     return FWK_SUCCESS;
@@ -554,6 +588,7 @@ const struct fwk_module module_smt = {
     .name = "smt",
     .type = FWK_MODULE_TYPE_SERVICE,
     .api_count = MOD_SMT_API_IDX_COUNT,
+    .notification_count = MOD_SMT_NOTIFICATION_IDX_COUNT,
     .init = smt_init,
     .element_init = smt_channel_init,
     .bind = smt_bind,

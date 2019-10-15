@@ -8,247 +8,206 @@
 #ifndef MOD_PSU_H
 #define MOD_PSU_H
 
-#include <stdbool.h>
-#include <stdint.h>
 #include <fwk_id.h>
 #include <fwk_module_idx.h>
+#include <fwk_status.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 /*!
  * \ingroup GroupModules
- * \defgroup GroupPsu PSU HAL
- * \{
- */
-
-/*!
- * \defgroup GroupPsuApis APIs
+ * \defgroup GroupPsu Power Supply Unit (PSU)
+ *
+ * \details The `psu` module represents an abstract interface through which
+ *      power supply units can be used. It provides functions for manipulating
+ *      the voltage as well as enabling/disabling the supply.
  * \{
  */
 
 /*!
  * \brief Device API.
+ *
+ * \details The PSU device API represents the abstract interface used to control
+ *      individual power supplies.
  */
 struct mod_psu_device_api {
     /*!
-     * \brief Get the enabled state of a device.
+     * \brief Get whether the device is enabled or not.
      *
-     * \param device_id Identifier of the device to get the state of.
-     * \param [out] enabled \c true if the device is enabled, or \c if it is
-     *      disabled.
+     * \param[in] device_id Identifier of the device to get the state of.
+     * \param[out] enabled `true` if the device is enabled, otherwise `false`.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
-     * \retval FWK_E_STATE The element cannot accept the request.
-     * \retval FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_E_STATE The device cannot currently accept the request.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     *
+     * \return Status code representing the result of the operation.
      */
     int (*get_enabled)(fwk_id_t device_id, bool *enabled);
 
     /*!
-     * \brief Set the enabled state of a device.
+     * \brief Enable or disable the device.
      *
-     * \param device_id Identifier of the device to set the state of.
-     * \param enable \c true to enable the device, or \c false to disable it.
+     * \param[in] device_id Identifier of the device to set the state of.
+     * \param[in] enable `true` to enable the device, or `false` to disable it.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
-     * \retval FWK_E_STATE The element cannot accept the request.
-     * \retval FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_E_STATE The device cannot currently accept the request.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     *
+     * \return Status code representing the result of the operation.
      */
     int (*set_enabled)(fwk_id_t device_id, bool enable);
 
     /*!
-     * \brief Set the enabled state of a device.
-     *
-     * \param device_id Identifier of the device to set the state of.
-     * \param enable \c true to enable the device, or \c false to disable it.
-     *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
-     * \retval FWK_E_STATE The element cannot accept the request.
-     * \retval FWK_E_NOMEM The event queue is full.
-     * \retval FWK_E_PANIC An error in the framework occurred.
-     */
-    int (*set_enabled_async)(fwk_id_t device_id, bool enable);
-
-    /*!
      * \brief Get the voltage of a device.
      *
-     * \param device_id Identifier of the device to get the voltage of.
-     * \param [out] voltage Voltage in mV.
+     * \param[in] device_id Identifier of the device to get the voltage of.
+     * \param[out] voltage Voltage in millivolts (mV).
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
-     * \retval FWK_E_STATE The element cannot accept the request.
-     * \retval FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_E_STATE The device cannot currently accept the request.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     *
+     * \return Status code representing the result of the operation.
      */
-    int (*get_voltage)(fwk_id_t device_id, uintmax_t *voltage);
+    int (*get_voltage)(fwk_id_t device_id, uint64_t *voltage);
 
     /*!
      * \brief Set the voltage of a device.
      *
-     * \param device_id Identifier of the device to set the voltage of.
-     * \param voltage New voltage in mV.
+     * \param[in] device_id Identifier of the device to set the voltage of.
+     * \param[in] voltage New voltage in millivolts (mV).
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
-     * \retval FWK_E_STATE The element cannot accept the request.
-     * \retval FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_E_STATE The device cannot currently accept the request.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     *
+     * \return Status code representing the result of the operation.
      */
-    int (*set_voltage)(fwk_id_t device_id, uintmax_t voltage);
-
-    /*!
-     * \brief Set the voltage of a device.
-     *
-     * \param device_id Identifier of the device to set the voltage of.
-     * \param voltage New voltage in mV.
-     *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
-     * \retval FWK_E_STATE The element cannot accept the request.
-     * \retval FWK_E_NOMEM The event queue is full.
-     * \retval FWK_E_PANIC An error in the framework occurred.
-     */
-    int (*set_voltage_async)(fwk_id_t device_id, uintmax_t voltage);
+    int (*set_voltage)(fwk_id_t device_id, uint64_t voltage);
 };
 
 /*!
  * \brief Driver API.
+ *
+ * \details The PSU driver API represents the abstract interface that power
+ *      supply drivers must implement in order for the PSU module to interact
+ *      with them.
  */
 struct mod_psu_driver_api {
     /*!
-     * \brief Set the enabled state of a device.
+     * \brief Get whether the device is enabled or not.
      *
-     * \param id Identifier of the device to set the state of.
-     * \param enable \c true to enable the device, or \c false to disable it.
-     *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \return One of the other driver-defined error codes.
-     */
-    int (*set_enabled)(fwk_id_t id, bool enable);
-
-    /*!
-     * \brief Get the enabled state of a device.
-     *
-     * \param id Identifier of the device to get the state of.
-     * \param [out] enabled \c true if the device is enabled, or \c if it is
+     * \param[in] id Identifier of the device to get the state of.
+     * \param[out] enabled `true` if the device is enabled, or `false` it is
      *      disabled.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \return One of the other driver-defined error codes.
+     * \retval ::FWK_E_HANDLER The operation failed.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     *
+     * \return Status code representing the result of the operation.
      */
     int (*get_enabled)(fwk_id_t id, bool *enabled);
 
     /*!
-     * \brief Set the voltage of a device.
+     * \brief Enable or disable the device.
      *
-     * \param id Identifier of the device to set the voltage of.
-     * \param voltage New voltage in millivolts (mV).
+     * \param[in] id Identifier of the device to set the state of.
+     * \param[in] enable `true` to enable the device, or `false` to disable it.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \return One of the other driver-defined error codes.
+     * \retval ::FWK_E_HANDLER The operation failed.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     *
+     * \return Status code representing the result of the operation.
      */
-    int (*set_voltage)(fwk_id_t id, uintmax_t voltage);
+    int (*set_enabled)(fwk_id_t id, bool enable);
 
     /*!
      * \brief Get the voltage of a device.
      *
-     * \param id Identifier of the device to get the voltage of.
-     * \param [out] voltage Voltage in millivolts (mV).
+     * \param[in] id Identifier of the device to get the voltage of.
+     * \param[out] voltage Voltage in millivolts (mV).
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \return One of the other driver-defined error codes.
+     * \retval ::FWK_E_HANDLER The operation failed.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     *
+     * \return Status code representing the result of the operation.
      */
-    int (*get_voltage)(fwk_id_t id, uintmax_t *voltage);
+    int (*get_voltage)(fwk_id_t id, uint64_t *voltage);
+
+    /*!
+     * \brief Set the voltage of a device.
+     *
+     * \param[in] id Identifier of the device to set the voltage of.
+     * \param[in] voltage New voltage in millivolts (mV).
+     *
+     * \retval ::FWK_E_HANDLER The operation failed.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     *
+     * \return Status code representing the result of the operation.
+     */
+    int (*set_voltage)(fwk_id_t id, uint64_t voltage);
 };
-
-/*!
- * \}
- */
-
-/*!
- * \defgroup GroupPsuConfig Configuration
- * \{
- */
 
 /*!
  * \brief Device configuration.
+ *
+ * \details This structure describes configuration parameters for power supply
+ *      devices, which are represented as elements of the PSU module.
  */
-struct mod_psu_device_config {
-    fwk_id_t driver_id; /*!< Driver identifier */
-    fwk_id_t driver_api_id; /*!< Driver API identifier */
+struct mod_psu_element_cfg {
+    /*!
+     * \brief Driver entity identifier.
+     *
+     * \details This identifies the entity of the driver, which must implement
+     *      ::mod_psu_driver_api.
+     */
+    fwk_id_t driver_id;
+
+    /*!
+     * \brief Driver API identifier.
+     *
+     * \details This identifies the API of the driver, which must implement
+     *      ::mod_psu_driver_api.
+     */
+    fwk_id_t driver_api_id;
 };
-
-/*!
- * \}
- */
-
-/*!
- * \defgroup GroupPsuEvents Events
- * \{
- */
-
-/*!
- * \brief <tt>Set enabled</tt> event response parameters.
- */
-struct mod_psu_event_params_set_enabled_response {
-    int status; /*!< Status of the request */
-};
-
-/*!
- * \brief <tt>Set voltage</tt> event response parameters.
- */
-struct mod_psu_event_params_set_voltage_response {
-    int status; /*!< Status of the request */
-};
-
-/*!
- * \}
- */
-
-/*!
- * \defgroup GroupPsuIds Identifiers
- * \{
- */
 
 /*!
  * \brief API indices.
  */
 enum mod_psu_api_idx {
-    /*! API index for mod_psu_api_id_psu_device */
-    MOD_PSU_API_IDX_PSU_DEVICE,
+    /*!
+     * \brief Device API index.
+     *
+     * \details This API is the abstract power supply interface exposed and
+     *      implemented by this module.
+     *
+     * \note This API identifier implements the ::mod_psu_device_api interface.
+     *
+     * \warning Binding to this API must occur through an element of this
+     *      module.
+     */
+    MOD_PSU_API_IDX_DEVICE,
 
-    /*! Number of defined APIs */
+    /*!
+     * \brief Number of defined APIs.
+     */
     MOD_PSU_API_IDX_COUNT
 };
 
-/*! Device API identifier */
-static const fwk_id_t mod_psu_api_id_psu_device =
-    FWK_ID_API_INIT(FWK_MODULE_IDX_PSU, MOD_PSU_API_IDX_PSU_DEVICE);
-
 /*!
- * \brief Event indices.
+ * \brief Device API identifier.
+ *
+ * \note This identifier corresponds to the ::MOD_PSU_API_IDX_DEVICE API index.
  */
-enum mod_psu_event_idx {
-    /*! Event index for mod_psu_event_id_set_enabled */
-    MOD_PSU_EVENT_IDX_SET_ENABLED,
-
-    /*! Event index for mod_psu_event_id_set_voltage */
-    MOD_PSU_EVENT_IDX_SET_VOLTAGE,
-
-    /*! Number of defined events */
-    MOD_PSU_EVENT_IDX_COUNT
-};
-
-/*! <tt>Set enabled</tt> event identifier */
-static const fwk_id_t mod_psu_event_id_set_enabled =
-    FWK_ID_EVENT_INIT(FWK_MODULE_IDX_PSU, MOD_PSU_EVENT_IDX_SET_ENABLED);
-
-/*! <tt>Set voltage</tt> event identifier */
-static const fwk_id_t mod_psu_event_id_set_voltage =
-    FWK_ID_EVENT_INIT(FWK_MODULE_IDX_PSU, MOD_PSU_EVENT_IDX_SET_VOLTAGE);
-
-/*!
- * \}
- */
+static const fwk_id_t mod_psu_api_id_device =
+    FWK_ID_API_INIT(FWK_MODULE_IDX_PSU, MOD_PSU_API_IDX_DEVICE);
 
 /*!
  * \}

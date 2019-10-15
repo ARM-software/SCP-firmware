@@ -1,6 +1,6 @@
 # Framework Guide
 
-Copyright (c) 2011-2017, Arm Limited. All rights reserved.
+Copyright (c) 2011-2019, Arm Limited. All rights reserved.
 
 This guide covers the framework that is used to implement the SCP/MCP Software
 and which can also be used to extend the provided implementation. Each of the

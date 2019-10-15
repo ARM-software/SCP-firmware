@@ -6,19 +6,20 @@
  */
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
+#include <fwk_status.h>
 #include <fwk_test.h>
 
 #define SIZE_MEM            (1024 * 1024)
 #define ALLOC_NUM           5
 #define ALLOC_SIZE          64
 #define ALLOC_ODD_SIZE      3
-#define ALLOC_ALIGN         16
+#define ALLOC_ALIGN         (alignof(max_align_t) * 2)
 #define ALLOC_BAD_ALIGN     12
 #define ALLOC_TOTAL_SIZE    (ALLOC_NUM * ALLOC_SIZE)
 #define MEM_PATTERN         0x0A
@@ -114,7 +115,7 @@ static void test_fwk_mm_alloc(void)
     /* Allocate a memory block with an odd size */
     result = fwk_mm_alloc(ALLOC_NUM, ALLOC_ODD_SIZE);
     assert(result != NULL);
-    assert(((uintptr_t)result & FWK_MM_DEFAULT_ALIGNMENT) == 0);
+    assert(((uintptr_t)result % FWK_MM_DEFAULT_ALIGNMENT) == 0);
 
     /*
      * The start address of the last-allocated block should be 64-bit aligned,
@@ -123,7 +124,7 @@ static void test_fwk_mm_alloc(void)
      */
     result = fwk_mm_alloc(ALLOC_NUM, ALLOC_SIZE);
     assert(result != NULL);
-    assert(((uintptr_t)result & FWK_MM_DEFAULT_ALIGNMENT) == 0);
+    assert(((uintptr_t)result % FWK_MM_DEFAULT_ALIGNMENT) == 0);
     assert((uintptr_t)result + ALLOC_TOTAL_SIZE <=
         (uintptr_t)start + SIZE_MEM);
 
@@ -209,7 +210,7 @@ static void test_fwk_mm_calloc(void)
     /* Allocate a memory block with an odd size */
     result = fwk_mm_calloc(ALLOC_NUM, ALLOC_ODD_SIZE);
     assert(result != NULL);
-    assert(((uintptr_t)result & FWK_MM_DEFAULT_ALIGNMENT) == 0);
+    assert(((uintptr_t)result % FWK_MM_DEFAULT_ALIGNMENT) == 0);
 
     /*
      * The start address of the last-allocated block should be 64-bit aligned,
@@ -218,7 +219,7 @@ static void test_fwk_mm_calloc(void)
      */
     result = fwk_mm_calloc(ALLOC_NUM, ALLOC_SIZE);
     assert(result != NULL);
-    assert(((uintptr_t)result & FWK_MM_DEFAULT_ALIGNMENT) == 0);
+    assert(((uintptr_t)result % FWK_MM_DEFAULT_ALIGNMENT) == 0);
     assert((uintptr_t)result + ALLOC_TOTAL_SIZE <=
            (uintptr_t)start + SIZE_MEM);
 

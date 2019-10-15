@@ -8,10 +8,10 @@
  *     N1SDP System Support.
  */
 
-#include <assert.h>
 #include <stdint.h>
 #include <string.h>
 #include <fmw_cmsis.h>
+#include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
 #include <fwk_macros.h>
@@ -20,18 +20,43 @@
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <mod_clock.h>
+#include <mod_n1sdp_dmc620.h>
 #include <mod_n1sdp_flash.h>
 #include <mod_n1sdp_system.h>
 #include <mod_log.h>
 #include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
+#include <mod_scmi.h>
+#include <mod_sds.h>
 #include <mod_system_power.h>
 #include <n1sdp_core.h>
 #include <n1sdp_scp_pik.h>
 #include <n1sdp_scp_irq.h>
 #include <n1sdp_scp_mmap.h>
+#include <n1sdp_scp_scmi.h>
+#include <n1sdp_sds.h>
 #include <n1sdp_ssc.h>
 #include <config_clock.h>
+
+/*
+ * DDR memory information structure used by BL31
+ */
+struct n1sdp_ddr_mem_info {
+    /* DDR memory size in GigaBytes */
+    uint32_t ddr_size_gb;
+};
+
+/*
+ * BL33 image information structure used by BL31
+ */
+struct n1sdp_bl33_info {
+    /* Source address of BL33 image */
+    uint32_t bl33_src_addr;
+    /* Load address of BL33 image */
+    uint32_t bl33_dst_addr;
+    /* BL33 image size */
+    uint32_t bl33_size;
+};
 
 /* Coresight counter register definitions */
 struct cs_cnt_ctrl_reg {
@@ -42,6 +67,30 @@ struct cs_cnt_ctrl_reg {
 };
 
 #define CS_CNTCONTROL ((struct cs_cnt_ctrl_reg *)SCP_CS_CNTCONTROL_BASE)
+
+/* SCMI Services used by software on the AP cores */
+static unsigned int scmi_notification_table[] = {
+    SCP_N1SDP_SCMI_SERVICE_IDX_PSCI,
+    SCP_N1SDP_SCMI_SERVICE_IDX_OSPM,
+};
+
+/* SDS Feature flags */
+static const uint32_t feature_flags = (N1SDP_SDS_FEATURE_FIRMWARE_MASK |
+                                       N1SDP_SDS_FEATURE_DMC_MASK |
+                                       N1SDP_SDS_FEATURE_MESSAGING_MASK);
+static fwk_id_t sds_feature_availability_id =
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS,
+                            SDS_ELEMENT_IDX_FEATURE_AVAILABILITY);
+
+/* SDS DDR memory information */
+static struct n1sdp_ddr_mem_info sds_ddr_mem_info;
+static fwk_id_t sds_ddr_mem_info_id =
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, SDS_ELEMENT_IDX_DDR_MEM_INFO);
+
+/* SDS BL33 image information */
+static struct n1sdp_bl33_info sds_bl33_info;
+static fwk_id_t sds_bl33_info_id =
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, SDS_ELEMENT_IDX_BL33_INFO);
 
 /* Module context */
 struct n1sdp_system_ctx {
@@ -57,6 +106,12 @@ struct n1sdp_system_ctx {
 
     /* Pointer to N1SDP Flash APIs */
     const struct mod_n1sdp_flash_api *flash_api;
+
+    /* Pointer to DMC620 memory information API */
+    const struct mod_dmc620_mem_info_api *dmc620_api;
+
+    /* Pointer to SDS */
+    const struct mod_sds_api *sds_api;
 };
 
 struct n1sdp_system_isr {
@@ -191,65 +246,6 @@ static int n1sdp_system_copy_to_ap_sram(uint64_t sram_address,
     return FWK_SUCCESS;
 }
 
-/*
- * Function to copy into DRAM location
- */
-static int n1sdp_system_copy_to_ap_ddr(uint64_t dram_address,
-                                       uint32_t spi_address,
-                                       uint32_t size)
-{
-    uint32_t scp_address = 0;
-    uint32_t copy_size = 0;
-    uint32_t addr_offset = 0;
-    int status = FWK_SUCCESS;
-
-    while (size != 0) {
-        addr_offset = (uint32_t)(dram_address & SCP_AP_1MB_WINDOW_ADDR_MASK);
-
-        /* Map 1MB window to corresponding address in AP memory map. */
-        n1sdp_system_enable_ap_memory_access(
-            dram_address >> SCP_AP_1MB_WINDOW_ADDR_SHIFT);
-
-        /* Get destination for this copy in SCP address space. */
-        scp_address = SCP_AP_1MB_WINDOW_BASE | addr_offset;
-
-        /* Get the size for this copy operation. */
-        if (size > (SCP_AP_1MB_WINDOW_SIZE - addr_offset)) {
-            /*
-             * If the copy operation will wrap around the end of the
-             * 1MB window we need to cut it off at the wrap around
-             * point and change the window address.
-             */
-            copy_size = (uint32_t)(SCP_AP_1MB_WINDOW_SIZE - addr_offset);
-        } else {
-            /* All remaining data is within the current 1MB window. */
-            copy_size = size;
-        }
-
-        /* Copy the data into the selected 1MB window. */
-        memcpy((void *)scp_address, (void *)spi_address, copy_size);
-
-        if (memcmp((void *)spi_address, (void *)scp_address, copy_size) != 0) {
-            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                "[N1SDP SYSTEM] Copy failed at destination address: 0x%08x\n",
-                scp_address);
-            status = FWK_E_DATA;
-            goto exit;
-        }
-
-        /* Update variables before starting over. */
-        dram_address = dram_address + copy_size;
-        spi_address = spi_address + copy_size;
-        size = size - copy_size;
-    }
-
-exit:
-    /* Disable the 1MB window. */
-    n1sdp_system_disable_ap_memory_access();
-
-    return status;
-}
-
 void cdbg_pwrupreq_handler(void)
 {
     n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
@@ -271,6 +267,161 @@ void csys_pwrupreq_handler(void)
     /* Clear interrupt */
     PIK_DEBUG->DEBUG_CTRL |= (0x1 << 2);
     fwk_interrupt_disable(CSYS_PWR_UP_REQ_IRQ);
+}
+
+/*
+ * Function to fill platform information structure.
+ */
+static int n1sdp_system_fill_mem_info(void)
+{
+    int status;
+    uint32_t ddr_size_gb;
+    const struct mod_sds_structure_desc *sds_structure_desc =
+        fwk_module_get_data(sds_ddr_mem_info_id);
+
+    ddr_size_gb = 0;
+    status = n1sdp_system_ctx.dmc620_api->get_mem_size_gb(&ddr_size_gb);
+    if (status != FWK_SUCCESS) {
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "Error calculating DDR memory size!\n");
+        return status;
+    }
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "    Total DDR Size: %d GB\n", ddr_size_gb);
+
+    sds_ddr_mem_info.ddr_size_gb = ddr_size_gb;
+    return n1sdp_system_ctx.sds_api->struct_write(sds_structure_desc->id,
+        0, (void *)(&sds_ddr_mem_info), sds_structure_desc->size);
+}
+
+static int n1sdp_system_fill_bl33_info(void)
+{
+    const struct mod_sds_structure_desc *sds_structure_desc =
+        fwk_module_get_data(sds_bl33_info_id);
+
+    sds_bl33_info.bl33_src_addr = BL33_SRC_BASE_ADDR;
+    sds_bl33_info.bl33_dst_addr = BL33_DST_BASE_ADDR;
+    sds_bl33_info.bl33_size = BL33_SIZE;
+    return n1sdp_system_ctx.sds_api->struct_write(sds_structure_desc->id,
+        0, (void *)(&sds_bl33_info), sds_structure_desc->size);
+}
+
+/*
+ * Initialize primary core during system initialization
+ */
+static int n1sdp_system_init_primary_core(void)
+{
+    int status;
+    struct mod_pd_restricted_api *mod_pd_restricted_api = NULL;
+    struct mod_n1sdp_fip_descriptor *fip_desc_table = NULL;
+    unsigned int fip_count;
+    unsigned int i;
+    unsigned int core_idx;
+    unsigned int cluster_idx;
+    unsigned int cluster_count;
+    int fip_index_bl31 = -1;
+
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[N1SDP SYSTEM] Looking for AP firmware in flash memory...\n");
+
+    status = n1sdp_system_ctx.flash_api->get_n1sdp_fip_descriptor_count(
+        FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SYSTEM), &fip_count);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    status = n1sdp_system_ctx.flash_api->get_n1sdp_fip_descriptor_table(
+        FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SYSTEM), &fip_desc_table);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    for (i = 0; i < fip_count; i++) {
+        if (fip_desc_table[i].type == MOD_N1SDP_FIP_TYPE_TF_BL31) {
+            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                "[N1SDP SYSTEM] Found BL31 at address: 0x%08x,"
+                " size: %u, flags: 0x%x\n",
+                fip_desc_table[i].address, fip_desc_table[i].size,
+                fip_desc_table[i].flags);
+            fip_index_bl31 = i;
+            break;
+        }
+    }
+
+    if (fip_index_bl31 < 0) {
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[N1SDP SYSTEM] Error! "
+            "FIP does not have BL31 binary\n");
+        return FWK_E_PANIC;
+    }
+
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[N1SDP SYSTEM] Copying AP BL31 to address 0x%x...\n",
+        AP_CORE_RESET_ADDR);
+
+    status = n1sdp_system_copy_to_ap_sram(AP_CORE_RESET_ADDR,
+                 fip_desc_table[fip_index_bl31].address,
+                 fip_desc_table[fip_index_bl31].size);
+    if (status != FWK_SUCCESS)
+        return FWK_E_PANIC;
+
+    /* Fill memory information structure */
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[N1SDP SYSTEM] Collecting memory information...\n");
+    status = n1sdp_system_fill_mem_info();
+    if (status != FWK_SUCCESS)
+        return status;
+
+    /* Fill BL33 image information structure */
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[N1SDP SYSTEM] Collecting memory information...\n");
+    status = n1sdp_system_fill_bl33_info();
+    if (status != FWK_SUCCESS)
+        return status;
+
+    mod_pd_restricted_api = n1sdp_system_ctx.mod_pd_restricted_api;
+
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[N1SDP SYSTEM] Setting AP Reset Address to 0x%08x\n",
+        AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET);
+
+    cluster_count = n1sdp_core_get_cluster_count();
+    for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
+        for (core_idx = 0;
+            core_idx < n1sdp_core_get_core_per_cluster_count(cluster_idx);
+            core_idx++) {
+            PIK_CLUSTER(cluster_idx)->STATIC_CONFIG[core_idx].RVBARADDR_LW
+                = (uint32_t)(AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET);
+            PIK_CLUSTER(cluster_idx)->STATIC_CONFIG[core_idx].RVBARADDR_UP
+                = (uint32_t)
+                ((AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET) >> 32);
+        }
+    }
+
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+        "[N1SDP SYSTEM] Booting primary core at %d MHz...\n",
+        PIK_CLK_RATE_CLUS0_CPU / FWK_MHZ);
+
+    status = mod_pd_restricted_api->set_composite_state_async(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
+        false,
+        MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
+            MOD_PD_STATE_ON, MOD_PD_STATE_ON));
+    if (status != FWK_SUCCESS)
+        return status;
+
+    return FWK_SUCCESS;
+}
+
+static int messaging_stack_ready(void)
+{
+    const struct mod_sds_structure_desc *sds_structure_desc =
+        fwk_module_get_data(sds_feature_availability_id);
+
+    /*
+     * Write SDS Feature Availability to signal the completion of the messaging
+     * stack
+     */
+    return n1sdp_system_ctx.sds_api->struct_write(sds_structure_desc->id,
+        0, (void *)(&feature_flags), sds_structure_desc->size);
 }
 
 /*
@@ -298,16 +449,23 @@ static int n1sdp_system_bind(fwk_id_t id, unsigned int round)
 {
     int status;
 
-    if (round == 0) {
-        status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
-            FWK_ID_API(FWK_MODULE_IDX_LOG, 0), &n1sdp_system_ctx.log_api);
-        if (status != FWK_SUCCESS)
-            return status;
-    }
+    if (round > 0)
+        return FWK_SUCCESS;
+
+    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
+        FWK_ID_API(FWK_MODULE_IDX_LOG, 0), &n1sdp_system_ctx.log_api);
+    if (status != FWK_SUCCESS)
+        return status;
 
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_FLASH),
-                             FWK_ID_API(FWK_MODULE_IDX_N1SDP_FLASH, 0),
-                             &n1sdp_system_ctx.flash_api);
+         FWK_ID_API(FWK_MODULE_IDX_N1SDP_FLASH, 0),
+         &n1sdp_system_ctx.flash_api);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_DMC620),
+         FWK_ID_API(FWK_MODULE_IDX_N1SDP_DMC620, MOD_DMC620_API_IDX_MEM_INFO),
+         &n1sdp_system_ctx.dmc620_api);
     if (status != FWK_SUCCESS)
         return status;
 
@@ -317,9 +475,15 @@ static int n1sdp_system_bind(fwk_id_t id, unsigned int round)
     if (status != FWK_SUCCESS)
         return status;
 
-    return fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_PPU_V1),
+    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_PPU_V1),
         FWK_ID_API(FWK_MODULE_IDX_PPU_V1, MOD_PPU_V1_API_IDX_ISR),
         &n1sdp_system_ctx.ppu_v1_isr_api);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    return fwk_module_bind(fwk_module_id_sds,
+        FWK_ID_API(FWK_MODULE_IDX_SDS, 0),
+        &n1sdp_system_ctx.sds_api);
 }
 
 static int n1sdp_system_process_bind_request(fwk_id_t requester_id,
@@ -342,6 +506,7 @@ static int n1sdp_system_process_bind_request(fwk_id_t requester_id,
 static int n1sdp_system_start(fwk_id_t id)
 {
     int status;
+    unsigned int i;
 
     status = fwk_notification_subscribe(
         mod_clock_notification_id_state_changed,
@@ -379,6 +544,33 @@ static int n1sdp_system_start(fwk_id_t id)
     n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
         "[N1SDP SYSTEM] Requesting SYSTOP initialization...\n");
 
+    /*
+     * Subscribe to these SCMI channels in order to know when they have all
+     * initialized.
+     * At that point we can consider the SCMI stack to be initialized from
+     * the point of view of the PSCI agent.
+     */
+    for (i = 0; i < FWK_ARRAY_SIZE(scmi_notification_table); i++) {
+        status = fwk_notification_subscribe(
+            mod_scmi_notification_id_initialized,
+            fwk_id_build_element_id(fwk_module_id_scmi,
+                scmi_notification_table[i]),
+            id);
+        if (status != FWK_SUCCESS)
+            return status;
+    }
+
+    /*
+     * Subscribe to the SDS initialized notification so we can correctly let the
+     * PSCI agent know that the SCMI stack is initialized.
+     */
+    status = fwk_notification_subscribe(
+        mod_sds_notification_id_initialized,
+        fwk_module_id_sds,
+        id);
+    if (status != FWK_SUCCESS)
+        return status;
+
     return n1sdp_system_ctx.mod_pd_restricted_api->set_composite_state_async(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0), false,
             MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
@@ -389,124 +581,50 @@ static int n1sdp_system_process_notification(const struct fwk_event *event,
     struct fwk_event *resp_event)
 {
     struct clock_notification_params *params = NULL;
-    struct mod_pd_restricted_api *mod_pd_restricted_api = NULL;
-    struct mod_n1sdp_fip_descriptor *fip_desc_table = NULL;
-    unsigned int fip_count;
-    unsigned int i;
-    unsigned int core_idx;
-    unsigned int cluster_idx;
-    unsigned int cluster_count;
-    int fip_index_bl31 = -1;
-    int fip_index_bl33 = -1;
+    static unsigned int scmi_notification_count = 0;
+    static bool sds_notification_received = false;
     int status;
 
-    assert(fwk_id_is_equal(event->id,
-                           mod_clock_notification_id_state_changed));
     assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
 
     params = (struct clock_notification_params *)event->params;
 
-    /*
-     * Initialize primary core when the system is initialized for the
-     * first time only.
-     */
-    if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
-
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-            "[N1SDP SYSTEM] Looking for AP firmware in flash memory...\n");
-
-        status = n1sdp_system_ctx.flash_api->get_n1sdp_fip_descriptor_count(
-            FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SYSTEM), &fip_count);
-        if (status != FWK_SUCCESS)
-            return status;
-
-        status = n1sdp_system_ctx.flash_api->get_n1sdp_fip_descriptor_table(
-            FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SYSTEM), &fip_desc_table);
-        if (status != FWK_SUCCESS)
-            return status;
-
-        for (i = 0; i < fip_count; i++) {
-            if (fip_desc_table[i].type == MOD_N1SDP_FIP_TYPE_TF_BL31) {
-                n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                    "[N1SDP SYSTEM] Found BL31 at address: 0x%08x,"
-                    " size: %u, flags: 0x%x\n",
-                    fip_desc_table[i].address, fip_desc_table[i].size,
-                    fip_desc_table[i].flags);
-                fip_index_bl31 = i;
-            } else if (fip_desc_table[i].type == MOD_N1SDP_FIP_TYPE_NS_BL33) {
-                n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                    "[N1SDP SYSTEM] Found BL33 at address: 0x%08x,"
-                    " size: %u, flags: 0x%x\n",
-                    fip_desc_table[i].address, fip_desc_table[i].size,
-                    fip_desc_table[i].flags);
-                fip_index_bl33 = i;
-            }
-        }
-
-        if ((fip_index_bl31 < 0) || (fip_index_bl33 < 0)) {
-            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                "[N1SDP SYSTEM] Error! "
-                "FIP does not have all required binaries\n");
-            return FWK_E_PANIC;
-        }
-
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-            "[N1SDP SYSTEM] Copying AP BL31 to address 0x%x...\n",
-            AP_CORE_RESET_ADDR);
-
-        status = n1sdp_system_copy_to_ap_sram(AP_CORE_RESET_ADDR,
-                     fip_desc_table[fip_index_bl31].address,
-                     fip_desc_table[fip_index_bl31].size);
-        if (status != FWK_SUCCESS)
-            return FWK_E_PANIC;
-
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-            "[N1SDP SYSTEM] Copying AP BL33 to address 0x%x...\n",
-            AP_BL33_BASE_ADDR);
-
-        status = n1sdp_system_copy_to_ap_ddr(AP_BL33_BASE_ADDR,
-                     fip_desc_table[fip_index_bl33].address,
-                     fip_desc_table[fip_index_bl33].size);
-        if (status != FWK_SUCCESS)
-            return FWK_E_PANIC;
-
-        mod_pd_restricted_api = n1sdp_system_ctx.mod_pd_restricted_api;
-
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-            "[N1SDP SYSTEM] Setting AP Reset Address to 0x%x\n",
-            AP_CORE_RESET_ADDR);
-
-        cluster_count = n1sdp_core_get_cluster_count();
-        for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
-            for (core_idx = 0;
-                core_idx < n1sdp_core_get_core_per_cluster_count(cluster_idx);
-                core_idx++) {
-                PIK_CLUSTER(cluster_idx)->STATIC_CONFIG[core_idx].RVBARADDR_LW
-                    = (uint32_t)(AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET);
-                PIK_CLUSTER(cluster_idx)->STATIC_CONFIG[core_idx].RVBARADDR_UP
-                    = (uint32_t)
-                    ((AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET) >> 32);
-            }
-        }
-
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
-            "[N1SDP SYSTEM] Switching ON primary core...\n");
-
-        status = mod_pd_restricted_api->set_composite_state_async(
-            FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
-            false,
-            MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
-                MOD_PD_STATE_ON, MOD_PD_STATE_ON));
-        if (status != FWK_SUCCESS)
-            return status;
+    if (fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed)) {
 
         /*
-         * Unsubscribe to interconnect clock state change notification as
-         * it has to be processed only once during system startup.
+         * Initialize primary core when the system is initialized for the
+         * first time only.
          */
-        return fwk_notification_unsubscribe(event->id, event->source_id,
-                                            event->target_id);
-    }
+        if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
+            status = n1sdp_system_init_primary_core();
+            if (status != FWK_SUCCESS)
+                return status;
+
+            /*
+             * Unsubscribe to interconnect clock state change notification as
+             * it has to be processed only once during system startup.
+             */
+            return fwk_notification_unsubscribe(event->id, event->source_id,
+                                                event->target_id);
+        }
+
+        return FWK_SUCCESS;
+    } else if (fwk_id_is_equal(event->id,
+                               mod_scmi_notification_id_initialized)) {
+        scmi_notification_count++;
+    } else if (fwk_id_is_equal(event->id,
+                               mod_sds_notification_id_initialized)) {
+        sds_notification_received = true;
+    } else
+        return FWK_E_PARAM;
+
+    if ((scmi_notification_count == FWK_ARRAY_SIZE(scmi_notification_table)) &&
+        sds_notification_received) {
+        messaging_stack_ready();
+
+        scmi_notification_count = 0;
+        sds_notification_received = false;
+     }
 
     return FWK_SUCCESS;
 }

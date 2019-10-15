@@ -89,9 +89,7 @@ static int dvfs_bind_element(fwk_id_t domain_id, unsigned int round)
 
     /* Bind to the power supply module */
     status = fwk_module_bind(
-        ctx->config->psu_id,
-        mod_psu_api_id_psu_device,
-        &ctx->apis.psu);
+        ctx->config->psu_id, mod_psu_api_id_device, &ctx->apis.psu);
     if (status != FWK_SUCCESS)
         return FWK_E_PANIC;
 

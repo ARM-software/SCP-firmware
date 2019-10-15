@@ -1,0 +1,12 @@
+#
+# Core maintainers
+#
+
+* chris.kay@arm.com nicola.mazzucato@arm.com jim.quigley@arm.com ronald.cron@arm.com souvik.chakravarty@arm.com
+
+#
+# Platform maintainers
+#
+
+/product/n1sdp/ manoj.kumar3@arm.com sudipto.paul@arm.com
+/product/synquacer/ masahisa.kojima@linaro.org

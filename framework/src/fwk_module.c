@@ -10,9 +10,9 @@
 
 #include <string.h>
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_host.h>
 #include <fwk_mm.h>
+#include <fwk_status.h>
 #include <internal/fwk_module.h>
 #include <internal/fwk_thread.h>
 #ifdef BUILD_HAS_NOTIFICATION
@@ -587,6 +587,14 @@ int fwk_module_get_element_count(fwk_id_t id)
         return FWK_E_PARAM;
 }
 
+int fwk_module_get_sub_element_count(fwk_id_t element_id)
+{
+    if (fwk_module_is_valid_element_id(element_id))
+        return __fwk_module_get_element_ctx(element_id)->sub_element_count;
+    else
+        return FWK_E_PARAM;
+}
+
 const char *fwk_module_get_name(fwk_id_t id)
 {
     if (fwk_module_is_valid_element_id(id))
@@ -599,7 +607,8 @@ const char *fwk_module_get_name(fwk_id_t id)
 
 const void *fwk_module_get_data(fwk_id_t id)
 {
-    if (fwk_module_is_valid_element_id(id))
+    if (fwk_module_is_valid_element_id(id) ||
+        fwk_module_is_valid_sub_element_id(id))
         return __fwk_module_get_element_ctx(id)->desc->data;
     else if (fwk_module_is_valid_module_id(id))
         return __fwk_module_get_ctx(id)->config->data;

@@ -66,13 +66,57 @@
  */
 #define PCIE_PHY_PLL_LOCK_TIMEOUT      UINT32_C(100)
 #define PCIE_CTRL_RC_RESET_TIMEOUT     UINT32_C(100)
-#define PCIE_LINK_TRAINING_TIMEOUT     UINT32_C(20000)
+#define PCIE_LINK_TRAINING_TIMEOUT     UINT32_C(100000)
+#define PCIE_LINK_RE_TRAINING_TIMEOUT  UINT32_C(1000000)
+
+/* PCIe controller power on timeout (in microseconds) */
+#define PCIE_POWER_ON_TIMEOUT          UINT32_C(10)
 
 /* PCIe configuration space offset definitions */
 #define PCIE_CLASS_CODE_OFFSET         0x8
+#define PCIE_LINK_CTRL_STATUS_OFFSET   0xD0
+#define PCIE_LINK_CTRL_STATUS_2_OFFSET 0xF0
+
+/* PCIe configuration space link control status register definitions */
+#define PCIE_LINK_CTRL_LINK_RETRAIN_MASK    0x20
+#define PCIE_LINK_CTRL_NEG_SPEED_MASK       0xF
+#define PCIE_LINK_CTRL_NEG_WIDTH_MASK       0x3F
+#define PCIE_LINK_CTRL_NEG_SPEED_POS        16
+#define PCIE_LINK_CTRL_NEG_WIDTH_POS        20
+
+/* PCIe configuration space link control status register 2 definitions */
+#define PCIE_LINK_CTRL_2_TARGET_SPEED_MASK  0xF
+#define PCIE_LINK_CTRL_2_TARGET_SPEED_GEN4  0x4
 
 /* PCIe class code for PCI bridge */
 #define PCIE_CLASS_CODE_PCI_BRIDGE     UINT32_C(0x06040000)
+
+/* PCIe controller local management (LM) register offsets */
+#define PCIE_LM_RC_BAR_CONFIG_REG      UINT32_C(0x300)
+#define PCIE_LM_RC_CCIX_CTRL_REG       UINT32_C(0xCA4)
+
+/* CCIX CONTROL Values */
+#define CCIX_CTRL_EN_OPT_TLP           (1U << 16)
+#define CCIX_CTRL_CSTT_V0_V1           (1U << 17)
+#define CCIX_CTRL_CAW                  (8U << 24)
+
+/*
+ * CCIX Consortium defined Vendor ID. This vendor id is embedded in
+ * the tlp packets.
+ * Non Compliance to this value would cause the CCIX capable PCIe
+ * controllers to drop the incoming packet.
+ * This value is same as what Xilinx Hood FPGA expects.
+ * To be revisited after consortium finalizes the value.
+ */
+#define CCIX_VENDER_ID                 (0x2692)
+
+/* PCIe LM root complex bar configuration register bit masks */
+#define TYPE1_PREF_MEM_BAR_ENABLE_MASK      (1U << 17)
+#define TYPE1_PREF_MEM_BAR_SIZE_32BIT_MASK  (0U << 18)
+#define TYPE1_PREF_MEM_BAR_SIZE_64BIT_MASK  (1U << 18)
+#define TYPE1_PREF_IO_BAR_ENABLE_MASK       (1U << 19)
+#define TYPE1_PREF_IO_BAR_SIZE_32BIT_MASK   (0U << 20)
+#define TYPE1_PREF_IO_BAR_SIZE_64BIT_MASK   (1U << 20)
 
 /*
  * Root port's config space cannot be written directly with its base address.
@@ -90,7 +134,7 @@
 
 /* Maximum bus levels for type 0 and type 1 transactions */
 #define MAX_TYPE0_BUS_LEVELS           2
-#define MAX_TYPE1_BUS_LEVELS           8
+#define MAX_TYPE1_BUS_LEVELS           16
 
 /* Maximum AXI space for type 0 and type 1 transactions */
 #define AXI_ECAM_TYPE0_SIZE            (MAX_TYPE0_BUS_LEVELS * \
@@ -114,7 +158,7 @@
 /*
  * CCIX AXI slave ECAM memory mapping
  */
-#define CCIX_AXI_ECAM_TYPE0_OFFSET     (16 * FWK_MIB)
+#define CCIX_AXI_ECAM_TYPE0_OFFSET     UINT32_C(0)
 
 #define CCIX_AXI_ECAM_TYPE1_OFFSET     (CCIX_AXI_ECAM_TYPE0_OFFSET + \
                                            AXI_ECAM_TYPE0_SIZE)
@@ -128,11 +172,12 @@
 /* CCIX AXI slave MMIO32 & IO offset addresses */
 #define CCIX_AXI_MMIO32_OFFSET         (CCIX_AXI_ECAM_TYPE1_OFFSET + \
                                             AXI_ECAM_TYPE1_SIZE)
-#define CCIX_AXI_IO_OFFSET             UINT32_C(0)
+#define CCIX_AXI_IO_OFFSET             (CCIX_AXI_MMIO32_OFFSET + \
+                                            AXI_MMIO32_SIZE)
 
 /* AXI inbound region data */
 #define AXI_IB_REGION_BASE             UINT64_C(0)
-#define AXI_IB_REGION_SIZE             (4 * FWK_GIB)
+#define AXI_IB_REGION_SIZE_MSB         42
 
 /*
  * PCIe Descriptor Register definitions
@@ -212,6 +257,34 @@
 #define AXI_LOW_ADDR_BIT_POS           8
 #define AXI_HIGH_ADDR_BIT_POS          32
 #define AXI_ADDR_NUM_BITS_MAX          ((1 << 6) - 1)
+
+#define TX_PRESET_VALUE                0x4
+
+#define GEN3_OFFSET_MIN                0x30C
+#define GEN3_OFFSET_MAX                0x32C
+#define GEN3_PRESET                    0x8
+
+#define GEN4_OFFSET_MIN                0x9E0
+#define GEN4_OFFSET_MAX                0x9F0
+#define GEN4_PRESET                    0x4
+
+/*
+ * PCI express extended capability header definitions
+ */
+#define EXT_CAP_ID_MASK                UINT32_C(0xFFFF)
+#define EXT_CAP_ID_POS                 UINT32_C(0)
+#define EXT_CAP_NEXT_CAP_MASK          UINT32_C(0xFFF)
+#define EXT_CAP_NEXT_CAP_POS           UINT32_C(20)
+#define EXT_CAP_START_OFFSET           UINT32_C(0x100)
+
+#define EXT_CAP_ID_ATS                 UINT16_C(0x0F)
+#define EXT_CAP_ID_PRI                 UINT16_C(0x13)
+
+/*
+ * AXI override values for PCIe & CCIX root ports
+ */
+#define AXI_OVRD_VAL_PCIE              UINT32_C(0x00303F3B)
+#define AXI_OVRD_VAL_CCIX              UINT32_C(0x00303F3B)
 
 /*
  * AXI outbound region register set definitions
@@ -326,6 +399,12 @@ struct axi_ob_config {
  * Identifiers of PCIe initialization stages
  */
 enum pcie_init_stage {
+    /* PCIe controller power ON stage */
+    PCIE_INIT_STAGE_PCIE_POWER_ON,
+
+    /* CCIX controller power ON stage */
+    PCIE_INIT_STAGE_CCIX_POWER_ON,
+
     /* PHY initialization stage */
     PCIE_INIT_STAGE_PHY,
 
@@ -335,14 +414,26 @@ enum pcie_init_stage {
     /* Link training stage */
     PCIE_INIT_STAGE_LINK_TRNG,
 
+    /* Link re-training stage for GEN4 speed */
+    PCIE_INIT_STAGE_LINK_RE_TRNG,
+
     /* PCIe initialization stages */
     PCIE_INIT_STAGE_COUNT,
 };
 
 /*
+ * Identifiers of PCIe Generation
+ */
+enum pcie_gen {
+    PCIE_GEN_1,
+    PCIE_GEN_2,
+    PCIE_GEN_3,
+    PCIE_GEN_4,
+};
+/*
  * Structure defining data to be passed to timer API
  */
-struct wait_condition_data {
+struct pcie_wait_condition_data {
     void *ctrl_apb;
     enum pcie_init_stage stage;
 };
@@ -387,18 +478,53 @@ int axi_inbound_region_setup(uint32_t axi_config_base_addr,
                              uint8_t bar);
 
 /*
+ * Brief - Function to check PCIe status in various initialization stages.
+ *
+ * param - data - Pointer to wait condition data
+ *
+ * retval - true - if the condition is met
+ *          false - if the condition is not met
+ */
+bool pcie_wait_condition(void *data);
+
+/*
  * Brief - Function to initialize different stages of PCIe module.
  *
  * param - ctrl_apb - Pointer to APB controller register space
  * param - timer_api - Pointer to timer API used for timeout detection
  * param - stage - Identifier of current PCIe initialization stage
+ * param - gen - PCIe Generation
  *
  * retval - FWK_SUCCESS - if the operation is succeeded
  *          FWK_E_TIMEOUT - if initialization times out
  */
 int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
               struct mod_timer_api *timer_api,
-              enum pcie_init_stage stage);
+              enum pcie_init_stage stage,
+              enum pcie_gen gen);
+
+
+/*
+ * Brief - Function to re-train PCIe link to GEN4 speed.
+ *
+ * param - ctrl_apb - Pointer to APB controller register space
+ * param - rp_ep_config_base - Root port configuration space base address
+ * param - timer_api - Pointer to timer API used for timeout detection
+ *
+ * retval - FWK_SUCCESS - if the operation is succeeded
+ *          FWK_E_TIMEOUT - if initialization times out
+ */
+int pcie_link_retrain(struct pcie_ctrl_apb_reg *ctrl_apb,
+                      uint32_t rp_ep_config_base,
+                      struct mod_timer_api *timer_api);
+
+/*
+ * Brief - Function to initialize PCIe PHY layer.
+ *
+ * param - pcie_phy_base - Base address of the PHY layer registers
+ * param - gen - PCIe Generation
+ */
+void pcie_phy_init(uint32_t phy_apb_base, enum pcie_gen gen);
 
 /*
  * Brief - Function to write to Root Port's/End Point's configuration space.
@@ -427,5 +553,34 @@ int pcie_rp_ep_config_write_word(uint32_t base,
 int pcie_rp_ep_config_read_word(uint32_t base,
                                 uint32_t offset,
                                 uint32_t *value);
+
+/*
+ * Brief - TX Equalization Preset function.
+ *
+ * param - rp_ep_config_apb_base - Base address of the PCIe configuration
+ *                                 APB registers.
+ * param - preset - Preset Value
+ * param - gen - PCIe generation
+ *
+ * retval - FWK_SUCCESS - if the operation is succeeded
+ *          FWK_E_DATA - if there is a mismatch between value written
+ *                       to and read from the register.
+ */
+int pcie_set_gen_tx_preset(uint32_t rp_ep_config_apb_base,
+                           uint32_t preset,
+                           enum pcie_gen gen);
+
+/*
+ * Brief - Function to skip an extended capability from capability
+ *         linked list.
+ *
+ * param - base - Base address of RP/EP's configuration memory
+ * param - ext_cap_id - Extended capability ID to be skipped
+ *
+ * retval - FWK_SUCCESS - if the operation is succeeded
+ *          FWK_E_SUPPORT - if the specified capability is not present in the
+ *                          linked list
+ */
+int pcie_skip_ext_cap(uint32_t base, uint16_t ext_cap_id);
 
 #endif /* N1SDP_PCIE_H */

@@ -42,7 +42,7 @@
  * Peripherals - Serial communication
  */
 #define SCP_UART_BASE                (SCP_PERIPHERAL_BASE + 0x2000)
-#define SCP_I2C0_BASE                (0x3FFFA000)
+#define SCP_I2C0_BASE                (0xBC040000)
 #define SCP_I2C1_BASE                (0x3FFFB000)
 #define SCP_I2C2_BASE                (0x3FFFC000)
 
@@ -186,8 +186,8 @@
 /*
  * DDR PHY base address
  */
-#define SCP_DDR_PHY0                 (SCP_SYS0_BASE + 0x3FB60000)
-#define SCP_DDR_PHY1                 (SCP_SYS0_BASE + 0x3FB70000)
+#define SCP_DDR_PHY0                 (0x50604000)
+#define SCP_DDR_PHY1                 (0x50614000)
 
 /*
  * DMC-620 controller base address

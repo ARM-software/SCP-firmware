@@ -14,15 +14,15 @@
 #include <string.h>
 #include <fwk_assert.h>
 #include <fwk_element.h>
-#include <fwk_errno.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <fwk_thread.h>
 #include <fwk_multi_thread.h>
 #include <fwk_notification.h>
+#include <fwk_status.h>
+#include <fwk_thread.h>
 #include <mod_log.h>
 #include <mod_power_domain.h>
 
@@ -47,6 +47,9 @@ struct power_state_transition_notification_ctx {
      * Power state the power domain has transitioned to.
      */
     unsigned int state;
+
+    /* Storage for pre-transition power state */
+    unsigned int previous_state;
 };
 
 /* Context for the power state pre-transition notification */
@@ -697,10 +700,10 @@ static int initiate_power_state_transition(struct pd_ctx *pd)
 
     if ((pd->driver_api->deny != NULL) &&
         pd->driver_api->deny(pd->driver_id, state)) {
-        mod_pd_ctx.log_api->log(MOD_LOG_GROUP_ERROR,
+        mod_pd_ctx.log_api->log(MOD_LOG_GROUP_WARNING,
             "[PD] Transition of %s to state <%s>,\n",
             fwk_module_get_name(pd->id), get_state_name(pd, state));
-        mod_pd_ctx.log_api->log(MOD_LOG_GROUP_ERROR,
+        mod_pd_ctx.log_api->log(MOD_LOG_GROUP_WARNING,
             "\tdenied by driver.\n");
         return FWK_E_DEVICE;
     }
@@ -1089,6 +1092,22 @@ static void process_power_state_transition_report(struct pd_ctx *pd,
         (pd == mod_pd_ctx.system_suspend.last_core_pd)) {
         mod_pd_ctx.system_suspend.ongoing = false;
         complete_system_suspend(pd);
+    }
+
+    /*
+     * If notifications are pending, the transition report is delayed until all
+     * the state change notifications responses have arrived.
+     */
+    if (pd->power_state_transition_notification_ctx.pending_responses > 0) {
+         /*
+          * Save previous state which will be used once all the notifications
+          * have arrived to continue for deeper or shallower state for the next
+          * power domain.
+          */
+         pd->power_state_transition_notification_ctx.previous_state =
+            previous_state;
+
+         return;
     }
 
     if (is_deeper_state(new_state, previous_state))
@@ -1650,7 +1669,7 @@ static int pd_init(fwk_id_t module_id, unsigned int dev_count,
     mod_pd_ctx.pd_count = dev_count;
     mod_pd_ctx.system_pd_ctx = &mod_pd_ctx.pd_ctx_table[dev_count - 1];
 
-    return FWK_SUCCESS;
+    return fwk_thread_create(module_id);
 }
 
 static int pd_power_domain_init(fwk_id_t pd_id, unsigned int unused,
@@ -1964,8 +1983,25 @@ static int process_power_state_transition_notification_response(
     if (pd->power_state_transition_notification_ctx.pending_responses != 0)
         return FWK_SUCCESS;
 
-    if (pd->power_state_transition_notification_ctx.state == pd->current_state)
+    if (pd->power_state_transition_notification_ctx.state ==
+        pd->current_state) {
+        /* All notifications received, complete the transition report */
+
+        unsigned int previous_state =
+            pd->power_state_transition_notification_ctx.previous_state;
+
+        pd->power_state_transition_notification_ctx.previous_state =
+            pd->current_state;
+        /*
+         * Complete the report state change now that we have all notifications
+         */
+        if (is_deeper_state(pd->current_state, previous_state))
+            process_power_state_transition_report_deeper_state(pd);
+        else if (is_shallower_state(pd->current_state, previous_state))
+            process_power_state_transition_report_shallower_state(pd);
+
         return FWK_SUCCESS;
+    }
 
     /*
      * While receiving the responses, the power state of the power domain
@@ -2017,7 +2053,9 @@ const struct fwk_module module_power_domain = {
     .type = FWK_MODULE_TYPE_HAL,
     .api_count = MOD_PD_API_IDX_COUNT,
     .event_count = PD_EVENT_COUNT,
+#ifdef BUILD_HAS_NOTIFICATION
     .notification_count = MOD_PD_NOTIFICATION_COUNT,
+#endif
     .init = pd_init,
     .element_init = pd_power_domain_init,
     .post_init = pd_post_init,

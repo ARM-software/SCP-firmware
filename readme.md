@@ -1,4 +1,4 @@
-SCP-firmware - version 2.4
+SCP-firmware - version 2.5
 ==========================
 
 Copyright (c) 2011-2019, Arm Limited. All rights reserved.
@@ -40,10 +40,12 @@ Functionality
 -------------
 
 - Initialization of the system to enable application core boot
-- Power domain management
-- System power management
-- Dynamic voltage and frequency scaling (DVFS)
-- Sensor management
+- Runtime services:
+    - Power domain management
+    - System power management
+    - Performance domain management (Dynamic voltage and frequency scaling)
+    - Clock management
+    - Sensor management
 - System Control and Management Interface (SCMI, platform-side)
 - Support for the GNU Arm Embedded and Arm Compiler 6 toolchains
 - Support for platforms with several control processors
@@ -54,7 +56,9 @@ Platforms
 Various builds of the release have been tested on the following ARM Fixed
 Virtual Platforms (FVPs):
 
-- System Guidance for Mobile platform SGM-775 (Version 11.1 Build 30)
+- System Guidance for Mobile platform SGM-775 (Version 11.3 Build 42)
+- System Guidance for Infrastruture SGI-575 (Version 11.3 Build 42)
+- Neoverse N1 reference design (Version 11.6 Build 45)
 
 License
 -------

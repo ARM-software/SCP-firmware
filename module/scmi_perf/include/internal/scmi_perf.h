@@ -8,8 +8,8 @@
  *      SCMI performance domain management protocol support.
  */
 
-#ifndef SCMI_PERF_H
-#define SCMI_PERF_H
+#ifndef INTERNAL_SCMI_PERF_H
+#define INTERNAL_SCMI_PERF_H
 
 #define SCMI_PROTOCOL_ID_PERF      UINT32_C(0x13)
 #define SCMI_PROTOCOL_VERSION_PERF UINT32_C(0x10000)
@@ -243,6 +243,4 @@ struct __attribute((packed)) scmi_perf_notify_level_p2a {
     int32_t status;
 };
 
-extern struct scp_scmi_protocol scmi_perf_protocol;
-
-#endif /* SCMI_PERF_H */
+#endif /* INTERNAL_SCMI_PERF_H */

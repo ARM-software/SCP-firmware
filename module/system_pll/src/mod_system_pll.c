@@ -6,12 +6,11 @@
  */
 
 #include <stdint.h>
-#include <stdlib.h>
 #include <fwk_element.h>
-#include <fwk_errno.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
+#include <fwk_status.h>
 #include <mod_clock.h>
 #include <mod_system_pll.h>
 #include <mod_power_domain.h>

@@ -1,12 +1,45 @@
-SCP-firmware maintainers
-========================
+# Maintainers
 
-SCP-firmware is an Arm maintained project. All contributions are ultimately
-merged by the maintainers listed below.
+SCP-firmware is an Arm-maintained project. All contributions to the project must
+be approved by both a core maintainer and one or more sub-maintainers (if
+applicable). Contributions are always merged by a core maintainer.
 
-Maintainers
------------
+---
 
-David Cunado (david.cunado@arm.com, [davidcunado-arm](https://github.com/davidcunado-arm))
+## Core Maintainers
 
-Ronald Cron (ronald.cron@arm.com, [ronald-cron-arm](https://github.com/ronald-cron-arm))
+The core maintainers oversee the project as a whole, and approve and merge all
+contributions.
+
+- [Chris Kay](https://github.com/CJKay) (chris.kay@arm.com)
+- [Nicola Mazzucato](https://github.com/nicola-mazzucato-arm) (nicola.mazzucato@arm.com)
+- [Jim Quigley](https://github.com/jimqui01) (jim.quigley@arm.com)
+
+## Secondary Maintainers
+
+In the event that none of the core maintainers are available to deal with
+time-sensitive issues, secondary maintainers may also approve and merge
+contributions.
+
+- [Ronald Cron](https://github.com/ronald-cron-arm) (ronald.cron@arm.com)
+- [Souvik Chakravarty](https://github.com/souvikkc) (souvik.chakravarty@arm.com)
+
+---
+
+## Platform Maintainers
+
+### Arm
+
+Arm platforms typically come under the maintainership of the project core
+maintainers. The platforms listed here represent the exceptions to this rule.
+
+#### N1SDP (n1sdp)
+
+- [Manoj Kumar](https://github.com/manojkumar-arm) (manoj.kumar3@arm.com)
+- [Sudipto Paul](https://github.com/sudpau01) (sudipto.paul@arm.com)
+
+### Socionext Platform Maintainers
+
+#### SynQuacer (synquacer)
+
+- [Masahisa Kojima](https://github.com/masahisak) (masahisa.kojima@linaro.org)

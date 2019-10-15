@@ -10,14 +10,14 @@
 
 #include <limits.h>
 #include <stdbool.h>
-#include <stdlib.h>
 #include <fwk_arch.h>
-#include <fwk_errno.h>
 #include <fwk_interrupt.h>
 #include <fwk_mm.h>
+#include <fwk_status.h>
 
 static bool initialized;
 static const struct fwk_arch_interrupt_driver *driver;
+static unsigned int critical_section_nest_level;
 
 int fwk_interrupt_init(const struct fwk_arch_interrupt_driver *_driver)
 {
@@ -64,7 +64,15 @@ int fwk_interrupt_global_enable(void)
     if (!initialized)
         return FWK_E_INIT;
 
-    return driver->global_enable();
+    /* Decrement critical_section_nest_level only if in critical section */
+    if (critical_section_nest_level > 0)
+        critical_section_nest_level--;
+
+    /* Enable interrupts globally if now outside critical section */
+    if (critical_section_nest_level == 0)
+        return driver->global_enable();
+
+    return FWK_SUCCESS;
 }
 
 int fwk_interrupt_global_disable(void)
@@ -72,7 +80,13 @@ int fwk_interrupt_global_disable(void)
     if (!initialized)
         return FWK_E_INIT;
 
-    return driver->global_disable();
+    critical_section_nest_level++;
+
+    /* If now in outer-most critical section, disable interrupts globally */
+    if (critical_section_nest_level == 1)
+        return driver->global_disable();
+
+    return FWK_SUCCESS;
 }
 
 int fwk_interrupt_is_enabled(unsigned int interrupt, bool *enabled)

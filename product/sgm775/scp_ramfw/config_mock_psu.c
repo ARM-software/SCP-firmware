@@ -12,28 +12,28 @@
 static const struct fwk_element element_table[] = {
     {
         .name = "CPU_GROUP_LITTLE",
-        .data = &(const struct mod_mock_psu_device_config) {
+        .data = &(const struct mod_mock_psu_element_cfg) {
             .default_enabled = true,
             .default_voltage = 100,
         },
     },
     {
         .name = "CPU_GROUP_BIG",
-        .data = &(const struct mod_mock_psu_device_config) {
+        .data = &(const struct mod_mock_psu_element_cfg) {
             .default_enabled = true,
             .default_voltage = 100,
         },
     },
     {
         .name = "GPU",
-        .data = &(const struct mod_mock_psu_device_config) {
+        .data = &(const struct mod_mock_psu_element_cfg) {
             .default_enabled = true,
             .default_voltage = 100,
         },
     },
     {
         .name = "VPU",
-        .data = &(const struct mod_mock_psu_device_config) {
+        .data = &(const struct mod_mock_psu_element_cfg) {
             .default_enabled = true,
             .default_voltage = 100,
         },

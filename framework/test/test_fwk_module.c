@@ -4,10 +4,11 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+#include <stdlib.h>
 #include <string.h>
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_macros.h>
+#include <fwk_status.h>
 #include <fwk_test.h>
 #include <internal/fwk_module.h>
 
@@ -906,6 +907,28 @@ static void test_fwk_module_get_element_count(void)
     assert(element_count == FWK_E_PARAM);
 }
 
+static void test_fwk_module_get_sub_element_count(void)
+{
+    int sub_element_count;
+
+    /* Invalid element ID */
+    sub_element_count =
+        fwk_module_get_sub_element_count(FWK_ID_ELEMENT(MODULE0_IDX, 0x05));
+    assert(sub_element_count == FWK_E_PARAM);
+
+    /* Valid module ID, but not an element */
+    sub_element_count = fwk_module_get_sub_element_count(MODULE0_ID);
+    assert(sub_element_count == FWK_E_PARAM);
+
+    /* Valid element ID with 0 sub-elements */
+    sub_element_count = fwk_module_get_sub_element_count(ELEM1_ID);
+    assert(sub_element_count == 0);
+
+    /* Valid element ID with 1 sub-element */
+    sub_element_count = fwk_module_get_sub_element_count(ELEM0_ID);
+    assert(sub_element_count == 1);
+}
+
 static void test_fwk_module_get_name(void)
 {
     fwk_id_t id;
@@ -946,8 +969,19 @@ static void test_fwk_module_get_data(void)
     assert(result != NULL);
     assert(result == (void *)(&config_elem0));
 
-    /* Invalid ID */
-    id = FWK_ID_ELEMENT(0xEF, 0xDBE);
+    /* Valid sub-element ID */
+    id = SUB_ELEM0_ID;
+    result = fwk_module_get_data(id);
+    assert(result != NULL);
+    assert(result == (void *)(&config_elem0));
+
+    /* Invalid element ID */
+     id = FWK_ID_ELEMENT(0xEF, 0xDBE);
+     result = fwk_module_get_data(id);
+     assert(result == NULL);
+
+    /* Invalid sub-element ID */
+    id = FWK_ID_SUB_ELEMENT(0xDE, 0xAA7, 9);
     result = fwk_module_get_data(id);
     assert(result == NULL);
 }
@@ -1117,6 +1151,7 @@ static const struct fwk_test_case_desc test_case_table[] = {
     FWK_TEST_CASE(test_fwk_module_is_valid_event_id),
     FWK_TEST_CASE(test_fwk_module_is_valid_notification_id),
     FWK_TEST_CASE(test_fwk_module_get_element_count),
+    FWK_TEST_CASE(test_fwk_module_get_sub_element_count),
     FWK_TEST_CASE(test_fwk_module_get_name),
     FWK_TEST_CASE(test_fwk_module_get_data),
     FWK_TEST_CASE(test_fwk_module_check_call_failed),

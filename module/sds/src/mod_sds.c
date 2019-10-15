@@ -11,12 +11,16 @@
 #include <string.h>
 #include <fwk_assert.h>
 #include <fwk_element.h>
-#include <fwk_errno.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
+#include <fwk_module_idx.h>
 #include <fwk_notification.h>
-#include <mod_clock.h>
+#include <fwk_status.h>
 #include <mod_sds.h>
+
+#if BUILD_HAS_MOD_CLOCK
+#include <mod_clock.h>
+#endif
 
 /* Arbitrary, 16 bit value that indicates a valid SDS Memory Region */
 #define REGION_SIGNATURE 0xAA7A
@@ -96,7 +100,7 @@ struct sds_ctx {
     const struct mod_sds_config *module_config;
 
     /* Pointer to the base of the SDS Memory Region. */
-    uint8_t *mem_base;
+    volatile char *mem_base;
 
     /* Size of the SDS Memory Region in bytes. */
     unsigned int mem_size;
@@ -105,10 +109,10 @@ struct sds_ctx {
     unsigned int mem_free;
 
     /* Pointer to the next free memory address in the SDS Memory Region. */
-    uint8_t *mem_next_free;
+    volatile char *mem_next_free;
 
     /* Pointer to the Region Descriptor structure at the memory region base. */
-    struct region_descriptor *region_desc;
+    volatile struct region_descriptor *region_desc;
 };
 
 /* Module context */
@@ -122,7 +126,7 @@ static struct sds_ctx ctx;
  * Perform some tests to determine whether any of the fields within a Structure
  * Header contain obviously invalid data.
  */
-static bool header_is_valid(struct structure_header *header)
+static bool header_is_valid(volatile struct structure_header *header)
 {
     if (header->id == 0)
         return false; /* Zero is not a valid identifier */
@@ -158,7 +162,7 @@ static bool validate_structure_access(uint32_t structure_size, uint32_t offset,
 /*
  * Search the SDS Memory Region for a given structure ID and return a
  * copy of the Structure Header that holds its information. Optionally, a
- * uint8_t pointer pointer may be provided to retrieve a pointer to the base
+ * char pointer pointer may be provided to retrieve a pointer to the base
  * address of the structure content.
  *
  * The validity of the header is checked before its contents are returned. These
@@ -174,37 +178,38 @@ static bool validate_structure_access(uint32_t structure_size, uint32_t offset,
  */
 static int get_structure_info(uint32_t structure_id,
                               struct structure_header *header,
-                              uint8_t **structure_base)
+                              volatile char **structure_base)
 {
-   unsigned int struct_idx;
-   struct structure_header current_header;
-   uint32_t offset;
+    unsigned int struct_idx;
+    struct structure_header current_header;
+    uint32_t offset;
 
-   offset = sizeof(struct region_descriptor);
+    offset = sizeof(struct region_descriptor);
 
-   /* Iterate over structure headers to find one with a matching ID */
-   for (struct_idx = 0; struct_idx < ctx.region_desc->structure_count;
-       struct_idx++) {
-       current_header = *(struct structure_header *)(ctx.mem_base + offset);
-       if (!header_is_valid(&current_header))
-           return FWK_E_DATA;
+    /* Iterate over structure headers to find one with a matching ID */
+    for (struct_idx = 0; struct_idx < ctx.region_desc->structure_count;
+            struct_idx++) {
+        current_header = *(struct structure_header *)(
+                ctx.mem_base + offset);
+        if (!header_is_valid(&current_header))
+            return FWK_E_DATA;
 
-       if (current_header.id == structure_id) {
-           if (structure_base != NULL)
-               *structure_base = ((uint8_t *)(ctx.mem_base + offset)) +
-                   sizeof(struct structure_header);
+        if (current_header.id == structure_id) {
+            if (structure_base != NULL)
+                *structure_base = ((volatile char *)(ctx.mem_base + offset)) +
+                    sizeof(struct structure_header);
 
-           *header = current_header;
-           return FWK_SUCCESS;
-       }
+            *header = current_header;
+            return FWK_SUCCESS;
+        }
 
-       offset += current_header.size;
-       offset += sizeof(struct structure_header);
-       if (offset >= ctx.mem_size)
-           return FWK_E_RANGE;
-   }
+        offset += current_header.size;
+        offset += sizeof(struct structure_header);
+        if (offset >= ctx.mem_size)
+            return FWK_E_RANGE;
+    }
 
-   return FWK_E_PARAM;
+    return FWK_E_PARAM;
 }
 
 /*
@@ -222,12 +227,14 @@ static bool structure_exists(uint32_t structure_id)
 
 static int struct_alloc(uint32_t structure_id, size_t size)
 {
-    struct structure_header *header = NULL;
+    volatile struct structure_header *header = NULL;
     unsigned int padded_size;
-    unsigned int status;
+    int status = FWK_SUCCESS;
 
-    if (size < MIN_STRUCT_SIZE)
-        return FWK_E_PARAM;
+    if (size < MIN_STRUCT_SIZE) {
+        status = FWK_E_PARAM;
+        goto exit;
+    }
 
     padded_size = FWK_ALIGN_NEXT(size, MIN_STRUCT_ALIGNMENT);
 
@@ -242,7 +249,7 @@ static int struct_alloc(uint32_t structure_id, size_t size)
     }
 
     /* Create the Structure Header */
-    header = (struct structure_header *)ctx.mem_next_free;
+    header = (volatile struct structure_header *)ctx.mem_next_free;
     header->id = structure_id;
     header->size = padded_size;
     header->valid = false;
@@ -250,14 +257,13 @@ static int struct_alloc(uint32_t structure_id, size_t size)
     ctx.mem_free -= sizeof(*header);
 
     /* Zero the memory reserved for the structure, avoiding the header */
-    memset(ctx.mem_next_free, 0, padded_size);
+    for (unsigned int i = 0; i < padded_size; i++)
+        ctx.mem_next_free[i] = 0u;
     ctx.mem_next_free += padded_size;
     ctx.mem_free -= padded_size;
 
     /* Increment the structure count within the region descriptor */
     ctx.region_desc->structure_count++;
-
-    status = FWK_SUCCESS;
 
 exit:
     return status;
@@ -296,7 +302,7 @@ static int reinitialize_memory_region(void)
 
     for (struct_idx = 0; struct_idx < ctx.region_desc->structure_count;
         struct_idx++) {
-        header = *(struct structure_header *)(ctx.mem_base + mem_used);
+        header = *(volatile struct structure_header *)(ctx.mem_base + mem_used);
 
         if (!header_is_valid(&header))
             return FWK_E_DATA; /* Unexpected invalid header */
@@ -363,7 +369,7 @@ static int create_memory_region(void)
      * directly.
      */
     ctx.mem_next_free = ctx.mem_base + sizeof(struct region_descriptor);
-    assert(((uintptr_t)ctx.mem_next_free %
+    fwk_assert(((uintptr_t)ctx.mem_next_free %
         MIN_STRUCT_ALIGNMENT) == 0);
 
     return FWK_SUCCESS;
@@ -373,35 +379,33 @@ static int struct_write(uint32_t structure_id, unsigned int offset,
                         const void *data, size_t size)
 {
     int status;
-    uint8_t *structure_base;
+    volatile char *structure_base;
     struct structure_header header;
 
-    assert(data != NULL);
-    assert(size != 0);
+    fwk_assert(data != NULL);
+    fwk_assert(size != 0);
 
     /* Look up the Structure Header by its identifier */
     status = get_structure_info(structure_id, &header, &structure_base);
     if (status != FWK_SUCCESS)
         return status;
 
-    /*
-     * Perform sanity checks on the field location and data size before invoking
-     * memcpy.
-     */
     status = validate_structure_access(header.size, offset, size);
     if (status != FWK_SUCCESS)
         return status;
 
-    memcpy(structure_base + offset, data, size);
+    for (unsigned int i = 0; i < size; i++)
+        structure_base[offset + i] = ((const char*)data)[i];
+
     return FWK_SUCCESS;
 }
 
 static int struct_finalize(uint32_t structure_id)
 {
     int status;
-    uint8_t *structure_base;
+    volatile char *structure_base;
     struct structure_header header;
-    struct structure_header *header_mem;
+    volatile struct structure_header *header_mem;
 
     /* Check that the structure being finalized exists */
     status = get_structure_info(structure_id, &header, &structure_base);
@@ -409,7 +413,8 @@ static int struct_finalize(uint32_t structure_id)
         return status;
 
     /* Update the valid flag of the header within the SDS Memory Region */
-    header_mem = (struct structure_header *)(structure_base - sizeof(header));
+    header_mem = (volatile struct structure_header *)(
+        structure_base - sizeof(header));
     header_mem->valid = true;
 
     return FWK_SUCCESS;
@@ -440,6 +445,39 @@ static int struct_init(const struct mod_sds_structure_desc *struct_desc)
     return status;
 }
 
+static int init_sds(void)
+{
+    int status;
+    int element_idx;
+    int element_count;
+    const struct mod_sds_structure_desc *struct_desc;
+    unsigned int notification_count;
+    struct fwk_event notification_event = {
+        .id = mod_sds_notification_id_initialized,
+        .source_id = fwk_module_id_sds,
+    };
+
+    /* Either reinitialize the memory region, or create it for the first time */
+    status = reinitialize_memory_region();
+    if (status != FWK_SUCCESS) {
+        status = create_memory_region();
+        if (status != FWK_SUCCESS)
+            return status;
+    }
+
+    element_count = fwk_module_get_element_count(fwk_module_id_sds);
+    for (element_idx = 0; element_idx < element_count; ++element_idx) {
+        struct_desc = fwk_module_get_data(
+            fwk_id_build_element_id(fwk_module_id_sds, element_idx));
+
+        status = struct_init(struct_desc);
+        if (status != FWK_SUCCESS)
+            return status;
+    }
+
+    return fwk_notification_notify(&notification_event, &notification_count);
+}
+
 /*
  * Module API
  */
@@ -466,7 +504,7 @@ static int sds_struct_read(uint32_t structure_id, unsigned int offset,
                            void *data, size_t size)
 {
     int status;
-    uint8_t *structure_base;
+    volatile char *structure_base;
     struct structure_header header;
 
     status = fwk_module_check_call(fwk_module_id_sds);
@@ -484,15 +522,13 @@ static int sds_struct_read(uint32_t structure_id, unsigned int offset,
     if (status != FWK_SUCCESS)
         return status;
 
-    /*
-     * Perform sanity checks on the field location and data size before invoking
-     * memcpy.
-     */
-     status = validate_structure_access(header.size, offset, size);
-     if (status != FWK_SUCCESS)
+    status = validate_structure_access(header.size, offset, size);
+    if (status != FWK_SUCCESS)
         return status;
 
-    memcpy(data, structure_base + offset, size);
+    for (unsigned int i = 0; i < size; i++)
+        ((char*)data)[i] = structure_base[offset + i];
+
     return FWK_SUCCESS;
 }
 
@@ -525,7 +561,7 @@ static int sds_init(fwk_id_t module_id, unsigned int element_count,
 
     ctx.module_config = data;
 
-    assert((MIN_STRUCT_ALIGNMENT % MIN_FIELD_ALIGNMENT) == 0);
+    fwk_assert((MIN_STRUCT_ALIGNMENT % MIN_FIELD_ALIGNMENT) == 0);
 
     if (ctx.module_config->region_base_address == 0)
         return FWK_E_PARAM;
@@ -533,9 +569,9 @@ static int sds_init(fwk_id_t module_id, unsigned int element_count,
         MIN_STRUCT_ALIGNMENT) > 0)
         return FWK_E_PARAM;
 
-    ctx.mem_base = (uint8_t *)ctx.module_config->region_base_address;
+    ctx.mem_base = (volatile char *)ctx.module_config->region_base_address;
     ctx.mem_size = ctx.module_config->region_size;
-    ctx.region_desc = (struct region_descriptor *)ctx.mem_base;
+    ctx.region_desc = (volatile struct region_descriptor *)ctx.mem_base;
 
     return FWK_SUCCESS;
 }
@@ -561,50 +597,37 @@ static int sds_start(fwk_id_t id)
     if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
         return FWK_SUCCESS;
 
-    /* Register the module for clock state notifications */
-    return fwk_notification_subscribe(
-        mod_clock_notification_id_state_changed,
-        ctx.module_config->clock_id,
-        id);
+#if BUILD_HAS_MOD_CLOCK
+    if (!fwk_id_is_equal(ctx.module_config->clock_id, FWK_ID_NONE)) {
+        /* Register for clock state notifications */
+        return fwk_notification_subscribe(
+            mod_clock_notification_id_state_changed,
+            ctx.module_config->clock_id,
+            id);
+    }
+#endif
+
+    return init_sds();
 }
 
+#if BUILD_HAS_MOD_CLOCK
 static int sds_process_notification(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
 {
-    int status;
     struct clock_notification_params *params;
-    int element_idx;
-    int element_count;
-    const struct mod_sds_structure_desc *struct_desc;
 
-    assert(fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed));
-    assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
+    fwk_assert(fwk_id_is_equal(event->id,
+                               mod_clock_notification_id_state_changed));
+    fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
 
     params = (struct clock_notification_params *)event->params;
     if (params->new_state != MOD_CLOCK_STATE_RUNNING)
         return FWK_SUCCESS;
 
-    /* Either reinitialize the memory region, or create it for the first time */
-    status = reinitialize_memory_region();
-    if (status != FWK_SUCCESS) {
-        status = create_memory_region();
-        if (status != FWK_SUCCESS)
-            return status;
-    }
-
-    element_count = fwk_module_get_element_count(event->target_id);
-    for (element_idx = 0; element_idx < element_count; ++element_idx) {
-        struct_desc = fwk_module_get_data(
-            fwk_id_build_element_id(event->target_id, element_idx));
-
-        status = struct_init(struct_desc);
-        if (status != FWK_SUCCESS)
-            return status;
-    }
-
-    return FWK_SUCCESS;
+    return init_sds();
 }
+#endif
 
 /* Module descriptor */
 const struct fwk_module module_sds = {
@@ -612,9 +635,12 @@ const struct fwk_module module_sds = {
     .type = FWK_MODULE_TYPE_SERVICE,
     .api_count = 1,
     .event_count = 0,
+    .notification_count = MOD_SDS_NOTIFICATION_IDX_COUNT,
     .init = sds_init,
     .element_init = sds_element_init,
     .process_bind_request = sds_process_bind_request,
     .start = sds_start,
+#if BUILD_HAS_MOD_CLOCK
     .process_notification = sds_process_notification
+#endif
 };

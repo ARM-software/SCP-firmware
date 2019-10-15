@@ -118,6 +118,12 @@ struct mod_scmi_service_config {
     fwk_id_t transport_api_id;
 
     /*!
+     * \brief Identifier of the notification indicating the transport has been
+     *      initialized.
+     */
+    fwk_id_t transport_notification_init_id;
+
+    /*!
      *  \brief Identifier of the agent.
      *
      *  \details An SCMI channel is the communication channel between an agent
@@ -139,8 +145,8 @@ struct mod_scmi_to_transport_api {
      * \brief Check whether a channel is secure or non-secure.
      *
      * \param channel_id Channel identifier.
-     * \param secure Pointer to storage for the channel security state. True
-     * if the channel is secure, or false if it is non-secure.
+     * \param[out] secure Channel security state. True if the channel
+     * is secure, or false if it is non-secure.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The channel_id parameter is invalid.
@@ -154,7 +160,7 @@ struct mod_scmi_to_transport_api {
      * \brief Get the maximum permitted payload size of a channel.
      *
      * \param channel_id Channel identifier.
-     * \param size Pointer to storage for the maximum payload size in bytes.
+     * \param[out] size Maximum payload size in bytes.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The channel_id parameter is invalid.
@@ -168,7 +174,7 @@ struct mod_scmi_to_transport_api {
      * \brief Get the SCMI message header from a channel.
      *
      * \param channel_id Channel identifier.
-     * \param message_header Pointer to storage for the SCMI message header.
+     * \param[out] message_header SCMI message header.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The channel_id parameter is invalid.
@@ -183,9 +189,9 @@ struct mod_scmi_to_transport_api {
      * \brief Get the SCMI payload from a channel.
      *
      * \param channel_id Channel identifier.
-     * \param payload Pointer to storage for the pointer to the payload.
-     * \param size Pointer to storage for the payload size. May be NULL, in
-     * which case the parameter should be ignored.
+     * \param[out] payload Pointer to the payload.
+     * \param[out] size Payload size. May be NULL, in which case the
+     * parameter should be ignored.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The channel_id parameter is invalid.
@@ -310,7 +316,7 @@ struct mod_scmi_from_protocol_api {
      * \brief Get the identifier of the agent associated with a service
      *
      * \param service_id Identifier of the service.
-     * \param agent_id Pointer to storage for the agent identifier.
+     * \param[out] agent_id Agent identifier.
      *
      * \retval FWK_SUCCESS The agent identifier was returned.
      * \retval FWK_E_PARAM The service identifier is not valid.
@@ -327,7 +333,7 @@ struct mod_scmi_from_protocol_api {
      *          of an agent identifier.
      *
      * \param agent_id Identifier of the agent.
-     * \param agent_type Pointer to storage for the agent type.
+     * \param[out] agent_type Agent type.
      *
      * \retval FWK_SUCCESS The agent identifier was returned.
      * \retval FWK_E_PARAM The agent identifier is not valid.
@@ -341,7 +347,7 @@ struct mod_scmi_from_protocol_api {
      *        with a service.
      *
      * \param service_id Service identifier.
-     * \param size Pointer to storage for the maximum payload size in bytes.
+     * \param[out] size Maximum payload size in bytes.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The service_id parameter is invalid.
@@ -414,6 +420,26 @@ static inline bool mod_scmi_is_slave(enum scmi_channel_type type,
 {
     return (int)type != (int)role;
 }
+
+/*!
+ * \brief SCMI notification indices.
+ */
+enum mod_scmi_notification_idx {
+    /*! The SCMI service has been initialized */
+    MOD_SCMI_NOTIFICATION_IDX_INITIALIZED,
+
+    /*! Number of defined notifications */
+    MOD_SCMI_NOTIFICATION_IDX_COUNT
+};
+
+/*!
+ * \brief Identifier for the MOD_SCMI_NOTIFICATION_IDX_INITIALIZED
+ *     notification.
+ */
+static const fwk_id_t mod_scmi_notification_id_initialized =
+    FWK_ID_NOTIFICATION_INIT(
+        FWK_MODULE_IDX_SCMI,
+        MOD_SCMI_NOTIFICATION_IDX_INITIALIZED);
 
 /*!
  * @}

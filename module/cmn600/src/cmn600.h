@@ -253,30 +253,37 @@ struct cmn600_hnf_reg {
     FWK_RW uint64_t SAM_MEMREGION[2];
     FWK_RW uint64_t SAM_SN_PROPERTIES;
     FWK_RW uint64_t SAM_6SN_NODEID;
-           uint8_t  RESERVED9[0x1000 - 0xD28];
+    FWK_RW uint64_t RN_PHYS_ID[32];
+           uint8_t  RESERVED9[0xF00 - 0xE28];
+    FWK_RW uint64_t SF_CXG_BLOCKED_WAYS;
+           uint8_t  RESERVED10[0xF10 - 0xF08];
+    FWK_RW uint64_t CML_PORT_AGGR_GRP0_ADD_MASK;
+           uint8_t  RESERVED11[0xF28 - 0xF18];
+    FWK_RW uint64_t CML_PORT_AGGR_GRP0_ADD_REG;
+           uint8_t  RESERVED12[0x1000 - 0xF30];
     FWK_RW uint64_t PPU_PWPR;
-    FWK_RW uint64_t PPU_PWSR;
-           uint8_t  RESERVED10[0x1014 - 0x1010];
+    FWK_R  uint64_t PPU_PWSR;
+           uint8_t  RESERVED13[0x1014 - 0x1010];
     FWK_R  uint32_t PPU_MISR;
-           uint8_t  RESERVED11[0x1100 - 0x1018];
+           uint8_t  RESERVED14[0x1100 - 0x1018];
     FWK_RW uint64_t PPU_DYN_RET_THRESHOLD;
-           uint8_t  RESERVED12[0x1FB0 - 0x1108];
+           uint8_t  RESERVED15[0x1FB0 - 0x1108];
     FWK_R  uint32_t PPU_IDR[2];
-           uint8_t  RESERVED13[0x1FC8 - 0x1FB8];
+           uint8_t  RESERVED16[0x1FC8 - 0x1FB8];
     FWK_R  uint32_t PPU_IIDR;
     FWK_R  uint32_t PPU_AIDR;
-           uint8_t  RESERVED14[0x2000 - 0x1FD0];
+           uint8_t  RESERVED17[0x2000 - 0x1FD0];
     FWK_RW uint64_t PMU_EVENT_SEL;
-           uint8_t  RESERVED15[0x3000 - 0x2008];
+           uint8_t  RESERVED18[0x3000 - 0x2008];
     FWK_R  uint64_t ERRFR;
     FWK_RW uint64_t ERRCTLR;
     FWK_RW uint64_t ERRSTATUS;
     FWK_RW uint64_t ERRADDR;
     FWK_RW uint64_t ERRMISC;
-           uint8_t  RESERVED16[0x3030 - 0x3028];
+           uint8_t  RESERVED19[0x3030 - 0x3028];
     FWK_RW uint64_t RN_ERR_INJ;
-    FWK_RW uint64_t RN_BYTE_PAR_ERR_INJ;
-           uint8_t  RESERVED17[0x3100 - 0x3040];
+    FWK_W  uint64_t RN_BYTE_PAR_ERR_INJ;
+           uint8_t  RESERVED20[0x3100 - 0x3040];
     FWK_R  uint64_t ERRFR_NS;
     FWK_RW uint64_t ERRCTLR_NS;
     FWK_RW uint64_t ERRSTATUS_NS;
@@ -639,9 +646,8 @@ uint64_t sam_encode_region_size(uint64_t size);
 /*
  * Configure a memory region
  *
- * \param reg Pointer to the region group descriptor to be configured
+ * \param[out] reg Region group descriptor to be configured
  *      \pre Must be a valid pointer
- * \param region Region entry in the region group descriptor
  * \param bit_offset Bit offset of the memory region in the group descriptor
  * \param base Region base address
  * \param size Region size

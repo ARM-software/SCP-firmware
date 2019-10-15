@@ -64,6 +64,36 @@ struct n1sdp_pcie_dev_config {
 };
 
 /*!
+ * \brief Module API indices
+ */
+enum n1sdp_pcie_api_idx {
+    /*! Index of the CCIX config API */
+    N1SDP_PCIE_API_IDX_CCIX_CONFIG,
+
+    /*! Number of APIs */
+    N1SDP_PCIE_API_COUNT
+};
+
+/*!
+ * \brief N1SDP PCIe ccix configuration api
+ */
+struct n1sdp_pcie_ccix_config_api {
+   /*!
+    * \brief Enable the optimized tlp (Transaction Layer Packet)
+    * for the ccix root complex
+    *
+    * \param enable Enable optimized tlp (true) or disable it (false)
+    * and thus enable pcie compatible header
+    *
+    * \retval FWK_SUCCESS The operation succeeded.
+    * \return One of the standard error codes.
+    */
+   int (*enable_opt_tlp)(bool enable);
+
+};
+
+
+/*!
  * \}
  */
 

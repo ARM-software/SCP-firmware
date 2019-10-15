@@ -6,9 +6,6 @@
 #
 
 BS_LIB_NAME := psu
-BS_LIB_SOURCES := \
-    mod_psu_device_api.c \
-    mod_psu_event.c \
-    mod_psu_module.c
+BS_LIB_SOURCES := mod_psu.c
 
 include $(BS_DIR)/lib.mk

@@ -8,8 +8,8 @@
  *      System Control and Management Interface (SCMI) support.
  */
 
-#ifndef SCMI_SENSOR_H
-#define SCMI_SENSOR_H
+#ifndef INTERNAL_SCMI_SENSOR_H
+#define INTERNAL_SCMI_SENSOR_H
 
 /*!
  * \addtogroup GroupModules Modules
@@ -153,12 +153,18 @@ struct __attribute((packed)) scmi_sensor_protocol_description_get_p2a {
     struct scmi_sensor_desc sensor_desc[];
 };
 
-/*!
- * @}
- */
+/* Event indices */
+enum scmi_sensor_api_idx {
+    SCMI_SENSOR_EVENT_IDX_REQUEST,
+    SCMI_SENSOR_EVENT_IDX_COUNT,
+};
 
 /*!
  * @}
  */
 
-#endif /* SCMI_SENSOR_H */
+/*!
+ * @}
+ */
+
+#endif /* INTERNAL_SCMI_SENSOR_H */

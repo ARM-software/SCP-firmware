@@ -7,12 +7,13 @@
 
 #include <string.h>
 #include <fwk_assert.h>
-#include <fwk_errno.h>
 #include <fwk_id.h>
+#include <fwk_math.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
+#include <fwk_status.h>
 #include <mod_clock.h>
 #include <mod_n1sdp_pcie.h>
 #include <mod_log.h>
@@ -89,25 +90,96 @@ struct n1sdp_pcie_ctx pcie_ctx;
 /*
  * Module functions
  */
+static int n1sdp_pcie_ccix_enable_opt_tlp(bool enable)
+{
+    uint32_t value;
+    unsigned int i;
+    struct n1sdp_pcie_dev_ctx *dev_ctx = NULL;
+    struct n1sdp_pcie_dev_config *config = NULL;
+
+    for (i = 0; i <= pcie_ctx.pcie_instance_count; i++) {
+        dev_ctx = &pcie_ctx.device_ctx_table[i];
+        if (dev_ctx->config->ccix_capable) {
+            config = dev_ctx->config;
+            break;
+        }
+    }
+
+    if (config == NULL)
+        return FWK_E_DATA;
+
+    /* Configure for the optimized header or pcie compatible header*/
+    if (enable)
+        value = (CCIX_CTRL_CAW | CCIX_CTRL_EN_OPT_TLP | CCIX_CTRL_CSTT_V0_V1 |
+                 CCIX_VENDER_ID);
+    else
+        value = (CCIX_CTRL_CAW | CCIX_VENDER_ID);
+
+    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                          "[PCIE] CCIX_CONTROL: 0x%08x\n", value);
+
+    *(uint32_t *)(dev_ctx->lm_apb + PCIE_LM_RC_CCIX_CTRL_REG) = value;
+
+    if (enable)
+        dev_ctx->ctrl_apb->CCIX_CTRL = 0x1;
+
+    return FWK_SUCCESS;
+}
+
+
 static int n1sdp_pcie_setup(struct n1sdp_pcie_dev_ctx *dev_ctx)
 {
     uint32_t ecam_base_addr;
+    uint8_t neg_config;
+    struct pcie_wait_condition_data wait_data;
     int status;
+    enum pcie_gen gen_speed;
+    uint32_t reg_val;
+
+    gen_speed = dev_ctx->config->ccix_capable ? PCIE_GEN_4 : PCIE_GEN_3;
 
     /* Enable the CCIX/PCIe controller */
+    wait_data.ctrl_apb = NULL;
     if (dev_ctx->config->ccix_capable) {
+        SCC->AXI_OVRD_CCIX = AXI_OVRD_VAL_CCIX;
         SCC->CCIX_PM_CTRL = SCC_CCIX_PM_CTRL_PWR_REQ_POS;
+        wait_data.stage = PCIE_INIT_STAGE_CCIX_POWER_ON;
+        status = pcie_ctx.timer_api->wait(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER,
+                                                         0),
+                                          PCIE_POWER_ON_TIMEOUT,
+                                          pcie_wait_condition,
+                                          &wait_data);
+        if (status != FWK_SUCCESS) {
+            pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                "[PCIe] Controller power-on failed!\n");
+            return status;
+        }
         SCC->SYS_MAN_RESET &= ~(1 << SCC_SYS_MAN_RESET_CCIX_POS);
     } else {
+        SCC->AXI_OVRD_PCIE = AXI_OVRD_VAL_PCIE;
         SCC->PCIE_PM_CTRL = SCC_PCIE_PM_CTRL_PWR_REQ_POS;
+        wait_data.stage = PCIE_INIT_STAGE_PCIE_POWER_ON;
+        status = pcie_ctx.timer_api->wait(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER,
+                                                         0),
+                                          PCIE_POWER_ON_TIMEOUT,
+                                          pcie_wait_condition,
+                                          &wait_data);
+        if (status != FWK_SUCCESS) {
+            pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                "[PCIe] Controller power-on failed!\n");
+            return status;
+        }
         SCC->SYS_MAN_RESET &= ~(1 << SCC_SYS_MAN_RESET_PCIE_POS);
     }
 
     /* PHY initialization */
     pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "[PCIe] Initializing PHY...");
+
+    pcie_phy_init(dev_ctx->phy_apb, gen_speed);
     status = pcie_init(dev_ctx->ctrl_apb,
                        pcie_ctx.timer_api,
-                       PCIE_INIT_STAGE_PHY);
+                       PCIE_INIT_STAGE_PHY,
+                       gen_speed);
     if (status != FWK_SUCCESS) {
         pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Timeout!\n");
         return status;
@@ -119,29 +191,93 @@ static int n1sdp_pcie_setup(struct n1sdp_pcie_dev_ctx *dev_ctx)
                           "[PCIe] Initializing controller...");
     status = pcie_init(dev_ctx->ctrl_apb,
                        pcie_ctx.timer_api,
-                       PCIE_INIT_STAGE_CTRL);
+                       PCIE_INIT_STAGE_CTRL,
+                       gen_speed);
     if (status != FWK_SUCCESS) {
         pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Timeout!\n");
         return status;
     }
     pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+
+    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[PCIe] Setting TX preset for GEN%d...", gen_speed);
+    status = pcie_set_gen_tx_preset(dev_ctx->rp_ep_config_apb,
+                                    TX_PRESET_VALUE,
+                                    gen_speed);
+    if (status != FWK_SUCCESS) {
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Equalization failed!\n");
+        return status;
+    }
 
     /* Link training */
     pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
                           "[PCIe] Starting link training...");
     status = pcie_init(dev_ctx->ctrl_apb,
                        pcie_ctx.timer_api,
-                       PCIE_INIT_STAGE_LINK_TRNG);
+                       PCIE_INIT_STAGE_LINK_TRNG,
+                       gen_speed);
     if (status != FWK_SUCCESS) {
         pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Timeout!\n");
-        return status;
+        return dev_ctx->config->ccix_capable ? FWK_SUCCESS : status;
     }
     pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+
+    neg_config = (dev_ctx->ctrl_apb->RP_CONFIG_OUT &
+        RP_CONFIG_OUT_NEGOTIATED_SPD_MASK) >> RP_CONFIG_OUT_NEGOTIATED_SPD_POS;
+    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[PCIe] Negotiated speed: GEN%d\n", neg_config + 1);
+
+    neg_config = (dev_ctx->ctrl_apb->RP_CONFIG_OUT &
+        RP_CONFIG_OUT_NEGOTIATED_LINK_WIDTH_MASK) >>
+        RP_CONFIG_OUT_NEGOTIATED_LINK_WIDTH_POS;
+    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[PCIe] Negotiated link width: x%d\n", fwk_math_pow2(neg_config));
+
+
+    if (dev_ctx->config->ccix_capable) {
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[PCIe] Re-training link to GEN4 speed...");
+        /* Set GEN4 as target speed */
+        pcie_rp_ep_config_read_word(dev_ctx->rp_ep_config_apb,
+                                    PCIE_LINK_CTRL_STATUS_2_OFFSET, &reg_val);
+        reg_val &= ~PCIE_LINK_CTRL_2_TARGET_SPEED_MASK;
+        reg_val |= PCIE_LINK_CTRL_2_TARGET_SPEED_GEN4;
+        pcie_rp_ep_config_write_word(dev_ctx->rp_ep_config_apb,
+                                     PCIE_LINK_CTRL_STATUS_2_OFFSET, reg_val);
+
+        /* Start link retraining */
+        status = pcie_link_retrain(dev_ctx->ctrl_apb,
+                                   dev_ctx->rp_ep_config_apb,
+                                   pcie_ctx.timer_api);
+        if (status != FWK_SUCCESS) {
+            pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "TIMEOUT\n");
+            goto ctrl_plane_init;
+        }
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+
+        pcie_rp_ep_config_read_word(dev_ctx->rp_ep_config_apb,
+                                    PCIE_LINK_CTRL_STATUS_OFFSET, &reg_val);
+        neg_config = (reg_val >> PCIE_LINK_CTRL_NEG_SPEED_POS) &
+                     PCIE_LINK_CTRL_NEG_SPEED_MASK;
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[PCIe] Re-negotiated speed: GEN%d\n", neg_config);
+
+        neg_config = (reg_val >> PCIE_LINK_CTRL_NEG_WIDTH_POS) &
+                     PCIE_LINK_CTRL_NEG_WIDTH_MASK;
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[PCIe] Re-negotiated link width: x%d\n", neg_config);
+    }
+
+ctrl_plane_init:
 
     /* Root Complex setup */
     pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
                           "[PCIe] Setup Type0 configuration...");
-    ecam_base_addr = dev_ctx->config->axi_slave_base32 +
+    if (dev_ctx->config->ccix_capable)
+        ecam_base_addr = dev_ctx->config->axi_slave_base32 +
+                         CCIX_AXI_ECAM_TYPE0_OFFSET;
+    else
+        ecam_base_addr = dev_ctx->config->axi_slave_base32 +
                          PCIE_AXI_ECAM_TYPE0_OFFSET;
     status = axi_outbound_region_setup(dev_ctx->rc_axi_config_apb,
                  (ecam_base_addr - SCP_AP_AXI_OFFSET),
@@ -155,7 +291,11 @@ static int n1sdp_pcie_setup(struct n1sdp_pcie_dev_ctx *dev_ctx)
 
     pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
         "[PCIe] Setup Type1 configuration...");
-    ecam_base_addr = dev_ctx->config->axi_slave_base32 +
+    if (dev_ctx->config->ccix_capable)
+        ecam_base_addr = dev_ctx->config->axi_slave_base32 +
+                         CCIX_AXI_ECAM_TYPE1_OFFSET;
+    else
+        ecam_base_addr = dev_ctx->config->axi_slave_base32 +
                          PCIE_AXI_ECAM_TYPE1_OFFSET;
     status = axi_outbound_region_setup(dev_ctx->rc_axi_config_apb,
                  (ecam_base_addr - SCP_AP_AXI_OFFSET),
@@ -230,15 +370,51 @@ static int n1sdp_pcie_setup(struct n1sdp_pcie_dev_ctx *dev_ctx)
         "[PCIe] Enable inbound region in BAR 2...");
     status = axi_inbound_region_setup(dev_ctx->rc_axi_config_apb,
                  AXI_IB_REGION_BASE,
-                 __builtin_ctz(AXI_IB_REGION_SIZE), 2);
+                 AXI_IB_REGION_SIZE_MSB, 2);
     if (status != FWK_SUCCESS) {
         pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Error!\n");
         return status;
     }
     pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
 
+    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[PCIe] Enable Type 1 I/O configuration\n");
+    *(uint32_t *)(dev_ctx->lm_apb + PCIE_LM_RC_BAR_CONFIG_REG) =
+        (TYPE1_PREF_MEM_BAR_ENABLE_MASK |
+         TYPE1_PREF_MEM_BAR_SIZE_64BIT_MASK |
+         TYPE1_PREF_IO_BAR_ENABLE_MASK |
+         TYPE1_PREF_IO_BAR_SIZE_32BIT_MASK);
+
+    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[PCIe] Skipping ATS capability...");
+    status = pcie_skip_ext_cap(dev_ctx->rp_ep_config_apb, EXT_CAP_ID_ATS);
+    if (status != FWK_SUCCESS)
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Not found!\n");
+    else
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+
+    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "[PCIe] Skipping PRI capability...");
+    status = pcie_skip_ext_cap(dev_ctx->rp_ep_config_apb, EXT_CAP_ID_PRI);
+    if (status != FWK_SUCCESS)
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Not found!\n");
+    else
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+
+    /*
+     * Wait until devices connected in downstream ports
+     * finish link training before doing bus enumeration
+     */
+    pcie_ctx.timer_api->delay(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                                 PCIE_LINK_TRAINING_TIMEOUT);
+
     return FWK_SUCCESS;
 }
+
+static const struct n1sdp_pcie_ccix_config_api pcie_ccix_config_api = {
+    .enable_opt_tlp = n1sdp_pcie_ccix_enable_opt_tlp,
+};
+
 
 /*
  * Framework handlers
@@ -333,6 +509,15 @@ static int n1sdp_pcie_start(fwk_id_t id)
         id);
 }
 
+static int n1sdp_pcie_process_bind_request(fwk_id_t requester_id,
+    fwk_id_t target_id, fwk_id_t api_id, const void **api)
+{
+    *api = &pcie_ccix_config_api;
+
+    return FWK_SUCCESS;
+}
+
+
 static int n1sdp_pcie_process_notification(const struct fwk_event *event,
                                           struct fwk_event *resp)
 {
@@ -349,10 +534,11 @@ static int n1sdp_pcie_process_notification(const struct fwk_event *event,
 const struct fwk_module module_n1sdp_pcie = {
     .name = "N1SDP PCIe",
     .type = FWK_MODULE_TYPE_DRIVER,
-    .api_count = 0,
+    .api_count = N1SDP_PCIE_API_COUNT,
     .init = n1sdp_pcie_init,
     .element_init = n1sdp_pcie_element_init,
     .bind = n1sdp_pcie_bind,
     .start = n1sdp_pcie_start,
+    .process_bind_request = n1sdp_pcie_process_bind_request,
     .process_notification = n1sdp_pcie_process_notification,
 };
