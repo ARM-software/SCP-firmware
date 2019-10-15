@@ -259,10 +259,6 @@ static const struct fwk_arch_interrupt_driver arm_nvic_driver = {
 
 static void irq_invalid(void)
 {
-    static unsigned int spurious = 0;
-
-    spurious++;
-
     disable(__get_IPSR());
 }
 
