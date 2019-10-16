@@ -104,5 +104,7 @@ const struct fwk_module_config config_cmn600 = {
         .mmap_count = FWK_ARRAY_SIZE(mmap),
         .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
             CLOCK_IDX_INTERCONNECT),
+        .chipinfo_api_id = FWK_ID_NONE_INIT,
+        .chipinfo_mod_id = FWK_ID_NONE_INIT,
     }),
 };

@@ -20,6 +20,7 @@
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <mod_clock.h>
+#include <mod_cmn600.h>
 #include <mod_n1sdp_dmc620.h>
 #include <mod_n1sdp_flash.h>
 #include <mod_n1sdp_system.h>
@@ -185,6 +186,23 @@ static int n1sdp_system_shutdown(
 static const struct mod_system_power_driver_api
     n1sdp_system_power_driver_api = {
     .system_shutdown = n1sdp_system_shutdown,
+};
+
+/*
+ * Chip information API
+ */
+static int n1sdp_get_chipinfo(uint8_t *chip_id, bool *mc_mode)
+{
+    fwk_assert((chip_id != NULL) && (mc_mode != NULL));
+
+    *chip_id = n1sdp_get_chipid();
+    *mc_mode = n1sdp_is_multichip_enabled();
+
+    return FWK_SUCCESS;
+}
+
+static const struct mod_cmn600_chipinfo_api n1sdp_chipinfo_api = {
+    .get_chipinfo = n1sdp_get_chipinfo,
 };
 
 /*
@@ -495,6 +513,9 @@ static int n1sdp_system_process_bind_request(fwk_id_t requester_id,
         break;
     case MOD_N1SDP_SYSTEM_API_IDX_AP_MEMORY_ACCESS:
         *api = &n1sdp_system_ap_memory_access_api;
+        break;
+    case MOD_N1SDP_SYSTEM_API_IDX_CHIPINFO:
+        *api = &n1sdp_chipinfo_api;
         break;
     default:
         return FWK_E_PARAM;

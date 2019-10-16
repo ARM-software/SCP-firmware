@@ -90,7 +90,13 @@ struct cmn600_ctx {
     /* Timer module API */
     struct mod_timer_api *timer_api;
 
+    /* Chip information API */
+    struct mod_cmn600_chipinfo_api *chipinfo_api;
+
     bool initialized;
+
+    /* Chip ID value */
+    uint8_t chip_id;
 };
 
 int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam);

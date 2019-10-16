@@ -9,6 +9,7 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <mod_cmn600.h>
+#include <mod_n1sdp_system.h>
 #include <n1sdp_scp_mmap.h>
 #include <config_clock.h>
 
@@ -177,5 +178,8 @@ const struct fwk_module_config config_cmn600 = {
         .mmap_count = FWK_ARRAY_SIZE(mmap),
         .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
             CLOCK_IDX_INTERCONNECT),
+        .chipinfo_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_SYSTEM,
+            MOD_N1SDP_SYSTEM_API_IDX_CHIPINFO),
+        .chipinfo_mod_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_N1SDP_SYSTEM),
     }),
 };
