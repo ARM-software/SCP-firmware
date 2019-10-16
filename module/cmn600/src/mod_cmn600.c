@@ -643,6 +643,15 @@ static int cmn600_bind(fwk_id_t id, unsigned int round)
                                  &ctx->timer_api);
         if (status != FWK_SUCCESS)
             return FWK_E_PANIC;
+
+        /* Bind to the chip information API in platform if provided */
+        if (!fwk_id_is_equal(ctx->config->chipinfo_mod_id, FWK_ID_NONE)) {
+            status = fwk_module_bind(ctx->config->chipinfo_mod_id,
+                                     ctx->config->chipinfo_api_id,
+                                     &ctx->chipinfo_api);
+            if (status != FWK_SUCCESS)
+                return FWK_E_PANIC;
+        }
     }
 
     return FWK_SUCCESS;
@@ -666,10 +675,24 @@ static int cmn600_process_bind_request(fwk_id_t requester_id,
 
 int cmn600_start(fwk_id_t id)
 {
+    uint8_t chip_id = 0;
+    bool mc_mode = false;
+    int status;
+
     if (fwk_id_is_equal(ctx->config->clock_id, FWK_ID_NONE)) {
         cmn600_setup();
         return FWK_SUCCESS;
     }
+
+    if (!fwk_id_is_equal(ctx->config->chipinfo_mod_id, FWK_ID_NONE)) {
+        status = ctx->chipinfo_api->get_chipinfo(&chip_id, &mc_mode);
+        if (status != FWK_SUCCESS)
+            return status;
+        ctx->chip_id = chip_id;
+    }
+
+    ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
+        MOD_NAME "Multichip mode: %d Chip ID: %d\n", mc_mode, chip_id);
 
     /* Register the module for clock state notifications */
     return fwk_notification_subscribe(
