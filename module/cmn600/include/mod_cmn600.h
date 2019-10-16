@@ -141,6 +141,9 @@ struct mod_cmn600_config {
     /*! Number of entries in the \ref mmap_table */
     size_t mmap_count;
 
+    /*! Address space of the chip */
+    uint64_t chip_addr_space;
+
     /*! Identifier of the clock that this device depends on */
     fwk_id_t clock_id;
 
