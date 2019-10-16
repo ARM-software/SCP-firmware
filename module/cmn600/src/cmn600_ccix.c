@@ -65,8 +65,12 @@ static bool cxg_link_wait_condition(void *data)
         return ((((val1 & CXG_LINK_STATUS_ACK_MASK) == 0) &&
                   ((val2 & CXG_LINK_STATUS_ACK_MASK) == 0)) != 0);
 
-    case CXG_LINK_STATUS_DVMDOMAIN_ACK_BIT_SET:
+    case CXG_LINK_STATUS_HA_DVMDOMAIN_ACK_BIT_SET:
         val1 = ctx->cxg_ha_reg->LINK_REGS[link_id].CXG_PRTCL_LINK_STATUS;
+        return (((val1 & CXG_LINK_STATUS_DVMDOMAIN_ACK_MASK)) != 0);
+
+    case CXG_LINK_STATUS_RA_DVMDOMAIN_ACK_BIT_SET:
+        val1 = ctx->cxg_ra_reg->LINK_REGS[link_id].CXG_PRTCL_LINK_STATUS;
         return (((val1 & CXG_LINK_STATUS_DVMDOMAIN_ACK_MASK)) != 0);
 
     default:
@@ -533,7 +537,39 @@ int ccix_enter_system_coherency(struct cmn600_ctx *ctx, uint8_t link_id)
         CXG_LINK_CTRL_DVMDOMAIN_REQ_MASK;
 
     /* Wait till DVMDOMAIN ACK bit is set in status register */
-    wait_data.cond = CXG_LINK_STATUS_DVMDOMAIN_ACK_BIT_SET;
+    wait_data.cond = CXG_LINK_STATUS_HA_DVMDOMAIN_ACK_BIT_SET;
+    status = ctx->timer_api->wait(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                                  CXG_PRTCL_LINK_DVMDOMAIN_TIMEOUT,
+                                  cxg_link_wait_condition,
+                                  &wait_data);
+    if (status != FWK_SUCCESS) {
+        ctx->log_api->log(MOD_LOG_GROUP_INFO, "Failed\n");
+        return status;
+    }
+
+    ctx->log_api->log(MOD_LOG_GROUP_DEBUG, "Done\n");
+    return FWK_SUCCESS;
+}
+
+int ccix_enter_dvm_domain(struct cmn600_ctx *ctx, uint8_t link_id)
+{
+    struct cxg_wait_condition_data wait_data;
+    int status;
+
+    if (link_id > 2)
+        return FWK_E_PARAM;
+
+    wait_data.ctx = ctx;
+    wait_data.link_id = link_id;
+
+    ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
+        MOD_NAME "Entering DVM domain for link %d...", link_id);
+    /* Enter system coherency by setting DVMDOMAIN request bit */
+    ctx->cxg_ra_reg->LINK_REGS[link_id].CXG_PRTCL_LINK_CTRL |=
+        CXG_LINK_CTRL_DVMDOMAIN_REQ_MASK;
+
+    /* Wait till DVMDOMAIN ACK bit is set in status register */
+    wait_data.cond = CXG_LINK_STATUS_RA_DVMDOMAIN_ACK_BIT_SET;
     status = ctx->timer_api->wait(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
                                   CXG_PRTCL_LINK_DVMDOMAIN_TIMEOUT,
                                   cxg_link_wait_condition,
