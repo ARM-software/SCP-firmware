@@ -265,6 +265,15 @@ struct mod_cmn600_ccix_config_api {
     * \return one of the error code otherwise.
     */
    int (*enter_system_coherency)(uint8_t link_id);
+   /*!
+    * \brief Interface to enter DVM domain
+    *
+    * \param  link_id Link on which DVM domain has to be enabled
+    *
+    * \retval FWK_SUCCESS if the operation succeed.
+    * \return one of the error code otherwise.
+    */
+   int (*enter_dvm_domain)(uint8_t link_id);
 };
 
 /*!

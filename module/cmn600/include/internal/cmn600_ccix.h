@@ -32,6 +32,11 @@ int ccix_exchange_protocol_credit(struct cmn600_ctx *ctx, uint8_t link_id);
  */
 int ccix_enter_system_coherency(struct cmn600_ctx *ctx, uint8_t link_id);
 
+/*
+ *  CMN600 CCIX Enter DVM domain Function
+ */
+int ccix_enter_dvm_domain(struct cmn600_ctx *ctx, uint8_t link_id);
+
 
 /*
  * CCIX Gateway (CXG) protocol link control & status registers
@@ -141,7 +146,8 @@ enum cxg_link_up_wait_cond {
     CXG_LINK_STATUS_DWN_BIT_CLR,
     CXG_LINK_STATUS_ACK_BIT_SET,
     CXG_LINK_STATUS_ACK_BIT_CLR,
-    CXG_LINK_STATUS_DVMDOMAIN_ACK_BIT_SET,
+    CXG_LINK_STATUS_HA_DVMDOMAIN_ACK_BIT_SET,
+    CXG_LINK_STATUS_RA_DVMDOMAIN_ACK_BIT_SET,
     CXG_LINK_UP_SEQ_COUNT,
 };
 

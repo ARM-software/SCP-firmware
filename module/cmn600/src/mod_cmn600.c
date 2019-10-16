@@ -572,6 +572,18 @@ static int cmn600_ccix_enter_system_coherency(uint8_t link_id)
 
     status = ccix_enter_system_coherency(ctx, link_id);
     return status;
+}
+
+static int cmn600_ccix_enter_dvm_domain(uint8_t link_id)
+{
+    int status;
+
+    status = fwk_module_check_call(fwk_module_id_cmn600);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    status = ccix_enter_dvm_domain(ctx, link_id);
+    return status;
 
 }
 
@@ -579,7 +591,8 @@ static const struct mod_cmn600_ccix_config_api cmn600_ccix_config_api = {
     .get_config = cmn600_ccix_config_get,
     .set_config = cmn600_ccix_config_set,
     .exchange_protocol_credit = cmn600_ccix_exchange_protocol_credit,
-    .enter_system_coherency = cmn600_ccix_enter_system_coherency
+    .enter_system_coherency = cmn600_ccix_enter_system_coherency,
+    .enter_dvm_domain = cmn600_ccix_enter_dvm_domain,
 };
 
 
