@@ -570,7 +570,7 @@ static int scmi_clock_rate_get_handler(fwk_id_t service_id,
     }
 
     status = check_service_permission(clock_device,
-        MOD_SCMI_CLOCK_PERM_ATTRIBUTES, &service_permission_granted);
+        MOD_SCMI_CLOCK_PERM_GET_RATE, &service_permission_granted);
     if (status != FWK_SUCCESS)
         goto exit;
 
@@ -635,7 +635,7 @@ static int scmi_clock_rate_set_handler(fwk_id_t service_id,
     }
 
     status = check_service_permission(clock_device,
-        MOD_SCMI_CLOCK_PERM_ATTRIBUTES, &service_permission_granted);
+        MOD_SCMI_CLOCK_PERM_SET_RATE, &service_permission_granted);
     if (status != FWK_SUCCESS)
         goto exit;
 
@@ -712,7 +712,7 @@ static int scmi_clock_config_set_handler(fwk_id_t service_id,
     }
 
     status = check_service_permission(clock_device,
-        MOD_SCMI_CLOCK_PERM_ATTRIBUTES, &service_permission_granted);
+        MOD_SCMI_CLOCK_PERM_SET_CONFIG, &service_permission_granted);
     if (status != FWK_SUCCESS)
         goto exit;
 
@@ -786,7 +786,7 @@ static int scmi_clock_describe_rates_handler(fwk_id_t service_id,
     }
 
     status = check_service_permission(clock_device,
-        MOD_SCMI_CLOCK_PERM_ATTRIBUTES, &service_permission_granted);
+        MOD_SCMI_CLOCK_PERM_DESCRIBE_RATES, &service_permission_granted);
     if (status != FWK_SUCCESS)
         goto exit;
 
