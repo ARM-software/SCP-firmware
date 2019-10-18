@@ -37,13 +37,14 @@ BS_FIRMWARE_MODULES := \
     scmi_clock \
     scmi_perf \
     scmi_power_domain \
+    sensor \
+    scmi_sensor \
     scmi_system_power \
     sds \
     i2c \
     dw_apb_i2c \
     juno_adc \
     juno_xrp7724 \
-    sensor \
     reg_sensor \
     psu
 
