@@ -21,6 +21,7 @@
 
 static jmp_buf test_context;
 static struct __fwk_thread_ctx *ctx;
+static struct fwk_element_ctx fake_element_ctx;
 
 /* Mock functions */
 static void * fwk_mm_calloc_val;
@@ -70,6 +71,12 @@ static bool is_valid_notification_id_return_val;
 bool __wrap_fwk_module_is_valid_notification_id(fwk_id_t id)
 {
     return is_valid_notification_id_return_val;
+}
+
+struct fwk_element_ctx *__wrap___fwk_module_get_element_ctx(fwk_id_t id)
+{
+    (void)id;
+    return &fake_element_ctx;
 }
 
 int __wrap_fwk_interrupt_global_enable(void)
