@@ -16,9 +16,8 @@
 #include <n1sdp_pcie.h>
 #include <n1sdp_scp_pik.h>
 
-void pcie_phy_init(uint32_t phy_apb_base, enum pcie_gen gen)
+void pcie_phy_init(uint32_t phy_apb_base)
 {
-
     uint32_t j;
 
     *((unsigned int *)(0x30038 | phy_apb_base)) = 0x00000013;
