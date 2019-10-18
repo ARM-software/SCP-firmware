@@ -134,6 +134,18 @@ struct n1sdp_pcie_init_api {
     */
    int (*rc_setup)(fwk_id_t id);
 
+   /*!
+    * \brief API to enable Virtual Channel 1 and map to
+    * specified Traffic class. This API is used in multichip mode.
+    *
+    * \param id Identifier of the PCIe instance
+    * \param vc1_tc Traffic class to be mapped to VC1
+    *
+    * \retval FWK_SUCCESS The operation succeeded.
+    * \return One of the standard error codes.
+    */
+   int (*vc1_setup)(fwk_id_t id, uint8_t vc1_tc);
+
 };
 
 /*!

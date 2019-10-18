@@ -503,12 +503,60 @@ static int n1sdp_pcie_rc_setup(fwk_id_t id)
     return FWK_SUCCESS;
 }
 
+static int n1sdp_pcie_vc1_setup(fwk_id_t id, uint8_t vc1_tc)
+{
+    struct n1sdp_pcie_dev_ctx *dev_ctx;
+    uint32_t config_base_addr;
+    int status;
+
+    dev_ctx = &pcie_ctx.device_ctx_table[fwk_id_get_element_idx(id)];
+    if (dev_ctx == NULL)
+        return FWK_E_PARAM;
+
+    if (!dev_ctx->config->ccix_capable || (vc1_tc > 7) || (vc1_tc == 0))
+        return FWK_E_PARAM;
+
+    config_base_addr = dev_ctx->rp_ep_config_apb;
+
+    pcie_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+        "[CCIX] Enabling VC1 in RP 0x%08x...", config_base_addr);
+
+    status = pcie_vc_setup(config_base_addr, vc1_tc);
+    if (status != FWK_SUCCESS) {
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_DEBUG, "Error!\n");
+        return status;
+    }
+    pcie_ctx.log_api->log(MOD_LOG_GROUP_DEBUG, "Done\n");
+
+    /* Set max payload size to 512 */
+    *(volatile uint32_t *)(config_base_addr + PCIE_DEV_CTRL_STATUS_OFFSET) |=
+        (0x2 << PCIE_DEV_CTRL_MAX_PAYLOAD_SHIFT);
+
+    config_base_addr = dev_ctx->config->axi_slave_base32 + 0x100000;
+
+    pcie_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+        "[CCIX] Enabling VC1 in EP 0x%08x...", config_base_addr);
+
+    status = pcie_vc_setup(config_base_addr, vc1_tc);
+    if (status != FWK_SUCCESS) {
+        pcie_ctx.log_api->log(MOD_LOG_GROUP_DEBUG, "Error!\n");
+        return status;
+    }
+    pcie_ctx.log_api->log(MOD_LOG_GROUP_DEBUG, "Done\n");
+
+    *(volatile uint32_t *)(config_base_addr + PCIE_DEV_CTRL_STATUS_OFFSET) |=
+        (0x2 << PCIE_DEV_CTRL_MAX_PAYLOAD_SHIFT);
+
+    return FWK_SUCCESS;
+}
+
 static const struct n1sdp_pcie_init_api pcie_init_api = {
     .power_on = n1sdp_pcie_power_on,
     .phy_init = n1sdp_pcie_phy_init,
     .controller_init = n1sdp_pcie_controller_init,
     .link_training = n1sdp_pcie_link_training,
     .rc_setup = n1sdp_pcie_rc_setup,
+    .vc1_setup = n1sdp_pcie_vc1_setup,
 };
 
 /*
