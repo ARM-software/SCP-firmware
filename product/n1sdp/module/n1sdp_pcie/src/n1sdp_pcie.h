@@ -522,9 +522,8 @@ int pcie_link_retrain(struct pcie_ctrl_apb_reg *ctrl_apb,
  * Brief - Function to initialize PCIe PHY layer.
  *
  * param - pcie_phy_base - Base address of the PHY layer registers
- * param - gen - PCIe Generation
  */
-void pcie_phy_init(uint32_t phy_apb_base, enum pcie_gen gen);
+void pcie_phy_init(uint32_t phy_apb_base);
 
 /*
  * Brief - Function to write to Root Port's/End Point's configuration space.
