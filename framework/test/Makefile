@@ -93,11 +93,12 @@ __fwk_notification_init
 
 TESTS += test_fwk_thread
 test_fwk_thread_SRC := test_fwk_thread.c fwk_thread.c fwk_test.c fwk_slist.c \
-    fwk_id.c
+    fwk_id.c fwk_thread_delayed_resp.c
 test_fwk_thread_WRAP := fwk_mm_calloc fwk_module_is_valid_entity_id \
     fwk_module_is_valid_event_id __fwk_slist_push_tail __fwk_module_get_ctx \
     fwk_interrupt_global_enable fwk_interrupt_global_disable \
-    fwk_interrupt_get_current fwk_module_is_valid_notification_id
+    fwk_interrupt_get_current fwk_module_is_valid_notification_id \
+    __fwk_module_get_element_ctx
 
 TESTS += test_fwk_notification
 test_fwk_notification_SRC := test_fwk_notification.c fwk_notification.c \
