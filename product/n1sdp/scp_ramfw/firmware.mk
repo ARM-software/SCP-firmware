@@ -45,6 +45,7 @@ BS_FIRMWARE_MODULES := \
     scmi_management \
     scmi_ccix_config \
     n1sdp_flash \
+    n1sdp_c2c \
     n1sdp_pcie \
     n1sdp_system
 
@@ -75,6 +76,7 @@ BS_FIRMWARE_SOURCES := \
     config_n1sdp_pcie.c \
     config_n1sdp_scp2pcc.c \
     config_sensor.c \
-    config_apcontext.c
+    config_apcontext.c \
+    config_n1sdp_c2c_i2c.c
 
 include $(BS_DIR)/firmware.mk
