@@ -370,74 +370,6 @@ static int n1sdp_system_init_primary_core(void)
     int fip_index_bl31 = -1;
 
     n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-        "[N1SDP SYSTEM] Looking for AP firmware in flash memory...\n");
-
-    status = n1sdp_system_ctx.flash_api->get_n1sdp_fip_descriptor_count(
-        FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SYSTEM), &fip_count);
-    if (status != FWK_SUCCESS)
-        return status;
-
-    status = n1sdp_system_ctx.flash_api->get_n1sdp_fip_descriptor_table(
-        FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SYSTEM), &fip_desc_table);
-    if (status != FWK_SUCCESS)
-        return status;
-
-    for (i = 0; i < fip_count; i++) {
-        if (fip_desc_table[i].type == MOD_N1SDP_FIP_TYPE_TF_BL31) {
-            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                "[N1SDP SYSTEM] Found BL31 at address: 0x%08x,"
-                " size: %u, flags: 0x%x\n",
-                fip_desc_table[i].address, fip_desc_table[i].size,
-                fip_desc_table[i].flags);
-            fip_index_bl31 = i;
-            break;
-        }
-    }
-
-    if (fip_index_bl31 < 0) {
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-            "[N1SDP SYSTEM] Error! "
-            "FIP does not have BL31 binary\n");
-        return FWK_E_PANIC;
-    }
-
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-        "[N1SDP SYSTEM] Copying AP BL31 to address 0x%x...\n",
-        AP_CORE_RESET_ADDR);
-
-    status = n1sdp_system_copy_to_ap_sram(AP_CORE_RESET_ADDR,
-                 fip_desc_table[fip_index_bl31].address,
-                 fip_desc_table[fip_index_bl31].size);
-    if (status != FWK_SUCCESS)
-        return FWK_E_PANIC;
-
-    /* Fill memory information structure */
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-        "[N1SDP SYSTEM] Collecting memory information...\n");
-    status = n1sdp_system_fill_mem_info();
-    if (status != FWK_SUCCESS)
-        return status;
-
-    /* Fill BL33 image information structure */
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-        "[N1SDP SYSTEM] Collecting memory information...\n");
-    status = n1sdp_system_fill_bl33_info();
-    if (status != FWK_SUCCESS)
-        return status;
-
-    /* Fill multichip mode information structure */
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-        "[N1SDP SYSTEM] Filling Multichip information...");
-    status = n1sdp_system_fill_multichip_info();
-    if (status != FWK_SUCCESS) {
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Failed\n");
-        return status;
-    }
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
-
-    mod_pd_restricted_api = n1sdp_system_ctx.mod_pd_restricted_api;
-
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
         "[N1SDP SYSTEM] Setting AP Reset Address to 0x%08x\n",
         AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET);
 
@@ -454,17 +386,87 @@ static int n1sdp_system_init_primary_core(void)
         }
     }
 
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
-        "[N1SDP SYSTEM] Booting primary core at %d MHz...\n",
-        PIK_CLK_RATE_CLUS0_CPU / FWK_MHZ);
+    if (n1sdp_get_chipid() == 0x0) {
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[N1SDP SYSTEM] Looking for AP firmware in flash memory...\n");
 
-    status = mod_pd_restricted_api->set_composite_state_async(
-        FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
-        false,
-        MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
-            MOD_PD_STATE_ON, MOD_PD_STATE_ON));
-    if (status != FWK_SUCCESS)
-        return status;
+        status = n1sdp_system_ctx.flash_api->get_n1sdp_fip_descriptor_count(
+            FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SYSTEM), &fip_count);
+        if (status != FWK_SUCCESS)
+            return status;
+
+        status = n1sdp_system_ctx.flash_api->get_n1sdp_fip_descriptor_table(
+            FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SYSTEM), &fip_desc_table);
+        if (status != FWK_SUCCESS)
+            return status;
+
+        for (i = 0; i < fip_count; i++) {
+            if (fip_desc_table[i].type == MOD_N1SDP_FIP_TYPE_TF_BL31) {
+                n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                    "[N1SDP SYSTEM] Found BL31 at address: 0x%08x,"
+                    " size: %u, flags: 0x%x\n",
+                    fip_desc_table[i].address, fip_desc_table[i].size,
+                    fip_desc_table[i].flags);
+                fip_index_bl31 = i;
+                break;
+            }
+        }
+
+        if (fip_index_bl31 < 0) {
+            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                "[N1SDP SYSTEM] Error! "
+                "FIP does not have BL31 binary\n");
+            return FWK_E_PANIC;
+        }
+
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[N1SDP SYSTEM] Copying AP BL31 to address 0x%x...\n",
+            AP_CORE_RESET_ADDR);
+
+        status = n1sdp_system_copy_to_ap_sram(AP_CORE_RESET_ADDR,
+                     fip_desc_table[fip_index_bl31].address,
+                     fip_desc_table[fip_index_bl31].size);
+        if (status != FWK_SUCCESS)
+            return FWK_E_PANIC;
+
+        /* Fill memory information structure */
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[N1SDP SYSTEM] Collecting memory information...\n");
+        status = n1sdp_system_fill_mem_info();
+        if (status != FWK_SUCCESS)
+            return status;
+
+        /* Fill BL33 image information structure */
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[N1SDP SYSTEM] Collecting memory information...\n");
+        status = n1sdp_system_fill_bl33_info();
+        if (status != FWK_SUCCESS)
+            return status;
+
+        /* Fill multichip mode information structure */
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[N1SDP SYSTEM] Filling Multichip information...");
+        status = n1sdp_system_fill_multichip_info();
+        if (status != FWK_SUCCESS) {
+            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Failed\n");
+            return status;
+        }
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+
+        mod_pd_restricted_api = n1sdp_system_ctx.mod_pd_restricted_api;
+
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+            "[N1SDP SYSTEM] Booting primary core at %d MHz...\n",
+            PIK_CLK_RATE_CLUS0_CPU / FWK_MHZ);
+
+        status = mod_pd_restricted_api->set_composite_state_async(
+            FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
+            false,
+            MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
+                MOD_PD_STATE_ON, MOD_PD_STATE_ON));
+        if (status != FWK_SUCCESS)
+            return status;
+    }
 
     return FWK_SUCCESS;
 }
