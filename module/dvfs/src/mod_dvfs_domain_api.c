@@ -194,11 +194,6 @@ static int api_set_frequency(fwk_id_t domain_id, uint64_t frequency)
     return FWK_SUCCESS;
 }
 
-static int api_set_frequency_async(fwk_id_t domain_id, uint64_t frequency)
-{
-    return FWK_E_SUPPORT;
-}
-
 int api_get_frequency_limits(
     fwk_id_t domain_id,
     struct mod_dvfs_frequency_limits *limits)
@@ -244,13 +239,6 @@ static int api_set_frequency_limits(
     return FWK_SUCCESS;
 }
 
-static int api_set_frequency_limits_async(
-    fwk_id_t domain_id,
-    const struct mod_dvfs_frequency_limits *limits)
-{
-    return FWK_E_SUPPORT;
-}
-
 const struct mod_dvfs_domain_api __mod_dvfs_domain_api = {
     .get_current_opp = api_get_current_opp,
     .get_sustained_opp = api_get_sustained_opp,
@@ -258,8 +246,6 @@ const struct mod_dvfs_domain_api __mod_dvfs_domain_api = {
     .get_opp_count = api_get_opp_count,
     .get_latency = api_get_latency,
     .set_frequency = api_set_frequency,
-    .set_frequency_async = api_set_frequency_async,
     .get_frequency_limits = api_get_frequency_limits,
     .set_frequency_limits = api_set_frequency_limits,
-    .set_frequency_limits_async = api_set_frequency_limits_async,
 };
