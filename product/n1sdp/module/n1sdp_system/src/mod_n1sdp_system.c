@@ -21,6 +21,7 @@
 #include <fwk_notification.h>
 #include <mod_clock.h>
 #include <mod_cmn600.h>
+#include <mod_n1sdp_c2c_i2c.h>
 #include <mod_n1sdp_dmc620.h>
 #include <mod_n1sdp_flash.h>
 #include <mod_n1sdp_system.h>
@@ -127,6 +128,12 @@ struct n1sdp_system_ctx {
 
     /* Pointer to SDS */
     const struct mod_sds_api *sds_api;
+
+    /* Pointer to N1SDP C2C slave information API */
+    const struct n1sdp_c2c_slave_info_api *c2c_api;
+
+    /* Remote DDR size (in GB) */
+    uint8_t remote_ddr_size_gb;
 };
 
 struct n1sdp_system_isr {
@@ -319,7 +326,8 @@ static int n1sdp_system_fill_mem_info(void)
         return status;
     }
     n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-        "    Total DDR Size: %d GB\n", ddr_size_gb);
+        "    Total DDR Size: %d GB\n",
+        ddr_size_gb + n1sdp_system_ctx.remote_ddr_size_gb);
 
     sds_ddr_mem_info.ddr_size_gb = ddr_size_gb;
     return n1sdp_system_ctx.sds_api->struct_write(sds_structure_desc->id,
@@ -340,16 +348,26 @@ static int n1sdp_system_fill_bl33_info(void)
 
 static int n1sdp_system_fill_multichip_info(void)
 {
+    int status;
     const struct mod_sds_structure_desc *sds_structure_desc =
         fwk_module_get_data(sds_multichip_info_id);
 
-    /*
-     * TODO: Add mechanism to update multichip information provided
-     * by I2C/C2C module.
-     */
-    sds_multichip_info.mode = false;
     sds_multichip_info.slave_count = 0;
     sds_multichip_info.remote_ddr_size = 0;
+    n1sdp_system_ctx.remote_ddr_size_gb = 0;
+
+    sds_multichip_info.mode = n1sdp_system_ctx.c2c_api->is_slave_alive();
+    if (sds_multichip_info.mode) {
+        sds_multichip_info.slave_count = 1;
+        status = n1sdp_system_ctx.c2c_api->get_ddr_size_gb(
+            &n1sdp_system_ctx.remote_ddr_size_gb);
+        if (status != FWK_SUCCESS)
+            goto fill_info;
+        sds_multichip_info.remote_ddr_size =
+            n1sdp_system_ctx.remote_ddr_size_gb;
+    }
+
+fill_info:
     return n1sdp_system_ctx.sds_api->struct_write(sds_structure_desc->id,
         0, (void *)(&sds_multichip_info), sds_structure_desc->size);
 }
@@ -429,16 +447,9 @@ static int n1sdp_system_init_primary_core(void)
         if (status != FWK_SUCCESS)
             return FWK_E_PANIC;
 
-        /* Fill memory information structure */
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-            "[N1SDP SYSTEM] Collecting memory information...\n");
-        status = n1sdp_system_fill_mem_info();
-        if (status != FWK_SUCCESS)
-            return status;
-
         /* Fill BL33 image information structure */
         n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-            "[N1SDP SYSTEM] Collecting memory information...\n");
+            "[N1SDP SYSTEM] Filling BL33 information...\n");
         status = n1sdp_system_fill_bl33_info();
         if (status != FWK_SUCCESS)
             return status;
@@ -452,6 +463,13 @@ static int n1sdp_system_init_primary_core(void)
             return status;
         }
         n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+
+        /* Fill memory information structure */
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[N1SDP SYSTEM] Collecting memory information...\n");
+        status = n1sdp_system_fill_mem_info();
+        if (status != FWK_SUCCESS)
+            return status;
 
         mod_pd_restricted_api = n1sdp_system_ctx.mod_pd_restricted_api;
 
@@ -538,6 +556,12 @@ static int n1sdp_system_bind(fwk_id_t id, unsigned int round)
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_PPU_V1),
         FWK_ID_API(FWK_MODULE_IDX_PPU_V1, MOD_PPU_V1_API_IDX_ISR),
         &n1sdp_system_ctx.ppu_v1_isr_api);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_C2C),
+        FWK_ID_API(FWK_MODULE_IDX_N1SDP_C2C, N1SDP_C2C_API_IDX_SLAVE_INFO),
+        &n1sdp_system_ctx.c2c_api);
     if (status != FWK_SUCCESS)
         return status;
 
