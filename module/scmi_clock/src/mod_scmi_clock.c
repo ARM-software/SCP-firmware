@@ -1122,7 +1122,6 @@ static int process_response_event(const struct fwk_event *event)
     uint64_t rate;
 
     clock_dev_idx = fwk_id_get_element_idx(event->source_id);
-    request = scmi_clock_ctx.clock_ops[clock_dev_idx].request;
     request = clock_ops_get_request(clock_dev_idx);
     service_id = clock_ops_get_service(clock_dev_idx);
 
