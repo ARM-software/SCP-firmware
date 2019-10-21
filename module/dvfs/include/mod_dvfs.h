@@ -150,16 +150,6 @@ struct mod_dvfs_domain_api {
     int (*set_frequency)(fwk_id_t domain_id, uint64_t frequency);
 
     /*!
-     * \brief Set the frequency of a domain.
-     *
-     * \note This function is asynchronous.
-     *
-     * \param domain_id Element identifier of the domain.
-     * \param idx Index of the operating point to transition to.
-     */
-    int (*set_frequency_async)(fwk_id_t domain_id, uint64_t frequency);
-
-    /*!
      * \brief Get the frequency of a domain.
      *
      * \param domain_id Element identifier of the domain.
@@ -176,18 +166,6 @@ struct mod_dvfs_domain_api {
      * \param limits Pointer to the new limits.
      */
     int (*set_frequency_limits)(
-        fwk_id_t domain_id,
-        const struct mod_dvfs_frequency_limits *limits);
-
-    /*!
-     * \brief Set the frequency of a domain.
-     *
-     * \note This function is asynchronous.
-     *
-     * \param domain_id Element identifier of the domain.
-     * \param limits Pointer to the new limits.
-     */
-    int (*set_frequency_limits_async)(
         fwk_id_t domain_id,
         const struct mod_dvfs_frequency_limits *limits);
 };
