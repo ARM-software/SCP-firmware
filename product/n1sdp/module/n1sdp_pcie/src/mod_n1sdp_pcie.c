@@ -15,10 +15,12 @@
 #include <fwk_notification.h>
 #include <fwk_status.h>
 #include <mod_clock.h>
+#include <mod_n1sdp_c2c_i2c.h>
 #include <mod_n1sdp_pcie.h>
 #include <mod_log.h>
 #include <mod_timer.h>
 #include <config_clock.h>
+#include <n1sdp_core.h>
 #include <n1sdp_pcie.h>
 #include <n1sdp_scc_reg.h>
 #include <n1sdp_scp_pik.h>
@@ -77,6 +79,9 @@ struct n1sdp_pcie_ctx {
 
     /* Timer module API */
     struct mod_timer_api *timer_api;
+
+    /* C2C API to check if slave chip is connected */
+    struct n1sdp_c2c_slave_info_api *c2c_api;
 
     /* Table of PCIe device contexts */
     struct n1sdp_pcie_dev_ctx *device_ctx_table;
@@ -665,6 +670,12 @@ static int n1sdp_pcie_bind(fwk_id_t id, unsigned int round)
             &pcie_ctx.timer_api);
         if (status != FWK_SUCCESS)
             return status;
+
+        status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_C2C),
+            FWK_ID_API(FWK_MODULE_IDX_N1SDP_C2C, N1SDP_C2C_API_IDX_SLAVE_INFO),
+            &pcie_ctx.c2c_api);
+        if (status != FWK_SUCCESS)
+            return status;
     }
     return FWK_SUCCESS;
 }
@@ -685,6 +696,12 @@ static int n1sdp_pcie_start(fwk_id_t id)
     dev_ctx = &pcie_ctx.device_ctx_table[fwk_id_get_element_idx(id)];
     if (dev_ctx == NULL)
         return FWK_E_PARAM;
+
+    /* Do not initialize PCIe RP in slave chip */
+    if (!dev_ctx->config->ccix_capable) {
+        if (n1sdp_get_chipid() != 0)
+            return FWK_SUCCESS;
+    }
 
     return fwk_notification_subscribe(
         mod_clock_notification_id_state_changed,
@@ -718,6 +735,19 @@ static int n1sdp_pcie_process_notification(const struct fwk_event *event,
                   fwk_id_get_element_idx(event->target_id)];
     if (dev_ctx == NULL)
         return FWK_E_PARAM;
+
+    /*
+     * The CCIX RP should not be initialized by n1sdp_pcie_setup() function
+     * in two special cases:
+     *     1. In case of slave chip as it will be initialized by C2C module
+     *        in endpoint mode.
+     *     2. In case of master chip if the slave I2C is alive & responding
+     *        then it will be initialized by C2C module in RP mode.
+     */
+    if (dev_ctx->config->ccix_capable) {
+        if (pcie_ctx.c2c_api->is_slave_alive() || (n1sdp_get_chipid() != 0))
+            return FWK_SUCCESS;
+    }
 
     return n1sdp_pcie_setup(event->target_id);
 }
