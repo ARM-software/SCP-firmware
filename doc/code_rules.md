@@ -22,6 +22,33 @@ The framework provides an optional multi-threading runtime, contingent on a
 CMSIS-RTOS-based RTOS. Interaction with the RTOS happens exclusively through the
 framework.
 
+Static Analysis
+---------------
+This project uses `cppcheck` to do a static analysis of the codebase for
+possible programmer error and other sources of bugs. This analysis occurs as a
+part of the standard continuous integration flow on pull requests. If the
+analyser identifies potential issues, the patch will be automatically rejected.
+
+To invoke `cppcheck` manually, use:
+
+\code
+cppcheck --xml \
+         --enable=all \
+         --force \
+         --library=\"${WORKDIR}/arm-cortex-m.cfg\" \
+         --suppressions-list=\"suppress-list.txt" \
+         --includes-file=\"${PROJECT_DIRECTORIES_FILE}\" \
+         -I \"${WORKDIR}/CMSIS\" \
+         -U__CSMC__ \
+         ."
+\endcode
+
+The CMSIS submodule is not checked.
+
+Certain checks have been manually suppressed. Checks are generally only
+disabled if they have been triaged as false positives. The list of suppressed
+checks can be found [here](tools/cppcheck_suppress_list.txt).
+
 C Standard Library
 ------------------
 When developing a module, only the following headers of the C standard library
