@@ -13,6 +13,12 @@ static const struct fwk_element element_table[] = {
     {
         .name = "CPU_GROUP_LITTLE",
         .data = &(const struct mod_mock_psu_element_cfg) {
+            .async_alarm_id = FWK_ID_NONE_INIT,
+            .async_alarm_api_id = FWK_ID_NONE_INIT,
+
+            .async_response_id = FWK_ID_NONE_INIT,
+            .async_response_api_id = FWK_ID_NONE_INIT,
+
             .default_enabled = true,
             .default_voltage = 100,
         },
@@ -20,6 +26,12 @@ static const struct fwk_element element_table[] = {
     {
         .name = "CPU_GROUP_BIG",
         .data = &(const struct mod_mock_psu_element_cfg) {
+            .async_alarm_id = FWK_ID_NONE_INIT,
+            .async_alarm_api_id = FWK_ID_NONE_INIT,
+
+            .async_response_id = FWK_ID_NONE_INIT,
+            .async_response_api_id = FWK_ID_NONE_INIT,
+
             .default_enabled = true,
             .default_voltage = 100,
         },
@@ -27,6 +39,12 @@ static const struct fwk_element element_table[] = {
     {
         .name = "GPU",
         .data = &(const struct mod_mock_psu_element_cfg) {
+            .async_alarm_id = FWK_ID_NONE_INIT,
+            .async_alarm_api_id = FWK_ID_NONE_INIT,
+
+            .async_response_id = FWK_ID_NONE_INIT,
+            .async_response_api_id = FWK_ID_NONE_INIT,
+
             .default_enabled = true,
             .default_voltage = 100,
         },
@@ -34,6 +52,12 @@ static const struct fwk_element element_table[] = {
     {
         .name = "VPU",
         .data = &(const struct mod_mock_psu_element_cfg) {
+            .async_alarm_id = FWK_ID_NONE_INIT,
+            .async_alarm_api_id = FWK_ID_NONE_INIT,
+
+            .async_response_id = FWK_ID_NONE_INIT,
+            .async_response_api_id = FWK_ID_NONE_INIT,
+
             .default_enabled = true,
             .default_voltage = 100,
         },
