@@ -197,7 +197,7 @@ static const struct fwk_element sensor_element_table[] = {
  */
 static const struct fwk_element sensor_element_table_fvp[] = {
     [0] = {
-        .name = "Juno fake reg sensor",
+        .name = "Fake sensor",
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_REG_SENSOR, 0),
             .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_REG_SENSOR, 0),
