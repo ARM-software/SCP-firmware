@@ -65,10 +65,10 @@ static struct fwk_element sds_element_table[] = {
         }),
     },
     {
-        .name = "DDR Memory Info",
+        .name = "Platform Info",
         .data = &((struct mod_sds_structure_desc) {
-            .id = N1SDP_SDS_DDR_MEM_INFO,
-            .size = N1SDP_SDS_DDR_MEM_INFO_SIZE,
+            .id = N1SDP_SDS_PLATFORM_INFO,
+            .size = N1SDP_SDS_PLATFORM_INFO_SIZE,
             .finalize = true,
         }),
     },
@@ -77,14 +77,6 @@ static struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc) {
             .id = N1SDP_SDS_BL33_INFO,
             .size = N1SDP_SDS_BL33_INFO_SIZE,
-            .finalize = true,
-        }),
-    },
-    {
-        .name = "Multichip Info",
-        .data = &((struct mod_sds_structure_desc) {
-            .id = N1SDP_SDS_MULTICHIP_INFO,
-            .size = N1SDP_SDS_MULTICHIP_INFO_SIZE,
             .finalize = true,
         }),
     },

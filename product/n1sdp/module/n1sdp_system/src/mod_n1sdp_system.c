@@ -41,11 +41,17 @@
 #include <config_clock.h>
 
 /*
- * DDR memory information structure used by BL31
+ * Platform information structure used by BL31
  */
-struct n1sdp_ddr_mem_info {
-    /* DDR memory size in GigaBytes */
-    uint32_t ddr_size_gb;
+struct n1sdp_platform_info {
+    /* If multichip mode */
+    bool multichip_mode;
+    /* Total number of slave chips  */
+    uint8_t slave_count;
+    /* Local ddr size in GB */
+    uint8_t local_ddr_size;
+    /* Remote ddr size in GB */
+    uint8_t remote_ddr_size;
 };
 
 /*
@@ -95,18 +101,14 @@ static fwk_id_t sds_feature_availability_id =
                             SDS_ELEMENT_IDX_FEATURE_AVAILABILITY);
 
 /* SDS DDR memory information */
-static struct n1sdp_ddr_mem_info sds_ddr_mem_info;
-static fwk_id_t sds_ddr_mem_info_id =
-    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, SDS_ELEMENT_IDX_DDR_MEM_INFO);
+static struct n1sdp_platform_info sds_platform_info;
+static fwk_id_t sds_platform_info_id =
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, SDS_ELEMENT_IDX_PLATFORM_INFO);
 
 /* SDS BL33 image information */
 static struct n1sdp_bl33_info sds_bl33_info;
 static fwk_id_t sds_bl33_info_id =
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, SDS_ELEMENT_IDX_BL33_INFO);
-
-static struct n1sdp_multichip_info sds_multichip_info;
-static fwk_id_t sds_multichip_info_id =
-    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, SDS_ELEMENT_IDX_MULTICHIP_INFO);
 
 /* Module context */
 struct n1sdp_system_ctx {
@@ -131,9 +133,6 @@ struct n1sdp_system_ctx {
 
     /* Pointer to N1SDP C2C slave information API */
     const struct n1sdp_c2c_slave_info_api *c2c_api;
-
-    /* Remote DDR size (in GB) */
-    uint8_t remote_ddr_size_gb;
 };
 
 struct n1sdp_system_isr {
@@ -311,27 +310,47 @@ void csys_pwrupreq_handler(void)
 /*
  * Function to fill platform information structure.
  */
-static int n1sdp_system_fill_mem_info(void)
+static int n1sdp_system_fill_platform_info(void)
 {
     int status;
     uint32_t ddr_size_gb;
-    const struct mod_sds_structure_desc *sds_structure_desc =
-        fwk_module_get_data(sds_ddr_mem_info_id);
 
-    ddr_size_gb = 0;
+    const struct mod_sds_structure_desc *sds_structure_desc =
+        fwk_module_get_data(sds_platform_info_id);
+
+    sds_platform_info.slave_count = 0;
+    sds_platform_info.remote_ddr_size = 0;
+
     status = n1sdp_system_ctx.dmc620_api->get_mem_size_gb(&ddr_size_gb);
     if (status != FWK_SUCCESS) {
         n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-            "Error calculating DDR memory size!\n");
+            "Error calculating local DDR memory size!\n");
         return status;
     }
+
+    sds_platform_info.local_ddr_size = ddr_size_gb;
+
+    /* Get remote chip's information */
+    sds_platform_info.multichip_mode = n1sdp_system_ctx.c2c_api->
+                                          is_slave_alive();
+
+    if (sds_platform_info.multichip_mode) {
+        sds_platform_info.slave_count = 1;
+        status = n1sdp_system_ctx.c2c_api->get_ddr_size_gb
+                                           (&sds_platform_info.remote_ddr_size);
+        if (status != FWK_SUCCESS) {
+            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                "Error calculating Remote DDR memory size!\n");
+            return status;
+        }
+    }
+
     n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
         "    Total DDR Size: %d GB\n",
-        ddr_size_gb + n1sdp_system_ctx.remote_ddr_size_gb);
+        sds_platform_info.local_ddr_size + sds_platform_info.remote_ddr_size);
 
-    sds_ddr_mem_info.ddr_size_gb = ddr_size_gb;
     return n1sdp_system_ctx.sds_api->struct_write(sds_structure_desc->id,
-        0, (void *)(&sds_ddr_mem_info), sds_structure_desc->size);
+        0, (void *)(&sds_platform_info), sds_structure_desc->size);
 }
 
 static int n1sdp_system_fill_bl33_info(void)
@@ -344,32 +363,6 @@ static int n1sdp_system_fill_bl33_info(void)
     sds_bl33_info.bl33_size = BL33_SIZE;
     return n1sdp_system_ctx.sds_api->struct_write(sds_structure_desc->id,
         0, (void *)(&sds_bl33_info), sds_structure_desc->size);
-}
-
-static int n1sdp_system_fill_multichip_info(void)
-{
-    int status;
-    const struct mod_sds_structure_desc *sds_structure_desc =
-        fwk_module_get_data(sds_multichip_info_id);
-
-    sds_multichip_info.slave_count = 0;
-    sds_multichip_info.remote_ddr_size = 0;
-    n1sdp_system_ctx.remote_ddr_size_gb = 0;
-
-    sds_multichip_info.mode = n1sdp_system_ctx.c2c_api->is_slave_alive();
-    if (sds_multichip_info.mode) {
-        sds_multichip_info.slave_count = 1;
-        status = n1sdp_system_ctx.c2c_api->get_ddr_size_gb(
-            &n1sdp_system_ctx.remote_ddr_size_gb);
-        if (status != FWK_SUCCESS)
-            goto fill_info;
-        sds_multichip_info.remote_ddr_size =
-            n1sdp_system_ctx.remote_ddr_size_gb;
-    }
-
-fill_info:
-    return n1sdp_system_ctx.sds_api->struct_write(sds_structure_desc->id,
-        0, (void *)(&sds_multichip_info), sds_structure_desc->size);
 }
 
 /*
@@ -454,20 +447,10 @@ static int n1sdp_system_init_primary_core(void)
         if (status != FWK_SUCCESS)
             return status;
 
-        /* Fill multichip mode information structure */
+        /* Fill Platform information structure */
         n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-            "[N1SDP SYSTEM] Filling Multichip information...");
-        status = n1sdp_system_fill_multichip_info();
-        if (status != FWK_SUCCESS) {
-            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Failed\n");
-            return status;
-        }
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
-
-        /* Fill memory information structure */
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-            "[N1SDP SYSTEM] Collecting memory information...\n");
-        status = n1sdp_system_fill_mem_info();
+            "[N1SDP SYSTEM] Collecting Platform information...\n");
+        status = n1sdp_system_fill_platform_info();
         if (status != FWK_SUCCESS)
             return status;
 
