@@ -16,6 +16,7 @@
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+#include <fwk_multi_thread.h>
 #include <fwk_notification.h>
 #include <mod_clock.h>
 #include <mod_cmn600.h>
@@ -26,6 +27,7 @@
 #include <mod_n1sdp_pcie.h>
 #include <mod_n1sdp_timer_sync.h>
 #include <mod_power_domain.h>
+#include <mod_timer.h>
 #include <config_clock.h>
 #include <n1sdp_core.h>
 
@@ -37,6 +39,11 @@
 
 #define N1SDP_C2C_SUCCESS          0
 #define N1SDP_C2C_ERROR            1
+
+#define CORE_COUNT_PER_CHIP        4
+
+#define C2C_MASTER_RETRY_DELAY_US  UINT32_C(10000)
+#define C2C_MASTER_RETRIES         10
 
 static const char * const cmd_str[] = {
     [N1SDP_C2C_CMD_CHECK_SLAVE] = "Check slave alive",
@@ -56,6 +63,7 @@ static const char * const cmd_str[] = {
     [N1SDP_C2C_CMD_TIMER_SYNC] = "Sync timer",
     [N1SDP_C2C_CMD_POWER_DOMAIN_ON] = "Power domain ON",
     [N1SDP_C2C_CMD_POWER_DOMAIN_OFF] = "Power domain OFF",
+    [N1SDP_C2C_CMD_POWER_DOMAIN_GET_STATE] = "Get power state",
 };
 
 /* Module context */
@@ -86,6 +94,9 @@ struct n1sdp_c2c_ctx {
 
     /* DMC620 memory information API */
     struct mod_dmc620_mem_info_api *dmc620_api;
+
+    /* Timer API */
+    struct mod_timer_api *timer_api;
 
     /* Timer synchronization API */
     struct n1sdp_timer_sync_api *tsync_api;
@@ -552,12 +563,29 @@ static int n1sdp_c2c_multichip_init(void)
 /*
  * Slave side protocol functions
  */
-static int n1sdp_c2c_process_command(const struct fwk_event *event)
+static int n1sdp_c2c_wait_for_next_command(void)
+{
+    int status;
+
+    status = n1sdp_c2c_ctx.slave_api->read(n1sdp_c2c_ctx.config->i2c_id,
+                                           &n1sdp_c2c_ctx.slave_rx_data[0],
+                                           N1SDP_C2C_DATA_SIZE);
+    if (status != FWK_SUCCESS) {
+        n1sdp_c2c_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                                   "[C2C] Error setting up read transfer!\n");
+        return status;
+    }
+
+    return FWK_SUCCESS;
+}
+
+static int n1sdp_c2c_process_command(void)
 {
     int status;
     uint8_t cmd;
     uint8_t rx_data[N1SDP_C2C_DATA_SIZE];
     uint32_t ddr_size_gb = 0;
+    unsigned int state = 0;
     struct mod_cmn600_ccix_remote_node_config remote_config;
 
     memcpy(rx_data, n1sdp_c2c_ctx.slave_rx_data, N1SDP_C2C_DATA_SIZE);
@@ -651,23 +679,79 @@ static int n1sdp_c2c_process_command(const struct fwk_event *event)
         break;
 
     case N1SDP_C2C_CMD_POWER_DOMAIN_OFF:
-        status = n1sdp_c2c_ctx.pd_api->set_composite_state_async(
-            FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
-            false,
-            MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
-                                   MOD_PD_STATE_ON, MOD_PD_STATE_OFF));
-        if (status != FWK_SUCCESS)
+        /*
+         * rx_data[0] - Contains the C2C command
+         * rx_data[1] - Contains target power domain ID
+         * rx_data[2] - Contains target power domain type (core or cluster)
+         */
+        switch (rx_data[2]) {
+        case MOD_PD_TYPE_CORE:
+            status = n1sdp_c2c_ctx.pd_api->set_composite_state(
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
+                MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
+                    MOD_PD_STATE_ON, MOD_PD_STATE_OFF));
+            if (status != FWK_SUCCESS)
+                goto error;
+            break;
+
+        case MOD_PD_TYPE_CLUSTER:
+            status = n1sdp_c2c_ctx.pd_api->set_composite_state(
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
+                MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
+                    MOD_PD_STATE_OFF, MOD_PD_STATE_OFF));
+            if (status != FWK_SUCCESS)
+                goto error;
+            break;
+
+        default:
+            status = FWK_E_PARAM;
             goto error;
+        }
         break;
 
     case N1SDP_C2C_CMD_POWER_DOMAIN_ON:
-        status = n1sdp_c2c_ctx.pd_api->set_composite_state_async(
+        /*
+         * rx_data[0] - Contains the C2C command
+         * rx_data[1] - Contains target power domain ID
+         * rx_data[2] - Contains target power domain type (core or cluster)
+         */
+        switch (rx_data[2]) {
+        case MOD_PD_TYPE_CORE:
+            status = n1sdp_c2c_ctx.pd_api->set_composite_state(
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
+                MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
+                    MOD_PD_STATE_ON, MOD_PD_STATE_ON));
+            if (status != FWK_SUCCESS)
+                goto error;
+            break;
+
+        case MOD_PD_TYPE_CLUSTER:
+            status = n1sdp_c2c_ctx.pd_api->set_composite_state(
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
+                MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
+                    MOD_PD_STATE_ON, MOD_PD_STATE_OFF));
+            if (status != FWK_SUCCESS)
+                goto error;
+            break;
+
+        default:
+            status = FWK_E_PARAM;
+            goto error;
+        }
+        break;
+
+    case N1SDP_C2C_CMD_POWER_DOMAIN_GET_STATE:
+        /*
+         * rx_data[0] - Contains the C2C command
+         * rx_data[1] - Contains target power domain ID
+         */
+        status = n1sdp_c2c_ctx.pd_api->get_state(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
-            false,
-            MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
-                                   MOD_PD_STATE_ON, MOD_PD_STATE_ON));
+            &state);
         if (status != FWK_SUCCESS)
             goto error;
+
+        n1sdp_c2c_ctx.slave_tx_data[1] = (uint8_t)state;
         break;
 
     case N1SDP_C2C_CMD_TIMER_SYNC:
@@ -701,21 +785,6 @@ error:
     return FWK_SUCCESS;
 }
 
-static int n1sdp_c2c_wait_for_next_command(const struct fwk_event *event)
-{
-    int status;
-
-    status = n1sdp_c2c_ctx.slave_api->read(
-        n1sdp_c2c_ctx.config->i2c_id,
-        &n1sdp_c2c_ctx.slave_rx_data[0], N1SDP_C2C_DATA_SIZE);
-    if (status != FWK_SUCCESS) {
-        n1sdp_c2c_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                                   "[C2C] Error setting up read transfer!\n");
-        return status;
-    }
-    return FWK_SUCCESS;
-}
-
 /*
  * Module APIs
  */
@@ -746,30 +815,94 @@ static const struct n1sdp_c2c_slave_info_api slave_info_api = {
 /*
  * Power domain API
  */
-static int n1sdp_c2c_pd_run_cmd(enum n1sdp_c2c_cmd cmd, unsigned int pd_id,
-    unsigned int pd_type)
+static int n1sdp_c2c_pd_set_state(enum n1sdp_c2c_cmd cmd, uint8_t pd_id,
+    uint8_t pd_type)
 {
     int status;
-
-    if ((cmd != N1SDP_C2C_CMD_POWER_DOMAIN_ON) ||
-        (cmd != N1SDP_C2C_CMD_POWER_DOMAIN_OFF))
-        return FWK_E_PARAM;
+    uint8_t retries;
 
     n1sdp_c2c_ctx.master_tx_data[1] = pd_id;
     n1sdp_c2c_ctx.master_tx_data[2] = pd_type;
-    status = n1sdp_c2c_master_tx_command(cmd);
+    status = n1sdp_c2c_master_tx_command((uint8_t)cmd);
     if (status != FWK_SUCCESS)
         return status;
 
-    status = n1sdp_c2c_master_rx_response();
+    /*
+     * PD command in slave will take some time to complete so master
+     * has to retry waiting for response from slave.
+     */
+    retries = C2C_MASTER_RETRIES;
+    do {
+        status = n1sdp_c2c_master_rx_response();
+        if (status == FWK_SUCCESS)
+            break;
+
+        retries--;
+        n1sdp_c2c_ctx.timer_api->delay(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                                       C2C_MASTER_RETRY_DELAY_US);
+    } while (retries != 0);
+
+    if ((retries == 0) && (status != FWK_SUCCESS))
+        return status;
+
+    if (n1sdp_c2c_ctx.master_rx_data[0] != N1SDP_C2C_SUCCESS) {
+        n1sdp_c2c_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                                   "[C2C] PD request failed!\n");
+        return FWK_E_STATE;
+    }
+
+    return FWK_SUCCESS;
+}
+
+static int n1sdp_c2c_pd_get_state(enum n1sdp_c2c_cmd cmd, uint8_t pd_id,
+    unsigned int *state)
+{
+    int status;
+    uint8_t retries;
+
+    fwk_assert(state != NULL);
+
+    n1sdp_c2c_ctx.master_tx_data[1] = pd_id;
+    status = n1sdp_c2c_master_tx_command((uint8_t)cmd);
     if (status != FWK_SUCCESS)
         return status;
+
+    /*
+     * PD command in slave will take some time to complete so master
+     * has to retry waiting for response from slave.
+     */
+    retries = C2C_MASTER_RETRIES;
+    do {
+        status = n1sdp_c2c_master_rx_response();
+        if (status == FWK_SUCCESS)
+            break;
+        retries--;
+
+        n1sdp_c2c_ctx.timer_api->delay(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                                       C2C_MASTER_RETRY_DELAY_US);
+    } while (retries != 0);
+
+    if ((retries == 0) && (status != FWK_SUCCESS))
+        return status;
+
+    /*
+     * master_rx_data[0] contains return status code
+     * master_rx_data[1] contains the current PD state in target
+     */
+    if (n1sdp_c2c_ctx.master_rx_data[0] != N1SDP_C2C_SUCCESS) {
+        n1sdp_c2c_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                                   "[C2C] PD request failed!\n");
+        return FWK_E_STATE;
+    }
+
+    *state = n1sdp_c2c_ctx.master_rx_data[1];
 
     return FWK_SUCCESS;
 }
 
 static const struct n1sdp_c2c_pd_api pd_api = {
-    .pd_run_cmd = n1sdp_c2c_pd_run_cmd,
+    .set_state = n1sdp_c2c_pd_set_state,
+    .get_state = n1sdp_c2c_pd_get_state,
 };
 
 /*
@@ -790,7 +923,10 @@ static int n1sdp_c2c_init(fwk_id_t module_id, unsigned int unused,
 
     n1sdp_c2c_ctx.chip_id = n1sdp_get_chipid();
 
-    return FWK_SUCCESS;
+    if (n1sdp_c2c_ctx.chip_id == 0x0)
+        return FWK_SUCCESS;
+    else
+        return fwk_thread_create(module_id);
 }
 
 static int n1sdp_c2c_bind(fwk_id_t id, unsigned int round)
@@ -837,6 +973,13 @@ static int n1sdp_c2c_bind(fwk_id_t id, unsigned int round)
                                  FWK_ID_API(FWK_MODULE_IDX_N1SDP_DMC620,
                                             MOD_DMC620_API_IDX_MEM_INFO),
                                  &n1sdp_c2c_ctx.dmc620_api);
+        if (status != FWK_SUCCESS)
+            return status;
+
+        status = fwk_module_bind(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                                 FWK_ID_API(FWK_MODULE_IDX_TIMER,
+                                            MOD_TIMER_API_IDX_TIMER),
+                                 &n1sdp_c2c_ctx.timer_api);
         if (status != FWK_SUCCESS)
             return status;
 
@@ -930,10 +1073,10 @@ static int n1sdp_c2c_process_notification(const struct fwk_event *event,
                                             event->target_id);
     } else if (fwk_id_is_equal(event->id,
                                mod_n1sdp_i2c_notification_id_slave_rx)) {
-        return n1sdp_c2c_process_command(event);
+        return n1sdp_c2c_process_command();
     } else if (fwk_id_is_equal(event->id,
                                mod_n1sdp_i2c_notification_id_slave_tx)) {
-        return n1sdp_c2c_wait_for_next_command(event);
+        return n1sdp_c2c_wait_for_next_command();
     }
 
     return FWK_SUCCESS;
