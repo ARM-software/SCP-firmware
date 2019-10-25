@@ -49,6 +49,7 @@ enum n1sdp_c2c_cmd {
     N1SDP_C2C_CMD_TIMER_SYNC,
     N1SDP_C2C_CMD_POWER_DOMAIN_ON,
     N1SDP_C2C_CMD_POWER_DOMAIN_OFF,
+    N1SDP_C2C_CMD_POWER_DOMAIN_GET_STATE,
 };
 
 /*!
@@ -104,17 +105,28 @@ struct n1sdp_c2c_slave_info_api {
  */
 struct n1sdp_c2c_pd_api {
    /*!
-    * \brief API to execute a power domain command.
+    * \brief API to set a power state in remote chip.
     *
     * \param cmd The C2C command type to issue.
     * \param pd_id The target power domain ID.
     * \param pd_type The target power domain type.
     *
-    * \retval true If slave is alive.
-    * \return false If slave is not alive.
+    * \retval FWK_SUCCESS If operation succeeds.
+    * \return One of the possible error return codes.
     */
-   int (*pd_run_cmd)(enum n1sdp_c2c_cmd cmd, unsigned int pd_id,
-                 unsigned int pd_type);
+   int (*set_state)(enum n1sdp_c2c_cmd cmd, uint8_t pd_id, uint8_t pd_type);
+   /*!
+    * \brief API to get a power state in remote chip.
+    *
+    * \param cmd The C2C command type to issue.
+    * \param pd_id The target power domain ID.
+    * \param state Current power state in power domain pd_id.
+    *
+    * \retval FWK_SUCCESS If operation succeeds.
+    * \return One of the possible error return codes.
+    */
+   int (*get_state)(enum n1sdp_c2c_cmd cmd, uint8_t pd_id,
+                    unsigned int *state);
 };
 
 /*!
