@@ -552,6 +552,18 @@ struct cmn600_hni_reg {
 #define CMN600_ROOT_NODE_OFFSET_PORT_POS 14
 #define CMN600_ROOT_NODE_OFFSET_Y_POS 20
 
+/* Peripheral ID Revision Numbers */
+#define CMN600_PERIPH_ID_2_REV_R1_P0 ((0x00 << 4) + (0x0B))
+#define CMN600_PERIPH_ID_2_REV_R1_P1 ((0x01 << 4) + (0x0B))
+#define CMN600_PERIPH_ID_2_REV_R1_P2 ((0x02 << 4) + (0x0B))
+#define CMN600_PERIPH_ID_2_REV_R1_P3 ((0x03 << 4) + (0x0B))
+#define CMN600_PERIPH_ID_2_REV_R2_P0 ((0x04 << 4) + (0x0B))
+#define CMN600_PERIPH_ID_2_REV_R3_P0 ((0x05 << 4) + (0x0B))
+#define CMN600_PERIPH_ID_2_REV_R3_P1 ((0x06 << 4) + (0x0B))
+
+/* Peripheral ID Revision Numbers */
+#define CMN600_PERIPH_ID_2_MASK UINT64_C(0xFF)
+
 /*
  * Retrieve the number of child nodes of a given node
  *
@@ -626,6 +638,15 @@ void *get_child_node(uintptr_t base, void *node_base, unsigned int child_index);
  * \return Physical child node identifier
  */
 unsigned int get_child_node_id(void *node_base, unsigned int child_index);
+
+/*
+ * Retrieve the revision number of CMN-600.
+ *
+ * \param root Pointer to the CMN-600 configuration master register.
+ *
+ * \return CMN-600 revision as integer value.
+ */
+unsigned int get_cmn600_revision(struct cmn600_cfgm_reg *root);
 
 /*
  * Verify if a child node (given a parent node base and child index) is an
