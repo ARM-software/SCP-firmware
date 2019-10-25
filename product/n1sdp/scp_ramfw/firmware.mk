@@ -47,6 +47,7 @@ BS_FIRMWARE_MODULES := \
     n1sdp_flash \
     n1sdp_timer_sync \
     n1sdp_c2c \
+    n1sdp_remote_pd \
     n1sdp_pcie \
     n1sdp_system
 
@@ -79,6 +80,7 @@ BS_FIRMWARE_SOURCES := \
     config_sensor.c \
     config_apcontext.c \
     config_n1sdp_c2c_i2c.c \
+    config_n1sdp_remote_pd.c \
     config_n1sdp_timer_sync.c
 
 include $(BS_DIR)/firmware.mk
