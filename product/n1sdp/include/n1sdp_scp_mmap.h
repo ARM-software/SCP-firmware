@@ -34,6 +34,11 @@
 #define SCP_WDOG_BASE                (SCP_PERIPHERAL_BASE + 0x6000)
 
 /*
+ * Timer Synchronization Module base
+ */
+#define SCP_TIMER_SYNC_BASE          UINT32_C(0x47000000)
+
+/*
  * CoreSight control base
  */
 #define SCP_CS_CNTCONTROL_BASE       (SCP_PERIPHERAL_BASE + 0xA000)
@@ -118,6 +123,7 @@
 #define SCP_AP_1MB_WINDOW_BASE       (SCP_SYS1_BASE + SCP_AP_1MB_WINDOW_OFFSET)
 #define SCP_AP_1MB_WINDOW_SIZE       0x100000
 #define SCP_AP_1MB_WINDOW_ADDR_MASK  0xFFFFF
+#define SCP_AP_1MB_WINDOW_SHIFT      20
 
 /*
  * GIC600 Registers
