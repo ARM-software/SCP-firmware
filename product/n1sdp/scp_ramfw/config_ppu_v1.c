@@ -148,9 +148,13 @@ static const struct fwk_element *ppu_v1_get_element_table(fwk_id_t module_id)
      * Configure pd_source_id with the SYSTOP identifier from the power domain
      * module which is dynamically defined based on the number of cores.
      */
-    ppu_v1_config_data.pd_source_id = fwk_id_build_element_id(
-        fwk_module_id_power_domain,
-        core_count + PD_STATIC_DEV_IDX_SYSTOP);
+    if (n1sdp_is_multichip_enabled() && (n1sdp_get_chipid() == 0x0)) {
+        ppu_v1_config_data.pd_source_id = fwk_id_build_element_id(
+            fwk_module_id_power_domain, PD_MULTI_CHIP_IDX_SYSTOP0);
+    } else {
+        ppu_v1_config_data.pd_source_id = fwk_id_build_element_id(
+            fwk_module_id_power_domain, PD_SINGLE_CHIP_IDX_SYSTOP0);
+    }
 
     return element_table;
 }

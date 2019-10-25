@@ -66,8 +66,13 @@ static const struct fwk_element *smt_get_element_table(fwk_id_t module_id)
     for (idx = 0; idx < SCP_N1SDP_SCMI_SERVICE_IDX_COUNT; idx++) {
         config =
             (struct mod_smt_channel_config *)(smt_element_table[idx].data);
-        config->pd_source_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN,
-            n1sdp_core_get_core_count() + PD_STATIC_DEV_IDX_SYSTOP);
+        if (n1sdp_is_multichip_enabled() && (n1sdp_get_chipid() == 0x0)) {
+            config->pd_source_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN,
+                                                  PD_MULTI_CHIP_IDX_SYSTOP0);
+        } else {
+            config->pd_source_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN,
+                                                  PD_SINGLE_CHIP_IDX_SYSTOP0);
+        }
     }
 
     return smt_element_table;
