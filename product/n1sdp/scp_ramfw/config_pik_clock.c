@@ -289,6 +289,15 @@ static const struct mod_pik_clock_rate rate_table_scp_aclk[] = {
     },
 };
 
+static const struct mod_pik_clock_rate rate_table_scp_syncclk[] = {
+    {
+        .rate = PIK_CLK_RATE_SCP_SYNCCLK,
+        .source = MOD_PIK_CLOCK_MSCLOCK_SOURCE_SYSPLLCLK,
+        .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_SYS,
+        .divider = CLOCK_RATE_SYSPLLCLK / PIK_CLK_RATE_SCP_SYNCCLK,
+    },
+};
+
 static const struct mod_pik_clock_rate rate_table_sys_ppu[] = {
     {
         .rate = PIK_CLK_RATE_SYS_PPU,
@@ -803,6 +812,18 @@ static const struct fwk_element pik_clock_element_table[] = {
             .rate_table = rate_table_scp_aclk,
             .rate_count = FWK_ARRAY_SIZE(rate_table_scp_aclk),
             .initial_rate = PIK_CLK_RATE_SCP_AXICLK,
+        }),
+    },
+    [CLOCK_PIK_IDX_SCP_SYNCCLK] = {
+        .name = "SCP SYNCCLK",
+        .data = &((struct mod_pik_clock_dev_config) {
+            .type = MOD_PIK_CLOCK_TYPE_MULTI_SOURCE,
+            .is_group_member = false,
+            .control_reg = &PIK_SCP->SYNCCLK_CTRL,
+            .divsys_reg = &PIK_SCP->SYNCCLK_DIV1,
+            .rate_table = rate_table_scp_syncclk,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_scp_syncclk),
+            .initial_rate = PIK_CLK_RATE_SCP_SYNCCLK,
         }),
     },
     [CLOCK_PIK_IDX_SYS_PPU] = {
