@@ -191,6 +191,7 @@ static void i2c_isr(uintptr_t data)
             goto i2c_error;
 
         ctx->irq_data_ctx.busy = false;
+        I2C_REG_W(ctx->reg->AR, I2C_AR_ADD7_MASK, I2C_AR_ADD7_SHIFT, 0);
 
         /* Run completion callback */
         if ((ctx->irq_data_ctx.state == MOD_N1SDP_I2C_STATE_TX) &&
@@ -425,6 +426,10 @@ static int i2c_slave_write_irq(fwk_id_t device_id,
     I2C_REG_RMW(device_ctx->reg->CR, I2C_CR_CLRFIFO_MASK, I2C_CR_CLRFIFO_SHIFT,
                     I2C_CLRFIFO_ON);
 
+    /* Set address in AR register */
+    I2C_REG_W(device_ctx->reg->AR, I2C_AR_ADD7_MASK, I2C_AR_ADD7_SHIFT,
+              device_ctx->config->slave_addr);
+
     /* Clear any pending IRQs and re-enable interrupts */
     device_ctx->reg->ISR = I2C_ISR_MASK;
     device_ctx->reg->IER = (I2C_IER_COMP_MASK | I2C_IER_DATA_MASK |
@@ -461,6 +466,10 @@ static int i2c_slave_read_irq(fwk_id_t device_id,
     /* Clear FIFO */
     I2C_REG_RMW(device_ctx->reg->CR, I2C_CR_CLRFIFO_MASK, I2C_CR_CLRFIFO_SHIFT,
                     I2C_CLRFIFO_ON);
+
+    /* Set address in AR register */
+    I2C_REG_W(device_ctx->reg->AR, I2C_AR_ADD7_MASK, I2C_AR_ADD7_SHIFT,
+              device_ctx->config->slave_addr);
 
     if (length < (I2C_TSR_TANSFER_SIZE - 2))
         device_ctx->reg->TSR = length;
