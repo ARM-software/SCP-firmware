@@ -105,5 +105,6 @@ const struct fwk_module_config config_cmn600 = {
             CLOCK_IDX_INTERCONNECT),
         .chipinfo_api_id = FWK_ID_NONE_INIT,
         .chipinfo_mod_id = FWK_ID_NONE_INIT,
+        .hnf_cal_mode = false,
     }),
 };

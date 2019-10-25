@@ -17,6 +17,7 @@
 
 #define CMN600_MAX_NUM_RNF    32
 #define CMN600_MAX_NUM_HNF    32
+#define CMN600_MAX_NUM_SCG    4
 
 #define SAM_GRANULARITY       (64 * FWK_MIB)
 
@@ -93,6 +94,8 @@ struct cmn600_rnsam_reg {
     FWK_RW uint64_t SYS_CACHE_GRP_HN_COUNT;
     FWK_RW uint64_t SYS_CACHE_GRP_SN_NODEID[8];
     FWK_RW uint64_t SYS_CACHE_GRP_SN_SAM_CFG[2];
+           uint8_t  RESERVED5[0xF10 - 0xD58];
+    FWK_RW uint64_t SYS_CACHE_GRP_CAL_MODE;
 };
 
 /*
@@ -510,6 +513,8 @@ struct cmn600_hni_reg {
 #define CMN600_RNSAM_REGION_ENTRIES_PER_GROUP 2
 #define CMN600_RNSAM_MAX_HASH_MEM_REGION_ENTRIES 4
 #define CMN600_RNSAM_MAX_NON_HASH_MEM_REGION_ENTRIES 20
+#define CMN600_RNSAM_SCG_HNF_CAL_MODE_EN UINT64_C(0x01)
+#define CMN600_RNSAM_SCG_HNF_CAL_MODE_SHIFT 16
 
 #define CMN600_RNSAM_STATUS_UNSTALL UINT64_C(0x0000000000000002)
 
@@ -751,5 +756,15 @@ unsigned int get_node_pos_y(void *node_base);
  */
 struct cmn600_cfgm_reg *get_root_node(uintptr_t base, unsigned int hnd_node_id,
     unsigned int mesh_size_x, unsigned int mesh_size_y);
+
+/*
+ * Check if CMN600 supports CAL mode. CAL mode is supported from CMN600 r2p0.
+ *
+ * \param root Pointer to the root node descriptor
+ *
+ * \retval true if the CMN600 revision is found to be r2p0 or above
+ * \retval false if the CMN600 revision is found to be r1p3 or below
+ */
+bool is_cal_mode_supported(struct cmn600_cfgm_reg *root);
 
 #endif /* CMN600_H */

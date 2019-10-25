@@ -75,6 +75,12 @@ unsigned int get_cmn600_revision(struct cmn600_cfgm_reg *root)
     return (root->PERIPH_ID[1] & CMN600_PERIPH_ID_2_MASK);
 }
 
+bool is_cal_mode_supported(struct cmn600_cfgm_reg *root)
+{
+    return (get_cmn600_revision(root) >= CMN600_PERIPH_ID_2_REV_R2_P0) ?
+            true : false;
+}
+
 bool is_child_external(void *node_base, unsigned int child_index)
 {
     struct node_header *node = node_base;

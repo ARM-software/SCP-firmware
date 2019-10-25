@@ -31,23 +31,55 @@ struct cmn600_ctx *ctx;
 static void process_node_hnf(struct cmn600_hnf_reg *hnf)
 {
     unsigned int logical_id;
+    unsigned int node_id;
     unsigned int group;
     unsigned int bit_pos;
     unsigned int region_idx;
     unsigned int region_sub_count = 0;
     const struct mod_cmn600_memory_region_map *region;
     const struct mod_cmn600_config *config = ctx->config;
+    static unsigned int cal_mode_factor = 1;
     uint64_t base_offset;
 
     logical_id = get_node_logical_id(hnf);
+    node_id = get_node_id(hnf);
+
+    /*
+     * If CAL mode is set, only even numbered hnf node should be added to the
+     * sys_cache_grp_hn_nodeid registers and hnf_count should be incremented
+     * only for the even numbered hnf nodes.
+     */
+    if (config->hnf_cal_mode == true && (node_id % 2 == 1) &&
+        is_cal_mode_supported(ctx->root)) {
+
+        /* Factor to manipulate the group and bit_pos */
+        cal_mode_factor = 2;
+
+        /*
+         * Reduce the hnf_count as the current hnf node is not getting included
+         * in the sys_cache_grp_hn_nodeid register
+         */
+        ctx->hnf_count--;
+    }
 
     assert(logical_id < config->snf_count);
 
-    group = logical_id / CMN600_HNF_CACHE_GROUP_ENTRIES_PER_GROUP;
-    bit_pos = CMN600_HNF_CACHE_GROUP_ENTRY_BITS_WIDTH *
-              (logical_id % CMN600_HNF_CACHE_GROUP_ENTRIES_PER_GROUP);
+    group = logical_id /
+        (CMN600_HNF_CACHE_GROUP_ENTRIES_PER_GROUP * cal_mode_factor);
+    bit_pos = (CMN600_HNF_CACHE_GROUP_ENTRY_BITS_WIDTH / cal_mode_factor) *
+        (logical_id % (CMN600_HNF_CACHE_GROUP_ENTRIES_PER_GROUP *
+                       cal_mode_factor));
 
-    ctx->hnf_cache_group[group] += ((uint64_t)get_node_id(hnf)) << bit_pos;
+    /*
+     * If CAL mode is set, add only even numbered hnd node to
+     * sys_cache_grp_hn_nodeid registers
+     */
+    if (config->hnf_cal_mode == true && is_cal_mode_supported(ctx->root)) {
+        if (node_id % 2 == 0)
+            ctx->hnf_cache_group[group] += ((uint64_t)get_node_id(hnf)) <<
+                                           bit_pos;
+    } else
+        ctx->hnf_cache_group[group] += ((uint64_t)get_node_id(hnf)) << bit_pos;
 
     /* Set target node */
     hnf->SAM_CONTROL = config->snf_table[logical_id];
@@ -223,6 +255,14 @@ static int cmn600_discovery(void)
         return FWK_E_RANGE;
     }
 
+    /* When CAL is present, the number of HN-Fs must be even. */
+    if ((ctx->hnf_count % 2 != 0) && (config->hnf_cal_mode == true)) {
+        ctx->log_api->log(MOD_LOG_GROUP_ERROR,
+                MOD_NAME "hnf count: %d should be even when CAL mode is set\n",
+                ctx->hnf_count);
+        return FWK_E_DATA;
+    }
+
     ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
         MOD_NAME "Total internal RN-SAM nodes: %d\n"
         MOD_NAME "Total external RN-SAM nodes: %d\n"
@@ -336,6 +376,8 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
     unsigned int group_count;
     enum sam_node_type sam_node_type;
     uint64_t base;
+    unsigned int scg_region = 0;
+    unsigned int scg_regions_enabled[CMN600_MAX_NUM_SCG] = {0, 0, 0, 0};
 
     ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
         MOD_NAME "Configuring SAM for node %d\n",
@@ -427,6 +469,11 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
                              region->size,
                              SAM_NODE_TYPE_HN_F);
 
+            /* Mark corresponding region as enabled */
+            scg_region = (2 * group) + (bit_pos/32);
+            fwk_assert(scg_region < CMN600_MAX_NUM_SCG);
+            scg_regions_enabled[scg_region] = 1;
+
             region_sys_count++;
             break;
 
@@ -472,6 +519,14 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
 
     /* Program the number of HNFs */
     rnsam->SYS_CACHE_GRP_HN_COUNT = ctx->hnf_count;
+
+    /* Use CAL mode only if the CMN600 revision is r2p0 or above */
+    if (is_cal_mode_supported(ctx->root) && config->hnf_cal_mode) {
+        for (region_idx = 0; region_idx < CMN600_MAX_NUM_SCG; region_idx++)
+            rnsam->SYS_CACHE_GRP_CAL_MODE = scg_regions_enabled[region_idx] *
+                (CMN600_RNSAM_SCG_HNF_CAL_MODE_EN <<
+                 (region_idx * CMN600_RNSAM_SCG_HNF_CAL_MODE_SHIFT));
+    }
 
     /* Enable RNSAM */
     rnsam->STATUS = CMN600_RNSAM_STATUS_UNSTALL;
