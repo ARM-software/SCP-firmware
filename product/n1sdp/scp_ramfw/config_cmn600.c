@@ -179,5 +179,6 @@ const struct fwk_module_config config_cmn600 = {
         .chipinfo_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_SYSTEM,
             MOD_N1SDP_SYSTEM_API_IDX_CHIPINFO),
         .chipinfo_mod_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_N1SDP_SYSTEM),
+        .hnf_cal_mode = false,
     }),
 };

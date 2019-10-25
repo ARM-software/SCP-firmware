@@ -148,6 +148,14 @@ struct mod_cmn600_config {
 
     /*! API ID for getting chip ID information */
     fwk_id_t chipinfo_api_id;
+
+    /*!
+     * \brief HN-F with CAL support flag
+     * \details When set to true, enables HN-F with CAL support. This flag will
+     * be used only if HN-F is found to be connected to CAL (When connected to
+     * a CAL port, node id of HN-F will be a odd number).
+     */
+    bool hnf_cal_mode;
 };
 
 /*!
