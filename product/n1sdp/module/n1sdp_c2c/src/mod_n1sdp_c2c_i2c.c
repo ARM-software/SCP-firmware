@@ -24,6 +24,7 @@
 #include <mod_n1sdp_dmc620.h>
 #include <mod_n1sdp_i2c.h>
 #include <mod_n1sdp_pcie.h>
+#include <mod_n1sdp_timer_sync.h>
 #include <mod_power_domain.h>
 #include <config_clock.h>
 #include <n1sdp_core.h>
@@ -52,6 +53,7 @@ static const char * const cmd_str[] = {
         "CMN600 enter system coherency",
     [N1SDP_C2C_CMD_CMN600_ENTER_DVM_DOMAIN] = "CMN600 enter DVM domain",
     [N1SDP_C2C_CMD_GET_SLV_DDR_SIZE] = "Get slave DDR size",
+    [N1SDP_C2C_CMD_TIMER_SYNC] = "Sync timer",
     [N1SDP_C2C_CMD_POWER_DOMAIN_ON] = "Power domain ON",
     [N1SDP_C2C_CMD_POWER_DOMAIN_OFF] = "Power domain OFF",
 };
@@ -84,6 +86,9 @@ struct n1sdp_c2c_ctx {
 
     /* DMC620 memory information API */
     struct mod_dmc620_mem_info_api *dmc620_api;
+
+    /* Timer synchronization API */
+    struct n1sdp_timer_sync_api *tsync_api;
 
     /* Chip ID */
     uint8_t chip_id;
@@ -444,6 +449,25 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
         }
         break;
 
+    case N1SDP_C2C_CMD_TIMER_SYNC:
+        status = n1sdp_c2c_ctx.tsync_api->master_sync(
+            FWK_ID_ELEMENT(FWK_MODULE_IDX_N1SDP_TIMER_SYNC, 0));
+        if (status != FWK_SUCCESS) {
+            n1sdp_c2c_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Error!\n");
+            return status;
+        }
+        if (run_in_slave) {
+            status = n1sdp_c2c_master_rx_response();
+            if (status != FWK_SUCCESS)
+                return status;
+            if (n1sdp_c2c_ctx.master_rx_data[0] != N1SDP_C2C_SUCCESS) {
+                n1sdp_c2c_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                    "[C2C] Command failed in slave!\n");
+                return FWK_E_STATE;
+            }
+        }
+        break;
+
     default:
         n1sdp_c2c_ctx.log_api->log(MOD_LOG_GROUP_INFO,
                                    "[C2C] Unsupported command\n");
@@ -513,6 +537,11 @@ static int n1sdp_c2c_multichip_init(void)
         return status;
 
     status = n1sdp_c2c_multichip_run_command(N1SDP_C2C_CMD_GET_SLV_DDR_SIZE,
+                                             true);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    status = n1sdp_c2c_multichip_run_command(N1SDP_C2C_CMD_TIMER_SYNC,
                                              true);
     if (status != FWK_SUCCESS)
         return status;
@@ -637,6 +666,13 @@ static int n1sdp_c2c_process_command(const struct fwk_event *event)
             false,
             MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
                                    MOD_PD_STATE_ON, MOD_PD_STATE_ON));
+        if (status != FWK_SUCCESS)
+            goto error;
+        break;
+
+    case N1SDP_C2C_CMD_TIMER_SYNC:
+        status = n1sdp_c2c_ctx.tsync_api->slave_sync(
+            FWK_ID_ELEMENT(FWK_MODULE_IDX_N1SDP_TIMER_SYNC, 0));
         if (status != FWK_SUCCESS)
             goto error;
         break;
@@ -801,6 +837,14 @@ static int n1sdp_c2c_bind(fwk_id_t id, unsigned int round)
                                  FWK_ID_API(FWK_MODULE_IDX_N1SDP_DMC620,
                                             MOD_DMC620_API_IDX_MEM_INFO),
                                  &n1sdp_c2c_ctx.dmc620_api);
+        if (status != FWK_SUCCESS)
+            return status;
+
+        status = fwk_module_bind(
+            FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_TIMER_SYNC),
+            FWK_ID_API(FWK_MODULE_IDX_N1SDP_TIMER_SYNC,
+                       N1SDP_TIMER_SYNC_API_IDX_TSYNC),
+            &n1sdp_c2c_ctx.tsync_api);
         if (status != FWK_SUCCESS)
             return status;
 
