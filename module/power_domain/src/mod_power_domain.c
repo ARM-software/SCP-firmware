@@ -1915,7 +1915,7 @@ static int process_power_state_pre_transition_notification_response(
 static int process_power_state_transition_notification_response(
     struct pd_ctx *pd)
 {
-    struct fwk_event notification_event;
+    struct fwk_event notification_event = { 0 };
     struct mod_pd_power_state_transition_notification_params *params;
 
     if (pd->power_state_transition_notification_ctx.pending_responses == 0) {
@@ -1953,6 +1953,7 @@ static int process_power_state_transition_notification_response(
      */
     notification_event.id = mod_pd_notification_id_power_state_transition;
     notification_event.response_requested = true;
+
     params = (struct mod_pd_power_state_transition_notification_params *)
         notification_event.params;
     params->state = pd->current_state;
