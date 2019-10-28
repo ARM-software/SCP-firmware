@@ -212,13 +212,12 @@ static void alarm_callback(uintptr_t param)
 /*
  * Functions for the system mode API
  */
-static void juno_xrp7724_shutdown(void)
+static int juno_xrp7724_shutdown(void)
 {
     int status;
     fwk_id_t gpio_id = fwk_id_build_element_id(fwk_module_id_juno_xrp7724,
         fwk_id_get_element_idx(module_ctx.config->gpio_mode_id));
 
-    struct fwk_event resp;
     struct fwk_event event = (struct fwk_event) {
         .target_id = gpio_id,
         .id = juno_xrp7724_event_id_request,
@@ -229,17 +228,19 @@ static void juno_xrp7724_shutdown(void)
     /* Select the mode to perform a shutdown */
     module_ctx.gpio_request = JUNO_XRP7724_GPIO_REQUEST_MODE_SHUTDOWN;
 
-    status = fwk_thread_put_event_and_wait(&event, &resp);
-    fwk_assert(status == FWK_SUCCESS);
+    status = fwk_thread_put_event(&event);
+    if (status == FWK_SUCCESS)
+        return FWK_PENDING;
+
+    return status;
 }
 
-static void juno_xrp7724_reset(void)
+static int juno_xrp7724_reset(void)
 {
     int status;
     fwk_id_t gpio_id = fwk_id_build_element_id(fwk_module_id_juno_xrp7724,
         fwk_id_get_element_idx(module_ctx.config->gpio_assert_id));
 
-    struct fwk_event resp;
     struct fwk_event event = (struct fwk_event) {
         .target_id = gpio_id,
         .id = juno_xrp7724_event_id_request,
@@ -254,8 +255,11 @@ static void juno_xrp7724_reset(void)
      */
     module_ctx.gpio_request = JUNO_XRP7724_GPIO_REQUEST_ASSERT_COLD_RESET;
 
-    status = fwk_thread_put_event_and_wait(&event, &resp);
-    fwk_assert(status == FWK_SUCCESS);
+    status = fwk_thread_put_event(&event);
+    if (status == FWK_SUCCESS)
+        return FWK_PENDING;
+
+    return status;
 }
 
 static const struct mod_juno_xrp7724_api_system_mode system_mode_api = {

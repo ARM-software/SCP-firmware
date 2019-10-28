@@ -100,18 +100,30 @@ struct mod_juno_xrp7724_api_system_mode {
     /*!
      * \brief Perform a shutdown.
      *
-     * \note The caller cannot be running on the common thread.
-     * \note This function returns only if the shutdown request has failed.
+     * \details When the function returns the request may not be completed.
+     *      When the operation has successfully finished, no response will be
+     *      returned to caller since the hardware will be entirely turned off.
+     *      The caller may get a response through an event in case the request
+     *      failed.
+     *
+     * \retval FWK_PENDING The request was submitted, not yet completed.
+     * \return One of the standard framework error codes.
      */
-    void (*shutdown)(void);
+    int (*shutdown)(void);
 
     /*!
      * \brief Perform a cold reset.
      *
-     * \note The caller cannot be running on the common thread.
-     * \note This function returns only if the reset request has failed.
+     * \details When the function returns the request may not be completed.
+     *      When the operation has successfully finished, no response will be
+     *      returned to caller since the hardware will be restarted.
+     *      The caller may get a response through an event in case the request
+     *      failed.
+
+     * \retval FWK_PENDING The request was submitted, not yet completed.
+     * \return One of the standard framework error codes.
      */
-    void (*reset)(void);
+    int (*reset)(void);
 };
 
 /*! Index of the available APIs */
