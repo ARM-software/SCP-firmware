@@ -229,6 +229,13 @@ static int pl011_start(fwk_id_t id)
             id);
         if (status != FWK_SUCCESS)
             return status;
+
+        status = fwk_notification_subscribe(
+            mod_pd_notification_id_pre_shutdown,
+            fwk_module_id_power_domain,
+            id);
+        if (status != FWK_SUCCESS)
+            return status;
     }
     #endif
 
@@ -369,6 +376,19 @@ static int pl011_process_notification(
             return FWK_SUCCESS;
 
         return pl011_powerup(event->target_id);
+    } else if (fwk_id_is_equal(event->id,
+        mod_pd_notification_id_pre_shutdown)) {
+        int status = FWK_E_PARAM;
+
+        status = pl011_powerdown(event->target_id);
+
+        struct mod_pd_pre_shutdown_notif_resp_params
+            *pd_pre_shutdown_resp_params =
+        (struct mod_pd_pre_shutdown_notif_resp_params *)
+            resp_event->params;
+
+        pd_pre_shutdown_resp_params->status = status;
+        return status;
     #endif
     } else
         return FWK_E_PARAM;
