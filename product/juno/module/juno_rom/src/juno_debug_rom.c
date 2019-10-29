@@ -201,10 +201,6 @@ int juno_debug_rom_init(const struct mod_juno_ppu_rom_api *rom_ppu_api)
     fwk_interrupt_clear_pending(CDBG_RST_REQ_IRQ);
     fwk_interrupt_clear_pending(CSYS_PWR_UP_REQ_IRQ);
 
-    fwk_interrupt_enable(CDBG_PWR_UP_REQ_IRQ);
-    fwk_interrupt_enable(CDBG_RST_REQ_IRQ);
-    fwk_interrupt_enable(CSYS_PWR_UP_REQ_IRQ);
-
     status = fwk_interrupt_set_isr(CDBG_PWR_UP_REQ_IRQ,
         juno_debug_cdbg_pwr_up_req_isr);
     if (status != FWK_SUCCESS)
@@ -219,6 +215,10 @@ int juno_debug_rom_init(const struct mod_juno_ppu_rom_api *rom_ppu_api)
         juno_debug_cdbg_rst_req_isr);
     if (status != FWK_SUCCESS)
         return status;
+
+    fwk_interrupt_enable(CDBG_PWR_UP_REQ_IRQ);
+    fwk_interrupt_enable(CDBG_RST_REQ_IRQ);
+    fwk_interrupt_enable(CSYS_PWR_UP_REQ_IRQ);
 
     return FWK_SUCCESS;
 }
