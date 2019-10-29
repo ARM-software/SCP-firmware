@@ -18,9 +18,13 @@
 #include <fwk_status.h>
 #include <internal/scmi.h>
 #include <internal/scmi_power_domain.h>
+#if BUILD_HAS_MOD_DEBUG
+#include <mod_debug.h>
+#endif
 #include <mod_log.h>
 #include <mod_power_domain.h>
 #include <mod_scmi.h>
+#include <mod_scmi_power_domain.h>
 
 struct scmi_pd_ctx {
     /* Number of power domains */
@@ -34,6 +38,13 @@ struct scmi_pd_ctx {
 
     /* Power domain module API */
     const struct mod_pd_restricted_api *pd_api;
+    #if BUILD_HAS_MOD_DEBUG
+    /* Debug module API */
+    const struct mod_debug_api *debug_api;
+
+    /* Debug device identifier */
+    fwk_id_t debug_id;
+    #endif
 };
 
 static int scmi_pd_protocol_version_handler(fwk_id_t service_id,
@@ -230,8 +241,8 @@ static int scmi_pd_power_domain_attributes_handler(fwk_id_t service_id,
             return_values.attributes = SCMI_PD_POWER_STATE_SET_SYNC;
         break;
 
-    case MOD_PD_TYPE_DEVICE:
     case MOD_PD_TYPE_DEVICE_DEBUG:
+    case MOD_PD_TYPE_DEVICE:
         /*
          * Support only synchronous POWER_STATE_SET for devices for any agent.
          */
@@ -369,8 +380,28 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
         status = scmi_pd_ctx.pd_api->set_state(pd_id, parameters->power_state);
         break;
 
-    case MOD_PD_TYPE_DEVICE:
+
     case MOD_PD_TYPE_DEVICE_DEBUG:
+    #if BUILD_HAS_MOD_DEBUG
+        if (!is_sync) {
+            return_values.status = SCMI_NOT_SUPPORTED;
+            goto exit;
+        }
+
+        status = scmi_device_state_to_pd_state(parameters->power_state,
+                                               &pd_power_state);
+        if (status != FWK_SUCCESS) {
+            status = FWK_SUCCESS;
+            return_values.status = SCMI_INVALID_PARAMETERS;
+            goto exit;
+        }
+
+        status = scmi_pd_ctx.debug_api->set_enabled(scmi_pd_ctx.debug_id,
+                pd_power_state == MOD_PD_STATE_ON, SCP_DEBUG_USER_AP);
+        break;
+    #endif
+
+    case MOD_PD_TYPE_DEVICE:
         if (!is_sync) {
             return_values.status = SCMI_NOT_SUPPORTED;
             goto exit;
@@ -419,6 +450,9 @@ static int scmi_pd_power_state_get_handler(fwk_id_t service_id,
     enum mod_pd_type pd_type;
     unsigned int pd_power_state;
     unsigned int power_state;
+    #if BUILD_HAS_MOD_DEBUG
+    bool dbg_enabled;
+    #endif
 
     parameters = (const struct scmi_pd_power_state_get_a2p *)payload;
 
@@ -447,8 +481,19 @@ static int scmi_pd_power_state_get_handler(fwk_id_t service_id,
         status = scmi_pd_ctx.pd_api->get_state(pd_id, &power_state);
         break;
 
-    case MOD_PD_TYPE_DEVICE:
     case MOD_PD_TYPE_DEVICE_DEBUG:
+    #if BUILD_HAS_MOD_DEBUG
+        status = scmi_pd_ctx.debug_api->get_enabled(pd_id, &dbg_enabled,
+                                                    SCP_DEBUG_USER_AP);
+        if (status != FWK_SUCCESS)
+            goto exit;
+
+        power_state = dbg_enabled ? pd_state_to_scmi_dev_state[MOD_PD_STATE_ON]
+                                : pd_state_to_scmi_dev_state[MOD_PD_STATE_OFF];
+
+        break;
+    #endif
+    case MOD_PD_TYPE_DEVICE:
 
         status = scmi_pd_ctx.pd_api->get_state(pd_id, &pd_power_state);
         if (status != FWK_SUCCESS)
@@ -528,8 +573,12 @@ static struct mod_scmi_to_protocol_api scmi_pd_mod_scmi_to_protocol_api = {
  */
 
 static int scmi_pd_init(fwk_id_t module_id, unsigned int element_count,
-                        const void *unused)
+                        const void *data)
 {
+    #if BUILD_HAS_MOD_DEBUG
+    struct mod_scmi_pd_config *config = (struct mod_scmi_pd_config *)data;
+    #endif
+
     if (element_count != 0)
         return FWK_E_SUPPORT;
 
@@ -543,6 +592,16 @@ static int scmi_pd_init(fwk_id_t module_id, unsigned int element_count,
     /* ... and expose no more than 0xFFFF number of domains. */
     if (scmi_pd_ctx.domain_count > UINT16_MAX)
         scmi_pd_ctx.domain_count = UINT16_MAX;
+
+    #if BUILD_HAS_MOD_DEBUG
+    if (config == NULL)
+        return FWK_E_PARAM;
+
+    if (fwk_module_is_valid_element_id(config->debug_id))
+        scmi_pd_ctx.debug_id = config->debug_id;
+    else
+        return FWK_E_DATA;
+    #endif
 
     return FWK_SUCCESS;
 }
@@ -564,6 +623,14 @@ static int scmi_pd_bind(fwk_id_t id, unsigned int round)
         &scmi_pd_ctx.scmi_api);
     if (status != FWK_SUCCESS)
         return status;
+
+    #if BUILD_HAS_MOD_DEBUG
+    status = fwk_module_bind(scmi_pd_ctx.debug_id,
+        FWK_ID_API(FWK_MODULE_IDX_DEBUG, MOD_DEBUG_API_IDX_HAL),
+        &scmi_pd_ctx.debug_api);
+    if (status != FWK_SUCCESS)
+        return status;
+    #endif
 
     return fwk_module_bind(fwk_module_id_power_domain, mod_pd_api_id_restricted,
         &scmi_pd_ctx.pd_api);
