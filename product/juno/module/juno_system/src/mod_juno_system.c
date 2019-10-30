@@ -112,6 +112,8 @@ static int process_gpu_power_state(
  */
 static int juno_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
 {
+    int status = FWK_SUCCESS;
+
     if (juno_system_ctx.platform_id == JUNO_IDX_PLATFORM_FVP) {
         NVIC_SystemReset();
 
@@ -120,18 +122,18 @@ static int juno_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
 
     switch (system_shutdown) {
     case MOD_PD_SYSTEM_SHUTDOWN:
-        juno_system_ctx.juno_xrp7724_api->shutdown();
+        status = juno_system_ctx.juno_xrp7724_api->shutdown();
         break;
 
     case MOD_PD_SYSTEM_COLD_RESET:
-        juno_system_ctx.juno_xrp7724_api->reset();
+        status = juno_system_ctx.juno_xrp7724_api->reset();
         break;
 
     default:
-        return FWK_E_SUPPORT;
+        status = FWK_E_SUPPORT;
     }
 
-    return FWK_SUCCESS;
+    return status;
 }
 
 static const struct mod_system_power_driver_api
