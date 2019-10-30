@@ -455,6 +455,8 @@ struct mod_pd_driver_api {
      * \param system_shutdown Type of system shutdown.
      *
      * \retval FWK_SUCCESS The operation succeeded.
+     * \retval FWK_PENDING The operation was acknowledged. Please note that at
+     *      present there is no dedicated driver input api for this case.
      * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
      *      call to the API.
      */

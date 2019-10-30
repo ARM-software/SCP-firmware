@@ -1240,7 +1240,14 @@ void perform_shutdown(
             "[PD] Shutting down %s\n", fwk_module_get_name(pd_id));
 
         if (api->shutdown != NULL) {
-            status = api->shutdown(pd->driver_id, system_shutdown);
+            status = pd->driver_api->shutdown(pd->driver_id, system_shutdown);
+            if (status == FWK_PENDING) {
+                /*
+                 * Only drivers implementing shutdown API can defer request for
+                 * now.
+                 */
+                return;
+            }
         } else {
             if ((api->deny != NULL) &&
                 api->deny(pd->driver_id, MOD_PD_STATE_OFF))
