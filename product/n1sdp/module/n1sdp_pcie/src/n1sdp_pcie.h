@@ -187,7 +187,7 @@
 
 /* AXI inbound region data */
 #define AXI_IB_REGION_BASE             UINT64_C(0)
-#define AXI_IB_REGION_SIZE_MSB         43
+#define AXI_IB_REGION_SIZE_MSB         48
 
 /*
  * PCIe Descriptor Register definitions
