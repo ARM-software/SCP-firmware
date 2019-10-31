@@ -120,13 +120,7 @@ static int create_async_request(struct clock_dev_ctx *ctx, fwk_id_t clock_id)
 
 static int get_ctx(fwk_id_t clock_id, struct clock_dev_ctx **ctx)
 {
-    int status;
-
     fwk_assert(fwk_module_is_valid_element_id(clock_id));
-
-    status = fwk_module_check_call(clock_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     *ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(clock_id)];
 

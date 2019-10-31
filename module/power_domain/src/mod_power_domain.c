@@ -1232,12 +1232,7 @@ static void process_system_shutdown_request(
 /* Functions common to the public and restricted API */
 static int pd_get_domain_type(fwk_id_t pd_id, enum mod_pd_type *type)
 {
-    int status;
     struct pd_ctx *pd;
-
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (type == NULL)
         return FWK_E_PARAM;
@@ -1254,12 +1249,7 @@ static int pd_get_domain_type(fwk_id_t pd_id, enum mod_pd_type *type)
 
 static int pd_get_domain_parent_id(fwk_id_t pd_id, fwk_id_t *parent_pd_id)
 {
-    int status;
     const struct pd_ctx *pd;
-
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (parent_pd_id == NULL)
         return FWK_E_PARAM;
@@ -1288,10 +1278,6 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
     struct pd_set_state_response *resp_params =
         (struct pd_set_state_response *)(&resp.params);
 
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
 
     if (!is_valid_state(pd, state))
@@ -1317,16 +1303,11 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
 static int pd_set_state_async(fwk_id_t pd_id,
                               bool response_requested, unsigned int state)
 {
-    int status;
     struct pd_ctx *pd;
     enum mod_pd_level level;
     struct fwk_event req;
     struct pd_set_state_request *req_params =
         (struct pd_set_state_request *)(&req.params);
-
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
 
@@ -1359,10 +1340,6 @@ static int pd_set_composite_state(fwk_id_t pd_id, uint32_t composite_state)
     struct pd_set_state_response *resp_params =
         (struct pd_set_state_response *)(&resp.params);
 
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
 
     if (!is_valid_composite_state(pd, composite_state))
@@ -1387,15 +1364,10 @@ static int pd_set_composite_state_async(fwk_id_t pd_id,
                                         bool response_requested,
                                         uint32_t composite_state)
 {
-    int status;
     struct pd_ctx *pd;
     struct fwk_event req;
     struct pd_set_state_request *req_params =
                                (struct pd_set_state_request *)(&req.params);
-
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
 
@@ -1423,10 +1395,6 @@ static int pd_get_state(fwk_id_t pd_id, unsigned int *state)
         (struct pd_get_state_request *)(&req.params);
     struct pd_get_state_response *resp_params =
         (struct pd_get_state_response *)(&resp.params);
-
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (state == NULL)
         return FWK_E_PARAM;
@@ -1460,10 +1428,6 @@ static int pd_get_composite_state(fwk_id_t pd_id, unsigned int *composite_state)
     struct pd_get_state_response *resp_params =
         (struct pd_get_state_response *)(&resp.params);
 
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     if (composite_state == NULL)
         return FWK_E_PARAM;
 
@@ -1493,10 +1457,6 @@ static int pd_reset(fwk_id_t pd_id)
     struct fwk_event resp;
     struct pd_response *resp_params = (struct pd_response *)(&resp.params);
 
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     req = (struct fwk_event) {
         .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_RESET),
         .target_id = pd_id,
@@ -1517,10 +1477,6 @@ static int pd_system_suspend(unsigned int state)
     struct pd_system_suspend_request *req_params =
         (struct pd_system_suspend_request *)(&req.params);
     struct pd_response *resp_params = (struct pd_response *)(&resp.params);
-
-    status = fwk_module_check_call(fwk_module_id_power_domain);
-    if (status != FWK_SUCCESS)
-        return status;
 
     req = (struct fwk_event) {
         .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
@@ -1546,10 +1502,6 @@ static int pd_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
         (struct pd_system_shutdown_request *)(&req.params);
     struct pd_response *resp_params = (struct pd_response *)(&resp.params);
 
-    status = fwk_module_check_call(fwk_module_id_power_domain);
-    if (status != FWK_SUCCESS)
-        return status;
-
     req = (struct fwk_event) {
         .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
                            PD_EVENT_IDX_SYSTEM_SHUTDOWN),
@@ -1569,13 +1521,8 @@ static int pd_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
 
 static int pd_reset_async(fwk_id_t pd_id, bool response_requested)
 {
-    int status;
     struct fwk_event req;
     struct pd_ctx *pd;
-
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
 
@@ -1609,14 +1556,8 @@ static int report_power_state_transition(const struct pd_ctx *pd,
 
 static int pd_report_power_state_transition(fwk_id_t pd_id, unsigned int state)
 {
-    int status;
-    const struct pd_ctx *pd;
-
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
-    pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
+    const struct pd_ctx *pd =
+                        &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
 
     return report_power_state_transition(pd, state);
 }

@@ -218,9 +218,6 @@ static int do_log(enum mod_log_group group, const char *fmt, ...)
     if (log_driver == NULL)
         return FWK_E_STATE;
 
-    status = fwk_module_check_call(FWK_ID_MODULE(FWK_MODULE_IDX_LOG));
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (!is_valid_group(group))
         return FWK_E_PARAM;
@@ -248,9 +245,6 @@ static int do_flush(void)
     if (log_driver == NULL)
         return FWK_E_STATE;
 
-    status = fwk_module_check_call(FWK_ID_MODULE(FWK_MODULE_IDX_LOG));
-    if (status != FWK_SUCCESS)
-        return status;
 
     status = log_driver->flush(log_config->device_id);
     if (status != FWK_SUCCESS)

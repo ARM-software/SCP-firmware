@@ -90,14 +90,9 @@ static void mhu2_isr(uintptr_t ctx_param)
 
 static int raise_interrupt(fwk_id_t slot_id)
 {
-    int status;
     unsigned int slot;
     struct mhu2_channel_ctx *channel_ctx;
     struct mhu2_send_reg *send;
-
-    status = fwk_module_check_call(slot_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     channel_ctx = &ctx.channel_ctx_table[fwk_id_get_element_idx(slot_id)];
     slot = fwk_id_get_sub_element_idx(slot_id);

@@ -399,12 +399,6 @@ exit:
 static int scmi_sensor_get_scmi_protocol_id(fwk_id_t protocol_id,
                                             uint8_t *scmi_protocol_id)
 {
-    int status;
-
-    status = fwk_module_check_call(protocol_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     *scmi_protocol_id = SCMI_PROTOCOL_ID_SENSOR;
 
     return FWK_SUCCESS;
@@ -416,12 +410,7 @@ static int scmi_sensor_message_handler(fwk_id_t protocol_id,
                                        size_t payload_size,
                                        unsigned int message_id)
 {
-    int status;
     int32_t return_value;
-
-    status = fwk_module_check_call(protocol_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     static_assert(FWK_ARRAY_SIZE(handler_table) ==
         FWK_ARRAY_SIZE(payload_size_table),
