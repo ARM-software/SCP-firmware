@@ -30,15 +30,10 @@ static struct mod_timer_api *timer_api;
 
 static int juno_ddr_phy400_config_ddr(fwk_id_t element_id)
 {
-    int status;
     struct mod_juno_ddr_phy400_ptm_reg *phy_ptm;
     struct mod_juno_ddr_phy400_c3a_reg *phy_c3a;
     struct mod_juno_ddr_phy400_bl_reg *phy_bl0;
     const struct mod_juno_ddr_phy400_element_config *element_config;
-
-    status = fwk_module_check_call(element_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     element_config = fwk_module_get_data(element_id);
     if (element_config == NULL)
@@ -146,12 +141,6 @@ static int juno_ddr_phy400_config_ddr(fwk_id_t element_id)
 
 static int juno_ddr_phy400_config_clk(fwk_id_t module_id)
 {
-    int status;
-
-    status = fwk_module_check_call(module_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     log_api->log(MOD_LOG_GROUP_DEBUG, "[DDR] Initializing PHY-PLL\n");
 
     /* Complete clock settings */
@@ -171,14 +160,9 @@ static bool ddr_phy_idle_check(void *data)
 
 static int juno_ddr_phy400_config_idle(fwk_id_t element_id)
 {
-    int status;
     struct mod_juno_ddr_phy400_ptm_reg *phy_ptm;
     const struct mod_juno_ddr_phy400_element_config * element_config;
     const struct mod_juno_ddr_phy400_config *module_config;
-
-    status = fwk_module_check_call(element_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     module_config = fwk_module_get_data(fwk_module_id_juno_ddr_phy400);
 
@@ -196,12 +180,6 @@ static int juno_ddr_phy400_config_idle(fwk_id_t element_id)
 
 static int juno_ddr_phy400_config_retention(fwk_id_t module_id, bool enable)
 {
-    int status;
-
-    status = fwk_module_check_call(module_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     if (enable) {
         SCC->DDR_PHY0_RETNCTRL = SCC_DDR_PHY_RETNCTRL_ENABLE;
         SCC->DDR_PHY1_RETNCTRL = SCC_DDR_PHY_RETNCTRL_ENABLE;

@@ -27,14 +27,9 @@ static struct mod_log_api *log_api;
  */
 static int get_value(fwk_id_t id, uint64_t *value)
 {
-    int status;
     uint32_t adc_value;
     uint64_t adc_quantity;
     enum juno_adc_dev_type dev_type;
-
-    status = fwk_module_check_call(id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     fwk_assert(fwk_module_is_valid_sub_element_id(id));
     fwk_assert(value != NULL);
@@ -114,12 +109,7 @@ static int get_value(fwk_id_t id, uint64_t *value)
 
 static int get_info(fwk_id_t id, struct mod_sensor_info *info)
 {
-    int status;
     const struct mod_juno_adc_dev_config *config;
-
-    status = fwk_module_check_call(id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     fwk_assert(fwk_module_is_valid_sub_element_id(id));
 
