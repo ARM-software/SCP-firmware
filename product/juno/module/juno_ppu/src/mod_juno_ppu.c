@@ -90,13 +90,7 @@ static bool set_power_status_check(void *data)
 
 static int get_ctx(fwk_id_t id, struct ppu_ctx **ppu_ctx)
 {
-    int status;
-
     fwk_assert(fwk_module_is_valid_element_id(id));
-
-    status = fwk_module_check_call(id);
-    if (!fwk_expect(status == FWK_SUCCESS))
-        return FWK_E_ACCESS;
 
     *ppu_ctx = juno_ppu_ctx.ppu_ctx_table + fwk_id_get_element_idx(id);
 
@@ -503,13 +497,8 @@ static int cluster_set_state(fwk_id_t ppu_id, unsigned int state)
 
 static bool cluster_deny(fwk_id_t ppu_id, unsigned int state)
 {
-    int status;
 
     fwk_assert(fwk_module_is_valid_element_id(ppu_id));
-
-    status = fwk_module_check_call(ppu_id);
-    if (!fwk_expect(status == FWK_SUCCESS))
-        return FWK_E_ACCESS;
 
     if (!fwk_expect(state < MOD_PD_STATE_COUNT))
         return true;
