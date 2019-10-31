@@ -18,7 +18,6 @@
 #include <mod_juno_dmc400.h>
 #include <juno_scc.h>
 
-static struct mod_log_api *log_api;
 static struct mod_timer_api *timer_api;
 
 #define DDR_PHY_400_CONFIG_IDLE_WAIT_TIMEOUT_US     1000
@@ -45,9 +44,6 @@ static int juno_ddr_phy400_config_ddr(fwk_id_t element_id)
 
     if ((phy_ptm == NULL) || (phy_c3a == NULL) || (phy_bl0 == NULL))
         return FWK_E_DATA;
-
-    log_api->log(MOD_LOG_GROUP_DEBUG,
-        "[DDR] Initializing PHY at 0x%x\n", (uintptr_t)phy_ptm);
 
     /* All writes to BL0 are copied to BL1-3 */
     phy_ptm->BL_APB_CTRL = 0x00000001;
@@ -141,8 +137,6 @@ static int juno_ddr_phy400_config_ddr(fwk_id_t element_id)
 
 static int juno_ddr_phy400_config_clk(fwk_id_t module_id)
 {
-    log_api->log(MOD_LOG_GROUP_DEBUG, "[DDR] Initializing PHY-PLL\n");
-
     /* Complete clock settings */
     SCC->DDR_PHY0_PLL = SCC_DDR_PHY_PLL_BYPASS_EN;
     SCC->DDR_PHY1_PLL = SCC_DDR_PHY_PLL_BYPASS_EN;
@@ -232,12 +226,6 @@ static int juno_ddr_phy400_bind(fwk_id_t id, unsigned int round)
 
     module_config = fwk_module_get_data(fwk_module_id_juno_ddr_phy400);
     fwk_assert(module_config != NULL);
-
-    /* Bind to the log module */
-    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG), MOD_LOG_API_ID,
-        &log_api);
-    if (status != FWK_SUCCESS)
-        return FWK_E_HANDLER;
 
     status = fwk_module_bind(module_config->timer_id,
         MOD_TIMER_API_ID_TIMER, &timer_api);
