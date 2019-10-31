@@ -124,10 +124,6 @@ static int system_power_set_state(fwk_id_t pd_id, unsigned int state)
     int status;
     unsigned int soc_wakeup_irq;
 
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     if (!fwk_expect(state < MOD_SYSTEM_POWER_POWER_STATE_COUNT))
         return FWK_E_PARAM;
 
@@ -209,12 +205,6 @@ static int system_power_set_state(fwk_id_t pd_id, unsigned int state)
 
 static int system_power_get_state(fwk_id_t pd_id, unsigned int *state)
 {
-    int status;
-
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     *state = system_power_ctx.state;
 
     return FWK_SUCCESS;
@@ -262,12 +252,7 @@ static const struct mod_pd_driver_api system_power_power_domain_driver_api = {
 static int system_power_report_power_state_transition(fwk_id_t dev_id,
     unsigned int state)
 {
-    int status;
     static unsigned int sys_ppu_transition_count = 0;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     sys_ppu_transition_count++;
 

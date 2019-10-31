@@ -214,13 +214,8 @@ static int system_pll_power_state_change(
     fwk_id_t dev_id,
     unsigned int state)
 {
-    int status;
     uint64_t rate;
     struct system_pll_dev_ctx *ctx;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
 
@@ -246,12 +241,7 @@ static int system_pll_power_state_pending_change(
     unsigned int current_state,
     unsigned int next_state)
 {
-    int status;
     struct system_pll_dev_ctx *ctx;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
 

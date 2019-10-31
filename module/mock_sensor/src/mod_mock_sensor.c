@@ -39,13 +39,8 @@ static void mock_sensor_callback(uintptr_t param)
 
 static int get_value(fwk_id_t id, uint64_t *value)
 {
-    int status;
     unsigned int sensor_hal_idx;
     const struct mod_mock_sensor_dev_config *config;
-
-    status = fwk_module_check_call(id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     config = fwk_module_get_data(id);
 
@@ -64,12 +59,7 @@ static int get_value(fwk_id_t id, uint64_t *value)
 
 static int get_info(fwk_id_t id, struct mod_sensor_info *info)
 {
-    int status;
     const struct mod_mock_sensor_dev_config *config;
-
-    status = fwk_module_check_call(id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     config = fwk_module_get_data(id);
 

@@ -166,12 +166,7 @@ exit:
 static int css_clock_set_rate(fwk_id_t dev_id, uint64_t rate,
                               enum mod_clock_round_mode round_mode)
 {
-    int status;
     struct css_clock_dev_ctx *ctx;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
 
@@ -183,12 +178,7 @@ static int css_clock_set_rate(fwk_id_t dev_id, uint64_t rate,
 
 static int css_clock_get_rate(fwk_id_t dev_id, uint64_t *rate)
 {
-    int status;
     struct css_clock_dev_ctx *ctx;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
     *rate = ctx->current_rate;
@@ -200,12 +190,7 @@ static int css_clock_get_rate_from_index(fwk_id_t dev_id,
                                          unsigned int rate_index,
                                          uint64_t *rate)
 {
-    int status;
     struct css_clock_dev_ctx *ctx;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (rate == NULL)
         return FWK_E_PARAM;
@@ -224,12 +209,6 @@ static int css_clock_get_rate_from_index(fwk_id_t dev_id,
 
 static int css_clock_set_state(fwk_id_t dev_id, enum mod_clock_state state)
 {
-    int status;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     if (state == MOD_CLOCK_STATE_RUNNING)
         return FWK_SUCCESS; /* CSS clocks are always running */
 
@@ -239,12 +218,6 @@ static int css_clock_set_state(fwk_id_t dev_id, enum mod_clock_state state)
 
 static int css_clock_get_state(fwk_id_t dev_id, enum mod_clock_state *state)
 {
-    int status;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     *state = MOD_CLOCK_STATE_RUNNING;
 
     return FWK_SUCCESS;
@@ -252,12 +225,7 @@ static int css_clock_get_state(fwk_id_t dev_id, enum mod_clock_state *state)
 
 static int css_clock_get_range(fwk_id_t dev_id, struct mod_clock_range *range)
 {
-    int status;
     struct css_clock_dev_ctx *ctx;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (range == NULL)
         return FWK_E_PARAM;
@@ -282,10 +250,6 @@ static int css_clock_power_state_change(
     unsigned int clock_idx;
     struct css_clock_dev_ctx *ctx;
     const struct mod_css_clock_dev_config *dev_config;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
     dev_config = ctx->config;
@@ -328,10 +292,6 @@ static int css_clock_pending_power_state_change(
     unsigned int clock_idx;
     struct css_clock_dev_ctx *ctx;
     const struct mod_css_clock_dev_config *dev_config;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
     dev_config = ctx->config;

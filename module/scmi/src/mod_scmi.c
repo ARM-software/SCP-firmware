@@ -149,14 +149,7 @@ static uint8_t read_protocol_id(uint32_t message_header)
 
 static int signal_message(fwk_id_t service_id)
 {
-    int32_t status;
-    struct fwk_event event;
-
-    status = fwk_module_check_call(service_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
-    event = (struct fwk_event) {
+    struct fwk_event event = (struct fwk_event) {
         .id = FWK_ID_EVENT(FWK_MODULE_IDX_SCMI, 0),
         .source_id = FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
         .target_id = service_id,
@@ -175,12 +168,7 @@ static const struct mod_scmi_from_transport_api mod_scmi_from_transport_api = {
 
 static int get_agent_id(fwk_id_t service_id, unsigned int *agent_id)
 {
-    int status;
     struct scmi_service_ctx *ctx;
-
-    status = fwk_module_check_call(service_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (agent_id == NULL)
         return FWK_E_PARAM;
@@ -207,12 +195,7 @@ static int get_agent_type(uint32_t scmi_agent_id,
 
 static int get_max_payload_size(fwk_id_t service_id, size_t *size)
 {
-    int status;
     struct scmi_service_ctx *ctx;
-
-    status = fwk_module_check_call(service_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (size == NULL)
         return FWK_E_PARAM;
@@ -225,12 +208,7 @@ static int get_max_payload_size(fwk_id_t service_id, size_t *size)
 static int write_payload(fwk_id_t service_id, size_t offset,
                          const void *payload, size_t size)
 {
-    int status;
     const struct scmi_service_ctx *ctx;
-
-    status = fwk_module_check_call(service_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(service_id)];
 
@@ -242,10 +220,6 @@ static void respond(fwk_id_t service_id, const void *payload, size_t size)
 {
     int status;
     const struct scmi_service_ctx *ctx;
-
-    status = fwk_module_check_call(service_id);
-    if (status != FWK_SUCCESS)
-        return;
 
     ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(service_id)];
 

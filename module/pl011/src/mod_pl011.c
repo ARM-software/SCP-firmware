@@ -88,12 +88,7 @@ static int set_baud_rate(unsigned int baud_rate_bps, uint64_t clock_rate_hz,
 
 static int do_putchar(fwk_id_t device_id, char c)
 {
-    int status;
     struct pl011_reg *reg;
-
-    status = fwk_module_check_call(device_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     reg = get_device_reg(device_id);
 
@@ -107,12 +102,7 @@ static int do_putchar(fwk_id_t device_id, char c)
 
 static int do_flush(fwk_id_t device_id)
 {
-    int status;
     struct pl011_reg *reg;
-
-    status = fwk_module_check_call(device_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     reg = get_device_reg(device_id);
 

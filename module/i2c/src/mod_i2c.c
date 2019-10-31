@@ -44,17 +44,11 @@ static const fwk_id_t mod_i2c_event_id_request_completed = FWK_ID_EVENT_INIT(
 /*
  * Static helpers
  */
-static int get_ctx(fwk_id_t id, struct mod_i2c_dev_ctx **ctx)
+static void get_ctx(fwk_id_t id, struct mod_i2c_dev_ctx **ctx)
 {
-    int status;
-
-    status = fwk_module_check_call(id);
-    if (status != FWK_SUCCESS)
-        return FWK_E_PARAM;
+    fwk_assert(fwk_module_is_valid_element_id(id));
 
     *ctx = ctx_table + fwk_id_get_element_idx(id);
-
-    return FWK_SUCCESS;
 }
 
 static int create_i2c_request(fwk_id_t dev_id,
@@ -66,11 +60,7 @@ static int create_i2c_request(fwk_id_t dev_id,
     struct mod_i2c_request *event_param =
         (struct mod_i2c_request *)event.params;
 
-    fwk_assert(fwk_module_is_valid_element_id(dev_id));
-
-    status = get_ctx(dev_id, &ctx);
-    if (status != FWK_SUCCESS)
-        return status;
+    get_ctx(dev_id, &ctx);
 
     /* The slave address should be on 7 bits */
     if (!fwk_expect(request->slave_address < 0x80))
@@ -343,17 +333,14 @@ static int respond_to_caller(int event_status,
 static int mod_i2c_process_event(const struct fwk_event *event,
                                  struct fwk_event *resp_event)
 {
-    int status, drv_status;
+    int status = FWK_E_PARAM;
+    int drv_status;
     struct mod_i2c_dev_ctx *ctx;
     struct mod_i2c_event_param *event_param =
         (struct mod_i2c_event_param *)event->params;
     struct mod_i2c_request *request = (struct mod_i2c_request *)event->params;
 
-    fwk_assert(fwk_module_is_valid_element_id(event->target_id));
-
-    status = get_ctx(event->target_id, &ctx);
-    if (status != FWK_SUCCESS)
-        return status;
+    get_ctx(event->target_id, &ctx);
 
     switch (fwk_id_get_event_idx(event->id)) {
     case MOD_I2C_EVENT_IDX_REQUEST_TRANSMIT:

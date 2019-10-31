@@ -41,11 +41,6 @@ static struct dev_ctx *ctx_table;
 static int enable(fwk_id_t dev_id)
 {
     struct dev_ctx *ctx;
-    int status;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = ctx_table + fwk_id_get_element_idx(dev_id);
 
@@ -58,11 +53,6 @@ static int enable(fwk_id_t dev_id)
 static int disable(fwk_id_t dev_id)
 {
     struct dev_ctx *ctx;
-    int status;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = ctx_table + fwk_id_get_element_idx(dev_id);
 
@@ -75,13 +65,8 @@ static int disable(fwk_id_t dev_id)
 static int get_counter(fwk_id_t dev_id, uint64_t *value)
 {
     const struct dev_ctx *ctx;
-    int status;
     uint32_t counter_low;
     uint32_t counter_high;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = ctx_table + fwk_id_get_element_idx(dev_id);
 
@@ -106,10 +91,6 @@ static int set_timer(fwk_id_t dev_id, uint64_t timestamp)
     struct dev_ctx *ctx;
     uint64_t counter;
     int status;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     status = get_counter(dev_id, &counter);
     if (status != FWK_SUCCESS)
@@ -137,13 +118,8 @@ static int set_timer(fwk_id_t dev_id, uint64_t timestamp)
 static int get_timer(fwk_id_t dev_id, uint64_t *timestamp)
 {
     struct dev_ctx *ctx;
-    int status;
     uint32_t counter_low;
     uint32_t counter_high;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = ctx_table + fwk_id_get_element_idx(dev_id);
 
@@ -158,15 +134,10 @@ static int get_timer(fwk_id_t dev_id, uint64_t *timestamp)
 
 static int get_frequency(fwk_id_t dev_id, uint32_t *frequency)
 {
-    int status;
     struct dev_ctx *ctx;
 
     if (frequency == NULL)
         return FWK_E_PARAM;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = ctx_table + fwk_id_get_element_idx(dev_id);
 

@@ -485,12 +485,6 @@ static int init_sds(void)
 static int sds_struct_write(uint32_t structure_id, unsigned int offset,
                             const void *data, size_t size)
 {
-    int status;
-
-    status = fwk_module_check_call(fwk_module_id_sds);
-    if (status != FWK_SUCCESS)
-        return status;
-
     if (data == NULL)
         return FWK_E_PARAM;
 
@@ -507,9 +501,6 @@ static int sds_struct_read(uint32_t structure_id, unsigned int offset,
     volatile char *structure_base;
     struct structure_header header;
 
-    status = fwk_module_check_call(fwk_module_id_sds);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (data == NULL)
         return FWK_E_PARAM;
@@ -534,12 +525,6 @@ static int sds_struct_read(uint32_t structure_id, unsigned int offset,
 
 static int sds_struct_finalize(uint32_t structure_id)
 {
-    int status;
-
-    status = fwk_module_check_call(fwk_module_id_sds);
-    if (status != FWK_SUCCESS)
-        return status;
-
     return struct_finalize(structure_id);
 }
 

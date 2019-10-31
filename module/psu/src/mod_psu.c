@@ -49,31 +49,13 @@ static struct mod_psu_element_ctx *mod_psu_get_element_ctx(fwk_id_t element_id)
     return &mod_psu_ctx.elements[element_idx];
 }
 
-static int mod_psu_check_call(fwk_id_t element_id)
-{
-    int status = FWK_E_PARAM;
-
-    if (fwk_id_get_module_idx(element_id) != FWK_MODULE_IDX_PSU)
-        goto exit;
-
-    status = fwk_module_check_call(element_id);
-    if (status != FWK_SUCCESS)
-        status = FWK_E_STATE;
-
-exit:
-    return status;
-}
-
 static int mod_psu_get_cfg_ctx(
     fwk_id_t element_id,
     const struct mod_psu_element_cfg **cfg,
     struct mod_psu_element_ctx **ctx)
 {
-    int status;
-
-    status = mod_psu_check_call(element_id);
-    if (status != FWK_SUCCESS)
-        goto exit;
+    if (fwk_id_get_module_idx(element_id) != FWK_MODULE_IDX_PSU)
+        return FWK_E_PARAM;
 
     if (ctx != NULL)
         *ctx = mod_psu_get_element_ctx(element_id);
@@ -81,8 +63,7 @@ static int mod_psu_get_cfg_ctx(
     if (cfg != NULL)
         *cfg = fwk_module_get_data(element_id);
 
-exit:
-    return status;
+    return FWK_SUCCESS;
 }
 
 static int mod_psu_get_enabled(fwk_id_t element_id, bool *enabled)

@@ -216,9 +216,6 @@ static int dvfs_process_notification(
 
 struct mod_dvfs_domain_ctx *__mod_dvfs_get_valid_domain_ctx(fwk_id_t domain_id)
 {
-    if (fwk_module_check_call(domain_id) != FWK_SUCCESS)
-        return NULL;
-
     return get_domain_ctx(domain_id);
 }
 
