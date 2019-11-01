@@ -352,12 +352,7 @@ static int pik_clock_set_rate(
     uint64_t rate,
     enum mod_clock_round_mode round_mode)
 {
-    int status;
     struct pik_clock_dev_ctx *ctx;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
 
@@ -372,12 +367,7 @@ static int pik_clock_set_rate(
 
 static int pik_clock_get_rate(fwk_id_t dev_id, uint64_t *rate)
 {
-    int status;
     struct pik_clock_dev_ctx *ctx;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (rate == NULL)
         return FWK_E_PARAM;
@@ -399,12 +389,7 @@ static int pik_clock_get_rate_from_index(
     unsigned int rate_index,
     uint64_t *rate)
 {
-    int status;
     struct pik_clock_dev_ctx *ctx;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (rate == NULL)
         return FWK_E_PARAM;
@@ -425,10 +410,6 @@ static int pik_clock_set_state(
     int status;
     struct pik_clock_dev_ctx *ctx;
     struct mod_pik_clock_rate *rate_entry;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
 
@@ -470,12 +451,7 @@ static int pik_clock_set_state(
 
 static int pik_clock_get_state(fwk_id_t dev_id, enum mod_clock_state *state)
 {
-    int status;
     struct pik_clock_dev_ctx *ctx;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
 
@@ -502,12 +478,7 @@ static int pik_clock_get_state(fwk_id_t dev_id, enum mod_clock_state *state)
 
 static int pik_clock_get_range(fwk_id_t dev_id, struct mod_clock_range *range)
 {
-    int status;
     struct pik_clock_dev_ctx *ctx;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (range == NULL)
         return FWK_E_PARAM;
@@ -524,12 +495,7 @@ static int pik_clock_get_range(fwk_id_t dev_id, struct mod_clock_range *range)
 
 static int pik_clock_power_state_change(fwk_id_t dev_id, unsigned int state)
 {
-    int status;
     struct pik_clock_dev_ctx *ctx;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
 
@@ -577,10 +543,6 @@ static int pik_clock_direct_set_div(
     int status;
     struct pik_clock_dev_ctx *ctx;
 
-    status = fwk_module_check_call(clock_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(clock_id);
     assert(ctx->config->is_group_member);
 
@@ -608,12 +570,7 @@ static int pik_clock_direct_set_div(
 
 static int pik_clock_direct_set_source(fwk_id_t clock_id, uint8_t source)
 {
-    int status;
     struct pik_clock_dev_ctx *ctx;
-
-    status = fwk_module_check_call(clock_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(clock_id);
     assert(ctx->config->is_group_member);
@@ -629,12 +586,7 @@ static int pik_clock_direct_set_mod(
     uint32_t numerator,
     uint32_t denominator)
 {
-    int status;
     struct pik_clock_dev_ctx *ctx;
-
-    status = fwk_module_check_call(clock_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(clock_id);
     assert(ctx->config->is_group_member);
@@ -649,12 +601,7 @@ static int pik_clock_direct_power_state_change(
     fwk_id_t dev_id,
     unsigned int state)
 {
-    int status;
     struct pik_clock_dev_ctx *ctx;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
 

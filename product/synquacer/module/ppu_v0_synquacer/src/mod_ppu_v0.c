@@ -109,10 +109,6 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
     int status;
     struct ppu_v0_pd_ctx *pd_ctx;
 
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     pd_ctx = ppu_v0_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
 
     ppu_v0_ctx.log_api->log(
@@ -174,17 +170,13 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
         return FWK_E_PARAM;
     }
 
+    (void)status;
     return FWK_SUCCESS;
 }
 
 static int pd_get_state(fwk_id_t pd_id, unsigned int *state)
 {
-    int status;
     struct ppu_v0_pd_ctx *pd_ctx;
-
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     pd_ctx = ppu_v0_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
 
@@ -195,10 +187,6 @@ static int pd_reset(fwk_id_t pd_id)
 {
     int status;
     struct ppu_v0_pd_ctx *pd_ctx;
-
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     pd_ctx = ppu_v0_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
 
@@ -212,12 +200,7 @@ static int pd_reset(fwk_id_t pd_id)
 
 static int ppu_v0_prepare_core_for_system_suspend(fwk_id_t core_pd_id)
 {
-    int status;
     struct ppu_v0_pd_ctx *pd_ctx;
-
-    status = fwk_module_check_call(core_pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     pd_ctx = ppu_v0_ctx.pd_ctx_table + fwk_id_get_element_idx(core_pd_id);
     ppu_v0_request_power_mode(pd_ctx->ppu, PPU_V0_MODE_OFF);
