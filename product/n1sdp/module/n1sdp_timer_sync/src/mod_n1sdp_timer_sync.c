@@ -101,13 +101,8 @@ bool is_timer_synced(struct tsync_device_ctx *ctx)
  */
 static int n1sdp_sync_master_timer(fwk_id_t id)
 {
-    int status;
     unsigned int retries;
     struct tsync_device_ctx *device_ctx;
-
-    status = fwk_module_check_call(id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     device_ctx = &tsync_ctx.device_ctx_table[fwk_id_get_element_idx(id)];
 
@@ -136,13 +131,8 @@ static int n1sdp_sync_master_timer(fwk_id_t id)
 
 static int n1sdp_sync_slave_timer(fwk_id_t id)
 {
-    int status;
     struct tsync_device_ctx *device_ctx;
     unsigned int irq;
-
-    status = fwk_module_check_call(id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     device_ctx = &tsync_ctx.device_ctx_table[fwk_id_get_element_idx(id)];
 

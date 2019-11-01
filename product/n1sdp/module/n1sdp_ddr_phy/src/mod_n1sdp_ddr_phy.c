@@ -81,16 +81,11 @@ static struct mod_log_api *log_api;
  */
 static int n1sdp_ddr_phy_config(fwk_id_t element_id, struct dimm_info *info)
 {
-    int status;
     int element_idx;
     struct mod_n1sdp_ddr_phy_reg *ddr_phy;
     const struct mod_n1sdp_ddr_phy_element_config *element_config;
 
     fwk_assert(info != NULL);
-
-    status = fwk_module_check_call(element_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     element_idx = fwk_id_get_element_idx(element_id);
     element_config = fwk_module_get_data(element_id);
@@ -756,10 +751,6 @@ static int n1sdp_ddr_phy_post_training_configure(fwk_id_t element_id,
 
     fwk_assert(info != NULL);
 
-    status = fwk_module_check_call(element_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     element_config = fwk_module_get_data(element_id);
     phy_addr = (uint32_t)element_config->ddr;
     rddata_valid_value = 0;
@@ -858,7 +849,6 @@ static int n1sdp_ddr_phy_post_training_configure(fwk_id_t element_id,
 static int n1sdp_verify_phy_status(fwk_id_t element_id,
     uint8_t training_type, struct dimm_info *info)
 {
-    int status;
     const struct mod_n1sdp_ddr_phy_element_config *element_config;
     uint32_t i;
     uint32_t j;
@@ -869,10 +859,6 @@ static int n1sdp_verify_phy_status(fwk_id_t element_id,
     uint32_t num_slices;
 
     fwk_assert(info != NULL);
-
-    status = fwk_module_check_call(element_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     element_config = fwk_module_get_data(element_id);
     phy_base = (uint32_t)element_config->ddr;
@@ -974,7 +960,6 @@ static int n1sdp_verify_phy_status(fwk_id_t element_id,
 static int n1sdp_wrlvl_phy_obs_regs(fwk_id_t element_id,
     uint32_t rank, struct dimm_info *info)
 {
-    int status;
     const struct mod_n1sdp_ddr_phy_element_config *element_config;
     uint32_t i;
     uint32_t j;
@@ -985,10 +970,6 @@ static int n1sdp_wrlvl_phy_obs_regs(fwk_id_t element_id,
     uint32_t rank_end;
 
     fwk_assert(info != NULL);
-
-    status = fwk_module_check_call(element_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     element_config = fwk_module_get_data(element_id);
     phy_addr = (uint32_t)element_config->ddr;
@@ -1028,7 +1009,6 @@ static int n1sdp_wrlvl_phy_obs_regs(fwk_id_t element_id,
 static int n1sdp_read_gate_phy_obs_regs(fwk_id_t element_id,
     uint32_t rank, struct dimm_info *info)
 {
-    int status;
     const struct mod_n1sdp_ddr_phy_element_config *element_config;
     uint32_t i;
     uint32_t h;
@@ -1038,10 +1018,6 @@ static int n1sdp_read_gate_phy_obs_regs(fwk_id_t element_id,
     uint32_t rank_end;
 
     fwk_assert(info != NULL);
-
-    status = fwk_module_check_call(element_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     element_config = fwk_module_get_data(element_id);
     phy_addr = (uint32_t)element_config->ddr;
