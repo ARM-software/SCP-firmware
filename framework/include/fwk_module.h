@@ -425,20 +425,6 @@ const char *fwk_module_get_name(fwk_id_t id);
 const void *fwk_module_get_data(fwk_id_t id);
 
 /*!
- * \brief Check whether a module or element is in a state where it can accept
- *      calls to one of its APIs.
- *
- * \param id Identifier of a module or element.
- *
- * \retval FWK_SUCCESS The module or element can service API calls.
- * \retval FWK_E_PARAM The identifier is invalid.
- * \retval FWK_E_INIT The module or element is not initialized.
- * \retval FWK_E_STATE The module or element is suspended.
- *
- */
-int fwk_module_check_call(fwk_id_t id);
-
-/*!
  * \brief Bind to an API of a module or an element.
  *
  * \details The framework will accept the bind request in one of the two

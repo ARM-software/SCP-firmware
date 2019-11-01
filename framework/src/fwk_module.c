@@ -616,32 +616,6 @@ const void *fwk_module_get_data(fwk_id_t id)
     return NULL;
 }
 
-int fwk_module_check_call(fwk_id_t id)
-{
-    int status;
-    enum fwk_module_state state;
-
-    status = __fwk_module_get_state(id, &state);
-    if (status != FWK_SUCCESS)
-        goto error;
-
-    if (state == FWK_MODULE_STATE_UNINITIALIZED) {
-        status = FWK_E_INIT;
-        goto error;
-    }
-
-    if (state == FWK_MODULE_STATE_SUSPENDED) {
-        status = FWK_E_STATE;
-        goto error;
-    }
-
-    return FWK_SUCCESS;
-
-error:
-    FWK_HOST_PRINT(err_msg_func, status, __func__);
-    return status;
-}
-
 int fwk_module_bind(fwk_id_t target_id, fwk_id_t api_id, const void *api)
 {
     int status = FWK_E_PARAM;
