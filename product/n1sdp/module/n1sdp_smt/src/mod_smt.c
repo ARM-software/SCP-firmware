@@ -63,14 +63,7 @@ static struct smt_ctx smt_ctx;
  */
 static int smt_get_secure(fwk_id_t channel_id, bool *secure)
 {
-    int status;
     struct smt_channel_ctx *channel_ctx;
-
-    status = fwk_module_check_call(channel_id);
-    if (status != FWK_SUCCESS) {
-        assert(false);
-        return status;
-    }
 
     if (secure == NULL) {
         assert(false);
@@ -87,14 +80,7 @@ static int smt_get_secure(fwk_id_t channel_id, bool *secure)
 
 static int smt_get_max_payload_size(fwk_id_t channel_id, size_t *size)
 {
-    int status;
     struct smt_channel_ctx *channel_ctx;
-
-    status = fwk_module_check_call(channel_id);
-    if (status != FWK_SUCCESS) {
-        assert(false);
-        return status;
-    }
 
     if (size == NULL) {
         assert(false);
@@ -111,14 +97,7 @@ static int smt_get_max_payload_size(fwk_id_t channel_id, size_t *size)
 
 static int smt_get_message_header(fwk_id_t channel_id, uint32_t *header)
 {
-    int status;
     struct smt_channel_ctx *channel_ctx;
-
-    status = fwk_module_check_call(channel_id);
-    if (status != FWK_SUCCESS) {
-        assert(false);
-        return status;
-    }
 
     if (header == NULL) {
         assert(false);
@@ -140,14 +119,7 @@ static int smt_get_payload(fwk_id_t channel_id,
                            const void **payload,
                            size_t *size)
 {
-    int status;
     struct smt_channel_ctx *channel_ctx;
-
-    status = fwk_module_check_call(channel_id);
-    if (status != FWK_SUCCESS) {
-        assert(false);
-        return status;
-    }
 
     if (payload == NULL) {
         assert(false);
@@ -175,14 +147,7 @@ static int smt_write_payload(fwk_id_t channel_id,
                              const void *payload,
                              size_t size)
 {
-    int status;
     struct smt_channel_ctx *channel_ctx;
-
-    status = fwk_module_check_call(channel_id);
-    if (status != FWK_SUCCESS) {
-        assert(false);
-        return status;
-    }
 
     channel_ctx =
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
@@ -208,14 +173,6 @@ static int smt_respond(fwk_id_t channel_id, const void *payload, size_t size)
 {
     struct smt_channel_ctx *channel_ctx;
     struct mod_smt_memory *memory;
-    int status;
-    (void)status;
-
-    status = fwk_module_check_call(channel_id);
-    if (status != FWK_SUCCESS) {
-        assert(false);
-        return status;
-    }
 
     channel_ctx =
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
@@ -264,13 +221,6 @@ static bool smt_is_channel_free(fwk_id_t channel_id)
 {
     struct smt_channel_ctx *channel_ctx;
     struct mod_smt_memory *memory;
-    int status;
-
-    status = fwk_module_check_call(channel_id);
-    if (status != FWK_SUCCESS) {
-        assert(false);
-        return false;
-    }
 
     channel_ctx =
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
@@ -283,13 +233,6 @@ static int smt_send(fwk_id_t channel_id, struct mod_smt_command_config *cmd)
 {
     struct smt_channel_ctx *channel_ctx;
     struct mod_smt_memory *memory;
-    int status;
-
-    status = fwk_module_check_call(channel_id);
-    if (status != FWK_SUCCESS) {
-        assert(false);
-        return status;
-    }
 
     channel_ctx =
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
@@ -325,13 +268,6 @@ static int smt_put_channel(fwk_id_t channel_id)
 {
     struct smt_channel_ctx *channel_ctx;
     struct mod_smt_memory *memory;
-    int status;
-
-    status = fwk_module_check_call(channel_id);
-    if (status != FWK_SUCCESS) {
-        assert(false);
-        return status;
-    }
 
     channel_ctx =
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
@@ -382,12 +318,7 @@ static int smt_master_handler(struct smt_channel_ctx *channel_ctx)
 
 static int smt_signal_message(fwk_id_t channel_id)
 {
-    int status;
     struct smt_channel_ctx *channel_ctx;
-
-    status = fwk_module_check_call(channel_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     channel_ctx =
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];

@@ -42,10 +42,6 @@ static struct mod_n1sdp_flash_ctx n1sdp_flash_ctx;
  */
 static int get_flash_descriptor_count(fwk_id_t id, unsigned int *count)
 {
-    int status = fwk_module_check_call(id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     if (count == NULL)
         return FWK_E_PARAM;
 
@@ -58,10 +54,6 @@ static int get_flash_descriptor_table(
     fwk_id_t id,
     struct mod_n1sdp_flash_descriptor **table)
 {
-    int status = fwk_module_check_call(id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     if (table == NULL)
         return FWK_E_PARAM;
 
@@ -72,10 +64,6 @@ static int get_flash_descriptor_table(
 
 static int get_n1sdp_fip_descriptor_count(fwk_id_t id, unsigned int *count)
 {
-    int status = fwk_module_check_call(id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     if (count == NULL)
         return FWK_E_PARAM;
 
@@ -88,10 +76,6 @@ static int get_n1sdp_fip_descriptor_table(
     fwk_id_t id,
     struct mod_n1sdp_fip_descriptor **table)
 {
-    int status = fwk_module_check_call(id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     if (table == NULL)
         return FWK_E_PARAM;
 

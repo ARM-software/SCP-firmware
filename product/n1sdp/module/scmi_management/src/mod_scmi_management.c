@@ -217,12 +217,6 @@ exit:
 static int scmi_management_get_scmi_protocol_id(fwk_id_t protocol_id,
     uint8_t *scmi_protocol_id)
 {
-    int status;
-
-    status = fwk_module_check_call(protocol_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     *scmi_protocol_id = SCMI_PROTOCOL_ID_MANAGEMENT;
 
     return FWK_SUCCESS;
@@ -235,7 +229,6 @@ static int scmi_management_message_handler(
     size_t payload_size,
     unsigned int message_id)
 {
-    int status;
     int32_t return_value;
 
     static_assert(FWK_ARRAY_SIZE(handler_table) ==
@@ -243,19 +236,13 @@ static int scmi_management_message_handler(
         "[SCMI] Management protocol table sizes not consistent");
     assert(payload != NULL);
 
-    status = fwk_module_check_call(protocol_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     if (message_id >= FWK_ARRAY_SIZE(handler_table)) {
         return_value = SCMI_NOT_SUPPORTED;
-        status = FWK_E_RANGE;
         goto error;
     }
 
     if (payload_size != payload_size_table[message_id]) {
         return_value = SCMI_PROTOCOL_ERROR;
-        status = FWK_E_SIZE;
         goto error;
     }
 
