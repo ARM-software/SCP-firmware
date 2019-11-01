@@ -80,13 +80,8 @@ void get_device_reg(
 
 static int do_putchar(fwk_id_t device_id, char c)
 {
-    int status;
     struct f_uart3_reg *reg;
     struct f_uart3_dla_reg *dla_reg;
-
-    status = fwk_module_check_call(device_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     get_device_reg(device_id, &reg, &dla_reg);
     if (reg != NULL) {
@@ -103,13 +98,8 @@ static int do_putchar(fwk_id_t device_id, char c)
 
 static int do_flush(fwk_id_t device_id)
 {
-    int status;
     struct f_uart3_reg *reg;
     struct f_uart3_dla_reg *dla_reg;
-
-    status = fwk_module_check_call(device_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     get_device_reg(device_id, &reg, &dla_reg);
     if (reg != NULL) {
