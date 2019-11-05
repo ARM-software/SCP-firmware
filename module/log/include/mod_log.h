@@ -146,7 +146,6 @@ struct mod_log_api {
      *      * \%s - string format
      *      * \%u - unsigned 32-bit decimal format
      *      * \%x - 32-bit hexadecimal format
-     *      * \%e - framework error code format
      *
      *      Numeric formats also accept a padding flag '0\<width\>' between the
      *      '\%' and the format specifier where the resulting string number will
