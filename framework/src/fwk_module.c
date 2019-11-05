@@ -55,7 +55,7 @@ extern const struct fwk_module_config *module_config_table[];
 
 static struct context ctx;
 
-#ifdef BUILD_HOST
+#if defined(BUILD_HOST) || defined(BUILD_OPTEE)
 static const char err_msg_line[] = "[MOD] Error %d in %s @%d\n";
 static const char err_msg_func[] = "[MOD] Error %d in %s\n";
 #endif
@@ -419,7 +419,9 @@ int __fwk_module_init(void)
 
     ctx.initialized = true;
 
+    #ifndef BUILD_OPTEE
     __fwk_thread_run();
+    #endif
 
     return FWK_SUCCESS;
 }
