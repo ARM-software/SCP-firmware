@@ -79,5 +79,22 @@ Submitting Changes
    -  Please do not delete your topic branch until it is safely merged into
       the `master` branch.
 
+Followthrough
+-------------
+
+- From time to time new features may be added and older features/functionality
+may deprecated. Code owners would be required to modify their code to support
+such new requirements within a reasonable time. Failure to do so may result
+in the code being deprecated and no longer maintained as a part of the master
+branch.
+
+- Any regressions must be fixed as soon as possible. If you are unwilling or
+unable to fix the regression, (and nobody else does it for you), your commit
+might be removed.
+
+- The author of the commit is responsible for fixing any bugs in a timely
+manner.  Failure to address issues/bugs may result in the causal commit
+being removed.
+
 --------------
 *Copyright (c) 2018-2019, Arm Limited and Contributors. All rights reserved.*
