@@ -172,6 +172,19 @@ noreturn void __fwk_thread_run(void)
     }
 }
 
+void __fwk_run_event(void)
+{
+    for (;;) {
+        while (!fwk_list_is_empty(&ctx.event_queue))
+            process_next_event();
+
+        if (fwk_list_is_empty(&ctx.isr_event_queue))
+            return;
+
+        process_isr();
+    }
+}
+
 struct __fwk_thread_ctx *__fwk_thread_get_ctx(void)
 {
     return &ctx;
