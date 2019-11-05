@@ -8,6 +8,10 @@
 #include <fwk_assert.h>
 #include <fwk_interrupt.h>
 
+#if defined(BUILD_OPTEE)
+#include <kernel/panic.h>
+#endif
+
 void fwk_trap(void)
 {
     #ifdef BUILD_MODE_DEBUG
@@ -28,6 +32,8 @@ void fwk_unreachable(void)
 {
     #ifdef BUILD_MODE_DEBUG
         fwk_trap();
+    #elif defined(BUILD_OPTEE)
+	panic();
     #else
         /*
          * Let the optimizer know that anything after this point is unreachable.
