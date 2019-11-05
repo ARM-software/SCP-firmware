@@ -23,6 +23,9 @@
  */
 #define FWK_HOST_PRINT printf
 
+#elif defined(BUILD_OPTEE)
+#include <trace.h>
+#define FWK_HOST_PRINT(...)	DMSG(__VA_ARGS__)
 #else
 #define FWK_HOST_PRINT(...) \
     do { \
