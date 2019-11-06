@@ -424,7 +424,7 @@ static int mod_psu_process_event(
             .status = params->status,
         };
 
-        switch (fwk_id_get_element_idx(event->id)) {
+        switch (fwk_id_get_event_idx(resp_event->id)) {
         case MOD_PSU_EVENT_IDX_GET_ENABLED:
             resp_params->enabled = params->enabled;
 
