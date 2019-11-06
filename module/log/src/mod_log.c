@@ -17,6 +17,11 @@
 #include <fwk_status.h>
 #include <mod_log.h>
 
+#ifdef BUILD_OPTEE
+#include <console.h>
+#include <trace.h>
+#endif
+
 static const struct mod_log_config *log_config;
 static struct mod_log_driver_api *log_driver;
 
@@ -25,6 +30,31 @@ static struct mod_log_driver_api *log_driver;
                          MOD_LOG_GROUP_INFO | \
                          MOD_LOG_GROUP_WARNING)
 
+#ifdef BUILD_OPTEE
+static int do_print(enum mod_log_group group, const char *fmt, va_list *args)
+{
+#if TRACE_LEVEL > 0
+	int level = TRACE_DEBUG;
+
+	switch (group) {
+	case MOD_LOG_GROUP_ERROR:
+		level = TRACE_ERROR;
+		break;
+	case MOD_LOG_GROUP_INFO:
+	case MOD_LOG_GROUP_WARNING:
+		level = TRACE_INFO;
+		break;
+	case MOD_LOG_GROUP_DEBUG:
+	default:
+		break;
+	}
+
+	trace_vprintf("[scmi-server]", 0, level, true, fmt, *args);
+#endif
+
+	return 0;
+}
+#else /* BUILD_OPTEE */
 static int do_putchar(char c)
 {
     int status;
@@ -101,7 +131,8 @@ static int print_string(const char *str)
     return FWK_SUCCESS;
 }
 
-static int do_print(const char *fmt, va_list *args)
+static int do_print(enum mod_log_group group __unused,
+                    const char *fmt, va_list *args)
 {
     int status;
     int bit64;
@@ -190,6 +221,7 @@ next_symbol:
 
     return FWK_SUCCESS;
 }
+#endif /* BUILD_OPTEE */
 
 static bool is_valid_group(unsigned int group)
 {
@@ -215,7 +247,7 @@ static int do_log(enum mod_log_group group, const char *fmt, ...)
     va_list args;
 
     /* API called too early */
-    if (log_driver == NULL)
+    if ((log_config != NULL) && (log_driver == NULL))
         return FWK_E_STATE;
 
     status = fwk_module_check_call(FWK_ID_MODULE(FWK_MODULE_IDX_LOG));
@@ -228,9 +260,9 @@ static int do_log(enum mod_log_group group, const char *fmt, ...)
     if (fmt == NULL)
         return FWK_E_PARAM;
 
-    if (group & log_config->log_groups) {
+    if ((log_config == NULL) || (group & log_config->log_groups)) {
         va_start(args, fmt);
-        status = do_print(fmt, &args);
+        status = do_print(group, fmt, &args);
         va_end(args);
 
         if (status != FWK_SUCCESS)
@@ -240,12 +272,20 @@ static int do_log(enum mod_log_group group, const char *fmt, ...)
     return FWK_SUCCESS;
 }
 
+#ifdef BUILD_OPTEE
+static int do_flush(void)
+{
+    console_flush();
+
+    return FWK_SUCCESS;
+}
+#else
 static int do_flush(void)
 {
     int status;
 
     /* API called too early */
-    if (log_driver == NULL)
+    if ((log_config != NULL) && (log_driver == NULL))
         return FWK_E_STATE;
 
     status = fwk_module_check_call(FWK_ID_MODULE(FWK_MODULE_IDX_LOG));
@@ -258,6 +298,7 @@ static int do_flush(void)
 
     return FWK_SUCCESS;
 }
+#endif
 
 static const struct mod_log_api module_api = {
     .log = do_log,
@@ -277,7 +318,7 @@ static int log_init(fwk_id_t module_id, unsigned int element_count,
         return FWK_E_DATA;
 
     /* Check for invalid groups in the 'log_groups' mask */
-    if (config->log_groups & ~ALL_GROUPS_MASK)
+    if (config && (config->log_groups & ~ALL_GROUPS_MASK))
         return FWK_E_PARAM;
 
     log_config = config;
@@ -292,6 +333,10 @@ static int log_bind(fwk_id_t id, unsigned int round)
 
     /* Skip second round */
     if (round == 1)
+        return FWK_SUCCESS;
+
+    /* No expected driver => we're done */
+    if (log_config == NULL)
         return FWK_SUCCESS;
 
     /* Get the device driver's API */
