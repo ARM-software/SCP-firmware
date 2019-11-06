@@ -97,6 +97,7 @@ static int cmn600_discovery(void)
     unsigned int xp_idx;
     unsigned int node_count;
     unsigned int node_idx;
+    bool xp_port;
     struct cmn600_mxp_reg *xp;
     struct node_header *node;
     const struct mod_cmn600_config *config = ctx->config;
@@ -128,17 +129,27 @@ static int cmn600_discovery(void)
 
             /* External nodes */
             if (is_child_external(xp, node_idx)) {
-                ctx->external_rnsam_count++;
+                xp_port = get_port_number(get_child_node_id(xp, node_idx));
 
-            if (get_child_node_id(xp, node_idx) == config->cxgla_node_id)
-                ctx->cxla_reg = (void *)node;
-
-            ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
-                    MOD_NAME "  Found external node ID:%d\n",
-                    get_child_node_id(xp, node_idx));
-
-            /* Internal nodes */
-            } else {
+                /*
+                 * If the device type is CXRH, CXHA, or CXRA, then the external
+                 * child node is CXLA as every CXRH, CXHA, or CXRA node has a
+                 * corresponding external CXLA node.
+                 */
+                if ((get_device_type(xp, xp_port) == DEVICE_TYPE_CXRH) ||
+                    (get_device_type(xp, xp_port) == DEVICE_TYPE_CXHA) ||
+                    (get_device_type(xp, xp_port) == DEVICE_TYPE_CXRA)) {
+                    ctx->cxla_reg = (void *)node;
+                    ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
+                        MOD_NAME "  Found CXLA at node ID: %d\n",
+                        get_child_node_id(xp, node_idx));
+                } else { /* External RN-SAM Node */
+                    ctx->external_rnsam_count++;
+                    ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
+                        MOD_NAME "  Found external node ID: %d\n",
+                        get_child_node_id(xp, node_idx));
+                }
+            } else { /* Internal nodes */
                 switch (get_node_type(node)) {
                 case NODE_TYPE_HN_F:
                     if (ctx->hnf_count >= MAX_HNF_COUNT) {
@@ -231,6 +242,7 @@ static void cmn600_configure(void)
 {
     unsigned int xp_count;
     unsigned int xp_idx;
+    bool xp_port;
     unsigned int node_count;
     unsigned int node_idx;
     unsigned int xrnsam_entry;
@@ -257,6 +269,13 @@ static void cmn600_configure(void)
 
             if (is_child_external(xp, node_idx)) {
                 unsigned int node_id = get_child_node_id(xp, node_idx);
+                xp_port = get_port_number(get_child_node_id(xp, node_idx));
+
+                /* Skip if the device type is CXG */
+                if ((get_device_type(xp, xp_port) == DEVICE_TYPE_CXRH) ||
+                    (get_device_type(xp, xp_port) == DEVICE_TYPE_CXHA) ||
+                    (get_device_type(xp, xp_port) == DEVICE_TYPE_CXRA))
+                    continue;
 
                 fwk_assert(xrnsam_entry < ctx->external_rnsam_count);
 
@@ -532,7 +551,7 @@ static int cmn600_ccix_config_get(
         return FWK_E_DATA;
 
     ctx->ccix_host_info.host_ra_count =
-        ctx->internal_rnsam_count + ctx->external_rnsam_count - 1;
+        ctx->internal_rnsam_count + ctx->external_rnsam_count;
     ctx->ccix_host_info.host_sa_count = ctx->config->sa_count;
 
     ccix_capabilities_get(ctx);

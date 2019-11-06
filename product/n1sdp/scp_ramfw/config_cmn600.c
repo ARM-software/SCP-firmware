@@ -21,8 +21,6 @@
 #define NODE_ID_HND      0x68
 #define NODE_ID_SBSX     0x64
 #define NODE_ID_CCIX     0x0
-#define NODE_ID_CXGLA    0x2
-
 
 static const unsigned int snf_table[] = {
     DMC0_ID, /* Maps to HN-F logical node 0 */
@@ -173,7 +171,6 @@ const struct fwk_module_config config_cmn600 = {
         .snf_table = snf_table,
         .snf_count = FWK_ARRAY_SIZE(snf_table),
         .sa_count  = 2,
-        .cxgla_node_id = NODE_ID_CXGLA,
         .mmap_table = mmap,
         .mmap_count = FWK_ARRAY_SIZE(mmap),
         .chip_addr_space = UINT64_C(4) * FWK_TIB,
