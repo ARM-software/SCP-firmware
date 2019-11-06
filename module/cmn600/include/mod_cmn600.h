@@ -1,4 +1,3 @@
-
 /*
  * Arm SCP/MCP Software
  * Copyright (c) 2017-2020, Arm Limited and Contributors. All rights reserved.
@@ -131,9 +130,6 @@ struct mod_cmn600_config {
 
     /*! Host SA count */
     unsigned int sa_count;
-
-    /*! Host CXG LA Node id */
-    unsigned int cxgla_node_id;
 
     /*! Table of region memory map entries */
     const struct mod_cmn600_memory_region_map *mmap_table;

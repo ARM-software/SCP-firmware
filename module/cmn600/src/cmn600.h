@@ -44,6 +44,12 @@ enum node_type {
     NODE_TYPE_CXLA      = 0x102,
 };
 
+enum device_type {
+    DEVICE_TYPE_CXHA    = 0x11, // 0b10001
+    DEVICE_TYPE_CXRA    = 0x12, // 0b10010
+    DEVICE_TYPE_CXRH    = 0x13, // 0b10011
+};
+
 /* Common node header */
 struct node_header {
     FWK_R uint64_t NODE_INFO;
@@ -359,7 +365,8 @@ struct cmn600_cfgm_reg {
  */
 struct cmn600_mxp_reg {
     FWK_R  uint64_t NODE_INFO;
-           uint8_t  RESERVED0[0x80 - 0x8];
+    FWK_R  uint64_t PORT_CONNECT_INFO[2];
+           uint8_t  RESERVED0[0x80 - 0x18];
     FWK_R  uint64_t CHILD_INFO;
            uint8_t  RESERVED1[0x100 - 0x88];
     FWK_R  uint64_t CHILD_POINTER[16];
@@ -538,6 +545,8 @@ struct cmn600_hni_reg {
 #define CMN600_NODE_ID_PORT_MASK 0x1
 #define CMN600_NODE_ID_Y_POS 3
 
+#define CMN600_MXP_PORT_CONNECT_INFO_DEVICE_TYPE_MASK UINT64_C(0x1F)
+
 #define CMN600_ROOT_NODE_OFFSET_PORT_POS 14
 #define CMN600_ROOT_NODE_OFFSET_Y_POS 20
 
@@ -629,6 +638,27 @@ unsigned int get_child_node_id(void *node_base, unsigned int child_index);
  * \retval false if the node is internal
  */
 bool is_child_external(void *node_base, unsigned int child_index);
+
+/*
+ * Returns the port number from the child node id.
+ *
+ * \param child_node_id Child node id calculated from the child pointer.
+ *
+ * \retval port number (either 0 or 1).
+ */
+bool get_port_number(unsigned int child_node_id);
+
+/*
+ * Returns the device type from the MXP's port connect info register.
+ *
+ * \param mxp_base Pointer to the cross point node descriptor
+ *      \pre The cross point node pointer must be valid
+ * \param port Port number
+ *      \pre The port number should be either 0 or 1.
+ *
+ * \retval device type (por_mxp_por_mxp_device_port_connect_info_p[port] & 0x1F)
+ */
+unsigned int get_device_type(void *mxp_base, bool port);
 
 /*
  * Convert a memory region size into a size format used by the CMN600 registers

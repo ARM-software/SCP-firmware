@@ -420,10 +420,10 @@ int ccix_setup(struct cmn600_ctx *ctx, void *remote_config)
                 (ctx->external_rnsam_count <= (0xFF + 1)));
 
     /* Number of local RN-F */
-    rnf_cnt = ctx->external_rnsam_count - 1;
+    rnf_cnt = ctx->external_rnsam_count;
 
     /* Number of local RAs */
-    local_ra_cnt = ctx->internal_rnsam_count + ctx->external_rnsam_count - 1;
+    local_ra_cnt = ctx->internal_rnsam_count + ctx->external_rnsam_count;
 
     /* Set initial RAID value to 0. */
     ctx->raid_value = 0;

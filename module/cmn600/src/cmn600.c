@@ -76,6 +76,19 @@ bool is_child_external(void *node_base, unsigned int child_index)
     return !!(node->CHILD_POINTER[child_index] & (UINT64_C(1) << 31));
 }
 
+bool get_port_number(unsigned int child_node_id)
+{
+    return (child_node_id >> CMN600_NODE_ID_PORT_POS) &
+        CMN600_NODE_ID_PORT_MASK;
+}
+
+unsigned int get_device_type(void *mxp_base, bool port)
+{
+    struct cmn600_mxp_reg *mxp = mxp_base;
+    return mxp->PORT_CONNECT_INFO[port] &
+        CMN600_MXP_PORT_CONNECT_INFO_DEVICE_TYPE_MASK;
+}
+
 uint64_t sam_encode_region_size(uint64_t size)
 {
     uint64_t blocks;
