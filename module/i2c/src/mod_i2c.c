@@ -41,9 +41,8 @@ static int get_ctx(fwk_id_t id, struct mod_i2c_dev_ctx **ctx)
     return FWK_SUCCESS;
 }
 
-static int create_i2c_request(fwk_id_t dev_id, uint8_t slave_address,
-    uint8_t *transmit_data, uint8_t *receive_data, uint8_t transmit_byte_count,
-    uint8_t receive_byte_count)
+static int create_i2c_request(fwk_id_t dev_id,
+                              struct mod_i2c_request *request)
 {
     int status;
     struct fwk_event event;
@@ -58,7 +57,7 @@ static int create_i2c_request(fwk_id_t dev_id, uint8_t slave_address,
         return status;
 
     /* The slave address should be on 7 bits */
-    if (!fwk_expect(slave_address < 0x80))
+    if (!fwk_expect(request->slave_address < 0x80))
         return FWK_E_PARAM;
 
     /* Check whether an I2C request is already on-going */
@@ -74,13 +73,7 @@ static int create_i2c_request(fwk_id_t dev_id, uint8_t slave_address,
         .response_requested = true,
     };
 
-    *event_param = (struct mod_i2c_request) {
-        .slave_address = slave_address,
-        .transmit_data = transmit_data,
-        .receive_data = receive_data,
-        .transmit_byte_count = transmit_byte_count,
-        .receive_byte_count = receive_byte_count,
-    };
+    *event_param = *request;
 
     return fwk_thread_put_event(&event);
 }
@@ -99,7 +92,13 @@ static int transmit_as_master(fwk_id_t dev_id,
     if (!fwk_expect(data != NULL))
         return FWK_E_PARAM;
 
-    return create_i2c_request(dev_id, slave_address, data, NULL, byte_count, 0);
+    struct mod_i2c_request request = {
+        .slave_address = slave_address,
+        .transmit_data = data,
+        .transmit_byte_count = byte_count,
+    };
+
+    return create_i2c_request(dev_id, &request);
 }
 
 static int receive_as_master(fwk_id_t dev_id,
@@ -113,7 +112,13 @@ static int receive_as_master(fwk_id_t dev_id,
     if (!fwk_expect(data != NULL))
         return FWK_E_PARAM;
 
-    return create_i2c_request(dev_id, slave_address, NULL, data, 0, byte_count);
+    struct mod_i2c_request request = {
+        .slave_address = slave_address,
+        .receive_data = data,
+        .receive_byte_count = byte_count,
+    };
+
+    return create_i2c_request(dev_id, &request);
 }
 
 static int transmit_then_receive_as_master(fwk_id_t dev_id,
@@ -129,8 +134,15 @@ static int transmit_then_receive_as_master(fwk_id_t dev_id,
     if (!fwk_expect((transmit_data != NULL) && (receive_data != NULL)))
         return FWK_E_PARAM;
 
-    return create_i2c_request(dev_id, slave_address, transmit_data,
-        receive_data, transmit_byte_count, receive_byte_count);
+    struct mod_i2c_request request = {
+        .slave_address = slave_address,
+        .transmit_data = transmit_data,
+        .receive_data = receive_data,
+        .transmit_byte_count = transmit_byte_count,
+        .receive_byte_count = receive_byte_count,
+    };
+
+    return create_i2c_request(dev_id, &request);
 }
 
 static struct mod_i2c_api i2c_api = {
