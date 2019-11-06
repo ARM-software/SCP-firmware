@@ -260,7 +260,6 @@ static const fwk_id_t mod_i2c_api_id_driver_response =
 enum mod_i2c_event_idx {
     MOD_I2C_EVENT_IDX_REQUEST,
     MOD_I2C_EVENT_IDX_REQUEST_COMPLETED,
-    MOD_I2C_EVENT_IDX_RESTART,
     MOD_I2C_EVENT_IDX_COUNT,
 };
 
@@ -271,11 +270,6 @@ static const fwk_id_t mod_i2c_event_id_request = FWK_ID_EVENT_INIT(
 /*! Request completed event identifier */
 static const fwk_id_t mod_i2c_event_id_request_completed = FWK_ID_EVENT_INIT(
     FWK_MODULE_IDX_I2C, MOD_I2C_EVENT_IDX_REQUEST_COMPLETED);
-
-/*! Restart event identifier */
-static const fwk_id_t mod_i2c_event_id_restart = FWK_ID_EVENT_INIT(
-    FWK_MODULE_IDX_I2C, MOD_I2C_EVENT_IDX_RESTART);
-
 
 /*!
  * \}
