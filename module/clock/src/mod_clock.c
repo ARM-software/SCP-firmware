@@ -15,7 +15,7 @@
 #include <fwk_status.h>
 #include <fwk_thread.h>
 #include <mod_power_domain.h>
-#include <clock.h>
+#include "clock.h"
 
 /* Device context */
 struct clock_dev_ctx {
@@ -64,9 +64,9 @@ static int process_response_event(const struct fwk_event *event)
     struct fwk_event resp_event;
     struct clock_dev_ctx *ctx;
     struct mod_clock_driver_resp_params *event_params =
-        (struct mod_clock_driver_resp_params *)event->params;
+        (struct mod_clock_driver_resp_params *)(void *)event->params;
     struct mod_clock_resp_params *resp_params =
-        (struct mod_clock_resp_params *)resp_event.params;
+        (struct mod_clock_resp_params *)(void *)resp_event.params;
 
     ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(event->target_id)];
 
@@ -140,14 +140,14 @@ static int get_ctx(fwk_id_t clock_id, struct clock_dev_ctx **ctx)
  * Driver response API.
  */
 
-void request_complete(fwk_id_t dev_id,
-                      struct mod_clock_driver_resp_params *response)
+static void request_complete(fwk_id_t dev_id,
+                             struct mod_clock_driver_resp_params *response)
 {
     int status;
     struct fwk_event event;
     struct clock_dev_ctx *ctx;
     struct mod_clock_driver_resp_params *event_params =
-        (struct mod_clock_driver_resp_params *)event.params;
+        (struct mod_clock_driver_resp_params *)(void *)event.params;
 
     fwk_assert(fwk_module_is_valid_element_id(dev_id));
 
@@ -626,7 +626,7 @@ static int clock_process_notification(
     else if (fwk_id_is_equal(event->id,
                  module_ctx.config->pd_pre_transition_notification_id))
         return clock_process_pd_pre_transition_notification(ctx, event,
-							    resp_event);
+                                                            resp_event);
     else
         return FWK_E_HANDLER;
 }
