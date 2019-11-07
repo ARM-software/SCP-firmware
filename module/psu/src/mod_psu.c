@@ -104,7 +104,7 @@ static int mod_psu_get_enabled(fwk_id_t element_id, bool *enabled)
 
     status = ctx->driver->get_enabled(cfg->driver_id, enabled);
     if (status == FWK_PENDING) {
-        struct fwk_event request = (struct fwk_event){
+        struct fwk_event request = {
             .id = mod_psu_event_id_get_enabled,
             .target_id = element_id,
 
@@ -144,7 +144,7 @@ static int mod_psu_set_enabled(fwk_id_t element_id, bool enabled)
 
     status = ctx->driver->set_enabled(cfg->driver_id, enabled);
     if (status == FWK_PENDING) {
-        struct fwk_event request = (struct fwk_event){
+        struct fwk_event request = {
             .id = mod_psu_event_id_set_enabled,
             .target_id = element_id,
 
@@ -184,7 +184,7 @@ static int mod_psu_get_voltage(fwk_id_t element_id, uint64_t *voltage)
 
     status = ctx->driver->get_voltage(cfg->driver_id, voltage);
     if (status == FWK_PENDING) {
-        struct fwk_event request = (struct fwk_event){
+        struct fwk_event request = {
             .id = mod_psu_event_id_get_voltage,
             .target_id = element_id,
 
@@ -224,7 +224,7 @@ static int mod_psu_set_voltage(fwk_id_t element_id, uint64_t voltage)
 
     status = ctx->driver->set_voltage(cfg->driver_id, voltage);
     if (status == FWK_PENDING) {
-        struct fwk_event request = (struct fwk_event){
+        struct fwk_event request = {
             .id = mod_psu_event_id_set_voltage,
             .target_id = element_id,
 
