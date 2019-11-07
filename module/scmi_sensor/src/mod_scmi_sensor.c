@@ -576,10 +576,14 @@ static int scmi_sensor_process_event(const struct fwk_event *event,
             (struct mod_sensor_event_params *)event->params;
 
         return_values = (struct scmi_sensor_protocol_reading_get_p2a) {
-            .status = SCMI_SUCCESS,
             .sensor_value_low = (uint32_t)params->value,
             .sensor_value_high = (uint32_t)(params->value >> 32),
         };
+
+        if (params->status == FWK_SUCCESS)
+            return_values.status = SCMI_SUCCESS;
+        else
+            return_values.status = SCMI_HARDWARE_ERROR;
 
         scmi_sensor_respond(&return_values, event->source_id);
     }
