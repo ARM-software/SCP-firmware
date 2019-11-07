@@ -290,8 +290,8 @@ static int scmi_power_scp_set_core_state(fwk_id_t pd_id,
                                                            composite_state);
     if (status != FWK_SUCCESS) {
         scmi_pd_ctx.log_api->log(MOD_LOG_GROUP_ERROR,
-            "[SCMI:power] Failed to send core set request (error %e)\n",
-            status);
+            "[SCMI:power] Failed to send core set request (error %s (%d))\n",
+            fwk_status_str(status), status);
     }
 
     return status;

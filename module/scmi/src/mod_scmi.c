@@ -265,7 +265,8 @@ static void respond(fwk_id_t service_id, const void *payload, size_t size)
     status = ctx->respond(ctx->transport_id, payload, size);
     if (status != FWK_SUCCESS)
         scmi_ctx.log_api->log(MOD_LOG_GROUP_ERROR,
-            "[SCMI] Failed to send response (%e)\n", status);
+            "[SCMI] Failed to send response %s (%d)\n",
+            fwk_status_str(status), status);
 }
 
 static const struct mod_scmi_from_protocol_api mod_scmi_from_protocol_api = {
@@ -790,8 +791,9 @@ static int scmi_process_event(const struct fwk_event *event,
 
     if (status != FWK_SUCCESS) {
         scmi_ctx.log_api->log(MOD_LOG_GROUP_ERROR,
-            "[SCMI] Protocol 0x%x handler error (%e), message_id = 0x%x\n",
-            ctx->scmi_protocol_id, status, ctx->scmi_message_id);
+            "[SCMI] Protocol 0x%x handler error %s (%d), message_id = 0x%x\n",
+            ctx->scmi_protocol_id, fwk_status_str(status), status,
+            ctx->scmi_message_id);
     }
 
     return FWK_SUCCESS;

@@ -82,6 +82,15 @@
 #define FWK_E_PANIC         -18
 
 /*!
+ * \brief Return a human readable string representation of a status code.
+ *
+ * \param status Status code value.
+ *
+ * \return String representation of \p status
+ */
+const char *fwk_status_str(int status);
+
+/*!
  * @}
  */
 
