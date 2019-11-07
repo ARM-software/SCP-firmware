@@ -10,12 +10,12 @@ BS_CPU_MK := 1
 
 include $(BS_DIR)/defs.mk
 
-BS_ARCH_CPU := $(BS_FIRMWARE_CPU)
-
 # Supported ARMv7-M CPUs
 ARMV7M_CPUS := cortex-m3 cortex-m7
 
 ifneq ($(findstring $(BS_FIRMWARE_CPU),$(ARMV7M_CPUS)),)
+    BS_ARCH_CPU := $(BS_FIRMWARE_CPU)
+
     BS_ARCH_ARCH := armv7-m
     BS_ARCH_ISA := thumb
 
@@ -27,7 +27,13 @@ ifneq ($(findstring $(BS_FIRMWARE_CPU),$(ARMV7M_CPUS)),)
     CFLAGS += -mno-unaligned-access # Disable unaligned access code generation
 else ifeq ($(BS_FIRMWARE_CPU),host)
     BS_ARCH_ARCH := host
+else ifeq ($(BS_FIRMWARE_CPU),optee)
+    BS_ARCH_ARCH := optee
 
+    ifeq ($(BS_ARCH_CPU),cortex-a7)
+    CFLAGS += -mfloat-abi=soft # No hardware floating point support
+    CFLAGS += -mthumb -mthumb-interwork -fno-short-enums -fno-common -mno-unaligned-access
+    endif
 else
     $(erro "$(BS_FIRMWARE_CPU) is not a supported CPU. Aborting...")
 endif

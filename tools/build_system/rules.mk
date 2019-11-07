@@ -63,10 +63,18 @@ else
     LDFLAGS_ARM += -Wl,--scatter=$(SCATTER_PP)
     LDFLAGS_GCC += -Wl,--script=$(SCATTER_PP)
 
-    CFLAGS_GCC  += -mcpu=$(BS_ARCH_CPU)
-    ASFLAGS_GCC += -mcpu=$(BS_ARCH_CPU)
-    LDFLAGS_GCC += -mcpu=$(BS_ARCH_CPU)
-    LDFLAGS_ARM += -mcpu=$(BS_ARCH_CPU)
+    ifeq ($(BS_ARCH_CPU),cortex-a53)
+    COMMON_FLAGS := -march=armv8-a -mtune=$(BS_ARCH_CPU)
+    else ifeq ($(BS_ARCH_CPU),cortex-a7)
+    COMMON_FLAGS := -mcpu=$(BS_ARCH_CPU)
+    else
+    COMMON_FLAGS := -mcpu=$(BS_ARCH_CPU)
+    endif
+
+    CFLAGS_GCC  += $(COMMON_FLAGS)
+    ASFLAGS_GCC += $(COMMON_FLAGS)
+    LDFLAGS_GCC += $(COMMON_FLAGS)
+    LDFLAGS_ARM += $(COMMON_FLAGS)
 
     # Optional ISA ("sub-arch") parameter
     ifneq ($(BS_ARCH_ISA),)
@@ -75,6 +83,10 @@ else
         LDFLAGS_GCC += -m$(BS_ARCH_ISA)
         LDFLAGS_ARM += -m$(BS_ARCH_ISA)
     endif
+endif
+
+ifeq ($(BS_ARCH_ARCH),optee)
+    DEFINES += BUILD_OPTEE
 endif
 
 #
