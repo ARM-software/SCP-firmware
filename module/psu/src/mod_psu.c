@@ -386,10 +386,14 @@ static int mod_psu_process_event(
 {
     int status = FWK_SUCCESS;
 
+    struct fwk_event hal_event;
+
     const struct mod_psu_driver_response *params =
         (struct mod_psu_driver_response *)event->params;
     struct mod_psu_response *resp_params =
         (struct mod_psu_response *)resp_event->params;
+    struct mod_psu_response *hal_params =
+        (struct mod_psu_response *)&hal_event.params;
 
     const struct mod_psu_element_cfg *cfg;
     struct mod_psu_element_ctx *ctx;
@@ -416,22 +420,22 @@ static int mod_psu_process_event(
         status = fwk_thread_get_delayed_response(
             event->target_id,
             ctx->op.cookie,
-            resp_event);
+            &hal_event);
         if (status != FWK_SUCCESS)
             return status;
 
-        *resp_params = (struct mod_psu_response){
+        *hal_params = (struct mod_psu_response){
             .status = params->status,
         };
 
-        switch (fwk_id_get_event_idx(resp_event->id)) {
+        switch (fwk_id_get_event_idx(hal_event.id)) {
         case MOD_PSU_EVENT_IDX_GET_ENABLED:
-            resp_params->enabled = params->enabled;
+            hal_params->enabled = params->enabled;
 
             break;
 
         case MOD_PSU_EVENT_IDX_GET_VOLTAGE:
-            resp_params->voltage = params->voltage;
+            hal_params->voltage = params->voltage;
 
             break;
 
@@ -439,7 +443,7 @@ static int mod_psu_process_event(
             break;
         }
 
-        status = fwk_thread_put_event(resp_event);
+        status = fwk_thread_put_event(&hal_event);
 
         break;
 
