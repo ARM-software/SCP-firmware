@@ -191,8 +191,6 @@ static int clock_set_rate(fwk_id_t clock_id, uint64_t rate,
     status = ctx->api->set_rate(ctx->config->driver_id, rate, round_mode);
     if (status == FWK_PENDING)
         return create_async_request(ctx, clock_id);
-    else if (status == FWK_SUCCESS)
-        return FWK_SUCCESS;
     else
         return status;
 }
@@ -216,8 +214,6 @@ static int clock_get_rate(fwk_id_t clock_id, uint64_t *rate)
     status = ctx->api->get_rate(ctx->config->driver_id, rate);
     if (status == FWK_PENDING)
         return create_async_request(ctx, clock_id);
-    else if (status == FWK_SUCCESS)
-        return FWK_SUCCESS;
     else
         return status;
 }
@@ -255,8 +251,6 @@ static int clock_set_state(fwk_id_t clock_id, enum mod_clock_state state)
     status = ctx->api->set_state(ctx->config->driver_id, state);
     if (status == FWK_PENDING)
         return create_async_request(ctx, clock_id);
-    else if (status == FWK_SUCCESS)
-        return FWK_SUCCESS;
     else
         return status;
 }
@@ -280,8 +274,6 @@ static int clock_get_state(fwk_id_t clock_id, enum mod_clock_state *state)
     status = ctx->api->get_state(ctx->config->driver_id, state);
     if (status == FWK_PENDING)
         return create_async_request(ctx, clock_id);
-    else if (status == FWK_SUCCESS)
-        return FWK_SUCCESS;
     else
         return status;
 }
