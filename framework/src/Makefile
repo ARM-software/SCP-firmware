@@ -23,6 +23,7 @@ endif
 ifeq ($(BUILD_HAS_NOTIFICATION),yes)
     BS_LIB_SOURCES += fwk_notification.c
 endif
+BS_LIB_SOURCES += fwk_status.c
 
 BS_LIB_INCLUDES += $(ARCH_DIR)/include
 BS_LIB_INCLUDES += $(FWK_DIR)/include

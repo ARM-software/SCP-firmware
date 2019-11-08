@@ -56,9 +56,13 @@ static const struct fwk_element *clock_get_dev_desc_table(fwk_id_t module_id)
     for (i = 0; i < CLOCK_IDX_COUNT; i++) {
         dev_config =
             (struct mod_clock_dev_config *)clock_dev_desc_table[i].data;
-        dev_config->pd_source_id = fwk_id_build_element_id(
-            fwk_module_id_power_domain,
-            n1sdp_core_get_core_count() + PD_STATIC_DEV_IDX_SYSTOP);
+        if (n1sdp_is_multichip_enabled() && (n1sdp_get_chipid() == 0x0)) {
+            dev_config->pd_source_id = fwk_id_build_element_id(
+                fwk_module_id_power_domain, PD_MULTI_CHIP_IDX_SYSTOP0);
+        } else {
+            dev_config->pd_source_id = fwk_id_build_element_id(
+                fwk_module_id_power_domain, PD_SINGLE_CHIP_IDX_SYSTOP0);
+        }
     }
 
     return clock_dev_desc_table;

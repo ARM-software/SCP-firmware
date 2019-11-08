@@ -37,6 +37,7 @@ static void process_node_hnf(struct cmn600_hnf_reg *hnf)
     unsigned int region_sub_count = 0;
     const struct mod_cmn600_memory_region_map *region;
     const struct mod_cmn600_config *config = ctx->config;
+    uint64_t base_offset;
 
     logical_id = get_node_logical_id(hnf);
 
@@ -50,6 +51,12 @@ static void process_node_hnf(struct cmn600_hnf_reg *hnf)
 
     /* Set target node */
     hnf->SAM_CONTROL = config->snf_table[logical_id];
+
+    if (ctx->chip_id != 0) {
+        base_offset = ((uint64_t)(ctx->config->chip_addr_space *
+                                  ctx->chip_id));
+    } else
+        base_offset = 0;
 
     /*
      * Map sub-regions to this HN-F node
@@ -65,8 +72,8 @@ static void process_node_hnf(struct cmn600_hnf_reg *hnf)
         hnf->SAM_MEMREGION[region_sub_count] = region->node_id |
             (sam_encode_region_size(region->size) <<
                 CMN600_HNF_SAM_MEMREGION_SIZE_POS) |
-            ((region->base / SAM_GRANULARITY) <<
-                CMN600_HNF_SAM_MEMREGION_BASE_POS) |
+            (((region->base + base_offset) / SAM_GRANULARITY) <<
+              CMN600_HNF_SAM_MEMREGION_BASE_POS) |
             CMN600_HNF_SAM_MEMREGION_VALID;
 
         region_sub_count++;
@@ -292,6 +299,7 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
     unsigned int group;
     unsigned int group_count;
     enum sam_node_type sam_node_type;
+    uint64_t base;
 
     ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
         MOD_NAME "Configuring SAM for node %d\n",
@@ -299,11 +307,24 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
 
     for (region_idx = 0; region_idx < config->mmap_count; region_idx++) {
         region = &config->mmap_table[region_idx];
+
+        if (ctx->chip_id != 0) {
+            if (region->type == MOD_CMN600_REGION_TYPE_CCIX)
+                base = 0;
+            else if (region->type == MOD_CMN600_MEMORY_REGION_TYPE_SYSCACHE)
+                base = region->base;
+            else {
+                base = ((uint64_t)(ctx->config->chip_addr_space *
+                                   ctx->chip_id) + region->base);
+            }
+        } else
+            base = region->base;
+
         ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
-            MOD_NAME "  [0x%lx - 0x%lx] %s\n",
-            region->base,
-            region->base + region->size - 1,
-            mmap_type_name[region->type]);
+                          MOD_NAME "  [0x%lx - 0x%lx] %s\n",
+                          base,
+                          base + region->size - 1,
+                          mmap_type_name[region->type]);
 
         group = region_io_count / CMN600_RNSAM_REGION_ENTRIES_PER_GROUP;
         bit_pos = (region_io_count % CMN600_RNSAM_REGION_ENTRIES_PER_GROUP) *
@@ -319,10 +340,10 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
                 (region->type == MOD_CMN600_MEMORY_REGION_TYPE_IO) ?
                     SAM_NODE_TYPE_HN_I : SAM_NODE_TYPE_CXRA;
             configure_region(&rnsam->NON_HASH_MEM_REGION[group],
-                bit_pos,
-                region->base,
-                region->size,
-                sam_node_type);
+                             bit_pos,
+                             base,
+                             region->size,
+                             sam_node_type);
             /*
              * Configure target node
              */
@@ -345,10 +366,10 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
              * Configure memory region
              */
             configure_region(&rnsam->SYS_CACHE_GRP_REGION[group],
-                bit_pos,
-                region->base,
-                region->size,
-                SAM_NODE_TYPE_HN_F);
+                             bit_pos,
+                             region->base,
+                             region->size,
+                             SAM_NODE_TYPE_HN_F);
            break;
 
         case MOD_CMN600_REGION_TYPE_SYSCACHE_NONHASH:
@@ -360,10 +381,10 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
              * Configure memory region
              */
             configure_region(&rnsam->SYS_CACHE_GRP_REGION[group],
-                bit_pos,
-                region->base,
-                region->size,
-                SAM_NODE_TYPE_HN_I);
+                             bit_pos,
+                             region->base,
+                             region->size,
+                             SAM_NODE_TYPE_HN_I);
 
             rnsam->SYS_CACHE_GRP_REGION[group] |= (UINT64_C(0x2) << bit_pos);
             bit_pos = CMN600_RNSAM_NON_HASH_TGT_NODEID_ENTRY_BITS_WIDTH *
@@ -572,6 +593,18 @@ static int cmn600_ccix_enter_system_coherency(uint8_t link_id)
 
     status = ccix_enter_system_coherency(ctx, link_id);
     return status;
+}
+
+static int cmn600_ccix_enter_dvm_domain(uint8_t link_id)
+{
+    int status;
+
+    status = fwk_module_check_call(fwk_module_id_cmn600);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    status = ccix_enter_dvm_domain(ctx, link_id);
+    return status;
 
 }
 
@@ -579,7 +612,8 @@ static const struct mod_cmn600_ccix_config_api cmn600_ccix_config_api = {
     .get_config = cmn600_ccix_config_get,
     .set_config = cmn600_ccix_config_set,
     .exchange_protocol_credit = cmn600_ccix_exchange_protocol_credit,
-    .enter_system_coherency = cmn600_ccix_enter_system_coherency
+    .enter_system_coherency = cmn600_ccix_enter_system_coherency,
+    .enter_dvm_domain = cmn600_ccix_enter_dvm_domain,
 };
 
 
@@ -643,6 +677,15 @@ static int cmn600_bind(fwk_id_t id, unsigned int round)
                                  &ctx->timer_api);
         if (status != FWK_SUCCESS)
             return FWK_E_PANIC;
+
+        /* Bind to the chip information API in platform if provided */
+        if (!fwk_id_is_equal(ctx->config->chipinfo_mod_id, FWK_ID_NONE)) {
+            status = fwk_module_bind(ctx->config->chipinfo_mod_id,
+                                     ctx->config->chipinfo_api_id,
+                                     &ctx->chipinfo_api);
+            if (status != FWK_SUCCESS)
+                return FWK_E_PANIC;
+        }
     }
 
     return FWK_SUCCESS;
@@ -666,10 +709,24 @@ static int cmn600_process_bind_request(fwk_id_t requester_id,
 
 int cmn600_start(fwk_id_t id)
 {
+    uint8_t chip_id = 0;
+    bool mc_mode = false;
+    int status;
+
     if (fwk_id_is_equal(ctx->config->clock_id, FWK_ID_NONE)) {
         cmn600_setup();
         return FWK_SUCCESS;
     }
+
+    if (!fwk_id_is_equal(ctx->config->chipinfo_mod_id, FWK_ID_NONE)) {
+        status = ctx->chipinfo_api->get_chipinfo(&chip_id, &mc_mode);
+        if (status != FWK_SUCCESS)
+            return status;
+    }
+    ctx->chip_id = chip_id;
+
+    ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
+        MOD_NAME "Multichip mode: %d Chip ID: %d\n", mc_mode, chip_id);
 
     /* Register the module for clock state notifications */
     return fwk_notification_subscribe(

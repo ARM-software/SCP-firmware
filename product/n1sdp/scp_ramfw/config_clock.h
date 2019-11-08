@@ -50,6 +50,7 @@
 
 #define PIK_CLK_RATE_SCP_CORECLK       (300 * FWK_MHZ)
 #define PIK_CLK_RATE_SCP_AXICLK        (300 * FWK_MHZ)
+#define PIK_CLK_RATE_SCP_SYNCCLK       (150 * FWK_MHZ)
 
 #define PIK_CLK_RATE_SYS_PPU           (300 * FWK_MHZ)
 #define PIK_CLK_RATE_INTERCONNECT      (1600 * FWK_MHZ)
@@ -146,6 +147,7 @@ enum clock_pik_idx {
     /* SCP element clocks */
     CLOCK_PIK_IDX_SCP_CORECLK,
     CLOCK_PIK_IDX_SCP_AXICLK,
+    CLOCK_PIK_IDX_SCP_SYNCCLK,
     /* Top element clocks */
     CLOCK_PIK_IDX_SYS_PPU,
     CLOCK_PIK_IDX_INTERCONNECT,

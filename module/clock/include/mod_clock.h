@@ -20,7 +20,7 @@
 /*!
  * \defgroup GroupClock Clock HAL
  *
- * \details A Hardware Abstraction Library for configuring clock devices.
+ * \details A Hardware Abstraction Layer for configuring clock devices.
  *
  * @{
  */
@@ -104,6 +104,11 @@ struct clock_state_change_pending_resp_params {
 enum mod_clock_api_type {
     /*! Clock HAL */
     MOD_CLOCK_API_TYPE_HAL,
+
+    /*! Clock driver response */
+    MOD_CLOCK_API_TYPE_DRIVER_RESPONSE,
+
+    /*! Number of defined APIs */
     MOD_CLOCK_API_COUNT,
 };
 
@@ -248,6 +253,8 @@ struct mod_clock_drv_api {
      * \param round_mode The type of rounding to perform, if required, to
      *      achieve the given rate.
      *
+     * \retval FWK_PENDING The request is pending. The driver will provide the
+     *      requested value later through the driver response API.
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
@@ -259,8 +266,10 @@ struct mod_clock_drv_api {
      *
      * \param clock_id Clock device identifier.
      *
-     * \param [out] rate The current clock rate in Hertz.
+     * \param[out] rate The current clock rate in Hertz.
      *
+     * \retval FWK_PENDING The request is pending. The driver will provide the
+     *      requested value later through the driver response API.
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
@@ -288,6 +297,8 @@ struct mod_clock_drv_api {
      *
      * \param state One of the valid clock states.
      *
+     * \retval FWK_PENDING The request is pending. The driver will provide the
+     *      requested value later through the driver response API.
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
@@ -300,6 +311,8 @@ struct mod_clock_drv_api {
      *
      * \param[out] state The current clock state.
      *
+     * \retval FWK_PENDING The request is pending. The driver will provide the
+     *      requested value later through the driver response API.
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
@@ -386,6 +399,8 @@ struct mod_clock_api {
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The clock identifier was invalid.
+     * \retval FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
+     *      supported.
      * \return One of the standard framework error codes.
      */
     int (*set_rate)(fwk_id_t clock_id, uint64_t rate,
@@ -401,6 +416,8 @@ struct mod_clock_api {
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The clock identifier was invalid.
      * \retval FWK_E_PARAM The rate pointer was NULL.
+     * \retval FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
+     *      supported.
      * \return One of the standard framework error codes.
      */
     int (*get_rate)(fwk_id_t clock_id, uint64_t *rate);
@@ -431,6 +448,8 @@ struct mod_clock_api {
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The clock identifier was invalid.
+     * \retval FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
+     *      supported.
      * \return One of the standard framework error codes.
      */
     int (*set_state)(fwk_id_t clock_id, enum mod_clock_state state);
@@ -445,6 +464,8 @@ struct mod_clock_api {
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The clock identifier was invalid.
      * \retval FWK_E_PARAM The state pointer was NULL.
+     * \retval FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
+     *      supported.
      * \return One of the standard framework error codes.
      */
     int (*get_state)(fwk_id_t clock_id, enum mod_clock_state *state);
@@ -463,6 +484,71 @@ struct mod_clock_api {
      */
     int (*get_info)(fwk_id_t clock_id, struct mod_clock_info *info);
 };
+
+/*!
+ * \brief Container for the values returned upon request completion.
+ */
+union mod_clock_resp_values {
+    /*! The current clock rate in Hertz */
+    uint64_t rate;
+
+    /*! The current clock state */
+    enum mod_clock_state state;
+};
+
+/*!
+ * \brief Driver response parameters.
+ */
+struct mod_clock_driver_resp_params {
+    /*! Status of driver operation */
+    int status;
+
+    /*! Values returned */
+    union mod_clock_resp_values value;
+};
+
+/*!
+ * \brief Clock driver response API.
+ *
+ * \details API used by the driver when an asynchronous request is completed.
+ *
+ */
+struct mod_clock_driver_response_api {
+    /*!
+     * \brief Signal the completion of a driver request.
+     *
+     * \param dev_id Specific clock device identifier.
+     * \param resp_values Pointer to the values requested.
+     */
+    void (*request_complete)(fwk_id_t dev_id,
+                             struct mod_clock_driver_resp_params *resp_values);
+};
+
+/*!
+ * \brief Event response parameters.
+ */
+struct mod_clock_resp_params {
+    /*! Status of requested operation */
+    int status;
+
+    /*! Values returned */
+    union mod_clock_resp_values value;
+};
+
+/*!
+ * \brief Define the first exposed event handled by this module. Other internal
+ *      events take indices after this.
+ */
+#define MOD_CLOCK_EVENT_IDX_REQUEST     0
+
+ /*!
+ * \brief Request event identifier.
+ *
+ * \details This identifier is used by the clients that expect to receive a
+ *      response event from this module.
+ */
+static const fwk_id_t mod_clock_event_id_request =
+    FWK_ID_EVENT_INIT(FWK_MODULE_IDX_CLOCK, MOD_CLOCK_EVENT_IDX_REQUEST);
 
 /*!
  * @}

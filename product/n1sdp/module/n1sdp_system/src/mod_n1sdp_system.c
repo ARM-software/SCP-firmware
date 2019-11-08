@@ -20,6 +20,8 @@
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <mod_clock.h>
+#include <mod_cmn600.h>
+#include <mod_n1sdp_c2c_i2c.h>
 #include <mod_n1sdp_dmc620.h>
 #include <mod_n1sdp_flash.h>
 #include <mod_n1sdp_system.h>
@@ -39,11 +41,17 @@
 #include <config_clock.h>
 
 /*
- * DDR memory information structure used by BL31
+ * Platform information structure used by BL31
  */
-struct n1sdp_ddr_mem_info {
-    /* DDR memory size in GigaBytes */
-    uint32_t ddr_size_gb;
+struct n1sdp_platform_info {
+    /* If multichip mode */
+    bool multichip_mode;
+    /* Total number of slave chips  */
+    uint8_t slave_count;
+    /* Local ddr size in GB */
+    uint8_t local_ddr_size;
+    /* Remote ddr size in GB */
+    uint8_t remote_ddr_size;
 };
 
 /*
@@ -56,6 +64,16 @@ struct n1sdp_bl33_info {
     uint32_t bl33_dst_addr;
     /* BL33 image size */
     uint32_t bl33_size;
+};
+
+/* MultiChip information */
+struct n1sdp_multichip_info {
+    /* If multichip mode */
+    bool mode;
+    /* Total number of slave chips  */
+    uint8_t slave_count;
+    /* Remote ddr size in GB */
+    uint8_t remote_ddr_size;
 };
 
 /* Coresight counter register definitions */
@@ -83,9 +101,9 @@ static fwk_id_t sds_feature_availability_id =
                             SDS_ELEMENT_IDX_FEATURE_AVAILABILITY);
 
 /* SDS DDR memory information */
-static struct n1sdp_ddr_mem_info sds_ddr_mem_info;
-static fwk_id_t sds_ddr_mem_info_id =
-    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, SDS_ELEMENT_IDX_DDR_MEM_INFO);
+static struct n1sdp_platform_info sds_platform_info;
+static fwk_id_t sds_platform_info_id =
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, SDS_ELEMENT_IDX_PLATFORM_INFO);
 
 /* SDS BL33 image information */
 static struct n1sdp_bl33_info sds_bl33_info;
@@ -112,6 +130,9 @@ struct n1sdp_system_ctx {
 
     /* Pointer to SDS */
     const struct mod_sds_api *sds_api;
+
+    /* Pointer to N1SDP C2C slave information API */
+    const struct n1sdp_c2c_slave_info_api *c2c_api;
 };
 
 struct n1sdp_system_isr {
@@ -185,6 +206,23 @@ static int n1sdp_system_shutdown(
 static const struct mod_system_power_driver_api
     n1sdp_system_power_driver_api = {
     .system_shutdown = n1sdp_system_shutdown,
+};
+
+/*
+ * Chip information API
+ */
+static int n1sdp_get_chipinfo(uint8_t *chip_id, bool *mc_mode)
+{
+    fwk_assert((chip_id != NULL) && (mc_mode != NULL));
+
+    *chip_id = n1sdp_get_chipid();
+    *mc_mode = n1sdp_is_multichip_enabled();
+
+    return FWK_SUCCESS;
+}
+
+static const struct mod_cmn600_chipinfo_api n1sdp_chipinfo_api = {
+    .get_chipinfo = n1sdp_get_chipinfo,
 };
 
 /*
@@ -272,26 +310,47 @@ void csys_pwrupreq_handler(void)
 /*
  * Function to fill platform information structure.
  */
-static int n1sdp_system_fill_mem_info(void)
+static int n1sdp_system_fill_platform_info(void)
 {
     int status;
     uint32_t ddr_size_gb;
-    const struct mod_sds_structure_desc *sds_structure_desc =
-        fwk_module_get_data(sds_ddr_mem_info_id);
 
-    ddr_size_gb = 0;
+    const struct mod_sds_structure_desc *sds_structure_desc =
+        fwk_module_get_data(sds_platform_info_id);
+
+    sds_platform_info.slave_count = 0;
+    sds_platform_info.remote_ddr_size = 0;
+
     status = n1sdp_system_ctx.dmc620_api->get_mem_size_gb(&ddr_size_gb);
     if (status != FWK_SUCCESS) {
         n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-            "Error calculating DDR memory size!\n");
+            "Error calculating local DDR memory size!\n");
         return status;
     }
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-        "    Total DDR Size: %d GB\n", ddr_size_gb);
 
-    sds_ddr_mem_info.ddr_size_gb = ddr_size_gb;
+    sds_platform_info.local_ddr_size = ddr_size_gb;
+
+    /* Get remote chip's information */
+    sds_platform_info.multichip_mode = n1sdp_system_ctx.c2c_api->
+                                          is_slave_alive();
+
+    if (sds_platform_info.multichip_mode) {
+        sds_platform_info.slave_count = 1;
+        status = n1sdp_system_ctx.c2c_api->get_ddr_size_gb
+                                           (&sds_platform_info.remote_ddr_size);
+        if (status != FWK_SUCCESS) {
+            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                "Error calculating Remote DDR memory size!\n");
+            return status;
+        }
+    }
+
+    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        "    Total DDR Size: %d GB\n",
+        sds_platform_info.local_ddr_size + sds_platform_info.remote_ddr_size);
+
     return n1sdp_system_ctx.sds_api->struct_write(sds_structure_desc->id,
-        0, (void *)(&sds_ddr_mem_info), sds_structure_desc->size);
+        0, (void *)(&sds_platform_info), sds_structure_desc->size);
 }
 
 static int n1sdp_system_fill_bl33_info(void)
@@ -322,64 +381,6 @@ static int n1sdp_system_init_primary_core(void)
     int fip_index_bl31 = -1;
 
     n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-        "[N1SDP SYSTEM] Looking for AP firmware in flash memory...\n");
-
-    status = n1sdp_system_ctx.flash_api->get_n1sdp_fip_descriptor_count(
-        FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SYSTEM), &fip_count);
-    if (status != FWK_SUCCESS)
-        return status;
-
-    status = n1sdp_system_ctx.flash_api->get_n1sdp_fip_descriptor_table(
-        FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SYSTEM), &fip_desc_table);
-    if (status != FWK_SUCCESS)
-        return status;
-
-    for (i = 0; i < fip_count; i++) {
-        if (fip_desc_table[i].type == MOD_N1SDP_FIP_TYPE_TF_BL31) {
-            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                "[N1SDP SYSTEM] Found BL31 at address: 0x%08x,"
-                " size: %u, flags: 0x%x\n",
-                fip_desc_table[i].address, fip_desc_table[i].size,
-                fip_desc_table[i].flags);
-            fip_index_bl31 = i;
-            break;
-        }
-    }
-
-    if (fip_index_bl31 < 0) {
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-            "[N1SDP SYSTEM] Error! "
-            "FIP does not have BL31 binary\n");
-        return FWK_E_PANIC;
-    }
-
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-        "[N1SDP SYSTEM] Copying AP BL31 to address 0x%x...\n",
-        AP_CORE_RESET_ADDR);
-
-    status = n1sdp_system_copy_to_ap_sram(AP_CORE_RESET_ADDR,
-                 fip_desc_table[fip_index_bl31].address,
-                 fip_desc_table[fip_index_bl31].size);
-    if (status != FWK_SUCCESS)
-        return FWK_E_PANIC;
-
-    /* Fill memory information structure */
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-        "[N1SDP SYSTEM] Collecting memory information...\n");
-    status = n1sdp_system_fill_mem_info();
-    if (status != FWK_SUCCESS)
-        return status;
-
-    /* Fill BL33 image information structure */
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-        "[N1SDP SYSTEM] Collecting memory information...\n");
-    status = n1sdp_system_fill_bl33_info();
-    if (status != FWK_SUCCESS)
-        return status;
-
-    mod_pd_restricted_api = n1sdp_system_ctx.mod_pd_restricted_api;
-
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
         "[N1SDP SYSTEM] Setting AP Reset Address to 0x%08x\n",
         AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET);
 
@@ -396,17 +397,77 @@ static int n1sdp_system_init_primary_core(void)
         }
     }
 
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
-        "[N1SDP SYSTEM] Booting primary core at %d MHz...\n",
-        PIK_CLK_RATE_CLUS0_CPU / FWK_MHZ);
+    if (n1sdp_get_chipid() == 0x0) {
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[N1SDP SYSTEM] Looking for AP firmware in flash memory...\n");
 
-    status = mod_pd_restricted_api->set_composite_state_async(
-        FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
-        false,
-        MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
-            MOD_PD_STATE_ON, MOD_PD_STATE_ON));
-    if (status != FWK_SUCCESS)
-        return status;
+        status = n1sdp_system_ctx.flash_api->get_n1sdp_fip_descriptor_count(
+            FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SYSTEM), &fip_count);
+        if (status != FWK_SUCCESS)
+            return status;
+
+        status = n1sdp_system_ctx.flash_api->get_n1sdp_fip_descriptor_table(
+            FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SYSTEM), &fip_desc_table);
+        if (status != FWK_SUCCESS)
+            return status;
+
+        for (i = 0; i < fip_count; i++) {
+            if (fip_desc_table[i].type == MOD_N1SDP_FIP_TYPE_TF_BL31) {
+                n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                    "[N1SDP SYSTEM] Found BL31 at address: 0x%08x,"
+                    " size: %u, flags: 0x%x\n",
+                    fip_desc_table[i].address, fip_desc_table[i].size,
+                    fip_desc_table[i].flags);
+                fip_index_bl31 = i;
+                break;
+            }
+        }
+
+        if (fip_index_bl31 < 0) {
+            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                "[N1SDP SYSTEM] Error! "
+                "FIP does not have BL31 binary\n");
+            return FWK_E_PANIC;
+        }
+
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[N1SDP SYSTEM] Copying AP BL31 to address 0x%x...\n",
+            AP_CORE_RESET_ADDR);
+
+        status = n1sdp_system_copy_to_ap_sram(AP_CORE_RESET_ADDR,
+                     fip_desc_table[fip_index_bl31].address,
+                     fip_desc_table[fip_index_bl31].size);
+        if (status != FWK_SUCCESS)
+            return FWK_E_PANIC;
+
+        /* Fill BL33 image information structure */
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[N1SDP SYSTEM] Filling BL33 information...\n");
+        status = n1sdp_system_fill_bl33_info();
+        if (status != FWK_SUCCESS)
+            return status;
+
+        /* Fill Platform information structure */
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[N1SDP SYSTEM] Collecting Platform information...\n");
+        status = n1sdp_system_fill_platform_info();
+        if (status != FWK_SUCCESS)
+            return status;
+
+        mod_pd_restricted_api = n1sdp_system_ctx.mod_pd_restricted_api;
+
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+            "[N1SDP SYSTEM] Booting primary core at %d MHz...\n",
+            PIK_CLK_RATE_CLUS0_CPU / FWK_MHZ);
+
+        status = mod_pd_restricted_api->set_composite_state_async(
+            FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
+            false,
+            MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
+                MOD_PD_STATE_ON, MOD_PD_STATE_ON));
+        if (status != FWK_SUCCESS)
+            return status;
+    }
 
     return FWK_SUCCESS;
 }
@@ -481,6 +542,12 @@ static int n1sdp_system_bind(fwk_id_t id, unsigned int round)
     if (status != FWK_SUCCESS)
         return status;
 
+    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_C2C),
+        FWK_ID_API(FWK_MODULE_IDX_N1SDP_C2C, N1SDP_C2C_API_IDX_SLAVE_INFO),
+        &n1sdp_system_ctx.c2c_api);
+    if (status != FWK_SUCCESS)
+        return status;
+
     return fwk_module_bind(fwk_module_id_sds,
         FWK_ID_API(FWK_MODULE_IDX_SDS, 0),
         &n1sdp_system_ctx.sds_api);
@@ -495,6 +562,9 @@ static int n1sdp_system_process_bind_request(fwk_id_t requester_id,
         break;
     case MOD_N1SDP_SYSTEM_API_IDX_AP_MEMORY_ACCESS:
         *api = &n1sdp_system_ap_memory_access_api;
+        break;
+    case MOD_N1SDP_SYSTEM_API_IDX_CHIPINFO:
+        *api = &n1sdp_chipinfo_api;
         break;
     default:
         return FWK_E_PARAM;

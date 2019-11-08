@@ -10,38 +10,52 @@
 #include <fwk_module_idx.h>
 #include <mod_mock_psu.h>
 #include <mod_psu.h>
+#include <config_mock_psu.h>
+#include <config_psu.h>
 
 static const struct fwk_element element_table[] = {
-    {
+    [CONFIG_PSU_ELEMENT_IDX_CPU_GROUP_LITTLE] = {
         .name = "CPU_GROUP_LITTLE",
         .data = &(const struct mod_psu_element_cfg) {
-            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MOCK_PSU, 0),
-            .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MOCK_PSU,
-                                             MOD_MOCK_PSU_API_IDX_DRIVER)
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_MOCK_PSU,
+                CONFIG_MOCK_PSU_ELEMENT_IDX_CPU_GROUP_LITTLE),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_MOCK_PSU,
+                MOD_MOCK_PSU_API_IDX_DRIVER),
         },
     },
-    {
+    [CONFIG_PSU_ELEMENT_IDX_CPU_GROUP_BIG] = {
         .name = "CPU_GROUP_BIG",
         .data = &(const struct mod_psu_element_cfg) {
-            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MOCK_PSU, 1),
-            .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MOCK_PSU,
-                                             MOD_MOCK_PSU_API_IDX_DRIVER)
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_MOCK_PSU,
+                CONFIG_MOCK_PSU_ELEMENT_IDX_CPU_GROUP_BIG),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_MOCK_PSU,
+                MOD_MOCK_PSU_API_IDX_DRIVER),
         },
     },
-    {
+    [CONFIG_PSU_ELEMENT_IDX_GPU] = {
         .name = "GPU",
         .data = &(const struct mod_psu_element_cfg) {
-            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MOCK_PSU, 2),
-            .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MOCK_PSU,
-                                             MOD_MOCK_PSU_API_IDX_DRIVER)
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_MOCK_PSU,
+                CONFIG_MOCK_PSU_ELEMENT_IDX_GPU),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_MOCK_PSU,
+                MOD_MOCK_PSU_API_IDX_DRIVER),
         },
     },
-    {
+    [CONFIG_PSU_ELEMENT_IDX_VPU] = {
         .name = "VPU",
         .data = &(const struct mod_psu_element_cfg) {
-            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MOCK_PSU, 3),
-            .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MOCK_PSU,
-                                             MOD_MOCK_PSU_API_IDX_DRIVER)
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_MOCK_PSU,
+                CONFIG_MOCK_PSU_ELEMENT_IDX_VPU),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_MOCK_PSU,
+                MOD_MOCK_PSU_API_IDX_DRIVER),
         },
     },
     { 0 }

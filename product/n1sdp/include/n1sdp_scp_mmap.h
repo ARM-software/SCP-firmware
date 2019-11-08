@@ -34,6 +34,11 @@
 #define SCP_WDOG_BASE                (SCP_PERIPHERAL_BASE + 0x6000)
 
 /*
+ * Timer Synchronization Module base
+ */
+#define SCP_TIMER_SYNC_BASE          UINT32_C(0x47000000)
+
+/*
  * CoreSight control base
  */
 #define SCP_CS_CNTCONTROL_BASE       (SCP_PERIPHERAL_BASE + 0xA000)
@@ -42,7 +47,8 @@
  * Peripherals - Serial communication
  */
 #define SCP_UART_BASE                (SCP_PERIPHERAL_BASE + 0x2000)
-#define SCP_I2C0_BASE                (0xBC040000)
+#define DIMM_SPD_I2C_BASE            (0xBC040000)
+#define SCP_I2C0_BASE                (0x3FFFA000)
 #define SCP_I2C1_BASE                (0x3FFFB000)
 #define SCP_I2C2_BASE                (0x3FFFC000)
 
@@ -117,6 +123,7 @@
 #define SCP_AP_1MB_WINDOW_BASE       (SCP_SYS1_BASE + SCP_AP_1MB_WINDOW_OFFSET)
 #define SCP_AP_1MB_WINDOW_SIZE       0x100000
 #define SCP_AP_1MB_WINDOW_ADDR_MASK  0xFFFFF
+#define SCP_AP_1MB_WINDOW_SHIFT      20
 
 /*
  * GIC600 Registers

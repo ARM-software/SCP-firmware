@@ -11,6 +11,7 @@
 #ifndef FWK_INTERRUPT_H
 #define FWK_INTERRUPT_H
 
+#include <fwk_arch.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <limits.h>
@@ -55,6 +56,16 @@
  *      Please refer to the individual function documentation for more details.
  */
 #define FWK_INTERRUPT_EXCEPTION (UINT_MAX - 2)
+
+/*!
+ * \brief Register interrupt driver in the framework.
+ *
+ * \param driver Interrupt driver instance to register
+ *
+ * \retval FWK_SUCCESS Operation succeeded.
+ * \retval FWK_E_PARAM One or more parameters were invalid.
+ */
+int fwk_interrupt_init(const struct fwk_arch_interrupt_driver *driver);
 
 /*!
  * \brief Enable interrupts.

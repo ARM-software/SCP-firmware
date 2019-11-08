@@ -9,6 +9,7 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <mod_cmn600.h>
+#include <mod_n1sdp_system.h>
 #include <n1sdp_scp_mmap.h>
 #include <config_clock.h>
 
@@ -34,10 +35,10 @@ static const struct mod_cmn600_memory_region_map mmap[] = {
     {
         /*
          * System cache backed region
-         * Map: 0x0000_0000_0000 - 0x03FF_FFFF_FFFF (4 TB)
+         * Map: 0x0000_0000_0000 - 0x07FF_FFFF_FFFF (8 TB)
          */
         .base = UINT64_C(0x000000000000),
-        .size = UINT64_C(4) * FWK_TIB,
+        .size = UINT64_C(8) * FWK_TIB,
         .type = MOD_CMN600_MEMORY_REGION_TYPE_SYSCACHE,
     },
     {
@@ -175,7 +176,11 @@ const struct fwk_module_config config_cmn600 = {
         .cxgla_node_id = NODE_ID_CXGLA,
         .mmap_table = mmap,
         .mmap_count = FWK_ARRAY_SIZE(mmap),
+        .chip_addr_space = UINT64_C(4) * FWK_TIB,
         .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
             CLOCK_IDX_INTERCONNECT),
+        .chipinfo_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_SYSTEM,
+            MOD_N1SDP_SYSTEM_API_IDX_CHIPINFO),
+        .chipinfo_mod_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_N1SDP_SYSTEM),
     }),
 };

@@ -76,6 +76,9 @@
 #define PCIE_CLASS_CODE_OFFSET         0x8
 #define PCIE_LINK_CTRL_STATUS_OFFSET   0xD0
 #define PCIE_LINK_CTRL_STATUS_2_OFFSET 0xF0
+#define PCIE_DEV_CTRL_STATUS_OFFSET    0xC8
+#define PCIE_VC_RESOURCE_CTRL_0_OFFSET 0x4D4
+#define PCIE_VC_RESOURCE_CTRL_1_OFFSET 0x4E0
 
 /* PCIe configuration space link control status register definitions */
 #define PCIE_LINK_CTRL_LINK_RETRAIN_MASK    0x20
@@ -87,6 +90,13 @@
 /* PCIe configuration space link control status register 2 definitions */
 #define PCIE_LINK_CTRL_2_TARGET_SPEED_MASK  0xF
 #define PCIE_LINK_CTRL_2_TARGET_SPEED_GEN4  0x4
+
+/* PCIe device control & status register definitions */
+#define PCIE_DEV_CTRL_MAX_PAYLOAD_SHIFT 5
+
+/* PCIe virtual channel register definitions */
+#define PCIE_VC_CTRL_VCEN_MASK         (1U << 31)
+#define PCIE_VC_VCID_SHIFT             24
 
 /* PCIe class code for PCI bridge */
 #define PCIE_CLASS_CODE_PCI_BRIDGE     UINT32_C(0x06040000)
@@ -177,7 +187,7 @@
 
 /* AXI inbound region data */
 #define AXI_IB_REGION_BASE             UINT64_C(0)
-#define AXI_IB_REGION_SIZE_MSB         42
+#define AXI_IB_REGION_SIZE_MSB         48
 
 /*
  * PCIe Descriptor Register definitions
@@ -522,9 +532,8 @@ int pcie_link_retrain(struct pcie_ctrl_apb_reg *ctrl_apb,
  * Brief - Function to initialize PCIe PHY layer.
  *
  * param - pcie_phy_base - Base address of the PHY layer registers
- * param - gen - PCIe Generation
  */
-void pcie_phy_init(uint32_t phy_apb_base, enum pcie_gen gen);
+void pcie_phy_init(uint32_t phy_apb_base);
 
 /*
  * Brief - Function to write to Root Port's/End Point's configuration space.
@@ -582,5 +591,17 @@ int pcie_set_gen_tx_preset(uint32_t rp_ep_config_apb_base,
  *                          linked list
  */
 int pcie_skip_ext_cap(uint32_t base, uint16_t ext_cap_id);
+
+/*
+ * Brief - Function to setup PCIe virtual channels and map to
+ *         specified traffic class.
+ *
+ * param - base - Base address of RP/EP's configuration memory
+ * param - vc1_tc - Traffic class value for virtual channel 1
+ *
+ * retval - FWK_SUCCESS - if the operation is succeeded
+ *          FWK_E_PARAM - if the passed parameters are inconsistent
+ */
+int pcie_vc_setup(uint32_t base, uint8_t vc1_tc);
 
 #endif /* N1SDP_PCIE_H */

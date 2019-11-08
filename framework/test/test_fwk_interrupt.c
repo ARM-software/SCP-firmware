@@ -12,11 +12,9 @@
 #include <fwk_macros.h>
 #include <fwk_status.h>
 #include <fwk_test.h>
+#include <internal/fwk_interrupt.h>
 
 #define INTERRUPT_ID 42
-
-extern int fwk_interrupt_init(const struct fwk_arch_interrupt_driver *_driver);
-extern int fwk_interrupt_set_isr_fault(void (*isr)(void));
 
 /*
  * Variables for the mock functions

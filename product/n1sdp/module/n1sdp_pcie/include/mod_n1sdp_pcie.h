@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <fwk_id.h>
 
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules
@@ -67,11 +68,84 @@ struct n1sdp_pcie_dev_config {
  * \brief Module API indices
  */
 enum n1sdp_pcie_api_idx {
+    /*! Index of the PCIe initialization API */
+    N1SDP_PCIE_API_IDX_PCIE_INIT,
+
     /*! Index of the CCIX config API */
     N1SDP_PCIE_API_IDX_CCIX_CONFIG,
 
     /*! Number of APIs */
     N1SDP_PCIE_API_COUNT
+};
+
+/*!
+ * \brief N1SDP PCIe initialization api
+ */
+struct n1sdp_pcie_init_api {
+   /*!
+    * \brief API to power ON the PCIe controller
+    *
+    * \param id Identifier of the PCIe instance
+    *
+    * \retval FWK_SUCCESS The operation succeeded.
+    * \return One of the standard error codes.
+    */
+   int (*power_on)(fwk_id_t id);
+
+   /*!
+    * \brief API to initialize the PHY layer
+    *
+    * \param id Identifier of the PCIe instance
+    *
+    * \retval FWK_SUCCESS The operation succeeded.
+    * \return One of the standard error codes.
+    */
+   int (*phy_init)(fwk_id_t id);
+
+   /*!
+    * \brief API to initialize the PCIe controller
+    *
+    * \param id Identifier of the PCIe instance
+    * \param ep_mode Identifier to configure the controller
+    * in root port or endpoint mode
+    *
+    * \retval FWK_SUCCESS The operation succeeded.
+    * \return One of the standard error codes.
+    */
+   int (*controller_init)(fwk_id_t id, bool ep_mode);
+
+   /*!
+    * \brief API to perform the link training process
+    *
+    * \param id Identifier of the PCIe instance
+    *
+    * \retval FWK_SUCCESS The operation succeeded.
+    * \return One of the standard error codes.
+    */
+   int (*link_training)(fwk_id_t id, bool ep_mode);
+
+   /*!
+    * \brief API to setup the root complex
+    *
+    * \param id Identifier of the PCIe instance
+    *
+    * \retval FWK_SUCCESS The operation succeeded.
+    * \return One of the standard error codes.
+    */
+   int (*rc_setup)(fwk_id_t id);
+
+   /*!
+    * \brief API to enable Virtual Channel 1 and map to
+    * specified Traffic class. This API is used in multichip mode.
+    *
+    * \param id Identifier of the PCIe instance
+    * \param vc1_tc Traffic class to be mapped to VC1
+    *
+    * \retval FWK_SUCCESS The operation succeeded.
+    * \return One of the standard error codes.
+    */
+   int (*vc1_setup)(fwk_id_t id, uint8_t vc1_tc);
+
 };
 
 /*!
@@ -91,7 +165,6 @@ struct n1sdp_pcie_ccix_config_api {
    int (*enable_opt_tlp)(bool enable);
 
 };
-
 
 /*!
  * \}

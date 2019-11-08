@@ -28,7 +28,7 @@ static struct ddr4_spd ddr4_dimm1;
  * Internal APIs used by SPD functions
  */
 
-static int spd_read(struct mod_n1sdp_i2c_master_api *i2c_api,
+static int spd_read(struct mod_n1sdp_i2c_master_api_polled *i2c_api,
     int address, uint8_t *spd_data)
 {
     char data[2] = {0};
@@ -430,7 +430,7 @@ static uint32_t cal_dly_wth_rounding(int32_t spd_val, int32_t spd_val_fine)
 /*
  * APIs invoked by DMC-620 core functions
  */
-int dimm_spd_init_check(struct mod_n1sdp_i2c_master_api *i2c_api,
+int dimm_spd_init_check(struct mod_n1sdp_i2c_master_api_polled *i2c_api,
                          struct dimm_info *ddr)
 {
     int status;

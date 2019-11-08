@@ -294,7 +294,7 @@ static const unsigned int mod_pd_cs_level_state_shift[MOD_PD_LEVEL_COUNT] = {
  * Internal variables
  */
 static struct mod_pd_ctx mod_pd_ctx;
-static const char driver_error_msg[] = "[PD] Driver error %e in %s @%d\n";
+static const char driver_error_msg[] = "[PD] Driver error %s (%d) in %s @%d\n";
 
 static const unsigned int tree_pos_level_shift[MOD_PD_LEVEL_COUNT] = {
     MOD_PD_TREE_POS_LEVEL_0_SHIFT,
@@ -711,9 +711,9 @@ static int initiate_power_state_transition(struct pd_ctx *pd)
     status = pd->driver_api->set_state(pd->driver_id, state);
 
     mod_pd_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
-        "[PD] %s: %s->%s, %e\n", fwk_module_get_name(pd->id),
+        "[PD] %s: %s->%s, %s (%d)\n", fwk_module_get_name(pd->id),
         get_state_name(pd, pd->state_requested_to_driver),
-        get_state_name(pd, state), status);
+        get_state_name(pd, state), fwk_status_str(status), status);
 
     pd->state_requested_to_driver = state;
 
@@ -1208,8 +1208,8 @@ static void process_system_shutdown_request(
 
         if (status != FWK_SUCCESS)
             mod_pd_ctx.log_api->log(MOD_LOG_GROUP_ERROR,
-                "[PD] Shutdown of %s returned %e\n",
-                fwk_module_get_name(pd_id), status);
+                "[PD] Shutdown of %s returned %s (%d)\n",
+                fwk_module_get_name(pd_id), fwk_status_str(status), status);
         else
             mod_pd_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
                 "[PD] %s shutdown\n", fwk_module_get_name(pd_id));
@@ -1795,7 +1795,7 @@ static int pd_start(fwk_id_t id)
         status = pd->driver_api->get_state(pd->driver_id, &state);
         if (status != FWK_SUCCESS) {
             mod_pd_ctx.log_api->log(MOD_LOG_GROUP_ERROR, driver_error_msg,
-                status, __func__, __LINE__);
+                fwk_status_str(status), status, __func__, __LINE__);
         } else {
             pd->requested_state = pd->state_requested_to_driver = state;
 

@@ -16,9 +16,8 @@
 #include <n1sdp_pcie.h>
 #include <n1sdp_scp_pik.h>
 
-void pcie_phy_init(uint32_t phy_apb_base, enum pcie_gen gen)
+void pcie_phy_init(uint32_t phy_apb_base)
 {
-
     uint32_t j;
 
     *((unsigned int *)(0x30038 | phy_apb_base)) = 0x00000013;
@@ -533,4 +532,25 @@ int pcie_skip_ext_cap(uint32_t base, uint16_t ext_cap_id)
     } while ((offset != 0));
 
     return FWK_E_SUPPORT;
+}
+
+int pcie_vc_setup(uint32_t base, uint8_t vc1_tc)
+{
+    /* VC1 Traffic class cannot be greater than 7 or equal to 0 */
+    if ((vc1_tc > 7) || (vc1_tc == 0))
+        return FWK_E_PARAM;
+
+    /* Map all other TCs to VC0 */
+    *(volatile uint32_t *)(base + PCIE_VC_RESOURCE_CTRL_0_OFFSET) =
+        PCIE_VC_CTRL_VCEN_MASK |
+        (0 << PCIE_VC_VCID_SHIFT) |
+        (~(1 << vc1_tc) & 0xFF);
+
+    /* Enable VC1 & map VC1 to TC7 */
+    *(volatile uint32_t *)(base + PCIE_VC_RESOURCE_CTRL_1_OFFSET) =
+        PCIE_VC_CTRL_VCEN_MASK |
+        (1 << PCIE_VC_VCID_SHIFT) |
+        ((1 << vc1_tc) & 0xFF);
+
+    return FWK_SUCCESS;
 }

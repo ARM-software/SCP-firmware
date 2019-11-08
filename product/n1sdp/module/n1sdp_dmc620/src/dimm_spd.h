@@ -360,7 +360,7 @@ struct ddr4_spd {
  * retval - FWK_SUCCESS - if the operation is succeeded
  *          FWK_E_DATA - if the SPD data is wrong
  */
-int dimm_spd_init_check(struct mod_n1sdp_i2c_master_api *i2c_api,
+int dimm_spd_init_check(struct mod_n1sdp_i2c_master_api_polled *i2c_api,
                          struct dimm_info *ddr);
 
 /*

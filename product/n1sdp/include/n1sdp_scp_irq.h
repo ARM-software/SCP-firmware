@@ -47,7 +47,7 @@ enum scp_n1sdp_interrupt {
     RESERVED31_IRQ                  = 31, /* Reserved */
     RESERVED32_IRQ                  = 32, /* Reserved */
     TIMREFCLK_IRQ                   = 33, /* REFCLK Physical Timer */
-    RESERVED34_IRQ                  = 34, /* Reserved */
+    TIMER_SYNC_IRQ                  = 34, /* Timer Synchronization Module */
     RESERVED35_IRQ                  = 35, /* Reserved */
     RESERVED36_IRQ                  = 36, /* Reserved */
     CTI_TRIGGER0_IRQ                = 37, /* SCP CTI0 Trigger */
