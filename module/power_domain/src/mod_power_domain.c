@@ -1865,9 +1865,10 @@ static int pd_process_event(const struct fwk_event *event,
     if (fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT))
         pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(event->target_id)];
 
+    fwk_assert(pd != NULL);
+
     switch (fwk_id_get_event_idx(event->id)) {
     case PD_EVENT_IDX_SET_STATE:
-        assert(pd != NULL);
 
         process_set_state_request(pd,
             (struct pd_set_state_request *)event->params, resp);
@@ -1875,7 +1876,6 @@ static int pd_process_event(const struct fwk_event *event,
         return FWK_SUCCESS;
 
     case PD_EVENT_IDX_GET_STATE:
-        assert(pd != NULL);
 
         process_get_state_request(pd,
             (struct pd_get_state_request *)event->params,
@@ -1884,14 +1884,12 @@ static int pd_process_event(const struct fwk_event *event,
         return FWK_SUCCESS;
 
     case PD_EVENT_IDX_RESET:
-        assert(pd != NULL);
 
         process_reset_request(pd, (struct pd_response *)resp->params);
 
         return FWK_SUCCESS;
 
     case PD_EVENT_IDX_REPORT_POWER_STATE_TRANSITION:
-        assert(pd != NULL);
 
         process_power_state_transition_report(pd,
             (struct pd_power_state_transition_report *)event->params);
