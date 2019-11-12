@@ -119,7 +119,7 @@ static int remote_pd_reset(fwk_id_t pd_id)
     if (status == FWK_SUCCESS)
         status = remote_pd_set_state(pd_id, MOD_PD_STATE_ON);
 
-    return FWK_SUCCESS;
+    return status;
 }
 
 static int remote_pd_prepare_for_system_suspend(fwk_id_t pd_id)
