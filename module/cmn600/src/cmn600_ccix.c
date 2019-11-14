@@ -402,6 +402,7 @@ int ccix_setup(struct cmn600_ctx *ctx, void *remote_config)
     uint8_t agent_id;
     uint8_t remote_agent_id;
     uint8_t offset_id;
+    unsigned int block;
     uint8_t local_ra_cnt;
     uint8_t unique_remote_rnf_ldid_value;
     int status;
@@ -425,10 +426,7 @@ int ccix_setup(struct cmn600_ctx *ctx, void *remote_config)
     /* Set initial RAID value to 0. */
     ctx->raid_value = 0;
 
-    if (ctx->chip_id == 0)
-        offset_id = 0;
-    else
-        offset_id = local_ra_cnt;
+    offset_id = ctx->chip_id * local_ra_cnt;
 
     for (rnf_ldid = 0; rnf_ldid < ctx->rnf_count; rnf_ldid++) {
         agent_id = ctx->raid_value + offset_id;
@@ -456,13 +454,20 @@ int ccix_setup(struct cmn600_ctx *ctx, void *remote_config)
      */
     unique_remote_rnf_ldid_value = ctx->rnf_count;
 
-    if (ctx->chip_id == 0)
-        offset_id = local_ra_cnt;
-    else
-        offset_id = 0;
-
     for (i = 0; i < ccix_remote_config->remote_rnf_count; i++) {
-        remote_agent_id = i + offset_id;
+        block = i / ctx->rnf_count;
+
+        /*
+         * The remote_agent_id should not include the current chip's agent ids.
+         * If `block` is less than the current chip_id, then include the agent
+         * ids of chip 0 till (not including) current chip. If the block is
+         * equal or greater than the current chip, then include the agent id
+         * from next chip till the max chip.
+         */
+        if (block < ctx->chip_id)
+            remote_agent_id = i + (ctx->rnf_count * block);
+        else
+            remote_agent_id = i + (ctx->rnf_count * block) + local_ra_cnt;
 
         /* Program the CXHA raid to ldid LUT */
         program_cxg_ha_raid_to_ldid_lut(ctx, remote_agent_id,
@@ -478,10 +483,7 @@ int ccix_setup(struct cmn600_ctx *ctx, void *remote_config)
         unique_remote_rnf_ldid_value++;
     }
 
-    if (ctx->chip_id == 0)
-        offset_id = 0;
-    else
-        offset_id = local_ra_cnt;
+    offset_id = ctx->chip_id * local_ra_cnt;
 
     for (i = 0; i < ctx->rnd_count; i++) {
         rnd_ldid = ctx->rnd_ldid[i];
