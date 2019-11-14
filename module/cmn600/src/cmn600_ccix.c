@@ -404,6 +404,7 @@ int ccix_setup(struct cmn600_ctx *ctx, void *remote_config)
     uint8_t offset_id;
     uint8_t rnf_cnt;
     uint8_t local_ra_cnt;
+    uint8_t unique_remote_rnf_ldid_value;
     int status;
 
     struct mod_cmn600_ccix_remote_node_config * ccix_remote_config =
@@ -454,10 +455,10 @@ int ccix_setup(struct cmn600_ctx *ctx, void *remote_config)
     }
 
     /*
-     * Unique_ha_ldid_value is used to keep track of the
+     * unique_remote_rnf_ldid_value is used to keep track of the
      * ldid of the remote RNF agents
      */
-    ctx->unique_ha_ldid_value = rnf_cnt;
+    unique_remote_rnf_ldid_value = rnf_cnt;
 
     if (ctx->chip_id == 0)
         offset_id = local_ra_cnt;
@@ -469,15 +470,16 @@ int ccix_setup(struct cmn600_ctx *ctx, void *remote_config)
 
         /* Program the CXHA raid to ldid LUT */
         program_cxg_ha_raid_to_ldid_lut(ctx, remote_agent_id,
-            ctx->unique_ha_ldid_value);
+            unique_remote_rnf_ldid_value);
         /*
          * Program HN-F ldid to CHI node id for
          * remote RN-F agents
          */
-        program_hnf_ldid_to_chi_node_id_reg(ctx, ctx->unique_ha_ldid_value,
-            ctx->cxg_ha_node_id, REMOTE_CCIX_NODE);
+        program_hnf_ldid_to_chi_node_id_reg(ctx,
+            unique_remote_rnf_ldid_value, ctx->cxg_ha_node_id,
+            REMOTE_CCIX_NODE);
 
-        ctx->unique_ha_ldid_value++;
+        unique_remote_rnf_ldid_value++;
     }
 
     if (ctx->chip_id == 0)
