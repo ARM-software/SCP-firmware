@@ -1,4 +1,3 @@
-
 /*
  * Arm SCP/MCP Software
  * Copyright (c) 2019-2020, Arm Limited and Contributors. All rights reserved.
@@ -77,7 +76,6 @@ struct cmn600_ctx {
     unsigned int cxg_ha_node_id;
     unsigned int cxg_ha_id_remote;
     uint8_t raid_value;
-    uint8_t unique_ha_ldid_value;
     struct cmn600_cxg_ra_reg *cxg_ra_reg;
     struct cmn600_cxg_ha_reg *cxg_ha_reg;
     struct cmn600_cxla_reg *cxla_reg;
