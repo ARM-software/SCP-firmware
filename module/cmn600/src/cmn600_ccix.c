@@ -402,7 +402,6 @@ int ccix_setup(struct cmn600_ctx *ctx, void *remote_config)
     uint8_t agent_id;
     uint8_t remote_agent_id;
     uint8_t offset_id;
-    uint8_t rnf_cnt;
     uint8_t local_ra_cnt;
     uint8_t unique_remote_rnf_ldid_value;
     int status;
@@ -420,9 +419,6 @@ int ccix_setup(struct cmn600_ctx *ctx, void *remote_config)
     fwk_assert((ctx->external_rnsam_count > 1) &&
                 (ctx->external_rnsam_count <= (0xFF + 1)));
 
-    /* Number of local RN-F */
-    rnf_cnt = ctx->external_rnsam_count;
-
     /* Number of local RAs */
     local_ra_cnt = ctx->internal_rnsam_count + ctx->external_rnsam_count;
 
@@ -434,7 +430,7 @@ int ccix_setup(struct cmn600_ctx *ctx, void *remote_config)
     else
         offset_id = local_ra_cnt;
 
-    for (rnf_ldid = 0; rnf_ldid < rnf_cnt; rnf_ldid++) {
+    for (rnf_ldid = 0; rnf_ldid < ctx->rnf_count; rnf_ldid++) {
         agent_id = ctx->raid_value + offset_id;
 
         /* Program RAID values in CXRA LDID to RAID LUT */
@@ -458,7 +454,7 @@ int ccix_setup(struct cmn600_ctx *ctx, void *remote_config)
      * unique_remote_rnf_ldid_value is used to keep track of the
      * ldid of the remote RNF agents
      */
-    unique_remote_rnf_ldid_value = rnf_cnt;
+    unique_remote_rnf_ldid_value = ctx->rnf_count;
 
     if (ctx->chip_id == 0)
         offset_id = local_ra_cnt;

@@ -208,16 +208,33 @@ static int cmn600_discovery(void)
         }
     }
 
+    /*
+     * RN-F nodes does not have node type identifier and hence the count cannot
+     * be determined during the discovery process. RN-F count will be total
+     * RN-SAM count minus the total RN-D, RN-I and CXHA count combined.
+     */
+    ctx->rnf_count = ctx->internal_rnsam_count + ctx->external_rnsam_count -
+        (ctx->rnd_count + ctx->rni_count + ctx->ccix_host_info.host_ha_count++);
+
+    if (ctx->rnf_count > MAX_RNF_COUNT) {
+        ctx->log_api->log(MOD_LOG_GROUP_ERROR,
+                MOD_NAME "rnf count %d > max limit (%d)\n",
+                ctx->rnf_count, MAX_RNF_COUNT);
+        return FWK_E_RANGE;
+    }
+
     ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
         MOD_NAME "Total internal RN-SAM nodes: %d\n"
         MOD_NAME "Total external RN-SAM nodes: %d\n"
         MOD_NAME "Total HN-F nodes: %d\n"
         MOD_NAME "Total RN-D nodes: %d\n"
+        MOD_NAME "Total RN-F nodes: %d\n",
         MOD_NAME "Total RN-I nodes: %d\n",
         ctx->internal_rnsam_count,
         ctx->external_rnsam_count,
         ctx->hnf_count,
         ctx->rnd_count,
+        ctx->rnf_count,
         ctx->rni_count);
 
     if (ctx->cxla_reg) {
