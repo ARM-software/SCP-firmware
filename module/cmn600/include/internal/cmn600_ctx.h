@@ -28,6 +28,7 @@ struct external_rnsam_tuple {
 /* Max Node Counts */
 #define MAX_HNF_COUNT 32
 #define MAX_RND_COUNT 32
+#define MAX_RNF_COUNT 32
 #define MAX_RNI_COUNT 32
 
 struct cmn600_ctx {
@@ -62,6 +63,11 @@ struct cmn600_ctx {
      */
     unsigned int rnd_count;
     uint8_t rnd_ldid[MAX_RND_COUNT];
+
+    /*
+     * RN-F nodes. The driver keeps track of the total number of the RN-F nodes.
+     */
+    unsigned int rnf_count;
 
     /*
      * RN-I nodes. The driver keeps a list of RN-I pointers to
