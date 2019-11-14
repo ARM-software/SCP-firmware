@@ -26,9 +26,9 @@ struct external_rnsam_tuple {
 };
 
 /* Max Node Counts */
-#define MAX_HNF_COUNT 4
-#define MAX_RND_COUNT 8
-#define MAX_RNI_COUNT 8
+#define MAX_HNF_COUNT 32
+#define MAX_RND_COUNT 32
+#define MAX_RNI_COUNT 32
 
 struct cmn600_ctx {
     const struct mod_cmn600_config *config;
@@ -61,7 +61,7 @@ struct cmn600_ctx {
      * parameters are known
      */
     unsigned int rnd_count;
-    uint8_t rnd_ldid[8];
+    uint8_t rnd_ldid[MAX_RND_COUNT];
 
     /*
      * RN-I nodes. The driver keeps a list of RN-I pointers to
@@ -69,7 +69,7 @@ struct cmn600_ctx {
      * parameters are known
      */
     unsigned int rni_count;
-    uint8_t rni_ldid[8];
+    uint8_t rni_ldid[MAX_RNI_COUNT];
 
    /* CCIX specific registers */
     unsigned int cxg_ha_id;
