@@ -13,6 +13,8 @@
 
 #include <fwk_event.h>
 
+#include <stdint.h>
+
 /*!
  * \addtogroup GroupLibFramework Framework
  * @{
@@ -49,14 +51,16 @@
  *      \ref fwk_event.cookie field of \p event must match that of the event
  *      it is responding to.
  *
- * \param event Pointer to the event to queue. Must not be \c NULL.
+ * \param[in] event Pointer to the event to queue. Must not be \c NULL.
  *
- * \retval FWK_SUCCESS The event was queued.
- * \retval FWK_E_INIT The thread framework component is not initialized.
- * \retval FWK_E_PARAM One or more parameters were invalid.
- * \retval FWK_E_PARAM One or more fields in the \p event parameter were
+ * \retval ::FWK_SUCCESS The event was queued.
+ * \retval ::FWK_E_INIT The thread framework component is not initialized.
+ * \retval ::FWK_E_PARAM One or more parameters were invalid.
+ * \retval ::FWK_E_PARAM One or more fields in the \p event parameter were
  *      invalid.
- * \retval FWK_E_OS Operating system error.
+ * \retval ::FWK_E_OS Operating system error.
+ *
+ * \return Status code representing the result of the operation.
  */
 int fwk_thread_put_event(struct fwk_event *event);
 
@@ -70,14 +74,17 @@ int fwk_thread_put_event(struct fwk_event *event);
  *      event. The event is not removed from the module or element internal
  *      data.
  *
- * \param id Identifier of the module or element that delayed the response.
- * \param cookie Cookie of the event which the response has been delayed
+ * \param[in] id Identifier of the module or element that delayed the response.
+ * \param[in] cookie Cookie of the event which the response has been delayed
  *      for. The cookie identifies the response event among the response events
  *      the entity \p id may have delayed.
  * \param[out] event The copy of the response event.
  *
- * \retval FWK_E_SUPPORT Not supported.
- * \return One of the standard framework error codes.
+ * \retval ::FWK_SUCCESS The event was queued.
+ * \retval ::FWK_E_PARAM One or more parameters were invalid.
+ * \retval ::FWK_E_ACCESS Access violation due to call from interrupt handler.
+ *
+ * \return Status code representing the result of the operation.
  */
 int fwk_thread_get_delayed_response(fwk_id_t id, uint32_t cookie,
                                     struct fwk_event *event);

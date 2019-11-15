@@ -111,7 +111,7 @@ test_fwk_notification_WRAP := fwk_mm_calloc fwk_module_is_valid_entity_id \
 # Multi-thread tests
 TESTS += test_fwk_multi_thread_init
 test_fwk_multi_thread_init_SRC := test_fwk_multi_thread_init.c \
-    fwk_multi_thread.c fwk_test.c fwk_slist.c fwk_id.c
+    fwk_multi_thread.c fwk_test.c fwk_slist.c fwk_id.c fwk_thread_delayed_resp.c
 test_fwk_multi_thread_init_WRAP := fwk_mm_calloc fwk_interrupt_get_current \
     osThreadFlagsWait osThreadFlagsSet osThreadNew __fwk_module_get_ctx \
     fwk_interrupt_global_disable fwk_interrupt_global_enable \
@@ -123,7 +123,7 @@ test_fwk_multi_thread_init_WRAP := fwk_mm_calloc fwk_interrupt_get_current \
 
 TESTS += test_fwk_multi_thread_create
 test_fwk_multi_thread_create_SRC := test_fwk_multi_thread_create.c \
-    fwk_multi_thread.c fwk_test.c fwk_slist.c fwk_id.c
+    fwk_multi_thread.c fwk_test.c fwk_slist.c fwk_id.c fwk_thread_delayed_resp.c
 test_fwk_multi_thread_create_WRAP := fwk_mm_calloc fwk_interrupt_get_current \
     osThreadFlagsWait osThreadFlagsSet osThreadNew __fwk_module_get_ctx \
     fwk_interrupt_global_disable fwk_interrupt_global_enable \
@@ -135,7 +135,8 @@ test_fwk_multi_thread_create_WRAP := fwk_mm_calloc fwk_interrupt_get_current \
 
 TESTS += test_fwk_multi_thread_common_thread
 test_fwk_multi_thread_common_thread_SRC := fwk_multi_thread.c fwk_test.c \
-    test_fwk_multi_thread_common_thread.c fwk_slist.c fwk_id.c
+    test_fwk_multi_thread_common_thread.c fwk_slist.c fwk_id.c \
+    fwk_thread_delayed_resp.c
 test_fwk_multi_thread_common_thread_WRAP := fwk_mm_calloc \
     osThreadFlagsWait osThreadFlagsSet osThreadNew __fwk_module_get_ctx \
     fwk_interrupt_global_disable fwk_interrupt_global_enable \
@@ -147,7 +148,7 @@ test_fwk_multi_thread_common_thread_WRAP := fwk_mm_calloc \
 
 TESTS += test_fwk_multi_thread_put_event
 test_fwk_multi_thread_put_event_SRC := test_fwk_multi_thread_put_event.c \
-    fwk_multi_thread.c fwk_test.c fwk_slist.c fwk_id.c
+    fwk_multi_thread.c fwk_test.c fwk_slist.c fwk_id.c fwk_thread_delayed_resp.c
 test_fwk_multi_thread_put_event_WRAP := fwk_mm_calloc __fwk_module_get_state \
     fwk_interrupt_get_current osThreadFlagsWait osThreadFlagsSet osThreadNew \
     fwk_interrupt_global_disable fwk_interrupt_global_enable \
@@ -159,7 +160,7 @@ test_fwk_multi_thread_put_event_WRAP := fwk_mm_calloc __fwk_module_get_state \
 
 TESTS += test_fwk_multi_thread_util
 test_fwk_multi_thread_util_SRC := test_fwk_multi_thread_util.c \
-    fwk_multi_thread.c fwk_test.c fwk_slist.c fwk_id.c
+    fwk_multi_thread.c fwk_test.c fwk_slist.c fwk_id.c fwk_thread_delayed_resp.c
 test_fwk_multi_thread_util_WRAP := fwk_mm_calloc __fwk_module_get_state \
     fwk_interrupt_get_current osThreadFlagsWait osThreadFlagsSet osThreadNew \
     fwk_interrupt_global_disable fwk_interrupt_global_enable \
