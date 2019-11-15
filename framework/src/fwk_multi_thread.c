@@ -5,19 +5,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <rtx_os.h>
+
+#include <internal/fwk_module.h>
+#include <internal/fwk_multi_thread.h>
+#include <internal/fwk_notification.h>
+#include <internal/fwk_thread_delayed_resp.h>
+
+#include <fwk_assert.h>
+#include <fwk_element.h>
+#include <fwk_host.h>
+#include <fwk_interrupt.h>
+#include <fwk_mm.h>
+#include <fwk_status.h>
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-#include <fwk_assert.h>
-#include <fwk_host.h>
-#include <fwk_interrupt.h>
-#include <fwk_element.h>
-#include <fwk_mm.h>
-#include <fwk_status.h>
-#include <internal/fwk_module.h>
-#include <internal/fwk_notification.h>
-#include <internal/fwk_multi_thread.h>
-#include <rtx_os.h>
 
 #define SIGNAL_ISR_EVENT 0x01
 #define SIGNAL_EVENT_TO_PROCESS 0x02
@@ -139,57 +143,6 @@ static struct __fwk_thread_ctx *thread_get_ctx(fwk_id_t id)
 }
 
 /*
- * Get the list of delayed responses for a given module or element.
- *
- * \note The function assumes the validity of all its input parameters.
- *
- * \param id Identifier of the module or element.
- *
- * \return A pointer to the list of subscriptions.
- */
-static struct fwk_slist *get_delayed_response_list(fwk_id_t id)
-{
-    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
-        return &__fwk_module_get_ctx(id)->delayed_response_list;
-
-    return &__fwk_module_get_element_ctx(id)->delayed_response_list;
-}
-
-/*
- * Search delayed response.
- *
- * \note The function assumes the validity of all its input parameters.
- *
- * \param id Identifier of the module or element that delayed the response.
- * \param cookie Cookie of the event which the response has been delayed
- *      for. This cookie identifies the response among the several responses
- *      that the entity 'id' may have delayed.
- *
- * \return A pointer to the delayed response event, NULL if not found.
- */
-static struct fwk_event *search_delayed_response(fwk_id_t id, uint32_t cookie)
-{
-    struct fwk_slist *delayed_response_list;
-    struct fwk_slist_node *delayed_response_node;
-    struct fwk_event *delayed_response;
-
-    delayed_response_list = get_delayed_response_list(id);
-    delayed_response_node = fwk_list_head(delayed_response_list);
-
-    while (delayed_response_node != NULL) {
-        delayed_response = FWK_LIST_GET(delayed_response_node,
-                                        struct fwk_event, slist_node);
-        if (delayed_response->cookie == cookie)
-            return delayed_response;
-
-        delayed_response_node = fwk_list_next(delayed_response_list,
-            delayed_response_node);
-    }
-
-    return NULL;
-}
-
-/*
  * Put an event in the ISR event queue.
  *
  * This function is a sub-routine of the fwk_thread_put_event() interface
@@ -287,12 +240,13 @@ static int put_event(struct __fwk_thread_ctx *target_thread_ctx,
         target_thread_ctx, event);
 
     if (event->is_delayed_response) {
-        allocated_event = search_delayed_response(event->source_id,
-                                                  event->cookie);
+        allocated_event = __fwk_thread_search_delayed_response(
+            event->source_id, event->cookie);
         if (allocated_event == NULL)
             goto error;
 
-        fwk_list_remove(get_delayed_response_list(event->source_id),
+        fwk_list_remove(
+            __fwk_thread_get_delayed_response_list(event->source_id),
             &allocated_event->slist_node);
 
         memcpy(allocated_event->params, event->params,
@@ -368,8 +322,9 @@ static void process_event_requiring_response(struct fwk_event *event)
     else {
         allocated_event = duplicate_event(&resp_event);
         if (allocated_event != NULL) {
-            fwk_list_push_tail(get_delayed_response_list(resp_event.source_id),
-                               &allocated_event->slist_node);
+            fwk_list_push_tail(
+                __fwk_thread_get_delayed_response_list(resp_event.source_id),
+                &allocated_event->slist_node);
         }
     }
 }
@@ -910,42 +865,6 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
     /* Restore the context of the current thread and the current event */
     ctx.current_thread_ctx = calling_thread_ctx;
     ctx.current_event = processed_event;
-
-    return FWK_SUCCESS;
-
-error:
-    FWK_HOST_PRINT(err_msg_func, status, __func__);
-    return status;
-}
-
-int fwk_thread_get_delayed_response(fwk_id_t id, uint32_t cookie,
-                                    struct fwk_event *event)
-{
-    int status = FWK_E_PARAM;
-    struct fwk_event *delayed_response;
-    unsigned int interrupt;
-
-    if (!ctx.initialized) {
-        status = FWK_E_INIT;
-        goto error;
-    }
-
-    if (fwk_interrupt_get_current(&interrupt) == FWK_SUCCESS) {
-        status = FWK_E_ACCESS;
-        goto error;
-    }
-
-    if (!fwk_module_is_valid_entity_id(id))
-        goto error;
-
-    if (event == NULL)
-        goto error;
-
-    delayed_response = search_delayed_response(id, cookie);
-    if (delayed_response == NULL)
-        goto error;
-
-    *event = *delayed_response;
 
     return FWK_SUCCESS;
 
