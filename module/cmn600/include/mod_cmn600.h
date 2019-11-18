@@ -207,6 +207,9 @@ struct mod_cmn600_ccix_remote_node_config {
     /*! Remote HA memory map table count */
     uint8_t remote_ha_mmap_count;
 
+    /*! SMP mode */
+    bool smp_mode;
+
     /*! Remote HA memory map table */
     struct mod_cmn600_ccix_ha_mmap remote_ha_mmap[MAX_HA_MMAP_ENTRIES];
 
