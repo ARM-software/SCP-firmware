@@ -461,7 +461,7 @@ int ccix_setup(struct cmn600_ctx *ctx, void *remote_config)
     else
         offset_id = 0;
 
-    for (i = 0; i < ccix_remote_config->remote_ra_count; i++) {
+    for (i = 0; i < ccix_remote_config->remote_rnf_count; i++) {
         remote_agent_id = i + offset_id;
 
         /* Program the CXHA raid to ldid LUT */

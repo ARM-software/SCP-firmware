@@ -170,10 +170,12 @@ struct mod_cmn600_ccix_ha_mmap {
  * \brief CMN600 CCIX configuration data from remote node
  */
 struct mod_cmn600_ccix_remote_node_config {
-    /*! Remote RA count */
-    uint8_t remote_ra_count;
+    /*!
+     * Count of remote caching agent (RN-F) that can send request to local HNs
+     */
+    uint8_t remote_rnf_count;
 
-    /*! Remote HA count */
+    /*! Remote SA count */
     uint8_t remote_sa_count;
 
     /*! Remote HA count */

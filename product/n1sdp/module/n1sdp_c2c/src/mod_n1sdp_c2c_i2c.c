@@ -367,7 +367,7 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
         break;
 
     case N1SDP_C2C_CMD_CMN600_SET_CONFIG:
-        remote_config.remote_ra_count = 2;
+        remote_config.remote_rnf_count = 2;
         remote_config.remote_sa_count = 0;
         remote_config.remote_ha_count = 1;
         remote_config.ccix_tc = CCIX_VC1_TC;
@@ -645,7 +645,7 @@ static int n1sdp_c2c_process_command(void)
         break;
 
     case N1SDP_C2C_CMD_CMN600_SET_CONFIG:
-        remote_config.remote_ra_count = 2;
+        remote_config.remote_rnf_count = 2;
         remote_config.remote_sa_count = 0;
         remote_config.remote_ha_count = 1;
         remote_config.ccix_tc = CCIX_VC1_TC;
