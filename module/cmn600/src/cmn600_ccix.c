@@ -286,6 +286,10 @@ static void program_cxg_ra_sam_addr_region(struct cmn600_ctx *ctx,
         fwk_assert((config->remote_ha_mmap[i].size &
                     (config->remote_ha_mmap[i].size - 1)) == 0);
 
+        /* Region base should be naturally aligned to the region size */
+        fwk_assert(config->remote_ha_mmap[i].base %
+                   config->remote_ha_mmap[i].size == 0);
+
         blocks = config->remote_ha_mmap[i].size / (64 * 1024);
         sz = fwk_math_log2(blocks);
         ctx->cxg_ra_reg->CXG_RA_SAM_ADDR_REGION_REG[i] =
