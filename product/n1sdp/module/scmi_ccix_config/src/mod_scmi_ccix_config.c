@@ -271,7 +271,7 @@ static int scmi_ccix_config_protocol_set_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    ccix_ep_config.remote_ra_count =
+    ccix_ep_config.remote_rnf_count =
         (uint8_t)(params->agent_count & RA_COUNT_MASK);
     ccix_ep_config.remote_ha_count =
         (uint8_t)((params->agent_count & HA_COUNT_MASK) >> HA_COUNT_BIT_POS);
