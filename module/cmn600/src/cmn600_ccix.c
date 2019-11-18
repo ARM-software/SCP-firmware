@@ -282,6 +282,10 @@ static void program_cxg_ra_sam_addr_region(struct cmn600_ctx *ctx,
         /* Size must be a multiple of SAM_GRANULARITY */
         fwk_assert((config->remote_ha_mmap[i].size % (64 * 1024)) == 0);
 
+        /* Size also must be a power of two */
+        fwk_assert((config->remote_ha_mmap[i].size &
+                    (config->remote_ha_mmap[i].size - 1)) == 0);
+
         blocks = config->remote_ha_mmap[i].size / (64 * 1024);
         sz = fwk_math_log2(blocks);
         ctx->cxg_ra_reg->CXG_RA_SAM_ADDR_REGION_REG[i] =

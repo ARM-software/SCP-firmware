@@ -108,6 +108,9 @@ uint64_t sam_encode_region_size(uint64_t size)
     /* Size must be a multiple of SAM_GRANULARITY */
     assert((size % SAM_GRANULARITY) == 0);
 
+    /* Size also must be a power of two */
+    assert((size & (size - 1)) == 0);
+
     blocks = size / SAM_GRANULARITY;
     result = fwk_math_log2(blocks);
 
