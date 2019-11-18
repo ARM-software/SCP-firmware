@@ -9,9 +9,9 @@
 #include <fwk_macros.h>
 #include <fwk_math.h>
 #include <mod_log.h>
+#include <cmn600.h>
 #include <internal/cmn600_ctx.h>
 #include <internal/cmn600_ccix.h>
-
 
 #define MOD_NAME "[CMN600] "
 
@@ -79,6 +79,47 @@ static bool cxg_link_wait_condition(void *data)
     }
 }
 
+static int enable_smp_mode(struct cmn600_ctx *ctx)
+{
+    if (get_cmn600_revision(ctx->root) == CMN600_PERIPH_ID_2_REV_R2_P0) {
+        /*
+         * CMN-600 revision r2p0 uses read-only bits from the CXG_RA and CXG_HA
+         * registers to determine whether the SMP Mode is enabled in hardware.
+         */
+        if (((ctx->cxg_ra_reg->CXG_RA_UNIT_INFO &
+              CXG_RA_UNIT_INFO_SMP_MODE_RO_MASK) !=
+             CXG_RA_UNIT_INFO_SMP_MODE_RO_MASK) ||
+            ((ctx->cxg_ha_reg->CXG_HA_UNIT_INFO &
+              CXG_HA_UNIT_INFO_SMP_MODE_RO_MASK) !=
+             CXG_HA_UNIT_INFO_SMP_MODE_RO_MASK)) {
+                ctx->log_api->log(MOD_LOG_GROUP_INFO, MOD_NAME
+                                  "SMP Mode not supported\n");
+                return FWK_E_SUPPORT;
+            }
+
+        ctx->log_api->log(MOD_LOG_GROUP_INFO, MOD_NAME "SMP Mode supported\n");
+        return FWK_SUCCESS;
+    } else if (get_cmn600_revision(ctx->root) >= CMN600_PERIPH_ID_2_REV_R3_P0) {
+        /*
+         * CMN-600 revision r3p0 and above allows the software to configure the
+         * SMP mode
+         */
+        ctx->cxg_ra_reg->CXG_RA_AUX_CTRL |=
+            (1 << CXG_RA_AUX_CTRL_SMP_MODE_RW_SHIFT_VAL);
+        ctx->cxg_ha_reg->CXG_HA_AUX_CTRL |=
+            (1 << CXG_HA_AUX_CTRL_SMP_MODE_RW_SHIFT_VAL);
+        ctx->cxla_reg->CXLA_AUX_CTRL |=
+            ((uint64_t)0x1 << CXLA_AUX_CTRL_SMP_MODE_SHIFT_VAL);
+        ctx->log_api->log(MOD_LOG_GROUP_INFO, MOD_NAME "SMP MODE enabled\n");
+        return FWK_SUCCESS;
+    }
+
+    /*
+     * CMN-600 revision till r1p3 does not provide registers to read or
+     * configure SMP Mode.
+     */
+    return FWK_SUCCESS;
+}
 
 static void program_cxg_ra_rnf_ldid_to_raid_reg(struct cmn600_ctx *ctx,
     uint8_t ldid_value, uint8_t raid)
@@ -407,7 +448,7 @@ int ccix_setup(struct cmn600_ctx *ctx, void *remote_config)
     uint8_t unique_remote_rnf_ldid_value;
     int status;
 
-    struct mod_cmn600_ccix_remote_node_config * ccix_remote_config =
+    struct mod_cmn600_ccix_remote_node_config *ccix_remote_config =
         (struct mod_cmn600_ccix_remote_node_config *)remote_config;
 
     ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
@@ -422,6 +463,12 @@ int ccix_setup(struct cmn600_ctx *ctx, void *remote_config)
 
     /* Number of local RAs */
     local_ra_cnt = ctx->internal_rnsam_count + ctx->external_rnsam_count;
+
+    if (ccix_remote_config->smp_mode == true) {
+        status = enable_smp_mode(ctx);
+        if (status != FWK_SUCCESS)
+            return status;
+    }
 
     /* Set initial RAID value to 0. */
     ctx->raid_value = 0;

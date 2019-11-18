@@ -63,7 +63,7 @@ struct cmn600_cxg_ha_reg {
            uint8_t      RESERVED2[0x980-0x908];
     FWK_RW uint64_t     CXG_HA_SEC_REG_GRP_OVERRIDE;
            uint8_t      RESERVED3[0xA08-0x988];
-    FWK_RW uint64_t     CXG_AUX_CTRL;
+    FWK_RW uint64_t     CXG_HA_AUX_CTRL;
            uint8_t      RESERVED4[0xC00-0xA10];
     FWK_RW uint64_t     CXG_HA_RNF_RAID_TO_LDID_REG[8];
     FWK_RW uint64_t     CXG_HA_AGENTID_TO_LINKID_REG[8];
@@ -177,6 +177,8 @@ struct cxg_wait_condition_data {
 #define CXG_RA_AGENTID_TO_LINKID_VAL_OFFSET       0xF20
 #define CXG_RA_REQUEST_TRACKER_DEPTH_MASK         UINT64_C(0x0000000001FF0000)
 #define CXG_RA_REQUEST_TRACKER_DEPTH_VAL          16
+#define CXG_RA_UNIT_INFO_SMP_MODE_RO_MASK         (UINT64_C(1) << 61)
+#define CXG_RA_AUX_CTRL_SMP_MODE_RW_SHIFT_VAL     (16)
 
 /* CCIX Gateway (CXG) Home Agent (HA) defines */
 
@@ -190,6 +192,8 @@ struct cxg_wait_condition_data {
 #define CXG_HA_SNOOP_TRACKER_DEPTH_VAL            36
 #define CXG_HA_WDB_DEPTH_MASK                     UINT64_C(0x0000000007FC0000)
 #define CXG_HA_WDB_DEPTH_VAL                      18
+#define CXG_HA_UNIT_INFO_SMP_MODE_RO_MASK         (UINT64_C(1) << 63)
+#define CXG_HA_AUX_CTRL_SMP_MODE_RW_SHIFT_VAL     (16)
 
 /* CCIX Gateway (CXG) Link Agent (LA) defines */
 
@@ -210,6 +214,8 @@ struct cxg_wait_condition_data {
 
 #define CXLA_PCIE_HDR_TRAFFIC_CLASS_SHIFT_VAL     12
 #define CXLA_PCIE_HDR_VENDOR_ID_SHIFT_VAL         32
+
+#define CXLA_AUX_CTRL_SMP_MODE_SHIFT_VAL          (47)
 
 /* CCIX Gateway (CXG) link control & status defines */
 

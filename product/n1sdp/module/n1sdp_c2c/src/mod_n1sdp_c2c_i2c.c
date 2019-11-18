@@ -375,6 +375,7 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
         remote_config.pcie_bus_num = 1;
         remote_config.ccix_link_id = 0;
         remote_config.ccix_opt_tlp = CCIX_OPT_TLP_EN;
+        remote_config.smp_mode = true;
         remote_config.remote_ha_mmap_count = 1;
         remote_config.remote_ha_mmap[0].ha_id = 0x1;
         remote_config.remote_ha_mmap[0].base = (4ULL * FWK_TIB);
@@ -653,6 +654,7 @@ static int n1sdp_c2c_process_command(void)
         remote_config.pcie_bus_num = 1;
         remote_config.ccix_link_id = 0;
         remote_config.ccix_opt_tlp = CCIX_OPT_TLP_EN;
+        remote_config.smp_mode = true;
         remote_config.remote_ha_mmap_count = 1;
         remote_config.remote_ha_mmap[0].ha_id = 0x0;
         remote_config.remote_ha_mmap[0].base = 0;
