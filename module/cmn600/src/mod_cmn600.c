@@ -328,7 +328,7 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
 {
     unsigned int region_idx;
     unsigned int region_io_count = 0;
-    unsigned int region_sys_count = 1;
+    unsigned int region_sys_count = 0;
     const struct mod_cmn600_memory_region_map *region;
     const struct mod_cmn600_config *config = ctx->config;
     unsigned int bit_pos;
@@ -362,16 +362,25 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
                           base + region->size - 1,
                           mmap_type_name[region->type]);
 
-        group = region_io_count / CMN600_RNSAM_REGION_ENTRIES_PER_GROUP;
-        bit_pos = (region_io_count % CMN600_RNSAM_REGION_ENTRIES_PER_GROUP) *
-                  CMN600_RNSAM_REGION_ENTRY_BITS_WIDTH;
-
         switch (region->type) {
         case MOD_CMN600_MEMORY_REGION_TYPE_IO:
         case MOD_CMN600_REGION_TYPE_CCIX:
             /*
              * Configure memory region
              */
+            if (region_io_count >
+                    CMN600_RNSAM_MAX_NON_HASH_MEM_REGION_ENTRIES) {
+                ctx->log_api->log(MOD_LOG_GROUP_ERROR, MOD_NAME
+                    "Non-Hashed Memory can have maximum of %d regions only",
+                    CMN600_RNSAM_MAX_NON_HASH_MEM_REGION_ENTRIES);
+                return FWK_E_DATA;
+            }
+
+            group = region_io_count / CMN600_RNSAM_REGION_ENTRIES_PER_GROUP;
+            bit_pos = (region_io_count %
+                       CMN600_RNSAM_REGION_ENTRIES_PER_GROUP) *
+                      CMN600_RNSAM_REGION_ENTRY_BITS_WIDTH;
+
             sam_node_type =
                 (region->type == MOD_CMN600_MEMORY_REGION_TYPE_IO) ?
                     SAM_NODE_TYPE_HN_I : SAM_NODE_TYPE_CXRA;
@@ -401,12 +410,25 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
             /*
              * Configure memory region
              */
+            if (region_sys_count >= CMN600_RNSAM_MAX_HASH_MEM_REGION_ENTRIES) {
+                ctx->log_api->log(MOD_LOG_GROUP_ERROR, MOD_NAME
+                    "Hashed Memory can have maximum of %d regions only",
+                    CMN600_RNSAM_MAX_HASH_MEM_REGION_ENTRIES);
+                return FWK_E_DATA;
+            }
+
+            group = region_sys_count / CMN600_RNSAM_REGION_ENTRIES_PER_GROUP;
+            bit_pos = (region_sys_count %
+                       CMN600_RNSAM_REGION_ENTRIES_PER_GROUP) *
+                      CMN600_RNSAM_REGION_ENTRY_BITS_WIDTH;
             configure_region(&rnsam->SYS_CACHE_GRP_REGION[group],
                              bit_pos,
                              region->base,
                              region->size,
                              SAM_NODE_TYPE_HN_F);
-           break;
+
+            region_sys_count++;
+            break;
 
         case MOD_CMN600_REGION_TYPE_SYSCACHE_NONHASH:
             group = region_sys_count / CMN600_RNSAM_REGION_ENTRIES_PER_GROUP;
