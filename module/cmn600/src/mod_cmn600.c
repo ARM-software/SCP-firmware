@@ -538,10 +538,11 @@ static int cmn600_ccix_config_get(
     if (status != FWK_SUCCESS)
         return status;
 
-    if (ctx->external_rnsam_count == 0)
+    if (ctx->internal_rnsam_count == 0)
         return FWK_E_DATA;
 
-    ctx->ccix_host_info.host_ra_count = ctx->external_rnsam_count - 1;
+    ctx->ccix_host_info.host_ra_count =
+        ctx->internal_rnsam_count + ctx->external_rnsam_count - 1;
     ctx->ccix_host_info.host_sa_count = ctx->config->sa_count;
 
     memcpy((void *)config, (void *)&ctx->ccix_host_info,
