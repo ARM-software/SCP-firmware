@@ -180,23 +180,19 @@ struct mod_dvfs_domain_api {
  */
 
 /*!
- * \brief <tt>Set operating point</tt> event response parameters.
+ * \brief <tt>Get current OPP </tt> event response parameters.
  */
-struct mod_dvfs_event_params_set_frequency_response {
-    int status; /*!< Status of the request */
-};
+struct mod_dvfs_params_response {
+    /*! Event response status */
+    int status;
 
-/*!
- * \brief <tt>Set limits</tt> event response parameters.
- */
-struct mod_dvfs_event_params_set_frequency_limits_response {
-    int status; /*!< Status of the request */
+    /*! Event response frequency */
+    uint64_t performance_level;
 };
 
 /*!
  * \}
  */
-
 /*!
  * \defgroup GroupDvfsIds Identifiers
  * \{
@@ -218,25 +214,18 @@ static const fwk_id_t mod_dvfs_api_id_dvfs =
  * \brief Event indices.
  */
 enum mod_dvfs_event_idx {
-    /*! Event index for mod_dvfs_event_id_set_frequency() */
-    MOD_DVFS_EVENT_IDX_SET_FREQUENCY,
-
-    /*! Event index for mod_dvfs_event_id_set_frequency_limits() */
-    MOD_DVFS_EVENT_IDX_SET_FREQUENCY_LIMITS,
-
-    /*! Number of defined events */
-    MOD_DVFS_EVENT_IDX_COUNT
+    MOD_DVFS_EVENT_IDX_SET,     /*!< Set level/limits */
+    MOD_DVFS_EVENT_IDX_GET_OPP, /*!< Get frequency */
+    MOD_DVFS_EVENT_IDX_COUNT,   /*!< event count */
 };
 
-/*! <tt>Set operating point</tt> event identifier */
-static const fwk_id_t mod_dvfs_event_id_set_frequency =
-    FWK_ID_EVENT_INIT(FWK_MODULE_IDX_DVFS, MOD_DVFS_EVENT_IDX_SET_FREQUENCY);
+/*! <tt>Set operating point/limits</tt> event identifier */
+static const fwk_id_t mod_dvfs_event_id_set =
+    FWK_ID_EVENT_INIT(FWK_MODULE_IDX_DVFS, MOD_DVFS_EVENT_IDX_SET);
 
-/*! <tt>Set frequency limits</tt> event identifier */
-static const fwk_id_t mod_dvfs_event_id_set_frequency_limits =
-    FWK_ID_EVENT_INIT(
-        FWK_MODULE_IDX_DVFS,
-        MOD_DVFS_EVENT_IDX_SET_FREQUENCY_LIMITS);
+/*! <tt>Get current OPP </tt> event identifier */
+static const fwk_id_t mod_dvfs_event_id_get_opp =
+    FWK_ID_EVENT_INIT(FWK_MODULE_IDX_DVFS, MOD_DVFS_EVENT_IDX_GET_OPP);
 
 /*!
  * \}
