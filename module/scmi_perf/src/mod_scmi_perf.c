@@ -804,6 +804,31 @@ static int process_request_event(const struct fwk_event *event)
     return FWK_E_PARAM;
 }
 
+/*
+ * Handle a response event from the HAL which indicates that the
+ * requested operation has completed.
+ */
+static int process_response_event(const struct fwk_event *event)
+{
+    struct mod_dvfs_params_response *params_level;
+    struct scmi_perf_level_get_p2a return_values_level;
+
+    if (fwk_id_is_equal(event->id, mod_dvfs_event_id_get_opp)) {
+        params_level = (struct mod_dvfs_params_response *)
+            event->params;
+        return_values_level = (struct scmi_perf_level_get_p2a) {
+            .status = params_level->status,
+            .performance_level = params_level->performance_level,
+        };
+        scmi_perf_respond(&return_values_level, event->source_id,
+            (return_values_level.status == SCMI_SUCCESS) ?
+            sizeof(return_values_level) :
+            sizeof(return_values_level.status));
+    }
+
+    return FWK_SUCCESS;
+}
+
 static int scmi_perf_process_event(const struct fwk_event *event,
                                     struct fwk_event *resp_event)
 {
@@ -812,9 +837,13 @@ static int scmi_perf_process_event(const struct fwk_event *event,
         fwk_id_get_module_idx(fwk_module_id_scmi))
         return process_request_event(event);
 
+    /* Response events from DVFS */
+    if (fwk_id_get_module_idx(event->source_id) ==
+        fwk_id_get_module_idx(fwk_module_id_dvfs))
+        return process_response_event(event);
+
     return FWK_E_PARAM;
 }
-
 
 /* SCMI Performance Management Protocol Definition */
 const struct fwk_module module_scmi_perf = {
