@@ -49,6 +49,8 @@ BS_FIRMWARE_MODULES := \
     n1sdp_c2c \
     n1sdp_remote_pd \
     n1sdp_pcie \
+    ssc \
+    system_info \
     n1sdp_system
 
 BS_FIRMWARE_SOURCES := \
@@ -56,6 +58,8 @@ BS_FIRMWARE_SOURCES := \
     rtx_config.c \
     n1sdp_core.c \
     config_armv7m_mpu.c \
+    config_ssc.c \
+    config_system_info.c \
     config_log.c \
     config_power_domain.c \
     config_ppu_v0.c \
