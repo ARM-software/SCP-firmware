@@ -38,7 +38,6 @@
 #include <n1sdp_scp_mmap.h>
 #include <n1sdp_scp_scmi.h>
 #include <n1sdp_sds.h>
-#include <n1sdp_ssc.h>
 #include <config_clock.h>
 
 /*
@@ -646,9 +645,6 @@ static int n1sdp_system_start(fwk_id_t id)
 
             PIK_CLUSTER(0)->CLKFORCE_SET = 0x00000004;
             PIK_CLUSTER(1)->CLKFORCE_SET = 0x00000004;
-
-            /* Enable debugger access in SSC */
-            SSC->SSC_DBGCFG_SET = 0x000000FF;
 
             /* Setup CoreSight counter */
             CS_CNTCONTROL->CS_CNTCR |= (1 << 0);
