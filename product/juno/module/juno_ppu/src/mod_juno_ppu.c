@@ -331,7 +331,7 @@ static int dbgsys_set_state(fwk_id_t ppu_id, unsigned int state)
     if (status != FWK_SUCCESS)
         return status;
 
-    if (!fwk_expect(state == MOD_PD_STATE_ON))
+    if (state != MOD_PD_STATE_ON)
         return FWK_E_PWRSTATE;
 
     status = ppu_set_state_and_wait(ppu_ctx, PPU_MODE_ON);
