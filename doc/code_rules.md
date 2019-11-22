@@ -35,15 +35,16 @@ To invoke `cppcheck` manually, use:
 cppcheck --xml \
          --enable=all \
          --force \
-         --library=\"${WORKDIR}/arm-cortex-m.cfg\" \
-         --suppressions-list=\"suppress-list.txt" \
-         --includes-file=\"${PROJECT_DIRECTORIES_FILE}\" \
-         -I \"${WORKDIR}/CMSIS\" \
+         --suppressions-list="${WORKDIR}/tools/cppcheck_suppress_list.txt" \
+         --includes-file="${WORKDIR}/framework/include/" \
+         -I "${WORKDIR}/CMSIS" \
+         -i cmsis \
          -U__CSMC__ \
-         ."
+         ${WORKDIR}
 \endcode
 
-The CMSIS submodule is not checked.
+The CMSIS submodule is not checked. Errors are printed in XML format on the
+error output.
 
 Certain checks have been manually suppressed. Checks are generally only
 disabled if they have been triaged as false positives. The list of suppressed
