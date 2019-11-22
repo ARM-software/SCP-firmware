@@ -34,9 +34,6 @@ struct mod_dvfs_domain_ctx {
     /* Number of operating points */
     size_t opp_count;
 
-    /* Operating point prior to domain suspension */
-    struct mod_dvfs_opp suspended_opp;
-
     /* Current operating point limits */
     struct mod_dvfs_frequency_limits frequency_limits;
 };
@@ -457,8 +454,6 @@ dvfs_element_init(fwk_id_t domain_id,
         .maximum = ctx->config->opps[ctx->opp_count - 1].frequency,
     };
 
-    ctx->suspended_opp = ctx->config->opps[ctx->config->sustained_idx];
-
     return FWK_SUCCESS;
 }
 
@@ -527,81 +522,6 @@ dvfs_process_bind_request(fwk_id_t source_id,
     return dvfs_process_bind_request_module(source_id, api_id, api);
 }
 
-static int
-dvfs_start(fwk_id_t id)
-{
-    int status;
-    const struct mod_dvfs_domain_ctx *ctx;
-
-    if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT))
-        return FWK_SUCCESS;
-
-    ctx = get_domain_ctx(id);
-
-    /* Register for clock state notifications */
-    status = fwk_notification_subscribe(
-        mod_clock_notification_id_state_changed,
-        ctx->config->clock_id,
-        id);
-    if (status != FWK_SUCCESS)
-        return status;
-
-    return fwk_notification_subscribe(
-        mod_clock_notification_id_state_change_pending,
-        ctx->config->clock_id,
-        id);
-}
-
-static int
-dvfs_notify_system_state_transition_suspend(fwk_id_t domain_id)
-{
-    struct mod_dvfs_domain_ctx *ctx =
-        get_domain_ctx(domain_id);
-
-    return __mod_dvfs_get_current_opp(ctx, &ctx->suspended_opp);
-}
-
-static int
-dvfs_notify_system_state_transition_resume(fwk_id_t domain_id)
-{
-    const struct mod_dvfs_domain_ctx *ctx =
-        get_domain_ctx(domain_id);
-
-    return __mod_dvfs_set_opp(ctx, &ctx->suspended_opp);
-}
-
-static int
-dvfs_process_notification(const struct fwk_event *event,
-    struct fwk_event *resp_event)
-{
-    struct clock_notification_params *params;
-    struct clock_state_change_pending_resp_params *resp_params;
-
-    fwk_assert(
-        fwk_id_is_equal(
-            event->id,
-            mod_clock_notification_id_state_changed) ||
-        fwk_id_is_equal(
-            event->id,
-            mod_clock_notification_id_state_change_pending));
-    fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT));
-
-    params = (struct clock_notification_params *)event->params;
-
-    if (fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed)) {
-        if (params->new_state == MOD_CLOCK_STATE_RUNNING)
-            return dvfs_notify_system_state_transition_resume(event->target_id);
-    } else if (params->new_state == MOD_CLOCK_STATE_STOPPED) {
-        /* DVFS has received the pending change notification */
-        resp_params =
-            (struct clock_state_change_pending_resp_params *)resp_event->params;
-        resp_params->status = FWK_SUCCESS;
-
-        return dvfs_notify_system_state_transition_suspend(event->target_id);
-    }
-
-    return FWK_SUCCESS;
-}
 /* Module description */
 const struct fwk_module module_dvfs = {
     .name = "DVFS",
@@ -611,8 +531,6 @@ const struct fwk_module module_dvfs = {
     .bind = dvfs_bind,
     .process_bind_request = dvfs_process_bind_request,
     .process_event = __mod_dvfs_process_event,
-    .start = dvfs_start,
-    .process_notification = dvfs_process_notification,
     .api_count = MOD_DVFS_API_IDX_COUNT,
     .event_count = MOD_DVFS_EVENT_IDX_COUNT,
 };
