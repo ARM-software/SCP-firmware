@@ -1229,18 +1229,25 @@ void perform_shutdown(
     int status;
     struct fwk_event delayed_resp;
     struct pd_response *resp_params;
+    struct mod_pd_driver_api *api;
 
     for (pd_idx = 0; pd_idx < mod_pd_ctx.pd_count; pd_idx++) {
         pd = &mod_pd_ctx.pd_ctx_table[pd_idx];
         pd_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, pd_idx);
+        api = pd->driver_api;
 
         mod_pd_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
             "[PD] Shutting down %s\n", fwk_module_get_name(pd_id));
 
-        if (pd->driver_api->shutdown != NULL) {
-            status = pd->driver_api->shutdown(pd->driver_id, system_shutdown);
-        } else
-            status = pd->driver_api->set_state(pd->driver_id, MOD_PD_STATE_OFF);
+        if (api->shutdown != NULL) {
+            status = api->shutdown(pd->driver_id, system_shutdown);
+        } else {
+            if ((api->deny != NULL) &&
+                api->deny(pd->driver_id, MOD_PD_STATE_OFF))
+                status = FWK_E_DEVICE;
+            else
+                status = api->set_state(pd->driver_id, MOD_PD_STATE_OFF);
+        }
 
         if (status != FWK_SUCCESS)
             mod_pd_ctx.log_api->log(MOD_LOG_GROUP_ERROR,
@@ -1619,7 +1626,6 @@ static int pd_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
         .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
                            PD_EVENT_IDX_SYSTEM_SHUTDOWN),
         .target_id = fwk_module_id_power_domain,
-        .response_requested = true,
     };
 
     req_params->system_shutdown = system_shutdown;
