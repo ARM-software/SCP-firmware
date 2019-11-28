@@ -67,6 +67,16 @@ struct mod_dvfs_domain_config {
      */
     fwk_id_t clock_id;
 
+    /*!
+     * \brief Alarm identifier.
+     *
+     * \warning This identifier must refer to an alarm of the \c timer module.
+     */
+    fwk_id_t alarm_id;
+
+    /*! Delay in milliseconds before retrying a request */
+    uint16_t retry_ms;
+
     /*! Worst-case transition latency in microseconds */
     uint16_t latency;
 
@@ -216,6 +226,7 @@ static const fwk_id_t mod_dvfs_api_id_dvfs =
 enum mod_dvfs_event_idx {
     MOD_DVFS_EVENT_IDX_SET,     /*!< Set level/limits */
     MOD_DVFS_EVENT_IDX_GET_OPP, /*!< Get frequency */
+    MOD_DVFS_EVENT_IDX_RETRY,   /*!< retry request */
     MOD_DVFS_EVENT_IDX_COUNT,   /*!< event count */
 };
 
