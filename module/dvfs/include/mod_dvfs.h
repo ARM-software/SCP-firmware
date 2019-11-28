@@ -67,6 +67,16 @@ struct mod_dvfs_domain_config {
      */
     fwk_id_t clock_id;
 
+    /*!
+     * \brief Alarm identifier.
+     *
+     * \warning This identifier must refer to an alarm of the \c timer module.
+     */
+    fwk_id_t alarm_id;
+
+    /*! Delay in milliseconds before retrying a request */
+    uint16_t retry_ms;
+
     /*! Worst-case transition latency in microseconds */
     uint16_t latency;
 
