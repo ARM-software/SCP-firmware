@@ -630,9 +630,6 @@ static bool is_allowed_by_parent_and_children(struct pd_ctx *pd,
 static bool check_power_state_pre_transition_notification(struct pd_ctx *pd,
     unsigned int state)
 {
-    if (!is_deeper_state(state, pd->state_requested_to_driver))
-        return false;
-
     if ((state == pd->power_state_pre_transition_notification_ctx.state) &&
         pd->power_state_pre_transition_notification_ctx.valid) {
         return (pd->power_state_pre_transition_notification_ctx.response_status
