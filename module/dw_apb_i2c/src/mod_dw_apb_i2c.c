@@ -137,9 +137,6 @@ static int transmit_as_master(fwk_id_t dev_id,
     unsigned int sent_bytes;
     struct dw_apb_i2c_ctx *ctx;
 
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (transmit_request->transmit_byte_count > I2C_TRANSMIT_BUFFER_LENGTH)
         return FWK_E_SUPPORT;
@@ -162,7 +159,13 @@ static int transmit_as_master(fwk_id_t dev_id,
 
     fwk_interrupt_global_enable();
 
-    return FWK_SUCCESS;
+    /*
+     * The data has been pushed to the I2C FIFO for transmission to the
+     * target device. An interrupt will signal the completion of the
+     * transfer. The i2c_isr() interrupt handler will be invoked to notify
+     * the caller.
+     */
+    return FWK_PENDING;
 }
 
 static int receive_as_master(fwk_id_t dev_id,
@@ -172,9 +175,6 @@ static int receive_as_master(fwk_id_t dev_id,
     unsigned int i;
     struct dw_apb_i2c_ctx *ctx;
 
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (receive_request->receive_byte_count > I2C_RECEIVE_BUFFER_LENGTH)
         return FWK_E_SUPPORT;
@@ -201,7 +201,13 @@ static int receive_as_master(fwk_id_t dev_id,
 
     fwk_interrupt_global_enable();
 
-    return FWK_SUCCESS;
+    /*
+     * The command has been sent to the I2C for requesting data from
+     * the target device. An interrupt will signal the completion of the
+     * transfer. The i2c_isr() interrupt handler will be invoked to notify
+     * the caller.
+     */
+    return FWK_PENDING;
 }
 
 static const struct mod_i2c_driver_api driver_api = {

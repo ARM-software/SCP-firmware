@@ -425,8 +425,8 @@ static void test_get_next_isr_event_3(void)
     assert(fwk_list_is_empty(&ctx->thread_ready_queue));
     assert(fwk_list_is_empty(&ctx->event_isr_queue));
     assert(fwk_list_is_empty(&ctx->common_thread_ctx.event_queue));
-    assert(fake_thread_module_ctx.event_queue.head = &event[0].slist_node);
-    assert(fake_thread_module_ctx.event_queue.tail = &event[0].slist_node);
+    assert(fake_thread_module_ctx.event_queue.head == &event[0].slist_node);
+    assert(fake_thread_module_ctx.event_queue.tail == &event[0].slist_node);
 
     assert(ctx->waiting_for_isr_event == false);
     assert(ctx->event_cookie_counter == 1);
@@ -469,8 +469,8 @@ static void test_get_next_isr_event_4(void)
     assert(fwk_list_is_empty(&ctx->thread_ready_queue));
     assert(fwk_list_is_empty(&ctx->event_isr_queue));
     assert(fwk_list_is_empty(&ctx->common_thread_ctx.event_queue));
-    assert(fake_thread_module_ctx.event_queue.head = &event[0].slist_node);
-    assert(fake_thread_module_ctx.event_queue.tail = &event[0].slist_node);
+    assert(fake_thread_module_ctx.event_queue.head == &event[0].slist_node);
+    assert(fake_thread_module_ctx.event_queue.tail == &event[0].slist_node);
 
     assert(ctx->waiting_for_isr_event == true);
     assert(ctx->event_cookie_counter == 8);
@@ -516,8 +516,8 @@ static void test_get_next_isr_event_5(void)
     assert(fwk_list_is_empty(&ctx->thread_ready_queue));
     assert(fwk_list_is_empty(&ctx->event_isr_queue));
     assert(fwk_list_is_empty(&ctx->common_thread_ctx.event_queue));
-    assert(fake_thread_module_ctx.event_queue.head = &event[0].slist_node);
-    assert(fake_thread_module_ctx.event_queue.tail = &event[0].slist_node);
+    assert(fake_thread_module_ctx.event_queue.head == &event[0].slist_node);
+    assert(fake_thread_module_ctx.event_queue.tail == &event[0].slist_node);
 
     assert(ctx->waiting_for_isr_event == true);
     assert(ctx->event_cookie_counter == 8);
@@ -664,8 +664,8 @@ static void test_launch_next_event_processing_2(void)
     assert(fwk_list_is_empty(&ctx->thread_ready_queue));
     assert(fwk_list_is_empty(&ctx->event_isr_queue));
     assert(fwk_list_is_empty(&ctx->common_thread_ctx.event_queue));
-    assert(fake_thread_module_ctx.event_queue.head = &event[3].slist_node);
-    assert(fake_thread_module_ctx.event_queue.tail = &event[3].slist_node);
+    assert(fake_thread_module_ctx.event_queue.head == &event[3].slist_node);
+    assert(fake_thread_module_ctx.event_queue.tail == &event[3].slist_node);
 
     assert(ctx->waiting_for_isr_event == false);
     assert(ctx->event_cookie_counter == 0);

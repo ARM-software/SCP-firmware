@@ -21,13 +21,7 @@ static struct mod_reg_sensor_dev_config **config_table;
  */
 static int get_value(fwk_id_t id, uint64_t *value)
 {
-    int status;
     struct mod_reg_sensor_dev_config *config;
-
-    status = fwk_module_check_call(id);
-    if (status != FWK_SUCCESS) {
-        return FWK_E_STATE;
-    }
 
     config = config_table[fwk_id_get_element_idx(id)];
     fwk_assert(config != NULL);
@@ -43,12 +37,7 @@ static int get_value(fwk_id_t id, uint64_t *value)
 
 static int get_info(fwk_id_t id, struct mod_sensor_info *info)
 {
-    int status;
     struct mod_reg_sensor_dev_config *config;
-
-    status = fwk_module_check_call(id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     config = config_table[fwk_id_get_element_idx(id)];
     fwk_assert(config != NULL);

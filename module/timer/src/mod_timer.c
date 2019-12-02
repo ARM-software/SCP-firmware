@@ -192,11 +192,6 @@ static void _insert_alarm_ctx_into_active_queue(struct dev_ctx *ctx,
 static int get_frequency(fwk_id_t dev_id, uint32_t *frequency)
 {
     struct dev_ctx *ctx;
-    int status;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = &ctx_table[fwk_id_get_element_idx(dev_id)];
 
@@ -210,12 +205,7 @@ static int time_to_timestamp(fwk_id_t dev_id,
                              uint32_t microseconds,
                              uint64_t *timestamp)
 {
-    int status;
     struct dev_ctx *ctx;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (timestamp == NULL)
         return FWK_E_PARAM;
@@ -228,11 +218,6 @@ static int time_to_timestamp(fwk_id_t dev_id,
 static int get_counter(fwk_id_t dev_id, uint64_t *counter)
 {
     struct dev_ctx *ctx;
-    int status;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = &ctx_table[fwk_id_get_element_idx(dev_id)];
 
@@ -248,10 +233,6 @@ static int delay(fwk_id_t dev_id, uint32_t microseconds)
     int status;
     struct dev_ctx *ctx;
     uint64_t counter, counter_limit;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = &ctx_table[fwk_id_get_element_idx(dev_id)];
 
@@ -276,10 +257,6 @@ static int wait(fwk_id_t dev_id,
     struct dev_ctx *ctx;
     int status;
     uint64_t counter, counter_limit;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = &ctx_table[fwk_id_get_element_idx(dev_id)];
 
@@ -313,11 +290,6 @@ static int remaining(fwk_id_t dev_id,
                      uint64_t *remaining_ticks)
 {
     struct dev_ctx *ctx;
-    int status;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = &ctx_table[fwk_id_get_element_idx(dev_id)];
 
@@ -331,14 +303,10 @@ static int get_next_alarm_remaining(fwk_id_t dev_id,
                                     bool *has_alarm,
                                     uint64_t *remaining_ticks)
 {
-    int status;
+    int status = FWK_E_PARAM;
     const struct dev_ctx *ctx;
     const struct alarm_ctx *alarm_ctx;
     const struct fwk_dlist_node *alarm_ctx_node;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (has_alarm == NULL)
         return FWK_E_PARAM;
@@ -384,15 +352,10 @@ static const struct mod_timer_api timer_api = {
 
 static int alarm_stop(fwk_id_t alarm_id)
 {
-    int status;
     struct dev_ctx *ctx;
     struct alarm_ctx *alarm;
 
     assert(fwk_module_is_valid_sub_element_id(alarm_id));
-
-    status = fwk_module_check_call(alarm_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = &ctx_table[fwk_id_get_element_idx(alarm_id)];
     alarm = &ctx->alarm_pool[fwk_id_get_sub_element_idx(alarm_id)];
@@ -435,10 +398,6 @@ static int alarm_start(fwk_id_t alarm_id,
     struct alarm_ctx *alarm;
 
     assert(fwk_module_is_valid_sub_element_id(alarm_id));
-
-    status = fwk_module_check_call(alarm_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     ctx = ctx_table + fwk_id_get_element_idx(alarm_id);
     alarm = &ctx->alarm_pool[fwk_id_get_sub_element_idx(alarm_id)];

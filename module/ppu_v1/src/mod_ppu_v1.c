@@ -130,10 +130,6 @@ static int ppu_v1_pd_set_state(fwk_id_t pd_id, unsigned int state)
     int status;
     struct ppu_v1_pd_ctx *pd_ctx;
 
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     pd_ctx = ppu_v1_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
 
     switch (state) {
@@ -157,17 +153,12 @@ static int ppu_v1_pd_set_state(fwk_id_t pd_id, unsigned int state)
         return FWK_E_PARAM;
     }
 
-    return FWK_SUCCESS;
+    return status;
 }
 
 static int ppu_v1_pd_get_state(fwk_id_t pd_id, unsigned int *state)
 {
-    int status;
     struct ppu_v1_pd_ctx *pd_ctx;
-
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     pd_ctx = ppu_v1_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
 
@@ -178,10 +169,6 @@ static int ppu_v1_pd_reset(fwk_id_t pd_id)
 {
     int status;
     struct ppu_v1_pd_ctx *pd_ctx;
-
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     pd_ctx = ppu_v1_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
 
@@ -227,10 +214,6 @@ static int ppu_v1_core_pd_set_state(fwk_id_t core_pd_id, unsigned int state)
     int status;
     struct ppu_v1_pd_ctx *pd_ctx;
     struct ppu_v1_reg *ppu;
-
-    status = fwk_module_check_call(core_pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     pd_ctx = ppu_v1_ctx.pd_ctx_table + fwk_id_get_element_idx(core_pd_id);
     ppu = pd_ctx->ppu;
@@ -287,7 +270,7 @@ static int ppu_v1_core_pd_set_state(fwk_id_t core_pd_id, unsigned int state)
         return FWK_E_PARAM;
     }
 
-    return FWK_SUCCESS;
+    return status;
 }
 
 static int ppu_v1_core_pd_reset(fwk_id_t core_pd_id)
@@ -303,13 +286,8 @@ static int ppu_v1_core_pd_reset(fwk_id_t core_pd_id)
 
 static int ppu_v1_core_pd_prepare_for_system_suspend(fwk_id_t core_pd_id)
 {
-    int status;
     struct ppu_v1_pd_ctx *pd_ctx;
     struct ppu_v1_reg *ppu;
-
-    status = fwk_module_check_call(core_pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     pd_ctx = ppu_v1_ctx.pd_ctx_table + fwk_id_get_element_idx(core_pd_id);
     ppu = pd_ctx->ppu;
@@ -508,9 +486,6 @@ static int ppu_v1_cluster_pd_set_state(fwk_id_t cluster_pd_id,
     struct ppu_v1_reg *ppu;
     (void)ppu;
 
-    status = fwk_module_check_call(cluster_pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     pd_ctx = ppu_v1_ctx.pd_ctx_table + fwk_id_get_element_idx(cluster_pd_id);
     ppu = pd_ctx->ppu;
@@ -537,7 +512,7 @@ static int ppu_v1_cluster_pd_set_state(fwk_id_t cluster_pd_id,
         status = pd_ctx->pd_driver_input_api->report_power_state_transition(
             pd_ctx->bound_id, MOD_PD_STATE_OFF);
         assert(status == FWK_SUCCESS);
-        return FWK_SUCCESS;
+        return status;
 
     default:
         ppu_v1_ctx.log_api->log(MOD_LOG_GROUP_ERROR,
@@ -625,12 +600,7 @@ static void ppu_interrupt_handler(uintptr_t pd_ctx_param)
 
 static void ppu_isr_api_interrupt_handler(fwk_id_t pd_id)
 {
-    int status;
     struct ppu_v1_pd_ctx *pd_ctx;
-
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return;
 
     if (!fwk_id_is_type(pd_id, FWK_ID_TYPE_ELEMENT))
         return;
@@ -645,12 +615,7 @@ static const struct ppu_v1_isr_api isr_api = {
 
 static int ppu_power_mode_on(fwk_id_t pd_id)
 {
-    int status;
     struct ppu_v1_pd_ctx *pd_ctx;
-
-    status = fwk_module_check_call(pd_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (!fwk_id_is_type(pd_id, FWK_ID_TYPE_ELEMENT))
         return FWK_E_PARAM;

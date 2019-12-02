@@ -986,55 +986,6 @@ static void test_fwk_module_get_data(void)
     assert(result == NULL);
 }
 
-static void test_fwk_module_check_call_failed(void)
-{
-    int result;
-    fwk_id_t id;
-    struct fwk_module_ctx *module_ctx;
-
-    /* The ID is invalid, so that __fwk_module_get_state fails */
-    id = FWK_ID_ELEMENT(0xEF, 0xDBE);
-    result = fwk_module_check_call(id);
-    assert(result == FWK_E_PARAM);
-
-    /* The modules are not successfully initialized */
-    init_return_val = FWK_E_PARAM;
-    __fwk_module_reset();
-    __fwk_module_init();
-
-    /* Module 0 is not initialized */
-    id = MODULE0_ID;
-    result = fwk_module_check_call(id);
-    assert(result == FWK_E_INIT);
-
-    /* Force module 0 in FWK_MODULE_STATE_SUSPENDED state */
-    module_ctx = __fwk_module_get_ctx(id);
-    module_ctx->state = FWK_MODULE_STATE_SUSPENDED;
-    result = fwk_module_check_call(id);
-    assert(result == FWK_E_STATE);
-}
-
-static void test_fwk_module_check_call_succeed(void)
-{
-    int result;
-    fwk_id_t id;
-
-    /* Force the modules to be initialized but not bound */
-    bind_return_val = FWK_E_PARAM;
-    __fwk_module_reset();
-    result = __fwk_module_init();
-
-    /* The module is initialized so the function should return successfully */
-    id = MODULE0_ID;
-    result = fwk_module_check_call(id);
-    assert(result == FWK_SUCCESS);
-
-    /* The element is initialized so the function should return successfully */
-    id = ELEM0_ID;
-    result = fwk_module_check_call(id);
-    assert(result == FWK_SUCCESS);
-}
-
 static void test_fwk_module_bind_stage_failure(void)
 {
     int result;
@@ -1154,8 +1105,6 @@ static const struct fwk_test_case_desc test_case_table[] = {
     FWK_TEST_CASE(test_fwk_module_get_sub_element_count),
     FWK_TEST_CASE(test_fwk_module_get_name),
     FWK_TEST_CASE(test_fwk_module_get_data),
-    FWK_TEST_CASE(test_fwk_module_check_call_failed),
-    FWK_TEST_CASE(test_fwk_module_check_call_succeed),
     FWK_TEST_CASE(test_fwk_module_bind_stage_failure),
     FWK_TEST_CASE(test_fwk_module_bind)
 };

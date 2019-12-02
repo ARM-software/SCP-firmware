@@ -36,9 +36,6 @@ static int ddr_phy500_config(fwk_id_t element_id)
     const struct mod_ddr_phy500_module_config *module_config;
     const struct mod_ddr_phy500_element_config *element_config;
 
-    status = fwk_module_check_call(element_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     module_config = fwk_module_get_data(fwk_module_id_ddr_phy500);
 

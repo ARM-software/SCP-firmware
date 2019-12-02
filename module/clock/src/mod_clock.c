@@ -120,13 +120,7 @@ static int create_async_request(struct clock_dev_ctx *ctx, fwk_id_t clock_id)
 
 static int get_ctx(fwk_id_t clock_id, struct clock_dev_ctx **ctx)
 {
-    int status;
-
     fwk_assert(fwk_module_is_valid_element_id(clock_id));
-
-    status = fwk_module_check_call(clock_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     *ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(clock_id)];
 
@@ -191,8 +185,6 @@ static int clock_set_rate(fwk_id_t clock_id, uint64_t rate,
     status = ctx->api->set_rate(ctx->config->driver_id, rate, round_mode);
     if (status == FWK_PENDING)
         return create_async_request(ctx, clock_id);
-    else if (status == FWK_SUCCESS)
-        return FWK_SUCCESS;
     else
         return status;
 }
@@ -216,8 +208,6 @@ static int clock_get_rate(fwk_id_t clock_id, uint64_t *rate)
     status = ctx->api->get_rate(ctx->config->driver_id, rate);
     if (status == FWK_PENDING)
         return create_async_request(ctx, clock_id);
-    else if (status == FWK_SUCCESS)
-        return FWK_SUCCESS;
     else
         return status;
 }
@@ -255,8 +245,6 @@ static int clock_set_state(fwk_id_t clock_id, enum mod_clock_state state)
     status = ctx->api->set_state(ctx->config->driver_id, state);
     if (status == FWK_PENDING)
         return create_async_request(ctx, clock_id);
-    else if (status == FWK_SUCCESS)
-        return FWK_SUCCESS;
     else
         return status;
 }
@@ -280,8 +268,6 @@ static int clock_get_state(fwk_id_t clock_id, enum mod_clock_state *state)
     status = ctx->api->get_state(ctx->config->driver_id, state);
     if (status == FWK_PENDING)
         return create_async_request(ctx, clock_id);
-    else if (status == FWK_SUCCESS)
-        return FWK_SUCCESS;
     else
         return status;
 }
@@ -506,7 +492,7 @@ static int clock_process_pd_pre_transition_notification(
         ctx->pd_pre_power_transition_notification_cookie = event->cookie;
     }
 
-    return FWK_SUCCESS;
+    return status;
 }
 
 static int clock_process_pd_transition_notification(
@@ -543,7 +529,7 @@ static int clock_process_pd_transition_notification(
     status = fwk_notification_notify(
         &outbound_event, &(transition_notifications_sent));
 
-    return FWK_SUCCESS;
+    return status;
 }
 
 static int clock_process_notification_response(

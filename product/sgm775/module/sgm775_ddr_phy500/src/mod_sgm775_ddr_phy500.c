@@ -24,13 +24,8 @@ static struct mod_log_api *log_api;
  */
 static int sgm775_ddr_phy500_config(fwk_id_t element_id)
 {
-    int status;
     struct mod_sgm775_ddr_phy500_reg *ddr;
     const struct mod_sgm775_ddr_phy500_element_config *element_config;
-
-    status = fwk_module_check_call(element_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     element_config = fwk_module_get_data(element_id);
 

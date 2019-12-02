@@ -231,12 +231,7 @@ static int i2c_master_read_polled(fwk_id_t device_id,
 {
     bool complete = false;
     unsigned int timeout;
-    int status;
     struct n1sdp_i2c_dev_ctx *device_ctx;
-
-    status = fwk_module_check_call(device_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     fwk_assert(length != 0);
 
@@ -308,13 +303,8 @@ static int i2c_master_write_polled(fwk_id_t device_id, uint16_t address,
 {
     bool complete = false;
     unsigned int timeout;
-    int status;
     struct n1sdp_i2c_dev_ctx *device_ctx;
     uint16_t sr, isr;
-
-    status = fwk_module_check_call(device_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     fwk_assert(length != 0);
 
@@ -402,12 +392,7 @@ static const struct mod_n1sdp_i2c_master_api_polled i2c_master_api_polled = {
 static int i2c_slave_write_irq(fwk_id_t device_id,
     uint8_t *data, uint8_t length)
 {
-    int status;
     struct n1sdp_i2c_dev_ctx *device_ctx;
-
-    status = fwk_module_check_call(device_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     device_ctx = &i2c_ctx.device_ctx_table[fwk_id_get_element_idx(device_id)];
 
@@ -443,12 +428,7 @@ static int i2c_slave_write_irq(fwk_id_t device_id,
 static int i2c_slave_read_irq(fwk_id_t device_id,
     uint8_t *data, uint8_t length)
 {
-    int status;
     struct n1sdp_i2c_dev_ctx *device_ctx;
-
-    status = fwk_module_check_call(device_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     device_ctx = &i2c_ctx.device_ctx_table[fwk_id_get_element_idx(device_id)];
 

@@ -107,14 +107,10 @@ static void mhu_isr(void)
 
 static int raise_interrupt(fwk_id_t slot_id)
 {
-    int status;
     struct mhu_device_ctx *device_ctx;
     unsigned int slot;
     struct mhu_reg *reg;
 
-    status = fwk_module_check_call(slot_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     device_ctx = &mhu_ctx.device_ctx_table[fwk_id_get_element_idx(slot_id)];
     slot = fwk_id_get_sub_element_idx(slot_id);

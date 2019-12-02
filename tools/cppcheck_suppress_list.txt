@@ -1,0 +1,31 @@
+// Depending on how the project is compiled, some code
+// snippets are unused. So, some of the functions are not called.
+unusedFunction
+
+// missingIncludeSystem: Cppcheck can handle whether a system header (e. g.
+// stdio.h) can not be found, so we do not want those warnings.
+missingIncludeSystem
+
+// If Cppcheck does not find any errors to be suppressed,
+// it would raise a warning by default. This entry prevents that.
+unmatchedSuppression
+
+// redundantAssignment: Conflicts with a secure coding guideline stating to
+// 'Initialize variables'.
+redundantAssignment
+
+// Conflicts with our coding style that states all local
+// variables should be declared at the beginning of the function.
+variableScope
+
+// We often create register maps based on the documentations
+// and it can happen that we do not read or write a specific field.
+unusedStructMember
+
+// Cppcheck does not consider passing the address of the local variable as
+// using it.
+unusedVariable:framework/test/test_fwk_list_init.c
+
+// Cppcheck can not properly understand fwk_expect() thus can not ascertain the
+// way we check for pointer values.
+nullPointerRedundantCheck:product/juno/*

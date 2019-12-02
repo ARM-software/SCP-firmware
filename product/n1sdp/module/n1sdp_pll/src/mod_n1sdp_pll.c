@@ -108,11 +108,12 @@ result:
                             (1 << PLL_POSTDIV2_POS);
 
     /* Enable PLL settings */
-    *config->control_reg0 |= (1 << PLL_PLLEN_POS);
+    *config->control_reg0 |= (UINT32_C(1) << PLL_PLLEN_POS);
 
     wait_cycles = MOD_N1SDP_PLL_LOCK_TIMEOUT;
     /* Wait until the PLL has locked */
-    while ((*config->control_reg1 & (1 << PLL_LOCK_STATUS_POS)) == 0) {
+    while ((*config->control_reg1 &
+           (UINT32_C(1) << PLL_LOCK_STATUS_POS)) == 0) {
         wait_cycles--;
         if (wait_cycles == 0)
             return FWK_E_TIMEOUT;
@@ -132,11 +133,6 @@ static int n1sdp_pll_set_rate(fwk_id_t dev_id, uint64_t rate,
                                 enum mod_clock_round_mode unused)
 {
     struct n1sdp_pll_dev_ctx *ctx = NULL;
-    int status;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (!fwk_module_is_valid_element_id(dev_id))
         return FWK_E_PARAM;
@@ -149,11 +145,6 @@ static int n1sdp_pll_set_rate(fwk_id_t dev_id, uint64_t rate,
 static int n1sdp_pll_get_rate(fwk_id_t dev_id, uint64_t *rate)
 {
     struct n1sdp_pll_dev_ctx *ctx = NULL;
-    int status;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if ((!fwk_module_is_valid_element_id(dev_id)) || (rate == NULL))
         return FWK_E_PARAM;
@@ -168,24 +159,12 @@ static int n1sdp_pll_get_rate_from_index(fwk_id_t dev_id,
                                          unsigned int rate_index,
                                          uint64_t *rate)
 {
-    int status;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     /* PLLs have a continuous range of rates and are not indexed */
     return FWK_E_SUPPORT;
 }
 
 static int n1sdp_pll_set_state(fwk_id_t dev_id, enum mod_clock_state state)
 {
-    int status;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     if (state == MOD_CLOCK_STATE_RUNNING)
         return FWK_SUCCESS;
 
@@ -196,11 +175,6 @@ static int n1sdp_pll_set_state(fwk_id_t dev_id, enum mod_clock_state state)
 static int n1sdp_pll_get_state(fwk_id_t dev_id, enum mod_clock_state *state)
 {
     struct n1sdp_pll_dev_ctx *ctx = NULL;
-    int status;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if ((!fwk_module_is_valid_element_id(dev_id)) || (state == NULL))
         return FWK_E_PARAM;
@@ -213,12 +187,6 @@ static int n1sdp_pll_get_state(fwk_id_t dev_id, enum mod_clock_state *state)
 
 static int n1sdp_pll_get_range(fwk_id_t dev_id, struct mod_clock_range *range)
 {
-    int status;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     if ((!fwk_module_is_valid_element_id(dev_id)) || (range == NULL))
         return FWK_E_PARAM;
 
@@ -234,11 +202,6 @@ static int n1sdp_pll_power_state_change(fwk_id_t dev_id, unsigned int state)
 {
     uint64_t rate;
     struct n1sdp_pll_dev_ctx *ctx = NULL;
-    int status;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (!fwk_module_is_valid_element_id(dev_id))
         return FWK_E_PARAM;
@@ -268,11 +231,6 @@ static int n1sdp_pll_power_state_pending_change(
     unsigned int next_state)
 {
     struct n1sdp_pll_dev_ctx *ctx = NULL;
-    int status;
-
-    status = fwk_module_check_call(dev_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (!fwk_module_is_valid_element_id(dev_id))
         return FWK_E_PARAM;

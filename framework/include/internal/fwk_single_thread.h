@@ -21,6 +21,11 @@ struct __fwk_thread_ctx {
     bool initialized;
 
     /*
+     * Counter used to generate event cookies.
+     */
+    uint32_t event_cookie_counter;
+
+    /*
      * Queue of event structures that are free to be filled in and linked
      * to the event queue or the ISR event queue.
      */

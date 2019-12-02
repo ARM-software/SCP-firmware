@@ -570,7 +570,7 @@ static int scmi_clock_rate_get_handler(fwk_id_t service_id,
     }
 
     status = check_service_permission(clock_device,
-        MOD_SCMI_CLOCK_PERM_ATTRIBUTES, &service_permission_granted);
+        MOD_SCMI_CLOCK_PERM_GET_RATE, &service_permission_granted);
     if (status != FWK_SUCCESS)
         goto exit;
 
@@ -635,7 +635,7 @@ static int scmi_clock_rate_set_handler(fwk_id_t service_id,
     }
 
     status = check_service_permission(clock_device,
-        MOD_SCMI_CLOCK_PERM_ATTRIBUTES, &service_permission_granted);
+        MOD_SCMI_CLOCK_PERM_SET_RATE, &service_permission_granted);
     if (status != FWK_SUCCESS)
         goto exit;
 
@@ -712,7 +712,7 @@ static int scmi_clock_config_set_handler(fwk_id_t service_id,
     }
 
     status = check_service_permission(clock_device,
-        MOD_SCMI_CLOCK_PERM_ATTRIBUTES, &service_permission_granted);
+        MOD_SCMI_CLOCK_PERM_SET_CONFIG, &service_permission_granted);
     if (status != FWK_SUCCESS)
         goto exit;
 
@@ -786,7 +786,7 @@ static int scmi_clock_describe_rates_handler(fwk_id_t service_id,
     }
 
     status = check_service_permission(clock_device,
-        MOD_SCMI_CLOCK_PERM_ATTRIBUTES, &service_permission_granted);
+        MOD_SCMI_CLOCK_PERM_DESCRIBE_RATES, &service_permission_granted);
     if (status != FWK_SUCCESS)
         goto exit;
 
@@ -918,12 +918,6 @@ exit:
 static int scmi_clock_get_scmi_protocol_id(fwk_id_t protocol_id,
                                            uint8_t *scmi_protocol_id)
 {
-    int status;
-
-    status = fwk_module_check_call(protocol_id);
-    if (status != FWK_SUCCESS)
-        return status;
-
     *scmi_protocol_id = SCMI_PROTOCOL_ID_CLOCK;
 
     return FWK_SUCCESS;
@@ -932,17 +926,12 @@ static int scmi_clock_get_scmi_protocol_id(fwk_id_t protocol_id,
 static int scmi_clock_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     const uint32_t *payload, size_t payload_size, unsigned int message_id)
 {
-    int status;
     int32_t return_value;
 
     static_assert(FWK_ARRAY_SIZE(handler_table) ==
         FWK_ARRAY_SIZE(payload_size_table),
         "[SCMI] Clock management protocol table sizes not consistent");
     assert(payload != NULL);
-
-    status = fwk_module_check_call(protocol_id);
-    if (status != FWK_SUCCESS)
-        return status;
 
     if (message_id >= FWK_ARRAY_SIZE(handler_table)) {
         return_value = SCMI_NOT_SUPPORTED;
@@ -993,7 +982,7 @@ static int scmi_clock_init(fwk_id_t module_id, unsigned int element_count,
     /* Allocate a table of clock operations */
     scmi_clock_ctx.clock_ops =
         fwk_mm_calloc((unsigned int)clock_devices,
-        sizeof(struct mod_clock_api));
+        sizeof(struct clock_operations));
     if (scmi_clock_ctx.clock_ops == NULL)
         return FWK_E_NOMEM;
 
@@ -1122,7 +1111,6 @@ static int process_response_event(const struct fwk_event *event)
     uint64_t rate;
 
     clock_dev_idx = fwk_id_get_element_idx(event->source_id);
-    request = scmi_clock_ctx.clock_ops[clock_dev_idx].request;
     request = clock_ops_get_request(clock_dev_idx);
     service_id = clock_ops_get_service(clock_dev_idx);
 

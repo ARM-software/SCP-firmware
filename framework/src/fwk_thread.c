@@ -8,8 +8,12 @@
  *     Single-thread facilities.
  */
 
-#include <stdbool.h>
-#include <string.h>
+#include <internal/fwk_module.h>
+#include <internal/fwk_notification.h>
+#include <internal/fwk_single_thread.h>
+#include <internal/fwk_thread.h>
+#include <internal/fwk_thread_delayed_resp.h>
+
 #include <fwk_assert.h>
 #include <fwk_element.h>
 #include <fwk_host.h>
@@ -17,10 +21,9 @@
 #include <fwk_interrupt.h>
 #include <fwk_mm.h>
 #include <fwk_status.h>
-#include <internal/fwk_module.h>
-#include <internal/fwk_notification.h>
-#include <internal/fwk_single_thread.h>
-#include <internal/fwk_thread.h>
+
+#include <stdbool.h>
+#include <string.h>
 
 static struct __fwk_thread_ctx ctx;
 
@@ -33,26 +36,71 @@ static const char err_msg_func[] = "[THR] Error %d in %s\n";
  * Static functions
  */
 
-static int put_event(struct fwk_event *event)
+/*
+ * Duplicate an event.
+ *
+ * \param event Pointer to the event to duplicate.
+ *
+ * \pre \p event must not be NULL
+ *
+ * \return The pointer to the duplicated event, NULL if the allocation to
+ *      duplicate the event failed.
+ */
+static struct fwk_event *duplicate_event(struct fwk_event *event)
 {
-    struct fwk_event *free_event;
-    unsigned int interrupt;
+    struct fwk_event *allocated_event = NULL;
 
-    free_event = FWK_LIST_GET(fwk_list_pop_head(&ctx.free_event_queue),
-        struct fwk_event, slist_node);
+    fwk_assert(event != NULL);
 
-    if (free_event == NULL) {
+    fwk_interrupt_global_disable();
+    allocated_event = FWK_LIST_GET(
+        fwk_list_pop_head(&ctx.free_event_queue), struct fwk_event, slist_node);
+    fwk_interrupt_global_enable();
+
+    if (allocated_event == NULL) {
         FWK_HOST_PRINT(err_msg_func, FWK_E_NOMEM, __func__);
-        assert(false);
-        return FWK_E_NOMEM;
+        fwk_assert(false);
     }
 
-    *free_event = *event;
+    *allocated_event = *event;
+    allocated_event->slist_node = (struct fwk_slist_node){ 0 };
+
+    return allocated_event;
+}
+
+static int put_event(struct fwk_event *event)
+{
+    struct fwk_event *allocated_event;
+    unsigned int interrupt;
+
+    if (event->is_delayed_response) {
+        allocated_event = __fwk_thread_search_delayed_response(
+            event->source_id, event->cookie);
+        if (allocated_event == NULL) {
+            FWK_HOST_PRINT(err_msg_func, FWK_E_NOMEM, __func__);
+            return FWK_E_PARAM;
+        }
+
+        fwk_list_remove(
+            __fwk_thread_get_delayed_response_list(event->source_id),
+            &allocated_event->slist_node);
+
+        memcpy(
+            allocated_event->params,
+            event->params,
+            sizeof(allocated_event->params));
+    } else {
+        allocated_event = duplicate_event(event);
+        if (allocated_event == NULL)
+            return FWK_E_NOMEM;
+    }
+
+    allocated_event->cookie = event->cookie = ctx.event_cookie_counter++;
 
     if (fwk_interrupt_get_current(&interrupt) != FWK_SUCCESS)
-        fwk_list_push_tail(&ctx.event_queue, &free_event->slist_node);
+        fwk_list_push_tail(&ctx.event_queue, &allocated_event->slist_node);
     else
-        fwk_list_push_tail(&ctx.isr_event_queue, &free_event->slist_node);
+        fwk_list_push_tail(&ctx.isr_event_queue, &allocated_event->slist_node);
 
     return FWK_SUCCESS;
 }
@@ -60,7 +108,7 @@ static int put_event(struct fwk_event *event)
 static void process_next_event(void)
 {
     int status;
-    struct fwk_event *event, async_response_event = {0};
+    struct fwk_event *event, *allocated_event, async_response_event = { 0 };
     const struct fwk_module *module;
     int (*process_event)(const struct fwk_event *event,
                          struct fwk_event *resp_event);
@@ -78,11 +126,10 @@ static void process_next_event(void)
                     module->process_event;
 
     if (event->response_requested) {
+        async_response_event = *event;
         async_response_event.source_id = event->target_id;
         async_response_event.target_id = event->source_id;
-        async_response_event.id = event->id;
-        memcpy(&async_response_event.params, &event->params,
-               sizeof(async_response_event.params));
+        async_response_event.is_delayed_response = false;
 
         status = process_event(event, &async_response_event);
         if (status != FWK_SUCCESS)
@@ -90,9 +137,17 @@ static void process_next_event(void)
 
         async_response_event.is_response = true;
         async_response_event.response_requested = false;
-        async_response_event.is_notification = event->is_notification;
         if (!async_response_event.is_delayed_response)
             put_event(&async_response_event);
+        else {
+            allocated_event = duplicate_event(&async_response_event);
+            if (allocated_event != NULL) {
+                fwk_list_push_tail(
+                    __fwk_thread_get_delayed_response_list(
+                        async_response_event.source_id),
+                    &allocated_event->slist_node);
+            }
+        }
     } else {
         status = process_event(event, &async_response_event);
         if (status != FWK_SUCCESS)
@@ -238,10 +293,4 @@ int fwk_thread_put_event(struct fwk_event *event)
 error:
     FWK_HOST_PRINT(err_msg_func, status, __func__);
     return status;
-}
-
-int fwk_thread_get_delayed_response(fwk_id_t id, uint32_t cookie,
-                                    struct fwk_event *event)
-{
-    return FWK_E_SUPPORT;
 }

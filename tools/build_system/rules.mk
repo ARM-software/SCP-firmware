@@ -31,7 +31,7 @@ ifeq ($(BS_LINKER),ARM)
     export OBJCOPY := $(shell $(CC) --print-prog-name fromelf)
     export SIZE := $(shell $(CC) --print-prog-name size)
 else
-    export AR := $(shell $(CC) --print-prog-name ar)
+    export AR := $(shell $(CC) --print-prog-name gcc-ar)
     export OBJCOPY := $(shell $(CC) --print-prog-name objcopy)
     export SIZE := $(shell $(CC) --print-prog-name size)
 endif
@@ -39,14 +39,24 @@ endif
 #
 # GCC-specific optimization levels for debug and release modes
 #
-DEFAULT_OPT_GCC_DEBUG := g
+
+ifeq ($(PRODUCT),juno)
+    # Enable link-time optimization
+    CFLAGS_GCC += -flto
+    LDFLAGS_GCC += -Wl,-flto
+
+    DEFAULT_OPT_GCC_DEBUG := s
+else
+    DEFAULT_OPT_GCC_DEBUG := g
+endif
+
 DEFAULT_OPT_GCC_RELEASE := 2
 
 #
 # Compiler options used when building for the host
 #
 ifeq ($(BS_ARCH_ARCH),host)
-    CFLAGS_GCC  += -mtune=native
+    CFLAGS  += -mtune=native
     ASFLAGS_GCC += -mtune=native
     LDFLAGS_GCC += -mtune=native
 
@@ -63,14 +73,14 @@ else
     LDFLAGS_ARM += -Wl,--scatter=$(SCATTER_PP)
     LDFLAGS_GCC += -Wl,--script=$(SCATTER_PP)
 
-    CFLAGS_GCC  += -mcpu=$(BS_ARCH_CPU)
+    CFLAGS  += -mcpu=$(BS_ARCH_CPU)
     ASFLAGS_GCC += -mcpu=$(BS_ARCH_CPU)
     LDFLAGS_GCC += -mcpu=$(BS_ARCH_CPU)
     LDFLAGS_ARM += -mcpu=$(BS_ARCH_CPU)
 
     # Optional ISA ("sub-arch") parameter
     ifneq ($(BS_ARCH_ISA),)
-        CFLAGS_GCC  += -m$(BS_ARCH_ISA)
+        CFLAGS  += -m$(BS_ARCH_ISA)
         ASFLAGS_GCC += -m$(BS_ARCH_ISA)
         LDFLAGS_GCC += -m$(BS_ARCH_ISA)
         LDFLAGS_ARM += -m$(BS_ARCH_ISA)
@@ -85,18 +95,18 @@ endif
 # behaviour in the code base, which can open security holes. Each flag applies a
 # set of warnings, and any warnings that do occur are upgraded to errors to
 # prevent the firmware from building.
-CFLAGS_GCC += -Werror
-CFLAGS_GCC += -Wall
-CFLAGS_GCC += -Wextra
-CFLAGS_GCC += -pedantic
-CFLAGS_GCC += -pedantic-errors
+CFLAGS += -Werror
+CFLAGS += -Wall
+CFLAGS += -Wextra
+CFLAGS += -pedantic
+CFLAGS += -pedantic-errors
 
-CFLAGS_GCC += -Wno-unused-parameter
+CFLAGS += -Wno-unused-parameter
 
 # GCC is not currently consistent in how it applies this warning, but this flag
 # should be removed should we move to a version that can build the firmware
 # without it.
-CFLAGS_GCC += -Wno-missing-field-initializers
+CFLAGS += -Wno-missing-field-initializers
 
 # Clang picks up a number of situations that GCC does not with this warning
 # enabled. Most of them do not have easy fixes, and are valid C, so this flag
@@ -106,18 +116,18 @@ CFLAGS_CLANG += -Wno-missing-braces
 
 # Place functions and data into their own sections. This allows the linker to
 # strip out functions with no references.
-CFLAGS_GCC += -ffunction-sections -fdata-sections
+CFLAGS += -ffunction-sections -fdata-sections
 LDFLAGS_GCC += -Wl,--gc-sections
 LDFLAGS_ARM += -Wl,--remove
 
 # Arm Compiler 6 uses dollar symbols in its linker-defined symbol names
 CFLAGS_CLANG += -Wno-dollar-in-identifier-extension
 
-CFLAGS_GCC += -g
-CFLAGS_GCC += -std=c11
+CFLAGS += -g
+CFLAGS += -std=c11
 CFLAGS_CLANG += -fshort-enums # Required by RTX
 
-CFLAGS_GCC += -fno-exceptions
+CFLAGS += -fno-exceptions
 
 DEP_CFLAGS_GCC = -MD -MP
 
@@ -161,16 +171,13 @@ ASFLAGS += $(addprefix -I,$(INCLUDES)) $(addprefix -D,$(DEFINES))
 #
 # Assign toolchain-specific flags
 #
-CFLAGS += $(CFLAGS_GCC)
 ASFLAGS += $(ASFLAGS_GCC)
 ARFLAGS = $(ARFLAGS_GCC)
 LDFLAGS += $(LDFLAGS_$(BS_LINKER))
 DEP_CFLAGS = $(DEP_CFLAGS_GCC)
 BUILTIN_LIBS = $(BUILTIN_LIBS_$(BS_LINKER))
 
-ifeq ($(BS_COMPILER),CLANG)
-    CFLAGS += $(CFLAGS_CLANG)
-endif
+CFLAGS += $(CFLAGS_$(BS_COMPILER))
 
 ifeq ($(BS_LINKER),ARM)
     OCFLAGS += --bin --output

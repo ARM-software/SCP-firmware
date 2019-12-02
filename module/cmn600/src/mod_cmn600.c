@@ -495,12 +495,7 @@ static int cmn600_setup(void)
 
 static int cmn600_setup_rnsam(unsigned int node_id)
 {
-    int status;
     unsigned int node_idx;
-
-    status = fwk_module_check_call(FWK_ID_MODULE(FWK_MODULE_IDX_CMN600));
-    if (status != FWK_SUCCESS)
-        return status;
 
     for (node_idx = 0; node_idx < ctx->external_rnsam_count; node_idx++) {
         if (ctx->external_rnsam_table[node_idx].node_id == node_id) {
@@ -533,15 +528,11 @@ static const struct mod_ppu_v1_power_state_observer_api cmn600_observer_api = {
 static int cmn600_ccix_config_get(
     struct mod_cmn600_ccix_host_node_config *config)
 {
-    int status;
-    status = fwk_module_check_call(fwk_module_id_cmn600);
-    if (status != FWK_SUCCESS)
-        return status;
-
-    if (ctx->external_rnsam_count == 0)
+    if (ctx->internal_rnsam_count == 0)
         return FWK_E_DATA;
 
-    ctx->ccix_host_info.host_ra_count = ctx->external_rnsam_count - 1;
+    ctx->ccix_host_info.host_ra_count =
+        ctx->internal_rnsam_count + ctx->external_rnsam_count - 1;
     ctx->ccix_host_info.host_sa_count = ctx->config->sa_count;
 
     memcpy((void *)config, (void *)&ctx->ccix_host_info,
@@ -556,9 +547,6 @@ static int cmn600_ccix_config_set(
     unsigned int i;
     int status;
 
-    status = fwk_module_check_call(fwk_module_id_cmn600);
-    if (status != FWK_SUCCESS)
-        return status;
 
     status = ccix_setup(ctx, config);
     if (status != FWK_SUCCESS)
@@ -573,39 +561,17 @@ static int cmn600_ccix_config_set(
 
 static int cmn600_ccix_exchange_protocol_credit(uint8_t link_id)
 {
-    int status;
-
-    status = fwk_module_check_call(fwk_module_id_cmn600);
-    if (status != FWK_SUCCESS)
-        return status;
-
-    status = ccix_exchange_protocol_credit(ctx, link_id);
-    return status;
+    return ccix_exchange_protocol_credit(ctx, link_id);
 }
 
 static int cmn600_ccix_enter_system_coherency(uint8_t link_id)
 {
-    int status;
-
-    status = fwk_module_check_call(fwk_module_id_cmn600);
-    if (status != FWK_SUCCESS)
-        return status;
-
-    status = ccix_enter_system_coherency(ctx, link_id);
-    return status;
+    return ccix_enter_system_coherency(ctx, link_id);
 }
 
 static int cmn600_ccix_enter_dvm_domain(uint8_t link_id)
 {
-    int status;
-
-    status = fwk_module_check_call(fwk_module_id_cmn600);
-    if (status != FWK_SUCCESS)
-        return status;
-
-    status = ccix_enter_dvm_domain(ctx, link_id);
-    return status;
-
+    return ccix_enter_dvm_domain(ctx, link_id);
 }
 
 static const struct mod_cmn600_ccix_config_api cmn600_ccix_config_api = {
