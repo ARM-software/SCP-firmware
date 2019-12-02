@@ -40,7 +40,7 @@ endif
 # GCC-specific optimization levels for debug and release modes
 #
 
-ifeq ($(PRODUCT),juno)
+ifeq ($(PRODUCT)-$(FIRMWARE),juno-scp_ramfw)
     # Enable link-time optimization
     CFLAGS_GCC += -flto
     LDFLAGS_GCC += -Wl,-flto
