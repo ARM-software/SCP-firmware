@@ -55,7 +55,7 @@ struct alarm_ctx {
     /* Flag indicating if this alarm if periodic */
     bool periodic;
     /* Flag indicating if this alarm is in the active queue */
-    bool started;
+    bool activated;
     /* Flag indicating if this alarm has been bound to */
     bool bound;
 };
@@ -181,7 +181,7 @@ static void _insert_alarm_ctx_into_active_queue(struct dev_ctx *ctx,
                     &(alarm_new->node),
                     alarm_node);
 
-    alarm_new->started = true;
+    alarm_new->activated = true;
 }
 
 
@@ -363,7 +363,7 @@ static int alarm_stop(fwk_id_t alarm_id)
     /* Prevent possible data races with the timer interrupt */
     ctx->driver->disable(ctx->driver_dev_id);
 
-    if (!alarm->started) {
+    if (!alarm->activated) {
         ctx->driver->enable(ctx->driver_dev_id);
         return FWK_E_STATE;
     }
@@ -380,7 +380,7 @@ static int alarm_stop(fwk_id_t alarm_id)
     fwk_interrupt_clear_pending(ctx->config->timer_irq);
 
     fwk_list_remove(&ctx->alarms_active, (struct fwk_dlist_node *)alarm);
-    alarm->started = false;
+    alarm->activated = false;
 
     _configure_timer_with_next_alarm(ctx);
 
@@ -402,7 +402,7 @@ static int alarm_start(fwk_id_t alarm_id,
     ctx = ctx_table + fwk_id_get_element_idx(alarm_id);
     alarm = &ctx->alarm_pool[fwk_id_get_sub_element_idx(alarm_id)];
 
-    if (alarm->started)
+    if (alarm->activated)
         alarm_stop(alarm_id);
 
     /* Cap to ensure value will not overflow when stored as microseconds */
@@ -456,7 +456,7 @@ static void timer_isr(uintptr_t ctx_ptr)
         return;
     }
 
-    alarm->started = false;
+    alarm->activated = false;
 
     /* Execute the callback function */
     alarm->callback(alarm->param);
