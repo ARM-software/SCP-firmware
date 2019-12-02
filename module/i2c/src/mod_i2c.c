@@ -282,32 +282,6 @@ static int mod_i2c_process_bind_request(fwk_id_t source_id,
     return FWK_SUCCESS;
 }
 
-static int process_request(int drv_status,
-                           struct mod_i2c_dev_ctx *ctx,
-                           const struct fwk_event *event,
-                           struct fwk_event *resp_event)
-{
-    if (drv_status == FWK_PENDING) {
-        /* The request has not completed, respond later */
-        ctx->cookie = event->cookie;
-        resp_event->is_delayed_response = true;
-
-        return FWK_SUCCESS;
-    } else {
-        /* The request has succeeded or failed, respond now */
-        struct mod_i2c_event_param *resp_param =
-            (struct mod_i2c_event_param *)resp_event->params;
-
-        if (drv_status != FWK_SUCCESS)
-            drv_status = FWK_E_DEVICE;
-
-        resp_param->status = drv_status;
-        ctx->state = MOD_I2C_DEV_IDLE;
-
-        return drv_status;
-    }
-}
-
 static int respond_to_caller(
     fwk_id_t dev_id,
     struct mod_i2c_dev_ctx *ctx,
@@ -329,38 +303,22 @@ static int respond_to_caller(
     return fwk_thread_put_event(&resp);
 }
 
-static int mod_i2c_process_event(const struct fwk_event *event,
-                                 struct fwk_event *resp_event)
+static int process_request(struct mod_i2c_dev_ctx *ctx, fwk_id_t event_id)
 {
-    fwk_id_t dev_id;
-    int status, drv_status;
-    struct mod_i2c_dev_ctx *ctx;
-    struct mod_i2c_request *request = (struct mod_i2c_request *)event->params;
-    struct mod_i2c_event_param *event_param;
+    int drv_status;
+    const struct mod_i2c_driver_api *driver_api = ctx->driver_api;
+    fwk_id_t driver_id = ctx->config->driver_id;
 
-    dev_id = event->target_id;
-    get_ctx(dev_id, &ctx);
-
-    switch (fwk_id_get_event_idx(event->id)) {
+    switch (fwk_id_get_event_idx(event_id)) {
     case MOD_I2C_EVENT_IDX_REQUEST_TRANSMIT:
-        ctx->request = *request;
-
-        drv_status = ctx->driver_api->transmit_as_master(ctx->config->driver_id,
-            &ctx->request);
-
-        status = process_request(drv_status, ctx, event, resp_event);
+        drv_status = driver_api->transmit_as_master(driver_id, &ctx->request);
         break;
 
     case MOD_I2C_EVENT_IDX_REQUEST_TRANSMIT_THEN_RECEIVE:
-        ctx->request = *request;
-
-        drv_status = ctx->driver_api->transmit_as_master(ctx->config->driver_id,
-            &ctx->request);
+        drv_status = driver_api->transmit_as_master(driver_id, &ctx->request);
 
         if (drv_status != FWK_SUCCESS) {
             /* The request has failed or been acknowledged */
-            status = process_request(drv_status, ctx, event, resp_event);
-
             break;
         } else {
             /*
@@ -372,15 +330,50 @@ static int mod_i2c_process_event(const struct fwk_event *event,
         /* fall through */
 
     case MOD_I2C_EVENT_IDX_REQUEST_RECEIVE:
+        drv_status = driver_api->receive_as_master(driver_id, &ctx->request);
+        break;
+    }
+
+    return drv_status;
+}
+
+static int mod_i2c_process_event(const struct fwk_event *event,
+                                 struct fwk_event *resp_event)
+{
+    fwk_id_t dev_id;
+    int status, drv_status;
+    bool is_request;
+    struct mod_i2c_dev_ctx *ctx;
+    struct mod_i2c_request *request;
+    struct mod_i2c_event_param *event_param, *resp_param;
+
+    dev_id = event->target_id;
+    get_ctx(dev_id, &ctx);
+
+    is_request = fwk_id_get_event_idx(event->id) < MOD_I2C_EVENT_IDX_COUNT;
+
+    if (is_request) {
+        request = (struct mod_i2c_request *)event->params;
         ctx->request = *request;
 
-        drv_status = ctx->driver_api->receive_as_master(ctx->config->driver_id,
-            &ctx->request);
+        drv_status = process_request(ctx, event->id);
 
-        status = process_request(drv_status, ctx, event, resp_event);
+        if (drv_status == FWK_PENDING) {
+            ctx->cookie = event->cookie;
+            resp_event->is_delayed_response = true;
+        } else {
+            /* The request has succeeded or failed, respond now */
+            resp_param = (struct mod_i2c_event_param *)resp_event->params;
 
-        break;
+            resp_param->status = (drv_status == FWK_SUCCESS) ?
+                                 FWK_SUCCESS : FWK_E_DEVICE;
+            ctx->state = MOD_I2C_DEV_IDLE;
+        }
 
+        return FWK_SUCCESS;
+    }
+
+    switch (fwk_id_get_event_idx(event->id)) {
     case MOD_I2C_EVENT_IDX_REQUEST_COMPLETED:
         event_param = (struct mod_i2c_event_param *)event->params;
 
