@@ -58,6 +58,8 @@ struct alarm_ctx {
     bool activated;
     /* Flag indicating if this alarm has been bound to */
     bool bound;
+    /* Flag indicating if this alarm is started */
+    bool started;
 };
 
 /* Table of timer device context structures */
@@ -388,10 +390,15 @@ static int alarm_stop(fwk_id_t alarm_id)
     /* Prevent possible data races with the timer interrupt */
     ctx->driver->disable(ctx->driver_dev_id);
 
-    if (!alarm->activated) {
+    if (!alarm->started) {
         ctx->driver->enable(ctx->driver_dev_id);
         return FWK_E_STATE;
     }
+
+    alarm->started = false;
+
+    if (!alarm->activated)
+        return FWK_SUCCESS;
 
     /*
      * If the alarm is stopped while the interrupts are globally disabled, an
@@ -437,8 +444,10 @@ static int alarm_start(fwk_id_t alarm_id,
     ctx = ctx_table + fwk_id_get_element_idx(alarm_id);
     alarm = &ctx->alarm_pool[fwk_id_get_sub_element_idx(alarm_id)];
 
-    if (alarm->activated)
+    if (alarm->started)
         alarm_stop(alarm_id);
+
+    alarm->started = true;
 
     /* Cap to ensure value will not overflow when stored as microseconds */
     milliseconds = FWK_MIN(milliseconds, UINT32_MAX / 1000);
@@ -496,7 +505,7 @@ static void timer_isr(uintptr_t ctx_ptr)
     /* Execute the callback function */
     alarm->callback(alarm->param);
 
-    if (alarm->periodic) {
+    if (alarm->periodic && alarm->started) {
         /* Put this alarm back into the active queue */
         status = _time_to_timestamp(ctx, alarm->microseconds, &timestamp);
 
