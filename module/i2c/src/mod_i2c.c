@@ -282,12 +282,12 @@ static int mod_i2c_process_bind_request(fwk_id_t source_id,
     return FWK_SUCCESS;
 }
 
-static int process_request(int status,
+static int process_request(int drv_status,
                            struct mod_i2c_dev_ctx *ctx,
                            const struct fwk_event *event,
                            struct fwk_event *resp_event)
 {
-    if (status == FWK_PENDING) {
+    if (drv_status == FWK_PENDING) {
         /* The request has not completed, respond later */
         ctx->cookie = event->cookie;
         resp_event->is_delayed_response = true;
@@ -298,13 +298,13 @@ static int process_request(int status,
         struct mod_i2c_event_param *resp_param =
             (struct mod_i2c_event_param *)resp_event->params;
 
-        if (status != FWK_SUCCESS)
-            status = FWK_E_DEVICE;
+        if (drv_status != FWK_SUCCESS)
+            drv_status = FWK_E_DEVICE;
 
-        resp_param->status = status;
+        resp_param->status = drv_status;
         ctx->state = MOD_I2C_DEV_IDLE;
 
-        return status;
+        return drv_status;
     }
 }
 
@@ -324,7 +324,7 @@ static int respond_to_caller(
     if (status != FWK_SUCCESS)
         return status;
 
-    param->status = drv_status;
+    param->status = (drv_status == FWK_SUCCESS) ? FWK_SUCCESS : FWK_E_DEVICE;
 
     return fwk_thread_put_event(&resp);
 }
