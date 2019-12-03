@@ -333,8 +333,7 @@ static int respond_to_caller(int event_status,
 static int mod_i2c_process_event(const struct fwk_event *event,
                                  struct fwk_event *resp_event)
 {
-    int status = FWK_E_PARAM;
-    int drv_status;
+    int status, drv_status;
     struct mod_i2c_dev_ctx *ctx;
     struct mod_i2c_event_param *event_param =
         (struct mod_i2c_event_param *)event->params;
@@ -405,6 +404,10 @@ static int mod_i2c_process_event(const struct fwk_event *event,
         } else
             status = FWK_E_STATE;
 
+        break;
+
+    default:
+        status = FWK_E_PANIC;
         break;
     }
 
