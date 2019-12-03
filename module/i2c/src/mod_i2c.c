@@ -20,6 +20,7 @@ enum mod_i2c_dev_state {
     MOD_I2C_DEV_TX,
     MOD_I2C_DEV_RX,
     MOD_I2C_DEV_TX_RX,
+    MOD_I2C_DEV_PANIC,
 };
 
 struct mod_i2c_dev_ctx {
@@ -67,8 +68,10 @@ static int create_i2c_request(fwk_id_t dev_id,
         return FWK_E_PARAM;
 
     /* Check whether an I2C request is already on-going */
-    if (ctx->state != MOD_I2C_DEV_IDLE)
-        return FWK_E_BUSY;
+    if (ctx->state != MOD_I2C_DEV_IDLE) {
+        return (ctx->state == MOD_I2C_DEV_PANIC) ?
+               FWK_E_PANIC : FWK_E_BUSY;
+    }
 
     /* Create the request */
     event = (struct fwk_event) {
@@ -353,6 +356,13 @@ static int mod_i2c_process_event(const struct fwk_event *event,
     is_request = fwk_id_get_event_idx(event->id) < MOD_I2C_EVENT_IDX_COUNT;
 
     if (is_request) {
+        if (ctx->state == MOD_I2C_DEV_PANIC) {
+            event_param = (struct mod_i2c_event_param *)resp_event->params;
+            event_param->status = FWK_E_PANIC;
+
+            return FWK_SUCCESS;
+        }
+
         request = (struct mod_i2c_request *)event->params;
         ctx->request = *request;
 
@@ -406,6 +416,9 @@ static int mod_i2c_process_event(const struct fwk_event *event,
         status = FWK_E_PANIC;
         break;
     }
+
+    if (status != FWK_SUCCESS)
+        ctx->state = MOD_I2C_DEV_PANIC;
 
     return status;
 }
