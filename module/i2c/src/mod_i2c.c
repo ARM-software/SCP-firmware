@@ -308,24 +308,23 @@ static int process_request(int status,
     }
 }
 
-static int respond_to_caller(int event_status,
-                             struct mod_i2c_dev_ctx *ctx,
-                             const struct fwk_event *event)
+static int respond_to_caller(
+    fwk_id_t dev_id,
+    struct mod_i2c_dev_ctx *ctx,
+    int drv_status)
 {
     int status;
     struct fwk_event resp;
-
-    ctx->state = MOD_I2C_DEV_IDLE;
-
-    status = fwk_thread_get_delayed_response(event->target_id,
-        ctx->cookie, &resp);
-    if (status != FWK_SUCCESS)
-        return FWK_E_DEVICE;
-
     struct mod_i2c_event_param *param =
         (struct mod_i2c_event_param *)resp.params;
 
-    param->status = event_status;
+    ctx->state = MOD_I2C_DEV_IDLE;
+
+    status = fwk_thread_get_delayed_response(dev_id, ctx->cookie, &resp);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    param->status = drv_status;
 
     return fwk_thread_put_event(&resp);
 }
@@ -383,7 +382,8 @@ static int mod_i2c_process_event(const struct fwk_event *event,
 
     case MOD_I2C_EVENT_IDX_REQUEST_COMPLETED:
         if ((ctx->state == MOD_I2C_DEV_TX) || (ctx->state == MOD_I2C_DEV_RX)) {
-            status = respond_to_caller(event_param->status, ctx, event);
+            status = respond_to_caller(
+                event->target_id, ctx, event_param->status);
         } else if (ctx->state == MOD_I2C_DEV_TX_RX) {
             if (event_param->status == FWK_SUCCESS) {
                 /* The TX request succeeded, proceed with the RX */
@@ -395,10 +395,12 @@ static int mod_i2c_process_event(const struct fwk_event *event,
                 if (drv_status == FWK_PENDING)
                     status = FWK_SUCCESS;
                 else
-                    status = respond_to_caller(drv_status, ctx, event);
+                    status = respond_to_caller(
+                        event->target_id, ctx, drv_status);
             } else {
                 /* The request failed, respond */
-                status = respond_to_caller(event_param->status, ctx, event);
+                status = respond_to_caller(
+                    event->target_id, ctx, event_param->status);
             }
         } else
             status = FWK_E_STATE;
