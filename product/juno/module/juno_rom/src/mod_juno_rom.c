@@ -394,6 +394,7 @@ static int juno_rom_process_event(
     systop_on_event = (struct fwk_event) {
         .response_requested = true,
         .id = mod_juno_rom_notification_id_systop,
+        .source_id = FWK_ID_NONE
     };
 
     notification_params = (void *)systop_on_event.params;
