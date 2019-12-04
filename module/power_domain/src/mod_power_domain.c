@@ -1519,10 +1519,8 @@ static int pd_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
 {
     int status;
     struct fwk_event req;
-    struct fwk_event resp;
     struct pd_system_shutdown_request *req_params =
         (struct pd_system_shutdown_request *)(&req.params);
-    struct pd_response *resp_params = (struct pd_response *)(&resp.params);
 
     req = (struct fwk_event) {
         .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
@@ -1532,11 +1530,11 @@ static int pd_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
 
     req_params->system_shutdown = system_shutdown;
 
-    status = fwk_thread_put_event_and_wait(&req, &resp);
-    if (status != FWK_SUCCESS)
-        return status;
+    status = fwk_thread_put_event(&req);
+    if (status == FWK_SUCCESS)
+        return FWK_PENDING;
 
-    return resp_params->status;
+    return status;
 }
 
 /* Functions specific to the driver input API */
