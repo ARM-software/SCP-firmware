@@ -718,6 +718,8 @@ struct mod_pd_restricted_api {
      *
      * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
      *      call to the API.
+     * \retval FWK_PENDING Request aknowledged. A response event will not be
+     *      sent to the caller.
      * \retval FWK_E_HANDLER The function is not called from a thread.
      * \retval FWK_E_NOMEM Failed to allocate a request descriptor.
      */
