@@ -22,7 +22,6 @@
 #include <internal/n1sdp_scp2pcc.h>
 
 #include <mod_clock.h>
-#include <mod_log.h>
 #include <mod_n1sdp_c2c_i2c.h>
 #include <mod_n1sdp_dmc620.h>
 #include <mod_n1sdp_flash.h>
@@ -38,6 +37,7 @@
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -222,19 +222,22 @@ static int n1sdp_system_shutdown(
 
     switch (system_shutdown) {
     case MOD_PD_SYSTEM_SHUTDOWN:
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        FWK_LOG_INFO(
+            n1sdp_system_ctx.log_api,
             "[N1SDP SYSTEM] Request PCC for system shutdown\n");
         n1sdp_system_ctx.scp2pcc_api->send(NULL, 0, SCP2PCC_TYPE_SHUTDOWN);
         break;
 
     case MOD_PD_SYSTEM_COLD_RESET:
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        FWK_LOG_INFO(
+            n1sdp_system_ctx.log_api,
             "[N1SDP SYSTEM] Request PCC for system reboot\n");
         n1sdp_system_ctx.scp2pcc_api->send(NULL, 0, SCP2PCC_TYPE_REBOOT);
         break;
 
     default:
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        FWK_LOG_INFO(
+            n1sdp_system_ctx.log_api,
             "[N1SDP SYSTEM] Unknown shutdown command!\n");
         break;
     }
@@ -296,12 +299,14 @@ static int n1sdp_system_copy_to_ap_sram(uint64_t sram_address,
     memcpy((void *)target_addr, (void *)spi_address, size);
 
     if (memcmp((void *)target_addr, (void *)spi_address, size) != 0) {
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        FWK_LOG_INFO(
+            n1sdp_system_ctx.log_api,
             "[N1SDP SYSTEM] Copy failed at destination address: 0x%08x\n",
             target_addr);
-            return FWK_E_DATA;
+        return FWK_E_DATA;
     }
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+    FWK_LOG_INFO(
+        n1sdp_system_ctx.log_api,
         "[N1SDP SYSTEM] Copied binary to SRAM address: 0x%08x\n",
         sram_address);
     return FWK_SUCCESS;
@@ -309,11 +314,12 @@ static int n1sdp_system_copy_to_ap_sram(uint64_t sram_address,
 
 void cdbg_pwrupreq_handler(void)
 {
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+    FWK_LOG_INFO(
+        n1sdp_system_ctx.log_api,
         "[N1SDP SYSTEM] Received debug power up request interrupt\n");
 
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-        "[N1SDP SYSTEM] Power on Debug PIK\n");
+    FWK_LOG_INFO(
+        n1sdp_system_ctx.log_api, "[N1SDP SYSTEM] Power on Debug PIK\n");
 
     /* Clear interrupt */
     PIK_DEBUG->DEBUG_CTRL |= (0x1 << 1);
@@ -322,7 +328,8 @@ void cdbg_pwrupreq_handler(void)
 
 void csys_pwrupreq_handler(void)
 {
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+    FWK_LOG_INFO(
+        n1sdp_system_ctx.log_api,
         "[N1SDP SYSTEM] Received system power up request interrupt\n");
 
     /* Clear interrupt */
@@ -346,7 +353,8 @@ static int n1sdp_system_fill_platform_info(void)
 
     status = n1sdp_system_ctx.dmc620_api->get_mem_size_gb(&ddr_size_gb);
     if (status != FWK_SUCCESS) {
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        FWK_LOG_INFO(
+            n1sdp_system_ctx.log_api,
             "Error calculating local DDR memory size!\n");
         return status;
     }
@@ -362,13 +370,15 @@ static int n1sdp_system_fill_platform_info(void)
         status = n1sdp_system_ctx.c2c_api->get_ddr_size_gb
                                            (&sds_platform_info.remote_ddr_size);
         if (status != FWK_SUCCESS) {
-            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            FWK_LOG_INFO(
+                n1sdp_system_ctx.log_api,
                 "Error calculating Remote DDR memory size!\n");
             return status;
         }
     }
 
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+    FWK_LOG_INFO(
+        n1sdp_system_ctx.log_api,
         "    Total DDR Size: %d GB\n",
         sds_platform_info.local_ddr_size + sds_platform_info.remote_ddr_size);
 
@@ -403,7 +413,8 @@ static int n1sdp_system_init_primary_core(void)
     unsigned int cluster_count;
     int fip_index_bl31 = -1;
 
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+    FWK_LOG_INFO(
+        n1sdp_system_ctx.log_api,
         "[N1SDP SYSTEM] Setting AP Reset Address to 0x%08x\n",
         AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET);
 
@@ -421,7 +432,8 @@ static int n1sdp_system_init_primary_core(void)
     }
 
     if (n1sdp_get_chipid() == 0x0) {
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        FWK_LOG_INFO(
+            n1sdp_system_ctx.log_api,
             "[N1SDP SYSTEM] Looking for AP firmware in flash memory...\n");
 
         status = n1sdp_system_ctx.flash_api->get_n1sdp_fip_descriptor_count(
@@ -436,10 +448,12 @@ static int n1sdp_system_init_primary_core(void)
 
         for (i = 0; i < fip_count; i++) {
             if (fip_desc_table[i].type == MOD_N1SDP_FIP_TYPE_TF_BL31) {
-                n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                FWK_LOG_INFO(
+                    n1sdp_system_ctx.log_api,
                     "[N1SDP SYSTEM] Found BL31 at address: 0x%08x,"
                     " size: %u, flags: 0x%x\n",
-                    fip_desc_table[i].address, fip_desc_table[i].size,
+                    fip_desc_table[i].address,
+                    fip_desc_table[i].size,
                     fip_desc_table[i].flags);
                 fip_index_bl31 = i;
                 break;
@@ -447,13 +461,15 @@ static int n1sdp_system_init_primary_core(void)
         }
 
         if (fip_index_bl31 < 0) {
-            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            FWK_LOG_INFO(
+                n1sdp_system_ctx.log_api,
                 "[N1SDP SYSTEM] Error! "
                 "FIP does not have BL31 binary\n");
             return FWK_E_PANIC;
         }
 
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        FWK_LOG_INFO(
+            n1sdp_system_ctx.log_api,
             "[N1SDP SYSTEM] Copying AP BL31 to address 0x%x...\n",
             AP_CORE_RESET_ADDR);
 
@@ -464,28 +480,32 @@ static int n1sdp_system_init_primary_core(void)
             return FWK_E_PANIC;
 
         /* Fill BL33 image information structure */
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        FWK_LOG_INFO(
+            n1sdp_system_ctx.log_api,
             "[N1SDP SYSTEM] Filling BL33 information...\n");
         status = n1sdp_system_fill_bl33_info();
         if (status != FWK_SUCCESS)
             return status;
 
         /* Fill Platform information structure */
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        FWK_LOG_INFO(
+            n1sdp_system_ctx.log_api,
             "[N1SDP SYSTEM] Collecting Platform information...\n");
         status = n1sdp_system_fill_platform_info();
         if (status != FWK_SUCCESS)
             return status;
 
         /* Enable non-secure CoreSight debug access */
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+        FWK_LOG_INFO(
+            n1sdp_system_ctx.log_api,
             "[N1SDP SYSTEM] Enabling CoreSight debug non-secure access\n");
         *(volatile uint32_t *)(AP_SCP_SRAM_OFFSET +
                                NIC_400_SEC_0_CSAPBM_OFFSET) = 0xFFFFFFFF;
 
         mod_pd_restricted_api = n1sdp_system_ctx.mod_pd_restricted_api;
 
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+        FWK_LOG_TRACE(
+            n1sdp_system_ctx.log_api,
             "[N1SDP SYSTEM] Booting primary core at %d MHz...\n",
             PIK_CLK_RATE_CLUS0_CPU / FWK_MHZ);
 
@@ -641,13 +661,16 @@ static int n1sdp_system_start(fwk_id_t id)
             CS_CNTCONTROL->CS_CNTCVLW = 0x00000000;
             CS_CNTCONTROL->CS_CNTCVUP = 0x0000FFFF;
         } else
-            n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+            FWK_LOG_TRACE(
+                n1sdp_system_ctx.log_api,
                 "[N1SDP SYSTEM] CSYS PWR UP REQ IRQ register failed\n");
     } else
-        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+        FWK_LOG_TRACE(
+            n1sdp_system_ctx.log_api,
             "[N1SDP SYSTEM] CDBG PWR UP REQ IRQ register failed\n");
 
-    n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+    FWK_LOG_TRACE(
+        n1sdp_system_ctx.log_api,
         "[N1SDP SYSTEM] Requesting SYSTOP initialization...\n");
 
     /*

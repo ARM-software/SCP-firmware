@@ -8,7 +8,6 @@
  *    Implementation of Timer module
  */
 
-#include <mod_log.h>
 #include <mod_timer.h>
 
 #include <fwk_assert.h>
@@ -16,6 +15,7 @@
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
 #include <fwk_list.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
@@ -512,10 +512,12 @@ static void timer_isr(uintptr_t ctx_ptr)
         if (status == FWK_SUCCESS) {
             alarm->timestamp += timestamp;
             _insert_alarm_ctx_into_active_queue(ctx, alarm);
-        } else
-            log_api->log(MOD_LOG_GROUP_ERROR,
-                         "[Timer] Error: Periodic alarm could not be added "
-                         "back into queue.\n");
+        } else {
+            FWK_LOG_ERR(
+                log_api,
+                "[Timer] Error: Periodic alarm could not be added "
+                "back into queue.\n");
+        }
     }
 
     _configure_timer_with_next_alarm(ctx);

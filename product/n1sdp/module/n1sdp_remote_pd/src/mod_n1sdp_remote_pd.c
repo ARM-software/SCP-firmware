@@ -10,13 +10,13 @@
 
 #include "n1sdp_core.h"
 
-#include <mod_log.h>
 #include <mod_n1sdp_c2c_i2c.h>
 #include <mod_n1sdp_remote_pd.h>
 #include <mod_power_domain.h>
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -128,7 +128,8 @@ static int remote_pd_set_state(fwk_id_t pd_id, unsigned int state)
         break;
 
     default:
-        remote_pd_ctx.log_api->log(MOD_LOG_GROUP_ERROR,
+        FWK_LOG_ERR(
+            remote_pd_ctx.log_api,
             "[C2C] Requested CPU power state (%i) is not supported!\n",
             state);
         return FWK_E_PARAM;

@@ -6,13 +6,15 @@
  */
 
 #include "low_level_access.h"
-#include "synquacer_debug.h"
 #include "synquacer_mmap.h"
 
 #include <sysdef_option.h>
 
 #include <internal/nic400.h>
 
+#include <mod_synquacer_system.h>
+
+#include <fwk_log.h>
 #include <fwk_macros.h>
 
 #include <stdint.h>
@@ -25,7 +27,8 @@ static void nic_sec_slave_security(
     uint32_t slave_index,
     uint32_t value)
 {
-    SYNQUACER_DEV_LOG_DEBUG(
+    FWK_LOG_TRACE(
+        synquacer_system_ctx.log_api,
         "%s addr 0x%08x value 0x%08x\n",
         __func__,
         (nic_top_addr + NIC_TOP_ADDR_SEC_REG +

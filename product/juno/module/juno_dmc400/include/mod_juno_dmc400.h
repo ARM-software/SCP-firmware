@@ -13,7 +13,6 @@
 
 #include "scp_config.h"
 
-#include <mod_log.h>
 #include <mod_timer.h>
 
 #include <fwk_id.h>

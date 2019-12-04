@@ -5,12 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "synquacer_debug.h"
 #include "synquacer_mmap.h"
 
 #include <internal/i2c_depend.h>
 #include <internal/i2c_driver.h>
 
+#include <mod_synquacer_system.h>
+
+#include <fwk_log.h>
 #include <fwk_macros.h>
 
 #include <stdio.h>
@@ -90,7 +92,10 @@ void i2c_construction(void)
             &i2c_params[i]);
         if (i2c_err != I2C_ERR_OK) {
             SCB_Error(i2c_err);
-            SYNQUACER_DEV_LOG_ERROR("[I2C] I2C ch#%d  initialize error.\n", i);
+            FWK_LOG_ERR(
+                synquacer_system_ctx.log_api,
+                "[I2C] I2C ch#%d  initialize error.\n",
+                i);
         }
     }
 }

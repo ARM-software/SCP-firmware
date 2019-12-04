@@ -14,7 +14,6 @@
 #include <cmn600.h>
 
 #include <mod_cmn600.h>
-#include <mod_log.h>
 #include <mod_timer.h>
 
 #include <stdbool.h>

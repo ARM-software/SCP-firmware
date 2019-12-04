@@ -12,12 +12,12 @@
 #include <internal/scmi.h>
 #include <internal/scmi_base.h>
 
-#include <mod_log.h>
 #include <mod_scmi.h>
 
 #include <fwk_assert.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
@@ -243,8 +243,8 @@ static void respond(fwk_id_t service_id, const void *payload, size_t size)
      * specification it should be like that for all commands.
      */
     if ((payload != NULL) && (*((int32_t *)payload) < SCMI_SUCCESS)) {
-        scmi_ctx.log_api->log(
-            MOD_LOG_GROUP_ERROR,
+        FWK_LOG_ERR(
+            scmi_ctx.log_api,
             "[SCMI] %s: Message %u (0x%x:0x%x) returned with an error (%d)\n",
             service_name,
             ctx->scmi_token,
@@ -252,8 +252,8 @@ static void respond(fwk_id_t service_id, const void *payload, size_t size)
             ctx->scmi_message_id,
             *((int *)payload));
     } else {
-        scmi_ctx.log_api->log(
-            MOD_LOG_GROUP_DEBUG,
+        FWK_LOG_TRACE(
+            scmi_ctx.log_api,
             "[SCMI] %s: Message %u (0x%x:0x%x) returned successfully\n",
             service_name,
             ctx->scmi_token,
@@ -263,8 +263,8 @@ static void respond(fwk_id_t service_id, const void *payload, size_t size)
 
     status = ctx->respond(ctx->transport_id, payload, size);
     if (status != FWK_SUCCESS) {
-        scmi_ctx.log_api->log(
-            MOD_LOG_GROUP_ERROR,
+        FWK_LOG_ERR(
+            scmi_ctx.log_api,
             "[SCMI] %s: Message %u (0x%x:0x%x) failed to respond (%s)\n",
             service_name,
             ctx->scmi_token,
@@ -764,8 +764,8 @@ static int scmi_process_event(const struct fwk_event *event,
 
     status = transport_api->get_message_header(transport_id, &message_header);
     if (status != FWK_SUCCESS) {
-        scmi_ctx.log_api->log(
-            MOD_LOG_GROUP_ERROR,
+        FWK_LOG_ERR(
+            scmi_ctx.log_api,
             "[SCMI] %s: Unable to read message header\n",
             service_name);
         return status;
@@ -773,8 +773,8 @@ static int scmi_process_event(const struct fwk_event *event,
 
     status = transport_api->get_payload(transport_id, &payload, &payload_size);
     if (status != FWK_SUCCESS) {
-        scmi_ctx.log_api->log(
-            MOD_LOG_GROUP_ERROR,
+        FWK_LOG_ERR(
+            scmi_ctx.log_api,
             "[SCMI] %s: Unable to read message payload\n",
             service_name);
         return status;
@@ -784,8 +784,8 @@ static int scmi_process_event(const struct fwk_event *event,
     ctx->scmi_message_id = read_message_id(message_header);
     ctx->scmi_token = read_token(message_header);
 
-    scmi_ctx.log_api->log(
-        MOD_LOG_GROUP_DEBUG,
+    FWK_LOG_TRACE(
+        scmi_ctx.log_api,
         "[SCMI] %s: Message %u (0x%x:0x%x) was received\n",
         service_name,
         ctx->scmi_token,
@@ -795,8 +795,8 @@ static int scmi_process_event(const struct fwk_event *event,
     protocol_idx = scmi_ctx.scmi_protocol_id_to_idx[ctx->scmi_protocol_id];
 
     if (protocol_idx == 0) {
-        scmi_ctx.log_api->log(
-            MOD_LOG_GROUP_ERROR,
+        FWK_LOG_ERR(
+            scmi_ctx.log_api,
             "[SCMI] %s: Message %u (0x%x:0x%x) requested an unsupported "
             "protocol\n",
             service_name,
@@ -813,8 +813,8 @@ static int scmi_process_event(const struct fwk_event *event,
         payload, payload_size, ctx->scmi_message_id);
 
     if (status != FWK_SUCCESS) {
-        scmi_ctx.log_api->log(
-            MOD_LOG_GROUP_ERROR,
+        FWK_LOG_ERR(
+            scmi_ctx.log_api,
             "[SCMI] %s: Message %u (0x%x:0x%x) encountered an error (%s)\n",
             service_name,
             ctx->scmi_token,

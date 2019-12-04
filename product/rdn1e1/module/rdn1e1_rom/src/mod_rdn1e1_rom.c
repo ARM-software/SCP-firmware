@@ -5,12 +5,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <mod_log.h>
 #include <mod_rdn1e1_rom.h>
 
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
+#include <fwk_log.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
@@ -98,7 +98,7 @@ static int rdn1e1_rom_start(fwk_id_t id)
 static int rdn1e1_rom_process_event(const struct fwk_event *event,
     struct fwk_event *resp)
 {
-    log_api->log(MOD_LOG_GROUP_INFO, "[ROM] Launch RAM\n");
+    FWK_LOG_INFO(log_api, "[ROM] Launch RAM\n");
 
     if (rom_config->load_ram_size != 0) {
         memcpy((void *)rom_config->ramfw_base,

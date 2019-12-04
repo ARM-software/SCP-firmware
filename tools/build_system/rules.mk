@@ -143,15 +143,18 @@ BUILTIN_LIBS_GCC := -lc -lgcc
 
 ifeq ($(MODE),release)
     O ?= $(DEFAULT_OPT_GCC_RELEASE)
+    LOG_LEVEL ?= $(DEFAULT_LOG_LEVEL_RELEASE)
 
     # Disable assertions in release mode
     DEFINES += NDEBUG
-
 else
     O ?= $(DEFAULT_OPT_GCC_DEBUG)
+    LOG_LEVEL ?= $(DEFAULT_LOG_LEVEL_DEBUG)
 
     DEFINES += BUILD_MODE_DEBUG
 endif
+
+DEFINES += FWK_LOG_LEVEL=FWK_LOG_LEVEL_$(LOG_LEVEL)
 
 ifeq ($(BUILD_HAS_DEBUGGER),yes)
     DEFINES += BUILD_HAS_DEBUGGER

@@ -47,14 +47,17 @@ enum mod_log_group {
     /*! The debug log group */
     MOD_LOG_GROUP_DEBUG = (1 << 0),
 
-    /*! The error log group */
-    MOD_LOG_GROUP_ERROR = (1 << 1),
-
     /*! The info log group */
-    MOD_LOG_GROUP_INFO = (1 << 2),
+    MOD_LOG_GROUP_INFO = (1 << 1),
 
     /*! The warning log group */
-    MOD_LOG_GROUP_WARNING = (1 << 3),
+    MOD_LOG_GROUP_WARNING = (1 << 2),
+
+    /*! The error log group */
+    MOD_LOG_GROUP_ERROR = (1 << 3),
+
+    /*! The critical log group */
+    MOD_LOG_GROUP_CRITICAl = (1 << 4),
 };
 
 /*!

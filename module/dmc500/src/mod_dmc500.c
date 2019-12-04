@@ -9,10 +9,10 @@
  */
 
 #include <mod_dmc500.h>
-#include <mod_log.h>
 #include <mod_timer.h>
 
 #include <fwk_assert.h>
+#include <fwk_log.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
@@ -113,10 +113,8 @@ static int dmc500_config(struct mod_dmc500_reg *dmc, fwk_id_t ddr_phy_id)
     module_config = fwk_module_get_data(fwk_module_id_dmc500);
     reg_val = module_config->reg_val;
 
-    status = log_api->log(MOD_LOG_GROUP_DEBUG,
-        "[DDR] Initialising DMC500 at 0x%x\n", (uintptr_t)dmc);
-    if (status != FWK_SUCCESS)
-        return status;
+    FWK_LOG_TRACE(
+        log_api, "[DDR] Initialising DMC500 at 0x%x\n", (uintptr_t)dmc);
 
     dmc->ADDRESS_CONTROL      = reg_val->ADDRESS_CONTROL;
     dmc->RANK_REMAP_CONTROL   = reg_val->RANK_REMAP_CONTROL;
@@ -128,10 +126,7 @@ static int dmc500_config(struct mod_dmc500_reg *dmc, fwk_id_t ddr_phy_id)
     dmc->ODT_RD_CONTROL_31_00 = reg_val->ODT_RD_CONTROL_31_00;
     dmc->ODT_TIMING           = reg_val->ODT_TIMING;
 
-    status = log_api->log(MOD_LOG_GROUP_DEBUG,
-        "[DDR] Setting timing settings\n");
-    if (status != FWK_SUCCESS)
-        return status;
+    FWK_LOG_TRACE(log_api, "[DDR] Setting timing settings\n");
 
     dmc->T_REFI          = reg_val->T_REFI;
     dmc->T_RFC           = reg_val->T_RFC;
@@ -154,17 +149,11 @@ static int dmc500_config(struct mod_dmc500_reg *dmc, fwk_id_t ddr_phy_id)
     dmc->T_ESR           = reg_val->T_ESR;
     dmc->T_XSR           = reg_val->T_XSR;
 
-    status = log_api->log(MOD_LOG_GROUP_DEBUG,
-        "[DDR] Setting address map\n");
-    if (status != FWK_SUCCESS)
-        return status;
+    FWK_LOG_TRACE(log_api, "[DDR] Setting address map\n");
 
     dmc->ADDRESS_MAP = reg_val->ADDRESS_MAP;
 
-    status = log_api->log(MOD_LOG_GROUP_DEBUG,
-        "[DDR] Setting PMU settings\n");
-    if (status != FWK_SUCCESS)
-        return status;
+    FWK_LOG_TRACE(log_api, "[DDR] Setting PMU settings\n");
 
     dmc->SI0_SI_INTERRUPT_CONTROL = reg_val->SI0_SI_INTERRUPT_CONTROL;
     dmc->SI0_PMU_REQ_CONTROL = reg_val->SI0_PMU_REQ_CONTROL;
@@ -272,10 +261,7 @@ static int dmc500_config(struct mod_dmc500_reg *dmc, fwk_id_t ddr_phy_id)
 
     dmc->ERR_RAMECC_CTLR = reg_val->ERR_RAMECC_CTLR;
 
-    status = log_api->log(MOD_LOG_GROUP_DEBUG,
-        "[DDR] Setting PHY-related settings\n");
-    if (status != FWK_SUCCESS)
-        return status;
+    FWK_LOG_TRACE(log_api, "[DDR] Setting PHY-related settings\n");
 
     dmc->PHY_POWER_CONTROL = reg_val->PHY_POWER_CONTROL;
     dmc->T_PHY_TRAIN = reg_val->T_PHY_TRAIN;
@@ -293,19 +279,13 @@ static int dmc500_config(struct mod_dmc500_reg *dmc, fwk_id_t ddr_phy_id)
     dmc->PHY_CONFIG = 0x01000000;
     dmc->PHY_CONFIG = 0x00000003;
 
-    status = log_api->log(MOD_LOG_GROUP_DEBUG,
-        "[DDR] Doing direct DDR commands\n");
-    if (status != FWK_SUCCESS)
-        return status;
+    FWK_LOG_TRACE(log_api, "[DDR] Doing direct DDR commands\n");
 
     module_config->direct_ddr_cmd(dmc);
 
     dmc->REFRESH_ENABLE = reg_val->REFRESH_ENABLE;
 
-    status = log_api->log(MOD_LOG_GROUP_DEBUG,
-        "[DDR] Setting dmc in READY mode\n");
-    if (status != FWK_SUCCESS)
-        return status;
+    FWK_LOG_TRACE(log_api, "[DDR] Setting dmc in READY mode\n");
 
     status = timer_api->time_to_timestamp(module_config->timer_id,
                                           1000 * 1000, &timeout);
@@ -334,8 +314,7 @@ static int dmc500_config(struct mod_dmc500_reg *dmc, fwk_id_t ddr_phy_id)
     dmc->SI0_SI_STATE_CONTROL = reg_val->SI0_SI_STATE_CONTROL;
     dmc->SI1_SI_STATE_CONTROL = reg_val->SI1_SI_STATE_CONTROL;
 
-    status = log_api->log(MOD_LOG_GROUP_DEBUG,
-        "[DDR] Waiting for Queue stall = 0...\n");
+    FWK_LOG_TRACE(log_api, "[DDR] Waiting for Queue stall = 0...\n");
     if (status != FWK_SUCCESS)
         return status;
 
@@ -349,10 +328,7 @@ static int dmc500_config(struct mod_dmc500_reg *dmc, fwk_id_t ddr_phy_id)
             goto timeout;
     }
 
-    status = log_api->log(MOD_LOG_GROUP_DEBUG,
-        "[DDR] Waiting for SI0 stall = 0...\n");
-    if (status != FWK_SUCCESS)
-        return FWK_SUCCESS;
+    FWK_LOG_TRACE(log_api, "[DDR] Waiting for SI0 stall = 0...\n");
 
     while ((dmc->SI0_SI_STATUS & MOD_DMC500_SI_STATUS_STALL_ACK) != 0) {
         status = timer_api->remaining(module_config->timer_id, timeout,
@@ -364,10 +340,7 @@ static int dmc500_config(struct mod_dmc500_reg *dmc, fwk_id_t ddr_phy_id)
             goto timeout;
     }
 
-    status = log_api->log(MOD_LOG_GROUP_DEBUG,
-        "[DDR] Waiting for SI1 stall = 0...\n");
-    if (status != FWK_SUCCESS)
-        return status;
+    FWK_LOG_TRACE(log_api, "[DDR] Waiting for SI1 stall = 0...\n");
 
     while ((dmc->SI1_SI_STATUS & MOD_DMC500_SI_STATUS_STALL_ACK) != 0) {
         status = timer_api->remaining(module_config->timer_id, timeout,
@@ -379,16 +352,12 @@ static int dmc500_config(struct mod_dmc500_reg *dmc, fwk_id_t ddr_phy_id)
             goto timeout;
     }
 
-    status = log_api->log(MOD_LOG_GROUP_DEBUG, "[DDR] DMC init done.\n");
-    if (status != FWK_SUCCESS)
-        return status;
+    FWK_LOG_TRACE(log_api, "[DDR] DMC init done.\n");
 
     return FWK_SUCCESS;
 
 timeout:
-    status = log_api->log(MOD_LOG_GROUP_ERROR,
-        "[DDR] Timed out in DMC500 init.\n");
-    if (status != FWK_SUCCESS)
-        return status;
+    FWK_LOG_ERR(log_api, "[DDR] Timed out in DMC500 init.\n");
+
     return FWK_E_TIMEOUT;
 }

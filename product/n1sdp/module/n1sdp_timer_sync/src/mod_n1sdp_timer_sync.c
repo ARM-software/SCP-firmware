@@ -12,7 +12,6 @@
 
 #include <internal/timer_sync.h>
 
-#include <mod_log.h>
 #include <mod_n1sdp_system.h>
 #include <mod_n1sdp_timer_sync.h>
 #include <mod_timer.h>
@@ -20,6 +19,7 @@
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
+#include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -140,13 +140,13 @@ static int n1sdp_sync_master_timer(fwk_id_t id)
                                    SYNC_CHECK_INTERVAL_US);
         retries--;
         if ((retries % 10) == 0)
-            tsync_ctx.log_api->log(MOD_LOG_GROUP_INFO, ".");
+            FWK_LOG_INFO(tsync_ctx.log_api, ".");
     } while (retries != 0);
 
     if ((retries == 0) && (!is_timer_synced(device_ctx)))
-        tsync_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Timeout!\n");
+        FWK_LOG_INFO(tsync_ctx.log_api, "Timeout!\n");
     else
-        tsync_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Synced\n");
+        FWK_LOG_INFO(tsync_ctx.log_api, "Synced\n");
 
     return FWK_SUCCESS;
 }

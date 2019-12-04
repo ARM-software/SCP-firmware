@@ -7,11 +7,11 @@
 
 #include <mod_apcontext.h>
 #include <mod_clock.h>
-#include <mod_log.h>
 
 #include <fwk_assert.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
@@ -29,8 +29,9 @@ static void apcontext_zero(void)
 
     config = fwk_module_get_data(fwk_module_id_apcontext);
 
-    log->log(MOD_LOG_GROUP_DEBUG, MODULE_NAME
-        " Zeroing AP context area [0x%08x - 0x%08x]\n",
+    FWK_LOG_TRACE(
+        log,
+        MODULE_NAME " Zeroing AP context area [0x%08x - 0x%08x]\n",
         config->base,
         config->base + config->size);
 

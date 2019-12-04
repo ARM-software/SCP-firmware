@@ -8,7 +8,6 @@
 #ifndef INTERNAL_SMMU_WRAPPER_H
 #define INTERNAL_SMMU_WRAPPER_H
 
-#include "synquacer_debug.h"
 #include "synquacer_mmap.h"
 
 #ifdef CONFIG_SCB_USE_PCIE_INTERCONNECT

@@ -6,7 +6,6 @@
  */
 
 #include "low_level_access.h"
-#include "synquacer_debug.h"
 #include "synquacer_mmap.h"
 
 #include <cmsis_os2.h>
@@ -14,7 +13,10 @@
 #include <internal/reset.h>
 #include <internal/sysoc.h>
 
+#include <mod_synquacer_system.h>
+
 #include <fwk_assert.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_status.h>
 
@@ -201,7 +203,8 @@ void lpcm_sysoc_reset(RST_TYPE_t type, RST_BLOCK block)
             osDelay(RESET_CHECK_CYCLE_MS);
         }
         if (i == status_check_num) {
-            SYNQUACER_DEV_LOG_ERROR(
+            FWK_LOG_ERR(
+                synquacer_system_ctx.log_api,
                 "[LPCM] Reset timeout.(%dms, %08x)\n",
                 RESET_TIMEOUT_MS,
                 reset_info[block].addr_lpcm);
@@ -218,7 +221,8 @@ void lpcm_sysoc_reset(RST_TYPE_t type, RST_BLOCK block)
             osDelay(RESET_CHECK_CYCLE_MS);
         }
         if (i == status_check_num) {
-            SYNQUACER_DEV_LOG_ERROR(
+            FWK_LOG_ERR(
+                synquacer_system_ctx.log_api,
                 "[SYSOC] Reset timeout.(%dms, %08x)\n",
                 RESET_TIMEOUT_MS,
                 reset_info[block].addr_sysoc_bus);
@@ -235,7 +239,8 @@ void lpcm_sysoc_reset(RST_TYPE_t type, RST_BLOCK block)
             osDelay(RESET_CHECK_CYCLE_MS);
         }
         if (i == status_check_num) {
-            SYNQUACER_DEV_LOG_ERROR(
+            FWK_LOG_ERR(
+                synquacer_system_ctx.log_api,
                 "[SYSOC] Reset timeout.(%dms, %08x)\n",
                 RESET_TIMEOUT_MS,
                 reset_info[block].addr_sysoc_blk);
@@ -282,7 +287,8 @@ void lpcm_sysoc_reset_clear(RST_TYPE_t type, RST_BLOCK block)
             osDelay(RESET_CHECK_CYCLE_MS);
         }
         if (i == status_check_num) {
-            SYNQUACER_DEV_LOG_ERROR(
+            FWK_LOG_ERR(
+                synquacer_system_ctx.log_api,
                 "[SYSOC] Reset clear timeout.(%dms, %08x)\n",
                 RESET_TIMEOUT_MS,
                 reset_info[block].addr_sysoc_blk);
@@ -299,7 +305,8 @@ void lpcm_sysoc_reset_clear(RST_TYPE_t type, RST_BLOCK block)
             osDelay(RESET_CHECK_CYCLE_MS);
         }
         if (i == status_check_num) {
-            SYNQUACER_DEV_LOG_ERROR(
+            FWK_LOG_ERR(
+                synquacer_system_ctx.log_api,
                 "[SYSOC] Reset clear timeout.(%dms, %08x)\n",
                 RESET_TIMEOUT_MS,
                 reset_info[block].addr_sysoc_bus);
@@ -315,7 +322,8 @@ void lpcm_sysoc_reset_clear(RST_TYPE_t type, RST_BLOCK block)
             osDelay(RESET_CHECK_CYCLE_MS);
         }
         if (i == status_check_num) {
-            SYNQUACER_DEV_LOG_ERROR(
+            FWK_LOG_ERR(
+                synquacer_system_ctx.log_api,
                 "[LPCM] Reset clear timeout.(%dms, %08x)\n",
                 RESET_TIMEOUT_MS,
                 reset_info[block].addr_lpcm);

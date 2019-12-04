@@ -12,7 +12,6 @@
 #include "system_mmap.h"
 
 #include <mod_juno_ppu.h>
-#include <mod_log.h>
 #include <mod_power_domain.h>
 #include <mod_system_power.h>
 #include <mod_timer.h>
@@ -20,6 +19,7 @@
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
+#include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>

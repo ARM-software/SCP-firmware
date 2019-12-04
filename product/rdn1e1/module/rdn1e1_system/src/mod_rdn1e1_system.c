@@ -18,7 +18,6 @@
 
 #include <mod_clock.h>
 #include <mod_cmn600.h>
-#include <mod_log.h>
 #include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
 #include <mod_rdn1e1_system.h>
@@ -31,6 +30,7 @@
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -283,7 +283,8 @@ static int rdn1e1_system_start(fwk_id_t id)
     if (status != FWK_SUCCESS)
         return status;
 
-    rdn1e1_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+    FWK_LOG_TRACE(
+        rdn1e1_system_ctx.log_api,
         "[RDN1E1 SYSTEM] Requesting SYSTOP initialization...\n");
 
     /*
@@ -366,8 +367,10 @@ int rdn1e1_system_process_notification(const struct fwk_event *event,
 
             status = rdn1e1_system_ctx.cmn600_api->set_config(&remote_config);
             if (status != FWK_SUCCESS) {
-                rdn1e1_system_ctx.log_api->log(MOD_LOG_GROUP_ERROR,
-                    "CCIX Setup Failed for Chip: %d!\n", chip_id);
+                FWK_LOG_ERR(
+                    rdn1e1_system_ctx.log_api,
+                    "CCIX Setup Failed for Chip: %d!\n",
+                    chip_id);
                 return status;
             }
             rdn1e1_system_ctx.cmn600_api->exchange_protocol_credit(0);
@@ -380,7 +383,8 @@ int rdn1e1_system_process_notification(const struct fwk_event *event,
          * time only
          */
         if (chip_id == 0) {
-            rdn1e1_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+            FWK_LOG_TRACE(
+                rdn1e1_system_ctx.log_api,
                 "[RDN1E1 SYSTEM] Initializing the primary core...\n");
 
             mod_pd_restricted_api = rdn1e1_system_ctx.mod_pd_restricted_api;
@@ -393,9 +397,11 @@ int rdn1e1_system_process_notification(const struct fwk_event *event,
             if (status != FWK_SUCCESS)
                 return status;
         } else {
-            rdn1e1_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+            FWK_LOG_TRACE(
+                rdn1e1_system_ctx.log_api,
                 "[RDN1E1 SYSTEM] Detected as slave chip %d, "
-                "Waiting for SCMI command\n", chip_id);
+                "Waiting for SCMI command\n",
+                chip_id);
         }
 
         /* Unsubscribe to the notification */

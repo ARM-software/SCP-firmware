@@ -14,7 +14,6 @@
 #include "juno_id.h"
 
 #include <mod_juno_thermal.h>
-#include <mod_log.h>
 #include <mod_power_domain.h>
 #include <mod_sensor.h>
 #include <mod_system_power.h>
@@ -22,6 +21,7 @@
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -204,7 +204,7 @@ static int juno_thermal_start(fwk_id_t id)
 static int check_threshold_breach(uint64_t temperature, uint64_t threshold)
 {
     if (temperature > threshold) {
-        log_api->log(MOD_LOG_GROUP_WARNING, "[THERMAL] system shutdown\n");
+        FWK_LOG_WARN(log_api, "[THERMAL] system shutdown\n");
 
         return pd_api->system_shutdown(MOD_PD_SYSTEM_FORCED_SHUTDOWN);
     }

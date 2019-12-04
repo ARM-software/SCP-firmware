@@ -29,3 +29,6 @@ unusedVariable:framework/test/test_fwk_list_init.c
 // Cppcheck can not properly understand fwk_expect() thus can not ascertain the
 // way we check for pointer values.
 nullPointerRedundantCheck:product/juno/*
+
+// Cppcheck seems to get confused when encountering parentheses in strings
+syntaxError:product/synquacer/module/synquacer_system/src/mmu500.c:34

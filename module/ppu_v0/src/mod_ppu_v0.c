@@ -10,7 +10,6 @@
 
 #include <ppu_v0.h>
 
-#include <mod_log.h>
 #include <mod_power_domain.h>
 #include <mod_ppu_v0.h>
 
@@ -20,6 +19,7 @@
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
@@ -89,8 +89,8 @@ static int get_state(struct ppu_v0_reg *ppu, unsigned int *state)
 
     *state = ppu_mode_to_power_state[ppu_mode];
     if (*state == MODE_UNSUPPORTED) {
-        ppu_v0_ctx.log_api->log(MOD_LOG_GROUP_ERROR,
-                                "[PD] Unexpected PPU mode (%i).\n", ppu_mode);
+        FWK_LOG_ERR(
+            ppu_v0_ctx.log_api, "[PD] Unexpected PPU mode (%i).\n", ppu_mode);
         return FWK_E_DEVICE;
     }
 
@@ -129,8 +129,10 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
         break;
 
     default:
-        ppu_v0_ctx.log_api->log(MOD_LOG_GROUP_ERROR,
-            "[PD] Requested power state (%i) is not supported.\n", state);
+        FWK_LOG_ERR(
+            ppu_v0_ctx.log_api,
+            "[PD] Requested power state (%i) is not supported.\n",
+            state);
         return FWK_E_PARAM;
     }
 
