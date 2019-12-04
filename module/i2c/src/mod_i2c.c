@@ -332,13 +332,15 @@ static int respond_to_caller(
 static int mod_i2c_process_event(const struct fwk_event *event,
                                  struct fwk_event *resp_event)
 {
+    fwk_id_t dev_id;
     int status, drv_status;
     struct mod_i2c_dev_ctx *ctx;
     struct mod_i2c_event_param *event_param =
         (struct mod_i2c_event_param *)event->params;
     struct mod_i2c_request *request = (struct mod_i2c_request *)event->params;
 
-    get_ctx(event->target_id, &ctx);
+    dev_id = event->target_id;
+    get_ctx(dev_id, &ctx);
 
     switch (fwk_id_get_event_idx(event->id)) {
     case MOD_I2C_EVENT_IDX_REQUEST_TRANSMIT:
@@ -382,8 +384,7 @@ static int mod_i2c_process_event(const struct fwk_event *event,
 
     case MOD_I2C_EVENT_IDX_REQUEST_COMPLETED:
         if ((ctx->state == MOD_I2C_DEV_TX) || (ctx->state == MOD_I2C_DEV_RX)) {
-            status = respond_to_caller(
-                event->target_id, ctx, event_param->status);
+            status = respond_to_caller(dev_id, ctx, event_param->status);
         } else if (ctx->state == MOD_I2C_DEV_TX_RX) {
             if (event_param->status == FWK_SUCCESS) {
                 /* The TX request succeeded, proceed with the RX */
@@ -395,12 +396,10 @@ static int mod_i2c_process_event(const struct fwk_event *event,
                 if (drv_status == FWK_PENDING)
                     status = FWK_SUCCESS;
                 else
-                    status = respond_to_caller(
-                        event->target_id, ctx, drv_status);
+                    status = respond_to_caller(dev_id, ctx, drv_status);
             } else {
                 /* The request failed, respond */
-                status = respond_to_caller(
-                    event->target_id, ctx, event_param->status);
+                status = respond_to_caller(dev_id, ctx, event_param->status);
             }
         } else
             status = FWK_E_STATE;
