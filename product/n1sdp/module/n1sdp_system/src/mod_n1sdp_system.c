@@ -24,6 +24,7 @@
 #include <mod_n1sdp_c2c_i2c.h>
 #include <mod_n1sdp_dmc620.h>
 #include <mod_n1sdp_flash.h>
+#include <mod_n1sdp_scp2pcc.h>
 #include <mod_n1sdp_system.h>
 #include <mod_log.h>
 #include <mod_power_domain.h>
@@ -133,6 +134,9 @@ struct n1sdp_system_ctx {
 
     /* Pointer to N1SDP C2C slave information API */
     const struct n1sdp_c2c_slave_info_api *c2c_api;
+
+    /* Pointer to SCP to PCC communication API */
+    const struct mod_n1sdp_scp2pcc_api *scp2pcc_api;
 };
 
 struct n1sdp_system_isr {
@@ -198,8 +202,26 @@ static struct n1sdp_system_isr isrs[] = {
 static int n1sdp_system_shutdown(
     enum mod_pd_system_shutdown system_shutdown)
 {
-    NVIC_SystemReset();
+    switch (system_shutdown) {
+    case MOD_PD_SYSTEM_SHUTDOWN:
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[N1SDP SYSTEM] Request PCC for system shutdown\n");
+        n1sdp_system_ctx.scp2pcc_api->send(NULL, 0, SCP2PCC_TYPE_SHUTDOWN);
+        break;
 
+    case MOD_PD_SYSTEM_COLD_RESET:
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[N1SDP SYSTEM] Request PCC for system reboot\n");
+        n1sdp_system_ctx.scp2pcc_api->send(NULL, 0, SCP2PCC_TYPE_REBOOT);
+        break;
+
+    default:
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[N1SDP SYSTEM] Unknown shutdown command!\n");
+        break;
+    }
+
+    NVIC_SystemReset();
     return FWK_E_DEVICE;
 }
 
@@ -545,6 +567,12 @@ static int n1sdp_system_bind(fwk_id_t id, unsigned int round)
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_C2C),
         FWK_ID_API(FWK_MODULE_IDX_N1SDP_C2C, N1SDP_C2C_API_IDX_SLAVE_INFO),
         &n1sdp_system_ctx.c2c_api);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SCP2PCC),
+        FWK_ID_API(FWK_MODULE_IDX_N1SDP_SCP2PCC, 0),
+        &n1sdp_system_ctx.scp2pcc_api);
     if (status != FWK_SUCCESS)
         return status;
 
