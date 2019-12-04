@@ -47,6 +47,9 @@ DEFAULT_BUILD_PATH := $(TOP_DIR)/build
 DEFAULT_VERBOSE := n
 DEFAULT_DEBUGGER := n
 
+DEFAULT_LOG_LEVEL_debug := TRACE
+DEFAULT_LOG_LEVEL_release := WARN
+
 #
 # Top-level configuration
 #
@@ -60,6 +63,9 @@ export MODE ?= $(DEFAULT_MODE)
 ifneq ($(filter-out debug release, $(MODE)),)
     $(error "Invalid MODE parameter. Aborting...")
 endif
+
+# Log level
+export LOG_LEVEL ?= $(DEFAULT_LOG_LEVEL_${MODE})
 
 # Build directory
 BUILD_PATH ?= $(DEFAULT_BUILD_PATH)
@@ -201,4 +207,9 @@ help:
 	@echo "        Value: <y|n>"
 	@echo "        Default: $(DEFAULT_DEBUGGER)"
 	@echo "        Include the debugger library."
+	@echo ""
+	@echo "    LOG_LEVEL"
+	@echo "        Value: <TRACE|INFO|WARN|ERROR|CRIT>"
+	@echo "        Default: $(LOG_LEVEL)"
+	@echo "        Filter log messages less important than this level."
 	@echo ""

@@ -7,10 +7,10 @@
 
 #include "synquacer_mmap.h"
 
-#include <mod_log.h>
 #include <mod_pl011.h>
 
 #include <fwk_banner.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>

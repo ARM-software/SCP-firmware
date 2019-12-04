@@ -15,13 +15,13 @@
 #include <internal/pcie_ctrl_apb_reg.h>
 
 #include <mod_clock.h>
-#include <mod_log.h>
 #include <mod_n1sdp_c2c_i2c.h>
 #include <mod_n1sdp_pcie.h>
 #include <mod_timer.h>
 
 #include <fwk_event.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_math.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
@@ -130,8 +130,7 @@ static int n1sdp_pcie_ccix_enable_opt_tlp(bool enable)
     else
         value = (CCIX_CTRL_CAW | CCIX_VENDER_ID);
 
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                          "[CCIX] CCIX_CONTROL: 0x%08x\n", value);
+    FWK_LOG_INFO(pcie_ctx.log_api, "[CCIX] CCIX_CONTROL: 0x%08x\n", value);
 
     *(uint32_t *)(dev_ctx->lm_apb + PCIE_LM_RC_CCIX_CTRL_REG) = value;
 
@@ -160,8 +159,8 @@ static int n1sdp_pcie_power_on(fwk_id_t id)
     if (dev_ctx == NULL)
         return FWK_E_PARAM;
 
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                          "[%s] Powering ON controller...", pcie_type[did]);
+    FWK_LOG_INFO(
+        pcie_ctx.log_api, "[%s] Powering ON controller...", pcie_type[did]);
     wait_data.ctrl_apb = NULL;
     if (dev_ctx->config->ccix_capable) {
         SCC->AXI_OVRD_CCIX = AXI_OVRD_VAL_CCIX;
@@ -173,7 +172,7 @@ static int n1sdp_pcie_power_on(fwk_id_t id)
                                           pcie_wait_condition,
                                           &wait_data);
         if (status != FWK_SUCCESS) {
-            pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Timeout!\n");
+            FWK_LOG_INFO(pcie_ctx.log_api, "Timeout!\n");
             return status;
         }
         SCC->SYS_MAN_RESET &= ~(1 << SCC_SYS_MAN_RESET_CCIX_POS);
@@ -187,12 +186,12 @@ static int n1sdp_pcie_power_on(fwk_id_t id)
                                           pcie_wait_condition,
                                           &wait_data);
         if (status != FWK_SUCCESS) {
-            pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Timeout!\n");
+            FWK_LOG_INFO(pcie_ctx.log_api, "Timeout!\n");
             return status;
         }
         SCC->SYS_MAN_RESET &= ~(1 << SCC_SYS_MAN_RESET_PCIE_POS);
     }
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+    FWK_LOG_INFO(pcie_ctx.log_api, "Done\n");
 
     return FWK_SUCCESS;
 }
@@ -211,8 +210,7 @@ static int n1sdp_pcie_phy_init(fwk_id_t id)
 
     gen_speed = dev_ctx->config->ccix_capable ? PCIE_GEN_4 : PCIE_GEN_3;
 
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                          "[%s] Initializing PHY...", pcie_type[did]);
+    FWK_LOG_INFO(pcie_ctx.log_api, "[%s] Initializing PHY...", pcie_type[did]);
 
     pcie_phy_init(dev_ctx->phy_apb);
     status = pcie_init(dev_ctx->ctrl_apb,
@@ -220,10 +218,10 @@ static int n1sdp_pcie_phy_init(fwk_id_t id)
                        PCIE_INIT_STAGE_PHY,
                        gen_speed);
     if (status != FWK_SUCCESS) {
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Timeout!\n");
+        FWK_LOG_INFO(pcie_ctx.log_api, "Timeout!\n");
         return status;
     }
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+    FWK_LOG_INFO(pcie_ctx.log_api, "Done\n");
 
     return FWK_SUCCESS;
 }
@@ -247,19 +245,20 @@ static int n1sdp_pcie_controller_init(fwk_id_t id, bool ep_mode)
         dev_ctx->ctrl_apb->EP_MISC_CTRL |= 0x100;
     }
 
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                          "[%s] Initializing controller in %s mode...",
-                          pcie_type[did],
-                          (ep_mode ? "endpoint" : "root port"));
+    FWK_LOG_INFO(
+        pcie_ctx.log_api,
+        "[%s] Initializing controller in %s mode...",
+        pcie_type[did],
+        (ep_mode ? "endpoint" : "root port"));
     status = pcie_init(dev_ctx->ctrl_apb,
                        pcie_ctx.timer_api,
                        PCIE_INIT_STAGE_CTRL,
                        gen_speed);
     if (status != FWK_SUCCESS) {
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Timeout!\n");
+        FWK_LOG_INFO(pcie_ctx.log_api, "Timeout!\n");
         return status;
     }
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+    FWK_LOG_INFO(pcie_ctx.log_api, "Done\n");
 
     return FWK_SUCCESS;
 }
@@ -281,50 +280,57 @@ static int n1sdp_pcie_link_training(fwk_id_t id, bool ep_mode)
     gen_speed = dev_ctx->config->ccix_capable ? PCIE_GEN_4 : PCIE_GEN_3;
 
     if (gen_speed >= PCIE_GEN_3 && !ep_mode) {
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                              "[%s] Setting TX Preset for GEN%d...",
-                              pcie_type[did], gen_speed + 1);
+        FWK_LOG_INFO(
+            pcie_ctx.log_api,
+            "[%s] Setting TX Preset for GEN%d...",
+            pcie_type[did],
+            gen_speed + 1);
         status = pcie_set_gen_tx_preset(dev_ctx->rp_ep_config_apb,
                                         TX_PRESET_VALUE,
                                         gen_speed);
         if (status != FWK_SUCCESS) {
-            pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Error!\n");
+            FWK_LOG_INFO(pcie_ctx.log_api, "Error!\n");
             return status;
         }
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+        FWK_LOG_INFO(pcie_ctx.log_api, "Done\n");
     }
 
     /* Link training */
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                          "[%s] Starting link training...", pcie_type[did]);
+    FWK_LOG_INFO(
+        pcie_ctx.log_api, "[%s] Starting link training...", pcie_type[did]);
     status = pcie_init(dev_ctx->ctrl_apb,
                        pcie_ctx.timer_api,
                        PCIE_INIT_STAGE_LINK_TRNG,
                        gen_speed);
     if (status != FWK_SUCCESS) {
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Timeout!\n");
+        FWK_LOG_INFO(pcie_ctx.log_api, "Timeout!\n");
         pcie_init_bdf_table(dev_ctx->config);
         return status;
     }
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+    FWK_LOG_INFO(pcie_ctx.log_api, "Done\n");
 
     neg_config = (dev_ctx->ctrl_apb->RP_CONFIG_OUT &
         RP_CONFIG_OUT_NEGOTIATED_SPD_MASK) >> RP_CONFIG_OUT_NEGOTIATED_SPD_POS;
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                          "[%s] Negotiated speed: GEN%d\n",
-                          pcie_type[did], neg_config + 1);
+    FWK_LOG_INFO(
+        pcie_ctx.log_api,
+        "[%s] Negotiated speed: GEN%d\n",
+        pcie_type[did],
+        neg_config + 1);
 
     neg_config = (dev_ctx->ctrl_apb->RP_CONFIG_OUT &
         RP_CONFIG_OUT_NEGOTIATED_LINK_WIDTH_MASK) >>
         RP_CONFIG_OUT_NEGOTIATED_LINK_WIDTH_POS;
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                          "[%s] Negotiated link width: x%d\n",
-                          pcie_type[did], fwk_math_pow2(neg_config));
+    FWK_LOG_INFO(
+        pcie_ctx.log_api,
+        "[%s] Negotiated link width: x%d\n",
+        pcie_type[did],
+        fwk_math_pow2(neg_config));
 
     if (gen_speed == PCIE_GEN_4) {
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                              "[%s] Re-training link to GEN4 speed...",
-                              pcie_type[did]);
+        FWK_LOG_INFO(
+            pcie_ctx.log_api,
+            "[%s] Re-training link to GEN4 speed...",
+            pcie_type[did]);
         /* Set GEN4 as target speed */
         pcie_rp_ep_config_read_word(dev_ctx->rp_ep_config_apb,
                                     PCIE_LINK_CTRL_STATUS_2_OFFSET, &reg_val);
@@ -338,24 +344,28 @@ static int n1sdp_pcie_link_training(fwk_id_t id, bool ep_mode)
                                    dev_ctx->rp_ep_config_apb,
                                    pcie_ctx.timer_api);
         if (status != FWK_SUCCESS) {
-            pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "TIMEOUT\n");
+            FWK_LOG_INFO(pcie_ctx.log_api, "TIMEOUT\n");
             return FWK_SUCCESS;
         }
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+        FWK_LOG_INFO(pcie_ctx.log_api, "Done\n");
 
         pcie_rp_ep_config_read_word(dev_ctx->rp_ep_config_apb,
                                     PCIE_LINK_CTRL_STATUS_OFFSET, &reg_val);
         neg_config = (reg_val >> PCIE_LINK_CTRL_NEG_SPEED_POS) &
                      PCIE_LINK_CTRL_NEG_SPEED_MASK;
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                              "[%s] Re-negotiated speed: GEN%d\n",
-                              pcie_type[did], neg_config);
+        FWK_LOG_INFO(
+            pcie_ctx.log_api,
+            "[%s] Re-negotiated speed: GEN%d\n",
+            pcie_type[did],
+            neg_config);
 
         neg_config = (reg_val >> PCIE_LINK_CTRL_NEG_WIDTH_POS) &
                      PCIE_LINK_CTRL_NEG_WIDTH_MASK;
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                              "[%s] Re-negotiated link width: x%d\n",
-                              pcie_type[did], neg_config);
+        FWK_LOG_INFO(
+            pcie_ctx.log_api,
+            "[%s] Re-negotiated link width: x%d\n",
+            pcie_type[did],
+            neg_config);
     }
 
     return FWK_SUCCESS;
@@ -373,8 +383,8 @@ static int n1sdp_pcie_rc_setup(fwk_id_t id)
     if (dev_ctx == NULL)
         return FWK_E_PARAM;
 
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                          "[%s] Setup Type0 configuration...", pcie_type[did]);
+    FWK_LOG_INFO(
+        pcie_ctx.log_api, "[%s] Setup Type0 configuration...", pcie_type[did]);
     if (dev_ctx->config->ccix_capable)
         ecam_base_addr = dev_ctx->config->axi_slave_base32 +
                          CCIX_AXI_ECAM_TYPE0_OFFSET;
@@ -386,13 +396,13 @@ static int n1sdp_pcie_rc_setup(fwk_id_t id)
                  __builtin_ctz(AXI_ECAM_TYPE0_SIZE),
                  TRANS_TYPE_0_CFG);
     if (status != FWK_SUCCESS) {
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Error!\n");
+        FWK_LOG_INFO(pcie_ctx.log_api, "Error!\n");
         return status;
     }
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+    FWK_LOG_INFO(pcie_ctx.log_api, "Done\n");
 
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                          "[%s] Setup Type1 configuration...", pcie_type[did]);
+    FWK_LOG_INFO(
+        pcie_ctx.log_api, "[%s] Setup Type1 configuration...", pcie_type[did]);
     if (dev_ctx->config->ccix_capable)
         ecam_base_addr = dev_ctx->config->axi_slave_base32 +
                          CCIX_AXI_ECAM_TYPE1_OFFSET;
@@ -404,14 +414,13 @@ static int n1sdp_pcie_rc_setup(fwk_id_t id)
                  __builtin_ctz(AXI_ECAM_TYPE1_SIZE),
                  TRANS_TYPE_1_CFG);
     if (status != FWK_SUCCESS) {
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Error!\n");
+        FWK_LOG_INFO(pcie_ctx.log_api, "Error!\n");
         return status;
     }
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+    FWK_LOG_INFO(pcie_ctx.log_api, "Done\n");
 
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                          "[%s] Setup MMIO32 configuration...",
-                          pcie_type[did]);
+    FWK_LOG_INFO(
+        pcie_ctx.log_api, "[%s] Setup MMIO32 configuration...", pcie_type[did]);
     if (dev_ctx->config->ccix_capable)
         ecam_base_addr = dev_ctx->config->axi_slave_base32 +
                              CCIX_AXI_MMIO32_OFFSET;
@@ -423,13 +432,13 @@ static int n1sdp_pcie_rc_setup(fwk_id_t id)
                  __builtin_ctz(AXI_MMIO32_SIZE),
                  TRANS_TYPE_MEM_IO);
     if (status != FWK_SUCCESS) {
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Error!\n");
+        FWK_LOG_INFO(pcie_ctx.log_api, "Error!\n");
         return status;
     }
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+    FWK_LOG_INFO(pcie_ctx.log_api, "Done\n");
 
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                          "[%s] Setup IO configuration...", pcie_type[did]);
+    FWK_LOG_INFO(
+        pcie_ctx.log_api, "[%s] Setup IO configuration...", pcie_type[did]);
     if (dev_ctx->config->ccix_capable)
         ecam_base_addr = dev_ctx->config->axi_slave_base32 +
                              CCIX_AXI_IO_OFFSET;
@@ -441,71 +450,72 @@ static int n1sdp_pcie_rc_setup(fwk_id_t id)
                  __builtin_ctz(AXI_IO_SIZE),
                  TRANS_TYPE_IO);
     if (status != FWK_SUCCESS) {
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Error!\n");
+        FWK_LOG_INFO(pcie_ctx.log_api, "Error!\n");
         return status;
     }
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+    FWK_LOG_INFO(pcie_ctx.log_api, "Done\n");
 
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                          "[%s] Setup MMIO64 configuration...",
-                          pcie_type[did]);
+    FWK_LOG_INFO(
+        pcie_ctx.log_api, "[%s] Setup MMIO64 configuration...", pcie_type[did]);
     status = axi_outbound_region_setup(dev_ctx->rc_axi_config_apb,
                  dev_ctx->config->axi_slave_base64,
                  __builtin_ctz(AXI_MMIO64_SIZE),
                  TRANS_TYPE_MEM_IO);
     if (status != FWK_SUCCESS) {
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Error!\n");
+        FWK_LOG_INFO(pcie_ctx.log_api, "Error!\n");
         return status;
     }
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+    FWK_LOG_INFO(pcie_ctx.log_api, "Done\n");
 
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                          "[%s] Setup RP classcode...", pcie_type[did]);
+    FWK_LOG_INFO(
+        pcie_ctx.log_api, "[%s] Setup RP classcode...", pcie_type[did]);
     status = pcie_rp_ep_config_write_word(dev_ctx->rp_ep_config_apb,
                                           PCIE_CLASS_CODE_OFFSET,
                                           PCIE_CLASS_CODE_PCI_BRIDGE);
     if (status != FWK_SUCCESS) {
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Error!\n");
+        FWK_LOG_INFO(pcie_ctx.log_api, "Error!\n");
         return status;
     }
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+    FWK_LOG_INFO(pcie_ctx.log_api, "Done\n");
 
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                          "[%s] Enable inbound region in BAR 2...",
-                          pcie_type[did]);
+    FWK_LOG_INFO(
+        pcie_ctx.log_api,
+        "[%s] Enable inbound region in BAR 2...",
+        pcie_type[did]);
     status = axi_inbound_region_setup(dev_ctx->rc_axi_config_apb,
                  AXI_IB_REGION_BASE,
                  AXI_IB_REGION_SIZE_MSB, 2);
     if (status != FWK_SUCCESS) {
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Error!\n");
+        FWK_LOG_INFO(pcie_ctx.log_api, "Error!\n");
         return status;
     }
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+    FWK_LOG_INFO(pcie_ctx.log_api, "Done\n");
 
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                          "[%s] Enable Type 1 I/O configuration\n",
-                          pcie_type[did]);
+    FWK_LOG_INFO(
+        pcie_ctx.log_api,
+        "[%s] Enable Type 1 I/O configuration\n",
+        pcie_type[did]);
     *(uint32_t *)(dev_ctx->lm_apb + PCIE_LM_RC_BAR_CONFIG_REG) =
         (TYPE1_PREF_MEM_BAR_ENABLE_MASK |
          TYPE1_PREF_MEM_BAR_SIZE_64BIT_MASK |
          TYPE1_PREF_IO_BAR_ENABLE_MASK |
          TYPE1_PREF_IO_BAR_SIZE_32BIT_MASK);
 
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                          "[%s] Skipping ATS capability...", pcie_type[did]);
+    FWK_LOG_INFO(
+        pcie_ctx.log_api, "[%s] Skipping ATS capability...", pcie_type[did]);
     status = pcie_skip_ext_cap(dev_ctx->rp_ep_config_apb, EXT_CAP_ID_ATS);
     if (status != FWK_SUCCESS)
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Not found!\n");
+        FWK_LOG_INFO(pcie_ctx.log_api, "Not found!\n");
     else
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+        FWK_LOG_INFO(pcie_ctx.log_api, "Done\n");
 
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                          "[%s] Skipping PRI capability...", pcie_type[did]);
+    FWK_LOG_INFO(
+        pcie_ctx.log_api, "[%s] Skipping PRI capability...", pcie_type[did]);
     status = pcie_skip_ext_cap(dev_ctx->rp_ep_config_apb, EXT_CAP_ID_PRI);
     if (status != FWK_SUCCESS)
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Not found!\n");
+        FWK_LOG_INFO(pcie_ctx.log_api, "Not found!\n");
     else
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Done\n");
+        FWK_LOG_INFO(pcie_ctx.log_api, "Done\n");
 
     /*
      * Wait until devices connected in downstream ports
@@ -534,15 +544,17 @@ static int n1sdp_pcie_vc1_setup(fwk_id_t id, uint8_t vc1_tc)
 
     config_base_addr = dev_ctx->rp_ep_config_apb;
 
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
-        "[CCIX] Enabling VC1 in RP 0x%08x...", config_base_addr);
+    FWK_LOG_TRACE(
+        pcie_ctx.log_api,
+        "[CCIX] Enabling VC1 in RP 0x%08x...",
+        config_base_addr);
 
     status = pcie_vc_setup(config_base_addr, vc1_tc);
     if (status != FWK_SUCCESS) {
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_DEBUG, "Error!\n");
+        FWK_LOG_TRACE(pcie_ctx.log_api, "Error!\n");
         return status;
     }
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_DEBUG, "Done\n");
+    FWK_LOG_TRACE(pcie_ctx.log_api, "Done\n");
 
     /* Set max payload size to 512 */
     *(volatile uint32_t *)(config_base_addr + PCIE_DEV_CTRL_STATUS_OFFSET) |=
@@ -550,15 +562,17 @@ static int n1sdp_pcie_vc1_setup(fwk_id_t id, uint8_t vc1_tc)
 
     config_base_addr = dev_ctx->config->axi_slave_base32 + 0x100000;
 
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
-        "[CCIX] Enabling VC1 in EP 0x%08x...", config_base_addr);
+    FWK_LOG_TRACE(
+        pcie_ctx.log_api,
+        "[CCIX] Enabling VC1 in EP 0x%08x...",
+        config_base_addr);
 
     status = pcie_vc_setup(config_base_addr, vc1_tc);
     if (status != FWK_SUCCESS) {
-        pcie_ctx.log_api->log(MOD_LOG_GROUP_DEBUG, "Error!\n");
+        FWK_LOG_TRACE(pcie_ctx.log_api, "Error!\n");
         return status;
     }
-    pcie_ctx.log_api->log(MOD_LOG_GROUP_DEBUG, "Done\n");
+    FWK_LOG_TRACE(pcie_ctx.log_api, "Done\n");
 
     *(volatile uint32_t *)(config_base_addr + PCIE_DEV_CTRL_STATUS_OFFSET) |=
         (0x2 << PCIE_DEV_CTRL_MAX_PAYLOAD_SHIFT);

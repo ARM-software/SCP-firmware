@@ -10,6 +10,7 @@
 #include <mod_f_i2c.h>
 
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_module.h>
 #include <fwk_status.h>
 

@@ -5,12 +5,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "synquacer_debug.h"
 #include "synquacer_mmap.h"
 
 #include <ddr_init.h>
 
 #include <fwk_assert.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 
 #include <stdint.h>
@@ -80,11 +80,13 @@ static void fw_fip_load_bl32(void)
             (void *)bl32_uuid,
             (void *)fip_package_p->fip_toc_entry[BL32_TOC_ENTRY_INDEX].uuid,
             sizeof(bl32_uuid)) != 0) {
-        SYNQUACER_DEV_LOG_ERROR("[FIP] BL32 UUID is wrong, skip loading\n");
+        FWK_LOG_ERR(
+            synquacer_system_ctx.log_api,
+            "[FIP] BL32 UUID is wrong, skip loading\n");
         return;
     }
 
-    SYNQUACER_DEV_LOG_ERROR("[FIP] load BL32\n");
+    FWK_LOG_ERR(synquacer_system_ctx.log_api, "[FIP] load BL32\n");
 
     /* enable DRAM access by configuring address trans register */
     trans_addr_39_20 =
@@ -103,7 +105,7 @@ static void fw_fip_load_bl32(void)
     *((volatile uint32_t *)(REG_ASH_SCP_POW_CTL + ADDR_TRANS_OFFSET)) =
         trans_addr_39_20;
 
-    SYNQUACER_DEV_LOG_ERROR("[FIP] BL32 is loaded\n");
+    FWK_LOG_ERR(synquacer_system_ctx.log_api, "[FIP] BL32 is loaded\n");
 }
 
 void fw_fip_load_arm_tf(void)
@@ -126,20 +128,26 @@ void fw_fip_load_arm_tf(void)
         "sizeof(arm_tf_fip_package_t) is wrong");
 
     for (i = 0; i < FWK_ARRAY_SIZE(arm_tf_dst_addr); i++) {
-        SYNQUACER_DEV_LOG_DEBUG(
+        FWK_LOG_TRACE(
+            synquacer_system_ctx.log_api,
             "[FIP] fip_toc_entry[%d] offset_addr %lx\n",
             i,
             fip_package_p->fip_toc_entry[i].offset_addr);
 
-        SYNQUACER_DEV_LOG_DEBUG(
+        FWK_LOG_TRACE(
+            synquacer_system_ctx.log_api,
             "[FIP] fip_toc_entry[%d] size        %lu\n",
             i,
             fip_package_p->fip_toc_entry[i].size);
 
-        SYNQUACER_DEV_LOG_DEBUG(
-            "[FIP] dst addr[%d]                  %x\n", i, arm_tf_dst_addr[i]);
+        FWK_LOG_TRACE(
+            synquacer_system_ctx.log_api,
+            "[FIP] dst addr[%d]                  %x\n",
+            i,
+            arm_tf_dst_addr[i]);
 
-        SYNQUACER_DEV_LOG_DEBUG(
+        FWK_LOG_TRACE(
+            synquacer_system_ctx.log_api,
             "[FIP] src addr[%d]                  %x\n",
             i,
             ((uint32_t)fip_package_p +

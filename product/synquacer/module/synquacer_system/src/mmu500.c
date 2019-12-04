@@ -6,7 +6,10 @@
  */
 
 #include "mmu500.h"
-#include "synquacer_debug.h"
+
+#include <mod_synquacer_system.h>
+
+#include <fwk_log.h>
 
 void SMMU_setup_PMU(MMU500_Type_t *SMMU)
 {
@@ -28,7 +31,8 @@ void SMMU_setup_PMU(MMU500_Type_t *SMMU)
     pmu_regs[0x0800 / 4] = 0x00000800U; /* PMCGCR0: enable=1, global_basis */
     pmu_regs[0x0e04 / 4] = 0x00000003U; /* PMCR: enable=1, reset=1 */
 
-    SYNQUACER_DEV_LOG_DEBUG(
+    FWK_LOG_TRACE(
+        synquacer_system_ctx.log_api,
         "[MMU500] setup PMU for MMU-500@0x%08x. page_size=%d."
         "0x%08x(access), 0x%08x(read), 0x%08x(write).\n",
         (uint32_t)SMMU,

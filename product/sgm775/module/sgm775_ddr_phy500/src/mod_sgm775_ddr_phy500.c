@@ -8,12 +8,12 @@
  *     SGM775 DDR-PHY500 module
  */
 
-#include <mod_log.h>
 #include <mod_sgm775_ddr_phy500.h>
 #include <mod_sgm775_dmc500.h>
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
@@ -34,8 +34,7 @@ static int sgm775_ddr_phy500_config(fwk_id_t element_id)
 
     ddr = (struct mod_sgm775_ddr_phy500_reg *)element_config->ddr;
 
-    log_api->log(MOD_LOG_GROUP_DEBUG,
-        "[DDR] Initializing PHY at 0x%x\n", (uintptr_t) ddr);
+    FWK_LOG_TRACE(log_api, "[DDR] Initializing PHY at 0x%x\n", (uintptr_t)ddr);
 
     ddr->T_CTRL_DELAY   = 0x00000000;
     ddr->READ_DELAY     = 0x00000003;

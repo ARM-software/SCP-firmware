@@ -6,7 +6,6 @@
  */
 
 #include "low_level_access.h"
-#include "synquacer_debug.h"
 
 #include <cmsis_os2.h>
 
@@ -17,6 +16,9 @@
 #include <internal/synquacer_ppu_driver.h>
 #include <internal/transaction_sw.h>
 
+#include <mod_synquacer_system.h>
+
+#include <fwk_log.h>
 #include <fwk_macros.h>
 
 #include <stdbool.h>
@@ -154,7 +156,9 @@ static void sni_power_domain_workaround_mp(void)
     uint32_t i, j;
     int r;
 
-    SYNQUACER_DEV_LOG_INFO("[PowerDomain] Socionext-PPU initialize .\n");
+    FWK_LOG_INFO(
+        synquacer_system_ctx.log_api,
+        "[PowerDomain] Socionext-PPU initialize .\n");
 
     /* ppu off */
     for (i = 0; i < FWK_ARRAY_SIZE(sni_ppu_info); i++) {
@@ -164,9 +168,9 @@ static void sni_power_domain_workaround_mp(void)
         r = change_power_state(
             sni_ppu_info[i].no, PPU_PP_OFF, 0, hwcsysreqen, 0);
         if (r != 0) {
-            SYNQUACER_DEV_LOG_ERROR(
-                "[PPU] powerdomain workaround error. "
-                "sni-ppu%d off-process.\n",
+            FWK_LOG_ERR(
+                synquacer_system_ctx.log_api,
+                "[PPU] powerdomain workaround error. sni-ppu%d off-process.\n",
                 sni_ppu_info[i].no);
         }
     }
@@ -181,7 +185,8 @@ static void sni_power_domain_workaround_mp(void)
             osDelay(PD_CHECK_CYCLE_MS);
         }
         if (j >= PD_TIMEOUT_COUNT) {
-            SYNQUACER_DEV_LOG_ERROR(
+            FWK_LOG_ERR(
+                synquacer_system_ctx.log_api,
                 "[PPU] powerdomain workaround error. sni-ppu%d "
                 "status timeout\n",
                 sni_ppu_info[i].no);
@@ -199,7 +204,9 @@ static void sni_power_domain_workaround_mp(void)
     lpcm_sysoc_reset(RST_TYPE_BUS, RST_PCIE_TOP);
     lpcm_sysoc_reset(RST_TYPE_BUS, RST_DMA);
 
-    SYNQUACER_DEV_LOG_INFO("[PowerDomain] Socionext-PPU initialize end .\n");
+    FWK_LOG_INFO(
+        synquacer_system_ctx.log_api,
+        "[PowerDomain] Socionext-PPU initialize end .\n");
 }
 
 static void sni_power_domain_on_mp(uint32_t dev_bitmap)
@@ -208,7 +215,9 @@ static void sni_power_domain_on_mp(uint32_t dev_bitmap)
     uint32_t pmu_bitmap;
     uint32_t transw_reg_bitmap[TRANSW_REG_NUM] = { 0 };
 
-    SYNQUACER_DEV_LOG_INFO("[PowerDomain] PowerDomain All-ON start.\n");
+    FWK_LOG_INFO(
+        synquacer_system_ctx.log_api,
+        "[PowerDomain] PowerDomain All-ON start.\n");
 
     /* pmu cycle time */
     FOR_EACH_PMU_INFO(i)
@@ -255,9 +264,9 @@ static void sni_power_domain_on_mp(uint32_t dev_bitmap)
     /* waiting pmu-on */
     r = pmu_wait(pmu_bitmap, true);
     if (r != 0)
-        SYNQUACER_DEV_LOG_ERROR(
-            "[PPU] sni-pmu timeout expected:(0x%08x) result: "
-            "(0x%08x).\n",
+        FWK_LOG_ERR(
+            synquacer_system_ctx.log_api,
+            "[PPU] sni-pmu timeout expected:(0x%08x) result: (0x%08x).\n",
             pmu_bitmap,
             pmu_read_pd_power_status());
 
@@ -287,23 +296,31 @@ static void sni_power_domain_on_mp(uint32_t dev_bitmap)
         lpcm_sysoc_reset_clear(RST_TYPE_ALL, RST_DDR);
 
     /* set TransactionSW */
-    SYNQUACER_DEV_LOG_INFO("[PowerDomain] Opening transaction switch\n");
+    FWK_LOG_INFO(
+        synquacer_system_ctx.log_api,
+        "[PowerDomain] Opening transaction switch\n");
 
     FOR_EACH_TRANSW_REG(i)
     {
-        SYNQUACER_DEV_LOG_DEBUG(
-            "[PowerDomain] Opening transaction switch + %d\n", i);
+        FWK_LOG_TRACE(
+            synquacer_system_ctx.log_api,
+            "[PowerDomain] Opening transaction switch + %d\n",
+            i);
 
         set_transactionsw_off(TRANSW_ADDR(i), transw_reg_bitmap[i]);
 
-        SYNQUACER_DEV_LOG_DEBUG(
-            "[PowerDomain] Finished opening transaction "
-            "switch + %d\n",
+        FWK_LOG_TRACE(
+            synquacer_system_ctx.log_api,
+            "[PowerDomain] Finished opening transaction switch + %d\n",
             i);
     }
-    SYNQUACER_DEV_LOG_INFO("[PowerDomain] Finished transaction switch\n");
+    FWK_LOG_INFO(
+        synquacer_system_ctx.log_api,
+        "[PowerDomain] Finished transaction switch\n");
 
-    SYNQUACER_DEV_LOG_INFO("[PowerDomain] PowerDomain All-ON finished.\n");
+    FWK_LOG_INFO(
+        synquacer_system_ctx.log_api,
+        "[PowerDomain] PowerDomain All-ON finished.\n");
 
     /* sni-ppu all on */
     FOR_EACH_PPU_INFO(i)
@@ -313,7 +330,8 @@ static void sni_power_domain_on_mp(uint32_t dev_bitmap)
 
         r = change_power_state(sni_ppu_info[i].no, PPU_PP_ON, 1, 1, 0);
         if (r != 0) {
-            SYNQUACER_DEV_LOG_ERROR(
+            FWK_LOG_ERR(
+                synquacer_system_ctx.log_api,
                 "[PPU] powerdomain error. sni-ppu%d on-process.\n",
                 sni_ppu_info[i].no);
         }
@@ -333,9 +351,9 @@ static void sni_power_domain_on_mp(uint32_t dev_bitmap)
             osDelay(PD_CHECK_CYCLE_MS);
         }
         if (j >= PD_TIMEOUT_COUNT) {
-            SYNQUACER_DEV_LOG_ERROR(
-                "[PPU] powerdomain error. sni-ppu%d status "
-                "timeout.\n",
+            FWK_LOG_ERR(
+                synquacer_system_ctx.log_api,
+                "[PPU] powerdomain error. sni-ppu%d status timeout.\n",
                 sni_ppu_info[i].no);
         }
     }
@@ -363,7 +381,8 @@ static void power_domain_on(uint32_t dev_bitmap)
 
 void power_domain_coldboot(void)
 {
-    SYNQUACER_DEV_LOG_INFO("[SYSTEM] Initializing power domain\n");
+    FWK_LOG_INFO(
+        synquacer_system_ctx.log_api, "[SYSTEM] Initializing power domain\n");
     sni_power_domain_workaround_mp();
     power_domain_on(PD_PRESET_COLDBOOT);
 }

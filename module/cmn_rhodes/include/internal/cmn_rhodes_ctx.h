@@ -14,7 +14,6 @@
 #include <cmn_rhodes.h>
 
 #include <mod_cmn_rhodes.h>
-#include <mod_log.h>
 
 #include <stdbool.h>
 #include <stdint.h>

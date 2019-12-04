@@ -9,6 +9,7 @@
 
 #include <fwk_assert.h>
 #include <fwk_element.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
@@ -306,13 +307,8 @@ static int log_bind(fwk_id_t id, unsigned int round)
     log_driver = driver;
 
     if (log_config->banner) {
-        status = do_log(MOD_LOG_GROUP_INFO, log_config->banner);
-        if (status != FWK_SUCCESS)
-            return status;
-
-        status = do_flush();
-        if (status != FWK_SUCCESS)
-            return status;
+        FWK_LOG_INFO(&module_api, log_config->banner);
+        FWK_LOG_FLUSH(&module_api);
     }
 
     return FWK_SUCCESS;

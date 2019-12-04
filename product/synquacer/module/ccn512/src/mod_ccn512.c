@@ -10,10 +10,10 @@
 #include <internal/ccn512.h>
 
 #include <mod_ccn512.h>
-#include <mod_log.h>
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
@@ -143,7 +143,7 @@ void fw_ccn512_exit(void)
 
     ccn5xx_hnf_reg_t *hnf = &ccn512->HNF_ID_2;
 
-    log_api->log(MOD_LOG_GROUP_DEBUG, "[CCN512] CCN512 exit.\n");
+    FWK_LOG_TRACE(log_api, "[CCN512] CCN512 exit.\n");
 
     /* exit ALL CA53 CPU SNOOP */
     for (i = 0; i < HNF_COUNT; i++)
@@ -152,19 +152,17 @@ void fw_ccn512_exit(void)
     /* Wait for write operations to finish. */
     __DMB();
 
-    log_api->log(MOD_LOG_GROUP_DEBUG, "[CCN512] CCN512 exit end.\n");
+    FWK_LOG_TRACE(log_api, "[CCN512] CCN512 exit end.\n");
 }
 
 static int ccn512_config(ccn512_reg_t *ccn512)
 {
-    log_api->log(
-        MOD_LOG_GROUP_DEBUG,
-        "[CCN512] Initialising ccn512 at 0x%x\n",
-        (uintptr_t)ccn512);
+    FWK_LOG_TRACE(
+        log_api, "[CCN512] Initialising ccn512 at 0x%x\n", (uintptr_t)ccn512);
 
     fw_ccn512_init(ccn512);
 
-    log_api->log(MOD_LOG_GROUP_DEBUG, "[CCN512] CCN512 init done.\n");
+    FWK_LOG_TRACE(log_api, "[CCN512] CCN512 init done.\n");
 
     return FWK_SUCCESS;
 }

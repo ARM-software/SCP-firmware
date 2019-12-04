@@ -10,7 +10,6 @@
  */
 
 #include <mod_bootloader.h>
-#include <mod_log.h>
 #include <mod_msys_rom.h>
 #include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
@@ -18,6 +17,7 @@
 #include <fwk_assert.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
@@ -53,12 +53,12 @@ static int msys_deferred_setup(void)
     ctx.ppu_boot_api->power_mode_on(ctx.rom_config->id_primary_cluster);
     ctx.ppu_boot_api->power_mode_on(ctx.rom_config->id_primary_core);
 
-    ctx.log_api->log(MOD_LOG_GROUP_INFO, "[SYSTEM] Primary CPU powered\n");
+    FWK_LOG_INFO(ctx.log_api, "[SYSTEM] Primary CPU powered\n");
 
     status = ctx.bootloader_api->load_image();
 
-    ctx.log_api->log(
-        MOD_LOG_GROUP_ERROR,
+    FWK_LOG_ERR(
+        ctx.log_api,
         "[SYSTEM] Failed to load RAM firmware image: %d\n",
         status);
 

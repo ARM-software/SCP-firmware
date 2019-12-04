@@ -12,11 +12,11 @@
 #include <internal/scmi.h>
 #include <internal/scmi_vendor_ext.h>
 
-#include <mod_log.h>
 #include <mod_scmi.h>
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -200,8 +200,9 @@ static int scmi_vendor_ext_protocol_memory_info_get_handler(
 {
     memset(&resp, 0, sizeof(struct scmi_vendor_ext_memory_info_get_resp));
 
-    scmi_vendor_ext_ctx.log_api->log(
-        MOD_LOG_GROUP_DEBUG, "[scmi_vendor_ext] memory info get handler.\n");
+    FWK_LOG_TRACE(
+        scmi_vendor_ext_ctx.log_api,
+        "[scmi_vendor_ext] memory info get handler.\n");
 
     get_memory_info(&resp.meminfo);
 
@@ -232,8 +233,8 @@ static int scmi_vendor_ext_message_handler(
 {
     int32_t return_value;
 
-    scmi_vendor_ext_ctx.log_api->log(
-        MOD_LOG_GROUP_DEBUG, "[scmi_vendor_ext] message handler.\n");
+    FWK_LOG_TRACE(
+        scmi_vendor_ext_ctx.log_api, "[scmi_vendor_ext] message handler.\n");
 
     static_assert(
         FWK_ARRAY_SIZE(handler_table) == FWK_ARRAY_SIZE(payload_size_table),
@@ -317,8 +318,9 @@ static int scmi_vendor_ext_process_bind_request(
     if (!fwk_id_is_equal(source_id, FWK_ID_MODULE(FWK_MODULE_IDX_SCMI)))
         return FWK_E_ACCESS;
 
-    scmi_vendor_ext_ctx.log_api->log(
-        MOD_LOG_GROUP_DEBUG, "[scmi_vendor_ext] process bind request.\n");
+    FWK_LOG_TRACE(
+        scmi_vendor_ext_ctx.log_api,
+        "[scmi_vendor_ext] process bind request.\n");
 
     *api = &scmi_vendor_ext_mod_scmi_to_protocol_api;
 

@@ -5,13 +5,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <mod_log.h>
 #include <mod_power_domain.h>
 #include <mod_synquacer_system.h>
 #include <mod_system_power.h>
 
 #include <fwk_event.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_multi_thread.h>
@@ -40,8 +40,8 @@ int synquacer_main(void);
 static int synquacer_system_shutdown(
     enum mod_pd_system_shutdown system_shutdown)
 {
-    synquacer_system_ctx.log_api->log(
-        MOD_LOG_GROUP_DEBUG,
+    FWK_LOG_TRACE(
+        synquacer_system_ctx.log_api,
         "[SYNQUACER SYSTEM] requesting synquacer system_shutdown\n");
 
     reboot_chip();
@@ -127,8 +127,8 @@ static int synquacer_system_start(fwk_id_t id)
 
     main_initialize();
 
-    synquacer_system_ctx.log_api->log(
-        MOD_LOG_GROUP_DEBUG,
+    FWK_LOG_TRACE(
+        synquacer_system_ctx.log_api,
         "[SYNQUACER SYSTEM] Request system initialization.\n");
 
     status = fwk_thread_create(FWK_ID_MODULE(FWK_MODULE_IDX_SYNQUACER_SYSTEM));
@@ -155,8 +155,8 @@ int synquacer_process_event(
     struct fwk_event *resp)
 {
     if (fwk_id_get_event_idx(event->id) == SYNQUACER_SYSTEM_EVENT_START) {
-        synquacer_system_ctx.log_api->log(
-            MOD_LOG_GROUP_DEBUG,
+        FWK_LOG_TRACE(
+            synquacer_system_ctx.log_api,
             "[SYNQUACER SYSTEM] Process system start event.\n");
         synquacer_main();
     }

@@ -12,12 +12,12 @@
 #include <internal/scmi.h>
 
 #include <mod_cmn600.h>
-#include <mod_log.h>
 #include <mod_n1sdp_pcie.h>
 #include <mod_scmi.h>
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -179,9 +179,10 @@ static int scmi_ccix_config_protocol_get_handler(fwk_id_t service_id,
     if (sizeof(return_values) > max_payload_size) {
         return_values.status = SCMI_OUT_OF_RANGE;
         status = FWK_E_RANGE;
-        scmi_ccix_config_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+        FWK_LOG_TRACE(
+            scmi_ccix_config_ctx.log_api,
             "[SCMI CCIX CONFIG] max payload size is  %d\n",
-             max_payload_size);
+            max_payload_size);
         goto exit;
     }
 
@@ -268,9 +269,10 @@ static int scmi_ccix_config_protocol_set_handler(fwk_id_t service_id,
     if (sizeof(*params) > max_payload_size) {
         return_values.status = SCMI_OUT_OF_RANGE;
         status = FWK_E_RANGE;
-        scmi_ccix_config_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+        FWK_LOG_TRACE(
+            scmi_ccix_config_ctx.log_api,
             "[SCMI CCIX CONFIG] max payload size is  %d\n",
-             max_payload_size);
+            max_payload_size);
         goto exit;
     }
 

@@ -9,7 +9,6 @@
 #include "pik_system.h"
 #include "synquacer_common.h"
 #include "synquacer_config.h"
-#include "synquacer_debug.h"
 #include "synquacer_mmap.h"
 
 #include <boot_ctl.h>
@@ -27,6 +26,7 @@
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
 
@@ -268,9 +268,11 @@ static void fw_system_reset(void)
 
 int reboot_chip(void)
 {
-    SYNQUACER_DEV_LOG_INFO("[SYNQUACER SYSTEM] HSSPI exit start.\n");
+    FWK_LOG_INFO(
+        synquacer_system_ctx.log_api, "[SYNQUACER SYSTEM] HSSPI exit start.\n");
     synquacer_system_ctx.hsspi_api->hsspi_exit();
-    SYNQUACER_DEV_LOG_INFO("[SYNQUACER SYSTEM] HSSPI exit end.\n");
+    FWK_LOG_INFO(
+        synquacer_system_ctx.log_api, "[SYNQUACER SYSTEM] HSSPI exit end.\n");
 
     __disable_fault_irq();
 
@@ -301,7 +303,8 @@ void main_initialize(void)
 
     fw_clear_clkforce(sysdef_option_get_clear_clkforce());
 
-    SYNQUACER_DEV_LOG_INFO(
+    FWK_LOG_INFO(
+        synquacer_system_ctx.log_api,
         "[SYNQUACER SYSTEM] chip version %s.\n",
         sysdef_option_get_chip_version());
 
@@ -333,11 +336,15 @@ static void fw_wakeup_ap(void)
     ap_dev_init();
 
     synquacer_system_ctx.hsspi_api->hsspi_init();
-    SYNQUACER_DEV_LOG_INFO(
+    FWK_LOG_INFO(
+        synquacer_system_ctx.log_api,
         "[SYNQUACER SYSTEM] Finished initializing HS-SPI controller.\n");
-    SYNQUACER_DEV_LOG_INFO("[SYNQUACER SYSTEM] Arm tf load start.\n");
+    FWK_LOG_INFO(
+        synquacer_system_ctx.log_api,
+        "[SYNQUACER SYSTEM] Arm tf load start.\n");
     fw_fip_load_arm_tf();
-    SYNQUACER_DEV_LOG_INFO("[SYNQUACER SYSTEM] Arm tf load end.\n");
+    FWK_LOG_INFO(
+        synquacer_system_ctx.log_api, "[SYNQUACER SYSTEM] Arm tf load end.\n");
 }
 
 int synquacer_main(void)
@@ -348,7 +355,8 @@ int synquacer_main(void)
     pcie_wrapper_configure();
     fw_wakeup_ap();
 
-    SYNQUACER_DEV_LOG_INFO("[SYNQUACER SYSTEM] powering up AP\n");
+    FWK_LOG_INFO(
+        synquacer_system_ctx.log_api, "[SYNQUACER SYSTEM] powering up AP\n");
     status =
         synquacer_system_ctx.mod_pd_restricted_api->set_composite_state_async(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
@@ -361,10 +369,14 @@ int synquacer_main(void)
                 MOD_PD_STATE_ON));
 
     if (status == FWK_SUCCESS)
-        SYNQUACER_DEV_LOG_INFO("[SYNQUACER SYSTEM] finished powering up AP\n");
+        FWK_LOG_INFO(
+            synquacer_system_ctx.log_api,
+            "[SYNQUACER SYSTEM] finished powering up AP\n");
     else
-        SYNQUACER_DEV_LOG_ERROR(
-            "[SYNQUACER SYSTEM] failed to power up AP. status=%d\n", status);
+        FWK_LOG_ERR(
+            synquacer_system_ctx.log_api,
+            "[SYNQUACER SYSTEM] failed to power up AP. status=%d\n",
+            status);
 
     return status;
 }

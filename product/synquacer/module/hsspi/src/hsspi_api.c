@@ -5,12 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "synquacer_debug.h"
 #include "synquacer_mmap.h"
 
 #include <internal/hsspi_api.h>
 #include <internal/hsspi_driver.h>
 #include <internal/reg_HSSPI.h>
+
+#include <mod_synquacer_system.h>
+
+#include <fwk_log.h>
 
 #include <stdbool.h>
 
@@ -39,7 +42,8 @@ void HSSPI_init(void)
 
     model_index = CONFIG_SCB_FORCE_HSSPI_RESOURCE_ALLOCATION_MODEL;
 
-    SYNQUACER_DEV_LOG_INFO(
+    FWK_LOG_INFO(
+        synquacer_system_ctx.log_api,
         "[HS-SPI] Configuring HS-SPI controller with "
         "clk_sel=%d clk_div=%d syncon=%d use_hsspi_cs1_flag=%d msel=%d\n",
         clk_config.clk_sel,

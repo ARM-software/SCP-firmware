@@ -5,13 +5,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "synquacer_debug.h"
 #include "synquacer_mmap.h"
 
 #include <cmsis_os2.h>
 
 #include <internal/hsspi_driver.h>
 #include <internal/reg_HSSPI.h>
+
+#include <mod_synquacer_system.h>
+
+#include <fwk_log.h>
 
 #include <fmw_cmsis.h>
 
@@ -540,7 +543,8 @@ void hsspi_command_switch(
 
     hsspi_read_jedec_id(reg_hsspi, mem_hsspi);
 
-    SYNQUACER_DEV_LOG_INFO(
+    FWK_LOG_INFO(
+        synquacer_system_ctx.log_api,
         "[HS-SPI] CS#0: Manufacturer ID:%02x, DeviceID:%02x%02x\n",
         m_abyJEDEC_ID[0],
         m_abyJEDEC_ID[1],
@@ -550,7 +554,8 @@ void hsspi_command_switch(
         hsspi_enter_to_quad_by_jedec_id(reg_hsspi, mem_hsspi, m_abyJEDEC_ID[0]);
 
     if (known_jedec_id < 0) {
-        SYNQUACER_DEV_LOG_INFO(
+        FWK_LOG_INFO(
+            synquacer_system_ctx.log_api,
             "[HS-SPI] Unknown manufacturer ID:%02x,"
             " default to Dual-Output-Fast-Read mode\n",
             m_abyJEDEC_ID[0]);
@@ -561,7 +566,8 @@ void hsspi_command_switch(
         unCSCFG.bit.MBM = HSSPI_EN_CSCFG_MBM_DUAL;
         (*reg_hsspi).CSCFG.DATA = unCSCFG.DATA;
     } else {
-        SYNQUACER_DEV_LOG_INFO(
+        FWK_LOG_INFO(
+            synquacer_system_ctx.log_api,
             "[HS-SPI] Configuring Quad-Output-Fast-Read mode\n");
 
         hsspi_quad_output_fast_read(reg_hsspi);

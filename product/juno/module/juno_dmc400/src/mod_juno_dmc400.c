@@ -16,7 +16,6 @@
 #include "system_clock.h"
 
 #include <mod_juno_dmc400.h>
-#include <mod_log.h>
 #include <mod_power_domain.h>
 #include <mod_system_power.h>
 #include <mod_timer.h>
@@ -24,6 +23,7 @@
 #include <fwk_assert.h>
 #include <fwk_event.h>
 #include <fwk_interrupt.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -614,7 +614,7 @@ static int ddr_training(fwk_id_t id)
     return FWK_SUCCESS;
 
 timeout:
-    ctx.log_api->log(MOD_LOG_GROUP_WARNING, "[DMC] Training time-out\n");
+    FWK_LOG_WARN(ctx.log_api, "[DMC] Training time-out\n");
 
     return FWK_E_TIMEOUT;
 }
@@ -650,7 +650,7 @@ static int ddr_retraining(fwk_id_t id)
 
     fwk_interrupt_enable(PHY_TRAINING_IRQ);
 
-    ctx.log_api->log(MOD_LOG_GROUP_DEBUG, "[DMC] Re-training done\n");
+    FWK_LOG_TRACE(ctx.log_api, "[DMC] Re-training done\n");
 
     return FWK_SUCCESS;
 }
@@ -910,8 +910,8 @@ static int juno_dmc400_start(fwk_id_t id)
         return FWK_SUCCESS;
 
     if (SCC->GPR0 & SCC_GPR0_DDR_DISABLE) {
-        ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
-                         "[DMC] GPR_0 disable flag set: skipping init");
+        FWK_LOG_TRACE(
+            ctx.log_api, "[DMC] GPR_0 disable flag set: skipping init");
 
         return FWK_SUCCESS;
     }
@@ -926,6 +926,9 @@ static int juno_dmc400_start(fwk_id_t id)
 
     ctx.dmc_refclk_ratio = (DDR_FREQUENCY_MHZ * FWK_MHZ) / CLOCK_RATE_REFCLK;
     fwk_assert(ctx.dmc_refclk_ratio > 0);
+
+    FWK_LOG_TRACE(
+        ctx.log_api, "[DMC] Initializing DMC-400 at 0x%x\n", (uintptr_t)dmc);
 
     status = ddr_clk_init(id);
     if (status != FWK_SUCCESS)
@@ -961,7 +964,7 @@ static int juno_dmc400_start(fwk_id_t id)
     dmc->INTEG_CFG = 0x00000000;
     dmc->INTEG_OUTPUTS = 0x00000000;
 
-    ctx.log_api->log(MOD_LOG_GROUP_DEBUG, "[DMC] DDR Ready\n");
+    FWK_LOG_TRACE(ctx.log_api, "[DMC] DDR Ready\n");
 
     /* Switch to READY */
     dmc->MEMC_CMD = DMC400_CMD_GO;

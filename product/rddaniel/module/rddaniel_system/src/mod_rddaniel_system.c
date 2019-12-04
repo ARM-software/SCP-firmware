@@ -17,7 +17,6 @@
 #include "scp_rddaniel_irq.h"
 
 #include <mod_clock.h>
-#include <mod_log.h>
 #include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
 #include <mod_rddaniel_system.h>
@@ -29,6 +28,7 @@
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -260,7 +260,8 @@ static int rddaniel_system_start(fwk_id_t id)
     if (status != FWK_SUCCESS)
         return status;
 
-    rddaniel_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+    FWK_LOG_TRACE(
+        rddaniel_system_ctx.log_api,
         "[RD-DANIEL SYSTEM] Requesting SYSTOP initialization...\n");
 
     /*
@@ -316,7 +317,8 @@ int rddaniel_system_process_notification(const struct fwk_event *event,
          * time only
          */
         if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
-            rddaniel_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+            FWK_LOG_TRACE(
+                rddaniel_system_ctx.log_api,
                 "[RD-DANIEL SYSTEM] Initializing the primary core...\n");
 
             mod_pd_restricted_api = rddaniel_system_ctx.mod_pd_restricted_api;

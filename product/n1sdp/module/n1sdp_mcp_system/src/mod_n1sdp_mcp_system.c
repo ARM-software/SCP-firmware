@@ -11,7 +11,6 @@
 #include "config_clock.h"
 
 #include <mod_clock.h>
-#include <mod_log.h>
 #include <mod_n1sdp_mcp_system.h>
 #include <mod_pik_clock.h>
 #include <mod_power_domain.h>
@@ -19,6 +18,7 @@
 
 #include <fwk_event.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
@@ -115,7 +115,8 @@ static int n1sdp_mcp_system_process_event(const struct fwk_event *event,
     if (status != FWK_SUCCESS)
         return status;
 
-    n1sdp_mcp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+    FWK_LOG_TRACE(
+        n1sdp_mcp_system_ctx.log_api,
         "[MCP SYSTEM] SCP clock status: 0x%x\n",
         clock_status);
 
@@ -133,7 +134,8 @@ static int n1sdp_mcp_system_process_event(const struct fwk_event *event,
     if (status != FWK_SUCCESS)
         return FWK_SUCCESS;
 
-    n1sdp_mcp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+    FWK_LOG_TRACE(
+        n1sdp_mcp_system_ctx.log_api,
         "[MCP SYSTEM] MCP PIK clocks configured\n");
 
     status = n1sdp_mcp_system_ctx.scmi_api->get_chipid_info(
@@ -142,9 +144,11 @@ static int n1sdp_mcp_system_process_event(const struct fwk_event *event,
     if (status != FWK_SUCCESS)
         return status;
 
-    n1sdp_mcp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+    FWK_LOG_TRACE(
+        n1sdp_mcp_system_ctx.log_api,
         "[MCP SYSTEM] MC Mode: 0x%x CHIPID: 0x%x\n",
-        mc_mode, chipid);
+        mc_mode,
+        chipid);
 
     return status;
 }

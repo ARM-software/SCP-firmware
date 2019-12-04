@@ -9,7 +9,6 @@
  */
 
 #include <mod_ddr_phy500.h>
-#include <mod_log.h>
 
 #ifdef BUILD_HAS_MOD_DMC500
 #    include <mod_dmc500.h>
@@ -21,6 +20,7 @@
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
@@ -34,7 +34,6 @@ static struct mod_log_api *log_api;
  */
 static int ddr_phy500_config(fwk_id_t element_id)
 {
-    int status;
     struct mod_ddr_phy500_reg *ddr;
     const struct mod_ddr_phy500_module_config *module_config;
     const struct mod_ddr_phy500_element_config *element_config;
@@ -46,10 +45,7 @@ static int ddr_phy500_config(fwk_id_t element_id)
 
     ddr = (struct mod_ddr_phy500_reg *)element_config->ddr;
 
-    status = log_api->log(MOD_LOG_GROUP_INFO,
-        "[DDR] Initializing PHY at 0x%x\n", (uintptr_t) ddr);
-    if (status != FWK_SUCCESS)
-        return status;
+    FWK_LOG_INFO(log_api, "[DDR] Initializing PHY at 0x%x\n", (uintptr_t)ddr);
 
     if (module_config->initialize_init_complete)
         ddr->INIT_COMPLETE = module_config->ddr_reg_val->INIT_COMPLETE;

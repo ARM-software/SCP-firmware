@@ -7,10 +7,13 @@
 
 #include "mmu500.h"
 #include "synquacer_config.h"
-#include "synquacer_debug.h"
 #include "synquacer_mmap.h"
 
 #include <internal/smmu_wrapper.h>
+
+#include <mod_synquacer_system.h>
+
+#include <fwk_log.h>
 
 #include <stdint.h>
 #include <string.h>
@@ -98,12 +101,14 @@ uint64_t smmu_convert_to_axi_addr(void *addr_cm3view)
 
 void smmu_wrapper_initialize(void)
 {
-    SYNQUACER_DEV_LOG_INFO("Configure System MMUs starts\n");
+    FWK_LOG_INFO(
+        synquacer_system_ctx.log_api, "Configure System MMUs starts\n");
 
     /* Basic Configuration */
     smmu_wrapper_pcie();
 
-    SYNQUACER_DEV_LOG_INFO("Configure System MMUs finished\n");
+    FWK_LOG_INFO(
+        synquacer_system_ctx.log_api, "Configure System MMUs finished\n");
 }
 
 void smmu_wrapper_pcie(void)

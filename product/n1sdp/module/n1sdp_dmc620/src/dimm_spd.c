@@ -7,12 +7,12 @@
 
 #include <dimm_spd.h>
 
-#include <mod_log.h>
 #include <mod_n1sdp_dmc620.h>
 #include <mod_n1sdp_i2c.h>
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
@@ -111,27 +111,34 @@ static void dimm_device_data(uint8_t *spd_data,
     unsigned int i;
 
     if (spd_data[2] == 0x0C) {
-        log_api->log(MOD_LOG_GROUP_INFO,
-            "    DIMM %d information:\n", dimm_id);
-        log_api->log(MOD_LOG_GROUP_INFO,
+        FWK_LOG_INFO(log_api, "    DIMM %d information:\n", dimm_id);
+        FWK_LOG_INFO(
+            log_api,
             "    Manufacturer ID = 0x%x 0x%x\n",
-            spd_data[320], spd_data[321]);
-        log_api->log(MOD_LOG_GROUP_INFO, "    Module part number = ");
+            spd_data[320],
+            spd_data[321]);
+        FWK_LOG_INFO(log_api, "    Module part number = ");
         for (i = 329; i <= 348; i++)
-            log_api->log(MOD_LOG_GROUP_INFO, "%c", spd_data[i]);
-        log_api->log(MOD_LOG_GROUP_INFO, "\n");
+            FWK_LOG_INFO(log_api, "%c", spd_data[i]);
+        FWK_LOG_INFO(log_api, "\n");
 
-        log_api->log(MOD_LOG_GROUP_INFO,
+        FWK_LOG_INFO(
+            log_api,
             "    Module serial number = 0x%x 0x%x 0x%x 0x%x\n",
-            spd_data[325], spd_data[326], spd_data[327], spd_data[328]);
+            spd_data[325],
+            spd_data[326],
+            spd_data[327],
+            spd_data[328]);
 
-        log_api->log(MOD_LOG_GROUP_INFO,
+        FWK_LOG_INFO(
+            log_api,
             "    Module manufacturing week %d%d year %d%d\n",
-            0xF & (spd_data[324] >> 4), 0xF & spd_data[324],
-            0xF & (spd_data[323] >> 4), 0xF & spd_data[323]);
+            0xF & (spd_data[324] >> 4),
+            0xF & spd_data[324],
+            0xF & (spd_data[323] >> 4),
+            0xF & spd_data[323]);
     } else {
-        log_api->log(MOD_LOG_GROUP_INFO,
-            "[DDR] ERROR! DDR4 SPD EEPROM Not Detected\n");
+        FWK_LOG_INFO(log_api, "[DDR] ERROR! DDR4 SPD EEPROM Not Detected\n");
         fwk_assert(false);
     }
 }

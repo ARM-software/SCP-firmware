@@ -11,12 +11,12 @@
 
 #include <mod_clock.h>
 #include <mod_cmn_rhodes.h>
-#include <mod_log.h>
 #include <mod_ppu_v1.h>
 
 #include <fwk_assert.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -125,7 +125,7 @@ static int cmn_rhodes_discovery(void)
     struct node_header *node;
     const struct mod_cmn_rhodes_config *config = ctx->config;
 
-    ctx->log_api->log(MOD_LOG_GROUP_DEBUG, MOD_NAME "Starting discovery...\n");
+    FWK_LOG_TRACE(ctx->log_api, MOD_NAME "Starting discovery...\n");
 
     assert(get_node_type(ctx->root) == NODE_TYPE_CFG);
 
@@ -135,13 +135,14 @@ static int cmn_rhodes_discovery(void)
         xp = get_child_node(config->base, ctx->root, xp_idx);
         assert(get_node_type(xp) == NODE_TYPE_XP);
 
-        ctx->log_api->log(MOD_LOG_GROUP_DEBUG, MOD_NAME "\n");
-        ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
-                          MOD_NAME "XP (%d, %d) ID:%d, LID:%d\n",
-                          get_node_pos_x(xp),
-                          get_node_pos_y(xp),
-                          get_node_id(xp),
-                          get_node_logical_id(xp));
+        FWK_LOG_TRACE(ctx->log_api, MOD_NAME "\n");
+        FWK_LOG_TRACE(
+            ctx->log_api,
+            MOD_NAME "XP (%d, %d) ID:%d, LID:%d\n",
+            get_node_pos_x(xp),
+            get_node_pos_y(xp),
+            get_node_id(xp),
+            get_node_logical_id(xp));
 
         /* Traverse nodes */
         node_count = get_node_child_count(xp);
@@ -158,22 +159,26 @@ static int cmn_rhodes_discovery(void)
                 if ((get_device_type(xp, xp_port) == DEVICE_TYPE_CXRH) ||
                     (get_device_type(xp, xp_port) == DEVICE_TYPE_CXHA) ||
                     (get_device_type(xp, xp_port) == DEVICE_TYPE_CXRA)) {
-                    ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
-                                      MOD_NAME "  Found CXLA at node ID: %d\n",
-                                      get_child_node_id(xp, node_idx));
+                    FWK_LOG_TRACE(
+                        ctx->log_api,
+                        MOD_NAME "  Found CXLA at node ID: %d\n",
+                        get_child_node_id(xp, node_idx));
                 } else { /* External RN-SAM Node */
                     ctx->external_rnsam_count++;
-                    ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
-                                      MOD_NAME "  Found external node ID: %d\n",
-                                      get_child_node_id(xp, node_idx));
+                    FWK_LOG_TRACE(
+                        ctx->log_api,
+                        MOD_NAME "  Found external node ID: %d\n",
+                        get_child_node_id(xp, node_idx));
                 }
             } else { /* Internal nodes */
                 switch (get_node_type(node)) {
                 case NODE_TYPE_HN_F:
                     if (ctx->hnf_count >= MAX_HNF_COUNT) {
-                        ctx->log_api->log(MOD_LOG_GROUP_DEBUG, MOD_NAME
-                                          "  hnf count %d >= max limit (%d)\n",
-                                          ctx->hnf_count, MAX_HNF_COUNT);
+                        FWK_LOG_TRACE(
+                            ctx->log_api,
+                            MOD_NAME "  hnf count %d >= max limit (%d)\n",
+                            ctx->hnf_count,
+                            MAX_HNF_COUNT);
                         return FWK_E_DATA;
                     }
                     ctx->hnf_count++;
@@ -188,30 +193,33 @@ static int cmn_rhodes_discovery(void)
                     break;
                 }
 
-                ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
-                                  MOD_NAME "  %s ID:%d, LID:%d\n",
-                                  get_node_type_name(get_node_type(node)),
-                                  get_node_id(node),
-                                  get_node_logical_id(node));
+                FWK_LOG_TRACE(
+                    ctx->log_api,
+                    MOD_NAME "  %s ID:%d, LID:%d\n",
+                    get_node_type_name(get_node_type(node)),
+                    get_node_id(node),
+                    get_node_logical_id(node));
             }
         }
     }
 
     /* When CAL is present, the number of HN-Fs must be even. */
     if ((ctx->hnf_count % 2 != 0) && (config->hnf_cal_mode == true)) {
-        ctx->log_api->log(MOD_LOG_GROUP_ERROR, MOD_NAME
-                          "hnf count: %d should be even when CAL mode is set\n",
-                          ctx->hnf_count);
+        FWK_LOG_ERR(
+            ctx->log_api,
+            MOD_NAME "hnf count: %d should be even when CAL mode is set\n",
+            ctx->hnf_count);
         return FWK_E_DATA;
     }
 
-    ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
-                      MOD_NAME "Total internal RN-SAM nodes: %d\n"
-                      MOD_NAME "Total external RN-SAM nodes: %d\n"
-                      MOD_NAME "Total HN-F nodes: %d\n",
-                      ctx->internal_rnsam_count,
-                      ctx->external_rnsam_count,
-                      ctx->hnf_count);
+    FWK_LOG_TRACE(
+        ctx->log_api,
+        MOD_NAME "Total internal RN-SAM nodes: %d\n" MOD_NAME
+                 "Total external RN-SAM nodes: %d\n" MOD_NAME
+                 "Total HN-F nodes: %d\n",
+        ctx->internal_rnsam_count,
+        ctx->external_rnsam_count,
+        ctx->hnf_count);
 
     return FWK_SUCCESS;
 }
@@ -294,18 +302,20 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
     const struct mod_cmn_rhodes_mem_region_map *region;
     const struct mod_cmn_rhodes_config *config = ctx->config;
 
-    ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
-                      MOD_NAME "Configuring SAM for node %d\n",
-                      get_node_id(rnsam));
+    FWK_LOG_TRACE(
+        ctx->log_api,
+        MOD_NAME "Configuring SAM for node %d\n",
+        get_node_id(rnsam));
 
     for (region_idx = 0; region_idx < config->mmap_count; region_idx++) {
         region = &config->mmap_table[region_idx];
 
-        ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
-                          MOD_NAME "  [0x%lx - 0x%lx] %s\n",
-                          region->base,
-                          region->base + region->size - 1,
-                          mmap_type_name[region->type]);
+        FWK_LOG_TRACE(
+            ctx->log_api,
+            MOD_NAME "  [0x%lx - 0x%lx] %s\n",
+            region->base,
+            region->base + region->size - 1,
+            mmap_type_name[region->type]);
 
         switch (region->type) {
         case MOD_CMN_RHODES_MEM_REGION_TYPE_IO:
@@ -446,7 +456,7 @@ static int cmn_rhodes_setup(void)
     for (rnsam_idx = 0; rnsam_idx < ctx->internal_rnsam_count; rnsam_idx++)
         cmn_rhodes_setup_sam(ctx->internal_rnsam_table[rnsam_idx]);
 
-    ctx->log_api->log(MOD_LOG_GROUP_DEBUG, MOD_NAME "Done\n");
+    FWK_LOG_TRACE(ctx->log_api, MOD_NAME "Done\n");
 
     ctx->initialized = true;
 

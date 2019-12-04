@@ -17,7 +17,6 @@
 #include "sgi575_sds.h"
 
 #include <mod_clock.h>
-#include <mod_log.h>
 #include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
 #include <mod_scmi.h>
@@ -29,6 +28,7 @@
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -257,7 +257,8 @@ static int sgi575_system_start(fwk_id_t id)
     if (status != FWK_SUCCESS)
         return status;
 
-    sgi575_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+    FWK_LOG_TRACE(
+        sgi575_system_ctx.log_api,
         "[SGI575 SYSTEM] Requesting SYSTOP initialization...\n");
 
     /*
@@ -313,7 +314,8 @@ int sgi575_system_process_notification(const struct fwk_event *event,
          * time only
          */
         if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
-            sgi575_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+            FWK_LOG_TRACE(
+                sgi575_system_ctx.log_api,
                 "[SGI575 SYSTEM] Initializing the primary core...\n");
 
             mod_pd_restricted_api = sgi575_system_ctx.mod_pd_restricted_api;

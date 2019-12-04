@@ -10,10 +10,10 @@
 
 #include <internal/n1sdp_scp2pcc.h>
 
-#include <mod_log.h>
 #include <mod_n1sdp_scp2pcc.h>
 
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
@@ -76,13 +76,12 @@ static int mem_msg_send_message(void *data, uint16_t size, uint16_t type)
     struct mem_msg_packet_st *packet = NULL;
 
     if (type == SCP2PCC_TYPE_SHUTDOWN)
-        scp2pcc_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-                                 "Shutdown request to PCC\n");
+        FWK_LOG_INFO(scp2pcc_ctx.log_api, "Shutdown request to PCC\n");
 
     /* Check parameters. */
     if ((size > MSG_PAYLOAD_SIZE) ||
         (type == MSG_UNUSED_MESSAGE_TYPE)) {
-        scp2pcc_ctx.log_api->log(MOD_LOG_GROUP_INFO, "Invalid parameters\n");
+        FWK_LOG_INFO(scp2pcc_ctx.log_api, "Invalid parameters\n");
         return FWK_E_PARAM;
     }
 

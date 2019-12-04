@@ -10,8 +10,6 @@
 #ifndef MOD_DDR_PHY500_H
 #define MOD_DDR_PHY500_H
 
-#include <mod_log.h>
-
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>

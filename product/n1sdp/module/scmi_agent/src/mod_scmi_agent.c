@@ -8,12 +8,12 @@
  *     SCMI Agent Support.
  */
 
-#include <mod_log.h>
 #include <mod_scmi_agent.h>
 #include <mod_smt.h>
 
 #include <fwk_event.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -64,8 +64,7 @@ static int _scmi_agent_transact(fwk_id_t agent_id,
 
     /* Check if channel is free */
     if (!ctx.smt_api->is_channel_free(agent_ctx->config->transport_id)) {
-        ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
-            "[SCMI AGENT] Channel Busy!\n");
+        FWK_LOG_TRACE(ctx.log_api, "[SCMI AGENT] Channel Busy!\n");
         return FWK_E_BUSY;
     }
 
@@ -260,7 +259,8 @@ static int scmi_agent_process_event(const struct fwk_event *event,
     if (status != FWK_SUCCESS)
         return status;
 
-    ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+    FWK_LOG_TRACE(
+        ctx.log_api,
         "[SCMI AGENT] Found management protocol version: 0x%x\n",
         temp);
 

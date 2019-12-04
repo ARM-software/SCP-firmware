@@ -7,10 +7,10 @@
 
 #include "synquacer_ddr.h"
 
-#include <mod_log.h>
 #include <mod_synquacer_memc.h>
 
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
@@ -73,7 +73,7 @@ static int synquacer_memc_config(void)
 {
     fw_ddr_init();
 
-    log_api->log(MOD_LOG_GROUP_INFO, "[SYNQUACER MEMC] DMC init done.\n");
+    FWK_LOG_INFO(log_api, "[SYNQUACER MEMC] DMC init done.\n");
 
     return FWK_SUCCESS;
 }

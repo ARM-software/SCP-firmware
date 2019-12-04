@@ -12,13 +12,13 @@
 
 #include <internal/n1sdp_i2c.h>
 
-#include <mod_log.h>
 #include <mod_n1sdp_i2c.h>
 
 #include <fwk_assert.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
+#include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
