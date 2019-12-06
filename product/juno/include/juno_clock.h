@@ -35,9 +35,23 @@ enum juno_clock_idx {
 
 /* Juno CDCEL937 clock indices */
 enum juno_clock_cdcel937_idx {
+    /*
+     * Generated clocks:
+     * These clocks are generated through this driver.
+     */
     JUNO_CLOCK_CDCEL937_IDX_I2SCLK,
     JUNO_CLOCK_CDCEL937_IDX_HDLCDREFCLK,
     JUNO_CLOCK_CDCEL937_IDX_HDLCDPXL,
+
+    /*
+     * Derived clocks:
+     * These clocks are used only as reference for
+     * the HDLCD module acting as a HAL.
+     */
+    JUNO_CLOCK_CDCEL937_IDX_HDLCD0,
+    JUNO_CLOCK_CDCEL937_IDX_HDLCD1,
+
+    /* Number of CDCEL clocks */
     JUNO_CLOCK_CDCEL937_IDX_COUNT
 };
 

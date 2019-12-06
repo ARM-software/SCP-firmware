@@ -100,24 +100,46 @@ static const struct fwk_element juno_cdcel937_element_table[] = {
             .output_id = MOD_JUNO_CDCEL937_OUTPUT_ID_Y2,
         }
     },
+    [JUNO_CLOCK_CDCEL937_IDX_HDLCD0] = {
+        .name = "CDCEL_HDLCD0",
+        .data = &(struct mod_juno_cdcel937_dev_config) {
+            .slave_address = 0x6C,
+            .xin_mhz = 24,
+            .clock_hal_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_HDLCD,
+                JUNO_CLOCK_HDLCD_IDX_HDLCD0),
+            .clock_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_JUNO_HDLCD,
+                MOD_JUNO_HDLCD_API_IDX_HDLCD_DRIVER_RESPONSE),
+            .min_rate = 25 * FWK_MHZ,
+            .max_rate = 120 * FWK_MHZ,
+            .min_step = 250 * FWK_KHZ,
+            .rate_type = MOD_CLOCK_RATE_TYPE_CONTINUOUS,
+            .output_id = MOD_JUNO_CDCEL937_OUTPUT_ID_Y2,
+        }
+    },
+    [JUNO_CLOCK_CDCEL937_IDX_HDLCD1] = {
+        .name = "CDCEL_HDLCD1",
+        .data = &(struct mod_juno_cdcel937_dev_config) {
+            .slave_address = 0x6C,
+            .xin_mhz = 24,
+            .clock_hal_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_HDLCD,
+                JUNO_CLOCK_HDLCD_IDX_HDLCD1),
+            .clock_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_JUNO_HDLCD,
+                MOD_JUNO_HDLCD_API_IDX_HDLCD_DRIVER_RESPONSE),
+            .min_rate = 25 * FWK_MHZ,
+            .max_rate = 120 * FWK_MHZ,
+            .min_step = 250 * FWK_KHZ,
+            .rate_type = MOD_CLOCK_RATE_TYPE_CONTINUOUS,
+            .output_id = MOD_JUNO_CDCEL937_OUTPUT_ID_Y2,
+        }
+    },
     [JUNO_CLOCK_CDCEL937_IDX_COUNT] = { 0 },
 };
 
-static const struct fwk_element *juno_cdcel937_get_element_table(
-        fwk_id_t module_id)
+static void hdlcd_setup_lookup_table(
+    struct mod_juno_cdcel937_dev_config *config,
+    enum juno_idx_platform platform_id)
 {
-    int status;
-    enum juno_idx_platform platform_id;
-    struct mod_juno_cdcel937_dev_config *config;
     uintptr_t hdlcd_lookup = HDLCD_PRESET_TABLE_BASE;
-
-    status = juno_id_get_platform(&platform_id);
-    if (status != FWK_SUCCESS)
-        return NULL;
-
-    /* Add the lookup table to the HDLCDREFCLK element */
-    config = (struct mod_juno_cdcel937_dev_config *)
-        (juno_cdcel937_element_table[JUNO_CLOCK_CDCEL937_IDX_HDLCDREFCLK].data);
 
     if (SCC->GPR0 & SCC_GPR0_HIGH_PXLCLK_ENABLE) {
         config->lookup_table_count =
@@ -144,6 +166,32 @@ static const struct fwk_element *juno_cdcel937_get_element_table(
         config->lookup_table = ((struct juno_clock_hdlcd_lookup *)
             HDLCD_PRESET_TABLE_BASE)->CLK;
     }
+}
+
+static const struct fwk_element *juno_cdcel937_get_element_table(
+        fwk_id_t module_id)
+{
+    int status;
+    enum juno_idx_platform platform_id;
+    struct mod_juno_cdcel937_dev_config *config;
+
+    status = juno_id_get_platform(&platform_id);
+    if (status != FWK_SUCCESS)
+        return NULL;
+
+    /* Add the lookup table to the HDLCD elements */
+    for (int i = 0; i < JUNO_CLOCK_CDCEL937_IDX_COUNT; i++) {
+
+        if (i == JUNO_CLOCK_CDCEL937_IDX_I2SCLK ||
+            i == JUNO_CLOCK_CDCEL937_IDX_HDLCDPXL)
+            continue;
+
+        config = (struct mod_juno_cdcel937_dev_config *)
+                    (juno_cdcel937_element_table[i].data);
+
+        hdlcd_setup_lookup_table(config, platform_id);
+    }
+
     return juno_cdcel937_element_table;
 }
 
