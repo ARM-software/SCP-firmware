@@ -958,6 +958,31 @@ static int mod_dvfs_process_event(const struct fwk_event *event,
 /*
  * Module framework support
  */
+
+/*
+ * The DVFS voltage/frequency must be set to the sustained OPP at startup
+ * for each domain.
+ */
+static int dvfs_start(fwk_id_t id)
+{
+    int status;
+    struct mod_dvfs_opp sustained_opp;
+    struct mod_dvfs_domain_ctx *ctx;
+
+    if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT))
+        return FWK_SUCCESS;
+
+    status = dvfs_get_sustained_opp(id, &sustained_opp);
+    if (status == FWK_SUCCESS) {
+        ctx = get_domain_ctx(id);
+        ctx->request.set_source_id = true;
+        ctx->request.num_retries = 0;
+        dvfs_set_frequency_start(ctx, &sustained_opp, true);
+    }
+
+    return status;
+}
+
 static int dvfs_init(fwk_id_t module_id, unsigned int element_count,
     const void *data)
 {
@@ -1076,6 +1101,7 @@ const struct fwk_module module_dvfs = {
     .type = FWK_MODULE_TYPE_HAL,
     .init = dvfs_init,
     .element_init = dvfs_element_init,
+    .start = dvfs_start,
     .bind = dvfs_bind,
     .process_bind_request = dvfs_process_bind_request,
     .process_event = mod_dvfs_process_event,
