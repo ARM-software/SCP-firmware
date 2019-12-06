@@ -122,6 +122,7 @@ static int juno_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
 
     switch (system_shutdown) {
     case MOD_PD_SYSTEM_SHUTDOWN:
+    case MOD_PD_SYSTEM_FORCED_SHUTDOWN:
         status = juno_system_ctx.juno_xrp7724_api->shutdown();
         break;
 
