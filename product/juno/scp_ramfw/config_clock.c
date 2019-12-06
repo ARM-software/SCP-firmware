@@ -49,7 +49,7 @@ static struct fwk_element clock_dev_desc_table[] = {
         }),
     },
     [JUNO_CLOCK_IDX_HDLCD0] = {
-        .name = "HDLCD0",
+        .name = "HDLCD_0",
         .data = &((struct mod_clock_dev_config) {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_HDLCD,
                 JUNO_CLOCK_HDLCD_IDX_HDLCD0),
@@ -59,7 +59,7 @@ static struct fwk_element clock_dev_desc_table[] = {
         }),
     },
     [JUNO_CLOCK_IDX_HDLCD1] = {
-        .name = "HDLCD1",
+        .name = "HDLCD_1",
         .data = &((struct mod_clock_dev_config) {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_HDLCD,
                 JUNO_CLOCK_HDLCD_IDX_HDLCD1),
