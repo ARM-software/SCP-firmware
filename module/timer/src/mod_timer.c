@@ -352,12 +352,37 @@ static const struct mod_timer_api timer_api = {
 
 static int alarm_stop(fwk_id_t alarm_id)
 {
+    int status;
     struct dev_ctx *ctx;
     struct alarm_ctx *alarm;
+    unsigned int interrupt;
 
     assert(fwk_module_is_valid_sub_element_id(alarm_id));
 
     ctx = &ctx_table[fwk_id_get_element_idx(alarm_id)];
+
+    status = fwk_interrupt_get_current(&interrupt);
+    switch (status) {
+    case FWK_E_STATE:
+        /* Not within an ISR */
+        break;
+
+    case FWK_SUCCESS:
+        /* Within an ISR */
+
+        if (interrupt == ctx->config->timer_irq) {
+            /*
+             * The interrupt handler is the interrupt handler for the alarm's
+             * timer
+             */
+            break;
+        }
+        /* Fall-through */
+
+    default:
+        return FWK_E_ACCESS;
+    }
+
     alarm = &ctx->alarm_pool[fwk_id_get_sub_element_idx(alarm_id)];
 
     /* Prevent possible data races with the timer interrupt */
@@ -396,8 +421,18 @@ static int alarm_start(fwk_id_t alarm_id,
     int status;
     struct dev_ctx *ctx;
     struct alarm_ctx *alarm;
+    unsigned int interrupt;
 
     assert(fwk_module_is_valid_sub_element_id(alarm_id));
+
+    status = fwk_interrupt_get_current(&interrupt);
+    if (status != FWK_E_STATE) {
+        /*
+         * Could not attain call context OR this function is called from an
+         * interrupt handler.
+         */
+        return FWK_E_ACCESS;
+    }
 
     ctx = ctx_table + fwk_id_get_element_idx(alarm_id);
     alarm = &ctx->alarm_pool[fwk_id_get_sub_element_idx(alarm_id)];

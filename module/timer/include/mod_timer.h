@@ -276,6 +276,8 @@ struct mod_timer_alarm_api {
      * \pre \p alarm_id must be a valid sub-element alarm identifier that has
      *     previously been bound to.
      *
+     * \retval FWK_E_ACCESS The function was called from an interrupt handler
+     *      OR could not attain call context.
      * \retval FWK_SUCCESS The alarm was started.
      */
     int (*start)(fwk_id_t alarm_id,
@@ -298,6 +300,10 @@ struct mod_timer_alarm_api {
      *
      * \retval FWK_SUCCESS The alarm was stopped.
      * \retval FWK_E_STATE The alarm was already stopped.
+     * \retval FWK_E_ACCESS The function was called from an interrupt handler
+     *      different from the interrupt handler of the timer the alarm is
+     *      associated to OR could not attain call context.
+     * \retval FWK_E_INIT The component has not been initialized.
      */
     int (*stop)(fwk_id_t alarm_id);
 };
