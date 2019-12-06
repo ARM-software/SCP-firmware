@@ -29,7 +29,7 @@ static const struct fwk_element juno_hdlcd_element_table[] = {
         .name = "HDLCD_0",
         .data = &(struct mod_juno_hdlcd_dev_config) {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_CDCEL937,
-                JUNO_CLOCK_CDCEL937_IDX_HDLCDREFCLK),
+                JUNO_CLOCK_CDCEL937_IDX_HDLCD0),
             .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_JUNO_CDCEL937,
                 MOD_JUNO_CDCEL937_API_IDX_HDLCD_DRIVER),
             .clock_hal_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
@@ -46,7 +46,7 @@ static const struct fwk_element juno_hdlcd_element_table[] = {
         .name = "HDLCD_1",
         .data = &(struct mod_juno_hdlcd_dev_config) {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_CDCEL937,
-                JUNO_CLOCK_CDCEL937_IDX_HDLCDREFCLK),
+                JUNO_CLOCK_CDCEL937_IDX_HDLCD1),
             .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_JUNO_CDCEL937,
                 MOD_JUNO_CDCEL937_API_IDX_HDLCD_DRIVER),
             .clock_hal_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
