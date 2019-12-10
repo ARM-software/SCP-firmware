@@ -244,6 +244,6 @@ struct cxg_wait_condition_data {
 #define SAM_ADDR_REG_VALID_MASK                   UINT64_C(0x8000000000000000)
 #define PCIE_OPT_HDR_MASK                         (0x1ULL << 6)
 #define CTL_NUM_SNPCRDS_MASK                      (0xF << 4)
-#define CCIX_VENDER_ID                            (0x2692)
+#define CCIX_VENDER_ID                            (0x1E2C)
 
 #endif /* INTERNAL_CMN600_CCIX_H */
