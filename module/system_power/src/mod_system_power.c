@@ -94,6 +94,24 @@ static void ext_ppus_set_state(enum mod_pd_state state)
     }
 }
 
+static void ext_ppus_shutdown(enum mod_pd_system_shutdown system_shutdown)
+{
+    unsigned int i;
+    const struct mod_pd_driver_api *api;
+    fwk_id_t ppu_id;
+
+    /* Shutdown external PPUs */
+    for (i = 0; i < system_power_ctx.config->ext_ppus_count; i++) {
+        api = system_power_ctx.ext_ppu_apis[i];
+        ppu_id = system_power_ctx.config->ext_ppus[i].ppu_id;
+
+        if (api->shutdown != NULL)
+            api->shutdown(ppu_id, system_shutdown);
+        else
+            api->set_state(ppu_id, MOD_PD_STATE_OFF);
+    }
+}
+
 static int set_system_power_state(unsigned int state)
 {
     int status;
@@ -113,6 +131,58 @@ static int set_system_power_state(unsigned int state)
     }
 
     return FWK_SUCCESS;
+}
+
+static int shutdown_system_power_ppus(
+    enum mod_pd_system_shutdown system_shutdown)
+{
+    unsigned int i;
+    struct system_power_dev_ctx *dev_ctx;
+    const struct mod_pd_driver_api *api;
+    fwk_id_t ppu_id;
+    unsigned int state;
+    int status;
+
+    for (i = 0; i < system_power_ctx.dev_count; i++) {
+        dev_ctx = &system_power_ctx.dev_ctx_table[i];
+
+        api = dev_ctx->sys_ppu_api;
+        ppu_id = dev_ctx->config->sys_ppu_id;
+
+        if (api->shutdown != NULL)
+            status = api->shutdown(ppu_id, system_shutdown);
+        else {
+            state = dev_ctx->config->sys_state_table[MOD_PD_STATE_OFF];
+
+            status = api->set_state(ppu_id, state);
+        }
+        if (status != FWK_SUCCESS)
+            return status;
+    }
+
+    return FWK_SUCCESS;
+}
+
+static int shutdown(
+    fwk_id_t pd_id,
+    enum mod_pd_system_shutdown system_shutdown)
+{
+    int status;
+
+    fwk_interrupt_disable(system_power_ctx.config->soc_wakeup_irq);
+
+    if (system_power_ctx.driver_api->platform_interrupts != NULL) {
+        status = system_power_ctx.driver_api->platform_interrupts(
+            MOD_SYSTEM_POWER_PLATFORM_INTERRUPT_CMD_DISABLE);
+        if (status != FWK_SUCCESS)
+            return FWK_E_DEVICE;
+    }
+
+    /* Shutdown external PPUs */
+    ext_ppus_shutdown(system_shutdown);
+
+    /* Shutdown system PPUs */
+    return shutdown_system_power_ppus(system_shutdown);
 }
 
 /*
@@ -220,7 +290,7 @@ static int system_power_shutdown(fwk_id_t pd_id,
 {
     int status;
 
-    status = system_power_set_state(pd_id, MOD_PD_STATE_OFF);
+    status = shutdown(pd_id, system_shutdown);
     if (status != FWK_SUCCESS)
         return status;
 
