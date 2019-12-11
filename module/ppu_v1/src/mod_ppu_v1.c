@@ -180,10 +180,17 @@ static int ppu_v1_pd_reset(fwk_id_t pd_id)
     return status;
 }
 
+static int ppu_v1_pd_shutdown(fwk_id_t core_pd_id,
+    enum mod_pd_system_shutdown system_shutdown)
+{
+    return FWK_SUCCESS;
+}
+
 static const struct mod_pd_driver_api pd_driver = {
     .set_state = ppu_v1_pd_set_state,
     .get_state = ppu_v1_pd_get_state,
     .reset = ppu_v1_pd_reset,
+    .shutdown = ppu_v1_pd_shutdown,
 };
 
 /*
@@ -353,7 +360,9 @@ static const struct mod_pd_driver_api core_pd_driver = {
     .set_state = ppu_v1_core_pd_set_state,
     .get_state = ppu_v1_pd_get_state,
     .reset = ppu_v1_core_pd_reset,
-    .prepare_core_for_system_suspend = ppu_v1_core_pd_prepare_for_system_suspend
+    .prepare_core_for_system_suspend =
+        ppu_v1_core_pd_prepare_for_system_suspend,
+    .shutdown = ppu_v1_pd_shutdown,
 };
 
 /*
@@ -584,6 +593,7 @@ static const struct mod_pd_driver_api cluster_pd_driver = {
     .set_state = ppu_v1_cluster_pd_set_state,
     .get_state = ppu_v1_pd_get_state,
     .reset = ppu_v1_pd_reset,
+    .shutdown = ppu_v1_pd_shutdown,
 };
 
 static void ppu_interrupt_handler(uintptr_t pd_ctx_param)
