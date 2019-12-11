@@ -837,17 +837,6 @@ static void process_set_state_request(struct pd_ctx *lowest_pd,
             continue;
 
         /*
-         * The driver must be called thus the processing of the set state
-         * request is going to be asynchronous. Assign the responsability of
-         * the response to the request to the power domain. If there is no
-         * need for a driver call for the ancestors or descendants of the power
-         * domain as part of the processing of the requested composite state,
-         * the response to the request will be sent when the transition to the
-         * new requested power state is completed.
-         */
-        pd_in_charge_of_response = pd;
-
-        /*
          * If a power state transition has already been initiated for an
          * ancestor or descendant, we don't initiate the power state transition
          * now. It will be initiated on completion of the transition of one
@@ -873,7 +862,20 @@ static void process_set_state_request(struct pd_ctx *lowest_pd,
             continue;
 
         status = initiate_power_state_transition(pd);
-        first_power_state_transition_initiated = (status == FWK_SUCCESS);
+
+        if (status == FWK_SUCCESS) {
+            /*
+             * The driver must be called thus the processing of the set state
+             * request is going to be asynchronous. Assign the responsibility
+             * of the response to the request to the power domain. If there is
+             * no need for a driver call for the ancestors or descendants of
+             * the power domain as part of the processing of the requested
+             * composite state, the response to the request will be sent when
+             * the transition to the new requested power state is completed.
+             */
+            pd_in_charge_of_response = pd;
+            first_power_state_transition_initiated = true;
+        }
     }
 
     if (!resp_event->response_requested)
