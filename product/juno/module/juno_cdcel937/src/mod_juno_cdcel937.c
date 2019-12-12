@@ -417,6 +417,9 @@ static int set_rate_write_pll_config(struct juno_cdcel937_dev_ctx *ctx)
     if (status != FWK_SUCCESS)
         return FWK_E_PARAM;
 
+    /* The first 4 bytes of the PLL config register are not needed */
+    base_address += 0x4;
+
     /* Write back the modified structure */
     status = write_configuration(ctx, base_address, &pll_config);
     if ((status != FWK_PENDING) && (status != FWK_SUCCESS))
