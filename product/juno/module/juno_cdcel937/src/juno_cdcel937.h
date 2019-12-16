@@ -241,7 +241,6 @@ struct juno_cdcel937_dev_ctx {
     struct pll_cfg_reg pll_config;
     struct cfg_reg_y1 y1_config;
     uint64_t rate;
-    uint64_t *rate_addr;
     int index;
 };
 
