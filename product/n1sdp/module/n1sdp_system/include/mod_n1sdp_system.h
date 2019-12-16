@@ -54,6 +54,12 @@
 #define BL33_SIZE                     UINT32_C(0x00200000)
 
 /*!
+ * Offset of NIC-400 security 0 register for
+ * non-secure CoreSight debug access
+ */
+#define NIC_400_SEC_0_CSAPBM_OFFSET   UINT32_C(0x2A10001C)
+
+/*!
  * \brief API indices.
  */
 enum mod_n1sdp_system_api_idx {
