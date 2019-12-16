@@ -714,7 +714,6 @@ static int juno_cdcel937_get_rate(fwk_id_t clock_id,
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
     if (ctx->rate_set == false) {
-        ctx->rate_addr = rate;
         status = create_get_rate_request(clock_id, ctx);
         if ((status != FWK_PENDING) && (status != FWK_SUCCESS))
             return FWK_E_DEVICE;
@@ -1110,10 +1109,6 @@ static int juno_cdcel937_process_event(const struct fwk_event *event,
     module_ctx.state = JUNO_CDCEL937_DEVICE_IDLE;
     response_param.status = status;
     response_param.value.rate = ctx->rate_hz;
-    if (ctx->rate_addr) {
-        *(ctx->rate_addr) = ctx->rate;
-        ctx->rate_addr = NULL;
-    }
     ctx->driver_response_api->request_complete(ctx->config->clock_hal_id,
         &response_param);
 
