@@ -476,6 +476,12 @@ static int n1sdp_system_init_primary_core(void)
         if (status != FWK_SUCCESS)
             return status;
 
+        /* Enable non-secure CoreSight debug access */
+        n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+            "[N1SDP SYSTEM] Enabling CoreSight debug non-secure access\n");
+        *(volatile uint32_t *)(AP_SCP_SRAM_OFFSET +
+                               NIC_400_SEC_0_CSAPBM_OFFSET) = 0xFFFFFFFF;
+
         mod_pd_restricted_api = n1sdp_system_ctx.mod_pd_restricted_api;
 
         n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
