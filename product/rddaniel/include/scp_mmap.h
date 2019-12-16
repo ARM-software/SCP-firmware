@@ -13,6 +13,7 @@
 #define SCP_SOC_EXPANSION1_BASE                0x01000000
 #define SCP_DTC_RAM_BASE                       0x20000000
 #define SCP_PERIPHERAL_BASE                    0x44000000
+#define SCP_ELEMENT_MANAGEMENT_PERIPHERAL_BASE 0x50000000
 #define SCP_SYSTEM_ACCESS_PORT1_BASE           0xA0000000
 
 #endif /* SCP_MMAP_H */
