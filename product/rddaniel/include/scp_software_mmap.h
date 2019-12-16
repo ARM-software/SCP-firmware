@@ -19,4 +19,10 @@
 #define SCP_RAMFW_IMAGE_FLASH_BASE         (SCP_NOR0_FLASH_BASE + 0x03D80000)
 #define SCP_RAMFW_IMAGE_FLASH_SIZE         (256 * FWK_KIB)
 
+/* SCP trusted and non-trusted RAM base address */
+#define SCP_TRUSTED_RAM_BASE               (SCP_SYSTEM_ACCESS_PORT1_BASE + \
+                                            0x04000000)
+#define SCP_NONTRUSTED_RAM_BASE            (SCP_SYSTEM_ACCESS_PORT1_BASE + \
+                                            0x06000000)
+
 #endif /* SCP_SOFTWARE_MMAP_H */
