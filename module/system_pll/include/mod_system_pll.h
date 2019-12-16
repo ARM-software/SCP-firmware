@@ -50,7 +50,7 @@ struct mod_system_pll_dev_config {
      * Mask for the bit within the status register that indicates whether the
      * PLL has locked at the programmed rate.
      */
-    const uint8_t lock_flag_mask;
+    const uint32_t lock_flag_mask;
 
     /*! The initial rate the PLL is set to during initialization. */
     const uint64_t initial_rate;
