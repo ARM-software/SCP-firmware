@@ -70,11 +70,26 @@ struct __attribute((packed)) scmi_ccix_config_mempools_map {
 #define HA_COUNT_MASK            UINT32_C(0x00FF0000)
 #define HA_COUNT_BIT_POS         16
 
+/*
+ * link_properties bit field definition
+ *
+ * data_credits[26-18]
+ * snoop_credits[17-9]
+ * request_credits[8-0]
+ */
+#define REQUEST_CREDITS_MASK         UINT32_C(0x000001FF)
+#define REQUEST_CREDITS_BIT_POS      0
+#define SNOOP_CREDITS_MASK           UINT32_C(0x0003FE00)
+#define SNOOP_CREDITS_BIT_POS        9
+#define DATA_CREDITS_MASK            UINT32_C(0x07FC0000)
+#define DATA_CREDITS_BIT_POS         18
+
 struct __attribute((packed)) scmi_ccix_config_protocol_get_p2a {
     int32_t  status;
     uint32_t agent_count;
     uint32_t host_mmap_count;
     struct scmi_ccix_config_mempools_map mem_pools[MAX_HA_MMAP_ENTRIES];
+    uint32_t link_properties;
 };
 
 /*

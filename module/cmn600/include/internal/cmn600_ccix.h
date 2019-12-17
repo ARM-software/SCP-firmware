@@ -37,6 +37,10 @@ int ccix_enter_system_coherency(struct cmn600_ctx *ctx, uint8_t link_id);
  */
 int ccix_enter_dvm_domain(struct cmn600_ctx *ctx, uint8_t link_id);
 
+/*
+ * CMN600 CCIX get Capabilities Function
+ */
+void ccix_capabilities_get(struct cmn600_ctx *ctx);
 
 /*
  * CCIX Gateway (CXG) protocol link control & status registers
@@ -171,6 +175,8 @@ struct cxg_wait_condition_data {
 #define CXG_RA_RND_RAID_VALID_REG_OFFSET          0xF38
 #define CXG_RA_AGENTID_TO_LINKID_OFFSET           0xE60
 #define CXG_RA_AGENTID_TO_LINKID_VAL_OFFSET       0xF20
+#define CXG_RA_REQUEST_TRACKER_DEPTH_MASK         UINT64_C(0x0000000001FF0000)
+#define CXG_RA_REQUEST_TRACKER_DEPTH_VAL          16
 
 /* CCIX Gateway (CXG) Home Agent (HA) defines */
 
@@ -180,6 +186,10 @@ struct cxg_wait_condition_data {
 #define CXG_HA_RAID_TO_LDID_VALID_OFFSET          (0xD08)
 #define CXG_HA_RAID_TO_LDID_RNF_MASK              (0x80)
 #define CXG_HA_LDID_TO_RAID_OFFSET                0xC00
+#define CXG_HA_SNOOP_TRACKER_DEPTH_MASK           UINT64_C(0x00001FF000000000)
+#define CXG_HA_SNOOP_TRACKER_DEPTH_VAL            36
+#define CXG_HA_WDB_DEPTH_MASK                     UINT64_C(0x0000000007FC0000)
+#define CXG_HA_WDB_DEPTH_VAL                      18
 
 /* CCIX Gateway (CXG) Link Agent (LA) defines */
 

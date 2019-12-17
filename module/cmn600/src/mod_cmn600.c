@@ -535,6 +535,8 @@ static int cmn600_ccix_config_get(
         ctx->internal_rnsam_count + ctx->external_rnsam_count - 1;
     ctx->ccix_host_info.host_sa_count = ctx->config->sa_count;
 
+    ccix_capabilities_get(ctx);
+
     memcpy((void *)config, (void *)&ctx->ccix_host_info,
         sizeof(struct mod_cmn600_ccix_host_node_config));
     return FWK_SUCCESS;
