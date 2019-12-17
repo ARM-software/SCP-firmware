@@ -73,6 +73,7 @@ struct __attribute((packed)) scmi_ccix_config_mempools_map {
 /*
  * link_properties bit field definition
  *
+ * max_packet_size[29-27]
  * data_credits[26-18]
  * snoop_credits[17-9]
  * request_credits[8-0]
@@ -83,6 +84,8 @@ struct __attribute((packed)) scmi_ccix_config_mempools_map {
 #define SNOOP_CREDITS_BIT_POS        9
 #define DATA_CREDITS_MASK            UINT32_C(0x07FC0000)
 #define DATA_CREDITS_BIT_POS         18
+#define HOST_MAX_PACKET_SIZE_MASK    UINT32_C(0x38000000)
+#define HOST_MAX_PACKET_SIZE_BIT_POS 27
 
 struct __attribute((packed)) scmi_ccix_config_protocol_get_p2a {
     int32_t  status;
@@ -97,7 +100,8 @@ struct __attribute((packed)) scmi_ccix_config_protocol_get_p2a {
  *
  * config_property bit field definition
  *
- * reserved[31-26]
+ * reserved[31-29]
+ * max_packet_size[28-26]
  * opt_tlp[25]
  * msg_packing[24]
  * link_id[23-16]
@@ -114,6 +118,8 @@ struct __attribute((packed)) scmi_ccix_config_protocol_get_p2a {
 #define MSG_PACK_BIT_POS         24
 #define OPT_TLP_MASK             UINT32_C(0x03000000)
 #define OPT_TLP_BIT_POS          25
+#define MAX_PACKET_SIZE_MASK     UINT32_C(0x1C000000)
+#define MAX_PACKET_SIZE_BIT_POS  26
 
 struct __attribute((packed)) scmi_ccix_config_protocol_set_a2p {
     uint32_t agent_count;

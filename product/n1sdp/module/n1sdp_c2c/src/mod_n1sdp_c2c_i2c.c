@@ -45,6 +45,11 @@
 #define C2C_MASTER_RETRY_DELAY_US  UINT32_C(10000)
 #define C2C_MASTER_RETRIES         10
 
+/* Max Packet Size values */
+#define CCIX_PROP_MAX_PACK_SIZE_128          0
+#define CCIX_PROP_MAX_PACK_SIZE_256          1
+#define CCIX_PROP_MAX_PACK_SIZE_512          2
+
 static const char * const cmd_str[] = {
     [N1SDP_C2C_CMD_CHECK_SLAVE] = "Check slave alive",
     [N1SDP_C2C_CMD_PCIE_POWER_ON] = "PCIe power ON",
@@ -368,6 +373,7 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
         remote_config.remote_ha_mmap[0].ha_id = 0x1;
         remote_config.remote_ha_mmap[0].base = (4ULL * FWK_TIB);
         remote_config.remote_ha_mmap[0].size = (4ULL * FWK_TIB);
+        remote_config.ccix_max_packet_size = CCIX_PROP_MAX_PACK_SIZE_512;
 
         status = n1sdp_c2c_ctx.cmn600_api->set_config(&remote_config);
         if (status != FWK_SUCCESS) {
