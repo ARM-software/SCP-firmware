@@ -212,7 +212,9 @@ static int scmi_ccix_config_protocol_get_handler(fwk_id_t service_id,
     return_values.link_properties =
         ((ccix_host_config.ccix_data_credits << DATA_CREDITS_BIT_POS) |
          (ccix_host_config.ccix_snoop_credits << SNOOP_CREDITS_BIT_POS) |
-         (ccix_host_config.ccix_request_credits << REQUEST_CREDITS_BIT_POS));
+         (ccix_host_config.ccix_request_credits << REQUEST_CREDITS_BIT_POS) |
+         (ccix_host_config.ccix_max_packet_size << HOST_MAX_PACKET_SIZE_BIT_POS)
+        );
 
 exit:
     scmi_ccix_config_ctx.scmi_api->respond(service_id, &return_values,
@@ -286,6 +288,9 @@ static int scmi_ccix_config_protocol_set_handler(fwk_id_t service_id,
     ccix_ep_config.remote_ha_mmap_count = (uint8_t)(params->remote_mmap_count);
     ccix_ep_config.ccix_opt_tlp = (bool)((params->config_property &
                                           OPT_TLP_MASK) >> OPT_TLP_BIT_POS);
+    ccix_ep_config.ccix_max_packet_size = (uint8_t)((params->config_property &
+                                                     MAX_PACKET_SIZE_MASK) >>
+                                                     MAX_PACKET_SIZE_BIT_POS);
 
     for (i = 0; i < ccix_ep_config.remote_ha_mmap_count; i++) {
         ccix_ep_config.remote_ha_mmap[i].ha_id =

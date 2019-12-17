@@ -203,6 +203,9 @@ struct mod_cmn600_ccix_remote_node_config {
 
     /*! Remote HA memory map table */
     struct mod_cmn600_ccix_ha_mmap remote_ha_mmap[MAX_HA_MMAP_ENTRIES];
+
+    /*! Max Packet Size */
+    uint8_t ccix_max_packet_size;
 };
 
 /*!
@@ -232,6 +235,9 @@ struct mod_cmn600_ccix_host_node_config {
 
     /*! CCIX Maximum Data send credits from Host */
     uint16_t ccix_data_credits;
+
+    /*! Max Packet Size */
+    uint8_t ccix_max_packet_size;
 };
 
 /*!

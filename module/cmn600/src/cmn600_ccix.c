@@ -277,7 +277,7 @@ static int enable_and_start_ccix_link_up_sequence(struct cmn600_ctx *ctx,
         ~CXLA_CCIX_PROP_MAX_PACK_SIZE_MASK;
 
     ctx->cxla_reg->CXLA_CCIX_PROP_CONFIGURED |=
-        (CXLA_CCIX_PROP_MAX_PACK_SIZE_512 <<
+        (config->ccix_max_packet_size <<
         CXLA_CCIX_PROP_MAX_PACK_SIZE_SHIFT_VAL);
 
     ctx->cxla_reg->CXLA_LINKID_TO_PCIE_BUS_NUM =
@@ -616,4 +616,10 @@ void ccix_capabilities_get(struct cmn600_ctx *ctx)
     ctx->ccix_host_info.ccix_data_credits =
         (ctx->cxg_ha_reg->CXG_HA_UNIT_INFO & CXG_HA_WDB_DEPTH_MASK) >>
           CXG_HA_WDB_DEPTH_VAL;
+
+    /* Populate max packet size capability */
+    ctx->ccix_host_info.ccix_max_packet_size =
+        (ctx->cxla_reg->CXLA_CCIX_PROP_CAPABILITIES &
+         CXLA_CCIX_PROP_MAX_PACK_SIZE_MASK) >>
+         CXLA_CCIX_PROP_MAX_PACK_SIZE_SHIFT_VAL;
 }
