@@ -142,6 +142,8 @@ void juno_hdlcd_request_complete(fwk_id_t dev_id,
 
     ctx->driver_response_api->request_complete(ctx->config->clock_hal_id,
         response_param);
+
+    module_ctx.request_clock_id = FWK_ID_NONE;
 }
 
 static const struct mod_clock_driver_response_api hdlcd_driver_response_api = {
@@ -170,6 +172,11 @@ static int juno_hdlcd_set_rate(fwk_id_t clock_id, uint64_t rate,
     if ((rounded_rate < ctx->config->min_rate) ||
         (rounded_rate > ctx->config->max_rate))
         return FWK_E_RANGE;
+
+    if (platform == JUNO_IDX_PLATFORM_RTL) {
+        if (!fwk_id_is_equal(module_ctx.request_clock_id, FWK_ID_NONE))
+            return FWK_E_BUSY;
+    }
 
     /*
      * Clock rate is always twice the pixel clock rate. This is because Juno has
@@ -233,7 +240,8 @@ static int juno_hdlcd_set_rate(fwk_id_t clock_id, uint64_t rate,
                 "[HDLCD] Failed to set board clock\n");
             return FWK_E_DEVICE;
         }
-        module_ctx.request_clock_id = clock_id;
+        if (status == FWK_PENDING)
+            module_ctx.request_clock_id = clock_id;
         return status;
     }
 
@@ -438,6 +446,7 @@ static int juno_hdlcd_start(fwk_id_t id)
 
     module_ctx.current_pll_rate = ((uint64_t)(PXL_REF_CLK_RATE) * nf) /
                                   (nr * od);
+    module_ctx.request_clock_id = FWK_ID_NONE;
 
     return FWK_SUCCESS;
 }
