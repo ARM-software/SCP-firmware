@@ -622,4 +622,13 @@ void ccix_capabilities_get(struct cmn600_ctx *ctx)
         (ctx->cxla_reg->CXLA_CCIX_PROP_CAPABILITIES &
          CXLA_CCIX_PROP_MAX_PACK_SIZE_MASK) >>
          CXLA_CCIX_PROP_MAX_PACK_SIZE_SHIFT_VAL;
+
+    /* Optimized TLP is always supported by CMN-600 */
+    ctx->ccix_host_info.ccix_opt_tlp = true;
+
+    /* Populate message packing capability */
+    ctx->ccix_host_info.ccix_msg_pack_enable =
+        !((ctx->cxla_reg->CXLA_CCIX_PROP_CAPABILITIES &
+          CXLA_CCIX_PROP_MSG_PACK_SHIFT_MASK) >>
+          CXLA_CCIX_PROP_MSG_PACK_SHIFT_VAL);
 }

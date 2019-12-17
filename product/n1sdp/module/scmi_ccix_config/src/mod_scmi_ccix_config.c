@@ -213,8 +213,10 @@ static int scmi_ccix_config_protocol_get_handler(fwk_id_t service_id,
         ((ccix_host_config.ccix_data_credits << DATA_CREDITS_BIT_POS) |
          (ccix_host_config.ccix_snoop_credits << SNOOP_CREDITS_BIT_POS) |
          (ccix_host_config.ccix_request_credits << REQUEST_CREDITS_BIT_POS) |
-         (ccix_host_config.ccix_max_packet_size << HOST_MAX_PACKET_SIZE_BIT_POS)
-        );
+         (ccix_host_config.ccix_max_packet_size <<
+          HOST_MAX_PACKET_SIZE_BIT_POS) |
+         (ccix_host_config.ccix_opt_tlp << HOST_OPT_TLP_BIT_POS) |
+         (ccix_host_config.ccix_msg_pack_enable << HOST_MSG_PACK_BIT_POS));
 
 exit:
     scmi_ccix_config_ctx.scmi_api->respond(service_id, &return_values,
