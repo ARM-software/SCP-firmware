@@ -73,6 +73,8 @@ struct __attribute((packed)) scmi_ccix_config_mempools_map {
 /*
  * link_properties bit field definition
  *
+ * opt_tlp[31]
+ * msg_packing[30]
  * max_packet_size[29-27]
  * data_credits[26-18]
  * snoop_credits[17-9]
@@ -86,6 +88,11 @@ struct __attribute((packed)) scmi_ccix_config_mempools_map {
 #define DATA_CREDITS_BIT_POS         18
 #define HOST_MAX_PACKET_SIZE_MASK    UINT32_C(0x38000000)
 #define HOST_MAX_PACKET_SIZE_BIT_POS 27
+#define HOST_MSG_PACK_MASK           UINT32_C(0x40000000)
+#define HOST_MSG_PACK_BIT_POS        30
+#define HOST_OPT_TLP_MASK            UINT32_C(0x80000000)
+#define HOST_OPT_TLP_BIT_POS         31
+
 
 struct __attribute((packed)) scmi_ccix_config_protocol_get_p2a {
     int32_t  status;

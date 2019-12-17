@@ -238,6 +238,12 @@ struct mod_cmn600_ccix_host_node_config {
 
     /*! Max Packet Size */
     uint8_t ccix_max_packet_size;
+
+    /*! CCIX optimised tlp mode capabiltiy of Host */
+    bool    ccix_opt_tlp;
+
+   /*! CCIX message packing flag capability of Host */
+    bool ccix_msg_pack_enable;
 };
 
 /*!
