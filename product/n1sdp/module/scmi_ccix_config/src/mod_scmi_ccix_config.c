@@ -209,6 +209,11 @@ static int scmi_ccix_config_protocol_get_handler(fwk_id_t service_id,
                        ADDRESS_LSB_MASK);
     }
 
+    return_values.link_properties =
+        ((ccix_host_config.ccix_data_credits << DATA_CREDITS_BIT_POS) |
+         (ccix_host_config.ccix_snoop_credits << SNOOP_CREDITS_BIT_POS) |
+         (ccix_host_config.ccix_request_credits << REQUEST_CREDITS_BIT_POS));
+
 exit:
     scmi_ccix_config_ctx.scmi_api->respond(service_id, &return_values,
         (return_values.status == SCMI_SUCCESS) ?

@@ -601,3 +601,19 @@ int ccix_enter_dvm_domain(struct cmn600_ctx *ctx, uint8_t link_id)
     ctx->log_api->log(MOD_LOG_GROUP_DEBUG, "Done\n");
     return FWK_SUCCESS;
 }
+
+void ccix_capabilities_get(struct cmn600_ctx *ctx)
+{
+    /* Populate maximum credit send capability */
+    ctx->ccix_host_info.ccix_request_credits =
+        (ctx->cxg_ra_reg->CXG_RA_UNIT_INFO & CXG_RA_REQUEST_TRACKER_DEPTH_MASK)
+         >> CXG_RA_REQUEST_TRACKER_DEPTH_VAL;
+
+    ctx->ccix_host_info.ccix_snoop_credits =
+        (ctx->cxg_ha_reg->CXG_HA_UNIT_INFO & CXG_HA_SNOOP_TRACKER_DEPTH_MASK) >>
+         CXG_HA_SNOOP_TRACKER_DEPTH_VAL;
+
+    ctx->ccix_host_info.ccix_data_credits =
+        (ctx->cxg_ha_reg->CXG_HA_UNIT_INFO & CXG_HA_WDB_DEPTH_MASK) >>
+          CXG_HA_WDB_DEPTH_VAL;
+}

@@ -224,6 +224,14 @@ struct mod_cmn600_ccix_host_node_config {
     /*! CCIX HA memory map table for endpoints */
     struct mod_cmn600_ccix_ha_mmap ccix_host_mmap[MAX_HA_MMAP_ENTRIES];
 
+    /*! CCIX Maximum Memory Request send credits from Host */
+    uint16_t ccix_request_credits;
+
+    /*! CCIX Maximum Snoop send credits from Host */
+    uint16_t ccix_snoop_credits;
+
+    /*! CCIX Maximum Data send credits from Host */
+    uint16_t ccix_data_credits;
 };
 
 /*!
