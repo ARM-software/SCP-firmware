@@ -151,6 +151,10 @@ else
     DEFINES += BUILD_MODE_DEBUG
 endif
 
+ifeq ($(BUILD_HAS_DEBUGGER),yes)
+    DEFINES += BUILD_HAS_DEBUGGER
+endif
+
 #
 # Always include the framework library
 #

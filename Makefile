@@ -25,6 +25,7 @@ export PRODUCTS_DIR := $(TOP_DIR)/product
 export MODULES_DIR := $(TOP_DIR)/module
 export CMSIS_DIR := $(TOP_DIR)/cmsis/CMSIS/Core
 export OS_DIR := $(TOP_DIR)/cmsis/CMSIS/RTOS2
+export DBG_DIR := $(TOP_DIR)/debugger
 
 BUILD_STRING := $(shell $(TOOLS_DIR)/build_string.py 2>/dev/null)
 export VERSION_STRING = v$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
@@ -44,6 +45,7 @@ export DOC := doxygen
 DEFAULT_MODE := release
 DEFAULT_BUILD_PATH := $(TOP_DIR)/build
 DEFAULT_VERBOSE := n
+DEFAULT_DEBUGGER := n
 
 #
 # Top-level configuration
@@ -73,6 +75,13 @@ export V
 ifeq ($(V),n)
     MAKEFLAGS += --silent
     MAKEFLAGS += --no-print-directory
+endif
+
+# Include debugger library: y/n
+DEBUGGER ?= $(DEFAULT_DEBUGGER)
+ifeq ($(DEBUGGER),y)
+    BUILD_HAS_DEBUGGER := yes
+    export BUILD_HAS_DEBUGGER
 endif
 
 #
@@ -187,4 +196,9 @@ help:
 	@echo "        Value: <y|n>"
 	@echo "        Default: $(DEFAULT_VERBOSE)"
 	@echo "        Enable or disable verbose mode for the build system."
+	@echo ""
+	@echo "    DEBUGGER"
+	@echo "        Value: <y|n>"
+	@echo "        Default: $(DEFAULT_DEBUGGER)"
+	@echo "        Include the debugger library."
 	@echo ""
