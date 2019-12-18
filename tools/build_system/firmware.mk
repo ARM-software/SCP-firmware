@@ -259,6 +259,13 @@ LIB_TARGETS_y += $(FWK_DIR)/src
 LIBS_y += $(call lib_path,arch$(BUILD_SUFFIX))
 LIBS_y += $(call lib_path,framework$(BUILD_SUFFIX))
 
+# Add the CLI Debugger library
+INCLUDES += $(DBG_DIR)/include
+ifeq ($(BUILD_HAS_DEBUGGER),yes)
+    LIB_TARGETS_y += $(DBG_DIR)/src
+    LIBS_y += $(call lib_path,debugger$(BUILD_SUFFIX))
+endif
+
 SOURCES += $(BUILD_FIRMWARE_DIR)/fwk_module_list.c
 $(BUILD_FIRMWARE_DIR)/fwk_module_list.c: gen_module
 EXTRA_DEP := gen_module
