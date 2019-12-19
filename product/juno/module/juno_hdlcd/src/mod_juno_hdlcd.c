@@ -138,7 +138,8 @@ void juno_hdlcd_request_complete(fwk_id_t dev_id,
 
     ctx = ctx_table + fwk_id_get_element_idx(module_ctx.request_clock_id);
 
-    enable_pll(module_ctx.request_clock_id, ctx);
+    if (response_param->status == FWK_SUCCESS)
+        enable_pll(module_ctx.request_clock_id, ctx);
 
     ctx->driver_response_api->request_complete(ctx->config->clock_hal_id,
         response_param);
