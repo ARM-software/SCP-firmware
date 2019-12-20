@@ -14,6 +14,9 @@ enum config_timer_element_idx {
 };
 
 enum config_timer_refclk_sub_element_idx {
+    CONFIG_TIMER_DVFS_CPU_GROUP_LITTLE,
+    CONFIG_TIMER_DVFS_CPU_GROUP_BIG,
+    CONFIG_TIMER_DVFS_GPU,
     CONFIG_TIMER_REFCLK_SUB_ELEMENT_IDX_COUNT,
 };
 

@@ -10,11 +10,15 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <config_dvfs.h>
+#include <config_timer.h>
 #include <mod_dvfs.h>
 
 static const struct mod_dvfs_domain_config cpu_group_little = {
     .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, 0),
     .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, 1),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0,
+        CONFIG_TIMER_DVFS_CPU_GROUP_LITTLE),
+    .retry_ms = 1,
     .latency = 1200,
     .sustained_idx = 2,
     .opps = (struct mod_dvfs_opp[]) {
@@ -45,6 +49,9 @@ static const struct mod_dvfs_domain_config cpu_group_little = {
 static const struct mod_dvfs_domain_config cpu_group_big = {
     .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, 1),
     .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, 0),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0,
+        CONFIG_TIMER_DVFS_CPU_GROUP_BIG),
+    .retry_ms = 1,
     .latency = 1200,
     .sustained_idx = 2,
     .opps = (struct mod_dvfs_opp[]) {
@@ -75,6 +82,9 @@ static const struct mod_dvfs_domain_config cpu_group_big = {
 static const struct mod_dvfs_domain_config gpu = {
     .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, 2),
     .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, 2),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0,
+        CONFIG_TIMER_DVFS_GPU),
+    .retry_ms = 1,
     .latency = 1200,
     .sustained_idx = 4,
     .opps = (struct mod_dvfs_opp[]) {
