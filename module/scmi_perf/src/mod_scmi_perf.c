@@ -324,7 +324,10 @@ static int scmi_perf_describe_levels_handler(fwk_id_t service_id,
         if (status != FWK_SUCCESS)
             goto exit;
 
-        perf_level.power_cost = opp.voltage;
+        if (opp.power != 0)
+            perf_level.power_cost = opp.power;
+        else
+            perf_level.power_cost = opp.voltage;
         perf_level.performance_level = opp.frequency;
         perf_level.attributes = latency;
 
