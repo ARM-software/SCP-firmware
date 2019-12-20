@@ -52,7 +52,7 @@ static const struct fwk_element timer_dev_table[] = {
             .id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_GTIMER, 0),
             .timer_irq = TIMREFCLK_IRQ,
         }),
-        .sub_element_count = 8, /* Number of alarms */
+        .sub_element_count = 10, /* Number of alarms */
     },
     [1] = { 0 },
 };
