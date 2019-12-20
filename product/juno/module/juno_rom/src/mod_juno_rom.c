@@ -5,20 +5,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <string.h>
-#include <fwk_assert.h>
-#include <fwk_id.h>
-#include <fwk_interrupt.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <fwk_notification.h>
-#include <fwk_status.h>
-#include <fwk_thread.h>
-#include <mod_bootloader.h>
-#include <mod_juno_ppu.h>
-#include <mod_juno_rom.h>
-#include <mod_log.h>
-#include <mod_power_domain.h>
 #include <juno_debug_rom.h>
 #include <juno_nic400.h>
 #include <juno_ppu_idx.h>
@@ -26,6 +12,22 @@
 #include <juno_utils.h>
 #include <juno_wdog_rom.h>
 #include <scp_config.h>
+
+#include <mod_bootloader.h>
+#include <mod_juno_ppu.h>
+#include <mod_juno_rom.h>
+#include <mod_log.h>
+#include <mod_power_domain.h>
+
+#include <fwk_assert.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <fwk_notification.h>
+#include <fwk_status.h>
+#include <fwk_thread.h>
+
+#include <string.h>
 
 /* Values for cluster configuration */
 #define CLUSTERCLK_CONTROL_CLKDIVSYS        UINT32_C(0x000000F0)
@@ -166,25 +168,6 @@ static void css_clock_cluster_sel_set(volatile uint32_t *clk,
     }
 }
 
-/*
- * This function assumes that the RAM firmware image is located at the beginning
- * of the SCP SRAM. The reset handler will be at offset 0x4.
- */
-static noreturn void jump_to_ramfw(void)
-{
-    uintptr_t *reset_base = NULL;
-    void (*ramfw_reset_handler)(void);
-
-    fwk_interrupt_global_disable();
-
-    reset_base = (uintptr_t *)(ctx.config->ramfw_base + 0x4);
-    ramfw_reset_handler = (void (*)(void))*reset_base;
-    ramfw_reset_handler();
-
-    while (true)
-        continue;
-}
-
 static int deferred_setup(void)
 {
     int status;
@@ -235,19 +218,13 @@ static int deferred_setup(void)
     #endif
 
     status = ctx.bootloader_api->load_image();
-    if (status != FWK_SUCCESS) {
-        ctx.log_api->log(MOD_LOG_GROUP_ERROR,
-                         "[ROM] ERROR: Failed to load RAM firmware image\n");
-        return FWK_E_DATA;
-    }
 
-    #ifndef BUILD_MODE_DEBUG
-    juno_wdog_rom_reload();
-    #endif
+    ctx.log_api->log(
+        MOD_LOG_GROUP_ERROR,
+        "[ROM] ERROR: Failed to load RAM firmware image: %d\n",
+        status);
 
-    jump_to_ramfw();
-
-    return FWK_SUCCESS;
+    return FWK_E_DATA;
 }
 
 /*

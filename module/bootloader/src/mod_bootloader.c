@@ -5,15 +5,21 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-#include <string.h>
-#include <fwk_element.h>
-#include <fwk_id.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <fwk_status.h>
 #include <mod_bootloader.h>
 #include <mod_sds.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_interrupt.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <fwk_noreturn.h>
+#include <fwk_status.h>
+
+#include <fmw_cmsis.h>
+
+#include <stdint.h>
+#include <string.h>
 
 /* Offset within the SDS structure where the valid flag is located. */
 #define BOOTLOADER_STRUCT_VALID_POS           0
@@ -38,6 +44,12 @@ static struct bootloader_ctx module_ctx;
 
 static int load_image(void)
 {
+    extern noreturn void mod_bootloader_boot(
+        uintptr_t destination,
+        void *source,
+        size_t size,
+        volatile uint32_t *vtor);
+
     int status;
     void *image_base;
     uint32_t image_flags;
@@ -96,10 +108,13 @@ static int load_image(void)
     image_base = (void *)((uint8_t *)module_ctx.module_config->source_base +
                           image_offset);
 
-    memcpy((void *)module_ctx.module_config->destination_base, image_base,
-           image_size);
+    fwk_interrupt_global_disable(); /* We are relocating the vector table */
 
-    return FWK_SUCCESS;
+    mod_bootloader_boot(
+        module_ctx.module_config->destination_base,
+        image_base,
+        image_size,
+        &SCB->VTOR);
 }
 
 static const struct mod_bootloader_api bootloader_api = {
