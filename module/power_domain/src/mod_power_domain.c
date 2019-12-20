@@ -146,8 +146,11 @@ struct pd_ctx {
 };
 
 struct system_suspend_ctx {
-    /* Flag indicating if a system suspend is ongoing (true) or not (false) */
-    bool ongoing;
+    /*
+     * Flag indicating if the last core is being turned off (true) or not
+     * (false).
+     */
+    bool last_core_off_ongoing;
 
     /* Last standing core context */
     struct pd_ctx *last_core_pd;
@@ -776,8 +779,8 @@ static void process_set_state_request(struct pd_ctx *lowest_pd,
     unsigned int state;
     bool first_power_state_transition_initiated = false;
 
-    /* A set state request cancels any pending system suspend. */
-    mod_pd_ctx.system_suspend.ongoing = false;
+    /* A set state request cancels the completion of system suspend. */
+    mod_pd_ctx.system_suspend.last_core_off_ongoing = false;
 
     composite_state = req_params->composite_state;
     up = is_upwards_transition_propagation(lowest_pd, composite_state);
@@ -1095,9 +1098,9 @@ static void process_power_state_transition_report(struct pd_ctx *pd,
             &pd->power_state_transition_notification_ctx.pending_responses);
     }
 
-    if ((mod_pd_ctx.system_suspend.ongoing) &&
+    if ((mod_pd_ctx.system_suspend.last_core_off_ongoing) &&
         (pd == mod_pd_ctx.system_suspend.last_core_pd)) {
-        mod_pd_ctx.system_suspend.ongoing = false;
+        mod_pd_ctx.system_suspend.last_core_off_ongoing = false;
         complete_system_suspend(pd);
     }
 
@@ -1173,7 +1176,8 @@ static void process_system_suspend_request(
         status = last_core_pd->driver_api->prepare_core_for_system_suspend(
             last_core_pd->driver_id);
         if (status == FWK_SUCCESS) {
-            mod_pd_ctx.system_suspend.ongoing = true;
+            mod_pd_ctx.system_suspend.last_core_off_ongoing = true;
+
             mod_pd_ctx.system_suspend.last_core_pd = last_core_pd;
             mod_pd_ctx.system_suspend.state = req_params->state;
             last_core_pd->requested_state =
