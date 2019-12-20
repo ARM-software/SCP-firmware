@@ -166,6 +166,11 @@ endif
 INCLUDES += $(FWK_DIR)/include
 
 #
+# Always include CMSIS
+#
+INCLUDES += $(CMSIS_DIR)/Include
+
+#
 # Toolchain-independent flags
 #
 CFLAGS += -O$(O)

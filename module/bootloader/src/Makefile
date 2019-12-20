@@ -6,6 +6,8 @@
 #
 
 BS_LIB_NAME := Bootloader
-BS_LIB_SOURCES := mod_bootloader.c
+BS_LIB_SOURCES := \
+    mod_bootloader.c \
+    mod_bootloader_boot.S
 
 include $(BS_DIR)/lib.mk

@@ -12,9 +12,11 @@
 #ifndef MOD_MSYS_ROM_H
 #define MOD_MSYS_ROM_H
 
+#include <fwk_id.h>
+#include <fwk_module_idx.h>
+
 #include <stddef.h>
 #include <stdint.h>
-#include <fwk_id.h>
 
 /*!
  * \ingroup GroupMSYSModule
@@ -31,9 +33,6 @@ struct msys_rom_config {
 
     /*! Size of the AP context area */
     const size_t ap_context_size;
-
-    /*! Base address of the RAM firmware image */
-    const uintptr_t ramfw_base;
 
     /*! Element ID of the primary cluster PPU */
     const fwk_id_t id_primary_cluster;
