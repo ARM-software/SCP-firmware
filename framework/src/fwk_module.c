@@ -10,6 +10,7 @@
 
 #include <string.h>
 #include <fwk_assert.h>
+#include <fwk_cli_dbg.h>
 #include <fwk_host.h>
 #include <fwk_mm.h>
 #include <fwk_status.h>
@@ -382,6 +383,8 @@ int __fwk_module_init(void)
         FWK_HOST_PRINT(err_msg_func, FWK_E_STATE, __func__);
         return FWK_E_STATE;
     }
+
+    CLI_DEBUGGER();
 
     status = __fwk_thread_init(EVENT_COUNT);
     if (status != FWK_SUCCESS)
