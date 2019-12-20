@@ -139,6 +139,14 @@ struct juno_xrp7724_dev_psu_ctx {
     uint32_t wait_event_cookie;
     fwk_id_t element_id;
     bool psu_set_enabled;
+
+    /*  Cache for the voltage of the PSU element */
+    uint64_t current_voltage;
+
+    /*
+     * This field is used when doing a set_voltage request to propagate the
+     * voltage parameter through the processing of the request
+     */
     uint64_t psu_set_voltage;
 };
 
@@ -373,7 +381,7 @@ static int juno_xrp7724_set_voltage(fwk_id_t id, uint64_t voltage)
     uint32_t mvref;
     uint8_t fine_adj;
     uint32_t coarse_val;
-    const struct juno_xrp7724_dev_ctx *ctx;
+    struct juno_xrp7724_dev_ctx *ctx;
     struct psu_set_voltage_param *param =
         (struct psu_set_voltage_param *)event.params;
 
@@ -386,6 +394,11 @@ static int juno_xrp7724_set_voltage(fwk_id_t id, uint64_t voltage)
 
     if (module_ctx.psu_request != JUNO_XRP7724_PSU_REQUEST_IDLE)
         return FWK_E_BUSY;
+
+    if (ctx->juno_xrp7724_dev_psu.current_voltage != 0 &&
+        ctx->juno_xrp7724_dev_psu.current_voltage == voltage) {
+        return FWK_SUCCESS;
+    }
 
     /* Compute the number of coarse voltage steps */
     coarse_val = (voltage * 1000) / PSU_VOUT_STEP_COARSE_UV;
@@ -436,6 +449,11 @@ static int juno_xrp7724_get_voltage(fwk_id_t id, uint64_t *voltage)
 
     if (module_ctx.psu_request != JUNO_XRP7724_PSU_REQUEST_IDLE)
         return FWK_E_BUSY;
+
+    if (ctx->juno_xrp7724_dev_psu.current_voltage != 0) {
+        *voltage = ctx->juno_xrp7724_dev_psu.current_voltage;
+        return FWK_SUCCESS;
+    }
 
     event = (struct fwk_event) {
         .target_id = id,
@@ -778,6 +796,9 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
         if (status == FWK_SUCCESS) {
             driver_response.voltage = (((uint16_t)ctx->receive_data[0] << 8) |
                 ctx->receive_data[1]) * PSU_MVOUT_SCALE_READ;
+
+            ctx->juno_xrp7724_dev_psu.current_voltage =
+                driver_response.voltage;
         }
 
         break;
@@ -833,7 +854,10 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
         /*
          * If channel is not enabled there is nothing more to do.
          */
+         ctx->juno_xrp7724_dev_psu.current_voltage =
+            ctx->juno_xrp7724_dev_psu.psu_set_voltage;
          status = FWK_SUCCESS;
+
          break;
 
     case JUNO_XRP7724_PSU_REQUEST_COMPARE_VOLTAGE:
@@ -845,8 +869,12 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
         if (((adc_val + PSU_TARGET_MARGIN_MV) <
             ctx->juno_xrp7724_dev_psu.psu_set_voltage) ||
             ((adc_val - PSU_TARGET_MARGIN_MV) >
-            ctx->juno_xrp7724_dev_psu.psu_set_voltage))
+            ctx->juno_xrp7724_dev_psu.psu_set_voltage)) {
                 status = FWK_E_DEVICE;
+        } else {
+            ctx->juno_xrp7724_dev_psu.current_voltage =
+                ctx->juno_xrp7724_dev_psu.psu_set_voltage;
+        }
 
         break;
 
