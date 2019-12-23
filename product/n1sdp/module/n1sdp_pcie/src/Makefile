@@ -6,6 +6,6 @@
 #
 
 BS_LIB_NAME := "N1SDP PCIe"
-BS_LIB_SOURCES = n1sdp_pcie.c mod_n1sdp_pcie.c
+BS_LIB_SOURCES = n1sdp_pcie.c pcie_enumeration.c mod_n1sdp_pcie.c
 
 include $(BS_DIR)/lib.mk
