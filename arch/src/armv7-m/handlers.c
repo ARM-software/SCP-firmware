@@ -38,7 +38,7 @@ noreturn void arm_exception_reset(void)
 #endif
 }
 
-noreturn void arm_exception_invalid(void)
+noreturn __attribute__((weak)) void arm_exception_invalid(void)
 {
     while (true)
         __WFI();
