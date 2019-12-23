@@ -181,8 +181,14 @@ static int shutdown(
     /* Shutdown external PPUs */
     ext_ppus_shutdown(system_shutdown);
 
+    system_power_ctx.requested_state = MOD_PD_STATE_OFF;
+
     /* Shutdown system PPUs */
-    return shutdown_system_power_ppus(system_shutdown);
+    status = shutdown_system_power_ppus(system_shutdown);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    return FWK_SUCCESS;
 }
 
 /*
