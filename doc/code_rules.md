@@ -48,7 +48,7 @@ error output.
 
 Certain checks have been manually suppressed. Checks are generally only
 disabled if they have been triaged as false positives. The list of suppressed
-checks can be found [here](tools/cppcheck_suppress_list.txt).
+checks can be found [here](../tools/cppcheck_suppress_list.txt).
 
 C Standard Library
 ------------------
