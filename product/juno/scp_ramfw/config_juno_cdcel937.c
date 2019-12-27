@@ -113,7 +113,7 @@ static const struct fwk_element juno_cdcel937_element_table[] = {
             .max_rate = 120 * FWK_MHZ,
             .min_step = 250 * FWK_KHZ,
             .rate_type = MOD_CLOCK_RATE_TYPE_CONTINUOUS,
-            .output_id = MOD_JUNO_CDCEL937_OUTPUT_ID_Y2,
+            .output_id = MOD_JUNO_CDCEL937_OUTPUT_ID_Y6,
         }
     },
     [JUNO_CLOCK_CDCEL937_IDX_HDLCD1] = {
@@ -129,7 +129,7 @@ static const struct fwk_element juno_cdcel937_element_table[] = {
             .max_rate = 120 * FWK_MHZ,
             .min_step = 250 * FWK_KHZ,
             .rate_type = MOD_CLOCK_RATE_TYPE_CONTINUOUS,
-            .output_id = MOD_JUNO_CDCEL937_OUTPUT_ID_Y2,
+            .output_id = MOD_JUNO_CDCEL937_OUTPUT_ID_Y6,
         }
     },
     [JUNO_CLOCK_CDCEL937_IDX_COUNT] = { 0 },
