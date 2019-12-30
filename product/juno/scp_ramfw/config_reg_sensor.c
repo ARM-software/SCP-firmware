@@ -11,7 +11,7 @@
 #include <mod_sensor.h>
 #include <system_mmap.h>
 
-static uint32_t fake_register = 0x00001234;
+static uint64_t fake_register = UINT64_C(0x1234);
 
 /*
  * Register Sensor driver config
