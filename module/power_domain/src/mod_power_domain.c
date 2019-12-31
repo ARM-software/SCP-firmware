@@ -728,10 +728,11 @@ static int initiate_power_state_transition(struct pd_ctx *pd)
  * Respond to a request.
  *
  * \param pd Description of the power domain in charge of the response
- * \param status Response status
+ * \param resp_status Response status
  */
-static void respond(struct pd_ctx *pd, int status)
+static void respond(struct pd_ctx *pd, int resp_status)
 {
+    int status;
     struct fwk_event resp_event;
     const struct pd_set_state_request *req_params =
         (struct pd_set_state_request *)(&resp_event.params);
@@ -749,7 +750,7 @@ static void respond(struct pd_ctx *pd, int status)
         return;
 
     resp_params->composite_state = req_params->composite_state;
-    resp_params->status = status;
+    resp_params->status = resp_status;
 
     fwk_thread_put_event(&resp_event);
 }
