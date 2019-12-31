@@ -761,10 +761,13 @@ static void respond(struct pd_ctx *pd, int status)
  * \param req_params Parameters of the 'set state' request
  * \param [out] Response event
  */
-static void process_set_state_request(struct pd_ctx *lowest_pd,
-    struct pd_set_state_request *req_params, struct fwk_event *resp_event)
+static void process_set_state_request(
+    struct pd_ctx *lowest_pd,
+    const struct fwk_event *event,
+    struct fwk_event *resp_event)
 {
     int status;
+    struct pd_set_state_request *req_params;
     struct pd_set_state_response *resp_params;
     uint32_t composite_state;
     bool up, first_power_state_transition_initiated;
@@ -773,6 +776,7 @@ static void process_set_state_request(struct pd_ctx *lowest_pd,
     struct pd_ctx *pd, *pd_in_charge_of_response;
     const struct pd_ctx *parent;
 
+    req_params = (struct pd_set_state_request *)event->params;
     resp_params = (struct pd_set_state_response *)resp_event->params;
     pd_in_charge_of_response = NULL;
     first_power_state_transition_initiated = false;
@@ -886,7 +890,7 @@ static void process_set_state_request(struct pd_ctx *lowest_pd,
         first_power_state_transition_initiated = true;
     }
 
-    if (!resp_event->response_requested)
+    if (!event->response_requested)
         return;
 
     if (pd_in_charge_of_response != NULL) {
@@ -915,7 +919,9 @@ static int complete_system_suspend(struct pd_ctx *target_pd)
     enum mod_pd_level level;
     unsigned int composite_state = 0;
     struct pd_ctx *pd = target_pd;
-    struct fwk_event resp_event;
+    struct fwk_event event, resp_event;
+    struct pd_set_state_request *event_params =
+        (struct pd_set_state_request *)event.params;
     struct pd_set_state_response *resp_params =
         (struct pd_set_state_response *)(&resp_event.params);
 
@@ -938,12 +944,12 @@ static int complete_system_suspend(struct pd_ctx *target_pd)
      */
     composite_state |= (--level) << MOD_PD_CS_LEVEL_SHIFT;
 
+    event = (struct fwk_event) { 0 };
+    event_params->composite_state = composite_state;
+
     resp_event = (struct fwk_event) { 0 };
 
-    process_set_state_request(target_pd,
-        &((struct pd_set_state_request){
-            .composite_state = composite_state,
-        }), &resp_event);
+    process_set_state_request(target_pd, &event, &resp_event);
 
     return resp_params->status;
 }
@@ -1839,8 +1845,7 @@ static int pd_process_event(const struct fwk_event *event,
     case PD_EVENT_IDX_SET_STATE:
         assert(pd != NULL);
 
-        process_set_state_request(pd,
-            (struct pd_set_state_request *)event->params, resp);
+        process_set_state_request(pd, event, resp);
 
         return FWK_SUCCESS;
 
