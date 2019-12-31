@@ -143,12 +143,6 @@ struct mod_cmn600_config {
     /*! Identifier of the clock that this device depends on */
     fwk_id_t clock_id;
 
-    /*! Module ID for getting chip ID information */
-    fwk_id_t chipinfo_mod_id;
-
-    /*! API ID for getting chip ID information */
-    fwk_id_t chipinfo_api_id;
-
     /*!
      * \brief HN-F with CAL support flag
      * \details When set to true, enables HN-F with CAL support. This flag will
@@ -306,24 +300,6 @@ struct mod_cmn600_ccix_config_api {
     * \return one of the error code otherwise.
     */
    int (*enter_dvm_domain)(uint8_t link_id);
-};
-
-/*!
- * \brief API to read chip information from platform
- */
-struct mod_cmn600_chipinfo_api {
-   /*!
-    * \brief API to be implemented by all platforms using CMN-600.
-    *        Used to get multichip mode and chip ID information from platform.
-    *
-    * \param  chip_id Pointer to storage where chip ID is stored.
-    * \param  multichip_enabled Pointer to storage where multichip
-    *                           flag is stored.
-    *
-    * \retval FWK_SUCCESS if the operation succeed.
-    * \return one of the error code otherwise.
-    */
-   int (*get_chipinfo)(uint8_t *chip_id, bool *multichip_enabled);
 };
 
 /*!

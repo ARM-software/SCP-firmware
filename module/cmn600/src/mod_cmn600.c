@@ -19,6 +19,7 @@
 #include <mod_cmn600.h>
 #include <mod_log.h>
 #include <mod_power_domain.h>
+#include <mod_system_info.h>
 #include <cmn600.h>
 #include <internal/cmn600_ccix.h>
 #include <internal/cmn600_ctx.h>
@@ -27,6 +28,9 @@
 #define MOD_NAME "[CMN600] "
 
 struct cmn600_ctx *ctx;
+
+/* Chip information API */
+struct mod_system_info_get_info_api *system_info_api;
 
 static void process_node_hnf(struct cmn600_hnf_reg *hnf)
 {
@@ -759,14 +763,13 @@ static int cmn600_bind(fwk_id_t id, unsigned int round)
         if (status != FWK_SUCCESS)
             return FWK_E_PANIC;
 
-        /* Bind to the chip information API in platform if provided */
-        if (!fwk_id_is_equal(ctx->config->chipinfo_mod_id, FWK_ID_NONE)) {
-            status = fwk_module_bind(ctx->config->chipinfo_mod_id,
-                                     ctx->config->chipinfo_api_id,
-                                     &ctx->chipinfo_api);
-            if (status != FWK_SUCCESS)
-                return FWK_E_PANIC;
-        }
+        /* Bind to system info module to obtain multi-chip info */
+        status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_SYSTEM_INFO),
+                                 FWK_ID_API(FWK_MODULE_IDX_SYSTEM_INFO,
+                                            MOD_SYSTEM_INFO_GET_API_IDX),
+                                 &system_info_api);
+        if (status != FWK_SUCCESS)
+            return FWK_E_PANIC;
     }
 
     return FWK_SUCCESS;
@@ -799,11 +802,12 @@ int cmn600_start(fwk_id_t id)
         return FWK_SUCCESS;
     }
 
-    if (!fwk_id_is_equal(ctx->config->chipinfo_mod_id, FWK_ID_NONE)) {
-        status = ctx->chipinfo_api->get_chipinfo(&chip_id, &mc_mode);
-        if (status != FWK_SUCCESS)
-            return status;
+    status = system_info_api->get_system_info(&ctx->system_info);
+    if (status == FWK_SUCCESS) {
+        chip_id = ctx->system_info->chip_id;
+        mc_mode = ctx->system_info->multi_chip_mode;
     }
+
     ctx->chip_id = chip_id;
 
     ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
