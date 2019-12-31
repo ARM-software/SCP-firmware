@@ -69,9 +69,6 @@ enum mod_n1sdp_system_api_idx {
     /*! API index for AP memory access */
     MOD_N1SDP_SYSTEM_API_IDX_AP_MEMORY_ACCESS,
 
-    /*! API index for getting chip information */
-    MOD_N1SDP_SYSTEM_API_IDX_CHIPINFO,
-
     /*! Number of exposed interfaces */
     MOD_N1SDP_SYSTEM_API_COUNT,
 };

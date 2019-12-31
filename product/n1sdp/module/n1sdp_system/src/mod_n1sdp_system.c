@@ -239,23 +239,6 @@ static const struct mod_system_power_driver_api
 };
 
 /*
- * Chip information API
- */
-static int n1sdp_get_chipinfo(uint8_t *chip_id, bool *mc_mode)
-{
-    fwk_assert((chip_id != NULL) && (mc_mode != NULL));
-
-    *chip_id = n1sdp_get_chipid();
-    *mc_mode = n1sdp_is_multichip_enabled();
-
-    return FWK_SUCCESS;
-}
-
-static const struct mod_cmn600_chipinfo_api n1sdp_chipinfo_api = {
-    .get_chipinfo = n1sdp_get_chipinfo,
-};
-
-/*
  * AP memory 1MB windowed access driver API
  */
 
@@ -610,9 +593,6 @@ static int n1sdp_system_process_bind_request(fwk_id_t requester_id,
         break;
     case MOD_N1SDP_SYSTEM_API_IDX_AP_MEMORY_ACCESS:
         *api = &n1sdp_system_ap_memory_access_api;
-        break;
-    case MOD_N1SDP_SYSTEM_API_IDX_CHIPINFO:
-        *api = &n1sdp_chipinfo_api;
         break;
     default:
         return FWK_E_PARAM;

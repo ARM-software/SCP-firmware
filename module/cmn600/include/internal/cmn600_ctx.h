@@ -94,8 +94,8 @@ struct cmn600_ctx {
     /* Timer module API */
     struct mod_timer_api *timer_api;
 
-    /* Chip information API */
-    struct mod_cmn600_chipinfo_api *chipinfo_api;
+    /* Chip information */
+    const struct mod_system_info *system_info;
 
     bool initialized;
 
