@@ -83,6 +83,7 @@ BS_FIRMWARE_SOURCES := \
     config_psu.c \
     config_mock_psu.c \
     config_juno_pvt.c \
-    config_juno_thermal.c
+    config_juno_thermal.c \
+    config_scmi_power_domain.c
 
 include $(BS_DIR)/firmware.mk

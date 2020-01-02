@@ -76,6 +76,7 @@ BS_FIRMWARE_SOURCES := \
     config_dvfs.c \
     config_scmi_perf.c \
     config_scmi_apcore.c \
-    config_apcontext.c
+    config_apcontext.c \
+    config_scmi_power_domain.c
 
 include $(BS_DIR)/firmware.mk

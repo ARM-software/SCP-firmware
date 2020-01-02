@@ -85,6 +85,7 @@ BS_FIRMWARE_SOURCES := \
     config_apcontext.c \
     config_n1sdp_c2c_i2c.c \
     config_n1sdp_remote_pd.c \
-    config_n1sdp_timer_sync.c
+    config_n1sdp_timer_sync.c \
+    config_scmi_power_domain.c
 
 include $(BS_DIR)/firmware.mk

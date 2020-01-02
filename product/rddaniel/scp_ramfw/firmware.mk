@@ -58,6 +58,7 @@ BS_FIRMWARE_SOURCES := \
     config_pik_clock.c \
     config_css_clock.c \
     config_clock.c \
-    config_apcontext.c
+    config_apcontext.c \
+    config_scmi_power_domain.c
 
 include $(BS_DIR)/firmware.mk

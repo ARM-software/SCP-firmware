@@ -589,6 +589,3 @@ const struct fwk_module module_scmi_power_domain = {
     .bind = scmi_pd_bind,
     .process_bind_request = scmi_pd_process_bind_request,
 };
-
-/* No elements, no module configuration data */
-struct fwk_module_config config_scmi_power_domain = { 0 };
