@@ -1,7 +1,7 @@
 Glossary
 ========
 
-Copyright (c) 2011-2019, Arm Limited. All rights reserved.
+Copyright (c) 2011-2020, Arm Limited. All rights reserved.
 
 __AP__
     Application Processor

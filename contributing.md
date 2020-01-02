@@ -97,4 +97,4 @@ manner.  Failure to address issues/bugs may result in the causal commit
 being removed.
 
 --------------
-*Copyright (c) 2018-2019, Arm Limited and Contributors. All rights reserved.*
+*Copyright (c) 2018-2020, Arm Limited and Contributors. All rights reserved.*
