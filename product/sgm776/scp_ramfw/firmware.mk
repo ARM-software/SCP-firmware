@@ -70,6 +70,7 @@ BS_FIRMWARE_SOURCES := \
     config_mock_psu.c \
     config_dvfs.c \
     config_sid.c \
-    config_system_info.c
+    config_system_info.c \
+    config_scmi_power_domain.c
 
 include $(BS_DIR)/firmware.mk

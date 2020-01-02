@@ -67,6 +67,7 @@ BS_FIRMWARE_SOURCES := \
     config_synquacer_memc.c \
     config_system_power.c \
     config_timer.c \
-    rtx_config.c
+    rtx_config.c \
+    config_scmi_power_domain.c
 
 include $(BS_DIR)/firmware.mk
