@@ -409,7 +409,6 @@ int ccix_setup(struct cmn600_ctx *ctx, void *remote_config)
     struct mod_cmn600_ccix_remote_node_config * ccix_remote_config =
         (struct mod_cmn600_ccix_remote_node_config *)remote_config;
 
-    cmn600_setup_sam((struct cmn600_rnsam_reg *)((uint32_t)ctx->cxg_ra_reg));
     ctx->log_api->log(MOD_LOG_GROUP_DEBUG,
         MOD_NAME "Programming CCIX gateway...\n");
 
