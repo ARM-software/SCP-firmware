@@ -18,10 +18,12 @@
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <mod_clock.h>
+#include <mod_cmn600.h>
 #include <mod_rdn1e1_system.h>
 #include <mod_log.h>
 #include <mod_scmi.h>
 #include <mod_sds.h>
+#include <mod_system_info.h>
 #include <mod_system_power.h>
 #include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
@@ -55,6 +57,12 @@ struct rdn1e1_system_ctx {
 
     /* SDS API pointer */
     const struct mod_sds_api *sds_api;
+
+    /* CMN600 CCIX config API pointer */
+    struct mod_cmn600_ccix_config_api *cmn600_api;
+
+    /* System Information HAL API pointer */
+    struct mod_system_info_get_info_api *system_info_api;
 };
 
 struct rdn1e1_system_isr {
@@ -230,6 +238,20 @@ static int rdn1e1_system_bind(fwk_id_t id, unsigned int round)
     if (status != FWK_SUCCESS)
         return status;
 
+    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_CMN600),
+                             FWK_ID_API(FWK_MODULE_IDX_CMN600,
+                                        MOD_CMN600_API_IDX_CCIX_CONFIG),
+                             &rdn1e1_system_ctx.cmn600_api);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_SYSTEM_INFO),
+                             FWK_ID_API(FWK_MODULE_IDX_SYSTEM_INFO,
+                                        MOD_SYSTEM_INFO_GET_API_IDX),
+                             &rdn1e1_system_ctx.system_info_api);
+   if (status != FWK_SUCCESS)
+       return status;
+
     return fwk_module_bind(fwk_module_id_sds,
         FWK_ID_API(FWK_MODULE_IDX_SDS, 0),
         &rdn1e1_system_ctx.sds_api);
@@ -299,36 +321,79 @@ int rdn1e1_system_process_notification(const struct fwk_event *event,
     struct mod_pd_restricted_api *mod_pd_restricted_api;
     static unsigned int scmi_notification_count = 0;
     static bool sds_notification_received = false;
+    struct mod_cmn600_ccix_remote_node_config remote_config;
+    const struct mod_system_info *system_info;
+    uint8_t chip_id = 0;
+    bool mc_mode = false;
+
+    status = rdn1e1_system_ctx.system_info_api->get_system_info(&system_info);
+    if (status == FWK_SUCCESS) {
+        chip_id = system_info->chip_id;
+        mc_mode = system_info->multi_chip_mode;
+    }
 
     assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
 
     if (fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed)) {
         params = (struct clock_notification_params *)event->params;
+        if (params->new_state != MOD_CLOCK_STATE_RUNNING)
+            return FWK_SUCCESS;
+
+        /* Perform the CCIX setup if multi-chip mode is detected */
+        if (mc_mode == true) {
+            /* Populate CCIX config data statically */
+            remote_config.remote_rnf_count = 2;
+            remote_config.remote_sa_count = 0;
+            remote_config.remote_ha_count = 1;
+            remote_config.ccix_link_id = 0;
+            remote_config.remote_ha_mmap_count = 1;
+            remote_config.smp_mode = true;
+            if (chip_id == 0) {
+                remote_config.remote_ha_mmap[0].ha_id = 0x1;
+                remote_config.remote_ha_mmap[0].base = (4ULL * FWK_TIB);
+            } else {
+                remote_config.remote_ha_mmap[0].ha_id = 0x0;
+                remote_config.remote_ha_mmap[0].base = 0x0;
+            }
+            remote_config.remote_ha_mmap[0].size = (4ULL * FWK_TIB);
+
+            status = rdn1e1_system_ctx.cmn600_api->set_config(&remote_config);
+            if (status != FWK_SUCCESS) {
+                rdn1e1_system_ctx.log_api->log(MOD_LOG_GROUP_ERROR,
+                    "CCIX Setup Failed for Chip: %d!\n", chip_id);
+                return status;
+            }
+            rdn1e1_system_ctx.cmn600_api->exchange_protocol_credit(0);
+            rdn1e1_system_ctx.cmn600_api->enter_system_coherency(0);
+            rdn1e1_system_ctx.cmn600_api->enter_dvm_domain(0);
+        }
 
         /*
          * Initialize primary core when the system is initialized for the first
          * time only
          */
-        if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
+        if (chip_id == 0) {
             rdn1e1_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
                 "[RDN1E1 SYSTEM] Initializing the primary core...\n");
 
             mod_pd_restricted_api = rdn1e1_system_ctx.mod_pd_restricted_api;
 
-            status =  mod_pd_restricted_api->set_composite_state_async(
+            status = mod_pd_restricted_api->set_composite_state_async(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
                 false,
                 MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
                     MOD_PD_STATE_ON, MOD_PD_STATE_ON));
             if (status != FWK_SUCCESS)
                 return status;
-
-            /* Unsubscribe to the notification */
-            return fwk_notification_unsubscribe(event->id, event->source_id,
-                                                event->target_id);
+        } else {
+            rdn1e1_system_ctx.log_api->log(MOD_LOG_GROUP_DEBUG,
+                "[RDN1E1 SYSTEM] Detected as slave chip %d, "
+                "Waiting for SCMI command\n", chip_id);
         }
 
-        return FWK_SUCCESS;
+        /* Unsubscribe to the notification */
+        return fwk_notification_unsubscribe(event->id, event->source_id,
+                                            event->target_id);
     } else if (fwk_id_is_equal(event->id,
                                mod_scmi_notification_id_initialized)) {
         scmi_notification_count++;
