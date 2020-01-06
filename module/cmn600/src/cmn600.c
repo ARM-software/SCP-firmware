@@ -10,6 +10,9 @@
 #include <fwk_math.h>
 #include <cmn600.h>
 
+static unsigned int encoding_bits;
+static unsigned int mask_bits;
+
 unsigned int get_node_child_count(void *node_base)
 {
     struct node_header *node = node_base;
@@ -143,20 +146,19 @@ const char *get_node_type_name(enum node_type node_type)
 unsigned int get_node_pos_x(void *node_base)
 {
     struct node_header *node = node_base;
-    return (unsigned int)((node->NODE_INFO >> 21) & 0x3);
+    return (get_node_id(node) >> (CMN600_NODE_ID_Y_POS + encoding_bits)) &
+            mask_bits;
 }
 
 unsigned int get_node_pos_y(void *node_base)
 {
     struct node_header *node = node_base;
-    return (unsigned int)((node->NODE_INFO >> 19) & 0x3);
+    return (get_node_id(node) >> CMN600_NODE_ID_Y_POS) & mask_bits;
 }
 
 struct cmn600_cfgm_reg *get_root_node(uintptr_t base, unsigned int hnd_node_id,
     unsigned int mesh_size_x, unsigned int mesh_size_y)
 {
-    unsigned int encoding_bits;
-    unsigned int mask_bits;
     unsigned int node_pos_x;
     unsigned int node_pos_y;
     unsigned int node_port;
