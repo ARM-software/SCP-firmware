@@ -10,7 +10,8 @@ BS_LIB_NAME := debugger
 BS_LIB_SOURCES += \
 	cli/cli.c \
 	cli/cli_commands_core.c \
-	cli/cli_fifo.c
+	cli/cli_fifo.c \
+	cli/cli_platform_time.c
 
 BS_LIB_INCLUDES += $(DBG_DIR)/include
 BS_LIB_INCLUDES += $(ARCH_DIR)/include
