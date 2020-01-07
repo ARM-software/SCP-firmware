@@ -8,6 +8,7 @@
 BS_LIB_NAME := debugger
 
 BS_LIB_SOURCES += \
+	checkpoint.c \
 	cli/cli.c \
 	cli/cli_commands_core.c \
 	cli/cli_fifo.c \
