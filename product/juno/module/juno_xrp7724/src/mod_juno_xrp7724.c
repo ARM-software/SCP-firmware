@@ -125,12 +125,6 @@ struct juno_xrp7724_ctx {
     enum juno_xrp7724_gpio_request gpio_request;
     enum juno_xrp7724_sensor_request sensor_request;
     bool driver_skipped;
-
-    /*
-     * Note that as all PSUs are accessible via a single I2C bus only one
-     * request may be active at any time.
-     */
-    enum juno_xrp7724_psu_request psu_request;
 };
 
 struct juno_xrp7724_dev_psu_ctx {
@@ -148,6 +142,7 @@ struct juno_xrp7724_dev_psu_ctx {
      * voltage parameter through the processing of the request
      */
     uint64_t psu_set_voltage;
+    enum juno_xrp7724_psu_request psu_request;
 };
 
 struct juno_xrp7724_dev_ctx {
@@ -328,7 +323,7 @@ static int juno_xrp7724_set_enabled(fwk_id_t id, bool enabled)
 {
     int status;
     struct fwk_event event;
-    const struct juno_xrp7724_dev_ctx *ctx;
+    struct juno_xrp7724_dev_ctx *ctx;
     struct psu_set_enabled_param *param =
         (struct psu_set_enabled_param *)event.params;
 
@@ -339,7 +334,7 @@ static int juno_xrp7724_set_enabled(fwk_id_t id, bool enabled)
      * We only have a single I2C bus so only one I2C request is allowed
      * at any one time.
      */
-    if (module_ctx.psu_request != JUNO_XRP7724_PSU_REQUEST_IDLE)
+    if (ctx->juno_xrp7724_dev_psu.psu_request != JUNO_XRP7724_PSU_REQUEST_IDLE)
         return FWK_E_BUSY;
 
     event = (struct fwk_event) {
@@ -353,7 +348,8 @@ static int juno_xrp7724_set_enabled(fwk_id_t id, bool enabled)
     if (status != FWK_SUCCESS)
         return status;
 
-    module_ctx.psu_request = JUNO_XRP7724_PSU_REQUEST_SET_ENABLED;
+    ctx->juno_xrp7724_dev_psu.psu_request =
+        JUNO_XRP7724_PSU_REQUEST_SET_ENABLED;
 
     return FWK_PENDING;
 }
@@ -392,7 +388,7 @@ static int juno_xrp7724_set_voltage(fwk_id_t id, uint64_t voltage)
     ctx = &ctx_table[fwk_id_get_element_idx(id)];
     fwk_assert(ctx->config->type == MOD_JUNO_XRP7724_ELEMENT_TYPE_PSU);
 
-    if (module_ctx.psu_request != JUNO_XRP7724_PSU_REQUEST_IDLE)
+    if (ctx->juno_xrp7724_dev_psu.psu_request != JUNO_XRP7724_PSU_REQUEST_IDLE)
         return FWK_E_BUSY;
 
     if (ctx->juno_xrp7724_dev_psu.current_voltage != 0 &&
@@ -430,7 +426,8 @@ static int juno_xrp7724_set_voltage(fwk_id_t id, uint64_t voltage)
     if (status != FWK_SUCCESS)
         return status;
 
-    module_ctx.psu_request = JUNO_XRP7724_PSU_REQUEST_SET_VOLTAGE;
+    ctx->juno_xrp7724_dev_psu.psu_request =
+        JUNO_XRP7724_PSU_REQUEST_SET_VOLTAGE;
 
     return FWK_PENDING;
 }
@@ -439,7 +436,7 @@ static int juno_xrp7724_get_voltage(fwk_id_t id, uint64_t *voltage)
 {
     int status;
     struct fwk_event event;
-    const struct juno_xrp7724_dev_ctx *ctx;
+    struct juno_xrp7724_dev_ctx *ctx;
 
     if (voltage == NULL)
         return FWK_E_PARAM;
@@ -447,7 +444,7 @@ static int juno_xrp7724_get_voltage(fwk_id_t id, uint64_t *voltage)
     ctx = &ctx_table[fwk_id_get_element_idx(id)];
     fwk_assert(ctx->config->type == MOD_JUNO_XRP7724_ELEMENT_TYPE_PSU);
 
-    if (module_ctx.psu_request != JUNO_XRP7724_PSU_REQUEST_IDLE)
+    if (ctx->juno_xrp7724_dev_psu.psu_request != JUNO_XRP7724_PSU_REQUEST_IDLE)
         return FWK_E_BUSY;
 
     if (ctx->juno_xrp7724_dev_psu.current_voltage != 0) {
@@ -464,7 +461,8 @@ static int juno_xrp7724_get_voltage(fwk_id_t id, uint64_t *voltage)
     if (status != FWK_SUCCESS)
         return status;
 
-    module_ctx.psu_request = JUNO_XRP7724_PSU_REQUEST_READ_VOLTAGE;
+    ctx->juno_xrp7724_dev_psu.psu_request =
+        JUNO_XRP7724_PSU_REQUEST_READ_VOLTAGE;
 
     return FWK_PENDING;
 }
@@ -771,9 +769,10 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
 
     ctx = &ctx_table[fwk_id_get_element_idx(id)];
 
-    switch (module_ctx.psu_request) {
+    switch (ctx->juno_xrp7724_dev_psu.psu_request) {
     case JUNO_XRP7724_PSU_REQUEST_READ_VOLTAGE:
-        module_ctx.psu_request = JUNO_XRP7724_PSU_REQUEST_CONVERT_VOLTAGE;
+        ctx->juno_xrp7724_dev_psu.psu_request =
+            JUNO_XRP7724_PSU_REQUEST_CONVERT_VOLTAGE;
 
         ctx->transmit_data[0] = PSU_PWR_GET_VOLTAGE_CHx +
             ctx->config->psu_bus_idx;
@@ -804,7 +803,8 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
         break;
 
     case JUNO_XRP7724_PSU_REQUEST_SET_VOLTAGE:
-        module_ctx.psu_request = JUNO_XRP7724_PSU_REQUEST_WAIT_FOR_VOLTAGE;
+        ctx->juno_xrp7724_dev_psu.psu_request =
+            JUNO_XRP7724_PSU_REQUEST_WAIT_FOR_VOLTAGE;
 
         set_value = ((struct psu_set_voltage_param *)event_params)->set_value;
         ctx->juno_xrp7724_dev_psu.psu_set_voltage =
@@ -846,7 +846,8 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
             if (status != FWK_SUCCESS)
                 break;
 
-            module_ctx.psu_request = JUNO_XRP7724_PSU_REQUEST_COMPARE_VOLTAGE;
+            ctx->juno_xrp7724_dev_psu.psu_request =
+                 JUNO_XRP7724_PSU_REQUEST_COMPARE_VOLTAGE;
 
             return FWK_SUCCESS;
         }
@@ -879,7 +880,8 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
         break;
 
     case JUNO_XRP7724_PSU_REQUEST_SET_ENABLED:
-        module_ctx.psu_request = JUNO_XRP7724_PSU_REQUEST_WAIT_FOR_ENABLED;
+        ctx->juno_xrp7724_dev_psu.psu_request =
+            JUNO_XRP7724_PSU_REQUEST_WAIT_FOR_ENABLED;
 
         ctx->juno_xrp7724_dev_psu.psu_set_enabled =
             ((struct psu_set_enabled_param *)event_params)->enabled;
@@ -919,7 +921,8 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
                 if (status != FWK_SUCCESS)
                     break;
 
-                module_ctx.psu_request = JUNO_XRP7724_PSU_REQUEST_DONE_ENABLED;
+                ctx->juno_xrp7724_dev_psu.psu_request =
+                    JUNO_XRP7724_PSU_REQUEST_DONE_ENABLED;
                 return FWK_SUCCESS;
             } else
                 status = FWK_SUCCESS;
@@ -936,7 +939,7 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
     }
 
     driver_response.status = status;
-    module_ctx.psu_request = JUNO_XRP7724_PSU_REQUEST_IDLE;
+    ctx->juno_xrp7724_dev_psu.psu_request = JUNO_XRP7724_PSU_REQUEST_IDLE;
 
     module_ctx.psu_driver_response_api->respond(ctx->config->driver_response_id,
                                                driver_response);
