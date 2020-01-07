@@ -12,4 +12,18 @@
 
 #define CLOCK_RATE_REFCLK       (100UL * FWK_MHZ)
 
+/*
+ * PLL clock indexes.
+ */
+enum clock_pll_idx {
+    CLOCK_PLL_IDX_CPU0,
+    CLOCK_PLL_IDX_CPU1,
+    CLOCK_PLL_IDX_CPU2,
+    CLOCK_PLL_IDX_CPU3,
+    CLOCK_PLL_IDX_SYS,
+    CLOCK_PLL_IDX_DMC,
+    CLOCK_PLL_IDX_INTERCONNECT,
+    CLOCK_PLL_IDX_COUNT
+};
+
 #endif /* CLOCK_SOC_H */
