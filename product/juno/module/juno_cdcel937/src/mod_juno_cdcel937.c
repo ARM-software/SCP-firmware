@@ -453,7 +453,7 @@ static int create_set_rate_request(fwk_id_t clock_id,
     if (ctx->rate_hz == rate)
         return FWK_SUCCESS;
 
-    if (module_ctx.state != JUNO_CDCEL937_DEVICE_IDLE)
+    if (ctx->state != JUNO_CDCEL937_DEVICE_IDLE)
         return FWK_E_BUSY;
 
     event = (struct fwk_event) {
@@ -468,7 +468,7 @@ static int create_set_rate_request(fwk_id_t clock_id,
     if (status != FWK_SUCCESS)
         return FWK_E_DEVICE;
 
-    module_ctx.state = JUNO_CDCEL937_DEVICE_SET_RATE_SET_BLOCK_ACCESS_LENGTH;
+    ctx->state = JUNO_CDCEL937_DEVICE_SET_RATE_SET_BLOCK_ACCESS_LENGTH;
 
     return FWK_PENDING;
 }
@@ -655,7 +655,7 @@ static int create_get_rate_request(fwk_id_t clock_id,
     if (!module_ctx.initialized)
         return FWK_E_INIT;
 
-    if (module_ctx.state != JUNO_CDCEL937_DEVICE_IDLE)
+    if (ctx->state != JUNO_CDCEL937_DEVICE_IDLE)
             return FWK_E_BUSY;
 
     event = (struct fwk_event) {
@@ -667,7 +667,7 @@ static int create_get_rate_request(fwk_id_t clock_id,
     if (status != FWK_SUCCESS)
         return FWK_E_DEVICE;
 
-    module_ctx.state = JUNO_CDCEL937_DEVICE_GET_RATE_SET_BLOCK_ACCESS_LENGTH;
+    ctx->state = JUNO_CDCEL937_DEVICE_GET_RATE_SET_BLOCK_ACCESS_LENGTH;
 
     return FWK_PENDING;
 }
@@ -944,9 +944,9 @@ static int juno_cdcel937_start(fwk_id_t id)
         ctx = ctx_table + i;
         ctx->rate_hz = -1;
         ctx->rate_set = false;
+        ctx->state = JUNO_CDCEL937_DEVICE_IDLE;
     }
     module_ctx.initialized = true;
-    module_ctx.state = JUNO_CDCEL937_DEVICE_IDLE;
     return FWK_SUCCESS;
 }
 
@@ -962,11 +962,11 @@ static int juno_cdcel937_process_event(const struct fwk_event *event,
 
     ctx = &ctx_table[fwk_id_get_element_idx(event->target_id)];
 
-    switch (module_ctx.state) {
+    switch (ctx->state) {
     case JUNO_CDCEL937_DEVICE_SET_RATE_SET_BLOCK_ACCESS_LENGTH:
         status = rate_set_block_access_length(ctx);
         if (status == FWK_PENDING) {
-            module_ctx.state =
+            ctx->state =
                 JUNO_CDCEL937_DEVICE_SET_RATE_READ_PLL_CONFIG;
             return FWK_SUCCESS;
         }
@@ -982,7 +982,7 @@ static int juno_cdcel937_process_event(const struct fwk_event *event,
         }
         status = set_rate_read_pll_config(ctx);
         if (status == FWK_PENDING) {
-            module_ctx.state =
+            ctx->state =
                 JUNO_CDCEL937_DEVICE_SET_RATE_WRITE_PLL_CONFIG;
             return FWK_SUCCESS;
         }
@@ -998,7 +998,7 @@ static int juno_cdcel937_process_event(const struct fwk_event *event,
         }
         status = set_rate_write_pll_config(ctx);
         if (status == FWK_PENDING) {
-            module_ctx.state = JUNO_CDCEL937_DEVICE_SET_RATE_COMPLETE;
+            ctx->state = JUNO_CDCEL937_DEVICE_SET_RATE_COMPLETE;
             return FWK_SUCCESS;
         }
 
@@ -1024,14 +1024,14 @@ static int juno_cdcel937_process_event(const struct fwk_event *event,
         if (type == JUNO_CDCEL937_OUTPUT_TYPE_Y1) {
             status = get_rate_y1_set_block_access_length(ctx);
             if (status == FWK_PENDING) {
-                module_ctx.state =
+                ctx->state =
                     JUNO_CDCEL937_DEVICE_GET_RATE_Y1_READ_Y1_CONFIG;
                 return FWK_SUCCESS;
             }
         } else {
             status = rate_set_block_access_length(ctx);
             if (status == FWK_PENDING) {
-                module_ctx.state =
+                ctx->state =
                     JUNO_CDCEL937_DEVICE_GET_RATE_READ_PLL_CONFIG;
                 return FWK_SUCCESS;
             }
@@ -1048,7 +1048,7 @@ static int juno_cdcel937_process_event(const struct fwk_event *event,
         }
         status = get_rate_y1_read_y1_config(ctx);
         if (status == FWK_PENDING) {
-            module_ctx.state =
+            ctx->state =
                 JUNO_CDCEL937_DEVICE_GET_RATE_Y1_CHECK_PDIV;
             return FWK_SUCCESS;
         }
@@ -1064,7 +1064,7 @@ static int juno_cdcel937_process_event(const struct fwk_event *event,
         }
         status = get_rate_y1_check_pdiv(ctx);
         if (status == FWK_PENDING) {
-            module_ctx.state =
+            ctx->state =
                 JUNO_CDCEL937_DEVICE_GET_RATE_Y1_READ_PLL_CONFIG;
             return FWK_SUCCESS;
         }
@@ -1074,7 +1074,7 @@ static int juno_cdcel937_process_event(const struct fwk_event *event,
     case JUNO_CDCEL937_DEVICE_GET_RATE_Y1_READ_PLL_CONFIG:
         status = get_rate_y1_read_pll_config(ctx);
         if (status == FWK_PENDING) {
-            module_ctx.state =
+            ctx->state =
                 JUNO_CDCEL937_DEVICE_GET_RATE_Y1_COMPLETE;
             return FWK_SUCCESS;
         }
@@ -1091,7 +1091,7 @@ static int juno_cdcel937_process_event(const struct fwk_event *event,
     case JUNO_CDCEL937_DEVICE_GET_RATE_READ_PLL_CONFIG:
         status = get_rate_read_pll_config(ctx);
         if (status == FWK_PENDING) {
-            module_ctx.state =
+            ctx->state =
                 JUNO_CDCEL937_DEVICE_GET_RATE_COMPLETE;
             return FWK_SUCCESS;
         }
@@ -1109,7 +1109,7 @@ static int juno_cdcel937_process_event(const struct fwk_event *event,
             return FWK_E_PARAM;
     }
 
-    module_ctx.state = JUNO_CDCEL937_DEVICE_IDLE;
+    ctx->state = JUNO_CDCEL937_DEVICE_IDLE;
     response_param.status = status;
     response_param.value.rate = ctx->rate_hz;
     ctx->driver_response_api->request_complete(ctx->config->clock_hal_id,
