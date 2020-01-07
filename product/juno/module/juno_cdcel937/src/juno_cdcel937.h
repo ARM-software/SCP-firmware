@@ -242,6 +242,7 @@ struct juno_cdcel937_dev_ctx {
     struct cfg_reg_y1 y1_config;
     uint64_t rate;
     int index;
+    enum juno_cdcel937_module_ctx_state state;
 };
 
 struct juno_cdcel937_module_ctx {
@@ -249,7 +250,6 @@ struct juno_cdcel937_module_ctx {
     const struct mod_i2c_api *i2c_api;
     bool initialized;
     uint32_t cookie;
-    enum juno_cdcel937_module_ctx_state state;
 };
 
 enum juno_cdcel937_event_idx {
