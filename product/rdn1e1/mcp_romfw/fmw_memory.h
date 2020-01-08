@@ -8,25 +8,25 @@
  *     ROM firmware memory layout for the linker script.
  */
 
-#ifndef FMW_MEMORY_LD_S
-#define FMW_MEMORY_LD_S
+#ifndef FMW_MEMORY_H
+#define FMW_MEMORY_H
 
-#include <scp_system_mmap_scp.h>
+#include <mcp_system_mmap_mcp.h>
 
 #define FIRMWARE_MEM_MODE FWK_MEM_MODE_DUAL_REGION_RELOCATION
 
 /*
  * ROM memory
  */
-#define FIRMWARE_MEM0_SIZE  SCP_ROM_SIZE
-#define FIRMWARE_MEM0_BASE  SCP_ROM_BASE
+#define FIRMWARE_MEM0_SIZE MCP_ROM_SIZE
+#define FIRMWARE_MEM0_BASE MCP_ROM_BASE
 
 /*
  * RAM memory
  */
-#define FIRMWARE_MEM1_SIZE  SCP_RAM1_SIZE
-#define FIRMWARE_MEM1_BASE  SCP_RAM1_BASE
+#define FIRMWARE_MEM1_SIZE MCP_RAM1_SIZE
+#define FIRMWARE_MEM1_BASE MCP_RAM1_BASE
 
 #define FIRMWARE_STACK_SIZE (1 * 1024)
 
-#endif /* FMW_MEMORY_LD_S */
+#endif /* FMW_MEMORY_H */

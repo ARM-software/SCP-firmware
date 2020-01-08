@@ -5,15 +5,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef FMW_MEMORY_LD_S
-#define FMW_MEMORY_LD_S
+#ifndef FMW_MEMORY_H
+#define FMW_MEMORY_H
 
 #include <system_mmap_scp.h>
 
 #define FIRMWARE_MEM_MODE FWK_MEM_MODE_SINGLE_REGION
 
 /* RAM */
-#define FIRMWARE_MEM0_BASE  SCP_RAM_BASE
-#define FIRMWARE_MEM0_SIZE  SCP_RAM_SIZE
+#define FIRMWARE_MEM0_BASE SCP_RAM_BASE
+#define FIRMWARE_MEM0_SIZE SCP_RAM_SIZE
 
-#endif /* FMW_MEMORY_LD_S */
+#define FIRMWARE_STACK_SIZE (1 * 1024)
+
+#endif /* FMW_MEMORY_H */

@@ -8,8 +8,8 @@
  *     RAM firmware memory layout for the linker script.
  */
 
-#ifndef FMW_MEMORY_LD_S
-#define FMW_MEMORY_LD_S
+#ifndef FMW_MEMORY_H
+#define FMW_MEMORY_H
 
 #include <scp_mmap.h>
 #include <scp_software_mmap.h>
@@ -19,15 +19,15 @@
 /*
  * RAM instruction memory
  */
-#define FIRMWARE_MEM0_SIZE  SCP_ITC_RAM_SIZE
-#define FIRMWARE_MEM0_BASE  SCP_ITC_RAM_BASE
+#define FIRMWARE_MEM0_SIZE SCP_ITC_RAM_SIZE
+#define FIRMWARE_MEM0_BASE SCP_ITC_RAM_BASE
 
 /*
  * RAM data memory
  */
-#define FIRMWARE_MEM1_SIZE  SCP_DTC_RAM_SIZE
-#define FIRMWARE_MEM1_BASE  SCP_DTC_RAM_BASE
+#define FIRMWARE_MEM1_SIZE SCP_DTC_RAM_SIZE
+#define FIRMWARE_MEM1_BASE SCP_DTC_RAM_BASE
 
 #define FIRMWARE_STACK_SIZE (1 * 1024)
 
-#endif /* FMW_MEMORY_LD_S */
+#endif /* FMW_MEMORY_H */

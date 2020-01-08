@@ -35,7 +35,7 @@
 #define FWK_MEM_MODE_DUAL_REGION_RELOCATION 1
 #define FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION 2
 
-#include <fmw_memory.ld.S>
+#include <fmw_memory.h>
 
 #ifndef FIRMWARE_MEM_MODE
     #error "FIRMWARE_MEM_MODE has not been configured"

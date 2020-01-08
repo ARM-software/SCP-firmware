@@ -66,8 +66,7 @@ represents a software image that is built as part of a product. Each firmware
 lists the modules that will be built into its image and provides configuration
 data for each of these modules.
 
-For each firmware, linker information must be provided in a *fmw_memory.ld.S*
-file:
+For each firmware, linker information must be provided in a *fmw_memory.h* file:
 
 - FIRMWARE_MEM_MODE: The desired memory region configuration. Can be one of the
     following:
@@ -97,7 +96,7 @@ firmware_root/
     config_module_a.c
     config_module_b.c
     firmware.mk
-    fmw_memory.ld.s
+    fmw_memory.h
 \endcode
 
 ### Modules
