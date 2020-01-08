@@ -28,7 +28,6 @@ struct mod_i2c_dev_ctx {
     const struct mod_i2c_dev_config *config;
     const struct mod_i2c_driver_api *driver_api;
     struct mod_i2c_request request;
-    uint32_t cookie;
     enum mod_i2c_dev_state state;
 };
 
@@ -286,7 +285,7 @@ static int respond_to_caller(
     struct mod_i2c_event_param *param =
         (struct mod_i2c_event_param *)resp.params;
 
-    status = fwk_thread_get_delayed_response(dev_id, ctx->cookie, &resp);
+    status = fwk_thread_get_first_delayed_response(dev_id, &resp);
     if (status != FWK_SUCCESS)
         return status;
 
@@ -383,8 +382,7 @@ static int process_next_request(fwk_id_t dev_id, struct mod_i2c_dev_ctx *ctx)
         status = fwk_thread_put_event(&delayed_response);
         if (status == FWK_SUCCESS)
             status = reload(dev_id, ctx);
-    } else
-        ctx->cookie = delayed_response.cookie;
+    }
 
     return status;
 }
@@ -421,10 +419,9 @@ static int mod_i2c_process_event(const struct fwk_event *event,
 
         drv_status = process_request(ctx, event->id);
 
-        if (drv_status == FWK_PENDING) {
-            ctx->cookie = event->cookie;
+        if (drv_status == FWK_PENDING)
             resp_event->is_delayed_response = true;
-        } else {
+        else {
             /* The request has succeeded or failed, respond now */
             resp_param = (struct mod_i2c_event_param *)resp_event->params;
 
