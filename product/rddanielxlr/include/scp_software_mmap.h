@@ -36,4 +36,8 @@
                                             SCP_AP_CONTEXT_SIZE)
 #define SCP_AP_CONTEXT_SIZE                (64)
 
+/* SDS Memory Region */
+#define SCP_SDS_MEM_BASE                   (SCP_AP_SHARED_SECURE_BASE)
+#define SCP_SDS_MEM_SIZE                   (3520)
+
 #endif /* SCP_SOFTWARE_MMAP_H */
