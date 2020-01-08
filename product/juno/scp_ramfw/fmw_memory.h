@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef FMW_MEMORY_LD_S
-#define FMW_MEMORY_LD_S
+#ifndef FMW_MEMORY_H
+#define FMW_MEMORY_H
 
 #include <scp_mmap.h>
 
@@ -18,4 +18,4 @@
 
 #define FIRMWARE_STACK_SIZE (1 * 1024)
 
-#endif /* FMW_MEMORY_LD_S */
+#endif /* FMW_MEMORY_H */
