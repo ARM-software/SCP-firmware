@@ -130,7 +130,6 @@ struct juno_xrp7724_ctx {
 struct juno_xrp7724_dev_psu_ctx {
     /* Indicate for a PSU element whether the channel is enabled */
     bool is_psu_channel_enabled;
-    uint32_t wait_event_cookie;
     fwk_id_t element_id;
     bool psu_set_enabled;
 
