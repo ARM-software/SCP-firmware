@@ -439,8 +439,6 @@ static int create_set_rate_request(fwk_id_t clock_id,
     int status;
     struct fwk_event event;
 
-    if (!module_ctx.initialized)
-        return FWK_E_INIT;
     if (rate < JUNO_CDCEL937_OUTPUT_MIN_FREQ)
         return FWK_E_RANGE;
     if (rate > JUNO_CDCEL937_OUTPUT_MAX_FREQ)
@@ -652,9 +650,6 @@ static int create_get_rate_request(fwk_id_t clock_id,
     int status;
     struct fwk_event event;
 
-    if (!module_ctx.initialized)
-        return FWK_E_INIT;
-
     if (ctx->state != JUNO_CDCEL937_DEVICE_IDLE)
             return FWK_E_BUSY;
 
@@ -710,9 +705,6 @@ static int juno_cdcel937_get_rate(fwk_id_t clock_id,
 
     if (!fwk_expect(rate != NULL))
         return FWK_E_PARAM;
-
-    if (!module_ctx.initialized)
-        return FWK_E_INIT;
 
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
@@ -866,6 +858,7 @@ static int juno_cdcel937_dev_init(fwk_id_t element_id,
                                   unsigned int sub_element_count,
                                   const void *data)
 {
+    struct juno_cdcel937_dev_ctx *ctx;
     const struct mod_juno_cdcel937_dev_config *config = data;
 
     /*
@@ -875,7 +868,12 @@ static int juno_cdcel937_dev_init(fwk_id_t element_id,
         || ((config->lookup_table_count != 0) &&
             (config->lookup_table != NULL)));
 
-    ctx_table[fwk_id_get_element_idx(element_id)].config = config;
+    ctx = &ctx_table[fwk_id_get_element_idx(element_id)];
+
+    ctx->config = config;
+    ctx->rate_hz = -1;
+    ctx->rate_set = false;
+    ctx->state = JUNO_CDCEL937_DEVICE_IDLE;
 
     return FWK_SUCCESS;
 }
@@ -926,27 +924,6 @@ static int juno_cdcel937_process_bind_request(fwk_id_t source_id,
     else
         return FWK_E_ACCESS;
 
-    return FWK_SUCCESS;
-}
-
-static int juno_cdcel937_start(fwk_id_t id)
-{
-    unsigned int i;
-    unsigned int element_count;
-    struct juno_cdcel937_dev_ctx *ctx;
-
-    if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
-        return FWK_SUCCESS;
-
-    element_count = fwk_module_get_element_count(id);
-
-    for (i = 0; i < element_count; i++) {
-        ctx = ctx_table + i;
-        ctx->rate_hz = -1;
-        ctx->rate_set = false;
-        ctx->state = JUNO_CDCEL937_DEVICE_IDLE;
-    }
-    module_ctx.initialized = true;
     return FWK_SUCCESS;
 }
 
@@ -1126,7 +1103,6 @@ const struct fwk_module module_juno_cdcel937 = {
     .init = juno_cdcel937_init,
     .element_init = juno_cdcel937_dev_init,
     .bind = juno_cdcel937_bind,
-    .start = juno_cdcel937_start,
     .process_bind_request = juno_cdcel937_process_bind_request,
     .process_event = juno_cdcel937_process_event,
 };
