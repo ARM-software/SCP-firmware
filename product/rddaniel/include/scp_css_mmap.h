@@ -10,6 +10,8 @@
 
 #include <scp_mmap.h>
 
+#define SCP_CMN_RHODES_BASE          (SCP_SYSTEM_ACCESS_PORT0_BASE + 0x10000000)
+
 #define SCP_SID_BASE                 (SCP_SYSTEM_ACCESS_PORT1_BASE + 0x2A4A0000)
 
 #define SCP_UART_BASE                (SCP_PERIPHERAL_BASE + 0x2000)
