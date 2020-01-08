@@ -10,6 +10,8 @@
 
 enum scp_rddanielxlr_interrupt {
     TIMREFCLK_IRQ              = 33, /* REFCLK Physical Timer */
+    SOC_WAKEUP0_IRQ            = 16, /* SoC Expansion Wakeup */
+
     PPU_CORES0_IRQ             = 50, /* Consolidated PPU Interrupt for cores
                                         1-32, 129-160 */
     PPU_CORES1_IRQ             = 51, /* Consolidated PPU Interrupt for cores
