@@ -248,7 +248,6 @@ struct juno_cdcel937_dev_ctx {
 struct juno_cdcel937_module_ctx {
     const struct mod_juno_cdcel937_config *module_config;
     const struct mod_i2c_api *i2c_api;
-    bool initialized;
     uint32_t cookie;
 };
 
