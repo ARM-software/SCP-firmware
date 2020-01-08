@@ -45,4 +45,15 @@ enum clock_pik_idx {
     CLOCK_PIK_IDX_COUNT
 };
 
+/*
+ * CSS clock indexes.
+ */
+enum clock_css_idx {
+    CLOCK_CSS_IDX_CPU_GROUP0,
+    CLOCK_CSS_IDX_CPU_GROUP1,
+    CLOCK_CSS_IDX_CPU_GROUP2,
+    CLOCK_CSS_IDX_CPU_GROUP3,
+    CLOCK_CSS_IDX_COUNT
+};
+
 #endif /* CLOCK_SOC_H */
