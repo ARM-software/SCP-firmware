@@ -765,18 +765,17 @@ static void process_set_state_request(struct pd_ctx *lowest_pd,
     struct pd_set_state_request *req_params, struct fwk_event *resp_event)
 {
     int status;
-    struct pd_set_state_response *resp_params =
-        (struct pd_set_state_response *)resp_event->params;
+    struct pd_set_state_response *resp_params;
     uint32_t composite_state;
-    bool up;
+    bool up, first_power_state_transition_initiated;
     enum mod_pd_level lowest_level, highest_level, level;
-    unsigned int nb_pds;
-    struct pd_ctx *pd;
+    unsigned int nb_pds, pd_index, state;
+    struct pd_ctx *pd, *pd_in_charge_of_response;
     const struct pd_ctx *parent;
-    struct pd_ctx *pd_in_charge_of_response = NULL;
-    unsigned int pd_index;
-    unsigned int state;
-    bool first_power_state_transition_initiated = false;
+
+    resp_params = (struct pd_set_state_response *)resp_event->params;
+    pd_in_charge_of_response = NULL;
+    first_power_state_transition_initiated = false;
 
     /* A set state request cancels the completion of system suspend. */
     mod_pd_ctx.system_suspend.last_core_off_ongoing = false;
