@@ -26,4 +26,14 @@
 #define SCP_NONTRUSTED_RAM_BASE            (SCP_SYSTEM_ACCESS_PORT1_BASE + \
                                             0x06000000)
 
+/* Secure Shared memory between AP and SCP */
+#define SCP_AP_SHARED_SECURE_BASE          (SCP_TRUSTED_RAM_BASE)
+#define SCP_AP_SHARED_SECURE_SIZE          (4 * FWK_KIB)
+
+/* AP Context Area */
+#define SCP_AP_CONTEXT_BASE                (SCP_AP_SHARED_SECURE_BASE + \
+                                            SCP_AP_SHARED_SECURE_SIZE - \
+                                            SCP_AP_CONTEXT_SIZE)
+#define SCP_AP_CONTEXT_SIZE                (64)
+
 #endif /* SCP_SOFTWARE_MMAP_H */
