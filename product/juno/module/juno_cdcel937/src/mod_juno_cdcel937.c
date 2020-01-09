@@ -201,12 +201,15 @@ static int read_configuration_y1(struct juno_cdcel937_dev_ctx *ctx,
 static int get_preset_low_precision(uint64_t rate,
                                     struct juno_clock_preset *preset)
 {
-    float freq;
+    uint32_t freq;
 
     fwk_assert(preset != NULL);
 
-    freq = rate / FWK_MHZ;
-    preset->PDIV = 230 / freq;
+    freq = (uint32_t)rate / (uint32_t)FWK_MHZ;
+
+    fwk_assert(freq <= 230);
+
+    preset->PDIV = UINT32_C(230) / freq;
     preset->N = freq * preset->PDIV;
     preset->M = 24;
 
