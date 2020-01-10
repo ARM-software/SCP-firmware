@@ -16,12 +16,21 @@
 #include <fwk_element.h>
 #include <fwk_host.h>
 #include <fwk_interrupt.h>
+#include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_status.h>
 
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+
+#if __has_include(<fmw_memory.h>)
+#    include <fmw_memory.h>
+#endif
+
+#ifndef FIRMWARE_STACK_SIZE
+#    define FIRMWARE_STACK_SIZE (1 * FWK_KIB)
+#endif
 
 #define SIGNAL_ISR_EVENT 0x01
 #define SIGNAL_EVENT_TO_PROCESS 0x02
@@ -53,7 +62,7 @@ static int init_thread_attr(osThreadAttr_t *attr)
     attr->cb_size = osRtxThreadCbSize;
     attr->cb_mem = fwk_mm_calloc(1, attr->cb_size);
 
-    attr->stack_size = 256 * 4;
+    attr->stack_size = FIRMWARE_STACK_SIZE;
     attr->stack_mem = fwk_mm_calloc(1, attr->stack_size);
 
     attr->priority = osPriorityNormal;
