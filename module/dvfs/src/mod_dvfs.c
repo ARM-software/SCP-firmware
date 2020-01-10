@@ -330,14 +330,13 @@ static int dvfs_create_pending_level_request(struct mod_dvfs_domain_ctx *ctx,
             return FWK_SUCCESS;
     } else {
         if ((new_opp->frequency == ctx->current_opp.frequency) &&
-            (new_opp->voltage == ctx->current_opp.voltage)) {
+            (new_opp->voltage == ctx->current_opp.voltage))
                 return FWK_SUCCESS;
 
-            ctx->pending_request.num_retries = 0;
-            ctx->pending_request.set_source_id = false;
-            ctx->pending_request.response_required = false;
-            ctx->request_pending = true;
-        }
+        ctx->pending_request.num_retries = 0;
+        ctx->pending_request.set_source_id = false;
+        ctx->pending_request.response_required = false;
+        ctx->request_pending = true;
     }
 
     ctx->pending_request.new_opp = *new_opp;
