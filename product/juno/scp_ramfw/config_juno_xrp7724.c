@@ -65,6 +65,8 @@ static const struct fwk_element juno_xrp7724_element_table[] = {
                 MOD_JUNO_SENSOR_VOLT_SYS_IDX),
             .psu_bus_idx = 0,
             .type = MOD_JUNO_XRP7724_ELEMENT_TYPE_PSU,
+            .alarm_hal_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0,
+                JUNO_XRP7724_ALARM_IDX_PSU_VSYS),
         },
     },
     [MOD_JUNO_XRP7724_ELEMENT_IDX_PSU_VBIG] = {
@@ -78,6 +80,8 @@ static const struct fwk_element juno_xrp7724_element_table[] = {
                 MOD_JUNO_SENSOR_VOLT_BIG_IDX),
             .psu_bus_idx = 1,
             .type = MOD_JUNO_XRP7724_ELEMENT_TYPE_PSU,
+            .alarm_hal_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0,
+                JUNO_XRP7724_ALARM_IDX_PSU_VBIG),
         },
     },
     [MOD_JUNO_XRP7724_ELEMENT_IDX_PSU_VLITTLE] = {
@@ -91,6 +95,8 @@ static const struct fwk_element juno_xrp7724_element_table[] = {
                  MOD_JUNO_SENSOR_VOLT_LITTLE_IDX),
             .psu_bus_idx = 2,
             .type = MOD_JUNO_XRP7724_ELEMENT_TYPE_PSU,
+            .alarm_hal_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0,
+                JUNO_XRP7724_ALARM_IDX_PSU_VLITTLE),
         },
     },
     [MOD_JUNO_XRP7724_ELEMENT_IDX_PSU_VGPU] = {
@@ -104,6 +110,8 @@ static const struct fwk_element juno_xrp7724_element_table[] = {
                 MOD_JUNO_SENSOR_VOLT_GPU_IDX),
             .psu_bus_idx = 3,
             .type = MOD_JUNO_XRP7724_ELEMENT_TYPE_PSU,
+            .alarm_hal_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0,
+                JUNO_XRP7724_ALARM_IDX_PSU_VGPU),
         },
     },
 
@@ -122,8 +130,6 @@ const struct fwk_module_config config_juno_xrp7724 = {
         .slave_address = 0x28,
         .i2c_hal_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_I2C, 0),
         .timer_hal_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
-        .alarm_hal_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0,
-            JUNO_XRP7724_ALARM_IDX),
         .gpio_assert_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_XRP7724,
             MOD_JUNO_XRP7724_ELEMENT_IDX_GPIO,
             MOD_JUNO_XRP7724_GPIO_IDX_ASSERT),
