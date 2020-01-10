@@ -26,6 +26,7 @@
 #include <fwk_log.h>
 #include <fwk_status.h>
 
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -113,19 +114,16 @@ void fw_ddr_init(void)
     if (result != 0) {
         /* Tentative workaround. Need to implement retrying. */
         do {
-            FWK_LOG_ERR(
-                synquacer_system_ctx.log_api,
-                "DDR Initialize Failed.(0x%x)\n",
-                result);
+            FWK_LOG_ERR("DDR Initialize Failed.(0x%x)", result);
             osDelay(10000);
         } while (1);
     }
 
     if (fw_get_ddr4_sdram_ecc_available() && dram_ecc_is_enabled()) {
-        FWK_LOG_INFO(synquacer_system_ctx.log_api, "[DDR] DRAM ECC enabled\n");
+        FWK_LOG_INFO("[DDR] DRAM ECC enabled");
         dram_init_for_ecc();
     } else {
-        FWK_LOG_INFO(synquacer_system_ctx.log_api, "[DDR] DRAM ECC disabled\n");
+        FWK_LOG_INFO("[DDR] DRAM ECC disabled");
     }
 
     /*
@@ -143,28 +141,27 @@ static void fw_ddr_change_freq(ddr_freq_t freq)
 
     switch (freq) {
     case DDR_FREQ_1333:
-        FWK_LOG_INFO(synquacer_system_ctx.log_api, "[DDR] 1333MHz\n");
+        FWK_LOG_INFO("[DDR] 1333MHz");
         value = 0x00000027U; /* 1333MHz */
         break;
     case DDR_FREQ_1600:
-        FWK_LOG_INFO(synquacer_system_ctx.log_api, "[DDR] 1600MHz\n");
+        FWK_LOG_INFO("[DDR] 1600MHz");
         value = 0x0000002FU; /* 1600MHz */
         break;
     case DDR_FREQ_1800:
-        FWK_LOG_INFO(synquacer_system_ctx.log_api, "[DDR] 1800MHz\n");
+        FWK_LOG_INFO("[DDR] 1800MHz");
         value = 0x00000035U; /* 1800MHz */
         break;
     case DDR_FREQ_1866:
-        FWK_LOG_INFO(synquacer_system_ctx.log_api, "[DDR] 1866MHz\n");
+        FWK_LOG_INFO("[DDR] 1866MHz");
         value = 0x00000037U; /* 1866MHz */
         break;
     case DDR_FREQ_2133:
-        FWK_LOG_INFO(synquacer_system_ctx.log_api, "[DDR] 2133MHz\n");
+        FWK_LOG_INFO("[DDR] 2133MHz");
         value = 0x0000003FU; /* 2133MHz */
         break;
     default:
-        FWK_LOG_INFO(
-            synquacer_system_ctx.log_api, "[DDR] Invalid DDR frequency\n");
+        FWK_LOG_INFO("[DDR] Invalid DDR frequency");
         assert(false);
     }
 
@@ -235,17 +232,13 @@ static spd_read_err_code_t read_spd(
         i2c_err = f_i2c_api->recv_data(
             I2C_EN_CH0, i2c_slave_addr_read_spd, 0, dst, read_len);
         if (i2c_err == I2C_ERR_UNAVAILABLE) {
-            FWK_LOG_TRACE(
-                synquacer_system_ctx.log_api,
-                "[SYSTEM] slot DIMM%d: not detected\n",
-                slot);
+            FWK_LOG_INFO("[SYSTEM] slot DIMM%" PRIu32 ": not detected", slot);
             return SPD_READ_SLOT_NONE;
         }
         if (i2c_err != I2C_ERR_OK) {
             FWK_LOG_INFO(
-                synquacer_system_ctx.log_api,
                 "[SYSTEM] Error detected while reading the first byte of SPD. "
-                "slave_addr:0x%02x, errror code = %d\n",
+                "slave_addr:0x%02" PRIx32 ", errror code = %d",
                 i2c_slave_addr_read_spd,
                 i2c_err);
             return SPD_READ_ERROR;
@@ -294,8 +287,7 @@ bool fw_spd_ddr_info_get(spd_ddr_info_t *spd_ddr_info_p)
         if ((spd_ddr_info_p->base_module_type != 0) &&
             (spd_ddr_info_p->base_module_type != (buf[3] & 0x0F))) {
             /* error! mixed base module memory */
-            FWK_LOG_ERR(
-                synquacer_system_ctx.log_api, "[ERROR] use same sdram type!\n");
+            FWK_LOG_ERR("[ERROR] use same sdram type!");
             error_flag = true;
             return error_flag;
         } else {
@@ -327,9 +319,7 @@ bool fw_spd_ddr_info_get(spd_ddr_info_t *spd_ddr_info_p)
 
         /* DDR4 package Type check */
         if ((buf[6] & 0x3) == 0x02 || (buf[6] & 0x3) == 0x03) {
-            FWK_LOG_ERR(
-                synquacer_system_ctx.log_api,
-                "[ERROR] not support sdram type!\n");
+            FWK_LOG_ERR("[ERROR] not support sdram type!");
             error_flag = true;
             return error_flag;
         }
@@ -349,8 +339,7 @@ bool fw_spd_ddr_info_get(spd_ddr_info_t *spd_ddr_info_p)
             << 8;
         spd_ddr_info_p->slot_bitmap |= (1 << check_dimm_slot);
         FWK_LOG_INFO(
-            synquacer_system_ctx.log_api,
-            "[SYSTEM] slot DIMM%d: %dMB %s %s\n",
+            "[SYSTEM] slot DIMM%d: %" PRIu32 "MB %s %s",
             check_dimm_slot,
             spd_ddr_info_p->sdram_slot_total[check_dimm_slot],
             dimm_module_type[spd_ddr_info_p->base_module_type],
@@ -419,9 +408,7 @@ bool fw_spd_rdimm_support_check(spd_ddr_info_t *spd_ddr_info_p)
 
     /* non support dimm slot layout! */
     default:
-        FWK_LOG_ERR(
-            synquacer_system_ctx.log_api,
-            "[ERROR] read spd at sdram non support dimm slot layout!\n");
+        FWK_LOG_ERR("[ERROR] read spd at sdram non support dimm slot layout!");
         error_flag = true;
         return error_flag;
     }
@@ -443,9 +430,7 @@ bool fw_spd_udimm_support_check(spd_ddr_info_t *spd_ddr_info_p)
         break;
 
     default:
-        FWK_LOG_ERR(
-            synquacer_system_ctx.log_api,
-            "[ERROR] non support capability dimm!\n");
+        FWK_LOG_ERR("[ERROR] non support capability dimm!");
         error_flag = true;
         return error_flag;
     }
@@ -468,9 +453,7 @@ bool fw_spd_udimm_support_check(spd_ddr_info_t *spd_ddr_info_p)
 
     /* non support dimm slot layout! */
     default:
-        FWK_LOG_ERR(
-            synquacer_system_ctx.log_api,
-            "[ERROR] read spd at sdram non support dimm slot layout!\n");
+        FWK_LOG_ERR("[ERROR] read spd at sdram non support dimm slot layout!");
         error_flag = true;
         return error_flag;
     }
@@ -491,9 +474,7 @@ bool fw_spd_72bitsoudimm_support_check(spd_ddr_info_t *spd_ddr_info_p)
         break;
 
     default:
-        FWK_LOG_ERR(
-            synquacer_system_ctx.log_api,
-            "[ERROR] non support capability dimm!\n");
+        FWK_LOG_ERR("[ERROR] non support capability dimm!");
         error_flag = true;
         return error_flag;
     }
@@ -517,9 +498,7 @@ bool fw_spd_72bitsoudimm_support_check(spd_ddr_info_t *spd_ddr_info_p)
     /* non support dimm slot layout! */
     default:
         error_flag = true;
-        FWK_LOG_ERR(
-            synquacer_system_ctx.log_api,
-            "[ERROR] read spd at sdram non support dimm slot layout!\n");
+        FWK_LOG_ERR("[ERROR] read spd at sdram non support dimm slot layout!");
     }
 
     return error_flag;
@@ -538,9 +517,7 @@ bool fw_spd_read_dimm_capacity_check(spd_ddr_info_t *spd_ddr_info_p)
             if ((spd_ddr_info_p->per_slot_dimm_size != 0) &&
                 (spd_ddr_info_p->per_slot_dimm_size !=
                  spd_ddr_info_p->sdram_slot_total[i])) {
-                FWK_LOG_ERR(
-                    synquacer_system_ctx.log_api,
-                    "[ERROR] Please use same capacity DDR memory!\n");
+                FWK_LOG_ERR("[ERROR] Please use same capacity DDR memory!");
                 error_flag = true;
                 return error_flag;
             }
@@ -575,9 +552,7 @@ bool fw_spd_read_dimm_kinds_check(spd_ddr_info_t *spd_ddr_info_p)
 
     /* other type memory module */
     default:
-        FWK_LOG_ERR(
-            synquacer_system_ctx.log_api,
-            "[ERROR] sdram other type memory module\n");
+        FWK_LOG_ERR("[ERROR] sdram other type memory module");
         error_flag = true;
         return error_flag;
     }
@@ -592,8 +567,7 @@ bool fw_spd_read_dimm_kinds_check(spd_ddr_info_t *spd_ddr_info_p)
 
 int fw_ddr_spd_param_check(void)
 {
-    FWK_LOG_INFO(
-        synquacer_system_ctx.log_api, "[SYSTEM] Starting check DRAM\n");
+    FWK_LOG_INFO("[SYSTEM] Starting check DRAM");
 
     if (fw_spd_ddr_info_get(&spd_ddr_info))
         return FWK_E_SUPPORT;
@@ -605,8 +579,7 @@ int fw_ddr_spd_param_check(void)
         return FWK_E_SUPPORT;
 
     FWK_LOG_INFO(
-        synquacer_system_ctx.log_api,
-        "[SYSTEM] Finished check DRAM memory total %dGB\n",
+        "[SYSTEM] Finished check DRAM memory total %" PRIu32 "GB",
         (config_ddr4_sdram_total_size / 1024));
 
     return FWK_SUCCESS;
@@ -688,8 +661,7 @@ static void dma330_zero_clear(
     REG_DMA330_S->INTEN = 0xffffffffU;
 
     while (REG_DMA330_S->DBGSTATUS != 0) {
-        FWK_LOG_INFO(
-            synquacer_system_ctx.log_api, "[SYSTEM] Wait DMA330 busy.\n");
+        FWK_LOG_INFO("[SYSTEM] Wait DMA330 busy.");
         osDelay(10);
     }
 
@@ -841,9 +813,7 @@ static void dram_init_for_ecc(void)
 
     dram_size = (uint64_t)config_ddr4_sdram_total_size * 1024 * 1024;
 
-    FWK_LOG_INFO(
-        synquacer_system_ctx.log_api,
-        "[DDR] Initializing DRAM for ECC\nNow Initializing[");
+    FWK_LOG_INFO("[DDR] Initializing DRAM for ECC\nNow Initializing[");
 
     dma330_wrapper_init();
 
@@ -852,7 +822,7 @@ static void dram_init_for_ecc(void)
          (dst_ddr_addr < DRAM_AREA_1_END_ADDR) && (dram_size != 0);
          dma_dst_addr += DMA330_ERASE_BLOCK_SIZE) {
         if ((dst_ddr_addr & 0x3fffffffULL) == 0)
-            FWK_LOG_INFO(synquacer_system_ctx.log_api, "+");
+            FWK_LOG_INFO("[DDR] +");
 
         dma330_zero_clear(0xce000000U, dma_dst_addr);
         dst_ddr_addr += DMA330_ERASE_BLOCK_SIZE;
@@ -864,7 +834,7 @@ static void dram_init_for_ecc(void)
          (dst_ddr_addr < DRAM_AREA_2_END_ADDR) && (dram_size != 0);
          dma_dst_addr += DMA330_ERASE_BLOCK_SIZE) {
         if ((dst_ddr_addr & 0x3fffffffULL) == 0)
-            FWK_LOG_INFO(synquacer_system_ctx.log_api, "-");
+            FWK_LOG_INFO("[DDR] -");
 
         if ((dst_ddr_addr & 0x1fffffffULL) == 0) {
             dmab_mmu500_init(dst_ddr_addr);
@@ -881,7 +851,7 @@ static void dram_init_for_ecc(void)
          (dst_ddr_addr < DRAM_AREA_3_END_ADDR) && (dram_size != 0);
          dma_dst_addr += DMA330_ERASE_BLOCK_SIZE) {
         if ((dst_ddr_addr & 0x3fffffffULL) == 0)
-            FWK_LOG_INFO(synquacer_system_ctx.log_api, "x");
+            FWK_LOG_INFO("[DDR] x");
 
         if ((dst_ddr_addr & 0x1fffffffULL) == 0) {
             dmab_mmu500_init(dst_ddr_addr);
@@ -893,9 +863,7 @@ static void dram_init_for_ecc(void)
         dram_size -= DMA330_ERASE_BLOCK_SIZE;
     }
 
-    FWK_LOG_INFO(
-        synquacer_system_ctx.log_api,
-        "]\n[DDR] Finished initializing DRAM for ECC\n");
+    FWK_LOG_INFO("[DDR] Finished initializing DRAM for ECC");
 
     (void)addr_trans(0x00800U, TEST_SIZE, false);
     (void)addr_trans(0x008ffU, TEST_SIZE, false);

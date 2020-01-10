@@ -56,6 +56,12 @@ uint32_t __wrap_osThreadFlagsSet(osThreadId_t thread_id, uint32_t flags)
     return 0;
 }
 
+uint32_t __wrap_osThreadFlagsClear(uint32_t flags)
+{
+    (void)flags;
+    return 0;
+}
+
 static osThreadId_t osThreadNew_return_val;
 osThreadId_t __wrap_osThreadNew(osThreadFunc_t func, void *argument,
                                 const osThreadAttr_t *attr)

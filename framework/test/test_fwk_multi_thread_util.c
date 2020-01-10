@@ -70,6 +70,11 @@ uint32_t __wrap_osThreadFlagsWait(uint32_t flags, uint32_t options,
     return 0;
 }
 
+uint32_t __wrap_osThreadFlagsClear(uint32_t flags)
+{
+    return 0;
+}
+
 uint32_t __wrap_osThreadFlagsSet(osThreadId_t thread_id, uint32_t flags)
 {
     return -1;

@@ -544,8 +544,7 @@ void hsspi_command_switch(
     hsspi_read_jedec_id(reg_hsspi, mem_hsspi);
 
     FWK_LOG_INFO(
-        synquacer_system_ctx.log_api,
-        "[HS-SPI] CS#0: Manufacturer ID:%02x, DeviceID:%02x%02x\n",
+        "[HS-SPI] CS#0: Manufacturer ID:%02x, DeviceID:%02x%02x",
         m_abyJEDEC_ID[0],
         m_abyJEDEC_ID[1],
         m_abyJEDEC_ID[2]);
@@ -555,9 +554,8 @@ void hsspi_command_switch(
 
     if (known_jedec_id < 0) {
         FWK_LOG_INFO(
-            synquacer_system_ctx.log_api,
             "[HS-SPI] Unknown manufacturer ID:%02x,"
-            " default to Dual-Output-Fast-Read mode\n",
+            " default to Dual-Output-Fast-Read mode",
             m_abyJEDEC_ID[0]);
 
         hsspi_dual_output_fast_read(reg_hsspi);
@@ -566,9 +564,7 @@ void hsspi_command_switch(
         unCSCFG.bit.MBM = HSSPI_EN_CSCFG_MBM_DUAL;
         (*reg_hsspi).CSCFG.DATA = unCSCFG.DATA;
     } else {
-        FWK_LOG_INFO(
-            synquacer_system_ctx.log_api,
-            "[HS-SPI] Configuring Quad-Output-Fast-Read mode\n");
+        FWK_LOG_INFO("[HS-SPI] Configuring Quad-Output-Fast-Read mode");
 
         hsspi_quad_output_fast_read(reg_hsspi);
         unCSCFG.DATA = (*reg_hsspi).CSCFG.DATA;

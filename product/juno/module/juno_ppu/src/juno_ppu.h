@@ -54,9 +54,6 @@ struct module_ctx {
     /* Table of element context structures */
     struct ppu_ctx *ppu_ctx_table;
 
-    /* Log module API */
-    const struct mod_log_api *log_api;
-
     /* Timer alarm API */
     const struct mod_timer_alarm_api *alarm_api;
 

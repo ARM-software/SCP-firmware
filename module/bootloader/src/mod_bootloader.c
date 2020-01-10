@@ -10,6 +10,7 @@
 
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
+#include <fwk_log.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_noreturn.h>
@@ -109,6 +110,8 @@ static int load_image(void)
                           image_offset);
 
     fwk_interrupt_global_disable(); /* We are relocating the vector table */
+
+    FWK_LOG_FLUSH();
 
     mod_bootloader_boot(
         module_ctx.module_config->destination_base,

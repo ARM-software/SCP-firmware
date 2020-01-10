@@ -417,7 +417,7 @@ static int css_set_state(fwk_id_t ppu_id, unsigned int state)
         /* Fall through */
 
     case MOD_SYSTEM_POWER_POWER_STATE_SLEEP0:
-        juno_ppu_ctx.log_api->flush();
+        FWK_LOG_FLUSH();
 
         enable_scp_remap();
 
@@ -833,11 +833,6 @@ static int juno_ppu_bind(fwk_id_t id, unsigned int round)
         return FWK_SUCCESS;
 
     if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
-        status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
-                                 MOD_LOG_API_ID, &juno_ppu_ctx.log_api);
-        if (status != FWK_SUCCESS)
-            return FWK_E_HANDLER;
-
         #if BUILD_HAS_MOD_TIMER
         config = fwk_module_get_data(fwk_module_id_juno_ppu);
 

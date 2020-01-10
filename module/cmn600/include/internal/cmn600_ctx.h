@@ -89,8 +89,6 @@ struct cmn600_ctx {
     /* CCIX host parameters to be sent to upper level firmware */
     struct mod_cmn600_ccix_host_node_config ccix_host_info;
 
-    struct mod_log_api *log_api;
-
     /* Timer module API */
     struct mod_timer_api *timer_api;
 

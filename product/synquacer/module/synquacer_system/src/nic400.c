@@ -17,6 +17,7 @@
 #include <fwk_log.h>
 #include <fwk_macros.h>
 
+#include <inttypes.h>
 #include <stdint.h>
 
 #define NIC_TOP_ADDR_SEC_REG (0x00000008)
@@ -27,9 +28,8 @@ static void nic_sec_slave_security(
     uint32_t slave_index,
     uint32_t value)
 {
-    FWK_LOG_TRACE(
-        synquacer_system_ctx.log_api,
-        "%s addr 0x%08x value 0x%08x\n",
+    FWK_LOG_INFO(
+        "%s addr 0x%08" PRIx32 " value 0x%08" PRIx32,
         __func__,
         (nic_top_addr + NIC_TOP_ADDR_SEC_REG +
          NIC_SEC_REG_OFFSET * slave_index),

@@ -268,11 +268,9 @@ static void fw_system_reset(void)
 
 int reboot_chip(void)
 {
-    FWK_LOG_INFO(
-        synquacer_system_ctx.log_api, "[SYNQUACER SYSTEM] HSSPI exit start.\n");
+    FWK_LOG_INFO("[SYNQUACER SYSTEM] HSSPI exit start.");
     synquacer_system_ctx.hsspi_api->hsspi_exit();
-    FWK_LOG_INFO(
-        synquacer_system_ctx.log_api, "[SYNQUACER SYSTEM] HSSPI exit end.\n");
+    FWK_LOG_INFO("[SYNQUACER SYSTEM] HSSPI exit end.");
 
     __disable_fault_irq();
 
@@ -304,8 +302,7 @@ void main_initialize(void)
     fw_clear_clkforce(sysdef_option_get_clear_clkforce());
 
     FWK_LOG_INFO(
-        synquacer_system_ctx.log_api,
-        "[SYNQUACER SYSTEM] chip version %s.\n",
+        "[SYNQUACER SYSTEM] chip version %s.",
         sysdef_option_get_chip_version());
 
     power_domain_coldboot();
@@ -336,15 +333,10 @@ static void fw_wakeup_ap(void)
     ap_dev_init();
 
     synquacer_system_ctx.hsspi_api->hsspi_init();
-    FWK_LOG_INFO(
-        synquacer_system_ctx.log_api,
-        "[SYNQUACER SYSTEM] Finished initializing HS-SPI controller.\n");
-    FWK_LOG_INFO(
-        synquacer_system_ctx.log_api,
-        "[SYNQUACER SYSTEM] Arm tf load start.\n");
+    FWK_LOG_INFO("[SYNQUACER SYSTEM] Finished initializing HS-SPI controller.");
+    FWK_LOG_INFO("[SYNQUACER SYSTEM] Arm tf load start.");
     fw_fip_load_arm_tf();
-    FWK_LOG_INFO(
-        synquacer_system_ctx.log_api, "[SYNQUACER SYSTEM] Arm tf load end.\n");
+    FWK_LOG_INFO("[SYNQUACER SYSTEM] Arm tf load end.");
 }
 
 int synquacer_main(void)
@@ -355,8 +347,7 @@ int synquacer_main(void)
     pcie_wrapper_configure();
     fw_wakeup_ap();
 
-    FWK_LOG_INFO(
-        synquacer_system_ctx.log_api, "[SYNQUACER SYSTEM] powering up AP\n");
+    FWK_LOG_INFO("[SYNQUACER SYSTEM] powering up AP");
     status =
         synquacer_system_ctx.mod_pd_restricted_api->set_composite_state_async(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
@@ -369,14 +360,10 @@ int synquacer_main(void)
                 MOD_PD_STATE_ON));
 
     if (status == FWK_SUCCESS)
-        FWK_LOG_INFO(
-            synquacer_system_ctx.log_api,
-            "[SYNQUACER SYSTEM] finished powering up AP\n");
+        FWK_LOG_INFO("[SYNQUACER SYSTEM] finished powering up AP");
     else
         FWK_LOG_ERR(
-            synquacer_system_ctx.log_api,
-            "[SYNQUACER SYSTEM] failed to power up AP. status=%d\n",
-            status);
+            "[SYNQUACER SYSTEM] failed to power up AP. status=%d", status);
 
     return status;
 }

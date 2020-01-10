@@ -16,7 +16,6 @@
 #include <fwk_status.h>
 
 const struct mod_f_i2c_api *f_i2c_api;
-static struct mod_log_api *log_api;
 static int synquacer_memc_config(void);
 
 /* Framework API */
@@ -49,11 +48,6 @@ static int mod_synquacer_memc_bind(fwk_id_t id, unsigned int round)
         return FWK_SUCCESS;
 
     status = fwk_module_bind(
-        FWK_ID_MODULE(FWK_MODULE_IDX_LOG), MOD_LOG_API_ID, &log_api);
-    if (status != FWK_SUCCESS)
-        return status;
-
-    status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_F_I2C),
         FWK_ID_API(FWK_MODULE_IDX_F_I2C, 0),
         &f_i2c_api);
@@ -73,7 +67,7 @@ static int synquacer_memc_config(void)
 {
     fw_ddr_init();
 
-    FWK_LOG_INFO(log_api, "[SYNQUACER MEMC] DMC init done.\n");
+    FWK_LOG_INFO("[SYNQUACER MEMC] DMC init done.");
 
     return FWK_SUCCESS;
 }

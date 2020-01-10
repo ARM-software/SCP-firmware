@@ -45,9 +45,6 @@ struct n1sdp_remote_pd_ctx {
     /* Total power domains */
     unsigned int pd_count;
 
-    /* Log API */
-    struct mod_log_api *log_api;
-
     /* C2C power domain API */
     struct n1sdp_c2c_pd_api *c2c_pd_api;
 
@@ -129,9 +126,7 @@ static int remote_pd_set_state(fwk_id_t pd_id, unsigned int state)
 
     default:
         FWK_LOG_ERR(
-            remote_pd_ctx.log_api,
-            "[C2C] Requested CPU power state (%i) is not supported!\n",
-            state);
+            "[C2C] Requested CPU power state (%i) is not supported!", state);
         return FWK_E_PARAM;
     }
 
@@ -215,11 +210,6 @@ static int remote_pd_bind(fwk_id_t id, unsigned int round)
         return FWK_SUCCESS;
 
     if ((round == 0) && fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
-        status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
-                                 MOD_LOG_API_ID, &remote_pd_ctx.log_api);
-        if (status != FWK_SUCCESS)
-            return status;
-
         status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_C2C),
                                  FWK_ID_API(FWK_MODULE_IDX_N1SDP_C2C,
                                             N1SDP_C2C_API_IDX_PD),

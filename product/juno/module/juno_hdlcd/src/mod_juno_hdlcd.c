@@ -12,15 +12,16 @@
 
 #include <mod_clock.h>
 #include <mod_juno_hdlcd.h>
-#include <mod_log.h>
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
 
+#include <inttypes.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -45,7 +46,6 @@ struct juno_hdlcd_dev_ctx {
 
 struct juno_hdlcd_ctx {
     const struct mod_juno_hdlcd_config *config;
-    const struct mod_log_api *log_api;
 
     /* Shared PLL rate value */
     uint32_t current_pll_rate;
@@ -107,8 +107,8 @@ static int round_rate(struct juno_hdlcd_dev_ctx *ctx,
 
 static void enable_pll(fwk_id_t clock_id, struct juno_hdlcd_dev_ctx *ctx)
 {
-    module_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-        "[HDLCD%u] Setting PLL R0:0x%08x R1:0x%08x\n",
+    FWK_LOG_INFO(
+        "[HDLCD%u] Setting PLL R0:0x%" PRIX32 " R1:0x%" PRIX32,
         fwk_id_get_element_idx(clock_id),
         ctx->config->lookup_table[ctx->index].pll.REG0,
         ctx->config->lookup_table[ctx->index].pll.REG1);
@@ -191,8 +191,9 @@ static int juno_hdlcd_set_rate(fwk_id_t clock_id, uint64_t rate,
         *ctx->config->scc_control &= ~SCC_HDLCD_CONTROL_PXLCLK_SEL;
         *ctx->config->scc_control |= SCC_HDLCD_CONTROL_PXLCLK_SEL_CLKIN;
 
-        module_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-            "[HDLCD%u]: Request:%uHz\n", fwk_id_get_element_idx(clock_id),
+        FWK_LOG_INFO(
+            "[HDLCD%u]: Request:%" PRIu32 "Hz",
+            fwk_id_get_element_idx(clock_id),
             rounded_rate);
 
         return FWK_SUCCESS;
@@ -206,8 +207,9 @@ static int juno_hdlcd_set_rate(fwk_id_t clock_id, uint64_t rate,
         *ctx->config->scc_control &= ~SCC_HDLCD_CONTROL_PXLCLK_SEL;
         *ctx->config->scc_control |= SCC_HDLCD_CONTROL_PXLCLK_SEL_PLL;
 
-        module_ctx.log_api->log(MOD_LOG_GROUP_INFO,
-            "[HDLCD%u]: Request:%uHz\n", fwk_id_get_element_idx(clock_id),
+        FWK_LOG_INFO(
+            "[HDLCD%u]: Request:%" PRIu32 "Hz",
+            fwk_id_get_element_idx(clock_id),
             rounded_rate);
 
         return FWK_SUCCESS;
@@ -223,8 +225,10 @@ static int juno_hdlcd_set_rate(fwk_id_t clock_id, uint64_t rate,
         ((unsigned int)ctx->index >= ctx->config->lookup_table_count))
         return FWK_E_RANGE;
 
-    module_ctx.log_api->log(MOD_LOG_GROUP_INFO, "[HDLCD%u] Entry index:%d\n",
-        fwk_id_get_element_idx(clock_id), ctx->index);
+    FWK_LOG_INFO(
+        "[HDLCD%u] Entry index:%d",
+        fwk_id_get_element_idx(clock_id),
+        ctx->index);
 
     /* Hold PLL in reset during the configuration process */
     SCC->PLL[PLL_IDX_HDLCD].REG0 = (PLL_REG0_PLL_RESET | PLL_REG0_HARD_BYPASS);
@@ -235,8 +239,7 @@ static int juno_hdlcd_set_rate(fwk_id_t clock_id, uint64_t rate,
         status = ctx->driver_api->set_rate_from_index(ctx->config->driver_id,
             ctx->index);
         if ((status != FWK_PENDING) && (status != FWK_SUCCESS)) {
-            module_ctx.log_api->log(MOD_LOG_GROUP_ERROR,
-                "[HDLCD] Failed to set board clock\n");
+            FWK_LOG_ERR("[HDLCD] Failed to set board clock");
             return FWK_E_DEVICE;
         }
         if (status == FWK_PENDING)
@@ -365,15 +368,8 @@ static int juno_hdlcd_bind(fwk_id_t id, unsigned int round)
     if (round > 0)
         return FWK_SUCCESS;
 
-    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
-        /* Bind to the log */
-        status = fwk_module_bind(fwk_module_id_log, MOD_LOG_API_ID,
-            &module_ctx.log_api);
-        if (status != FWK_SUCCESS)
-            return FWK_E_HANDLER;
-
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
         return FWK_SUCCESS;
-    }
 
     ctx = ctx_table + fwk_id_get_element_idx(id);
 

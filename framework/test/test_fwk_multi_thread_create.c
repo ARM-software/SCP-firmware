@@ -62,6 +62,12 @@ uint32_t __wrap_osThreadFlagsWait(uint32_t flags, uint32_t options,
     return flags;
 }
 
+uint32_t __wrap_osThreadFlagsClear(uint32_t flags)
+{
+    (void)flags;
+    return 0;
+}
+
 uint32_t __wrap_osThreadFlagsSet(osThreadId_t thread_id, uint32_t flags)
 {
     (void) thread_id;
@@ -186,24 +192,12 @@ static void test_case_setup(void)
     fwk_module_is_valid_module_id_return_val = true;
 }
 
-static void check_osThreadNew_param(void)
-{
-    assert(strcmp(osThreadNew_param_attr->name, "") == 0);
-    assert(osThreadNew_param_attr->attr_bits == osThreadDetached);
-    assert(osThreadNew_param_attr->cb_mem != NULL);
-    assert(osThreadNew_param_attr->cb_size == osRtxThreadCbSize);
-    assert(osThreadNew_param_attr->stack_mem != NULL);
-    assert(osThreadNew_param_attr->stack_size == (256 * 4));
-    assert(osThreadNew_param_attr->priority == osPriorityNormal);
-}
-
 static void test_create_common_thread(void)
 {
     int result;
 
     result = __fwk_thread_init(16);
     assert(result == FWK_SUCCESS);
-    check_osThreadNew_param();
 }
 
 static void test_create_id_invalid(void)
@@ -261,7 +255,6 @@ static void test_create_thread_creation_failed(void)
     osThreadNew_return_val = NULL;
     status = fwk_thread_create(id);
     assert(status == FWK_E_OS);
-    check_osThreadNew_param();
 }
 
 static void test_create_element_thread(void)
@@ -273,7 +266,6 @@ static void test_create_element_thread(void)
     fwk_module_is_valid_element_id_return_val = true;
     status = fwk_thread_create(id);
     assert(status == FWK_SUCCESS);
-    check_osThreadNew_param();
     assert(fake_element_ctx.thread_ctx == fwk_mm_calloc_val);
 }
 
@@ -285,7 +277,6 @@ static void test_create_module_thread(void)
     /* Thread creation for a module */
     status = fwk_thread_create(id);
     assert(status == FWK_SUCCESS);
-    check_osThreadNew_param();
     assert(fake_module_ctx.thread_ctx == fwk_mm_calloc_val);
 }
 

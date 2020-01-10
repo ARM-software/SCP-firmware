@@ -48,9 +48,7 @@ uint32_t osRtxErrorNotify(uint32_t code, void *object_id)
          * Stack underflow detected for thread
          * thread_id=object_id
          */
-        FWK_LOG_ERR(
-            synquacer_system_ctx.log_api,
-            "[SYSTEM] osRtxErrorStackUnderflow.\n");
+        FWK_LOG_ERR("[SYSTEM] osRtxErrorStackUnderflow.");
         break;
 
     case osRtxErrorISRQueueOverflow:
@@ -58,9 +56,7 @@ uint32_t osRtxErrorNotify(uint32_t code, void *object_id)
          * ISR Queue overflow detected when inserting object
          * object_id
          */
-        FWK_LOG_ERR(
-            synquacer_system_ctx.log_api,
-            "[SYSTEM] osRtxErrorISRQueueOverflow.\n");
+        FWK_LOG_ERR("[SYSTEM] osRtxErrorISRQueueOverflow.");
         break;
 
     case osRtxErrorTimerQueueOverflow:
@@ -68,9 +64,7 @@ uint32_t osRtxErrorNotify(uint32_t code, void *object_id)
          * User Timer Callback Queue overflow detected for timer
          * timer_id=object_id
          */
-        FWK_LOG_ERR(
-            synquacer_system_ctx.log_api,
-            "[SYSTEM] osRtxErrorTimerQueueOverflow.\n");
+        FWK_LOG_ERR("[SYSTEM] osRtxErrorTimerQueueOverflow.");
         break;
 
     case osRtxErrorClibSpace:
@@ -78,16 +72,14 @@ uint32_t osRtxErrorNotify(uint32_t code, void *object_id)
          * Standard C/C++ library libspace not available:
          * increase OS_THREAD_LIBSPACE_NUM
          */
-        FWK_LOG_ERR(
-            synquacer_system_ctx.log_api, "[SYSTEM] osRtxErrorClibSpace.\n");
+        FWK_LOG_ERR("[SYSTEM] osRtxErrorClibSpace.");
         break;
 
     case osRtxErrorClibMutex:
         /*
          * Standard C/C++ library mutex initialization failed
          */
-        FWK_LOG_ERR(
-            synquacer_system_ctx.log_api, "[SYSTEM] oosRtxErrorClibMutex.\n");
+        FWK_LOG_ERR("[SYSTEM] oosRtxErrorClibMutex.");
         break;
 
     default:

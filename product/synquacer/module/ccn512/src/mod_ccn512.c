@@ -23,8 +23,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-static struct mod_log_api *log_api;
-
 #define HNF_COUNT 8
 #define SNF_ID_DMC1 0x8ULL
 #define SNF_ID_DMC3 0x1AULL
@@ -143,7 +141,7 @@ void fw_ccn512_exit(void)
 
     ccn5xx_hnf_reg_t *hnf = &ccn512->HNF_ID_2;
 
-    FWK_LOG_TRACE(log_api, "[CCN512] CCN512 exit.\n");
+    FWK_LOG_INFO("[CCN512] CCN512 exit.");
 
     /* exit ALL CA53 CPU SNOOP */
     for (i = 0; i < HNF_COUNT; i++)
@@ -152,17 +150,16 @@ void fw_ccn512_exit(void)
     /* Wait for write operations to finish. */
     __DMB();
 
-    FWK_LOG_TRACE(log_api, "[CCN512] CCN512 exit end.\n");
+    FWK_LOG_INFO("[CCN512] CCN512 exit end.");
 }
 
 static int ccn512_config(ccn512_reg_t *ccn512)
 {
-    FWK_LOG_TRACE(
-        log_api, "[CCN512] Initialising ccn512 at 0x%x\n", (uintptr_t)ccn512);
+    FWK_LOG_INFO("[CCN512] Initialising ccn512 at 0x%x", (uintptr_t)ccn512);
 
     fw_ccn512_init(ccn512);
 
-    FWK_LOG_TRACE(log_api, "[CCN512] CCN512 init done.\n");
+    FWK_LOG_INFO("[CCN512] CCN512 init done.");
 
     return FWK_SUCCESS;
 }
@@ -192,8 +189,6 @@ static int mod_ccn512_element_init(
 
 static int mod_ccn512_bind(fwk_id_t id, unsigned int round)
 {
-    int status;
-
     /* Nothing to do in the second round of calls. */
     if (round == 1)
         return FWK_SUCCESS;
@@ -201,11 +196,6 @@ static int mod_ccn512_bind(fwk_id_t id, unsigned int round)
     /* Nothing to do in case of elements. */
     if (fwk_module_is_valid_element_id(id))
         return FWK_SUCCESS;
-
-    status = fwk_module_bind(
-        FWK_ID_MODULE(FWK_MODULE_IDX_LOG), MOD_LOG_API_ID, &log_api);
-    if (status != FWK_SUCCESS)
-        return status;
 
     return FWK_SUCCESS;
 }

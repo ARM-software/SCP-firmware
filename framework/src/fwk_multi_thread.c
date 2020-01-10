@@ -16,10 +16,10 @@
 
 #include <fwk_assert.h>
 #include <fwk_event.h>
-#include <fwk_host.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
 #include <fwk_list.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
@@ -38,19 +38,18 @@
 #endif
 
 #ifndef FIRMWARE_STACK_SIZE
-#    define FIRMWARE_STACK_SIZE (1 * FWK_KIB)
+#    define FIRMWARE_STACK_SIZE 1536
 #endif
 
 #define SIGNAL_ISR_EVENT 0x01
 #define SIGNAL_EVENT_TO_PROCESS 0x02
 #define SIGNAL_EVENT_PROCESSED 0x04
 #define SIGNAL_NO_READY_THREAD 0x08
+#define SIGNAL_CHECK_LOGS 0x10
 
 static struct __fwk_multi_thread_ctx ctx;
-#ifdef BUILD_HOST
-static const char err_msg_line[] = "[THR] Error %d @%d\n";
-static const char err_msg_func[] = "[THR] Error %d in %s\n";
-#endif
+static const char err_msg_line[] = "[FWK] Error %d @%d";
+static const char err_msg_func[] = "[FWK] Error %d in %s";
 
 /*
  * Static functions
@@ -123,7 +122,7 @@ static struct fwk_event *duplicate_event(struct fwk_event *event)
     }
 
     assert(false);
-    FWK_HOST_PRINT(err_msg_func, FWK_E_NOMEM, __func__);
+    FWK_LOG_CRIT(err_msg_func, FWK_E_NOMEM, __func__);
     return NULL;
 }
 
@@ -176,10 +175,6 @@ static int put_isr_event(struct fwk_event *event)
     if (allocated_event == NULL)
         return FWK_E_NOMEM;
 
-    FWK_HOST_PRINT("[THR] Add ISR event (%s,%s,%s)\n",
-                   FWK_ID_STR(event->source_id),
-                   FWK_ID_STR(event->target_id), FWK_ID_STR(event->id));
-
     /*
      * Assumption: there are no interrupt priorities, at least among interrupts
      * leading to the call of fwk_thread_put_event(). As a consequence the
@@ -192,7 +187,7 @@ static int put_isr_event(struct fwk_event *event)
         flags = osThreadFlagsSet(ctx.common_thread_ctx.os_thread_id,
                                  SIGNAL_ISR_EVENT);
         if ((int32_t)flags < 0) {
-            FWK_HOST_PRINT(err_msg_func, FWK_E_OS, __func__);
+            FWK_LOG_CRIT(err_msg_func, FWK_E_OS, __func__);
             return FWK_E_OS;
         }
         ctx.waiting_for_isr_event = false;
@@ -246,10 +241,6 @@ static int put_event(struct __fwk_thread_ctx *target_thread_ctx,
     struct fwk_event *allocated_event;
     bool is_empty;
 
-    FWK_HOST_PRINT("[THR] Add event to thread queue (%s,%s,%s)\n",
-                   FWK_ID_STR(event->source_id), FWK_ID_STR(event->target_id),
-                   FWK_ID_STR(event->id));
-
     event->is_thread_wakeup_event = is_thread_wakeup_event(
         target_thread_ctx, event);
 
@@ -294,7 +285,7 @@ static int put_event(struct __fwk_thread_ctx *target_thread_ctx,
     return FWK_SUCCESS;
 
 error:
-    FWK_HOST_PRINT(err_msg_func, status, __func__);
+    FWK_LOG_CRIT(err_msg_func, status, __func__);
     return status;
 }
 
@@ -327,7 +318,7 @@ static void process_event_requiring_response(struct fwk_event *event)
 
     status = process_event(event, &resp_event);
     if (status != FWK_SUCCESS)
-        FWK_HOST_PRINT(err_msg_line, status, __LINE__);
+        FWK_LOG_CRIT(err_msg_line, status, __LINE__);
 
     resp_event.is_response = true;
     resp_event.response_requested = false;
@@ -368,10 +359,6 @@ static void process_next_thread_event(struct __fwk_thread_ctx *thread_ctx)
                      struct fwk_event, slist_node);
     assert(event != NULL);
 
-    FWK_HOST_PRINT("[THR] Process thread event (%s,%s,%s)\n",
-                   FWK_ID_STR(event->source_id),
-                   FWK_ID_STR(event->target_id), FWK_ID_STR(event->id));
-
     if (event->response_requested)
         process_event_requiring_response(event);
     else {
@@ -381,7 +368,7 @@ static void process_next_thread_event(struct __fwk_thread_ctx *thread_ctx)
         else
             status = module->process_event(event, &async_resp_event);
         if (status != FWK_SUCCESS)
-            FWK_HOST_PRINT(err_msg_line, status, __LINE__);
+            FWK_LOG_CRIT(err_msg_line, status, __LINE__);
     }
 
     /* No event currently processed, no thread currently active. */
@@ -443,7 +430,7 @@ static struct __fwk_thread_ctx *launch_next_event_processing(
                 return next_thread_ctx;
         }
 
-        FWK_HOST_PRINT(err_msg_line, FWK_E_OS, __LINE__);
+        FWK_LOG_CRIT(err_msg_line, FWK_E_OS, __LINE__);
         event = FWK_LIST_GET(fwk_list_pop_head(&next_thread_ctx->event_queue),
                              struct fwk_event, slist_node);
         free_event(event);
@@ -479,7 +466,7 @@ static void thread_function(struct __fwk_thread_ctx *thread_ctx,
             flags = osThreadFlagsWait(signals, osFlagsWaitAny, osWaitForever);
             /* If there is more than one flag raised or not an expected one */
             if ((flags & (flags - 1)) || (!(flags & signals))) {
-                FWK_HOST_PRINT(err_msg_line, FWK_E_OS, __LINE__);
+                FWK_LOG_CRIT(err_msg_line, FWK_E_OS, __LINE__);
                 continue;
             }
             if (flags & SIGNAL_NO_READY_THREAD)
@@ -513,7 +500,12 @@ static void thread_function(struct __fwk_thread_ctx *thread_ctx,
         flags = osThreadFlagsSet(
             ctx.common_thread_ctx.os_thread_id, SIGNAL_NO_READY_THREAD);
         if ((int32_t)flags < 0)
-            FWK_HOST_PRINT(err_msg_line, FWK_E_OS, __LINE__);
+            FWK_LOG_CRIT(err_msg_line, FWK_E_OS, __LINE__);
+
+        /* Let the logging thread know we might have messages to process */
+        flags = osThreadFlagsSet(ctx.log_thread_id, SIGNAL_CHECK_LOGS);
+        if ((int32_t)flags < 0)
+            FWK_LOG_CRIT(err_msg_line, FWK_E_OS, __LINE__);
     }
 }
 
@@ -539,7 +531,7 @@ static void get_next_isr_event(void)
             flags = osThreadFlagsWait(
                 SIGNAL_ISR_EVENT, osFlagsWaitAll, osWaitForever);
             if (flags != SIGNAL_ISR_EVENT)
-                FWK_HOST_PRINT(err_msg_line, FWK_E_OS, __LINE__);
+                FWK_LOG_CRIT(err_msg_line, FWK_E_OS, __LINE__);
             continue;
         }
 
@@ -548,10 +540,12 @@ static void get_next_isr_event(void)
         fwk_interrupt_global_enable();
 
         assert(isr_event != NULL);
-        FWK_HOST_PRINT("[THR] Get ISR event (%s,%s,%s)\n",
-                       FWK_ID_STR(isr_event->source_id),
-                       FWK_ID_STR(isr_event->target_id),
-                       FWK_ID_STR(isr_event->id));
+
+        FWK_LOG_TRACE(
+            "[FWK] Get ISR event (%s: %s -> %s)\n",
+            FWK_ID_STR(isr_event->id),
+            FWK_ID_STR(isr_event->source_id),
+            FWK_ID_STR(isr_event->target_id));
 
         target_thread_ctx = thread_get_ctx(isr_event->target_id);
 
@@ -589,6 +583,32 @@ static void common_thread_function(void *arg)
             thread_function(&ctx.common_thread_ctx, next_thread_ctx);
 
         get_next_isr_event();
+    }
+}
+
+static void logging_thread(void *arg)
+{
+    while (true) {
+        int status;
+
+        (void)osThreadFlagsWait(
+            SIGNAL_CHECK_LOGS, osFlagsNoClear, osWaitForever);
+
+        /*
+         * At this point we've received a signal from one of the other threads
+         * that there might be log messages we need to process. Because logging
+         * is a low-priority task, we yield as soon as we've printed a character
+         * in order to maintain lower latencies elsewhere.
+         *
+         * We will only clear the signal once we have emptied out the log
+         * buffer (at which point we will enter an idle state).
+         */
+
+        status = fwk_log_unbuffer();
+        if (status == FWK_SUCCESS)
+            osThreadFlagsClear(SIGNAL_CHECK_LOGS);
+        else if (status != FWK_PENDING)
+            FWK_LOG_WARN("[FWK] Warning: unable to unbuffer logged message");
     }
 }
 
@@ -632,12 +652,27 @@ int __fwk_thread_init(size_t event_count)
         goto error;
     }
 
+    /* Initialize the logging thread */
+
+    status = init_thread_attr(&thread_attr);
+    if (status != FWK_SUCCESS)
+        goto error;
+
+    thread_attr.priority = osPriorityLow;
+
+    ctx.log_thread_id = osThreadNew(logging_thread, NULL, &thread_attr);
+    if (ctx.log_thread_id == NULL) {
+        status = FWK_E_OS;
+
+        goto error;
+    }
+
     ctx.initialized = true;
 
     return FWK_SUCCESS;
 
 error:
-    FWK_HOST_PRINT(err_msg_func, status, __func__);
+    FWK_LOG_CRIT(err_msg_func, status, __func__);
     return status;
 }
 
@@ -674,7 +709,7 @@ int __fwk_thread_put_notification(struct fwk_event *event)
 
     /* Call from an ISR */
     if (!fwk_module_is_valid_entity_id(event->source_id)) {
-        FWK_HOST_PRINT(err_msg_func, FWK_E_PARAM, __func__);
+        FWK_LOG_CRIT(err_msg_func, FWK_E_PARAM, __func__);
         return FWK_E_PARAM;
     }
 
@@ -735,7 +770,7 @@ int fwk_thread_create(fwk_id_t id)
     return FWK_SUCCESS;
 
 error:
-    FWK_HOST_PRINT(err_msg_func, status, __func__);
+    FWK_LOG_CRIT(err_msg_func, status, __func__);
     return status;
 }
 
@@ -799,7 +834,7 @@ int fwk_thread_put_event(struct fwk_event *event)
     return put_isr_event(event);
 
 error:
-    FWK_HOST_PRINT(err_msg_func, status, __func__);
+    FWK_LOG_CRIT(err_msg_func, status, __func__);
     return status;
 }
 
@@ -880,6 +915,6 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
     return FWK_SUCCESS;
 
 error:
-    FWK_HOST_PRINT(err_msg_func, status, __func__);
+    FWK_LOG_CRIT(err_msg_func, status, __func__);
     return status;
 }

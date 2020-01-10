@@ -40,9 +40,7 @@ int synquacer_main(void);
 static int synquacer_system_shutdown(
     enum mod_pd_system_shutdown system_shutdown)
 {
-    FWK_LOG_TRACE(
-        synquacer_system_ctx.log_api,
-        "[SYNQUACER SYSTEM] requesting synquacer system_shutdown\n");
+    FWK_LOG_INFO("[SYNQUACER SYSTEM] requesting synquacer system_shutdown");
 
     reboot_chip();
 
@@ -71,13 +69,6 @@ static int synquacer_system_bind(fwk_id_t id, unsigned int round)
     int status;
 
     if (round == 0) {
-        status = fwk_module_bind(
-            FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
-            FWK_ID_API(FWK_MODULE_IDX_LOG, 0),
-            &synquacer_system_ctx.log_api);
-        if (status != FWK_SUCCESS)
-            return status;
-
         status = fwk_module_bind(
             FWK_ID_MODULE(FWK_MODULE_IDX_CCN512),
             FWK_ID_API(FWK_MODULE_IDX_CCN512, 0),
@@ -127,9 +118,7 @@ static int synquacer_system_start(fwk_id_t id)
 
     main_initialize();
 
-    FWK_LOG_TRACE(
-        synquacer_system_ctx.log_api,
-        "[SYNQUACER SYSTEM] Request system initialization.\n");
+    FWK_LOG_INFO("[SYNQUACER SYSTEM] Request system initialization.");
 
     status = fwk_thread_create(FWK_ID_MODULE(FWK_MODULE_IDX_SYNQUACER_SYSTEM));
     if (status != FWK_SUCCESS)
@@ -155,9 +144,7 @@ int synquacer_process_event(
     struct fwk_event *resp)
 {
     if (fwk_id_get_event_idx(event->id) == SYNQUACER_SYSTEM_EVENT_START) {
-        FWK_LOG_TRACE(
-            synquacer_system_ctx.log_api,
-            "[SYNQUACER SYSTEM] Process system start event.\n");
+        FWK_LOG_INFO("[SYNQUACER SYSTEM] Process system start event.");
         synquacer_main();
     }
 

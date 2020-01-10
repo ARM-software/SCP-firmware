@@ -51,7 +51,6 @@
 static struct {
     const struct mod_juno_rom_config *config;
     const struct mod_juno_ppu_rom_api *ppu_api;
-    struct mod_log_api *log_api;
     struct mod_bootloader_api *bootloader_api;
     unsigned int notification_count;
     unsigned int boot_map_little;
@@ -183,8 +182,7 @@ static int deferred_setup(void)
         FWK_ARRAY_SIZE(core_ppu_table_little));
 
     if (status != FWK_SUCCESS) {
-        FWK_LOG_ERR(
-            ctx.log_api, "[ROM] ERROR: Failed to turn on LITTLE cluster.\n");
+        FWK_LOG_ERR("[ROM] ERROR: Failed to turn on LITTLE cluster.");
         return FWK_E_DEVICE;
     }
 
@@ -195,8 +193,7 @@ static int deferred_setup(void)
         FWK_ARRAY_SIZE(core_ppu_table_big));
 
     if (status != FWK_SUCCESS) {
-        FWK_LOG_ERR(
-            ctx.log_api, "[ROM] ERROR: Failed to turn on big cluster.\n");
+        FWK_LOG_ERR("[ROM] ERROR: Failed to turn on big cluster.");
         return FWK_E_DEVICE;
     }
 
@@ -220,10 +217,7 @@ static int deferred_setup(void)
 
     status = ctx.bootloader_api->load_image();
 
-    FWK_LOG_ERR(
-        ctx.log_api,
-        "[ROM] ERROR: Failed to load RAM firmware image: %d\n",
-        status);
+    FWK_LOG_ERR("[ROM] ERROR: Failed to load RAM firmware image: %d", status);
 
     return FWK_E_DATA;
 }
@@ -259,10 +253,6 @@ static int juno_rom_bind(fwk_id_t id, unsigned int round)
 
     status = fwk_module_bind(fwk_module_id_juno_ppu,
         mod_juno_ppu_api_id_rom, &ctx.ppu_api);
-    if (!fwk_expect(status == FWK_SUCCESS))
-        return FWK_E_PANIC;
-
-    status = fwk_module_bind(fwk_module_id_log, MOD_LOG_API_ID, &ctx.log_api);
     if (!fwk_expect(status == FWK_SUCCESS))
         return FWK_E_PANIC;
 
@@ -349,9 +339,8 @@ static int juno_rom_process_event(
     if (SCC->APP_ALT_BOOT != 0) {
         if ((SCC->APP_ALT_BOOT & 0x3) != 0) {
             FWK_LOG_ERR(
-                ctx.log_api,
                 "[ROM] ERROR: Alternative AP ROM address does not have 4 byte "
-                "alignment\n");
+                "alignment");
             return FWK_E_ALIGN;
         }
 

@@ -17,6 +17,7 @@
 #include <fwk_log.h>
 #include <fwk_status.h>
 
+#include <inttypes.h>
 #include <stdint.h>
 
 #define DELAY_COUNTER 10
@@ -26,8 +27,7 @@ int thermal_enable(void)
     int32_t sensor_num = sysdef_option_get_sensor_num();
     int32_t i = 0;
 
-    FWK_LOG_INFO(
-        synquacer_system_ctx.log_api, "[THERMAL] Thermal enable start\n");
+    FWK_LOG_INFO("[THERMAL] Thermal enable start");
     writel(THERMAL_BASE_ADDRESS + THERMAL_ALLCONFIG_OFFSET, 0);
     for (i = 0; i < sensor_num; i++) {
         uint32_t sensor_offset = THERMAL_SENSOR_BASE(i);
@@ -35,18 +35,14 @@ int thermal_enable(void)
         writel(sensor_offset + THERMAL_TS_EN_OFFSET, THERMAL_ENABLE);
         if (readl(sensor_offset + THERMAL_TS_EN_OFFSET) == 0) {
             FWK_LOG_INFO(
-                synquacer_system_ctx.log_api,
-                "[THERMAL] Enable individual sensor #%x fail\n",
-                i);
+                "[THERMAL] Enable individual sensor #%" PRIx32 " fail", i);
             return FWK_E_DEVICE;
         }
 
         writel(sensor_offset + THERMAL_TS_RESET_OFFSET, THERMAL_ENABLE);
         if (readl(sensor_offset + THERMAL_TS_RESET_OFFSET) == 0) {
             FWK_LOG_INFO(
-                synquacer_system_ctx.log_api,
-                "[THERMAL] Reset individual sensor #%x fail\n",
-                i);
+                "[THERMAL] Reset individual sensor #%" PRIx32 " fail", i);
             return FWK_E_DEVICE;
         }
     }
@@ -63,7 +59,6 @@ int thermal_enable(void)
         }
     }
 
-    FWK_LOG_INFO(
-        synquacer_system_ctx.log_api, "[THERMAL] Thermal enable end\n");
+    FWK_LOG_INFO("[THERMAL] Thermal enable end");
     return FWK_SUCCESS;
 }

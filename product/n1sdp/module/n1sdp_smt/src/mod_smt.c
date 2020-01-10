@@ -12,7 +12,6 @@
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
-#include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -48,9 +47,6 @@ struct smt_channel_ctx {
 };
 
 struct smt_ctx {
-    /* Log module API */
-    struct mod_log_api *log_api;
-
     /* Table of channel contexts */
     struct smt_channel_ctx *channel_ctx_table;
 
@@ -391,11 +387,8 @@ static int smt_bind(fwk_id_t id, unsigned int round)
     struct smt_channel_ctx *channel_ctx;
 
     if (round == 0) {
-        if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
-            return fwk_module_bind(fwk_module_id_log,
-                                   FWK_ID_API(FWK_MODULE_IDX_LOG, 0),
-                                   &smt_ctx.log_api);
-        }
+        if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+            return FWK_SUCCESS;
 
         channel_ctx = &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(id)];
         status = fwk_module_bind(channel_ctx->config->driver_id,

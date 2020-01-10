@@ -29,7 +29,6 @@
 struct scmi_vendor_ext_ctx {
     const struct mod_scmi_from_protocol_api *scmi_api;
     const struct mod_vendor_ext_api *vendor_ext_api;
-    const struct mod_log_api *log_api;
     uint32_t vendor_ext_count;
 };
 
@@ -200,9 +199,7 @@ static int scmi_vendor_ext_protocol_memory_info_get_handler(
 {
     memset(&resp, 0, sizeof(struct scmi_vendor_ext_memory_info_get_resp));
 
-    FWK_LOG_TRACE(
-        scmi_vendor_ext_ctx.log_api,
-        "[scmi_vendor_ext] memory info get handler.\n");
+    FWK_LOG_INFO("[scmi_vendor_ext] memory info get handler.");
 
     get_memory_info(&resp.meminfo);
 
@@ -233,8 +230,7 @@ static int scmi_vendor_ext_message_handler(
 {
     int32_t return_value;
 
-    FWK_LOG_TRACE(
-        scmi_vendor_ext_ctx.log_api, "[scmi_vendor_ext] message handler.\n");
+    FWK_LOG_INFO("[scmi_vendor_ext] message handler.");
 
     static_assert(
         FWK_ARRAY_SIZE(handler_table) == FWK_ARRAY_SIZE(payload_size_table),
@@ -290,13 +286,6 @@ static int scmi_vendor_ext_bind(fwk_id_t id, unsigned int round)
         return FWK_SUCCESS;
 
     status = fwk_module_bind(
-        FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
-        FWK_ID_API(FWK_MODULE_IDX_LOG, 0),
-        &scmi_vendor_ext_ctx.log_api);
-    if (status != FWK_SUCCESS)
-        return status;
-
-    status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
         FWK_ID_API(FWK_MODULE_IDX_SCMI, MOD_SCMI_API_IDX_PROTOCOL),
         &scmi_vendor_ext_ctx.scmi_api);
@@ -318,9 +307,7 @@ static int scmi_vendor_ext_process_bind_request(
     if (!fwk_id_is_equal(source_id, FWK_ID_MODULE(FWK_MODULE_IDX_SCMI)))
         return FWK_E_ACCESS;
 
-    FWK_LOG_TRACE(
-        scmi_vendor_ext_ctx.log_api,
-        "[scmi_vendor_ext] process bind request.\n");
+    FWK_LOG_INFO("[scmi_vendor_ext] process bind request.");
 
     *api = &scmi_vendor_ext_mod_scmi_to_protocol_api;
 

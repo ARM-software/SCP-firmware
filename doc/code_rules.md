@@ -55,7 +55,7 @@ C Standard Library
 When developing a module, only the following headers of the C standard library
 are allowed to be included:
 `<limits.h>`, `<stdarg.h>`, `<stdbool.h>`, `<stddef.h>`, `<stdint.h>`,
-`<stdio.h>`, `<stdlib.h>` and `<string.h>`.
+`<stdio.h>`, `<stdlib.h>`, `<string.h>` and `<inttypes.h>`.
 
 Concerning the library functions defined in `<stdio.h>`, only `snprintf()` may
 be used.

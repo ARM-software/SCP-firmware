@@ -30,6 +30,7 @@
 #    include <fwk_multi_thread.h>
 #endif
 
+#include <inttypes.h>
 #include <string.h>
 
 struct scmi_protocol {
@@ -58,9 +59,6 @@ struct scmi_ctx {
 
     /* Table of service contexts */
     struct scmi_service_ctx *service_ctx_table;
-
-    /* Log module API */
-    struct mod_log_api *log_api;
 };
 
 /*
@@ -244,8 +242,8 @@ static void respond(fwk_id_t service_id, const void *payload, size_t size)
      */
     if ((payload != NULL) && (*((int32_t *)payload) < SCMI_SUCCESS)) {
         FWK_LOG_ERR(
-            scmi_ctx.log_api,
-            "[SCMI] %s: Message %u (0x%x:0x%x) returned with an error (%d)\n",
+            "[SCMI] %s: Message [%" PRIu16
+            " (0x%x:0x%x)] returned with an error (%d)",
             service_name,
             ctx->scmi_token,
             ctx->scmi_protocol_id,
@@ -253,8 +251,8 @@ static void respond(fwk_id_t service_id, const void *payload, size_t size)
             *((int *)payload));
     } else {
         FWK_LOG_TRACE(
-            scmi_ctx.log_api,
-            "[SCMI] %s: Message %u (0x%x:0x%x) returned successfully\n",
+            "[SCMI] %s: Message [%" PRIu16
+            " (0x%x:0x%x)] returned successfully",
             service_name,
             ctx->scmi_token,
             ctx->scmi_protocol_id,
@@ -264,8 +262,8 @@ static void respond(fwk_id_t service_id, const void *payload, size_t size)
     status = ctx->respond(ctx->transport_id, payload, size);
     if (status != FWK_SUCCESS) {
         FWK_LOG_ERR(
-            scmi_ctx.log_api,
-            "[SCMI] %s: Message %u (0x%x:0x%x) failed to respond (%s)\n",
+            "[SCMI] %s: Message [%" PRIu16
+            " (0x%x:0x%x)] failed to respond (%s)",
             service_name,
             ctx->scmi_token,
             ctx->scmi_protocol_id,
@@ -644,11 +642,8 @@ static int scmi_bind(fwk_id_t id, unsigned int round)
     uint8_t scmi_protocol_id;
 
     if (round == 0) {
-        if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
-            return fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
-                                   FWK_ID_API(FWK_MODULE_IDX_LOG, 0),
-                                   &scmi_ctx.log_api);
-        }
+        if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+            return FWK_SUCCESS;
 
         ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(id)];
         status = fwk_module_bind(ctx->config->transport_id,
@@ -764,19 +759,13 @@ static int scmi_process_event(const struct fwk_event *event,
 
     status = transport_api->get_message_header(transport_id, &message_header);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_ERR(
-            scmi_ctx.log_api,
-            "[SCMI] %s: Unable to read message header\n",
-            service_name);
+        FWK_LOG_ERR("[SCMI] %s: Unable to read message header", service_name);
         return status;
     }
 
     status = transport_api->get_payload(transport_id, &payload, &payload_size);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_ERR(
-            scmi_ctx.log_api,
-            "[SCMI] %s: Unable to read message payload\n",
-            service_name);
+        FWK_LOG_ERR("[SCMI] %s: Unable to read message payload", service_name);
         return status;
     }
 
@@ -785,8 +774,7 @@ static int scmi_process_event(const struct fwk_event *event,
     ctx->scmi_token = read_token(message_header);
 
     FWK_LOG_TRACE(
-        scmi_ctx.log_api,
-        "[SCMI] %s: Message %u (0x%x:0x%x) was received\n",
+        "[SCMI] %s: Message [%" PRIu16 " (0x%x:0x%x)] was received",
         service_name,
         ctx->scmi_token,
         ctx->scmi_protocol_id,
@@ -796,9 +784,9 @@ static int scmi_process_event(const struct fwk_event *event,
 
     if (protocol_idx == 0) {
         FWK_LOG_ERR(
-            scmi_ctx.log_api,
-            "[SCMI] %s: Message %u (0x%x:0x%x) requested an unsupported "
-            "protocol\n",
+            "[SCMI] %s: Message [%" PRIu16
+            " (0x%x:0x%x)] requested an "
+            "unsupported protocol",
             service_name,
             ctx->scmi_token,
             ctx->scmi_protocol_id,
@@ -814,8 +802,7 @@ static int scmi_process_event(const struct fwk_event *event,
 
     if (status != FWK_SUCCESS) {
         FWK_LOG_ERR(
-            scmi_ctx.log_api,
-            "[SCMI] %s: Message %u (0x%x:0x%x) encountered an error (%s)\n",
+            "[SCMI] %s: Message [%" PRIu16 " (0x%x:0x%x)] handler error (%s)",
             service_name,
             ctx->scmi_token,
             ctx->scmi_protocol_id,

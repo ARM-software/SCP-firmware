@@ -29,7 +29,6 @@
 
 struct msys_rom_ctx {
     const struct msys_rom_config *rom_config;
-    struct mod_log_api *log_api;
     struct ppu_v1_boot_api *ppu_boot_api;
     struct mod_bootloader_api *bootloader_api;
     unsigned int notification_count; /* Notifications awaiting a response */
@@ -53,14 +52,11 @@ static int msys_deferred_setup(void)
     ctx.ppu_boot_api->power_mode_on(ctx.rom_config->id_primary_cluster);
     ctx.ppu_boot_api->power_mode_on(ctx.rom_config->id_primary_core);
 
-    FWK_LOG_INFO(ctx.log_api, "[SYSTEM] Primary CPU powered\n");
+    FWK_LOG_INFO("[SYSTEM] Primary CPU powered");
 
     status = ctx.bootloader_api->load_image();
 
-    FWK_LOG_ERR(
-        ctx.log_api,
-        "[SYSTEM] Failed to load RAM firmware image: %d\n",
-        status);
+    FWK_LOG_ERR("[SYSTEM] Failed to load RAM firmware image: %d", status);
 
     return FWK_E_DATA;
 }
@@ -87,14 +83,6 @@ static int msys_rom_bind(fwk_id_t id, unsigned int round)
 
     /* Use second round only (round numbering is zero-indexed) */
     if (round == 1) {
-
-        /* Bind to the log component */
-        status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
-                                 FWK_ID_API(FWK_MODULE_IDX_LOG, 0),
-                                 &ctx.log_api);
-
-        if (status != FWK_SUCCESS)
-            return FWK_E_PANIC;
 
         /* Bind to the PPU module */
         status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_PPU_V1),

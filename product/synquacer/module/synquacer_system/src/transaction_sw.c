@@ -14,6 +14,7 @@
 
 #include <fwk_log.h>
 
+#include <inttypes.h>
 #include <stdint.h>
 
 #define STATUS_ADDR 4
@@ -25,10 +26,7 @@ void set_transactionsw_off(
     unsigned int intsts;
     uint32_t value;
 
-    FWK_LOG_TRACE(
-        synquacer_system_ctx.log_api,
-        "  traSW disable_bit =  %08x\n",
-        disable_bit);
+    FWK_LOG_INFO("  traSW disable_bit =  %08" PRIx32, disable_bit);
 
     DI(intsts);
 
@@ -53,10 +51,7 @@ void set_transactionsw_on(uint32_t transactionsw_reg_addr, uint32_t enable_bit)
     unsigned int intsts;
     uint32_t value;
 
-    FWK_LOG_TRACE(
-        synquacer_system_ctx.log_api,
-        "  traSW enable_bit =  %08x\n",
-        enable_bit);
+    FWK_LOG_INFO("  traSW enable_bit =  %08" PRIx32, enable_bit);
 
     DI(intsts);
 

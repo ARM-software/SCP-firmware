@@ -59,9 +59,6 @@ enum mod_synquacer_system_api_idx {
  * \brief Module Context
  */
 struct synquacer_system_ctx {
-    /*! pointer to the log module. */
-    const struct mod_log_api *log_api;
-
     /*! pointer to the power domain module. */
     const struct mod_pd_restricted_api *mod_pd_restricted_api;
 

@@ -20,6 +20,7 @@
 #include <fwk_status.h>
 #include <fwk_thread.h>
 
+#include <inttypes.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -39,9 +40,6 @@ struct scmi_agent_ctx {
 struct mod_scmi_agent_module_ctx {
     /* Pointer to agent configuration table */
     struct scmi_agent_ctx *agent_ctx_table;
-
-    /* Log API pointer */
-    const struct mod_log_api *log_api;
 
     /* SMT API pointer */
     const struct mod_scmi_agent_to_transport_api *smt_api;
@@ -64,7 +62,7 @@ static int _scmi_agent_transact(fwk_id_t agent_id,
 
     /* Check if channel is free */
     if (!ctx.smt_api->is_channel_free(agent_ctx->config->transport_id)) {
-        FWK_LOG_TRACE(ctx.log_api, "[SCMI AGENT] Channel Busy!\n");
+        FWK_LOG_ERR("[SCMI AGENT] Channel Busy!");
         return FWK_E_BUSY;
     }
 
@@ -211,11 +209,9 @@ static int scmi_agent_bind(fwk_id_t id, unsigned int round)
     struct scmi_agent_ctx *agent_ctx;
 
     if (round == 0) {
-        if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
-            return fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
-                                   FWK_ID_API(FWK_MODULE_IDX_LOG, 0),
-                                   &ctx.log_api);
-        }
+        if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+            return FWK_SUCCESS;
+
         agent_ctx = &ctx.agent_ctx_table[fwk_id_get_element_idx(id)];
         return fwk_module_bind(agent_ctx->config->transport_id,
                                agent_ctx->config->transport_api_id,
@@ -259,10 +255,8 @@ static int scmi_agent_process_event(const struct fwk_event *event,
     if (status != FWK_SUCCESS)
         return status;
 
-    FWK_LOG_TRACE(
-        ctx.log_api,
-        "[SCMI AGENT] Found management protocol version: 0x%x\n",
-        temp);
+    FWK_LOG_INFO(
+        "[SCMI AGENT] Found management protocol version: 0x%" PRIu32, temp);
 
     return status;
 }

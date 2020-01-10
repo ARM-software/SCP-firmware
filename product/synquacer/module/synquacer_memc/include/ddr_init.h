@@ -25,10 +25,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define printf(...) \
-    FWK_LOG_INFO(synquacer_system_ctx.log_api, "[DDR] " __VA_ARGS__)
-#define pr_err(...) \
-    FWK_LOG_ERR(synquacer_system_ctx.log_api, "[DDR] " __VA_ARGS__)
+#define printf(...) FWK_LOG_INFO("[DDR] " __VA_ARGS__)
+#define pr_err(...) FWK_LOG_ERR("[DDR] " __VA_ARGS__)
 
 #define dmb __DMB
 #define usleep(usec) osDelay((usec / 1000) + 2)
