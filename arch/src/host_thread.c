@@ -142,7 +142,9 @@ uint32_t osThreadFlagsWait(uint32_t flags, uint32_t options, uint32_t timeout)
     }
 
     tmp_signal_flags = local_thread_data->signal_flags;
-    local_thread_data->signal_flags &= ~flags;
+
+    if (!(options & osFlagsNoClear))
+        local_thread_data->signal_flags &= ~flags;
 
     return tmp_signal_flags;
 }
@@ -163,6 +165,15 @@ uint32_t osThreadFlagsSet(osThreadId_t thread_id, uint32_t flags)
         return osFlagsErrorUnknown;
 
     return flags;
+}
+
+uint32_t osThreadFlagsClear(uint32_t flags)
+{
+    uint32_t old_flags = local_thread_data->signal_flags;
+
+    local_thread_data->signal_flags &= ~flags;
+
+    return old_flags;
 }
 
 osThreadId_t osThreadNew(osThreadFunc_t func, void *argument,

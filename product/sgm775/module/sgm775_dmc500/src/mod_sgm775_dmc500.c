@@ -32,7 +32,6 @@
 /* Timeout in us */
 #define TIMEOUT_DMC_INIT_US (1000 * 1000)
 
-static struct mod_log_api *log_api;
 static struct mod_timer_api *timer_api;
 static struct mod_sgm775_dmc_ddr_phy_api *ddr_phy_api;
 
@@ -71,12 +70,6 @@ static int mod_sgm775_dmc500_bind(fwk_id_t id, unsigned int round)
 
         module_config = fwk_module_get_data(fwk_module_id_sgm775_dmc500);
         fwk_assert(module_config != NULL);
-
-        /* Bind to the log module */
-        status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
-            MOD_LOG_API_ID, &log_api);
-        if (status != FWK_SUCCESS)
-            return status;
 
         /* Bind to the timer */
         status = fwk_module_bind(module_config->timer_id,
@@ -132,8 +125,7 @@ static int sgm775_dmc500_config(struct mod_sgm775_dmc500_reg *dmc,
 
     module_config = fwk_module_get_data(fwk_module_id_sgm775_dmc500);
 
-    FWK_LOG_TRACE(
-        log_api, "[DDR] Initialising DMC500 at 0x%x\n", (uintptr_t)dmc);
+    FWK_LOG_INFO("[DDR] Initialising DMC500 at 0x%x", (uintptr_t)dmc);
 
     dmc->ADDRESS_CONTROL = ((RANK_BITS << 24) |
                             (BANK_BITS << 16) |
@@ -150,7 +142,7 @@ static int sgm775_dmc500_config(struct mod_sgm775_dmc500_reg *dmc,
     dmc->ODT_RD_CONTROL_31_00 = 0x00000000;
     dmc->ODT_TIMING = 0x10001000;
 
-    FWK_LOG_TRACE(log_api, "[DDR] Setting timing settings\n");
+    FWK_LOG_INFO("[DDR] Setting timing settings");
 
     dmc->T_REFI = 0x0000030B;
     dmc->T_RFC = 0x000340D0;
@@ -173,11 +165,11 @@ static int sgm775_dmc500_config(struct mod_sgm775_dmc500_reg *dmc,
     dmc->T_ESR = 0x00000019;
     dmc->T_XSR = 0x00E100E1;
 
-    FWK_LOG_TRACE(log_api, "[DDR] Setting address map\n");
+    FWK_LOG_INFO("[DDR] Setting address map");
 
     dmc->ADDRESS_MAP = ((1 << 8) | (ADDR_SHUTTER));
 
-    FWK_LOG_TRACE(log_api, "[DDR] Setting PMU settings\n");
+    FWK_LOG_INFO("[DDR] Setting PMU settings");
 
     dmc->SI0_SI_INTERRUPT_CONTROL = 0x00000000;
     dmc->SI0_PMU_REQ_CONTROL = 0x00000B1A;
@@ -260,7 +252,7 @@ static int sgm775_dmc500_config(struct mod_sgm775_dmc500_reg *dmc,
     dmc->T_PHYWRLAT = 0x010F170E;
     dmc->ERR_RAMECC_CTLR = 0x00000000;
 
-    FWK_LOG_TRACE(log_api, "[DDR] Setting PHY-related settings\n");
+    FWK_LOG_INFO("[DDR] Setting PHY-related settings");
 
     dmc->PHY_POWER_CONTROL = 0x0000012A;
     dmc->T_PHY_TRAIN = 0x00F8000A;
@@ -277,7 +269,7 @@ static int sgm775_dmc500_config(struct mod_sgm775_dmc500_reg *dmc,
     dmc->PHY_CONFIG = 0x01000000;
     dmc->PHY_CONFIG = 0x00000003;
 
-    FWK_LOG_TRACE(log_api, "[DDR] Doing direct DDR commands\n");
+    FWK_LOG_INFO("[DDR] Doing direct DDR commands");
 
     dmc->DIRECT_CMD_SETTINGS = 0x00C80000;
     dmc->DIRECT_CMD = 0x00000000;
@@ -304,7 +296,7 @@ static int sgm775_dmc500_config(struct mod_sgm775_dmc500_reg *dmc,
     dmc->DIRECT_CMD = 0x00D60DE6;
     dmc->REFRESH_ENABLE = 0x00000001;
 
-    FWK_LOG_TRACE(log_api, "[DDR] Setting dmc in READY mode\n");
+    FWK_LOG_INFO("[DDR] Setting dmc in READY mode");
 
     status = timer_api->time_to_timestamp(module_config->timer_id,
                                           TIMEOUT_DMC_INIT_US, &timeout);
@@ -333,7 +325,7 @@ static int sgm775_dmc500_config(struct mod_sgm775_dmc500_reg *dmc,
     dmc->SI0_SI_STATE_CONTROL = 0x00000000;
     dmc->SI1_SI_STATE_CONTROL = 0x00000000;
 
-    FWK_LOG_TRACE(log_api, "[DDR] Waiting for Queue stall = 0...\n");
+    FWK_LOG_INFO("[DDR] Waiting for Queue stall = 0...");
 
     while ((dmc->QUEUE_STATUS & MOD_DMC500_QUEUE_STATUS_STALL_ACK) != 0) {
         status = timer_api->remaining(module_config->timer_id, timeout,
@@ -345,7 +337,7 @@ static int sgm775_dmc500_config(struct mod_sgm775_dmc500_reg *dmc,
             goto timeout;
     }
 
-    FWK_LOG_TRACE(log_api, "[DDR] Waiting for SI0 stall = 0...\n");
+    FWK_LOG_INFO("[DDR] Waiting for SI0 stall = 0...");
 
     while ((dmc->SI0_SI_STATUS & MOD_DMC500_SI_STATUS_STALL_ACK) != 0) {
         status = timer_api->remaining(module_config->timer_id, timeout,
@@ -357,7 +349,7 @@ static int sgm775_dmc500_config(struct mod_sgm775_dmc500_reg *dmc,
             goto timeout;
     }
 
-    FWK_LOG_TRACE(log_api, "[DDR] Waiting for SI1 stall = 0...\n");
+    FWK_LOG_INFO("[DDR] Waiting for SI1 stall = 0...");
 
     while ((dmc->SI1_SI_STATUS & MOD_DMC500_SI_STATUS_STALL_ACK) != 0) {
         status = timer_api->remaining(module_config->timer_id, timeout,
@@ -369,12 +361,12 @@ static int sgm775_dmc500_config(struct mod_sgm775_dmc500_reg *dmc,
             goto timeout;
     }
 
-    FWK_LOG_TRACE(log_api, "[DDR] DMC init done.\n");
+    FWK_LOG_INFO("[DDR] DMC init done.");
 
     return FWK_SUCCESS;
 
 timeout:
-    FWK_LOG_ERR(log_api, "[DDR] Timed out in DMC500 init.\n");
+    FWK_LOG_ERR("[DDR] Timed out in DMC500 init.");
 
     return FWK_E_TIMEOUT;
 }

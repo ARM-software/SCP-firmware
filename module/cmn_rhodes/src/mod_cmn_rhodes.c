@@ -23,6 +23,8 @@
 #include <fwk_notification.h>
 #include <fwk_status.h>
 
+#include <inttypes.h>
+
 #define MOD_NAME "[CMN_RHODES] "
 
 static struct cmn_rhodes_ctx *ctx;
@@ -125,7 +127,7 @@ static int cmn_rhodes_discovery(void)
     struct node_header *node;
     const struct mod_cmn_rhodes_config *config = ctx->config;
 
-    FWK_LOG_TRACE(ctx->log_api, MOD_NAME "Starting discovery...\n");
+    FWK_LOG_INFO(MOD_NAME "Starting discovery...");
 
     assert(get_node_type(ctx->root) == NODE_TYPE_CFG);
 
@@ -135,10 +137,8 @@ static int cmn_rhodes_discovery(void)
         xp = get_child_node(config->base, ctx->root, xp_idx);
         assert(get_node_type(xp) == NODE_TYPE_XP);
 
-        FWK_LOG_TRACE(ctx->log_api, MOD_NAME "\n");
-        FWK_LOG_TRACE(
-            ctx->log_api,
-            MOD_NAME "XP (%d, %d) ID:%d, LID:%d\n",
+        FWK_LOG_INFO(
+            MOD_NAME "XP (%d, %d) ID:%d, LID:%d",
             get_node_pos_x(xp),
             get_node_pos_y(xp),
             get_node_id(xp),
@@ -159,24 +159,21 @@ static int cmn_rhodes_discovery(void)
                 if ((get_device_type(xp, xp_port) == DEVICE_TYPE_CXRH) ||
                     (get_device_type(xp, xp_port) == DEVICE_TYPE_CXHA) ||
                     (get_device_type(xp, xp_port) == DEVICE_TYPE_CXRA)) {
-                    FWK_LOG_TRACE(
-                        ctx->log_api,
-                        MOD_NAME "  Found CXLA at node ID: %d\n",
+                    FWK_LOG_INFO(
+                        MOD_NAME "  Found CXLA at node ID: %d",
                         get_child_node_id(xp, node_idx));
                 } else { /* External RN-SAM Node */
                     ctx->external_rnsam_count++;
-                    FWK_LOG_TRACE(
-                        ctx->log_api,
-                        MOD_NAME "  Found external node ID: %d\n",
+                    FWK_LOG_INFO(
+                        MOD_NAME "  Found external node ID: %d",
                         get_child_node_id(xp, node_idx));
                 }
             } else { /* Internal nodes */
                 switch (get_node_type(node)) {
                 case NODE_TYPE_HN_F:
                     if (ctx->hnf_count >= MAX_HNF_COUNT) {
-                        FWK_LOG_TRACE(
-                            ctx->log_api,
-                            MOD_NAME "  hnf count %d >= max limit (%d)\n",
+                        FWK_LOG_INFO(
+                            MOD_NAME "  hnf count %d >= max limit (%d)",
                             ctx->hnf_count,
                             MAX_HNF_COUNT);
                         return FWK_E_DATA;
@@ -193,9 +190,8 @@ static int cmn_rhodes_discovery(void)
                     break;
                 }
 
-                FWK_LOG_TRACE(
-                    ctx->log_api,
-                    MOD_NAME "  %s ID:%d, LID:%d\n",
+                FWK_LOG_INFO(
+                    MOD_NAME "  %s ID:%d, LID:%d",
                     get_node_type_name(get_node_type(node)),
                     get_node_id(node),
                     get_node_logical_id(node));
@@ -206,17 +202,15 @@ static int cmn_rhodes_discovery(void)
     /* When CAL is present, the number of HN-Fs must be even. */
     if ((ctx->hnf_count % 2 != 0) && (config->hnf_cal_mode == true)) {
         FWK_LOG_ERR(
-            ctx->log_api,
-            MOD_NAME "hnf count: %d should be even when CAL mode is set\n",
+            MOD_NAME "hnf count: %d should be even when CAL mode is set",
             ctx->hnf_count);
         return FWK_E_DATA;
     }
 
-    FWK_LOG_TRACE(
-        ctx->log_api,
-        MOD_NAME "Total internal RN-SAM nodes: %d\n" MOD_NAME
-                 "Total external RN-SAM nodes: %d\n" MOD_NAME
-                 "Total HN-F nodes: %d\n",
+    FWK_LOG_INFO(
+        MOD_NAME "Total internal RN-SAM nodes: %d" MOD_NAME
+                 "Total external RN-SAM nodes: %d" MOD_NAME
+                 "Total HN-F nodes: %d",
         ctx->internal_rnsam_count,
         ctx->external_rnsam_count,
         ctx->hnf_count);
@@ -302,17 +296,13 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
     const struct mod_cmn_rhodes_mem_region_map *region;
     const struct mod_cmn_rhodes_config *config = ctx->config;
 
-    FWK_LOG_TRACE(
-        ctx->log_api,
-        MOD_NAME "Configuring SAM for node %d\n",
-        get_node_id(rnsam));
+    FWK_LOG_INFO(MOD_NAME "Configuring SAM for node %d", get_node_id(rnsam));
 
     for (region_idx = 0; region_idx < config->mmap_count; region_idx++) {
         region = &config->mmap_table[region_idx];
 
-        FWK_LOG_TRACE(
-            ctx->log_api,
-            MOD_NAME "  [0x%lx - 0x%lx] %s\n",
+        FWK_LOG_INFO(
+            MOD_NAME "  [0x%" PRIx64 " - 0x%" PRIx64 "] %s",
             region->base,
             region->base + region->size - 1,
             mmap_type_name[region->type]);
@@ -456,7 +446,7 @@ static int cmn_rhodes_setup(void)
     for (rnsam_idx = 0; rnsam_idx < ctx->internal_rnsam_count; rnsam_idx++)
         cmn_rhodes_setup_sam(ctx->internal_rnsam_table[rnsam_idx]);
 
-    FWK_LOG_TRACE(ctx->log_api, MOD_NAME "Done\n");
+    FWK_LOG_INFO(MOD_NAME "Done");
 
     ctx->initialized = true;
 
@@ -530,23 +520,6 @@ static int cmn_rhodes_init(fwk_id_t module_id, unsigned int element_count,
     return FWK_SUCCESS;
 }
 
-static int cmn_rhodes_bind(fwk_id_t id, unsigned int round)
-{
-    int status;
-
-    /* Use second round only (round numbering is zero-indexed) */
-    if (round == 1) {
-        /* Bind to the log component */
-        status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
-                                 FWK_ID_API(FWK_MODULE_IDX_LOG, 0),
-                                 &ctx->log_api);
-        if (status != FWK_SUCCESS)
-            return FWK_E_PANIC;
-    }
-
-    return FWK_SUCCESS;
-}
-
 static int cmn_rhodes_process_bind_request(fwk_id_t requester_id,
     fwk_id_t target_id, fwk_id_t api_id, const void **api)
 {
@@ -587,7 +560,6 @@ const struct fwk_module module_cmn_rhodes = {
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_CMN_RHODES_API_COUNT,
     .init = cmn_rhodes_init,
-    .bind = cmn_rhodes_bind,
     .start = cmn_rhodes_start,
     .process_bind_request = cmn_rhodes_process_bind_request,
     .process_notification = cmn_rhodes_process_notification,

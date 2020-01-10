@@ -59,9 +59,6 @@ struct smt_channel_ctx {
 };
 
 struct smt_ctx {
-    /* Log module API */
-    struct mod_log_api *log_api;
-
     /* Table of channel contexts */
     struct smt_channel_ctx *channel_ctx_table;
 
@@ -250,8 +247,7 @@ static int smt_slave_handler(struct smt_channel_ctx *channel_ctx)
     /* Check we have ownership of the mailbox */
     if (memory->status & MOD_SMT_MAILBOX_STATUS_FREE_MASK) {
         FWK_LOG_ERR(
-            smt_ctx.log_api,
-            "[SMT] Mailbox ownership error on channel %u\n",
+            "[SMT] Mailbox ownership error on channel %u",
             fwk_id_get_element_idx(channel_ctx->id));
 
         return FWK_E_STATE;
@@ -306,7 +302,7 @@ static int smt_signal_message(fwk_id_t channel_id)
 
     if (!channel_ctx->smt_mailbox_ready) {
         /* Discard any message in the mailbox when not ready */
-        FWK_LOG_ERR(smt_ctx.log_api, "[SMT] Message not valid\n");
+        FWK_LOG_ERR("[SMT] Message not valid");
 
         return FWK_SUCCESS;
     }
@@ -378,11 +374,8 @@ static int smt_bind(fwk_id_t id, unsigned int round)
     struct smt_channel_ctx *channel_ctx;
 
     if (round == 0) {
-        if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
-            return fwk_module_bind(fwk_module_id_log,
-                                   FWK_ID_API(FWK_MODULE_IDX_LOG, 0),
-                                   &smt_ctx.log_api);
-        }
+        if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+            return FWK_SUCCESS;
 
         channel_ctx = &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(id)];
         status = fwk_module_bind(channel_ctx->config->driver_id,

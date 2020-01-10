@@ -20,6 +20,7 @@
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
 
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -103,11 +104,11 @@ static int enable_smp_mode(struct cmn600_ctx *ctx)
             ((ctx->cxg_ha_reg->CXG_HA_UNIT_INFO &
               CXG_HA_UNIT_INFO_SMP_MODE_RO_MASK) !=
              CXG_HA_UNIT_INFO_SMP_MODE_RO_MASK)) {
-            FWK_LOG_INFO(ctx->log_api, MOD_NAME "SMP Mode not supported\n");
+            FWK_LOG_INFO(MOD_NAME "SMP Mode not supported");
             return FWK_E_SUPPORT;
         }
 
-        FWK_LOG_INFO(ctx->log_api, MOD_NAME "SMP Mode supported\n");
+        FWK_LOG_INFO(MOD_NAME "SMP Mode supported");
         return FWK_SUCCESS;
     } else if (get_cmn600_revision(ctx->root) >= CMN600_PERIPH_ID_2_REV_R3_P0) {
         /*
@@ -120,7 +121,7 @@ static int enable_smp_mode(struct cmn600_ctx *ctx)
             (1 << CXG_HA_AUX_CTRL_SMP_MODE_RW_SHIFT_VAL);
         ctx->cxla_reg->CXLA_AUX_CTRL |=
             ((uint64_t)0x1 << CXLA_AUX_CTRL_SMP_MODE_SHIFT_VAL);
-        FWK_LOG_INFO(ctx->log_api, MOD_NAME "SMP MODE enabled\n");
+        FWK_LOG_INFO(MOD_NAME "SMP MODE enabled");
         return FWK_SUCCESS;
     }
 
@@ -357,12 +358,11 @@ static int enable_and_start_ccix_link_up_sequence(struct cmn600_ctx *ctx,
         val1 | ((uint64_t)CCIX_VENDER_ID <<
         CXLA_PCIE_HDR_VENDOR_ID_SHIFT_VAL);
 
-    FWK_LOG_TRACE(
-        ctx->log_api,
-        MOD_NAME "CXLA_PCIE_HDR_FIELDS: 0x%lx\n",
+    FWK_LOG_INFO(
+        MOD_NAME "CXLA_PCIE_HDR_FIELDS: 0x%" PRIx64,
         ctx->cxla_reg->CXLA_PCIE_HDR_FIELDS);
 
-    FWK_LOG_TRACE(ctx->log_api, MOD_NAME "Enabling CCIX link %d...", link_id);
+    FWK_LOG_INFO(MOD_NAME "Enabling CCIX link %d...", link_id);
     /* Set link enable bit to enable the CCIX link */
     ctx->cxg_ra_reg->LINK_REGS[link_id].CXG_PRTCL_LINK_CTRL =
         CXG_LINK_CTRL_EN_MASK;
@@ -376,12 +376,12 @@ static int enable_and_start_ccix_link_up_sequence(struct cmn600_ctx *ctx,
                                   cxg_link_wait_condition,
                                   &wait_data);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_INFO(ctx->log_api, "Failed\n");
+        FWK_LOG_INFO(MOD_NAME "Failed");
         return status;
     }
-    FWK_LOG_TRACE(ctx->log_api, "Done\n");
+    FWK_LOG_INFO(MOD_NAME "Done");
 
-    FWK_LOG_TRACE(ctx->log_api, MOD_NAME "Verifying link down status...");
+    FWK_LOG_INFO(MOD_NAME "Verifying link down status...");
     /* Wait till link up bits are cleared in control register */
     wait_data.cond = CXG_LINK_CTRL_UP_BIT_CLR;
     status = ctx->timer_api->wait(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
@@ -389,7 +389,7 @@ static int enable_and_start_ccix_link_up_sequence(struct cmn600_ctx *ctx,
                                   cxg_link_wait_condition,
                                   &wait_data);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_INFO(ctx->log_api, "Failed\n");
+        FWK_LOG_INFO(MOD_NAME "Failed");
         return status;
     }
 
@@ -400,7 +400,7 @@ static int enable_and_start_ccix_link_up_sequence(struct cmn600_ctx *ctx,
                                   cxg_link_wait_condition,
                                   &wait_data);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_INFO(ctx->log_api, "Failed\n");
+        FWK_LOG_INFO(MOD_NAME "Failed");
         return status;
     }
 
@@ -411,13 +411,13 @@ static int enable_and_start_ccix_link_up_sequence(struct cmn600_ctx *ctx,
                                    cxg_link_wait_condition,
                                    &wait_data);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_INFO(ctx->log_api, "Failed\n");
+        FWK_LOG_INFO(MOD_NAME "Failed");
         return status;
     }
 
-    FWK_LOG_TRACE(ctx->log_api, "Done\n");
+    FWK_LOG_INFO(MOD_NAME "Done");
 
-    FWK_LOG_TRACE(ctx->log_api, MOD_NAME "Bringing up link...");
+    FWK_LOG_INFO(MOD_NAME "Bringing up link...");
 
     /* Bring up link using link request bit */
     ctx->cxg_ra_reg->LINK_REGS[link_id].CXG_PRTCL_LINK_CTRL |=
@@ -432,7 +432,7 @@ static int enable_and_start_ccix_link_up_sequence(struct cmn600_ctx *ctx,
                                    cxg_link_wait_condition,
                                    &wait_data);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_INFO(ctx->log_api, "Failed\n");
+        FWK_LOG_INFO(MOD_NAME "Failed");
         return status;
     }
 
@@ -444,10 +444,10 @@ static int enable_and_start_ccix_link_up_sequence(struct cmn600_ctx *ctx,
                                    cxg_link_wait_condition,
                                    &wait_data);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_INFO(ctx->log_api, "Failed\n");
+        FWK_LOG_INFO(MOD_NAME "Failed");
         return status;
     }
-    FWK_LOG_TRACE(ctx->log_api, "Done\n");
+    FWK_LOG_INFO(MOD_NAME "Done");
     return FWK_SUCCESS;
 }
 
@@ -468,7 +468,7 @@ int ccix_setup(struct cmn600_ctx *ctx, void *remote_config)
     struct mod_cmn600_ccix_remote_node_config *ccix_remote_config =
         (struct mod_cmn600_ccix_remote_node_config *)remote_config;
 
-    FWK_LOG_TRACE(ctx->log_api, MOD_NAME "Programming CCIX gateway...\n");
+    FWK_LOG_INFO(MOD_NAME "Programming CCIX gateway...");
 
     /*
      *assert if outside the range as it next step value bein latched
@@ -589,16 +589,14 @@ int ccix_exchange_protocol_credit(struct cmn600_ctx *ctx, uint8_t link_id)
     if (link_id > 2)
         return FWK_E_PARAM;
 
-    FWK_LOG_TRACE(
-        ctx->log_api,
-        MOD_NAME "Exchanging protocol credits for link %d...",
-        link_id);
+    FWK_LOG_INFO(
+        MOD_NAME "Exchanging protocol credits for link %d...", link_id);
     /* Exchange protocol credits using link up bit */
     ctx->cxg_ra_reg->LINK_REGS[link_id].CXG_PRTCL_LINK_CTRL |=
         CXG_LINK_CTRL_UP_MASK;
     ctx->cxg_ha_reg->LINK_REGS[link_id].CXG_PRTCL_LINK_CTRL |=
         CXG_LINK_CTRL_UP_MASK;
-    FWK_LOG_TRACE(ctx->log_api, "Done\n");
+    FWK_LOG_INFO(MOD_NAME "Done");
     return FWK_SUCCESS;
 }
 
@@ -613,10 +611,7 @@ int ccix_enter_system_coherency(struct cmn600_ctx *ctx, uint8_t link_id)
     wait_data.ctx = ctx;
     wait_data.link_id = link_id;
 
-    FWK_LOG_TRACE(
-        ctx->log_api,
-        MOD_NAME "Entering system coherency for link %d...",
-        link_id);
+    FWK_LOG_INFO(MOD_NAME "Entering system coherency for link %d...", link_id);
     /* Enter system coherency by setting DVMDOMAIN request bit */
     ctx->cxg_ha_reg->LINK_REGS[link_id].CXG_PRTCL_LINK_CTRL |=
         CXG_LINK_CTRL_DVMDOMAIN_REQ_MASK;
@@ -628,11 +623,11 @@ int ccix_enter_system_coherency(struct cmn600_ctx *ctx, uint8_t link_id)
                                   cxg_link_wait_condition,
                                   &wait_data);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_INFO(ctx->log_api, "Failed\n");
+        FWK_LOG_INFO(MOD_NAME "Failed");
         return status;
     }
 
-    FWK_LOG_TRACE(ctx->log_api, "Done\n");
+    FWK_LOG_INFO(MOD_NAME "Done");
     return FWK_SUCCESS;
 }
 
@@ -647,8 +642,7 @@ int ccix_enter_dvm_domain(struct cmn600_ctx *ctx, uint8_t link_id)
     wait_data.ctx = ctx;
     wait_data.link_id = link_id;
 
-    FWK_LOG_TRACE(
-        ctx->log_api, MOD_NAME "Entering DVM domain for link %d...", link_id);
+    FWK_LOG_INFO(MOD_NAME "Entering DVM domain for link %d...", link_id);
     /* Enter system coherency by setting DVMDOMAIN request bit */
     ctx->cxg_ra_reg->LINK_REGS[link_id].CXG_PRTCL_LINK_CTRL |=
         CXG_LINK_CTRL_DVMDOMAIN_REQ_MASK;
@@ -660,11 +654,11 @@ int ccix_enter_dvm_domain(struct cmn600_ctx *ctx, uint8_t link_id)
                                   cxg_link_wait_condition,
                                   &wait_data);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_INFO(ctx->log_api, "Failed\n");
+        FWK_LOG_INFO(MOD_NAME "Failed");
         return status;
     }
 
-    FWK_LOG_TRACE(ctx->log_api, "Done\n");
+    FWK_LOG_INFO(MOD_NAME "Done");
     return FWK_SUCCESS;
 }
 

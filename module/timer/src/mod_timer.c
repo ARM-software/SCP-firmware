@@ -65,9 +65,6 @@ struct alarm_ctx {
 /* Table of timer device context structures */
 static struct dev_ctx *ctx_table;
 
-/* Log API */
-static const struct mod_log_api *log_api;
-
 /*
  * Forward declarations
  */
@@ -514,9 +511,8 @@ static void timer_isr(uintptr_t ctx_ptr)
             _insert_alarm_ctx_into_active_queue(ctx, alarm);
         } else {
             FWK_LOG_ERR(
-                log_api,
                 "[Timer] Error: Periodic alarm could not be added "
-                "back into queue.\n");
+                "back into queue.");
         }
     }
 
@@ -563,12 +559,8 @@ static int timer_bind(fwk_id_t id, unsigned int round)
     if (round > 0)
         return FWK_SUCCESS;
 
-    /* Bind to log module */
-    if (fwk_module_is_valid_module_id(id)) {
-        return fwk_module_bind(fwk_module_id_log,
-                               FWK_ID_API(FWK_MODULE_IDX_LOG, 0),
-                               &log_api);
-    }
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+        return FWK_SUCCESS;
 
     ctx = ctx_table + fwk_id_get_element_idx(id);
     ctx->driver_dev_id = ctx->config->id;

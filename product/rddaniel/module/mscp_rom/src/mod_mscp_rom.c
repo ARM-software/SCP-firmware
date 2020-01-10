@@ -20,7 +20,6 @@
 #include <string.h>
 
 static const struct mscp_rom_config *rom_config;
-static struct mod_log_api *log_api;
 
 enum rom_event {
     ROM_EVENT_RUN,
@@ -61,24 +60,6 @@ static int mscp_rom_init(fwk_id_t module_id, unsigned int element_count,
     return FWK_SUCCESS;
 }
 
-static int mscp_rom_bind(fwk_id_t id, unsigned int round)
-{
-    int status;
-
-    /* Use second round only (round numbering is zero-indexed) */
-    if (round == 1) {
-        /* Bind to the log component */
-        status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
-                                 FWK_ID_API(FWK_MODULE_IDX_LOG, 0),
-                                 &log_api);
-
-        if (status != FWK_SUCCESS)
-            return FWK_E_PANIC;
-    }
-
-    return FWK_SUCCESS;
-}
-
 static int mscp_rom_start(fwk_id_t id)
 {
     int status;
@@ -96,7 +77,7 @@ static int mscp_rom_start(fwk_id_t id)
 static int mscp_rom_process_event(const struct fwk_event *event,
                                       struct fwk_event *resp)
 {
-    FWK_LOG_INFO(log_api, "[ROM] Loading RAM firmware\n");
+    FWK_LOG_INFO("[ROM] Loading RAM firmware");
 
     if (rom_config->ramfw_flash_size != 0) {
         memcpy((void *)rom_config->ramfw_ram_base,
@@ -104,7 +85,7 @@ static int mscp_rom_process_event(const struct fwk_event *event,
             rom_config->ramfw_flash_size);
     }
 
-    FWK_LOG_INFO(log_api, "[ROM] Starting RAM firmware execution\n");
+    FWK_LOG_INFO("[ROM] Starting RAM firmware execution");
     jump_to_ramfw();
 
     return FWK_SUCCESS;
@@ -116,7 +97,6 @@ const struct fwk_module module_mscp_rom = {
     .type = FWK_MODULE_TYPE_SERVICE,
     .event_count = ROM_EVENT_COUNT,
     .init = mscp_rom_init,
-    .bind = mscp_rom_bind,
     .start = mscp_rom_start,
     .process_event = mscp_rom_process_event,
 };

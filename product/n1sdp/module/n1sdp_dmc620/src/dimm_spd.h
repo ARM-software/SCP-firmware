@@ -367,11 +367,9 @@ int dimm_spd_init_check(struct mod_n1sdp_i2c_master_api_polled *i2c_api,
 /*
  * Brief - Function to print the DIMM card information
  *
- * param - log_api - Pointer to log module APIs
- *
  * retval - NONE
  */
-void dimm_spd_mem_info(struct mod_log_api *log_api);
+void dimm_spd_mem_info(void);
 
 /*
  * Brief - Function to calculate DMC-620 ADDRESS_CONTROL register value

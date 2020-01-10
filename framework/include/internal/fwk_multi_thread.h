@@ -114,6 +114,8 @@ struct __fwk_multi_thread_ctx {
      * ready to execute as soon as the CPU becomes available for them.
      */
     struct fwk_slist thread_ready_queue;
+
+    osThreadId_t log_thread_id;
 };
 
 /*

@@ -46,9 +46,6 @@ struct scmi_pd_ctx {
     /* Number of power domains */
     unsigned int domain_count;
 
-    /* Log module API */
-    const struct mod_log_api *log_api;
-
     /* SCMI module API */
     const struct mod_scmi_from_protocol_api *scmi_api;
 
@@ -381,8 +378,7 @@ static int scmi_power_scp_set_core_state(fwk_id_t pd_id,
                                                            composite_state);
     if (status != FWK_SUCCESS) {
         FWK_LOG_ERR(
-            scmi_pd_ctx.log_api,
-            "[SCMI:power] Failed to send core set request (error %s (%d))\n",
+            "[SCMI:power] Failed to send core set request (error %s (%d))",
             fwk_status_str(status),
             status);
     }
@@ -735,11 +731,6 @@ static int scmi_pd_bind(fwk_id_t id, unsigned int round)
 
     if (round == 1)
         return FWK_SUCCESS;
-
-    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
-        FWK_ID_API(FWK_MODULE_IDX_LOG, 0), &scmi_pd_ctx.log_api);
-    if (status != FWK_SUCCESS)
-        return status;
 
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
         FWK_ID_API(FWK_MODULE_IDX_SCMI, MOD_SCMI_API_IDX_PROTOCOL),

@@ -139,13 +139,18 @@ uint32_t __wrap_osThreadFlagsSet(osThreadId_t thread_id, uint32_t flags)
     return osThreadFlagsSet_return_val[osThreadFlagsSet_call_count++];
 }
 
+uint32_t __wrap_osThreadFlagsClear(uint32_t flags)
+{
+    return osThreadFlagsSet_param_flags[osThreadFlagsSet_call_count];
+}
+
 static osThreadFunc_t common_thread_function;
 static osThreadFunc_t specific_thread_function;
 osThreadId_t __wrap_osThreadNew(osThreadFunc_t func, void *argument,
                                 const osThreadAttr_t *attr)
 {
     static unsigned int call_count = 0;
-    assert(call_count < 2);
+    assert(call_count < 3);
 
     (void) argument;
     (void) attr;
@@ -901,7 +906,7 @@ static void test_thread_function_4(void)
     assert(osThreadFlagsWait_param_flags[1] == SIGNAL_EVENT_TO_PROCESS);
     assert(osThreadFlagsWait_param_flags[2] == 0);
 
-    assert(osThreadFlagsSet_call_count == 1);
+    assert(osThreadFlagsSet_call_count == 2);
     assert(osThreadFlagsSet_param_flags[0] == SIGNAL_NO_READY_THREAD);
     assert(osThreadFlagsSet_param_thread_id[0] ==
         (osThreadId_t)COMMON_THREAD_ID);
@@ -1107,7 +1112,7 @@ static void test_thread_function_8(void)
     assert(osThreadFlagsWait_param_flags[1] == SIGNAL_EVENT_TO_PROCESS);
     assert(osThreadFlagsWait_param_flags[2] == 0);
 
-    assert(osThreadFlagsSet_call_count == 1);
+    assert(osThreadFlagsSet_call_count == 2);
     assert(osThreadFlagsSet_param_flags[0] == SIGNAL_NO_READY_THREAD);
     assert(osThreadFlagsSet_param_thread_id[0] ==
         (osThreadId_t)COMMON_THREAD_ID);
@@ -1197,7 +1202,7 @@ static void test_thread_function_10(void)
     assert(osThreadFlagsWait_param_flags[1] == SIGNAL_EVENT_TO_PROCESS);
     assert(osThreadFlagsWait_param_flags[2] == 0);
 
-    assert(osThreadFlagsSet_call_count == 1);
+    assert(osThreadFlagsSet_call_count == 2);
     assert(osThreadFlagsSet_param_flags[0] == SIGNAL_NO_READY_THREAD);
     assert(osThreadFlagsSet_param_thread_id[0] ==
         (osThreadId_t)COMMON_THREAD_ID);
@@ -1399,7 +1404,7 @@ static void test_process_next_thread_event_3(void)
     assert(osThreadFlagsWait_param_flags[1] == SIGNAL_EVENT_TO_PROCESS);
     assert(osThreadFlagsWait_param_flags[2] == 0);
 
-    assert(osThreadFlagsSet_call_count == 1);
+    assert(osThreadFlagsSet_call_count == 2);
     assert(osThreadFlagsSet_param_flags[0] == SIGNAL_NO_READY_THREAD);
     assert(osThreadFlagsSet_param_thread_id[0] ==
         (osThreadId_t)COMMON_THREAD_ID);

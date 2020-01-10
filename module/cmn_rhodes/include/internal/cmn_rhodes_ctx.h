@@ -43,8 +43,6 @@ static struct cmn_rhodes_ctx {
     unsigned int internal_rnsam_count;
     struct cmn_rhodes_rnsam_reg **internal_rnsam_table;
 
-    struct mod_log_api *log_api;
-
     bool initialized;
 } *ctx;
 

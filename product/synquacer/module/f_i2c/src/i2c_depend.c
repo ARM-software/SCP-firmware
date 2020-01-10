@@ -92,10 +92,7 @@ void i2c_construction(void)
             &i2c_params[i]);
         if (i2c_err != I2C_ERR_OK) {
             SCB_Error(i2c_err);
-            FWK_LOG_ERR(
-                synquacer_system_ctx.log_api,
-                "[I2C] I2C ch#%d  initialize error.\n",
-                i);
+            FWK_LOG_ERR("[I2C] I2C ch#%d  initialize error.", i);
         }
     }
 }

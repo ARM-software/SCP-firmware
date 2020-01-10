@@ -105,40 +105,33 @@ static int chk_ddr4_dimms(unsigned int speed,
     return FWK_SUCCESS;
 }
 
-static void dimm_device_data(uint8_t *spd_data,
-    struct mod_log_api *log_api, uint8_t dimm_id)
+static void dimm_device_data(uint8_t *spd_data, uint8_t dimm_id)
 {
     unsigned int i;
 
     if (spd_data[2] == 0x0C) {
-        FWK_LOG_INFO(log_api, "    DIMM %d information:\n", dimm_id);
+        FWK_LOG_INFO("    DIMM %d information:", dimm_id);
         FWK_LOG_INFO(
-            log_api,
-            "    Manufacturer ID = 0x%x 0x%x\n",
-            spd_data[320],
-            spd_data[321]);
-        FWK_LOG_INFO(log_api, "    Module part number = ");
+            "    Manufacturer ID = 0x%x 0x%x", spd_data[320], spd_data[321]);
+        FWK_LOG_INFO("    Module part number = ");
         for (i = 329; i <= 348; i++)
-            FWK_LOG_INFO(log_api, "%c", spd_data[i]);
-        FWK_LOG_INFO(log_api, "\n");
+            FWK_LOG_INFO("%c", spd_data[i]);
 
         FWK_LOG_INFO(
-            log_api,
-            "    Module serial number = 0x%x 0x%x 0x%x 0x%x\n",
+            "    Module serial number = 0x%x 0x%x 0x%x 0x%x",
             spd_data[325],
             spd_data[326],
             spd_data[327],
             spd_data[328]);
 
         FWK_LOG_INFO(
-            log_api,
-            "    Module manufacturing week %d%d year %d%d\n",
+            "    Module manufacturing week %d%d year %d%d",
             0xF & (spd_data[324] >> 4),
             0xF & spd_data[324],
             0xF & (spd_data[323] >> 4),
             0xF & spd_data[323]);
     } else {
-        FWK_LOG_INFO(log_api, "[DDR] ERROR! DDR4 SPD EEPROM Not Detected\n");
+        FWK_LOG_INFO("[DDR] ERROR! DDR4 SPD EEPROM Not Detected");
         fwk_assert(false);
     }
 }
@@ -462,12 +455,10 @@ int dimm_spd_init_check(struct mod_n1sdp_i2c_master_api_polled *i2c_api,
     return FWK_SUCCESS;
 }
 
-void dimm_spd_mem_info(struct mod_log_api *log_api)
+void dimm_spd_mem_info(void)
 {
-    fwk_assert(log_api != NULL);
-
-    dimm_device_data((uint8_t *)&ddr4_dimm0, log_api, 0);
-    dimm_device_data((uint8_t *)&ddr4_dimm1, log_api, 1);
+    dimm_device_data((uint8_t *)&ddr4_dimm0, 0);
+    dimm_device_data((uint8_t *)&ddr4_dimm1, 1);
 }
 
 int dimm_spd_address_control(uint32_t *temp_reg, struct dimm_info *ddr)

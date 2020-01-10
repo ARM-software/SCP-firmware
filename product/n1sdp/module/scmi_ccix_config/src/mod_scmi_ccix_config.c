@@ -35,9 +35,6 @@ struct scmi_ccix_config_ctx {
 
     /* PCIe CCIX config api */
     const struct n1sdp_pcie_ccix_config_api *pcie_ccix_config_api;
-
-    /* Log module API */
-    struct mod_log_api *log_api;
 };
 
 static struct scmi_ccix_config_ctx scmi_ccix_config_ctx;
@@ -179,10 +176,8 @@ static int scmi_ccix_config_protocol_get_handler(fwk_id_t service_id,
     if (sizeof(return_values) > max_payload_size) {
         return_values.status = SCMI_OUT_OF_RANGE;
         status = FWK_E_RANGE;
-        FWK_LOG_TRACE(
-            scmi_ccix_config_ctx.log_api,
-            "[SCMI CCIX CONFIG] max payload size is  %d\n",
-            max_payload_size);
+        FWK_LOG_INFO(
+            "[SCMI CCIX CONFIG] max payload size is  %d", max_payload_size);
         goto exit;
     }
 
@@ -269,10 +264,8 @@ static int scmi_ccix_config_protocol_set_handler(fwk_id_t service_id,
     if (sizeof(*params) > max_payload_size) {
         return_values.status = SCMI_OUT_OF_RANGE;
         status = FWK_E_RANGE;
-        FWK_LOG_TRACE(
-            scmi_ccix_config_ctx.log_api,
-            "[SCMI CCIX CONFIG] max payload size is  %d\n",
-            max_payload_size);
+        FWK_LOG_INFO(
+            "[SCMI CCIX CONFIG] max payload size is  %d", max_payload_size);
         goto exit;
     }
 
@@ -424,14 +417,6 @@ static int scmi_ccix_config_bind(fwk_id_t id, unsigned int round)
 
     if (round == 1)
         return FWK_SUCCESS;
-
-    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
-        FWK_ID_API(FWK_MODULE_IDX_LOG, 0), &scmi_ccix_config_ctx.log_api);
-    if (status != FWK_SUCCESS) {
-        /* Failed to bind to log module */
-        fwk_assert(false);
-        return status;
-    }
 
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
         FWK_ID_API(FWK_MODULE_IDX_SCMI, MOD_SCMI_API_IDX_PROTOCOL),

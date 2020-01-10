@@ -27,8 +27,6 @@
 
 #include <stddef.h>
 
-static struct mod_log_api *log_api;
-
 /*
  * Functions fulfilling this module's interface
  */
@@ -45,7 +43,7 @@ static int ddr_phy500_config(fwk_id_t element_id)
 
     ddr = (struct mod_ddr_phy500_reg *)element_config->ddr;
 
-    FWK_LOG_INFO(log_api, "[DDR] Initializing PHY at 0x%x\n", (uintptr_t)ddr);
+    FWK_LOG_INFO("[DDR] Initializing PHY at 0x%x", (uintptr_t)ddr);
 
     if (module_config->initialize_init_complete)
         ddr->INIT_COMPLETE = module_config->ddr_reg_val->INIT_COMPLETE;
@@ -95,8 +93,6 @@ static int ddr_phy500_element_init(fwk_id_t element_id, unsigned int unused,
 
 static int ddr_phy500_bind(fwk_id_t id, unsigned int round)
 {
-    int status;
-
     /* Skip the second round (rounds are zero-indexed) */
     if (round == 1)
         return FWK_SUCCESS;
@@ -104,12 +100,6 @@ static int ddr_phy500_bind(fwk_id_t id, unsigned int round)
     /* Nothing to be done for element-level binding */
     if (fwk_module_is_valid_element_id(id))
         return FWK_SUCCESS;
-
-    /* Bind to the log module and get a pointer to its API */
-    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG), MOD_LOG_API_ID,
-        &log_api);
-    if (status != FWK_SUCCESS)
-        return FWK_E_HANDLER;
 
     return FWK_SUCCESS;
 }

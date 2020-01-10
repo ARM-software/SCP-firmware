@@ -101,14 +101,12 @@ uint64_t smmu_convert_to_axi_addr(void *addr_cm3view)
 
 void smmu_wrapper_initialize(void)
 {
-    FWK_LOG_INFO(
-        synquacer_system_ctx.log_api, "Configure System MMUs starts\n");
+    FWK_LOG_INFO("Configure System MMUs starts");
 
     /* Basic Configuration */
     smmu_wrapper_pcie();
 
-    FWK_LOG_INFO(
-        synquacer_system_ctx.log_api, "Configure System MMUs finished\n");
+    FWK_LOG_INFO("Configure System MMUs finished");
 }
 
 void smmu_wrapper_pcie(void)

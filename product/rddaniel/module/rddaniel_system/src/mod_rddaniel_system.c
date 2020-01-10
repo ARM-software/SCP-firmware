@@ -50,9 +50,6 @@ struct rddaniel_system_ctx {
     /* Pointer to the SCP PIK registers */
     struct pik_scp_reg *pik_scp_reg;
 
-    /* Log API pointer */
-    const struct mod_log_api *log_api;
-
     /* Pointer to the Interrupt Service Routine API of the PPU_V1 module */
     const struct ppu_v1_isr_api *ppu_v1_isr_api;
 
@@ -219,11 +216,6 @@ static int rddaniel_system_bind(fwk_id_t id, unsigned int round)
     if (round > 0)
         return FWK_SUCCESS;
 
-    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
-        FWK_ID_API(FWK_MODULE_IDX_LOG, 0), &rddaniel_system_ctx.log_api);
-    if (status != FWK_SUCCESS)
-        return status;
-
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_POWER_DOMAIN),
         FWK_ID_API(FWK_MODULE_IDX_POWER_DOMAIN, MOD_PD_API_IDX_RESTRICTED),
         &rddaniel_system_ctx.mod_pd_restricted_api);
@@ -260,9 +252,7 @@ static int rddaniel_system_start(fwk_id_t id)
     if (status != FWK_SUCCESS)
         return status;
 
-    FWK_LOG_TRACE(
-        rddaniel_system_ctx.log_api,
-        "[RD-DANIEL SYSTEM] Requesting SYSTOP initialization...\n");
+    FWK_LOG_INFO("[RD-DANIEL SYSTEM] Requesting SYSTOP initialization...");
 
     /*
      * Subscribe to these SCMI channels in order to know when they have all
@@ -317,9 +307,7 @@ int rddaniel_system_process_notification(const struct fwk_event *event,
          * time only
          */
         if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
-            FWK_LOG_TRACE(
-                rddaniel_system_ctx.log_api,
-                "[RD-DANIEL SYSTEM] Initializing the primary core...\n");
+            FWK_LOG_INFO("[RD-DANIEL SYSTEM] Initializing the primary core...");
 
             mod_pd_restricted_api = rddaniel_system_ctx.mod_pd_restricted_api;
 

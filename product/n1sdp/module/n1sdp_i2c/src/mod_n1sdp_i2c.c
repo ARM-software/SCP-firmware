@@ -18,7 +18,6 @@
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
-#include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -82,9 +81,6 @@ struct n1sdp_i2c_dev_ctx {
 struct n1sdp_i2c_ctx {
     /* Table of device contexts */
     struct n1sdp_i2c_dev_ctx *device_ctx_table;
-
-    /* Log API pointer */
-    const struct mod_log_api *log_api;
 };
 
 static struct n1sdp_i2c_ctx i2c_ctx;
@@ -560,15 +556,6 @@ static int n1sdp_i2c_element_init(fwk_id_t element_id, unsigned int unused,
     return FWK_SUCCESS;
 }
 
-static int n1sdp_i2c_bind(fwk_id_t id, unsigned int round)
-{
-    if ((round == 0) && (fwk_id_get_type(id) == FWK_ID_TYPE_MODULE)) {
-        return fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
-            MOD_LOG_API_ID, &i2c_ctx.log_api);
-    }
-    return FWK_SUCCESS;
-}
-
 static int n1sdp_i2c_process_bind_request(fwk_id_t requester_id,
     fwk_id_t target_id, fwk_id_t api_id, const void **api)
 {
@@ -632,7 +619,6 @@ const struct fwk_module module_n1sdp_i2c = {
     .notification_count = MOD_N1SDP_I2C_NOTIFICATION_COUNT,
     .init = n1sdp_i2c_init,
     .element_init = n1sdp_i2c_element_init,
-    .bind = n1sdp_i2c_bind,
     .process_bind_request = n1sdp_i2c_process_bind_request,
     .start = n1sdp_i2c_start,
 };

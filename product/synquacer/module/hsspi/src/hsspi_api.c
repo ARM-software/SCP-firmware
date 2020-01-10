@@ -43,9 +43,8 @@ void HSSPI_init(void)
     model_index = CONFIG_SCB_FORCE_HSSPI_RESOURCE_ALLOCATION_MODEL;
 
     FWK_LOG_INFO(
-        synquacer_system_ctx.log_api,
         "[HS-SPI] Configuring HS-SPI controller with "
-        "clk_sel=%d clk_div=%d syncon=%d use_hsspi_cs1_flag=%d msel=%d\n",
+        "clk_sel=%d clk_div=%d syncon=%d use_hsspi_cs1_flag=%d msel=%d",
         clk_config.clk_sel,
         clk_config.clk_div,
         clk_config.syncon,

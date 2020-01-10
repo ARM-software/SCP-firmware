@@ -47,9 +47,6 @@ struct ppu_v0_pd_ctx {
 struct ppu_v0_ctx {
     /* Table of the power domain contexts */
     struct ppu_v0_pd_ctx *pd_ctx_table;
-
-    /* Log API */
-    struct mod_log_api *log_api;
 };
 
 /*
@@ -89,15 +86,11 @@ static int get_state(struct ppu_v0_reg *ppu, unsigned int *state)
 
     *state = ppu_mode_to_power_state[ppu_mode];
     if (*state == MODE_UNSUPPORTED) {
-        FWK_LOG_ERR(
-            ppu_v0_ctx.log_api,
-            "[PPUV0] Unexpected PPU mode (%i).\n",
-            ppu_mode);
+        FWK_LOG_ERR("[PPUV0] Unexpected PPU mode (%i).", ppu_mode);
         return FWK_E_DEVICE;
     }
 
-    FWK_LOG_INFO(
-        ppu_v0_ctx.log_api, "[PPUV0] get state reg=0x%x (0x%x)\n", ppu, *state);
+    FWK_LOG_INFO("[PPUV0] get state reg=0x%p (0x%x)", (void *)ppu, *state);
 
     return FWK_SUCCESS;
 }
@@ -117,9 +110,8 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
     pd_ctx = ppu_v0_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
 
     FWK_LOG_INFO(
-        ppu_v0_ctx.log_api,
-        "[PPUV0] set_state start. reg=(0x%x) state=(0x%x)\n",
-        pd_ctx->ppu,
+        "[PPUV0] set_state start. reg=(0x%p) state=(0x%x)",
+        (void *)pd_ctx->ppu,
         state);
 
     switch (state) {
@@ -129,9 +121,8 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
             pd_ctx->bound_id, MOD_PD_STATE_ON);
 
         FWK_LOG_INFO(
-            ppu_v0_ctx.log_api,
-            "[PPUV0] set_state end. reg=(0x%x) state=(0x%x)\n",
-            pd_ctx->ppu,
+            "[PPUV0] set_state end. reg=(0x%p) state=(0x%x)",
+            (void *)pd_ctx->ppu,
             state);
 
         assert(status == FWK_SUCCESS);
@@ -140,8 +131,7 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
     case MOD_PD_STATE_OFF:
         if (pd_ctx->config->pd_type == MOD_PD_TYPE_SYSTEM) {
             FWK_LOG_INFO(
-                ppu_v0_ctx.log_api,
-                "[PPUV0] SYNQUACER SYSTEM module will shutdown the system\n");
+                "[PPUV0] SYNQUACER SYSTEM module will shutdown the system");
             break;
         }
 
@@ -159,9 +149,8 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
             pd_ctx->bound_id, MOD_PD_STATE_OFF);
 
         FWK_LOG_INFO(
-            ppu_v0_ctx.log_api,
-            "[PPUV0] set_state end. reg=(0x%x) state=(0x%x)\n",
-            pd_ctx->ppu,
+            "[PPUV0] set_state end. reg=(0x%p) state=(0x%x)",
+            (void *)pd_ctx->ppu,
             state);
 
         assert(status == FWK_SUCCESS);
@@ -169,9 +158,7 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
 
     default:
         FWK_LOG_ERR(
-            ppu_v0_ctx.log_api,
-            "[PPUV0] Requested power state (%i) is not supported.\n",
-            state);
+            "[PPUV0] Requested power state (%i) is not supported.", state);
         return FWK_E_PARAM;
     }
 
@@ -278,13 +265,8 @@ static int ppu_v0_bind(fwk_id_t id, unsigned int round)
     if (round == 0)
         return FWK_SUCCESS;
 
-    /* In the case of the module, bind to the log component */
-    if (fwk_module_is_valid_module_id(id)) {
-        return fwk_module_bind(
-            FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
-            FWK_ID_API(FWK_MODULE_IDX_LOG, 0),
-            &ppu_v0_ctx.log_api);
-    }
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+        return FWK_SUCCESS;
 
     pd_ctx = ppu_v0_ctx.pd_ctx_table + fwk_id_get_element_idx(id);
 

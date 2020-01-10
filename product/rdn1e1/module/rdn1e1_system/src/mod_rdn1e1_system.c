@@ -53,9 +53,6 @@ struct rdn1e1_system_ctx {
     /* Pointer to the SCP PIK registers */
     struct pik_scp_reg *pik_scp_reg;
 
-    /* Log API pointer */
-    const struct mod_log_api *log_api;
-
     /* Pointer to the Interrupt Service Routine API of the PPU_V1 module */
     const struct ppu_v1_isr_api *ppu_v1_isr_api;
 
@@ -228,11 +225,6 @@ static int rdn1e1_system_bind(fwk_id_t id, unsigned int round)
     if (round > 0)
         return FWK_SUCCESS;
 
-    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
-        FWK_ID_API(FWK_MODULE_IDX_LOG, 0), &rdn1e1_system_ctx.log_api);
-    if (status != FWK_SUCCESS)
-        return status;
-
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_POWER_DOMAIN),
         FWK_ID_API(FWK_MODULE_IDX_POWER_DOMAIN, MOD_PD_API_IDX_RESTRICTED),
         &rdn1e1_system_ctx.mod_pd_restricted_api);
@@ -283,9 +275,7 @@ static int rdn1e1_system_start(fwk_id_t id)
     if (status != FWK_SUCCESS)
         return status;
 
-    FWK_LOG_TRACE(
-        rdn1e1_system_ctx.log_api,
-        "[RDN1E1 SYSTEM] Requesting SYSTOP initialization...\n");
+    FWK_LOG_INFO("[RDN1E1 SYSTEM] Requesting SYSTOP initialization...");
 
     /*
      * Subscribe to these SCMI channels in order to know when they have all
@@ -367,10 +357,7 @@ int rdn1e1_system_process_notification(const struct fwk_event *event,
 
             status = rdn1e1_system_ctx.cmn600_api->set_config(&remote_config);
             if (status != FWK_SUCCESS) {
-                FWK_LOG_ERR(
-                    rdn1e1_system_ctx.log_api,
-                    "CCIX Setup Failed for Chip: %d!\n",
-                    chip_id);
+                FWK_LOG_ERR("CCIX Setup Failed for Chip: %d!", chip_id);
                 return status;
             }
             rdn1e1_system_ctx.cmn600_api->exchange_protocol_credit(0);
@@ -383,9 +370,7 @@ int rdn1e1_system_process_notification(const struct fwk_event *event,
          * time only
          */
         if (chip_id == 0) {
-            FWK_LOG_TRACE(
-                rdn1e1_system_ctx.log_api,
-                "[RDN1E1 SYSTEM] Initializing the primary core...\n");
+            FWK_LOG_INFO("[RDN1E1 SYSTEM] Initializing the primary core...");
 
             mod_pd_restricted_api = rdn1e1_system_ctx.mod_pd_restricted_api;
 
@@ -397,10 +382,9 @@ int rdn1e1_system_process_notification(const struct fwk_event *event,
             if (status != FWK_SUCCESS)
                 return status;
         } else {
-            FWK_LOG_TRACE(
-                rdn1e1_system_ctx.log_api,
+            FWK_LOG_INFO(
                 "[RDN1E1 SYSTEM] Detected as slave chip %d, "
-                "Waiting for SCMI command\n",
+                "Waiting for SCMI command",
                 chip_id);
         }
 

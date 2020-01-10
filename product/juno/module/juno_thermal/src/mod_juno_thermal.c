@@ -34,7 +34,6 @@ enum mod_juno_thermal_event_idx {
     MOD_JUNO_THERMAL_EVENT_IDX_COUNT,
 };
 
-static const struct mod_log_api *log_api;
 static const struct mod_pd_restricted_api *pd_api;
 
 static const fwk_id_t systop_pd_id =
@@ -144,14 +143,8 @@ static int juno_thermal_bind(fwk_id_t id, unsigned int round)
 
     if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         /* Bind to power domain - only binding to module is allowed */
-        status = fwk_module_bind(
-            fwk_module_id_power_domain,
-            mod_pd_api_id_restricted,
-            &pd_api);
-        if (status != FWK_SUCCESS)
-            return FWK_E_PANIC;
-
-        return fwk_module_bind(fwk_module_id_log, MOD_LOG_API_ID, &log_api);
+        return fwk_module_bind(
+            fwk_module_id_power_domain, mod_pd_api_id_restricted, &pd_api);
     }
 
     ctx = &ctx_table[fwk_id_get_element_idx(id)];
@@ -204,7 +197,7 @@ static int juno_thermal_start(fwk_id_t id)
 static int check_threshold_breach(uint64_t temperature, uint64_t threshold)
 {
     if (temperature > threshold) {
-        FWK_LOG_WARN(log_api, "[THERMAL] system shutdown\n");
+        FWK_LOG_WARN("[THERMAL] system shutdown");
 
         return pd_api->system_shutdown(MOD_PD_SYSTEM_FORCED_SHUTDOWN);
     }

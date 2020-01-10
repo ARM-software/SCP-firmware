@@ -42,9 +42,6 @@ struct system_power_dev_ctx {
 
 /* Module context */
 struct system_power_ctx {
-    /* Log API pointer */
-    const struct mod_log_api *log_api;
-
     /* System power element context table */
     struct system_power_dev_ctx *dev_ctx_table;
 
@@ -443,10 +440,6 @@ static int system_power_bind(fwk_id_t id, unsigned int round)
     }
 
     if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
-        status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_LOG),
-            FWK_ID_API(FWK_MODULE_IDX_LOG, 0), &system_power_ctx.log_api);
-        if (status != FWK_SUCCESS)
-            return status;
 
         config = system_power_ctx.config;
 

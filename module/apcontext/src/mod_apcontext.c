@@ -17,11 +17,10 @@
 #include <fwk_notification.h>
 #include <fwk_status.h>
 
+#include <inttypes.h>
 #include <string.h>
 
 #define MODULE_NAME "[APContext]"
-
-static const struct mod_log_api *log;
 
 static void apcontext_zero(void)
 {
@@ -29,9 +28,9 @@ static void apcontext_zero(void)
 
     config = fwk_module_get_data(fwk_module_id_apcontext);
 
-    FWK_LOG_TRACE(
-        log,
-        MODULE_NAME " Zeroing AP context area [0x%08x - 0x%08x]\n",
+    FWK_LOG_INFO(
+        MODULE_NAME " Zeroing AP context area [0x%" PRIxPTR " - 0x%" PRIxPTR
+                    "]",
         config->base,
         config->base + config->size);
 
@@ -56,21 +55,6 @@ static int apcontext_init(fwk_id_t module_id, unsigned int element_count,
 
     if (config->size == 0)
         return FWK_E_DATA;
-
-    return FWK_SUCCESS;
-}
-
-static int apcontext_bind(fwk_id_t id, unsigned int round)
-{
-    int status;
-
-    /* Skip second round */
-    if (round > 0)
-        return FWK_SUCCESS;
-
-    status = fwk_module_bind(fwk_module_id_log, MOD_LOG_API_ID, &log);
-    if (status != FWK_SUCCESS)
-        return FWK_E_PANIC;
 
     return FWK_SUCCESS;
 }
@@ -121,7 +105,6 @@ const struct fwk_module module_apcontext = {
     .name = "APContext",
     .type = FWK_MODULE_TYPE_SERVICE,
     .init = apcontext_init,
-    .bind = apcontext_bind,
     .start = apcontext_start,
     .process_notification = apcontext_process_notification,
 };

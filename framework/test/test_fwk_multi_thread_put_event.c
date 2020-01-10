@@ -94,6 +94,12 @@ uint32_t __wrap_osThreadFlagsWait(uint32_t flags, uint32_t options,
         return osThreadFlagsWait_return_val[osThreadFlagsWait_count_call++];
 }
 
+uint32_t __wrap_osThreadFlagsClear(uint32_t flags)
+{
+    (void)flags;
+    return 0;
+}
+
 static uint32_t osThreadFlagsSet_return_val;
 static osThreadId_t osThreadFlagsSet_param_thread_id[3];
 static uint32_t osThreadFlagsSet_param_flags[3];
@@ -860,11 +866,12 @@ static void test_put_event_and_wait_called_from_current_thread(void)
     assert(fwk_thread_put_event_and_wait_return_val == FWK_E_ACCESS);
     assert(osThreadFlagsWait_param_flags[0] == SIGNAL_EVENT_TO_PROCESS);
         assert(osThreadFlagsWait_param_options[0] == osFlagsWaitAny);
-    assert(osThreadFlagsSet_count_call == 1);
-    assert(osThreadFlagsSet_param_thread_id[0] ==
-        (osThreadId_t)COMMON_THREAD_ID);
-    assert(osThreadFlagsSet_param_flags[0] == SIGNAL_NO_READY_THREAD);
-    assert(ctx->event_cookie_counter == 0);
+        assert(osThreadFlagsSet_count_call == 2);
+        assert(
+            osThreadFlagsSet_param_thread_id[0] ==
+            (osThreadId_t)COMMON_THREAD_ID);
+        assert(osThreadFlagsSet_param_flags[0] == SIGNAL_NO_READY_THREAD);
+        assert(ctx->event_cookie_counter == 0);
 }
 
 static void test_put_event_and_wait_event_with_response(void)

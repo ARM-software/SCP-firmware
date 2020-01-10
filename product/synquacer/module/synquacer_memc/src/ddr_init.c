@@ -121,13 +121,13 @@ int ddr_ch0_init_mp(void)
 
     g_DDR4_DMC520_INIT_CH = 0;
 
-    printf("Initializing DDR ch0\n");
+    FWK_LOG_INFO("[DDR] Initializing DDR ch0");
 
     ddr_init_mc0_mp(REG_DMC520_0);
 
     /* allocate 60MiB secure DRAM for OP-TEE */
     if (ddr_is_secure_dram_enabled()) {
-        printf("secure DRAM enabled\n");
+        FWK_LOG_INFO("[DDR] secure DRAM enabled");
         REG_DMC520_0->access_address_min0_31_00_next = 0xFC00000C;
         REG_DMC520_0->access_address_min0_43_32_next = 0x00000000;
         REG_DMC520_0->access_address_max0_31_00_next = 0xFFBF0000;
@@ -136,39 +136,39 @@ int ddr_ch0_init_mp(void)
 
     status = ddr_init_phy0_mp(REG_DDRPHY_CONFIG_0, 0);
     if (status != 0) {
-        pr_err("[DDR] ch0 initialize failed. ddr_init_phy0_mp()\n");
+        FWK_LOG_CRIT("[DDR] ch0 initialize failed. ddr_init_phy0_mp()");
         return status;
     }
     status = ddr_init_phy1_mp(REG_DDRPHY_CONFIG_0, 0);
     if (status != 0) {
-        pr_err("[DDR] ch0 initialize failed. ddr_init_phy1_mp()\n");
+        FWK_LOG_CRIT("[DDR] ch0 initialize failed. ddr_init_phy1_mp()");
         return status;
     }
 
     status = ddr_init_sdram_mp(REG_DDRPHY_CONFIG_0, 0);
     if (status != 0) {
-        pr_err("[DDR] ch0 initialize failed. ddr_init_sdram_mp()\n");
+        FWK_LOG_CRIT("[DDR] ch0 initialize failed. ddr_init_sdram_mp()");
         return status;
     }
 
     status = ddr_init_mc1_mp(REG_DMC520_0);
     if (status != 0) {
-        pr_err("[DDR] ch0 initialize failed. ddr_init_mc1_mp()\n");
+        FWK_LOG_CRIT("[DDR] ch0 initialize failed. ddr_init_mc1_mp()");
         return status;
     }
 
     status = ddr_init_train_mp(REG_DDRPHY_CONFIG_0, 0);
     if (status != 0) {
-        pr_err("[DDR] ch0 fatal error occurred.\n");
+        FWK_LOG_CRIT("[DDR] ch0 fatal error occurred.");
         return status;
     }
     status = ddr_init_mc2_mp(REG_DMC520_0);
     if (status != 0) {
-        pr_err("[DDR] ch0 initialize failed. ddr_init_mc1_mp()\n");
+        FWK_LOG_CRIT("[DDR] ch0 initialize failed. ddr_init_mc1_mp()");
         return status;
     }
 
-    printf("Finished initializing DDR ch0\n");
+    FWK_LOG_INFO("[DDR] Finished initializing DDR ch0");
 
     return 0;
 }
@@ -186,51 +186,51 @@ int ddr_ch1_init_mp(void)
 
     g_DDR4_DMC520_INIT_CH = 1;
 
-    printf("Initializing DDR ch1\n");
+    FWK_LOG_INFO("[DDR] Initializing DDR ch1");
 
     status = ddr_init_mc0_mp(REG_DMC520_1);
     if (status != 0) {
-        pr_err("[DDR] ch1 initialize failed. ddr_init_mc0_mp()\n");
+        FWK_LOG_CRIT("[DDR] ch1 initialize failed. ddr_init_mc0_mp()");
         return status;
     }
 
     status = ddr_init_phy0_mp(REG_DDRPHY_CONFIG_1, 0);
     if (status != 0) {
-        pr_err("[DDR] ch1 initialize failed. ddr_init_phy0_mp()\n");
+        FWK_LOG_CRIT("[DDR] ch1 initialize failed. ddr_init_phy0_mp()");
         return status;
     }
 
     status = ddr_init_phy1_mp(REG_DDRPHY_CONFIG_1, 0);
     if (status != 0) {
-        pr_err("[DDR] ch1 initialize failed. ddr_init_phy1_mp()\n");
+        FWK_LOG_CRIT("[DDR] ch1 initialize failed. ddr_init_phy1_mp()");
         return status;
     }
 
     status = ddr_init_sdram_mp(REG_DDRPHY_CONFIG_1, 0);
     if (status != 0) {
-        pr_err("[DDR] ch1 initialize failed. ddr_init_sdram_mp()\n");
+        FWK_LOG_CRIT("[DDR] ch1 initialize failed. ddr_init_sdram_mp()");
         return status;
     }
 
     status = ddr_init_mc1_mp(REG_DMC520_1);
     if (status != 0) {
-        pr_err("[DDR] ch1 initialize failed. ddr_init_mc1_mp()\n");
+        FWK_LOG_CRIT("[DDR] ch1 initialize failed. ddr_init_mc1_mp()");
         return status;
     }
 
     status = ddr_init_train_mp(REG_DDRPHY_CONFIG_1, 0);
     if (status != 0) {
-        pr_err("[DDR] ch1 fatal error occurred.\n");
+        FWK_LOG_CRIT("[DDR] ch1 fatal error occurred.");
         return status;
     }
 
     status = ddr_init_mc2_mp(REG_DMC520_1);
     if (status != 0) {
-        pr_err("[DDR] ch1 initialize failed. ddr_init_mc2_mp()\n");
+        FWK_LOG_CRIT("[DDR] ch1 initialize failed. ddr_init_mc2_mp()");
         return status;
     }
 
-    printf("Finished initializing DDR ch1\n");
+    FWK_LOG_INFO("[DDR] Finished initializing DDR ch1");
 
     return 0;
 }
@@ -1159,8 +1159,9 @@ int ddr_init_train_mp(
         0x3001);
 
     if ((REG_DDRPHY_CONFIG->PGSR0 & 0x4FF80000) != 0) {
-        printf(
-            "error : Write Leveling, Gate Training, Write Leveling Adjust\n");
+        FWK_LOG_CRIT(
+            "[DDR] error : Write Leveling, Gate Training, Write Leveling "
+            "Adjust");
         status = 0x3002;
         goto ERROR_END;
     }
@@ -1203,7 +1204,7 @@ int ddr_init_train_mp(
         0x3003);
 
     if ((REG_DDRPHY_CONFIG->PGSR0 & 0x4FF80000) != 0) {
-        printf("error : Data Bit Deskew, Data Eye, Static Read\n");
+        FWK_LOG_CRIT("[DDR] error : Data Bit Deskew, Data Eye, Static Read");
         status = 0x3004;
         goto ERROR_END;
     }
@@ -1231,7 +1232,7 @@ int ddr_init_train_mp(
             0x3005);
 
         if ((REG_DDRPHY_CONFIG->PGSR0 & 0x4FF80000) != 0) {
-            printf("error : VREF Training\n");
+            FWK_LOG_CRIT("[DDR] error : VREF Training");
             status = 0x3006;
             goto ERROR_END;
         }
@@ -1246,43 +1247,43 @@ ERROR_END:
     /////////////////////////////////////////////////////////////////////
     phy_status_0 = REG_DDRPHY_CONFIG->PGSR0;
     if (((phy_status_0 >> 19) & 0x1) == 0x1) {
-        pr_err("%s VREF Training Error\n", __func__);
+        FWK_LOG_CRIT("[DDR] %s VREF Training Error", __func__);
         status = 0x3010;
     }
     if (((phy_status_0 >> 20) & 0x1) == 0x1) {
-        pr_err("%s Impedance Calibration Error\n", __func__);
+        FWK_LOG_CRIT("[DDR] %s Impedance Calibration Error", __func__);
         status = 0x3011;
     }
     if (((phy_status_0 >> 21) & 0x1) == 0x1) {
-        pr_err("%s Write Leveling Error\n", __func__);
+        FWK_LOG_CRIT("[DDR] %s Write Leveling Error", __func__);
         status = 0x3012;
     }
     if (((phy_status_0 >> 22) & 0x1) == 0x1) {
-        pr_err("%s DQS Gate Training Error\n", __func__);
+        FWK_LOG_CRIT("[DDR] %s DQS Gate Training Error", __func__);
         status = 0x3013;
     }
     if (((phy_status_0 >> 23) & 0x1) == 0x1) {
-        pr_err("%s Write Leveling Adjustment Error\n", __func__);
+        FWK_LOG_CRIT("[DDR] %s Write Leveling Adjustment Error", __func__);
         status = 0x3014;
     }
     if (((phy_status_0 >> 24) & 0x1) == 0x1) {
-        pr_err("%s Read Bit Deskew Error\n", __func__);
+        FWK_LOG_CRIT("[DDR] %s Read Bit Deskew Error", __func__);
         status = 0x3015;
     }
     if (((phy_status_0 >> 25) & 0x1) == 0x1) {
-        pr_err("%s Write Bit Deskew Error\n", __func__);
+        FWK_LOG_CRIT("[DDR] %s Write Bit Deskew Error", __func__);
         status = 0x3016;
     }
     if (((phy_status_0 >> 26) & 0x1) == 0x1) {
-        pr_err("%s Read Eye Training Error\n", __func__);
+        FWK_LOG_CRIT("[DDR] %s Read Eye Training Error", __func__);
         status = 0x3017;
     }
     if (((phy_status_0 >> 27) & 0x1) == 0x1) {
-        pr_err("%s Write Eye Training Error\n", __func__);
+        FWK_LOG_CRIT("[DDR] %s Write Eye Training Error", __func__);
         status = 0x3018;
     }
     if (((phy_status_0 >> 30) & 0x1) == 0x1) {
-        pr_err("%s Static Read Error\n", __func__);
+        FWK_LOG_CRIT("[DDR] %s Static Read Error", __func__);
         status = 0x3019;
     }
 
