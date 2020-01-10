@@ -34,15 +34,6 @@ struct mod_juno_xrp7724_config {
     /*! Identifier of the timer */
     fwk_id_t timer_hal_id;
 
-    /*!
-     * \brief Identifier of the alarm.
-     *
-     * \note  When setting the voltage, it is necessary to wait for the PSU to
-     * \note  stabilize at the new voltage. We use the Timer HAL to insert a
-     * \note  short delay for this.
-     */
-    fwk_id_t alarm_hal_id;
-
     /*! Identifier of the GPIO for the assert command */
     fwk_id_t gpio_assert_id;
 
@@ -93,6 +84,15 @@ struct mod_juno_xrp7724_dev_config {
 
     /*! Element type */
     enum mod_juno_xrp7724_element_type type;
+
+    /*!
+     * \brief Identifier of the alarm.
+     *
+     * \note  When setting the voltage, it is necessary to wait for the PSU to
+     * \note  stabilize at the new voltage. We use the Timer HAL to insert a
+     * \note  short delay for this.
+     */
+    fwk_id_t alarm_hal_id;
 };
 
 /*! API for system mode */

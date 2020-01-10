@@ -120,7 +120,6 @@ struct juno_xrp7724_ctx {
     const struct mod_psu_driver_response_api *psu_driver_response_api;
     const struct mod_i2c_api *i2c_api;
     const struct mod_timer_api *timer_api;
-    const struct mod_timer_alarm_api *alarm_api;
     const struct mod_sensor_api *adc_api;
     enum juno_xrp7724_gpio_request gpio_request;
     enum juno_xrp7724_sensor_request sensor_request;
@@ -149,6 +148,8 @@ struct juno_xrp7724_dev_ctx {
     uint32_t cookie;
     uint8_t transmit_data[TRANSMIT_DATA_MAX];
     uint8_t receive_data[RECEIVE_DATA_MAX];
+    fwk_id_t alarm_hal_id;
+    const struct mod_timer_alarm_api *alarm_api;
     /* PSU data for the device */
     struct juno_xrp7724_dev_psu_ctx juno_xrp7724_dev_psu;
 };
@@ -525,6 +526,7 @@ static int juno_xrp7724_element_init(fwk_id_t element_id,
             return FWK_E_DATA;
         ctx->juno_xrp7724_dev_psu.is_psu_channel_enabled = true;
         ctx->juno_xrp7724_dev_psu.element_id = element_id;
+        ctx->alarm_hal_id = ctx->config->alarm_hal_id;
     }
 
     return FWK_SUCCESS;
@@ -553,12 +555,6 @@ static int juno_xrp7724_bind(fwk_id_t id, unsigned int round)
         if (status != FWK_SUCCESS)
             return FWK_E_HANDLER;
 
-        /* Bind to the alarm HAL */
-        status = fwk_module_bind(config->alarm_hal_id, MOD_TIMER_API_ID_ALARM,
-            &module_ctx.alarm_api);
-        if (status != FWK_SUCCESS)
-            return FWK_E_HANDLER;
-
         return FWK_SUCCESS;
     }
 
@@ -583,6 +579,13 @@ static int juno_xrp7724_bind(fwk_id_t id, unsigned int round)
             mod_sensor_api_id_sensor, &module_ctx.adc_api);
         if (status != FWK_SUCCESS)
             return FWK_E_HANDLER;
+
+        /* Bind to the alarm HAL */
+        status = fwk_module_bind(
+            ctx->alarm_hal_id, MOD_TIMER_API_ID_ALARM, &ctx->alarm_api);
+        if (status != FWK_SUCCESS)
+            return FWK_E_HANDLER;
+
     }
 
     return FWK_SUCCESS;
@@ -839,7 +842,7 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
          * back the output voltage.
          */
         if (ctx->juno_xrp7724_dev_psu.is_psu_channel_enabled) {
-            status = module_ctx.alarm_api->start(module_config->alarm_hal_id,
+            status = ctx->alarm_api->start(ctx->alarm_hal_id,
                 PSU_RAMP_DELAY_SET_MS, MOD_TIMER_ALARM_TYPE_ONCE,
                 alarm_callback, (uintptr_t)ctx);
             if (status != FWK_SUCCESS)
@@ -914,8 +917,8 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
              * Wait a fixed time for the voltage to stabilize.
              */
             if (ctx->juno_xrp7724_dev_psu.is_psu_channel_enabled) {
-                status = module_ctx.alarm_api->start(
-                    module_config->alarm_hal_id, PSU_RAMP_DELAY_ENABLE_MS,
+                status = ctx->alarm_api->start(
+                    ctx->alarm_hal_id, PSU_RAMP_DELAY_ENABLE_MS,
                     MOD_TIMER_ALARM_TYPE_ONCE, alarm_callback, (uintptr_t)ctx);
                 if (status != FWK_SUCCESS)
                     break;
