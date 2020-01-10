@@ -911,13 +911,17 @@ static int mod_dvfs_process_event(const struct fwk_event *event,
     }
 
     /*
-     * local DVFS event from dvfs_flush_pending_request()
+     * local DVFS event from alarm_callback() generated when alarm set by
+     * dvfs_handle_pending_request() fires
      */
     if (fwk_id_is_equal(event->id, mod_dvfs_event_id_retry)) {
         ctx->request.set_source_id = false;
-        return dvfs_set_frequency_start(ctx, &ctx->pending_request.new_opp,
+        ctx->request_pending = false;
+        status = dvfs_set_frequency_start(ctx, &ctx->pending_request.new_opp,
             ctx->pending_request.retry_request,
             ctx->pending_request.num_retries);
+        ctx->pending_request = (struct mod_dvfs_request){ 0 };
+        return status;
     }
 
     /*
