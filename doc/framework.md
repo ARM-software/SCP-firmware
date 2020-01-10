@@ -77,6 +77,8 @@ For each firmware, linker information must be provided in a *fmw_memory.h* file:
     used regardless of the memory region configuration given by
     *FIRMWARE_MEM_MODE*.
 - FIRMWARE_MEM0_SIZE: The size of the MEM0 region in bytes.
+- FIRMWARE_STACK_SIZE (if multithreading enabled): The size of each individual
+    thread stack in bytes.
 
 If a dual-region memory configuration is used then *FIRMWARE_MEM1_BASE* and
 *FIRMWARE_MEM1_SIZE* must also be defined.
