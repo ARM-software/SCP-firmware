@@ -258,11 +258,13 @@ static int put_event_request(struct mod_dvfs_domain_ctx *ctx,
 
 static int dvfs_set_frequency_start(struct mod_dvfs_domain_ctx *ctx,
     const struct mod_dvfs_opp *new_opp,
-    bool retry_request)
+    bool retry_request,
+    uint8_t num_retries)
 {
     ctx->request.new_opp = *new_opp;
     ctx->request.retry_request = retry_request;
     ctx->request.response_required = false;
+    ctx->request.num_retries = num_retries;
 
     return put_event_request(ctx, mod_dvfs_event_id_set,
         DVFS_DOMAIN_SET_OPP);
@@ -276,7 +278,8 @@ static void dvfs_flush_pending_request(struct mod_dvfs_domain_ctx *ctx)
     if (ctx->request_pending) {
         ctx->request_pending = false;
         dvfs_set_frequency_start(ctx, &ctx->pending_request.new_opp,
-            ctx->pending_request.retry_request);
+            ctx->pending_request.retry_request,
+            ctx->pending_request.num_retries);
     }
     ctx->pending_request = (struct mod_dvfs_request){ 0 };
 }
@@ -505,7 +508,7 @@ static int dvfs_set_frequency(fwk_id_t domain_id, uint64_t frequency)
         (new_opp->voltage == ctx->current_opp.voltage))
         return FWK_SUCCESS;
 
-    return dvfs_set_frequency_start(ctx, new_opp, false);
+    return dvfs_set_frequency_start(ctx, new_opp, false, 0);
 }
 
 static int dvfs_set_frequency_limits(fwk_id_t domain_id,
@@ -535,7 +538,7 @@ static int dvfs_set_frequency_limits(fwk_id_t domain_id,
     if (ctx->state != DVFS_DOMAIN_STATE_IDLE)
         return dvfs_create_pending_level_request(ctx, new_opp, true);
 
-    return dvfs_set_frequency_start(ctx, new_opp, true);
+    return dvfs_set_frequency_start(ctx, new_opp, true, 0);
 }
 
 static const struct mod_dvfs_domain_api mod_dvfs_domain_api = {
@@ -913,7 +916,8 @@ static int mod_dvfs_process_event(const struct fwk_event *event,
     if (fwk_id_is_equal(event->id, mod_dvfs_event_id_retry)) {
         ctx->request.set_source_id = false;
         return dvfs_set_frequency_start(ctx, &ctx->pending_request.new_opp,
-            ctx->pending_request.retry_request);
+            ctx->pending_request.retry_request,
+            ctx->pending_request.num_retries);
     }
 
     /*
@@ -975,8 +979,7 @@ static int dvfs_start(fwk_id_t id)
     if (status == FWK_SUCCESS) {
         ctx = get_domain_ctx(id);
         ctx->request.set_source_id = true;
-        ctx->request.num_retries = 0;
-        dvfs_set_frequency_start(ctx, &sustained_opp, true);
+        dvfs_set_frequency_start(ctx, &sustained_opp, true, 0);
     }
 
     return status;
