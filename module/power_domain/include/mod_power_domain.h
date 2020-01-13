@@ -962,6 +962,70 @@ static const fwk_id_t mod_pd_notification_id_pre_shutdown =
 #endif
 
 /*!
+ * \brief Power Domain public events indices
+ */
+enum mod_pd_public_event_idx {
+    /*! Set state request event */
+    MOD_PD_PUBLIC_EVENT_IDX_SET_STATE,
+
+    /*! Get state request event */
+    MOD_PD_PUBLIC_EVENT_IDX_GET_STATE,
+
+    /*! Number of public Power Domain events */
+    MOD_PD_PUBLIC_EVENT_IDX_COUNT,
+};
+
+/*!
+ * \brief Parameters of the set state response event
+ */
+struct pd_set_state_response {
+    /*! Status of the set state request event processing */
+    int status;
+
+    /*!
+     * \brief Copy of the "composite_state" request parameter
+     *
+     * \details The composite state that defines the power state that the power
+     * domain, target of the request, had to be put into and possibly the power
+     * states the ancestors of the power domain had to be put into.
+     */
+    uint32_t composite_state;
+};
+
+/*! Parameters of the get state response event */
+struct pd_get_state_response {
+    /*! Status of the get state request event processing */
+    int status;
+
+    /*! Copy of the "composite" request parameter */
+    bool composite;
+
+    /*!
+     * \brief Copy of the "state" request parameter
+     *
+     * \details The power state of the power domain target of the request or
+     * the composite state of the power domain and its ancestors depending on
+     * the value of the "composite" request parameter.
+     */
+    uint32_t state;
+};
+
+/*!
+ * \brief Public Events identifiers.
+ */
+#if BUILD_HAS_MOD_POWER_DOMAIN
+/*! Identifier of the public event set_state identifier */
+static const fwk_id_t mod_pd_public_event_id_set_state =
+    FWK_ID_EVENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN,
+                      MOD_PD_PUBLIC_EVENT_IDX_SET_STATE);
+
+/*! Identifier of the public event get_state identifier */
+static const fwk_id_t mod_pd_public_event_id_get_state =
+    FWK_ID_EVENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN,
+                      MOD_PD_PUBLIC_EVENT_IDX_GET_STATE);
+#endif
+
+/*!
  * \}
  */
 
