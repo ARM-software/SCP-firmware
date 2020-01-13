@@ -10,6 +10,16 @@
 
 enum scp_rddanielxlr_interrupt {
     TIMREFCLK_IRQ              = 33, /* REFCLK Physical Timer */
+    PPU_CORES0_IRQ             = 50, /* Consolidated PPU Interrupt for cores
+                                        1-32, 129-160 */
+    PPU_CORES1_IRQ             = 51, /* Consolidated PPU Interrupt for cores
+                                        33-64, 161-192 */
+    PPU_CORES2_IRQ             = 52, /* Consolidated PPU Interrupt for cores
+                                        65-96, 193-224 */
+    PPU_CORES3_IRQ             = 53, /* Consolidated PPU Interrupt for cores
+                                        97-128, 225-256 */
+    PPU_CLUSTERS_IRQ           = 54, /* Consolidated clusters PPU */
+
     MHU_AP_SEC_IRQ             = 83, /* MHU secure irq bewteen SCP and AP */
 };
 
