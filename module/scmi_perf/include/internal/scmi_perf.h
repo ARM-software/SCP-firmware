@@ -33,7 +33,8 @@ enum scmi_perf_command_id {
     SCMI_PERF_LEVEL_SET         = 0x007,
     SCMI_PERF_LEVEL_GET         = 0x008,
     SCMI_PERF_NOTIFY_LIMITS     = 0x009,
-    SCMI_PERF_NOTIFY_LEVEL      = 0x00A
+    SCMI_PERF_NOTIFY_LEVEL      = 0x00A,
+    SCMI_PERF_DESCRIBE_FAST_CHANNEL = 0x00B,
 };
 
 enum scmi_perf_notification_id {
@@ -269,4 +270,29 @@ struct __attribute((packed)) scmi_perf_limits_changed {
     uint32_t range_min;
     uint32_t range_max;
 };
+
+/*
+ * PERFORMANCE_DESCRIBE_FASTCHANNEL
+ */
+
+struct __attribute((packed)) scmi_perf_describe_fc_a2p {
+    uint32_t domain_id;
+    uint32_t message_id;
+};
+
+struct __attribute((packed)) scmi_perf_describe_fc_p2a {
+    int32_t status;
+    uint32_t attributes;
+    uint32_t rate_limit;
+    uint32_t chan_addr_low;
+    uint32_t chan_addr_high;
+    uint32_t chan_size;
+    uint32_t doorbell_addr_low;
+    uint32_t doorbell_addr_high;
+    uint32_t doorbell_set_mask_low;
+    uint32_t doorbell_set_mask_high;
+    uint32_t doorbell_preserve_mask_low;
+    uint32_t doorbell_preserve_mask_high;
+};
+
 #endif /* INTERNAL_SCMI_PERF_H */
