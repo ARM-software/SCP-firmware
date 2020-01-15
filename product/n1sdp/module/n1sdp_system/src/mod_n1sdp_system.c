@@ -611,6 +611,7 @@ static int n1sdp_system_start(fwk_id_t id)
 {
     int status;
     unsigned int i;
+    uint32_t composite_state;
 
     status = fwk_notification_subscribe(
         mod_clock_notification_id_state_changed,
@@ -675,10 +676,23 @@ static int n1sdp_system_start(fwk_id_t id)
     if (status != FWK_SUCCESS)
         return status;
 
+    if (n1sdp_is_multichip_enabled() && (n1sdp_get_chipid() == 0x0)) {
+        composite_state = MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_3,
+                                                 MOD_PD_STATE_ON,
+                                                 MOD_PD_STATE_ON,
+                                                 MOD_PD_STATE_OFF,
+                                                 MOD_PD_STATE_OFF);
+    } else {
+        composite_state = MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2,
+                                                 0,
+                                                 MOD_PD_STATE_ON,
+                                                 MOD_PD_STATE_OFF,
+                                                 MOD_PD_STATE_OFF);
+    }
+
     return n1sdp_system_ctx.mod_pd_restricted_api->set_composite_state_async(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0), false,
-            MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
-                                   MOD_PD_STATE_OFF, MOD_PD_STATE_OFF));
+            composite_state);
 }
 
 static int n1sdp_system_process_notification(const struct fwk_event *event,

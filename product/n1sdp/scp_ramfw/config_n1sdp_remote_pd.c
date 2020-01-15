@@ -48,7 +48,25 @@ static const struct fwk_element remote_pd_element_table[] = {
             .pd_type = MOD_PD_TYPE_CLUSTER,
         }),
     },
-    [6] = { 0 },
+    [6] = {
+        .name = "SLV-DBGTOP",
+        .data = &((struct mod_n1sdp_remote_pd_config) {
+            .pd_type = MOD_PD_TYPE_DEVICE_DEBUG,
+        }),
+    },
+    [7] = {
+        .name = "SLV-SYSTOP",
+        .data = &((struct mod_n1sdp_remote_pd_config) {
+            .pd_type = MOD_PD_TYPE_SYSTEM,
+        }),
+    },
+    [8] = {
+        .name = "SYSTOP-LOGICAL",
+        .data = &((struct mod_n1sdp_remote_pd_config) {
+            .pd_type = MOD_PD_TYPE_SYSTEM,
+        }),
+    },
+    [9] = { 0 },
 };
 
 static const struct fwk_element *remote_pd_get_element_table(fwk_id_t id)

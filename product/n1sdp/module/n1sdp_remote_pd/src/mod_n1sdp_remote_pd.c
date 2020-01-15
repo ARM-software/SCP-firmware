@@ -46,6 +46,9 @@ struct n1sdp_remote_pd_ctx {
 
     /* C2C power domain API */
     struct n1sdp_c2c_pd_api *c2c_pd_api;
+
+    /* Logical SYSTOP PD state */
+    unsigned int logical_systop_state;
 };
 
 static struct n1sdp_remote_pd_ctx remote_pd_ctx;
@@ -59,6 +62,15 @@ static int remote_pd_get_state(fwk_id_t pd_id, unsigned int *state)
 
     element_id = fwk_id_get_element_idx(pd_id);
     fwk_assert(element_id < remote_pd_ctx.pd_count);
+
+    /*
+     * The last element is logical systop so report current state from
+     * context variable.
+     */
+    if (element_id == (remote_pd_ctx.pd_count - 1)) {
+        *state = remote_pd_ctx.logical_systop_state;
+        return FWK_SUCCESS;
+    }
 
     return remote_pd_ctx.c2c_pd_api->get_state(
         N1SDP_C2C_CMD_POWER_DOMAIN_GET_STATE, (uint8_t)element_id,
@@ -75,6 +87,16 @@ static int remote_pd_set_state(fwk_id_t pd_id, unsigned int state)
     fwk_assert(element_id < remote_pd_ctx.pd_count);
 
     dev_ctx = &remote_pd_ctx.dev_ctx_table[element_id];
+
+    /*
+     * The last element is logical systop so no action is required
+     * except reporting the state transition.
+     */
+    if (element_id == (remote_pd_ctx.pd_count - 1)) {
+        remote_pd_ctx.logical_systop_state = state;
+        return dev_ctx->pd_driver_input_api->report_power_state_transition(
+            dev_ctx->bound_id, state);
+    }
 
     switch (state) {
     case MOD_PD_STATE_OFF:

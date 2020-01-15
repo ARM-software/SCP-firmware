@@ -25,10 +25,6 @@
 /* Maximum power domain name size including the null terminator */
 #define PD_NAME_SIZE 16
 
-/*
- * TBD: To be used once PD level 3 handling is fixed in PD driver
- */
-#if 0
 /* Mask of the allowed states for the systop logical power domain */
 static const uint32_t systop_logical_allowed_state_mask_table[] = {
     [0] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK
@@ -38,14 +34,6 @@ static const uint32_t systop_logical_allowed_state_mask_table[] = {
 static const uint32_t systop_allowed_state_mask_table[] = {
     [MOD_PD_STATE_OFF] = MOD_PD_STATE_OFF_MASK,
     [MOD_PD_STATE_ON] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK |
-          (1 << MOD_SYSTEM_POWER_POWER_STATE_SLEEP0) |
-          (1 << MOD_SYSTEM_POWER_POWER_STATE_SLEEP1)
-};
-#endif
-
-/* Mask of the allowed states for the systop power domain */
-static const uint32_t systop_allowed_state_mask_table[] = {
-    [0] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK |
           (1 << MOD_SYSTEM_POWER_POWER_STATE_SLEEP0) |
           (1 << MOD_SYSTEM_POWER_POWER_STATE_SLEEP1)
 };
@@ -106,18 +94,6 @@ struct mod_power_domain_element_config *pd_config_table = NULL;
  *    CLUS0       CLUS1    DBGTOP0   CLUS2       CLUS3     DBGTOP1
  *   /    \      /    \             /    \      /    \
  * CPU0--CPU1--CPU2--CPU3---------CPU4--CPU5--CPU6--CPU7
- *
- * Here the SYSTOP LOGICAL is at PD level 3 but currently there is an issue
- * in handling level 3 in PD driver. So until it is fixed, the master chip's
- * SCP uses the following PD tree view:
- *
- *            --------------SYSTOP0--------------
- *           /        /        |         \       \
- *          /        /         |          \       \
- *         /        /          |           \       \
- *    CLUS0       CLUS1      CLUS2       CLUS3  DBGTOP0
- *   /    \      /    \      /    \      /    \
- * CPU0--CPU1--CPU2--CPU3--CPU4--CPU5--CPU6--CPU7
  *
  * The slave chip's SCP however looks a single chip view of PD tree having
  * its own local power domains and looks like below:
@@ -323,7 +299,7 @@ static struct fwk_element n1sdp_pd_multi_chip_element_table[] = {
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CORE,
             .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_0, 0, 0, 2, 0),
+                MOD_PD_LEVEL_0, 0, 1, 0, 0),
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_N1SDP_REMOTE_PD,
                                              0),
             .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_REMOTE_PD,
@@ -338,7 +314,7 @@ static struct fwk_element n1sdp_pd_multi_chip_element_table[] = {
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CORE,
             .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_0, 0, 0, 2, 1),
+                MOD_PD_LEVEL_0, 0, 1, 0, 1),
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_N1SDP_REMOTE_PD,
                                              1),
             .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_REMOTE_PD,
@@ -353,7 +329,7 @@ static struct fwk_element n1sdp_pd_multi_chip_element_table[] = {
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CORE,
             .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_0, 0, 0, 3, 0),
+                MOD_PD_LEVEL_0, 0, 1, 1, 0),
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_N1SDP_REMOTE_PD,
                                              2),
             .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_REMOTE_PD,
@@ -368,7 +344,7 @@ static struct fwk_element n1sdp_pd_multi_chip_element_table[] = {
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CORE,
             .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_0, 0, 0, 3, 1),
+                MOD_PD_LEVEL_0, 0, 1, 1, 1),
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_N1SDP_REMOTE_PD,
                                              3),
             .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_REMOTE_PD,
@@ -408,12 +384,26 @@ static struct fwk_element n1sdp_pd_multi_chip_element_table[] = {
                 FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
         }),
     },
+    [PD_MULTI_CHIP_IDX_DBGTOP0] = {
+        .name = "DBGTOP",
+        .data = &((struct mod_power_domain_element_config) {
+            .attributes.pd_type = MOD_PD_TYPE_DEVICE_DEBUG,
+            .tree_pos = MOD_PD_TREE_POS(
+                MOD_PD_LEVEL_1, 0, 0, 2, 0),
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_PPU_V0, PPU_V0_ELEMENT_IDX_DBGTOP),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PPU_V0, 0),
+            .allowed_state_mask_table = toplevel_allowed_state_mask_table,
+            .allowed_state_mask_table_size =
+                FWK_ARRAY_SIZE(toplevel_allowed_state_mask_table)
+        }),
+    },
     [PD_MULTI_CHIP_IDX_CLUSTER2] = {
         .name = "SLV-CLUS0",
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
             .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, 2, 0),
+                MOD_PD_LEVEL_1, 0, 1, 0, 0),
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_N1SDP_REMOTE_PD,
                                              4),
             .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_REMOTE_PD,
@@ -428,7 +418,7 @@ static struct fwk_element n1sdp_pd_multi_chip_element_table[] = {
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
             .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, 3, 0),
+                MOD_PD_LEVEL_1, 0, 1, 1, 0),
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_N1SDP_REMOTE_PD,
                                              5),
             .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_REMOTE_PD,
@@ -438,15 +428,16 @@ static struct fwk_element n1sdp_pd_multi_chip_element_table[] = {
                 FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
         }),
     },
-    [PD_MULTI_CHIP_IDX_DBGTOP0] = {
-        .name = "DBGTOP0",
+    [PD_MULTI_CHIP_IDX_DBGTOP1] = {
+        .name = "SLV-DBGTOP",
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE_DEBUG,
             .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, 4, 0),
-            .driver_id = FWK_ID_ELEMENT_INIT(
-                FWK_MODULE_IDX_PPU_V0, PPU_V0_ELEMENT_IDX_DBGTOP),
-            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PPU_V0, 0),
+                MOD_PD_LEVEL_1, 0, 1, 2, 0),
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_N1SDP_REMOTE_PD,
+                                             6),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_REMOTE_PD,
+                                      N1SDP_REMOTE_PD_API_IDX),
             .allowed_state_mask_table = toplevel_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(toplevel_allowed_state_mask_table)
@@ -465,6 +456,36 @@ static struct fwk_element n1sdp_pd_multi_chip_element_table[] = {
             .allowed_state_mask_table = systop_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(systop_allowed_state_mask_table)
+        }),
+    },
+    [PD_MULTI_CHIP_IDX_SYSTOP1] = {
+        .name = "SLV-SYSTOP",
+        .data = &((struct mod_power_domain_element_config) {
+            .attributes.pd_type = MOD_PD_TYPE_SYSTEM,
+            .tree_pos = MOD_PD_TREE_POS(
+                MOD_PD_LEVEL_2, 0, 1, 0, 0),
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_N1SDP_REMOTE_PD,
+                                             7),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_REMOTE_PD,
+                                      N1SDP_REMOTE_PD_API_IDX),
+            .allowed_state_mask_table = systop_allowed_state_mask_table,
+            .allowed_state_mask_table_size =
+                FWK_ARRAY_SIZE(systop_allowed_state_mask_table)
+        }),
+    },
+    [PD_MULTI_CHIP_IDX_SYSTOP_LOGICAL] = {
+        .name = "SYSTOP-LOGICAL",
+        .data = &((struct mod_power_domain_element_config) {
+            .attributes.pd_type = MOD_PD_TYPE_SYSTEM,
+            .tree_pos = MOD_PD_TREE_POS(
+                MOD_PD_LEVEL_3, 0, 0, 0, 0),
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_N1SDP_REMOTE_PD,
+                                             8),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_REMOTE_PD,
+                                      N1SDP_REMOTE_PD_API_IDX),
+            .allowed_state_mask_table = systop_logical_allowed_state_mask_table,
+            .allowed_state_mask_table_size =
+                FWK_ARRAY_SIZE(systop_logical_allowed_state_mask_table)
         }),
     },
     [PD_MULTI_CHIP_IDX_COUNT] = { 0 },
