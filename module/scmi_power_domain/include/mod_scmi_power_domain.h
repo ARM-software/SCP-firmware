@@ -9,6 +9,7 @@
 #ifndef MOD_SCMI_POWER_DOMAIN_H
 #define MOD_SCMI_POWER_DOMAIN_H
 
+#if BUILD_HAS_MOD_DEBUG
 #include <fwk_id.h>
 
 /*!
@@ -21,6 +22,18 @@
  * \brief SCMI Power domain module configuration.
  */
 struct mod_scmi_pd_config {
+
+    /*!
+     * \brief Identifier of the debug power domain.
+     *
+     * \details This identifier is required only for platforms using the debug
+     *      module.
+     *
+     * \note Only one element is supported at the moment.
+     *
+     */
+    fwk_id_t debug_pd_id;
+
     /*!
      * \brief Identifier of one the debug module devices.
      *
@@ -33,5 +46,6 @@ struct mod_scmi_pd_config {
 /*!
  * \}
  */
+#endif
 
 #endif /* MOD_SCMI_POWER_DOMAIN_H */
