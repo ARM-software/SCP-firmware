@@ -13,6 +13,7 @@
 
 #include <stdint.h>
 #include <fwk_id.h>
+#include <mod_power_domain.h>
 
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules
@@ -50,6 +51,7 @@ enum n1sdp_c2c_cmd {
     N1SDP_C2C_CMD_POWER_DOMAIN_ON,
     N1SDP_C2C_CMD_POWER_DOMAIN_OFF,
     N1SDP_C2C_CMD_POWER_DOMAIN_GET_STATE,
+    N1SDP_C2C_CMD_SHUTDOWN_OR_REBOOT,
 };
 
 /*!
@@ -127,6 +129,17 @@ struct n1sdp_c2c_pd_api {
     */
    int (*get_state)(enum n1sdp_c2c_cmd cmd, uint8_t pd_id,
                     unsigned int *state);
+   /*!
+    * \brief API to issue shutdown/reboot to remote chip.
+    *
+    * \param cmd The C2C command type to issue.
+    * \param type The shutdown/reboot type to issue.
+    *
+    * \retval FWK_SUCCESS If operation succeeds.
+    * \return One of the possible error return codes.
+    */
+   int (*shutdown_reboot)(enum n1sdp_c2c_cmd cmd,
+                          enum mod_pd_system_shutdown type);
 };
 
 /*!
