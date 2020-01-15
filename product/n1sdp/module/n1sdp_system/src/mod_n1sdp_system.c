@@ -135,6 +135,9 @@ struct n1sdp_system_ctx {
     /* Pointer to N1SDP C2C slave information API */
     const struct n1sdp_c2c_slave_info_api *c2c_api;
 
+    /* Pointer to N1SDP C2C PD API */
+    const struct n1sdp_c2c_pd_api *c2c_pd_api;
+
     /* Pointer to SCP to PCC communication API */
     const struct mod_n1sdp_scp2pcc_api *scp2pcc_api;
 };
@@ -202,6 +205,12 @@ static struct n1sdp_system_isr isrs[] = {
 static int n1sdp_system_shutdown(
     enum mod_pd_system_shutdown system_shutdown)
 {
+    /* Check if we are running in multichip configuration */
+    if (n1sdp_system_ctx.c2c_api->is_slave_alive()) {
+        n1sdp_system_ctx.c2c_pd_api->shutdown_reboot(
+            N1SDP_C2C_CMD_SHUTDOWN_OR_REBOOT, system_shutdown);
+    }
+
     switch (system_shutdown) {
     case MOD_PD_SYSTEM_SHUTDOWN:
         n1sdp_system_ctx.log_api->log(MOD_LOG_GROUP_INFO,
@@ -573,6 +582,12 @@ static int n1sdp_system_bind(fwk_id_t id, unsigned int round)
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_C2C),
         FWK_ID_API(FWK_MODULE_IDX_N1SDP_C2C, N1SDP_C2C_API_IDX_SLAVE_INFO),
         &n1sdp_system_ctx.c2c_api);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_C2C),
+        FWK_ID_API(FWK_MODULE_IDX_N1SDP_C2C, N1SDP_C2C_API_IDX_PD),
+        &n1sdp_system_ctx.c2c_pd_api);
     if (status != FWK_SUCCESS)
         return status;
 

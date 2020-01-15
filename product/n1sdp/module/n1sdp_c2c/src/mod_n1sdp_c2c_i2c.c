@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
+#include <fmw_cmsis.h>
 #include <fwk_assert.h>
 #include <fwk_element.h>
 #include <fwk_id.h>
@@ -25,6 +26,7 @@
 #include <mod_n1sdp_dmc620.h>
 #include <mod_n1sdp_i2c.h>
 #include <mod_n1sdp_pcie.h>
+#include <mod_n1sdp_scp2pcc.h>
 #include <mod_n1sdp_timer_sync.h>
 #include <mod_power_domain.h>
 #include <mod_timer.h>
@@ -69,6 +71,7 @@ static const char * const cmd_str[] = {
     [N1SDP_C2C_CMD_POWER_DOMAIN_ON] = "Power domain ON",
     [N1SDP_C2C_CMD_POWER_DOMAIN_OFF] = "Power domain OFF",
     [N1SDP_C2C_CMD_POWER_DOMAIN_GET_STATE] = "Get power state",
+    [N1SDP_C2C_CMD_SHUTDOWN_OR_REBOOT] = "Shutdown/Reboot",
 };
 
 /* Module context */
@@ -105,6 +108,9 @@ struct n1sdp_c2c_ctx {
 
     /* Timer synchronization API */
     struct n1sdp_timer_sync_api *tsync_api;
+
+    /* SCP to PCC communication API */
+    struct mod_n1sdp_scp2pcc_api *scp2pcc_api;
 
     /* Chip ID */
     uint8_t chip_id;
@@ -787,6 +793,37 @@ static int n1sdp_c2c_process_command(void)
             goto error;
         break;
 
+    case N1SDP_C2C_CMD_SHUTDOWN_OR_REBOOT:
+        /*
+         * rx_data[0] - Contains the C2C command
+         * rx_data[1] - Contains shutdown/reboot type
+         */
+        switch (rx_data[1]) {
+        case MOD_PD_SYSTEM_SHUTDOWN:
+            n1sdp_c2c_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                "[C2C] Request PCC for system shutdown\n");
+            status = n1sdp_c2c_ctx.scp2pcc_api->send(NULL, 0,
+                                                     SCP2PCC_TYPE_SHUTDOWN);
+            fwk_assert(status == FWK_SUCCESS);
+            break;
+
+        case MOD_PD_SYSTEM_COLD_RESET:
+            n1sdp_c2c_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                "[C2C] Request PCC for system reboot\n");
+            status = n1sdp_c2c_ctx.scp2pcc_api->send(NULL, 0,
+                                                     SCP2PCC_TYPE_REBOOT);
+            fwk_assert(status == FWK_SUCCESS);
+            break;
+
+        default:
+            n1sdp_c2c_ctx.log_api->log(MOD_LOG_GROUP_INFO,
+                "[C2C] Unknown shutdown command!\n");
+            status = FWK_E_PARAM;
+            break;
+        }
+        NVIC_SystemReset();
+        break;
+
     default:
         n1sdp_c2c_ctx.log_api->log(MOD_LOG_GROUP_INFO,
                                    "[C2C] Unsupported command %d\n", cmd);
@@ -926,9 +963,22 @@ static int n1sdp_c2c_pd_get_state(enum n1sdp_c2c_cmd cmd, uint8_t pd_id,
     return FWK_SUCCESS;
 }
 
+static int n1sdp_c2c_pd_shutdown_reboot(enum n1sdp_c2c_cmd cmd,
+                                        enum mod_pd_system_shutdown type)
+{
+    n1sdp_c2c_ctx.master_tx_data[1] = (uint8_t)type;
+    /*
+     * Send command to slave. Don't wait for response as slave will
+     * trigger shutdown/reboot sequence of SoC and I2C may not be
+     * available.
+     */
+    return n1sdp_c2c_master_tx_command((uint8_t)cmd);
+}
+
 static const struct n1sdp_c2c_pd_api pd_api = {
     .set_state = n1sdp_c2c_pd_set_state,
     .get_state = n1sdp_c2c_pd_get_state,
+    .shutdown_reboot = n1sdp_c2c_pd_shutdown_reboot,
 };
 
 /*
@@ -1014,6 +1064,12 @@ static int n1sdp_c2c_bind(fwk_id_t id, unsigned int round)
             FWK_ID_API(FWK_MODULE_IDX_N1SDP_TIMER_SYNC,
                        N1SDP_TIMER_SYNC_API_IDX_TSYNC),
             &n1sdp_c2c_ctx.tsync_api);
+        if (status != FWK_SUCCESS)
+            return status;
+
+        status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SCP2PCC),
+                                 FWK_ID_API(FWK_MODULE_IDX_N1SDP_SCP2PCC, 0),
+                                 &n1sdp_c2c_ctx.scp2pcc_api);
         if (status != FWK_SUCCESS)
             return status;
 

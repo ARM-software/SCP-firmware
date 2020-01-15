@@ -149,12 +149,19 @@ static int remote_pd_prepare_for_system_suspend(fwk_id_t pd_id)
     return remote_pd_set_state(pd_id, MOD_PD_STATE_OFF);
 }
 
+static int remote_pd_shutdown(fwk_id_t pd_id,
+                              enum mod_pd_system_shutdown system_shutdown)
+{
+    return FWK_SUCCESS;
+}
+
 static const struct mod_pd_driver_api remote_pd_driver = {
     .set_state = remote_pd_set_state,
     .get_state = remote_pd_get_state,
     .reset = remote_pd_reset,
     .prepare_core_for_system_suspend =
         remote_pd_prepare_for_system_suspend,
+    .shutdown = remote_pd_shutdown,
 };
 
 /*
