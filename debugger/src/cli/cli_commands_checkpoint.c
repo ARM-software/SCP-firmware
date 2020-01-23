@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern struct cli_ctx cli_ctx;
+extern checkpoint_st checkpoint_table[CHECKPOINT_NUM];
 
 const char checkpoint_call[] = "checkpoint";
 const char checkpoint_help[] =
@@ -33,15 +33,13 @@ const char checkpoint_help[] =
 int32_t checkpoint_f(int32_t argc, char **argv)
 {
     uint32_t i = 0;
-    uint32_t run_cnt = 0;
     uint32_t id = 0;
-    struct checkpoint_config *cp;
 
     if ((argc == 2) && (cli_strncmp(argv[1], "list", 4) == 0)) {
         for (i = 0; i < CHECKPOINT_NUM; i++) {
-            cp = cli_ctx.cp_api->get(i);
-            if (cp->in_use == true)
-                cli_printf(NONE, "%s\n  Task ID: %d\n", cp->name, i);
+            if (checkpoint_table[i].in_use == true)
+                cli_printf(NONE, "%s\n  Task ID: %d\n",
+                    checkpoint_table[i].name, i);
         }
         return FWK_SUCCESS;
     }
@@ -52,14 +50,12 @@ int32_t checkpoint_f(int32_t argc, char **argv)
             cli_print("Task ID out of range.\n");
             return FWK_E_PARAM;
         }
-        cp = cli_ctx.cp_api->get(id);
-        if (cp->pause == false) {
+        if (checkpoint_table[id].pause == false) {
             cli_print("Thread is still running.\n");
             return FWK_E_STATE;
         }
-        cp->tag[0] = 0;
-        cp->bypass = CHECKPOINT_ENABLED;
-        osThreadFlagsSet(cp->tid, CHECKPOINT_SIGNAL);
+        checkpoint_table[id].tag[0] = 0;
+        checkpoint_table[id].bypass = CHECKPOINT_ENABLED;
         return FWK_SUCCESS;
     }
 
@@ -69,16 +65,12 @@ int32_t checkpoint_f(int32_t argc, char **argv)
             cli_print("Task ID out of range.\n");
             return FWK_E_PARAM;
         }
-        cp = cli_ctx.cp_api->get(id);
-        if (cp->pause == false) {
+        if (checkpoint_table[id].pause == false) {
             cli_print("Thread is still running.\n");
             return FWK_E_STATE;
         }
-        run_cnt = strtoul(argv[3], NULL, 0);
-        cp->tag[0] = 0;
-        cp->bypass = run_cnt;
-        osThreadFlagsSet(cp->tid, CHECKPOINT_SIGNAL);
-        return FWK_SUCCESS;
+        if (checkpoint_table[id].pause == false)
+            return FWK_SUCCESS;
     }
 
     else if ((argc == 4) && (cli_strncmp(argv[2], "tag", 3) == 0)) {
@@ -87,15 +79,12 @@ int32_t checkpoint_f(int32_t argc, char **argv)
             cli_print("Task ID out of range.\n");
             return FWK_E_PARAM;
         }
-        cp = cli_ctx.cp_api->get(id);
-        if (cp->pause == false) {
+        if (checkpoint_table[id].pause == false) {
             cli_print("Thread is still running.\n");
             return FWK_E_STATE;
         }
-        strncpy(cp->tag, argv[3], CHECKPOINT_TAG_LEN);
-        cp->tag[CHECKPOINT_TAG_LEN - 1] = 0;
-        cp->bypass = CHECKPOINT_DISABLED;
-        osThreadFlagsSet(cp->tid, CHECKPOINT_SIGNAL);
+        strncpy(checkpoint_table[id].tag, argv[3], CHECKPOINT_TAG_LEN);
+        checkpoint_table[id].bypass = CHECKPOINT_DISABLED;
         return FWK_SUCCESS;
     }
 
@@ -105,8 +94,7 @@ int32_t checkpoint_f(int32_t argc, char **argv)
             cli_print("Task ID out of range.\n");
             return FWK_E_PARAM;
         }
-        cp = cli_ctx.cp_api->get(id);
-        cp->bypass = CHECKPOINT_ENABLED;
+        checkpoint_table[id].bypass = CHECKPOINT_ENABLED;
     }
 
     else if ((argc == 3) && (cli_strncmp(argv[2], "disable", 7) == 0)) {
@@ -115,13 +103,11 @@ int32_t checkpoint_f(int32_t argc, char **argv)
             cli_print("Task ID out of range.\n");
             return FWK_E_PARAM;
         }
-        cp = cli_ctx.cp_api->get(id);
-        if (cp->pause == false) {
+        if (checkpoint_table[id].pause == false) {
             cli_print("Thread is still running.\n");
             return FWK_E_STATE;
         }
-        cp->bypass = CHECKPOINT_DISABLED;
-        osThreadFlagsSet(cp->tid, CHECKPOINT_SIGNAL);
+        checkpoint_table[id].bypass = CHECKPOINT_DISABLED;
         return FWK_SUCCESS;
     }
     cli_print("CLI: Invalid command received:\n");
@@ -143,11 +129,10 @@ void checkpoint_boot_state(uint32_t timeout_s)
     while (timeout_s != 0) {
         if (cli_platform_uart_get(&c, false) == FWK_SUCCESS) {
             cli_print("\nCheckpoints enabled.\n");
-            cli_ctx.cp_api->enable_all();
+            checkpoint_enable_all();
             return;
         }
         cli_printf(NONE, "%c%d", 0x8, timeout_s);
-        osDelay(CHECKPOINT_SECOND_MS);
         timeout_s = timeout_s - 1;
     }
     cli_printf(NONE, "%c0\n", 0x8);

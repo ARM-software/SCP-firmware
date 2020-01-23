@@ -12,10 +12,7 @@
 #include <fwk_status.h>
 #include <cli.h>
 
-/* Maximum number of threads that can use checkpoints. */
-#define CHECKPOINT_NUM 4
-
-static checkpoint_st checkpoint_table[CHECKPOINT_NUM] = {0};
+checkpoint_st checkpoint_table[CHECKPOINT_NUM] = {0};
 
 /* Reset value for bypass. */
 static volatile int32_t bypass_reset = CHECKPOINT_DISABLED;
