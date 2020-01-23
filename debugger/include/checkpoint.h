@@ -7,6 +7,7 @@
 #ifndef CHECKPOINT_H
 #define CHECKPOINT_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 /*!
@@ -25,6 +26,12 @@
  *
  */
 #define CHECKPOINT_TAG_LEN 32
+
+/*!
+ * Maximum number of checkpoints.
+ *
+ */
+#define CHECKPOINT_NUM 4
 
 /*!
  * \brief Checkpoint bypass value.

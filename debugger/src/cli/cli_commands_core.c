@@ -325,6 +325,9 @@ static int32_t reset_sys_f(int32_t argc, char **argv)
 /*****************************************************************************/
 /* Command Structure Array                                                   */
 /*****************************************************************************/
+extern const char checkpoint_call[];
+extern const char checkpoint_help[];
+extern int32_t checkpoint_f(int32_t argc, char **argv);
 
 /* The last parameter in each of the commands below indicates whether the */
 /* command handles its own help or not.  Right now, the PCIe/CCIX commands */
@@ -338,6 +341,7 @@ cli_command_st cli_commands[] = {
     { write_memory_call, write_memory_help, &write_memory_f, false },
     { reset_sys_call, reset_sys_help, &reset_sys_f, false },
     { uptime_call, uptime_help, &uptime_f, false },
+    { checkpoint_call, checkpoint_help, &checkpoint_f, false },
 
     /* End of commands. */
     { 0, 0, 0 }
