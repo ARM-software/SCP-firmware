@@ -28,7 +28,13 @@ enum juno_dvfs_alarm_idx {
     JUNO_DVFS_ALARM_IDX_CNT,
 };
 
+/* Alarm indices for PPU */
+enum juno_ppu_alarm_idx {
+    JUNO_PPU_ALARM_IDX = JUNO_DVFS_ALARM_IDX_CNT,
+    JUNO_PPU_ALARM_IDX_COUNT,
+};
+
 /* Total count of alarms */
-#define JUNO_ALARM_IDX_COUNT    JUNO_DVFS_ALARM_IDX_CNT
+#define JUNO_ALARM_IDX_COUNT    JUNO_PPU_ALARM_IDX_COUNT
 
 #endif /* JUNO_ALARM_IDX_H */
