@@ -20,7 +20,7 @@ static const struct fwk_element element_table[] = {
             .async_response_api_id = FWK_ID_NONE_INIT,
 
             .default_enabled = true,
-            .default_voltage = 100,
+            .default_voltage = 800,
         },
     },
     {
@@ -33,7 +33,7 @@ static const struct fwk_element element_table[] = {
             .async_response_api_id = FWK_ID_NONE_INIT,
 
             .default_enabled = true,
-            .default_voltage = 100,
+            .default_voltage = 800,
         },
     },
     {
@@ -46,7 +46,7 @@ static const struct fwk_element element_table[] = {
             .async_response_api_id = FWK_ID_NONE_INIT,
 
             .default_enabled = true,
-            .default_voltage = 100,
+            .default_voltage = 800,
         },
     },
     {
@@ -59,7 +59,7 @@ static const struct fwk_element element_table[] = {
             .async_response_api_id = FWK_ID_NONE_INIT,
 
             .default_enabled = true,
-            .default_voltage = 100,
+            .default_voltage = 800,
         },
     },
     { 0 }
