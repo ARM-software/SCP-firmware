@@ -135,6 +135,8 @@ static uint32_t cli_format(cli_option_et options, char *buffer, uint32_t size);
  *       Index of the most recent item in the history buffer.
  *     uint32_t history_size
  *       Size of command history buffer.
+ *     bool *exit
+ *       Exit CLI was requested.
  *   Return
  *     uint32_t: FWK_SUCCESS if it works, something else if it
  *     doesn't.
@@ -145,7 +147,8 @@ static uint32_t cli_get_command(
     uint32_t *command_length,
     char **history,
     uint32_t history_index,
-    uint32_t history_size);
+    uint32_t history_size,
+    bool *exit);
 
 /*
  * cli_backspace
@@ -611,6 +614,7 @@ static void cli_main(void const *argument)
     uint32_t history_index = 0;
     uint32_t last_history_index = CLI_CONFIG_HISTORY_LENGTH - 1;
     uint32_t command_length = 0;
+    bool cli_exit = false;
 
     /* Thread was started successfully, set state to CLI_RUNNING. */
     cli_state = CLI_RUNNING;
@@ -634,10 +638,17 @@ static void cli_main(void const *argument)
             &command_length,
             cli_history,
             history_index,
-            CLI_CONFIG_HISTORY_LENGTH);
+            CLI_CONFIG_HISTORY_LENGTH,
+            &cli_exit);
         if (status != FWK_SUCCESS) {
             cli_error_handler(status);
             continue;
+        }
+
+        /* Ctrl+d was pressed to exit cli */
+        if (cli_exit) {
+            cli_state = CLI_READY;
+            return;
         }
 
         /* Make sure command string is not empty. */
@@ -845,7 +856,8 @@ static uint32_t cli_get_command(
     uint32_t *command_length,
     char **history,
     uint32_t history_index,
-    uint32_t history_size)
+    uint32_t history_size,
+    bool *exit)
 {
     int32_t status = FWK_SUCCESS;
     uint32_t index = 0;
@@ -885,6 +897,12 @@ static uint32_t cli_get_command(
         if (c == '\x03') {
             *command_length = 0;
             return cli_debug_output();
+        }
+
+        /* If we received a Ctrl+d press, exit cli. */
+        if (c == '\x04') {
+            *exit = true;
+            return CLI_SUCCESS;
         }
 
         /* Ignoring non-printing characters except for a few we care about. */
@@ -1146,6 +1164,8 @@ static uint32_t cli_command_dispatch(char **args, cli_command_st *cmd)
         cli_print("  Displays this information.\n");
         cli_printf(NONE, "Ctrl+C\n");
         cli_print("  Displays debug output from running threads.\n");
+        cli_printf(NONE, "Ctrl+d\n");
+        cli_print("  Exit the CLI.\n");
         return FWK_SUCCESS;
     }
 
