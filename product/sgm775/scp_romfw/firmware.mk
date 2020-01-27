@@ -13,7 +13,10 @@ BS_FIRMWARE_HAS_MULTITHREADING := no
 BS_FIRMWARE_HAS_NOTIFICATION := yes
 BS_FIRMWARE_MODULE_HEADERS_ONLY := timer \
                                    power_domain
-BS_FIRMWARE_MODULES := ppu_v0 \
+BS_FIRMWARE_MODULES := sid \
+                       system_info \
+                       pcid \
+                       ppu_v0 \
                        ppu_v1 \
                        pl011 \
                        log \
@@ -25,6 +28,7 @@ BS_FIRMWARE_MODULES := ppu_v0 \
                        pik_clock \
                        clock \
                        sds
+
 BS_FIRMWARE_SOURCES := config_log.c \
                        config_timer.c \
                        config_msys_rom.c \
@@ -36,6 +40,8 @@ BS_FIRMWARE_SOURCES := config_log.c \
                        config_clock.c \
                        sgm775_core.c \
                        config_ppu_v0.c \
-                       config_ppu_v1.c
+                       config_ppu_v1.c \
+                       config_sid.c \
+                       config_system_info.c
 
 include $(BS_DIR)/firmware.mk
