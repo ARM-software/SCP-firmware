@@ -39,4 +39,8 @@ struct ssc_reg {
     FWK_R  uint32_t COMPID3;
 };
 
+enum ssc_part {
+    SSC_PART_SGM_775 = 0x790,
+};
+
 #endif /* SGM775_SSC_H */
