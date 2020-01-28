@@ -296,7 +296,7 @@ static int respond_to_caller(
 
 static int process_request(struct mod_i2c_dev_ctx *ctx, fwk_id_t event_id)
 {
-    int drv_status;
+    int drv_status = FWK_E_PARAM;
     const struct mod_i2c_driver_api *driver_api = ctx->driver_api;
     fwk_id_t driver_id = ctx->config->driver_id;
 
