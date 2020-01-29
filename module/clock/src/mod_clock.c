@@ -486,6 +486,10 @@ static int clock_process_pd_pre_transition_notification(
     status = fwk_notification_notify(
         &outbound_event,
         &(ctx->transition_pending_notifications_sent));
+    if (status != FWK_SUCCESS) {
+        pd_resp_params->status = status;
+        return status;
+    }
 
     if (ctx->transition_pending_notifications_sent > 0) {
         /* There are one or more subscribers that must respond */
