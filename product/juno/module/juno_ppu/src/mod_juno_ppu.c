@@ -90,13 +90,11 @@ static bool set_power_status_check(void *data)
     return ((params->reg->POWER_STATUS & PPU_REG_PPR_PSR) == params->mode);
 }
 
-static int get_ctx(fwk_id_t id, struct ppu_ctx **ppu_ctx)
+static void get_ctx(fwk_id_t id, struct ppu_ctx **ppu_ctx)
 {
     fwk_assert(fwk_module_is_valid_element_id(id));
 
-    *ppu_ctx = juno_ppu_ctx.ppu_ctx_table + fwk_id_get_element_idx(id);
-
-    return FWK_SUCCESS;
+    *ppu_ctx = &juno_ppu_ctx.ppu_ctx_table[fwk_id_get_element_idx(id)];
 }
 
 static int clear_pending_wakeup_irq(
@@ -258,9 +256,7 @@ static int pd_set_state(fwk_id_t ppu_id, unsigned int state)
     struct ppu_ctx *ppu_ctx;
     enum ppu_mode mode;
 
-    status = get_ctx(ppu_id, &ppu_ctx);
-    if (status != FWK_SUCCESS)
-        return status;
+    get_ctx(ppu_id, &ppu_ctx);
 
     if (!fwk_expect(state < MOD_PD_STATE_COUNT))
         return FWK_E_PARAM;
@@ -289,15 +285,12 @@ static int pd_set_state(fwk_id_t ppu_id, unsigned int state)
 
 static int pd_get_state(fwk_id_t ppu_id, unsigned int *state)
 {
-    int status;
     struct ppu_ctx *ppu_ctx;
 
     if (!fwk_expect(state != NULL))
         return FWK_E_PARAM;
 
-    status = get_ctx(ppu_id, &ppu_ctx);
-    if (status != FWK_SUCCESS)
-        return status;
+    get_ctx(ppu_id, &ppu_ctx);
 
     return get_state(ppu_ctx, state);
 }
@@ -307,9 +300,7 @@ static int pd_reset(fwk_id_t ppu_id)
     int status;
     struct ppu_ctx *ppu_ctx;
 
-    status = get_ctx(ppu_id, &ppu_ctx);
-    if (status != FWK_SUCCESS)
-        return status;
+    get_ctx(ppu_id, &ppu_ctx);
 
     status = ppu_set_state_and_wait(ppu_ctx, PPU_MODE_WARM_RESET);
     if (status != FWK_SUCCESS)
@@ -351,9 +342,7 @@ static int dbgsys_set_state(fwk_id_t ppu_id, unsigned int state)
     int status;
     struct ppu_ctx *ppu_ctx;
 
-    status = get_ctx(ppu_id, &ppu_ctx);
-    if (status != FWK_SUCCESS)
-        return status;
+    get_ctx(ppu_id, &ppu_ctx);
 
     if (state != MOD_PD_STATE_ON)
         return FWK_E_PWRSTATE;
@@ -389,9 +378,7 @@ static int css_set_state(fwk_id_t ppu_id, unsigned int state)
     int status;
     struct ppu_ctx *ppu_ctx;
 
-    status = get_ctx(ppu_id, &ppu_ctx);
-    if (status != FWK_SUCCESS)
-        return status;
+    get_ctx(ppu_id, &ppu_ctx);
 
     if (!fwk_expect(state < JUNO_POWER_DOMAIN_STATE_COUNT))
         return FWK_E_PARAM;
@@ -477,9 +464,7 @@ static int cluster_set_state(fwk_id_t ppu_id, unsigned int state)
     volatile uint32_t *snoop_ctrl;
     struct ppu_ctx *ppu_ctx;
 
-    status = get_ctx(ppu_id, &ppu_ctx);
-    if (status != FWK_SUCCESS)
-        return status;
+    get_ctx(ppu_id, &ppu_ctx);
 
     if ((uintptr_t)ppu_ctx->reg == PPU_BIG_SSTOP_BASE)
         snoop_ctrl = &SCP_CONFIG->BIG_SNOOP_CONTROL;
@@ -556,9 +541,7 @@ static int core_set_state(fwk_id_t ppu_id, unsigned int state)
     struct ppu_ctx *ppu_ctx;
     const struct mod_juno_ppu_element_config *dev_config;
 
-    status = get_ctx(ppu_id, &ppu_ctx);
-    if (status != FWK_SUCCESS)
-        return status;
+    get_ctx(ppu_id, &ppu_ctx);
 
     dev_config = ppu_ctx->config;
 
@@ -639,9 +622,7 @@ static int core_reset(fwk_id_t ppu_id)
     struct ppu_ctx *ppu_ctx;
     const struct mod_juno_ppu_element_config *dev_config;
 
-    status = get_ctx(ppu_id, &ppu_ctx);
-    if (status != FWK_SUCCESS)
-        return status;
+    get_ctx(ppu_id, &ppu_ctx);
 
     dev_config = ppu_ctx->config;
 
@@ -663,9 +644,7 @@ static int core_prepare_core_for_system_suspend(fwk_id_t ppu_id)
     const struct mod_juno_ppu_element_config *dev_config;
     const struct mod_juno_ppu_config *config;
 
-    status = get_ctx(ppu_id, &ppu_ctx);
-    if (status != FWK_SUCCESS)
-        return status;
+    get_ctx(ppu_id, &ppu_ctx);
 
     dev_config = ppu_ctx->config;
 
@@ -712,9 +691,7 @@ static int rom_set_state_and_wait(fwk_id_t ppu_id, unsigned int state)
     if (!fwk_expect(state < MOD_PD_STATE_COUNT))
         return FWK_E_PARAM;
 
-    status = get_ctx(ppu_id, &ppu_ctx);
-    if (status != FWK_SUCCESS)
-        return status;
+    get_ctx(ppu_id, &ppu_ctx);
 
     mode = pd_state_to_ppu_mode[state];
 
