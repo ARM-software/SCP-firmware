@@ -11,6 +11,7 @@
 enum scp_rddaniel_interrupt {
     SOC_WAKEUP0_IRQ            = 16, /* SoC Expansion Wakeup */
     TIMREFCLK_IRQ              = 33, /* REFCLK Physical Timer */
+    MHU_AP_SEC_IRQ             = 83, /* MHU secure irq bewteen SCP and AP */
 };
 
 #endif /* SCP_RDDANIEL_IRQ_H */
