@@ -5,10 +5,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <cli_platform.h>
+#include <fwk_list.h>
+#include <fwk_mm.h>
+
 #include <cli.h>
 #include <cli_config.h>
 #include <cli_fifo.h>
+#include <cli_platform.h>
 
 #include <stdarg.h>
 #include <stdbool.h>
@@ -55,6 +58,45 @@ size_t maxlen;
     for (e = s, n = 0; *e && n < maxlen; e++, n++)
         ;
     return n;
+}
+
+struct command_ctx {
+    cli_command_st cmd;
+    struct fwk_slist_node list_node;
+};
+
+/* A linked list used for extend the existing command at run time */
+static struct fwk_slist cli_commands_list;
+
+/* This array holds the common command available for all platforms */
+extern cli_command_st cli_commands[];
+
+int cli_command_register(cli_command_st new_cmd)
+{
+    struct command_ctx *c = fwk_mm_calloc(1, sizeof(struct command_ctx));
+    if (c == NULL)
+        return FWK_E_NOMEM;
+
+    c->cmd = new_cmd;
+    fwk_list_push_tail(&cli_commands_list, &c->list_node);
+
+    return FWK_SUCCESS;
+}
+
+int cli_command_init(void)
+{
+    uint32_t index;
+    int status;
+
+    fwk_list_init(&cli_commands_list);
+
+    /* Add the common commands to the commands linked list */
+    for (index = 0; cli_commands[index].command != 0; index++) {
+        status = cli_command_register(cli_commands[index]);
+        if (status != FWK_SUCCESS)
+            return status;
+    }
+    return FWK_SUCCESS;
 }
 
 /*
@@ -206,13 +248,11 @@ static uint32_t cli_split(
  *     char **args
  *       Pointer to an array of strings containing the arguments received from
  *       the terminal.
- *     cli_command_st *cmd
- *       Pointer to the array containing command structures.
  *   Return
  *     uint32_t: FWK_SUCCESS if it works, something else if it
  *     doesn't.
  */
-static uint32_t cli_command_dispatch(char **args, cli_command_st *cmd);
+static uint32_t cli_command_dispatch(char **args);
 
 /*
  * cli_debug_output
@@ -310,6 +350,10 @@ uint32_t cli_init(void)
     /* Initialize print buffer FIFO. */
     status = fifo_init(
         &cli_print_fifo, cli_print_fifo_buffer, CLI_CONFIG_PRINT_BUFFER_SIZE);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    status = cli_command_init();
     if (status != FWK_SUCCESS)
         return status;
 
@@ -687,7 +731,7 @@ static void cli_main(void const *argument)
             continue;
 
         /* Dispatching command for processing. */
-        status = cli_command_dispatch(cli_args, cli_commands);
+        status = cli_command_dispatch(cli_args);
         if (status != FWK_SUCCESS)
             cli_error_handler(status);
     }
@@ -902,7 +946,7 @@ static uint32_t cli_get_command(
         /* If we received a Ctrl+d press, exit cli. */
         if (c == '\x04') {
             *exit = true;
-            return CLI_SUCCESS;
+            return FWK_SUCCESS;
         }
 
         /* Ignoring non-printing characters except for a few we care about. */
@@ -1142,24 +1186,28 @@ static uint32_t cli_split(
     return FWK_SUCCESS;
 }
 
-static uint32_t cli_command_dispatch(char **args, cli_command_st *cmd)
+static uint32_t cli_command_dispatch(char **args)
 {
-    uint32_t cmd_index = 0;
     uint32_t index = 0;
     uint32_t num_args = 0;
     uint32_t status = FWK_SUCCESS;
+    struct fwk_slist *node = NULL;
+    struct command_ctx *cc = NULL;
+    bool command_found;
 
-    /* Checking pointers. */
-    if (args == 0 || cmd == 0)
+    /* Checking pointer. */
+    if (args == 0)
         return FWK_E_PARAM;
 
     /* Special case command: help. */
     if (cli_strncmp(args[0], "help", 5) == 0) {
-        for (index = 0; cli_commands[index].command != 0; index++) {
-            cli_printf(NONE, "%s\n", cli_commands[index].command);
-            cli_print(cli_commands[index].help);
-            cli_print("\n");
+        FWK_LIST_FOR_EACH(&cli_commands_list, node,
+            struct command_ctx, list_node, cc) {
+                cli_printf(NONE, "%s\n", cc->cmd.command);
+                cli_print(cc->cmd.help);
+                cli_print("\n");
         }
+
         cli_printf(NONE, "help\n");
         cli_print("  Displays this information.\n");
         cli_printf(NONE, "Ctrl+C\n");
@@ -1184,25 +1232,29 @@ static uint32_t cli_command_dispatch(char **args, cli_command_st *cmd)
     /* Searching for command handler. */
     /* Using strcmp here because each entry in args is guaranteed to be null
      * terminated by cli_split. */
-    for (cmd_index = 0; cmd[cmd_index].command != 0 &&
-         strcmp(args[0], cmd[cmd_index].command) != 0;
-         cmd_index++)
-        ;
-    if (cmd[cmd_index].command == 0)
+    command_found = false;
+    FWK_LIST_FOR_EACH(&cli_commands_list, node,
+        struct command_ctx, list_node, cc) {
+        if (strcmp(args[0], cc->cmd.command) == 0) {
+            command_found = true;
+            break;
+        }
+    }
+    if (!command_found)
         return FWK_E_SUPPORT;
-
 
     /* Handler found, if -h or --help is given just print it's help string and
      * return. */
-    if (cmd[cmd_index].ignore_help_flag == false) {
+    if (cc->cmd.ignore_help_flag == false) {
         for (index = 1;
              (args[index] != 0) && (cli_strncmp(args[index], "-h", 3) != 0) &&
              (cli_strncmp(args[index], "--help", 7) != 0);
              index++)
             ;
-        if ((args[index] != 0 || cmd[cmd_index].handler == 0) &&
-            cmd[cmd_index].help != 0) {
-            status = cli_print(cmd[cmd_index].help);
+
+        if ((args[index] != 0 || cc->cmd.handler == 0) &&
+            cc->cmd.help != 0) {
+            status = cli_print(cc->cmd.help);
             if (status != FWK_SUCCESS)
                 return status;
 
@@ -1220,8 +1272,8 @@ static uint32_t cli_command_dispatch(char **args, cli_command_st *cmd)
     /* Calling command handler. */
     /* args is incremented so the command just gets the arguments and not the
      * name of itself. */
-    if (cmd[cmd_index].handler != 0)
-        return cmd[cmd_index].handler(num_args, args);
+    if (cc->cmd.handler != 0)
+        return cc->cmd.handler(num_args, args);
     else
         return FWK_E_PARAM;
 }
