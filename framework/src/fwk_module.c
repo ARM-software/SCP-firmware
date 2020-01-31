@@ -20,8 +20,11 @@
 #endif
 
 #define EVENT_COUNT 64
-#define NOTIFICATION_COUNT 64
 #define BIND_ROUND_MAX 1
+
+#ifndef NOTIFICATION_COUNT
+#define NOTIFICATION_COUNT 64
+#endif
 
 /* Pre-runtime phase stages */
 enum module_stage {
