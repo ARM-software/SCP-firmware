@@ -65,6 +65,9 @@ The following parameters are mandatory:
   to yes, firmware will be built with multithreading support.
 * __BS_FIRMWARE_HAS_NOTIFICATION__ <yes|no> - Notification support. When set
   to yes, firmware will be built with notification support.
+* __BS_FIRMWARE_NOTIFICATION_COUNT__ < count > - When notification support is set
+  to yes, firmware can optinally specifiy the number notfication subscriptions
+  to be supported.
 * __BS_FIRMWARE_MODULES__ - The list of modules to be included and built into
   the firmware and any APIs to be omitted from each module.
 * __BS_FIRMWARE_MODULE_HEADERS_ONLY__ - The list of modules to have their header
@@ -176,13 +179,19 @@ Notification Support                                     {#section_notification}
 
 When building a firmware and its dependencies, the
 BS_FIRMWARE_HAS_NOTIFICATION parameter controls whether notification support
-is enabled or not.
+is enabled or not. If notification support is enabled, the firmware can define
+the number of notification subscriptions supported on the platform using
+BS_FIRMWARE_NOTIFICATION_COUNT parameter.
 
 When notification support is enabled, the following applies:
 
 * The BUILD_HAS_NOTIFICATION definition is defined for the units being built.
 * Notification specific APIs are made available to the modules via the
   framework components (see \ref GroupLibFramework).
+* The BUILD_NOTIFICATION_COUNT definition is defined if the optional
+  parameter BS_FIRMWARE_NOTIFICATION_COUNT is defined. It specified the
+  number of notification subscriptions supported and set to the value
+  defined by BS_FIRMWARE_NOTIFICATION_COUNT parameter.
 
 Definitions
 ===========

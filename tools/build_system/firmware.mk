@@ -204,6 +204,13 @@ else
 endif
 export BUILD_HAS_NOTIFICATION
 
+ifeq ($(BUILD_HAS_NOTIFICATION),yes)
+    ifdef BS_FIRMWARE_NOTIFICATION_COUNT
+        BUILD_NOTIFICATION_COUNT=$(BS_FIRMWARE_NOTIFICATION_COUNT)
+    endif
+    export BUILD_NOTIFICATION_COUNT
+endif
+
 # Add directories to the list of targets to build
 LIB_TARGETS_y += $(patsubst %,$(MODULES_DIR)/%/src, \
                             $(BUILD_STANDARD_MODULES))
