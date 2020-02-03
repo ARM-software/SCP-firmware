@@ -15,6 +15,7 @@ BS_FIRMWARE_MODULE_HEADERS_ONLY := \
 
 BS_FIRMWARE_MODULES := \
     sid \
+    system_info \
     pcid \
     ppu_v1 \
     pl011 \
@@ -40,6 +41,7 @@ BS_FIRMWARE_SOURCES := \
     config_pik_clock.c \
     config_css_clock.c \
     config_clock.c \
-    config_sid.c
+    config_sid.c \
+    config_system_info.c
 
 include $(BS_DIR)/firmware.mk

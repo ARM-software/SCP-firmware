@@ -11,6 +11,7 @@ BS_FIRMWARE_HAS_NOTIFICATION := yes
 
 BS_FIRMWARE_MODULES := \
     sid \
+    system_info \
     pcid \
     pl011 \
     log \
@@ -68,6 +69,7 @@ BS_FIRMWARE_SOURCES := \
     config_psu.c \
     config_mock_psu.c \
     config_dvfs.c \
-    config_sid.c
+    config_sid.c \
+    config_system_info.c
 
 include $(BS_DIR)/firmware.mk

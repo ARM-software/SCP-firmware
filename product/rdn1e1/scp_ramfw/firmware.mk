@@ -13,6 +13,7 @@ BS_FIRMWARE_MODULE_HEADERS_ONLY :=
 BS_FIRMWARE_MODULES := \
     armv7m_mpu \
     sid \
+    system_info \
     pcid \
     pl011 \
     log \
@@ -49,6 +50,7 @@ BS_FIRMWARE_MODULES := \
 BS_FIRMWARE_SOURCES := \
     config_system_power.c \
     config_sid.c \
+    config_system_info.c \
     rtx_config.c \
     config_armv7m_mpu.c \
     config_log.c \

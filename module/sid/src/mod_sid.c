@@ -12,10 +12,12 @@
 #include <fwk_mm.h>
 #include <mod_pcid.h>
 #include <mod_sid.h>
+#include <mod_system_info.h>
 #include <sid_reg.h>
 
 static bool initialized;
 static struct mod_sid_info info;
+static struct mod_system_info sys_info;
 
 int mod_sid_get_system_info(const struct mod_sid_info **system_info)
 {
@@ -28,6 +30,24 @@ int mod_sid_get_system_info(const struct mod_sid_info **system_info)
     return FWK_E_INIT;
 }
 
+static struct mod_system_info *get_driver_data(void)
+{
+    if (!initialized)
+        return NULL;
+
+    return &sys_info;
+}
+
+/*
+ * API for the use of system info module to get the driver data.
+ */
+static struct mod_system_info_get_driver_data_api get_sys_info_driver_data = {
+    .get_driver_data = get_driver_data
+};
+
+/*
+ * Framework Handlers
+ */
 static int sid_init(
     fwk_id_t module_id,
     unsigned int element_count,
@@ -98,9 +118,29 @@ static int sid_subsystem_init(
         info.name = fwk_module_get_name(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_SID, info.system_idx));
 
+        /* Populate the system info structure */
+        sys_info.product_id = info.system_part_number;
+        sys_info.config_id = info.config_number;
+        sys_info.chip_id = info.node_number;
+        sys_info.multi_chip_mode = info.multi_chip_mode;
+        sys_info.name = info.name;
+
         initialized = true;
     }
 
+    return FWK_SUCCESS;
+}
+
+static int sid_process_bind_request(fwk_id_t requester_id, fwk_id_t targer_id,
+        fwk_id_t api_id, const void **api)
+{
+    switch (fwk_id_get_api_idx(api_id)) {
+    case MOD_SID_SYSTEM_INFO_DRIVER_DATA_API_IDX:
+        *api = &get_sys_info_driver_data;
+        break;
+    default:
+        return FWK_E_PARAM;
+    }
     return FWK_SUCCESS;
 }
 
@@ -109,4 +149,6 @@ const struct fwk_module module_sid = {
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = sid_init,
     .element_init = sid_subsystem_init,
+    .process_bind_request = sid_process_bind_request,
+    .api_count = MOD_SID_API_COUNT,
 };
