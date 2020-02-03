@@ -104,6 +104,14 @@ struct mod_sid_subsystem_config {
 int mod_sid_get_system_info(const struct mod_sid_info **system_info);
 
 /*!
+ * \brief Module API indices.
+ */
+enum mod_sid_api_idx {
+    MOD_SID_SYSTEM_INFO_DRIVER_DATA_API_IDX,
+    MOD_SID_API_COUNT
+};
+
+/*!
  * @}
  */
 

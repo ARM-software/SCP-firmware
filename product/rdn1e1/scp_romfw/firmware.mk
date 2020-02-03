@@ -14,6 +14,7 @@ BS_FIRMWARE_MODULE_HEADERS_ONLY := \
 
 BS_FIRMWARE_MODULES := \
     sid \
+    system_info \
     pcid \
     pl011 \
     log \
@@ -23,6 +24,7 @@ BS_FIRMWARE_MODULES := \
 
 BS_FIRMWARE_SOURCES := \
     config_sid.c \
+    config_system_info.c \
     config_log.c \
     config_rdn1e1_rom.c \
     config_gtimer.c \
