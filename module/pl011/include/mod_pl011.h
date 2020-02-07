@@ -48,6 +48,20 @@ struct mod_pl011_device_config {
 };
 
 /*!
+ * \brief Set the baud rate of the PL011 device
+ *
+ * \param baud_rate_bps The desired baudrate in bps
+ * \param clock_rate_hz The clock rate as specified in the config in MHz
+ * \param reg_ptr Pointer to the PL011 register to use
+ *
+ * \retval FWK_E_PARAM if one of the given parameters is invalid
+ * \retval FWK_E_RANGE if a calculated value from the parameters is out of range
+ * \retval FWK_SUCCESS if operation is successful
+ */
+int mod_pl011_set_baud_rate(unsigned int baud_rate_bps, uint64_t clock_rate_hz,
+    uintptr_t reg_ptr);
+
+/*!
  * @}
  */
 

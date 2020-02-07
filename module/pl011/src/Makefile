@@ -8,4 +8,8 @@
 BS_LIB_NAME := "PL011"
 BS_LIB_SOURCES = mod_pl011.c
 
+ifeq ($(BUILD_HAS_DEBUGGER),yes)
+    BS_LIB_SOURCES += debug_uart.c
+endif
+
 include $(BS_DIR)/lib.mk
