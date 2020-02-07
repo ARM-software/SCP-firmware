@@ -45,13 +45,15 @@ static struct pl011_reg *get_device_reg(fwk_id_t device_id)
  * For details on the constants and equations used to calculate the baud rate
  * settings, please consult the PL011 TRM.
  */
-static int set_baud_rate(unsigned int baud_rate_bps, uint64_t clock_rate_hz,
-    struct pl011_reg *reg)
+int mod_pl011_set_baud_rate(unsigned int baud_rate_bps, uint64_t clock_rate_hz,
+    uintptr_t reg_ptr)
 {
     uint32_t divisor_integer;
     uint32_t divisor_fractional;
     uint32_t divisor;
     uint32_t clock_rate_x4;
+
+    struct pl011_reg *reg = (struct pl011_reg *)reg_ptr;
 
     assert(reg);
 
@@ -171,9 +173,9 @@ static int pl011_element_init(fwk_id_t element_id, unsigned int unused,
     if (reg == NULL)
         return FWK_E_DATA;
 
-    status = set_baud_rate(config->baud_rate_bps,
+    status = mod_pl011_set_baud_rate(config->baud_rate_bps,
                            config->clock_rate_hz,
-                           reg);
+                           config->reg_base);
     if (status != FWK_SUCCESS)
         return status;
 
