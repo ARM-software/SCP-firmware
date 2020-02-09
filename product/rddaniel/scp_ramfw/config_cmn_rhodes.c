@@ -30,22 +30,22 @@
 #define NODE_ID_SBSX 0
 
 static const unsigned int snf_table[] = {
-    MEM_CNTRL0_ID, /* Maps to HN-F logical node 0 */
-    MEM_CNTRL0_ID, /* Maps to HN-F logical node 1 */
-    MEM_CNTRL0_ID, /* Maps to HN-F logical node 2 */
-    MEM_CNTRL0_ID, /* Maps to HN-F logical node 3 */
-    MEM_CNTRL1_ID, /* Maps to HN-F logical node 0 */
-    MEM_CNTRL1_ID, /* Maps to HN-F logical node 1 */
-    MEM_CNTRL1_ID, /* Maps to HN-F logical node 2 */
-    MEM_CNTRL1_ID, /* Maps to HN-F logical node 3 */
-    MEM_CNTRL2_ID, /* Maps to HN-F logical node 0 */
-    MEM_CNTRL2_ID, /* Maps to HN-F logical node 1 */
-    MEM_CNTRL2_ID, /* Maps to HN-F logical node 2 */
-    MEM_CNTRL2_ID, /* Maps to HN-F logical node 3 */
-    MEM_CNTRL3_ID, /* Maps to HN-F logical node 0 */
-    MEM_CNTRL3_ID, /* Maps to HN-F logical node 1 */
-    MEM_CNTRL3_ID, /* Maps to HN-F logical node 2 */
-    MEM_CNTRL3_ID, /* Maps to HN-F logical node 3 */
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 0  */
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 1  */
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 2  */
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 3  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 4  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 5  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 6  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 7  */
+    MEM_CNTRL2_ID, /* Maps to HN-F logical node 8  */
+    MEM_CNTRL2_ID, /* Maps to HN-F logical node 9  */
+    MEM_CNTRL2_ID, /* Maps to HN-F logical node 10 */
+    MEM_CNTRL2_ID, /* Maps to HN-F logical node 11 */
+    MEM_CNTRL3_ID, /* Maps to HN-F logical node 12 */
+    MEM_CNTRL3_ID, /* Maps to HN-F logical node 13 */
+    MEM_CNTRL3_ID, /* Maps to HN-F logical node 14 */
+    MEM_CNTRL3_ID, /* Maps to HN-F logical node 15 */
 };
 
 static const struct mod_cmn_rhodes_mem_region_map mmap[] = {
