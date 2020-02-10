@@ -45,14 +45,20 @@ struct smt_channel_ctx {
     /* Driver entity identifier */
     fwk_id_t driver_id;
 
-    /* SCMI module service bound to the channel */
-    fwk_id_t scmi_service_id;
+    /* service bound to the channel */
+    fwk_id_t service_id;
 
     /* Driver API */
     struct mod_smt_driver_api *driver_api;
 
-    /* SCMI service API */
-    struct mod_scmi_from_transport_api *scmi_api;
+    /* service APIs to signal incoming messages or errors */
+    union signal_apis {
+        struct mod_scmi_from_transport_api *scmi_api;
+        struct mod_smt_from_transport_api *signal_api;
+    } smt_signal;
+
+    /* Flag indicating the service bound to the channel is of type SCMI */
+    bool is_scmi_channel;
 
     /* Flag indicating the mailbox is ready */
     bool smt_mailbox_ready;
@@ -228,6 +234,18 @@ static const struct mod_scmi_to_transport_api smt_mod_scmi_to_transport_api = {
 };
 
 /*
+ * The following API is intended to be used for NON SCMI messages.
+ */
+static const struct mod_smt_to_transport_api smt_mod_smt_to_transport_api = {
+    .get_secure = smt_get_secure,
+    .get_max_payload_size = smt_get_max_payload_size,
+    .get_message_header = smt_get_message_header,
+    .get_payload = smt_get_payload,
+    .write_payload = smt_write_payload,
+    .respond = smt_respond,
+};
+
+/*
  * Driver handler API
  */
 static int smt_slave_handler(struct smt_channel_ctx *channel_ctx)
@@ -276,17 +294,29 @@ static int smt_slave_handler(struct smt_channel_ctx *channel_ctx)
          > channel_ctx->max_payload_size)) {
 
         out->status |= MOD_SMT_MAILBOX_STATUS_ERROR_MASK;
-        return channel_ctx->scmi_api->signal_error(
-                channel_ctx->scmi_service_id);
+
+        if (channel_ctx->is_scmi_channel)
+            status = channel_ctx->smt_signal.scmi_api->signal_error(
+                         channel_ctx->service_id);
+        else
+            status = channel_ctx->smt_signal.signal_api->signal_error(
+                         channel_ctx->service_id);
+
+        return status;
     }
 
     /* Copy payload from shared memory to read buffer */
     payload_size = in->length - sizeof(in->message_header);
     memcpy(in->payload, memory->payload, payload_size);
 
-    /* Let SCMI handle the message */
-    status =
-        channel_ctx->scmi_api->signal_message(channel_ctx->scmi_service_id);
+    /* Let subscribed service handle the message */
+    if (channel_ctx->is_scmi_channel)
+        status = channel_ctx->smt_signal.scmi_api->signal_message(
+                    channel_ctx->service_id);
+    else
+        status = channel_ctx->smt_signal.signal_api->signal_message(
+                    channel_ctx->service_id);
+
     if (status != FWK_SUCCESS)
         return FWK_E_HANDLER;
 
@@ -388,9 +418,20 @@ static int smt_bind(fwk_id_t id, unsigned int round)
 
     if ((round == 1) && fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
         channel_ctx = &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(id)];
-        status = fwk_module_bind(channel_ctx->scmi_service_id,
-            FWK_ID_API(FWK_MODULE_IDX_SCMI, MOD_SCMI_API_IDX_TRANSPORT),
-            &channel_ctx->scmi_api);
+
+        if (fwk_id_is_equal(fwk_id_build_module_id(channel_ctx->service_id),
+                        fwk_module_id_scmi)) {
+            status = fwk_module_bind(channel_ctx->service_id,
+                                    FWK_ID_API(FWK_MODULE_IDX_SCMI,
+                                    MOD_SCMI_API_IDX_TRANSPORT),
+                                    &channel_ctx->smt_signal.scmi_api);
+            channel_ctx->is_scmi_channel = true;
+        } else {
+            status = fwk_module_bind(channel_ctx->service_id,
+                                    channel_ctx->config->signal_api_id,
+                                    &channel_ctx->smt_signal.signal_api);
+            channel_ctx->is_scmi_channel = false;
+        }
         if (status != FWK_SUCCESS)
             return status;
     }
@@ -445,7 +486,13 @@ static int smt_process_bind_request(fwk_id_t source_id,
     case MOD_SMT_API_IDX_SCMI_TRANSPORT:
         /* SCMI transport API */
         *api = &smt_mod_scmi_to_transport_api;
-        channel_ctx->scmi_service_id = source_id;
+        channel_ctx->service_id = source_id;
+        break;
+
+    case MOD_SMT_API_IDX_TO_TRANSPORT:
+        /* SMT transport API */
+        *api = &smt_mod_smt_to_transport_api;
+        channel_ctx->service_id = source_id;
         break;
 
     default:
