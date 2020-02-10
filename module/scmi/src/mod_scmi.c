@@ -153,6 +153,17 @@ static uint16_t read_token(uint32_t message_header)
 /*
  * Transport entity -> SCMI module
  */
+static int signal_error(fwk_id_t service_id)
+{
+    fwk_id_t transport_id;
+    struct scmi_service_ctx *ctx;
+
+    ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(service_id)];
+    transport_id = ctx->transport_id;
+
+    return ctx->respond(transport_id, &(int32_t){SCMI_PROTOCOL_ERROR},
+                        sizeof(int32_t));
+}
 
 static int signal_message(fwk_id_t service_id)
 {
@@ -166,7 +177,8 @@ static int signal_message(fwk_id_t service_id)
 }
 
 static const struct mod_scmi_from_transport_api mod_scmi_from_transport_api = {
-    .signal_message = signal_message
+    .signal_error = signal_error,
+    .signal_message = signal_message,
 };
 
 /*
