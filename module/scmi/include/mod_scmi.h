@@ -249,6 +249,23 @@ struct mod_scmi_to_transport_api {
  */
 struct mod_scmi_from_transport_api {
     /*!
+     * \brief Signal to a SCMI service that a incoming message for it has
+     * incorrect length and payload size and so the incoming message has been
+     * dropped.
+     *
+     * \note Subscribed SCMI service should call the respond API to free the
+     *       channel.
+     *
+     * \param service_id service identifier.
+     *
+     * \retval FWK_SUCCESS The operation succeeded.
+     * \retval FWK_E_PARAM The service_id parameter is invalid.
+     * \return One of the standard error codes for implementation-defined
+     * errors.
+     */
+    int (*signal_error)(fwk_id_t service_id);
+
+    /*!
      * \brief Signal to a service that a message is incoming.
      *
      * \param service_id SCMI service identifier.

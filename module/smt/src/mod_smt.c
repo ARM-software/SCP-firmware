@@ -276,8 +276,8 @@ static int smt_slave_handler(struct smt_channel_ctx *channel_ctx)
          > channel_ctx->max_payload_size)) {
 
         out->status |= MOD_SMT_MAILBOX_STATUS_ERROR_MASK;
-        return smt_respond(channel_ctx->id, &(int32_t){SCMI_PROTOCOL_ERROR},
-                           sizeof(int32_t));
+        return channel_ctx->scmi_api->signal_error(
+                channel_ctx->scmi_service_id);
     }
 
     /* Copy payload from shared memory to read buffer */
