@@ -110,19 +110,32 @@ static const struct mod_cmn_rhodes_mem_region_map mmap[] = {
     },
 };
 
+static const struct fwk_element cmn_rhodes_device_table[] = {
+    [0] = {
+        .name = "Chip-0 CMN-Rhodes Mesh Config",
+        .data = &((struct mod_cmn_rhodes_config) {
+                .base = SCP_CMN_RHODES_BASE,
+                .mesh_size_x = 3,
+                .mesh_size_y = 5,
+                .hnd_node_id = NODE_ID_HND,
+                .snf_table = snf_table,
+                .snf_count = FWK_ARRAY_SIZE(snf_table),
+                .mmap_table = mmap,
+                .mmap_count = FWK_ARRAY_SIZE(mmap),
+                .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
+                    CLOCK_IDX_INTERCONNECT),
+                .hnf_cal_mode = true,
+            })
+    },
+    [1] = { 0 }
+};
+
+static const struct fwk_element *cmn_rhodes_get_device_table(fwk_id_t module_id)
+{
+    return cmn_rhodes_device_table;
+}
+
 const struct fwk_module_config config_cmn_rhodes = {
-    .get_element_table = NULL,
-    .data = &((struct mod_cmn_rhodes_config) {
-        .base = SCP_CMN_RHODES_BASE,
-        .mesh_size_x = 3,
-        .mesh_size_y = 5,
-        .hnd_node_id = NODE_ID_HND,
-        .snf_table = snf_table,
-        .snf_count = FWK_ARRAY_SIZE(snf_table),
-        .mmap_table = mmap,
-        .mmap_count = FWK_ARRAY_SIZE(mmap),
-        .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
-            CLOCK_IDX_INTERCONNECT),
-        .hnf_cal_mode = true,
-    }),
+    .get_element_table = cmn_rhodes_get_device_table,
+    .data = NULL
 };

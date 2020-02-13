@@ -18,7 +18,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-static struct cmn_rhodes_ctx {
+struct cmn_rhodes_device_ctx {
     const struct mod_cmn_rhodes_config *config;
 
     struct cmn_rhodes_cfgm_reg *root;
@@ -44,7 +44,6 @@ static struct cmn_rhodes_ctx {
     struct cmn_rhodes_rnsam_reg **internal_rnsam_table;
 
     bool initialized;
-} *ctx;
+};
 
-
-#endif /* INTERNAL_CMN600_CTX_H */
+#endif /* INTERNAL_CMN_RHODES_CTX_H */
