@@ -28,7 +28,7 @@
 
 #define MOD_NAME "[CMN_RHODES] "
 
-static struct cmn_rhodes_ctx *ctx;
+static struct cmn_rhodes_device_ctx *ctx;
 
 /* Chip Information */
 static struct mod_system_info_get_info_api *system_info_api;
@@ -500,36 +500,48 @@ cmn_rhodes_observer_api = {
  * Framework handlers
  */
 
-static int cmn_rhodes_init(fwk_id_t module_id, unsigned int element_count,
+static int cmn_rhodes_init(fwk_id_t module_id, unsigned int device_count,
     const void *data)
 {
-    const struct mod_cmn_rhodes_config *config = data;
-
-    /* No elements support */
-    if (element_count > 0)
+    /* Atleast one device should be passed as element */
+    if (device_count == 0)
         return FWK_E_DATA;
 
-    /* Allocate space for the context */
-    ctx = fwk_mm_calloc(1, sizeof(*ctx));
+    /* Allocate space for the device context table */
+    ctx = fwk_mm_calloc(device_count, sizeof(struct cmn_rhodes_device_ctx));
 
-    if (config->base == 0)
+    return FWK_SUCCESS;
+}
+
+static int cmn_rhodes_device_init(fwk_id_t element_id,
+                                  unsigned int element_count,
+                                  const void *data)
+{
+    struct cmn_rhodes_device_ctx *device_ctx;
+
+    assert(data != NULL);
+
+    device_ctx = ctx + fwk_id_get_element_idx(element_id);
+    device_ctx->config = data;
+
+    if (device_ctx->config->base == 0)
         return FWK_E_DATA;
 
-    if ((config->mesh_size_x == 0) ||
-        (config->mesh_size_x > CMN_RHODES_MESH_X_MAX))
+    if ((device_ctx->config->mesh_size_x == 0) ||
+        (device_ctx->config->mesh_size_x > CMN_RHODES_MESH_X_MAX))
         return FWK_E_DATA;
 
-    if ((config->mesh_size_y == 0) ||
-        (config->mesh_size_y > CMN_RHODES_MESH_Y_MAX))
+    if ((device_ctx->config->mesh_size_y == 0) ||
+        (device_ctx->config->mesh_size_y > CMN_RHODES_MESH_Y_MAX))
         return FWK_E_DATA;
 
-    if (config->snf_count > CMN_RHODES_HNF_CACHE_GROUP_ENTRIES_MAX)
+    if (device_ctx->config->snf_count > CMN_RHODES_HNF_CACHE_GROUP_ENTRIES_MAX)
         return FWK_E_DATA;
 
-    ctx->root = get_root_node(config->base, config->hnd_node_id,
-        config->mesh_size_x, config->mesh_size_y);
-
-    ctx->config = config;
+    device_ctx->root = get_root_node(device_ctx->config->base,
+                                     device_ctx->config->hnd_node_id,
+                                     device_ctx->config->mesh_size_x,
+                                     device_ctx->config->mesh_size_y);
 
     return FWK_SUCCESS;
 }
@@ -538,15 +550,13 @@ static int cmn_rhodes_bind(fwk_id_t id, unsigned int round)
 {
     int status;
 
-    /* Use second round only (round numbering is zero-indexed) */
-    if (round == 1) {
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         /* Bind to system info module to obtain multi-chip info */
         status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_SYSTEM_INFO),
                                  FWK_ID_API(FWK_MODULE_IDX_SYSTEM_INFO,
                                             MOD_SYSTEM_INFO_GET_API_IDX),
                                  &system_info_api);
-        if (status != FWK_SUCCESS)
-            return FWK_E_PANIC;
+        return status;
     }
 
     return FWK_SUCCESS;
@@ -563,10 +573,9 @@ int cmn_rhodes_start(fwk_id_t id)
 {
     int status;
 
-    if (fwk_id_is_equal(ctx->config->clock_id, FWK_ID_NONE)) {
-        cmn_rhodes_setup();
+    /* No need to do anything for element */
+    if (!fwk_module_is_valid_element_id(id))
         return FWK_SUCCESS;
-    }
 
     status = system_info_api->get_system_info(&system_info);
     if (status == FWK_SUCCESS) {
@@ -574,8 +583,20 @@ int cmn_rhodes_start(fwk_id_t id)
         multi_chip_mode = system_info->multi_chip_mode;
     }
 
+    /* No need to anything for other elements */
+    if (fwk_id_get_element_idx(id) != chip_id)
+        return FWK_SUCCESS;
+
+    /* Pickup the context based on the chip_id */
+    ctx = ctx + fwk_id_get_element_idx(id);
+
     FWK_LOG_INFO(MOD_NAME "Multichip mode: %d Chip ID: %d\n",
         multi_chip_mode, chip_id);
+
+    if (fwk_id_is_equal(ctx->config->clock_id, FWK_ID_NONE)) {
+        cmn_rhodes_setup();
+        return FWK_SUCCESS;
+    }
 
     /* Register the module for clock state notifications */
     return fwk_notification_subscribe(mod_clock_notification_id_state_changed,
@@ -588,8 +609,9 @@ static int cmn_rhodes_process_notification(
 {
     struct clock_notification_params *params;
 
-    assert(fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed));
-    assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
+    fwk_assert(fwk_id_is_equal(event->id,
+                               mod_clock_notification_id_state_changed));
+    fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT));
 
     params = (struct clock_notification_params *)event->params;
     if (params->new_state == MOD_CLOCK_STATE_RUNNING)
@@ -603,6 +625,7 @@ const struct fwk_module module_cmn_rhodes = {
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_CMN_RHODES_API_COUNT,
     .init = cmn_rhodes_init,
+    .element_init = cmn_rhodes_device_init,
     .bind = cmn_rhodes_bind,
     .start = cmn_rhodes_start,
     .process_bind_request = cmn_rhodes_process_bind_request,
