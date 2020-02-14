@@ -12,6 +12,7 @@
 #include <mod_clock.h>
 #include <mod_cmn_rhodes.h>
 #include <mod_ppu_v1.h>
+#include <mod_system_info.h>
 
 #include <fwk_assert.h>
 #include <fwk_event.h>
@@ -28,6 +29,14 @@
 #define MOD_NAME "[CMN_RHODES] "
 
 static struct cmn_rhodes_ctx *ctx;
+
+/* Chip Information */
+static struct mod_system_info_get_info_api *system_info_api;
+static const struct mod_system_info *system_info;
+
+/* Initialize default for multi-chip mode and chip-id */
+static unsigned int chip_id;
+static bool multi_chip_mode;
 
 static void process_node_hnf(struct cmn_rhodes_hnf_reg *hnf)
 {
@@ -525,6 +534,24 @@ static int cmn_rhodes_init(fwk_id_t module_id, unsigned int element_count,
     return FWK_SUCCESS;
 }
 
+static int cmn_rhodes_bind(fwk_id_t id, unsigned int round)
+{
+    int status;
+
+    /* Use second round only (round numbering is zero-indexed) */
+    if (round == 1) {
+        /* Bind to system info module to obtain multi-chip info */
+        status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_SYSTEM_INFO),
+                                 FWK_ID_API(FWK_MODULE_IDX_SYSTEM_INFO,
+                                            MOD_SYSTEM_INFO_GET_API_IDX),
+                                 &system_info_api);
+        if (status != FWK_SUCCESS)
+            return FWK_E_PANIC;
+    }
+
+    return FWK_SUCCESS;
+}
+
 static int cmn_rhodes_process_bind_request(fwk_id_t requester_id,
     fwk_id_t target_id, fwk_id_t api_id, const void **api)
 {
@@ -534,10 +561,21 @@ static int cmn_rhodes_process_bind_request(fwk_id_t requester_id,
 
 int cmn_rhodes_start(fwk_id_t id)
 {
+    int status;
+
     if (fwk_id_is_equal(ctx->config->clock_id, FWK_ID_NONE)) {
         cmn_rhodes_setup();
         return FWK_SUCCESS;
     }
+
+    status = system_info_api->get_system_info(&system_info);
+    if (status == FWK_SUCCESS) {
+        chip_id = system_info->chip_id;
+        multi_chip_mode = system_info->multi_chip_mode;
+    }
+
+    FWK_LOG_INFO(MOD_NAME "Multichip mode: %d Chip ID: %d\n",
+        multi_chip_mode, chip_id);
 
     /* Register the module for clock state notifications */
     return fwk_notification_subscribe(mod_clock_notification_id_state_changed,
@@ -565,6 +603,7 @@ const struct fwk_module module_cmn_rhodes = {
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_CMN_RHODES_API_COUNT,
     .init = cmn_rhodes_init,
+    .bind = cmn_rhodes_bind,
     .start = cmn_rhodes_start,
     .process_bind_request = cmn_rhodes_process_bind_request,
     .process_notification = cmn_rhodes_process_notification,
