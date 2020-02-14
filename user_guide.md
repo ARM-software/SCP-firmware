@@ -12,7 +12,7 @@ Running SCP-firmware on Fixed Virtual Platform (FVP) models requires at least
 12GB of available memory. A multicore CPU is highly recommended to maintain
 smooth operation.
 
-This software has been tested on Ubuntu 16.04 LTS (64-bit).
+This software has been tested on Ubuntu 18.04 LTS (64-bit).
 
 ## Prerequisites
 
@@ -20,20 +20,21 @@ To build the SCP/MCP firmware for a target product, the following tools are
 required:
 
 - [GNU Make](https://www.gnu.org/software/make/) (*4.2* or later)
-- [Python 3](https://www.python.org/download/releases/3.0/) (*3.5.0* or later)
+- [Python 3](https://www.python.org/downloads/release/python-369/) (*3.6.9* or
+    later)
 
 Additionally, the firmware may be built using one of two compilers:
 - [GNU Arm Embedded Toolchain](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
-    (*6-2017-q2-update* or later)
+    (*9-2019-q4* or later)
 - [Arm Compiler 6](https://developer.arm.com/tools-and-software/embedded/arm-compiler/downloads/version-6)
-    (*6.10* or later)
+    (*6.13* or later)
 
 The following tools are recommended but not required:
 
-- [Doxygen](http://www.doxygen.nl/) (*1.8.0* or later): Required to generate
+- [Doxygen](http://www.doxygen.nl/) (*1.8.13* or later): Required to generate
     supporting documentation
-- [GNU GCC](https://gcc.gnu.org/) (*6.0* or later): Required to build framework
-    tests that run on the host system
+- [GNU GCC](https://gcc.gnu.org/) (*7.4.0* or later): Required to build
+    framework tests that run on the host system
 
 If building for an Arm FVP platform, you will need to ensure you have
 [the relevant FVP](https://developer.arm.com/products/system-design/fixed-virtual-platforms).
@@ -43,7 +44,7 @@ The FVPs also have a soft dependency on the following tools:
 - [xterm](https://invisible-island.net/xterm/): Required to view UART output
 
 The instructions provided as a part of this guide assume you have [Git](https://git-scm.com/)
-(*2.13* or later) available in your environment.
+(*2.17.1* or later) available in your environment.
 
 Installing these prerequisites can be done on any standard Debian-based system
 with the following:
