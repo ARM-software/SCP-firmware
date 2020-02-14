@@ -47,6 +47,7 @@ static void process_node_hnf(struct cmn_rhodes_hnf_reg *hnf)
     unsigned int region_idx;
     unsigned int region_sub_count = 0;
     static unsigned int cal_mode_factor = 1;
+    uint64_t base;
     const struct mod_cmn_rhodes_mem_region_map *region;
     const struct mod_cmn_rhodes_config *config = ctx->config;
 
@@ -108,11 +109,15 @@ static void process_node_hnf(struct cmn_rhodes_hnf_reg *hnf)
         if (region->type != MOD_CMN_RHODES_REGION_TYPE_SYSCACHE_SUB)
             continue;
 
+        /* Offset the base with chip address space base on chip-id */
+        base = ((uint64_t) (ctx->config->chip_addr_space * chip_id)) +
+               region->base;
+
         /* Configure sub-region entry */
         hnf->SAM_MEMREGION[region_sub_count] = region->node_id |
             (sam_encode_region_size(region->size) <<
              CMN_RHODES_HNF_SAM_MEMREGION_SIZE_POS) |
-            ((region->base / SAM_GRANULARITY) <<
+            ((base / SAM_GRANULARITY) <<
              CMN_RHODES_HNF_SAM_MEMREGION_BASE_POS) |
             CMN_RHODES_HNF_SAM_MEMREGION_VALID;
 
@@ -307,6 +312,7 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
     unsigned int region_io_count = 0;
     unsigned int region_sys_count = 0;
     unsigned int scg_regions_enabled[MAX_SCG_COUNT] = {0, 0, 0, 0};
+    uint64_t base;
     const struct mod_cmn_rhodes_mem_region_map *region;
     const struct mod_cmn_rhodes_config *config = ctx->config;
 
@@ -315,10 +321,14 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
     for (region_idx = 0; region_idx < config->mmap_count; region_idx++) {
         region = &config->mmap_table[region_idx];
 
+        /* Offset the base with chip address space base on chip-id */
+        base = ((uint64_t)(ctx->config->chip_addr_space * chip_id) +
+                region->base);
+
         FWK_LOG_INFO(
             MOD_NAME "  [0x%" PRIx64 " - 0x%" PRIx64 "] %s",
-            region->base,
-            region->base + region->size - 1,
+            base,
+            base + region->size - 1,
             mmap_type_name[region->type]);
 
         switch (region->type) {
@@ -327,7 +337,7 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
              * Configure memory region
              */
             configure_region(&rnsam->NON_HASH_MEM_REGION[region_io_count],
-                             region->base,
+                             base,
                              region->size,
                              SAM_NODE_TYPE_HN_I);
 
@@ -354,7 +364,7 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
              * Configure memory region
              */
             configure_region(&rnsam->SYS_CACHE_GRP_REGION[region_sys_count],
-                             region->base,
+                             base,
                              region->size,
                              SAM_NODE_TYPE_HN_F);
 

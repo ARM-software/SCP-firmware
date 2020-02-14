@@ -122,6 +122,7 @@ static const struct fwk_element cmn_rhodes_device_table[] = {
                 .snf_count = FWK_ARRAY_SIZE(snf_table),
                 .mmap_table = mmap,
                 .mmap_count = FWK_ARRAY_SIZE(mmap),
+                .chip_addr_space = UINT64_C(4) * FWK_TIB,
                 .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
                     CLOCK_IDX_INTERCONNECT),
                 .hnf_cal_mode = true,
