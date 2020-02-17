@@ -297,6 +297,40 @@ def main():
     result = subprocess.call(cmd, shell=True)
     results.append(('Product synquacer debug build (ARM)', result))
 
+    banner('Test building sgm776 product')
+
+    cmd = \
+        'CC=arm-none-eabi-gcc ' \
+        'PRODUCT=sgm776 ' \
+        'MODE=release ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product sgm776 release build (GCC)', result))
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=sgm776 ' \
+        'MODE=release ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product sgm776 release build (ARM)', result))
+
+    cmd = \
+        'CC=arm-none-eabi-gcc ' \
+        'PRODUCT=sgm776 ' \
+        'MODE=debug ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product sgm776 debug build (GCC)', result))
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=sgm776 ' \
+        'MODE=debug ' \
+        'make clean all'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product sgm776 debug build (ARM)', result))
+
     banner('Tests summary')
 
     total_success = 0

@@ -1,0 +1,96 @@
+/*
+ * Arm SCP/MCP Software
+ * Copyright (c) 2017-2020, Arm Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+#ifndef SGM776_MMAP_H
+#define SGM776_MMAP_H
+
+#include <stdint.h>
+
+/*
+ * Top-level base addresses
+ */
+#define EXPANSION0_BASE           UINT32_C(0x40000000)
+#define PERIPHERAL_BASE           UINT32_C(0x44000000)
+#define POWER_PERIPHERAL_BASE     UINT32_C(0x50000000)
+#define SYS0_BASE                 UINT32_C(0x60000000)
+#define SYS1_BASE                 UINT32_C(0xA0000000)
+#define PPB_INTERNAL_BASE         UINT32_C(0xE0000000)
+#define PPB_EXTERNAL_BASE         UINT32_C(0xE0040000)
+#define EXPANSION1_BASE           UINT32_C(0xE0100000)
+
+/*
+ * Peripherals
+ */
+#define REFCLK_CNTCTL_BASE        (PERIPHERAL_BASE + 0x0000)
+#define REFCLK_CNTBASE0_BASE      (PERIPHERAL_BASE + 0x1000)
+#define MHU_RECV_NS_BASE          (PERIPHERAL_BASE + 0x2000)
+#define MHU_SEND_NS_BASE          (PERIPHERAL_BASE + 0x3000)
+#define MHU_RECV_S_BASE           (PERIPHERAL_BASE + 0x4000)
+#define MHU_SEND_S_BASE           (PERIPHERAL_BASE + 0x5000)
+#define WDOG_BASE                 (PERIPHERAL_BASE + 0x6000)
+#define S32K_CNTCONTROL_BASE      (PERIPHERAL_BASE + 0x7000)
+#define S32K_CNTCTL_BASE          (PERIPHERAL_BASE + 0x8000)
+#define S32K_CNTBASE0_BASE        (PERIPHERAL_BASE + 0x9000)
+#define CS_CNTCONTROL_BASE        (PERIPHERAL_BASE + 0xA000)
+
+/*
+ * Power control peripherals
+ */
+#define PIK_SCP_BASE              (POWER_PERIPHERAL_BASE + 0x000000)
+#define PIK_DEBUG_BASE            (POWER_PERIPHERAL_BASE + 0x020000)
+#define SENSOR_DEBUG_BASE         (POWER_PERIPHERAL_BASE + 0x030000)
+#define PIK_SYSTEM_BASE           (POWER_PERIPHERAL_BASE + 0x040000)
+#define SENSOR_SYSTEM_BASE        (POWER_PERIPHERAL_BASE + 0x050000)
+#define PIK_CLUS0_BASE            (POWER_PERIPHERAL_BASE + 0x060000)
+#define SENSOR_CLUS0_BASE         (POWER_PERIPHERAL_BASE + 0x070000)
+#define PIK_CLUS1_BASE            (POWER_PERIPHERAL_BASE + 0x080000)
+#define SENSOR_CLUS1_BASE         (POWER_PERIPHERAL_BASE + 0x090000)
+#define PIK_GPU_BASE              (POWER_PERIPHERAL_BASE + 0x0A0000)
+#define SENSOR_GPU_BASE           (POWER_PERIPHERAL_BASE + 0x0B0000)
+#define PIK_VPU_BASE              (POWER_PERIPHERAL_BASE + 0x0C0000)
+#define SENSOR_VPU_BASE           (POWER_PERIPHERAL_BASE + 0x0D0000)
+#define PIK_DPU_BASE              (POWER_PERIPHERAL_BASE + 0x0E0000)
+#define SENSOR_DPU_BASE           (POWER_PERIPHERAL_BASE + 0x0F0000)
+#define PIK_DEBUG_CHAIN_BASE      (POWER_PERIPHERAL_BASE + 0x100000)
+
+/*
+ * PPU base address
+ */
+#define PPU_SCP_BASE              (PIK_SCP_BASE + 0x1000)
+#define PPU_SYS0_BASE             (PIK_SYSTEM_BASE + 0x1000)
+#define PPU_SYS1_BASE             (PIK_SYSTEM_BASE + 0x2000)
+#define PPU_DEBUG_BASE            (PIK_DEBUG_BASE + 0x1000)
+#define PPU_CLUS0CORE0_BASE       (PIK_CLUS0_BASE + 0x2000)
+#define PPU_CLUS0CORE1_BASE       (PIK_CLUS0_BASE + 0x3000)
+#define PPU_CLUS0CORE2_BASE       (PIK_CLUS0_BASE + 0x4000)
+#define PPU_CLUS0CORE3_BASE       (PIK_CLUS0_BASE + 0x5000)
+#define PPU_CLUS0CORE4_BASE       (PIK_CLUS0_BASE + 0x6000)
+#define PPU_CLUS0CORE5_BASE       (PIK_CLUS0_BASE + 0x7000)
+#define PPU_CLUS0CORE6_BASE       (PIK_CLUS0_BASE + 0x8000)
+#define PPU_CLUS0CORE7_BASE       (PIK_CLUS0_BASE + 0x9000)
+#define PPU_CLUS0_BASE            (PIK_CLUS0_BASE + 0x1000)
+#define PPU_CLUS1CORE0_BASE       (PIK_CLUS1_BASE + 0x2000)
+#define PPU_CLUS1CORE1_BASE       (PIK_CLUS1_BASE + 0x3000)
+#define PPU_CLUS1CORE2_BASE       (PIK_CLUS1_BASE + 0x4000)
+#define PPU_CLUS1CORE3_BASE       (PIK_CLUS1_BASE + 0x5000)
+#define PPU_CLUS1_BASE            (PIK_CLUS1_BASE + 0x1000)
+#define PPU_GPU_BASE              (PIK_GPU_BASE + 0x1000)
+#define PPU_VPU_BASE              (PIK_VPU_BASE + 0x1000)
+#define PPU_DPU_BASE              (PIK_DPU_BASE + 0x1000)
+
+/*
+ * System access port 1
+ */
+#define TRUSTED_RAM_BASE          (SYS1_BASE + 0x04000000)
+#define NONTRUSTED_RAM_BASE       (SYS1_BASE + 0x06000000)
+#define CCI_BASE                  (SYS1_BASE + 0x2A000000)
+#define ARACHNE_BASE              (SYS1_BASE + 0x2A100000)
+#define SID_BASE                  (SYS1_BASE + 0x2A420000)
+#define REFCLK_CNTCONTROL_BASE    (SYS1_BASE + 0x2A430000)
+#define DMC_BASE                  (SYS1_BASE + 0x2A500000)
+
+#endif /* SGM776_MMAP_H */
