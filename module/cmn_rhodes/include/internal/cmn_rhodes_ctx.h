@@ -43,6 +43,29 @@ struct cmn_rhodes_device_ctx {
     unsigned int internal_rnsam_count;
     struct cmn_rhodes_rnsam_reg **internal_rnsam_table;
 
+    /* CCIX specific members */
+
+    /* Node count of CXG_RA, CXG_HA, CXLA nodes each. */
+    size_t ccix_node_count;
+
+    /*
+     * CXG_RA register and node_id pairs. The driver keeps a list of tuples of
+     * pointers to the CXG_RA registers.
+     */
+    struct cxg_ra_reg_tuple *cxg_ra_reg_table;
+
+    /*
+     * CXG_HA register and node_id pairs. The driver keeps a list of tuples of
+     * pointers to the CXG_HA registers.
+     */
+    struct cxg_ha_reg_tuple *cxg_ha_reg_table;
+
+    /*
+     * CXLA register and node_id pairs. The driver keeps a list of tuples of
+     * pointers to the CXLA registers.
+     */
+    struct cxla_reg_tuple *cxla_reg_table;
+
     bool initialized;
 };
 

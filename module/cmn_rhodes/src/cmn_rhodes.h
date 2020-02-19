@@ -34,6 +34,24 @@ struct external_rnsam_tuple {
     struct cmn_rhodes_rnsam_reg *node;
 };
 
+/* Pair of CCIX Request Agent (CXG_RA) register and its node-id */
+struct cxg_ra_reg_tuple {
+    unsigned int node_id;
+    struct cmn_rhodes_cxg_ra_reg *cxg_ra_reg;
+};
+
+/* Pair of CCIX Request Agent (CXG_HA) register and its node-id */
+struct cxg_ha_reg_tuple {
+    unsigned int node_id;
+    struct cmn_rhodes_cxg_ha_reg *cxg_ha_reg;
+};
+
+/* Pair of CCIX Link Agent (CXLA) register and its node-id */
+struct cxla_reg_tuple {
+    unsigned int node_id;
+    struct cmn_rhodes_cxla_reg *cxla_reg;
+};
+
 enum node_type {
     NODE_TYPE_INVALID   = 0x0,
     NODE_TYPE_DVM       = 0x1,
@@ -119,6 +137,99 @@ struct cmn_rhodes_hnf_reg {
            uint8_t  RESERVED8[0x1C00 - 0xD18];
     FWK_RW uint64_t PPU_PWPR;
 };
+
+/*
+ * CCIX Gateway (CXG) protocol link control & status registers
+ */
+struct cxg_link_regs {
+    FWK_RW uint64_t CXG_PRTCL_LINK_CTRL;
+    FWK_R  uint64_t CXG_PRTCL_LINK_STATUS;
+};
+
+/*
+ * CCIX Gateway (CXG) Requesting Agent (RA) registers
+ */
+struct cmn_rhodes_cxg_ra_reg {
+    FWK_R  uint64_t CXG_RA_NODE_INFO;
+           uint8_t  RESERVED0[0x80-0x8];
+    FWK_R  uint64_t CXG_RA_CHILD_INFO;
+           uint8_t  RESERVED1[0x900-0x88];
+    FWK_R  uint64_t CXG_RA_UNIT_INFO;
+           uint8_t  RESERVED2[0x980-0x908];
+    FWK_RW uint64_t CXG_RA_SEC_REG_GRP_OVERRIDE;
+           uint8_t  RESERVED3[0xA00-0x988];
+    FWK_RW uint64_t CXG_RA_CFG_CTRL;
+    FWK_RW uint64_t CXG_RA_AUX_CTRL;
+           uint8_t  RESERVED4[0xDA8-0xA10];
+    FWK_RW uint64_t CXG_RA_SAM_ADDR_REGION_REG[8];
+           uint8_t  RESERVED5[0xE00-0xDE8];
+    FWK_RW uint64_t CXG_RA_SAM_MEM_REGION_LIMIT_REG[8];
+           uint8_t  RESERVED6[0xE60-0xE40];
+    FWK_RW uint64_t CXG_RA_AGENTID_TO_LINKID_REG[8];
+    FWK_RW uint64_t CXG_RA_RNF_LDID_TO_RAID_REG[8];
+    FWK_RW uint64_t CXG_RA_RNI_LDID_TO_RAID_REG[4];
+    FWK_RW uint64_t CXG_RA_RND_LDID_TO_RAID_REG[4];
+    FWK_RW uint64_t CXG_RA_AGENTID_TO_LINKID_VAL;
+    FWK_RW uint64_t CXG_RA_RNF_LDID_TO_RAID_VAL;
+    FWK_RW uint64_t CXG_RA_RNI_LDID_TO_RAID_VAL;
+    FWK_RW uint64_t CXG_RA_RND_LDID_TO_RAID_VAL;
+           uint8_t  RESERVED7[0x1C00-0xF40];
+           struct cxg_link_regs LINK_REGS[3];
+           uint8_t  RESERVED8[0x2000-0x1030];
+    FWK_RW uint64_t CXG_RA_PMU_EVENT_SEL;
+};
+
+/*
+ * CCIX Gateway (CXG) Home Agent (HA) registers
+ */
+struct cmn_rhodes_cxg_ha_reg {
+    FWK_R  uint64_t CXG_HA_NODE_INFO;
+    FWK_RW uint64_t CXG_HA_ID;
+           uint8_t  RESERVED0[0x80-0x10];
+    FWK_R  uint64_t CXG_HA_CHILD_INFO;
+           uint8_t  RESERVED1[0x900-0x88];
+    FWK_R  uint64_t CXG_HA_UNIT_INFO;
+           uint8_t  RESERVED2[0x980-0x908];
+    FWK_RW uint64_t CXG_HA_SEC_REG_GRP_OVERRIDE;
+           uint8_t  RESERVED3[0xA08-0x988];
+    FWK_RW uint64_t CXG_HA_AUX_CTRL;
+           uint8_t  RESERVED4[0xC00-0xA10];
+    FWK_RW uint64_t CXG_HA_RNF_RAID_TO_LDID_REG[8];
+    FWK_RW uint64_t CXG_HA_AGENTID_TO_LINKID_REG[8];
+           uint8_t  RESERVED5[0xD00-0xC80];
+    FWK_RW uint64_t CXG_HA_AGENTID_TO_LINKID_VAL;
+    FWK_RW uint64_t CXG_HA_RNF_RAID_TO_LDID_VAL;
+           uint8_t  RESERVED6[0x1C00-0xD10];
+           struct cxg_link_regs LINK_REGS[3];
+           uint8_t  RESERVED7[0x2000-0x1030];
+    FWK_RW uint64_t CXG_HA_PMU_EVENT_SEL;
+};
+
+/*
+ * CCIX Gateway (CXG) Link Agent (LA) registers
+ */
+struct cmn_rhodes_cxla_reg {
+    FWK_R  uint64_t CXLA_NODE_INFO;
+           uint8_t  RESERVED0[0x80-0x8];
+    FWK_R  uint64_t CXLA_CHILD_INFO;
+           uint8_t  RESERVED1[0x900-0x88];
+    FWK_R  uint64_t CXLA_UNIT_INFO;
+           uint8_t  RESERVED2[0x980-0x908];
+    FWK_RW uint64_t CXLA_SEC_REG_GRP_OVERRIDE;
+           uint8_t  RESERVED3[0xA08-0x988];
+    FWK_RW uint64_t CXLA_AUX_CTRL;
+           uint8_t  RESERVED4[0xC00-0xA10];
+    FWK_R  uint64_t CXLA_CCIX_PROP_CAPABILITIES;
+    FWK_RW uint64_t CXLA_CCIX_PROP_CONFIGURED;
+    FWK_R  uint64_t CXLA_TX_CXS_ATTR_CAPABILITIES;
+    FWK_R  uint64_t CXLA_RX_CXS_ATTR_CAPABILITIES;
+           uint8_t  RESERVED5[0xC30-0xC20];
+    FWK_RW uint64_t CXLA_AGENTID_TO_LINKID_REG[8];
+    FWK_RW uint64_t CXLA_AGENTID_TO_LINKID_VAL;
+    FWK_RW uint64_t CXLA_LINKID_TO_PCIE_BUS_NUM;
+    FWK_RW uint64_t CXLA_PCIE_HDR_FIELDS;
+};
+
 
 /*
  * Configuration slave registers

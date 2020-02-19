@@ -57,6 +57,11 @@ enum mod_cmn_rhodes_mem_region_type {
      * dedicated SN-F nodes).
      */
     MOD_CMN_RHODES_REGION_TYPE_SYSCACHE_SUB,
+
+    /*!
+     * Region used for CCIX access (serviced by the CXRA nodes).
+     */
+    MOD_CMN_RHODES_REGION_TYPE_CCIX,
 };
 
 /*!
@@ -76,12 +81,22 @@ struct mod_cmn_rhodes_mem_region_map {
      * \brief Target node identifier
      *
      * \note Not used for \ref
-     *      mod_cmn_rhodes_mem_region_type.
-     *      MOD_CMN_RHODES_MEM_REGION_TYPE_SYSCACHE
-     *      memory regions as it uses the pool of HN-F nodes available in the
-     *      system
+     * mod_cmn_rhodes_mem_region_type.MOD_CMN_RHODES_REGION_TYPE_SYSCACHE_SUB
+     * memory regions as it uses the pool of HN-F nodes available in the
+     * system
      */
     unsigned int node_id;
+};
+
+/*!
+ * \brief CCIX Gateway block descriptor
+ */
+struct mod_cmn_rhodes_ccix_config {
+    /*! Logical ID of the CXG block to which this configuration applies */
+    unsigned int ldid;
+
+    /*! Table of region memory map entries */
+    const struct mod_cmn_rhodes_mem_region_map remote_mmap_table;
 };
 
 /*!
@@ -117,6 +132,12 @@ struct mod_cmn_rhodes_config {
 
     /*! Number of entries in the \ref mmap_table */
     size_t mmap_count;
+
+    /*! Table of CCIX configuration */
+    const struct mod_cmn_rhodes_ccix_config *ccix_config_table;
+
+    /*! Number of entries in the \ref ccix_config_table table */
+    const size_t ccix_table_count;
 
     /*! Address space size of the chip */
     uint64_t chip_addr_space;
