@@ -135,10 +135,17 @@ static int cmn_rhodes_discovery(void)
     unsigned int xp_idx;
     unsigned int node_count;
     unsigned int node_idx;
+    unsigned int cxg_ra_reg_count;
+    unsigned int cxg_ha_reg_count;
+    unsigned int cxla_reg_count;
     bool xp_port;
     struct cmn_rhodes_mxp_reg *xp;
     struct node_header *node;
     const struct mod_cmn_rhodes_config *config = ctx->config;
+
+    cxg_ra_reg_count = 0;
+    cxg_ha_reg_count = 0;
+    cxla_reg_count = 0;
 
     FWK_LOG_INFO(MOD_NAME "Starting discovery...");
 
@@ -172,6 +179,7 @@ static int cmn_rhodes_discovery(void)
                 if ((get_device_type(xp, xp_port) == DEVICE_TYPE_CXRH) ||
                     (get_device_type(xp, xp_port) == DEVICE_TYPE_CXHA) ||
                     (get_device_type(xp, xp_port) == DEVICE_TYPE_CXRA)) {
+                    cxla_reg_count++;
                     FWK_LOG_INFO(
                         MOD_NAME "  Found CXLA at node ID: %d",
                         get_child_node_id(xp, node_idx));
@@ -198,6 +206,22 @@ static int cmn_rhodes_discovery(void)
                     ctx->internal_rnsam_count++;
                     break;
 
+                case NODE_TYPE_CXRA:
+                    cxg_ra_reg_count++;
+                    break;
+
+                case NODE_TYPE_CXHA:
+                    cxg_ha_reg_count++;
+                    break;
+
+                /* CXLA should not be an internal node */
+                case NODE_TYPE_CXLA:
+                    FWK_LOG_ERR(MOD_NAME
+                            "CXLA node should not be internal node, "
+                            "discovery failed");
+                    return FWK_E_DEVICE;
+                    break;
+
                 default:
                     /* Nothing to be done for other node types */
                     break;
@@ -220,12 +244,34 @@ static int cmn_rhodes_discovery(void)
         return FWK_E_DATA;
     }
 
+    /* Total number of CXG_RA, CXG_HA and CXLA nodes should be equal */
+    if ((cxg_ra_reg_count != cxg_ha_reg_count) ||
+        (cxg_ha_reg_count != cxla_reg_count)) {
+        FWK_LOG_ERR(MOD_NAME
+            "Inconsistent count of CXG components detected, discovery failed.\n"
+            " CXG_RA count: %d\n"
+            " CXG_HA count: %d\n"
+            " CXLA   count: %d\n",
+            cxg_ra_reg_count,
+            cxg_ha_reg_count,
+            cxla_reg_count);
+        return FWK_E_DEVICE;
+    }
+
+    ctx->ccix_node_count = cxg_ra_reg_count;
+
     FWK_LOG_INFO(MOD_NAME
         "Total internal RN-SAM nodes: %d", ctx->internal_rnsam_count);
     FWK_LOG_INFO(MOD_NAME
         "Total external RN-SAM nodes: %d", ctx->external_rnsam_count);
     FWK_LOG_INFO(MOD_NAME
         "Total HN-F nodes: %d", ctx->hnf_count);
+    FWK_LOG_INFO(MOD_NAME
+        "Total CCIX Request Agent nodes: %d", cxg_ra_reg_count);
+    FWK_LOG_INFO(MOD_NAME
+        "Total CCIX Home Agent nodes: %d", cxg_ha_reg_count);
+    FWK_LOG_INFO(MOD_NAME
+        "Total CCIX Link Agent nodes: %d", cxla_reg_count);
 
     return FWK_SUCCESS;
 }
@@ -238,6 +284,8 @@ static void cmn_rhodes_configure(void)
     unsigned int xp_idx;
     unsigned int xrnsam_entry;
     unsigned int irnsam_entry;
+    unsigned int ldid;
+    unsigned int node_id;
     bool xp_port;
     void *node;
     struct cmn_rhodes_mxp_reg *xp;
@@ -259,23 +307,30 @@ static void cmn_rhodes_configure(void)
         for (node_idx = 0; node_idx < node_count; node_idx++) {
             node = get_child_node(config->base, xp, node_idx);
             if (is_child_external(xp, node_idx)) {
-                unsigned int node_id = get_child_node_id(xp, node_idx);
+                node_id = get_child_node_id(xp, node_idx);
                 xp_port = get_port_number(get_child_node_id(xp, node_idx));
 
-                /* Skip if the device type is CXG */
                 if ((get_device_type(xp, xp_port) == DEVICE_TYPE_CXRH) ||
                     (get_device_type(xp, xp_port) == DEVICE_TYPE_CXHA) ||
-                    (get_device_type(xp, xp_port) == DEVICE_TYPE_CXRA))
-                    continue;
+                    (get_device_type(xp, xp_port) == DEVICE_TYPE_CXRA)) {
+                    ldid = get_node_logical_id(node);
+                    fwk_assert(ldid < ctx->ccix_node_count);
 
-                fwk_assert(xrnsam_entry < ctx->external_rnsam_count);
+                    ctx->cxla_reg_table[ldid].node_id =
+                        node_id;
+                    ctx->cxla_reg_table[ldid].cxla_reg =
+                        (struct cmn_rhodes_cxla_reg *)node;
+                } else {
+                    fwk_assert(xrnsam_entry < ctx->external_rnsam_count);
 
-                ctx->external_rnsam_table[xrnsam_entry].node_id = node_id;
-                ctx->external_rnsam_table[xrnsam_entry].node = node;
+                    ctx->external_rnsam_table[xrnsam_entry].node_id = node_id;
+                    ctx->external_rnsam_table[xrnsam_entry].node = node;
 
-                xrnsam_entry++;
+                    xrnsam_entry++;
+                }
             } else {
                 enum node_type node_type = get_node_type(node);
+                node_id = get_node_id(node);
 
                 if (node_type == NODE_TYPE_RN_SAM) {
                     fwk_assert(irnsam_entry < ctx->internal_rnsam_count);
@@ -283,6 +338,22 @@ static void cmn_rhodes_configure(void)
                     ctx->internal_rnsam_table[irnsam_entry] = node;
 
                     irnsam_entry++;
+                } else if (node_type == NODE_TYPE_CXRA) {
+                    ldid = get_node_logical_id(node);
+                    fwk_assert(ldid < ctx->ccix_node_count);
+
+                    /* Use ldid as index of the cxg_ra table */
+                    ctx->cxg_ra_reg_table[ldid].node_id = node_id;
+                    ctx->cxg_ra_reg_table[ldid].cxg_ra_reg =
+                        (struct cmn_rhodes_cxg_ra_reg *)node;
+                } else if (node_type == NODE_TYPE_CXHA) {
+                    ldid = get_node_logical_id(node);
+                    fwk_assert(ldid < ctx->ccix_node_count);
+
+                    /* Use ldid as index of the cxg_ra table */
+                    ctx->cxg_ha_reg_table[ldid].node_id = node_id;
+                    ctx->cxg_ha_reg_table[ldid].cxg_ha_reg =
+                        (struct cmn_rhodes_cxg_ha_reg *)node;
                 } else if (node_type == NODE_TYPE_HN_F)
                     process_node_hnf(node);
             }
@@ -294,6 +365,7 @@ static const char * const mmap_type_name[] = {
     [MOD_CMN_RHODES_MEM_REGION_TYPE_IO] = "I/O",
     [MOD_CMN_RHODES_MEM_REGION_TYPE_SYSCACHE] = "System Cache",
     [MOD_CMN_RHODES_REGION_TYPE_SYSCACHE_SUB] = "Sub-System Cache",
+    [MOD_CMN_RHODES_REGION_TYPE_CCIX] = "CCIX",
 };
 
 static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
@@ -303,8 +375,11 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
     unsigned int group_count;
     unsigned int hnf_count;
     unsigned int region_idx;
+    unsigned int idx;
     unsigned int region_io_count = 0;
     unsigned int region_sys_count = 0;
+    unsigned int cxra_ldid;
+    unsigned int cxra_node_id;
     unsigned int scg_regions_enabled[MAX_SCG_COUNT] = {0, 0, 0, 0};
     uint64_t base;
     const struct mod_cmn_rhodes_mem_region_map *region;
@@ -371,6 +446,52 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
 
         case MOD_CMN_RHODES_REGION_TYPE_SYSCACHE_SUB:
             /* Do nothing. System cache sub-regions are handled by HN-Fs */
+            break;
+
+        default:
+            assert(false);
+            return FWK_E_DATA;
+        }
+    }
+
+    /* Do configuration for CCIX Gateway Home Nodes */
+    for (idx = 0; idx < config->ccix_table_count; idx++) {
+        region = &config->ccix_config_table[idx].remote_mmap_table;
+
+        FWK_LOG_INFO(
+            MOD_NAME "  [0x%" PRIx64 " - 0x%" PRIx64 "] %s",
+            region->base,
+            region->base + region->size - 1,
+            mmap_type_name[region->type]);
+
+        switch (region->type) {
+        case MOD_CMN_RHODES_REGION_TYPE_CCIX:
+            /*
+             * Configure memory region
+             */
+            configure_region(&rnsam->NON_HASH_MEM_REGION[region_io_count],
+                             region->base,
+                             region->size,
+                             SAM_NODE_TYPE_CXRA);
+
+            /*
+             * Configure target node
+             */
+            cxra_ldid = config->ccix_config_table[idx].ldid;
+            cxra_node_id = ctx->cxg_ra_reg_table[cxra_ldid].node_id;
+            group = region_io_count /
+                    CMN_RHODES_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP;
+            bit_pos = CMN_RHODES_RNSAM_NON_HASH_TGT_NODEID_ENTRY_BITS_WIDTH *
+                      (region_io_count %
+                       CMN_RHODES_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP);
+
+            rnsam->NON_HASH_TGT_NODEID[group] &=
+                ~(CMN_RHODES_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK << bit_pos);
+            rnsam->NON_HASH_TGT_NODEID[group] |=
+                (cxra_node_id &
+                 CMN_RHODES_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK) << bit_pos;
+
+            region_io_count++;
             break;
 
         default:
@@ -465,6 +586,24 @@ static int cmn_rhodes_setup(void)
                 ctx->hnf_count /
                 CMN_RHODES_RNSAM_SYS_CACHE_GRP_SN_NODEID_ENTRIES_PER_GROUP,
                 sizeof(*ctx->sn_nodeid_group));
+        }
+
+        /* Allocate resource for the CCIX Gateway nodes */
+        if (ctx->ccix_node_count != 0) {
+            ctx->cxg_ra_reg_table = fwk_mm_calloc(ctx->ccix_node_count,
+                    sizeof(*ctx->cxg_ra_reg_table));
+            if (ctx->cxg_ra_reg_table == NULL)
+                return FWK_E_NOMEM;
+
+            ctx->cxg_ha_reg_table = fwk_mm_calloc(ctx->ccix_node_count,
+                    sizeof(*ctx->cxg_ha_reg_table));
+            if (ctx->cxg_ha_reg_table == NULL)
+                return FWK_E_NOMEM;
+
+            ctx->cxla_reg_table = fwk_mm_calloc(ctx->ccix_node_count,
+                    sizeof(*ctx->cxla_reg_table));
+            if (ctx->cxla_reg_table == NULL)
+                return FWK_E_NOMEM;
         }
     }
 
