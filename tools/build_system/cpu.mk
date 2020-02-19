@@ -24,7 +24,6 @@ ifneq ($(findstring $(BS_FIRMWARE_CPU),$(ARMV7M_CPUS)),)
     CFLAGS_CLANG += --target=arm-arm-none-eabi
 
     CFLAGS += -mfloat-abi=soft # No hardware floating point support
-    CFLAGS += -mno-unaligned-access # Disable unaligned access code generation
 else ifeq ($(BS_FIRMWARE_CPU),host)
     BS_ARCH_ARCH := host
 

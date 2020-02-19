@@ -65,7 +65,6 @@ static void arm_init_ccr(void)
      * Set up the Configuration Control Register (CCR) in the System Control
      * Block (1) by setting the following flag bits:
      *
-     * UNALIGN_TRP [3]: Enable trapping on unaligned word or halfword accesses.
      * DIV_0_TRP   [4]: Enable trapping on division by zero.
      * STKALIGN    [9]: Enable automatic DWORD stack-alignment on exception
      *                  entry (2).
@@ -76,7 +75,6 @@ static void arm_init_ccr(void)
      * (2) ARM® v7-M Architecture Reference Manual, section B1.5.7.
      */
 
-    *SCB_CCR |= SCB_CCR_UNALIGN_TRP_MASK;
     *SCB_CCR |= SCB_CCR_DIV_0_TRP_MASK;
     *SCB_CCR |= SCB_CCR_STKALIGN_MASK;
 }
