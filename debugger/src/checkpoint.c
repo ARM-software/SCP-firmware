@@ -81,11 +81,8 @@ void checkpoint(checkpoint_st *c, char *file, int32_t line, char *tag)
 
         c->tag[0] = 0;
         c->bypass = CHECKPOINT_ENABLED;
-        c->pause = true;
 
         cli_start();
-
-        c->pause = false;
 
         cli_printf(NONE,
             "SCP execution resume at a checkpoint.\n"
