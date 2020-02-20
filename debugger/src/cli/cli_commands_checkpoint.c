@@ -20,68 +20,48 @@ extern checkpoint_st checkpoint_table[CHECKPOINT_NUM];
 
 const char checkpoint_call[] = "checkpoint";
 const char checkpoint_help[] =
-    "  Show all threads currently using checkpoints and their task IDs.\n"
+    "  Show all current checkpoints.\n"
     "    Usage: checkpoint list\n"
-    "  Tell a paused thread to run to the next checkpoint.\n"
-    "    Usage: checkpoint <task ID> next\n"
-    "  Tell a paused thread to skip N future checkpoints.\n"
-    "    Usage: checkpoint <task ID> skip N\n"
-    "  Tell a paused thread to run to a checkpoint tag.\n"
-    "    Usage: checkpoint <task ID> tag <tag>\n"
-    "  Enable or disable all checkpoints in a thread.\n"
-    "    Usage: checkpoint <task ID> <enable|disable>";
+    "  Skip N future checkpoints.\n"
+    "    Usage: checkpoint <CP ID> skip N\n"
+    "  Disable checkpoints until given tag reached.\n"
+    "    Usage: checkpoint <CP ID> tag <tag>\n"
+    "  Enable or disable a checkpoint.\n"
+    "    Usage: checkpoint <CP ID> <enable|disable>\n"
+    "  Enable or disable all checkpoints.\n"
+    "    Usage: checkpoint <enableall|disableall>";
+
 int32_t checkpoint_f(int32_t argc, char **argv)
 {
     uint32_t i = 0;
     uint32_t id = 0;
+    uint32_t run_cnt = 0;
 
     if ((argc == 2) && (cli_strncmp(argv[1], "list", 4) == 0)) {
         for (i = 0; i < CHECKPOINT_NUM; i++) {
             if (checkpoint_table[i].in_use == true)
-                cli_printf(NONE, "%s\n  Task ID: %d\n",
-                    checkpoint_table[i].name, i);
+                cli_printf(NONE, "%d: %s\n", i, checkpoint_table[i].name);
         }
-        return FWK_SUCCESS;
-    }
-
-    else if ((argc == 3) && (cli_strncmp(argv[2], "next", 4) == 0)) {
-        id = strtoul(argv[1], NULL, 0);
-        if (id >= CHECKPOINT_NUM) {
-            cli_print("Task ID out of range.\n");
-            return FWK_E_PARAM;
-        }
-        if (checkpoint_table[id].pause == false) {
-            cli_print("Thread is still running.\n");
-            return FWK_E_STATE;
-        }
-        checkpoint_table[id].tag[0] = 0;
-        checkpoint_table[id].bypass = CHECKPOINT_ENABLED;
         return FWK_SUCCESS;
     }
 
     else if ((argc == 4) && (cli_strncmp(argv[2], "skip", 4) == 0)) {
         id = strtoul(argv[1], NULL, 0);
+        run_cnt = strtoul(argv[3], NULL, 0);
         if (id >= CHECKPOINT_NUM) {
-            cli_print("Task ID out of range.\n");
+            cli_print("CP ID out of range.\n");
             return FWK_E_PARAM;
         }
-        if (checkpoint_table[id].pause == false) {
-            cli_print("Thread is still running.\n");
-            return FWK_E_STATE;
-        }
-        if (checkpoint_table[id].pause == false)
-            return FWK_SUCCESS;
+        checkpoint_table[id].tag[0] = 0;
+        checkpoint_table[id].bypass = run_cnt;
+        return FWK_SUCCESS;
     }
 
     else if ((argc == 4) && (cli_strncmp(argv[2], "tag", 3) == 0)) {
         id = strtoul(argv[1], NULL, 0);
         if (id >= CHECKPOINT_NUM) {
-            cli_print("Task ID out of range.\n");
+            cli_print("Checkpoint number out of range.\n");
             return FWK_E_PARAM;
-        }
-        if (checkpoint_table[id].pause == false) {
-            cli_print("Thread is still running.\n");
-            return FWK_E_STATE;
         }
         strncpy(checkpoint_table[id].tag, argv[3], CHECKPOINT_TAG_LEN);
         checkpoint_table[id].bypass = CHECKPOINT_DISABLED;
@@ -91,25 +71,33 @@ int32_t checkpoint_f(int32_t argc, char **argv)
     else if ((argc == 3) && (cli_strncmp(argv[2], "enable", 6) == 0)) {
         id = strtoul(argv[1], NULL, 0);
         if (id >= CHECKPOINT_NUM) {
-            cli_print("Task ID out of range.\n");
+            cli_print("CP ID out of range.\n");
             return FWK_E_PARAM;
         }
         checkpoint_table[id].bypass = CHECKPOINT_ENABLED;
+        return FWK_SUCCESS;
     }
 
     else if ((argc == 3) && (cli_strncmp(argv[2], "disable", 7) == 0)) {
         id = strtoul(argv[1], NULL, 0);
         if (id >= CHECKPOINT_NUM) {
-            cli_print("Task ID out of range.\n");
+            cli_print("CP ID out of range.\n");
             return FWK_E_PARAM;
-        }
-        if (checkpoint_table[id].pause == false) {
-            cli_print("Thread is still running.\n");
-            return FWK_E_STATE;
         }
         checkpoint_table[id].bypass = CHECKPOINT_DISABLED;
         return FWK_SUCCESS;
     }
+
+    else if ((argc == 2) && (cli_strncmp(argv[1], "enableall", 9) == 0)) {
+        checkpoint_enable_all();
+        return FWK_SUCCESS;
+    }
+
+    else if ((argc == 2) && (cli_strncmp(argv[1], "disableall", 10) == 0)) {
+        checkpoint_disable_all();
+        return FWK_SUCCESS;
+    }
+
     cli_print("CLI: Invalid command received:\n");
     for (i = 0; i < (uint32_t)argc; i++)
         cli_printf(NONE, "Parameter %d is %s\n", i, argv[i]);

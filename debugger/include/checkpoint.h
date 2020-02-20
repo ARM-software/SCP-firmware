@@ -62,8 +62,6 @@ typedef struct {
     volatile int32_t bypass;
     /*! Valid checkpoint in the checkpoint table */
     bool in_use;
-    /*! Execution pasused at this checkpoint */
-    volatile bool pause;
 } checkpoint_st;
 
 /*!
