@@ -1106,13 +1106,13 @@ static uint32_t cli_backspace(uint32_t *cursor, uint32_t width)
 
     /* If cursor is at the first position of a line. */
     if (*cursor == 0) {
-        status = cli_printf(0, "\0x1B[A\0x1B[%dC ", width - 1);
+        status = cli_printf(0, "\x1B[A\x1B[%dC ", width - 1);
         if (status != FWK_SUCCESS)
             return status;
         *cursor = width - 1;
     } else {
         /* For compatibility, print back, space, back. */
-        status = cli_print("\0x1B[D \0x1B[D");
+        status = cli_print("\x1B[D \x1B[D");
         if (status != FWK_SUCCESS)
             return status;
         *cursor = *cursor - 1;
