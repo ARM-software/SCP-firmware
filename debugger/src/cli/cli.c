@@ -29,6 +29,8 @@ static char cli_input_buffer[CLI_CONFIG_COMMAND_BUF_SIZE] = { 0 };
 /* Array holding pointers to arguments after a command is parsed. */
 static char *cli_args[CLI_CONFIG_MAX_NUM_ARGUMENTS] = { 0 };
 
+/* Starting history buffer index. */
+static uint32_t history_index = 0;
 /* Buffer used to store the command history. */
 static char *cli_history[CLI_CONFIG_HISTORY_LENGTH] = { 0 };
 static char cli_history_buffer
@@ -664,8 +666,6 @@ uint32_t cli_getline(
 static void cli_main(void const *argument)
 {
     int32_t status = FWK_SUCCESS;
-    /* Starting history buffer index. */
-    uint32_t history_index = 0;
     uint32_t last_history_index = CLI_CONFIG_HISTORY_LENGTH - 1;
     uint32_t command_length = 0;
     bool cli_exit = false;
