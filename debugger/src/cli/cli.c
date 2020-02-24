@@ -73,7 +73,17 @@ extern cli_command_st cli_commands[];
 
 int cli_command_register(cli_command_st new_cmd)
 {
-    struct command_ctx *c = fwk_mm_calloc(1, sizeof(struct command_ctx));
+    struct fwk_slist *node = NULL;
+    struct command_ctx *c = NULL;
+
+    FWK_LIST_FOR_EACH(&cli_commands_list, node,
+        struct command_ctx, list_node, c) {
+        if (strcmp(new_cmd.command, c->cmd.command) == 0)
+            /* Command exist. Skip registration */
+            return FWK_SUCCESS;
+    }
+
+    c = fwk_mm_calloc(1, sizeof(struct command_ctx));
     if (c == NULL)
         return FWK_E_NOMEM;
 
