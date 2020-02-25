@@ -8,9 +8,10 @@
 Description of Files
 
   cli_commands_core.c
-    Contains all code implementing core executable commands for the debug console.
-    If you wish to add new commands, create a new cli_commands_<name>.c file and
-    add links to the command functions in the command structure.
+    Contains all code implementing core executable commands for the debug
+    console. If you wish to add new commands, create a new command structure and
+    add links to the command functions in the structure then call the command
+    registration function cli_command_register.
 
   cli_config.h
     Definitions of compile-time command line interface settings, such as buffer
@@ -25,14 +26,10 @@ Description of Files
   cli_fifo.h
     Header file containing function prototypes and descriptions for cli_fifo.c.
 
-  cli_platform.c
-    Platform-specific function definitions.  Porting this CLI to almost
-    anything can be done entirely by editing this file.
-
   cli_platform.h
     Function prototypes and descriptions for platform-specific functions.  If
     you wish to port this CLI, start by reading this file and then implement
-    the functions in cli_platform.c.
+    the functions in the platform directory.
 
   cli.c
     Core CLI function definitions.  Contains both public and private CLI
@@ -40,17 +37,23 @@ Description of Files
 
   cli.h
     CLI enumerated types, structure types, and public function prototypes and
-    descriptions.  To access CLI functionality from other threads, you only
+    descriptions.  To access CLI functionality from other files, you only
     need to include this file.
 
 Using the Console
 
+  There are two mechanisms to enter the console. At compile time using
+  checkpoints and at run time using Ctrl+E press. To exit the console, Ctrl+D
+  should be pressed. Note that CTRL+E only works once the modules have been
+  started, as the module monitoring the keystrokes starts last.
+  Once inside the console, all dequeuing of events in the queue is blocked. The
+  framework will resume handling events after exiting the console.
   By default the CLI is in command mode, to exit command mode and enter debug,
-  mode press Ctrl+C.  To return to command mode, press Ctrl+C again.  Know that,
-  while in command mode, the print buffers can fill up quickly.  Once this happens,
-  all debug data from the time the print buffers fill up to the time you
-  reenter debug mode and the CLI can empty the buffers will be lost.  If a
-  buffer fills up, you will see a message like "CONSOLE ERROR: Print buffer
+  mode press Ctrl+C. To return to command mode, press Ctrl+C again.  Know that,
+  while in command mode, the print buffers can fill up quickly.
+  Once this happens, all debug data from the time the print buffers fill up to
+  the time you reenter debug mode and the CLI can empty the buffers will be lost
+  If a buffer fills up, you will see a message like "CONSOLE ERROR: Print buffer
   overflow."
 
 Printing From Other Threads
