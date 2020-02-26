@@ -422,7 +422,7 @@ uint32_t cli_bprintf(cli_option_et options, const char *format, ...)
     if (options != NONE) {
         strncat(
             scratch_buffer,
-            "[\0x1B0m",
+            "\x1B[0m",
             (CLI_CONFIG_SCRATCH_BUFFER_SIZE - buffer_index));
         buffer_index = strnlen(scratch_buffer, CLI_CONFIG_SCRATCH_BUFFER_SIZE);
     }
@@ -464,7 +464,7 @@ uint32_t cli_bprint(const char *string)
     /* Print an error message if the print buffer is full. */
     if ((status != FWK_SUCCESS) && (overflow == false)) {
         overflow = true;
-        cli_print("\0x1B[31mCONSOLE ERROR:\0x1B[0m Print buffer overflow.\n");
+        cli_print("\x1B[31mCONSOLE ERROR:\x1B[0m Print buffer overflow.\n");
     }
 
     return status;
@@ -472,7 +472,7 @@ uint32_t cli_bprint(const char *string)
 static char sCLIbuffer[CLI_CONFIG_SCRATCH_BUFFER_SIZE] = { 0 };
 
 static const char str_format_buf_too_small[] =
-    "[\0x1B31mCONSOLE ERROR:\0x1B[0m CLI format print buffer too small.\n";
+    "\x1B[31mCONSOLE ERROR:\x1B[0m CLI format print buffer too small.\n";
 uint32_t cli_printf(cli_option_et options, const char *format, ...)
 {
     va_list arg;
@@ -764,7 +764,7 @@ uint32_t cli_format(cli_option_et options, char *buffer, uint32_t size)
         if (buffer != NULL) {
             if (size < 5)
                 return FWK_E_NOMEM;
-            memcpy(buffer, "\0x1B[0m", 8);
+            memcpy(buffer, "\x1B[0m", 5);
             buffer = &(buffer[4]);
             size = size - 4;
         } else
@@ -775,11 +775,11 @@ uint32_t cli_format(cli_option_et options, char *buffer, uint32_t size)
         if (buffer != NULL) {
             if (size < 5)
                 return FWK_E_NOMEM;
-            memcpy(buffer, "\0x1B[2J", 8);
+            memcpy(buffer, "\x1B[2J", 5);
             buffer = &(buffer[4]);
             size = size - 4;
         } else
-            status = cli_print("\0x1B[2J");
+            status = cli_print("\x1B[2J");
 
         if (status != FWK_SUCCESS)
             return status;
@@ -790,11 +790,11 @@ uint32_t cli_format(cli_option_et options, char *buffer, uint32_t size)
             if (size < 7)
                 return FWK_E_NOMEM;
 
-            memcpy(buffer, "\0x1B[0;0f", 10);
+            memcpy(buffer, "\x1B[0;0f", 7);
             buffer = &(buffer[6]);
             size = size - 6;
         } else
-            status = cli_print("\0x1B[0;0f");
+            status = cli_print("\x1B[0;0f");
 
         if (status != FWK_SUCCESS)
             return status;
@@ -804,11 +804,11 @@ uint32_t cli_format(cli_option_et options, char *buffer, uint32_t size)
         if (buffer != NULL) {
             if (size < 3)
                 return FWK_E_NOMEM;
-            memcpy(buffer, "\0x1B[", 6);
+            memcpy(buffer, "\x1B[", 3);
             buffer = &(buffer[2]);
             size = size - 2;
         } else {
-            status = cli_print("\0x1B[");
+            status = cli_print("\x1B[");
             if (status != FWK_SUCCESS)
                 return status;
         }
@@ -932,13 +932,13 @@ static uint32_t cli_get_command(
     if (!automation_mode) {
         /* Getting terminal window size. */
         /* Saving cursor position. */
-        cli_print("\0x1B[s");
+        cli_print("\x1B[s");
         /* Moving cursor to bottom right position. */
-        cli_print("\0x1B[999;999f");
+        cli_print("\x1B[999;999f");
         /* Requesting new cursor position. */
-        cli_print("\0x1B[6n");
+        cli_print("\x1B[6n");
         /* Restoring old cursor position. */
-        cli_print("\0x1B[u");
+        cli_print("\x1B[u");
     }
 
     while (1) {
