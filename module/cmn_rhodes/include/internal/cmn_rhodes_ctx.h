@@ -25,6 +25,10 @@ struct cmn_rhodes_device_ctx {
 
     /* Number of HN-F (system cache) nodes in the system */
     unsigned int hnf_count;
+
+    /* Pointer to list of HN-F nodes for use in CCIX programming */
+    uintptr_t *hnf_node;
+
     uint64_t *hnf_cache_group;
     uint64_t *sn_nodeid_group;
 
@@ -42,6 +46,11 @@ struct cmn_rhodes_device_ctx {
      */
     unsigned int internal_rnsam_count;
     struct cmn_rhodes_rnsam_reg **internal_rnsam_table;
+
+    /* Count of RN Nodes for the use in CCIX programming */
+    unsigned int rnd_count;
+    unsigned int rnf_count;
+    unsigned int rni_count;
 
     /* CCIX specific members */
 
