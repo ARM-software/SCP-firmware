@@ -6,6 +6,7 @@
  */
 
 #include <cmn_rhodes.h>
+#include <cmn_rhodes_ccix.h>
 
 #include <internal/cmn_rhodes_ctx.h>
 
@@ -13,6 +14,7 @@
 #include <mod_cmn_rhodes.h>
 #include <mod_ppu_v1.h>
 #include <mod_system_info.h>
+#include <mod_timer.h>
 
 #include <fwk_assert.h>
 #include <fwk_event.h>
@@ -445,17 +447,17 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
         base = ((uint64_t)(ctx->config->chip_addr_space * chip_id) +
                 region->base);
 
-        FWK_LOG_INFO(
-            MOD_NAME "  [0x%" PRIx64 " - 0x%" PRIx64 "] %s",
-            base,
-            base + region->size - 1,
-            mmap_type_name[region->type]);
-
         switch (region->type) {
         case MOD_CMN_RHODES_MEM_REGION_TYPE_IO:
             /*
              * Configure memory region
              */
+            FWK_LOG_INFO(
+                MOD_NAME "  [0x%" PRIx64 " - 0x%" PRIx64 "] %s",
+                base,
+                base + region->size - 1,
+                mmap_type_name[region->type]);
+
             configure_region(&rnsam->NON_HASH_MEM_REGION[region_io_count],
                              base,
                              region->size,
@@ -483,8 +485,14 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
             /*
              * Configure memory region
              */
+            FWK_LOG_INFO(
+                MOD_NAME "  [0x%" PRIx64 " - 0x%" PRIx64 "] %s",
+                base,
+                base + region->size - 1,
+                mmap_type_name[region->type]);
+
             configure_region(&rnsam->SYS_CACHE_GRP_REGION[region_sys_count],
-                             base,
+                             region->base,
                              region->size,
                              SAM_NODE_TYPE_HN_F);
 
@@ -496,7 +504,13 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
             break;
 
         case MOD_CMN_RHODES_REGION_TYPE_SYSCACHE_SUB:
-            /* Do nothing. System cache sub-regions are handled by HN-Fs */
+            FWK_LOG_INFO(
+                MOD_NAME "  [0x%" PRIx64 " - 0x%" PRIx64 "] %s",
+                base,
+                base + region->size - 1,
+                mmap_type_name[region->type]);
+
+            /* System cache sub-regions are handled by HN-Fs */
             break;
 
         default:
@@ -675,6 +689,27 @@ static int cmn_rhodes_setup(void)
     return FWK_SUCCESS;
 }
 
+static int cmn_rhodes_ccix_setup(void)
+{
+    unsigned int idx;
+    const struct mod_cmn_rhodes_config *config = ctx->config;
+
+    /* Do configuration for CCIX Gateway Nodes and enable the links */
+    for (idx = 0; idx < config->ccix_table_count; idx++)
+        ccix_setup(chip_id, ctx, &config->ccix_config_table[idx]);
+
+    /*
+     * Exchange protocol credits and enter system coherecy and dvm domain for
+     * multichip SMP mode operation.
+     */
+    for (idx = 0; idx < config->ccix_table_count; idx++) {
+        ccix_exchange_protocol_credit(ctx, &config->ccix_config_table[idx]);
+        ccix_enter_system_coherency(ctx, &config->ccix_config_table[idx]);
+        ccix_enter_dvm_domain(ctx, &config->ccix_config_table[idx]);
+    }
+    return FWK_SUCCESS;
+}
+
 static int cmn_rhodes_setup_rnsam(unsigned int node_id)
 {
     unsigned int node_idx;
@@ -757,6 +792,7 @@ static int cmn_rhodes_device_init(fwk_id_t element_id,
 static int cmn_rhodes_bind(fwk_id_t id, unsigned int round)
 {
     int status;
+    struct cmn_rhodes_device_ctx *device_ctx;
 
     if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         /* Bind to system info module to obtain multi-chip info */
@@ -765,6 +801,19 @@ static int cmn_rhodes_bind(fwk_id_t id, unsigned int round)
                                             MOD_SYSTEM_INFO_GET_API_IDX),
                                  &system_info_api);
         return status;
+    }
+
+    /* Use second round only (round numbering is zero-indexed) */
+    if (round == 1) {
+        device_ctx = ctx + fwk_id_get_element_idx(id);
+
+        /* Bind to the timer component */
+        status = fwk_module_bind(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                                 FWK_ID_API(FWK_MODULE_IDX_TIMER,
+                                            MOD_TIMER_API_IDX_TIMER),
+                                 &device_ctx->timer_api);
+        if (status != FWK_SUCCESS)
+            return FWK_E_PANIC;
     }
 
     return FWK_SUCCESS;
@@ -803,6 +852,7 @@ int cmn_rhodes_start(fwk_id_t id)
 
     if (fwk_id_is_equal(ctx->config->clock_id, FWK_ID_NONE)) {
         cmn_rhodes_setup();
+        cmn_rhodes_ccix_setup();
         return FWK_SUCCESS;
     }
 
@@ -822,8 +872,10 @@ static int cmn_rhodes_process_notification(
     fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT));
 
     params = (struct clock_notification_params *)event->params;
-    if (params->new_state == MOD_CLOCK_STATE_RUNNING)
+    if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
         cmn_rhodes_setup();
+        cmn_rhodes_ccix_setup();
+    }
 
     return FWK_SUCCESS;
 }

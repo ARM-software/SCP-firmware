@@ -118,7 +118,8 @@ struct cmn_rhodes_rnsam_reg {
     FWK_RW uint64_t SYS_CACHE_GRP_SN_NODEID[16];
            uint8_t  RESERVED8[0x1100 - 0x1080];
     FWK_RW uint64_t STATUS;
-           uint8_t  RESERVED9[0x1120 - 0x1108];
+           uint64_t GIC_MEM_REGION;
+           uint8_t  RESERVED9[0x1120 - 0x1110];
     FWK_RW uint64_t SYS_CACHE_GRP_CAL_MODE;
 };
 
@@ -134,7 +135,9 @@ struct cmn_rhodes_hnf_reg {
            uint8_t  RESERVED2[0xD00 - 0x908];
     FWK_RW uint64_t SAM_CONTROL;
     FWK_RW uint64_t SAM_MEMREGION[2];
-           uint8_t  RESERVED8[0x1C00 - 0xD18];
+           uint8_t  RESERVED3[0xD28 - 0xD18];
+    FWK_RW uint64_t RN_PHYS_ID[32];
+           uint8_t  RESERVED4[0x1C00 - 0xE28];
     FWK_RW uint64_t PPU_PWPR;
 };
 

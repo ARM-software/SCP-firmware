@@ -75,6 +75,9 @@ struct cmn_rhodes_device_ctx {
      */
     struct cxla_reg_tuple *cxla_reg_table;
 
+    /* Timer module API */
+    struct mod_timer_api *timer_api;
+
     bool initialized;
 };
 
