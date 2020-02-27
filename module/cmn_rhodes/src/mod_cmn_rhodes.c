@@ -206,6 +206,28 @@ static int cmn_rhodes_discovery(void)
                     ctx->internal_rnsam_count++;
                     break;
 
+                case NODE_TYPE_RN_D:
+                    if ((ctx->rnd_count) >= MAX_RND_COUNT) {
+                        FWK_LOG_ERR(
+                            MOD_NAME "  rnd count %d >= max limit (%d)\n",
+                            ctx->rnd_count,
+                            MAX_RND_COUNT);
+                        return FWK_E_DATA;
+                    }
+                    ctx->rnd_count++;
+                    break;
+
+                case NODE_TYPE_RN_I:
+                    if ((ctx->rni_count++) >= MAX_RNI_COUNT) {
+                        FWK_LOG_ERR(
+                            MOD_NAME "  rni count %d >= max limit (%d)\n",
+                            ctx->rni_count,
+                            MAX_RNI_COUNT);
+                        return FWK_E_DATA;
+                    }
+                    ctx->rni_count++;
+                    break;
+
                 case NODE_TYPE_CXRA:
                     cxg_ra_reg_count++;
                     break;
@@ -260,12 +282,35 @@ static int cmn_rhodes_discovery(void)
 
     ctx->ccix_node_count = cxg_ra_reg_count;
 
+    /*
+     * TODO Below need fixing
+     * RN-F nodes does not have node type identifier and hence the count cannot
+     * be determined during the discovery process. RN-F count will be total
+     * RN-SAM count minus the total RN-D, RN-I and CXHA count combined.
+     */
+    ctx->rnf_count = ctx->internal_rnsam_count + ctx->external_rnsam_count -
+                     (ctx->rnd_count + ctx->rni_count + cxg_ha_reg_count);
+
+    if (ctx->rnf_count > MAX_RNF_COUNT) {
+        FWK_LOG_ERR(
+            MOD_NAME "rnf count %d > max limit (%d)\n",
+            ctx->rnf_count,
+            MAX_RNF_COUNT);
+        return FWK_E_RANGE;
+    }
+
     FWK_LOG_INFO(MOD_NAME
         "Total internal RN-SAM nodes: %d", ctx->internal_rnsam_count);
     FWK_LOG_INFO(MOD_NAME
         "Total external RN-SAM nodes: %d", ctx->external_rnsam_count);
     FWK_LOG_INFO(MOD_NAME
         "Total HN-F nodes: %d", ctx->hnf_count);
+    FWK_LOG_INFO(MOD_NAME
+        "Total RN-D nodes: %d\n", ctx->rnd_count);
+    FWK_LOG_INFO(MOD_NAME
+        "Total RN-F nodes: %d\n", ctx->rnf_count);
+    FWK_LOG_INFO(MOD_NAME
+        "Total RN-I nodes: %d\n", ctx->rni_count);
     FWK_LOG_INFO(MOD_NAME
         "Total CCIX Request Agent nodes: %d", cxg_ra_reg_count);
     FWK_LOG_INFO(MOD_NAME
@@ -284,6 +329,7 @@ static void cmn_rhodes_configure(void)
     unsigned int xp_idx;
     unsigned int xrnsam_entry;
     unsigned int irnsam_entry;
+    unsigned int hnf_entry;
     unsigned int ldid;
     unsigned int node_id;
     bool xp_port;
@@ -295,6 +341,7 @@ static void cmn_rhodes_configure(void)
 
     xrnsam_entry = 0;
     irnsam_entry = 0;
+    hnf_entry = 0;
 
     /* Traverse cross points (XP) */
     xp_count = get_node_child_count(ctx->root);
@@ -354,8 +401,12 @@ static void cmn_rhodes_configure(void)
                     ctx->cxg_ha_reg_table[ldid].node_id = node_id;
                     ctx->cxg_ha_reg_table[ldid].cxg_ha_reg =
                         (struct cmn_rhodes_cxg_ha_reg *)node;
-                } else if (node_type == NODE_TYPE_HN_F)
+                } else if (node_type == NODE_TYPE_HN_F) {
+                    fwk_assert(hnf_entry < ctx->hnf_count);
+                    ctx->hnf_node[hnf_entry++] = (uintptr_t)(void *)node;
+
                     process_node_hnf(node);
+                }
             }
         }
     }
@@ -579,6 +630,10 @@ static int cmn_rhodes_setup(void)
              * Allocate enough group descriptors to accommodate all expected
              * HN-F nodes in the system.
              */
+            ctx->hnf_node = fwk_mm_calloc(ctx->hnf_count,
+                sizeof(*ctx->hnf_node));
+            if (ctx->hnf_node == NULL)
+                return FWK_E_NOMEM;
             ctx->hnf_cache_group = fwk_mm_calloc(
                 ctx->hnf_count / CMN_RHODES_HNF_CACHE_GROUP_ENTRIES_PER_GROUP,
                 sizeof(*ctx->hnf_cache_group));
