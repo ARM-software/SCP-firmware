@@ -28,6 +28,12 @@
  * @{
  */
 
+/*! Maximum CCIX Protocol Links supported by CCIX Gateway (CXG) */
+#define CMN_RHODES_MAX_CCIX_PROTOCOL_LINKS  3
+
+/*! Maximum RA SAM Address regions */
+#define CMN_RHODES_MAX_RA_SAM_ADDR_REGION   8
+
 /*!
  * \brief Module API indices
  */
@@ -89,14 +95,111 @@ struct mod_cmn_rhodes_mem_region_map {
 };
 
 /*!
+ * \brief Remote Agent to Link ID mapping
+ *
+ * \details Each CCIX Gateway block (CXG) can communicate up to three remote
+ * CCIX protocol links. Each remote agent, identified by their AgentID (RAID
+ * or HAID) will be behind one of these three links. This structure holds the
+ * start and end Agent IDs for each link. The remote AgentID to LinkID LUT
+ * registers (por_{cxg_ra,cxg_ha, cxla}_agentid_to_linkid_reg<X>) will be
+ * configured sequentially from \ref
+ * mod_cmn_rhodes_agentid_to_linkid_map.remote_agentid_start
+ * and \ref mod_cmn_rhodes_agentid_to_linkid_map.remote_agentid_end values. For
+ * all three links, corresponding to these remote Agent IDs, HN-F's RN_PHYS_ID
+ * registers will be programmed with the node id of the CXG Gateway block.
+ *
+ */
+struct mod_cmn_rhodes_agentid_to_linkid_map {
+    /*! Remote Agent ID start */
+    unsigned int remote_agentid_start;
+
+    /*! Remote Agent ID end */
+    unsigned int remote_agentid_end;
+};
+
+/*!
+ * \brief Remote Memory region map descriptor which will be used by CXRA SAM
+ * programming
+ */
+struct mod_cmn_rhodes_ra_mem_region_map {
+    /*! Base address */
+    uint64_t base;
+
+    /*! Region size in bytes */
+    uint64_t size;
+
+    /*! Target HAID of remote CXG gateway for CXRA SAM Address region */
+    unsigned int remote_haid;
+};
+
+/*!
  * \brief CCIX Gateway block descriptor
+ *
+ * \details Each CCIX Gateway block (CXG) can have up to eight remote memory map
+ * \ref mod_cmn_rhodes_ra_mem_region_map descriptors and can have three links
+ * which can target range of remote agent ids. User is expected to assign an
+ * Home AgentID (HAID) \ref mod_cmn_rhodes_ccix_config.haid for each logical ids
+ * of the CXG blocks. Overall structure of the descriptor is shown below:
+ *
+ *         +----------------------------------------------------------+
+ *         | mod_cmn_rhodes_ccix_config<ldid>                         |
+ *         |                                                          |
+ *         |   HAID = haid                                            |
+ *         +----------------------------------------------------------+
+ *         | ra_mmap_table0                   | agentid_to_linkid_map0|
+ *         |                                  |  remote_agent_id_start|
+ *         | base..base+size --> remote_haid  |  .                    |
+ *         |                                  |  .                    |
+ *         +----------------------------------+  .                    |
+ *         | ra_mmap_table1                   |  .                    |
+ *         |                                  |  remote_agent_id_end  |
+ *         | base..base+size --> remote_haid  |                       |
+ *         |                                  +-----------------------+
+ *         +----------------------------------+ agentid_to_linkid_map1|
+ *         | .                                |  remote_agent_id_start|
+ *         | .                                |  .                    |
+ *         | .                                |  .                    |
+ *         | .                                |  .                    |
+ *         | .                                |  .                    |
+ *         | .                                |  remote_agent_id_end  |
+ *         +----------------------------------+                       |
+ *         | ra_mmap_table6                   +-----------------------+
+ *         |                                  | agentid_to_linkid_map2|
+ *         | base..base+size --> remote_haid  |  remote_agent_id_start|
+ *         |                                  |  .                    |
+ *         +----------------------------------+  .                    |
+ *         | ra_mmap_table7                   |  .                    |
+ *         |                                  |  .                    |
+ *         | base..base+size --> remote_haid  |  remote_agent_id_end  |
+ *         |                                  |                       |
+ *         +----------------------------------+-----------------------+
  */
 struct mod_cmn_rhodes_ccix_config {
     /*! Logical ID of the CXG block to which this configuration applies */
     unsigned int ldid;
 
+    /*! Unique HAID in a multi-chip system. This has to be assigned manually */
+    unsigned int haid;
+
+    /*! Number of remote RN Caching agents. */
+    unsigned int remote_rnf_count;
+
     /*! Table of region memory map entries */
     const struct mod_cmn_rhodes_mem_region_map remote_mmap_table;
+
+    /*! Table of remote region memory map entries */
+    const struct mod_cmn_rhodes_ra_mem_region_map
+        ra_mmap_table[CMN_RHODES_MAX_RA_SAM_ADDR_REGION];
+
+    /*! Number of entries in the \ref ra_mmap_table */
+    size_t ra_mmap_count;
+
+    /*! Table of remote agent ids start and end backed by the links */
+    struct mod_cmn_rhodes_agentid_to_linkid_map
+        remote_agentid_to_linkid_map[CMN_RHODES_MAX_CCIX_PROTOCOL_LINKS];
+
+    /*! SMP Mode */
+    bool smp_mode;
 };
 
 /*!
