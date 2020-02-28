@@ -37,7 +37,7 @@ static struct mod_sensor_info juno_xrp7724_info_temperature = {
 
 static const struct fwk_element juno_xrp7724_element_table[] = {
     [MOD_JUNO_XRP7724_ELEMENT_IDX_SENSOR] = {
-        .name = "TEMPERATURE SENSOR",
+        .name = "TEMP",
         .data = &(const struct mod_juno_xrp7724_dev_config) {
             .driver_response_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SENSOR,
                 MOD_JUNO_SENSOR_XRP7724_PMIC_TEMP_IDX),
