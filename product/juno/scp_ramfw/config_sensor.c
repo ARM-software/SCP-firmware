@@ -23,7 +23,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
      * PMIC Sensor
      */
     [MOD_JUNO_SENSOR_XRP7724_PMIC_TEMP_IDX] = {
-        .name = "PMIC temperature",
+        .name = "PMIC-temp",
         .data = &(struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_XRP7724, 0),
             .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_JUNO_XRP7724,
@@ -76,7 +76,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
      * ADC Sensors
      */
     [MOD_JUNO_SENSOR_VOLT_SYS_IDX] = {
-        .name = "Volt-sys",
+        .name = "adc-V-sys",
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_ADC,
                                                  ADC_TYPE_VOLT,
@@ -86,7 +86,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
         }),
     },
     [MOD_JUNO_SENSOR_VOLT_BIG_IDX] = {
-        .name = "Volt-big",
+        .name = "adc-V-big",
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_ADC,
                                                  ADC_TYPE_VOLT,
@@ -96,7 +96,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
         }),
     },
     [MOD_JUNO_SENSOR_VOLT_LITTLE_IDX] = {
-        .name = "Volt-little",
+        .name = "adc-V-little",
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_ADC,
                                                  ADC_TYPE_VOLT,
@@ -106,7 +106,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
         }),
     },
     [MOD_JUNO_SENSOR_VOLT_GPU_IDX] = {
-        .name = "Volt-gpu",
+        .name = "adc-V-gpu",
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_ADC,
                                                  ADC_TYPE_VOLT,
@@ -116,7 +116,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
         }),
     },
     [MOD_JUNO_SENSOR_AMPS_SYS_IDX] = {
-        .name = "Amps-sys",
+        .name = "adc-I-sys",
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_ADC,
                                                  ADC_TYPE_CURRENT,
@@ -126,7 +126,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
         }),
     },
     [MOD_JUNO_SENSOR_AMPS_BIG_IDX] = {
-        .name = "Amps-big",
+        .name = "adc-I-big",
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_ADC,
                                                  ADC_TYPE_CURRENT,
@@ -136,7 +136,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
         }),
     },
     [MOD_JUNO_SENSOR_AMPS_LITTLE_IDX] = {
-        .name = "Amps-little",
+        .name = "adc-I-little",
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_ADC,
                                                  ADC_TYPE_CURRENT,
@@ -146,7 +146,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
         }),
     },
     [MOD_JUNO_SENSOR_AMPS_GPU_IDX] = {
-        .name = "Amps-gpu",
+        .name = "adc-I-gpu",
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_ADC,
                                                  ADC_TYPE_CURRENT,
@@ -156,7 +156,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
         }),
     },
     [MOD_JUNO_SENSOR_WATT_SYS_IDX] = {
-        .name = "Watt-sys",
+        .name = "adc-W-sys",
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_ADC,
                                                  ADC_TYPE_POWER,
@@ -166,7 +166,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
         }),
     },
     [MOD_JUNO_SENSOR_WATT_BIG_IDX] = {
-        .name = "Watt-big",
+        .name = "adc-W-big",
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_ADC,
                                                  ADC_TYPE_POWER,
@@ -176,7 +176,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
         }),
     },
     [MOD_JUNO_SENSOR_WATT_LITTLE_IDX] = {
-        .name = "Watt-little",
+        .name = "adc-W-little",
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_ADC,
                                                  ADC_TYPE_POWER,
@@ -186,7 +186,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
         }),
     },
     [MOD_JUNO_SENSOR_WATT_GPU_IDX] = {
-        .name = "Watt-gpu",
+        .name = "adc-W-gpu",
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_ADC,
                                                  ADC_TYPE_POWER,
@@ -196,7 +196,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
         }),
     },
     [MOD_JUNO_SENSOR_JOULE_SYS_IDX] = {
-        .name = "Joule-sys",
+        .name = "adc-J-sys",
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_ADC,
                                                  ADC_TYPE_ENERGY,
@@ -206,7 +206,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
         }),
     },
     [MOD_JUNO_SENSOR_JOULE_BIG_IDX] = {
-        .name = "Joule-big",
+        .name = "adc-J-big",
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_ADC,
                                                  ADC_TYPE_ENERGY,
@@ -216,7 +216,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
         }),
     },
     [MOD_JUNO_SENSOR_JOULE_LITTLE_IDX] = {
-        .name = "Joule-little",
+        .name = "adc-J-little",
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_ADC,
                                                  ADC_TYPE_ENERGY,
@@ -226,7 +226,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
         }),
     },
     [MOD_JUNO_SENSOR_JOULE_GPU_IDX] = {
-        .name = "Joule-gpu",
+        .name = "adc-J-gpu",
         .data = &((struct mod_sensor_dev_config) {
             .driver_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_ADC,
                                                  ADC_TYPE_ENERGY,
