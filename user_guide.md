@@ -29,6 +29,9 @@ Additionally, the firmware may be built using one of two compilers:
 - [Arm Compiler 6](https://developer.arm.com/tools-and-software/embedded/arm-compiler/downloads/version-6)
     (*6.13* or later)
 
+For Juno, it is required to have a more recent of GNU Arm embedded toolchain.
+We recommend to use at least the following release: 9-2019-q4-major.
+
 The following tools are recommended but not required:
 
 - [Doxygen](http://www.doxygen.nl/) (*1.8.13* or later): Required to generate
@@ -300,6 +303,62 @@ FVP_CSS_SGI-575 \
     -C css.mcp.ROMloader.fname=${MCP_ROM_PATH} \
     -C board.flashloader0.fname=${NOR_PATH}
 ```
+
+## Running the SCP firmware on Juno Development Board
+
+For an introduction to the Juno Development Board, please refer to
+[the Arm Developer documentation](https://developer.arm.com/tools-and-software/development-boards/juno-development-board).
+
+The instructions within this section are similar to the use for SGM platforms
+with small differences.
+
+### Building the images
+
+Like for SGM platforms, the build system generates two images. For Juno, an
+additional binary is generated:
+
+- `scp_romfw_bypass.bin`: SCP ROM BYPASS firmware image - alternative ROM
+    firmware that is loaded from an external non volatile on-board memory.
+    This binary needs to be used in order to successfully load the scp_ramfw,
+    and is chain-loaded from the burned-in ROM on the physical board (not
+    necessary for the FVP).
+
+Please note that we recommend to use the latest release of TF-A (at least 2.2)
+and the following patch needs to be included (if not yet present) [ddc93cbaa42bba08afd5041822a386876518446b](https://review.trustedfirmware.org/plugins/gitiles/TF-A/trusted-firmware-a/+/ddc93cbaa42bba08afd5041822a386876518446b)
+
+This change makes sure that SCP-firmware is correctly loaded by TF-A.
+
+### Booting the firmware
+
+The same steps for creating a FIP binary described for SGM platforms can be
+applied here. When invoking make for TF-A please replace PLAT=sgm775 with
+PLAT=juno.
+
+Before proceeding with the boot on Juno, make sure you have all the following
+binaries:
+
+- scp_romfw_bypass.bin
+- fip.bin
+- bl1.bin
+- bl2.bin
+
+At this stage, it is expected that the Juno board has the SD card with the
+factory content. If this is not the case, you can follow the Linaro software
+release [instructions](https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms.git/about/docs/juno/user-guide.rst) and/or download a new SD card filesystem on the
+[Linaro Releases](https://releases.linaro.org/members/arm/platforms/). Please
+choose, for this example, juno-latest-busybox-uboot.zip.
+
+Once you have extracted the content of the zipped folder into the SD card,
+simply replace fip.bin, bl1.bin and bl2.bin previously generated with the ones
+provided from the release. Rename scp_romfw_bypass.bin into scp_bl1.bin and
+replace this as well. All the above binaries will be replaced into the SOFTWARE
+folder in the SD card.
+
+Lastly, run 'sync' on your host computer and you can reset the board. After this
+the board will boot to BusyBox.
+
+You can see the progress of the boot by connecting the UART to your host PC
+(please follow instructions in the Juno Getting Started Guide).
 
 ## Software stack
 

@@ -3,65 +3,70 @@ SCP-firmware Change Log
 
 Copyright (c) 2019-2020, Arm Limited and Contributors. All rights reserved.
 
-SCP-firmware - version 2.5.0
+SCP-firmware - version 2.6.0
 ============================
 
 New features
 ------------
 
-- Module-based architecture with an event-driven execution model:
-    - Firmware code is organized into modules, where a module fulfills a well-
-      defined role (driver HAL, driver, protocol or service).
-    - A framework drives the initialization, orchestration of, and interactions
-      between modules.
+- Support for the following platforms has been added :-
+    - Juno Arm Development Platform
+    - Neoverse N1 Software Development Platform
+    - SGM-776
+    - RD-N1-Edge
+    - RD-N1-Edge Dual-Chip
+    - RD-Daniel Config-M
 
-- Processor-agnostic module code enables firmware portability across systems:
-    - Processor-dependent features (e.g. interrupt handling) are abstracted from
-      the modules by the framework.
-    - The framework relies on an interface whose implementation is processor-
-      dependent to provide these features.
+- New modules:
+    - DMC500
+    - XRP7724
+    - CDCEL937
+    - I2C
+    - dw_apb_i2c (Synopsis DesignWare I2C controller)
+    - mock_sensor
+    - Debug Module
+    - System Info
 
-- Module configurability easing the re-use of modules on different platforms:
-    - Strict split between the hardware and software feature configuration data
-      and module code.
+Changed
+-------
 
-- A native framework test suite provides rapid development and validation of the
-  core framework implementation.
+- Build System:
+    static analysis: Add suppression list for Cppcheck Static Code Analysis
+    tools: Add script to check usage of banned functions
+    build: enhance entry guards in internal header files
 
-- Support for Armv7-M control processor architecture based on CMSIS v5 and Keil
-  RTX 5.
+- Documentation:
+    DVFS: Document DVFS architecture
+    doc: Fix link location for Cppcheck suppression list
+    doc: Correct Cppcheck invocation description
+    doc: Add notification information to the documentation
+    doc: Clarify contributors' and Maintainers' responsibilities
+    doc: Update list of maintainers for SCP-firmware
+    doc: Add documentation for deferred responses
+    doc: Add glossary to Doxygen configuration input
 
-- Provides system initialization support to enable boot of the application
-  cores.
+- Framework:
+    fwk/notification: Allow use of provided source_id for notify
+    thread: Get head of delayed response list
+    module: Add FWK_ID_NONE source_id for notifications
+    fwk: Delete fwk_module_check_call implementation
+    fwk: Extend delayed response support
+    fwk: Split delayed response from fwk_multi_thread
+    fwk_interrupt: add missing declaration of exported functions
+    fwk_thread: Clarify support for delayed responses
+    fwk: Rename fwk_errno.h to fwk_status.h
+    fwk_errno: Add FWK_PENDING return value
+    fwk_module: Extend fwk_module_get_data for sub-elements
+    framework: allow product to define notification count
 
-- Provides the following runtime services:
-    - Power domain management
-    - System power management
-    - Performance domain management (Dynamic voltage and frequency scaling)
-    - Clock management
-    - Sensor management
-
-- Provides a reference implementation of the System Control and Management
-  Interface v1.0 (SCMI, platform-side). The SCMI specification can be found
-  [here](http://infocenter.arm.com/help/topic/com.arm.doc.den0056a/DEN0056A_System_Control_and_Management_Interface.pdf).
-
-- Provides a build system supporting:
-    - The GNU Arm Embedded and Arm Compiler 6 toolchains
-    - Platforms with multiple firmware images
-
-- In-source Doxygen documentation
-
-- Support for the SGM-775 platform
-
-Known issues
-------------
-
-- The build system does not configure the compiler to avoid code generation of
-  unaligned accesses. As ARMv7-M targets are configured to trap on unaligned
-  word or halfword accesses, this can result in hardware exceptions.
-  [This patch](https://github.com/ARM-software/SCP-firmware/commit/d2a77e0d4d0d369f7504c032a380578a4d145438)
-  fixes this issue.
-
+- Modules:
+    DVFS: Add support for pending requests
+    clock: Add full support for asynchronous drivers
+    scmi_clock: Add support for pending requests
+    scmi_sensor: Add support for pending responses
+    sensor: Add support for asynchronous drivers
+    arch/armv7-m: Split exception table from handlers
+    arm7-m: Add support for custom default exception handler
 
 SCP-firmware - version 2.5.0
 ============================
@@ -127,3 +132,63 @@ Resolved issues
     - cmn600: Stop checking type of external nodes
     - ppu_v0: Ensure bound_id is set when bound by system_power
     - system_power: Fix extented PPU support
+
+SCP-firmware - version 2.4.0
+============================
+
+New features
+------------
+
+- Module-based architecture with an event-driven execution model:
+    - Firmware code is organized into modules, where a module fulfills a well-
+      defined role (driver HAL, driver, protocol or service).
+    - A framework drives the initialization, orchestration of, and interactions
+      between modules.
+
+- Processor-agnostic module code enables firmware portability across systems:
+    - Processor-dependent features (e.g. interrupt handling) are abstracted from
+      the modules by the framework.
+    - The framework relies on an interface whose implementation is processor-
+      dependent to provide these features.
+
+- Module configurability easing the re-use of modules on different platforms:
+    - Strict split between the hardware and software feature configuration data
+      and module code.
+
+- A native framework test suite provides rapid development and validation of the
+  core framework implementation.
+
+- Support for Armv7-M control processor architecture based on CMSIS v5 and Keil
+  RTX 5.
+
+- Provides system initialization support to enable boot of the application
+  cores.
+
+- Provides the following runtime services:
+    - Power domain management
+    - System power management
+    - Performance domain management (Dynamic voltage and frequency scaling)
+    - Clock management
+    - Sensor management
+
+- Provides a reference implementation of the System Control and Management
+  Interface v1.0 (SCMI, platform-side). The SCMI specification can be found
+  [here](http://infocenter.arm.com/help/topic/com.arm.doc.den0056a/DEN0056A_System_Control_and_Management_Interface.pdf).
+
+- Provides a build system supporting:
+    - The GNU Arm Embedded and Arm Compiler 6 toolchains
+    - Platforms with multiple firmware images
+
+- In-source Doxygen documentation
+
+- Support for the SGM-775 platform
+
+Known issues
+------------
+
+- The Juno platform is extremely limited with regards to available memory.
+  As a result the debug experience is poor, and the ability to add new
+  features severely restricted.
+- arm-compiler-6 does not support LTO with our build system. No runs
+  can be done when the SCP-firmware is built with arm-compiler-6 due
+  to space limitations.
