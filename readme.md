@@ -1,4 +1,4 @@
-SCP-firmware - version 2.5
+SCP-firmware - version 2.6
 ==========================
 
 Copyright (c) 2011-2020, Arm Limited. All rights reserved.
@@ -59,6 +59,12 @@ Virtual Platforms (FVPs):
 - System Guidance for Mobile platform SGM-775 (Version 11.3 Build 42)
 - System Guidance for Infrastruture SGI-575 (Version 11.3 Build 42)
 - Neoverse N1 reference design (Version 11.6 Build 45)
+- System Guidance for Mobile platform SGM-776 (Version 11.6 Build 45)
+- Juno reference design (Please contact Arm directly to obtain the Juno FVP)
+- RD-N1-Edge Dual-Chip reference design  (Please contact Arm directly to obtain the
+  RdN1EdgeX2 FVP)
+- RD-Daniel Config-M reference design  (Please contact Arm directly to obtain the
+  RdDaniel-CfgM FVP)
 
 License
 -------
