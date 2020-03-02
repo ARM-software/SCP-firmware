@@ -20,11 +20,11 @@ static const struct fwk_element n1sdp_tsync_element_table[] = {
         .data = &((struct mod_n1sdp_tsync_config) {
             .irq = TIMER_SYNC_IRQ,
             .reg = SCP_TIMER_SYNC_BASE,
-            .ccix_delay = 90,
+            .ccix_delay = 25,
             .sync_timeout = 0x200,
             .sync_interval = 0x500,
             .off_threshold = 0xF,
-            .target_cnt_base = 0x2A430008,
+            .target_cnt_base = 0x2A430000,
             .local_offset = SCP_SYS1_BASE,
             .remote_offset = (4UL * FWK_TIB),
         })
