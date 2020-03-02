@@ -29,6 +29,12 @@
 #define SYNC_CHECK_INTERVAL_US UINT32_C(100000)
 #define SYNC_RETRIES           100
 
+#define CNTCTL_CR_OFFSET        UINT32_C(0x0)
+#define CNTCTL_CVL_OFFSET       UINT32_C(0x8)
+#define CNTCTL_CVH_OFFSET       UINT32_C(0xC)
+#define CNTCONTROL_CR_EN        UINT32_C(0x00000001)
+#define CNTCONTROL_CR_FCREQ     UINT32_C(0x00000100)
+
 /* N1SDP timer synchronization device context */
 struct tsync_device_ctx {
     /* Pointer to the device configuration */
@@ -89,11 +95,21 @@ bool is_timer_synced(struct tsync_device_ctx *ctx)
 
     fwk_assert(ctx != NULL);
 
-    low = *(volatile uint32_t *)(ctx->local_cnt_addr);
+    low = *(volatile uint32_t *)(ctx->local_cnt_addr + CNTCTL_CVL_OFFSET);
     tsync_ctx.ap_mem_api->enable_ap_memory_access(ctx->remote_cnt_addr);
     low_r = *(volatile uint32_t *)(SCP_AP_1MB_WINDOW_BASE +
-        (ctx->local_cnt_addr & SCP_AP_1MB_WINDOW_ADDR_MASK));
+        ((ctx->local_cnt_addr + CNTCTL_CVL_OFFSET) &
+         SCP_AP_1MB_WINDOW_ADDR_MASK));
     return (((low_r - low) < COUNTER_DELTA_MAX));
+}
+
+void n1sdp_timer_reset_counter(struct tsync_device_ctx *ctx)
+{
+    *(volatile uint32_t *)(ctx->local_cnt_addr + CNTCTL_CR_OFFSET) = 0;
+    *(volatile uint32_t *)(ctx->local_cnt_addr + CNTCTL_CVH_OFFSET) = 0;
+    *(volatile uint32_t *)(ctx->local_cnt_addr + CNTCTL_CVL_OFFSET) = 0;
+    *(volatile uint32_t *)(ctx->local_cnt_addr + CNTCTL_CR_OFFSET) |=
+        (CNTCONTROL_CR_EN | CNTCONTROL_CR_FCREQ);
 }
 
 /*
@@ -106,6 +122,7 @@ static int n1sdp_sync_master_timer(fwk_id_t id)
 
     device_ctx = &tsync_ctx.device_ctx_table[fwk_id_get_element_idx(id)];
 
+    n1sdp_timer_reset_counter(device_ctx);
     device_ctx->reg->GCNT_TIMEOUT = device_ctx->config->sync_timeout;
     device_ctx->reg->SLVCHIP_GCNT_NW_DELAY = device_ctx->config->ccix_delay;
     device_ctx->reg->MST_GCNT_SYNC_CTRL = MST_GCNT_SYNC_CTRL_EN_MASK;
@@ -136,6 +153,7 @@ static int n1sdp_sync_slave_timer(fwk_id_t id)
 
     device_ctx = &tsync_ctx.device_ctx_table[fwk_id_get_element_idx(id)];
 
+    n1sdp_timer_reset_counter(device_ctx);
     irq = device_ctx->config->irq;
     fwk_interrupt_set_isr_param(irq, &timer_sync_isr, (uintptr_t)device_ctx);
     fwk_interrupt_clear_pending(irq);
