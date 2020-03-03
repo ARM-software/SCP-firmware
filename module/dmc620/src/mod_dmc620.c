@@ -58,10 +58,12 @@ static int mod_dmc620_bind(fwk_id_t id, unsigned int round)
     module_config = fwk_module_get_data(fwk_module_id_dmc620);
     assert(module_config != NULL);
 
-    status = fwk_module_bind(module_config->ddr_module_id,
-                             module_config->ddr_api_id, &ddr_phy_api);
-    if (status != FWK_SUCCESS)
-        return status;
+    if (!(fwk_id_is_equal(module_config->ddr_module_id, FWK_ID_NONE))) {
+        status = fwk_module_bind(module_config->ddr_module_id,
+                                 module_config->ddr_api_id, &ddr_phy_api);
+        if (status != FWK_SUCCESS)
+            return status;
+    }
 
     return FWK_SUCCESS;
 }
@@ -254,7 +256,8 @@ static int dmc620_config(struct mod_dmc620_reg *dmc, fwk_id_t ddr_id)
     /* Enable RAS interrupts and error detection */
     dmc->ERR0CTLR0 = reg_val->ERR0CTLR0;
 
-    ddr_phy_api->configure(ddr_id);
+    if (!(fwk_id_is_equal(module_config->ddr_module_id, FWK_ID_NONE)))
+        ddr_phy_api->configure(ddr_id);
 
     for (i = 0; i < 3; i++) /* ~200ns */
         __NOP();
