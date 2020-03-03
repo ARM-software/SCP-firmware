@@ -528,7 +528,7 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
     /* Use CAL mode only if the CMN600 revision is r2p0 or above */
     if (is_cal_mode_supported(ctx->root) && config->hnf_cal_mode) {
         for (region_idx = 0; region_idx < CMN600_MAX_NUM_SCG; region_idx++)
-            rnsam->SYS_CACHE_GRP_CAL_MODE = scg_regions_enabled[region_idx] *
+            rnsam->SYS_CACHE_GRP_CAL_MODE |= scg_regions_enabled[region_idx] *
                 (CMN600_RNSAM_SCG_HNF_CAL_MODE_EN <<
                  (region_idx * CMN600_RNSAM_SCG_HNF_CAL_MODE_SHIFT));
     }
