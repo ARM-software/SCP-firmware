@@ -373,7 +373,7 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
      */
     if (config->hnf_cal_mode)
         for (region_idx = 0; region_idx < MAX_SCG_COUNT; region_idx++)
-            rnsam->SYS_CACHE_GRP_CAL_MODE = scg_regions_enabled[region_idx] *
+            rnsam->SYS_CACHE_GRP_CAL_MODE |= scg_regions_enabled[region_idx] *
                 (CMN_RHODES_RNSAM_SCG_HNF_CAL_MODE_EN <<
                  (region_idx * CMN_RHODES_RNSAM_SCG_HNF_CAL_MODE_SHIFT));
 
