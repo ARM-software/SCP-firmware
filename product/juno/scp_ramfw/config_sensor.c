@@ -115,6 +115,8 @@ static const struct fwk_element sensor_element_table_r0[] = {
                                              MOD_JUNO_ADC_API_IDX_DRIVER),
         }),
     },
+
+    #if USE_FULL_SET_SENSORS
     [MOD_JUNO_SENSOR_AMPS_SYS_IDX] = {
         .name = "adc-I-sys",
         .data = &((struct mod_sensor_dev_config) {
@@ -235,11 +237,12 @@ static const struct fwk_element sensor_element_table_r0[] = {
                                              MOD_JUNO_ADC_API_IDX_DRIVER),
         }),
     },
+    #endif
 
     /* The termination description is added at runtime */
 };
 
-
+#if USE_FULL_SET_SENSORS
 /* The following table lists PVT sensors available on juno R1 & R2 */
 static const struct fwk_element pvt_sensors_juno_r1_r2_elem_table[] = {
     [0] = {
@@ -280,6 +283,7 @@ static const struct fwk_element pvt_sensors_juno_r1_r2_elem_table[] = {
     },
     /* The termination description is added at runtime */
 };
+#endif
 
 /*
  * When running on a model at least one fake sensor is required to register in
@@ -301,9 +305,12 @@ static const struct fwk_element *get_sensor_element_table(fwk_id_t module_id)
 {
     int status;
     enum juno_idx_platform platform_id = JUNO_IDX_PLATFORM_COUNT;
+
+    #if USE_FULL_SET_SENSORS
     enum juno_idx_revision rev;
+    #endif
+
     size_t sensor_elem_table_size;
-    size_t pvt_sensor_elem_table_size;
     struct fwk_element *element_table;
 
     status = juno_id_get_platform(&platform_id);
@@ -313,13 +320,12 @@ static const struct fwk_element *get_sensor_element_table(fwk_id_t module_id)
     if (platform_id == JUNO_IDX_PLATFORM_FVP)
         return sensor_element_table_fvp;
     else {
+        sensor_elem_table_size = FWK_ARRAY_SIZE(sensor_element_table_r0);
+
+        #if USE_FULL_SET_SENSORS
         status = juno_id_get_revision(&rev);
         if (status != FWK_SUCCESS)
             return NULL;
-
-        sensor_elem_table_size = FWK_ARRAY_SIZE(sensor_element_table_r0);
-        pvt_sensor_elem_table_size =
-            FWK_ARRAY_SIZE(pvt_sensors_juno_r1_r2_elem_table);
 
         if (rev == JUNO_IDX_REVISION_R0) {
             /* Just add the termination description */
@@ -351,6 +357,18 @@ static const struct fwk_element *get_sensor_element_table(fwk_id_t module_id)
                    pvt_sensors_juno_r1_r2_elem_table,
                    sizeof(pvt_sensors_juno_r1_r2_elem_table));
         }
+        #else
+        /* Just add the termination description */
+        element_table = fwk_mm_calloc(
+            (sensor_elem_table_size + 1),
+            sizeof(struct fwk_element));
+        if (element_table == NULL)
+            return NULL;
+
+        memcpy(element_table,
+               sensor_element_table_r0,
+               sizeof(sensor_element_table_r0));
+        #endif
 
         return element_table;
     }

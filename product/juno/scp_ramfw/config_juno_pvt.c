@@ -15,6 +15,7 @@
 #include <juno_irq.h>
 #include <juno_pvt.h>
 #include <config_power_domain.h>
+#include <config_sensor.h>
 #include <pvt_sensor_calibration.h>
 
 /* Constants for additional calibration on Juno R0 */
@@ -128,6 +129,7 @@ static const struct mod_juno_pvt_dev_config dev_config_gpu[] = {
     }
 };
 
+#if USE_FULL_SET_SENSORS
 static const struct mod_juno_pvt_dev_config dev_config_soc[] = {
     [0] = {
         .group = &sensor_group[JUNO_PVT_GROUP_SOC],
@@ -138,6 +140,7 @@ static const struct mod_juno_pvt_dev_config dev_config_soc[] = {
         .cal_reg_b = (uint16_t *)&JUNO_PVT_CALIBRATION->G1_S0_900MV_85C,
     },
 };
+#endif
 
 static const struct mod_juno_pvt_dev_config dev_config_soc_r0[] = {
     [0] = {
@@ -163,6 +166,7 @@ static const struct mod_juno_pvt_dev_config dev_config_stdcell[] = {
     },
 };
 
+#if USE_FULL_SET_SENSORS
 static const struct fwk_element pvt_juno_element_table[] = {
     [JUNO_PVT_GROUP_BIG] = {
         .name = "",
@@ -191,6 +195,7 @@ static const struct fwk_element pvt_juno_element_table[] = {
     },
     [JUNO_PVT_GROUP_COUNT] = { 0 },
 };
+#endif
 
 static const struct fwk_element pvt_juno_element_table_r0[] = {
     [JUNO_PVT_GROUP_BIG] = {
@@ -223,6 +228,7 @@ static const struct fwk_element pvt_juno_element_table_r0[] = {
 
 static const struct fwk_element *get_pvt_juno_element_table(fwk_id_t id)
 {
+    #if USE_FULL_SET_SENSORS
     int status;
     enum juno_idx_revision rev;
 
@@ -241,6 +247,12 @@ static const struct fwk_element *get_pvt_juno_element_table(fwk_id_t id)
 
         return pvt_juno_element_table;
     }
+    #else
+    sensor_group[JUNO_PVT_GROUP_BIG].sensor_count = 1;
+    sensor_group[JUNO_PVT_GROUP_LITTLE].sensor_count = 1;
+
+    return pvt_juno_element_table_r0;
+    #endif
 }
 
 struct fwk_module_config config_juno_pvt = {
