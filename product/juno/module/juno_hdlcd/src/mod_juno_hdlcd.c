@@ -162,8 +162,6 @@ static int juno_hdlcd_set_rate(fwk_id_t clock_id, uint64_t rate,
     uint32_t clock_rate;
     uint32_t rounded_rate;
 
-    fwk_assert(fwk_module_is_valid_element_id(clock_id));
-
     ctx = ctx_table + fwk_id_get_element_idx(clock_id);
 
     status = round_rate(ctx, round_mode, rate, &rounded_rate);
@@ -255,9 +253,6 @@ static int juno_hdlcd_get_rate(fwk_id_t clock_id, uint64_t *rate)
 {
     struct juno_hdlcd_dev_ctx *ctx;
 
-    fwk_assert(fwk_module_is_valid_element_id(clock_id));
-    fwk_assert(rate != NULL);
-
     ctx = ctx_table + fwk_id_get_element_idx(clock_id);
 
     /* Find out the clock source in use */
@@ -283,8 +278,6 @@ static int juno_hdlcd_get_rate_from_index(fwk_id_t clock_id,
 static int juno_hdlcd_set_state(fwk_id_t clock_id,
                                 enum mod_clock_state state)
 {
-    fwk_assert(fwk_module_is_valid_element_id(clock_id));
-
     if (state != MOD_CLOCK_STATE_RUNNING)
         return FWK_E_SUPPORT;
 
@@ -294,9 +287,6 @@ static int juno_hdlcd_set_state(fwk_id_t clock_id,
 static int juno_hdlcd_get_state(fwk_id_t clock_id,
                                 enum mod_clock_state *state)
 {
-    fwk_assert(fwk_module_is_valid_element_id(clock_id));
-    fwk_assert(state != NULL);
-
     *state = MOD_CLOCK_STATE_RUNNING;
 
     return FWK_SUCCESS;
@@ -306,9 +296,6 @@ static int juno_hdlcd_get_range(fwk_id_t clock_id,
                                 struct mod_clock_range *range)
 {
     struct juno_hdlcd_dev_ctx *ctx;
-
-    fwk_assert(fwk_module_is_valid_element_id(clock_id));
-    fwk_assert(range != NULL);
 
     ctx = ctx_table + fwk_id_get_element_idx(clock_id);
 
