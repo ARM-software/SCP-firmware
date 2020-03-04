@@ -678,8 +678,6 @@ static int juno_cdcel937_set_rate(fwk_id_t clock_id,
     uint64_t rounded_rate = rate;
     struct juno_cdcel937_dev_ctx *ctx;
 
-    fwk_assert(fwk_module_is_valid_element_id(clock_id));
-
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
     if (ctx->config->rate_type == MOD_CLOCK_RATE_TYPE_CONTINUOUS) {
@@ -701,11 +699,6 @@ static int juno_cdcel937_get_rate(fwk_id_t clock_id,
     int status;
     struct juno_cdcel937_dev_ctx *ctx;
 
-    fwk_assert(fwk_module_is_valid_element_id(clock_id));
-
-    if (!fwk_expect(rate != NULL))
-        return FWK_E_PARAM;
-
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
     if (ctx->rate_set == false) {
@@ -726,11 +719,6 @@ static int juno_cdcel937_get_rate_from_index(fwk_id_t clock_id,
 {
     struct juno_cdcel937_dev_ctx *ctx;
 
-    fwk_assert(fwk_module_is_valid_element_id(clock_id));
-
-    if (!fwk_expect(rate != NULL))
-        return FWK_E_PARAM;
-
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
     if (rate_index >= ctx->config->lookup_table_count)
@@ -744,8 +732,6 @@ static int juno_cdcel937_get_rate_from_index(fwk_id_t clock_id,
 static int juno_cdcel937_set_state(fwk_id_t clock_id,
                                    enum mod_clock_state state)
 {
-    fwk_assert(fwk_module_is_valid_element_id(clock_id));
-
     if (state != MOD_CLOCK_STATE_RUNNING)
         return FWK_E_SUPPORT;
 
@@ -759,11 +745,6 @@ static int juno_cdcel937_set_state(fwk_id_t clock_id,
 static int juno_cdcel937_get_state(fwk_id_t clock_id,
                                    enum mod_clock_state *state)
 {
-    fwk_assert(fwk_module_is_valid_element_id(clock_id));
-
-    if (!fwk_expect(state != NULL))
-        return FWK_E_PARAM;
-
     /*
      * It is unlikely that outputs will be disabled as, due to the design of
      * the device outputs, disabling one clock could unintentionally
@@ -780,11 +761,6 @@ static int juno_cdcel937_get_range(fwk_id_t clock_id,
 {
     unsigned int last_idx;
     struct juno_cdcel937_dev_ctx *ctx;
-
-    fwk_assert(fwk_module_is_valid_element_id(clock_id));
-
-    if (!fwk_expect(range != NULL))
-        return FWK_E_PARAM;
 
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
@@ -810,8 +786,6 @@ static int juno_cdcel937_set_rate_from_index(fwk_id_t clock_id,
 {
     uint64_t rate;
     struct juno_cdcel937_dev_ctx *ctx;
-
-    fwk_assert(fwk_module_is_valid_element_id(clock_id));
 
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
