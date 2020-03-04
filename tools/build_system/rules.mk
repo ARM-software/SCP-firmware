@@ -124,6 +124,8 @@ CFLAGS_CLANG += -fshort-enums # Required by RTX
 
 CFLAGS += -fno-exceptions
 
+CPPFLAGS += -x c -E -P
+
 DEP_CFLAGS_GCC = -MD -MP
 
 ASFLAGS_GCC += -x

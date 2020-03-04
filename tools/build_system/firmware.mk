@@ -306,7 +306,7 @@ $(TARGET_ELF): $(LIB_TARGETS_y) $(SCATTER_PP) $(OBJECTS) | $$(@D)/
 
 $(SCATTER_PP): $(SCATTER_SRC) | $$(@D)/
 	$(call show-action,GEN,$@)
-	$(CC) $(CFLAGS) -E -P -C $< -o $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 $(TARGET_BIN): $(TARGET_ELF) | $$(@D)/
 	$(call show-action,BIN,$@)
