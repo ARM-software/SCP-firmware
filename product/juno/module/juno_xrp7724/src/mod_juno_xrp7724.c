@@ -274,15 +274,9 @@ static int juno_xrp7724_sensor_get_value(fwk_id_t id, uint64_t *value)
 {
     int status;
     struct fwk_event event;
-    struct juno_xrp7724_dev_ctx *ctx;
-
-    fwk_assert(fwk_module_is_valid_element_id(id));
 
     if (module_ctx.sensor_request != JUNO_XRP7724_SENSOR_REQUEST_IDLE)
         return FWK_E_BUSY;
-
-    ctx = &ctx_table[fwk_id_get_element_idx(id)];
-    fwk_assert(ctx->config->type == MOD_JUNO_XRP7724_ELEMENT_TYPE_SENSOR);
 
     event = (struct fwk_event) {
         .target_id = id,
@@ -305,10 +299,7 @@ static int juno_xrp7724_sensor_get_info(fwk_id_t id,
 {
     const struct juno_xrp7724_dev_ctx *ctx;
 
-    fwk_assert(info != NULL);
-
     ctx = &ctx_table[fwk_id_get_element_idx(id)];
-    fwk_assert(ctx->config->type == MOD_JUNO_XRP7724_ELEMENT_TYPE_SENSOR);
 
     *info = *(ctx->config->sensor_info);
 
