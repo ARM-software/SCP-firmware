@@ -16,7 +16,7 @@
 
 static const struct fwk_element dw_apb_i2c_element_table[] = {
     [0] = {
-        .name = "DW APB I2C",
+        .name = "",
         .data = &(struct mod_dw_apb_i2c_dev_config) {
             .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
             .i2c_irq = I2C_IRQ,

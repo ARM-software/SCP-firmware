@@ -36,7 +36,7 @@
 
 static struct fwk_element juno_dmc400_element_table[] = {
     [0] = {
-        .name = "DMC400",
+        .name = "",
         .data = &((struct mod_juno_dmc400_element_config) {
             .dmc = DMC400_BASE,
             .ddr_phy_0_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_DDR_PHY400,

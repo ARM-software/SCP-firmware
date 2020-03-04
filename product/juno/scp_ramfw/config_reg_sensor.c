@@ -25,7 +25,7 @@ static struct mod_sensor_info info_fake_temperature = {
 
 static const struct fwk_element reg_sensor_element_table[] = {
     [0] = {
-        .name = "Fake Temperature",
+        .name = "",
         .data = &((struct mod_reg_sensor_dev_config) {
             .reg = (uintptr_t)(&fake_register),
             .info = &info_fake_temperature,

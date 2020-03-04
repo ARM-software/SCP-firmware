@@ -24,7 +24,7 @@ static const uint8_t system_power_to_sys_ppu_state[] = {
 
 static const struct fwk_element system_power_element_table[] = {
     [0] = {
-        .name = "SYS-PPU-0",
+        .name = "",
         .data = &((struct mod_system_power_dev_config) {
             .sys_ppu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_SYSTOP),

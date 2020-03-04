@@ -13,7 +13,7 @@
 
 static const struct fwk_element adc_juno_element_table[] = {
     [ADC_TYPE_CURRENT] = {
-        .name = "ADC-I",
+        .name = "",
         .sub_element_count = ADC_DEV_TYPE_COUNT,
         .data = &((struct mod_juno_adc_dev_config) {
             .info = &((struct mod_sensor_info) {
@@ -23,7 +23,7 @@ static const struct fwk_element adc_juno_element_table[] = {
         }),
     },
     [ADC_TYPE_VOLT] = {
-        .name = "ADC-V",
+        .name = "",
         .sub_element_count = ADC_DEV_TYPE_COUNT,
         .data = &((struct mod_juno_adc_dev_config) {
             .info = &((struct mod_sensor_info) {
@@ -33,7 +33,7 @@ static const struct fwk_element adc_juno_element_table[] = {
         }),
     },
     [ADC_TYPE_POWER] = {
-        .name = "ADC-W",
+        .name = "",
         .sub_element_count = ADC_DEV_TYPE_COUNT,
         .data = &((struct mod_juno_adc_dev_config) {
             .info = &((struct mod_sensor_info) {
@@ -43,7 +43,7 @@ static const struct fwk_element adc_juno_element_table[] = {
         }),
     },
     [ADC_TYPE_ENERGY] = {
-        .name = "ADC-J",
+        .name = "",
         .sub_element_count = ADC_DEV_TYPE_COUNT,
         .data = &((struct mod_juno_adc_dev_config) {
             .info = &((struct mod_sensor_info) {

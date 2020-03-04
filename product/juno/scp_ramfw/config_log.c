@@ -17,7 +17,7 @@
 
 static const struct fwk_element pl011_element_desc_table[] = {
     [0] = {
-        .name = "board-uart1",
+        .name = "",
         .data = &(struct mod_pl011_device_config) {
             .reg_base = FPGA_UART1_BASE,
             .baud_rate_bps = 115200,
