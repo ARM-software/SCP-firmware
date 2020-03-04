@@ -354,8 +354,6 @@ static int juno_soc_clock_set_rate(fwk_id_t clock_id,
     struct juno_soc_clock_dev_ctx *ctx;
     const struct juno_soc_clock_ram_rate *rate_entry;
 
-    fwk_assert(fwk_module_is_valid_element_id(clock_id));
-
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
     if (ctx->state == MOD_CLOCK_STATE_STOPPED)
@@ -386,9 +384,6 @@ static int juno_soc_clock_get_rate(fwk_id_t clock_id,
 {
     struct juno_soc_clock_dev_ctx *ctx;
 
-    fwk_assert(rate != NULL);
-    fwk_assert(fwk_module_is_valid_element_id(clock_id));
-
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
     if (!ctx->rate_initialized)
@@ -405,9 +400,6 @@ static int juno_soc_clock_get_rate_from_index(fwk_id_t clock_id,
 {
     struct juno_soc_clock_dev_ctx *ctx;
 
-    fwk_assert(fwk_module_is_valid_element_id(clock_id));
-    fwk_assert(rate != NULL);
-
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
     if (rate_index >= ctx->config->rate_count)
@@ -423,8 +415,6 @@ static int juno_soc_clock_set_state(fwk_id_t clock_id,
 {
     int status;
     struct juno_soc_clock_dev_ctx *ctx;
-
-    fwk_assert(fwk_module_is_valid_element_id(clock_id));
 
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
@@ -457,9 +447,6 @@ static int juno_soc_clock_get_state(fwk_id_t clock_id,
 {
     struct juno_soc_clock_dev_ctx *ctx;
 
-    fwk_assert(state != NULL);
-    fwk_assert(fwk_module_is_valid_element_id(clock_id));
-
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
     *state = ctx->state;
@@ -471,9 +458,6 @@ static int juno_soc_clock_get_range(fwk_id_t clock_id,
                                     struct mod_clock_range *range)
 {
     struct juno_soc_clock_dev_ctx *ctx;
-
-    fwk_assert(range != NULL);
-    fwk_assert(fwk_module_is_valid_element_id(clock_id));
 
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
@@ -493,8 +477,6 @@ static int juno_soc_clock_process_power_transition(fwk_id_t clock_id,
                                                    unsigned int state)
 {
     struct juno_soc_clock_dev_ctx *ctx;
-
-    fwk_assert(fwk_module_is_valid_element_id(clock_id));
 
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
