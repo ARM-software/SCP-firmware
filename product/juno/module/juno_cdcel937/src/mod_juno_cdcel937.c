@@ -69,8 +69,12 @@ static int output_type_from_output_id(
     switch (output_id) {
     case MOD_JUNO_CDCEL937_OUTPUT_ID_Y1:
         /* Y1 needs special handling */
+        #if USE_OUTPUT_Y1
         *type = JUNO_CDCEL937_OUTPUT_TYPE_Y1;
         return FWK_SUCCESS;
+        #else
+        return FWK_E_SUPPORT;
+        #endif
 
     case MOD_JUNO_CDCEL937_OUTPUT_ID_Y2:
     case MOD_JUNO_CDCEL937_OUTPUT_ID_Y4:
@@ -170,6 +174,7 @@ static int read_configuration(struct juno_cdcel937_dev_ctx *ctx,
     return status;
 }
 
+#if USE_OUTPUT_Y1
 static int read_configuration_y1(struct juno_cdcel937_dev_ctx *ctx,
                                  struct cfg_reg_y1 *config)
 {
@@ -189,6 +194,7 @@ static int read_configuration_y1(struct juno_cdcel937_dev_ctx *ctx,
 
     return status;
 }
+#endif
 
 static int get_preset_low_precision(uint64_t rate,
                                     struct juno_clock_preset *preset)
@@ -293,8 +299,10 @@ static int set_rate_read_pll_config(struct juno_cdcel937_dev_ctx *ctx)
     if (status != FWK_SUCCESS)
         return FWK_E_PARAM;
 
+    #if USE_OUTPUT_Y1
     if (type == JUNO_CDCEL937_OUTPUT_TYPE_Y1)
         return FWK_E_PARAM;
+    #endif
 
     status = pll_base_from_output_id(ctx->config->output_id, &base_address);
     if (status != FWK_SUCCESS)
@@ -457,6 +465,7 @@ static int create_set_rate_request(fwk_id_t clock_id,
     return FWK_PENDING;
 }
 
+#if USE_OUTPUT_Y1
 static int get_rate_y1_set_block_access_length(
     struct juno_cdcel937_dev_ctx *ctx)
 {
@@ -506,7 +515,6 @@ static int get_rate_y1_check_pdiv(struct juno_cdcel937_dev_ctx *ctx)
     }
 }
 
-
 static int get_rate_y1_read_pll_config(struct juno_cdcel937_dev_ctx *ctx)
 {
     int status;
@@ -553,6 +561,7 @@ static int get_rate_y1_calc(struct juno_cdcel937_dev_ctx *ctx)
 
     return FWK_SUCCESS;
 }
+#endif
 
 static int rate_set_block_access_length(struct juno_cdcel937_dev_ctx *ctx)
 {
@@ -958,6 +967,7 @@ static int juno_cdcel937_process_event(const struct fwk_event *event,
         if (status != FWK_SUCCESS)
             break;
 
+        #if USE_OUTPUT_Y1
         if (type == JUNO_CDCEL937_OUTPUT_TYPE_Y1) {
             status = get_rate_y1_set_block_access_length(ctx);
             if (status == FWK_PENDING) {
@@ -974,8 +984,18 @@ static int juno_cdcel937_process_event(const struct fwk_event *event,
             }
         }
 
+        #else
+        status = rate_set_block_access_length(ctx);
+        if (status == FWK_PENDING) {
+            ctx->state =
+                JUNO_CDCEL937_DEVICE_GET_RATE_READ_PLL_CONFIG;
+            return FWK_SUCCESS;
+        }
+
+        #endif
         break;
 
+    #if USE_OUTPUT_Y1
     case JUNO_CDCEL937_DEVICE_GET_RATE_Y1_READ_Y1_CONFIG:
         /* check I2C request */
         if ((param->status != FWK_PENDING) &&
@@ -1024,6 +1044,7 @@ static int juno_cdcel937_process_event(const struct fwk_event *event,
         ctx->rate_set = true;
 
         break;
+    #endif
 
     case JUNO_CDCEL937_DEVICE_GET_RATE_READ_PLL_CONFIG:
         status = get_rate_read_pll_config(ctx);

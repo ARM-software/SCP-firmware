@@ -25,6 +25,9 @@
  * @{
  */
 
+/*! Define whether the output Y1 is used */
+#define USE_OUTPUT_Y1   0
+
 /*! Output type */
 enum mod_juno_cdcel937_output_id {
     MOD_JUNO_CDCEL937_OUTPUT_ID_Y1 = 1, /* Output indices start from 1 */
