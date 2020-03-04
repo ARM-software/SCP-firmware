@@ -31,9 +31,6 @@ static int get_value(fwk_id_t id, uint64_t *value)
     uint64_t adc_quantity;
     enum juno_adc_dev_type dev_type;
 
-    fwk_assert(fwk_module_is_valid_sub_element_id(id));
-    fwk_assert(value != NULL);
-
     dev_type = fwk_id_get_sub_element_idx(id);
 
     switch (fwk_id_get_element_idx(id)) {
@@ -111,14 +108,10 @@ static int get_info(fwk_id_t id, struct mod_sensor_info *info)
 {
     const struct mod_juno_adc_dev_config *config;
 
-    fwk_assert(fwk_module_is_valid_sub_element_id(id));
-
     config = fwk_module_get_data(id);
 
     if (!fwk_expect(config->info != NULL))
         return FWK_E_DATA;
-
-    fwk_assert(info != NULL);
 
     *info = *(config->info);
 
