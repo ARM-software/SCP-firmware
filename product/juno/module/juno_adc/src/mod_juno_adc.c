@@ -15,12 +15,9 @@
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
 #include <mod_juno_adc.h>
-#include <mod_log.h>
 #include <mod_sensor.h>
 #include <juno_adc.h>
 #include <v2m_sys_regs.h>
-
-static struct mod_log_api *log_api;
 
 /*
  * ADC driver API functions.
@@ -47,9 +44,6 @@ static int get_value(fwk_id_t id, uint64_t *value)
 
         *value = adc_quantity;
 
-        log_api->log(MOD_LOG_GROUP_INFO,
-            "[ADC] Current 0x%lx mA\n", adc_quantity);
-
         return FWK_SUCCESS;
 
     case ADC_TYPE_VOLT:
@@ -59,9 +53,6 @@ static int get_value(fwk_id_t id, uint64_t *value)
         adc_quantity = (((uint64_t)adc_value) * JUNO_ADC_VOLT_MULTIPLIER)
                           / ADC_VOLT_CONST;
         *value = adc_quantity;
-
-        log_api->log(MOD_LOG_GROUP_INFO,
-            "[ADC] Voltage 0x%lx mV\n", adc_quantity);
 
         return FWK_SUCCESS;
 
@@ -78,9 +69,6 @@ static int get_value(fwk_id_t id, uint64_t *value)
 
         *value = adc_quantity;
 
-        log_api->log(MOD_LOG_GROUP_INFO,
-            "[ADC] Power 0x%lx uW\n", adc_quantity);
-
         return FWK_SUCCESS;
 
     case ADC_TYPE_ENERGY:
@@ -93,9 +81,6 @@ static int get_value(fwk_id_t id, uint64_t *value)
             adc_quantity /= ADC_ENERGY_CONST2;
 
         *value = adc_quantity;
-
-        log_api->log(MOD_LOG_GROUP_INFO,
-            "[ADC] Energy 0x%lx uJ\n", adc_quantity);
 
         return FWK_SUCCESS;
 
@@ -143,25 +128,6 @@ static int juno_adc_element_init(fwk_id_t element_id,
     return FWK_SUCCESS;
 }
 
-static int juno_adc_bind(fwk_id_t id, unsigned int round)
-{
-    int status;
-
-    /* Nothing to do in the second round of calls */
-    if (round > 0)
-        return FWK_SUCCESS;
-
-    /* Nothing to do in case of elements */
-    if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
-        return FWK_SUCCESS;
-
-    status = fwk_module_bind(fwk_module_id_log, MOD_LOG_API_ID, &log_api);
-    if (status != FWK_SUCCESS)
-        return status;
-
-    return FWK_SUCCESS;
-}
-
 static int juno_adc_process_bind_request(fwk_id_t source_id,
                                          fwk_id_t target_id,
                                          fwk_id_t api_id,
@@ -187,7 +153,6 @@ const struct fwk_module module_juno_adc = {
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_JUNO_ADC_API_IDX_COUNT,
     .init = juno_adc_init,
-    .bind = juno_adc_bind,
     .element_init = juno_adc_element_init,
     .process_bind_request = juno_adc_process_bind_request
 };
