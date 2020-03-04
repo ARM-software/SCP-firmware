@@ -24,7 +24,7 @@
 #define PPU_CORE_NAME_SIZE 12
 
 /* Maximum PPU cluster name size including the null terminator */
-#define PPU_CLUS_NAME_SIZE 6
+#define PPU_CLUS_NAME_SIZE 7
 
 /* Module configuration data */
 static struct mod_ppu_v1_config ppu_v1_config_data = {
