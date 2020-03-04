@@ -17,7 +17,7 @@
 
 static struct fwk_element element_table[] = {
     [JUNO_PPU_DEV_IDX_BIG_SSTOP] = {
-        .name = "BIG_SSTOP",
+        .name = "",
         .data = &(const struct mod_juno_ppu_element_config) {
             .reg_base = PPU_BIG_SSTOP_BASE,
             .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
@@ -25,7 +25,7 @@ static struct fwk_element element_table[] = {
         },
     },
     [JUNO_PPU_DEV_IDX_BIG_CPU0] = {
-        .name = "BIG_CPU0",
+        .name = "",
         .data = &(const struct mod_juno_ppu_element_config) {
             .reg_base = PPU_BIG_CPU0_BASE,
             .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
@@ -36,7 +36,7 @@ static struct fwk_element element_table[] = {
         },
     },
     [JUNO_PPU_DEV_IDX_BIG_CPU1] = {
-        .name = "BIG_CPU1",
+        .name = "",
         .data = &(const struct mod_juno_ppu_element_config) {
             .reg_base = PPU_BIG_CPU1_BASE,
             .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
@@ -47,7 +47,7 @@ static struct fwk_element element_table[] = {
         },
     },
     [JUNO_PPU_DEV_IDX_LITTLE_SSTOP] = {
-        .name = "LITTLE_SSTOP",
+        .name = "",
         .data = &(const struct mod_juno_ppu_element_config) {
             .reg_base = PPU_LITTLE_SSTOP_BASE,
             .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
@@ -55,7 +55,7 @@ static struct fwk_element element_table[] = {
         },
     },
     [JUNO_PPU_DEV_IDX_LITTLE_CPU0] = {
-        .name = "LITTLE_CPU0",
+        .name = "",
         .data = &(const struct mod_juno_ppu_element_config) {
             .reg_base = PPU_LITTLE_CPU0_BASE,
             .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
@@ -66,7 +66,7 @@ static struct fwk_element element_table[] = {
         },
     },
     [JUNO_PPU_DEV_IDX_LITTLE_CPU1] = {
-        .name = "LITTLE_CPU1",
+        .name = "",
         .data = &(const struct mod_juno_ppu_element_config) {
             .reg_base = PPU_LITTLE_CPU1_BASE,
             .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
@@ -77,7 +77,7 @@ static struct fwk_element element_table[] = {
         },
     },
     [JUNO_PPU_DEV_IDX_LITTLE_CPU2] = {
-        .name = "LITTLE_CPU2",
+        .name = "",
         .data = &(const struct mod_juno_ppu_element_config) {
             .reg_base = PPU_LITTLE_CPU2_BASE,
             .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
@@ -88,7 +88,7 @@ static struct fwk_element element_table[] = {
         },
     },
     [JUNO_PPU_DEV_IDX_LITTLE_CPU3] = {
-        .name = "LITTLE_CPU3",
+        .name = "",
         .data = &(const struct mod_juno_ppu_element_config) {
             .reg_base = PPU_LITTLE_CPU3_BASE,
             .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
@@ -99,7 +99,7 @@ static struct fwk_element element_table[] = {
         },
     },
     [JUNO_PPU_DEV_IDX_GPUTOP] = {
-        .name = "GPUTOP",
+        .name = "",
         .data = &(const struct mod_juno_ppu_element_config) {
             .reg_base = PPU_GPUTOP_BASE,
             .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
@@ -107,7 +107,7 @@ static struct fwk_element element_table[] = {
         },
     },
     [JUNO_PPU_DEV_IDX_SYSTOP] = {
-        .name = "SYSTOP",
+        .name = "",
         .data = &(const struct mod_juno_ppu_element_config) {
             .reg_base = PPU_SYSTOP_BASE,
             .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
@@ -115,7 +115,7 @@ static struct fwk_element element_table[] = {
         },
     },
     [JUNO_PPU_DEV_IDX_DBGSYS] = {
-        .name = "DBGSYS",
+        .name = "",
         .data = &(const struct mod_juno_ppu_element_config) {
             .reg_base = PPU_DBGSYS_BASE,
             .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),

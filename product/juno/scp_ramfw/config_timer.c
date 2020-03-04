@@ -19,7 +19,7 @@
 
 static const struct fwk_element gtimer_element_table[] = {
     [0] = {
-        .name = "REFCLK",
+        .name = "",
         .data = &(struct mod_gtimer_dev_config) {
             .hw_timer = REFCLK_CNTBASE0_BASE,
             .hw_counter = REFCLK_CNTCTL_BASE,

@@ -165,27 +165,27 @@ static const struct mod_juno_pvt_dev_config dev_config_stdcell[] = {
 
 static const struct fwk_element pvt_juno_element_table[] = {
     [JUNO_PVT_GROUP_BIG] = {
-        .name = "big",
+        .name = "",
         .data = &dev_config_big,
         .sub_element_count = 2,
     },
     [JUNO_PVT_GROUP_LITTLE] = {
-        .name = "little",
+        .name = "",
         .data = &dev_config_little,
         .sub_element_count = 2,
     },
     [JUNO_PVT_GROUP_GPU] = {
-        .name = "gpu",
+        .name = "",
         .data = &dev_config_gpu,
         .sub_element_count = 2,
     },
     [JUNO_PVT_GROUP_SOC] = {
-        .name = "soc",
+        .name = "",
         .data = &dev_config_soc,
         .sub_element_count = 1,
     },
     [JUNO_PVT_GROUP_STDCELL] = {
-        .name = "std_cell",
+        .name = "",
         .data = &dev_config_stdcell,
         .sub_element_count = 1,
     },
@@ -194,27 +194,27 @@ static const struct fwk_element pvt_juno_element_table[] = {
 
 static const struct fwk_element pvt_juno_element_table_r0[] = {
     [JUNO_PVT_GROUP_BIG] = {
-        .name = "big",
+        .name = "",
         .data = &dev_config_big,
         .sub_element_count = 1,
     },
     [JUNO_PVT_GROUP_LITTLE] = {
-        .name = "little",
+        .name = "",
         .data = &dev_config_little,
         .sub_element_count = 1,
     },
     [JUNO_PVT_GROUP_GPU] = {
-        .name = "gpu",
+        .name = "",
         .data = &dev_config_gpu,
         .sub_element_count = 0,
     },
     [JUNO_PVT_GROUP_SOC] = {
-        .name = "soc",
+        .name = "",
         .data = &dev_config_soc_r0,
         .sub_element_count = 1,
     },
     [JUNO_PVT_GROUP_STDCELL] = {
-        .name = "std_cell",
+        .name = "",
         .data = &dev_config_stdcell,
         .sub_element_count = 1,
     },

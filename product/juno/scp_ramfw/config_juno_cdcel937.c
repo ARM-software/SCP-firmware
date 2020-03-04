@@ -51,7 +51,7 @@ static struct juno_clock_lookup i2s_lookup_table[] = {
 
 static const struct fwk_element juno_cdcel937_element_table[] = {
     [JUNO_CLOCK_CDCEL937_IDX_I2SCLK] = {
-        .name = "I2SCLK",
+        .name = "",
         .data = &(struct mod_juno_cdcel937_dev_config) {
             .slave_address = 0x6D,
             .xin_mhz = 24,
@@ -69,7 +69,7 @@ static const struct fwk_element juno_cdcel937_element_table[] = {
         }
     },
     [JUNO_CLOCK_CDCEL937_IDX_HDLCDREFCLK] = {
-        .name = "HDLCDREFCLK",
+        .name = "",
         .data = &(struct mod_juno_cdcel937_dev_config) {
             .slave_address = 0x6C,
             .xin_mhz = 24,
@@ -85,7 +85,7 @@ static const struct fwk_element juno_cdcel937_element_table[] = {
         }
     },
     [JUNO_CLOCK_CDCEL937_IDX_HDLCDPXL] = {
-        .name = "HDLCDPXL",
+        .name = "",
         .data = &(struct mod_juno_cdcel937_dev_config) {
             .slave_address = 0x6D,
             .xin_mhz = 24,
@@ -101,7 +101,7 @@ static const struct fwk_element juno_cdcel937_element_table[] = {
         }
     },
     [JUNO_CLOCK_CDCEL937_IDX_HDLCD0] = {
-        .name = "CDCEL_HDLCD0",
+        .name = "",
         .data = &(struct mod_juno_cdcel937_dev_config) {
             .slave_address = 0x6C,
             .xin_mhz = 24,
@@ -117,7 +117,7 @@ static const struct fwk_element juno_cdcel937_element_table[] = {
         }
     },
     [JUNO_CLOCK_CDCEL937_IDX_HDLCD1] = {
-        .name = "CDCEL_HDLCD1",
+        .name = "",
         .data = &(struct mod_juno_cdcel937_dev_config) {
             .slave_address = 0x6C,
             .xin_mhz = 24,

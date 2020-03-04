@@ -37,7 +37,7 @@ static struct mod_sensor_info juno_xrp7724_info_temperature = {
 
 static const struct fwk_element juno_xrp7724_element_table[] = {
     [MOD_JUNO_XRP7724_ELEMENT_IDX_SENSOR] = {
-        .name = "TEMP",
+        .name = "",
         .data = &(const struct mod_juno_xrp7724_dev_config) {
             .driver_response_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SENSOR,
                 MOD_JUNO_SENSOR_XRP7724_PMIC_TEMP_IDX),
@@ -48,14 +48,14 @@ static const struct fwk_element juno_xrp7724_element_table[] = {
         },
     },
     [MOD_JUNO_XRP7724_ELEMENT_IDX_GPIO] = {
-        .name = "GPIOs",
+        .name = "",
         .sub_element_count = MOD_JUNO_XRP7724_GPIO_IDX_COUNT,
         .data = &(const struct mod_juno_xrp7724_dev_config) {
             .type = MOD_JUNO_XRP7724_ELEMENT_TYPE_GPIO,
         },
     },
     [MOD_JUNO_XRP7724_ELEMENT_IDX_PSU_VSYS] = {
-        .name = "VSYS",
+        .name = "",
         .data = &(const struct mod_juno_xrp7724_dev_config) {
             .driver_response_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU,
                 MOD_PSU_ELEMENT_IDX_VSYS),
@@ -70,7 +70,7 @@ static const struct fwk_element juno_xrp7724_element_table[] = {
         },
     },
     [MOD_JUNO_XRP7724_ELEMENT_IDX_PSU_VBIG] = {
-        .name = "VBIG",
+        .name = "",
         .data = &(const struct mod_juno_xrp7724_dev_config) {
             .driver_response_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU,
                 MOD_PSU_ELEMENT_IDX_VBIG),
@@ -85,7 +85,7 @@ static const struct fwk_element juno_xrp7724_element_table[] = {
         },
     },
     [MOD_JUNO_XRP7724_ELEMENT_IDX_PSU_VLITTLE] = {
-        .name = "VLITTLE",
+        .name = "",
         .data = &(const struct mod_juno_xrp7724_dev_config) {
             .driver_response_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU,
                 MOD_PSU_ELEMENT_IDX_VLITTLE),
@@ -100,7 +100,7 @@ static const struct fwk_element juno_xrp7724_element_table[] = {
         },
     },
     [MOD_JUNO_XRP7724_ELEMENT_IDX_PSU_VGPU] = {
-        .name = "VGPU",
+        .name = "",
         .data = &(const struct mod_juno_xrp7724_dev_config) {
             .driver_response_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU,
                 MOD_PSU_ELEMENT_IDX_VGPU),

@@ -13,7 +13,7 @@
 
 static struct fwk_element juno_ddr_phy400_element_table[] = {
     [0] = {
-        .name = "DDR_PHY400-0",
+        .name = "",
         .data = &((struct mod_juno_ddr_phy400_element_config) {
             .ddr_phy_ptm = (DDR_PHY0_BASE + OFFSET_DDR_PHY400_PTM_REGS),
             .ddr_phy_c3a = (DDR_PHY0_BASE + OFFSET_DDR_PHY400_C3A_REGS),
@@ -24,7 +24,7 @@ static struct fwk_element juno_ddr_phy400_element_table[] = {
         })
     },
     [1] = {
-        .name = "DDR_PHY400-1",
+        .name = "",
         .data = &((struct mod_juno_ddr_phy400_element_config) {
             .ddr_phy_ptm = (DDR_PHY1_BASE + OFFSET_DDR_PHY400_PTM_REGS),
             .ddr_phy_c3a = (DDR_PHY1_BASE + OFFSET_DDR_PHY400_C3A_REGS),

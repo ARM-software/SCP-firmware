@@ -15,7 +15,7 @@
 
 static const struct fwk_element element_table[] = {
     [JUNO_MHU_DEVICE_IDX_S] = {
-        .name = "MHU Secure",
+        .name = "",
         .sub_element_count = 1,
         .data = &(struct mod_mhu_device_config) {
             .irq = MHU_SECURE_IRQ,
@@ -24,7 +24,7 @@ static const struct fwk_element element_table[] = {
         },
     },
     [JUNO_MHU_DEVICE_IDX_NS_H] = {
-        .name = "MHU Non-Secure High Priority",
+        .name = "",
         .sub_element_count = 1,
         .data = &(struct mod_mhu_device_config) {
             .irq = MHU_HIGH_PRIO_IRQ,
@@ -33,7 +33,7 @@ static const struct fwk_element element_table[] = {
         },
     },
     [JUNO_MHU_DEVICE_IDX_NS_L] = {
-        .name = "MHU Non-Secure Low Priority",
+        .name = "",
         .sub_element_count = 1,
         .data = &(struct mod_mhu_device_config) {
             .irq = MHU_LOW_PRIO_IRQ,

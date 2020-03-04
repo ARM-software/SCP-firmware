@@ -26,7 +26,7 @@ enum juno_hdlcd_element_idx {
 
 static const struct fwk_element juno_hdlcd_element_table[] = {
     [JUNO_CLOCK_HDLCD_IDX_HDLCD0] = {
-        .name = "HDLCD_0",
+        .name = "",
         .data = &(struct mod_juno_hdlcd_dev_config) {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_CDCEL937,
                 JUNO_CLOCK_CDCEL937_IDX_HDLCD0),
@@ -43,7 +43,7 @@ static const struct fwk_element juno_hdlcd_element_table[] = {
         }
     },
     [JUNO_CLOCK_HDLCD_IDX_HDLCD1] = {
-        .name = "HDLCD_1",
+        .name = "",
         .data = &(struct mod_juno_hdlcd_dev_config) {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_CDCEL937,
                 JUNO_CLOCK_CDCEL937_IDX_HDLCD1),
