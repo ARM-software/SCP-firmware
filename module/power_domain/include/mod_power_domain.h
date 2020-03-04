@@ -568,16 +568,12 @@ struct mod_pd_restricted_api {
     /*!
      * \brief Request an asynchronous power state transition.
      *
-     * \warning Successful completion of this function does not indicate
-     *      completion of a transition, but instead that a request has been
-     *      submitted.
-     *
      * \param pd_id Identifier of the power domain whose state has to be set.
      * \param resp_requested True if the caller wants to be notified with an
      *      event response at the end of the request processing.
      * \param state State of the power domain.
      *
-     * \retval FWK_SUCCESS The power state transition request was submitted.
+     * \retval FWK_PENDING The power state transition request was submitted.
      * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
      *      call to the API.
      * \retval FWK_E_PARAM One or more parameters were invalid.

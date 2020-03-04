@@ -1407,6 +1407,7 @@ static int pd_set_state_async(fwk_id_t pd_id,
     struct fwk_event req;
     struct pd_set_state_request *req_params =
         (struct pd_set_state_request *)(&req.params);
+    int status;
 
     pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
 
@@ -1426,7 +1427,11 @@ static int pd_set_state_async(fwk_id_t pd_id,
     req_params->composite_state = (level << MOD_PD_CS_LEVEL_SHIFT) |
                                   (state << mod_pd_cs_level_state_shift[level]);
 
-    return fwk_thread_put_event(&req);
+    status = fwk_thread_put_event(&req);
+    if (status == FWK_SUCCESS)
+        return FWK_PENDING;
+
+    return status;
 }
 
 static int pd_set_composite_state(fwk_id_t pd_id, uint32_t composite_state)
