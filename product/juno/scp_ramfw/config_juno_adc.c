@@ -10,24 +10,27 @@
 #include <fwk_module_idx.h>
 #include <mod_juno_adc.h>
 #include <mod_sensor.h>
+#include <config_sensor.h>
 
 static const struct fwk_element adc_juno_element_table[] = {
-    [ADC_TYPE_CURRENT] = {
-        .name = "",
-        .sub_element_count = ADC_DEV_TYPE_COUNT,
-        .data = &((struct mod_juno_adc_dev_config) {
-            .info = &((struct mod_sensor_info) {
-                .type = MOD_SENSOR_TYPE_AMPS,
-                .unit_multiplier = -3,
-            }),
-        }),
-    },
     [ADC_TYPE_VOLT] = {
         .name = "",
         .sub_element_count = ADC_DEV_TYPE_COUNT,
         .data = &((struct mod_juno_adc_dev_config) {
             .info = &((struct mod_sensor_info) {
                 .type = MOD_SENSOR_TYPE_VOLTS,
+                .unit_multiplier = -3,
+            }),
+        }),
+    },
+
+    #if USE_FULL_SET_SENSORS
+    [ADC_TYPE_CURRENT] = {
+        .name = "",
+        .sub_element_count = ADC_DEV_TYPE_COUNT,
+        .data = &((struct mod_juno_adc_dev_config) {
+            .info = &((struct mod_sensor_info) {
+                .type = MOD_SENSOR_TYPE_AMPS,
                 .unit_multiplier = -3,
             }),
         }),
@@ -52,6 +55,8 @@ static const struct fwk_element adc_juno_element_table[] = {
             }),
         }),
     },
+    #endif
+
     [ADC_TYPE_COUNT] = { 0 },
 };
 

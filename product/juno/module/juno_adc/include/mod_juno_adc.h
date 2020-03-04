@@ -24,10 +24,10 @@
  * \brief ADC Type indices.
  */
 enum juno_adc_sensor_type {
-    /*! Current type ADC */
-    ADC_TYPE_CURRENT = 0,
     /*! Voltage type ADC */
-    ADC_TYPE_VOLT,
+    ADC_TYPE_VOLT = 0,
+    /*! Current type ADC */
+    ADC_TYPE_CURRENT,
     /*! Power type ADC */
     ADC_TYPE_POWER,
     /*! Energy type ADC */
