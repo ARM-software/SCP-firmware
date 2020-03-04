@@ -359,8 +359,6 @@ static int get_info(fwk_id_t id, struct mod_sensor_info *info)
     struct mod_juno_pvt_dev_config *sensor_cfg;
     struct pvt_dev_ctx *group_ctx;
 
-    fwk_assert(fwk_module_is_valid_sub_element_id(id));
-
     if (mod_ctx.driver_is_disabled)
         return FWK_E_DEVICE;
 
@@ -368,9 +366,6 @@ static int get_info(fwk_id_t id, struct mod_sensor_info *info)
     sensor_cfg = &group_ctx->sensor_cfg_table[fwk_id_get_sub_element_idx(id)];
 
     fwk_assert(sensor_cfg != NULL);
-
-    if (info == NULL)
-        return FWK_E_DATA;
 
     *info = *(sensor_cfg->info);
 
@@ -383,8 +378,6 @@ static int get_value(fwk_id_t id, uint64_t *value)
     struct pvt_dev_ctx *group_ctx;
     struct fwk_event read_req;
     int status;
-
-    fwk_assert(fwk_module_is_valid_sub_element_id(id));
 
     if (mod_ctx.driver_is_disabled)
         return FWK_E_DEVICE;
