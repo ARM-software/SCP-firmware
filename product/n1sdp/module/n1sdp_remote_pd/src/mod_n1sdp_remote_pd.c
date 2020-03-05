@@ -179,8 +179,6 @@ static int remote_pd_init(fwk_id_t module_id, unsigned int device_count,
 
     remote_pd_ctx.dev_ctx_table = fwk_mm_calloc(device_count,
         sizeof(remote_pd_ctx.dev_ctx_table[0]));
-    if (remote_pd_ctx.dev_ctx_table == NULL)
-        return FWK_E_NOMEM;
 
     remote_pd_ctx.pd_count = device_count;
 

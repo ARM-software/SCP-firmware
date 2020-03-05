@@ -75,13 +75,9 @@ static const struct fwk_element *ppu_v1_get_element_table(fwk_id_t module_id)
     element_table = fwk_mm_calloc(core_count + cluster_count +
         FWK_ARRAY_SIZE(ppu_v1_system_element_table) + 1,
         sizeof(struct fwk_element));
-    if (element_table == NULL)
-        return NULL;
 
     pd_config_table = fwk_mm_calloc(core_count + cluster_count,
                                     sizeof(struct mod_ppu_v1_pd_config));
-    if (pd_config_table == NULL)
-        return NULL;
 
     for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
         for (core_idx = 0;
@@ -91,8 +87,6 @@ static const struct fwk_element *ppu_v1_get_element_table(fwk_id_t module_id)
             pd_config = &pd_config_table[core_element_count];
 
             element->name = fwk_mm_alloc(PPU_CORE_NAME_SIZE, 1);
-            if (element->name == NULL)
-                return NULL;
 
             snprintf((char *)element->name, PPU_CORE_NAME_SIZE, "CLUS%uCORE%u",
                 cluster_idx, core_idx);
@@ -113,8 +107,6 @@ static const struct fwk_element *ppu_v1_get_element_table(fwk_id_t module_id)
         pd_config = &pd_config_table[core_count + cluster_idx];
 
         element->name = fwk_mm_alloc(PPU_CLUS_NAME_SIZE, 1);
-        if (element->name == NULL)
-            return NULL;
 
         snprintf((char *)element->name, PPU_CLUS_NAME_SIZE, "CLUS%u",
             cluster_idx);

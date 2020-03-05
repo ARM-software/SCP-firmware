@@ -149,8 +149,6 @@ static int n1sdp_fip_parse(uintptr_t n1sdp_fip_base)
     n1sdp_flash_ctx.n1sdp_fip_desc_table = fwk_mm_calloc(
         n1sdp_flash_ctx.n1sdp_fip_desc_count,
         sizeof(struct mod_n1sdp_fip_descriptor));
-    if (n1sdp_flash_ctx.n1sdp_fip_desc_table == NULL)
-        return FWK_E_NOMEM;
 
     for (unsigned int i = 0; i < n1sdp_flash_ctx.n1sdp_fip_desc_count; i++) {
         toc_entry = &n1sdp_fip_toc->entry[i];
@@ -212,9 +210,6 @@ static int n1sdp_flash_parse(uintptr_t address, uintptr_t offset)
     n1sdp_flash_ctx.flash_desc_table = fwk_mm_calloc(
         n1sdp_flash_ctx.flash_desc_count,
         sizeof(struct mod_n1sdp_flash_descriptor));
-
-    if (n1sdp_flash_ctx.flash_desc_table == NULL)
-        return FWK_E_NOMEM;
 
     for (unsigned int i = 0; i < n1sdp_flash_ctx.flash_desc_count; ++i) {
         toc_entry = &toc->entry[i];

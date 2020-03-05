@@ -410,16 +410,12 @@ static int cmn_rhodes_setup(void)
         if (ctx->internal_rnsam_count != 0) {
             ctx->internal_rnsam_table = fwk_mm_calloc(
                 ctx->internal_rnsam_count, sizeof(*ctx->internal_rnsam_table));
-            if (ctx->internal_rnsam_table == NULL)
-                return FWK_E_NOMEM;
         }
 
         /* Tuples for the external RN-RAM nodes (including their node IDs) */
         if (ctx->external_rnsam_count != 0) {
             ctx->external_rnsam_table = fwk_mm_calloc(
                 ctx->external_rnsam_count, sizeof(*ctx->external_rnsam_table));
-            if (ctx->external_rnsam_table == NULL)
-                return FWK_E_NOMEM;
         }
 
         /* Cache groups */
@@ -431,14 +427,10 @@ static int cmn_rhodes_setup(void)
             ctx->hnf_cache_group = fwk_mm_calloc(
                 ctx->hnf_count / CMN_RHODES_HNF_CACHE_GROUP_ENTRIES_PER_GROUP,
                 sizeof(*ctx->hnf_cache_group));
-            if (ctx->hnf_cache_group == NULL)
-                return FWK_E_NOMEM;
             ctx->sn_nodeid_group = fwk_mm_calloc(
                 ctx->hnf_count /
                 CMN_RHODES_RNSAM_SYS_CACHE_GRP_SN_NODEID_ENTRIES_PER_GROUP,
                 sizeof(*ctx->sn_nodeid_group));
-            if (ctx->sn_nodeid_group == NULL)
-                return FWK_E_NOMEM;
         }
     }
 
@@ -499,8 +491,6 @@ static int cmn_rhodes_init(fwk_id_t module_id, unsigned int element_count,
 
     /* Allocate space for the context */
     ctx = fwk_mm_calloc(1, sizeof(*ctx));
-    if (ctx == NULL)
-        return FWK_E_NOMEM;
 
     if (config->base == 0)
         return FWK_E_DATA;

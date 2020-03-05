@@ -485,8 +485,6 @@ static int juno_xrp7724_init(fwk_id_t module_id,
 
     ctx_table = fwk_mm_calloc(element_count,
         sizeof(struct juno_xrp7724_dev_ctx));
-    if (ctx_table == NULL)
-        return FWK_E_NOMEM;
 
     status = juno_id_get_platform(&platform_id);
     if (!fwk_expect(status == FWK_SUCCESS))

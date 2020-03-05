@@ -648,8 +648,6 @@ static int ppu_v1_mod_init(fwk_id_t module_id, unsigned int pd_count,
 {
     ppu_v1_ctx.pd_ctx_table = fwk_mm_calloc(pd_count,
                                             sizeof(struct ppu_v1_pd_ctx));
-    if (ppu_v1_ctx.pd_ctx_table == NULL)
-        return FWK_E_NOMEM;
 
     ppu_v1_ctx.pd_ctx_table_size = pd_count;
 
@@ -677,8 +675,6 @@ static int ppu_v1_pd_init(fwk_id_t pd_id, unsigned int unused, const void *data)
 
     if (config->pd_type == MOD_PD_TYPE_CLUSTER) {
         pd_ctx->data = fwk_mm_calloc(1, sizeof(struct ppu_v1_cluster_pd_ctx));
-        if (pd_ctx->data == NULL)
-            return FWK_E_NOMEM;
     }
 
     if (config->default_power_on) {

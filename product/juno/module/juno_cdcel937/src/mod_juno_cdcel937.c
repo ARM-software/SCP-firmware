@@ -815,9 +815,6 @@ static int juno_cdcel937_init(fwk_id_t module_id,
 {
     ctx_table = fwk_mm_calloc(element_count, sizeof(*ctx_table));
 
-    if (ctx_table == NULL)
-        return FWK_E_NOMEM;
-
     module_config = data;
 
     return FWK_SUCCESS;

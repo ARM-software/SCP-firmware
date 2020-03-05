@@ -431,8 +431,6 @@ static int juno_pvt_init(fwk_id_t module_id,
         return FWK_E_PARAM;
 
     dev_ctx = fwk_mm_calloc(element_count, sizeof(struct pvt_dev_ctx));
-    if (dev_ctx == NULL)
-        return FWK_E_NOMEM;
 
     status = juno_id_get_platform(&plat);
     if (status != FWK_SUCCESS)
@@ -465,8 +463,6 @@ static int juno_pvt_element_init(fwk_id_t element_id,
 
     group_ctx->sensor_ctx_table =
         fwk_mm_calloc(sub_element_count, sizeof(struct pvt_sub_dev_ctx));
-    if (group_ctx->sensor_ctx_table == NULL)
-        return FWK_E_NOMEM;
 
     group_ctx->sensor_cfg_table = (struct mod_juno_pvt_dev_config *)data;
     group_ctx->sensor_read_id = FWK_ID_NONE;

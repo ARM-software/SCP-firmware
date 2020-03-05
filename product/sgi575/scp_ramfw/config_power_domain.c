@@ -157,8 +157,6 @@ static const struct fwk_element *sgi575_power_domain_get_element_table
 
     pd_config_table = fwk_mm_calloc(core_count,
         sizeof(struct mod_power_domain_element_config));
-    if (pd_config_table == NULL)
-        return NULL;
 
     for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
         for (core_idx = 0;
@@ -169,8 +167,6 @@ static const struct fwk_element *sgi575_power_domain_get_element_table
             pd_config = &pd_config_table[core_element_count];
 
             element->name = fwk_mm_alloc(PD_NAME_SIZE, 1);
-            if (element->name == NULL)
-                return NULL;
 
             snprintf((char *)element->name, PD_NAME_SIZE, "CLUS%uCORE%u",
                 cluster_idx, core_idx);

@@ -186,8 +186,6 @@ static int n1sdp_timer_sync_init(fwk_id_t module_id, unsigned int device_count,
 
     tsync_ctx.device_ctx_table = fwk_mm_calloc(device_count,
         sizeof(tsync_ctx.device_ctx_table[0]));
-    if (tsync_ctx.device_ctx_table == NULL)
-        return FWK_E_NOMEM;
 
     return FWK_SUCCESS;
 }

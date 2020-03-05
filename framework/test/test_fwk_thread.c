@@ -146,10 +146,6 @@ static void test___fwk_thread_init(void)
     int result;
     size_t event_count = 2;
 
-    /* Memory allocation failed */
-    fwk_mm_calloc_return_val = false;
-    result = __fwk_thread_init(event_count);
-    assert(result == FWK_E_NOMEM);
     fwk_mm_calloc_return_val = true;
 
     /* Insert 2 events in the list */

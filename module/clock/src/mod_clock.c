@@ -320,9 +320,6 @@ static int clock_init(fwk_id_t module_id, unsigned int element_count,
     module_ctx.config = config;
     module_ctx.dev_ctx_table = fwk_mm_calloc(element_count,
                                              sizeof(struct clock_dev_ctx));
-    if (module_ctx.dev_ctx_table == NULL)
-        return FWK_E_NOMEM;
-
     return FWK_SUCCESS;
 }
 

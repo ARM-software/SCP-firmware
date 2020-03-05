@@ -128,10 +128,6 @@ static void test___fwk_notification_init(void)
     int result;
     size_t notification_count = 4;
 
-    /* Memory allocation failed */
-    fwk_mm_calloc_return_val = false;
-    result = __fwk_notification_init(notification_count);
-    assert(result == FWK_E_NOMEM);
     fwk_mm_calloc_return_val = true;
 
     /* Insert 2 events in the list */

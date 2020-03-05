@@ -332,8 +332,6 @@ static const struct fwk_element *get_sensor_element_table(fwk_id_t module_id)
             element_table = fwk_mm_calloc(
                 (sensor_elem_table_size + 1),
                 sizeof(struct fwk_element));
-            if (element_table == NULL)
-                return NULL;
 
             memcpy(element_table,
                    sensor_element_table_r0,
@@ -346,8 +344,6 @@ static const struct fwk_element *get_sensor_element_table(fwk_id_t module_id)
             element_table = fwk_mm_calloc(
                 (sensor_elem_table_size + pvt_sensor_elem_table_size + 1),
                 sizeof(struct fwk_element));
-            if (element_table == NULL)
-                return NULL;
 
             memcpy(element_table,
                    sensor_element_table_r0,

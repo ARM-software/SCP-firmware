@@ -531,9 +531,6 @@ static int timer_init(fwk_id_t module_id,
 {
     ctx_table = fwk_mm_calloc(element_count, sizeof(struct dev_ctx));
 
-    if (ctx_table == NULL)
-        return FWK_E_NOMEM;
-
     return FWK_SUCCESS;
 }
 
@@ -547,13 +544,8 @@ static int timer_device_init(fwk_id_t element_id, unsigned int alarm_count,
     ctx = ctx_table + fwk_id_get_element_idx(element_id);
     ctx->config = data;
 
-    if (alarm_count > 0) {
+    if (alarm_count > 0)
         ctx->alarm_pool = fwk_mm_calloc(alarm_count, sizeof(struct alarm_ctx));
-        if (ctx->alarm_pool == NULL) {
-            assert(false);
-            return FWK_E_NOMEM;
-        }
-    }
 
     return FWK_SUCCESS;
 }

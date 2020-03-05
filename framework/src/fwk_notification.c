@@ -151,10 +151,6 @@ int __fwk_notification_init(size_t notification_count)
 
     subscription_table = fwk_mm_calloc(
         notification_count, sizeof(struct __fwk_notification_subscription));
-    if (subscription_table == NULL) {
-        FWK_HOST_PRINT(err_msg_func, FWK_E_NOMEM, __func__);
-        return FWK_E_NOMEM;
-    }
 
     /* All the subscription structures are free to be used. */
     fwk_list_init(&ctx.free_subscription_dlist);

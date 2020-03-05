@@ -166,9 +166,6 @@ static int gtimer_init(fwk_id_t module_id,
 {
     ctx_table = fwk_mm_alloc(element_count, sizeof(struct dev_ctx));
 
-    if (ctx_table == NULL)
-        return FWK_E_NOMEM;
-
     return FWK_SUCCESS;
 }
 
