@@ -687,8 +687,6 @@ static int scmi_perf_init(fwk_id_t module_id, unsigned int element_count,
 
     scmi_perf_ctx.perf_ops_table = fwk_mm_calloc(return_val,
         sizeof(struct perf_operations));
-    if (scmi_perf_ctx.perf_ops_table == NULL)
-        return FWK_E_NOMEM;
 
     scmi_perf_ctx.config = config;
     scmi_perf_ctx.domain_count = return_val;

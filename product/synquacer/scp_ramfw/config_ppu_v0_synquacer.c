@@ -92,8 +92,6 @@ static const struct fwk_element *ppu_v0_get_element_table(fwk_id_t module_id)
 
     ppu_v0_config_table = fwk_mm_calloc(
         (cluster_count + core_count), sizeof(struct mod_ppu_v0_pd_config));
-    if (ppu_v0_config_table == NULL)
-        return NULL;
 
     element_count = 0;
 
@@ -104,8 +102,6 @@ static const struct fwk_element *ppu_v0_get_element_table(fwk_id_t module_id)
             ppu_v0_config = &ppu_v0_config_table[element_count];
 
             element->name = fwk_mm_alloc(PPU_V0_NAME_SIZE, 1);
-            if (element->name == NULL)
-                return NULL;
 
             snprintf(
                 (char *)element->name,
@@ -130,8 +126,6 @@ static const struct fwk_element *ppu_v0_get_element_table(fwk_id_t module_id)
 
         /* prepare cluster config table */
         element->name = fwk_mm_alloc(PPU_V0_NAME_SIZE, 1);
-        if (element->name == NULL)
-            return NULL;
 
         snprintf(
             (char *)element->name, PPU_V0_NAME_SIZE, "CLUS%u", cluster_idx);

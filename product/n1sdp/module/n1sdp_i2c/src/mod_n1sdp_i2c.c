@@ -497,8 +497,6 @@ static int n1sdp_i2c_init(fwk_id_t module_id, unsigned int element_count,
 
     i2c_ctx.device_ctx_table = fwk_mm_calloc(element_count,
         sizeof(i2c_ctx.device_ctx_table[0]));
-    if (i2c_ctx.device_ctx_table == NULL)
-        return FWK_E_NOMEM;
 
     return FWK_SUCCESS;
 }

@@ -1640,8 +1640,6 @@ static int pd_init(fwk_id_t module_id, unsigned int dev_count,
         return FWK_E_PARAM;
 
     mod_pd_ctx.pd_ctx_table = fwk_mm_calloc(dev_count, sizeof(struct pd_ctx));
-    if (mod_pd_ctx.pd_ctx_table == NULL)
-        return FWK_E_NOMEM;
 
     mod_pd_ctx.pd_count = dev_count;
     mod_pd_ctx.system_pd_ctx = &mod_pd_ctx.pd_ctx_table[dev_count - 1];

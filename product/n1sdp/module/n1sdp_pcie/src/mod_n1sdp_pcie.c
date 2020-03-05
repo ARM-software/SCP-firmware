@@ -621,8 +621,6 @@ static int n1sdp_pcie_init(fwk_id_t module_id, unsigned int element_count,
 
     pcie_ctx.device_ctx_table = fwk_mm_calloc(element_count,
         sizeof(pcie_ctx.device_ctx_table[0]));
-    if (pcie_ctx.device_ctx_table == NULL)
-        return FWK_E_NOMEM;
 
     pcie_ctx.pcie_instance_count = element_count;
 

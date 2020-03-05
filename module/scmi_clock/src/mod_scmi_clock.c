@@ -983,8 +983,6 @@ static int scmi_clock_init(fwk_id_t module_id, unsigned int element_count,
     scmi_clock_ctx.clock_ops =
         fwk_mm_calloc((unsigned int)clock_devices,
         sizeof(struct clock_operations));
-    if (scmi_clock_ctx.clock_ops == NULL)
-        return FWK_E_NOMEM;
 
     /* Initialize table */
     for (unsigned int i = 0; i < (unsigned int)clock_devices; i++)

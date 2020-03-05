@@ -226,8 +226,6 @@ static int ppu_v0_mod_init(
 {
     ppu_v0_ctx.pd_ctx_table =
         fwk_mm_calloc(pd_count, sizeof(struct ppu_v0_pd_ctx));
-    if (ppu_v0_ctx.pd_ctx_table == NULL)
-        return FWK_E_NOMEM;
 
     return FWK_SUCCESS;
 }

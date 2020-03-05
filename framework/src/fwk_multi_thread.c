@@ -52,13 +52,9 @@ static int init_thread_attr(osThreadAttr_t *attr)
     attr->attr_bits = osThreadDetached;
     attr->cb_size = osRtxThreadCbSize;
     attr->cb_mem = fwk_mm_calloc(1, attr->cb_size);
-    if (attr->cb_mem == NULL)
-        return FWK_E_NOMEM;
 
     attr->stack_size = 256 * 4;
     attr->stack_mem = fwk_mm_calloc(1, attr->stack_size);
-    if (attr->stack_mem == NULL)
-        return FWK_E_NOMEM;
 
     attr->priority = osPriorityNormal;
 
@@ -596,10 +592,6 @@ int __fwk_thread_init(size_t event_count)
     }
 
     event_table = fwk_mm_calloc(event_count, sizeof(struct fwk_event));
-    if (event_table == NULL) {
-        status = FWK_E_NOMEM;
-        goto error;
-    }
 
     /* All the event structures are free to be used. */
     fwk_list_init(&ctx.event_free_queue);
@@ -714,6 +706,7 @@ int fwk_thread_create(fwk_id_t id)
     thread_ctx->id = id;
     thread_ctx->os_thread_id = osThreadNew(specific_thread_function, thread_ctx,
                                            &thread_attr);
+
     if (thread_ctx->os_thread_id == NULL) {
         status = FWK_E_OS;
         goto error;

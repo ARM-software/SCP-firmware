@@ -294,80 +294,6 @@ static void test_case_setup(void)
     __fwk_module_init();
 }
 
-static void test___fwk_module_init_memory_allocation_failure(void)
-{
-    int result;
-    struct fwk_dlist *subscription_dlist_table;
-
-    /* Memory allocation for the modules failed */
-    fwk_mm_calloc_return = 5;
-    __fwk_module_reset();
-    result = __fwk_module_init();
-    assert(result == FWK_E_NOMEM);
-
-    /*
-     * Memory allocation for the module 0 notification subscription lists
-     * failed
-     */
-    fwk_mm_calloc_return = 4;
-    __fwk_module_reset();
-    result = __fwk_module_init();
-    assert(result == FWK_E_NOMEM);
-
-    /* Memory allocation for the elements failed */
-    init_return_val = FWK_SUCCESS;
-    fwk_mm_calloc_return = 3;
-    __fwk_module_reset();
-    result = __fwk_module_init();
-    assert(result == FWK_E_NOMEM);
-
-    /*
-     * Memory allocation for the module 0 element 1 notification subscription
-     * lists failed
-     */
-    init_return_val = FWK_SUCCESS;
-    fwk_mm_calloc_return = 1;
-    __fwk_module_reset();
-    result = __fwk_module_init();
-    assert(result == FWK_E_NOMEM);
-
-    assert(__fwk_module_get_ctx(MODULE0_ID)->desc == &fake_module_desc0);
-    assert(__fwk_module_get_ctx(MODULE0_ID)->element_count == 2);
-    assert(__fwk_module_get_ctx(MODULE0_ID)->state == 0);
-    assert(__fwk_module_get_ctx(MODULE0_ID)->element_ctx_table != NULL);
-    subscription_dlist_table =
-        __fwk_module_get_ctx(MODULE0_ID)->subscription_dlist_table;
-    assert(subscription_dlist_table != NULL);
-    assert(subscription_dlist_table[0].head ==
-           (struct fwk_dlist_node *)subscription_dlist_table[0].head);
-    assert(subscription_dlist_table[0].tail ==
-           (struct fwk_dlist_node *)subscription_dlist_table[0].head);
-    assert(subscription_dlist_table[1].head ==
-           (struct fwk_dlist_node *)subscription_dlist_table[1].head);
-    assert(subscription_dlist_table[1].tail ==
-           (struct fwk_dlist_node *)subscription_dlist_table[1].head);
-    subscription_dlist_table = __fwk_module_get_ctx(MODULE0_ID)->
-        element_ctx_table[0].subscription_dlist_table;
-    assert(subscription_dlist_table != NULL);
-    assert(subscription_dlist_table[0].head ==
-           (struct fwk_dlist_node *)subscription_dlist_table[0].head);
-    assert(subscription_dlist_table[0].tail ==
-           (struct fwk_dlist_node *)subscription_dlist_table[0].head);
-    assert(subscription_dlist_table[1].head ==
-           (struct fwk_dlist_node *)subscription_dlist_table[1].head);
-    assert(subscription_dlist_table[1].tail ==
-           (struct fwk_dlist_node *)subscription_dlist_table[1].head);
-    subscription_dlist_table = __fwk_module_get_ctx(MODULE0_ID)->
-        element_ctx_table[1].subscription_dlist_table;
-    assert(subscription_dlist_table == NULL);
-
-    assert(__fwk_module_get_ctx(MODULE1_ID)->desc == NULL);
-    assert(__fwk_module_get_ctx(MODULE1_ID)->element_count == 0);
-    assert(__fwk_module_get_ctx(MODULE1_ID)->state == 0);
-    assert(__fwk_module_get_ctx(MODULE1_ID)->element_ctx_table == NULL);
-    assert(__fwk_module_get_ctx(MODULE1_ID)->subscription_dlist_table == NULL);
-}
-
 static void test___fwk_module_init_module_desc_bad_params(void)
 {
     int result;
@@ -1086,7 +1012,6 @@ static void test_fwk_module_bind(void)
 }
 
 static const struct fwk_test_case_desc test_case_table[] = {
-    FWK_TEST_CASE(test___fwk_module_init_memory_allocation_failure),
     FWK_TEST_CASE(test___fwk_module_init_module_desc_bad_params),
     FWK_TEST_CASE(test___fwk_module_init_failure),
     FWK_TEST_CASE(test___fwk_module_init_bind_failure),

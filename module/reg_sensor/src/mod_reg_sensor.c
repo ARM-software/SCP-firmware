@@ -64,9 +64,6 @@ static int reg_sensor_init(fwk_id_t module_id,
 {
     config_table = fwk_mm_alloc(element_count, sizeof(*config_table));
 
-    if (config_table == NULL)
-        return FWK_E_NOMEM;
-
     return FWK_SUCCESS;
 }
 

@@ -93,8 +93,7 @@ void *fwk_mm_alloc_aligned(size_t num, size_t size, unsigned int alignment)
     return (void *)start;
 
 error:
-    fwk_expect(false);
-    return NULL;
+    fwk_trap();
 }
 
 void *fwk_mm_calloc(size_t num, size_t size)

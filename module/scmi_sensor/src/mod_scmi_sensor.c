@@ -468,8 +468,6 @@ static int scmi_sensor_init(fwk_id_t module_id,
     scmi_sensor_ctx.sensor_ops_table =
         fwk_mm_calloc(scmi_sensor_ctx.sensor_count,
         sizeof(struct sensor_operations));
-    if (scmi_sensor_ctx.sensor_ops_table == NULL)
-        return FWK_E_NOMEM;
 
     /* Initialize the service identifier for each sensor to 'available' */
     for (unsigned int i = 0; i < scmi_sensor_ctx.sensor_count; i++)

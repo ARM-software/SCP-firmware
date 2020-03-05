@@ -567,13 +567,9 @@ static int scmi_init(fwk_id_t module_id, unsigned int service_count,
     scmi_ctx.protocol_table = fwk_mm_calloc(
         config->protocol_count_max + PROTOCOL_TABLE_RESERVED_ENTRIES_COUNT,
         sizeof(scmi_ctx.protocol_table[0]));
-    if (scmi_ctx.protocol_table == NULL)
-        return FWK_E_NOMEM;
 
     scmi_ctx.service_ctx_table = fwk_mm_calloc(
         service_count, sizeof(scmi_ctx.service_ctx_table[0]));
-    if (scmi_ctx.service_ctx_table == NULL)
-        return FWK_E_NOMEM;
 
     scmi_ctx.protocol_table[PROTOCOL_TABLE_BASE_PROTOCOL_IDX].message_handler =
         scmi_base_message_handler;

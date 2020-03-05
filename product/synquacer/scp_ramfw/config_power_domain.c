@@ -147,14 +147,10 @@ static const struct fwk_element *synquacer_power_domain_get_element_table(
             FWK_ARRAY_SIZE(synquacer_power_domain_static_element_table) +
             1, /* Terminator */
         sizeof(struct fwk_element));
-    if (element_table == NULL)
-        return NULL;
 
     pd_config_table = fwk_mm_calloc(
         (cluster_count + core_count),
         sizeof(struct mod_power_domain_element_config));
-    if (pd_config_table == NULL)
-        return NULL;
 
     /*
      * power domain element table should follow the ascending order
@@ -169,8 +165,6 @@ static const struct fwk_element *synquacer_power_domain_get_element_table(
             pd_config = &pd_config_table[element_count];
 
             element->name = fwk_mm_alloc(PD_NAME_SIZE, 1);
-            if (element->name == NULL)
-                return NULL;
 
             snprintf(
                 (char *)element->name,
@@ -201,8 +195,6 @@ static const struct fwk_element *synquacer_power_domain_get_element_table(
         pd_config = &pd_config_table[element_count];
 
         element->name = fwk_mm_alloc(PD_NAME_SIZE, 1);
-        if (element->name == NULL)
-            return NULL;
 
         snprintf((char *)element->name, PD_NAME_SIZE, "CLUS%u", cluster_idx);
 

@@ -306,8 +306,6 @@ static int mod_mock_psu_init(
 
     mod_mock_psu_ctx.elements =
         fwk_mm_calloc(element_count, sizeof(mod_mock_psu_ctx.elements[0]));
-    if (mod_mock_psu_ctx.elements == NULL)
-        return FWK_E_NOMEM;
 
     return FWK_SUCCESS;
 }

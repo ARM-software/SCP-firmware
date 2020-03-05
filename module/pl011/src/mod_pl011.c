@@ -155,8 +155,6 @@ static int pl011_init(fwk_id_t module_id, unsigned int element_count,
         return FWK_E_DATA;
 
     dev_ctx_table = fwk_mm_calloc(element_count, sizeof(dev_ctx_table[0]));
-    if (dev_ctx_table == NULL)
-        return FWK_E_NOMEM;
 
     return FWK_SUCCESS;
 }

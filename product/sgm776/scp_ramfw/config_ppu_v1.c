@@ -119,14 +119,10 @@ static const struct fwk_element *sgm776_ppu_v1_get_element_table(
      */
     table_size = FWK_ARRAY_SIZE(static_ppu_table) + sgm776_core_get_count() + 2;
     element_table = fwk_mm_calloc(table_size, sizeof(struct fwk_element));
-    if (element_table == NULL)
-        return NULL;
 
     /* Table to hold configs for all cores and the cluster */
     pd_config_table = fwk_mm_calloc(sgm776_core_get_count() + 1,
                                     sizeof(struct mod_ppu_v1_pd_config));
-    if (pd_config_table == NULL)
-        return NULL;
 
     /* Cores */
     for (core_idx = 0; core_idx < sgm776_core_get_count(); core_idx++) {

@@ -75,10 +75,6 @@ static int init_notification_dlist_table(size_t count,
     unsigned int dlist_idx;
 
     dlist_table = fwk_mm_calloc(count, sizeof(struct fwk_dlist));
-    if (dlist_table == NULL) {
-        FWK_HOST_PRINT(err_msg_line, FWK_E_NOMEM, __func__, __LINE__);
-        return FWK_E_NOMEM;
-    }
     *notification_dlist_table = dlist_table;
 
     for (dlist_idx = 0; dlist_idx < count; dlist_idx++)
@@ -105,8 +101,6 @@ static int init_elements(struct fwk_module_ctx *module_ctx,
     module_ctx->element_ctx_table =
         fwk_mm_calloc(module_ctx->element_count,
                       sizeof(struct fwk_element_ctx));
-    if (module_ctx->element_ctx_table == NULL)
-        return FWK_E_NOMEM;
 
     for (element_idx = 0; element_idx < module_ctx->element_count;
          element_idx++) {
@@ -229,10 +223,6 @@ static int init_modules(void)
 
     ctx.module_ctx_table = fwk_mm_calloc(ctx.module_count,
                                          sizeof(struct fwk_module_ctx));
-    if (ctx.module_ctx_table == NULL) {
-        FWK_HOST_PRINT(err_msg_line, FWK_E_NOMEM, __func__, __LINE__);
-        return FWK_E_NOMEM;
-    }
 
     for (module_idx = 0; module_idx < ctx.module_count; module_idx++) {
         module_ctx = &ctx.module_ctx_table[module_idx];

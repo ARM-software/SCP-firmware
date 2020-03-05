@@ -282,8 +282,7 @@ int arm_nvic_init(const struct fwk_arch_interrupt_driver **driver)
      * corresponding parameters.
      */
     callback = fwk_mm_calloc(isr_count, sizeof(callback[0]));
-    if (callback == NULL)
-        return FWK_E_NOMEM;
+
     /*
      * The base address for the vector table must align on the number of
      * entries in the table, corresponding to a word boundary rounded up to the
@@ -300,9 +299,6 @@ int arm_nvic_init(const struct fwk_arch_interrupt_driver **driver)
     align_word = align_entries * sizeof(vector[0]);
 
     vector = fwk_mm_alloc_aligned(isr_count, sizeof(vector[0]), align_word);
-
-    if (vector == NULL)
-        return FWK_E_NOMEM;
 
     /*
      * Initialize all exception entries to point to the arm_exception_invalid()

@@ -994,8 +994,6 @@ static int dvfs_init(fwk_id_t module_id, unsigned int element_count,
 {
     dvfs_ctx.domain_ctx = fwk_mm_calloc(element_count,
         sizeof((*dvfs_ctx.domain_ctx)[0]));
-    if (dvfs_ctx.domain_ctx == NULL)
-        return FWK_E_NOMEM;
 
     dvfs_ctx.dvfs_domain_element_count = element_count;
 

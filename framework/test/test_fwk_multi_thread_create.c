@@ -239,26 +239,6 @@ static void test_create_thread_invalid(void)
     assert(status == FWK_E_STATE);
 }
 
-static void test_create_cb_memory_allocation_failed(void)
-{
-    int status;
-    fwk_id_t id = FWK_ID_MODULE(0x1);
-    /* CB memory allocation failed */
-    fwk_mm_calloc_return_null = 1;
-    status = fwk_thread_create(id);
-    assert(status == FWK_E_NOMEM);
-}
-
-static void test_create_stack_memory_allocation_failed(void)
-{
-    int status;
-    fwk_id_t id = FWK_ID_MODULE(0x1);
-    /* CB memory allocation failed */
-    fwk_mm_calloc_return_null = 2;
-    status = fwk_thread_create(id);
-    assert(status == FWK_E_NOMEM);
-}
-
 static void test_create_thread_memory_allocation_failed(void)
 {
     int status;
@@ -312,8 +292,6 @@ static const struct fwk_test_case_desc test_case_table[] = {
     FWK_TEST_CASE(test_create_id_invalid),
     FWK_TEST_CASE(test_create_not_initialized),
     FWK_TEST_CASE(test_create_thread_invalid),
-    FWK_TEST_CASE(test_create_cb_memory_allocation_failed),
-    FWK_TEST_CASE(test_create_stack_memory_allocation_failed),
     FWK_TEST_CASE(test_create_thread_memory_allocation_failed),
     FWK_TEST_CASE(test_create_thread_creation_failed),
     FWK_TEST_CASE(test_create_element_thread),

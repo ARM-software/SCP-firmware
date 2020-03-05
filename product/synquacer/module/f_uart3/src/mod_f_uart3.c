@@ -134,8 +134,6 @@ static int f_uart3_init(
      */
     device_config_table =
         fwk_mm_calloc(element_count, sizeof(*device_config_table));
-    if (device_config_table == NULL)
-        return FWK_E_NOMEM;
 
     return FWK_SUCCESS;
 }

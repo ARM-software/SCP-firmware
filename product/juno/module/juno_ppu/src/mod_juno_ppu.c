@@ -772,8 +772,6 @@ static int juno_ppu_module_init(fwk_id_t module_id,
 
     juno_ppu_ctx.ppu_ctx_table = fwk_mm_calloc(element_count,
         sizeof(struct ppu_ctx));
-    if (juno_ppu_ctx.ppu_ctx_table == NULL)
-        return FWK_E_NOMEM;
 
     juno_ppu_ctx.css_state = MOD_PD_STATE_ON;
 
