@@ -32,6 +32,7 @@
 #define CLI_DEBUGGER() cli_init()
 
 #else
+
 /*!
  * \brief Define the CLI Debugger function
  *
@@ -39,7 +40,8 @@
  *          will be empty
  *
  */
-#define CLI_DEBUGGER()
+#define CLI_DEBUGGER() do { } while (0)
+
 #endif
 
 /*!
