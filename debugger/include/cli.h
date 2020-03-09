@@ -272,6 +272,8 @@ uint32_t cli_getline(
  */
 int32_t cli_strncmp(const char *s1, const char *s2, uint32_t limit);
 
+#ifdef BUILD_HAS_DEBUGGER
+
 /*!
  * \brief Register a new CLI command at run time
  *
@@ -281,5 +283,22 @@ int32_t cli_strncmp(const char *s1, const char *s2, uint32_t limit);
  * \retval CLI_ERR_MEM Not enough memory.
  */
 int cli_command_register(cli_command_st new_cmd);
+
+#else
+
+/*!
+ * \brief Register a new CLI command at run time
+ *
+ * \param new_cmd The new command to register.
+ *
+ * \retval CLI_SUCCESS Operation succeeded.
+ * \retval CLI_ERR_MEM Not enough memory.
+ */
+#define cli_command_register(new_cmd) \
+    __extension__({ \
+        (void)new_cmd; \
+        FWK_SUCCESS; \
+    })
+#endif
 
 #endif /* _CLI_H_ */
