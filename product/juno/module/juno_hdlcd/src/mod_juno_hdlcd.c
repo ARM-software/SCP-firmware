@@ -68,9 +68,6 @@ static int round_rate(struct juno_hdlcd_dev_ctx *ctx,
     uint32_t round_up = FWK_ALIGN_NEXT(rate, ctx->config->min_step);
     uint32_t round_down = FWK_ALIGN_PREVIOUS(rate, ctx->config->min_step);
 
-    fwk_assert(ctx != NULL);
-    fwk_assert(rounded_rate != NULL);
-
     switch (round_mode) {
     case MOD_CLOCK_ROUND_MODE_NONE:
         *rounded_rate = rate;
@@ -105,8 +102,6 @@ static int round_rate(struct juno_hdlcd_dev_ctx *ctx,
 
 static void enable_pll(fwk_id_t clock_id, struct juno_hdlcd_dev_ctx *ctx)
 {
-    fwk_assert(ctx != NULL);
-
     module_ctx.log_api->log(MOD_LOG_GROUP_INFO,
         "[HDLCD%u] Setting PLL R0:0x%08x R1:0x%08x\n",
         fwk_id_get_element_idx(clock_id),
