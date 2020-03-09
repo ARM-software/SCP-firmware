@@ -39,8 +39,6 @@ static uint8_t i2c_transmit[16];
 static int pll_base_from_output_id(enum mod_juno_cdcel937_output_id output_id,
                                    uint8_t *base)
 {
-    fwk_assert(base != NULL);
-
     /* Special case: no PLL for output Y1 */
     switch (output_id) {
     case MOD_JUNO_CDCEL937_OUTPUT_ID_Y2:
@@ -68,8 +66,6 @@ static int output_type_from_output_id(
     enum mod_juno_cdcel937_output_id output_id,
     enum juno_cdcel937_output_type *type)
 {
-    fwk_assert(type != NULL);
-
     switch (output_id) {
     case MOD_JUNO_CDCEL937_OUTPUT_ID_Y1:
         /* Y1 needs special handling */
@@ -129,8 +125,6 @@ static int write_configuration(struct juno_cdcel937_dev_ctx *ctx,
 {
     int status;
 
-    fwk_assert(config != NULL);
-
     if (base > 0x40)
         return FWK_E_RANGE;
 
@@ -159,8 +153,6 @@ static int read_configuration(struct juno_cdcel937_dev_ctx *ctx,
 {
     int status;
     const uint8_t block_access_length = 8;
-
-    fwk_assert(config != NULL);
 
     if (base > 0x40)
         return FWK_E_RANGE;
@@ -203,8 +195,6 @@ static int get_preset_low_precision(uint64_t rate,
 {
     uint32_t freq;
 
-    fwk_assert(preset != NULL);
-
     freq = (uint32_t)rate / (uint32_t)FWK_MHZ;
 
     fwk_assert(freq <= 230);
@@ -222,8 +212,6 @@ static int search_preset(struct juno_cdcel937_dev_ctx *ctx,
 {
     unsigned int i;
     bool lookup_hit = false;
-
-    fwk_assert(preset != NULL);
 
     /*
      * Check if we can use a value from the lookup table for extra precision
@@ -253,8 +241,6 @@ static int get_rounded_rate(struct juno_cdcel937_dev_ctx *ctx,
 {
     uint64_t rounded_up_rate;
     uint64_t rounded_down_rate;
-
-    fwk_assert(rounded_rate != NULL);
 
     if (ctx->config->rate_type != MOD_CLOCK_RATE_TYPE_CONTINUOUS)
         return FWK_E_SUPPORT;
