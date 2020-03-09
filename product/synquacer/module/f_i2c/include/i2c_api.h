@@ -8,9 +8,10 @@
 #ifndef I2C_API_H
 #define I2C_API_H
 
-#include <stdint.h>
 #include <internal/i2c_depend.h>
 #include <internal/i2c_driver.h>
+
+#include <stdint.h>
 
 #define I2C_MP_START_ADDR 0x50
 

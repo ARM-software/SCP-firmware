@@ -5,20 +5,26 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stddef.h>
-#include <string.h>
+#include "config_power_domain.h"
+#include "config_ppu_v1.h"
+#include "sgm776_core.h"
+#include "sgm776_irq.h"
+#include "sgm776_mmap.h"
+
+#include <mod_power_domain.h>
+#include <mod_ppu_v1.h>
+
 #include <fwk_element.h>
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_power_domain.h>
-#include <mod_ppu_v1.h>
-#include <sgm776_core.h>
-#include <sgm776_irq.h>
-#include <sgm776_mmap.h>
-#include <config_power_domain.h>
-#include <config_ppu_v1.h>
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
 
 static const char *core_pd_name_table[SGM776_CORE_PER_CLUSTER_MAX] = {
     "CLUS0CORE0", "CLUS0CORE1", "CLUS0CORE2", "CLUS0CORE3",

@@ -5,10 +5,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_assert.h>
-#include <fwk_macros.h>
-#include <fwk_math.h>
 #include <cmn600.h>
+
+#include <fwk_assert.h>
+#include <fwk_math.h>
 
 static unsigned int encoding_bits;
 static unsigned int mask_bits;

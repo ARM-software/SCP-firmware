@@ -8,19 +8,25 @@
  *     N1SDP I2C Driver
  */
 
-#include <string.h>
-#include <stdbool.h>
+#include "n1sdp_core.h"
+
+#include <internal/n1sdp_i2c.h>
+
+#include <mod_log.h>
+#include <mod_n1sdp_i2c.h>
+
 #include <fwk_assert.h>
+#include <fwk_event.h>
+#include <fwk_id.h>
 #include <fwk_interrupt.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
+#include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
-#include <internal/n1sdp_i2c.h>
-#include <mod_log.h>
-#include <mod_n1sdp_i2c.h>
-#include <mod_power_domain.h>
-#include <n1sdp_core.h>
+
+#include <stdbool.h>
+#include <string.h>
 
 /* I2C divider calculation values */
 #define I2C_HZ                  22

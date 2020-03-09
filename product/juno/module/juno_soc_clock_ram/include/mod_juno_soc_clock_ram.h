@@ -8,10 +8,11 @@
 #ifndef MOD_JUNO_SOC_CLOCK_RAM_H
 #define MOD_JUNO_SOC_CLOCK_RAM_H
 
-#include <stdint.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module_idx.h>
+
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupModules Modules

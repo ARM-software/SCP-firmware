@@ -11,6 +11,8 @@
 #ifndef INTERNAL_SCMI_SENSOR_H
 #define INTERNAL_SCMI_SENSOR_H
 
+#include <stdint.h>
+
 /*!
  * \addtogroup GroupModules Modules
  * @{

@@ -11,9 +11,11 @@
 #ifndef SCP_PIK_H
 #define SCP_PIK_H
 
-#include <stdint.h>
+#include "scp_css_mmap.h"
+
 #include <fwk_macros.h>
-#include <scp_css_mmap.h>
+
+#include <stdint.h>
 
 /*!
  * \brief SCP PIK register definitions

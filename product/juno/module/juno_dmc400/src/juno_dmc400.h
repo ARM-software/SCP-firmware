@@ -8,10 +8,11 @@
 #ifndef JUNO_DMC400_H
 #define JUNO_DMC400_H
 
+#include "system_clock.h"
+
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module_idx.h>
-#include <system_clock.h>
 
 /* DDR frequency in MHz */
 #define DDR_FREQUENCY_MHZ   UINT32_C(800)

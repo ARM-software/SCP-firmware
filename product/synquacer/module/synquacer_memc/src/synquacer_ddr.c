@@ -5,22 +5,29 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "low_level_access.h"
+#include "mmu500.h"
+#include "synquacer_config.h"
+#include "synquacer_ddr.h"
+#include "synquacer_debug.h"
+#include "synquacer_mmap.h"
+
+#include <cmsis_os2.h>
+#include <ddr_init.h>
+#include <sysdef_option.h>
+
+#include <internal/i2c_depend.h>
+#include <internal/i2c_driver.h>
+#include <internal/reg_DMA330.h>
+
+#include <mod_f_i2c.h>
+
+#include <fwk_assert.h>
+#include <fwk_status.h>
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-#include <fwk_status.h>
-#include <mod_f_i2c.h>
-#include <synquacer_config.h>
-#include <synquacer_ddr.h>
-#include <synquacer_debug.h>
-#include <synquacer_mmap.h>
-#include <internal/reg_DMA330.h>
-#include <cmsis_os2.h>
-#include <ddr_init.h>
-#include <i2c_api.h>
-#include <low_level_access.h>
-#include <mmu500.h>
-#include <sysdef_option.h>
 
 extern const struct mod_f_i2c_api *f_i2c_api;
 

@@ -11,8 +11,9 @@
 #ifndef N1SDP_SCP_SOFTWARE_MMAP_H
 #define N1SDP_SCP_SOFTWARE_MMAP_H
 
+#include "n1sdp_scp_mmap.h"
+
 #include <fwk_macros.h>
-#include <n1sdp_scp_mmap.h>
 
 /*
  * Trusted shared SRAM region

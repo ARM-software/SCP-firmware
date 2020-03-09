@@ -5,9 +5,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_module.h>
+#include "scp_system_mmap_scp.h"
+
 #include <mod_synquacer_rom.h>
-#include <scp_system_mmap_scp.h>
+
+#include <fwk_module.h>
 
 const struct fwk_module_config config_synquacer_rom = {
     .data = &((struct synquacer_rom_config){

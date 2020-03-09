@@ -5,13 +5,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stddef.h>
-#include <fwk_element.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
+#include "system_mmap.h"
+
 #include <mod_reg_sensor.h>
 #include <mod_sensor.h>
-#include <system_mmap.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 enum REG_SENSOR_DEVICES {
     REG_SENSOR_DEV_SOC_TEMP,

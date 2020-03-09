@@ -8,8 +8,9 @@
 #ifndef INTERNAL_TIMER_SYNC_H
 #define INTERNAL_TIMER_SYNC_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \brief Timer Synchronization Register Definitions

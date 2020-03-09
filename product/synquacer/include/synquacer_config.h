@@ -8,9 +8,10 @@
 #ifndef SYNQUACER_CONFIG_H
 #define SYNQUACER_CONFIG_H
 
+#include "synquacer_mmap.h"
+
 #include <stdbool.h>
 #include <stdint.h>
-#include <synquacer_mmap.h>
 
 #define THRESHOLD_TYPE_UNR (0)
 #define THRESHOLD_TYPE_UCR (1)

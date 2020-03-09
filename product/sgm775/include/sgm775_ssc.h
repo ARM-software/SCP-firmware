@@ -8,8 +8,9 @@
 #ifndef SGM775_SSC_H
 #define SGM775_SSC_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \brief System Security Control (SSC) register definitions

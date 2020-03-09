@@ -8,16 +8,20 @@
  *     DMC-620 driver
  */
 
+#include <mod_clock.h>
+#include <mod_dmc620.h>
+#include <mod_log.h>
+
 #include <fwk_assert.h>
+#include <fwk_event.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
-#include <mod_dmc620.h>
-#include <mod_clock.h>
-#include <mod_log.h>
-#include <mod_power_domain.h>
-#include <cmsis_compiler.h>
+
+#include <fmw_cmsis.h>
+
+#include <stddef.h>
 
 static struct mod_log_api *log_api;
 static struct mod_dmc_ddr_phy_api *ddr_phy_api;

@@ -14,6 +14,8 @@
 #include <fwk_id.h>
 #include <fwk_module_idx.h>
 
+#include <stdint.h>
+
 /*!
  * \ingroup GroupJunoModule
  *

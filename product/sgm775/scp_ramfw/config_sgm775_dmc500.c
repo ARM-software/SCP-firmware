@@ -5,12 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "system_mmap.h"
+
+#include <mod_sgm775_dmc500.h>
+
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_sgm775_dmc500.h>
-#include <system_mmap.h>
 
 static struct fwk_element sgm775_dmc500_element_table[] = {
     [0] = { .name = "DMC500-0",

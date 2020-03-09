@@ -5,15 +5,19 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "juno_irq.h"
+#include "juno_ppu_idx.h"
+
+#include <mod_juno_ppu.h>
+#include <mod_power_domain.h>
+#include <mod_system_power.h>
+
+#include <fwk_element.h>
 #include <fwk_id.h>
-#include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <juno_irq.h>
-#include <juno_power_domain.h>
-#include <juno_ppu_idx.h>
-#include <mod_juno_ppu.h>
-#include <mod_system_power.h>
+
+#include <stdint.h>
 
 static const uint8_t system_power_to_sys_ppu_state[] = {
     [MOD_PD_STATE_ON]                     = (uint8_t)MOD_PD_STATE_ON,

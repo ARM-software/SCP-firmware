@@ -8,8 +8,9 @@
 #ifndef PIK_CPU_H
 #define PIK_CPU_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \brief CPU PIK register definitions

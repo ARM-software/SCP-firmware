@@ -9,14 +9,18 @@
  *     package residing in on-board QSPI flash memory.
  */
 
-#include <string.h>
+#include <internal/n1sdp_flash_layout.h>
+#include <internal/uuid.h>
+
+#include <mod_n1sdp_flash.h>
+
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_status.h>
-#include <mod_n1sdp_flash.h>
-#include <internal/n1sdp_flash_layout.h>
+
+#include <string.h>
 
 /*
  * Module context

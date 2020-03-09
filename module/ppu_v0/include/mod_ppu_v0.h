@@ -11,9 +11,10 @@
 #ifndef MOD_PPU_V0_H
 #define MOD_PPU_V0_H
 
+#include <mod_power_domain.h>
+
 #include <stdbool.h>
 #include <stdint.h>
-#include <mod_power_domain.h>
 
 /*!
  * \addtogroup GroupModules Modules

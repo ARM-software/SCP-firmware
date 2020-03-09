@@ -8,8 +8,9 @@
 #ifndef MOD_F_UART3_H
 #define MOD_F_UART3_H
 
-#include <stdint.h>
 #include <fwk_id.h>
+
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupSYNQUACERModule SYNQUACER Product Modules

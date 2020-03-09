@@ -11,10 +11,14 @@
 #ifndef MOD_SCMI_H
 #define MOD_SCMI_H
 
+#include <internal/scmi.h>
+
+#include <fwk_id.h>
+#include <fwk_module_idx.h>
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <internal/scmi.h>
 
 /*!
  * \addtogroup GroupModules Modules

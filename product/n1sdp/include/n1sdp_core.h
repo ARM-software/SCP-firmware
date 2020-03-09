@@ -8,8 +8,8 @@
 #ifndef N1SDP_CORE_H
 #define N1SDP_CORE_H
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #define CORES_PER_CLUSTER  2
 #define NUMBER_OF_CLUSTERS 2

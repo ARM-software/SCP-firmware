@@ -5,16 +5,21 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_id.h>
-#include <fwk_macros.h>
-#include <fwk_mm.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
+#include "scp_sgi575_irq.h"
+#include "sgi575_core.h"
+
+#include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
 #include <mod_sgi575_system.h>
 #include <mod_system_power.h>
-#include <scp_sgi575_irq.h>
-#include <sgi575_core.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_macros.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+
+#include <stdint.h>
 
 static const uint8_t system_power_to_sys_ppu0_state[] = {
     [MOD_PD_STATE_ON]                     = (uint8_t)MOD_PD_STATE_ON,

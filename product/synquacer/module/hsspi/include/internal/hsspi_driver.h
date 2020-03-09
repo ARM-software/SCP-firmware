@@ -8,9 +8,11 @@
 #ifndef INTERNAL_HSSPI_DRIVER_H
 #define INTERNAL_HSSPI_DRIVER_H
 
-#include <stdint.h>
-#include <synquacer_mmap.h>
+#include "synquacer_mmap.h"
+
 #include <internal/reg_HSSPI.h>
+
+#include <stdint.h>
 
 #define MEM_HSSPI_BYTE(var) ((volatile uint8_t *)(var))
 #define MEM_HSSPI_HALF(var) ((volatile uint16_t *)(var))

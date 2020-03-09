@@ -9,8 +9,10 @@
 #ifndef MOD_APCONTEXT_H
 #define MOD_APCONTEXT_H
 
-#include <stdint.h>
+#include <fwk_id.h>
+
 #include <stddef.h>
+#include <stdint.h>
 
 /*!
  * \ingroup GroupModules Modules

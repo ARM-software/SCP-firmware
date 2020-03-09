@@ -5,16 +5,22 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_assert.h>
-#include <fwk_element.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
+#include "config_juno_xrp7724.h"
+#include "config_psu.h"
+#include "juno_id.h"
+
 #include <mod_juno_xrp7724.h>
 #include <mod_mock_psu.h>
 #include <mod_psu.h>
-#include <config_juno_xrp7724.h>
-#include <config_psu.h>
-#include <juno_id.h>
+
+#include <fwk_assert.h>
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <fwk_status.h>
+
+#include <stddef.h>
 
 static struct fwk_element psu_dev_desc_table[] = {
     [MOD_PSU_ELEMENT_IDX_VSYS] = {

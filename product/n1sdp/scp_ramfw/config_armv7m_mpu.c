@@ -5,11 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "n1sdp_scp_mmap.h"
+#include "n1sdp_scp_system_mmap.h"
+
+#include <mod_armv7m_mpu.h>
+
 #include <fwk_macros.h>
 #include <fwk_module.h>
-#include <mod_armv7m_mpu.h>
-#include <n1sdp_scp_mmap.h>
-#include <n1sdp_scp_system_mmap.h>
+
+#include <fmw_cmsis.h>
 
 static const ARM_MPU_Region_t regions[] = {
     { /* 0x0000_0000 - 0xFFFF_FFFF */

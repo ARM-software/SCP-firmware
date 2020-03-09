@@ -5,10 +5,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stddef.h>
 #include <ppu_v1.h>
+
 #include <fwk_assert.h>
 #include <fwk_status.h>
+
+#include <stddef.h>
 
 void ppu_v1_init(struct ppu_v1_reg *ppu)
 {

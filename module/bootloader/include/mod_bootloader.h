@@ -8,8 +8,10 @@
 #ifndef MOD_BOOTLOADER_H
 #define MOD_BOOTLOADER_H
 
-#include <stdint.h>
 #include <fwk_element.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupModules Modules

@@ -5,14 +5,19 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "juno_mmap.h"
+
+#include <mod_log.h>
+#include <mod_pl011.h>
+
 #include <fwk_banner.h>
+#include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_log.h>
-#include <mod_pl011.h>
-#include <juno_mmap.h>
+
+#include <stddef.h>
 
 static const struct fwk_element pl011_element_desc_table[] = {
     [0] = {

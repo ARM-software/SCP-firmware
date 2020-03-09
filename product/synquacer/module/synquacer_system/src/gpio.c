@@ -5,12 +5,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <synquacer_debug.h>
-#include <synquacer_mmap.h>
-#include <low_level_access.h>
+#include "low_level_access.h"
+#include "synquacer_debug.h"
+#include "synquacer_mmap.h"
+
 #include <sysdef_option.h>
 
 #include <internal/gpio.h>
+
+#include <fwk_macros.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 static const uint8_t prmux_pingrp[] = CONFIG_SCB_PRMUX_PINGRP;
 static const uint8_t gpio_direction[] = CONFIG_SCB_GPIO_DIRECTION;

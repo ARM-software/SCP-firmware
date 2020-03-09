@@ -5,9 +5,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <setjmp.h>
-#include <stdbool.h>
-#include <stdlib.h>
+#include <internal/fwk_module.h>
+#include <internal/fwk_single_thread.h>
+#include <internal/fwk_thread.h>
+
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_list.h>
@@ -15,9 +16,10 @@
 #include <fwk_slist.h>
 #include <fwk_status.h>
 #include <fwk_test.h>
-#include <internal/fwk_module.h>
-#include <internal/fwk_single_thread.h>
-#include <internal/fwk_thread.h>
+
+#include <setjmp.h>
+#include <stdbool.h>
+#include <stdlib.h>
 
 /* Mock functions */
 static void * fwk_mm_calloc_val;

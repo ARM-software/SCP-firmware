@@ -5,16 +5,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stddef.h>
-#include <fwk_element.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
+#include "clock_devices.h"
+
 #include <mod_clock.h>
 #include <mod_css_clock.h>
-#include <mod_system_pll.h>
 #include <mod_msys_rom.h>
 #include <mod_pik_clock.h>
-#include <clock_devices.h>
+#include <mod_system_pll.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
 
 static const struct fwk_element clock_dev_desc_table[] = {
     [CLOCK_DEV_IDX_BIG] = {

@@ -5,11 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "scp_rddaniel_irq.h"
+
+#include <mod_timer.h>
+
+#include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_timer.h>
-#include <scp_rddaniel_irq.h>
 
 /*
  * Timer HAL config

@@ -8,10 +8,13 @@
 #ifndef MOD_SID_H
 #define MOD_SID_H
 
-#include <stdint.h>
+#include <mod_pcid.h>
+
 #include <fwk_id.h>
 #include <fwk_module_idx.h>
-#include <mod_pcid.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupModules Modules

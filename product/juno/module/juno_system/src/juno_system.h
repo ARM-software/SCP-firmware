@@ -8,9 +8,13 @@
 #ifndef JUNO_SYSTEM_H
 #define JUNO_SYSTEM_H
 
+#include "config_power_domain.h"
+#include "config_psu.h"
+
+#include <mod_psu.h>
+
 #include <fwk_id.h>
 #include <fwk_module_idx.h>
-#include <config_psu.h>
 
 /* PSU API identifier */
 static const fwk_id_t psu_api_id =

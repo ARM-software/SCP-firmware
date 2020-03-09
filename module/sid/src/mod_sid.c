@@ -5,15 +5,19 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <sid_reg.h>
+
+#include <mod_pcid.h>
+#include <mod_sid.h>
+#include <mod_system_info.h>
+
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <fwk_mm.h>
-#include <mod_pcid.h>
-#include <mod_sid.h>
-#include <mod_system_info.h>
-#include <sid_reg.h>
+#include <fwk_status.h>
+
+#include <stddef.h>
 
 static bool initialized;
 static struct mod_sid_info info;

@@ -11,8 +11,9 @@
 #ifndef INTERNAL_PCIE_CTRL_APB_REG_H
 #define INTERNAL_PCIE_CTRL_APB_REG_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \brief PCIe APB register definitions

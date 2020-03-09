@@ -8,9 +8,11 @@
 #ifndef JUNO_CLOCK_H
 #define JUNO_CLOCK_H
 
-#include <stdint.h>
+#include "juno_scc.h"
+
 #include <fwk_macros.h>
-#include <juno_scc.h>
+
+#include <stdint.h>
 
 /* Number of entries of the HDLCD lookup table */
 #define JUNO_CLOCK_HDLCD_LOOKUP_COUNT 566

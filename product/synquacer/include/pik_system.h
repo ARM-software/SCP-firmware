@@ -8,8 +8,9 @@
 #ifndef PIK_SYSTEM_H
 #define PIK_SYSTEM_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 typedef struct {
     FWK_R uint32_t RESERVED0[512];

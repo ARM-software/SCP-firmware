@@ -5,19 +5,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-#include <string.h>
+#include "config_power_domain.h"
+#include "config_ppu_v0.h"
+#include "sgm775_core.h"
+
+#include <mod_power_domain.h>
+#include <mod_ppu_v1.h>
+#include <mod_system_power.h>
+
 #include <fwk_element.h>
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <config_power_domain.h>
-#include <config_ppu_v0.h>
-#include <mod_system_power.h>
-#include <mod_power_domain.h>
-#include <mod_ppu_v1.h>
-#include <sgm775_core.h>
+
+#include <stdint.h>
+#include <string.h>
 
 static const char *core_pd_name_table[SGM775_CORE_PER_CLUSTER_MAX] = {
     "CLUS0CORE0", "CLUS0CORE1", "CLUS0CORE2", "CLUS0CORE3",

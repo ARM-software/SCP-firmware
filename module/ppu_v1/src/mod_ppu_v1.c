@@ -8,8 +8,18 @@
  *     Power State Management PPU v1 driver.
  */
 
-#include <stdbool.h>
+#include <ppu_v1.h>
+
+#include <mod_log.h>
+#include <mod_power_domain.h>
+#include <mod_ppu_v1.h>
+
+#if BUILD_HAS_MOD_SYSTEM_POWER
+#    include <mod_system_power.h>
+#endif
+
 #include <fwk_assert.h>
+#include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
 #include <fwk_macros.h>
@@ -17,13 +27,10 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
-#include <mod_log.h>
-#include <mod_power_domain.h>
-#include <mod_ppu_v1.h>
-#include <ppu_v1.h>
-#if BUILD_HAS_MOD_SYSTEM_POWER
-#include <mod_system_power.h>
-#endif
+#include <fwk_status.h>
+
+#include <stdbool.h>
+#include <stddef.h>
 
 #define CORE_PER_CLUSTER_COUNT_MAX 8
 

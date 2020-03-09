@@ -8,12 +8,16 @@
  *     DMC-500 driver
  */
 
-#include <assert.h>
-#include <fwk_mm.h>
+#include <mod_dmc500.h>
+#include <mod_log.h>
+#include <mod_timer.h>
+
+#include <fwk_assert.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <mod_dmc500.h>
+
+#include <stddef.h>
 
 static struct mod_log_api *log_api;
 static struct mod_dmc_ddr_phy_api *ddr_phy_api;

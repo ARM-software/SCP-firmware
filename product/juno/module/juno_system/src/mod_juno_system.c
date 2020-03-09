@@ -5,17 +5,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-#include <fmw_cmsis.h>
-#include <fwk_assert.h>
-#include <fwk_event.h>
-#include <fwk_id.h>
-#include <fwk_macros.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <fwk_multi_thread.h>
-#include <fwk_notification.h>
-#include <fwk_status.h>
+#include "juno_id.h"
+#include "juno_scmi.h"
+#include "juno_sds.h"
+#include "juno_system.h"
+
 #include <mod_juno_system.h>
 #include <mod_juno_xrp7724.h>
 #include <mod_power_domain.h>
@@ -23,14 +17,22 @@
 #include <mod_scmi.h>
 #include <mod_sds.h>
 #include <mod_system_power.h>
-#include <config_power_domain.h>
-#include <juno_id.h>
-#include <juno_irq.h>
-#include <juno_ppu_idx.h>
-#include <juno_scmi.h>
-#include <juno_sds.h>
-#include <juno_system.h>
-#include <system_mmap.h>
+
+#include <fwk_assert.h>
+#include <fwk_event.h>
+#include <fwk_id.h>
+#include <fwk_macros.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <fwk_notification.h>
+#include <fwk_status.h>
+#include <fwk_thread.h>
+
+#include <fmw_cmsis.h>
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 static fwk_id_t sds_feature_availability_id =
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, JUNO_SDS_RAM_FEATURES_IDX);

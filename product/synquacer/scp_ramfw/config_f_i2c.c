@@ -5,11 +5,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_element.h>
 #include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <mod_f_i2c.h>
-#include <synquacer_mmap.h>
+
+#include <stddef.h>
 
 /* Configuration of the F_I2C module. */
 const struct fwk_module_config config_f_i2c = {

@@ -5,13 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <synquacer_debug.h>
-#include <synquacer_mmap.h>
-#include <low_level_access.h>
+#include "synquacer_debug.h"
+#include "synquacer_mmap.h"
+
 #include <internal/hsspi_api.h>
 #include <internal/hsspi_driver.h>
+#include <internal/reg_HSSPI.h>
+
+#include <stdbool.h>
 
 #define FILE_GRP_ID DBG_DRV_HSSPI
 #define xcpb_bridge_mode_set(enable)

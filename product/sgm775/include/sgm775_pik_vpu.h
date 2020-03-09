@@ -8,8 +8,9 @@
 #ifndef SGM775_PIK_VPU_H
 #define SGM775_PIK_VPU_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \brief VPU PIK register definitions

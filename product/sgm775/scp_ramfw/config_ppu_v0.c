@@ -5,12 +5,19 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_element.h>
-#include <fwk_module.h>
+#include "config_ppu_v0.h"
+#include "sgm775_irq.h"
+#include "sgm775_mmap.h"
+
+#include <mod_power_domain.h>
 #include <mod_ppu_v0.h>
-#include <config_ppu_v0.h>
-#include <sgm775_irq.h>
-#include <sgm775_mmap.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
+
+#include <stdbool.h>
+#include <stddef.h>
 
 static struct fwk_element sgm775_ppu_v0_element_table[] = {
     [PPU_V0_ELEMENT_IDX_DBGTOP] = {

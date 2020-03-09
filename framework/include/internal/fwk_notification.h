@@ -8,10 +8,11 @@
 #ifndef FWK_INTERNAL_NOTIFICATION_H
 #define FWK_INTERNAL_NOTIFICATION_H
 
-#include <stdbool.h>
-#include <stddef.h>
 #include <fwk_list.h>
 #include <fwk_notification.h>
+
+#include <stdbool.h>
+#include <stddef.h>
 
 struct __fwk_notification_subscription {
     struct fwk_dlist_node dlist_node;

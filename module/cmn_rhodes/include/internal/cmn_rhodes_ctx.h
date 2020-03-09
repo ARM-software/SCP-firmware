@@ -11,11 +11,13 @@
 #ifndef INTERNAL_CMN_RHODES_CTX_H
 #define INTERNAL_CMN_RHODES_CTX_H
 
-#include <stdbool.h>
-#include <stdint.h>
+#include <cmn_rhodes.h>
+
 #include <mod_cmn_rhodes.h>
 #include <mod_log.h>
-#include <cmn_rhodes.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 static struct cmn_rhodes_ctx {
     const struct mod_cmn_rhodes_config *config;

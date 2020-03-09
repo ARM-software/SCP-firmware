@@ -10,9 +10,9 @@
  *      timeframe.
  */
 
+#include "juno_scc.h"
+
 #include <fwk_noreturn.h>
-#include <fwk_module.h>
-#include <juno_scc.h>
 
 #ifdef __ARMCC_VERSION
 #   define __wrap_arm_exception_reset $Sub$$arm_exception_reset

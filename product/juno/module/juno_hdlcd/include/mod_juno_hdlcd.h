@@ -8,11 +8,15 @@
 #ifndef MOD_JUNO_HDLCD_H
 #define MOD_JUNO_HDLCD_H
 
-#include <stdint.h>
-#include <fwk_id.h>
-#include <fwk_module_idx.h>
+#include "juno_clock.h"
+
 #include <mod_clock.h>
-#include <juno_clock.h>
+
+#include <fwk_id.h>
+#include <fwk_macros.h>
+#include <fwk_module_idx.h>
+
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupModules Modules

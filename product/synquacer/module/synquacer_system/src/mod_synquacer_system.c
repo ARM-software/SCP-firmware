@@ -5,28 +5,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-
-#include <fwk_assert.h>
-#include <fwk_id.h>
-#include <fwk_interrupt.h>
-#include <fwk_macros.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <fwk_multi_thread.h>
-#include <fwk_notification.h>
-
-#include <mod_ccn512.h>
-#include <mod_clock.h>
-#include <mod_f_i2c.h>
-#include <mod_hsspi.h>
 #include <mod_log.h>
 #include <mod_power_domain.h>
 #include <mod_synquacer_system.h>
 #include <mod_system_power.h>
-#include <mod_timer.h>
 
-#include <synquacer_mmap.h>
+#include <fwk_event.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <fwk_multi_thread.h>
+#include <fwk_status.h>
+#include <fwk_thread.h>
+
+#include <stdbool.h>
 
 struct synquacer_system_ctx synquacer_system_ctx;
 const struct fwk_module_config config_synquacer_system = { 0 };

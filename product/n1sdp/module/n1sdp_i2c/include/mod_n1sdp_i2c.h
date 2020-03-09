@@ -12,11 +12,13 @@
 #define MOD_N1SDP_I2C_H
 
 #include <internal/n1sdp_i2c.h>
-#include <stdbool.h>
-#include <stdint.h>
+
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module_idx.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules

@@ -5,18 +5,21 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
-#include <stdint.h>
+#include <internal/n1sdp_pll.h>
+
+#include <mod_clock.h>
+#include <mod_n1sdp_pll.h>
+#include <mod_power_domain.h>
+
 #include <fwk_assert.h>
-#include <fwk_element.h>
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_status.h>
-#include <mod_clock.h>
-#include <mod_n1sdp_pll.h>
-#include <mod_power_domain.h>
-#include <internal/n1sdp_pll.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 /* Device context */
 struct n1sdp_pll_dev_ctx {

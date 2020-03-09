@@ -11,8 +11,9 @@
 #ifndef MOD_MHU_H
 #define MOD_MHU_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules

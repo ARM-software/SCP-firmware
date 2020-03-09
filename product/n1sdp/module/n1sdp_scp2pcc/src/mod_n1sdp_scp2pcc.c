@@ -8,11 +8,18 @@
  *     N1SDP SCP to PCC communications protocol driver
  */
 
-#include <stdint.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
+#include <internal/n1sdp_scp2pcc.h>
+
 #include <mod_log.h>
 #include <mod_n1sdp_scp2pcc.h>
+
+#include <fwk_id.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <fwk_status.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 /* Module context */
 struct n1sdp_scp2pcc_ctx {

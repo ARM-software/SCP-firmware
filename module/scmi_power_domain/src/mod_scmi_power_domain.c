@@ -8,7 +8,18 @@
  *     SCMI power domain management protocol support.
  */
 
-#include <string.h>
+#include <internal/scmi.h>
+#include <internal/scmi_power_domain.h>
+
+#include <mod_log.h>
+#include <mod_power_domain.h>
+#include <mod_scmi.h>
+#include <mod_scmi_power_domain.h>
+
+#ifdef BUILD_HAS_MOD_DEBUG
+#    include <mod_debug.h>
+#endif
+
 #include <fwk_assert.h>
 #include <fwk_element.h>
 #include <fwk_id.h>
@@ -17,17 +28,11 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <internal/scmi.h>
-#include <internal/scmi_power_domain.h>
-#include <config_power_domain.h>
-#if BUILD_HAS_MOD_DEBUG
-#include <mod_debug.h>
 #include <fwk_thread.h>
-#endif
-#include <mod_log.h>
-#include <mod_power_domain.h>
-#include <mod_scmi.h>
-#include <mod_scmi_power_domain.h>
+
+#include <stdbool.h>
+#include <stdint.h>
+#include <string.h>
 
 struct scmi_pd_operations {
     /*

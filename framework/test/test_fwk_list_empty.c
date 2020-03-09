@@ -5,11 +5,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stddef.h>
 #include <fwk_assert.h>
 #include <fwk_list.h>
 #include <fwk_macros.h>
 #include <fwk_test.h>
+
+#include <stddef.h>
 
 static struct fwk_slist slist;
 static struct fwk_dlist dlist;

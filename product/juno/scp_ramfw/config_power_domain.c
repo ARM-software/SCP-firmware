@@ -5,16 +5,21 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-#include <fwk_element.h>
-#include <fwk_macros.h>
-#include <fwk_module.h>
+#include "config_power_domain.h"
+#include "juno_power_domain.h"
+#include "juno_ppu_idx.h"
+
 #include <mod_juno_ppu.h>
 #include <mod_power_domain.h>
 #include <mod_system_power.h>
-#include <config_power_domain.h>
-#include <juno_power_domain.h>
-#include <juno_ppu_idx.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_macros.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+
+#include <stdint.h>
 
 /* Masks of the allowed states for the systop power domain */
 static const uint32_t systop_pd_allowed_state_mask_table[] = {

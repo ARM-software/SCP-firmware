@@ -8,10 +8,12 @@
  *     Intrusive circular singly-linked list.
  */
 
-#include <stdbool.h>
-#include <stddef.h>
 #include <fwk_assert.h>
 #include <fwk_list.h>
+#include <fwk_slist.h>
+
+#include <stdbool.h>
+#include <stddef.h>
 
 void __fwk_slist_init(struct fwk_slist *list)
 {

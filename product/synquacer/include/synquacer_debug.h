@@ -8,11 +8,13 @@
 #ifndef SYNQUACER_DEBUG_H
 #define SYNQUACER_DEBUG_H
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <fwk_assert.h>
 #include <mod_log.h>
 #include <mod_synquacer_system.h>
+
+#include <fwk_assert.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 #ifdef SYNQUACER_LOG_GROUP_ERROR
 #define SYNQUACER_DEV_LOG_ERROR(...) \

@@ -5,19 +5,27 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_assert.h>
-#include <fwk_mm.h>
-#include <fwk_module.h>
-#include <fwk_notification.h>
-#include <fwk_status.h>
+#include <pl011.h>
+
 #include <mod_clock.h>
 #include <mod_log.h>
 #include <mod_pl011.h>
 #include <mod_power_domain.h>
+
 #if BUILD_HAS_MOD_POWER_DOMAIN
-#include <mod_system_power.h>
+#    include <mod_system_power.h>
 #endif
-#include <pl011.h>
+
+#include <fwk_assert.h>
+#include <fwk_event.h>
+#include <fwk_id.h>
+#include <fwk_mm.h>
+#include <fwk_module.h>
+#include <fwk_notification.h>
+#include <fwk_status.h>
+
+#include <stdbool.h>
+#include <stddef.h>
 
 struct pl011_device_ctx {
     /* Pointer to configuration data */

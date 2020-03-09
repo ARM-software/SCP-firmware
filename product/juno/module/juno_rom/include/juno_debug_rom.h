@@ -8,8 +8,9 @@
 #ifndef JUNO_DEBUG_ROM_H
 #define JUNO_DEBUG_ROM_H
 
-#include <stdint.h>
 #include <mod_juno_ppu.h>
+
+#include <stdint.h>
 
 int juno_debug_rom_init(const struct mod_juno_ppu_rom_api *rom_ppu_api);
 

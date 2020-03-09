@@ -5,11 +5,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <mod_debug.h>
+#include <mod_juno_debug.h>
+
 #include <fwk_element.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_debug.h>
-#include <mod_juno_debug.h>
 
 /* Configuration of the Debug elements */
 static const struct fwk_element debug_element_table[] = {

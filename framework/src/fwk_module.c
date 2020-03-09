@@ -8,17 +8,25 @@
  *     Module facilities.
  */
 
-#include <string.h>
-#include <fwk_assert.h>
-#include <fwk_cli_dbg.h>
-#include <fwk_host.h>
-#include <fwk_mm.h>
-#include <fwk_status.h>
+#include <internal/fwk_id.h>
 #include <internal/fwk_module.h>
 #include <internal/fwk_thread.h>
+
 #ifdef BUILD_HAS_NOTIFICATION
-#include <internal/fwk_notification.h>
+#    include <internal/fwk_notification.h>
 #endif
+
+#include <fwk_assert.h>
+#include <fwk_cli_dbg.h>
+#include <fwk_dlist.h>
+#include <fwk_element.h>
+#include <fwk_host.h>
+#include <fwk_list.h>
+#include <fwk_mm.h>
+#include <fwk_module.h>
+#include <fwk_status.h>
+
+#include <stdbool.h>
 
 #define EVENT_COUNT 64
 #define BIND_ROUND_MAX 1

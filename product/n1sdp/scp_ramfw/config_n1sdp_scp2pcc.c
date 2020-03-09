@@ -6,7 +6,10 @@
  */
 
 #include <mod_n1sdp_scp2pcc.h>
+
 #include <fwk_module.h>
+
+#include <stdint.h>
 
 #define MSG_ALIVE_ADDRESS    0xB3FFF000
 #define MSG_RX_BUF_ADDRESS   0xB3FFF104

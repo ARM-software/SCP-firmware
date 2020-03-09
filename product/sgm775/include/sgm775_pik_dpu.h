@@ -8,8 +8,9 @@
 #ifndef SGM775_PIK_DPU_H
 #define SGM775_PIK_DPU_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \brief DPU PIK register definitions

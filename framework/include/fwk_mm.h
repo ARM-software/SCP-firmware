@@ -11,8 +11,9 @@
 #ifndef FWK_MM_H
 #define FWK_MM_H
 
-#include <stddef.h>
 #include <fwk_align.h>
+
+#include <stddef.h>
 
 /*!
  * \addtogroup GroupLibFramework Framework

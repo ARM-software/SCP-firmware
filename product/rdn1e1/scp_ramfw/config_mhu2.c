@@ -5,13 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "scp_rdn1e1_irq.h"
+#include "scp_rdn1e1_mhu.h"
+#include "scp_rdn1e1_mmap.h"
+
+#include <mod_mhu2.h>
+
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
-#include <mod_mhu2.h>
-#include <scp_rdn1e1_irq.h>
-#include <scp_rdn1e1_mmap.h>
-#include <scp_rdn1e1_mhu.h>
 
 static const struct fwk_element mhu_element_table[] = {
     [SCP_RDN1E1_MHU_DEVICE_IDX_SCP_AP_S_CLUS0] = {

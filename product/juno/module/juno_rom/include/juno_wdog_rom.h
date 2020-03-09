@@ -8,6 +8,7 @@
 #ifndef JUNO_WDOG_ROM_H
 #define JUNO_WDOG_ROM_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 void juno_wdog_rom_halt_on_debug_config(void);

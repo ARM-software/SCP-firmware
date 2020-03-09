@@ -1,4 +1,4 @@
- /*
+/*
  * Arm SCP/MCP Software
  * Copyright (c) 2019-2020, Arm Limited and Contributors. All rights reserved.
  *
@@ -10,9 +10,11 @@
 #ifndef PHY_VALUES_H
 #define PHY_VALUES_H
 
-#include <stdint.h>
-#include <mod_n1sdp_dmc620.h>
 #include <internal/n1sdp_ddr_phy.h>
+
+#include <mod_n1sdp_dmc620.h>
+
+#include <stdint.h>
 
 /*
  * \brief Function to configure and run DDR PHY at 800MHz frequency.

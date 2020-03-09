@@ -8,6 +8,9 @@
 #ifndef SYSDEF_OPTION_H
 #define SYSDEF_OPTION_H
 
+#include <stdbool.h>
+#include <stdint.h>
+
 #define NIC_CONFIG_NUM 6
 
 #define I2C_TEG_START_ADDR 0x51

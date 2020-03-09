@@ -5,13 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_assert.h>
+#include "synquacer_ddr.h"
+
+#include <mod_log.h>
+#include <mod_synquacer_memc.h>
+
+#include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <mod_log.h>
-#include <mod_synquacer_memc.h>
-#include <synquacer_ddr.h>
 
 const struct mod_f_i2c_api *f_i2c_api;
 static struct mod_log_api *log_api;

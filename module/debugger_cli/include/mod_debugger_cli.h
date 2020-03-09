@@ -12,6 +12,7 @@
 #define MOD_DEBUGGER_CLI_H
 
 #include <mod_timer.h>
+
 #include <fwk_module.h>
 
 /*!

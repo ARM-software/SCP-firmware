@@ -8,8 +8,11 @@
 #ifndef PVT_SENSOR_CALIBRATION_H
 #define PVT_SENSOR_CALIBRATION_H
 
+#include "juno_mmap.h"
+
+#include <fwk_macros.h>
+
 #include <stdint.h>
-#include <juno_mmap.h>
 
 #define SOC_PART_ID_LEN     7
 

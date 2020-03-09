@@ -5,13 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_element.h>
-#include <fwk_macros.h>
-#include <fwk_module.h>
+#include "sgm775_mmap.h"
+#include "sgm775_mmap_scp.h"
+#include "sgm775_sds.h"
+#include "system_mmap_scp.h"
+
 #include <mod_bootloader.h>
-#include <system_mmap.h>
-#include <system_mmap_scp.h>
-#include <sgm775_sds.h>
+
+#include <fwk_module.h>
 
 static const struct mod_bootloader_config bootloader_module_config = {
     .source_base = TRUSTED_RAM_BASE,

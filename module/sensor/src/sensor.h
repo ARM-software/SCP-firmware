@@ -8,9 +8,11 @@
 #ifndef SENSOR_H
 #define SENSOR_H
 
-#include <stdint.h>
-#include <fwk_id.h>
 #include <mod_sensor.h>
+
+#include <fwk_id.h>
+
+#include <stdint.h>
 
 /*!
  * \cond

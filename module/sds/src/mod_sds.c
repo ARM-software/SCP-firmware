@@ -5,22 +5,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
+#include <mod_sds.h>
+
+#if BUILD_HAS_MOD_CLOCK
+#    include <mod_clock.h>
+#endif
+
 #include <fwk_assert.h>
-#include <fwk_element.h>
+#include <fwk_event.h>
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
-#include <mod_sds.h>
 
-#if BUILD_HAS_MOD_CLOCK
-#include <mod_clock.h>
-#endif
+#include <stdbool.h>
+#include <stdint.h>
 
 /* Arbitrary, 16 bit value that indicates a valid SDS Memory Region */
 #define REGION_SIGNATURE 0xAA7A

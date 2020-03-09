@@ -8,6 +8,8 @@
 #ifndef MOD_SSC_H
 #define MOD_SSC_H
 
+#include <stdint.h>
+
 /*!
  * \brief Module configuration.
  */

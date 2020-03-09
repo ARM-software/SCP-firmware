@@ -11,6 +11,8 @@
 #ifndef MOD_N1SDP_SYSTEM_H
 #define MOD_N1SDP_SYSTEM_H
 
+#include <stdint.h>
+
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules
  * @{

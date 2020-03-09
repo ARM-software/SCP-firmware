@@ -5,9 +5,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_module.h>
+#include "mcp_sgi575_mmap_mcp.h"
+
 #include <mod_sgi575_rom.h>
-#include <mcp_sgi575_mmap_mcp.h>
+
+#include <fwk_module.h>
 
 const struct fwk_module_config config_sgi575_rom = {
     .data = &((struct sgi575_rom_config) {

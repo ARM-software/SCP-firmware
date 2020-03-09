@@ -5,15 +5,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-#include <string.h>
-
-#include <fwk_assert.h>
-
-#include <synquacer_debug.h>
-#include <synquacer_mmap.h>
+#include "synquacer_debug.h"
+#include "synquacer_mmap.h"
 
 #include <ddr_init.h>
+
+#include <fwk_assert.h>
+#include <fwk_macros.h>
+
+#include <stdint.h>
+#include <string.h>
 
 struct fip_toc_header_s {
     uint32_t name;

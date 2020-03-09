@@ -5,11 +5,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-#include <synquacer_config.h>
-#include <synquacer_ddr.h>
+#include "synquacer_config.h"
+#include "synquacer_ddr.h"
+
 #include <boot_ctl.h>
 #include <ddr_init.h>
+
+#include <internal/reg_DDRPHY_CONFIG.h>
+#include <internal/reg_DMC520.h>
+
+#include <stdint.h>
 
 extern void usleep_en(uint32_t usec);
 

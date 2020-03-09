@@ -5,11 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_macros.h>
+#include <mod_sid.h>
+#include <mod_system_info.h>
+
+#include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_system_info.h>
-#include <mod_sid.h>
+
+#include <stddef.h>
 
 const struct fwk_module_config config_system_info = {
     .get_element_table = NULL,

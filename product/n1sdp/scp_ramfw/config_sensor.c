@@ -5,13 +5,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stddef.h>
-#include <fwk_element.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
 #include <mod_n1sdp_sensor.h>
 #include <mod_sensor.h>
 #include <mod_timer.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+
+#include <stddef.h>
 
 /*
  * N1SDP sensor driver config

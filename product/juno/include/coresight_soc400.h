@@ -13,8 +13,9 @@
 #ifndef CORESIGHT_SOC400_H
 #define CORESIGHT_SOC400_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 struct cti_reg {
     FWK_RW uint32_t  CTI_CONTROL;

@@ -5,25 +5,29 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
-#include <string.h>
+#include <cmn600.h>
+
+#include <internal/cmn600_ccix.h>
+#include <internal/cmn600_ctx.h>
+
+#include <mod_clock.h>
+#include <mod_cmn600.h>
+#include <mod_log.h>
+#include <mod_ppu_v1.h>
+#include <mod_system_info.h>
+#include <mod_timer.h>
+
 #include <fwk_assert.h>
-#include <fwk_macros.h>
-#include <fwk_math.h>
+#include <fwk_event.h>
+#include <fwk_id.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
-#include <mod_clock.h>
-#include <mod_cmn600.h>
-#include <mod_log.h>
-#include <mod_power_domain.h>
-#include <mod_system_info.h>
-#include <cmn600.h>
-#include <internal/cmn600_ccix.h>
-#include <internal/cmn600_ctx.h>
-#include <mod_ppu_v1.h>
+
+#include <stdbool.h>
+#include <string.h>
 
 #define MOD_NAME "[CMN600] "
 

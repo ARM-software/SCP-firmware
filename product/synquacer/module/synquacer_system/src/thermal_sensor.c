@@ -5,14 +5,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_status.h>
-#include <cmsis_os2.h>
+#include "low_level_access.h"
+#include "synquacer_debug.h"
 
-#include <synquacer_debug.h>
-#include <low_level_access.h>
+#include <cmsis_os2.h>
 #include <sysdef_option.h>
 
 #include <internal/thermal_sensor.h>
+
+#include <fwk_status.h>
+
+#include <stdint.h>
 
 #define DELAY_COUNTER 10
 

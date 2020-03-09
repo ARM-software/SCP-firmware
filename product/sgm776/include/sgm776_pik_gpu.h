@@ -8,8 +8,9 @@
 #ifndef SGM776_PIK_GPU_H
 #define SGM776_PIK_GPU_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \brief GPU PIK register definitions

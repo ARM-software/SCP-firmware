@@ -8,12 +8,10 @@
  *      ARMv7-M exception handlers.
  */
 
-#include <stdbool.h>
+#include "exceptions.h"
+
 #include <stdint.h>
 #include <string.h>
-#include <fwk_noreturn.h>
-#include <cmsis_compiler.h>
-#include "exceptions.h"
 
 #ifdef __NEWLIB__
 /*

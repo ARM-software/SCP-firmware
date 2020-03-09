@@ -5,11 +5,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-
 #include <cli_config.h>
 #include <cli_fifo.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 uint32_t fifo_init(fifo_st *fifo, char *buf, uint32_t buf_size)
 {

@@ -8,9 +8,11 @@
 #ifndef MOD_SMT_H
 #define MOD_SMT_H
 
+#include <fwk_id.h>
+#include <fwk_module_idx.h>
+
 #include <stddef.h>
 #include <stdint.h>
-#include <fwk_id.h>
 
 /*!
  * \name Channel policies

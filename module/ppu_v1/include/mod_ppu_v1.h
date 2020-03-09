@@ -11,12 +11,13 @@
 #ifndef MOD_PPU_V1_H
 #define MOD_PPU_V1_H
 
+#include <mod_power_domain.h>
+
+#include <fwk_id.h>
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <fwk_id.h>
-#include <mod_power_domain.h>
-
 
 /*!
  * \addtogroup GroupModules Modules

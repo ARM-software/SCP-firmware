@@ -11,8 +11,9 @@
 #ifndef MOD_MHU2_H
 #define MOD_MHU2_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupModules Modules

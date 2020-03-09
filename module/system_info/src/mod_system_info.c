@@ -8,12 +8,14 @@
  *     System Information Hardware Abstraction module.
  */
 
+#include <mod_system_info.h>
+
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
-#include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <mod_system_info.h>
+
+#include <stddef.h>
 
 /* Pointer to the config data for module use. */
 static const struct mod_system_info_config *config;

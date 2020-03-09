@@ -5,12 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <config_power_domain.h>
+
+#include <mod_scmi_power_domain.h>
+
 #include <fwk_element.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_scmi_power_domain.h>
-#include <config_power_domain.h>
 
 #if BUILD_HAS_MOD_DEBUG
 struct fwk_module_config config_scmi_power_domain = {

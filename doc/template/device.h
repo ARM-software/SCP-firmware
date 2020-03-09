@@ -11,8 +11,9 @@
 #ifndef <DEVICE>_H
 #define <DEVICE>_H
 
-#include <stdint.h>
-#include <fwk_macros.h>
+#    include <fwk_macros.h>
+
+#    include <stdint.h>
 
 typedef struct {
     /* Readable and writable register */

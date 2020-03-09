@@ -5,12 +5,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <limits.h>
-#include <stdint.h>
 #include <fwk_assert.h>
 #include <fwk_macros.h>
 #include <fwk_math.h>
 #include <fwk_test.h>
+
+#include <limits.h>
+#include <stdint.h>
 
 static void test_fwk_math_pow2_uc(void)
 {

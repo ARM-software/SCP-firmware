@@ -8,9 +8,14 @@
  *     SCMI sensor management protocol support.
  */
 
-#include <string.h>
+#include <internal/scmi.h>
+#include <internal/scmi_sensor.h>
+
+#include <mod_scmi.h>
+#include <mod_sensor.h>
+
 #include <fwk_assert.h>
-#include <fwk_element.h>
+#include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
@@ -18,10 +23,10 @@
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
 #include <fwk_thread.h>
-#include <internal/scmi.h>
-#include <internal/scmi_sensor.h>
-#include <mod_scmi.h>
-#include <mod_sensor.h>
+
+#include <stdbool.h>
+#include <stdint.h>
+#include <string.h>
 
 struct sensor_operations {
     /*

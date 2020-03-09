@@ -8,12 +8,14 @@
  *     Utility functions for Juno.
  */
 
-#include <stddef.h>
+#include "pl35x.h"
+#include "scp_config.h"
+
 #include <fwk_assert.h>
-#include <juno_id.h>
-#include <juno_scc.h>
-#include <pl35x.h>
-#include <scp_config.h>
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #define SNOOP_CONTROL_L2ACCREQ      UINT32_C(0x00000001)
 #define SNOOP_CONTROL_L2ACCACK      UINT32_C(0x00000002)

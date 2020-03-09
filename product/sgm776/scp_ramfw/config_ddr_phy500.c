@@ -4,10 +4,13 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-#include <fwk_element.h>
-#include <fwk_module.h>
+#include "system_mmap.h"
+
 #include <mod_ddr_phy500.h>
-#include <system_mmap.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
 
 /* Default configuration values for DDR PHY500 devices. */
 static const struct mod_ddr_phy500_reg ddr_reg_val = {

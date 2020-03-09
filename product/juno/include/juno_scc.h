@@ -11,9 +11,11 @@
 #ifndef JUNO_SCC_H
 #define JUNO_SCC_H
 
-#include <stdint.h>
+#include "juno_mmap.h"
+
 #include <fwk_macros.h>
-#include <juno_mmap.h>
+
+#include <stdint.h>
 
 enum pll_idx {
     PLL_IDX_BIG,

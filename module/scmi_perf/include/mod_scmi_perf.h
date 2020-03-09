@@ -12,6 +12,7 @@
 #define MOD_SCMI_PERF_H
 
 #include <stddef.h>
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupModules Modules

@@ -11,11 +11,14 @@
 #ifndef MOD_DMC500_H
 #define MOD_DMC500_H
 
-#include <stdint.h>
-#include <fwk_macros.h>
-#include <fwk_module.h>
 #include <mod_log.h>
 #include <mod_timer.h>
+
+#include <fwk_id.h>
+#include <fwk_macros.h>
+#include <fwk_module.h>
+
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupModules Modules

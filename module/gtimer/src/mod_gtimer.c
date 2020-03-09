@@ -5,19 +5,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
+#include <gtimer_reg.h>
+
+#include <mod_clock.h>
+#include <mod_gtimer.h>
+#include <mod_timer.h>
+
 #include <fwk_assert.h>
+#include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
-#include <gtimer_reg.h>
-#include <mod_clock.h>
-#include <mod_gtimer.h>
-#include <mod_power_domain.h>
-#include <mod_timer.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 #define GTIMER_FREQUENCY_MIN_HZ  UINT32_C(1)
 #define GTIMER_FREQUENCY_MAX_HZ  UINT32_C(1000000000)

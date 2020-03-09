@@ -8,8 +8,9 @@
 #ifndef INTERNAL_GPIO_H
 #define INTERNAL_GPIO_H
 
+#include "synquacer_mmap.h"
+
 #include <stdint.h>
-#include <synquacer_mmap.h>
 
 #define PRMUX_MAX_IDX CONFIG_SOC_PRMUX_MAX_IDX
 #define GPIO_MAX_IDX 3

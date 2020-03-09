@@ -5,15 +5,19 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
+#include "config_clock.h"
+#include "n1sdp_mcp_pik.h"
+#include "n1sdp_pik_mcp.h"
+#include "n1sdp_system_clock.h"
+
+#include <mod_pik_clock.h>
+
 #include <fwk_element.h>
 #include <fwk_id.h>
+#include <fwk_macros.h>
 #include <fwk_module.h>
-#include <mod_pik_clock.h>
-#include <n1sdp_mcp_pik.h>
-#include <n1sdp_pik_mcp.h>
-#include <n1sdp_system_clock.h>
-#include <config_clock.h>
+
+#include <stdbool.h>
 
 /*
  * Rate lookup tables

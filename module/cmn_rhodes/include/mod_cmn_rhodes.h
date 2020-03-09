@@ -8,6 +8,10 @@
 #ifndef MOD_CMN_RHODES_H
 #define MOD_CMN_RHODES_H
 
+#include <fwk_id.h>
+
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 /*!

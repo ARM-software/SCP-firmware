@@ -11,13 +11,14 @@
 #ifndef MOD_I2C_H
 #define MOD_I2C_H
 
-#include <stdbool.h>
-#include <stdint.h>
 #include <fwk_assert.h>
 #include <fwk_element.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_module_idx.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupModules Modules

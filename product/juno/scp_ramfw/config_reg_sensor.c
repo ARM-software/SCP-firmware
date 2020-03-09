@@ -5,11 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_element.h>
-#include <fwk_module.h>
 #include <mod_reg_sensor.h>
 #include <mod_sensor.h>
-#include <system_mmap.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 static uint64_t fake_register = UINT64_C(0x1234);
 

@@ -8,9 +8,11 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#include <stdint.h>
-#include <fwk_id.h>
 #include <mod_debug.h>
+
+#include <fwk_id.h>
+
+#include <stdint.h>
 
 enum debug_state {
     DEBUG_IDLE,

@@ -8,8 +8,8 @@
 #ifndef N1SDP_MCP_PIK_H
 #define N1SDP_MCP_PIK_H
 
-#include <n1sdp_mcp_mmap.h>
-#include <n1sdp_pik_mcp.h>
+#include "n1sdp_mcp_mmap.h"
+#include "n1sdp_pik_mcp.h"
 
 #define PIK_MCP  ((struct pik_mcp_reg *) MCP_PIK_BASE)
 

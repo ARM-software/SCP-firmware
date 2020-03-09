@@ -5,9 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stdint.h>
+#include <mod_log.h>
+
 #include <fwk_assert.h>
 #include <fwk_element.h>
 #include <fwk_macros.h>
@@ -15,7 +14,10 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <mod_log.h>
+
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 static const struct mod_log_config *log_config;
 static struct mod_log_driver_api *log_driver;

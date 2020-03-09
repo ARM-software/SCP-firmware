@@ -8,13 +8,19 @@
 #ifndef DDR_INIT_H
 #define DDR_INIT_H
 
-#include <stdint.h>
-#include <synquacer_debug.h>
-#include <synquacer_mmap.h>
+#include "synquacer_debug.h"
+#include "synquacer_mmap.h"
+
 #include <cmsis_os.h>
+#include <cmsis_os2.h>
 
 #include <internal/reg_DDRPHY_CONFIG.h>
 #include <internal/reg_DMC520.h>
+
+#include <fmw_cmsis.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 #define printf(...) SYNQUACER_DEV_LOG_INFO("[DDR] " __VA_ARGS__)
 #define pr_err(...) SYNQUACER_DEV_LOG_ERROR("[DDR] " __VA_ARGS__)

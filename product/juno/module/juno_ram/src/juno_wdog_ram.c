@@ -5,8 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-#include <juno_wdog.h>
+#include "juno_wdog.h"
 
 void juno_wdog_ram_disable(void)
 {

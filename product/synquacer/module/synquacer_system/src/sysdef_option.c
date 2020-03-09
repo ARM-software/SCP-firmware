@@ -5,14 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-
-#include <synquacer_mmap.h>
-#include <low_level_access.h>
 #include <sysdef_option.h>
 
 #include <internal/nic400.h>
+
+#include <fwk_macros.h>
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #define SYNQUACER_CHIP_VER_MP UINT32_C(1)
 

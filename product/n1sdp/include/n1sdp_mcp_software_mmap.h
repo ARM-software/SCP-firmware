@@ -11,7 +11,7 @@
 #ifndef N1SDP_MCP_SOFTWARE_MMAP_H
 #define N1SDP_MCP_SOFTWARE_MMAP_H
 
-#include <n1sdp_mcp_mmap.h>
+#include "n1sdp_mcp_mmap.h"
 
 /* SCMI payload size */
 #define MCP_SCMI_PAYLOAD_SIZE      (128)

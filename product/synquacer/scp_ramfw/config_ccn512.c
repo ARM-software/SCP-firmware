@@ -5,11 +5,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_element.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
+#include "synquacer_mmap.h"
+
 #include <mod_ccn512.h>
-#include <synquacer_mmap.h>
+
+#include <fwk_module.h>
+
+#include <stddef.h>
 
 /*
  * CCN512 module

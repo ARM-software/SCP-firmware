@@ -8,15 +8,21 @@
  *     Clock driver for the clocks of the Juno SoC
  */
 
-#include <stdint.h>
+#include "juno_id.h"
+#include "juno_scc.h"
+#include "scp_config.h"
+#include "system_clock.h"
+
+#include <mod_juno_soc_clock.h>
+
 #include <fwk_assert.h>
+#include <fwk_id.h>
+#include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_status.h>
-#include <mod_juno_soc_clock.h>
-#include <juno_id.h>
-#include <juno_scc.h>
-#include <scp_config.h>
-#include <system_clock.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 /*
  * Masks for clock control registers

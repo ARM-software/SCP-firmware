@@ -11,6 +11,9 @@
 #include <fwk_id.h>
 #include <fwk_module_idx.h>
 
+#include <stddef.h>
+#include <stdint.h>
+
 /*!
  * \addtogroup GroupJunoModule Juno Product Modules
  * \{

@@ -6,9 +6,8 @@
  */
 
 #include <checkpoint.h>
-
-#include <cli_platform.h>
 #include <cli.h>
+#include <cli_platform.h>
 
 #include <fwk_status.h>
 

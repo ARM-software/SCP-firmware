@@ -8,10 +8,15 @@
  *     sgm776 System Support.
  */
 
-#include <fmw_cmsis.h>
-#include <fwk_module.h>
-#include <mod_system_power.h>
+#include <mod_power_domain.h>
 #include <mod_sgm776_system.h>
+#include <mod_system_power.h>
+
+#include <fwk_id.h>
+#include <fwk_module.h>
+#include <fwk_status.h>
+
+#include <fmw_cmsis.h>
 
 /*
  * Functions fulfilling the framework's module interface

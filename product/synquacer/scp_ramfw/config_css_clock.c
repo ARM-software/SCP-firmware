@@ -7,12 +7,7 @@
 
 #include <fwk_element.h>
 #include <fwk_id.h>
-#include <fwk_macros.h>
 #include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <mod_css_clock.h>
-#include <mod_pik_clock.h>
-#include <config_clock.h>
 
 static const struct fwk_element css_clock_element_table[] = {
     [0] = { 0 },

@@ -4,12 +4,13 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-#include <fwk_element.h>
-#include <fwk_module.h>
-#include <internal/n1sdp_ddr_phy.h>
+#include "n1sdp_scp_mmap.h"
+
 #include <mod_n1sdp_ddr_phy.h>
-#include <n1sdp_scp_mmap.h>
-#include <config_clock.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
 
 /* Table of N1SDP DDR PHY element descriptions. */
 static struct fwk_element n1sdp_ddr_phy_element_table[] = {

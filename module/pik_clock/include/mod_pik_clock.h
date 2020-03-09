@@ -8,8 +8,10 @@
 #ifndef MOD_PIK_CLOCK_H
 #define MOD_PIK_CLOCK_H
 
-#include <stdint.h>
 #include <fwk_element.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupModules Modules

@@ -8,10 +8,11 @@
 #ifndef MOD_SENSOR_H
 #define MOD_SENSOR_H
 
-#include <stdbool.h>
-#include <stdint.h>
 #include <fwk_id.h>
 #include <fwk_module_idx.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupModules Modules
@@ -313,7 +314,7 @@ struct mod_sensor_event_params {
  */
 #define MOD_SENSOR_EVENT_IDX_READ_REQUEST    0
 
- /*!
+/*!
  * \brief Read request event identifier.
  *
  * \details Clients which expect to receive a response event from this module

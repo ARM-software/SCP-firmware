@@ -5,21 +5,25 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdio.h>
-#include <string.h>
+#include "config_power_domain.h"
+#include "scp_sgi575_mmap.h"
+#include "sgi575_core.h"
+
+#include <mod_cmn600.h>
+#include <mod_power_domain.h>
+#include <mod_ppu_v1.h>
+
 #include <fwk_assert.h>
 #include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_interrupt.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_cmn600.h>
-#include <mod_power_domain.h>
-#include <mod_ppu_v1.h>
-#include <scp_sgi575_irq.h>
-#include <scp_sgi575_mmap.h>
-#include <sgi575_core.h>
-#include <config_power_domain.h>
+
+#include <stdio.h>
+#include <string.h>
 
 /* Maximum PPU core name size including the null terminator */
 #define PPU_CORE_NAME_SIZE 12

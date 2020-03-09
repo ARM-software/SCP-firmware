@@ -5,12 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_element.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
+#include <config_sensor.h>
+
 #include <mod_juno_adc.h>
 #include <mod_sensor.h>
-#include <config_sensor.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
 
 static const struct fwk_element adc_juno_element_table[] = {
     [ADC_TYPE_VOLT] = {

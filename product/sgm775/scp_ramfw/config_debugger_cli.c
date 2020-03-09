@@ -5,9 +5,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <mod_debugger_cli.h>
-#include <fwk_module_idx.h>
 #include <config_timer.h>
+
+#include <mod_debugger_cli.h>
+
+#include <fwk_module_idx.h>
 
 /*
  * Data for the debugger CLI module configuration

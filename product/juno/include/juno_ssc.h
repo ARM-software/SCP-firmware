@@ -11,9 +11,11 @@
 #ifndef JUNO_SSC_H
 #define JUNO_SSC_H
 
-#include <stdint.h>
+#include "system_mmap.h"
+
 #include <fwk_macros.h>
-#include <system_mmap.h>
+
+#include <stdint.h>
 
 struct ssc_reg {
            uint8_t   RESERVED1[0x10 - 0];

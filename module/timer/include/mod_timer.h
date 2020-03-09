@@ -11,10 +11,11 @@
 #ifndef MOD_TIMER_H
 #define MOD_TIMER_H
 
-#include <stdbool.h>
-#include <stdint.h>
 #include <fwk_id.h>
 #include <fwk_module_idx.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupModules Modules

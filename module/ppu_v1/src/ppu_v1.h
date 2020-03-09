@@ -13,9 +13,10 @@
  * @{
  */
 
+#include <fwk_macros.h>
+
 #include <stdbool.h>
 #include <stdint.h>
-#include <fwk_macros.h>
 
 /*
  * PPU 1.1 register definitions

@@ -11,6 +11,8 @@
 #ifndef INTERNAL_SCMI_VENDOR_EXT_H
 #define INTERNAL_SCMI_VENDOR_EXT_H
 
+#include <stdint.h>
+
 /*!
  * \addtogroup GroupSYNQUACERModule SYNQUACER Product Modules
  * @{

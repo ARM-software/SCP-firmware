@@ -5,21 +5,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <setjmp.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
+#include <internal/fwk_id.h>
+#include <internal/fwk_module.h>
+#include <internal/fwk_multi_thread.h>
+#include <internal/fwk_notification.h>
+
 #include <fwk_assert.h>
 #include <fwk_event.h>
 #include <fwk_list.h>
 #include <fwk_macros.h>
 #include <fwk_status.h>
 #include <fwk_test.h>
-#include <internal/fwk_id.h>
-#include <internal/fwk_module.h>
-#include <internal/fwk_multi_thread.h>
-#include <internal/fwk_notification.h>
+
+#include <setjmp.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define SIGNAL_ISR_EVENT 0x01
 #define SIGNAL_EVENT_TO_PROCESS 0x02

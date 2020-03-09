@@ -12,9 +12,10 @@
 #define FWK_INTERRUPT_H
 
 #include <fwk_arch.h>
+
+#include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <limits.h>
 
 /*!
  * \addtogroup GroupLibFramework Framework

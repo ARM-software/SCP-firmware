@@ -5,17 +5,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
+#include "config_mhu.h"
+#include "config_power_domain.h"
+#include "config_scmi.h"
+#include "synquacer_core.h"
+#include "synquacer_mmap.h"
+
+#include <mod_smt.h>
+
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_smt.h>
-#include <synquacer_core.h>
-#include <synquacer_mmap.h>
-#include <config_mhu.h>
-#include <config_power_domain.h>
-#include <config_scmi.h>
+
+#include <stdint.h>
 
 static const struct fwk_element smt_element_table[] = {
     [SCP_SYNQUACER_SCMI_SERVICE_IDX_PSCI] = {

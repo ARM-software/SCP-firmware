@@ -5,14 +5,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "config_ppu_v0.h"
+
+#include <mod_power_domain.h>
+#include <mod_synquacer_system.h>
+#include <mod_system_power.h>
+
+#include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_synquacer_system.h>
-#include <mod_system_power.h>
-#include <config_ppu_v0.h>
+
+#include <stdint.h>
 
 static const struct mod_system_power_ext_ppu_config ext_ppus[] = {
     {

@@ -5,15 +5,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "config_power_domain.h"
+#include "juno_mhu.h"
+#include "juno_scmi.h"
+#include "software_mmap.h"
+
+#include <mod_smt.h>
+
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_smt.h>
-#include <config_power_domain.h>
-#include <juno_mhu.h>
-#include <juno_scmi.h>
-#include <software_mmap.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 static const struct fwk_element element_table[] = {
     [JUNO_SCMI_SERVICE_IDX_PSCI] = {

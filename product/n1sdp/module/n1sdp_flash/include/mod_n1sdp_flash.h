@@ -12,9 +12,10 @@
 #ifndef MOD_N1SDP_FLASH_H
 #define MOD_N1SDP_FLASH_H
 
+#include <fwk_id.h>
+
 #include <stddef.h>
 #include <stdint.h>
-#include <fwk_id.h>
 
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules

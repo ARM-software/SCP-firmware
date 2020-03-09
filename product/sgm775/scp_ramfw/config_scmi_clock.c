@@ -5,14 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-#include <fwk_element.h>
+#include "clock_devices.h"
+#include "sgm775_scmi.h"
+
+#include <mod_scmi_clock.h>
+
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_scmi_clock.h>
-#include <sgm775_scmi.h>
-#include <clock_devices.h>
 
 static const struct mod_scmi_clock_device agent_device_table_ospm[] = {
     {

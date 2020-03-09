@@ -8,9 +8,11 @@
  *      ARMv7-M exception handlers.
  */
 
-#include <stdbool.h>
 #include <cmsis_compiler.h>
+
 #include <fwk_noreturn.h>
+
+#include <stdbool.h>
 
 noreturn void arm_exception_reset(void)
 {

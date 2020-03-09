@@ -8,9 +8,10 @@
 #ifndef FWK_ASSERT_H
 #define FWK_ASSERT_H
 
+#include <fwk_noreturn.h>
+
 #include <assert.h>
 #include <stdbool.h>
-#include <fwk_noreturn.h>
 
 #ifndef static_assert
 #   define static_assert _Static_assert

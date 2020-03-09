@@ -8,20 +8,26 @@
  *     Power State Management PPU v0 driver.
  */
 
-#include <stdint.h>
-#include <fwk_id.h>
+#include <ppu_v0.h>
+
+#include <mod_log.h>
+#include <mod_power_domain.h>
+#include <mod_ppu_v0.h>
+
+#if BUILD_HAS_MOD_SYSTEM_POWER
+#    include <mod_system_power.h>
+#endif
+
 #include <fwk_assert.h>
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_log.h>
-#include <mod_power_domain.h>
-#include <mod_ppu_v0.h>
-#include <ppu_v0.h>
-#if BUILD_HAS_MOD_SYSTEM_POWER
-#include <mod_system_power.h>
-#endif
+#include <fwk_status.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 /* Power domain context */
 struct ppu_v0_pd_ctx {

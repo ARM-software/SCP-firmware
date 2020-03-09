@@ -8,17 +8,11 @@
  *     N1SDP SCP to SCP I2C communications protocol driver
  */
 
-#include <stdint.h>
-#include <string.h>
-#include <stdbool.h>
-#include <fmw_cmsis.h>
-#include <fwk_assert.h>
-#include <fwk_element.h>
-#include <fwk_id.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <fwk_multi_thread.h>
-#include <fwk_notification.h>
+#include "config_clock.h"
+#include "n1sdp_core.h"
+
+#include <internal/n1sdp_scp2pcc.h>
+
 #include <mod_clock.h>
 #include <mod_cmn600.h>
 #include <mod_log.h>
@@ -30,8 +24,22 @@
 #include <mod_n1sdp_timer_sync.h>
 #include <mod_power_domain.h>
 #include <mod_timer.h>
-#include <config_clock.h>
-#include <n1sdp_core.h>
+
+#include <fwk_assert.h>
+#include <fwk_event.h>
+#include <fwk_id.h>
+#include <fwk_macros.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <fwk_multi_thread.h>
+#include <fwk_notification.h>
+#include <fwk_status.h>
+
+#include <fmw_cmsis.h>
+
+#include <stdbool.h>
+#include <stdint.h>
+#include <string.h>
 
 /* Module definitions */
 #define N1SDP_C2C_DATA_SIZE        8

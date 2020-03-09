@@ -8,23 +8,28 @@
  *     N1SDP DMC-620 driver
  */
 
+#include "n1sdp_pik_system.h"
+#include "n1sdp_scp_irq.h"
+#include "n1sdp_scp_pik.h"
+
+#include <dimm_spd.h>
+
+#include <mod_clock.h>
+#include <mod_log.h>
+#include <mod_n1sdp_dmc620.h>
+#include <mod_n1sdp_i2c.h>
+#include <mod_timer.h>
+
 #include <fwk_assert.h>
+#include <fwk_event.h>
 #include <fwk_interrupt.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
-#include <mod_clock.h>
-#include <mod_log.h>
-#include <mod_n1sdp_dmc620.h>
-#include <mod_n1sdp_i2c.h>
-#include <mod_power_domain.h>
-#include <mod_timer.h>
-#include <config_clock.h>
-#include <n1sdp_scp_irq.h>
-#include <n1sdp_scp_pik.h>
-#include <n1sdp_pik_system.h>
-#include <dimm_spd.h>
+
+#include <stdbool.h>
+#include <stddef.h>
 
 /* DMC-620 register specific definitions */
 #define DDR_TRAIN_TWO_RANKS          0

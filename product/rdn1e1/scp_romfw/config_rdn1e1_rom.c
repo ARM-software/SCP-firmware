@@ -5,10 +5,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_module.h>
+#include "scp_rdn1e1_mmap_scp.h"
+#include "scp_software_mmap.h"
+
 #include <mod_rdn1e1_rom.h>
-#include <scp_software_mmap.h>
-#include <scp_rdn1e1_mmap_scp.h>
+
+#include <fwk_module.h>
 
 const struct fwk_module_config config_rdn1e1_rom = {
     .data = &((struct rdn1e1_rom_config) {

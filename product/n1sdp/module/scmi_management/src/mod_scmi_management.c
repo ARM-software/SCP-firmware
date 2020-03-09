@@ -8,18 +8,23 @@
  *     SCMI Management Protocol Support.
  */
 
-#include <stdint.h>
+#include "n1sdp_scc_reg.h"
+#include "n1sdp_scp_pik.h"
+
+#include <internal/scmi.h>
+
+#include <mod_scmi.h>
+#include <mod_scmi_management.h>
+
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <internal/scmi.h>
-#include <mod_scmi.h>
-#include <mod_scmi_management.h>
-#include <n1sdp_scc_reg.h>
-#include <n1sdp_scp_pik.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 struct scmi_management_ctx {
     /* SCMI module API */

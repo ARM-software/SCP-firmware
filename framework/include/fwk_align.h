@@ -19,7 +19,7 @@
 #   define __alignas_is_defined 1
 #   define __alignof_is_defined 1
 #else
-#   include <stdalign.h>
+#    include <stdalign.h>
 #endif
 
 #endif /* FWK_ALIGN_H */

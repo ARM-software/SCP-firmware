@@ -8,23 +8,24 @@
  *     Interrupt management.
  */
 
-#include <limits.h>
-#include <stdint.h>
+#include <cmsis_compiler.h>
+
 #include <fwk_arch.h>
 #include <fwk_interrupt.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_noreturn.h>
 #include <fwk_status.h>
-#include <cmsis_compiler.h>
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #ifdef BUILD_HAS_MULTITHREADING
-    #include <rtx_os.h>
+#    include <rtx_os.h>
 #endif
 
 extern noreturn void arm_exception_invalid(void);
-
-struct nvic;
 
 #define SCB_SHCSR ((FWK_RW uint32_t *)(0xE000ED24UL))
 #define SCB_VTOR ((FWK_RW uint32_t *)(0xE000ED08UL))

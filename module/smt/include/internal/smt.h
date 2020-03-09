@@ -8,6 +8,8 @@
 #ifndef INTERNAL_SMT_H
 #define INTERNAL_SMT_H
 
+#include <stdint.h>
+
 struct __attribute((packed)) mod_smt_memory {
     uint32_t reserved0;
     uint32_t status;

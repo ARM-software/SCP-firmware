@@ -8,6 +8,9 @@
 #ifndef JUNO_UTILS_H
 #define JUNO_UTILS_H
 
+#include <stdbool.h>
+#include <stdint.h>
+
 void juno_utils_open_snoop_gate_and_wait(volatile uint32_t *snoop_ctrl);
 void juno_utils_close_snoop_gate(volatile uint32_t *snoop_ctrl);
 

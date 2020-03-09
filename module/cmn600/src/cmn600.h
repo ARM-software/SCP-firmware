@@ -11,9 +11,10 @@
 #ifndef CMN600_H
 #define CMN600_H
 
-#include <stdint.h>
-#include <stdbool.h>
 #include <fwk_macros.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 #define CMN600_MAX_NUM_RNF    32
 #define CMN600_MAX_NUM_HNF    32

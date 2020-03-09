@@ -5,34 +5,36 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <string.h>
+#include "low_level_access.h"
+#include "pik_system.h"
+#include "synquacer_common.h"
+#include "synquacer_config.h"
+#include "synquacer_debug.h"
+#include "synquacer_mmap.h"
 
-#include <fwk_id.h>
-#include <fwk_macros.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <fwk_notification.h>
-#include <fwk_status.h>
+#include <boot_ctl.h>
+#include <sysdef_option.h>
+
+#include <internal/crg11.h>
+#include <internal/gpio.h>
+#include <internal/nic400.h>
+#include <internal/thermal_sensor.h>
 
 #include <mod_f_i2c.h>
 #include <mod_hsspi.h>
 #include <mod_power_domain.h>
 #include <mod_synquacer_system.h>
 
-#include <synquacer_config.h>
-#include <synquacer_debug.h>
-#include <synquacer_mmap.h>
-#include <config_power_domain.h>
-#include <low_level_access.h>
+#include <fwk_assert.h>
+#include <fwk_id.h>
+#include <fwk_module_idx.h>
+#include <fwk_status.h>
 
-#include <internal/crg11.h>
-#include <internal/gpio.h>
-#include <internal/nic400.h>
-#include <internal/thermal_sensor.h>
-#include <boot_ctl.h>
-#include <sysdef_option.h>
+#include <fmw_cmsis.h>
+
+#include <stdbool.h>
+#include <stdint.h>
+#include <string.h>
 
 #define SEC_OVERRIDE_CONVERT_MASK UINT32_C(0x3)
 

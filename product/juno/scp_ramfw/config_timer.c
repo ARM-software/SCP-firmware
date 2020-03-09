@@ -5,17 +5,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_id.h>
-#include <fwk_macros.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <mod_clock.h>
+#include "juno_alarm_idx.h"
+#include "juno_irq.h"
+#include "system_clock.h"
+#include "system_mmap.h"
+
 #include <mod_gtimer.h>
 #include <mod_timer.h>
-#include <juno_alarm_idx.h>
-#include <juno_irq.h>
-#include <system_clock.h>
-#include <system_mmap.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
 
 static const struct fwk_element gtimer_element_table[] = {
     [0] = {

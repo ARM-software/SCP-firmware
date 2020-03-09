@@ -5,14 +5,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "config_ppu_v0.h"
+#include "sgm775_irq.h"
+
+#include <mod_power_domain.h>
+#include <mod_sgm775_system.h>
+#include <mod_system_power.h>
+
+#include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <sgm775_irq.h>
-#include <config_ppu_v0.h>
-#include <mod_system_power.h>
-#include <mod_sgm775_system.h>
+
+#include <stdint.h>
 
 /*
  * The DPU/GPU/VPU PPUs in this list are there as a temporary workaround, until

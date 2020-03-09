@@ -5,11 +5,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <synquacer_debug.h>
-#include <synquacer_mmap.h>
-#include <low_level_access.h>
+#include "low_level_access.h"
+#include "synquacer_common.h"
+#include "synquacer_debug.h"
 
 #include <internal/transaction_sw.h>
+
+#include <stdint.h>
 
 #define STATUS_ADDR 4
 

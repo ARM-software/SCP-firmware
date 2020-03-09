@@ -5,16 +5,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "synquacer_ddr.h"
+
+#include <internal/ccn512.h>
+
+#include <mod_ccn512.h>
+#include <mod_log.h>
+
 #include <fwk_assert.h>
-#include <fwk_mm.h>
+#include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <mod_ccn512.h>
-#include <mod_log.h>
-#include <synquacer_ddr.h>
-#include <synquacer_mmap.h>
-#include <sysdef_option.h>
+
+#include <fmw_cmsis.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 static struct mod_log_api *log_api;
 

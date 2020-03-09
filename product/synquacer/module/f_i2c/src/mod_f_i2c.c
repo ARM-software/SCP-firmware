@@ -5,15 +5,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_assert.h>
-#include <fwk_mm.h>
-#include <fwk_module.h>
-#include <fwk_notification.h>
-#include <fwk_status.h>
-#include <mod_clock.h>
-#include <mod_f_i2c.h>
-#include <mod_log.h>
 #include <i2c_api.h>
+
+#include <mod_f_i2c.h>
+
+#include <fwk_id.h>
+#include <fwk_module.h>
+#include <fwk_status.h>
 
 static struct mod_f_i2c_api module_api = {
     .init = i2c_construction,

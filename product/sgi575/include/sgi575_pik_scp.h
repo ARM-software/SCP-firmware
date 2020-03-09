@@ -11,8 +11,9 @@
 #ifndef SGI575_PIK_SCP_H
 #define SGI575_PIK_SCP_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \brief SCP PIK register definitions

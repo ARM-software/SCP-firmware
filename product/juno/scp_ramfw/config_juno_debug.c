@@ -5,15 +5,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <config_power_domain.h>
+#include <juno_id.h>
+#include <system_clock.h>
+
+#include <mod_debug.h>
+#include <mod_juno_debug.h>
+
 #include <fwk_element.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_debug.h>
-#include <mod_juno_debug.h>
-#include <config_power_domain.h>
-#include <juno_id.h>
-#include <system_clock.h>
 
 /* Debug clock settings for Juno with default values for R0 */
 static struct juno_css_debug_dev clock_settings = {

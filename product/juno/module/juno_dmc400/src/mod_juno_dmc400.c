@@ -8,26 +8,32 @@
  *     Juno DMC-400 driver
  */
 
-#include <fwk_assert.h>
-#include <fwk_interrupt.h>
-#include <fwk_macros.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <fwk_multi_thread.h>
-#include <fwk_notification.h>
-#include <fwk_status.h>
+#include "juno_dmc400.h"
+#include "juno_id.h"
+#include "juno_irq.h"
+#include "juno_scc.h"
+#include "scp_config.h"
+#include "system_clock.h"
+
 #include <mod_juno_dmc400.h>
 #include <mod_log.h>
 #include <mod_power_domain.h>
 #include <mod_system_power.h>
-#include <cmsis_compiler.h>
-#include <juno_id.h>
-#include <juno_irq.h>
-#include <juno_dmc400.h>
-#include <juno_scc.h>
-#include <scp_config.h>
-#include <system_clock.h>
-#include <system_mmap.h>
+#include <mod_timer.h>
+
+#include <fwk_assert.h>
+#include <fwk_event.h>
+#include <fwk_interrupt.h>
+#include <fwk_macros.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <fwk_notification.h>
+#include <fwk_status.h>
+#include <fwk_thread.h>
+
+#include <fmw_cmsis.h>
+
+#include <stddef.h>
 
 struct juno_dmc400_ctx {
     const struct mod_juno_dmc400_ddr_phy_api *ddr_phy_api;

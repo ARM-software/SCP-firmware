@@ -5,10 +5,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_element.h>
-#include <fwk_module.h>
+#include "scp_rdn1e1_mmap.h"
+
 #include <mod_sid.h>
-#include <scp_rdn1e1_mmap.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
 
 static const struct fwk_element subsystem_table[] = {
     {

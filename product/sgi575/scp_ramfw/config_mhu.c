@@ -5,13 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "scp_sgi575_irq.h"
+#include "scp_sgi575_mhu.h"
+#include "scp_sgi575_mmap.h"
+
+#include <mod_mhu.h>
+
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
-#include <mod_mhu.h>
-#include <scp_sgi575_irq.h>
-#include <scp_sgi575_mhu.h>
-#include <scp_sgi575_mmap.h>
 
 static const struct fwk_element mhu_element_table[] = {
     [SCP_SGI575_MHU_DEVICE_IDX_SCP_AP_S] = {

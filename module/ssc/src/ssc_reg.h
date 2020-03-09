@@ -8,8 +8,9 @@
 #ifndef SSC_REG_H
 #define SSC_REG_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \brief System Security Control (SSC) register definitions

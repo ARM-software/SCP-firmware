@@ -5,9 +5,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <mod_juno_ram.h>
+
+#include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_juno_ram.h>
 
 struct fwk_module_config config_juno_ram = {
     .data = &(struct mod_juno_ram_config) {

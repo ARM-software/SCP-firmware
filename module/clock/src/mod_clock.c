@@ -5,17 +5,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
+#include <clock.h>
+
+#include <mod_clock.h>
+#include <mod_power_domain.h>
+
 #include <fwk_assert.h>
-#include <fwk_element.h>
+#include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
 #include <fwk_thread.h>
-#include <mod_power_domain.h>
-#include <clock.h>
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 /* Device context */
 struct clock_dev_ctx {

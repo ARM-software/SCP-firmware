@@ -1,4 +1,4 @@
- /*
+/*
  * Arm SCP/MCP Software
  * Copyright (c) 2019-2020, Arm Limited and Contributors. All rights reserved.
  *

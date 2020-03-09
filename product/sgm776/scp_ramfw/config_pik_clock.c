@@ -5,15 +5,26 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "sgm776_pik.h"
+#include "sgm776_pik_cpu.h"
+#include "sgm776_pik_dpu.h"
+#include "sgm776_pik_gpu.h"
+#include "sgm776_pik_system.h"
+#include "sgm776_pik_vpu.h"
+#include "system_clock.h"
+
+#include <mod_pik_clock.h>
+#include <mod_sid.h>
+
 #include <fwk_assert.h>
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
-#include <mod_pik_clock.h>
-#include <mod_sid.h>
-#include <sgm776_pik.h>
-#include <system_clock.h>
+#include <fwk_status.h>
+
+#include <stdbool.h>
+#include <stddef.h>
 
 /*
  * Rate lookup tables

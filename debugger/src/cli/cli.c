@@ -5,13 +5,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_list.h>
-#include <fwk_mm.h>
-
 #include <cli.h>
 #include <cli_config.h>
 #include <cli_fifo.h>
 #include <cli_platform.h>
+
+#include <fwk_list.h>
+#include <fwk_mm.h>
 
 #include <stdarg.h>
 #include <stdbool.h>

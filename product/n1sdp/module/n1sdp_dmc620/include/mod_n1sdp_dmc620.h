@@ -11,9 +11,11 @@
 #ifndef MOD_N1SDP_DMC620_H
 #define MOD_N1SDP_DMC620_H
 
-#include <stdint.h>
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
+
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules

@@ -11,6 +11,8 @@
 #ifndef INTERNAL_SCMI_POWER_H
 #define INTERNAL_SCMI_POWER_H
 
+#include <stdint.h>
+
 /*!
  * \addtogroup GroupModules Modules
  * @{

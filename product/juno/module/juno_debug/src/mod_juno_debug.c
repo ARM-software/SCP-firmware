@@ -8,17 +8,6 @@
  *     Juno Debug driver
  */
 
-#include <fwk_assert.h>
-#include <fwk_interrupt.h>
-#include <fwk_macros.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <fwk_multi_thread.h>
-#include <fwk_status.h>
-#include <mod_debug.h>
-#include <mod_juno_debug.h>
-#include <mod_power_domain.h>
-#include <mod_timer.h>
 #include <coresight_soc400.h>
 #include <juno_irq.h>
 #include <juno_ssc.h>
@@ -26,6 +15,19 @@
 #include <scp_config.h>
 #include <system_clock.h>
 #include <system_mmap.h>
+
+#include <mod_debug.h>
+#include <mod_juno_debug.h>
+#include <mod_power_domain.h>
+#include <mod_timer.h>
+
+#include <fwk_assert.h>
+#include <fwk_interrupt.h>
+#include <fwk_macros.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <fwk_multi_thread.h>
+#include <fwk_status.h>
 
 #define CS_CNTCONTROL       ((struct cs_cnt_ctrl_reg *) CS_CNTCONTROL_BASE)
 #define CNTCONTROL_CR_HDBG  UINT32_C(0x00000002)

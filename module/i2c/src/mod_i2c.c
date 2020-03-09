@@ -4,16 +4,19 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-#include <stdbool.h>
-#include <string.h>
+#include <mod_i2c.h>
+
 #include <fwk_assert.h>
+#include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
 #include <fwk_thread.h>
-#include <mod_i2c.h>
+
+#include <stdbool.h>
+#include <string.h>
 
 enum mod_i2c_dev_state {
     MOD_I2C_DEV_IDLE,

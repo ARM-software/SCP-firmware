@@ -8,7 +8,6 @@
 #include <mod_bootloader.h>
 #include <mod_sds.h>
 
-#include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
 #include <fwk_module.h>
@@ -18,6 +17,7 @@
 
 #include <fmw_cmsis.h>
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 

@@ -8,12 +8,11 @@
  *     Power domain management support.
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
+#include <mod_log.h>
+#include <mod_power_domain.h>
+
 #include <fwk_assert.h>
-#include <fwk_element.h>
+#include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
@@ -23,8 +22,10 @@
 #include <fwk_notification.h>
 #include <fwk_status.h>
 #include <fwk_thread.h>
-#include <mod_log.h>
-#include <mod_power_domain.h>
+
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
 
 /*
  * Module and power domain contexts

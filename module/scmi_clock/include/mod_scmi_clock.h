@@ -11,6 +11,9 @@
 #ifndef MOD_SCMI_CLOCK_H
 #define MOD_SCMI_CLOCK_H
 
+#include <fwk_id.h>
+
+#include <stddef.h>
 #include <stdint.h>
 
 /*!

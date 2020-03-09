@@ -8,14 +8,24 @@
  *     Notification facilities.
  */
 
-#include <fwk_assert.h>
-#include <fwk_host.h>
-#include <fwk_interrupt.h>
-#include <fwk_list.h>
-#include <fwk_mm.h>
 #include <internal/fwk_module.h>
 #include <internal/fwk_notification.h>
 #include <internal/fwk_thread.h>
+
+#include <fwk_assert.h>
+#include <fwk_dlist.h>
+#include <fwk_event.h>
+#include <fwk_host.h>
+#include <fwk_id.h>
+#include <fwk_interrupt.h>
+#include <fwk_list.h>
+#include <fwk_mm.h>
+#include <fwk_module.h>
+#include <fwk_notification.h>
+#include <fwk_status.h>
+
+#include <stdbool.h>
+#include <stddef.h>
 
 struct notification_ctx {
     /*

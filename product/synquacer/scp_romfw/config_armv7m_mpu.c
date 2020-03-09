@@ -5,9 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <mod_armv7m_mpu.h>
+
 #include <fwk_macros.h>
 #include <fwk_module.h>
-#include <mod_armv7m_mpu.h>
+
+#include <fmw_cmsis.h>
+
+#include <stdint.h>
 
 #define ROM_BASE 0x00000000UL
 #define AP_RAM_BASE UINT32_C(0xA4000000)

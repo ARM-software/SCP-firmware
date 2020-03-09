@@ -5,14 +5,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
+#include <mod_reg_sensor.h>
+#include <mod_sensor.h>
+
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_status.h>
-#include <mod_reg_sensor.h>
-#include <mod_sensor.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 static struct mod_reg_sensor_dev_config **config_table;
 

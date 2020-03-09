@@ -5,19 +5,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
+#include "config_power_domain.h"
+#include "sgm775_core.h"
+#include "sgm775_mhu.h"
+#include "sgm775_scmi.h"
+#include "software_mmap.h"
+
+#include <mod_smt.h>
+
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_clock.h>
-#include <mod_smt.h>
-#include <sgm775_core.h>
-#include <sgm775_mhu.h>
-#include <sgm775_scmi.h>
-#include <config_power_domain.h>
-#include <clock_devices.h>
-#include <software_mmap.h>
+
+#include <stdint.h>
 
 static const struct fwk_element smt_element_table[] = {
     [SGM775_SCMI_SERVICE_IDX_PSCI] = {

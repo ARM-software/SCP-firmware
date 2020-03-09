@@ -10,6 +10,8 @@
 
 #include <internal/reg_PPU.h>
 
+#include <stdint.h>
+
 #define PPU_INT_PPU0 20
 #define PPU_INT_PPU1 21
 #define PPU_INT_PPU2 22

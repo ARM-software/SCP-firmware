@@ -8,19 +8,22 @@
  *     N1SDP DDR-PHY driver
  */
 
-#include <string.h>
+#include "n1sdp_scp_mmap.h"
+
+#include <n1sdp_ddr_phy_values.h>
+
+#include <mod_log.h>
+#include <mod_n1sdp_ddr_phy.h>
+#include <mod_n1sdp_dmc620.h>
+
 #include <fwk_assert.h>
 #include <fwk_id.h>
-#include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <internal/n1sdp_ddr_phy.h>
-#include <mod_n1sdp_ddr_phy.h>
-#include <mod_n1sdp_dmc620.h>
-#include <mod_log.h>
-#include <n1sdp_ddr_phy_values.h>
-#include <n1sdp_scp_mmap.h>
+
+#include <stdbool.h>
+#include <string.h>
 
 #define NUM_SLICES          9
 #define NUM_BITS_PER_SLICE  8

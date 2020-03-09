@@ -11,8 +11,13 @@
 #ifndef MOD_SYSTEM_POWER_H
 #define MOD_SYSTEM_POWER_H
 
-#include <fwk_id.h>
 #include <mod_power_domain.h>
+
+#include <fwk_id.h>
+#include <fwk_module_idx.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 /*!
  * \ingroup GroupModules Modules

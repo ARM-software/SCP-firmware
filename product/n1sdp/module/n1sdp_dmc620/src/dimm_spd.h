@@ -8,10 +8,11 @@
 #ifndef DIMM_SPD_H
 #define DIMM_SPD_H
 
-#include <stdint.h>
-#include <mod_n1sdp_dmc620.h>
 #include <mod_log.h>
+#include <mod_n1sdp_dmc620.h>
 #include <mod_n1sdp_i2c.h>
+
+#include <stdint.h>
 
 /*
  * DMC-620 ADDRESS_CONTROL register bit field values

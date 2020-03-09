@@ -8,9 +8,11 @@
 #ifndef SYSTEM_PIK_H
 #define SYSTEM_PIK_H
 
-#include <stdint.h>
+#include "scp_css_mmap.h"
+
 #include <fwk_macros.h>
-#include <scp_css_mmap.h>
+
+#include <stdint.h>
 
 /*!
  * \brief TCU clock register definitions

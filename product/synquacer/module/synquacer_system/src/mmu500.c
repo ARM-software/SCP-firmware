@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <synquacer_debug.h>
-#include <mmu500.h>
+#include "mmu500.h"
+#include "synquacer_debug.h"
 
 void SMMU_setup_PMU(MMU500_Type_t *SMMU)
 {

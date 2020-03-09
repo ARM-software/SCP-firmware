@@ -5,14 +5,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
+#include "n1sdp_mcp_mhu.h"
+#include "n1sdp_mcp_software_mmap.h"
+
+#include <mod_smt.h>
+
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_smt.h>
-#include <n1sdp_mcp_mhu.h>
-#include <n1sdp_mcp_software_mmap.h>
+
+#include <stdint.h>
 
 static const struct fwk_element smt_element_table[] = {
     [0] = {

@@ -5,14 +5,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_banner.h>
-#include <fwk_macros.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
+#include "n1sdp_scp_mmap.h"
+#include "n1sdp_system_clock.h"
+
 #include <mod_log.h>
 #include <mod_pl011.h>
-#include <n1sdp_scp_mmap.h>
-#include <n1sdp_system_clock.h>
+
+#include <fwk_banner.h>
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
 
 /*
  * N1SDP BYPASS ROM firmware banner string.

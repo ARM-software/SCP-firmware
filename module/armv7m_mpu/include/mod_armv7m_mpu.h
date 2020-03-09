@@ -9,6 +9,7 @@
 #define MOD_ARMV7M_MPU_H
 
 #include <fmw_cmsis.h>
+
 #include <stddef.h>
 
 /*!

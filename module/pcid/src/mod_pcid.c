@@ -5,11 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <mod_pcid.h>
+
+#include <fwk_assert.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
+#include <fwk_status.h>
+
 #include <stdbool.h>
 #include <string.h>
-#include <fwk_assert.h>
-#include <fwk_module.h>
-#include <mod_pcid.h>
 
 bool mod_pcid_check_registers(const struct mod_pcid_registers *registers,
                               const struct mod_pcid_registers *expected)

@@ -8,9 +8,11 @@
 #ifndef MOD_SYSTEM_PLL_H
 #define MOD_SYSTEM_PLL_H
 
-#include <stdint.h>
 #include <fwk_element.h>
 #include <fwk_macros.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 /*!
  * \ingroup GroupModules Modules

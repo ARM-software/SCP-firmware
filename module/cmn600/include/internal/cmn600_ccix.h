@@ -12,10 +12,12 @@
 #ifndef INTERNAL_CMN600_CCIX_H
 #define INTERNAL_CMN600_CCIX_H
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <fwk_module_idx.h>
 #include <internal/cmn600_ctx.h>
+
+#include <fwk_module_idx.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 /*
  * CMN600 CCIX Setup Function

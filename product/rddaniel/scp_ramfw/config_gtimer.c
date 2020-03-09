@@ -5,13 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "clock_soc.h"
+#include "scp_css_mmap.h"
+
+#include <mod_gtimer.h>
+
+#include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_gtimer.h>
-#include <mod_timer.h>
-#include <clock_soc.h>
-#include <scp_css_mmap.h>
 
 /*
  * Generic timer driver config

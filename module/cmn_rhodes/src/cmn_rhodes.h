@@ -11,9 +11,10 @@
 #ifndef CMN_RHODES_H
 #define CMN_RHODES_H
 
-#include <stdint.h>
-#include <stdbool.h>
 #include <fwk_macros.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 /* Max Node Counts */
 #define MAX_HNF_COUNT 64

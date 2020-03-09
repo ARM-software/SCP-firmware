@@ -8,15 +8,14 @@
  *     SGI575 System Support.
  */
 
-#include <stdint.h>
-#include <fwk_assert.h>
-#include <fmw_cmsis.h>
-#include <fwk_id.h>
-#include <fwk_interrupt.h>
-#include <fwk_macros.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <fwk_notification.h>
+#include "config_clock.h"
+#include "scp_sgi575_irq.h"
+#include "scp_sgi575_mmap.h"
+#include "scp_sgi575_scmi.h"
+#include "sgi575_core.h"
+#include "sgi575_pik_scp.h"
+#include "sgi575_sds.h"
+
 #include <mod_clock.h>
 #include <mod_log.h>
 #include <mod_power_domain.h>
@@ -25,13 +24,21 @@
 #include <mod_sds.h>
 #include <mod_sgi575_system.h>
 #include <mod_system_power.h>
-#include <scp_sgi575_irq.h>
-#include <scp_sgi575_mmap.h>
-#include <scp_sgi575_scmi.h>
-#include <sgi575_core.h>
-#include <sgi575_pik_scp.h>
-#include <sgi575_sds.h>
-#include <config_clock.h>
+
+#include <fwk_assert.h>
+#include <fwk_event.h>
+#include <fwk_id.h>
+#include <fwk_interrupt.h>
+#include <fwk_macros.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <fwk_notification.h>
+#include <fwk_status.h>
+
+#include <fmw_cmsis.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 /* SCMI services required to enable the messaging stack */
 static unsigned int scmi_notification_table[] = {

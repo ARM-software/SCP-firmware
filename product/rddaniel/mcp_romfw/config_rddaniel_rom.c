@@ -5,9 +5,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_module.h>
+#include "mcp_software_mmap.h"
+
 #include <mod_mscp_rom.h>
-#include <mcp_software_mmap.h>
+
+#include <fwk_module.h>
 
 const struct fwk_module_config config_mscp_rom = {
     .data = &((struct mscp_rom_config) {

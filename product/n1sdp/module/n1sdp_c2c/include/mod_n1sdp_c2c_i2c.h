@@ -11,9 +11,12 @@
 #ifndef MOD_N1SDP_C2C_I2C_H
 #define MOD_N1SDP_C2C_I2C_H
 
-#include <stdint.h>
-#include <fwk_id.h>
 #include <mod_power_domain.h>
+
+#include <fwk_id.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules

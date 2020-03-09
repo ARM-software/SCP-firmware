@@ -8,6 +8,8 @@
 #ifndef INTERNAL_TRANSACTION_SW_H
 #define INTERNAL_TRANSACTION_SW_H
 
+#include <stdint.h>
+
 void set_transactionsw_off(
     uint32_t transactionsw_reg_addr,
     uint32_t disable_bit);

@@ -5,24 +5,33 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "config_power_domain.h"
+#include "juno_id.h"
+#include "juno_pcie.h"
+#include "juno_scc.h"
+#include "juno_utils.h"
+#include "juno_wdog_ram.h"
+#include "nic400_gpv.h"
+#include "pl35x.h"
+#include "xpressrich3.h"
+
+#include <mod_juno_ram.h>
+#include <mod_power_domain.h>
+#include <mod_system_power.h>
+#include <mod_timer.h>
+
 #include <fwk_assert.h>
+#include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_math.h>
 #include <fwk_module.h>
+#include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
-#include <mod_juno_ram.h>
-#include <mod_system_power.h>
-#include <mod_timer.h>
-#include <config_power_domain.h>
-#include <juno_id.h>
-#include <juno_pcie.h>
-#include <juno_scc.h>
-#include <juno_utils.h>
-#include <juno_wdog_ram.h>
-#include <nic400_gpv.h>
-#include <pl35x.h>
-#include <xpressrich3.h>
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #define TIMEOUT_RESET_PCIE_US       (1000 * 1000)
 #define SMC_INIT_CMD_SET_CS5        UINT32_C(5 << 23)

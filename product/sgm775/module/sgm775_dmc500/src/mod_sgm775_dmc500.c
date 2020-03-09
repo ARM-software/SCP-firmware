@@ -8,12 +8,16 @@
  *     SGM775 DMC-500 module.
  */
 
+#include <mod_log.h>
+#include <mod_sgm775_dmc500.h>
+#include <mod_timer.h>
+
 #include <fwk_assert.h>
-#include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <mod_sgm775_dmc500.h>
+
+#include <stddef.h>
 
 #define COL_BITS 1
 #define BANK_BITS 0

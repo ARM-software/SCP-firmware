@@ -11,8 +11,9 @@
 #ifndef MOD_GTIMER_H
 #define MOD_GTIMER_H
 
-#include <stdint.h>
 #include <fwk_id.h>
+
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupModules Modules

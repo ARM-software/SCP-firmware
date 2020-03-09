@@ -4,15 +4,17 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-#include <stdbool.h>
-#include <stdint.h>
-#include <fwk_assert.h>
+#include <internal/fwk_interrupt.h>
+
 #include <fwk_arch.h>
+#include <fwk_assert.h>
 #include <fwk_interrupt.h>
 #include <fwk_macros.h>
 #include <fwk_status.h>
 #include <fwk_test.h>
-#include <internal/fwk_interrupt.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 #define INTERRUPT_ID 42
 

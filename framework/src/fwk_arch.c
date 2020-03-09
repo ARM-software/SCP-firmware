@@ -8,11 +8,11 @@
  *     Framework API for the architecture layer.
  */
 
+#include <internal/fwk_module.h>
+
 #include <fwk_arch.h>
 #include <fwk_host.h>
-#include <fwk_mm.h>
 #include <fwk_status.h>
-#include <internal/fwk_module.h>
 
 extern int fwk_mm_init(uintptr_t start, size_t size);
 extern int fwk_interrupt_init(const struct fwk_arch_interrupt_driver *driver);

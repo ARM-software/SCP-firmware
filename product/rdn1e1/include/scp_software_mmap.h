@@ -11,7 +11,8 @@
 #ifndef SCP_SOFTWARE_MMAP_H
 #define SCP_SOFTWARE_MMAP_H
 
-#include <scp_rdn1e1_mmap.h>
+#include "scp_rdn1e1_mmap.h"
+
 #include <fwk_macros.h>
 
 #define SCP_NOR_FLASH_BASE                  0x08000000

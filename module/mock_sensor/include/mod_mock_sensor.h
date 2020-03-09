@@ -8,8 +8,9 @@
 #ifndef MOD_MOCK_SENSOR_H
 #define MOD_MOCK_SENSOR_H
 
-#include <stdint.h>
 #include <mod_sensor.h>
+
+#include <stdint.h>
 
 /*!
  * \ingroup GroupModules

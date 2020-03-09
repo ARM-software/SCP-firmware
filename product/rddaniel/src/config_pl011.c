@@ -5,12 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_element.h>
-#include <fwk_macros.h>
-#include <fwk_id.h>
-#include <fwk_module.h>
+#include "scp_css_mmap.h"
+
 #include <mod_pl011.h>
-#include <scp_css_mmap.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_macros.h>
+#include <fwk_module.h>
 
 static const struct fwk_element pl011_element_desc_table[] = {
        [0] = {

@@ -5,11 +5,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
+#include "low_level_access.h"
+#include "synquacer_mmap.h"
 
-#include <synquacer_debug.h>
-#include <synquacer_mmap.h>
-#include <low_level_access.h>
+#include <stdint.h>
 
 #define REG_ADDR_OFFSET_BOOT_REMAP UINT32_C(0x000)
 #define REG_ADDR_OFFSET_BOOT_FE UINT32_C(0x004)

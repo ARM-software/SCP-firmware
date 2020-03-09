@@ -5,15 +5,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "clock_devices.h"
+#include "system_mmap.h"
+
+#include <mod_log.h>
+#include <mod_pl011.h>
+
 #include <fwk_banner.h>
+#include <fwk_element.h>
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_clock.h>
-#include <mod_log.h>
-#include <mod_pl011.h>
-#include <system_mmap.h>
-#include <clock_devices.h>
+
+#include <stddef.h>
 
 /*
  * PL011 module

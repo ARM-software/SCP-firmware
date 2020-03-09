@@ -9,8 +9,9 @@
 #ifndef MOD_PL011_H
 #define MOD_PL011_H
 
-#include <stdint.h>
 #include <fwk_id.h>
+
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupModules Modules

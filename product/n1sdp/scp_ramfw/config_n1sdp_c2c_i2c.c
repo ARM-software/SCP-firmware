@@ -5,12 +5,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_element.h>
+#include <mod_n1sdp_c2c_i2c.h>
+
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_n1sdp_c2c_i2c.h>
-#include <mod_n1sdp_i2c.h>
 
 const struct fwk_module_config config_n1sdp_c2c = {
     .data = &((struct n1sdp_c2c_dev_config) {

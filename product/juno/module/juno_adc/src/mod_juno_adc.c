@@ -8,16 +8,20 @@
  *     Juno ADC Driver
  */
 
+#include "juno_adc.h"
+#include "v2m_sys_regs.h"
+
+#include <mod_juno_adc.h>
+#include <mod_sensor.h>
+
 #include <fwk_assert.h>
 #include <fwk_id.h>
-#include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <mod_juno_adc.h>
-#include <mod_sensor.h>
-#include <juno_adc.h>
-#include <v2m_sys_regs.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 /*
  * ADC driver API functions.

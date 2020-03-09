@@ -5,19 +5,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
+#include "synquacer_core.h"
+#include "synquacer_mmap.h"
+
+#include <mod_power_domain.h>
+#include <mod_ppu_v0.h>
+
 #include <fwk_element.h>
+#include <fwk_id.h>
 #include <fwk_interrupt.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
-#include <mod_ppu_v0.h>
-#include <synquacer_core.h>
-#include <synquacer_irq.h>
-#include <synquacer_mmap.h>
-#include <config_ppu_v0.h>
+
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 #define PPU_V0_NAME_SIZE (12)
 

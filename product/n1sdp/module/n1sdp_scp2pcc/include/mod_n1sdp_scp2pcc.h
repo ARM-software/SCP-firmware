@@ -12,6 +12,8 @@
 #define MOD_N1SDP_SCP2PCC_H
 
 #include <internal/n1sdp_scp2pcc.h>
+
+#include <stdint.h>
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules
  * @{

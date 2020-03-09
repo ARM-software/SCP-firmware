@@ -8,9 +8,10 @@
 #ifndef FWK_INTERNAL_SINGLE_THREAD_H
 #define FWK_INTERNAL_SINGLE_THREAD_H
 
-#include <stdbool.h>
 #include <fwk_event.h>
 #include <fwk_list.h>
+
+#include <stdbool.h>
 
 /*
  * Thread component context. Exposed for testing purposes only.

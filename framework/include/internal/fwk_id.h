@@ -8,6 +8,8 @@
 #ifndef FWK_INTERNAL_ID_H
 #define FWK_INTERNAL_ID_H
 
+#include <stdint.h>
+
 /* Identifier type */
 enum __fwk_id_type {
     /*

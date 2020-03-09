@@ -11,6 +11,8 @@
 #ifndef INTERNAL_SCMI_CCIX_CONFIG_H
 #define INTERNAL_SCMI_CCIX_CONFIG_H
 
+#include <stdint.h>
+
 /*
  * SCMI CCIX config ID definition.
  */

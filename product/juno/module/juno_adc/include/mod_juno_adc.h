@@ -11,8 +11,12 @@
 #ifndef MOD_JUNO_ADC_H
 #define MOD_JUNO_ADC_H
 
-#include <stdint.h>
 #include <mod_sensor.h>
+
+#include <fwk_id.h>
+#include <fwk_module_idx.h>
+
+#include <stdint.h>
 
 /*!
  * \ingroup GroupJunoModule

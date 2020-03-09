@@ -11,12 +11,14 @@
 #ifndef MOD_POWER_DOMAIN_H
 #define MOD_POWER_DOMAIN_H
 
-#include <limits.h>
-#include <stdbool.h>
-#include <stdint.h>
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module_idx.h>
+
+#include <limits.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupModules Modules
