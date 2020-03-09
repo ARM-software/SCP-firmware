@@ -5,13 +5,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "juno_irq.h"
+#include "juno_mhu.h"
+#include "system_mmap.h"
+
+#include <mod_mhu.h>
+
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
-#include <mod_mhu.h>
-#include <juno_irq.h>
-#include <juno_mhu.h>
-#include <system_mmap.h>
+
+#include <stddef.h>
 
 static const struct fwk_element element_table[] = {
     [JUNO_MHU_DEVICE_IDX_S] = {

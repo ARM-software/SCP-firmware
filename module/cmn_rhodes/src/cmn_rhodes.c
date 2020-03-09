@@ -5,9 +5,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <cmn_rhodes.h>
+
 #include <fwk_assert.h>
 #include <fwk_math.h>
-#include <cmn_rhodes.h>
 
 /*
  * Encoding bits size of the X and Y position in the Node info value.

@@ -5,18 +5,24 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <string.h>
+#include "config_sensor.h"
+#include "juno_id.h"
+
+#include <mod_juno_adc.h>
+#include <mod_juno_pvt.h>
+#include <mod_juno_xrp7724.h>
+#include <mod_sensor.h>
+
 #include <fwk_assert.h>
 #include <fwk_element.h>
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_juno_adc.h>
-#include <mod_juno_pvt.h>
-#include <mod_juno_xrp7724.h>
-#include <config_sensor.h>
-#include <juno_id.h>
+#include <fwk_status.h>
+
+#include <string.h>
 
 static const struct fwk_element sensor_element_table_r0[] = {
     /*

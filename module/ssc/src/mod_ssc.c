@@ -5,14 +5,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_assert.h>
+#include <ssc_reg.h>
+
+#include <mod_ssc.h>
+#include <mod_system_info.h>
+
 #include <fwk_id.h>
 #include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <fwk_mm.h>
-#include <mod_system_info.h>
-#include <mod_ssc.h>
-#include <ssc_reg.h>
+#include <fwk_status.h>
+
+#include <stdbool.h>
+#include <stddef.h>
 
 static bool initialized;
 static int chip_id, multi_chip_mode, part_number, revision_number;

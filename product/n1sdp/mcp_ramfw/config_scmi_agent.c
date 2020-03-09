@@ -5,15 +5,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
-#include <fwk_element.h>
-#include <fwk_id.h>
-#include <fwk_macros.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
+#include "n1sdp_mcp_scmi.h"
+
 #include <mod_scmi_agent.h>
 #include <mod_smt.h>
-#include <n1sdp_mcp_scmi.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+
+#include <stddef.h>
 
 static const struct fwk_element agent_table[] = {
     [MCP_N1SDP_SCMI_AGENT_IDX_MANAGEMENT] = {

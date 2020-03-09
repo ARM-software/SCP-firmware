@@ -8,9 +8,11 @@
 #ifndef INTERNAL_MHU_H
 #define INTERNAL_MHU_H
 
-#include <stdint.h>
-#include <fwk_macros.h>
 #include <mod_mhu.h>
+
+#include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \brief MHU Register Definitions

@@ -13,9 +13,11 @@
 #ifndef NIC400_GPV_H
 #define NIC400_GPV_H
 
-#include <stdint.h>
+#include "juno_mmap.h"
+
 #include <fwk_macros.h>
-#include <juno_mmap.h>
+
+#include <stdint.h>
 
 struct nic400_gpv_reg {
             uint8_t   RESERVED1[0x100 - 0x0];

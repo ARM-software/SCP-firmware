@@ -8,8 +8,9 @@
 #ifndef INTERNAL_CCN512_H
 #define INTERNAL_CCN512_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*
  * CCN5xx miscellaneous node (MN) registers

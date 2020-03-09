@@ -11,9 +11,11 @@
 #ifndef JUNO_PVT_H
 #define JUNO_PVT_H
 
-#include <stdint.h>
+#include "juno_mmap.h"
+
 #include <fwk_macros.h>
-#include <juno_mmap.h>
+
+#include <stdint.h>
 
 /*
  * PVT-Group register definitions.

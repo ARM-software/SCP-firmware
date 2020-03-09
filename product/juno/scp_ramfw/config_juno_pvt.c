@@ -5,18 +5,24 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_macros.h>
-#include <fwk_element.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
+#include "config_power_domain.h"
+#include "config_sensor.h"
+#include "juno_id.h"
+#include "juno_irq.h"
+#include "juno_pvt.h"
+#include "pvt_sensor_calibration.h"
+
 #include <mod_juno_pvt.h>
 #include <mod_sensor.h>
-#include <juno_id.h>
-#include <juno_irq.h>
-#include <juno_pvt.h>
-#include <config_power_domain.h>
-#include <config_sensor.h>
-#include <pvt_sensor_calibration.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <fwk_status.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 /* Constants for additional calibration on Juno R0 */
 #define CAL_45_JUNO_R0      455

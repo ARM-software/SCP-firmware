@@ -8,10 +8,11 @@
 #ifndef MOD_DVFS_H
 #define MOD_DVFS_H
 
-#include <stddef.h>
-#include <stdint.h>
 #include <fwk_id.h>
 #include <fwk_module_idx.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 /*!
  * \ingroup GroupModules

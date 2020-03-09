@@ -11,9 +11,11 @@
 #ifndef V2M_SYS_REGS_H
 #define V2M_SYS_REGS_H
 
-#include <stdint.h>
+#include "juno_mmap.h"
+
 #include <fwk_macros.h>
-#include <juno_mmap.h>
+
+#include <stdint.h>
 
 enum v2m_sys_regs_adc_dev {
     SYS_REGS_ADC_DEV_SYS,

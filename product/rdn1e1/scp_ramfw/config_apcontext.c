@@ -5,11 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "config_clock.h"
+#include "scp_software_mmap.h"
+
+#include <mod_apcontext.h>
+
+#include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_apcontext.h>
-#include <scp_software_mmap.h>
-#include <config_clock.h>
 
 /*
  * AP Context module configuration

@@ -8,8 +8,9 @@
 #ifndef RDN1E1_PIK_DEBUG_H
 #define RDN1E1_PIK_DEBUG_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \brief Debug register definitions

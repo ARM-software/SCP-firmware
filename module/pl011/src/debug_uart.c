@@ -5,13 +5,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <dbg_system_map.h>
+#include <pl011.h>
+
+#include <mod_pl011.h>
+
 #include <fwk_assert.h>
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <mod_pl011.h>
-#include <pl011.h>
-#include <dbg_system_map.h>
 
 static const struct mod_pl011_device_config config = {
     .reg_base = DEBUG_UART_BASE,

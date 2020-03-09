@@ -5,7 +5,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
+#include <debug.h>
+
+#include <mod_debug.h>
+
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
@@ -14,8 +17,8 @@
 #include <fwk_module_idx.h>
 #include <fwk_multi_thread.h>
 #include <fwk_status.h>
-#include <mod_debug.h>
-#include <debug.h>
+
+#include <stdbool.h>
 
 static struct debug_dev_ctx *ctx_table;
 

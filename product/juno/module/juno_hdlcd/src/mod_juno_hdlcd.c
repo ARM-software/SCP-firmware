@@ -5,19 +5,24 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
+#include "juno_clock.h"
+#include "juno_id.h"
+#include "juno_scc.h"
+#include "system_clock.h"
+
+#include <mod_clock.h>
+#include <mod_juno_hdlcd.h>
+#include <mod_log.h>
+
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
+#include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <mod_clock.h>
-#include <mod_juno_hdlcd.h>
-#include <mod_log.h>
-#include <juno_clock.h>
-#include <juno_id.h>
-#include <juno_scc.h>
-#include <system_clock.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 /*
  * This driver supports the following policy with regards to how both HDLCDs

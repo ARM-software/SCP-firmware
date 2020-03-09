@@ -5,13 +5,19 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "config_clock.h"
+#include "n1sdp_scp_mmap.h"
+
+#include <mod_cmn600.h>
+
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_cmn600.h>
-#include <mod_n1sdp_system.h>
-#include <n1sdp_scp_mmap.h>
-#include <config_clock.h>
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 /*
  * CMN600 nodes

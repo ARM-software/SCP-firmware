@@ -8,10 +8,11 @@
 #ifndef MOD_DEBUG_H
 #define MOD_DEBUG_H
 
-#include <stdint.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_module_idx.h>
+
+#include <stdint.h>
 
 /*!
  * \ingroup GroupModules

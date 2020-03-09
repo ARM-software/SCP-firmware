@@ -11,7 +11,7 @@
 #ifndef FMW_MEMORY_H
 #define FMW_MEMORY_H
 
-#include <mcp_system_mmap_mcp.h>
+#include "mcp_system_mmap_mcp.h"
 
 #define FIRMWARE_MEM_MODE FWK_MEM_MODE_DUAL_REGION_RELOCATION
 

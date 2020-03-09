@@ -8,8 +8,9 @@
 #ifndef SGM775_PIK_CPU_H
 #define SGM775_PIK_CPU_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 #define PE_COUNT_MAX  16
 

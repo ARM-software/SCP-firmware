@@ -13,8 +13,9 @@
 #ifndef INTERNAL_N1SDP_FLASH_LAYOUT_H
 #define INTERNAL_N1SDP_FLASH_LAYOUT_H
 
-#include <stdint.h>
 #include "uuid.h"
+
+#include <stdint.h>
 
 /*
  * Flash entry definitions

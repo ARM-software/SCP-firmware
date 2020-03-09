@@ -11,9 +11,11 @@
 #ifndef PL35X_H
 #define PL35X_H
 
-#include <stdint.h>
+#include "juno_mmap.h"
+
 #include <fwk_macros.h>
-#include <juno_mmap.h>
+
+#include <stdint.h>
 
 /*
  * PL35X register definitions

@@ -11,7 +11,7 @@
 #ifndef FMW_MEMORY_H
 #define FMW_MEMORY_H
 
-#include <scp_system_mmap_scp.h>
+#include "scp_system_mmap_scp.h"
 
 #define FIRMWARE_MEM_MODE FWK_MEM_MODE_DUAL_REGION_RELOCATION
 

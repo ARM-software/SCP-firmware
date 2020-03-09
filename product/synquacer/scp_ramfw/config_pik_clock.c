@@ -5,15 +5,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "config_clock.h"
+#include "pik_cpu.h"
+#include "synquacer_mmap.h"
+#include "system_clock.h"
+
+#include <mod_pik_clock.h>
+
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
-#include <mod_pik_clock.h>
-#include <synquacer_core.h>
-#include <synquacer_mmap.h>
-#include <config_clock.h>
-#include <system_clock.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 #define PIK_DEBUG_TRACECLK_CTRL UINT32_C(0x0810)
 #define PIK_DEBUG_TRACECLK_DIV1 UINT32_C(0x0814)

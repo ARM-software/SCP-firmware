@@ -5,15 +5,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-#include <fwk_element.h>
+#include <mod_clock.h>
+#include <mod_power_domain.h>
+#include <mod_system_pll.h>
+
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_status.h>
-#include <mod_clock.h>
-#include <mod_system_pll.h>
-#include <mod_power_domain.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 /* Device context */
 struct system_pll_dev_ctx {

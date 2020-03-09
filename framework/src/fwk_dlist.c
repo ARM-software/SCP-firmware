@@ -8,9 +8,11 @@
  *     Intrusive circular doubly-linked list.
  */
 
-#include <stddef.h>
 #include <fwk_assert.h>
-#include <fwk_list.h>
+#include <fwk_dlist.h>
+#include <fwk_slist.h>
+
+#include <stddef.h>
 
 void __fwk_dlist_push_head(
     struct fwk_dlist *list,

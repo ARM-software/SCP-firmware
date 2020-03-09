@@ -5,11 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_element.h>
-#include <fwk_module.h>
+#include "sgm775_mmap.h"
+#include "sgm775_ssc.h"
+
 #include <mod_sid.h>
-#include <sgm775_mmap.h>
-#include <sgm775_ssc.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
 
 static const struct fwk_element subsystem_table[] = {
     {

@@ -5,17 +5,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
+#include "config_power_domain.h"
+#include "scp_sgi575_mhu.h"
+#include "scp_sgi575_scmi.h"
+#include "scp_software_mmap.h"
+#include "sgi575_core.h"
+
+#include <mod_smt.h>
+
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_smt.h>
-#include <scp_software_mmap.h>
-#include <scp_sgi575_mhu.h>
-#include <scp_sgi575_scmi.h>
-#include <sgi575_core.h>
-#include <config_power_domain.h>
+
+#include <stdint.h>
 
 static const struct fwk_element smt_element_table[] = {
     [SCP_SGI575_SCMI_SERVICE_IDX_PSCI] = {

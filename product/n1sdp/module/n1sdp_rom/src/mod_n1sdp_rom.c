@@ -5,16 +5,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-#include <string.h>
+#include <mod_log.h>
+#include <mod_n1sdp_flash.h>
+#include <mod_n1sdp_rom.h>
+
+#include <fwk_event.h>
+#include <fwk_id.h>
 #include <fwk_interrupt.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
 #include <fwk_thread.h>
-#include <mod_n1sdp_flash.h>
-#include <mod_n1sdp_rom.h>
-#include <mod_log.h>
+
+#include <stdint.h>
+#include <string.h>
 
 /*
  * Module context

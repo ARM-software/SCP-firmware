@@ -8,8 +8,9 @@
 #ifndef SGI575_PIK_DEBUG_H
 #define SGI575_PIK_DEBUG_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \brief Debug register definitions

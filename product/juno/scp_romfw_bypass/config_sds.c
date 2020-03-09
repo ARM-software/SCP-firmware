@@ -5,21 +5,25 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
+#include "juno_id.h"
+#include "juno_scc.h"
+#include "juno_sds.h"
+#include "juno_ssc.h"
+#include "scp_config.h"
+#include "software_mmap.h"
+
+#include <mod_sds.h>
+
 #include <fwk_assert.h>
 #include <fwk_element.h>
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <mod_sds.h>
-#include <juno_id.h>
-#include <juno_mmap.h>
-#include <juno_scc.h>
-#include <juno_sds.h>
-#include <juno_ssc.h>
-#include <scp_config.h>
-#include <software_mmap.h>
-#include <system_mmap.h>
+#include <fwk_status.h>
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 static const uint32_t version_packed = FWK_BUILD_VERSION;
 static struct juno_sds_platid platid;

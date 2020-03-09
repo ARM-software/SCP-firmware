@@ -5,12 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-#include <fwk_element.h>
-#include <fwk_module.h>
-#include <config_dvfs.h>
-#include <sgm776_scmi.h>
+#include "config_dvfs.h"
+#include "sgm776_scmi.h"
+
 #include <mod_scmi_perf.h>
+
+#include <fwk_module.h>
+
+#include <stdint.h>
 
 static const struct mod_scmi_perf_domain_config domains[] = {
     [DVFS_ELEMENT_IDX_LITTLE] = {

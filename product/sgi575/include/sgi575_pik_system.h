@@ -8,8 +8,9 @@
 #ifndef SGI575_PIK_SYSTEM_H
 #define SGI575_PIK_SYSTEM_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \brief TCU clock register definitions

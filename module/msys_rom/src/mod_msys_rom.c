@@ -16,8 +16,10 @@
 #include <mod_ppu_v1.h>
 
 #include <fwk_assert.h>
+#include <fwk_event.h>
+#include <fwk_id.h>
 #include <fwk_module.h>
-#include <fwk_noreturn.h>
+#include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
 #include <fwk_thread.h>

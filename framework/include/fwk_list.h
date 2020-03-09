@@ -11,10 +11,11 @@
 #ifndef FWK_LIST_H
 #define FWK_LIST_H
 
-#include <stddef.h>
-#include <stdint.h>
 #include <fwk_dlist.h>
 #include <fwk_slist.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupLibFramework Framework

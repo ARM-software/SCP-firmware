@@ -8,24 +8,26 @@
  *     Juno Thermal Protection
  */
 
-#include <fwk_assert.h>
-#include <fwk_id.h>
-#include <fwk_mm.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <fwk_notification.h>
-#include <fwk_thread.h>
-#include <fwk_status.h>
+#include "config_juno_thermal.h"
+#include "config_power_domain.h"
+#include "juno_alarm_idx.h"
+#include "juno_id.h"
+
 #include <mod_juno_thermal.h>
 #include <mod_log.h>
 #include <mod_power_domain.h>
 #include <mod_sensor.h>
 #include <mod_system_power.h>
 #include <mod_timer.h>
-#include <config_juno_thermal.h>
-#include <config_power_domain.h>
-#include <juno_alarm_idx.h>
-#include <juno_id.h>
+
+#include <fwk_assert.h>
+#include <fwk_id.h>
+#include <fwk_mm.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <fwk_notification.h>
+#include <fwk_status.h>
+#include <fwk_thread.h>
 
 enum mod_juno_thermal_event_idx {
     MOD_JUNO_THERMAL_EVENT_IDX_TIMER,

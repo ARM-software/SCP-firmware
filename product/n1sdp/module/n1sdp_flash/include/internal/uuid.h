@@ -13,6 +13,8 @@
 #ifndef INTERNAL_UUID_H
 #define INTERNAL_UUID_H
 
+#include <stdint.h>
+
 /* Length of a node address (an IEEE 802 address). */
 #define _UUID_NODE_LEN 6
 

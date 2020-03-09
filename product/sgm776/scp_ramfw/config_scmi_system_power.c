@@ -5,10 +5,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stddef.h>
-#include <fwk_module.h>
 #include <mod_scmi_system_power.h>
 #include <mod_system_power.h>
+
+#include <fwk_module.h>
+
+#include <stddef.h>
 
 struct fwk_module_config config_scmi_system_power = {
     .get_element_table = NULL,

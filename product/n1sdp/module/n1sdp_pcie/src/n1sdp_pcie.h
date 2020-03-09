@@ -8,10 +8,14 @@
 #ifndef N1SDP_PCIE_H
 #define N1SDP_PCIE_H
 
-#include <stdint.h>
-#include <fwk_macros.h>
-#include <mod_timer.h>
 #include <internal/pcie_ctrl_apb_reg.h>
+
+#include <mod_timer.h>
+
+#include <fwk_macros.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 /*
  * Definitions of PCIe APB register offsets from global configuration

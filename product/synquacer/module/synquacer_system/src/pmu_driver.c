@@ -5,11 +5,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <synquacer_debug.h>
-#include <synquacer_mmap.h>
-#include <low_level_access.h>
+#include "low_level_access.h"
+#include "synquacer_common.h"
+#include "synquacer_mmap.h"
 
 #include <internal/pmu.h>
+
+#include <stdint.h>
 
 #define CONFIG_SOC_REG_ADDR_PMU_CTL (CONFIG_SOC_REG_ADDR_PMU_TOP + 0)
 #define CONFIG_SOC_REG_ADDR_PMU_INT_EN (CONFIG_SOC_REG_ADDR_PMU_TOP + 0x8U)

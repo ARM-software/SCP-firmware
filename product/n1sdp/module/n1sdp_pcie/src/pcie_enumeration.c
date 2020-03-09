@@ -14,16 +14,20 @@
  * fault when reading the configuration space.
  */
 
+#include "n1sdp_scp_mmap.h"
+
+#include <n1sdp_pcie.h>
+
+#include <mod_n1sdp_pcie.h>
+
+#include <fwk_assert.h>
+#include <fwk_macros.h>
+
+#include <fmw_cmsis.h>
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <cmsis_compiler.h>
-#include <fwk_assert.h>
-#include <fwk_macros.h>
-#include <fwk_status.h>
-#include <mod_n1sdp_pcie.h>
-#include <n1sdp_pcie.h>
-#include <n1sdp_scp_mmap.h>
 
 /* PCIe configuration space offset definitions */
 #define PCIE_HEADER_TYPE_OFFSET         0xE

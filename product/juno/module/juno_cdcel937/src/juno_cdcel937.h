@@ -8,9 +8,14 @@
 #ifndef JUNO_CDCEL937_H
 #define JUNO_CDCEL937_H
 
-#include <stdint.h>
-#include <fwk_macros.h>
 #include <mod_juno_cdcel937.h>
+
+#include <fwk_id.h>
+#include <fwk_macros.h>
+#include <fwk_module_idx.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 #define JUNO_CDCEL937_I2C_TRANSFER_MODE_POS  7
 #define JUNO_CDCEL937_I2C_BYTE_OFFSET_MASK   0x7F

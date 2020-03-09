@@ -10,10 +10,12 @@
 
 #include <cmsis_os2.h>
 #include <pthread.h>
-#include <stdbool.h>
 #include <unistd.h>
+
 #include <fwk_assert.h>
 #include <fwk_mm.h>
+
+#include <stdbool.h>
 
 /* CMSIS-RTOS2 thread context data */
 struct thread_data {

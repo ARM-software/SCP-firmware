@@ -8,26 +8,29 @@
  *     System Control and Management Interface (SCMI) support.
  */
 
-#include <stdbool.h>
-#include <stdio.h>
-#include <string.h>
+#include <internal/mod_scmi.h>
+#include <internal/scmi.h>
+#include <internal/scmi_base.h>
+
+#include <mod_log.h>
+#include <mod_scmi.h>
+
 #include <fwk_assert.h>
+#include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#ifdef BUILD_HAS_MULTITHREADING
-#include <fwk_multi_thread.h>
-#else
-#include <fwk_thread.h>
-#endif
 #include <fwk_notification.h>
 #include <fwk_status.h>
-#include <internal/mod_scmi.h>
-#include <internal/scmi.h>
-#include <internal/scmi_base.h>
-#include <mod_log.h>
+#include <fwk_thread.h>
+
+#ifdef BUILD_HAS_MULTITHREADING
+#    include <fwk_multi_thread.h>
+#endif
+
+#include <string.h>
 
 struct scmi_protocol {
     /* SCMI protocol message handler */

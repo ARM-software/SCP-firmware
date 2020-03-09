@@ -5,8 +5,22 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <string.h>
-#include <fwk_assert.h>
+#include "config_clock.h"
+#include "n1sdp_core.h"
+#include "n1sdp_scc_reg.h"
+#include "n1sdp_scp_pik.h"
+
+#include <n1sdp_pcie.h>
+
+#include <internal/pcie_ctrl_apb_reg.h>
+
+#include <mod_clock.h>
+#include <mod_log.h>
+#include <mod_n1sdp_c2c_i2c.h>
+#include <mod_n1sdp_pcie.h>
+#include <mod_timer.h>
+
+#include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_math.h>
 #include <fwk_mm.h>
@@ -14,17 +28,8 @@
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
-#include <mod_clock.h>
-#include <mod_n1sdp_c2c_i2c.h>
-#include <mod_n1sdp_pcie.h>
-#include <mod_log.h>
-#include <mod_timer.h>
-#include <config_clock.h>
-#include <n1sdp_core.h>
-#include <n1sdp_pcie.h>
-#include <n1sdp_scc_reg.h>
-#include <n1sdp_scp_pik.h>
-#include <internal/pcie_ctrl_apb_reg.h>
+
+#include <string.h>
 
 void pcie_bus_enumeration(struct n1sdp_pcie_dev_config *config);
 void pcie_init_bdf_table(struct n1sdp_pcie_dev_config *config);

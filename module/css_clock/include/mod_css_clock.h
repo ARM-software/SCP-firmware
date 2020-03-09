@@ -8,9 +8,11 @@
 #ifndef MOD_CSS_CLOCK_H
 #define MOD_CSS_CLOCK_H
 
+#include <fwk_element.h>
+#include <fwk_id.h>
+
 #include <stdbool.h>
 #include <stdint.h>
-#include <fwk_element.h>
 
 /*!
  * \addtogroup GroupModules Modules

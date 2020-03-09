@@ -5,20 +5,29 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <cmsis_os2.h>
 #include <rtx_os.h>
 
+#include <internal/fwk_id.h>
 #include <internal/fwk_module.h>
 #include <internal/fwk_multi_thread.h>
-#include <internal/fwk_notification.h>
+#include <internal/fwk_thread.h>
 #include <internal/fwk_thread_delayed_resp.h>
 
 #include <fwk_assert.h>
-#include <fwk_element.h>
+#include <fwk_event.h>
 #include <fwk_host.h>
+#include <fwk_id.h>
 #include <fwk_interrupt.h>
+#include <fwk_list.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
+#include <fwk_module.h>
+#include <fwk_multi_thread.h>
+#include <fwk_noreturn.h>
+#include <fwk_slist.h>
 #include <fwk_status.h>
+#include <fwk_thread.h>
 
 #include <stdbool.h>
 #include <stdint.h>

@@ -5,17 +5,19 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stddef.h>
-#include <fwk_element.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
+#include "config_power_domain.h"
+#include "juno_clock.h"
+
 #include <mod_clock.h>
 #include <mod_juno_cdcel937.h>
 #include <mod_juno_hdlcd.h>
 #include <mod_juno_soc_clock_ram.h>
 #include <mod_power_domain.h>
-#include <juno_clock.h>
-#include <config_power_domain.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
 
 static struct fwk_element clock_dev_desc_table[] = {
     [JUNO_CLOCK_IDX_I2SCLK] = {

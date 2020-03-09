@@ -8,8 +8,9 @@
 #ifndef SGI575_SSC_H
 #define SGI575_SSC_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \brief System Security Control (SSC) register definitions

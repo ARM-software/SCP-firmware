@@ -5,10 +5,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "n1sdp_core.h"
+#include "n1sdp_scc_reg.h"
+#include "n1sdp_scp_pik.h"
+
 #include <fwk_assert.h>
-#include <n1sdp_core.h>
-#include <n1sdp_scc_reg.h>
-#include <n1sdp_scp_pik.h>
 
 unsigned int n1sdp_core_get_core_per_cluster_count(unsigned int cluster)
 {

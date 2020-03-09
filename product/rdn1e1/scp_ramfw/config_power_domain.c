@@ -5,21 +5,25 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
+#include "config_power_domain.h"
+#include "config_ppu_v0.h"
+#include "rdn1e1_core.h"
+#include "rdn1e1_power_domain.h"
+
+#include <mod_power_domain.h>
+#include <mod_ppu_v1.h>
+#include <mod_system_power.h>
+
 #include <fwk_element.h>
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_system_power.h>
-#include <mod_power_domain.h>
-#include <mod_ppu_v1.h>
-#include <rdn1e1_power_domain.h>
-#include <rdn1e1_core.h>
-#include <config_ppu_v0.h>
-#include <config_power_domain.h>
+
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 /* Maximum power domain name size including the null terminator */
 #define PD_NAME_SIZE 12

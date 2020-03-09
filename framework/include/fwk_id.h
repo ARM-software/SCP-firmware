@@ -11,10 +11,12 @@
 #ifndef FWK_ID_H
 #define FWK_ID_H
 
+#include <internal/fwk_id.h>
+
+#include <fwk_status.h>
+
 #include <stdbool.h>
 #include <stdint.h>
-#include <internal/fwk_id.h>
-#include <fwk_status.h>
 
 /*!
  * \addtogroup GroupLibFramework Framework

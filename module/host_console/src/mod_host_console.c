@@ -5,11 +5,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-#include <stdio.h>
+#include <mod_log.h>
+
 #include <fwk_module.h>
 #include <fwk_status.h>
-#include <mod_log.h>
+
+#include <stdint.h>
+#include <stdio.h>
 
 /*
  * Module driver API

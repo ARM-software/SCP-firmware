@@ -5,12 +5,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_element.h>
+#include "sgm775_core.h"
+#include "sgm775_pik.h"
+#include "sgm775_pik_cpu.h"
+
+#include <mod_scmi_apcore.h>
+
 #include <fwk_macros.h>
 #include <fwk_module.h>
-#include <mod_scmi_apcore.h>
-#include <sgm775_core.h>
-#include <sgm775_pik.h>
+
+#include <stdint.h>
 
 static const struct mod_scmi_apcore_reset_register_group
     reset_reg_group_table[] = {

@@ -8,18 +8,28 @@
  *     SGM775 System Support.
  */
 
-#include <fmw_cmsis.h>
+#include "sgm775_scmi.h"
+#include "sgm775_sds.h"
+
+#include <mod_power_domain.h>
+#include <mod_scmi.h>
+#include <mod_sds.h>
+#include <mod_sgm775_system.h>
+#include <mod_system_power.h>
+
 #include <fwk_assert.h>
+#include <fwk_event.h>
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
-#include <mod_scmi.h>
-#include <mod_sds.h>
-#include <mod_system_power.h>
-#include <mod_sgm775_system.h>
-#include <sgm775_scmi.h>
-#include <sgm775_sds.h>
+#include <fwk_status.h>
+
+#include <fmw_cmsis.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 static const uint32_t feature_flags = SGM775_SDS_FEATURE_FIRMWARE_MASK;
 static fwk_id_t sds_feature_availability_id =

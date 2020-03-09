@@ -5,11 +5,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "coresight_soc400.h"
+#include "juno_ssc.h"
+#include "juno_wdog.h"
+#include "system_mmap.h"
+
 #include <stdbool.h>
 #include <stdint.h>
-#include <coresight_soc400.h>
-#include <juno_ssc.h>
-#include <juno_wdog.h>
 
 #define CTI_TRIGGER_WDOG_DISABLE        UINT32_C(0x00000001)
 

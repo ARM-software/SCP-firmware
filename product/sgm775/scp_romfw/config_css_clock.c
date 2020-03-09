@@ -5,13 +5,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <mod_css_clock.h>
+#include <mod_pik_clock.h>
+#include <mod_system_pll.h>
+
 #include <fwk_element.h>
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_css_clock.h>
-#include <mod_system_pll.h>
-#include <mod_pik_clock.h>
+
+#include <stdbool.h>
 
 static const struct mod_css_clock_rate rate_table_cpu_group_big[] = {
     {

@@ -5,19 +5,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
-#include <string.h>
+#include <internal/smt.h>
+
+#include <mod_smt.h>
+
 #include <fwk_assert.h>
+#include <fwk_id.h>
 #include <fwk_interrupt.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <fwk_notification.h>
 #include <fwk_status.h>
-#include <mod_log.h>
-#include <mod_power_domain.h>
-#include <mod_smt.h>
-#include <internal/smt.h>
+
+#include <stdbool.h>
+#include <string.h>
 
 struct smt_channel_ctx {
     /* Channel identifier */

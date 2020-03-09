@@ -5,15 +5,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "config_clock.h"
+#include "scp_sgi575_pik.h"
+#include "scp_system_mmap.h"
+#include "sgi575_pik_scp.h"
+
+#include <mod_system_pll.h>
+
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
-#include <mod_system_pll.h>
-#include <scp_sgi575_pik.h>
-#include <scp_system_mmap.h>
-#include <sgi575_pik_scp.h>
-#include <config_clock.h>
 
 static const struct fwk_element system_pll_element_table[] = {
     [CLOCK_PLL_IDX_CPU0] = {

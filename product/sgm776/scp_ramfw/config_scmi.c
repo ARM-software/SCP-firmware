@@ -5,15 +5,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "sgm776_scmi.h"
+
+#include <internal/scmi.h>
+
+#include <mod_scmi.h>
+#include <mod_smt.h>
+
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <sgm776_scmi.h>
-#include <mod_scmi.h>
-#include <internal/scmi.h>
-#include <mod_smt.h>
 
 static const struct fwk_element service_table[] = {
     [SGM776_SCMI_SERVICE_IDX_PSCI] = {

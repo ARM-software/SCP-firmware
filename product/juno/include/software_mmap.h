@@ -11,7 +11,7 @@
 #ifndef SOFTWARE_MMAP_H
 #define SOFTWARE_MMAP_H
 
-#include <system_mmap.h>
+#include "system_mmap.h"
 
 /*
  * The 4KB "Context Region" at the base of Trusted SRAM is used for several

@@ -5,12 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
-#include <stdio.h>
-#include <synquacer_debug.h>
-#include <synquacer_mmap.h>
-#include <i2c_api.h>
+#include "synquacer_debug.h"
+#include "synquacer_mmap.h"
+
 #include <internal/i2c_depend.h>
+#include <internal/i2c_driver.h>
+
+#include <fwk_macros.h>
+
+#include <stdio.h>
 
 typedef unsigned int ADDR_T;
 

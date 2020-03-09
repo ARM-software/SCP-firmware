@@ -8,9 +8,10 @@
 #ifndef INTERNAL_HSSPI_API_H
 #define INTERNAL_HSSPI_API_H
 
+#include <internal/hsspi_driver.h>
+
 #include <stdbool.h>
 #include <stdint.h>
-#include <internal/hsspi_driver.h>
 
 struct HSSPI_clk_config {
     HSSPI_EN_MCTRL_CDSS_t clk_sel;

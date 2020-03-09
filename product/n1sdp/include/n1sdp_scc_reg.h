@@ -11,8 +11,9 @@
 #ifndef N1SDP_SCC_REG_H
 #define N1SDP_SCC_REG_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 struct scc_pcid_registers {
     FWK_R uint32_t PID4;

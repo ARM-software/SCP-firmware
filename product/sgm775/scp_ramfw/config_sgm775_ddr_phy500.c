@@ -5,10 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_element.h>
-#include <fwk_module.h>
+#include "system_mmap.h"
+
 #include <mod_sgm775_ddr_phy500.h>
-#include <system_mmap.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
+
+#include <stddef.h>
 
 /* Table of DDR PHY500 element descriptions. */
 static struct fwk_element sgm775_ddr_phy500_element_table[] = {

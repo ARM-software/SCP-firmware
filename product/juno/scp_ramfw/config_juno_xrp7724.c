@@ -5,19 +5,19 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "config_juno_xrp7724.h"
+#include "config_psu.h"
+#include "config_sensor.h"
+#include "juno_alarm_idx.h"
+
+#include <mod_juno_xrp7724.h>
+#include <mod_psu.h>
+#include <mod_sensor.h>
+
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_i2c.h>
-#include <mod_juno_xrp7724.h>
-#include <mod_psu.h>
-#include <mod_sensor.h>
-#include <mod_timer.h>
-#include <juno_alarm_idx.h>
-#include <config_sensor.h>
-#include <config_juno_xrp7724.h>
-#include <config_psu.h>
 
 enum mod_juno_xrp7724_gpio_idx  {
     MOD_JUNO_XRP7724_GPIO_IDX_ASSERT,

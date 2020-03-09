@@ -12,7 +12,9 @@
 #define FWK_THREAD_H
 
 #include <fwk_event.h>
+#include <fwk_id.h>
 
+#include <stdbool.h>
 #include <stdint.h>
 
 /*!

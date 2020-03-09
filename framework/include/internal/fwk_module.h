@@ -11,9 +11,13 @@
 #ifndef FWK_INTERNAL_MODULE_H
 #define FWK_INTERNAL_MODULE_H
 
-#include <stddef.h>
-#include <fwk_module.h>
 #include <internal/fwk_notification.h>
+
+#include <fwk_id.h>
+#include <fwk_module.h>
+#include <fwk_slist.h>
+
+#include <stddef.h>
 
 /*
  * Module context.

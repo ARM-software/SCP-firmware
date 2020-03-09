@@ -5,9 +5,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
 #include <cli.h>
 #include <cli_platform.h>
+
+#include <stdint.h>
 
 __attribute__((weak)) void cli_platform_get_time(cli_timestamp_t *t)
 {

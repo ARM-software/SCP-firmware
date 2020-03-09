@@ -5,11 +5,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
+#include <internal/i2c_driver.h>
 #include <internal/i2c_reg.h>
 #include <internal/i2c_reg_access.h>
+
+#include <stdint.h>
 
 static inline void i2c_write_reg(
     uint32_t base_addr,

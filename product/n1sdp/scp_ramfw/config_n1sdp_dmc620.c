@@ -5,12 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "config_clock.h"
+#include "n1sdp_scp_mmap.h"
+
+#include <mod_n1sdp_dmc620.h>
+
 #include <fwk_element.h>
+#include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_n1sdp_dmc620.h>
-#include <n1sdp_scp_mmap.h>
-#include <config_clock.h>
 
 /* Table of DMC620 elements descriptions. */
 static struct fwk_element dmc620_element_table[] = {

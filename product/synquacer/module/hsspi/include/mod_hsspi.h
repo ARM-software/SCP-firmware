@@ -8,9 +8,11 @@
 #ifndef MOD_HSSPI_H
 #define MOD_HSSPI_H
 
-#include <stdint.h>
-#include <fwk_id.h>
 #include <internal/hsspi_api.h>
+
+#include <fwk_id.h>
+
+#include <stdint.h>
 /*!
  * \addtogroup GroupSYNQUACERModule SYNQUACER Product Modules
  * @{

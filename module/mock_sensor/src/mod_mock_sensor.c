@@ -5,14 +5,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
+#include <mod_mock_sensor.h>
+#include <mod_sensor.h>
+#include <mod_timer.h>
+
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_status.h>
-#include <mod_mock_sensor.h>
-#include <mod_sensor.h>
-#include <mod_timer.h>
+
+#include <stdint.h>
 
 #define MOCK_SENSOR_ALARM_DELAY_MS  10
 

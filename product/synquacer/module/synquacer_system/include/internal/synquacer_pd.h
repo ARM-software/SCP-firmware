@@ -8,8 +8,9 @@
 #ifndef INTERNAL_SYNQUACER_PD_H
 #define INTERNAL_SYNQUACER_PD_H
 
-#include <internal/reset.h>
 #include <ppu_v0.h>
+
+#include <internal/reset.h>
 
 #define PD_TIMEOUT_MS 200
 #define PD_CHECK_CYCLE_MS 1

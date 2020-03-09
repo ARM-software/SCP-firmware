@@ -5,15 +5,22 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
+#include <sensor.h>
+
+#include <mod_sensor.h>
+
 #include <fwk_assert.h>
+#include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
 #include <fwk_thread.h>
-#include <sensor.h>
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 static struct sensor_dev_ctx *ctx_table;
 

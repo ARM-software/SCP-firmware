@@ -8,12 +8,13 @@
 #ifndef MOD_SDS_H
 #define MOD_SDS_H
 
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_module_idx.h>
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <fwk_element.h>
-#include <fwk_module_idx.h>
-#include <fwk_id.h>
 
 /*!
  * \addtogroup GroupModules Modules

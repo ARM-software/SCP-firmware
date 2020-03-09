@@ -11,8 +11,9 @@
 #ifndef DW_APB_I2C_H
 #define DW_APB_I2C_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 #define I2C_TRANSMIT_BUFFER_LENGTH       16
 #define I2C_RECEIVE_BUFFER_LENGTH        16

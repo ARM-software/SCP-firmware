@@ -5,15 +5,19 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-#include <string.h>
+#include <mod_log.h>
+#include <mod_rdn1e1_rom.h>
+
+#include <fwk_event.h>
+#include <fwk_id.h>
 #include <fwk_interrupt.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
 #include <fwk_thread.h>
-#include <mod_log.h>
-#include <mod_rdn1e1_rom.h>
+
+#include <stdint.h>
+#include <string.h>
 
 static const struct rdn1e1_rom_config *rom_config;
 static struct mod_log_api *log_api;

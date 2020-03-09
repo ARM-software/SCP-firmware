@@ -8,7 +8,9 @@
 #ifndef MOD_MOCK_PSU_H
 #define MOD_MOCK_PSU_H
 
+#include <fwk_id.h>
 #include <fwk_module_idx.h>
+
 #include <stdbool.h>
 #include <stdint.h>
 

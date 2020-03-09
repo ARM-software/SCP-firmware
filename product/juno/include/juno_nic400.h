@@ -11,8 +11,9 @@
 #ifndef JUNO_NIC400_H
 #define JUNO_NIC400_H
 
+#include "juno_mmap.h"
+
 #include <fwk_macros.h>
-#include <juno_mmap.h>
 
 struct nic400_reg {
     FWK_RW  uint32_t  REMAP;

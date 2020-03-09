@@ -8,6 +8,8 @@
 #ifndef SYNQUACER_DDR_H
 #define SYNQUACER_DDR_H
 
+#include "synquacer_mmap.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 

@@ -5,15 +5,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
+#include "synquacer_debug.h"
+#include "synquacer_mmap.h"
 
-#include <fmw_cmsis.h>
 #include <cmsis_os2.h>
-
-#include <synquacer_debug.h>
 
 #include <internal/hsspi_driver.h>
 #include <internal/reg_HSSPI.h>
+
+#include <fmw_cmsis.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 static const uint16_t m_awcCommandList_NULL[] = {
     /*    DATA[15:8]    CONT[3]        TRP[2:1]    DEC[0]    */

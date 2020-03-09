@@ -11,6 +11,10 @@
 #ifndef MOD_JUNO_PVT_H
 #define MOD_JUNO_PVT_H
 
+#include <fwk_id.h>
+
+#include <stdint.h>
+
 /*!
  * \ingroup GroupJunoModule
  * \defgroup GroupJunoPVT Juno PVT

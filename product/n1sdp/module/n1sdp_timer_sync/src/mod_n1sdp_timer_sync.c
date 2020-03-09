@@ -8,8 +8,15 @@
  *      N1SDP Timer Synchronization Driver.
  */
 
-#include <stddef.h>
-#include <stdint.h>
+#include "n1sdp_scp_mmap.h"
+
+#include <internal/timer_sync.h>
+
+#include <mod_log.h>
+#include <mod_n1sdp_system.h>
+#include <mod_n1sdp_timer_sync.h>
+#include <mod_timer.h>
+
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
@@ -17,12 +24,10 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <internal/timer_sync.h>
-#include <mod_log.h>
-#include <mod_n1sdp_system.h>
-#include <mod_n1sdp_timer_sync.h>
-#include <mod_timer.h>
-#include <n1sdp_scp_pik.h>
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #define COUNTER_DELTA_MAX      0x100
 #define INT_STATUS_TIMEOUT     UINT32_C(1000)

@@ -11,9 +11,11 @@
 #ifndef SCP_CONFIG_H
 #define SCP_CONFIG_H
 
-#include <stdint.h>
+#include "system_mmap.h"
+
 #include <fwk_macros.h>
-#include <system_mmap.h>
+
+#include <stdint.h>
 
 struct scp_config_reset_reg {
     FWK_RW  uint32_t  STATUS;

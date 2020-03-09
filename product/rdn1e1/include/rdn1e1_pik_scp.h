@@ -11,8 +11,9 @@
 #ifndef RDN1E1_PIK_SCP_H
 #define RDN1E1_PIK_SCP_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \brief SCP PIK register definitions

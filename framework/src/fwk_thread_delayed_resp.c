@@ -7,10 +7,16 @@
 
 #include <internal/fwk_module.h>
 
-#include <fwk_element.h>
+#include <fwk_event.h>
 #include <fwk_host.h>
+#include <fwk_id.h>
 #include <fwk_interrupt.h>
+#include <fwk_list.h>
+#include <fwk_module.h>
+#include <fwk_status.h>
 
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #ifdef BUILD_HOST

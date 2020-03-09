@@ -11,9 +11,12 @@
 #ifndef MOD_INTERNAL_SCMI_H
 #define MOD_INTERNAL_SCMI_H
 
+#include <mod_scmi.h>
+
+#include <fwk_id.h>
+
 #include <stddef.h>
 #include <stdint.h>
-#include <mod_scmi.h>
 
 #define SCMI_VERSION 0x10000
 

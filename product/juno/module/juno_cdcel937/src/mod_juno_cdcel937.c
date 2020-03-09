@@ -5,22 +5,26 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-#include <string.h>
-#include <fwk_assert.h>
-#include <fwk_id.h>
-#include <fwk_mm.h>
-#include <fwk_module.h>
-#include <fwk_multi_thread.h>
-#include <fwk_status.h>
+#include "juno_cdcel937.h"
+#include "juno_clock.h"
+
 #include <mod_clock.h>
 #include <mod_i2c.h>
 #include <mod_juno_cdcel937.h>
 #include <mod_juno_hdlcd.h>
-#include <mod_log.h>
-#include <juno_cdcel937.h>
-#include <juno_clock.h>
-#include <juno_id.h>
+
+#include <fwk_assert.h>
+#include <fwk_event.h>
+#include <fwk_id.h>
+#include <fwk_macros.h>
+#include <fwk_mm.h>
+#include <fwk_module.h>
+#include <fwk_status.h>
+#include <fwk_thread.h>
+
+#include <stdbool.h>
+#include <stdint.h>
+#include <string.h>
 
 static const struct mod_juno_cdcel937_config *module_config;
 static struct juno_cdcel937_module_ctx module_ctx;

@@ -5,16 +5,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "n1sdp_scc_reg.h"
+#include "n1sdp_scp_pik.h"
+
+#include <n1sdp_pcie.h>
+
+#include <internal/pcie_ctrl_apb_reg.h>
+
+#include <mod_timer.h>
+
+#include <fwk_assert.h>
+#include <fwk_id.h>
+#include <fwk_module_idx.h>
+#include <fwk_status.h>
+
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-#include <fwk_assert.h>
-#include <fwk_status.h>
-#include <internal/pcie_ctrl_apb_reg.h>
-#include <mod_n1sdp_pcie.h>
-#include <mod_timer.h>
-#include <n1sdp_pcie.h>
-#include <n1sdp_scp_pik.h>
 
 void pcie_phy_init(uint32_t phy_apb_base)
 {

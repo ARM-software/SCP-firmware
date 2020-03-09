@@ -8,15 +8,19 @@
 #ifndef SYNQUACER_PIK_H
 #define SYNQUACER_PIK_H
 
-#include <stdint.h>
-#include <fmw_cmsis.h>
-#include <fwk_macros.h>
-#include <synquacer_irq.h>
-#include <synquacer_mmap.h>
-#include <pik_cpu.h>
-#include <pik_scp.h>
-#include <pik_system.h>
+#include "pik_cpu.h"
+#include "pik_scp.h"
+#include "pik_system.h"
+#include "synquacer_irq.h"
+#include "synquacer_mmap.h"
+
 #include <ppu_v0.h>
+
+#include <fwk_macros.h>
+
+#include <fmw_cmsis.h>
+
+#include <stdint.h>
 
 #define PIK_SCP_BASE (POWER_PERIPH_BASE + 0x00000)
 #define PIK_DEBUG_BASE (POWER_PERIPH_BASE + 0x20000)

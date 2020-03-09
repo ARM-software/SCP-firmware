@@ -8,7 +8,7 @@
 #ifndef SCP_SYSTEM_MMAP_H
 #define SCP_SYSTEM_MMAP_H
 
-#include <scp_rdn1e1_mmap.h>
+#include "scp_rdn1e1_mmap.h"
 
 #define SCP_PLAT_BASE           (SCP_SYS0_BASE + 0x3FFE0000)
 

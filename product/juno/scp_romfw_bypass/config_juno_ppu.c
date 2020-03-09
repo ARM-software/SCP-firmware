@@ -5,13 +5,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "juno_ppu_idx.h"
+#include "system_mmap.h"
+
+#include <mod_juno_ppu.h>
+
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
-#include <mod_juno_ppu.h>
-#include <juno_ppu_idx.h>
-#include <system_clock.h>
-#include <system_mmap.h>
+
+#include <stddef.h>
 
 static struct fwk_element element_table[] = {
     [JUNO_PPU_DEV_IDX_BIG_SSTOP] = {

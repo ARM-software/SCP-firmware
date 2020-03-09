@@ -5,23 +5,22 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "low_level_access.h"
+#include "synquacer_debug.h"
 
-#include <fmw_cmsis.h>
-#include <fwk_status.h>
-
-#include <synquacer_core.h>
-#include <synquacer_debug.h>
-#include <synquacer_mmap.h>
-
-#include <low_level_access.h>
+#include <cmsis_os2.h>
 
 #include <internal/pmu.h>
+#include <internal/reg_PPU.h>
 #include <internal/reset.h>
 #include <internal/synquacer_pd.h>
 #include <internal/synquacer_ppu_driver.h>
 #include <internal/transaction_sw.h>
+
+#include <fwk_macros.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 #define SCB_DIV_ROUND_UP(NUMERATOR, DENOMINATOR) \
     (((NUMERATOR) + (DENOMINATOR)-1) / (DENOMINATOR))

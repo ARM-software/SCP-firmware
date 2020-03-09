@@ -8,9 +8,11 @@
 #ifndef MOD_CLOCK_H
 #define MOD_CLOCK_H
 
-#include <stdint.h>
 #include <fwk_element.h>
+#include <fwk_id.h>
 #include <fwk_module_idx.h>
+
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupModules Modules
@@ -549,7 +551,7 @@ struct mod_clock_resp_params {
  */
 #define MOD_CLOCK_EVENT_IDX_REQUEST     0
 
- /*!
+/*!
  * \brief Request event identifier.
  *
  * \details This identifier is used by the clients that expect to receive a

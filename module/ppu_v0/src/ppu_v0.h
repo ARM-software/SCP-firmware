@@ -13,9 +13,10 @@
  * @{
  */
 
+#include <fwk_macros.h>
+
 #include <stdbool.h>
 #include <stdint.h>
-#include <fwk_macros.h>
 
 struct ppu_v0_reg {
   FWK_RW  uint32_t POWER_POLICY;

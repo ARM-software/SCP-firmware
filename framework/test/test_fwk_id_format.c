@@ -5,12 +5,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdio.h>
-#include <string.h>
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_test.h>
+
+#include <stdio.h>
+#include <string.h>
 
 static void test_format_module_id(void)
 {

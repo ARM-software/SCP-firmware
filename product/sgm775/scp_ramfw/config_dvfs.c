@@ -5,15 +5,21 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "config_dvfs.h"
+#include "config_timer.h"
+
+#include <mod_dvfs.h>
+#include <mod_sid.h>
+
 #include <fwk_assert.h>
 #include <fwk_element.h>
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <config_dvfs.h>
-#include <config_timer.h>
-#include <mod_dvfs.h>
-#include <mod_sid.h>
+#include <fwk_status.h>
+
+#include <stddef.h>
 
 static const struct mod_dvfs_domain_config cpu_group_little = {
     .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, 0),

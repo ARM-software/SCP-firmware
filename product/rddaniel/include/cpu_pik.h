@@ -8,9 +8,11 @@
 #ifndef CPU_PIK_H
 #define CPU_PIK_H
 
-#include <stdint.h>
+#include "scp_css_mmap.h"
+
 #include <fwk_macros.h>
-#include <scp_css_mmap.h>
+
+#include <stdint.h>
 
 /*!
  * \brief PE Static Configuration register definitions

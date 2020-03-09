@@ -8,7 +8,7 @@
 #ifndef SYSTEM_MMAP_H
 #define SYSTEM_MMAP_H
 
-#include <sgm775_mmap.h>
+#include "sgm775_mmap.h"
 
 #define DMC_EXTERNAL0       (SYS0_BASE + 0x3FBE0000)
 #define DMC_EXTERNAL1       (SYS0_BASE + 0x3FBF0000)

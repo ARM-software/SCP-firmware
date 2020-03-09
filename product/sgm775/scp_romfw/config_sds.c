@@ -5,19 +5,25 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
+#include "clock_devices.h"
+#include "sgm775_mmap.h"
+#include "sgm775_pik.h"
+#include "sgm775_pik_scp.h"
+#include "sgm775_sds.h"
+#include "sgm775_ssc.h"
+#include "system_mmap.h"
+
+#include <mod_sds.h>
+
 #include <fwk_assert.h>
 #include <fwk_element.h>
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_sds.h>
-#include <sgm775_mmap.h>
-#include <sgm775_sds.h>
-#include <sgm775_ssc.h>
-#include <sgm775_pik.h>
-#include <system_mmap.h>
-#include <clock_devices.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 static const struct mod_sds_config sds_module_config = {
     .region_base_address = TRUSTED_RAM_BASE,

@@ -5,12 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_element.h>
-#include <fwk_module.h>
+#include "config_ppu_v0.h"
+#include "scp_sgi575_mmap.h"
+
+#include <mod_power_domain.h>
 #include <mod_ppu_v0.h>
-#include <scp_sgi575_irq.h>
-#include <scp_sgi575_mmap.h>
-#include <config_ppu_v0.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
 
 static struct fwk_element ppu_v0_element_table[] = {
     [PPU_V0_ELEMENT_IDX_DBGTOP] = {

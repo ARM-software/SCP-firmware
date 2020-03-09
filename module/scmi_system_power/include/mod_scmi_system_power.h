@@ -8,6 +8,10 @@
 #ifndef MOD_SCMI_SYSTEM_POWER_H
 #define MOD_SCMI_SYSTEM_POWER_H
 
+#include <fwk_id.h>
+
+#include <stdint.h>
+
 /*!
  * \addtogroup GroupModules Modules
  * @{

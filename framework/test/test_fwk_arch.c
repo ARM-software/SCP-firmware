@@ -5,12 +5,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
-#include <fwk_assert.h>
 #include <fwk_arch.h>
+#include <fwk_assert.h>
 #include <fwk_macros.h>
 #include <fwk_status.h>
 #include <fwk_test.h>
+
+#include <stdbool.h>
 
 static int fwk_mm_init_return_val;
 static int mm_init_handler_return_val;

@@ -8,15 +8,20 @@
  *     Juno DDR-PHY400 driver
  */
 
+#include "juno_scc.h"
+
+#include <mod_juno_ddr_phy400.h>
+#include <mod_juno_dmc400.h>
+#include <mod_timer.h>
+
 #include <fwk_assert.h>
 #include <fwk_id.h>
-#include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <mod_juno_ddr_phy400.h>
-#include <mod_juno_dmc400.h>
-#include <juno_scc.h>
+
+#include <stdbool.h>
+#include <stddef.h>
 
 static struct mod_timer_api *timer_api;
 

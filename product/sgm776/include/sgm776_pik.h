@@ -8,14 +8,14 @@
 #ifndef SGM776_PIK_H
 #define SGM776_PIK_H
 
-#include <sgm776_mmap.h>
-#include <sgm776_pik_cpu.h>
-#include <sgm776_pik_debug.h>
-#include <sgm776_pik_dpu.h>
-#include <sgm776_pik_scp.h>
-#include <sgm776_pik_gpu.h>
-#include <sgm776_pik_system.h>
-#include <sgm776_pik_vpu.h>
+#include "sgm776_mmap.h"
+#include "sgm776_pik_cpu.h"
+#include "sgm776_pik_debug.h"
+#include "sgm776_pik_dpu.h"
+#include "sgm776_pik_gpu.h"
+#include "sgm776_pik_scp.h"
+#include "sgm776_pik_system.h"
+#include "sgm776_pik_vpu.h"
 
 #define PIK_CLUS0     ((struct pik_cpu_reg *) PIK_CLUS0_BASE)
 #define PIK_CLUS1     ((struct pik_cpu_reg *) PIK_CLUS1_BASE)

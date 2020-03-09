@@ -11,8 +11,8 @@
 #ifndef MOD_SCMI_MANAGEMENT_H
 #define MOD_SCMI_MANAGEMENT_H
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules

@@ -11,6 +11,8 @@
 #ifndef INTERNAL_SCMI_BASE_H
 #define INTERNAL_SCMI_BASE_H
 
+#include <stdint.h>
+
 #define SCMI_PROTOCOL_ID_BASE      UINT32_C(0x10)
 #define SCMI_PROTOCOL_VERSION_BASE UINT32_C(0x10000)
 

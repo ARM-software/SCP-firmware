@@ -5,12 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stddef.h>
+#include "juno_id.h"
+#include "juno_scc.h"
+#include "v2m_sys_regs.h"
+
 #include <fwk_assert.h>
 #include <fwk_status.h>
-#include <juno_id.h>
-#include <juno_scc.h>
-#include <v2m_sys_regs.h>
+
+#include <stddef.h>
 
 /* SYS_ID Rev Field description */
 enum juno_id_board_rev {

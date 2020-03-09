@@ -8,9 +8,11 @@
 #ifndef SID_REG_H
 #define SID_REG_H
 
-#include <stdint.h>
-#include <fwk_macros.h>
 #include <mod_pcid.h>
+
+#include <fwk_macros.h>
+
+#include <stdint.h>
 
 struct sid_reg {
             uint8_t   RESERVED0[0x40 - 0];

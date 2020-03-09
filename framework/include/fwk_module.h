@@ -11,11 +11,12 @@
 #ifndef FWK_MODULE_H
 #define FWK_MODULE_H
 
-#include <stdbool.h>
-#include <stdint.h>
 #include <fwk_element.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupLibFramework Framework

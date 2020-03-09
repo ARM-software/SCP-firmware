@@ -5,19 +5,27 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-#include <fwk_assert.h>
-#include <fwk_id.h>
-#include <fwk_mm.h>
-#include <fwk_module.h>
-#include <fwk_multi_thread.h>
-#include <fwk_status.h>
+#include "juno_id.h"
+
 #include <mod_i2c.h>
 #include <mod_juno_xrp7724.h>
 #include <mod_psu.h>
 #include <mod_sensor.h>
 #include <mod_timer.h>
-#include <juno_id.h>
+
+#include <fwk_assert.h>
+#include <fwk_event.h>
+#include <fwk_id.h>
+#include <fwk_mm.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <fwk_multi_thread.h>
+#include <fwk_status.h>
+#include <fwk_thread.h>
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 /* Maximum required length for the I2C transmissions */
 #define TRANSMIT_DATA_MAX   3

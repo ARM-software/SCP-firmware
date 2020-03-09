@@ -6,12 +6,16 @@
  */
 
 #include <mod_psu.h>
+
 #include <fwk_assert.h>
 #include <fwk_event.h>
-#include <fwk_macros.h>
+#include <fwk_id.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <fwk_status.h>
 #include <fwk_thread.h>
+
 #include <string.h>
 
 enum mod_psu_state {

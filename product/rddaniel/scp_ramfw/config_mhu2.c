@@ -5,13 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "scp_css_mmap.h"
+#include "scp_rddaniel_irq.h"
+#include "scp_rddaniel_mhu.h"
+
+#include <mod_mhu2.h>
+
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
-#include <mod_mhu2.h>
-#include <scp_rddaniel_irq.h>
-#include <scp_css_mmap.h>
-#include <scp_rddaniel_mhu.h>
 
 static const struct fwk_element mhu_element_table[] = {
     [SCP_RDDANIEL_MHU_DEVICE_IDX_SCP_AP_S_CLUS0] = {

@@ -5,9 +5,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <i2c_api.h>
+
+#include <internal/i2c_depend.h>
+#include <internal/i2c_driver.h>
+
 #include <stdbool.h>
 #include <stdio.h>
-#include <i2c_api.h>
 
 #define FILE_GRP_ID DBG_DRV_I2C
 #define MASTER_CODE_VAL 0x04

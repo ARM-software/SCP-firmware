@@ -8,8 +8,9 @@
 #ifndef F_UART3_H
 #define F_UART3_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /* Normal mode registers */
 struct f_uart3_reg {

@@ -5,7 +5,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
+#include "juno_ppu.h"
+#include "juno_ppu_idx.h"
+#include "juno_utils.h"
+#include "scp_config.h"
+#include "system_mmap.h"
+
+#include <mod_juno_ppu.h>
+#include <mod_log.h>
+#include <mod_power_domain.h>
+#include <mod_system_power.h>
+#include <mod_timer.h>
+
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
@@ -13,18 +24,10 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <mod_juno_ppu.h>
-#include <mod_log.h>
-#include <mod_power_domain.h>
-#include <mod_system_power.h>
-#include <mod_timer.h>
-#include <juno_irq.h>
-#include <juno_power_domain.h>
-#include <juno_ppu.h>
-#include <juno_ppu_idx.h>
-#include <juno_utils.h>
-#include <scp_config.h>
-#include <system_mmap.h>
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #define PPU_SET_STATE_AND_WAIT_TIMEOUT_US   (100 * 1000)
 

@@ -8,22 +8,28 @@
  *     Juno PVT Sensors driver.
  */
 
+#include "juno_id.h"
+#include "juno_pvt.h"
+#include "pvt_sensor_calibration.h"
+#include "system_clock.h"
+
+#include <mod_juno_pvt.h>
+#include <mod_power_domain.h>
+#include <mod_sensor.h>
+
 #include <fwk_assert.h>
+#include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
+#include <fwk_status.h>
 #include <fwk_thread.h>
-#include <mod_juno_pvt.h>
-#include <mod_power_domain.h>
-#include <mod_sensor.h>
-#include <juno_id.h>
-#include <juno_irq.h>
-#include <juno_pvt.h>
-#include <pvt_sensor_calibration.h>
-#include <system_clock.h>
+
+#include <stdbool.h>
+#include <stddef.h>
 
 /* Location Identifier */
 #define PVTGROUP_GROUP_INFO_LOC                 UINT32_C(0x00000001)

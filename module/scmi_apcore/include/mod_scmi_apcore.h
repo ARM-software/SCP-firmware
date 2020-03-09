@@ -11,8 +11,8 @@
 #ifndef MOD_SCMI_APCORE_H
 #define MOD_SCMI_APCORE_H
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 /*!
  * \ingroup GroupModules Modules

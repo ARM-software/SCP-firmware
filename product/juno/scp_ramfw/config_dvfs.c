@@ -5,17 +5,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "config_dvfs.h"
+#include "config_psu.h"
+#include "juno_alarm_idx.h"
+#include "juno_clock.h"
+#include "juno_id.h"
+
+#include <mod_dvfs.h>
+
 #include <fwk_assert.h>
 #include <fwk_element.h>
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <config_dvfs.h>
-#include <config_psu.h>
-#include <juno_alarm_idx.h>
-#include <juno_clock.h>
-#include <juno_id.h>
-#include <mod_dvfs.h>
+#include <fwk_status.h>
+
+#include <stddef.h>
 
 /*
  * The power cost figures from this file are built using the dynamic power

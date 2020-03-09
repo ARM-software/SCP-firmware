@@ -8,10 +8,11 @@
 #ifndef FWK_INTERNAL_THREAD_H
 #define FWK_INTERNAL_THREAD_H
 
-#include <stddef.h>
 #include <fwk_event.h>
 #include <fwk_noreturn.h>
 #include <fwk_thread.h>
+
+#include <stddef.h>
 
 /*
  * \brief Initialize the thread framework component.

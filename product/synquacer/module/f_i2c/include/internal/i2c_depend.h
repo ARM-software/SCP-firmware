@@ -8,8 +8,9 @@
 #ifndef INTERNAL_I2C_DEPEND_H
 #define INTERNAL_I2C_DEPEND_H
 
-#include <stdint.h>
 #include <internal/i2c_driver.h>
+
+#include <stdint.h>
 
 typedef enum { I2C_EN_CH0, I2C_EN_CH1, I2C_EN_CH2 } I2C_EN_CH_t;
 

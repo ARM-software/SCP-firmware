@@ -8,17 +8,19 @@
  *     System Power Support.
  */
 
-#include <stdint.h>
+#include <mod_power_domain.h>
+#include <mod_system_power.h>
+
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
-#include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_log.h>
-#include <mod_system_power.h>
-#include <mod_power_domain.h>
+#include <fwk_status.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 /* SoC wakeup composite state */
 #define MOD_SYSTEM_POWER_SOC_WAKEUP_STATE \

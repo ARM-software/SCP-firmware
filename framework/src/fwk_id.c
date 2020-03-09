@@ -8,9 +8,13 @@
  *     Identifiers.
  */
 
-#include <stdio.h>
+#include <internal/fwk_id.h>
+
 #include <fwk_assert.h>
 #include <fwk_id.h>
+
+#include <stdint.h>
+#include <stdio.h>
 
 struct __fwk_id_fmt __fwk_id_str(fwk_id_t id)
 {

@@ -5,20 +5,26 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <string.h>
+#include "synquacer_ddr.h"
+
+#include <ddr_init.h>
+
+#include <internal/scmi.h>
+#include <internal/scmi_vendor_ext.h>
+
+#include <mod_log.h>
+#include <mod_scmi.h>
+
 #include <fwk_assert.h>
-#include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <mod_log.h>
-#include <mod_scmi.h>
-#include <ddr_init.h>
-#include <synquacer_ddr.h>
-#include <internal/scmi.h>
-#include <internal/scmi_vendor_ext.h>
+
+#include <stdbool.h>
+#include <stdint.h>
+#include <string.h>
 
 struct scmi_vendor_ext_ctx {
     const struct mod_scmi_from_protocol_api *scmi_api;

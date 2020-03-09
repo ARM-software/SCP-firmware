@@ -11,8 +11,9 @@
 #ifndef SOFTWARE_MMAP_H
 #define SOFTWARE_MMAP_H
 
+#include "system_mmap.h"
+
 #include <fwk_macros.h>
-#include <system_mmap.h>
 
 /*
  * The 4KiB AP/SCP Shared memory at the base of Trusted SRAM is used for several

@@ -5,15 +5,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <string.h>
 #include <fwk_assert.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_status.h>
 #include <fwk_test.h>
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
 
 #define SIZE_MEM            (1024 * 1024)
 #define ALLOC_NUM           5

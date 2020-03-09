@@ -5,14 +5,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
+#include "low_level_access.h"
+#include "synquacer_debug.h"
+#include "synquacer_mmap.h"
 
-#include <synquacer_debug.h>
-#include <synquacer_mmap.h>
-#include <low_level_access.h>
+#include <sysdef_option.h>
 
 #include <internal/nic400.h>
-#include <sysdef_option.h>
+
+#include <fwk_macros.h>
+
+#include <stdint.h>
 
 #define NIC_TOP_ADDR_SEC_REG (0x00000008)
 #define NIC_SEC_REG_OFFSET (0x04)

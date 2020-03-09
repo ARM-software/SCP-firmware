@@ -5,12 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "config_clock.h"
+#include "scp_system_mmap.h"
+
+#include <mod_dmc620.h>
+
 #include <fwk_element.h>
+#include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_dmc620.h>
-#include <scp_system_mmap.h>
-#include <config_clock.h>
 
 #define COL_BITS 2
 #define BANK_BITS 4

@@ -5,12 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <cmsis_compiler.h>
+#include "system_clock.h"
+
 #include <rtx_lib.c>
 #include <rtx_os.h>
-#include <system_clock.h>
+
+#include <fmw_cmsis.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 /*
  * Required by RTX to configure the SysTick timer.

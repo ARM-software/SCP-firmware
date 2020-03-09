@@ -13,6 +13,8 @@
 
 #include <fwk_macros.h>
 
+#include <stdint.h>
+
 struct pl011_reg {
     FWK_RW  uint16_t DR;
             uint16_t RESERVED0;

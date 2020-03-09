@@ -5,18 +5,21 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <internal/scmi.h>
+#include <internal/scmi_system_power.h>
+
+#include <mod_power_domain.h>
+#include <mod_scmi.h>
+#include <mod_scmi_system_power.h>
+
 #include <fwk_assert.h>
-#include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <internal/scmi.h>
-#include <internal/scmi_system_power.h>
-#include <mod_power_domain.h>
-#include <mod_scmi.h>
-#include <mod_scmi_system_power.h>
+
+#include <stddef.h>
 
 struct scmi_sys_power_ctx {
     const struct mod_scmi_system_power_config *config;

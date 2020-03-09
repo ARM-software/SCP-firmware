@@ -8,10 +8,12 @@
 #ifndef MOD_JUNO_PPU_H
 #define MOD_JUNO_PPU_H
 
-#include <stdint.h>
+#include <mod_power_domain.h>
+
 #include <fwk_id.h>
 #include <fwk_module_idx.h>
-#include <mod_power_domain.h>
+
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupJunoModule Juno Product Modules

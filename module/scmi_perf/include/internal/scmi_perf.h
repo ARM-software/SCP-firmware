@@ -11,6 +11,8 @@
 #ifndef INTERNAL_SCMI_PERF_H
 #define INTERNAL_SCMI_PERF_H
 
+#include <stdint.h>
+
 #define SCMI_PROTOCOL_ID_PERF      UINT32_C(0x13)
 #define SCMI_PROTOCOL_VERSION_PERF UINT32_C(0x10000)
 

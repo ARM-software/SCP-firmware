@@ -11,11 +11,16 @@
 #ifndef MOD_JUNO_DMC400_H
 #define MOD_JUNO_DMC400_H
 
-#include <stdint.h>
-#include <fwk_macros.h>
+#include "scp_config.h"
+
 #include <mod_log.h>
 #include <mod_timer.h>
-#include <scp_config.h>
+
+#include <fwk_id.h>
+#include <fwk_macros.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 /*!
  * \ingroup GroupJunoModule

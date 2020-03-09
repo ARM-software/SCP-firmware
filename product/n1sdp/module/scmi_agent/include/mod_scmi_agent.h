@@ -11,6 +11,10 @@
 #ifndef MOD_SCMI_AGENT_H
 #define MOD_SCMI_AGENT_H
 
+#include <fwk_id.h>
+
+#include <stdint.h>
+
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules
  * @{

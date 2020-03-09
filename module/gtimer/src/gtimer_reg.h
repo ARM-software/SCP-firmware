@@ -8,8 +8,9 @@
 #ifndef GTIMER_REG_H
 #define GTIMER_REG_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \brief Counter registers (CNTCONTROL)

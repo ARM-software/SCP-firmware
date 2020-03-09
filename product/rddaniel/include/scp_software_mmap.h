@@ -8,7 +8,8 @@
 #ifndef SCP_SOFTWARE_MMAP_H
 #define SCP_SOFTWARE_MMAP_H
 
-#include <scp_soc_mmap.h>
+#include "scp_soc_mmap.h"
+
 #include <fwk_macros.h>
 
 /* SCP ROM and RAM firmware size loaded on main memory */

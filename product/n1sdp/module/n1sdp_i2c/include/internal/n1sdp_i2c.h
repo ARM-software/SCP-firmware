@@ -13,6 +13,8 @@
 
 #include <fwk_macros.h>
 
+#include <stdint.h>
+
 struct i2c_reg {
     /* Control Register */
     FWK_RW  uint16_t CR;

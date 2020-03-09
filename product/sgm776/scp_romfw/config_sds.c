@@ -5,19 +5,26 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "clock_devices.h"
+#include "sgm776_mmap.h"
+#include "sgm776_pik.h"
+#include "sgm776_pik_scp.h"
+#include "sgm776_sds.h"
+#include "system_mmap.h"
+
+#include <mod_sds.h>
+#include <mod_sid.h>
+
 #include <fwk_assert.h>
-#include <stdint.h>
 #include <fwk_element.h>
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_sds.h>
-#include <mod_sid.h>
-#include <sgm776_mmap.h>
-#include <sgm776_sds.h>
-#include <sgm776_pik.h>
-#include <system_mmap.h>
-#include <clock_devices.h>
+#include <fwk_status.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 static const uint32_t version_packed = FWK_BUILD_VERSION;
 static struct sgm776_sds_platid platid;

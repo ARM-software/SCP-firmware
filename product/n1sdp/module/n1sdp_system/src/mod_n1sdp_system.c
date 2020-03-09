@@ -8,37 +8,47 @@
  *     N1SDP System Support.
  */
 
-#include <stdint.h>
-#include <string.h>
-#include <fmw_cmsis.h>
-#include <fwk_assert.h>
-#include <fwk_id.h>
-#include <fwk_interrupt.h>
-#include <fwk_macros.h>
-#include <fwk_mm.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <fwk_notification.h>
+#include "config_clock.h"
+#include "n1sdp_core.h"
+#include "n1sdp_pik_cpu.h"
+#include "n1sdp_pik_debug.h"
+#include "n1sdp_pik_scp.h"
+#include "n1sdp_scp_irq.h"
+#include "n1sdp_scp_mmap.h"
+#include "n1sdp_scp_pik.h"
+#include "n1sdp_scp_scmi.h"
+#include "n1sdp_sds.h"
+
+#include <internal/n1sdp_scp2pcc.h>
+
 #include <mod_clock.h>
-#include <mod_cmn600.h>
+#include <mod_log.h>
 #include <mod_n1sdp_c2c_i2c.h>
 #include <mod_n1sdp_dmc620.h>
 #include <mod_n1sdp_flash.h>
 #include <mod_n1sdp_scp2pcc.h>
 #include <mod_n1sdp_system.h>
-#include <mod_log.h>
 #include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
 #include <mod_scmi.h>
 #include <mod_sds.h>
 #include <mod_system_power.h>
-#include <n1sdp_core.h>
-#include <n1sdp_scp_pik.h>
-#include <n1sdp_scp_irq.h>
-#include <n1sdp_scp_mmap.h>
-#include <n1sdp_scp_scmi.h>
-#include <n1sdp_sds.h>
-#include <config_clock.h>
+
+#include <fwk_assert.h>
+#include <fwk_event.h>
+#include <fwk_id.h>
+#include <fwk_interrupt.h>
+#include <fwk_macros.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <fwk_notification.h>
+#include <fwk_status.h>
+
+#include <fmw_cmsis.h>
+
+#include <stdbool.h>
+#include <stdint.h>
+#include <string.h>
 
 /*
  * Platform information structure used by BL31

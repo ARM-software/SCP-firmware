@@ -8,9 +8,11 @@
 #ifndef JUNO_SOC_CLOCK_RAM_PLL_H
 #define JUNO_SOC_CLOCK_RAM_PLL_H
 
-#include <stdint.h>
+#include "juno_scc.h"
+
 #include <mod_juno_soc_clock_ram.h>
-#include <juno_scc.h>
+
+#include <stdint.h>
 
 void juno_soc_clock_ram_pll_init(void);
 

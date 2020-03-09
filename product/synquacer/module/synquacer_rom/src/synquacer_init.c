@@ -5,10 +5,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-#include <synquacer_mmap.h>
-#include <low_level_access.h>
+#include "low_level_access.h"
+#include "pik_scp.h"
+#include "pik_system.h"
+#include "synquacer_mmap.h"
+
 #include <ppu_v0.h>
+
+#include <fwk_macros.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 void fw_clk_init(void);
 void fw_sysoc_init(void);

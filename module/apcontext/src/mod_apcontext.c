@@ -5,17 +5,19 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <string.h>
+#include <mod_apcontext.h>
+#include <mod_clock.h>
+#include <mod_log.h>
+
 #include <fwk_assert.h>
+#include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
-#include <mod_apcontext.h>
-#include <mod_clock.h>
-#include <mod_log.h>
-#include <mod_power_domain.h>
+
+#include <string.h>
 
 #define MODULE_NAME "[APContext]"
 

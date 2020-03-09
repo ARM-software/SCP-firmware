@@ -5,17 +5,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_assert.h>
-#include <fwk_mm.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <fwk_notification.h>
 #include <cmn_rhodes.h>
+
+#include <internal/cmn_rhodes_ctx.h>
+
 #include <mod_clock.h>
 #include <mod_cmn_rhodes.h>
 #include <mod_log.h>
 #include <mod_ppu_v1.h>
-#include <internal/cmn_rhodes_ctx.h>
+
+#include <fwk_assert.h>
+#include <fwk_event.h>
+#include <fwk_id.h>
+#include <fwk_mm.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <fwk_notification.h>
+#include <fwk_status.h>
 
 #define MOD_NAME "[CMN_RHODES] "
 

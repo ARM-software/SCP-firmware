@@ -5,13 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <cli.h>
+#include <cli_platform.h>
+
+#include <mod_debugger_cli.h>
+
 #include <fwk_assert.h>
 #include <fwk_module.h>
 #include <fwk_status.h>
 #include <fwk_thread.h>
-#include <mod_debugger_cli.h>
-#include <cli.h>
-#include <cli_platform.h>
 
 enum debugger_cli_internal_event_idx {
     DEBUGGER_CLI_INTERNAL_EVENT_IDX_ENTER_DEBUGGER,

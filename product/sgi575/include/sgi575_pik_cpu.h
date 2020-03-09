@@ -8,8 +8,9 @@
 #ifndef SGI575_PIK_CPU_H
 #define SGI575_PIK_CPU_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \brief PE Static Configuration register definitions

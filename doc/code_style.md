@@ -47,13 +47,20 @@ SPDX-License-Identifier: BSD-3-Clause
 
 Inclusions
 ----------
-Header file inclusions should follow a consistent sequence, defined as:
+Header file inclusions should follow a consistent sequence, defined by scope
+from local to global:
 
-- Standard library (stdbool, stdint, etc)
-- Framework components (fwk_<component>.h)
-- Modules
+- Private firmware headers (`"config_scmi.h"`)
+- Public non-project headers (`<cmsis.h>`)
+- Private module headers (`<internal/scmi.h>)
+- Public module headers (`<mod_scmi.h>)
+- Public framework headers (`<fwk_list.h>`)
+- Public architecture headers (`<arch_exceptions.h>`)
+- Public firmware headers (`<fmw_cmsis.h>`)
+- Public standard library headers (`<stddef.h>`)
 
-For each group, order the individual headers alphabetically.
+For each group, order the individual headers alphabetically and separate the
+blocks logically.
 
 Header files (`.h` files) should include the headers needed for them to compile
 and only these ones.

@@ -11,9 +11,11 @@
 #ifndef XPRESSRICH3_H
 #define XPRESSRICH3_H
 
-#include <stdint.h>
+#include "juno_mmap.h"
+
 #include <fwk_macros.h>
-#include <juno_mmap.h>
+
+#include <stdint.h>
 
 /* Controller Core Registers (ARM defined) */
 struct xpressrich3_core_reg {

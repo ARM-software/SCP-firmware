@@ -5,17 +5,22 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "low_level_access.h"
+#include "synquacer_debug.h"
+#include "synquacer_mmap.h"
 
-#include <fwk_status.h>
-
-#include <synquacer_debug.h>
-#include <synquacer_mmap.h>
-#include <low_level_access.h>
+#include <cmsis_os2.h>
 
 #include <internal/reset.h>
 #include <internal/sysoc.h>
+
+#include <fwk_assert.h>
+#include <fwk_macros.h>
+#include <fwk_status.h>
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #define MAIN_BUS_RESET_BIT (0x1)
 

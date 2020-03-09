@@ -8,29 +8,37 @@
  *     RD-Daniel System Support.
  */
 
-#include <stdint.h>
-#include <fmw_cmsis.h>
+#include "clock_soc.h"
+#include "rddaniel_core.h"
+#include "rddaniel_scmi.h"
+#include "rddaniel_sds.h"
+#include "scp_css_mmap.h"
+#include "scp_pik.h"
+#include "scp_rddaniel_irq.h"
+
+#include <mod_clock.h>
+#include <mod_log.h>
+#include <mod_power_domain.h>
+#include <mod_ppu_v1.h>
+#include <mod_rddaniel_system.h>
+#include <mod_scmi.h>
+#include <mod_sds.h>
+#include <mod_system_power.h>
+
 #include <fwk_assert.h>
+#include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
-#include <mod_clock.h>
-#include <mod_rddaniel_system.h>
-#include <mod_log.h>
-#include <mod_scmi.h>
-#include <mod_sds.h>
-#include <mod_system_power.h>
-#include <mod_power_domain.h>
-#include <mod_ppu_v1.h>
-#include <clock_soc.h>
-#include <rddaniel_core.h>
-#include <rddaniel_sds.h>
-#include <rddaniel_scmi.h>
-#include <scp_rddaniel_irq.h>
-#include <scp_pik.h>
+#include <fwk_status.h>
+
+#include <fmw_cmsis.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 /* SCMI services required to enable the messaging stack */
 static unsigned int scmi_notification_table[] = {

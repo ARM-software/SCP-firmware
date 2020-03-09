@@ -8,6 +8,8 @@
 #ifndef MOD_CMN600_H
 #define MOD_CMN600_H
 
+#include <fwk_id.h>
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>

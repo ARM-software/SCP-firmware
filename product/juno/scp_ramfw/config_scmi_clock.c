@@ -5,14 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-#include <fwk_element.h>
+#include "juno_clock.h"
+#include "juno_scmi.h"
+
+#include <mod_scmi_clock.h>
+
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_scmi_clock.h>
-#include <juno_scmi.h>
-#include <juno_clock.h>
 
 static const struct mod_scmi_clock_device agent_device_table_ospm[] = {
     {

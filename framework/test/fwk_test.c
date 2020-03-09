@@ -4,13 +4,14 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-#include <setjmp.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <fwk_noreturn.h>
 #include <fwk_status.h>
 #include <fwk_test.h>
+
+#include <setjmp.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 /* Test information provided by the test suite */
 extern struct fwk_test_suite_desc test_suite;

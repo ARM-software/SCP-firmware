@@ -10,7 +10,7 @@
 #define MOD_SCMI_POWER_DOMAIN_H
 
 #if BUILD_HAS_MOD_DEBUG
-#include <fwk_id.h>
+#    include <fwk_id.h>
 
 /*!
  * \ingroup GroupModules Modules

@@ -5,8 +5,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_id.h>
 #include <fwk_module.h>
-#include <mod_clock.h>
 
 const struct fwk_module_config config_clock = { 0 };

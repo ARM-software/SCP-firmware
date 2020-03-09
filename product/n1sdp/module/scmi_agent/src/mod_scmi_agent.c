@@ -8,16 +8,20 @@
  *     SCMI Agent Support.
  */
 
-#include <stdint.h>
-#include <fwk_id.h>
-#include <fwk_macros.h>
-#include <fwk_mm.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <fwk_thread.h>
 #include <mod_log.h>
 #include <mod_scmi_agent.h>
 #include <mod_smt.h>
+
+#include <fwk_event.h>
+#include <fwk_id.h>
+#include <fwk_mm.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <fwk_status.h>
+#include <fwk_thread.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 /* SCMI agent context */
 struct scmi_agent_ctx {

@@ -6,6 +6,7 @@
  */
 
 #include <mod_debugger_cli.h>
+
 #include <fwk_module_idx.h>
 
 /*

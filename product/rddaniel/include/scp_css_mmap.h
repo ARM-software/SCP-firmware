@@ -8,7 +8,7 @@
 #ifndef SCP_CSS_MMAP_H
 #define SCP_CSS_MMAP_H
 
-#include <scp_mmap.h>
+#include "scp_mmap.h"
 
 #define SCP_CMN_RHODES_BASE          (SCP_SYSTEM_ACCESS_PORT0_BASE + 0x10000000)
 

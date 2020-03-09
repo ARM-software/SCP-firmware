@@ -8,9 +8,10 @@
 #ifndef MOD_PCID_H
 #define MOD_PCID_H
 
+#include <fwk_macros.h>
+
 #include <stdbool.h>
 #include <stdint.h>
-#include <fwk_macros.h>
 
 /*!
  * \addtogroup GroupModules Modules

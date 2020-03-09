@@ -5,15 +5,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "synquacer_irq.h"
+#include "synquacer_mmap.h"
+#include "system_clock.h"
+
+#include <mod_gtimer.h>
+#include <mod_timer.h>
+
+#include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_clock.h>
-#include <mod_gtimer.h>
-#include <mod_timer.h>
-#include <synquacer_irq.h>
-#include <synquacer_mmap.h>
-#include <system_clock.h>
 
 /*
  * Generic timer driver config

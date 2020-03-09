@@ -5,16 +5,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "juno_irq.h"
+#include "juno_ppu_idx.h"
+#include "juno_utils.h"
+#include "juno_wdog_rom.h"
+#include "scp_config.h"
+
+#include <mod_juno_ppu.h>
+#include <mod_power_domain.h>
+
 #include <fwk_assert.h>
+#include <fwk_id.h>
 #include <fwk_interrupt.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <mod_juno_ppu.h>
-#include <juno_irq.h>
-#include <juno_ppu_idx.h>
-#include <juno_utils.h>
-#include <juno_wdog_rom.h>
-#include <scp_config.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 /* Platform default dividers for debug clocks */
 #define JUNO_DEBUG_ROM_DIVIDER_ATCLK        16

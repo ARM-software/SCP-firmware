@@ -1,4 +1,4 @@
- /*
+/*
  * Arm SCP/MCP Software
  * Copyright (c) 2015-2020, Arm Limited and Contributors. All rights reserved.
  *
@@ -10,9 +10,10 @@
 #ifndef MOD_SGM775_DDR_PHY500_H
 #define MOD_SGM775_DDR_PHY500_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
+
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupSGM775Module SGM775 Product Modules

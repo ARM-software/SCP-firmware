@@ -8,8 +8,8 @@
 #ifndef SYNQUACER_MMAP_H
 #define SYNQUACER_MMAP_H
 
-#include <synquacer_common.h>
-#include <synquacer_pik.h>
+#include "synquacer_common.h"
+#include "synquacer_pik.h"
 
 #define PERIPH_BASE UINT32_C(0x44000000)
 #define POWER_PERIPH_BASE UINT32_C(0x50000000)

@@ -8,6 +8,9 @@
 #ifndef MOD_SYSTEM_INFO_H
 #define MOD_SYSTEM_INFO_H
 
+#include <fwk_id.h>
+
+#include <stdbool.h>
 #include <stdint.h>
 
 /*!

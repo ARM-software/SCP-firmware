@@ -5,12 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <checkpoint.h>
+#include <cli.h>
+
+#include <fwk_status.h>
+
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <checkpoint.h>
-#include <fwk_status.h>
-#include <cli.h>
 
 checkpoint_st checkpoint_table[CHECKPOINT_NUM] = {0};
 

@@ -9,7 +9,7 @@
 #define FWK_HOST_H
 
 #ifdef BUILD_HOST
-#include <stdio.h>
+#    include <stdio.h>
 
 /*!
  * \brief Print a message using the host's standard output.

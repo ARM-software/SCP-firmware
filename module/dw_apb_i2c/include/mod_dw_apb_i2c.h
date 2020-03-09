@@ -11,9 +11,10 @@
 #ifndef MOD_DW_APB_I2C_H
 #define MOD_DW_APB_I2C_H
 
-#include <stdint.h>
 #include <fwk_id.h>
 #include <fwk_module_idx.h>
+
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupModules Modules

@@ -5,12 +5,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_element.h>
+#include "scp_sgi575_pik.h"
+#include "sgi575_core.h"
+#include "sgi575_pik_cpu.h"
+
+#include <mod_scmi_apcore.h>
+
 #include <fwk_macros.h>
 #include <fwk_module.h>
-#include <mod_scmi_apcore.h>
-#include <scp_sgi575_pik.h>
-#include <sgi575_core.h>
+
+#include <stdint.h>
 
 static const struct mod_scmi_apcore_reset_register_group
     reset_reg_group_table[] = {

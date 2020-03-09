@@ -8,18 +8,22 @@
  *      N1SDP Remote Power Domain (PD) management driver.
  */
 
-#include <stddef.h>
-#include <stdint.h>
+#include "n1sdp_core.h"
+
+#include <mod_log.h>
+#include <mod_n1sdp_c2c_i2c.h>
+#include <mod_n1sdp_remote_pd.h>
+#include <mod_power_domain.h>
+
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_log.h>
-#include <mod_n1sdp_c2c_i2c.h>
-#include <mod_n1sdp_remote_pd.h>
-#include <mod_power_domain.h>
-#include <n1sdp_core.h>
+#include <fwk_status.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 /* N1SDP remote PD driver device context */
 struct n1sdp_remote_pd_device_ctx {

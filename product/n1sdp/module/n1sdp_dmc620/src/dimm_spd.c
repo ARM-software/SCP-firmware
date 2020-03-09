@@ -5,15 +5,21 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <dimm_spd.h>
+
+#include <mod_log.h>
+#include <mod_n1sdp_dmc620.h>
+#include <mod_n1sdp_i2c.h>
+
+#include <fwk_assert.h>
+#include <fwk_id.h>
+#include <fwk_macros.h>
+#include <fwk_module_idx.h>
+#include <fwk_status.h>
+
+#include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-#include <fwk_assert.h>
-#include <fwk_macros.h>
-#include <fwk_id.h>
-#include <fwk_module_idx.h>
-#include <mod_log.h>
-#include <mod_n1sdp_i2c.h>
-#include <dimm_spd.h>
 
 static bool multi_rank;
 static float t_refi = .0000078;

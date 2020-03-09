@@ -8,10 +8,11 @@
  *     Interrupt management.
  */
 
-#include <stdbool.h>
-#include <stdint.h>
 #include <fwk_arch.h>
 #include <fwk_status.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 static int global_enable(void)
 {

@@ -8,8 +8,9 @@
 #ifndef MMU500_H
 #define MMU500_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 #define SMMU_NUMSMRG 16
 #define SMMU_NUMCB 8

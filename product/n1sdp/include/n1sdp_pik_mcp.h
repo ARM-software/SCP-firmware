@@ -11,8 +11,9 @@
 #ifndef N1SDP_PIK_MCP_H
 #define N1SDP_PIK_MCP_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*!
  * \brief MCP PIK register definitions

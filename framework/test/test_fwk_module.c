@@ -4,13 +4,15 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-#include <stdlib.h>
-#include <string.h>
+#include <internal/fwk_module.h>
+
 #include <fwk_assert.h>
 #include <fwk_macros.h>
 #include <fwk_status.h>
 #include <fwk_test.h>
-#include <internal/fwk_module.h>
+
+#include <stdlib.h>
+#include <string.h>
 
 #define MODULE0_IDX        0
 #define MODULE1_IDX        1

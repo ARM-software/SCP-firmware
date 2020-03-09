@@ -8,11 +8,12 @@
  *     Memory initialization.
  */
 
-#include <stdint.h>
 #include <fwk_arch.h>
 #include <fwk_assert.h>
-#include <fwk_macros.h>
 #include <fwk_status.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 int arm_mm_init(struct fwk_arch_mm_data *data)
 {

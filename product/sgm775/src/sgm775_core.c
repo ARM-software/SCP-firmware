@@ -5,8 +5,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <sgm775_pik.h>
-#include <sgm775_core.h>
+#include "sgm775_core.h"
+#include "sgm775_pik.h"
+#include "sgm775_pik_cpu.h"
 
 unsigned int sgm775_core_get_count(void)
 {

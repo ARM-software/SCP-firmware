@@ -11,9 +11,11 @@
 #ifndef JUNO_WDOG_H
 #define JUNO_WDOG_H
 
-#include <stdint.h>
+#include "system_mmap.h"
+
 #include <fwk_macros.h>
-#include <system_mmap.h>
+
+#include <stdint.h>
 
 struct sp805_reg {
     FWK_RW  uint32_t    LOAD;

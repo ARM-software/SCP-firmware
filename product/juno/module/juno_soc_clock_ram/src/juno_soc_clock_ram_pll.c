@@ -8,14 +8,17 @@
  *     Clock driver for the big/little cluster and GPU clocks of the Juno SoC
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdlib.h>
+#include "juno_scc.h"
+#include "juno_soc_clock_ram_pll.h"
+#include "scp_config.h"
+
+#include <mod_juno_soc_clock_ram.h>
+
 #include <fwk_assert.h>
 #include <fwk_status.h>
-#include <juno_scc.h>
-#include <juno_soc_clock_ram_pll.h>
-#include <scp_config.h>
+
+#include <stdint.h>
+#include <stdlib.h>
 
 /*
  * Static helper functions

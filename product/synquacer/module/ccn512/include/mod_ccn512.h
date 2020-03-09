@@ -8,10 +8,12 @@
 #ifndef MOD_CCN512_H
 #define MOD_CCN512_H
 
-#include <stdint.h>
+#include <internal/ccn512.h>
+
 #include <fwk_id.h>
 #include <fwk_macros.h>
-#include <internal/ccn512.h>
+
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupSYNQUACERModule SYNQUACER Product Modules

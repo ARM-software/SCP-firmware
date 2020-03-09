@@ -8,21 +8,23 @@
  *     N1SDP MCP System Support.
  */
 
-#include <stdint.h>
-#include <fwk_id.h>
-#include <fwk_macros.h>
-#include <fwk_mm.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <fwk_thread.h>
+#include "config_clock.h"
+
 #include <mod_clock.h>
-#include <mod_n1sdp_mcp_system.h>
 #include <mod_log.h>
+#include <mod_n1sdp_mcp_system.h>
 #include <mod_pik_clock.h>
 #include <mod_power_domain.h>
 #include <mod_scmi_agent.h>
-#include <n1sdp_mcp_pik.h>
-#include <config_clock.h>
+
+#include <fwk_event.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <fwk_status.h>
+#include <fwk_thread.h>
+
+#include <stdint.h>
 
 /* Module context */
 struct n1sdp_mcp_system_ctx {

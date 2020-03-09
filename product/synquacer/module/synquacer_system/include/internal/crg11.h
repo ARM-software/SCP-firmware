@@ -8,10 +8,12 @@
 #ifndef INTERNAL_CRG11_H
 #define INTERNAL_CRG11_H
 
+#include "synquacer_mmap.h"
+
+#include <cmsis_os2.h>
+
 #include <stdbool.h>
 #include <stdint.h>
-#include <synquacer_mmap.h>
-#include <cmsis_os2.h>
 
 /* CRG11 is only used to reboot system */
 #define CRG11_CRSWR(crg11_top_reg_addr) (crg11_top_reg_addr + 0x0024U)

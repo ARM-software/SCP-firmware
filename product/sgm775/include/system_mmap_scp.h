@@ -13,7 +13,7 @@
 #ifndef SYSTEM_MMAP_SCP_H
 #define SYSTEM_MMAP_SCP_H
 
-#include <sgm775_mmap_scp.h>
+#include "sgm775_mmap_scp.h"
 
 #define SCP_ROM_SIZE  (64 * 1024)
 #define SCP_RAM_SIZE  (128 * 1024)

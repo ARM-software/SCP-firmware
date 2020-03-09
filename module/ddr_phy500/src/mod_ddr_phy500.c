@@ -8,21 +8,24 @@
  *     DDR-PHY500 driver
  */
 
-#include <fwk_assert.h>
-#include <fwk_id.h>
-#include <fwk_mm.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <fwk_status.h>
 #include <mod_ddr_phy500.h>
+#include <mod_log.h>
 
 #ifdef BUILD_HAS_MOD_DMC500
-    #include <mod_dmc500.h>
+#    include <mod_dmc500.h>
 #endif
 
 #ifdef BUILD_HAS_MOD_DMC620
-    #include <mod_dmc620.h>
+#    include <mod_dmc620.h>
 #endif
+
+#include <fwk_assert.h>
+#include <fwk_id.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+#include <fwk_status.h>
+
+#include <stddef.h>
 
 static struct mod_log_api *log_api;
 

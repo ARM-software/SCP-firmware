@@ -11,8 +11,9 @@
 #ifndef INTERNAL_N1SDP_DDR_PHY_H
 #define INTERNAL_N1SDP_DDR_PHY_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 /*
  * N1SDP DDR PHY register definitions.

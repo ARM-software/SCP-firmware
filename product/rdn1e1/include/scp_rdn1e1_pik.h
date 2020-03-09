@@ -8,10 +8,10 @@
 #ifndef SCP_RDN1E1_PIK_H
 #define SCP_RDN1E1_PIK_H
 
-#include <scp_rdn1e1_mmap.h>
-#include <rdn1e1_pik_cpu.h>
-#include <rdn1e1_pik_scp.h>
-#include <rdn1e1_pik_system.h>
+#include "rdn1e1_pik_cpu.h"
+#include "rdn1e1_pik_scp.h"
+#include "rdn1e1_pik_system.h"
+#include "scp_rdn1e1_mmap.h"
 
 #define PIK_CLUSTER(IDX) ((struct pik_cpu_reg *) SCP_PIK_CLUSTER_BASE(IDX))
 #define PIK_SCP          ((struct pik_scp_reg *) SCP_PIK_SCP_BASE)

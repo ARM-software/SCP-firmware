@@ -8,20 +8,23 @@
  *     SCMI CCIX_CONFIG management protocol support.
  */
 
-#include <string.h>
+#include <internal/mod_scmi_ccix_config.h>
+#include <internal/scmi.h>
+
+#include <mod_cmn600.h>
+#include <mod_log.h>
+#include <mod_n1sdp_pcie.h>
+#include <mod_scmi.h>
+
 #include <fwk_assert.h>
-#include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <internal/scmi.h>
-#include <internal/mod_scmi_ccix_config.h>
-#include <mod_n1sdp_pcie.h>
-#include <mod_scmi.h>
-#include <mod_cmn600.h>
-#include <mod_log.h>
+
+#include <stdbool.h>
+#include <string.h>
 
 struct scmi_ccix_config_ctx {
     /* scmi module api */

@@ -11,8 +11,9 @@
 #ifndef JUNO_MMAP_H
 #define JUNO_MMAP_H
 
+#include "system_mmap.h"
+
 #include <stdint.h>
-#include <system_mmap.h>
 
 #define I2C_BASE                    (VENDOR_EXTENSION_BASE + 0x00000000)
 #define PVT_AON_BASE                (VENDOR_EXTENSION_BASE + 0x00001000)

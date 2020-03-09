@@ -11,13 +11,14 @@
 #ifndef INTERNAL_CMN600_CTX_H
 #define INTERNAL_CMN600_CTX_H
 
-#include <stdbool.h>
-#include <stdint.h>
+#include <cmn600.h>
+
 #include <mod_cmn600.h>
 #include <mod_log.h>
 #include <mod_timer.h>
-#include <cmn600.h>
 
+#include <stdbool.h>
+#include <stdint.h>
 
 /* External nodes that require RN-SAM mapping during run-time */
 struct external_rnsam_tuple {

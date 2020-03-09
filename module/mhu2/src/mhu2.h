@@ -8,8 +8,9 @@
 #ifndef MHU2_H
 #define MHU2_H
 
-#include <stdint.h>
 #include <fwk_macros.h>
+
+#include <stdint.h>
 
 #define CHANNEL_MAX 124
 

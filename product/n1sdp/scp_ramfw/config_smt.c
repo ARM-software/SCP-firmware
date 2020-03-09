@@ -5,18 +5,19 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
+#include "config_power_domain.h"
+#include "n1sdp_core.h"
+#include "n1sdp_scp_mhu.h"
+#include "n1sdp_scp_mmap.h"
+#include "n1sdp_scp_scmi.h"
+#include "n1sdp_scp_software_mmap.h"
+
+#include <mod_smt.h>
+
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_smt.h>
-#include <n1sdp_core.h>
-#include <n1sdp_scp_mhu.h>
-#include <n1sdp_scp_mmap.h>
-#include <n1sdp_scp_scmi.h>
-#include <n1sdp_scp_software_mmap.h>
-#include <config_power_domain.h>
 
 static const struct fwk_element smt_element_table[] = {
     [SCP_N1SDP_SCMI_SERVICE_IDX_PSCI] = {

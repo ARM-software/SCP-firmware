@@ -11,8 +11,9 @@
 #ifndef MOD_JUNO_DEBUG_H
 #define MOD_JUNO_DEBUG_H
 
-#include <stdint.h>
 #include <fwk_id.h>
+
+#include <stdint.h>
 
 /*!
  * \brief Element-specific clock configuration.

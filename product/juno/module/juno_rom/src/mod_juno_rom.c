@@ -5,13 +5,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <juno_debug_rom.h>
-#include <juno_nic400.h>
-#include <juno_ppu_idx.h>
-#include <juno_scc.h>
-#include <juno_utils.h>
-#include <juno_wdog_rom.h>
-#include <scp_config.h>
+#include "juno_debug_rom.h"
+#include "juno_nic400.h"
+#include "juno_ppu_idx.h"
+#include "juno_scc.h"
+#include "juno_utils.h"
+#include "juno_wdog_rom.h"
+#include "scp_config.h"
 
 #include <mod_bootloader.h>
 #include <mod_juno_ppu.h>
@@ -20,13 +20,16 @@
 #include <mod_power_domain.h>
 
 #include <fwk_assert.h>
+#include <fwk_event.h>
 #include <fwk_id.h>
+#include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
 #include <fwk_thread.h>
 
+#include <stdbool.h>
 #include <string.h>
 
 /* Values for cluster configuration */

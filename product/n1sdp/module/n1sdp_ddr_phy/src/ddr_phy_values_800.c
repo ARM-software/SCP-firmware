@@ -8,11 +8,16 @@
  *     N1SDP DDR-PHY register value configuration for 800MHz speed.
  */
 
-#include <stddef.h>
-#include <fwk_assert.h>
-#include <mod_n1sdp_dmc620.h>
 #include <n1sdp_ddr_phy_values.h>
+
 #include <internal/n1sdp_ddr_phy.h>
+
+#include <mod_n1sdp_dmc620.h>
+
+#include <fwk_assert.h>
+
+#include <stddef.h>
+#include <stdint.h>
 
 static uint8_t PHY_WRITE_PATH_LAT_ADD_1600[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 static uint16_t PHY_WRLVL_DELAY_PERIOD_THRESHOLD_1600[9] = {

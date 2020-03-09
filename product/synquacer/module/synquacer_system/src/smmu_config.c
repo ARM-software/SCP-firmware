@@ -5,14 +5,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdint.h>
-#include <string.h>
-
-#include <synquacer_config.h>
-#include <synquacer_mmap.h>
-#include <mmu500.h>
+#include "mmu500.h"
+#include "synquacer_config.h"
+#include "synquacer_debug.h"
+#include "synquacer_mmap.h"
 
 #include <internal/smmu_wrapper.h>
+
+#include <stdint.h>
+#include <string.h>
 
 typedef struct {
     uint64_t desc[0x1000 / 8];

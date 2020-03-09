@@ -10,6 +10,8 @@
 
 #include <mod_sds.h>
 
+#include <stdint.h>
+
 /*
  * Structure identifiers.
  */

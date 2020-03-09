@@ -5,20 +5,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <stdbool.h>
+#include "config_clock.h"
+#include "rdn1e1_pik_scp.h"
+#include "rdn1e1_sds.h"
+#include "scp_rdn1e1_pik.h"
+#include "scp_software_mmap.h"
+
+#include <mod_sds.h>
+
 #include <fwk_assert.h>
 #include <fwk_element.h>
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_sds.h>
-#include <mod_sid.h>
-#include <rdn1e1_sds.h>
-#include <scp_rdn1e1_mmap.h>
-#include <scp_rdn1e1_pik.h>
-#include <scp_software_mmap.h>
-#include <scp_system_mmap.h>
-#include <config_clock.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 static const uint32_t version_packed = FWK_BUILD_VERSION;
 static const uint32_t feature_flags = 0x00000000;

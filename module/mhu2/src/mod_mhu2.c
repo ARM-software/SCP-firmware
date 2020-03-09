@@ -8,8 +8,11 @@
  *      Message Handling Unit (MHU) v2 Device Driver.
  */
 
-#include <stddef.h>
-#include <stdint.h>
+#include <mhu2.h>
+
+#include <mod_mhu2.h>
+#include <mod_smt.h>
+
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
@@ -17,9 +20,10 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <mod_mhu2.h>
-#include <mhu2.h>
-#include <mod_smt.h>
+
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #define MHU_SLOT_COUNT_MAX 32
 

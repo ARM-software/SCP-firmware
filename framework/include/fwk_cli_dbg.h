@@ -20,7 +20,7 @@
  */
 
 #if defined(BUILD_HAS_DEBUGGER)
-#include <cli.h>
+#    include <cli.h>
 
 /*!
  * \brief Define the CLI Debugger function

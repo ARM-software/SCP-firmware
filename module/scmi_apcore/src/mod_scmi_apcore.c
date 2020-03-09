@@ -8,17 +8,21 @@
  *     SCMI Core Configuration Protocol Support.
  */
 
-#include <stdint.h>
+#include <internal/scmi.h>
+#include <internal/scmi_apcore.h>
+
+#include <mod_scmi.h>
+#include <mod_scmi_apcore.h>
+
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <internal/scmi.h>
-#include <internal/scmi_apcore.h>
-#include <mod_scmi.h>
-#include <mod_scmi_apcore.h>
+
+#include <stdbool.h>
+#include <stdint.h>
 
 struct scmi_apcore_ctx {
     /* Module Configuration */
