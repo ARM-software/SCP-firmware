@@ -739,11 +739,11 @@ static int pvt_process_event(const struct fwk_event *event,
                 if (status != FWK_SUCCESS)
                     return FWK_E_PANIC;
 
+                pd_resp_params->status = FWK_SUCCESS;
+
                 status = fwk_thread_put_event(&resp_notif);
                 if (status != FWK_SUCCESS)
                     return FWK_E_PANIC;
-
-                pd_resp_params->status = FWK_SUCCESS;
             }
 
             return FWK_SUCCESS;
