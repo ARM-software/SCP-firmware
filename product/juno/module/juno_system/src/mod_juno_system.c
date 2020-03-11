@@ -253,7 +253,7 @@ static int juno_system_process_notification(const struct fwk_event *event,
 {
     static unsigned int scmi_notification_count = 0;
     static bool sds_notification_received = false;
-    int status = FWK_E_PARAM;
+    int status = FWK_SUCCESS;
 
     struct mod_pd_power_state_pre_transition_notification_params
         *state_pre_params;
@@ -261,8 +261,11 @@ static int juno_system_process_notification(const struct fwk_event *event,
     struct mod_pd_power_state_pre_transition_notification_resp_params
         *pd_resp_params;
 
-    if (!fwk_expect(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE)))
+    if (!fwk_expect(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE))) {
+        status = FWK_E_PARAM;
+
         goto exit;
+    }
 
     if (fwk_id_is_equal(event->id, mod_scmi_notification_id_initialized))
         scmi_notification_count++;
@@ -278,37 +281,26 @@ static int juno_system_process_notification(const struct fwk_event *event,
         (struct mod_pd_power_state_pre_transition_notification_resp_params *)
             resp_event->params;
 
-        if (state_pre_params->target_state != MOD_PD_STATE_ON) {
-            status = FWK_SUCCESS;
-            pd_resp_params->status = status;
-            goto exit;
-        }
-
         if (fwk_id_is_equal(event->source_id, gpu_pd_id)) {
-            /* Power domain is about to be turned ON, turn on VGPU first */
-            status = process_gpu_power_state(event, resp_event, true);
-        }
+            if (state_pre_params->target_state == MOD_PD_STATE_ON)
+                status = process_gpu_power_state(event, resp_event, true);
+        } else
+            status = FWK_E_PARAM;
 
         pd_resp_params->status = status;
-        goto exit;
-
     } else if (fwk_id_is_equal(
                    event->id, mod_pd_notification_id_power_state_transition)) {
         params = (struct mod_pd_power_state_transition_notification_params *)
             event->params;
 
-        if (params->state != MOD_PD_STATE_OFF) {
-            status = FWK_SUCCESS;
-            goto exit;
-        }
-
         if (fwk_id_is_equal(event->source_id, gpu_pd_id)) {
-            /* Power domain has been turned OFF, turn off VGPU */
-            status = process_gpu_power_state(event, resp_event, false);
-        }
-
-        goto exit;
+            if (params->state == MOD_PD_STATE_OFF)
+                status = process_gpu_power_state(event, resp_event, false);
+        } else
+            status = FWK_E_PARAM;
     } else {
+        status = FWK_E_PARAM;
+
         goto exit;
     }
 
