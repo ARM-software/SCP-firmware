@@ -129,8 +129,7 @@ static const struct mod_juno_pvt_dev_config dev_config_gpu[] = {
     }
 };
 
-#if USE_FULL_SET_SENSORS
-static const struct mod_juno_pvt_dev_config dev_config_soc[] = {
+static const struct mod_juno_pvt_dev_config dev_config_soc_r1_r2[] = {
     [0] = {
         .group = &sensor_group[JUNO_PVT_GROUP_SOC],
         .index = 0,
@@ -140,7 +139,6 @@ static const struct mod_juno_pvt_dev_config dev_config_soc[] = {
         .cal_reg_b = (uint16_t *)&JUNO_PVT_CALIBRATION->G1_S0_900MV_85C,
     },
 };
-#endif
 
 static const struct mod_juno_pvt_dev_config dev_config_soc_r0[] = {
     [0] = {
@@ -167,7 +165,7 @@ static const struct mod_juno_pvt_dev_config dev_config_stdcell[] = {
 };
 
 #if USE_FULL_SET_SENSORS
-static const struct fwk_element pvt_juno_element_table[] = {
+static const struct fwk_element pvt_juno_element_table_r1_r2[] = {
     [JUNO_PVT_GROUP_BIG] = {
         .name = "",
         .data = &dev_config_big,
@@ -185,7 +183,7 @@ static const struct fwk_element pvt_juno_element_table[] = {
     },
     [JUNO_PVT_GROUP_SOC] = {
         .name = "",
-        .data = &dev_config_soc,
+        .data = &dev_config_soc_r1_r2,
         .sub_element_count = 1,
     },
     [JUNO_PVT_GROUP_STDCELL] = {
@@ -197,7 +195,7 @@ static const struct fwk_element pvt_juno_element_table[] = {
 };
 #endif
 
-static const struct fwk_element pvt_juno_element_table_r0[] = {
+static struct fwk_element pvt_juno_element_table[] = {
     [JUNO_PVT_GROUP_BIG] = {
         .name = "",
         .data = &dev_config_big,
@@ -228,7 +226,6 @@ static const struct fwk_element pvt_juno_element_table_r0[] = {
 
 static const struct fwk_element *get_pvt_juno_element_table(fwk_id_t id)
 {
-    #if USE_FULL_SET_SENSORS
     int status;
     enum juno_idx_revision rev;
 
@@ -236,22 +233,27 @@ static const struct fwk_element *get_pvt_juno_element_table(fwk_id_t id)
     if (status != FWK_SUCCESS)
         return NULL;
 
+    #if USE_FULL_SET_SENSORS
+
     if (rev == JUNO_IDX_REVISION_R0) {
         sensor_group[JUNO_PVT_GROUP_BIG].sensor_count = 1;
         sensor_group[JUNO_PVT_GROUP_LITTLE].sensor_count = 1;
 
-        return pvt_juno_element_table_r0;
+        return pvt_juno_element_table;
     } else {
         sensor_group[JUNO_PVT_GROUP_BIG].sensor_count = 2;
         sensor_group[JUNO_PVT_GROUP_LITTLE].sensor_count = 2;
 
-        return pvt_juno_element_table;
+        return pvt_juno_element_table_r1_r2;
     }
     #else
     sensor_group[JUNO_PVT_GROUP_BIG].sensor_count = 1;
     sensor_group[JUNO_PVT_GROUP_LITTLE].sensor_count = 1;
 
-    return pvt_juno_element_table_r0;
+    if (rev != JUNO_IDX_REVISION_R0)
+        pvt_juno_element_table[JUNO_PVT_GROUP_SOC].data = &dev_config_soc_r1_r2;
+
+    return pvt_juno_element_table;
     #endif
 }
 
