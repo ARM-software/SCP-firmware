@@ -250,7 +250,7 @@ static int cmn600_discovery(void)
      * RN-SAM count minus the total RN-D, RN-I and CXHA count combined.
      */
     ctx->rnf_count = ctx->internal_rnsam_count + ctx->external_rnsam_count -
-        (ctx->rnd_count + ctx->rni_count + ctx->ccix_host_info.host_ha_count++);
+        (ctx->rnd_count + ctx->rni_count + ctx->ccix_host_info.host_ha_count);
 
     if (ctx->rnf_count > MAX_RNF_COUNT) {
         ctx->log_api->log(MOD_LOG_GROUP_ERROR,
@@ -272,7 +272,7 @@ static int cmn600_discovery(void)
         MOD_NAME "Total external RN-SAM nodes: %d\n"
         MOD_NAME "Total HN-F nodes: %d\n"
         MOD_NAME "Total RN-D nodes: %d\n"
-        MOD_NAME "Total RN-F nodes: %d\n",
+        MOD_NAME "Total RN-F nodes: %d\n"
         MOD_NAME "Total RN-I nodes: %d\n",
         ctx->internal_rnsam_count,
         ctx->external_rnsam_count,
