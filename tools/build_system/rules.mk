@@ -44,16 +44,7 @@ endif
 # GCC-specific optimization levels for debug and release modes
 #
 
-ifeq ($(PRODUCT)-$(FIRMWARE),juno-scp_ramfw)
-    # Enable link-time optimization
-    CFLAGS_GCC += -flto
-    LDFLAGS_GCC += -Wl,-flto
-
-    DEFAULT_OPT_GCC_DEBUG := s
-else
-    DEFAULT_OPT_GCC_DEBUG := g
-endif
-
+DEFAULT_OPT_GCC_DEBUG := g
 DEFAULT_OPT_GCC_RELEASE := 2
 
 #
