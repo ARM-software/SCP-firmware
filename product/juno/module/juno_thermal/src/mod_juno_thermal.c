@@ -13,14 +13,17 @@
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+#include <fwk_notification.h>
 #include <fwk_thread.h>
 #include <fwk_status.h>
 #include <mod_juno_thermal.h>
 #include <mod_log.h>
 #include <mod_power_domain.h>
 #include <mod_sensor.h>
+#include <mod_system_power.h>
 #include <mod_timer.h>
 #include <config_juno_thermal.h>
+#include <config_power_domain.h>
 #include <juno_alarm_idx.h>
 #include <juno_id.h>
 
@@ -31,6 +34,10 @@ enum mod_juno_thermal_event_idx {
 
 static const struct mod_log_api *log_api;
 static const struct mod_pd_restricted_api *pd_api;
+
+static const fwk_id_t systop_pd_id =
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN,
+    POWER_DOMAIN_IDX_SYSTOP);
 
 /*
  * The sensor used for monitoring the temperature is available only on the real
@@ -175,6 +182,13 @@ static int juno_thermal_start(fwk_id_t id)
 
     ctx = &ctx_table[fwk_id_get_element_idx(id)];
 
+    status = fwk_notification_subscribe(
+        mod_pd_notification_id_power_state_pre_transition,
+        systop_pd_id,
+        id);
+    if (status != FWK_SUCCESS)
+        return status;
+
     status = ctx->alarm_api->start(
         ctx->config->alarm_id,
         ctx->config->period_ms,
@@ -233,6 +247,103 @@ static int juno_thermal_process_event(
     return status;
 }
 
+static int juno_thermal_process_notification(
+    const struct fwk_event *event,
+    struct fwk_event *resp_event)
+{
+    int status;
+    struct thermal_dev_ctx *ctx;
+
+    if (fwk_id_is_equal(
+        event->id,
+        mod_pd_notification_id_power_state_pre_transition)) {
+
+        struct mod_pd_power_state_pre_transition_notification_params
+            *pd_pre_transition_params;
+        struct mod_pd_power_state_pre_transition_notification_resp_params
+            *pd_resp_params;
+
+        pd_pre_transition_params =
+        (struct mod_pd_power_state_pre_transition_notification_params *)event
+            ->params;
+        pd_resp_params =
+        (struct mod_pd_power_state_pre_transition_notification_resp_params *)
+            resp_event->params;
+
+        if ((pd_pre_transition_params->target_state == MOD_PD_STATE_OFF) ||
+            (pd_pre_transition_params->target_state ==
+                MOD_SYSTEM_POWER_POWER_STATE_SLEEP0)) {
+
+            /* Stop the timer alarm and change subscription for post-state */
+            ctx = &ctx_table[fwk_id_get_element_idx(event->target_id)];
+
+            status = ctx->alarm_api->stop(ctx->config->alarm_id);
+            if (status != FWK_SUCCESS) {
+                pd_resp_params->status = status;
+                return status;
+            }
+
+            status = fwk_notification_unsubscribe(
+                mod_pd_notification_id_power_state_pre_transition,
+                systop_pd_id,
+                event->target_id);
+            if (status != FWK_SUCCESS) {
+                pd_resp_params->status = status;
+                return status;
+            }
+
+            status = fwk_notification_subscribe(
+                mod_pd_notification_id_power_state_transition,
+                systop_pd_id,
+                event->target_id);
+
+        } else
+            status = FWK_SUCCESS;
+
+        pd_resp_params->status = status;
+
+        return status;
+    } else if (fwk_id_is_equal(
+        event->id,
+        mod_pd_notification_id_power_state_transition)) {
+
+        struct mod_pd_power_state_transition_notification_params *params =
+            (struct mod_pd_power_state_transition_notification_params *)
+                event->params;
+
+        if (params->state == MOD_PD_STATE_ON) {
+
+            /* Restart timer and change subscription for pre-state */
+            ctx = &ctx_table[fwk_id_get_element_idx(event->target_id)];
+
+            status = ctx->alarm_api->start(
+                ctx->config->alarm_id,
+                ctx->config->period_ms,
+                MOD_TIMER_ALARM_TYPE_PERIODIC,
+                juno_thermal_alarm_callback,
+                (uintptr_t)fwk_id_get_element_idx(event->target_id));
+            if (status != FWK_SUCCESS)
+                return status;
+
+            status = fwk_notification_unsubscribe(
+                mod_pd_notification_id_power_state_transition,
+                systop_pd_id,
+                event->target_id);
+            if (status != FWK_SUCCESS)
+                return status;
+
+            status = fwk_notification_subscribe(
+                mod_pd_notification_id_power_state_pre_transition,
+                systop_pd_id,
+                event->target_id);
+        } else
+            status = FWK_SUCCESS;
+
+        return status;
+    } else
+        return FWK_E_PARAM;
+}
+
 const struct fwk_module module_juno_thermal = {
     .name = "JUNO THERMAL",
     .type = FWK_MODULE_TYPE_SERVICE,
@@ -242,4 +353,5 @@ const struct fwk_module module_juno_thermal = {
     .bind = juno_thermal_bind,
     .start = juno_thermal_start,
     .process_event = juno_thermal_process_event,
+    .process_notification = juno_thermal_process_notification,
 };
