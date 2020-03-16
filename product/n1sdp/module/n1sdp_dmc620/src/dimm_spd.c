@@ -442,10 +442,10 @@ int dimm_spd_init_check(struct mod_n1sdp_i2c_master_api_polled *i2c_api,
     if (status != FWK_SUCCESS)
         return status;
 
-    dmc_clk_freq = ddr->speed * 1000000;
-    dmc_clk_period = 1/((float)(ddr->speed * 1000000));
-    dmc_clk_period_ps = (int32_t)((1/((float)(ddr->speed * 1000000))) *
-                                  1000000000000);
+    dmc_clk_freq = ddr->speed * UINT32_C(1000000);
+    dmc_clk_period = 1.0f / dmc_clk_freq;
+    dmc_clk_period_ps = dmc_clk_period * 1000000000000.0f;
+
     return FWK_SUCCESS;
 }
 
