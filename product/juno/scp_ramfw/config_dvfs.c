@@ -340,11 +340,11 @@ static const struct fwk_element element_table_r0[] = {
 
 static const struct fwk_element element_table_r1[] = {
     [DVFS_ELEMENT_IDX_LITTLE] = {
-        .name = "CPU_LITTLE",
+        .name = "LITTLE_CPU",
         .data = &cpu_group_little_r1,
     },
     [DVFS_ELEMENT_IDX_BIG] = {
-        .name = "CPU_BIG",
+        .name = "BIG_CPU",
         .data = &cpu_group_big_r1,
     },
     [DVFS_ELEMENT_IDX_GPU] = {
@@ -356,11 +356,11 @@ static const struct fwk_element element_table_r1[] = {
 
 static const struct fwk_element element_table_r2[] = {
     [DVFS_ELEMENT_IDX_LITTLE] = {
-        .name = "CPU_GROUP_LITTLE",
+        .name = "LITTLE_CPU",
         .data = &cpu_group_little_r2,
     },
     [DVFS_ELEMENT_IDX_BIG] = {
-        .name = "CPU_GROUP_BIG",
+        .name = "BIG_CPU",
         .data = &cpu_group_big_r2,
     },
     [DVFS_ELEMENT_IDX_GPU] = {
