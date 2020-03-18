@@ -314,7 +314,7 @@ static const struct mod_dvfs_domain_config gpu_r2 = {
             .power = (4.6875 * 450 * 0.820 * 0.820),
         },
         {
-            .frequency = 487500 * FWK_KHZ,
+            .frequency = 600 * FWK_MHZ,
             .voltage = 900,
             .power = (4.6875 * 600 * 0.900 * 0.900),
         },
