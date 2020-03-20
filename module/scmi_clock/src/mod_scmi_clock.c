@@ -1161,7 +1161,8 @@ static int scmi_clock_process_event(const struct fwk_event *event,
         return process_request_event(event);
     }
 
-    if (fwk_id_is_equal(event->id, mod_clock_event_id_request)) {
+    if (fwk_id_get_module_idx(event->source_id) ==
+        fwk_id_get_module_idx(fwk_module_id_clock)) {
         /* Responses from Clock HAL */
         return process_response_event(event);
     }
