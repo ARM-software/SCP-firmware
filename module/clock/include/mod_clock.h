@@ -546,19 +546,39 @@ struct mod_clock_resp_params {
 };
 
 /*!
- * \brief Define the first exposed event handled by this module. Other internal
- *      events take indices after this.
+ * \brief Define the event identifiers for deferred responses.
  */
-#define MOD_CLOCK_EVENT_IDX_REQUEST     0
+enum mod_clock_event_idx {
+    MOD_CLOCK_EVENT_IDX_SET_RATE_REQUEST,
+    MOD_CLOCK_EVENT_IDX_GET_RATE_REQUEST,
 
-/*!
- * \brief Request event identifier.
+    MOD_CLOCK_EVENT_IDX_SET_STATE_REQUEST,
+    MOD_CLOCK_EVENT_IDX_GET_STATE_REQUEST,
+
+    MOD_CLOCK_EVENT_IDX_COUNT
+};
+
+ /*!
+ * \brief Request event identifiers.
  *
- * \details This identifier is used by the clients that expect to receive a
- *      response event from this module.
+ * \details These identifiers are used by the clients that expect to receive a
+ *      response event from this module when a request is deferred.
  */
-static const fwk_id_t mod_clock_event_id_request =
-    FWK_ID_EVENT_INIT(FWK_MODULE_IDX_CLOCK, MOD_CLOCK_EVENT_IDX_REQUEST);
+static const fwk_id_t mod_clock_event_id_set_rate_request =
+    FWK_ID_EVENT_INIT(FWK_MODULE_IDX_CLOCK,
+                      MOD_CLOCK_EVENT_IDX_SET_RATE_REQUEST);
+
+static const fwk_id_t mod_clock_event_id_get_rate_request =
+    FWK_ID_EVENT_INIT(FWK_MODULE_IDX_CLOCK,
+                      MOD_CLOCK_EVENT_IDX_GET_RATE_REQUEST);
+
+static const fwk_id_t mod_clock_event_id_set_state_request =
+    FWK_ID_EVENT_INIT(FWK_MODULE_IDX_CLOCK,
+                      MOD_CLOCK_EVENT_IDX_SET_STATE_REQUEST);
+
+static const fwk_id_t mod_clock_event_id_get_state_request =
+    FWK_ID_EVENT_INIT(FWK_MODULE_IDX_CLOCK,
+                      MOD_CLOCK_EVENT_IDX_GET_STATE_REQUEST);
 
 /*!
  * @}

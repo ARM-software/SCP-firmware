@@ -962,7 +962,7 @@ static int mod_dvfs_process_event(const struct fwk_event *event,
     /*
      * response event from SET_OPP() Clock set_rate()
      */
-    if (fwk_id_is_equal(event->id, mod_clock_event_id_request)) {
+    if (fwk_id_is_equal(event->id, mod_clock_event_id_set_rate_request)) {
         /*
          * Handle set_frequency() asynchronously, no response required for
          * a SET_OPP() request so resp_event discarded.
