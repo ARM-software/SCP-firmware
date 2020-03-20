@@ -34,9 +34,6 @@ struct clock_operations {
      * A 'none' value indicates that there is no pending request.
      */
     fwk_id_t service_id;
-
-    /* Type of request being requested */
-    enum scmi_clock_request_type request;
 };
 
 struct scmi_clock_ctx {
@@ -228,18 +225,6 @@ static inline bool clock_ops_is_available(unsigned int clock_dev_idx)
                            FWK_ID_NONE);
 }
 
-static inline void clock_ops_set_request(unsigned int clock_dev_idx,
-                                         enum scmi_clock_request_type request)
-{
-    scmi_clock_ctx.clock_ops[clock_dev_idx].request = request;
-}
-
-static inline enum scmi_clock_request_type clock_ops_get_request(
-    unsigned int clock_dev_idx)
-{
-    return scmi_clock_ctx.clock_ops[clock_dev_idx].request;
-}
-
 /*
  * Helper for the 'get_state' response
  */
@@ -407,7 +392,6 @@ static int create_event_request(fwk_id_t clock_id,
         return status;
 
     clock_ops_set_busy(clock_dev_idx, service_id);
-    clock_ops_set_request(clock_dev_idx, request);
 
     return FWK_SUCCESS;
 }
@@ -1110,19 +1094,17 @@ static int process_response_event(const struct fwk_event *event)
         (struct mod_clock_resp_params *)event->params;
     unsigned int clock_dev_idx;
     fwk_id_t service_id;
-    enum scmi_clock_request_type request;
     enum mod_clock_state clock_state;
     uint64_t rate;
 
     clock_dev_idx = fwk_id_get_element_idx(event->source_id);
-    request = clock_ops_get_request(clock_dev_idx);
     service_id = clock_ops_get_service(clock_dev_idx);
 
     if (params->status != FWK_SUCCESS)
         request_response(params->status, service_id);
     else {
-        switch (request) {
-        case SCMI_CLOCK_REQUEST_GET_STATE:
+        switch (fwk_id_get_event_idx(event->id)) {
+        case MOD_CLOCK_EVENT_IDX_GET_STATE_REQUEST:
             clock_state = params->value.state;
 
             get_state_respond(event->source_id, service_id, &clock_state,
@@ -1130,15 +1112,15 @@ static int process_response_event(const struct fwk_event *event)
 
             break;
 
-        case SCMI_CLOCK_REQUEST_GET_RATE:
+        case MOD_CLOCK_EVENT_IDX_GET_RATE_REQUEST:
             rate = params->value.rate;
 
             get_rate_respond(service_id, &rate, FWK_SUCCESS);
 
             break;
 
-        case SCMI_CLOCK_REQUEST_SET_RATE:
-        case SCMI_CLOCK_REQUEST_SET_STATE:
+        case MOD_CLOCK_EVENT_IDX_SET_RATE_REQUEST:
+        case MOD_CLOCK_EVENT_IDX_SET_STATE_REQUEST:
             set_request_respond(service_id, FWK_SUCCESS);
 
             break;
