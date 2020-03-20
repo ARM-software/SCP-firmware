@@ -124,13 +124,11 @@ static int create_async_request(struct clock_dev_ctx *ctx, fwk_id_t clock_id)
     return FWK_PENDING;
 }
 
-static int get_ctx(fwk_id_t clock_id, struct clock_dev_ctx **ctx)
+static void get_ctx(fwk_id_t clock_id, struct clock_dev_ctx **ctx)
 {
     fwk_assert(fwk_module_is_valid_element_id(clock_id));
 
     *ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(clock_id)];
-
-    return FWK_SUCCESS;
 }
 
 /*
@@ -180,9 +178,7 @@ static int clock_set_rate(fwk_id_t clock_id, uint64_t rate,
     int status;
     struct clock_dev_ctx *ctx;
 
-    status = get_ctx(clock_id, &ctx);
-    if (status != FWK_SUCCESS)
-        return status;
+    get_ctx(clock_id, &ctx);
 
     /* Concurrency is not supported */
     if (ctx->is_request_ongoing)
@@ -200,9 +196,7 @@ static int clock_get_rate(fwk_id_t clock_id, uint64_t *rate)
     int status;
     struct clock_dev_ctx *ctx;
 
-    status = get_ctx(clock_id, &ctx);
-    if (status != FWK_SUCCESS)
-        return status;
+    get_ctx(clock_id, &ctx);
 
     if (rate == NULL)
         return FWK_E_PARAM;
@@ -221,12 +215,9 @@ static int clock_get_rate(fwk_id_t clock_id, uint64_t *rate)
 static int clock_get_rate_from_index(fwk_id_t clock_id, unsigned int rate_index,
                                      uint64_t *rate)
 {
-    int status;
     struct clock_dev_ctx *ctx;
 
-    status = get_ctx(clock_id, &ctx);
-    if (status != FWK_SUCCESS)
-        return status;
+    get_ctx(clock_id, &ctx);
 
     if (rate == NULL)
         return FWK_E_PARAM;
@@ -240,9 +231,7 @@ static int clock_set_state(fwk_id_t clock_id, enum mod_clock_state state)
     int status;
     struct clock_dev_ctx *ctx;
 
-    status = get_ctx(clock_id, &ctx);
-    if (status != FWK_SUCCESS)
-        return status;
+    get_ctx(clock_id, &ctx);
 
     /* Concurrency is not supported */
     if (ctx->is_request_ongoing)
@@ -260,9 +249,7 @@ static int clock_get_state(fwk_id_t clock_id, enum mod_clock_state *state)
     int status;
     struct clock_dev_ctx *ctx;
 
-    status = get_ctx(clock_id, &ctx);
-    if (status != FWK_SUCCESS)
-        return status;
+    get_ctx(clock_id, &ctx);
 
     if (state == NULL)
         return FWK_E_PARAM;
@@ -283,9 +270,7 @@ static int clock_get_info(fwk_id_t clock_id, struct mod_clock_info *info)
     int status;
     struct clock_dev_ctx *ctx;
 
-    status = get_ctx(clock_id, &ctx);
-    if (status != FWK_SUCCESS)
-        return status;
+    get_ctx(clock_id, &ctx);
 
     if (info == NULL)
         return FWK_E_PARAM;
