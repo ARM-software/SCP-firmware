@@ -110,7 +110,7 @@ the requested operation.
     PE2 > > > E2
     PE3 > > > RE
 
-A client calls *get/set* HAL module API which calls directly the driver.
+A client calls *get/set* HAL module API which directly calls the driver.
 
 The driver cannot do the operation immediately, it returns FWK_PENDING.
 
