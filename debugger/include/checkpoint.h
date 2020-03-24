@@ -129,7 +129,7 @@ void checkpoint(checkpoint_st *c, char *file, int32_t line, char *tag);
  *
  */
 #define checkpoint_register(c, name) \
-    __extension__ ({ \
+    __extension__({ \
         (void)c; \
         (void)name; \
         FWK_SUCCESS; \
