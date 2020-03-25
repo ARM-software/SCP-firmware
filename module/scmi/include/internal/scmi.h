@@ -36,22 +36,6 @@
 #define SCMI_PROTOCOL_ID_MAX 0xFF
 
 /*!
- * \brief Return a packed 32-bit message header comprised of a 10-bit message
- *      identifier, an 8-bit protocol identifier, and a 10-bit token.
- *
- * \param MESSAGE_ID Message identifier.
- * \param PROTOCOL_ID Protocol identifier.
- * \param TOKEN Token.
- */
-#define SCMI_MESSAGE_HEADER(MESSAGE_ID, PROTOCOL_ID, TOKEN) \
-    ((((MESSAGE_ID) << SCMI_MESSAGE_HEADER_MESSAGE_ID_POS) & \
-        SCMI_MESSAGE_HEADER_MESSAGE_ID_MASK) | \
-    (((PROTOCOL_ID) << SCMI_MESSAGE_HEADER_PROTOCOL_ID_POS) & \
-        SCMI_MESSAGE_HEADER_PROTOCOL_ID_MASK) | \
-    (((TOKEN) << SCMI_MESSAGE_HEADER_TOKEN_POS) & \
-        SCMI_MESSAGE_HEADER_TOKEN_POS))
-
-/*!
  * \brief Entity role.
  */
 enum scmi_role {
