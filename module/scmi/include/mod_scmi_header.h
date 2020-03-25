@@ -1,0 +1,34 @@
+/*
+ * Arm SCP/MCP Software
+ * Copyright (c) 2020, Arm Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Description:
+ *     System Control and Management Interface (SCMI) support.
+ */
+
+#ifndef MOD_SCMI_HEADER_H
+#define MOD_SCMI_HEADER_H
+
+#define SCMI_MESSAGE_HEADER_MESSAGE_ID_POS    0
+#define SCMI_MESSAGE_HEADER_MESSAGE_TYPE_POS  8
+#define SCMI_MESSAGE_HEADER_PROTOCOL_ID_POS  10
+#define SCMI_MESSAGE_HEADER_TOKEN_POS        18
+
+#define SCMI_MESSAGE_HEADER_MESSAGE_ID_MASK \
+    (UINT32_C(0xFF) << SCMI_MESSAGE_HEADER_MESSAGE_ID_POS)
+#define SCMI_MESSAGE_HEADER_MESSAGE_TYPE_MASK \
+    (UINT32_C(0x3) << SCMI_MESSAGE_HEADER_MESSAGE_TYPE_POS)
+#define SCMI_MESSAGE_HEADER_PROTOCOL_ID_MASK \
+    (UINT32_C(0xFF)  << SCMI_MESSAGE_HEADER_PROTOCOL_ID_POS)
+#define SCMI_MESSAGE_HEADER_TOKEN_MASK  \
+    (UINT32_C(0x3FF) << SCMI_MESSAGE_HEADER_TOKEN_POS)
+
+enum mod_scmi_message_type {
+    MOD_SCMI_MESSAGE_TYPE_COMMAND = 0,
+    MOD_SCMI_MESSAGE_TYPE_DELAYED_RESPONSE = 2,
+    MOD_SCMI_MESSAGE_TYPE_NOTIFICATION = 3,
+};
+
+#endif /* MOD_SCMI_HEADER_H */

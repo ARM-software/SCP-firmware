@@ -12,6 +12,7 @@
 #define MOD_INTERNAL_SCMI_H
 
 #include <mod_scmi.h>
+#include <mod_scmi_header.h>
 
 #include <fwk_id.h>
 
@@ -19,25 +20,6 @@
 #include <stdint.h>
 
 #define SCMI_VERSION 0x10000
-
-#define SCMI_MESSAGE_HEADER_MESSAGE_ID_POS  0
-#define SCMI_MESSAGE_HEADER_PROTOCOL_ID_POS 10
-#define SCMI_MESSAGE_HEADER_TOKEN_POS       18
-
-#define SCMI_MESSAGE_HEADER_MESSAGE_ID_MASK \
-    (UINT32_C(0x3FF) << SCMI_MESSAGE_HEADER_MESSAGE_ID_POS)
-#define SCMI_MESSAGE_HEADER_PROTOCOL_ID_MASK \
-    (UINT32_C(0xFF)  << SCMI_MESSAGE_HEADER_PROTOCOL_ID_POS)
-#define SCMI_MESSAGE_HEADER_TOKEN_MASK  \
-    (UINT32_C(0x3FF) << SCMI_MESSAGE_HEADER_TOKEN_POS)
-
-#define SCMI_MESSAGE_HEADER(MESSAGE_ID, PROTOCOL_ID, TOKEN) \
-    ((((MESSAGE_ID) << SCMI_MESSAGE_HEADER_MESSAGE_ID_POS) & \
-        SCMI_MESSAGE_HEADER_MESSAGE_ID_MASK) | \
-    (((PROTOCOL_ID) << SCMI_MESSAGE_HEADER_PROTOCOL_ID_POS) & \
-        SCMI_MESSAGE_HEADER_PROTOCOL_ID_MASK) | \
-    (((TOKEN) << SCMI_MESSAGE_HEADER_TOKEN_POS) & \
-        SCMI_MESSAGE_HEADER_TOKEN_POS))
 
 /* SCMI service context */
 struct scmi_service_ctx {
@@ -64,6 +46,9 @@ struct scmi_service_ctx {
 
     /* SCMI identifier of the message currently being processed */
     unsigned int scmi_message_id;
+
+    /* SCMI type of the message currently being processed */
+    enum mod_scmi_message_type scmi_message_type;
 };
 
 #endif /* MOD_INTERNAL_SCMI_H */
