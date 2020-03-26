@@ -47,6 +47,10 @@ static int scmi_perf_limits_set_handler(
     fwk_id_t service_id, const uint32_t *payload);
 static int scmi_perf_limits_get_handler(
     fwk_id_t service_id, const uint32_t *payload);
+static int scmi_perf_limits_notify(
+    fwk_id_t service_id, const uint32_t *payload);
+static int scmi_perf_level_notify(
+    fwk_id_t service_id, const uint32_t *payload);
 
 static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
     [SCMI_PROTOCOL_VERSION] =
@@ -66,7 +70,11 @@ static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
     [SCMI_PERF_LEVEL_SET] =
                        scmi_perf_level_set_handler,
     [SCMI_PERF_LEVEL_GET] =
-                       scmi_perf_level_get_handler
+                       scmi_perf_level_get_handler,
+    [SCMI_PERF_NOTIFY_LIMITS] =
+                       scmi_perf_limits_notify,
+    [SCMI_PERF_NOTIFY_LEVEL] =
+                       scmi_perf_level_notify
 };
 
 static unsigned int payload_size_table[] = {
@@ -86,6 +94,10 @@ static unsigned int payload_size_table[] = {
                        sizeof(struct scmi_perf_limits_set_a2p),
     [SCMI_PERF_LIMITS_GET] =
                        sizeof(struct scmi_perf_limits_get_a2p),
+    [SCMI_PERF_NOTIFY_LIMITS] =
+                       sizeof(struct scmi_perf_notify_limits_a2p),
+    [SCMI_PERF_NOTIFY_LEVEL] =
+                       sizeof(struct scmi_perf_notify_level_a2p)
 };
 
 struct perf_operations {
@@ -96,6 +108,19 @@ struct perf_operations {
     fwk_id_t service_id;
 };
 
+struct agent_notifications {
+    /*
+     * Track whether an agent is requesting notifications on limit change
+     * operations.
+     */
+    fwk_id_t *limit_notification;
+
+    /*
+     * Track whether an agent is requesting notifications on level change
+     * operations.
+     */
+    fwk_id_t *level_notification;
+};
 
 struct scmi_perf_ctx {
     /* SCMI Performance Module Configuration */
@@ -112,6 +137,12 @@ struct scmi_perf_ctx {
 
     /* Pointer to a table of operations */
     struct perf_operations *perf_ops_table;
+
+    /* Number of active agents */
+    int agent_count;
+
+    /* Agent notifications table */
+    struct agent_notifications **agent_notifications;
 };
 
 static struct scmi_perf_ctx scmi_perf_ctx;
@@ -598,6 +629,88 @@ exit:
     return status;
 }
 
+static int scmi_perf_limits_notify(fwk_id_t service_id,
+                                   const uint32_t *payload)
+{
+    unsigned int agent_id;
+    int status;
+    unsigned int id;
+    const struct scmi_perf_notify_limits_a2p *parameters;
+    struct scmi_perf_notify_limits_p2a return_values = {
+        .status = SCMI_GENERIC_ERROR,
+    };
+
+    parameters = (const struct scmi_perf_notify_limits_a2p *)payload;
+    id = parameters->domain_id;
+    if (id >= scmi_perf_ctx.domain_count) {
+        status = FWK_SUCCESS;
+        return_values.status = SCMI_NOT_FOUND;
+
+        goto exit;
+    }
+
+    status = scmi_perf_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+    if (status != FWK_SUCCESS)
+        goto exit;
+
+    if (parameters->notify_enable)
+        scmi_perf_ctx.agent_notifications[id]->limit_notification[agent_id] =
+            service_id;
+    else
+        scmi_perf_ctx.agent_notifications[id]->limit_notification[agent_id] =
+            FWK_ID_NONE;
+
+    return_values.status = SCMI_SUCCESS;
+
+exit:
+    scmi_perf_ctx.scmi_api->respond(service_id, &return_values,
+        (return_values.status == SCMI_SUCCESS) ?
+        sizeof(return_values) : sizeof(return_values.status));
+
+    return status;
+}
+
+static int scmi_perf_level_notify(fwk_id_t service_id,
+                                   const uint32_t *payload)
+{
+    unsigned int agent_id;
+    int status;
+    unsigned int id;
+    const struct scmi_perf_notify_level_a2p *parameters;
+    struct scmi_perf_notify_level_p2a return_values = {
+        .status = SCMI_GENERIC_ERROR,
+    };
+
+    parameters = (const struct scmi_perf_notify_level_a2p *)payload;
+    id = parameters->domain_id;
+    if (id >= scmi_perf_ctx.domain_count) {
+        status = FWK_SUCCESS;
+        return_values.status = SCMI_NOT_FOUND;
+
+        goto exit;
+    }
+
+    status = scmi_perf_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+    if (status != FWK_SUCCESS)
+        goto exit;
+
+    if (parameters->notify_enable)
+        scmi_perf_ctx.agent_notifications[id]->level_notification[agent_id] =
+            service_id;
+    else
+        scmi_perf_ctx.agent_notifications[id]->level_notification[agent_id] =
+            FWK_ID_NONE;
+
+    return_values.status = SCMI_SUCCESS;
+
+exit:
+    scmi_perf_ctx.scmi_api->respond(service_id, &return_values,
+        (return_values.status == SCMI_SUCCESS) ?
+        sizeof(return_values) : sizeof(return_values.status));
+
+    return status;
+}
+
 /*
  * SCMI module -> SCMI performance module interface
  */
@@ -671,6 +784,61 @@ static void scmi_perf_respond(
     scmi_perf_ctx.perf_ops_table[idx].service_id = FWK_ID_NONE;
 }
 
+static void scmi_perf_notify_limits(uint32_t domain_id,
+    uintptr_t cookie, uint32_t range_min, uint32_t range_max)
+{
+    struct scmi_perf_limits_changed limits_changed;
+    fwk_id_t id;
+    int i;
+
+    limits_changed.agent_id = (uint32_t)cookie;
+
+    /* note: skip agent 0, platform agent */
+    for (i = 1; i < scmi_perf_ctx.agent_count; i++) {
+        id =
+            scmi_perf_ctx.agent_notifications[domain_id]->limit_notification[i];
+
+        if (!fwk_id_is_equal(id, FWK_ID_NONE)) {
+            limits_changed.domain_id = domain_id;
+            limits_changed.range_min = range_min;
+            limits_changed.range_max = range_max;
+
+            scmi_perf_ctx.scmi_api->notify(id,
+                SCMI_PROTOCOL_ID_PERF, SCMI_PERF_LIMITS_CHANGED,
+                &limits_changed, sizeof(limits_changed));
+        }
+    }
+}
+
+static void scmi_perf_notify_level(uint32_t domain_id,
+    uintptr_t cookie, uint32_t level)
+{
+    struct scmi_perf_level_changed level_changed;
+    fwk_id_t id;
+    int i;
+
+    level_changed.agent_id = (uint32_t)cookie;
+
+    /* note: skip agent 0, platform agent */
+    for (i = 1; i < scmi_perf_ctx.agent_count; i++) {
+        id =
+            scmi_perf_ctx.agent_notifications[domain_id]->level_notification[i];
+        if (!fwk_id_is_equal(id, FWK_ID_NONE)) {
+            level_changed.domain_id = domain_id;
+            level_changed.performance_level = level;
+
+            scmi_perf_ctx.scmi_api->notify(id,
+                SCMI_PROTOCOL_ID_PERF, SCMI_PERF_LEVEL_CHANGED,
+                &level_changed, sizeof(level_changed));
+        }
+    }
+}
+
+static struct mod_dvfs_notification_api notification_api = {
+    .notify_limits = scmi_perf_notify_limits,
+    .notify_level = scmi_perf_notify_level,
+};
+
 /*
  * Framework handlers
  */
@@ -700,6 +868,41 @@ static int scmi_perf_init(fwk_id_t module_id, unsigned int element_count,
     for (i = 0; i < return_val; i++)
         scmi_perf_ctx.perf_ops_table[i].service_id = FWK_ID_NONE;
 
+
+    return FWK_SUCCESS;
+}
+
+static int scmi_init_notifications(int domains)
+{
+    int i, j, status;
+
+    status = scmi_perf_ctx.scmi_api->get_agent_count(
+        &scmi_perf_ctx.agent_count);
+    if (status != FWK_SUCCESS)
+        return status;
+    fwk_assert(scmi_perf_ctx.agent_count != 0);
+
+    scmi_perf_ctx.agent_notifications = fwk_mm_calloc(
+        domains, sizeof(struct agent_notifications *));
+
+    for (i = 0; i < domains; i++) {
+        scmi_perf_ctx.agent_notifications[i] =
+            fwk_mm_calloc(1, sizeof(struct agent_notifications));
+        scmi_perf_ctx.agent_notifications[i]->limit_notification =
+            fwk_mm_calloc(scmi_perf_ctx.agent_count, sizeof(fwk_id_t));
+        scmi_perf_ctx.agent_notifications[i]->level_notification =
+            fwk_mm_calloc(scmi_perf_ctx.agent_count, sizeof(fwk_id_t));
+    }
+
+    for (i = 0; i < domains; i++) {
+        for (j = 0; j < scmi_perf_ctx.agent_count; j++) {
+            scmi_perf_ctx.agent_notifications[i]->limit_notification[j] =
+                FWK_ID_NONE;
+            scmi_perf_ctx.agent_notifications[i]->level_notification[j] =
+                FWK_ID_NONE;
+        }
+    }
+
     return FWK_SUCCESS;
 }
 
@@ -716,6 +919,10 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
     if (status != FWK_SUCCESS)
         return status;
 
+    status = scmi_init_notifications(scmi_perf_ctx.domain_count);
+    if (status != FWK_SUCCESS)
+        return status;
+
     return fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_DVFS),
         FWK_ID_API(FWK_MODULE_IDX_DVFS, 0), &scmi_perf_ctx.dvfs_api);
 }
@@ -723,10 +930,18 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
 static int scmi_perf_process_bind_request(fwk_id_t source_id,
     fwk_id_t target_id, fwk_id_t api_id, const void **api)
 {
-    if (!fwk_id_is_equal(source_id, FWK_ID_MODULE(FWK_MODULE_IDX_SCMI)))
-        return FWK_E_ACCESS;
+    switch (fwk_id_get_api_idx(api_id)) {
+    case MOD_SCMI_PERF_PROTOCOL_API:
+        *api = &scmi_perf_mod_scmi_to_protocol_api;
+        break;
 
-    *api = &scmi_perf_mod_scmi_to_protocol_api;
+    case MOD_SCMI_PERF_NOTIFICATION_API:
+        *api = &notification_api;
+        break;
+
+    default:
+        return FWK_E_ACCESS;
+    }
 
     return FWK_SUCCESS;
 }
@@ -854,7 +1069,7 @@ static int scmi_perf_process_event(const struct fwk_event *event,
 /* SCMI Performance Management Protocol Definition */
 const struct fwk_module module_scmi_perf = {
     .name = "SCMI Performance Management Protocol",
-    .api_count = 1,
+    .api_count = MOD_SCMI_PERF_API_COUNT,
     .event_count = SCMI_PERF_EVENT_IDX_COUNT,
     .type = FWK_MODULE_TYPE_PROTOCOL,
     .init = scmi_perf_init,

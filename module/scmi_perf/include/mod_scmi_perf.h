@@ -11,6 +11,8 @@
 #ifndef MOD_SCMI_PERF_H
 #define MOD_SCMI_PERF_H
 
+#include <fwk_id.h>
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -51,6 +53,22 @@ struct mod_scmi_perf_domain_config {
 struct mod_scmi_perf_config {
     /*! Per-domain configuration data */
     const struct mod_scmi_perf_domain_config (*domains)[];
+};
+
+/*!
+ * \brief SCMI Performance APIs.
+ *
+ * \details APIs exported by SCMI Performance Protocol.
+ */
+enum scmi_perf_api_idx {
+    /*! Index for the SCMI protocol API */
+    MOD_SCMI_PERF_PROTOCOL_API,
+
+    /*! Index of the notification API */
+    MOD_SCMI_PERF_NOTIFICATION_API,
+
+    /*! Number of APIs */
+    MOD_SCMI_PERF_API_COUNT
 };
 
 /*!
