@@ -183,6 +183,34 @@ struct mod_dvfs_domain_api {
 };
 
 /*!
+ * \brief DVFS notification API.
+ *
+ * \details API used by the domain when a notification is required.
+ */
+struct mod_dvfs_notification_api {
+    /*!
+     * \brief Send a limits_changed notification for the domain.
+     *
+     * \param domain_id Domain identifier
+     * \param cookie Context-specific value
+     * \param range_min Min allowed performance level
+     * \param range_max Max allowed performance level
+     */
+    void (*notify_limits)(uint32_t domain_id, uintptr_t cookie,
+        uint32_t range_min, uint32_t range_max);
+
+    /*!
+     * \brief Send a level_changed notification for the domain.
+     *
+     * \param domain_id Domain identifier
+     * \param cookie Context-specific value
+     * \param level The new performance level of the domain
+     */
+    void (*notify_level)(uint32_t domain_id, uintptr_t cookie,
+        uint32_t level);
+};
+
+/*!
  * \}
  */
 

@@ -36,6 +36,11 @@ enum scmi_perf_command_id {
     SCMI_PERF_NOTIFY_LEVEL      = 0x00A
 };
 
+enum scmi_perf_notification_id {
+    SCMI_PERF_LIMITS_CHANGED = 0x000,
+    SCMI_PERF_LEVEL_CHANGED = 0x001,
+};
+
 /*
  * PROTOCOL_ATTRIBUTES
  */
@@ -245,4 +250,22 @@ struct __attribute((packed)) scmi_perf_notify_level_p2a {
     int32_t status;
 };
 
+/*
+ * PERFORMANCE_LEVEL_CHANGED
+ */
+struct __attribute((packed)) scmi_perf_level_changed {
+    uint32_t agent_id;
+    uint32_t domain_id;
+    uint32_t performance_level;
+};
+
+/*
+ * PERFORMANCE_LIMITS_CHANGED
+ */
+struct __attribute((packed)) scmi_perf_limits_changed {
+    uint32_t agent_id;
+    uint32_t domain_id;
+    uint32_t range_min;
+    uint32_t range_max;
+};
 #endif /* INTERNAL_SCMI_PERF_H */
