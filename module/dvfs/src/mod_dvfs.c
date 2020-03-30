@@ -1086,21 +1086,6 @@ dvfs_bind(fwk_id_t id, unsigned int round)
 }
 
 static int
-dvfs_process_bind_request_module(fwk_id_t source_id,
-    fwk_id_t api_id,
-    const void **api)
-{
-    /* Only expose the module API */
-    if (!fwk_id_is_equal(api_id, mod_dvfs_api_id_dvfs))
-        return FWK_E_PARAM;
-
-    /* We don't do any permissions management */
-    *api = &mod_dvfs_domain_api;
-
-    return FWK_SUCCESS;
-}
-
-static int
 dvfs_process_bind_request(fwk_id_t source_id,
     fwk_id_t target_id,
     fwk_id_t api_id,
@@ -1110,7 +1095,10 @@ dvfs_process_bind_request(fwk_id_t source_id,
     if (!fwk_id_is_equal(target_id, fwk_module_id_dvfs))
         return FWK_E_PARAM;
 
-    return dvfs_process_bind_request_module(source_id, api_id, api);
+    /* We don't do any permissions management */
+    *api = &mod_dvfs_domain_api;
+
+    return FWK_SUCCESS;
 }
 
 /* Module description */
