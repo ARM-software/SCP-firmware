@@ -22,6 +22,10 @@ enum scmi_sys_power_command_id {
     SCMI_SYS_POWER_STATE_NOTIFY = 0x005,
 };
 
+enum scmi_sys_power_notification_id {
+    SCMI_SYS_POWER_STATE_SET_NOTIFY = 0x000,
+};
+
 /*
  * PROTOCOL_MESSAGE_ATTRIBUTES
  */
@@ -80,8 +84,9 @@ struct __attribute((packed)) scmi_sys_power_state_notify_p2a {
  * SYSTEM_POWER_STATE_NOTIFIER
  */
 
-struct __attribute((packed)) scmi_sys_power_state_notifier_p2a {
+struct __attribute((packed)) scmi_sys_power_state_notifier {
     uint32_t agent_id;
+    uint32_t flags;
     uint32_t system_state;
 };
 
