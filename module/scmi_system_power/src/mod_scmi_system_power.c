@@ -15,6 +15,7 @@
 #include <fwk_assert.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
+#include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
@@ -26,6 +27,10 @@ struct scmi_sys_power_ctx {
     const struct mod_scmi_from_protocol_api *scmi_api;
     const struct mod_pd_restricted_api *pd_api;
     fwk_id_t system_power_domain_id;
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    int agent_count;
+    fwk_id_t *system_power_notifications;
+#endif
 };
 
 static int scmi_sys_power_version_handler(fwk_id_t service_id,
@@ -38,6 +43,10 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
     const uint32_t *payload);
 static int scmi_sys_power_state_get_handler(fwk_id_t service_id,
     const uint32_t *payload);
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+static int scmi_sys_power_state_notify_handler(fwk_id_t service_id,
+    const uint32_t *payload);
+#endif
 
 /*
  * Internal variables
@@ -50,6 +59,9 @@ static int (* const handler_table[])(fwk_id_t, const uint32_t *) = {
     [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] = scmi_sys_power_msg_attributes_handler,
     [SCMI_SYS_POWER_STATE_SET] = scmi_sys_power_state_set_handler,
     [SCMI_SYS_POWER_STATE_GET] = scmi_sys_power_state_get_handler,
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    [SCMI_SYS_POWER_STATE_NOTIFY] = scmi_sys_power_state_notify_handler,
+#endif
 };
 
 static const unsigned int payload_size_table[] = {
@@ -60,6 +72,10 @@ static const unsigned int payload_size_table[] = {
     [SCMI_SYS_POWER_STATE_SET] =
                        sizeof(struct scmi_sys_power_state_set_a2p),
     [SCMI_SYS_POWER_STATE_GET] = 0,
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    [SCMI_SYS_POWER_STATE_NOTIFY] =
+                       sizeof(struct scmi_sys_power_state_notify_a2p),
+#endif
 };
 
 static enum mod_pd_system_shutdown system_state2system_shutdown[] = {
@@ -93,6 +109,38 @@ static int system_state_get(enum scmi_system_state *system_state)
 
     return FWK_SUCCESS;
 }
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+static void scmi_sys_power_state_notify(fwk_id_t service_id,
+    uint32_t system_state, bool forceful)
+{
+    unsigned int agent_id;
+    fwk_id_t id;
+    struct scmi_sys_power_state_notifier return_values;
+    int status, i;
+
+    status = scmi_sys_power_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+    if (status != FWK_SUCCESS)
+        return;
+
+    return_values.agent_id = (uint32_t)agent_id;
+    return_values.system_state = system_state;
+    if (forceful)
+        return_values.flags = 0;
+    else
+        return_values.flags = 1;
+
+    for (i = 0; i < SCMI_AGENT_ID_MAX; i++) {
+        id =  scmi_sys_power_ctx.system_power_notifications[i];
+        if (fwk_id_is_equal(id, FWK_ID_NONE))
+            continue;
+
+        scmi_sys_power_ctx.scmi_api->notify(id,
+            SCMI_PROTOCOL_ID_SYS_POWER, SCMI_SYS_POWER_STATE_SET_NOTIFY,
+            &return_values, sizeof(return_values));
+    }
+}
+#endif
 
 /*
  * PROTOCOL_VERSION
@@ -272,6 +320,12 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
         goto exit;
     };
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    scmi_sys_power_state_notify(service_id, parameters->system_state,
+        ((parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST) ?
+            true : false));
+#endif
+
     return_values.status = SCMI_SUCCESS;
 
 exit:
@@ -328,6 +382,47 @@ exit:
 
     return status;
 }
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+/*
+ * SYSTEM_POWER_STATE_NOTIFY
+ */
+static int scmi_sys_power_state_notify_handler(fwk_id_t service_id,
+                                               const uint32_t *payload)
+{
+    unsigned int agent_id;
+    const struct scmi_sys_power_state_notify_a2p *parameters;
+    struct scmi_sys_power_state_notify_p2a return_values = {
+        .status = SCMI_GENERIC_ERROR,
+    };
+    int status;
+
+    status = scmi_sys_power_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+    if (status != FWK_SUCCESS)
+        goto exit;
+
+    parameters = (const struct scmi_sys_power_state_notify_a2p *)payload;
+
+    if (parameters->flags & (~STATE_NOTIFY_FLAGS_MASK)) {
+        return_values.status = SCMI_INVALID_PARAMETERS;
+        goto exit;
+    }
+
+    if (parameters->flags & STATE_NOTIFY_FLAGS_MASK)
+        scmi_sys_power_ctx.system_power_notifications[agent_id] = service_id;
+    else
+        scmi_sys_power_ctx.system_power_notifications[agent_id] = FWK_ID_NONE;
+
+    return_values.status = SCMI_SUCCESS;
+
+exit:
+    scmi_sys_power_ctx.scmi_api->respond(service_id, &return_values,
+        (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
+        sizeof(return_values.status));
+
+    return FWK_SUCCESS;
+}
+#endif
 
 /*
  * SCMI module -> SCMI system power module interface
@@ -389,6 +484,30 @@ static int scmi_sys_power_init(fwk_id_t module_id, unsigned int element_count,
     return FWK_SUCCESS;
 }
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+static int scmi_sys_power_init_notifications(void)
+{
+    int status;
+    int i;
+
+
+    status = scmi_sys_power_ctx.scmi_api->get_agent_count(
+        &scmi_sys_power_ctx.agent_count);
+    if (status != FWK_SUCCESS)
+        return status;
+    fwk_assert(scmi_sys_power_ctx.agent_count != 0);
+
+    scmi_sys_power_ctx.system_power_notifications = fwk_mm_calloc(
+        scmi_sys_power_ctx.agent_count, sizeof(fwk_id_t));
+
+    for (i = 0; i < scmi_sys_power_ctx.agent_count; i++)
+        scmi_sys_power_ctx.system_power_notifications[i] = FWK_ID_NONE;
+
+    return FWK_SUCCESS;
+
+}
+#endif
+
 static int scmi_sys_power_bind(fwk_id_t id, unsigned int round)
 {
     int status;
@@ -418,7 +537,11 @@ static int scmi_sys_power_bind(fwk_id_t id, unsigned int round)
     scmi_sys_power_ctx.system_power_domain_id =
         FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, pd_count - 1);
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    return scmi_sys_power_init_notifications();
+#else
     return FWK_SUCCESS;
+#endif
 }
 
 static int scmi_sys_power_process_bind_request(fwk_id_t source_id,
