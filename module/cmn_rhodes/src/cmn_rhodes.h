@@ -43,6 +43,8 @@ enum node_type {
     NODE_TYPE_HN_F      = 0x5,
     NODE_TYPE_XP        = 0x6,
     NODE_TYPE_SBSX      = 0x7,
+    NODE_TYPE_MPAM_S    = 0x8,
+    NODE_TYPE_MPAM_NS   = 0x9,
     NODE_TYPE_RN_I      = 0xA,
     NODE_TYPE_RN_D      = 0xD,
     NODE_TYPE_RN_SAM    = 0xF,
