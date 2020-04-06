@@ -28,6 +28,10 @@
 /* SAM Granularity of RN-SAM and HN-F SAM */
 #define SAM_GRANULARITY       (64 * FWK_MIB)
 
+/* Macros to split 64 bit value two 32 bit values */
+#define HIGH_WORD(x)    ((unsigned int)((((x) & 0xFFFFFFFF00000000ULL) >> 32)))
+#define LOW_WORD(x)     ((unsigned int)((x) & 0xFFFFFFFF))
+
 /* External nodes that require RN-SAM mapping during run-time */
 struct external_rnsam_tuple {
     unsigned int node_id;
