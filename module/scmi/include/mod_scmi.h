@@ -334,6 +334,16 @@ struct mod_scmi_to_protocol_api {
  */
 struct mod_scmi_from_protocol_api {
     /*!
+     * \brief Get the number of active agents.
+     *
+     * \param[out] agent_count Number of active agents.
+     *
+     * \retval FWK_SUCCESS The agent count was returned.
+     * \retval FWK_E_PARAM The parameter `agent_count` is equal to `NULL`.
+     */
+     int (*get_agent_count)(int *agent_count);
+
+    /*!
      * \brief Get the identifier of the agent associated with a service
      *
      * \param service_id Identifier of the service.
