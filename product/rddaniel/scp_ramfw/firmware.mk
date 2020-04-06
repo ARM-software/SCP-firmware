@@ -17,6 +17,13 @@ BS_FIRMWARE_MODULES := \
     pcid \
     pl011 \
     log \
+    pik_clock \
+    css_clock \
+    clock \
+    gtimer \
+    timer \
+    cmn_rhodes \
+    apcontext \
     ppu_v1 \
     system_power \
     mhu2 \
@@ -24,16 +31,9 @@ BS_FIRMWARE_MODULES := \
     scmi \
     sds \
     system_pll \
-    pik_clock \
-    css_clock \
-    clock \
-    gtimer \
-    timer \
-    apcontext \
     power_domain \
     scmi_power_domain \
     scmi_system_power \
-    cmn_rhodes \
     rddaniel_system
 
 BS_FIRMWARE_SOURCES := \
