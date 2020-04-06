@@ -453,9 +453,10 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
              * Configure memory region
              */
             FWK_LOG_INFO(
-                MOD_NAME "  [0x%" PRIx64 " - 0x%" PRIx64 "] %s",
-                base,
-                base + region->size - 1,
+                MOD_NAME "  [0x%x%x - 0x%x%x] %s",
+                HIGH_WORD(base), LOW_WORD(base),
+                HIGH_WORD(base + region->size - 1),
+                LOW_WORD(base + region->size - 1),
                 mmap_type_name[region->type]);
 
             configure_region(&rnsam->NON_HASH_MEM_REGION[region_io_count],
@@ -486,9 +487,10 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
              * Configure memory region
              */
             FWK_LOG_INFO(
-                MOD_NAME "  [0x%" PRIx64 " - 0x%" PRIx64 "] %s",
-                base,
-                base + region->size - 1,
+                MOD_NAME "  [0x%x%x - 0x%x%x] %s",
+                HIGH_WORD(region->base), LOW_WORD(region->base),
+                HIGH_WORD(region->base + region->size - 1),
+                LOW_WORD(region->base + region->size - 1),
                 mmap_type_name[region->type]);
 
             configure_region(&rnsam->SYS_CACHE_GRP_REGION[region_sys_count],
@@ -505,9 +507,10 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
 
         case MOD_CMN_RHODES_REGION_TYPE_SYSCACHE_SUB:
             FWK_LOG_INFO(
-                MOD_NAME "  [0x%" PRIx64 " - 0x%" PRIx64 "] %s",
-                base,
-                base + region->size - 1,
+                MOD_NAME "  [0x%x%x - 0x%x%x] %s",
+                HIGH_WORD(region->base), LOW_WORD(region->base),
+                HIGH_WORD(region->base + region->size - 1),
+                LOW_WORD(region->base + region->size - 1),
                 mmap_type_name[region->type]);
 
             /* System cache sub-regions are handled by HN-Fs */
@@ -524,9 +527,10 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
         region = &config->ccix_config_table[idx].remote_mmap_table;
 
         FWK_LOG_INFO(
-            MOD_NAME "  [0x%" PRIx64 " - 0x%" PRIx64 "] %s",
-            region->base,
-            region->base + region->size - 1,
+            MOD_NAME "  [0x%x%x - 0x%x%x] %s",
+            HIGH_WORD(region->base), LOW_WORD(region->base),
+            HIGH_WORD(region->base + region->size - 1),
+            LOW_WORD(region->base + region->size - 1),
             mmap_type_name[region->type]);
 
         switch (region->type) {
