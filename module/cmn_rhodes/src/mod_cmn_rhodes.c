@@ -207,13 +207,12 @@ static int cmn_rhodes_discovery(void)
         return FWK_E_DATA;
     }
 
-    FWK_LOG_INFO(
-        MOD_NAME "Total internal RN-SAM nodes: %d" MOD_NAME
-                 "Total external RN-SAM nodes: %d" MOD_NAME
-                 "Total HN-F nodes: %d",
-        ctx->internal_rnsam_count,
-        ctx->external_rnsam_count,
-        ctx->hnf_count);
+    FWK_LOG_INFO(MOD_NAME
+        "Total internal RN-SAM nodes: %d", ctx->internal_rnsam_count);
+    FWK_LOG_INFO(MOD_NAME
+        "Total external RN-SAM nodes: %d", ctx->external_rnsam_count);
+    FWK_LOG_INFO(MOD_NAME
+        "Total HN-F nodes: %d", ctx->hnf_count);
 
     return FWK_SUCCESS;
 }
