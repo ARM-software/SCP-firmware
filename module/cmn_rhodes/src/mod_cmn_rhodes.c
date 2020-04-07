@@ -56,18 +56,11 @@ static void process_node_hnf(struct cmn_rhodes_hnf_reg *hnf)
 
     /*
      * If CAL mode is set, only even numbered hnf node should be added to the
-     * sys_cache_grp_hn_nodeid registers and hnf_count should be incremented
-     * only for the even numbered hnf nodes.
+     * sys_cache_grp_hn_nodeid registers.
      */
     if (config->hnf_cal_mode == true && (node_id % 2 == 1)) {
         /* Factor to manipulate the group and bit_pos */
         cal_mode_factor = 2;
-
-        /*
-         * Reduce the hnf_count as the current hnf node is not getting included
-         * in the sys_cache_grp_hn_nodeid register
-         */
-        ctx->hnf_count--;
     }
 
     assert(logical_id < config->snf_count);
@@ -308,6 +301,7 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
     unsigned int bit_pos;
     unsigned int group;
     unsigned int group_count;
+    unsigned int hnf_count;
     unsigned int region_idx;
     unsigned int region_io_count = 0;
     unsigned int region_sys_count = 0;
@@ -385,12 +379,22 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
         }
     }
 
-    group_count = ctx->hnf_count / CMN_RHODES_HNF_CACHE_GROUP_ENTRIES_PER_GROUP;
+    /*
+     * If CAL mode is enabled, then only the even numbered HN-F nodes are
+     * programmed to the SYS_CACHE registers. Hence reduce the HN-F count by
+     * half if CAL mode is enabled.
+     */
+    if (config->hnf_cal_mode)
+        hnf_count = ctx->hnf_count/2;
+    else
+        hnf_count = ctx->hnf_count;
+
+    group_count = hnf_count / CMN_RHODES_HNF_CACHE_GROUP_ENTRIES_PER_GROUP;
     for (group = 0; group < group_count; group++)
         rnsam->SYS_CACHE_GRP_HN_NODEID[group] = ctx->hnf_cache_group[group];
 
     /* Program the number of HNFs */
-    rnsam->SYS_CACHE_GRP_HN_COUNT = ctx->hnf_count;
+    rnsam->SYS_CACHE_GRP_HN_COUNT = hnf_count;
 
     /*
      * If CAL mode is enabled by the configuration program the SCG CAL Mode
