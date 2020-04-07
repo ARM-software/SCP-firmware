@@ -12,11 +12,11 @@
 /* Include Files                                                             */
 /*****************************************************************************/
 
-#include "cli_config.h"
-#include "cli_fifo.h"
-
 #include <stdbool.h>
 #include <stdint.h>
+
+#include "cli_config.h"
+#include "cli_fifo.h"
 
 /*****************************************************************************/
 /* Enumerated Types                                                          */
