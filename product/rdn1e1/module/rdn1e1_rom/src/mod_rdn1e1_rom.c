@@ -80,6 +80,7 @@ static int rdn1e1_rom_process_event(const struct fwk_event *event,
     struct fwk_event *resp)
 {
     FWK_LOG_INFO("[ROM] Launch RAM");
+    FWK_LOG_FLUSH();
 
     if (rom_config->load_ram_size != 0) {
         memcpy((void *)rom_config->ramfw_base,

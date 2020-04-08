@@ -86,6 +86,8 @@ static int mscp_rom_process_event(const struct fwk_event *event,
     }
 
     FWK_LOG_INFO("[ROM] Starting RAM firmware execution");
+    FWK_LOG_FLUSH();
+
     jump_to_ramfw();
 
     return FWK_SUCCESS;

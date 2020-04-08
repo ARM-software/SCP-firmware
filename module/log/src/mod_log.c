@@ -65,8 +65,6 @@ static int log_bind(fwk_id_t id, unsigned int round)
     int status;
     struct mod_log_driver_api *driver = NULL;
 
-    const char *banner;
-
     /* Skip second round */
     if (round == 1)
         return FWK_SUCCESS;
@@ -86,21 +84,15 @@ static int log_bind(fwk_id_t id, unsigned int round)
 
     log_driver = driver;
 
-    banner = log_config->banner;
-
-    while (banner != NULL) {
-        FWK_LOG_INFO("%s", banner);
-
-        banner = strchr(banner, '\n');
-        if (banner != NULL)
-            banner += 1;
-    }
-
     return FWK_SUCCESS;
 }
 
 static int log_start(fwk_id_t id)
 {
+    int status;
+
+    const char *banner;
+
     static const struct fwk_log_backend backend = {
         .print = log_backend_print,
         .flush = log_backend_flush,
@@ -108,7 +100,22 @@ static int log_start(fwk_id_t id)
 
     fwk_assert(fwk_id_is_type(id, FWK_ID_TYPE_MODULE));
 
-    return fwk_log_register(&backend);
+    status = fwk_log_register(&backend);
+    fwk_expect(status == FWK_SUCCESS);
+
+    banner = log_config->banner;
+
+    while (banner != NULL) {
+        FWK_LOG_CRIT("%s", banner);
+
+        banner = strchr(banner, '\n');
+        if (banner != NULL)
+            banner += 1;
+    }
+
+    FWK_LOG_FLUSH();
+
+    return FWK_SUCCESS;
 }
 
 /* Module descriptor */

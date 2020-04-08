@@ -691,22 +691,28 @@ static int initiate_power_state_transition(struct pd_ctx *pd)
     if ((pd->driver_api->deny != NULL) &&
         pd->driver_api->deny(pd->driver_id, state)) {
         FWK_LOG_WARN(
-            "[PD] Transition of %s to state <%s>,",
+            "[PD] Transition of %s to state <%s> denied by driver",
             fwk_module_get_name(pd->id),
             get_state_name(pd, state));
-        FWK_LOG_WARN("\tdenied by driver.");
         return FWK_E_DEVICE;
     }
 
     status = pd->driver_api->set_state(pd->driver_id, state);
 
-    FWK_LOG_INFO(
-        "[PD] %s: %s->%s, %s (%d)",
-        fwk_module_get_name(pd->id),
-        get_state_name(pd, pd->state_requested_to_driver),
-        get_state_name(pd, state),
-        fwk_status_str(status),
-        status);
+    if (status == FWK_SUCCESS) {
+        FWK_LOG_TRACE(
+            "[PD] Transition of %s from <%s> to <%s> succeeded",
+            fwk_module_get_name(pd->id),
+            get_state_name(pd, pd->state_requested_to_driver),
+            get_state_name(pd, state));
+    } else {
+        FWK_LOG_ERR(
+            "[PD] Transition of %s from <%s> to <%s> failed: %s",
+            fwk_module_get_name(pd->id),
+            get_state_name(pd, pd->state_requested_to_driver),
+            get_state_name(pd, state),
+            fwk_status_str(status));
+    }
 
     pd->state_requested_to_driver = state;
 

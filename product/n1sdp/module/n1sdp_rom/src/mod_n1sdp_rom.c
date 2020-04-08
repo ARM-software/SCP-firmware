@@ -157,6 +157,7 @@ static int n1sdp_rom_process_event(const struct fwk_event *event,
     FWK_LOG_INFO("[ROM] Done!");
 
     FWK_LOG_INFO("[ROM] Jumping to RAM Firmware");
+    FWK_LOG_FLUSH();
 
     jump_to_ramfw();
 
