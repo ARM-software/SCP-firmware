@@ -285,6 +285,8 @@ exit:
 
 void fwk_log_flush(void)
 {
+    const struct fwk_log_backend *backend = NULL;
+
 #ifdef FWK_LOG_BUFFERED
     int status;
 
@@ -298,10 +300,12 @@ void fwk_log_flush(void)
 #endif
 
     if (fwk_log_ctx.backend != NULL)
-        fwk_log_ctx.backend->flush();
+        backend = fwk_log_ctx.backend;
+    else if (fwk_log_ctx.aon_backend != NULL)
+        backend = fwk_log_ctx.aon_backend;
 
-    if (fwk_log_ctx.aon_backend != NULL)
-        fwk_log_ctx.aon_backend->flush();
+    if ((backend != NULL) && (backend->flush != NULL))
+        backend->flush();
 }
 
 int fwk_log_register_aon(const struct fwk_log_backend *backend)

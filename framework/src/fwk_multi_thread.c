@@ -367,8 +367,16 @@ static void process_next_thread_event(struct __fwk_thread_ctx *thread_ctx)
             status = module->process_notification(event, &async_resp_event);
         else
             status = module->process_event(event, &async_resp_event);
-        if (status != FWK_SUCCESS)
-            FWK_LOG_CRIT(err_msg_line, status, __LINE__);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(
+                "[FWK] %s%s%s error: %s %s -> %s",
+                event->is_notification ? "Notification" : "Event",
+                event->is_delayed_response ? " delayed" : "",
+                event->is_response ? " response" : "",
+                FWK_ID_STR(event->id),
+                FWK_ID_STR(event->source_id),
+                FWK_ID_STR(event->target_id));
+        }
     }
 
     /* No event currently processed, no thread currently active. */

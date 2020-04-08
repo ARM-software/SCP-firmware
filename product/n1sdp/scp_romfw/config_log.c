@@ -20,7 +20,7 @@
 /*
  * N1SDP BYPASS ROM firmware banner string.
  */
-#define N1SDP_BANNER_ROM_FIRMWARE "Entered BYPASS ROM Firmware"
+#define N1SDP_BANNER_ROM_FIRMWARE "Entered BYPASS ROM Firmware\n"
 
 /*
  * PL011 module
