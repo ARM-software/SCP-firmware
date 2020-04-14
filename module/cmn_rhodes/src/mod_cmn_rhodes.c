@@ -74,11 +74,17 @@ static void process_node_hnf(struct cmn_rhodes_hnf_reg *hnf)
      * sys_cache_grp_hn_nodeid registers
      */
     if (config->hnf_cal_mode == true) {
-        if (node_id % 2 == 0)
+        if (node_id % 2 == 0) {
             ctx->hnf_cache_group[group] += ((uint64_t)get_node_id(hnf)) <<
                                            bit_pos;
-    } else
+            ctx->sn_nodeid_group[group] +=
+                ((uint64_t)config->snf_table[logical_id]) << bit_pos;
+        }
+    } else {
         ctx->hnf_cache_group[group] += ((uint64_t)get_node_id(hnf)) << bit_pos;
+        ctx->sn_nodeid_group[group] +=
+            ((uint64_t)config->snf_table[logical_id]) << bit_pos;
+    }
 
     /* Set target node */
     hnf->SAM_CONTROL = config->snf_table[logical_id];
