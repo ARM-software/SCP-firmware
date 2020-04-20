@@ -893,10 +893,20 @@ static void scmi_perf_notify_limits(fwk_id_t domain_id,
     struct scmi_perf_limits_changed limits_changed;
     fwk_id_t id;
     int i, idx;
+    const struct mod_scmi_perf_domain_config *domain;
+    struct mod_scmi_perf_fast_channel *fc;
 
     idx = fwk_id_get_element_idx(domain_id);
-    limits_changed.agent_id = (uint32_t)cookie;
 
+    domain = &(*scmi_perf_ctx.config->domains)[idx];
+    if (domain->fast_channels_addr_scp != 0x0) {
+        fc = (struct mod_scmi_perf_fast_channel *)
+            ((uintptr_t)domain->fast_channels_addr_scp);
+        fc->get_limit_range_max = range_max;
+        fc->get_limit_range_min = range_min;
+    }
+
+    limits_changed.agent_id = (uint32_t)cookie;
     /* note: skip agent 0, platform agent */
     for (i = 1; i < scmi_perf_ctx.agent_count; i++) {
         id =
@@ -920,8 +930,18 @@ static void scmi_perf_notify_level(fwk_id_t domain_id,
     struct scmi_perf_level_changed level_changed;
     fwk_id_t id;
     int i, idx;
+    const struct mod_scmi_perf_domain_config *domain;
+    struct mod_scmi_perf_fast_channel *fc;
 
     idx = fwk_id_get_element_idx(domain_id);
+
+    domain = &(*scmi_perf_ctx.config->domains)[idx];
+    if (domain->fast_channels_addr_scp != 0x0) {
+        fc = (struct mod_scmi_perf_fast_channel *)
+            ((uintptr_t)domain->fast_channels_addr_scp);
+        fc->get_level = level;
+    }
+
     level_changed.agent_id = (uint32_t)cookie;
 
     /* note: skip agent 0, platform agent */
