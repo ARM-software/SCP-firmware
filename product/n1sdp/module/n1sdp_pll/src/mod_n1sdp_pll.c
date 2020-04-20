@@ -68,7 +68,7 @@ static int pll_set_rate(struct n1sdp_pll_dev_ctx *ctx, uint64_t rate,
     size_t i;
 
     fwk_assert(ctx != NULL);
-    fwk_assert(rate <= (UINT16_MAX * FWK_MHZ));
+    fwk_assert(rate <= ((uint64_t)UINT16_MAX * FWK_MHZ));
 
     config = ctx->config;
 
