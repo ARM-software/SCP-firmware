@@ -402,9 +402,12 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
             base = region->base;
 
         FWK_LOG_INFO(
-            MOD_NAME "  [0x%" PRIX64 " - 0x%" PRIX64 "] %s",
-            base,
-            base + region->size - 1,
+            MOD_NAME "  [0x%08" PRIX32 "%08" PRIX32
+            " - 0x%08" PRIX32 "%08" PRIX32 "] %s",
+            (uint32_t)(base >> 32),
+            (uint32_t)base,
+            (uint32_t)((base + region->size - 1) >> 32),
+            (uint32_t)(base + region->size - 1),
             mmap_type_name[region->type]);
 
         switch (region->type) {
