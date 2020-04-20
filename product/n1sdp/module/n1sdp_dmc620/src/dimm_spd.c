@@ -107,15 +107,19 @@ static int chk_ddr4_dimms(unsigned int speed,
 
 static void dimm_device_data(uint8_t *spd_data, uint8_t dimm_id)
 {
-    unsigned int i;
+    unsigned int i, j;
+    char part_num[20];
 
     if (spd_data[2] == 0x0C) {
         FWK_LOG_INFO("    DIMM %d information:", dimm_id);
         FWK_LOG_INFO(
             "    Manufacturer ID = 0x%x 0x%x", spd_data[320], spd_data[321]);
-        FWK_LOG_INFO("    Module part number = ");
+
+        j = 0;
         for (i = 329; i <= 348; i++)
-            FWK_LOG_INFO("%c", spd_data[i]);
+            part_num[j++] = spd_data[i];
+
+        FWK_LOG_INFO("    Module part number = %s", part_num);
 
         FWK_LOG_INFO(
             "    Module serial number = 0x%x 0x%x 0x%x 0x%x",
