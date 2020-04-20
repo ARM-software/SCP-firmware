@@ -281,22 +281,20 @@ struct mod_n1sdp_system_ap_memory_access_api
 /*
  * Function to copy into AP SRAM.
  */
-static int n1sdp_system_copy_to_ap_sram(uint64_t sram_address,
+static int n1sdp_system_copy_to_ap_sram(uint32_t sram_address,
                                         uint32_t spi_address,
                                         uint32_t size)
 {
-    uint32_t target_addr = (uint32_t)sram_address;
+    memcpy((void *)sram_address, (void *)spi_address, size);
 
-    memcpy((void *)target_addr, (void *)spi_address, size);
-
-    if (memcmp((void *)target_addr, (void *)spi_address, size) != 0) {
+    if (memcmp((void *)sram_address, (void *)spi_address, size) != 0) {
         FWK_LOG_INFO(
             "[N1SDP SYSTEM] Copy failed at destination address: 0x%" PRIX32,
-            target_addr);
+            sram_address);
         return FWK_E_DATA;
     }
     FWK_LOG_INFO(
-        "[N1SDP SYSTEM] Copied binary to SRAM address: 0x%" PRIX64,
+        "[N1SDP SYSTEM] Copied binary to SRAM address: 0x%08" PRIX32,
         sram_address);
     return FWK_SUCCESS;
 }
@@ -393,8 +391,8 @@ static int n1sdp_system_init_primary_core(void)
     int fip_index_bl31 = -1;
 
     FWK_LOG_INFO(
-        "[N1SDP SYSTEM] Setting AP Reset Address to 0x%" PRIX64,
-        AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET);
+        "[N1SDP SYSTEM] Setting AP Reset Address to 0x%08" PRIX32,
+        (AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET));
 
     cluster_count = n1sdp_core_get_cluster_count();
     for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
@@ -402,10 +400,8 @@ static int n1sdp_system_init_primary_core(void)
             core_idx < n1sdp_core_get_core_per_cluster_count(cluster_idx);
             core_idx++) {
             PIK_CLUSTER(cluster_idx)->STATIC_CONFIG[core_idx].RVBARADDR_LW
-                = (uint32_t)(AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET);
-            PIK_CLUSTER(cluster_idx)->STATIC_CONFIG[core_idx].RVBARADDR_UP
-                = (uint32_t)
-                ((AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET) >> 32);
+                = (AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET);
+            PIK_CLUSTER(cluster_idx)->STATIC_CONFIG[core_idx].RVBARADDR_UP = 0;
         }
     }
 
@@ -444,7 +440,7 @@ static int n1sdp_system_init_primary_core(void)
         }
 
         FWK_LOG_INFO(
-            "[N1SDP SYSTEM] Copying AP BL31 to address 0x%" PRIX64 "...",
+            "[N1SDP SYSTEM] Copying AP BL31 to address 0x%08" PRIX32 "...",
             AP_CORE_RESET_ADDR);
 
         status = n1sdp_system_copy_to_ap_sram(AP_CORE_RESET_ADDR,

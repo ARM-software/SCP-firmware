@@ -41,7 +41,7 @@
 #define AP_SCP_SRAM_OFFSET            UINT32_C(0xA0000000)
 
 /*! AP Cores Reset Address in SCP Address Space */
-#define AP_CORE_RESET_ADDR            UINT64_C(0xA4040000)
+#define AP_CORE_RESET_ADDR            UINT32_C(0xA4040000)
 
 /*! Address translation enable bit */
 #define ADDR_TRANS_EN                 UINT32_C(0x1)
