@@ -8,6 +8,7 @@
 #ifndef SCP_MMAP_H
 #define SCP_MMAP_H
 
+#define SCP_SOC_EXPANSION3_BASE                0x40000000
 #define SCP_PERIPHERAL_BASE                    0x44000000
 #define SCP_ELEMENT_MANAGEMENT_PERIPHERAL_BASE 0x50000000
 
