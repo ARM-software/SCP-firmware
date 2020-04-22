@@ -10,6 +10,7 @@
 
 #include <fwk_macros.h>
 
+#define CLOCK_RATE_REFCLK       (100UL * FWK_MHZ)
 #define CLOCK_RATE_SYSPLLCLK    (2000UL * FWK_MHZ)
 
 /*
@@ -34,6 +35,14 @@ enum clock_pik_idx {
     CLOCK_PIK_IDX_SYSPERCLK,
     CLOCK_PIK_IDX_UARTCLK,
     CLOCK_PIK_IDX_COUNT
+};
+
+/*
+ * CSS clock indexes.
+ */
+enum clock_css_idx {
+    CLOCK_CSS_IDX_CPU_GROUP0,
+    CLOCK_CSS_IDX_COUNT
 };
 
 #endif /* CLOCK_SOC_H */
