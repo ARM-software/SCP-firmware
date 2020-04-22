@@ -15,5 +15,7 @@
 #define SCP_PIK_SCP_BASE             (SCP_ELEMENT_MANAGEMENT_PERIPHERAL_BASE)
 #define SCP_PIK_CLUSTER_BASE(n)      ((SCP_ELEMENT_MANAGEMENT_PERIPHERAL_BASE \
                                         + 0x60000) + ((n) * 0x20000))
+#define SCP_PIK_SYSTEM_BASE          (SCP_ELEMENT_MANAGEMENT_PERIPHERAL_BASE \
+                                       + 0x40000)
 
 #endif /* SCP_CSS_MMAP_H */
