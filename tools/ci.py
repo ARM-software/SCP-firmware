@@ -326,6 +326,40 @@ def main():
     result = subprocess.call(cmd, shell=True)
     results.append(('Product rddaniel debug build (ARM)', result))
 
+    banner('Test building rddanielxlr product')
+
+    cmd = \
+        'CC=arm-none-eabi-gcc ' \
+        'PRODUCT=rddanielxlr ' \
+        'MODE=release ' \
+        'make clean all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product rddanielxlr release build (GCC)', result))
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=rddanielxlr ' \
+        'MODE=release ' \
+        'make clean all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product rddanielxlr release build (ARM)', result))
+
+    cmd = \
+        'CC=arm-none-eabi-gcc ' \
+        'PRODUCT=rddanielxlr ' \
+        'MODE=debug ' \
+        'make clean all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product rddanielxlr debug build (GCC)', result))
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=rddanielxlr ' \
+        'MODE=debug ' \
+        'make clean all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product rddanielxlr debug build (ARM)', result))
+
     banner('Test building tc0 product')
 
     cmd = \
