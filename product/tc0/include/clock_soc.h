@@ -10,6 +10,8 @@
 
 #include <fwk_macros.h>
 
+#define CLOCK_RATE_SYSPLLCLK    (2000UL * FWK_MHZ)
+
 /*
  * PLL clock indexes.
  */
@@ -18,6 +20,20 @@ enum clock_pll_idx {
     CLOCK_PLL_IDX_SYS,
     CLOCK_PLL_IDX_INTERCONNECT,
     CLOCK_PLL_IDX_COUNT
+};
+
+/*
+ * PIK clock indexes.
+ */
+enum clock_pik_idx {
+    CLOCK_PIK_IDX_CLUS0_CPU0,
+    CLOCK_PIK_IDX_INTERCONNECT,
+    CLOCK_PIK_IDX_SCP,
+    CLOCK_PIK_IDX_GIC,
+    CLOCK_PIK_IDX_PCLKSCP,
+    CLOCK_PIK_IDX_SYSPERCLK,
+    CLOCK_PIK_IDX_UARTCLK,
+    CLOCK_PIK_IDX_COUNT
 };
 
 #endif /* CLOCK_SOC_H */
