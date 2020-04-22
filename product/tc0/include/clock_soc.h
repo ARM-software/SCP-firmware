@@ -1,0 +1,23 @@
+/*
+ * Arm SCP/MCP Software
+ * Copyright (c) 2020, Arm Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+#ifndef CLOCK_SOC_H
+#define CLOCK_SOC_H
+
+#include <fwk_macros.h>
+
+/*
+ * PLL clock indexes.
+ */
+enum clock_pll_idx {
+    CLOCK_PLL_IDX_CPU0,
+    CLOCK_PLL_IDX_SYS,
+    CLOCK_PLL_IDX_INTERCONNECT,
+    CLOCK_PLL_IDX_COUNT
+};
+
+#endif /* CLOCK_SOC_H */
