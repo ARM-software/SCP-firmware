@@ -11,5 +11,6 @@
 #include "scp_mmap.h"
 
 #define SCP_UART_BASE                (SCP_PERIPHERAL_BASE + 0x2000)
+#define SCP_PIK_SCP_BASE             (SCP_ELEMENT_MANAGEMENT_PERIPHERAL_BASE)
 
 #endif /* SCP_CSS_MMAP_H */
