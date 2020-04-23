@@ -21,6 +21,8 @@
 /* SCP trusted and non-trusted RAM base address */
 #define SCP_TRUSTED_RAM_BASE               (SCP_SYSTEM_ACCESS_PORT1_BASE + \
                                             0x04000000)
+#define SCP_NONTRUSTED_RAM_BASE            (SCP_SYSTEM_ACCESS_PORT1_BASE + \
+                                            0x06000000)
 
 /* Secure Shared memory between AP and SCP */
 #define SCP_AP_SHARED_SECURE_BASE          (SCP_TRUSTED_RAM_BASE)
