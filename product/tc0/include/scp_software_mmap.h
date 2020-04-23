@@ -13,6 +13,8 @@
 
 #include <fwk_macros.h>
 
+#define SCP_ITC_RAM_SIZE                   (256 * 1024)
+
 /* SCP trusted and non-trusted RAM base address */
 #define SCP_TRUSTED_RAM_BASE               (SCP_SYSTEM_ACCESS_PORT1_BASE + \
                                             0x04000000)
@@ -21,6 +23,11 @@
 #define SCP_AP_SHARED_SECURE_BASE          (SCP_TRUSTED_RAM_BASE)
 #define SCP_AP_SHARED_SECURE_SIZE          (4 * FWK_KIB)
 
+/* AP Context Area */
+#define SCP_AP_CONTEXT_BASE                (SCP_AP_SHARED_SECURE_BASE + \
+                                           SCP_AP_SHARED_SECURE_SIZE - \
+                                           SCP_AP_CONTEXT_SIZE)
+#define SCP_AP_CONTEXT_SIZE                (64)
 
 /* SDS Memory Region */
 #define SCP_SDS_MEM_BASE                   (SCP_AP_SHARED_SECURE_BASE)
