@@ -10,6 +10,8 @@
 
 #include "scp_mmap.h"
 
+#define SCP_CMN_BOOKER_BASE          (SCP_SYSTEM_ACCESS_PORT0_BASE + 0x10000000)
+
 #define SCP_UART_BASE                (SCP_PERIPHERAL_BASE + 0x2000)
 
 #define SCP_PIK_SCP_BASE             (SCP_ELEMENT_MANAGEMENT_PERIPHERAL_BASE)
