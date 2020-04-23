@@ -12,6 +12,8 @@
 
 enum scp_tc0_interrupt {
     TIMREFCLK_IRQ              = 33, /* REFCLK Physical Timer */
+    MHU_AP_NONSEC_IRQ          = 82, /* MHU non-secure irq bewteen SCP and AP */
+    MHU_AP_SEC_IRQ             = 83, /* MHU secure irq bewteen SCP and AP */
 };
 
 #endif /* SCP_TC0_IRQ_H */
