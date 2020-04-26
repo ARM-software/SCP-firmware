@@ -130,14 +130,6 @@ static unsigned int payload_size_table[] = {
     [MOD_SCMI_PD_POWER_STATE_GET] = sizeof(struct scmi_pd_power_state_get_a2p),
 };
 
-static unsigned int scmi_dev_state_id_lost_ctx_to_pd_state[] = {
-    [SCMI_PD_DEVICE_STATE_ID_OFF] = MOD_PD_STATE_OFF,
-};
-
-static unsigned int scmi_dev_state_id_preserved_ctx_to_pd_state[] = {
-    [SCMI_PD_DEVICE_STATE_ID_ON] = MOD_PD_STATE_ON,
-};
-
 static uint32_t pd_state_to_scmi_dev_state[] = {
     [MOD_PD_STATE_OFF] = SCMI_PD_DEVICE_STATE_ID_OFF |
                          SCMI_PD_DEVICE_STATE_TYPE,
@@ -192,18 +184,14 @@ static int scmi_device_state_to_pd_state(uint32_t scmi_state,
     ctx_lost = !!(scmi_state & SCMI_PD_DEVICE_STATE_TYPE);
     scmi_state_id = scmi_state & SCMI_PD_DEVICE_STATE_ID_MASK;
 
-    if (ctx_lost) {
-        if (scmi_state_id >=
-            FWK_ARRAY_SIZE(scmi_dev_state_id_lost_ctx_to_pd_state))
-            return FWK_E_PWRSTATE;
-
-        *pd_state = scmi_dev_state_id_lost_ctx_to_pd_state[scmi_state_id];
+    if (scmi_state_id == SCMI_PD_DEVICE_STATE_ID) {
+        if (ctx_lost)
+            *pd_state = MOD_PD_STATE_OFF;
+        else
+            *pd_state = MOD_PD_STATE_ON;
     } else {
-        if (scmi_state_id >=
-            FWK_ARRAY_SIZE(scmi_dev_state_id_preserved_ctx_to_pd_state))
-            return FWK_E_PWRSTATE;
-
-        *pd_state = scmi_dev_state_id_preserved_ctx_to_pd_state[scmi_state_id];
+        /* Implementation Defined state */
+        *pd_state = scmi_state;
     }
 
     return FWK_SUCCESS;
@@ -521,7 +509,10 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
             goto exit;
         }
 
-        status = scmi_pd_ctx.pd_api->set_state(pd_id, pd_power_state);
+        status = scmi_pd_ctx.pd_api->set_composite_state_async(
+                    pd_id,
+                    false,
+                    pd_power_state);
         break;
 
     case MOD_PD_TYPE_SYSTEM:
