@@ -29,11 +29,7 @@ static const struct fwk_element element_table[] = {
     },
     [JUNO_MHU_DEVICE_IDX_NS_H] = {
         .name = "",
-#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
         .sub_element_count = 2,
-#else
-        .sub_element_count = 1,
-#endif
         .data = &(struct mod_mhu_device_config) {
             .irq = MHU_HIGH_PRIO_IRQ,
             .in = MHU_CPU_INTR_H_BASE,

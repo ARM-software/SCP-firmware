@@ -9,6 +9,7 @@
 #define MOD_DVFS_H
 
 #include <fwk_id.h>
+#include <fwk_macros.h>
 #include <fwk_module_idx.h>
 
 #include <stddef.h>
@@ -75,6 +76,16 @@ struct mod_dvfs_domain_config {
      * \warning This identifier must refer to an alarm of the \c timer module.
      */
     fwk_id_t alarm_id;
+
+    /*!
+     * \brief Notifications identifier.
+     */
+    fwk_id_t notification_id;
+
+    /*!
+     * \brief Notifications API identifier.
+     */
+    fwk_id_t notification_api_id;
 
     /*! Delay in milliseconds before retrying a request */
     uint16_t retry_ms;
@@ -157,9 +168,11 @@ struct mod_dvfs_domain_api {
      * \brief Set the frequency of a domain.
      *
      * \param domain_id Element identifier of the domain.
-     * \param idx Index of the operating point to transition to.
+     * \param cookie Context-specific value.
+     * \param frequency Requested frequency.
      */
-    int (*set_frequency)(fwk_id_t domain_id, uint64_t frequency);
+    int (*set_frequency)(fwk_id_t domain_id, uintptr_t cookie,
+        uint64_t frequency);
 
     /*!
      * \brief Get the frequency of a domain.
@@ -175,10 +188,11 @@ struct mod_dvfs_domain_api {
      * \brief Set the frequency of a domain.
      *
      * \param domain_id Element identifier of the domain.
+     * \param cookie Context-specific value.
      * \param limits Pointer to the new limits.
      */
     int (*set_frequency_limits)(
-        fwk_id_t domain_id,
+        fwk_id_t domain_id, uintptr_t cookie,
         const struct mod_dvfs_frequency_limits *limits);
 };
 
@@ -189,24 +203,24 @@ struct mod_dvfs_domain_api {
  */
 struct mod_dvfs_notification_api {
     /*!
-     * \brief Send a limits_changed notification for the domain.
+     * \brief Send a limitschanged notification for the domain.
      *
-     * \param domain_id Domain identifier
-     * \param cookie Context-specific value
-     * \param range_min Min allowed performance level
-     * \param range_max Max allowed performance level
+     * \param domain_id Domain identifier.
+     * \param cookie Context-specific value.
+     * \param range_min Min allowed performance level.
+     * \param range_max Max allowed performance level.
      */
-    void (*notify_limits)(uint32_t domain_id, uintptr_t cookie,
+    void (*notify_limits)(fwk_id_t domain_id, uintptr_t cookie,
         uint32_t range_min, uint32_t range_max);
 
     /*!
-     * \brief Send a level_changed notification for the domain.
+     * \brief Send a level changed notification for the domain.
      *
-     * \param domain_id Domain identifier
-     * \param cookie Context-specific value
-     * \param level The new performance level of the domain
+     * \param domain_id Domain identifier.
+     * \param cookie Context-specific value.
+     * \param level The new performance level of the domain.
      */
-    void (*notify_level)(uint32_t domain_id, uintptr_t cookie,
+    void (*notify_level)(fwk_id_t domain_id, uintptr_t cookie,
         uint32_t level);
 };
 

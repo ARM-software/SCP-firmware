@@ -240,6 +240,7 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
     struct scmi_perf_domain_attributes_p2a return_values = {
         .status = SCMI_GENERIC_ERROR,
     };
+    bool notifications = false;
 
     parameters = (const struct scmi_perf_domain_attributes_a2p *)payload;
 
@@ -263,10 +264,13 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
     if (status != FWK_SUCCESS)
         goto exit;
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    notifications = true;
+#endif
     return_values = (struct scmi_perf_domain_attributes_p2a) {
         .status = SCMI_SUCCESS,
         .attributes = SCMI_PERF_DOMAIN_ATTRIBUTES(
-            false, false,
+            notifications, notifications,
             !!(permissions & MOD_SCMI_PERF_PERMS_SET_LEVEL),
             !!(permissions & MOD_SCMI_PERF_PERMS_SET_LIMITS)
         ),
@@ -434,6 +438,7 @@ static int scmi_perf_limits_set_handler(fwk_id_t service_id,
 
     status = scmi_perf_ctx.dvfs_api->set_frequency_limits(
         FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, parameters->domain_id),
+        agent_id,
         &((struct mod_dvfs_frequency_limits) {
         .minimum = parameters->range_min,
         .maximum = parameters->range_max
@@ -551,7 +556,7 @@ static int scmi_perf_level_set_handler(fwk_id_t service_id,
 
     status = scmi_perf_ctx.dvfs_api->set_frequency(
        FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, parameters->domain_id),
-       (uint64_t)parameters->performance_level);
+       agent_id, (uint64_t)parameters->performance_level);
 
     /*
      * Return immediately to the caller, fire-and-forget.
@@ -784,22 +789,23 @@ static void scmi_perf_respond(
     scmi_perf_ctx.perf_ops_table[idx].service_id = FWK_ID_NONE;
 }
 
-static void scmi_perf_notify_limits(uint32_t domain_id,
+static void scmi_perf_notify_limits(fwk_id_t domain_id,
     uintptr_t cookie, uint32_t range_min, uint32_t range_max)
 {
     struct scmi_perf_limits_changed limits_changed;
     fwk_id_t id;
-    int i;
+    int i, idx;
 
+    idx = fwk_id_get_element_idx(domain_id);
     limits_changed.agent_id = (uint32_t)cookie;
 
     /* note: skip agent 0, platform agent */
     for (i = 1; i < scmi_perf_ctx.agent_count; i++) {
         id =
-            scmi_perf_ctx.agent_notifications[domain_id]->limit_notification[i];
+            scmi_perf_ctx.agent_notifications[idx]->limit_notification[i];
 
         if (!fwk_id_is_equal(id, FWK_ID_NONE)) {
-            limits_changed.domain_id = domain_id;
+            limits_changed.domain_id = idx;
             limits_changed.range_min = range_min;
             limits_changed.range_max = range_max;
 
@@ -810,21 +816,22 @@ static void scmi_perf_notify_limits(uint32_t domain_id,
     }
 }
 
-static void scmi_perf_notify_level(uint32_t domain_id,
+static void scmi_perf_notify_level(fwk_id_t domain_id,
     uintptr_t cookie, uint32_t level)
 {
     struct scmi_perf_level_changed level_changed;
     fwk_id_t id;
-    int i;
+    int i, idx;
 
+    idx = fwk_id_get_element_idx(domain_id);
     level_changed.agent_id = (uint32_t)cookie;
 
     /* note: skip agent 0, platform agent */
     for (i = 1; i < scmi_perf_ctx.agent_count; i++) {
         id =
-            scmi_perf_ctx.agent_notifications[domain_id]->level_notification[i];
+            scmi_perf_ctx.agent_notifications[idx]->level_notification[i];
         if (!fwk_id_is_equal(id, FWK_ID_NONE)) {
-            level_changed.domain_id = domain_id;
+            level_changed.domain_id = idx;
             level_changed.performance_level = level;
 
             scmi_perf_ctx.scmi_api->notify(id,
@@ -935,7 +942,7 @@ static int scmi_perf_process_bind_request(fwk_id_t source_id,
         *api = &scmi_perf_mod_scmi_to_protocol_api;
         break;
 
-    case MOD_SCMI_PERF_NOTIFICATION_API:
+    case MOD_SCMI_PERF_DVFS_NOTIFICATION_API:
         *api = &notification_api;
         break;
 
