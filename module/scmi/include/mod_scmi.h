@@ -242,6 +242,24 @@ struct mod_scmi_to_transport_api {
      * errors.
      */
     int (*respond)(fwk_id_t channel_id, const void *payload, size_t size);
+
+    /*!
+     * \brief Send a message on a channel.
+     *
+     * \param channel_id Channel identifier.
+     * \param message_header Message ID.
+     * \param payload Payload data to write.
+     * \param size Size of the payload source.
+     *
+     * \retval FWK_SUCCESS The operation succeeded.
+     * \retval FWK_E_PARAM The channel_id parameter is invalid.
+     * \retval FWK_E_PARAM The size parameter is less than the size of one
+     * payload entry.
+     * \return One of the standard error codes for implementation-defined
+     * errors.
+     */
+    int (*transmit)(fwk_id_t channel_id, uint32_t message_header,
+        const void *payload, size_t size);
 };
 
 /*!
@@ -417,6 +435,19 @@ struct mod_scmi_from_protocol_api {
      * \param size Size of the payload.
      */
     void (*respond)(fwk_id_t service_id, const void *payload, size_t size);
+
+    /*!
+     * \brief Send a notification to the agent on behalf on an SCMI service.
+     *
+     * \param service_id Service identifier.
+     * \param protocol_id Protocol identifier.
+     * \param message_id Message identifier.
+     * \param payload Payload data to write, or NULL if a payload has already
+     *         been written.
+     * \param size Size of the payload in bytes.
+     */
+    void (*notify)(fwk_id_t service_id, int protocol_id, int message_id,
+        const void *payload, size_t size);
 };
 
 

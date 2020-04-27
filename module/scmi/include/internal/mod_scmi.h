@@ -35,8 +35,16 @@ struct scmi_service_ctx {
     /* Pointer to the transport API used to read and respond to messages */
     const struct mod_scmi_to_transport_api *transport_api;
 
-    /* Copy of the pointer to the 'respond' function within the transport API */
+    /*
+     * Copy of the pointer to the 'respond' function within the transport API.
+     */
     int (*respond)(fwk_id_t transport_id, const void *payload, size_t size);
+
+    /*
+     * Copy of the pointer to the 'transmit' function within the transport API.
+     */
+    int (*transmit)(fwk_id_t transport_id, uint32_t message_header,
+        const void *payload, size_t size);
 
     /* SCMI message token, used by the agent to identify individual messages */
     uint16_t scmi_token;
