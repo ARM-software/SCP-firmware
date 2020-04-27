@@ -65,6 +65,14 @@ The following parameters are mandatory:
   to yes, firmware will be built with multithreading support.
 * __BS_FIRMWARE_HAS_NOTIFICATION__ <yes|no> - Notification support. When set
   to yes, firmware will be built with notification support.
+* __BS_FIRMWARE_USE_NEWLIB_NANO_SPECS__ <yes|no> - Firmware is by default built
+  with Newlib as standard C library. From GCC ARM Embedded 4.7 version onwards,
+  GCC toolchain includes Newlib-nano library to generate optimized code size.
+  When this flag is set to yes, firmware will be built with Newlib-nano as
+  standard C library instead of Newlib. Doing this will reduce the code size but
+  some features that were added after C89 will not be available. For example,
+  it does not have 64-bit integer support in format IO due to which it won't be
+  possible to print a 64-bit integer while using Newlib-nano.
 * __BS_FIRMWARE_MODULES__ - The list of modules to be included and built into
   the firmware and any APIs to be omitted from each module.
 * __BS_FIRMWARE_MODULE_HEADERS_ONLY__ - The list of modules to have their header

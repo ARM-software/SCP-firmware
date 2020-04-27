@@ -47,6 +47,7 @@ endif
 export BS_FIRMWARE_CPU
 export BS_FIRMWARE_HAS_MULTITHREADING
 export BS_FIRMWARE_HAS_NOTIFICATION
+export BS_FIRMWARE_USE_NEWLIB_NANO_SPECS
 
 #
 # Generate FIRMWARE_MODULES_LIST and list of excluded APIs for each module in
