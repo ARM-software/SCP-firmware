@@ -224,6 +224,50 @@ static int smt_respond(fwk_id_t channel_id, const void *payload, size_t size)
     return FWK_SUCCESS;
 }
 
+
+static int smt_transmit(fwk_id_t channel_id, uint32_t message_header,
+    const void *payload, size_t size)
+{
+    struct smt_channel_ctx *channel_ctx;
+    struct mod_smt_memory *memory;
+
+    if (payload == NULL)
+        return FWK_E_DATA;
+
+    channel_ctx =
+        &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
+    memory = ((struct mod_smt_memory *)
+        channel_ctx->config->mailbox_address);
+
+    /*
+     * If the agent has not yet read the previous message we
+     * abandon this transmission. We don't want to poll on the BUSY/FREE
+     * bit, and while it is probably safe to just overwrite the data
+     * the agent could be in the process of reading.
+     */
+    if (!(memory->status & MOD_SMT_MAILBOX_STATUS_FREE_MASK))
+        return FWK_E_BUSY;
+
+    memory->message_header = message_header;
+
+    /*
+     * we do not want the agent to send an interrupt when it receives
+     * the message.
+     */
+    memory->flags = 0;
+
+    /* Copy the payload */
+    memcpy(memory->payload, payload, size);
+
+    memory->length = sizeof(memory->message_header) + size;
+    memory->status &= ~MOD_SMT_MAILBOX_STATUS_FREE_MASK;
+
+    /* Notify the agent */
+    channel_ctx->driver_api->raise_interrupt(channel_ctx->driver_id);
+
+    return FWK_SUCCESS;
+}
+
 static const struct mod_scmi_to_transport_api smt_mod_scmi_to_transport_api = {
     .get_secure = smt_get_secure,
     .get_max_payload_size = smt_get_max_payload_size,
@@ -231,6 +275,7 @@ static const struct mod_scmi_to_transport_api smt_mod_scmi_to_transport_api = {
     .get_payload = smt_get_payload,
     .write_payload = smt_write_payload,
     .respond = smt_respond,
+    .transmit = smt_transmit,
 };
 
 /*

@@ -133,6 +133,24 @@ static struct scmi_ctx scmi_ctx;
 /*
  * Utility functions
  */
+/*
+ * Return a packed 32-bit message header comprised of an 8-bit message
+ * identifier, a 2-bit message type, an 8-bit protocol identifier,
+ * and a 10-bit token.
+ */
+static uint32_t scmi_message_header(uint8_t message_id,
+    uint8_t message_type, uint8_t protocol_id, uint8_t token)
+{
+    return ((((message_id) << SCMI_MESSAGE_HEADER_MESSAGE_ID_POS) &
+        SCMI_MESSAGE_HEADER_MESSAGE_ID_MASK) |
+    (((message_type) << SCMI_MESSAGE_HEADER_MESSAGE_TYPE_POS) &
+        SCMI_MESSAGE_HEADER_MESSAGE_TYPE_MASK) |
+    (((protocol_id) << SCMI_MESSAGE_HEADER_PROTOCOL_ID_POS) &
+        SCMI_MESSAGE_HEADER_PROTOCOL_ID_MASK) |
+    (((token) << SCMI_MESSAGE_HEADER_TOKEN_POS) &
+        SCMI_MESSAGE_HEADER_TOKEN_POS));
+}
+
 static uint16_t read_message_id(uint32_t message_header)
 {
     return (message_header & SCMI_MESSAGE_HEADER_MESSAGE_ID_MASK) >>
@@ -326,6 +344,28 @@ static void respond(fwk_id_t service_id, const void *payload, size_t size)
     }
 }
 
+static void scmi_notify(fwk_id_t id, int protocol_id, int message_id,
+    const void *payload, size_t size)
+{
+    const struct scmi_service_ctx *ctx;
+    uint32_t message_header;
+
+    if (fwk_id_is_equal(id, FWK_ID_NONE))
+        return;
+
+    ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(id)];
+
+    if (ctx == NULL)
+        return; /* No notification service configured */
+
+    message_header = scmi_message_header(message_id,
+        MOD_SCMI_MESSAGE_TYPE_NOTIFICATION,
+        protocol_id, 0);
+
+    ctx->transmit(ctx->transport_id, message_header,
+        payload, size);
+}
+
 static const struct mod_scmi_from_protocol_api mod_scmi_from_protocol_api = {
     .get_agent_count = get_agent_count,
     .get_agent_id = get_agent_id,
@@ -333,6 +373,7 @@ static const struct mod_scmi_from_protocol_api mod_scmi_from_protocol_api = {
     .get_max_payload_size = get_max_payload_size,
     .write_payload = write_payload,
     .respond = respond,
+    .notify = scmi_notify,
 };
 
 /*
