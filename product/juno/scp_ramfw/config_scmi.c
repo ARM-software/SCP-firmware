@@ -19,12 +19,12 @@
 #include <fwk_module_idx.h>
 
 static const struct fwk_element element_table[] = {
-    [JUNO_SCMI_SERVICE_IDX_PSCI] = {
+    [JUNO_SCMI_SERVICE_IDX_PSCI_A2P] = {
         .name = "PSCI",
         .data = &(struct mod_scmi_service_config) {
             .transport_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_SMT,
-                JUNO_SCMI_SERVICE_IDX_PSCI),
+                JUNO_SCMI_SERVICE_IDX_PSCI_A2P),
             .transport_api_id = FWK_ID_API_INIT(
                 FWK_MODULE_IDX_SMT,
                 MOD_SMT_API_IDX_SCMI_TRANSPORT),
@@ -35,12 +35,12 @@ static const struct fwk_element element_table[] = {
         },
     },
 
-    [JUNO_SCMI_SERVICE_IDX_OSPM_0] = {
-        .name = "OSPM-0",
+    [JUNO_SCMI_SERVICE_IDX_OSPM_A2P_0] = {
+        .name = "OSPM-A2P-0",
         .data = &(struct mod_scmi_service_config) {
             .transport_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_SMT,
-                JUNO_SCMI_SERVICE_IDX_OSPM_0),
+                JUNO_SCMI_SERVICE_IDX_OSPM_A2P_0),
             .transport_api_id = FWK_ID_API_INIT(
                 FWK_MODULE_IDX_SMT,
                 MOD_SMT_API_IDX_SCMI_TRANSPORT),
@@ -51,12 +51,12 @@ static const struct fwk_element element_table[] = {
         },
     },
 
-    [JUNO_SCMI_SERVICE_IDX_OSPM_1] = {
-        .name = "OSPM-1",
+    [JUNO_SCMI_SERVICE_IDX_OSPM_A2P_1] = {
+        .name = "OSPM-A2P-1",
         .data = &(struct mod_scmi_service_config) {
             .transport_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_SMT,
-                JUNO_SCMI_SERVICE_IDX_OSPM_1),
+                JUNO_SCMI_SERVICE_IDX_OSPM_A2P_1),
             .transport_api_id = FWK_ID_API_INIT(
                 FWK_MODULE_IDX_SMT,
                 MOD_SMT_API_IDX_SCMI_TRANSPORT),
@@ -66,6 +66,24 @@ static const struct fwk_element element_table[] = {
             .scmi_agent_id = JUNO_SCMI_AGENT_IDX_OSPM,
         },
     },
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    [JUNO_SCMI_SERVICE_IDX_OSPM_P2A] = {
+        .name = "OSPM-P2A",
+        .data = &(struct mod_scmi_service_config) {
+            .transport_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_SMT,
+                JUNO_SCMI_SERVICE_IDX_OSPM_P2A),
+            .transport_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_SMT,
+                MOD_SMT_API_IDX_SCMI_TRANSPORT),
+            .transport_notification_init_id =
+                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
+                    MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
+            .scmi_agent_id = JUNO_SCMI_AGENT_IDX_OSPM,
+        },
+    },
+#endif
 
     [JUNO_SCMI_SERVICE_IDX_COUNT] = { 0 },
 };
