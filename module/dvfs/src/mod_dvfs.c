@@ -69,6 +69,9 @@ struct mod_dvfs_request {
     /* New operating point data for the request */
     struct mod_dvfs_opp new_opp;
 
+    /* Context-specific value */
+    uintptr_t cookie;
+
     /* Response expected for this request */
     bool response_required;
 
@@ -102,6 +105,8 @@ struct mod_dvfs_domain_ctx {
         /* Alarm API for pending requests */
         const struct mod_timer_alarm_api *alarm_api;
 
+        /* DVFS perf notification API */
+        struct mod_dvfs_notification_api *notification_api;
     } apis;
 
     /* Number of operating points */
@@ -132,6 +137,9 @@ struct mod_dvfs_domain_ctx {
 struct mod_dvfs_ctx {
     /* Number of DVFS domains */
     uint32_t dvfs_domain_element_count;
+
+    /* DVFS config data */
+    struct mod_dvfs_config *config;
 
     /* DVFS device context table */
     struct mod_dvfs_domain_ctx (*domain_ctx)[];
@@ -256,10 +264,12 @@ static int put_event_request(struct mod_dvfs_domain_ctx *ctx,
 }
 
 static int dvfs_set_frequency_start(struct mod_dvfs_domain_ctx *ctx,
+    uintptr_t cookie,
     const struct mod_dvfs_opp *new_opp,
     bool retry_request,
     uint8_t num_retries)
 {
+    ctx->request.cookie = cookie,
     ctx->request.new_opp = *new_opp;
     ctx->request.retry_request = retry_request;
     ctx->request.response_required = false;
@@ -276,7 +286,9 @@ static void dvfs_flush_pending_request(struct mod_dvfs_domain_ctx *ctx)
 {
     if (ctx->request_pending) {
         ctx->request_pending = false;
-        dvfs_set_frequency_start(ctx, &ctx->pending_request.new_opp,
+        dvfs_set_frequency_start(ctx,
+            ctx->pending_request.cookie,
+            &ctx->pending_request.new_opp,
             ctx->pending_request.retry_request,
             ctx->pending_request.num_retries);
     }
@@ -323,7 +335,8 @@ static int dvfs_handle_pending_request(struct mod_dvfs_domain_ctx *ctx)
 }
 
 static int dvfs_create_pending_level_request(struct mod_dvfs_domain_ctx *ctx,
-    const struct mod_dvfs_opp *new_opp, bool retry_request)
+    uintptr_t cookie, const struct mod_dvfs_opp *new_opp,
+    bool retry_request)
 {
 
     if (ctx->request_pending) {
@@ -349,7 +362,7 @@ static int dvfs_create_pending_level_request(struct mod_dvfs_domain_ctx *ctx,
      */
     if (retry_request)
         ctx->pending_request.retry_request = retry_request;
-
+    ctx->pending_request.cookie = cookie;
     return FWK_SUCCESS;
 }
 
@@ -483,7 +496,12 @@ static int dvfs_get_current_opp(fwk_id_t domain_id, struct mod_dvfs_opp *opp)
 /*
  * DVFS module asynchronous API functions
  */
-static int dvfs_set_frequency(fwk_id_t domain_id, uint64_t frequency)
+
+/*
+ * DVFS module asynchronous API functions
+ */
+static int dvfs_set_frequency(fwk_id_t domain_id, uintptr_t cookie,
+    uint64_t frequency)
 {
     struct mod_dvfs_domain_ctx *ctx;
     const struct mod_dvfs_opp *new_opp;
@@ -501,17 +519,18 @@ static int dvfs_set_frequency(fwk_id_t domain_id, uint64_t frequency)
         return FWK_E_RANGE;
 
     if (ctx->state != DVFS_DOMAIN_STATE_IDLE)
-        return dvfs_create_pending_level_request(ctx, new_opp, false);
+        return dvfs_create_pending_level_request(ctx, cookie,
+            new_opp, false);
 
     if ((new_opp->frequency == ctx->current_opp.frequency) &&
         (new_opp->voltage == ctx->current_opp.voltage))
         return FWK_SUCCESS;
 
-    return dvfs_set_frequency_start(ctx, new_opp, false, 0);
+    return dvfs_set_frequency_start(ctx, cookie, new_opp, false, 0);
 }
 
 static int dvfs_set_frequency_limits(fwk_id_t domain_id,
-    const struct mod_dvfs_frequency_limits *limits)
+    uintptr_t cookie, const struct mod_dvfs_frequency_limits *limits)
 {
     struct mod_dvfs_domain_ctx *ctx;
     const struct mod_dvfs_opp *new_opp;
@@ -534,10 +553,18 @@ static int dvfs_set_frequency_limits(fwk_id_t domain_id,
         return FWK_SUCCESS;
     }
 
-    if (ctx->state != DVFS_DOMAIN_STATE_IDLE)
-        return dvfs_create_pending_level_request(ctx, new_opp, true);
+    if (ctx->apis.notification_api) {
+        ctx->apis.notification_api->notify_limits(
+            ctx->domain_id, cookie,
+            limits->minimum, limits->maximum);
+    }
 
-    return dvfs_set_frequency_start(ctx, new_opp, true, 0);
+    if (ctx->state != DVFS_DOMAIN_STATE_IDLE) {
+        return dvfs_create_pending_level_request(ctx, cookie,
+             new_opp, true);
+    }
+
+    return dvfs_set_frequency_start(ctx, cookie, new_opp, true, 0);
 }
 
 static const struct mod_dvfs_domain_api mod_dvfs_domain_api = {
@@ -623,9 +650,18 @@ static int dvfs_complete(struct mod_dvfs_domain_ctx *ctx,
             ctx->pending_request.retry_request = ctx->request.retry_request;
             ctx->pending_request.num_retries = ctx->request.num_retries;
             if (!ctx->request_pending) {
+                ctx->pending_request.cookie = ctx->request.cookie;
                 ctx->pending_request.new_opp = ctx->request.new_opp;
                 ctx->request_pending = true;
             }
+        }
+    }
+
+    if ((req_status == FWK_SUCCESS) && (ctx->state != DVFS_DOMAIN_GET_OPP)) {
+        if (ctx->apis.notification_api) {
+            ctx->apis.notification_api->notify_level(
+                ctx->domain_id, ctx->request.cookie,
+                ctx->current_opp.frequency);
         }
     }
 
@@ -922,7 +958,9 @@ static int mod_dvfs_process_event(const struct fwk_event *event,
     if (fwk_id_is_equal(event->id, mod_dvfs_event_id_retry)) {
         ctx->request.set_source_id = false;
         ctx->request_pending = false;
-        status = dvfs_set_frequency_start(ctx, &ctx->pending_request.new_opp,
+        status = dvfs_set_frequency_start(ctx,
+            ctx->pending_request.cookie,
+            &ctx->pending_request.new_opp,
             ctx->pending_request.retry_request,
             ctx->pending_request.num_retries);
         ctx->pending_request = (struct mod_dvfs_request){ 0 };
@@ -997,7 +1035,7 @@ static int dvfs_start(fwk_id_t id)
     if (status == FWK_SUCCESS) {
         ctx = get_domain_ctx(id);
         ctx->request.set_source_id = true;
-        dvfs_set_frequency_start(ctx, &sustained_opp, true, 0);
+        dvfs_set_frequency_start(ctx, 0, &sustained_opp, true, 0);
     }
 
     return status;
@@ -1009,6 +1047,7 @@ static int dvfs_init(fwk_id_t module_id, unsigned int element_count,
     dvfs_ctx.domain_ctx = fwk_mm_calloc(element_count,
         sizeof((*dvfs_ctx.domain_ctx)[0]));
 
+    dvfs_ctx.config = (struct mod_dvfs_config *)data;
     dvfs_ctx.dvfs_domain_element_count = element_count;
 
     return FWK_SUCCESS;
@@ -1048,10 +1087,6 @@ dvfs_bind_element(fwk_id_t domain_id, unsigned int round)
     int status;
     const struct mod_dvfs_domain_ctx *ctx = get_domain_ctx(domain_id);
 
-    /* Only handle the first round */
-    if (round > 0)
-        return FWK_SUCCESS;
-
     /* Bind to the power supply module */
     status = fwk_module_bind(ctx->config->psu_id, mod_psu_api_id_device,
         &ctx->apis.psu);
@@ -1063,6 +1098,15 @@ dvfs_bind_element(fwk_id_t domain_id, unsigned int round)
         FWK_ID_API(FWK_MODULE_IDX_CLOCK, 0), &ctx->apis.clock);
     if (status != FWK_SUCCESS)
         return FWK_E_PANIC;
+
+    /* Bind to a notification module if required */
+    if (!(fwk_id_is_equal(ctx->config->notification_id, FWK_ID_NONE))) {
+        status = fwk_module_bind(ctx->config->notification_id,
+            ctx->config->notification_api_id,
+            &ctx->apis.notification_api);
+        if (status != FWK_SUCCESS)
+            return FWK_E_PANIC;
+    }
 
     /* Bind to the alarm HAL if required */
     if (ctx->config->retry_ms > 0) {
@@ -1078,6 +1122,10 @@ dvfs_bind_element(fwk_id_t domain_id, unsigned int round)
 static int
 dvfs_bind(fwk_id_t id, unsigned int round)
 {
+    /* Only handle the first round */
+    if (round > 0)
+        return FWK_SUCCESS;
+
     /* Bind our elements */
     if (fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT))
         return dvfs_bind_element(id, round);

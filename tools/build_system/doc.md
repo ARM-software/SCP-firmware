@@ -193,6 +193,13 @@ When notification support is enabled, the following applies:
   number of notification subscriptions supported and set to the value
   defined by BS_FIRMWARE_NOTIFICATION_COUNT parameter.
 
+SCMI Notifications Support                         {#section_scmi_notifications}
+==========================
+
+When building a firmware and its dependencies, the
+BS_FIRMWARE_HAS_SCMI_NOTIFICATIONS parameter controls whether SCMI notifications
+are enabled or not.
+
 Definitions
 ===========
 

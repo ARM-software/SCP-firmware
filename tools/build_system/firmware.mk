@@ -211,6 +211,12 @@ ifeq ($(BUILD_HAS_NOTIFICATION),yes)
     export BUILD_NOTIFICATION_COUNT
 endif
 
+ifeq ($(BS_FIRMWARE_HAS_SCMI_NOTIFICATIONS),yes)
+    BUILD_HAS_SCMI_NOTIFICATIONS := yes
+else
+    BUILD_HAS_SCMI_NOTIFICATIONS := no
+endif
+
 # Add directories to the list of targets to build
 LIB_TARGETS_y += $(patsubst %,$(MODULES_DIR)/%/src, \
                             $(BUILD_STANDARD_MODULES))

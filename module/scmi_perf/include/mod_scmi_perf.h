@@ -65,7 +65,7 @@ enum scmi_perf_api_idx {
     MOD_SCMI_PERF_PROTOCOL_API,
 
     /*! Index of the notification API */
-    MOD_SCMI_PERF_NOTIFICATION_API,
+    MOD_SCMI_PERF_DVFS_NOTIFICATION_API,
 
     /*! Number of APIs */
     MOD_SCMI_PERF_API_COUNT

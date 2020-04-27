@@ -133,6 +133,7 @@ static struct scmi_ctx scmi_ctx;
 /*
  * Utility functions
  */
+
 /*
  * Return a packed 32-bit message header comprised of an 8-bit message
  * identifier, a 2-bit message type, an 8-bit protocol identifier,
@@ -355,7 +356,7 @@ static void scmi_notify(fwk_id_t id, int protocol_id, int message_id,
 
     ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(id)];
 
-    if (ctx == NULL)
+    if ((ctx == NULL) || (ctx->transmit == NULL))
         return; /* No notification service configured */
 
     message_header = scmi_message_header(message_id,
@@ -751,13 +752,13 @@ static int scmi_bind(fwk_id_t id, unsigned int round)
             (transport_api->get_max_payload_size == NULL) ||
             (transport_api->get_message_header == NULL) ||
             (transport_api->get_payload == NULL) ||
-            (transport_api->write_payload == NULL) ||
-            (transport_api->respond == NULL))
+            (transport_api->write_payload == NULL))
             return FWK_E_DATA;
 
         ctx->transport_api = transport_api;
         ctx->transport_id = ctx->config->transport_id;
         ctx->respond = transport_api->respond;
+        ctx->transmit = transport_api->transmit;
 
         return FWK_SUCCESS;
     }
