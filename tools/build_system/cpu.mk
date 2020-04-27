@@ -23,7 +23,16 @@ ifneq ($(findstring $(BS_FIRMWARE_CPU),$(ARMV7M_CPUS)),)
     BS_ARCH_ARCH := armv7-m
     BS_ARCH_MODE := thumb
 
-    LDFLAGS_GCC += --specs=nano.specs
+    ifeq ($(BS_FIRMWARE_USE_NEWLIB_NANO_SPECS),yes)
+        # From GCC ARM Embedded 4.7 version and onwards, GCC toolchain includes
+        # newlib-nano library. Selecting nano.specs results in use of
+        # newlib-nano as standard C library. This will generate lesser code size
+        # but with cuts in some features that were added after C89.
+        LDFLAGS_GCC += --specs=nano.specs
+    else
+        LDFLAGS_GCC += --specs=nosys.specs
+    endif
+
     LDFLAGS_ARM += --target=arm-arm-none-eabi
     CFLAGS_CLANG += --target=arm-arm-none-eabi
 

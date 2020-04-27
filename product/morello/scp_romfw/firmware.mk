@@ -11,6 +11,8 @@
 BS_FIRMWARE_CPU := cortex-m7
 BS_FIRMWARE_HAS_MULTITHREADING := no
 BS_FIRMWARE_HAS_NOTIFICATION := yes
+BS_FIRMWARE_USE_NEWLIB_NANO_SPECS := yes
+
 BS_FIRMWARE_MODULE_HEADERS_ONLY := timer \
                                    power_domain
 
