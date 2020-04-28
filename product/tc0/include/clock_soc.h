@@ -20,6 +20,9 @@ enum clock_pll_idx {
     CLOCK_PLL_IDX_CPU0,
     CLOCK_PLL_IDX_SYS,
     CLOCK_PLL_IDX_INTERCONNECT,
+    CLOCK_PLL_IDX_DPU,
+    CLOCK_PLL_IDX_PIX0,
+    CLOCK_PLL_IDX_PIX1,
     CLOCK_PLL_IDX_COUNT
 };
 
@@ -34,6 +37,7 @@ enum clock_pik_idx {
     CLOCK_PIK_IDX_PCLKSCP,
     CLOCK_PIK_IDX_SYSPERCLK,
     CLOCK_PIK_IDX_UARTCLK,
+    CLOCK_PIK_IDX_DPU,
     CLOCK_PIK_IDX_COUNT
 };
 
@@ -42,6 +46,7 @@ enum clock_pik_idx {
  */
 enum clock_css_idx {
     CLOCK_CSS_IDX_CPU_GROUP0,
+    CLOCK_CSS_IDX_DPU,
     CLOCK_CSS_IDX_COUNT
 };
 
@@ -51,6 +56,9 @@ enum clock_css_idx {
 enum clock_idx {
     CLOCK_IDX_INTERCONNECT,
     CLOCK_IDX_CPU_GROUP0,
+    CLOCK_IDX_DPU,
+    CLOCK_IDX_PIXEL_0,
+    CLOCK_IDX_PIXEL_1,
     CLOCK_IDX_COUNT
 };
 

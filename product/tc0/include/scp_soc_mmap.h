@@ -13,6 +13,9 @@
 #define SCP_PLL_BASE                 (SCP_SOC_EXPANSION3_BASE + 0x03000000)
 
 #define SCP_PLL_SYSPLL               (SCP_PLL_BASE + 0x00000000)
+#define SCP_PLL_DISPLAY              (SCP_PLL_BASE + 0x00000014)
+#define SCP_PLL_PIX0                 (SCP_PLL_BASE + 0x00000018)
+#define SCP_PLL_PIX1                 (SCP_PLL_BASE + 0x0000001C)
 #define SCP_PLL_INTERCONNECT         (SCP_PLL_BASE + 0x00000020)
 
 #define SCP_PLL_CPU0                 (SCP_PLL_BASE + 0x00000100)
