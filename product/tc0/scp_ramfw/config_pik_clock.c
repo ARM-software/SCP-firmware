@@ -7,6 +7,7 @@
 
 #include "clock_soc.h"
 #include "cpu_pik.h"
+#include "dpu_pik.h"
 #include "scp_pik.h"
 #include "system_pik.h"
 
@@ -80,6 +81,15 @@ static const struct mod_pik_clock_rate rate_table_uartclk[] = {
         .source = MOD_PIK_CLOCK_MSCLOCK_SOURCE_SYSPLLCLK,
         .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_SYS,
         .divider = CLOCK_RATE_SYSPLLCLK / (2000 * FWK_MHZ),
+    },
+};
+
+static struct mod_pik_clock_rate rate_table_dpu[] = {
+    {
+        .rate = 600 * FWK_MHZ,
+        .source = MOD_PIK_CLOCK_ACLKDPU_SOURCE_DISPLAYPLLCLK,
+        .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
+        .divider = 1, /* Rate adjusted via display PLL */
     },
 };
 
@@ -167,6 +177,20 @@ static const struct fwk_element pik_clock_element_table[] = {
             .rate_table = rate_table_uartclk,
             .rate_count = FWK_ARRAY_SIZE(rate_table_uartclk),
             .initial_rate = 2000 * FWK_MHZ,
+        }),
+    },
+    [CLOCK_PIK_IDX_DPU] = {
+        .name = "DPU",
+        .data = &((struct mod_pik_clock_dev_config) {
+            .type = MOD_PIK_CLOCK_TYPE_MULTI_SOURCE,
+            .is_group_member = true,
+            .control_reg = &DPU_PIK_PTR->ACLKDP_CTRL,
+            .divsys_reg = &DPU_PIK_PTR->ACLKDP_DIV1,
+            .divext_reg = &DPU_PIK_PTR->ACLKDP_DIV2,
+            .rate_table = rate_table_dpu,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_dpu),
+            .initial_rate = 600 * FWK_MHZ,
+            .defer_initialization = true,
         }),
     },
     [CLOCK_PIK_IDX_COUNT] = { 0 }, /* Termination description. */

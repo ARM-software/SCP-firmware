@@ -13,6 +13,7 @@
 #include <mod_css_clock.h>
 #include <mod_pik_clock.h>
 #include <mod_power_domain.h>
+#include <mod_system_pll.h>
 
 #include <fwk_element.h>
 #include <fwk_module.h>
@@ -36,6 +37,33 @@ static const struct fwk_element clock_dev_desc_table[] = {
                 CLOCK_CSS_IDX_CPU_GROUP0),
             .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_CSS_CLOCK,
                 MOD_CSS_CLOCK_API_TYPE_CLOCK),
+        }),
+    },
+    [CLOCK_IDX_DPU] = {
+        .name = "DPU",
+        .data = &((struct mod_clock_dev_config) {
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CSS_CLOCK,
+                CLOCK_CSS_IDX_DPU),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_CSS_CLOCK,
+                MOD_CSS_CLOCK_API_TYPE_CLOCK),
+        }),
+    },
+    [CLOCK_IDX_PIXEL_0] = {
+        .name = "PIXEL_0",
+        .data = &((struct mod_clock_dev_config) {
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SYSTEM_PLL,
+                CLOCK_PLL_IDX_PIX0),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SYSTEM_PLL,
+                                      MOD_SYSTEM_PLL_API_TYPE_DEFAULT),
+        }),
+    },
+    [CLOCK_IDX_PIXEL_1] = {
+        .name = "PIXEL_1",
+        .data = &((struct mod_clock_dev_config) {
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SYSTEM_PLL,
+                CLOCK_PLL_IDX_PIX1),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SYSTEM_PLL,
+                                      MOD_SYSTEM_PLL_API_TYPE_DEFAULT),
         }),
     },
     { 0 }, /* Termination description. */
