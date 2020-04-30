@@ -193,6 +193,12 @@ When notification support is enabled, the following applies:
   number of notification subscriptions supported and set to the value
   defined by BS_FIRMWARE_NOTIFICATION_COUNT parameter.
 
+Fast Channels Support                                   {#section_fast_channels}
+=====================
+
+When building a firmware and its dependencies, the BS_FIRMWARE_HAS_FAST_CHANNELS
+parameter controls whether DVFS Fast channel support is enabled or not.
+
 SCMI Notifications Support                         {#section_scmi_notifications}
 ==========================
 
