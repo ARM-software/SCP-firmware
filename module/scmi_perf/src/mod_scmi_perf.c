@@ -14,6 +14,7 @@
 #include <mod_dvfs.h>
 #include <mod_scmi.h>
 #include <mod_scmi_perf.h>
+#include <mod_timer.h>
 
 #include <fwk_assert.h>
 #include <fwk_event.h>
@@ -47,6 +48,8 @@ static int scmi_perf_limits_set_handler(
     fwk_id_t service_id, const uint32_t *payload);
 static int scmi_perf_limits_get_handler(
     fwk_id_t service_id, const uint32_t *payload);
+static int scmi_perf_describe_fast_channels(
+    fwk_id_t service_id, const uint32_t *payload);
 static int scmi_perf_limits_notify(
     fwk_id_t service_id, const uint32_t *payload);
 static int scmi_perf_level_notify(
@@ -71,6 +74,8 @@ static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
                        scmi_perf_level_set_handler,
     [SCMI_PERF_LEVEL_GET] =
                        scmi_perf_level_get_handler,
+    [SCMI_PERF_DESCRIBE_FAST_CHANNEL] =
+                       scmi_perf_describe_fast_channels,
     [SCMI_PERF_NOTIFY_LIMITS] =
                        scmi_perf_limits_notify,
     [SCMI_PERF_NOTIFY_LEVEL] =
@@ -94,6 +99,8 @@ static unsigned int payload_size_table[] = {
                        sizeof(struct scmi_perf_limits_set_a2p),
     [SCMI_PERF_LIMITS_GET] =
                        sizeof(struct scmi_perf_limits_get_a2p),
+    [SCMI_PERF_DESCRIBE_FAST_CHANNEL] =
+                       sizeof(struct scmi_perf_describe_fc_a2p),
     [SCMI_PERF_NOTIFY_LIMITS] =
                        sizeof(struct scmi_perf_notify_limits_a2p),
     [SCMI_PERF_NOTIFY_LEVEL] =
@@ -143,6 +150,15 @@ struct scmi_perf_ctx {
 
     /* Agent notifications table */
     struct agent_notifications **agent_notifications;
+
+    /* Alarm API for fast channels */
+    const struct mod_timer_alarm_api *fc_alarm_api;
+
+    /* Alarm for fast channels */
+    fwk_id_t fast_channels_alarm_id;
+
+    /* Fast Channels Polling Rate Limit */
+    uint32_t fast_channels_rate_limit;
 };
 
 static struct scmi_perf_ctx scmi_perf_ctx;
@@ -695,6 +711,8 @@ static int scmi_perf_level_notify(fwk_id_t service_id,
         goto exit;
     }
 
+    id = parameters->domain_id;
+
     status = scmi_perf_ctx.scmi_api->get_agent_id(service_id, &agent_id);
     if (status != FWK_SUCCESS)
         goto exit;
@@ -714,6 +732,86 @@ exit:
         sizeof(return_values) : sizeof(return_values.status));
 
     return status;
+}
+
+/*
+ * Note that the Fast Channel doorbell is not supported in this
+ * implementation.
+ */
+static int scmi_perf_describe_fast_channels(fwk_id_t service_id,
+                                            const uint32_t *payload)
+{
+    const struct mod_scmi_perf_domain_config *domain;
+    const struct scmi_perf_describe_fc_a2p *parameters;
+    struct scmi_perf_describe_fc_p2a return_values = {
+        .status = SCMI_GENERIC_ERROR,
+    };
+    uint32_t chan_size, chan_offset;
+
+    parameters = (const struct scmi_perf_describe_fc_a2p *)payload;
+
+    /* Validate the domain identifier */
+    if (parameters->domain_id >= scmi_perf_ctx.domain_count) {
+        return_values.status = SCMI_NOT_FOUND;
+
+        goto exit;
+    }
+
+    domain = &(*scmi_perf_ctx.config->domains)[parameters->domain_id];
+
+    fwk_assert(domain->fast_channels_addr_scp != 0x0);
+
+    switch (parameters->message_id) {
+    case SCMI_PERF_LEVEL_GET:
+        chan_offset = offsetof(struct mod_scmi_perf_fast_channel, get_level);
+        chan_size = sizeof(uint32_t);
+        break;
+
+    case SCMI_PERF_LEVEL_SET:
+        chan_offset = offsetof(struct mod_scmi_perf_fast_channel, set_level);
+        chan_size = sizeof(uint32_t);
+        break;
+
+    case SCMI_PERF_LIMITS_SET:
+        chan_offset = offsetof(struct mod_scmi_perf_fast_channel,
+            set_limit_range_max);
+        chan_size = sizeof(uint32_t) * 2;
+        break;
+
+    case SCMI_PERF_LIMITS_GET:
+        chan_offset = offsetof(struct mod_scmi_perf_fast_channel,
+            get_limit_range_max);
+        chan_size = sizeof(uint32_t) * 2;
+        break;
+
+    default:
+        return_values.status = SCMI_NOT_SUPPORTED;
+        goto exit;
+
+    }
+
+    return_values.status = SCMI_SUCCESS;
+    return_values.attributes = 0; /* Doorbell not supported */
+    return_values.rate_limit = scmi_perf_ctx.fast_channels_rate_limit;
+    return_values.chan_addr_low = (uint32_t)
+        (domain->fast_channels_addr_ap & ~0UL) + chan_offset;
+    return_values.chan_addr_high =
+        (domain->fast_channels_addr_ap >> 32);
+    return_values.chan_size = chan_size;
+
+exit:
+    scmi_perf_ctx.scmi_api->respond(service_id, &return_values,
+        (return_values.status == SCMI_SUCCESS) ?
+        sizeof(return_values) : sizeof(return_values.status));
+
+    return FWK_SUCCESS;
+}
+
+/*
+ * Fast Channel Polling
+ */
+static void fast_channel_callback(uintptr_t param)
+{
 }
 
 /*
@@ -870,6 +968,12 @@ static int scmi_perf_init(fwk_id_t module_id, unsigned int element_count,
 
     scmi_perf_ctx.config = config;
     scmi_perf_ctx.domain_count = return_val;
+    scmi_perf_ctx.fast_channels_alarm_id = config->fast_channels_alarm_id;
+    if (config->fast_channels_rate_limit < SCMI_PERF_FC_MIN_RATE_LIMIT)
+        scmi_perf_ctx.fast_channels_rate_limit = SCMI_PERF_FC_MIN_RATE_LIMIT;
+    else
+        scmi_perf_ctx.fast_channels_rate_limit =
+            config->fast_channels_rate_limit;
 
     /* Initialize table */
     for (i = 0; i < return_val; i++)
@@ -930,6 +1034,13 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
     if (status != FWK_SUCCESS)
         return status;
 
+    if (!fwk_id_is_equal(scmi_perf_ctx.fast_channels_alarm_id, FWK_ID_NONE)) {
+        status = fwk_module_bind(scmi_perf_ctx.fast_channels_alarm_id,
+            MOD_TIMER_API_ID_ALARM, &scmi_perf_ctx.fc_alarm_api);
+        if (status != FWK_SUCCESS)
+            return FWK_E_PANIC;
+    }
+
     return fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_DVFS),
         FWK_ID_API(FWK_MODULE_IDX_DVFS, 0), &scmi_perf_ctx.dvfs_api);
 }
@@ -951,6 +1062,44 @@ static int scmi_perf_process_bind_request(fwk_id_t source_id,
     }
 
     return FWK_SUCCESS;
+}
+
+static int scmi_perf_start(fwk_id_t id)
+{
+    const struct mod_scmi_perf_domain_config *domain;
+    struct mod_scmi_perf_fast_channel *fc;
+    uint32_t fc_interval_msecs;
+    int status = FWK_SUCCESS;
+    unsigned int i;
+
+    /*
+     * Set up the Fast Channel polling if required
+     */
+    if (!fwk_id_is_equal(scmi_perf_ctx.fast_channels_alarm_id, FWK_ID_NONE)) {
+        if (scmi_perf_ctx.fast_channels_rate_limit <
+            SCMI_PERF_FC_MIN_RATE_LIMIT)
+            fc_interval_msecs = (uint32_t)SCMI_PERF_FC_MIN_RATE_LIMIT / 1000;
+        else
+            fc_interval_msecs = (uint32_t)
+            scmi_perf_ctx.fast_channels_rate_limit / 1000;
+        status = scmi_perf_ctx.fc_alarm_api->start(
+            scmi_perf_ctx.fast_channels_alarm_id,
+            fc_interval_msecs, MOD_TIMER_ALARM_TYPE_PERIODIC,
+            fast_channel_callback, (uintptr_t)0);
+        if (status != FWK_SUCCESS)
+            return status;
+    }
+
+    for (i = 0; i < scmi_perf_ctx.domain_count; i++) {
+        domain = &(*scmi_perf_ctx.config->domains)[i];
+        if (domain->fast_channels_addr_scp != 0x0) {
+            fc = (struct mod_scmi_perf_fast_channel *)
+                ((uintptr_t)domain->fast_channels_addr_scp);
+            memset((void *)fc, 0, sizeof(struct mod_scmi_perf_domain_config));
+        }
+    }
+
+    return status;
 }
 
 /*
@@ -1081,6 +1230,7 @@ const struct fwk_module module_scmi_perf = {
     .type = FWK_MODULE_TYPE_PROTOCOL,
     .init = scmi_perf_init,
     .bind = scmi_perf_bind,
+    .start = scmi_perf_start,
     .process_bind_request = scmi_perf_process_bind_request,
     .process_event = scmi_perf_process_event,
 };

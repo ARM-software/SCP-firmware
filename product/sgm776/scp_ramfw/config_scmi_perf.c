@@ -41,5 +41,6 @@ static const struct mod_scmi_perf_domain_config domains[] = {
 const struct fwk_module_config config_scmi_perf = {
     .data = &((struct mod_scmi_perf_config) {
         .domains = &domains,
+        .fast_channels_alarm_id = FWK_ID_NONE_INIT,
     }),
 };
