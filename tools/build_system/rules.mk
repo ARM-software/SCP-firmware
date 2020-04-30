@@ -29,6 +29,10 @@ ifeq ($(BUILD_HAS_SCMI_NOTIFICATIONS),yes)
     DEFINES += BUILD_HAS_SCMI_NOTIFICATIONS
 endif
 
+ifeq ($(BUILD_HAS_FAST_CHANNELS),yes)
+    DEFINES += BUILD_HAS_FAST_CHANNELS
+endif
+
 export AS := $(CC)
 export LD := $(CC)
 
