@@ -13,6 +13,7 @@
 #include <fwk_assert.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
+#include <fwk_interrupt.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -505,6 +506,7 @@ static int dvfs_set_frequency(fwk_id_t domain_id, uintptr_t cookie,
 {
     struct mod_dvfs_domain_ctx *ctx;
     const struct mod_dvfs_opp *new_opp;
+    unsigned int interrupt;
 
     ctx = get_domain_ctx(domain_id);
     if (ctx == NULL)
@@ -526,6 +528,10 @@ static int dvfs_set_frequency(fwk_id_t domain_id, uintptr_t cookie,
         (new_opp->voltage == ctx->current_opp.voltage))
         return FWK_SUCCESS;
 
+    if (fwk_interrupt_get_current(&interrupt) == FWK_SUCCESS)
+        ctx->request.set_source_id = true;
+    else
+        ctx->request.set_source_id = false;
     return dvfs_set_frequency_start(ctx, cookie, new_opp, false, 0);
 }
 
@@ -534,6 +540,7 @@ static int dvfs_set_frequency_limits(fwk_id_t domain_id,
 {
     struct mod_dvfs_domain_ctx *ctx;
     const struct mod_dvfs_opp *new_opp;
+    unsigned int interrupt;
 
     ctx = get_domain_ctx(domain_id);
     if (ctx == NULL)
@@ -564,6 +571,10 @@ static int dvfs_set_frequency_limits(fwk_id_t domain_id,
              new_opp, true);
     }
 
+    if (fwk_interrupt_get_current(&interrupt) == FWK_SUCCESS)
+        ctx->request.set_source_id = true;
+    else
+        ctx->request.set_source_id = false;
     return dvfs_set_frequency_start(ctx, cookie, new_opp, true, 0);
 }
 
