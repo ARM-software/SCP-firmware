@@ -14,7 +14,11 @@
 #include <stdint.h>
 
 #define SCMI_PROTOCOL_ID_PERF      UINT32_C(0x13)
+#ifdef BUILD_HAS_FAST_CHANNELS
+#define SCMI_PROTOCOL_VERSION_PERF UINT32_C(0x20000)
+#else
 #define SCMI_PROTOCOL_VERSION_PERF UINT32_C(0x10000)
+#endif
 
 #define SCMI_PERF_SUPPORTS_STATS_SHARED_MEM_REGION  0
 #define SCMI_PERF_STATS_SHARED_MEM_REGION_ADDR_LOW  0
@@ -78,6 +82,7 @@ struct __attribute((packed)) scmi_perf_protocol_attributes_p2a {
 #define SCMI_PERF_DOMAIN_ATTRIBUTES_CAN_SET_LEVEL_POS  30
 #define SCMI_PERF_DOMAIN_ATTRIBUTES_LIMITS_NOTIFY_POS  29
 #define SCMI_PERF_DOMAIN_ATTRIBUTES_LEVEL_NOTIFY_POS   28
+#define SCMI_PERF_DOMAIN_ATTRIBUTES_FAST_CHANNEL_POS   27
 
 #define SCMI_PERF_DOMAIN_ATTRIBUTES_CAN_SET_LIMITS_MASK \
     (UINT32_C(0x1) << SCMI_PERF_DOMAIN_ATTRIBUTES_CAN_SET_LIMITS_POS)
@@ -94,8 +99,12 @@ struct __attribute((packed)) scmi_perf_protocol_attributes_p2a {
 #define SCMI_PERF_DOMAIN_ATTRIBUTES_FAST_CHANNEL_MASK \
     (UINT32_C(0x1) << SCMI_PERF_DOMAIN_ATTRIBUTES_FAST_CHANNEL_POS)
 
+#define SCMI_PERF_DOMAIN_ATTRIBUTES_FAST_CHANNEL_MASK \
+    (UINT32_C(0x1) << SCMI_PERF_DOMAIN_ATTRIBUTES_FAST_CHANNEL_POS)
+
 #define SCMI_PERF_DOMAIN_ATTRIBUTES(LEVEL_NOTIFY, LIMITS_NOTIFY, \
-                                    CAN_SET_LEVEL, CAN_SET_LIMITS) \
+                                    CAN_SET_LEVEL, CAN_SET_LIMITS, \
+                                    FAST_CHANNEL) \
     ( \
         (((LEVEL_NOTIFY) << \
             SCMI_PERF_DOMAIN_ATTRIBUTES_LEVEL_NOTIFY_POS) & \
@@ -108,7 +117,10 @@ struct __attribute((packed)) scmi_perf_protocol_attributes_p2a {
             SCMI_PERF_DOMAIN_ATTRIBUTES_CAN_SET_LEVEL_MASK) | \
         (((CAN_SET_LIMITS) << \
             SCMI_PERF_DOMAIN_ATTRIBUTES_CAN_SET_LIMITS_POS) & \
-            SCMI_PERF_DOMAIN_ATTRIBUTES_CAN_SET_LIMITS_MASK) \
+            SCMI_PERF_DOMAIN_ATTRIBUTES_CAN_SET_LIMITS_MASK) | \
+        (((FAST_CHANNEL) << \
+            SCMI_PERF_DOMAIN_ATTRIBUTES_FAST_CHANNEL_POS) & \
+            SCMI_PERF_DOMAIN_ATTRIBUTES_FAST_CHANNEL_MASK) \
     )
 
 struct __attribute((packed)) scmi_perf_domain_attributes_a2p {
