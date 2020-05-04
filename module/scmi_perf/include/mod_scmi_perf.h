@@ -68,6 +68,9 @@ struct mod_scmi_perf_domain_config {
      * \brief Rate limit in microsecs
      */
     uint32_t fast_channels_rate_limit;
+
+    /*! Flag indicating that statistics are collected for this domain */
+    bool stats_collected;
 };
 
 /*!
@@ -102,6 +105,9 @@ struct mod_scmi_perf_config {
 
     /*! Fast Channel polling rate */
     uint32_t fast_channels_rate_limit;
+
+    /*! Flag indicating statistics in use */
+    bool stats_enabled;
 };
 
 /*!

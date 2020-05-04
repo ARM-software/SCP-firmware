@@ -13,6 +13,9 @@
 #include <mod_dvfs.h>
 #include <mod_scmi.h>
 #include <mod_scmi_perf.h>
+#ifdef BUILD_HAS_STATISTICS
+#include <mod_stats.h>
+#endif
 #include <mod_timer.h>
 
 #include <fwk_assert.h>
@@ -124,6 +127,11 @@ struct scmi_perf_ctx {
     /* DVFS module API */
     const struct mod_dvfs_domain_api *dvfs_api;
 
+#ifdef BUILD_HAS_STATISTICS
+    /* Statistics module API */
+    const struct mod_stats_api *stats_api;
+#endif
+
     /* Pointer to a table of operations */
     struct perf_operations *perf_ops_table;
 
@@ -189,10 +197,17 @@ static int scmi_perf_protocol_attributes_handler(fwk_id_t service_id,
         .status = SCMI_SUCCESS,
         .attributes =
             SCMI_PERF_PROTOCOL_ATTRIBUTES(true, scmi_perf_ctx.domain_count),
-        .statistics_len = 0, /* Unsupported */
-        .statistics_address_low = 0, /* Unsupported */
-        .statistics_address_high = 0, /* Unsupported */
     };
+    uint32_t addr_low = 0, addr_high = 0, len = 0;
+
+#ifdef BUILD_HAS_STATISTICS
+    scmi_perf_ctx.stats_api->get_statistics_desc(
+        fwk_module_id_scmi_perf, &addr_low, &addr_high, &len);
+#endif
+
+    return_values.statistics_len = len;
+    return_values.statistics_address_low = addr_low;
+    return_values.statistics_address_high = addr_high;
 
     scmi_perf_ctx.scmi_api->respond(service_id, &return_values,
                                     sizeof(return_values));
@@ -1028,8 +1043,20 @@ static void scmi_perf_notify_level(fwk_id_t domain_id,
     int i, idx;
     const struct mod_scmi_perf_domain_config *domain;
     struct mod_scmi_perf_fast_channel *fc;
+#ifdef BUILD_HAS_STATISTICS
+    size_t level_id;
+    int status;
+#endif
 
     idx = fwk_id_get_element_idx(domain_id);
+
+#ifdef BUILD_HAS_STATISTICS
+    status = scmi_perf_ctx.dvfs_api->get_frequency_id(domain_id, level,
+        &level_id);
+    if (status == FWK_SUCCESS)
+        scmi_perf_ctx.stats_api->update_domain(fwk_module_id_scmi_perf,
+            FWK_ID_ELEMENT(FWK_MODULE_IDX_SCMI_PERF, idx), level_id);
+#endif
 
     domain = &(*scmi_perf_ctx.config->domains)[idx];
     if (domain->fast_channels_addr_scp != 0x0) {
@@ -1161,6 +1188,16 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
             return FWK_E_PANIC;
     }
 
+#ifdef BUILD_HAS_STATISTICS
+    if (scmi_perf_ctx.config->stats_enabled) {
+        status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_STATISTICS),
+            FWK_ID_API(FWK_MODULE_IDX_STATISTICS, MOD_STATS_API_IDX_STATS),
+            &scmi_perf_ctx.stats_api);
+        if (status != FWK_SUCCESS)
+            return FWK_E_PANIC;
+    }
+#endif
+
     return fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_DVFS),
         FWK_ID_API(FWK_MODULE_IDX_DVFS, 0), &scmi_perf_ctx.dvfs_api);
 }
@@ -1183,6 +1220,58 @@ static int scmi_perf_process_bind_request(fwk_id_t source_id,
 
     return FWK_SUCCESS;
 }
+
+#ifdef BUILD_HAS_STATISTICS
+static int scmi_perf_stats_start(void)
+{
+    const struct mod_scmi_perf_domain_config *domain;
+    int status = FWK_SUCCESS;
+    int stats_domains = 0;
+    unsigned int i;
+
+    if (!scmi_perf_ctx.config->stats_enabled)
+        return FWK_E_SUPPORT;
+
+    /* Count how many domains have statistics */
+    for (i = 0; i < scmi_perf_ctx.domain_count; i++) {
+        domain = &(*scmi_perf_ctx.config->domains)[i];
+        if (domain->stats_collected)
+            stats_domains++;
+    }
+
+    status = scmi_perf_ctx.stats_api->init_stats(fwk_module_id_scmi_perf,
+        scmi_perf_ctx.domain_count, stats_domains);
+
+    if (status != FWK_SUCCESS)
+        return status;
+
+    for (i = 0; i < scmi_perf_ctx.domain_count; i++) {
+        domain = &(*scmi_perf_ctx.config->domains)[i];
+        /* Add this domain to track statistics when needed */
+        if (domain->stats_collected) {
+            fwk_id_t domain_id;
+            size_t opp_count;
+
+            domain_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, i);
+            status = scmi_perf_ctx.dvfs_api->get_opp_count(domain_id,
+                &opp_count);
+
+            if (status != FWK_SUCCESS)
+                return status;
+
+            status = scmi_perf_ctx.stats_api->add_domain(
+                fwk_module_id_scmi_perf,
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_SCMI_PERF, i),
+                (int)opp_count);
+
+            if (status != FWK_SUCCESS)
+                return status;
+        }
+    }
+
+    return scmi_perf_ctx.stats_api->start_stats(fwk_module_id_scmi_perf);
+}
+#endif
 
 static int scmi_perf_start(fwk_id_t id)
 {
@@ -1219,6 +1308,10 @@ static int scmi_perf_start(fwk_id_t id)
             memset((void *)fc, 0, sizeof(struct mod_scmi_perf_fast_channel));
         }
     }
+
+#ifdef BUILD_HAS_STATISTICS
+    status = scmi_perf_stats_start();
+#endif
 
     return status;
 }
