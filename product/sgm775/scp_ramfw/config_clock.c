@@ -102,7 +102,7 @@ static const struct fwk_element *clock_get_dev_desc_table(fwk_id_t module_id)
             (struct mod_clock_dev_config *)clock_dev_desc_table[i].data;
         dev_config->pd_source_id = FWK_ID_ELEMENT(
             FWK_MODULE_IDX_POWER_DOMAIN,
-            CONFIG_POWER_DOMAIN_SYSTOP_CHILD_COUNT + core_count);
+            CONFIG_POWER_DOMAIN_SYSTOP_SYSTEM + core_count);
     }
 
     return clock_dev_desc_table;

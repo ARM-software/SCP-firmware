@@ -8,6 +8,8 @@
 #ifndef CONFIG_POWER_DOMAIN_H
 #define CONFIG_POWER_DOMAIN_H
 
+#include <stdint.h>
+
 /*
  * Total supported chips in multichip use case
  */
@@ -26,6 +28,7 @@ enum pd_single_chip_idx {
     PD_SINGLE_CHIP_IDX_DBGTOP0,
     PD_SINGLE_CHIP_IDX_SYSTOP0,
     PD_SINGLE_CHIP_IDX_COUNT,
+    PD_SINGLE_CHIP_IDX_NONE = UINT32_MAX
 };
 
 /*
@@ -54,6 +57,7 @@ enum pd_multi_chip_idx {
     /* PD Level 3 */
     PD_MULTI_CHIP_IDX_SYSTOP_LOGICAL,
     PD_MULTI_CHIP_IDX_COUNT,
+    PD_MULTI_CHIP_IDX_NONE = UINT32_MAX
 };
 
 #endif /* CONFIG_POWER_DOMAIN_H */

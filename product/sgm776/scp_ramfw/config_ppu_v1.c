@@ -163,7 +163,7 @@ static const struct fwk_element *sgm776_ppu_v1_get_element_table(
 
     sgm776_ppu_v1_notification_config.pd_source_id = FWK_ID_ELEMENT(
         FWK_MODULE_IDX_POWER_DOMAIN,
-        CONFIG_POWER_DOMAIN_SYSTOP_CHILD_COUNT + sgm776_core_get_count());
+        CONFIG_POWER_DOMAIN_SYSTOP_SYSTEM + sgm776_core_get_count());
 
     return element_table;
 }

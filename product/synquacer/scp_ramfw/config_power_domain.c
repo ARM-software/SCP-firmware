@@ -61,7 +61,6 @@ static struct fwk_element synquacer_power_domain_static_element_table[] = {
         .name = "SYS3",
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
-            .tree_pos = MOD_PD_TREE_POS(MOD_PD_LEVEL_1, 0, 0, 12, 0),
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_PPU_V0_SYNQUACER,
                 PPU_V0_ELEMENT_IDX_SYS3),
@@ -74,7 +73,6 @@ static struct fwk_element synquacer_power_domain_static_element_table[] = {
         .name = "SYS1",
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
-            .tree_pos = MOD_PD_TREE_POS(MOD_PD_LEVEL_1, 0, 0, 13, 0),
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_PPU_V0_SYNQUACER,
                 PPU_V0_ELEMENT_IDX_SYS1),
@@ -87,7 +85,6 @@ static struct fwk_element synquacer_power_domain_static_element_table[] = {
         .name = "SYS2",
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
-            .tree_pos = MOD_PD_TREE_POS(MOD_PD_LEVEL_1, 0, 0, 14, 0),
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_PPU_V0_SYNQUACER,
                 PPU_V0_ELEMENT_IDX_SYS2),
@@ -103,7 +100,6 @@ static struct fwk_element synquacer_power_domain_static_element_table[] = {
         .name = "DEBUG",
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE_DEBUG,
-            .tree_pos = MOD_PD_TREE_POS(MOD_PD_LEVEL_1, 0, 0, 16, 0),
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_PPU_V0_SYNQUACER,
                 PPU_V0_ELEMENT_IDX_DEBUG),
@@ -116,7 +112,7 @@ static struct fwk_element synquacer_power_domain_static_element_table[] = {
         .name = "SYSTOP",
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_SYSTEM,
-            .tree_pos = MOD_PD_TREE_POS(MOD_PD_LEVEL_2, 0, 0, 0, 0),
+            .parent_idx = PD_STATIC_DEV_IDX_NONE,
             .driver_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SYSTEM_POWER),
             .api_id = FWK_ID_API_INIT(
                 FWK_MODULE_IDX_SYSTEM_POWER,
@@ -125,7 +121,6 @@ static struct fwk_element synquacer_power_domain_static_element_table[] = {
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(systop_allowed_state_mask_table) }),
     },
-    [PD_STATIC_DEV_IDX_COUNT] = { 0 }, /* Termination entry */
 };
 
 static const struct fwk_element *synquacer_power_domain_get_element_table(
@@ -133,21 +128,26 @@ static const struct fwk_element *synquacer_power_domain_get_element_table(
 {
     struct fwk_element *element_table, *element;
     struct mod_power_domain_element_config *pd_config_table, *pd_config;
-    unsigned int core_idx;
+    unsigned int core_idx, i;
     unsigned int cluster_idx;
     unsigned int core_count;
     unsigned int cluster_count;
     unsigned int core_per_cluster_count;
-    unsigned int element_count = 0;
+    unsigned int element_counter = 0;
+    unsigned int total_elements;
+    unsigned int systop_idx;
 
     core_count = synquacer_core_get_core_count();
     cluster_count = synquacer_core_get_cluster_count();
     core_per_cluster_count = synquacer_core_get_core_per_cluster_count();
 
+    total_elements = cluster_count + core_count +
+        FWK_ARRAY_SIZE(synquacer_power_domain_static_element_table);
+
+    systop_idx = total_elements - 1;
+
     element_table = fwk_mm_calloc(
-        cluster_count + core_count +
-            FWK_ARRAY_SIZE(synquacer_power_domain_static_element_table) +
-            1, /* Terminator */
+        total_elements + 1, /* Terminator */
         sizeof(struct fwk_element));
 
     pd_config_table = fwk_mm_calloc(
@@ -163,8 +163,8 @@ static const struct fwk_element *synquacer_power_domain_get_element_table(
     /* prepare core config table */
     for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
         for (core_idx = 0; core_idx < core_per_cluster_count; core_idx++) {
-            element = &element_table[element_count];
-            pd_config = &pd_config_table[element_count];
+            element = &element_table[element_counter];
+            pd_config = &pd_config_table[element_counter];
 
             element->name = fwk_mm_alloc(PD_NAME_SIZE, 1);
 
@@ -178,23 +178,21 @@ static const struct fwk_element *synquacer_power_domain_get_element_table(
             element->data = pd_config;
 
             pd_config->attributes.pd_type = MOD_PD_TYPE_CORE;
-            pd_config->tree_pos =
-                MOD_PD_TREE_POS(MOD_PD_LEVEL_0, 0, 0, cluster_idx, core_idx);
-            pd_config->driver_id =
-                FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V0_SYNQUACER, element_count);
+            pd_config->driver_id = FWK_ID_ELEMENT(
+                FWK_MODULE_IDX_PPU_V0_SYNQUACER, element_counter);
             pd_config->api_id = FWK_ID_API(FWK_MODULE_IDX_PPU_V0_SYNQUACER, 0);
             pd_config->allowed_state_mask_table =
                 core_pd_allowed_state_mask_table;
             pd_config->allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table);
-            element_count++;
+            element_counter++;
         }
     }
 
     /* prepare cluster config table */
     for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
-        element = &element_table[element_count];
-        pd_config = &pd_config_table[element_count];
+        element = &element_table[element_counter];
+        pd_config = &pd_config_table[element_counter];
 
         element->name = fwk_mm_alloc(PD_NAME_SIZE, 1);
 
@@ -203,20 +201,29 @@ static const struct fwk_element *synquacer_power_domain_get_element_table(
         element->data = pd_config;
 
         pd_config->attributes.pd_type = MOD_PD_TYPE_CLUSTER;
-        pd_config->tree_pos =
-            MOD_PD_TREE_POS(MOD_PD_LEVEL_1, 0, 0, cluster_idx, 0);
+        pd_config->parent_idx = systop_idx;
         pd_config->driver_id =
-            FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V0_SYNQUACER, element_count);
+            FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V0_SYNQUACER, element_counter);
         pd_config->api_id = FWK_ID_API(FWK_MODULE_IDX_PPU_V0_SYNQUACER, 0);
         pd_config->allowed_state_mask_table =
             cluster_pd_allowed_state_mask_table;
         pd_config->allowed_state_mask_table_size =
             FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table);
-        element_count++;
+        element_counter++;
+    }
+
+    /* Set the parent for all level one domains */
+    for (i = 0;
+         i < (FWK_ARRAY_SIZE(synquacer_power_domain_static_element_table) - 1);
+         i++) {
+        pd_config = (struct mod_power_domain_element_config *)
+                        synquacer_power_domain_static_element_table[i]
+                            .data;
+        pd_config->parent_idx = systop_idx;
     }
 
     memcpy(
-        element_table + element_count,
+        element_table + element_counter,
         synquacer_power_domain_static_element_table,
         sizeof(synquacer_power_domain_static_element_table));
 

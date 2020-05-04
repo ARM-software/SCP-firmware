@@ -74,12 +74,6 @@ static struct fwk_element sgm776_power_domain_static_element_table[] = {
         .name = "CLUS0",
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1,
-                0,
-                0,
-                CONFIG_POWER_DOMAIN_SYSTOP_CHILD_CLUSTER0,
-                0),
             .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PPU_V1,
                                       MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
             .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
@@ -91,12 +85,6 @@ static struct fwk_element sgm776_power_domain_static_element_table[] = {
         .name = "DBGTOP",
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE_DEBUG,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1,
-                0,
-                0,
-                CONFIG_POWER_DOMAIN_SYSTOP_CHILD_DBGTOP,
-                0),
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_PPU_V1, PPU_V1_ELEMENT_IDX_DBGTOP),
             .api_id = FWK_ID_API_INIT(
@@ -111,12 +99,6 @@ static struct fwk_element sgm776_power_domain_static_element_table[] = {
         .name = "DPUTOP",
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1,
-                0,
-                0,
-                CONFIG_POWER_DOMAIN_SYSTOP_CHILD_DPUTOP,
-                0),
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_PPU_V1, PPU_V1_ELEMENT_IDX_DPUTOP),
             .api_id = FWK_ID_API_INIT(
@@ -131,12 +113,6 @@ static struct fwk_element sgm776_power_domain_static_element_table[] = {
         .name = "GPUTOP",
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1,
-                0,
-                0,
-                CONFIG_POWER_DOMAIN_SYSTOP_CHILD_GPUTOP,
-                0),
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_PPU_V1, PPU_V1_ELEMENT_IDX_GPUTOP),
             .api_id = FWK_ID_API_INIT(
@@ -151,12 +127,6 @@ static struct fwk_element sgm776_power_domain_static_element_table[] = {
         .name = "VPUTOP",
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1,
-                0,
-                0,
-                CONFIG_POWER_DOMAIN_SYSTOP_CHILD_VPUTOP,
-                0),
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_PPU_V1, PPU_V1_ELEMENT_IDX_VPUTOP),
             .api_id = FWK_ID_API_INIT(
@@ -167,12 +137,11 @@ static struct fwk_element sgm776_power_domain_static_element_table[] = {
                 FWK_ARRAY_SIZE(toplevel_allowed_state_mask_table)
         }),
     },
-    [CONFIG_POWER_DOMAIN_SYSTOP_CHILD_COUNT] = {
+    [CONFIG_POWER_DOMAIN_SYSTOP_SYSTEM] = {
         .name = "SYSTOP",
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_SYSTEM,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_2, 0, 0, 0, 0),
+            .parent_idx = CONFIG_POWER_DOMAIN_NONE,
             .driver_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SYSTEM_POWER),
             .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SYSTEM_POWER,
                 MOD_SYSTEM_POWER_API_IDX_PD_DRIVER),
@@ -183,7 +152,6 @@ static struct fwk_element sgm776_power_domain_static_element_table[] = {
     },
 };
 
-
 /*
  * Function definitions with internal linkage
  */
@@ -192,12 +160,18 @@ static const struct fwk_element *sgm776_power_domain_get_element_table
 {
     struct fwk_element *element_table, *element;
     struct mod_power_domain_element_config *pd_config_table, *pd_config;
-    unsigned int core_idx;
+    unsigned int core_idx, i;
+    unsigned int cluster_offset = sgm776_core_get_count();
+    unsigned int systop_idx;
+    unsigned int elements_count;
+
+    elements_count = sgm776_core_get_count() +
+        FWK_ARRAY_SIZE(sgm776_power_domain_static_element_table);
+
+    systop_idx = elements_count - 1;
 
     element_table = fwk_mm_calloc(
-        sgm776_core_get_count()
-        + FWK_ARRAY_SIZE(sgm776_power_domain_static_element_table)
-        + 1, /* Terminator */
+        elements_count + 1, /* Terminator */
         sizeof(struct fwk_element));
 
     pd_config_table = fwk_mm_calloc(sgm776_core_get_count(),
@@ -211,12 +185,7 @@ static const struct fwk_element *sgm776_power_domain_get_element_table
         element->data = pd_config;
 
         pd_config->attributes.pd_type = MOD_PD_TYPE_CORE,
-        pd_config->tree_pos = MOD_PD_TREE_POS(
-            MOD_PD_LEVEL_0,
-            0,
-            0,
-            CONFIG_POWER_DOMAIN_SYSTOP_CHILD_CLUSTER0,
-            core_idx),
+        pd_config->parent_idx = cluster_offset,
         pd_config->driver_id = FWK_ID_ELEMENT(
             FWK_MODULE_IDX_PPU_V1, PPU_V1_ELEMENT_IDX_COUNT + core_idx),
         pd_config->api_id = FWK_ID_API(
@@ -233,6 +202,16 @@ static const struct fwk_element *sgm776_power_domain_get_element_table
     pd_config->driver_id =
         FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1,
                        PPU_V1_ELEMENT_IDX_COUNT + sgm776_core_get_count());
+
+    /* Set the parent for all level one domains */
+    for (i = 0;
+         i < (FWK_ARRAY_SIZE(sgm776_power_domain_static_element_table) - 1);
+         i++) {
+        pd_config = (struct mod_power_domain_element_config *)
+                        sgm776_power_domain_static_element_table[i]
+                            .data;
+        pd_config->parent_idx = systop_idx;
+    }
 
     memcpy(element_table + sgm776_core_get_count(),
            sgm776_power_domain_static_element_table,

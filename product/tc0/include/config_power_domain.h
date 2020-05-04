@@ -8,6 +8,8 @@
 #ifndef CONFIG_POWER_DOMAIN_H
 #define CONFIG_POWER_DOMAIN_H
 
+#include <stdint.h>
+
 /*
  * Power domain indices for the statically defined domains used for:
  * - Indexing the domains in the tc0_power_domain_static_element_table
@@ -19,7 +21,8 @@
 enum pd_static_dev_idx {
     PD_STATIC_DEV_IDX_CLUSTER0,
     PD_STATIC_DEV_IDX_SYSTOP,
-    PD_STATIC_DEV_IDX_COUNT
+    PD_STATIC_DEV_IDX_COUNT,
+    PD_STATIC_DEV_IDX_NONE = UINT32_MAX
 };
 
 #endif /* CONFIG_POWER_DOMAIN_H */
