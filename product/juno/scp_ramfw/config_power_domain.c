@@ -74,12 +74,7 @@ static struct fwk_element element_table[] = {
         .name = "BIG_CPU0",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CORE,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_0,
-                0,
-                0,
-                TREE_IDX_SYSTOP_CHILD_BIG,
-                TREE_IDX_CLUSTER_CHILD_CPU0),
+            .parent_idx = POWER_DOMAIN_IDX_BIG_SSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_BIG_CPU0),
@@ -95,12 +90,7 @@ static struct fwk_element element_table[] = {
         .name = "BIG_CPU1",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CORE,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_0,
-                0,
-                0,
-                TREE_IDX_SYSTOP_CHILD_BIG,
-                TREE_IDX_CLUSTER_CHILD_CPU1),
+            .parent_idx = POWER_DOMAIN_IDX_BIG_SSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_BIG_CPU1),
@@ -116,12 +106,7 @@ static struct fwk_element element_table[] = {
         .name = "LITTLE_CPU0",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CORE,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_0,
-                0,
-                0,
-                TREE_IDX_SYSTOP_CHILD_LITTLE,
-                TREE_IDX_CLUSTER_CHILD_CPU0),
+            .parent_idx = POWER_DOMAIN_IDX_LITTLE_SSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_LITTLE_CPU0),
@@ -137,12 +122,7 @@ static struct fwk_element element_table[] = {
         .name = "LITTLE_CPU1",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CORE,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_0,
-                0,
-                0,
-                TREE_IDX_SYSTOP_CHILD_LITTLE,
-                TREE_IDX_CLUSTER_CHILD_CPU1),
+            .parent_idx = POWER_DOMAIN_IDX_LITTLE_SSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_LITTLE_CPU1),
@@ -158,12 +138,7 @@ static struct fwk_element element_table[] = {
         .name = "LITTLE_CPU2",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CORE,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_0,
-                0,
-                0,
-                TREE_IDX_SYSTOP_CHILD_LITTLE,
-                TREE_IDX_CLUSTER_CHILD_CPU2),
+            .parent_idx = POWER_DOMAIN_IDX_LITTLE_SSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_LITTLE_CPU2),
@@ -179,12 +154,7 @@ static struct fwk_element element_table[] = {
         .name = "LITTLE_CPU3",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CORE,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_0,
-                0,
-                0,
-                TREE_IDX_SYSTOP_CHILD_LITTLE,
-                TREE_IDX_CLUSTER_CHILD_CPU3),
+            .parent_idx = POWER_DOMAIN_IDX_LITTLE_SSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_LITTLE_CPU3),
@@ -200,12 +170,7 @@ static struct fwk_element element_table[] = {
         .name = "BIG_SSTOP",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1,
-                0,
-                0,
-                TREE_IDX_SYSTOP_CHILD_BIG,
-                0),
+            .parent_idx = POWER_DOMAIN_IDX_SYSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_BIG_SSTOP),
@@ -221,12 +186,7 @@ static struct fwk_element element_table[] = {
         .name = "LITTLE_SSTOP",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1,
-                0,
-                0,
-                TREE_IDX_SYSTOP_CHILD_LITTLE,
-                0),
+            .parent_idx = POWER_DOMAIN_IDX_SYSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_LITTLE_SSTOP),
@@ -242,12 +202,7 @@ static struct fwk_element element_table[] = {
         .name = "GPUTOP",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1,
-                0,
-                0,
-                TREE_IDX_SYSTOP_CHILD_GPU,
-                0),
+            .parent_idx = POWER_DOMAIN_IDX_SYSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_GPUTOP),
@@ -263,12 +218,7 @@ static struct fwk_element element_table[] = {
         .name = "DBGSYS",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE_DEBUG,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1,
-                0,
-                0,
-                TREE_IDX_SYSTOP_CHILD_DBG,
-                0),
+            .parent_idx = POWER_DOMAIN_IDX_SYSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_DBGSYS),
@@ -284,12 +234,7 @@ static struct fwk_element element_table[] = {
         .name = "SYSTOP",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_SYSTEM,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_2,
-                0,
-                0,
-                0,
-                0),
+            .parent_idx = POWER_DOMAIN_IDX_NONE,
             .driver_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SYSTEM_POWER),
             .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SYSTEM_POWER,
                 MOD_SYSTEM_POWER_API_IDX_PD_DRIVER),

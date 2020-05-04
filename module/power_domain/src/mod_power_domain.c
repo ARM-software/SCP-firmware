@@ -127,16 +127,14 @@ struct pd_ctx {
     struct pd_ctx *parent;
 
     /*
-     * Pointer to the context of the power domain's first child. This
-     * field is equal to NULL if the power domain does not have any children.
+     * List if all power domain children if any.
      */
-    struct pd_ctx *first_child;
+    struct fwk_slist children_list;
 
     /*
-     * Pointer to the context of the power domain sibling in the chain of the
-     * children power domains of their parent.
+     * Node in the parent list if not the root
      */
-    struct pd_ctx *sibling;
+    struct fwk_slist_node child_node;
 
     /* Requested power state for the power domain */
     unsigned int requested_state;
@@ -305,72 +303,6 @@ static const char * const default_state_name_table[] = {
  * Utility functions
  */
 
-/* Functions related to power domain positions in the power domain tree */
-static bool is_valid_tree_pos(uint64_t tree_pos)
-{
-    return (tree_pos < MOD_PD_TREE_POS(MOD_PD_LEVEL_COUNT, 0, 0, 0, 0));
-}
-
-static enum mod_pd_level get_level_from_tree_pos(uint64_t tree_pos)
-{
-    return (enum mod_pd_level)((tree_pos >> MOD_PD_TREE_POS_LEVEL_SHIFT) &
-                              MOD_PD_TREE_POS_LEVEL_MASK);
-}
-
-static uint64_t compute_parent_tree_pos_from_tree_pos(uint64_t tree_pos)
-{
-    unsigned int parent_level;
-    uint64_t tree_pos_mask;
-    uint64_t parent_tree_pos;
-
-    parent_level = get_level_from_tree_pos(tree_pos) + 1;
-
-    /*
-     * Create a mask of bits for levels strictly lower than 'parent_level'. We
-     * use this mask below for clearing off in 'tree_pos' the levels strictly
-     * lower than 'parent_level'.
-     */
-    tree_pos_mask = (UINT64_C(1) <<
-                     (parent_level * MOD_PD_TREE_POS_BITS_PER_LEVEL)) - 1;
-
-    parent_tree_pos = (tree_pos & (~tree_pos_mask)) +
-                      (UINT64_C(1) << MOD_PD_TREE_POS_LEVEL_SHIFT);
-
-    return parent_tree_pos;
-}
-
-/*
- * Get a pointer to the descriptor of a power domain given its position in the
- * power domain tree.
- *
- * \param tree_pos The power domain position in the power domain tree.
- *
- * \retval NULL The tree position of the power domain is invalid.
- * \return Pointer to the descriptor of the power domain.
- */
-static struct pd_ctx *get_ctx_from_tree_pos(uint64_t tree_pos)
-{
-    unsigned int min_idx = 0;
-    unsigned int max_idx_plus_one = mod_pd_ctx.pd_count;
-    unsigned int middle_idx;
-    struct pd_ctx *pd;
-
-    while (min_idx < max_idx_plus_one) {
-        middle_idx = (min_idx + max_idx_plus_one) / 2;
-        pd = &mod_pd_ctx.pd_ctx_table[middle_idx];
-        if (pd->config->tree_pos == tree_pos)
-            return pd;
-        else {
-            if (pd->config->tree_pos > tree_pos)
-                max_idx_plus_one = middle_idx;
-            else
-                min_idx = middle_idx + 1;
-        }
-    }
-
-    return NULL;
-}
-
 /* State related utility functions */
 static bool is_valid_state(const struct pd_ctx *pd, unsigned int state)
 {
@@ -416,9 +348,11 @@ static bool is_allowed_by_child(const struct pd_ctx *child,
 
 static bool is_allowed_by_children(const struct pd_ctx *pd, unsigned int state)
 {
-    const struct pd_ctx *child;
+    const struct pd_ctx *child = NULL;
+    struct fwk_slist *c_node = NULL;
 
-    for (child = pd->first_child; child != NULL; child = child->sibling) {
+    FWK_LIST_FOR_EACH(&pd->children_list, c_node, struct pd_ctx, child_node,
+                      child) {
         if (!is_allowed_by_child(child, state, child->requested_state))
             return false;
     }
@@ -514,20 +448,18 @@ static bool is_valid_composite_state(struct pd_ctx *target_pd,
 
     assert(target_pd != NULL);
 
-    level = get_level_from_tree_pos(pd->config->tree_pos);
-    highest_level = get_highest_level_from_composite_state(pd, composite_state);
-
-    if ((highest_level < level) ||
-        (highest_level >= MOD_PD_LEVEL_COUNT))
-        goto error;
-
     if (!pd->cs_support)
         goto error;
+
+    highest_level = get_highest_level_from_composite_state(pd, composite_state);
 
     state_mask_table = pd->composite_state_mask_table;
     table_size = pd->composite_state_mask_table_size;
 
-    for (; level <= highest_level && level < (table_size) ; level++) {
+    if (highest_level >= table_size)
+        goto error;
+
+    for (level = 0; level <= highest_level; level++) {
         if (pd == NULL)
             goto error;
 
@@ -567,21 +499,20 @@ error:
 static bool is_upwards_transition_propagation(const struct pd_ctx *lowest_pd,
     uint32_t composite_state)
 {
-    int  lowest_level, highest_level, level;
+    int highest_level, level;
     const struct pd_ctx *pd;
     unsigned int state;
     const uint32_t *state_mask_table;
 
-    lowest_level = get_level_from_tree_pos(lowest_pd->config->tree_pos);
     highest_level = get_highest_level_from_composite_state(lowest_pd,
                                                            composite_state);
 
     if (!lowest_pd->cs_support)
         return is_deeper_state(composite_state, lowest_pd->requested_state);
 
-    state_mask_table = lowest_pd->allowed_state_mask_table;
+    state_mask_table = lowest_pd->composite_state_mask_table;
 
-    for (level = lowest_level, pd = lowest_pd; level <= highest_level;
+    for (level = 0, pd = lowest_pd; (level <= highest_level) && (pd != NULL);
          level++, pd = pd->parent) {
 
         state = get_level_state_from_composite_state(state_mask_table,
@@ -596,54 +527,22 @@ static bool is_upwards_transition_propagation(const struct pd_ctx *lowest_pd,
 }
 
 /* Sub-routine of 'pd_post_init()', to build the power domain tree */
-static int build_pd_tree(void)
+static int connect_pd_tree(void)
 {
     unsigned int index;
-    struct pd_ctx *pd;
-    uint64_t tree_pos;
-    uint64_t parent_tree_pos;
-    uint64_t last_parent_tree_pos;
-    struct pd_ctx *parent = NULL;
-    struct pd_ctx *child;
-    struct pd_ctx *prev_sibling;
+    struct pd_ctx *pd, *parent;
 
-    last_parent_tree_pos = 0; /* Impossible value for a parent position */
     for (index = 0; index < mod_pd_ctx.pd_count; index++) {
         pd = &mod_pd_ctx.pd_ctx_table[index];
-        tree_pos = pd->config->tree_pos;
-        parent_tree_pos = compute_parent_tree_pos_from_tree_pos(tree_pos);
-        if (parent_tree_pos != last_parent_tree_pos) {
-            parent = get_ctx_from_tree_pos(parent_tree_pos);
-            last_parent_tree_pos = parent_tree_pos;
-        }
-        pd->parent = parent;
-
-        if (parent == NULL) {
-            if (index == (mod_pd_ctx.pd_count - 1))
-                break;
-            else
-                return FWK_E_PARAM;
+        if (pd->config->parent_idx >= mod_pd_ctx.pd_count) {
+            pd->parent = NULL;
+            continue;
         }
 
-        /*
-         * Update the list of children of the power domain parent. The children
-         * are in increasing order of their identifier in the chain of children.
-         */
-        child = parent->first_child;
-        prev_sibling = NULL;
-
-        while ((child != NULL) && (child->config->tree_pos < tree_pos)) {
-            prev_sibling = child;
-            child = child->sibling;
-        }
-
-        if (prev_sibling == NULL) {
-            pd->sibling = parent->first_child;
-            parent->first_child = pd;
-        } else {
-            pd->sibling = prev_sibling->sibling;
-            prev_sibling->sibling = pd;
-        }
+        parent = pd->parent = &mod_pd_ctx.pd_ctx_table[pd->config->parent_idx];
+        if (parent == NULL)
+            return FWK_E_DATA;
+        fwk_list_push_tail(&parent->children_list, &pd->child_node);
     }
 
     return FWK_SUCCESS;
@@ -660,7 +559,8 @@ static int build_pd_tree(void)
 static bool is_allowed_by_parent_and_children(struct pd_ctx *pd,
     unsigned int state)
 {
-    struct pd_ctx *parent, *child;
+    struct pd_ctx *parent, *child = NULL;
+    struct fwk_slist *c_node = NULL;
 
     parent = pd->parent;
     if (parent != NULL) {
@@ -668,11 +568,10 @@ static bool is_allowed_by_parent_and_children(struct pd_ctx *pd,
             return false;
     }
 
-    child = pd->first_child;
-    while (child != NULL) {
+    FWK_LIST_FOR_EACH(&pd->children_list, c_node, struct pd_ctx, child_node,
+                      child) {
         if (!is_allowed_by_child(child, state, child->current_state))
             return false;
-        child = child->sibling;
     }
 
     return true;
@@ -865,10 +764,10 @@ static void process_set_state_request(
      * 'highest_level >= lowest_level' and 'highest_level' is lower
      * than the highest power level.
      */
-    lowest_level = get_level_from_tree_pos(lowest_pd->config->tree_pos);
+    lowest_level = 0;
     highest_level = get_highest_level_from_composite_state(lowest_pd,
                                                            composite_state);
-    nb_pds = highest_level - lowest_level + 1;
+    nb_pds = highest_level + 1;
 
     status = FWK_SUCCESS;
     pd = lowest_pd;
@@ -879,7 +778,7 @@ static void process_set_state_request(
 
     for (pd_index = 0; pd_index < nb_pds; pd_index++, pd = pd->parent) {
         if (up)
-            level = lowest_level + pd_index;
+            level = pd_index;
         else {
             /*
              * When walking down the power domain tree, get the context of the
@@ -1023,7 +922,7 @@ static int complete_system_suspend(struct pd_ctx *target_pd)
      * to build the composite state with MOD_PD_STATE_OFF power state for all
      * levels but the last one.
      */
-    level = get_level_from_tree_pos(target_pd->config->tree_pos);
+    level = 0;
     do {
         shift = number_of_bits_to_shift(state_mask_table[level]);
         composite_state |= ((pd->parent != NULL) ? MOD_PD_STATE_OFF :
@@ -1059,7 +958,7 @@ static void process_get_state_request(struct pd_ctx *pd,
     const struct pd_get_state_request *req_params,
     struct pd_get_state_response *resp_params)
 {
-    enum mod_pd_level level = get_level_from_tree_pos(pd->config->tree_pos);
+    enum mod_pd_level level = 0;
     unsigned int composite_state = 0;
     uint32_t shift;
     const uint32_t *state_mask_table;
@@ -1109,18 +1008,19 @@ static void process_reset_request(struct pd_ctx *pd,
                                   struct pd_response *resp_params)
 {
     int status;
-    struct pd_ctx *child;
+    struct pd_ctx *child = NULL;
+    struct fwk_slist *c_node = NULL;
 
     status = FWK_E_PWRSTATE;
     if (pd->requested_state == MOD_PD_STATE_OFF)
         goto exit;
 
-    child = pd->first_child;
-    while (child != NULL) {
+
+    FWK_LIST_FOR_EACH(&pd->children_list, c_node, struct pd_ctx, child_node,
+                      child) {
         if ((child->requested_state != MOD_PD_STATE_OFF) ||
             (child->current_state != MOD_PD_STATE_OFF))
             goto exit;
-        child = child->sibling;
     }
 
     status = pd->driver_api->reset(pd->driver_id);
@@ -1165,10 +1065,12 @@ static void process_power_state_transition_report_deeper_state(
 static void process_power_state_transition_report_shallower_state(
     struct pd_ctx *pd)
 {
-    struct pd_ctx *child;
+    struct pd_ctx *child = NULL;
     unsigned int requested_state;
+    struct fwk_slist *c_node = NULL;
 
-    for (child = pd->first_child; child != NULL; child = child->sibling) {
+    FWK_LIST_FOR_EACH(&pd->children_list, c_node, struct pd_ctx, child_node,
+                      child) {
         requested_state = child->requested_state;
         if (child->state_requested_to_driver == requested_state)
             continue;
@@ -1756,8 +1658,6 @@ static int pd_init(fwk_id_t module_id, unsigned int dev_count,
 static int pd_power_domain_init(fwk_id_t pd_id, unsigned int unused,
                                 const void *config)
 {
-    static uint64_t max_tree_pos = MOD_PD_INVALID_TREE_POS;
-
     const struct mod_power_domain_element_config *pd_config =
         (const struct mod_power_domain_element_config *)config;
     struct pd_ctx *pd;
@@ -1765,21 +1665,11 @@ static int pd_power_domain_init(fwk_id_t pd_id, unsigned int unused,
 
     pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
 
-    if (!is_valid_tree_pos(pd_config->tree_pos))
-        return FWK_E_PARAM;
+    fwk_list_init(&pd->children_list);
 
     if (pd_config->attributes.pd_type >=
         MOD_PD_TYPE_COUNT)
         return FWK_E_PARAM;
-
-    /*
-     * Check that the power domains are declared by increasing order of their
-     * tree position.
-     */
-    if ((max_tree_pos != MOD_PD_INVALID_TREE_POS) &&
-        (pd_config->tree_pos <= max_tree_pos))
-            return FWK_E_PARAM;
-    max_tree_pos = pd_config->tree_pos;
 
     if ((pd_config->allowed_state_mask_table == NULL) ||
         (pd_config->allowed_state_mask_table_size == 0))
@@ -1827,7 +1717,7 @@ static int pd_post_init(fwk_id_t module_id)
 {
     int status;
 
-    status = build_pd_tree();
+    status = connect_pd_tree();
     if (status != FWK_SUCCESS)
         return status;
 

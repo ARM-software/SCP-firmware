@@ -52,236 +52,11 @@ static const struct mod_power_domain_config
     rddaniel_power_domain_config = { 0 };
 
 static struct fwk_element rddaniel_power_domain_static_element_table[] = {
-    [PD_STATIC_DEV_IDX_CLUSTER0] = {
-        .name = "CLUS0",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, PD_STATIC_DEV_IDX_CLUSTER0, 0),
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
-    [PD_STATIC_DEV_IDX_CLUSTER1] = {
-        .name = "CLUS1",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, PD_STATIC_DEV_IDX_CLUSTER1, 0),
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
-        [PD_STATIC_DEV_IDX_CLUSTER2] = {
-        .name = "CLUS2",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, PD_STATIC_DEV_IDX_CLUSTER2, 0),
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
-    [PD_STATIC_DEV_IDX_CLUSTER3] = {
-        .name = "CLUS3",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, PD_STATIC_DEV_IDX_CLUSTER3, 0),
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
-    [PD_STATIC_DEV_IDX_CLUSTER4] = {
-        .name = "CLUS4",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, PD_STATIC_DEV_IDX_CLUSTER4, 0),
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
-    [PD_STATIC_DEV_IDX_CLUSTER5] = {
-        .name = "CLUS5",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, PD_STATIC_DEV_IDX_CLUSTER5, 0),
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
-    [PD_STATIC_DEV_IDX_CLUSTER6] = {
-        .name = "CLUS6",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, PD_STATIC_DEV_IDX_CLUSTER6, 0),
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
-    [PD_STATIC_DEV_IDX_CLUSTER7] = {
-        .name = "CLUS7",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, PD_STATIC_DEV_IDX_CLUSTER7, 0),
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
-    [PD_STATIC_DEV_IDX_CLUSTER8] = {
-        .name = "CLUS8",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, PD_STATIC_DEV_IDX_CLUSTER8, 0),
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
-    [PD_STATIC_DEV_IDX_CLUSTER9] = {
-        .name = "CLUS9",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, PD_STATIC_DEV_IDX_CLUSTER9, 0),
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
-    [PD_STATIC_DEV_IDX_CLUSTER10] = {
-        .name = "CLUS10",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, PD_STATIC_DEV_IDX_CLUSTER10, 0),
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
-    [PD_STATIC_DEV_IDX_CLUSTER11] = {
-        .name = "CLUS11",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, PD_STATIC_DEV_IDX_CLUSTER11, 0),
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
-    [PD_STATIC_DEV_IDX_CLUSTER12] = {
-        .name = "CLUS12",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, PD_STATIC_DEV_IDX_CLUSTER12, 0),
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
-    [PD_STATIC_DEV_IDX_CLUSTER13] = {
-        .name = "CLUS13",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, PD_STATIC_DEV_IDX_CLUSTER13, 0),
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
-    [PD_STATIC_DEV_IDX_CLUSTER14] = {
-        .name = "CLUS14",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, PD_STATIC_DEV_IDX_CLUSTER14, 0),
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
-    [PD_STATIC_DEV_IDX_CLUSTER15] = {
-        .name = "CLUS15",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, PD_STATIC_DEV_IDX_CLUSTER15, 0),
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
     [PD_STATIC_DEV_IDX_SYSTOP] = {
         .name = "SYSTOP",
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_SYSTEM,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_2, 0, 0, 0, 0),
+            .parent_idx = PD_STATIC_DEV_IDX_NONE,
             .driver_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SYSTEM_POWER),
             .api_id = FWK_ID_API_INIT(
                 FWK_MODULE_IDX_SYSTEM_POWER,
@@ -305,27 +80,35 @@ static const struct fwk_element *rddaniel_power_domain_get_element_table
     unsigned int cluster_idx;
     unsigned int core_count;
     unsigned int cluster_count;
-    unsigned int core_element_count = 0;
+    unsigned int cluster_offset;
+    unsigned int core_element_counter = 0;
+    unsigned int elements_count;
+    unsigned int systop_idx;
+    const size_t config_size = sizeof(struct mod_power_domain_element_config);
 
     core_count = rddaniel_core_get_core_count();
     cluster_count = rddaniel_core_get_cluster_count();
 
-    element_table = fwk_mm_calloc(
-        core_count
-        + FWK_ARRAY_SIZE(rddaniel_power_domain_static_element_table)
-        + 1, /* Terminator */
-        sizeof(struct fwk_element));
+    elements_count = core_count + cluster_count +
+        FWK_ARRAY_SIZE(rddaniel_power_domain_static_element_table);
+    systop_idx = elements_count - 1;
 
-    pd_config_table = fwk_mm_calloc(core_count,
-        sizeof(struct mod_power_domain_element_config));
+    cluster_offset = core_count;
+
+    element_table = fwk_mm_calloc(elements_count + 1, /* Terminator */
+                                  sizeof(struct fwk_element));
+    if (element_table == NULL)
+        return NULL;
+
+    pd_config_table = fwk_mm_calloc(core_count + cluster_count, config_size);
 
     for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
         for (core_idx = 0;
              core_idx < rddaniel_core_get_core_per_cluster_count(cluster_idx);
              core_idx++) {
 
-            element = &element_table[core_element_count];
-            pd_config = &pd_config_table[core_element_count];
+            element = &element_table[core_element_counter];
+            pd_config = &pd_config_table[core_element_counter];
 
             element->name = fwk_mm_alloc(PD_NAME_SIZE, 1);
 
@@ -335,11 +118,9 @@ static const struct fwk_element *rddaniel_power_domain_get_element_table
             element->data = pd_config;
 
             pd_config->attributes.pd_type = MOD_PD_TYPE_CORE;
-            pd_config->tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_0, 0, 0, cluster_idx, core_idx);
+            pd_config->parent_idx = cluster_idx + cluster_offset;
             pd_config->driver_id =
-                FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1,
-                               core_element_count);
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1, core_element_counter);
             pd_config->api_id = FWK_ID_API(
                 FWK_MODULE_IDX_PPU_V1,
                 MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER);
@@ -347,18 +128,34 @@ static const struct fwk_element *rddaniel_power_domain_get_element_table
                 core_pd_allowed_state_mask_table;
             pd_config->allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table);
-            core_element_count++;
+            core_element_counter++;
         }
 
-        /* Define the driver id for the cluster */
-        pd_config = (struct mod_power_domain_element_config *)
-            rddaniel_power_domain_static_element_table[cluster_idx].data;
+        /* Define the cluster configuration */
+        element = &element_table[cluster_idx + cluster_offset];
+        pd_config = &pd_config_table[cluster_idx + cluster_offset];
+
+        element->name = fwk_mm_alloc(PD_NAME_SIZE, 1);
+
+        snprintf((char *)element->name, PD_NAME_SIZE, "CLUS%u", cluster_idx);
+
+        element->data = pd_config;
+
+        pd_config->attributes.pd_type = MOD_PD_TYPE_CLUSTER;
+        pd_config->parent_idx = systop_idx;
         pd_config->driver_id =
             FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1,
-                           (core_count + cluster_idx));
+                            cluster_idx + cluster_offset);
+        pd_config->api_id = FWK_ID_API(
+            FWK_MODULE_IDX_PPU_V1,
+            MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER);
+        pd_config->allowed_state_mask_table =
+            cluster_pd_allowed_state_mask_table;
+        pd_config->allowed_state_mask_table_size =
+            FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table);
     }
 
-    memcpy(element_table + core_count,
+    memcpy(element_table + core_count + cluster_count,
            rddaniel_power_domain_static_element_table,
            sizeof(rddaniel_power_domain_static_element_table));
 
