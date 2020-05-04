@@ -92,58 +92,6 @@ enum mod_pd_level {
 };
 
 /*!
- * \brief Number of bits used for each level within a power domain tree
- *      position.
- */
-#define MOD_PD_TREE_POS_BITS_PER_LEVEL 8
-
-/*!
- * \brief Shifts for the power level fields within a power domain tree position.
- */
-enum {
-    /*! Number of bits to shift for the power level 0 field. */
-    MOD_PD_TREE_POS_LEVEL_0_SHIFT =
-        MOD_PD_LEVEL_0 * MOD_PD_TREE_POS_BITS_PER_LEVEL,
-    /*! Number of bits to shift for the power level 1 field. */
-    MOD_PD_TREE_POS_LEVEL_1_SHIFT =
-        MOD_PD_LEVEL_1 * MOD_PD_TREE_POS_BITS_PER_LEVEL,
-    /*! Number of bits to shift for the power level 2 field. */
-    MOD_PD_TREE_POS_LEVEL_2_SHIFT =
-        MOD_PD_LEVEL_2 * MOD_PD_TREE_POS_BITS_PER_LEVEL,
-    /*! Number of bits to shift for the power level 3 field. */
-    MOD_PD_TREE_POS_LEVEL_3_SHIFT =
-        MOD_PD_LEVEL_3 * MOD_PD_TREE_POS_BITS_PER_LEVEL,
-    MOD_PD_TREE_POS_LEVEL_SHIFT =
-        MOD_PD_LEVEL_COUNT * MOD_PD_TREE_POS_BITS_PER_LEVEL,
-};
-
-/*!
- * \brief Mask for the power level fields within a power domain tree position.
- */
-#define MOD_PD_TREE_POS_LEVEL_MASK  UINT64_C(0xFF)
-
-/*!
- * \brief Build the power domain tree position of a power domain.
- */
-#define MOD_PD_TREE_POS(LEVEL, LEVEL_3, LEVEL_2, LEVEL_1, LEVEL_0) \
-         ((((uint64_t)((LEVEL)   & MOD_PD_TREE_POS_LEVEL_MASK)) << \
-                                              MOD_PD_TREE_POS_LEVEL_SHIFT)   | \
-          (((uint64_t)((LEVEL_3) & MOD_PD_TREE_POS_LEVEL_MASK)) << \
-                                              MOD_PD_TREE_POS_LEVEL_3_SHIFT) | \
-          (((uint64_t)((LEVEL_2) & MOD_PD_TREE_POS_LEVEL_MASK)) << \
-                                              MOD_PD_TREE_POS_LEVEL_2_SHIFT) | \
-          (((uint64_t)((LEVEL_1) & MOD_PD_TREE_POS_LEVEL_MASK)) << \
-                                              MOD_PD_TREE_POS_LEVEL_1_SHIFT) | \
-          (((uint64_t)((LEVEL_0) & MOD_PD_TREE_POS_LEVEL_MASK)) << \
-                                              MOD_PD_TREE_POS_LEVEL_0_SHIFT))
-
-/*!
- * \brief Representation of the invalid tree position. Used when checking that
- *      power domains are declared in increasing order of their tree position.
- */
-#define MOD_PD_INVALID_TREE_POS MOD_PD_TREE_POS(MOD_PD_LEVEL_COUNT, 0, 0, 0, 0)
-
-/*!
  * \brief Power domain module configuration.
  */
 struct mod_power_domain_config {
@@ -176,37 +124,9 @@ struct mod_power_domain_config {
  */
 struct mod_power_domain_element_config {
     /*!
-     * \brief Defines the position of the power domain within the power domain
-     *      tree.
-     *
-     * \details Each child of a power domain is assigned a number ranging from 0
-     *      to 255. Compute the position of a power domain from the position of
-     *      its parent 'parent_pos' (the number assigned to the power domain as
-     *      a child of its parent is 'child_pos') as follows:
-     *
-     *      tree_pos = (parent_pos - (1 << MOD_PD_TREE_POS_LEVEL_SHIFT)) +
-     *                 (child_pos << (8*pd_level))
-     *
-     *      The position of the top-level domain is defined as:
-     *      (level of the top-level domain) << MOD_PD_TREE_POS_LEVEL_SHIFT
-     *
-     *      If the power domain hierarchy maps to the core hierarchy (based on
-     *      MPIDR levels of affinity), derive the position of the core power
-     *      domains from the Aff0, Aff1, Aff2 and Aff3 fields of the MPIDR
-     *      registers of the cores as follows:
-     *
-     *      core power domain position = (Aff3 << MOD_PD_TREE_LEVEL_3_SHIFT) +
-     *                                   (Aff2 << MOD_PD_TREE_LEVEL_2_SHIFT) +
-     *                                   (Aff1 << MOD_PD_TREE_LEVEL_1_SHIFT) +
-     *                                   (Aff0 << MOD_PD_TREE_LEVEL_0_SHIFT)
-     *
-     *      In the module configuration data, the power domains have to be in
-     *      increasing order of their power domain position. Thus, the power
-     *      domains with the lowest power level have to be first and the system
-     *      power domain has to be last. This table must contain at least one
-     *      element, the system power domain.
+     * brief Power domain parent index
      */
-    uint64_t tree_pos;
+    uint32_t parent_idx;
 
     /*!
      *  Identifier of the module or element providing the driver for the power

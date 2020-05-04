@@ -8,6 +8,8 @@
 #ifndef CONFIG_POWER_DOMAIN_H
 #define CONFIG_POWER_DOMAIN_H
 
+#include <stdint.h>
+
 /*
  * Power domain element indexes defined in increasing order of power domain
  * level.
@@ -33,6 +35,8 @@ enum power_domain_idx {
 
     /* Number of defined elements */
     POWER_DOMAIN_IDX_COUNT,
+
+    POWER_DOMAIN_IDX_NONE = UINT32_MAX
 };
 
 #endif /* CONFIG_POWER_DOMAIN_H */

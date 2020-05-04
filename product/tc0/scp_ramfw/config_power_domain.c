@@ -56,8 +56,6 @@ static struct fwk_element tc0_power_domain_static_element_table[] = {
         .name = "CLUS0",
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_1, 0, 0, PD_STATIC_DEV_IDX_CLUSTER0, 0),
             .api_id = FWK_ID_API_INIT(
                 FWK_MODULE_IDX_PPU_V1,
                 MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
@@ -70,8 +68,7 @@ static struct fwk_element tc0_power_domain_static_element_table[] = {
         .name = "SYSTOP",
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_SYSTEM,
-            .tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_2, 0, 0, 0, 0),
+            .parent_idx = PD_STATIC_DEV_IDX_NONE,
             .driver_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SYSTEM_POWER),
             .api_id = FWK_ID_API_INIT(
                 FWK_MODULE_IDX_SYSTEM_POWER,
@@ -93,17 +90,23 @@ static const struct fwk_element *tc0_power_domain_get_element_table
     struct mod_power_domain_element_config *pd_config_table, *pd_config;
     unsigned int core_idx;
     unsigned int cluster_idx;
+    unsigned int cluster_offset;
     unsigned int core_count;
     unsigned int cluster_count;
-    unsigned int core_element_count = 0;
+    unsigned int core_element_counter = 0;
+    unsigned int elements_count;
+    unsigned int systop_idx;
 
-    core_count = tc0_core_get_core_count();
+    core_count = cluster_offset = tc0_core_get_core_count();
     cluster_count = tc0_core_get_cluster_count();
 
+    elements_count =
+        core_count + FWK_ARRAY_SIZE(tc0_power_domain_static_element_table);
+
+    systop_idx = elements_count - 1;
+
     element_table = fwk_mm_calloc(
-        core_count
-        + FWK_ARRAY_SIZE(tc0_power_domain_static_element_table)
-        + 1, /* Terminator */
+        elements_count + 1, /* Terminator */
         sizeof(struct fwk_element));
     if (element_table == NULL)
         return NULL;
@@ -118,9 +121,8 @@ static const struct fwk_element *tc0_power_domain_get_element_table
              core_idx < tc0_core_get_core_per_cluster_count(
                 cluster_idx);
              core_idx++) {
-
-            element = &element_table[core_element_count];
-            pd_config = &pd_config_table[core_element_count];
+            element = &element_table[core_element_counter];
+            pd_config = &pd_config_table[core_element_counter];
 
             element->name = fwk_mm_alloc(PD_NAME_SIZE, 1);
             if (element->name == NULL)
@@ -132,11 +134,9 @@ static const struct fwk_element *tc0_power_domain_get_element_table
             element->data = pd_config;
 
             pd_config->attributes.pd_type = MOD_PD_TYPE_CORE;
-            pd_config->tree_pos = MOD_PD_TREE_POS(
-                MOD_PD_LEVEL_0, 0, 0, cluster_idx, core_idx);
+            pd_config->parent_idx = cluster_idx + cluster_offset;
             pd_config->driver_id =
-                FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1,
-                               core_element_count);
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1, core_element_counter);
             pd_config->api_id = FWK_ID_API(
                 FWK_MODULE_IDX_PPU_V1,
                 MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER);
@@ -144,15 +144,15 @@ static const struct fwk_element *tc0_power_domain_get_element_table
                 core_pd_allowed_state_mask_table;
             pd_config->allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table);
-            core_element_count++;
+            core_element_counter++;
         }
 
         /* Define the driver id for the cluster */
         pd_config = (struct mod_power_domain_element_config *)
             tc0_power_domain_static_element_table[cluster_idx].data;
+        pd_config->parent_idx = systop_idx;
         pd_config->driver_id =
-            FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1,
-                           (core_count + cluster_idx));
+            FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1, (core_count + cluster_idx));
     }
 
     memcpy(element_table + core_count,

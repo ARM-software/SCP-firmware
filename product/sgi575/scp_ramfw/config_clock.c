@@ -60,7 +60,8 @@ static const struct fwk_element *clock_get_dev_desc_table(fwk_id_t module_id)
             (struct mod_clock_dev_config *)clock_dev_desc_table[i].data;
         dev_config->pd_source_id = fwk_id_build_element_id(
             fwk_module_id_power_domain,
-            sgi575_core_get_core_count() + PD_STATIC_DEV_IDX_SYSTOP);
+            sgi575_core_get_core_count() + sgi575_core_get_cluster_count() +
+                PD_STATIC_DEV_IDX_SYSTOP);
     }
 
     return clock_dev_desc_table;

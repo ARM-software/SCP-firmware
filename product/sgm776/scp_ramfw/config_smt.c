@@ -71,8 +71,9 @@ static const struct fwk_element *smt_get_element_table(fwk_id_t module_id)
 
     for (idx = 0; idx < SGM776_SCMI_SERVICE_IDX_COUNT; idx++) {
         config = (struct mod_smt_channel_config *)(smt_element_table[idx].data);
-        config->pd_source_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN,
-            CONFIG_POWER_DOMAIN_SYSTOP_CHILD_COUNT + sgm776_core_get_count());
+        config->pd_source_id = FWK_ID_ELEMENT(
+            FWK_MODULE_IDX_POWER_DOMAIN,
+            CONFIG_POWER_DOMAIN_SYSTOP_SYSTEM + sgm776_core_get_count());
     }
 
     return smt_element_table;
