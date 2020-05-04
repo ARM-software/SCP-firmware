@@ -407,6 +407,33 @@ static int dvfs_get_nth_opp(fwk_id_t domain_id,
     return FWK_SUCCESS;
 }
 
+static int dvfs_get_frequency_id(fwk_id_t domain_id,
+    uint64_t frequency,
+    size_t *level_id)
+{
+    const struct mod_dvfs_domain_ctx *ctx;
+    size_t idx;
+
+    ctx = get_domain_ctx(domain_id);
+    if (ctx == NULL)
+        return FWK_E_PARAM;
+
+    /*
+     * When the setup code forces platform to provide frequency array
+     * sorted, then this code can be changed to bisect search in order
+     * to speed-up.
+     */
+    for (idx = 0; idx < ctx->opp_count; idx++) {
+        const struct mod_dvfs_opp *opp = &ctx->config->opps[idx];
+        if (opp->frequency == frequency) {
+            *level_id = idx;
+            return FWK_SUCCESS;
+        }
+    }
+
+    return FWK_E_PARAM;
+}
+
 static int dvfs_get_opp_count(fwk_id_t domain_id, size_t *opp_count)
 {
     const struct mod_dvfs_domain_ctx *ctx;
@@ -582,6 +609,7 @@ static const struct mod_dvfs_domain_api mod_dvfs_domain_api = {
     .get_current_opp = dvfs_get_current_opp,
     .get_sustained_opp = dvfs_get_sustained_opp,
     .get_nth_opp = dvfs_get_nth_opp,
+    .get_frequency_id = dvfs_get_frequency_id,
     .get_opp_count = dvfs_get_opp_count,
     .get_latency = dvfs_get_latency,
     .set_frequency = dvfs_set_frequency,

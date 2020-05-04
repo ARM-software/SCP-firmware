@@ -157,6 +157,16 @@ struct mod_dvfs_domain_api {
     int (*get_opp_count)(fwk_id_t domain_id, size_t *opp_count);
 
     /*!
+     * \brief Get the level id for the given frequency.
+     *
+     * \param domain_id Element identifier of the domain.
+     * \param frequency Requested frequency.
+     * \param [out] level id inside the OPP table.
+     */
+    int (*get_frequency_id)(fwk_id_t domain_id, uint64_t frequency,
+        size_t *level_id);
+
+    /*!
      * \brief Get the worst-case transition latency of a domain.
      *
      * \param domain_id Element identifier of the domain.
