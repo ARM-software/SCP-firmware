@@ -93,4 +93,9 @@
                                        SCMI_PAYLOAD_SIZE)
 #define SCMI_FAST_CHANNEL_SIZE        (SCMI_PAYLOAD_SIZE)
 
+/* SCMIv2 Performance statistics region */
+#define SCMI_PERF_STATS_BASE          (SCMI_FAST_CHANNEL_BASE + \
+                                       SCMI_PAYLOAD_SIZE)
+#define SCMI_PERF_STATS_SIZE          (0x1000)
+
 #endif /* SOFTWARE_MMAP_H */
