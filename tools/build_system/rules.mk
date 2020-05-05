@@ -37,6 +37,10 @@ ifeq ($(BUILD_HAS_SCMI_RESET),yes)
     DEFINES += BUILD_HAS_SCMI_RESET
 endif
 
+ifeq ($(BUILD_HAS_STATISTICS),yes)
+    DEFINES += BUILD_HAS_STATISTICS
+endif
+
 export AS := $(CC)
 export LD := $(CC)
 

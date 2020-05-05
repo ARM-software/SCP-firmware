@@ -213,6 +213,13 @@ When building a firmware and its dependencies, the BS_FIRMWARE_HAS_DEBUG_UNIT
 parameter controls whether the support for the Debug probe/trace unit is
 included.
 
+SCMI Statistics Support                                    {#section_statistics}
+=====================
+
+When building a firmware and its dependencies, the
+BS_FIRMWARE_HAS_STATISTICS parameter controls whether statistics support is
+enabled or not.
+
 Definitions
 ===========
 

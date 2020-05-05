@@ -221,6 +221,12 @@ else
     BUILD_HAS_SCMI_RESET := no
 endif
 
+ifeq ($(BS_FIRMWARE_HAS_STATISTICS),yes)
+    BUILD_HAS_STATISTICS := yes
+else
+    BUILD_HAS_STATISTICS := no
+endif
+
 # Add directories to the list of targets to build
 LIB_TARGETS_y += $(patsubst %,$(MODULES_DIR)/%/src, \
                             $(BUILD_STANDARD_MODULES))
