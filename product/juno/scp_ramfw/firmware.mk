@@ -15,6 +15,7 @@ BS_FIRMWARE_HAS_SCMI_NOTIFICATIONS := no
 BS_FIRMWARE_HAS_FAST_CHANNELS := no
 BS_FIRMWARE_HAS_DEBUG_UNIT := yes
 BS_FIRMWARE_HAS_SCMI_RESET := no
+BS_FIRMWARE_HAS_STATISTICS := no
 
 BS_FIRMWARE_MODULE_HEADERS_ONLY :=
 
@@ -110,6 +111,11 @@ ifeq ($(BS_FIRMWARE_HAS_SCMI_RESET),yes)
     BS_FIRMWARE_SOURCES += config_reset_domain.c \
         config_scmi_reset_domain.c \
         config_juno_reset_domain.c
+endif
+
+ifeq ($(BS_FIRMWARE_HAS_STATISTICS),yes)
+    BS_FIRMWARE_MODULES += statistics
+    BS_FIRMWARE_SOURCES += config_stats.c
 endif
 
 include $(BS_DIR)/firmware.mk
