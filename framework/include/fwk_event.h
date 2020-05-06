@@ -76,12 +76,14 @@ struct fwk_event {
      */
     bool is_delayed_response;
 
+#ifdef BUILD_HAS_MULTITHREADING
     /*!
      * \internal
      * \brief Flag indicating whether the event is a response event that a
      *      thread is waiting for to resume execution.
      */
     bool is_thread_wakeup_event;
+#endif
 
     /*!
      * \brief Event identifier.
