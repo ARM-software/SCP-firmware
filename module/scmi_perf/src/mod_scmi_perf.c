@@ -1165,7 +1165,7 @@ static int scmi_perf_start(fwk_id_t id)
         if (domain->fast_channels_addr_scp != 0x0) {
             fc = (struct mod_scmi_perf_fast_channel *)
                 ((uintptr_t)domain->fast_channels_addr_scp);
-            memset((void *)fc, 0, sizeof(struct mod_scmi_perf_domain_config));
+            memset((void *)fc, 0, sizeof(struct mod_scmi_perf_fast_channel));
         }
     }
 
