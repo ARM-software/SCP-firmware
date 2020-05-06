@@ -40,6 +40,9 @@ struct clock_dev_ctx {
     /* Status of the pending transition */
     unsigned int transition_pending_response_status;
 
+    /* Enable count of the clock, if applicable */
+    unsigned int run_count;
+
     /* A request is on-going */
     bool is_request_ongoing;
 
@@ -246,6 +249,25 @@ static int clock_set_state(fwk_id_t clock_id, enum mod_clock_state state)
     if (ctx->is_request_ongoing)
         return FWK_E_BUSY;
 
+    /* Clock is already stopped - inbalanced stop */
+    if (state == MOD_CLOCK_STATE_STOPPED &&
+        ctx->run_count == 0)
+            return FWK_E_DATA;
+
+    if (state == MOD_CLOCK_STATE_STOPPED) {
+        ctx->run_count--;
+
+        /* clock should stay on at this point */
+        if (ctx->run_count)
+            return FWK_SUCCESS;
+    } else {
+        ctx->run_count++;
+
+        /* clock was already on, no action needed */
+        if (ctx->run_count > 1)
+            return FWK_SUCCESS;
+    }
+
     status = ctx->api->set_state(ctx->config->driver_id, state);
     if (status == FWK_PENDING)
         return create_async_request(
@@ -360,6 +382,31 @@ static int clock_bind(fwk_id_t id, unsigned int round)
                            &ctx->api);
 }
 
+static int clock_init_run_count(struct clock_dev_ctx *ctx, fwk_id_t clock_id)
+{
+    int status;
+    enum mod_clock_state state;
+
+    status = ctx->api->get_state(ctx->config->driver_id, &state);
+    if (status != FWK_SUCCESS)
+        /*
+         * TODO: Support delayed reponse to get state
+         * ATM, no clock driver seems to possibly reply PENDING to
+         * get_state(). Keep things simple for this first try and
+         * handle that case later
+         */
+        return status;
+
+    if (state == MOD_CLOCK_STATE_STOPPED)
+        /* Clock is initially stopped */
+        ctx->run_count = 0;
+    else
+        /* Clock is initially running */
+        ctx->run_count = 1;
+
+    return FWK_SUCCESS;
+}
+
 static int clock_start(fwk_id_t id)
 {
     int status;
@@ -370,6 +417,10 @@ static int clock_start(fwk_id_t id)
         return FWK_SUCCESS;
 
     ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(id)];
+
+    status = clock_init_run_count(ctx, id);
+    if (status != FWK_SUCCESS)
+        return status;
 
     if (fwk_id_is_type(ctx->config->pd_source_id, FWK_ID_TYPE_NONE))
          return FWK_SUCCESS;
