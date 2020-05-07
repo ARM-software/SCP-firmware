@@ -56,7 +56,6 @@ BS_FIRMWARE_MODULES := \
     juno_thermal
 
 BS_FIRMWARE_SOURCES := \
-    rtx_config.c \
     juno_utils.c \
     config_sds.c \
     config_log.c \
@@ -91,5 +90,9 @@ BS_FIRMWARE_SOURCES := \
     config_juno_pvt.c \
     config_juno_thermal.c \
     config_scmi_power_domain.c
+
+ifeq ($(BS_FIRMWARE_HAS_MULTITHREADING),yes)
+    BS_FIRMWARE_SOURCES += rtx_config.c
+endif
 
 include $(BS_DIR)/firmware.mk
