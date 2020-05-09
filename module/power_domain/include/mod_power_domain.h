@@ -238,6 +238,17 @@ struct mod_power_domain_element_config {
      */
     const char **state_name_table;
 
+    /*! Composite state number of levels mask */
+    const uint32_t composite_state_levels_mask;
+
+    /*!
+     * Composite state mask table. This table provides the mask for each level
+     */
+    const uint32_t *composite_state_mask_table;
+
+    /*! Size of the composite state mask table */
+    size_t composite_state_mask_table_size;
+
     /*! Size of the table of allowed state masks */
     size_t allowed_state_mask_table_size;
 
@@ -321,9 +332,6 @@ enum {
         MOD_PD_LEVEL_3 * MOD_PD_CS_STATE_BITS_PER_LEVEL,
     MOD_PD_CS_LEVEL_SHIFT =
         MOD_PD_LEVEL_COUNT * MOD_PD_CS_STATE_BITS_PER_LEVEL,
-
-    MOD_PD_CS_VALID_BITS = (1 <<
-        (MOD_PD_CS_LEVEL_SHIFT + MOD_PD_CS_STATE_BITS_PER_LEVEL)) - 1
 };
 
 /*!

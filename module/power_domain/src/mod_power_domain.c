@@ -108,6 +108,20 @@ struct pd_ctx {
     /* Size of the table of allowed state masks */
     size_t allowed_state_mask_table_size;
 
+    /* Composite state is supported */
+    bool cs_support;
+
+    /*
+     * Composite state mask table. This table provides the mask for each level
+     */
+    const uint32_t *composite_state_mask_table;
+
+    /* Size of the composite state mask table */
+    size_t composite_state_mask_table_size;
+
+    /* Composite state number of levels mask */
+    uint32_t composite_state_levels_mask;
+
     /* Pointer to the power domain's parent context */
     struct pd_ctx *parent;
 
@@ -278,6 +292,14 @@ static const unsigned int mod_pd_cs_level_state_shift[MOD_PD_LEVEL_COUNT] = {
     MOD_PD_CS_LEVEL_3_STATE_SHIFT
 };
 
+/* Mask of the core composite states */
+static const uint32_t core_composite_state_mask_table[] = {
+    MOD_PD_CS_STATE_MASK << MOD_PD_CS_LEVEL_0_STATE_SHIFT,
+    MOD_PD_CS_STATE_MASK << MOD_PD_CS_LEVEL_1_STATE_SHIFT,
+    MOD_PD_CS_STATE_MASK << MOD_PD_CS_LEVEL_2_STATE_SHIFT,
+    MOD_PD_CS_STATE_MASK << MOD_PD_CS_LEVEL_3_STATE_SHIFT,
+};
+
 /*
  * Internal variables
  */
@@ -426,19 +448,63 @@ static const char *get_state_name(const struct pd_ctx *pd, unsigned int state)
         return unknown_name;
 }
 
-/* Functions related to a composite state */
-static unsigned int get_level_state_from_composite_state(
-    uint32_t composite_state, enum mod_pd_level level)
+static unsigned int number_of_bits_to_shift(uint32_t mask)
 {
-    return (composite_state >> mod_pd_cs_level_state_shift[level])
-            & MOD_PD_CS_STATE_MASK;
+    unsigned int num_bits = 0;
+
+    if (!mask)
+        return 0;
+
+    while (!(mask & 1)) {
+        mask = mask >> 1;
+        num_bits++;
+    }
+
+    return num_bits;
 }
 
-static enum mod_pd_level get_highest_level_from_composite_state(
+/* Functions related to a composite state */
+static unsigned int get_level_state_from_composite_state(
+    const uint32_t *table,
+    uint32_t composite_state,
+    int level)
+{
+    uint32_t mask = table[level];
+    unsigned int shift = number_of_bits_to_shift(mask);
+
+    return (composite_state & mask) >> shift;
+}
+
+static int get_highest_level_from_composite_state(
+    const struct pd_ctx *pd,
     uint32_t composite_state)
 {
-    return (enum mod_pd_level)((composite_state >> MOD_PD_CS_LEVEL_SHIFT) &
-                              MOD_PD_CS_STATE_MASK);
+    uint32_t state;
+    unsigned int shift, level;
+    const uint32_t *state_mask_table;
+    unsigned int table_size;
+
+    if (!pd->cs_support)
+        return 0;
+
+    if (pd->composite_state_levels_mask) {
+        shift = number_of_bits_to_shift(pd->composite_state_levels_mask);
+        level = (pd->composite_state_levels_mask & composite_state) >> shift;
+    } else {
+        state_mask_table = pd->composite_state_mask_table;
+        table_size = pd->composite_state_mask_table_size;
+
+        for (level = 0; ((level < table_size) && (pd != NULL));
+             level++, pd = pd->parent) {
+            state = get_level_state_from_composite_state(
+                state_mask_table, composite_state, level);
+            if (!is_valid_state(pd, state))
+                break;
+        }
+        level--;
+    }
+
+    return level;
 }
 
 static bool is_valid_composite_state(struct pd_ctx *target_pd,
@@ -449,22 +515,31 @@ static bool is_valid_composite_state(struct pd_ctx *target_pd,
     unsigned int state, child_state = MOD_PD_STATE_OFF;
     struct pd_ctx *pd = target_pd;
     struct pd_ctx *child = NULL;
+    const uint32_t *state_mask_table;
+    unsigned int table_size;
 
-    if (composite_state & (~MOD_PD_CS_VALID_BITS))
-        goto error;
+    assert(target_pd != NULL);
 
     level = get_level_from_tree_pos(pd->config->tree_pos);
-    highest_level = get_highest_level_from_composite_state(composite_state);
+    highest_level = get_highest_level_from_composite_state(pd, composite_state);
 
     if ((highest_level < level) ||
         (highest_level >= MOD_PD_LEVEL_COUNT))
         goto error;
 
-    for (; level <= highest_level; level++) {
+    if (!pd->cs_support)
+        goto error;
+
+    state_mask_table = pd->composite_state_mask_table;
+    table_size = pd->composite_state_mask_table_size;
+
+    for (; level <= highest_level && level < (table_size); level++) {
         if (pd == NULL)
             goto error;
 
-        state = get_level_state_from_composite_state(composite_state, level);
+        state = get_level_state_from_composite_state(
+            state_mask_table, composite_state, level);
+
         if (!is_valid_state(pd, state))
             goto error;
 
@@ -498,17 +573,24 @@ error:
 static bool is_upwards_transition_propagation(const struct pd_ctx *lowest_pd,
     uint32_t composite_state)
 {
-    enum mod_pd_level lowest_level, highest_level, level;
+    int lowest_level, highest_level, level;
     const struct pd_ctx *pd;
     unsigned int state;
+    const uint32_t *state_mask_table;
 
     lowest_level = get_level_from_tree_pos(lowest_pd->config->tree_pos);
-    highest_level = get_highest_level_from_composite_state(composite_state);
+    highest_level =
+        get_highest_level_from_composite_state(lowest_pd, composite_state);
+
+    if (!lowest_pd->cs_support)
+        return is_deeper_state(composite_state, lowest_pd->requested_state);
+
+    state_mask_table = lowest_pd->allowed_state_mask_table;
 
     for (level = lowest_level, pd = lowest_pd; level <= highest_level;
          level++, pd = pd->parent) {
-
-        state = get_level_state_from_composite_state(composite_state, level);
+        state = get_level_state_from_composite_state(
+            state_mask_table, composite_state, level);
         if (state == pd->requested_state)
             continue;
 
@@ -769,6 +851,7 @@ static void process_set_state_request(
     unsigned int nb_pds, pd_index, state;
     struct pd_ctx *pd, *pd_in_charge_of_response;
     const struct pd_ctx *parent;
+    const uint32_t *state_mask_table;
 
     req_params = (struct pd_set_state_request *)event->params;
     resp_params = (struct pd_set_state_response *)resp_event->params;
@@ -787,11 +870,14 @@ static void process_set_state_request(
      * than the highest power level.
      */
     lowest_level = get_level_from_tree_pos(lowest_pd->config->tree_pos);
-    highest_level = get_highest_level_from_composite_state(composite_state);
+    highest_level =
+        get_highest_level_from_composite_state(lowest_pd, composite_state);
     nb_pds = highest_level - lowest_level + 1;
 
     status = FWK_SUCCESS;
     pd = lowest_pd;
+    state_mask_table = pd->composite_state_mask_table;
+
     for (pd_index = 0; pd_index < nb_pds; pd_index++, pd = pd->parent) {
         if (up)
             level = lowest_level + pd_index;
@@ -806,7 +892,8 @@ static void process_set_state_request(
                 pd = pd->parent;
         }
 
-        state = get_level_state_from_composite_state(composite_state, level);
+        state = get_level_state_from_composite_state(
+            state_mask_table, composite_state, level);
         if (state == pd->requested_state)
             continue;
 
@@ -911,14 +998,21 @@ static void process_set_state_request(
 static int complete_system_suspend(struct pd_ctx *target_pd)
 {
     enum mod_pd_level level;
-    unsigned int composite_state = 0;
+    unsigned int shift, composite_state = 0;
     struct pd_ctx *pd = target_pd;
     struct fwk_event event, resp_event;
     struct pd_set_state_request *event_params =
         (struct pd_set_state_request *)event.params;
     struct pd_set_state_response *resp_params =
         (struct pd_set_state_response *)(&resp_event.params);
+    const uint32_t *state_mask_table;
+    int table_size;
 
+    if (!pd->cs_support)
+        return FWK_E_PARAM;
+
+    state_mask_table = pd->composite_state_mask_table;
+    table_size = pd->composite_state_mask_table_size;
     /*
      * Traverse the PD tree bottom-up from current power domain to the top
      * to build the composite state with MOD_PD_STATE_OFF power state for all
@@ -926,11 +1020,14 @@ static int complete_system_suspend(struct pd_ctx *target_pd)
      */
     level = get_level_from_tree_pos(target_pd->config->tree_pos);
     do {
-        composite_state |= ((pd->parent != NULL) ? MOD_PD_STATE_OFF :
-                            mod_pd_ctx.system_suspend.state)
-                           << mod_pd_cs_level_state_shift[level++];
+        shift = number_of_bits_to_shift(state_mask_table[level]);
+        composite_state |=
+            ((pd->parent != NULL) ? MOD_PD_STATE_OFF :
+                                    mod_pd_ctx.system_suspend.state)
+            << shift;
         pd = pd->parent;
-    } while (pd != NULL);
+        level++;
+    } while ((pd != NULL) && (level < table_size));
 
     /*
      * Finally, we need to update the highest valid level in the composite
@@ -1777,6 +1874,26 @@ static int pd_power_domain_init(fwk_id_t pd_id, unsigned int unused,
 
     for (state = 0; state < pd->allowed_state_mask_table_size; state++)
         pd->valid_state_mask |= pd->allowed_state_mask_table[state];
+
+    if ((pd_config->composite_state_mask_table != NULL) &&
+        (pd_config->composite_state_mask_table_size > 0)) {
+        pd->composite_state_mask_table = pd_config->composite_state_mask_table;
+        pd->composite_state_mask_table_size =
+            pd_config->composite_state_mask_table_size;
+        pd->composite_state_levels_mask =
+            pd_config->composite_state_levels_mask;
+        pd->cs_support = true;
+
+    } else if (pd_config->attributes.pd_type == MOD_PD_TYPE_CORE) {
+        pd->composite_state_mask_table = core_composite_state_mask_table;
+        pd->composite_state_mask_table_size =
+            FWK_ARRAY_SIZE(core_composite_state_mask_table);
+        pd->composite_state_levels_mask = MOD_PD_CS_STATE_MASK
+            << MOD_PD_CS_LEVEL_SHIFT;
+        pd->cs_support = true;
+
+    } else
+        pd->cs_support = false;
 
     pd->id = pd_id;
     pd->config = pd_config;
