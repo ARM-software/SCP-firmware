@@ -407,7 +407,11 @@ static int juno_debug_element_init(fwk_id_t element_id,
                                    unsigned int sub_element_count,
                                    const void *data)
 {
+#ifdef BUILD_HAS_MULTITHREADING
     return fwk_thread_create(element_id);
+#else
+    return FWK_SUCCESS;
+#endif
 }
 
 static int juno_debug_bind(fwk_id_t id, unsigned int round)
