@@ -99,6 +99,7 @@ endif
 # set of warnings, and any warnings that do occur are upgraded to errors to
 # prevent the firmware from building.
 CFLAGS += -Werror
+CFLAGS += -Wno-error=deprecated-declarations
 CFLAGS += -Wall
 CFLAGS += -Wextra
 CFLAGS += -pedantic

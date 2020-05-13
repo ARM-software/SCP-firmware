@@ -21,6 +21,7 @@ CFLAGS += -Wall
 CFLAGS += -Wextra
 CFLAGS += -Werror
 CFLAGS += -Wno-missing-field-initializers
+CFLAGS += -Wno-error=deprecated-declarations
 CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-strict-aliasing
 CFLAGS += -std=c11
