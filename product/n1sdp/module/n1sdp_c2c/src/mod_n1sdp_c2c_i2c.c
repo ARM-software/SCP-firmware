@@ -685,7 +685,7 @@ static int n1sdp_c2c_process_command(void)
          */
         switch (rx_data[2]) {
         case MOD_PD_TYPE_CORE:
-            status = n1sdp_c2c_ctx.pd_api->set_composite_state(
+            status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
                 MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
                     MOD_PD_STATE_ON, MOD_PD_STATE_OFF));
@@ -695,7 +695,7 @@ static int n1sdp_c2c_process_command(void)
 
         case MOD_PD_TYPE_CLUSTER:
         case MOD_PD_TYPE_DEVICE_DEBUG:
-            status = n1sdp_c2c_ctx.pd_api->set_composite_state(
+            status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
                 MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
                     MOD_PD_STATE_OFF, MOD_PD_STATE_OFF));
@@ -704,7 +704,7 @@ static int n1sdp_c2c_process_command(void)
             break;
 
         case MOD_PD_TYPE_SYSTEM:
-            status = n1sdp_c2c_ctx.pd_api->set_composite_state(
+            status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
                 MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
                     MOD_PD_STATE_OFF, MOD_PD_STATE_OFF));
@@ -726,7 +726,7 @@ static int n1sdp_c2c_process_command(void)
          */
         switch (rx_data[2]) {
         case MOD_PD_TYPE_CORE:
-            status = n1sdp_c2c_ctx.pd_api->set_composite_state(
+            status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
                 MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
                     MOD_PD_STATE_ON, MOD_PD_STATE_ON));
@@ -736,7 +736,7 @@ static int n1sdp_c2c_process_command(void)
 
         case MOD_PD_TYPE_CLUSTER:
         case MOD_PD_TYPE_DEVICE_DEBUG:
-            status = n1sdp_c2c_ctx.pd_api->set_composite_state(
+            status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
                 MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
                     MOD_PD_STATE_ON, MOD_PD_STATE_OFF));
@@ -745,7 +745,7 @@ static int n1sdp_c2c_process_command(void)
             break;
 
         case MOD_PD_TYPE_SYSTEM:
-            status = n1sdp_c2c_ctx.pd_api->set_composite_state(
+            status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
                 MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
                     MOD_PD_STATE_OFF, MOD_PD_STATE_OFF));

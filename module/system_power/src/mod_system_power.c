@@ -322,7 +322,7 @@ static void soc_wakeup_handler(void)
         fwk_trap();
 
     status =
-        system_power_ctx.mod_pd_restricted_api->set_composite_state_async(
+        system_power_ctx.mod_pd_restricted_api->set_state_async(
             system_power_ctx.last_core_pd_id, false, state);
     fwk_check(status == FWK_SUCCESS);
 }

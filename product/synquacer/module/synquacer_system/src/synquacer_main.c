@@ -349,7 +349,7 @@ int synquacer_main(void)
 
     FWK_LOG_INFO("[SYNQUACER SYSTEM] powering up AP");
     status =
-        synquacer_system_ctx.mod_pd_restricted_api->set_composite_state_async(
+        synquacer_system_ctx.mod_pd_restricted_api->set_state_async(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
             false,
             MOD_PD_COMPOSITE_STATE(

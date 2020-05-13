@@ -281,7 +281,7 @@ static int rddaniel_system_start(fwk_id_t id)
         return status;
 
     return
-        rddaniel_system_ctx.mod_pd_restricted_api->set_composite_state_async(
+        rddaniel_system_ctx.mod_pd_restricted_api->set_state_async(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0), false,
             MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
                                    MOD_PD_STATE_OFF, MOD_PD_STATE_OFF));
@@ -310,7 +310,7 @@ int rddaniel_system_process_notification(const struct fwk_event *event,
 
             mod_pd_restricted_api = rddaniel_system_ctx.mod_pd_restricted_api;
 
-            status =  mod_pd_restricted_api->set_composite_state_async(
+            status =  mod_pd_restricted_api->set_state_async(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
                 false,
                 MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,

@@ -852,7 +852,7 @@ static void process_set_state_request(
     struct pd_set_state_request *req_params;
     struct pd_set_state_response *resp_params;
     uint32_t composite_state;
-    bool up, first_power_state_transition_initiated;
+    bool up, first_power_state_transition_initiated, composite_state_operation;
     enum mod_pd_level lowest_level, highest_level, level;
     unsigned int nb_pds, pd_index, state;
     struct pd_ctx *pd, *pd_in_charge_of_response;
@@ -883,7 +883,10 @@ static void process_set_state_request(
 
     status = FWK_SUCCESS;
     pd = lowest_pd;
-    state_mask_table = pd->composite_state_mask_table;
+
+    composite_state_operation = pd->cs_support;
+    if (composite_state_operation)
+        state_mask_table = pd->composite_state_mask_table;
 
     for (pd_index = 0; pd_index < nb_pds; pd_index++, pd = pd->parent) {
         if (up)
@@ -899,8 +902,14 @@ static void process_set_state_request(
                 pd = pd->parent;
         }
 
-        state = get_level_state_from_composite_state(state_mask_table,
-                                                     composite_state, level);
+
+        if (composite_state_operation)
+            state = get_level_state_from_composite_state(state_mask_table,
+                                                         composite_state,
+                                                         level);
+        else
+            state = composite_state;
+
         if (state == pd->requested_state)
             continue;
 
@@ -1473,11 +1482,10 @@ static int pd_get_domain_parent_id(fwk_id_t pd_id, fwk_id_t *parent_pd_id)
 
 /* Functions specific to the restricted API */
 
-static int pd_set_state(fwk_id_t pd_id, unsigned int state)
+static int pd_set_state(fwk_id_t pd_id, uint32_t state)
 {
     int status;
     struct pd_ctx *pd;
-    enum mod_pd_level level;
     struct fwk_event req;
     struct fwk_event resp;
     struct pd_set_state_request *req_params =
@@ -1487,19 +1495,22 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
 
     pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
 
-    if (!is_valid_state(pd, state))
-        return FWK_E_PARAM;
-
-    level = get_level_from_tree_pos(pd->config->tree_pos);
+    if (pd->cs_support) {
+        if (!is_valid_composite_state(pd, state))
+            return FWK_E_PARAM;
+    } else {
+        if (!is_valid_state(pd, state))
+            return FWK_E_PARAM;
+    }
 
     req = (struct fwk_event) {
         .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
                            MOD_PD_PUBLIC_EVENT_IDX_SET_STATE),
+        .source_id = pd->driver_id,
         .target_id = pd_id,
     };
 
-    req_params->composite_state = (level << MOD_PD_CS_LEVEL_SHIFT) |
-                                  (state << mod_pd_cs_level_state_shift[level]);
+    req_params->composite_state = state;
 
     status = fwk_thread_put_event_and_wait(&req, &resp);
     if (status != FWK_SUCCESS)
@@ -1509,75 +1520,8 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
 }
 
 static int pd_set_state_async(fwk_id_t pd_id,
-                              bool response_requested, unsigned int state)
-{
-    struct pd_ctx *pd;
-    enum mod_pd_level level;
-    struct fwk_event req;
-    struct pd_set_state_request *req_params =
-        (struct pd_set_state_request *)(&req.params);
-    int status;
-
-    pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
-
-    if (!is_valid_state(pd, state))
-        return FWK_E_PARAM;
-
-    level = get_level_from_tree_pos(pd->config->tree_pos);
-
-    req = (struct fwk_event) {
-        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
-                           MOD_PD_PUBLIC_EVENT_IDX_SET_STATE),
-        .source_id = pd->driver_id,
-        .target_id = pd_id,
-        .response_requested = response_requested,
-    };
-
-    req_params->composite_state = (level << MOD_PD_CS_LEVEL_SHIFT) |
-                                  (state << mod_pd_cs_level_state_shift[level]);
-
-    status = fwk_thread_put_event(&req);
-    if (status == FWK_SUCCESS)
-        return FWK_PENDING;
-
-    return status;
-}
-
-static int pd_set_composite_state(fwk_id_t pd_id, uint32_t composite_state)
-{
-    int status;
-    struct pd_ctx *pd;
-    struct fwk_event req;
-    struct fwk_event resp;
-    struct pd_set_state_request *req_params =
-        (struct pd_set_state_request *)(&req.params);
-    struct pd_set_state_response *resp_params =
-        (struct pd_set_state_response *)(&resp.params);
-
-    pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
-
-    if (!is_valid_composite_state(pd, composite_state))
-        return FWK_E_PARAM;
-
-    req = (struct fwk_event) {
-        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
-                           MOD_PD_PUBLIC_EVENT_IDX_SET_STATE),
-        .source_id = pd->driver_id,
-        .target_id = pd_id,
-    };
-
-    req_params->composite_state = composite_state;
-
-    status = fwk_thread_put_event_and_wait(&req, &resp);
-    if (status != FWK_SUCCESS)
-        return status;
-
-    return resp_params->status;
-}
-
-static int pd_set_composite_state_async(fwk_id_t pd_id,
-                                        bool response_requested,
-                                        uint32_t composite_state)
+                              bool response_requested,
+                              uint32_t state)
 {
     struct pd_ctx *pd;
     struct fwk_event req;
@@ -1586,8 +1530,13 @@ static int pd_set_composite_state_async(fwk_id_t pd_id,
 
     pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
 
-    if (!is_valid_composite_state(pd, composite_state))
-        return FWK_E_PARAM;
+    if (pd->cs_support) {
+        if (!is_valid_composite_state(pd, state))
+            return FWK_E_PARAM;
+    } else {
+        if (!is_valid_state(pd, state))
+            return FWK_E_PARAM;
+    }
 
     req = (struct fwk_event) {
         .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
@@ -1597,7 +1546,7 @@ static int pd_set_composite_state_async(fwk_id_t pd_id,
         .response_requested = response_requested,
     };
 
-    req_params->composite_state = composite_state;
+    req_params->composite_state = state;
 
     return fwk_thread_put_event(&req);
 }
@@ -1801,8 +1750,6 @@ static const struct mod_pd_restricted_api pd_restricted_api = {
 
     .set_state = pd_set_state,
     .set_state_async = pd_set_state_async,
-    .set_composite_state = pd_set_composite_state,
-    .set_composite_state_async = pd_set_composite_state_async,
     .get_state = pd_get_state,
     .get_composite_state = pd_get_composite_state,
     .reset = pd_reset,
@@ -1812,7 +1759,6 @@ static const struct mod_pd_restricted_api pd_restricted_api = {
 
 static const struct mod_pd_driver_input_api pd_driver_input_api = {
     .set_state_async = pd_set_state_async,
-    .set_composite_state_async = pd_set_composite_state_async,
     .reset_async = pd_reset_async,
     .report_power_state_transition = pd_report_power_state_transition,
     .get_last_core_pd_id = pd_get_last_core_pd_id,
