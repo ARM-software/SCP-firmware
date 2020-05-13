@@ -450,11 +450,15 @@ static int n1sdp_system_init_primary_core(void)
             "[N1SDP SYSTEM] Booting primary core at %lu MHz...",
             PIK_CLK_RATE_CLUS0_CPU / FWK_MHZ);
 
-        status = mod_pd_restricted_api->set_composite_state_async(
+        status = mod_pd_restricted_api->set_state_async(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
             false,
-            MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON,
-                MOD_PD_STATE_ON, MOD_PD_STATE_ON));
+            MOD_PD_COMPOSITE_STATE(
+                MOD_PD_LEVEL_2,
+                0,
+                MOD_PD_STATE_ON,
+                MOD_PD_STATE_ON,
+                MOD_PD_STATE_ON));
         if (status != FWK_SUCCESS)
             return status;
     }
@@ -644,9 +648,8 @@ static int n1sdp_system_start(fwk_id_t id)
                                                  MOD_PD_STATE_OFF);
     }
 
-    return n1sdp_system_ctx.mod_pd_restricted_api->set_composite_state_async(
-            FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0), false,
-            composite_state);
+    return n1sdp_system_ctx.mod_pd_restricted_api->set_state_async(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0), false, composite_state);
 }
 
 static int n1sdp_system_process_notification(const struct fwk_event *event,
