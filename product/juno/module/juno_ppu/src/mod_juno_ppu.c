@@ -732,8 +732,8 @@ static void core_wakeup_handler(uintptr_t param)
     status = disable_wakeup_irq(dev_config);
     fwk_assert(status == FWK_SUCCESS);
 
-    status = ppu_ctx->pd_api->set_composite_state_async(ppu_ctx->bound_id,
-        false, CPU_WAKEUP_COMPOSITE_STATE);
+    status = ppu_ctx->pd_api->set_state_async(
+        ppu_ctx->bound_id, false, CPU_WAKEUP_COMPOSITE_STATE);
     fwk_assert(status == FWK_SUCCESS);
 }
 
