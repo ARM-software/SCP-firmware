@@ -71,7 +71,7 @@ def main(argv=[], prog_name=''):
     illegal_use = 0
 
     with open(BANNED_LIST) as file:
-        for l, fname in enumerate(file):
+        for fname in file:
             if fname[0] == '#':
                 continue
             BANNED_API.append(fname.rstrip())

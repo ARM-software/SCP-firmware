@@ -80,7 +80,7 @@ def main(argv=[], prog_name=''):
     #  excluded by .git/info/exclude)
     git_clean_output = subprocess.check_output("git clean -ndX".split())
     git_clean_output = git_clean_output.decode()
-    git_ignores = [l.split()[-1] for l in git_clean_output.splitlines()]
+    git_ignores = [line.split()[-1] for line in git_clean_output.splitlines()]
 
     cwd = os.getcwd()
     print("Executing from %s" % cwd)
