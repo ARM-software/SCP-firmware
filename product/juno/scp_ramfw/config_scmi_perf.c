@@ -12,6 +12,9 @@
 
 #include <internal/scmi_perf.h>
 #include <mod_scmi_perf.h>
+#ifdef BUILD_HAS_STATISTICS
+#include <mod_stats.h>
+#endif
 
 #include <fwk_element.h>
 #include <fwk_id.h>
@@ -33,6 +36,9 @@ static const struct mod_scmi_perf_domain_config domains[] = {
         .fast_channels_addr_scp = SCMI_FAST_CHANNEL_BASE,
         .fast_channels_addr_ap = SCMI_FAST_CHANNEL_BASE - EXTERNAL_DEV_BASE,
 #endif
+#ifdef BUILD_HAS_STATISTICS
+        .stats_collected = true,
+#endif
     },
     [DVFS_ELEMENT_IDX_BIG] = {
         .permissions = &(const uint32_t[]) {
@@ -46,6 +52,9 @@ static const struct mod_scmi_perf_domain_config domains[] = {
         .fast_channels_addr_ap = SCMI_FAST_CHANNEL_BASE +
             sizeof(struct mod_scmi_perf_fast_channel) -
             EXTERNAL_DEV_BASE,
+#endif
+#ifdef BUILD_HAS_STATISTICS
+        .stats_collected = true,
 #endif
     },
     [DVFS_ELEMENT_IDX_GPU] = {
@@ -61,9 +70,11 @@ static const struct mod_scmi_perf_domain_config domains[] = {
             (sizeof(struct mod_scmi_perf_fast_channel) * 2) -
             EXTERNAL_DEV_BASE,
 #endif
+#ifdef BUILD_HAS_STATISTICS
+        .stats_collected = true,
+#endif
     },
 };
-
 
 struct fwk_module_config config_scmi_perf = {
     .data = &((struct mod_scmi_perf_config) {
@@ -75,6 +86,9 @@ struct fwk_module_config config_scmi_perf = {
         .fast_channels_rate_limit = SCMI_PERF_FC_MIN_RATE_LIMIT,
 #else
         .fast_channels_alarm_id = FWK_ID_NONE_INIT,
+#endif
+#ifdef BUILD_HAS_STATISTICS
+        .stats_enabled = true,
 #endif
     }),
 };
