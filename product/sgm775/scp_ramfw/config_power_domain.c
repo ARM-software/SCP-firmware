@@ -256,6 +256,7 @@ static const struct fwk_element *sgm775_power_domain_get_element_table
  * Power module configuration data
  */
 struct fwk_module_config config_power_domain = {
-    .get_element_table = sgm775_power_domain_get_element_table,
     .data = &sgm775_power_domain_config,
+    .elements =
+        FWK_MODULE_DYNAMIC_ELEMENTS(sgm775_power_domain_get_element_table),
 };

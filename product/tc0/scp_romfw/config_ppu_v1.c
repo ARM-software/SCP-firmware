@@ -132,10 +132,12 @@ static const struct fwk_element *tc0_ppu_v1_get_element_table(
  * Power module configuration data
  */
 struct fwk_module_config config_ppu_v1 = {
-    .get_element_table = tc0_ppu_v1_get_element_table,
-    .data = &(struct mod_ppu_v1_config) {
-        .pd_notification_id = FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_MSYS_ROM,
-                                  MOD_MSYS_ROM_NOTIFICATION_IDX_POWER_SYSTOP),
-        .pd_source_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_MSYS_ROM),
-    },
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(tc0_ppu_v1_get_element_table),
+    .data =
+        &(struct mod_ppu_v1_config){
+            .pd_notification_id = FWK_ID_NOTIFICATION_INIT(
+                FWK_MODULE_IDX_MSYS_ROM,
+                MOD_MSYS_ROM_NOTIFICATION_IDX_POWER_SYSTOP),
+            .pd_source_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_MSYS_ROM),
+        },
 };

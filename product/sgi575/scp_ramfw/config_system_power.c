@@ -90,5 +90,5 @@ static const struct fwk_element *sgi575_system_get_element_table(
 
 const struct fwk_module_config config_system_power = {
     .data = &system_power_config,
-    .get_element_table = sgi575_system_get_element_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(sgi575_system_get_element_table),
 };

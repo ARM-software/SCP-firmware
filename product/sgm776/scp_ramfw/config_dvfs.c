@@ -212,5 +212,5 @@ static const struct fwk_element *dvfs_get_element_table(fwk_id_t module_id)
 }
 
 const struct fwk_module_config config_dvfs = {
-    .get_element_table = dvfs_get_element_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(dvfs_get_element_table),
 };

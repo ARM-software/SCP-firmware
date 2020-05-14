@@ -38,5 +38,5 @@ static const struct fwk_element *timer_get_dev_table(fwk_id_t module_id)
 }
 
 const struct fwk_module_config config_timer = {
-    .get_element_table = timer_get_dev_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(timer_get_dev_table),
 };

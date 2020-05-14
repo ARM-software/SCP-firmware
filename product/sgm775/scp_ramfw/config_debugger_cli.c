@@ -24,6 +24,5 @@ static const struct mod_debugger_cli_module_config debugger_cli_data = {
  * Configuration for the debugger CLI module
  */
 struct fwk_module_config config_debugger_cli = {
-    .get_element_table = NULL,
     .data = &debugger_cli_data
 };

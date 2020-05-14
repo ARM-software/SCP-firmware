@@ -56,5 +56,5 @@ static const struct fwk_element *mhu_get_element_table(fwk_id_t module_id)
 }
 
 struct fwk_module_config config_mhu2 = {
-    .get_element_table = mhu_get_element_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(mhu_get_element_table),
 };

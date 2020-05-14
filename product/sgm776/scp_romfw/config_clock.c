@@ -109,11 +109,13 @@ static const struct fwk_element *clock_get_dev_desc_table(fwk_id_t module_id)
 }
 
 const struct fwk_module_config config_clock = {
-    .get_element_table = clock_get_dev_desc_table,
-    .data = &((struct mod_clock_config) {
-        .pd_transition_notification_id = FWK_ID_NOTIFICATION_INIT(
-            FWK_MODULE_IDX_MSYS_ROM,
-            MOD_MSYS_ROM_NOTIFICATION_IDX_POWER_SYSTOP),
-        .pd_pre_transition_notification_id = FWK_ID_NONE_INIT,
-    }),
+    .data =
+        &(struct mod_clock_config){
+            .pd_transition_notification_id = FWK_ID_NOTIFICATION_INIT(
+                FWK_MODULE_IDX_MSYS_ROM,
+                MOD_MSYS_ROM_NOTIFICATION_IDX_POWER_SYSTOP),
+            .pd_pre_transition_notification_id = FWK_ID_NONE_INIT,
+        },
+
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(clock_get_dev_desc_table),
 };

@@ -40,7 +40,7 @@ static const struct fwk_element *get_f_uart3_table(fwk_id_t module_id)
 }
 
 struct fwk_module_config config_f_uart3 = {
-    .get_element_table = get_f_uart3_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_f_uart3_table),
 };
 
 /*

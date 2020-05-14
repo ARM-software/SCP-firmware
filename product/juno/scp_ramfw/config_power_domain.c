@@ -307,6 +307,7 @@ static const struct fwk_element *get_element_table(fwk_id_t module_id)
 }
 
 struct fwk_module_config config_power_domain = {
-    .get_element_table = get_element_table,
-    .data = &(struct mod_power_domain_config){ 0 }
+    .data = &(struct mod_power_domain_config){ 0 },
+
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_element_table),
 };

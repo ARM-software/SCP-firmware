@@ -105,12 +105,14 @@ static const struct mod_scmi_agent agent_table[] = {
 };
 
 struct fwk_module_config config_scmi = {
-    .get_element_table = get_element_table,
-    .data = &(struct mod_scmi_config) {
-        .protocol_count_max = 5,
-        .agent_count = FWK_ARRAY_SIZE(agent_table) - 1,
-        .agent_table = agent_table,
-        .vendor_identifier = "arm",
-        .sub_vendor_identifier = "arm",
-    },
+    .data =
+        &(struct mod_scmi_config){
+            .protocol_count_max = 5,
+            .agent_count = FWK_ARRAY_SIZE(agent_table) - 1,
+            .agent_table = agent_table,
+            .vendor_identifier = "arm",
+            .sub_vendor_identifier = "arm",
+        },
+
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_element_table),
 };

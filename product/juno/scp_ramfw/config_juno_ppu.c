@@ -135,10 +135,13 @@ static const struct fwk_element *get_element_table(fwk_id_t module_id)
 }
 
 struct fwk_module_config config_juno_ppu = {
-    .get_element_table = get_element_table,
-    .data = &((struct mod_juno_ppu_config) {
-        .timer_alarm_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER,
-                                                  0,
-                                                  JUNO_PPU_ALARM_IDX),
-    }),
+    .data =
+        &(struct mod_juno_ppu_config){
+            .timer_alarm_id = FWK_ID_SUB_ELEMENT_INIT(
+                FWK_MODULE_IDX_TIMER,
+                0,
+                JUNO_PPU_ALARM_IDX),
+        },
+
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_element_table),
 };

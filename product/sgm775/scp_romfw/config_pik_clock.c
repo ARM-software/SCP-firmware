@@ -310,5 +310,5 @@ static const struct fwk_element *pik_clock_get_element_table
 }
 
 struct fwk_module_config config_pik_clock = {
-    .get_element_table = pik_clock_get_element_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(pik_clock_get_element_table),
 };

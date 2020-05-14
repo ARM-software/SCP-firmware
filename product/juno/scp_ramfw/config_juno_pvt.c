@@ -265,5 +265,5 @@ static const struct fwk_element *get_pvt_juno_element_table(fwk_id_t id)
 }
 
 struct fwk_module_config config_juno_pvt = {
-    .get_element_table = get_pvt_juno_element_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_pvt_juno_element_table),
 };

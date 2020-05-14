@@ -46,7 +46,7 @@ static const struct fwk_element *get_pl011_table(fwk_id_t module_id)
 }
 
 struct fwk_module_config config_pl011 = {
-    .get_element_table = get_pl011_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_pl011_table),
 };
 
 /*
@@ -60,6 +60,5 @@ static const struct mod_log_config log_data = {
 };
 
 struct fwk_module_config config_log = {
-    .get_element_table = NULL,
     .data = &log_data,
 };

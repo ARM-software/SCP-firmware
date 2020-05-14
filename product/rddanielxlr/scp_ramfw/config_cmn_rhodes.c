@@ -582,6 +582,5 @@ static const struct fwk_element *cmn_rhodes_get_device_table(fwk_id_t module_id)
 }
 
 const struct fwk_module_config config_cmn_rhodes = {
-    .get_element_table = cmn_rhodes_get_device_table,
-    .data = NULL
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(cmn_rhodes_get_device_table),
 };

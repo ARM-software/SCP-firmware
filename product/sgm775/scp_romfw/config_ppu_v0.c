@@ -51,5 +51,5 @@ static const struct fwk_element *sgm775_ppu_v0_get_element_table(
  * Power module configuration data
  */
 struct fwk_module_config config_ppu_v0 = {
-    .get_element_table = sgm775_ppu_v0_get_element_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(sgm775_ppu_v0_get_element_table),
 };

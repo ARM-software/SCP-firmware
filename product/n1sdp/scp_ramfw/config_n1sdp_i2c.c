@@ -60,5 +60,5 @@ static const struct fwk_element *get_i2c_table(fwk_id_t module_id)
 }
 
 const struct fwk_module_config config_n1sdp_i2c = {
-    .get_element_table = get_i2c_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_i2c_table),
 };

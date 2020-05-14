@@ -41,5 +41,5 @@ static const struct fwk_element *n1sdp_tsync_get_element_table(
 }
 
 struct fwk_module_config config_n1sdp_timer_sync = {
-    .get_element_table = n1sdp_tsync_get_element_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(n1sdp_tsync_get_element_table),
 };

@@ -94,8 +94,8 @@ static const struct mod_cmn_booker_mem_region_map mmap[] = {
 };
 
 const struct fwk_module_config config_cmn_booker = {
-    .get_element_table = NULL,
-    .data = &((struct mod_cmn_booker_config) {
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(NULL),
+    .data = &((struct mod_cmn_booker_config){
         .base = SCP_CMN_BOOKER_BASE,
         .mesh_size_x = 2,
         .mesh_size_y = 2,
@@ -104,8 +104,8 @@ const struct fwk_module_config config_cmn_booker = {
         .snf_count = FWK_ARRAY_SIZE(snf_table),
         .mmap_table = mmap,
         .mmap_count = FWK_ARRAY_SIZE(mmap),
-        .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
-            CLOCK_IDX_INTERCONNECT),
+        .clock_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_INTERCONNECT),
         .hnf_cal_mode = false,
     }),
 };

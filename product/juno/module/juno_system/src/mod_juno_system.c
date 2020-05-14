@@ -372,7 +372,4 @@ const struct fwk_module module_juno_system = {
 };
 
 /* No elements, no configuration data */
-struct fwk_module_config config_juno_system = {
-    .get_element_table = NULL,
-    .data = NULL,
-};
+struct fwk_module_config config_juno_system = { 0 };

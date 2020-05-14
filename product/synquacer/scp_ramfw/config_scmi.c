@@ -50,12 +50,14 @@ static struct mod_scmi_agent agent_table[] = {
 };
 
 const struct fwk_module_config config_scmi = {
-    .get_element_table = get_service_table,
-    .data = &((struct mod_scmi_config) {
-        .protocol_count_max = 9,
-        .agent_count = FWK_ARRAY_SIZE(agent_table) - 1,
-        .agent_table = agent_table,
-        .vendor_identifier = "socionext",
-        .sub_vendor_identifier = "socionext",
-    }),
+    .data =
+        &(struct mod_scmi_config){
+            .protocol_count_max = 9,
+            .agent_count = FWK_ARRAY_SIZE(agent_table) - 1,
+            .agent_table = agent_table,
+            .vendor_identifier = "socionext",
+            .sub_vendor_identifier = "socionext",
+        },
+
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_service_table),
 };

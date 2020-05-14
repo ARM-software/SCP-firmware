@@ -68,5 +68,5 @@ static const struct fwk_element *get_adc_juno_element_table(fwk_id_t id)
 }
 
 struct fwk_module_config config_juno_adc = {
-    .get_element_table = get_adc_juno_element_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_adc_juno_element_table),
 };

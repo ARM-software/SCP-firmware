@@ -134,5 +134,5 @@ static const struct fwk_element *css_clock_get_element_table
 }
 
 struct fwk_module_config config_css_clock = {
-    .get_element_table = css_clock_get_element_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(css_clock_get_element_table),
 };

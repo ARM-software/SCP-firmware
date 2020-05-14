@@ -203,8 +203,10 @@ static const struct fwk_element *juno_cdcel937_get_element_table(
 }
 
 struct fwk_module_config config_juno_cdcel937 = {
-    .get_element_table = juno_cdcel937_get_element_table,
-    .data = &(struct mod_juno_cdcel937_config) {
-        .i2c_hal_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_I2C, 0),
-    },
+    .data =
+        &(struct mod_juno_cdcel937_config){
+            .i2c_hal_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_I2C, 0),
+        },
+
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(juno_cdcel937_get_element_table),
 };

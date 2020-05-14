@@ -84,15 +84,16 @@ static const struct fwk_element *system_power_get_element_table(
 }
 
 const struct fwk_module_config config_system_power = {
-    .data = &((struct mod_system_power_config) {
-        .soc_wakeup_irq = FWK_INTERRUPT_NONE,
-        .ext_ppus = ext_ppus,
-        .ext_ppus_count = FWK_ARRAY_SIZE(ext_ppus),
-        .initial_system_power_state = MOD_PD_STATE_ON,
-        .driver_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SYNQUACER_SYSTEM),
-        .driver_api_id = FWK_ID_API_INIT(
-            FWK_MODULE_IDX_SYNQUACER_SYSTEM,
-            MOD_SYNQUACER_SYSTEM_API_IDX_SYSTEM_POWER_DRIVER)
-    }),
-    .get_element_table = system_power_get_element_table,
+    .data =
+        &(struct mod_system_power_config){
+            .soc_wakeup_irq = FWK_INTERRUPT_NONE,
+            .ext_ppus = ext_ppus,
+            .ext_ppus_count = FWK_ARRAY_SIZE(ext_ppus),
+            .initial_system_power_state = MOD_PD_STATE_ON,
+            .driver_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SYNQUACER_SYSTEM),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_SYNQUACER_SYSTEM,
+                MOD_SYNQUACER_SYSTEM_API_IDX_SYSTEM_POWER_DRIVER) },
+
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(system_power_get_element_table),
 };

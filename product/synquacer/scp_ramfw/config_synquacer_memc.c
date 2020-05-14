@@ -10,6 +10,4 @@
 #include <stddef.h>
 
 /* Configuration of the SynQuacerMEMC module. */
-const struct fwk_module_config config_synquacer_memc = {
-    .get_element_table = NULL,
-};
+const struct fwk_module_config config_synquacer_memc = { 0 };

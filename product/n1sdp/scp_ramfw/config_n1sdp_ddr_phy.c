@@ -35,5 +35,5 @@ static const struct fwk_element *n1sdp_ddr_phy_get_element_table
 
 /* Configuration of the N1SDP DDR PHY module. */
 const struct fwk_module_config config_n1sdp_ddr_phy = {
-    .get_element_table = n1sdp_ddr_phy_get_element_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(n1sdp_ddr_phy_get_element_table),
 };
