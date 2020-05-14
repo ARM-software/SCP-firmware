@@ -48,5 +48,5 @@ static const struct fwk_element *n1sdp_pcie_get_element_table
 }
 
 const struct fwk_module_config config_n1sdp_pcie = {
-    .get_element_table = n1sdp_pcie_get_element_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(n1sdp_pcie_get_element_table),
 };

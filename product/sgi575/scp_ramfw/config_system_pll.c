@@ -88,5 +88,5 @@ static const struct fwk_element *system_pll_get_element_table
 }
 
 const struct fwk_module_config config_system_pll = {
-    .get_element_table = system_pll_get_element_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(system_pll_get_element_table),
 };

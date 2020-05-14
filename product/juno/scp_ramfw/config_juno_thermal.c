@@ -45,5 +45,5 @@ static const struct fwk_element *juno_thermal_get_element_table(
 }
 
 const struct fwk_module_config config_juno_thermal = {
-    .get_element_table = juno_thermal_get_element_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(juno_thermal_get_element_table),
 };

@@ -213,12 +213,14 @@ static void direct_ddr_cmd(struct mod_dmc500_reg *dmc)
 
 /* Configuration of the DMC500 module. */
 const struct fwk_module_config config_dmc500 = {
-    .get_element_table = dmc500_get_element_table,
-    .data = &((struct mod_dmc500_module_config) {
-        .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
-        .ddr_phy_module_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_DDR_PHY500),
-        .ddr_phy_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_DDR_PHY500, 0),
-        .reg_val = &reg_val,
-        .direct_ddr_cmd = direct_ddr_cmd,
-    }),
+    .data =
+        &(struct mod_dmc500_module_config){
+            .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
+            .ddr_phy_module_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_DDR_PHY500),
+            .ddr_phy_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_DDR_PHY500, 0),
+            .reg_val = &reg_val,
+            .direct_ddr_cmd = direct_ddr_cmd,
+        },
+
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(dmc500_get_element_table),
 };

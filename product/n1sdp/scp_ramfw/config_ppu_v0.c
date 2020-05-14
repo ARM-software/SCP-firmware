@@ -39,5 +39,5 @@ static const struct fwk_element *ppu_v0_get_element_table(fwk_id_t module_id)
  * Power module configuration data
  */
 const struct fwk_module_config config_ppu_v0 = {
-    .get_element_table = ppu_v0_get_element_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(ppu_v0_get_element_table),
 };

@@ -111,12 +111,14 @@ static const struct fwk_element *juno_dmc400_get_element_table
 
 /* Configuration of the Juno DMC400 module */
 struct fwk_module_config config_juno_dmc400 = {
-    .get_element_table = juno_dmc400_get_element_table,
-    .data = &((struct mod_juno_dmc400_module_config) {
-        .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
-        .ddr_phy_module_id =
-            FWK_ID_MODULE_INIT(FWK_MODULE_IDX_JUNO_DDR_PHY400),
-        .ddr_phy_api_id =
-            FWK_ID_API_INIT(FWK_MODULE_IDX_JUNO_DDR_PHY400, 0),
-    })
+    .data =
+        &(struct mod_juno_dmc400_module_config){
+            .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
+            .ddr_phy_module_id =
+                FWK_ID_MODULE_INIT(FWK_MODULE_IDX_JUNO_DDR_PHY400),
+            .ddr_phy_api_id =
+                FWK_ID_API_INIT(FWK_MODULE_IDX_JUNO_DDR_PHY400, 0),
+        },
+
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(juno_dmc400_get_element_table),
 };

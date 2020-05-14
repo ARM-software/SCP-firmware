@@ -120,5 +120,5 @@ static const struct fwk_element *juno_hdlcd_get_element_table(
 }
 
 struct fwk_module_config config_juno_hdlcd = {
-    .get_element_table = juno_hdlcd_get_element_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(juno_hdlcd_get_element_table),
 };

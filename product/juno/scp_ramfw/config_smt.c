@@ -100,6 +100,5 @@ static const struct fwk_element *get_element_table(fwk_id_t module_id)
 }
 
 struct fwk_module_config config_smt = {
-    .get_element_table = get_element_table,
-    .data = NULL,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_element_table),
 };

@@ -212,6 +212,7 @@ static const struct fwk_element *sgi575_power_domain_get_element_table
  * Power module configuration data
  */
 const struct fwk_module_config config_power_domain = {
-    .get_element_table = sgi575_power_domain_get_element_table,
     .data = &sgi575_power_domain_config,
+    .elements =
+        FWK_MODULE_DYNAMIC_ELEMENTS(sgi575_power_domain_get_element_table),
 };

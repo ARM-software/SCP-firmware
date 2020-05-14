@@ -172,6 +172,6 @@ static const struct fwk_element *sgm776_ppu_v1_get_element_table(
  * Power module configuration data
  */
 struct fwk_module_config config_ppu_v1 = {
-    .get_element_table = sgm776_ppu_v1_get_element_table,
     .data = &sgm776_ppu_v1_notification_config,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(sgm776_ppu_v1_get_element_table),
 };

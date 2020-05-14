@@ -10,6 +10,4 @@
 #include <stddef.h>
 
 /* Configuration of the HSSPI module. */
-const struct fwk_module_config config_hsspi = {
-    .get_element_table = NULL,
-};
+const struct fwk_module_config config_hsspi = { 0 };

@@ -277,10 +277,12 @@ static void test_case_setup(void)
     fake_element_desc_table1[1].name = NULL;
     fake_element_desc_table1[1].data = NULL;
 
-    fake_module_config0.get_element_table = get_element_table0;
+    fake_module_config0.elements.type = FWK_MODULE_ELEMENTS_TYPE_DYNAMIC;
+    fake_module_config0.elements.generator = get_element_table0;
     fake_module_config0.data = &config_module0;
 
-    fake_module_config1.get_element_table = get_element_table1;
+    fake_module_config1.elements.type = FWK_MODULE_ELEMENTS_TYPE_DYNAMIC;
+    fake_module_config1.elements.generator = get_element_table1;
     fake_module_config1.data = &config_module1;
 
     module_table[0] = &fake_module_desc0;
@@ -539,7 +541,7 @@ static void test___fwk_module_init_succeed(void)
     fake_module_desc1.start = NULL;
 
     /* Module 1 has no element */
-    fake_module_config1.get_element_table = NULL;
+    fake_module_config1.elements.generator = NULL;
 
     bind_count_call = 0;
     start_count_call = 0;

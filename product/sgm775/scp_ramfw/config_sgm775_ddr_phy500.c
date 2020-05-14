@@ -48,6 +48,6 @@ static const struct fwk_element *sgm775_ddr_phy500_get_element_table
 
 /* Configuration of the DDR PHY500 module. */
 struct fwk_module_config config_sgm775_ddr_phy500 = {
-    .get_element_table = sgm775_ddr_phy500_get_element_table,
-    .data = NULL,
+    .elements =
+        FWK_MODULE_DYNAMIC_ELEMENTS(sgm775_ddr_phy500_get_element_table),
 };

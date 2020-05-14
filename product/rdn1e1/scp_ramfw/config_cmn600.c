@@ -110,7 +110,6 @@ static const struct mod_cmn600_memory_region_map mmap[] = {
 };
 
 const struct fwk_module_config config_cmn600 = {
-    .get_element_table = NULL,
     .data = &((struct mod_cmn600_config) {
         .base = SCP_CMN600_BASE,
         .mesh_size_x = 4,

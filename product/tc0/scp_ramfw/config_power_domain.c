@@ -166,6 +166,6 @@ static const struct fwk_element *tc0_power_domain_get_element_table
  * Power module configuration data
  */
 const struct fwk_module_config config_power_domain = {
-    .get_element_table = tc0_power_domain_get_element_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(tc0_power_domain_get_element_table),
     .data = &tc0_power_domain_config,
 };

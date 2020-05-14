@@ -10,6 +10,4 @@
 #include <stddef.h>
 
 /* Configuration of the F_I2C module. */
-const struct fwk_module_config config_f_i2c = {
-    .get_element_table = NULL,
-};
+const struct fwk_module_config config_f_i2c = { 0 };

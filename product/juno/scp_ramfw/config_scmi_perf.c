@@ -66,7 +66,6 @@ static const struct mod_scmi_perf_domain_config domains[] = {
 
 
 struct fwk_module_config config_scmi_perf = {
-    .get_element_table = NULL,
     .data = &((struct mod_scmi_perf_config) {
         .domains = &domains,
 #ifdef BUILD_HAS_FAST_CHANNELS

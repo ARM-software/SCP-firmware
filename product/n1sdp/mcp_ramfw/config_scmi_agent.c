@@ -38,6 +38,5 @@ static const struct fwk_element *get_agent_table(fwk_id_t module_id)
 }
 
 const struct fwk_module_config config_scmi_agent = {
-    .get_element_table = get_agent_table,
-    .data = NULL,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_agent_table),
 };

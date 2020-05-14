@@ -32,6 +32,5 @@ static const struct fwk_element *get_debug_element_table(fwk_id_t module_id)
 
 /* Configuration of the Debug module */
 struct fwk_module_config config_debug = {
-    .get_element_table = get_debug_element_table,
-    .data = NULL,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_debug_element_table),
 };

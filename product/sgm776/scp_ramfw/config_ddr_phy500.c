@@ -59,8 +59,10 @@ static const struct fwk_element *ddr_phy500_get_element_table(
 
 /* Configuration of the DDR PHY500 module. */
 const struct fwk_module_config config_ddr_phy500 = {
-    .get_element_table = ddr_phy500_get_element_table,
-    .data = &((struct mod_ddr_phy500_module_config) {
-        .ddr_reg_val = &ddr_reg_val,
-    }),
+    .data =
+        &(struct mod_ddr_phy500_module_config){
+            .ddr_reg_val = &ddr_reg_val,
+        },
+
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(ddr_phy500_get_element_table),
 };

@@ -69,8 +69,10 @@ static const struct fwk_element *get_juno_debug_elem_table(fwk_id_t module_id)
 }
 
 struct fwk_module_config config_juno_debug = {
-    .get_element_table = get_juno_debug_elem_table,
-    .data = &((struct mod_juno_debug_config) {
-        .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
-    }),
+    .data =
+        &(struct mod_juno_debug_config){
+            .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
+        },
+
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_juno_debug_elem_table),
 };

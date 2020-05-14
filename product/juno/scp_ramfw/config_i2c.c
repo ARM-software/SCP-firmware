@@ -38,7 +38,7 @@ static const struct fwk_element *dw_apb_i2c_get_element_table(
 }
 
 struct fwk_module_config config_dw_apb_i2c = {
-    .get_element_table = dw_apb_i2c_get_element_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(dw_apb_i2c_get_element_table),
 };
 
 static const struct fwk_element i2c_element_table[] = {
@@ -59,5 +59,5 @@ static const struct fwk_element *i2c_get_element_table(fwk_id_t module_id)
 }
 
 struct fwk_module_config config_i2c = {
-    .get_element_table = i2c_get_element_table,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(i2c_get_element_table),
 };

@@ -14,9 +14,8 @@
 #include <stddef.h>
 
 const struct fwk_module_config config_ssc = {
-    .get_element_table = NULL,
-    .data = &(struct mod_ssc_config) {
-        .ssc_base = SSC_BASE,
-        .product_name = "System Guidance for Infrastructure - 575"
-    },
+    .data =
+        &(struct mod_ssc_config){
+            .ssc_base = SSC_BASE,
+            .product_name = "System Guidance for Infrastructure - 575" },
 };

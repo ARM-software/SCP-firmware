@@ -136,6 +136,6 @@ static const struct fwk_element *sds_get_element_table(fwk_id_t module_id)
 }
 
 struct fwk_module_config config_sds = {
-    .get_element_table = sds_get_element_table,
     .data = &sds_module_config,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(sds_get_element_table),
 };

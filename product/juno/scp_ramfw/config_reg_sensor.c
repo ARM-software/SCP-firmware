@@ -45,6 +45,5 @@ static const struct fwk_element *get_reg_sensor_element_table(fwk_id_t id)
 }
 
 struct fwk_module_config config_reg_sensor = {
-    .get_element_table = get_reg_sensor_element_table,
-    .data = NULL,
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_reg_sensor_element_table),
 };

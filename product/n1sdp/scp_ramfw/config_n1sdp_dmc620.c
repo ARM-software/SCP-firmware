@@ -45,12 +45,12 @@ static const struct fwk_element *dmc620_get_element_table(fwk_id_t module_id)
 
 /* Configuration of the DMC620 module. */
 const struct fwk_module_config config_n1sdp_dmc620 = {
-    .get_element_table = dmc620_get_element_table,
-    .data = &((struct mod_dmc620_module_config) {
-            .ddr_module_id = FWK_ID_MODULE_INIT(
-                FWK_MODULE_IDX_N1SDP_DDR_PHY),
-            .ddr_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_DDR_PHY,
-                0),
+    .data =
+        &(struct mod_dmc620_module_config){
+            .ddr_module_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_N1SDP_DDR_PHY),
+            .ddr_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_DDR_PHY, 0),
             .ddr_speed = DDR_CLOCK_MHZ,
-        }),
+        },
+
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(dmc620_get_element_table),
 };

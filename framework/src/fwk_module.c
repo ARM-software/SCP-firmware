@@ -179,11 +179,23 @@ static int init_module(struct fwk_module_ctx *module_ctx,
     }
     #endif
 
-    if (module_config->get_element_table != NULL) {
-        element_table = module_config->get_element_table(module_ctx->id);
-        if (!fwk_expect(element_table != NULL))
-            return FWK_E_PARAM;
+    switch (module_config->elements.type) {
+    case FWK_MODULE_ELEMENTS_TYPE_STATIC:
+        element_table = module_config->elements.table;
 
+        break;
+
+    case FWK_MODULE_ELEMENTS_TYPE_DYNAMIC:
+        if (module_config->elements.generator != NULL) {
+            element_table = module_config->elements.generator(module_ctx->id);
+            if (!fwk_expect(element_table != NULL))
+                return FWK_E_PARAM;
+        }
+
+        break;
+    }
+
+    if (element_table != NULL) {
         for (count = 0; element_table[count].name != NULL; count++)
             continue;
 

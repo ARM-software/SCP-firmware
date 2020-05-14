@@ -89,6 +89,7 @@ static const struct fwk_element *rddanielxlr_system_get_element_table(
 }
 
 const struct fwk_module_config config_system_power = {
-    .get_element_table = rddanielxlr_system_get_element_table,
     .data = &system_power_config,
+    .elements =
+        FWK_MODULE_DYNAMIC_ELEMENTS(rddanielxlr_system_get_element_table),
 };

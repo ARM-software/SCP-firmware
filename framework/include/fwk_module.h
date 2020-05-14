@@ -288,28 +288,117 @@ struct fwk_module {
 };
 
 /*!
+ * \brief Define a static element table with the content of the table.
+ *
+ * \param[in] ... An array of elements in the form `{ X, Y, Z, { 0 } }`.
+ *
+ * \see ::fwk_module_elements::table
+ */
+#define FWK_MODULE_STATIC_ELEMENTS(...) \
+    { \
+        .type = FWK_MODULE_ELEMENTS_TYPE_STATIC, \
+        .table = (const struct fwk_element[])__VA_ARGS__, \
+    }
+
+/*!
+ * \brief Define a static element table with a pointer to the table.
+ *
+ * \details Some element tables require extra preprocessing beforehand. As it is
+ *      undefined behaviour for preprocessing macros to occur within macro
+ *      argument lists, this macro has been provided to work around this
+ *      language restriction.
+ *
+ * \param[in] TABLE Pointer to the static element table.
+ *
+ * \see ::fwk_module_elements::table
+ */
+#define FWK_MODULE_STATIC_ELEMENTS_PTR(TABLE) \
+    { \
+        .type = FWK_MODULE_ELEMENTS_TYPE_STATIC, \
+        .table = TABLE, \
+    }
+
+/*!
+ * \brief Define a dynamic element table.
+ *
+ * \details Element table generators are functions that take a module identifier
+ *      and return an element table. They will be called once the module has
+ *      begun initialization, and may allocate a variable number of elements.
+ *
+ * \param[in] GENERATOR Function to generate the element table.
+ *
+ * \see ::fwk_module_elements::generator
+ */
+#define FWK_MODULE_DYNAMIC_ELEMENTS(GENERATOR) \
+    { \
+        .type = FWK_MODULE_ELEMENTS_TYPE_DYNAMIC, \
+        .generator = (GENERATOR), \
+    }
+
+/*!
+ * \brief Element table type.
+ */
+enum fwk_module_elements_type {
+    FWK_MODULE_ELEMENTS_TYPE_STATIC, /*<! Static element table. */
+    FWK_MODULE_ELEMENTS_TYPE_DYNAMIC, /*<! Dynamic element table. */
+};
+
+/*!
+ * \brief Element table.
+ */
+struct fwk_module_elements {
+    /*!
+     * \brief Element table type.
+     *
+     * \details Elements may be statically defined, or they can be generated
+     *      once the module comes online.
+     */
+    enum fwk_module_elements_type type;
+
+    /*!
+     * \brief Element table data.
+     */
+    union {
+        /*!
+         * \brief Pointer to the function to get the table of element
+         *      descriptions.
+         *
+         * \param[in] module_id Identifier of the module.
+         *
+         * \details The table of module element descriptions ends with an
+         *      invalid element description where the pointer to the element
+         *      name is equal to `NULL`.
+         *
+         * \warning The framework does not copy the element description data
+         *      and keep a pointer to the ones returned by this function.
+         *      Pointers returned by this function must thus points to data
+         *      with static storage or data stored in memory allocated from
+         *      the memory management component.
+         *
+         * \return Pointer to table of element descriptions.
+         */
+        const struct fwk_element *(*generator)(fwk_id_t module_id);
+
+        /*!
+         * \brief Table of element descriptions.
+         *
+         * \details The table of module element descriptions ends with an
+         *      invalid element description where the pointer to the element
+         *      name is equal to `NULL`.
+         */
+        const struct fwk_element *table;
+    };
+};
+
+/*!
  * \brief Module configuration.
  */
 struct fwk_module_config {
-    /*!
-     * \brief Pointer to the function to get the table of element descriptions.
-     *
-     * \param module_id Identifier of the module.
-     *
-     * \details The table of module element descriptions ends with an invalid
-     *      element description where the pointer to the element name is
-     *      equal to NULL.
-     *
-     * \warning The framework does not copy the element description data and
-     *      keep a pointer to the ones returned by this function. Pointers
-     *      returned by this function must thus points to data with static
-     *      storage or data stored in memory allocated from the memory
-     *      management component.
-     */
-    const struct fwk_element *(*get_element_table)(fwk_id_t module_id);
-
     /*! Pointer to the module-specific configuration data */
     const void *data;
+
+    /*! Element table */
+    struct fwk_module_elements elements;
 };
 
 /*!
