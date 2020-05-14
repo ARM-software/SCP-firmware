@@ -17,16 +17,19 @@ BS_LIB_SOURCES += fwk_mm.c
 BS_LIB_SOURCES += fwk_module.c
 BS_LIB_SOURCES += fwk_ring.c
 BS_LIB_SOURCES += fwk_slist.c
+BS_LIB_SOURCES += fwk_status.c
 BS_LIB_SOURCES += fwk_thread_delayed_resp.c
+BS_LIB_SOURCES += fwk_time.c
+
 ifeq ($(BUILD_HAS_MULTITHREADING),yes)
     BS_LIB_SOURCES += fwk_multi_thread.c
 else
     BS_LIB_SOURCES += fwk_thread.c
 endif
+
 ifeq ($(BUILD_HAS_NOTIFICATION),yes)
     BS_LIB_SOURCES += fwk_notification.c
 endif
-BS_LIB_SOURCES += fwk_status.c
 
 BS_LIB_INCLUDES += $(FWK_DIR)/include
 
