@@ -65,14 +65,14 @@ def generate_file(path, filename, content):
 def generate_header(path, modules):
     enum = ""
     const = ""
-    for module in modules:
-        enum += "    FWK_MODULE_IDX_{},\n".format(module.upper())
+    for idx, module in enumerate(modules):
+        enum += "    FWK_MODULE_IDX_{} = {},\n".format(module.upper(), idx)
         const += "static const fwk_id_t fwk_module_id_{} = " \
                  "FWK_ID_MODULE_INIT(FWK_MODULE_IDX_{});\n".format(module,
                                                                    module
                                                                    .upper())
 
-    enum += "    FWK_MODULE_IDX_COUNT,\n"
+    enum += "    FWK_MODULE_IDX_COUNT = {},\n".format(idx + 1)
 
     content = TEMPLATE_H.format(sys.argv[0], enum, const)
     generate_file(path, FILENAME_H, content)
