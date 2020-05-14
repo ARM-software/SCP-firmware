@@ -4,6 +4,7 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+#include <fwk_module_idx.h>
 #include <fwk_noreturn.h>
 #include <fwk_status.h>
 #include <fwk_test.h>
@@ -18,8 +19,8 @@ extern struct fwk_test_suite_desc test_suite;
 
 static jmp_buf test_buf_context;
 
-__attribute((weak)) struct fwk_module *module_table[1];
-__attribute((weak)) struct fwk_module_config *module_config_table[1];
+struct fwk_module *module_table[FWK_MODULE_IDX_COUNT];
+struct fwk_module_config *module_config_table[FWK_MODULE_IDX_COUNT];
 
 noreturn void __assert_fail(const char *assertion,
     const char *file, unsigned int line, const char *function)

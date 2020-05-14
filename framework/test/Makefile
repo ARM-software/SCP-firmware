@@ -220,8 +220,14 @@ test_fwk_multi_thread_util_WRAP += osThreadFlagsSet
 test_fwk_multi_thread_util_WRAP += osThreadFlagsWait
 test_fwk_multi_thread_util_WRAP += osThreadNew
 
+test_fwk_module_MODULE_IDX_H := test_fwk_module_module_idx.h
+
 $(foreach test, $(TESTS), \
     $(if $(filter fwk_multi_thread.c, $($(test)_SRC)), \
 		$(eval $(test)_CFLAGS += -DBUILD_HAS_MULTITHREADING)))
+
+$(foreach test, $(TESTS), \
+    $(if $($(test)_MODULE_IDX_H), \
+		$(eval $(test)_CFLAGS += -DFWK_TEST_MODULE_IDX_H=\"$($(test)_MODULE_IDX_H)\"),))
 
 include $(BS_DIR)/test.mk

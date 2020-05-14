@@ -8,14 +8,13 @@
 
 #include <fwk_assert.h>
 #include <fwk_macros.h>
+#include <fwk_module_idx.h>
 #include <fwk_status.h>
 #include <fwk_test.h>
 
 #include <stdlib.h>
 #include <string.h>
 
-#define MODULE0_IDX        0
-#define MODULE1_IDX        1
 #define ELEM0_IDX          0
 #define ELEM1_IDX          1
 #define ELEM2_IDX          0
@@ -29,22 +28,22 @@
 #define NOTIFICATION1_IDX  1
 #define NOTIFICATION2_IDX  2
 
-#define MODULE0_ID        FWK_ID_MODULE(MODULE0_IDX)
-#define MODULE1_ID        FWK_ID_MODULE(MODULE1_IDX)
-#define ELEM0_ID          FWK_ID_ELEMENT(MODULE0_IDX, ELEM0_IDX)
-#define ELEM1_ID          FWK_ID_ELEMENT(MODULE0_IDX, ELEM1_IDX)
-#define ELEM2_ID          FWK_ID_ELEMENT(MODULE1_IDX, ELEM2_IDX)
-#define SUB_ELEM0_ID      FWK_ID_SUB_ELEMENT(MODULE0_IDX, \
-                                             ELEM0_IDX, \
-                                             SUB_ELEM0_IDX)
-#define API0_ID           FWK_ID_API(MODULE0_IDX, API0_IDX)
-#define API1_ID           FWK_ID_API(MODULE0_IDX, API1_IDX)
-#define EVENT0_ID         FWK_ID_EVENT(MODULE1_IDX, EVENT0_IDX)
-#define EVENT1_ID         FWK_ID_EVENT(MODULE1_IDX, EVENT1_IDX)
-#define EVENT2_ID         FWK_ID_EVENT(MODULE1_IDX, EVENT2_IDX)
-#define NOTIFICATION0_ID  FWK_ID_NOTIFICATION(MODULE0_IDX, NOTIFICATION0_IDX)
-#define NOTIFICATION1_ID  FWK_ID_NOTIFICATION(MODULE0_IDX, NOTIFICATION1_IDX)
-#define NOTIFICATION2_ID  FWK_ID_NOTIFICATION(MODULE0_IDX, NOTIFICATION2_IDX)
+#define ELEM0_ID FWK_ID_ELEMENT(FWK_MODULE_IDX_FAKE0, ELEM0_IDX)
+#define ELEM1_ID FWK_ID_ELEMENT(FWK_MODULE_IDX_FAKE0, ELEM1_IDX)
+#define ELEM2_ID FWK_ID_ELEMENT(FWK_MODULE_IDX_FAKE1, ELEM2_IDX)
+#define SUB_ELEM0_ID \
+    FWK_ID_SUB_ELEMENT(FWK_MODULE_IDX_FAKE0, ELEM0_IDX, SUB_ELEM0_IDX)
+#define API0_ID FWK_ID_API(FWK_MODULE_IDX_FAKE0, API0_IDX)
+#define API1_ID FWK_ID_API(FWK_MODULE_IDX_FAKE0, API1_IDX)
+#define EVENT0_ID FWK_ID_EVENT(FWK_MODULE_IDX_FAKE1, EVENT0_IDX)
+#define EVENT1_ID FWK_ID_EVENT(FWK_MODULE_IDX_FAKE1, EVENT1_IDX)
+#define EVENT2_ID FWK_ID_EVENT(FWK_MODULE_IDX_FAKE1, EVENT2_IDX)
+#define NOTIFICATION0_ID \
+    FWK_ID_NOTIFICATION(FWK_MODULE_IDX_FAKE0, NOTIFICATION0_IDX)
+#define NOTIFICATION1_ID \
+    FWK_ID_NOTIFICATION(FWK_MODULE_IDX_FAKE0, NOTIFICATION1_IDX)
+#define NOTIFICATION2_ID \
+    FWK_ID_NOTIFICATION(FWK_MODULE_IDX_FAKE0, NOTIFICATION2_IDX)
 
 /* Fake API */
 struct fake_api {
@@ -75,8 +74,8 @@ struct config_module_data {
 static struct config_module_data config_module0;
 static struct config_module_data config_module1;
 
-struct fwk_module *module_table[3];
-struct fwk_module_config *module_config_table[3];
+extern struct fwk_module *module_table[FWK_MODULE_IDX_COUNT];
+extern struct fwk_module_config *module_config_table[FWK_MODULE_IDX_COUNT];
 
 static struct fwk_module fake_module_desc0;
 static struct fwk_module fake_module_desc1;
@@ -231,13 +230,13 @@ static void test_case_setup(void)
     start_count_call = 0;
 
     config_elem0.fake_val = 5;
-    config_elem0.ref = fwk_id_build_element_id(MODULE0_ID, ELEM0_IDX);
+    config_elem0.ref = fwk_id_build_element_id(fwk_module_id_fake0, ELEM0_IDX);
 
     config_elem1.fake_val = 6;
-    config_elem1.ref = fwk_id_build_element_id(MODULE0_ID, ELEM1_IDX);
+    config_elem1.ref = fwk_id_build_element_id(fwk_module_id_fake0, ELEM1_IDX);
 
     config_elem2.fake_val = 7;
-    config_elem2.ref = fwk_id_build_element_id(MODULE1_ID, ELEM2_IDX);
+    config_elem2.ref = fwk_id_build_element_id(fwk_module_id_fake1, ELEM2_IDX);
 
     config_module0.fake_val = 8;
     config_module1.fake_val = 9;
@@ -360,7 +359,7 @@ static void test___fwk_module_init_failure(void)
     assert(result == FWK_E_PARAM);
     init_return_val = FWK_SUCCESS;
 
-    result = __fwk_module_get_state(MODULE0_ID, &state);
+    result = __fwk_module_get_state(fwk_module_id_fake0, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_UNINITIALIZED);
 
@@ -370,11 +369,11 @@ static void test___fwk_module_init_failure(void)
     result = __fwk_module_init();
     assert(result == FWK_E_PARAM);
 
-    result = __fwk_module_get_state(MODULE0_ID, &state);
+    result = __fwk_module_get_state(fwk_module_id_fake0, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_UNINITIALIZED);
 
-    result = __fwk_module_get_state(MODULE1_ID, &state);
+    result = __fwk_module_get_state(fwk_module_id_fake1, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_UNINITIALIZED);
 
@@ -395,11 +394,11 @@ static void test___fwk_module_init_failure(void)
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_INITIALIZED);
 
-    result = __fwk_module_get_state(MODULE0_ID, &state);
+    result = __fwk_module_get_state(fwk_module_id_fake0, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_UNINITIALIZED);
 
-    result = __fwk_module_get_state(MODULE1_ID, &state);
+    result = __fwk_module_get_state(fwk_module_id_fake1, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_UNINITIALIZED);
 }
@@ -428,11 +427,11 @@ static void test___fwk_module_init_bind_failure(void)
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_INITIALIZED);
 
-    result = __fwk_module_get_state(MODULE0_ID, &state);
+    result = __fwk_module_get_state(fwk_module_id_fake0, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_INITIALIZED);
 
-    result = __fwk_module_get_state(MODULE1_ID, &state);
+    result = __fwk_module_get_state(fwk_module_id_fake1, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_INITIALIZED);
 
@@ -461,11 +460,11 @@ static void test___fwk_module_init_start_failure(void)
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_BOUND);
 
-    result = __fwk_module_get_state(MODULE0_ID, &state);
+    result = __fwk_module_get_state(fwk_module_id_fake0, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_BOUND);
 
-    result = __fwk_module_get_state(MODULE1_ID, &state);
+    result = __fwk_module_get_state(fwk_module_id_fake1, &state);
     assert(result == FWK_SUCCESS);
     assert(state == (FWK_MODULE_STATE_BOUND));
 }
@@ -488,19 +487,23 @@ static void check_correct_initialization(void)
     enum fwk_module_state state;
 
     /* Check module 0 is correctly initialized */
-    result = __fwk_module_get_state(MODULE0_ID, &state);
+    result = __fwk_module_get_state(fwk_module_id_fake0, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_STARTED);
-    assert(__fwk_module_get_ctx(MODULE0_ID)->desc == &fake_module_desc0);
-    assert(__fwk_module_get_ctx(MODULE0_ID)->config == &fake_module_config0);
-    assert(__fwk_module_get_ctx(MODULE0_ID)->element_count == 2);
+    assert(
+        __fwk_module_get_ctx(fwk_module_id_fake0)->desc == &fake_module_desc0);
+    assert(
+        __fwk_module_get_ctx(fwk_module_id_fake0)->config ==
+        &fake_module_config0);
+    assert(__fwk_module_get_ctx(fwk_module_id_fake0)->element_count == 2);
 
     /* Check element 0 is correctly initialized */
     result = __fwk_module_get_state(ELEM0_ID, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_STARTED);
-    assert(__fwk_module_get_element_ctx(ELEM0_ID) ==
-           &(__fwk_module_get_ctx(MODULE0_ID)->element_ctx_table[0]));
+    assert(
+        __fwk_module_get_element_ctx(ELEM0_ID) ==
+        &(__fwk_module_get_ctx(fwk_module_id_fake0)->element_ctx_table[0]));
     assert(__fwk_module_get_element_ctx(ELEM0_ID)->desc ==
         &fake_element_desc_table0[0]);
 
@@ -508,18 +511,22 @@ static void check_correct_initialization(void)
     result = __fwk_module_get_state(ELEM1_ID, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_STARTED);
-    assert(__fwk_module_get_element_ctx(ELEM1_ID) ==
-           &(__fwk_module_get_ctx(MODULE0_ID)->element_ctx_table[1]));
+    assert(
+        __fwk_module_get_element_ctx(ELEM1_ID) ==
+        &(__fwk_module_get_ctx(fwk_module_id_fake0)->element_ctx_table[1]));
     assert(__fwk_module_get_element_ctx(ELEM1_ID)->desc ==
         &fake_element_desc_table0[1]);
 
     /* Check module 1 is correctly initialized */
-    result = __fwk_module_get_state(MODULE1_ID, &state);
+    result = __fwk_module_get_state(fwk_module_id_fake1, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_STARTED);
-    assert(__fwk_module_get_ctx(MODULE1_ID)->desc == &fake_module_desc1);
-    assert(__fwk_module_get_ctx(MODULE1_ID)->config == &fake_module_config1);
-    assert(__fwk_module_get_ctx(MODULE1_ID)->element_count == 0);
+    assert(
+        __fwk_module_get_ctx(fwk_module_id_fake1)->desc == &fake_module_desc1);
+    assert(
+        __fwk_module_get_ctx(fwk_module_id_fake1)->config ==
+        &fake_module_config1);
+    assert(__fwk_module_get_ctx(fwk_module_id_fake1)->element_count == 0);
 }
 
 static void test___fwk_module_init_succeed(void)
@@ -569,13 +576,13 @@ static void test___fwk_module_get_state(void)
     assert(result == FWK_E_PARAM);
 
     /* Get module 0 state */
-    id = MODULE0_ID;
+    id = fwk_module_id_fake0;
     result = __fwk_module_get_state(id, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_STARTED);
 
     /* Get module 1 state */
-    id = MODULE1_ID;
+    id = fwk_module_id_fake1;
     result = __fwk_module_get_state(id, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_STARTED);
@@ -593,12 +600,12 @@ static void test_fwk_module_is_valid_module_id(void)
     bool result;
 
     /* Valid module ID */
-    id = MODULE0_ID;
+    id = fwk_module_id_fake0;
     result = fwk_module_is_valid_module_id(id);
     assert(result);
 
     /* Valid module ID */
-    id = MODULE1_ID;
+    id = fwk_module_id_fake1;
     result = fwk_module_is_valid_module_id(id);
     assert(result);
 
@@ -634,17 +641,17 @@ static void test_fwk_module_is_valid_element_id(void)
     assert(!result);
 
     /* Element IDX non valid */
-    id = FWK_ID_ELEMENT(MODULE1_IDX, 0x01);
+    id = FWK_ID_ELEMENT(FWK_MODULE_IDX_FAKE1, 0x01);
     result = fwk_module_is_valid_element_id(id);
     assert(!result);
 
     /* Element IDX non valid */
-    id = FWK_ID_ELEMENT(MODULE0_IDX, 0x02);
+    id = FWK_ID_ELEMENT(FWK_MODULE_IDX_FAKE0, 0x02);
     result = fwk_module_is_valid_element_id(id);
     assert(!result);
 
     /* Invalid type */
-    id = MODULE0_ID;
+    id = fwk_module_id_fake0;
     result = fwk_module_is_valid_element_id(id);
     assert(!result);
 }
@@ -667,13 +674,13 @@ static void test_fwk_module_is_valid_sub_element_id(void)
     assert(!result);
 
     /* Invalid element IDX */
-    result = fwk_module_is_valid_sub_element_id(FWK_ID_SUB_ELEMENT(MODULE0_IDX,
-        5, SUB_ELEM0_IDX));
+    result = fwk_module_is_valid_sub_element_id(
+        FWK_ID_SUB_ELEMENT(FWK_MODULE_IDX_FAKE0, 5, SUB_ELEM0_IDX));
     assert(!result);
 
     /* Invalid sub-element ID */
-    result = fwk_module_is_valid_sub_element_id(FWK_ID_SUB_ELEMENT(MODULE0_IDX,
-        ELEM0_IDX, 5));
+    result = fwk_module_is_valid_sub_element_id(
+        FWK_ID_SUB_ELEMENT(FWK_MODULE_IDX_FAKE0, ELEM0_IDX, 5));
     assert(!result);
 }
 
@@ -682,7 +689,7 @@ static void test_fwk_module_is_valid_entity_id(void)
     bool result;
 
     /* Valid module ID */
-    result = fwk_module_is_valid_entity_id(MODULE0_ID);
+    result = fwk_module_is_valid_entity_id(fwk_module_id_fake0);
     assert(result);
 
     /* Invalid module ID */
@@ -731,17 +738,17 @@ static void test_fwk_module_is_valid_api_id(void)
     assert(!result);
 
     /* API IDX non valid */
-    id = FWK_ID_API(MODULE1_IDX, 0x01);
+    id = FWK_ID_API(FWK_MODULE_IDX_FAKE1, 0x01);
     result = fwk_module_is_valid_api_id(id);
     assert(!result);
 
     /* API IDX non valid */
-    id = FWK_ID_ELEMENT(MODULE0_IDX, 0x02);
+    id = FWK_ID_ELEMENT(FWK_MODULE_IDX_FAKE0, 0x02);
     result = fwk_module_is_valid_api_id(id);
     assert(!result);
 
     /* Invalid type */
-    id = MODULE0_ID;
+    id = fwk_module_id_fake0;
     result = fwk_module_is_valid_api_id(id);
     assert(!result);
 }
@@ -767,17 +774,17 @@ static void test_fwk_module_is_valid_event_id(void)
     assert(!result);
 
     /* Event IDX non valid */
-    id = FWK_ID_EVENT(MODULE1_IDX, 0x03);
+    id = FWK_ID_EVENT(FWK_MODULE_IDX_FAKE1, 0x03);
     result = fwk_module_is_valid_event_id(id);
     assert(!result);
 
     /* Module IDX non valid */
-    id = FWK_ID_EVENT(MODULE0_IDX, 0x00);
+    id = FWK_ID_EVENT(FWK_MODULE_IDX_FAKE0, 0x00);
     result = fwk_module_is_valid_event_id(id);
     assert(!result);
 
     /* Invalid type */
-    id = MODULE0_ID;
+    id = fwk_module_id_fake0;
     result = fwk_module_is_valid_event_id(id);
     assert(!result);
 }
@@ -803,17 +810,17 @@ static void test_fwk_module_is_valid_notification_id(void)
     assert(!result);
 
     /* Event IDX non valid */
-    id = FWK_ID_NOTIFICATION(MODULE0_IDX, 0x03);
+    id = FWK_ID_NOTIFICATION(FWK_MODULE_IDX_FAKE0, 0x03);
     result = fwk_module_is_valid_notification_id(id);
     assert(!result);
 
     /* Module IDX non valid */
-    id = FWK_ID_NOTIFICATION(MODULE1_IDX, 0x00);
+    id = FWK_ID_NOTIFICATION(FWK_MODULE_IDX_FAKE1, 0x00);
     result = fwk_module_is_valid_notification_id(id);
     assert(!result);
 
     /* Invalid type */
-    id = MODULE0_ID;
+    id = fwk_module_id_fake0;
     result = fwk_module_is_valid_notification_id(id);
     assert(!result);
 }
@@ -823,7 +830,7 @@ static void test_fwk_module_get_element_count(void)
     int element_count;
 
     /* Valid module ID with 2 elements */
-    element_count = fwk_module_get_element_count(MODULE0_ID);
+    element_count = fwk_module_get_element_count(fwk_module_id_fake0);
     assert(element_count == 2);
 
     /* Invalid module ID */
@@ -840,12 +847,12 @@ static void test_fwk_module_get_sub_element_count(void)
     int sub_element_count;
 
     /* Invalid element ID */
-    sub_element_count =
-        fwk_module_get_sub_element_count(FWK_ID_ELEMENT(MODULE0_IDX, 0x05));
+    sub_element_count = fwk_module_get_sub_element_count(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_FAKE0, 0x05));
     assert(sub_element_count == FWK_E_PARAM);
 
     /* Valid module ID, but not an element */
-    sub_element_count = fwk_module_get_sub_element_count(MODULE0_ID);
+    sub_element_count = fwk_module_get_sub_element_count(fwk_module_id_fake0);
     assert(sub_element_count == FWK_E_PARAM);
 
     /* Valid element ID with 0 sub-elements */
@@ -863,7 +870,7 @@ static void test_fwk_module_get_name(void)
     const char *result;
 
     /* Valid module ID */
-    id = MODULE0_ID;
+    id = fwk_module_id_fake0;
     result = fwk_module_get_name(id);
     assert(result != NULL);
     assert(strcmp(result, "FAKE MODULE 0") == 0);
@@ -886,7 +893,7 @@ static void test_fwk_module_get_data(void)
     const void *result;
 
     /* Valid module ID */
-    id = MODULE0_ID;
+    id = fwk_module_id_fake0;
     result = fwk_module_get_data(id);
     assert(result != NULL);
     assert(result == (void *)(&config_module0));
@@ -933,7 +940,7 @@ static void test_fwk_module_bind_stage_failure(void)
      * MODULE_STAGE_INITIALIZE and the module is in
      * FWK_MODULE_STATE_UNINITIALIZED state.
      */
-    result = fwk_module_bind(MODULE0_ID, API1_ID, &api);
+    result = fwk_module_bind(fwk_module_id_fake0, API1_ID, &api);
     assert(result == FWK_E_STATE);
 
     /*
@@ -950,7 +957,7 @@ static void test_fwk_module_bind_stage_failure(void)
      * framework is in MODULE_STAGE_START stage.
      */
     process_bind_request_return_val = FWK_SUCCESS;
-    result = fwk_module_bind(MODULE0_ID, API1_ID, &api);
+    result = fwk_module_bind(fwk_module_id_fake0, API1_ID, &api);
     assert(result == FWK_E_STATE);
 }
 
@@ -972,20 +979,20 @@ static void test_fwk_module_bind(void)
     assert(result == FWK_E_PARAM);
 
     /* The binding request should fail because the API ID is not valid */
-    result = fwk_module_bind(MODULE1_ID, FWK_ID_API(1, 0), &api);
+    result = fwk_module_bind(fwk_module_id_fake1, FWK_ID_API(1, 0), &api);
     assert(result == FWK_E_PARAM);
 
     /*
      * The binding request should fail because API0_ID does not belong to
-     * MODULE1_ID.
+     * fwk_module_id_fake1.
      */
-    result = fwk_module_bind(MODULE1_ID, API0_ID, &api);
+    result = fwk_module_bind(fwk_module_id_fake1, API0_ID, &api);
     assert(result == FWK_E_PARAM);
 
     /*
      * The binding request should fail because the API address pointer is NULL
      */
-    result = fwk_module_bind(MODULE0_ID, API1_ID, NULL);
+    result = fwk_module_bind(fwk_module_id_fake0, API1_ID, NULL);
     assert(result == FWK_E_PARAM);
 
     /*
@@ -993,7 +1000,7 @@ static void test_fwk_module_bind(void)
      * associated with the module fails.
      */
     process_bind_request_return_val = FWK_E_PARAM;
-    result = fwk_module_bind(MODULE0_ID, API1_ID, &api);
+    result = fwk_module_bind(fwk_module_id_fake0, API1_ID, &api);
     assert(result == FWK_E_PARAM);
     process_bind_request_return_val = FWK_SUCCESS;
 
@@ -1003,13 +1010,13 @@ static void test_fwk_module_bind(void)
      * function.
      */
     process_bind_request_return_api = false;
-    result = fwk_module_bind(MODULE0_ID, API1_ID, &null_api);
+    result = fwk_module_bind(fwk_module_id_fake0, API1_ID, &null_api);
     assert(result == FWK_E_HANDLER);
     assert(null_api == NULL);
     process_bind_request_return_api = true;
 
     /* The binding request should return successfully */
-    result = fwk_module_bind(MODULE0_ID, API1_ID, &api);
+    result = fwk_module_bind(fwk_module_id_fake0, API1_ID, &api);
     assert(result == FWK_SUCCESS);
 }
 
