@@ -874,25 +874,24 @@ static int scmi_process_event(const struct fwk_event *event,
     ctx->scmi_token = read_token(message_header);
 
     FWK_LOG_TRACE(
-        "[SCMI] %s: Message [%" PRIu16 " (0x%x:0x%x:%s)] was received",
+        "[SCMI] %s: %s [%" PRIu16 " (0x%x:0x%x)] was received",
         service_name,
+        message_type_name,
         ctx->scmi_token,
         ctx->scmi_protocol_id,
-        ctx->scmi_message_id,
-        message_type_name);
+        ctx->scmi_message_id);
 
     protocol_idx = scmi_ctx.scmi_protocol_id_to_idx[ctx->scmi_protocol_id];
 
     if (protocol_idx == 0) {
         FWK_LOG_ERR(
-            "[SCMI] %s: Message [%" PRIu16
-            " (0x%x:0x%x:%s)] requested an "
-            "unsupported protocol",
+            "[SCMI] %s: %s [%" PRIu16
+            "(0x%x:0x%x)] requested an unsupported protocol",
             service_name,
+            message_type_name,
             ctx->scmi_token,
             ctx->scmi_protocol_id,
-            ctx->scmi_message_id,
-            message_type_name);
+            ctx->scmi_message_id);
         ctx->respond(transport_id, &(int32_t) { SCMI_NOT_SUPPORTED },
                      sizeof(int32_t));
         return FWK_SUCCESS;
@@ -904,13 +903,12 @@ static int scmi_process_event(const struct fwk_event *event,
 
     if (status != FWK_SUCCESS) {
         FWK_LOG_ERR(
-            "[SCMI] %s: Message [%" PRIu16 " (0x%x:0x%x:%s)]"
-            " handler error (%s)",
+            "[SCMI] %s: %s [%" PRIu16 " (0x%x:0x%x)] handler error (%s)",
             service_name,
+            message_type_name,
             ctx->scmi_token,
             ctx->scmi_protocol_id,
             ctx->scmi_message_id,
-            message_type_name,
             fwk_status_str(status));
 
         return FWK_SUCCESS;
