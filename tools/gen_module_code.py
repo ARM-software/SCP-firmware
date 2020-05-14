@@ -44,12 +44,10 @@ TEMPLATE_C = "/* This file was auto generated using {} */\n" \
              "\n" \
              "const struct fwk_module *module_table[] = {{\n" \
              "{}" \
-             "    NULL\n" \
              "}};\n" \
              "\n" \
              "const struct fwk_module_config *module_config_table[] = {{\n" \
              "{}" \
-             "    NULL\n" \
              "}};\n"
 
 
@@ -73,6 +71,8 @@ def generate_header(path, modules):
                  "FWK_ID_MODULE_INIT(FWK_MODULE_IDX_{});\n".format(module,
                                                                    module
                                                                    .upper())
+
+    enum += "    FWK_MODULE_IDX_COUNT,\n"
 
     content = TEMPLATE_H.format(sys.argv[0], enum, const)
     generate_file(path, FILENAME_H, content)

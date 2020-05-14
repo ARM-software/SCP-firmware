@@ -24,6 +24,7 @@
 #include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
+#include <fwk_module_idx.h>
 #include <fwk_status.h>
 
 #include <stdbool.h>
@@ -46,11 +47,8 @@ struct context {
     /* Flag indicating whether all modules have been initialized */
     bool initialized;
 
-    /* Number of modules */
-    unsigned int module_count;
-
     /* Table of module contexts */
-    struct fwk_module_ctx *module_ctx_table;
+    struct fwk_module_ctx module_ctx_table[FWK_MODULE_IDX_COUNT];
 
     /* Pre-runtime phase stage */
     enum module_stage stage;
@@ -62,8 +60,9 @@ struct context {
     fwk_id_t bind_id;
 };
 
-extern const struct fwk_module *module_table[];
-extern const struct fwk_module_config *module_config_table[];
+extern const struct fwk_module *module_table[FWK_MODULE_IDX_COUNT];
+extern const struct fwk_module_config
+    *module_config_table[FWK_MODULE_IDX_COUNT];
 
 static struct context ctx;
 
@@ -225,13 +224,7 @@ static int init_modules(void)
     unsigned int module_idx;
     struct fwk_module_ctx *module_ctx;
 
-    while (module_table[ctx.module_count] != NULL)
-        ctx.module_count++;
-
-    ctx.module_ctx_table = fwk_mm_calloc(ctx.module_count,
-                                         sizeof(struct fwk_module_ctx));
-
-    for (module_idx = 0; module_idx < ctx.module_count; module_idx++) {
+    for (module_idx = 0; module_idx < FWK_MODULE_IDX_COUNT; module_idx++) {
         module_ctx = &ctx.module_ctx_table[module_idx];
         module_ctx->id = FWK_ID_MODULE(module_idx);
         status = init_module(module_ctx, module_table[module_idx],
@@ -304,7 +297,7 @@ static int bind_modules(unsigned int round)
     unsigned int module_idx;
     struct fwk_module_ctx *module_ctx;
 
-    for (module_idx = 0; module_idx < ctx.module_count; module_idx++) {
+    for (module_idx = 0; module_idx < FWK_MODULE_IDX_COUNT; module_idx++) {
         module_ctx = &ctx.module_ctx_table[module_idx];
         status = bind_module(module_ctx, round);
         if (status != FWK_SUCCESS)
@@ -366,7 +359,7 @@ static int start_modules(void)
     unsigned int module_idx;
     struct fwk_module_ctx *module_ctx;
 
-    for (module_idx = 0; module_idx < ctx.module_count; module_idx++) {
+    for (module_idx = 0; module_idx < FWK_MODULE_IDX_COUNT; module_idx++) {
         module_ctx = &ctx.module_ctx_table[module_idx];
         status = start_module(module_ctx);
         if (status != FWK_SUCCESS)
@@ -470,7 +463,7 @@ bool fwk_module_is_valid_module_id(fwk_id_t id)
     if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
         return false;
 
-    if (fwk_id_get_module_idx(id) >= ctx.module_count)
+    if (fwk_id_get_module_idx(id) >= FWK_MODULE_IDX_COUNT)
         return false;
 
     return true;
@@ -484,7 +477,7 @@ bool fwk_module_is_valid_element_id(fwk_id_t id)
         return false;
 
     module_idx = fwk_id_get_module_idx(id);
-    if (module_idx >= ctx.module_count)
+    if (module_idx >= FWK_MODULE_IDX_COUNT)
         return false;
 
     return (fwk_id_get_element_idx(id) <
@@ -501,7 +494,7 @@ bool fwk_module_is_valid_sub_element_id(fwk_id_t id)
         return false;
 
     module_idx = fwk_id_get_module_idx(id);
-    if (module_idx >= ctx.module_count)
+    if (module_idx >= FWK_MODULE_IDX_COUNT)
         return false;
     module_ctx = &ctx.module_ctx_table[module_idx];
 
@@ -540,7 +533,7 @@ bool fwk_module_is_valid_api_id(fwk_id_t id)
         return false;
 
     module_idx = fwk_id_get_module_idx(id);
-    if (module_idx >= ctx.module_count)
+    if (module_idx >= FWK_MODULE_IDX_COUNT)
         return false;
 
     return (fwk_id_get_api_idx(id) <
@@ -555,7 +548,7 @@ bool fwk_module_is_valid_event_id(fwk_id_t id)
         return false;
 
     module_idx = fwk_id_get_module_idx(id);
-    if (module_idx >= ctx.module_count)
+    if (module_idx >= FWK_MODULE_IDX_COUNT)
         return false;
 
     return (fwk_id_get_event_idx(id) <
@@ -571,7 +564,7 @@ bool fwk_module_is_valid_notification_id(fwk_id_t id)
         return false;
 
     module_idx = fwk_id_get_module_idx(id);
-    if (module_idx >= ctx.module_count)
+    if (module_idx >= FWK_MODULE_IDX_COUNT)
         return false;
 
     return (fwk_id_get_notification_idx(id) <
