@@ -43,7 +43,18 @@ enum juno_thermal_alarm_idx {
     JUNO_THERMAL_ALARM_IDX_COUNT,
 };
 
+#ifdef BUILD_HAS_STATISTICS
+/* Alarm indices for Statistics */
+enum juno_statistics_idx {
+    JUNO_STATISTICS_ALARM_IDX = JUNO_THERMAL_ALARM_IDX_COUNT,
+    JUNO_STATISTICS_ALARM_IDX_COUNT,
+};
+
 /* Total count of alarms */
+#define JUNO_ALARM_IDX_COUNT    JUNO_STATISTICS_ALARM_IDX_COUNT
+#else
 #define JUNO_ALARM_IDX_COUNT    JUNO_THERMAL_ALARM_IDX_COUNT
+#endif
+
 
 #endif /* JUNO_ALARM_IDX_H */
