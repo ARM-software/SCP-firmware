@@ -314,6 +314,7 @@ static const struct fwk_element *get_sensor_element_table(fwk_id_t module_id)
 
     #if USE_FULL_SET_SENSORS
     enum juno_idx_revision rev;
+    size_t pvt_sensor_elem_table_size;
     #endif
 
     size_t sensor_elem_table_size;
@@ -343,6 +344,9 @@ static const struct fwk_element *get_sensor_element_table(fwk_id_t module_id)
                    sensor_element_table_r0,
                    sizeof(sensor_element_table_r0));
         } else {
+            pvt_sensor_elem_table_size =
+                FWK_ARRAY_SIZE(pvt_sensors_juno_r1_r2_elem_table);
+
             /*
              * Add additional sensors available on Juno R1 & R2 and the
              * termination description.
