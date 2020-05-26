@@ -215,6 +215,12 @@ else
     BUILD_HAS_SCMI_NOTIFICATIONS := no
 endif
 
+ifeq ($(BS_FIRMWARE_HAS_SCMI_RESET),yes)
+    BUILD_HAS_SCMI_RESET := yes
+else
+    BUILD_HAS_SCMI_RESET := no
+endif
+
 # Add directories to the list of targets to build
 LIB_TARGETS_y += $(patsubst %,$(MODULES_DIR)/%/src, \
                             $(BUILD_STANDARD_MODULES))

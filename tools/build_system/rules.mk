@@ -33,6 +33,10 @@ ifeq ($(BUILD_HAS_FAST_CHANNELS),yes)
     DEFINES += BUILD_HAS_FAST_CHANNELS
 endif
 
+ifeq ($(BUILD_HAS_SCMI_RESET),yes)
+    DEFINES += BUILD_HAS_SCMI_RESET
+endif
+
 export AS := $(CC)
 export LD := $(CC)
 
