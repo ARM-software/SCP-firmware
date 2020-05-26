@@ -172,6 +172,28 @@ enum scmi_sensor_command_id {
 };
 
 /*!
+ * \brief SCMI Reset Domain Protocol
+ */
+#define MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN UINT32_C(0x16)
+
+/*!
+ * \brief SCMI Reset Domain Management Protocol Message IDs
+ */
+enum scmi_reset_domain_command_id {
+    MOD_SCMI_RESET_DOMAIN_ATTRIBUTES = 0x03,
+    MOD_SCMI_RESET_REQUEST = 0x04,
+    MOD_SCMI_RESET_NOTIFY = 0x05,
+};
+
+/*!
+ * \brief SCMI Reset Domain Management Protocol Response IDs.
+ */
+enum scmi_reset_domain_response_id {
+    MOD_SCMI_RESET_ISSUED = 0x00,
+    MOD_SCMI_RESET_COMPLETE = 0x04,
+};
+
+/*!
  * @}
  */
 
