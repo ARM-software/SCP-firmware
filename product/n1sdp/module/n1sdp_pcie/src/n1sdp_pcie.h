@@ -444,6 +444,18 @@ enum pcie_gen {
     PCIE_GEN_3,
     PCIE_GEN_4,
 };
+
+/*
+ * Identifiers of PCIe LANE COUNT
+ */
+enum pcie_lane_count {
+    LAN_COUNT_IN_X_1,
+    LAN_COUNT_IN_X_2,
+    LAN_COUNT_IN_X_4,
+    LAN_COUNT_IN_X_8,
+    LAN_COUNT_IN_X_16,
+};
+
 /*
  * Structure defining data to be passed to timer API
  */
@@ -508,6 +520,7 @@ bool pcie_wait_condition(void *data);
  * param - timer_api - Pointer to timer API used for timeout detection
  * param - stage - Identifier of current PCIe initialization stage
  * param - gen - PCIe Generation
+ * param - lane_count - PCIe Lane Count
  *
  * retval - FWK_SUCCESS - if the operation is succeeded
  *          FWK_E_TIMEOUT - if initialization times out
@@ -515,7 +528,8 @@ bool pcie_wait_condition(void *data);
 int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
               struct mod_timer_api *timer_api,
               enum pcie_init_stage stage,
-              enum pcie_gen gen);
+              enum pcie_gen gen,
+              enum pcie_lane_count lane_count);
 
 
 /*
@@ -536,8 +550,9 @@ int pcie_link_retrain(struct pcie_ctrl_apb_reg *ctrl_apb,
  * Brief - Function to initialize PCIe PHY layer.
  *
  * param - pcie_phy_base - Base address of the PHY layer registers
+ * param - lane_count - PCIe Lane Count
  */
-void pcie_phy_init(uint32_t phy_apb_base);
+void pcie_phy_init(uint32_t phy_apb_base, uint32_t lane_count);
 
 /*
  * Brief - Function to write to Root Port's/End Point's configuration space.
