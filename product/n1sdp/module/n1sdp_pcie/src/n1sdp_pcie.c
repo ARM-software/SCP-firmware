@@ -23,16 +23,17 @@
 #include <stdint.h>
 #include <string.h>
 
-void pcie_phy_init(uint32_t phy_apb_base)
+void pcie_phy_init(uint32_t phy_apb_base, uint32_t pcie_lane_count)
 {
     uint32_t j;
+    uint32_t lane_count = (1 << pcie_lane_count);
 
     *((unsigned int *)(0x30038 | phy_apb_base)) = 0x00000013;
     *((unsigned int *)(0x0010C | phy_apb_base)) = 0x0000002D;
     *((unsigned int *)(0x00138 | phy_apb_base)) = 0x00001005;
     *((unsigned int *)(0x00260 | phy_apb_base)) = 0x00002100;
 
-    for (j = 0; j < 16; j++) {
+    for (j = 0; j < lane_count; j++) {
         *((unsigned int *)((j << 11) | 0x1000C | phy_apb_base)) = 0x00006910;
         *((unsigned int *)((j << 11) | 0x100EC | phy_apb_base)) = 0x00000055;
 
@@ -300,7 +301,8 @@ bool pcie_wait_condition(void *data)
 int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
               struct mod_timer_api *timer_api,
               enum pcie_init_stage stage,
-              enum pcie_gen gen)
+              enum pcie_gen gen,
+              enum pcie_lane_count lane_count)
 {
     assert(ctrl_apb != NULL);
     assert(timer_api != NULL);
@@ -334,7 +336,7 @@ int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
         ctrl_apb->RP_CONFIG_IN &= ~RP_CONFIG_IN_PCIE_GEN_SEL_MASK;
         ctrl_apb->RP_CONFIG_IN &= ~RP_CONFIG_IN_LANE_CNT_IN_MASK;
 
-        ctrl_apb->RP_CONFIG_IN |= (0x4 << RP_CONFIG_IN_LANE_CNT_IN_POS) |
+        ctrl_apb->RP_CONFIG_IN |= (lane_count << RP_CONFIG_IN_LANE_CNT_IN_POS) |
                                   (gen << RP_CONFIG_IN_PCIE_GEN_SEL_POS);
         ctrl_apb->RESET_CTRL = RESET_CTRL_RC_REL_MASK;
         status = timer_api->wait(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),

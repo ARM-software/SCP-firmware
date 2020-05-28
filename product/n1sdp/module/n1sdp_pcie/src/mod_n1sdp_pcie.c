@@ -199,6 +199,7 @@ static int n1sdp_pcie_phy_init(fwk_id_t id)
     enum pcie_gen gen_speed;
     int status;
     unsigned int did;
+    enum pcie_lane_count lane_count;
 
     did = fwk_id_get_element_idx(id);
     dev_ctx = &pcie_ctx.device_ctx_table[did];
@@ -206,14 +207,16 @@ static int n1sdp_pcie_phy_init(fwk_id_t id)
         return FWK_E_PARAM;
 
     gen_speed = dev_ctx->config->ccix_capable ? PCIE_GEN_4 : PCIE_GEN_3;
+    lane_count = LAN_COUNT_IN_X_16;
 
     FWK_LOG_INFO("[%s] Initializing PHY...", pcie_type[did]);
 
-    pcie_phy_init(dev_ctx->phy_apb);
+    pcie_phy_init(dev_ctx->phy_apb, lane_count);
     status = pcie_init(dev_ctx->ctrl_apb,
                        pcie_ctx.timer_api,
                        PCIE_INIT_STAGE_PHY,
-                       gen_speed);
+                       gen_speed,
+                       lane_count);
     if (status != FWK_SUCCESS) {
         FWK_LOG_INFO("[%s] Timeout!", pcie_type[did]);
         return status;
@@ -229,6 +232,7 @@ static int n1sdp_pcie_controller_init(fwk_id_t id, bool ep_mode)
     enum pcie_gen gen_speed;
     int status;
     int did;
+    enum pcie_lane_count lane_count;
 
     did = fwk_id_get_element_idx(id);
     dev_ctx = &pcie_ctx.device_ctx_table[did];
@@ -236,6 +240,7 @@ static int n1sdp_pcie_controller_init(fwk_id_t id, bool ep_mode)
         return FWK_E_PARAM;
 
     gen_speed = dev_ctx->config->ccix_capable ? PCIE_GEN_4 : PCIE_GEN_3;
+    lane_count = LAN_COUNT_IN_X_16;
 
     if (ep_mode) {
         dev_ctx->ctrl_apb->MODE_CTRL = 0x0;
@@ -249,7 +254,8 @@ static int n1sdp_pcie_controller_init(fwk_id_t id, bool ep_mode)
     status = pcie_init(dev_ctx->ctrl_apb,
                        pcie_ctx.timer_api,
                        PCIE_INIT_STAGE_CTRL,
-                       gen_speed);
+                       gen_speed,
+                       lane_count);
     if (status != FWK_SUCCESS) {
         FWK_LOG_INFO("[%s] Timeout!", pcie_type[did]);
         return status;
@@ -267,6 +273,7 @@ static int n1sdp_pcie_link_training(fwk_id_t id, bool ep_mode)
     uint32_t reg_val;
     int status;
     unsigned int did;
+    enum pcie_lane_count lane_count;
 
     did = fwk_id_get_element_idx(id);
     dev_ctx = &pcie_ctx.device_ctx_table[did];
@@ -274,6 +281,7 @@ static int n1sdp_pcie_link_training(fwk_id_t id, bool ep_mode)
         return FWK_E_PARAM;
 
     gen_speed = dev_ctx->config->ccix_capable ? PCIE_GEN_4 : PCIE_GEN_3;
+    lane_count = LAN_COUNT_IN_X_16;
 
     if (gen_speed >= PCIE_GEN_3 && !ep_mode) {
         FWK_LOG_INFO(
@@ -295,7 +303,8 @@ static int n1sdp_pcie_link_training(fwk_id_t id, bool ep_mode)
     status = pcie_init(dev_ctx->ctrl_apb,
                        pcie_ctx.timer_api,
                        PCIE_INIT_STAGE_LINK_TRNG,
-                       gen_speed);
+                       gen_speed,
+                       lane_count);
     if (status != FWK_SUCCESS) {
         FWK_LOG_INFO("[%s] Timeout!", pcie_type[did]);
         pcie_init_bdf_table(dev_ctx->config);
