@@ -272,7 +272,8 @@
 #define AXI_HIGH_ADDR_BIT_POS          32
 #define AXI_ADDR_NUM_BITS_MAX          ((1 << 6) - 1)
 
-#define TX_PRESET_VALUE                0x4
+#define PCIE_RC_TX_PRESET_VALUE        0x4
+#define CCIX_RC_TX_PRESET_VALUE        0x8
 
 #define GEN3_OFFSET_MIN                0x30C
 #define GEN3_OFFSET_MAX                0x32C
@@ -587,7 +588,8 @@ int pcie_rp_ep_config_read_word(uint32_t base,
  *
  * param - rp_ep_config_apb_base - Base address of the PCIe configuration
  *                                 APB registers.
- * param - preset - Preset Value
+ * param - down_stream_tx_preset - downstream Preset Value
+ * param - up_stream_tx_preset - upstream Preset Value
  * param - gen - PCIe generation
  *
  * retval - FWK_SUCCESS - if the operation is succeeded
@@ -595,7 +597,8 @@ int pcie_rp_ep_config_read_word(uint32_t base,
  *                       to and read from the register.
  */
 int pcie_set_gen_tx_preset(uint32_t rp_ep_config_apb_base,
-                           uint32_t preset,
+                           uint32_t down_stream_tx_preset,
+                           uint32_t up_stream_tx_preset,
                            enum pcie_gen gen);
 
 /*

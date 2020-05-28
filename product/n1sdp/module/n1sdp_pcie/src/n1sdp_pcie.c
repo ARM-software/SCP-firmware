@@ -464,7 +464,7 @@ int pcie_rp_ep_config_write_word(uint32_t base,
         return FWK_E_PARAM;
 
     base |= ROOT_PORT_WRITE_ENABLE;
-    *(uint32_t *)(base + offset) = value;
+    *(volatile uint32_t *)(base + offset) = value;
 
     return FWK_SUCCESS;
 }
@@ -476,19 +476,21 @@ int pcie_rp_ep_config_read_word(uint32_t base,
     if ((offset % 4) || (value == NULL))
         return FWK_E_PARAM;
 
-    *value = *(uint32_t *)(base + offset);
+    *value = *(volatile uint32_t *)(base + offset);
 
     return FWK_SUCCESS;
 }
 
 int pcie_set_gen_tx_preset(uint32_t rp_ep_config_apb_base,
-                           uint32_t preset,
+                           uint32_t down_stream_tx_preset,
+                           uint32_t up_stream_tx_preset,
                            enum pcie_gen gen)
 {
     uint32_t i;
+    uint32_t j;
     uint32_t offset;
     uint32_t reg_value;
-    uint32_t preset_reg = 0;
+    uint32_t preset_value = 0;
     uint32_t offset_min;
     uint32_t offset_max;
     uint32_t nibble;
@@ -499,14 +501,20 @@ int pcie_set_gen_tx_preset(uint32_t rp_ep_config_apb_base,
     offset_max = (gen == PCIE_GEN_3) ? GEN3_OFFSET_MAX : GEN4_OFFSET_MAX;
     nibble = (gen == PCIE_GEN_3) ? GEN3_PRESET : GEN4_PRESET;
 
-    for (i = 0; i < 32; i += nibble)
-        preset_reg |= (preset << i);
+    for (i = 0, j = 0; i < 32; i += nibble, j++) {
+        if (j%2 == 0)
+            preset_value |= (down_stream_tx_preset << i);
+        else
+            preset_value |= (up_stream_tx_preset << i);
+    }
 
     for (offset = offset_min; offset < offset_max; offset += 0x4) {
-        pcie_rp_ep_config_write_word(rp_ep_config_apb_base, offset, preset_reg);
-        pcie_rp_ep_config_read_word(rp_ep_config_apb_base, offset, &reg_value);
+        pcie_rp_ep_config_write_word(rp_ep_config_apb_base,
+                                    offset, preset_value);
+        pcie_rp_ep_config_read_word(rp_ep_config_apb_base,
+                                    offset, &reg_value);
 
-        if (reg_value != preset_reg)
+        if (reg_value != preset_value)
             return FWK_E_DATA;
     }
     return FWK_SUCCESS;

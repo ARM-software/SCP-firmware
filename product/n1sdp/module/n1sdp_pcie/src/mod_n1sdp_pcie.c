@@ -274,6 +274,8 @@ static int n1sdp_pcie_link_training(fwk_id_t id, bool ep_mode)
     int status;
     unsigned int did;
     enum pcie_lane_count lane_count;
+    uint32_t down_stream_tx_preset = 0;
+    uint32_t up_stream_tx_preset  = 0;
 
     did = fwk_id_get_element_idx(id);
     dev_ctx = &pcie_ctx.device_ctx_table[did];
@@ -282,18 +284,37 @@ static int n1sdp_pcie_link_training(fwk_id_t id, bool ep_mode)
 
     gen_speed = dev_ctx->config->ccix_capable ? PCIE_GEN_4 : PCIE_GEN_3;
     lane_count = LAN_COUNT_IN_X_16;
+    down_stream_tx_preset = dev_ctx->config->ccix_capable ?
+                            CCIX_RC_TX_PRESET_VALUE : PCIE_RC_TX_PRESET_VALUE;
+    up_stream_tx_preset = dev_ctx->config->ccix_capable ?
+                          CCIX_RC_TX_PRESET_VALUE : PCIE_RC_TX_PRESET_VALUE;
 
     if (gen_speed >= PCIE_GEN_3 && !ep_mode) {
         FWK_LOG_INFO(
             "[%s] Setting TX Preset for GEN%d...",
             pcie_type[did],
-            gen_speed + 1);
+            PCIE_GEN_3 + 1);
         status = pcie_set_gen_tx_preset(dev_ctx->rp_ep_config_apb,
-                                        TX_PRESET_VALUE,
-                                        gen_speed);
+                                        down_stream_tx_preset,
+                                        up_stream_tx_preset,
+                                        PCIE_GEN_3);
         if (status != FWK_SUCCESS) {
             FWK_LOG_INFO("[%s] Error!", pcie_type[did]);
             return status;
+        }
+        if (gen_speed == PCIE_GEN_4) {
+            FWK_LOG_INFO(
+                "[%s] Setting TX Preset for GEN%d...",
+                pcie_type[did],
+                PCIE_GEN_4 + 1);
+            status = pcie_set_gen_tx_preset(dev_ctx->rp_ep_config_apb,
+                                            down_stream_tx_preset,
+                                            up_stream_tx_preset,
+                                            PCIE_GEN_4);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_INFO("[%s] Error!", pcie_type[did]);
+                return status;
+            }
         }
         FWK_LOG_INFO("[%s] Done", pcie_type[did]);
     }
