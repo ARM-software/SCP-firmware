@@ -206,6 +206,13 @@ When building a firmware and its dependencies, the
 BS_FIRMWARE_HAS_SCMI_NOTIFICATIONS parameter controls whether SCMI notifications
 are enabled or not.
 
+Debug Module Support                                     {#section_debug_module}
+==========================
+
+When building a firmware and its dependencies, the BS_FIRMWARE_HAS_DEBUG_UNIT
+parameter controls whether the support for the Debug probe/trace unit is
+included.
+
 Definitions
 ===========
 

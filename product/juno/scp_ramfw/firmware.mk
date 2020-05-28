@@ -13,6 +13,7 @@ BS_FIRMWARE_HAS_MULTITHREADING := yes
 BS_FIRMWARE_HAS_NOTIFICATION := yes
 BS_FIRMWARE_HAS_SCMI_NOTIFICATIONS := no
 BS_FIRMWARE_HAS_FAST_CHANNELS := no
+BS_FIRMWARE_HAS_DEBUG_UNIT := yes
 
 BS_FIRMWARE_MODULE_HEADERS_ONLY :=
 
@@ -32,8 +33,6 @@ BS_FIRMWARE_MODULES := \
     juno_ppu \
     juno_system \
     system_power \
-    juno_debug \
-    debug \
     power_domain \
     mhu \
     smt \
@@ -55,6 +54,10 @@ BS_FIRMWARE_MODULES := \
     juno_pvt \
     juno_thermal
 
+ifeq ($(BS_FIRMWARE_HAS_DEBUG_UNIT),yes)
+    BS_FIRMWARE_MODULES += juno_debug debug
+endif
+
 BS_FIRMWARE_SOURCES := \
     juno_utils.c \
     config_sds.c \
@@ -71,8 +74,6 @@ BS_FIRMWARE_SOURCES := \
     config_juno_ram.c \
     config_juno_ppu.c \
     config_system_power.c \
-    config_juno_debug.c \
-    config_debug.c \
     config_power_domain.c \
     config_mhu.c \
     config_smt.c \
@@ -93,6 +94,10 @@ BS_FIRMWARE_SOURCES := \
 
 ifeq ($(BS_FIRMWARE_HAS_MULTITHREADING),yes)
     BS_FIRMWARE_SOURCES += rtx_config.c
+endif
+
+ifeq ($(BS_FIRMWARE_HAS_DEBUG_UNIT),yes)
+    BS_FIRMWARE_SOURCES += config_juno_debug.c config_debug.c
 endif
 
 include $(BS_DIR)/firmware.mk
