@@ -10,8 +10,14 @@
 
 #include "exceptions.h"
 
+#include <fmw_cmsis.h>
+
 #include <stdint.h>
 #include <string.h>
+
+#ifdef BUILD_HAS_MULTITHREADING
+#    include <rtx_os.h>
+#endif
 
 #ifdef __NEWLIB__
 /*
@@ -33,24 +39,6 @@ void software_init_hook(void)
 }
 #endif
 
-enum {
-    EXCEPTION_RESET,
-    EXCEPTION_NMI,
-    EXCEPTION_HARDFAULT,
-    EXCEPTION_MEMMANAGE,
-    EXCEPTION_BUSFAULT,
-    EXCEPTION_USAGEFAULT,
-    EXCEPTION_RESERVED0,
-    EXCEPTION_RESERVED1,
-    EXCEPTION_RESERVED2,
-    EXCEPTION_RESERVED3,
-    EXCEPTION_SVCALL,
-    EXCEPTION_DEBUGMONITOR,
-    EXCEPTINO_RESERVED4,
-    EXCEPTION_PENDSV,
-    EXCEPTION_SYSTICK,
-};
-
 #ifdef __ARMCC_VERSION
 extern char Image$$ARM_LIB_STACKHEAP$$ZI$$Limit;
 
@@ -69,19 +57,39 @@ extern char __stackheap_end__;
 
 const struct {
     uintptr_t stack;
-    uintptr_t exceptions[15];
+    uintptr_t exceptions[NVIC_USER_IRQ_OFFSET - 1];
 } arch_exceptions __attribute__((section(".exceptions"))) = {
     .stack = (uintptr_t)(arch_exception_stack),
     .exceptions = {
-        [EXCEPTION_RESET] = (uintptr_t)(arch_exception_reset),
-        [EXCEPTION_NMI] = (uintptr_t)(arch_exception_invalid),
-        [EXCEPTION_HARDFAULT] = (uintptr_t)(arch_exception_invalid),
-        [EXCEPTION_MEMMANAGE] = (uintptr_t)(arch_exception_invalid),
-        [EXCEPTION_BUSFAULT] = (uintptr_t)(arch_exception_invalid),
-        [EXCEPTION_USAGEFAULT] = (uintptr_t)(arch_exception_invalid),
-        [EXCEPTION_SVCALL] = (uintptr_t)(arch_exception_invalid),
-        [EXCEPTION_DEBUGMONITOR] = (uintptr_t)(arch_exception_invalid),
-        [EXCEPTION_PENDSV] = (uintptr_t)(arch_exception_invalid),
-        [EXCEPTION_SYSTICK] = (uintptr_t)(arch_exception_invalid),
+        [NVIC_USER_IRQ_OFFSET + Reset_IRQn - 1] =
+            (uintptr_t)(arch_exception_reset),
+        [NonMaskableInt_IRQn +  (NVIC_USER_IRQ_OFFSET - 1)] =
+            (uintptr_t)(arch_exception_invalid),
+        [NVIC_USER_IRQ_OFFSET + HardFault_IRQn - 1] =
+            (uintptr_t)(arch_exception_invalid),
+        [NVIC_USER_IRQ_OFFSET + MemoryManagement_IRQn - 1] =
+            (uintptr_t)(arch_exception_invalid),
+        [NVIC_USER_IRQ_OFFSET + BusFault_IRQn - 1] =
+            (uintptr_t)(arch_exception_invalid),
+        [NVIC_USER_IRQ_OFFSET + UsageFault_IRQn - 1] =
+            (uintptr_t)(arch_exception_invalid),
+        [NVIC_USER_IRQ_OFFSET + DebugMonitor_IRQn - 1] =
+            (uintptr_t)(arch_exception_invalid),
+
+#ifdef BUILD_HAS_MULTITHREADING
+        [NVIC_USER_IRQ_OFFSET + SVCall_IRQn - 1] =
+            (uintptr_t)(SVC_Handler),
+        [NVIC_USER_IRQ_OFFSET + PendSV_IRQn - 1] =
+            (uintptr_t)(PendSV_Handler),
+        [NVIC_USER_IRQ_OFFSET + SysTick_IRQn - 1] =
+            (uintptr_t)(SysTick_Handler),
+#else
+        [NVIC_USER_IRQ_OFFSET + SVCall_IRQn - 1] =
+            (uintptr_t)(arch_exception_invalid),
+        [NVIC_USER_IRQ_OFFSET + PendSV_IRQn - 1] =
+            (uintptr_t)(arch_exception_invalid),
+        [NVIC_USER_IRQ_OFFSET + SysTick_IRQn - 1] =
+            (uintptr_t)(arch_exception_invalid),
+#endif
     },
 };

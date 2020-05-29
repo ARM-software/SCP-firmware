@@ -11,14 +11,10 @@
 #include <fwk_assert.h>
 #include <fwk_macros.h>
 
+#include <fmw_cmsis.h>
+
 #include <stdbool.h>
 #include <stdint.h>
-
-#define SCB_CCR ((FWK_RW uint32_t *)(0xE000ED14))
-
-#define SCB_CCR_UNALIGN_TRP_MASK  (1U << 3)
-#define SCB_CCR_DIV_0_TRP_MASK    (1U << 4)
-#define SCB_CCR_STKALIGN_MASK     (1U << 9)
 
 extern int arch_nvic_init(struct fwk_arch_interrupt_driver **driver);
 extern int arch_mm_init(struct fwk_arch_mm_data *data);
@@ -77,8 +73,8 @@ static void arch_init_ccr(void)
      * (2) ARM® v7-M Architecture Reference Manual, section B1.5.7.
      */
 
-    *SCB_CCR |= SCB_CCR_DIV_0_TRP_MASK;
-    *SCB_CCR |= SCB_CCR_STKALIGN_MASK;
+    SCB->CCR |= SCB_CCR_DIV_0_TRP_Msk;
+    SCB->CCR |= SCB_CCR_STKALIGN_Msk;
 }
 
 int main(void)

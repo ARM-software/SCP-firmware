@@ -8,8 +8,6 @@
  *     Interrupt management.
  */
 
-#include <cmsis_compiler.h>
-
 #include <fwk_arch.h>
 #include <fwk_interrupt.h>
 #include <fwk_macros.h>
@@ -17,76 +15,38 @@
 #include <fwk_noreturn.h>
 #include <fwk_status.h>
 
+#include <fmw_cmsis.h>
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-
-#ifdef BUILD_HAS_MULTITHREADING
-#    include <rtx_os.h>
-#endif
+#include <string.h>
 
 extern noreturn void arch_exception_invalid(void);
 
-#define SCB_SHCSR ((FWK_RW uint32_t *)(0xE000ED24UL))
-#define SCB_VTOR ((FWK_RW uint32_t *)(0xE000ED08UL))
-#define SCS_ICTR ((FWK_R  uint32_t *)(0xE000E004UL))
-#define SCS_STIR ((FWK_W  uint32_t *)(0xE000EF00UL))
-#define SCS_NVIC ((struct nvic *)(0xE000E100UL))
-
-#define SCB_SHCSR_MEMFAULTENA_MASK  (1 << 16)
-#define SCB_SHCSR_BUSFAULTENA_MASK  (1 << 17)
-#define SCB_SHCSR_USGFAULTENA_MASK  (1 << 18)
-
-enum exception_num {
-    EXCEPTION_NUM_INVALID      = 0U,
-    EXCEPTION_NUM_RESET        = 1U,
-    EXCEPTION_NUM_NMI          = 2U,
-    EXCEPTION_NUM_HARDFAULT    = 3U,
-    EXCEPTION_NUM_MEMMANAGE    = 4U,
-    EXCEPTION_NUM_BUSFAULT     = 5U,
-    EXCEPTION_NUM_USAGEFAULT   = 6U,
-    EXCEPTION_NUM_SVCALL       = 11U,
-    EXCEPTION_NUM_DEBUGMONITOR = 12U,
-    EXCEPTION_NUM_PENDSV       = 14U,
-    EXCEPTION_NUM_SYSTICK      = 15U,
-    EXCEPTION_NUM_COUNT,
-};
-
-struct nvic {
-    FWK_RW uint32_t ISER[16];      /* Interrupt Set Enabled Register */
-           uint32_t RESERVED0[16];
-    FWK_RW uint32_t ICER[16];      /* Interrupt Clear Enabled Register */
-           uint32_t RESERVED1[16];
-    FWK_RW uint32_t ISPR[16];      /* Interrupt Set Pending Register  */
-           uint32_t RESERVED2[16];
-    FWK_RW uint32_t ICPR[16];      /* Interrupt Clear Pending Register */
-           uint32_t RESERVED3[16];
-    FWK_R  uint32_t IABR[16];      /* Interrupt Active Bit Register */
-           uint32_t RESERVED4[48];
-    FWK_W  uint32_t IPR[16];       /* Interrupt Priority Register */
-           uint32_t RESERVED5[48];
-};
-
-static uint32_t isr_count;
-static uint32_t irq_count;
+static unsigned int isr_count;
+static unsigned int irq_count;
 
 /*
  * For interrupts with parameters, their entry in the vector table points to a
  * global handler that calls a registered function in the callback table with a
  * corresponding parameter. Entries in the vector table for interrupts without
  * parameters point directly to the handler functions.
+ *
+ * Entry indices are offset by -1 relative to their interrupt numbers, as no
+ * interrupt may have an interrupt number of zero.
  */
 struct callback {
     void (*func)(uintptr_t param);
     uintptr_t param;
 };
 
-static void (**vector)(void);
 static struct callback *callback;
 
 static void irq_global(void)
 {
-    struct callback *entry = &callback[__get_IPSR()];
+    struct callback *entry = &callback[__get_IPSR() - 1];
+
     entry->func(entry->param);
 }
 
@@ -109,8 +69,7 @@ static int is_enabled(unsigned int interrupt, bool *enabled)
     if (interrupt >= irq_count)
         return FWK_E_PARAM;
 
-    *enabled = SCS_NVIC->ISER[interrupt / 32] &
-        (UINT32_C(1) << (interrupt & 0x1F));
+    *enabled = NVIC_GetEnableIRQ(interrupt);
 
     return FWK_SUCCESS;
 }
@@ -120,7 +79,7 @@ static int enable(unsigned int interrupt)
     if (interrupt >= irq_count)
         return FWK_E_PARAM;
 
-    SCS_NVIC->ISER[interrupt / 32] = UINT32_C(1) << (interrupt & 0x1F);
+    NVIC_EnableIRQ(interrupt);
 
     return FWK_SUCCESS;
 }
@@ -130,7 +89,7 @@ static int disable(unsigned int interrupt)
     if (interrupt >= irq_count)
         return FWK_E_PARAM;
 
-    SCS_NVIC->ICER[interrupt / 32] = UINT32_C(1) << (interrupt & 0x1F);
+    NVIC_DisableIRQ(interrupt);
 
     return FWK_SUCCESS;
 }
@@ -140,8 +99,7 @@ static int is_pending(unsigned int interrupt, bool *pending)
     if (interrupt >= irq_count)
         return FWK_E_PARAM;
 
-    *pending = SCS_NVIC->ISPR[interrupt / 32] &
-        (UINT32_C(1) << (interrupt & 0x1F));
+    *pending = NVIC_GetPendingIRQ(interrupt);
 
     return FWK_SUCCESS;
 }
@@ -151,7 +109,7 @@ static int set_pending(unsigned int interrupt)
     if (interrupt >= irq_count)
         return FWK_E_PARAM;
 
-    *SCS_STIR = interrupt;
+    NVIC_SetPendingIRQ(interrupt);
 
     return FWK_SUCCESS;
 }
@@ -161,7 +119,7 @@ static int clear_pending(unsigned int interrupt)
     if (interrupt >= irq_count)
         return FWK_E_PARAM;
 
-    SCS_NVIC->ICPR[interrupt / 32] = UINT32_C(1) << (interrupt & 0x1F);
+    NVIC_ClearPendingIRQ(interrupt);
 
     return FWK_SUCCESS;
 }
@@ -171,31 +129,32 @@ static int set_isr_irq(unsigned int interrupt, void (*isr)(void))
     if (interrupt >= irq_count)
         return FWK_E_PARAM;
 
-    vector[EXCEPTION_NUM_COUNT + interrupt] = isr;
+    NVIC_SetVector(interrupt, (uint32_t)isr);
 
     return FWK_SUCCESS;
 }
 
-static int set_isr_irq_param(unsigned int interrupt,
-                             void (*isr)(uintptr_t param),
-                             uintptr_t parameter)
+static int set_isr_irq_param(
+    unsigned int interrupt,
+    void (*isr)(uintptr_t param),
+    uintptr_t parameter)
 {
     struct callback *entry;
     if (interrupt >= irq_count)
         return FWK_E_PARAM;
 
-    vector[EXCEPTION_NUM_COUNT + interrupt] = irq_global;
-
-    entry = &callback[EXCEPTION_NUM_COUNT + interrupt];
+    entry = &callback[NVIC_USER_IRQ_OFFSET + interrupt - 1];
     entry->func = isr;
     entry->param = parameter;
+
+    NVIC_SetVector(interrupt, (uint32_t)irq_global);
 
     return FWK_SUCCESS;
 }
 
 static int set_isr_nmi(void (*isr)(void))
 {
-    vector[EXCEPTION_NUM_NMI] = isr;
+    NVIC_SetVector(NonMaskableInt_IRQn, (uint32_t)isr);
 
     return FWK_SUCCESS;
 }
@@ -204,21 +163,21 @@ static int set_isr_nmi_param(void (*isr)(uintptr_t param), uintptr_t parameter)
 {
     struct callback *entry;
 
-    vector[EXCEPTION_NUM_NMI] = irq_global;
-
-    entry = &callback[EXCEPTION_NUM_NMI];
+    entry = &callback[NVIC_USER_IRQ_OFFSET + NonMaskableInt_IRQn - 1];
     entry->func = isr;
     entry->param = parameter;
+
+    NVIC_SetVector(NonMaskableInt_IRQn, (uint32_t)irq_global);
 
     return FWK_SUCCESS;
 }
 
 static int set_isr_fault(void (*isr)(void))
 {
-    vector[EXCEPTION_NUM_HARDFAULT]  = isr;
-    vector[EXCEPTION_NUM_MEMMANAGE]  = isr;
-    vector[EXCEPTION_NUM_BUSFAULT]   = isr;
-    vector[EXCEPTION_NUM_USAGEFAULT] = isr;
+    NVIC_SetVector(HardFault_IRQn, (uint32_t)isr);
+    NVIC_SetVector(MemoryManagement_IRQn, (uint32_t)isr);
+    NVIC_SetVector(BusFault_IRQn, (uint32_t)isr);
+    NVIC_SetVector(UsageFault_IRQn, (uint32_t)isr);
 
     return FWK_SUCCESS;
 }
@@ -231,12 +190,12 @@ static int get_current(unsigned int *interrupt)
     if (*interrupt == 0)
         return FWK_E_STATE;
 
-    if (*interrupt == EXCEPTION_NUM_NMI)
+    if (*interrupt == (NVIC_USER_IRQ_OFFSET + NonMaskableInt_IRQn))
         *interrupt = FWK_INTERRUPT_NMI;
-    else if ((*interrupt) < EXCEPTION_NUM_COUNT)
+    else if (*interrupt < NVIC_USER_IRQ_OFFSET)
         *interrupt = FWK_INTERRUPT_EXCEPTION;
     else
-        *interrupt -= EXCEPTION_NUM_COUNT;
+        *interrupt -= NVIC_USER_IRQ_OFFSET;
 
     return FWK_SUCCESS;
 }
@@ -268,15 +227,17 @@ int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
     uint32_t ictr_intlinesnum;
     uint32_t align_entries;
     uint32_t align_word;
-    unsigned int i;
+
+    uint32_t *vector;
+    IRQn_Type irq;
 
     if (driver == NULL)
         return FWK_E_PARAM;
 
     /* Find the number of interrupt lines implemented in hardware */
-    ictr_intlinesnum = *SCS_ICTR & 0x0000000F;
+    ictr_intlinesnum = SCnSCB->ICTR & SCnSCB_ICTR_INTLINESNUM_Msk;
     irq_count = (ictr_intlinesnum + 1) * 32;
-    isr_count = irq_count + EXCEPTION_NUM_COUNT;
+    isr_count = NVIC_USER_IRQ_OFFSET + irq_count;
 
     /*
      * Allocate and initialize a table for the callback functions and their
@@ -299,45 +260,37 @@ int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
     /* Calculate alignment on a word boundary */
     align_word = align_entries * sizeof(vector[0]);
 
-    vector = fwk_mm_alloc_aligned(isr_count, sizeof(vector[0]), align_word);
+    /* Allocate and wipe the new vector table */
+    vector = fwk_mm_calloc_aligned(isr_count, sizeof(vector[0]), align_word);
 
-    /*
-     * Initialize all exception entries to point to the arch_exception_invalid()
-     * handler.
-     *
-     * Note: Initialization starts from entry 1 since entry 0 is not an
-     * exception pointer but the default stack pointer.
-     */
-    for (i = 1; i < EXCEPTION_NUM_COUNT; i++)
-        vector[i] = arch_exception_invalid;
-
-    /* Initialize IRQs */
-    for (i = 0; i < irq_count; i++) {
-        /* Initialize all IRQ entries to point to the irq_invalid() handler */
-        vector[EXCEPTION_NUM_COUNT + i] = irq_invalid;
-
-        /* Ensure IRQs are disabled during boot sequence */
-        disable(i);
-        clear_pending(i);
-    }
-
-#ifdef BUILD_HAS_MULTITHREADING
-    /* Set exception entries that are implemented and handled by RTX */
-    vector[EXCEPTION_NUM_SVCALL] = SVC_Handler;
-    vector[EXCEPTION_NUM_PENDSV] = PendSV_Handler;
-    vector[EXCEPTION_NUM_SYSTICK] = SysTick_Handler;
-#endif
+    /* Copy the processor exception table over to the new vector table */
+    memcpy(
+        vector,
+        (const void *)SCB->VTOR,
+        NVIC_USER_IRQ_OFFSET * sizeof(vector[0]));
 
     __DMB();
+
+    __disable_irq();
 
     /* Switch to the new vector table */
-    *SCB_VTOR = (uint32_t)vector;
-    __DMB();
+    SCB->VTOR = (uint32_t)vector;
+
+    /* Initialize IRQs */
+    for (irq = 0; irq < (IRQn_Type)irq_count; irq++) {
+        /* Ensure IRQs are disabled during boot sequence */
+        NVIC_DisableIRQ(irq);
+        NVIC_ClearPendingIRQ(irq);
+
+        /* Initialize all IRQ entries to point to the irq_invalid() handler */
+        NVIC_SetVector(irq, (uint32_t)irq_invalid);
+    }
+
+    __enable_irq();
 
     /* Enable the Usage, Bus and Memory faults which are disabled by default */
-    *SCB_SHCSR |= SCB_SHCSR_MEMFAULTENA_MASK |
-                  SCB_SHCSR_BUSFAULTENA_MASK |
-                  SCB_SHCSR_USGFAULTENA_MASK;
+    SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA_Msk | SCB_SHCSR_BUSFAULTENA_Msk |
+        SCB_SHCSR_USGFAULTENA_Msk;
 
     *driver = &arch_nvic_driver;
 
