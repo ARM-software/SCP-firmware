@@ -37,34 +37,34 @@
 
 #include <fmw_memory.h>
 
-#ifndef FIRMWARE_MEM_MODE
-    #error "FIRMWARE_MEM_MODE has not been configured"
+#ifndef FMW_MEM_MODE
+#    error "FMW_MEM_MODE has not been configured"
 #endif
 
-#if (FIRMWARE_MEM_MODE != FWK_MEM_MODE_SINGLE_REGION) && \
-    (FIRMWARE_MEM_MODE != FWK_MEM_MODE_DUAL_REGION_RELOCATION) && \
-    (FIRMWARE_MEM_MODE != FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION)
-    #error "FIRMWARE_MEM_MODE has been configured improperly"
+#if (FMW_MEM_MODE != FWK_MEM_MODE_SINGLE_REGION) && \
+    (FMW_MEM_MODE != FWK_MEM_MODE_DUAL_REGION_RELOCATION) && \
+    (FMW_MEM_MODE != FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION)
+#    error "FMW_MEM_MODE has been configured improperly"
 #endif
 
-#ifndef FIRMWARE_MEM0_BASE
-    #error "FIRMWARE_MEM0_BASE has not been configured"
+#ifndef FMW_MEM0_BASE
+#    error "FMW_MEM0_BASE has not been configured"
 #endif
 
-#ifndef FIRMWARE_MEM0_SIZE
-    #error "FIRMWARE_MEM0_SIZE has not been configured"
+#ifndef FMW_MEM0_SIZE
+#    error "FMW_MEM0_SIZE has not been configured"
 #endif
 
-#define FIRMWARE_MEM0_LIMIT (FIRMWARE_MEM0_BASE + FIRMWARE_MEM0_SIZE)
+#define FMW_MEM0_LIMIT (FMW_MEM0_BASE + FMW_MEM0_SIZE)
 
-#if FIRMWARE_MEM_MODE != FWK_MEM_MODE_SINGLE_REGION
-    #ifndef FIRMWARE_MEM1_BASE
-        #error "FIRMWARE_MEM1_BASE has not been configured"
-    #endif
+#if FMW_MEM_MODE != FWK_MEM_MODE_SINGLE_REGION
+#    ifndef FMW_MEM1_BASE
+#        error "FMW_MEM1_BASE has not been configured"
+#    endif
 
-    #ifndef FIRMWARE_MEM1_SIZE
-        #error "FIRMWARE_MEM1_SIZE has not been configured"
-    #endif
+#    ifndef FMW_MEM1_SIZE
+#        error "FMW_MEM1_SIZE has not been configured"
+#    endif
 
-    #define FIRMWARE_MEM1_LIMIT (FIRMWARE_MEM1_BASE + FIRMWARE_MEM1_SIZE)
+#    define FMW_MEM1_LIMIT (FMW_MEM1_BASE + FMW_MEM1_SIZE)
 #endif
