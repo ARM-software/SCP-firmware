@@ -31,6 +31,9 @@
  *      bus.
  */
 
+#ifndef ARCH_SCATTER_H
+#define ARCH_SCATTER_H
+
 #define ARCH_MEM_MODE_SINGLE_REGION 0
 #define ARCH_MEM_MODE_DUAL_REGION_RELOCATION 1
 #define ARCH_MEM_MODE_DUAL_REGION_NO_RELOCATION 2
@@ -68,3 +71,5 @@
 
 #    define ARCH_MEM1_LIMIT (FMW_MEM1_BASE + FMW_MEM1_SIZE)
 #endif
+
+#endif /* ARCH_SCATTER_H */
