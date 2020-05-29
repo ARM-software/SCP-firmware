@@ -11,13 +11,13 @@
 #include <fwk_assert.h>
 #include <fwk_macros.h>
 
+#include <arch_mm.h>
+#include <arch_nvic.h>
+
 #include <fmw_cmsis.h>
 
 #include <stdbool.h>
 #include <stdint.h>
-
-extern int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver);
-extern int arch_mm_init(struct fwk_arch_mm_data *data);
 
 #if defined(__ARMCC_VERSION)
 /*
