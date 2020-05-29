@@ -16,7 +16,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-extern int arch_nvic_init(struct fwk_arch_interrupt_driver **driver);
+extern int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver);
 extern int arch_mm_init(struct fwk_arch_mm_data *data);
 
 #if defined(__ARMCC_VERSION)
@@ -52,7 +52,7 @@ void _exit(int status)
 }
 #endif
 
-static struct fwk_arch_init_driver arch_init_driver = {
+static const struct fwk_arch_init_driver arch_init_driver = {
     .mm = arch_mm_init,
     .interrupt = arch_nvic_init,
 };

@@ -37,7 +37,7 @@ int __wrap_fwk_interrupt_init(const struct fwk_arch_interrupt_driver *driver)
     return fwk_interrupt_init_return_val;
 }
 
-int interrupt_init_handler(struct fwk_arch_interrupt_driver **driver)
+int interrupt_init_handler(const struct fwk_arch_interrupt_driver **driver)
 {
     return interrupt_init_handler_return_val;
 }
