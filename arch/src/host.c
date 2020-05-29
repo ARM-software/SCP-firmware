@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-extern int arch_interrupt_init(struct fwk_arch_interrupt_driver **driver);
+extern int arch_interrupt_init(const struct fwk_arch_interrupt_driver **driver);
 
 /*
  * Catches early failures in the initialization.

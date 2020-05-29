@@ -38,11 +38,11 @@ static int mm_init(int (*mm_init_handler)(struct fwk_arch_mm_data *data))
     return FWK_SUCCESS;
 }
 
-static int interrupt_init(
-    int (*interrupt_init_handler)(struct fwk_arch_interrupt_driver **driver))
+static int interrupt_init(int (*interrupt_init_handler)(
+    const struct fwk_arch_interrupt_driver **driver))
 {
     int status;
-    struct fwk_arch_interrupt_driver *driver;
+    const struct fwk_arch_interrupt_driver *driver;
 
     /*
      * Retrieve a pointer to the interrupt management driver from the

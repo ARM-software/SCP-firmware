@@ -226,7 +226,7 @@ struct fwk_arch_init_driver {
      * \retval FWK_E_PARAM The parameter received by the handler is invalid.
      * \retval FWK_E_PANIC Unrecoverable initialization error.
      */
-    int (*interrupt)(struct fwk_arch_interrupt_driver **driver);
+    int (*interrupt)(const struct fwk_arch_interrupt_driver **driver);
 };
 
 /*!
