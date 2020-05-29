@@ -10,7 +10,7 @@
 
 #include "system_mmap_scp.h"
 
-#define FMW_MEM_MODE FWK_MEM_MODE_SINGLE_REGION
+#define FMW_MEM_MODE ARCH_MEM_MODE_SINGLE_REGION
 
 /* RAM */
 #define FMW_MEM0_BASE SCP_RAM_BASE

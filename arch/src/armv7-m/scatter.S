@@ -10,7 +10,7 @@
 
 #include "scatter.h"
 
-#if FMW_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
+#if FMW_MEM_MODE == ARCH_MEM_MODE_SINGLE_REGION
 /*
  * Single region memory layout:
  *  - MEM0 accepts:
@@ -22,7 +22,7 @@
 #    define ARCH_X_BASE +0
 #    define ARCH_R_BASE +0
 #    define ARCH_W_BASE +0
-#elif FMW_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_RELOCATION
+#elif FMW_MEM_MODE == ARCH_MEM_MODE_DUAL_REGION_RELOCATION
 /*
  * Dual region memory layout with initialized data relocation:
  *  - MEM0 accepts:
@@ -37,7 +37,7 @@
 #    define ARCH_R_BASE +0
 
 #    define ARCH_W_BASE FMW_MEM1_BASE
-#elif FMW_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION
+#elif FMW_MEM_MODE == ARCH_MEM_MODE_DUAL_REGION_NO_RELOCATION
     /*
      * Dual region memory layout without initialized data relocation:
      *  - MEM0 accepts:
@@ -54,7 +54,7 @@
 #    define ARCH_W_BASE +0
 #endif
 
-#if FMW_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
+#if FMW_MEM_MODE == ARCH_MEM_MODE_SINGLE_REGION
 #    define ARCH_W_LIMIT ARCH_MEM0_LIMIT
 #else
 #    define ARCH_W_LIMIT ARCH_MEM1_LIMIT

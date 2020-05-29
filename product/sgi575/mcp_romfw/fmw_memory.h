@@ -13,7 +13,7 @@
 
 #include "mcp_system_mmap_mcp.h"
 
-#define FMW_MEM_MODE FWK_MEM_MODE_DUAL_REGION_RELOCATION
+#define FMW_MEM_MODE ARCH_MEM_MODE_DUAL_REGION_RELOCATION
 
 /*
  * ROM memory

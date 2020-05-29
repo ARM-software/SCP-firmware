@@ -13,7 +13,7 @@
 ENTRY(arch_exception_reset)
 
 MEMORY {
-#if FMW_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
+#if FMW_MEM_MODE == ARCH_MEM_MODE_SINGLE_REGION
     /*
      * Single region memory layout:
      *  - MEM0 accepts:
@@ -23,7 +23,7 @@ MEMORY {
      */
 
     mem0 (rwx) : ORIGIN = FMW_MEM0_BASE, LENGTH = FMW_MEM0_SIZE
-#elif FMW_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_RELOCATION
+#elif FMW_MEM_MODE == ARCH_MEM_MODE_DUAL_REGION_RELOCATION
     /*
      * Dual region memory layout with initialized data relocation:
      *  - MEM0 accepts:
@@ -36,7 +36,7 @@ MEMORY {
 
     mem0 (rx) : ORIGIN = FMW_MEM0_BASE, LENGTH = FMW_MEM0_SIZE
     mem1 (w) : ORIGIN = FMW_MEM1_BASE, LENGTH = FMW_MEM1_SIZE
-#elif FMW_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION
+#elif FMW_MEM_MODE == ARCH_MEM_MODE_DUAL_REGION_NO_RELOCATION
     /*
      * Dual region memory layout without initialized data relocation:
      *  - MEM0 accepts:
@@ -52,15 +52,15 @@ MEMORY {
 #endif
 }
 
-#if FMW_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
+#if FMW_MEM_MODE == ARCH_MEM_MODE_SINGLE_REGION
     REGION_ALIAS("r", mem0);
     REGION_ALIAS("w", mem0);
     REGION_ALIAS("x", mem0);
-#elif FMW_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_RELOCATION
+#elif FMW_MEM_MODE == ARCH_MEM_MODE_DUAL_REGION_RELOCATION
     REGION_ALIAS("r", mem0);
     REGION_ALIAS("w", mem1);
     REGION_ALIAS("x", mem0);
-#elif FMW_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION
+#elif FMW_MEM_MODE == ARCH_MEM_MODE_DUAL_REGION_NO_RELOCATION
     REGION_ALIAS("r", mem1);
     REGION_ALIAS("w", mem1);
     REGION_ALIAS("x", mem0);
