@@ -44,6 +44,6 @@ BS_FIRMWARE_SOURCES := \
     config_bootloader.c \
     juno_pll_workaround.c
 
-LDFLAGS_GCC += -Wl,--wrap=arm_exception_reset
+LDFLAGS_GCC += -Wl,--wrap=arch_exception_reset
 
 include $(BS_DIR)/firmware.mk

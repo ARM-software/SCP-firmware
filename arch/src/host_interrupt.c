@@ -104,7 +104,7 @@ static const struct fwk_arch_interrupt_driver driver = {
     .get_current    = get_current,
 };
 
-int host_interrupt_init(const struct fwk_arch_interrupt_driver **_driver)
+int arch_interrupt_init(const struct fwk_arch_interrupt_driver **_driver)
 {
     if (_driver == NULL)
         return FWK_E_PARAM;

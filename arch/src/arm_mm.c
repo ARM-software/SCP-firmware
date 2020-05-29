@@ -15,7 +15,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-int arm_mm_init(struct fwk_arch_mm_data *data)
+int arch_mm_init(struct fwk_arch_mm_data *data)
 {
     fwk_assert(data != NULL);
 

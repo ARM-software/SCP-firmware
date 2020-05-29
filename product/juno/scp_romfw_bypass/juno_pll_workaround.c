@@ -15,8 +15,8 @@
 #include <fwk_noreturn.h>
 
 #ifdef __ARMCC_VERSION
-#   define __wrap_arm_exception_reset $Sub$$arm_exception_reset
-#   define __real_arm_exception_reset $Super$$arm_exception_reset
+#    define __wrap_arch_exception_reset $Sub$$arch_exception_reset
+#    define __real_arch_exception_reset $Super$$arch_exception_reset
 #endif
 
 /*
@@ -25,9 +25,9 @@
  * error out. We do this at the earliest possible point in time in order to
  * ensure nothing delays it from happening.
  */
-noreturn void __wrap_arm_exception_reset(void)
+noreturn void __wrap_arch_exception_reset(void)
 {
-    extern noreturn void __real_arm_exception_reset(void);
+    extern noreturn void __real_arch_exception_reset(void);
 
     unsigned int pll_idx;
 
@@ -35,5 +35,5 @@ noreturn void __wrap_arm_exception_reset(void)
     for (pll_idx = 0; pll_idx < PLL_IDX_COUNT; pll_idx++)
         SCC->PLL[pll_idx].REG0 &= ~PLL_REG0_PLL_RESET;
 
-    __real_arm_exception_reset();
+    __real_arch_exception_reset();
 }

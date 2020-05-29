@@ -25,7 +25,7 @@
 #    include <rtx_os.h>
 #endif
 
-extern noreturn void arm_exception_invalid(void);
+extern noreturn void arch_exception_invalid(void);
 
 #define SCB_SHCSR ((FWK_RW uint32_t *)(0xE000ED24UL))
 #define SCB_VTOR ((FWK_RW uint32_t *)(0xE000ED08UL))
@@ -241,21 +241,21 @@ static int get_current(unsigned int *interrupt)
     return FWK_SUCCESS;
 }
 
-static const struct fwk_arch_interrupt_driver arm_nvic_driver = {
-    .global_enable     = global_enable,
-    .global_disable    = global_disable,
-    .is_enabled        = is_enabled,
-    .enable            = enable,
-    .disable           = disable,
-    .is_pending        = is_pending,
-    .set_pending       = set_pending,
-    .clear_pending     = clear_pending,
-    .set_isr_irq       = set_isr_irq,
+static const struct fwk_arch_interrupt_driver arch_nvic_driver = {
+    .global_enable = global_enable,
+    .global_disable = global_disable,
+    .is_enabled = is_enabled,
+    .enable = enable,
+    .disable = disable,
+    .is_pending = is_pending,
+    .set_pending = set_pending,
+    .clear_pending = clear_pending,
+    .set_isr_irq = set_isr_irq,
     .set_isr_irq_param = set_isr_irq_param,
-    .set_isr_nmi       = set_isr_nmi,
+    .set_isr_nmi = set_isr_nmi,
     .set_isr_nmi_param = set_isr_nmi_param,
-    .set_isr_fault     = set_isr_fault,
-    .get_current       = get_current,
+    .set_isr_fault = set_isr_fault,
+    .get_current = get_current,
 };
 
 static void irq_invalid(void)
@@ -263,7 +263,7 @@ static void irq_invalid(void)
     disable(__get_IPSR());
 }
 
-int arm_nvic_init(const struct fwk_arch_interrupt_driver **driver)
+int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
 {
     uint32_t ictr_intlinesnum;
     uint32_t align_entries;
@@ -302,14 +302,14 @@ int arm_nvic_init(const struct fwk_arch_interrupt_driver **driver)
     vector = fwk_mm_alloc_aligned(isr_count, sizeof(vector[0]), align_word);
 
     /*
-     * Initialize all exception entries to point to the arm_exception_invalid()
+     * Initialize all exception entries to point to the arch_exception_invalid()
      * handler.
      *
      * Note: Initialization starts from entry 1 since entry 0 is not an
      * exception pointer but the default stack pointer.
      */
     for (i = 1; i < EXCEPTION_NUM_COUNT; i++)
-        vector[i] = arm_exception_invalid;
+        vector[i] = arch_exception_invalid;
 
     /* Initialize IRQs */
     for (i = 0; i < irq_count; i++) {
@@ -339,7 +339,7 @@ int arm_nvic_init(const struct fwk_arch_interrupt_driver **driver)
                   SCB_SHCSR_BUSFAULTENA_MASK |
                   SCB_SHCSR_USGFAULTENA_MASK;
 
-    *driver = &arm_nvic_driver;
+    *driver = &arch_nvic_driver;
 
     return FWK_SUCCESS;
 }

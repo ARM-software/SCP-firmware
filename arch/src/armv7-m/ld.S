@@ -10,7 +10,7 @@
 
 #include "scatter.h"
 
-ENTRY(arm_exception_reset)
+ENTRY(arch_exception_reset)
 
 MEMORY {
 #if FIRMWARE_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
