@@ -10,34 +10,34 @@
 
 #include "scatter.h"
 
-#if FIRMWARE_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
-    /*
-     * Single region memory layout:
-     *  - MEM0 accepts:
-     *      - Read-only sections
-     *      - Read-write sections
-     *      - Executable sections
-     */
+#if FMW_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
+/*
+ * Single region memory layout:
+ *  - MEM0 accepts:
+ *      - Read-only sections
+ *      - Read-write sections
+ *      - Executable sections
+ */
 
-    #define FIRMWARE_X_BASE +0
-    #define FIRMWARE_R_BASE +0
-    #define FIRMWARE_W_BASE +0
-#elif FIRMWARE_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_RELOCATION
-    /*
-     * Dual region memory layout with initialized data relocation:
-     *  - MEM0 accepts:
-     *      - Read-only sections
-     *      - Executable sections
-     *
-     *  - MEM1 accepts:
-     *      - Read-write sections
-     */
+#    define FMW_X_BASE +0
+#    define FMW_R_BASE +0
+#    define FMW_W_BASE +0
+#elif FMW_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_RELOCATION
+/*
+ * Dual region memory layout with initialized data relocation:
+ *  - MEM0 accepts:
+ *      - Read-only sections
+ *      - Executable sections
+ *
+ *  - MEM1 accepts:
+ *      - Read-write sections
+ */
 
-    #define FIRMWARE_X_BASE +0
-    #define FIRMWARE_R_BASE +0
+#    define FMW_X_BASE +0
+#    define FMW_R_BASE +0
 
-    #define FIRMWARE_W_BASE FIRMWARE_MEM1_BASE
-#elif FIRMWARE_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION
+#    define FMW_W_BASE FMW_MEM1_BASE
+#elif FMW_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION
     /*
      * Dual region memory layout without initialized data relocation:
      *  - MEM0 accepts:
@@ -48,20 +48,20 @@
      *      - Read-write sections
      */
 
-    #define FIRMWARE_X_BASE +0
+#    define FMW_X_BASE +0
 
-    #define FIRMWARE_R_BASE FIRMWARE_MEM1_BASE
-    #define FIRMWARE_W_BASE +0
+#    define FMW_R_BASE FMW_MEM1_BASE
+#    define FMW_W_BASE +0
 #endif
 
-#if FIRMWARE_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
-    #define FIRMWARE_W_LIMIT FIRMWARE_MEM0_LIMIT
+#if FMW_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
+#    define FMW_W_LIMIT FMW_MEM0_LIMIT
 #else
-    #define FIRMWARE_W_LIMIT FIRMWARE_MEM1_LIMIT
+#    define FMW_W_LIMIT FMW_MEM1_LIMIT
 #endif
 
-LR_FIRMWARE FIRMWARE_MEM0_BASE {
-    ER_EXCEPTIONS FIRMWARE_X_BASE {
+LR_FIRMWARE FMW_MEM0_BASE {
+    ER_EXCEPTIONS FMW_X_BASE {
         *(.exceptions)
     }
 
@@ -69,11 +69,11 @@ LR_FIRMWARE FIRMWARE_MEM0_BASE {
         *(+CODE)
     }
 
-    ER_RODATA FIRMWARE_R_BASE {
+    ER_RODATA FMW_R_BASE {
         *(+CONST)
     }
 
-    ER_DATA FIRMWARE_W_BASE {
+    ER_DATA FMW_W_BASE {
         *(+DATA)
     }
 
@@ -81,5 +81,5 @@ LR_FIRMWARE FIRMWARE_MEM0_BASE {
         *(+BSS)
     }
 
-    ARM_LIB_STACKHEAP +0 EMPTY (FIRMWARE_W_LIMIT - +0) { }
+    ARM_LIB_STACKHEAP +0 EMPTY (FMW_W_LIMIT - +0) { }
 }

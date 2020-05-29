@@ -37,8 +37,8 @@
 #    include <fmw_memory.h>
 #endif
 
-#ifndef FIRMWARE_STACK_SIZE
-#    define FIRMWARE_STACK_SIZE 1536
+#ifndef FMW_STACK_SIZE
+#    define FMW_STACK_SIZE 1536
 #endif
 
 #define SIGNAL_ISR_EVENT 0x01
@@ -70,7 +70,7 @@ static int init_thread_attr(osThreadAttr_t *attr)
     attr->cb_size = osRtxThreadCbSize;
     attr->cb_mem = fwk_mm_calloc(1, attr->cb_size);
 
-    attr->stack_size = FIRMWARE_STACK_SIZE;
+    attr->stack_size = FMW_STACK_SIZE;
     attr->stack_mem = fwk_mm_calloc(1, attr->stack_size);
 
     attr->priority = osPriorityNormal;

@@ -68,20 +68,19 @@ data for each of these modules.
 
 For each firmware, linker information must be provided in a *fmw_memory.h* file:
 
-- FIRMWARE_MEM_MODE: The desired memory region configuration. Can be one of the
-    following:
+- FMW_MEM_MODE: The desired memory region configuration. Can be one of the
+  following:
     - FWK_MEM_MODE_SINGLE_REGION
     - FWK_MEM_MODE_DUAL_REGION_RELOCATION
     - FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION
-- FIRMWARE_MEM0_BASE: The base address of the MEM0 region, which is always
-    used regardless of the memory region configuration given by
-    *FIRMWARE_MEM_MODE*.
-- FIRMWARE_MEM0_SIZE: The size of the MEM0 region in bytes.
-- FIRMWARE_STACK_SIZE (if multithreading enabled): The size of each individual
-    thread stack in bytes.
+- FMW_MEM0_BASE: The base address of the MEM0 region, which is always
+  used regardless of the memory region configuration given by *FMW_MEM_MODE*.
+- FMW_MEM0_SIZE: The size of the MEM0 region in bytes.
+- FMW_STACK_SIZE (if multithreading enabled): The size of each individual
+  thread stack in bytes.
 
-If a dual-region memory configuration is used then *FIRMWARE_MEM1_BASE* and
-*FIRMWARE_MEM1_SIZE* must also be defined.
+If a dual-region memory configuration is used then *FMW_MEM1_BASE* and
+*FMW_MEM1_SIZE* must also be defined.
 
 It is the responsibility of the firmware to define - in its Makefile - the
 architecture target for the image (using *BS_FIRMWARE_CPU*) and whether the
