@@ -70,9 +70,9 @@ For each firmware, linker information must be provided in a *fmw_memory.h* file:
 
 - FMW_MEM_MODE: The desired memory region configuration. Can be one of the
   following:
-    - FWK_MEM_MODE_SINGLE_REGION
-    - FWK_MEM_MODE_DUAL_REGION_RELOCATION
-    - FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION
+    - ARCH_MEM_MODE_SINGLE_REGION
+    - ARCH_MEM_MODE_DUAL_REGION_RELOCATION
+    - ARCH_MEM_MODE_DUAL_REGION_NO_RELOCATION
 - FMW_MEM0_BASE: The base address of the MEM0 region, which is always
   used regardless of the memory region configuration given by *FMW_MEM_MODE*.
 - FMW_MEM0_SIZE: The size of the MEM0 region in bytes.

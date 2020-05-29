@@ -14,7 +14,7 @@
 #include "scp_mmap.h"
 #include "scp_software_mmap.h"
 
-#define FMW_MEM_MODE FWK_MEM_MODE_DUAL_REGION_RELOCATION
+#define FMW_MEM_MODE ARCH_MEM_MODE_DUAL_REGION_RELOCATION
 
 /*
  * ROM memory
