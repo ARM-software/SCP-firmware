@@ -5,6 +5,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#ifndef ARCH_EXCEPTIONS_H
+#define ARCH_EXCEPTIONS_H
+
 #include <fwk_noreturn.h>
 
 /*!
@@ -21,3 +24,5 @@ noreturn void arch_exception_reset(void);
  *      that have not been configured with a handler of their own.
  */
 noreturn void arch_exception_invalid(void);
+
+#endif /* ARCH_EXCEPTIONS_H */
