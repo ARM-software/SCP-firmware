@@ -68,22 +68,6 @@ def main():
     result = subprocess.call(cmd, shell=True)
     results.append(('Framework build (Cortex-M3, ARM)', result))
 
-    banner('Test building arch library')
-
-    cmd = \
-        'CC=arm-none-eabi-gcc ' \
-        'BS_FIRMWARE_CPU=cortex-m3 ' \
-        'make clean lib-arch -j'
-    result = subprocess.call(cmd, shell=True)
-    results.append(('Arch build (Cortex-M3, GCC)', result))
-
-    cmd = \
-        'CC=armclang ' \
-        'BS_FIRMWARE_CPU=cortex-m3 ' \
-        'make clean lib-arch -j'
-    result = subprocess.call(cmd, shell=True)
-    results.append(('Arch build (Cortex-M3, ARM)', result))
-
     banner('Test building host product')
 
     cmd = \
