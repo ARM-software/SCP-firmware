@@ -55,7 +55,7 @@
 #    error "FMW_MEM0_SIZE has not been configured"
 #endif
 
-#define FMW_MEM0_LIMIT (FMW_MEM0_BASE + FMW_MEM0_SIZE)
+#define ARCH_MEM0_LIMIT (FMW_MEM0_BASE + FMW_MEM0_SIZE)
 
 #if FMW_MEM_MODE != FWK_MEM_MODE_SINGLE_REGION
 #    ifndef FMW_MEM1_BASE
@@ -66,5 +66,5 @@
 #        error "FMW_MEM1_SIZE has not been configured"
 #    endif
 
-#    define FMW_MEM1_LIMIT (FMW_MEM1_BASE + FMW_MEM1_SIZE)
+#    define ARCH_MEM1_LIMIT (FMW_MEM1_BASE + FMW_MEM1_SIZE)
 #endif

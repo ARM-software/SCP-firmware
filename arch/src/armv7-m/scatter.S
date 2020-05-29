@@ -19,9 +19,9 @@
  *      - Executable sections
  */
 
-#    define FMW_X_BASE +0
-#    define FMW_R_BASE +0
-#    define FMW_W_BASE +0
+#    define ARCH_X_BASE +0
+#    define ARCH_R_BASE +0
+#    define ARCH_W_BASE +0
 #elif FMW_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_RELOCATION
 /*
  * Dual region memory layout with initialized data relocation:
@@ -33,10 +33,10 @@
  *      - Read-write sections
  */
 
-#    define FMW_X_BASE +0
-#    define FMW_R_BASE +0
+#    define ARCH_X_BASE +0
+#    define ARCH_R_BASE +0
 
-#    define FMW_W_BASE FMW_MEM1_BASE
+#    define ARCH_W_BASE FMW_MEM1_BASE
 #elif FMW_MEM_MODE == FWK_MEM_MODE_DUAL_REGION_NO_RELOCATION
     /*
      * Dual region memory layout without initialized data relocation:
@@ -48,20 +48,20 @@
      *      - Read-write sections
      */
 
-#    define FMW_X_BASE +0
+#    define ARCH_X_BASE +0
 
-#    define FMW_R_BASE FMW_MEM1_BASE
-#    define FMW_W_BASE +0
+#    define ARCH_R_BASE FMW_MEM1_BASE
+#    define ARCH_W_BASE +0
 #endif
 
 #if FMW_MEM_MODE == FWK_MEM_MODE_SINGLE_REGION
-#    define FMW_W_LIMIT FMW_MEM0_LIMIT
+#    define ARCH_W_LIMIT ARCH_MEM0_LIMIT
 #else
-#    define FMW_W_LIMIT FMW_MEM1_LIMIT
+#    define ARCH_W_LIMIT ARCH_MEM1_LIMIT
 #endif
 
 LR_FIRMWARE FMW_MEM0_BASE {
-    ER_EXCEPTIONS FMW_X_BASE {
+    ER_EXCEPTIONS ARCH_X_BASE {
         *(.exceptions)
     }
 
@@ -69,11 +69,11 @@ LR_FIRMWARE FMW_MEM0_BASE {
         *(+CODE)
     }
 
-    ER_RODATA FMW_R_BASE {
+    ER_RODATA ARCH_R_BASE {
         *(+CONST)
     }
 
-    ER_DATA FMW_W_BASE {
+    ER_DATA ARCH_W_BASE {
         *(+DATA)
     }
 
@@ -81,5 +81,5 @@ LR_FIRMWARE FMW_MEM0_BASE {
         *(+BSS)
     }
 
-    ARM_LIB_STACKHEAP +0 EMPTY (FMW_W_LIMIT - +0) { }
+    ARM_LIB_STACKHEAP +0 EMPTY (ARCH_W_LIMIT - +0) { }
 }
