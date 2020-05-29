@@ -14,7 +14,7 @@
 
 #include <stdbool.h>
 
-noreturn void arm_exception_reset(void)
+noreturn void arch_exception_reset(void)
 {
     /*
      * When entering the firmware, before the framework is entered the following
@@ -40,7 +40,7 @@ noreturn void arm_exception_reset(void)
 #endif
 }
 
-noreturn __attribute__((weak)) void arm_exception_invalid(void)
+noreturn __attribute__((weak)) void arch_exception_invalid(void)
 {
     while (true)
         __WFI();

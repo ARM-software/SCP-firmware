@@ -345,7 +345,7 @@ static bool exception_handler(const int exception,
     return false;
 }
 
-void arm_exception_invalid(void)
+void arch_exception_invalid(void)
 {
     struct context *context;
     __asm__ volatile(

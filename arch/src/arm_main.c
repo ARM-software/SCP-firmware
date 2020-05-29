@@ -20,8 +20,8 @@
 #define SCB_CCR_DIV_0_TRP_MASK    (1U << 4)
 #define SCB_CCR_STKALIGN_MASK     (1U << 9)
 
-extern int arm_nvic_init(struct fwk_arch_interrupt_driver **driver);
-extern int arm_mm_init(struct fwk_arch_mm_data *data);
+extern int arch_nvic_init(struct fwk_arch_interrupt_driver **driver);
+extern int arch_mm_init(struct fwk_arch_mm_data *data);
 
 #if defined(__ARMCC_VERSION)
 /*
@@ -57,11 +57,11 @@ void _exit(int status)
 #endif
 
 static struct fwk_arch_init_driver arch_init_driver = {
-    .mm = arm_mm_init,
-    .interrupt = arm_nvic_init,
+    .mm = arch_mm_init,
+    .interrupt = arch_nvic_init,
 };
 
-static void arm_init_ccr(void)
+static void arch_init_ccr(void)
 {
     /*
      * Set up the Configuration Control Register (CCR) in the System Control
@@ -83,7 +83,7 @@ static void arm_init_ccr(void)
 
 int main(void)
 {
-    arm_init_ccr();
+    arch_init_ccr();
 
     return fwk_arch_init(&arch_init_driver);
 }

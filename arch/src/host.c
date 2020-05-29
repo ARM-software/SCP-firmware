@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-extern int host_interrupt_init(struct fwk_arch_interrupt_driver **driver);
+extern int arch_interrupt_init(struct fwk_arch_interrupt_driver **driver);
 
 /*
  * Catches early failures in the initialization.
@@ -40,7 +40,7 @@ static int mm_init(struct fwk_arch_mm_data *data)
 
 static const struct fwk_arch_init_driver arch_init_driver = {
     .mm = mm_init,
-    .interrupt = host_interrupt_init,
+    .interrupt = arch_interrupt_init,
 };
 
 int main(void)

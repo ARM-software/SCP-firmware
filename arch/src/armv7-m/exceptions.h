@@ -12,7 +12,7 @@
  *
  * \details This is the first function that executes when the core comes online.
  */
-noreturn void arm_exception_reset(void);
+noreturn void arch_exception_reset(void);
 
 /*!
  * \brief Invalid exception handler.
@@ -20,4 +20,4 @@ noreturn void arm_exception_reset(void);
  * \details This handler is used as the default in order to catch exceptions
  *      that have not been configured with a handler of their own.
  */
-noreturn void arm_exception_invalid(void);
+noreturn void arch_exception_invalid(void);

@@ -54,11 +54,11 @@ enum {
 #ifdef __ARMCC_VERSION
 extern char Image$$ARM_LIB_STACKHEAP$$ZI$$Limit;
 
-#   define arm_exception_stack (&Image$$ARM_LIB_STACKHEAP$$ZI$$Limit)
+#    define arch_exception_stack (&Image$$ARM_LIB_STACKHEAP$$ZI$$Limit)
 #else
 extern char __stackheap_end__;
 
-#   define arm_exception_stack (&__stackheap_end__)
+#    define arch_exception_stack (&__stackheap_end__)
 #endif
 
 /*
@@ -70,18 +70,18 @@ extern char __stackheap_end__;
 const struct {
     uintptr_t stack;
     uintptr_t exceptions[15];
-} arm_exceptions __attribute__((section(".exceptions"))) = {
-    .stack = (uintptr_t)(arm_exception_stack),
+} arch_exceptions __attribute__((section(".exceptions"))) = {
+    .stack = (uintptr_t)(arch_exception_stack),
     .exceptions = {
-        [EXCEPTION_RESET] = (uintptr_t)(arm_exception_reset),
-        [EXCEPTION_NMI] = (uintptr_t)(arm_exception_invalid),
-        [EXCEPTION_HARDFAULT] = (uintptr_t)(arm_exception_invalid),
-        [EXCEPTION_MEMMANAGE] = (uintptr_t)(arm_exception_invalid),
-        [EXCEPTION_BUSFAULT] = (uintptr_t)(arm_exception_invalid),
-        [EXCEPTION_USAGEFAULT] = (uintptr_t)(arm_exception_invalid),
-        [EXCEPTION_SVCALL] = (uintptr_t)(arm_exception_invalid),
-        [EXCEPTION_DEBUGMONITOR] = (uintptr_t)(arm_exception_invalid),
-        [EXCEPTION_PENDSV] = (uintptr_t)(arm_exception_invalid),
-        [EXCEPTION_SYSTICK] = (uintptr_t)(arm_exception_invalid),
-    }
+        [EXCEPTION_RESET] = (uintptr_t)(arch_exception_reset),
+        [EXCEPTION_NMI] = (uintptr_t)(arch_exception_invalid),
+        [EXCEPTION_HARDFAULT] = (uintptr_t)(arch_exception_invalid),
+        [EXCEPTION_MEMMANAGE] = (uintptr_t)(arch_exception_invalid),
+        [EXCEPTION_BUSFAULT] = (uintptr_t)(arch_exception_invalid),
+        [EXCEPTION_USAGEFAULT] = (uintptr_t)(arch_exception_invalid),
+        [EXCEPTION_SVCALL] = (uintptr_t)(arch_exception_invalid),
+        [EXCEPTION_DEBUGMONITOR] = (uintptr_t)(arch_exception_invalid),
+        [EXCEPTION_PENDSV] = (uintptr_t)(arch_exception_invalid),
+        [EXCEPTION_SYSTICK] = (uintptr_t)(arch_exception_invalid),
+    },
 };
