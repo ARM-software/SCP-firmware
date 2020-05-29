@@ -15,14 +15,14 @@
 #include <fwk_noreturn.h>
 #include <fwk_status.h>
 
+#include <arch_exceptions.h>
+
 #include <fmw_cmsis.h>
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-
-extern noreturn void arch_exception_invalid(void);
 
 static unsigned int isr_count;
 static unsigned int irq_count;

@@ -9,10 +9,10 @@
 #include <fwk_noreturn.h>
 #include <fwk_status.h>
 
+#include <arch_interrupt.h>
+
 #include <stdio.h>
 #include <stdlib.h>
-
-extern int arch_interrupt_init(const struct fwk_arch_interrupt_driver **driver);
 
 /*
  * Catches early failures in the initialization.
