@@ -13,7 +13,6 @@
 #include "n1sdp_pik_cpu.h"
 #include "n1sdp_pik_debug.h"
 #include "n1sdp_pik_scp.h"
-#include "n1sdp_scp_irq.h"
 #include "n1sdp_scp_mmap.h"
 #include "n1sdp_scp_pik.h"
 #include "n1sdp_scp_scmi.h"

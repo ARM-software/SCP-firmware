@@ -6,7 +6,6 @@
  */
 
 #include "config_clock.h"
-#include "n1sdp_scp_irq.h"
 #include "n1sdp_scp_mmap.h"
 
 #include <mod_n1sdp_i2c.h>
@@ -16,6 +15,8 @@
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+
+#include <fmw_cmsis.h>
 
 #include <stdbool.h>
 

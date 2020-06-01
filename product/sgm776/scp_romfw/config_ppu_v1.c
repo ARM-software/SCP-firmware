@@ -5,7 +5,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "sgm776_irq.h"
 #include "sgm776_mmap.h"
 
 #include <mod_msys_rom.h>
@@ -16,6 +15,8 @@
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+
+#include <fmw_cmsis.h>
 
 #include <stdbool.h>
 

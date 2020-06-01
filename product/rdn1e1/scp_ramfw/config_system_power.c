@@ -6,7 +6,6 @@
  */
 
 #include "rdn1e1_core.h"
-#include "scp_rdn1e1_irq.h"
 
 #include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
@@ -18,6 +17,8 @@
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+
+#include <fmw_cmsis.h>
 
 #include <stdint.h>
 

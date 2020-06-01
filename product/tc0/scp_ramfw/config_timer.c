@@ -5,7 +5,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "scp_tc0_irq.h"
 #include "tc0_timer.h"
 
 #include <mod_timer.h>
@@ -14,6 +13,8 @@
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+
+#include <fmw_cmsis.h>
 
 /*
  * Timer HAL config

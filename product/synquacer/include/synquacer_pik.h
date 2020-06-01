@@ -11,7 +11,6 @@
 #include "pik_cpu.h"
 #include "pik_scp.h"
 #include "pik_system.h"
-#include "synquacer_irq.h"
 #include "synquacer_mmap.h"
 
 #include <ppu_v0.h>

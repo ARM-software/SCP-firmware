@@ -9,7 +9,6 @@
  */
 
 #include "config_clock.h"
-#include "scp_sgi575_irq.h"
 #include "scp_sgi575_mmap.h"
 #include "scp_sgi575_scmi.h"
 #include "sgi575_core.h"

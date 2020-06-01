@@ -5,7 +5,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "sgm775_irq.h"
 #include "sgm775_mhu.h"
 #include "sgm775_mmap.h"
 
@@ -14,6 +13,8 @@
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
+
+#include <fmw_cmsis.h>
 
 static const struct fwk_element mhu_element_table[] = {
     [SGM775_MHU_DEVICE_IDX_S] = {

@@ -6,7 +6,6 @@
  */
 
 #include "config_clock.h"
-#include "scp_rdn1e1_irq.h"
 #include "scp_rdn1e1_mmap.h"
 #include "system_clock.h"
 
@@ -17,6 +16,8 @@
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+
+#include <fmw_cmsis.h>
 
 /*
  * Generic timer driver config

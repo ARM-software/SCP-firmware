@@ -9,7 +9,6 @@
  */
 
 #include "n1sdp_pik_system.h"
-#include "n1sdp_scp_irq.h"
 #include "n1sdp_scp_pik.h"
 
 #include <dimm_spd.h>
@@ -27,6 +26,8 @@
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
+
+#include <fmw_cmsis.h>
 
 #include <inttypes.h>
 #include <stdbool.h>

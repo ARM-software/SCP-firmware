@@ -12,7 +12,6 @@
 #include "rdn1e1_core.h"
 #include "rdn1e1_pik_scp.h"
 #include "rdn1e1_sds.h"
-#include "scp_rdn1e1_irq.h"
 #include "scp_rdn1e1_mmap.h"
 #include "scp_rdn1e1_scmi.h"
 

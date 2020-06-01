@@ -8,7 +8,6 @@
 #include "config_power_domain.h"
 #include "config_sensor.h"
 #include "juno_id.h"
-#include "juno_irq.h"
 #include "juno_pvt.h"
 #include "pvt_sensor_calibration.h"
 
@@ -20,6 +19,8 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
+
+#include <fmw_cmsis.h>
 
 #include <stddef.h>
 #include <stdint.h>

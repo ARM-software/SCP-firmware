@@ -8,7 +8,6 @@
 #include "config_power_domain.h"
 #include "config_ppu_v1.h"
 #include "sgm776_core.h"
-#include "sgm776_irq.h"
 #include "sgm776_mmap.h"
 
 #include <mod_power_domain.h>
@@ -20,6 +19,8 @@
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+
+#include <fmw_cmsis.h>
 
 #include <stdbool.h>
 #include <stddef.h>

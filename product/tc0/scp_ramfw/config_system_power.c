@@ -6,18 +6,19 @@
  */
 
 #include "tc0_core.h"
-#include "scp_tc0_irq.h"
 
 #include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
-#include <mod_tc0_system.h>
 #include <mod_system_power.h>
+#include <mod_tc0_system.h>
 
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+
+#include <fmw_cmsis.h>
 
 #include <stdint.h>
 
