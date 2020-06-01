@@ -12,7 +12,7 @@
 /*
  * noreturn void mod_bootloader_boot(
  *     uint8_t *destination,
- *     uint8_t *source,
+ *     const uint8_t *source,
  *     uint32_t size,
  *     uint32_t *vtor);
  */
