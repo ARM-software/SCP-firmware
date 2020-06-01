@@ -14,12 +14,10 @@ BS_FIRMWARE_MODULE_HEADERS_ONLY := \
 BS_FIRMWARE_MODULES := \
     pl011 \
     log \
-    clock \
-    rdn1e1_rom
+    clock
 
 BS_FIRMWARE_SOURCES := \
-    config_log.c \
     config_clock.c \
-    config_rdn1e1_rom.c
+    config_log.c
 
 include $(BS_DIR)/firmware.mk

@@ -18,16 +18,17 @@ BS_FIRMWARE_MODULES := \
     pcid \
     pl011 \
     log \
-    rdn1e1_rom \
     gtimer \
-    clock
+    clock \
+    bootloader \
+    isys_rom
 
 BS_FIRMWARE_SOURCES := \
-    config_sid.c \
-    config_system_info.c \
-    config_log.c \
-    config_rdn1e1_rom.c \
+    config_bootloader.c \
+    config_clock.c \
     config_gtimer.c \
-    config_clock.c
+    config_log.c \
+    config_sid.c \
+    config_system_info.c
 
 include $(BS_DIR)/firmware.mk
