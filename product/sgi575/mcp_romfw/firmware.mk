@@ -17,12 +17,10 @@ BS_FIRMWARE_MODULE_HEADERS_ONLY := \
 BS_FIRMWARE_MODULES := \
     pl011 \
     log \
-    clock \
-    sgi575_rom
+    clock
 
 BS_FIRMWARE_SOURCES := \
-    config_log.c \
     config_clock.c \
-    config_sgi575_rom.c
+    config_log.c
 
 include $(BS_DIR)/firmware.mk
