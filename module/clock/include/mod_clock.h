@@ -32,7 +32,7 @@
  */
 enum mod_clock_state {
     /*! The clock is stopped */
-    MOD_CLOCK_STATE_STOPPED,
+    MOD_CLOCK_STATE_STOPPED = 0,
 
     /*! The clock is running */
     MOD_CLOCK_STATE_RUNNING,

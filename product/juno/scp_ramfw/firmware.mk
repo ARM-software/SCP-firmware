@@ -90,7 +90,8 @@ BS_FIRMWARE_SOURCES := \
     config_mock_psu.c \
     config_juno_pvt.c \
     config_juno_thermal.c \
-    config_scmi_power_domain.c
+    config_scmi_power_domain.c \
+    juno_scmi_clock.c
 
 ifeq ($(BS_FIRMWARE_HAS_MULTITHREADING),yes)
     BS_FIRMWARE_SOURCES += rtx_config.c
