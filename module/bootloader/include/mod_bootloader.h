@@ -32,9 +32,12 @@
 struct mod_bootloader_config {
     /*!
      * Base address of the memory region that the image will be copied from.
-     * Note that this is not the base address of the image to be loaded. This
-     * base address must be combined with an offset value, provided by
-     * application processor firmware via a Shared Data Storage region.
+     * Note that this is not the base address of the image to be loaded.
+     *
+     * Note that if Shared Data Storage (SDS) is used for the booting process
+     * then this is not the base address of the image to be loaded. In this
+     * situation the base address is combined with an offset value, provided by
+     * the application processor firmware, via a Shared Data Storage region.
      */
     uintptr_t source_base;
 
@@ -43,7 +46,7 @@ struct mod_bootloader_config {
      * This value implicitly limits the maximum size of the image that can be
      * copied.
      */
-    size_t source_size;
+    uint32_t source_size;
 
     /*! Base address of the location that the image will be copied to. */
     uintptr_t destination_base;
@@ -53,13 +56,15 @@ struct mod_bootloader_config {
      * This value implicitly limits the maximum size of the image that can be
      * copied.
      */
-    size_t destination_size;
+    uint32_t destination_size;
 
+#ifdef BUILD_HAS_MOD_SDS
     /*!
      * Identifier of the SDS structure containing image metadata, such as the
      * size of the image and its offset from source_base.
      */
     uint32_t sds_struct_id;
+#endif
 };
 
 /*!
