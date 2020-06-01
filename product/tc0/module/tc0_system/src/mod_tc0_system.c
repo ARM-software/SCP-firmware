@@ -9,19 +9,18 @@
  */
 
 #include "clock_soc.h"
-#include "tc0_core.h"
-#include "tc0_sds.h"
-#include "tc0_scmi.h"
-#include "scp_tc0_irq.h"
 #include "scp_pik.h"
+#include "tc0_core.h"
+#include "tc0_scmi.h"
+#include "tc0_sds.h"
 
 #include <mod_clock.h>
-#include <mod_tc0_system.h>
+#include <mod_power_domain.h>
+#include <mod_ppu_v1.h>
 #include <mod_scmi.h>
 #include <mod_sds.h>
 #include <mod_system_power.h>
-#include <mod_power_domain.h>
-#include <mod_ppu_v1.h>
+#include <mod_tc0_system.h>
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
@@ -35,7 +34,6 @@
 #include <fmw_cmsis.h>
 
 #include <stdint.h>
-
 
 /* SCMI services required to enable the messaging stack */
 static unsigned int scmi_notification_table[] = {

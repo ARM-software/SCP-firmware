@@ -6,7 +6,6 @@
  */
 
 #include "config_mhu.h"
-#include "synquacer_irq.h"
 #include "synquacer_mmap.h"
 
 #include <mod_mhu.h>
@@ -14,6 +13,8 @@
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
+
+#include <fmw_cmsis.h>
 
 static const struct fwk_element mhu_element_table[] = {
     [SCP_SYNQUACER_MHU_DEVICE_IDX_SCP_AP_S] = {

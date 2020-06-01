@@ -9,7 +9,6 @@
  */
 
 #include <coresight_soc400.h>
-#include <juno_irq.h>
 #include <juno_ssc.h>
 #include <juno_utils.h>
 #include <scp_config.h>
@@ -28,6 +27,8 @@
 #include <fwk_module_idx.h>
 #include <fwk_multi_thread.h>
 #include <fwk_status.h>
+
+#include <fmw_cmsis.h>
 
 #define CS_CNTCONTROL       ((struct cs_cnt_ctrl_reg *) CS_CNTCONTROL_BASE)
 #define CNTCONTROL_CR_HDBG  UINT32_C(0x00000002)

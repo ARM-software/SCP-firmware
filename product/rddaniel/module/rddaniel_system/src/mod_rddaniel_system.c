@@ -14,7 +14,6 @@
 #include "rddaniel_sds.h"
 #include "scp_css_mmap.h"
 #include "scp_pik.h"
-#include "scp_rddaniel_irq.h"
 
 #include <mod_clock.h>
 #include <mod_power_domain.h>

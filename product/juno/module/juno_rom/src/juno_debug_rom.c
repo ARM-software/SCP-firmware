@@ -5,7 +5,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "juno_irq.h"
 #include "juno_ppu_idx.h"
 #include "juno_utils.h"
 #include "juno_wdog_rom.h"
@@ -19,6 +18,8 @@
 #include <fwk_interrupt.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
+
+#include <fmw_cmsis.h>
 
 #include <stdbool.h>
 #include <stdint.h>

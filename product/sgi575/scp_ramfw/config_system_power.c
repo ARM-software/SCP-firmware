@@ -5,7 +5,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "scp_sgi575_irq.h"
 #include "sgi575_core.h"
 
 #include <mod_power_domain.h>
@@ -18,6 +17,8 @@
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+
+#include <fmw_cmsis.h>
 
 #include <stdint.h>
 

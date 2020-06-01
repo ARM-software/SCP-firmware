@@ -6,7 +6,6 @@
  */
 
 #include "juno_alarm_idx.h"
-#include "juno_irq.h"
 #include "system_clock.h"
 #include "system_mmap.h"
 
@@ -17,6 +16,8 @@
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+
+#include <fmw_cmsis.h>
 
 static const struct fwk_element gtimer_element_table[] = {
     [0] = {

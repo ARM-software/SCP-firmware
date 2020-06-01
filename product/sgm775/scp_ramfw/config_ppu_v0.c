@@ -6,7 +6,6 @@
  */
 
 #include "config_ppu_v0.h"
-#include "sgm775_irq.h"
 #include "sgm775_mmap.h"
 
 #include <mod_power_domain.h>
@@ -15,6 +14,8 @@
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
+
+#include <fmw_cmsis.h>
 
 #include <stdbool.h>
 #include <stddef.h>

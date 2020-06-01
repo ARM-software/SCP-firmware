@@ -10,7 +10,6 @@
 
 #include "juno_dmc400.h"
 #include "juno_id.h"
-#include "juno_irq.h"
 #include "juno_scc.h"
 #include "scp_config.h"
 #include "system_clock.h"

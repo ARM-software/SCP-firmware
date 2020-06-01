@@ -7,7 +7,6 @@
 
 #include "config_power_domain.h"
 #include "sgm775_core.h"
-#include "sgm775_irq.h"
 #include "sgm775_mmap.h"
 
 #include <mod_power_domain.h>
@@ -18,6 +17,8 @@
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+
+#include <fmw_cmsis.h>
 
 #include <stddef.h>
 #include <stdint.h>
