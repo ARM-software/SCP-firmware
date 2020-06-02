@@ -401,6 +401,8 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
         .status = SCMI_GENERIC_ERROR
     };
     enum mod_pd_type pd_type;
+    uint32_t power_state;
+    enum mod_scmi_pd_policy_status policy_status;
 
     parameters = (const struct scmi_pd_power_state_set_a2p *)payload;
 
@@ -438,13 +440,26 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
          goto exit;
     }
 
+    power_state = parameters->power_state;
+    status = scmi_pd_power_state_set_policy(&policy_status, &power_state,
+        agent_id, pd_id);
+
+    if (status != FWK_SUCCESS) {
+        return_values.status = SCMI_GENERIC_ERROR;
+        goto exit;
+    }
+    if (policy_status == MOD_SCMI_PD_SKIP_MESSAGE_HANDLER) {
+        return_values.status = SCMI_SUCCESS;
+        goto exit;
+    }
+
     switch (pd_type) {
     case MOD_PD_TYPE_CORE:
         /*
          * Async/sync flag is ignored for core power domains as stated
          * by the specification.
          */
-        status = scmi_power_scp_set_core_state(pd_id, parameters->power_state);
+        status = scmi_power_scp_set_core_state(pd_id, power_state);
         if (status == FWK_E_PARAM)
             return_values.status = SCMI_INVALID_PARAMETERS;
         break;
@@ -455,7 +470,7 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
             goto exit;
         }
 
-        status = scmi_pd_ctx.pd_api->set_state(pd_id, parameters->power_state);
+        status = scmi_pd_ctx.pd_api->set_state(pd_id, power_state);
         break;
 
 
@@ -466,7 +481,7 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
             goto exit;
         }
 
-        status = scmi_device_state_to_pd_state(parameters->power_state,
+        status = scmi_device_state_to_pd_state(power_state,
                                                &pd_power_state);
         if (status != FWK_SUCCESS) {
             status = FWK_SUCCESS;
@@ -505,7 +520,7 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
             goto exit;
         }
 
-        status = scmi_device_state_to_pd_state(parameters->power_state,
+        status = scmi_device_state_to_pd_state(power_state,
                                                &pd_power_state);
         if (status != FWK_SUCCESS) {
             status = FWK_SUCCESS;
@@ -628,6 +643,20 @@ exit:
         sizeof(return_values) : sizeof(return_values.status));
 
     return status;
+}
+
+/*
+ * SCMI Power Domain Policy Handlers
+ */
+__attribute__((weak)) int scmi_pd_power_state_set_policy(
+    enum mod_scmi_pd_policy_status *policy_status,
+    uint32_t *state,
+    unsigned int agent_id,
+    fwk_id_t pd_id)
+{
+    *policy_status = MOD_SCMI_PD_EXECUTE_MESSAGE_HANDLER;
+
+    return FWK_SUCCESS;
 }
 
 /*
