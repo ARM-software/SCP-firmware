@@ -226,7 +226,8 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
     unsigned int agent_id;
     enum scmi_agent_type agent_type;
     enum mod_pd_system_shutdown system_shutdown;
-    enum scmi_system_state system_state;
+    uint32_t scmi_system_state;
+    enum mod_scmi_sys_power_policy_status policy_status;
 
     parameters = (const struct scmi_sys_power_state_set_a2p *)payload;
 
@@ -259,12 +260,30 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    switch (parameters->system_state) {
+    /*
+     * Note that the scmi_system_state value may be changed by the policy
+     * handler.
+     */
+    scmi_system_state = parameters->system_state;
+    status = scmi_sys_power_state_set_policy(&policy_status, &scmi_system_state,
+        agent_id);
+
+    if (status != FWK_SUCCESS) {
+        return_values.status = SCMI_GENERIC_ERROR;
+        goto exit;
+    }
+    if (policy_status == MOD_SCMI_SYS_POWER_SKIP_MESSAGE_HANDLER) {
+        return_values.status = SCMI_SUCCESS;
+        goto exit;
+    }
+
+
+    switch (scmi_system_state) {
     case SCMI_SYSTEM_STATE_SHUTDOWN:
     case SCMI_SYSTEM_STATE_COLD_RESET:
     case SCMI_SYSTEM_STATE_WARM_RESET:
         system_shutdown =
-            system_state2system_shutdown[parameters->system_state];
+            system_state2system_shutdown[scmi_system_state];
         status = scmi_sys_power_ctx.pd_api->system_shutdown(system_shutdown);
         if (status == FWK_PENDING) {
             /*
@@ -297,12 +316,12 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
             goto exit;
         }
 
-        status = system_state_get(&system_state);
+        status = system_state_get((enum scmi_system_state *)&scmi_system_state);
         if (status != FWK_SUCCESS)
             goto exit;
 
-        if ((system_state != SCMI_SYSTEM_STATE_SHUTDOWN) &&
-            (system_state != SCMI_SYSTEM_STATE_SUSPEND)) {
+        if ((scmi_system_state != SCMI_SYSTEM_STATE_SHUTDOWN) &&
+            (scmi_system_state != SCMI_SYSTEM_STATE_SUSPEND)) {
 
             return_values.status = SCMI_DENIED;
             goto exit;
@@ -321,7 +340,7 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
     };
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    scmi_sys_power_state_notify(service_id, parameters->system_state,
+    scmi_sys_power_state_notify(service_id, scmi_system_state,
         ((parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST) ?
             true : false));
 #endif
@@ -423,6 +442,21 @@ exit:
     return FWK_SUCCESS;
 }
 #endif
+
+/*
+ * SCMI System Power Policy Handlers
+ *
+ * The system_state value may be modified by the policy handler
+ */
+__attribute((weak)) int scmi_sys_power_state_set_policy(
+    enum mod_scmi_sys_power_policy_status *policy_status,
+    uint32_t *state,
+    unsigned int agent_id)
+{
+    *policy_status = MOD_SCMI_SYS_POWER_EXECUTE_MESSAGE_HANDLER;
+
+    return FWK_SUCCESS;
+}
 
 /*
  * SCMI module -> SCMI system power module interface
