@@ -430,10 +430,13 @@ static int scmi_perf_limits_set_handler(fwk_id_t service_id,
     unsigned int agent_id;
     const struct mod_scmi_perf_domain_config *domain;
     const struct scmi_perf_limits_set_a2p *parameters;
+    uint64_t range_min, range_max;
+    fwk_id_t domain_id;
     uint32_t permissions;
     struct scmi_perf_limits_set_p2a return_values = {
         .status = SCMI_GENERIC_ERROR,
     };
+    enum mod_scmi_perf_policy_status policy_status;
 
     parameters = (const struct scmi_perf_limits_set_a2p *)payload;
 
@@ -459,16 +462,30 @@ static int scmi_perf_limits_set_handler(fwk_id_t service_id,
 
     if (parameters->range_min > parameters->range_max) {
         return_values.status = SCMI_INVALID_PARAMETERS;
+        goto exit;
+    }
 
+    domain_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, parameters->domain_id);
+    range_min = parameters->range_min;
+    range_max = parameters->range_max;
+
+    status = scmi_perf_limits_set_policy(&policy_status, &range_min,
+        &range_max, agent_id, domain_id);
+
+    if (status != FWK_SUCCESS) {
+        return_values.status = SCMI_GENERIC_ERROR;
+        goto exit;
+    }
+    if (policy_status == MOD_SCMI_PERF_SKIP_MESSAGE_HANDLER) {
+        return_values.status = SCMI_SUCCESS;
         goto exit;
     }
 
     status = scmi_perf_ctx.dvfs_api->set_frequency_limits(
-        FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, parameters->domain_id),
-        agent_id,
+        domain_id, agent_id,
         &((struct mod_dvfs_frequency_limits) {
-        .minimum = parameters->range_min,
-        .maximum = parameters->range_max
+        .minimum = range_min,
+        .maximum = range_max
         }));
 
     /*
@@ -554,10 +571,13 @@ static int scmi_perf_level_set_handler(fwk_id_t service_id,
     unsigned int agent_id;
     const struct mod_scmi_perf_domain_config *domain;
     const struct scmi_perf_level_set_a2p *parameters;
+    fwk_id_t domain_id;
     uint32_t permissions;
     struct scmi_perf_level_set_p2a return_values = {
         .status = SCMI_GENERIC_ERROR,
     };
+    uint64_t perf_level;
+    enum mod_scmi_perf_policy_status policy_status;
 
     parameters = (const struct scmi_perf_level_set_a2p *)payload;
 
@@ -581,9 +601,26 @@ static int scmi_perf_level_set_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    status = scmi_perf_ctx.dvfs_api->set_frequency(
-       FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, parameters->domain_id),
-       agent_id, (uint64_t)parameters->performance_level);
+    /*
+     * Note that the policy handler may change the performance level
+     */
+    domain_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, parameters->domain_id);
+    perf_level = (uint64_t)parameters->performance_level;
+
+    status = scmi_perf_level_set_policy(&policy_status, &perf_level, agent_id,
+        domain_id);
+
+    if (status != FWK_SUCCESS) {
+        return_values.status = SCMI_GENERIC_ERROR;
+        goto exit;
+    }
+    if (policy_status == MOD_SCMI_PERF_SKIP_MESSAGE_HANDLER) {
+        return_values.status = SCMI_SUCCESS;
+        goto exit;
+    }
+
+    status = scmi_perf_ctx.dvfs_api->set_frequency(domain_id,
+        agent_id, perf_level);
 
     /*
      * Return immediately to the caller, fire-and-forget.
@@ -859,6 +896,32 @@ static void fast_channel_callback(uintptr_t param)
             }
         }
     }
+}
+
+/*
+ * SCMI Performance Policy Handlers
+ */
+__attribute__((weak)) int scmi_perf_limits_set_policy(
+    enum mod_scmi_perf_policy_status *policy_status,
+    uint64_t *range_min,
+    uint64_t *range_max,
+    unsigned int agent_id,
+    fwk_id_t domain_id)
+{
+    *policy_status = MOD_SCMI_PERF_EXECUTE_MESSAGE_HANDLER;
+
+    return FWK_SUCCESS;
+}
+
+__attribute__((weak)) int scmi_perf_level_set_policy(
+    enum mod_scmi_perf_policy_status *policy_status,
+    uint64_t *frequency,
+    unsigned int agent_id,
+    fwk_id_t domain_id)
+{
+    *policy_status = MOD_SCMI_PERF_EXECUTE_MESSAGE_HANDLER;
+
+    return FWK_SUCCESS;
 }
 
 /*
