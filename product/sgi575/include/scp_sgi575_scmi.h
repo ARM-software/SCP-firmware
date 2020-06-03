@@ -16,6 +16,7 @@ enum scp_sgi575_scmi_agent_id {
     /* 0 is reserved for the platform */
     SCP_SCMI_AGENT_ID_OSPM = 1,
     SCP_SCMI_AGENT_ID_PSCI,
+    SCP_SCMI_AGENT_ID_COUNT,
 };
 
 /* SCMI service indexes */

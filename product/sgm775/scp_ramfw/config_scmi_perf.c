@@ -17,25 +17,10 @@
 
 static const struct mod_scmi_perf_domain_config domains[] = {
     [DVFS_ELEMENT_IDX_LITTLE] = {
-        .permissions = &(const uint32_t[]) {
-            [SCMI_AGENT_ID_OSPM] = MOD_SCMI_PERF_PERMS_SET_LEVEL  |
-                                   MOD_SCMI_PERF_PERMS_SET_LIMITS,
-            [SCMI_AGENT_ID_PSCI] = MOD_SCMI_PERF_PERMS_NONE,
-        }
     },
     [DVFS_ELEMENT_IDX_BIG] = {
-        .permissions = &(const uint32_t[]) {
-            [SCMI_AGENT_ID_OSPM] = MOD_SCMI_PERF_PERMS_SET_LEVEL  |
-                                   MOD_SCMI_PERF_PERMS_SET_LIMITS,
-            [SCMI_AGENT_ID_PSCI] = MOD_SCMI_PERF_PERMS_NONE,
-        }
     },
     [DVFS_ELEMENT_IDX_GPU] = {
-        .permissions = &(const uint32_t[]) {
-            [SCMI_AGENT_ID_OSPM] = MOD_SCMI_PERF_PERMS_SET_LEVEL  |
-                                   MOD_SCMI_PERF_PERMS_SET_LIMITS,
-            [SCMI_AGENT_ID_PSCI] = MOD_SCMI_PERF_PERMS_NONE,
-        }
     },
 };
 

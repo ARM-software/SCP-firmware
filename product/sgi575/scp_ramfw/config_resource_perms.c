@@ -5,7 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "tc0_scmi.h"
+#include "config_clock.h"
+#include "scp_sgi575_scmi.h"
 
 #include <mod_resource_perms.h>
 #include <mod_scmi_std.h>
@@ -21,8 +22,14 @@
  * must be allocated in writable memory.
  */
 
+/*!
+ * Agent 0 gets access to all resources.
+ */
 #define AGENT_IDX(agent_id) (agent_id - 1)
 
+/*!
+ * Note that permissions are denied when a bit is set.
+ */
 static struct mod_res_agent_protocol_permissions
     agent_protocol_permissions[] = {
     [AGENT_IDX(SCP_SCMI_AGENT_ID_OSPM)] = {
@@ -42,45 +49,54 @@ static struct mod_res_agent_protocol_permissions
  * to bit[1], etc.
  */
 static struct mod_res_agent_msg_permissions agent_msg_permissions[] = {
-        [AGENT_IDX(SCP_SCMI_AGENT_ID_OSPM)] = {
-            .messages[MOD_RES_PERMS_SCMI_BASE_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_POWER_DOMAIN_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_SYS_POWER_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_PERF_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_CLOCK_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_SENSOR_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_RESET_DOMAIN_MESSAGE_IDX] = 0x0,
-        },
-        [AGENT_IDX(SCP_SCMI_AGENT_ID_PSCI)] = {
-            .messages[MOD_RES_PERMS_SCMI_BASE_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_POWER_DOMAIN_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_SYS_POWER_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_PERF_MESSAGE_IDX] =
-                ((1 << (MOD_SCMI_PERF_DOMAIN_ATTRIBUTES -
-                      MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
-                 /* DESCRIBE_LEVELS is required for some reason ... */
-                 (0 << (MOD_SCMI_PERF_DESCRIBE_LEVELS -
-                      MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
-                 (1 << (MOD_SCMI_PERF_LIMITS_SET -
-                      MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
-                 (1 << (MOD_SCMI_PERF_LIMITS_GET -
-                      MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
-                 (1 << (MOD_SCMI_PERF_LEVEL_SET -
-                      MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
-                 (1 << (MOD_SCMI_PERF_LEVEL_GET -
-                      MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
-                 (1 << (MOD_SCMI_PERF_NOTIFY_LIMITS -
-                      MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
-                 (1 << (MOD_SCMI_PERF_NOTIFY_LEVEL -
-                      MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
-                 (1 << (MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL -
-                      MOD_SCMI_PERF_DOMAIN_ATTRIBUTES))),
-            /* Clocks, no access */
-            .messages[MOD_RES_PERMS_SCMI_CLOCK_MESSAGE_IDX] = 0xff,
-            .messages[MOD_RES_PERMS_SCMI_SENSOR_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_RESET_DOMAIN_MESSAGE_IDX] = 0x0,
-        },
-    };
+    [AGENT_IDX(SCP_SCMI_AGENT_ID_OSPM)] = {
+        /* Example, Base, disable unused msg 12 */
+        .messages[MOD_RES_PERMS_SCMI_BASE_MESSAGE_IDX] =
+            (1 << 12),  /* Example, Base, disable unused msg 12 */
+        /* Power Domain */
+        .messages[MOD_RES_PERMS_SCMI_POWER_DOMAIN_MESSAGE_IDX] = 0x0,
+        /* System Power Domain */
+        .messages[MOD_RES_PERMS_SCMI_SYS_POWER_MESSAGE_IDX] = 0x0,
+        /* Performance */
+        .messages[MOD_RES_PERMS_SCMI_PERF_MESSAGE_IDX] = 0x0,
+        /* Clocks */
+        .messages[MOD_RES_PERMS_SCMI_CLOCK_MESSAGE_IDX] = 0x0,
+        /* Sensors */
+        .messages[MOD_RES_PERMS_SCMI_SENSOR_MESSAGE_IDX] = 0x0,
+        /* Reset Domains */
+        .messages[MOD_RES_PERMS_SCMI_RESET_DOMAIN_MESSAGE_IDX] = 0x0,
+    },
+
+    [AGENT_IDX(SCP_SCMI_AGENT_ID_PSCI)] = {
+        .messages[MOD_RES_PERMS_SCMI_BASE_MESSAGE_IDX] = 0x0,
+        .messages[MOD_RES_PERMS_SCMI_POWER_DOMAIN_MESSAGE_IDX] = 0x0,
+        .messages[MOD_RES_PERMS_SCMI_SYS_POWER_MESSAGE_IDX] = 0x0,
+        .messages[MOD_RES_PERMS_SCMI_PERF_MESSAGE_IDX] =
+            ((1 << (MOD_SCMI_PERF_DOMAIN_ATTRIBUTES -
+                    MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+             /* DESCRIBE_LEVELS is required for some reason ... */
+             (0 << (MOD_SCMI_PERF_DESCRIBE_LEVELS -
+                    MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+             (1 << (MOD_SCMI_PERF_LIMITS_SET -
+                    MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+             (1 << (MOD_SCMI_PERF_LIMITS_GET -
+                    MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+             (1 << (MOD_SCMI_PERF_LEVEL_SET -
+                    MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+             (1 << (MOD_SCMI_PERF_LEVEL_GET -
+                    MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+             (1 << (MOD_SCMI_PERF_NOTIFY_LIMITS -
+                    MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+             (1 << (MOD_SCMI_PERF_NOTIFY_LEVEL -
+                    MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+             (1 << (MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL -
+                    MOD_SCMI_PERF_DOMAIN_ATTRIBUTES))),
+        /* Clocks, no access */
+        .messages[MOD_RES_PERMS_SCMI_CLOCK_MESSAGE_IDX] = 0xff,
+        .messages[MOD_RES_PERMS_SCMI_SENSOR_MESSAGE_IDX] = 0x0,
+        .messages[MOD_RES_PERMS_SCMI_RESET_DOMAIN_MESSAGE_IDX] = 0x0,
+    },
+};
 
 /*
  * Protocols have an index offset from SCMI_BASE protocol, 0x10
@@ -88,7 +104,22 @@ static struct mod_res_agent_msg_permissions agent_msg_permissions[] = {
  * on a protocol:command basis, there is no resource permissions
  * associated with the protocols.
  */
-static mod_res_perms_t scmi_clock_perms[][5][1] = {
+
+/*
+ * We are tracking 5 SCMI Clock Protocol commands
+ *
+ *  0, SCMI_CLOCK_ATTRIBUTES
+ *  1, SCMI_CLOCK_RATE_GET
+ *  2, SCMI_CLOCK_RATE_SET
+ *  3, SCMI_CLOCK_CONFIG_SET
+ *  4, SCMI_CLOCK_DESCRIBE_RATES
+ */
+#define SGI575_CLOCK_RESOURCE_CMDS 5
+#define SGI575_CLOCK_RESOURCE_ELEMENTS \
+    ((CLOCK_IDX_COUNT >> MOD_RES_PERMS_TYPE_SHIFT) + 1)
+static mod_res_perms_t
+    scmi_clock_perms[][SGI575_CLOCK_RESOURCE_CMDS]
+        [SGI575_CLOCK_RESOURCE_ELEMENTS] = {
         /* SCMI_PROTOCOL_ID_CLOCK */
         /* 0, SCMI_CLOCK_ATTRIBUTES */
         /* 1, SCMI_CLOCK_RATE_GET */
@@ -130,5 +161,6 @@ struct fwk_module_config config_resource_perms = {
             .agent_permissions = (uintptr_t)&agent_permissions,
             .agent_count = SCP_SCMI_AGENT_ID_COUNT,
             .protocol_count = 6,
+            .clock_count = CLOCK_IDX_COUNT,
         },
 };

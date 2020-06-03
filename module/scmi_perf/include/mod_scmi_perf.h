@@ -79,8 +79,6 @@ enum mod_scmi_perf_fast_channel_memory_offset {
  * \brief Performance domain configuration data.
  */
 struct mod_scmi_perf_domain_config {
-    const uint32_t (*permissions)[]; /*!< Per-agent permission flags */
-
     /*!
      * \brief Domain fast channels.
      *

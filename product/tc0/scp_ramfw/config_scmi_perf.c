@@ -15,11 +15,6 @@
 
 static const struct mod_scmi_perf_domain_config domains[] = {
     [0] = {
-        .permissions = &(const uint32_t[]) {
-            [SCP_SCMI_AGENT_ID_OSPM] = MOD_SCMI_PERF_PERMS_SET_LEVEL  |
-                                       MOD_SCMI_PERF_PERMS_SET_LIMITS,
-            [SCP_SCMI_AGENT_ID_PSCI] = MOD_SCMI_PERF_PERMS_NONE,
-        }
     },
 };
 
