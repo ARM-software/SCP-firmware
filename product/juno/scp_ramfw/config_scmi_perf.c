@@ -27,11 +27,6 @@
 
 static const struct mod_scmi_perf_domain_config domains[] = {
     [DVFS_ELEMENT_IDX_LITTLE] = {
-        .permissions = &(const uint32_t[]) {
-            [JUNO_SCMI_AGENT_IDX_OSPM] = MOD_SCMI_PERF_PERMS_SET_LEVEL  |
-                                   MOD_SCMI_PERF_PERMS_SET_LIMITS,
-            [JUNO_SCMI_AGENT_IDX_PSCI] = 0 /* No Access */,
-        },
 #ifdef BUILD_HAS_FAST_CHANNELS
         .fast_channels_addr_scp = (uint64_t[]) {
             [MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_SET] = SCMI_FAST_CHANNEL_BASE
@@ -79,11 +74,6 @@ static const struct mod_scmi_perf_domain_config domains[] = {
 #endif
     },
     [DVFS_ELEMENT_IDX_BIG] = {
-        .permissions = &(const uint32_t[]) {
-            [JUNO_SCMI_AGENT_IDX_OSPM] = MOD_SCMI_PERF_PERMS_SET_LEVEL  |
-                                   MOD_SCMI_PERF_PERMS_SET_LIMITS,
-            [JUNO_SCMI_AGENT_IDX_PSCI] = 0 /* No Access */,
-        },
 #ifdef BUILD_HAS_FAST_CHANNELS
 .fast_channels_addr_scp = (uint64_t[]) {
             [MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_SET] = SCMI_FAST_CHANNEL_BASE
@@ -131,11 +121,6 @@ static const struct mod_scmi_perf_domain_config domains[] = {
 #endif
     },
     [DVFS_ELEMENT_IDX_GPU] = {
-        .permissions = &(const uint32_t[]) {
-            [JUNO_SCMI_AGENT_IDX_OSPM] = MOD_SCMI_PERF_PERMS_SET_LEVEL  |
-                                   MOD_SCMI_PERF_PERMS_SET_LIMITS,
-            [JUNO_SCMI_AGENT_IDX_PSCI] = 0 /* No Access */,
-        },
 #ifdef BUILD_HAS_FAST_CHANNELS
         .fast_channels_addr_scp = (uint64_t[]) {
             [MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_SET] = SCMI_FAST_CHANNEL_BASE

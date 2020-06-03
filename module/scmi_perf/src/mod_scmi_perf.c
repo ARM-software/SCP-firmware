@@ -11,6 +11,9 @@
 #include <internal/scmi_perf.h>
 
 #include <mod_dvfs.h>
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#    include <mod_resource_perms.h>
+#endif
 #include <mod_scmi.h>
 #include <mod_scmi_perf.h>
 #ifdef BUILD_HAS_STATISTICS
@@ -158,6 +161,11 @@ struct scmi_perf_ctx {
 
     /* Fast Channels Polling Rate Limit */
     uint32_t fast_channels_rate_limit;
+
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    /* SCMI Resource Permissions API */
+    const struct mod_res_permissions_api *res_perms_api;
+#endif
 };
 
 static struct scmi_perf_ctx scmi_perf_ctx;
@@ -180,6 +188,60 @@ static const fwk_id_t scmi_perf_get_level =
 static const fwk_id_t scmi_perf_get_limits =
     FWK_ID_EVENT_INIT(FWK_MODULE_IDX_SCMI_PERF,
                       SCMI_PERF_EVENT_IDX_LIMITS_GET_REQUEST);
+
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+
+/*
+ * SCMI Resource Permissions handler
+ */
+static int get_perf_domain_id(const uint32_t *payload, unsigned int *domain_id)
+{
+    /*
+     * Every SCMI Performance message is formatted with the domain ID
+     * as the first message element. We will use the perf_limits_get
+     * message as a basic format to retrieve the domain ID to avoid
+     * unnecessary code.
+     */
+    const struct scmi_perf_limits_get_a2p *parameters =
+        (const struct scmi_perf_limits_get_a2p *)payload;
+
+    if (parameters->domain_id >= scmi_perf_ctx.domain_count)
+        return FWK_E_PARAM;
+
+    *domain_id = parameters->domain_id;
+    return FWK_SUCCESS;
+}
+
+static int scmi_perf_permissions_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload,
+    unsigned int message_id)
+{
+    enum mod_res_perms_permissions perms;
+    unsigned int agent_id, domain_id;
+    int status;
+
+    status = scmi_perf_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+    if (status != FWK_SUCCESS)
+        return FWK_E_ACCESS;
+
+    if (message_id < 3)
+        return FWK_SUCCESS;
+
+    status = get_perf_domain_id(payload, &domain_id);
+    if (status != FWK_SUCCESS)
+        return FWK_E_PARAM;
+
+    perms = scmi_perf_ctx.res_perms_api->agent_has_resource_permission(
+        agent_id, MOD_SCMI_PROTOCOL_ID_PERF, message_id, domain_id);
+
+    if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
+        return FWK_SUCCESS;
+    else
+        return FWK_E_ACCESS;
+}
+
+#endif
 
 /*
  * Protocol command handlers
@@ -260,7 +322,6 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
 {
     int status;
     unsigned int agent_id;
-    const struct mod_scmi_perf_domain_config *domain;
     const struct scmi_perf_domain_attributes_a2p *parameters;
     uint32_t permissions;
     fwk_id_t domain_id;
@@ -285,8 +346,19 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
     if (status != FWK_SUCCESS)
         goto exit;
 
-    domain = &(*scmi_perf_ctx.config->domains)[parameters->domain_id];
-    permissions = (*domain->permissions)[agent_id];
+#ifndef BUILD_HAS_RESOURCE_PERMISSIONS
+    permissions =
+        MOD_SCMI_PERF_PERMS_SET_LIMITS | MOD_SCMI_PERF_PERMS_SET_LEVEL;
+#else
+    status = scmi_perf_permissions_handler(
+        service_id, payload, MOD_SCMI_PERF_LIMITS_SET);
+    if (status == FWK_SUCCESS)
+        permissions = MOD_SCMI_PERF_PERMS_SET_LIMITS;
+    status = scmi_perf_permissions_handler(
+        service_id, payload, MOD_SCMI_PERF_LEVEL_SET);
+    if (status == FWK_SUCCESS)
+        permissions |= MOD_SCMI_PERF_PERMS_SET_LEVEL;
+#endif
 
     domain_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, parameters->domain_id);
     status = scmi_perf_ctx.dvfs_api->get_sustained_opp(domain_id, &opp);
@@ -435,11 +507,9 @@ static int scmi_perf_limits_set_handler(fwk_id_t service_id,
 {
     int status;
     unsigned int agent_id;
-    const struct mod_scmi_perf_domain_config *domain;
     const struct scmi_perf_limits_set_a2p *parameters;
     uint64_t range_min, range_max;
     fwk_id_t domain_id;
-    uint32_t permissions;
     struct scmi_perf_limits_set_p2a return_values = {
         .status = SCMI_GENERIC_ERROR,
     };
@@ -457,15 +527,6 @@ static int scmi_perf_limits_set_handler(fwk_id_t service_id,
     status = scmi_perf_ctx.scmi_api->get_agent_id(service_id, &agent_id);
     if (status != FWK_SUCCESS)
         goto exit;
-
-    /* Ensure the agent has permission to do this */
-    domain = &(*scmi_perf_ctx.config->domains)[parameters->domain_id];
-    permissions = (*domain->permissions)[agent_id];
-    if (!(permissions & MOD_SCMI_PERF_PERMS_SET_LIMITS)) {
-        return_values.status = SCMI_DENIED;
-
-        goto exit;
-    }
 
     if (parameters->range_min > parameters->range_max) {
         return_values.status = SCMI_INVALID_PARAMETERS;
@@ -575,10 +636,8 @@ static int scmi_perf_level_set_handler(fwk_id_t service_id,
 {
     int status;
     unsigned int agent_id;
-    const struct mod_scmi_perf_domain_config *domain;
     const struct scmi_perf_level_set_a2p *parameters;
     fwk_id_t domain_id;
-    uint32_t permissions;
     struct scmi_perf_level_set_p2a return_values = {
         .status = SCMI_GENERIC_ERROR,
     };
@@ -596,15 +655,6 @@ static int scmi_perf_level_set_handler(fwk_id_t service_id,
     status = scmi_perf_ctx.scmi_api->get_agent_id(service_id, &agent_id);
     if (status != FWK_SUCCESS)
         goto exit;
-
-    /* Ensure the agent has permission to do this */
-    domain = &(*scmi_perf_ctx.config->domains)[parameters->domain_id];
-    permissions = (*domain->permissions)[agent_id];
-    if (!(permissions & MOD_SCMI_PERF_PERMS_SET_LEVEL)) {
-        return_values.status = SCMI_DENIED;
-
-        goto exit;
-    }
 
     /*
      * Note that the policy handler may change the performance level
@@ -970,6 +1020,9 @@ static int scmi_perf_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     const uint32_t *payload, size_t payload_size, unsigned int message_id)
 {
     int32_t return_value;
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    int status;
+#endif
 
     static_assert(FWK_ARRAY_SIZE(handler_table) ==
         FWK_ARRAY_SIZE(payload_size_table),
@@ -985,6 +1038,17 @@ static int scmi_perf_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
         return_value = SCMI_PROTOCOL_ERROR;
         goto error;
     }
+
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    status = scmi_perf_permissions_handler(service_id, payload, message_id);
+    if (status != FWK_SUCCESS) {
+        if (status == FWK_E_PARAM)
+            return_value = SCMI_NOT_FOUND;
+        else
+            return_value = SCMI_DENIED;
+        goto error;
+    }
+#endif
 
     return handler_table[message_id](service_id, payload);
 
@@ -1232,6 +1296,15 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
         if (status != FWK_SUCCESS)
             return FWK_E_PANIC;
     }
+#endif
+
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
+        FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS, MOD_RES_PERM_RESOURCE_PERMS),
+        &scmi_perf_ctx.res_perms_api);
+    if (status != FWK_SUCCESS)
+        return status;
 #endif
 
     return fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_DVFS),

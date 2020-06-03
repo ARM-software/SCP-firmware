@@ -42,7 +42,7 @@ static struct mod_res_agent_protocol_permissions
 
     /* PSCI agent has no access to clock protocol */
     [AGENT_IDX(JUNO_SCMI_AGENT_IDX_PSCI)] = {
-            .protocols = MOD_RES_PERMS_SCMI_CLOCK_PROTOCOL_DENIED,
+        .protocols = MOD_RES_PERMS_SCMI_CLOCK_PROTOCOL_DENIED,
     },
 };
 
@@ -74,7 +74,26 @@ static struct mod_res_agent_msg_permissions agent_msg_permissions[] = {
         .messages[MOD_RES_PERMS_SCMI_BASE_MESSAGE_IDX] = 0x0,
         .messages[MOD_RES_PERMS_SCMI_POWER_DOMAIN_MESSAGE_IDX] = 0x0,
         .messages[MOD_RES_PERMS_SCMI_SYS_POWER_MESSAGE_IDX] = 0x0,
-        .messages[MOD_RES_PERMS_SCMI_PERF_MESSAGE_IDX] = 0x0,
+        .messages[MOD_RES_PERMS_SCMI_PERF_MESSAGE_IDX] =
+            ((1 << (MOD_SCMI_PERF_DOMAIN_ATTRIBUTES -
+                    MOD_RES_PERMS_SCMI_PERF_BITMASK_IDX)) |
+             /* DESCRIBE_LEVELS is required for some reason ... */
+             (0 << (MOD_SCMI_PERF_DESCRIBE_LEVELS -
+                    MOD_RES_PERMS_SCMI_PERF_BITMASK_IDX)) |
+             (1 << (MOD_SCMI_PERF_LIMITS_SET -
+                    MOD_RES_PERMS_SCMI_PERF_BITMASK_IDX)) |
+             (1 << (MOD_SCMI_PERF_LIMITS_GET -
+                    MOD_RES_PERMS_SCMI_PERF_BITMASK_IDX)) |
+             (1 << (MOD_SCMI_PERF_LEVEL_SET -
+                    MOD_RES_PERMS_SCMI_PERF_BITMASK_IDX)) |
+             (1 << (MOD_SCMI_PERF_LEVEL_GET -
+                    MOD_RES_PERMS_SCMI_PERF_BITMASK_IDX)) |
+             (1 << (MOD_SCMI_PERF_NOTIFY_LIMITS -
+                    MOD_RES_PERMS_SCMI_PERF_BITMASK_IDX)) |
+             (1 << (MOD_SCMI_PERF_NOTIFY_LEVEL -
+                    MOD_RES_PERMS_SCMI_PERF_BITMASK_IDX)) |
+             (1 << (MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL -
+                    MOD_RES_PERMS_SCMI_PERF_BITMASK_IDX))),
         /* Clocks, no access */
         .messages[MOD_RES_PERMS_SCMI_CLOCK_MESSAGE_IDX] = 0xff,
         .messages[MOD_RES_PERMS_SCMI_SENSOR_MESSAGE_IDX] = 0x0,
@@ -111,7 +130,6 @@ static mod_res_perms_t scmi_clock_perms[]
         /* 4, SCMI_CLOCK_DESCRIBE_RATES */
         [AGENT_IDX(JUNO_SCMI_AGENT_IDX_OSPM)] = {
             [MOD_RES_PERMS_SCMI_CLOCK_ATTRIBUTES_IDX][0] = 0x0,
-            [MOD_RES_PERMS_SCMI_CLOCK_DESCRIBE_RATE_IDX][0] = 0x0,
             /*
              * Clocks 0, 1, 2, 4 do not allow set commands,
              * Clocks 3 and 5 allow rate_set/config_set
@@ -121,14 +139,15 @@ static mod_res_perms_t scmi_clock_perms[]
             [MOD_RES_PERMS_SCMI_CLOCK_RATE_GET_IDX][0] =
                 ((1 << 0) | (1 << 1) | (1 << 2) | (1 << 4)),
             [MOD_RES_PERMS_SCMI_CLOCK_CONFIG_SET_IDX][0] = 0x0,
+            [MOD_RES_PERMS_SCMI_CLOCK_DESCRIBE_RATE_IDX][0] = 0x0,
         },
         [AGENT_IDX(JUNO_SCMI_AGENT_IDX_PSCI)] = {
             /* No access to clocks for PSCI agent, so bits [4:0] set  */
             [MOD_RES_PERMS_SCMI_CLOCK_ATTRIBUTES_IDX][0] = 0x1f,
-            [MOD_RES_PERMS_SCMI_CLOCK_DESCRIBE_RATE_IDX][0] = 0x1f,
             [MOD_RES_PERMS_SCMI_CLOCK_RATE_SET_IDX][0] = 0x1f,
             [MOD_RES_PERMS_SCMI_CLOCK_RATE_GET_IDX][0] = 0x1f,
             [MOD_RES_PERMS_SCMI_CLOCK_CONFIG_SET_IDX][0] = 0x1f,
+            [MOD_RES_PERMS_SCMI_CLOCK_DESCRIBE_RATE_IDX][0] = 0x1f,
         },
 };
 
@@ -165,11 +184,68 @@ static mod_res_perms_t
             },
 };
 
+/*
+ * We are tracking 9 SCMI Performance Protocol commands
+ *
+ * 0, SCMI_PERF_DOMAIN_ATTRIBUTES
+ * 1, SCMI_PERF_DESCRIBE_LEVELS
+ * 2, SCMI_PERF_LIMITS_SET
+ * 3, SCMI_PERF_LIMITS_GET
+ * 4, SCMI_PERF_LEVEL_SET
+ * 5, SCMI_PERF_LEVEL_GET
+ * 6, SCMI_PERF_NOTIFY_LIMITS
+ * 7, SCMI_PERF_NOTIFY_LEVEL
+ * 8, SCMI_PERF_DESCRIBE_FAST_CHANNEL
+ */
+#define JUNO_PERF_RESOURCE_CMDS 9
+#define JUNO_PERF_RESOURCE_ELEMENTS \
+    ((DVFS_ELEMENT_IDX_COUNT >> MOD_RES_PERMS_TYPE_SHIFT) + 1)
+static mod_res_perms_t
+    scmi_perf_perms[][JUNO_PERF_RESOURCE_CMDS][JUNO_PERF_RESOURCE_ELEMENTS] = {
+        /* SCMI_PROTOCOL_ID_PERF */
+        /* 0, SCMI_PERF_DOMAIN_ATTRIBUTES */
+        /* 1, SCMI_PERF_DESCRIBE_LEVELS */
+        /* 2, SCMI_PERF_LIMITS_SET */
+        /* 3, SCMI_PERF_LIMITS_GET */
+        /* 4, SCMI_PERF_LEVEL_SET */
+        /* 5, SCMI_PERF_LEVEL_GET */
+        /* 6, SCMI_PERF_NOTIFY_LIMITS */
+        /* 7, SCMI_PERF_NOTIFY_LEVEL */
+        /* 8, SCMI_PERF_DESCRIBE_FAST_CHANNEL */
+        /*
+         * For Juno, resource_id == performance domain_id
+         * see mod_scmi_perf_domain_config domains[]
+         */
+        [AGENT_IDX(JUNO_SCMI_AGENT_IDX_OSPM)] = {
+            [MOD_RES_PERMS_SCMI_PERF_ATTRIBUTES_IDX][0] = 0x0,
+            [MOD_RES_PERMS_SCMI_PERF_DESCRIBE_LEVELS_IDX][0] = 0x0,
+            [MOD_RES_PERMS_SCMI_PERF_LIMITS_SET_IDX][0] = 0x0,
+            [MOD_RES_PERMS_SCMI_PERF_LIMITS_GET_IDX][0] = 0x0,
+            [MOD_RES_PERMS_SCMI_PERF_LEVEL_SET_IDX][0] = 0x0,
+            [MOD_RES_PERMS_SCMI_PERF_LEVEL_GET_IDX][0] = 0x0,
+            [MOD_RES_PERMS_SCMI_PERF_NOTIFY_LIMITS_IDX][0] = 0x0,
+            [MOD_RES_PERMS_SCMI_PERF_NOTIFY_LEVEL_IDX][0] = 0x0,
+            [MOD_RES_PERMS_SCMI_PERF_DESCRIBE_FAST_CHANNEL_IDX][0] = 0x0,
+        },
+        [AGENT_IDX(JUNO_SCMI_AGENT_IDX_PSCI)] = {
+            [MOD_RES_PERMS_SCMI_PERF_ATTRIBUTES_IDX][0] = 0x0,
+            [MOD_RES_PERMS_SCMI_PERF_DESCRIBE_LEVELS_IDX][0] = 0x0,
+            [MOD_RES_PERMS_SCMI_PERF_LIMITS_SET_IDX][0] = 0x0,
+            [MOD_RES_PERMS_SCMI_PERF_LIMITS_GET_IDX][0] = 0x0,
+            [MOD_RES_PERMS_SCMI_PERF_LEVEL_SET_IDX][0] = 0x0,
+            [MOD_RES_PERMS_SCMI_PERF_LEVEL_GET_IDX][0] = 0x0,
+            [MOD_RES_PERMS_SCMI_PERF_NOTIFY_LIMITS_IDX][0] = 0x0,
+            [MOD_RES_PERMS_SCMI_PERF_NOTIFY_LEVEL_IDX][0] = 0x0,
+            [MOD_RES_PERMS_SCMI_PERF_DESCRIBE_FAST_CHANNEL_IDX][0] = 0x0,
+        },
+};
+
 static struct mod_res_agent_permission agent_permissions = {
     .agent_protocol_permissions = agent_protocol_permissions,
     .agent_msg_permissions = agent_msg_permissions,
     .scmi_clock_perms = &scmi_clock_perms[0][0][0],
     .scmi_pd_perms = &scmi_pd_perms[0][0][0],
+    .scmi_perf_perms = &scmi_perf_perms[0][0][0],
 };
 
 struct fwk_module_config config_resource_perms = {

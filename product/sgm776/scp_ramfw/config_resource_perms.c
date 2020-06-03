@@ -66,7 +66,26 @@ static struct mod_res_agent_msg_permissions agent_msg_permissions[] = {
         .messages[0] = 0x0, /* Base */
         .messages[1] = 0x0, /* Power Domain */
         .messages[2] = 0x0, /* System Power Domain */
-        .messages[3] = 0x0,
+        .messages[3] =
+            ((1 << (MOD_SCMI_PERF_DOMAIN_ATTRIBUTES -
+                  MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+             /* DESCRIBE_LEVELS is required for some reason ... */
+             (0 << (MOD_SCMI_PERF_DESCRIBE_LEVELS -
+                  MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+             (1 << (MOD_SCMI_PERF_LIMITS_SET -
+                  MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+             (1 << (MOD_SCMI_PERF_LIMITS_GET -
+                  MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+             (1 << (MOD_SCMI_PERF_LEVEL_SET -
+                  MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+             (1 << (MOD_SCMI_PERF_LEVEL_GET -
+                  MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+             (1 << (MOD_SCMI_PERF_NOTIFY_LIMITS -
+                  MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+             (1 << (MOD_SCMI_PERF_NOTIFY_LEVEL -
+                  MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+             (1 << (MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL -
+                  MOD_SCMI_PERF_DOMAIN_ATTRIBUTES))),
         /*
          * sgm776 denies access to CONFIG_SET
          */
