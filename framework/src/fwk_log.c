@@ -10,11 +10,14 @@
 #include <fwk_log.h>
 #include <fwk_ring.h>
 #include <fwk_status.h>
+#include <fwk_time.h>
 
+#include <inttypes.h>
 #include <limits.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -80,37 +83,74 @@ static bool fwk_log_buffer(struct fwk_ring *ring, const char *message)
 #endif
 
 static void fwk_log_format(
-    char (*buffer)[FMW_LOG_COLUMNS + sizeof(FWK_LOG_TERMINATOR)],
+    char *buffer,
+    size_t buffer_size,
     const char *format,
     va_list *args)
 {
+    fwk_timestamp_t timestamp = 0;
+    fwk_duration_ns_t duration = 0;
+
+    uint32_t duration_s = 0;
+    uint32_t duration_us = 0;
+
+    size_t length = 0;
+
     char *newline;
 
+    buffer_size -= strlen(FWK_LOG_TERMINATOR);
+
     /*
-     * Firstly, we need to `snprintf()` the message into a temporary buffer
-     * because we need to manipulate it before we store it in the ring buffer.
+     * We start by generating a timestamp for the message using the number of
+     * nanoseconds since boot.
      */
 
-    (void)vsnprintf(
-        *buffer,
-        sizeof(*buffer) - sizeof(FWK_LOG_TERMINATOR) + 1,
-        format,
-        *args);
+    timestamp = fwk_time_current();
+    duration = fwk_time_stamp_duration(timestamp);
 
     /*
-     * Secondly, we need to figure out if the user has accidentally included
-     * their own newline, in which case we consider that to be the end of the
-     * message.
+     * Newlib support for printing 64-bit integers with `printf()` is
+     * optional and actually disabled by default in GNU Arm Embedded. To
+     * print the timestamp values under this configuration we need to
+     * truncate the timestamp values to 32 bits.
+     *
+     * This gives us a theoretical maximum of 136 years' worth of seconds on the
+     * timestamp, which is still plenty.
      */
 
-    newline = strchr(*buffer, '\n');
-    if (newline != NULL)
-        *newline = '\0';
-    else
-        newline = *buffer + strlen(*buffer);
+    duration_s = (uint32_t)fwk_time_duration_s(duration);
+    duration_us = (uint32_t)fwk_time_duration_us(duration % FWK_S(1));
+
+    /* Generate the timestamp at the beginning of the buffer */
+    length = snprintf(
+        buffer,
+        buffer_size,
+        "[%5" PRIu32 ".%06" PRIu32 "] ",
+        duration_s,
+        duration_us);
+    fwk_assert(length < buffer_size);
 
     /*
-     * Lastly, we follow through on that termination with a proper carriage
+     * We then need to `snprintf()` the message into a temporary buffer because
+     * we need to manipulate it before we print or store it.
+     */
+
+    length += vsnprintf(buffer + length, buffer_size - length, format, *args);
+    length = FWK_MIN(length, buffer_size - 1);
+
+    /*
+     * Figure out if the user has included a newline, in which case we consider
+     * that to be the end of the message. This stops us from being able to
+     * create multi-line messages, but means we can properly generate timestamps
+     * on a line-by-line basis.
+     */
+
+    newline = strchr(buffer, '\n');
+    if (newline == NULL)
+        newline = buffer + length;
+
+    /*
+     * Lastly, we follow through on the termination with a proper carriage
      * return and newline. Terminals that don't care about the carriage return
      * will generally ignore it, but most terminals require it in order to start
      * the next line at the first column.
@@ -129,7 +169,7 @@ void fwk_log_snprintf(const char *format, ...)
     va_list args;
 
     va_start(args, format);
-    fwk_log_format(&buffer, format, &args);
+    fwk_log_format(buffer, sizeof(buffer), format, &args);
     va_end(args);
 
     if (fwk_log_ctx.backend != NULL) {

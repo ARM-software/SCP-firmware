@@ -50,6 +50,7 @@ COMMON_SRC += fwk_ring.c
 COMMON_SRC += fwk_slist.c
 COMMON_SRC += fwk_test.c
 COMMON_SRC += fwk_thread_delayed_resp.c
+COMMON_SRC += fwk_time.c
 
 test_fwk_arch_SRC += fwk_thread.c
 test_fwk_id_build_SRC += fwk_thread.c
