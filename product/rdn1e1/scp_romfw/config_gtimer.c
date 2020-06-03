@@ -13,6 +13,7 @@
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
+#include <fwk_time.h>
 
 /*
  * Generic timer driver config
@@ -31,11 +32,11 @@ static const struct fwk_element gtimer_dev_table[] = {
     [1] = { 0 },
 };
 
-static const struct fwk_element *gtimer_get_dev_table(fwk_id_t module_id)
-{
-    return gtimer_dev_table;
-}
-
 const struct fwk_module_config config_gtimer = {
-    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(gtimer_get_dev_table),
+    .elements = FWK_MODULE_STATIC_ELEMENTS_PTR(gtimer_dev_table),
 };
+
+struct fwk_time_driver fmw_time_driver(const void **ctx)
+{
+    return mod_gtimer_driver(ctx, config_gtimer.elements.table[0].data);
+}
