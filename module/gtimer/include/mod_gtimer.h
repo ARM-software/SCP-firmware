@@ -49,6 +49,21 @@ struct mod_gtimer_dev_config {
 };
 
 /*!
+ * \brief Get the framework time driver for a generic timer device.
+ *
+ * \details This function is intended to be used by a firmware to register a
+ *      generic timer as the driver for the framework time component.
+ *
+ * \param[out] ctx Pointer to storage for the context passed to the driver.
+ * \param[in] cfg Generic timer configuration.
+ *
+ * \return Framework time driver for the given device.
+ */
+struct fwk_time_driver mod_gtimer_driver(
+    const void **ctx,
+    const struct mod_gtimer_dev_config *cfg);
+
+/*!
  * @}
  */
 
