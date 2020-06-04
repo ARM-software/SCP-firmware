@@ -12,10 +12,6 @@
 #include <internal/fwk_module.h>
 #include <internal/fwk_thread.h>
 
-#ifdef BUILD_HAS_NOTIFICATION
-#    include <internal/fwk_notification.h>
-#endif
-
 #include <fwk_assert.h>
 #include <fwk_cli_dbg.h>
 #include <fwk_dlist.h>
@@ -31,10 +27,6 @@
 
 #define EVENT_COUNT 64
 #define BIND_ROUND_MAX 1
-
-#ifndef NOTIFICATION_COUNT
-#define NOTIFICATION_COUNT 64
-#endif
 
 /* Pre-runtime phase stages */
 enum module_stage {
@@ -412,12 +404,6 @@ int __fwk_module_init(void)
         if (status != FWK_SUCCESS)
             return status;
     }
-
-    #ifdef BUILD_HAS_NOTIFICATION
-    status = __fwk_notification_init(NOTIFICATION_COUNT);
-    if (status != FWK_SUCCESS)
-        return status;
-    #endif
 
     ctx.stage = MODULE_STAGE_START;
     status = start_modules();

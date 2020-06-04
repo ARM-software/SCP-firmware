@@ -14,11 +14,27 @@
 #include <fwk_event.h>
 #include <fwk_id.h>
 
+#if __has_include(<fmw_notification.h>)
+#    include <fmw_notification.h>
+#endif
+
 /*!
  * \ingroup GroupLibFramework
  * \defgroup GroupNotification Notifications
  * @{
  */
+
+/*!
+ * \def FMW_NOTIFICATION_MAX
+ *
+ * \brief Maximum number of active notifications.
+ *
+ * \details This value represents the maximum number of notifications that can
+ *      be active at any one time.
+ */
+#ifndef FMW_NOTIFICATION_MAX
+#    define FMW_NOTIFICATION_MAX 64
+#endif
 
 /*!
  * \brief Subscribe to a notification.
