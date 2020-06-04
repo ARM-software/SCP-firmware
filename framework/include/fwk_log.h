@@ -403,16 +403,6 @@ const struct fwk_log_backend *fwk_log_deregister(void);
 /*!
  * \internal
  *
- * \brief Initialize the logging component.
- *
- * \details This function initializes the logging component, enabling log
- *      messages to be buffered until a backend is registered.
- */
-void fwk_log_init(void);
-
-/*!
- * \internal
- *
  * \brief Log a message with a specified filter level.
  *
  * \param[in] format Format string.

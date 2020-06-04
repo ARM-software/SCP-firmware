@@ -237,14 +237,14 @@ void fwk_log_snprintf(const char *format, ...)
     fwk_interrupt_global_enable();
 }
 
-void fwk_log_init(void)
-{
 #ifdef FWK_LOG_BUFFERED
+__attribute((constructor)) void fwk_log_init(void)
+{
     static char storage[FMW_LOG_BUFFER_SIZE];
 
     fwk_ring_init(&fwk_log_ctx.ring, storage, sizeof(storage));
-#endif
 }
+#endif
 
 int fwk_log_unbuffer(void)
 {
