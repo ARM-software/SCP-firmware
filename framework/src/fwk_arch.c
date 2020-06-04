@@ -64,8 +64,6 @@ int fwk_arch_init(const struct fwk_arch_init_driver *driver)
 {
     int status;
 
-    fwk_log_init();
-
     if (driver == NULL)
         return FWK_E_PARAM;
 
