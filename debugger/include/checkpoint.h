@@ -128,12 +128,12 @@ void checkpoint(checkpoint_st *c, char *file, int32_t line, char *tag);
  * \retval FWK_E_NOMEM when checkpoints limit is reached.
  *
  */
-#define checkpoint_register(c, name) \
-    __extension__({ \
-        (void)c; \
-        (void)name; \
-        FWK_SUCCESS; \
-    })
+#    define checkpoint_register(c, name) \
+        ({ \
+            (void)c; \
+            (void)name; \
+            FWK_SUCCESS; \
+        })
 
 /*!
  * \brief Insert a checkpoint
@@ -151,13 +151,13 @@ void checkpoint(checkpoint_st *c, char *file, int32_t line, char *tag);
  * \param line Line number of the checkpoint, use __LINE__ macro.
  * \param tag Checkpoint tag string.
  */
-#define checkpoint(c, file, line, tag) \
-    do { \
-        (void)c; \
-        (void)file; \
-        (void)line; \
-        (void)tag; \
-    } while (0)
+#    define checkpoint(c, file, line, tag) \
+        do { \
+            (void)c; \
+            (void)file; \
+            (void)line; \
+            (void)tag; \
+        } while (0)
 
 #endif
 
