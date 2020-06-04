@@ -294,11 +294,11 @@ int cli_command_register(cli_command_st new_cmd);
  * \retval CLI_SUCCESS Operation succeeded.
  * \retval CLI_ERR_MEM Not enough memory.
  */
-#define cli_command_register(new_cmd) \
-    __extension__({ \
-        (void)new_cmd; \
-        FWK_SUCCESS; \
-    })
+#    define cli_command_register(new_cmd) \
+        ({ \
+            (void)new_cmd; \
+            FWK_SUCCESS; \
+        })
 #endif
 
 #endif /* _CLI_H_ */

@@ -99,12 +99,10 @@ endif
 # set of warnings, and any warnings that do occur are upgraded to errors to
 # prevent the firmware from building.
 CFLAGS += -Werror
-CFLAGS += -Wno-error=deprecated-declarations
 CFLAGS += -Wall
 CFLAGS += -Wextra
-CFLAGS += -pedantic
-CFLAGS += -pedantic-errors
 
+CFLAGS += -Wno-error=deprecated-declarations
 CFLAGS += -Wno-unused-parameter
 
 # GCC is not currently consistent in how it applies this warning, but this flag
@@ -128,7 +126,7 @@ LDFLAGS_ARM += -Wl,--remove
 CFLAGS_CLANG += -Wno-dollar-in-identifier-extension
 
 CFLAGS += -g
-CFLAGS += -std=c11
+CFLAGS += -std=gnu11
 CFLAGS_CLANG += -fshort-enums # Required by RTX
 
 CFLAGS += -fno-exceptions

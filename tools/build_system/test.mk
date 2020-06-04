@@ -24,7 +24,7 @@ CFLAGS += -Wno-missing-field-initializers
 CFLAGS += -Wno-error=deprecated-declarations
 CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-strict-aliasing
-CFLAGS += -std=c11
+CFLAGS += -std=gnu11
 CFLAGS += $(addprefix -I,$(INCLUDES))
 
 CFLAGS += -DBUILD_MODE_DEBUG
