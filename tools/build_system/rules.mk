@@ -110,12 +110,6 @@ CFLAGS += -Wno-unused-parameter
 # without it.
 CFLAGS += -Wno-missing-field-initializers
 
-# Clang picks up a number of situations that GCC does not with this warning
-# enabled. Most of them do not have easy fixes, and are valid C, so this flag
-# should remain unless we move to a version of Clang/Arm Compiler that does not
-# warn about the situations that have not already been fixed.
-CFLAGS_CLANG += -Wno-missing-braces
-
 # Place functions and data into their own sections. This allows the linker to
 # strip out functions with no references.
 CFLAGS += -ffunction-sections -fdata-sections
