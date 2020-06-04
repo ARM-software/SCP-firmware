@@ -29,12 +29,6 @@
 
 struct notification_ctx {
     /*
-     * Flag indicating whether the notification framework component is
-     * initialized.
-     */
-    bool initialized;
-
-    /*
      * Queue of notification subscription structures that are free.
      */
     struct fwk_dlist free_subscription_dlist;
@@ -152,31 +146,25 @@ static void send_notifications(struct fwk_event *notification_event,
  * Private interface functions
  */
 
-int __fwk_notification_init(size_t notification_count)
+static __attribute((constructor)) void fwk_notification_init(void)
 {
-    struct __fwk_notification_subscription *subscription_table,
-        *subscription_table_upper_limit, *subscription;
+    static struct __fwk_notification_subscription
+        subscriptions[FMW_NOTIFICATION_MAX];
 
-    subscription_table = fwk_mm_calloc(
-        notification_count, sizeof(struct __fwk_notification_subscription));
+    unsigned int i;
 
-    /* All the subscription structures are free to be used. */
+    /* All the subscription structures are free to be used */
     fwk_list_init(&ctx.free_subscription_dlist);
-    for (subscription = subscription_table,
-         subscription_table_upper_limit = subscription + notification_count;
-         subscription < subscription_table_upper_limit;
-         subscription++)
-        fwk_list_push_tail(&ctx.free_subscription_dlist,
-                           &subscription->dlist_node);
 
-    ctx.initialized = true;
-
-    return FWK_SUCCESS;
+    for (i = 0; i < FMW_NOTIFICATION_MAX; i++) {
+        fwk_list_push_tail(
+            &ctx.free_subscription_dlist, &subscriptions[i].dlist_node);
+    }
 }
 
 void __fwk_notification_reset(void)
 {
-    ctx = (struct notification_ctx){ 0 };
+    fwk_notification_init();
 }
 
 /*
@@ -190,11 +178,6 @@ int fwk_notification_subscribe(fwk_id_t notification_id, fwk_id_t source_id,
     unsigned int interrupt;
     struct fwk_dlist *subscription_dlist;
     struct __fwk_notification_subscription *subscription;
-
-    if (!ctx.initialized) {
-        status = FWK_E_INIT;
-        goto error;
-    }
 
     if (fwk_interrupt_get_current(&interrupt) == FWK_SUCCESS) {
         status = FWK_E_HANDLER;
@@ -248,11 +231,6 @@ int fwk_notification_unsubscribe(fwk_id_t notification_id, fwk_id_t source_id,
     struct fwk_dlist *subscription_dlist;
     struct __fwk_notification_subscription *subscription;
 
-    if (!ctx.initialized) {
-        status = FWK_E_INIT;
-        goto error;
-    }
-
     if (fwk_interrupt_get_current(&interrupt) == FWK_SUCCESS) {
         status = FWK_E_HANDLER;
         goto error;
@@ -293,11 +271,6 @@ int fwk_notification_notify(struct fwk_event *notification_event,
     int status;
     unsigned int interrupt;
     const struct fwk_event *current_event;
-
-    if (!ctx.initialized) {
-        status = FWK_E_INIT;
-        goto error;
-    }
 
     if ((notification_event == NULL) || (count == NULL))
         return FWK_E_PARAM;
