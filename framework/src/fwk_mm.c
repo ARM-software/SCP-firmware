@@ -19,10 +19,27 @@
 #include <stdint.h>
 #include <string.h>
 
-static bool initialized;
-static bool mm_locked;
-static uintptr_t heap_free;
-static uintptr_t heap_end;
+/*!
+ * \internal
+ *
+ * \brief Memory manager context.
+ */
+static struct fwk_mm_ctx {
+    /*!
+     * \brief Whether the memory management component is initialized.
+     */
+    bool initialized;
+
+    /*!
+     * \brief Address of the start of free heap memory.
+     */
+    uintptr_t heap_free;
+
+    /*!
+     * \brief Address of the end of heap memory.
+     */
+    uintptr_t heap_end;
+} fwk_mm_ctx;
 
 /*
  * Initialize the memory management component.
@@ -36,16 +53,16 @@ static uintptr_t heap_end;
  */
 int fwk_mm_init(uintptr_t start, size_t size)
 {
-    if (initialized)
+    if (fwk_mm_ctx.initialized)
         return FWK_E_STATE;
 
     if ((start == 0) || (size == 0))
         return FWK_E_RANGE;
 
-    heap_free = start;
-    heap_end = start + size;
+    fwk_mm_ctx.heap_free = start;
+    fwk_mm_ctx.heap_end = start + size;
 
-    initialized = true;
+    fwk_mm_ctx.initialized = true;
 
     return FWK_SUCCESS;
 }
@@ -61,7 +78,7 @@ void *fwk_mm_alloc_aligned(size_t num, size_t size, unsigned int alignment)
     size_t total_size;
     bool overflow;
 
-    if (mm_locked || !num || !size || !alignment || !initialized)
+    if (!num || !size || !alignment || !fwk_mm_ctx.initialized)
         goto error;
 
     /* Ensure 'alignment' is a power of two */
@@ -74,17 +91,17 @@ void *fwk_mm_alloc_aligned(size_t num, size_t size, unsigned int alignment)
     if (overflow)
         goto error;
 
-    start = FWK_ALIGN_NEXT(heap_free, alignment);
+    start = FWK_ALIGN_NEXT(fwk_mm_ctx.heap_free, alignment);
 
     /* Ensure there is no overflow during the alignment */
-    if (start < heap_free)
+    if (start < fwk_mm_ctx.heap_free)
         goto error;
 
     /* Ensure 'total_size' fits in the remaining heap area */
-    if (total_size > (heap_end - start))
+    if (total_size > (fwk_mm_ctx.heap_end - start))
         goto error;
 
-    heap_free = start + total_size;
+    fwk_mm_ctx.heap_free = start + total_size;
 
     return (void *)start;
 
@@ -112,7 +129,7 @@ void *fwk_mm_calloc_aligned(size_t num, size_t size, unsigned int alignment)
 void *_sbrk(intptr_t increment)
 {
     if (increment == 0) {
-        return (void *)heap_end;
+        return (void *)fwk_mm_ctx.heap_end;
     } else {
         errno = ENOMEM;
 
