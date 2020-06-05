@@ -47,7 +47,6 @@ struct fwk_test_suite_desc test_suite = {
 };
 
 extern int fwk_mm_init(uintptr_t start, size_t size);
-extern void fwk_mm_lock(void);
 
 static int start[SIZE_MEM];
 
