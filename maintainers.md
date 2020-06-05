@@ -14,6 +14,10 @@ contributions.
 - [Chris Kay](https://github.com/CJKay) (chris.kay@arm.com)
 - [Nicola Mazzucato](https://github.com/nicola-mazzucato-arm) (nicola.mazzucato@arm.com)
 - [Jim Quigley](https://github.com/jimqui01) (jim.quigley@arm.com)
+- [Tarek El-Sherbiny](https://github.com/tarek-arm) (tarek.el-sherbiny@arm.com)
+- [Girish Pathak](https://github.com/girishpathak) (girish.pathak@arm.com)
+- [Leandro Belli](https://github.com/leandro-arm) (leandro.belli@arm.com)
+- [Luca Vizzarro](https://github.com/Sevenarth) (luca.vizzarro@arm.com)
 
 ## Secondary Maintainers
 
@@ -38,7 +42,15 @@ maintainers. The platforms listed here represent the exceptions to this rule.
 - [Manoj Kumar](https://github.com/manojkumar-arm) (manoj.kumar3@arm.com)
 - [Sudipto Paul](https://github.com/sudpau01) (sudipto.paul@arm.com)
 
-### Socionext Platform Maintainers
+#### RD-Daniel (rddaniel, rddanielxlr)
+
+- [Thomas Abraham](https://github.com/omasab) (thomas.abraham@arm.com)
+
+#### Total Compute (tc0)
+
+- [Tushar Khandelwal](https://github.com/tusharkhandelwal2) (tushar.khandelwal@arm.com)
+
+### Socionext
 
 #### SynQuacer (synquacer)
 
