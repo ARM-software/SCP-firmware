@@ -50,11 +50,6 @@ int fwk_mm_init(uintptr_t start, size_t size)
     return FWK_SUCCESS;
 }
 
-void fwk_mm_lock(void)
-{
-    mm_locked = true;
-}
-
 void *fwk_mm_alloc(size_t num, size_t size)
 {
     return fwk_mm_alloc_aligned(num, size, FWK_MM_DEFAULT_ALIGNMENT);
