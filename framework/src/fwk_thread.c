@@ -199,6 +199,9 @@ static void process_isr(void)
                              struct fwk_event, slist_node);
     fwk_interrupt_global_enable();
 
+    if (isr_event == NULL)
+        return;
+
     FWK_LOG_TRACE(
         "[FWK] Get ISR event (%s: %s -> %s)\n",
         FWK_ID_STR(isr_event->id),
@@ -238,14 +241,8 @@ noreturn void __fwk_thread_run(void)
     for (;;) {
         while (!fwk_list_is_empty(&ctx.event_queue))
             process_next_event();
-
-        while (fwk_list_is_empty(&ctx.isr_event_queue)) {
-            fwk_log_unbuffer();
-
-            continue;
-        }
-
         process_isr();
+        fwk_log_unbuffer();
     }
 }
 
@@ -385,9 +382,7 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
     for (;;) {
 
         if (fwk_list_is_empty(&ctx.event_queue)) {
-            if (!fwk_list_is_empty(&ctx.isr_event_queue))
                 process_isr();
-            continue;
         }
 
         ctx.current_event = next_event = FWK_LIST_GET(fwk_list_head(
@@ -399,8 +394,6 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
             * we get to the event from the waiting call.
             */
             process_next_event();
-            if (!fwk_list_is_empty(&ctx.isr_event_queue))
-                process_isr();
             continue;
         }
 
@@ -455,8 +448,7 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
              * Check for any interrupt events that might have been
              * queued while the event was being executed.
              */
-            while (!fwk_list_is_empty(&ctx.isr_event_queue))
-                process_isr();
+            process_isr();
             continue;
         }
 
