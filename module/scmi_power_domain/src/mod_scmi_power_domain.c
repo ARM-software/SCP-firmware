@@ -200,10 +200,11 @@ static int scmi_device_state_to_pd_state(uint32_t scmi_state,
 static int pd_state_to_scmi_device_state(unsigned int pd_state,
                                          uint32_t *scmi_state)
 {
-     if (pd_state >= FWK_ARRAY_SIZE(pd_state_to_scmi_dev_state))
-         return FWK_E_PWRSTATE;
+    if (pd_state == MOD_PD_STATE_OFF || pd_state == MOD_PD_STATE_ON)
+        *scmi_state = pd_state_to_scmi_dev_state[pd_state];
+    else
+        *scmi_state = pd_state;
 
-     *scmi_state = pd_state_to_scmi_dev_state[pd_state];
      return FWK_SUCCESS;
 }
 
@@ -571,9 +572,6 @@ static int scmi_pd_power_state_get_handler(fwk_id_t service_id,
 
     switch (pd_type) {
     case MOD_PD_TYPE_CORE:
-        status = scmi_pd_ctx.pd_api->get_composite_state(pd_id, &power_state);
-        break;
-
     case MOD_PD_TYPE_CLUSTER:
         status = scmi_pd_ctx.pd_api->get_state(pd_id, &power_state);
         break;

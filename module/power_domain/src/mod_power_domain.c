@@ -282,17 +282,6 @@ struct pd_system_shutdown_request {
     enum mod_pd_system_shutdown system_shutdown;
 };
 
-/*
- * For each power level, shift in a composite state of the state for the power
- * level.
- */
-static const unsigned int mod_pd_cs_level_state_shift[MOD_PD_LEVEL_COUNT] = {
-    MOD_PD_CS_LEVEL_0_STATE_SHIFT,
-    MOD_PD_CS_LEVEL_1_STATE_SHIFT,
-    MOD_PD_CS_LEVEL_2_STATE_SHIFT,
-    MOD_PD_CS_LEVEL_3_STATE_SHIFT
-};
-
 /* Mask of the core composite states */
 static const uint32_t core_composite_state_mask_table[] = {
     MOD_PD_CS_STATE_MASK << MOD_PD_CS_LEVEL_0_STATE_SHIFT,
@@ -1072,26 +1061,37 @@ static void process_get_state_request(struct pd_ctx *pd,
 {
     enum mod_pd_level level = get_level_from_tree_pos(pd->config->tree_pos);
     unsigned int composite_state = 0;
+    uint32_t shift;
+    const uint32_t *state_mask_table;
+    int table_size, cs_idx = 0;
 
-    if (!req_params->composite)
+    if (!pd->cs_support)
         resp_params->state = pd->current_state;
     else {
+        state_mask_table = pd->composite_state_mask_table;
+        table_size = pd->composite_state_mask_table_size;
+
         /*
          * Traverse the PD tree bottom-up from current power domain to the top,
          * collecting node's states and placing them in the correct position in
          * the composite state.
          */
         do {
-            composite_state |= pd->current_state <<
-                               mod_pd_cs_level_state_shift[level++];
+            shift = number_of_bits_to_shift(state_mask_table[cs_idx]);
+            composite_state |= pd->current_state << shift;
             pd = pd->parent;
-        } while (pd != NULL);
+            cs_idx++;
+            level++;
+        } while (pd != NULL && cs_idx < table_size);
 
         /*
          * Finally, we need to update the highest valid level in
          * the composite state.
          */
-        composite_state |= (--level) << MOD_PD_CS_LEVEL_SHIFT;
+        if (pd->composite_state_levels_mask) {
+            shift = number_of_bits_to_shift(pd->composite_state_levels_mask);
+            composite_state |= (--level) << shift;
+        }
 
         resp_params->state = composite_state;
     }
@@ -1584,39 +1584,6 @@ static int pd_get_state(fwk_id_t pd_id, unsigned int *state)
     return FWK_SUCCESS;
 }
 
-static int pd_get_composite_state(fwk_id_t pd_id, unsigned int *composite_state)
-{
-    int status;
-    struct fwk_event req;
-    struct fwk_event resp;
-    struct pd_get_state_request *req_params =
-        (struct pd_get_state_request *)(&req.params);
-    struct pd_get_state_response *resp_params =
-        (struct pd_get_state_response *)(&resp.params);
-
-    if (composite_state == NULL)
-        return FWK_E_PARAM;
-
-    req = (struct fwk_event) {
-        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
-                           MOD_PD_PUBLIC_EVENT_IDX_GET_STATE),
-        .target_id = pd_id,
-    };
-
-    req_params->composite = true;
-
-    status = fwk_thread_put_event_and_wait(&req, &resp);
-    if (status != FWK_SUCCESS)
-        return status;
-
-    if (resp_params->status != FWK_SUCCESS)
-        return resp_params->status;
-
-    *composite_state = resp_params->state;
-
-    return FWK_SUCCESS;
-}
-
 static int pd_reset(fwk_id_t pd_id)
 {
     int status;
@@ -1751,7 +1718,6 @@ static const struct mod_pd_restricted_api pd_restricted_api = {
     .set_state = pd_set_state,
     .set_state_async = pd_set_state_async,
     .get_state = pd_get_state,
-    .get_composite_state = pd_get_composite_state,
     .reset = pd_reset,
     .system_suspend = pd_system_suspend,
     .system_shutdown = pd_system_shutdown

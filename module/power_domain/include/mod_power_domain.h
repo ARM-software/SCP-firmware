@@ -624,27 +624,6 @@ struct mod_pd_restricted_api {
     int (*get_state)(fwk_id_t pd_id, unsigned int *state);
 
     /*!
-     * \brief Get the composite state of a power domain and its ancestors (if
-     *        any) in the power domain tree.
-     *
-     * \note The function gets the composite state of the power domain
-     *      identified by 'pd_id' and its ancestors (if any) synchronously from
-     *      the point of view of the calling thread.
-     *
-     * \param pd_id Identifier of the power domain whose composite state has to
-     *      be retrieved.
-     * \param[out] composite_state The power domain composite state.
-     *
-     * \retval FWK_SUCCESS The composite state was returned.
-     * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
-     *      call to the API.
-     * \retval FWK_E_HANDLER The function is not called from a thread.
-     * \retval FWK_E_PARAM The power domain identifier is unknown.
-     * \retval FWK_E_PARAM The pointer 'composite state' is equal to NULL.
-     */
-    int (*get_composite_state)(fwk_id_t pd_id, unsigned int *composite_state);
-
-    /*!
      * \brief Reset of a power domain.
      *
      * \note The function resets the power domain identified by 'pd_id'. When
