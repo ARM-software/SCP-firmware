@@ -86,7 +86,7 @@ static bool cxg_link_wait_condition(void *data)
         return (((val1 & CXG_LINK_STATUS_DVMDOMAIN_ACK_MASK)) != 0);
 
     default:
-        fwk_assert(false);
+        fwk_unexpected();
         return false;
     }
 }

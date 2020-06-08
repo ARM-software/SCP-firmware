@@ -107,7 +107,7 @@ static void i2c_callback_fn(struct n1sdp_i2c_dev_ctx *ctx,
             c2c_event.id = mod_n1sdp_i2c_notification_id_slave_error;
             break;
         default:
-            fwk_assert(false);
+            fwk_unexpected();
             return;
         }
         c2c_event.response_requested = false;

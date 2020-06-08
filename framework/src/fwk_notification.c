@@ -205,7 +205,7 @@ int fwk_notification_subscribe(fwk_id_t notification_id, fwk_id_t source_id,
 
     if (subscription == NULL) {
         status = FWK_E_NOMEM;
-        fwk_assert(false);
+        fwk_unexpected();
         goto error;
     }
 

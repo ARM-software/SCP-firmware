@@ -130,7 +130,7 @@ uint32_t osThreadFlagsWait(uint32_t flags, uint32_t options, uint32_t timeout)
             wait = (local_thread_data->signal_flags & flags) != flags;
             break;
         default:
-            fwk_assert(false);
+            fwk_unexpected();
         }
 
         if (!wait)

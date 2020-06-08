@@ -153,7 +153,7 @@ static int msys_rom_process_notification(
 
     /* At least one notification response must be outstanding */
     if (ctx.notification_count == 0) {
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_PANIC;
     }
 

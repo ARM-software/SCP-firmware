@@ -517,7 +517,7 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
             break;
 
         default:
-            fwk_assert(false);
+            fwk_unexpected();
             return FWK_E_DATA;
         }
     }
@@ -564,7 +564,7 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
             break;
 
         default:
-            fwk_assert(false);
+            fwk_unexpected();
             return FWK_E_DATA;
         }
     }

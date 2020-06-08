@@ -584,7 +584,7 @@ static void cluster_pd_ppu_interrupt_handler(struct ppu_v1_pd_ctx *pd_ctx)
 
     default:
         /* Cluster is in an invalid power mode */
-        fwk_assert(false);
+        fwk_unexpected();
         return;
     }
 }
@@ -688,7 +688,7 @@ static int ppu_v1_pd_init(fwk_id_t pd_id, unsigned int unused, const void *data)
             return ppu_v1_set_power_mode(pd_ctx->ppu, PPU_V1_MODE_ON);
 
         default:
-            fwk_assert(false);
+            fwk_unexpected();
             return FWK_E_SUPPORT;
         }
     }
@@ -749,7 +749,7 @@ static int ppu_v1_bind(fwk_id_t id, unsigned int round)
     if (!fwk_id_is_equal(pd_ctx->config->observer_id, FWK_ID_NONE)) {
         if (pd_ctx->config->pd_type != MOD_PD_TYPE_CLUSTER) {
             /* State observation only supported for clusters */
-            fwk_assert(false);
+            fwk_unexpected();
             return FWK_E_SUPPORT;
         }
 
@@ -781,7 +781,7 @@ static int ppu_v1_bind(fwk_id_t id, unsigned int round)
     #endif
 
     default:
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_SUPPORT;
     }
 }
@@ -821,7 +821,7 @@ static int ppu_v1_process_bind_request(fwk_id_t source_id,
     /* Allow multiple binding only for device power domain for now */
     if ((pd_ctx->config->pd_type != MOD_PD_TYPE_DEVICE) &&
         (!fwk_id_is_equal(pd_ctx->bound_id, FWK_ID_NONE))) {
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_ACCESS;
     }
 

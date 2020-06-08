@@ -493,7 +493,7 @@ static void timer_isr(uintptr_t ctx_ptr)
 
     if (alarm == NULL) {
         /* Timer interrupt triggered without any alarm in the active queue */
-        fwk_assert(false);
+        fwk_unexpected();
         return;
     }
 
@@ -595,7 +595,7 @@ static int timer_process_bind_request(fwk_id_t requester_id,
 
     if (fwk_id_is_equal(api_id, MOD_TIMER_API_ID_TIMER)) {
         if (!fwk_module_is_valid_element_id(id)) {
-            fwk_assert(false);
+            fwk_unexpected();
             return FWK_E_PARAM;
         }
 
@@ -606,7 +606,7 @@ static int timer_process_bind_request(fwk_id_t requester_id,
     /* Alarm API requested */
 
     if (!fwk_module_is_valid_sub_element_id(id)) {
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_PARAM;
     }
 
@@ -614,7 +614,7 @@ static int timer_process_bind_request(fwk_id_t requester_id,
     alarm_ctx = &ctx->alarm_pool[fwk_id_get_sub_element_idx(id)];
 
     if (alarm_ctx->bound) {
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_STATE;
     }
 

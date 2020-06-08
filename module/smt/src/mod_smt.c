@@ -82,7 +82,7 @@ static int smt_get_secure(fwk_id_t channel_id, bool *secure)
     struct smt_channel_ctx *channel_ctx;
 
     if (secure == NULL) {
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_PARAM;
     }
 
@@ -99,7 +99,7 @@ static int smt_get_max_payload_size(fwk_id_t channel_id, size_t *size)
     struct smt_channel_ctx *channel_ctx;
 
     if (size == NULL) {
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_PARAM;
     }
 
@@ -116,7 +116,7 @@ static int smt_get_message_header(fwk_id_t channel_id, uint32_t *header)
     struct smt_channel_ctx *channel_ctx;
 
     if (header == NULL) {
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_PARAM;
     }
 
@@ -138,7 +138,7 @@ static int smt_get_payload(fwk_id_t channel_id,
     struct smt_channel_ctx *channel_ctx;
 
     if (payload == NULL) {
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_PARAM;
     }
 
@@ -172,7 +172,7 @@ static int smt_write_payload(fwk_id_t channel_id,
         (offset  > channel_ctx->max_payload_size) ||
         (size > channel_ctx->max_payload_size)    ||
         ((offset + size) > channel_ctx->max_payload_size)) {
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_PARAM;
     }
 
@@ -384,14 +384,14 @@ static int smt_signal_message(fwk_id_t channel_id)
     switch (channel_ctx->config->type) {
     case MOD_SMT_CHANNEL_TYPE_MASTER:
         /* Not supported yet */
-        fwk_assert(false);
+        fwk_unexpected();
         break;
     case MOD_SMT_CHANNEL_TYPE_SLAVE:
         return smt_slave_handler(channel_ctx);
         break;
     default:
         /* Invalid config */
-        fwk_assert(false);
+        fwk_unexpected();
         break;
     }
 
@@ -428,7 +428,7 @@ static int smt_channel_init(fwk_id_t channel_id, unsigned int unused,
     if ((channel_ctx->config->type >= MOD_SMT_CHANNEL_TYPE_COUNT) ||
         (channel_ctx->config->mailbox_address == 0) ||
         (channel_ctx->config->mailbox_size == 0)) {
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_DATA;
     }
 
@@ -493,7 +493,7 @@ static int smt_process_bind_request(fwk_id_t source_id,
     /* Only bind to a channel (not the whole module) */
     if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT)) {
         /* Tried to bind to something other than a specific channel */
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_PARAM;
     }
 
@@ -522,7 +522,7 @@ static int smt_process_bind_request(fwk_id_t source_id,
             *api = &driver_input_api;
         } else {
             /* A module that we did not bind to is trying to bind to us */
-            fwk_assert(false);
+            fwk_unexpected();
             return FWK_E_ACCESS;
         }
         break;
@@ -541,7 +541,7 @@ static int smt_process_bind_request(fwk_id_t source_id,
 
     default:
         /* Invalid API */
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_PARAM;
     }
 

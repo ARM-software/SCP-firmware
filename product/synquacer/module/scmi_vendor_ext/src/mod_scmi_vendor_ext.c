@@ -271,7 +271,7 @@ static int scmi_vendor_ext_init(
 {
     if (element_count != 0) {
         /* This module should not have any elements */
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_SUPPORT;
     }
 
@@ -291,7 +291,7 @@ static int scmi_vendor_ext_bind(fwk_id_t id, unsigned int round)
         &scmi_vendor_ext_ctx.scmi_api);
     if (status != FWK_SUCCESS) {
         /* Failed to bind to SCMI module */
-        fwk_assert(false);
+        fwk_unexpected();
         return status;
     }
 

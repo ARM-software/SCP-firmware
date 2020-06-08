@@ -162,7 +162,7 @@ static void fw_ddr_change_freq(ddr_freq_t freq)
         break;
     default:
         FWK_LOG_INFO("[DDR] Invalid DDR frequency");
-        fwk_assert(false);
+        fwk_unexpected();
     }
 
     /* set value */
