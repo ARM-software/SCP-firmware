@@ -293,7 +293,7 @@ bool pcie_wait_condition(void *data)
     case PCIE_INIT_STAGE_LINK_RE_TRNG:
         return ((ctrl_apb->RP_LTSSM_STATE & RP_LTSSM_STATE_MASK) == 0x10);
     default:
-        fwk_assert(false);
+        fwk_unexpected();
         return false;
     }
 }
@@ -359,7 +359,7 @@ int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
         break;
 
     default:
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_PARAM;
     }
     return FWK_SUCCESS;

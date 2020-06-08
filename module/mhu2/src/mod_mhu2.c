@@ -129,7 +129,7 @@ static int mhu2_init(fwk_id_t module_id,
 {
     if (channel_count == 0) {
         /* There must be at least 1 mhu channel */
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_PARAM;
     }
 
@@ -150,7 +150,7 @@ static int mhu2_channel_init(fwk_id_t channel_id,
     struct mhu2_recv_reg *recv_reg;
 
     if ((config == NULL) || (config->recv == 0) || (config->send == 0)) {
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_DATA;
     }
 
@@ -158,7 +158,7 @@ static int mhu2_channel_init(fwk_id_t channel_id,
     channel_ctx->send = (struct mhu2_send_reg *)config->send;
 
     if (config->channel >= channel_ctx->send->MSG_NO_CAP) {
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_DATA;
     }
 
@@ -196,7 +196,7 @@ static int mhu2_bind(fwk_id_t id, unsigned int round)
                                      &smt_channel->api);
             if (status != FWK_SUCCESS) {
                 /* Unable to bind back to SMT channel */
-                fwk_assert(false);
+                fwk_unexpected();
                 return status;
             }
         }
@@ -218,7 +218,7 @@ static int mhu2_process_bind_request(fwk_id_t source_id,
          * Something tried to bind to the module or an element. Only binding to
          * a slot (sub-element) is allowed.
          */
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_ACCESS;
     }
 
@@ -227,7 +227,7 @@ static int mhu2_process_bind_request(fwk_id_t source_id,
 
     if (channel_ctx->bound_slots & (1 << slot)) {
         /* Something tried to bind to a slot that has already been bound to */
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_ACCESS;
     }
 
@@ -255,13 +255,13 @@ static int mhu2_start(fwk_id_t id)
                                              (uintptr_t)channel_ctx);
         if (status != FWK_SUCCESS) {
             /* Failed to set isr */
-            fwk_assert(false);
+            fwk_unexpected();
             return status;
         }
         status = fwk_interrupt_enable(channel_ctx->config->irq);
         if (status != FWK_SUCCESS) {
             /* Failed to enable isr */
-            fwk_assert(false);
+            fwk_unexpected();
             return status;
         }
     }

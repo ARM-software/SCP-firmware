@@ -209,7 +209,7 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
 
     if (SCMI_SENSOR_DESCS_MAX(max_payload_size) == 0) {
         /* Can't even fit one sensor description in the payload */
-        fwk_assert(false);
+        fwk_unexpected();
         status = FWK_E_SIZE;
         goto exit;
     }
@@ -238,7 +238,7 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
         sensor_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, desc_index);
         if (!fwk_module_is_valid_element_id(sensor_id)) {
             /* domain_idx did not map to a sensor device */
-            fwk_assert(false);
+            fwk_unexpected();
             return_values.status = SCMI_NOT_FOUND;
             goto exit;
         }
@@ -246,13 +246,13 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
         status = scmi_sensor_ctx.sensor_api->get_info(sensor_id, &sensor_info);
         if (status != FWK_SUCCESS) {
             /* Unable to get sensor info */
-            fwk_assert(false);
+            fwk_unexpected();
             goto exit;
         }
 
         if (sensor_info.type >= MOD_SENSOR_TYPE_COUNT) {
             /* Invalid sensor type */
-            fwk_assert(false);
+            fwk_unexpected();
             goto exit;
         }
 
@@ -262,7 +262,7 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
              SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_UNIT_MULTIPLIER_MAX)) {
 
             /* Sensor unit multiplier out of range */
-            fwk_assert(false);
+            fwk_unexpected();
             goto exit;
         }
 
@@ -272,7 +272,7 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
              SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_UPDATE_MULTIPLIER_MAX)) {
 
             /* Sensor update interval multiplier is out of range */
-            fwk_assert(false);
+            fwk_unexpected();
             goto exit;
         }
 
@@ -280,7 +280,7 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
             SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_UPDATE_INTERVAL_MASK) {
 
             /* Update interval is too big to fit in its mask */
-            fwk_assert(false);
+            fwk_unexpected();
             goto exit;
         }
 
@@ -302,7 +302,7 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
             payload_size, &desc, sizeof(struct scmi_sensor_desc));
         if (status != FWK_SUCCESS) {
             /* Failed to write sensor description into message payload */
-            fwk_assert(false);
+            fwk_unexpected();
             goto exit;
         }
     }
@@ -455,7 +455,7 @@ static int scmi_sensor_init(fwk_id_t module_id,
 {
     if (element_count != 0) {
         /* This module should not have any elements */
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_SUPPORT;
     }
 
@@ -494,7 +494,7 @@ static int scmi_sensor_bind(fwk_id_t id, unsigned int round)
                              &scmi_sensor_ctx.scmi_api);
     if (status != FWK_SUCCESS) {
         /* Failed to bind to SCMI module */
-        fwk_assert(false);
+        fwk_unexpected();
         return status;
     }
 
@@ -503,7 +503,7 @@ static int scmi_sensor_bind(fwk_id_t id, unsigned int round)
                              &scmi_sensor_ctx.sensor_api);
     if (status != FWK_SUCCESS) {
         /* Failed to bind to sensor module */
-        fwk_assert(false);
+        fwk_unexpected();
         return status;
     }
 

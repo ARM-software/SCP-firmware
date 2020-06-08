@@ -295,7 +295,7 @@ bool dmc620_wait_condition(void *data)
         return ((dmc->CHANNEL_STATUS &
                  MOD_DMC620_CHANNEL_STATUS_M0_IDLE) != 0);
     default:
-        fwk_assert(false);
+        fwk_unexpected();
         return false;
     }
 }
@@ -608,7 +608,7 @@ static int direct_ddr_cmd(struct mod_dmc620_reg *dmc)
         addr = 0x000000A4;
         break;
     default:
-        fwk_assert(false);
+        fwk_unexpected();
         break;
     }
     execute_ddr_cmd(dmc, addr, 0x0001070F, 5);
@@ -626,7 +626,7 @@ static int direct_ddr_cmd(struct mod_dmc620_reg *dmc)
         addr = 0x00000347;
         break;
     default:
-        fwk_assert(false);
+        fwk_unexpected();
         break;
     }
     execute_ddr_cmd(dmc, addr, 0x0001070F, 5);
@@ -711,7 +711,7 @@ static int direct_ddr_cmd(struct mod_dmc620_reg *dmc)
             addr = 0x00000CA3;
         break;
     default:
-        fwk_assert(false);
+        fwk_unexpected();
         break;
     }
     addr = addr | 0x00000080;
@@ -752,7 +752,7 @@ static int direct_ddr_cmd(struct mod_dmc620_reg *dmc)
         ddr_info.cwl_value = 14;
         break;
     default:
-        fwk_assert(false);
+        fwk_unexpected();
         break;
     }
     execute_ddr_cmd(dmc, addr,
@@ -775,7 +775,7 @@ static int direct_ddr_cmd(struct mod_dmc620_reg *dmc)
         addr = 0x00000B44;
         break;
     default:
-        fwk_assert(false);
+        fwk_unexpected();
         break;
     }
     execute_ddr_cmd(dmc, addr,
@@ -1034,7 +1034,7 @@ static int dmc620_config(struct mod_dmc620_reg *dmc, fwk_id_t ddr_id)
         dmc->T_RDDATA_EN_NEXT = 0x000E000E;
         break;
     default:
-        fwk_assert(false);
+        fwk_unexpected();
         break;
     }
 
@@ -1051,7 +1051,7 @@ static int dmc620_config(struct mod_dmc620_reg *dmc, fwk_id_t ddr_id)
         dmc->T_PHYWRLAT_NEXT = 0x010A000E;
         break;
     default:
-        fwk_assert(false);
+        fwk_unexpected();
         break;
     }
 

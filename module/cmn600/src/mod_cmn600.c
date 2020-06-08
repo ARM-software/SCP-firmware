@@ -516,7 +516,7 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
             break;
 
         default:
-            fwk_assert(false);
+            fwk_unexpected();
             return FWK_E_DATA;
         }
     }

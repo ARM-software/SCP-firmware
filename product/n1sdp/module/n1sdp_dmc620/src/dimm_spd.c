@@ -98,7 +98,7 @@ static int chk_ddr4_dimms(unsigned int speed,
             return FWK_E_DATA;
         break;
     default:
-        fwk_assert(false);
+        fwk_unexpected();
         break;
     }
 
@@ -136,7 +136,7 @@ static void dimm_device_data(uint8_t *spd_data, uint8_t dimm_id)
             0xF & spd_data[323]);
     } else {
         FWK_LOG_INFO("[DDR] ERROR! DDR4 SPD EEPROM Not Detected");
-        fwk_assert(false);
+        fwk_unexpected();
     }
 }
 

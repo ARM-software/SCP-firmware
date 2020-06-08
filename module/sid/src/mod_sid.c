@@ -61,7 +61,7 @@ static int sid_init(
     struct sid_reg *sid_reg;
 
     if ((config == NULL) || (config->sid_base == 0) || (element_count == 0)) {
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_DATA;
     }
 

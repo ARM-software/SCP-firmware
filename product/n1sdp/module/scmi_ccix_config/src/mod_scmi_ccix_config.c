@@ -404,7 +404,7 @@ static int scmi_ccix_config_init(fwk_id_t module_id,
 {
     if (element_count != 0) {
         /* This module should not have any elements */
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_SUPPORT;
     }
 
@@ -423,7 +423,7 @@ static int scmi_ccix_config_bind(fwk_id_t id, unsigned int round)
         &scmi_ccix_config_ctx.scmi_api);
     if (status != FWK_SUCCESS) {
         /* Failed to bind to SCMI module */
-        fwk_assert(false);
+        fwk_unexpected();
         return status;
     }
 
@@ -432,7 +432,7 @@ static int scmi_ccix_config_bind(fwk_id_t id, unsigned int round)
         &scmi_ccix_config_ctx.pcie_ccix_config_api);
     if (status != FWK_SUCCESS) {
         /* Failed to bind to N1SDP PCIE module */
-        fwk_assert(false);
+        fwk_unexpected();
         return status;
     }
 
@@ -441,7 +441,7 @@ static int scmi_ccix_config_bind(fwk_id_t id, unsigned int round)
         &scmi_ccix_config_ctx.cmn600_ccix_config_api);
     if (status != FWK_SUCCESS) {
         /* Failed to bind to CMN600 module */
-        fwk_assert(false);
+        fwk_unexpected();
         return status;
     }
 

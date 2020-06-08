@@ -2007,7 +2007,7 @@ static int process_power_state_pre_transition_notification_response(
 {
     if (pd->power_state_pre_transition_notification_ctx.pending_responses
         == 0) {
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_PANIC;
     }
 
@@ -2053,7 +2053,7 @@ static int process_power_state_transition_notification_response(
     struct mod_pd_power_state_transition_notification_params *params;
 
     if (pd->power_state_transition_notification_ctx.pending_responses == 0) {
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_PANIC;
     }
 
@@ -2107,7 +2107,7 @@ static int pd_process_notification(const struct fwk_event *event,
 
     /* Only responses are expected. */
     if (!event->is_response) {
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_SUPPORT;
     }
 
@@ -2115,7 +2115,7 @@ static int pd_process_notification(const struct fwk_event *event,
         return process_pre_shutdown_notification_response();
 
     if (!fwk_module_is_valid_element_id(event->target_id)) {
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_PARAM;
     }
 

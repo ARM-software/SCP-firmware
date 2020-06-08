@@ -607,7 +607,7 @@ static int core_set_state(fwk_id_t ppu_id, unsigned int state)
         break;
 
     default:
-        fwk_assert(false);
+        fwk_unexpected();
         status = FWK_E_PANIC;
 
         break;
@@ -886,7 +886,7 @@ static int juno_ppu_bind(fwk_id_t id, unsigned int round)
         #endif
 
         default:
-            fwk_assert(false);
+            fwk_unexpected();
             return FWK_E_SUPPORT;
 
             break;

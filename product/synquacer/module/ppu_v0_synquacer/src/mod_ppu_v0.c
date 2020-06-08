@@ -293,7 +293,7 @@ static int ppu_v0_bind(fwk_id_t id, unsigned int round)
 #endif
 
     default:
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_SUPPORT;
     }
 }
@@ -311,7 +311,7 @@ static int ppu_v0_process_bind_request(
     switch (pd_ctx->config->pd_type) {
     case MOD_PD_TYPE_SYSTEM:
         if (!fwk_id_is_equal(pd_ctx->bound_id, FWK_ID_NONE)) {
-            fwk_assert(false);
+            fwk_unexpected();
             return FWK_E_ACCESS;
         }
         /* Fallthrough */
@@ -333,7 +333,7 @@ static int ppu_v0_process_bind_request(
             break;
         }
 #endif
-        fwk_assert(false);
+        fwk_unexpected();
         return FWK_E_ACCESS;
 
     default:

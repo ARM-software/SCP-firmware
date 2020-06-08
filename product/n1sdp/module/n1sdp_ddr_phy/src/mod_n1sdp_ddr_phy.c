@@ -387,7 +387,7 @@ static int write_eye_detect_single_rank(fwk_id_t element_id,
         dmc = (struct mod_dmc620_reg *)SCP_DMC1;
         ddr_phy_base = SCP_DDR_PHY1;
     } else
-        fwk_assert(false);
+        fwk_unexpected();
 
     best_vrefdq_mr6 = -1;
     for (slice = 0; slice < NUM_SLICES; slice++) {

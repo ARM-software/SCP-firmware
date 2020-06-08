@@ -132,7 +132,7 @@ void __fwk_slist_remove(
         node_iter = node_iter->next;
     }
 
-    fwk_assert(false);
+    fwk_unexpected();
 }
 
 bool __fwk_slist_contains(
