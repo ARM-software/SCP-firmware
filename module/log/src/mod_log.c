@@ -101,7 +101,7 @@ static int log_start(fwk_id_t id)
     fwk_assert(fwk_id_is_type(id, FWK_ID_TYPE_MODULE));
 
     status = fwk_log_register(&backend);
-    fwk_expect(status == FWK_SUCCESS);
+    fwk_check(status == FWK_SUCCESS);
 
     banner = log_config->banner;
 

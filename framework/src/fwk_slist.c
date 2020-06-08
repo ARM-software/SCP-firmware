@@ -53,7 +53,7 @@ void __fwk_slist_push_head(
 {
     assert(list != NULL);
     assert(new != NULL);
-    fwk_expect(new->next == NULL);
+    fwk_check(new->next == NULL);
 
     new->next = list->head;
 
@@ -68,7 +68,7 @@ void __fwk_slist_push_tail(
 {
     assert(list != NULL);
     assert(new != NULL);
-    fwk_expect(new->next == NULL);
+    fwk_check(new->next == NULL);
 
     new->next = (struct fwk_slist_node *)list;
 

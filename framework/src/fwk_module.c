@@ -153,7 +153,7 @@ static int init_module(struct fwk_module_ctx *module_ctx,
         (module->init == NULL) ||
         (module_config == NULL) ||
         ((module->api_count > 0) && (module->process_bind_request == NULL))) {
-        fwk_expect(false);
+        fwk_check(false);
         return FWK_E_PARAM;
     }
 
@@ -652,7 +652,7 @@ int fwk_module_bind(fwk_id_t target_id, fwk_id_t api_id, const void *api)
     return FWK_SUCCESS;
 
 error:
-    fwk_expect(false);
+    fwk_check(false);
     FWK_LOG_CRIT(err_msg_func, status, __func__);
     return status;
 }

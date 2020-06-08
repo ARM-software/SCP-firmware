@@ -508,7 +508,7 @@ static int juno_soc_clock_init(fwk_id_t module_id,
                                unsigned int element_count,
                                const void *data)
 {
-    fwk_expect(element_count > 0);
+    fwk_check(element_count > 0);
 
     ctx_table = fwk_mm_calloc(element_count,
         sizeof(struct juno_soc_clock_dev_ctx));

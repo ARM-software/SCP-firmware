@@ -20,7 +20,7 @@ void __fwk_dlist_push_head(
 {
     assert(list != NULL);
     assert(new != NULL);
-    fwk_expect(new->prev == NULL);
+    fwk_check(new->prev == NULL);
 
     new->prev = (struct fwk_dlist_node *)list;
     list->head->prev = new;
@@ -36,7 +36,7 @@ void __fwk_dlist_push_tail(
 {
     assert(list != NULL);
     assert(new != NULL);
-    fwk_expect(new->prev == NULL);
+    fwk_check(new->prev == NULL);
 
     new->prev = list->tail;
 
@@ -91,8 +91,8 @@ void __fwk_dlist_insert(
     assert(list != NULL);
     assert(new != NULL);
     assert(new != node);
-    fwk_expect(new->next == NULL);
-    fwk_expect(new->prev == NULL);
+    fwk_check(new->next == NULL);
+    fwk_check(new->prev == NULL);
 
     if (node == NULL) {
         __fwk_dlist_push_tail(list, new);

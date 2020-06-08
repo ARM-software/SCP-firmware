@@ -13,70 +13,195 @@
 #include <assert.h>
 #include <stdbool.h>
 
-#ifndef static_assert
-#   define static_assert _Static_assert
-#endif
-
 /*!
  * \addtogroup GroupLibFramework
  * \defgroup GroupAssert Assertion Helpers
+ *
+ * \details The framework provides a number of assertion helpers to aid in
+ *      debugging and documenting code. Most of these trigger a standard library
+ *      assertion in some way, but they differ in when.
+ *
+ *      Choosing the most appropriate assertion helper can be complex, so their
+ *      individual purposes are summarised below:
+ *
+ *      - ::fwk_trap() - it is unsafe to continue at all
+ *      - ::fwk_unreachable() - this code is unreachable in normal
+ *          operation, and it is unsafe to continue
+ *      - ::fwk_unexpected() - this code is unreachable in normal operation,
+ *          but it is safe to continue
+ *      - ::fwk_assert(condition) - this condition holds true in normal
+ *          operation, and it is unsafe to continue
+ *      - ::fwk_check(condition) - this condition holds true in normal
+ *          operation, but it is safe to continue (statements only)
+ *      - ::fwk_expect(condition) - this condition holds true in normal
+ *          operation, but it is safe to continue (branch conditions only)
+ *
  * \{
  */
 
 /*!
- * \brief Force a target-dependent, unrecoverable trap.
+ * \brief Force a target-dependent abnormal program abort.
  *
- * \note If the framework is being built in debug mode then this function will
- *      loop indefinitely in order to facilitate the connection of a debugger
- *      instead of trapping.
+ * \note The only behaviour guaranteed by this macro is that the program will
+ *      terminate abnormally at the point that this macro is called.
  */
-noreturn void fwk_trap(void);
+#define fwk_trap() __builtin_trap()
 
 /*!
+ * \def fwk_unreachable
+ *
  * \brief Mark a code path as unreachable.
  *
- * \details This function will trap in debug builds, but in release builds
- *      this code path will be marked as unreachable to the optimizer.
- */
-noreturn void fwk_unreachable(void);
-
-/*!
- * \brief Expect the success of a condition.
+ * \details In debug builds, this macro will trigger an assertion. In release
+ *      builds this code path will be marked as unreachable to the compiler.
  *
- * \details This function will trap in debug builds if \p condition evaluates to
- *      \c false, but will otherwise do nothing.
- *
- *      Example usage:
+ *      #### Example
  *
  *      \code{.c}
- *      int n = 5;
+ *      int do_something(int x) {
+ *          switch (x) {
+ *          case 0:
+ *              return FWK_E_STATE;
  *
- *      if (!fwk_expect(n == 42))
- *          return FWK_E_STATE;
+ *          case 10:
+ *              return FWK_SUCCESS;
+ *
+ *          default:
+ *              fwk_unreachable();
+ *          }
+ *      }
  *      \endcode
  *
- *      In this example, \ref fwk_expect() is used to test the value of \c n. In
- *      debug builds, the condition will not hold and the program will trap. In
- *      release builds, the branch will be taken so the error can be properly
- *      handled.
- *
- * \param condition Condition to test.
- *
- * \retval true The expectation held.
- * \retval false The expectation did not hold.
+ *      In this example, the code will assert in a debug build if the
+ *      unreachable code is reached. In a release build the behaviour of the
+ *      program is undefined.
  */
-bool fwk_expect(bool condition);
+
+#ifdef NDEBUG
+#    define fwk_unreachable() __builtin_unreachable()
+#else
+#    define fwk_unreachable() fwk_assert("Unreachable code reached!" && 0)
+#endif
 
 /*!
+ * \def fwk_unexpected
+ *
+ * \brief Mark a code path as unexpected.
+ *
+ * \details Unexpected code paths are paths which the code should never have
+ *      taken, but which have associated error handling.
+ *
+ *      In debug builds, this macro will trigger an assertion. In release
+ *      builds, or if running tests, it will do nothing.
+ *
+ *      #### Example
+ *
+ *      \code{.c}
+ *      if (rand() == 42) {
+ *          fwk_unexpected();
+ *
+ *          return FWK_E_STATE;
+ *      }
+ *
+ *      return FWK_E_SUCCESS;
+ *      \endcode
+ *
+ *      In this example, the code will assert in a debug build if `rand()`
+ *      returns `42`. In a release build the expectation will be removed and the
+ *      function will return `FWK_E_STATE`.
+ */
+
+#if defined(NDEBUG) || defined(BUILD_TESTS)
+#    define fwk_unexpected() ((void)0)
+#else
+#    define fwk_unexpected() fwk_assert("Unexpected code reached!" && 0)
+#endif
+
+/*!
+ * \def fwk_assert
+ *
  * \brief Assert an invariant.
  *
- * \details This function will trap in debug builds if \p condition evaluates to
- *      \c false. Otherwise, it will be asserted to the optimizer that
- *      \p condition will always evaluates to \c true.
+ * \details This macro will pass the condition to the standard C library's
+ *      `assert()` macro, which will evaluate the condition and abort the
+ *      program if the condition fails.
+ *
+ *      Unlike `assert()`, this macro will _evaluate_ the condition regardless
+ *      of whether assertions are enabled or not.
  *
  * \param condition Condition to test.
  */
-void fwk_assert(bool condition);
+
+#ifdef NDEBUG
+#    define fwk_assert(condition) ((void)(condition))
+#else
+#    define fwk_assert(condition) assert(condition)
+#endif
+
+/*!
+ * \def fwk_check
+ *
+ * \brief Expect the success of a condition in a statement.
+ *
+ * \details In debug builds, the macro will evaluate the condition and trigger
+ *      an assertion if it fails. In release builds, or if running tests, the
+ *      macro will evaluate the condition and discard its result.
+ *
+ *      #### Example
+ *
+ *      \code{.c}
+ *      fwk_check(*x > 5);
+ *
+ *      *x = 42;
+ *      \endcode
+ *
+ *      In this example, the code will assert in a debug build if `*x` is
+ *      greater than 5. In a release build the check will be removed and `*x`
+ *      will be assigned `42`.
+ *
+ * \note This macro is similar to ::fwk_expect(), but expands to a statement
+ *      rather than an expression, and does not do any branch weighting.
+ *
+ * \param condition Condition to test.
+ */
+
+#if defined(NDEBUG) || defined(BUILD_TESTS)
+#    define fwk_check(condition) ((void)(condition))
+#else
+#    define fwk_check(condition) fwk_assert(condition)
+#endif
+
+/*!
+ * \def fwk_expect
+ *
+ * \brief Expect the success of a condition in an expression.
+ *
+ * \details In debug builds, the macro will evaluate the condition and trigger
+ *      an assertion if it fails. In release builds, or if running tests, the
+ *      macro will evaluate the condition and discard its result.
+ *
+ *      #### Example
+ *
+ *      \code{.c}
+ *      if (!fwk_expect(rand() != 42))
+ *          return FWK_E_STATE;
+ *
+ *      return FWK_E_SUCCESS;
+ *      \endcode
+ *
+ *      In this example, the code will assert in a debug build if `rand` is
+ *      equal to 42. In a release build the branch will be taken.
+ *
+ * \param condition Condition to test.
+ *
+ * \return The value of `condition`.
+ */
+
+#if defined(NDEBUG) || defined(BUILD_TESTS)
+#    define fwk_expect(condition) __builtin_expect((condition), 1)
+#else
+#    define fwk_expect(condition) (fwk_check(condition), 1)
+#endif
 
 /*!
  * \}

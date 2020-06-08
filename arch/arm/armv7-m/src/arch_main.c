@@ -19,31 +19,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#if defined(__ARMCC_VERSION)
-/*
- * Standard library backend functions required by Arm Compiler 6.
- */
-
-/* Platform-dependent backend for the assert() macro */
-void __aeabi_assert(const char *expr, const char *file, int line)
-{
-    fwk_trap();
-}
-#elif defined(__NEWLIB__)
-/*
- * Standard library backend functions required by newlib[-nano].
- */
-
-/* Platform-dependent backend for the assert() macro */
-void __assert_func(
-    const char *file,
-    int line,
-    const char *function,
-    const char *assertion)
-{
-    fwk_trap();
-}
-
+#ifdef __NEWLIB__
 /* Platform-dependent backend for the _Exit() function */
 void _exit(int status)
 {

@@ -275,7 +275,7 @@ static int mod_psu_init(
     unsigned int element_count,
     const void *data)
 {
-    fwk_expect(data == NULL);
+    fwk_check(data == NULL);
 
     mod_psu_ctx.elements =
         fwk_mm_calloc(element_count, sizeof(mod_psu_ctx.elements[0]));
@@ -290,7 +290,7 @@ static int mod_psu_element_init(
 {
     struct mod_psu_element_ctx *ctx;
 
-    fwk_expect(sub_element_count == 0);
+    fwk_check(sub_element_count == 0);
 
     ctx = mod_psu_get_element_ctx(element_id);
 

@@ -71,10 +71,8 @@ and not `<stdlib.h>` to define `size_t`.
 
 Additionally, the framework wraps the following standard library header files:
 `<stdalign.h>`, `<stdnoreturn.h>`, `<assert.h>` and `<errno.h>`. These header
-files must not be directly included in module code. This is because certain
-compilers, while themselves C11-compliant, do not provide a full C11 standard
-library implementation. In this situation, the framework provides a custom
-implementation through these headers.
+files must not be directly included in module code, as extended alternatives are
+provided by the framework.
 
 Header Files
 ------------

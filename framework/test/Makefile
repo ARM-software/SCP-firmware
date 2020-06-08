@@ -39,7 +39,6 @@ TESTS += test_fwk_ring_init
 TESTS += test_fwk_thread
 
 COMMON_SRC := fwk_arch.c
-COMMON_SRC += fwk_assert.c
 COMMON_SRC += fwk_dlist.c
 COMMON_SRC += fwk_id.c
 COMMON_SRC += fwk_interrupt.c

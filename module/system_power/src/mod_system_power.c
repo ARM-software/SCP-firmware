@@ -324,7 +324,7 @@ static void soc_wakeup_handler(void)
     status =
         system_power_ctx.mod_pd_restricted_api->set_composite_state_async(
             system_power_ctx.last_core_pd_id, false, state);
-    fwk_expect(status == FWK_SUCCESS);
+    fwk_check(status == FWK_SUCCESS);
 }
 
 static const struct mod_pd_driver_api system_power_power_domain_driver_api = {
@@ -373,7 +373,7 @@ static int system_power_mod_init(fwk_id_t module_id,
     const struct mod_system_power_config *config;
 
     fwk_assert(data != NULL);
-    fwk_expect(element_count > 0);
+    fwk_check(element_count > 0);
 
     system_power_ctx.config = config = data;
     system_power_ctx.mod_pd_system_id = FWK_ID_NONE;
