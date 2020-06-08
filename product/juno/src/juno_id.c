@@ -94,7 +94,7 @@ int juno_id_get_revision(enum juno_idx_revision *revision)
     *revision = revision_cached;
 
 exit:
-    fwk_expect(status == FWK_SUCCESS);
+    fwk_check(status == FWK_SUCCESS);
 
     return status;
 }

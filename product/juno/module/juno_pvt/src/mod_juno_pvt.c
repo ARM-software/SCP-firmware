@@ -596,8 +596,8 @@ static int pvt_start(fwk_id_t id)
         sensor_ctx = &group_ctx->sensor_ctx_table[sub_elem_ix];
         sensor_cfg = &group_ctx->sensor_cfg_table[sub_elem_ix];
 
-        fwk_expect(sensor_cfg->cal_reg_a != NULL);
-        fwk_expect(sensor_cfg->cal_reg_b != NULL);
+        fwk_check(sensor_cfg->cal_reg_a != NULL);
+        fwk_check(sensor_cfg->cal_reg_b != NULL);
 
         calibration_a = *(sensor_cfg->cal_reg_a) + sensor_cfg->offset_cal_reg_a;
         calibration_b = *(sensor_cfg->cal_reg_b) + sensor_cfg->offset_cal_reg_b;

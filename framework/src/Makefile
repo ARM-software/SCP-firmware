@@ -8,7 +8,6 @@
 BS_LIB_NAME := framework
 
 BS_LIB_SOURCES += fwk_arch.c
-BS_LIB_SOURCES += fwk_assert.c
 BS_LIB_SOURCES += fwk_dlist.c
 BS_LIB_SOURCES += fwk_id.c
 BS_LIB_SOURCES += fwk_interrupt.c
@@ -20,6 +19,8 @@ BS_LIB_SOURCES += fwk_slist.c
 BS_LIB_SOURCES += fwk_status.c
 BS_LIB_SOURCES += fwk_thread_delayed_resp.c
 BS_LIB_SOURCES += fwk_time.c
+
+BS_LIB_SOURCES += assert.c
 
 ifeq ($(BUILD_HAS_MULTITHREADING),yes)
     BS_LIB_SOURCES += fwk_multi_thread.c
