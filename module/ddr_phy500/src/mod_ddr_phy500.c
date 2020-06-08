@@ -78,7 +78,7 @@ static struct mod_dmc_ddr_phy_api ddr_phy500_api = {
 static int ddr_phy500_init(fwk_id_t module_id, unsigned int element_count,
                            const void *config)
 {
-    assert(config != NULL);
+    fwk_assert(config != NULL);
 
     return FWK_SUCCESS;
 }
@@ -86,7 +86,7 @@ static int ddr_phy500_init(fwk_id_t module_id, unsigned int element_count,
 static int ddr_phy500_element_init(fwk_id_t element_id, unsigned int unused,
                                    const void *data)
 {
-    assert(data != NULL);
+    fwk_assert(data != NULL);
 
     return FWK_SUCCESS;
 }

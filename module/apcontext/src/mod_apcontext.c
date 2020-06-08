@@ -81,8 +81,9 @@ static int apcontext_process_notification(const struct fwk_event *event,
 {
     struct clock_notification_params *params;
 
-    assert(fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed));
-    assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
+    fwk_assert(
+        fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed));
+    fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
 
     params = (struct clock_notification_params *)event->params;
 

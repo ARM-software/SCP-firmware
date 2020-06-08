@@ -77,7 +77,7 @@ static const struct fwk_element *ppu_v1_get_element_table(fwk_id_t module_id)
     core_count = n1sdp_core_get_core_count();
     cluster_count = n1sdp_core_get_cluster_count();
 
-    assert(cluster_count == FWK_ARRAY_SIZE(cluster_idx_to_node_id));
+    fwk_assert(cluster_count == FWK_ARRAY_SIZE(cluster_idx_to_node_id));
 
     /*
      * Allocate element descriptors based on:

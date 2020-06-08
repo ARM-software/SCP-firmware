@@ -63,7 +63,7 @@ int mod_pl011_set_baud_rate(unsigned int baud_rate_bps, uint64_t clock_rate_hz,
 
     struct pl011_reg *reg = (struct pl011_reg *)reg_ptr;
 
-    assert(reg);
+    fwk_assert(reg);
 
     if (baud_rate_bps == 0)
         return FWK_E_PARAM;
@@ -73,7 +73,7 @@ int mod_pl011_set_baud_rate(unsigned int baud_rate_bps, uint64_t clock_rate_hz,
         return FWK_E_PARAM;
 
     /* The highest clock x4 should still fit in 32 bits */
-    assert((PL011_UARTCLK_MAX * UINT64_C(4)) < UINT32_MAX);
+    fwk_assert((PL011_UARTCLK_MAX * UINT64_C(4)) < UINT32_MAX);
 
     /* Ensure baud rate is not higher than the clock can support */
     clock_rate_x4 = clock_rate_hz * 4;

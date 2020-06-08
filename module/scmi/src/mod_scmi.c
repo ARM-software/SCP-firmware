@@ -641,7 +641,7 @@ static int scmi_base_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     static_assert(FWK_ARRAY_SIZE(base_handler_table) ==
                   FWK_ARRAY_SIZE(base_payload_size_table),
                   "[SCMI] Base protocol table sizes not consistent");
-    assert(payload != NULL);
+    fwk_assert(payload != NULL);
 
     if (message_id >= FWK_ARRAY_SIZE(base_handler_table)) {
         return_value = SCMI_NOT_SUPPORTED;

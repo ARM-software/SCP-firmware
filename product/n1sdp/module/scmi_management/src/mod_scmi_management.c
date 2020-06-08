@@ -239,7 +239,7 @@ static int scmi_management_message_handler(
     static_assert(FWK_ARRAY_SIZE(handler_table) ==
         FWK_ARRAY_SIZE(payload_size_table),
         "[SCMI] Management protocol table sizes not consistent");
-    assert(payload != NULL);
+    fwk_assert(payload != NULL);
 
     if (message_id >= FWK_ARRAY_SIZE(handler_table)) {
         return_value = SCMI_NOT_SUPPORTED;

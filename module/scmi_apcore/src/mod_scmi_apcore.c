@@ -94,7 +94,7 @@ static int set_reset_address(uint32_t address_low, uint32_t address_high)
 
         reg_group =
             &scmi_apcore_ctx.config->reset_register_group_table[grp_idx];
-        assert(reg_group->base_register != 0);
+        fwk_assert(reg_group->base_register != 0);
 
         /* Begin with the first register in the group */
         reset_reg = reg_group->base_register;
@@ -339,8 +339,7 @@ static int scmi_apcore_message_handler(
     static_assert(FWK_ARRAY_SIZE(handler_table) ==
         FWK_ARRAY_SIZE(payload_size_table),
         "[SCMI] Core configuration protocol table sizes not consistent");
-    assert(payload != NULL);
-
+    fwk_assert(payload != NULL);
 
     if (message_id >= FWK_ARRAY_SIZE(handler_table)) {
         return_value = SCMI_NOT_SUPPORTED;

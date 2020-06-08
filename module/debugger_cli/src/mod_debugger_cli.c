@@ -47,7 +47,7 @@ static void alarm_callback(uintptr_t module_idx)
 
             status = fwk_thread_put_event(event);
 
-            assert(status == FWK_SUCCESS);
+            fwk_assert(status == FWK_SUCCESS);
         }
     }
 }

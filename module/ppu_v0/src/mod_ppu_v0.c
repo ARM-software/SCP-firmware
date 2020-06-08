@@ -82,7 +82,7 @@ static int get_state(struct ppu_v0_reg *ppu, unsigned int *state)
                   "[MOD_PPU_V0] ppu_mode_to_power_state size error");
 
     ppu_v0_get_power_mode(ppu, &ppu_mode);
-    assert(ppu_mode < PPU_V0_MODE_COUNT);
+    fwk_assert(ppu_mode < PPU_V0_MODE_COUNT);
 
     *state = ppu_mode_to_power_state[ppu_mode];
     if (*state == MODE_UNSUPPORTED) {
@@ -114,14 +114,14 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
         ppu_v0_set_power_mode(pd_ctx->ppu, PPU_V0_MODE_ON);
         status = pd_ctx->pd_driver_input_api->report_power_state_transition(
             pd_ctx->bound_id, MOD_PD_STATE_ON);
-        assert(status == FWK_SUCCESS);
+        fwk_assert(status == FWK_SUCCESS);
         break;
 
     case MOD_PD_STATE_OFF:
         ppu_v0_set_power_mode(pd_ctx->ppu, PPU_V0_MODE_OFF);
         status = pd_ctx->pd_driver_input_api->report_power_state_transition(
             pd_ctx->bound_id, MOD_PD_STATE_OFF);
-        assert(status == FWK_SUCCESS);
+        fwk_assert(status == FWK_SUCCESS);
         break;
 
     default:
@@ -242,7 +242,7 @@ static int ppu_v0_bind(fwk_id_t id, unsigned int round)
     #endif
 
     default:
-        assert(false);
+        fwk_assert(false);
         return FWK_E_SUPPORT;
     }
 }
@@ -258,7 +258,7 @@ static int ppu_v0_process_bind_request(fwk_id_t source_id,
     switch (pd_ctx->config->pd_type) {
     case MOD_PD_TYPE_SYSTEM:
         if (!fwk_id_is_equal(pd_ctx->bound_id, FWK_ID_NONE)) {
-            assert(false);
+            fwk_assert(false);
             return FWK_E_ACCESS;
         }
     /* Fallthrough */
@@ -279,7 +279,7 @@ static int ppu_v0_process_bind_request(fwk_id_t source_id,
             break;
         }
         #endif
-        assert(false);
+        fwk_assert(false);
         return FWK_E_ACCESS;
 
     default:

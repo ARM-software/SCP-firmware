@@ -37,7 +37,7 @@ static int mod_dmc620_init(fwk_id_t module_id, unsigned int element_count,
 static int mod_dmc620_element_init(fwk_id_t element_id, unsigned int unused,
                                    const void *data)
 {
-    assert(data != NULL);
+    fwk_assert(data != NULL);
 
     return FWK_SUCCESS;
 }
@@ -56,7 +56,7 @@ static int mod_dmc620_bind(fwk_id_t id, unsigned int round)
         return FWK_SUCCESS;
 
     module_config = fwk_module_get_data(fwk_module_id_dmc620);
-    assert(module_config != NULL);
+    fwk_assert(module_config != NULL);
 
     if (!(fwk_id_is_equal(module_config->ddr_module_id, FWK_ID_NONE))) {
         status = fwk_module_bind(module_config->ddr_module_id,
@@ -101,8 +101,9 @@ static int mod_dmc620_process_notification(
 {
     struct clock_notification_params *params;
 
-    assert(fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed));
-    assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT));
+    fwk_assert(
+        fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed));
+    fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT));
 
     params = (struct clock_notification_params *)event->params;
 

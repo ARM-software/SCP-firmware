@@ -105,8 +105,8 @@ static uint16_t crc16(const void *data, uint32_t size)
     const uint8_t *byte = data;
     uint32_t i = 0, j = 0;
 
-    assert(data != NULL);
-    assert(size != 0);
+    fwk_assert(data != NULL);
+    fwk_assert(size != 0);
 
     for (i = 0; i < size; ++i) {
         crc = crc ^ byte[i];

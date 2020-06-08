@@ -21,8 +21,8 @@ static int armv7m_mpu_init(
 {
     const struct mod_armv7m_mpu_config *config;
 
-    assert(element_count == 0);
-    assert(data != NULL);
+    fwk_assert(element_count == 0);
+    fwk_assert(data != NULL);
 
     config = data;
 

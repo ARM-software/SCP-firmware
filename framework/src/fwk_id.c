@@ -20,8 +20,8 @@ struct __fwk_id_fmt __fwk_id_str(fwk_id_t id)
 {
     struct __fwk_id_fmt fmt;
 
-    assert(id.common.type != __FWK_ID_TYPE_INVALID);
-    assert(id.common.type < __FWK_ID_TYPE_COUNT);
+    fwk_assert(id.common.type != __FWK_ID_TYPE_INVALID);
+    fwk_assert(id.common.type < __FWK_ID_TYPE_COUNT);
 
     switch (id.common.type) {
     case FWK_ID_TYPE_MODULE:
@@ -65,56 +65,56 @@ struct __fwk_id_fmt __fwk_id_str(fwk_id_t id)
 
 bool fwk_id_is_type(fwk_id_t id, enum fwk_id_type type)
 {
-    assert(id.common.type != __FWK_ID_TYPE_INVALID);
-    assert(id.common.type < __FWK_ID_TYPE_COUNT);
+    fwk_assert(id.common.type != __FWK_ID_TYPE_INVALID);
+    fwk_assert(id.common.type < __FWK_ID_TYPE_COUNT);
 
     return id.common.type == type;
 }
 
 enum fwk_id_type fwk_id_get_type(fwk_id_t id)
 {
-    assert(id.common.type != __FWK_ID_TYPE_INVALID);
-    assert(id.common.type < __FWK_ID_TYPE_COUNT);
+    fwk_assert(id.common.type != __FWK_ID_TYPE_INVALID);
+    fwk_assert(id.common.type < __FWK_ID_TYPE_COUNT);
 
     return id.common.type;
 }
 
 bool fwk_id_is_equal(fwk_id_t left, fwk_id_t right)
 {
-    assert(left.common.type != __FWK_ID_TYPE_INVALID);
-    assert(left.common.type < __FWK_ID_TYPE_COUNT);
+    fwk_assert(left.common.type != __FWK_ID_TYPE_INVALID);
+    fwk_assert(left.common.type < __FWK_ID_TYPE_COUNT);
 
     return left.value == right.value;
 }
 
 fwk_id_t fwk_id_build_module_id(fwk_id_t id)
 {
-    assert(id.common.type != __FWK_ID_TYPE_INVALID);
-    assert(id.common.type < __FWK_ID_TYPE_COUNT);
+    fwk_assert(id.common.type != __FWK_ID_TYPE_INVALID);
+    fwk_assert(id.common.type < __FWK_ID_TYPE_COUNT);
 
     return FWK_ID_MODULE(id.common.module_idx);
 }
 
 fwk_id_t fwk_id_build_element_id(fwk_id_t id, unsigned int element_idx)
 {
-    assert(id.common.type != __FWK_ID_TYPE_INVALID);
-    assert(id.common.type < __FWK_ID_TYPE_COUNT);
+    fwk_assert(id.common.type != __FWK_ID_TYPE_INVALID);
+    fwk_assert(id.common.type < __FWK_ID_TYPE_COUNT);
 
     return FWK_ID_ELEMENT(id.common.module_idx, element_idx);
 }
 
 fwk_id_t fwk_id_build_api_id(fwk_id_t id, unsigned int api_idx)
 {
-    assert(id.common.type != __FWK_ID_TYPE_INVALID);
-    assert(id.common.type < __FWK_ID_TYPE_COUNT);
+    fwk_assert(id.common.type != __FWK_ID_TYPE_INVALID);
+    fwk_assert(id.common.type < __FWK_ID_TYPE_COUNT);
 
     return FWK_ID_API(id.common.module_idx, api_idx);
 }
 
 unsigned int fwk_id_get_module_idx(fwk_id_t id)
 {
-    assert(id.common.type != __FWK_ID_TYPE_INVALID);
-    assert(id.common.type < __FWK_ID_TYPE_COUNT);
+    fwk_assert(id.common.type != __FWK_ID_TYPE_INVALID);
+    fwk_assert(id.common.type < __FWK_ID_TYPE_COUNT);
 
     return id.common.module_idx;
 }
@@ -129,28 +129,28 @@ unsigned int fwk_id_get_element_idx(fwk_id_t element_id)
 
 unsigned int fwk_id_get_sub_element_idx(fwk_id_t sub_element_id)
 {
-    assert(sub_element_id.common.type == __FWK_ID_TYPE_SUB_ELEMENT);
+    fwk_assert(sub_element_id.common.type == __FWK_ID_TYPE_SUB_ELEMENT);
 
     return sub_element_id.sub_element.sub_element_idx;
 }
 
 unsigned int fwk_id_get_api_idx(fwk_id_t api_id)
 {
-    assert(api_id.common.type == __FWK_ID_TYPE_API);
+    fwk_assert(api_id.common.type == __FWK_ID_TYPE_API);
 
     return api_id.api.api_idx;
 }
 
 unsigned int fwk_id_get_event_idx(fwk_id_t event_id)
 {
-    assert(event_id.common.type == __FWK_ID_TYPE_EVENT);
+    fwk_assert(event_id.common.type == __FWK_ID_TYPE_EVENT);
 
     return event_id.event.event_idx;
 }
 
 unsigned int fwk_id_get_notification_idx(fwk_id_t notification_id)
 {
-    assert(notification_id.common.type == __FWK_ID_TYPE_NOTIFICATION);
+    fwk_assert(notification_id.common.type == __FWK_ID_TYPE_NOTIFICATION);
 
     return notification_id.notification.notification_idx;
 }

@@ -106,10 +106,10 @@ uint64_t sam_encode_region_size(uint64_t size)
     uint64_t result;
 
     /* Size must be a multiple of SAM_GRANULARITY */
-    assert((size % SAM_GRANULARITY) == 0);
+    fwk_assert((size % SAM_GRANULARITY) == 0);
 
     /* Size also must be a power of two */
-    assert((size & (size - 1)) == 0);
+    fwk_assert((size & (size - 1)) == 0);
 
     blocks = size / SAM_GRANULARITY;
     result = fwk_math_log2(blocks);
@@ -122,8 +122,8 @@ void configure_region(volatile uint64_t *reg, unsigned int bit_offset,
 {
     uint64_t value;
 
-    assert(reg);
-    assert((base % size) == 0);
+    fwk_assert(reg);
+    fwk_assert((base % size) == 0);
 
     value = CMN600_RNSAM_REGION_ENTRY_VALID;
     value |= node_type << CMN600_RNSAM_REGION_ENTRY_TYPE_POS;

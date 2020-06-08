@@ -106,7 +106,7 @@ static struct fwk_event *duplicate_event(struct fwk_event *event)
 {
     struct fwk_event *allocated_event;
 
-    assert(event != NULL);
+    fwk_assert(event != NULL);
 
     fwk_interrupt_global_disable();
     allocated_event = FWK_LIST_GET(fwk_list_pop_head(&ctx.event_free_queue),
@@ -121,7 +121,7 @@ static struct fwk_event *duplicate_event(struct fwk_event *event)
         return allocated_event;
     }
 
-    assert(false);
+    fwk_assert(false);
     FWK_LOG_CRIT(err_msg_func, FWK_E_NOMEM, __func__);
     return NULL;
 }
@@ -357,7 +357,7 @@ static void process_next_thread_event(struct __fwk_thread_ctx *thread_ctx)
     ctx.current_event = event =
         FWK_LIST_GET(fwk_list_pop_head(&thread_ctx->event_queue),
                      struct fwk_event, slist_node);
-    assert(event != NULL);
+    fwk_assert(event != NULL);
 
     if (event->response_requested)
         process_event_requiring_response(event);
@@ -519,7 +519,7 @@ static void thread_function(struct __fwk_thread_ctx *thread_ctx,
 
 static void specific_thread_function(void *arg)
 {
-    assert(arg != NULL);
+    fwk_assert(arg != NULL);
 
     thread_function((struct __fwk_thread_ctx *)arg, NULL);
 }
@@ -547,7 +547,7 @@ static void get_next_isr_event(void)
                                  struct fwk_event, slist_node);
         fwk_interrupt_global_enable();
 
-        assert(isr_event != NULL);
+        fwk_assert(isr_event != NULL);
 
         FWK_LOG_TRACE(
             "[FWK] Get ISR event (%s: %s -> %s)\n",

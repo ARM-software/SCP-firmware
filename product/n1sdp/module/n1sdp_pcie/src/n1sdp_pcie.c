@@ -271,7 +271,7 @@ void pcie_phy_init(uint32_t phy_apb_base, uint32_t pcie_lane_count)
 
 bool pcie_wait_condition(void *data)
 {
-    assert(data != NULL);
+    fwk_assert(data != NULL);
 
     struct pcie_wait_condition_data *wait_data =
         (struct pcie_wait_condition_data *)data;
@@ -293,7 +293,7 @@ bool pcie_wait_condition(void *data)
     case PCIE_INIT_STAGE_LINK_RE_TRNG:
         return ((ctrl_apb->RP_LTSSM_STATE & RP_LTSSM_STATE_MASK) == 0x10);
     default:
-        assert(false);
+        fwk_assert(false);
         return false;
     }
 }
@@ -304,9 +304,9 @@ int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
               enum pcie_gen gen,
               enum pcie_lane_count lane_count)
 {
-    assert(ctrl_apb != NULL);
-    assert(timer_api != NULL);
-    assert(stage < PCIE_INIT_STAGE_COUNT);
+    fwk_assert(ctrl_apb != NULL);
+    fwk_assert(timer_api != NULL);
+    fwk_assert(stage < PCIE_INIT_STAGE_COUNT);
 
     struct pcie_wait_condition_data wait_data;
     int status;
@@ -359,7 +359,7 @@ int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
         break;
 
     default:
-        assert(false);
+        fwk_assert(false);
         return FWK_E_PARAM;
     }
     return FWK_SUCCESS;
@@ -372,9 +372,9 @@ int pcie_link_retrain(struct pcie_ctrl_apb_reg *ctrl_apb,
     uint32_t reg_val = 0;
     struct pcie_wait_condition_data wait_data;
 
-    assert(ctrl_apb != NULL);
-    assert(rp_ep_config_base != 0x0);
-    assert(timer_api != NULL);
+    fwk_assert(ctrl_apb != NULL);
+    fwk_assert(rp_ep_config_base != 0x0);
+    fwk_assert(timer_api != NULL);
 
     wait_data.ctrl_apb = ctrl_apb;
     wait_data.stage = PCIE_INIT_STAGE_LINK_RE_TRNG;
@@ -495,7 +495,7 @@ int pcie_set_gen_tx_preset(uint32_t rp_ep_config_apb_base,
     uint32_t offset_max;
     uint32_t nibble;
 
-    assert((gen == PCIE_GEN_3) || (gen == PCIE_GEN_4));
+    fwk_assert((gen == PCIE_GEN_3) || (gen == PCIE_GEN_4));
 
     offset_min = (gen == PCIE_GEN_3) ? GEN3_OFFSET_MIN : GEN4_OFFSET_MIN;
     offset_max = (gen == PCIE_GEN_3) ? GEN3_OFFSET_MAX : GEN4_OFFSET_MAX;

@@ -118,8 +118,8 @@ uint32_t osThreadFlagsWait(uint32_t flags, uint32_t options, uint32_t timeout)
     bool wait;
     uint32_t tmp_signal_flags;
 
-    assert(flags != 0);
-    assert(timeout == osWaitForever);
+    fwk_assert(flags != 0);
+    fwk_assert(timeout == osWaitForever);
 
     while (true) {
         switch (options) {
@@ -130,7 +130,7 @@ uint32_t osThreadFlagsWait(uint32_t flags, uint32_t options, uint32_t timeout)
             wait = (local_thread_data->signal_flags & flags) != flags;
             break;
         default:
-            assert(false);
+            fwk_assert(false);
         }
 
         if (!wait)
