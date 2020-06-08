@@ -531,7 +531,7 @@ static int pik_clock_direct_set_div(fwk_id_t clock_id, uint32_t divider_type,
     struct pik_clock_dev_ctx *ctx;
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(clock_id);
-    assert(ctx->config->is_group_member);
+    fwk_assert(ctx->config->is_group_member);
 
     if (ctx->current_state == MOD_CLOCK_STATE_STOPPED)
         return FWK_E_PWRSTATE;
@@ -557,7 +557,7 @@ static int pik_clock_direct_set_source(fwk_id_t clock_id, uint8_t source)
     struct pik_clock_dev_ctx *ctx;
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(clock_id);
-    assert(ctx->config->is_group_member);
+    fwk_assert(ctx->config->is_group_member);
 
     if (ctx->current_state == MOD_CLOCK_STATE_STOPPED)
         return FWK_E_PWRSTATE;
@@ -571,7 +571,7 @@ static int pik_clock_direct_set_mod(fwk_id_t clock_id, uint32_t numerator,
     struct pik_clock_dev_ctx *ctx;
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(clock_id);
-    assert(ctx->config->is_group_member);
+    fwk_assert(ctx->config->is_group_member);
 
     if (ctx->current_state == MOD_CLOCK_STATE_STOPPED)
         return FWK_E_PWRSTATE;

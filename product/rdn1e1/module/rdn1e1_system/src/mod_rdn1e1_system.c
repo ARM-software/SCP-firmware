@@ -329,7 +329,7 @@ int rdn1e1_system_process_notification(const struct fwk_event *event,
         mc_mode = system_info->multi_chip_mode;
     }
 
-    assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
+    fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
 
     if (fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed)) {
         params = (struct clock_notification_params *)event->params;

@@ -679,7 +679,7 @@ static int n1sdp_system_process_notification(const struct fwk_event *event,
     static bool sds_notification_received = false;
     int status;
 
-    assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
+    fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
 
     params = (struct clock_notification_params *)event->params;
 

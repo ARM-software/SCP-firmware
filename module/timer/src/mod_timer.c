@@ -82,8 +82,8 @@ static int _time_to_timestamp(struct dev_ctx *ctx,
     int status;
     uint32_t frequency;
 
-    assert(ctx != NULL);
-    assert(timestamp != NULL);
+    fwk_assert(ctx != NULL);
+    fwk_assert(timestamp != NULL);
 
     status = ctx->driver->get_frequency(ctx->driver_dev_id, &frequency);
     if (status != FWK_SUCCESS)
@@ -101,8 +101,8 @@ static int _timestamp_from_now(struct dev_ctx *ctx,
     int status;
     uint64_t counter;
 
-    assert(ctx != NULL);
-    assert(timestamp != NULL);
+    fwk_assert(ctx != NULL);
+    fwk_assert(timestamp != NULL);
 
     status = _time_to_timestamp(ctx, microseconds, timestamp);
     if (status != FWK_SUCCESS)
@@ -144,7 +144,7 @@ static void _configure_timer_with_next_alarm(struct dev_ctx *ctx)
 {
     struct alarm_ctx *alarm_head;
 
-    assert(ctx != NULL);
+    fwk_assert(ctx != NULL);
 
     alarm_head = (struct alarm_ctx *)fwk_list_head(&ctx->alarms_active);
     if (alarm_head != NULL) {
@@ -160,8 +160,8 @@ static void _insert_alarm_ctx_into_active_queue(struct dev_ctx *ctx,
     struct fwk_dlist_node *alarm_node;
     struct alarm_ctx *alarm;
 
-    assert(ctx != NULL);
-    assert(alarm_new != NULL);
+    fwk_assert(ctx != NULL);
+    fwk_assert(alarm_new != NULL);
 
     /*
      * Search though the active queue to find the correct place to insert the
@@ -356,7 +356,7 @@ static int alarm_stop(fwk_id_t alarm_id)
     struct alarm_ctx *alarm;
     unsigned int interrupt;
 
-    assert(fwk_module_is_valid_sub_element_id(alarm_id));
+    fwk_assert(fwk_module_is_valid_sub_element_id(alarm_id));
 
     ctx = &ctx_table[fwk_id_get_element_idx(alarm_id)];
 
@@ -427,7 +427,7 @@ static int alarm_start(fwk_id_t alarm_id,
     struct alarm_ctx *alarm;
     unsigned int interrupt;
 
-    assert(fwk_module_is_valid_sub_element_id(alarm_id));
+    fwk_assert(fwk_module_is_valid_sub_element_id(alarm_id));
 
     status = fwk_interrupt_get_current(&interrupt);
     if (status != FWK_E_STATE) {
@@ -483,7 +483,7 @@ static void timer_isr(uintptr_t ctx_ptr)
     struct dev_ctx *ctx = (struct dev_ctx *)ctx_ptr;
     uint64_t timestamp = 0;
 
-    assert(ctx != NULL);
+    fwk_assert(ctx != NULL);
 
     /* Disable timer interrupts to work with the active queue */
     ctx->driver->disable(ctx->driver_dev_id);
@@ -493,7 +493,7 @@ static void timer_isr(uintptr_t ctx_ptr)
 
     if (alarm == NULL) {
         /* Timer interrupt triggered without any alarm in the active queue */
-        assert(false);
+        fwk_assert(false);
         return;
     }
 
@@ -537,7 +537,7 @@ static int timer_device_init(fwk_id_t element_id, unsigned int alarm_count,
 {
     struct dev_ctx *ctx;
 
-    assert(data != NULL);
+    fwk_assert(data != NULL);
 
     ctx = ctx_table + fwk_id_get_element_idx(element_id);
     ctx->config = data;
@@ -595,7 +595,7 @@ static int timer_process_bind_request(fwk_id_t requester_id,
 
     if (fwk_id_is_equal(api_id, MOD_TIMER_API_ID_TIMER)) {
         if (!fwk_module_is_valid_element_id(id)) {
-            assert(false);
+            fwk_assert(false);
             return FWK_E_PARAM;
         }
 
@@ -606,7 +606,7 @@ static int timer_process_bind_request(fwk_id_t requester_id,
     /* Alarm API requested */
 
     if (!fwk_module_is_valid_sub_element_id(id)) {
-        assert(false);
+        fwk_assert(false);
         return FWK_E_PARAM;
     }
 
@@ -614,7 +614,7 @@ static int timer_process_bind_request(fwk_id_t requester_id,
     alarm_ctx = &ctx->alarm_pool[fwk_id_get_sub_element_idx(id)];
 
     if (alarm_ctx->bound) {
-        assert(false);
+        fwk_assert(false);
         return FWK_E_STATE;
     }
 

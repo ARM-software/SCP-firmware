@@ -294,7 +294,7 @@ int tc0_system_process_notification(const struct fwk_event *event,
     static unsigned int scmi_notification_count = 0;
     static bool sds_notification_received = false;
 
-    assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
+    fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
 
     if (fwk_id_is_equal(event->id,
                                mod_scmi_notification_id_initialized)) {

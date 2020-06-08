@@ -13,7 +13,7 @@
 
 unsigned int n1sdp_core_get_core_per_cluster_count(unsigned int cluster)
 {
-    assert(cluster < n1sdp_core_get_cluster_count());
+    fwk_assert(cluster < n1sdp_core_get_cluster_count());
 
     return CORES_PER_CLUSTER;
 }

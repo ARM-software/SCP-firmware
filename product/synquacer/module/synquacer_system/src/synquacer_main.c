@@ -315,7 +315,7 @@ void main_initialize(void)
     synquacer_system_ctx.f_i2c_api->init();
 
     status = fw_ddr_spd_param_check();
-    assert(status == FWK_SUCCESS);
+    fwk_assert(status == FWK_SUCCESS);
 
     /* prepare eeprom configuration data */
     memcpy(

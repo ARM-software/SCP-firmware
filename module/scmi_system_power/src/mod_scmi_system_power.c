@@ -447,7 +447,7 @@ static int scmi_sys_power_handler(fwk_id_t protocol_id,
                   FWK_ARRAY_SIZE(payload_size_table),
                   "[SCMI] System power protocol table sizes not consistent");
 
-    assert(payload != NULL);
+    fwk_assert(payload != NULL);
 
     if (message_id >= FWK_ARRAY_SIZE(handler_table)) {
         return_value = SCMI_NOT_SUPPORTED;

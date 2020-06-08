@@ -147,12 +147,13 @@ static int msys_rom_process_notification(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
 {
-    assert(fwk_id_is_equal(event->id, mod_msys_rom_notification_id_systop));
-    assert(event->is_response == true);
+    fwk_assert(
+        fwk_id_is_equal(event->id, mod_msys_rom_notification_id_systop));
+    fwk_assert(event->is_response == true);
 
     /* At least one notification response must be outstanding */
     if (ctx.notification_count == 0) {
-        assert(false);
+        fwk_assert(false);
         return FWK_E_PANIC;
     }
 

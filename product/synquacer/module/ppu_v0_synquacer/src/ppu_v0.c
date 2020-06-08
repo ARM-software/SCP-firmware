@@ -14,7 +14,7 @@
 
 void ppu_v0_init(struct ppu_v0_reg *ppu)
 {
-    assert(ppu != NULL);
+    fwk_assert(ppu != NULL);
 
     /* Set mode as masked to all input edge interrupts */
     ppu->IESR = 0;
@@ -29,8 +29,8 @@ void ppu_v0_init(struct ppu_v0_reg *ppu)
 int ppu_v0_request_power_mode(struct ppu_v0_reg *ppu, enum ppu_v0_mode mode)
 {
     uint32_t power_policy;
-    assert(ppu != NULL);
-    assert(mode < PPU_V0_MODE_COUNT);
+    fwk_assert(ppu != NULL);
+    fwk_assert(mode < PPU_V0_MODE_COUNT);
 
     power_policy =
         ppu->POWER_POLICY & ~(PPU_V0_PPR_POLICY | PPU_V0_PPR_DYNAMIC_EN);
@@ -42,7 +42,7 @@ int ppu_v0_request_power_mode(struct ppu_v0_reg *ppu, enum ppu_v0_mode mode)
 int ppu_v0_set_power_mode(struct ppu_v0_reg *ppu, enum ppu_v0_mode mode)
 {
     int status;
-    assert(ppu != NULL);
+    fwk_assert(ppu != NULL);
 
     status = ppu_v0_request_power_mode(ppu, mode);
     if (status != FWK_SUCCESS)
@@ -57,8 +57,8 @@ int ppu_v0_set_power_mode(struct ppu_v0_reg *ppu, enum ppu_v0_mode mode)
 
 int ppu_v0_get_power_mode(struct ppu_v0_reg *ppu, enum ppu_v0_mode *mode)
 {
-    assert(ppu != NULL);
-    assert(mode != NULL);
+    fwk_assert(ppu != NULL);
+    fwk_assert(mode != NULL);
 
     *mode = (enum ppu_v0_mode)(ppu->POWER_STATUS & PPU_V0_PSR_POWSTAT);
 

@@ -34,7 +34,7 @@ static int mod_dmc500_init(fwk_id_t module_id, unsigned int element_count,
 static int mod_dmc500_element_init(fwk_id_t element_id, unsigned int unused,
                                    const void *data)
 {
-    assert(data != NULL);
+    fwk_assert(data != NULL);
 
     return FWK_SUCCESS;
 }
@@ -53,7 +53,7 @@ static int mod_dmc500_bind(fwk_id_t id, unsigned int round)
         return FWK_SUCCESS;
 
     module_config = fwk_module_get_data(fwk_module_id_dmc500);
-    assert(module_config != NULL);
+    fwk_assert(module_config != NULL);
 
     status = fwk_module_bind(module_config->ddr_phy_module_id,
                              module_config->ddr_phy_api_id, &ddr_phy_api);

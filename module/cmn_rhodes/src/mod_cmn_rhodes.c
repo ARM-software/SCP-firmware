@@ -65,7 +65,7 @@ static void process_node_hnf(struct cmn_rhodes_hnf_reg *hnf)
         cal_mode_factor = 2;
     }
 
-    assert(logical_id < config->snf_count);
+    fwk_assert(logical_id < config->snf_count);
 
     group = logical_id /
             (CMN_RHODES_HNF_CACHE_GROUP_ENTRIES_PER_GROUP * cal_mode_factor);
@@ -151,13 +151,13 @@ static int cmn_rhodes_discovery(void)
 
     FWK_LOG_INFO(MOD_NAME "Starting discovery...");
 
-    assert(get_node_type(ctx->root) == NODE_TYPE_CFG);
+    fwk_assert(get_node_type(ctx->root) == NODE_TYPE_CFG);
 
     /* Traverse cross points (XP) */
     xp_count = get_node_child_count(ctx->root);
     for (xp_idx = 0; xp_idx < xp_count; xp_idx++) {
         xp = get_child_node(config->base, ctx->root, xp_idx);
-        assert(get_node_type(xp) == NODE_TYPE_XP);
+        fwk_assert(get_node_type(xp) == NODE_TYPE_XP);
 
         FWK_LOG_INFO(
             MOD_NAME "XP (%d, %d) ID:%d, LID:%d",
@@ -339,7 +339,7 @@ static void cmn_rhodes_configure(void)
     struct cmn_rhodes_mxp_reg *xp;
     const struct mod_cmn_rhodes_config *config = ctx->config;
 
-    assert(get_node_type(ctx->root) == NODE_TYPE_CFG);
+    fwk_assert(get_node_type(ctx->root) == NODE_TYPE_CFG);
 
     xrnsam_entry = 0;
     irnsam_entry = 0;
@@ -349,7 +349,7 @@ static void cmn_rhodes_configure(void)
     xp_count = get_node_child_count(ctx->root);
     for (xp_idx = 0; xp_idx < xp_count; xp_idx++) {
         xp = get_child_node(config->base, ctx->root, xp_idx);
-        assert(get_node_type(xp) == NODE_TYPE_XP);
+        fwk_assert(get_node_type(xp) == NODE_TYPE_XP);
 
         /* Traverse nodes */
         node_count = get_node_child_count(xp);
@@ -517,7 +517,7 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
             break;
 
         default:
-            assert(false);
+            fwk_assert(false);
             return FWK_E_DATA;
         }
     }
@@ -564,7 +564,7 @@ static int cmn_rhodes_setup_sam(struct cmn_rhodes_rnsam_reg *rnsam)
             break;
 
         default:
-            assert(false);
+            fwk_assert(false);
             return FWK_E_DATA;
         }
     }
@@ -734,7 +734,7 @@ static int cmn_rhodes_setup_rnsam(unsigned int node_id)
 
 static void post_ppu_on(void *data)
 {
-    assert(data != NULL);
+    fwk_assert(data != NULL);
     cmn_rhodes_setup_rnsam(*(unsigned int *)data);
 }
 
@@ -766,7 +766,7 @@ static int cmn_rhodes_device_init(fwk_id_t element_id,
 {
     struct cmn_rhodes_device_ctx *device_ctx;
 
-    assert(data != NULL);
+    fwk_assert(data != NULL);
 
     device_ctx = ctx + fwk_id_get_element_idx(element_id);
     device_ctx->config = data;

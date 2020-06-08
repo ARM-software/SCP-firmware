@@ -135,7 +135,7 @@ void fw_ccn512_exit(void)
     unsigned int i;
 
     module_config = fwk_module_get_data(fwk_module_id_ccn512);
-    assert(module_config != NULL);
+    fwk_assert(module_config != NULL);
 
     ccn512 = module_config->reg_base;
 
@@ -182,7 +182,7 @@ static int mod_ccn512_element_init(
     unsigned int unused,
     const void *data)
 {
-    assert(data != NULL);
+    fwk_assert(data != NULL);
 
     return FWK_SUCCESS;
 }
@@ -206,7 +206,7 @@ static int mod_ccn512_start(fwk_id_t id)
     ccn512_reg_t *ccn512;
 
     module_config = fwk_module_get_data(fwk_module_id_ccn512);
-    assert(module_config != NULL);
+    fwk_assert(module_config != NULL);
 
     ccn512 = module_config->reg_base;
 

@@ -450,8 +450,6 @@ static bool is_valid_composite_state(struct pd_ctx *target_pd,
     struct pd_ctx *pd = target_pd;
     struct pd_ctx *child = NULL;
 
-    assert(target_pd != NULL);
-
     if (composite_state & (~MOD_PD_CS_VALID_BITS))
         goto error;
 
@@ -1938,14 +1936,14 @@ static int pd_process_event(const struct fwk_event *event,
 
     switch (fwk_id_get_event_idx(event->id)) {
     case MOD_PD_PUBLIC_EVENT_IDX_SET_STATE:
-        assert(pd != NULL);
+        fwk_assert(pd != NULL);
 
         process_set_state_request(pd, event, resp);
 
         return FWK_SUCCESS;
 
     case MOD_PD_PUBLIC_EVENT_IDX_GET_STATE:
-        assert(pd != NULL);
+        fwk_assert(pd != NULL);
 
         process_get_state_request(pd,
             (struct pd_get_state_request *)event->params,
@@ -1954,14 +1952,14 @@ static int pd_process_event(const struct fwk_event *event,
         return FWK_SUCCESS;
 
     case PD_EVENT_IDX_RESET:
-        assert(pd != NULL);
+        fwk_assert(pd != NULL);
 
         process_reset_request(pd, (struct pd_response *)resp->params);
 
         return FWK_SUCCESS;
 
     case PD_EVENT_IDX_REPORT_POWER_STATE_TRANSITION:
-        assert(pd != NULL);
+        fwk_assert(pd != NULL);
 
         process_power_state_transition_report(pd,
             (struct pd_power_state_transition_report *)event->params);
@@ -2009,7 +2007,7 @@ static int process_power_state_pre_transition_notification_response(
 {
     if (pd->power_state_pre_transition_notification_ctx.pending_responses
         == 0) {
-        assert(false);
+        fwk_assert(false);
         return FWK_E_PANIC;
     }
 
@@ -2055,7 +2053,7 @@ static int process_power_state_transition_notification_response(
     struct mod_pd_power_state_transition_notification_params *params;
 
     if (pd->power_state_transition_notification_ctx.pending_responses == 0) {
-        assert(false);
+        fwk_assert(false);
         return FWK_E_PANIC;
     }
 
@@ -2109,7 +2107,7 @@ static int pd_process_notification(const struct fwk_event *event,
 
     /* Only responses are expected. */
     if (!event->is_response) {
-        assert(false);
+        fwk_assert(false);
         return FWK_E_SUPPORT;
     }
 
@@ -2117,7 +2115,7 @@ static int pd_process_notification(const struct fwk_event *event,
         return process_pre_shutdown_notification_response();
 
     if (!fwk_module_is_valid_element_id(event->target_id)) {
-        assert(false);
+        fwk_assert(false);
         return FWK_E_PARAM;
     }
 

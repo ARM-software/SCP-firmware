@@ -18,8 +18,8 @@
 bool mod_pcid_check_registers(const struct mod_pcid_registers *registers,
                               const struct mod_pcid_registers *expected)
 {
-    assert(registers != NULL);
-    assert(expected != NULL);
+    fwk_assert(registers != NULL);
+    fwk_assert(expected != NULL);
 
     return !memcmp(registers, expected, sizeof(*registers));
 }

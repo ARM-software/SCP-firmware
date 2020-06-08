@@ -53,7 +53,7 @@ static void process_node_hnf(struct cmn_booker_hnf_reg *hnf)
         cal_mode_factor = 2;
     }
 
-    assert(logical_id < config->snf_count);
+    fwk_assert(logical_id < config->snf_count);
 
     group = logical_id /
             (CMN_BOOKER_HNF_CACHE_GROUP_ENTRIES_PER_GROUP * cal_mode_factor);
@@ -128,13 +128,13 @@ static int cmn_booker_discovery(void)
 
     FWK_LOG_INFO(MOD_NAME "Starting discovery...");
 
-    assert(get_node_type(ctx->root) == NODE_TYPE_CFG);
+    fwk_assert(get_node_type(ctx->root) == NODE_TYPE_CFG);
 
     /* Traverse cross points (XP) */
     xp_count = get_node_child_count(ctx->root);
     for (xp_idx = 0; xp_idx < xp_count; xp_idx++) {
         xp = get_child_node(config->base, ctx->root, xp_idx);
-        assert(get_node_type(xp) == NODE_TYPE_XP);
+        fwk_assert(get_node_type(xp) == NODE_TYPE_XP);
 
         FWK_LOG_INFO(
             MOD_NAME "XP (%d, %d) ID:%d, LID:%d",
@@ -229,7 +229,7 @@ static void cmn_booker_configure(void)
     struct cmn_booker_mxp_reg *xp;
     const struct mod_cmn_booker_config *config = ctx->config;
 
-    assert(get_node_type(ctx->root) == NODE_TYPE_CFG);
+    fwk_assert(get_node_type(ctx->root) == NODE_TYPE_CFG);
 
     xrnsam_entry = 0;
     irnsam_entry = 0;
@@ -238,7 +238,7 @@ static void cmn_booker_configure(void)
     xp_count = get_node_child_count(ctx->root);
     for (xp_idx = 0; xp_idx < xp_count; xp_idx++) {
         xp = get_child_node(config->base, ctx->root, xp_idx);
-        assert(get_node_type(xp) == NODE_TYPE_XP);
+        fwk_assert(get_node_type(xp) == NODE_TYPE_XP);
 
         /* Traverse nodes */
         node_count = get_node_child_count(xp);
@@ -369,7 +369,7 @@ static int cmn_booker_setup_sam(struct cmn_booker_rnsam_reg *rnsam)
             break;
 
         default:
-            assert(false);
+            fwk_assert(false);
             return FWK_E_DATA;
         }
     }
@@ -496,7 +496,7 @@ static int cmn_booker_setup_rnsam(unsigned int node_id)
 
 static void post_ppu_on(void *data)
 {
-    assert(data != NULL);
+    fwk_assert(data != NULL);
     cmn_booker_setup_rnsam(*(unsigned int *)data);
 }
 
@@ -568,8 +568,9 @@ static int cmn_booker_process_notification(
 {
     struct clock_notification_params *params;
 
-    assert(fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed));
-    assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
+    fwk_assert(
+        fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed));
+    fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
 
     params = (struct clock_notification_params *)event->params;
     if (params->new_state == MOD_CLOCK_STATE_RUNNING)

@@ -174,8 +174,8 @@ static int get_clock_device_entry(
 
     *clock_device = &agent_entry->device_table[clock_idx];
 
-    assert((*clock_device)->permissions != MOD_SCMI_CLOCK_PERM_INVALID);
-    assert(fwk_module_is_valid_element_id((*clock_device)->element_id));
+    fwk_assert((*clock_device)->permissions != MOD_SCMI_CLOCK_PERM_INVALID);
+    fwk_assert(fwk_module_is_valid_element_id((*clock_device)->element_id));
 
     if (agent != NULL)
         *agent = agent_entry;
@@ -921,7 +921,7 @@ static int scmi_clock_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     static_assert(FWK_ARRAY_SIZE(handler_table) ==
         FWK_ARRAY_SIZE(payload_size_table),
         "[SCMI] Clock management protocol table sizes not consistent");
-    assert(payload != NULL);
+    fwk_assert(payload != NULL);
 
     if (message_id >= FWK_ARRAY_SIZE(handler_table)) {
         return_value = SCMI_NOT_SUPPORTED;

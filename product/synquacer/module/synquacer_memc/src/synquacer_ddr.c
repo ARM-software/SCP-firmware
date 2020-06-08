@@ -162,7 +162,7 @@ static void fw_ddr_change_freq(ddr_freq_t freq)
         break;
     default:
         FWK_LOG_INFO("[DDR] Invalid DDR frequency");
-        assert(false);
+        fwk_assert(false);
     }
 
     /* set value */
@@ -362,7 +362,7 @@ bool fw_spd_rdimm_support_check(spd_ddr_info_t *spd_ddr_info_p)
 {
     bool error_flag = false;
 
-    assert(spd_ddr_info_p->per_slot_dimm_size == FW_MODULE_CAPACITY_16GB);
+    fwk_assert(spd_ddr_info_p->per_slot_dimm_size == FW_MODULE_CAPACITY_16GB);
 
     /* !ERROR CHECK! and memory kinds select */
     /* 16GB module RDIMM */

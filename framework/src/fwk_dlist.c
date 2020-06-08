@@ -18,8 +18,8 @@ void __fwk_dlist_push_head(
     struct fwk_dlist *list,
     struct fwk_dlist_node *new)
 {
-    assert(list != NULL);
-    assert(new != NULL);
+    fwk_assert(list != NULL);
+    fwk_assert(new != NULL);
     fwk_check(new->prev == NULL);
 
     new->prev = (struct fwk_dlist_node *)list;
@@ -34,8 +34,8 @@ void __fwk_dlist_push_tail(
     struct fwk_dlist *list,
     struct fwk_dlist_node *new)
 {
-    assert(list != NULL);
-    assert(new != NULL);
+    fwk_assert(list != NULL);
+    fwk_assert(new != NULL);
     fwk_check(new->prev == NULL);
 
     new->prev = list->tail;
@@ -49,7 +49,7 @@ struct fwk_dlist_node *__fwk_dlist_pop_head(struct fwk_dlist *list)
 {
     struct fwk_dlist_node *popped;
 
-    assert(list != NULL);
+    fwk_assert(list != NULL);
 
     popped = (struct fwk_dlist_node *)__fwk_slist_pop_head(
         (struct fwk_slist *)list);
@@ -66,11 +66,11 @@ void __fwk_dlist_remove(
     struct fwk_dlist *list,
     struct fwk_dlist_node *node)
 {
-    assert(list != NULL);
-    assert(node != NULL);
-    assert(node != (struct fwk_dlist_node *)list);
-    assert(node->prev != NULL);
-    assert(node->next != NULL);
+    fwk_assert(list != NULL);
+    fwk_assert(node != NULL);
+    fwk_assert(node != (struct fwk_dlist_node *)list);
+    fwk_assert(node->prev != NULL);
+    fwk_assert(node->next != NULL);
 
     assert(__fwk_slist_contains(
         (struct fwk_slist *)list,
@@ -88,9 +88,9 @@ void __fwk_dlist_insert(
     struct fwk_dlist_node *restrict new,
     struct fwk_dlist_node *restrict node)
 {
-    assert(list != NULL);
-    assert(new != NULL);
-    assert(new != node);
+    fwk_assert(list != NULL);
+    fwk_assert(new != NULL);
+    fwk_assert(new != node);
     fwk_check(new->next == NULL);
     fwk_check(new->prev == NULL);
 
@@ -100,8 +100,8 @@ void __fwk_dlist_insert(
         return;
     }
 
-    assert(node->prev != NULL);
-    assert(node->next != NULL);
+    fwk_assert(node->prev != NULL);
+    fwk_assert(node->next != NULL);
 
     assert(__fwk_slist_contains(
         (struct fwk_slist *)list,

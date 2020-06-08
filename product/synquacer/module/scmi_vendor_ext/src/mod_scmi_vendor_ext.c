@@ -235,7 +235,7 @@ static int scmi_vendor_ext_message_handler(
     static_assert(
         FWK_ARRAY_SIZE(handler_table) == FWK_ARRAY_SIZE(payload_size_table),
         "[SCMI] vendor_ext management protocol table sizes not consistent");
-    assert(payload != NULL);
+    fwk_assert(payload != NULL);
 
     if (message_id >= FWK_ARRAY_SIZE(handler_table)) {
         return_value = SCMI_NOT_SUPPORTED;
@@ -271,7 +271,7 @@ static int scmi_vendor_ext_init(
 {
     if (element_count != 0) {
         /* This module should not have any elements */
-        assert(false);
+        fwk_assert(false);
         return FWK_E_SUPPORT;
     }
 
@@ -291,7 +291,7 @@ static int scmi_vendor_ext_bind(fwk_id_t id, unsigned int round)
         &scmi_vendor_ext_ctx.scmi_api);
     if (status != FWK_SUCCESS) {
         /* Failed to bind to SCMI module */
-        assert(false);
+        fwk_assert(false);
         return status;
     }
 

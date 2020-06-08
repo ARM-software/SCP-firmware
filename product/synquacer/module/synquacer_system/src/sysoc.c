@@ -343,7 +343,7 @@ void bus_sysoc_init(void)
     result = sysoc_wait_status_change(
         CONFIG_SOC_REG_ADDR_SYSOC_BUS_TOP, false, MAIN_BUS_RESET_BIT);
 
-    assert(result == FWK_SUCCESS);
+    fwk_assert(result == FWK_SUCCESS);
 }
 
 #define CONFIG_SOC_PCIEB_SYSOC_REG_BASE UINT32_C(0x78240000)
