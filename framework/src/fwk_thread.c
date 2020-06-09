@@ -68,6 +68,8 @@ static struct fwk_event *duplicate_event(struct fwk_event *event)
     if (allocated_event == NULL) {
         FWK_LOG_CRIT(err_msg_func, FWK_E_NOMEM, __func__);
         fwk_assert(false);
+
+        return NULL;
     }
 
     *allocated_event = *event;
