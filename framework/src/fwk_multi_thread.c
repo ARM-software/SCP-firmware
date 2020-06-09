@@ -6,7 +6,6 @@
  */
 
 #include <cmsis_os2.h>
-#include <rtx_os.h>
 
 #include <internal/fwk_id.h>
 #include <internal/fwk_module.h>
@@ -54,29 +53,6 @@ static const char err_msg_func[] = "[FWK] Error %d in %s";
 /*
  * Static functions
  */
-
-/*
- * Initialize the attributes of thread.
- *
- * \param[out] attr Thread's attributes.
- *
- * \retval FWK_SUCCESS The initialization succeeded.
- * \retval FWK_E_NOMEM A memory allocation failed.
- */
-static int init_thread_attr(osThreadAttr_t *attr)
-{
-    attr->name = "";
-    attr->attr_bits = osThreadDetached;
-    attr->cb_size = osRtxThreadCbSize;
-    attr->cb_mem = fwk_mm_calloc(1, attr->cb_size);
-
-    attr->stack_size = FMW_STACK_SIZE;
-    attr->stack_mem = fwk_mm_calloc(1, attr->stack_size);
-
-    attr->priority = osPriorityNormal;
-
-    return FWK_SUCCESS;
-}
 
 /*
  * Put back an event into the queue of free events.
@@ -628,7 +604,10 @@ int __fwk_thread_init(size_t event_count)
 {
     int status;
     struct fwk_event *event_table, *event_table_end, *event;
-    osThreadAttr_t thread_attr;
+
+    osThreadAttr_t thread_attr = {
+        .stack_size = FMW_STACK_SIZE,
+    };
 
     fwk_interrupt_global_enable();
     status = osKernelInitialize();
@@ -649,10 +628,6 @@ int __fwk_thread_init(size_t event_count)
         fwk_list_push_tail(&ctx.event_free_queue,
                            &event->slist_node);
 
-    status = init_thread_attr(&thread_attr);
-    if (status != FWK_SUCCESS)
-        goto error;
-
     ctx.common_thread_ctx.os_thread_id = osThreadNew(common_thread_function,
         &ctx.common_thread_ctx, &thread_attr);
     if (ctx.common_thread_ctx.os_thread_id == NULL) {
@@ -661,12 +636,9 @@ int __fwk_thread_init(size_t event_count)
     }
 
     /* Initialize the logging thread */
-
-    status = init_thread_attr(&thread_attr);
-    if (status != FWK_SUCCESS)
-        goto error;
-
-    thread_attr.priority = osPriorityLow;
+    thread_attr = (osThreadAttr_t){
+        .priority = osPriorityLow,
+    };
 
     ctx.log_thread_id = osThreadNew(logging_thread, NULL, &thread_attr);
     if (ctx.log_thread_id == NULL) {
@@ -732,7 +704,10 @@ int fwk_thread_create(fwk_id_t id)
 {
     int status;
     struct __fwk_thread_ctx **p_thread_ctx, *thread_ctx;
-    osThreadAttr_t thread_attr;
+
+    osThreadAttr_t thread_attr = {
+        .stack_size = FMW_STACK_SIZE,
+    };
 
     if (!ctx.initialized) {
         status = FWK_E_INIT;
@@ -747,10 +722,6 @@ int fwk_thread_create(fwk_id_t id)
         status = FWK_E_PARAM;
         goto error;
     }
-
-    status = init_thread_attr(&thread_attr);
-    if (status != FWK_SUCCESS)
-        goto error;
 
     if ((ctx.running) || (*p_thread_ctx != NULL)) {
         status = FWK_E_STATE;
