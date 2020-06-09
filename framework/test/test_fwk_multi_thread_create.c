@@ -172,7 +172,6 @@ static int test_suite_setup(void)
 
 static void test_case_setup(void)
 {
-
     fwk_mm_calloc_return_null = UINT_MAX;
     fwk_mm_calloc_call_count = 0;
     fwk_interrupt_get_current_return_val = FWK_SUCCESS;
@@ -241,7 +240,7 @@ static void test_create_thread_memory_allocation_failed(void)
     fwk_id_t id = FWK_ID_MODULE(0x1);
 
     /* Thread memory allocation failed */
-    fwk_mm_calloc_return_null = 3;
+    fwk_mm_calloc_return_null = 1;
     status = fwk_thread_create(id);
     assert(status == FWK_E_NOMEM);
 }

@@ -13,6 +13,7 @@
 #include <mod_synquacer_system.h>
 
 #include <fwk_log.h>
+#include <fwk_mm.h>
 
 #include <fmw_cmsis.h>
 
@@ -87,4 +88,19 @@ uint32_t osRtxErrorNotify(uint32_t code, void *object_id)
     }
 
     osRtxIdleThread(object_id);
+}
+
+uint32_t osRtxMemoryInit(void *mem, uint32_t size)
+{
+    return 1;
+}
+
+void *osRtxMemoryAlloc(void *mem, uint32_t size, uint32_t type)
+{
+    return fwk_mm_alloc(1, size);
+}
+
+uint32_t osRtxMemoryFree(void *mem, void *block)
+{
+    return 1;
 }
