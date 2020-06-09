@@ -6,4 +6,4 @@
 #
 
 BS_PRODUCT_NAME := morello
-BS_FIRMWARE_LIST := scp_ramfw_fvp
+BS_FIRMWARE_LIST := scp_ramfw_fvp mcp_ramfw_fvp
