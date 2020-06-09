@@ -10,6 +10,8 @@
 
 #include <stdint.h>
 
+#include <mod_n1sdp_flash.h>
+
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules
  * @{
@@ -28,7 +30,7 @@ struct n1sdp_rom_config {
     const uintptr_t ramfw_base;
 
     /*! Type of RAM Firmware to load */
-    const uint8_t image_type;
+    const struct mod_n1sdp_flash_entry_id* const image_type;
 };
 
 /*!

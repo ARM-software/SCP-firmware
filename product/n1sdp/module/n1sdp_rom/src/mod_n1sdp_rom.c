@@ -19,6 +19,7 @@
 
 #include <fmw_cmsis.h>
 
+#include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -106,66 +107,46 @@ static int n1sdp_rom_start(fwk_id_t id)
     return fwk_thread_put_event(&event);
 }
 
+static const char * get_image_type_str(
+    const struct mod_n1sdp_flash_entry_id * const id)
+{
+    if (id == &mod_n1sdp_flash_entry_mcp_bl2)
+        return "MCP";
+    if (id == &mod_n1sdp_flash_entry_scp_bl2)
+        return "SCP";
+    return "???";
+}
+
 static int n1sdp_rom_process_event(const struct fwk_event *event,
     struct fwk_event *resp)
 {
-    struct mod_n1sdp_fip_descriptor *fip_desc_table = NULL;
-    struct mod_n1sdp_fip_descriptor *fip_desc = NULL;
-    unsigned int fip_count = 0;
-    unsigned int i;
-    int status;
-
-    status = n1sdp_rom_ctx.flash_api->get_n1sdp_fip_descriptor_count(
-                 FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_ROM),
-                 &fip_count);
-    if (status != FWK_SUCCESS)
+    struct mod_n1sdp_flash_entry entry;
+    int status = n1sdp_rom_ctx.flash_api->get_entry(
+        n1sdp_rom_ctx.rom_config->image_type,
+         &entry);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_INFO("[ROM] Failed to locate %s_BL2, error: %d\n",
+            get_image_type_str(n1sdp_rom_ctx.rom_config->image_type),
+            status);
         return status;
-    status = n1sdp_rom_ctx.flash_api->get_n1sdp_fip_descriptor_table(
-                 FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_ROM),
-                 &fip_desc_table);
-    if (status != FWK_SUCCESS)
-        return status;
-
-    for (i = 0; i < fip_count; i++) {
-        fip_desc = &fip_desc_table[i];
-        if (fip_desc->type != n1sdp_rom_ctx.rom_config->image_type)
-            continue;
-
-        if (fip_desc->size == 0)
-            return FWK_E_DATA;
-
-        if (fip_desc->type == MOD_N1SDP_FIP_TYPE_MCP_BL2) {
-            FWK_LOG_INFO(
-                "[ROM] Found MCP RAM Firmware at address: 0x%x,"
-                " size: %d bytes, flags: 0x%x",
-                fip_desc->address,
-                fip_desc->size,
-                fip_desc->flags);
-            FWK_LOG_INFO("[ROM] Copying MCP RAM Firmware to ITCRAM...!");
-        } else {
-            FWK_LOG_INFO(
-                "[ROM] Found SCP BL2 RAM Firmware at address: 0x%x,"
-                " size: %d bytes, flags: 0x%x",
-                fip_desc->address,
-                fip_desc->size,
-                fip_desc->flags);
-            FWK_LOG_INFO("[ROM] Copying SCP RAM Firmware to ITCRAM...!");
-        }
-        break;
     }
 
-    if (i >= fip_count)
-        return FWK_E_DATA;
+    FWK_LOG_INFO("[ROM] Located %s_BL2:\n",
+        get_image_type_str(n1sdp_rom_ctx.rom_config->image_type));
+    FWK_LOG_INFO("[ROM]   address: %p\n", entry.p);
+    FWK_LOG_INFO("[ROM]   size   : %u\n", entry.size);
+    FWK_LOG_INFO("[ROM]   flags  : 0x%08" PRIX32 "%08" PRIX32"\n",
+        (uint32_t)(entry.flags >> 32),  (uint32_t)entry.flags);
+    FWK_LOG_INFO("[ROM] Copying %s_BL2 to ITCRAM...!\n",
+        get_image_type_str(n1sdp_rom_ctx.rom_config->image_type));
 
-    memcpy((void *)n1sdp_rom_ctx.rom_config->ramfw_base,
-        (uint8_t *)fip_desc->address, fip_desc->size);
+    memcpy((void *)n1sdp_rom_ctx.rom_config->ramfw_base, entry.p, entry.size);
     FWK_LOG_INFO("[ROM] Done!");
 
-    FWK_LOG_INFO("[ROM] Jumping to RAM Firmware");
-    FWK_LOG_FLUSH();
+    FWK_LOG_INFO("[ROM] Jumping to %s_BL2\n",
+        get_image_type_str(n1sdp_rom_ctx.rom_config->image_type));
 
     jump_to_ramfw();
-
     return FWK_SUCCESS;
 }
 

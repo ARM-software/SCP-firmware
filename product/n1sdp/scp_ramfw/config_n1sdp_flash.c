@@ -15,6 +15,5 @@ const struct fwk_module_config config_n1sdp_flash = {
     .data = &((struct mod_n1sdp_flash_config) {
         .flash_base_address = SCP_QSPI_FLASH_BASE_ADDR,
         .flash_base_address_alt = SCP_QSPI_FLASH_BASE_ADDR_ALT,
-        .toc_offset = 0x0,
     })
 };

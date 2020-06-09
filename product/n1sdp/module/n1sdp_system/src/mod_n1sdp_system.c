@@ -281,12 +281,12 @@ struct mod_n1sdp_system_ap_memory_access_api
  * Function to copy into AP SRAM.
  */
 static int n1sdp_system_copy_to_ap_sram(uint32_t sram_address,
-                                        uint32_t spi_address,
+                                        const void * const spi_address,
                                         uint32_t size)
 {
-    memcpy((void *)sram_address, (void *)spi_address, size);
+    memcpy((void *)sram_address, spi_address, size);
 
-    if (memcmp((void *)sram_address, (void *)spi_address, size) != 0) {
+    if (memcmp((void *)sram_address, spi_address, size) != 0) {
         FWK_LOG_INFO(
             "[N1SDP SYSTEM] Copy failed at destination address: 0x%" PRIX32,
             sram_address);
@@ -381,13 +381,9 @@ static int n1sdp_system_init_primary_core(void)
 {
     int status;
     struct mod_pd_restricted_api *mod_pd_restricted_api = NULL;
-    struct mod_n1sdp_fip_descriptor *fip_desc_table = NULL;
-    unsigned int fip_count;
-    unsigned int i;
     unsigned int core_idx;
     unsigned int cluster_idx;
     unsigned int cluster_count;
-    int fip_index_bl31 = -1;
 
     FWK_LOG_INFO(
         "[N1SDP SYSTEM] Setting AP Reset Address to 0x%08" PRIX32,
@@ -405,46 +401,28 @@ static int n1sdp_system_init_primary_core(void)
     }
 
     if (n1sdp_get_chipid() == 0x0) {
-        FWK_LOG_INFO(
-            "[N1SDP SYSTEM] Looking for AP firmware in flash memory...");
-
-        status = n1sdp_system_ctx.flash_api->get_n1sdp_fip_descriptor_count(
-            FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SYSTEM), &fip_count);
-        if (status != FWK_SUCCESS)
-            return status;
-
-        status = n1sdp_system_ctx.flash_api->get_n1sdp_fip_descriptor_table(
-            FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SYSTEM), &fip_desc_table);
-        if (status != FWK_SUCCESS)
-            return status;
-
-        for (i = 0; i < fip_count; i++) {
-            if (fip_desc_table[i].type == MOD_N1SDP_FIP_TYPE_TF_BL31) {
-                FWK_LOG_INFO(
-                    "[N1SDP SYSTEM] Found BL31 at address: 0x%08x,"
-                    " size: %u, flags: 0x%x",
-                    fip_desc_table[i].address,
-                    fip_desc_table[i].size,
-                    fip_desc_table[i].flags);
-                fip_index_bl31 = i;
-                break;
-            }
-        }
-
-        if (fip_index_bl31 < 0) {
+        struct mod_n1sdp_flash_entry entry;
+        status = n1sdp_system_ctx.flash_api->get_entry(
+            &mod_n1sdp_flash_entry_tf_bl31,
+            &entry);
+        if (status != FWK_SUCCESS) {
             FWK_LOG_INFO(
-                "[N1SDP SYSTEM] Error! "
-                "FIP does not have BL31 binary");
+                "[N1SDP SYSTEM] Failed to locate AP TF_BL31, error: %d\n",
+                status);
             return FWK_E_PANIC;
         }
 
+        FWK_LOG_INFO("[N1SDP SYSTEM] Located AP TF_BL31:\n");
+        FWK_LOG_INFO("[N1SDP SYSTEM]   address: %p\n", entry.p);
+        FWK_LOG_INFO("[N1SDP SYSTEM]   size   : %u\n", entry.size);
+        FWK_LOG_INFO("[N1SDP SYSTEM]   flags  : 0x%08" PRIX32 "%08" PRIX32"\n",
+            (uint32_t)(entry.flags >> 32),  (uint32_t)entry.flags);
         FWK_LOG_INFO(
-            "[N1SDP SYSTEM] Copying AP BL31 to address 0x%08" PRIX32 "...",
+            "[N1SDP SYSTEM] Copying AP TF_BL31 to address 0x%"PRIx32"...\n",
             AP_CORE_RESET_ADDR);
 
         status = n1sdp_system_copy_to_ap_sram(AP_CORE_RESET_ADDR,
-                     fip_desc_table[fip_index_bl31].address,
-                     fip_desc_table[fip_index_bl31].size);
+            entry.p, entry.size);
         if (status != FWK_SUCCESS)
             return FWK_E_PANIC;
 

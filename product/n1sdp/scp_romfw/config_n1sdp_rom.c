@@ -15,6 +15,6 @@
 const struct fwk_module_config config_n1sdp_rom = {
     .data = &((struct n1sdp_rom_config) {
         .ramfw_base = SCP_RAM0_BASE,
-        .image_type = MOD_N1SDP_FIP_TYPE_SCP_BL2,
+        .image_type = &mod_n1sdp_flash_entry_scp_bl2,
     })
 };
