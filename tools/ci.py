@@ -122,42 +122,39 @@ def main():
     result = subprocess.call(cmd, shell=True)
     results.append(('Product sgi575 debug build (ARM)', result))
 
-    # TODO: Re-enable N1SDP tests once their pre-compiled sensor library has
-    #       been updated
-    #
-    # banner('Test building n1sdp product')
-    #
-    # cmd = \
-    #     'CC=arm-none-eabi-gcc ' \
-    #     'PRODUCT=n1sdp ' \
-    #     'MODE=debug ' \
-    #     'make clean all -j'
-    # result = subprocess.call(cmd, shell=True)
-    # results.append(('Product n1sdp debug build (GCC)', result))
-    #
-    # cmd = \
-    #     'CC=armclang ' \
-    #     'PRODUCT=n1sdp ' \
-    #     'MODE=debug ' \
-    #     'make clean all -j'
-    # result = subprocess.call(cmd, shell=True)
-    # results.append(('Product n1sdp debug build (ARM)', result))
-    #
-    # cmd = \
-    #     'CC=arm-none-eabi-gcc ' \
-    #     'PRODUCT=n1sdp ' \
-    #     'MODE=release ' \
-    #     'make clean all -j'
-    # result = subprocess.call(cmd, shell=True)
-    # results.append(('Product n1sdp release build (GCC)', result))
-    #
-    # cmd = \
-    #     'CC=armclang ' \
-    #     'PRODUCT=n1sdp ' \
-    #     'MODE=release ' \
-    #     'make clean all -j'
-    # result = subprocess.call(cmd, shell=True)
-    # results.append(('Product n1sdp release build (ARM)', result))
+    banner('Test building n1sdp product')
+
+    cmd = \
+        'CC=arm-none-eabi-gcc ' \
+        'PRODUCT=n1sdp ' \
+        'MODE=debug ' \
+        'make clean all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product n1sdp debug build (GCC)', result))
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=n1sdp ' \
+        'MODE=debug ' \
+        'make clean all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product n1sdp debug build (ARM)', result))
+
+    cmd = \
+        'CC=arm-none-eabi-gcc ' \
+        'PRODUCT=n1sdp ' \
+        'MODE=release ' \
+        'make clean all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product n1sdp release build (GCC)', result))
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=n1sdp ' \
+        'MODE=release ' \
+        'make clean all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product n1sdp release build (ARM)', result))
 
     banner('Test building rdn1e1 product')
 
