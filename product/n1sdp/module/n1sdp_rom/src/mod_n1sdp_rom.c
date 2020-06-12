@@ -17,6 +17,8 @@
 #include <fwk_status.h>
 #include <fwk_thread.h>
 
+#include <fmw_cmsis.h>
+
 #include <stdint.h>
 #include <string.h>
 
@@ -40,8 +42,8 @@ static struct mod_n1sdp_rom_ctx n1sdp_rom_ctx;
 
 static void jump_to_ramfw(void)
 {
-    uintptr_t const *reset_base =
-        (uintptr_t *)(n1sdp_rom_ctx.rom_config->ramfw_base + 0x4);
+    uintptr_t ramfw_base = n1sdp_rom_ctx.rom_config->ramfw_base;
+    uintptr_t const *reset_base = (uintptr_t *)(ramfw_base + 0x4);
     void (*ramfw_reset_handler)(void);
 
     /*
@@ -51,6 +53,9 @@ static void jump_to_ramfw(void)
     fwk_interrupt_global_disable();
 
     ramfw_reset_handler = (void (*)(void))*reset_base;
+
+    /* Set the vector table offset register */
+    SCB->VTOR = ramfw_base;
 
     /*
      * Execute the RAM firmware's reset handler to pass control from ROM
