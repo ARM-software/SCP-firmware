@@ -394,6 +394,40 @@ def main():
     result = subprocess.call(cmd, shell=True)
     results.append(('Product tc0 debug build (ARM)', result))
 
+    banner('Test building morello product')
+
+    cmd = \
+        'CC=arm-none-eabi-gcc ' \
+        'PRODUCT=morello ' \
+        'MODE=debug ' \
+        'make clean all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product morello debug build (GCC)', result))
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=morello ' \
+        'MODE=debug ' \
+        'make clean all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product morello debug build (ARM)', result))
+
+    cmd = \
+        'CC=arm-none-eabi-gcc ' \
+        'PRODUCT=morello ' \
+        'MODE=release ' \
+        'make clean all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product morello release build (GCC)', result))
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=morello ' \
+        'MODE=release ' \
+        'make clean all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product morello release build (ARM)', result))
+
     banner('Tests summary')
 
     total_success = 0
