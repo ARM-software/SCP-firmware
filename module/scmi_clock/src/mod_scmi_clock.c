@@ -8,7 +8,6 @@
  *     SCMI Clock Management Protocol Support.
  */
 
-#include <internal/scmi.h>
 #include <internal/scmi_clock.h>
 
 #include <mod_clock.h>
@@ -104,28 +103,29 @@ static int scmi_clock_describe_rates_handler(fwk_id_t service_id,
  */
 static struct scmi_clock_ctx scmi_clock_ctx;
 
-static int (* const handler_table[])(fwk_id_t, const uint32_t *) = {
-    [SCMI_PROTOCOL_VERSION] = scmi_clock_protocol_version_handler,
-    [SCMI_PROTOCOL_ATTRIBUTES] = scmi_clock_protocol_attributes_handler,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+static int (*const handler_table[])(fwk_id_t, const uint32_t *) = {
+    [MOD_SCMI_PROTOCOL_VERSION] = scmi_clock_protocol_version_handler,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] = scmi_clock_protocol_attributes_handler,
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
         scmi_clock_protocol_message_attributes_handler,
-    [SCMI_CLOCK_ATTRIBUTES] = scmi_clock_attributes_handler,
-    [SCMI_CLOCK_RATE_GET] = scmi_clock_rate_get_handler,
-    [SCMI_CLOCK_RATE_SET] = scmi_clock_rate_set_handler,
-    [SCMI_CLOCK_CONFIG_SET] = scmi_clock_config_set_handler,
-    [SCMI_CLOCK_DESCRIBE_RATES] = scmi_clock_describe_rates_handler,
+    [MOD_SCMI_CLOCK_ATTRIBUTES] = scmi_clock_attributes_handler,
+    [MOD_SCMI_CLOCK_RATE_GET] = scmi_clock_rate_get_handler,
+    [MOD_SCMI_CLOCK_RATE_SET] = scmi_clock_rate_set_handler,
+    [MOD_SCMI_CLOCK_CONFIG_SET] = scmi_clock_config_set_handler,
+    [MOD_SCMI_CLOCK_DESCRIBE_RATES] = scmi_clock_describe_rates_handler,
 };
 
 static const unsigned int payload_size_table[] = {
-    [SCMI_PROTOCOL_VERSION] = 0,
-    [SCMI_PROTOCOL_ATTRIBUTES] = 0,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+    [MOD_SCMI_PROTOCOL_VERSION] = 0,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
         sizeof(struct scmi_protocol_message_attributes_a2p),
-    [SCMI_CLOCK_ATTRIBUTES] = sizeof(struct scmi_clock_attributes_a2p),
-    [SCMI_CLOCK_RATE_GET] = sizeof(struct scmi_clock_rate_get_a2p),
-    [SCMI_CLOCK_RATE_SET] = sizeof(struct scmi_clock_rate_set_a2p),
-    [SCMI_CLOCK_CONFIG_SET] = sizeof(struct scmi_clock_config_set_a2p),
-    [SCMI_CLOCK_DESCRIBE_RATES] = sizeof(struct scmi_clock_describe_rates_a2p),
+    [MOD_SCMI_CLOCK_ATTRIBUTES] = sizeof(struct scmi_clock_attributes_a2p),
+    [MOD_SCMI_CLOCK_RATE_GET] = sizeof(struct scmi_clock_rate_get_a2p),
+    [MOD_SCMI_CLOCK_RATE_SET] = sizeof(struct scmi_clock_rate_set_a2p),
+    [MOD_SCMI_CLOCK_CONFIG_SET] = sizeof(struct scmi_clock_config_set_a2p),
+    [MOD_SCMI_CLOCK_DESCRIBE_RATES] =
+        sizeof(struct scmi_clock_describe_rates_a2p),
 };
 
 /*
@@ -1145,7 +1145,7 @@ exit:
 static int scmi_clock_get_scmi_protocol_id(fwk_id_t protocol_id,
                                            uint8_t *scmi_protocol_id)
 {
-    *scmi_protocol_id = SCMI_PROTOCOL_ID_CLOCK;
+    *scmi_protocol_id = MOD_SCMI_PROTOCOL_ID_CLOCK;
 
     return FWK_SUCCESS;
 }

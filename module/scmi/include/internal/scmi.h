@@ -20,22 +20,6 @@
  */
 
 /*!
- * \brief Maximum value for an agent identifier. The limit is derived from the
- *      the base protocol's "PROTOCOL_ATTRIBUTES" command. This command returns
- *      a 32-bits "attributes" value which, in turn, contains an 8-bit field
- *      giving the number of agents in the system.
- */
-#define SCMI_AGENT_ID_MAX 0xFF
-
-/*!
- * \brief SCMI identifier of the platform.
- */
-#define SCMI_PLATFORM_ID 0
-
-/*! Maximum value of an SCMI protocol identifier */
-#define SCMI_PROTOCOL_ID_MAX 0xFF
-
-/*!
  * \brief Entity role.
  */
 enum scmi_role {
@@ -91,31 +75,6 @@ enum scmi_channel_type {
     SCMI_CHANNEL_TYPE_P2A = SCMI_ROLE_PLATFORM
 };
 
-/*!
- * \brief SCMI error codes.
- */
-enum scmi_error {
-    SCMI_SUCCESS            =  0,
-    SCMI_NOT_SUPPORTED      = -1,
-    SCMI_INVALID_PARAMETERS = -2,
-    SCMI_DENIED             = -3,
-    SCMI_NOT_FOUND          = -4,
-    SCMI_OUT_OF_RANGE       = -5,
-    SCMI_BUSY               = -6,
-    SCMI_COMMS_ERROR        = -7,
-    SCMI_GENERIC_ERROR      = -8,
-    SCMI_HARDWARE_ERROR     = -9,
-    SCMI_PROTOCOL_ERROR     = -10,
-};
-
-/*!
- * \brief Common command identifiers.
- */
-enum scmi_command_id {
-    SCMI_PROTOCOL_VERSION            = 0x000,
-    SCMI_PROTOCOL_ATTRIBUTES         = 0x001,
-    SCMI_PROTOCOL_MESSAGE_ATTRIBUTES = 0x002
-};
 
 /*!
  * \brief Generic platform-to-agent PROTOCOL_VERSION structure.

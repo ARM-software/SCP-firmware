@@ -5,7 +5,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <internal/scmi.h>
 #include <internal/scmi_system_power.h>
 
 #include <mod_power_domain.h>
@@ -53,28 +52,29 @@ static int scmi_sys_power_state_notify_handler(fwk_id_t service_id,
  */
 static struct scmi_sys_power_ctx scmi_sys_power_ctx;
 
-static int (* const handler_table[])(fwk_id_t, const uint32_t *) = {
-    [SCMI_PROTOCOL_VERSION] = scmi_sys_power_version_handler,
-    [SCMI_PROTOCOL_ATTRIBUTES] = scmi_sys_power_attributes_handler,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] = scmi_sys_power_msg_attributes_handler,
-    [SCMI_SYS_POWER_STATE_SET] = scmi_sys_power_state_set_handler,
-    [SCMI_SYS_POWER_STATE_GET] = scmi_sys_power_state_get_handler,
+static int (*const handler_table[])(fwk_id_t, const uint32_t *) = {
+    [MOD_SCMI_PROTOCOL_VERSION] = scmi_sys_power_version_handler,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] = scmi_sys_power_attributes_handler,
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+        scmi_sys_power_msg_attributes_handler,
+    [MOD_SCMI_SYS_POWER_STATE_SET] = scmi_sys_power_state_set_handler,
+    [MOD_SCMI_SYS_POWER_STATE_GET] = scmi_sys_power_state_get_handler,
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    [SCMI_SYS_POWER_STATE_NOTIFY] = scmi_sys_power_state_notify_handler,
+    [MOD_SCMI_SYS_POWER_STATE_NOTIFY] = scmi_sys_power_state_notify_handler,
 #endif
 };
 
 static const unsigned int payload_size_table[] = {
-    [SCMI_PROTOCOL_VERSION] = 0,
-    [SCMI_PROTOCOL_ATTRIBUTES] = 0,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
-                       sizeof(struct scmi_protocol_message_attributes_a2p),
-    [SCMI_SYS_POWER_STATE_SET] =
-                       sizeof(struct scmi_sys_power_state_set_a2p),
-    [SCMI_SYS_POWER_STATE_GET] = 0,
+    [MOD_SCMI_PROTOCOL_VERSION] = 0,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+        sizeof(struct scmi_protocol_message_attributes_a2p),
+    [MOD_SCMI_SYS_POWER_STATE_SET] =
+        sizeof(struct scmi_sys_power_state_set_a2p),
+    [MOD_SCMI_SYS_POWER_STATE_GET] = 0,
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    [SCMI_SYS_POWER_STATE_NOTIFY] =
-                       sizeof(struct scmi_sys_power_state_notify_a2p),
+    [MOD_SCMI_SYS_POWER_STATE_NOTIFY] =
+        sizeof(struct scmi_sys_power_state_notify_a2p),
 #endif
 };
 
@@ -199,7 +199,7 @@ static int scmi_sys_power_msg_attributes_handler(fwk_id_t service_id,
         .attributes = 0,
     };
 
-    if (message_id == SCMI_SYS_POWER_STATE_SET) {
+    if (message_id == MOD_SCMI_SYS_POWER_STATE_SET) {
         return_values.attributes |= SYS_POWER_STATE_SET_ATTRIBUTES_SUSPEND |
                                     SYS_POWER_STATE_SET_ATTRIBUTES_WARM_RESET;
     }
@@ -464,7 +464,7 @@ __attribute((weak)) int scmi_sys_power_state_set_policy(
 static int scmi_sys_power_get_scmi_protocol_id(fwk_id_t protocol_id,
                                                uint8_t *scmi_protocol_id)
 {
-    *scmi_protocol_id = SCMI_PROTOCOL_ID_SYS_POWER;
+    *scmi_protocol_id = MOD_SCMI_PROTOCOL_ID_SYS_POWER;
 
     return FWK_SUCCESS;
 }

@@ -8,7 +8,6 @@
  *     SCMI Core Configuration Protocol Support.
  */
 
-#include <internal/scmi.h>
 #include <internal/scmi_apcore.h>
 
 #include <mod_scmi.h>
@@ -55,19 +54,19 @@ static int scmi_apcore_reset_address_get_handler(fwk_id_t service_id,
  */
 static struct scmi_apcore_ctx scmi_apcore_ctx;
 
-static int (* const handler_table[])(fwk_id_t, const uint32_t *) = {
-    [SCMI_PROTOCOL_VERSION] = scmi_apcore_protocol_version_handler,
-    [SCMI_PROTOCOL_ATTRIBUTES] = scmi_apcore_protocol_attributes_handler,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+static int (*const handler_table[])(fwk_id_t, const uint32_t *) = {
+    [MOD_SCMI_PROTOCOL_VERSION] = scmi_apcore_protocol_version_handler,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] = scmi_apcore_protocol_attributes_handler,
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
         scmi_apcore_protocol_message_attributes_handler,
     [SCMI_APCORE_RESET_ADDRESS_SET] = scmi_apcore_reset_address_set_handler,
     [SCMI_APCORE_RESET_ADDRESS_GET] = scmi_apcore_reset_address_get_handler,
 };
 
 static const unsigned int payload_size_table[] = {
-    [SCMI_PROTOCOL_VERSION] = 0,
-    [SCMI_PROTOCOL_ATTRIBUTES] = 0,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+    [MOD_SCMI_PROTOCOL_VERSION] = 0,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
         sizeof(struct scmi_protocol_message_attributes_a2p),
     [SCMI_APCORE_RESET_ADDRESS_SET] =
         sizeof(struct scmi_apcore_reset_address_set_a2p),

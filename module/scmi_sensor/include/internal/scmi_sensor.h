@@ -23,18 +23,7 @@
  * @{
  */
 
-#define SCMI_PROTOCOL_ID_SENSOR      UINT32_C(0x15)
 #define SCMI_PROTOCOL_VERSION_SENSOR UINT32_C(0x10000)
-
-/*
- * Identifiers of the SCMI Sensor Management Protocol commands
- */
-enum scmi_sensor_command_id {
-    SCMI_SENSOR_DESCRIPTION_GET = 0x003,
-    SCMI_SENSOR_CONFIG_SET      = 0x004,
-    SCMI_SENSOR_TRIP_POINT_SET  = 0x005,
-    SCMI_SENSOR_READING_GET     = 0x006,
-};
 
 /*
  * PROTOCOL_ATTRIBUTES

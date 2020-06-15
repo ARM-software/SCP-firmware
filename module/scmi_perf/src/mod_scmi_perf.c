@@ -8,7 +8,6 @@
  *     SCMI performance domain management protocol support.
  */
 
-#include <internal/scmi.h>
 #include <internal/scmi_perf.h>
 
 #include <mod_dvfs.h>
@@ -56,55 +55,38 @@ static int scmi_perf_level_notify(
     fwk_id_t service_id, const uint32_t *payload);
 
 static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
-    [SCMI_PROTOCOL_VERSION] =
-                       scmi_perf_protocol_version_handler,
-    [SCMI_PROTOCOL_ATTRIBUTES] =
-                       scmi_perf_protocol_attributes_handler,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
-                       scmi_perf_protocol_message_attributes_handler,
-    [SCMI_PERF_DOMAIN_ATTRIBUTES] =
-                       scmi_perf_domain_attributes_handler,
-    [SCMI_PERF_DESCRIBE_LEVELS] =
-                       scmi_perf_describe_levels_handler,
-    [SCMI_PERF_LIMITS_SET] =
-                       scmi_perf_limits_set_handler,
-    [SCMI_PERF_LIMITS_GET] =
-                       scmi_perf_limits_get_handler,
-    [SCMI_PERF_LEVEL_SET] =
-                       scmi_perf_level_set_handler,
-    [SCMI_PERF_LEVEL_GET] =
-                       scmi_perf_level_get_handler,
-    [SCMI_PERF_DESCRIBE_FAST_CHANNEL] =
-                       scmi_perf_describe_fast_channels,
-    [SCMI_PERF_NOTIFY_LIMITS] =
-                       scmi_perf_limits_notify,
-    [SCMI_PERF_NOTIFY_LEVEL] =
-                       scmi_perf_level_notify
+    [MOD_SCMI_PROTOCOL_VERSION] = scmi_perf_protocol_version_handler,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] = scmi_perf_protocol_attributes_handler,
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+        scmi_perf_protocol_message_attributes_handler,
+    [MOD_SCMI_PERF_DOMAIN_ATTRIBUTES] = scmi_perf_domain_attributes_handler,
+    [MOD_SCMI_PERF_DESCRIBE_LEVELS] = scmi_perf_describe_levels_handler,
+    [MOD_SCMI_PERF_LIMITS_SET] = scmi_perf_limits_set_handler,
+    [MOD_SCMI_PERF_LIMITS_GET] = scmi_perf_limits_get_handler,
+    [MOD_SCMI_PERF_LEVEL_SET] = scmi_perf_level_set_handler,
+    [MOD_SCMI_PERF_LEVEL_GET] = scmi_perf_level_get_handler,
+    [MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL] = scmi_perf_describe_fast_channels,
+    [MOD_SCMI_PERF_NOTIFY_LIMITS] = scmi_perf_limits_notify,
+    [MOD_SCMI_PERF_NOTIFY_LEVEL] = scmi_perf_level_notify
 };
 
 static unsigned int payload_size_table[] = {
-    [SCMI_PROTOCOL_VERSION] = 0,
-    [SCMI_PROTOCOL_ATTRIBUTES] = 0,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
-                       sizeof(struct scmi_protocol_message_attributes_a2p),
-    [SCMI_PERF_DOMAIN_ATTRIBUTES] =
-                       sizeof(struct scmi_perf_domain_attributes_a2p),
-    [SCMI_PERF_DESCRIBE_LEVELS] =
-                       sizeof(struct scmi_perf_describe_levels_a2p),
-    [SCMI_PERF_LEVEL_SET] =
-                       sizeof(struct scmi_perf_level_set_a2p),
-    [SCMI_PERF_LEVEL_GET] =
-                       sizeof(struct scmi_perf_level_get_a2p),
-    [SCMI_PERF_LIMITS_SET] =
-                       sizeof(struct scmi_perf_limits_set_a2p),
-    [SCMI_PERF_LIMITS_GET] =
-                       sizeof(struct scmi_perf_limits_get_a2p),
-    [SCMI_PERF_DESCRIBE_FAST_CHANNEL] =
-                       sizeof(struct scmi_perf_describe_fc_a2p),
-    [SCMI_PERF_NOTIFY_LIMITS] =
-                       sizeof(struct scmi_perf_notify_limits_a2p),
-    [SCMI_PERF_NOTIFY_LEVEL] =
-                       sizeof(struct scmi_perf_notify_level_a2p)
+    [MOD_SCMI_PROTOCOL_VERSION] = 0,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+        sizeof(struct scmi_protocol_message_attributes_a2p),
+    [MOD_SCMI_PERF_DOMAIN_ATTRIBUTES] =
+        sizeof(struct scmi_perf_domain_attributes_a2p),
+    [MOD_SCMI_PERF_DESCRIBE_LEVELS] =
+        sizeof(struct scmi_perf_describe_levels_a2p),
+    [MOD_SCMI_PERF_LEVEL_SET] = sizeof(struct scmi_perf_level_set_a2p),
+    [MOD_SCMI_PERF_LEVEL_GET] = sizeof(struct scmi_perf_level_get_a2p),
+    [MOD_SCMI_PERF_LIMITS_SET] = sizeof(struct scmi_perf_limits_set_a2p),
+    [MOD_SCMI_PERF_LIMITS_GET] = sizeof(struct scmi_perf_limits_get_a2p),
+    [MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL] =
+        sizeof(struct scmi_perf_describe_fc_a2p),
+    [MOD_SCMI_PERF_NOTIFY_LIMITS] = sizeof(struct scmi_perf_notify_limits_a2p),
+    [MOD_SCMI_PERF_NOTIFY_LEVEL] = sizeof(struct scmi_perf_notify_level_a2p)
 };
 
 struct perf_operations {
@@ -810,23 +792,23 @@ static int scmi_perf_describe_fast_channels(fwk_id_t service_id,
     fwk_assert(domain->fast_channels_addr_scp != 0x0);
 
     switch (parameters->message_id) {
-    case SCMI_PERF_LEVEL_GET:
+    case MOD_SCMI_PERF_LEVEL_GET:
         chan_offset = offsetof(struct mod_scmi_perf_fast_channel, get_level);
         chan_size = sizeof(uint32_t);
         break;
 
-    case SCMI_PERF_LEVEL_SET:
+    case MOD_SCMI_PERF_LEVEL_SET:
         chan_offset = offsetof(struct mod_scmi_perf_fast_channel, set_level);
         chan_size = sizeof(uint32_t);
         break;
 
-    case SCMI_PERF_LIMITS_SET:
+    case MOD_SCMI_PERF_LIMITS_SET:
         chan_offset = offsetof(struct mod_scmi_perf_fast_channel,
             set_limit_range_max);
         chan_size = sizeof(uint32_t) * 2;
         break;
 
-    case SCMI_PERF_LIMITS_GET:
+    case MOD_SCMI_PERF_LIMITS_GET:
         chan_offset = offsetof(struct mod_scmi_perf_fast_channel,
             get_limit_range_max);
         chan_size = sizeof(uint32_t) * 2;
@@ -931,7 +913,7 @@ __attribute__((weak)) int scmi_perf_level_set_policy(
 static int scmi_perf_get_scmi_protocol_id(fwk_id_t protocol_id,
                                           uint8_t *scmi_protocol_id)
 {
-    *scmi_protocol_id = SCMI_PROTOCOL_ID_PERF;
+    *scmi_protocol_id = MOD_SCMI_PROTOCOL_ID_PERF;
 
     return FWK_SUCCESS;
 }
@@ -1028,9 +1010,12 @@ static void scmi_perf_notify_limits(fwk_id_t domain_id,
             limits_changed.range_min = range_min;
             limits_changed.range_max = range_max;
 
-            scmi_perf_ctx.scmi_api->notify(id,
-                SCMI_PROTOCOL_ID_PERF, SCMI_PERF_LIMITS_CHANGED,
-                &limits_changed, sizeof(limits_changed));
+            scmi_perf_ctx.scmi_api->notify(
+                id,
+                MOD_SCMI_PROTOCOL_ID_PERF,
+                SCMI_PERF_LIMITS_CHANGED,
+                &limits_changed,
+                sizeof(limits_changed));
         }
     }
 }
@@ -1063,9 +1048,12 @@ static void scmi_perf_notify_level(fwk_id_t domain_id,
             level_changed.domain_id = idx;
             level_changed.performance_level = level;
 
-            scmi_perf_ctx.scmi_api->notify(id,
-                SCMI_PROTOCOL_ID_PERF, SCMI_PERF_LEVEL_CHANGED,
-                &level_changed, sizeof(level_changed));
+            scmi_perf_ctx.scmi_api->notify(
+                id,
+                MOD_SCMI_PROTOCOL_ID_PERF,
+                SCMI_PERF_LEVEL_CHANGED,
+                &level_changed,
+                sizeof(level_changed));
         }
     }
 }

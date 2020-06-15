@@ -5,7 +5,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <internal/scmi.h>
 #include <internal/smt.h>
 
 #include <mod_power_domain.h>
