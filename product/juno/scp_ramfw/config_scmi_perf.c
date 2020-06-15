@@ -33,8 +33,46 @@ static const struct mod_scmi_perf_domain_config domains[] = {
             [JUNO_SCMI_AGENT_IDX_PSCI] = 0 /* No Access */,
         },
 #ifdef BUILD_HAS_FAST_CHANNELS
-        .fast_channels_addr_scp = SCMI_FAST_CHANNEL_BASE,
-        .fast_channels_addr_ap = SCMI_FAST_CHANNEL_BASE - EXTERNAL_DEV_BASE,
+        .fast_channels_addr_scp = (uint64_t[]) {
+            [MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_SET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LEVEL_SET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_LITTLE),
+            [MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_SET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LIMIT_SET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_LITTLE),
+            [MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_GET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LEVEL_GET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_LITTLE),
+            [MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_GET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LIMIT_GET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_LITTLE),
+        },
+        .fast_channels_addr_ap = (uint64_t[]) {
+            [MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_SET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LEVEL_SET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_LITTLE)
+                - EXTERNAL_DEV_BASE,
+            [MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_SET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LIMIT_SET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_LITTLE)
+                - EXTERNAL_DEV_BASE,
+            [MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_GET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LEVEL_GET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_LITTLE)
+                - EXTERNAL_DEV_BASE,
+            [MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_GET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LIMIT_GET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_LITTLE)
+                - EXTERNAL_DEV_BASE,
+        },
 #endif
 #ifdef BUILD_HAS_STATISTICS
         .stats_collected = true,
@@ -47,11 +85,46 @@ static const struct mod_scmi_perf_domain_config domains[] = {
             [JUNO_SCMI_AGENT_IDX_PSCI] = 0 /* No Access */,
         },
 #ifdef BUILD_HAS_FAST_CHANNELS
-        .fast_channels_addr_scp = SCMI_FAST_CHANNEL_BASE +
-            sizeof(struct mod_scmi_perf_fast_channel),
-        .fast_channels_addr_ap = SCMI_FAST_CHANNEL_BASE +
-            sizeof(struct mod_scmi_perf_fast_channel) -
-            EXTERNAL_DEV_BASE,
+.fast_channels_addr_scp = (uint64_t[]) {
+            [MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_SET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LEVEL_SET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_BIG),
+            [MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_SET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LIMIT_SET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_BIG),
+            [MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_GET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LEVEL_GET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_BIG),
+            [MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_GET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LIMIT_GET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_BIG),
+        },
+        .fast_channels_addr_ap = (uint64_t[]) {
+            [MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_SET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LEVEL_SET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_BIG)
+                - EXTERNAL_DEV_BASE,
+            [MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_SET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LIMIT_SET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_BIG)
+                - EXTERNAL_DEV_BASE,
+            [MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_GET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LEVEL_GET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_BIG)
+                - EXTERNAL_DEV_BASE,
+            [MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_GET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LIMIT_GET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_BIG)
+                - EXTERNAL_DEV_BASE,
+        },
 #endif
 #ifdef BUILD_HAS_STATISTICS
         .stats_collected = true,
@@ -64,11 +137,46 @@ static const struct mod_scmi_perf_domain_config domains[] = {
             [JUNO_SCMI_AGENT_IDX_PSCI] = 0 /* No Access */,
         },
 #ifdef BUILD_HAS_FAST_CHANNELS
-        .fast_channels_addr_scp = SCMI_FAST_CHANNEL_BASE +
-            (sizeof(struct mod_scmi_perf_fast_channel) * 2),
-        .fast_channels_addr_ap = SCMI_FAST_CHANNEL_BASE +
-            (sizeof(struct mod_scmi_perf_fast_channel) * 2) -
-            EXTERNAL_DEV_BASE,
+        .fast_channels_addr_scp = (uint64_t[]) {
+            [MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_SET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LEVEL_SET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_GPU),
+            [MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_SET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LIMIT_SET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_GPU),
+            [MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_GET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LEVEL_GET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_GPU),
+            [MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_GET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LIMIT_GET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_GPU),
+        },
+        .fast_channels_addr_ap = (uint64_t[]) {
+            [MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_SET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LEVEL_SET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_GPU)
+                - EXTERNAL_DEV_BASE,
+            [MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_SET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LIMIT_SET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_GPU)
+                - EXTERNAL_DEV_BASE,
+            [MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_GET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LEVEL_GET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_GPU)
+                - EXTERNAL_DEV_BASE,
+            [MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_GET] = SCMI_FAST_CHANNEL_BASE
+                + MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LIMIT_GET
+                + (MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL
+                * DVFS_ELEMENT_IDX_GPU)
+                - EXTERNAL_DEV_BASE,
+        },
 #endif
 #ifdef BUILD_HAS_STATISTICS
         .stats_collected = true,
