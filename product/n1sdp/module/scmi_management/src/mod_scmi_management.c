@@ -11,8 +11,6 @@
 #include "n1sdp_scc_reg.h"
 #include "n1sdp_scp_pik.h"
 
-#include <internal/scmi.h>
-
 #include <mod_scmi.h>
 #include <mod_scmi_management.h>
 
@@ -47,10 +45,11 @@ static int scmi_management_chipid_info_get_handler(fwk_id_t service_id,
  */
 static struct scmi_management_ctx scmi_management_ctx;
 
-static int (* const handler_table[])(fwk_id_t, const uint32_t *) = {
-    [SCMI_PROTOCOL_VERSION] = scmi_management_protocol_version_handler,
-    [SCMI_PROTOCOL_ATTRIBUTES] = scmi_management_protocol_attributes_handler,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+static int (*const handler_table[])(fwk_id_t, const uint32_t *) = {
+    [MOD_SCMI_PROTOCOL_VERSION] = scmi_management_protocol_version_handler,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] =
+        scmi_management_protocol_attributes_handler,
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
         scmi_management_protocol_message_attributes_handler,
     [SCMI_MANAGEMENT_CLOCK_STATUS_GET] =
         scmi_management_clock_status_get_handler,
@@ -59,9 +58,9 @@ static int (* const handler_table[])(fwk_id_t, const uint32_t *) = {
 };
 
 static const unsigned int payload_size_table[] = {
-    [SCMI_PROTOCOL_VERSION] = 0,
-    [SCMI_PROTOCOL_ATTRIBUTES] = 0,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] = 0,
+    [MOD_SCMI_PROTOCOL_VERSION] = 0,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] = 0,
     [SCMI_MANAGEMENT_CLOCK_STATUS_GET] = 0,
     [SCMI_MANAGEMENT_CHIPID_INFO_GET] = 0,
 };

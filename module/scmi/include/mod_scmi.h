@@ -12,6 +12,7 @@
 #define MOD_SCMI_H
 
 #include <internal/scmi.h>
+#include <mod_scmi_std.h>
 
 #include <fwk_id.h>
 #include <fwk_module_idx.h>

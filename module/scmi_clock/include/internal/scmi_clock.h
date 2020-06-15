@@ -13,7 +13,6 @@
 
 #include <mod_clock.h>
 
-#define SCMI_PROTOCOL_ID_CLOCK      UINT32_C(0x14)
 #define SCMI_PROTOCOL_VERSION_CLOCK UINT32_C(0x10000)
 
 /*
@@ -67,17 +66,6 @@ union event_request_data {
 struct event_request_params {
     fwk_id_t clock_dev_id;
     union event_request_data request_data;
-};
-
-/*
- * Identifiers of the SCMI Clock Management Protocol commands
- */
-enum scmi_clock_command_id {
-    SCMI_CLOCK_ATTRIBUTES =     0x003,
-    SCMI_CLOCK_DESCRIBE_RATES = 0x004,
-    SCMI_CLOCK_RATE_SET =       0x005,
-    SCMI_CLOCK_RATE_GET =       0x006,
-    SCMI_CLOCK_CONFIG_SET =     0x007,
 };
 
 /*

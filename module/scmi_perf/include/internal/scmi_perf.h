@@ -13,7 +13,6 @@
 
 #include <stdint.h>
 
-#define SCMI_PROTOCOL_ID_PERF      UINT32_C(0x13)
 #ifdef BUILD_HAS_FAST_CHANNELS
 #define SCMI_PROTOCOL_VERSION_PERF UINT32_C(0x20000)
 #else
@@ -24,22 +23,6 @@
 #define SCMI_PERF_STATS_SHARED_MEM_REGION_ADDR_LOW  0
 #define SCMI_PERF_STATS_SHARED_MEM_REGION_ADDR_HIGH 0
 #define SCMI_PERF_STATS_SHARED_MEM_REGION_LENGTH    0
-
-/*
- * Identifier of the SCMI Performance Domain Management Protocol commands
- */
-
-enum scmi_perf_command_id {
-    SCMI_PERF_DOMAIN_ATTRIBUTES = 0x003,
-    SCMI_PERF_DESCRIBE_LEVELS   = 0x004,
-    SCMI_PERF_LIMITS_SET        = 0x005,
-    SCMI_PERF_LIMITS_GET        = 0x006,
-    SCMI_PERF_LEVEL_SET         = 0x007,
-    SCMI_PERF_LEVEL_GET         = 0x008,
-    SCMI_PERF_NOTIFY_LIMITS     = 0x009,
-    SCMI_PERF_NOTIFY_LEVEL      = 0x00A,
-    SCMI_PERF_DESCRIBE_FAST_CHANNEL = 0x00B,
-};
 
 enum scmi_perf_notification_id {
     SCMI_PERF_LIMITS_CHANGED = 0x000,

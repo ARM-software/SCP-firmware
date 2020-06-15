@@ -8,7 +8,6 @@
  *     SCMI power domain management protocol support.
  */
 
-#include <internal/scmi.h>
 #include <internal/scmi_power_domain.h>
 
 #include <mod_power_domain.h>
@@ -110,31 +109,25 @@ static const fwk_id_t mod_scmi_pd_event_id_dbg_enable_get =
 static struct scmi_pd_ctx scmi_pd_ctx;
 
 static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
-    [SCMI_PROTOCOL_VERSION] =
-                       scmi_pd_protocol_version_handler,
-    [SCMI_PROTOCOL_ATTRIBUTES] =
-                       scmi_pd_protocol_attributes_handler,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
-                       scmi_pd_protocol_message_attributes_handler,
-    [SCMI_PD_POWER_DOMAIN_ATTRIBUTES] =
-                       scmi_pd_power_domain_attributes_handler,
-    [SCMI_PD_POWER_STATE_SET] =
-                       scmi_pd_power_state_set_handler,
-    [SCMI_PD_POWER_STATE_GET] =
-                       scmi_pd_power_state_get_handler,
+    [MOD_SCMI_PROTOCOL_VERSION] = scmi_pd_protocol_version_handler,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] = scmi_pd_protocol_attributes_handler,
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+        scmi_pd_protocol_message_attributes_handler,
+    [MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES] =
+        scmi_pd_power_domain_attributes_handler,
+    [MOD_SCMI_PD_POWER_STATE_SET] = scmi_pd_power_state_set_handler,
+    [MOD_SCMI_PD_POWER_STATE_GET] = scmi_pd_power_state_get_handler,
 };
 
 static unsigned int payload_size_table[] = {
-    [SCMI_PROTOCOL_VERSION] = 0,
-    [SCMI_PROTOCOL_ATTRIBUTES] = 0,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
-                       sizeof(struct scmi_protocol_message_attributes_a2p),
-    [SCMI_PD_POWER_DOMAIN_ATTRIBUTES] =
-                       sizeof(struct scmi_pd_power_domain_attributes_a2p),
-    [SCMI_PD_POWER_STATE_SET] =
-                       sizeof(struct scmi_pd_power_state_set_a2p),
-    [SCMI_PD_POWER_STATE_GET] =
-                       sizeof(struct scmi_pd_power_state_get_a2p),
+    [MOD_SCMI_PROTOCOL_VERSION] = 0,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+        sizeof(struct scmi_protocol_message_attributes_a2p),
+    [MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES] =
+        sizeof(struct scmi_pd_power_domain_attributes_a2p),
+    [MOD_SCMI_PD_POWER_STATE_SET] = sizeof(struct scmi_pd_power_state_set_a2p),
+    [MOD_SCMI_PD_POWER_STATE_GET] = sizeof(struct scmi_pd_power_state_get_a2p),
 };
 
 static unsigned int scmi_dev_state_id_lost_ctx_to_pd_state[] = {
@@ -665,7 +658,7 @@ __attribute__((weak)) int scmi_pd_power_state_set_policy(
 static int scmi_pd_get_scmi_protocol_id(fwk_id_t protocol_id,
                                         uint8_t *scmi_protocol_id)
 {
-    *scmi_protocol_id = SCMI_PROTOCOL_ID_POWER_DOMAIN;
+    *scmi_protocol_id = MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN;
 
     return FWK_SUCCESS;
 }

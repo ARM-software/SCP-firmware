@@ -56,7 +56,7 @@ struct scmi_ctx {
      * SCMI protocol identifier to the index of the entry in protocol_table[]
      * dedicated to the protocol.
      */
-    uint8_t scmi_protocol_id_to_idx[SCMI_PROTOCOL_ID_MAX + 1];
+    uint8_t scmi_protocol_id_to_idx[MOD_SCMI_PROTOCOL_ID_MAX + 1];
 
     /* Table of service contexts */
     struct scmi_service_ctx *service_ctx_table;
@@ -88,37 +88,33 @@ static int scmi_base_discover_list_protocols_handler(
 static int scmi_base_discover_agent_handler(
     fwk_id_t service_id, const uint32_t *payload);
 
-static int (* const base_handler_table[])(fwk_id_t, const uint32_t *) = {
-    [SCMI_PROTOCOL_VERSION] =
-        scmi_base_protocol_version_handler,
-    [SCMI_PROTOCOL_ATTRIBUTES] =
-        scmi_base_protocol_attributes_handler,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+static int (*const base_handler_table[])(fwk_id_t, const uint32_t *) = {
+    [MOD_SCMI_PROTOCOL_VERSION] = scmi_base_protocol_version_handler,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] = scmi_base_protocol_attributes_handler,
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
         scmi_base_protocol_message_attributes_handler,
-    [SCMI_BASE_DISCOVER_VENDOR] =
-        scmi_base_discover_vendor_handler,
-    [SCMI_BASE_DISCOVER_SUB_VENDOR] =
+    [MOD_SCMI_BASE_DISCOVER_VENDOR] = scmi_base_discover_vendor_handler,
+    [MOD_SCMI_BASE_DISCOVER_SUB_VENDOR] =
         scmi_base_discover_sub_vendor_handler,
-    [SCMI_BASE_DISCOVER_IMPLEMENTATION_VERSION] =
+    [MOD_SCMI_BASE_DISCOVER_IMPLEMENTATION_VERSION] =
         scmi_base_discover_implementation_version_handler,
-    [SCMI_BASE_DISCOVER_LIST_PROTOCOLS] =
+    [MOD_SCMI_BASE_DISCOVER_LIST_PROTOCOLS] =
         scmi_base_discover_list_protocols_handler,
-    [SCMI_BASE_DISCOVER_AGENT] =
-        scmi_base_discover_agent_handler,
+    [MOD_SCMI_BASE_DISCOVER_AGENT] = scmi_base_discover_agent_handler,
 };
 
 static const unsigned int base_payload_size_table[] = {
-    [SCMI_PROTOCOL_VERSION] = 0,
-    [SCMI_PROTOCOL_ATTRIBUTES] = 0,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
-                        sizeof(struct scmi_protocol_message_attributes_a2p),
-    [SCMI_BASE_DISCOVER_VENDOR] = 0,
-    [SCMI_BASE_DISCOVER_SUB_VENDOR] = 0,
-    [SCMI_BASE_DISCOVER_IMPLEMENTATION_VERSION] = 0,
-    [SCMI_BASE_DISCOVER_LIST_PROTOCOLS] =
-                        sizeof(struct scmi_base_discover_list_protocols_a2p),
-    [SCMI_BASE_DISCOVER_AGENT] =
-                        sizeof(struct scmi_base_discover_agent_a2p),
+    [MOD_SCMI_PROTOCOL_VERSION] = 0,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+        sizeof(struct scmi_protocol_message_attributes_a2p),
+    [MOD_SCMI_BASE_DISCOVER_VENDOR] = 0,
+    [MOD_SCMI_BASE_DISCOVER_SUB_VENDOR] = 0,
+    [MOD_SCMI_BASE_DISCOVER_IMPLEMENTATION_VERSION] = 0,
+    [MOD_SCMI_BASE_DISCOVER_LIST_PROTOCOLS] =
+        sizeof(struct scmi_base_discover_list_protocols_a2p),
+    [MOD_SCMI_BASE_DISCOVER_AGENT] =
+        sizeof(struct scmi_base_discover_agent_a2p),
 };
 
 static const char * const default_agent_names[] = {
@@ -260,7 +256,7 @@ static int get_agent_type(uint32_t scmi_agent_id,
 {
     if ((agent_type == NULL) ||
         (scmi_agent_id > scmi_ctx.config->agent_count) ||
-        (scmi_agent_id == SCMI_PLATFORM_ID))
+        (scmi_agent_id == MOD_SCMI_PLATFORM_ID))
         return FWK_E_PARAM;
 
     *agent_type = scmi_ctx.config->agent_table[scmi_agent_id].type;
@@ -552,7 +548,7 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
          (protocol_count < protocol_count_max);
          index++) {
         if ((scmi_ctx.scmi_protocol_id_to_idx[index] == 0) ||
-            (index == SCMI_PROTOCOL_ID_BASE))
+            (index == MOD_SCMI_PROTOCOL_ID_BASE))
             continue;
 
         protocol_count++;
@@ -608,14 +604,15 @@ static int scmi_base_discover_agent_handler(fwk_id_t service_id,
 
     return_values.status = SCMI_SUCCESS;
 
-    if (parameters->agent_id == SCMI_PLATFORM_ID) {
-       static const char name[] = "platform";
+    if (parameters->agent_id == MOD_SCMI_PLATFORM_ID) {
+        static const char name[] = "platform";
 
-       static_assert(sizeof(return_values.name) >= sizeof(name),
-              "return_values.name is not large enough to contain name");
+        static_assert(
+            sizeof(return_values.name) >= sizeof(name),
+            "return_values.name is not large enough to contain name");
 
-       memcpy(return_values.name, name, sizeof(name));
-       goto exit;
+        memcpy(return_values.name, name, sizeof(name));
+        goto exit;
     }
 
     agent = &scmi_ctx.config->agent_table[parameters->agent_id];
@@ -676,15 +673,16 @@ static int scmi_init(fwk_id_t module_id, unsigned int service_count,
         return FWK_E_PARAM;
 
     if ((config->agent_count == 0) ||
-        (config->agent_count > SCMI_AGENT_ID_MAX))
+        (config->agent_count > MOD_SCMI_AGENT_ID_MAX))
         return FWK_E_PARAM;
 
     /*
-     * Loop over the agent descriptors. The SCMI_PLATFORM_ID(0) entry of
+     * Loop over the agent descriptors. The MOD_SCMI_PLATFORM_ID(0) entry of
      * the table - that would refer to the platform - is ignored.
      */
-    for (agent_idx = SCMI_PLATFORM_ID + 1;
-         agent_idx <= config->agent_count; agent_idx++) {
+    for (agent_idx = MOD_SCMI_PLATFORM_ID + 1;
+         agent_idx <= config->agent_count;
+         agent_idx++) {
         agent = &config->agent_table[agent_idx];
         if (agent->type >= SCMI_AGENT_TYPE_COUNT)
             return FWK_E_PARAM;
@@ -699,7 +697,7 @@ static int scmi_init(fwk_id_t module_id, unsigned int service_count,
 
     scmi_ctx.protocol_table[PROTOCOL_TABLE_BASE_PROTOCOL_IDX].message_handler =
         scmi_base_message_handler;
-    scmi_ctx.scmi_protocol_id_to_idx[SCMI_PROTOCOL_ID_BASE] =
+    scmi_ctx.scmi_protocol_id_to_idx[MOD_SCMI_PROTOCOL_ID_BASE] =
         PROTOCOL_TABLE_BASE_PROTOCOL_IDX;
 
     scmi_ctx.config = config;
@@ -714,7 +712,7 @@ static int scmi_service_init(fwk_id_t service_id, unsigned int unused,
         (struct mod_scmi_service_config *)data;
     struct scmi_service_ctx *ctx;
 
-    if ((config->scmi_agent_id == SCMI_PLATFORM_ID) ||
+    if ((config->scmi_agent_id == MOD_SCMI_PLATFORM_ID) ||
         (config->scmi_agent_id > scmi_ctx.config->agent_count))
         return FWK_E_PARAM;
 

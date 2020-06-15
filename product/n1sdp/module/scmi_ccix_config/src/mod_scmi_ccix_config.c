@@ -9,7 +9,6 @@
  */
 
 #include <internal/mod_scmi_ccix_config.h>
-#include <internal/scmi.h>
 
 #include <mod_cmn600.h>
 #include <mod_n1sdp_pcie.h>
@@ -55,16 +54,13 @@ static int scmi_ccix_config_protocol_enter_system_coherency(fwk_id_t service_id,
     const uint32_t *payload);
 
 static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
-    [SCMI_PROTOCOL_VERSION] =
-        scmi_ccix_config_protocol_version_handler,
-    [SCMI_PROTOCOL_ATTRIBUTES] =
+    [MOD_SCMI_PROTOCOL_VERSION] = scmi_ccix_config_protocol_version_handler,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] =
         scmi_ccix_config_protocol_attributes_handler,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
         scmi_ccix_config_protocol_msg_attributes_handler,
-    [SCMI_CCIX_CONFIG_SET] =
-        scmi_ccix_config_protocol_set_handler,
-    [SCMI_CCIX_CONFIG_GET] =
-        scmi_ccix_config_protocol_get_handler,
+    [SCMI_CCIX_CONFIG_SET] = scmi_ccix_config_protocol_set_handler,
+    [SCMI_CCIX_CONFIG_GET] = scmi_ccix_config_protocol_get_handler,
     [SCMI_CCIX_CONFIG_EXCHANGE_PROTOCOL_CREDIT] =
         scmi_ccix_config_protocol_exchange_credit,
     [SCMI_CCIX_CONFIG_ENTER_SYSTEM_COHERENCY] =
@@ -72,12 +68,11 @@ static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
 };
 
 static unsigned int payload_size_table[] = {
-    [SCMI_PROTOCOL_VERSION] = 0,
-    [SCMI_PROTOCOL_ATTRIBUTES] = 0,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+    [MOD_SCMI_PROTOCOL_VERSION] = 0,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
         sizeof(struct scmi_protocol_message_attributes_a2p),
-    [SCMI_CCIX_CONFIG_SET] =
-        sizeof(struct scmi_ccix_config_protocol_set_a2p),
+    [SCMI_CCIX_CONFIG_SET] = sizeof(struct scmi_ccix_config_protocol_set_a2p),
     [SCMI_CCIX_CONFIG_GET] = 0,
     [SCMI_CCIX_CONFIG_EXCHANGE_PROTOCOL_CREDIT] =
         sizeof(struct scmi_ccix_config_protocol_credit_a2p),

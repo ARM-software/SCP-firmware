@@ -8,7 +8,6 @@
  *     SCMI sensor management protocol support.
  */
 
-#include <internal/scmi.h>
 #include <internal/scmi_sensor.h>
 
 #include <mod_scmi.h>
@@ -75,26 +74,23 @@ static const fwk_id_t mod_scmi_sensor_event_id_get_request =
 static struct scmi_sensor_ctx scmi_sensor_ctx;
 
 static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
-    [SCMI_PROTOCOL_VERSION] =
-                       scmi_sensor_protocol_version_handler,
-    [SCMI_PROTOCOL_ATTRIBUTES] =
-                       scmi_sensor_protocol_attributes_handler,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
-                       scmi_sensor_protocol_msg_attributes_handler,
-    [SCMI_SENSOR_DESCRIPTION_GET] =
-                       scmi_sensor_protocol_desc_get_handler,
-    [SCMI_SENSOR_READING_GET] = scmi_sensor_reading_get_handler
+    [MOD_SCMI_PROTOCOL_VERSION] = scmi_sensor_protocol_version_handler,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] = scmi_sensor_protocol_attributes_handler,
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+        scmi_sensor_protocol_msg_attributes_handler,
+    [MOD_SCMI_SENSOR_DESCRIPTION_GET] = scmi_sensor_protocol_desc_get_handler,
+    [MOD_SCMI_SENSOR_READING_GET] = scmi_sensor_reading_get_handler
 };
 
 static unsigned int payload_size_table[] = {
-    [SCMI_PROTOCOL_VERSION] = 0,
-    [SCMI_PROTOCOL_ATTRIBUTES] = 0,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
-                       sizeof(struct scmi_protocol_message_attributes_a2p),
-    [SCMI_SENSOR_DESCRIPTION_GET] =
-                       sizeof(struct scmi_sensor_protocol_description_get_a2p),
-    [SCMI_SENSOR_READING_GET] =
-                       sizeof(struct scmi_sensor_protocol_reading_get_a2p),
+    [MOD_SCMI_PROTOCOL_VERSION] = 0,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+        sizeof(struct scmi_protocol_message_attributes_a2p),
+    [MOD_SCMI_SENSOR_DESCRIPTION_GET] =
+        sizeof(struct scmi_sensor_protocol_description_get_a2p),
+    [MOD_SCMI_SENSOR_READING_GET] =
+        sizeof(struct scmi_sensor_protocol_reading_get_a2p),
 };
 
 /*
@@ -404,7 +400,7 @@ exit:
 static int scmi_sensor_get_scmi_protocol_id(fwk_id_t protocol_id,
                                             uint8_t *scmi_protocol_id)
 {
-    *scmi_protocol_id = SCMI_PROTOCOL_ID_SENSOR;
+    *scmi_protocol_id = MOD_SCMI_PROTOCOL_ID_SENSOR;
 
     return FWK_SUCCESS;
 }

@@ -23,23 +23,12 @@
  * @{
  */
 
-#define SCMI_PROTOCOL_ID_POWER_DOMAIN      UINT32_C(0x11)
 #define SCMI_PROTOCOL_VERSION_POWER_DOMAIN UINT32_C(0x10000)
 
 #define SCMI_PD_DEVICE_STATE_ID_OFF    0
 #define SCMI_PD_DEVICE_STATE_ID_ON     0
 #define SCMI_PD_DEVICE_STATE_ID_MASK   0xFFFFFFF
 #define SCMI_PD_DEVICE_STATE_TYPE      (1 << 30)
-
-/*
- * Identifier of the SCMI Power Domain Management Protocol commands
- */
-enum scmi_pd_command_id {
-    SCMI_PD_POWER_DOMAIN_ATTRIBUTES = 0x03,
-    SCMI_PD_POWER_STATE_SET         = 0x04,
-    SCMI_PD_POWER_STATE_GET         = 0x05,
-    SCMI_PD_POWER_STATE_NOTIFY      = 0x06,
-};
 
 /*
  * PROTOCOL_ATTRIBUTES

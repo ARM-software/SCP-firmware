@@ -9,7 +9,6 @@
 
 #include <ddr_init.h>
 
-#include <internal/scmi.h>
 #include <internal/scmi_vendor_ext.h>
 
 #include <mod_scmi.h>
@@ -51,18 +50,19 @@ static int scmi_vendor_ext_protocol_memory_info_get_handler(
 static struct scmi_vendor_ext_ctx scmi_vendor_ext_ctx;
 
 static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
-    [SCMI_PROTOCOL_VERSION] = scmi_vendor_ext_protocol_version_handler,
-    [SCMI_PROTOCOL_ATTRIBUTES] = scmi_vendor_ext_protocol_attributes_handler,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+    [MOD_SCMI_PROTOCOL_VERSION] = scmi_vendor_ext_protocol_version_handler,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] =
+        scmi_vendor_ext_protocol_attributes_handler,
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
         scmi_vendor_ext_protocol_msg_attributes_handler,
     [SCMI_VENDOR_EXT_MEMORY_INFO_GET] =
         scmi_vendor_ext_protocol_memory_info_get_handler,
 };
 
 static unsigned int payload_size_table[] = {
-    [SCMI_PROTOCOL_VERSION] = 0,
-    [SCMI_PROTOCOL_ATTRIBUTES] = 0,
-    [SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+    [MOD_SCMI_PROTOCOL_VERSION] = 0,
+    [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
+    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
         sizeof(struct scmi_protocol_message_attributes_a2p),
     [SCMI_VENDOR_EXT_MEMORY_INFO_GET] = 0,
 };

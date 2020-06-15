@@ -10,17 +10,7 @@
 
 #include <stdint.h>
 
-#define SCMI_PROTOCOL_ID_SYS_POWER      UINT32_C(0x12)
 #define SCMI_PROTOCOL_VERSION_SYS_POWER UINT32_C(0x10000)
-
-/*
- * Identifiers of the SCMI System Power Management Protocol commands
- */
-enum scmi_sys_power_command_id {
-    SCMI_SYS_POWER_STATE_SET    = 0x003,
-    SCMI_SYS_POWER_STATE_GET    = 0x004,
-    SCMI_SYS_POWER_STATE_NOTIFY = 0x005,
-};
 
 enum scmi_sys_power_notification_id {
     SCMI_SYS_POWER_STATE_SET_NOTIFY = 0x000,

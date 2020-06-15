@@ -7,8 +7,6 @@
 
 #include "juno_scmi.h"
 
-#include <internal/scmi.h>
-
 #include <mod_scmi.h>
 #include <mod_smt.h>
 
