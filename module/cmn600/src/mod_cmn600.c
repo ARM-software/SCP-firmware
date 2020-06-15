@@ -32,6 +32,12 @@
 
 #define MOD_NAME "[CMN600] "
 
+static inline size_t cmn600_hnf_cache_group_count(size_t hnf_count)
+{
+    return (hnf_count + CMN600_HNF_CACHE_GROUP_ENTRIES_PER_GROUP - 1) /
+        CMN600_HNF_CACHE_GROUP_ENTRIES_PER_GROUP;
+}
+
 struct cmn600_ctx *ctx;
 
 /* Chip information API */
@@ -521,7 +527,7 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
         }
     }
 
-    group_count = ctx->hnf_count / CMN600_HNF_CACHE_GROUP_ENTRIES_PER_GROUP;
+    group_count = cmn600_hnf_cache_group_count(ctx->hnf_count);
     for (group = 0; group < group_count; group++)
         rnsam->SYS_CACHE_GRP_HN_NODEID[group] = ctx->hnf_cache_group[group];
 
@@ -575,7 +581,7 @@ static int cmn600_setup(void)
              * HN-F nodes in the system.
              */
             ctx->hnf_cache_group = fwk_mm_calloc(
-                ctx->hnf_count / CMN600_HNF_CACHE_GROUP_ENTRIES_PER_GROUP,
+                cmn600_hnf_cache_group_count(ctx->hnf_count),
                 sizeof(*ctx->hnf_cache_group));
         }
     }
