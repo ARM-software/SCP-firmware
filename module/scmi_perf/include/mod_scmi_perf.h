@@ -42,6 +42,40 @@ enum mod_scmi_perf_permissions {
 };
 
 /*!
+ * \brief Fast channels address index
+ */
+enum mod_scmi_perf_fast_channels_addr_index {
+    MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_SET,
+    MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_SET,
+    MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_GET,
+    MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_GET,
+    MOD_SMCI_PERF_FAST_CHANNEL_ADDR_INDEX_COUNT
+};
+/*!
+ *\brief Per-Domain Fast Channel Limit in shared memory.
+ */
+struct mod_scmi_perf_fast_channel_limit {
+    /*! Performance limit max. */
+    uint32_t range_max;
+    /*! Performance limit min. */
+    uint32_t range_min;
+};
+
+/*!
+ *\brief Fast channels memory offset
+ */
+enum mod_scmi_perf_fast_channel_memory_offset {
+    MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LEVEL_SET = 0,
+    MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LIMIT_SET = sizeof(uint32_t),
+    MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LEVEL_GET =
+        sizeof(uint32_t) + sizeof(struct mod_scmi_perf_fast_channel_limit),
+    MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LIMIT_GET =
+        sizeof(uint32_t) * 2 + sizeof(struct mod_scmi_perf_fast_channel_limit),
+    MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL = sizeof(uint32_t) * 2 +
+        sizeof(struct mod_scmi_perf_fast_channel_limit) * 2
+};
+
+/*!
  * \brief Performance domain configuration data.
  */
 struct mod_scmi_perf_domain_config {
@@ -55,14 +89,14 @@ struct mod_scmi_perf_domain_config {
      * \note May be set to 0x0, in which case support for fast
      *       channels is disabled for the platform.
      */
-    uint64_t fast_channels_addr_scp;
+    uint64_t *fast_channels_addr_scp;
 
-   /*!
+    /*!
      * \brief Agent Domain fast channel address
      *
      * \details Address of shared memory for the agent
      */
-    uint64_t fast_channels_addr_ap;
+    uint64_t *fast_channels_addr_ap;
 
     /*!
      * \brief Rate limit in microsecs
@@ -71,20 +105,6 @@ struct mod_scmi_perf_domain_config {
 
     /*! Flag indicating that statistics are collected for this domain */
     bool stats_collected;
-};
-
-/*!
- *\brief Domain Fast Channel
- *
- *\note Layout of the Per-Domain Fast Channel in shared memory.
- */
-struct mod_scmi_perf_fast_channel {
-    FWK_R uint32_t set_level; /*!< Performance level to be set */
-    FWK_R uint32_t set_limit_range_max; /*!< max limit to be set */
-    FWK_R uint32_t set_limit_range_min; /*!< min limit to be set */
-    FWK_W uint32_t get_level; /*!< Current performance level */
-    FWK_W uint32_t get_limit_range_max; /*!< Current limits, max */
-    FWK_W uint32_t get_limit_range_min; /*!< Current limits, min */
 };
 
 /*!
