@@ -281,6 +281,57 @@
 #endif
 
 /*!
+ * \def FWK_WARN_UNUSED
+ *
+ * \brief "Warn on unused result" attribute.
+ *
+ * \details Hints that it is a possible error to ignore the result of a
+ *      function.
+ *
+ * \see https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-warn_005funused_005fresult-function-attribute
+ */
+
+#if FWK_HAS_GNU_ATTRIBUTE(__warn_unused_result__)
+#    define FWK_WARN_UNUSED __attribute__((__warn_unused_result__))
+#else
+#    define FWK_WARN_UNUSED
+#endif
+
+/*!
+ * \def FWK_LEAF
+ *
+ * \brief "Leaf" attribute.
+ *
+ * \details Specifies that the function will return to the current compilation
+ *      unit only by returning or by throwing an exception.
+ *
+ * \see https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-leaf-function-attribute
+ */
+
+#if FWK_HAS_GNU_ATTRIBUTE(__leaf__)
+#    define FWK_LEAF __attribute__((__leaf__))
+#else
+#    define FWK_LEAF
+#endif
+
+/*!
+ * \def FWK_NOTHROW
+ *
+ * \brief "Doesn't throw" attribute.
+ *
+ * \details Specifies that the function will not throw an exception, either
+ *      directly or indirectly.
+ *
+ * \see https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-nothrow-function-attribute
+ */
+
+#if FWK_HAS_GNU_ATTRIBUTE(__nothrow__)
+#    define FWK_NOTHROW __attribute__((__nothrow__))
+#else
+#    define FWK_NOTHROW
+#endif
+
+/*!
  * \}
  */
 

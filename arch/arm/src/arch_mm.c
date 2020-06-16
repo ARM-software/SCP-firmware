@@ -8,33 +8,75 @@
  *     Memory initialization.
  */
 
-#include <fwk_arch.h>
-#include <fwk_assert.h>
-#include <fwk_status.h>
+#include <fwk_macros.h>
 
 #include <stddef.h>
 #include <stdint.h>
 
-int arch_mm_init(struct fwk_arch_mm_data *data)
-{
-    fwk_assert(data != NULL);
-
-#ifdef __ARMCC_VERSION
-    extern unsigned int Image$$ARM_LIB_STACKHEAP$$ZI$$Base;
-    extern unsigned int Image$$ARM_LIB_STACKHEAP$$ZI$$Length;
-
-    data->start = (uintptr_t)(&Image$$ARM_LIB_STACKHEAP$$ZI$$Base);
-    data->size = (size_t)(&Image$$ARM_LIB_STACKHEAP$$ZI$$Length);
-#else
-    extern char __stackheap_start__;
-    extern char __stackheap_end__;
-
-    uintptr_t start = (uintptr_t)(&__stackheap_start__);
-    uintptr_t end = (uintptr_t)(&__stackheap_end__);
-
-    data->start = start;
-    data->size = end - start;
+#if FWK_HAS_INCLUDE(<sys/features.h>)
+#    include <sys/features.h>
 #endif
 
-    return FWK_SUCCESS;
+#ifdef __NEWLIB__
+#    include <errno.h>
+#    include <malloc.h>
+
+extern char __stackheap_start__;
+extern char __stackheap_end__;
+
+/*!
+ * \brief Architecture memory manager context.
+ */
+static struct arch_mm_ctx {
+    /*!
+     * \brief Current heap break address.
+     */
+    uintptr_t heap_break;
+} arch_mm_ctx = {
+    .heap_break = ((uintptr_t)&__stackheap_start__),
+};
+
+int posix_memalign(void **memptr, size_t alignment, size_t size)
+{
+    if (alignment == 0)
+        return EINVAL;
+
+    /* Enforce power-of-two alignment */
+    if ((alignment & (alignment - 1)) != 0)
+        return EINVAL;
+
+    if ((alignment % sizeof(void *)) != 0)
+        return EINVAL;
+
+    if (size == 0) {
+        *memptr = NULL;
+    } else {
+        *memptr = _memalign_r(_REENT, alignment, size);
+
+        if (*memptr == NULL)
+            return ENOMEM;
+    }
+
+    return 0;
 }
+
+void *_sbrk(intptr_t increment)
+{
+    if (increment == 0) {
+        return (void *)arch_mm_ctx.heap_break;
+    } else {
+        uintptr_t heap_old = arch_mm_ctx.heap_break;
+        uintptr_t heap_new = arch_mm_ctx.heap_break + increment;
+
+        if (heap_new > ((uintptr_t)&__stackheap_end__)) {
+            errno = ENOMEM;
+
+            return (void *)-1;
+        } else {
+            arch_mm_ctx.heap_break = heap_new;
+
+            return (void *)heap_old;
+        }
+    }
+}
+#endif
