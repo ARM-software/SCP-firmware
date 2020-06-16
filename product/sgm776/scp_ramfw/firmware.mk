@@ -8,6 +8,7 @@
 BS_FIRMWARE_CPU := cortex-m3
 BS_FIRMWARE_HAS_MULTITHREADING := yes
 BS_FIRMWARE_HAS_NOTIFICATION := yes
+BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS := yes
 
 BS_FIRMWARE_MODULES := \
     sid \
@@ -43,6 +44,10 @@ BS_FIRMWARE_MODULES := \
     scmi_apcore \
     sds
 
+ifeq ($(BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS),yes)
+    BS_FIRMWARE_MODULES += resource_perms
+endif
+
 BS_FIRMWARE_SOURCES := \
     rtx_config.c \
     config_log.c \
@@ -73,4 +78,7 @@ BS_FIRMWARE_SOURCES := \
     config_system_info.c \
     config_scmi_power_domain.c
 
+ifeq ($(BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS),yes)
+    BS_FIRMWARE_SOURCES += config_resource_perms.c
+endif
 include $(BS_DIR)/firmware.mk
