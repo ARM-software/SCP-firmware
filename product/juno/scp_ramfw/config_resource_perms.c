@@ -39,8 +39,10 @@ static struct mod_res_agent_protocol_permissions
     [AGENT_IDX(JUNO_SCMI_AGENT_IDX_OSPM)] = {
         .protocols = MOD_RES_PERMS_SCMI_ALL_PROTOCOLS_ALLOWED,
     },
+
+    /* PSCI agent has no access to clock protocol */
     [AGENT_IDX(JUNO_SCMI_AGENT_IDX_PSCI)] = {
-        .protocols = MOD_RES_PERMS_SCMI_ALL_PROTOCOLS_ALLOWED,
+            .protocols = MOD_RES_PERMS_SCMI_CLOCK_PROTOCOL_DENIED,
     },
 };
 
@@ -73,7 +75,8 @@ static struct mod_res_agent_msg_permissions agent_msg_permissions[] = {
         .messages[MOD_RES_PERMS_SCMI_POWER_DOMAIN_MESSAGE_IDX] = 0x0,
         .messages[MOD_RES_PERMS_SCMI_SYS_POWER_MESSAGE_IDX] = 0x0,
         .messages[MOD_RES_PERMS_SCMI_PERF_MESSAGE_IDX] = 0x0,
-        .messages[MOD_RES_PERMS_SCMI_CLOCK_MESSAGE_IDX] = 0x0,
+        /* Clocks, no access */
+        .messages[MOD_RES_PERMS_SCMI_CLOCK_MESSAGE_IDX] = 0xff,
         .messages[MOD_RES_PERMS_SCMI_SENSOR_MESSAGE_IDX] = 0x0,
         .messages[MOD_RES_PERMS_SCMI_RESET_DOMAIN_MESSAGE_IDX] = 0x0,
     },
