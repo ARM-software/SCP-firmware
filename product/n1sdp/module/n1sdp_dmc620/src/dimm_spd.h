@@ -12,6 +12,8 @@
 #include <mod_n1sdp_dmc620.h>
 #include <mod_n1sdp_i2c.h>
 
+#include <fwk_attributes.h>
+
 #include <stdint.h>
 
 /*
@@ -210,7 +212,7 @@
  *  Address 0x000 - 0x07F
  *  This section defines parameters that are common to all DDR4 module types
  */
-struct ddr4_dram_param {
+struct FWK_PACKED ddr4_dram_param {
     /* Number of Bytes used */
     uint8_t num_bytes;
     /* SPD Revision */
@@ -337,16 +339,16 @@ struct ddr4_dram_param {
     uint8_t crc_lsb;
     /* Cyclical Redundancy Code (CRC) for Base Configuration Section, MSB */
     uint8_t crc_msb;
-} __attribute__((packed));
+};
 
-struct ddr4_spd {
-  struct ddr4_dram_param dram_param;
-  uint8_t standard_mod[64];
-  uint8_t hybrid_mod[64];
-  uint8_t hybrid_ext_func[64];
-  uint8_t mfg_info[64];
-  uint8_t end_usr[128];
-} __attribute__((packed));
+struct FWK_PACKED ddr4_spd {
+    struct ddr4_dram_param dram_param;
+    uint8_t standard_mod[64];
+    uint8_t hybrid_mod[64];
+    uint8_t hybrid_ext_func[64];
+    uint8_t mfg_info[64];
+    uint8_t end_usr[128];
+};
 
 /*
  * SPD API function prototypes

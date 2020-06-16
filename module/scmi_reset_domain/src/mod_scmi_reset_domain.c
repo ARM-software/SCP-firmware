@@ -8,21 +8,26 @@
  *     SCMI Reset Domain management protocol support.
  */
 
+#include <internal/scmi_reset_domain.h>
+
+#include <mod_reset_domain.h>
+#include <mod_scmi.h>
+#include <mod_scmi_reset_domain.h>
+
 #include <fwk_assert.h>
+#include <fwk_attributes.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
-#include <internal/scmi_reset_domain.h>
-#include <mod_reset_domain.h>
+
+#include <string.h>
+
 #ifdef BUILD_HAS_RESOURCE_PERMISSIONS
 #    include <mod_resource_perms.h>
 #endif
-#include <mod_scmi.h>
-#include <mod_scmi_reset_domain.h>
-#include <string.h>
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
 struct agent_notifications {
@@ -229,7 +234,7 @@ static int get_reset_device(fwk_id_t service_id,
 /*
  * Reset Request Policy Handler
  */
-__attribute__((weak)) int scmi_reset_domain_reset_request_policy(
+FWK_WEAK int scmi_reset_domain_reset_request_policy(
     enum mod_scmi_reset_domain_policy_status *policy_status,
     enum mod_reset_domain_mode *mode,
     uint32_t *reset_state,

@@ -8,6 +8,7 @@
 #ifndef FWK_MULTI_THREAD_H
 #define FWK_MULTI_THREAD_H
 
+#include <fwk_attributes.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_thread.h>
@@ -86,9 +87,9 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
     struct fwk_event *resp_event);
 
 #else
-int fwk_thread_put_event_and_wait(struct fwk_event *event,
-    struct fwk_event *resp_event)
-    __attribute__((deprecated));
+int fwk_thread_put_event_and_wait(
+    struct fwk_event *event,
+    struct fwk_event *resp_event) FWK_DEPRECATED;
 
 #endif
 

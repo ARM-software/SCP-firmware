@@ -10,6 +10,7 @@
 
 #include <cmsis_compiler.h>
 
+#include <fwk_attributes.h>
 #include <fwk_noreturn.h>
 
 #include <stdbool.h>
@@ -40,7 +41,7 @@ noreturn void arch_exception_reset(void)
 #endif
 }
 
-noreturn __attribute__((weak)) void arch_exception_invalid(void)
+noreturn FWK_WEAK void arch_exception_invalid(void)
 {
     while (true)
         __WFI();

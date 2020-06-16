@@ -8,6 +8,7 @@
 #ifndef FWK_LOG_H
 #define FWK_LOG_H
 
+#include <fwk_attributes.h>
 #include <fwk_macros.h>
 
 #if FWK_HAS_INCLUDE(<fmw_log.h>)
@@ -408,8 +409,7 @@ const struct fwk_log_backend *fwk_log_deregister(void);
  * \param[in] format Format string.
  * \param[in] ... Associated parameters.
  */
-void fwk_log_snprintf(const char *format, ...)
-    __attribute__((format(printf, 1, 2)));
+void fwk_log_snprintf(const char *format, ...) FWK_PRINTF(1, 2);
 
 /*!
  * \internal

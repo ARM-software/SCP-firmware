@@ -872,7 +872,7 @@ EXCLUDE_PATTERNS       = */internal/*
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories use the pattern */test/*
 
-EXCLUDE_SYMBOLS        =
+EXCLUDE_SYMBOLS        = FWK_ALLOC_1 FWK_ALLOC_2 FWK_ALLOC_3
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or directories
 # that contain example code fragments that are included (see the \include
@@ -2053,7 +2053,9 @@ INCLUDE_FILE_PATTERNS  =
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
 PREDEFINED             = __attribute__(x)= \
-                         __attribute(x)=
+                         __declspec(x)= \
+                         __has_attribute(x)=1 \
+                         __has_declspec_attribute(x)=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
@@ -2062,7 +2064,17 @@ PREDEFINED             = __attribute__(x)= \
 # definition found in the source code.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-EXPAND_AS_DEFINED      =
+EXPAND_AS_DEFINED      = FWK_ALLOC \
+                         FWK_ALLOC_SIZE1 \
+                         FWK_ALLOC_SIZE2 \
+                         FWK_ALLOC_ALIGN \
+                         FWK_WEAK \
+                         FWK_PRINTF \
+                         FWK_CONSTRUCTOR \
+                         FWK_PACKED \
+                         FWK_SECTION \
+                         FWK_DEPRECATED \
+                         FWK_NOINLINE
 
 # If the SKIP_FUNCTION_MACROS tag is set to YES then doxygen's preprocessor will
 # remove all references to function-like macros that are alone on a line, have

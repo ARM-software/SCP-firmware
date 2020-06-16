@@ -6,6 +6,7 @@
  */
 
 #include <fwk_arch.h>
+#include <fwk_attributes.h>
 #include <fwk_status.h>
 #include <fwk_time.h>
 
@@ -16,7 +17,7 @@ struct {
     const void *driver_ctx; /* Time driver context */
 } fwk_time_ctx;
 
-__attribute__((constructor)) void fwk_time_init(void)
+FWK_CONSTRUCTOR void fwk_time_init(void)
 {
     struct fwk_time_driver driver = fmw_time_driver(&fwk_time_ctx.driver_ctx);
 
@@ -68,7 +69,7 @@ fwk_duration_h_t fwk_time_duration_h(fwk_duration_ns_t duration)
     return duration / FWK_H(1);
 }
 
-__attribute__((weak)) struct fwk_time_driver fmw_time_driver(const void **ctx)
+FWK_WEAK struct fwk_time_driver fmw_time_driver(const void **ctx)
 {
     return (struct fwk_time_driver){
         .timestamp = NULL,

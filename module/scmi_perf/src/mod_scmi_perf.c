@@ -1011,7 +1011,7 @@ static void fast_channel_callback(uintptr_t param)
 /*
  * SCMI Performance Policy Handlers
  */
-__attribute__((weak)) int scmi_perf_limits_set_policy(
+FWK_WEAK int scmi_perf_limits_set_policy(
     enum mod_scmi_perf_policy_status *policy_status,
     uint32_t *range_min,
     uint32_t *range_max,
@@ -1023,7 +1023,7 @@ __attribute__((weak)) int scmi_perf_limits_set_policy(
     return FWK_SUCCESS;
 }
 
-__attribute__((weak)) int scmi_perf_level_set_policy(
+FWK_WEAK int scmi_perf_level_set_policy(
     enum mod_scmi_perf_policy_status *policy_status,
     uint32_t *level,
     unsigned int agent_id,
