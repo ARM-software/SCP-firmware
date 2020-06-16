@@ -12,6 +12,9 @@
 #include <internal/scmi.h>
 #include <internal/scmi_base.h>
 
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#    include <mod_resource_perms.h>
+#endif
 #include <mod_scmi.h>
 #include <mod_scmi_header.h>
 
@@ -60,6 +63,11 @@ struct scmi_ctx {
 
     /* Table of service contexts */
     struct scmi_service_ctx *service_ctx_table;
+
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    /* SCMI Resource Permissions API */
+    const struct mod_res_permissions_api *res_perms_api;
+#endif
 };
 
 /*
@@ -630,6 +638,40 @@ exit:
     return FWK_SUCCESS;
 }
 
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+/*
+ * SCMI Resource Permissions handler
+ */
+static int scmi_base_permissions_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload,
+    size_t payload_size,
+    unsigned int message_id)
+{
+    enum mod_res_perms_permissions perms;
+    unsigned int agent_id;
+    int status;
+
+    status = get_agent_id(service_id, &agent_id);
+    if (status != FWK_SUCCESS)
+        return FWK_E_ACCESS;
+
+    if (message_id < 3)
+        return FWK_SUCCESS;
+
+    /*
+     * Check that the agent has permissions to access the message.
+     */
+    perms = scmi_ctx.res_perms_api->agent_has_message_permission(
+        agent_id, MOD_SCMI_PROTOCOL_ID_BASE, message_id);
+
+    if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
+        return FWK_SUCCESS;
+    else
+        return FWK_E_ACCESS;
+}
+#endif
+
 static int scmi_base_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     const uint32_t *payload, size_t payload_size, unsigned int message_id)
 {
@@ -649,6 +691,14 @@ static int scmi_base_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
         return_value = SCMI_PROTOCOL_ERROR;
         goto error;
     }
+
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    if (scmi_base_permissions_handler(
+            service_id, payload, payload_size, message_id) != FWK_SUCCESS) {
+        return_value = SCMI_DENIED;
+        goto error;
+    }
+#endif
 
     return base_handler_table[message_id](service_id, payload);
 
@@ -789,6 +839,15 @@ static int scmi_bind(fwk_id_t id, unsigned int round)
             protocol_idx + PROTOCOL_TABLE_RESERVED_ENTRIES_COUNT;
         protocol->message_handler = protocol_api->message_handler;
     }
+
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
+        FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS, MOD_RES_PERM_RESOURCE_PERMS),
+        &scmi_ctx.res_perms_api);
+    if (status != FWK_SUCCESS)
+        return status;
+#endif
 
     return FWK_SUCCESS;
 }
