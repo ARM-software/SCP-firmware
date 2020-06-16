@@ -14,29 +14,7 @@
 #include <fwk_log.h>
 #include <fwk_status.h>
 
-extern int fwk_mm_init(uintptr_t start, size_t size);
 extern int fwk_interrupt_init(const struct fwk_arch_interrupt_driver *driver);
-
-static int mm_init(int (*mm_init_handler)(struct fwk_arch_mm_data *data))
-{
-    int status;
-    struct fwk_arch_mm_data data;
-
-    /*
-     * Retrieve a description of the memory area used for dynamic memory
-     * allocation from the architecture layer.
-     */
-    status = mm_init_handler(&data);
-    if (status != FWK_SUCCESS)
-        return FWK_E_PANIC;
-
-    /* Initialize the memory management component */
-    status = fwk_mm_init(data.start, data.size);
-    if (status != FWK_SUCCESS)
-        return FWK_E_PANIC;
-
-    return FWK_SUCCESS;
-}
 
 static int interrupt_init(int (*interrupt_init_handler)(
     const struct fwk_arch_interrupt_driver **driver))
@@ -67,13 +45,8 @@ int fwk_arch_init(const struct fwk_arch_init_driver *driver)
     if (driver == NULL)
         return FWK_E_PARAM;
 
-    if (driver->mm == NULL)
+    if (driver->interrupt == NULL)
         return FWK_E_PARAM;
-
-    /* Initialize memory management */
-    status = mm_init(driver->mm);
-    if (status != FWK_SUCCESS)
-        return FWK_E_PANIC;
 
     /* Initialize interrupt management */
     status = interrupt_init(driver->interrupt);

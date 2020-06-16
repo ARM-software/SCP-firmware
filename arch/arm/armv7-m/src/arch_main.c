@@ -11,7 +11,6 @@
 #include <fwk_assert.h>
 #include <fwk_macros.h>
 
-#include <arch_mm.h>
 #include <arch_nvic.h>
 
 #include <fmw_cmsis.h>
@@ -29,7 +28,6 @@ void _exit(int status)
 #endif
 
 static const struct fwk_arch_init_driver arch_init_driver = {
-    .mm = arch_mm_init,
     .interrupt = arch_nvic_init,
 };
 

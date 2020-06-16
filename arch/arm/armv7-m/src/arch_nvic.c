@@ -261,7 +261,7 @@ int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
     align_word = align_entries * sizeof(vector[0]);
 
     /* Allocate and wipe the new vector table */
-    vector = fwk_mm_calloc_aligned(isr_count, sizeof(vector[0]), align_word);
+    vector = fwk_mm_calloc_aligned(align_word, isr_count, sizeof(vector[0]));
 
     /* Copy the processor exception table over to the new vector table */
     memcpy(

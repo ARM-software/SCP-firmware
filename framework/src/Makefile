@@ -21,6 +21,7 @@ BS_LIB_SOURCES += fwk_thread_delayed_resp.c
 BS_LIB_SOURCES += fwk_time.c
 
 BS_LIB_SOURCES += assert.c
+BS_LIB_SOURCES += stdlib.c
 
 ifeq ($(BUILD_HAS_MULTITHREADING),yes)
     BS_LIB_SOURCES += fwk_multi_thread.c

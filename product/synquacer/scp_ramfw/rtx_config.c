@@ -102,5 +102,7 @@ void *osRtxMemoryAlloc(void *mem, uint32_t size, uint32_t type)
 
 uint32_t osRtxMemoryFree(void *mem, void *block)
 {
+    fwk_mm_free(block);
+
     return 1;
 }

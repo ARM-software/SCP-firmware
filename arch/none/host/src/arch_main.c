@@ -23,23 +23,7 @@ static noreturn void panic(void)
     exit(1);
 }
 
-static int mm_init(struct fwk_arch_mm_data *data)
-{
-    const size_t size = 1024 * 1024; /* 1MB of heap */
-    void *mem;
-
-    mem = malloc(size);
-    if (mem == NULL)
-        return FWK_E_NOMEM;
-
-    data->start = (uintptr_t)mem;
-    data->size = size;
-
-    return FWK_SUCCESS;
-}
-
 static const struct fwk_arch_init_driver arch_init_driver = {
-    .mm = mm_init,
     .interrupt = arch_interrupt_init,
 };
 
