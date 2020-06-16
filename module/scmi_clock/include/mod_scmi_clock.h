@@ -69,9 +69,6 @@ struct mod_scmi_clock_device {
      *      that is defined by the \c clock module.
      */
     fwk_id_t element_id;
-
-    /*! Mask of permission flags defined by \ref mod_scmi_clock_permissions */
-    uint8_t permissions;
 };
 
 /*!

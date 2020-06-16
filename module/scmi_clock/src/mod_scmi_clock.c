@@ -28,6 +28,10 @@
 #include <stdbool.h>
 #include <string.h>
 
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#    include <mod_resource_perms.h>
+#endif
+
 struct clock_operations {
     /*
      * Service identifier currently requesting operation from this clock.
@@ -60,6 +64,11 @@ struct scmi_clock_ctx {
 
     /* Pointer to a table of clock operations */
     struct clock_operations *clock_ops;
+
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    /* SCMI Resource Permissions API */
+    const struct mod_res_permissions_api *res_perms_api;
+#endif
 };
 
 static const fwk_id_t mod_scmi_clock_event_id_get_state =
@@ -181,7 +190,6 @@ static int get_clock_device_entry(
 
     *clock_device = &agent_entry->device_table[clock_idx];
 
-    fwk_assert((*clock_device)->permissions != MOD_SCMI_CLOCK_PERM_INVALID);
     fwk_assert(fwk_module_is_valid_element_id((*clock_device)->element_id));
 
     if (agent != NULL)
@@ -252,23 +260,6 @@ static int set_agent_clock_state(
     idx = (agent_id * scmi_clock_ctx.clock_devices) + clock_idx;
 
     agent_clock_state[idx] = state;
-
-    return FWK_SUCCESS;
-}
-
-/*
- * Query the permissions for a service making a request to determine if
- * the operation is permitted on the given clock device.
- */
-static int check_service_permission(
-    const struct mod_scmi_clock_device *device,
-    enum mod_scmi_clock_permissions requested_permission,
-    bool *granted)
-{
-    if (granted == NULL)
-        return FWK_E_PARAM;
-
-    *granted = device->permissions & requested_permission;
 
     return FWK_SUCCESS;
 }
@@ -515,6 +506,55 @@ __attribute((weak)) int mod_scmi_clock_config_set_policy(
     return FWK_SUCCESS;
 }
 
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+
+/*
+ * SCMI Resource Permissions handler
+ */
+static unsigned int get_clock_id(const uint32_t *payload)
+{
+    /*
+     * Every SCMI Clock message is formatted with the clock ID
+     * as the first message element. We will use the clock_attributes
+     * message as a basic format to retrieve the clock ID to avoid
+     * unnecessary code.
+     */
+    const struct scmi_clock_attributes_a2p *parameters =
+        (const struct scmi_clock_attributes_a2p *)payload;
+
+    return parameters->clock_id;
+}
+
+static int scmi_clock_permissions_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload,
+    size_t payload_size,
+    unsigned int message_id)
+{
+    enum mod_res_perms_permissions perms;
+    unsigned int agent_id, clock_id;
+    int status;
+
+    status = scmi_clock_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+    if (status != FWK_SUCCESS)
+        return FWK_E_ACCESS;
+
+    if (message_id < 3)
+        return FWK_SUCCESS;
+
+    clock_id = get_clock_id(payload);
+
+    perms = scmi_clock_ctx.res_perms_api->agent_has_resource_permission(
+        agent_id, MOD_SCMI_PROTOCOL_ID_CLOCK, message_id, clock_id);
+
+    if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
+        return FWK_SUCCESS;
+    else
+        return FWK_E_ACCESS;
+}
+
+#endif
+
 /*
  * Helper to create events for processing pending requests
  */
@@ -674,7 +714,6 @@ static int scmi_clock_attributes_handler(fwk_id_t service_id,
     int status;
     const struct mod_scmi_clock_agent *agent;
     const struct mod_scmi_clock_device *clock_device;
-    bool service_permission_granted;
     size_t response_size;
     const struct scmi_clock_attributes_a2p *parameters;
     struct scmi_clock_attributes_p2a return_values = {
@@ -689,16 +728,6 @@ static int scmi_clock_attributes_handler(fwk_id_t service_id,
                                     &agent);
     if (status != FWK_SUCCESS) {
         return_values.status = SCMI_NOT_FOUND;
-        goto exit;
-    }
-
-    status = check_service_permission(clock_device,
-        MOD_SCMI_CLOCK_PERM_ATTRIBUTES, &service_permission_granted);
-    if (status != FWK_SUCCESS)
-        goto exit;
-
-    if (!service_permission_granted) {
-        return_values.status = SCMI_DENIED;
         goto exit;
     }
 
@@ -733,7 +762,6 @@ static int scmi_clock_rate_get_handler(fwk_id_t service_id,
     int status;
     const struct mod_scmi_clock_agent *agent;
     const struct mod_scmi_clock_device *clock_device;
-    bool service_permission_granted;
     size_t response_size;
     const struct scmi_clock_rate_get_a2p *parameters;
     struct scmi_clock_rate_get_p2a return_values = {
@@ -748,16 +776,6 @@ static int scmi_clock_rate_get_handler(fwk_id_t service_id,
                                     &agent);
     if (status != FWK_SUCCESS) {
         return_values.status = SCMI_NOT_FOUND;
-        goto exit;
-    }
-
-    status = check_service_permission(clock_device,
-        MOD_SCMI_CLOCK_PERM_GET_RATE, &service_permission_granted);
-    if (status != FWK_SUCCESS)
-        goto exit;
-
-    if (!service_permission_granted) {
-        return_values.status = SCMI_NOT_SUPPORTED;
         goto exit;
     }
 
@@ -792,7 +810,6 @@ static int scmi_clock_rate_set_handler(fwk_id_t service_id,
     int status;
     const struct mod_scmi_clock_agent *agent;
     const struct mod_scmi_clock_device *clock_device;
-    bool service_permission_granted;
     bool round_auto;
     bool round_up;
     bool asynchronous;
@@ -817,16 +834,6 @@ static int scmi_clock_rate_set_handler(fwk_id_t service_id,
                                     &agent);
     if (status != FWK_SUCCESS) {
         return_values.status = SCMI_NOT_FOUND;
-        goto exit;
-    }
-
-    status = check_service_permission(clock_device,
-        MOD_SCMI_CLOCK_PERM_SET_RATE, &service_permission_granted);
-    if (status != FWK_SUCCESS)
-        goto exit;
-
-    if (!service_permission_granted) {
-        return_values.status = SCMI_NOT_SUPPORTED;
         goto exit;
     }
 
@@ -897,7 +904,6 @@ static int scmi_clock_config_set_handler(fwk_id_t service_id,
 {
     int status;
     bool enable;
-    bool service_permission_granted;
     size_t response_size;
     const struct scmi_clock_config_set_a2p *parameters;
     const struct mod_scmi_clock_agent *agent;
@@ -917,16 +923,6 @@ static int scmi_clock_config_set_handler(fwk_id_t service_id,
                                     &agent);
     if (status != FWK_SUCCESS) {
         return_values.status = SCMI_NOT_FOUND;
-        goto exit;
-    }
-
-    status = check_service_permission(clock_device,
-        MOD_SCMI_CLOCK_PERM_SET_CONFIG, &service_permission_granted);
-    if (status != FWK_SUCCESS)
-        goto exit;
-
-    if (!service_permission_granted) {
-        return_values.status = SCMI_NOT_SUPPORTED;
         goto exit;
     }
 
@@ -983,7 +979,6 @@ static int scmi_clock_describe_rates_handler(fwk_id_t service_id,
     int status;
     const struct mod_scmi_clock_agent *agent;
     const struct mod_scmi_clock_device *clock_device;
-    bool service_permission_granted;
     unsigned int i;
     size_t max_payload_size;
     uint32_t payload_size;
@@ -1009,16 +1004,6 @@ static int scmi_clock_describe_rates_handler(fwk_id_t service_id,
                                     &agent);
     if (status != FWK_SUCCESS) {
         return_values.status = SCMI_NOT_FOUND;
-        goto exit;
-    }
-
-    status = check_service_permission(clock_device,
-        MOD_SCMI_CLOCK_PERM_DESCRIBE_RATES, &service_permission_granted);
-    if (status != FWK_SUCCESS)
-        goto exit;
-
-    if (!service_permission_granted) {
-        return_values.status = SCMI_NOT_SUPPORTED;
         goto exit;
     }
 
@@ -1154,6 +1139,7 @@ static int scmi_clock_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     const uint32_t *payload, size_t payload_size, unsigned int message_id)
 {
     int32_t return_value;
+    int status;
 
     static_assert(FWK_ARRAY_SIZE(handler_table) ==
         FWK_ARRAY_SIZE(payload_size_table),
@@ -1169,6 +1155,15 @@ static int scmi_clock_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
         return_value = SCMI_PROTOCOL_ERROR;
         goto error;
     }
+
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    status = scmi_clock_permissions_handler(
+        service_id, payload, payload_size, message_id);
+    if (status != FWK_SUCCESS) {
+        return_value = SCMI_DENIED;
+        goto error;
+    }
+#endif
 
     return handler_table[message_id](service_id, payload);
 
@@ -1231,6 +1226,15 @@ static int scmi_clock_bind(fwk_id_t id, unsigned int round)
         &scmi_clock_ctx.scmi_api);
     if (status != FWK_SUCCESS)
         return status;
+
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
+        FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS, MOD_RES_PERM_RESOURCE_PERMS),
+        &scmi_clock_ctx.res_perms_api);
+    if (status != FWK_SUCCESS)
+        return status;
+#endif
 
     return fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_CLOCK),
         FWK_ID_API(FWK_MODULE_IDX_CLOCK, 0), &scmi_clock_ctx.clock_api);

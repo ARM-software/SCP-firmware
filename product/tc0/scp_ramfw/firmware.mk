@@ -9,6 +9,7 @@ BS_FIRMWARE_CPU := cortex-m7
 BS_FIRMWARE_HAS_MULTITHREADING := yes
 BS_FIRMWARE_HAS_NOTIFICATION := yes
 BS_FIRMWARE_NOTIFICATION_COUNT := 128
+BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS := yes
 
 BS_FIRMWARE_MODULES := \
     armv7m_mpu \
@@ -36,6 +37,10 @@ BS_FIRMWARE_MODULES := \
     psu \
     tc0_system
 
+ifeq ($(BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS),yes)
+    BS_FIRMWARE_MODULES += resource_perms
+endif
+
 BS_FIRMWARE_SOURCES := \
     config_system_power.c \
     rtx_config.c \
@@ -61,5 +66,9 @@ BS_FIRMWARE_SOURCES := \
     config_css_clock.c \
     config_clock.c \
     config_scmi_power_domain.c
+
+ifeq ($(BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS),yes)
+    BS_FIRMWARE_SOURCES += config_resource_perms.c
+endif
 
 include $(BS_DIR)/firmware.mk

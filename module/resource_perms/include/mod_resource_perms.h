@@ -158,6 +158,27 @@ struct mod_res_agent_msg_permissions {
  */
 
 /*!
+ * \brief SCMI Clock Protocol Message index offset
+ */
+#define MOD_RES_PERMS_CLOCK_PERMS_OFFSET MOD_SCMI_CLOCK_ATTRIBUTES
+
+/*!
+ * \brief SCMI Clock Protocol Message Indices
+ */
+enum mod_res_clock_permissions_idx {
+    MOD_RES_PERMS_SCMI_CLOCK_ATTRIBUTES_IDX =
+        MOD_SCMI_CLOCK_ATTRIBUTES - MOD_RES_PERMS_CLOCK_PERMS_OFFSET,
+    MOD_RES_PERMS_SCMI_CLOCK_DESCRIBE_RATE_IDX =
+        MOD_SCMI_CLOCK_DESCRIBE_RATES - MOD_RES_PERMS_CLOCK_PERMS_OFFSET,
+    MOD_RES_PERMS_SCMI_CLOCK_RATE_SET_IDX =
+        MOD_SCMI_CLOCK_RATE_SET - MOD_RES_PERMS_CLOCK_PERMS_OFFSET,
+    MOD_RES_PERMS_SCMI_CLOCK_RATE_GET_IDX =
+        MOD_SCMI_CLOCK_RATE_GET - MOD_RES_PERMS_CLOCK_PERMS_OFFSET,
+    MOD_RES_PERMS_SCMI_CLOCK_CONFIG_SET_IDX =
+        MOD_SCMI_CLOCK_CONFIG_SET - MOD_RES_PERMS_CLOCK_PERMS_OFFSET,
+};
+
+/*!
  * \brief SCMI Agent Permissions
  *
  * \details An agent may have any combination of the permissions

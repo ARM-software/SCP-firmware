@@ -20,52 +20,31 @@ static const struct mod_scmi_clock_device agent_device_table_ospm[] = {
         /* Big */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_BIGCLK),
-        .permissions = MOD_SCMI_CLOCK_PERM_ATTRIBUTES |
-                       MOD_SCMI_CLOCK_PERM_DESCRIBE_RATES |
-                       MOD_SCMI_CLOCK_PERM_GET_RATE,
     },
     {
         /* Little */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_LITTLECLK),
-        .permissions = MOD_SCMI_CLOCK_PERM_ATTRIBUTES |
-                       MOD_SCMI_CLOCK_PERM_DESCRIBE_RATES |
-                       MOD_SCMI_CLOCK_PERM_GET_RATE,
     },
     {
         /* GPU */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_GPUCLK),
-        .permissions = MOD_SCMI_CLOCK_PERM_ATTRIBUTES |
-                       MOD_SCMI_CLOCK_PERM_DESCRIBE_RATES |
-                       MOD_SCMI_CLOCK_PERM_GET_RATE,
     },
     {
         /* HDLCD0 */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_HDLCD0),
-        .permissions = MOD_SCMI_CLOCK_PERM_ATTRIBUTES |
-                       MOD_SCMI_CLOCK_PERM_DESCRIBE_RATES |
-                       MOD_SCMI_CLOCK_PERM_GET_RATE |
-                       MOD_SCMI_CLOCK_PERM_SET_RATE |
-                       MOD_SCMI_CLOCK_PERM_SET_CONFIG,
     },
     {
         /* HDLCD1 */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_HDLCD1),
-        .permissions = MOD_SCMI_CLOCK_PERM_ATTRIBUTES |
-                       MOD_SCMI_CLOCK_PERM_DESCRIBE_RATES,
     },
     {
         /* I2S */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_I2SCLK),
-        .permissions = MOD_SCMI_CLOCK_PERM_ATTRIBUTES |
-                       MOD_SCMI_CLOCK_PERM_DESCRIBE_RATES |
-                       MOD_SCMI_CLOCK_PERM_GET_RATE |
-                       MOD_SCMI_CLOCK_PERM_SET_RATE |
-                       MOD_SCMI_CLOCK_PERM_SET_CONFIG,
     },
 };
 

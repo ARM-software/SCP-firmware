@@ -89,9 +89,53 @@ static struct mod_res_agent_msg_permissions agent_msg_permissions[] = {
  * associated with the protocols.
  */
 
+/*
+ * We are tracking 5 SCMI Clock Protocol commands
+ *
+ *  0, SCMI_CLOCK_ATTRIBUTES
+ *  1, SCMI_CLOCK_RATE_GET
+ *  2, SCMI_CLOCK_RATE_SET
+ *  3, SCMI_CLOCK_CONFIG_SET
+ *  4, SCMI_CLOCK_DESCRIBE_RATES
+ */
+#define JUNO_CLOCK_RESOURCE_CMDS 5
+#define JUNO_CLOCK_RESOURCE_ELEMENTS \
+    ((JUNO_CLOCK_IDX_COUNT >> MOD_RES_PERMS_TYPE_SHIFT) + 1)
+static mod_res_perms_t scmi_clock_perms[]
+    [JUNO_CLOCK_RESOURCE_CMDS][JUNO_CLOCK_RESOURCE_ELEMENTS] = {
+        /* SCMI_PROTOCOL_ID_CLOCK */
+        /* 0, SCMI_CLOCK_ATTRIBUTES */
+        /* 1, SCMI_CLOCK_RATE_GET */
+        /* 2, SCMI_CLOCK_RATE_SET */
+        /* 3, SCMI_CLOCK_CONFIG_SET */
+        /* 4, SCMI_CLOCK_DESCRIBE_RATES */
+        [AGENT_IDX(JUNO_SCMI_AGENT_IDX_OSPM)] = {
+            [MOD_RES_PERMS_SCMI_CLOCK_ATTRIBUTES_IDX][0] = 0x0,
+            [MOD_RES_PERMS_SCMI_CLOCK_DESCRIBE_RATE_IDX][0] = 0x0,
+            /*
+             * Clocks 0, 1, 2, 4 do not allow set commands,
+             * Clocks 3 and 5 allow rate_set/config_set
+             */
+            [MOD_RES_PERMS_SCMI_CLOCK_RATE_SET_IDX][0] =
+                ((1 << 0) | (1 << 1) | (1 << 2) | (1 << 4)),
+            [MOD_RES_PERMS_SCMI_CLOCK_RATE_GET_IDX][0] =
+                ((1 << 0) | (1 << 1) | (1 << 2) | (1 << 4)),
+            [MOD_RES_PERMS_SCMI_CLOCK_CONFIG_SET_IDX][0] = 0x0,
+        },
+        [AGENT_IDX(JUNO_SCMI_AGENT_IDX_PSCI)] = {
+            /* No access to clocks for PSCI agent, so bits [4:0] set  */
+            [MOD_RES_PERMS_SCMI_CLOCK_ATTRIBUTES_IDX][0] = 0x1f,
+            [MOD_RES_PERMS_SCMI_CLOCK_DESCRIBE_RATE_IDX][0] = 0x1f,
+            [MOD_RES_PERMS_SCMI_CLOCK_RATE_SET_IDX][0] = 0x1f,
+            [MOD_RES_PERMS_SCMI_CLOCK_RATE_GET_IDX][0] = 0x1f,
+            [MOD_RES_PERMS_SCMI_CLOCK_CONFIG_SET_IDX][0] = 0x1f,
+        },
+};
+
 static struct mod_res_agent_permission agent_permissions = {
     .agent_protocol_permissions = agent_protocol_permissions,
     .agent_msg_permissions = agent_msg_permissions,
+    .scmi_clock_perms = &scmi_clock_perms[0][0][0],
 };
 
 struct fwk_module_config config_resource_perms = {
