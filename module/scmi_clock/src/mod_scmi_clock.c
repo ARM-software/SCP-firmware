@@ -15,6 +15,7 @@
 #include <mod_scmi_clock.h>
 
 #include <fwk_assert.h>
+#include <fwk_attributes.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_log.h>
@@ -387,7 +388,7 @@ static void set_request_respond(fwk_id_t service_id, int status)
                                      sizeof(return_values.status));
 }
 
-__attribute((weak)) int mod_scmi_clock_rate_set_policy(
+FWK_WEAK int mod_scmi_clock_rate_set_policy(
     enum mod_scmi_clock_policy_status *policy_status,
     enum mod_clock_round_mode *round_mode,
     uint64_t *rate,
@@ -399,7 +400,7 @@ __attribute((weak)) int mod_scmi_clock_rate_set_policy(
     return FWK_SUCCESS;
 }
 
-__attribute((weak)) int mod_scmi_clock_config_set_policy(
+FWK_WEAK int mod_scmi_clock_config_set_policy(
     enum mod_scmi_clock_policy_status *policy_status,
     enum mod_clock_state *state,
     fwk_id_t service_id,

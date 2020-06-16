@@ -10,6 +10,7 @@
 #include <ddr_init.h>
 
 #include <fwk_assert.h>
+#include <fwk_attributes.h>
 #include <fwk_log.h>
 #include <fwk_macros.h>
 
@@ -17,37 +18,37 @@
 #include <stdint.h>
 #include <string.h>
 
-struct fip_toc_header_s {
+struct FWK_PACKED fip_toc_header_s {
     uint32_t name;
     uint32_t serial_num;
     uint64_t flags;
-} __attribute__((packed));
+};
 
 typedef struct fip_toc_header_s fip_toc_header_t;
 /* fip toc header 16 byte*/
 
-struct fip_toc_entry_s {
+struct FWK_PACKED fip_toc_entry_s {
     uint8_t uuid[16];
     uint64_t offset_addr;
     uint64_t size;
     uint64_t flags;
-} __attribute__((packed));
+};
 
 typedef struct fip_toc_entry_s fip_toc_entry_t;
 /* fip toc entry 40 byte*/
 
-struct fip_package_s {
+struct FWK_PACKED fip_package_s {
     fip_toc_header_t fip_toc_header;
     fip_toc_entry_t fip_toc_entry[5];
     uint32_t data[1];
-} __attribute__((packed));
+};
 
 typedef struct fip_package_s fip_package_t;
 
-struct arm_tf_fip_package_s {
+struct FWK_PACKED arm_tf_fip_package_s {
     fip_toc_header_t fip_toc_header;
     fip_toc_entry_t fip_toc_entry[4];
-} __attribute__((packed));
+};
 
 typedef struct arm_tf_fip_package_s arm_tf_fip_package_t;
 

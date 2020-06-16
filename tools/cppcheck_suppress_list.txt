@@ -35,3 +35,6 @@ syntaxError:product/synquacer/module/synquacer_system/src/mmu500.c:34
 
 // Cppcheck doesn't like include directives that use macros
 preprocessorErrorDirective:framework/test/fwk_module_idx.h:14
+
+// Cppcheck does not properly parse the `FWK_HAS_INCLUDE` macro
+preprocessorErrorDirective:arch/arm/src/arch_mm.c:16

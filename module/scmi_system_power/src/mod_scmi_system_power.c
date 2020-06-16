@@ -18,6 +18,7 @@
 #include <mod_timer.h>
 
 #include <fwk_assert.h>
+#include <fwk_attributes.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
@@ -495,7 +496,7 @@ exit:
  * Platforms can override this policy by implementing this interface in the
  * platform code.
  */
-__attribute((weak)) int scmi_sys_power_state_set_policy(
+FWK_WEAK int scmi_sys_power_state_set_policy(
     enum mod_scmi_sys_power_policy_status *policy_status,
     uint32_t *state,
     fwk_id_t service_id,

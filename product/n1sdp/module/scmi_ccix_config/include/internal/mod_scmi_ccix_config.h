@@ -11,6 +11,8 @@
 #ifndef INTERNAL_SCMI_CCIX_CONFIG_H
 #define INTERNAL_SCMI_CCIX_CONFIG_H
 
+#include <fwk_attributes.h>
+
 #include <stdint.h>
 
 /*
@@ -44,15 +46,13 @@ enum scmi_ccix_config_command_id {
 #define ADDRESS_MSB_MASK        UINT64_C(0xFFFFFFFF00000000)
 #define ADDRESS_LSB_MASK        UINT64_C(0x00000000FFFFFFFF)
 
-
-struct __attribute((packed)) scmi_ccix_config_mempools_map {
+struct FWK_PACKED scmi_ccix_config_mempools_map {
     uint32_t ha_id;
     uint32_t base_msb;
     uint32_t base_lsb;
     uint32_t size_msb;
     uint32_t size_lsb;
 };
-
 
 /*
  * CCIX CONFIG GET
@@ -95,8 +95,7 @@ struct __attribute((packed)) scmi_ccix_config_mempools_map {
 #define HOST_OPT_TLP_MASK            UINT32_C(0x80000000)
 #define HOST_OPT_TLP_BIT_POS         31
 
-
-struct __attribute((packed)) scmi_ccix_config_protocol_get_p2a {
+struct FWK_PACKED scmi_ccix_config_protocol_get_p2a {
     int32_t  status;
     uint32_t agent_count;
     uint32_t host_mmap_count;
@@ -130,30 +129,29 @@ struct __attribute((packed)) scmi_ccix_config_protocol_get_p2a {
 #define MAX_PACKET_SIZE_MASK     UINT32_C(0x1C000000)
 #define MAX_PACKET_SIZE_BIT_POS  26
 
-struct __attribute((packed)) scmi_ccix_config_protocol_set_a2p {
+struct FWK_PACKED scmi_ccix_config_protocol_set_a2p {
     uint32_t agent_count;
     uint32_t config_property;
     uint32_t remote_mmap_count;
     struct scmi_ccix_config_mempools_map mem_pools[MAX_HA_MMAP_ENTRIES];
 };
 
-struct __attribute((packed)) scmi_ccix_config_protocol_set_p2a {
+struct FWK_PACKED scmi_ccix_config_protocol_set_p2a {
     int32_t status;
 };
 
 /*
  * CCIX CONFIG EXCHANGE PROTOCOL CREDIT
  */
-struct __attribute((packed)) scmi_ccix_config_protocol_credit_a2p {
+struct FWK_PACKED scmi_ccix_config_protocol_credit_a2p {
     uint32_t  link_id;
 };
 
 /*
  * CCIX CONFIG ENTER SYSTEM COHERENCY
  */
-struct __attribute((packed)) scmi_ccix_config_protocol_sys_coherency_a2p {
+struct FWK_PACKED scmi_ccix_config_protocol_sys_coherency_a2p {
     uint32_t  link_id;
 };
-
 
 #endif /* INTERNAL_SCMI_CCIX_CONFIG_H */

@@ -8,6 +8,7 @@
 #ifndef MOD_STATISTICS_H
 #define MOD_STATISTICS_H
 
+#include <fwk_attributes.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_module_idx.h>
@@ -29,7 +30,7 @@
 /*!
  * \brief Statistics memory region information.
  */
-struct mod_stats_config_info {
+struct FWK_PACKED mod_stats_config_info {
     /*! AP physical address where statistics are located */
     uint64_t ap_stats_addr;
 
@@ -155,14 +156,14 @@ struct mod_stats_desc_header {
      * statistics data section. If the value is 0 then statistics are not
      * collected for this domain. */
     uint32_t domain_offset[];
-} __attribute__((packed));
+};
 
 /*!
  * \brief Performance or power level statistics data
  *
  * \note In case of power domain. Here the reference to level means power state
  */
-struct mod_stats_level_stats {
+struct FWK_PACKED mod_stats_level_stats {
     /*! The performance or power level ID. */
     uint32_t level_id;
 
@@ -175,12 +176,12 @@ struct mod_stats_level_stats {
     /*! Cumulative time of how long this level has been used. Value is in
      * microseconds. */
     uint64_t total_residency_us;
-} __attribute__((packed));
+};
 
 /*!
  * \brief Performance or power domain statistics data
  */
-struct mod_stats_domain_stats_data {
+struct FWK_PACKED mod_stats_domain_stats_data {
     /*! Holds value of total number of performance or power levels available
      * in the domain. */
     uint16_t level_count;
@@ -198,8 +199,7 @@ struct mod_stats_domain_stats_data {
     /*! Beginning of the statistics region with information for each
      * performance or power level. */
     struct mod_stats_level_stats level[];
-} __attribute__((packed));
-
+};
 
 /*!
  * \}

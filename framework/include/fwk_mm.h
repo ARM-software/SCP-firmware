@@ -12,6 +12,7 @@
 #define FWK_MM_H
 
 #include <fwk_align.h>
+#include <fwk_attributes.h>
 
 #include <stddef.h>
 
@@ -43,8 +44,7 @@
  * \retval NULL Allocation failed.
  * \return Pointer to a newly-allocated block of memory.
  */
-void *fwk_mm_alloc(size_t num, size_t size)
-    __attribute__((malloc, alloc_size(1, 2)));
+void *fwk_mm_alloc(size_t num, size_t size) FWK_ALLOC FWK_ALLOC_SIZE2(1, 2);
 
 /*!
  * \brief Allocate a block of memory with specified alignment.
@@ -57,7 +57,7 @@ void *fwk_mm_alloc(size_t num, size_t size)
  * \return Pointer to a newly-allocated block of memory.
  */
 void *fwk_mm_alloc_aligned(size_t num, size_t size, unsigned int alignment)
-    __attribute__((malloc, alloc_size(1, 2), alloc_align(3)));
+    FWK_ALLOC FWK_ALLOC_SIZE2(1, 2) FWK_ALLOC_ALIGN(3);
 
 /*!
  * \brief Allocate a block of memory and initialize all its bits to zero.
@@ -71,8 +71,7 @@ void *fwk_mm_alloc_aligned(size_t num, size_t size, unsigned int alignment)
  * \retval NULL Allocation failed.
  * \return Pointer to a newly-allocated block of memory.
  */
-void *fwk_mm_calloc(size_t num, size_t size)
-    __attribute__((malloc, alloc_size(1, 2)));
+void *fwk_mm_calloc(size_t num, size_t size) FWK_ALLOC FWK_ALLOC_SIZE2(1, 2);
 
 /*!
  * \brief Allocate a block of memory with specified alignment and initialize
@@ -86,7 +85,7 @@ void *fwk_mm_calloc(size_t num, size_t size)
  * \return Pointer to a newly-allocated block of memory.
  */
 void *fwk_mm_calloc_aligned(size_t num, size_t size, unsigned int alignment)
-    __attribute__((malloc, alloc_size(1, 2), alloc_align(3)));
+    FWK_ALLOC FWK_ALLOC_SIZE2(1, 2) FWK_ALLOC_ALIGN(3);
 
 /*!
  * @}

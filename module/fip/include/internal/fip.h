@@ -20,6 +20,8 @@
 #ifndef INTERNAL_FIP_H
 #define INTERNAL_FIP_H
 
+#include <fwk_attributes.h>
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -157,24 +159,24 @@
  *  +----------------+
  */
 
-struct __attribute__((packed)) fip_uuid {
+struct FWK_PACKED fip_uuid {
     uint8_t u[16];
 };
 
-struct __attribute__((packed)) fip_toc_header {
+struct FWK_PACKED fip_toc_header {
     uint32_t name;
     uint32_t serial_number;
     uint64_t flags;
 };
 
-struct __attribute__((packed)) fip_toc_entry {
+struct FWK_PACKED fip_toc_entry {
     struct fip_uuid uuid;
     uint64_t offset_address;
     uint64_t size;
     uint64_t flags;
 };
 
-struct __attribute__((packed)) fip_toc {
+struct FWK_PACKED fip_toc {
     struct fip_toc_header header;
     struct fip_toc_entry entry[];
 };

@@ -6,6 +6,7 @@
  */
 
 #include <fwk_assert.h>
+#include <fwk_attributes.h>
 #include <fwk_interrupt.h>
 #include <fwk_log.h>
 #include <fwk_ring.h>
@@ -238,7 +239,7 @@ void fwk_log_snprintf(const char *format, ...)
 }
 
 #ifdef FWK_LOG_BUFFERED
-__attribute((constructor)) void fwk_log_init(void)
+FWK_CONSTRUCTOR void fwk_log_init(void)
 {
     static char storage[FMW_LOG_BUFFER_SIZE];
 

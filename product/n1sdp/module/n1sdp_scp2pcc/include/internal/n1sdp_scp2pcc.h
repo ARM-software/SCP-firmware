@@ -11,6 +11,8 @@
 #ifndef INTERNAL_N1SDP_SCP2PCC_H
 #define INTERNAL_N1SDP_SCP2PCC_H
 
+#include <fwk_attributes.h>
+
 #include <stdint.h>
 
 #define MSG_PAYLOAD_SIZE         16
@@ -20,7 +22,7 @@
 #define SCP2PCC_TYPE_SHUTDOWN    0x0001
 #define SCP2PCC_TYPE_REBOOT      0x0002
 
-struct mem_msg_packet_st {
+struct FWK_PACKED mem_msg_packet_st {
     /* Message type, lower 16 bits only. */
     unsigned int type;
     /* Valid payload size, lower 16 bits only. */
@@ -29,6 +31,6 @@ struct mem_msg_packet_st {
     unsigned int sequence;
     /* Data payload. */
     uint8_t payload[MSG_PAYLOAD_SIZE];
-} __attribute__((packed));
+};
 
 #endif /* INTERNAL_N1SDP_SCP2PCC_H */

@@ -21,6 +21,7 @@
 #include <mod_n1sdp_pcie.h>
 
 #include <fwk_assert.h>
+#include <fwk_attributes.h>
 #include <fwk_macros.h>
 
 #include <fmw_cmsis.h>
@@ -271,7 +272,7 @@ void pcie_bus_enumeration(struct n1sdp_pcie_dev_config *config)
 /*!
  * \brief Callee context at exception
  */
-struct __attribute((packed)) context {
+struct FWK_PACKED context {
     uint32_t r0;
     uint32_t r1;
     uint32_t r2;
@@ -301,8 +302,9 @@ struct __attribute((packed)) context {
 
 #define EXCEPTION_BUSFAULT 5
 
-__attribute__((noinline)) /* only one location where the checked load happen */
-static bool checked_read_u32(uint32_t *const value, const uint32_t *const src)
+FWK_NOINLINE /* only one location where the checked load happen */
+    static bool
+    checked_read_u32(uint32_t *const value, const uint32_t *const src)
 {
     uint32_t err;
     uint32_t dst;

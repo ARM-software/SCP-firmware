@@ -13,6 +13,7 @@
 #include <internal/fwk_thread.h>
 
 #include <fwk_assert.h>
+#include <fwk_attributes.h>
 #include <fwk_dlist.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
@@ -146,7 +147,7 @@ static void send_notifications(struct fwk_event *notification_event,
  * Private interface functions
  */
 
-static __attribute((constructor)) void fwk_notification_init(void)
+static FWK_CONSTRUCTOR void fwk_notification_init(void)
 {
     static struct __fwk_notification_subscription
         subscriptions[FMW_NOTIFICATION_MAX];

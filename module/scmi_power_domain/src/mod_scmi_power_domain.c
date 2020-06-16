@@ -643,7 +643,7 @@ exit:
 /*
  * SCMI Power Domain Policy Handlers
  */
-__attribute__((weak)) int scmi_pd_power_state_set_policy(
+FWK_WEAK int scmi_pd_power_state_set_policy(
     enum mod_scmi_pd_policy_status *policy_status,
     uint32_t *state,
     unsigned int agent_id,

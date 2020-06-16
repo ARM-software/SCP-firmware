@@ -10,6 +10,7 @@
 
 #include "juno_scc.h"
 
+#include <fwk_attributes.h>
 #include <fwk_macros.h>
 
 #include <stdint.h>
@@ -72,7 +73,7 @@ enum juno_clock_soc_ram_idx {
     JUNO_CLOCK_SOC_RAM_IDX_COUNT
 };
 
-struct juno_clock_preset {
+struct FWK_PACKED juno_clock_preset {
     /*
      * \brief Denominator value
      *
@@ -91,7 +92,7 @@ struct juno_clock_preset {
      * \note This value should be between 1 and 127
      */
     uint16_t PDIV;
-} __attribute((packed));
+};
 
 struct juno_clock_lookup {
     struct pll_reg pll;

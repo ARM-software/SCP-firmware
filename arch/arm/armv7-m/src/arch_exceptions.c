@@ -8,6 +8,8 @@
  *      ARMv7-M exception handlers.
  */
 
+#include <fwk_attributes.h>
+
 #include <arch_exceptions.h>
 
 #include <fmw_cmsis.h>
@@ -58,7 +60,7 @@ extern char __stackheap_end__;
 const struct {
     uintptr_t stack;
     uintptr_t exceptions[NVIC_USER_IRQ_OFFSET - 1];
-} arch_exceptions __attribute__((section(".exceptions"))) = {
+} arch_exceptions FWK_SECTION(".exceptions") = {
     .stack = (uintptr_t)(arch_exception_stack),
     .exceptions = {
         [NVIC_USER_IRQ_OFFSET + Reset_IRQn - 1] =
