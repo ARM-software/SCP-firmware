@@ -13,6 +13,7 @@ BS_FIRMWARE_HAS_MULTITHREADING := no
 BS_FIRMWARE_HAS_NOTIFICATION := yes
 BS_FIRMWARE_HAS_SCMI_NOTIFICATIONS := no
 BS_FIRMWARE_HAS_FAST_CHANNELS := no
+BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS := yes
 BS_FIRMWARE_HAS_DEBUG_UNIT := yes
 BS_FIRMWARE_HAS_SCMI_RESET := no
 BS_FIRMWARE_HAS_STATISTICS := no
@@ -62,6 +63,10 @@ endif
 
 ifeq ($(BS_FIRMWARE_HAS_SCMI_RESET),yes)
     BS_FIRMWARE_MODULES += reset_domain scmi_reset_domain juno_reset_domain
+endif
+
+ifeq ($(BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS),yes)
+    BS_FIRMWARE_MODULES += resource_perms
 endif
 
 BS_FIRMWARE_SOURCES := \
@@ -116,6 +121,10 @@ endif
 ifeq ($(BS_FIRMWARE_HAS_STATISTICS),yes)
     BS_FIRMWARE_MODULES += statistics
     BS_FIRMWARE_SOURCES += config_stats.c
+endif
+
+ifeq ($(BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS),yes)
+    BS_FIRMWARE_SOURCES += config_resource_perms.c
 endif
 
 include $(BS_DIR)/firmware.mk
