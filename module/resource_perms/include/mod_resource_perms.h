@@ -230,6 +230,25 @@ enum mod_res_perf_permissions_idx {
 };
 
 /*!
+ * \brief SCMI Sensor Protocol Message index offset
+ */
+#define MOD_RES_PERMS_SENSOR_PERMS_OFFSET MOD_SCMI_SENSOR_DESCRIPTION_GET
+
+/*!
+ * \brief SCMI Sensor Protocol Message Indices
+ */
+enum mod_res_sensor_permissions_idx {
+    MOD_RES_PERMS_SCMI_SENSOR_DESCRIPTION_GET_IDX =
+        MOD_SCMI_PERF_DOMAIN_ATTRIBUTES - MOD_RES_PERMS_SENSOR_PERMS_OFFSET,
+    MOD_RES_PERMS_SCMI_SENSOR_CONFIG_SET_IDX =
+        MOD_SCMI_SENSOR_CONFIG_SET - MOD_RES_PERMS_SENSOR_PERMS_OFFSET,
+    MOD_RES_PERMS_SCMI_SENSOR_TRIP_POINT_SET_IDX =
+        MOD_SCMI_SENSOR_TRIP_POINT_SET - MOD_RES_PERMS_SENSOR_PERMS_OFFSET,
+    MOD_RES_PERMS_SCMI_SENSOR_READING_GET_IDX =
+        MOD_SCMI_SENSOR_READING_GET - MOD_RES_PERMS_SENSOR_PERMS_OFFSET,
+};
+
+/*!
  * \brief SCMI Agent Permissions
  *
  * \details An agent may have any combination of the permissions
