@@ -41,6 +41,10 @@ ifeq ($(BUILD_HAS_STATISTICS),yes)
     DEFINES += BUILD_HAS_STATISTICS
 endif
 
+ifeq ($(BUILD_HAS_RESOURCE_PERMISSIONS),yes)
+    DEFINES += BUILD_HAS_RESOURCE_PERMISSIONS
+endif
+
 export AS := $(CC)
 export LD := $(CC)
 

@@ -37,6 +37,11 @@
 /*! Maximum value of an SCMI protocol identifier */
 #define MOD_SCMI_PROTOCOL_ID_MAX 0xFF
 
+/*! Minimum Protocol ID reserved for vendor or platform-specific extensions */
+#define MOD_SCMI_PLATFORM_PROTOCOL_ID_MIN 0x80
+/*! Maximum Protocol ID reserved for vendor or platform-specific extensions */
+#define MOD_SCMI_PLATFORM_PROTOCOL_ID_MAX MOD_SCMI_PROTOCOL_ID_MAX
+
 /*!
  * \brief SCMI error codes.
  */
@@ -183,6 +188,7 @@ enum scmi_reset_domain_command_id {
     MOD_SCMI_RESET_DOMAIN_ATTRIBUTES = 0x03,
     MOD_SCMI_RESET_REQUEST = 0x04,
     MOD_SCMI_RESET_NOTIFY = 0x05,
+    MOD_SCMI_RESET_COMMAND_COUNT,
 };
 
 /*!
