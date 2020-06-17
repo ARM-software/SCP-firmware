@@ -39,6 +39,10 @@ BS_FIRMWARE_MODULES := \
     fip \
     ssc \
     system_info \
+    psu \
+    mock_psu \
+    dvfs \
+    scmi_perf \
     morello_system
 
 BS_FIRMWARE_SOURCES := \
@@ -67,6 +71,9 @@ BS_FIRMWARE_SOURCES := \
     config_css_clock.c \
     config_clock.c \
     config_fip.c \
+    config_psu.c \
+    config_mock_psu.c \
+    config_dvfs.c \
+    config_scmi_perf.c \
     config_apcontext.c
-
 include $(BS_DIR)/firmware.mk
