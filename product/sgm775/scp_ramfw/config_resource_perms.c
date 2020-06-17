@@ -62,6 +62,18 @@ static struct mod_res_agent_msg_permissions agent_msg_permissions[] = {
         /* Reset Domains */
         .messages[MOD_RES_PERMS_SCMI_RESET_DOMAIN_MESSAGE_IDX] = 0x0,
     },
+    [AGENT_IDX(SCMI_AGENT_ID_PSCI)] = {
+        .messages[0] = 0x0, /* Base */
+        .messages[1] = 0x0, /* Power Domain */
+        .messages[2] = 0x0, /* System Power Domain */
+        .messages[3] = 0x0,
+        /*
+         * sgm775 denies access to CONFIG_SET
+         */
+        .messages[4] =
+            (1 << (MOD_SCMI_CLOCK_CONFIG_SET - MOD_SCMI_CLOCK_ATTRIBUTES)),
+        .messages[5] = 0x0, /* Sensors */
+    },
 };
 
 static struct mod_res_agent_permission agent_permissions = {
