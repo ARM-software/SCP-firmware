@@ -11,6 +11,9 @@
 #include <internal/scmi_power_domain.h>
 
 #include <mod_power_domain.h>
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#    include <mod_resource_perms.h>
+#endif
 #include <mod_scmi.h>
 #include <mod_scmi_power_domain.h>
 
@@ -64,6 +67,11 @@ struct scmi_pd_ctx {
 
     /* Pointer to a table of scmi_pd operations */
     struct scmi_pd_operations *ops;
+
+#if BUILD_HAS_RESOURCE_PERMISSIONS
+    /* SCMI Resource Permissions API */
+    const struct mod_res_permissions_api *res_perms_api;
+#endif
 };
 
 static int scmi_pd_protocol_version_handler(fwk_id_t service_id,
@@ -638,6 +646,87 @@ __attribute__((weak)) int scmi_pd_power_state_set_policy(
     return FWK_SUCCESS;
 }
 
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+
+/*
+ * SCMI Resource Permissions handler
+ */
+static unsigned int get_pd_domain_id(
+    const uint32_t *payload,
+    unsigned int message_id)
+{
+    const struct scmi_pd_power_state_set_a2p *params_set;
+    const struct scmi_pd_power_state_get_a2p *params_get;
+
+    switch (message_id) {
+    case MOD_SCMI_PD_POWER_STATE_SET:
+        params_set = (const struct scmi_pd_power_state_set_a2p *)payload;
+        return params_set->domain_id;
+
+    default:
+        /*
+         * Every SCMI Power Domains message apart from power_state_set
+         * is formatted with the domain ID as the first message element.
+         * We will use the power_state_set message as a basic format to
+         * retrieve the domain ID to avoid unnecessary code.
+         */
+        params_get = (const struct scmi_pd_power_state_get_a2p *)payload;
+        return params_get->domain_id;
+    }
+}
+
+static int scmi_pd_permissions_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload,
+    size_t payload_size,
+    unsigned int message_id,
+    int32_t *return_values)
+{
+    enum mod_res_perms_permissions perms;
+    unsigned int agent_id, domain_id;
+    enum mod_pd_type pd_type;
+    fwk_id_t pd_id;
+    int status;
+
+    status = scmi_pd_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+    if (status != FWK_SUCCESS) {
+        *return_values = SCMI_GENERIC_ERROR;
+        return FWK_E_PARAM;
+    }
+
+    if (message_id < 3)
+        return FWK_SUCCESS;
+
+    domain_id = get_pd_domain_id(payload, message_id);
+    if (domain_id > UINT16_MAX) {
+        *return_values = SCMI_NOT_FOUND;
+        return FWK_E_ACCESS;
+    }
+
+    pd_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, domain_id);
+    if (!fwk_module_is_valid_element_id(pd_id)) {
+        *return_values = SCMI_NOT_FOUND;
+        return FWK_E_ACCESS;
+    }
+
+    status = scmi_pd_ctx.pd_api->get_domain_type(pd_id, &pd_type);
+    if (status != FWK_SUCCESS) {
+        *return_values = SCMI_GENERIC_ERROR;
+        return FWK_E_ACCESS;
+    }
+
+    perms = scmi_pd_ctx.res_perms_api->agent_has_resource_permission(
+        agent_id, MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN, message_id, domain_id);
+
+    if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
+        return FWK_SUCCESS;
+
+    *return_values = SCMI_DENIED;
+    return FWK_E_ACCESS;
+}
+
+#endif
+
 /*
  * SCMI module -> SCMI power module interface
  */
@@ -653,6 +742,9 @@ static int scmi_pd_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     const uint32_t *payload, size_t payload_size, unsigned int message_id)
 {
     int32_t return_value;
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    int status;
+#endif
 
     static_assert(FWK_ARRAY_SIZE(handler_table) ==
         FWK_ARRAY_SIZE(payload_size_table),
@@ -668,6 +760,13 @@ static int scmi_pd_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
         return_value = SCMI_PROTOCOL_ERROR;
         goto error;
     }
+
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    status = scmi_pd_permissions_handler(
+        service_id, payload, payload_size, message_id, &return_value);
+    if (status != FWK_SUCCESS)
+        goto error;
+#endif
 
     return handler_table[message_id](service_id, payload);
 
@@ -753,6 +852,15 @@ static int scmi_pd_bind(fwk_id_t id, unsigned int round)
     if (status != FWK_SUCCESS)
         return status;
     #endif
+
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
+        FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS, MOD_RES_PERM_RESOURCE_PERMS),
+        &scmi_pd_ctx.res_perms_api);
+    if (status != FWK_SUCCESS)
+        return status;
+#endif
 
     return fwk_module_bind(fwk_module_id_power_domain, mod_pd_api_id_restricted,
         &scmi_pd_ctx.pd_api);

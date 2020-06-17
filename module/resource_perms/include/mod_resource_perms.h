@@ -179,6 +179,28 @@ enum mod_res_clock_permissions_idx {
 };
 
 /*!
+ * \brief SCMI Power Domain Protocol Message index offset
+ */
+#define MOD_RES_PERMS_POWER_DOMAIN_PERMS_OFFSET \
+    MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES
+
+/*!
+ * \brief SCMI Power Domain Protocol Message Indices
+ */
+enum mod_res_power_domain_permissions_idx {
+    MOD_RES_PERMS_SCMI_POWER_DOMAIN_ATTRIBUTES_IDX =
+        MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES -
+        MOD_RES_PERMS_POWER_DOMAIN_PERMS_OFFSET,
+    MOD_RES_PERMS_SCMI_POWER_DOMAIN_STATE_SET_IDX =
+        MOD_SCMI_PD_POWER_STATE_SET - MOD_RES_PERMS_POWER_DOMAIN_PERMS_OFFSET,
+    MOD_RES_PERMS_SCMI_POWER_DOMAIN_STATE_GET_IDX =
+        MOD_SCMI_PD_POWER_STATE_GET - MOD_RES_PERMS_POWER_DOMAIN_PERMS_OFFSET,
+    MOD_RES_PERMS_SCMI_POWER_DOMAIN_STATE_NOTIFY_IDX =
+        MOD_SCMI_PD_POWER_STATE_NOTIFY -
+        MOD_RES_PERMS_POWER_DOMAIN_PERMS_OFFSET,
+};
+
+/*!
  * \brief SCMI Agent Permissions
  *
  * \details An agent may have any combination of the permissions

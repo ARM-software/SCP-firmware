@@ -132,10 +132,44 @@ static mod_res_perms_t scmi_clock_perms[]
         },
 };
 
+/*
+ * We are tracking 4 SCMI Power Domain Protocol commands
+ *
+ *  0, SCMI_PD_POWER_DOMAIN_ATTRIBUTES
+ *  1, SCMI_PD_POWER_STATE_SET
+ *  2, SCMI_PD_POWER_STATE_GET
+ *  3, SCMI_PD_POWER_STATE_NOTIFY
+ */
+#define JUNO_PD_RESOURCE_CMDS 4
+#define JUNO_PD_RESOURCE_ELEMENTS \
+    ((POWER_DOMAIN_IDX_COUNT >> MOD_RES_PERMS_TYPE_SHIFT) + 1)
+static mod_res_perms_t
+    scmi_pd_perms[][JUNO_PD_RESOURCE_CMDS][JUNO_PD_RESOURCE_ELEMENTS] = {
+        /* SCMI_PROTOCOL_ID_POWER_DOMAIN */
+        /* 0, SCMI_PD_POWER_DOMAIN_ATTRIBUTES */
+        /* 1, SCMI_PD_POWER_STATE_SET */
+        /* 2, SCMI_PD_POWER_STATE_GET */
+        /* 3, SCMI_PD_POWER_STATE_NOTIFY */
+        /* For Juno, resource_id == power domain ID */
+        [AGENT_IDX(JUNO_SCMI_AGENT_IDX_OSPM)] = {
+                [MOD_RES_PERMS_SCMI_POWER_DOMAIN_ATTRIBUTES_IDX][0] = 0x0,
+                [MOD_RES_PERMS_SCMI_POWER_DOMAIN_STATE_SET_IDX][0] = 0x0,
+                [MOD_RES_PERMS_SCMI_POWER_DOMAIN_STATE_GET_IDX][0] = 0x0,
+                [MOD_RES_PERMS_SCMI_POWER_DOMAIN_STATE_NOTIFY_IDX][0] = 0x0,
+            },
+        [AGENT_IDX(JUNO_SCMI_AGENT_IDX_PSCI)] = {
+                [MOD_RES_PERMS_SCMI_POWER_DOMAIN_ATTRIBUTES_IDX][0] = 0x0,
+                [MOD_RES_PERMS_SCMI_POWER_DOMAIN_STATE_SET_IDX][0] = 0x0,
+                [MOD_RES_PERMS_SCMI_POWER_DOMAIN_STATE_GET_IDX][0] = 0x0,
+                [MOD_RES_PERMS_SCMI_POWER_DOMAIN_STATE_NOTIFY_IDX][0] = 0x0,
+            },
+};
+
 static struct mod_res_agent_permission agent_permissions = {
     .agent_protocol_permissions = agent_protocol_permissions,
     .agent_msg_permissions = agent_msg_permissions,
     .scmi_clock_perms = &scmi_clock_perms[0][0][0],
+    .scmi_pd_perms = &scmi_pd_perms[0][0][0],
 };
 
 struct fwk_module_config config_resource_perms = {
