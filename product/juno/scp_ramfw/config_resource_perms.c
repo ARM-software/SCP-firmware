@@ -240,12 +240,49 @@ static mod_res_perms_t
         },
 };
 
+/*
+ * We are tracking 4 SCMI Sensor Protocol commands
+ *
+ * 0, SCMI_SENSOR_DESCRIPTION_GET
+ * 1, SCMI_SENSOR_CONFIG_SET
+ * 2, SCMI_SENSOR_TRIP_POINT_SET
+ * 3, SCMI_SENSOR_READING_GET
+ */
+#define JUNO_SENSOR_RESOURCE_CMDS 4
+#define JUNO_SENSOR_RESOURCE_ELEMENTS \
+    ((MOD_JUNO_R1_R2_SENSOR_IDX_COUNT >> MOD_RES_PERMS_TYPE_SHIFT) + 1)
+static mod_res_perms_t
+    scmi_sensor_perms[][JUNO_SENSOR_RESOURCE_CMDS]
+        [JUNO_SENSOR_RESOURCE_ELEMENTS] = {
+            /* SCMI_PROTOCOL_ID_SENSOR */
+            /* 0, SCMI_SENSOR_DESCRIPTION_GET */
+            /* 1, SCMI_SENSOR_CONFIG_SET */
+            /* 2, SCMI_SENSOR_TRIP_POINT_SET */
+            /* 3, SCMI_SENSOR_READING_GET */
+            [AGENT_IDX(JUNO_SCMI_AGENT_IDX_OSPM)] = {
+                [MOD_RES_PERMS_SCMI_SENSOR_DESCRIPTION_GET_IDX][0] = 0x0,
+                [MOD_RES_PERMS_SCMI_SENSOR_CONFIG_SET_IDX][0] = 0x0,
+                [MOD_RES_PERMS_SCMI_SENSOR_TRIP_POINT_SET_IDX][0] = 0x0,
+                [MOD_RES_PERMS_SCMI_SENSOR_READING_GET_IDX][0] = 0x0,
+            },
+            [AGENT_IDX(JUNO_SCMI_AGENT_IDX_PSCI)] = {
+                [MOD_RES_PERMS_SCMI_SENSOR_DESCRIPTION_GET_IDX][0] = 0x0,
+                [MOD_RES_PERMS_SCMI_SENSOR_CONFIG_SET_IDX][0] = 0x0,
+                [MOD_RES_PERMS_SCMI_SENSOR_TRIP_POINT_SET_IDX][0] = 0x0,
+                [MOD_RES_PERMS_SCMI_SENSOR_READING_GET_IDX][0] = 0x0,
+            },
+    };
+
+/*
+ * Juno Platform Permissions
+ */
 static struct mod_res_agent_permission agent_permissions = {
     .agent_protocol_permissions = agent_protocol_permissions,
     .agent_msg_permissions = agent_msg_permissions,
     .scmi_clock_perms = &scmi_clock_perms[0][0][0],
     .scmi_pd_perms = &scmi_pd_perms[0][0][0],
     .scmi_perf_perms = &scmi_perf_perms[0][0][0],
+    .scmi_sensor_perms = &scmi_sensor_perms[0][0][0],
 };
 
 struct fwk_module_config config_resource_perms = {
