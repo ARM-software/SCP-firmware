@@ -8,6 +8,9 @@
 #include <internal/scmi_system_power.h>
 
 #include <mod_power_domain.h>
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#    include <mod_resource_perms.h>
+#endif
 #include <mod_scmi.h>
 #include <mod_scmi_system_power.h>
 
@@ -29,6 +32,11 @@ struct scmi_sys_power_ctx {
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     int agent_count;
     fwk_id_t *system_power_notifications;
+#endif
+
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    /* SCMI Resource Permissions API */
+    const struct mod_res_permissions_api *res_perms_api;
 #endif
 };
 
@@ -458,6 +466,42 @@ __attribute((weak)) int scmi_sys_power_state_set_policy(
     return FWK_SUCCESS;
 }
 
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+
+/*
+ * SCMI Resource Permissions handler
+ */
+static int scmi_sys_power_permissions_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload,
+    size_t payload_size,
+    unsigned int message_id)
+{
+    enum mod_res_perms_permissions perms;
+    unsigned int agent_id;
+    int status;
+
+    status = scmi_sys_power_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+    if (status != FWK_SUCCESS)
+        return FWK_E_ACCESS;
+
+    if (message_id < 3)
+        return FWK_SUCCESS;
+
+    /*
+     * We check that the agent has permssions to access the command
+     */
+    perms = scmi_sys_power_ctx.res_perms_api->agent_has_message_permission(
+        agent_id, MOD_SCMI_PROTOCOL_ID_BASE, message_id);
+
+    if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
+        return FWK_SUCCESS;
+    else
+        return FWK_E_ACCESS;
+}
+
+#endif
+
 /*
  * SCMI module -> SCMI system power module interface
  */
@@ -476,6 +520,9 @@ static int scmi_sys_power_handler(fwk_id_t protocol_id,
                                   unsigned int message_id)
 {
     int32_t return_value;
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    int status;
+#endif
 
     static_assert(FWK_ARRAY_SIZE(handler_table) ==
                   FWK_ARRAY_SIZE(payload_size_table),
@@ -493,6 +540,15 @@ static int scmi_sys_power_handler(fwk_id_t protocol_id,
         return_value = SCMI_PROTOCOL_ERROR;
         goto error;
     }
+
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    status = scmi_sys_power_permissions_handler(
+        service_id, payload, payload_size, message_id);
+    if (status != FWK_SUCCESS) {
+        return_value = SCMI_DENIED;
+        goto error;
+    }
+#endif
 
     return handler_table[message_id](service_id, payload);
 
@@ -557,6 +613,15 @@ static int scmi_sys_power_bind(fwk_id_t id, unsigned int round)
                              &scmi_sys_power_ctx.scmi_api);
     if (status != FWK_SUCCESS)
         return status;
+
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
+        FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS, MOD_RES_PERM_RESOURCE_PERMS),
+        &scmi_sys_power_ctx.res_perms_api);
+    if (status != FWK_SUCCESS)
+        return status;
+#endif
 
     /* Bind to POWER DOMAIN module */
     status = fwk_module_bind(fwk_module_id_power_domain,
