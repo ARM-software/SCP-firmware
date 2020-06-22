@@ -9,6 +9,8 @@
 #include "config_ppu_v0.h"
 #include "sgm775_core.h"
 
+#include <power_domain_utils.h>
+
 #include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
 #include <mod_system_power.h>
@@ -22,11 +24,6 @@
 
 #include <stdint.h>
 #include <string.h>
-
-static const char *core_pd_name_table[SGM775_CORE_PER_CLUSTER_MAX] = {
-    "CLUS0CORE0", "CLUS0CORE1", "CLUS0CORE2", "CLUS0CORE3",
-    "CLUS0CORE4", "CLUS0CORE5", "CLUS0CORE6", "CLUS0CORE7",
-};
 
 /* Mask of the allowed states for the systop power domain */
 static const uint32_t systop_allowed_state_mask_table[] = {
@@ -73,17 +70,6 @@ static const uint32_t core_pd_allowed_state_mask_table[] = {
 static const struct mod_power_domain_config sgm775_power_domain_config = { 0 };
 
 static struct fwk_element sgm775_power_domain_static_element_table[] = {
-    [CONFIG_POWER_DOMAIN_SYSTOP_CHILD_CLUSTER0] = {
-        .name = "CLUS0",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PPU_V1,
-                                      MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
     [CONFIG_POWER_DOMAIN_SYSTOP_CHILD_DBGTOP] = {
         .name = "DBGTOP",
         .data = &((struct mod_power_domain_element_config) {
@@ -165,64 +151,17 @@ static struct fwk_element sgm775_power_domain_static_element_table[] = {
 static const struct fwk_element *sgm775_power_domain_get_element_table
     (fwk_id_t module_id)
 {
-    struct fwk_element *element_table, *element;
-    struct mod_power_domain_element_config *pd_config_table, *pd_config;
-    unsigned int core_idx, i;
-    unsigned int cluster_offset = sgm775_core_get_count();
-    unsigned int systop_idx;
-    unsigned int elements_count;
-
-    elements_count = sgm775_core_get_count() +
-        FWK_ARRAY_SIZE(sgm775_power_domain_static_element_table);
-
-    systop_idx = elements_count - 1;
-
-    element_table = fwk_mm_calloc(
-        elements_count + 1, /* Terminator */
-        sizeof(struct fwk_element));
-
-    pd_config_table = fwk_mm_calloc(sgm775_core_get_count(),
-        sizeof(struct mod_power_domain_element_config));
-
-    for (core_idx = 0; core_idx < sgm775_core_get_count(); core_idx++) {
-        element = &element_table[core_idx];
-        pd_config = &pd_config_table[core_idx];
-
-        element->name = core_pd_name_table[core_idx];
-        element->data = pd_config;
-
-        pd_config->attributes.pd_type = MOD_PD_TYPE_CORE,
-        pd_config->parent_idx = cluster_offset,
-        pd_config->driver_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1, core_idx),
-        pd_config->api_id = FWK_ID_API(
-            FWK_MODULE_IDX_PPU_V1, MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-        pd_config->allowed_state_mask_table = core_pd_allowed_state_mask_table,
-        pd_config->allowed_state_mask_table_size =
-            FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table);
-    }
-
-    pd_config = (struct mod_power_domain_element_config *)
-                    sgm775_power_domain_static_element_table
-                        [CONFIG_POWER_DOMAIN_SYSTOP_CHILD_CLUSTER0]
-                            .data;
-    pd_config->driver_id =
-        FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1, sgm775_core_get_count());
-
-    /* Set the parent for all level one domains */
-    for (i = 0;
-         i < (FWK_ARRAY_SIZE(sgm775_power_domain_static_element_table) - 1);
-         i++) {
-        pd_config = (struct mod_power_domain_element_config *)
-                        sgm775_power_domain_static_element_table[i]
-                            .data;
-        pd_config->parent_idx = systop_idx;
-    }
-
-    memcpy(element_table + sgm775_core_get_count(),
-           sgm775_power_domain_static_element_table,
-           sizeof(sgm775_power_domain_static_element_table));
-
-    return element_table;
+    return create_power_domain_element_table(
+        sgm775_core_get_count(),
+        sgm775_cluster_get_count(),
+        FWK_MODULE_IDX_PPU_V1,
+        MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER,
+        core_pd_allowed_state_mask_table,
+        FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table),
+        cluster_pd_allowed_state_mask_table,
+        FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table),
+        sgm775_power_domain_static_element_table,
+        FWK_ARRAY_SIZE(sgm775_power_domain_static_element_table));
 }
 
 /*

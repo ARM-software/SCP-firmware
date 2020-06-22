@@ -91,10 +91,11 @@ static const struct fwk_element clock_dev_desc_table[] = {
 static const struct fwk_element *clock_get_dev_desc_table(fwk_id_t module_id)
 {
     unsigned int i;
-    unsigned int core_count;
+    unsigned int core_count, cluster_count;
     struct mod_clock_dev_config *dev_config;
 
     core_count = sgm776_core_get_count();
+    cluster_count = sgm776_cluster_get_count();
 
     /* Configure all clocks to respond to changes in SYSTOP power state */
     for (i = 0; i < CLOCK_DEV_IDX_COUNT; i++) {
@@ -102,7 +103,7 @@ static const struct fwk_element *clock_get_dev_desc_table(fwk_id_t module_id)
             (struct mod_clock_dev_config *)clock_dev_desc_table[i].data;
         dev_config->pd_source_id = FWK_ID_ELEMENT(
             FWK_MODULE_IDX_POWER_DOMAIN,
-            CONFIG_POWER_DOMAIN_SYSTOP_SYSTEM + core_count);
+            CONFIG_POWER_DOMAIN_SYSTOP_SYSTEM + core_count + cluster_count);
     }
 
     return clock_dev_desc_table;
