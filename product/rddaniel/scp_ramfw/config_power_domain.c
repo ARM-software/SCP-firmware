@@ -9,6 +9,8 @@
 #include "rddaniel_core.h"
 #include "rddaniel_power_domain.h"
 
+#include <power_domain_utils.h>
+
 #include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
 #include <mod_system_power.h>
@@ -74,91 +76,17 @@ static struct fwk_element rddaniel_power_domain_static_element_table[] = {
 static const struct fwk_element *rddaniel_power_domain_get_element_table
     (fwk_id_t module_id)
 {
-    struct fwk_element *element_table, *element;
-    struct mod_power_domain_element_config *pd_config_table, *pd_config;
-    unsigned int core_idx;
-    unsigned int cluster_idx;
-    unsigned int core_count;
-    unsigned int cluster_count;
-    unsigned int cluster_offset;
-    unsigned int core_element_counter = 0;
-    unsigned int elements_count;
-    unsigned int systop_idx;
-    const size_t config_size = sizeof(struct mod_power_domain_element_config);
-
-    core_count = rddaniel_core_get_core_count();
-    cluster_count = rddaniel_core_get_cluster_count();
-
-    elements_count = core_count + cluster_count +
-        FWK_ARRAY_SIZE(rddaniel_power_domain_static_element_table);
-    systop_idx = elements_count - 1;
-
-    cluster_offset = core_count;
-
-    element_table = fwk_mm_calloc(
-        elements_count + 1, /* Terminator */
-        sizeof(struct fwk_element));
-    if (element_table == NULL)
-        return NULL;
-
-    pd_config_table = fwk_mm_calloc(core_count + cluster_count, config_size);
-
-    for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
-        for (core_idx = 0;
-             core_idx < rddaniel_core_get_core_per_cluster_count(cluster_idx);
-             core_idx++) {
-            element = &element_table[core_element_counter];
-            pd_config = &pd_config_table[core_element_counter];
-
-            element->name = fwk_mm_alloc(PD_NAME_SIZE, 1);
-
-            snprintf((char *)element->name, PD_NAME_SIZE, "CLUS%uCORE%u",
-                cluster_idx, core_idx);
-
-            element->data = pd_config;
-
-            pd_config->attributes.pd_type = MOD_PD_TYPE_CORE;
-            pd_config->parent_idx = cluster_idx + cluster_offset;
-            pd_config->driver_id =
-                FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1, core_element_counter);
-            pd_config->api_id = FWK_ID_API(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER);
-            pd_config->allowed_state_mask_table =
-                core_pd_allowed_state_mask_table;
-            pd_config->allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table);
-            core_element_counter++;
-        }
-
-        /* Define the cluster configuration */
-        element = &element_table[cluster_idx + cluster_offset];
-        pd_config = &pd_config_table[cluster_idx + cluster_offset];
-
-        element->name = fwk_mm_alloc(PD_NAME_SIZE, 1);
-
-        snprintf((char *)element->name, PD_NAME_SIZE, "CLUS%u", cluster_idx);
-
-        element->data = pd_config;
-
-        pd_config->attributes.pd_type = MOD_PD_TYPE_CLUSTER;
-        pd_config->parent_idx = systop_idx;
-        pd_config->driver_id =
-            FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1, cluster_idx + cluster_offset);
-        pd_config->api_id = FWK_ID_API(
-            FWK_MODULE_IDX_PPU_V1, MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER);
-        pd_config->allowed_state_mask_table =
-            cluster_pd_allowed_state_mask_table;
-        pd_config->allowed_state_mask_table_size =
-            FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table);
-    }
-
-    memcpy(
-        element_table + core_count + cluster_count,
+    return create_power_domain_element_table(
+        rddaniel_core_get_core_count(),
+        rddaniel_core_get_cluster_count(),
+        FWK_MODULE_IDX_PPU_V1,
+        MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER,
+        core_pd_allowed_state_mask_table,
+        FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table),
+        cluster_pd_allowed_state_mask_table,
+        FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table),
         rddaniel_power_domain_static_element_table,
-        sizeof(rddaniel_power_domain_static_element_table));
-
-    return element_table;
+        FWK_ARRAY_SIZE(rddaniel_power_domain_static_element_table));
 }
 
 /*

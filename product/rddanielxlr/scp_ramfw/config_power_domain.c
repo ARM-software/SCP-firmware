@@ -8,6 +8,8 @@
 #include "rddanielxlr_core.h"
 #include "rddanielxlr_power_domain.h"
 
+#include <power_domain_utils.h>
+
 #include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
 #include <mod_system_power.h>
@@ -22,7 +24,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-
 
 /* Maximum power domain name size including the null terminator */
 #define PD_NAME_SIZE 12
@@ -52,54 +53,6 @@ static const struct mod_power_domain_config
     rddanielxlr_power_domain_config = { 0 };
 
 static struct fwk_element rddanielxlr_power_domain_static_element_table[] = {
-    [PD_STATIC_DEV_IDX_CLUSTER0] = {
-        .name = "CLUS0",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
-    [PD_STATIC_DEV_IDX_CLUSTER1] = {
-        .name = "CLUS1",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
-        [PD_STATIC_DEV_IDX_CLUSTER2] = {
-        .name = "CLUS2",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
-    [PD_STATIC_DEV_IDX_CLUSTER3] = {
-        .name = "CLUS3",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
-            .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table)
-        }),
-    },
     [PD_STATIC_DEV_IDX_SYSTOP] = {
         .name = "SYSTOP",
         .data = &((struct mod_power_domain_element_config) {
@@ -122,80 +75,17 @@ static struct fwk_element rddanielxlr_power_domain_static_element_table[] = {
 static const struct fwk_element *rddanielxlr_power_domain_get_element_table
     (fwk_id_t module_id)
 {
-    struct fwk_element *element_table, *element;
-    struct mod_power_domain_element_config *pd_config_table, *pd_config;
-    unsigned int core_idx;
-    unsigned int cluster_idx;
-    unsigned int cluster_offset = rddanielxlr_core_get_core_count();
-    unsigned int core_count;
-    unsigned int cluster_count;
-    unsigned int core_element_counter = 0;
-    unsigned int elements_count;
-    unsigned int systop_idx;
-
-    core_count = rddanielxlr_core_get_core_count();
-    cluster_count = rddanielxlr_core_get_cluster_count();
-
-    elements_count = core_count +
-        FWK_ARRAY_SIZE(rddanielxlr_power_domain_static_element_table);
-
-    systop_idx = elements_count - 1;
-
-    element_table = fwk_mm_calloc(
-        elements_count + 1, /* Terminator */
-        sizeof(struct fwk_element));
-    if (element_table == NULL)
-        return NULL;
-
-    pd_config_table = fwk_mm_calloc(
-        core_count, sizeof(struct mod_power_domain_element_config));
-    if (pd_config_table == NULL)
-        return NULL;
-
-    for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
-        for (core_idx = 0;
-            core_idx < rddanielxlr_core_get_core_per_cluster_count(cluster_idx);
-            core_idx++) {
-            element = &element_table[core_element_counter];
-            pd_config = &pd_config_table[core_element_counter];
-
-            element->name = fwk_mm_alloc(PD_NAME_SIZE, 1);
-            if (element->name == NULL)
-                return NULL;
-
-            snprintf((char *)element->name, PD_NAME_SIZE, "CLUS%uCORE%u",
-                cluster_idx, core_idx);
-
-            element->data = pd_config;
-
-            pd_config->attributes.pd_type = MOD_PD_TYPE_CORE;
-            pd_config->parent_idx = cluster_offset + cluster_idx;
-            pd_config->driver_id =
-                FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1, core_element_counter);
-            pd_config->api_id = FWK_ID_API(
-                FWK_MODULE_IDX_PPU_V1,
-                MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER);
-            pd_config->allowed_state_mask_table =
-                core_pd_allowed_state_mask_table;
-            pd_config->allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table);
-            core_element_counter++;
-        }
-
-        /* Define the driver id for the cluster */
-        pd_config = (struct mod_power_domain_element_config *)
-            rddanielxlr_power_domain_static_element_table[cluster_idx].data;
-        pd_config->parent_idx = systop_idx;
-        pd_config->driver_id =
-            FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1,
-                           (core_count + cluster_idx));
-    }
-
-    memcpy(element_table + core_count,
-           rddanielxlr_power_domain_static_element_table,
-           sizeof(rddanielxlr_power_domain_static_element_table));
-
-    return element_table;
+    return create_power_domain_element_table(
+        rddanielxlr_core_get_core_count(),
+        rddanielxlr_core_get_cluster_count(),
+        FWK_MODULE_IDX_PPU_V1,
+        MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER,
+        core_pd_allowed_state_mask_table,
+        FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table),
+        cluster_pd_allowed_state_mask_table,
+        FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table),
+        rddanielxlr_power_domain_static_element_table,
+        FWK_ARRAY_SIZE(rddanielxlr_power_domain_static_element_table));
 }
 
 /*

@@ -13,3 +13,8 @@ unsigned int sgm776_core_get_count(void)
 {
     return (PIK_CLUS0->PCL_CONFIG & PIK_CPU_PCL_CONFIG_NO_OF_PPU) - 1;
 }
+
+unsigned int sgm776_cluster_get_count(void)
+{
+    return SGM776_CLUSTER_COUNT;
+}

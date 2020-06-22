@@ -93,7 +93,8 @@ static const struct fwk_element *sgm775_ppu_v1_get_element_table
 
     sgm775_ppu_v1_notification_config.pd_source_id = FWK_ID_ELEMENT(
         FWK_MODULE_IDX_POWER_DOMAIN,
-        CONFIG_POWER_DOMAIN_SYSTOP_SYSTEM + sgm775_core_get_count());
+        CONFIG_POWER_DOMAIN_SYSTOP_SYSTEM + sgm775_core_get_count() +
+            sgm775_cluster_get_count());
 
     return element_table;
 }

@@ -143,7 +143,7 @@ static const struct fwk_element *ppu_v1_get_element_table(fwk_id_t module_id)
      */
     ppu_v1_config_data.pd_source_id = fwk_id_build_element_id(
         fwk_module_id_power_domain,
-        core_count + PD_STATIC_DEV_IDX_SYSTOP);
+        core_count + cluster_count + PD_STATIC_DEV_IDX_SYSTOP);
 
     return element_table;
 }

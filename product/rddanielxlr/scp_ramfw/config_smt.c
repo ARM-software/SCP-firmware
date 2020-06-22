@@ -43,8 +43,11 @@ static const struct fwk_element *smt_get_element_table(fwk_id_t module_id)
 
     for (idx = 0; idx < SCP_RDDANIELXLR_SCMI_SERVICE_IDX_COUNT; idx++) {
         config = (struct mod_smt_channel_config *)(smt_element_table[idx].data);
-        config->pd_source_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN,
-            rddanielxlr_core_get_core_count() + PD_STATIC_DEV_IDX_SYSTOP);
+        config->pd_source_id = FWK_ID_ELEMENT(
+            FWK_MODULE_IDX_POWER_DOMAIN,
+            rddanielxlr_core_get_core_count() +
+                rddanielxlr_core_get_cluster_count() +
+                PD_STATIC_DEV_IDX_SYSTOP);
     }
 
     return smt_element_table;
