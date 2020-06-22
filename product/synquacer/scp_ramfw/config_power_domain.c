@@ -11,6 +11,7 @@
 
 #include <mod_power_domain.h>
 #include <mod_system_power.h>
+#include <power_domain_utils.h>
 
 #include <fwk_element.h>
 #include <fwk_id.h>
@@ -126,109 +127,17 @@ static struct fwk_element synquacer_power_domain_static_element_table[] = {
 static const struct fwk_element *synquacer_power_domain_get_element_table(
     fwk_id_t module_id)
 {
-    struct fwk_element *element_table, *element;
-    struct mod_power_domain_element_config *pd_config_table, *pd_config;
-    unsigned int core_idx, i;
-    unsigned int cluster_idx;
-    unsigned int core_count;
-    unsigned int cluster_count;
-    unsigned int core_per_cluster_count;
-    unsigned int element_counter = 0;
-    unsigned int total_elements;
-    unsigned int systop_idx;
-
-    core_count = synquacer_core_get_core_count();
-    cluster_count = synquacer_core_get_cluster_count();
-    core_per_cluster_count = synquacer_core_get_core_per_cluster_count();
-
-    total_elements = cluster_count + core_count +
-                     FWK_ARRAY_SIZE(
-                     synquacer_power_domain_static_element_table);
-
-    systop_idx = total_elements - 1;
-
-    element_table = fwk_mm_calloc(total_elements + 1, /* Terminator */
-        sizeof(struct fwk_element));
-
-    pd_config_table = fwk_mm_calloc(
-        (cluster_count + core_count),
-        sizeof(struct mod_power_domain_element_config));
-
-    /*
-     * power domain element table should follow the ascending order
-     * of tree position.
-     * It means first element must be cluster0_core0,
-     * last element should be system power element(SYSTOP)
-     */
-    /* prepare core config table */
-    for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
-        for (core_idx = 0; core_idx < core_per_cluster_count; core_idx++) {
-            element = &element_table[element_counter];
-            pd_config = &pd_config_table[element_counter];
-
-            element->name = fwk_mm_alloc(PD_NAME_SIZE, 1);
-
-            snprintf(
-                (char *)element->name,
-                PD_NAME_SIZE,
-                "CLUS%uCORE%u",
-                cluster_idx,
-                core_idx);
-
-            element->data = pd_config;
-
-            pd_config->attributes.pd_type = MOD_PD_TYPE_CORE;
-            pd_config->driver_id =
-                FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V0_SYNQUACER,
-                               element_counter);
-            pd_config->api_id = FWK_ID_API(FWK_MODULE_IDX_PPU_V0_SYNQUACER, 0);
-            pd_config->allowed_state_mask_table =
-                core_pd_allowed_state_mask_table;
-            pd_config->allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table);
-            element_counter++;
-        }
-    }
-
-    /* prepare cluster config table */
-    for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
-        element = &element_table[element_counter];
-        pd_config = &pd_config_table[element_counter];
-
-        element->name = fwk_mm_alloc(PD_NAME_SIZE, 1);
-
-        snprintf((char *)element->name, PD_NAME_SIZE, "CLUS%u", cluster_idx);
-
-        element->data = pd_config;
-
-        pd_config->attributes.pd_type = MOD_PD_TYPE_CLUSTER;
-        pd_config->parent_idx = systop_idx;
-        pd_config->driver_id =
-            FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V0_SYNQUACER, element_counter);
-        pd_config->api_id = FWK_ID_API(FWK_MODULE_IDX_PPU_V0_SYNQUACER, 0);
-        pd_config->allowed_state_mask_table =
-            cluster_pd_allowed_state_mask_table;
-        pd_config->allowed_state_mask_table_size =
-            FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table);
-        element_counter++;
-    }
-
-    /* Set the parent for all level one domains */
-    for (i = 0;
-         i < (FWK_ARRAY_SIZE(synquacer_power_domain_static_element_table) - 1);
-         i++) {
-
-        pd_config = (struct mod_power_domain_element_config *)
-                     synquacer_power_domain_static_element_table[i].data;
-        pd_config->parent_idx = systop_idx;
-    }
-
-    memcpy(
-        element_table + element_counter,
+    return create_power_domain_element_table(
+        synquacer_core_get_core_count(),
+        synquacer_core_get_cluster_count(),
+        FWK_MODULE_IDX_PPU_V0_SYNQUACER,
+        0,
+        core_pd_allowed_state_mask_table,
+        FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table),
+        cluster_pd_allowed_state_mask_table,
+        FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table),
         synquacer_power_domain_static_element_table,
-        sizeof(synquacer_power_domain_static_element_table));
-
-    return element_table;
+        FWK_ARRAY_SIZE(synquacer_power_domain_static_element_table));
 }
 
 /*

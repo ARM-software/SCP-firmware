@@ -50,7 +50,7 @@ struct mod_ppu_v1_config sgm776_ppu_v1_notification_config = {
         MOD_PD_NOTIFICATION_IDX_POWER_STATE_TRANSITION),
 };
 
-static const struct fwk_element static_ppu_table[] = {
+static struct fwk_element ppu_table[PPU_V1_ELEMENT_IDX_COUNT + 1] = {
     [PPU_V1_ELEMENT_IDX_DBGTOP] = {
         .name = "DBGTOP",
         .data = &((struct mod_ppu_v1_pd_config) {
@@ -108,24 +108,15 @@ static const struct fwk_element static_ppu_table[] = {
             .observer_id = FWK_ID_NONE_INIT,
         }),
     },
+    [PPU_V1_ELEMENT_IDX_COUNT] = {0},
 };
 
 static const struct fwk_element *sgm776_ppu_v1_get_element_table(
     fwk_id_t module_id)
 {
-    struct fwk_element *element_table, *element;
+    struct fwk_element *element;
     struct mod_ppu_v1_pd_config *pd_config_table, *pd_config;
-    unsigned int core_idx, table_size;
-
-    /*
-     * Allocate element descriptors based on:
-     *   Size of static ppu table
-     *   +  Number of cores
-     *   +1 cluster descriptor
-     *   +1 terminator descriptor
-     */
-    table_size = FWK_ARRAY_SIZE(static_ppu_table) + sgm776_core_get_count() + 2;
-    element_table = fwk_mm_calloc(table_size, sizeof(struct fwk_element));
+    unsigned int core_idx;
 
     /* Table to hold configs for all cores and the cluster */
     pd_config_table = fwk_mm_calloc(sgm776_core_get_count() + 1,
@@ -133,7 +124,7 @@ static const struct fwk_element *sgm776_ppu_v1_get_element_table(
 
     /* Cores */
     for (core_idx = 0; core_idx < sgm776_core_get_count(); core_idx++) {
-        element = &element_table[PPU_V1_ELEMENT_IDX_COUNT + core_idx];
+        element = &ppu_table[PPU_V1_ELEMENT_IDX_CORE0 + core_idx];
         pd_config = &pd_config_table[core_idx];
 
         element->name = core_pd_name_table[core_idx];
@@ -143,11 +134,11 @@ static const struct fwk_element *sgm776_ppu_v1_get_element_table(
         pd_config->ppu.reg_base = core_pd_ppu_base_table[core_idx];
         pd_config->ppu.irq = core_pd_ppu_irq_table[core_idx];
         pd_config->cluster_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1,
-                                               table_size - 2);
+                                               PPU_V1_ELEMENT_IDX_CLUSTER);
         pd_config->observer_id = FWK_ID_NONE;
     }
 
-    element = &element_table[table_size - 2];
+    element = &ppu_table[PPU_V1_ELEMENT_IDX_CLUSTER];
     pd_config = &pd_config_table[sgm776_core_get_count()];
 
     element->name = "CLUS0";
@@ -158,14 +149,13 @@ static const struct fwk_element *sgm776_ppu_v1_get_element_table(
     pd_config->ppu.irq = PPU_CLUS0_IRQ;
     pd_config->observer_id = FWK_ID_NONE;
 
-    /* Copy static table to the beginning of the dynamic table */
-    memcpy(element_table, static_ppu_table, sizeof(static_ppu_table));
-
     sgm776_ppu_v1_notification_config.pd_source_id = FWK_ID_ELEMENT(
         FWK_MODULE_IDX_POWER_DOMAIN,
-        CONFIG_POWER_DOMAIN_SYSTOP_SYSTEM + sgm776_core_get_count());
+        CONFIG_POWER_DOMAIN_SYSTOP_SYSTEM +
+        sgm776_cluster_get_count() +
+        sgm776_core_get_count());
 
-    return element_table;
+    return ppu_table;
 }
 
 /*

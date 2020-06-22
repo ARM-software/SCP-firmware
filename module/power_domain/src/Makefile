@@ -6,6 +6,8 @@
 #
 
 BS_LIB_NAME := Power domain
-BS_LIB_SOURCES := mod_power_domain.c
+BS_LIB_SOURCES := \
+    mod_power_domain.c \
+    power_domain_utils.c
 
 include $(BS_DIR)/lib.mk
