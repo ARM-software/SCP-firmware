@@ -384,7 +384,8 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
     for (;;) {
 
         if (fwk_list_is_empty(&ctx.event_queue)) {
-                process_isr();
+            process_isr();
+            continue;
         }
 
         ctx.current_event = next_event = FWK_LIST_GET(fwk_list_head(
