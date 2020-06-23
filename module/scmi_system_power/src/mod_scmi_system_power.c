@@ -130,13 +130,13 @@ static void scmi_sys_power_state_notify(fwk_id_t service_id,
     else
         return_values.flags = 1;
 
-    for (i = 0; i < SCMI_AGENT_ID_MAX; i++) {
+    for (i = 0; i < MOD_SCMI_AGENT_ID_MAX; i++) {
         id =  scmi_sys_power_ctx.system_power_notifications[i];
         if (fwk_id_is_equal(id, FWK_ID_NONE))
             continue;
 
         scmi_sys_power_ctx.scmi_api->notify(id,
-            SCMI_PROTOCOL_ID_SYS_POWER, SCMI_SYS_POWER_STATE_SET_NOTIFY,
+            MOD_SCMI_PROTOCOL_ID_SYS_POWER, SCMI_SYS_POWER_STATE_SET_NOTIFY,
             &return_values, sizeof(return_values));
     }
 }
