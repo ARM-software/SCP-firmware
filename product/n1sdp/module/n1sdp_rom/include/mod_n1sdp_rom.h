@@ -8,9 +8,9 @@
 #ifndef MOD_N1SDP_ROM_H
 #define MOD_N1SDP_ROM_H
 
-#include <stdint.h>
+#include <mod_fip.h>
 
-#include <mod_n1sdp_flash.h>
+#include <stdint.h>
 
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules
@@ -30,7 +30,7 @@ struct n1sdp_rom_config {
     const uintptr_t ramfw_base;
 
     /*! Type of RAM Firmware to load */
-    const struct mod_n1sdp_flash_entry_id* const image_type;
+    enum mod_fip_toc_entry_type image_type;
 };
 
 /*!

@@ -44,7 +44,7 @@ BS_FIRMWARE_MODULES := \
     scmi_system_power \
     scmi_management \
     scmi_ccix_config \
-    n1sdp_flash \
+    fip \
     n1sdp_timer_sync \
     n1sdp_c2c \
     n1sdp_remote_pd \
@@ -78,7 +78,7 @@ BS_FIRMWARE_SOURCES := \
     config_pik_clock.c \
     config_css_clock.c \
     config_clock.c \
-    config_n1sdp_flash.c \
+    config_fip.c \
     config_n1sdp_pcie.c \
     config_n1sdp_scp2pcc.c \
     config_sensor.c \

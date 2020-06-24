@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <mod_n1sdp_flash.h>
+#include <mod_fip.h>
 #include <mod_n1sdp_rom.h>
 
 #include <fwk_event.h>
@@ -30,8 +30,8 @@ struct mod_n1sdp_rom_ctx {
     /* ROM configuration structure */
     const struct n1sdp_rom_config *rom_config;
 
-    /* Pointer to n1sdp_flash API */
-    struct mod_n1sdp_flash_api *flash_api;
+    /* Pointer to FIP API */
+    struct mod_fip_api *fip_api;
 };
 
 enum rom_event {
@@ -86,9 +86,10 @@ static int n1sdp_rom_bind(fwk_id_t id, unsigned int round)
     /* Use second round only (round numbering is zero-indexed) */
     if (round == 1) {
         /* Bind to the n1sdp_flash component */
-        status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_FLASH),
-                                 FWK_ID_API(FWK_MODULE_IDX_N1SDP_FLASH, 0),
-                                 &n1sdp_rom_ctx.flash_api);
+        status = fwk_module_bind(
+            FWK_ID_MODULE(FWK_MODULE_IDX_FIP),
+            FWK_ID_API(FWK_MODULE_IDX_FIP, 0),
+            &n1sdp_rom_ctx.fip_api);
         if (status != FWK_SUCCESS)
             return FWK_E_PANIC;
     }
@@ -107,12 +108,11 @@ static int n1sdp_rom_start(fwk_id_t id)
     return fwk_thread_put_event(&event);
 }
 
-static const char * get_image_type_str(
-    const struct mod_n1sdp_flash_entry_id * const id)
+static const char *get_image_type_str(enum mod_fip_toc_entry_type type)
 {
-    if (id == &mod_n1sdp_flash_entry_mcp_bl2)
+    if (type == MOD_FIP_TOC_ENTRY_MCP_BL2)
         return "MCP";
-    if (id == &mod_n1sdp_flash_entry_scp_bl2)
+    if (type == MOD_FIP_TOC_ENTRY_SCP_BL2)
         return "SCP";
     return "???";
 }
@@ -120,31 +120,30 @@ static const char * get_image_type_str(
 static int n1sdp_rom_process_event(const struct fwk_event *event,
     struct fwk_event *resp)
 {
-    struct mod_n1sdp_flash_entry entry;
-    int status = n1sdp_rom_ctx.flash_api->get_entry(
-        n1sdp_rom_ctx.rom_config->image_type,
-         &entry);
+    struct mod_fip_entry_data entry;
+    int status = n1sdp_rom_ctx.fip_api->get_entry(
+        n1sdp_rom_ctx.rom_config->image_type, &entry);
+    const char *image_type =
+        get_image_type_str(n1sdp_rom_ctx.rom_config->image_type);
+
     if (status != FWK_SUCCESS) {
-        FWK_LOG_INFO("[ROM] Failed to locate %s_BL2, error: %d\n",
-            get_image_type_str(n1sdp_rom_ctx.rom_config->image_type),
-            status);
+        FWK_LOG_INFO(
+            "[ROM] Failed to locate %s_BL2, error: %d\n", image_type, status);
         return status;
     }
 
-    FWK_LOG_INFO("[ROM] Located %s_BL2:\n",
-        get_image_type_str(n1sdp_rom_ctx.rom_config->image_type));
-    FWK_LOG_INFO("[ROM]   address: %p\n", entry.p);
+    FWK_LOG_INFO("[ROM] Located %s_BL2:\n", image_type);
+    FWK_LOG_INFO("[ROM]   address: %p\n", entry.base);
     FWK_LOG_INFO("[ROM]   size   : %u\n", entry.size);
     FWK_LOG_INFO("[ROM]   flags  : 0x%08" PRIX32 "%08" PRIX32"\n",
         (uint32_t)(entry.flags >> 32),  (uint32_t)entry.flags);
-    FWK_LOG_INFO("[ROM] Copying %s_BL2 to ITCRAM...!\n",
-        get_image_type_str(n1sdp_rom_ctx.rom_config->image_type));
+    FWK_LOG_INFO("[ROM] Copying %s_BL2 to ITCRAM...!\n", image_type);
 
-    memcpy((void *)n1sdp_rom_ctx.rom_config->ramfw_base, entry.p, entry.size);
+    memcpy(
+        (void *)n1sdp_rom_ctx.rom_config->ramfw_base, entry.base, entry.size);
     FWK_LOG_INFO("[ROM] Done!");
 
-    FWK_LOG_INFO("[ROM] Jumping to %s_BL2\n",
-        get_image_type_str(n1sdp_rom_ctx.rom_config->image_type));
+    FWK_LOG_INFO("[ROM] Jumping to %s_BL2\n", image_type);
 
     jump_to_ramfw();
     return FWK_SUCCESS;

@@ -21,9 +21,9 @@
 #include <internal/n1sdp_scp2pcc.h>
 
 #include <mod_clock.h>
+#include <mod_fip.h>
 #include <mod_n1sdp_c2c_i2c.h>
 #include <mod_n1sdp_dmc620.h>
-#include <mod_n1sdp_flash.h>
 #include <mod_n1sdp_scp2pcc.h>
 #include <mod_n1sdp_system.h>
 #include <mod_power_domain.h>
@@ -128,8 +128,8 @@ struct n1sdp_system_ctx {
     /* Power domain module restricted API pointer */
     struct mod_pd_restricted_api *mod_pd_restricted_api;
 
-    /* Pointer to N1SDP Flash APIs */
-    const struct mod_n1sdp_flash_api *flash_api;
+    /* Pointer to FIP APIs */
+    const struct mod_fip_api *fip_api;
 
     /* Pointer to DMC620 memory information API */
     const struct mod_dmc620_mem_info_api *dmc620_api;
@@ -401,10 +401,9 @@ static int n1sdp_system_init_primary_core(void)
     }
 
     if (n1sdp_get_chipid() == 0x0) {
-        struct mod_n1sdp_flash_entry entry;
-        status = n1sdp_system_ctx.flash_api->get_entry(
-            &mod_n1sdp_flash_entry_tf_bl31,
-            &entry);
+        struct mod_fip_entry_data entry;
+        status = n1sdp_system_ctx.fip_api->get_entry(
+            MOD_FIP_TOC_ENTRY_TFA_BL31, &entry);
         if (status != FWK_SUCCESS) {
             FWK_LOG_INFO(
                 "[N1SDP SYSTEM] Failed to locate AP TF_BL31, error: %d\n",
@@ -413,7 +412,7 @@ static int n1sdp_system_init_primary_core(void)
         }
 
         FWK_LOG_INFO("[N1SDP SYSTEM] Located AP TF_BL31:\n");
-        FWK_LOG_INFO("[N1SDP SYSTEM]   address: %p\n", entry.p);
+        FWK_LOG_INFO("[N1SDP SYSTEM]   address: %p\n", entry.base);
         FWK_LOG_INFO("[N1SDP SYSTEM]   size   : %u\n", entry.size);
         FWK_LOG_INFO("[N1SDP SYSTEM]   flags  : 0x%08" PRIX32 "%08" PRIX32"\n",
             (uint32_t)(entry.flags >> 32),  (uint32_t)entry.flags);
@@ -421,8 +420,8 @@ static int n1sdp_system_init_primary_core(void)
             "[N1SDP SYSTEM] Copying AP TF_BL31 to address 0x%"PRIx32"...\n",
             AP_CORE_RESET_ADDR);
 
-        status = n1sdp_system_copy_to_ap_sram(AP_CORE_RESET_ADDR,
-            entry.p, entry.size);
+        status = n1sdp_system_copy_to_ap_sram(
+            AP_CORE_RESET_ADDR, entry.base, entry.size);
         if (status != FWK_SUCCESS)
             return FWK_E_PANIC;
 
@@ -507,9 +506,10 @@ static int n1sdp_system_bind(fwk_id_t id, unsigned int round)
     if (round > 0)
         return FWK_SUCCESS;
 
-    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_FLASH),
-         FWK_ID_API(FWK_MODULE_IDX_N1SDP_FLASH, 0),
-         &n1sdp_system_ctx.flash_api);
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_FIP),
+        FWK_ID_API(FWK_MODULE_IDX_FIP, 0),
+        &n1sdp_system_ctx.fip_api);
     if (status != FWK_SUCCESS)
         return status;
 
