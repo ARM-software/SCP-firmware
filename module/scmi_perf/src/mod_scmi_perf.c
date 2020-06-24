@@ -219,8 +219,8 @@ static int scmi_perf_protocol_message_attributes_handler(fwk_id_t service_id,
 
     return_values.attributes = 0;
 #ifdef BUILD_HAS_FAST_CHANNELS
-    if ((parameters->message_id <= SCMI_PERF_LEVEL_GET) &&
-        (parameters->message_id >= SCMI_PERF_LIMITS_SET))
+    if ((parameters->message_id <= MOD_SCMI_PERF_LEVEL_GET) &&
+        (parameters->message_id >= MOD_SCMI_PERF_LIMITS_SET))
         return_values.attributes = 1; /* Fast Channel available */
 #endif
 
