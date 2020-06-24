@@ -16,6 +16,7 @@
 #include <fwk_module.h>
 #include <fwk_status.h>
 
+#include <inttypes.h>
 #include <string.h>
 
 /*
@@ -146,7 +147,8 @@ static int fip_init(
          * early stages, such as in ROM code.
          */
         FWK_LOG_ERR(
-            "[FIP] Invalid FIP ToC header name: [0x%lx]", toc->header.name);
+            "[FIP] Invalid FIP ToC header name: [0x%08" PRIX32 "]",
+            toc->header.name);
         return FWK_E_INIT;
     }
 
