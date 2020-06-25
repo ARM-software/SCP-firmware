@@ -688,7 +688,7 @@ static int initiate_power_state_transition(struct pd_ctx *pd)
 
     if ((pd->driver_api->deny != NULL) &&
         pd->driver_api->deny(pd->driver_id, state)) {
-        FWK_LOG_WARN(
+        FWK_LOG_TRACE(
             "[PD] Transition of %s to state <%s> denied by driver",
             fwk_module_get_name(pd->id),
             get_state_name(pd, state));
