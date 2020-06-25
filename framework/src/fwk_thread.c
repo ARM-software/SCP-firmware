@@ -291,22 +291,28 @@ int fwk_thread_put_event(struct fwk_event *event)
     else if (!fwk_module_is_valid_entity_id(event->source_id))
         goto error;
 
-    if (!fwk_module_is_valid_entity_id(event->target_id) ||
-        !fwk_module_is_valid_event_id(event->id))
-        goto error;
-
-    if (event->is_response) {
-        if (fwk_id_get_module_idx(event->source_id) !=
-            fwk_id_get_module_idx(event->id))
+    if (event->is_notification) {
+        if (!fwk_module_is_valid_notification_id(event->id))
             goto error;
-        if (event->response_requested)
+        if ((!event->is_response) || (event->response_requested))
             goto error;
-    } else {
         if (fwk_id_get_module_idx(event->target_id) !=
             fwk_id_get_module_idx(event->id))
              goto error;
-        if (event->is_notification)
+    } else {
+        if (!fwk_module_is_valid_event_id(event->id))
             goto error;
+        if (event->is_response) {
+            if (fwk_id_get_module_idx(event->source_id) !=
+                fwk_id_get_module_idx(event->id))
+                goto error;
+            if (event->response_requested)
+                goto error;
+        } else {
+            if (fwk_id_get_module_idx(event->target_id) !=
+                fwk_id_get_module_idx(event->id))
+                goto error;
+        }
     }
 
     return put_event(event);
