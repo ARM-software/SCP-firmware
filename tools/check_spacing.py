@@ -41,6 +41,7 @@ EXCLUDE = [
     '*.md',
     '*.swp',
     '*.a',
+    '*.pdf',
 ]
 
 KEYWORDS = [
