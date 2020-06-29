@@ -42,6 +42,7 @@ EXCLUDE = [
     '.gitmodules',
     '*.svg',
     '*.a',
+    '*.pdf',
 ]
 
 
