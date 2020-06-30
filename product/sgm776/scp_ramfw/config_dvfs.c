@@ -9,6 +9,7 @@
 
 #include <mod_dvfs.h>
 #include <mod_sid.h>
+#include <mod_scmi_perf.h>
 
 #include <fwk_assert.h>
 #include <fwk_element.h>
@@ -21,7 +22,9 @@
 static const struct mod_dvfs_domain_config cpu_group_little = {
     .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, 0),
     .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, 1),
-    .notification_id = FWK_ID_NONE_INIT,
+    .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
+    .notification_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SCMI_PERF,
+        MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
     .latency = 1200,
     .sustained_idx = 2,
     .opps = (struct mod_dvfs_opp[]) {
@@ -52,7 +55,9 @@ static const struct mod_dvfs_domain_config cpu_group_little = {
 static const struct mod_dvfs_domain_config cpu_group_big = {
     .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, 1),
     .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, 0),
-    .notification_id = FWK_ID_NONE_INIT,
+    .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
+    .notification_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SCMI_PERF,
+        MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
     .latency = 1200,
     .sustained_idx = 2,
     .opps = (struct mod_dvfs_opp[]) {
@@ -83,7 +88,9 @@ static const struct mod_dvfs_domain_config cpu_group_big = {
 static const struct mod_dvfs_domain_config gpu = {
     .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, 2),
     .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, 2),
-    .notification_id = FWK_ID_NONE_INIT,
+    .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
+    .notification_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SCMI_PERF,
+        MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
     .latency = 1200,
     .sustained_idx = 4,
     .opps = (struct mod_dvfs_opp[]) {
