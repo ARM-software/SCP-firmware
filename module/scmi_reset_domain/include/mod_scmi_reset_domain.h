@@ -12,6 +12,7 @@
 #define MOD_SCMI_RESET_DOMAIN_H
 
 #include <fwk_id.h>
+#include <mod_reset_domain.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -107,6 +108,67 @@ enum scmi_reset_domain_api_idx {
     MOD_SCMI_RESET_DOMAIN_API_COUNT
 };
 
+/*!
+ * \defgroup GroupScmiResetDomainPolicyHandler Policy Handler
+ *
+ * \brief SCMI Reset Domain Policy Handler.
+ *
+ * \details The SCMI policy handlers are weak definitions to allow a platform
+ *      to implement a policy appropriate to that platform. The SCMI
+ *      reset domain policy functions may be overridden in the
+ *      `product/<platform>/src` directory.
+ *
+ * \note The `mode`/`reset_state` values may be changed by the policy handler.
+ * \note See `product/juno/src/juno_scmi_clock.c` for an example policy
+ *      handler.
+ *
+ * \{
+ */
+
+/*!
+ * \brief Policy handler policies.
+ *
+ * \details These values are returned to the message handler by the policy
+ *      handlers to determine whether the message handler should continue
+ *      processing the message, or whether the request has been rejected.
+ */
+enum mod_scmi_reset_domain_policy_status {
+    /*! Do not execute the message handler */
+    MOD_SCMI_RESET_DOMAIN_SKIP_MESSAGE_HANDLER,
+
+    /*! Execute the message handler */
+    MOD_SCMI_RESET_DOMAIN_EXECUTE_MESSAGE_HANDLER,
+};
+
+/*!
+ *
+ * \brief SCMI Reset Domain Reset Request command policy.
+ *
+ * \details This function determines whether the SCMI message handler should
+ *      allow or reject the SCMI Reset Domain reset_request command.
+ *
+ *      The SCMI policy handler is executed before the message handler is
+ *      called. The SCMI protocol message handler will only continue if the
+ *      policy handler both returns ::FWK_SUCCESS and sets the policy status to
+ *      ::MOD_SCMI_RESET_DOMAIN_EXECUTE_MESSAGE_HANDLER.
+ *
+ * \param[out] policy_status Whether the command should be accepted or not.
+ * \param[in, out] mode Reset domain mode.
+ * \param[in, out] reset_state Reset domain state as defined in SCMIv2
+ *      specification.
+ * \param[in] agent_id Identifier of the agent requesting the service.
+ * \param[in] domain_id Identifier of the reset domain.
+ *
+ * \retval ::FWK_SUCCESS The operation succeeded.
+ *
+ * \return Status code representing the result of the operation.
+ */
+int scmi_reset_domain_reset_request_policy(
+        enum mod_scmi_reset_domain_policy_status *policy_status,
+        enum mod_reset_domain_mode *mode,
+        uint32_t *reset_state,
+        uint32_t agent_id,
+        uint32_t domain_id);
 /*!
  * \}
  */
