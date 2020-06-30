@@ -218,6 +218,22 @@ static int get_reset_device(fwk_id_t service_id,
     return FWK_SUCCESS;
 }
 
+/*
+ * Reset Request Policy Handler
+ */
+__attribute__((weak)) int scmi_reset_domain_reset_request_policy(
+    enum mod_scmi_reset_domain_policy_status *policy_status,
+    enum mod_reset_domain_mode *mode,
+    uint32_t *reset_state,
+    uint32_t agent_id,
+    uint32_t domain_id)
+{
+    *policy_status = MOD_SCMI_RESET_DOMAIN_EXECUTE_MESSAGE_HANDLER;
+
+    return FWK_SUCCESS;
+}
+
+
 static int reset_attributes_handler(fwk_id_t service_id,
                                     const uint32_t *payload)
 {
@@ -277,6 +293,8 @@ static int reset_request_handler(fwk_id_t service_id,
     size_t outmsg_size = sizeof(outmsg.status);
     const struct mod_reset_domain_api *reset_api = scmi_rd_ctx.reset_api;
     const struct mod_scmi_reset_domain_device *reset_device = NULL;
+    enum mod_scmi_reset_domain_policy_status policy_status;
+    uint32_t reset_state;
 
     params = *(const struct scmi_reset_domain_request_a2p *)payload;
 
@@ -343,10 +361,23 @@ static int reset_request_handler(fwk_id_t service_id,
         }
     }
 
+    reset_state = params.reset_state;
+    status = scmi_reset_domain_reset_request_policy(&policy_status,
+        &mode, &reset_state, agent_id, params.domain_id);
+
+    if (status != FWK_SUCCESS) {
+        outmsg.status = SCMI_GENERIC_ERROR;
+        goto exit;
+    }
+    if (policy_status == MOD_SCMI_RESET_DOMAIN_SKIP_MESSAGE_HANDLER) {
+        outmsg.status = SCMI_SUCCESS;
+        goto exit;
+    }
+
     outmsg.status = SCMI_NOT_SUPPORTED;
     status = reset_api->set_reset_state(reset_device->element_id,
                                         mode,
-                                        params.reset_state,
+                                        reset_state,
                                         (uintptr_t)agent_id);
     if (status != FWK_SUCCESS) {
         if (status == FWK_E_STATE)
