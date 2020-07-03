@@ -249,6 +249,24 @@ enum mod_res_sensor_permissions_idx {
 };
 
 /*!
+ * \brief SCMI Reset Domain Management Protocol Message index offset
+ */
+#define MOD_RES_PERMS_RESET_DOMAIN_PERMS_OFFSET MOD_SCMI_RESET_DOMAIN_ATTRIBUTES
+
+/*!
+ * \brief SCMI Reset Domain Management Protocol Message Indices
+ */
+enum mod_res_reset_domain_permissions_idx {
+    MOD_RES_PERMS_SCMI_RESET_DOMAIN_ATTRIBUTES_IDX =
+        MOD_SCMI_RESET_DOMAIN_ATTRIBUTES -
+        MOD_RES_PERMS_RESET_DOMAIN_PERMS_OFFSET,
+    MOD_RES_PERMS_SCMI_RESET_DOMAIN_RESET_REQUEST_IDX =
+        MOD_SCMI_RESET_REQUEST - MOD_RES_PERMS_RESET_DOMAIN_PERMS_OFFSET,
+    MOD_RES_PERMS_SCMI_RESET_DOMAIN_RESET_NOTIFY_IDX =
+        MOD_SCMI_RESET_NOTIFY - MOD_RES_PERMS_RESET_DOMAIN_PERMS_OFFSET,
+};
+
+/*!
  * \brief SCMI Agent Permissions
  *
  * \details An agent may have any combination of the permissions

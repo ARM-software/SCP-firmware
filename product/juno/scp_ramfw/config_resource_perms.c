@@ -11,6 +11,10 @@
 #include "juno_clock.h"
 #include "juno_scmi.h"
 
+#ifdef BUILD_HAS_SCMI_RESET
+#    include <mod_juno_reset_domain.h>
+#endif
+
 #include <mod_resource_perms.h>
 #include <mod_scmi_std.h>
 
@@ -274,6 +278,39 @@ static mod_res_perms_t
     };
 
 /*
+ * We are tracking 3 SCMI Reset Domain Protocol commands
+ *
+ * 0, MOD_SCMI_RESET_DOMAIN_ATTRIBUTES
+ * 1, MOD_SCMI_RESET_REQUEST
+ * 2, MOD_SCMI_RESET_NOTIFY
+ */
+#ifdef BUILD_HAS_SCMI_RESET
+
+#    define JUNO_RESET_DOMAIN_RESOURCE_CMDS 3
+#    define JUNO_RESET_DOMAIN_RESOURCE_ELEMENTS \
+        ((JUNO_RESET_DOMAIN_IDX_COUNT >> MOD_RES_PERMS_TYPE_SHIFT) + 1)
+static mod_res_perms_t
+    scmi_reset_domain_perms[] [JUNO_RESET_DOMAIN_RESOURCE_CMDS]
+        [JUNO_RESET_DOMAIN_RESOURCE_ELEMENTS] = {
+     /* SCMI_PROTOCOL_ID_RESET_DOMAIN */
+     /* 0, MOD_SCMI_RESET_DOMAIN_ATTRIBUTES */
+     /* 1, MOD_SCMI_RESET_REQUEST */
+     /* 2, MOD_SCMI_RESET_NOTIFY */
+     [AGENT_IDX(JUNO_SCMI_AGENT_IDX_OSPM)] = {
+         [MOD_RES_PERMS_SCMI_RESET_DOMAIN_ATTRIBUTES_IDX][0] = 0x0,
+         [MOD_RES_PERMS_SCMI_RESET_DOMAIN_RESET_REQUEST_IDX][0] = 0x0,
+         [MOD_RES_PERMS_SCMI_RESET_DOMAIN_RESET_NOTIFY_IDX][0] = 0x0,
+     },
+     [AGENT_IDX(JUNO_SCMI_AGENT_IDX_PSCI)] = {
+         [MOD_RES_PERMS_SCMI_RESET_DOMAIN_ATTRIBUTES_IDX][0] = 0x0,
+         [MOD_RES_PERMS_SCMI_RESET_DOMAIN_RESET_REQUEST_IDX][0] = 0x0,
+         [MOD_RES_PERMS_SCMI_RESET_DOMAIN_RESET_NOTIFY_IDX][0] = 0x0,
+     },
+ };
+
+#endif
+
+/*
  * Juno Platform Permissions
  */
 static struct mod_res_agent_permission agent_permissions = {
@@ -283,6 +320,9 @@ static struct mod_res_agent_permission agent_permissions = {
     .scmi_pd_perms = &scmi_pd_perms[0][0][0],
     .scmi_perf_perms = &scmi_perf_perms[0][0][0],
     .scmi_sensor_perms = &scmi_sensor_perms[0][0][0],
+#ifdef BUILD_HAS_SCMI_RESET
+    .scmi_reset_domain_perms = &scmi_reset_domain_perms[0][0][0],
+#endif
 };
 
 struct fwk_module_config config_resource_perms = {
@@ -295,5 +335,8 @@ struct fwk_module_config config_resource_perms = {
             .sensor_count = MOD_JUNO_R0_SENSOR_IDX_COUNT,
             .pd_count = POWER_DOMAIN_IDX_COUNT,
             .perf_count = DVFS_ELEMENT_IDX_COUNT,
+#ifdef BUILD_HAS_SCMI_RESET
+            .reset_domain_count = JUNO_RESET_DOMAIN_IDX_COUNT,
+#endif
         },
 };
