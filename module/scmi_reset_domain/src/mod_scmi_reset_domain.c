@@ -17,6 +17,9 @@
 #include <fwk_status.h>
 #include <internal/scmi_reset_domain.h>
 #include <mod_reset_domain.h>
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#    include <mod_resource_perms.h>
+#endif
 #include <mod_scmi.h>
 #include <mod_scmi_reset_domain.h>
 #include <string.h>
@@ -45,6 +48,11 @@ struct scmi_rd_ctx {
     /* Agent notifications table */
     struct agent_notifications **agent_notifications;
     fwk_id_t notification_id;
+#endif
+
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    /* SCMI Resource Permissions API */
+    const struct mod_res_permissions_api *res_perms_api;
 #endif
 };
 
@@ -465,6 +473,48 @@ static void scmi_reset_issued_notify(uint32_t domain_id,
     }
 }
 #endif
+
+/*
+ * SCMI Resource Permissions handler
+ */
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+static unsigned int get_reset_domain_id(const uint32_t *payload)
+{
+    struct scmi_reset_domain_request_a2p *params;
+
+    params = (struct scmi_reset_domain_request_a2p *)payload;
+    return params->domain_id;
+}
+
+static int scmi_reset_domain_permissions_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload,
+    size_t payload_size,
+    unsigned int message_id)
+{
+    enum mod_res_perms_permissions perms;
+    unsigned int agent_id, domain_id;
+    int status;
+
+    status = scmi_rd_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+    if (status != FWK_SUCCESS)
+        return FWK_E_ACCESS;
+
+    if (message_id < 3)
+        return FWK_SUCCESS;
+
+    domain_id = get_reset_domain_id(payload);
+
+    perms = scmi_rd_ctx.res_perms_api->agent_has_resource_permission(
+        agent_id, MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN, message_id, domain_id);
+
+    if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
+        return FWK_SUCCESS;
+    else
+        return FWK_E_ACCESS;
+}
+#endif
+
 /*
  * SCMI module -> SCMI reset module interface
  */
@@ -499,6 +549,14 @@ static int scmi_reset_message_handler(fwk_id_t protocol_id,
         return_value = SCMI_PROTOCOL_ERROR;
         goto error;
     }
+
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    if (scmi_reset_domain_permissions_handler(
+            service_id, payload, payload_size, message_id) != FWK_SUCCESS) {
+        return_value = SCMI_DENIED;
+        goto error;
+    }
+#endif
 
     return msg_handler_table[message_id](service_id, payload);
 
@@ -582,6 +640,15 @@ static int scmi_reset_bind(fwk_id_t id, unsigned int round)
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     status = scmi_reset_init_notifications(scmi_rd_ctx.plat_reset_domain_count);
+    if (status != FWK_SUCCESS)
+        return status;
+#endif
+
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
+        FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS, MOD_RES_PERM_RESOURCE_PERMS),
+        &scmi_rd_ctx.res_perms_api);
     if (status != FWK_SUCCESS)
         return status;
 #endif
