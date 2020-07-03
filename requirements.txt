@@ -1,1 +1,2 @@
+clang-format==9.0.0
 pycodestyle==2.6.0
