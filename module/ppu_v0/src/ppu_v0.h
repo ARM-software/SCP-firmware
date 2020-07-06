@@ -13,6 +13,8 @@
  * @{
  */
 
+#include <mod_timer.h>
+
 #include <fwk_macros.h>
 
 #include <stdbool.h>
@@ -130,11 +132,23 @@ enum ppu_v0_mode {
 #define PPU_V0_ARCHITECTURE_ID UINT32_C(0x00000000)
 
 /*
+ * Timer context to be passed to set_power_mode function.
+ */
+struct ppu_v0_timer_ctx {
+    fwk_id_t timer_id;
+    struct mod_timer_api *timer_api;
+    uint32_t delay_us;
+};
+
+/*
  * Interface
  */
 void ppu_v0_init(struct ppu_v0_reg *ppu);
 int ppu_v0_request_power_mode(struct ppu_v0_reg *ppu, enum ppu_v0_mode mode);
-int ppu_v0_set_power_mode(struct ppu_v0_reg *ppu, enum ppu_v0_mode mode);
+int ppu_v0_set_power_mode(
+    struct ppu_v0_reg *ppu,
+    enum ppu_v0_mode mode,
+    struct ppu_v0_timer_ctx *timer_ctx);
 int ppu_v0_get_power_mode(struct ppu_v0_reg *ppu, enum ppu_v0_mode *mode);
 
 /*!
