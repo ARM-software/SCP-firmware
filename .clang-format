@@ -25,6 +25,7 @@ ContinuationIndentWidth: '4'
 Cpp11BracedListStyle: 'false'
 DerivePointerAlignment: 'false'
 DisableFormat: 'false'
+IncludeBlocks: 'Regroup'
 IncludeCategories:
 - Regex: '^<internal/(.+)\.h>$'
   Priority: -2
@@ -34,10 +35,12 @@ IncludeCategories:
   Priority: 0
 - Regex: '^<fwk_(.+)\.h>$'
   Priority: 1
-- Regex: '^<fmw_(.+)\.h>$'
+- Regex: '^<arch_(.+)\.h>$'
   Priority: 2
-- Regex: '^<((std.+)|assert|complex|ctype|errno|fenv|float|inttypes|iso646|limits|locale|math|setjmp|signal|string|tgmath|threads|time|uchar|wchar|wctype)\.h>$'
+- Regex: '^<fmw_(.+)\.h>$'
   Priority: 3
+- Regex: '^<((std.+)|assert|complex|ctype|errno|fenv|float|inttypes|iso646|limits|locale|math|setjmp|signal|string|tgmath|threads|time|uchar|wchar|wctype|malloc|(sys/.+))\.h>$'
+  Priority: 4
 - Regex: '^".+"$'
   Priority: -4
 - Regex: '^<.+>$'
