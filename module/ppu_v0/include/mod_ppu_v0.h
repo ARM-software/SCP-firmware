@@ -38,6 +38,28 @@ struct mod_ppu_v0 {
 };
 
 /*!
+ * \brief Timer for set_state.
+ *
+ * \details This structure is required to be filled in PPUv0 config file only
+ *          when the timeout feature is required.
+ */
+struct mod_ppu_v0_timer_config {
+    /*!
+     * \brief Timer identifier.
+     *
+     * \details Used for binding with the timer API and waiting for specified
+     *          delay after setting the PPU state.
+     */
+    fwk_id_t timer_id;
+
+    /*!
+     * PPU state change wait delay in micro seconds.
+     * A valid non-zero value has to be specified when using this feature.
+     */
+    uint32_t set_state_timeout_us;
+};
+
+/*!
  * \brief Configuration data of a power domain of the PPU_V0 driver module.
  */
 struct mod_ppu_v0_pd_config {
@@ -47,8 +69,12 @@ struct mod_ppu_v0_pd_config {
     /*! PPU descriptor */
     struct mod_ppu_v0 ppu;
 
+    /*! Timer descriptor */
+    struct mod_ppu_v0_timer_config *timer_config;
+
     /*!
      * Flag indicating if this domain should be powered on during element init.
+     * Timeout is not provided at this stage.
      */
     bool default_power_on;
 };

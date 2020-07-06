@@ -12,6 +12,23 @@
 
 #include <stddef.h>
 
+struct set_power_status_check_params_v0 {
+    enum ppu_v0_mode mode;
+    struct ppu_v0_reg *reg;
+};
+
+static bool ppu_v0_set_power_status_check(void *data)
+{
+    struct set_power_status_check_params_v0 *params;
+
+    fwk_assert(data != NULL);
+    params = (struct set_power_status_check_params_v0 *)data;
+
+    return (
+        (params->reg->POWER_STATUS &
+         (PPU_V0_PSR_POWSTAT | PPU_V0_PSR_DYNAMIC)) == params->mode);
+}
+
 void ppu_v0_init(struct ppu_v0_reg *ppu)
 {
     fwk_assert(ppu != NULL);
@@ -39,18 +56,31 @@ int ppu_v0_request_power_mode(struct ppu_v0_reg *ppu, enum ppu_v0_mode mode)
     return FWK_SUCCESS;
 }
 
-int ppu_v0_set_power_mode(struct ppu_v0_reg *ppu, enum ppu_v0_mode mode)
+int ppu_v0_set_power_mode(
+    struct ppu_v0_reg *ppu,
+    enum ppu_v0_mode mode,
+    struct ppu_v0_timer_ctx *timer_ctx)
 {
     int status;
     fwk_assert(ppu != NULL);
+    struct set_power_status_check_params_v0 params;
 
     status = ppu_v0_request_power_mode(ppu, mode);
     if (status != FWK_SUCCESS)
         return status;
-
-    while ((ppu->POWER_STATUS & (PPU_V0_PSR_POWSTAT | PPU_V0_PSR_DYNAMIC))
-           != mode)
-        continue;
+    if (timer_ctx == NULL) {
+        while ((ppu->POWER_STATUS &
+                (PPU_V0_PSR_POWSTAT | PPU_V0_PSR_DYNAMIC)) != mode)
+            continue;
+    } else {
+        params.mode = mode;
+        params.reg = ppu;
+        return timer_ctx->timer_api->wait(
+            timer_ctx->timer_id,
+            timer_ctx->delay_us,
+            ppu_v0_set_power_status_check,
+            &params);
+    }
 
     return FWK_SUCCESS;
 }
