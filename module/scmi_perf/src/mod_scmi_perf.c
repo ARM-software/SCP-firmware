@@ -804,7 +804,11 @@ static int scmi_perf_describe_fast_channels(fwk_id_t service_id,
 
     domain = &(*scmi_perf_ctx.config->domains)[parameters->domain_id];
 
-    fwk_assert(domain->fast_channels_addr_scp != 0x0);
+    if (domain->fast_channels_addr_scp == 0x0) {
+        return_values.status = SCMI_NOT_SUPPORTED;
+
+        goto exit;
+    }
 
     switch (parameters->message_id) {
     case MOD_SCMI_PERF_LEVEL_GET:
