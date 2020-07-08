@@ -85,9 +85,7 @@ If a dual-region memory configuration is used then *FMW_MEM1_BASE* and
 It is the responsibility of the firmware to define - in its Makefile - the
 architecture target for the image (using *BS_FIRMWARE_CPU*) and whether the
 firmware is multithreading-enabled (using *BS_FIRMWARE_HAS_MULTITHREADING*)
-and/or has notification support (using *BS_FIRMWARE_HAS_NOTIFICATION*). The
-firmware can optionally define the count of notification subscriptions
-(using *BS_FIRMWARE_NOTIFICATION_COUNT*) to be supported.
+and/or has notification support (using *BS_FIRMWARE_HAS_NOTIFICATION*).
 
 An example of a simple firmware directory which contains configuration files for
 two modules, the firmware.mk file, and the linker script.
