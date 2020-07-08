@@ -715,6 +715,14 @@ static int scmi_perf_limits_notify(fwk_id_t service_id,
         goto exit;
     }
 
+    if ((parameters->notify_enable &
+         ~SCMI_PERF_NOTIFY_LIMITS_NOTIFY_ENABLE_MASK) != 0x0) {
+        status = FWK_SUCCESS;
+        return_values.status = SCMI_INVALID_PARAMETERS;
+
+        goto exit;
+    }
+
     status = scmi_perf_ctx.scmi_api->get_agent_id(service_id, &agent_id);
     if (status != FWK_SUCCESS)
         goto exit;
@@ -752,6 +760,14 @@ static int scmi_perf_level_notify(fwk_id_t service_id,
     if (id >= scmi_perf_ctx.domain_count) {
         status = FWK_SUCCESS;
         return_values.status = SCMI_NOT_FOUND;
+
+        goto exit;
+    }
+
+    if ((parameters->notify_enable &
+         ~SCMI_PERF_NOTIFY_LEVEL_NOTIFY_ENABLE_MASK) != 0x0) {
+        status = FWK_SUCCESS;
+        return_values.status = SCMI_INVALID_PARAMETERS;
 
         goto exit;
     }

@@ -230,6 +230,8 @@ struct __attribute((packed)) scmi_perf_level_get_p2a {
  * PERFORMANCE_NOTIFY_LIMITS
  */
 
+#define SCMI_PERF_NOTIFY_LIMITS_NOTIFY_ENABLE_MASK UINT32_C(0x1)
+
 struct __attribute((packed)) scmi_perf_notify_limits_a2p {
     uint32_t domain_id;
     uint32_t notify_enable;
@@ -242,6 +244,8 @@ struct __attribute((packed)) scmi_perf_notify_limits_p2a {
 /*
  * PERFORMANCE_NOTIFY_LEVEL
  */
+
+#define SCMI_PERF_NOTIFY_LEVEL_NOTIFY_ENABLE_MASK UINT32_C(0x1)
 
 struct __attribute((packed)) scmi_perf_notify_level_a2p {
     uint32_t domain_id;
