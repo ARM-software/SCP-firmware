@@ -288,7 +288,8 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
     notifications = true;
 #endif
 #ifdef BUILD_HAS_FAST_CHANNELS
-    fast_channels = true;
+    if (domain->fast_channels_addr_scp != 0x0)
+        fast_channels = true;
 #endif
     return_values = (struct scmi_perf_domain_attributes_p2a) {
         .status = SCMI_SUCCESS,
