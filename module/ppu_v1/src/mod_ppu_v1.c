@@ -54,6 +54,9 @@ struct ppu_v1_pd_ctx {
     /* Pointer to the power state observer API */
     const struct mod_ppu_v1_power_state_observer_api *observer_api;
 
+    /* Timer context */
+    struct ppu_v1_timer_ctx *timer_ctx;
+
     /* Context data specific to the type of power domain */
     void *data;
 };
@@ -137,14 +140,14 @@ static int ppu_v1_pd_set_state(fwk_id_t pd_id, unsigned int state)
 
     switch (state) {
     case MOD_PD_STATE_ON:
-        ppu_v1_set_power_mode(pd_ctx->ppu, PPU_V1_MODE_ON);
+        ppu_v1_set_power_mode(pd_ctx->ppu, PPU_V1_MODE_ON, pd_ctx->timer_ctx);
         status = pd_ctx->pd_driver_input_api->report_power_state_transition(
             pd_ctx->bound_id, MOD_PD_STATE_ON);
         fwk_assert(status == FWK_SUCCESS);
         break;
 
     case MOD_PD_STATE_OFF:
-        ppu_v1_set_power_mode(pd_ctx->ppu, PPU_V1_MODE_OFF);
+        ppu_v1_set_power_mode(pd_ctx->ppu, PPU_V1_MODE_OFF, pd_ctx->timer_ctx);
         status = pd_ctx->pd_driver_input_api->report_power_state_transition(
             pd_ctx->bound_id, MOD_PD_STATE_OFF);
         fwk_assert(status == FWK_SUCCESS);
@@ -175,9 +178,11 @@ static int ppu_v1_pd_reset(fwk_id_t pd_id)
     pd_ctx = ppu_v1_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
 
     /* Model does not support warm reset at the moment. Using OFF instead. */
-    status = ppu_v1_set_power_mode(pd_ctx->ppu, PPU_V1_MODE_OFF);
+    status =
+        ppu_v1_set_power_mode(pd_ctx->ppu, PPU_V1_MODE_OFF, pd_ctx->timer_ctx);
     if (status == FWK_SUCCESS)
-        status = ppu_v1_set_power_mode(pd_ctx->ppu, PPU_V1_MODE_ON);
+        status = ppu_v1_set_power_mode(
+            pd_ctx->ppu, PPU_V1_MODE_ON, pd_ctx->timer_ctx);
 
     return status;
 }
@@ -233,7 +238,7 @@ static int ppu_v1_core_pd_set_state(fwk_id_t core_pd_id, unsigned int state)
                                           PPU_V1_MODE_ON,
                                           PPU_V1_EDGE_SENSITIVITY_MASKED);
         ppu_v1_interrupt_mask(ppu, PPU_V1_IMR_DYN_POLICY_MIN_IRQ_MASK);
-        ppu_v1_set_power_mode(ppu, PPU_V1_MODE_OFF);
+        ppu_v1_set_power_mode(ppu, PPU_V1_MODE_OFF, pd_ctx->timer_ctx);
         ppu_v1_lock_off_disable(ppu);
         ppu_v1_off_unlock(ppu);
         status = pd_ctx->pd_driver_input_api->report_power_state_transition(
@@ -246,7 +251,7 @@ static int ppu_v1_core_pd_set_state(fwk_id_t core_pd_id, unsigned int state)
         ppu_v1_set_input_edge_sensitivity(ppu,
                                           PPU_V1_MODE_ON,
                                           PPU_V1_EDGE_SENSITIVITY_MASKED);
-        ppu_v1_set_power_mode(ppu, PPU_V1_MODE_ON);
+        ppu_v1_set_power_mode(ppu, PPU_V1_MODE_ON, pd_ctx->timer_ctx);
         ppu_v1_dynamic_enable(ppu, PPU_V1_MODE_OFF);
         status = pd_ctx->pd_driver_input_api->report_power_state_transition(
             pd_ctx->bound_id, MOD_PD_STATE_ON);
@@ -434,7 +439,7 @@ static bool cluster_off(struct ppu_v1_pd_ctx *pd_ctx)
         return false;
     }
 
-    ppu_v1_set_power_mode(ppu, PPU_V1_MODE_OFF);
+    ppu_v1_set_power_mode(ppu, PPU_V1_MODE_OFF, pd_ctx->timer_ctx);
     return true;
 }
 
@@ -451,7 +456,7 @@ static void cluster_on(struct ppu_v1_pd_ctx *pd_ctx)
                                       PPU_V1_MODE_ON,
                                       PPU_V1_EDGE_SENSITIVITY_MASKED);
 
-    ppu_v1_set_power_mode(ppu, PPU_V1_MODE_ON);
+    ppu_v1_set_power_mode(ppu, PPU_V1_MODE_ON, pd_ctx->timer_ctx);
     status = pd_ctx->pd_driver_input_api->report_power_state_transition(
         pd_ctx->bound_id, MOD_PD_STATE_ON);
     fwk_assert(status == FWK_SUCCESS);
@@ -632,7 +637,8 @@ static int ppu_power_mode_on(fwk_id_t pd_id)
 
     pd_ctx = ppu_v1_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
 
-    return ppu_v1_set_power_mode(pd_ctx->ppu, PPU_V1_MODE_ON);
+    return ppu_v1_set_power_mode(
+        pd_ctx->ppu, PPU_V1_MODE_ON, pd_ctx->timer_ctx);
 }
 
 static const struct ppu_v1_boot_api boot_api = {
@@ -676,7 +682,24 @@ static int ppu_v1_pd_init(fwk_id_t pd_id, unsigned int unused, const void *data)
     if (config->pd_type == MOD_PD_TYPE_CLUSTER) {
         pd_ctx->data = fwk_mm_calloc(1, sizeof(struct ppu_v1_cluster_pd_ctx));
     }
-
+#if BUILD_HAS_MOD_TIMER
+    if (config->timer_config == NULL) {
+        pd_ctx->timer_ctx = NULL;
+    } else {
+        pd_ctx->timer_ctx = fwk_mm_calloc(1, sizeof(struct ppu_v1_timer_ctx));
+        if (pd_ctx->timer_ctx == NULL)
+            return FWK_E_NOMEM;
+        /* Check for valid timeout value if timer ID is specified */
+        if (config->timer_config->set_state_timeout_us == 0)
+            return FWK_E_PARAM;
+        /* Save the timer ID to pd context */
+        pd_ctx->timer_ctx->timer_id = config->timer_config->timer_id;
+        pd_ctx->timer_ctx->delay_us =
+            config->timer_config->set_state_timeout_us;
+    }
+#else
+    pd_ctx->timer_ctx = NULL;
+#endif
     if (config->default_power_on) {
         switch (config->pd_type) {
         case MOD_PD_TYPE_DEVICE:
@@ -685,14 +708,13 @@ static int ppu_v1_pd_init(fwk_id_t pd_id, unsigned int unused, const void *data)
             /* Fall through */
         case MOD_PD_TYPE_SYSTEM:
             ppu_v1_init(pd_ctx->ppu);
-            return ppu_v1_set_power_mode(pd_ctx->ppu, PPU_V1_MODE_ON);
+            return ppu_v1_set_power_mode(pd_ctx->ppu, PPU_V1_MODE_ON, NULL);
 
         default:
             fwk_unexpected();
             return FWK_E_SUPPORT;
         }
     }
-
     return FWK_SUCCESS;
 }
 
@@ -745,6 +767,19 @@ static int ppu_v1_bind(fwk_id_t id, unsigned int round)
         return FWK_SUCCESS;
 
     pd_ctx = ppu_v1_ctx.pd_ctx_table + fwk_id_get_element_idx(id);
+
+#if BUILD_HAS_MOD_TIMER
+    if (pd_ctx->timer_ctx != NULL &&
+        !fwk_id_is_equal(pd_ctx->timer_ctx->timer_id, FWK_ID_NONE)) {
+        /* Bind to the timer */
+        status = fwk_module_bind(
+            pd_ctx->timer_ctx->timer_id,
+            MOD_TIMER_API_ID_TIMER,
+            &pd_ctx->timer_ctx->timer_api);
+        if (status != FWK_SUCCESS)
+            return status;
+    }
+#endif
 
     if (!fwk_id_is_equal(pd_ctx->config->observer_id, FWK_ID_NONE)) {
         if (pd_ctx->config->pd_type != MOD_PD_TYPE_CLUSTER) {

@@ -53,6 +53,27 @@ struct mod_ppu_v1 {
     /*! PPU's IRQ number */
     unsigned int irq;
 };
+/*!
+ * \brief Timer for set_state.
+ *
+ * \details This structure is required to be filled in PPUv1 config file only
+ *          when the timeout feature is required.
+ */
+struct mod_ppu_v1_timer_config {
+    /*!
+     * \brief Timer identifier.
+     *
+     * \details Used for binding with the timer API and waiting for specified
+     *          delay after setting the PPU state.
+     */
+    fwk_id_t timer_id;
+
+    /*!
+     * PPU state change wait delay in micro seconds.
+     * A valid non-zero value has to be specified when using this feature.
+     */
+    uint32_t set_state_timeout_us;
+};
 
 /*!
  * \brief PPU_V1 module configuration
@@ -88,7 +109,7 @@ struct mod_ppu_v1_pd_config {
     /*!
      * Flag indicating if this domain should be powered on during element
      * init. This flag is only supported for device and system PPUs and should
-     * not be set for any other type.
+     * not be set for any other type. Timeout is not provided at this stage.
      */
     bool default_power_on;
 
@@ -112,6 +133,9 @@ struct mod_ppu_v1_pd_config {
      *     \ref mod_ppu_v1_power_state_observer_api::post_ppu_on().
      */
     void *post_ppu_on_param;
+
+    /*! Timer descriptor */
+    struct mod_ppu_v1_timer_config *timer_config;
 };
 
 /*!
