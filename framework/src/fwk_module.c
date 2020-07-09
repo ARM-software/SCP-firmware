@@ -25,7 +25,12 @@
 
 #include <stdbool.h>
 
-#define EVENT_COUNT 64
+#if FMW_NOTIFICATION_MAX > 64
+#    define EVENT_COUNT FMW_NOTIFICATION_MAX
+#else
+#    define EVENT_COUNT 64
+#endif
+
 #define BIND_ROUND_MAX 1
 
 /* Pre-runtime phase stages */
