@@ -32,6 +32,8 @@ struct scmi_sys_power_ctx {
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     int agent_count;
     fwk_id_t *system_power_notifications;
+    fwk_id_t graceful_req_id;
+    bool *graceful_response;
 #endif
 
 #ifdef BUILD_HAS_RESOURCE_PERMISSIONS
@@ -138,15 +140,65 @@ static void scmi_sys_power_state_notify(fwk_id_t service_id,
     else
         return_values.flags = 1;
 
-    for (i = 0; i < MOD_SCMI_AGENT_ID_MAX; i++) {
+    for (i = 0; i < scmi_sys_power_ctx.agent_count; i++) {
         id =  scmi_sys_power_ctx.system_power_notifications[i];
-        if (fwk_id_is_equal(id, FWK_ID_NONE))
+        if (fwk_id_is_equal(id, FWK_ID_NONE) || fwk_id_is_equal(id, service_id))
             continue;
 
         scmi_sys_power_ctx.scmi_api->notify(id,
             MOD_SCMI_PROTOCOL_ID_SYS_POWER, SCMI_SYS_POWER_STATE_SET_NOTIFY,
             &return_values, sizeof(return_values));
     }
+}
+
+static bool all_agents_responded_to_graceful_request(void)
+{
+    int i;
+    fwk_id_t id;
+    enum scmi_agent_type agent_type;
+
+    for (i = 0; i < scmi_sys_power_ctx.agent_count; i++) {
+        id = scmi_sys_power_ctx.system_power_notifications[i];
+        scmi_sys_power_ctx.scmi_api->get_agent_type(i, &agent_type);
+        if (fwk_id_is_equal(id, FWK_ID_NONE) ||
+            (agent_type == SCMI_AGENT_TYPE_OSPM))
+            continue;
+        if (!scmi_sys_power_ctx.graceful_response[i])
+            return false;
+    }
+    return true;
+}
+static void reset_graceful_request(void)
+{
+    int i;
+
+    scmi_sys_power_ctx.graceful_req_id = FWK_ID_NONE;
+    for (i = 0; i < scmi_sys_power_ctx.agent_count; i++)
+        scmi_sys_power_ctx.graceful_response[i] = false;
+}
+
+static bool graceful_request_completed(
+    fwk_id_t service_id,
+    uint32_t scmi_system_state)
+{
+    unsigned int agent_id;
+
+    scmi_sys_power_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+    scmi_sys_power_ctx.graceful_response[agent_id] = true;
+
+    if (fwk_id_is_equal(scmi_sys_power_ctx.graceful_req_id, FWK_ID_NONE)) {
+        /* Starting the graceful request process */
+        scmi_sys_power_ctx.graceful_req_id = service_id;
+        scmi_sys_power_state_notify(service_id, scmi_system_state, false);
+    }
+
+    if (all_agents_responded_to_graceful_request()) {
+        /* reset graceful request variables */
+        reset_graceful_request();
+        return true;
+    }
+
+    return false;
 }
 #endif
 
@@ -261,6 +313,16 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
 
     scmi_system_state = parameters->system_state;
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    if ((parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST) &&
+        (scmi_system_state == SCMI_SYSTEM_STATE_SHUTDOWN)) {
+        if (!graceful_request_completed(service_id, scmi_system_state)) {
+            return_values.status = SCMI_SUCCESS;
+            goto exit;
+        }
+    }
+#endif
+
     /*
      * Note that the scmi_system_state value may be changed by the policy
      * handler.
@@ -276,7 +338,6 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
         return_values.status = SCMI_SUCCESS;
         goto exit;
     }
-
 
     switch (scmi_system_state) {
     case SCMI_SYSTEM_STATE_SHUTDOWN:
@@ -340,9 +401,16 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
     };
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    scmi_sys_power_state_notify(service_id, scmi_system_state,
-        ((parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST) ?
-            true : false));
+    /*
+     * Only send notifications if this is a forceful request. For graceful
+     * requests the notifications are sent before executing the command.
+     */
+    if (!(parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST) ||
+        (scmi_system_state != SCMI_SYSTEM_STATE_SHUTDOWN))
+        scmi_sys_power_state_notify(
+            service_id,
+            scmi_system_state,
+            parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST);
 #endif
 
     return_values.status = SCMI_SUCCESS;
@@ -594,6 +662,11 @@ static int scmi_sys_power_init_notifications(void)
 
     for (i = 0; i < scmi_sys_power_ctx.agent_count; i++)
         scmi_sys_power_ctx.system_power_notifications[i] = FWK_ID_NONE;
+
+    scmi_sys_power_ctx.graceful_response =
+        fwk_mm_calloc(scmi_sys_power_ctx.agent_count, sizeof(bool));
+
+    reset_graceful_request();
 
     return FWK_SUCCESS;
 
