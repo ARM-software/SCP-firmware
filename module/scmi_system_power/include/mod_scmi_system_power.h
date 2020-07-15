@@ -60,6 +60,16 @@ struct mod_scmi_system_power_config {
      * \brief System suspend state.
      */
     unsigned int system_suspend_state;
+
+    /*!
+     * \brief Identifier of the alarm for graceful request timeout.
+     */
+    fwk_id_t alarm_id;
+
+    /*!
+     * Timeout period to wait for graceful response (milliseconds)
+     */
+    uint32_t graceful_timeout;
 };
 
 /*!

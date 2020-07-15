@@ -8,11 +8,14 @@
 #include <internal/scmi_system_power.h>
 
 #include <mod_power_domain.h>
+
+#include <fwk_log.h>
 #ifdef BUILD_HAS_RESOURCE_PERMISSIONS
 #    include <mod_resource_perms.h>
 #endif
 #include <mod_scmi.h>
 #include <mod_scmi_system_power.h>
+#include <mod_timer.h>
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
@@ -34,6 +37,7 @@ struct scmi_sys_power_ctx {
     fwk_id_t *system_power_notifications;
     fwk_id_t graceful_req_id;
     bool *graceful_response;
+    struct mod_timer_alarm_api *alarm_api;
 #endif
 
 #ifdef BUILD_HAS_RESOURCE_PERMISSIONS
@@ -177,6 +181,35 @@ static void reset_graceful_request(void)
         scmi_sys_power_ctx.graceful_response[i] = false;
 }
 
+static void graceful_timer_callback(uintptr_t scmi_system_state)
+{
+    int status;
+    unsigned int agent_id;
+    enum mod_pd_system_shutdown system_shutdown;
+    enum mod_scmi_sys_power_policy_status policy_status;
+
+    FWK_LOG_INFO("SCMI_SYS_POWER: Graceful request timeout...");
+    FWK_LOG_INFO(
+        "SCMI_SYS_POWER: Forcing SCMI SYSTEM STATE %d", scmi_system_state);
+
+    status = scmi_sys_power_ctx.scmi_api->get_agent_id(
+        scmi_sys_power_ctx.graceful_req_id, &agent_id);
+    if (status != FWK_SUCCESS)
+        return;
+
+    status = scmi_sys_power_state_set_policy(
+        &policy_status, (uint32_t *)&scmi_system_state, agent_id);
+    if (status != FWK_SUCCESS)
+        return;
+
+    reset_graceful_request();
+
+    if (scmi_system_state == SCMI_SYSTEM_STATE_SHUTDOWN) {
+        system_shutdown = system_state2system_shutdown[scmi_system_state];
+        scmi_sys_power_ctx.pd_api->system_shutdown(system_shutdown);
+    }
+}
+
 static bool graceful_request_completed(
     fwk_id_t service_id,
     uint32_t scmi_system_state)
@@ -190,10 +223,17 @@ static bool graceful_request_completed(
         /* Starting the graceful request process */
         scmi_sys_power_ctx.graceful_req_id = service_id;
         scmi_sys_power_state_notify(service_id, scmi_system_state, false);
+        scmi_sys_power_ctx.alarm_api->start(
+            scmi_sys_power_ctx.config->alarm_id,
+            scmi_sys_power_ctx.config->graceful_timeout,
+            MOD_TIMER_ALARM_TYPE_ONCE,
+            graceful_timer_callback,
+            scmi_system_state);
     }
 
     if (all_agents_responded_to_graceful_request()) {
         /* reset graceful request variables */
+        scmi_sys_power_ctx.alarm_api->stop(scmi_sys_power_ctx.config->alarm_id);
         reset_graceful_request();
         return true;
     }
@@ -338,7 +378,6 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
         return_values.status = SCMI_SUCCESS;
         goto exit;
     }
-
     switch (scmi_system_state) {
     case SCMI_SYSTEM_STATE_SHUTDOWN:
     case SCMI_SYSTEM_STATE_COLD_RESET:
@@ -712,6 +751,16 @@ static int scmi_sys_power_bind(fwk_id_t id, unsigned int round)
         FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, pd_count - 1);
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    /*
+     * If notifications is supported a timer is required to handle graceful
+     * requests.
+     */
+    status = fwk_module_bind(
+        scmi_sys_power_ctx.config->alarm_id,
+        MOD_TIMER_API_ID_ALARM,
+        &scmi_sys_power_ctx.alarm_api);
+    if (status != FWK_SUCCESS)
+        return status;
     return scmi_sys_power_init_notifications();
 #else
     return FWK_SUCCESS;

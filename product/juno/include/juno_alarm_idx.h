@@ -11,6 +11,8 @@
 #ifndef JUNO_ALARM_IDX_H
 #define JUNO_ALARM_IDX_H
 
+#define JUNO_ALARM_ELEMENT_IDX 0
+
 /* Alarm indices for XRP7724 */
 enum juno_xrp7724_alarm_idx {
     JUNO_XRP7724_ALARM_IDX_PSU_VSYS,
@@ -31,30 +33,14 @@ enum juno_dvfs_alarm_idx {
     JUNO_DVFS_ALARM_IDX_CNT,
 };
 
-/* Alarm indices for PPU */
-enum juno_ppu_alarm_idx {
+enum juno_misc_alarm_idx {
     JUNO_PPU_ALARM_IDX = JUNO_DVFS_ALARM_IDX_CNT,
-    JUNO_PPU_ALARM_IDX_COUNT,
-};
-
-/* Alarm indices for Thermal Protection */
-enum juno_thermal_alarm_idx {
-    JUNO_THERMAL_ALARM_IDX = JUNO_PPU_ALARM_IDX_COUNT,
-    JUNO_THERMAL_ALARM_IDX_COUNT,
-};
-
+    JUNO_THERMAL_ALARM_IDX,
 #ifdef BUILD_HAS_STATISTICS
-/* Alarm indices for Statistics */
-enum juno_statistics_idx {
-    JUNO_STATISTICS_ALARM_IDX = JUNO_THERMAL_ALARM_IDX_COUNT,
-    JUNO_STATISTICS_ALARM_IDX_COUNT,
-};
-
-/* Total count of alarms */
-#define JUNO_ALARM_IDX_COUNT    JUNO_STATISTICS_ALARM_IDX_COUNT
-#else
-#define JUNO_ALARM_IDX_COUNT    JUNO_THERMAL_ALARM_IDX_COUNT
+    JUNO_STATISTICS_ALARM_IDX,
 #endif
-
+    JUNO_SYSTEM_POWER_ALARM_IDX,
+    JUNO_ALARM_IDX_COUNT
+};
 
 #endif /* JUNO_ALARM_IDX_H */
