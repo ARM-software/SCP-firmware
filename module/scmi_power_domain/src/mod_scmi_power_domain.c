@@ -517,8 +517,7 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
             goto exit;
         }
 
-        status =
-            scmi_pd_ctx.pd_api->set_state_async(pd_id, false, pd_power_state);
+        status = scmi_pd_ctx.pd_api->set_state(pd_id, pd_power_state);
         break;
 
     case MOD_PD_TYPE_SYSTEM:
