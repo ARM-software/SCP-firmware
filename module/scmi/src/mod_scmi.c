@@ -675,11 +675,14 @@ static int scmi_base_set_device_permissions(
     struct scmi_base_set_device_permissions_p2a return_values = {
         .status = SCMI_NOT_FOUND,
     };
+    int status = FWK_SUCCESS;
 
     parameters = (const struct scmi_base_set_device_permissions_a2p *)payload;
 
-    if (parameters->agent_id > scmi_ctx.config->agent_count)
+    if (parameters->agent_id > scmi_ctx.config->agent_count) {
+        status = FWK_E_ACCESS;
         goto exit;
+    }
 
     if (parameters->agent_id == MOD_SCMI_PLATFORM_ID) {
         return_values.status = SCMI_SUCCESS;
@@ -688,10 +691,27 @@ static int scmi_base_set_device_permissions(
 
     if (parameters->flags & ~MOD_RES_PERMS_PERMISSIONS_MASK) {
         return_values.status = SCMI_INVALID_PARAMETERS;
+        status = FWK_E_PARAM;
         goto exit;
     }
 
-    return_values.status = SCMI_NOT_SUPPORTED;
+    status = scmi_ctx.res_perms_api->agent_set_device_permission(
+        parameters->agent_id, parameters->device_id, parameters->flags);
+
+    switch (status) {
+    case FWK_SUCCESS:
+        return_values.status = SCMI_SUCCESS;
+        break;
+    case FWK_E_PARAM:
+        return_values.status = SCMI_INVALID_PARAMETERS;
+        break;
+    case FWK_E_ACCESS:
+        return_values.status = SCMI_NOT_FOUND;
+        break;
+    default:
+        return_values.status = SCMI_NOT_SUPPORTED;
+        break;
+    }
 
 exit:
     respond(
@@ -700,7 +720,7 @@ exit:
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
                                                  sizeof(return_values.status));
 
-    return FWK_SUCCESS;
+    return status;
 }
 
 /*
@@ -714,11 +734,14 @@ static int scmi_base_set_protocol_permissions(
     struct scmi_base_set_protocol_permissions_p2a return_values = {
         .status = SCMI_NOT_FOUND,
     };
+    int status = FWK_SUCCESS;
 
     parameters = (const struct scmi_base_set_protocol_permissions_a2p *)payload;
 
-    if (parameters->agent_id > scmi_ctx.config->agent_count)
+    if (parameters->agent_id > scmi_ctx.config->agent_count) {
+        status = FWK_E_ACCESS;
         goto exit;
+    }
 
     if (parameters->agent_id == MOD_SCMI_PLATFORM_ID) {
         return_values.status = SCMI_SUCCESS;
@@ -726,6 +749,7 @@ static int scmi_base_set_protocol_permissions(
     }
 
     if (parameters->flags & ~MOD_RES_PERMS_PERMISSIONS_MASK) {
+        status = FWK_E_PARAM;
         return_values.status = SCMI_INVALID_PARAMETERS;
         goto exit;
     }
@@ -735,7 +759,26 @@ static int scmi_base_set_protocol_permissions(
         goto exit;
     }
 
-    return_values.status = SCMI_NOT_SUPPORTED;
+    status = scmi_ctx.res_perms_api->agent_set_device_protocol_permission(
+        parameters->agent_id,
+        parameters->device_id,
+        parameters->command_id,
+        parameters->flags);
+
+    switch (status) {
+    case FWK_SUCCESS:
+        return_values.status = SCMI_SUCCESS;
+        break;
+    case FWK_E_PARAM:
+        return_values.status = SCMI_INVALID_PARAMETERS;
+        break;
+    case FWK_E_ACCESS:
+        return_values.status = SCMI_NOT_FOUND;
+        break;
+    default:
+        return_values.status = SCMI_NOT_SUPPORTED;
+        break;
+    }
 
 exit:
     respond(
@@ -744,7 +787,7 @@ exit:
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
                                                  sizeof(return_values.status));
 
-    return FWK_SUCCESS;
+    return status;
 }
 
 /*
@@ -758,6 +801,7 @@ static int scmi_base_reset_agent_config(
     struct scmi_base_reset_agent_config_p2a return_values = {
         .status = SCMI_NOT_FOUND,
     };
+    int status;
 
     parameters = (const struct scmi_base_reset_agent_config_a2p *)payload;
 
@@ -774,7 +818,23 @@ static int scmi_base_reset_agent_config(
         goto exit;
     }
 
-    return_values.status = SCMI_NOT_SUPPORTED;
+    status = scmi_ctx.res_perms_api->agent_reset_config(
+        parameters->agent_id, parameters->flags);
+
+    switch (status) {
+    case FWK_SUCCESS:
+        return_values.status = SCMI_SUCCESS;
+        break;
+    case FWK_E_PARAM:
+        return_values.status = SCMI_INVALID_PARAMETERS;
+        break;
+    case FWK_E_ACCESS:
+        return_values.status = SCMI_NOT_FOUND;
+        break;
+    default:
+        return_values.status = SCMI_NOT_SUPPORTED;
+        break;
+    }
 
 exit:
     respond(
