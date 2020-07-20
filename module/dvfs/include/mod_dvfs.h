@@ -30,8 +30,8 @@
  * \brief Frequency limits.
  */
 struct mod_dvfs_frequency_limits {
-    uint64_t minimum; /*!< Minimum permitted rate */
-    uint64_t maximum; /*!< Maximum permitted rate */
+    uint32_t minimum; /*!< Minimum permitted rate */
+    uint32_t maximum; /*!< Maximum permitted rate */
 };
 
 /*!
@@ -39,8 +39,8 @@ struct mod_dvfs_frequency_limits {
  */
 struct mod_dvfs_opp {
     uint64_t voltage; /*!< Power supply voltage in millivolts (mV) */
-    uint64_t frequency; /*!< Clock rate in Hertz (Hz) */
-    uint64_t power; /*!< Power draw in milliwatts (mW) */
+    uint32_t frequency; /*!< Clock rate in Hertz (Hz) */
+    uint32_t power; /*!< Power draw in milliwatts(mW) */
 };
 
 /*!
@@ -163,7 +163,9 @@ struct mod_dvfs_domain_api {
      * \param frequency Requested frequency.
      * \param [out] level id inside the OPP table.
      */
-    int (*get_frequency_id)(fwk_id_t domain_id, uint64_t frequency,
+    int (*get_frequency_id)(
+        fwk_id_t domain_id,
+        uint32_t frequency,
         size_t *level_id);
 
     /*!
@@ -181,8 +183,10 @@ struct mod_dvfs_domain_api {
      * \param cookie Context-specific value.
      * \param frequency Requested frequency.
      */
-    int (*set_frequency)(fwk_id_t domain_id, uintptr_t cookie,
-        uint64_t frequency);
+    int (*set_frequency)(
+        fwk_id_t domain_id,
+        uintptr_t cookie,
+        uint32_t frequency);
 
     /*!
      * \brief Get the frequency of a domain.
@@ -251,7 +255,7 @@ struct mod_dvfs_params_response {
     int status;
 
     /*! Event response frequency */
-    uint64_t performance_level;
+    uint32_t performance_level;
 };
 
 /*!

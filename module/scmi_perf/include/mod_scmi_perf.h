@@ -199,7 +199,7 @@ enum mod_scmi_perf_policy_status {
  */
 int scmi_perf_level_set_policy(
     enum mod_scmi_perf_policy_status *policy_status,
-    uint64_t *frequency,
+    uint32_t *frequency,
     unsigned int agent_id,
     fwk_id_t domain_id);
 
@@ -226,8 +226,8 @@ int scmi_perf_level_set_policy(
  */
 int scmi_perf_limits_set_policy(
     enum mod_scmi_perf_policy_status *policy_status,
-    uint64_t *range_min,
-    uint64_t *range_max,
+    uint32_t *range_min,
+    uint32_t *range_max,
     unsigned int agent_id,
     fwk_id_t domain_id);
 
