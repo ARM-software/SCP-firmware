@@ -171,7 +171,7 @@ static int count_opps(const struct mod_dvfs_opp *opps)
 
 static const struct mod_dvfs_opp *get_opp_for_values(
     const struct mod_dvfs_domain_ctx *ctx,
-    uint64_t frequency,
+    uint32_t frequency,
     uint64_t voltage)
 {
     size_t opp_idx;
@@ -227,7 +227,7 @@ static const struct mod_dvfs_opp *adjust_opp_for_new_limits(
     const struct mod_dvfs_opp *opp,
     const struct mod_dvfs_frequency_limits *limits)
 {
-    uint64_t needle;
+    uint32_t needle;
 
     if (opp->frequency < limits->minimum)
         needle = limits->minimum;
@@ -407,8 +407,9 @@ static int dvfs_get_nth_opp(fwk_id_t domain_id,
     return FWK_SUCCESS;
 }
 
-static int dvfs_get_frequency_id(fwk_id_t domain_id,
-    uint64_t frequency,
+static int dvfs_get_frequency_id(
+    fwk_id_t domain_id,
+    uint32_t frequency,
     size_t *level_id)
 {
     const struct mod_dvfs_domain_ctx *ctx;
@@ -528,8 +529,10 @@ static int dvfs_get_current_opp(fwk_id_t domain_id, struct mod_dvfs_opp *opp)
 /*
  * DVFS module asynchronous API functions
  */
-static int dvfs_set_frequency(fwk_id_t domain_id, uintptr_t cookie,
-    uint64_t frequency)
+static int dvfs_set_frequency(
+    fwk_id_t domain_id,
+    uintptr_t cookie,
+    uint32_t frequency)
 {
     struct mod_dvfs_domain_ctx *ctx;
     const struct mod_dvfs_opp *new_opp;
