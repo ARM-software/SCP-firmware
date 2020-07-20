@@ -34,7 +34,7 @@ struct mod_mock_psu_operation {
 
     union {
         bool enabled;
-        uint64_t voltage;
+        uint32_t voltage;
     };
 };
 
@@ -42,7 +42,7 @@ static struct mod_mock_psu_ctx {
     struct mod_mock_psu_element_ctx {
         struct {
             bool enabled;
-            uint64_t voltage;
+            uint32_t voltage;
         } state;
 
         struct mod_mock_psu_operation op;
@@ -227,9 +227,7 @@ exit:
     return status;
 }
 
-static int mod_mock_psu_get_voltage(
-    fwk_id_t element_id,
-    uint64_t *voltage)
+static int mod_mock_psu_get_voltage(fwk_id_t element_id, uint32_t *voltage)
 {
     int status;
 
@@ -259,9 +257,7 @@ exit:
     return status;
 }
 
-static int mod_mock_psu_set_voltage(
-    fwk_id_t element_id,
-    uint64_t voltage)
+static int mod_mock_psu_set_voltage(fwk_id_t element_id, uint32_t voltage)
 {
     int status;
 

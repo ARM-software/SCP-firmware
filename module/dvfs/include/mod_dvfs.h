@@ -38,7 +38,7 @@ struct mod_dvfs_frequency_limits {
  * \brief Operating Performance Point (OPP).
  */
 struct mod_dvfs_opp {
-    uint64_t voltage; /*!< Power supply voltage in millivolts (mV) */
+    uint32_t voltage; /*!< Power supply voltage in millivolts (mV) */
     uint32_t frequency; /*!< Clock rate in Hertz (Hz) */
     uint32_t power; /*!< Power draw in milliwatts(mW) */
 };

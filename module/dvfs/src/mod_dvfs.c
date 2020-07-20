@@ -172,7 +172,7 @@ static int count_opps(const struct mod_dvfs_opp *opps)
 static const struct mod_dvfs_opp *get_opp_for_values(
     const struct mod_dvfs_domain_ctx *ctx,
     uint32_t frequency,
-    uint64_t voltage)
+    uint32_t voltage)
 {
     size_t opp_idx;
     const struct mod_dvfs_opp *opp;
@@ -731,8 +731,9 @@ static int dvfs_complete(struct mod_dvfs_domain_ctx *ctx,
  * The SET_OPP() request has successfully completed the first step,
  * reading the voltage.
  */
-static int dvfs_handle_set_opp(struct mod_dvfs_domain_ctx *ctx,
-    uint64_t voltage)
+static int dvfs_handle_set_opp(
+    struct mod_dvfs_domain_ctx *ctx,
+    uint32_t voltage)
 {
     int status = FWK_SUCCESS;
 
@@ -822,10 +823,11 @@ static int dvfs_handle_set_opp(struct mod_dvfs_domain_ctx *ctx,
  * synchronously or asynchronously. Note that resp_event will only be set
  * by a GET_OPP(), it will always be NULL for SET_OPP().
  */
-static int dvfs_handle_psu_get_voltage_resp(struct mod_dvfs_domain_ctx *ctx,
+static int dvfs_handle_psu_get_voltage_resp(
+    struct mod_dvfs_domain_ctx *ctx,
     struct fwk_event *resp_event,
     int req_status,
-    uint64_t voltage)
+    uint32_t voltage)
 {
     const struct mod_dvfs_opp *opp;
 
@@ -941,7 +943,7 @@ static int mod_dvfs_process_event(const struct fwk_event *event,
     int status = FWK_SUCCESS;
     struct mod_dvfs_domain_ctx *ctx;
     struct mod_psu_driver_response *psu_response;
-    uint64_t voltage;
+    uint32_t voltage;
 
     ctx = get_domain_ctx(event->target_id);
     if (ctx == NULL)
