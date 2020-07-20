@@ -76,4 +76,43 @@ struct scmi_base_discover_agent_p2a {
     char name[16];
 };
 
+/*
+ * BASE_SET_DEVICE_PERMISSIONS
+ */
+struct __attribute((packed)) scmi_base_set_device_permissions_a2p {
+    uint32_t agent_id;
+    uint32_t device_id;
+    uint32_t flags;
+};
+
+struct __attribute((packed)) scmi_base_set_device_permissions_p2a {
+    int32_t status;
+};
+
+/*
+ * BASE_SET_PROTOCOL_PERMISSIONS
+ */
+struct __attribute((packed)) scmi_base_set_protocol_permissions_a2p {
+    uint32_t agent_id;
+    uint32_t device_id;
+    uint32_t command_id;
+    uint32_t flags;
+};
+
+struct __attribute((packed)) scmi_base_set_protocol_permissions_p2a {
+    int32_t status;
+};
+
+/*
+ * BASE_RESET_AGENT_CONFIG
+ */
+struct __attribute((packed)) scmi_base_reset_agent_config_a2p {
+    uint32_t agent_id;
+    uint32_t flags;
+};
+
+struct __attribute((packed)) scmi_base_reset_agent_config_p2a {
+    int32_t status;
+};
+
 #endif /* INTERNAL_SCMI_BASE_H */
