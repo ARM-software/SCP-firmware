@@ -39,6 +39,9 @@ struct res_perms_ctx {
     /*! Number of performance domain resources for the platform. */
     uint32_t perf_count;
 
+    /*! Number of devices for the platform. */
+    uint32_t device_count;
+
 #ifdef BUILD_HAS_SCMI_RESET
     /*! Number of reset domain resources for the platform. */
     uint32_t reset_domain_count;
@@ -61,6 +64,12 @@ struct res_perms_ctx {
      * memory.
      */
     struct mod_res_agent_permission *agent_permissions;
+
+    /*!
+     * The list of domain devices in the system. If this is not set then setting
+     * device permissions for an agent is not supported.
+     */
+    struct mod_res_device *domain_devices;
 };
 
 static struct res_perms_ctx res_perms_ctx;
@@ -649,10 +658,45 @@ static enum mod_res_perms_permissions agent_resource_permissions(
     return MOD_RES_PERMS_ACCESS_ALLOWED;
 }
 
+/*
+ * Set the permissions for an agent:device.
+ */
+static int mod_res_agent_set_device_permission(
+    uint32_t agent_id,
+    uint32_t device_id,
+    uint32_t flags)
+{
+    return FWK_SUCCESS;
+}
+
+/*
+ * Set the permissions for an agent:device:protocol.
+ */
+static int mod_res_agent_set_device_protocol_permission(
+    uint32_t agent_id,
+    uint32_t device_id,
+    uint32_t protocol_id,
+    uint32_t flags)
+{
+    return FWK_SUCCESS;
+}
+
+/*
+ * Reset the permissions for an agent to the default configuration.
+ */
+static int mod_res_agent_reset_config(uint32_t agent_id, uint32_t flags)
+{
+    return FWK_SUCCESS;
+}
+
 static const struct mod_res_permissions_api res_perms_api = {
     .agent_has_protocol_permission = agent_protocol_permissions,
     .agent_has_message_permission = agent_message_permissions,
     .agent_has_resource_permission = agent_resource_permissions,
+    .agent_set_device_permission = mod_res_agent_set_device_permission,
+    .agent_set_device_protocol_permission =
+        mod_res_agent_set_device_protocol_permission,
+    .agent_reset_config = mod_res_agent_reset_config,
 };
 
 /*
@@ -691,9 +735,12 @@ static int mod_res_perms_resources_init(
         res_perms_ctx.sensor_count = config->sensor_count;
         res_perms_ctx.pd_count = config->pd_count;
         res_perms_ctx.perf_count = config->perf_count;
+        res_perms_ctx.device_count = config->device_count;
 #ifdef BUILD_HAS_SCMI_RESET
         res_perms_ctx.reset_domain_count = config->reset_domain_count;
 #endif
+        res_perms_ctx.domain_devices =
+            (struct mod_res_device *)config->domain_devices;
     }
 
     return FWK_SUCCESS;
