@@ -150,7 +150,7 @@ exit:
     return status;
 }
 
-static int mod_psu_get_voltage(fwk_id_t element_id, uint64_t *voltage)
+static int mod_psu_get_voltage(fwk_id_t element_id, uint32_t *voltage)
 {
     int status;
 
@@ -190,7 +190,7 @@ exit:
     return status;
 }
 
-static int mod_psu_set_voltage(fwk_id_t element_id, uint64_t voltage)
+static int mod_psu_set_voltage(fwk_id_t element_id, uint32_t voltage)
 {
     int status;
 

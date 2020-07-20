@@ -92,7 +92,7 @@ struct mod_mock_psu_element_cfg {
     /*!
      * \brief Default voltage, in millivolts (mV), of the device's supply.
      */
-    uint64_t default_voltage;
+    uint32_t default_voltage;
 };
 
 /*!
