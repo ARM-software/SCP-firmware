@@ -15,6 +15,7 @@
 #include <mod_scmi_std.h>
 
 #include <fwk_assert.h>
+#include <fwk_id.h>
 #include <fwk_status.h>
 
 #include <stdint.h>
@@ -267,6 +268,44 @@ enum mod_res_reset_domain_permissions_idx {
 };
 
 /*!
+ * \brief SCMI Domain Types
+ */
+enum mod_res_domain_device_types {
+    MOD_RES_POWER_DOMAIN_DEVICE = 0,
+    MOD_RES_PERF_DOMAIN_DEVICE,
+    MOD_RES_CLOCK_DOMAIN_DEVICE,
+    MOD_RES_SENSOR_DOMAIN_DEVICE,
+    MOD_RES_RESET_DOMAIN_DEVICE,
+    MOD_RES_PLATFORM_DOMAIN_DEVICE,
+    MOD_RES_DOMAIN_DEVICE_INVALID
+};
+
+/*!
+ * \brief Each device is made up multiple domain devices.
+ *      The protocol is determined by the device type.
+ *      The resource ID for a protocol is the element ID of the
+ *      device_id.
+ */
+struct mod_res_domain_device {
+    /*! \brief Identifier of the domain device instance */
+    fwk_id_t device_id;
+
+    /*! \brief Type of the domain device instance */
+    enum mod_res_domain_device_types type;
+};
+
+/*!
+ * \brief Device definition.
+ */
+struct mod_res_device {
+    /*! \brief Device Identifier */
+    uint16_t device_id;
+
+    /*! \brief List of domain devices in the device */
+    struct mod_res_domain_device *domain_devices;
+};
+
+/*!
  * \brief SCMI Agent Permissions
  *
  * \details An agent may have any combination of the permissions
@@ -359,6 +398,52 @@ struct mod_res_permissions_api {
         uint32_t protocol_id,
         uint32_t message_id,
         uint32_t resource_id);
+
+    /*!
+     * \brief Set device permissions for an agent
+     *
+     * \param agent_id      identifier of the agent.
+     * \param device_id     identifier of the device.
+     * \param flags         permissions to set.
+     *
+     * \retval FWK_SUCCESS  The operation has completed successfully.
+     * \retval FWK_E_PARAM  Unknown agent_id or device_id.
+     * \retval FWK_E_INVAL  Invalid flags.
+     */
+    int (*agent_set_device_permission)(
+        uint32_t agent_id,
+        uint32_t device_id,
+        uint32_t flags);
+
+    /*!
+     * \brief Set device protocol permissions for an agent
+     *
+     * \param agent_id      identifier of the agent.
+     * \param device_id     identifier of the device.
+     * \param device_id     identifier of the protocol.
+     * \param flags         permissions to set.
+     *
+     * \retval FWK_SUCCESS  The operation has completed successfully.
+     * \retval FWK_E_PARAM  Unknown agent_id or device_id.
+     * \retval FWK_E_INVAL  Invalid flags or protocol_ID.
+     */
+    int (*agent_set_device_protocol_permission)(
+        uint32_t agent_id,
+        uint32_t device_id,
+        uint32_t protocol_id,
+        uint32_t flags);
+
+    /*!
+     * \brief Reset permissions for an agent
+     *
+     * \param agent_id      identifier of the agent.
+     * \param flags         permissions to set.
+     *
+     * \retval FWK_SUCCESS  The operation has completed successfully.
+     * \retval FWK_E_PARAM  Unknown agent_id.
+     * \retval FWK_E_INVAL  Invalid flags.
+     */
+    int (*agent_reset_config)(uint32_t agent_id, uint32_t flags);
 };
 
 /*!
@@ -387,12 +472,18 @@ struct mod_res_resource_perms_config {
     uint32_t perf_count;
 
 #ifdef BUILD_HAS_SCMI_RESET
-    /*! \brief Number of performance domains supported by the platform. */
+    /*! \brief Number of reset domains supported by the platform. */
     uint32_t reset_domain_count;
 #endif
 
+    /*! \brief Number of devices supported by the platform. */
+    uint32_t device_count;
+
     /*! \brief Address of the permissions table */
     uintptr_t agent_permissions;
+
+    /*! \brief Address of the domain devices */
+    uintptr_t domain_devices;
 };
 
 /*!
