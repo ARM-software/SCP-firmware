@@ -409,8 +409,8 @@ struct mod_res_permissions_api {
      * \param flags         permissions to set.
      *
      * \retval FWK_SUCCESS  The operation has completed successfully.
-     * \retval FWK_E_PARAM  Unknown agent_id or device_id.
-     * \retval FWK_E_INVAL  Invalid flags.
+     * \retval FWK_E_ACCESS Unknown agent_id or device_id.
+     * \retval FWK_E_PARAM  Invalid flags or protocol_ID.
      */
     int (*agent_set_device_permission)(
         uint32_t agent_id,
@@ -426,8 +426,8 @@ struct mod_res_permissions_api {
      * \param flags         permissions to set.
      *
      * \retval FWK_SUCCESS  The operation has completed successfully.
-     * \retval FWK_E_PARAM  Unknown agent_id or device_id.
-     * \retval FWK_E_INVAL  Invalid flags or protocol_ID.
+     * \retval FWK_E_ACCESS Unknown agent_id or device_id.
+     * \retval FWK_E_PARAM  Invalid flags or protocol_ID.
      */
     int (*agent_set_device_protocol_permission)(
         uint32_t agent_id,
@@ -442,8 +442,8 @@ struct mod_res_permissions_api {
      * \param flags         permissions to set.
      *
      * \retval FWK_SUCCESS  The operation has completed successfully.
-     * \retval FWK_E_PARAM  Unknown agent_id.
-     * \retval FWK_E_INVAL  Invalid flags.
+     * \retval FWK_E_ACCESS Unknown agent_id.
+     * \retval FWK_E_PARAM  Invalid flags.
      */
     int (*agent_reset_config)(uint32_t agent_id, uint32_t flags);
 };
