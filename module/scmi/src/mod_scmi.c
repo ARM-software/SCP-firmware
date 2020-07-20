@@ -95,6 +95,17 @@ static int scmi_base_discover_list_protocols_handler(
     fwk_id_t service_id, const uint32_t *payload);
 static int scmi_base_discover_agent_handler(
     fwk_id_t service_id, const uint32_t *payload);
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+static int scmi_base_set_device_permissions(
+    fwk_id_t service_id,
+    const uint32_t *payload);
+static int scmi_base_set_protocol_permissions(
+    fwk_id_t service_id,
+    const uint32_t *payload);
+static int scmi_base_reset_agent_config(
+    fwk_id_t service_id,
+    const uint32_t *payload);
+#endif
 
 static int (*const base_handler_table[])(fwk_id_t, const uint32_t *) = {
     [MOD_SCMI_PROTOCOL_VERSION] = scmi_base_protocol_version_handler,
@@ -102,13 +113,18 @@ static int (*const base_handler_table[])(fwk_id_t, const uint32_t *) = {
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
         scmi_base_protocol_message_attributes_handler,
     [MOD_SCMI_BASE_DISCOVER_VENDOR] = scmi_base_discover_vendor_handler,
-    [MOD_SCMI_BASE_DISCOVER_SUB_VENDOR] =
-        scmi_base_discover_sub_vendor_handler,
+    [MOD_SCMI_BASE_DISCOVER_SUB_VENDOR] = scmi_base_discover_sub_vendor_handler,
     [MOD_SCMI_BASE_DISCOVER_IMPLEMENTATION_VERSION] =
         scmi_base_discover_implementation_version_handler,
     [MOD_SCMI_BASE_DISCOVER_LIST_PROTOCOLS] =
         scmi_base_discover_list_protocols_handler,
     [MOD_SCMI_BASE_DISCOVER_AGENT] = scmi_base_discover_agent_handler,
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    [MOD_SCMI_BASE_SET_DEVICE_PERMISSIONS] = scmi_base_set_device_permissions,
+    [MOD_SCMI_BASE_SET_PROTOCOL_PERMISSIONS] =
+        scmi_base_set_protocol_permissions,
+    [MOD_SCMI_BASE_RESET_AGENT_CONFIG] = scmi_base_reset_agent_config,
+#endif
 };
 
 static const unsigned int base_payload_size_table[] = {
@@ -123,6 +139,14 @@ static const unsigned int base_payload_size_table[] = {
         sizeof(struct scmi_base_discover_list_protocols_a2p),
     [MOD_SCMI_BASE_DISCOVER_AGENT] =
         sizeof(struct scmi_base_discover_agent_a2p),
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    [MOD_SCMI_BASE_SET_DEVICE_PERMISSIONS] =
+        sizeof(struct scmi_base_set_device_permissions_a2p),
+    [MOD_SCMI_BASE_SET_PROTOCOL_PERMISSIONS] =
+        sizeof(struct scmi_base_set_protocol_permissions_a2p),
+    [MOD_SCMI_BASE_RESET_AGENT_CONFIG] =
+        sizeof(struct scmi_base_reset_agent_config_a2p),
+#endif
 };
 
 static const char * const default_agent_names[] = {
@@ -639,6 +663,129 @@ exit:
 }
 
 #ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+
+/*
+ * BASE_SET_DEVICE_PERMISSIONS
+ */
+static int scmi_base_set_device_permissions(
+    fwk_id_t service_id,
+    const uint32_t *payload)
+{
+    const struct scmi_base_set_device_permissions_a2p *parameters;
+    struct scmi_base_set_device_permissions_p2a return_values = {
+        .status = SCMI_NOT_FOUND,
+    };
+
+    parameters = (const struct scmi_base_set_device_permissions_a2p *)payload;
+
+    if (parameters->agent_id > scmi_ctx.config->agent_count)
+        goto exit;
+
+    if (parameters->agent_id == MOD_SCMI_PLATFORM_ID) {
+        return_values.status = SCMI_SUCCESS;
+        goto exit;
+    }
+
+    if (parameters->flags & ~MOD_RES_PERMS_PERMISSIONS_MASK) {
+        return_values.status = SCMI_INVALID_PARAMETERS;
+        goto exit;
+    }
+
+    return_values.status = SCMI_NOT_SUPPORTED;
+
+exit:
+    respond(
+        service_id,
+        &return_values,
+        (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
+                                                 sizeof(return_values.status));
+
+    return FWK_SUCCESS;
+}
+
+/*
+ * BASE_SET_PROTOCOL_PERMISSIONS
+ */
+static int scmi_base_set_protocol_permissions(
+    fwk_id_t service_id,
+    const uint32_t *payload)
+{
+    const struct scmi_base_set_protocol_permissions_a2p *parameters;
+    struct scmi_base_set_protocol_permissions_p2a return_values = {
+        .status = SCMI_NOT_FOUND,
+    };
+
+    parameters = (const struct scmi_base_set_protocol_permissions_a2p *)payload;
+
+    if (parameters->agent_id > scmi_ctx.config->agent_count)
+        goto exit;
+
+    if (parameters->agent_id == MOD_SCMI_PLATFORM_ID) {
+        return_values.status = SCMI_SUCCESS;
+        goto exit;
+    }
+
+    if (parameters->flags & ~MOD_RES_PERMS_PERMISSIONS_MASK) {
+        return_values.status = SCMI_INVALID_PARAMETERS;
+        goto exit;
+    }
+
+    if (parameters->command_id == MOD_SCMI_PROTOCOL_ID_BASE) {
+        return_values.status = SCMI_DENIED;
+        goto exit;
+    }
+
+    return_values.status = SCMI_NOT_SUPPORTED;
+
+exit:
+    respond(
+        service_id,
+        &return_values,
+        (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
+                                                 sizeof(return_values.status));
+
+    return FWK_SUCCESS;
+}
+
+/*
+ * BASE_RESET_AGENT_CONFIG
+ */
+static int scmi_base_reset_agent_config(
+    fwk_id_t service_id,
+    const uint32_t *payload)
+{
+    const struct scmi_base_reset_agent_config_a2p *parameters;
+    struct scmi_base_reset_agent_config_p2a return_values = {
+        .status = SCMI_NOT_FOUND,
+    };
+
+    parameters = (const struct scmi_base_reset_agent_config_a2p *)payload;
+
+    if (parameters->agent_id > scmi_ctx.config->agent_count)
+        goto exit;
+
+    if (parameters->agent_id == MOD_SCMI_PLATFORM_ID) {
+        return_values.status = SCMI_SUCCESS;
+        goto exit;
+    }
+
+    if (parameters->flags & ~MOD_RES_PERMS_PERMISSIONS_MASK) {
+        return_values.status = SCMI_INVALID_PARAMETERS;
+        goto exit;
+    }
+
+    return_values.status = SCMI_NOT_SUPPORTED;
+
+exit:
+    respond(
+        service_id,
+        &return_values,
+        (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
+                                                 sizeof(return_values.status));
+
+    return FWK_SUCCESS;
+}
+
 /*
  * SCMI Resource Permissions handler
  */
@@ -670,6 +817,7 @@ static int scmi_base_permissions_handler(
     else
         return FWK_E_ACCESS;
 }
+
 #endif
 
 static int scmi_base_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,

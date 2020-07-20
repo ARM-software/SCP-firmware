@@ -46,6 +46,8 @@ enum mod_res_perms_permissions {
     MOD_RES_PERMS_ACCESS_DENIED = 1,
 };
 
+#define MOD_RES_PERMS_PERMISSIONS_MASK 0x1
+
 #define MOD_RES_PERMS_PROTOCOL_OFFSET MOD_SCMI_PROTOCOL_ID_BASE
 
 enum mod_res_perms_protocol_deny {
