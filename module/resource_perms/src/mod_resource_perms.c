@@ -13,6 +13,7 @@
 #include <mod_scmi_std.h>
 
 #include <fwk_assert.h>
+#include <fwk_log.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
@@ -661,11 +662,298 @@ static enum mod_res_perms_permissions agent_resource_permissions(
 /*
  * Set the permissions for an agent:device.
  */
+static int set_agent_resource_message_perms(
+    uint32_t agent_id,
+    uint32_t protocol_id,
+    uint32_t message_idx,
+    uint32_t resource_id,
+    mod_res_perms_t *perms,
+    enum mod_res_perms_permissions flags)
+{
+    int status;
+    int32_t resource_idx;
+    mod_res_perms_t permissions;
+
+    status = mod_res_resource_id_to_index(
+        agent_id, protocol_id, message_idx, resource_id, &resource_idx);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    permissions = perms[resource_idx];
+
+    flags =
+        ((flags == 0) ? MOD_RES_PERMS_ACCESS_DENIED :
+                        MOD_RES_PERMS_ACCESS_ALLOWED);
+
+    if (flags == MOD_RES_PERMS_ACCESS_ALLOWED)
+        permissions &= ~(1 << (MOD_RES_PERMS_RESOURCE_BIT(resource_id)));
+    else
+        permissions |= (1 << (MOD_RES_PERMS_RESOURCE_BIT(resource_id)));
+
+    perms[resource_idx] = permissions;
+
+    return FWK_SUCCESS;
+}
+
+static int set_agent_resource_pd_permissions(
+    uint32_t agent_id,
+    uint32_t resource_id,
+    enum mod_res_perms_permissions flags)
+{
+    int status;
+    int32_t message_idx;
+
+    if (res_perms_ctx.agent_permissions->scmi_pd_perms == NULL)
+        return FWK_SUCCESS;
+    if (resource_id >= res_perms_ctx.pd_count)
+        return FWK_E_ACCESS;
+
+    for (message_idx = MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES;
+         message_idx <= MOD_SCMI_PD_POWER_STATE_NOTIFY;
+         message_idx++) {
+        status = set_agent_resource_message_perms(
+            agent_id,
+            MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN,
+            message_idx,
+            resource_id,
+            res_perms_ctx.agent_permissions->scmi_pd_perms,
+            flags);
+
+        if (status != FWK_SUCCESS)
+            return status;
+    }
+    return FWK_SUCCESS;
+}
+
+static int set_agent_resource_perf_permissions(
+    uint32_t agent_id,
+    uint32_t resource_id,
+    enum mod_res_perms_permissions flags)
+{
+    int status;
+    int32_t message_idx;
+
+    if (res_perms_ctx.agent_permissions->scmi_perf_perms == NULL)
+        return FWK_SUCCESS;
+    if (resource_id >= res_perms_ctx.perf_count)
+        return FWK_E_ACCESS;
+
+    for (message_idx = MOD_SCMI_PERF_DOMAIN_ATTRIBUTES;
+         message_idx <= MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL;
+         message_idx++) {
+        status = set_agent_resource_message_perms(
+            agent_id,
+            MOD_SCMI_PROTOCOL_ID_PERF,
+            message_idx,
+            resource_id,
+            res_perms_ctx.agent_permissions->scmi_perf_perms,
+            flags);
+
+        if (status != FWK_SUCCESS)
+            return status;
+    }
+
+    return FWK_SUCCESS;
+}
+
+static int set_agent_resource_clock_permissions(
+    uint32_t agent_id,
+    uint32_t resource_id,
+    enum mod_res_perms_permissions flags)
+{
+    int status;
+    int32_t message_idx;
+
+    if (res_perms_ctx.agent_permissions->scmi_clock_perms == NULL)
+        return FWK_SUCCESS;
+    if (resource_id >= res_perms_ctx.clock_count)
+        return FWK_E_ACCESS;
+
+    for (message_idx = MOD_SCMI_CLOCK_ATTRIBUTES;
+         message_idx <= MOD_SCMI_CLOCK_CONFIG_SET;
+         message_idx++) {
+        status = set_agent_resource_message_perms(
+            agent_id,
+            MOD_SCMI_PROTOCOL_ID_CLOCK,
+            message_idx,
+            resource_id,
+            res_perms_ctx.agent_permissions->scmi_clock_perms,
+            flags);
+
+        if (status != FWK_SUCCESS)
+            return status;
+    }
+
+    return FWK_SUCCESS;
+}
+
+#ifdef BUILD_HAS_SCMI_RESET
+
+static int set_agent_resource_reset_permissions(
+    uint32_t agent_id,
+    uint32_t resource_id,
+    enum mod_res_perms_permissions flags)
+{
+    int status;
+    int32_t message_idx;
+
+    if (res_perms_ctx.agent_permissions->scmi_reset_perms == NULL)
+        return FWK_SUCCESS;
+    if (resource_id >= res_perms_ctx.reset_domain_count)
+        return FWK_E_ACCESS;
+
+    for (message_idx = MOD_SCMI_RESET_DOMAIN_ATTRIBUTES;
+         message_idx <= MOD_SCMI_RESET_NOTIFY;
+         message_idx++) {
+        status = set_agent_resource_message_perms(
+            agent_id,
+            MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN,
+            message_idx,
+            resource_id,
+            res_perms_ctx.agent_permissions->scmi_reset_domain_perms,
+            flags);
+
+        if (status != FWK_SUCCESS)
+            return status;
+    }
+
+    return FWK_SUCCESS;
+}
+
+#endif
+
+static int set_agent_resource_sensor_permissions(
+    uint32_t agent_id,
+    uint32_t resource_id,
+    enum mod_res_perms_permissions flags)
+{
+    int status;
+    int32_t message_idx;
+
+    if (res_perms_ctx.agent_permissions->scmi_sensor_perms == NULL)
+        return FWK_SUCCESS;
+    if (resource_id >= res_perms_ctx.sensor_count)
+        return FWK_E_ACCESS;
+
+    for (message_idx = MOD_SCMI_SENSOR_DESCRIPTION_GET;
+         message_idx <= MOD_SCMI_SENSOR_READING_GET;
+         message_idx++) {
+        status = set_agent_resource_message_perms(
+            agent_id,
+            MOD_SCMI_PROTOCOL_ID_SENSOR,
+            message_idx,
+            resource_id,
+            res_perms_ctx.agent_permissions->scmi_sensor_perms,
+            flags);
+
+        if (status != FWK_SUCCESS)
+            return status;
+    }
+
+    return FWK_SUCCESS;
+}
+
+static int mod_res_agent_set_permissions(
+    enum mod_res_domain_device_types type,
+    uint32_t agent_id,
+    uint32_t resource_id,
+    enum mod_res_perms_permissions flags)
+{
+    int status;
+
+    switch (type) {
+    case MOD_RES_POWER_DOMAIN_DEVICE:
+        status =
+            set_agent_resource_pd_permissions(agent_id, resource_id, flags);
+        break;
+
+    case MOD_RES_PERF_DOMAIN_DEVICE:
+        status =
+            set_agent_resource_perf_permissions(agent_id, resource_id, flags);
+        break;
+
+    case MOD_RES_CLOCK_DOMAIN_DEVICE:
+        status =
+            set_agent_resource_clock_permissions(agent_id, resource_id, flags);
+        break;
+
+    case MOD_RES_SENSOR_DOMAIN_DEVICE:
+        status =
+            set_agent_resource_sensor_permissions(agent_id, resource_id, flags);
+        break;
+
+#ifdef BUILD_HAS_SCMI_RESET
+    case MOD_RES_RESET_DOMAIN_DEVICE:
+        status =
+            set_agent_resource_reset_permissions(agent_id, resource_id, flags);
+        break;
+#endif
+
+    default:
+        status = FWK_E_ACCESS;
+        break;
+    }
+
+    if (status != FWK_SUCCESS)
+        FWK_LOG_WARN(
+            "[perms] set_permissions for agent %d type %d device %d failed\n",
+            (int)agent_id,
+            (int)type,
+            (int)resource_id);
+
+    return status;
+}
+
 static int mod_res_agent_set_device_permission(
     uint32_t agent_id,
     uint32_t device_id,
     uint32_t flags)
 {
+    struct mod_res_domain_device *dev;
+    uint32_t resource_id;
+    int status;
+    uint32_t i;
+
+    /* No device permissons */
+    if ((res_perms_ctx.device_count == 0) ||
+        (res_perms_ctx.domain_devices == NULL))
+        return FWK_E_ACCESS;
+
+    if (device_id >= res_perms_ctx.device_count)
+        return FWK_E_PARAM;
+
+    if ((flags != 0) && (flags != 1))
+        return FWK_E_PARAM;
+
+    /* Find device */
+    for (i = 0; i < res_perms_ctx.device_count; i++) {
+        if (res_perms_ctx.domain_devices[i].device_id == device_id)
+            break;
+    }
+
+    if (i == res_perms_ctx.device_count)
+        return FWK_E_ACCESS;
+
+    dev = res_perms_ctx.domain_devices[i].domain_devices;
+    while (dev->type != MOD_RES_DOMAIN_DEVICE_INVALID) {
+        if (fwk_id_is_equal(dev->device_id, FWK_ID_NONE))
+            return FWK_SUCCESS;
+
+        resource_id = fwk_id_get_element_idx(dev->device_id);
+
+        status = mod_res_agent_set_permissions(
+            dev->type, agent_id, resource_id, flags);
+
+        if (status != FWK_SUCCESS)
+            FWK_LOG_WARN(
+                "[perms] set_permissions for agent %d device %d failed\n",
+                (int)agent_id,
+                (int)i);
+
+        /* next domain device */
+        dev++;
+    };
+
     return FWK_SUCCESS;
 }
 
@@ -678,6 +966,79 @@ static int mod_res_agent_set_device_protocol_permission(
     uint32_t protocol_id,
     uint32_t flags)
 {
+    enum mod_res_domain_device_types dev_type;
+    struct mod_res_domain_device *dev;
+    uint32_t resource_id;
+    int status;
+    uint32_t i;
+
+    /* No device permissons */
+    if ((res_perms_ctx.device_count == 0) ||
+        (res_perms_ctx.domain_devices == NULL))
+        return FWK_E_ACCESS;
+
+    if (device_id >= res_perms_ctx.device_count)
+        return FWK_E_PARAM;
+
+    if ((flags != 0) && (flags != 1))
+        return FWK_E_PARAM;
+
+    /* Find device */
+    for (i = 0; i < res_perms_ctx.device_count; i++) {
+        if (res_perms_ctx.domain_devices[i].device_id == device_id)
+            break;
+    }
+
+    if (i == res_perms_ctx.device_count)
+        return FWK_E_ACCESS;
+
+    switch (protocol_id) {
+    case MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN:
+        dev_type = MOD_RES_POWER_DOMAIN_DEVICE;
+        break;
+    case MOD_SCMI_PROTOCOL_ID_PERF:
+        dev_type = MOD_RES_PERF_DOMAIN_DEVICE;
+        break;
+    case MOD_SCMI_PROTOCOL_ID_CLOCK:
+        dev_type = MOD_RES_CLOCK_DOMAIN_DEVICE;
+        break;
+    case MOD_SCMI_PROTOCOL_ID_SENSOR:
+        dev_type = MOD_RES_SENSOR_DOMAIN_DEVICE;
+        break;
+    case MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN:
+        dev_type = MOD_RES_RESET_DOMAIN_DEVICE;
+        break;
+    default:
+    case MOD_SCMI_PROTOCOL_ID_BASE:
+    case MOD_SCMI_PROTOCOL_ID_SYS_POWER:
+        return FWK_E_ACCESS;
+    }
+
+    dev = res_perms_ctx.domain_devices[i].domain_devices;
+    while (dev->type != MOD_RES_DOMAIN_DEVICE_INVALID) {
+        if (fwk_id_is_equal(dev->device_id, FWK_ID_NONE))
+            return FWK_SUCCESS;
+
+        if (dev->type != dev_type) {
+            dev++;
+            continue;
+        }
+
+        resource_id = fwk_id_get_element_idx(dev->device_id);
+
+        status = mod_res_agent_set_permissions(
+            dev->type, agent_id, resource_id, flags);
+
+        if (status != FWK_SUCCESS)
+            FWK_LOG_WARN(
+                "[perms] set_permissions for agent %d device %d failed\n",
+                (int)agent_id,
+                (int)i);
+
+        /* next domain device */
+        dev++;
+    };
+
     return FWK_SUCCESS;
 }
 
