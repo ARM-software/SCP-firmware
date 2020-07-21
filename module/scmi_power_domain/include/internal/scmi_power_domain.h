@@ -65,6 +65,8 @@ struct __attribute((packed)) scmi_pd_power_domain_attributes_p2a {
  */
 
 #define SCMI_PD_POWER_STATE_SET_ASYNC_FLAG_MASK    (1 << 0)
+#define SCMI_PD_POWER_STATE_SET_FLAGS_MASK (1 << 0)
+#define SCMI_PD_POWER_STATE_SET_POWER_STATE_MASK UINT32_C(0x4FFFFFFF)
 
 struct __attribute((packed)) scmi_pd_power_state_set_a2p {
     uint32_t flags;
