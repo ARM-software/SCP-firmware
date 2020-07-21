@@ -411,6 +411,15 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
         goto exit;
     }
 
+    if (((parameters->flags & ~SCMI_PD_POWER_STATE_SET_FLAGS_MASK) != 0x0) ||
+        ((parameters->power_state &
+          ~SCMI_PD_POWER_STATE_SET_POWER_STATE_MASK) != 0x0)) {
+        status = FWK_SUCCESS;
+        return_values.status = SCMI_INVALID_PARAMETERS;
+
+        goto exit;
+    }
+
     pd_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, domain_idx);
     if (!fwk_module_is_valid_element_id(pd_id)) {
         return_values.status = SCMI_NOT_FOUND;
