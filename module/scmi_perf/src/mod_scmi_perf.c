@@ -369,6 +369,9 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
     notifications = true;
 #endif
 #ifdef BUILD_HAS_FAST_CHANNELS
+    const struct mod_scmi_perf_domain_config *domain =
+        &(*scmi_perf_ctx.config->domains)[parameters->domain_id];
+
     if (domain->fast_channels_addr_scp != 0x0)
         fast_channels = true;
 #endif
