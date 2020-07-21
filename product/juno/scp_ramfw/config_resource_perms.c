@@ -7,6 +7,7 @@
 
 #include "config_dvfs.h"
 #include "config_power_domain.h"
+#include "config_resource_perms.h"
 #include "config_sensor.h"
 #include "juno_clock.h"
 #include "juno_scmi.h"
@@ -325,6 +326,164 @@ static struct mod_res_agent_permission agent_permissions = {
 #endif
 };
 
+/*
+ * Juno Platform devices
+ *
+ * Note that a device must be terminated with
+ *  {FWK_ID_NONE, MOD_RES_DOMAIN_DEVICE_INVALID}
+ *
+ */
+static struct mod_res_domain_device devices_cpu[] = {
+    {
+        .device_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SCMI_PERF, DVFS_ELEMENT_IDX_BIG),
+        .type = MOD_RES_PERF_DOMAIN_DEVICE,
+    },
+    {
+        .device_id = FWK_ID_ELEMENT_INIT(
+            FWK_MODULE_IDX_SCMI_CLOCK,
+            JUNO_CLOCK_IDX_BIGCLK),
+        .type = MOD_RES_CLOCK_DOMAIN_DEVICE,
+    },
+    {
+        .device_id = FWK_ID_ELEMENT_INIT(
+            FWK_MODULE_IDX_SCMI_POWER_DOMAIN,
+            POWER_DOMAIN_IDX_BIG_CPU0),
+        .type = MOD_RES_POWER_DOMAIN_DEVICE,
+    },
+    {
+        .device_id = FWK_ID_ELEMENT_INIT(
+            FWK_MODULE_IDX_SCMI_POWER_DOMAIN,
+            POWER_DOMAIN_IDX_BIG_CPU1),
+        .type = MOD_RES_POWER_DOMAIN_DEVICE,
+    },
+    {
+        .device_id = FWK_ID_ELEMENT_INIT(
+            FWK_MODULE_IDX_SCMI_POWER_DOMAIN,
+            POWER_DOMAIN_IDX_BIG_SSTOP),
+        .type = MOD_RES_POWER_DOMAIN_DEVICE,
+    },
+    {
+        .device_id = FWK_ID_ELEMENT_INIT(
+            FWK_MODULE_IDX_SCMI_PERF,
+            DVFS_ELEMENT_IDX_LITTLE),
+        .type = MOD_RES_PERF_DOMAIN_DEVICE,
+    },
+    {
+        .device_id = FWK_ID_ELEMENT_INIT(
+            FWK_MODULE_IDX_SCMI_CLOCK,
+            JUNO_CLOCK_IDX_LITTLECLK),
+        .type = MOD_RES_CLOCK_DOMAIN_DEVICE,
+    },
+    {
+        .device_id = FWK_ID_ELEMENT_INIT(
+            FWK_MODULE_IDX_SCMI_POWER_DOMAIN,
+            POWER_DOMAIN_IDX_LITTLE_CPU0),
+        .type = MOD_RES_POWER_DOMAIN_DEVICE,
+    },
+    {
+        .device_id = FWK_ID_ELEMENT_INIT(
+            FWK_MODULE_IDX_SCMI_POWER_DOMAIN,
+            POWER_DOMAIN_IDX_LITTLE_CPU1),
+        .type = MOD_RES_POWER_DOMAIN_DEVICE,
+    },
+    {
+        .device_id = FWK_ID_ELEMENT_INIT(
+            FWK_MODULE_IDX_SCMI_POWER_DOMAIN,
+            POWER_DOMAIN_IDX_LITTLE_CPU2),
+        .type = MOD_RES_POWER_DOMAIN_DEVICE,
+    },
+    {
+        .device_id = FWK_ID_ELEMENT_INIT(
+            FWK_MODULE_IDX_SCMI_POWER_DOMAIN,
+            POWER_DOMAIN_IDX_LITTLE_CPU3),
+        .type = MOD_RES_POWER_DOMAIN_DEVICE,
+    },
+    {
+        .device_id = FWK_ID_ELEMENT_INIT(
+            FWK_MODULE_IDX_SCMI_POWER_DOMAIN,
+            POWER_DOMAIN_IDX_LITTLE_SSTOP),
+        .type = MOD_RES_POWER_DOMAIN_DEVICE,
+    },
+    {
+        .device_id = FWK_ID_NONE_INIT,
+        .type = MOD_RES_DOMAIN_DEVICE_INVALID,
+    },
+};
+
+static struct mod_res_domain_device devices_gpu[] = {
+    {
+        .device_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SCMI_PERF, DVFS_ELEMENT_IDX_GPU),
+        .type = MOD_RES_PERF_DOMAIN_DEVICE,
+    },
+    {
+        .device_id = FWK_ID_ELEMENT_INIT(
+            FWK_MODULE_IDX_SCMI_CLOCK,
+            JUNO_CLOCK_IDX_GPUCLK),
+        .type = MOD_RES_CLOCK_DOMAIN_DEVICE,
+    },
+    {
+        .device_id = FWK_ID_ELEMENT_INIT(
+            FWK_MODULE_IDX_SCMI_POWER_DOMAIN,
+            POWER_DOMAIN_IDX_GPUTOP),
+        .type = MOD_RES_POWER_DOMAIN_DEVICE,
+    },
+    {
+        .device_id = FWK_ID_NONE_INIT,
+        .type = MOD_RES_DOMAIN_DEVICE_INVALID,
+    },
+};
+
+static struct mod_res_domain_device devices_io[] = {
+    {
+        .device_id = FWK_ID_ELEMENT_INIT(
+            FWK_MODULE_IDX_SCMI_CLOCK,
+            JUNO_CLOCK_IDX_HDLCD0),
+        .type = MOD_RES_CLOCK_DOMAIN_DEVICE,
+    },
+    {
+        .device_id = FWK_ID_ELEMENT_INIT(
+            FWK_MODULE_IDX_SCMI_CLOCK,
+            JUNO_CLOCK_IDX_HDLCD1),
+        .type = MOD_RES_CLOCK_DOMAIN_DEVICE,
+    },
+    {
+        .device_id = FWK_ID_ELEMENT_INIT(
+            FWK_MODULE_IDX_SCMI_CLOCK,
+            JUNO_CLOCK_IDX_I2SCLK),
+        .type = MOD_RES_CLOCK_DOMAIN_DEVICE,
+    },
+#ifdef BUILD_HAS_SCMI_RESET
+    {
+        .device_id = FWK_ID_ELEMENT_INIT(
+            FWK_MODULE_IDX_RESET_DOMAIN,
+            JUNO_RESET_DOMAIN_IDX_UART),
+        .type = MOD_RES_RESET_DOMAIN_DEVICE,
+    },
+#endif
+    {
+        .device_id = FWK_ID_NONE_INIT,
+        .type = MOD_RES_DOMAIN_DEVICE_INVALID,
+    },
+};
+
+static struct mod_res_device juno_devices[] = {
+    {
+        .device_id = JUNO_RES_PERMS_DEVICES_CPU,
+        .domain_devices = devices_cpu,
+    },
+    {
+        .device_id = JUNO_RES_PERMS_DEVICES_GPU,
+        .domain_devices = devices_gpu,
+    },
+    {
+        .device_id = JUNO_RES_PERMS_DEVICES_IO,
+        .domain_devices = devices_io,
+    },
+    { 0 },
+};
+
 struct fwk_module_config config_resource_perms = {
     .data =
         &(struct mod_res_resource_perms_config){
@@ -335,8 +494,12 @@ struct fwk_module_config config_resource_perms = {
             .sensor_count = MOD_JUNO_R0_SENSOR_IDX_COUNT,
             .pd_count = POWER_DOMAIN_IDX_COUNT,
             .perf_count = DVFS_ELEMENT_IDX_COUNT,
+            .perf_cmd_count = JUNO_PERF_RESOURCE_CMDS,
+            .perf_resource_count = JUNO_PERF_RESOURCE_ELEMENTS,
+            .device_count = JUNO_RES_PERMS_DEVICES_COUNT,
 #ifdef BUILD_HAS_SCMI_RESET
             .reset_domain_count = JUNO_RESET_DOMAIN_IDX_COUNT,
 #endif
+            .domain_devices = (uintptr_t)&juno_devices,
         },
 };
