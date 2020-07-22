@@ -154,7 +154,7 @@ enum scmi_perf_api_idx {
  *      performance policy functions may be overridden in the
  * `product/<platform>/src` directory.
  *
- * \note The `frequency`/`range` values may be changed by the policy handlers.
+ * \note The `level`/`range` values may be changed by the policy handlers.
  * \note See `product/juno/src/juno_scmi_clock.c` for an example policy
  *      handler.
  *
@@ -189,7 +189,7 @@ enum mod_scmi_perf_policy_status {
  *      ::MOD_SCMI_PERF_EXECUTE_MESSAGE_HANDLER.
  *
  * \param[out] policy_status Whether the command should be accepted or not.
- * \param[in, out] frequency Frequency requested to be set.
+ * \param[in, out] level Level requested to be set.
  * \param[in] agent_id Identifier of the agent requesting the service.
  * \param[in] domain_id Identifier of the performance domain.
  *
@@ -199,7 +199,7 @@ enum mod_scmi_perf_policy_status {
  */
 int scmi_perf_level_set_policy(
     enum mod_scmi_perf_policy_status *policy_status,
-    uint32_t *frequency,
+    uint32_t *level,
     unsigned int agent_id,
     fwk_id_t domain_id);
 
@@ -215,8 +215,8 @@ int scmi_perf_level_set_policy(
  *      ::MOD_SCMI_PERF_EXECUTE_MESSAGE_HANDLER.
  *
  * \param[out] policy_status Whether the command should be accepted or not.
- * \param[in, out] range_min Minimum frequency range.
- * \param[in, out] range_max Maximum frequency range.
+ * \param[in, out] range_min Minimum level range.
+ * \param[in, out] range_max Maximum level range.
  * \param[in] agent_id Identifier of the agent requesting the service.
  * \param[in] domain_id Identifier of the performance domain.
  *

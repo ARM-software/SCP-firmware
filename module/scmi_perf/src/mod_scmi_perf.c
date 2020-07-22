@@ -385,7 +385,7 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
             fast_channels),
         .rate_limit = 0, /* Unsupported */
         .sustained_freq = opp.frequency / FWK_KHZ,
-        .sustained_perf_level = opp.frequency,
+        .sustained_perf_level = opp.level,
     };
 
     /* Copy the domain name into the mailbox */
@@ -477,7 +477,7 @@ static int scmi_perf_describe_levels_handler(fwk_id_t service_id,
             perf_level.power_cost = opp.power;
         else
             perf_level.power_cost = opp.voltage;
-        perf_level.performance_level = opp.frequency;
+        perf_level.performance_level = opp.level;
         perf_level.attributes = latency;
 
         status = scmi_perf_ctx.scmi_api->write_payload(service_id, payload_size,
@@ -551,11 +551,11 @@ static int scmi_perf_limits_set_handler(fwk_id_t service_id,
         return_values.status = SCMI_SUCCESS;
         goto exit;
     }
-    status = scmi_perf_ctx.dvfs_api->set_frequency_limits(
+    status = scmi_perf_ctx.dvfs_api->set_level_limits(
         domain_id,
         agent_id,
-        &((struct mod_dvfs_frequency_limits){ .minimum = range_min,
-                                              .maximum = range_max }));
+        &((struct mod_dvfs_level_limits){ .minimum = range_min,
+                                          .maximum = range_max }));
 
     /*
      * Return immediately to the caller, fire-and-forget.
@@ -675,8 +675,7 @@ static int scmi_perf_level_set_handler(fwk_id_t service_id,
         return_values.status = SCMI_SUCCESS;
         goto exit;
     }
-    status =
-        scmi_perf_ctx.dvfs_api->set_frequency(domain_id, agent_id, perf_level);
+    status = scmi_perf_ctx.dvfs_api->set_level(domain_id, agent_id, perf_level);
 
     /*
      * Return immediately to the caller, fire-and-forget.
@@ -960,16 +959,16 @@ static void fast_channel_callback(uintptr_t param)
              * Check for set_level
              */
             if (set_level != 0x0 && *set_level != 0) {
-                scmi_perf_ctx.dvfs_api->set_frequency(
+                scmi_perf_ctx.dvfs_api->set_level(
                     FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, i), 0, *set_level);
             }
             if (set_limit != 0) {
                 if ((set_limit->range_max == 0) && (set_limit->range_min == 0))
                     continue;
-                scmi_perf_ctx.dvfs_api->set_frequency_limits(
+                scmi_perf_ctx.dvfs_api->set_level_limits(
                     FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, i),
                     0,
-                    &((struct mod_dvfs_frequency_limits){
+                    &((struct mod_dvfs_level_limits){
                         .minimum = set_limit->range_min,
                         .maximum = set_limit->range_max,
                     }));
@@ -995,7 +994,7 @@ __attribute__((weak)) int scmi_perf_limits_set_policy(
 
 __attribute__((weak)) int scmi_perf_level_set_policy(
     enum mod_scmi_perf_policy_status *policy_status,
-    uint32_t *frequency,
+    uint32_t *level,
     unsigned int agent_id,
     fwk_id_t domain_id)
 {
@@ -1150,8 +1149,7 @@ static void scmi_perf_notify_level(fwk_id_t domain_id,
     idx = fwk_id_get_element_idx(domain_id);
 
 #ifdef BUILD_HAS_STATISTICS
-    status = scmi_perf_ctx.dvfs_api->get_frequency_id(domain_id, level,
-        &level_id);
+    status = scmi_perf_ctx.dvfs_api->get_level_id(domain_id, level, &level_id);
     if (status == FWK_SUCCESS)
         scmi_perf_ctx.stats_api->update_domain(fwk_module_id_scmi_perf,
             FWK_ID_ELEMENT(FWK_MODULE_IDX_SCMI_PERF, idx), level_id);
@@ -1433,7 +1431,7 @@ static int scmi_perf_start(fwk_id_t id)
 static int process_request_event(const struct fwk_event *event)
 {
     int status;
-    struct mod_dvfs_frequency_limits limits;
+    struct mod_dvfs_level_limits limits;
     struct scmi_perf_event_parameters *params;
     struct scmi_perf_level_get_p2a return_values_level;
     struct scmi_perf_limits_get_p2a return_values_limits;
@@ -1449,7 +1447,7 @@ static int process_request_event(const struct fwk_event *event)
             /* DVFS value is ready */
             return_values_level = (struct scmi_perf_level_get_p2a){
                 .status = SCMI_SUCCESS,
-                .performance_level = opp.frequency,
+                .performance_level = opp.level,
             };
 
             scmi_perf_respond(&return_values_level, params->domain_id,
@@ -1474,8 +1472,8 @@ static int process_request_event(const struct fwk_event *event)
     if (fwk_id_is_equal(event->id, scmi_perf_get_limits)) {
         params = (struct scmi_perf_event_parameters *)event->params;
 
-        status = scmi_perf_ctx.dvfs_api->get_frequency_limits(params->domain_id,
-                                                       &limits);
+        status = scmi_perf_ctx.dvfs_api->get_level_limits(
+            params->domain_id, &limits);
         if (status == FWK_SUCCESS) {
             /* DVFS value is ready */
             return_values_limits = (struct scmi_perf_limits_get_p2a){
