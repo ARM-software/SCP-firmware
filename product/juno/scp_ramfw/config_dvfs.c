@@ -35,325 +35,363 @@
  */
 
 static const struct mod_dvfs_domain_config cpu_group_little_r0 = {
-    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU,
-        MOD_PSU_ELEMENT_IDX_VLITTLE),
-    .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
-        JUNO_CLOCK_IDX_LITTLECLK),
-    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0,
+    .psu_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, MOD_PSU_ELEMENT_IDX_VLITTLE),
+    .clock_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_LITTLECLK),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
+        FWK_MODULE_IDX_TIMER,
+        0,
         JUNO_DVFS_ALARM_VLITTLE_IDX),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SCMI_PERF,
+    .notification_api_id = FWK_ID_API_INIT(
+        FWK_MODULE_IDX_SCMI_PERF,
         MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 2,
-    .opps = (struct mod_dvfs_opp[]) {
-        {
-            .frequency = 450 * FWK_MHZ,
-            .voltage = 820,
-            .power = (0.14 * 450 * 0.820 * 0.820),
-        },
-        {
-            .frequency = 575 * FWK_MHZ,
-            .voltage = 850,
-            .power = (0.14 * 575 * 0.850 * 0.850),
-        },
-        {
-            .frequency = 700 * FWK_MHZ,
-            .voltage = 900,
-            .power = (0.14 * 700 * 0.900 * 0.900),
-        },
-        {
-            .frequency = 775 * FWK_MHZ,
-            .voltage = 950,
-            .power = (0.14 * 775 * 0.950 * 0.950),
-        },
-        {
-            .frequency = 850 * FWK_MHZ,
-            .voltage = 1000,
-            .power = (0.14 * 850 * 1.000 * 1.000),
-        },
-        { 0 }
-    }
+    .opps = (struct mod_dvfs_opp[]){ {
+                                         .level = 450 * 1000000UL,
+                                         .frequency = 450 * FWK_MHZ,
+                                         .voltage = 820,
+                                         .power = (0.14 * 450 * 0.820 * 0.820),
+                                     },
+                                     {
+                                         .level = 575 * 1000000UL,
+                                         .frequency = 575 * FWK_MHZ,
+                                         .voltage = 850,
+                                         .power = (0.14 * 575 * 0.850 * 0.850),
+                                     },
+                                     {
+                                         .level = 700 * 1000000UL,
+                                         .frequency = 700 * FWK_MHZ,
+                                         .voltage = 900,
+                                         .power = (0.14 * 700 * 0.900 * 0.900),
+                                     },
+                                     {
+                                         .level = 775 * 1000000UL,
+                                         .frequency = 775 * FWK_MHZ,
+                                         .voltage = 950,
+                                         .power = (0.14 * 775 * 0.950 * 0.950),
+                                     },
+                                     {
+                                         .level = 850 * 1000000UL,
+                                         .frequency = 850 * FWK_MHZ,
+                                         .voltage = 1000,
+                                         .power = (0.14 * 850 * 1.000 * 1.000),
+                                     },
+                                     { 0 } }
 };
 
 static const struct mod_dvfs_domain_config cpu_group_little_r1 = {
-    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU,
-        MOD_PSU_ELEMENT_IDX_VLITTLE),
-    .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
-        JUNO_CLOCK_IDX_LITTLECLK),
-    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0,
+    .psu_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, MOD_PSU_ELEMENT_IDX_VLITTLE),
+    .clock_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_LITTLECLK),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
+        FWK_MODULE_IDX_TIMER,
+        0,
         JUNO_DVFS_ALARM_VLITTLE_IDX),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SCMI_PERF,
+    .notification_api_id = FWK_ID_API_INIT(
+        FWK_MODULE_IDX_SCMI_PERF,
         MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 0,
-    .opps = (struct mod_dvfs_opp[]) {
-        {
-            .frequency = 650 * FWK_MHZ,
-            .voltage = 800,
-            .power = (0.14 * 650 * 0.800 * 0.800),
-        },
-        { 0 }
-    }
+    .opps = (struct mod_dvfs_opp[]){ {
+                                         .level = 650 * 1000000UL,
+                                         .frequency = 650 * FWK_MHZ,
+                                         .voltage = 800,
+                                         .power = (0.14 * 650 * 0.800 * 0.800),
+                                     },
+                                     { 0 } }
 };
 
 static const struct mod_dvfs_domain_config cpu_group_little_r2 = {
-    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU,
-        MOD_PSU_ELEMENT_IDX_VLITTLE),
-    .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
-        JUNO_CLOCK_IDX_LITTLECLK),
-    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0,
+    .psu_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, MOD_PSU_ELEMENT_IDX_VLITTLE),
+    .clock_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_LITTLECLK),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
+        FWK_MODULE_IDX_TIMER,
+        0,
         JUNO_DVFS_ALARM_VLITTLE_IDX),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SCMI_PERF,
+    .notification_api_id = FWK_ID_API_INIT(
+        FWK_MODULE_IDX_SCMI_PERF,
         MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 1,
-    .opps = (struct mod_dvfs_opp[]) {
-        {
-            .frequency = 450 * FWK_MHZ,
-            .voltage = 820,
-            .power = (0.14 * 450 * 0.820 * 0.820),
-        },
-        {
-            .frequency = 800 * FWK_MHZ,
-            .voltage = 900,
-            .power = (0.14 * 800 * 0.900 * 0.900),
-        },
-        {
-            .frequency = 950 * FWK_MHZ,
-            .voltage = 1000,
-            .power = (0.14 * 950 * 1.000 * 1.000),
-        },
-        { 0 }
-    }
+    .opps = (struct mod_dvfs_opp[]){ {
+                                         .level = 450 * 1000000UL,
+                                         .frequency = 450 * FWK_MHZ,
+                                         .voltage = 820,
+                                         .power = (0.14 * 450 * 0.820 * 0.820),
+                                     },
+                                     {
+                                         .level = 800 * 1000000UL,
+                                         .frequency = 800 * FWK_MHZ,
+                                         .voltage = 900,
+                                         .power = (0.14 * 800 * 0.900 * 0.900),
+                                     },
+                                     {
+                                         .level = 950 * 1000000UL,
+                                         .frequency = 950 * FWK_MHZ,
+                                         .voltage = 1000,
+                                         .power = (0.14 * 950 * 1.000 * 1.000),
+                                     },
+                                     { 0 } }
 };
 
 static const struct mod_dvfs_domain_config cpu_group_big_r0 = {
-    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU,
-        MOD_PSU_ELEMENT_IDX_VBIG),
-    .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
-        JUNO_CLOCK_IDX_BIGCLK),
-    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0,
+    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, MOD_PSU_ELEMENT_IDX_VBIG),
+    .clock_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_BIGCLK),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
+        FWK_MODULE_IDX_TIMER,
+        0,
         JUNO_DVFS_ALARM_BIG_IDX),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SCMI_PERF,
+    .notification_api_id = FWK_ID_API_INIT(
+        FWK_MODULE_IDX_SCMI_PERF,
         MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 2,
-    .opps = (struct mod_dvfs_opp[]) {
-        {
-            .frequency = 450 * FWK_MHZ,
-            .voltage = 820,
-            .power = (0.53 * 450 * 0.820 * 0.820),
-        },
-        {
-            .frequency = 625 * FWK_MHZ,
-            .voltage = 850,
-            .power = (0.53 * 625 * 0.850 * 0.850),
-        },
-        {
-            .frequency = 800 * FWK_MHZ,
-            .voltage = 900,
-            .power = (0.53 * 800 * 0.900 * 0.900),
-        },
-        {
-            .frequency = 950 * FWK_MHZ,
-            .voltage = 950,
-            .power = (0.53 * 950 * 0.950 * 0.950),
-        },
-        {
-            .frequency = 1100 * FWK_MHZ,
-            .voltage = 1000,
-            .power = (0.53 * 1100 * 1.000 * 1.000),
-        },
-        { 0 }
-    }
+    .opps = (struct mod_dvfs_opp[]){ {
+                                         .level = 450 * 1000000UL,
+                                         .frequency = 450 * FWK_MHZ,
+                                         .voltage = 820,
+                                         .power = (0.53 * 450 * 0.820 * 0.820),
+                                     },
+                                     {
+                                         .level = 625 * 1000000UL,
+                                         .frequency = 625 * FWK_MHZ,
+                                         .voltage = 850,
+                                         .power = (0.53 * 625 * 0.850 * 0.850),
+                                     },
+                                     {
+                                         .level = 800 * 1000000UL,
+                                         .frequency = 800 * FWK_MHZ,
+                                         .voltage = 900,
+                                         .power = (0.53 * 800 * 0.900 * 0.900),
+                                     },
+                                     {
+                                         .level = 950 * 1000000UL,
+                                         .frequency = 950 * FWK_MHZ,
+                                         .voltage = 950,
+                                         .power = (0.53 * 950 * 0.950 * 0.950),
+                                     },
+                                     {
+                                         .level = 1100 * 1000000UL,
+                                         .frequency = 1100 * FWK_MHZ,
+                                         .voltage = 1000,
+                                         .power = (0.53 * 1100 * 1.000 * 1.000),
+                                     },
+                                     { 0 } }
 };
 
 static const struct mod_dvfs_domain_config cpu_group_big_r1 = {
-    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU,
-        MOD_PSU_ELEMENT_IDX_VBIG),
-    .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
-        JUNO_CLOCK_IDX_BIGCLK),
-    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0,
+    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, MOD_PSU_ELEMENT_IDX_VBIG),
+    .clock_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_BIGCLK),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
+        FWK_MODULE_IDX_TIMER,
+        0,
         JUNO_DVFS_ALARM_BIG_IDX),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SCMI_PERF,
+    .notification_api_id = FWK_ID_API_INIT(
+        FWK_MODULE_IDX_SCMI_PERF,
         MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 1,
-    .opps = (struct mod_dvfs_opp[]) {
-        {
-            .frequency = 600 * FWK_MHZ,
-            .voltage = 800,
-            .power = (0.53 * 600 * 0.800 * 0.800),
-        },
-        {
-            .frequency = 900 * FWK_MHZ,
-            .voltage = 900,
-            .power = (0.53 * 900 * 0.900 * 0.900),
-        },
-        {
-            .frequency = 1150 * FWK_MHZ,
-            .voltage = 1000,
-            .power = (0.53 * 1150 * 1.000 * 1.000),
-        },
-        { 0 }
-    }
+    .opps = (struct mod_dvfs_opp[]){ {
+                                         .level = 600 * 1000000UL,
+                                         .frequency = 600 * FWK_MHZ,
+                                         .voltage = 800,
+                                         .power = (0.53 * 600 * 0.800 * 0.800),
+                                     },
+                                     {
+                                         .level = 900 * 1000000UL,
+                                         .frequency = 900 * FWK_MHZ,
+                                         .voltage = 900,
+                                         .power = (0.53 * 900 * 0.900 * 0.900),
+                                     },
+                                     {
+                                         .level = 1150 * 1000000UL,
+                                         .frequency = 1150 * FWK_MHZ,
+                                         .voltage = 1000,
+                                         .power = (0.53 * 1150 * 1.000 * 1.000),
+                                     },
+                                     { 0 } }
 };
 
 static const struct mod_dvfs_domain_config cpu_group_big_r2 = {
-    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU,
-        MOD_PSU_ELEMENT_IDX_VBIG),
-    .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
-        JUNO_CLOCK_IDX_BIGCLK),
-    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0,
+    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, MOD_PSU_ELEMENT_IDX_VBIG),
+    .clock_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_BIGCLK),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
+        FWK_MODULE_IDX_TIMER,
+        0,
         JUNO_DVFS_ALARM_BIG_IDX),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SCMI_PERF,
+    .notification_api_id = FWK_ID_API_INIT(
+        FWK_MODULE_IDX_SCMI_PERF,
         MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 1,
-    .opps = (struct mod_dvfs_opp[]) {
-        {
-            .frequency = 600 * FWK_MHZ,
-            .voltage = 820,
-            .power = (0.45 * 600 * 0.820 * 0.820),
-        },
-        {
-            .frequency = 1000 * FWK_MHZ,
-            .voltage = 900,
-            .power = (0.45 * 1000 * 0.900 * 0.900),
-        },
-        {
-            .frequency = 1200 * FWK_MHZ,
-            .voltage = 1000,
-            .power = (0.45 * 1200 * 1.000 * 1.000),
-        },
-        { 0 }
-    }
+    .opps = (struct mod_dvfs_opp[]){ {
+                                         .level = 600 * 1000000UL,
+                                         .frequency = 600 * FWK_MHZ,
+                                         .voltage = 820,
+                                         .power = (0.45 * 600 * 0.820 * 0.820),
+                                     },
+                                     {
+                                         .level = 1000 * 1000000UL,
+                                         .frequency = 1000 * FWK_MHZ,
+                                         .voltage = 900,
+                                         .power = (0.45 * 1000 * 0.900 * 0.900),
+                                     },
+                                     {
+                                         .level = 1200 * 1000000UL,
+                                         .frequency = 1200 * FWK_MHZ,
+                                         .voltage = 1000,
+                                         .power = (0.45 * 1200 * 1.000 * 1.000),
+                                     },
+                                     { 0 } }
 };
 
 static const struct mod_dvfs_domain_config gpu_r0 = {
-    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU,
-        MOD_PSU_ELEMENT_IDX_VGPU),
-    .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
-        JUNO_CLOCK_IDX_GPUCLK),
-    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0,
+    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, MOD_PSU_ELEMENT_IDX_VGPU),
+    .clock_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_GPUCLK),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
+        FWK_MODULE_IDX_TIMER,
+        0,
         JUNO_DVFS_ALARM_GPU_IDX),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SCMI_PERF,
+    .notification_api_id = FWK_ID_API_INIT(
+        FWK_MODULE_IDX_SCMI_PERF,
         MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 4,
-    .opps = (struct mod_dvfs_opp[]) {
-        {
-            .frequency = 450 * FWK_MHZ,
-            .voltage = 820,
-            .power = (4.6875 * 450 * 0.820 * 0.820),
-        },
-        {
-            .frequency = 487500 * FWK_KHZ,
-            .voltage = 825,
-            .power = (4.6875 * 487.5 * 0.825 * 0.825),
-        },
-        {
-            .frequency = 525 * FWK_MHZ,
-            .voltage = 850,
-            .power = (4.6875 * 525 * 0.850 * 0.850),
-        },
-        {
-            .frequency = 562500 * FWK_KHZ,
-            .voltage = 875,
-            .power = (4.6875 * 562.5 * 0.875 * 0.875),
-        },
-        {
-            .frequency = 600 * FWK_MHZ,
-            .voltage = 900,
-            .power = (4.6875 * 600 * 0.900 * 0.900),
-        },
-        { 0 }
-    }
+    .opps =
+        (struct mod_dvfs_opp[]){ {
+                                     .level = 450 * 1000000UL,
+                                     .frequency = 450 * FWK_MHZ,
+                                     .voltage = 820,
+                                     .power = (4.6875 * 450 * 0.820 * 0.820),
+                                 },
+                                 {
+                                     .level = 487500 * 1000UL,
+                                     .frequency = 487500 * FWK_KHZ,
+                                     .voltage = 825,
+                                     .power = (4.6875 * 487.5 * 0.825 * 0.825),
+                                 },
+                                 {
+                                     .level = 525 * 1000000UL,
+                                     .frequency = 525 * FWK_MHZ,
+                                     .voltage = 850,
+                                     .power = (4.6875 * 525 * 0.850 * 0.850),
+                                 },
+                                 {
+                                     .level = 562500 * 1000UL,
+                                     .frequency = 562500 * FWK_KHZ,
+                                     .voltage = 875,
+                                     .power = (4.6875 * 562.5 * 0.875 * 0.875),
+                                 },
+                                 {
+                                     .level = 600 * 1000000UL,
+                                     .frequency = 600 * FWK_MHZ,
+                                     .voltage = 900,
+                                     .power = (4.6875 * 600 * 0.900 * 0.900),
+                                 },
+                                 { 0 } }
 };
 
 static const struct mod_dvfs_domain_config gpu_r1 = {
-    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU,
-        MOD_PSU_ELEMENT_IDX_VGPU),
-    .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
-        JUNO_CLOCK_IDX_GPUCLK),
-    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0,
+    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, MOD_PSU_ELEMENT_IDX_VGPU),
+    .clock_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_GPUCLK),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
+        FWK_MODULE_IDX_TIMER,
+        0,
         JUNO_DVFS_ALARM_GPU_IDX),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SCMI_PERF,
+    .notification_api_id = FWK_ID_API_INIT(
+        FWK_MODULE_IDX_SCMI_PERF,
         MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 4,
-    .opps = (struct mod_dvfs_opp[]) {
-        {
-            .frequency = 450 * FWK_MHZ,
-            .voltage = 820,
-            .power = (4.6875 * 450 * 0.820 * 0.820),
-        },
-        {
-            .frequency = 487500 * FWK_KHZ,
-            .voltage = 825,
-            .power = (4.6875 * 487.5 * 0.825 * 0.825),
-        },
-        {
-            .frequency = 525 * FWK_MHZ,
-            .voltage = 850,
-            .power = (4.6875 * 525 * 0.850 * 0.850),
-        },
-        {
-            .frequency = 562500 * FWK_KHZ,
-            .voltage = 875,
-            .power = (4.6875 * 562.5 * 0.875 * 0.875),
-        },
-        {
-            .frequency = 600 * FWK_MHZ,
-            .voltage = 900,
-            .power = (4.6875 * 600 * 0.900 * 0.900),
-        },
-        { 0 }
-    }
+    .opps =
+        (struct mod_dvfs_opp[]){ {
+                                     .level = 450 * 1000000UL,
+                                     .frequency = 450 * FWK_MHZ,
+                                     .voltage = 820,
+                                     .power = (4.6875 * 450 * 0.820 * 0.820),
+                                 },
+                                 {
+                                     .level = 487500 * 1000UL,
+                                     .frequency = 487500 * FWK_KHZ,
+                                     .voltage = 825,
+                                     .power = (4.6875 * 487.5 * 0.825 * 0.825),
+                                 },
+                                 {
+                                     .level = 525 * 1000000UL,
+                                     .frequency = 525 * FWK_MHZ,
+                                     .voltage = 850,
+                                     .power = (4.6875 * 525 * 0.850 * 0.850),
+                                 },
+                                 {
+                                     .level = 562500 * 1000UL,
+                                     .frequency = 562500 * FWK_KHZ,
+                                     .voltage = 875,
+                                     .power = (4.6875 * 562.5 * 0.875 * 0.875),
+                                 },
+                                 {
+                                     .level = 600 * 1000000UL,
+                                     .frequency = 600 * FWK_MHZ,
+                                     .voltage = 900,
+                                     .power = (4.6875 * 600 * 0.900 * 0.900),
+                                 },
+                                 { 0 } }
 };
 
 static const struct mod_dvfs_domain_config gpu_r2 = {
-    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU,
-        MOD_PSU_ELEMENT_IDX_VGPU),
-    .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
-        JUNO_CLOCK_IDX_GPUCLK),
-    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0,
+    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, MOD_PSU_ELEMENT_IDX_VGPU),
+    .clock_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_GPUCLK),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
+        FWK_MODULE_IDX_TIMER,
+        0,
         JUNO_DVFS_ALARM_GPU_IDX),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SCMI_PERF,
+    .notification_api_id = FWK_ID_API_INIT(
+        FWK_MODULE_IDX_SCMI_PERF,
         MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 1,
-    .opps = (struct mod_dvfs_opp[]) {
-        {
-            .frequency = 450 * FWK_MHZ,
-            .voltage = 820,
-            .power = (4.6875 * 450 * 0.820 * 0.820),
-        },
-        {
-            .frequency = 600 * FWK_MHZ,
-            .voltage = 900,
-            .power = (4.6875 * 600 * 0.900 * 0.900),
-        },
-        { 0 }
-    }
+    .opps =
+        (struct mod_dvfs_opp[]){ {
+                                     .level = 450 * 1000000UL,
+                                     .frequency = 450 * FWK_MHZ,
+                                     .voltage = 820,
+                                     .power = (4.6875 * 450 * 0.820 * 0.820),
+                                 },
+                                 {
+                                     .level = 600 * 1000000UL,
+                                     .frequency = 600 * FWK_MHZ,
+                                     .voltage = 900,
+                                     .power = (4.6875 * 600 * 0.900 * 0.900),
+                                 },
+                                 { 0 } }
 };
 
 static const struct fwk_element element_table_r0[] = {

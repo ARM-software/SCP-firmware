@@ -27,20 +27,21 @@
  */
 
 /*!
- * \brief Frequency limits.
+ * \brief Level limits.
  */
-struct mod_dvfs_frequency_limits {
-    uint32_t minimum; /*!< Minimum permitted rate */
-    uint32_t maximum; /*!< Maximum permitted rate */
+struct mod_dvfs_level_limits {
+    uint32_t minimum; /*!< Minimum permitted level */
+    uint32_t maximum; /*!< Maximum permitted level */
 };
 
 /*!
  * \brief Operating Performance Point (OPP).
  */
 struct mod_dvfs_opp {
+    uint32_t level; /*!< Level value of the OPP */
     uint32_t voltage; /*!< Power supply voltage in millivolts (mV) */
     uint32_t frequency; /*!< Clock rate in Hertz (Hz) */
-    uint32_t power; /*!< Power draw in milliwatts(mW) */
+    uint32_t power; /*!< Power draw in milliwatts (mW) */
 };
 
 /*!
@@ -99,8 +100,8 @@ struct mod_dvfs_domain_config {
     /*!
      * \brief Operating points.
      *
-     * \note The frequencies of these operating points must be in ascending
-     *      order.
+     * \note The frequencies and levels of these operating points must be in
+     *      ascending order.
      */
     struct mod_dvfs_opp *opps;
 };
@@ -157,16 +158,13 @@ struct mod_dvfs_domain_api {
     int (*get_opp_count)(fwk_id_t domain_id, size_t *opp_count);
 
     /*!
-     * \brief Get the level id for the given frequency.
+     * \brief Get the level id for the given level.
      *
      * \param domain_id Element identifier of the domain.
-     * \param frequency Requested frequency.
+     * \param level Requested level.
      * \param [out] level id inside the OPP table.
      */
-    int (*get_frequency_id)(
-        fwk_id_t domain_id,
-        uint32_t frequency,
-        size_t *level_id);
+    int (*get_level_id)(fwk_id_t domain_id, uint32_t level, size_t *level_id);
 
     /*!
      * \brief Get the worst-case transition latency of a domain.
@@ -177,37 +175,35 @@ struct mod_dvfs_domain_api {
     int (*get_latency)(fwk_id_t domain_id, uint16_t *latency);
 
     /*!
-     * \brief Set the frequency of a domain.
+     * \brief Set the level of a domain.
      *
      * \param domain_id Element identifier of the domain.
      * \param cookie Context-specific value.
-     * \param frequency Requested frequency.
+     * \param level Requested level.
      */
-    int (*set_frequency)(
-        fwk_id_t domain_id,
-        uintptr_t cookie,
-        uint32_t frequency);
+    int (*set_level)(fwk_id_t domain_id, uintptr_t cookie, uint32_t level);
 
     /*!
-     * \brief Get the frequency of a domain.
+     * \brief Get the level of a domain.
      *
      * \param domain_id Element identifier of the domain.
-     * \param [out] limits Current frequency limits.
+     * \param [out] limits Current level limits.
      */
-    int (*get_frequency_limits)(
+    int (*get_level_limits)(
         fwk_id_t domain_id,
-        struct mod_dvfs_frequency_limits *limits);
+        struct mod_dvfs_level_limits *limits);
 
     /*!
-     * \brief Set the frequency of a domain.
+     * \brief Set the level of a domain.
      *
      * \param domain_id Element identifier of the domain.
      * \param cookie Context-specific value.
      * \param limits Pointer to the new limits.
      */
-    int (*set_frequency_limits)(
-        fwk_id_t domain_id, uintptr_t cookie,
-        const struct mod_dvfs_frequency_limits *limits);
+    int (*set_level_limits)(
+        fwk_id_t domain_id,
+        uintptr_t cookie,
+        const struct mod_dvfs_level_limits *limits);
 };
 
 /*!
@@ -282,9 +278,9 @@ static const fwk_id_t mod_dvfs_api_id_dvfs =
  * \brief Event indices.
  */
 enum mod_dvfs_event_idx {
-    MOD_DVFS_EVENT_IDX_SET,     /*!< Set level/limits */
-    MOD_DVFS_EVENT_IDX_GET_OPP, /*!< Get frequency */
-    MOD_DVFS_EVENT_IDX_COUNT,   /*!< event count */
+    MOD_DVFS_EVENT_IDX_SET, /*!< Set level/limits */
+    MOD_DVFS_EVENT_IDX_GET_OPP, /*!< Get Operating Performance Point */
+    MOD_DVFS_EVENT_IDX_COUNT, /*!< event count */
 };
 
 /*! <tt>Set operating point/limits</tt> event identifier */

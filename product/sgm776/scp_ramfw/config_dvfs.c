@@ -23,99 +23,111 @@ static const struct mod_dvfs_domain_config cpu_group_little = {
     .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, 0),
     .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, 1),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SCMI_PERF,
+    .notification_api_id = FWK_ID_API_INIT(
+        FWK_MODULE_IDX_SCMI_PERF,
         MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
     .latency = 1200,
     .sustained_idx = 2,
-    .opps = (struct mod_dvfs_opp[]) {
-        {
-            .frequency = 665 * FWK_MHZ,
-            .voltage = 800,
-        },
-        {
-            .frequency = 998 * FWK_MHZ,
-            .voltage = 850,
-        },
-        {
-            .frequency = 1330 * FWK_MHZ,
-            .voltage = 900,
-        },
-        {
-            .frequency = 1463 * FWK_MHZ,
-            .voltage = 950,
-        },
-        {
-            .frequency = 2200 * FWK_MHZ,
-            .voltage = 1000,
-        },
-        { 0 }
-    }
+    .opps = (struct mod_dvfs_opp[]){ {
+                                         .level = 665 * 1000000UL,
+                                         .frequency = 665 * FWK_MHZ,
+                                         .voltage = 800,
+                                     },
+                                     {
+                                         .level = 998 * 1000000UL,
+                                         .frequency = 998 * FWK_MHZ,
+                                         .voltage = 850,
+                                     },
+                                     {
+                                         .level = 1330 * 1000000UL,
+                                         .frequency = 1330 * FWK_MHZ,
+                                         .voltage = 900,
+                                     },
+                                     {
+                                         .level = 1463 * 1000000UL,
+                                         .frequency = 1463 * FWK_MHZ,
+                                         .voltage = 950,
+                                     },
+                                     {
+                                         .level = 2200 * 1000000UL,
+                                         .frequency = 2200 * FWK_MHZ,
+                                         .voltage = 1000,
+                                     },
+                                     { 0 } }
 };
 
 static const struct mod_dvfs_domain_config cpu_group_big = {
     .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, 1),
     .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, 0),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SCMI_PERF,
+    .notification_api_id = FWK_ID_API_INIT(
+        FWK_MODULE_IDX_SCMI_PERF,
         MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
     .latency = 1200,
     .sustained_idx = 2,
-    .opps = (struct mod_dvfs_opp[]) {
-        {
-            .frequency = 1313 * FWK_MHZ,
-            .voltage = 800,
-        },
-        {
-            .frequency = 1531 * FWK_MHZ,
-            .voltage = 850,
-        },
-        {
-            .frequency = 1750 * FWK_MHZ,
-            .voltage = 900,
-        },
-        {
-            .frequency = 2100 * FWK_MHZ,
-            .voltage = 950,
-        },
-        {
-            .frequency = 2700 * FWK_MHZ,
-            .voltage = 1000,
-        },
-        { 0 }
-    }
+    .opps = (struct mod_dvfs_opp[]){ {
+                                         .level = 1313 * 1000000UL,
+                                         .frequency = 1313 * FWK_MHZ,
+                                         .voltage = 800,
+                                     },
+                                     {
+                                         .level = 1531 * 1000000UL,
+                                         .frequency = 1531 * FWK_MHZ,
+                                         .voltage = 850,
+                                     },
+                                     {
+                                         .level = 1750 * 1000000UL,
+                                         .frequency = 1750 * FWK_MHZ,
+                                         .voltage = 900,
+                                     },
+                                     {
+                                         .level = 2100 * 1000000UL,
+                                         .frequency = 2100 * FWK_MHZ,
+                                         .voltage = 950,
+                                     },
+                                     {
+                                         .level = 2700 * 1000000UL,
+                                         .frequency = 2700 * FWK_MHZ,
+                                         .voltage = 1000,
+                                     },
+                                     { 0 } }
 };
 
 static const struct mod_dvfs_domain_config gpu = {
     .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, 2),
     .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, 2),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SCMI_PERF,
+    .notification_api_id = FWK_ID_API_INIT(
+        FWK_MODULE_IDX_SCMI_PERF,
         MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
     .latency = 1200,
     .sustained_idx = 4,
-    .opps = (struct mod_dvfs_opp[]) {
-        {
-            .frequency = 450 * FWK_MHZ,
-            .voltage = 800,
-        },
-        {
-            .frequency = 487500 * FWK_KHZ,
-            .voltage = 850,
-        },
-        {
-            .frequency = 525 * FWK_MHZ,
-            .voltage = 900,
-        },
-        {
-            .frequency = 562500 * FWK_KHZ,
-            .voltage = 950,
-        },
-        {
-            .frequency = 800 * FWK_MHZ,
-            .voltage = 1000,
-        },
-        { 0 }
-    }
+    .opps = (struct mod_dvfs_opp[]){ {
+                                         .level = 450 * 1000000UL,
+                                         .frequency = 450 * FWK_MHZ,
+                                         .voltage = 800,
+                                     },
+                                     {
+                                         .level = 487500 * 1000UL,
+                                         .frequency = 487500 * FWK_KHZ,
+                                         .voltage = 850,
+                                     },
+                                     {
+                                         .level = 525 * 1000000UL,
+                                         .frequency = 525 * FWK_MHZ,
+                                         .voltage = 900,
+                                     },
+                                     {
+                                         .level = 562500 * 1000UL,
+                                         .frequency = 562500 * FWK_KHZ,
+                                         .voltage = 950,
+                                     },
+                                     {
+                                         .level = 800 * 1000000UL,
+                                         .frequency = 800 * FWK_MHZ,
+                                         .voltage = 1000,
+                                     },
+                                     { 0 } }
 };
 
 static const struct fwk_element element_table[] = {

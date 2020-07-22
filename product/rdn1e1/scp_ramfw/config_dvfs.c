@@ -19,29 +19,32 @@
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
 
-static struct mod_dvfs_opp opps[] = {
-        {
-            .frequency = 1313 * FWK_MHZ,
-            .voltage = 800,
-        },
-        {
-            .frequency = 1531 * FWK_MHZ,
-            .voltage = 850,
-        },
-        {
-            .frequency = 1750 * FWK_MHZ,
-            .voltage = 900,
-        },
-        {
-            .frequency = 2100 * FWK_MHZ,
-            .voltage = 950,
-        },
-        {
-            .frequency = 2600 * FWK_MHZ,
-            .voltage = 1000,
-        },
-        { 0 }
-};
+static struct mod_dvfs_opp opps[] = { {
+                                          .level = 1313 * 1000000UL,
+                                          .frequency = 1313 * FWK_MHZ,
+                                          .voltage = 800,
+                                      },
+                                      {
+                                          .level = 1531 * 1000000UL,
+                                          .frequency = 1531 * FWK_MHZ,
+                                          .voltage = 850,
+                                      },
+                                      {
+                                          .level = 1750 * 1000000UL,
+                                          .frequency = 1750 * FWK_MHZ,
+                                          .voltage = 900,
+                                      },
+                                      {
+                                          .level = 2100 * 1000000UL,
+                                          .frequency = 2100 * FWK_MHZ,
+                                          .voltage = 950,
+                                      },
+                                      {
+                                          .level = 2600 * 1000000UL,
+                                          .frequency = 2600 * FWK_MHZ,
+                                          .voltage = 1000,
+                                      },
+                                      { 0 } };
 
 static const struct mod_dvfs_domain_config cpu_group0 = {
     .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, 0),
