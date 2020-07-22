@@ -104,6 +104,13 @@ struct mod_dvfs_domain_config {
      *      ascending order.
      */
     struct mod_dvfs_opp *opps;
+
+    /*! \brief Allow inexact performance levels.
+     *
+     * \note It will set any immediately higher than the requested value if it
+     * is possible, otherwise it will set the highest possible.
+     */
+    bool approximate_level;
 };
 
 /*!

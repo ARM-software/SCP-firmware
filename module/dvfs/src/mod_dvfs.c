@@ -179,12 +179,15 @@ static const struct mod_dvfs_opp *get_opp_for_level(
     for (opp_idx = 0; opp_idx < ctx->opp_count; opp_idx++) {
         opp = &ctx->config->opps[opp_idx];
 
-        if (opp->level != level)
+        if (ctx->config->approximate_level && (opp->level < level))
+            continue;
+        else if (opp->level != level)
             continue;
 
         return opp;
     }
-
+    if (ctx->config->approximate_level)
+        return &ctx->config->opps[ctx->opp_count - 1];
     return NULL;
 }
 
