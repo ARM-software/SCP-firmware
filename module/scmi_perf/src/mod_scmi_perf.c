@@ -384,7 +384,7 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
             !!(permissions & MOD_SCMI_PERF_PERMS_SET_LIMITS),
             fast_channels),
         .rate_limit = 0, /* Unsupported */
-        .sustained_freq = opp.frequency / FWK_KHZ,
+        .sustained_freq = opp.frequency,
         .sustained_perf_level = opp.level,
     };
 

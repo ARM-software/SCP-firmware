@@ -30,27 +30,27 @@ static const struct mod_dvfs_domain_config cpu_group_little = {
     .sustained_idx = 2,
     .opps = (struct mod_dvfs_opp[]){ {
                                          .level = 665 * 1000000UL,
-                                         .frequency = 665 * FWK_MHZ,
+                                         .frequency = 665 * FWK_KHZ,
                                          .voltage = 800,
                                      },
                                      {
                                          .level = 998 * 1000000UL,
-                                         .frequency = 998 * FWK_MHZ,
+                                         .frequency = 998 * FWK_KHZ,
                                          .voltage = 850,
                                      },
                                      {
                                          .level = 1330 * 1000000UL,
-                                         .frequency = 1330 * FWK_MHZ,
+                                         .frequency = 1330 * FWK_KHZ,
                                          .voltage = 900,
                                      },
                                      {
                                          .level = 1463 * 1000000UL,
-                                         .frequency = 1463 * FWK_MHZ,
+                                         .frequency = 1463 * FWK_KHZ,
                                          .voltage = 950,
                                      },
                                      {
                                          .level = 2200 * 1000000UL,
-                                         .frequency = 2200 * FWK_MHZ,
+                                         .frequency = 2200 * FWK_KHZ,
                                          .voltage = 1000,
                                      },
                                      { 0 } }
@@ -67,27 +67,27 @@ static const struct mod_dvfs_domain_config cpu_group_big = {
     .sustained_idx = 2,
     .opps = (struct mod_dvfs_opp[]){ {
                                          .level = 1313 * 1000000UL,
-                                         .frequency = 1313 * FWK_MHZ,
+                                         .frequency = 1313 * FWK_KHZ,
                                          .voltage = 800,
                                      },
                                      {
                                          .level = 1531 * 1000000UL,
-                                         .frequency = 1531 * FWK_MHZ,
+                                         .frequency = 1531 * FWK_KHZ,
                                          .voltage = 850,
                                      },
                                      {
                                          .level = 1750 * 1000000UL,
-                                         .frequency = 1750 * FWK_MHZ,
+                                         .frequency = 1750 * FWK_KHZ,
                                          .voltage = 900,
                                      },
                                      {
                                          .level = 2100 * 1000000UL,
-                                         .frequency = 2100 * FWK_MHZ,
+                                         .frequency = 2100 * FWK_KHZ,
                                          .voltage = 950,
                                      },
                                      {
                                          .level = 2700 * 1000000UL,
-                                         .frequency = 2700 * FWK_MHZ,
+                                         .frequency = 2700 * FWK_KHZ,
                                          .voltage = 1000,
                                      },
                                      { 0 } }
@@ -104,27 +104,27 @@ static const struct mod_dvfs_domain_config gpu = {
     .sustained_idx = 4,
     .opps = (struct mod_dvfs_opp[]){ {
                                          .level = 450 * 1000000UL,
-                                         .frequency = 450 * FWK_MHZ,
+                                         .frequency = 450 * FWK_KHZ,
                                          .voltage = 800,
                                      },
                                      {
                                          .level = 487500 * 1000UL,
-                                         .frequency = 487500 * FWK_KHZ,
+                                         .frequency = 487500,
                                          .voltage = 850,
                                      },
                                      {
                                          .level = 525 * 1000000UL,
-                                         .frequency = 525 * FWK_MHZ,
+                                         .frequency = 525 * FWK_KHZ,
                                          .voltage = 900,
                                      },
                                      {
                                          .level = 562500 * 1000UL,
-                                         .frequency = 562500 * FWK_KHZ,
+                                         .frequency = 562500,
                                          .voltage = 950,
                                      },
                                      {
                                          .level = 800 * 1000000UL,
-                                         .frequency = 800 * FWK_MHZ,
+                                         .frequency = 800 * FWK_KHZ,
                                          .voltage = 1000,
                                      },
                                      { 0 } }
@@ -207,24 +207,21 @@ static const struct fwk_element *dvfs_get_element_table(fwk_id_t module_id)
      * draw. The capacitance constants are given in mW/MHz/V^2.
      */
     for (opp = cpu_group_little.opps; opp->frequency != 0; opp++) {
-        opp->power = little_cpu_core_coefficient *
-                     little_cpu_core_count *
-                     (opp->frequency / FWK_MHZ) *
-                     (opp->voltage * opp->voltage) / 1000000;
+        opp->power = little_cpu_core_coefficient * little_cpu_core_count *
+            (opp->frequency / FWK_KHZ) * (opp->voltage * opp->voltage) /
+            1000000;
     }
 
     for (opp = cpu_group_big.opps; opp->frequency != 0; opp++) {
-        opp->power = big_cpu_core_coefficient *
-                     big_cpu_core_count *
-                     (opp->frequency / FWK_MHZ) *
-                     (opp->voltage * opp->voltage) / 1000000;
+        opp->power = big_cpu_core_coefficient * big_cpu_core_count *
+            (opp->frequency / FWK_KHZ) * (opp->voltage * opp->voltage) /
+            1000000;
     }
 
     for (opp = gpu.opps; opp->frequency != 0; opp++) {
-        opp->power = gpu_core_coefficient *
-                     gpu_core_count *
-                     (opp->frequency / FWK_MHZ) *
-                     (opp->voltage * opp->voltage) / 1000000;
+        opp->power = gpu_core_coefficient * gpu_core_count *
+            (opp->frequency / FWK_KHZ) * (opp->voltage * opp->voltage) /
+            1000000;
     }
 
     return element_table;

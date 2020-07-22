@@ -769,7 +769,7 @@ static int dvfs_handle_set_opp(
          */
         status = ctx->apis.clock->set_rate(
             ctx->config->clock_id,
-            ctx->request.new_opp.frequency,
+            (uint64_t)ctx->request.new_opp.frequency * FWK_KHZ,
             MOD_CLOCK_ROUND_MODE_NONE);
 
         if (status == FWK_PENDING) {
@@ -782,7 +782,7 @@ static int dvfs_handle_set_opp(
          */
         status = ctx->apis.clock->set_rate(
             ctx->config->clock_id,
-            ctx->request.new_opp.frequency,
+            (uint64_t)ctx->request.new_opp.frequency * FWK_KHZ,
             MOD_CLOCK_ROUND_MODE_NONE);
 
         if (status == FWK_PENDING) {
@@ -811,7 +811,7 @@ static int dvfs_handle_set_opp(
          */
         status = ctx->apis.clock->set_rate(
             ctx->config->clock_id,
-            ctx->request.new_opp.frequency,
+            (uint64_t)ctx->request.new_opp.frequency * FWK_KHZ,
             MOD_CLOCK_ROUND_MODE_NONE);
 
         if (status == FWK_PENDING) {
