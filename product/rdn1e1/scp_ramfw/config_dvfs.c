@@ -21,27 +21,27 @@
 
 static struct mod_dvfs_opp opps[] = { {
                                           .level = 1313 * 1000000UL,
-                                          .frequency = 1313 * FWK_MHZ,
+                                          .frequency = 1313 * FWK_KHZ,
                                           .voltage = 800,
                                       },
                                       {
                                           .level = 1531 * 1000000UL,
-                                          .frequency = 1531 * FWK_MHZ,
+                                          .frequency = 1531 * FWK_KHZ,
                                           .voltage = 850,
                                       },
                                       {
                                           .level = 1750 * 1000000UL,
-                                          .frequency = 1750 * FWK_MHZ,
+                                          .frequency = 1750 * FWK_KHZ,
                                           .voltage = 900,
                                       },
                                       {
                                           .level = 2100 * 1000000UL,
-                                          .frequency = 2100 * FWK_MHZ,
+                                          .frequency = 2100 * FWK_KHZ,
                                           .voltage = 950,
                                       },
                                       {
                                           .level = 2600 * 1000000UL,
-                                          .frequency = 2600 * FWK_MHZ,
+                                          .frequency = 2600 * FWK_KHZ,
                                           .voltage = 1000,
                                       },
                                       { 0 } };
@@ -117,10 +117,9 @@ static const struct fwk_element *dvfs_get_element_table(fwk_id_t module_id)
      * draw. The capacitance constants are given in mW/MHz/V^2.
      */
     for (opp = opps; opp->frequency != 0; opp++) {
-        opp->power = cluster_core_coefficient *
-                     cluster_core_count *
-                     (opp->frequency / FWK_MHZ) *
-                     (opp->voltage * opp->voltage) / 1000000;
+        opp->power = cluster_core_coefficient * cluster_core_count *
+            (opp->frequency / FWK_KHZ) * (opp->voltage * opp->voltage) /
+            1000000;
     }
 
     return element_table;

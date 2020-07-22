@@ -18,27 +18,27 @@
 
 static struct mod_dvfs_opp opps[] = { {
                                           .level = 1313 * 1000000UL,
-                                          .frequency = 1313 * FWK_MHZ,
+                                          .frequency = 1313 * FWK_KHZ,
                                           .voltage = 100,
                                       },
                                       {
                                           .level = 1531 * 1000000UL,
-                                          .frequency = 1531 * FWK_MHZ,
+                                          .frequency = 1531 * FWK_KHZ,
                                           .voltage = 200,
                                       },
                                       {
                                           .level = 1750 * 1000000UL,
-                                          .frequency = 1750 * FWK_MHZ,
+                                          .frequency = 1750 * FWK_KHZ,
                                           .voltage = 300,
                                       },
                                       {
                                           .level = 2100 * 1000000UL,
-                                          .frequency = 2100 * FWK_MHZ,
+                                          .frequency = 2100 * FWK_KHZ,
                                           .voltage = 400,
                                       },
                                       {
                                           .level = 2600 * 1000000UL,
-                                          .frequency = 2600 * FWK_MHZ,
+                                          .frequency = 2600 * FWK_KHZ,
                                           .voltage = 500,
                                       },
                                       { 0 } };
