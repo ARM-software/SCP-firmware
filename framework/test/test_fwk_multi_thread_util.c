@@ -139,19 +139,19 @@ bool __wrap_fwk_module_is_valid_notification_id(fwk_id_t id)
     return true;
 }
 
-struct fwk_element_ctx *__wrap___fwk_module_get_element_ctx(fwk_id_t id)
+struct fwk_element_ctx *__wrap_fwk_module_get_element_ctx(fwk_id_t id)
 {
     (void) id;
     return &fake_element_ctx;
 }
 
-struct fwk_module_ctx *__wrap___fwk_module_get_ctx(fwk_id_t id)
+struct fwk_module_ctx *__wrap_fwk_module_get_ctx(fwk_id_t id)
 {
     (void) id;
     return &fake_module_ctx;
 }
 
-int __wrap___fwk_module_get_state(fwk_id_t id, enum fwk_module_state *state)
+int __wrap_fwk_module_get_state(fwk_id_t id, enum fwk_module_state *state)
 {
     (void) id;
     *state = FWK_MODULE_STATE_INITIALIZED;

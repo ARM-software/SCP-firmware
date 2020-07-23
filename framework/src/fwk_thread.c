@@ -149,7 +149,7 @@ static void process_next_event(void)
         FWK_ID_STR(event->source_id),
         FWK_ID_STR(event->target_id));
 
-    module = __fwk_module_get_ctx(event->target_id)->desc;
+    module = fwk_module_get_ctx(event->target_id)->desc;
     process_event = event->is_notification ? module->process_notification :
                     module->process_event;
 
@@ -411,7 +411,7 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
             fwk_list_pop_head(&ctx.event_queue), struct fwk_event, slist_node);
 
         if (wait_state == WAITING_FOR_EVENT) {
-            module = __fwk_module_get_ctx(next_event->target_id)->desc;
+            module = fwk_module_get_ctx(next_event->target_id)->desc;
             process_event = module->process_event;
 
             response_event = *next_event;

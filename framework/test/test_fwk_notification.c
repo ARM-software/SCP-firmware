@@ -43,7 +43,7 @@ void *__wrap_fwk_mm_calloc(size_t num, size_t size)
 
 static struct fwk_module_ctx fake_module_ctx;
 static struct fwk_dlist fake_module_dlist_table[4];
-struct fwk_module_ctx *__wrap___fwk_module_get_ctx(fwk_id_t id)
+struct fwk_module_ctx *__wrap_fwk_module_get_ctx(fwk_id_t id)
 {
     fake_module_ctx.subscription_dlist_table = fake_module_dlist_table;
     return &fake_module_ctx;
@@ -51,7 +51,7 @@ struct fwk_module_ctx *__wrap___fwk_module_get_ctx(fwk_id_t id)
 
 static struct fwk_element_ctx fake_element_ctx;
 static struct fwk_dlist fake_element_dlist_table[4];
-struct fwk_element_ctx *__wrap___fwk_module_get_element_ctx(fwk_id_t id)
+struct fwk_element_ctx *__wrap_fwk_module_get_element_ctx(fwk_id_t id)
 {
     fake_element_ctx.subscription_dlist_table = fake_element_dlist_table;
     return &fake_element_ctx;

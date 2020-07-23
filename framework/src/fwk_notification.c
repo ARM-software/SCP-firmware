@@ -60,10 +60,10 @@ static struct fwk_dlist *get_subscription_dlist(
 
     if (fwk_id_is_type(source_id, FWK_ID_TYPE_MODULE)) {
         subscription_dlist_table =
-            __fwk_module_get_ctx(source_id)->subscription_dlist_table;
+            fwk_module_get_ctx(source_id)->subscription_dlist_table;
     } else {
         subscription_dlist_table =
-            __fwk_module_get_element_ctx(source_id)->subscription_dlist_table;
+            fwk_module_get_element_ctx(source_id)->subscription_dlist_table;
     }
 
     return &subscription_dlist_table[

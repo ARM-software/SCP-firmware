@@ -115,7 +115,7 @@ static struct __fwk_thread_ctx *thread_get_ctx(fwk_id_t id)
     struct fwk_element_ctx *element_ctx;
 
     if (fwk_module_is_valid_element_id(id)) {
-        element_ctx = __fwk_module_get_element_ctx(id);
+        element_ctx = fwk_module_get_element_ctx(id);
         if (element_ctx->thread_ctx != NULL)
             return element_ctx->thread_ctx;
         else
@@ -123,7 +123,7 @@ static struct __fwk_thread_ctx *thread_get_ctx(fwk_id_t id)
     }
 
     if (fwk_module_is_valid_module_id(id)) {
-        module_ctx = __fwk_module_get_ctx(id);
+        module_ctx = fwk_module_get_ctx(id);
         return (module_ctx->thread_ctx != NULL) ?
                module_ctx->thread_ctx : &ctx.common_thread_ctx;
     }
@@ -281,7 +281,7 @@ static void process_event_requiring_response(struct fwk_event *event)
     int (*process_event)(const struct fwk_event *event,
                          struct fwk_event *resp_event);
 
-    module = __fwk_module_get_ctx(event->target_id)->desc;
+    module = fwk_module_get_ctx(event->target_id)->desc;
     source_thread_ctx = thread_get_ctx(event->source_id);
 
     process_event = event->is_notification ?
@@ -338,7 +338,7 @@ static void process_next_thread_event(struct __fwk_thread_ctx *thread_ctx)
     if (event->response_requested)
         process_event_requiring_response(event);
     else {
-        module = __fwk_module_get_ctx(event->target_id)->desc;
+        module = fwk_module_get_ctx(event->target_id)->desc;
         if (event->is_notification)
             status = module->process_notification(event, &async_resp_event);
         else
@@ -715,9 +715,9 @@ int fwk_thread_create(fwk_id_t id)
     }
 
     if (fwk_module_is_valid_element_id(id))
-        p_thread_ctx = &__fwk_module_get_element_ctx(id)->thread_ctx;
+        p_thread_ctx = &fwk_module_get_element_ctx(id)->thread_ctx;
     else if (fwk_module_is_valid_module_id(id))
-        p_thread_ctx = &__fwk_module_get_ctx(id)->thread_ctx;
+        p_thread_ctx = &fwk_module_get_ctx(id)->thread_ctx;
     else {
         status = FWK_E_PARAM;
         goto error;

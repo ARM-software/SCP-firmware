@@ -293,39 +293,39 @@ static void test_case_setup(void)
     module_config_table[1] = &fake_module_config1;
     module_config_table[2] = NULL;
 
-    __fwk_module_reset();
-    __fwk_module_init();
+    fwk_module_reset();
+    fwk_module_init();
 }
 
-static void test___fwk_module_init_module_desc_bad_params(void)
+static void test_fwk_module_init_module_desc_bad_params(void)
 {
     int result;
 
     /* Module descriptor has bad name */
     fake_module_desc0.name = NULL;
-    __fwk_module_reset();
-    result = __fwk_module_init();
+    fwk_module_reset();
+    result = fwk_module_init();
     assert(result == FWK_E_PARAM);
     fake_module_desc0.name = "FAKE MODULE 0";
 
     /* Module descriptor has bad type */
     fake_module_desc0.type = FWK_MODULE_TYPE_COUNT;
-    __fwk_module_reset();
-    result = __fwk_module_init();
+    fwk_module_reset();
+    result = fwk_module_init();
     assert(result == FWK_E_PARAM);
     fake_module_desc0.type = FWK_MODULE_TYPE_DRIVER;
 
     /* Module descriptor has no init function */
     fake_module_desc0.init = NULL;
-    __fwk_module_reset();
-    result = __fwk_module_init();
+    fwk_module_reset();
+    result = fwk_module_init();
     assert(result == FWK_E_PARAM);
     fake_module_desc0.init = init;
 
     /* Module descriptor has no element_init function */
     fake_module_desc0.element_init = NULL;
-    __fwk_module_reset();
-    result = __fwk_module_init();
+    fwk_module_reset();
+    result = fwk_module_init();
     assert(result == FWK_E_PARAM);
     fake_module_desc0.element_init = element_init;
 
@@ -336,13 +336,13 @@ static void test___fwk_module_init_module_desc_bad_params(void)
 
     /* Element description table of module 0 is NULL */
     get_element_table0_return_val = false;
-    __fwk_module_reset();
-    result = __fwk_module_init();
+    fwk_module_reset();
+    result = fwk_module_init();
     assert(result == FWK_E_PARAM);
     get_element_table0_return_val = true;
 }
 
-static void test___fwk_module_init_failure(void)
+static void test_fwk_module_init_failure(void)
 {
     int result;
     enum fwk_module_state state;
@@ -356,26 +356,26 @@ static void test___fwk_module_init_failure(void)
 
     /* Init function failure */
     init_return_val = FWK_E_PARAM;
-    __fwk_module_reset();
-    result = __fwk_module_init();
+    fwk_module_reset();
+    result = fwk_module_init();
     assert(result == FWK_E_PARAM);
     init_return_val = FWK_SUCCESS;
 
-    result = __fwk_module_get_state(fwk_module_id_fake0, &state);
+    result = fwk_module_get_state(fwk_module_id_fake0, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_UNINITIALIZED);
 
     /* Element_init function failure */
     element_init_return_val = FWK_E_PARAM;
-    __fwk_module_reset();
-    result = __fwk_module_init();
+    fwk_module_reset();
+    result = fwk_module_init();
     assert(result == FWK_E_PARAM);
 
-    result = __fwk_module_get_state(fwk_module_id_fake0, &state);
+    result = fwk_module_get_state(fwk_module_id_fake0, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_UNINITIALIZED);
 
-    result = __fwk_module_get_state(fwk_module_id_fake1, &state);
+    result = fwk_module_get_state(fwk_module_id_fake1, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_UNINITIALIZED);
 
@@ -383,29 +383,29 @@ static void test___fwk_module_init_failure(void)
 
     /* post_init function failure */
     post_init_return_val = FWK_E_PARAM;
-    __fwk_module_reset();
-    result = __fwk_module_init();
+    fwk_module_reset();
+    result = fwk_module_init();
     assert(result == FWK_E_PARAM);
     post_init_return_val = FWK_SUCCESS;
 
-    result = __fwk_module_get_state(ELEM0_ID, &state);
+    result = fwk_module_get_state(ELEM0_ID, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_INITIALIZED);
 
-    result = __fwk_module_get_state(ELEM1_ID, &state);
+    result = fwk_module_get_state(ELEM1_ID, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_INITIALIZED);
 
-    result = __fwk_module_get_state(fwk_module_id_fake0, &state);
+    result = fwk_module_get_state(fwk_module_id_fake0, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_UNINITIALIZED);
 
-    result = __fwk_module_get_state(fwk_module_id_fake1, &state);
+    result = fwk_module_get_state(fwk_module_id_fake1, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_UNINITIALIZED);
 }
 
-static void test___fwk_module_init_bind_failure(void)
+static void test_fwk_module_init_bind_failure(void)
 {
     int result;
     enum fwk_module_state state;
@@ -416,30 +416,30 @@ static void test___fwk_module_init_bind_failure(void)
 
     /* Bind function failure */
     bind_return_val = FWK_E_PARAM;
-    __fwk_module_reset();
-    result = __fwk_module_init();
+    fwk_module_reset();
+    result = fwk_module_init();
     assert(result == FWK_E_PARAM);
     bind_return_val = FWK_SUCCESS;
 
-    result = __fwk_module_get_state(ELEM0_ID, &state);
+    result = fwk_module_get_state(ELEM0_ID, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_INITIALIZED);
 
-    result = __fwk_module_get_state(ELEM1_ID, &state);
+    result = fwk_module_get_state(ELEM1_ID, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_INITIALIZED);
 
-    result = __fwk_module_get_state(fwk_module_id_fake0, &state);
+    result = fwk_module_get_state(fwk_module_id_fake0, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_INITIALIZED);
 
-    result = __fwk_module_get_state(fwk_module_id_fake1, &state);
+    result = fwk_module_get_state(fwk_module_id_fake1, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_INITIALIZED);
 
 }
 
-static void test___fwk_module_init_start_failure(void)
+static void test_fwk_module_init_start_failure(void)
 {
     int result;
     enum fwk_module_state state;
@@ -449,24 +449,24 @@ static void test___fwk_module_init_start_failure(void)
 
     /* Start function failure */
     start_return_val = FWK_E_PARAM;
-    __fwk_module_reset();
-    result = __fwk_module_init();
+    fwk_module_reset();
+    result = fwk_module_init();
     assert(result == FWK_E_PARAM);
     start_return_val = FWK_SUCCESS;
 
-    result = __fwk_module_get_state(ELEM0_ID, &state);
+    result = fwk_module_get_state(ELEM0_ID, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_BOUND);
 
-    result = __fwk_module_get_state(ELEM1_ID, &state);
+    result = fwk_module_get_state(ELEM1_ID, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_BOUND);
 
-    result = __fwk_module_get_state(fwk_module_id_fake0, &state);
+    result = fwk_module_get_state(fwk_module_id_fake0, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_BOUND);
 
-    result = __fwk_module_get_state(fwk_module_id_fake1, &state);
+    result = fwk_module_get_state(fwk_module_id_fake1, &state);
     assert(result == FWK_SUCCESS);
     assert(state == (FWK_MODULE_STATE_BOUND));
 }
@@ -477,8 +477,8 @@ static void test_fwk_thread_failure(void)
 
     /* fwk_thread_init failed */
     thread_init_return_val = FWK_E_PARAM;
-    __fwk_module_reset();
-    result = __fwk_module_init();
+    fwk_module_reset();
+    result = fwk_module_init();
     assert(result == FWK_E_PARAM);
     thread_init_return_val = FWK_SUCCESS;
 }
@@ -489,49 +489,49 @@ static void check_correct_initialization(void)
     enum fwk_module_state state;
 
     /* Check module 0 is correctly initialized */
-    result = __fwk_module_get_state(fwk_module_id_fake0, &state);
+    result = fwk_module_get_state(fwk_module_id_fake0, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_STARTED);
+    assert(fwk_module_get_ctx(fwk_module_id_fake0)->desc == &fake_module_desc0);
     assert(
-        __fwk_module_get_ctx(fwk_module_id_fake0)->desc == &fake_module_desc0);
-    assert(
-        __fwk_module_get_ctx(fwk_module_id_fake0)->config ==
+        fwk_module_get_ctx(fwk_module_id_fake0)->config ==
         &fake_module_config0);
-    assert(__fwk_module_get_ctx(fwk_module_id_fake0)->element_count == 2);
+    assert(fwk_module_get_ctx(fwk_module_id_fake0)->element_count == 2);
 
     /* Check element 0 is correctly initialized */
-    result = __fwk_module_get_state(ELEM0_ID, &state);
+    result = fwk_module_get_state(ELEM0_ID, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_STARTED);
     assert(
-        __fwk_module_get_element_ctx(ELEM0_ID) ==
-        &(__fwk_module_get_ctx(fwk_module_id_fake0)->element_ctx_table[0]));
-    assert(__fwk_module_get_element_ctx(ELEM0_ID)->desc ==
+        fwk_module_get_element_ctx(ELEM0_ID) ==
+        &(fwk_module_get_ctx(fwk_module_id_fake0)->element_ctx_table[0]));
+    assert(
+        fwk_module_get_element_ctx(ELEM0_ID)->desc ==
         &fake_element_desc_table0[0]);
 
     /* Check element 1 is correctly initialized */
-    result = __fwk_module_get_state(ELEM1_ID, &state);
+    result = fwk_module_get_state(ELEM1_ID, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_STARTED);
     assert(
-        __fwk_module_get_element_ctx(ELEM1_ID) ==
-        &(__fwk_module_get_ctx(fwk_module_id_fake0)->element_ctx_table[1]));
-    assert(__fwk_module_get_element_ctx(ELEM1_ID)->desc ==
+        fwk_module_get_element_ctx(ELEM1_ID) ==
+        &(fwk_module_get_ctx(fwk_module_id_fake0)->element_ctx_table[1]));
+    assert(
+        fwk_module_get_element_ctx(ELEM1_ID)->desc ==
         &fake_element_desc_table0[1]);
 
     /* Check module 1 is correctly initialized */
-    result = __fwk_module_get_state(fwk_module_id_fake1, &state);
+    result = fwk_module_get_state(fwk_module_id_fake1, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_STARTED);
+    assert(fwk_module_get_ctx(fwk_module_id_fake1)->desc == &fake_module_desc1);
     assert(
-        __fwk_module_get_ctx(fwk_module_id_fake1)->desc == &fake_module_desc1);
-    assert(
-        __fwk_module_get_ctx(fwk_module_id_fake1)->config ==
+        fwk_module_get_ctx(fwk_module_id_fake1)->config ==
         &fake_module_config1);
-    assert(__fwk_module_get_ctx(fwk_module_id_fake1)->element_count == 0);
+    assert(fwk_module_get_ctx(fwk_module_id_fake1)->element_count == 0);
 }
 
-static void test___fwk_module_init_succeed(void)
+static void test_fwk_module_init_succeed(void)
 {
     int result;
 
@@ -545,8 +545,8 @@ static void test___fwk_module_init_succeed(void)
 
     bind_count_call = 0;
     start_count_call = 0;
-    __fwk_module_reset();
-    result = __fwk_module_init();
+    fwk_module_reset();
+    result = fwk_module_init();
     assert(result == FWK_SUCCESS);
     /* bind is called twice for module 0 and twice for element 0 and 1 */
     assert(bind_count_call == 6);
@@ -556,13 +556,13 @@ static void test___fwk_module_init_succeed(void)
     check_correct_initialization();
 
     /* Init should failed if the initialisation has already been done */
-    result = __fwk_module_init();
+    result = fwk_module_init();
     assert(result == FWK_E_STATE);
 
     check_correct_initialization();
 }
 
-static void test___fwk_module_get_state(void)
+static void test_fwk_module_get_state(void)
 {
     int result;
     fwk_id_t id;
@@ -570,28 +570,28 @@ static void test___fwk_module_get_state(void)
 
     /* Invalid ID */
     id = FWK_ID_ELEMENT(0xEF, 0xDBE);
-    result = __fwk_module_get_state(id, &state);
+    result = fwk_module_get_state(id, &state);
     assert(result == FWK_E_PARAM);
 
     /* Bad parameters */
-    result = __fwk_module_get_state(id, NULL);
+    result = fwk_module_get_state(id, NULL);
     assert(result == FWK_E_PARAM);
 
     /* Get module 0 state */
     id = fwk_module_id_fake0;
-    result = __fwk_module_get_state(id, &state);
+    result = fwk_module_get_state(id, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_STARTED);
 
     /* Get module 1 state */
     id = fwk_module_id_fake1;
-    result = __fwk_module_get_state(id, &state);
+    result = fwk_module_get_state(id, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_STARTED);
 
     /* Get element 0 state */
     id = ELEM0_ID;
-    result = __fwk_module_get_state(id, &state);
+    result = fwk_module_get_state(id, &state);
     assert(result == FWK_SUCCESS);
     assert(state == FWK_MODULE_STATE_STARTED);
 }
@@ -931,9 +931,9 @@ static void test_fwk_module_bind_stage_failure(void)
     /*
      * The framework is forced into the initialization stage
      */
-    __fwk_module_reset();
+    fwk_module_reset();
     init_return_val = FWK_E_PARAM;
-    result = __fwk_module_init();
+    result = fwk_module_init();
     assert(result == FWK_E_PARAM);
     init_return_val = FWK_SUCCESS;
 
@@ -949,8 +949,8 @@ static void test_fwk_module_bind_stage_failure(void)
      * The framework is forced into the start stage
      */
     start_return_val = FWK_E_PARAM;
-    __fwk_module_reset();
-    result = __fwk_module_init();
+    fwk_module_reset();
+    result = fwk_module_init();
     assert(result == FWK_E_PARAM);
     start_return_val = FWK_SUCCESS;
 
@@ -970,9 +970,9 @@ static void test_fwk_module_bind(void)
     void *null_api = NULL;
 
     /* The framework component is forced into the bound stage */
-    __fwk_module_reset();
+    fwk_module_reset();
     bind_return_val = FWK_E_PARAM;
-    result = __fwk_module_init();
+    result = fwk_module_init();
     assert(result == FWK_E_PARAM);
     bind_return_val = FWK_SUCCESS;
 
@@ -1023,13 +1023,13 @@ static void test_fwk_module_bind(void)
 }
 
 static const struct fwk_test_case_desc test_case_table[] = {
-    FWK_TEST_CASE(test___fwk_module_init_module_desc_bad_params),
-    FWK_TEST_CASE(test___fwk_module_init_failure),
-    FWK_TEST_CASE(test___fwk_module_init_bind_failure),
-    FWK_TEST_CASE(test___fwk_module_init_start_failure),
+    FWK_TEST_CASE(test_fwk_module_init_module_desc_bad_params),
+    FWK_TEST_CASE(test_fwk_module_init_failure),
+    FWK_TEST_CASE(test_fwk_module_init_bind_failure),
+    FWK_TEST_CASE(test_fwk_module_init_start_failure),
     FWK_TEST_CASE(test_fwk_thread_failure),
-    FWK_TEST_CASE(test___fwk_module_init_succeed),
-    FWK_TEST_CASE(test___fwk_module_get_state),
+    FWK_TEST_CASE(test_fwk_module_init_succeed),
+    FWK_TEST_CASE(test_fwk_module_get_state),
     FWK_TEST_CASE(test_fwk_module_is_valid_module_id),
     FWK_TEST_CASE(test_fwk_module_is_valid_element_id),
     FWK_TEST_CASE(test_fwk_module_is_valid_sub_element_id),
