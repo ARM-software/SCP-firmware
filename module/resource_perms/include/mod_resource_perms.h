@@ -464,18 +464,48 @@ struct mod_res_resource_perms_config {
     /*! \brief Number of clocks supported by the platform. */
     uint32_t clock_count;
 
+    /*! \brief Number of clock commands supported by the platform. */
+    uint32_t clock_cmd_count;
+
+    /*! \brief Number of clock resources supported by the platform. */
+    uint32_t clock_resource_count;
+
     /*! \brief Number of sensors supported by the platform. */
     uint32_t sensor_count;
+
+    /*! \brief Number of sensor commands supported by the platform. */
+    uint32_t sensor_cmd_count;
+
+    /*! \brief Number of sensor resources supported by the platform. */
+    uint32_t sensor_resource_count;
 
     /*! \brief Number of power domains supported by the platform. */
     uint32_t pd_count;
 
-    /*! \brief Number of performance domains supported by the platform. */
+    /*! \brief Number of power domain commands supported by the platform. */
+    uint32_t pd_cmd_count;
+
+    /*! \brief Number of power domain resources supported by the platform. */
+    uint32_t pd_resource_count;
+
+    /*! \brief Number of perf domains supported by the platform. */
     uint32_t perf_count;
+
+    /*! \brief Number of perf domain commands supported by the platform. */
+    uint32_t perf_cmd_count;
+
+    /*! \brief Number of perf domain resources supported by the platform. */
+    uint32_t perf_resource_count;
 
 #ifdef BUILD_HAS_SCMI_RESET
     /*! \brief Number of reset domains supported by the platform. */
     uint32_t reset_domain_count;
+
+    /*! \brief Number of reset domain commands supported by the platform. */
+    uint32_t reset_domain_cmd_count;
+
+    /*! \brief Number of reset domain resources supported by the platform. */
+    uint32_t reset_domain_resource_count;
 #endif
 
     /*! \brief Number of devices supported by the platform. */
