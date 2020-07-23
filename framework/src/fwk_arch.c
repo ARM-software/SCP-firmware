@@ -16,7 +16,7 @@
 
 extern int fwk_interrupt_init(const struct fwk_arch_interrupt_driver *driver);
 
-static int interrupt_init(int (*interrupt_init_handler)(
+static int fwk_arch_interrupt_init(int (*interrupt_init_handler)(
     const struct fwk_arch_interrupt_driver **driver))
 {
     int status;
@@ -49,12 +49,12 @@ int fwk_arch_init(const struct fwk_arch_init_driver *driver)
         return FWK_E_PARAM;
 
     /* Initialize interrupt management */
-    status = interrupt_init(driver->interrupt);
+    status = fwk_arch_interrupt_init(driver->interrupt);
     if (status != FWK_SUCCESS)
         return FWK_E_PANIC;
 
     /* Initialize modules */
-    status = __fwk_module_init();
+    status = fwk_module_init();
     if (status != FWK_SUCCESS)
         return FWK_E_PANIC;
 

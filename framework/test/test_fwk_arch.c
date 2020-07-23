@@ -15,7 +15,7 @@
 
 static int fwk_interrupt_init_return_val;
 static int interrupt_init_handler_return_val;
-static int __fwk_module_init_return_val;
+static int fwk_module_init_return_val;
 
 /*
  * Mock functions
@@ -30,9 +30,9 @@ int interrupt_init_handler(const struct fwk_arch_interrupt_driver **driver)
     return interrupt_init_handler_return_val;
 }
 
-int __wrap___fwk_module_init(void)
+int __wrap_fwk_module_init(void)
 {
-    return __fwk_module_init_return_val;
+    return fwk_module_init_return_val;
 }
 
 static const struct fwk_arch_init_driver driver_invalid = {
@@ -43,7 +43,7 @@ static void test_case_setup(void)
 {
     fwk_interrupt_init_return_val = FWK_SUCCESS;
     interrupt_init_handler_return_val = FWK_SUCCESS;
-    __fwk_module_init_return_val = FWK_SUCCESS;
+    fwk_module_init_return_val = FWK_SUCCESS;
 }
 
 static const struct fwk_arch_init_driver driver = {
@@ -90,7 +90,7 @@ static void test_fwk_arch_init_module_fail(void)
     int result;
 
     /* Module initialization failed */
-    __fwk_module_init_return_val = FWK_E_STATE;
+    fwk_module_init_return_val = FWK_E_STATE;
     result = fwk_arch_init(&driver);
     assert(result == FWK_E_PANIC);
 }

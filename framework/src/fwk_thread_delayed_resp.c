@@ -43,9 +43,9 @@ static int check_api_call(fwk_id_t id, void *data)
 struct fwk_slist *__fwk_thread_get_delayed_response_list(fwk_id_t id)
 {
     if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
-        return &__fwk_module_get_ctx(id)->delayed_response_list;
+        return &fwk_module_get_ctx(id)->delayed_response_list;
 
-    return &__fwk_module_get_element_ctx(id)->delayed_response_list;
+    return &fwk_module_get_element_ctx(id)->delayed_response_list;
 }
 
 struct fwk_event *__fwk_thread_search_delayed_response(

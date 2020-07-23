@@ -92,7 +92,7 @@ struct fwk_element_ctx {
  * \return One of the other framework error codes depending on the
  *      irrecoverable error that occurred.
  */
-int __fwk_module_init(void);
+int fwk_module_init(void);
 
 /*
  * \brief Get a pointer to the context of a module or element.
@@ -103,7 +103,7 @@ int __fwk_module_init(void);
  *
  * \return Pointer to the module context.
  */
-struct fwk_module_ctx *__fwk_module_get_ctx(fwk_id_t id);
+struct fwk_module_ctx *fwk_module_get_ctx(fwk_id_t id);
 
 /*
  * \brief Get the state of a module or element.
@@ -114,7 +114,7 @@ struct fwk_module_ctx *__fwk_module_get_ctx(fwk_id_t id);
  * \retval FWK_SUCCESS The state was returned.
  * \retval FWK_E_PARAM One or more parameters were invalid.
  */
-int __fwk_module_get_state(fwk_id_t id, enum fwk_module_state *state);
+int fwk_module_get_state(fwk_id_t id, enum fwk_module_state *state);
 
 /*
  * \brief Get a pointer to the framework context of an element.
@@ -125,13 +125,13 @@ int __fwk_module_get_state(fwk_id_t id, enum fwk_module_state *state);
  *
  * \return Pointer to the element context.
  */
-struct fwk_element_ctx *__fwk_module_get_element_ctx(fwk_id_t element_id);
+struct fwk_element_ctx *fwk_module_get_element_ctx(fwk_id_t element_id);
 
 /*
  * \brief Reset the module framework component.
  *
  * \note Only for testing.
  */
-void __fwk_module_reset(void);
+void fwk_module_reset(void);
 
 #endif /* FWK_INTERNAL_MODULE_H */
