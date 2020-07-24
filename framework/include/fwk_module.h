@@ -339,6 +339,7 @@ struct fwk_module {
  * \brief Element table type.
  */
 enum fwk_module_elements_type {
+    FWK_MODULE_ELEMENTS_TYPE_NONE, /*!< No element table. */
     FWK_MODULE_ELEMENTS_TYPE_STATIC, /*<! Static element table. */
     FWK_MODULE_ELEMENTS_TYPE_DYNAMIC, /*<! Dynamic element table. */
 };
@@ -534,6 +535,17 @@ const void *fwk_module_get_data(fwk_id_t id);
  * \retval FWK_E_HANDLER The returned API pointer is invalid (NULL).
  */
 int fwk_module_bind(fwk_id_t target_id, fwk_id_t api_id, const void *api);
+
+/*!
+ * \internal
+ *
+ * \brief Initialize the module component.
+ *
+ * \details Initializes the module framework component contexts, allowing
+ *      module details to be accessed through the module interfaces. This does
+ *      not start any modules.
+ */
+void fwk_module_init(void);
 
 /*!
  * @}

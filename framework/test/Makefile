@@ -7,7 +7,6 @@
 
 include $(BS_DIR)/defs.mk
 
-TESTS := test_fwk_arch
 TESTS += test_fwk_id_build
 TESTS += test_fwk_id_equality
 TESTS += test_fwk_id_format
@@ -50,7 +49,6 @@ COMMON_SRC += fwk_test.c
 COMMON_SRC += fwk_thread_delayed_resp.c
 COMMON_SRC += fwk_time.c
 
-test_fwk_arch_SRC += fwk_thread.c
 test_fwk_id_build_SRC += fwk_thread.c
 test_fwk_id_equality_SRC += fwk_thread.c
 test_fwk_id_format_SRC += fwk_thread.c
@@ -87,9 +85,6 @@ test_fwk_thread_SRC += fwk_notification.c
 test_fwk_module_CFLAGS += -DBUILD_HAS_NOTIFICATION
 test_fwk_notification_CFLAGS += -DBUILD_HAS_NOTIFICATION
 test_fwk_thread_CFLAGS += -DBUILD_HAS_NOTIFICATION
-
-test_fwk_arch_WRAP := fwk_module_init
-test_fwk_arch_WRAP += fwk_interrupt_init
 
 test_fwk_module_WRAP := __fwk_notification_init
 test_fwk_module_WRAP += __fwk_thread_init

@@ -46,3 +46,6 @@ memleak:product/rddanielxlr/scp_ramfw/config_ppu_v1.c:87
 memleak:product/tc0/scp_ramfw/config_power_domain.c:114
 memleak:product/tc0/scp_ramfw/config_ppu_v1.c:87
 memleak:product/tc0/scp_romfw/config_ppu_v1.c:81
+
+// This memory has static lifetime
+memleak:framework/test/fwk_test.c:145

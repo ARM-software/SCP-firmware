@@ -4,6 +4,8 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+
+#include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_noreturn.h>
 #include <fwk_status.h>
@@ -21,6 +23,14 @@ static jmp_buf test_buf_context;
 
 struct fwk_module *module_table[FWK_MODULE_IDX_COUNT];
 struct fwk_module_config *module_config_table[FWK_MODULE_IDX_COUNT];
+
+static int fake_init(
+    fwk_id_t module_id,
+    unsigned int element_count,
+    const void *data)
+{
+    return FWK_SUCCESS;
+}
 
 noreturn void __assert_fail(const char *assertion,
     const char *file, unsigned int line, const char *function)
@@ -113,6 +123,29 @@ static unsigned int run_tests(void)
 int main(void)
 {
     unsigned int successful_tests;
+
+    for (enum fwk_module_idx i = 0; i < FWK_MODULE_IDX_COUNT; i++) {
+        char *name = malloc(64);
+
+        snprintf(name, 64, "fake%d", i);
+
+        struct fwk_module *module = malloc(sizeof(*module));
+        struct fwk_module_config *config = malloc(sizeof(*config));
+
+        *module = (struct fwk_module){
+            .name = name,
+            .type = FWK_MODULE_TYPE_SERVICE,
+            .init = fake_init,
+        };
+
+        *config = (struct fwk_module_config){ 0 };
+
+        module_table[i] = module;
+        module_config_table[i] = config;
+    }
+
+    fwk_module_init();
+
     if (test_suite.test_case_count != 0) {
         print_prologue();
         successful_tests = run_tests();

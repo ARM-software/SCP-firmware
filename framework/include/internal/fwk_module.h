@@ -84,15 +84,17 @@ struct fwk_element_ctx {
     struct fwk_slist delayed_response_list;
 };
 
-/*
- * \brief Initialize the module framework component.
+/*!
+ * \internal
  *
- * \retval FWK_SUCCESS The module framework component was initialized.
- * \retval FWK_E_INIT The module framework component was already initialized.
- * \return One of the other framework error codes depending on the
- *      irrecoverable error that occurred.
+ * \brief Start the module component.
+ *
+ * \details Starts each module and its elements, running through their
+ *      initialization routines.
+ *
+ * \return Status code representing the result of the operation.
  */
-int fwk_module_init(void);
+int fwk_module_start(void);
 
 /*
  * \brief Get a pointer to the context of a module or element.
