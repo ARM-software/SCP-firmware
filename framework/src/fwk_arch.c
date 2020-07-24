@@ -11,6 +11,7 @@
 #include <internal/fwk_module.h>
 
 #include <fwk_arch.h>
+#include <fwk_assert.h>
 #include <fwk_log.h>
 #include <fwk_status.h>
 
@@ -48,14 +49,15 @@ int fwk_arch_init(const struct fwk_arch_init_driver *driver)
     if (driver->interrupt == NULL)
         return FWK_E_PARAM;
 
+    fwk_module_init();
+
     /* Initialize interrupt management */
     status = fwk_arch_interrupt_init(driver->interrupt);
-    if (status != FWK_SUCCESS)
+    if (!fwk_expect(status == FWK_SUCCESS))
         return FWK_E_PANIC;
 
-    /* Initialize modules */
-    status = fwk_module_init();
-    if (status != FWK_SUCCESS)
+    status = fwk_module_start();
+    if (!fwk_expect(status == FWK_SUCCESS))
         return FWK_E_PANIC;
 
     return FWK_SUCCESS;
