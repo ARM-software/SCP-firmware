@@ -31,6 +31,14 @@
 #define SCMI_PD_DEVICE_STATE_ID_MASK   0xFFFFFFF
 #define SCMI_PD_DEVICE_STATE_TYPE      (1 << 30)
 
+/*!
+ * \brief SCMI Power Domain Protocol Notifications message ids.
+ */
+enum scmi_pd_notification_id {
+    SCMI_POWER_STATE_CHANGED = 0x000,
+    SCMI_POWER_STATE_CHANGE_REQUESTED = 0x001,
+};
+
 /*
  * PROTOCOL_ATTRIBUTES
  */
@@ -94,6 +102,7 @@ struct scmi_pd_power_state_get_p2a {
 /*
  * POWER_STATE_NOTIFY
  */
+#define SCMI_PD_NOTIFY_ENABLE_MASK UINT32_C(0x1)
 
 struct scmi_pd_power_state_notify_a2p {
     uint32_t domain_id;
@@ -102,6 +111,12 @@ struct scmi_pd_power_state_notify_a2p {
 
 struct scmi_pd_power_state_notify_p2a {
     int32_t status;
+};
+
+struct __attribute((packed)) scmi_pd_power_state_notification_message_p2a {
+    uint32_t agent_id;
+    uint32_t domain_id;
+    uint32_t power_state;
 };
 
 /*!

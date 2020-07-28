@@ -29,6 +29,7 @@
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+#include <fwk_notification.h>
 #include <fwk_status.h>
 #include <fwk_thread.h>
 
@@ -36,12 +37,17 @@
 #include <stdint.h>
 #include <string.h>
 
+#define MOD_SCMI_PD_NOTIFICATION_COUNT 2
+
 struct scmi_pd_operations {
     /*
      * Service identifier currently requesting operation.
      * A 'none' value means that there is no pending request.
      */
     fwk_id_t service_id;
+
+    /* Track agent requesting the pd operation */
+    unsigned int agent_id;
 };
 
 struct scmi_pd_ctx {
@@ -53,7 +59,7 @@ struct scmi_pd_ctx {
 
     /* Power domain module API */
     const struct mod_pd_restricted_api *pd_api;
-#ifdef BUILD_HAS_MOD_DEBUG
+#if BUILD_HAS_MOD_DEBUG
     /* Debug module API */
     const struct mod_debug_api *debug_api;
 
@@ -63,7 +69,9 @@ struct scmi_pd_ctx {
     /* Debug Power Domain element identifier */
     fwk_id_t debug_pd_id;
 
-    #endif
+    /* Holds debug state change notification state */
+    bool debug_pd_state_notification_enabled;
+#endif
 
     /* Pointer to a table of scmi_pd operations */
     struct scmi_pd_operations *ops;
@@ -71,6 +79,14 @@ struct scmi_pd_ctx {
 #ifdef BUILD_HAS_RESOURCE_PERMISSIONS
     /* SCMI Resource Permissions API */
     const struct mod_res_permissions_api *res_perms_api;
+#endif
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    /* Number of active agents */
+    int agent_count;
+
+    /* SCMI notification API */
+    const struct mod_scmi_notification_api *scmi_notification_api;
 #endif
 };
 
@@ -86,6 +102,19 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
     const uint32_t *payload);
 static int scmi_pd_power_state_get_handler(fwk_id_t service_id,
     const uint32_t *payload);
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+static int scmi_pd_power_state_notify_handler(
+    enum scmi_pd_command_id command_id,
+    fwk_id_t service_id,
+    const uint32_t *payload);
+static int scmi_pd_power_state_changed_notify_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload);
+static int scmi_pd_power_state_change_requested_notify_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload);
+#endif
 
 #ifdef BUILD_HAS_MOD_DEBUG
 enum scmi_clock_event_idx {
@@ -125,6 +154,13 @@ static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
         scmi_pd_power_domain_attributes_handler,
     [MOD_SCMI_PD_POWER_STATE_SET] = scmi_pd_power_state_set_handler,
     [MOD_SCMI_PD_POWER_STATE_GET] = scmi_pd_power_state_get_handler,
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    [MOD_SCMI_PD_POWER_STATE_NOTIFY] =
+        scmi_pd_power_state_changed_notify_handler,
+    [MOD_SCMI_PD_POWER_STATE_CHANGE_REQUESTED_NOTIFY] =
+        scmi_pd_power_state_change_requested_notify_handler,
+#endif
 };
 
 static unsigned int payload_size_table[] = {
@@ -136,6 +172,13 @@ static unsigned int payload_size_table[] = {
         sizeof(struct scmi_pd_power_domain_attributes_a2p),
     [MOD_SCMI_PD_POWER_STATE_SET] = sizeof(struct scmi_pd_power_state_set_a2p),
     [MOD_SCMI_PD_POWER_STATE_GET] = sizeof(struct scmi_pd_power_state_get_a2p),
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    [MOD_SCMI_PD_POWER_STATE_NOTIFY] =
+        sizeof(struct scmi_pd_power_state_notify_a2p),
+    [MOD_SCMI_PD_POWER_STATE_CHANGE_REQUESTED_NOTIFY] =
+        sizeof(struct scmi_pd_power_state_notify_a2p),
+#endif
 };
 
 static uint32_t pd_state_to_scmi_dev_state[] = {
@@ -169,6 +212,19 @@ static fwk_id_t ops_get_service(fwk_id_t pd_id)
     unsigned int pd_idx = fwk_id_get_element_idx(pd_id);
 
     return scmi_pd_ctx.ops[pd_idx].service_id;
+}
+
+static void ops_set_agent_id(fwk_id_t pd_id, unsigned int agent_id)
+{
+    unsigned int pd_idx = fwk_id_get_element_idx(pd_id);
+    scmi_pd_ctx.ops[pd_idx].agent_id = agent_id;
+}
+
+static unsigned int ops_get_agent_id(fwk_id_t pd_id)
+{
+    unsigned int pd_idx = fwk_id_get_element_idx(pd_id);
+
+    return scmi_pd_ctx.ops[pd_idx].agent_id;
 }
 
 static void ops_set_idle(fwk_id_t pd_id)
@@ -375,6 +431,29 @@ static int scmi_power_scp_set_core_state(fwk_id_t pd_id,
     return status;
 }
 
+static void scmi_pd_power_state_notify(
+    enum scmi_pd_command_id command_id,
+    enum scmi_pd_notification_id notification_message_id,
+    unsigned int domain_id,
+    unsigned int agent_id,
+    uint32_t power_state)
+{
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    struct scmi_pd_power_state_notification_message_p2a message;
+
+    message.agent_id = agent_id;
+    message.domain_id = domain_id;
+    message.power_state = power_state;
+
+    scmi_pd_ctx.scmi_notification_api->scmi_notification_notify(
+        MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN,
+        command_id,
+        notification_message_id,
+        &message,
+        sizeof(message));
+#endif
+}
+
 static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
                                            const uint32_t *payload)
 {
@@ -503,9 +582,29 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
         event_params->pd_power_state = pd_power_state;
         event_params->pd_id = pd_id;
 
+        scmi_pd_power_state_notify(
+            MOD_SCMI_PD_POWER_STATE_CHANGE_REQUESTED_NOTIFY,
+            SCMI_POWER_STATE_CHANGE_REQUESTED,
+            domain_idx,
+            agent_id,
+            power_state);
+
+        ops_set_agent_id(pd_id, agent_id);
+
         status = fwk_thread_put_event(&event);
         if (status != FWK_SUCCESS)
             break;
+
+        if (scmi_pd_ctx.debug_pd_state_notification_enabled == false) {
+            status = fwk_notification_subscribe(
+                mod_pd_notification_id_power_state_transition,
+                pd_id,
+                fwk_module_id_scmi_power_domain);
+            if (status != FWK_SUCCESS)
+                break;
+            else
+                scmi_pd_ctx.debug_pd_state_notification_enabled = true;
+        }
 
         ops_set_busy(pd_id, service_id);
 
@@ -526,7 +625,32 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
             goto exit;
         }
 
+        /* We are supporting SCMI notifications only for DEVICE type
+         * power domains. Core and cluster changes power states very frequently
+         * hence notifying power states of core/cluster is cpu intensive
+         * and not very much useful to any agent as notified state can become
+         * invalid soon after notification. See SCMI spec v2 4.3.3.1
+         * "that notified power states might not match those requested by the
+         * agent that is notified"
+         */
+        scmi_pd_power_state_notify(
+            MOD_SCMI_PD_POWER_STATE_CHANGE_REQUESTED_NOTIFY,
+            SCMI_POWER_STATE_CHANGE_REQUESTED,
+            domain_idx,
+            agent_id,
+            power_state);
+
         status = scmi_pd_ctx.pd_api->set_state(pd_id, pd_power_state);
+
+        if (status == FWK_SUCCESS) {
+            scmi_pd_power_state_notify(
+                MOD_SCMI_PD_POWER_STATE_NOTIFY,
+                SCMI_POWER_STATE_CHANGED,
+                domain_idx,
+                agent_id,
+                power_state);
+        }
+
         break;
 
     case MOD_PD_TYPE_SYSTEM:
@@ -639,6 +763,108 @@ exit:
 
     return status;
 }
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+static int scmi_pd_power_state_notify_handler(
+    enum scmi_pd_command_id command_id,
+    fwk_id_t service_id,
+    const uint32_t *payload)
+{
+    unsigned int agent_id;
+    enum mod_pd_type pd_type;
+    int status;
+    unsigned int domain_idx;
+    fwk_id_t pd_id;
+    const struct scmi_pd_power_state_notify_a2p *parameters;
+    struct scmi_pd_power_state_notify_p2a return_values = {
+        .status = SCMI_GENERIC_ERROR,
+    };
+
+    parameters = (const struct scmi_pd_power_state_notify_a2p *)payload;
+    domain_idx = parameters->domain_id;
+    if (domain_idx >= scmi_pd_ctx.domain_count) {
+        return_values.status = SCMI_NOT_FOUND;
+        goto exit;
+    }
+
+    pd_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, domain_idx);
+    if (!fwk_module_is_valid_element_id(pd_id)) {
+        return_values.status = SCMI_NOT_FOUND;
+        goto exit;
+    }
+
+    status = scmi_pd_ctx.pd_api->get_domain_type(pd_id, &pd_type);
+    if (status != FWK_SUCCESS) {
+        return_values.status = SCMI_NOT_FOUND;
+        goto exit;
+    }
+
+    /* We are supporting SCMI notifications only for DEVICE type
+     * power domains. Core and cluster changes power states very frequently
+     * hence notifying power states of core/cluster is cpu intensive
+     * and not much useful to any agent as notified state can become
+     * invalid soon after notification. See SCMI spec v2 4.3.3.1
+     * "that notified power states might not match those requested by the
+     * agent that is notified"
+     */
+    if (pd_type != MOD_PD_TYPE_DEVICE && pd_type != MOD_PD_TYPE_DEVICE_DEBUG) {
+        return_values.status = SCMI_DENIED;
+        goto exit;
+    }
+
+    if ((parameters->notify_enable & ~SCMI_PD_NOTIFY_ENABLE_MASK) != 0x0) {
+        return_values.status = SCMI_INVALID_PARAMETERS;
+        goto exit;
+    }
+
+    status = scmi_pd_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+    if (status != FWK_SUCCESS) {
+        return_values.status = SCMI_NOT_FOUND;
+        goto exit;
+    }
+
+    if (parameters->notify_enable) {
+        scmi_pd_ctx.scmi_notification_api->scmi_notification_add_subscriber(
+            MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN,
+            domain_idx,
+            command_id,
+            service_id);
+    } else {
+        scmi_pd_ctx.scmi_notification_api->scmi_notification_remove_subscriber(
+            MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN,
+            agent_id,
+            domain_idx,
+            command_id);
+    }
+
+    return_values.status = SCMI_SUCCESS;
+
+exit:
+    scmi_pd_ctx.scmi_api->respond(
+        service_id,
+        &return_values,
+        (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
+                                                 sizeof(return_values.status));
+
+    return FWK_SUCCESS;
+}
+
+static int scmi_pd_power_state_changed_notify_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload)
+{
+    return scmi_pd_power_state_notify_handler(
+        MOD_SCMI_PD_POWER_STATE_NOTIFY, service_id, payload);
+}
+
+static int scmi_pd_power_state_change_requested_notify_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload)
+{
+    return scmi_pd_power_state_notify_handler(
+        MOD_SCMI_PD_POWER_STATE_CHANGE_REQUESTED_NOTIFY, service_id, payload);
+}
+#endif
 
 /*
  * SCMI Power Domain Policy Handlers
@@ -845,6 +1071,29 @@ static int scmi_pd_init(fwk_id_t module_id, unsigned int element_count,
     return FWK_SUCCESS;
 }
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+static int scmi_init_notifications(unsigned int domains)
+{
+    int status;
+
+    status = scmi_pd_ctx.scmi_api->get_agent_count(&scmi_pd_ctx.agent_count);
+    if (status != FWK_SUCCESS)
+        return status;
+    fwk_assert(scmi_pd_ctx.agent_count != 0);
+
+    status = scmi_pd_ctx.scmi_notification_api->scmi_notification_init(
+        MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN,
+        scmi_pd_ctx.agent_count,
+        domains,
+        MOD_SCMI_PD_NOTIFICATION_COUNT);
+
+    if (status != FWK_SUCCESS)
+        return status;
+
+    return FWK_SUCCESS;
+}
+#endif
+
 static int scmi_pd_bind(fwk_id_t id, unsigned int round)
 {
     int status;
@@ -857,6 +1106,15 @@ static int scmi_pd_bind(fwk_id_t id, unsigned int round)
         &scmi_pd_ctx.scmi_api);
     if (status != FWK_SUCCESS)
         return status;
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
+        FWK_ID_API(FWK_MODULE_IDX_SCMI, MOD_SCMI_API_IDX_NOTIFICATION),
+        &scmi_pd_ctx.scmi_notification_api);
+    if (status != FWK_SUCCESS)
+        return status;
+#endif
 
 #ifdef BUILD_HAS_MOD_DEBUG
     status = fwk_module_bind(scmi_pd_ctx.debug_id,
@@ -1033,7 +1291,45 @@ static int scmi_pd_process_event(const struct fwk_event *event,
     }
     return FWK_E_PARAM;
 }
+
+static int scmi_pd_process_notification(
+    const struct fwk_event *event,
+    struct fwk_event *resp_event)
+{
+    unsigned int domain_id;
+    unsigned int agent_id;
+    uint32_t state;
+    struct mod_pd_power_state_transition_notification_params *event_params =
+        ((struct mod_pd_power_state_transition_notification_params *)
+            event->params);
+
+    if (fwk_id_is_equal(
+            event->id, mod_pd_notification_id_power_state_transition)) {
+        domain_id = fwk_id_get_element_idx(event->source_id);
+        state = event_params->state;
+        agent_id = ops_get_agent_id(event->source_id);
+        scmi_pd_power_state_notify(
+            MOD_SCMI_PD_POWER_STATE_NOTIFY,
+            SCMI_POWER_STATE_CHANGED,
+            domain_id,
+            agent_id,
+            state);
+    }
+
+    return FWK_SUCCESS;
+}
 #endif
+
+static int scmi_pd_start(fwk_id_t id)
+{
+    int status = FWK_SUCCESS;
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    status = scmi_init_notifications(scmi_pd_ctx.domain_count);
+    if (status != FWK_SUCCESS)
+        return status;
+#endif
+    return status;
+}
 
 /* SCMI Power Domain Management Protocol Definition */
 const struct fwk_module module_scmi_power_domain = {
@@ -1042,9 +1338,11 @@ const struct fwk_module module_scmi_power_domain = {
     .type = FWK_MODULE_TYPE_PROTOCOL,
     .init = scmi_pd_init,
     .bind = scmi_pd_bind,
+    .start = scmi_pd_start,
     .process_bind_request = scmi_pd_process_bind_request,
 #ifdef BUILD_HAS_MOD_DEBUG
     .event_count = SCMI_PD_EVENT_IDX_COUNT,
     .process_event = scmi_pd_process_event,
+    .process_notification = scmi_pd_process_notification,
 #endif
 };
