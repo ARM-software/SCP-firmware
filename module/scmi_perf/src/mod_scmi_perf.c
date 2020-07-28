@@ -911,7 +911,7 @@ static int scmi_perf_describe_fast_channels(fwk_id_t service_id,
         break;
 
     default:
-        return_values.status = SCMI_NOT_SUPPORTED;
+        return_values.status = SCMI_NOT_FOUND;
         goto exit;
 
     }
