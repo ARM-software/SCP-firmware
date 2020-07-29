@@ -7,7 +7,7 @@
 
 #include <mod_sds.h>
 
-#if BUILD_HAS_MOD_CLOCK
+#ifdef BUILD_HAS_MOD_CLOCK
 #    include <mod_clock.h>
 #endif
 
@@ -614,14 +614,14 @@ static int sds_process_bind_request(fwk_id_t requester_id, fwk_id_t id,
 
 static int sds_start(fwk_id_t id)
 {
-#if BUILD_HAS_MOD_CLOCK
+#ifdef BUILD_HAS_MOD_CLOCK
     const struct mod_sds_config *config;
 #endif
 
     if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
         return FWK_SUCCESS;
 
-#if BUILD_HAS_MOD_CLOCK
+#ifdef BUILD_HAS_MOD_CLOCK
     config = fwk_module_get_data(fwk_module_id_sds);
     if (!fwk_id_is_equal(config->clock_id, FWK_ID_NONE)) {
         /* Register the module for clock state notifications */
@@ -635,7 +635,7 @@ static int sds_start(fwk_id_t id)
     return init_sds();
 }
 
-#if BUILD_HAS_MOD_CLOCK
+#ifdef BUILD_HAS_MOD_CLOCK
 static int sds_process_notification(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
@@ -665,7 +665,7 @@ const struct fwk_module module_sds = {
     .element_init = sds_element_init,
     .process_bind_request = sds_process_bind_request,
     .start = sds_start,
-#if BUILD_HAS_MOD_CLOCK
+#ifdef BUILD_HAS_MOD_CLOCK
     .process_notification = sds_process_notification
 #endif
 };

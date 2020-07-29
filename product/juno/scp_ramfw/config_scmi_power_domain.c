@@ -14,7 +14,7 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 
-#if BUILD_HAS_MOD_DEBUG
+#ifdef BUILD_HAS_MOD_DEBUG
 struct fwk_module_config config_scmi_power_domain = {
     .data = &((struct mod_scmi_pd_config) {
         .debug_pd_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN,

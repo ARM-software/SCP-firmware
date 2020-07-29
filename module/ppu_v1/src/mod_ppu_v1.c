@@ -13,7 +13,7 @@
 #include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
 
-#if BUILD_HAS_MOD_SYSTEM_POWER
+#ifdef BUILD_HAS_MOD_SYSTEM_POWER
 #    include <mod_system_power.h>
 #endif
 
@@ -682,7 +682,7 @@ static int ppu_v1_pd_init(fwk_id_t pd_id, unsigned int unused, const void *data)
     if (config->pd_type == MOD_PD_TYPE_CLUSTER) {
         pd_ctx->data = fwk_mm_calloc(1, sizeof(struct ppu_v1_cluster_pd_ctx));
     }
-#if BUILD_HAS_MOD_TIMER
+#ifdef BUILD_HAS_MOD_TIMER
     if (config->timer_config == NULL) {
         pd_ctx->timer_ctx = NULL;
     } else {
@@ -768,7 +768,7 @@ static int ppu_v1_bind(fwk_id_t id, unsigned int round)
 
     pd_ctx = ppu_v1_ctx.pd_ctx_table + fwk_id_get_element_idx(id);
 
-#if BUILD_HAS_MOD_TIMER
+#ifdef BUILD_HAS_MOD_TIMER
     if (pd_ctx->timer_ctx != NULL &&
         !fwk_id_is_equal(pd_ctx->timer_ctx->timer_id, FWK_ID_NONE)) {
         /* Bind to the timer */
@@ -799,7 +799,7 @@ static int ppu_v1_bind(fwk_id_t id, unsigned int round)
         return FWK_SUCCESS;
 
     switch (fwk_id_get_module_idx(pd_ctx->bound_id)) {
-    #if BUILD_HAS_MOD_POWER_DOMAIN
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
     case FWK_MODULE_IDX_POWER_DOMAIN:
         return fwk_module_bind(pd_ctx->bound_id,
                                mod_pd_api_id_driver_input,
@@ -807,7 +807,7 @@ static int ppu_v1_bind(fwk_id_t id, unsigned int round)
         break;
     #endif
 
-    #if BUILD_HAS_MOD_SYSTEM_POWER
+#ifdef BUILD_HAS_MOD_SYSTEM_POWER
     case FWK_MODULE_IDX_SYSTEM_POWER:
         return fwk_module_bind(pd_ctx->bound_id,
                                mod_system_power_api_id_pd_driver_input,
@@ -860,11 +860,11 @@ static int ppu_v1_process_bind_request(fwk_id_t source_id,
         return FWK_E_ACCESS;
     }
 
-    #if BUILD_HAS_MOD_POWER_DOMAIN
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
     is_power_domain_module = (fwk_id_get_module_idx(source_id) ==
         FWK_MODULE_IDX_POWER_DOMAIN);
     #endif
-    #if BUILD_HAS_MOD_SYSTEM_POWER
+#ifdef BUILD_HAS_MOD_SYSTEM_POWER
     is_system_power_module = (fwk_id_get_module_idx(source_id) ==
         FWK_MODULE_IDX_SYSTEM_POWER);
     #endif

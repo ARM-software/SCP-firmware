@@ -780,7 +780,7 @@ static int juno_ppu_module_init(fwk_id_t module_id,
 
     juno_ppu_ctx.dbgsys_state = MOD_PD_STATE_OFF;
 
-    #if BUILD_HAS_MOD_TIMER
+#ifdef BUILD_HAS_MOD_TIMER
     fwk_assert(data != NULL);
     #endif
 
@@ -833,7 +833,7 @@ static int juno_ppu_bind(fwk_id_t id, unsigned int round)
         return FWK_SUCCESS;
 
     if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
-        #if BUILD_HAS_MOD_TIMER
+#ifdef BUILD_HAS_MOD_TIMER
         config = fwk_module_get_data(fwk_module_id_juno_ppu);
 
         status = fwk_module_bind(
@@ -850,7 +850,7 @@ static int juno_ppu_bind(fwk_id_t id, unsigned int round)
     ppu_ctx = juno_ppu_ctx.ppu_ctx_table + fwk_id_get_element_idx(id);
     dev_config = ppu_ctx->config;
 
-    #if BUILD_HAS_MOD_TIMER
+#ifdef BUILD_HAS_MOD_TIMER
     if (!fwk_id_is_equal(dev_config->timer_id, FWK_ID_NONE)) {
         /* Bind to the timer */
         status = fwk_module_bind(dev_config->timer_id,
@@ -863,7 +863,7 @@ static int juno_ppu_bind(fwk_id_t id, unsigned int round)
     if (!fwk_id_is_equal(ppu_ctx->bound_id, FWK_ID_NONE)) {
         /* Bind back to the entity that bound to us (if any) */
         switch (fwk_id_get_module_idx(ppu_ctx->bound_id)) {
-        #if BUILD_HAS_MOD_POWER_DOMAIN
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
         case FWK_MODULE_IDX_POWER_DOMAIN:
             /* Bind back to the PD module */
             status = fwk_module_bind(ppu_ctx->bound_id,
@@ -874,7 +874,7 @@ static int juno_ppu_bind(fwk_id_t id, unsigned int round)
             break;
         #endif
 
-        #if BUILD_HAS_MOD_SYSTEM_POWER
+#ifdef BUILD_HAS_MOD_SYSTEM_POWER
         case FWK_MODULE_IDX_SYSTEM_POWER:
             /* Bind back to the System Power module */
             status = fwk_module_bind(ppu_ctx->bound_id,

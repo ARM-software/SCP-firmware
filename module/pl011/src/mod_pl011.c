@@ -12,7 +12,7 @@
 #include <mod_pl011.h>
 #include <mod_power_domain.h>
 
-#if BUILD_HAS_MOD_POWER_DOMAIN
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
 #    include <mod_system_power.h>
 #endif
 
@@ -228,7 +228,7 @@ static int pl011_start(fwk_id_t id)
      * Subscribe to power domain pre-state change notifications when identifier
      * is provided.
      */
-    #if BUILD_HAS_MOD_POWER_DOMAIN
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
     int status;
     if (!fwk_id_is_type(config->pd_id, FWK_ID_TYPE_NONE)) {
         status = fwk_notification_subscribe(
@@ -278,7 +278,7 @@ static int process_clock_notification(
     return FWK_SUCCESS;
 }
 
-#if BUILD_HAS_MOD_POWER_DOMAIN
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
 static int pl011_powerdown(fwk_id_t id)
 {
     int status;
@@ -341,7 +341,7 @@ static int pl011_process_notification(
          * Clock notification
          */
         return process_clock_notification(event, resp_event);
-    #if BUILD_HAS_MOD_POWER_DOMAIN
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
     } else if (fwk_id_is_equal(
         event->id,
         mod_pd_notification_id_power_state_pre_transition)) {
