@@ -533,7 +533,7 @@ static const struct mod_clock_drv_api api_clock = {
  * Direct driver API functions
  */
 
-#if BUILD_HAS_MOD_CSS_CLOCK
+#ifdef BUILD_HAS_MOD_CSS_CLOCK
 static int pik_clock_direct_set_div(
     fwk_id_t clock_id,
     uint32_t divider_type,
@@ -718,7 +718,7 @@ static int pik_clock_process_bind_request(
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(target_id);
 
     if (ctx->config->is_group_member) {
-#if BUILD_HAS_MOD_CSS_CLOCK
+#ifdef BUILD_HAS_MOD_CSS_CLOCK
         /* Only the CSS Clock module can bind to group members. */
         if (fwk_id_get_module_idx(source_id) == FWK_MODULE_IDX_CSS_CLOCK) {
             *api = &api_direct;

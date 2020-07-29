@@ -475,7 +475,7 @@ static int smt_start(fwk_id_t id)
 
     ctx = &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(id)];
 
-#if BUILD_HAS_MOD_POWER_DOMAIN
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
     /* Register for power domain state transition notifications */
     return fwk_notification_subscribe(
         mod_pd_notification_id_power_state_transition,
@@ -493,7 +493,7 @@ static int smt_start(fwk_id_t id)
 #endif
 }
 
-#if BUILD_HAS_MOD_POWER_DOMAIN
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
 static int smt_process_notification(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
@@ -535,7 +535,7 @@ const struct fwk_module module_n1sdp_smt = {
     .bind = smt_bind,
     .start = smt_start,
     .process_bind_request = smt_process_bind_request,
-#if BUILD_HAS_MOD_POWER_DOMAIN
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
     .process_notification = smt_process_notification,
 #endif
 };

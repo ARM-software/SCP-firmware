@@ -13,7 +13,7 @@
 #include <mod_power_domain.h>
 #include <mod_ppu_v0.h>
 
-#if BUILD_HAS_MOD_SYSTEM_POWER
+#ifdef BUILD_HAS_MOD_SYSTEM_POWER
 #    include <mod_system_power.h>
 #endif
 
@@ -194,7 +194,7 @@ static int ppu_v0_pd_init(fwk_id_t pd_id, unsigned int unused, const void *data)
     pd_ctx->ppu = (struct ppu_v0_reg *)(config->ppu.reg_base);
     pd_ctx->bound_id = FWK_ID_NONE;
 
-#if BUILD_HAS_MOD_TIMER
+#ifdef BUILD_HAS_MOD_TIMER
     if (config->timer_config == NULL) {
         pd_ctx->timer_ctx = NULL;
     } else {
@@ -243,7 +243,7 @@ static int ppu_v0_bind(fwk_id_t id, unsigned int round)
 
     pd_ctx = ppu_v0_ctx.pd_ctx_table + fwk_id_get_element_idx(id);
 
-#if BUILD_HAS_MOD_TIMER
+#ifdef BUILD_HAS_MOD_TIMER
     if (pd_ctx->timer_ctx != NULL) {
         /* Bind to the timer */
         status = fwk_module_bind(
@@ -259,7 +259,7 @@ static int ppu_v0_bind(fwk_id_t id, unsigned int round)
         return FWK_SUCCESS;
 
     switch (fwk_id_get_module_idx(pd_ctx->bound_id)) {
-    #if BUILD_HAS_MOD_POWER_DOMAIN
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
     case FWK_MODULE_IDX_POWER_DOMAIN:
         return fwk_module_bind(pd_ctx->bound_id,
                                mod_pd_api_id_driver_input,
@@ -267,7 +267,7 @@ static int ppu_v0_bind(fwk_id_t id, unsigned int round)
         break;
     #endif
 
-    #if BUILD_HAS_MOD_SYSTEM_POWER
+#ifdef BUILD_HAS_MOD_SYSTEM_POWER
     case FWK_MODULE_IDX_SYSTEM_POWER:
         return fwk_module_bind(pd_ctx->bound_id,
                                mod_system_power_api_id_pd_driver_input,
@@ -300,14 +300,14 @@ static int ppu_v0_process_bind_request(fwk_id_t source_id,
 
     case MOD_PD_TYPE_DEVICE:
     case MOD_PD_TYPE_DEVICE_DEBUG:
-        #if BUILD_HAS_MOD_POWER_DOMAIN
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
         if (fwk_id_get_module_idx(source_id) == FWK_MODULE_IDX_POWER_DOMAIN) {
             pd_ctx->bound_id = source_id;
             *api = &pd_driver;
             break;
         }
         #endif
-        #if BUILD_HAS_MOD_SYSTEM_POWER
+#ifdef BUILD_HAS_MOD_SYSTEM_POWER
         if (fwk_id_get_module_idx(source_id) == FWK_MODULE_IDX_SYSTEM_POWER) {
             pd_ctx->bound_id = source_id;
             *api = &pd_driver;

@@ -758,7 +758,7 @@ enum mod_pd_api_idx {
     MOD_PD_API_IDX_COUNT,
 };
 
-#if BUILD_HAS_MOD_POWER_DOMAIN
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
 /*! Public API identifier */
 static const fwk_id_t mod_pd_api_id_public =
     FWK_ID_API_INIT(FWK_MODULE_IDX_POWER_DOMAIN, MOD_PD_API_IDX_PUBLIC);
@@ -792,7 +792,7 @@ enum mod_pd_notification_idx {
 /*!
  * \brief Notification identifiers.
  */
-#if BUILD_HAS_MOD_POWER_DOMAIN
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
 /*! Identifier of the power state transition notification */
 static const fwk_id_t mod_pd_notification_id_power_state_transition =
     FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_POWER_DOMAIN,
@@ -866,7 +866,7 @@ struct pd_get_state_response {
 /*!
  * \brief Public Events identifiers.
  */
-#if BUILD_HAS_MOD_POWER_DOMAIN
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
 /*! Identifier of the public event set_state identifier */
 static const fwk_id_t mod_pd_public_event_id_set_state =
     FWK_ID_EVENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN,

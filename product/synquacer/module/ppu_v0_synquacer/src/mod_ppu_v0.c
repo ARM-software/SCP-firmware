@@ -21,7 +21,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#if BUILD_HAS_MOD_SYSTEM_POWER
+#ifdef BUILD_HAS_MOD_SYSTEM_POWER
 #    include <mod_system_power.h>
 #endif
 #include <ppu_v0.h>
@@ -274,7 +274,7 @@ static int ppu_v0_bind(fwk_id_t id, unsigned int round)
         return FWK_SUCCESS;
 
     switch (fwk_id_get_module_idx(pd_ctx->bound_id)) {
-#if BUILD_HAS_MOD_POWER_DOMAIN
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
     case FWK_MODULE_IDX_POWER_DOMAIN:
         return fwk_module_bind(
             pd_ctx->bound_id,
@@ -283,7 +283,7 @@ static int ppu_v0_bind(fwk_id_t id, unsigned int round)
         break;
 #endif
 
-#if BUILD_HAS_MOD_SYSTEM_POWER
+#ifdef BUILD_HAS_MOD_SYSTEM_POWER
     case FWK_MODULE_IDX_SYSTEM_POWER:
         return fwk_module_bind(
             pd_ctx->bound_id,
@@ -320,14 +320,14 @@ static int ppu_v0_process_bind_request(
     case MOD_PD_TYPE_DEVICE_DEBUG:
     case MOD_PD_TYPE_CLUSTER:
     case MOD_PD_TYPE_CORE:
-#if BUILD_HAS_MOD_POWER_DOMAIN
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
         if (fwk_id_get_module_idx(source_id) == FWK_MODULE_IDX_POWER_DOMAIN) {
             pd_ctx->bound_id = source_id;
             *api = &pd_driver;
             break;
         }
 #endif
-#if BUILD_HAS_MOD_SYSTEM_POWER
+#ifdef BUILD_HAS_MOD_SYSTEM_POWER
         if (fwk_id_get_module_idx(source_id) == FWK_MODULE_IDX_SYSTEM_POWER) {
             *api = &pd_driver;
             break;
