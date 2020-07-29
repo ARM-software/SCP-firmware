@@ -16,7 +16,6 @@ BS_FIRMWARE_MODULE_HEADERS_ONLY :=
 BS_FIRMWARE_MODULES := \
     armv7m_mpu \
     pl011 \
-    log \
     cmn600 \
     apcontext \
     power_domain \
@@ -60,8 +59,6 @@ BS_FIRMWARE_SOURCES := \
     config_armv7m_mpu.c \
     config_ssc.c \
     config_system_info.c \
-    config_log.c \
-    config_pl011.c \
     config_power_domain.c \
     config_ppu_v0.c \
     config_ppu_v1.c \
@@ -87,7 +84,8 @@ BS_FIRMWARE_SOURCES := \
     config_n1sdp_c2c_i2c.c \
     config_n1sdp_remote_pd.c \
     config_n1sdp_timer_sync.c \
-    config_scmi_power_domain.c
+    config_scmi_power_domain.c \
+    config_pl011.c
 
 ifeq ($(BUILD_HAS_DEBUGGER),yes)
     BS_FIRMWARE_MODULES += debugger_cli

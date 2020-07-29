@@ -19,12 +19,12 @@ struct fwk_module_config config_f_uart3 = {
         [0] = {
             .name = "F_UART3",
             .data =
-                &(struct mod_f_uart3_device_config){
+                &(struct mod_f_uart3_element_cfg){
                     .reg_base = F_UART3_BASE_ADDR,
                     .dla_reg_base = F_UART3_BASE_ADDR,
-                    .baud_rate_bps = 115200,
-                    .clock_rate_hz = 62500 * FWK_KHZ,
-                    .clock_id = FWK_ID_NONE_INIT,
+                    .parity_enable_flag = false,
+                    .even_parity_flag = false,
+                    .baud_rate = MOD_F_UART3_BAUD_RATE_115200,
                 },
         },
 

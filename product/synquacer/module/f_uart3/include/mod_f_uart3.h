@@ -8,8 +8,7 @@
 #ifndef MOD_F_UART3_H
 #define MOD_F_UART3_H
 
-#include <fwk_id.h>
-
+#include <stdbool.h>
 #include <stdint.h>
 
 /*!
@@ -28,23 +27,35 @@
  */
 
 /*!
+ * \brief Support baud rates.
+ */
+enum mod_f_uart3_baud_rate {
+    MOD_F_UART3_BAUD_RATE_9600, /*!< 9600 bits per second */
+    MOD_F_UART3_BAUD_RATE_19200, /*!< 19200 bits per second */
+    MOD_F_UART3_BAUD_RATE_38400, /*!< 38400 bits per second */
+    MOD_F_UART3_BAUD_RATE_57600, /*!< 57600 bits per second */
+    MOD_F_UART3_BAUD_RATE_115200, /*!< 115200 bits per second */
+    MOD_F_UART3_BAUD_RATE_230400, /*!< 230400 bits per second */
+};
+
+/*!
  * \brief F_UART3 device configuration data.
  */
-struct mod_f_uart3_device_config {
+struct mod_f_uart3_element_cfg {
     /*! Base address of the device registers */
     uintptr_t reg_base;
 
     /*! Base address of the DivLatch access device registers */
     uintptr_t dla_reg_base;
 
-    /*! Baud rate (bits per second) */
-    unsigned int baud_rate_bps;
+    /*! Parity enable */
+    bool parity_enable_flag;
 
-    /*! Reference clock (Hertz) */
-    uint64_t clock_rate_hz;
+    /*! Even parity select */
+    bool even_parity_flag;
 
-    /*! Identifier of the clock that this device depends on */
-    fwk_id_t clock_id;
+    /*! Divider latch table index */
+    enum mod_f_uart3_baud_rate baud_rate;
 };
 
 /*!

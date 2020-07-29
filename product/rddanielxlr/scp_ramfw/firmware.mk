@@ -15,7 +15,6 @@ BS_FIRMWARE_MODULES := \
     system_info \
     pcid \
     pl011 \
-    log \
     pik_clock \
     css_clock \
     clock \
@@ -42,7 +41,6 @@ BS_FIRMWARE_SOURCES := \
     rtx_config.c \
     config_armv7m_mpu.c \
     config_pl011.c \
-    config_log.c \
     config_power_domain.c \
     config_ppu_v1.c \
     config_mhu2.c \

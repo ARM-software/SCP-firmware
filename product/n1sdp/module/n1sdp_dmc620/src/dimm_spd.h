@@ -8,7 +8,6 @@
 #ifndef DIMM_SPD_H
 #define DIMM_SPD_H
 
-#include <mod_log.h>
 #include <mod_n1sdp_dmc620.h>
 #include <mod_n1sdp_i2c.h>
 

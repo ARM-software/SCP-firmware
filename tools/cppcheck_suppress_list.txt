@@ -48,3 +48,7 @@ memleak:product/tc0/scp_romfw/config_ppu_v1.c:81
 
 // This memory has static lifetime
 memleak:framework/test/fwk_test.c:145
+
+// Cppcheck does not inspect these conditions deeply enough to know that the
+// dereference can only occur if the check succeeds
+nullPointerRedundantCheck:framework/src/fwk_io.c

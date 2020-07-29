@@ -17,7 +17,6 @@ BS_FIRMWARE_MODULES := \
     system_info \
     pcid \
     pl011 \
-    log \
     cmn600 \
     apcontext \
     power_domain \
@@ -55,7 +54,6 @@ BS_FIRMWARE_SOURCES := \
     config_system_info.c \
     rtx_config.c \
     config_armv7m_mpu.c \
-    config_log.c \
     config_pl011.c \
     config_power_domain.c \
     config_ppu_v0.c \

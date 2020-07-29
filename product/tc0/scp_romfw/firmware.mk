@@ -14,7 +14,6 @@ BS_FIRMWARE_MODULE_HEADERS_ONLY := \
 
 BS_FIRMWARE_MODULES := \
     pl011 \
-    log \
     ppu_v1 \
     msys_rom \
     sds \
@@ -28,7 +27,6 @@ BS_FIRMWARE_MODULES := \
     cmn_booker
 
 BS_FIRMWARE_SOURCES := \
-    config_log.c \
     config_pl011.c \
     config_ppu_v1.c \
     config_sds.c \

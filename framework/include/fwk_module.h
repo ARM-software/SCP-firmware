@@ -14,6 +14,7 @@
 #include <fwk_element.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
+#include <fwk_io.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -87,6 +88,19 @@ struct fwk_module {
     /*! Number of notifications defined by the module */
     unsigned int notification_count;
     #endif
+
+    /*!
+     * \brief Stream adapter.
+     *
+     * \details Every module may provide an optional stream adapter, which
+     *      allows it to service input/output requests to and from other modules
+     *      in a fashion similar to standard file operations in the standard
+     *      library.
+     *
+     *      This adapter handles adapter requests to the module, its elements,
+     *      and its sub-elements.
+     */
+    struct fwk_io_adapter adapter;
 
     /*!
      * \brief Pointer to the module initialization function.
@@ -535,6 +549,25 @@ const void *fwk_module_get_data(fwk_id_t id);
  * \retval FWK_E_HANDLER The returned API pointer is invalid (NULL).
  */
 int fwk_module_bind(fwk_id_t target_id, fwk_id_t api_id, const void *api);
+
+/*!
+ * \brief Get the [stream adapter](::fwk_module::adapter) of a module.
+ *
+ * \details Stream adapters are owned by the module, rather than its elements or
+ *      sub-elements, but element and sub-element identifiers may also be
+ *      provided to this function to get the adapter of the parent module.
+ *
+ * \param[out] adapter Pointer to the stream adapter belonging to the entity, or
+ *      a null pointer value if the module has no registered adapter.
+ * \param[in] id Identifier of an entity.
+ *
+ * \return Status code representing the result of the operation.
+ *
+ * \retval ::FWK_SUCCESS The operation succeeded.
+ * \retval ::FWK_E_PARAM The `adapter` parameter was a null pointer value.
+ * \retval ::FWK_E_PARAM The `id` parameter did not resolve to a valid entity.
+ */
+int fwk_module_adapter(const struct fwk_io_adapter **adapter, fwk_id_t id);
 
 /*!
  * \internal

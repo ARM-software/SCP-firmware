@@ -7,7 +7,6 @@
 
 #include <pl011.h>
 
-#include <mod_log.h>
 #include <mod_pl011.h>
 
 #include <fwk_assert.h>
@@ -41,15 +40,24 @@ struct mod_pl011_element_ctx {
 
     /* Whether the device's clock domain is available */
     bool clocked;
+
+    /* Whether the device has an open file stream */
+    bool open;
 };
 
 static struct mod_pl011_ctx {
+    bool initialized; /* Whether the context has been initialized */
+
     struct mod_pl011_element_ctx *elements; /* Element context table */
-} mod_pl011_ctx;
+} mod_pl011_ctx = {
+    .initialized = false,
+};
 
 static int mod_pl011_init_ctx(struct mod_pl011_ctx *ctx)
 {
     size_t element_count;
+
+    fwk_assert(!mod_pl011_ctx.initialized);
 
     element_count = fwk_module_get_element_count(fwk_module_id_pl011);
     if (element_count == 0)
@@ -66,6 +74,8 @@ static int mod_pl011_init_ctx(struct mod_pl011_ctx *ctx)
         ctx->elements[i] = (struct mod_pl011_element_ctx){
             .powered = true, /* Assume the device is always powered */
             .clocked = true, /* Assume the device is always clocked */
+
+            .open = false,
         };
 
 #ifdef BUILD_HAS_MOD_POWER_DOMAIN
@@ -78,6 +88,8 @@ static int mod_pl011_init_ctx(struct mod_pl011_ctx *ctx)
 
         (void)cfg;
     }
+
+    mod_pl011_ctx.initialized = true;
 
     return FWK_SUCCESS;
 }
@@ -161,6 +173,25 @@ static void mod_pl011_putch(fwk_id_t id, char ch)
     reg->DR = ch;
 }
 
+static bool mod_pl011_getch(fwk_id_t id, char *ch)
+{
+    const struct mod_pl011_element_cfg *cfg = fwk_module_get_data(id);
+    struct mod_pl011_element_ctx *ctx =
+        &mod_pl011_ctx.elements[fwk_id_get_element_idx(id)];
+
+    struct pl011_reg *reg = (void *)cfg->reg_base;
+
+    fwk_assert(ctx->powered);
+    fwk_assert(ctx->clocked);
+
+    if (reg->FR & PL011_FR_RXFE)
+        return false;
+
+    *ch = reg->DR;
+
+    return true;
+}
+
 static void mod_pl011_flush(fwk_id_t id)
 {
     const struct mod_pl011_element_cfg *cfg = fwk_module_get_data(id);
@@ -176,49 +207,15 @@ static void mod_pl011_flush(fwk_id_t id)
         continue;
 }
 
-static int mod_pl011_log_flush(fwk_id_t device_id)
-{
-    struct mod_pl011_element_ctx *ctx =
-        &mod_pl011_ctx.elements[fwk_id_get_element_idx(device_id)];
-
-    if (!ctx->powered || !ctx->clocked)
-        return FWK_E_PWRSTATE;
-
-    mod_pl011_flush(device_id);
-
-    return FWK_SUCCESS;
-}
-
-static int mod_pl011_log_putchar(fwk_id_t device_id, char c)
-{
-    struct mod_pl011_element_ctx *ctx =
-        &mod_pl011_ctx.elements[fwk_id_get_element_idx(device_id)];
-
-    if (!ctx->powered || !ctx->clocked)
-        return FWK_E_PWRSTATE;
-
-    mod_pl011_putch(device_id, c);
-
-    return FWK_SUCCESS;
-}
-
-static const struct mod_log_driver_api mod_pl011_log = {
-    .flush = mod_pl011_log_flush,
-    .putchar = mod_pl011_log_putchar,
-};
-
 static int mod_pl011_init(
     fwk_id_t module_id,
     unsigned int element_count,
     const void *data)
 {
-    int status;
+    if (mod_pl011_ctx.initialized)
+        return FWK_SUCCESS;
 
-    status = mod_pl011_init_ctx(&mod_pl011_ctx);
-    if (status != FWK_SUCCESS)
-        return FWK_E_STATE;
-
-    return FWK_SUCCESS;
+    return mod_pl011_init_ctx(&mod_pl011_ctx);
 }
 
 static int mod_pl011_element_init(
@@ -226,26 +223,6 @@ static int mod_pl011_element_init(
     unsigned int unused,
     const void *data)
 {
-    struct mod_pl011_element_ctx *ctx;
-
-    ctx = &mod_pl011_ctx.elements[fwk_id_get_element_idx(element_id)];
-    if (ctx->powered && ctx->clocked)
-        mod_pl011_enable(element_id); /* Enable the device if possible */
-
-    return FWK_SUCCESS;
-}
-
-static int mod_pl011_process_bind_request(
-    fwk_id_t requester_id,
-    fwk_id_t target_id,
-    fwk_id_t api_id,
-    const void **api)
-{
-    if (!fwk_expect(fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT)))
-        return FWK_E_PARAM;
-
-    *api = &mod_pl011_log;
-
     return FWK_SUCCESS;
 }
 
@@ -560,16 +537,104 @@ static int mod_pl011_process_notification(
     return status;
 }
 
+static int mod_pl011_io_open(const struct fwk_io_stream *stream)
+{
+    int status;
+
+    struct mod_pl011_element_ctx *ctx;
+
+    if (!fwk_id_is_type(stream->id, FWK_ID_TYPE_ELEMENT))
+        return FWK_E_SUPPORT;
+
+    if (!mod_pl011_ctx.initialized) {
+        status = mod_pl011_init_ctx(&mod_pl011_ctx);
+        if (status != FWK_SUCCESS)
+            return FWK_E_STATE;
+    }
+
+    ctx = &mod_pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
+    if (ctx->open) /* Refuse to open the same device twice */
+        return FWK_E_BUSY;
+
+    ctx->open = true;
+
+    if (ctx->powered && ctx->clocked)
+        mod_pl011_enable(stream->id); /* Enable the device if possible */
+
+    return FWK_SUCCESS;
+}
+
+static int mod_pl011_io_getch(
+    const struct fwk_io_stream *restrict stream,
+    char *restrict ch)
+{
+    const struct mod_pl011_element_ctx *ctx =
+        &mod_pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
+
+    bool ok = true;
+
+    fwk_assert(ctx->open);
+
+    if (!ctx->powered || !ctx->clocked)
+        return FWK_E_PWRSTATE;
+
+    ok = mod_pl011_getch(stream->id, ch);
+    if (!ok)
+        return FWK_PENDING;
+
+    return FWK_SUCCESS;
+}
+
+static int mod_pl011_io_putch(const struct fwk_io_stream *stream, char ch)
+{
+    const struct mod_pl011_element_ctx *ctx =
+        &mod_pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
+
+    fwk_assert(ctx->open);
+
+    if (!ctx->powered || !ctx->clocked)
+        return FWK_E_PWRSTATE;
+
+    if ((ch == '\n') && !(stream->mode & FWK_IO_MODE_BINARY))
+        mod_pl011_putch(stream->id, '\r'); /* Prepend carriage return */
+
+    mod_pl011_putch(stream->id, ch);
+
+    return FWK_SUCCESS;
+}
+
+static int mod_pl011_close(const struct fwk_io_stream *stream)
+{
+    struct mod_pl011_element_ctx *ctx;
+
+    fwk_assert(stream != NULL); /* Validated by the framework */
+    fwk_assert(fwk_module_is_valid_element_id(stream->id));
+
+    mod_pl011_flush(stream->id);
+
+    ctx = &mod_pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
+    fwk_assert(ctx->open);
+
+    ctx->open = false;
+
+    return FWK_SUCCESS;
+}
+
 const struct fwk_module module_pl011 = {
     .name = "pl011",
     .type = FWK_MODULE_TYPE_DRIVER,
-
-    .api_count = 1,
 
     .init = mod_pl011_init,
     .element_init = mod_pl011_element_init,
     .start = mod_pl011_start,
 
-    .process_bind_request = mod_pl011_process_bind_request,
     .process_notification = mod_pl011_process_notification,
+
+    .adapter =
+        (struct fwk_io_adapter){
+            .open = mod_pl011_io_open,
+            .getch = mod_pl011_io_getch,
+            .putch = mod_pl011_io_putch,
+            .close = mod_pl011_close,
+        },
 };
