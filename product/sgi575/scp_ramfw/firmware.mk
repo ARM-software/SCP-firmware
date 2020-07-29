@@ -17,7 +17,6 @@ BS_FIRMWARE_MODULE_HEADERS_ONLY :=
 BS_FIRMWARE_MODULES := \
     armv7m_mpu \
     pl011 \
-    log \
     cmn600 \
     apcontext \
     power_domain \
@@ -54,7 +53,6 @@ BS_FIRMWARE_MODULES := \
 BS_FIRMWARE_SOURCES := \
     rtx_config.c \
     config_armv7m_mpu.c \
-    config_log.c \
     config_pl011.c \
     config_cmn600.c \
     config_power_domain.c \

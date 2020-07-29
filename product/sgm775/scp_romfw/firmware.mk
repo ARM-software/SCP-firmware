@@ -19,7 +19,6 @@ BS_FIRMWARE_MODULES := sid \
                        ppu_v0 \
                        ppu_v1 \
                        pl011 \
-                       log \
                        gtimer \
                        msys_rom \
                        bootloader \
@@ -29,8 +28,7 @@ BS_FIRMWARE_MODULES := sid \
                        clock \
                        sds
 
-BS_FIRMWARE_SOURCES := config_log.c \
-                       config_pl011.c \
+BS_FIRMWARE_SOURCES := config_pl011.c \
                        config_timer.c \
                        config_msys_rom.c \
                        config_sds.c \

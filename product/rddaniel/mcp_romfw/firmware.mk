@@ -13,12 +13,10 @@ BS_FIRMWARE_MODULE_HEADERS_ONLY := \
 
 BS_FIRMWARE_MODULES := \
     pl011 \
-    log \
     clock \
     mscp_rom
 
 BS_FIRMWARE_SOURCES := \
-    config_log.c \
     config_pl011.c \
     config_clock.c \
     config_rddaniel_rom.c

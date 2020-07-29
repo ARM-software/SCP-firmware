@@ -12,8 +12,13 @@
 
 #include <fwk_arch.h>
 #include <fwk_assert.h>
+#include <fwk_io.h>
 #include <fwk_log.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
 #include <fwk_status.h>
+
+#include <string.h>
 
 extern int fwk_interrupt_init(const struct fwk_arch_interrupt_driver *driver);
 
@@ -50,6 +55,14 @@ int fwk_arch_init(const struct fwk_arch_init_driver *driver)
         return FWK_E_PARAM;
 
     fwk_module_init();
+
+    status = fwk_io_init();
+    if (!fwk_expect(status == FWK_SUCCESS))
+        return FWK_E_PANIC;
+
+    status = fwk_log_init();
+    if (!fwk_expect(status == FWK_SUCCESS))
+        return FWK_E_PANIC;
 
     /* Initialize interrupt management */
     status = fwk_arch_interrupt_init(driver->interrupt);

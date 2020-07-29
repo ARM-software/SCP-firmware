@@ -21,7 +21,6 @@ INCLUDES += $(OS_DIR)/RTX/Include1
 BS_FIRMWARE_MODULES := \
     armv7m_mpu \
     f_uart3 \
-    log \
     gtimer \
     timer \
     ppu_v0_synquacer \
@@ -51,7 +50,6 @@ BS_FIRMWARE_SOURCES := \
     config_css_clock.c \
     config_f_i2c.c \
     config_hsspi.c \
-    config_log_f_uart3.c \
     config_f_uart3.c \
     config_mhu.c \
     config_pik_clock.c \

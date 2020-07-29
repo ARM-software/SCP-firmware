@@ -18,7 +18,6 @@ BS_FIRMWARE_MODULE_HEADERS_ONLY := \
 BS_FIRMWARE_MODULES := \
     armv7m_mpu \
     pl011 \
-    log \
     pik_clock \
     clock \
     n1sdp_mhu \
@@ -29,7 +28,6 @@ BS_FIRMWARE_MODULES := \
 BS_FIRMWARE_SOURCES := \
     rtx_config.c \
     config_armv7m_mpu.c \
-    config_log.c \
     config_pl011.c \
     config_pik_clock.c \
     config_clock.c \

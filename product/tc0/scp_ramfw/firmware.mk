@@ -13,7 +13,6 @@ BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS := yes
 BS_FIRMWARE_MODULES := \
     armv7m_mpu \
     pl011 \
-    log \
     ppu_v1 \
     system_power \
     mhu2 \
@@ -45,7 +44,6 @@ BS_FIRMWARE_SOURCES := \
     rtx_config.c \
     config_armv7m_mpu.c \
     config_pl011.c \
-    config_log.c \
     config_power_domain.c \
     config_ppu_v1.c \
     config_mhu2.c \

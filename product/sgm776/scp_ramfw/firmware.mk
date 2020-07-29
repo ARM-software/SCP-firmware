@@ -15,7 +15,6 @@ BS_FIRMWARE_MODULES := \
     system_info \
     pcid \
     pl011 \
-    log \
     gtimer \
     timer \
     ddr_phy500 \
@@ -49,7 +48,6 @@ ifeq ($(BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS),yes)
 endif
 
 BS_FIRMWARE_SOURCES := \
-    config_log.c \
     config_pl011.c \
     config_timer.c \
     config_ddr_phy500.c \

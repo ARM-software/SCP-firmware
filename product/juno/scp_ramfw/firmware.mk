@@ -21,7 +21,6 @@ BS_FIRMWARE_HAS_STATISTICS := no
 BS_FIRMWARE_MODULE_HEADERS_ONLY :=
 
 BS_FIRMWARE_MODULES := \
-    log \
     pl011 \
     juno_soc_clock_ram \
     clock \
@@ -72,7 +71,6 @@ endif
 BS_FIRMWARE_SOURCES := \
     juno_utils.c \
     config_sds.c \
-    config_log.c \
     config_pl011.c \
     config_juno_soc_clock_ram.c \
     config_clock.c \

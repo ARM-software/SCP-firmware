@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-BS_LIB_NAME := "Host Console"
-BS_LIB_SOURCES = mod_host_console.c
+BS_LIB_NAME := "stdio"
+BS_LIB_SOURCES = mod_stdio.c
 
 include $(BS_DIR)/lib.mk

@@ -16,16 +16,14 @@ BS_FIRMWARE_MODULE_HEADERS_ONLY := timer \
 
 BS_FIRMWARE_MODULES := \
     pl011 \
-    log \
     fip \
     n1sdp_rom \
     clock
 
 BS_FIRMWARE_SOURCES := \
-    config_log.c \
-    config_pl011.c \
     config_fip.c \
     config_n1sdp_rom.c \
-    config_clock.c
+    config_clock.c \
+    config_pl011.c
 
 include $(BS_DIR)/firmware.mk

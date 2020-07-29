@@ -424,6 +424,8 @@ int fwk_module_start(void)
 
     fwk_module_ctx.initialized = true;
 
+    FWK_LOG_CRIT("[FWK] Module initialization complete!");
+
     __fwk_thread_run();
 
     return FWK_SUCCESS;
@@ -666,4 +668,23 @@ error:
     fwk_check(false);
     FWK_LOG_CRIT(fwk_module_err_msg_func, status, __func__);
     return status;
+}
+
+int fwk_module_adapter(const struct fwk_io_adapter **adapter, fwk_id_t id)
+{
+    unsigned int idx;
+
+    if (adapter == NULL)
+        return FWK_E_PARAM;
+
+    *adapter = NULL;
+
+    if (!fwk_module_is_valid_entity_id(id))
+        return FWK_E_PARAM;
+
+    idx = fwk_id_get_module_idx(id);
+
+    *adapter = &module_table[idx]->adapter;
+
+    return FWK_SUCCESS;
 }

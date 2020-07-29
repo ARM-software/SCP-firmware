@@ -19,7 +19,6 @@ BS_FIRMWARE_MODULES := \
     pcid \
     ppu_v1 \
     pl011 \
-    log \
     gtimer \
     msys_rom \
     sds \
@@ -31,7 +30,6 @@ BS_FIRMWARE_MODULES := \
 
 BS_FIRMWARE_SOURCES := \
     sgm776_core.c \
-    config_log.c \
     config_pl011.c \
     config_timer.c \
     config_msys_rom.c \

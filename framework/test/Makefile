@@ -39,6 +39,7 @@ TESTS += test_fwk_thread
 COMMON_SRC := fwk_arch.c
 COMMON_SRC += fwk_dlist.c
 COMMON_SRC += fwk_id.c
+COMMON_SRC += fwk_io.c
 COMMON_SRC += fwk_interrupt.c
 COMMON_SRC += fwk_log.c
 COMMON_SRC += fwk_mm.c
@@ -216,11 +217,11 @@ test_fwk_module_MODULE_IDX_H := test_fwk_module_module_idx.h
 
 $(foreach test, $(TESTS), \
     $(if $(filter fwk_multi_thread.c, $($(test)_SRC)), \
-		$(eval $(test)_CFLAGS += -DBUILD_HAS_MULTITHREADING)))
+        $(eval $(test)_CFLAGS += -DBUILD_HAS_MULTITHREADING)))
 
 $(foreach test, $(TESTS), \
     $(if $($(test)_MODULE_IDX_H), \
-		$(eval $(test)_CFLAGS += -DFWK_TEST_MODULE_IDX_H=\"$($(test)_MODULE_IDX_H)\"),))
+        $(eval $(test)_CFLAGS += -DFWK_TEST_MODULE_IDX_H=\"$($(test)_MODULE_IDX_H)\"),))
 
 $(foreach test, $(TESTS), \
     $(eval $(test)_CFLAGS += -DBUILD_VERSION_DESCRIBE_STRING=))
