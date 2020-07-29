@@ -49,7 +49,7 @@ enum scmi_perf_notification_id {
             SCMI_PERF_PROTOCOL_ATTRIBUTES_NUM_DOMAINS_MASK) \
     )
 
-struct __attribute((packed)) scmi_perf_protocol_attributes_p2a {
+struct scmi_perf_protocol_attributes_p2a {
     int32_t status;
     uint32_t attributes;
     uint32_t statistics_address_low;
@@ -106,7 +106,7 @@ struct __attribute((packed)) scmi_perf_protocol_attributes_p2a {
             SCMI_PERF_DOMAIN_ATTRIBUTES_FAST_CHANNEL_MASK) \
     )
 
-struct __attribute((packed)) scmi_perf_domain_attributes_a2p {
+struct scmi_perf_domain_attributes_a2p {
     uint32_t domain_id;
 };
 
@@ -114,7 +114,7 @@ struct __attribute((packed)) scmi_perf_domain_attributes_a2p {
 #define SCMI_PERF_DOMAIN_RATE_LIMIT_MASK \
     (UINT32_C(0xFFFFF) << SCMI_PERF_DOMAIN_RATE_LIMIT_POS)
 
-struct __attribute((packed)) scmi_perf_domain_attributes_p2a {
+struct scmi_perf_domain_attributes_p2a {
     int32_t status;
     uint32_t attributes;
     uint32_t rate_limit;
@@ -140,13 +140,13 @@ struct __attribute((packed)) scmi_perf_domain_attributes_p2a {
     (((LATENCY) << SCMI_PERF_LEVEL_ATTRIBUTES_POS) & \
         SCMI_PERF_LEVEL_ATTRIBUTES_MASK)
 
-struct __attribute((packed)) scmi_perf_level {
+struct scmi_perf_level {
     uint32_t performance_level;
     uint32_t power_cost;
     uint32_t attributes;
 };
 
-struct __attribute((packed)) scmi_perf_describe_levels_a2p {
+struct scmi_perf_describe_levels_a2p {
     uint32_t domain_id;
     uint32_t level_index;
 };
@@ -165,7 +165,7 @@ struct __attribute((packed)) scmi_perf_describe_levels_a2p {
      (((REMAINING_LEVELS) << SCMI_PERF_NUM_LEVELS_REMAINING_LEVELS_POS) & \
         SCMI_PERF_NUM_LEVELS_REMAINING_LEVELS_MASK))
 
-struct __attribute((packed)) scmi_perf_describe_levels_p2a {
+struct scmi_perf_describe_levels_p2a {
     int32_t status;
     uint32_t num_levels;
 
@@ -176,13 +176,13 @@ struct __attribute((packed)) scmi_perf_describe_levels_p2a {
  * PERFORMANCE_LIMITS_SET
  */
 
-struct __attribute((packed)) scmi_perf_limits_set_a2p {
+struct scmi_perf_limits_set_a2p {
     uint32_t domain_id;
     uint32_t range_max;
     uint32_t range_min;
 };
 
-struct __attribute((packed)) scmi_perf_limits_set_p2a {
+struct scmi_perf_limits_set_p2a {
     int32_t status;
 };
 
@@ -190,11 +190,11 @@ struct __attribute((packed)) scmi_perf_limits_set_p2a {
  * PERFORMANCE_LIMITS_GET
  */
 
-struct __attribute((packed)) scmi_perf_limits_get_a2p {
+struct scmi_perf_limits_get_a2p {
     uint32_t domain_id;
 };
 
-struct __attribute((packed)) scmi_perf_limits_get_p2a {
+struct scmi_perf_limits_get_p2a {
     int32_t status;
     uint32_t range_max;
     uint32_t range_min;
@@ -204,12 +204,12 @@ struct __attribute((packed)) scmi_perf_limits_get_p2a {
  * PERFORMANCE_LEVEL_SET
  */
 
-struct __attribute((packed)) scmi_perf_level_set_a2p {
+struct scmi_perf_level_set_a2p {
     uint32_t domain_id;
     uint32_t performance_level;
 };
 
-struct __attribute((packed)) scmi_perf_level_set_p2a {
+struct scmi_perf_level_set_p2a {
     int32_t status;
 };
 
@@ -217,11 +217,11 @@ struct __attribute((packed)) scmi_perf_level_set_p2a {
  * PERFORMANCE_LEVEL_GET
  */
 
-struct __attribute((packed)) scmi_perf_level_get_a2p {
+struct scmi_perf_level_get_a2p {
     uint32_t domain_id;
 };
 
-struct __attribute((packed)) scmi_perf_level_get_p2a {
+struct scmi_perf_level_get_p2a {
     int32_t status;
     uint32_t performance_level;
 };
@@ -232,12 +232,12 @@ struct __attribute((packed)) scmi_perf_level_get_p2a {
 
 #define SCMI_PERF_NOTIFY_LIMITS_NOTIFY_ENABLE_MASK UINT32_C(0x1)
 
-struct __attribute((packed)) scmi_perf_notify_limits_a2p {
+struct scmi_perf_notify_limits_a2p {
     uint32_t domain_id;
     uint32_t notify_enable;
 };
 
-struct __attribute((packed)) scmi_perf_notify_limits_p2a {
+struct scmi_perf_notify_limits_p2a {
     int32_t status;
 };
 
@@ -247,19 +247,19 @@ struct __attribute((packed)) scmi_perf_notify_limits_p2a {
 
 #define SCMI_PERF_NOTIFY_LEVEL_NOTIFY_ENABLE_MASK UINT32_C(0x1)
 
-struct __attribute((packed)) scmi_perf_notify_level_a2p {
+struct scmi_perf_notify_level_a2p {
     uint32_t domain_id;
     uint32_t notify_enable;
 };
 
-struct __attribute((packed)) scmi_perf_notify_level_p2a {
+struct scmi_perf_notify_level_p2a {
     int32_t status;
 };
 
 /*
  * PERFORMANCE_LEVEL_CHANGED
  */
-struct __attribute((packed)) scmi_perf_level_changed {
+struct scmi_perf_level_changed {
     uint32_t agent_id;
     uint32_t domain_id;
     uint32_t performance_level;
@@ -268,7 +268,7 @@ struct __attribute((packed)) scmi_perf_level_changed {
 /*
  * PERFORMANCE_LIMITS_CHANGED
  */
-struct __attribute((packed)) scmi_perf_limits_changed {
+struct scmi_perf_limits_changed {
     uint32_t agent_id;
     uint32_t domain_id;
     uint32_t range_min;
@@ -279,12 +279,12 @@ struct __attribute((packed)) scmi_perf_limits_changed {
  * PERFORMANCE_DESCRIBE_FASTCHANNEL
  */
 
-struct __attribute((packed)) scmi_perf_describe_fc_a2p {
+struct scmi_perf_describe_fc_a2p {
     uint32_t domain_id;
     uint32_t message_id;
 };
 
-struct __attribute((packed)) scmi_perf_describe_fc_p2a {
+struct scmi_perf_describe_fc_p2a {
     int32_t status;
     uint32_t attributes;
     uint32_t rate_limit;

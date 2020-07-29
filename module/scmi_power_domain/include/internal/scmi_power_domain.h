@@ -35,7 +35,7 @@
  * PROTOCOL_ATTRIBUTES
  */
 
-struct __attribute((packed)) scmi_pd_protocol_attributes_p2a {
+struct scmi_pd_protocol_attributes_p2a {
     int32_t status;
     uint32_t attributes;
     uint32_t statistics_address_low;
@@ -47,14 +47,14 @@ struct __attribute((packed)) scmi_pd_protocol_attributes_p2a {
  * POWER_DOMAIN_ATTRIBUTES
  */
 
-struct __attribute((packed)) scmi_pd_power_domain_attributes_a2p {
+struct scmi_pd_power_domain_attributes_a2p {
     uint32_t domain_id;
 };
 
 #define SCMI_PD_POWER_STATE_SET_ASYNC    (1 << 30)
 #define SCMI_PD_POWER_STATE_SET_SYNC     (1 << 29)
 
-struct __attribute((packed)) scmi_pd_power_domain_attributes_p2a {
+struct scmi_pd_power_domain_attributes_p2a {
     int32_t status;
     uint32_t attributes;
     uint8_t name[16];
@@ -68,13 +68,13 @@ struct __attribute((packed)) scmi_pd_power_domain_attributes_p2a {
 #define SCMI_PD_POWER_STATE_SET_FLAGS_MASK (1 << 0)
 #define SCMI_PD_POWER_STATE_SET_POWER_STATE_MASK UINT32_C(0x4FFFFFFF)
 
-struct __attribute((packed)) scmi_pd_power_state_set_a2p {
+struct scmi_pd_power_state_set_a2p {
     uint32_t flags;
     uint32_t domain_id;
     uint32_t power_state;
 };
 
-struct __attribute((packed)) scmi_pd_power_state_set_p2a {
+struct scmi_pd_power_state_set_p2a {
     int32_t status;
 };
 
@@ -82,11 +82,11 @@ struct __attribute((packed)) scmi_pd_power_state_set_p2a {
  * POWER_STATE_GET
  */
 
-struct __attribute((packed)) scmi_pd_power_state_get_a2p {
+struct scmi_pd_power_state_get_a2p {
     uint32_t domain_id;
 };
 
-struct __attribute((packed)) scmi_pd_power_state_get_p2a {
+struct scmi_pd_power_state_get_p2a {
     int32_t status;
     uint32_t power_state;
 };
@@ -95,12 +95,12 @@ struct __attribute((packed)) scmi_pd_power_state_get_p2a {
  * POWER_STATE_NOTIFY
  */
 
-struct __attribute((packed)) scmi_pd_power_state_notify_a2p {
+struct scmi_pd_power_state_notify_a2p {
     uint32_t domain_id;
     uint32_t notify_enable;
 };
 
-struct __attribute((packed)) scmi_pd_power_state_notify_p2a {
+struct scmi_pd_power_state_notify_p2a {
     int32_t status;
 };
 

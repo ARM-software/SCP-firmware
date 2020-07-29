@@ -29,7 +29,7 @@
  * PROTOCOL_ATTRIBUTES
  */
 
-struct __attribute((packed)) scmi_sensor_protocol_attributes_p2a {
+struct scmi_sensor_protocol_attributes_p2a {
     int32_t status;
     uint32_t attributes;
     uint32_t sensor_reg_address_low;
@@ -43,12 +43,12 @@ struct __attribute((packed)) scmi_sensor_protocol_attributes_p2a {
 
 #define SCMI_SENSOR_PROTOCOL_READING_GET_ASYNC_FLAG_MASK    (1 << 0)
 
-struct __attribute((packed)) scmi_sensor_protocol_reading_get_a2p {
+struct scmi_sensor_protocol_reading_get_a2p {
     uint32_t sensor_id;
     uint32_t flags;
 };
 
-struct __attribute((packed)) scmi_sensor_protocol_reading_get_p2a {
+struct scmi_sensor_protocol_reading_get_p2a {
     int32_t status;
     uint32_t sensor_value_low;
     uint32_t sensor_value_high;
@@ -127,18 +127,18 @@ struct __attribute((packed)) scmi_sensor_protocol_reading_get_p2a {
 
 #define SCMI_SENSOR_NAME_LEN    16
 
-struct __attribute((packed)) scmi_sensor_desc {
+struct scmi_sensor_desc {
     uint32_t sensor_id;
     uint32_t sensor_attributes_low;
     uint32_t sensor_attributes_high;
     char sensor_name[SCMI_SENSOR_NAME_LEN];
 };
 
-struct __attribute((packed)) scmi_sensor_protocol_description_get_a2p {
+struct scmi_sensor_protocol_description_get_a2p {
     uint32_t desc_index;
 };
 
-struct __attribute((packed)) scmi_sensor_protocol_description_get_p2a {
+struct scmi_sensor_protocol_description_get_p2a {
     int32_t status;
     uint32_t num_sensor_flags;
     struct scmi_sensor_desc sensor_desc[];

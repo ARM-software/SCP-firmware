@@ -38,12 +38,12 @@ enum scmi_system_state {
     SCMI_SYSTEM_STATE_MAX
 };
 
-struct __attribute((packed)) scmi_sys_power_state_set_a2p {
+struct scmi_sys_power_state_set_a2p {
     uint32_t flags;
     uint32_t system_state;
 };
 
-struct __attribute((packed)) scmi_sys_power_state_set_p2a {
+struct scmi_sys_power_state_set_p2a {
     int32_t status;
 };
 
@@ -51,7 +51,7 @@ struct __attribute((packed)) scmi_sys_power_state_set_p2a {
  * SYSTEM_POWER_STATE_GET
  */
 
-struct __attribute((packed)) scmi_sys_power_state_get_p2a {
+struct scmi_sys_power_state_get_p2a {
     int32_t status;
     uint32_t system_state;
 };
@@ -62,11 +62,11 @@ struct __attribute((packed)) scmi_sys_power_state_get_p2a {
 
 #define STATE_NOTIFY_FLAGS_MASK 0x1
 
-struct __attribute((packed)) scmi_sys_power_state_notify_a2p {
+struct scmi_sys_power_state_notify_a2p {
     uint32_t flags;
 };
 
-struct __attribute((packed)) scmi_sys_power_state_notify_p2a {
+struct scmi_sys_power_state_notify_p2a {
     int32_t status;
 };
 
@@ -74,7 +74,7 @@ struct __attribute((packed)) scmi_sys_power_state_notify_p2a {
  * SYSTEM_POWER_STATE_NOTIFIER
  */
 
-struct __attribute((packed)) scmi_sys_power_state_notifier {
+struct scmi_sys_power_state_notifier {
     uint32_t agent_id;
     uint32_t flags;
     uint32_t system_state;

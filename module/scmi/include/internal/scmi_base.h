@@ -33,7 +33,7 @@
 /*
  * BASE_DISCOVER_VENDOR
  */
-struct __attribute((packed)) scmi_base_discover_vendor_p2a {
+struct scmi_base_discover_vendor_p2a {
     int32_t status;
     char vendor_identifier[16];
 };
@@ -41,7 +41,7 @@ struct __attribute((packed)) scmi_base_discover_vendor_p2a {
 /*
  * BASE_DISCOVER_SUB_VENDOR
  */
-struct __attribute((packed)) scmi_base_discover_sub_vendor_p2a {
+struct scmi_base_discover_sub_vendor_p2a {
     int32_t status;
     char sub_vendor_identifier[16];
 };
@@ -54,11 +54,11 @@ struct __attribute((packed)) scmi_base_discover_sub_vendor_p2a {
 /*
  * BASE_DISCOVER_LIST_PROTOCOLS
  */
-struct __attribute((packed)) scmi_base_discover_list_protocols_a2p {
+struct scmi_base_discover_list_protocols_a2p {
     uint32_t skip;
 };
 
-struct __attribute((packed)) scmi_base_discover_list_protocols_p2a {
+struct scmi_base_discover_list_protocols_p2a {
     int32_t status;
     uint32_t num_protocols;
     uint32_t protocols[];
@@ -67,11 +67,11 @@ struct __attribute((packed)) scmi_base_discover_list_protocols_p2a {
 /*
  * BASE_DISCOVER_AGENT
  */
-struct __attribute((packed)) scmi_base_discover_agent_a2p {
+struct scmi_base_discover_agent_a2p {
     uint32_t agent_id;
 };
 
-struct __attribute((packed)) scmi_base_discover_agent_p2a {
+struct scmi_base_discover_agent_p2a {
     int32_t status;
     char name[16];
 };
