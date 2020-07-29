@@ -79,7 +79,7 @@ enum scmi_channel_type {
 /*!
  * \brief Generic platform-to-agent PROTOCOL_VERSION structure.
  */
-struct __attribute((packed)) scmi_protocol_version_p2a {
+struct scmi_protocol_version_p2a {
     int32_t status;
     uint32_t version;
 };
@@ -87,7 +87,7 @@ struct __attribute((packed)) scmi_protocol_version_p2a {
 /*!
  * \brief Generic platform-to-agent PROTOCOL_ATTRIBUTES structure.
  */
-struct __attribute((packed)) scmi_protocol_attributes_p2a {
+struct scmi_protocol_attributes_p2a {
     int32_t status;
     uint32_t attributes;
 };
@@ -95,14 +95,14 @@ struct __attribute((packed)) scmi_protocol_attributes_p2a {
 /*!
  * \brief Generic agent-to-platform PROTOCOL_MESSAGE_ATTRIBUTES structure.
  */
-struct __attribute((packed)) scmi_protocol_message_attributes_a2p {
+struct scmi_protocol_message_attributes_a2p {
     uint32_t message_id;
 };
 
 /*!
  * \brief Generic platform-to-agent PROTOCOL_MESSAGE_ATTRIBUTES structure.
  */
-struct __attribute((packed)) scmi_protocol_message_attributes_p2a {
+struct scmi_protocol_message_attributes_p2a {
     int32_t status;
     uint32_t attributes;
 };

@@ -42,13 +42,13 @@ enum scmi_apcore_command_id {
 #define SCMI_APCORE_RESET_ADDRESS_SET_LOCK_MASK \
     (UINT32_C(0x1) << SCMI_APCORE_RESET_ADDRESS_SET_LOCK_POS)
 
-struct __attribute((packed)) scmi_apcore_reset_address_set_a2p {
+struct scmi_apcore_reset_address_set_a2p {
     uint32_t reset_address_low;
     uint32_t reset_address_high;
     uint32_t attributes;
 };
 
-struct __attribute((packed)) scmi_apcore_reset_address_set_p2a {
+struct scmi_apcore_reset_address_set_p2a {
     int32_t status;
 };
 
@@ -61,7 +61,7 @@ struct __attribute((packed)) scmi_apcore_reset_address_set_p2a {
 #define SCMI_APCORE_RESET_ADDRESS_GET_LOCK_MASK \
     (UINT32_C(0x1) << SCMI_APCORE_RESET_ADDRESS_GET_LOCK_POS)
 
-struct __attribute((packed)) scmi_apcore_reset_address_get_p2a {
+struct scmi_apcore_reset_address_get_p2a {
     int32_t status;
     uint32_t reset_address_low;
     uint32_t reset_address_high;

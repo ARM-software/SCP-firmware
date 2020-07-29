@@ -31,7 +31,7 @@
  * PROTOCOL_ATTRIBUTES
  */
 
-struct __attribute((packed)) scmi_reset_domain_protocol_attributes_p2a {
+struct scmi_reset_domain_protocol_attributes_p2a {
     int32_t status;
     uint32_t attributes;
 };
@@ -46,11 +46,11 @@ struct __attribute((packed)) scmi_reset_domain_protocol_attributes_p2a {
 /* Macro for scmi_reset_domain_attributes_p2a:name */
 #define SCMI_RESET_DOMAIN_ATTR_NAME_SZ  16
 
-struct __attribute((packed)) scmi_reset_domain_attributes_a2p {
+struct scmi_reset_domain_attributes_a2p {
     uint32_t domain_id;
 };
 
-struct __attribute((packed)) scmi_reset_domain_attributes_p2a {
+struct scmi_reset_domain_attributes_p2a {
     int32_t status;
     uint32_t flags;
     uint32_t latency;
@@ -66,13 +66,13 @@ struct __attribute((packed)) scmi_reset_domain_attributes_p2a {
 #define SCMI_RESET_DOMAIN_EXPLICIT   (1 << 1)
 #define SCMI_RESET_DOMAIN_AUTO       (1 << 0)
 
-struct __attribute((packed)) scmi_reset_domain_request_a2p {
+struct scmi_reset_domain_request_a2p {
     uint32_t domain_id;
     uint32_t flags;
     uint32_t reset_state;
 };
 
-struct __attribute((packed)) scmi_reset_domain_request_p2a {
+struct scmi_reset_domain_request_p2a {
     int32_t status;
 };
 
@@ -83,12 +83,12 @@ struct __attribute((packed)) scmi_reset_domain_request_p2a {
 /* Values for scmi_reset_notify_p2a:flags */
 #define SCMI_RESET_DOMAIN_DO_NOTIFY  (1 << 0)
 
-struct __attribute((packed)) scmi_reset_domain_notify_a2p {
+struct scmi_reset_domain_notify_a2p {
     uint32_t domain_id;
     uint32_t notify_enable;
 };
 
-struct __attribute((packed)) scmi_reset_domain_notify_p2a {
+struct scmi_reset_domain_notify_p2a {
     int32_t status;
 };
 
@@ -96,7 +96,7 @@ struct __attribute((packed)) scmi_reset_domain_notify_p2a {
  * RESET_COMPLETE
  */
 
-struct __attribute((packed)) scmi_reset_domain_complete_p2a {
+struct scmi_reset_domain_complete_p2a {
     int32_t status;
     uint32_t domain_id;
 };
@@ -105,7 +105,7 @@ struct __attribute((packed)) scmi_reset_domain_complete_p2a {
  * RESET_ISSUED
  */
 
-struct __attribute((packed)) scmi_reset_domain_issued_p2a {
+struct scmi_reset_domain_issued_p2a {
     uint32_t agent_id;
     uint32_t domain_id;
     uint32_t reset_state;

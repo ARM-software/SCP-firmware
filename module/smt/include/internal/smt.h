@@ -10,7 +10,7 @@
 
 #include <stdint.h>
 
-struct __attribute((packed)) mod_smt_memory {
+struct mod_smt_memory {
     uint32_t reserved0;
     uint32_t status;
     uint64_t reserved1;
