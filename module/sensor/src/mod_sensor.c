@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -19,6 +19,7 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
+#include <fwk_string.h>
 #include <fwk_thread.h>
 
 #include <stdbool.h>
@@ -114,42 +115,49 @@ static int get_value(fwk_id_t id, uint64_t *value)
         return status;
     }
 
-    /* Concurrent readings are not supported */
-    if (ctx->read_busy) {
+    if (ctx->concurrency_readings.dequeuing) {
+        /* Prevent new reading request while dequeuing pending readings
+         * cached value is returned
+         */
+        *value = ctx->last_read.value;
+        return ctx->last_read.status;
+    }
+
+    if (ctx->concurrency_readings.pending_requests == 0) {
+        status = ctx->driver_api->get_value(ctx->config->driver_id, value);
+        if (status == FWK_SUCCESS) {
+#ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
+            trip_point_process(id, *value);
+#endif
+            return status;
+        } else if (status != FWK_PENDING) {
+            return status;
+        }
+    }
+
+    if (ctx->concurrency_readings.pending_requests >=
+        SENSOR_MAX_PENDING_REQUESTS) {
         return FWK_E_BUSY;
     }
 
-    status = ctx->driver_api->get_value(ctx->config->driver_id, value);
-    if (status == FWK_PENDING) {
-        req = (struct fwk_event) {
-            .target_id = id,
-            .id = mod_sensor_event_id_read_request,
-            .response_requested = true,
-        };
+    req = (struct fwk_event){
+        .target_id = id,
+        .id = mod_sensor_event_id_read_request,
+        .response_requested = true,
+    };
 
-        status = fwk_thread_put_event(&req);
-        if (status == FWK_SUCCESS) {
-            ctx->read_busy = true;
-
-             /*
-              * We return FWK_PENDING here to indicate to the caller that the
-              * result of the request is pending and will arrive later through
-              * an event.
-              */
-            return FWK_PENDING;
-        } else {
-            return status;
-        }
-    } else if (status == FWK_SUCCESS) {
-#ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
-        trip_point_process(id, *value);
-#endif
-        return FWK_SUCCESS;
+    status = fwk_thread_put_event(&req);
+    if (status != FWK_SUCCESS) {
+        return status;
     }
 
-    else {
-        return FWK_E_DEVICE;
-    }
+    ctx->concurrency_readings.pending_requests++;
+    /*
+     * We return FWK_PENDING here to indicate to the caller that the
+     * result of the request is pending and will arrive later through
+     * an event.
+     */
+    return FWK_PENDING;
 }
 
 static int get_info(fwk_id_t id, struct mod_sensor_scmi_info *info)
@@ -239,7 +247,6 @@ static void reading_complete(fwk_id_t dev_id,
     }
 
     ctx = &ctx_table[fwk_id_get_element_idx(dev_id)];
-
     event = (struct fwk_event) {
         .id = mod_sensor_event_id_read_complete,
         .source_id = ctx->config->driver_id,
@@ -255,6 +262,10 @@ static void reading_complete(fwk_id_t dev_id,
     } else {
         event_params->status = FWK_E_DEVICE;
     }
+
+    ctx->last_read.status = event_params->status;
+    ctx->last_read.value = event_params->value;
+    ctx->concurrency_readings.dequeuing = true;
 
     status = fwk_thread_put_event(&event);
     fwk_assert(status == FWK_SUCCESS);
@@ -301,6 +312,10 @@ static int sensor_dev_init(fwk_id_t element_id,
     } else {
         ctx->trip_point_ctx = NULL;
     }
+
+    /* Pre-init last read with an invalid status */
+    ctx->last_read.status = FWK_E_DEVICE;
+
     return FWK_SUCCESS;
 }
 
@@ -389,16 +404,68 @@ static int sensor_process_bind_request(fwk_id_t source_id,
     return FWK_E_PARAM;
 }
 
+static int process_pending_requests(
+    fwk_id_t dev_id,
+    struct mod_sensor_event_params *event_params)
+{
+    int status;
+    bool list_is_empty;
+    struct fwk_event delayed_response;
+    struct sensor_dev_ctx *ctx;
+    struct mod_sensor_event_params response_params = { 0 };
+
+    status = fwk_thread_is_delayed_response_list_empty(dev_id, &list_is_empty);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    ctx = &ctx_table[fwk_id_get_element_idx(dev_id)];
+
+    for (; !list_is_empty && ctx->concurrency_readings.pending_requests > 0;
+         ctx->concurrency_readings.pending_requests--) {
+        status =
+            fwk_thread_get_first_delayed_response(dev_id, &delayed_response);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+
+        if (event_params != NULL) {
+            fwk_str_memcpy(
+                delayed_response.params,
+                event_params,
+                sizeof(struct mod_sensor_event_params));
+        } else {
+            response_params.status = FWK_E_DEVICE;
+            fwk_str_memcpy(
+                delayed_response.params,
+                &response_params,
+                sizeof(struct mod_sensor_event_params));
+        }
+
+        status = fwk_thread_put_event(&delayed_response);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+
+        status =
+            fwk_thread_is_delayed_response_list_empty(dev_id, &list_is_empty);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+    }
+
+    ctx->concurrency_readings.pending_requests = 0;
+    ctx->concurrency_readings.dequeuing = false;
+
+    return FWK_SUCCESS;
+}
+
 static int sensor_process_event(const struct fwk_event *event,
                                 struct fwk_event *resp_event)
 {
     int status;
     struct sensor_dev_ctx *ctx;
     struct fwk_event read_req_event;
-    struct mod_sensor_event_params *event_params =
-        (struct mod_sensor_event_params *)(event->params);
-    struct mod_sensor_event_params *resp_params =
-        (struct mod_sensor_event_params *)(read_req_event.params);
 
     enum mod_sensor_event_idx event_id_type;
 
@@ -412,14 +479,18 @@ static int sensor_process_event(const struct fwk_event *event,
 
     switch (event_id_type) {
     case SENSOR_EVENT_IDX_READ_REQUEST:
-        ctx->cookie = event->cookie;
+        if (ctx->concurrency_readings.pending_requests == 1) {
+            /*
+             * We keep the cookie event of the request that triggers the
+             * reading.
+             */
+            ctx->cookie = event->cookie;
+        }
         resp_event->is_delayed_response = true;
 
         return FWK_SUCCESS;
 
     case SENSOR_EVENT_IDX_READ_COMPLETE:
-        ctx->read_busy = false;
-
         status = fwk_thread_get_delayed_response(event->target_id,
                                                  ctx->cookie,
                                                  &read_req_event);
@@ -427,8 +498,27 @@ static int sensor_process_event(const struct fwk_event *event,
             return status;
         }
 
-        *resp_params = *event_params;
-        return fwk_thread_put_event(&read_req_event);
+        fwk_str_memcpy(
+            read_req_event.params,
+            event->params,
+            sizeof(struct mod_sensor_event_params));
+        fwk_str_memcpy(
+            &ctx->last_read,
+            event->params,
+            sizeof(struct mod_sensor_event_params));
+
+        status = fwk_thread_put_event(&read_req_event);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+
+        /*
+         * After a read complete event all pending requests are processed.
+         * We are processing pending events until it reaches a new reading
+         * or the event queue is empty.
+         */
+        return process_pending_requests(
+            event->target_id, (struct mod_sensor_event_params *)event->params);
 
     default:
         return FWK_E_PARAM;
