@@ -13,6 +13,7 @@
 
 #include <internal/fwk_id.h>
 
+#include <fwk_attributes.h>
 #include <fwk_status.h>
 
 #include <stdbool.h>
@@ -409,7 +410,8 @@ typedef union __fwk_id fwk_id_t;
  * \retval true The identifier is of the type specified.
  * \retval false The identifier is not of the type specified.
  */
-bool fwk_id_is_type(fwk_id_t id, enum fwk_id_type type);
+bool fwk_id_is_type(fwk_id_t id, enum fwk_id_type type) FWK_CONST FWK_LEAF
+    FWK_NOTHROW;
 
 /*!
  * \brief Retrieve the type of an identifier.
@@ -418,7 +420,7 @@ bool fwk_id_is_type(fwk_id_t id, enum fwk_id_type type);
  *
  * \return Identifier type.
  */
-enum fwk_id_type fwk_id_get_type(fwk_id_t id);
+enum fwk_id_type fwk_id_get_type(fwk_id_t id) FWK_CONST FWK_LEAF FWK_NOTHROW;
 
 /*!
  * \brief Check if two identifiers refer to the same entity.
@@ -429,7 +431,8 @@ enum fwk_id_type fwk_id_get_type(fwk_id_t id);
  * \retval true The identifiers refer to the same entity.
  * \retval false The identifiers do not refer to the same entity.
  */
-bool fwk_id_is_equal(fwk_id_t left, fwk_id_t right);
+bool fwk_id_is_equal(fwk_id_t left, fwk_id_t right) FWK_CONST FWK_LEAF
+    FWK_NOTHROW;
 
 /*!
  * \brief Retrieve the identifier of the module that owns a given identifier.
@@ -441,7 +444,7 @@ bool fwk_id_is_equal(fwk_id_t left, fwk_id_t right);
  *
  * \return Identifier of the owning module.
  */
-fwk_id_t fwk_id_build_module_id(fwk_id_t id);
+fwk_id_t fwk_id_build_module_id(fwk_id_t id) FWK_CONST FWK_LEAF FWK_NOTHROW;
 
 /*!
  * \brief Retrieve the identifier of an element for a given identifier and
@@ -460,7 +463,8 @@ fwk_id_t fwk_id_build_module_id(fwk_id_t id);
  *
  * \return Element identifier associated with the element index for the module.
  */
-fwk_id_t fwk_id_build_element_id(fwk_id_t id, unsigned int element_idx);
+fwk_id_t fwk_id_build_element_id(fwk_id_t id, unsigned int element_idx)
+    FWK_CONST FWK_LEAF FWK_NOTHROW;
 
 /*!
  * \brief Retrieve the identifier of an API for a given identifier and
@@ -479,7 +483,8 @@ fwk_id_t fwk_id_build_element_id(fwk_id_t id, unsigned int element_idx);
  *
  * \return API identifier associated with the API index for the module.
  */
-fwk_id_t fwk_id_build_api_id(fwk_id_t id, unsigned int api_idx);
+fwk_id_t fwk_id_build_api_id(fwk_id_t id, unsigned int api_idx)
+    FWK_CONST FWK_LEAF FWK_NOTHROW;
 
 /*!
  * \brief Retrieve the module index of an identifier.
@@ -488,7 +493,7 @@ fwk_id_t fwk_id_build_api_id(fwk_id_t id, unsigned int api_idx);
  *
  * \return Module index.
  */
-unsigned int fwk_id_get_module_idx(fwk_id_t id);
+unsigned int fwk_id_get_module_idx(fwk_id_t id) FWK_CONST FWK_LEAF FWK_NOTHROW;
 
 /*!
  * \brief Retrieve the index of an element from its identifier or the identifier
@@ -498,7 +503,8 @@ unsigned int fwk_id_get_module_idx(fwk_id_t id);
  *
  * \return Element index.
  */
-unsigned int fwk_id_get_element_idx(fwk_id_t element_id);
+unsigned int fwk_id_get_element_idx(fwk_id_t element_id) FWK_CONST FWK_LEAF
+    FWK_NOTHROW;
 
 /*!
  * \brief Retrieve the index of a sub-element from its identifier.
@@ -507,7 +513,8 @@ unsigned int fwk_id_get_element_idx(fwk_id_t element_id);
  *
  * \return Sub-element index.
  */
-unsigned int fwk_id_get_sub_element_idx(fwk_id_t sub_element_id);
+unsigned int fwk_id_get_sub_element_idx(
+    fwk_id_t sub_element_id) FWK_CONST FWK_LEAF FWK_NOTHROW;
 
 /*!
  * \brief Retrieve the index of an API from its identifier.
@@ -516,7 +523,7 @@ unsigned int fwk_id_get_sub_element_idx(fwk_id_t sub_element_id);
  *
  * \return API index.
  */
-unsigned int fwk_id_get_api_idx(fwk_id_t api_id);
+unsigned int fwk_id_get_api_idx(fwk_id_t api_id) FWK_CONST FWK_LEAF FWK_NOTHROW;
 
 /*!
  * \brief Retrieve the index of an event from its identifier.
@@ -525,7 +532,8 @@ unsigned int fwk_id_get_api_idx(fwk_id_t api_id);
  *
  * \return Event index.
  */
-unsigned int fwk_id_get_event_idx(fwk_id_t event_id);
+unsigned int fwk_id_get_event_idx(fwk_id_t event_id) FWK_CONST FWK_LEAF
+    FWK_NOTHROW;
 
 /*!
  * \brief Retrieve the index of a notification from its identifier.
@@ -534,7 +542,8 @@ unsigned int fwk_id_get_event_idx(fwk_id_t event_id);
  *
  * \return Notification index.
  */
-unsigned int fwk_id_get_notification_idx(fwk_id_t notification_id);
+unsigned int fwk_id_get_notification_idx(
+    fwk_id_t notification_id) FWK_CONST FWK_LEAF FWK_NOTHROW;
 
 /*!
  * @}

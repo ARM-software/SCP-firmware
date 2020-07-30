@@ -332,6 +332,198 @@
 #endif
 
 /*!
+ * \def FWK_CONST
+ *
+ * \brief "Strictly pure" attribute.
+ *
+ * \details Hints that the function will consistently return the same result for
+ *      the same input and will not make any changes to the observable state
+ *      of the program.
+ *
+ * \see https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-const-function-attribute
+ */
+
+#if FWK_HAS_GNU_ATTRIBUTE(__const__)
+#    define FWK_CONST __attribute__((__const__))
+#else
+#    define FWK_CONST
+#endif
+
+/*!
+ * \def FWK_PURE
+ *
+ * \brief "Pure" attribute.
+ *
+ * \details Hints that the function will consistently return the same result for
+ *      the same input and will not make any changes to the observable state
+ *      of the program, but may read non-volatile objects not given as an input
+ *      to the function
+ *
+ * \see https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-pure-function-attribute
+ */
+
+#if FWK_HAS_GNU_ATTRIBUTE(__pure__)
+#    define FWK_PURE __attribute__((__pure__))
+#else
+#    define FWK_PURE
+#endif
+
+/*!
+ * \def FWK_READ_ONLY1
+ *
+ * \brief "Read only" attribute.
+ *
+ * \details Hints that the function takes a reference to an object which is read
+ *      from but not written to, and that the object must therefore be
+ *      initialized.
+ *
+ * \param[in] REF_POS Position of the reference parameter, 1-indexed.
+ *
+ * \see https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html
+ */
+
+/*!
+ * \def FWK_READ_ONLY2
+ *
+ * \brief "Read only" attribute.
+ *
+ * \details Hints that the function takes a reference to an object with a given
+ *      size which is read from but not written to, and that the object must
+ *      therefore be initialized.
+ *
+ * \param[in] REF_POS Position of the reference parameter, 1-indexed.
+ * \param[in] SIZE_POS Position of the size parameter, 1-indexed.
+ *
+ * \see https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html
+ */
+
+#if FWK_HAS_GNU_ATTRIBUTE(__access__)
+#    define FWK_READ_ONLY1(REF_POS) \
+        __attribute__((__access__(read_only, REF_POS)))
+#    define FWK_READ_ONLY2(REF_POS, SIZE_POS) \
+        __attribute__((__access__(read_only, REF_POS, SIZE_POS)))
+#else
+#    define FWK_READ_ONLY1(REF_POS)
+#    define FWK_READ_ONLY2(REF_POS, SIZE_POS)
+#endif
+
+/*!
+ * \def FWK_WRITE_ONLY1
+ *
+ * \brief "Write only" attribute.
+ *
+ * \details Hints that the function takes a reference to an object which is
+ *      written to but not read from, and that the object is therefore permitted
+ *      to be uninitialized.
+ *
+ * \param[in] REF_POS Position of the reference parameter, 1-indexed.
+ *
+ * \see https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html
+ */
+
+/*!
+ * \def FWK_WRITE_ONLY2
+ *
+ * \brief "Write only" attribute.
+ *
+ * \details Hints that the function takes a reference to an object with a given
+ *      size which is written to but not read from, and that the object is
+ *      therefore permitted to be uninitialized.
+ *
+ * \param[in] REF_POS Position of the reference parameter, 1-indexed.
+ * \param[in] SIZE_POS Position of the size parameter, 1-indexed.
+ *
+ * \see https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html
+ */
+
+#if FWK_HAS_GNU_ATTRIBUTE(__access__)
+#    define FWK_WRITE_ONLY1(REF_POS) \
+        __attribute__((__access__(write_only, REF_POS)))
+#    define FWK_WRITE_ONLY2(REF_POS, SIZE_POS) \
+        __attribute__((__access__(write_only, REF_POS, SIZE_POS)))
+#else
+#    define FWK_WRITE_ONLY1(REF_POS)
+#    define FWK_WRITE_ONLY2(REF_POS, SIZE_POS)
+#endif
+
+/*!
+ * \def FWK_READ_WRITE1
+ *
+ * \brief "Read/write" attribute.
+ *
+ * \details Hints that the function takes a reference to an object which is
+ *      both read from and written to, and that the object must therefore be
+ *      initialized.
+ *
+ * \param[in] REF_POS Position of the reference parameter, 1-indexed.
+ *
+ * \see https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html
+ */
+
+/*!
+ * \def FWK_READ_WRITE2
+ *
+ * \brief "Read/write" attribute.
+ *
+ * \details Hints that the function takes a reference to an object with a given
+ *      size which is both read from and written to, and that the object must
+ *      therefore be initialized.
+ *
+ * \param[in] REF_POS Position of the reference parameter, 1-indexed.
+ * \param[in] SIZE_POS Position of the size parameter, 1-indexed.
+ *
+ * \see https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html
+ */
+
+#if FWK_HAS_GNU_ATTRIBUTE(__access__)
+#    define FWK_READ_WRITE1(REF_POS) \
+        __attribute__((__access__(read_write, REF_POS)))
+#    define FWK_READ_WRITE2(REF_POS, SIZE_POS) \
+        __attribute__((__access__(read_write, REF_POS, SIZE_POS)))
+#else
+#    define FWK_READ_WRITE1(REF_POS)
+#    define FWK_READ_WRITE2(REF_POS, SIZE_POS)
+#endif
+
+/*!
+ * \def FWK_UNTOUCHED
+ *
+ * \brief "Untouched" attribute.
+ *
+ * \details Hints that the function takes a reference to an object which is
+ *      neither read from nor written to, but for which the reference itself is
+ *      used.
+ *
+ * \param[in] REF_POS Position of the reference parameter, 1-indexed.
+ *
+ * \see https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html
+ */
+
+#if FWK_HAS_GNU_ATTRIBUTE(__access__)
+#    define FWK_UNTOUCHED(REF_POS) __attribute__((__access__(none, REF_POS)))
+#else
+#    define FWK_UNTOUCHED(REF_POS)
+#endif
+
+/*!
+ * \def FWK_NONNULL
+ *
+ * \brief "Non-null" attribute.
+ *
+ * \details Hints that the the function takes a pointer that should not be null.
+ *
+ * \param[in] PTR_POS Position of the pointer parameter, 1-indexed.
+ *
+ * \see https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-nonnull-function-attribute
+ */
+
+#if FWK_HAS_GNU_ATTRIBUTE(__nonnull__)
+#    define FWK_NONNULL(PTR_POS) __attribute__((__nonnull__(PTR_POS)))
+#else
+#    define FWK_NONNULL(PTR_POS)
+#endif
+
+/*!
  * \}
  */
 

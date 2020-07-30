@@ -62,9 +62,9 @@ struct fwk_dlist_node {
  * For internal use only.
  * See fwk_list_push_head(list, new) for the public interface.
  */
-void __fwk_dlist_push_head(
-    struct fwk_dlist *list,
-    struct fwk_dlist_node *new);
+void __fwk_dlist_push_head(struct fwk_dlist *list, struct fwk_dlist_node *new)
+    FWK_LEAF FWK_NOTHROW FWK_NONNULL(1) FWK_NONNULL(2) FWK_READ_WRITE1(1)
+        FWK_READ_WRITE1(2);
 
 /*
  * Add a new node to the end of a doubly-linked list.
@@ -72,9 +72,9 @@ void __fwk_dlist_push_head(
  * For internal use only.
  * See fwk_list_push_tail(list, new) for the public interface.
  */
-void __fwk_dlist_push_tail(
-    struct fwk_dlist *list,
-    struct fwk_dlist_node *new);
+void __fwk_dlist_push_tail(struct fwk_dlist *list, struct fwk_dlist_node *new)
+    FWK_LEAF FWK_NOTHROW FWK_NONNULL(1) FWK_NONNULL(2) FWK_READ_WRITE1(1)
+        FWK_READ_WRITE1(2);
 
 /*
  * Remove and return the head node from a doubly-linked list.
@@ -82,7 +82,8 @@ void __fwk_dlist_push_tail(
  * For internal use only.
  * See fwk_list_pop_head(list) for the public interface.
  */
-struct fwk_dlist_node *__fwk_dlist_pop_head(struct fwk_dlist *list);
+struct fwk_dlist_node *__fwk_dlist_pop_head(struct fwk_dlist *list) FWK_LEAF
+    FWK_NOTHROW FWK_NONNULL(1) FWK_READ_WRITE1(1);
 
 /*
  * Remove a node from a doubly-linked list.
@@ -90,9 +91,9 @@ struct fwk_dlist_node *__fwk_dlist_pop_head(struct fwk_dlist *list);
  * For internal use only.
  * See fwk_list_remove(list, node) for the public interface.
  */
-void __fwk_dlist_remove(
-    struct fwk_dlist *list,
-    struct fwk_dlist_node *node);
+void __fwk_dlist_remove(struct fwk_dlist *list, struct fwk_dlist_node *node)
+    FWK_LEAF FWK_NOTHROW FWK_NONNULL(1) FWK_NONNULL(2) FWK_UNTOUCHED(1)
+        FWK_READ_WRITE1(2);
 
 /*
  * Insert a node into a doubly-linked list.
@@ -103,7 +104,8 @@ void __fwk_dlist_remove(
 void __fwk_dlist_insert(
     struct fwk_dlist *list,
     struct fwk_dlist_node *restrict new,
-    struct fwk_dlist_node *restrict node);
+    struct fwk_dlist_node *restrict node) FWK_LEAF FWK_NOTHROW FWK_NONNULL(1)
+    FWK_NONNULL(2) FWK_READ_WRITE1(1) FWK_READ_WRITE1(2) FWK_READ_WRITE1(3);
 
 /*!
  * @endcond
