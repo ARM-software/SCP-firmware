@@ -205,7 +205,7 @@
  *
  * \param[in] EXPR The expression to void.
  */
-#define FWK_LOG_VOID_EXPR(EXPR) (void)(EXPR);
+#define FWK_LOG_VOID_EXPR(EXPR) ((void)(EXPR));
 
 /*!
  * \internal
