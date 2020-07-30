@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -17,6 +17,11 @@
 /*!
  * \cond
  */
+
+/*
+ * Sensor concurrency readings max pending requests.
+ */
+#define SENSOR_MAX_PENDING_REQUESTS 3
 
 /*
  * Sensor trip point element context
@@ -36,7 +41,13 @@ struct sensor_dev_ctx {
 
     struct sensor_trip_point_ctx *trip_point_ctx;
     uint32_t cookie;
-    bool read_busy;
+
+    struct {
+        uint32_t pending_requests;
+        bool dequeuing;
+    } concurrency_readings;
+
+    struct mod_sensor_event_params last_read;
 };
 
 struct sensor_mod_ctx {
