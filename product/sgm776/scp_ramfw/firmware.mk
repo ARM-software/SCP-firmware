@@ -6,7 +6,7 @@
 #
 
 BS_FIRMWARE_CPU := cortex-m3
-BS_FIRMWARE_HAS_MULTITHREADING := yes
+BS_FIRMWARE_HAS_MULTITHREADING := no
 BS_FIRMWARE_HAS_NOTIFICATION := yes
 BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS := yes
 
@@ -49,7 +49,6 @@ ifeq ($(BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS),yes)
 endif
 
 BS_FIRMWARE_SOURCES := \
-    rtx_config.c \
     config_log.c \
     config_timer.c \
     config_ddr_phy500.c \
@@ -77,6 +76,10 @@ BS_FIRMWARE_SOURCES := \
     config_sid.c \
     config_system_info.c \
     config_scmi_power_domain.c
+
+ifeq ($(BS_FIRMWARE_HAS_MULTITHREADING),yes)
+    BS_FIRMWARE_SOURCES += rtx_config.c
+endif
 
 ifeq ($(BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS),yes)
     BS_FIRMWARE_SOURCES += config_resource_perms.c
