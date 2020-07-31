@@ -710,12 +710,6 @@ static int n1sdp_pcie_start(fwk_id_t id)
     if (dev_ctx == NULL)
         return FWK_E_PARAM;
 
-    /* Do not initialize PCIe RP in slave chip */
-    if (!dev_ctx->config->ccix_capable) {
-        if (n1sdp_get_chipid() != 0)
-            return FWK_SUCCESS;
-    }
-
     return fwk_notification_subscribe(
         mod_clock_notification_id_state_changed,
         FWK_ID_ELEMENT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_INTERCONNECT),
