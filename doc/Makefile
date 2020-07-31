@@ -23,4 +23,4 @@ include $(BS_DIR)/rules.mk
 .PHONY: doc
 doc: | $(BUILD_DOC_DIR)/
 	$(call show-action,DOC,)
-	$(DOC) $(DOC_DIR)/config.dxy
+	$(DOC) $(DOC_DIR)/Doxyfile

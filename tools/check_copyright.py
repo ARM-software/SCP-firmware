@@ -41,7 +41,6 @@ FILE_TYPES = [
     '*.S',
     '*.py',
     '*.scat',
-    '*.dxy',
 ]
 
 #
