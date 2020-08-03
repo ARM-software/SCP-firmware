@@ -524,6 +524,22 @@
 #endif
 
 /*!
+ * \def FWK_FALLTHROUGH
+ *
+ * \brief "Fallthrough" attribute.
+ *
+ * \details Hints that a fallthrough in a switch statement is intended.
+ *
+ * \see https://gcc.gnu.org/onlinedocs/gcc/Statement-Attributes.html#index-fallthrough-statement-attribute
+ */
+
+#if FWK_HAS_GNU_ATTRIBUTE(__fallthrough__)
+#    define FWK_FALLTHROUGH __attribute__((__fallthrough__))
+#else
+#    define FWK_FALLTHROUGH
+#endif
+
+/*!
  * \}
  */
 

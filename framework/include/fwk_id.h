@@ -397,6 +397,21 @@ enum fwk_id_type {
 #define FWK_ID_STR(ID) (__fwk_id_str(ID).str)
 
 /*!
+ * \brief Build a verbose string representation of an identifier.
+ *
+ * \details Strings returned by this macro describe the integer parts of an
+ *      identifier and include the names of its parts that represent system
+ *      entities.
+ *
+ * \param ID Identifier.
+ *
+ * \return String representation of the identifier.
+ *
+ * \hideinitializer
+ */
+#define FWK_ID_VERBOSE_STR(ID) (fwk_id_verbose_str(ID).str)
+
+/*!
  * \brief Generic identifier.
  */
 typedef union __fwk_id fwk_id_t;
@@ -544,6 +559,34 @@ unsigned int fwk_id_get_event_idx(fwk_id_t event_id) FWK_CONST FWK_LEAF
  */
 unsigned int fwk_id_get_notification_idx(
     fwk_id_t notification_id) FWK_CONST FWK_LEAF FWK_NOTHROW;
+
+/*!
+ * \internal
+ *
+ * \brief Verbose identifier string helper structure.
+ *
+ * \details C does not support returning an array from a function. This
+ *      structure hides the array within a structure, and instead the structure
+ *      is returned to the caller. This allows them to access the array without
+ *      it decaying to a pointer when returned.
+ */
+struct fwk_id_verbose_fmt {
+    char str[128]; /*!< Identifier string representation. */
+};
+
+/*!
+ * \internal
+ *
+ * \brief Generate a verbose string description of an identifier.
+ *
+ * \details Generates a string description of an identifier, including the names
+ *      of any entities that form part of the identifier.
+ *
+ * \param[in] id Identifier to describe.
+ *
+ * \return Verbose string representation of the identifier.
+ */
+struct fwk_id_verbose_fmt fwk_id_verbose_str(fwk_id_t id);
 
 /*!
  * @}
