@@ -23,17 +23,21 @@
 
 #define AGENT_IDX(agent_id) (agent_id - 1)
 
-static struct mod_res_agent_protocol_permissions
-    agent_protocol_permissions[] = {
-    [AGENT_IDX(SCP_SCMI_AGENT_ID_OSPM)] = {
-        .protocols = MOD_RES_PERMS_SCMI_ALL_PROTOCOLS_ALLOWED,
-    },
+static struct mod_res_agent_protocol_permissions agent_protocol_permissions[] =
+    {
+        [AGENT_IDX(SCP_SCMI_AGENT_ID_OSPM)] =
+            {
+                .protocols = MOD_RES_PERMS_SCMI_ALL_PROTOCOLS_ALLOWED,
+            },
 
-    /* PSCI agent has no access to clock protocol */
-    [AGENT_IDX(SCP_SCMI_AGENT_ID_PSCI)] = {
-        .protocols = MOD_RES_PERMS_SCMI_CLOCK_PROTOCOL_DENIED,
-    },
-};
+        /* PSCI agent has no access to clock, perf and sensor protocol */
+        [AGENT_IDX(SCP_SCMI_AGENT_ID_PSCI)] =
+            {
+                .protocols = MOD_RES_PERMS_SCMI_CLOCK_PROTOCOL_DENIED |
+                    MOD_RES_PERMS_SCMI_PERF_PROTOCOL_DENIED |
+                    MOD_RES_PERMS_SCMI_SENSOR_PROTOCOL_DENIED,
+            },
+    };
 
 /*
  * Messages have an index offset from 0x3 as all agents can access
