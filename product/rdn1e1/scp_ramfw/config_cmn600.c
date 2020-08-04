@@ -59,7 +59,7 @@ static const struct mod_cmn600_memory_region_map mmap[] = {
     },
     {
         /*
-         * Peripherals
+         * NOR Flash
          * Map: 0x00_0800_0000 - 0x00_0FFF_FFFF (128 MB)
          */
         .base = UINT64_C(0x0008000000),
