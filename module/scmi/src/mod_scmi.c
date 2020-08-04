@@ -430,13 +430,50 @@ static int scmi_base_protocol_version_handler(fwk_id_t service_id,
 static int scmi_base_protocol_attributes_handler(fwk_id_t service_id,
                                                  const uint32_t *payload)
 {
+    size_t protocol_count;
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    int status;
+    size_t global_protocol_count;
+    enum mod_res_perms_permissions perms;
+    unsigned int agent_id;
+    uint8_t protocol_id;
+    unsigned int index;
+
+    status = get_agent_id(service_id, &agent_id);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    for (index = 0, protocol_count = 0, global_protocol_count = 0;
+         (index < FWK_ARRAY_SIZE(scmi_ctx.scmi_protocol_id_to_idx)) &&
+         (global_protocol_count < scmi_ctx.protocol_count);
+         index++) {
+        if ((scmi_ctx.scmi_protocol_id_to_idx[index] == 0) ||
+            (index == MOD_SCMI_PROTOCOL_ID_BASE))
+            continue;
+
+        protocol_id = index;
+
+        /*
+         * Check that the agent has the permission to access the protocol
+         */
+        perms = scmi_ctx.res_perms_api->agent_has_protocol_permission(
+            agent_id, protocol_id);
+
+        if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
+            protocol_count++;
+
+        global_protocol_count++;
+    }
+#else
+    protocol_count = scmi_ctx.protocol_count;
+#endif
+
     struct scmi_protocol_attributes_p2a return_values = {
         .status = SCMI_SUCCESS,
     };
 
-    return_values.attributes =
-        SCMI_BASE_PROTOCOL_ATTRIBUTES(scmi_ctx.protocol_count,
-                                      scmi_ctx.config->agent_count);
+    return_values.attributes = SCMI_BASE_PROTOCOL_ATTRIBUTES(
+        protocol_count, scmi_ctx.config->agent_count);
 
     respond(service_id, &return_values, sizeof(return_values));
 
@@ -546,8 +583,17 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
     size_t payload_size;
     size_t entry_count;
     size_t protocol_count, protocol_count_max;
+    size_t avail_protocol_count = 0;
     unsigned int index;
     uint8_t protocol_id;
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+    enum mod_res_perms_permissions perms;
+    unsigned int agent_id;
+
+    status = get_agent_id(service_id, &agent_id);
+    if (status != FWK_SUCCESS)
+        goto error;
+#endif
 
     status = get_max_payload_size(service_id, &max_payload_size);
     if (status != FWK_SUCCESS)
@@ -566,16 +612,12 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
     parameters = (const struct scmi_base_discover_list_protocols_a2p *)payload;
     skip = parameters->skip;
 
-    if (skip > scmi_ctx.protocol_count) {
-        return_values.status = SCMI_INVALID_PARAMETERS;
-        goto error;
-    }
-
     protocol_count_max = (scmi_ctx.protocol_count < (skip + entry_count)) ?
                          scmi_ctx.protocol_count : (skip + entry_count);
 
-    for (index = 0, protocol_count = 0,
-         payload_size = sizeof(struct scmi_base_discover_list_protocols_p2a);
+    for (index = 0,
+        protocol_count = 0,
+        payload_size = sizeof(struct scmi_base_discover_list_protocols_p2a);
          (index < FWK_ARRAY_SIZE(scmi_ctx.scmi_protocol_id_to_idx)) &&
          (protocol_count < protocol_count_max);
          index++) {
@@ -588,15 +630,33 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
             continue;
 
         protocol_id = index;
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+        /*
+         * Check that the agent has the permission to access the protocol
+         */
+        perms = scmi_ctx.res_perms_api->agent_has_protocol_permission(
+            agent_id, protocol_id);
+
+        if (perms == MOD_RES_PERMS_ACCESS_DENIED) {
+            continue;
+        }
+#endif
+
         status = write_payload(service_id, payload_size, &protocol_id,
                                sizeof(protocol_id));
         if (status != FWK_SUCCESS)
             goto error;
         payload_size += sizeof(protocol_id);
+        avail_protocol_count++;
+    }
+
+    if (skip > avail_protocol_count) {
+        return_values.status = SCMI_INVALID_PARAMETERS;
+        goto error;
     }
 
     return_values.status = SCMI_SUCCESS;
-    return_values.num_protocols = protocol_count_max - skip;
+    return_values.num_protocols = avail_protocol_count;
 
     status = write_payload(service_id, 0,
                            &return_values, sizeof(return_values));
