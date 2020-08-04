@@ -220,7 +220,7 @@ static int cmn_rhodes_discovery(void)
                     break;
 
                 case NODE_TYPE_RN_I:
-                    if ((ctx->rni_count++) >= MAX_RNI_COUNT) {
+                    if ((ctx->rni_count) >= MAX_RNI_COUNT) {
                         FWK_LOG_ERR(
                             MOD_NAME "  rni count %d >= max limit (%d)\n",
                             ctx->rni_count,
