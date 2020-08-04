@@ -115,7 +115,6 @@ static const unsigned int snf_table_1_3[] = {
     MEM_CNTRL7_ID, /* Maps to HN-F logical node 31 */
  };
 
-
 static const struct mod_cmn_rhodes_mem_region_map mmap[] = {
     {
         /*
@@ -138,7 +137,7 @@ static const struct mod_cmn_rhodes_mem_region_map mmap[] = {
     },
     {
         /*
-         * Peripherals
+         * NOR Flash
          * Map: 0x00_0800_0000 - 0x00_0FFF_FFFF (128 MB)
          */
         .base = UINT64_C(0x0008000000),
