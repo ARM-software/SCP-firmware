@@ -26,6 +26,7 @@
 #include <fwk_status.h>
 #include <fwk_thread.h>
 
+#include <inttypes.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -121,6 +122,13 @@ static int put_event(struct fwk_event *event)
     else
         fwk_list_push_tail(&ctx.isr_event_queue, &allocated_event->slist_node);
 
+    FWK_LOG_TRACE(
+        "[FWK] Sent %" PRIu32 ": %s @ %s -> %s",
+        event->cookie,
+        FWK_ID_STR(event->id),
+        FWK_ID_STR(event->source_id),
+        FWK_ID_STR(event->target_id));
+
     return FWK_SUCCESS;
 }
 
@@ -144,7 +152,8 @@ static void process_next_event(void)
         fwk_list_pop_head(&ctx.event_queue), struct fwk_event, slist_node);
 
     FWK_LOG_TRACE(
-        "[FWK] Get event (%s: %s -> %s)\n",
+        "[FWK] Processing %" PRIu32 ": %s @ %s -> %s\n",
+        event->cookie,
         FWK_ID_STR(event->id),
         FWK_ID_STR(event->source_id),
         FWK_ID_STR(event->target_id));
@@ -205,7 +214,7 @@ static void process_isr(void)
         return;
 
     FWK_LOG_TRACE(
-        "[FWK] Get ISR event (%s: %s -> %s)\n",
+        "[FWK] Pulled ISR event (%s: %s -> %s)\n",
         FWK_ID_STR(isr_event->id),
         FWK_ID_STR(isr_event->source_id),
         FWK_ID_STR(isr_event->target_id));

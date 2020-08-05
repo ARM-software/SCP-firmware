@@ -28,6 +28,7 @@
 #include <fwk_status.h>
 #include <fwk_thread.h>
 
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -258,6 +259,13 @@ static int put_event(struct __fwk_thread_ctx *target_thread_ctx,
                                &target_thread_ctx->slist_node);
     }
 
+    FWK_LOG_TRACE(
+        "[FWK] Sent %" PRIu32 ": %s @ %s -> %s",
+        event->cookie,
+        FWK_ID_STR(event->id),
+        FWK_ID_STR(event->source_id),
+        FWK_ID_STR(event->target_id));
+
     return FWK_SUCCESS;
 
 error:
@@ -334,6 +342,13 @@ static void process_next_thread_event(struct __fwk_thread_ctx *thread_ctx)
         FWK_LIST_GET(fwk_list_pop_head(&thread_ctx->event_queue),
                      struct fwk_event, slist_node);
     fwk_assert(event != NULL);
+
+    FWK_LOG_TRACE(
+        "[FWK] Processing %" PRIu32 ": %s @ %s -> %s\n",
+        event->cookie,
+        FWK_ID_STR(event->id),
+        FWK_ID_STR(event->source_id),
+        FWK_ID_STR(event->target_id));
 
     if (event->response_requested)
         process_event_requiring_response(event);
@@ -526,7 +541,7 @@ static void get_next_isr_event(void)
         fwk_assert(isr_event != NULL);
 
         FWK_LOG_TRACE(
-            "[FWK] Get ISR event (%s: %s -> %s)\n",
+            "[FWK] Pulled ISR event (%s: %s -> %s)\n",
             FWK_ID_STR(isr_event->id),
             FWK_ID_STR(isr_event->source_id),
             FWK_ID_STR(isr_event->target_id));
