@@ -201,7 +201,7 @@ static void process_next_event(void)
     return;
 }
 
-static void process_isr(void)
+static bool process_isr(void)
 {
     struct fwk_event *isr_event;
 
@@ -211,7 +211,7 @@ static void process_isr(void)
     fwk_interrupt_global_enable();
 
     if (isr_event == NULL)
-        return;
+        return false;
 
     FWK_LOG_TRACE(
         "[FWK] Pulled ISR event (%s: %s -> %s)\n",
@@ -220,6 +220,8 @@ static void process_isr(void)
         FWK_ID_STR(isr_event->target_id));
 
     fwk_list_push_tail(&ctx.event_queue, &isr_event->slist_node);
+
+    return true;
 }
 
 /*
@@ -252,7 +254,10 @@ noreturn void __fwk_thread_run(void)
     for (;;) {
         while (!fwk_list_is_empty(&ctx.event_queue))
             process_next_event();
-        process_isr();
+
+        if (process_isr())
+            continue;
+
         fwk_log_unbuffer();
     }
 }
