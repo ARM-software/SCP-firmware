@@ -38,17 +38,6 @@ struct mod_log_config {
 
     /*! API identifier used to select the API provided by the I/O device */
     const fwk_id_t api_id;
-
-    /*!
-     * \brief A string that will be written automatically after the module
-     *      is initialized.
-     *
-     * \details Allows a firmware to provide a string that is written before any
-     *      other log messages.
-     *
-     * \note May be NULL, in which case the banner functionality is not used.
-     */
-    const char *banner;
 };
 
 /*!

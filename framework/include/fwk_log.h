@@ -11,6 +11,8 @@
 #include <fwk_attributes.h>
 #include <fwk_macros.h>
 
+#include <stdbool.h>
+
 #if FWK_HAS_INCLUDE(<fmw_log.h>)
 #    include <fmw_log.h>
 #endif
@@ -244,7 +246,7 @@
  */
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
-#    define FWK_LOG_TRACE(...) fwk_log_snprintf(__VA_ARGS__)
+#    define FWK_LOG_TRACE(...) fwk_log_snprintf(true, __VA_ARGS__)
 #else
 #    define FWK_LOG_TRACE(...) FWK_LOG_VOID(__VA_ARGS__)
 #endif
@@ -258,7 +260,7 @@
  */
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
-#    define FWK_LOG_INFO(...) fwk_log_snprintf(__VA_ARGS__)
+#    define FWK_LOG_INFO(...) fwk_log_snprintf(true, __VA_ARGS__)
 #else
 #    define FWK_LOG_INFO(...) FWK_LOG_VOID(__VA_ARGS__)
 #endif
@@ -272,7 +274,7 @@
  */
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_WARN
-#    define FWK_LOG_WARN(...) fwk_log_snprintf(__VA_ARGS__)
+#    define FWK_LOG_WARN(...) fwk_log_snprintf(true, __VA_ARGS__)
 #else
 #    define FWK_LOG_WARN(...) FWK_LOG_VOID(__VA_ARGS__)
 #endif
@@ -286,7 +288,7 @@
  */
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
-#    define FWK_LOG_ERR(...) fwk_log_snprintf(__VA_ARGS__)
+#    define FWK_LOG_ERR(...) fwk_log_snprintf(true, __VA_ARGS__)
 #else
 #    define FWK_LOG_ERR(...) FWK_LOG_VOID(__VA_ARGS__)
 #endif
@@ -300,7 +302,7 @@
  */
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_CRIT
-#    define FWK_LOG_CRIT(...) fwk_log_snprintf(__VA_ARGS__)
+#    define FWK_LOG_CRIT(...) fwk_log_snprintf(true, __VA_ARGS__)
 #else
 #    define FWK_LOG_CRIT(...) FWK_LOG_VOID(__VA_ARGS__)
 #endif
@@ -406,10 +408,12 @@ const struct fwk_log_backend *fwk_log_deregister(void);
  *
  * \brief Log a message with a specified filter level.
  *
+ * \param[in] print_banner Try to print the initialization banner.
  * \param[in] format Format string.
  * \param[in] ... Associated parameters.
  */
-void fwk_log_snprintf(const char *format, ...) FWK_PRINTF(1, 2);
+void fwk_log_snprintf(bool print_banner, const char *format, ...)
+    FWK_PRINTF(2, 3);
 
 /*!
  * \internal

@@ -160,14 +160,44 @@ static void fwk_log_format(
     memcpy(newline, FWK_LOG_TERMINATOR, sizeof(FWK_LOG_TERMINATOR));
 }
 
-void fwk_log_snprintf(const char *format, ...)
+static bool fwk_log_banner(void)
 {
+    const char *banner =
+        " ___  ___ ___      __ _\n"
+        "/ __|/ __| _ \\___ / _(_)_ _ _ ____ __ ____ _ _ _ ___\n"
+        "\\__ | (__|  _|___|  _| | '_| '  \\ V  V / _` | '_/ -_)\n"
+        "|___/\\___|_|     |_| |_|_| |_|_|_\\_/\\_/\\__,_|_| \\___|\n"
+        "\n" BUILD_VERSION_DESCRIBE_STRING "\n";
+
+    while (banner != NULL) {
+        unsigned int dropped = fwk_log_ctx.dropped;
+
+        fwk_log_snprintf(false, "%s", banner);
+
+        if (fwk_log_ctx.dropped > dropped)
+            return false;
+
+        banner = strchr(banner, '\n');
+        if (banner != NULL)
+            banner++;
+    }
+
+    return true;
+}
+
+void fwk_log_snprintf(bool print_banner, const char *format, ...)
+{
+    static bool banner = false;
+
     const struct fwk_log_backend *backend = NULL;
     bool buffered = false;
 
     char buffer[FMW_LOG_COLUMNS + sizeof(FWK_LOG_TERMINATOR)];
 
     va_list args;
+
+    if (print_banner && !banner)
+        banner = fwk_log_banner();
 
     va_start(args, format);
     fwk_log_format(buffer, sizeof(buffer), format, &args);
@@ -277,7 +307,9 @@ int fwk_log_unbuffer(void)
 
             if (fwk_log_ctx.dropped > 0) {
                 fwk_log_snprintf(
-                    "[FWK] ... and %u more messages...", fwk_log_ctx.dropped);
+                    true,
+                    "[FWK] ... and %u more messages...",
+                    fwk_log_ctx.dropped);
 
                 fwk_log_ctx.dropped = 0;
 
