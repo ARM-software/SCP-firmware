@@ -65,10 +65,12 @@ static int mod_isys_rom_process_event(
     const struct fwk_event *event,
     struct fwk_event *resp)
 {
-    int status = ctx.bootloader_api->load_image();
+    int status;
 
-    FWK_LOG_ERR(
-        "[SYSTEM] Failed to load RAM firmware image: %s",
+    status = ctx.bootloader_api->load_image();
+
+    FWK_LOG_CRIT(
+        "[ISYS-ROM] Failed to load RAM firmware image: %s",
         fwk_status_str(status));
 
     return FWK_SUCCESS;
