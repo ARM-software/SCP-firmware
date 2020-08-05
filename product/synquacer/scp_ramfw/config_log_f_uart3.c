@@ -10,7 +10,6 @@
 #include <mod_f_uart3.h>
 #include <mod_log.h>
 
-#include <fwk_banner.h>
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
@@ -49,8 +48,6 @@ struct fwk_module_config config_f_uart3 = {
 static const struct mod_log_config log_data = {
     .device_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_F_UART3, 0),
     .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_F_UART3, 0),
-    .banner =
-        FWK_BANNER_SCP FWK_BANNER_RAM_FIRMWARE BUILD_VERSION_DESCRIBE_STRING,
 };
 
 struct fwk_module_config config_log = {

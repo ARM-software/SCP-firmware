@@ -91,8 +91,6 @@ static int log_start(fwk_id_t id)
 {
     int status;
 
-    const char *banner;
-
     static const struct fwk_log_backend backend = {
         .print = log_backend_print,
         .flush = log_backend_flush,
@@ -102,18 +100,6 @@ static int log_start(fwk_id_t id)
 
     status = fwk_log_register(&backend);
     fwk_check(status == FWK_SUCCESS);
-
-    banner = log_config->banner;
-
-    while (banner != NULL) {
-        FWK_LOG_CRIT("%s", banner);
-
-        banner = strchr(banner, '\n');
-        if (banner != NULL)
-            banner += 1;
-    }
-
-    FWK_LOG_FLUSH();
 
     return FWK_SUCCESS;
 }

@@ -222,4 +222,7 @@ $(foreach test, $(TESTS), \
     $(if $($(test)_MODULE_IDX_H), \
 		$(eval $(test)_CFLAGS += -DFWK_TEST_MODULE_IDX_H=\"$($(test)_MODULE_IDX_H)\"),))
 
+$(foreach test, $(TESTS), \
+    $(eval $(test)_CFLAGS += -DBUILD_VERSION_DESCRIBE_STRING=))
+
 include $(BS_DIR)/test.mk
