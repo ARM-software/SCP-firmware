@@ -14,20 +14,25 @@
 #include <fwk_macros.h>
 #include <fwk_module.h>
 
-const struct fwk_module_config config_pl011 = {
-    .elements = FWK_MODULE_STATIC_ELEMENTS({
-        [0] = {
-            .name = "uart",
-            .data =
-                &(struct mod_pl011_device_config){
-                    .reg_base = SCP_UART_BASE,
-                    .baud_rate_bps = 115200,
-                    .clock_rate_hz = 24 * FWK_MHZ,
-                    .clock_id = FWK_ID_NONE_INIT,
-                    .pd_id = FWK_ID_NONE_INIT,
-                },
-        },
+static const struct fwk_element config_pl011_elements[] = {
+    [0] = {
+        .name = "uart",
+        .data =
+            &(struct mod_pl011_element_cfg){
+                .reg_base = SCP_UART_BASE,
+                .baud_rate_bps = 115200,
+                .clock_rate_hz = 24 * FWK_MHZ,
+                .clock_id = FWK_ID_NONE_INIT,
 
-        [1] = { 0 },
-    }),
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
+                .pd_id = FWK_ID_NONE_INIT,
+#endif
+            },
+    },
+
+    [1] = { 0 },
+};
+
+const struct fwk_module_config config_pl011 = {
+    .elements = FWK_MODULE_STATIC_ELEMENTS_PTR(config_pl011_elements),
 };

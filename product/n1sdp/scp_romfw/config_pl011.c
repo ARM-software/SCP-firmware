@@ -19,12 +19,11 @@ struct fwk_module_config config_pl011 = {
         [0] = {
             .name = "SCP UART",
             .data =
-                &(struct mod_pl011_device_config){
+                &(struct mod_pl011_element_cfg){
                     .reg_base = SCP_UART_BASE,
                     .baud_rate_bps = 115200,
                     .clock_rate_hz = CLOCK_RATE_REFCLK,
                     .clock_id = FWK_ID_NONE_INIT,
-                    .pd_id = FWK_ID_NONE_INIT,
                 },
         },
 
