@@ -284,8 +284,9 @@ bool pcie_wait_condition(void *data)
     case PCIE_INIT_STAGE_CCIX_POWER_ON:
         return ((SCC->CCIX_PM_CTRL & SCC_CCIX_PM_CTRL_PWR_ACK_MASK) != 0);
     case PCIE_INIT_STAGE_PHY:
-        return ((ctrl_apb->RESET_STATUS &
-                 RESET_STATUS_PHY_REL_ST_MASK) != 0);
+        return (
+            ((ctrl_apb->RESET_STATUS & RESET_STATUS_PHY_REL_ST_MASK) != 0) &&
+            ((ctrl_apb->RESET_STATUS & RESET_STATUS_PLL_ST_MASK) != 0));
     case PCIE_INIT_STAGE_CTRL:
         return ((ctrl_apb->RESET_STATUS &
                  RESET_STATUS_RC_REL_ST_MASK) != 0);

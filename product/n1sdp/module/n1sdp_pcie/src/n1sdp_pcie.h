@@ -68,7 +68,7 @@
  * Note: Execution will block for the specified timeout. If the timeout
  * is too long switch to alarm API instead of blocking.
  */
-#define PCIE_PHY_PLL_LOCK_TIMEOUT      UINT32_C(100)
+#define PCIE_PHY_PLL_LOCK_TIMEOUT UINT32_C(500)
 #define PCIE_CTRL_RC_RESET_TIMEOUT     UINT32_C(100)
 #define PCIE_LINK_TRAINING_TIMEOUT     UINT32_C(100000)
 #define PCIE_LINK_RE_TRAINING_TIMEOUT  UINT32_C(1000000)
