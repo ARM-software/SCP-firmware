@@ -73,6 +73,7 @@ BS_FIRMWARE_SOURCES := \
     juno_utils.c \
     config_sds.c \
     config_log.c \
+    config_pl011.c \
     config_juno_soc_clock_ram.c \
     config_clock.c \
     config_dvfs.c \

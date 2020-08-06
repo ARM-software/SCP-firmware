@@ -27,6 +27,7 @@ BS_FIRMWARE_SOURCES := \
     config_bootloader.c \
     config_clock.c \
     config_gtimer.c \
-    config_log.c
+    config_log.c \
+    config_pl011.c
 
 include $(BS_DIR)/firmware.mk

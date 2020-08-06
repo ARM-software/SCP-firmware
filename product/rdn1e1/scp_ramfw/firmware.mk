@@ -56,6 +56,7 @@ BS_FIRMWARE_SOURCES := \
     rtx_config.c \
     config_armv7m_mpu.c \
     config_log.c \
+    config_pl011.c \
     config_power_domain.c \
     config_ppu_v0.c \
     config_ppu_v1.c \

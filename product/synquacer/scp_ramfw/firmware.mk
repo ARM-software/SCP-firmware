@@ -52,6 +52,7 @@ BS_FIRMWARE_SOURCES := \
     config_f_i2c.c \
     config_hsspi.c \
     config_log_f_uart3.c \
+    config_f_uart3.c \
     config_mhu.c \
     config_pik_clock.c \
     config_power_domain.c \

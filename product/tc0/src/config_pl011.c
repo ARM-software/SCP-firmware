@@ -15,17 +15,19 @@
 #include <fwk_module.h>
 
 static const struct fwk_element pl011_element_desc_table[] = {
-       [0] = {
-           .name = "uart",
-           .data = &((struct mod_pl011_device_config) {
-               .reg_base = SCP_UART_BASE,
-               .baud_rate_bps = 115200,
-               .clock_rate_hz = 24 * FWK_MHZ,
-               .clock_id = FWK_ID_NONE_INIT,
-               .pd_id = FWK_ID_NONE_INIT,
-            }),
-       },
-       [1] = { 0 },
+    [0] = {
+        .name = "uart",
+        .data =
+            &(struct mod_pl011_device_config){
+                .reg_base = SCP_UART_BASE,
+                .baud_rate_bps = 115200,
+                .clock_rate_hz = 24 * FWK_MHZ,
+                .clock_id = FWK_ID_NONE_INIT,
+                .pd_id = FWK_ID_NONE_INIT,
+            },
+    },
+
+    [1] = { 0 },
 };
 
 static const struct fwk_element *get_pl011_table(fwk_id_t id)

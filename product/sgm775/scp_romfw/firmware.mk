@@ -30,6 +30,7 @@ BS_FIRMWARE_MODULES := sid \
                        sds
 
 BS_FIRMWARE_SOURCES := config_log.c \
+                       config_pl011.c \
                        config_timer.c \
                        config_msys_rom.c \
                        config_sds.c \

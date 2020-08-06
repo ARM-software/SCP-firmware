@@ -56,6 +56,7 @@ BS_FIRMWARE_SOURCES := \
     rtx_config.c \
     sgm775_core.c \
     config_log.c \
+    config_pl011.c\
     config_timer.c \
     config_sgm775_ddr_phy500.c \
     config_sgm775_dmc500.c \

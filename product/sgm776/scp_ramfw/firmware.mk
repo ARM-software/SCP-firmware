@@ -50,6 +50,7 @@ endif
 
 BS_FIRMWARE_SOURCES := \
     config_log.c \
+    config_pl011.c \
     config_timer.c \
     config_ddr_phy500.c \
     config_dmc500.c \

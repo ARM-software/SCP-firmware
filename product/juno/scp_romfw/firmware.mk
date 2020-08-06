@@ -37,6 +37,7 @@ BS_FIRMWARE_SOURCES := \
     config_juno_soc_clock.c \
     config_clock.c \
     config_log.c \
+    config_pl011.c \
     config_timer.c \
     config_sds.c \
     config_bootloader.c
