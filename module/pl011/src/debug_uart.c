@@ -16,26 +16,21 @@
 #include <stddef.h>
 #include <stdint.h>
 
-static const struct mod_pl011_device_config config = {
+static const struct mod_pl011_element_cfg config = {
     .reg_base = DEBUG_UART_BASE,
     .baud_rate_bps = 115200,
-    .clock_rate_hz = 24 * FWK_MHZ
+    .clock_rate_hz = 24 * FWK_MHZ,
 };
 
 uint32_t cli_platform_uart_init(void)
 {
     volatile struct pl011_reg *reg;
-    int status;
 
     reg = (volatile struct pl011_reg *)config.reg_base;
     if (reg == NULL)
         return FWK_E_DATA;
 
-    status = mod_pl011_set_baud_rate(config.baud_rate_bps,
-                           config.clock_rate_hz,
-                           config.reg_base);
-    if (status != FWK_SUCCESS)
-        return status;
+    mod_pl011_set_baud_rate(&config);
 
     /*
      * Initialize PL011 device

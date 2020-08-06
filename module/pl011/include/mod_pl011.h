@@ -15,59 +15,72 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupModulePl011 PL011 Driver
  *
- * \brief Arm PL011 device driver, fulfilling the Log module's driver API.
+ * \brief Device driver module for the Primecell® PL011 UART.
  *
- * \details This module implements a device driver for the Primecell® PL011
- *      UART.
- * @{
+ * \{
  */
 
 /*!
- * \brief PL011 device configuration data.
+ * \brief PL011 element configuration data.
  */
-struct mod_pl011_device_config {
-    /*! Base address of the device registers */
+struct mod_pl011_element_cfg {
+    /*!
+     * \brief Base address of the device registers.
+     */
     uintptr_t reg_base;
 
-    /*! Baud rate (bits per second) */
+    /*!
+     * \brief Baud rate in bits per second.
+     */
     unsigned int baud_rate_bps;
 
-    /*! Reference clock (Hertz) */
+    /*!
+     * \brief Reference clock in Hertz.
+     */
     uint64_t clock_rate_hz;
 
-    /*! Identifier of the clock that this device depends on */
+#ifdef BUILD_HAS_MOD_CLOCK
+    /*!
+     * \brief Identifier of the clock that this device depends on.
+     *
+     * \note If set to a value other than ::FWK_ID_NONE, this device will not be
+     *      enabled until the element has received confirmation that the clock
+     *      domain is available.
+     */
     fwk_id_t clock_id;
+#endif
 
-    /*! Identifier of the power domain that this device depends on */
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
+    /*!
+     * \brief Identifier of the power domain that this device depends on.
+     *
+     * \note If set to a value other than ::FWK_ID_NONE, this device will not be
+     *      enabled until the element has received confirmation that the power
+     *      domain is available.
+     */
     fwk_id_t pd_id;
+#endif
 };
 
 /*!
  * \brief Set the baud rate of the PL011 device
  *
- * \param baud_rate_bps The desired baudrate in bps
- * \param clock_rate_hz The clock rate as specified in the config in MHz
- * \param reg_ptr Pointer to the PL011 register to use
- *
- * \retval FWK_E_PARAM if one of the given parameters is invalid
- * \retval FWK_E_RANGE if a calculated value from the parameters is out of range
- * \retval FWK_SUCCESS if operation is successful
+ * \param[in] cfg The desired device configuration.
  */
-int mod_pl011_set_baud_rate(unsigned int baud_rate_bps, uint64_t clock_rate_hz,
-    uintptr_t reg_ptr);
+void mod_pl011_set_baud_rate(const struct mod_pl011_element_cfg *cfg);
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_PL011_H */

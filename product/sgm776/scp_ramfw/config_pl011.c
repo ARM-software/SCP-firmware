@@ -21,7 +21,7 @@ const struct fwk_module_config config_pl011 = {
         [0] = {
             .name = "board-uart1",
             .data =
-                &(struct mod_pl011_device_config){
+                &(struct mod_pl011_element_cfg){
                     .reg_base = BOARD_UART1_BASE,
                     .baud_rate_bps = 115200,
                     .clock_rate_hz = 24 * FWK_MHZ,
