@@ -18,6 +18,7 @@ BS_FIRMWARE_MODULES := \
 
 BS_FIRMWARE_SOURCES := \
     config_clock.c \
-    config_log.c
+    config_log.c \
+    config_pl011.c
 
 include $(BS_DIR)/firmware.mk

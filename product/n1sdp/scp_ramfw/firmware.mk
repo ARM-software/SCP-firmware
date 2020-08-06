@@ -61,6 +61,7 @@ BS_FIRMWARE_SOURCES := \
     config_ssc.c \
     config_system_info.c \
     config_log.c \
+    config_pl011.c \
     config_power_domain.c \
     config_ppu_v0.c \
     config_ppu_v1.c \

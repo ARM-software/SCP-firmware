@@ -11,9 +11,6 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 
-/*
- * Log module
- */
 static const struct mod_log_config log_data = {
     .device_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PL011, 0),
     .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PL011, 0),

@@ -19,6 +19,7 @@ BS_FIRMWARE_MODULES := \
 
 BS_FIRMWARE_SOURCES := \
     config_log.c \
+    config_pl011.c \
     config_clock.c \
     config_rddanielxlr_rom.c
 

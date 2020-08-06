@@ -29,7 +29,8 @@ BS_FIRMWARE_MODULES := \
 BS_FIRMWARE_SOURCES := \
     config_armv7m_mpu.c \
     config_clock.c \
-    config_log_f_uart3.c \
+    config_log.c \
+    config_f_uart3.c \
     config_synquacer_pik_clock.c \
     config_synquacer_rom.c \
     config_timer.c
