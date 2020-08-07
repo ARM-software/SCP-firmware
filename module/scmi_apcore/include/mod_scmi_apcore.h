@@ -21,6 +21,24 @@
  */
 
 /*!
+ * \brief SCMI APCORE protocol
+ */
+#define MOD_SCMI_PROTOCOL_ID_APCORE UINT32_C(0x90)
+
+/*!
+ * \brief SCMI APCORE protocol version
+ */
+#define MOD_SCMI_PROTOCOL_VERSION_APCORE UINT32_C(0x10000)
+
+/*!
+ * \brief Identifiers of the SCMI Core Configuration Protocol commands
+ */
+enum mod_scmi_apcore_command_id {
+    MOD_SCMI_APCORE_RESET_ADDRESS_SET = 0x3,
+    MOD_SCMI_APCORE_RESET_ADDRESS_GET = 0x4,
+};
+
+/*!
  * \brief Platform reset register widths.
  */
 enum mod_scmi_apcore_register_width {

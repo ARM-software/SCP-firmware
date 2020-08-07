@@ -9,6 +9,7 @@
 #include "scp_sgi575_scmi.h"
 
 #include <mod_resource_perms.h>
+#include <mod_scmi_apcore.h>
 #include <mod_scmi_std.h>
 
 #include <fwk_element.h>
@@ -149,6 +150,63 @@ static mod_res_perms_t
         },
 };
 
+/*
+ * Check whether an agent has access to a protocol.
+ *
+ * Note that we will always check the higher permissions levels
+ * when called, so
+ *
+ *      protocol -> message -> resource
+ *
+ * This overrides the version in the resource_perms module
+ * for the platform specific protocols.
+ */
+enum mod_res_perms_permissions mod_res_plat_agent_protocol_permissions(
+    uint32_t agent_id,
+    uint32_t protocol_id)
+{
+    if (protocol_id == MOD_SCMI_PROTOCOL_ID_APCORE)
+        return MOD_RES_PERMS_ACCESS_ALLOWED;
+
+    return MOD_RES_PERMS_ACCESS_DENIED;
+}
+
+/*
+ * Check whether an agent can access a protocol:message.
+ *
+ * This overrides the version in the resource_perms module
+ * for the platform specific protocol:messages.
+ */
+enum mod_res_perms_permissions mod_res_plat_agent_message_permissions(
+    uint32_t agent_id,
+    uint32_t protocol_id,
+    uint32_t message_id)
+{
+    if ((protocol_id == MOD_SCMI_PROTOCOL_ID_APCORE) &&
+        (message_id <= MOD_SCMI_APCORE_RESET_ADDRESS_GET))
+        return MOD_RES_PERMS_ACCESS_ALLOWED;
+
+    return MOD_RES_PERMS_ACCESS_DENIED;
+}
+
+/*
+ * Check the permissions for agent:protocol:message:resource.
+ *
+ * This overrides the version in the resource_perms module
+ * for the platform specific protocol:message:resources.
+ */
+enum mod_res_perms_permissions mod_res_plat_agent_resource_permissions(
+    uint32_t agent_id,
+    uint32_t protocol_id,
+    uint32_t message_id,
+    uint32_t resource_id)
+{
+    if ((protocol_id == MOD_SCMI_PROTOCOL_ID_APCORE) &&
+        (message_id <= MOD_SCMI_APCORE_RESET_ADDRESS_GET))
+        return MOD_RES_PERMS_ACCESS_ALLOWED;
+
+    return MOD_RES_PERMS_ACCESS_DENIED;
+}
 static struct mod_res_agent_permission agent_permissions = {
     .agent_protocol_permissions = agent_protocol_permissions,
     .agent_msg_permissions = agent_msg_permissions,
