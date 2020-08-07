@@ -69,13 +69,6 @@ struct mod_pl011_element_cfg {
 };
 
 /*!
- * \brief Set the baud rate of the PL011 device
- *
- * \param[in] cfg The desired device configuration.
- */
-void mod_pl011_set_baud_rate(const struct mod_pl011_element_cfg *cfg);
-
-/*!
  * \}
  */
 

@@ -10,6 +10,7 @@
 #include <cli_fifo.h>
 #include <cli_platform.h>
 
+#include <fwk_io.h>
 #include <fwk_list.h>
 #include <fwk_mm.h>
 
@@ -354,11 +355,6 @@ uint32_t cli_init(void)
     strncpy(cli_prompt, prompt, CLI_CONFIG_PROMPT_BUF_SIZE);
     cli_prompt_size = strlen(prompt);
 
-    /* Initializing platform UART. */
-    status = cli_platform_uart_init();
-    if (status != FWK_SUCCESS)
-        return status;
-
     /* Initialize print buffer FIFO. */
     status = fifo_init(
         &cli_print_fifo, cli_print_fifo_buffer, CLI_CONFIG_PRINT_BUFFER_SIZE);
@@ -528,7 +524,7 @@ uint32_t cli_print(const char *string)
     int32_t status = FWK_SUCCESS;
 
     for (index = 0; string[index] != 0; index++) {
-        status = cli_platform_uart_put(&string[index], true);
+        status = fwk_io_putch(fwk_io_stdout, string[index]);
         if (status != FWK_SUCCESS)
             return status;
     }
@@ -579,13 +575,14 @@ uint32_t cli_getline(
 
     /*
      * Loop will terminate when the user presses enter or when an error is
-     * generated.  If your cli_platform_uart_get is thread friendly (and it
-     * should be if implemented correctly), this loop will have negligible
-     * impact on system performance.
+     * generated. This loop will have negligible impact on system performance.
      */
     while (1) {
         /* Grab a character from the UART. */
-        status = cli_platform_uart_get(&c, true);
+        do {
+            status = fwk_io_getch(fwk_io_stdin, &c);
+        } while (status == FWK_PENDING);
+
         if (status != FWK_SUCCESS)
             return status;
 
@@ -630,7 +627,10 @@ uint32_t cli_getline(
         }
 
         /* Echo received character to console. */
-        status = cli_platform_uart_put(&c, true);
+        do {
+            status = fwk_io_putch(fwk_io_stdout, c);
+        } while (status == FWK_PENDING);
+
         if (status != FWK_SUCCESS)
             return status;
 
@@ -943,7 +943,10 @@ static uint32_t cli_get_command(
 
     while (1) {
         /* Get character from UART. */
-        status = cli_platform_uart_get(&c, true);
+        do {
+            status = fwk_io_getch(fwk_io_stdin, &c);
+        } while (status == FWK_PENDING);
+
         if (status != FWK_SUCCESS)
             return status;
 
@@ -1006,8 +1009,8 @@ static uint32_t cli_get_command(
 
                             /* Printing history command to screen. */
                             while (buffer[index] != 0) {
-                                status = cli_platform_uart_put(&buffer[index],
-                                    true);
+                                status =
+                                    fwk_io_putch(fwk_io_stdout, buffer[index]);
                                 if (status != FWK_SUCCESS)
                                     return status;
                                 index = index + 1;
@@ -1044,8 +1047,8 @@ static uint32_t cli_get_command(
 
                             /* Printing history command to screen. */
                             while (buffer[index] != 0) {
-                                status = cli_platform_uart_put(&buffer[index],
-                                    true);
+                                status =
+                                    fwk_io_putch(fwk_io_stdout, buffer[index]);
                                 if (status != FWK_SUCCESS)
                                     return status;
 
@@ -1096,7 +1099,7 @@ static uint32_t cli_get_command(
         }
 
         /* Printing received character to console. */
-        status = cli_platform_uart_put(&c, true);
+        status = fwk_io_putch(fwk_io_stdout, c);
         if (status != FWK_SUCCESS)
             return status;
 
@@ -1299,7 +1302,7 @@ static uint32_t cli_debug_output(void)
         "press Ctrl+C.\n");
     while (1) {
         /* Looking for Ctrl+C press. */
-        if (cli_platform_uart_get((char *)&c, false) == FWK_SUCCESS) {
+        if (fwk_io_getch(fwk_io_stdin, &c) == FWK_SUCCESS) {
             if (c == '\x03') {
                 cli_printf(
                     0,
@@ -1313,7 +1316,7 @@ static uint32_t cli_debug_output(void)
         fifo_status = fifo_get(&cli_print_fifo, &c);
         if (fifo_status == FWK_SUCCESS) {
             overflow = false;
-            cli_platform_uart_put((char *)&c, true);
+            fwk_io_putch(fwk_io_stdout, c);
         } else
             /* If no characters are available, let other stuff run. */
             cli_platform_delay_ms(0);
@@ -1325,24 +1328,7 @@ static void cli_error_handler(uint32_t status)
     if (status == FWK_SUCCESS)
         return;
 
-    cli_printf(NONE, "CONSOLE ERROR: ");
-    switch (status) {
-    case FWK_E_NOMEM:
-        cli_print("Buffer size.\n");
-        break;
-    case FWK_E_PARAM:
-        cli_print("Bad argument.\n");
-        break;
-    case FWK_E_SUPPORT:
-        cli_print("Not found.\n");
-        break;
-    case FWK_E_DATA:
-        cli_print("No data available.\n");
-        break;
-    default:
-        cli_print("Unknown error.\n");
-        return;
-    }
+    cli_printf(NONE, "CONSOLE ERROR: %s\n", fwk_status_str(status));
 }
 
 static void cli_val2str(

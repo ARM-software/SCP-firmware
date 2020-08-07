@@ -9,6 +9,7 @@
 #include <cli.h>
 #include <cli_platform.h>
 
+#include <fwk_io.h>
 #include <fwk_status.h>
 
 #include <stdint.h>
@@ -109,12 +110,12 @@ void checkpoint_boot_state(uint32_t timeout_s)
     char c = 0;
 
     /* Make sure nothing is waiting in UART buffer. */
-    while (cli_platform_uart_get(&c, false) == FWK_SUCCESS)
+    while (fwk_io_getch(fwk_io_stdin, &c) == FWK_SUCCESS)
         ;
 
     cli_print("Press any key to enable checkpoints before boot... ");
     while (timeout_s != 0) {
-        if (cli_platform_uart_get(&c, false) == FWK_SUCCESS) {
+        if (fwk_io_getch(fwk_io_stdin, &c) == FWK_SUCCESS) {
             cli_print("\nCheckpoints enabled.\n");
             checkpoint_enable_all();
             return;

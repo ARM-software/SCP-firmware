@@ -33,7 +33,7 @@ static void alarm_callback(uintptr_t module_idx)
     struct fwk_event *event;
 
     /* Get the pending character (if any) from the UART without blocking */
-    status = cli_platform_uart_get(&ch, false);
+    status = fwk_io_getch(fwk_io_stdin, &ch);
 
     if (status == FWK_SUCCESS) {
         /* Ctrl-E has been pressed */

@@ -65,15 +65,6 @@ void cli_platform_delay_ms(uint32_t ms);
 /*****************************************************************************/
 
 /*
- * cli_platform_uart_init
- *   Description
- *     Initializes the necessary hardware to send and receive characters.
- *   Return
- *     cli_ret_et: success if it works, something else if it fails.
- */
-uint32_t cli_platform_uart_init(void);
-
-/*
  * cli_platform_uid_notify
  *   Description
  *     If system has a UID light, this function notifies it of activity on
@@ -82,42 +73,5 @@ uint32_t cli_platform_uart_init(void);
  *     cli_ret_et: success if it works, something else if it fails.
  */
 uint32_t cli_platform_uid_notify(void);
-
-/*
- * cli_platform_uart_get
- *   Description
- *     Receives a single character from the UART.  Must support blocking and
- *     non-blocking receive operations.
- *   Parameters
- *     char *c
- *       Pointer to a char in which to place the received character.
- *     bool block
- *       If true, this function must not return until a character is
- *       received or the UART generates an error.  If false, this function
- *       returns immediately regardless of whether or not a character was
- *       received.
- *   Return
- *     cli_ret_et: success if a character is read with no errors, error_empty
- *     if block==true and no characters are available, or some other error
- *     from the UART.
- */
-uint32_t cli_platform_uart_get(char *c, bool block);
-
-/*
- * cli_platform_uart_put
- *   Description
- *     Sends a single character on the UART.  This function is blocking.
- *   Parameters
- *     char *c
- *       Pointer to character to send.
- *     bool block
- *       If true, this function must not return until a character is
- *       output or the UART generates an error.  If false, this function
- *       returns immediately regardless of whether or not a character was
- *       output.
- *   Return
- *     cli_ret_et: success if it works, some other error if it doesn't.
- */
-uint32_t cli_platform_uart_put(const char *c, bool block);
 
 #endif /* _CLI_PLATFORM_H_ */
