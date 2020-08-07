@@ -41,9 +41,6 @@
 /*   cli_getline                                                             */
 /*     Retrieves a line of user input from the console, see cli_module.h for */
 /*     full description.                                                     */
-/*   cli_platform_uart_get and cli_platform_uart_put                         */
-/*     Direct access to the UART hardware, using these is not recommended    */
-/*     but shouldn't hurt anything.                                          */
 /*   cli_snprintf                                                            */
 /*     Takes the place of snprintf and it's derivatives, a bit rudimentary   */
 /*     but has no heap dependence, see cli_module.h for full descriptions.   */
@@ -58,6 +55,8 @@
 #include <cli_config.h>
 #include <cli_fifo.h>
 #include <cli_platform.h>
+
+#include <fwk_io.h>
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -109,10 +108,10 @@ static int32_t dump_memory_f(int32_t argc, char **argv)
         for (j = 0; j < NUM_BYTES_PER_LINE; j++) {
             if ((bytes[j] >= 0x20) && (bytes[j] <= 0x7E))
                 /* Character is printing. */
-                cli_platform_uart_put((const char *)&bytes[j], true);
+                fwk_io_putch(fwk_io_stdout, bytes[j]);
             else
                 /* Character is non-printing so put a period. */
-                cli_platform_uart_put(".", true);
+                fwk_io_putch(fwk_io_stdout, '.');
         }
         cli_print("\"\n");
     }

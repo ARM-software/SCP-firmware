@@ -94,7 +94,7 @@ static int mod_pl011_init_ctx(struct mod_pl011_ctx *ctx)
     return FWK_SUCCESS;
 }
 
-void mod_pl011_set_baud_rate(const struct mod_pl011_element_cfg *cfg)
+static void mod_pl011_set_baud_rate(const struct mod_pl011_element_cfg *cfg)
 {
     struct pl011_reg *reg = (void *)cfg->reg_base;
 
