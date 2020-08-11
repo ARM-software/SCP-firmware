@@ -27,19 +27,19 @@
 
 #include <stddef.h>
 
+#define INVALID_AGENT_ID UINT32_MAX
+
 struct scmi_sys_power_ctx {
     const struct mod_scmi_system_power_config *config;
     const struct mod_scmi_from_protocol_api *scmi_api;
     const struct mod_pd_restricted_api *pd_api;
     fwk_id_t system_power_domain_id;
+    bool start_graceful_process;
+    struct mod_timer_alarm_api *alarm_api;
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     int agent_count;
     fwk_id_t *system_power_notifications;
-    fwk_id_t graceful_req_id;
-    bool *graceful_response;
-    struct mod_timer_alarm_api *alarm_api;
 #endif
-
 #ifdef BUILD_HAS_RESOURCE_PERMISSIONS
     /* SCMI Resource Permissions API */
     const struct mod_res_permissions_api *res_perms_api;
@@ -154,93 +154,23 @@ static void scmi_sys_power_state_notify(fwk_id_t service_id,
             &return_values, sizeof(return_values));
     }
 }
-
-static bool all_agents_responded_to_graceful_request(void)
-{
-    int i;
-    fwk_id_t id;
-    enum scmi_agent_type agent_type;
-
-    for (i = 0; i < scmi_sys_power_ctx.agent_count; i++) {
-        id = scmi_sys_power_ctx.system_power_notifications[i];
-        scmi_sys_power_ctx.scmi_api->get_agent_type(i, &agent_type);
-        if (fwk_id_is_equal(id, FWK_ID_NONE) ||
-            (agent_type == SCMI_AGENT_TYPE_OSPM))
-            continue;
-        if (!scmi_sys_power_ctx.graceful_response[i])
-            return false;
-    }
-    return true;
-}
-static void reset_graceful_request(void)
-{
-    int i;
-
-    scmi_sys_power_ctx.graceful_req_id = FWK_ID_NONE;
-    for (i = 0; i < scmi_sys_power_ctx.agent_count; i++)
-        scmi_sys_power_ctx.graceful_response[i] = false;
-}
+#endif
 
 static void graceful_timer_callback(uintptr_t scmi_system_state)
 {
-    int status;
-    unsigned int agent_id;
     enum mod_pd_system_shutdown system_shutdown;
-    enum mod_scmi_sys_power_policy_status policy_status;
 
     FWK_LOG_INFO("SCMI_SYS_POWER: Graceful request timeout...");
     FWK_LOG_INFO(
         "SCMI_SYS_POWER: Forcing SCMI SYSTEM STATE %d", scmi_system_state);
 
-    status = scmi_sys_power_ctx.scmi_api->get_agent_id(
-        scmi_sys_power_ctx.graceful_req_id, &agent_id);
-    if (status != FWK_SUCCESS)
-        return;
-
-    status = scmi_sys_power_state_set_policy(
-        &policy_status, (uint32_t *)&scmi_system_state, agent_id);
-    if (status != FWK_SUCCESS)
-        return;
-
-    reset_graceful_request();
+    scmi_sys_power_ctx.start_graceful_process = false;
 
     if (scmi_system_state == SCMI_SYSTEM_STATE_SHUTDOWN) {
         system_shutdown = system_state2system_shutdown[scmi_system_state];
         scmi_sys_power_ctx.pd_api->system_shutdown(system_shutdown);
     }
 }
-
-static bool graceful_request_completed(
-    fwk_id_t service_id,
-    uint32_t scmi_system_state)
-{
-    unsigned int agent_id;
-
-    scmi_sys_power_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    scmi_sys_power_ctx.graceful_response[agent_id] = true;
-
-    if (fwk_id_is_equal(scmi_sys_power_ctx.graceful_req_id, FWK_ID_NONE)) {
-        /* Starting the graceful request process */
-        scmi_sys_power_ctx.graceful_req_id = service_id;
-        scmi_sys_power_state_notify(service_id, scmi_system_state, false);
-        scmi_sys_power_ctx.alarm_api->start(
-            scmi_sys_power_ctx.config->alarm_id,
-            scmi_sys_power_ctx.config->graceful_timeout,
-            MOD_TIMER_ALARM_TYPE_ONCE,
-            graceful_timer_callback,
-            scmi_system_state);
-    }
-
-    if (all_agents_responded_to_graceful_request()) {
-        /* reset graceful request variables */
-        scmi_sys_power_ctx.alarm_api->stop(scmi_sys_power_ctx.config->alarm_id);
-        reset_graceful_request();
-        return true;
-    }
-
-    return false;
-}
-#endif
 
 /*
  * PROTOCOL_VERSION
@@ -353,22 +283,15 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
 
     scmi_system_state = parameters->system_state;
 
-#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    if ((parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST) &&
-        (scmi_system_state == SCMI_SYSTEM_STATE_SHUTDOWN)) {
-        if (!graceful_request_completed(service_id, scmi_system_state)) {
-            return_values.status = SCMI_SUCCESS;
-            goto exit;
-        }
-    }
-#endif
-
     /*
      * Note that the scmi_system_state value may be changed by the policy
      * handler.
      */
-    status = scmi_sys_power_state_set_policy(&policy_status, &scmi_system_state,
-        agent_id);
+    status = scmi_sys_power_state_set_policy(
+        &policy_status,
+        &scmi_system_state,
+        service_id,
+        (parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST));
 
     if (status != FWK_SUCCESS) {
         return_values.status = SCMI_GENERIC_ERROR;
@@ -563,14 +486,43 @@ exit:
 /*
  * SCMI System Power Policy Handlers
  *
- * The system_state value may be modified by the policy handler
+ * The system_state_set policy for forceful commands returns the same state.
+ *
+ * The system_state_set policy for graceful commands sends notifications if
+ * supported then starts a timer. When the timer expires the command will be
+ * executed. The current policy only supports the shutdown command.
+ *
+ * Platforms can override this policy by implementing this interface in the
+ * platform code.
  */
 __attribute((weak)) int scmi_sys_power_state_set_policy(
     enum mod_scmi_sys_power_policy_status *policy_status,
     uint32_t *state,
-    unsigned int agent_id)
+    fwk_id_t service_id,
+    bool graceful)
 {
     *policy_status = MOD_SCMI_SYS_POWER_EXECUTE_MESSAGE_HANDLER;
+
+    if (graceful) {
+        *policy_status = MOD_SCMI_SYS_POWER_SKIP_MESSAGE_HANDLER;
+
+        if (!scmi_sys_power_ctx.start_graceful_process) {
+            /* Only shutdown command is enabled */
+            if (*state != SCMI_SYSTEM_STATE_SHUTDOWN)
+                return FWK_SUCCESS;
+            /* Starting the graceful request process */
+            scmi_sys_power_ctx.start_graceful_process = true;
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+            scmi_sys_power_state_notify(service_id, *state, false);
+#endif
+            scmi_sys_power_ctx.alarm_api->start(
+                scmi_sys_power_ctx.config->alarm_id,
+                scmi_sys_power_ctx.config->graceful_timeout,
+                MOD_TIMER_ALARM_TYPE_ONCE,
+                graceful_timer_callback,
+                *state);
+        }
+    }
 
     return FWK_SUCCESS;
 }
@@ -679,6 +631,7 @@ static int scmi_sys_power_init(fwk_id_t module_id, unsigned int element_count,
                                const void *data)
 {
     scmi_sys_power_ctx.config = data;
+    scmi_sys_power_ctx.start_graceful_process = false;
 
     return FWK_SUCCESS;
 }
@@ -701,11 +654,6 @@ static int scmi_sys_power_init_notifications(void)
 
     for (i = 0; i < scmi_sys_power_ctx.agent_count; i++)
         scmi_sys_power_ctx.system_power_notifications[i] = FWK_ID_NONE;
-
-    scmi_sys_power_ctx.graceful_response =
-        fwk_mm_calloc(scmi_sys_power_ctx.agent_count, sizeof(bool));
-
-    reset_graceful_request();
 
     return FWK_SUCCESS;
 

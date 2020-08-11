@@ -123,7 +123,8 @@ enum mod_scmi_sys_power_policy_status {
  *
  * \param[out] policy_status Whether the command should be accepted or not.
  * \param[in, out] state Pointer to the requested state.
- * \param[in] agent_id Identifier of the agent requesting the service.
+ * \param[in] service_id Identifier of the service requesting the change.
+ * \param[in] graceful The set state request is graceful or not.
  *
  * \retval ::FWK_SUCCESS The operation succeeded.
  *
@@ -132,7 +133,8 @@ enum mod_scmi_sys_power_policy_status {
 int scmi_sys_power_state_set_policy(
     enum mod_scmi_sys_power_policy_status *policy_status,
     uint32_t *state,
-    unsigned int agent_id);
+    fwk_id_t service_id,
+    bool graceful);
 
 /*!
  * @}
