@@ -30,12 +30,7 @@
 #endif
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-struct agent_notifications {
-    /*
-     * Track whether an agent is requesting notification on reset operation.
-     */
-    fwk_id_t *reset_notification;
-};
+#    define MOD_SCMI_RESET_DOMAIN_NOTIFICATION_COUNT 1
 #endif
 
 struct scmi_rd_ctx {
@@ -50,9 +45,11 @@ struct scmi_rd_ctx {
     uint8_t plat_reset_domain_count;
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    /* Agent notifications table */
-    struct agent_notifications **agent_notifications;
+    /*! SCMI notification_id */
     fwk_id_t notification_id;
+
+    /* SCMI notification API */
+    const struct mod_scmi_notification_api *scmi_notification_api;
 #endif
 
 #ifdef BUILD_HAS_RESOURCE_PERMISSIONS
@@ -434,11 +431,17 @@ static int reset_notify_handler(fwk_id_t service_id,
     }
 
     if (parameters->notify_enable)
-        scmi_rd_ctx.agent_notifications[domain_id]->
-            reset_notification[agent_id] = service_id;
+        scmi_rd_ctx.scmi_notification_api->scmi_notification_add_subscriber(
+            MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN,
+            domain_id,
+            MOD_SCMI_RESET_NOTIFY,
+            service_id);
     else
-        scmi_rd_ctx.agent_notifications[domain_id]->
-            reset_notification[agent_id] = FWK_ID_NONE;
+        scmi_rd_ctx.scmi_notification_api->scmi_notification_remove_subscriber(
+            MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN,
+            agent_id,
+            domain_id,
+            MOD_SCMI_RESET_NOTIFY);
 
     outmsg.status = SCMI_SUCCESS;
 
@@ -458,24 +461,16 @@ static void scmi_reset_issued_notify(uint32_t domain_id,
     struct scmi_reset_domain_issued_p2a reset_issued = {
          .agent_id = (uint32_t)cookie
     };
-    fwk_id_t service_id;
-    unsigned int i;
 
-    /* note: skip agent 0, platform agent */
-    for (i = 1; i < scmi_rd_ctx.config->agent_count; i++) {
-        service_id =
-            scmi_rd_ctx.agent_notifications[domain_id]->reset_notification[i];
+    reset_issued.domain_id = domain_id;
+    reset_issued.reset_state = reset_state;
 
-        if (!fwk_id_is_equal(service_id, FWK_ID_NONE)) {
-            reset_issued.domain_id = domain_id;
-            reset_issued.reset_state = reset_state;
-
-            scmi_rd_ctx.scmi_api->notify(service_id,
-                                         MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN,
-                                         MOD_SCMI_RESET_ISSUED,
-                                         &reset_issued, sizeof(reset_issued));
-        }
-    }
+    scmi_rd_ctx.scmi_notification_api->scmi_notification_notify(
+        MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN,
+        MOD_SCMI_RESET_NOTIFY,
+        MOD_SCMI_RESET_ISSUED,
+        &reset_issued,
+        sizeof(reset_issued));
 }
 #endif
 
@@ -602,30 +597,16 @@ static int scmi_reset_init(fwk_id_t module_id,
 }
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-static int scmi_reset_init_notifications(unsigned int scmi_reset_domains)
+static int scmi_reset_init_notifications(void)
 {
-    unsigned int i, j;
 
     fwk_assert(scmi_rd_ctx.config->agent_count != 0);
 
-    scmi_rd_ctx.agent_notifications = fwk_mm_calloc(
-        scmi_reset_domains, sizeof(struct agent_notifications *));
-
-    for (i = 0; i < scmi_reset_domains; i++) {
-        scmi_rd_ctx.agent_notifications[i] =
-            fwk_mm_calloc(1, sizeof(struct agent_notifications));
-        scmi_rd_ctx.agent_notifications[i]->reset_notification =
-            fwk_mm_calloc(scmi_rd_ctx.config->agent_count, sizeof(fwk_id_t));
-    }
-
-    for (i = 0; i < scmi_reset_domains; i++) {
-        for (j = 0; j < scmi_rd_ctx.config->agent_count; j++) {
-            scmi_rd_ctx.agent_notifications[i]->reset_notification[j] =
-                FWK_ID_NONE;
-        }
-    }
-
-    return FWK_SUCCESS;
+    return scmi_rd_ctx.scmi_notification_api->scmi_notification_init(
+        MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN,
+        scmi_rd_ctx.config->agent_count,
+        scmi_rd_ctx.plat_reset_domain_count,
+        MOD_SCMI_RESET_DOMAIN_NOTIFICATION_COUNT);
 }
 #endif
 
@@ -643,16 +624,20 @@ static int scmi_reset_bind(fwk_id_t id, unsigned int round)
     if (status != FWK_SUCCESS)
         return status;
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
+        FWK_ID_API(FWK_MODULE_IDX_SCMI, MOD_SCMI_API_IDX_NOTIFICATION),
+        &scmi_rd_ctx.scmi_notification_api);
+    if (status != FWK_SUCCESS)
+        return status;
+#endif
+
     scmi_rd_ctx.plat_reset_domain_count = fwk_module_get_element_count(
         FWK_ID_MODULE(FWK_MODULE_IDX_RESET_DOMAIN));
     if (scmi_rd_ctx.plat_reset_domain_count == 0)
         return FWK_E_SUPPORT;
 
-#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    status = scmi_reset_init_notifications(scmi_rd_ctx.plat_reset_domain_count);
-    if (status != FWK_SUCCESS)
-        return status;
-#endif
 
 #ifdef BUILD_HAS_RESOURCE_PERMISSIONS
     status = fwk_module_bind(
@@ -703,12 +688,17 @@ static int scmi_reset_process_notification(const struct fwk_event *event,
 
 static int scmi_reset_start(fwk_id_t id)
 {
+    int status;
     struct mod_reset_domain_config *config;
     config = (struct mod_reset_domain_config*)fwk_module_get_data(
         FWK_ID_MODULE(FWK_MODULE_IDX_RESET_DOMAIN)
         );
 
     scmi_rd_ctx.notification_id = config->notification_id;
+
+    status = scmi_reset_init_notifications();
+    if (status != FWK_SUCCESS)
+        return status;
 
     return fwk_notification_subscribe(
         scmi_rd_ctx.notification_id,
