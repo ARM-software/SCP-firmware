@@ -35,6 +35,8 @@
 #include <stddef.h>
 #include <string.h>
 
+#define MOD_SCMI_PERF_NOTIFICATION_COUNT 2
+
 static int scmi_perf_protocol_version_handler(
     fwk_id_t service_id, const uint32_t *payload);
 static int scmi_perf_protocol_attributes_handler(
@@ -126,20 +128,6 @@ struct perf_operations {
     fwk_id_t service_id;
 };
 
-struct agent_notifications {
-    /*
-     * Track whether an agent is requesting notifications on limit change
-     * operations.
-     */
-    fwk_id_t *limit_notification;
-
-    /*
-     * Track whether an agent is requesting notifications on level change
-     * operations.
-     */
-    fwk_id_t *level_notification;
-};
-
 struct scmi_perf_ctx {
     /* SCMI Performance Module Configuration */
     const struct mod_scmi_perf_config *config;
@@ -161,14 +149,13 @@ struct scmi_perf_ctx {
     /* Pointer to a table of operations */
     struct perf_operations *perf_ops_table;
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     /* Number of active agents */
     int agent_count;
 
-#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    /* Agent notifications table */
-    struct agent_notifications **agent_notifications;
+    /* SCMI notification API */
+    const struct mod_scmi_notification_api *scmi_notification_api;
 #endif
-
 #ifdef BUILD_HAS_FAST_CHANNELS
     /* Alarm API for fast channels */
     const struct mod_timer_alarm_api *fc_alarm_api;
@@ -777,7 +764,6 @@ exit:
 }
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-
 static int scmi_perf_limits_notify(fwk_id_t service_id,
                                    const uint32_t *payload)
 {
@@ -811,11 +797,18 @@ static int scmi_perf_limits_notify(fwk_id_t service_id,
         goto exit;
 
     if (parameters->notify_enable)
-        scmi_perf_ctx.agent_notifications[id]->limit_notification[agent_id] =
-            service_id;
+        scmi_perf_ctx.scmi_notification_api->scmi_notification_add_subscriber(
+            MOD_SCMI_PROTOCOL_ID_PERF,
+            id,
+            MOD_SCMI_PERF_NOTIFY_LIMITS,
+            service_id);
     else
-        scmi_perf_ctx.agent_notifications[id]->limit_notification[agent_id] =
-            FWK_ID_NONE;
+        scmi_perf_ctx.scmi_notification_api
+            ->scmi_notification_remove_subscriber(
+                MOD_SCMI_PROTOCOL_ID_PERF,
+                agent_id,
+                id,
+                MOD_SCMI_PERF_NOTIFY_LIMITS);
 
     return_values.status = SCMI_SUCCESS;
 
@@ -862,11 +855,18 @@ static int scmi_perf_level_notify(fwk_id_t service_id,
         goto exit;
 
     if (parameters->notify_enable)
-        scmi_perf_ctx.agent_notifications[id]->level_notification[agent_id] =
-            service_id;
+        scmi_perf_ctx.scmi_notification_api->scmi_notification_add_subscriber(
+            MOD_SCMI_PROTOCOL_ID_PERF,
+            id,
+            MOD_SCMI_PERF_NOTIFY_LEVEL,
+            service_id);
     else
-        scmi_perf_ctx.agent_notifications[id]->level_notification[agent_id] =
-            FWK_ID_NONE;
+        scmi_perf_ctx.scmi_notification_api
+            ->scmi_notification_remove_subscriber(
+                MOD_SCMI_PROTOCOL_ID_PERF,
+                agent_id,
+                id,
+                MOD_SCMI_PERF_NOTIFY_LEVEL);
 
     return_values.status = SCMI_SUCCESS;
 
@@ -877,7 +877,6 @@ exit:
 
     return status;
 }
-
 #endif
 
 #ifdef BUILD_HAS_FAST_CHANNELS
@@ -1135,8 +1134,6 @@ static void scmi_perf_notify_limits_updated(
 {
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     struct scmi_perf_limits_changed limits_changed;
-    fwk_id_t id;
-    int i;
 #endif
     int idx;
     const struct mod_scmi_perf_domain_config *domain;
@@ -1157,24 +1154,16 @@ static void scmi_perf_notify_limits_updated(
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     limits_changed.agent_id = (uint32_t)cookie;
-    /* note: skip agent 0, platform agent */
-    for (i = 1; i < scmi_perf_ctx.agent_count; i++) {
-        id =
-            scmi_perf_ctx.agent_notifications[idx]->limit_notification[i];
+    limits_changed.domain_id = idx;
+    limits_changed.range_min = range_min;
+    limits_changed.range_max = range_max;
 
-        if (!fwk_id_is_equal(id, FWK_ID_NONE)) {
-            limits_changed.domain_id = idx;
-            limits_changed.range_min = range_min;
-            limits_changed.range_max = range_max;
-
-            scmi_perf_ctx.scmi_api->notify(
-                id,
-                MOD_SCMI_PROTOCOL_ID_PERF,
-                SCMI_PERF_LIMITS_CHANGED,
-                &limits_changed,
-                sizeof(limits_changed));
-        }
-    }
+    scmi_perf_ctx.scmi_notification_api->scmi_notification_notify(
+        MOD_SCMI_PROTOCOL_ID_PERF,
+        MOD_SCMI_PERF_NOTIFY_LIMITS,
+        SCMI_PERF_LIMITS_CHANGED,
+        &limits_changed,
+        sizeof(limits_changed));
 #endif
 }
 
@@ -1191,8 +1180,6 @@ static void scmi_perf_notify_level_updated(
 {
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     struct scmi_perf_level_changed level_changed;
-    fwk_id_t id;
-    int i;
 #endif
     int idx;
     const struct mod_scmi_perf_domain_config *domain;
@@ -1221,23 +1208,15 @@ static void scmi_perf_notify_level_updated(
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     level_changed.agent_id = (uint32_t)cookie;
+    level_changed.domain_id = idx;
+    level_changed.performance_level = level;
 
-    /* note: skip agent 0, platform agent */
-    for (i = 1; i < scmi_perf_ctx.agent_count; i++) {
-        id =
-            scmi_perf_ctx.agent_notifications[idx]->level_notification[i];
-        if (!fwk_id_is_equal(id, FWK_ID_NONE)) {
-            level_changed.domain_id = idx;
-            level_changed.performance_level = level;
-
-            scmi_perf_ctx.scmi_api->notify(
-                id,
-                MOD_SCMI_PROTOCOL_ID_PERF,
-                SCMI_PERF_LEVEL_CHANGED,
-                &level_changed,
-                sizeof(level_changed));
-        }
-    }
+    scmi_perf_ctx.scmi_notification_api->scmi_notification_notify(
+        MOD_SCMI_PROTOCOL_ID_PERF,
+        MOD_SCMI_PERF_NOTIFY_LEVEL,
+        SCMI_PERF_LEVEL_CHANGED,
+        &level_changed,
+        sizeof(level_changed));
 #endif
 }
 
@@ -1288,41 +1267,25 @@ static int scmi_perf_init(fwk_id_t module_id, unsigned int element_count,
 }
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-
 static int scmi_init_notifications(int domains)
 {
-    int i, j, status;
+    int status;
 
     status = scmi_perf_ctx.scmi_api->get_agent_count(
         &scmi_perf_ctx.agent_count);
     if (status != FWK_SUCCESS)
         return status;
+
     fwk_assert(scmi_perf_ctx.agent_count != 0);
 
-    scmi_perf_ctx.agent_notifications = fwk_mm_calloc(
-        domains, sizeof(struct agent_notifications *));
+    status = scmi_perf_ctx.scmi_notification_api->scmi_notification_init(
+        MOD_SCMI_PROTOCOL_ID_PERF,
+        scmi_perf_ctx.agent_count,
+        domains,
+        MOD_SCMI_PERF_NOTIFICATION_COUNT);
 
-    for (i = 0; i < domains; i++) {
-        scmi_perf_ctx.agent_notifications[i] =
-            fwk_mm_calloc(1, sizeof(struct agent_notifications));
-        scmi_perf_ctx.agent_notifications[i]->limit_notification =
-            fwk_mm_calloc(scmi_perf_ctx.agent_count, sizeof(fwk_id_t));
-        scmi_perf_ctx.agent_notifications[i]->level_notification =
-            fwk_mm_calloc(scmi_perf_ctx.agent_count, sizeof(fwk_id_t));
-    }
-
-    for (i = 0; i < domains; i++) {
-        for (j = 0; j < scmi_perf_ctx.agent_count; j++) {
-            scmi_perf_ctx.agent_notifications[i]->limit_notification[j] =
-                FWK_ID_NONE;
-            scmi_perf_ctx.agent_notifications[i]->level_notification[j] =
-                FWK_ID_NONE;
-        }
-    }
-
-    return FWK_SUCCESS;
+    return status;
 }
-
 #endif
 
 static int scmi_perf_bind(fwk_id_t id, unsigned int round)
@@ -1339,7 +1302,10 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
         return status;
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    status = scmi_init_notifications(scmi_perf_ctx.domain_count);
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
+        FWK_ID_API(FWK_MODULE_IDX_SCMI, MOD_SCMI_API_IDX_NOTIFICATION),
+        &scmi_perf_ctx.scmi_notification_api);
     if (status != FWK_SUCCESS)
         return status;
 #endif
@@ -1492,6 +1458,14 @@ static int scmi_perf_start(fwk_id_t id)
 
 #ifdef BUILD_HAS_STATISTICS
     status = scmi_perf_stats_start();
+    if (status != FWK_SUCCESS)
+        return status;
+#endif
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    status = scmi_init_notifications(scmi_perf_ctx.domain_count);
+    if (status != FWK_SUCCESS)
+        return status;
 #endif
 
     return status;
