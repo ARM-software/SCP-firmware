@@ -37,6 +37,9 @@
 enum mod_scmi_api_idx {
     MOD_SCMI_API_IDX_PROTOCOL,
     MOD_SCMI_API_IDX_TRANSPORT,
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    MOD_SCMI_API_IDX_NOTIFICATION,
+#endif
     MOD_SCMI_API_IDX_COUNT,
 };
 
@@ -356,6 +359,92 @@ struct mod_scmi_to_protocol_api {
     /*! Protocol message handler. */
     mod_scmi_message_handler_t *message_handler;
 };
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+/*!
+ * \brief SCMI protocol SCMI module SCMI notification API.
+ */
+struct mod_scmi_notification_api {
+    /*!
+     * \brief Initialize notification context for a protocol.
+     *
+     * \param protocol_id Identifier of the protocol.
+     * \param agent_count Number of agents supported by the protocol.
+     * \param element_count Number of elements that support notification.
+     * \param operation_count Number of notification SCMI messages supported.
+     *
+     * \retval FWK_SUCCESS Initialization successful.
+     * \retval One of the standard error codes for implementation-defined
+     * errors.
+     */
+    int (*scmi_notification_init)(
+        unsigned int protocol_id,
+        unsigned int agent_count,
+        unsigned int element_count,
+        unsigned int operation_count);
+
+    /*!
+     * \brief Add an agent to subscriber list that requested a notification.
+     *
+     * \param protocol_id Identifier of the protocol.
+     * \param element_idx Index of the element within specified protocol
+     *     context.
+     * \param operation_id Identifier of the operation.
+     * \param service_id  Identifier of the agent's SCMI service context.
+     *
+     * \retval FWK_SUCCESS Adding of subscriber agent to the list is successful.
+     * \retval One of the standard error codes for implementation-defined
+     * errors.
+     */
+    int (*scmi_notification_add_subscriber)(
+        unsigned int protocol_id,
+        unsigned int element_idx,
+        unsigned int operation_id,
+        fwk_id_t service_id);
+
+    /*!
+     * \brief Remove an agent from subscriber list.
+     *
+     * \param protocol_id Identifier of the protocol.
+     * \param agent_idx Index of the agent within specified protocol context.
+     * \param element_idx Index of the element within specified protocol
+     *     context.
+     * \param operation_id Identifier of the operation.
+     *
+     * \retval FWK_SUCCESS Removing of subscriber agent from the list is
+     *     successful.
+     * \retval One of the standard error codes for implementation-defined
+     * errors.
+     */
+    int (*scmi_notification_remove_subscriber)(
+        unsigned int protocol_id,
+        unsigned int agent_idx,
+        unsigned int element_idx,
+        unsigned int operation_id);
+
+    /*!
+     * \brief Notifiy all agents which requested a specific notification.
+     *
+     * \param protocol_id Identifier of the protocol.
+     * \param operation_id Identifier of the operation.
+     * \param scmi_response_message_id SCMI message identifier that is sent as
+     *     as a part of the notification.
+     * \param payload_p2a Notification message payload from platform to
+     *     agent.
+     * \param payload_size Size of the message.
+     *
+     * \retval FWK_SUCCESS Notification to agents is successful.
+     * \retval One of the standard error codes for implementation-defined
+     * errors.
+     */
+    int (*scmi_notification_notify)(
+        unsigned int protocol_id,
+        unsigned int operation_id,
+        unsigned int scmi_response_message_id,
+        void *payload_p2a,
+        size_t payload_size);
+};
+#endif
 
 /*!
  * \brief SCMI protocol module to SCMI module API.

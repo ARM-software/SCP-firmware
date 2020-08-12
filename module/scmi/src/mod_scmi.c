@@ -45,6 +45,45 @@ struct scmi_protocol {
     fwk_id_t id;
 };
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+
+/* Following macros are used for scmi notification related operations */
+#    define MOD_SCMI_PROTOCOL_MAX_OPERATION_ID 0x20
+#    define MOD_SCMI_PROTOCOL_OPERATION_IDX_INVALID 0xFF
+
+struct scmi_notification_subscribers {
+    unsigned int agent_count;
+    unsigned int element_count;
+    unsigned int operation_count;
+    unsigned int operation_idx;
+    uint8_t operation_id_to_idx[MOD_SCMI_PROTOCOL_MAX_OPERATION_ID];
+
+    /*
+     * Table of protocol operations for which SCMI notification is requested
+     * An agent which is requesting a SCMI notification is identified using its
+     * service_id and associated context as below.
+     *
+     * Usually, a notification is requested for
+     * 1. A specific operation on the protocol.
+     * 2. An element (e.g. domain_id)
+     * 3. And a specific agent (e.g PSCI/OSPM)
+     *
+     * e.g. in Performance domain case,
+     * 1. operation_id maps to
+     *    either PERFORMANCE_LIMITS_CHANGED/PERFORMANCE_LEVEL_CHANGED
+     * 2. element maps to a performance domain.
+     * 3. And an agent maps to either a PSCI agent or an OSPM agent
+     *
+     * Thus, a service_id of a requesting agent can be indexed using above
+     * information using a simple 3-dimentional array as below
+     *
+     *   agent_service_ids[operation_idx][element_idx][agent_idx]
+     */
+    fwk_id_t *agent_service_ids;
+};
+
+#endif
+
 struct scmi_ctx {
     /* SCMI module configuration data */
     struct mod_scmi_config *config;
@@ -67,6 +106,10 @@ struct scmi_ctx {
 #ifdef BUILD_HAS_RESOURCE_PERMISSIONS
     /* SCMI Resource Permissions API */
     const struct mod_res_permissions_api *res_perms_api;
+#endif
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    /* Table of scmi notification subscribers */
+    struct scmi_notification_subscribers *scmi_notification_subscribers;
 #endif
 };
 
@@ -415,6 +458,212 @@ static const struct mod_scmi_from_protocol_api mod_scmi_from_protocol_api = {
     .respond = respond,
     .notify = scmi_notify,
 };
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+static struct scmi_notification_subscribers *notification_subscribers(
+    unsigned int protocol_id)
+{
+    unsigned int protocol_idx;
+    protocol_idx = scmi_ctx.scmi_protocol_id_to_idx[protocol_id];
+    /*
+     * Couple of entries are reserved in scmi_protocol_id_to_idx,
+     * out of these, one is reserved for the Base protocol. Since we may need
+     * to enable notification for the Base protocol adjust the protocol_idx
+     * accordingly.
+     */
+    protocol_idx -= (PROTOCOL_TABLE_RESERVED_ENTRIES_COUNT - 1);
+    return &scmi_ctx.scmi_notification_subscribers[protocol_idx];
+}
+
+static int scmi_notification_init(
+    unsigned int protocol_id,
+    unsigned int agent_count,
+    unsigned int element_count,
+    unsigned int operation_count)
+{
+    int i;
+    int total_count;
+    struct scmi_notification_subscribers *subscribers =
+        notification_subscribers(protocol_id);
+
+    subscribers->agent_count = agent_count;
+    subscribers->element_count = element_count;
+    subscribers->operation_count = operation_count;
+
+    total_count = operation_count * element_count * agent_count;
+
+    subscribers->agent_service_ids =
+        fwk_mm_calloc(total_count, sizeof(fwk_id_t));
+
+    /*
+     * Mark all operations_idx as invalid. This will be updated
+     * whenever an agent subscribes to a notification for an operation.
+     */
+    memset(
+        subscribers->operation_id_to_idx,
+        MOD_SCMI_PROTOCOL_OPERATION_IDX_INVALID,
+        MOD_SCMI_PROTOCOL_MAX_OPERATION_ID);
+
+    for (i = 0; i < total_count; i++) {
+        subscribers->agent_service_ids[i] = FWK_ID_NONE;
+    }
+
+    return FWK_SUCCESS;
+}
+
+static int scmi_notification_service_idx(
+    unsigned int agent_idx,
+    unsigned int element_idx,
+    unsigned int operation_idx,
+    unsigned int agent_count,
+    unsigned int element_count)
+{
+    /*
+     * The index is from a 3-dimentional array
+     * [operation_idx][element_idx][agent_idx]
+     * The calculation of service_id offset in above array is as below
+     * 1. Get the offset of the service_id in the 3rd array .
+     *    +
+     * 2. Get the offset of the 3rd array within the 2nd array.
+     *    +
+     * 3. Get the offset of the 2nd array within the first array.
+     */
+    return (
+        agent_idx + element_idx * agent_count +
+        operation_idx * element_count * agent_count);
+}
+
+static int scmi_notification_add_subscriber(
+    unsigned int protocol_id,
+    unsigned int element_idx,
+    unsigned int operation_id,
+    fwk_id_t service_id)
+{
+    int status;
+    unsigned int operation_idx = 0;
+    unsigned int service_id_idx;
+    unsigned int agent_idx;
+
+    struct scmi_notification_subscribers *subscribers =
+        notification_subscribers(protocol_id);
+
+    status = get_agent_id(service_id, &agent_idx);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    fwk_assert(operation_id < MOD_SCMI_PROTOCOL_MAX_OPERATION_ID);
+    /*
+     * Initialize only if the entry is
+     * invalid (MOD_SCMI_PROTOCOL_OPERATION_IDX_INVALID)
+     */
+    if (subscribers->operation_id_to_idx[operation_id] ==
+        MOD_SCMI_PROTOCOL_OPERATION_IDX_INVALID) {
+        operation_idx = subscribers->operation_idx++;
+        fwk_assert(operation_idx < subscribers->operation_count);
+        subscribers->operation_id_to_idx[operation_id] = operation_idx;
+    }
+
+    service_id_idx = scmi_notification_service_idx(
+        agent_idx,
+        element_idx,
+        operation_idx,
+        subscribers->agent_count,
+        subscribers->element_count);
+
+    subscribers->agent_service_ids[service_id_idx] = service_id;
+
+    return FWK_SUCCESS;
+}
+
+static int scmi_notification_remove_subscriber(
+    unsigned int protocol_id,
+    unsigned int agent_idx,
+    unsigned int element_idx,
+    unsigned int operation_id)
+{
+    unsigned int operation_idx = 0;
+    unsigned int service_id_idx;
+
+    struct scmi_notification_subscribers *subscribers =
+        notification_subscribers(protocol_id);
+
+    fwk_assert(operation_id < MOD_SCMI_PROTOCOL_MAX_OPERATION_ID);
+
+    operation_idx = subscribers->operation_id_to_idx[operation_id];
+
+    service_id_idx = scmi_notification_service_idx(
+        agent_idx,
+        element_idx,
+        operation_idx,
+        subscribers->agent_count,
+        subscribers->element_count);
+
+    subscribers->agent_service_ids[service_id_idx] = FWK_ID_NONE;
+
+    return FWK_SUCCESS;
+}
+
+static int scmi_notification_notify(
+    unsigned int protocol_id,
+    unsigned int operation_id,
+    unsigned int scmi_response_id,
+    void *payload_p2a,
+    size_t payload_size)
+{
+    unsigned int i, j;
+    unsigned int operation_idx;
+    fwk_id_t service_id;
+    unsigned int service_id_idx;
+
+    struct scmi_notification_subscribers *subscribers =
+        notification_subscribers(protocol_id);
+
+    fwk_assert(operation_id < MOD_SCMI_PROTOCOL_MAX_OPERATION_ID);
+    operation_idx = subscribers->operation_id_to_idx[operation_id];
+
+    /*
+     * Silently return FWK_SUCCESS if no valid operation_idx is found
+     * for a given operation_id. This is required in where(e.g. DVFS/perf)
+     * scmi_notification_notify gets called before a call to
+     * scmi_notification_add_subscriber.
+     */
+    if (operation_idx == MOD_SCMI_PROTOCOL_OPERATION_IDX_INVALID) {
+        return FWK_SUCCESS;
+    }
+
+    for (i = 0; i < subscribers->element_count; i++) {
+        /* Skip agent 0, platform agent */
+        for (j = 1; j < subscribers->agent_count; j++) {
+            service_id_idx = scmi_notification_service_idx(
+                j,
+                i,
+                operation_idx,
+                subscribers->agent_count,
+                subscribers->element_count);
+
+            service_id = subscribers->agent_service_ids[service_id_idx];
+
+            if (!fwk_id_is_equal(service_id, FWK_ID_NONE)) {
+                scmi_notify(
+                    service_id,
+                    protocol_id,
+                    scmi_response_id,
+                    payload_p2a,
+                    payload_size);
+            }
+        }
+    }
+
+    return FWK_SUCCESS;
+}
+
+static struct mod_scmi_notification_api mod_scmi_notification_api = {
+    .scmi_notification_init = scmi_notification_init,
+    .scmi_notification_add_subscriber = scmi_notification_add_subscriber,
+    .scmi_notification_remove_subscriber = scmi_notification_remove_subscriber,
+    .scmi_notification_notify = scmi_notification_notify,
+};
+#endif
 
 /*
  * Base protocol implementation
@@ -1163,6 +1412,15 @@ static int scmi_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
         *api = &mod_scmi_from_transport_api;
         break;
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    case MOD_SCMI_API_IDX_NOTIFICATION:
+        if (!fwk_id_is_type(target_id, FWK_ID_TYPE_MODULE))
+            return FWK_E_SUPPORT;
+
+        *api = &mod_scmi_notification_api;
+        break;
+#endif
+
     default:
         return FWK_E_SUPPORT;
     };
@@ -1259,8 +1517,16 @@ static int scmi_start(fwk_id_t id)
     const struct mod_scmi_service_config *config;
     unsigned int notifications_sent;
 
-    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
+#    ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+        /* scmi_ctx.protocol_count + 1 to include Base protocol */
+        scmi_ctx.scmi_notification_subscribers = fwk_mm_calloc(
+            scmi_ctx.protocol_count + 1,
+            sizeof(struct scmi_notification_subscribers));
+#    endif
+
         return FWK_SUCCESS;
+    }
 
     config = fwk_module_get_data(id);
 
