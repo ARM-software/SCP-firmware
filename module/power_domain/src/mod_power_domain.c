@@ -1597,8 +1597,12 @@ static int pd_report_power_state_transition(fwk_id_t pd_id, unsigned int state)
 
 static int pd_get_last_core_pd_id(fwk_id_t *last_core_pd_id)
 {
+    bool ongoing = mod_pd_ctx.system_suspend.last_core_off_ongoing;
     if (last_core_pd_id == NULL)
         return FWK_E_PARAM;
+
+    if (!ongoing)
+        return FWK_E_PWRSTATE;
 
     *last_core_pd_id = mod_pd_ctx.system_suspend.last_core_pd->id;
 
