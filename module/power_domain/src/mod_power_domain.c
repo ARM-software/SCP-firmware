@@ -166,6 +166,11 @@ struct system_suspend_ctx {
      */
     bool last_core_off_ongoing;
 
+    /*
+     * Flag indicating if the system is being suspended (true) or not (false).
+     */
+    bool suspend_ongoing;
+
     /* Last standing core context */
     struct pd_ctx *last_core_pd;
 
@@ -913,6 +918,9 @@ static int complete_system_suspend(struct pd_ctx *target_pd)
 
     state_mask_table = pd->composite_state_mask_table;
     table_size = pd->composite_state_mask_table_size;
+
+    mod_pd_ctx.system_suspend.suspend_ongoing = true;
+
     /*
      * Traverse the PD tree bottom-up from current power domain to the top
      * to build the composite state with MOD_PD_STATE_OFF power state for all
@@ -1124,6 +1132,14 @@ static void process_power_state_transition_report(struct pd_ctx *pd,
         complete_system_suspend(pd);
 
         return;
+    }
+
+    if (pd->parent == NULL) {
+        /* this is the top pd (SYSTOP) */
+        if (mod_pd_ctx.system_suspend.state != MOD_PD_STATE_ON) {
+            /* has gone down, invalidate the system suspend ongoing */
+            mod_pd_ctx.system_suspend.suspend_ongoing = false;
+        }
     }
 
     /*
@@ -1601,8 +1617,12 @@ static int pd_report_power_state_transition(fwk_id_t pd_id, unsigned int state)
 
 static int pd_get_last_core_pd_id(fwk_id_t *last_core_pd_id)
 {
+    bool system_suspend_ongoing = mod_pd_ctx.system_suspend.suspend_ongoing;
     if (last_core_pd_id == NULL)
         return FWK_E_PARAM;
+
+    if (!system_suspend_ongoing)
+        return FWK_E_PWRSTATE;
 
     *last_core_pd_id = mod_pd_ctx.system_suspend.last_core_pd->id;
 
