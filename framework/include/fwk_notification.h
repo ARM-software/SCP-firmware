@@ -13,8 +13,9 @@
 
 #include <fwk_event.h>
 #include <fwk_id.h>
+#include <fwk_macros.h>
 
-#if __has_include(<fmw_notification.h>)
+#if FWK_HAS_INCLUDE(<fmw_notification.h>)
 #    include <fmw_notification.h>
 #endif
 
