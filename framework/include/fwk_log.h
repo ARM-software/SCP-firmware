@@ -10,7 +10,7 @@
 
 #include <fwk_macros.h>
 
-#if __has_include(<fmw_log.h>)
+#if FWK_HAS_INCLUDE(<fmw_log.h>)
 #    include <fmw_log.h>
 #endif
 

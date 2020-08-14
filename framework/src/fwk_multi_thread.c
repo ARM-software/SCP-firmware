@@ -32,7 +32,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#if __has_include(<fmw_memory.h>)
+#if FWK_HAS_INCLUDE(<fmw_memory.h>)
 #    include <fmw_memory.h>
 #endif
 
