@@ -870,7 +870,7 @@ static int set_agent_resource_reset_permissions(
     int status;
     int32_t message_idx;
 
-    if (res_perms_ctx.agent_permissions->scmi_reset_perms == NULL)
+    if (res_perms_ctx.agent_permissions->scmi_reset_domain_perms == NULL)
         return FWK_SUCCESS;
     if (resource_id >= res_perms_ctx.reset_domain_count)
         return FWK_E_ACCESS;
@@ -1189,8 +1189,8 @@ static void mod_res_agent_copy_config(
         break;
 #ifdef BUILD_HAS_SCMI_RESET
     case MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN:
-        cmd_count = MOD_SCMI_RESET_DOMAIN_COMMAND_COUNT;
-        resource_count = res_perms_ctx.config->reset_domainresource_count;
+        cmd_count = MOD_SCMI_RESET_COMMAND_COUNT;
+        resource_count = res_perms_ctx.config->reset_domain_resource_count;
         break;
 #endif
     default:
