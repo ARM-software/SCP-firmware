@@ -352,8 +352,14 @@ static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    /* Reject asynchronous read requests for now */
     flags = parameters->flags;
+    if ((flags & ~SCMI_SENSOR_PROTOCOL_READING_GET_ASYNC_FLAG_MASK) != 0) {
+        return_values.status = SCMI_INVALID_PARAMETERS;
+        status = FWK_SUCCESS;
+        goto exit;
+    }
+
+    /* Reject asynchronous read requests for now */
     if (flags & SCMI_SENSOR_PROTOCOL_READING_GET_ASYNC_FLAG_MASK) {
         return_values.status = SCMI_NOT_SUPPORTED;
         status = FWK_SUCCESS;
