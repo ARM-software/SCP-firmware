@@ -86,46 +86,10 @@ static struct mod_res_agent_msg_permissions agent_msg_permissions[] = {
         },
     };
 
-/*
- * Protocols have an index offset from SCMI_BASE protocol, 0x10
- * Note that the BASE and SYSTEM_POWER protocols are managed
- * on a protocol:command basis, there is no resource permissions
- * associated with the protocols.
- */
-static mod_res_perms_t scmi_clock_perms[][5][1] = {
-        /* SCMI_PROTOCOL_ID_CLOCK */
-        /* 0, SCMI_CLOCK_ATTRIBUTES */
-        /* 1, SCMI_CLOCK_RATE_GET */
-        /* 2, SCMI_CLOCK_RATE_SET */
-        /* 3, SCMI_CLOCK_CONFIG_SET */
-        /* 4, SCMI_CLOCK_DESCRIBE_RATES */
-        [AGENT_IDX(SCP_SCMI_AGENT_ID_OSPM)] = {
-            [MOD_RES_PERMS_SCMI_CLOCK_ATTRIBUTES_IDX][0] = 0x0,
-            /*
-             * Clocks 0, 1, 2, 4 do not allow set commands,
-             * Clocks 3 and 5 allow rate_set/config_set
-             */
-            [MOD_RES_PERMS_SCMI_CLOCK_RATE_SET_IDX][0] =
-                ((1 << 0) | (1 << 1) | (1 << 2) | (1 << 4)),
-            [MOD_RES_PERMS_SCMI_CLOCK_RATE_GET_IDX][0] =
-                ((1 << 0) | (1 << 1) | (1 << 2) | (1 << 4)),
-            [MOD_RES_PERMS_SCMI_CLOCK_CONFIG_SET_IDX][0] = 0x0,
-            [MOD_RES_PERMS_SCMI_CLOCK_DESCRIBE_RATE_IDX][0] = 0x0,
-        },
-        [AGENT_IDX(SCP_SCMI_AGENT_ID_PSCI)] = {
-            /* No access to clocks for PSCI agent, so bits [4:0] set  */
-            [MOD_RES_PERMS_SCMI_CLOCK_ATTRIBUTES_IDX][0] = 0x1f,
-            [MOD_RES_PERMS_SCMI_CLOCK_RATE_SET_IDX][0] = 0x1f,
-            [MOD_RES_PERMS_SCMI_CLOCK_RATE_GET_IDX][0] = 0x1f,
-            [MOD_RES_PERMS_SCMI_CLOCK_CONFIG_SET_IDX][0] = 0x1f,
-            [MOD_RES_PERMS_SCMI_CLOCK_DESCRIBE_RATE_IDX][0] = 0x1f,
-        },
-};
 
 static struct mod_res_agent_permission agent_permissions = {
     .agent_protocol_permissions = agent_protocol_permissions,
     .agent_msg_permissions = agent_msg_permissions,
-    .scmi_clock_perms = &scmi_clock_perms[0][0][0],
 };
 
 struct fwk_module_config config_resource_perms = {
