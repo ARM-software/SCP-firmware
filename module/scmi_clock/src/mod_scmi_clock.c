@@ -539,8 +539,13 @@ static int scmi_clock_permissions_handler(
     if (status != FWK_SUCCESS)
         return FWK_E_ACCESS;
 
-    if (message_id < 3)
-        return FWK_SUCCESS;
+    if (message_id < 3) {
+        perms = scmi_clock_ctx.res_perms_api->agent_has_protocol_permission(
+            agent_id, MOD_SCMI_PROTOCOL_ID_CLOCK);
+        if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
+            return FWK_SUCCESS;
+        return FWK_E_ACCESS;
+    }
 
     clock_id = get_clock_id(payload);
 

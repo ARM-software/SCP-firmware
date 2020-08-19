@@ -225,8 +225,13 @@ static int scmi_perf_permissions_handler(
     if (status != FWK_SUCCESS)
         return FWK_E_ACCESS;
 
-    if (message_id < 3)
-        return FWK_SUCCESS;
+    if (message_id < 3) {
+        perms = scmi_perf_ctx.res_perms_api->agent_has_protocol_permission(
+            agent_id, MOD_SCMI_PROTOCOL_ID_PERF);
+        if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
+            return FWK_SUCCESS;
+        return FWK_E_ACCESS;
+    }
 
     status = get_perf_domain_id(payload, &domain_id);
     if (status != FWK_SUCCESS)

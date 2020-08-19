@@ -444,8 +444,13 @@ static int scmi_sensor_permissions_handler(
     if (status != FWK_SUCCESS)
         return FWK_E_ACCESS;
 
-    if (message_id < 3)
-        return FWK_SUCCESS;
+    if (message_id < 3) {
+        perms = scmi_sensor_ctx.res_perms_api->agent_has_protocol_permission(
+            agent_id, MOD_SCMI_PROTOCOL_ID_SENSOR);
+        if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
+            return FWK_SUCCESS;
+        return FWK_E_ACCESS;
+    }
 
     sensor_id = get_sensor_id(payload);
     if (sensor_id >= scmi_sensor_ctx.sensor_count)

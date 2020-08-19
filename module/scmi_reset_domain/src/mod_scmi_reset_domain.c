@@ -500,8 +500,13 @@ static int scmi_reset_domain_permissions_handler(
     if (status != FWK_SUCCESS)
         return FWK_E_ACCESS;
 
-    if (message_id < 3)
-        return FWK_SUCCESS;
+    if (message_id < 3) {
+        perms = scmi_rd_ctx.res_perms_api->agent_has_protocol_permission(
+            agent_id, MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN);
+        if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
+            return FWK_SUCCESS;
+        return FWK_E_ACCESS;
+    }
 
     domain_id = get_reset_domain_id(payload);
 

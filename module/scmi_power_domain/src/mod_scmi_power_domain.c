@@ -702,8 +702,13 @@ static int scmi_pd_permissions_handler(
         return FWK_E_PARAM;
     }
 
-    if (message_id < 3)
-        return FWK_SUCCESS;
+    if (message_id < 3) {
+        perms = scmi_pd_ctx.res_perms_api->agent_has_protocol_permission(
+            agent_id, MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN);
+        if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
+            return FWK_SUCCESS;
+        return FWK_E_ACCESS;
+    }
 
     domain_id = get_pd_domain_id(payload, message_id);
     if (domain_id > UINT16_MAX) {
