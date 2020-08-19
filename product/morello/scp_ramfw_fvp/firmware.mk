@@ -43,7 +43,8 @@ BS_FIRMWARE_MODULES := \
     mock_psu \
     dvfs \
     scmi_perf \
-    morello_system
+    morello_system \
+    resource_perms
 
 BS_FIRMWARE_SOURCES := \
     rtx_config.c \
@@ -75,5 +76,6 @@ BS_FIRMWARE_SOURCES := \
     config_mock_psu.c \
     config_dvfs.c \
     config_scmi_perf.c \
-    config_apcontext.c
+    config_apcontext.c \
+    config_resource_perms.c
 include $(BS_DIR)/firmware.mk
