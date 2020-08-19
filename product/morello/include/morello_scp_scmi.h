@@ -17,6 +17,7 @@ enum scp_morello_scmi_agent_id {
     SCP_SCMI_AGENT_ID_OSPM = 1,
     SCP_SCMI_AGENT_ID_PSCI,
     SCP_SCMI_AGENT_ID_MCP,
+    SCP_SCMI_AGENT_ID_COUNT
 };
 
 /* SCMI service indexes */
