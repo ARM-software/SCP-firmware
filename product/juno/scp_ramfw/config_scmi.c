@@ -30,6 +30,7 @@ static const struct fwk_element element_table[] = {
                 FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
                     MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = JUNO_SCMI_AGENT_IDX_PSCI,
+            .scmi_p2a_id = FWK_ID_NONE_INIT,
         },
     },
 
@@ -46,6 +47,13 @@ static const struct fwk_element element_table[] = {
                 FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
                     MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = JUNO_SCMI_AGENT_IDX_OSPM,
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+            .scmi_p2a_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_SCMI,
+                JUNO_SCMI_SERVICE_IDX_OSPM_P2A),
+#else
+            .scmi_p2a_id = FWK_ID_NONE_INIT,
+#endif
         },
     },
 
@@ -62,6 +70,13 @@ static const struct fwk_element element_table[] = {
                 FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
                     MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = JUNO_SCMI_AGENT_IDX_OSPM,
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+            .scmi_p2a_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_SCMI,
+                JUNO_SCMI_SERVICE_IDX_OSPM_P2A),
+#else
+            .scmi_p2a_id = FWK_ID_NONE_INIT,
+#endif
         },
     },
 
@@ -79,6 +94,7 @@ static const struct fwk_element element_table[] = {
                 FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
                     MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = JUNO_SCMI_AGENT_IDX_OSPM,
+            .scmi_p2a_id = FWK_ID_NONE_INIT,
         },
     },
 #endif

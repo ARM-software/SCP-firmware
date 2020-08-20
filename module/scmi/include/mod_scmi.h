@@ -140,6 +140,15 @@ struct mod_scmi_service_config {
      *        module configuration data.
      */
     unsigned int scmi_agent_id;
+
+    /*!
+     *  \brief Identifier of SCMI P2A service asssociated with this A2P service.
+     *
+     *  \details If a request for notifications is received on this service
+     *        channel the notifications will be sent on the channel identified
+     *        here.
+     */
+    fwk_id_t scmi_p2a_id;
 };
 
 /*!

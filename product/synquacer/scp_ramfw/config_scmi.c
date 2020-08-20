@@ -30,6 +30,7 @@ static const struct fwk_element service_table[] = {
                 FWK_MODULE_IDX_SMT,
                 MOD_SMT_API_IDX_SCMI_TRANSPORT),
             .scmi_agent_id = SCP_SCMI_AGENT_ID_PSCI,
+            .scmi_p2a_id = FWK_ID_NONE_INIT,
         }),
     },
     [SCP_SYNQUACER_SCMI_SERVICE_IDX_COUNT] = { 0 }

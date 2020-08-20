@@ -376,23 +376,34 @@ static void respond(fwk_id_t service_id, const void *payload, size_t size)
 static void scmi_notify(fwk_id_t id, int protocol_id, int message_id,
     const void *payload, size_t size)
 {
-    const struct scmi_service_ctx *ctx;
+    const struct scmi_service_ctx *ctx, *p2a_ctx;
     uint32_t message_header;
 
+    /*
+     * The ID is the identifier of the service channel which
+     * the agent used to request notificatiosn on. This ID is
+     * linked to a P2A channel by the scmi_p2a_id.
+     */
     if (fwk_id_is_equal(id, FWK_ID_NONE))
         return;
 
     ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(id)];
-
-    if ((ctx == NULL) || (ctx->transmit == NULL))
+    if (ctx == NULL)
+        return;
+    /* ctx is the original A2P service channel */
+    if (fwk_id_is_equal(ctx->config->scmi_p2a_id, FWK_ID_NONE))
+        return;
+    /* Get the P2A service channel for A2P ctx */
+    p2a_ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(
+        ctx->config->scmi_p2a_id)];
+    if ((p2a_ctx == NULL) || (p2a_ctx->transmit == NULL))
         return; /* No notification service configured */
 
     message_header = scmi_message_header(message_id,
         MOD_SCMI_MESSAGE_TYPE_NOTIFICATION,
         protocol_id, 0);
 
-    ctx->transmit(ctx->transport_id, message_header,
-        payload, size);
+    p2a_ctx->transmit(p2a_ctx->transport_id, message_header, payload, size);
 }
 
 static const struct mod_scmi_from_protocol_api mod_scmi_from_protocol_api = {
