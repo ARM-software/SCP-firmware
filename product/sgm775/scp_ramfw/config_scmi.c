@@ -28,6 +28,7 @@ static const struct fwk_element service_table[] = {
                 FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
                     MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCMI_AGENT_ID_PSCI,
+            .scmi_p2a_id = FWK_ID_NONE_INIT,
         }),
     },
     [SGM775_SCMI_SERVICE_IDX_OSPM_0] = {
@@ -41,6 +42,7 @@ static const struct fwk_element service_table[] = {
                 FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
                     MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCMI_AGENT_ID_OSPM,
+            .scmi_p2a_id = FWK_ID_NONE_INIT,
         }),
     },
     [SGM775_SCMI_SERVICE_IDX_OSPM_1] = {
@@ -54,6 +56,7 @@ static const struct fwk_element service_table[] = {
                 FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
                     MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCMI_AGENT_ID_OSPM,
+            .scmi_p2a_id = FWK_ID_NONE_INIT,
         }),
     },
     [SGM775_SCMI_SERVICE_IDX_COUNT] = { 0 }
