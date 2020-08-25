@@ -48,8 +48,9 @@ static const struct mod_dvfs_domain_config cpu_group0 = {
     .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_CPU_GROUP0),
     .alarm_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0, 0),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SCMI_PERF,
-        MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
+    .updates_api_id = FWK_ID_API_INIT(
+        FWK_MODULE_IDX_SCMI_PERF,
+        MOD_SCMI_PERF_DVFS_UPDATE_API),
     .retry_ms = 1,
     .latency = 1200,
     .sustained_idx = 2,
@@ -61,8 +62,9 @@ static const struct mod_dvfs_domain_config cpu_group1 = {
     .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_CPU_GROUP1),
     .alarm_id = FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0, 1),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SCMI_PERF,
-        MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
+    .updates_api_id = FWK_ID_API_INIT(
+        FWK_MODULE_IDX_SCMI_PERF,
+        MOD_SCMI_PERF_DVFS_UPDATE_API),
     .retry_ms = 1,
     .latency = 1200,
     .sustained_idx = 2,

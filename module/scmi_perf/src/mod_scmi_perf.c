@@ -1121,14 +1121,24 @@ static void scmi_perf_respond(
     scmi_perf_ctx.perf_ops_table[idx].service_id = FWK_ID_NONE;
 }
 
-#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-
-static void scmi_perf_notify_limits(fwk_id_t domain_id,
-    uintptr_t cookie, uint32_t range_min, uint32_t range_max)
+/*
+ * A domain limits range has been updated. Depending on the system
+ * configuration we may send an SCMI notification to the agents which
+ * have registered for these notifications and/or update the associated
+ * fast channels.
+ */
+static void scmi_perf_notify_limits_updated(
+    fwk_id_t domain_id,
+    uintptr_t cookie,
+    uint32_t range_min,
+    uint32_t range_max)
 {
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     struct scmi_perf_limits_changed limits_changed;
     fwk_id_t id;
-    int i, idx;
+    int i;
+#endif
+    int idx;
     const struct mod_scmi_perf_domain_config *domain;
     struct mod_scmi_perf_fast_channel_limit *get_limit;
 
@@ -1145,6 +1155,7 @@ static void scmi_perf_notify_limits(fwk_id_t domain_id,
         }
     }
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     limits_changed.agent_id = (uint32_t)cookie;
     /* note: skip agent 0, platform agent */
     for (i = 1; i < scmi_perf_ctx.agent_count; i++) {
@@ -1164,14 +1175,26 @@ static void scmi_perf_notify_limits(fwk_id_t domain_id,
                 sizeof(limits_changed));
         }
     }
+#endif
 }
 
-static void scmi_perf_notify_level(fwk_id_t domain_id,
-    uintptr_t cookie, uint32_t level)
+/*
+ * A domain performance level has been updated. Depending on the system
+ * configuration we may send an SCMI notification to the agents which
+ * have registered for these notifications and/or update the associated
+ * fast channels.
+ */
+static void scmi_perf_notify_level_updated(
+    fwk_id_t domain_id,
+    uintptr_t cookie,
+    uint32_t level)
 {
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     struct scmi_perf_level_changed level_changed;
     fwk_id_t id;
-    int i, idx;
+    int i;
+#endif
+    int idx;
     const struct mod_scmi_perf_domain_config *domain;
     uint32_t *get_level;
 #ifdef BUILD_HAS_STATISTICS
@@ -1196,6 +1219,7 @@ static void scmi_perf_notify_level(fwk_id_t domain_id,
             *get_level = level;
     }
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     level_changed.agent_id = (uint32_t)cookie;
 
     /* note: skip agent 0, platform agent */
@@ -1214,14 +1238,13 @@ static void scmi_perf_notify_level(fwk_id_t domain_id,
                 sizeof(level_changed));
         }
     }
+#endif
 }
 
-static struct mod_dvfs_notification_api notification_api = {
-    .notify_limits = scmi_perf_notify_limits,
-    .notify_level = scmi_perf_notify_level,
+static struct mod_dvfs_perf_updated_api perf_update_api = {
+    .notify_limits_updated = scmi_perf_notify_limits_updated,
+    .notify_level_updated = scmi_perf_notify_level_updated,
 };
-
-#endif
 
 /*
  * Framework handlers
@@ -1362,11 +1385,9 @@ static int scmi_perf_process_bind_request(fwk_id_t source_id,
         *api = &scmi_perf_mod_scmi_to_protocol_api;
         break;
 
-#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    case MOD_SCMI_PERF_DVFS_NOTIFICATION_API:
-        *api = &notification_api;
+    case MOD_SCMI_PERF_DVFS_UPDATE_API:
+        *api = &perf_update_api;
         break;
-#endif
 
     default:
         return FWK_E_ACCESS;

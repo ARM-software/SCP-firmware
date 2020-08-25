@@ -44,9 +44,9 @@ static const struct mod_dvfs_domain_config cpu_group_little_r0 = {
         0,
         JUNO_DVFS_ALARM_VLITTLE_IDX),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(
+    .updates_api_id = FWK_ID_API_INIT(
         FWK_MODULE_IDX_SCMI_PERF,
-        MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
+        MOD_SCMI_PERF_DVFS_UPDATE_API),
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 2,
@@ -93,9 +93,9 @@ static const struct mod_dvfs_domain_config cpu_group_little_r1 = {
         0,
         JUNO_DVFS_ALARM_VLITTLE_IDX),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(
+    .updates_api_id = FWK_ID_API_INIT(
         FWK_MODULE_IDX_SCMI_PERF,
-        MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
+        MOD_SCMI_PERF_DVFS_UPDATE_API),
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 0,
@@ -118,9 +118,9 @@ static const struct mod_dvfs_domain_config cpu_group_little_r2 = {
         0,
         JUNO_DVFS_ALARM_VLITTLE_IDX),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(
+    .updates_api_id = FWK_ID_API_INIT(
         FWK_MODULE_IDX_SCMI_PERF,
-        MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
+        MOD_SCMI_PERF_DVFS_UPDATE_API),
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 1,
@@ -154,9 +154,9 @@ static const struct mod_dvfs_domain_config cpu_group_big_r0 = {
         0,
         JUNO_DVFS_ALARM_BIG_IDX),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(
+    .updates_api_id = FWK_ID_API_INIT(
         FWK_MODULE_IDX_SCMI_PERF,
-        MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
+        MOD_SCMI_PERF_DVFS_UPDATE_API),
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 2,
@@ -202,9 +202,9 @@ static const struct mod_dvfs_domain_config cpu_group_big_r1 = {
         0,
         JUNO_DVFS_ALARM_BIG_IDX),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(
+    .updates_api_id = FWK_ID_API_INIT(
         FWK_MODULE_IDX_SCMI_PERF,
-        MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
+        MOD_SCMI_PERF_DVFS_UPDATE_API),
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 1,
@@ -238,9 +238,9 @@ static const struct mod_dvfs_domain_config cpu_group_big_r2 = {
         0,
         JUNO_DVFS_ALARM_BIG_IDX),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(
+    .updates_api_id = FWK_ID_API_INIT(
         FWK_MODULE_IDX_SCMI_PERF,
-        MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
+        MOD_SCMI_PERF_DVFS_UPDATE_API),
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 1,
@@ -274,9 +274,9 @@ static const struct mod_dvfs_domain_config gpu_r0 = {
         0,
         JUNO_DVFS_ALARM_GPU_IDX),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(
+    .updates_api_id = FWK_ID_API_INIT(
         FWK_MODULE_IDX_SCMI_PERF,
-        MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
+        MOD_SCMI_PERF_DVFS_UPDATE_API),
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 4,
@@ -323,9 +323,9 @@ static const struct mod_dvfs_domain_config gpu_r1 = {
         0,
         JUNO_DVFS_ALARM_GPU_IDX),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(
+    .updates_api_id = FWK_ID_API_INIT(
         FWK_MODULE_IDX_SCMI_PERF,
-        MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
+        MOD_SCMI_PERF_DVFS_UPDATE_API),
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 4,
@@ -372,9 +372,9 @@ static const struct mod_dvfs_domain_config gpu_r2 = {
         0,
         JUNO_DVFS_ALARM_GPU_IDX),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .notification_api_id = FWK_ID_API_INIT(
+    .updates_api_id = FWK_ID_API_INIT(
         FWK_MODULE_IDX_SCMI_PERF,
-        MOD_SCMI_PERF_DVFS_NOTIFICATION_API),
+        MOD_SCMI_PERF_DVFS_UPDATE_API),
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 1,
