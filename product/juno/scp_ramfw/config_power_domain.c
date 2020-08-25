@@ -84,6 +84,7 @@ static struct fwk_element element_table[] = {
             .allowed_state_mask_table = core_pd_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table),
+            .disable_state_transition_notifications = true,
         },
     },
     [POWER_DOMAIN_IDX_BIG_CPU1] = {
@@ -100,6 +101,7 @@ static struct fwk_element element_table[] = {
             .allowed_state_mask_table = core_pd_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table),
+            .disable_state_transition_notifications = true,
         },
     },
     [POWER_DOMAIN_IDX_LITTLE_CPU0] = {
@@ -116,6 +118,7 @@ static struct fwk_element element_table[] = {
             .allowed_state_mask_table = core_pd_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table),
+            .disable_state_transition_notifications = true,
         },
     },
     [POWER_DOMAIN_IDX_LITTLE_CPU1] = {
@@ -132,6 +135,7 @@ static struct fwk_element element_table[] = {
             .allowed_state_mask_table = core_pd_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table),
+            .disable_state_transition_notifications = true,
         },
     },
     [POWER_DOMAIN_IDX_LITTLE_CPU2] = {
@@ -148,6 +152,7 @@ static struct fwk_element element_table[] = {
             .allowed_state_mask_table = core_pd_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table),
+            .disable_state_transition_notifications = true,
         },
     },
     [POWER_DOMAIN_IDX_LITTLE_CPU3] = {
@@ -164,6 +169,7 @@ static struct fwk_element element_table[] = {
             .allowed_state_mask_table = core_pd_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table),
+            .disable_state_transition_notifications = true,
         },
     },
     [POWER_DOMAIN_IDX_BIG_SSTOP] = {
