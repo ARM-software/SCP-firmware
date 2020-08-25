@@ -174,6 +174,9 @@ struct mod_power_domain_element_config {
 
     /*! Size of the table of allowed state masks */
     size_t state_name_table_size;
+
+    /*! Disable power domain transition notifications */
+    bool disable_state_transition_notifications;
 };
 
 /*!

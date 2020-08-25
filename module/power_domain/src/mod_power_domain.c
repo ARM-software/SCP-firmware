@@ -614,6 +614,9 @@ static bool initiate_power_state_pre_transition_notification(struct pd_ctx *pd)
     };
     struct mod_pd_power_state_pre_transition_notification_params *params;
 
+    if (pd->config->disable_state_transition_notifications == true)
+        false;
+
     state = pd->requested_state;
     if (!check_power_state_pre_transition_notification(pd, state))
         return false;
@@ -1105,7 +1108,8 @@ static void process_power_state_transition_report(struct pd_ctx *pd,
     previous_state = pd->current_state;
     pd->current_state = new_state;
 
-    if (pd->power_state_transition_notification_ctx.pending_responses == 0) {
+    if (pd->power_state_transition_notification_ctx.pending_responses == 0 &&
+        pd->config->disable_state_transition_notifications == false) {
         params = (struct mod_pd_power_state_transition_notification_params *)
             notification_event.params;
         params->state = new_state;
