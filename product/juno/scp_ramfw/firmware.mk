@@ -20,6 +20,12 @@ BS_FIRMWARE_HAS_STATISTICS := no
 
 BS_FIRMWARE_MODULE_HEADERS_ONLY :=
 
+ifeq ($(BS_FIRMWARE_HAS_FAST_CHANNELS),yes)
+    ifneq ($(BS_FIRMWARE_HAS_SCMI_NOTIFICATIONS),yes)
+        "error: Fast Channels requires SCMI Notifications!"
+    endif
+endif
+
 BS_FIRMWARE_MODULES := \
     log \
     pl011 \
