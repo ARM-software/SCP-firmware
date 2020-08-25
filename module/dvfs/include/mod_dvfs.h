@@ -84,9 +84,9 @@ struct mod_dvfs_domain_config {
     fwk_id_t notification_id;
 
     /*!
-     * \brief Notifications API identifier.
+     * \brief Updates API identifier.
      */
-    fwk_id_t notification_api_id;
+    fwk_id_t updates_api_id;
 
     /*! Delay in milliseconds before retrying a request */
     uint16_t retry_ms;
@@ -214,30 +214,36 @@ struct mod_dvfs_domain_api {
 };
 
 /*!
- * \brief DVFS notification API.
+ * \brief DVFS updates notification API.
  *
- * \details API used by the domain when a notification is required.
+ * \details API used by the domain to notify the HAL when either the
+ *      limits or level has been changed.
  */
-struct mod_dvfs_notification_api {
+struct mod_dvfs_perf_updated_api {
     /*!
-     * \brief Send a limitschanged notification for the domain.
+     * \brief Inform the HAL that the domain limits have been updated.
      *
      * \param domain_id Domain identifier.
      * \param cookie Context-specific value.
      * \param range_min Min allowed performance level.
      * \param range_max Max allowed performance level.
      */
-    void (*notify_limits)(fwk_id_t domain_id, uintptr_t cookie,
-        uint32_t range_min, uint32_t range_max);
+    void (*notify_limits_updated)(
+        fwk_id_t domain_id,
+        uintptr_t cookie,
+        uint32_t range_min,
+        uint32_t range_max);
 
     /*!
-     * \brief Send a level changed notification for the domain.
+     * \brief Inform the HAL that the domain level has been updated.
      *
      * \param domain_id Domain identifier.
      * \param cookie Context-specific value.
      * \param level The new performance level of the domain.
      */
-    void (*notify_level)(fwk_id_t domain_id, uintptr_t cookie,
+    void (*notify_level_updated)(
+        fwk_id_t domain_id,
+        uintptr_t cookie,
         uint32_t level);
 };
 

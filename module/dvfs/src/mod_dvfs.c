@@ -106,10 +106,8 @@ struct mod_dvfs_domain_ctx {
         /* Alarm API for pending requests */
         const struct mod_timer_alarm_api *alarm_api;
 
-#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-        /* DVFS perf notification API */
-        struct mod_dvfs_notification_api *notification_api;
-#endif
+        /* DVFS perf updates notification API */
+        struct mod_dvfs_perf_updated_api *perf_updated_api;
     } apis;
 
     /* Number of operating points */
@@ -608,13 +606,11 @@ static int dvfs_set_level_limits(
         return FWK_SUCCESS;
     }
 
-#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    if (ctx->apis.notification_api) {
-        ctx->apis.notification_api->notify_limits(
-            ctx->domain_id, cookie,
-            limits->minimum, limits->maximum);
+    /* notify the HAL that the limits have been updated */
+    if (ctx->apis.perf_updated_api) {
+        ctx->apis.perf_updated_api->notify_limits_updated(
+            ctx->domain_id, cookie, limits->minimum, limits->maximum);
     }
-#endif
 
     if (ctx->state != DVFS_DOMAIN_STATE_IDLE) {
         return dvfs_create_pending_level_request(ctx, cookie,
@@ -719,14 +715,13 @@ static int dvfs_complete(struct mod_dvfs_domain_ctx *ctx,
         }
     }
 
-#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    /* notify the HAL that the level has been updated */
     if ((req_status == FWK_SUCCESS) && (ctx->state != DVFS_DOMAIN_GET_OPP)) {
-        if (ctx->apis.notification_api) {
-            ctx->apis.notification_api->notify_level(
+        if (ctx->apis.perf_updated_api) {
+            ctx->apis.perf_updated_api->notify_level_updated(
                 ctx->domain_id, ctx->request.cookie, ctx->current_opp.level);
         }
     }
-#endif
 
     /*
      * Now we need to start processing the pending request if any,
@@ -1166,16 +1161,15 @@ dvfs_bind_element(fwk_id_t domain_id, unsigned int round)
     if (status != FWK_SUCCESS)
         return FWK_E_PANIC;
 
-#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     /* Bind to a notification module if required */
     if (!(fwk_id_is_equal(ctx->config->notification_id, FWK_ID_NONE))) {
-        status = fwk_module_bind(ctx->config->notification_id,
-            ctx->config->notification_api_id,
-            &ctx->apis.notification_api);
+        status = fwk_module_bind(
+            ctx->config->notification_id,
+            ctx->config->updates_api_id,
+            &ctx->apis.perf_updated_api);
         if (status != FWK_SUCCESS)
             return FWK_E_PANIC;
     }
-#endif
 
     /* Bind to the alarm HAL if required */
     if (ctx->config->retry_ms > 0) {
