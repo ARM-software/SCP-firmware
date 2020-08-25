@@ -55,10 +55,12 @@ static int scmi_perf_limits_get_handler(
     fwk_id_t service_id, const uint32_t *payload);
 static int scmi_perf_describe_fast_channels(
     fwk_id_t service_id, const uint32_t *payload);
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
 static int scmi_perf_limits_notify(
     fwk_id_t service_id, const uint32_t *payload);
 static int scmi_perf_level_notify(
     fwk_id_t service_id, const uint32_t *payload);
+#endif
 
 static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
     [MOD_SCMI_PROTOCOL_VERSION] = scmi_perf_protocol_version_handler,
@@ -72,8 +74,10 @@ static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
     [MOD_SCMI_PERF_LEVEL_SET] = scmi_perf_level_set_handler,
     [MOD_SCMI_PERF_LEVEL_GET] = scmi_perf_level_get_handler,
     [MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL] = scmi_perf_describe_fast_channels,
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     [MOD_SCMI_PERF_NOTIFY_LIMITS] = scmi_perf_limits_notify,
     [MOD_SCMI_PERF_NOTIFY_LEVEL] = scmi_perf_level_notify
+#endif
 };
 
 static unsigned int payload_size_table[] = {
@@ -91,8 +95,10 @@ static unsigned int payload_size_table[] = {
     [MOD_SCMI_PERF_LIMITS_GET] = sizeof(struct scmi_perf_limits_get_a2p),
     [MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL] =
         sizeof(struct scmi_perf_describe_fc_a2p),
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     [MOD_SCMI_PERF_NOTIFY_LIMITS] = sizeof(struct scmi_perf_notify_limits_a2p),
     [MOD_SCMI_PERF_NOTIFY_LEVEL] = sizeof(struct scmi_perf_notify_level_a2p)
+#endif
 };
 
 static unsigned int fast_channel_elem_size[] = {
@@ -150,8 +156,10 @@ struct scmi_perf_ctx {
     /* Number of active agents */
     int agent_count;
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     /* Agent notifications table */
     struct agent_notifications **agent_notifications;
+#endif
 
     /* Alarm API for fast channels */
     const struct mod_timer_alarm_api *fc_alarm_api;
@@ -758,6 +766,8 @@ exit:
     return status;
 }
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+
 static int scmi_perf_limits_notify(fwk_id_t service_id,
                                    const uint32_t *payload)
 {
@@ -857,6 +867,8 @@ exit:
 
     return status;
 }
+
+#endif
 
 /*
  * Note that the Fast Channel doorbell is not supported in this
@@ -1095,6 +1107,8 @@ static void scmi_perf_respond(
     scmi_perf_ctx.perf_ops_table[idx].service_id = FWK_ID_NONE;
 }
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+
 static void scmi_perf_notify_limits(fwk_id_t domain_id,
     uintptr_t cookie, uint32_t range_min, uint32_t range_max)
 {
@@ -1193,6 +1207,8 @@ static struct mod_dvfs_notification_api notification_api = {
     .notify_level = scmi_perf_notify_level,
 };
 
+#endif
+
 /*
  * Framework handlers
  */
@@ -1232,6 +1248,8 @@ static int scmi_perf_init(fwk_id_t module_id, unsigned int element_count,
     return FWK_SUCCESS;
 }
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+
 static int scmi_init_notifications(int domains)
 {
     int i, j, status;
@@ -1266,6 +1284,8 @@ static int scmi_init_notifications(int domains)
     return FWK_SUCCESS;
 }
 
+#endif
+
 static int scmi_perf_bind(fwk_id_t id, unsigned int round)
 {
     int status;
@@ -1279,9 +1299,11 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
     if (status != FWK_SUCCESS)
         return status;
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     status = scmi_init_notifications(scmi_perf_ctx.domain_count);
     if (status != FWK_SUCCESS)
         return status;
+#endif
 
     if (!fwk_id_is_equal(scmi_perf_ctx.config->fast_channels_alarm_id,
         FWK_ID_NONE)) {
@@ -1322,9 +1344,11 @@ static int scmi_perf_process_bind_request(fwk_id_t source_id,
         *api = &scmi_perf_mod_scmi_to_protocol_api;
         break;
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     case MOD_SCMI_PERF_DVFS_NOTIFICATION_API:
         *api = &notification_api;
         break;
+#endif
 
     default:
         return FWK_E_ACCESS;
