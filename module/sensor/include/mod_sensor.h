@@ -125,10 +125,17 @@ enum mod_sensor_type {
 };
 
 /*!
- * \brief Structure containing all sensor information.
+ * \brief Structure containing all sensor trip point information.
+ */
+struct mod_sensor_trip_point_info {
+    /*! Sensor trip point count */
+    uint32_t count;
+};
+
+/*!
+ * \brief Structure containing all sensor driver information.
  *
- * \details Sensor information structure used to configure the sensor and serve
- *     SCMI requests.
+ * \details Sensor information structure used to configure the sensor HAL.
  */
 struct mod_sensor_info {
     /*! SCMI sensor type */
@@ -169,6 +176,46 @@ struct mod_sensor_info {
 };
 
 /*!
+ * \brief Structure containing all sensor information for SCMI requests.
+ *
+ * \details Sensor information structure used serve SCMI requests.
+ */
+struct mod_sensor_scmi_info {
+    /*! Sensor HAL information */
+    struct mod_sensor_info hal_info;
+
+    /*! Sensor trip information */
+    struct mod_sensor_trip_point_info trip_point;
+};
+
+/*!
+ * \brief Sensor trip point detection mode
+ */
+enum mod_sensor_trip_point_mode {
+    MOD_SENSOR_TRIP_POINT_MODE_DISABLED = 0,
+    MOD_SENSOR_TRIP_POINT_MODE_POSITIVE,
+    MOD_SENSOR_TRIP_POINT_MODE_NEGATIVE,
+    MOD_SENSOR_TRIP_POINT_MODE_TRANSITION
+};
+
+/*!
+ * \brief Structure containing trip point parameters.
+ *
+ * \details Sensor trip point information structure used to configure
+ *     a trip point value.
+ */
+struct mod_sensor_trip_point_params {
+    /*! Sensor trip point low valuer */
+    uint32_t low_value;
+
+    /*! Sensor trip point high value */
+    uint32_t high_value;
+
+    /*! Sensor trip point mode */
+    enum mod_sensor_trip_point_mode mode;
+};
+
+/*!
  * \brief Sensor device configuration.
  *
  * \details Configuration structure for individual sensors.
@@ -179,6 +226,9 @@ struct mod_sensor_dev_config {
 
     /*! API identifier of the driver */
     fwk_id_t driver_api_id;
+
+    /*! Sensor trip information */
+    struct mod_sensor_trip_point_info trip_point;
 };
 
 /*!
@@ -246,7 +296,41 @@ struct mod_sensor_api {
      * \retval ::FWK_E_DEVICE Driver error.
      * \return One of the standard framework error codes.
      */
-    int (*get_info)(fwk_id_t id, struct mod_sensor_info *info);
+    int (*get_info)(fwk_id_t id, struct mod_sensor_scmi_info *info);
+
+    /*!
+     * \brief Set trip point.
+     *
+     * \details Set trip point sensor configuration.
+     *
+     * \param id Specific sensor device id.
+     * \param trip_point_idx Specific trip point index.
+     * \param params Pointer to trip points parameters structure.
+     *
+     * \retval FWK_SUCCESS Operation succeeded.
+     * \return One of the standard framework error codes.
+     */
+    int (*set_trip_point)(
+        fwk_id_t id,
+        uint32_t trip_point_idx,
+        struct mod_sensor_trip_point_params *params);
+
+    /*!
+     * \brief Get trip point.
+     *
+     * \details Get trip point sensor configuration.
+     *
+     * \param id Specific sensor device id.
+     * \param trip_point_idx Specific trip point index.
+     * \param[out] params Pointer to trip points parameters structure.
+     *
+     * \retval FWK_SUCCESS Operation succeeded.
+     * \return One of the standard framework error codes.
+     */
+    int (*get_trip_point)(
+        fwk_id_t id,
+        uint32_t trip_point_idx,
+        struct mod_sensor_trip_point_params *params);
 };
 
 /*!

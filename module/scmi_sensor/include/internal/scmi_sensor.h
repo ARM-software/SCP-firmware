@@ -43,6 +43,17 @@ struct scmi_sensor_protocol_attributes_p2a {
 
 #define SCMI_SENSOR_PROTOCOL_READING_GET_ASYNC_FLAG_MASK    (1 << 0)
 
+struct scmi_sensor_trip_point_config_a2p {
+    uint32_t sensor_id;
+    uint32_t flags;
+    uint32_t sensor_value_low;
+    uint32_t sensor_value_high;
+};
+
+struct scmi_sensor_trip_point_config_p2a {
+    int32_t status;
+};
+
 struct scmi_sensor_protocol_reading_get_a2p {
     uint32_t sensor_id;
     uint32_t flags;
@@ -64,6 +75,23 @@ struct scmi_sensor_protocol_reading_get_p2a {
             sizeof(struct scmi_sensor_protocol_description_get_p2a)) \
                 / sizeof(struct scmi_sensor_desc)) \
         : 0)
+
+#define SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_ASYNC_READING_POS 31
+#define SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_NUM_TRIP_POINTS_POS 0
+
+#define SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_ASYNC_READING_MASK \
+    (UINT32_C(0x1) << SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_ASYNC_READING_POS)
+#define SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_NUM_TRIP_POINTS_MASK \
+    (UINT32_C(0xFF) << SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_NUM_TRIP_POINTS_POS)
+
+#define SCMI_SENSOR_DESC_ATTRIBUTES_LOW(ASYNCHRO_READING, NUM_TRIP_POINTS) \
+    ( \
+        (((ASYNCHRO_READING) \
+          << SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_ASYNC_READING_POS) & \
+         SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_ASYNC_READING_MASK) | \
+        (((NUM_TRIP_POINTS) \
+          << SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_NUM_TRIP_POINTS_POS) & \
+         SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_NUM_TRIP_POINTS_MASK))
 
 #define SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_TYPE_POS              0
 #define SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_UNIT_MULTIPLIER_POS   11
@@ -126,6 +154,20 @@ struct scmi_sensor_protocol_reading_get_p2a {
     )
 
 #define SCMI_SENSOR_NAME_LEN    16
+
+#define SCMI_SENSOR_TRIP_POINT_FLAGS_RESERVED1_POS 12
+#define SCMI_SENSOR_TRIP_POINT_FLAGS_ID_POS 4
+#define SCMI_SENSOR_TRIP_POINT_FLAGS_RESERVED2_POS 2
+#define SCMI_SENSOR_TRIP_POINT_FLAGS_EV_CTRL_POS 0
+
+#define SCMI_SENSOR_TRIP_POINT_FLAGS_RESERVED1_MASK \
+    (UINT32_C(0xFFFFF) << SCMI_SENSOR_TRIP_POINT_FLAGS_RESERVED1_POS)
+#define SCMI_SENSOR_TRIP_POINT_FLAGS_ID_MASK \
+    (UINT32_C(0xFF) << SCMI_SENSOR_TRIP_POINT_FLAGS_ID_POS)
+#define SCMI_SENSOR_TRIP_POINT_FLAGS_RESERVED2_MASK \
+    (UINT32_C(0x3) << SCMI_SENSOR_TRIP_POINT_FLAGS_RESERVED2_POS)
+#define SCMI_SENSOR_TRIP_POINT_FLAGS_EV_CTRL_MASK \
+    (UINT32_C(0x3) << SCMI_SENSOR_TRIP_POINT_FLAGS_EV_CTRL_POS)
 
 struct scmi_sensor_desc {
     uint32_t sensor_id;

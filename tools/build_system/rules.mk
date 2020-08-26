@@ -43,6 +43,12 @@ ifeq ($(BUILD_HAS_RESOURCE_PERMISSIONS),yes)
     DEFINES += BUILD_HAS_RESOURCE_PERMISSIONS
 endif
 
+ifeq ($(BUILD_HAS_SCMI_SENSOR_EVENTS),yes)
+    ifeq ($(BUILD_HAS_SCMI_NOTIFICATIONS),yes)
+            DEFINES += BUILD_HAS_SCMI_SENSOR_EVENTS
+    endif
+endif
+
 export AS := $(CC)
 export LD := $(CC)
 

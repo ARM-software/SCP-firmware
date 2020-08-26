@@ -65,6 +65,11 @@ static int scmi_sensor_protocol_msg_attributes_handler(fwk_id_t service_id,
     const uint32_t *payload);
 static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
     const uint32_t *payload);
+#ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
+static int scmi_sensor_trip_point_config_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload);
+#endif
 static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
     const uint32_t *payload);
 
@@ -87,6 +92,9 @@ static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
         scmi_sensor_protocol_msg_attributes_handler,
     [MOD_SCMI_SENSOR_DESCRIPTION_GET] = scmi_sensor_protocol_desc_get_handler,
+#ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
+    [MOD_SCMI_SENSOR_TRIP_POINT_CONFIG] = scmi_sensor_trip_point_config_handler,
+#endif
     [MOD_SCMI_SENSOR_READING_GET] = scmi_sensor_reading_get_handler
 };
 
@@ -97,6 +105,10 @@ static unsigned int payload_size_table[] = {
         sizeof(struct scmi_protocol_message_attributes_a2p),
     [MOD_SCMI_SENSOR_DESCRIPTION_GET] =
         sizeof(struct scmi_sensor_protocol_description_get_a2p),
+#ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
+    [MOD_SCMI_SENSOR_TRIP_POINT_CONFIG] =
+        sizeof(struct scmi_sensor_trip_point_config_a2p),
+#endif
     [MOD_SCMI_SENSOR_READING_GET] =
         sizeof(struct scmi_sensor_protocol_reading_get_a2p),
 };
@@ -198,7 +210,7 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
                (const struct scmi_sensor_protocol_description_get_a2p *)payload;
     struct scmi_sensor_desc desc = { 0 };
     unsigned int num_descs, desc_index, desc_index_max;
-    struct mod_sensor_info sensor_info;
+    struct mod_sensor_scmi_info sensor_info;
     struct scmi_sensor_protocol_description_get_p2a return_values = {
         .status = SCMI_GENERIC_ERROR,
     };
@@ -254,45 +266,52 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
             goto exit;
         }
 
-        if (sensor_info.type >= MOD_SENSOR_TYPE_COUNT) {
+        if (sensor_info.hal_info.type >= MOD_SENSOR_TYPE_COUNT) {
             /* Invalid sensor type */
             fwk_unexpected();
             goto exit;
         }
 
-        if ((sensor_info.unit_multiplier <
+        if ((sensor_info.hal_info.unit_multiplier <
              SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_UNIT_MULTIPLIER_MIN) ||
-            (sensor_info.unit_multiplier >
+            (sensor_info.hal_info.unit_multiplier >
              SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_UNIT_MULTIPLIER_MAX)) {
-
             /* Sensor unit multiplier out of range */
             fwk_unexpected();
             goto exit;
         }
 
-        if ((sensor_info.update_interval_multiplier <
+        if ((sensor_info.hal_info.update_interval_multiplier <
              SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_UPDATE_MULTIPLIER_MIN) ||
-            (sensor_info.update_interval_multiplier >
+            (sensor_info.hal_info.update_interval_multiplier >
              SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_UPDATE_MULTIPLIER_MAX)) {
-
             /* Sensor update interval multiplier is out of range */
             fwk_unexpected();
             goto exit;
         }
 
-        if (sensor_info.update_interval >=
+        if (sensor_info.hal_info.update_interval >=
             SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_UPDATE_INTERVAL_MASK) {
-
             /* Update interval is too big to fit in its mask */
             fwk_unexpected();
             goto exit;
         }
+        if (sensor_info.trip_point.count >=
+            SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_NUM_TRIP_POINTS_MASK) {
+            /* Number of trip points is too big to fit in its mask */
+            fwk_unexpected();
+            goto exit;
+        }
 
-        desc.sensor_attributes_high =
-            SCMI_SENSOR_DESC_ATTRIBUTES_HIGH(sensor_info.type,
-                sensor_info.unit_multiplier,
-                (uint32_t)sensor_info.update_interval_multiplier,
-                (uint32_t)sensor_info.update_interval);
+        desc.sensor_attributes_low = SCMI_SENSOR_DESC_ATTRIBUTES_LOW(
+            0, /* Asyncronous reading not-supported */
+            (uint32_t)sensor_info.trip_point.count);
+
+        desc.sensor_attributes_high = SCMI_SENSOR_DESC_ATTRIBUTES_HIGH(
+            sensor_info.hal_info.type,
+            sensor_info.hal_info.unit_multiplier,
+            (uint32_t)sensor_info.hal_info.update_interval_multiplier,
+            (uint32_t)sensor_info.hal_info.update_interval);
 
         /*
          * Copy sensor name into description struct. Copy n-1 chars to ensure a
@@ -331,6 +350,74 @@ exit:
 
     return status;
 }
+
+#ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
+static int scmi_sensor_trip_point_config_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload)
+{
+    struct scmi_sensor_trip_point_config_a2p *parameters;
+    struct scmi_sensor_trip_point_config_p2a return_values;
+    struct mod_sensor_scmi_info sensor_info;
+    struct mod_sensor_trip_point_params trip_point_param;
+    fwk_id_t sensor_id;
+    uint32_t trip_point_idx;
+    int status;
+
+    parameters = (struct scmi_sensor_trip_point_config_a2p *)payload;
+
+    if (parameters->sensor_id >= scmi_sensor_ctx.sensor_count) {
+        /* Sensor does not exist */
+        status = FWK_SUCCESS;
+        return_values.status = SCMI_NOT_FOUND;
+        goto exit;
+    }
+    if ((parameters->flags & SCMI_SENSOR_TRIP_POINT_FLAGS_RESERVED1_MASK) ||
+        (parameters->flags & SCMI_SENSOR_TRIP_POINT_FLAGS_RESERVED2_MASK)) {
+        status = FWK_SUCCESS;
+        return_values.status = SCMI_INVALID_PARAMETERS;
+        goto exit;
+    }
+
+    sensor_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, parameters->sensor_id);
+    status = scmi_sensor_ctx.sensor_api->get_info(sensor_id, &sensor_info);
+    if (status != FWK_SUCCESS) {
+        /* Unable to get sensor info */
+        fwk_unexpected();
+        goto exit;
+    }
+    trip_point_idx =
+        (parameters->flags & SCMI_SENSOR_TRIP_POINT_FLAGS_ID_MASK) >>
+        SCMI_SENSOR_TRIP_POINT_FLAGS_ID_POS;
+
+    if (trip_point_idx >= sensor_info.trip_point.count) {
+        /* Sensor Trip point does not exist */
+        status = FWK_SUCCESS;
+        return_values.status = SCMI_INVALID_PARAMETERS;
+        goto exit;
+    }
+
+    trip_point_param.high_value = parameters->sensor_value_high;
+    trip_point_param.low_value = parameters->sensor_value_low;
+    trip_point_param.mode =
+        (parameters->flags & SCMI_SENSOR_TRIP_POINT_FLAGS_EV_CTRL_MASK) >>
+        SCMI_SENSOR_TRIP_POINT_FLAGS_EV_CTRL_POS;
+
+    scmi_sensor_ctx.sensor_api->set_trip_point(
+        sensor_id, trip_point_idx, &trip_point_param);
+    return_values.status = SCMI_SUCCESS;
+    status = FWK_SUCCESS;
+
+exit:
+    scmi_sensor_ctx.scmi_api->respond(
+        service_id,
+        &return_values,
+        (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
+                                                 sizeof(return_values.status));
+
+    return status;
+}
+#endif
 
 static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
                                            const uint32_t *payload)
