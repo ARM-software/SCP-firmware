@@ -227,8 +227,27 @@ struct mod_sensor_dev_config {
     /*! API identifier of the driver */
     fwk_id_t driver_api_id;
 
+    /*!  Notifications identifier */
+    fwk_id_t notification_id;
+
+    /*! Trip point API identifier */
+    fwk_id_t trip_point_api_id;
+
     /*! Sensor trip information */
     struct mod_sensor_trip_point_info trip_point;
+};
+
+/*!
+ * \brief Sensor module configuration.
+ *
+ * \details Configuration structure sensor module.
+ */
+struct mod_sensor_config {
+    /*!  Notifications identifier */
+    fwk_id_t notification_id;
+
+    /*! Trip point API identifier */
+    fwk_id_t trip_point_api_id;
 };
 
 /*!

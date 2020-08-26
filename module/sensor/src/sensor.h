@@ -31,10 +31,17 @@ struct sensor_trip_point_ctx {
  */
 struct sensor_dev_ctx {
     struct mod_sensor_dev_config *config;
+
     struct mod_sensor_driver_api *driver_api;
+
     struct sensor_trip_point_ctx *trip_point_ctx;
     uint32_t cookie;
     bool read_busy;
+};
+
+struct sensor_mod_ctx {
+    struct mod_sensor_config *config;
+    struct mod_sensor_trip_point_api *sensor_trip_point_api;
 };
 
 /*

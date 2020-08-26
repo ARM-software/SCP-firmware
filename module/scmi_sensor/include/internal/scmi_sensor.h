@@ -43,6 +43,15 @@ struct scmi_sensor_protocol_attributes_p2a {
 
 #define SCMI_SENSOR_PROTOCOL_READING_GET_ASYNC_FLAG_MASK    (1 << 0)
 
+struct scmi_sensor_trip_point_notify_a2p {
+    uint32_t sensor_id;
+    uint32_t flags;
+};
+
+struct scmi_sensor_trip_point_notify_p2a {
+    int32_t status;
+};
+
 struct scmi_sensor_trip_point_config_a2p {
     uint32_t sensor_id;
     uint32_t flags;
@@ -63,6 +72,15 @@ struct scmi_sensor_protocol_reading_get_p2a {
     int32_t status;
     uint32_t sensor_value_low;
     uint32_t sensor_value_high;
+};
+
+/*
+ * SENSOR TRIP POINT EVENT
+ */
+struct scmi_sensor_trip_point_event_p2a {
+    uint32_t agent_id;
+    uint32_t sensor_id;
+    uint32_t trip_point_desc;
 };
 
 /*
@@ -153,6 +171,10 @@ struct scmi_sensor_protocol_reading_get_p2a {
             SCMI_SENSOR_NUM_SENSOR_FLAGS_NUM_REMAINING_DESCS_MASK) \
     )
 
+#define SCMI_SENSOR_CONFIG_FLAGS_EVENT_CONTROL_POS 0
+#define SCMI_SENSOR_CONFIG_FLAGS_EVENT_CONTROL_MASK \
+    (UINT32_C(0x1) << SCMI_SENSOR_CONFIG_FLAGS_EVENT_CONTROL_POS)
+
 #define SCMI_SENSOR_NAME_LEN    16
 
 #define SCMI_SENSOR_TRIP_POINT_FLAGS_RESERVED1_POS 12
@@ -168,6 +190,20 @@ struct scmi_sensor_protocol_reading_get_p2a {
     (UINT32_C(0x3) << SCMI_SENSOR_TRIP_POINT_FLAGS_RESERVED2_POS)
 #define SCMI_SENSOR_TRIP_POINT_FLAGS_EV_CTRL_MASK \
     (UINT32_C(0x3) << SCMI_SENSOR_TRIP_POINT_FLAGS_EV_CTRL_POS)
+
+#define SCMI_SENSOR_TRIP_POINT_EVENT_DESC_DIRECTION_POS 16
+#define SCMI_SENSOR_TRIP_POINT_EVENT_DESC_ID_POS 0
+
+#define SCMI_SENSOR_TRIP_POINT_EVENT_DESC_DIRECTION_MASK \
+    (UINT32_C(0x1) << SCMI_SENSOR_TRIP_POINT_EVENT_DESC_DIRECTION_POS)
+#define SCMI_SENSOR_TRIP_POINT_EVENT_DESC_ID_MASK \
+    (UINT32_C(0xFF) << SCMI_SENSOR_TRIP_POINT_EVENT_DESC_ID_POS)
+
+#define SCMI_SENSOR_TRIP_POINT_EVENT_DESC(DIRECTION, ID) \
+    ((((DIRECTION) << SCMI_SENSOR_TRIP_POINT_EVENT_DESC_DIRECTION_POS) & \
+      SCMI_SENSOR_TRIP_POINT_EVENT_DESC_DIRECTION_MASK) | \
+     (((ID) << SCMI_SENSOR_TRIP_POINT_EVENT_DESC_ID_POS) & \
+      SCMI_SENSOR_TRIP_POINT_EVENT_DESC_ID_MASK))
 
 struct scmi_sensor_desc {
     uint32_t sensor_id;
@@ -187,10 +223,13 @@ struct scmi_sensor_protocol_description_get_p2a {
 };
 
 /* Event indices */
-enum scmi_sensor_api_idx {
+enum scmi_sensor_event_idx {
     SCMI_SENSOR_EVENT_IDX_REQUEST,
     SCMI_SENSOR_EVENT_IDX_COUNT,
 };
+
+/* SCMI sensor notifications indices */
+enum scmi_sensor_notification_id { SCMI_SENSOR_TRIP_POINT_EVENT = 0x0 };
 
 /*!
  * \}

@@ -14,6 +14,7 @@
 #    include <mod_resource_perms.h>
 #endif
 #include <mod_scmi.h>
+#include <mod_scmi_sensor.h>
 #include <mod_sensor.h>
 
 #include <fwk_assert.h>
@@ -29,6 +30,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+
+#define MOD_SCMI_SENSOR_NOTIFICATION_COUNT 1
 
 struct sensor_operations {
     /*
@@ -55,6 +58,14 @@ struct scmi_sensor_ctx {
     /* SCMI Resource Permissions API */
     const struct mod_res_permissions_api *res_perms_api;
 #endif
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    /* Number of active agents */
+    int agent_count;
+
+    /* SCMI notification API */
+    const struct mod_scmi_notification_api *scmi_notification_api;
+#endif
 };
 
 static int scmi_sensor_protocol_version_handler(fwk_id_t service_id,
@@ -66,6 +77,9 @@ static int scmi_sensor_protocol_msg_attributes_handler(fwk_id_t service_id,
 static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
     const uint32_t *payload);
 #ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
+static int scmi_sensor_trip_point_notify_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload);
 static int scmi_sensor_trip_point_config_handler(
     fwk_id_t service_id,
     const uint32_t *payload);
@@ -93,6 +107,7 @@ static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
         scmi_sensor_protocol_msg_attributes_handler,
     [MOD_SCMI_SENSOR_DESCRIPTION_GET] = scmi_sensor_protocol_desc_get_handler,
 #ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
+    [MOD_SCMI_SENSOR_TRIP_POINT_NOTIFY] = scmi_sensor_trip_point_notify_handler,
     [MOD_SCMI_SENSOR_TRIP_POINT_CONFIG] = scmi_sensor_trip_point_config_handler,
 #endif
     [MOD_SCMI_SENSOR_READING_GET] = scmi_sensor_reading_get_handler
@@ -106,6 +121,8 @@ static unsigned int payload_size_table[] = {
     [MOD_SCMI_SENSOR_DESCRIPTION_GET] =
         sizeof(struct scmi_sensor_protocol_description_get_a2p),
 #ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
+    [MOD_SCMI_SENSOR_TRIP_POINT_NOTIFY] =
+        sizeof(struct scmi_sensor_trip_point_notify_a2p),
     [MOD_SCMI_SENSOR_TRIP_POINT_CONFIG] =
         sizeof(struct scmi_sensor_trip_point_config_a2p),
 #endif
@@ -350,6 +367,61 @@ exit:
 
     return status;
 }
+
+#ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
+static int scmi_sensor_trip_point_notify_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload)
+{
+    uint32_t flags;
+    unsigned int agent_id;
+    int status;
+    struct scmi_sensor_trip_point_notify_a2p *parameters;
+    struct scmi_sensor_trip_point_notify_p2a return_values = {
+        .status = SCMI_GENERIC_ERROR,
+    };
+
+    parameters = (struct scmi_sensor_trip_point_notify_a2p *)payload;
+
+    if (parameters->sensor_id >= scmi_sensor_ctx.sensor_count) {
+        /* Sensor does not exist */
+        status = FWK_SUCCESS;
+        return_values.status = SCMI_NOT_FOUND;
+        goto exit;
+    }
+
+    status = scmi_sensor_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+    if (status != FWK_SUCCESS)
+        goto exit;
+
+    flags = parameters->flags;
+    if (flags & SCMI_SENSOR_CONFIG_FLAGS_EVENT_CONTROL_MASK)
+        scmi_sensor_ctx.scmi_notification_api->scmi_notification_add_subscriber(
+            MOD_SCMI_PROTOCOL_ID_SENSOR,
+            parameters->sensor_id,
+            MOD_SCMI_SENSOR_TRIP_POINT_NOTIFY,
+            service_id);
+    else
+        scmi_sensor_ctx.scmi_notification_api
+            ->scmi_notification_remove_subscriber(
+                MOD_SCMI_PROTOCOL_ID_SENSOR,
+                agent_id,
+                parameters->sensor_id,
+                MOD_SCMI_PERF_NOTIFY_LEVEL);
+
+    return_values.status = SCMI_SUCCESS;
+    status = FWK_SUCCESS;
+
+exit:
+    scmi_sensor_ctx.scmi_api->respond(
+        service_id,
+        &return_values,
+        (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
+                                                 sizeof(return_values.status));
+
+    return status;
+}
+#endif
 
 #ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
 static int scmi_sensor_trip_point_config_handler(
@@ -613,6 +685,30 @@ static struct mod_scmi_to_protocol_api scmi_sensor_mod_scmi_to_protocol_api = {
     .message_handler = scmi_sensor_message_handler
 };
 
+static void scmi_sensor_notify_trip_point(
+    fwk_id_t sensor_id,
+    uint32_t state,
+    uint32_t trip_point_idx)
+{
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    struct scmi_sensor_trip_point_event_p2a trip_point_event;
+    trip_point_event.sensor_id = fwk_id_get_element_idx(sensor_id);
+    trip_point_event.agent_id = 0x0;
+    trip_point_event.trip_point_desc =
+        SCMI_SENSOR_TRIP_POINT_EVENT_DESC(state, trip_point_idx);
+
+    scmi_sensor_ctx.scmi_notification_api->scmi_notification_notify(
+        MOD_SCMI_PROTOCOL_ID_SENSOR,
+        MOD_SCMI_SENSOR_TRIP_POINT_NOTIFY,
+        SCMI_SENSOR_TRIP_POINT_EVENT,
+        &trip_point_event,
+        sizeof(trip_point_event));
+#endif
+}
+static struct mod_sensor_trip_point_api sensor_trip_point_api = {
+    .notify_sensor_trip_point = scmi_sensor_notify_trip_point
+};
+
 /*
  * Framework interface
  */
@@ -647,6 +743,28 @@ static int scmi_sensor_init(fwk_id_t module_id,
 
     return FWK_SUCCESS;
 }
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+static int scmi_init_notifications(int sensor_count)
+{
+    int status;
+
+    status =
+        scmi_sensor_ctx.scmi_api->get_agent_count(&scmi_sensor_ctx.agent_count);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    fwk_assert(scmi_sensor_ctx.agent_count != 0);
+
+    status = scmi_sensor_ctx.scmi_notification_api->scmi_notification_init(
+        MOD_SCMI_PROTOCOL_ID_SENSOR,
+        scmi_sensor_ctx.agent_count,
+        scmi_sensor_ctx.sensor_count,
+        MOD_SCMI_SENSOR_NOTIFICATION_COUNT);
+
+    return status;
+}
+#endif
 
 static int scmi_sensor_bind(fwk_id_t id, unsigned int round)
 {
@@ -683,7 +801,29 @@ static int scmi_sensor_bind(fwk_id_t id, unsigned int round)
         return status;
 #endif
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
+        FWK_ID_API(FWK_MODULE_IDX_SCMI, MOD_SCMI_API_IDX_NOTIFICATION),
+        &scmi_sensor_ctx.scmi_notification_api);
+    if (status != FWK_SUCCESS)
+        return status;
+#endif
+
     return FWK_SUCCESS;
+}
+
+static int scmi_sensor_start(fwk_id_t id)
+{
+    int status = FWK_SUCCESS;
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    status = scmi_init_notifications(scmi_sensor_ctx.sensor_count);
+    if (status != FWK_SUCCESS)
+        return status;
+#endif
+
+    return status;
 }
 
 static int scmi_sensor_process_bind_request(fwk_id_t source_id,
@@ -691,11 +831,20 @@ static int scmi_sensor_process_bind_request(fwk_id_t source_id,
                                             fwk_id_t api_id,
                                             const void **api)
 {
-    if (!fwk_id_is_equal(source_id, FWK_ID_MODULE(FWK_MODULE_IDX_SCMI)))
+    switch (fwk_id_get_api_idx(api_id)) {
+    case SCMI_SENSOR_API_IDX_REQUEST:
+        if (!fwk_id_is_equal(source_id, FWK_ID_MODULE(FWK_MODULE_IDX_SCMI)))
+            return FWK_E_ACCESS;
+        *api = &scmi_sensor_mod_scmi_to_protocol_api;
+        break;
+
+    case SCMI_SENSOR_API_IDX_TRIP_POINT:
+        *api = &sensor_trip_point_api;
+        break;
+
+    default:
         return FWK_E_ACCESS;
-
-    *api = &scmi_sensor_mod_scmi_to_protocol_api;
-
+    }
     return FWK_SUCCESS;
 }
 
@@ -761,11 +910,12 @@ static int scmi_sensor_process_event(const struct fwk_event *event,
 
 const struct fwk_module module_scmi_sensor = {
     .name = "SCMI sensor management",
-    .api_count = 1,
+    .api_count = SCMI_SENSOR_API_IDX_COUNT,
     .event_count = SCMI_SENSOR_EVENT_IDX_COUNT,
     .type = FWK_MODULE_TYPE_PROTOCOL,
     .init = scmi_sensor_init,
     .bind = scmi_sensor_bind,
+    .start = scmi_sensor_start,
     .process_bind_request = scmi_sensor_process_bind_request,
     .process_event = scmi_sensor_process_event,
 };
