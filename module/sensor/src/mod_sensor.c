@@ -38,6 +38,60 @@ static int get_ctx_if_valid_call(fwk_id_t id,
     return FWK_SUCCESS;
 }
 
+#ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
+static bool trip_point_evaluate(
+    struct sensor_trip_point_ctx *ctx,
+    uint64_t value)
+{
+    uint64_t threshold;
+    bool new_above_threshold, trigger = false;
+
+    threshold = (((uint64_t)ctx->params.high_value << 32) & ~0U) |
+        (((uint64_t)ctx->params.low_value) & ~0U);
+    new_above_threshold = value > threshold;
+
+    switch (ctx->params.mode) {
+    case MOD_SENSOR_TRIP_POINT_MODE_POSITIVE:
+        if (!ctx->above_threshold && value > threshold)
+            trigger = true;
+        break;
+
+    case MOD_SENSOR_TRIP_POINT_MODE_NEGATIVE:
+        if (ctx->above_threshold && (value <= threshold))
+            trigger = true;
+        break;
+
+    case MOD_SENSOR_TRIP_POINT_MODE_TRANSITION:
+        if ((!ctx->above_threshold && value > threshold) ||
+            (ctx->above_threshold && value <= threshold))
+            trigger = true;
+        break;
+
+    default:
+        break;
+    }
+    ctx->above_threshold = new_above_threshold;
+    return trigger;
+}
+#endif
+
+#ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
+static void trip_point_process(fwk_id_t id, uint64_t value)
+{
+    struct sensor_dev_ctx *ctx;
+    unsigned int i;
+
+    fwk_check(!fwk_id_is_equal(id, FWK_ID_NONE));
+    ctx = ctx_table + fwk_id_get_element_idx(id);
+
+    for (i = 0; i < ctx->config->trip_point.count; i++) {
+        if (trip_point_evaluate(&(ctx->trip_point_ctx[i]), value)) {
+            /* Handle trip point event*/
+        }
+    }
+}
+#endif
+
 /*
  * Module API
  */
@@ -75,13 +129,18 @@ static int get_value(fwk_id_t id, uint64_t *value)
             return FWK_PENDING;
         } else
             return status;
-    } else if (status == FWK_SUCCESS)
+    } else if (status == FWK_SUCCESS) {
+#ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
+        trip_point_process(id, *value);
+#endif
         return FWK_SUCCESS;
+    }
+
     else
         return FWK_E_DEVICE;
 }
 
-static int get_info(fwk_id_t id, struct mod_sensor_info *info)
+static int get_info(fwk_id_t id, struct mod_sensor_scmi_info *info)
 {
     int status;
     struct sensor_dev_ctx *ctx;
@@ -90,17 +149,61 @@ static int get_info(fwk_id_t id, struct mod_sensor_info *info)
     if (status != FWK_SUCCESS)
         return status;
 
-    status = ctx->driver_api->get_info(ctx->config->driver_id, info);
+    status = ctx->driver_api->get_info(ctx->config->driver_id, &info->hal_info);
     if (!fwk_expect(status == FWK_SUCCESS))
         return FWK_E_DEVICE;
+    info->trip_point = ctx->config->trip_point;
 
     return FWK_SUCCESS;
 }
 
-static struct mod_sensor_api sensor_api = {
-    .get_value = get_value,
-    .get_info  = get_info,
-};
+static int sensor_get_trip_point(
+    fwk_id_t id,
+    uint32_t trip_point_idx,
+    struct mod_sensor_trip_point_params *params)
+{
+    struct sensor_dev_ctx *ctx;
+
+    fwk_check(params != NULL);
+
+    ctx = ctx_table + fwk_id_get_element_idx(id);
+
+    if (trip_point_idx >= ctx->config->trip_point.count)
+        return FWK_E_PARAM;
+
+    *params = ctx->trip_point_ctx[trip_point_idx].params;
+
+    return FWK_SUCCESS;
+}
+
+static int sensor_set_trip_point(
+    fwk_id_t id,
+    uint32_t trip_point_idx,
+    struct mod_sensor_trip_point_params *params)
+{
+    struct sensor_dev_ctx *ctx;
+
+    if (params == NULL)
+        return FWK_E_PARAM;
+
+    ctx = ctx_table + fwk_id_get_element_idx(id);
+
+    if (trip_point_idx >= ctx->config->trip_point.count)
+        return FWK_E_PARAM;
+
+    ctx->trip_point_ctx[trip_point_idx].params = *params;
+
+    /* Clear the trip point flag */
+    ctx->trip_point_ctx[trip_point_idx].above_threshold = false;
+    return FWK_SUCCESS;
+}
+
+static struct mod_sensor_api sensor_api = { .get_value = get_value,
+                                            .get_info = get_info,
+                                            .get_trip_point =
+                                                sensor_get_trip_point,
+                                            .set_trip_point =
+                                                sensor_set_trip_point };
 
 /*
  * Driver response API.
@@ -128,6 +231,9 @@ static void reading_complete(fwk_id_t dev_id,
     if (response != NULL) {
         event_params->status = response->status;
         event_params->value = response->value;
+#ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
+        trip_point_process(dev_id, response->value);
+#endif
     } else
         event_params->status = FWK_E_DEVICE;
 
@@ -159,10 +265,17 @@ static int sensor_dev_init(fwk_id_t element_id,
     struct mod_sensor_dev_config *config;
 
     ctx = ctx_table + fwk_id_get_element_idx(element_id);
+
+    fwk_check(data != NULL);
     config = (struct mod_sensor_dev_config*)data;
 
     ctx->config = config;
 
+    if (config->trip_point.count > 0) {
+        ctx->trip_point_ctx = fwk_mm_calloc(
+            config->trip_point.count, sizeof(struct sensor_trip_point_ctx));
+    } else
+        ctx->trip_point_ctx = NULL;
     return FWK_SUCCESS;
 }
 

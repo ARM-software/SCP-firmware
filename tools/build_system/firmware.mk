@@ -238,6 +238,12 @@ else
     BUILD_HAS_STATISTICS := no
 endif
 
+ifeq ($(BS_FIRMWARE_HAS_SCMI_SENSOR_EVENTS),yes)
+    BUILD_HAS_SCMI_SENSOR_EVENTS := yes
+else
+    BUILD_HAS_SCMI_SENSOR_EVENTS := no
+endif
+
 # Add directories to the list of targets to build
 LIB_TARGETS_y += $(patsubst %,$(MODULES_DIR)/%/src, \
                             $(BUILD_STANDARD_MODULES))
