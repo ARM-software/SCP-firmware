@@ -7,6 +7,7 @@
 
 #include <sensor.h>
 
+#include <mod_scmi_sensor.h>
 #include <mod_sensor.h>
 
 #include <fwk_assert.h>
@@ -23,6 +24,7 @@
 #include <stdint.h>
 
 static struct sensor_dev_ctx *ctx_table;
+static struct sensor_mod_ctx sensor_mod_ctx;
 
 static int get_ctx_if_valid_call(fwk_id_t id,
                                  void *data,
@@ -87,6 +89,9 @@ static void trip_point_process(fwk_id_t id, uint64_t value)
     for (i = 0; i < ctx->config->trip_point.count; i++) {
         if (trip_point_evaluate(&(ctx->trip_point_ctx[i]), value)) {
             /* Handle trip point event*/
+            if (sensor_mod_ctx.sensor_trip_point_api != NULL)
+                sensor_mod_ctx.sensor_trip_point_api->notify_sensor_trip_point(
+                    id, ctx->trip_point_ctx->above_threshold, i);
         }
     }
 }
@@ -248,12 +253,17 @@ static struct mod_sensor_driver_response_api sensor_driver_response_api = {
 /*
  * Framework handlers
  */
-static int sensor_init(fwk_id_t module_id,
-                       unsigned int element_count,
-                       const void *unused)
+static int sensor_init(
+    fwk_id_t module_id,
+    unsigned int element_count,
+    const void *data)
 {
-    ctx_table = fwk_mm_calloc(element_count, sizeof(ctx_table[0]));
+    struct mod_sensor_config *config;
 
+    ctx_table = fwk_mm_calloc(element_count, sizeof(ctx_table[0]));
+    config = (struct mod_sensor_config *)data;
+
+    sensor_mod_ctx.config = config;
     return FWK_SUCCESS;
 }
 
@@ -285,16 +295,26 @@ static int sensor_bind(fwk_id_t id, unsigned int round)
     int status;
     struct mod_sensor_driver_api *driver = NULL;
 
-    if ((round > 0) || fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
+    if (round > 0) {
         /*
          * Only bind in first round of calls
-         * Nothing to do for module
          */
         return FWK_SUCCESS;
     }
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
+        if (sensor_mod_ctx.config == NULL)
+            return FWK_SUCCESS;
 
+        if (fwk_id_is_equal(
+                sensor_mod_ctx.config->notification_id, FWK_ID_NONE))
+            return FWK_SUCCESS;
+
+        return fwk_module_bind(
+            sensor_mod_ctx.config->notification_id,
+            sensor_mod_ctx.config->trip_point_api_id,
+            &sensor_mod_ctx.sensor_trip_point_api);
+    }
     ctx = ctx_table + fwk_id_get_element_idx(id);
-
     /* Bind to driver */
     status = fwk_module_bind(ctx->config->driver_id,
         ctx->config->driver_api_id,

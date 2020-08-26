@@ -11,6 +11,7 @@
 #include <mod_juno_adc.h>
 #include <mod_juno_pvt.h>
 #include <mod_juno_xrp7724.h>
+#include <mod_scmi_sensor.h>
 #include <mod_sensor.h>
 
 #include <fwk_assert.h>

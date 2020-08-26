@@ -252,7 +252,7 @@ static mod_res_perms_t
  * We are tracking 4 SCMI Sensor Protocol commands
  *
  * 0, SCMI_SENSOR_DESCRIPTION_GET
- * 1, SCMI_SENSOR_CONFIG_SET
+ * 1, SCMI_SENSOR_TRIP_POINT_NOTIFY
  * 2, SCMI_SENSOR_TRIP_POINT_CONFIG
  * 3, SCMI_SENSOR_READING_GET
  */
@@ -264,18 +264,18 @@ static mod_res_perms_t
         [JUNO_SENSOR_RESOURCE_ELEMENTS] = {
             /* SCMI_PROTOCOL_ID_SENSOR */
             /* 0, SCMI_SENSOR_DESCRIPTION_GET */
-            /* 1, SCMI_SENSOR_CONFIG_SET */
+            /* 1, SCMI_SENSOR_TRIP_POINT_NOTIFY */
             /* 2, SCMI_SENSOR_TRIP_POINT_CONFIG */
             /* 3, SCMI_SENSOR_READING_GET */
             [AGENT_IDX(JUNO_SCMI_AGENT_IDX_OSPM)] = {
                 [MOD_RES_PERMS_SCMI_SENSOR_DESCRIPTION_GET_IDX][0] = 0x0,
-                [MOD_RES_PERMS_SCMI_SENSOR_CONFIG_SET_IDX][0] = 0x0,
+                [MOD_RES_PERMS_SCMI_SENSOR_TRIP_POINT_NOTIFY_IDX][0] = 0x0,
                 [MOD_RES_PERMS_SCMI_SENSOR_TRIP_POINT_CONFIG_IDX][0] = 0x0,
                 [MOD_RES_PERMS_SCMI_SENSOR_READING_GET_IDX][0] = 0x0,
             },
             [AGENT_IDX(JUNO_SCMI_AGENT_IDX_PSCI)] = {
                 [MOD_RES_PERMS_SCMI_SENSOR_DESCRIPTION_GET_IDX][0] = 0x0,
-                [MOD_RES_PERMS_SCMI_SENSOR_CONFIG_SET_IDX][0] = 0x0,
+                [MOD_RES_PERMS_SCMI_SENSOR_TRIP_POINT_NOTIFY_IDX][0] = 0x0,
                 [MOD_RES_PERMS_SCMI_SENSOR_TRIP_POINT_CONFIG_IDX][0] = 0x0,
                 [MOD_RES_PERMS_SCMI_SENSOR_READING_GET_IDX][0] = 0x0,
             },
