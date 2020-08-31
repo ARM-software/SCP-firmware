@@ -78,9 +78,12 @@ enum node_type {
 };
 
 enum device_type {
+    DEVICE_TYPE_RN_F_CHIB_ESAM = 0x5, // 0b00101
     DEVICE_TYPE_CXHA = 0x11, // 0b10001
     DEVICE_TYPE_CXRA = 0x12, // 0b10010
     DEVICE_TYPE_CXRH = 0x13, // 0b10011
+    DEVICE_TYPE_RN_F_CHID_ESAM = 0x15, // 0b10101
+    DEVICE_TYPE_RN_F_CHIC_ESAM = 0x17, // 0b10111
 };
 
 /* Common node header */
@@ -320,7 +323,9 @@ struct cmn650_mxp_reg {
 #define CMN650_NODE_ID_PORT_MASK 0x1
 #define CMN650_NODE_ID_Y_POS     3
 
-#define CMN650_MXP_PORT_CONNECT_INFO_DEVICE_TYPE_MASK UINT64_C(0x1F)
+#define CMN650_MXP_PORT_CONNECT_INFO_DEVICE_TYPE_MASK   UINT64_C(0x1F)
+#define CMN650_MXP_PORT_CONNECT_INFO_CAL_CONNECTED_MASK UINT64_C(0x80)
+#define CMN650_MXP_PORT_CONNECT_INFO_CAL_CONNECTED_POS  7
 
 #define CMN650_ROOT_NODE_OFFSET_PORT_POS 16
 #define CMN650_ROOT_NODE_OFFSET_Y_POS    22
@@ -434,6 +439,33 @@ bool get_port_number(unsigned int child_node_id);
  * \retval device type (por_mxp_por_mxp_device_port_connect_info_p[port] & 0x1F)
  */
 unsigned int get_device_type(void *mxp_base, bool port);
+
+/*
+ * Verify if the MXP port has CAL connected to it.
+ *
+ * \param mxp_base Pointer to the cross point node descriptor
+ *      \pre The cross point node pointer must be valid
+ * \param port Port number
+ *      \pre The port number should be either 0 or 1.
+ *
+ * \retval true if CAL is connected to \param port
+ * \retval false if CAL is non connected to \param port
+ */
+bool is_cal_connected(void *mxp_base, uint8_t port);
+
+/*
+ * Verify if the device type connected to the MXP's port is of one of the RN-F
+ * type.
+ *
+ * \param mxp_base Pointer to the cross point node descriptor
+ *      \pre The cross point node pointer must be valid
+ * \param port Port number
+ *      \pre The port number should be either 0 or 1.
+ *
+ * \retval true if the device connected to \param port is one of the RN-F types
+ * \retval false if the device connected to \param port not an RN-F type
+ */
+bool is_device_type_rnf(void *mxp_base, uint8_t port);
 
 /*
  * Convert a memory region size into a size format used by the CMN 650

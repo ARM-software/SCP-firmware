@@ -105,6 +105,22 @@ unsigned int get_device_type(void *mxp_base, bool port)
         CMN650_MXP_PORT_CONNECT_INFO_DEVICE_TYPE_MASK;
 }
 
+bool is_cal_connected(void *mxp_base, uint8_t port)
+{
+    struct cmn650_mxp_reg *mxp = mxp_base;
+    return (mxp->PORT_CONNECT_INFO[port] &
+            CMN650_MXP_PORT_CONNECT_INFO_CAL_CONNECTED_MASK) >>
+        CMN650_MXP_PORT_CONNECT_INFO_CAL_CONNECTED_POS;
+}
+
+bool is_device_type_rnf(void *mxp_base, uint8_t port)
+{
+    return (
+        (get_device_type(mxp_base, port) == DEVICE_TYPE_RN_F_CHIB_ESAM) ||
+        (get_device_type(mxp_base, port) == DEVICE_TYPE_RN_F_CHIC_ESAM) ||
+        (get_device_type(mxp_base, port) == DEVICE_TYPE_RN_F_CHID_ESAM));
+}
+
 uint64_t sam_encode_region_size(uint64_t size)
 {
     uint64_t blocks;

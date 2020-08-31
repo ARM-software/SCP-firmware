@@ -203,6 +203,29 @@ static int cmn650_discovery(void)
 
                 case NODE_TYPE_RN_SAM:
                     ctx->internal_rnsam_count++;
+
+                    /*
+                     * RN-F nodes do not have node type identifier and hence the
+                     * count cannot be determined using the node type id.
+                     * Alternatively, check if the device type connected to the
+                     * Crosspoint (XP) is one of the RNF types and determine the
+                     * RN-F count (if CAL connected RN-F, double the count).
+                     */
+                    xp_port = get_port_number(get_node_id(node));
+
+                    if (is_device_type_rnf(xp, xp_port)) {
+                        if (is_cal_connected(xp, xp_port)) {
+                            ctx->rnf_count += 2;
+                            FWK_LOG_INFO(
+                                MOD_NAME
+                                "  RN-F (CAL connected) found at port: %d",
+                                xp_port);
+                        } else {
+                            ctx->rnf_count++;
+                            FWK_LOG_INFO(
+                                MOD_NAME "  RN-F found at port: %d", xp_port);
+                        }
+                    }
                     break;
 
                 case NODE_TYPE_RN_D:
@@ -281,15 +304,6 @@ static int cmn650_discovery(void)
     }
 
     ctx->ccix_node_count = cxg_ra_reg_count;
-
-    /*
-     * TODO Below need fixing
-     * RN-F nodes does not have node type identifier and hence the count cannot
-     * be determined during the discovery process. RN-F count will be total
-     * RN-SAM count minus the total RN-D, RN-I and CXHA count combined.
-     */
-    ctx->rnf_count = ctx->internal_rnsam_count + ctx->external_rnsam_count -
-        (ctx->rnd_count + ctx->rni_count + cxg_ha_reg_count);
 
     if (ctx->rnf_count > MAX_RNF_COUNT) {
         FWK_LOG_ERR(
