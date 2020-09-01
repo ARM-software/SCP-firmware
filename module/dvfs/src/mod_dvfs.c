@@ -1296,6 +1296,9 @@ static int dvfs_process_bind_request(
     if (!fwk_id_is_equal(target_id, fwk_module_id_dvfs))
         return FWK_E_PARAM;
 
+    if (!fwk_id_is_equal(api_id, mod_dvfs_api_id_dvfs))
+        return FWK_E_ACCESS;
+
     /* We don't do any permissions management */
     *api = &mod_dvfs_domain_api;
 

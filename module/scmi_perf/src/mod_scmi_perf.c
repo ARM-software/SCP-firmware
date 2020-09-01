@@ -1345,8 +1345,10 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
         return status;
 #endif
 
-    return fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_DVFS),
-        FWK_ID_API(FWK_MODULE_IDX_DVFS, 0), &scmi_perf_ctx.dvfs_api);
+    return fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_DVFS),
+        FWK_ID_API(FWK_MODULE_IDX_DVFS, MOD_DVFS_API_IDX_DVFS),
+        &scmi_perf_ctx.dvfs_api);
 }
 
 static int scmi_perf_process_bind_request(fwk_id_t source_id,
