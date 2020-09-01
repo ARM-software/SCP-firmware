@@ -12,6 +12,8 @@
 #ifndef INTERNAL_SCMI_RESET_DOMAIN_H
 #define INTERNAL_SCMI_RESET_DOMAIN_H
 
+#include <stdint.h>
+
 /*!
  * \addtogroup GroupModules Modules
  * \{
