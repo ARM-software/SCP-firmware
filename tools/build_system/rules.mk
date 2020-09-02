@@ -257,7 +257,7 @@ $(OBJ_DIR)/%.o: %.S | $$(@D)/
 	$(call show-action,AS,$<)
 	$(AS) -c $(CFLAGS) $(DEP_CFLAGS) $< -o $@
 
-$(BUILD_PATH)/%/:
+$(BUILD_PATH)%/:
 	$(call show-action,MD,$@)
 	$(MD) $@
 
