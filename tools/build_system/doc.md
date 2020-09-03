@@ -106,6 +106,9 @@ The following parameters are optional (default is 'no' when omitted):
   generates SCMI notifications on cross-over events for the trip points.
 * __BS_FIRMWARE_HAS_CLOCK_TREE_MGMT__ <yes|no> - Clock tree management. When set
 to yes, the platform can provide support for clock tree management.
+* __BS_FIRMWARE_HAS_PERF_PLUGIN_HANDLER__ <yes|no> - Performance Plugin Handler
+  Support. When set to yes, performance plugins (modules) can be interposed
+  in the performance request chain.
 
 The format of the __BS_FIRMWARE_MODULES__ parameter can be seen in the following
 example:
@@ -268,6 +271,11 @@ Clock Tree Management                           {#section_clock_tree_management}
 
 When building a firmware and its dependencies, the BUILD_HAS_CLOCK_TREE_MGMT
 parameter controls if Clock Tree Management is enabled.
+
+Performance Plugin Handler
+==========================
+
+/* TODO */
 
 Definitions
 ===========
