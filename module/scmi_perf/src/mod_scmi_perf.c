@@ -13,6 +13,9 @@
 #include <mod_dvfs.h>
 #include <mod_scmi.h>
 #include <mod_scmi_perf.h>
+#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+#    include <perf_plugins_handler.h>
+#endif
 #include <mod_timer.h>
 
 #include <fwk_assert.h>
@@ -209,6 +212,8 @@ struct scmi_perf_ctx {
     struct scmi_perf_domain_ctx *domain_ctx_table;
 
     struct opp_table *opp_table;
+
+    unsigned int dvfs_doms_count;
 };
 
 static struct scmi_perf_ctx scmi_perf_ctx;
@@ -232,6 +237,15 @@ static const fwk_id_t scmi_perf_get_level =
  * SCMI PERF Helpers
  */
 
+static inline fwk_id_t get_dependency_id(unsigned int el_idx)
+{
+#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+    return perf_plugins_get_dependency_id(el_idx);
+#else
+    return FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, el_idx);
+#endif
+}
+
 static inline struct scmi_perf_domain_ctx *get_ctx(fwk_id_t domain_id)
 {
     return &scmi_perf_ctx.domain_ctx_table[fwk_id_get_element_idx(domain_id)];
@@ -249,7 +263,8 @@ static inline int opp_for_level_found(
 
 static int find_opp_for_level(
     struct scmi_perf_domain_ctx *domain_ctx,
-    uint32_t *level)
+    uint32_t *level,
+    bool use_nearest)
 {
     struct opp_table *opp_table;
     size_t i;
@@ -261,10 +276,9 @@ static int find_opp_for_level(
     for (i = 0; i < opp_table->opp_count; i++) {
         opp_level = opp_table->opps[i].level;
 
-        if ((scmi_perf_ctx.config->approximate_level &&
+        if ((use_nearest &&
              ((opp_level < *level) && (opp_level < limit_max))) ||
-            (!scmi_perf_ctx.config->approximate_level &&
-             (opp_level != *level))) {
+            (!use_nearest && (opp_level != *level))) {
             /*
              * The current OPP level is either below the desired level
              * or not exact match found.
@@ -284,7 +298,7 @@ static int find_opp_for_level(
     }
 
     /* Either not exact match or approximate to the highest level */
-    if (scmi_perf_ctx.config->approximate_level) {
+    if (use_nearest) {
         i--;
 
         return opp_for_level_found(level, opp_table, i);
@@ -303,7 +317,8 @@ static int perf_set_level(
 
     domain_ctx = get_ctx(domain_id);
 
-    status = find_opp_for_level(domain_ctx, &perf_level);
+    status = find_opp_for_level(
+        domain_ctx, &perf_level, scmi_perf_ctx.config->approximate_level);
     if (status != FWK_SUCCESS) {
         return status;
     }
@@ -320,20 +335,25 @@ static int validate_new_limits(
     struct scmi_perf_domain_ctx *domain_ctx,
     const struct mod_scmi_perf_level_limits *limits)
 {
-    uint32_t level;
+    uint32_t limit;
     int status;
 
-    level = limits->minimum;
-    status = find_opp_for_level(domain_ctx, &level);
+    if (scmi_perf_ctx.config->approximate_level) {
+        /* When approx level is chosen, a level is always found */
+        return FWK_SUCCESS;
+    }
+
+    limit = limits->minimum;
+    status = find_opp_for_level(domain_ctx, &limit, false);
     if (status != FWK_SUCCESS) {
         return status;
     }
 
-    level = limits->maximum;
-    return find_opp_for_level(domain_ctx, &level);
+    limit = limits->maximum;
+    return find_opp_for_level(domain_ctx, &limit, false);
 }
 
-static int perf_set_limits(
+int perf_set_limits(
     fwk_id_t domain_id,
     unsigned int agent_id,
     const struct mod_scmi_perf_level_limits *limits)
@@ -379,13 +399,56 @@ static int perf_set_limits(
         return FWK_SUCCESS;
     }
 
-    status = find_opp_for_level(domain_ctx, &needle);
+    status = find_opp_for_level(
+        domain_ctx, &needle, scmi_perf_ctx.config->approximate_level);
     if (status != FWK_SUCCESS) {
         return status;
     }
 
     return scmi_perf_ctx.dvfs_api->set_level(domain_id, agent_id, needle);
 }
+
+#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+/*
+ * Evaluate the level & limits in one go.
+ * Because the limits may also come from the external plugins, their value may
+ * not always be exact to the OPPs, so allow approximation.
+ */
+void perf_eval_performance(
+    fwk_id_t domain_id,
+    const struct mod_scmi_perf_level_limits *limits,
+    uint32_t *level)
+{
+    struct scmi_perf_domain_ctx *domain_ctx;
+
+    if (limits->minimum > limits->maximum) {
+        return;
+    }
+
+    domain_ctx = get_ctx(domain_id);
+
+    if ((limits->minimum == domain_ctx->level_limits.minimum) &&
+        (limits->maximum == domain_ctx->level_limits.maximum)) {
+        find_opp_for_level(domain_ctx, level, true);
+        return;
+    }
+
+    scmi_perf_notify_limits_updated(
+        domain_id, 0, limits->minimum, limits->maximum);
+
+    /* adjust_opp_for_new_limits */
+    if (*level < limits->minimum) {
+        *level = limits->minimum;
+    } else if (*level > limits->maximum) {
+        *level = limits->maximum;
+    }
+
+    domain_ctx->level_limits.minimum = limits->minimum;
+    domain_ctx->level_limits.maximum = limits->maximum;
+
+    find_opp_for_level(domain_ctx, level, true);
+}
+#endif
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 
@@ -573,7 +636,7 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
     }
 #endif
 
-    domain_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, parameters->domain_id);
+    domain_id = get_dependency_id(parameters->domain_id);
     status = scmi_perf_ctx.dvfs_api->get_sustained_opp(domain_id, &opp);
     if (status != FWK_SUCCESS) {
         goto exit;
@@ -662,7 +725,7 @@ static int scmi_perf_describe_levels_handler(fwk_id_t service_id,
     }
 
     /* Get the number of operating points for the domain */
-    domain_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, parameters->domain_id);
+    domain_id = get_dependency_id(parameters->domain_id);
     status = scmi_perf_ctx.dvfs_api->get_opp_count(domain_id, &opp_count);
     if (status != FWK_SUCCESS) {
         goto exit;
@@ -765,7 +828,7 @@ static int scmi_perf_limits_set_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    domain_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, parameters->domain_id);
+    domain_id = get_dependency_id(parameters->domain_id);
     range_min = parameters->range_min;
     range_max = parameters->range_max;
 
@@ -820,7 +883,7 @@ static int scmi_perf_limits_get_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    domain_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_SCMI_PERF, parameters->domain_id);
+    domain_id = get_dependency_id(parameters->domain_id);
     domain_ctx = get_ctx(domain_id);
 
     return_values.status = SCMI_SUCCESS;
@@ -866,7 +929,7 @@ static int scmi_perf_level_set_handler(fwk_id_t service_id,
     /*
      * Note that the policy handler may change the performance level
      */
-    domain_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, parameters->domain_id);
+    domain_id = get_dependency_id(parameters->domain_id);
     perf_level = parameters->performance_level;
 
     status = scmi_perf_level_set_policy(&policy_status, &perf_level, agent_id,
@@ -922,8 +985,11 @@ static int scmi_perf_level_get_handler(fwk_id_t service_id,
 
     /* Check if there is already a request pending for this domain */
     if (!fwk_id_is_equal(
-            scmi_perf_ctx.perf_ops_table[parameters->domain_id].service_id,
-            FWK_ID_NONE)){
+            scmi_perf_ctx
+                .perf_ops_table[fwk_id_get_element_idx(
+                    get_dependency_id(parameters->domain_id))]
+                .service_id,
+            FWK_ID_NONE)) {
         return_values.status = (int32_t)SCMI_BUSY;
         status = FWK_SUCCESS;
 
@@ -937,8 +1003,7 @@ static int scmi_perf_level_get_handler(fwk_id_t service_id,
     };
 
     evt_params = (struct scmi_perf_event_parameters *)event.params;
-    evt_params->domain_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS,
-        parameters->domain_id);
+    evt_params->domain_id = get_dependency_id(parameters->domain_id);
 
     status = fwk_thread_put_event(&event);
     if (status != FWK_SUCCESS) {
@@ -948,7 +1013,8 @@ static int scmi_perf_level_get_handler(fwk_id_t service_id,
     }
 
     /* Store service identifier to indicate there is a pending request */
-    scmi_perf_ctx.perf_ops_table[parameters->domain_id].service_id = service_id;
+    scmi_perf_ctx.perf_ops_table[fwk_id_get_element_idx(evt_params->domain_id)]
+        .service_id = service_id;
 
     return FWK_SUCCESS;
 
@@ -1178,7 +1244,9 @@ static void fast_channel_callback(uintptr_t param)
 {
     const struct mod_scmi_perf_domain_config *domain;
     struct mod_scmi_perf_fast_channel_limit *set_limit;
+    struct scmi_perf_domain_ctx *domain_ctx;
     uint32_t *set_level;
+    uint32_t tlevel, tmax, tmin;
     unsigned int i;
 
     for (i = 0; i < scmi_perf_ctx.domain_count; i++) {
@@ -1190,26 +1258,63 @@ static void fast_channel_callback(uintptr_t param)
             set_level =
                 (uint32_t *)((uintptr_t)domain->fast_channels_addr_scp
                                  [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET]);
+
+            domain_ctx = &scmi_perf_ctx.domain_ctx_table[i];
+
+            if (set_limit != 0x0) {
+                tmax = set_limit->range_max;
+                tmin = set_limit->range_min;
+            } else {
+                tmax = domain_ctx->level_limits.maximum;
+                tmin = domain_ctx->level_limits.minimum;
+            }
+
+            tlevel = (set_level != 0x0) ? *set_level : domain_ctx->curr_level;
+
+#    ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+            struct fc_perf_update update = {
+                .domain_id = get_dependency_id(i),
+                .level = tlevel,
+                .max_limit = tmax,
+                .min_limit = tmin,
+            };
+
+            perf_plugins_handler_update(&update);
+
+            tlevel = update.level;
+            tmax = update.adj_max_limit;
+            tmin = update.adj_min_limit;
+
+            perf_eval_performance(
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_SCMI_PERF, i),
+                &((struct mod_scmi_perf_level_limits){
+                    .minimum = tmin,
+                    .maximum = tmax,
+                }),
+                &tlevel);
+
+            scmi_perf_ctx.dvfs_api->set_level(get_dependency_id(i), 0, tlevel);
+#    else
+
             /*
              * Check for set_level
              */
-            if (set_level != NULL && *set_level != 0) {
-                perf_set_level(
-                    FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, i), 0, *set_level);
+            if (set_level != NULL && tlevel > 0) {
+                perf_set_level(get_dependency_id(i), 0, tlevel);
             }
             if (set_limit != NULL) {
-                if ((set_limit->range_max == 0) &&
-                    (set_limit->range_min == 0)) {
+                if ((tmax == 0) && (tmin == 0)) {
                     continue;
                 }
                 perf_set_limits(
-                    FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, i),
+                    get_dependency_id(i),
                     0,
                     &((struct mod_scmi_perf_level_limits){
-                        .minimum = set_limit->range_min,
-                        .maximum = set_limit->range_max,
+                        .minimum = tmin,
+                        .maximum = tmax,
                     }));
             }
+#    endif
         }
     }
 }
@@ -1362,6 +1467,16 @@ static void scmi_perf_notify_limits_updated(
         }
     }
 
+#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+    struct perf_plugins_perf_report perf_report = {
+        .dep_dom_id = domain_id,
+        .max_limit = range_max,
+        .min_limit = range_min,
+    };
+
+    perf_plugins_handler_report(&perf_report);
+#endif
+
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     limits_changed.agent_id = (uint32_t)cookie;
     limits_changed.domain_id = (uint32_t)idx;
@@ -1393,7 +1508,6 @@ static void scmi_perf_notify_level_updated(
 #endif
 
     struct scmi_perf_domain_ctx *domain_ctx;
-    int idx;
     const struct mod_scmi_perf_domain_config *domain;
     uint32_t *get_level;
 
@@ -1401,8 +1515,12 @@ static void scmi_perf_notify_level_updated(
     size_t level_id;
     int status;
 #endif
-
-    idx = (int)fwk_id_get_element_idx(domain_id);
+#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+    fwk_id_t dep_dom_id;
+#endif
+#if defined(BUILD_HAS_MOD_STATISTICS) || defined(BUILD_HAS_SCMI_NOTIFICATIONS)
+    int idx = fwk_id_get_element_idx(domain_id);
+#endif
 
 #ifdef BUILD_HAS_MOD_STATISTICS
     status = scmi_perf_ctx.dvfs_api->get_level_id(domain_id, level, &level_id);
@@ -1412,7 +1530,40 @@ static void scmi_perf_notify_level_updated(
     }
 #endif
 
-    domain = &(*scmi_perf_ctx.config->domains)[idx];
+#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+    struct perf_plugins_perf_report perf_report = {
+        .dep_dom_id = domain_id,
+        .level = level,
+    };
+
+    perf_plugins_handler_report(&perf_report);
+
+    /*
+     * The SCMI spec enforces that "[PERFORMANCE_LEVEL_GET] this command returns
+     * the current performance level of a domain", thus when a physical domain
+     * has been updated, we update all the relevant logical domains.
+     */
+    for (unsigned int i = 0; i < scmi_perf_ctx.domain_count; i++) {
+        dep_dom_id = get_dependency_id(i);
+
+        if (fwk_id_get_element_idx(dep_dom_id) ==
+            fwk_id_get_element_idx(domain_id)) {
+            domain = &(*scmi_perf_ctx.config->domains)[i];
+
+            if (domain->fast_channels_addr_scp != NULL) {
+                get_level =
+                    (uint32_t *)((uintptr_t)domain->fast_channels_addr_scp
+                                     [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET]);
+                if (get_level != 0x0) { /* note: get_level may not be defined */
+                    *get_level = level;
+                }
+            }
+        }
+    }
+
+#else
+    domain =
+        &(*scmi_perf_ctx.config->domains)[fwk_id_get_element_idx(domain_id)];
     if (domain->fast_channels_addr_scp != NULL) {
         get_level = (uint32_t *)((uintptr_t)domain->fast_channels_addr_scp
                                      [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET]);
@@ -1420,6 +1571,7 @@ static void scmi_perf_notify_level_updated(
             *get_level = level;
         }
     }
+#endif
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     level_changed.agent_id = (uint32_t)cookie;
@@ -1448,8 +1600,8 @@ static struct mod_scmi_perf_updated_api perf_update_api = {
 static int scmi_perf_init(fwk_id_t module_id, unsigned int element_count,
                           const void *data)
 {
-    int return_val;
-    int i;
+    int dvfs_doms_count;
+    uint32_t i;
     const struct mod_scmi_perf_config *config =
         (const struct mod_scmi_perf_config *)data;
 
@@ -1457,20 +1609,22 @@ static int scmi_perf_init(fwk_id_t module_id, unsigned int element_count,
         return FWK_E_PARAM;
     }
 
-    return_val = fwk_module_get_element_count(
-        FWK_ID_MODULE(FWK_MODULE_IDX_DVFS));
-    if (return_val <= 0) {
+    dvfs_doms_count =
+        fwk_module_get_element_count(FWK_ID_MODULE(FWK_MODULE_IDX_DVFS));
+    if (dvfs_doms_count <= 0) {
         return FWK_E_SUPPORT;
     }
 
-    scmi_perf_ctx.perf_ops_table =
-        fwk_mm_calloc((size_t)return_val, sizeof(struct perf_operations));
+    scmi_perf_ctx.dvfs_doms_count = (unsigned int)dvfs_doms_count;
 
-    scmi_perf_ctx.domain_ctx_table =
-        fwk_mm_calloc(return_val, sizeof(struct scmi_perf_domain_ctx));
+    scmi_perf_ctx.perf_ops_table =
+        fwk_mm_calloc(config->perf_doms_count, sizeof(struct perf_operations));
+
+    scmi_perf_ctx.domain_ctx_table = fwk_mm_calloc(
+        config->perf_doms_count, sizeof(struct scmi_perf_domain_ctx));
 
     scmi_perf_ctx.config = config;
-    scmi_perf_ctx.domain_count = (uint32_t)return_val;
+    scmi_perf_ctx.domain_count = config->perf_doms_count;
 #ifdef BUILD_HAS_FAST_CHANNELS
     scmi_perf_ctx.fast_channels_alarm_id = config->fast_channels_alarm_id;
     if (config->fast_channels_rate_limit < SCMI_PERF_FC_MIN_RATE_LIMIT) {
@@ -1482,11 +1636,15 @@ static int scmi_perf_init(fwk_id_t module_id, unsigned int element_count,
 #endif
 
     /* Initialize table */
-    for (i = 0; i < return_val; i++) {
+    for (i = 0; i < scmi_perf_ctx.domain_count; i++) {
         scmi_perf_ctx.perf_ops_table[i].service_id = FWK_ID_NONE;
     }
 
+#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+    return perf_plugins_handler_init(config);
+#else
     return FWK_SUCCESS;
+#endif
 }
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
@@ -1569,6 +1727,13 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
     }
 #endif
 
+#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+    status = perf_plugins_handler_bind();
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+#endif
+
     return fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_DVFS),
         FWK_ID_API(FWK_MODULE_IDX_DVFS, MOD_DVFS_API_IDX_DVFS),
@@ -1590,6 +1755,15 @@ static int scmi_perf_process_bind_request(fwk_id_t source_id,
         }
 
         *api = &perf_update_api;
+        break;
+
+    case MOD_SCMI_PERF_PLUGINS_API:
+#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+        return perf_plugins_handler_bind_request(
+            source_id, target_id, api_id, api);
+#else
+        return FWK_E_ACCESS;
+#endif
         break;
 
     default:
@@ -1633,7 +1807,7 @@ static int scmi_perf_stats_start(void)
             fwk_id_t domain_id;
             size_t opp_count;
 
-            domain_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, i);
+            domain_id = get_dependency_id(i);
             status = scmi_perf_ctx.dvfs_api->get_opp_count(domain_id,
                 &opp_count);
 
@@ -1667,17 +1841,19 @@ static int scmi_perf_start(fwk_id_t id)
 
     const struct mod_dvfs_domain_config *dvfs_config;
     struct opp_table *opp_table = NULL;
+    const struct mod_scmi_perf_domain_config *domain_cfg;
+    unsigned int dom_idx;
+    bool has_phy_group;
 
     scmi_perf_ctx.opp_table =
-        fwk_mm_calloc(scmi_perf_ctx.domain_count, sizeof(struct opp_table));
+        fwk_mm_calloc(scmi_perf_ctx.dvfs_doms_count, sizeof(struct opp_table));
 
-    for (i = 0; i < scmi_perf_ctx.domain_count; i++) {
-        domain_ctx = &scmi_perf_ctx.domain_ctx_table[i];
+    for (i = 0; i < scmi_perf_ctx.dvfs_doms_count; i++) {
         opp_table = &scmi_perf_ctx.opp_table[i];
 
         domain_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, i);
 
-        /* Get the number of levels for this domain */
+        /* Get the number of levels for this DVFS domain */
         status = scmi_perf_ctx.dvfs_api->get_opp_count(domain_id, &opp_count);
         if (status != FWK_SUCCESS) {
             return status;
@@ -1690,12 +1866,43 @@ static int scmi_perf_start(fwk_id_t id)
         opp_table->opps = &dvfs_config->opps[0];
         opp_table->opp_count = opp_count;
         opp_table->dvfs_id = domain_id;
+    }
 
-        domain_ctx->opp_table = opp_table;
+    /* Assign to each performance domain the correct OPP table */
+    for (dom_idx = 0; dom_idx < scmi_perf_ctx.domain_count; dom_idx++) {
+        domain_cfg = &(*scmi_perf_ctx.config->domains)[dom_idx];
 
-        /* init limits */
-        domain_ctx->level_limits.minimum = opp_table->opps[0].level;
-        domain_ctx->level_limits.maximum = opp_table->opps[opp_count - 1].level;
+        has_phy_group = fwk_optional_id_is_defined(domain_cfg->phy_group_id);
+        if (has_phy_group) {
+            domain_id = domain_cfg->phy_group_id;
+        } else {
+            domain_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, dom_idx);
+        }
+
+        domain_ctx = &scmi_perf_ctx.domain_ctx_table[dom_idx];
+
+        /*
+         * Search the corresponding physical domain for this performance domain
+         * and assign the correct opp_table.
+         */
+        for (i = 0; i < scmi_perf_ctx.dvfs_doms_count; i++) {
+            opp_table = &scmi_perf_ctx.opp_table[i];
+
+            if (fwk_id_is_equal(opp_table->dvfs_id, domain_id)) {
+                domain_ctx->opp_table = opp_table;
+
+                /* init limits */
+                domain_ctx->level_limits.minimum = opp_table->opps[0].level;
+                domain_ctx->level_limits.maximum =
+                    opp_table->opps[opp_table->opp_count - 1].level;
+
+                break;
+            }
+        }
+        if (domain_ctx->opp_table == NULL) {
+            /* The corresponding physical domain did not have a match */
+            return FWK_E_PANIC;
+        }
     }
 
 #ifdef BUILD_HAS_FAST_CHANNELS
@@ -1726,6 +1933,45 @@ static int scmi_perf_start(fwk_id_t id)
         }
     }
 
+#    ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+    struct mod_scmi_perf_fast_channel_limit *fc_limits;
+    struct mod_dvfs_opp opp;
+
+    /* Initialise FastChannels level to 0 and limits to min/max OPPs */
+
+    for (i = 0; i < scmi_perf_ctx.domain_count; i++) {
+        domain = &(*scmi_perf_ctx.config->domains)[i];
+        if (domain->fast_channels_addr_scp != NULL) {
+            for (j = 0; j < MOD_SCMI_PERF_FAST_CHANNEL_ADDR_INDEX_COUNT; j++) {
+                fc_elem = (void *)(uintptr_t)domain->fast_channels_addr_scp[j];
+                if (fc_elem != NULL) {
+                    if ((j == MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET) ||
+                        (j == MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET)) {
+                        status = scmi_perf_ctx.dvfs_api->get_sustained_opp(
+                            get_dependency_id(i), &opp);
+                        if (status != FWK_SUCCESS) {
+                            return status;
+                        }
+
+                        memset(fc_elem, opp.level, fast_channel_elem_size[j]);
+                    } else {
+                        /* _LIMIT_SET or _LIMIT_GET */
+                        domain_ctx = &scmi_perf_ctx.domain_ctx_table[i];
+                        opp_table = domain_ctx->opp_table;
+
+                        fc_limits =
+                            (struct mod_scmi_perf_fast_channel_limit *)fc_elem;
+                        fc_limits->range_min = opp_table->opps[0].level;
+                        fc_limits->range_max =
+                            opp_table->opps[opp_table->opp_count - 1].level;
+                    }
+                }
+            }
+        }
+    }
+
+#    else
+    /* Initialise FastChannels to 0 */
     for (i = 0; i < scmi_perf_ctx.domain_count; i++) {
         domain = &(*scmi_perf_ctx.config->domains)[i];
         if (domain->fast_channels_addr_scp != NULL) {
@@ -1737,6 +1983,7 @@ static int scmi_perf_start(fwk_id_t id)
             }
         }
     }
+#    endif
 #endif
 
 #ifdef BUILD_HAS_MOD_STATISTICS

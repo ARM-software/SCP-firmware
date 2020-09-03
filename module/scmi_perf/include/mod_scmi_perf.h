@@ -111,6 +111,33 @@ struct mod_scmi_perf_domain_config {
 
     /*! Flag indicating that statistics are collected for this domain */
     bool stats_collected;
+
+    /*!
+     * \brief Performance group.
+     *
+     * \details When there's a mapping of n logical domains from SCMI to one
+     *      physical DVFS domain, it is required to indicate the physical domain
+     *      associated with each logical domain. See architecture documentation
+     *      for further details.
+     *
+     * \note When not provided, the logical and physical domains are the same.
+     *      It is also expected that either none of the domains or all of them
+     *      are present.
+     */
+    fwk_optional_id_t phy_group_id;
+};
+
+/*!
+ * \brief Performance Plugins domain type
+ *
+ * \details The plugin's view on performance domains. See architecture
+ *      documentation for further details.
+ */
+enum plugin_domain_type {
+    PERF_PLUGIN_DOM_TYPE_PHYSICAL,
+    PERF_PLUGIN_DOM_TYPE_LOGICAL,
+
+    PERF_PLUGIN_DOM_TYPE_COUNT,
 };
 
 /*!
@@ -119,6 +146,13 @@ struct mod_scmi_perf_domain_config {
 struct mod_scmi_perf_config {
     /*! Per-domain configuration data */
     const struct mod_scmi_perf_domain_config (*domains)[];
+
+    /*!
+     * \brief Performance domain count
+     *
+     * \details This is the number of performance domains exposed via SCMI.
+     */
+    size_t perf_doms_count;
 
     /*!
      * \brief Fast Channels Alarm ID
@@ -143,6 +177,12 @@ struct mod_scmi_perf_config {
      * it is within current limits.
      */
     bool approximate_level;
+
+    /*! Table of Performance Plugins */
+    const struct mod_scmi_plugin_config *plugins;
+
+    /*! Number of Performance Plugins */
+    size_t plugins_count;
 };
 
 /*!
@@ -157,8 +197,22 @@ enum scmi_perf_api_idx {
     /*! Index of the updates notification API */
     MOD_SCMI_PERF_DVFS_UPDATE_API = 1,
 
+    /*! Index of the Performance Plugin Handler API */
+    MOD_SCMI_PERF_PLUGINS_API = 2,
+
     /*! Number of APIs */
-    MOD_SCMI_PERF_API_COUNT = 2
+    MOD_SCMI_PERF_API_COUNT = 3
+};
+
+/*!
+ * \brief Performance Plugins configuration data.
+ */
+struct mod_scmi_plugin_config {
+    /*! Performance Plugin identifier */
+    fwk_id_t id;
+
+    /*! Performance Plugin domain type mode */
+    enum plugin_domain_type dom_type;
 };
 
 /*!
@@ -287,6 +341,168 @@ int scmi_perf_limits_set_policy(
  */
 
 /*!
+ * \brief Performance Plugins performance data.
+ *
+ * \details This dataset is shared with the plugins. It contains the data
+ *      collected from fast-channels and provides a way for the plugins to
+ *      request an adjusted level/limit for the performance driver.
+ *      Depending ond the plugin's domain view (physical or logical), levels and
+ *      limits can be scalars or arrays.
+ */
+struct perf_plugins_perf_update {
+    /*! Performance domain identifier */
+    fwk_id_t domain_id;
+
+    /*! Performance level(s) - This is an input for the plugin */
+    uint32_t *level;
+
+    /*! Performance max limit(s) - This is an input for the plugin */
+    uint32_t *max_limit;
+
+    /*! Performance min limit(s) - This is an input for the plugin */
+    uint32_t *min_limit;
+
+    /*!
+     * \brief Adjusted performance max limit(s).
+     *
+     * \details A performance plugin should overwrite these values if wishes to
+     *      affect the performance limit for targeted domains.
+     */
+    uint32_t *adj_max_limit;
+
+    /*!
+     * \brief Adjusted performance min limit(s).
+     *
+     * \details A performance plugin should overwrite these valuee if wishes to
+     *      affect the performance limit for targeted domains.
+     */
+    uint32_t *adj_min_limit;
+};
+
+/*!
+ * \brief Performance Report data.
+ *
+ * \details This dataset is shared with the plugins when the performance driver
+ *      reports the final applied performance level/limit change.
+ */
+struct perf_plugins_perf_report {
+    /*! Physical (or dependency) domain identifier */
+    const fwk_id_t dep_dom_id;
+
+    /*! Performance level */
+    const uint32_t level;
+
+    /*! Performance max limit */
+    const uint32_t max_limit;
+
+    /*! Performance min limit */
+    const uint32_t min_limit;
+};
+
+/*!
+ * \brief Performance Plugin APIs.
+ *
+ * \details APIs exported by the Performance Plugins.
+ */
+enum scmi_perf_plugin_api_idx {
+    /*! Index for SCMI Performance Plugin API */
+    MOD_SCMI_PERF_PLUGIN_API = 0,
+
+    /*! Number of SCMI Performance Plugins APIs */
+
+    /*!
+     * \brief Number of SCMI Performance Plugins APIs
+     *
+     * \details Other APIs implemented by a performance plugin will start from
+     *      this index afterwards.
+     */
+    MOD_SCMI_PERF_PLUGIN_API_COUNT = 1,
+};
+
+/*!
+ * \brief Performance Plugins interface.
+ *
+ * \details The interface that performance plugins should implement to receive
+ *      updates on performance.
+ */
+struct perf_plugins_api {
+    /*!
+     * \brief Update performance data.
+     *
+     * \details This function is called periodically to inform the plugin with
+     *      the latest performance requests coming from SCMI.
+     *
+     * \param data Performance data
+     * \retval ::FWK_SUCCESS or one of FWK_E_* error codes.
+     *
+     * \return Status code representing the result of the operation.
+     */
+    int (*update)(struct perf_plugins_perf_update *data);
+
+    /*!
+     * \brief Report performance data.
+     *
+     * \details This function is called once a final performance level limit has
+     *      been applied.
+     *
+     * \param data Performance data
+     * \retval ::FWK_SUCCESS or one of FWK_E_* error codes.
+     *
+     * \note This function is optional. Plugins that are not interested to
+     *      receive a report of the last performance transition can omit this
+     *      function.
+     *
+     * \return Status code representing the result of the operation.
+     */
+    int (*report)(struct perf_plugins_perf_report *data);
+};
+
+/*!
+ * \brief Performance Request Limits data.
+ *
+ * \details Data container for the plugin hanlder, contains the requested
+ *      limits.
+ */
+struct plugin_limits_req {
+    /*! Performance domain identifier */
+    const fwk_id_t domain_id;
+
+    /*! Performance max limit requested */
+    const uint32_t max_limit;
+
+    /*! Performance min limit requested */
+    const uint32_t min_limit;
+};
+
+/*!
+ * \brief Plugin handler API - reserved for plugins only
+ *
+ * \details This interface can be used by any of the performance plugins to
+ *      interact with the plugin handler to asyncronously request a performance
+ *      level/limit.
+ *
+ * \warning This API should be used only in circumstances where waiting for the
+ *      next update call would cause a significant loss of performance.
+ *      Plugins should always try to use the update callback (see above)
+ *      whenever possible.
+ */
+struct perf_plugins_handler_api {
+    /*!
+     * \brief Set limits
+     *
+     * \param data Limits request data.
+     *
+     * \retval ::FWK_E_PARAM Invalid parameter.
+     * \retval ::FWK_E_DEVICE The request to the performance driver failed.
+     * \retval ::FWK_SUCCESS The operation succeeded. Note that the operation
+     *      may complete asyncronously depending on the performance driver.
+     *
+     * \return Status code representing the result of the operation.
+     */
+    int (*plugin_set_limits)(struct plugin_limits_req *data);
+};
+
+/*!
  * \}
  */
 
@@ -294,4 +510,4 @@ int scmi_perf_limits_set_policy(
  * \}
  */
 
-#endif /* SCP_SCMI_PERF_H */
+#endif /* MOD_SCMI_PERF_H */
