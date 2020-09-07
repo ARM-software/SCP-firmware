@@ -912,6 +912,12 @@ static int scmi_perf_describe_fast_channels(fwk_id_t service_id,
         goto exit;
     }
 
+    if (parameters->message_id >= MOD_SCMI_PERF_COMMAND_COUNT) {
+        return_values.status = SCMI_NOT_FOUND;
+
+        goto exit;
+    }
+
     switch (parameters->message_id) {
     case MOD_SCMI_PERF_LEVEL_GET:
         chan_index = MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_GET;
@@ -938,7 +944,7 @@ static int scmi_perf_describe_fast_channels(fwk_id_t service_id,
         break;
 
     default:
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = SCMI_NOT_SUPPORTED;
         goto exit;
 
     }
