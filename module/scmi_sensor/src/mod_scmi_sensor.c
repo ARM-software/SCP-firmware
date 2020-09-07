@@ -10,9 +10,6 @@
 
 #include <internal/scmi_sensor.h>
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
-#    include <mod_resource_perms.h>
-#endif
 #include <mod_scmi.h>
 #include <mod_scmi_sensor.h>
 #include <mod_sensor.h>
@@ -32,6 +29,10 @@
 #include <string.h>
 
 #define MOD_SCMI_SENSOR_NOTIFICATION_COUNT 1
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+#    include <mod_resource_perms.h>
+#endif
 
 struct sensor_operations {
     /*
@@ -54,7 +55,7 @@ struct scmi_sensor_ctx {
     /* Pointer to a table of sensor operations */
     struct sensor_operations *sensor_ops_table;
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     /* SCMI Resource Permissions API */
     const struct mod_res_permissions_api *res_perms_api;
 #endif
@@ -575,7 +576,7 @@ static int scmi_sensor_get_scmi_protocol_id(fwk_id_t protocol_id,
 /*
  * SCMI Resource Permissions handler
  */
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 static unsigned int get_sensor_id(const uint32_t *payload)
 {
     /*
@@ -632,7 +633,7 @@ static int scmi_sensor_message_handler(fwk_id_t protocol_id,
                                        unsigned int message_id)
 {
     int32_t return_value;
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     int status;
 #endif
 
@@ -652,7 +653,7 @@ static int scmi_sensor_message_handler(fwk_id_t protocol_id,
         goto error;
     }
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     status = scmi_sensor_permissions_handler(
         service_id, payload, payload_size, message_id);
     if (status != FWK_SUCCESS) {
@@ -786,7 +787,7 @@ static int scmi_sensor_bind(fwk_id_t id, unsigned int round)
         return status;
     }
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
         FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS, MOD_RES_PERM_RESOURCE_PERMS),

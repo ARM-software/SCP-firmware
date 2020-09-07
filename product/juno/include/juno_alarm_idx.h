@@ -36,7 +36,7 @@ enum juno_dvfs_alarm_idx {
 enum juno_misc_alarm_idx {
     JUNO_PPU_ALARM_IDX = JUNO_DVFS_ALARM_IDX_CNT,
     JUNO_THERMAL_ALARM_IDX,
-#ifdef BUILD_HAS_STATISTICS
+#ifdef BUILD_HAS_MOD_STATISTICS
     JUNO_STATISTICS_ALARM_IDX,
 #endif
     JUNO_SYSTEM_POWER_ALARM_IDX,

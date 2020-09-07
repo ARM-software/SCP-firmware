@@ -10,9 +10,6 @@
 #include <mod_power_domain.h>
 
 #include <fwk_log.h>
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
-#    include <mod_resource_perms.h>
-#endif
 #include <mod_scmi.h>
 #include <mod_scmi_system_power.h>
 #include <mod_timer.h>
@@ -28,6 +25,10 @@
 
 #include <stddef.h>
 
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+#    include <mod_resource_perms.h>
+#endif
+
 #define INVALID_AGENT_ID UINT32_MAX
 
 struct scmi_sys_power_ctx {
@@ -41,7 +42,7 @@ struct scmi_sys_power_ctx {
     int agent_count;
     fwk_id_t *system_power_notifications;
 #endif
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     /* SCMI Resource Permissions API */
     const struct mod_res_permissions_api *res_perms_api;
 #endif
@@ -522,7 +523,7 @@ FWK_WEAK int scmi_sys_power_state_set_policy(
     return FWK_SUCCESS;
 }
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 
 /*
  * SCMI Resource Permissions handler
@@ -576,7 +577,7 @@ static int scmi_sys_power_handler(fwk_id_t protocol_id,
                                   unsigned int message_id)
 {
     int32_t return_value;
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     int status;
 #endif
 
@@ -597,7 +598,7 @@ static int scmi_sys_power_handler(fwk_id_t protocol_id,
         goto error;
     }
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     status = scmi_sys_power_permissions_handler(
         service_id, payload, payload_size, message_id);
     if (status != FWK_SUCCESS) {
@@ -671,7 +672,7 @@ static int scmi_sys_power_bind(fwk_id_t id, unsigned int round)
     if (status != FWK_SUCCESS)
         return status;
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
         FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS, MOD_RES_PERM_RESOURCE_PERMS),

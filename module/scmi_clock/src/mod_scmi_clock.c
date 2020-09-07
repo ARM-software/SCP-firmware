@@ -29,7 +29,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 #    include <mod_resource_perms.h>
 #endif
 
@@ -81,7 +81,7 @@ struct scmi_clock_ctx {
     /* Pointer to a table of clock operations */
     struct clock_operations *clock_ops;
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     /* SCMI Resource Permissions API */
     const struct mod_res_permissions_api *res_perms_api;
 #endif
@@ -574,7 +574,7 @@ FWK_WEAK int mod_scmi_clock_config_set_policy(
     return FWK_SUCCESS;
 }
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 
 /*
  * SCMI Resource Permissions handler
@@ -1259,7 +1259,7 @@ static int scmi_clock_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     const uint32_t *payload, size_t payload_size, unsigned int message_id)
 {
     int32_t return_value;
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     int status;
 #endif
 
@@ -1278,7 +1278,7 @@ static int scmi_clock_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
         goto error;
     }
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     status = scmi_clock_permissions_handler(
         service_id, payload, payload_size, message_id);
     if (status != FWK_SUCCESS) {
@@ -1349,7 +1349,7 @@ static int scmi_clock_bind(fwk_id_t id, unsigned int round)
     if (status != FWK_SUCCESS)
         return status;
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
         FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS, MOD_RES_PERM_RESOURCE_PERMS),

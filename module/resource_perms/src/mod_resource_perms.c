@@ -47,7 +47,7 @@ struct res_perms_ctx {
     /*! Number of devices for the platform. */
     uint32_t device_count;
 
-#ifdef BUILD_HAS_SCMI_RESET
+#ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
     /*! Number of reset domain resources for the platform. */
     uint32_t reset_domain_count;
 #endif
@@ -90,7 +90,7 @@ struct res_perms_backup {
     /*! \brief Sensor:Resource permissions. */
     mod_res_perms_t *scmi_sensor_perms;
 
-#ifdef BUILD_HAS_SCMI_RESET
+#ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
     /*! \brief Reset Domain:Resource permissions. */
     mod_res_perms_t *scmi_reset_domain_perms;
 #endif
@@ -390,7 +390,7 @@ static int mod_res_resource_id_to_index(
         }
         return FWK_E_PARAM;
 
-#ifdef BUILD_HAS_SCMI_RESET
+#ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
     case MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN:
         if ((message_id >= MOD_SCMI_RESET_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_RESET_NOTIFY)) {
@@ -661,7 +661,7 @@ static enum mod_res_perms_permissions agent_resource_permissions(
             res_perms_ctx.agent_permissions->scmi_sensor_perms[resource_idx];
         break;
 
-#ifdef BUILD_HAS_SCMI_RESET
+#ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
     case MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN:
         if (res_perms_ctx.agent_permissions->scmi_reset_domain_perms == NULL)
             return MOD_RES_PERMS_ACCESS_ALLOWED;
@@ -860,7 +860,7 @@ static int set_agent_resource_clock_permissions(
     return FWK_SUCCESS;
 }
 
-#ifdef BUILD_HAS_SCMI_RESET
+#ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
 
 static int set_agent_resource_reset_permissions(
     uint32_t agent_id,
@@ -990,7 +990,7 @@ static int mod_res_agent_set_permissions(
             set_agent_resource_sensor_permissions(agent_id, resource_id, flags);
         break;
 
-#ifdef BUILD_HAS_SCMI_RESET
+#ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
     case MOD_RES_RESET_DOMAIN_DEVICE:
         status =
             set_agent_resource_reset_permissions(agent_id, resource_id, flags);
@@ -1187,7 +1187,7 @@ static void mod_res_agent_copy_config(
         cmd_count = MOD_SCMI_SENSOR_COMMAND_COUNT;
         resource_count = res_perms_ctx.config->sensor_resource_count;
         break;
-#ifdef BUILD_HAS_SCMI_RESET
+#ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
     case MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN:
         cmd_count = MOD_SCMI_RESET_COMMAND_COUNT;
         resource_count = res_perms_ctx.config->reset_domain_resource_count;
@@ -1257,7 +1257,7 @@ static int mod_res_agent_reset_config(uint32_t agent_id, uint32_t flags)
             MOD_SCMI_PROTOCOL_ID_SENSOR);
     }
 
-#ifdef BUILD_HAS_SCMI_RESET
+#ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
     if (res_perms_backup.scmi_reset_domain_perms != NULL) {
         mod_res_agent_copy_config(
             agent_id,
@@ -1317,7 +1317,7 @@ static int mod_res_perms_resources_init(
         res_perms_ctx.pd_count = config->pd_count;
         res_perms_ctx.perf_count = config->perf_count;
         res_perms_ctx.device_count = config->device_count;
-#ifdef BUILD_HAS_SCMI_RESET
+#ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
         res_perms_ctx.reset_domain_count = config->reset_domain_count;
 #endif
         res_perms_ctx.domain_devices =

@@ -28,7 +28,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 #    include <mod_resource_perms.h>
 #endif
 
@@ -62,7 +62,7 @@ struct scmi_voltd_ctx {
     /* Pointer to a table of domain operations */
     struct voltd_operations *voltd_ops;
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     /* SCMI Resource Permissions API */
     const struct mod_res_permissions_api *res_perms_api;
 #endif
@@ -169,7 +169,7 @@ static int get_device(fwk_id_t service_id, unsigned int elt_idx,
     return FWK_SUCCESS;
 }
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 /*
  * SCMI Resource Permissions handler
  */
@@ -611,7 +611,7 @@ static int scmi_voltd_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
         goto error;
     }
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdefBUILD_HAS_MOD_RESOURCE_PERMS
     if (scmi_voltd_permissions_handler(service_id, payload, payload_size,
                                        message_id) != FWK_SUCCESS) {
         outmsg = SCMI_DENIED;
@@ -672,7 +672,7 @@ static int scmi_voltd_bind(fwk_id_t id, unsigned int round)
     if (status != FWK_SUCCESS)
         return status;
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdefBUILD_HAS_MOD_RESOURCE_PERMS
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
                              FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS,
                                         MOD_RES_PERM_RESOURCE_PERMS),

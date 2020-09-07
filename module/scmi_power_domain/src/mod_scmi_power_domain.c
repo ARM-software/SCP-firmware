@@ -11,15 +11,8 @@
 #include <internal/scmi_power_domain.h>
 
 #include <mod_power_domain.h>
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
-#    include <mod_resource_perms.h>
-#endif
 #include <mod_scmi.h>
 #include <mod_scmi_power_domain.h>
-
-#ifdef BUILD_HAS_MOD_DEBUG
-#    include <mod_debug.h>
-#endif
 
 #include <fwk_assert.h>
 #include <fwk_element.h>
@@ -36,6 +29,14 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+#    include <mod_resource_perms.h>
+#endif
+
+#ifdef BUILD_HAS_MOD_DEBUG
+#    include <mod_debug.h>
+#endif
 
 #define MOD_SCMI_PD_NOTIFICATION_COUNT 2
 
@@ -76,7 +77,7 @@ struct scmi_pd_ctx {
     /* Pointer to a table of scmi_pd operations */
     struct scmi_pd_operations *ops;
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     /* SCMI Resource Permissions API */
     const struct mod_res_permissions_api *res_perms_api;
 #endif
@@ -886,7 +887,7 @@ FWK_WEAK int scmi_pd_power_state_set_policy(
     return FWK_SUCCESS;
 }
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 
 /*
  * SCMI Resource Permissions handler
@@ -987,7 +988,7 @@ static int scmi_pd_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     const uint32_t *payload, size_t payload_size, unsigned int message_id)
 {
     int32_t return_value;
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     int status;
 #endif
 
@@ -1006,7 +1007,7 @@ static int scmi_pd_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
         goto error;
     }
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     status = scmi_pd_permissions_handler(
         service_id, payload, payload_size, message_id, &return_value);
     if (status != FWK_SUCCESS)
@@ -1130,7 +1131,7 @@ static int scmi_pd_bind(fwk_id_t id, unsigned int round)
         return status;
     #endif
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
         FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS, MOD_RES_PERM_RESOURCE_PERMS),
