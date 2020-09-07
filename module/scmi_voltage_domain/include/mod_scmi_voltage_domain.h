@@ -24,7 +24,7 @@
  * \{
  */
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 /*!
  * \brief Permission flags governing the ability to use certain SCMI commands to
  *      interact with a voltage domain.

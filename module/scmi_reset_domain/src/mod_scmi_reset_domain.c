@@ -25,7 +25,7 @@
 
 #include <string.h>
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 #    include <mod_resource_perms.h>
 #endif
 
@@ -52,7 +52,7 @@ struct scmi_rd_ctx {
     const struct mod_scmi_notification_api *scmi_notification_api;
 #endif
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     /* SCMI Resource Permissions API */
     const struct mod_res_permissions_api *res_perms_api;
 #endif
@@ -500,7 +500,7 @@ static void scmi_reset_issued_notify(uint32_t domain_id,
 /*
  * SCMI Resource Permissions handler
  */
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 static unsigned int get_reset_domain_id(const uint32_t *payload)
 {
     struct scmi_reset_domain_request_a2p *params;
@@ -578,7 +578,7 @@ static int scmi_reset_message_handler(fwk_id_t protocol_id,
         goto error;
     }
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     if (scmi_reset_domain_permissions_handler(
             service_id, payload, payload_size, message_id) != FWK_SUCCESS) {
         return_value = SCMI_DENIED;
@@ -661,8 +661,7 @@ static int scmi_reset_bind(fwk_id_t id, unsigned int round)
     if (scmi_rd_ctx.plat_reset_domain_count == 0)
         return FWK_E_SUPPORT;
 
-
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
         FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS, MOD_RES_PERM_RESOURCE_PERMS),

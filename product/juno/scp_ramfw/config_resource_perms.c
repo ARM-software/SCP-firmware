@@ -12,7 +12,7 @@
 #include "juno_clock.h"
 #include "juno_scmi.h"
 
-#ifdef BUILD_HAS_SCMI_RESET
+#ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
 #    include <mod_juno_reset_domain.h>
 #endif
 
@@ -288,7 +288,7 @@ static mod_res_perms_t
  * 1, MOD_SCMI_RESET_REQUEST
  * 2, MOD_SCMI_RESET_NOTIFY
  */
-#ifdef BUILD_HAS_SCMI_RESET
+#ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
 
 #    define JUNO_RESET_DOMAIN_RESOURCE_CMDS 3
 #    define JUNO_RESET_DOMAIN_RESOURCE_ELEMENTS \
@@ -324,7 +324,7 @@ static struct mod_res_agent_permission agent_permissions = {
     .scmi_pd_perms = &scmi_pd_perms[0][0][0],
     .scmi_perf_perms = &scmi_perf_perms[0][0][0],
     .scmi_sensor_perms = &scmi_sensor_perms[0][0][0],
-#ifdef BUILD_HAS_SCMI_RESET
+#ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
     .scmi_reset_domain_perms = &scmi_reset_domain_perms[0][0][0],
 #endif
 };
@@ -457,7 +457,7 @@ static struct mod_res_domain_device devices_io[] = {
             JUNO_CLOCK_IDX_I2SCLK),
         .type = MOD_RES_CLOCK_DOMAIN_DEVICE,
     },
-#ifdef BUILD_HAS_SCMI_RESET
+#ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
     {
         .device_id = FWK_ID_ELEMENT_INIT(
             FWK_MODULE_IDX_RESET_DOMAIN,
@@ -500,7 +500,7 @@ struct fwk_module_config config_resource_perms = {
             .perf_cmd_count = JUNO_PERF_RESOURCE_CMDS,
             .perf_resource_count = JUNO_PERF_RESOURCE_ELEMENTS,
             .device_count = JUNO_RES_PERMS_DEVICES_COUNT,
-#ifdef BUILD_HAS_SCMI_RESET
+#ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
             .reset_domain_count = JUNO_RESET_DOMAIN_IDX_COUNT,
 #endif
             .domain_devices = (uintptr_t)&juno_devices,

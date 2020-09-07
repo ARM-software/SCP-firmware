@@ -57,7 +57,7 @@ static const struct fwk_element *get_service_table(fwk_id_t module_id)
     return service_table;
 }
 
-#ifndef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifndef BUILD_HAS_MOD_RESOURCE_PERMS
 
 /* PSCI agent has no access to perf and sensor protocols */
 static const uint32_t dis_protocol_list_psci[] = {
@@ -80,7 +80,7 @@ static struct mod_scmi_agent agent_table[] = {
 const struct fwk_module_config config_scmi = {
     .data = &((struct mod_scmi_config){
         .protocol_count_max = 9,
-#ifndef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifndef BUILD_HAS_MOD_RESOURCE_PERMS
         .dis_protocol_count_psci = FWK_ARRAY_SIZE(dis_protocol_list_psci),
         .dis_protocol_list_psci = dis_protocol_list_psci,
 #endif

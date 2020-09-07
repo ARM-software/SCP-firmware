@@ -107,7 +107,7 @@ static const struct fwk_element *get_element_table(fwk_id_t module_id)
     return element_table;
 }
 
-#ifndef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifndef BUILD_HAS_MOD_RESOURCE_PERMS
 
 /* PSCI agent has no access to clock, perf and sensor protocol
  */
@@ -133,7 +133,7 @@ struct fwk_module_config config_scmi = {
     .data =
         &(struct mod_scmi_config){
             .protocol_count_max = 6,
-#ifndef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifndef BUILD_HAS_MOD_RESOURCE_PERMS
             .dis_protocol_count_psci = FWK_ARRAY_SIZE(dis_protocol_list_psci),
             .dis_protocol_list_psci = dis_protocol_list_psci,
 #endif

@@ -11,14 +11,8 @@
 #include <internal/scmi_perf.h>
 
 #include <mod_dvfs.h>
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
-#    include <mod_resource_perms.h>
-#endif
 #include <mod_scmi.h>
 #include <mod_scmi_perf.h>
-#ifdef BUILD_HAS_STATISTICS
-#include <mod_stats.h>
-#endif
 #include <mod_timer.h>
 
 #include <fwk_assert.h>
@@ -34,6 +28,14 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+#    include <mod_resource_perms.h>
+#endif
+
+#ifdef BUILD_HAS_MOD_STATISTICS
+#    include <mod_stats.h>
+#endif
 
 #define MOD_SCMI_PERF_NOTIFICATION_COUNT 2
 
@@ -141,7 +143,7 @@ struct scmi_perf_ctx {
     /* DVFS module API */
     const struct mod_dvfs_domain_api *dvfs_api;
 
-#ifdef BUILD_HAS_STATISTICS
+#ifdef BUILD_HAS_MOD_STATISTICS
     /* Statistics module API */
     const struct mod_stats_api *stats_api;
 #endif
@@ -167,7 +169,7 @@ struct scmi_perf_ctx {
     uint32_t fast_channels_rate_limit;
 #endif
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     /* SCMI Resource Permissions API */
     const struct mod_res_permissions_api *res_perms_api;
 #endif
@@ -194,7 +196,7 @@ static const fwk_id_t scmi_perf_get_limits =
     FWK_ID_EVENT_INIT(FWK_MODULE_IDX_SCMI_PERF,
                       SCMI_PERF_EVENT_IDX_LIMITS_GET_REQUEST);
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 
 /*
  * SCMI Resource Permissions handler
@@ -281,7 +283,7 @@ static int scmi_perf_protocol_attributes_handler(fwk_id_t service_id,
     };
     uint32_t addr_low = 0, addr_high = 0, len = 0;
 
-#ifdef BUILD_HAS_STATISTICS
+#ifdef BUILD_HAS_MOD_STATISTICS
     scmi_perf_ctx.stats_api->get_statistics_desc(
         fwk_module_id_scmi_perf, &addr_low, &addr_high, &len);
 #endif
@@ -356,7 +358,7 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
     if (status != FWK_SUCCESS)
         goto exit;
 
-#ifndef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifndef BUILD_HAS_MOD_RESOURCE_PERMS
     permissions =
         MOD_SCMI_PERF_PERMS_SET_LIMITS | MOD_SCMI_PERF_PERMS_SET_LEVEL;
 #else
@@ -1055,7 +1057,7 @@ static int scmi_perf_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     const uint32_t *payload, size_t payload_size, unsigned int message_id)
 {
     int32_t return_value;
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     int status;
 #endif
 
@@ -1074,7 +1076,7 @@ static int scmi_perf_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
         goto error;
     }
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     status = scmi_perf_permissions_handler(service_id, payload, message_id);
     if (status != FWK_SUCCESS) {
         if (status == FWK_E_PARAM)
@@ -1190,14 +1192,14 @@ static void scmi_perf_notify_level_updated(
     int idx;
     const struct mod_scmi_perf_domain_config *domain;
     uint32_t *get_level;
-#ifdef BUILD_HAS_STATISTICS
+#ifdef BUILD_HAS_MOD_STATISTICS
     size_t level_id;
     int status;
 #endif
 
     idx = fwk_id_get_element_idx(domain_id);
 
-#ifdef BUILD_HAS_STATISTICS
+#ifdef BUILD_HAS_MOD_STATISTICS
     status = scmi_perf_ctx.dvfs_api->get_level_id(domain_id, level, &level_id);
     if (status == FWK_SUCCESS)
         scmi_perf_ctx.stats_api->update_domain(fwk_module_id_scmi_perf,
@@ -1326,7 +1328,7 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
     }
 #endif
 
-#ifdef BUILD_HAS_STATISTICS
+#ifdef BUILD_HAS_MOD_STATISTICS
     if (scmi_perf_ctx.config->stats_enabled) {
         status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_STATISTICS),
             FWK_ID_API(FWK_MODULE_IDX_STATISTICS, MOD_STATS_API_IDX_STATS),
@@ -1336,7 +1338,7 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
     }
 #endif
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
         FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS, MOD_RES_PERM_RESOURCE_PERMS),
@@ -1370,7 +1372,7 @@ static int scmi_perf_process_bind_request(fwk_id_t source_id,
     return FWK_SUCCESS;
 }
 
-#ifdef BUILD_HAS_STATISTICS
+#ifdef BUILD_HAS_MOD_STATISTICS
 static int scmi_perf_stats_start(void)
 {
     const struct mod_scmi_perf_domain_config *domain;
@@ -1464,7 +1466,7 @@ static int scmi_perf_start(fwk_id_t id)
     }
 #endif
 
-#ifdef BUILD_HAS_STATISTICS
+#ifdef BUILD_HAS_MOD_STATISTICS
     status = scmi_perf_stats_start();
     if (status != FWK_SUCCESS)
         return status;

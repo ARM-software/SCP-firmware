@@ -12,9 +12,6 @@
 #include <internal/scmi.h>
 #include <internal/scmi_base.h>
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
-#    include <mod_resource_perms.h>
-#endif
 #include <mod_scmi.h>
 #include <mod_scmi_header.h>
 
@@ -29,6 +26,10 @@
 #include <fwk_notification.h>
 #include <fwk_status.h>
 #include <fwk_thread.h>
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+#    include <mod_resource_perms.h>
+#endif
 
 #ifdef BUILD_HAS_MULTITHREADING
 #    include <fwk_multi_thread.h>
@@ -103,7 +104,7 @@ struct scmi_ctx {
     /* Table of service contexts */
     struct scmi_service_ctx *service_ctx_table;
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     /* SCMI Resource Permissions API */
     const struct mod_res_permissions_api *res_perms_api;
 #endif
@@ -138,7 +139,7 @@ static int scmi_base_discover_list_protocols_handler(
     fwk_id_t service_id, const uint32_t *payload);
 static int scmi_base_discover_agent_handler(
     fwk_id_t service_id, const uint32_t *payload);
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 static int scmi_base_set_device_permissions(
     fwk_id_t service_id,
     const uint32_t *payload);
@@ -162,7 +163,7 @@ static int (*const base_handler_table[])(fwk_id_t, const uint32_t *) = {
     [MOD_SCMI_BASE_DISCOVER_LIST_PROTOCOLS] =
         scmi_base_discover_list_protocols_handler,
     [MOD_SCMI_BASE_DISCOVER_AGENT] = scmi_base_discover_agent_handler,
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     [MOD_SCMI_BASE_SET_DEVICE_PERMISSIONS] = scmi_base_set_device_permissions,
     [MOD_SCMI_BASE_SET_PROTOCOL_PERMISSIONS] =
         scmi_base_set_protocol_permissions,
@@ -182,7 +183,7 @@ static const unsigned int base_payload_size_table[] = {
         sizeof(struct scmi_base_discover_list_protocols_a2p),
     [MOD_SCMI_BASE_DISCOVER_AGENT] =
         sizeof(struct scmi_base_discover_agent_a2p),
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     [MOD_SCMI_BASE_SET_DEVICE_PERMISSIONS] =
         sizeof(struct scmi_base_set_device_permissions_a2p),
     [MOD_SCMI_BASE_SET_PROTOCOL_PERMISSIONS] =
@@ -694,7 +695,7 @@ static int scmi_base_protocol_attributes_handler(fwk_id_t service_id,
     int status;
     unsigned int agent_id;
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     size_t global_protocol_count;
     enum mod_res_perms_permissions perms;
     uint8_t protocol_id;
@@ -707,7 +708,7 @@ static int scmi_base_protocol_attributes_handler(fwk_id_t service_id,
     if (status != FWK_SUCCESS)
         return status;
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     for (index = 0, protocol_count = 0, global_protocol_count = 0;
          (index < FWK_ARRAY_SIZE(scmi_ctx.scmi_protocol_id_to_idx)) &&
          (global_protocol_count < scmi_ctx.protocol_count);
@@ -865,7 +866,7 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
     size_t avail_protocol_count = 0;
     unsigned int index;
     uint8_t protocol_id;
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     enum mod_res_perms_permissions perms;
 #else
     unsigned int dis_protocol_list_psci_index;
@@ -878,7 +879,7 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
     if (status != FWK_SUCCESS)
         goto error;
 
-#ifndef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifndef BUILD_HAS_MOD_RESOURCE_PERMS
     status = get_agent_type(agent_id, &agent_type);
     if (status != FWK_SUCCESS)
         goto error;
@@ -901,7 +902,7 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
     parameters = (const struct scmi_base_discover_list_protocols_a2p *)payload;
     skip = parameters->skip;
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     protocol_count_max = (scmi_ctx.protocol_count < (skip + entry_count)) ?
                          scmi_ctx.protocol_count : (skip + entry_count);
 #else
@@ -934,7 +935,7 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
 
         protocol_id = index;
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
         /*
          * Check that the agent has the permission to access the protocol
          */
@@ -1067,7 +1068,7 @@ exit:
     return FWK_SUCCESS;
 }
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 
 /*
  * BASE_SET_DEVICE_PERMISSIONS
@@ -1305,7 +1306,7 @@ static int scmi_base_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
         goto error;
     }
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     if (scmi_base_permissions_handler(
             service_id, payload, payload_size, message_id) != FWK_SUCCESS) {
         return_value = SCMI_DENIED;
@@ -1453,7 +1454,7 @@ static int scmi_bind(fwk_id_t id, unsigned int round)
         protocol->message_handler = protocol_api->message_handler;
     }
 
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
         FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS, MOD_RES_PERM_RESOURCE_PERMS),
@@ -1524,7 +1525,7 @@ static int scmi_process_event(const struct fwk_event *event,
     const void *payload;
     size_t payload_size;
     unsigned int protocol_idx;
-#ifndef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifndef BUILD_HAS_MOD_RESOURCE_PERMS
     enum scmi_agent_type agent_type;
     unsigned int agent_id;
     unsigned int dis_protocol_list_psci_index;
@@ -1581,7 +1582,7 @@ static int scmi_process_event(const struct fwk_event *event,
         return FWK_SUCCESS;
     }
 
-#ifndef BUILD_HAS_RESOURCE_PERMISSIONS
+#ifndef BUILD_HAS_MOD_RESOURCE_PERMS
     status = get_agent_id(event->target_id, &agent_id);
     if (status != FWK_SUCCESS) {
         FWK_LOG_ERR("[SCMI] %s: Unable to get agent id", service_name);

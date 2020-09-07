@@ -332,7 +332,7 @@ struct mod_res_agent_permission {
     /*! \brief Sensor:Resource permissions. */
     mod_res_perms_t *scmi_sensor_perms;
 
-#ifdef BUILD_HAS_SCMI_RESET
+#ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
     /*! \brief Reset Domain:Resource permissions. */
     mod_res_perms_t *scmi_reset_domain_perms;
 #endif
@@ -497,7 +497,7 @@ struct mod_res_resource_perms_config {
     /*! \brief Number of perf domain resources supported by the platform. */
     uint32_t perf_resource_count;
 
-#ifdef BUILD_HAS_SCMI_RESET
+#ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
     /*! \brief Number of reset domains supported by the platform. */
     uint32_t reset_domain_count;
 
