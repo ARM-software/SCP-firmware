@@ -29,18 +29,32 @@ static const struct fwk_element mhu_element_table[] = {
                                                         SCP_MHU_SCP_AP_SND_S_CLUS0,
                                                     .channel = 0,
                                                 }) },
-    [SCP_TC0_MHU_DEVICE_IDX_SCP_AP_NS_CLUS0] = { .name = "MHU_SCP_AP_NS",
-                                                 .sub_element_count = 1,
-                                                 .data = &((
-                                                     struct
-                                                     mod_mhu2_channel_config){
-                                                     .irq = MHU_AP_NONSEC_IRQ,
-                                                     .recv =
-                                                         SCP_MHU_SCP_AP_RCV_NS_CLUS0,
-                                                     .send =
-                                                         SCP_MHU_SCP_AP_SND_NS_CLUS0,
-                                                     .channel = 0,
-                                                 }) },
+    [SCP_TC0_MHU_DEVICE_IDX_SCP_AP_NS_HP_CLUS0] = { .name = "MHU_SCP_AP_NS_HP",
+                                                    .sub_element_count = 1,
+                                                    .data = &((
+                                                        struct
+                                                        mod_mhu2_channel_config){
+                                                        .irq =
+                                                            MHU_AP_NONSEC_HP_IRQ,
+                                                        .recv =
+                                                            SCP_MHU_SCP_AP_RCV_NS_CLUS0,
+                                                        .send =
+                                                            SCP_MHU_SCP_AP_SND_NS_CLUS0,
+                                                        .channel = 0,
+                                                    }) },
+    [SCP_TC0_MHU_DEVICE_IDX_SCP_AP_NS_LP_CLUS0] = { .name = "MHU_SCP_AP_NS_LP",
+                                                    .sub_element_count = 1,
+                                                    .data = &((
+                                                        struct
+                                                        mod_mhu2_channel_config){
+                                                        .irq =
+                                                            MHU_AP_NONSEC_LP_IRQ,
+                                                        .recv =
+                                                            SCP_MHU_SCP_AP_RCV_NS_CLUS0,
+                                                        .send =
+                                                            SCP_MHU_SCP_AP_SND_NS_CLUS0,
+                                                        .channel = 1,
+                                                    }) },
     [SCP_TC0_MHU_DEVICE_IDX_COUNT] = { 0 },
 };
 

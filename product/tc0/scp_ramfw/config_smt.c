@@ -40,24 +40,44 @@ static const struct fwk_element smt_element_table[] = {
                                                 FWK_MODULE_IDX_MHU2,
                                                 0),
                                         }) },
-    [SCP_TC0_SCMI_SERVICE_IDX_OSPM] = { .name = "OSPM",
-                                        .data = &((
-                                            struct mod_smt_channel_config){
-                                            .type = MOD_SMT_CHANNEL_TYPE_SLAVE,
-                                            .policies =
-                                                MOD_SMT_POLICY_INIT_MAILBOX,
-                                            .mailbox_address = (uintptr_t)
-                                                SCP_SCMI_PAYLOAD_NS_A2P_BASE,
-                                            .mailbox_size =
-                                                SCP_SCMI_PAYLOAD_SIZE,
-                                            .driver_id = FWK_ID_SUB_ELEMENT_INIT(
-                                                FWK_MODULE_IDX_MHU2,
-                                                SCP_TC0_MHU_DEVICE_IDX_SCP_AP_NS_CLUS0,
-                                                0),
-                                            .driver_api_id = FWK_ID_API_INIT(
-                                                FWK_MODULE_IDX_MHU2,
-                                                0),
-                                        }) },
+    [SCP_TC0_SCMI_SERVICE_IDX_OSPM_0] = { .name = "OSPM0",
+                                          .data = &((
+                                              struct mod_smt_channel_config){
+                                              .type =
+                                                  MOD_SMT_CHANNEL_TYPE_SLAVE,
+                                              .policies =
+                                                  MOD_SMT_POLICY_INIT_MAILBOX,
+                                              .mailbox_address = (uintptr_t)
+                                                  SCP_SCMI_PAYLOAD0_NS_A2P_BASE,
+                                              .mailbox_size =
+                                                  SCP_SCMI_PAYLOAD_SIZE,
+                                              .driver_id = FWK_ID_SUB_ELEMENT_INIT(
+                                                  FWK_MODULE_IDX_MHU2,
+                                                  SCP_TC0_MHU_DEVICE_IDX_SCP_AP_NS_HP_CLUS0,
+                                                  0),
+                                              .driver_api_id = FWK_ID_API_INIT(
+                                                  FWK_MODULE_IDX_MHU2,
+                                                  0),
+                                          }) },
+    [SCP_TC0_SCMI_SERVICE_IDX_OSPM_1] = { .name = "OSPM1",
+                                          .data = &((
+                                              struct mod_smt_channel_config){
+                                              .type =
+                                                  MOD_SMT_CHANNEL_TYPE_SLAVE,
+                                              .policies =
+                                                  MOD_SMT_POLICY_INIT_MAILBOX,
+                                              .mailbox_address = (uintptr_t)
+                                                  SCP_SCMI_PAYLOAD1_NS_A2P_BASE,
+                                              .mailbox_size =
+                                                  SCP_SCMI_PAYLOAD_SIZE,
+                                              .driver_id = FWK_ID_SUB_ELEMENT_INIT(
+                                                  FWK_MODULE_IDX_MHU2,
+                                                  SCP_TC0_MHU_DEVICE_IDX_SCP_AP_NS_LP_CLUS0,
+                                                  0),
+                                              .driver_api_id = FWK_ID_API_INIT(
+                                                  FWK_MODULE_IDX_MHU2,
+                                                  0),
+                                          }) },
     [SCP_TC0_SCMI_SERVICE_IDX_COUNT] = { 0 },
 };
 

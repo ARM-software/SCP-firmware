@@ -22,7 +22,8 @@ enum scp_tc0_scmi_agent_id {
 /* SCMI service indexes */
 enum scp_tc0_scmi_service_idx {
     SCP_TC0_SCMI_SERVICE_IDX_PSCI,
-    SCP_TC0_SCMI_SERVICE_IDX_OSPM,
+    SCP_TC0_SCMI_SERVICE_IDX_OSPM_0,
+    SCP_TC0_SCMI_SERVICE_IDX_OSPM_1,
     SCP_TC0_SCMI_SERVICE_IDX_COUNT,
 };
 
