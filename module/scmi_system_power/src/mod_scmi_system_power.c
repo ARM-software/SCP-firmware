@@ -219,6 +219,18 @@ static int scmi_sys_power_msg_attributes_handler(fwk_id_t service_id,
     parameters = (const struct scmi_protocol_message_attributes_a2p*)payload;
     message_id = parameters->message_id;
 
+/*
+ * NOT_SUPPORTED must be returned for notifications cmds,
+ * when notifications are not supported.
+ */
+#ifndef BUILD_HAS_SCMI_NOTIFICATIONS
+    if (message_id == MOD_SCMI_SYS_POWER_STATE_NOTIFY) {
+        return_values.status = SCMI_NOT_SUPPORTED;
+
+        goto exit;
+    }
+#endif
+
     if ((message_id >= FWK_ARRAY_SIZE(handler_table)) ||
         (handler_table[message_id] == NULL)) {
 
