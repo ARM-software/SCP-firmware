@@ -9,7 +9,7 @@
 #define FMW_CMSIS_H
 
 #define __CHECK_DEVICE_DEFINES
-#define __CM7_REV 0x0000U
+#define __CM3_REV 0x0201
 #define __FPU_PRESENT 0U
 #define __MPU_PRESENT 1U
 #define __ICACHE_PRESENT 0U
@@ -45,6 +45,6 @@ typedef enum IRQn {
     PPU_CLUSTERS_IRQ = 54, /* Consolidated clusters PPU */
 } IRQn_Type;
 
-#include <core_cm7.h>
+#include <core_cm3.h>
 
 #endif /* FMW_CMSIS_H */
