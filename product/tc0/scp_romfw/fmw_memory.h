@@ -23,9 +23,13 @@
 #define FMW_MEM0_BASE SCP_BOOT_ROM_BASE
 
 /*
- * RAM memory
+ * RAM memory for scp_romfw (16 KiB block at the top of the RAM)
+ *
+ * The last 16 KiB of SCP RAM are used for scp_romfw data regions.
+ * The start of the RAM is where the scp bootloader places the scp_ramfw
+ * so the 2 areas don't overlap.
  */
-#define FMW_MEM1_SIZE SCP_DTC_RAM_SIZE
-#define FMW_MEM1_BASE SCP_DTC_RAM_BASE
+#define FMW_MEM1_SIZE (16 * 1024)
+#define FMW_MEM1_BASE (SCP_RAM_BASE + SCP_RAM_SIZE - FMW_MEM1_SIZE)
 
 #endif /* FMW_MEMORY_H */
