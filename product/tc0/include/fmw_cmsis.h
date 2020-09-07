@@ -32,8 +32,9 @@ typedef enum IRQn {
 
     SOC_WAKEUP0_IRQ = 16, /* SoC Expansion Wakeup */
     TIMREFCLK_IRQ = 33, /* REFCLK Physical Timer */
-    MHU_AP_NONSEC_IRQ = 82, /* MHU non-secure irq bewteen SCP and AP */
-    MHU_AP_SEC_IRQ = 83, /* MHU secure irq bewteen SCP and AP */
+    MHU_AP_NONSEC_HP_IRQ = 34, /* MHU High Priority Non-Secure */
+    MHU_AP_NONSEC_LP_IRQ = 35, /* MHU Low Priority Non-Secure */
+    MHU_AP_SEC_IRQ = 36, /* MHU Secure */
     PPU_CORES0_IRQ =
         50, /* Consolidated PPU Interrupt for cores 1-32, 129-160 */
     PPU_CORES1_IRQ =
