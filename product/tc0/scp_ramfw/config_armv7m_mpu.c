@@ -30,34 +30,21 @@ static const ARM_MPU_Region_t regions[] = {
             ARM_MPU_REGION_SIZE_4GB),
     },
     {
-        /* 0x0080_0000 - 0x00FF_FFFF */
-        .RBAR = ARM_MPU_RBAR(1, SCP_ITC_RAM_BASE),
+        /* 0x1000_0000 - 0x1007_FFFF */
+        .RBAR = ARM_MPU_RBAR(1, SCP_RAM_BASE),
         .RASR = ARM_MPU_RASR(
             0,
-            ARM_MPU_AP_PRO,
-            0,
-            0,
-            1,
-            0,
-            0,
-            ARM_MPU_REGION_SIZE_256KB),
-    },
-    {
-        /* 0x2000_0000 - 0x20FF_FFFF */
-        .RBAR = ARM_MPU_RBAR(2, SCP_DTC_RAM_BASE),
-        .RASR = ARM_MPU_RASR(
-            1,
             ARM_MPU_AP_PRIV,
             0,
             0,
             1,
             1,
             0,
-            ARM_MPU_REGION_SIZE_256KB),
+            ARM_MPU_REGION_SIZE_512KB),
     },
     {
         /* 0xA400_0000 - 0xA400_7FFF*/
-        .RBAR = ARM_MPU_RBAR(3, SCP_TRUSTED_RAM_BASE),
+        .RBAR = ARM_MPU_RBAR(2, SCP_TRUSTED_RAM_BASE),
         .RASR = ARM_MPU_RASR(
             1,
             ARM_MPU_AP_PRIV,
@@ -70,7 +57,7 @@ static const ARM_MPU_Region_t regions[] = {
     },
     {
         /* 0xA600_0000 - 0xA600_7FFF */
-        .RBAR = ARM_MPU_RBAR(4, SCP_NONTRUSTED_RAM_BASE),
+        .RBAR = ARM_MPU_RBAR(3, SCP_NONTRUSTED_RAM_BASE),
         .RASR = ARM_MPU_RASR(
             1,
             ARM_MPU_AP_PRIV,

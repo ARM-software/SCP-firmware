@@ -13,9 +13,8 @@
 #include <fwk_macros.h>
 
 /* SCP ROM and RAM firmware size loaded on main memory */
-#define SCP_BOOT_ROM_SIZE (64 * 1024)
-#define SCP_DTC_RAM_SIZE (256 * 1024)
-#define SCP_ITC_RAM_SIZE (256 * 1024)
+#define SCP_BOOT_ROM_SIZE (512 * 1024)
+#define SCP_RAM_SIZE (512 * 1024)
 
 /* SCP trusted and non-trusted RAM base address */
 #define SCP_TRUSTED_RAM_BASE (SCP_SYSTEM_ACCESS_PORT1_BASE + 0x04000000)

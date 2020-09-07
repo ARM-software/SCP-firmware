@@ -15,8 +15,8 @@
 static const struct mod_bootloader_config bootloader_module_config = {
     .source_base = SCP_TRUSTED_RAM_BASE,
     .source_size = 512 * 1024,
-    .destination_base = SCP_ITC_RAM_BASE,
-    .destination_size = SCP_ITC_RAM_SIZE,
+    .destination_base = SCP_RAM_BASE,
+    .destination_size = SCP_RAM_SIZE,
     .sds_struct_id = TC0_SDS_BOOTLOADER,
 };
 

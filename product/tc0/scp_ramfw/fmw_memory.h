@@ -14,18 +14,10 @@
 #include "scp_mmap.h"
 #include "scp_software_mmap.h"
 
-#define FMW_MEM_MODE ARCH_MEM_MODE_DUAL_REGION_RELOCATION
+#define FMW_MEM_MODE ARCH_MEM_MODE_SINGLE_REGION
 
-/*
- * RAM instruction memory
- */
-#define FMW_MEM0_SIZE SCP_ITC_RAM_SIZE
-#define FMW_MEM0_BASE SCP_ITC_RAM_BASE
-
-/*
- * RAM data memory
- */
-#define FMW_MEM1_SIZE SCP_DTC_RAM_SIZE
-#define FMW_MEM1_BASE SCP_DTC_RAM_BASE
+/* RAM */
+#define FMW_MEM0_BASE SCP_RAM_BASE
+#define FMW_MEM0_SIZE SCP_RAM_SIZE
 
 #endif /* FMW_MEMORY_H */
