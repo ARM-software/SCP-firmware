@@ -94,7 +94,6 @@ static const struct mod_cmn_booker_mem_region_map mmap[] = {
 };
 
 const struct fwk_module_config config_cmn_booker = {
-    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(NULL),
     .data = &((struct mod_cmn_booker_config){
         .base = SCP_CMN_BOOKER_BASE,
         .mesh_size_x = 2,
