@@ -35,14 +35,10 @@ typedef enum IRQn {
     MHU_AP_NONSEC_HP_IRQ = 34, /* MHU High Priority Non-Secure */
     MHU_AP_NONSEC_LP_IRQ = 35, /* MHU Low Priority Non-Secure */
     MHU_AP_SEC_IRQ = 36, /* MHU Secure */
-    PPU_CORES0_IRQ =
-        50, /* Consolidated PPU Interrupt for cores 1-32, 129-160 */
-    PPU_CORES1_IRQ =
-        51, /* Consolidated PPU Interrupt for cores 33-64, 161-192 */
-    PPU_CORES2_IRQ =
-        52, /* Consolidated PPU Interrupt for cores 65-96, 193-224 */
-    PPU_CORES3_IRQ =
-        53, /* Consolidated PPU Interrupt for cores 97-128, 225-256 */
+    PPU_CORES0_IRQ = 64, /* PPU core 0 IRQ */
+    PPU_CORES1_IRQ = 65, /* PPU core 1 IRQ */
+    PPU_CORES2_IRQ = 66, /* PPU core 2 IRQ */
+    PPU_CORES3_IRQ = 67, /* PPU core 3 IRQ */
     PPU_CLUSTERS_IRQ = 54, /* Consolidated clusters PPU */
 } IRQn_Type;
 
