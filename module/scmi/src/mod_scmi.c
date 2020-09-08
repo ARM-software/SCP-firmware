@@ -636,11 +636,8 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
             (index == MOD_SCMI_PROTOCOL_ID_BASE))
             continue;
 
-        protocol_count++;
-        if (protocol_count <= skip)
-            continue;
-
         protocol_id = index;
+
 #ifdef BUILD_HAS_RESOURCE_PERMISSIONS
         /*
          * Check that the agent has the permission to access the protocol
@@ -653,6 +650,10 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
         }
 #endif
 
+        protocol_count++;
+        if (protocol_count <= skip)
+            continue;
+
         status = write_payload(service_id, payload_size, &protocol_id,
                                sizeof(protocol_id));
         if (status != FWK_SUCCESS)
@@ -661,7 +662,7 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
         avail_protocol_count++;
     }
 
-    if (skip > avail_protocol_count) {
+    if (skip > protocol_count) {
         return_values.status = SCMI_INVALID_PARAMETERS;
         goto error;
     }
