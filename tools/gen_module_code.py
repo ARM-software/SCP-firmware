@@ -17,6 +17,7 @@
 import argparse
 import os
 import sys
+import tempfile
 
 DEFAULT_PATH = 'build/'
 
@@ -53,13 +54,21 @@ TEMPLATE_C = "/* This file was auto generated using {} */\n" \
 
 def generate_file(path, filename, content):
     full_filename = os.path.join(path, filename)
-    with open(full_filename, 'a+') as f:
-        f.seek(0)
-        if f.read() != content:
+
+    try:
+        with open(full_filename) as f:
+            rewrite = f.read() != content
+    except FileNotFoundError:
+        rewrite = True
+
+    if rewrite:
+        with tempfile.NamedTemporaryFile(prefix="gen-module-code",
+                                         dir=path,
+                                         delete=False,
+                                         mode="wt") as f:
             print("[GEN] {}...".format(full_filename))
-            f.seek(0)
-            f.truncate()
             f.write(content)
+        os.replace(f.name, full_filename)
 
 
 def generate_header(path, modules):
