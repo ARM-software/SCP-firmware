@@ -932,6 +932,11 @@ static int scmi_clock_config_set_handler(fwk_id_t service_id,
         goto exit;
     }
 
+    if ((parameters->attributes & ~SCMI_CLOCK_CONFIG_SET_ENABLE_MASK) != 0) {
+        return_values.status = SCMI_INVALID_PARAMETERS;
+        goto exit;
+    }
+
     struct event_set_state_request_data data = {
         .state = enable ? MOD_CLOCK_STATE_RUNNING : MOD_CLOCK_STATE_STOPPED
     };
