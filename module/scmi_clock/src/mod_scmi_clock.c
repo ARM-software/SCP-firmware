@@ -1036,7 +1036,7 @@ static int scmi_clock_describe_rates_handler(fwk_id_t service_id,
         /* The clock has a discrete list of frequencies */
 
         if (index >= info.range.rate_count) {
-            return_values.status = SCMI_INVALID_PARAMETERS;
+            return_values.status = SCMI_OUT_OF_RANGE;
             goto exit;
         }
 
