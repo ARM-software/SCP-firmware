@@ -35,6 +35,7 @@ BS_FIRMWARE_MODULES := \
     timer \
     scmi_power_domain \
     scmi_system_power \
+    scmi_management \
     fip \
     ssc \
     system_info \
@@ -60,6 +61,7 @@ BS_FIRMWARE_SOURCES := \
     config_scmi_system_power.c \
     config_scmi_power_domain.c \
     config_pl011.c \
+    config_scmi_management.c \
     config_morello_pll.c \
     config_pik_clock.c \
     config_css_clock.c \
