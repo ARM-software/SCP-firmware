@@ -16,3 +16,59 @@ project(
     HOMEPAGE_URL
         "https://developer.arm.com/tools-and-software/open-source-software/firmware/scp-firmware"
     LANGUAGES NONE)
+
+#
+# Set up global inclusions and exclusions for source file quality assurance
+# tools. This is intended to filter in external directories (e.g. out-of-tree
+# modules) and filter out third-party directories.
+#
+
+list(APPEND glob_includes "${SCP_SOURCE_DIR}")
+
+list(APPEND glob_excludes "^${SCP_SOURCE_DIR}/contrib/cmsis/git")
+
+#
+# Glob sources and place them in their respective variables. Globs for source
+# types can be with specified with a `${type}_globs` variable, which should be a
+# list of globs to be fed into `file(GLOB_RECURSE ...)`.
+#
+
+# cmake-lint: disable=C0103
+
+foreach(type)
+    unset(sources)
+
+    foreach(include IN LISTS glob_includes)
+        foreach(glob IN LISTS ${type}_globs)
+            file(GLOB_RECURSE _sources "${include}/${glob}")
+            list(APPEND sources ${_sources})
+        endforeach()
+    endforeach()
+
+    foreach(exclude IN LISTS glob_excludes)
+        list(FILTER sources EXCLUDE REGEX "${exclude}")
+    endforeach()
+
+    set(${type}_sources ${sources})
+endforeach()
+
+#
+# Create the final check targets. These targets consist of miscellaneous quality
+# assurance tasks like linting and formatting, and act as dummy targets that
+# invoke the various tools we set up above.
+#
+
+add_custom_target(
+    format
+    DEPENDS ${format_targets}
+    COMMENT "Formatting all sources...")
+
+add_custom_target(
+    lint
+    DEPENDS ${lint_targets}
+    COMMENT "Linting all sources...")
+
+add_custom_target(
+    check
+    DEPENDS ${check_targets} lint
+    COMMENT "Checking lint...")
