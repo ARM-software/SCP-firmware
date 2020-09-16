@@ -350,6 +350,57 @@ if(SCP_FIRMWARE)
     #
 
     add_subdirectory("framework" EXCLUDE_FROM_ALL)
+
+    #
+    # Collect up all the source files used to build the various targets created
+    # above.
+    #
+
+    # cmake-format: off
+
+    string(APPEND scp_sources "$<TARGET_PROPERTY:framework,INTERFACE_SOURCES>$<SEMICOLON>")
+    string(APPEND scp_sources "$<TARGET_PROPERTY:framework,SOURCES>$<SEMICOLON>")
+    string(APPEND scp_sources "$<TARGET_PROPERTY:${SCP_ARCHITECTURE_TARGET},INTERFACE_SOURCES>$<SEMICOLON>")
+    string(APPEND scp_sources "$<TARGET_PROPERTY:${SCP_ARCHITECTURE_TARGET},SOURCES>$<SEMICOLON>")
+    string(APPEND scp_sources "$<TARGET_PROPERTY:${SCP_FIRMWARE_TARGET},INTERFACE_SOURCES>$<SEMICOLON>")
+    string(APPEND scp_sources "$<TARGET_PROPERTY:${SCP_FIRMWARE_TARGET},SOURCES>$<SEMICOLON>")
+
+    string(APPEND scp_includes "$<TARGET_PROPERTY:framework,INTERFACE_INCLUDE_DIRECTORIES>$<SEMICOLON>")
+    string(APPEND scp_includes "$<TARGET_PROPERTY:framework,INCLUDE_DIRECTORIES>$<SEMICOLON>")
+    string(APPEND scp_includes "$<TARGET_PROPERTY:${SCP_ARCHITECTURE_TARGET},INTERFACE_INCLUDE_DIRECTORIES>$<SEMICOLON>")
+    string(APPEND scp_includes "$<TARGET_PROPERTY:${SCP_ARCHITECTURE_TARGET},INCLUDE_DIRECTORIES>$<SEMICOLON>")
+    string(APPEND scp_includes "$<TARGET_PROPERTY:${SCP_FIRMWARE_TARGET},INTERFACE_INCLUDE_DIRECTORIES>$<SEMICOLON>")
+    string(APPEND scp_includes "$<TARGET_PROPERTY:${SCP_FIRMWARE_TARGET},INCLUDE_DIRECTORIES>$<SEMICOLON>")
+
+    string(APPEND scp_defines "$<TARGET_PROPERTY:framework,INTERFACE_COMPILE_DEFINITIONS>$<SEMICOLON>")
+    string(APPEND scp_defines "$<TARGET_PROPERTY:framework,COMPILE_DEFINITIONS>$<SEMICOLON>")
+    string(APPEND scp_defines "$<TARGET_PROPERTY:${SCP_ARCHITECTURE_TARGET},INTERFACE_COMPILE_DEFINITIONS>$<SEMICOLON>")
+    string(APPEND scp_defines "$<TARGET_PROPERTY:${SCP_ARCHITECTURE_TARGET},COMPILE_DEFINITIONS>$<SEMICOLON>" )
+    string(APPEND scp_defines "$<TARGET_PROPERTY:${SCP_FIRMWARE_TARGET},INTERFACE_COMPILE_DEFINITIONS>$<SEMICOLON>")
+    string(APPEND scp_defines "$<TARGET_PROPERTY:${SCP_FIRMWARE_TARGET},COMPILE_DEFINITIONS>$<SEMICOLON>")
+
+    foreach(module IN LISTS SCP_MODULE_TARGETS)
+        string(APPEND scp_sources "$<TARGET_PROPERTY:${module},INTERFACE_SOURCES>$<SEMICOLON>")
+        string(APPEND scp_sources "$<TARGET_PROPERTY:${module},SOURCES>$<SEMICOLON>")
+
+        string(APPEND scp_includes "$<TARGET_PROPERTY:${module},INTERFACE_INCLUDE_DIRECTORIES>$<SEMICOLON>")
+        string(APPEND scp_includes "$<TARGET_PROPERTY:${module},INCLUDE_DIRECTORIES>$<SEMICOLON>")
+
+        string(APPEND scp_defines "$<TARGET_PROPERTY:${module},INTERFACE_COMPILE_DEFINITIONS>$<SEMICOLON>")
+        string(APPEND scp_defines "$<TARGET_PROPERTY:${module},COMPILE_DEFINITIONS>$<SEMICOLON>")
+    endforeach()
+
+    set(scp_sources $<REMOVE_DUPLICATES:${scp_sources}>)
+    set(scp_includes $<REMOVE_DUPLICATES:${scp_includes}>)
+    set(scp_defines $<REMOVE_DUPLICATES:${scp_defines}>)
+
+    # cmake-format: on
+
+    #
+    # Load in the documentation generation.
+    #
+
+    add_subdirectory("doc")
 endif()
 
 #
