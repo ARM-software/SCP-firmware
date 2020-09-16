@@ -20,6 +20,23 @@ project(
     LANGUAGES NONE)
 
 #
+# Configure the default build type to be "Release". We choose to default to a
+# release build as non-developer consumers will generally want a release build,
+# whereas developers who need a debug build are generally familiar with how to
+# enable it in the build system.
+#
+
+if((NOT CMAKE_BUILD_TYPE) AND (NOT CMAKE_CONFIGURATION_TYPES))
+    set(CMAKE_BUILD_TYPE
+        "Release"
+        CACHE STRING "Build type." FORCE)
+
+    set_property(
+        CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel"
+                                                "RelWithDebInfo")
+endif()
+
+#
 # Set up global inclusions and exclusions for source file quality assurance
 # tools. This is intended to filter in external directories (e.g. out-of-tree
 # modules) and filter out third-party directories.
