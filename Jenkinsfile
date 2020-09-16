@@ -146,6 +146,14 @@ pipeline {
 
                                                 sh 'cmake --build .'
                                             }
+
+                                            stage("Check ${config}") {
+                                                sh """
+                                                    cmake
+                                                        --build . \
+                                                        --target check
+                                                """
+                                            }
                                         }
                                     }
                                 }]
