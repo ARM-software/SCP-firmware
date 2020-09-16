@@ -151,7 +151,7 @@ struct mod_dvfs_domain_ctx {
     bool request_pending;
 };
 
-struct mod_dvfs_ctx {
+static struct mod_dvfs_ctx {
     /* Number of DVFS domains */
     uint32_t dvfs_domain_element_count;
 
