@@ -120,6 +120,12 @@ if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
 endif()
 
 #
+# Pull in the CMSIS package.
+#
+
+add_subdirectory("contrib/cmsis" EXCLUDE_FROM_ALL)
+
+#
 # Set up global inclusions and exclusions for source file quality assurance
 # tools. This is intended to filter in external directories (e.g. out-of-tree
 # modules) and filter out third-party directories.
