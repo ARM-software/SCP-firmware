@@ -11,6 +11,52 @@ cmake_minimum_required(VERSION 3.18.3)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
+#
+# Individual firmware targets are configured based on the 'Firmware.cmake'
+# living in the firmware source directory that the user provides to us, which
+# determines the default set of configuration options we are given, including
+# the toolchain file.
+#
+
+if(SCP_FIRMWARE_SOURCE_DIR)
+    get_filename_component(SCP_FIRMWARE_SOURCE_DIR "${SCP_FIRMWARE_SOURCE_DIR}"
+                           ABSOLUTE BASE_DIR "${CMAKE_SOURCE_DIR}/product")
+
+    include("${SCP_FIRMWARE_SOURCE_DIR}/Firmware.cmake")
+
+    if((NOT SCP_FIRMWARE) OR (NOT SCP_FIRMWARE_TARGET))
+        # cmake-format: off
+        message(FATAL_ERROR
+            "Insufficient firmware metadata provided.\n"
+
+            "Please ensure your 'Firmware.cmake' has set both `SCP_FIRMWARE` "
+            "and `SCP_FIRMWARE_TARGET` to the name of your firmware and the "
+            "firmware's CMake target respectively.")
+        # cmake-format: on
+    endif()
+
+    if(NOT SCP_FIRMWARE_BINARY_DIR)
+        #
+        # Derive the binary directory from the location of the source directory
+        # if it's in-tree.
+        #
+
+        file(RELATIVE_PATH SCP_FIRMWARE_BINARY_DIR "${CMAKE_SOURCE_DIR}"
+             "${SCP_FIRMWARE_SOURCE_DIR}")
+    endif()
+
+    if(SCP_FIRMWARE_BINARY_DIR MATCHES "\\.\\.")
+        # cmake-format: off
+        message(FATAL_ERROR
+            "Invalid firmware binary directory.\n"
+
+            "Please ensure your firmware binary directory is a relative path. "
+            "This path is used as the location within the project binary "
+            "directory that will be used for firmware artifacts.")
+        # cmake-format: on
+    endif()
+endif()
+
 project(
     SCP
     VERSION 2.7.0
