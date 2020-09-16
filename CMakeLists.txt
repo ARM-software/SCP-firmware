@@ -120,6 +120,31 @@ if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
 endif()
 
 #
+# Enable inter-procedural optimization for all targets if we can.
+# `CheckIPOSupported` doesn't play particularly nicely with toolchains that
+# cannot build executables right off the bat, so we skip this check if we're
+# cross compiling.
+#
+
+include(CheckIPOSupported)
+include(CMakeDependentOption)
+
+check_ipo_supported(RESULT SCP_IPO_SUPPORTED)
+
+cmake_dependent_option(
+    SCP_ENABLE_IPO "Enable the interprocedural optimization (IPO) if supported?"
+    "${SCP_ENABLE_IPO_INIT}" "DEFINED SCP_ENABLE_IPO_INIT"
+    "${SCP_ENABLE_IPO}")
+
+if(CMAKE_CROSSCOMPILING AND (CMAKE_C_COMPILER_ID STREQUAL "GNU") AND SCP_ENABLE_IPO)
+    set(SCP_IPO_SUPPORTED TRUE)
+endif()
+
+cmake_dependent_option(
+    CMAKE_INTERPROCEDURAL_OPTIMIZATION "Enable interprocedural optimization?"
+    TRUE "SCP_IPO_SUPPORTED" FALSE)
+
+#
 # If the firmware developer has given us initial values for these configuration
 # options, we can expose them to the user.
 #
