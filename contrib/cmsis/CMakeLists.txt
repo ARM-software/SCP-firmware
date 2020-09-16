@@ -13,6 +13,20 @@ project(
     DESCRIPTION "Cortex Microcontroller Software Interface Standard (CMSIS)"
     HOMEPAGE_URL "https://developer.arm.com/tools-and-software/embedded/cmsis"
     LANGUAGES C)
+#
+# Define CMSIS-Core (M).
+#
+
+add_library(core-m INTERFACE)
+
+target_include_directories(
+    core-m INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/git/CMSIS/Core/Include")
+
+add_library(cmsis::core-m ALIAS core-m)
+
+#
+# Define CMSIS-RTOS2.
+#
 
 add_library(rtos2 INTERFACE)
 
