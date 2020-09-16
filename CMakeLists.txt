@@ -145,6 +145,12 @@ cmake_dependent_option(
     TRUE "SCP_IPO_SUPPORTED" FALSE)
 
 #
+# Export a `compile_commands.json` file for generators that support it.
+#
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+
+#
 # Set up Cppcheck if it's available.
 #
 
