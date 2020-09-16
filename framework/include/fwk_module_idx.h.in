@@ -1,0 +1,23 @@
+/*
+ * Arm SCP/MCP Software
+ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+#ifndef FWK_MODULE_IDX_H
+#define FWK_MODULE_IDX_H
+
+#include <fwk_id.h>
+
+@SCP_MODULE_ID_INIT_GEN@
+
+@SCP_MODULE_ID_GEN@
+
+enum fwk_module_idx {
+@SCP_MODULE_IDX_GEN@
+};
+
+@SCP_MODULE_ID_CONST_GEN@
+
+#endif /* FWK_MODULE_IDX_H */

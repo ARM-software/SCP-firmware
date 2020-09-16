@@ -1,0 +1,23 @@
+/*
+ * Arm SCP/MCP Software
+ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+
+#include <stddef.h>
+
+@SCP_MODULE_EXTERN_GEN@
+
+const struct fwk_module *module_table[FWK_MODULE_IDX_COUNT] = {
+@SCP_MODULE_GEN@
+};
+
+@SCP_MODULE_EXTERN_CONFIG_GEN@
+
+const struct fwk_module_config *module_config_table[FWK_MODULE_IDX_COUNT] = {
+@SCP_MODULE_CONFIG_GEN@
+};

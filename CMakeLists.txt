@@ -83,7 +83,7 @@ project(
     DESCRIPTION "Arm SCP/MCP Software"
     HOMEPAGE_URL
         "https://developer.arm.com/tools-and-software/open-source-software/firmware/scp-firmware"
-    LANGUAGES NONE)
+    LANGUAGES C ASM)
 
 #
 # Configure the default build type to be "Release". We choose to default to a
@@ -120,10 +120,70 @@ if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
 endif()
 
 #
-# Pull in the CMSIS package.
+# If the firmware developer has given us initial values for these configuration
+# options, we can expose them to the user.
 #
 
-add_subdirectory("contrib/cmsis" EXCLUDE_FROM_ALL)
+include(CMakeDependentOption)
+
+# Common build options
+cmake_dependent_option(
+    SCP_ENABLE_MULTITHREADING "Enable the multithreading subsystem?"
+    "${SCP_ENABLE_MULTITHREADING_INIT}"
+    "DEFINED SCP_ENABLE_MULTITHREADING_INIT" "${SCP_ENABLE_MULTITHREADING}")
+
+cmake_dependent_option(
+    SCP_ENABLE_NOTIFICATIONS "Enable the notification subsystem?"
+    "${SCP_ENABLE_NOTIFICATIONS_INIT}" "DEFINED SCP_ENABLE_NOTIFICATIONS_INIT"
+    "${SCP_ENABLE_NOTIFICATIONS}")
+
+if(SCP_FIRMWARE)
+    #
+    # Pull in the CMSIS package.
+    #
+
+    add_subdirectory("contrib/cmsis" EXCLUDE_FROM_ALL)
+
+    #
+    # Load in the firmware. We do this now so that the firmware list files can
+    # make adjustments to any modules it wishes to load in, configure the
+    # architecture library, etc.
+    #
+
+    add_subdirectory("${SCP_FIRMWARE_SOURCE_DIR}" "${SCP_FIRMWARE_BINARY_DIR}"
+                     EXCLUDE_FROM_ALL)
+
+    #
+    # Make the firmware target a part of the 'all' pseudo-target and give it a
+    # fixed output binary name so that different toolchains don't generate
+    # different names (which is desirable especially for higher-level build
+    # systems).
+    #
+
+    set_target_properties(
+        ${SCP_FIRMWARE_TARGET} PROPERTIES EXCLUDE_FROM_ALL FALSE
+                                          OUTPUT_NAME "${SCP_FIRMWARE_TARGET}"
+                                          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
+    #
+    # Load in the architecture support library.
+    #
+
+    add_subdirectory("arch" EXCLUDE_FROM_ALL)
+
+    #
+    # Load in the modules specified, plus any that need to be included to
+    # support other modules.
+    #
+
+    add_subdirectory("module" EXCLUDE_FROM_ALL)
+
+    #
+    # Load in the framework. This should be the last of the targets we need.
+    #
+
+    add_subdirectory("framework" EXCLUDE_FROM_ALL)
+endif()
 
 #
 # Set up global inclusions and exclusions for source file quality assurance
