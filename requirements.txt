@@ -1,3 +1,4 @@
 clang-format==9.0.0
+cmake-format==0.6.13
 docker==4.3.1
 pycodestyle==2.6.0

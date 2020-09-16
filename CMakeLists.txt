@@ -9,6 +9,8 @@
 
 cmake_minimum_required(VERSION 3.18.3)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
 project(
     SCP
     VERSION 2.7.0
@@ -27,6 +29,9 @@ list(APPEND glob_includes "${SCP_SOURCE_DIR}")
 
 list(APPEND glob_excludes "^${SCP_SOURCE_DIR}/contrib/cmsis/git")
 
+list(APPEND cmake_globs "CMakeLists.txt")
+list(APPEND cmake_globs "*.cmake")
+
 #
 # Glob sources and place them in their respective variables. Globs for source
 # types can be with specified with a `${type}_globs` variable, which should be a
@@ -35,7 +40,7 @@ list(APPEND glob_excludes "^${SCP_SOURCE_DIR}/contrib/cmsis/git")
 
 # cmake-lint: disable=C0103
 
-foreach(type)
+foreach(type cmake)
     unset(sources)
 
     foreach(include IN LISTS glob_includes)
@@ -51,6 +56,43 @@ foreach(type)
 
     set(${type}_sources ${sources})
 endforeach()
+
+#
+# Configure cmake-format.
+#
+
+find_package(CMakeFormat OPTIONAL_COMPONENTS Format Lint)
+
+if(TARGET CMakeFormat::Format)
+    add_custom_target(
+        format-cmake
+        COMMAND CMakeFormat::Format -i "${cmake_sources}"
+        WORKING_DIRECTORY "${SCP_SOURCE_DIR}"
+        COMMENT "Formatting CMake sources..."
+        COMMAND_EXPAND_LISTS)
+
+    list(APPEND format_targets "format-cmake")
+
+    add_custom_target(
+        check-cmake
+        COMMAND CMakeFormat::Format --check "${cmake_sources}"
+        WORKING_DIRECTORY "${SCP_SOURCE_DIR}"
+        COMMENT "Checking CMake sources..."
+        COMMAND_EXPAND_LISTS)
+
+    list(APPEND check_targets "check-cmake")
+endif()
+
+if(TARGET CMakeFormat::Lint)
+    add_custom_target(
+        lint-cmake
+        COMMAND CMakeFormat::Lint --suppress-decorations "${cmake_sources}"
+        WORKING_DIRECTORY "${SCP_SOURCE_DIR}"
+        COMMENT "Linting CMake sources..."
+        COMMAND_EXPAND_LISTS)
+
+    list(APPEND lint_targets "lint-cmake")
+endif()
 
 #
 # Create the final check targets. These targets consist of miscellaneous quality
