@@ -83,6 +83,28 @@ The following parameters are mandatory:
   firmware. The source files (.S and .c) can be either at product or firmware
   level.
 
+The following parameters are optional (default is 'no' when omitted):
+* __BS_FIRMWARE_HAS_SCMI_NOTIFICATIONS__ <yes|no> - SCMI Notification. When set
+  to yes, firmware can provide notifications of events taking place in the
+  platform, such as changes in power state, and others where implemented.
+* __BS_FIRMWARE_HAS_FAST_CHANNELS__ <yes|no> - SCMI FastChannels. When set to
+  yes, FastChannels can be discovered via specific commands over SCMI and the
+  platform accepts FastChannels commands for implemented commands.
+* __BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS__ <yes|no> - Resource Permission for
+  SCMI agents. When set to yes, the platform supports a custom-defined set of
+  permissions for each agents and for each SCMI protocol.
+* __BS_FIRMWARE_HAS_DEBUG_UNIT__ <yes|no> - Debug Unit interface. When set to
+  yes, the HAL debug module __mod_debug__ can be used as an interface between
+  power domain and its debug drivers.
+* __BS_FIRMWARE_HAS_SCMI_RESET__ <yes|no> - SCMI Reset domain. When set to yes,
+  the platform supports the SCMI reset management protocol.
+* __BS_FIRMWARE_HAS_STATISTICS__ <yes|no> - SCMI Performance statistics. When
+  set to yes, the platform can provide support for performance statistics over
+  SCMI.
+* __BUILD_HAS_SCMI_SENSOR_EVENTS__ <yes|no> - SCMI Sensor trip points. When
+  set to yes, the platform supports the configuration of trip points and
+  generates SCMI notifications on cross-over events for the trip points.
+
 The format of the __BS_FIRMWARE_MODULES__ parameter can be seen in the following
 example:
 \code
@@ -218,6 +240,26 @@ SCMI Statistics Support                                    {#section_statistics}
 When building a firmware and its dependencies, the
 BS_FIRMWARE_HAS_STATISTICS parameter controls whether statistics support is
 enabled or not.
+
+SCMI Agent Resource Permissions                   {#section_resource_permission}
+===============================
+
+When building a firmware and its dependencies, it is possible to enable a set
+of predefined access rules for protocols and agents via the
+BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS parameter.
+
+SCMI Reset Domain Protocol                          {#section_scmi_domain_reset}
+==========================
+
+When building a firmware and its dependencies, the SCMI Reset protocol is
+enabled to control of reset-capable domains in the platform. This is possible
+via the BS_FIRMWARE_HAS_SCMI_RESET parameter.
+
+SCMI Sensor Event Notifications       {#section_scmi_sensor_event_notifications}
+===============================
+
+When building a firmware and its dependencies, the BUILD_HAS_SCMI_SENSOR_EVENTS
+parameter controls if SCMI event notifications are enabled.
 
 Definitions
 ===========
