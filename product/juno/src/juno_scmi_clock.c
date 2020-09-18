@@ -23,11 +23,13 @@ int mod_scmi_clock_rate_set_policy(
     fwk_id_t service_id,
     uint32_t clock_dev_id)
 {
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
     FWK_LOG_TRACE(
         "[SCMI-CLK] Set Clock Rate Policy Handler agent: %u clock: %" PRIu32
         "\n",
         fwk_id_get_element_idx(service_id),
         clock_dev_id);
+#endif
 
     *policy_status = MOD_SCMI_CLOCK_EXECUTE_MESSAGE_HANDLER;
 
