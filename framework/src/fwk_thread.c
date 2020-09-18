@@ -122,12 +122,14 @@ static int put_event(struct fwk_event *event)
     else
         fwk_list_push_tail(&ctx.isr_event_queue, &allocated_event->slist_node);
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
     FWK_LOG_TRACE(
         "[FWK] Sent %" PRIu32 ": %s @ %s -> %s",
         event->cookie,
         FWK_ID_STR(event->id),
         FWK_ID_STR(event->source_id),
         FWK_ID_STR(event->target_id));
+#endif
 
     return FWK_SUCCESS;
 }
@@ -151,12 +153,14 @@ static void process_next_event(void)
     ctx.current_event = event = FWK_LIST_GET(
         fwk_list_pop_head(&ctx.event_queue), struct fwk_event, slist_node);
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
     FWK_LOG_TRACE(
         "[FWK] Processing %" PRIu32 ": %s @ %s -> %s\n",
         event->cookie,
         FWK_ID_STR(event->id),
         FWK_ID_STR(event->source_id),
         FWK_ID_STR(event->target_id));
+#endif
 
     module = fwk_module_get_ctx(event->target_id)->desc;
     process_event = event->is_notification ? module->process_notification :
@@ -213,11 +217,13 @@ static bool process_isr(void)
     if (isr_event == NULL)
         return false;
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
     FWK_LOG_TRACE(
         "[FWK] Pulled ISR event (%s: %s -> %s)\n",
         FWK_ID_STR(isr_event->id),
         FWK_ID_STR(isr_event->source_id),
         FWK_ID_STR(isr_event->target_id));
+#endif
 
     fwk_list_push_tail(&ctx.event_queue, &isr_event->slist_node);
 
@@ -384,11 +390,13 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
     ctx.waiting_event_processing_completion = true;
     ctx.previous_event = ctx.current_event;
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
     FWK_LOG_TRACE(
         "[FWK] deprecated put_event_and_wait (%s: %s -> %s)\n",
         FWK_ID_STR(event->id),
         FWK_ID_STR(event->source_id),
         FWK_ID_STR(event->target_id));
+#endif
 
     event->is_response = false;
     event->is_delayed_response = false;

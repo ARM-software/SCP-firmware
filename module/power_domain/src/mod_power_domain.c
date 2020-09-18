@@ -298,10 +298,12 @@ static const uint32_t core_composite_state_mask_table[] = {
 static struct mod_pd_ctx mod_pd_ctx;
 static const char driver_error_msg[] = "[PD] Driver error %s (%d) in %s @%d";
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
 static const char * const default_state_name_table[] = {
     "OFF", "ON", "SLEEP", "3", "4", "5", "6", "7",
     "8", "9", "10", "11", "12", "13", "14", "15"
 };
+#endif
 
 /*
  * Utility functions
@@ -365,6 +367,7 @@ static bool is_allowed_by_children(const struct pd_ctx *pd, unsigned int state)
     return true;
 }
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
 static const char *get_state_name(const struct pd_ctx *pd, unsigned int state)
 {
     static char const unknown_name[] = "Unknown";
@@ -376,6 +379,7 @@ static const char *get_state_name(const struct pd_ctx *pd, unsigned int state)
     else
         return unknown_name;
 }
+#endif
 
 static unsigned int number_of_bits_to_shift(uint32_t mask)
 {
@@ -668,22 +672,29 @@ static int initiate_power_state_transition(struct pd_ctx *pd)
 
     if ((pd->driver_api->deny != NULL) &&
         pd->driver_api->deny(pd->driver_id, state)) {
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
         FWK_LOG_TRACE(
             "[PD] Transition of %s to state <%s> denied by driver",
             fwk_module_get_name(pd->id),
             get_state_name(pd, state));
+#endif
         return FWK_E_DEVICE;
     }
 
     status = pd->driver_api->set_state(pd->driver_id, state);
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
     if (status == FWK_SUCCESS) {
         FWK_LOG_TRACE(
             "[PD] Transition of %s from <%s> to <%s> succeeded",
             fwk_module_get_name(pd->id),
             get_state_name(pd, pd->state_requested_to_driver),
             get_state_name(pd, state));
-    } else {
+    }
+#endif
+
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERR
+    if (status != FWK_SUCCESS) {
         FWK_LOG_ERR(
             "[PD] Transition of %s from <%s> to <%s> failed: %s",
             fwk_module_get_name(pd->id),
@@ -691,6 +702,7 @@ static int initiate_power_state_transition(struct pd_ctx *pd)
             get_state_name(pd, state),
             fwk_status_str(status));
     }
+#endif
 
     pd->state_requested_to_driver = state;
 
