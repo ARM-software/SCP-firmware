@@ -145,8 +145,7 @@ static mod_res_perms_t scmi_clock_perms[]
              */
             [MOD_RES_PERMS_SCMI_CLOCK_RATE_SET_IDX][0] =
                 ((1 << 0) | (1 << 1) | (1 << 2) | (1 << 4)),
-            [MOD_RES_PERMS_SCMI_CLOCK_RATE_GET_IDX][0] =
-                ((1 << 0) | (1 << 1) | (1 << 2) | (1 << 4)),
+            [MOD_RES_PERMS_SCMI_CLOCK_RATE_GET_IDX][0] = 0x0,
             [MOD_RES_PERMS_SCMI_CLOCK_CONFIG_SET_IDX][0] = 0x0,
             [MOD_RES_PERMS_SCMI_CLOCK_DESCRIBE_RATE_IDX][0] = 0x0,
         },
