@@ -314,6 +314,7 @@ int fwk_thread_put_event(struct fwk_event *event)
     unsigned int interrupt;
     enum thread_interrupt_states intr_state;
 
+#ifdef BUILD_MODE_DEBUG
     if (!ctx.initialized) {
         status = FWK_E_INIT;
         goto error;
@@ -321,6 +322,7 @@ int fwk_thread_put_event(struct fwk_event *event)
 
     if (event == NULL)
         goto error;
+#endif
 
     status = fwk_interrupt_get_current(&interrupt);
     if (status != FWK_SUCCESS)
@@ -335,6 +337,7 @@ int fwk_thread_put_event(struct fwk_event *event)
         goto error;
     }
 
+#ifdef BUILD_MODE_DEBUG
     status = FWK_E_PARAM;
     if (event->is_notification) {
         if (!fwk_module_is_valid_notification_id(event->id))
@@ -359,6 +362,7 @@ int fwk_thread_put_event(struct fwk_event *event)
                 goto error;
         }
     }
+#endif
 
     return put_event(event, intr_state);
 
@@ -376,9 +380,10 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
     struct fwk_event response_event;
     struct fwk_event *next_event;
     struct fwk_event *allocated_event;
-    unsigned int interrupt;
     int status = FWK_E_PARAM;
     enum wait_states wait_state = WAITING_FOR_EVENT;
+#ifdef BUILD_MODE_DEBUG
+    unsigned int interrupt;
 
     if (!ctx.initialized) {
         status = FWK_E_INIT;
@@ -395,6 +400,7 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
         status = FWK_E_STATE;
         goto error;
     }
+#endif
 
     if (ctx.current_event != NULL)
         event->source_id = ctx.current_event->target_id;
