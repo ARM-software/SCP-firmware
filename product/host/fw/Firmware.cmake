@@ -7,3 +7,9 @@
 
 set(SCP_FIRMWARE "host")
 set(SCP_FIRMWARE_TARGET "host")
+
+set(SCP_ENABLE_MULTITHREADING FALSE)
+
+set(SCP_ARCHITECTURE "none")
+
+list(APPEND SCP_MODULES "stdio")
