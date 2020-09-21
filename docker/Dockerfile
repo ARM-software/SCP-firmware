@@ -19,7 +19,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get dist-upgrade -y && \
     apt-get install -y --no-install-recommends \
-        gcc g++ gpg-agent git gosu lsb-release make ninja-build \
+        bundler gcc g++ gpg-agent git gosu lsb-release make ninja-build \
         python3 python3-pip software-properties-common wget && \
     wget -nv -O - -c "https://apt.llvm.org/llvm.sh" | bash && \
     apt-get update && \
