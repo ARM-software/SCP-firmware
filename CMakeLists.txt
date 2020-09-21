@@ -57,6 +57,26 @@ if(SCP_FIRMWARE_SOURCE_DIR)
     endif()
 endif()
 
+#
+# Handle automatic selection of the toolchain. This only occurs if the user has
+# not explicitly provided the path to a toolchain file and the firmware has
+# given us a default preference.
+#
+
+if(SCP_TOOLCHAIN_INIT AND (NOT CMAKE_TOOLCHAIN_FILE))
+    #
+    # Let the firmware decide what its default toolchain should be, but allow
+    # the user to override it.
+    #
+
+    if(NOT SCP_TOOLCHAIN)
+        set(SCP_TOOLCHAIN "${SCP_TOOLCHAIN_INIT}")
+    endif()
+
+    set(CMAKE_TOOLCHAIN_FILE
+        "${SCP_FIRMWARE_SOURCE_DIR}/Toolchain-${SCP_TOOLCHAIN}.cmake")
+endif()
+
 project(
     SCP
     VERSION 2.7.0
