@@ -177,6 +177,19 @@ if(SCP_FIRMWARE)
                                           RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
     #
+    # Load in the CLI debugger if it was requested.
+    #
+
+    cmake_dependent_option(
+        SCP_ENABLE_DEBUGGER "Enable the debugger-cli subsystem?"
+        "${SCP_ENABLE_DEBUGGER_INIT}" "DEFINED SCP_ENABLE_DEBUGGER_INIT"
+        "${SCP_ENABLE_DEBUGGER}")
+
+    if(SCP_ENABLE_DEBUGGER)
+        add_subdirectory("debugger" EXCLUDE_FROM_ALL)
+    endif()
+
+    #
     # Load in the architecture support library.
     #
 

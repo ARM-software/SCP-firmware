@@ -184,3 +184,12 @@ target_include_directories(
 foreach(target IN LISTS SCP_MODULE_TARGETS)
     target_link_libraries(framework PRIVATE ${target})
 endforeach()
+
+#
+# If the debugger has been requested, we also need to link to that explicitly,
+# as the debugger is initially set up through the framework.
+#
+
+if(SCP_ENABLE_DEBUGGER)
+    target_link_libraries(framework PUBLIC debugger)
+endif()
