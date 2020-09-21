@@ -41,6 +41,12 @@ enum wait_states {
     WAITING_FOR_RESPONSE  = 1,
 };
 
+enum thread_interrupt_states {
+    UNKNOWN_THREAD = 0,
+    INTERRUPT_THREAD = 1,
+    NOT_INTERRUPT_THREAD = 2,
+};
+
 /*
  * Static functions
  */
@@ -79,11 +85,14 @@ static struct fwk_event *duplicate_event(struct fwk_event *event)
     return allocated_event;
 }
 
-static int put_event(struct fwk_event *event)
+static int put_event(
+    struct fwk_event *event,
+    enum thread_interrupt_states intr_state)
 {
     struct fwk_event *allocated_event;
     unsigned int interrupt;
     bool is_wakeup_event = false;
+    int status;
 
     if (event->is_delayed_response) {
         allocated_event = __fwk_thread_search_delayed_response(
@@ -117,7 +126,14 @@ static int put_event(struct fwk_event *event)
     if (is_wakeup_event)
        ctx.cookie = event->cookie;
 
-    if (fwk_interrupt_get_current(&interrupt) != FWK_SUCCESS)
+    if (intr_state == UNKNOWN_THREAD) {
+        status = fwk_interrupt_get_current(&interrupt);
+        if (status != FWK_SUCCESS)
+            intr_state = NOT_INTERRUPT_THREAD;
+        else
+            intr_state = INTERRUPT_THREAD;
+    }
+    if (intr_state == NOT_INTERRUPT_THREAD)
         fwk_list_push_tail(&ctx.event_queue, &allocated_event->slist_node);
     else
         fwk_list_push_tail(&ctx.isr_event_queue, &allocated_event->slist_node);
@@ -179,7 +195,7 @@ static void process_next_event(void)
         async_response_event.is_response = true;
         async_response_event.response_requested = false;
         if (!async_response_event.is_delayed_response)
-            put_event(&async_response_event);
+            put_event(&async_response_event, UNKNOWN_THREAD);
         else {
             allocated_event = duplicate_event(&async_response_event);
             if (allocated_event != NULL) {
@@ -284,7 +300,7 @@ int __fwk_thread_put_notification(struct fwk_event *event)
     event->is_response = false;
     event->is_notification = true;
 
-    return put_event(event);
+    return put_event(event, UNKNOWN_THREAD);
 }
 #endif
 
@@ -296,6 +312,7 @@ int fwk_thread_put_event(struct fwk_event *event)
 {
     int status = FWK_E_PARAM;
     unsigned int interrupt;
+    enum thread_interrupt_states intr_state;
 
     if (!ctx.initialized) {
         status = FWK_E_INIT;
@@ -305,12 +322,20 @@ int fwk_thread_put_event(struct fwk_event *event)
     if (event == NULL)
         goto error;
 
-    if ((fwk_interrupt_get_current(&interrupt) != FWK_SUCCESS) &&
-        (ctx.current_event != NULL))
-        event->source_id = ctx.current_event->target_id;
-    else if (!fwk_module_is_valid_entity_id(event->source_id))
-        goto error;
+    status = fwk_interrupt_get_current(&interrupt);
+    if (status != FWK_SUCCESS)
+        intr_state = NOT_INTERRUPT_THREAD;
+    else
+        intr_state = INTERRUPT_THREAD;
 
+    if ((intr_state == NOT_INTERRUPT_THREAD) && (ctx.current_event != NULL))
+        event->source_id = ctx.current_event->target_id;
+    else if (!fwk_module_is_valid_entity_id(event->source_id)) {
+        status = FWK_E_PARAM;
+        goto error;
+    }
+
+    status = FWK_E_PARAM;
     if (event->is_notification) {
         if (!fwk_module_is_valid_notification_id(event->id))
             goto error;
@@ -335,7 +360,7 @@ int fwk_thread_put_event(struct fwk_event *event)
         }
     }
 
-    return put_event(event);
+    return put_event(event, intr_state);
 
 error:
     FWK_LOG_CRIT(err_msg_func, status, __func__);
@@ -403,7 +428,7 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
     event->response_requested = true;
     event->is_notification = false;
 
-    status = put_event(event);
+    status = put_event(event, NOT_INTERRUPT_THREAD);
     if (status != FWK_SUCCESS)
         goto exit;
 
@@ -454,7 +479,7 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
             response_event.is_response = true;
             response_event.response_requested = false;
             if (!response_event.is_delayed_response) {
-                status = put_event(&response_event);
+                status = put_event(&response_event, UNKNOWN_THREAD);
                 if (status != FWK_SUCCESS)
                     goto exit;
                 ctx.cookie = response_event.cookie;
