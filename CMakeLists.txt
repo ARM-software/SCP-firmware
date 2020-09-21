@@ -34,6 +34,9 @@ list(APPEND cmake_globs "*.cmake")
 
 list(APPEND markdown_globs "*.md")
 
+list(APPEND yaml_globs "*.yml")
+list(APPEND yaml_globs "*.yaml")
+
 #
 # Glob sources and place them in their respective variables. Globs for source
 # types can be with specified with a `${type}_globs` variable, which should be a
@@ -42,7 +45,7 @@ list(APPEND markdown_globs "*.md")
 
 # cmake-lint: disable=C0103
 
-foreach(type cmake markdown)
+foreach(type cmake markdown yaml)
     unset(sources)
 
     foreach(include IN LISTS glob_includes)
@@ -111,6 +114,51 @@ if(Markdownlint_FOUND)
         COMMAND_EXPAND_LISTS)
 
     list(APPEND lint_targets "lint-markdown")
+endif()
+
+#
+# Configure yaml-format.
+#
+
+find_package(Python3 COMPONENTS Interpreter)
+
+if(Python3_Interpreter_FOUND)
+    add_custom_target(
+        format-yaml
+        COMMAND Python3::Interpreter "${SCP_SOURCE_DIR}/tools/yaml-format.py"
+                format -i "${yaml_sources}"
+        WORKING_DIRECTORY "${SCP_SOURCE_DIR}"
+        COMMENT "Formatting YAML sources..."
+        COMMAND_EXPAND_LISTS)
+
+    list(APPEND format_targets "format-yaml")
+
+    add_custom_target(
+        check-yaml
+        COMMAND Python3::Interpreter "${SCP_SOURCE_DIR}/tools/yaml-format.py"
+                diff --check "${yaml_sources}"
+        WORKING_DIRECTORY "${SCP_SOURCE_DIR}"
+        COMMENT "Checking YAML sources..."
+        COMMAND_EXPAND_LISTS)
+
+    list(APPEND check_targets "check-yaml")
+endif()
+
+#
+# Configure yamllint.
+#
+
+find_package(Yamllint)
+
+if(Yamllint_FOUND)
+    add_custom_target(
+        lint-yaml
+        COMMAND Yamllint -s "${yaml_sources}"
+        WORKING_DIRECTORY "${SCP_SOURCE_DIR}"
+        COMMENT "Linting YAML sources..."
+        COMMAND_EXPAND_LISTS)
+
+    list(APPEND lint_targets "lint-yaml")
 endif()
 
 #
