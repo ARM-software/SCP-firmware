@@ -32,6 +32,8 @@ list(APPEND glob_excludes "^${SCP_SOURCE_DIR}/contrib/cmsis/git")
 list(APPEND cmake_globs "CMakeLists.txt")
 list(APPEND cmake_globs "*.cmake")
 
+list(APPEND markdown_globs "*.md")
+
 #
 # Glob sources and place them in their respective variables. Globs for source
 # types can be with specified with a `${type}_globs` variable, which should be a
@@ -40,7 +42,7 @@ list(APPEND cmake_globs "*.cmake")
 
 # cmake-lint: disable=C0103
 
-foreach(type cmake)
+foreach(type cmake markdown)
     unset(sources)
 
     foreach(include IN LISTS glob_includes)
@@ -92,6 +94,23 @@ if(TARGET CMakeFormat::Lint)
         COMMAND_EXPAND_LISTS)
 
     list(APPEND lint_targets "lint-cmake")
+endif()
+
+#
+# Configure markdownlint.
+#
+
+find_package(Markdownlint)
+
+if(Markdownlint_FOUND)
+    add_custom_target(
+        lint-markdown
+        COMMAND Markdownlint "${markdown_sources}"
+        WORKING_DIRECTORY "${SCP_SOURCE_DIR}"
+        COMMENT "Running Markdown sources..."
+        COMMAND_EXPAND_LISTS)
+
+    list(APPEND lint_targets "lint-markdown")
 endif()
 
 #
