@@ -330,6 +330,11 @@ cmake_dependent_option(
     "${SCP_ENABLE_RESOURCE_PERMISSIONS_INIT}" "DEFINED SCP_ENABLE_RESOURCE_PERMISSIONS_INIT"
     "${SCP_ENABLE_RESOURCE_PERMISSIONS}")
 
+cmake_dependent_option(
+    SCP_ENABLE_SCMI_NOTIFICATIONS "Enable the SCMI notifications?"
+    "${SCP_ENABLE_SCMI_NOTIFICATIONS_INIT}" "DEFINED SCP_ENABLE_SCMI_NOTIFICATIONS_INIT"
+    "${SCP_ENABLE_SCMI_NOTIFICATIONS}")
+
 #
 # Wrap `add_executable` in a way that allows us to do some extra processing on
 # the firmware target.(e.g. flat binary generation) This is necessary
