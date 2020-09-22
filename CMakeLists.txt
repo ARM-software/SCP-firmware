@@ -283,6 +283,14 @@ if(CMAKE_C_COMPILER_ID MATCHES "ARMClang")
 endif()
 
 #
+# Try to identify any standard libraries that require special treatment.
+#
+
+include(CheckSymbolExists)
+
+check_symbol_exists("__NEWLIB__" "sys/features.h" SCP_HAVE_NEWLIB)
+
+#
 # If the user asks for it, we can save them some time by creating a flat binary
 # from the firmware's compiled ELF image.
 #
