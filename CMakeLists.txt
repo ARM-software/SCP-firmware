@@ -229,6 +229,40 @@ if (ENABLE_CLANG_TIDY)
 endif()
 
 #
+# Set up Include What You Use ("IWYU") if it's available and enabled.
+#
+if (ENABLE_IWYU)
+
+    find_program(CMAKE_C_INCLUDE_WHAT_YOU_USE NAMES iwyu include-what-you-use)
+
+    if(NOT CMAKE_C_INCLUDE_WHAT_YOU_USE)
+        unset(CMAKE_C_INCLUDE_WHAT_YOU_USE CACHE)
+    endif()
+
+    if(CMAKE_C_INCLUDE_WHAT_YOU_USE)
+        # cmake-format: off
+
+        if(CMAKE_C_COMPILER_TARGET)
+            list(APPEND CMAKE_C_INCLUDE_WHAT_YOU_USE "--target=${CMAKE_C_COMPILER_TARGET}")
+        endif()
+
+        foreach(dir IN LISTS CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES)
+            list(APPEND CMAKE_C_INCLUDE_WHAT_YOU_USE "-isystem")
+            list(APPEND CMAKE_C_INCLUDE_WHAT_YOU_USE "${dir}")
+        endforeach()
+
+        if(CMAKE_C_COMPILER_ID STREQUAL "ARMClang")
+            list(APPEND CMAKE_C_INCLUDE_WHAT_YOU_USE "-D__ARM_PROMISE=__builtin_assume")
+            list(APPEND CMAKE_C_INCLUDE_WHAT_YOU_USE "-D__ARMCC_VERSION=600000")
+            list(APPEND CMAKE_C_INCLUDE_WHAT_YOU_USE "-D__ESCAPE__(x)=(x)")
+        endif()
+
+        # cmake-format: on
+    endif()
+
+endif()
+
+#
 # If the firmware developer has given us initial values for these configuration
 # options, we can expose them to the user.
 #

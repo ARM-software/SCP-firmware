@@ -8,9 +8,9 @@
 #ifndef ASSERT_H
 #define ASSERT_H
 
-#include_next <assert.h>
+#include_next <assert.h> /* IWYU pragma: keep */
 
-#ifndef __USE_ISOC11
+#ifndef static_assert
 #    define static_assert _Static_assert
 #endif
 

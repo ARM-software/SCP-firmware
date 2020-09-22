@@ -12,6 +12,7 @@ ARG ARM_COMPILER_6_URL="https://developer.arm.com/-/media/Files/downloads/compil
 ARG DOXYGEN_URL="http://doxygen.nl/files/doxygen-1.8.20.linux.bin.tar.gz"
 ARG CMAKE_URL="https://github.com/Kitware/CMake/releases/download/v3.18.3/cmake-3.18.3-Linux-x86_64.tar.gz"
 ARG CPPCHECK_SRC_URL="git://github.com/danmar/cppcheck.git"
+ARG IWYU_SRC_URL="https://github.com/include-what-you-use/include-what-you-use.git"
 
 ENV ARMLMD_LICENSE_FILE=
 
@@ -26,7 +27,9 @@ RUN apt-get update && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
         clang-format libclang-cpp9 libclang1-9 \
-        clang-tidy-10 libclang-9-dev && \
+        clang-tidy-10 libclang-9-dev \
+        clang-10 llvm-10 libclang-10-dev \
+        llvm-10-dev && \
     python3 -m pip install --upgrade pip
 
 ENV DEBIAN_FRONTEND=
@@ -75,6 +78,16 @@ RUN cwd=$PWD && mkdir "/opt/cppcheck" && cd "/opt/cppcheck" && \
         "/etc/profile.d/50-scp-fimrware-env.sh"
 
 ENV PATH="/opt/cppcheck/bin:${PATH}"
+
+RUN cwd=$PWD && mkdir "/opt/iwyu" && cd "/opt/iwyu" && \
+    git clone "${IWYU_SRC_URL}" -b clang_10 --single-branch iwyu-10 && \
+    cmake -G "Ninja" -DCMAKE_PREFIX_PATH=/usr/lib/llvm-10 \
+    ./iwyu-10 && cmake --build . && \
+    cd bin && ln -s include-what-you-use iwyu && cd $cwd && \
+    echo 'export PATH=/opt/iwyu/bin:${PATH}' >> \
+        "/etc/profile.d/50-scp-fimrware-env.sh"
+
+ENV PATH="/opt/iwyu/bin:${PATH}"
 
 COPY rootfs/usr/local/bin/init /usr/local/bin/init
 RUN  chmod 755 "/usr/local/bin/init"
