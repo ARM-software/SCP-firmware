@@ -52,6 +52,7 @@ BS_FIRMWARE_MODULES := \
     juno_xrp7724 \
     reg_sensor \
     psu \
+    mock_clock \
     mock_psu \
     juno_pvt \
     juno_thermal
@@ -97,6 +98,7 @@ BS_FIRMWARE_SOURCES := \
     config_sensor.c \
     config_reg_sensor.c \
     config_psu.c \
+    config_mock_clock.c \
     config_mock_psu.c \
     config_juno_pvt.c \
     config_juno_thermal.c \
