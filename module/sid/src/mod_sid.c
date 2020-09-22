@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <sid_reg.h>
+#include "sid_reg.h"
 
 #include <mod_pcid.h>
 #include <mod_sid.h>

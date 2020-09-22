@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <clock.h>
+#include "clock.h"
 
 #include <mod_clock.h>
 #include <mod_power_domain.h>

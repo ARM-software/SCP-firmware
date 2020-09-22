@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <ppu_v0.h>
+#include "ppu_v0.h"
 
 #include <fwk_assert.h>
 #include <fwk_status.h>
