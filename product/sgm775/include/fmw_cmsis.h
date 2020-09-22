@@ -8,11 +8,15 @@
 #ifndef FMW_CMSIS_H
 #define FMW_CMSIS_H
 
+#include <stdint.h>
+
 #define __CHECK_DEVICE_DEFINES
 #define __CM3_REV 0x0201
 #define __MPU_PRESENT 1
 #define __NVIC_PRIO_BITS 3
 #define __Vendor_SysTickConfig 0
+
+extern uint32_t SystemCoreClock; /*!< System Clock Frequency (Core Clock)*/
 
 typedef enum IRQn {
     Reset_IRQn = -15,

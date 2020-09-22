@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <gtimer_reg.h>
+#include "gtimer_reg.h"
 
 #include <mod_clock.h>
 #include <mod_gtimer.h>

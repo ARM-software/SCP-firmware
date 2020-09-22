@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <pl011.h>
+#include "pl011.h"
 
 #include <mod_pl011.h>
 

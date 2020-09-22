@@ -8,7 +8,7 @@
  *     Power State Management PPU v0 driver.
  */
 
-#include <ppu_v0.h>
+#include "ppu_v0.h"
 
 #include <mod_power_domain.h>
 #include <mod_ppu_v0.h>

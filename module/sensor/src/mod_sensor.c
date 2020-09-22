@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <sensor.h>
+#include "sensor.h"
 
 #include <mod_scmi_sensor.h>
 #include <mod_sensor.h>
