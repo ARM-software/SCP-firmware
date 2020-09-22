@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "config_mock_clock.h"
 #include "juno_clock.h"
 #include "juno_id.h"
 #include "juno_mmap.h"
@@ -13,6 +14,7 @@
 #include <mod_clock.h>
 #include <mod_juno_cdcel937.h>
 #include <mod_juno_hdlcd.h>
+#include <mod_mock_clock.h>
 
 #include <fwk_assert.h>
 #include <fwk_element.h>
@@ -185,6 +187,19 @@ static const struct fwk_element *juno_cdcel937_get_element_table(
     status = juno_id_get_platform(&platform_id);
     if (status != FWK_SUCCESS)
         return NULL;
+
+    /* If running under a FVP, direct interactions to the mocked elements */
+    if (platform_id == JUNO_IDX_PLATFORM_FVP) {
+        config =
+            (struct mod_juno_cdcel937_dev_config
+                 *)(juno_cdcel937_element_table[JUNO_CLOCK_CDCEL937_IDX_I2SCLK]
+                        .data);
+
+        config->clock_hal_id = (fwk_id_t)FWK_ID_ELEMENT_INIT(
+            FWK_MODULE_IDX_MOCK_CLOCK, MOD_MOCK_CLOCK_ELEMENT_IDX_I2S);
+        config->clock_api_id = (fwk_id_t)FWK_ID_API_INIT(
+            FWK_MODULE_IDX_MOCK_CLOCK, MOD_MOCK_CLOCK_API_TYPE_RESPONSE_DRIVER);
+    }
 
     /* Add the lookup table to the HDLCD elements */
     for (int i = 0; i < JUNO_CLOCK_CDCEL937_IDX_COUNT; i++) {
