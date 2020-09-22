@@ -308,6 +308,22 @@ if(SCP_FIRMWARE)
                      EXCLUDE_FROM_ALL)
 
     #
+    # Generate a map file for the firmware.
+    #
+
+    if(CMAKE_C_COMPILER_ID STREQUAL "ARMClang")
+        target_link_options(
+            ${SCP_FIRMWARE_TARGET}
+            PRIVATE "LINKER:--map"
+                    "LINKER:--list=$<TARGET_FILE:${SCP_FIRMWARE_TARGET}>.map")
+    else()
+        target_link_options(
+            ${SCP_FIRMWARE_TARGET}
+            PRIVATE "LINKER:--cref"
+                    "LINKER:-Map=$<TARGET_FILE:${SCP_FIRMWARE_TARGET}>.map")
+    endif()
+
+    #
     # Make the firmware target a part of the 'all' pseudo-target and give it a
     # fixed output binary name so that different toolchains don't generate
     # different names (which is desirable especially for higher-level build
