@@ -269,6 +269,32 @@ if (ENABLE_IWYU)
 endif()
 
 #
+# Try to locate Arm Compiler's 'fromelf' tool.
+#
+
+if(CMAKE_C_COMPILER_ID MATCHES "ARMClang")
+    get_filename_component(base ${CMAKE_C_COMPILER} DIRECTORY)
+
+    find_program(SCP_FROMELF fromelf ${base})
+
+    if(SCP_FROMELF)
+        mark_as_advanced(SCP_FROMELF)
+    endif()
+endif()
+
+#
+# If the user asks for it, we can save them some time by creating a flat binary
+# from the firmware's compiled ELF image.
+#
+
+include(CMakeDependentOption)
+
+cmake_dependent_option(
+    SCP_GENERATE_FLAT_BINARY "Generate a flat binary (.bin) image?"
+    "${SCP_GENERATE_FLAT_BINARY_INIT}" "DEFINED SCP_GENERATE_FLAT_BINARY_INIT"
+    "${SCP_GENERATE_FLAT_BINARY}")
+
+#
 # If the firmware developer has given us initial values for these configuration
 # options, we can expose them to the user.
 #
@@ -290,6 +316,52 @@ cmake_dependent_option(
     SCP_ENABLE_NOTIFICATIONS "Enable the notification subsystem?"
     "${SCP_ENABLE_NOTIFICATIONS_INIT}" "DEFINED SCP_ENABLE_NOTIFICATIONS_INIT"
     "${SCP_ENABLE_NOTIFICATIONS}")
+
+#
+# Wrap `add_executable` in a way that allows us to do some extra processing on
+# the firmware target.(e.g. flat binary generation) This is necessary
+# almost exclusively because  `add_custom_command` cannot be used with a target
+# created in a different directory.
+#
+
+# cmake-lint: disable=C0103,C0111
+
+macro(add_executable target)
+    _add_executable(${target} ${ARGN})
+
+    if("${target}" STREQUAL "${SCP_FIRMWARE_TARGET}")
+        if(SCP_GENERATE_FLAT_BINARY)
+            #
+            # Invoke 'objcopy' or 'fromelf', which we use to generate a flat
+            # binary for the generated firmware image. We make this optional
+            # because some binaries consist of disjoint sections far apart from
+            # one another, which can generate huge binaries.
+            #
+
+            if(SCP_FROMELF)
+                # cmake-format: off
+                add_custom_command(
+                    TARGET ${target} POST_BUILD
+                    COMMAND ${SCP_FROMELF}
+                    ARGS
+                        --bin "$<TARGET_FILE:${target}>"
+                        --output "$<TARGET_FILE_DIR:${target}>/$<TARGET_PROPERTY:${target},OUTPUT_NAME>.bin"
+                    COMMENT "Generating flat binary ${target}.bin")
+                # cmake-format: on
+            elseif(CMAKE_OBJCOPY)
+                # cmake-format: off
+                add_custom_command(
+                    TARGET ${target} POST_BUILD
+                    COMMAND ${CMAKE_OBJCOPY}
+                    ARGS -O binary
+                        "$<TARGET_FILE:${target}>"
+                        "$<TARGET_FILE:${target}>.bin"
+                    COMMENT "Generating flat binary ${target}.bin")
+                # cmake-format: on
+            endif()
+        endif()
+    endif()
+endmacro()
 
 if(SCP_FIRMWARE)
     #
