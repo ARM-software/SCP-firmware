@@ -82,97 +82,109 @@ static const struct mod_pik_clock_rate rate_table_uartclk[] = {
     },
 };
 
-static const struct fwk_element pik_clock_element_table[] = {
+static const struct fwk_element
+    pik_clock_element_table[] =
+        {
 
-    [CLOCK_PIK_IDX_CLUS0_CPU0] = {
-        .name = "CLUS0_CPU0",
-        .data = &((struct mod_pik_clock_dev_config) {
-            .type = MOD_PIK_CLOCK_TYPE_CLUSTER,
-            .is_group_member = true,
-            .control_reg = &CLUSTER_PIK_PTR(0)->CORECLK[0].CTRL,
-            .divext_reg = &CLUSTER_PIK_PTR(0)->CORECLK[0].DIV,
-            .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[0].MOD,
-            .rate_table = rate_table_cpu_group,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group),
-        }),
-    },
-    [CLOCK_PIK_IDX_INTERCONNECT] = {
-        .name = "INTERCONNECT",
-        .data = &((struct mod_pik_clock_dev_config) {
-            .type = MOD_PIK_CLOCK_TYPE_MULTI_SOURCE,
-            .is_group_member = false,
-            .control_reg = &SYSTEM_PIK_PTR->INTCLK_CTRL,
-            .divext_reg = &SYSTEM_PIK_PTR->INTCLK_DIV1,
-            .rate_table = rate_table_sys_intclk,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_sys_intclk),
-            .initial_rate = 2000 * FWK_MHZ,
-        }),
-    },
-    [CLOCK_PIK_IDX_SCP] = {
-        .name = "SCP",
-        .data = &((struct mod_pik_clock_dev_config) {
-            .type = MOD_PIK_CLOCK_TYPE_MULTI_SOURCE,
-            .is_group_member = false,
-            .control_reg = &SCP_PIK_PTR->CORECLK_CTRL,
-            .divsys_reg = &SCP_PIK_PTR->CORECLK_DIV1,
-            .rate_table = rate_table_scp,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_scp),
-            .initial_rate = 2000 * FWK_MHZ,
-        }),
-    },
-    [CLOCK_PIK_IDX_GIC] = {
-        .name = "GIC",
-        .data = &((struct mod_pik_clock_dev_config) {
-            .type = MOD_PIK_CLOCK_TYPE_MULTI_SOURCE,
-            .is_group_member = false,
-            .control_reg = &SYSTEM_PIK_PTR->GICCLK_CTRL,
-            .divsys_reg = &SYSTEM_PIK_PTR->GICCLK_DIV1,
-            .rate_table = rate_table_gicclk,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_gicclk),
-            .initial_rate = 2000 * FWK_MHZ,
-        }),
-    },
-    [CLOCK_PIK_IDX_PCLKSCP] = {
-        .name = "PCLKSCP",
-        .data = &((struct mod_pik_clock_dev_config) {
-            .type = MOD_PIK_CLOCK_TYPE_MULTI_SOURCE,
-            .is_group_member = false,
-            .control_reg = &SYSTEM_PIK_PTR->PCLKSCP_CTRL,
-            .divsys_reg = &SYSTEM_PIK_PTR->PCLKSCP_DIV1,
-            .rate_table = rate_table_pclkscp,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_pclkscp),
-            .initial_rate = 2000 * FWK_MHZ,
-        }),
-    },
-    [CLOCK_PIK_IDX_SYSPERCLK] = {
-        .name = "SYSPERCLK",
-        .data = &((struct mod_pik_clock_dev_config) {
-            .type = MOD_PIK_CLOCK_TYPE_MULTI_SOURCE,
-            .is_group_member = false,
-            .control_reg = &SYSTEM_PIK_PTR->SYSPERCLK_CTRL,
-            .divsys_reg = &SYSTEM_PIK_PTR->SYSPERCLK_DIV1,
-            .rate_table = rate_table_sysperclk,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_sysperclk),
-            .initial_rate = 2000 * FWK_MHZ,
-        }),
-    },
-    [CLOCK_PIK_IDX_UARTCLK] = {
-        .name = "UARTCLK",
-        .data = &((struct mod_pik_clock_dev_config) {
-            .type = MOD_PIK_CLOCK_TYPE_MULTI_SOURCE,
-            .is_group_member = false,
-            .control_reg = &SYSTEM_PIK_PTR->UARTCLK_CTRL,
-            .divsys_reg = &SYSTEM_PIK_PTR->UARTCLK_DIV1,
-            .rate_table = rate_table_uartclk,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_uartclk),
-            .initial_rate = 2000 * FWK_MHZ,
-        }),
-    },
-    [CLOCK_PIK_IDX_COUNT] = { 0 }, /* Termination description. */
-};
+            [CLOCK_PIK_IDX_CLUS0_CPU0] =
+                {
+                    .name = "CLUS0_CPU0",
+                    .data = &((struct mod_pik_clock_dev_config){
+                        .type = MOD_PIK_CLOCK_TYPE_CLUSTER,
+                        .is_group_member = true,
+                        .control_reg = &CLUSTER_PIK_PTR(0)->CORECLK[0].CTRL,
+                        .divext_reg = &CLUSTER_PIK_PTR(0)->CORECLK[0].DIV,
+                        .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[0].MOD,
+                        .rate_table = rate_table_cpu_group,
+                        .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group),
+                    }),
+                },
+            [CLOCK_PIK_IDX_INTERCONNECT] =
+                {
+                    .name = "INTERCONNECT",
+                    .data = &((struct mod_pik_clock_dev_config){
+                        .type = MOD_PIK_CLOCK_TYPE_MULTI_SOURCE,
+                        .is_group_member = false,
+                        .control_reg = &SYSTEM_PIK_PTR->INTCLK_CTRL,
+                        .divext_reg = &SYSTEM_PIK_PTR->INTCLK_DIV1,
+                        .rate_table = rate_table_sys_intclk,
+                        .rate_count = FWK_ARRAY_SIZE(rate_table_sys_intclk),
+                        .initial_rate = 2000 * FWK_MHZ,
+                    }),
+                },
+            [CLOCK_PIK_IDX_SCP] =
+                {
+                    .name = "SCP",
+                    .data = &((struct mod_pik_clock_dev_config){
+                        .type = MOD_PIK_CLOCK_TYPE_MULTI_SOURCE,
+                        .is_group_member = false,
+                        .control_reg = &SCP_PIK_PTR->CORECLK_CTRL,
+                        .divsys_reg = &SCP_PIK_PTR->CORECLK_DIV1,
+                        .rate_table = rate_table_scp,
+                        .rate_count = FWK_ARRAY_SIZE(rate_table_scp),
+                        .initial_rate = 2000 * FWK_MHZ,
+                    }),
+                },
+            [CLOCK_PIK_IDX_GIC] =
+                {
+                    .name = "GIC",
+                    .data = &((struct mod_pik_clock_dev_config){
+                        .type = MOD_PIK_CLOCK_TYPE_MULTI_SOURCE,
+                        .is_group_member = false,
+                        .control_reg = &SYSTEM_PIK_PTR->GICCLK_CTRL,
+                        .divsys_reg = &SYSTEM_PIK_PTR->GICCLK_DIV1,
+                        .rate_table = rate_table_gicclk,
+                        .rate_count = FWK_ARRAY_SIZE(rate_table_gicclk),
+                        .initial_rate = 2000 * FWK_MHZ,
+                    }),
+                },
+            [CLOCK_PIK_IDX_PCLKSCP] =
+                {
+                    .name = "PCLKSCP",
+                    .data = &((struct mod_pik_clock_dev_config){
+                        .type = MOD_PIK_CLOCK_TYPE_MULTI_SOURCE,
+                        .is_group_member = false,
+                        .control_reg = &SYSTEM_PIK_PTR->PCLKSCP_CTRL,
+                        .divsys_reg = &SYSTEM_PIK_PTR->PCLKSCP_DIV1,
+                        .rate_table = rate_table_pclkscp,
+                        .rate_count = FWK_ARRAY_SIZE(rate_table_pclkscp),
+                        .initial_rate = 2000 * FWK_MHZ,
+                    }),
+                },
+            [CLOCK_PIK_IDX_SYSPERCLK] =
+                {
+                    .name = "SYSPERCLK",
+                    .data =
+                        &(
+                            (struct mod_pik_clock_dev_config){
+                                .type = MOD_PIK_CLOCK_TYPE_MULTI_SOURCE,
+                                .is_group_member = false,
+                                .control_reg = &SYSTEM_PIK_PTR->SYSPERCLK_CTRL,
+                                .divsys_reg = &SYSTEM_PIK_PTR->SYSPERCLK_DIV1,
+                                .rate_table = rate_table_sysperclk,
+                                .rate_count =
+                                    FWK_ARRAY_SIZE(rate_table_sysperclk),
+                                .initial_rate = 2000 * FWK_MHZ,
+                            }),
+                },
+            [CLOCK_PIK_IDX_UARTCLK] =
+                {
+                    .name = "UARTCLK",
+                    .data = &(
+                        (struct mod_pik_clock_dev_config){
+                            .type = MOD_PIK_CLOCK_TYPE_MULTI_SOURCE,
+                            .is_group_member = false,
+                            .control_reg = &SYSTEM_PIK_PTR->UARTCLK_CTRL,
+                            .divsys_reg = &SYSTEM_PIK_PTR->UARTCLK_DIV1,
+                            .rate_table = rate_table_uartclk,
+                            .rate_count = FWK_ARRAY_SIZE(rate_table_uartclk),
+                            .initial_rate = 2000 * FWK_MHZ,
+                        }),
+                },
+            [CLOCK_PIK_IDX_COUNT] = { 0 }, /* Termination description. */
+        };
 
-static const struct fwk_element *pik_clock_get_element_table
-    (fwk_id_t module_id)
+static const struct fwk_element *pik_clock_get_element_table(fwk_id_t module_id)
 {
     return pik_clock_element_table;
 }

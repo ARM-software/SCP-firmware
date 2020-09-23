@@ -14,7 +14,7 @@
 #include <fwk_module_idx.h>
 
 const struct fwk_module_config config_msys_rom = {
-    .data = &((struct msys_rom_config) {
+    .data = &((struct msys_rom_config){
         .ap_context_base = SCP_AP_CONTEXT_BASE,
         .ap_context_size = SCP_AP_CONTEXT_SIZE,
         .id_primary_cluster = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PPU_V1, 1),

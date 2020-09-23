@@ -196,8 +196,7 @@ static const struct fwk_element pik_clock_element_table[] = {
     [CLOCK_PIK_IDX_COUNT] = { 0 }, /* Termination description. */
 };
 
-static const struct fwk_element *pik_clock_get_element_table
-    (fwk_id_t module_id)
+static const struct fwk_element *pik_clock_get_element_table(fwk_id_t module_id)
 {
     return pik_clock_element_table;
 }

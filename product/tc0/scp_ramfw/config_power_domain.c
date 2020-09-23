@@ -31,7 +31,7 @@
 
 /* Mask of the allowed states for the systop power domain */
 static const uint32_t systop_allowed_state_mask_table[] = {
-    [0] =  MOD_PD_STATE_ON_MASK
+    [0] = MOD_PD_STATE_ON_MASK
 };
 
 /*
@@ -50,31 +50,30 @@ static const uint32_t core_pd_allowed_state_mask_table[] = {
 };
 
 /* Power module specific configuration data (none) */
-static const struct mod_power_domain_config
-    tc0_power_domain_config = { 0 };
+static const struct mod_power_domain_config tc0_power_domain_config = { 0 };
 
 static struct fwk_element tc0_power_domain_static_element_table[] = {
-    [PD_STATIC_DEV_IDX_SYSTOP] = {
-        .name = "SYSTOP",
-        .data = &((struct mod_power_domain_element_config) {
-            .attributes.pd_type = MOD_PD_TYPE_SYSTEM,
-            .parent_idx = PD_STATIC_DEV_IDX_NONE,
-            .driver_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SYSTEM_POWER),
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_SYSTEM_POWER,
-                MOD_SYSTEM_POWER_API_IDX_PD_DRIVER),
-            .allowed_state_mask_table = systop_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(systop_allowed_state_mask_table)
-        }),
-    },
+    [PD_STATIC_DEV_IDX_SYSTOP] =
+        {
+            .name = "SYSTOP",
+            .data = &((struct mod_power_domain_element_config){
+                .attributes.pd_type = MOD_PD_TYPE_SYSTEM,
+                .parent_idx = PD_STATIC_DEV_IDX_NONE,
+                .driver_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SYSTEM_POWER),
+                .api_id = FWK_ID_API_INIT(
+                    FWK_MODULE_IDX_SYSTEM_POWER,
+                    MOD_SYSTEM_POWER_API_IDX_PD_DRIVER),
+                .allowed_state_mask_table = systop_allowed_state_mask_table,
+                .allowed_state_mask_table_size =
+                    FWK_ARRAY_SIZE(systop_allowed_state_mask_table) }),
+        },
 };
 
 /*
  * Function definitions with internal linkage
  */
-static const struct fwk_element *tc0_power_domain_get_element_table
-    (fwk_id_t module_id)
+static const struct fwk_element *tc0_power_domain_get_element_table(
+    fwk_id_t module_id)
 {
     return create_power_domain_element_table(
         tc0_core_get_core_count(),

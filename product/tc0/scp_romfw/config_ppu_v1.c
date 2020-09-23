@@ -6,8 +6,8 @@
  */
 
 #include "config_power_domain.h"
-#include "tc0_core.h"
 #include "scp_css_mmap.h"
+#include "tc0_core.h"
 
 #include <mod_cmn_booker.h>
 #include <mod_msys_rom.h>
@@ -31,14 +31,13 @@
 /* Maximum PPU cluster name size including the null terminator */
 #define PPU_CLUS_NAME_SIZE 6
 
-
 /* Lookup table for translating cluster indicies into CMN_BOOKER node IDs */
-static const unsigned int cluster_idx_to_node_id[] = {68};
+static const unsigned int cluster_idx_to_node_id[] = { 68 };
 
 static struct fwk_element ppu_v1_system_element_table[] = {
     {
         .name = "SYS0",
-        .data = &((struct mod_ppu_v1_pd_config) {
+        .data = &((struct mod_ppu_v1_pd_config){
             .pd_type = MOD_PD_TYPE_SYSTEM,
             .ppu.reg_base = SCP_PPU_SYS0_BASE,
             .observer_id = FWK_ID_NONE_INIT,
@@ -47,7 +46,7 @@ static struct fwk_element ppu_v1_system_element_table[] = {
     },
     {
         .name = "SYS1",
-        .data = &((struct mod_ppu_v1_pd_config) {
+        .data = &((struct mod_ppu_v1_pd_config){
             .pd_type = MOD_PD_TYPE_SYSTEM,
             .ppu.reg_base = SCP_PPU_SYS1_BASE,
             .observer_id = FWK_ID_NONE_INIT,
@@ -70,8 +69,8 @@ static const struct fwk_element *tc0_ppu_v1_get_element_table(
      *   + Number of system power domain descriptors
      *   + 1 terminator descriptor
      */
-    element_table = fwk_mm_calloc(2 +
-        FWK_ARRAY_SIZE(ppu_v1_system_element_table) + 1,
+    element_table = fwk_mm_calloc(
+        2 + FWK_ARRAY_SIZE(ppu_v1_system_element_table) + 1,
         sizeof(struct fwk_element));
     if (element_table == NULL)
         return NULL;
@@ -95,11 +94,10 @@ static const struct fwk_element *tc0_ppu_v1_get_element_table(
     pd_config->pd_type = MOD_PD_TYPE_CORE;
     pd_config->ppu.reg_base = SCP_PPU_CORE_BASE(0, 0);
     pd_config->ppu.irq = FWK_INTERRUPT_NONE;
-    pd_config->cluster_id =
-        FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1, 1);
+    pd_config->cluster_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1, 1);
     pd_config->observer_id = FWK_ID_NONE;
 
-    //pd_config for cluster0
+    // pd_config for cluster0
     element = &element_table[1];
     pd_config = &pd_config_table[1];
 
@@ -116,14 +114,14 @@ static const struct fwk_element *tc0_ppu_v1_get_element_table(
     pd_config->ppu.irq = FWK_INTERRUPT_NONE;
 
     pd_config->observer_id = fwk_module_id_cmn_booker;
-    pd_config->observer_api = FWK_ID_API(FWK_MODULE_IDX_CMN_BOOKER,
-                                         MOD_CMN_BOOKER_API_IDX_PPU_OBSERVER);
-    pd_config->post_ppu_on_param =
-        (void *)&cluster_idx_to_node_id[0];
+    pd_config->observer_api = FWK_ID_API(
+        FWK_MODULE_IDX_CMN_BOOKER, MOD_CMN_BOOKER_API_IDX_PPU_OBSERVER);
+    pd_config->post_ppu_on_param = (void *)&cluster_idx_to_node_id[0];
 
-    memcpy(&element_table[2],
-           ppu_v1_system_element_table,
-           sizeof(ppu_v1_system_element_table));
+    memcpy(
+        &element_table[2],
+        ppu_v1_system_element_table,
+        sizeof(ppu_v1_system_element_table));
 
     return element_table;
 }

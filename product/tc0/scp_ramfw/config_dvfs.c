@@ -58,13 +58,12 @@ static const struct mod_dvfs_domain_config cpu_group = {
     .opps = opps,
 };
 
-static const struct fwk_element element_table[] = {
-    [0] = {
-        .name = "CPU_GROUP",
-        .data = &cpu_group,
-    },
-    { 0 }
-};
+static const struct fwk_element element_table[] = { [0] =
+                                                        {
+                                                            .name = "CPU_GROUP",
+                                                            .data = &cpu_group,
+                                                        },
+                                                    { 0 } };
 
 static const struct fwk_element *dvfs_get_element_table(fwk_id_t module_id)
 {

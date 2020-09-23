@@ -12,8 +12,8 @@
 
 #define TC0_CORE_PER_CLUSTER_MAX 4
 
-#define CORES_PER_CLUSTER   4
-#define NUMBER_OF_CLUSTERS  1
+#define CORES_PER_CLUSTER 4
+#define NUMBER_OF_CLUSTERS 1
 
 static inline unsigned int tc0_core_get_cluster_count(void)
 {
@@ -31,7 +31,7 @@ static inline unsigned int tc0_core_get_core_per_cluster_count(
 static inline unsigned int tc0_core_get_core_count(void)
 {
     return tc0_core_get_core_per_cluster_count(0) *
-            tc0_core_get_cluster_count();
+        tc0_core_get_cluster_count();
 }
 
 #endif /* TC0_CORE_H */
