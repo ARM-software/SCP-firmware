@@ -18,8 +18,7 @@
 static const struct mod_scmi_clock_device agent_device_table_ospm[] = {
     {
         /* DPU */
-        .element_id =
-            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_DPU),
+        .element_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_DPU),
     },
     {
         /* PIXEL_0 */
@@ -33,17 +32,18 @@ static const struct mod_scmi_clock_device agent_device_table_ospm[] = {
     },
 };
 
-static const struct mod_scmi_clock_agent
-  agent_table[SCP_SCMI_AGENT_ID_COUNT] = {
-    [SCP_SCMI_AGENT_ID_PSCI] = { 0 /* No access */ },
-    [SCP_SCMI_AGENT_ID_OSPM] = {
-        .device_table = agent_device_table_ospm,
-        .device_count = FWK_ARRAY_SIZE(agent_device_table_ospm),
-    },
-};
+static const struct mod_scmi_clock_agent agent_table[SCP_SCMI_AGENT_ID_COUNT] =
+    {
+        [SCP_SCMI_AGENT_ID_PSCI] = { 0 /* No access */ },
+        [SCP_SCMI_AGENT_ID_OSPM] =
+            {
+                .device_table = agent_device_table_ospm,
+                .device_count = FWK_ARRAY_SIZE(agent_device_table_ospm),
+            },
+    };
 
 const struct fwk_module_config config_scmi_clock = {
-    .data = &((struct mod_scmi_clock_config) {
+    .data = &((struct mod_scmi_clock_config){
         .max_pending_transactions = 0,
         .agent_table = agent_table,
         .agent_count = FWK_ARRAY_SIZE(agent_table),

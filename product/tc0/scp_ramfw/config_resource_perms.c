@@ -45,47 +45,63 @@ static struct mod_res_agent_protocol_permissions agent_protocol_permissions[] =
  * protocols, hence message 0x3 maps to bit[0], message 0x4 maps
  * to bit[1], etc.
  */
-static struct mod_res_agent_msg_permissions agent_msg_permissions[] = {
-        [AGENT_IDX(SCP_SCMI_AGENT_ID_OSPM)] = {
-            .messages[MOD_RES_PERMS_SCMI_BASE_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_POWER_DOMAIN_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_SYS_POWER_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_PERF_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_CLOCK_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_SENSOR_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_RESET_DOMAIN_MESSAGE_IDX] = 0x0,
-        },
-        [AGENT_IDX(SCP_SCMI_AGENT_ID_PSCI)] = {
-            .messages[MOD_RES_PERMS_SCMI_BASE_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_POWER_DOMAIN_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_SYS_POWER_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_PERF_MESSAGE_IDX] =
-                ((1 << (MOD_SCMI_PERF_DOMAIN_ATTRIBUTES -
-                      MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
-                 /* DESCRIBE_LEVELS is required for some reason ... */
-                 (0 << (MOD_SCMI_PERF_DESCRIBE_LEVELS -
-                      MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
-                 (1 << (MOD_SCMI_PERF_LIMITS_SET -
-                      MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
-                 (1 << (MOD_SCMI_PERF_LIMITS_GET -
-                      MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
-                 (1 << (MOD_SCMI_PERF_LEVEL_SET -
-                      MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
-                 (1 << (MOD_SCMI_PERF_LEVEL_GET -
-                      MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
-                 (1 << (MOD_SCMI_PERF_NOTIFY_LIMITS -
-                      MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
-                 (1 << (MOD_SCMI_PERF_NOTIFY_LEVEL -
-                      MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
-                 (1 << (MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL -
-                      MOD_SCMI_PERF_DOMAIN_ATTRIBUTES))),
-            /* Clocks, no access */
-            .messages[MOD_RES_PERMS_SCMI_CLOCK_MESSAGE_IDX] = 0xff,
-            .messages[MOD_RES_PERMS_SCMI_SENSOR_MESSAGE_IDX] = 0x0,
-            .messages[MOD_RES_PERMS_SCMI_RESET_DOMAIN_MESSAGE_IDX] = 0x0,
-        },
-    };
-
+static struct mod_res_agent_msg_permissions
+    agent_msg_permissions[] =
+        {
+            [AGENT_IDX(SCP_SCMI_AGENT_ID_OSPM)] =
+                {
+                    .messages[MOD_RES_PERMS_SCMI_BASE_MESSAGE_IDX] = 0x0,
+                    .messages[MOD_RES_PERMS_SCMI_POWER_DOMAIN_MESSAGE_IDX] =
+                        0x0,
+                    .messages[MOD_RES_PERMS_SCMI_SYS_POWER_MESSAGE_IDX] = 0x0,
+                    .messages[MOD_RES_PERMS_SCMI_PERF_MESSAGE_IDX] = 0x0,
+                    .messages[MOD_RES_PERMS_SCMI_CLOCK_MESSAGE_IDX] = 0x0,
+                    .messages[MOD_RES_PERMS_SCMI_SENSOR_MESSAGE_IDX] = 0x0,
+                    .messages[MOD_RES_PERMS_SCMI_RESET_DOMAIN_MESSAGE_IDX] =
+                        0x0,
+                },
+            [AGENT_IDX(SCP_SCMI_AGENT_ID_PSCI)] =
+                {
+                    .messages[MOD_RES_PERMS_SCMI_BASE_MESSAGE_IDX] = 0x0,
+                    .messages[MOD_RES_PERMS_SCMI_POWER_DOMAIN_MESSAGE_IDX] =
+                        0x0,
+                    .messages[MOD_RES_PERMS_SCMI_SYS_POWER_MESSAGE_IDX] = 0x0,
+                    .messages[MOD_RES_PERMS_SCMI_PERF_MESSAGE_IDX] =
+                        ((1
+                          << (MOD_SCMI_PERF_DOMAIN_ATTRIBUTES -
+                              MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+                         /* DESCRIBE_LEVELS is required for some reason ... */
+                         (0
+                          << (MOD_SCMI_PERF_DESCRIBE_LEVELS -
+                              MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+                         (1
+                          << (MOD_SCMI_PERF_LIMITS_SET -
+                              MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+                         (1
+                          << (MOD_SCMI_PERF_LIMITS_GET -
+                              MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+                         (1
+                          << (MOD_SCMI_PERF_LEVEL_SET -
+                              MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+                         (1
+                          << (MOD_SCMI_PERF_LEVEL_GET -
+                              MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+                         (1
+                          << (MOD_SCMI_PERF_NOTIFY_LIMITS -
+                              MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+                         (1
+                          << (MOD_SCMI_PERF_NOTIFY_LEVEL -
+                              MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
+                         (1
+                          << (MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL -
+                              MOD_SCMI_PERF_DOMAIN_ATTRIBUTES))),
+                    /* Clocks, no access */
+                    .messages[MOD_RES_PERMS_SCMI_CLOCK_MESSAGE_IDX] = 0xff,
+                    .messages[MOD_RES_PERMS_SCMI_SENSOR_MESSAGE_IDX] = 0x0,
+                    .messages[MOD_RES_PERMS_SCMI_RESET_DOMAIN_MESSAGE_IDX] =
+                        0x0,
+                },
+        };
 
 static struct mod_res_agent_permission agent_permissions = {
     .agent_protocol_permissions = agent_protocol_permissions,

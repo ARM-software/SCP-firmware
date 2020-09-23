@@ -6,9 +6,9 @@
  */
 
 #include "clock_soc.h"
-#include "tc0_sds.h"
 #include "scp_pik.h"
 #include "scp_software_mmap.h"
+#include "tc0_sds.h"
 
 #include <mod_sds.h>
 
@@ -25,27 +25,29 @@
 static const uint32_t feature_flags = TC0_SDS_FEATURE_FIRMWARE_MASK;
 
 static const struct mod_sds_region_desc sds_module_regions[] = {
-    [TC0_SDS_REGION_SECURE] = {
-        .base = (void*)SCP_SDS_MEM_BASE,
-        .size = SCP_SDS_MEM_SIZE,
-    },
+    [TC0_SDS_REGION_SECURE] =
+        {
+            .base = (void *)SCP_SDS_MEM_BASE,
+            .size = SCP_SDS_MEM_SIZE,
+        },
 };
 
-static_assert(FWK_ARRAY_SIZE(sds_module_regions) == TC0_SDS_REGION_COUNT,
-              "Mismatch between number of SDS regions and number of regions "
-              "provided by the SDS configuration.");
+static_assert(
+    FWK_ARRAY_SIZE(sds_module_regions) == TC0_SDS_REGION_COUNT,
+    "Mismatch between number of SDS regions and number of regions "
+    "provided by the SDS configuration.");
 
 const struct mod_sds_config sds_module_config = {
     .regions = sds_module_regions,
     .region_count = TC0_SDS_REGION_COUNT,
-    .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
-        CLOCK_IDX_INTERCONNECT)
+    .clock_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_INTERCONNECT)
 };
 
 static struct fwk_element sds_element_table[] = {
     {
         .name = "CPU Info",
-        .data = &((struct mod_sds_structure_desc) {
+        .data = &((struct mod_sds_structure_desc){
             .id = TC0_SDS_CPU_INFO,
             .size = TC0_SDS_CPU_INFO_SIZE,
             .region_id = TC0_SDS_REGION_SECURE,
@@ -54,7 +56,7 @@ static struct fwk_element sds_element_table[] = {
     },
     {
         .name = "Feature Availability",
-        .data = &((struct mod_sds_structure_desc) {
+        .data = &((struct mod_sds_structure_desc){
             .id = TC0_SDS_FEATURE_AVAILABILITY,
             .size = TC0_SDS_FEATURE_AVAILABILITY_SIZE,
             .payload = &feature_flags,
@@ -65,10 +67,10 @@ static struct fwk_element sds_element_table[] = {
     { 0 }, /* Termination description. */
 };
 
-static_assert(SCP_SDS_MEM_SIZE >
-                    TC0_SDS_CPU_INFO_SIZE +
-                    TC0_SDS_FEATURE_AVAILABILITY_SIZE,
-              "SDS structures too large for SDS SRAM.\n");
+static_assert(
+    SCP_SDS_MEM_SIZE >
+        TC0_SDS_CPU_INFO_SIZE + TC0_SDS_FEATURE_AVAILABILITY_SIZE,
+    "SDS structures too large for SDS SRAM.\n");
 
 static const struct fwk_element *sds_get_element_table(fwk_id_t module_id)
 {

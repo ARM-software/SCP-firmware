@@ -14,8 +14,7 @@
 #include <stdint.h>
 
 static const struct mod_scmi_perf_domain_config domains[] = {
-    [0] = {
-    },
+    [0] = {},
 };
 
 const struct fwk_module_config config_scmi_perf = {

@@ -18,14 +18,15 @@
  * Timer HAL config
  */
 static const struct fwk_element timer_dev_table[] = {
-    [0] = {
-        .name = "REFCLK",
-        .data = &((struct mod_timer_dev_config) {
-            .id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_GTIMER, 0),
-            .timer_irq = TIMREFCLK_IRQ,
-        }),
-        .sub_element_count = 8, /* Number of alarms */
-    },
+    [0] =
+        {
+            .name = "REFCLK",
+            .data = &((struct mod_timer_dev_config){
+                .id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_GTIMER, 0),
+                .timer_irq = TIMREFCLK_IRQ,
+            }),
+            .sub_element_count = 8, /* Number of alarms */
+        },
     [1] = { 0 },
 };
 

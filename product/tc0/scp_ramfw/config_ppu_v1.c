@@ -6,8 +6,8 @@
  */
 
 #include "config_power_domain.h"
-#include "tc0_core.h"
 #include "scp_css_mmap.h"
+#include "tc0_core.h"
 
 #include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
@@ -37,22 +37,24 @@ static struct mod_ppu_v1_config ppu_v1_config_data = {
 };
 
 static struct fwk_element ppu_v1_system_element_table[] = {
-    [0] = {
-        .name = "SYS0",
-        .data = &((struct mod_ppu_v1_pd_config) {
-            .pd_type = MOD_PD_TYPE_SYSTEM,
-            .ppu.reg_base = SCP_PPU_SYS0_BASE,
-            .observer_id = FWK_ID_NONE_INIT,
-        }),
-    },
-    [1] = {
-        .name = "SYS1",
-        .data = &((struct mod_ppu_v1_pd_config) {
-            .pd_type = MOD_PD_TYPE_SYSTEM,
-            .ppu.reg_base = SCP_PPU_SYS1_BASE,
-            .observer_id = FWK_ID_NONE_INIT,
-        }),
-    },
+    [0] =
+        {
+            .name = "SYS0",
+            .data = &((struct mod_ppu_v1_pd_config){
+                .pd_type = MOD_PD_TYPE_SYSTEM,
+                .ppu.reg_base = SCP_PPU_SYS0_BASE,
+                .observer_id = FWK_ID_NONE_INIT,
+            }),
+        },
+    [1] =
+        {
+            .name = "SYS1",
+            .data = &((struct mod_ppu_v1_pd_config){
+                .pd_type = MOD_PD_TYPE_SYSTEM,
+                .ppu.reg_base = SCP_PPU_SYS1_BASE,
+                .observer_id = FWK_ID_NONE_INIT,
+            }),
+        },
 };
 
 static const struct fwk_element *ppu_v1_get_element_table(fwk_id_t module_id)
@@ -75,21 +77,21 @@ static const struct fwk_element *ppu_v1_get_element_table(fwk_id_t module_id)
      *   + Number of system power domain descriptors
      *   + 1 terminator descriptor
      */
-    element_table = fwk_mm_calloc(core_count + cluster_count +
-        FWK_ARRAY_SIZE(ppu_v1_system_element_table) + 1,
+    element_table = fwk_mm_calloc(
+        core_count + cluster_count +
+            FWK_ARRAY_SIZE(ppu_v1_system_element_table) + 1,
         sizeof(struct fwk_element));
     if (element_table == NULL)
         return NULL;
 
-    pd_config_table = fwk_mm_calloc(core_count + cluster_count,
-                                    sizeof(struct mod_ppu_v1_pd_config));
+    pd_config_table = fwk_mm_calloc(
+        core_count + cluster_count, sizeof(struct mod_ppu_v1_pd_config));
     if (pd_config_table == NULL)
         return NULL;
 
     for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
         for (core_idx = 0;
-             core_idx < tc0_core_get_core_per_cluster_count(
-                cluster_idx);
+             core_idx < tc0_core_get_core_per_cluster_count(cluster_idx);
              core_idx++) {
             element = &element_table[core_element_count];
             pd_config = &pd_config_table[core_element_count];
@@ -98,17 +100,20 @@ static const struct fwk_element *ppu_v1_get_element_table(fwk_id_t module_id)
             if (element->name == NULL)
                 return NULL;
 
-            snprintf((char *)element->name, PPU_CORE_NAME_SIZE, "CLUS%uCORE%u",
-                cluster_idx, core_idx);
+            snprintf(
+                (char *)element->name,
+                PPU_CORE_NAME_SIZE,
+                "CLUS%uCORE%u",
+                cluster_idx,
+                core_idx);
 
             element->data = pd_config;
 
             pd_config->pd_type = MOD_PD_TYPE_CORE;
             pd_config->ppu.reg_base = SCP_PPU_CORE_BASE(cluster_idx, core_idx);
             pd_config->ppu.irq = FWK_INTERRUPT_NONE;
-            pd_config->cluster_id =
-                FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1,
-                               (core_count + cluster_idx));
+            pd_config->cluster_id = FWK_ID_ELEMENT(
+                FWK_MODULE_IDX_PPU_V1, (core_count + cluster_idx));
             pd_config->observer_id = FWK_ID_NONE;
             core_element_count++;
         }
@@ -120,8 +125,8 @@ static const struct fwk_element *ppu_v1_get_element_table(fwk_id_t module_id)
         if (element->name == NULL)
             return NULL;
 
-        snprintf((char *)element->name, PPU_CLUS_NAME_SIZE, "CLUS%u",
-            cluster_idx);
+        snprintf(
+            (char *)element->name, PPU_CLUS_NAME_SIZE, "CLUS%u", cluster_idx);
 
         element->data = pd_config;
 
@@ -131,9 +136,10 @@ static const struct fwk_element *ppu_v1_get_element_table(fwk_id_t module_id)
         pd_config->observer_id = FWK_ID_NONE;
     }
 
-    memcpy(&element_table[core_count + cluster_count],
-           ppu_v1_system_element_table,
-           sizeof(ppu_v1_system_element_table));
+    memcpy(
+        &element_table[core_count + cluster_count],
+        ppu_v1_system_element_table,
+        sizeof(ppu_v1_system_element_table));
 
     /*
      * Configure pd_source_id with the SYSTOP identifier from the power domain

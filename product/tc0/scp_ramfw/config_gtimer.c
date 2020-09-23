@@ -20,17 +20,15 @@
  * Generic timer driver config
  */
 static const struct fwk_element gtimer_dev_table[] = {
-    [0] = {
-        .name = "REFCLK",
-        .data = &((struct mod_gtimer_dev_config) {
-            .hw_timer   = SCP_REFCLK_CNTBASE0_BASE,
-            .hw_counter = SCP_REFCLK_CNTCTL_BASE,
-            .control    = SCP_REFCLK_CNTCONTROL_BASE,
-            .frequency  = CLOCK_RATE_REFCLK,
-            .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
-                CLOCK_IDX_INTERCONNECT)
-        })
-    },
+    [0] = { .name = "REFCLK",
+            .data = &((struct mod_gtimer_dev_config){
+                .hw_timer = SCP_REFCLK_CNTBASE0_BASE,
+                .hw_counter = SCP_REFCLK_CNTCTL_BASE,
+                .control = SCP_REFCLK_CNTCONTROL_BASE,
+                .frequency = CLOCK_RATE_REFCLK,
+                .clock_id = FWK_ID_ELEMENT_INIT(
+                    FWK_MODULE_IDX_CLOCK,
+                    CLOCK_IDX_INTERCONNECT) }) },
     [1] = { 0 },
 };
 

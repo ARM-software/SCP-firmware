@@ -63,9 +63,9 @@ struct tc0_system_isr {
 static struct tc0_system_ctx tc0_system_ctx;
 const struct fwk_module_config config_tc0_system = { 0 };
 
-static const uint32_t feature_flags = (TC0_SDS_FEATURE_FIRMWARE_MASK |
-                                   TC0_SDS_FEATURE_DMC_MASK |
-                                   TC0_SDS_FEATURE_MESSAGING_MASK);
+static const uint32_t feature_flags =
+    (TC0_SDS_FEATURE_FIRMWARE_MASK | TC0_SDS_FEATURE_DMC_MASK |
+     TC0_SDS_FEATURE_MESSAGING_MASK);
 
 static fwk_id_t sds_feature_availability_id =
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, 1);
@@ -112,34 +112,26 @@ static void ppu_cores_isr(unsigned int first, uint32_t status)
 
 static void ppu_cores_isr_0(void)
 {
-    ppu_cores_isr(0,
-        tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[0]);
-    ppu_cores_isr(128,
-        tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[4]);
+    ppu_cores_isr(0, tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[0]);
+    ppu_cores_isr(128, tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[4]);
 }
 
 static void ppu_cores_isr_1(void)
 {
-    ppu_cores_isr(32,
-        tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[1]);
-    ppu_cores_isr(160,
-        tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[5]);
+    ppu_cores_isr(32, tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[1]);
+    ppu_cores_isr(160, tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[5]);
 }
 
 static void ppu_cores_isr_2(void)
 {
-    ppu_cores_isr(64,
-        tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[2]);
-    ppu_cores_isr(192,
-        tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[6]);
+    ppu_cores_isr(64, tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[2]);
+    ppu_cores_isr(192, tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[6]);
 }
 
 static void ppu_cores_isr_3(void)
 {
-    ppu_cores_isr(96,
-        tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[3]);
-    ppu_cores_isr(224,
-        tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[7]);
+    ppu_cores_isr(96, tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[3]);
+    ppu_cores_isr(224, tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[7]);
 }
 
 static void ppu_clusters_isr(void)
@@ -150,9 +142,8 @@ static void ppu_clusters_isr(void)
     while (status != 0) {
         cluster_idx = __builtin_ctz(status);
 
-        tc0_system_ctx.ppu_v1_isr_api->ppu_interrupt_handler(
-            FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1,
-            tc0_core_get_core_count() + cluster_idx));
+        tc0_system_ctx.ppu_v1_isr_api->ppu_interrupt_handler(FWK_ID_ELEMENT(
+            FWK_MODULE_IDX_PPU_V1, tc0_core_get_core_count() + cluster_idx));
 
         status &= ~(1 << cluster_idx);
     }
@@ -163,24 +154,18 @@ static void ppu_clusters_isr(void)
  */
 
 static struct tc0_system_isr isrs[] = {
-    [0] = { .interrupt = PPU_CORES0_IRQ,
-            .handler = ppu_cores_isr_0 },
-    [1] = { .interrupt = PPU_CORES1_IRQ,
-            .handler = ppu_cores_isr_1 },
-    [2] = { .interrupt = PPU_CORES2_IRQ,
-            .handler = ppu_cores_isr_2 },
-    [3] = { .interrupt = PPU_CORES3_IRQ,
-            .handler = ppu_cores_isr_3 },
-    [4] = { .interrupt = PPU_CLUSTERS_IRQ,
-            .handler = ppu_clusters_isr },
+    [0] = { .interrupt = PPU_CORES0_IRQ, .handler = ppu_cores_isr_0 },
+    [1] = { .interrupt = PPU_CORES1_IRQ, .handler = ppu_cores_isr_1 },
+    [2] = { .interrupt = PPU_CORES2_IRQ, .handler = ppu_cores_isr_2 },
+    [3] = { .interrupt = PPU_CORES3_IRQ, .handler = ppu_cores_isr_3 },
+    [4] = { .interrupt = PPU_CLUSTERS_IRQ, .handler = ppu_clusters_isr },
 };
 
 /*
  * System power's driver API
  */
 
-static int tc0_system_shutdown(
-    enum mod_pd_system_shutdown system_shutdown)
+static int tc0_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
 {
     NVIC_SystemReset();
 
@@ -189,14 +174,15 @@ static int tc0_system_shutdown(
 
 static const struct mod_system_power_driver_api
     tc0_system_system_power_driver_api = {
-    .system_shutdown = tc0_system_shutdown,
-};
+        .system_shutdown = tc0_system_shutdown,
+    };
 
 /*
  * Functions fulfilling the framework's module interface
  */
 
-static int tc0_system_mod_init(fwk_id_t module_id,
+static int tc0_system_mod_init(
+    fwk_id_t module_id,
     unsigned int unused,
     const void *unused2)
 {
@@ -211,8 +197,7 @@ static int tc0_system_mod_init(fwk_id_t module_id,
             return status;
     }
 
-    tc0_system_ctx.pik_scp_reg =
-        (struct pik_scp_reg *)SCP_PIK_SCP_BASE;
+    tc0_system_ctx.pik_scp_reg = (struct pik_scp_reg *)SCP_PIK_SCP_BASE;
 
     return FWK_SUCCESS;
 }
@@ -224,25 +209,31 @@ static int tc0_system_bind(fwk_id_t id, unsigned int round)
     if (round > 0)
         return FWK_SUCCESS;
 
-    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_POWER_DOMAIN),
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_POWER_DOMAIN),
         FWK_ID_API(FWK_MODULE_IDX_POWER_DOMAIN, MOD_PD_API_IDX_RESTRICTED),
         &tc0_system_ctx.mod_pd_restricted_api);
     if (status != FWK_SUCCESS)
         return status;
 
-    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_PPU_V1),
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_PPU_V1),
         FWK_ID_API(FWK_MODULE_IDX_PPU_V1, MOD_PPU_V1_API_IDX_ISR),
         &tc0_system_ctx.ppu_v1_isr_api);
     if (status != FWK_SUCCESS)
         return status;
 
-    return fwk_module_bind(fwk_module_id_sds,
+    return fwk_module_bind(
+        fwk_module_id_sds,
         FWK_ID_API(FWK_MODULE_IDX_SDS, 0),
         &tc0_system_ctx.sds_api);
 }
 
-static int tc0_system_process_bind_request(fwk_id_t requester_id,
-    fwk_id_t pd_id, fwk_id_t api_id, const void **api)
+static int tc0_system_process_bind_request(
+    fwk_id_t requester_id,
+    fwk_id_t pd_id,
+    fwk_id_t api_id,
+    const void **api)
 {
     *api = &tc0_system_system_power_driver_api;
     return FWK_SUCCESS;
@@ -262,8 +253,8 @@ static int tc0_system_start(fwk_id_t id)
     for (i = 0; i < FWK_ARRAY_SIZE(scmi_notification_table); i++) {
         status = fwk_notification_subscribe(
             mod_scmi_notification_id_initialized,
-            fwk_id_build_element_id(fwk_module_id_scmi,
-                scmi_notification_table[i]),
+            fwk_id_build_element_id(
+                fwk_module_id_scmi, scmi_notification_table[i]),
             id);
         if (status != FWK_SUCCESS)
             return status;
@@ -274,9 +265,7 @@ static int tc0_system_start(fwk_id_t id)
      * PSCI agent know that the SCMI stack is initialized.
      */
     status = fwk_notification_subscribe(
-        mod_sds_notification_id_initialized,
-        fwk_module_id_sds,
-        id);
+        mod_sds_notification_id_initialized, fwk_module_id_sds, id);
     if (status != FWK_SUCCESS)
         return status;
 
@@ -291,7 +280,8 @@ static int tc0_system_start(fwk_id_t id)
             MOD_PD_STATE_OFF));
 }
 
-int tc0_system_process_notification(const struct fwk_event *event,
+int tc0_system_process_notification(
+    const struct fwk_event *event,
     struct fwk_event *resp_event)
 {
     static unsigned int scmi_notification_count = 0;
@@ -299,11 +289,10 @@ int tc0_system_process_notification(const struct fwk_event *event,
 
     fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
 
-    if (fwk_id_is_equal(event->id,
-                               mod_scmi_notification_id_initialized)) {
+    if (fwk_id_is_equal(event->id, mod_scmi_notification_id_initialized)) {
         scmi_notification_count++;
-    } else if (fwk_id_is_equal(event->id,
-                               mod_sds_notification_id_initialized)) {
+    } else if (fwk_id_is_equal(
+                   event->id, mod_sds_notification_id_initialized)) {
         sds_notification_received = true;
     } else
         return FWK_E_PARAM;
