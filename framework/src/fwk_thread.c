@@ -207,7 +207,8 @@ static void process_next_event(void)
         }
     } else {
         status = process_event(event, &async_response_event);
-        if ((status != FWK_SUCCESS) && (status != FWK_PENDING)) {
+        if ((status != FWK_SUCCESS) && (status != FWK_PENDING) &&
+            (status != FWK_E_PARAM)) {
             FWK_LOG_CRIT(
                 "[FWK] Process event (%s: %s -> %s) (%d)\n",
                 FWK_ID_STR(event->id),
