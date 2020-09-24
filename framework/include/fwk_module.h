@@ -299,6 +299,22 @@ struct fwk_module {
      */
     int (*process_notification)(const struct fwk_event *event,
                                 struct fwk_event *resp_event);
+
+    /*!
+     * \brief Process a signal.
+     *
+     * \details This function is called by the framework for signals targeting
+     *      the module or one of its elements.
+     *
+     * \note This function is \b optional.
+     *
+     * \param target_id Identifier of the target module, element or sub-element.
+     * \param signal_id Identifier of the signal to be sent.
+     *
+     * \retval ::FWK_SUCCESS The signal was processed successfully.
+     * \return One of the other module-defined error codes.
+     */
+    int (*process_signal)(const fwk_id_t target_id, const fwk_id_t signal_id);
 };
 
 /*!

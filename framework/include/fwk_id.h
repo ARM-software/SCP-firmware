@@ -47,6 +47,8 @@ enum fwk_id_type {
     FWK_ID_TYPE_EVENT = __FWK_ID_TYPE_EVENT,
     /*! Notification */
     FWK_ID_TYPE_NOTIFICATION = __FWK_ID_TYPE_NOTIFICATION,
+    /*! Signal */
+    FWK_ID_TYPE_SIGNAL = __FWK_ID_TYPE_SIGNAL,
 };
 
 /*!
@@ -90,7 +92,7 @@ enum fwk_id_type {
  *
  * \return invalid identifier.
  */
-#define FWK_ID_NONE ((fwk_id_t) FWK_ID_NONE_INIT)
+#define FWK_ID_NONE ((fwk_id_t)FWK_ID_NONE_INIT)
 
 /*!
  * \brief Build a module identifier from a module index.
@@ -133,7 +135,7 @@ enum fwk_id_type {
  *
  * \return Module identifier.
  */
-#define FWK_ID_MODULE(MODULE_IDX) ((fwk_id_t) FWK_ID_MODULE_INIT(MODULE_IDX))
+#define FWK_ID_MODULE(MODULE_IDX) ((fwk_id_t)FWK_ID_MODULE_INIT(MODULE_IDX))
 
 /*!
  * \brief Build an element identifier from a module index and an element index.
@@ -180,7 +182,7 @@ enum fwk_id_type {
  * \return Element identifier.
  */
 #define FWK_ID_ELEMENT(MODULE_IDX, ELEMENT_IDX) \
-    ((fwk_id_t) FWK_ID_ELEMENT_INIT(MODULE_IDX, ELEMENT_IDX))
+    ((fwk_id_t)FWK_ID_ELEMENT_INIT(MODULE_IDX, ELEMENT_IDX))
 
 /*!
  * \brief Build a sub-element identifier from a module index, an element index
@@ -233,8 +235,8 @@ enum fwk_id_type {
  * \return Sub-element identifier.
  */
 #define FWK_ID_SUB_ELEMENT(MODULE_IDX, ELEMENT_IDX, SUB_ELEMENT_IDX) \
-    ((fwk_id_t) FWK_ID_SUB_ELEMENT_INIT(MODULE_IDX, ELEMENT_IDX, \
-    SUB_ELEMENT_IDX))
+    ((fwk_id_t)FWK_ID_SUB_ELEMENT_INIT( \
+        MODULE_IDX, ELEMENT_IDX, SUB_ELEMENT_IDX))
 
 /*!
  * \brief Build an API identifier from a module index and an API index.
@@ -281,7 +283,7 @@ enum fwk_id_type {
  * \return API identifier.
  */
 #define FWK_ID_API(MODULE_IDX, API_IDX) \
-    ((fwk_id_t) FWK_ID_API_INIT(MODULE_IDX, API_IDX))
+    ((fwk_id_t)FWK_ID_API_INIT(MODULE_IDX, API_IDX))
 
 /*!
  * \brief Build an event identifier from a module index and an event index.
@@ -328,7 +330,54 @@ enum fwk_id_type {
  * \return Event identifier.
  */
 #define FWK_ID_EVENT(MODULE_IDX, EVENT_IDX) \
-    ((fwk_id_t) FWK_ID_EVENT_INIT(MODULE_IDX, EVENT_IDX))
+    ((fwk_id_t)FWK_ID_EVENT_INIT(MODULE_IDX, EVENT_IDX))
+
+/*!
+ * \brief Build a signal identifier from a module index and a signal index.
+ *
+ * \note This macro expands to a designated initializer, and can be used to
+ *      initialize a ::fwk_id_t.
+ *
+ * \details Example usage:
+ *      \code{.c}
+ *      static const fwk_id_t my_signal = FWK_ID_SIGNAL_INIT(42, 56);
+ *      \endcode
+ *
+ * \param MODULE_IDX Module index.
+ * \param SIGNAL_IDX Signal index.
+ *
+ * \return Signal identifier.
+ */
+#define FWK_ID_SIGNAL_INIT(MODULE_IDX, SIGNAL_IDX) \
+    { \
+        .signal = { \
+            .type = __FWK_ID_TYPE_SIGNAL, \
+            .module_idx = MODULE_IDX, \
+            .signal_idx = SIGNAL_IDX, \
+        }, \
+    }
+
+/*!
+ * \brief Build a signal identifier from a module index and a signal index.
+ *
+ * \note This macro expands to a compound literal, and can be used as an lvalue
+ *      expression returning type ::fwk_id_t.
+ *
+ * \details Example usage:
+ *      \code{.c}
+ *      fwk_id_t get_signal_42_56(void)
+ *      {
+ *          return FWK_ID_SIGNAL(42, 56);
+ *      }
+ *      \endcode
+ *
+ * \param MODULE_IDX Module index.
+ * \param SIGNAL_IDX Signal index.
+ *
+ * \return Signal identifier.
+ */
+#define FWK_ID_SIGNAL(MODULE_IDX, SIGNAL_IDX) \
+    ((fwk_id_t)FWK_ID_SIGNAL_INIT(MODULE_IDX, SIGNAL_IDX))
 
 /*!
  * \brief Build a notification identifier from a module index and a
@@ -378,7 +427,7 @@ enum fwk_id_type {
  * \return Notification identifier.
  */
 #define FWK_ID_NOTIFICATION(MODULE_IDX, NOTIFICATION_IDX) \
-    ((fwk_id_t) FWK_ID_NOTIFICATION_INIT(MODULE_IDX, NOTIFICATION_IDX))
+    ((fwk_id_t)FWK_ID_NOTIFICATION_INIT(MODULE_IDX, NOTIFICATION_IDX))
 
 /*!
  * \brief Build a string representation of an identifier.

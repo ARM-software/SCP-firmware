@@ -46,6 +46,9 @@ enum __fwk_id_type {
     /* Notification */
     __FWK_ID_TYPE_NOTIFICATION,
 
+    /* Signal */
+    __FWK_ID_TYPE_SIGNAL,
+
     /* Number of defined types */
     __FWK_ID_TYPE_COUNT,
 };
@@ -97,6 +100,13 @@ union __fwk_id {
         uint32_t event_idx : 6; /* Event index */
         uint32_t reserved : 14; /* Reserved */
     } event; /* Event variant */
+
+    struct {
+        uint32_t type : 4; /* Identifier type */
+        uint32_t module_idx : 8; /* Module index */
+        uint32_t signal_idx : 6; /* Signal index */
+        uint32_t reserved : 14; /* Reserved */
+    } signal; /* Signal variant */
 
     struct {
         uint32_t type : 4; /* Identifier type */

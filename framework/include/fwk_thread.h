@@ -89,8 +89,10 @@ int fwk_thread_put_event(struct fwk_event *event);
  *
  * \return Status code representing the result of the operation.
  */
-int fwk_thread_get_delayed_response(fwk_id_t id, uint32_t cookie,
-                                    struct fwk_event *event);
+int fwk_thread_get_delayed_response(
+    fwk_id_t id,
+    uint32_t cookie,
+    struct fwk_event *event);
 
 /*!
  * \brief Check if the list of delayed response events of a given module or
@@ -138,12 +140,38 @@ int fwk_thread_is_delayed_response_list_empty(fwk_id_t id, bool *is_empty);
  * \return Status code representing the result of the operation.
  */
 int fwk_thread_get_first_delayed_response(fwk_id_t id, struct fwk_event *event);
+
 /*!
- * \}
+ * \brief Post a signal into the signal queue.
+ *
+ * \details The framework copies the signal description into its internal data.
+ *      The signal will be sent to the target module or element before any
+ * pending events, ie, signals will always take precedence.
+ *
+ * \param[in] source_id Identifier of the module or element sending the
+ *      signal.
+ * \param[in] target_id Identifier of the module or element targeted by the
+ *      signal.
+ * \param[in] signal_id Identifier of the signal.
+ *
+ * \retval ::FWK_SUCCESS The signal was queued.
+ * \retval ::FWK_E_BUSY The signal could not be queued due to resource
+ *          constraints.
+ * \retval ::FWK_E_SUPPORT The platform does not implement the
+ *          signal function.
+ *
+ * \return Status code representing the result of the operation.
  */
+int fwk_thread_put_signal(
+    const fwk_id_t source_id,
+    const fwk_id_t target_id,
+    const fwk_id_t signal_id);
 
 /*!
  * \}
  */
 
+/*!
+ * \}
+ */
 #endif /* FWK_THREAD_H */
