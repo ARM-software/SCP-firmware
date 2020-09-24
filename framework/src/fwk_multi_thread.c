@@ -918,3 +918,11 @@ error:
     FWK_LOG_CRIT(err_msg_func, status, __func__);
     return status;
 }
+
+int fwk_thread_put_signal(
+    fwk_id_t source_id,
+    fwk_id_t target_id,
+    fwk_id_t signal_id)
+{
+    return FWK_E_SUPPORT;
+}
