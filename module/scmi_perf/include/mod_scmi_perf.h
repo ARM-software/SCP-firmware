@@ -45,11 +45,11 @@ enum mod_scmi_perf_permissions {
  * \brief Fast channels address index
  */
 enum mod_scmi_perf_fast_channels_addr_index {
-    MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_SET,
-    MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_SET,
-    MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_GET,
-    MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_GET,
-    MOD_SMCI_PERF_FAST_CHANNEL_ADDR_INDEX_COUNT
+    MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET,
+    MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET,
+    MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET,
+    MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET,
+    MOD_SCMI_PERF_FAST_CHANNEL_ADDR_INDEX_COUNT
 };
 /*!
  *\brief Per-Domain Fast Channel Limit in shared memory.
@@ -65,13 +65,13 @@ struct mod_scmi_perf_fast_channel_limit {
  *\brief Fast channels memory offset
  */
 enum mod_scmi_perf_fast_channel_memory_offset {
-    MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LEVEL_SET = 0,
-    MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LIMIT_SET = sizeof(uint32_t),
-    MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LEVEL_GET =
+    MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_LEVEL_SET = 0,
+    MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_LIMIT_SET = sizeof(uint32_t),
+    MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_LEVEL_GET =
         sizeof(uint32_t) + sizeof(struct mod_scmi_perf_fast_channel_limit),
-    MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_LIMIT_GET =
+    MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_LIMIT_GET =
         sizeof(uint32_t) * 2 + sizeof(struct mod_scmi_perf_fast_channel_limit),
-    MOD_SMCI_PERF_FAST_CHANNEL_OFFSET_TOTAL = sizeof(uint32_t) * 2 +
+    MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_TOTAL = sizeof(uint32_t) * 2 +
         sizeof(struct mod_scmi_perf_fast_channel_limit) * 2
 };
 
