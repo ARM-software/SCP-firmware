@@ -111,11 +111,11 @@ static unsigned int payload_size_table[] = {
 
 #ifdef BUILD_HAS_FAST_CHANNELS
 static unsigned int fast_channel_elem_size[] = {
-    [MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_SET] = sizeof(uint32_t),
-    [MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_SET] =
+    [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] = sizeof(uint32_t),
+    [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET] =
         sizeof(struct mod_scmi_perf_fast_channel_limit),
-    [MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_GET] = sizeof(uint32_t),
-    [MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_GET] =
+    [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] = sizeof(uint32_t),
+    [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET] =
         sizeof(struct mod_scmi_perf_fast_channel_limit)
 };
 #endif
@@ -920,27 +920,27 @@ static int scmi_perf_describe_fast_channels(fwk_id_t service_id,
 
     switch (parameters->message_id) {
     case MOD_SCMI_PERF_LEVEL_GET:
-        chan_index = MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_GET;
+        chan_index = MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET;
         chan_size =
-            fast_channel_elem_size[MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_GET];
+            fast_channel_elem_size[MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET];
         break;
 
     case MOD_SCMI_PERF_LEVEL_SET:
-        chan_index = MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_SET;
+        chan_index = MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET;
         chan_size =
-            fast_channel_elem_size[MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_SET];
+            fast_channel_elem_size[MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET];
         break;
 
     case MOD_SCMI_PERF_LIMITS_SET:
-        chan_index = MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_SET;
+        chan_index = MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET;
         chan_size =
-            fast_channel_elem_size[MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_SET];
+            fast_channel_elem_size[MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET];
         break;
 
     case MOD_SCMI_PERF_LIMITS_GET:
-        chan_index = MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_GET;
+        chan_index = MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET;
         chan_size =
-            fast_channel_elem_size[MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_GET];
+            fast_channel_elem_size[MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET];
         break;
 
     default:
@@ -985,10 +985,10 @@ static void fast_channel_callback(uintptr_t param)
         if (domain->fast_channels_addr_scp != 0x0) {
             set_limit = (struct mod_scmi_perf_fast_channel_limit
                              *)((uintptr_t)domain->fast_channels_addr_scp
-                                    [MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_SET]);
+                                    [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET]);
             set_level =
                 (uint32_t *)((uintptr_t)domain->fast_channels_addr_scp
-                                 [MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_SET]);
+                                 [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET]);
             /*
              * Check for set_level
              */
@@ -1151,7 +1151,7 @@ static void scmi_perf_notify_limits_updated(
     if (domain->fast_channels_addr_scp != 0x0) {
         get_limit = (struct mod_scmi_perf_fast_channel_limit
                          *)((uintptr_t)domain->fast_channels_addr_scp
-                                [MOD_SMCI_PERF_FAST_CHANNEL_LIMIT_GET]);
+                                [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET]);
         if (get_limit != 0x0) { /* note: get_limit may not be defined */
             get_limit->range_max = range_max;
             get_limit->range_min = range_min;
@@ -1207,7 +1207,7 @@ static void scmi_perf_notify_level_updated(
     domain = &(*scmi_perf_ctx.config->domains)[idx];
     if (domain->fast_channels_addr_scp != 0x0) {
         get_level = (uint32_t *)((uintptr_t)domain->fast_channels_addr_scp
-                                     [MOD_SMCI_PERF_FAST_CHANNEL_LEVEL_GET]);
+                                     [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET]);
         if (get_level != 0x0) /* note: get_level may not be defined */
             *get_level = level;
     }
@@ -1453,7 +1453,7 @@ static int scmi_perf_start(fwk_id_t id)
     for (i = 0; i < scmi_perf_ctx.domain_count; i++) {
         domain = &(*scmi_perf_ctx.config->domains)[i];
         if (domain->fast_channels_addr_scp != 0x0) {
-            for (j = 0; j < MOD_SMCI_PERF_FAST_CHANNEL_ADDR_INDEX_COUNT; j++) {
+            for (j = 0; j < MOD_SCMI_PERF_FAST_CHANNEL_ADDR_INDEX_COUNT; j++) {
                 fc_elem = (void *)(uintptr_t)domain->fast_channels_addr_scp[j];
                 if (fc_elem != 0x0)
                     memset(fc_elem, 0, fast_channel_elem_size[j]);
