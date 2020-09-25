@@ -1,0 +1,19 @@
+{
+    "name": "SCP-firmware Development Container",
+
+    "dockerFile": "docker/Dockerfile",
+    "build": {
+        "target": "dev",
+    },
+
+    "remoteUser": "user",
+
+    "workspaceMount": "source=${localWorkspaceFolder},target=/scp-firmware,type=bind,consistency=default",
+    "workspaceFolder": "/scp-firmware",
+
+    "settings": {
+        "terminal.integrated.shell.linux": null
+    },
+
+    "extensions": [],
+}

@@ -9,8 +9,6 @@
 #
 
 MODULE_INCLUDES += $(shell ls -d $(MODULES_DIR)/*/include/ 2>/dev/null)
-MODULE_INCLUDES += $(shell ls -d $(PRODUCTS_DIR)/*/module/*/include/ \
-                                 2>/dev/null)
 
 MODULE_DOCS += $(shell ls -d $(MODULES_DIR)/*/doc/ 2>/dev/null)
 MODULE_DOCS += $(shell ls -d $(PRODUCTS_DIR)/*/module/*/doc/ 2>/dev/null)

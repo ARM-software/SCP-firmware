@@ -1,0 +1,34 @@
+#!/usr/bin/env sh
+
+#
+# Arm SCP/MCP Software
+# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+if [ -f "requirements.txt" ]; then
+    python3 -m pip install -r "requirements.txt" > /dev/null
+fi
+
+if id vagrant > /dev/null 2>&1; then
+    user=vagrant
+elif id user > /dev/null 2>&1; then
+    user=user
+fi
+
+if [ -z "${user}" ]; then
+    exec $@
+else
+    uid=$(stat -c "%u" ".")
+    gid=$(stat -c "%u" ".")
+
+    usermod -u ${uid} ${user}
+    groupmod -g ${gid} ${user}
+
+    if [ $# -eq 0 ]; then
+        exec su ${user}
+    else
+        exec gosu ${user} $@
+    fi
+fi
