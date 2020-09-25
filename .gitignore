@@ -50,3 +50,11 @@ cscope.*
 
 # Visual Studio Code IDE
 .vscode/
+
+# Vagrant
+
+# General
+.vagrant/
+
+### Vagrant Patch ###
+*.box
