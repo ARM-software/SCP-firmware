@@ -9,6 +9,7 @@
 #define MOD_RCAR_CLOCK_H
 
 #include <rcar_mmap.h>
+#include <utils_def.h>
 
 #include <mod_clock.h>
 

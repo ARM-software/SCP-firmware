@@ -8,6 +8,8 @@
 #ifndef MOD_RCAR_REG_SENSOR_H
 #define MOD_RCAR_REG_SENSOR_H
 
+#include <utils_def.h>
+
 #include <mod_sensor.h>
 
 #include <stdint.h>
