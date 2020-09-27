@@ -1,0 +1,92 @@
+#
+# Renesas SCP/MCP Software
+# Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+BS_FIRMWARE_CPU := cortex-a57.cortex-a53
+BS_FIRMWARE_HAS_MULTITHREADING := yes
+BS_FIRMWARE_HAS_NOTIFICATION := yes
+BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS := no
+
+BS_FIRMWARE_MODULES := \
+    rcar_scif \
+    rcar_system \
+    scmi \
+    smt \
+    clock \
+    rcar_clock \
+    rcar_sd_clock \
+    rcar_mstp_clock \
+    rcar_system_power \
+    rcar_dvfs \
+    rcar_pmic \
+    rcar_mock_pmic \
+    rcar_mfismh \
+    rcar_power_domain \
+    rcar_pd_sysc \
+    rcar_pd_core \
+    rcar_reg_sensor \
+    sensor \
+    scmi_power_domain \
+    scmi_clock \
+    scmi_sensor \
+    scmi_apcore
+
+ifeq ($(BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS),yes)
+    BS_FIRMWARE_MODULES += resource_perms
+endif
+
+BS_FIRMWARE_SOURCES := \
+    rcar_core.c \
+    config_rcar_scif.c \
+    config_rcar_power_domain.c \
+    config_rcar_pd_sysc.c \
+    config_rcar_pd_core.c \
+    config_sensor.c \
+    config_clock.c \
+    config_rcar_clock.c \
+    config_rcar_sd_clock.c \
+    config_rcar_mstp_clock.c \
+    config_rcar_dvfs.c \
+    config_rcar_pmic.c \
+    config_rcar_mock_pmic.c \
+    config_rcar_mfismh.c \
+    config_smt.c \
+    config_scmi.c \
+    config_scmi_clock.c \
+    config_scmi_apcore.c \
+    config_scmi_power_domain.c \
+    config_rcar_system_power.c \
+    config_rcar_system.c
+
+ifeq ($(BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS),yes)
+    BS_FIRMWARE_SOURCES += config_resource_perms.c
+endif
+
+#
+# Temporary source code until CMSIS-FreeRTOS is updated
+#
+BS_FIRMWARE_SOURCES += \
+    portASM.S \
+    port.c \
+    list.c \
+    queue.c \
+    tasks.c \
+    timers.c \
+    heap_1.c \
+    cmsis_os2_tiny4scp.c
+
+vpath %.c $(PRODUCT_DIR)/src/CMSIS-FreeRTOS/Source/portable/GCC/ARM_CA53_64_Rcar
+vpath %.S $(PRODUCT_DIR)/src/CMSIS-FreeRTOS/Source/portable/GCC/ARM_CA53_64_Rcar
+vpath %.c $(PRODUCT_DIR)/src/CMSIS-FreeRTOS/Source
+vpath %.c $(PRODUCT_DIR)/src/CMSIS-FreeRTOS/Source/portable/MemMang
+vpath %.c $(PRODUCT_DIR)/src/CMSIS-FreeRTOS/CMSIS/RTOS2/FreeRTOS/Source
+
+#
+# Temporary directory until CMSIS-FreeRTOS is updated
+#
+FREERTOS_DIR := $(PRODUCT_DIR)/src/CMSIS-FreeRTOS/CMSIS/RTOS2
+
+include $(BS_DIR)/firmware.mk

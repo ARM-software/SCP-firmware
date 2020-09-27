@@ -83,13 +83,14 @@ FIRMWARE_DIR := $(PRODUCT_DIR)/$(FIRMWARE)
 TARGET := $(BIN_DIR)/$(FIRMWARE)
 TARGET_BIN := $(TARGET).bin
 TARGET_ELF := $(TARGET).elf
+TARGET_SREC := $(TARGET).srec
 
 vpath %.c $(FIRMWARE_DIR)
 vpath %.S $(FIRMWARE_DIR)
 vpath %.c $(PRODUCT_DIR)/src
 vpath %.S $(PRODUCT_DIR)/src
 
-goal: $(TARGET_BIN)
+goal: $(TARGET_SREC)
 
 ifneq ($(BS_ARCH_CPU),host)
     ifeq ($(BS_LINKER),ARM)
@@ -180,9 +181,15 @@ ifeq ($(BS_FIRMWARE_HAS_MULTITHREADING),yes)
     BUILD_SUFFIX := $(MULTHREADING_SUFFIX)
     BUILD_HAS_MULTITHREADING := yes
 
-    INCLUDES += $(OS_DIR)/RTX/Source
-    INCLUDES += $(OS_DIR)/RTX/Include
-    INCLUDES += $(OS_DIR)/../Core/Include
+    ifneq ($(findstring $(BS_FIRMWARE_CPU),$(ARMV8A_CPUS)),)
+        INCLUDES += $(OS_DIR)/Include
+        INCLUDES += $(FREERTOS_DIR)/../../Source/include
+        INCLUDES += $(FREERTOS_DIR)/../../Source/portable/GCC/ARM_CA53_64_Rcar
+    else
+        INCLUDES += $(OS_DIR)/RTX/Source
+        INCLUDES += $(OS_DIR)/RTX/Include
+        INCLUDES += $(OS_DIR)/../Core/Include
+    endif
 else
     BUILD_HAS_MULTITHREADING := no
 endif
@@ -335,4 +342,8 @@ $(TARGET_BIN): $(TARGET_ELF) | $$(@D)/
 	$(call show-action,BIN,$@)
 	$(OBJCOPY) $< $(OCFLAGS) $@
 	cp $@ $(BIN_DIR)/firmware.bin
+
+$(TARGET_SREC): $(TARGET_BIN)
+	$(call show-action,SREC,$@)
+	$(OBJCOPY) -O srec $(TARGET_ELF) $(basename $@).srec
 endif
