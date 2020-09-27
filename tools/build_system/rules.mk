@@ -13,7 +13,9 @@ include $(BS_DIR)/cpu.mk
 
 ifeq ($(BUILD_HAS_MULTITHREADING),yes)
     # Add the OS directory to the main INCLUDES list
-    INCLUDES += $(OS_DIR)/Include
+    ifeq ($(findstring $(BS_FIRMWARE_CPU),$(ARMV8A_CPUS)),)
+        INCLUDES += $(OS_DIR)/Include
+    endif
     DEFINES += BUILD_HAS_MULTITHREADING
 endif
 
@@ -148,7 +150,11 @@ LDFLAGS_GCC += -Wl,--cref
 LDFLAGS_GCC += -Wl,--undefined=arch_exceptions
 LDFLAGS_ARM += -Wl,--undefined=arch_exceptions
 
-BUILTIN_LIBS_GCC := -lc -lgcc
+ifneq ($(BS_ARCH_ARCH),armv8-a)
+    BUILTIN_LIBS_GCC := -lc -lgcc
+else
+    BUILTIN_LIBS_GCC := -nostdlib
+endif
 
 ifeq ($(MODE),release)
     O ?= $(DEFAULT_OPT_GCC_RELEASE)
@@ -177,15 +183,24 @@ INCLUDES += $(ARCH_DIR)/include
 INCLUDES += $(ARCH_DIR)/$(BS_ARCH_VENDOR)/include
 INCLUDES += $(ARCH_DIR)/$(BS_ARCH_VENDOR)/$(BS_ARCH_ARCH)/include
 
+ifeq ($(BS_ARCH_ARCH),armv8-a)
+    INCLUDES += $(ARCH_DIR)/$(BS_ARCH_VENDOR)/$(BS_ARCH_ARCH)/include/common
+    INCLUDES += $(ARCH_DIR)/$(BS_ARCH_VENDOR)/$(BS_ARCH_ARCH)/include/lib
+    INCLUDES += $(ARCH_DIR)/$(BS_ARCH_VENDOR)/$(BS_ARCH_ARCH)/include/lib/libc
+    INCLUDES += $(ARCH_DIR)/$(BS_ARCH_VENDOR)/$(BS_ARCH_ARCH)/include/lib/libc/aarch64
+endif
+
 #
 # Always include the framework library
 #
 INCLUDES += $(FWK_DIR)/include
 
 #
-# Always include CMSIS
+# CMSIS library
 #
-INCLUDES += $(CMSIS_DIR)/Include
+ifneq ($(BS_ARCH_ARCH),armv8-a)
+    INCLUDES += $(CMSIS_DIR)/Include
+endif
 
 #
 # Toolchain-independent flags
@@ -201,6 +216,7 @@ ASFLAGS += $(ASFLAGS_GCC)
 ARFLAGS = $(ARFLAGS_GCC)
 LDFLAGS += $(LDFLAGS_$(BS_LINKER))
 DEP_CFLAGS = $(DEP_CFLAGS_GCC)
+DEP_ASFLAGS = $(DEP_ASFLAGS_GCC)
 BUILTIN_LIBS = $(BUILTIN_LIBS_$(BS_LINKER))
 
 CFLAGS += $(CFLAGS_$(BS_COMPILER))
@@ -255,7 +271,7 @@ $(OBJ_DIR)/%.o: %.s | $$(@D)/
 
 $(OBJ_DIR)/%.o: %.S | $$(@D)/
 	$(call show-action,AS,$<)
-	$(AS) -c $(CFLAGS) $(DEP_CFLAGS) $< -o $@
+	$(AS) -c $(CFLAGS) $(DEP_CFLAGS) $(DEP_ASFLAGS) $< -o $@
 
 $(BUILD_PATH)%/:
 	$(call show-action,MD,$@)
