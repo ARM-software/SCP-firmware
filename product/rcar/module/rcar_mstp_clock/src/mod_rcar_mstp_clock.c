@@ -7,6 +7,7 @@
 
 #include <clock_mstp_devices.h>
 #include <mmio.h>
+#include <utils_def.h>
 
 #include <mod_clock.h>
 #include <mod_rcar_clock.h>
