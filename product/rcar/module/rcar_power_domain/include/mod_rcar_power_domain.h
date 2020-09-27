@@ -857,8 +857,8 @@ static const fwk_id_t mod_pd_notification_id_power_state_pre_transition =
  * @cond
  */
 
-#define CPU_PWR_OFF U(0x00000003)
-#define MODE_L2_DOWN (0x00000002U)
+#define CPU_PWR_OFF UINT32_C(0x00000003)
+#define MODE_L2_DOWN UINT32_C(0x00000002)
 
 /*
  * Module and power domain contexts
