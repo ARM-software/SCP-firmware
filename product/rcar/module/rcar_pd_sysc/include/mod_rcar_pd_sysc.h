@@ -1,0 +1,83 @@
+/*
+ * Renesas SCP/MCP Software
+ * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+#ifndef MOD_RCAR_PD_SYSC_H
+#define MOD_RCAR_PD_SYSC_H
+
+#include <stdbool.h>
+#include <stdint.h>
+#include <mod_rcar_power_domain.h>
+
+/*!
+ * \addtogroup GroupRCARModule RCAR Product Modules
+ * @{
+ */
+
+/*!
+ * \defgroup GroupRCARPdSysc SYSC Driver
+ * @{
+ */
+
+/*!
+ * @cond
+ */
+
+/* Power domain context */
+struct rcar_sysc_pd_ctx {
+    /* Power domain configuration data */
+    const struct mod_rcar_pd_sysc_config *config;
+
+    /* Identifier of the entity bound to the power domain driver API */
+    fwk_id_t bound_id;
+
+    /* Power module driver input API */
+    struct mod_pd_driver_input_api *pd_driver_input_api;
+    /* Power Domain current state*/
+    unsigned int current_state;
+};
+
+/* Module context */
+struct rcar_sysc_ctx {
+    /* Table of the power domain contexts */
+    struct rcar_sysc_pd_ctx *pd_ctx_table;
+
+    /* Log API */
+    struct mod_log_api *log_api;
+};
+
+/*!
+ * @endcond
+ */
+
+/*!
+ * \brief Configuration data of a power domain of the SYSC module.
+ */
+struct mod_rcar_pd_sysc_config {
+    /*! Power domain type */
+    enum mod_pd_type pd_type;
+    /*! Offset of PWRSR register for this area */
+    unsigned int chan_offs;
+    /*! Bit in PWR* (except for PWRUP in PWRSR) */
+    unsigned char chan_bit;
+    /*! Bit in SYSCI*R */
+    unsigned char isr_bit;
+
+    /*!
+     * Flag indicating if this domain should be powered on during element init.
+     */
+    bool default_power_on;
+};
+
+/*!
+ * @}
+ */
+
+/*!
+ * @}
+ */
+
+#endif /* MOD_RCAR_PD_SYSC_H */
