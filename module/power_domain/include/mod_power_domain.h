@@ -288,8 +288,8 @@ struct mod_pd_driver_api {
      *      power state. This function must not return until the transition has
      *      completed.
      *
-     * \warning In the case of a <tt>shutdown</tt> request, if provided, \ref
-     *      shutdown will be called instead.
+     * \warning In the case of a <tt>shutdown</tt> request, if provided,
+     *      ::mod_pd_driver_api::shutdown will be called instead.
      *
      * \param dev_id Driver identifier of the power domain.
      * \param state Power state the power domain has to be put into.
@@ -360,10 +360,10 @@ struct mod_pd_driver_api {
      * \brief Prepare the last standing core for a system suspend.
      *
      * \details The function prepares the last standing core for entering the
-     *      \ref MOD_PD_STATE_OFF state (powered off, no wake-up interrupt) when
+     *      ::MOD_PD_STATE_OFF state (powered off, no wake-up interrupt) when
      *      it will execute WFI. The function should also ensure that when the
      *      core is powered off a state transition report is sent by means of
-     *      the \ref mod_pd_driver_input_api::report_power_state_transition
+     *      the ::mod_pd_driver_input_api::report_power_state_transition
      *      driver input interface function indicating that the core power
      *      domain state should be updated. This function is mandatory for core
      *      power domains, but is otherwise unused.
@@ -423,7 +423,7 @@ struct mod_pd_public_api {
     /*!
      * \brief Get the identifier of the parent of a power domain.
      *
-     * \note The function returns \ref FWK_ID_NONE in the case of the root power
+     * \note The function returns ::FWK_ID_NONE in the case of the root power
      *      domain which does not have any parent.
      *
      * \param pd_id Identifier of the power domain.
@@ -466,7 +466,7 @@ struct mod_pd_restricted_api {
     /*!
      * \brief Get the identifier of the parent of a power domain.
      *
-     * \note The function returns \ref FWK_ID_NONE in the case of the root power
+     * \note The function returns ::FWK_ID_NONE in the case of the root power
      *      domain which does not have any parent.
      *
      * \param pd_id Identifier of the power domain.

@@ -264,10 +264,10 @@ struct fwk_module {
      *      the module or one of its elements.
      *
      * \note This function is \b optional. If a response event is expected and
-     *      the \ref fwk_event.is_delayed_response flag is not set by the
+     *      the ::fwk_event::is_delayed_response flag is not set by the
      *      processing function then the response event is immediately and
      *      automatically sent to the event's source by the framework. If
-     *      however the \ref fwk_event.is_delayed_response flag is set by the
+     *      however the ::fwk_event::is_delayed_response flag is set by the
      *      processing function then the framework does not send the response
      *      event and it is the responsability of the event's target to send it
      *      at some point.

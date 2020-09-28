@@ -57,7 +57,7 @@ enum mod_clock_notification_idx {
 
 #ifdef BUILD_HAS_MOD_CLOCK
 /*!
- * \brief Identifier for the \ref MOD_CLOCK_NOTIFICATION_IDX_STATE_CHANGED
+ * \brief Identifier for the ::MOD_CLOCK_NOTIFICATION_IDX_STATE_CHANGED
  *     notification.
  */
 static const fwk_id_t mod_clock_notification_id_state_changed =
@@ -66,8 +66,8 @@ static const fwk_id_t mod_clock_notification_id_state_changed =
         MOD_CLOCK_NOTIFICATION_IDX_STATE_CHANGED);
 
 /*!
- * \brief Identifier for the \ref
- *     MOD_CLOCK_NOTIFICATION_IDX_STATE_CHANGE_PENDING notification
+ * \brief Identifier for the ::MOD_CLOCK_NOTIFICATION_IDX_STATE_CHANGE_PENDING
+ * notification
  */
 static const fwk_id_t mod_clock_notification_id_state_change_pending =
     FWK_ID_NOTIFICATION_INIT(
@@ -77,8 +77,8 @@ static const fwk_id_t mod_clock_notification_id_state_change_pending =
 
 /*!
  * \brief Event parameters shared by the
- *     \ref MOD_CLOCK_NOTIFICATION_IDX_STATE_CHANGED and
- *     \ref MOD_CLOCK_NOTIFICATION_IDX_STATE_CHANGE_PENDING notifications.
+ *     ::MOD_CLOCK_NOTIFICATION_IDX_STATE_CHANGED and
+ *     ::MOD_CLOCK_NOTIFICATION_IDX_STATE_CHANGE_PENDING notifications.
  */
 struct clock_notification_params {
     /*!
@@ -90,12 +90,12 @@ struct clock_notification_params {
 
 /*!
  * \brief Response parameters for the
- *     \ref MOD_CLOCK_NOTIFICATION_IDX_STATE_CHANGE_PENDING notification.
+ *     ::MOD_CLOCK_NOTIFICATION_IDX_STATE_CHANGE_PENDING notification.
  */
 struct clock_state_change_pending_resp_params {
     /*!
      * The status returned by the notified subscriber on processing the
-     * \ref MOD_CLOCK_NOTIFICATION_IDX_STATE_CHANGE_PENDING notification.
+     * ::MOD_CLOCK_NOTIFICATION_IDX_STATE_CHANGE_PENDING notification.
      */
     int status;
 };
@@ -154,7 +154,7 @@ struct mod_clock_config {
      *     order to receive notifications of power domain transitions that have
      *     already occurred.
      *
-     * \note May be \ref FWK_ID_NONE to disable this functionality for all
+     * \note May be ::FWK_ID_NONE to disable this functionality for all
      *     elements.
      */
     const fwk_id_t pd_transition_notification_id;
@@ -164,7 +164,7 @@ struct mod_clock_config {
      *     order to receive notifications of power domain transitions that are
      *     about to occur.
      *
-     * \note May be \ref FWK_ID_NONE to disable this functionality for all
+     * \note May be ::FWK_ID_NONE to disable this functionality for all
      *     elements.
      */
     const fwk_id_t pd_pre_transition_notification_id;
@@ -207,11 +207,13 @@ struct mod_clock_range {
     uint64_t max;
 
     /*!
-     * The number of Hertz by which the rate can be incremented at each step
-     * throughout the clock's range. Valid only when rate_type is equal to
-     * \ref mod_clock_rate_type.MOD_CLOCK_RATE_TYPE_CONTINUOUS, as clocks that
-     * use \ref mod_clock_rate_type.MOD_CLOCK_RATE_TYPE_DISCRETE may not have a
-     * regular step between their rates.
+     * \brief Number of Hertz by which the rate can be incremented at each step
+     *      throughout the clock's range.
+     *
+     * \warning Valid only when rate_type is equal to
+     *      ::MOD_CLOCK_RATE_TYPE_CONTINUOUS, as clocks that use
+     *      ::MOD_CLOCK_RATE_TYPE_DISCRETE may not have a regular step between
+     *      their rates.
      */
     uint64_t step;
 

@@ -102,7 +102,7 @@ struct mod_scmi_clock_config {
      */
     const struct mod_scmi_clock_agent *agent_table;
 
-    /*! Number of agents in \ref agent_table */
+    /*! Number of agents in ::mod_scmi_clock_config::agent_table */
     size_t agent_count;
 };
 
