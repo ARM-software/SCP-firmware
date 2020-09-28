@@ -261,10 +261,10 @@ struct fwk_io_stream {
  * \return Status code representing the result of the operation.
  *
  * \retval ::FWK_SUCCESS The entity was successfully opened.
- * \retval ::FWK_E_PARAM The `stream` parameter was a null pointer value.
- * \retval ::FWK_E_PARAM The `id` parameter was not a valid system entity
- *      identifier.
- * \retval ::FWK_E_PARAM The `mode` parameter was not a valid access mode.
+ * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+ *      - The `stream` parameter was a null pointer value.
+ *      - The `id` parameter was not a valid system entity identifier.
+ *      - The `mode` parameter was not a valid access mode.
  * \retval ::FWK_E_SUPPORT The system entity does not support this access mode.
  * \retval ::FWK_E_HANDLER The stream adapter encountered an error.
  */
@@ -286,8 +286,9 @@ int fwk_io_open(
  *
  * \retval ::FWK_SUCCESS A character was successfully read.
  * \retval ::FWK_PENDING The end of the stream was reached.
- * \retval ::FWK_E_PARAM The `stream` parameter was a null pointer value.
- * \retval ::FWK_E_PARAM The `ch` parameter was a null pointer value.
+ * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+ *      - The `stream` parameter was a null pointer value.
+ *      - The `ch` parameter was a null pointer value.
  * \retval ::FWK_E_STATE The stream has already been closed.
  * \retval ::FWK_E_SUPPORT The stream was not opened with read access.
  * \retval ::FWK_E_HANDLER The stream adapter encountered an error.
@@ -337,8 +338,9 @@ int fwk_io_putch(const struct fwk_io_stream *stream, char ch);
  * \return Status code representing the result of the operation.
  *
  * \retval ::FWK_SUCCESS The read completed successfully.
- * \retval ::FWK_E_PARAM The `stream` parameter was a null pointer value.
- * \retval ::FWK_E_PARAM The `buffer` parameter was a null pointer value.
+ * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+ *      - The `stream` parameter was a null pointer value.
+ *      - The `buffer` parameter was a null pointer value.
  * \retval ::FWK_E_STATE The stream has already been closed.
  * \retval ::FWK_E_SUPPORT The stream was not opened with read access.
  * \retval ::FWK_E_DATA The read succeeded but the buffer was not filled.
@@ -369,8 +371,9 @@ int fwk_io_read(
  * \return Status code representing the result of the operation.
  *
  * \retval ::FWK_SUCCESS All the objects were successfully written.
- * \retval ::FWK_E_PARAM The `stream` parameter was a null pointer value.
- * \retval ::FWK_E_PARAM The `buffer` parameter was a null pointer value.
+ * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+ *      - The `stream` parameter was a null pointer value.
+ *      - The `buffer` parameter was a null pointer value.
  * \retval ::FWK_E_STATE The stream has already been closed.
  * \retval ::FWK_E_SUPPORT The stream was not opened with write access.
  * \retval ::FWK_E_HANDLER The stream adapter encountered an error.
@@ -393,8 +396,9 @@ int fwk_io_write(
  * \return Status code representing the result of the operation.
  *
  * \retval ::FWK_SUCCESS The string was successfully written.
- * \retval ::FWK_E_PARAM The `stream` parameter was a null pointer value.
- * \retval ::FWK_E_PARAM The `str` parameter was a null pointer value.
+ * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+ *      - The `stream` parameter was a null pointer value.
+ *      - The `str` parameter was a null pointer value.
  * \retval ::FWK_E_STATE The stream has already been closed.
  * \retval ::FWK_E_SUPPORT The stream was not opened with write access.
  * \retval ::FWK_E_HANDLER The stream adapter encountered an error.
@@ -419,11 +423,13 @@ int fwk_io_puts(
  * \return Status code representing the result of the operation.
  *
  * \retval ::FWK_SUCCESS The formatted string was successfully written.
- * \retval ::FWK_E_PARAM The `stream` parameter was a null pointer value.
- * \retval ::FWK_E_PARAM The `format` parameter was a null pointer value.
- * \retval ::FWK_E_STATE An error occurred attempting to format the string.
+ * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+ *      - The `stream` parameter was a null pointer value.
+ *      - The `format` parameter was a null pointer value.
  * \retval ::FWK_E_NOMEM There is not enough memory to format the string.
- * \retval ::FWK_E_STATE The stream has already been closed.
+ * \retval ::FWK_E_STATE An internal error occurred:
+ *      - An error occurred attempting to format the string.
+ *      - The stream has already been closed.
  * \retval ::FWK_E_SUPPORT The stream was not opened with write access.
  * \retval ::FWK_E_HANDLER The stream adapter encountered an error.
  */
@@ -448,11 +454,13 @@ int fwk_io_vprintf(
  * \return Status code representing the result of the operation.
  *
  * \retval ::FWK_SUCCESS The formatted string was successfully written.
- * \retval ::FWK_E_PARAM The `stream` parameter was a null pointer value.
- * \retval ::FWK_E_PARAM The `format` parameter was a null pointer value.
- * \retval ::FWK_E_STATE An error occurred attempting to format the string.
+ * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+ *      - The `stream` parameter was a null pointer value.
+ *      - The `format` parameter was a null pointer value.
  * \retval ::FWK_E_NOMEM There is not enough memory to format the string.
- * \retval ::FWK_E_STATE The stream has already been closed.
+ * \retval ::FWK_E_STATE An internal error occurred:
+ *      - An error occurred attempting to format the string.
+ *      - The stream has already been closed.
  * \retval ::FWK_E_SUPPORT The stream was not opened with write access.
  * \retval ::FWK_E_HANDLER The stream adapter encountered an error.
  */

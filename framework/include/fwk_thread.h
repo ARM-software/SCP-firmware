@@ -57,9 +57,9 @@
  *
  * \retval ::FWK_SUCCESS The event was queued.
  * \retval ::FWK_E_INIT The thread framework component is not initialized.
- * \retval ::FWK_E_PARAM One or more parameters were invalid.
- * \retval ::FWK_E_PARAM One or more fields in the \p event parameter were
- *      invalid.
+ * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+ *      - The `event` parameter was a null pointer value.
+ *      - One or more fields of the event were invalid.
  * \retval ::FWK_E_OS Operating system error.
  *
  * \return Status code representing the result of the operation.
