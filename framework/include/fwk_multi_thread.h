@@ -39,15 +39,15 @@
  *
  * \param id Identifier of the module or element to create the thread for.
  *
- * \retval FWK_SUCCESS The module/element thread was created.
- * \retval FWK_E_PARAM The identifier is not a valid module or element
+ * \retval ::FWK_SUCCESS The module/element thread was created.
+ * \retval ::FWK_E_PARAM The identifier is not a valid module or element
  *     identifier.
- * \retval FWK_E_INIT The thread framework component is not initialized.
- * \retval FWK_E_STATE The execution has already started, or it is not possible
- *      to create a thread anymore, or a thread has already been created for the
- *      given module or element.
- * \retval FWK_E_NOMEM A memory allocation failed.
- * \retval FWK_E_OS Operating system error.
+ * \retval ::FWK_E_INIT The thread framework component is not initialized.
+ * \retval ::FWK_E_STATE The execution has already started, or it is not
+ *      possible to create a thread anymore, or a thread has already been
+ *      created for the given module or element.
+ * \retval ::FWK_E_NOMEM A memory allocation failed.
+ * \retval ::FWK_E_OS Operating system error.
  */
 int fwk_thread_create(fwk_id_t id);
 
@@ -74,12 +74,12 @@ int fwk_thread_create(fwk_id_t id);
  * \param event Event to put into the queue for processing. Must not be \c NULL.
  * \param[out] resp_event The response event. Must not be \c NULL.
  *
- * \retval FWK_SUCCESS The event was successfully processed.
- * \retval FWK_E_STATE The execution is not started.
- * \retval FWK_E_PARAM One or more of the parameters were invalid.
- * \retval FWK_E_PARAM One or more fields in the \p event parameter were
+ * \retval ::FWK_SUCCESS The event was successfully processed.
+ * \retval ::FWK_E_STATE The execution is not started.
+ * \retval ::FWK_E_PARAM One or more of the parameters were invalid.
+ * \retval ::FWK_E_PARAM One or more fields in the \p event parameter were
  *      invalid.
- * \retval FWK_E_ACCESS The API is called from an ISR, called from the common
+ * \retval ::FWK_E_ACCESS The API is called from an ISR, called from the common
  *      thread, or the event targets the calling thread.
  */
 #ifdef BUILD_HAS_MULTITHREADING

@@ -294,8 +294,8 @@ struct mod_pd_driver_api {
      * \param dev_id Driver identifier of the power domain.
      * \param state Power state the power domain has to be put into.
      *
-     * \retval FWK_SUCCESS The power state has been successfully set.
-     * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
+     * \retval ::FWK_SUCCESS The power state has been successfully set.
+     * \retval ::FWK_E_ACCESS Invalid access, the framework has rejected the
      *      call to the API.
      * \return One of the other specific error codes described by the driver
      *      module.
@@ -312,8 +312,8 @@ struct mod_pd_driver_api {
      * \param dev_id Driver identifier of the power domain.
      * \param[out] state Power state of the power domain.
      *
-     * \retval FWK_SUCCESS The power state was successfully returned.
-     * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
+     * \retval ::FWK_SUCCESS The power state was successfully returned.
+     * \retval ::FWK_E_ACCESS Invalid access, the framework has rejected the
      *      call to the API.
      */
     int (*get_state)(fwk_id_t dev_id, unsigned int *state);
@@ -327,8 +327,8 @@ struct mod_pd_driver_api {
      *
      * \param dev_id Driver identifier of the power domain.
      *
-     * \retval FWK_SUCCESS The power domain was successfully reset.
-     * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
+     * \retval ::FWK_SUCCESS The power domain was successfully reset.
+     * \retval ::FWK_E_ACCESS Invalid access, the framework has rejected the
      *      call to the API.
      * \return One of the other specific error codes described by the module.
      */
@@ -370,8 +370,8 @@ struct mod_pd_driver_api {
      *
      * \param dev_id Driver identifier of the power domain.
      *
-     * \retval FWK_SUCCESS The core has been successfully prepared.
-     * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
+     * \retval ::FWK_SUCCESS The core has been successfully prepared.
+     * \retval ::FWK_E_ACCESS Invalid access, the framework has rejected the
      *      call to the API.
      */
     int (*prepare_core_for_system_suspend)(fwk_id_t dev_id);
@@ -387,10 +387,10 @@ struct mod_pd_driver_api {
      * \param dev_id Driver identifier of the power domain.
      * \param system_shutdown Type of system shutdown.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_PENDING The operation was acknowledged. Please note that at
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_PENDING The operation was acknowledged. Please note that at
      *      present there is no dedicated driver input api for this case.
-     * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
+     * \retval ::FWK_E_ACCESS Invalid access, the framework has rejected the
      *      call to the API.
      */
     int (*shutdown)(fwk_id_t dev_id,
@@ -412,11 +412,11 @@ struct mod_pd_public_api {
      *      queried for.
      * \param[out] type Type of the power domain.
      *
-     * \retval FWK_SUCCESS The type of the power domain was returned.
-     * \retval FWK_E_INIT The module has not been initialized.
-     * \retval FWK_E_STATE The power domain module is in an invalid state.
-     * \retval FWK_E_PARAM The power domain identifier is unknown.
-     * \retval FWK_E_PARAM The pointer 'type' is equal to NULL.
+     * \retval ::FWK_SUCCESS The type of the power domain was returned.
+     * \retval ::FWK_E_INIT The module has not been initialized.
+     * \retval ::FWK_E_STATE The power domain module is in an invalid state.
+     * \retval ::FWK_E_PARAM The power domain identifier is unknown.
+     * \retval ::FWK_E_PARAM The pointer 'type' is equal to NULL.
      */
     int (*get_domain_type)(fwk_id_t pd_id, enum mod_pd_type *type);
 
@@ -429,12 +429,12 @@ struct mod_pd_public_api {
      * \param pd_id Identifier of the power domain.
      * \param[out] parent_pd_id Identifier of the parent power domain.
      *
-     * \retval FWK_SUCCESS The identifier of the parent power domain was
+     * \retval ::FWK_SUCCESS The identifier of the parent power domain was
      *      returned.
-     * \retval FWK_E_INIT The module has not been initialized.
-     * \retval FWK_E_STATE The power domain module is in an invalid state.
-     * \retval FWK_E_PARAM The power domain identifier is unknown.
-     * \retval FWK_E_PARAM The pointer 'parent_pd_id' is equal to NULL.
+     * \retval ::FWK_E_INIT The module has not been initialized.
+     * \retval ::FWK_E_STATE The power domain module is in an invalid state.
+     * \retval ::FWK_E_PARAM The power domain identifier is unknown.
+     * \retval ::FWK_E_PARAM The pointer 'parent_pd_id' is equal to NULL.
      */
     int (*get_domain_parent_id)(fwk_id_t pd_id, fwk_id_t *parent_pd_id);
 };
@@ -455,11 +455,11 @@ struct mod_pd_restricted_api {
      *     queried for.
      * \param[out] type Type of the power domain.
      *
-     * \retval FWK_SUCCESS The type of the power domain was returned.
-     * \retval FWK_E_INIT The module has not been initialized.
-     * \retval FWK_E_STATE The power domain module is in an invalid state.
-     * \retval FWK_E_PARAM The power domain identifier is unknown.
-     * \retval FWK_E_PARAM The pointer 'type' is equal to NULL.
+     * \retval ::FWK_SUCCESS The type of the power domain was returned.
+     * \retval ::FWK_E_INIT The module has not been initialized.
+     * \retval ::FWK_E_STATE The power domain module is in an invalid state.
+     * \retval ::FWK_E_PARAM The power domain identifier is unknown.
+     * \retval ::FWK_E_PARAM The pointer 'type' is equal to NULL.
      */
     int (*get_domain_type)(fwk_id_t pd_id, enum mod_pd_type *type);
 
@@ -472,12 +472,12 @@ struct mod_pd_restricted_api {
      * \param pd_id Identifier of the power domain.
      * \param[out] parent_pd_id The identifier of the parent power domain.
      *
-     * \retval FWK_SUCCESS The identifier of the parent power domain was
+     * \retval ::FWK_SUCCESS The identifier of the parent power domain was
      *      returned.
-     * \retval FWK_E_INIT The module has not been initialized.
-     * \retval FWK_E_STATE The power domain module is in an invalid state.
-     * \retval FWK_E_PARAM The power domain identifier is unknown.
-     * \retval FWK_E_PARAM The pointer 'parent_pd_id' is equal to NULL.
+     * \retval ::FWK_E_INIT The module has not been initialized.
+     * \retval ::FWK_E_STATE The power domain module is in an invalid state.
+     * \retval ::FWK_E_PARAM The power domain identifier is unknown.
+     * \retval ::FWK_E_PARAM The pointer 'parent_pd_id' is equal to NULL.
      */
     int (*get_domain_parent_id)(fwk_id_t pd_id, fwk_id_t *parent_pd_id);
 
@@ -497,11 +497,11 @@ struct mod_pd_restricted_api {
      *      and the children of the power domain involved are in a state where
      *      the transition can be completed.
      *
-     * \retval FWK_SUCCESS The power state transition was completed.
-     * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
+     * \retval ::FWK_SUCCESS The power state transition was completed.
+     * \retval ::FWK_E_ACCESS Invalid access, the framework has rejected the
      *      call to the API.
-     * \retval FWK_E_HANDLER The function is not called from a thread.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_E_HANDLER The function is not called from a thread.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
      */
     int (*set_state)(fwk_id_t pd_id, uint32_t state);
 
@@ -523,10 +523,10 @@ struct mod_pd_restricted_api {
      *      and the children of the power domain involved are in a state where
      *      the transition can be completed.
      *
-     * \retval FWK_SUCCESS The power state transition was submitted.
-     * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
+     * \retval ::FWK_SUCCESS The power state transition was submitted.
+     * \retval ::FWK_E_ACCESS Invalid access, the framework has rejected the
      *      call to the API.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
      */
     int (*set_state_async)(fwk_id_t pd_id, bool resp_requested, uint32_t state);
 
@@ -537,12 +537,12 @@ struct mod_pd_restricted_api {
      *      retrieved.
      * \param[out] state The power domain state.
      *
-     * \retval FWK_SUCCESS The power state was returned.
-     * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
+     * \retval ::FWK_SUCCESS The power state was returned.
+     * \retval ::FWK_E_ACCESS Invalid access, the framework has rejected the
      *      call to the API.
-     * \retval FWK_E_HANDLER The function is not called from a thread.
-     * \retval FWK_E_PARAM The power domain identifier is unknown.
-     * \retval FWK_E_PARAM The pointer 'state' is equal to NULL.
+     * \retval ::FWK_E_HANDLER The function is not called from a thread.
+     * \retval ::FWK_E_PARAM The power domain identifier is unknown.
+     * \retval ::FWK_E_PARAM The pointer 'state' is equal to NULL.
      */
     int (*get_state)(fwk_id_t pd_id, unsigned int *state);
 
@@ -554,12 +554,12 @@ struct mod_pd_restricted_api {
      *
      * \param pd_id Identifier of the power domain to reset.
      *
-     * \retval FWK_SUCCESS Power state retrieving request transmitted.
-     * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
+     * \retval ::FWK_SUCCESS Power state retrieving request transmitted.
+     * \retval ::FWK_E_ACCESS Invalid access, the framework has rejected the
      *      call to the API.
-     * \retval FWK_E_HANDLER The function is not called from a thread.
-     * \retval FWK_E_NOMEM Failed to allocate a request descriptor.
-     * \retval FWK_E_PARAM The power domain identifier is unknown.
+     * \retval ::FWK_E_HANDLER The function is not called from a thread.
+     * \retval ::FWK_E_NOMEM Failed to allocate a request descriptor.
+     * \retval ::FWK_E_PARAM The power domain identifier is unknown.
      */
     int (*reset)(fwk_id_t pd_id);
 
@@ -574,14 +574,14 @@ struct mod_pd_restricted_api {
      * \param state State the system has to be suspended to. The definition
      *      of those states is platform specific.
      *
-     * \retval FWK_SUCCESS The system suspension has been initiated
+     * \retval ::FWK_SUCCESS The system suspension has been initiated
      *      successfully.
-     * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
+     * \retval ::FWK_E_ACCESS Invalid access, the framework has rejected the
      *      call to the API.
-     * \retval FWK_E_HANDLER The function is not called from a thread.
-     * \retval FWK_E_NOMEM Failed to allocate a request descriptor.
-     * \retval FWK_E_PARAM Invalid state.
-     * \retval FWK_E_STATE The system is not in the proper state to be
+     * \retval ::FWK_E_HANDLER The function is not called from a thread.
+     * \retval ::FWK_E_NOMEM Failed to allocate a request descriptor.
+     * \retval ::FWK_E_PARAM Invalid state.
+     * \retval ::FWK_E_STATE The system is not in the proper state to be
      *      suspended.
      */
     int (*system_suspend)(unsigned int state);
@@ -592,12 +592,12 @@ struct mod_pd_restricted_api {
      * \note The function shutdowns the system whatever its current state. If
      *      the shutdown is successful, the function does not return.
      *
-     * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
+     * \retval ::FWK_E_ACCESS Invalid access, the framework has rejected the
      *      call to the API.
-     * \retval FWK_PENDING Request aknowledged. A response event will not be
+     * \retval ::FWK_PENDING Request aknowledged. A response event will not be
      *      sent to the caller.
-     * \retval FWK_E_HANDLER The function is not called from a thread.
-     * \retval FWK_E_NOMEM Failed to allocate a request descriptor.
+     * \retval ::FWK_E_HANDLER The function is not called from a thread.
+     * \retval ::FWK_E_NOMEM Failed to allocate a request descriptor.
      */
     int (*system_shutdown)(enum mod_pd_system_shutdown system_shutdown);
 };
@@ -628,10 +628,10 @@ struct mod_pd_driver_input_api {
      *      and the children of the power domain involved are in a state where
      *      the transition can be completed.
      *
-     * \retval FWK_SUCCESS The composite power state transition was submitted.
-     * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
+     * \retval ::FWK_SUCCESS The composite power state transition was submitted.
+     * \retval ::FWK_E_ACCESS Invalid access, the framework has rejected the
      *      call to the API.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
      */
     int (*set_state_async)(
         fwk_id_t pd_id,
@@ -650,12 +650,12 @@ struct mod_pd_driver_input_api {
      * \param resp_requested True if the caller wants to be notified with an
      *      event response at the end of the request processing.
      *
-     * \retval FWK_SUCCESS Reset request transmitted.
-     * \retval FWK_E_ACCESS Invalid access, the framework has rejected the
+     * \retval ::FWK_SUCCESS Reset request transmitted.
+     * \retval ::FWK_E_ACCESS Invalid access, the framework has rejected the
      *      call to the API.
-     * \retval FWK_E_HANDLER The function is not called from a thread.
-     * \retval FWK_E_NOMEM Failed to allocate a request descriptor.
-     * \retval FWK_E_PARAM The power domain identifier is unknown.
+     * \retval ::FWK_E_HANDLER The function is not called from a thread.
+     * \retval ::FWK_E_NOMEM Failed to allocate a request descriptor.
+     * \retval ::FWK_E_PARAM The power domain identifier is unknown.
      */
     int (*reset_async)(fwk_id_t pd_id, bool resp_requested);
 
@@ -669,11 +669,11 @@ struct mod_pd_driver_input_api {
      * \param pd_id Identifier of the power domain, a power state transition
      *      report is is sent to.
      *
-     * \retval FWK_SUCCESS Report transmitted.
-     * \retval FWK_E_ACCESS Invalid access, the framework has rejected the call
-     *      to the API.
-     * \retval FWK_E_NOMEM Failed to allocate a report event.
-     * \retval FWK_E_PARAM The power domain identifier is unknown.
+     * \retval ::FWK_SUCCESS Report transmitted.
+     * \retval ::FWK_E_ACCESS Invalid access, the framework has rejected the
+     *      call to the API.
+     * \retval ::FWK_E_NOMEM Failed to allocate a report event.
+     * \retval ::FWK_E_PARAM The power domain identifier is unknown.
      */
     int (*report_power_state_transition)(fwk_id_t pd_id, unsigned int state);
 
@@ -693,8 +693,8 @@ struct mod_pd_driver_input_api {
      *
      * \param[out] last_core_pd_id Identifier of the last core.
      *
-     * \retval FWK_E_PARAM The pointer to the identifier is not valid.
-     * \retval FWK_SUCCESS The request was successful.
+     * \retval ::FWK_E_PARAM The pointer to the identifier is not valid.
+     * \retval ::FWK_SUCCESS The request was successful.
      * \return One of the standard framework error codes.
      */
     int (*get_last_core_pd_id)(fwk_id_t *last_core_pd_id);

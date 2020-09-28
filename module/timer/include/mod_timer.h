@@ -122,8 +122,8 @@ struct mod_timer_api {
      * \param dev_id Element identifier that identifies the timer device.
      * \param[out] frequency The timer frequency.
      *
-     * \retval FWK_SUCCESS Operation succeeded.
-     * \retval FWK_E_PARAM The frequency pointer was invalid.
+     * \retval ::FWK_SUCCESS Operation succeeded.
+     * \retval ::FWK_E_PARAM The frequency pointer was invalid.
      * \retval One of the other specific error codes described by the framework.
      */
     int (*get_frequency)(fwk_id_t dev_id, uint32_t *frequency);
@@ -139,8 +139,8 @@ struct mod_timer_api {
      * \param microseconds Period, in microseconds.
      * \param[out] timestamp The resulting counter timestamp.
      *
-     * \retval FWK_SUCCESS Operation succeeded.
-     * \retval FWK_E_PARAM The timestamp pointer was invalid.
+     * \retval ::FWK_SUCCESS Operation succeeded.
+     * \retval ::FWK_E_PARAM The timestamp pointer was invalid.
      * \retval One of the other specific error codes described by the framework.
      */
     int (*time_to_timestamp)(fwk_id_t dev_id,
@@ -156,8 +156,8 @@ struct mod_timer_api {
      * \param dev_id Element identifier that identifies the timer device.
      * \param[out] counter The counter value.
      *
-     * \retval FWK_SUCCESS Operation succeeded.
-     * \retval FWK_E_PARAM The counter pointer was invalid.
+     * \retval ::FWK_SUCCESS Operation succeeded.
+     * \retval ::FWK_E_PARAM The counter pointer was invalid.
      * \retval One of the other specific error codes described by the framework.
      */
     int (*get_counter)(fwk_id_t dev_id, uint64_t *counter);
@@ -171,7 +171,7 @@ struct mod_timer_api {
      * \param dev_id Element identifier that identifies the timer device.
      * \param microseconds The amount of time, given in microseconds, to delay.
      *
-     * \retval FWK_SUCCESS Operation succeeded.
+     * \retval ::FWK_SUCCESS Operation succeeded.
      * \retval One of the other specific error codes described by the framework.
      */
     int (*delay)(fwk_id_t dev_id, uint32_t microseconds);
@@ -191,10 +191,10 @@ struct mod_timer_api {
      *      or until the timeout period has elapsed.
      * \param data Pointer passed to the condition function when it is called.
      *
-     * \retval FWK_SUCCESS The condition was met before the timeout period
+     * \retval ::FWK_SUCCESS The condition was met before the timeout period
      *      elapsed.
-     * \retval FWK_E_TIMEOUT The timeout period elapsed before the condition was
-     *      met.
+     * \retval ::FWK_E_TIMEOUT The timeout period elapsed before the condition
+     *      was met.
      * \retval One of the other specific error codes described by the framework.
      */
     int (*wait)(fwk_id_t dev_id,
@@ -215,8 +215,8 @@ struct mod_timer_api {
      * \param[out] remaining_ticks The remaining number of ticks before
      * the timer value reaches the given timestamp.
      *
-     * \retval FWK_SUCCESS Operation succeeded.
-     * \retval FWK_E_PARAM The remaining_ticks pointer was invalid.
+     * \retval ::FWK_SUCCESS Operation succeeded.
+     * \retval ::FWK_E_PARAM The remaining_ticks pointer was invalid.
      * \retval One of the other specific error codes described by the framework.
      *
      * \note remaining_ticks is also a timestamp.
@@ -238,8 +238,8 @@ struct mod_timer_api {
      * \param [out] remaining_ticks Number of ticks between now and the next
      *      alarm trigger of the timer identified by \p dev_id.
      *
-     * \retval FWK_SUCCESS Operation succeeded.
-     * \retval FWK_E_PARAM One of the parameters is invalid.
+     * \retval ::FWK_SUCCESS Operation succeeded.
+     * \retval ::FWK_E_PARAM One of the parameters is invalid.
      * \return One of the other specific error codes described by the framework.
      */
     int (*get_next_alarm_remaining)(fwk_id_t dev_id,
@@ -277,9 +277,9 @@ struct mod_timer_alarm_api {
      * \pre \p alarm_id must be a valid sub-element alarm identifier that has
      *     previously been bound to.
      *
-     * \retval FWK_E_ACCESS The function was called from an interrupt handler
+     * \retval ::FWK_E_ACCESS The function was called from an interrupt handler
      *      OR could not attain call context.
-     * \retval FWK_SUCCESS The alarm was started.
+     * \retval ::FWK_SUCCESS The alarm was started.
      */
     int (*start)(fwk_id_t alarm_id,
                  unsigned int milliseconds,
@@ -299,12 +299,12 @@ struct mod_timer_alarm_api {
      * \pre \p alarm_id must be a valid sub-element alarm identifier that has
      *     previously been bound to.
      *
-     * \retval FWK_SUCCESS The alarm was stopped.
-     * \retval FWK_E_STATE The alarm was already stopped.
-     * \retval FWK_E_ACCESS The function was called from an interrupt handler
+     * \retval ::FWK_SUCCESS The alarm was stopped.
+     * \retval ::FWK_E_STATE The alarm was already stopped.
+     * \retval ::FWK_E_ACCESS The function was called from an interrupt handler
      *      different from the interrupt handler of the timer the alarm is
      *      associated to OR could not attain call context.
-     * \retval FWK_E_INIT The component has not been initialized.
+     * \retval ::FWK_E_INIT The component has not been initialized.
      */
     int (*stop)(fwk_id_t alarm_id);
 };

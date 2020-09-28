@@ -174,7 +174,7 @@ struct ppu_v1_boot_api {
      *
      * \param pd_id Identifier of the power domain
      *
-     * \retval FWK_SUCCESS Operation successful.
+     * \retval ::FWK_SUCCESS Operation successful.
      * \return One of the standard framework error codes.
      */
     int (*power_mode_on)(fwk_id_t pd_id);

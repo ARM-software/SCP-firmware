@@ -56,7 +56,7 @@ struct mod_n1sdp_scp2pcc_api {
      * \param size Size of the payload to be sent.
      * \param type Indicates the type of payload sent.
      *
-     * \retval FWK_SUCCESS Operation succeeded.
+     * \retval ::FWK_SUCCESS Operation succeeded.
      * \return One of the other specific error codes described by the framework.
      */
     int (*send)(void *data, uint16_t size, uint16_t type);

@@ -99,7 +99,7 @@ struct n1sdp_c2c_slave_info_api {
     *
     * \param size_gb Pointer to storage where the size is stored.
     *
-    * \retval FWK_SUCCESS If operation succeeds.
+    * \retval ::FWK_SUCCESS If operation succeeds.
     * \return One of the possible error return codes.
     */
    int (*get_ddr_size_gb)(uint8_t *size_gb);
@@ -109,40 +109,41 @@ struct n1sdp_c2c_slave_info_api {
  * \brief N1SDP C2C power domain API
  */
 struct n1sdp_c2c_pd_api {
-   /*!
-    * \brief API to set a power state in remote chip.
-    *
-    * \param cmd The C2C command type to issue.
-    * \param pd_id The target power domain ID.
-    * \param pd_type The target power domain type.
-    *
-    * \retval FWK_SUCCESS If operation succeeds.
-    * \return One of the possible error return codes.
-    */
-   int (*set_state)(enum n1sdp_c2c_cmd cmd, uint8_t pd_id, uint8_t pd_type);
-   /*!
-    * \brief API to get a power state in remote chip.
-    *
-    * \param cmd The C2C command type to issue.
-    * \param pd_id The target power domain ID.
-    * \param state Current power state in power domain pd_id.
-    *
-    * \retval FWK_SUCCESS If operation succeeds.
-    * \return One of the possible error return codes.
-    */
-   int (*get_state)(enum n1sdp_c2c_cmd cmd, uint8_t pd_id,
-                    unsigned int *state);
-   /*!
-    * \brief API to issue shutdown/reboot to remote chip.
-    *
-    * \param cmd The C2C command type to issue.
-    * \param type The shutdown/reboot type to issue.
-    *
-    * \retval FWK_SUCCESS If operation succeeds.
-    * \return One of the possible error return codes.
-    */
-   int (*shutdown_reboot)(enum n1sdp_c2c_cmd cmd,
-                          enum mod_pd_system_shutdown type);
+    /*!
+     * \brief API to set a power state in remote chip.
+     *
+     * \param cmd The C2C command type to issue.
+     * \param pd_id The target power domain ID.
+     * \param pd_type The target power domain type.
+     *
+     * \retval ::FWK_SUCCESS If operation succeeds.
+     * \return One of the possible error return codes.
+     */
+    int (*set_state)(enum n1sdp_c2c_cmd cmd, uint8_t pd_id, uint8_t pd_type);
+    /*!
+     * \brief API to get a power state in remote chip.
+     *
+     * \param cmd The C2C command type to issue.
+     * \param pd_id The target power domain ID.
+     * \param state Current power state in power domain pd_id.
+     *
+     * \retval ::FWK_SUCCESS If operation succeeds.
+     * \return One of the possible error return codes.
+     */
+    int (
+        *get_state)(enum n1sdp_c2c_cmd cmd, uint8_t pd_id, unsigned int *state);
+    /*!
+     * \brief API to issue shutdown/reboot to remote chip.
+     *
+     * \param cmd The C2C command type to issue.
+     * \param type The shutdown/reboot type to issue.
+     *
+     * \retval ::FWK_SUCCESS If operation succeeds.
+     * \return One of the possible error return codes.
+     */
+    int (*shutdown_reboot)(
+        enum n1sdp_c2c_cmd cmd,
+        enum mod_pd_system_shutdown type);
 };
 
 /*!

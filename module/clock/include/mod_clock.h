@@ -255,9 +255,9 @@ struct mod_clock_drv_api {
      * \param round_mode The type of rounding to perform, if required, to
      *      achieve the given rate.
      *
-     * \retval FWK_PENDING The request is pending. The driver will provide the
+     * \retval ::FWK_PENDING The request is pending. The driver will provide the
      *      requested value later through the driver response API.
-     * \retval FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
     int (*set_rate)(fwk_id_t clock_id, uint64_t rate,
@@ -270,9 +270,9 @@ struct mod_clock_drv_api {
      *
      * \param[out] rate The current clock rate in Hertz.
      *
-     * \retval FWK_PENDING The request is pending. The driver will provide the
+     * \retval ::FWK_PENDING The request is pending. The driver will provide the
      *      requested value later through the driver response API.
-     * \retval FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
     int (*get_rate)(fwk_id_t clock_id, uint64_t *rate);
@@ -286,7 +286,7 @@ struct mod_clock_drv_api {
      *
      * \param[out] rate The rate, in Hertz, corresponding to the index.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
     int (*get_rate_from_index)(fwk_id_t clock_id, unsigned int rate_index,
@@ -299,9 +299,9 @@ struct mod_clock_drv_api {
      *
      * \param state One of the valid clock states.
      *
-     * \retval FWK_PENDING The request is pending. The driver will provide the
+     * \retval ::FWK_PENDING The request is pending. The driver will provide the
      *      requested value later through the driver response API.
-     * \retval FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
     int (*set_state)(fwk_id_t clock_id, enum mod_clock_state state);
@@ -313,9 +313,9 @@ struct mod_clock_drv_api {
      *
      * \param[out] state The current clock state.
      *
-     * \retval FWK_PENDING The request is pending. The driver will provide the
+     * \retval ::FWK_PENDING The request is pending. The driver will provide the
      *      requested value later through the driver response API.
-     * \retval FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
     int (*get_state)(fwk_id_t clock_id, enum mod_clock_state *state);
@@ -327,7 +327,7 @@ struct mod_clock_drv_api {
      *
      * \param[out] range The clock range structure.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
     int (*get_range)(fwk_id_t clock_id, struct mod_clock_range *range);
@@ -352,7 +352,7 @@ struct mod_clock_drv_api {
      * \param new_state The power state that the clock's power domain will
      *     transition to.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
     int (*process_pending_power_transition)(
@@ -379,7 +379,7 @@ struct mod_clock_drv_api {
      * \param state The power state that the clock's power domain transitioned
      *     to.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
     int (*process_power_transition)(fwk_id_t clock_id, unsigned int state);
@@ -399,11 +399,11 @@ struct mod_clock_api {
      * \param round_mode The type of rounding to perform, if required, to
      *      achieve the given rate.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_PENDING The request is pending. The result for this operation
-     *      will be provided via a response event.
-     * \retval FWK_E_PARAM The clock identifier was invalid.
-     * \retval FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_PENDING The request is pending. The result for this
+     *      operation will be provided via a response event.
+     * \retval ::FWK_E_PARAM The clock identifier was invalid.
+     * \retval ::FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
      *      supported.
      * \return One of the standard framework error codes.
      */
@@ -417,12 +417,12 @@ struct mod_clock_api {
      *
      * \param[out] rate The current clock rate in Hertz.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_PENDING The request is pending. The requested rate will be
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_PENDING The request is pending. The requested rate will be
      *      provided via a response event.
-     * \retval FWK_E_PARAM The clock identifier was invalid.
-     * \retval FWK_E_PARAM The rate pointer was NULL.
-     * \retval FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
+     * \retval ::FWK_E_PARAM The clock identifier was invalid.
+     * \retval ::FWK_E_PARAM The rate pointer was NULL.
+     * \retval ::FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
      *      supported.
      * \return One of the standard framework error codes.
      */
@@ -437,9 +437,9 @@ struct mod_clock_api {
      *
      * \param[out] rate The rate, in Hertz, corresponding to the index.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM The clock identifier was invalid.
-     * \retval FWK_E_PARAM The rate pointer was NULL.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_E_PARAM The clock identifier was invalid.
+     * \retval ::FWK_E_PARAM The rate pointer was NULL.
      * \return One of the standard framework error codes.
      */
     int (*get_rate_from_index)(fwk_id_t clock_id, unsigned int rate_index,
@@ -452,11 +452,11 @@ struct mod_clock_api {
      *
      * \param state One of the valid clock states.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_PENDING The request is pending. The result for this operation
-     *      will be provided via a response event.
-     * \retval FWK_E_PARAM The clock identifier was invalid.
-     * \retval FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_PENDING The request is pending. The result for this
+     *      operation will be provided via a response event.
+     * \retval ::FWK_E_PARAM The clock identifier was invalid.
+     * \retval ::FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
      *      supported.
      * \return One of the standard framework error codes.
      */
@@ -469,12 +469,12 @@ struct mod_clock_api {
      *
      * \param[out] state The current clock state.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_PENDING The request is pending. The requested state will be
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_PENDING The request is pending. The requested state will be
      *      provided via a response event.
-     * \retval FWK_E_PARAM The clock identifier was invalid.
-     * \retval FWK_E_PARAM The state pointer was NULL.
-     * \retval FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
+     * \retval ::FWK_E_PARAM The clock identifier was invalid.
+     * \retval ::FWK_E_PARAM The state pointer was NULL.
+     * \retval ::FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
      *      supported.
      * \return One of the standard framework error codes.
      */
@@ -487,9 +487,9 @@ struct mod_clock_api {
      *
      * \param[out] info The clock device properties.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM The clock identifier was invalid.
-     * \retval FWK_E_PARAM The info pointer was NULL.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_E_PARAM The clock identifier was invalid.
+     * \retval ::FWK_E_PARAM The info pointer was NULL.
      * \return One of the standard framework error codes.
      */
     int (*get_info)(fwk_id_t clock_id, struct mod_clock_info *info);

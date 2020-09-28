@@ -55,14 +55,14 @@ struct fwk_test_suite_desc {
     /*! Test suite name */
     const char *name;
 
-     /*!
+    /*!
      * \brief Pointer to a test suite setup function.
      *
      * \details This function should be used to initialize and configure a test
      *      fixture or to execute expensive routines that could otherwise be
      *      done within a test case setup function.
      *
-     * \retval FWK_SUCCESS The test suite environment was successfully set up.
+     * \retval ::FWK_SUCCESS The test suite environment was successfully set up.
      * \return Any of the other error codes defined by the framework.
      *
      * \note May be NULL, in which case the test suite is considered to have no

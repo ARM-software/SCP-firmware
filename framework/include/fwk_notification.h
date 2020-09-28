@@ -44,13 +44,13 @@
  * \param source_id Notification source identifier.
  * \param target_id Notification target identifier.
  *
- * \retval FWK_SUCCESS The subscription was successful.
- * \retval FWK_E_INIT The notification component has not been initialized.
- * \retval FWK_E_HANDLER The function was called from an interrupt handler.
- * \retval FWK_E_PARAM One or more identifiers were invalid.
- * \retval FWK_E_STATE The entity \p target_id has already subscribed to the
+ * \retval ::FWK_SUCCESS The subscription was successful.
+ * \retval ::FWK_E_INIT The notification component has not been initialized.
+ * \retval ::FWK_E_HANDLER The function was called from an interrupt handler.
+ * \retval ::FWK_E_PARAM One or more identifiers were invalid.
+ * \retval ::FWK_E_STATE The entity \p target_id has already subscribed to the
  *      notification \p notification_id from the entity \p source_id.
- * \retval FWK_E_NOMEM The maximum number of subscriptions has been reached.
+ * \retval ::FWK_E_NOMEM The maximum number of subscriptions has been reached.
  */
 int fwk_notification_subscribe(fwk_id_t notification_id, fwk_id_t source_id,
                                fwk_id_t target_id);
@@ -62,11 +62,11 @@ int fwk_notification_subscribe(fwk_id_t notification_id, fwk_id_t source_id,
  * \param source_id Notification source identifier.
  * \param target_id Notification target identifier.
  *
- * \retval FWK_SUCCESS The subscription was successfully cancelled.
- * \retval FWK_E_INIT The notification component has not been initialized.
- * \retval FWK_E_HANDLER The function was called from an interrupt handler.
- * \retval FWK_E_PARAM One or more identifiers were invalid.
- * \retval FWK_E_STATE The entity \p target_id has not subscribed to the
+ * \retval ::FWK_SUCCESS The subscription was successfully cancelled.
+ * \retval ::FWK_E_INIT The notification component has not been initialized.
+ * \retval ::FWK_E_HANDLER The function was called from an interrupt handler.
+ * \retval ::FWK_E_PARAM One or more identifiers were invalid.
+ * \retval ::FWK_E_STATE The entity \p target_id has not subscribed to the
  *      notification \p notification_id from the entity \p source_id.
  */
 int fwk_notification_unsubscribe(fwk_id_t notification_id, fwk_id_t source_id,
@@ -86,9 +86,9 @@ int fwk_notification_unsubscribe(fwk_id_t notification_id, fwk_id_t source_id,
  * \param [out] count Number of notification events that were sent. Must not be
  *      \c NULL.
  *
- * \retval FWK_SUCCESS All subscribers were notified successfully.
- * \retval FWK_E_INIT The notification component has not been initialized.
- * \retval FWK_E_PARAM One of more parameters were invalid.
+ * \retval ::FWK_SUCCESS All subscribers were notified successfully.
+ * \retval ::FWK_E_INIT The notification component has not been initialized.
+ * \retval ::FWK_E_PARAM One of more parameters were invalid.
  */
 int fwk_notification_notify(struct fwk_event *notification_event,
                             unsigned int *count);

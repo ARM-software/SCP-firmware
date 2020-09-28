@@ -445,7 +445,7 @@ struct mod_sgm775_dmc_ddr_phy_api {
      * \param element_id Element identifier corresponding to the device to
      *      configure.
      *
-     * \retval FWK_SUCCESS if the operation succeed.
+     * \retval ::FWK_SUCCESS if the operation succeed.
      * \return One of the standard framework error codes.
      */
     int (*configure)(fwk_id_t element_id);

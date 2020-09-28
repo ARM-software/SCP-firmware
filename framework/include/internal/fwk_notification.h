@@ -30,10 +30,10 @@ struct __fwk_notification_subscription {
  * \param notification_count The maximum number of notification subscriptions at
  *      any time.
  *
- * \retval FWK_SUCCESS The notification framework component was initialized.
- * \retval FWK_E_PARAM The maximum number of notification subscriptions is equal
- *      to zero.
- * \retval FWK_E_NOMEM Insufficient memory available to allocate the
+ * \retval ::FWK_SUCCESS The notification framework component was initialized.
+ * \retval ::FWK_E_PARAM The maximum number of notification subscriptions is
+ *      equal to zero.
+ * \retval ::FWK_E_NOMEM Insufficient memory available to allocate the
  *      notification subscription.
  */
 int __fwk_notification_init(size_t notification_count);

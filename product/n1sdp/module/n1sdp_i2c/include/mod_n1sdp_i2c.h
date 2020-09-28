@@ -159,7 +159,7 @@ struct mod_n1sdp_i2c_master_api_polled {
      * \param data Pointer to data buffer.
      * \param length Data size to be read in bytes.
      *
-     * \retval FWK_SUCCESS Operation succeeded.
+     * \retval ::FWK_SUCCESS Operation succeeded.
      * \return One of the other specific error codes described by the framework.
      */
     int (*read)(fwk_id_t device_id, uint16_t address, char *data,
@@ -175,7 +175,7 @@ struct mod_n1sdp_i2c_master_api_polled {
      * \param stop When set to true indicates end of data transfer and interface
      *      releases the sclk line.
      *
-     * \retval FWK_SUCCESS Operation succeeded.
+     * \retval ::FWK_SUCCESS Operation succeeded.
      * \return One of the other specific error codes described by the framework.
      */
     int (*write)(fwk_id_t device_id, uint16_t address, const char *data,
@@ -193,7 +193,7 @@ struct mod_n1sdp_i2c_slave_api_irq {
      * \param data Pointer to data buffer.
      * \param length Data size to be read in bytes.
      *
-     * \retval FWK_SUCCESS Operation succeeded.
+     * \retval ::FWK_SUCCESS Operation succeeded.
      * \return One of the other specific error codes described by the framework.
      */
     int (*read)(fwk_id_t device_id, uint8_t *data, uint8_t length);
@@ -207,7 +207,7 @@ struct mod_n1sdp_i2c_slave_api_irq {
      * \param stop When set to true indicates end of data transfer and interface
      *      releases the sclk line.
      *
-     * \retval FWK_SUCCESS Operation succeeded.
+     * \retval ::FWK_SUCCESS Operation succeeded.
      * \return One of the other specific error codes described by the framework.
      */
     int (*write)(fwk_id_t device_id, uint8_t *data, uint8_t length);

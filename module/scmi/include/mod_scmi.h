@@ -165,9 +165,9 @@ struct mod_scmi_to_transport_api {
      * \param[out] secure Channel security state. True if the channel
      * is secure, or false if it is non-secure.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM The channel_id parameter is invalid.
-     * \retval FWK_E_PARAM The secure parameter is NULL.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_E_PARAM The channel_id parameter is invalid.
+     * \retval ::FWK_E_PARAM The secure parameter is NULL.
      * \return One of the standard error codes for implementation-defined
      * errors.
      */
@@ -179,9 +179,9 @@ struct mod_scmi_to_transport_api {
      * \param channel_id Channel identifier.
      * \param[out] size Maximum payload size in bytes.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM The channel_id parameter is invalid.
-     * \retval FWK_E_PARAM The size parameter is NULL.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_E_PARAM The channel_id parameter is invalid.
+     * \retval ::FWK_E_PARAM The size parameter is NULL.
      * \return One of the standard error codes for implementation-defined
      * errors.
      */
@@ -193,10 +193,10 @@ struct mod_scmi_to_transport_api {
      * \param channel_id Channel identifier.
      * \param[out] message_header SCMI message header.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM The channel_id parameter is invalid.
-     * \retval FWK_E_PARAM The message_header parameter is NULL.
-     * \retval FWK_E_ACCESS No message is available to read.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_E_PARAM The channel_id parameter is invalid.
+     * \retval ::FWK_E_PARAM The message_header parameter is NULL.
+     * \retval ::FWK_E_ACCESS No message is available to read.
      * \return One of the standard error codes for implementation-defined
      * errors.
      */
@@ -210,10 +210,10 @@ struct mod_scmi_to_transport_api {
      * \param[out] size Payload size. May be NULL, in which case the
      * parameter should be ignored.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM The channel_id parameter is invalid.
-     * \retval FWK_E_PARAM The payload parameter is NULL.
-     * \retval FWK_E_ACCESS No message is available to read.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_E_PARAM The channel_id parameter is invalid.
+     * \retval ::FWK_E_PARAM The payload parameter is NULL.
+     * \retval ::FWK_E_ACCESS No message is available to read.
      * \return One of the standard error codes for implementation-defined
      * errors.
      */
@@ -228,9 +228,9 @@ struct mod_scmi_to_transport_api {
      * \param payload Payload data to write.
      * \param size Size of the payload data.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM The payload parameter is NULL.
-     * \retval FWK_E_PARAM The offset and size provided are not within the
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_E_PARAM The payload parameter is NULL.
+     * \retval ::FWK_E_PARAM The offset and size provided are not within the
      * bounds of the payload area.
      * \return One of the standard error codes for implementation-defined
      * errors.
@@ -246,11 +246,11 @@ struct mod_scmi_to_transport_api {
      * been written.
      * \param size Size of the payload source.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM The channel_id parameter is invalid.
-     * \retval FWK_E_PARAM The size parameter is less than the size of one
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_E_PARAM The channel_id parameter is invalid.
+     * \retval ::FWK_E_PARAM The size parameter is less than the size of one
      * payload entry.
-     * \retval FWK_E_ACCESS No message is available to respond to.
+     * \retval ::FWK_E_ACCESS No message is available to respond to.
      * \return One of the standard error codes for implementation-defined
      * errors.
      */
@@ -264,9 +264,9 @@ struct mod_scmi_to_transport_api {
      * \param payload Payload data to write.
      * \param size Size of the payload source.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM The channel_id parameter is invalid.
-     * \retval FWK_E_PARAM The size parameter is less than the size of one
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_E_PARAM The channel_id parameter is invalid.
+     * \retval ::FWK_E_PARAM The size parameter is less than the size of one
      * payload entry.
      * \return One of the standard error codes for implementation-defined
      * errors.
@@ -289,8 +289,8 @@ struct mod_scmi_from_transport_api {
      *
      * \param service_id service identifier.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM The service_id parameter is invalid.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_E_PARAM The service_id parameter is invalid.
      * \return One of the standard error codes for implementation-defined
      * errors.
      */
@@ -301,9 +301,9 @@ struct mod_scmi_from_transport_api {
      *
      * \param service_id SCMI service identifier.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM The channel_id parameter is invalid.
-     * \retval FWK_E_PARAM The secure parameter is NULL.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_E_PARAM The channel_id parameter is invalid.
+     * \retval ::FWK_E_PARAM The secure parameter is NULL.
      * \return One of the standard error codes for implementation-defined
      * errors.
      */
@@ -329,7 +329,7 @@ struct mod_scmi_from_transport_api {
  * \param message_id Identifier of the message to be handled by the protocol
  *      handler.
  *
- * \retval FWK_SUCCESS The operation succeeded.
+ * \retval ::FWK_SUCCESS The operation succeeded.
  * \return One of the standard error codes for implementation-defined errors.
  *
  */
@@ -348,7 +348,7 @@ struct mod_scmi_to_protocol_api {
      * \param protocol_id Identifier of the protocol module.
      * \param scmi_protocol_id SCMI protocol identifier.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard error codes for implementation-defined
      *      errors.
      *
@@ -373,7 +373,7 @@ struct mod_scmi_notification_api {
      * \param element_count Number of elements that support notification.
      * \param operation_count Number of notification SCMI messages supported.
      *
-     * \retval FWK_SUCCESS Initialization successful.
+     * \retval ::FWK_SUCCESS Initialization successful.
      * \retval One of the standard error codes for implementation-defined
      * errors.
      */
@@ -392,9 +392,10 @@ struct mod_scmi_notification_api {
      * \param operation_id Identifier of the operation.
      * \param service_id  Identifier of the agent's SCMI service context.
      *
-     * \retval FWK_SUCCESS Adding of subscriber agent to the list is successful.
+     * \retval ::FWK_SUCCESS Adding of subscriber agent to the list is
+     *      successful.
      * \retval One of the standard error codes for implementation-defined
-     * errors.
+     *      errors.
      */
     int (*scmi_notification_add_subscriber)(
         unsigned int protocol_id,
@@ -411,7 +412,7 @@ struct mod_scmi_notification_api {
      *     context.
      * \param operation_id Identifier of the operation.
      *
-     * \retval FWK_SUCCESS Removing of subscriber agent from the list is
+     * \retval ::FWK_SUCCESS Removing of subscriber agent from the list is
      *     successful.
      * \retval One of the standard error codes for implementation-defined
      * errors.
@@ -433,7 +434,7 @@ struct mod_scmi_notification_api {
      *     agent.
      * \param payload_size Size of the message.
      *
-     * \retval FWK_SUCCESS Notification to agents is successful.
+     * \retval ::FWK_SUCCESS Notification to agents is successful.
      * \retval One of the standard error codes for implementation-defined
      * errors.
      */
@@ -455,10 +456,10 @@ struct mod_scmi_from_protocol_api {
      *
      * \param[out] agent_count Number of active agents.
      *
-     * \retval FWK_SUCCESS The agent count was returned.
-     * \retval FWK_E_PARAM The parameter `agent_count` is equal to `NULL`.
+     * \retval ::FWK_SUCCESS The agent count was returned.
+     * \retval ::FWK_E_PARAM The parameter `agent_count` is equal to `NULL`.
      */
-     int (*get_agent_count)(int *agent_count);
+    int (*get_agent_count)(int *agent_count);
 
     /*!
      * \brief Get the identifier of the agent associated with a service
@@ -466,13 +467,13 @@ struct mod_scmi_from_protocol_api {
      * \param service_id Identifier of the service.
      * \param[out] agent_id Agent identifier.
      *
-     * \retval FWK_SUCCESS The agent identifier was returned.
-     * \retval FWK_E_PARAM The service identifier is not valid.
-     * \retval FWK_E_PARAM The parameter 'agent_id' is equal to NULL.
-     * \retval FWK_E_INIT The service is not initialized.
-     * \retval FWK_E_STATE The service is in an invalid state.
+     * \retval ::FWK_SUCCESS The agent identifier was returned.
+     * \retval ::FWK_E_PARAM The service identifier is not valid.
+     * \retval ::FWK_E_PARAM The parameter 'agent_id' is equal to NULL.
+     * \retval ::FWK_E_INIT The service is not initialized.
+     * \retval ::FWK_E_STATE The service is in an invalid state.
      */
-     int (*get_agent_id)(fwk_id_t service_id, unsigned int *agent_id);
+    int (*get_agent_id)(fwk_id_t service_id, unsigned int *agent_id);
 
     /*!
      * \brief Get the type of the agent given its identifier.
@@ -483,12 +484,11 @@ struct mod_scmi_from_protocol_api {
      * \param agent_id Identifier of the agent.
      * \param[out] agent_type Agent type.
      *
-     * \retval FWK_SUCCESS The agent identifier was returned.
-     * \retval FWK_E_PARAM The agent identifier is not valid.
-     * \retval FWK_E_PARAM The parameter 'agent_type' is equal to NULL.
+     * \retval ::FWK_SUCCESS The agent identifier was returned.
+     * \retval ::FWK_E_PARAM The agent identifier is not valid.
+     * \retval ::FWK_E_PARAM The parameter 'agent_type' is equal to NULL.
      */
-     int (*get_agent_type)(uint32_t agent_id,
-                           enum scmi_agent_type *agent_type);
+    int (*get_agent_type)(uint32_t agent_id, enum scmi_agent_type *agent_type);
 
     /*!
      * \brief Get the maximum permitted payload size of a channel associated
@@ -497,11 +497,11 @@ struct mod_scmi_from_protocol_api {
      * \param service_id Service identifier.
      * \param[out] size Maximum payload size in bytes.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM The service_id parameter is invalid.
-     * \retval FWK_E_PARAM The size parameter is NULL.
-     * \retval FWK_E_INIT The service is not initialized.
-     * \retval FWK_E_STATE The service is in an invalid sate.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_E_PARAM The service_id parameter is invalid.
+     * \retval ::FWK_E_PARAM The size parameter is NULL.
+     * \retval ::FWK_E_INIT The service is not initialized.
+     * \retval ::FWK_E_STATE The service is in an invalid sate.
      * \return One of the standard error codes for implementation-defined
      * errors.
      */
@@ -515,9 +515,9 @@ struct mod_scmi_from_protocol_api {
      * \param payload Payload data to write.
      * \param size Size of the payload data.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM The payload parameter is NULL.
-     * \retval FWK_E_PARAM The offset and size provided are not within the
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_E_PARAM The payload parameter is NULL.
+     * \retval ::FWK_E_PARAM The offset and size provided are not within the
      *      bounds of the payload area.
      * \return One of the standard error codes for implementation-defined
      * errors.

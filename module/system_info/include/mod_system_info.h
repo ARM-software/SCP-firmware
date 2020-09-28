@@ -101,8 +101,8 @@ struct mod_system_info_get_info_api {
      *
      * \param[out] sys_info Pointer to the system information data.
      *
-     * \retval FWK_SUCCESS if the sys_info pointer has been successfully set.
-     * \retval FWK_E_SUPPORT if the system information is not supported by the
+     * \retval ::FWK_SUCCESS if the sys_info pointer has been successfully set.
+     * \retval ::FWK_E_SUPPORT if the system information is not supported by the
      *      product.
      */
     int (*get_system_info)(const struct mod_system_info **sys_info);

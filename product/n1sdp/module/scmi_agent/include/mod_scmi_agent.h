@@ -77,7 +77,7 @@ struct mod_scmi_agent_api {
      * \param agent_id Agent identifier
      * \param[out] version Protocol version.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard error codes for implementation-defined
      * errors.
      */
@@ -89,7 +89,7 @@ struct mod_scmi_agent_api {
      * \param agent_id Agent identifier
      * \param[out] clock_status SCP clock status.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard error codes for implementation-defined
      * errors.
      */
@@ -102,7 +102,7 @@ struct mod_scmi_agent_api {
      * \param[out] multichip_mode Multi-chip mode value.
      * \param[out] chipid Chip ID value.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard error codes for implementation-defined
      * errors.
      */
