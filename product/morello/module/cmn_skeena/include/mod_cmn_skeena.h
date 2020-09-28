@@ -258,7 +258,7 @@ struct mod_cmn_skeena_ccix_config_api {
      *
      * \param[out] config CCIX host configuration
      *
-     * \retval FWK_SUCCESS if the operation succeed.
+     * \retval ::FWK_SUCCESS if the operation succeed.
      * \return one of the error code otherwise.
      */
     int (*get_config)(struct mod_cmn_skeena_ccix_host_node_config *config);
@@ -267,7 +267,7 @@ struct mod_cmn_skeena_ccix_config_api {
      *
      * \param[in] config CCIX endpoint configuration
      *
-     * \retval FWK_SUCCESS if the operation succeed.
+     * \retval ::FWK_SUCCESS if the operation succeed.
      * \return one of the error code otherwise.
      */
     int (*set_config)(struct mod_cmn_skeena_ccix_remote_node_config *config);
@@ -277,7 +277,7 @@ struct mod_cmn_skeena_ccix_config_api {
      * \param  link_id Link on which the protocol credit exchange
      *                 would initiate.
      *
-     * \retval FWK_SUCCESS if the operation succeed.
+     * \retval ::FWK_SUCCESS if the operation succeed.
      * \return one of the error code otherwise.
      */
     int (*exchange_protocol_credit)(uint8_t link_id);
@@ -287,7 +287,7 @@ struct mod_cmn_skeena_ccix_config_api {
      * \param  link_id Link on which the coherency has to
      *                 be enabled.
      *
-     * \retval FWK_SUCCESS if the operation succeed.
+     * \retval ::FWK_SUCCESS if the operation succeed.
      * \return one of the error code otherwise.
      */
     int (*enter_system_coherency)(uint8_t link_id);
@@ -296,7 +296,7 @@ struct mod_cmn_skeena_ccix_config_api {
      *
      * \param  link_id Link on which DVM domain has to be enabled
      *
-     * \retval FWK_SUCCESS if the operation succeed.
+     * \retval ::FWK_SUCCESS if the operation succeed.
      * \return one of the error code otherwise.
      */
     int (*enter_dvm_domain)(uint8_t link_id);

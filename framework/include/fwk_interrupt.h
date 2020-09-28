@@ -63,24 +63,24 @@
  *
  * \param driver Interrupt driver instance to register
  *
- * \retval FWK_SUCCESS Operation succeeded.
- * \retval FWK_E_PARAM One or more parameters were invalid.
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_PARAM One or more parameters were invalid.
  */
 int fwk_interrupt_init(const struct fwk_arch_interrupt_driver *driver);
 
 /*!
  * \brief Enable interrupts.
  *
- * \retval FWK_SUCCESS Operation succeeded.
- * \retval FWK_E_INIT The component has not been initialized.
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_INIT The component has not been initialized.
  */
 int fwk_interrupt_global_enable(void);
 
 /*!
  * \brief Disable interrupts.
  *
- * \retval FWK_SUCCESS Operation succeeded.
- * \retval FWK_E_INIT The component has not been initialized.
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_INIT The component has not been initialized.
  */
 int fwk_interrupt_global_disable(void);
 
@@ -90,9 +90,9 @@ int fwk_interrupt_global_disable(void);
  * \param interrupt Interrupt number.
  * \param [out] enabled \c true if the interrupt is enabled, else \c false.
  *
- * \retval FWK_SUCCESS Operation succeeded.
- * \retval FWK_E_PARAM One or more parameters were invalid.
- * \retval FWK_E_INIT The component has not been initialized.
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_PARAM One or more parameters were invalid.
+ * \retval ::FWK_E_INIT The component has not been initialized.
  */
 int fwk_interrupt_is_enabled(unsigned int interrupt, bool *enabled);
 
@@ -101,9 +101,9 @@ int fwk_interrupt_is_enabled(unsigned int interrupt, bool *enabled);
  *
  * \param interrupt Interrupt number.
  *
- * \retval FWK_SUCCESS Operation succeeded.
- * \retval FWK_E_PARAM One or more parameters were invalid.
- * \retval FWK_E_INIT The component has not been initialized.
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_PARAM One or more parameters were invalid.
+ * \retval ::FWK_E_INIT The component has not been initialized.
  */
 int fwk_interrupt_enable(unsigned int interrupt);
 
@@ -112,9 +112,9 @@ int fwk_interrupt_enable(unsigned int interrupt);
  *
  * \param interrupt Interrupt number.
  *
- * \retval FWK_SUCCESS Operation succeeded.
- * \retval FWK_E_PARAM One or more parameters were invalid.
- * \retval FWK_E_INIT The component has not been initialized.
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_PARAM One or more parameters were invalid.
+ * \retval ::FWK_E_INIT The component has not been initialized.
  */
 int fwk_interrupt_disable(unsigned int interrupt);
 
@@ -124,9 +124,9 @@ int fwk_interrupt_disable(unsigned int interrupt);
  * \param interrupt Interrupt number.
  * \param [out] pending \c true if the interrupt is pending, else \c false.
  *
- * \retval FWK_SUCCESS Operation succeeded.
- * \retval FWK_E_PARAM One or more parameters were invalid.
- * \retval FWK_E_INIT The component has not been initialized.
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_PARAM One or more parameters were invalid.
+ * \retval ::FWK_E_INIT The component has not been initialized.
  */
 int fwk_interrupt_is_pending(unsigned int interrupt, bool *pending);
 
@@ -135,9 +135,9 @@ int fwk_interrupt_is_pending(unsigned int interrupt, bool *pending);
  *
  * \param interrupt Interrupt number.
  *
- * \retval FWK_SUCCESS Operation succeeded.
- * \retval FWK_E_PARAM One or more parameters were invalid.
- * \retval FWK_E_INIT The component has not been initialized.
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_PARAM One or more parameters were invalid.
+ * \retval ::FWK_E_INIT The component has not been initialized.
  */
 int fwk_interrupt_set_pending(unsigned int interrupt);
 
@@ -146,9 +146,9 @@ int fwk_interrupt_set_pending(unsigned int interrupt);
  *
  * \param interrupt Interrupt number.
  *
- * \retval FWK_SUCCESS Operation succeeded.
- * \retval FWK_E_PARAM One or more parameters were invalid.
- * \retval FWK_E_INIT The component has not been initialized.
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_PARAM One or more parameters were invalid.
+ * \retval ::FWK_E_INIT The component has not been initialized.
  */
 int fwk_interrupt_clear_pending(unsigned int interrupt);
 
@@ -159,9 +159,9 @@ int fwk_interrupt_clear_pending(unsigned int interrupt);
  *      an interrupt number.
  * \param isr Pointer to the interrupt service routine function.
  *
- * \retval FWK_SUCCESS Operation succeeded.
- * \retval FWK_E_PARAM One or more parameters were invalid.
- * \retval FWK_E_INIT The component has not been initialized.
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_PARAM One or more parameters were invalid.
+ * \retval ::FWK_E_INIT The component has not been initialized.
  */
 int fwk_interrupt_set_isr(unsigned int interrupt, void (*isr)(void));
 
@@ -174,9 +174,9 @@ int fwk_interrupt_set_isr(unsigned int interrupt, void (*isr)(void));
  * \param isr Pointer to the interrupt service routine function.
  * \param param Parameter that should be passed to the isr when it is called.
  *
- * \retval FWK_SUCCESS Operation succeeded.
- * \retval FWK_E_PARAM One or more parameters were invalid.
- * \retval FWK_E_INIT The component has not been initialized.
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_PARAM One or more parameters were invalid.
+ * \retval ::FWK_E_INIT The component has not been initialized.
  */
 int fwk_interrupt_set_isr_param(unsigned int interrupt,
                                 void (*isr)(uintptr_t param),
@@ -192,10 +192,10 @@ int fwk_interrupt_set_isr_param(unsigned int interrupt,
  *          * FWK_INTERRUPT_EXCEPTION - When the current interrupt is an
  *            exception.
  *
- * \retval FWK_SUCCESS Operation succeeded.
- * \retval FWK_E_PARAM One or more parameters were invalid.
- * \retval FWK_E_STATE An interrupt is not currently being serviced.
- * \retval FWK_E_INIT The component has not been initialized.
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_PARAM One or more parameters were invalid.
+ * \retval ::FWK_E_STATE An interrupt is not currently being serviced.
+ * \retval ::FWK_E_INIT The component has not been initialized.
  */
 int fwk_interrupt_get_current(unsigned int *interrupt);
 

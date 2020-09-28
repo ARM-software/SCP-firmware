@@ -19,8 +19,8 @@
  *
  * \param event_count The maximum number of events in all queues at all time.
  *
- * \retval FWK_SUCCESS The thread framework component was initialized.
- * \retval FWK_E_NOMEM Insufficient memory available for event queues.
+ * \retval ::FWK_SUCCESS The thread framework component was initialized.
+ * \retval ::FWK_E_NOMEM Insufficient memory available for event queues.
  */
 int __fwk_thread_init(size_t event_count);
 
@@ -55,9 +55,9 @@ const struct fwk_event *__fwk_thread_get_current_event(void);
  *
  * \param event Pointer to the notification event to queue.
  *
- * \retval FWK_SUCCESS The event was queued.
- * \retval FWK_E_PARAM The source identifier is not valid.
- * \retval FWK_E_NOMEM No memory space to copy the event data.
+ * \retval ::FWK_SUCCESS The event was queued.
+ * \retval ::FWK_E_PARAM The source identifier is not valid.
+ * \retval ::FWK_E_NOMEM No memory space to copy the event data.
  */
 int __fwk_thread_put_notification(struct fwk_event *event);
 

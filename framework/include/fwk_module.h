@@ -118,8 +118,8 @@ struct fwk_module {
      * \param element_count Number of module elements.
      * \param data Module-specific configuration data.
      *
-     * \retval FWK_SUCCESS The module was initialized successfully.
-     * \retval FWK_E_NOMEM A memory allocation failed.
+     * \retval ::FWK_SUCCESS The module was initialized successfully.
+     * \retval ::FWK_E_NOMEM A memory allocation failed.
      * \return One of the other module-defined error codes.
      */
     int (*init)(fwk_id_t module_id, unsigned int element_count,
@@ -144,8 +144,8 @@ struct fwk_module {
      * \param sub_element_count Number of sub-elements.
      * \param data Element-specific configuration data.
      *
-     * \retval FWK_SUCCESS The element was initialized successfully.
-     * \retval FWK_E_NOMEM A memory allocation failed.
+     * \retval ::FWK_SUCCESS The element was initialized successfully.
+     * \retval ::FWK_E_NOMEM A memory allocation failed.
      * \return One of the other module-defined error codes.
      */
     int (*element_init)(fwk_id_t element_id, unsigned int sub_element_count,
@@ -165,8 +165,8 @@ struct fwk_module {
      *
      * \param module_id Identifier of the module element.
      *
-     * \retval FWK_SUCCESS The module post-initialization was successful.
-     * \retval FWK_E_NOMEM A memory allocation failed.
+     * \retval ::FWK_SUCCESS The module post-initialization was successful.
+     * \retval ::FWK_E_NOMEM A memory allocation failed.
      * \return One of the other module-defined error codes.
      */
     int (*post_init)(fwk_id_t module_id);
@@ -195,9 +195,9 @@ struct fwk_module {
      * \param round Current call round, \c 0 for the first round \c 1 for
      *      the second round.
      *
-     * \retval FWK_SUCCESS The binding was successful.
-     * \retval FWK_E_ACCESS At least one binding request was rejected.
-     * \retval FWK_E_NOMEM A memory allocation failed.
+     * \retval ::FWK_SUCCESS The binding was successful.
+     * \retval ::FWK_E_ACCESS At least one binding request was rejected.
+     * \retval ::FWK_E_NOMEM A memory allocation failed.
      * \return One of the other module-defined error codes.
      */
     int (*bind)(fwk_id_t id, unsigned int round);
@@ -220,7 +220,7 @@ struct fwk_module {
      *
      * \param id Identifier of the module or element to start.
      *
-     * \retval FWK_SUCCESS The module or element was successfully started.
+     * \retval ::FWK_SUCCESS The module or element was successfully started.
      * \return One of the other module-defined error codes.
      */
     int (*start)(fwk_id_t id);
@@ -248,9 +248,9 @@ struct fwk_module {
      * \param [out] api Pointer to the API implementation to be used by the
      *      requester.
      *
-     * \retval FWK_SUCCESS The binding request was accepted by the module or
+     * \retval ::FWK_SUCCESS The binding request was accepted by the module or
      *      element.
-     * \retval FWK_E_ACCESS The binding request was rejected by the module or
+     * \retval ::FWK_E_ACCESS The binding request was rejected by the module or
      *      element.
      * \return One of the other module-defined error codes.
      */
@@ -276,7 +276,7 @@ struct fwk_module {
      * \param [out] resp_event The response event to the provided event if
      *      any.
      *
-     * \retval FWK_SUCCESS The event was processed successfully.
+     * \retval ::FWK_SUCCESS The event was processed successfully.
      * \return One of the other module-defined error codes.
      */
     int (*process_event)(const struct fwk_event *event,
@@ -294,7 +294,7 @@ struct fwk_module {
      * \param [out] resp_event The response event to the provided event, if
      *      any.
      *
-     * \retval FWK_SUCCESS The notification was processed successfully.
+     * \retval ::FWK_SUCCESS The notification was processed successfully.
      * \return One of the other module-defined error codes.
      */
     int (*process_notification)(const struct fwk_event *event,
@@ -494,7 +494,7 @@ bool fwk_module_is_valid_notification_id(fwk_id_t id);
  *
  * \param module_id Identifier of the module.
  *
- * \retval FWK_E_PARAM The identifier of the module is invalid.
+ * \retval ::FWK_E_PARAM The identifier of the module is invalid.
  * \return Number of module elements.
  */
 int fwk_module_get_element_count(fwk_id_t module_id);
@@ -504,7 +504,7 @@ int fwk_module_get_element_count(fwk_id_t module_id);
  *
  * \param element_id Identifier of the element.
  *
- * \retval FWK_E_PARAM The identifier of the element is invalid.
+ * \retval ::FWK_E_PARAM The identifier of the element is invalid.
  * \return Number of sub-elements.
  */
 int fwk_module_get_sub_element_count(fwk_id_t element_id);
@@ -542,11 +542,11 @@ const void *fwk_module_get_data(fwk_id_t id);
  * \param api_id Identifier of the API to return an implementation of.
  * \param api [out] Pointer to storage for the pointer to the API.
  *
- * \retval FWK_SUCCESS The API was returned.
- * \retval FWK_E_PARAM A least one of the identifiers is invalid.
- * \retval FWK_E_STATE Call outside of the pre-runtime bind stage.
- * \retval FWK_E_ACCESS The access to the API was refused.
- * \retval FWK_E_HANDLER The returned API pointer is invalid (NULL).
+ * \retval ::FWK_SUCCESS The API was returned.
+ * \retval ::FWK_E_PARAM A least one of the identifiers is invalid.
+ * \retval ::FWK_E_STATE Call outside of the pre-runtime bind stage.
+ * \retval ::FWK_E_ACCESS The access to the API was refused.
+ * \retval ::FWK_E_HANDLER The returned API pointer is invalid (NULL).
  */
 int fwk_module_bind(fwk_id_t target_id, fwk_id_t api_id, const void *api);
 

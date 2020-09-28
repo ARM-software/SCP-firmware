@@ -85,11 +85,11 @@ struct mod_debug_api {
      *
      * \param user_id The user requesting the Debug functionality.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_PENDING The operation has been acknowledged.
-     * \retval FWK_E_PARAM One or more parameters were incorrect.
-     * \retval FWK_E_BUSY Another request is already being processed.
-     * \retval FWK_E_ACCESS The specified user doesn't have the permission to
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_PENDING The operation has been acknowledged.
+     * \retval ::FWK_E_PARAM One or more parameters were incorrect.
+     * \retval ::FWK_E_BUSY Another request is already being processed.
+     * \retval ::FWK_E_ACCESS The specified user doesn't have the permission to
      * perform the requested action.
      * \return One of the standard framework error codes.
      */
@@ -105,11 +105,11 @@ struct mod_debug_api {
      *
      * \param user_id The user requesting the Debug enabled status.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_PENDING The operation has been acknowledged.
-     * \retval FWK_E_PARAM One or more parameters were incorrect.
-     * \retval FWK_E_BUSY Another request is already being processed.
-     * \retval FWK_E_ACCESS The specified user doesn't have the permission to
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_PENDING The operation has been acknowledged.
+     * \retval ::FWK_E_PARAM One or more parameters were incorrect.
+     * \retval ::FWK_E_BUSY Another request is already being processed.
+     * \retval ::FWK_E_ACCESS The specified user doesn't have the permission to
      * perform the requested action.
      * \return One of the standard framework error codes.
      */
@@ -120,7 +120,7 @@ struct mod_debug_api {
      *
      * \param id Debug device identifier.
      *
-     * \retval FWK_E_SUPPORT The operation is not supported.
+     * \retval ::FWK_E_SUPPORT The operation is not supported.
      * \return One of the standard framework error codes.
      */
     int (*reset)(fwk_id_t id);
@@ -130,7 +130,7 @@ struct mod_debug_api {
      *
      * \param id Debug device identifier.
      *
-     * \retval FWK_E_SUPPORT The operation is not supported.
+     * \retval ::FWK_E_SUPPORT The operation is not supported.
      * \return One of the standard framework error codes.
      */
     int (*end)(fwk_id_t id);
@@ -150,9 +150,9 @@ struct mod_debug_driver_api {
      *
      * \param user_id The user requesting the Debug driver functionality.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_PENDING The operation has been acknowledged.
-     * \retval FWK_E_BUSY Another request is already being processed.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_PENDING The operation has been acknowledged.
+     * \retval ::FWK_E_BUSY Another request is already being processed.
      * \return One of the standard framework error codes.
      */
     int (*set_enabled)(fwk_id_t id, bool enable, enum scp_debug_user user_id);
@@ -167,9 +167,9 @@ struct mod_debug_driver_api {
      *
      * \param user_id The user requesting the Debug driver enabled status.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_PENDING The operation has been acknowledged.
-     * \retval FWK_E_BUSY Another request is already being processed.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_PENDING The operation has been acknowledged.
+     * \retval ::FWK_E_BUSY Another request is already being processed.
      * \return One of the standard framework error codes.
      */
     int (*get_enabled)(fwk_id_t id, bool *enabled, enum scp_debug_user user_id);
@@ -204,7 +204,7 @@ struct mod_debug_driver_input_api {
      *
      * \param user_id The requesting user.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
     int (*enable)(fwk_id_t id, bool enable, enum scp_debug_user user_id);

@@ -124,9 +124,9 @@ struct mod_juno_ppu_rom_api {
      * \param state The new state for the PPU (defined in the Power Domain
      *     module).
      *
-     * \retval FWK_SUCCESS Operation succeeded.
-     * \retval FWK_E_PARAM An invalid state was given.
-     * \retval FWK_E_DEVICE The PPU did not accept the new state.
+     * \retval ::FWK_SUCCESS Operation succeeded.
+     * \retval ::FWK_E_PARAM An invalid state was given.
+     * \retval ::FWK_E_DEVICE The PPU did not accept the new state.
      * \return One of the standard framework error codes.
      */
     int (*set_state_and_wait)(fwk_id_t ppu_id, unsigned int state);
@@ -137,9 +137,9 @@ struct mod_juno_ppu_rom_api {
      * \param ppu_id Element identifier of the PPU.
      * \param[out] state Policy.
      *
-     * \retval FWK_SUCCESS Operation succeeded.
-     * \retval FWK_E_PARAM The \p state parameter was \c NULL.
-     * \retval FWK_E_DEVICE Device error.
+     * \retval ::FWK_SUCCESS Operation succeeded.
+     * \retval ::FWK_E_PARAM The \p state parameter was \c NULL.
+     * \retval ::FWK_E_DEVICE Device error.
      * \return One of the standard framework error codes.
      */
     int (*get_state)(fwk_id_t ppu_id, unsigned int *state);

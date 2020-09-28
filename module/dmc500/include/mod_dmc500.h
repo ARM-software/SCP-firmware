@@ -529,7 +529,7 @@ struct mod_dmc_ddr_phy_api {
      * \param element_id Element identifier corresponding to the device to
      *      configure.
      *
-     * \retval FWK_SUCCESS if the operation succeed.
+     * \retval ::FWK_SUCCESS if the operation succeed.
      * \return one of the error code otherwise.
      */
     int (*configure)(fwk_id_t element_id);

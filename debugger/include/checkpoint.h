@@ -85,8 +85,8 @@ void checkpoint_enable_all(void);
  *          successfully.
  * \param name Name or description of the function registering. Must be less
  *             than CHECKPOINT_NAME_LEN characters in length.
- * \retval FWK_SUCCESS if operation is successful.
- * \retval FWK_E_NOMEM when checkpoints limit is reached.
+ * \retval ::FWK_SUCCESS if operation is successful.
+ * \retval ::FWK_E_NOMEM when checkpoints limit is reached.
  *
  */
 int32_t checkpoint_register(checkpoint_st **c, char *name);
@@ -124,8 +124,8 @@ void checkpoint(checkpoint_st *c, char *file, int32_t line, char *tag);
  *          successfully.
  * \param name Name or description of the function registering. Must be less
  *             than CHECKPOINT_NAME_LEN characters in length.
- * \retval FWK_SUCCESS if operation is successful.
- * \retval FWK_E_NOMEM when checkpoints limit is reached.
+ * \retval ::FWK_SUCCESS if operation is successful.
+ * \retval ::FWK_E_NOMEM when checkpoints limit is reached.
  *
  */
 #    define checkpoint_register(c, name) \

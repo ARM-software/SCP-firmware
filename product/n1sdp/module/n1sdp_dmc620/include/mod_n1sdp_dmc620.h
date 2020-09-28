@@ -706,7 +706,7 @@ struct mod_dmc_ddr_phy_api {
      * \param element_id Element identifier corresponding to the device to
      *      configure.
      *
-     * \retval FWK_SUCCESS if the operation succeed.
+     * \retval ::FWK_SUCCESS if the operation succeed.
      * \return one of the error code otherwise.
      */
     int (*configure)(fwk_id_t element_id, struct dimm_info *info);
@@ -717,7 +717,7 @@ struct mod_dmc_ddr_phy_api {
      * \param element_id Element identifier corresponding to the device to
      *      configure.
      *
-     * \retval FWK_SUCCESS if the operation succeed.
+     * \retval ::FWK_SUCCESS if the operation succeed.
      * \return one of the error code otherwise.
      */
     int (*post_training_configure)(fwk_id_t element_id,
@@ -730,7 +730,7 @@ struct mod_dmc_ddr_phy_api {
      *      configure.
      * \param training_type Training type for which PHY status to be verified.
      *
-     * \retval FWK_SUCCESS if the operation succeed.
+     * \retval ::FWK_SUCCESS if the operation succeed.
      * \return one of the error code otherwise.
      */
     int (*verify_phy_status)(fwk_id_t element_id,
@@ -744,7 +744,7 @@ struct mod_dmc_ddr_phy_api {
      *      configure.
      * \param rank The rank number to perform the tuning.
      *
-     * \retval FWK_SUCCESS if the operation succeed.
+     * \retval ::FWK_SUCCESS if the operation succeed.
      * \return one of the error code otherwise.
      */
     int (*wrlvl_phy_obs_regs)(fwk_id_t element_id,
@@ -758,7 +758,7 @@ struct mod_dmc_ddr_phy_api {
      *      configure.
      * \param rank The rank number to perform the tuning.
      *
-     * \retval FWK_SUCCESS if the operation succeed.
+     * \retval ::FWK_SUCCESS if the operation succeed.
      * \return one of the error code otherwise.
      */
     int (*read_gate_phy_obs_regs)(fwk_id_t element_id,
@@ -772,7 +772,7 @@ struct mod_dmc_ddr_phy_api {
      *      configure.
      * \param rank The rank number to perform the tuning.
      *
-     * \retval FWK_SUCCESS if the operation succeed.
+     * \retval ::FWK_SUCCESS if the operation succeed.
      * \return one of the error code otherwise.
      */
     int (*phy_obs_regs)(fwk_id_t element_id,
@@ -789,7 +789,7 @@ struct mod_dmc620_mem_info_api {
      *
      * \param size Pointer where memory size will be stored.
      *
-     * \retval FWK_SUCCESS if the operation succeed.
+     * \retval ::FWK_SUCCESS if the operation succeed.
      * \retval one of the error code otherwise.
      */
     int (*get_mem_size_gb)(uint32_t *size);

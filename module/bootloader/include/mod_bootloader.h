@@ -78,20 +78,21 @@ struct mod_bootloader_api {
      * \param config Pointer to an scp_bootloader_config structure containing
      *      settings that control where the image is copied from and to.
      *
-     * \retval FWK_SUCCESS The RAM Firmware image was copied successfully.
-     * \retval FWK_E_ALIGN The given image offset is not properly aligned.
-     * \retval FWK_E_DATA The image did not pass checksum validation.
-     * \retval FWK_E_PARAM The config structure pointer is invalid.
-     * \retval FWK_E_PARAM One or more config structure fields are invalid.
-     * \retval FWK_E_SIZE The given image size is below the minimum possible
+     * \retval ::FWK_SUCCESS The RAM Firmware image was copied successfully.
+     * \retval ::FWK_E_ALIGN The given image offset is not properly aligned.
+     * \retval ::FWK_E_DATA The image did not pass checksum validation.
+     * \retval ::FWK_E_PARAM The config structure pointer is invalid.
+     * \retval ::FWK_E_PARAM One or more config structure fields are invalid.
+     * \retval ::FWK_E_SIZE The given image size is below the minimum possible
      *      size.
-     * \retval FWK_E_SIZE The image is too large for the destination memory
+     * \retval ::FWK_E_SIZE The image is too large for the destination memory
      *      area.
-     * \retval FWK_E_SIZE The given image offset is beyond the source memory
+     * \retval ::FWK_E_SIZE The given image offset is beyond the source memory
      *      area.
-     * \retval FWK_E_SIZE The header's size field does not match the given size.
-     * \retval FWK_E_SIZE Part of the image lies outside of the source memory
-     *      area.
+     * \retval ::FWK_E_SIZE The header's size field does not match the given
+     *      size.
+     * \retval ::FWK_E_SIZE Part of the image lies outside of the source
+     *      memory area.
      */
     int (*load_image)(void);
 };

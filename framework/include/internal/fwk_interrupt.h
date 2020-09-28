@@ -27,9 +27,9 @@
  *
  * \param isr Pointer to the fault interrupt service routine function.
  *
- * \retval FWK_SUCCESS Operation succeeded.
- * \retval FWK_E_PARAM One or more parameters were invalid.
- * \retval FWK_E_INIT The component has not been initialized.
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_PARAM One or more parameters were invalid.
+ * \retval ::FWK_E_INIT The component has not been initialized.
  */
 int fwk_interrupt_set_isr_fault(void (*isr)(void));
 

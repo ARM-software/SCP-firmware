@@ -113,8 +113,8 @@ struct fwk_module_ctx *fwk_module_get_ctx(fwk_id_t id);
  * \param id Module, element or sub-element identifier.
  * \param state [out] State of the module or element.
  *
- * \retval FWK_SUCCESS The state was returned.
- * \retval FWK_E_PARAM One or more parameters were invalid.
+ * \retval ::FWK_SUCCESS The state was returned.
+ * \retval ::FWK_E_PARAM One or more parameters were invalid.
  */
 int fwk_module_get_state(fwk_id_t id, enum fwk_module_state *state);
 

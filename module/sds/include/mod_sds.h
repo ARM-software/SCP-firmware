@@ -170,10 +170,10 @@ struct mod_sds_api {
      *
      * \param size Size, in bytes, of the data to be written.
      *
-     * \retval FWK_SUCCESS Data was successfully written to the structure.
-     * \retval FWK_E_PARAM The data pointer parameter was NULL.
-     * \retval FWK_E_PARAM An invalid structure identifier was provided.
-     * \retval FWK_E_RANGE The field extends outside of the structure bounds.
+     * \retval ::FWK_SUCCESS Data was successfully written to the structure.
+     * \retval ::FWK_E_PARAM The data pointer parameter was NULL.
+     * \retval ::FWK_E_PARAM An invalid structure identifier was provided.
+     * \retval ::FWK_E_RANGE The field extends outside of the structure bounds.
      */
     int (*struct_write)(uint32_t structure_id, unsigned int offset,
                         const void *data, size_t size);
@@ -204,10 +204,10 @@ struct mod_sds_api {
      * \param size Size, in bytes, of the storage pointed to by the data
      *       parameter.
      *
-     * \retval FWK_SUCCESS Data was successfully read from the structure.
-     * \retval FWK_E_PARAM The data pointer parameter was NULL.
-     * \retval FWK_E_PARAM An invalid structure identifier was provided.
-     * \retval FWK_E_RANGE The field extends outside of the structure bounds.
+     * \retval ::FWK_SUCCESS Data was successfully read from the structure.
+     * \retval ::FWK_E_PARAM The data pointer parameter was NULL.
+     * \retval ::FWK_E_PARAM An invalid structure identifier was provided.
+     * \retval ::FWK_E_RANGE The field extends outside of the structure bounds.
      */
     int (*struct_read)(uint32_t structure_id, unsigned int offset, void *data,
                        size_t size);
@@ -219,9 +219,9 @@ struct mod_sds_api {
      * \param structure_id The identifier of the Shared Data Structure to
      *      finalize.
      *
-     * \retval FWK_SUCCESS The structure was successfully finalized.
-     * \retval FWK_E_PARAM An invalid structure identifier was provided.
-     * \retval FWK_E_STATE The structure has already been finalized.
+     * \retval ::FWK_SUCCESS The structure was successfully finalized.
+     * \retval ::FWK_E_PARAM An invalid structure identifier was provided.
+     * \retval ::FWK_E_STATE The structure has already been finalized.
      */
     int (*struct_finalize)(uint32_t structure_id);
 };

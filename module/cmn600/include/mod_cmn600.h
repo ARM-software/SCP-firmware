@@ -255,53 +255,53 @@ struct mod_cmn600_ccix_host_node_config {
  * \brief CMN600 CCIX configuration interface
  */
 struct mod_cmn600_ccix_config_api {
-   /*!
-    * \brief Get the CCIX host configuration
-    *
-    * \param[out] config CCIX host configuration
-    *
-    * \retval FWK_SUCCESS if the operation succeed.
-    * \return one of the error code otherwise.
-    */
-   int (*get_config)(struct mod_cmn600_ccix_host_node_config *config);
-   /*!
-    * \brief set the CCIX endpoint configuration
-    *
-    * \param[in] config CCIX endpoint configuration
-    *
-    * \retval FWK_SUCCESS if the operation succeed.
-    * \return one of the error code otherwise.
-    */
-   int (*set_config)(struct mod_cmn600_ccix_remote_node_config *config);
-   /*!
-    * \brief Interface to trigger the protocol credit exchange
-    *
-    * \param  link_id Link on which the protocol credit exchange
-    *                 would initiate.
-    *
-    * \retval FWK_SUCCESS if the operation succeed.
-    * \return one of the error code otherwise.
-    */
-   int (*exchange_protocol_credit)(uint8_t link_id);
-   /*!
-    * \brief Interface to configure for system coherency
-    *
-    * \param  link_id Link on which the coherency has to
-    *                 be enabled.
-    *
-    * \retval FWK_SUCCESS if the operation succeed.
-    * \return one of the error code otherwise.
-    */
-   int (*enter_system_coherency)(uint8_t link_id);
-   /*!
-    * \brief Interface to enter DVM domain
-    *
-    * \param  link_id Link on which DVM domain has to be enabled
-    *
-    * \retval FWK_SUCCESS if the operation succeed.
-    * \return one of the error code otherwise.
-    */
-   int (*enter_dvm_domain)(uint8_t link_id);
+    /*!
+     * \brief Get the CCIX host configuration
+     *
+     * \param[out] config CCIX host configuration
+     *
+     * \retval ::FWK_SUCCESS if the operation succeed.
+     * \return one of the error code otherwise.
+     */
+    int (*get_config)(struct mod_cmn600_ccix_host_node_config *config);
+    /*!
+     * \brief set the CCIX endpoint configuration
+     *
+     * \param[in] config CCIX endpoint configuration
+     *
+     * \retval ::FWK_SUCCESS if the operation succeed.
+     * \return one of the error code otherwise.
+     */
+    int (*set_config)(struct mod_cmn600_ccix_remote_node_config *config);
+    /*!
+     * \brief Interface to trigger the protocol credit exchange
+     *
+     * \param  link_id Link on which the protocol credit exchange
+     *                 would initiate.
+     *
+     * \retval ::FWK_SUCCESS if the operation succeed.
+     * \return one of the error code otherwise.
+     */
+    int (*exchange_protocol_credit)(uint8_t link_id);
+    /*!
+     * \brief Interface to configure for system coherency
+     *
+     * \param  link_id Link on which the coherency has to
+     *                 be enabled.
+     *
+     * \retval ::FWK_SUCCESS if the operation succeed.
+     * \return one of the error code otherwise.
+     */
+    int (*enter_system_coherency)(uint8_t link_id);
+    /*!
+     * \brief Interface to enter DVM domain
+     *
+     * \param  link_id Link on which DVM domain has to be enabled
+     *
+     * \retval ::FWK_SUCCESS if the operation succeed.
+     * \return one of the error code otherwise.
+     */
+    int (*enter_dvm_domain)(uint8_t link_id);
 };
 
 /*!

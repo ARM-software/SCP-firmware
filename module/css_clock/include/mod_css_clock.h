@@ -150,7 +150,7 @@ struct mod_css_clock_direct_api {
      * \param new_state The power state that the clock's power domain will
      *     transition to.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
     int (*process_pending_power_transition)(
@@ -177,7 +177,7 @@ struct mod_css_clock_direct_api {
      * \param state The power state that the clock's power domain transitioned
      *     to.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
     int (*process_power_transition)(fwk_id_t clock_id, unsigned int state);

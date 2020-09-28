@@ -140,8 +140,8 @@ static struct __fwk_thread_ctx *thread_get_ctx(fwk_id_t id)
  *
  * \param event Pointer to the ISR event to queue.
  *
- * \retval FWK_SUCCESS The event was put successfully.
- * \retval FWK_E_NOMEM The free event queue is empty.
+ * \retval ::FWK_SUCCESS The event was put successfully.
+ * \retval ::FWK_E_NOMEM The free event queue is empty.
  */
 static int put_isr_event(struct fwk_event *event)
 {
@@ -208,8 +208,8 @@ static bool is_thread_wakeup_event(struct __fwk_thread_ctx *thread_ctx,
  * \param thread_ctx Pointer to the context of the thread target of the event.
  * \param event Pointer to the event to queue.
  *
- * \retval FWK_SUCCESS The event was put successfully.
- * \retval FWK_E_PARAM The event source is not valid.
+ * \retval ::FWK_SUCCESS The event was put successfully.
+ * \retval ::FWK_E_PARAM The event source is not valid.
  */
 static int put_event(struct __fwk_thread_ctx *target_thread_ctx,
                      struct fwk_event *event)

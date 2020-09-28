@@ -139,7 +139,7 @@ struct mod_reset_domain_api {
      * \param mode Reset domain mode.
      * \param reset_state Reset domain state as defined in SCMIv2 specification.
      * \param cookie Context-specific value.
-     * \retval FWK_SUCCESS or one of FWK_E_* error codes.
+     * \retval ::FWK_SUCCESS or one of FWK_E_* error codes.
      */
     int (*set_reset_state)(fwk_id_t element_id,
                            enum mod_reset_domain_mode mode,
@@ -162,7 +162,7 @@ struct mod_reset_domain_drv_api {
      * \param reset_state Reset domain state as defined in SCMIv2 specification.
      *
      * \param cookie Context-specific value.
-     * \retval FWK_SUCCESS or one of FWK_E_* error codes.
+     * \retval ::FWK_SUCCESS or one of FWK_E_* error codes.
      */
     int (*set_reset_state)(fwk_id_t dev_id,
                            enum mod_reset_domain_mode mode,

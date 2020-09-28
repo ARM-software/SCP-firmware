@@ -661,8 +661,8 @@ static bool initiate_power_state_pre_transition_notification(struct pd_ctx *pd)
  * \param pd Description of the power domain to initiate the state transition
  *      for.
  *
- * \retval FWK_SUCCESS The power state transition was initiated.
- * \retval FWK_E_DEVICE The power state transition was denied by the driver.
+ * \retval ::FWK_SUCCESS The power state transition was initiated.
+ * \retval ::FWK_E_DEVICE The power state transition was denied by the driver.
  * \return One of the other driver-defined error codes.
  */
 static int initiate_power_state_transition(struct pd_ctx *pd)

@@ -101,8 +101,8 @@ struct mod_sid_subsystem_config {
  *
  * \param[out] system_info Pointer to the system information data.
  *
- * \retval FWK_SUCCESS The pointer was returned successfully.
- * \retval FWK_E_INIT The system information is not initialized.
+ * \retval ::FWK_SUCCESS The pointer was returned successfully.
+ * \retval ::FWK_E_INIT The system information is not initialized.
  */
 int mod_sid_get_system_info(const struct mod_sid_info **system_info);
 

@@ -107,9 +107,9 @@ struct mod_i2c_driver_api {
      * \param dev_id Identifier of the I2C device
      * \param transmit_request Request information for the I2C transmission
      *
-     * \retval FWK_PENDING The request was submitted.
-     * \retval FWK_SUCCESS The request was successfully completed.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_PENDING The request was submitted.
+     * \retval ::FWK_SUCCESS The request was successfully completed.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
      * \return One of the standard framework status codes.
      */
     int (*transmit_as_master)(
@@ -126,9 +126,9 @@ struct mod_i2c_driver_api {
      * \param dev_id Identifier of the I2C device
      * \param receive_request Request information for the I2C reception
      *
-     * \retval FWK_PENDING The request was submitted.
-     * \retval FWK_SUCCESS The request was successfully completed.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_PENDING The request was submitted.
+     * \retval ::FWK_SUCCESS The request was successfully completed.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
      * \return One of the standard framework status codes.
      */
     int (*receive_as_master)(
@@ -153,10 +153,10 @@ struct mod_i2c_api {
      * \param data Pointer to the data bytes to transmit to the slave
      * \param byte_count Number of data bytes to transmit
      *
-     * \retval FWK_PENDING The request was submitted.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
-     * \retval FWK_E_BUSY An I2C transaction is already on-going.
-     * \retval FWK_E_DEVICE The transmission is aborted due to a device error.
+     * \retval ::FWK_PENDING The request was submitted.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_E_BUSY An I2C transaction is already on-going.
+     * \retval ::FWK_E_DEVICE The transmission is aborted due to a device error.
      * \return One of the standard framework status codes.
      */
     int (*transmit_as_master)(fwk_id_t dev_id, uint8_t slave_address,
@@ -176,10 +176,10 @@ struct mod_i2c_api {
      * \param data Pointer to the buffer to receive data from the slave
      * \param byte_count Number of data bytes to receive
      *
-     * \retval FWK_PENDING The request was submitted.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
-     * \retval FWK_E_BUSY An I2C transaction is already on-going.
-     * \retval FWK_E_DEVICE The reception is aborted due to a device error.
+     * \retval ::FWK_PENDING The request was submitted.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_E_BUSY An I2C transaction is already on-going.
+     * \retval ::FWK_E_DEVICE The reception is aborted due to a device error.
      * \return One of the standard framework status codes.
      */
     int (*receive_as_master)(fwk_id_t dev_id, uint8_t slave_address,
@@ -206,10 +206,10 @@ struct mod_i2c_api {
      * \param receive_byte_count Number of data bytes to receive in the second
      *      phase.
      *
-     * \retval FWK_PENDING The request was submitted.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
-     * \retval FWK_E_BUSY An I2C transaction is already on-going.
-     * \retval FWK_E_DEVICE The reception is aborted due to a device error.
+     * \retval ::FWK_PENDING The request was submitted.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_E_BUSY An I2C transaction is already on-going.
+     * \retval ::FWK_E_DEVICE The reception is aborted due to a device error.
      * \return One of the standard framework status codes.
      */
     int (*transmit_then_receive_as_master)(fwk_id_t dev_id,

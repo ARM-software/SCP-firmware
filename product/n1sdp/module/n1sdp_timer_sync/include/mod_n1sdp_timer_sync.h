@@ -41,24 +41,24 @@ enum mod_n1sdp_timer_sync_api_idx {
  * \brief N1SDP Timer Synchronization API
  */
 struct n1sdp_timer_sync_api {
-   /*!
-    * \brief API to trigger synchronization in master.
-    *
-    * \param id Identifier of the timer sync module.
-    *
-    * \retval FWK_SUCCESS If operation succeeds.
-    * \return One of the possible error return codes.
-    */
-   int (*master_sync)(fwk_id_t id);
-   /*!
-    * \brief API to trigger synchronization in slave.
-    *
-    * \param id Identifier of the timer sync module.
-    *
-    * \retval FWK_SUCCESS If operation succeeds.
-    * \return One of the possible error return codes.
-    */
-   int (*slave_sync)(fwk_id_t id);
+    /*!
+     * \brief API to trigger synchronization in master.
+     *
+     * \param id Identifier of the timer sync module.
+     *
+     * \retval ::FWK_SUCCESS If operation succeeds.
+     * \return One of the possible error return codes.
+     */
+    int (*master_sync)(fwk_id_t id);
+    /*!
+     * \brief API to trigger synchronization in slave.
+     *
+     * \param id Identifier of the timer sync module.
+     *
+     * \retval ::FWK_SUCCESS If operation succeeds.
+     * \return One of the possible error return codes.
+     */
+    int (*slave_sync)(fwk_id_t id);
 };
 
 /*!

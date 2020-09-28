@@ -86,10 +86,11 @@ struct mod_fip_api {
      * \param type FIP ToC entry type.
      * \param[out] entry Updated if the type of entry requested is found.
 
-     * \retval FWK_SUCCESS Entry found and \p entry updated.
-     * \retval FWK_E_INIT Underlying storage could not be parsed (during init).
-     * \retval FWK_E_RANGE No entry of type \p type could be located.
-     * \retval FWK_E_DATA FIP ToC corrupted or otherwise not usable on this
+     * \retval ::FWK_SUCCESS Entry found and \p entry updated.
+     * \retval ::FWK_E_INIT Underlying storage could not be parsed (during
+     *      init).
+     * \retval ::FWK_E_RANGE No entry of type \p type could be located.
+     * \retval ::FWK_E_DATA FIP ToC corrupted or otherwise not usable on this
      *         platform.
      */
     int (*get_entry)(

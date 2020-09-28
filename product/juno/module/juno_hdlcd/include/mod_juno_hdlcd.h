@@ -105,8 +105,8 @@ struct mod_juno_hdlcd_drv_api {
      * \param index The index of the lookup table that contains the information
      *      to set the rate of the clock.
      *
-     * \retval FWK_SUCCESS The request is successful.
-     * \retval FWK_E_PARAM One or more parameters are incorrect.
+     * \retval ::FWK_SUCCESS The request is successful.
+     * \retval ::FWK_E_PARAM One or more parameters are incorrect.
      *
      * \return Status code representing the result of the operation.
      */
