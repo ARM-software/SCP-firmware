@@ -84,13 +84,18 @@ TARGET := $(BIN_DIR)/$(FIRMWARE)
 TARGET_BIN := $(TARGET).bin
 TARGET_ELF := $(TARGET).elf
 TARGET_SREC := $(TARGET).srec
+ifeq ($(BS_LINKER),ARM)
+TARGET_GOAL := $(TARGET_BIN)
+else
+TARGET_GOAL := $(TARGET_SREC)
+endif
 
 vpath %.c $(FIRMWARE_DIR)
 vpath %.S $(FIRMWARE_DIR)
 vpath %.c $(PRODUCT_DIR)/src
 vpath %.S $(PRODUCT_DIR)/src
 
-goal: $(TARGET_SREC)
+goal: $(TARGET_GOAL)
 
 ifneq ($(BS_ARCH_CPU),host)
     ifeq ($(BS_LINKER),ARM)
