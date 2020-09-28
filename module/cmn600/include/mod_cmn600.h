@@ -94,10 +94,8 @@ struct mod_cmn600_memory_region_map {
     /*!
      * \brief Target node identifier
      *
-     * \note Not used for \ref
-     *      mod_cmn600_memory_region_type.MOD_CMN600_MEMORY_REGION_TYPE_SYSCACHE
-     *      memory regions as it uses the pool of HN-F nodes available in the
-     *      system
+     * \note Not used for ::MOD_CMN600_MEMORY_REGION_TYPE_SYSCACHE memory
+     *      regions as it uses the pool of HN-F nodes available in the system.
      */
     unsigned int node_id;
 };
@@ -127,7 +125,7 @@ struct mod_cmn600_config {
      */
     const unsigned int *snf_table;
 
-    /*! Number of entries in the \ref snf_table */
+    /*! Number of entries in the ::mod_cmn600_config::snf_table */
     size_t snf_count;
 
     /*! Host SA count */
@@ -136,7 +134,7 @@ struct mod_cmn600_config {
     /*! Table of region memory map entries */
     const struct mod_cmn600_memory_region_map *mmap_table;
 
-    /*! Number of entries in the \ref mmap_table */
+    /*! Number of entries in the ::mod_cmn600_config::mmap_table */
     size_t mmap_count;
 
     /*! Address space of the chip */

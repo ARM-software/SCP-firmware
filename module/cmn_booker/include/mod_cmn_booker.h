@@ -75,8 +75,7 @@ struct mod_cmn_booker_mem_region_map {
     /*!
      * \brief Target node identifier
      *
-     * \note Not used for \ref
-     *      mod_cmn_booker_mem_region_type.
+     * \note Not used for ::mod_cmn_booker_mem_region_type.
      *      MOD_CMN_BOOKER_MEM_REGION_TYPE_SYSCACHE
      *      memory regions as it uses the pool of HN-F nodes available in the
      *      system
@@ -109,13 +108,13 @@ struct mod_cmn_booker_config {
      */
     const unsigned int *snf_table;
 
-    /*! Number of entries in the \ref snf_table */
+    /*! Number of entries in the ::mod_cmn_booker_config::snf_table */
     size_t snf_count;
 
     /*! Table of region memory map entries */
     const struct mod_cmn_booker_mem_region_map *mmap_table;
 
-    /*! Number of entries in the \ref mmap_table */
+    /*! Number of entries in the ::mod_cmn_booker_config::mmap_table */
     size_t mmap_count;
 
     /*! Identifier of the clock that this device depends on */

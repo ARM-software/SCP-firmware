@@ -90,7 +90,7 @@ struct pd_ctx {
     const struct mod_power_domain_element_config *config;
 
     /*
-     * Mask of the valid states. Bit \c n in \ref valid_states_mask is equal
+     * Mask of the valid states. Bit \c n in ::valid_states_mask is equal
      * to one if and only if the state \c n is a valid state for the power
      * domain. The number of bits of this field has to be greater or equal than
      * MOD_PD_STATE_COUNT_MAX.

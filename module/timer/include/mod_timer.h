@@ -269,8 +269,8 @@ struct mod_timer_alarm_api {
      * \param alarm_id Sub-element identifier of the alarm.
      * \param milliseconds The time delay, given in milliseconds, until the
      *     alarm should trigger.
-     * \param type \ref MOD_TIMER_ALARM_TYPE_ONCE or
-     *     \ref MOD_TIMER_ALARM_TYPE_PERIODIC.
+     * \param type ::MOD_TIMER_ALARM_TYPE_ONCE or
+     *     ::MOD_TIMER_ALARM_TYPE_PERIODIC.
      * \param callback Pointer to the callback function.
      * \param param Parameter given to the callback function when called.
      *

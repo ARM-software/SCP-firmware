@@ -117,20 +117,20 @@ struct mod_ppu_v1_pd_config {
      * \brief Identifier of an entity wishing to be notified when the PPU
      *     transitions out of the OFF state.
      *
-     * \note This field may be set to \ref FWK_ID_NONE, in which case no
+     * \note This field may be set to ::FWK_ID_NONE, in which case no
      *     observer will be set.
      */
     fwk_id_t observer_id;
 
     /*!
      * \brief Identifier of the power state observer API implemented by
-     *     \ref observer_id.
+     *     ::mod_ppu_v1_pd_config::observer_id.
      */
     fwk_id_t observer_api;
 
     /*!
      * \brief Parameter passed to
-     *     \ref mod_ppu_v1_power_state_observer_api::post_ppu_on().
+     *     ::mod_ppu_v1_power_state_observer_api::post_ppu_on().
      */
     void *post_ppu_on_param;
 

@@ -53,7 +53,7 @@ enum fwk_id_type {
  * \brief Build a 'none' identifier.
  *
  * \note This macro expands to a designated initializer, and can be used to
- *      initialize a \ref fwk_id_t.
+ *      initialize a ::fwk_id_t.
  *
  * \details Build an id that explicitly refers to nothing.
  *
@@ -75,7 +75,7 @@ enum fwk_id_type {
  * \brief Build a 'none' identifier.
  *
  * \note This macro expands to a compound literal, and can be used as an lvalue
- *      expression returning type \ref fwk_id_t.
+ *      expression returning type ::fwk_id_t.
  *
  * \details Build an id that explicitly refers to nothing.
  *
@@ -96,7 +96,7 @@ enum fwk_id_type {
  * \brief Build a module identifier from a module index.
  *
  * \note This macro expands to a designated initializer, and can be used to
- *      initialize a \ref fwk_id_t.
+ *      initialize a ::fwk_id_t.
  *
  * \details Example usage:
  *      \code{.c}
@@ -119,7 +119,7 @@ enum fwk_id_type {
  * \brief Build a module identifier from a module index.
  *
  * \note This macro expands to a compound literal, and can be used as an lvalue
- *      expression returning type \ref fwk_id_t.
+ *      expression returning type ::fwk_id_t.
  *
  * \details Example usage:
  *      \code{.c}
@@ -139,7 +139,7 @@ enum fwk_id_type {
  * \brief Build an element identifier from a module index and an element index.
  *
  * \note This macro expands to a designated initializer, and can be used to
- *      initialize a \ref fwk_id_t.
+ *      initialize a ::fwk_id_t.
  *
  * \details Example usage:
  *      \code{.c}
@@ -164,7 +164,7 @@ enum fwk_id_type {
  * \brief Build an element identifier from a module index and an element index.
  *
  * \note This macro expands to a compound literal, and can be used as an lvalue
- *      expression returning type \ref fwk_id_t.
+ *      expression returning type ::fwk_id_t.
  *
  * \details Example usage:
  *      \code{.c}
@@ -187,7 +187,7 @@ enum fwk_id_type {
  *      and a sub-element index.
  *
  * \note This macro expands to a designated initializer, and can be used to
- *      initialize a \ref fwk_id_t.
+ *      initialize a ::fwk_id_t.
  *
  * \details Example usage:
  *      \code{.c}
@@ -216,7 +216,7 @@ enum fwk_id_type {
  *      and a sub-element index.
  *
  * \note This macro expands to a compound literal, and can be used as an lvalue
- *      expression returning type \ref fwk_id_t.
+ *      expression returning type ::fwk_id_t.
  *
  * \details Example usage:
  *      \code{.c}
@@ -240,7 +240,7 @@ enum fwk_id_type {
  * \brief Build an API identifier from a module index and an API index.
  *
  * \note This macro expands to a designated initializer, and can be used to
- *      initialize a \ref fwk_id_t.
+ *      initialize a ::fwk_id_t.
  *
  * \details Example usage:
  *      \code{.c}
@@ -265,7 +265,7 @@ enum fwk_id_type {
  * \brief Build an API identifier from a module index and an API index.
  *
  * \note This macro expands to a compound literal, and can be used as an lvalue
- *      expression returning type \ref fwk_id_t.
+ *      expression returning type ::fwk_id_t.
  *
  * \details Example usage:
  *      \code{.c}
@@ -287,7 +287,7 @@ enum fwk_id_type {
  * \brief Build an event identifier from a module index and an event index.
  *
  * \note This macro expands to a designated initializer, and can be used to
- *      initialize a \ref fwk_id_t.
+ *      initialize a ::fwk_id_t.
  *
  * \details Example usage:
  *      \code{.c}
@@ -312,7 +312,7 @@ enum fwk_id_type {
  * \brief Build an event identifier from a module index and an event index.
  *
  * \note This macro expands to a compound literal, and can be used as an lvalue
- *      expression returning type \ref fwk_id_t.
+ *      expression returning type ::fwk_id_t.
  *
  * \details Example usage:
  *      \code{.c}
@@ -335,7 +335,7 @@ enum fwk_id_type {
  *      notification index.
  *
  * \note This macro expands to a designated initializer, and can be used to
- *      initialize a \ref fwk_id_t.
+ *      initialize a ::fwk_id_t.
  *
  * \details Example usage:
  *      \code{.c}
@@ -362,7 +362,7 @@ enum fwk_id_type {
  *      notification index.
  *
  * \note This macro expands to a compound literal, and can be used as an lvalue
- *      expression returning type \ref fwk_id_t.
+ *      expression returning type ::fwk_id_t.
  *
  * \details Example usage:
  *      \code{.c}

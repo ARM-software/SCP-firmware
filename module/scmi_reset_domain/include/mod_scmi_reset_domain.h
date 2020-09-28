@@ -90,7 +90,7 @@ struct mod_scmi_reset_domain_config {
      */
     const struct mod_scmi_reset_domain_agent *agent_table;
 
-    /*! Number of agents in \ref agent_table */
+    /*! Number of agents in ::mod_scmi_reset_domain_config::agent_table */
     unsigned int agent_count;
 
 };

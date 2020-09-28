@@ -134,23 +134,36 @@ struct mod_sensor_info {
     /*! SCMI sensor type */
     enum mod_sensor_type type;
 
-    /*! Time (in seconds) between sensor updates. Set this field to 0 to
-     *  indicate that the sensor does not have a minimum update interval. This
-     *  field is used with \ref update_interval_multiplier to calculate the
-     *  actual update_interval.
+    /*!
+     * \brief Time (in seconds) between sensor updates.
+     *
+     * \details Set this field to 0 to indicate that the sensor does not have a
+     *      minimum update interval. This field is used with
+     *      ::mod_sensor_info::update_interval_multiplier to calculate the
+     *      actual update interval.
      */
     unsigned int update_interval;
 
     /*!
-     *  Power-of-10 multiplier for \ref update_interval \n\n
-     *  This is used to calculate the actual interval time:\n
-     *  actual = \ref update_interval x10^(\ref update_interval_multiplier)\n
+     * \brief Power-of-10 multiplier for ::mod_sensor_info::update_interval.
+     *
+     * \details This is used to calculate the actual interval time:
+     *
+     *      ```none
+     *      actual = update_interval * 10^(update_interval_multiplier)
+     *      ```
      */
     int update_interval_multiplier;
 
     /*!
-     *  Power-of-10 multiplier applied to the unit (specified by \ref type)\n\n
-     *  Used like this: unit x10^(\ref unit_multiplier)
+     * \brief Power-of-10 multiplier applied to the unit specified by
+     *      ::mod_sensor_info::type.
+     *
+     * \details Used per:
+     *
+     *      ```none
+     *      unit * 10^(unit_multiplier)
+     *      ```
      */
     int unit_multiplier;
 };

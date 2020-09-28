@@ -50,7 +50,7 @@
  *      must be set.
  *
  *      If multi-threading is enabled, and \p event is a delayed response, the
- *      \ref fwk_event.cookie field of \p event must match that of the event
+ *      ::fwk_event::cookie field of \p event must match that of the event
  *      it is responding to.
  *
  * \param[in] event Pointer to the event to queue. Must not be \c NULL.

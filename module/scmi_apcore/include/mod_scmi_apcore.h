@@ -70,15 +70,15 @@ struct mod_scmi_apcore_reset_register_group {
  */
 struct mod_scmi_apcore_config {
     /*!
-     * \brief Pointer to the table of \ref mod_scmi_apcore_reset_register_group
+     * \brief Pointer to the table of ::mod_scmi_apcore_reset_register_group
      *     structures that define the reset registers within the platform.
      */
     const struct mod_scmi_apcore_reset_register_group
         *reset_register_group_table;
 
     /*!
-     * \brief Number of \ref mod_scmi_apcore_reset_register_group structures in
-     *     \ref reset_register_group_table.
+     * \brief Number of ::mod_scmi_apcore_reset_register_group structures in
+     *     ::mod_scmi_apcore_config::reset_register_group_table.
      */
     size_t reset_register_group_count;
 
