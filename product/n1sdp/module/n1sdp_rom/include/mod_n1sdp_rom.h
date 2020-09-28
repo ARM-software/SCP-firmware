@@ -14,12 +14,12 @@
 
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupN1SDPRom N1SDP SCP ROM Support
- * @{
+ * \{
  */
 
 /*!
@@ -34,11 +34,11 @@ struct n1sdp_rom_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_N1SDP_ROM_H */

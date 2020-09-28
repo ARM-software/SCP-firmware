@@ -11,12 +11,12 @@
 
 /*!
  * \addtogroup GroupLibFramework Framework
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupCLI Debugger
- * @{
+ * \{
  */
 
 #if defined(BUILD_HAS_DEBUGGER)
@@ -45,10 +45,10 @@
 #endif
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 #endif /* FWK_CLI_DBG_H */

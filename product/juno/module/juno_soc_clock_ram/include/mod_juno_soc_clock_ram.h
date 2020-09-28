@@ -16,7 +16,7 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
@@ -25,7 +25,7 @@
  * \details A driver for Juno Soc clock devices for GPU and
  *          big/little core clusters.
  *
- * @{
+ * \{
  */
 
 /*! Juno SoC clock API indexes */
@@ -110,11 +110,11 @@ struct mod_juno_soc_clock_ram_dev_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_JUNO_SOC_CLOCK_RAM_H */

@@ -19,7 +19,7 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
@@ -31,7 +31,7 @@
  *
  * \sa
  * https://developer.arm.com/docs/100568/latest/programmers-model/register-summary
- * @{
+ * \{
  */
 
 /*!
@@ -45,7 +45,7 @@
 struct mod_dmc_bing_access_address_next {
     /*!
      * \cond
-     * @{
+     * \{
      */
     FWK_RW uint32_t MIN_31_00;
     FWK_RW uint32_t MIN_43_32;
@@ -53,7 +53,7 @@ struct mod_dmc_bing_access_address_next {
     FWK_RW uint32_t MAX_43_32;
     /*!
      * \endcond
-     * @}
+     * \}
      */
 };
 
@@ -63,7 +63,7 @@ struct mod_dmc_bing_access_address_next {
 struct mod_dmc_bing_access_address_now {
     /*!
      * \cond
-     * @{
+     * \{
      */
     FWK_R uint32_t MIN_31_00;
     FWK_R uint32_t MIN_43_32;
@@ -71,7 +71,7 @@ struct mod_dmc_bing_access_address_now {
     FWK_R uint32_t MAX_43_32;
     /*!
      * \endcond
-     * @}
+     * \}
      */
 };
 
@@ -81,7 +81,7 @@ struct mod_dmc_bing_access_address_now {
 struct mod_dmc_bing_pmu_counter {
     /*!
      * \cond
-     * @{
+     * \{
      */
     FWK_RW uint32_t MASK_31_00;
     FWK_RW uint32_t MASK_63_32;
@@ -95,7 +95,7 @@ struct mod_dmc_bing_pmu_counter {
     uint32_t RESERVED2;
     /*!
      * \endcond
-     * @}
+     * \}
      */
 };
 
@@ -105,7 +105,7 @@ struct mod_dmc_bing_pmu_counter {
 struct mod_dmc_bing_reg {
     /*!
      * \cond
-     * @{
+     * \{
      */
     FWK_R uint32_t MEMC_STATUS;
     FWK_R uint32_t MEMC_CONFIG;
@@ -561,7 +561,7 @@ struct mod_dmc_bing_reg {
     FWK_R uint32_t COMPONENT_ID_3;
     /*!
      * \endcond
-     * @}
+     * \}
      */
 };
 
@@ -663,11 +663,11 @@ struct mod_dmc_bing_module_config {
 extern const struct fwk_module module_dmc_bing;
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_DMC_BING_H */

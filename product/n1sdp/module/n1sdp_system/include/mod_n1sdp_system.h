@@ -15,12 +15,12 @@
 
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupN1SDPSystem N1SDP System Support
- * @{
+ * \{
  */
 
 /*!
@@ -97,11 +97,11 @@ struct mod_n1sdp_system_ap_memory_access_api {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_N1SDP_SYSTEM_H */

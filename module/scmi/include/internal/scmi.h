@@ -16,7 +16,7 @@
 
 /*!
  * \defgroup GroupSCMI System Control & Management Interface (SCMI)
- * @{
+ * \{
  */
 
 /*!
@@ -108,7 +108,7 @@ struct scmi_protocol_message_attributes_p2a {
 };
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* INTERNAL_SCMI_H */

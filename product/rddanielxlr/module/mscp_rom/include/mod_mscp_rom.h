@@ -12,12 +12,12 @@
 
 /*!
  * \addtogroup GroupSCPModule MSCP Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupSCP ROM Support
- * @{
+ * \{
  */
 
 /*!
@@ -35,11 +35,11 @@ struct mscp_rom_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_MSCP_ROM_H */

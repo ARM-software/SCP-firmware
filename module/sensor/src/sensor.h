@@ -16,7 +16,7 @@
 
 /*!
  * \cond
- * @{
+ * \{
  */
 
 /*
@@ -47,7 +47,7 @@ static const fwk_id_t mod_sensor_event_id_read_complete =
 
 /*!
  * \endcond
- * @}
+ * \}
  */
 
 #endif /* SENSOR_H */

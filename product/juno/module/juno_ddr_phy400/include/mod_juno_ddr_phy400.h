@@ -33,7 +33,7 @@
 struct mod_juno_ddr_phy400_ptm_reg {
     /*!
      * \cond
-     * @{
+     * \{
      */
     FWK_RW  uint32_t    INTERRUPT_ENABLE;
     FWK_RW  uint32_t    INTERRUPT_STATUS;
@@ -69,7 +69,7 @@ struct mod_juno_ddr_phy400_ptm_reg {
     FWK_RW  uint32_t    PHY_SCRATCH2;
     /*!
      * \endcond
-     * @}
+     * \}
      */
 };
 
@@ -84,7 +84,7 @@ struct mod_juno_ddr_phy400_ptm_reg {
 struct mod_juno_ddr_phy400_c3a_reg {
     /*!
      * \cond
-     * @{
+     * \{
      */
     FWK_RW  uint32_t    INTERRUPT_ENABLE;
     FWK_RW  uint32_t    INTERRUPT_STATUS;
@@ -107,7 +107,7 @@ struct mod_juno_ddr_phy400_c3a_reg {
     FWK_RW  uint32_t    IO_CTRL3;
     /*!
      * \endcond
-     * @}
+     * \}
      */
 };
 
@@ -137,7 +137,7 @@ struct mod_juno_ddr_phy400_c3a_reg {
 struct mod_juno_ddr_phy400_bl_reg {
     /*!
      * \cond
-     * @{
+     * \{
      */
     FWK_RW  uint32_t    INTERRUPT_ENABLE;
     FWK_RW  uint32_t    RAW_INTERRUPT1;
@@ -230,7 +230,7 @@ struct mod_juno_ddr_phy400_bl_reg {
     FWK_RW  uint32_t    WRDLL_DCC_STATUS;
     /*!
      * \endcond
-     * @}
+     * \}
      */
 };
 
@@ -270,7 +270,7 @@ struct mod_juno_ddr_phy400_element_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_JUNO_DDR_PHY400_H */

@@ -15,7 +15,7 @@
 
 /*!
  * \addtogroup GroupSYNQUACERModule SYNQUACER Product Modules
- * @{
+ * \{
  */
 
 /*!
@@ -25,15 +25,15 @@
  *
  * \details This module implements a device driver for the memory controller
  *
- * @{
+ * \{
  */
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_SYNQUACER_MEMC_H */

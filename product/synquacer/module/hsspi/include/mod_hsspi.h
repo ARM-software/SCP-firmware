@@ -15,7 +15,7 @@
 #include <stdint.h>
 /*!
  * \addtogroup GroupSYNQUACERModule SYNQUACER Product Modules
- * @{
+ * \{
  */
 
 /*!
@@ -25,7 +25,7 @@
  *
  * \details This module implements a device driver for the HSSPI
  *
- * @{
+ * \{
  */
 
 /*!
@@ -58,11 +58,11 @@ struct mod_hsspi_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_HSSPI_H */

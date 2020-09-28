@@ -12,7 +12,7 @@
 
 /*!
  * \addtogroup GroupSYNQUACERModule SYNQUACER Product Modules
- * @{
+ * \{
  */
 
 /*!
@@ -22,7 +22,7 @@
  *
  * \details This module implements a service for the ROM firmware
  *
- * @{
+ * \{
  */
 
 /*!
@@ -40,11 +40,11 @@ struct synquacer_rom_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_SYNQUACER_ROM_H */

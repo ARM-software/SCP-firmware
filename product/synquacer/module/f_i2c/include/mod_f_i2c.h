@@ -19,7 +19,7 @@
 
 /*!
  * \addtogroup GroupSYNQUACERModule SYNQUACER Product Modules
- * @{
+ * \{
  */
 
 /*!
@@ -29,7 +29,7 @@
  *
  * \details This module implements a device driver for the F_I2C
  *
- * @{
+ * \{
  */
 
 /*!
@@ -101,11 +101,11 @@ struct mod_f_i2c_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_F_I2C_H */

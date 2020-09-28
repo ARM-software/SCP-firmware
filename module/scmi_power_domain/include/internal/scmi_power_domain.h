@@ -15,12 +15,12 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupSCMI_PERF SCMI Power Domain Management Protocol
- * @{
+ * \{
  */
 
 #define SCMI_PROTOCOL_VERSION_POWER_DOMAIN UINT32_C(0x10000)
@@ -120,11 +120,11 @@ struct __attribute((packed)) scmi_pd_power_state_notification_message_p2a {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* INTERNAL_SCMI_POWER_DOMAIN_H */

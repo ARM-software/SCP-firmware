@@ -15,12 +15,12 @@
 
 /*!
  * \addtogroup GroupLibFramework Framework
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupElement Elements
- * @{
+ * \{
  */
 
 /*!
@@ -49,11 +49,11 @@ struct fwk_element {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* FWK_ELEMENT_H */

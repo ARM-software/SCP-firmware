@@ -20,7 +20,7 @@
  *
  * \details A driver for system PLL devices.
  *
- * @{
+ * \{
  */
 
 /*! The slowest rate at which the PLL hardware can operate. */
@@ -85,11 +85,11 @@ struct mod_system_pll_dev_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_SYSTEM_PLL_H */

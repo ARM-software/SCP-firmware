@@ -17,12 +17,12 @@
 
 /*!
  * \addtogroup GroupMORELLOModule MORELLO Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupMORELLOScmiAgent SCMI Agent Support
- * @{
+ * \{
  */
 
 /*!
@@ -123,11 +123,11 @@ enum mod_scmi_agent_api_idx {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_SCMI_AGENT_H */

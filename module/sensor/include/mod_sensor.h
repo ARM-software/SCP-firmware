@@ -16,7 +16,7 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
@@ -26,7 +26,7 @@
  *
  * \details Module for interfacing with and reading various hardware sensors.
  *
- * @{
+ * \{
  */
 
 /*!
@@ -324,11 +324,11 @@ static const fwk_id_t mod_sensor_event_id_read_request =
     FWK_ID_EVENT_INIT(FWK_MODULE_IDX_SENSOR, MOD_SENSOR_EVENT_IDX_READ_REQUEST);
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_SENSOR_H */

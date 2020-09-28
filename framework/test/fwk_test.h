@@ -10,13 +10,13 @@
 
 /*!
  * \addtogroup GroupLibFramework Framework
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupTest Test
  *
- * @{
+ * \{
  */
 
 /*!
@@ -112,11 +112,11 @@ struct fwk_test_suite_desc {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* FWK_TEST_H */

@@ -15,12 +15,12 @@
 
 /*!
  * \addtogroup GroupRDDANIELModule RDDANIEL Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupRDDANIELSystem RDDANIEL System Support
- * @{
+ * \{
  */
 
 /*!
@@ -54,11 +54,11 @@ enum mod_rddaniel_system_api_idx {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_RDDANIEL_SYSTEM_H */

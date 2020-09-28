@@ -21,12 +21,12 @@
 
 /*!
  * \addtogroup GroupLibFramework Framework
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupId Identifiers
- * @{
+ * \{
  */
 
 /*!
@@ -589,11 +589,11 @@ struct fwk_id_verbose_fmt {
 struct fwk_id_verbose_fmt fwk_id_verbose_str(fwk_id_t id);
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* FWK_ID_H */

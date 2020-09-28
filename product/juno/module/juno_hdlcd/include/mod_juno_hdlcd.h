@@ -20,13 +20,13 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupJUNOHDLCD JUNO HDLCD
  *
- * @{
+ * \{
  */
 
 /*!
@@ -130,11 +130,11 @@ static const fwk_id_t mod_juno_hdlcd_api_id_hdlcd_driver_response =
     FWK_ID_API_INIT(FWK_MODULE_IDX_JUNO_HDLCD,
         MOD_JUNO_HDLCD_API_IDX_HDLCD_DRIVER_RESPONSE);
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_JUNO_HDLCD_H */

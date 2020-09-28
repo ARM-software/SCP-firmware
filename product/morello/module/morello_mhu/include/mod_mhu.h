@@ -17,12 +17,12 @@
 
 /*!
  * \addtogroup GroupMORELLOModule MORELLO Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupMORELLOMHU MORELLO Message Handling Unit (MHU) Driver
- * @{
+ * \{
  */
 
 /*!
@@ -44,11 +44,11 @@ struct mod_mhu_device_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_MHU_H */

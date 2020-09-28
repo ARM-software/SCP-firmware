@@ -16,7 +16,7 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
@@ -24,7 +24,7 @@
  *
  * \details A Hardware Abstraction Layer for configuring clock devices.
  *
- * @{
+ * \{
  */
 
 /*!
@@ -581,11 +581,11 @@ static const fwk_id_t mod_clock_event_id_get_state_request =
                       MOD_CLOCK_EVENT_IDX_GET_STATE_REQUEST);
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_CLOCK_H */

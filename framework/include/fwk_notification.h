@@ -22,7 +22,7 @@
 /*!
  * \ingroup GroupLibFramework
  * \defgroup GroupNotification Notifications
- * @{
+ * \{
  */
 
 /*!
@@ -94,7 +94,7 @@ int fwk_notification_notify(struct fwk_event *notification_event,
                             unsigned int *count);
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* FWK_NOTIFICATION_H */

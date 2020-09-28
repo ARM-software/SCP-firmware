@@ -15,12 +15,12 @@
 
 /*!
  * \addtogroup GroupRDN1E1Module RDN1E1 Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupRDN1E1System RDN1E1 System Support
- * @{
+ * \{
  */
 
 /*!
@@ -54,11 +54,11 @@ enum mod_rdn1e1_system_api_idx {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_RDN1E1_SYSTEM_H */

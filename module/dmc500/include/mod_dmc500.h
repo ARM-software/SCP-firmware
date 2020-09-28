@@ -21,7 +21,7 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
@@ -30,7 +30,7 @@
  * \details Please consult the Arm CoreLink DMC-500 Dynamic Memory Controller
  *      Technical Reference Manual for details on the specific registers that
  *      are programmed here.
- * @{
+ * \{
  */
 
 /*!
@@ -39,7 +39,7 @@
 struct mod_dmc500_reg {
     /*!
      * \cond
-     * @{
+     * \{
      */
     FWK_R   uint32_t SI0_SI_STATUS;
     FWK_R   uint32_t SI0_SI_INTERRUPT_STATUS;
@@ -408,9 +408,9 @@ struct mod_dmc500_reg {
     FWK_R   uint32_t COMPONENT_ID_2;
     FWK_R   uint32_t COMPONENT_ID_3;
     /*!
-    * \endcond
-    * @}
-    */
+     * \endcond
+     * \}
+     */
 };
 
 /*!
@@ -560,11 +560,11 @@ struct mod_dmc500_module_config {
 extern const struct fwk_module module_dmc500;
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_DMC500_H */

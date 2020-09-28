@@ -16,7 +16,7 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
@@ -25,7 +25,7 @@
  * \brief Arm Coherent Mesh Network (CMN) 600 module
  *
  * \details This module adds support for the CMN600 interconnect
- * @{
+ * \{
  */
 
 /*!
@@ -305,11 +305,11 @@ struct mod_cmn600_ccix_config_api {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_CMN600_H */

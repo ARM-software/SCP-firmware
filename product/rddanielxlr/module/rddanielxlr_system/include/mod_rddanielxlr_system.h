@@ -15,12 +15,12 @@
 
 /*!
  * \addtogroup GroupRDDANIELXLRModule RDDANIELXLR Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupRDDANIELXLRSystem RDDANIELXLR System Support
- * @{
+ * \{
  */
 
 /*!
@@ -54,11 +54,11 @@ enum mod_rddanielxlr_system_api_idx {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_RDDANIELXLR_SYSTEM_H */

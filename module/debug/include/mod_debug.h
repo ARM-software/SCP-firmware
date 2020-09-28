@@ -241,6 +241,6 @@ static const fwk_id_t mod_debug_event_id_req_enable_set =
                       MOD_DEBUG_PUBLIC_EVENT_IDX_REQ_ENABLE_SET);
 
 /*!
- * @}
+ * \}
  */
 #endif /* MOD_DEBUG_H */

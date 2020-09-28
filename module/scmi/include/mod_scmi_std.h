@@ -13,12 +13,12 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupSCMI System Control & Management Interface (SCMI)
- * @{
+ * \{
  */
 
 /*!
@@ -204,11 +204,11 @@ enum scmi_reset_domain_response_id {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_SCMI_STD_H */

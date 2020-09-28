@@ -16,7 +16,7 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
@@ -25,7 +25,7 @@
  * \brief Arm Coherent Mesh Network (CMN) 600 module
  *
  * \details This module adds support for the CMN_SKEENA interconnect
- * @{
+ * \{
  */
 
 /*!
@@ -303,11 +303,11 @@ struct mod_cmn_skeena_ccix_config_api {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_CMN_SKEENA_H */

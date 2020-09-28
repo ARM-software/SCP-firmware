@@ -17,12 +17,12 @@
 
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupN1SDPMHU N1SDP Message Handling Unit (MHU) Driver
- * @{
+ * \{
  */
 
 /*!
@@ -44,11 +44,11 @@ struct mod_mhu_device_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_MHU_H */

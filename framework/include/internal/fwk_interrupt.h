@@ -13,12 +13,12 @@
 
 /*!
  * \addtogroup GroupLibFramework Framework
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupInterrupt Interrupt Management
- * @{
+ * \{
  */
 
 /*!
@@ -34,11 +34,11 @@
 int fwk_interrupt_set_isr_fault(void (*isr)(void));
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* INTERNAL_FWK_INTERRUPT_H */

@@ -18,12 +18,12 @@
 
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupN1SDPTimerSync N1SDP Timer Synchronization Driver
- * @{
+ * \{
  */
 
 /*!
@@ -94,11 +94,11 @@ struct mod_n1sdp_tsync_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_N1SDP_TIMER_SYNC_H */

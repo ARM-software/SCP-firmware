@@ -18,7 +18,7 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
@@ -27,7 +27,7 @@
  * \brief Module used to interface with the SID register set.
  *
  * \details This module uses the SID register set to get information about the
- *     subsystem that the firmware is running on. @{
+ *     subsystem that the firmware is running on. \{
  */
 
 /*!
@@ -115,11 +115,11 @@ enum mod_sid_api_idx {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_SID_H */

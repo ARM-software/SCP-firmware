@@ -19,13 +19,13 @@
 
 /*!
  * \addtogroup GroupLibFramework Framework
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupThread Threading
  *
- * @{
+ * \{
  */
 
 /*!
@@ -139,11 +139,11 @@ int fwk_thread_is_delayed_response_list_empty(fwk_id_t id, bool *is_empty);
  */
 int fwk_thread_get_first_delayed_response(fwk_id_t id, struct fwk_event *event);
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* FWK_THREAD_H */

@@ -14,12 +14,12 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupSCMI_SYS SCMI System Power Management Protocol
- * @{
+ * \{
  */
 
 /*!
@@ -137,15 +137,15 @@ int scmi_sys_power_state_set_policy(
     bool graceful);
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_SCMI_SYSTEM_POWER_H */

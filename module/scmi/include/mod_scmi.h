@@ -23,12 +23,12 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupSCMI System Control & Management Interface (SCMI)
- * @{
+ * \{
  */
 
 /*!
@@ -603,11 +603,11 @@ static const fwk_id_t mod_scmi_notification_id_initialized =
         MOD_SCMI_NOTIFICATION_IDX_INITIALIZED);
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_SCMI_H */

@@ -17,12 +17,12 @@
 
 /*!
  * \addtogroup GroupLibFramework Framework
- * @{
+ * \{
  */
 
 /*!
  * \addtogroup GroupLinkedList Linked Lists
- * @{
+ * \{
  */
 
 /*!
@@ -144,11 +144,11 @@ bool __fwk_slist_contains(
  */
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* FWK_SLIST_H */

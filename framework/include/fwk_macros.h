@@ -13,12 +13,12 @@
 
 /*!
  * \addtogroup GroupLibFramework Framework
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupMacros Macros
- * @{
+ * \{
  */
 
 /*!
@@ -370,11 +370,11 @@
 #endif
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* FWK_MACROS_H */

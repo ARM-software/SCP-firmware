@@ -18,7 +18,7 @@
  * \details Math helper functions to implement several common operations in an
  *      efficient way.
  *
- * @{
+ * \{
  */
 
 /*!
@@ -64,7 +64,7 @@
     ((sizeof(num) * CHAR_BIT) - fwk_math_clz(num) - 1)
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* FWK_MATH_H */

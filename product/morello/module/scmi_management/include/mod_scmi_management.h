@@ -16,12 +16,12 @@
 
 /*!
  * \addtogroup GroupMORELLOModule MORELLO Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupMORELLOSCMI_MANAGEMENT SCMI Management Protocol
- * @{
+ * \{
  */
 
 /*!
@@ -67,11 +67,11 @@ struct scmi_management_chipid_info_get_p2a {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_SCMI_MANAGEMENT_H */

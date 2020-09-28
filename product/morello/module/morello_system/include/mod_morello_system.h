@@ -13,12 +13,12 @@
 
 /*!
  * \addtogroup GroupMORELLOModule MORELLO Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupMORELLOSystem MORELLO System Support
- * @{
+ * \{
  */
 
 /*!
@@ -98,11 +98,11 @@ struct mod_morello_system_ap_memory_access_api {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_MORELLO_SYSTEM_H */

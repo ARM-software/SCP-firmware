@@ -15,7 +15,7 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
@@ -28,7 +28,7 @@
  *      driver module to obtain a pointer to the system information data. Module
  *      which requires system information data then can use the api provided
  *      by this module to get the generic system information.
- *      @{
+ *      \{
  */
 
 /*!
@@ -117,11 +117,11 @@ enum mod_system_info_api_idx {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_SYSTEM_INFO_H */
