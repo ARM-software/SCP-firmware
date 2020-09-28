@@ -58,7 +58,6 @@
 struct mod_juno_dmc400_reg {
     /*!
      * \cond
-     * \{
      */
     FWK_R   uint32_t MEMC_STATUS;
     FWK_R   uint32_t MEMC_CONFIG;
@@ -189,7 +188,6 @@ struct mod_juno_dmc400_reg {
     FWK_R   uint32_t COMPONENT_ID_3;
     /*!
      * \endcond
-     * \}
      */
 };
 

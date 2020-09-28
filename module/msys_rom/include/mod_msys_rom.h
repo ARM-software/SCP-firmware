@@ -61,8 +61,4 @@ static const fwk_id_t mod_msys_rom_notification_id_systop =
  * \}
  */
 
-/*!
- * \}
- */
-
 #endif /* MOD_MSYS_ROM_H */

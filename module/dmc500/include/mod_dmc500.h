@@ -39,7 +39,6 @@
 struct mod_dmc500_reg {
     /*!
      * \cond
-     * \{
      */
     FWK_R   uint32_t SI0_SI_STATUS;
     FWK_R   uint32_t SI0_SI_INTERRUPT_STATUS;
@@ -409,7 +408,6 @@ struct mod_dmc500_reg {
     FWK_R   uint32_t COMPONENT_ID_3;
     /*!
      * \endcond
-     * \}
      */
 };
 

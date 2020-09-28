@@ -115,8 +115,4 @@ int scmi_pd_power_state_set_policy(
  * \}
  */
 
-/*!
- * \}
- */
-
 #endif /* MOD_SCMI_POWER_DOMAIN_H */
