@@ -43,7 +43,7 @@ static int get_value(fwk_id_t id, uint64_t *value)
 {
     unsigned int sensor_hal_idx;
     const struct mod_mock_sensor_dev_config *config;
-
+    int status;
     config = fwk_module_get_data(id);
 
     sensor_hal_idx = fwk_id_get_element_idx(config->sensor_hal_id);
