@@ -87,9 +87,9 @@ struct mod_cmn_rhodes_mem_region_map {
      * \brief Target node identifier
      *
      * \note Not used for \ref
-     * mod_cmn_rhodes_mem_region_type.MOD_CMN_RHODES_REGION_TYPE_SYSCACHE_SUB
-     * memory regions as it uses the pool of HN-F nodes available in the
-     * system
+     *      mod_cmn_rhodes_mem_region_type.MOD_CMN_RHODES_REGION_TYPE_SYSCACHE_SUB
+     *      memory regions as it uses the pool of HN-F nodes available in the
+     *      system
      */
     unsigned int node_id;
 };
@@ -98,15 +98,15 @@ struct mod_cmn_rhodes_mem_region_map {
  * \brief Remote Agent to Link ID mapping
  *
  * \details Each CCIX Gateway block (CXG) can communicate up to three remote
- * CCIX protocol links. Each remote agent, identified by their AgentID (RAID
- * or HAID) will be behind one of these three links. This structure holds the
- * start and end Agent IDs for each link. The remote AgentID to LinkID LUT
- * registers (por_{cxg_ra,cxg_ha, cxla}_agentid_to_linkid_reg<X>) will be
- * configured sequentially from \ref
- * mod_cmn_rhodes_agentid_to_linkid_map.remote_agentid_start
- * and \ref mod_cmn_rhodes_agentid_to_linkid_map.remote_agentid_end values. For
- * all three links, corresponding to these remote Agent IDs, HN-F's RN_PHYS_ID
- * registers will be programmed with the node id of the CXG Gateway block.
+ *      CCIX protocol links. Each remote agent, identified by their AgentID
+ *      (RAID or HAID) will be behind one of these three links. This structure
+ *      holds the start and end Agent IDs for each link. The remote AgentID to
+ *      LinkID LUT registers (por_{cxg_ra,cxg_ha,
+ *      cxla}_agentid_to_linkid_reg<X>) will be configured sequentially from
+ *      \ref mod_cmn_rhodes_agentid_to_linkid_map.remote_agentid_start and \ref
+ *      mod_cmn_rhodes_agentid_to_linkid_map.remote_agentid_end values. For all
+ *      three links, corresponding to these remote Agent IDs, HN-F's RN_PHYS_ID
+ *      registers will be programmed with the node id of the CXG Gateway block.
  *
  */
 struct mod_cmn_rhodes_agentid_to_linkid_map {
@@ -119,7 +119,7 @@ struct mod_cmn_rhodes_agentid_to_linkid_map {
 
 /*!
  * \brief Remote Memory region map descriptor which will be used by CXRA SAM
- * programming
+ *      programming
  */
 struct mod_cmn_rhodes_ra_mem_region_map {
     /*! Base address */
@@ -136,10 +136,11 @@ struct mod_cmn_rhodes_ra_mem_region_map {
  * \brief CCIX Gateway block descriptor
  *
  * \details Each CCIX Gateway block (CXG) can have up to eight remote memory map
- * \ref mod_cmn_rhodes_ra_mem_region_map descriptors and can have three links
- * which can target range of remote agent ids. User is expected to assign an
- * Home AgentID (HAID) \ref mod_cmn_rhodes_ccix_config.haid for each logical ids
- * of the CXG blocks. Overall structure of the descriptor is shown below:
+ *      \ref mod_cmn_rhodes_ra_mem_region_map descriptors and can have three
+ *      links which can target range of remote agent ids. User is expected to
+ *      assign an Home AgentID (HAID) \ref mod_cmn_rhodes_ccix_config.haid for
+ *      each logical ids of the CXG blocks. Overall structure of the descriptor
+ *      is shown below:
  *
  *         +----------------------------------------------------------+
  *         | mod_cmn_rhodes_ccix_config<ldid>                         |
@@ -251,8 +252,8 @@ struct mod_cmn_rhodes_config {
     /*!
      * \brief HN-F with CAL support flag
      * \details When set to true, enables HN-F with CAL support. This flag will
-     * be used only if HN-F is found to be connected to CAL (When connected to
-     * a CAL port, node id of HN-F will be a odd number).
+     *      be used only if HN-F is found to be connected to CAL (When connected
+     *      to a CAL port, node id of HN-F will be a odd number).
      */
     bool hnf_cal_mode;
 };

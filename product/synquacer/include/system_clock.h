@@ -12,7 +12,7 @@
 
 /*!
  * \brief Calculates the necessary divider for obtaining a target frequency
- * from a given clock.
+ *      from a given clock.
  *
  * \param CLOCK_RATE The tick rate of the clock to be divided.
  *

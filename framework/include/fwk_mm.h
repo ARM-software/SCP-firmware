@@ -98,7 +98,7 @@ void *fwk_mm_alloc(size_t num, size_t size) FWK_LEAF FWK_NOTHROW FWK_ALLOC
  *
  * \return On success, returns the pointer to the beginning of newly allocated
  *      memory. To avoid a memory leak, the returned pointer must be
- * deallocated with ::fwk_mm_free() or ::fwk_mm_realloc().
+ *      deallocated with ::fwk_mm_free() or ::fwk_mm_realloc().
  *
  * \return On failure, returns a null pointer.
  */

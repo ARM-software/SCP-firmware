@@ -37,10 +37,11 @@ enum scmi_role {
  *          - a PSCI implementation on AP processors.
  *          - a management agent.
  *          - an OSPM.
- * The POWER_STATE_SET command targeting a power domain, including AP cores, is
- * processed only if issued by a PSCI agent. The processing of the
- * SYSTEM_POWER_STATE_SET command depends on the type of the agent that issued
- * it. The OTHER type is added here to cover the other type of agents.
+ *      The POWER_STATE_SET command targeting a power domain, including AP
+ *      cores, is processed only if issued by a PSCI agent. The processing of
+ *      the SYSTEM_POWER_STATE_SET command depends on the type of the agent that
+ *      issued it. The OTHER type is added here to cover the other type of
+ *      agents.
  */
 enum scmi_agent_type {
     /*! PSCI agent */
@@ -65,7 +66,7 @@ enum scmi_agent_type {
  * \details Defines the channel direction in terms of the master to the slave.
  *
  * \note The integer values of this enumeration are based on the master of
- * communications in that configuration.
+ *      communications in that configuration.
  */
 enum scmi_channel_type {
     /*!< Agent-to-platform */

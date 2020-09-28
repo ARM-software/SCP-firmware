@@ -75,8 +75,8 @@ enum mod_res_perms_protocol_deny {
 struct mod_res_agent_protocol_permissions {
     /*!
      * \details This bitmask specifies which protocols are DISABLED for this
-     * agent. If a bit is set that agent does NOT have permission to
-     * use the protocol.
+     *      agent. If a bit is set that agent does NOT have permission to
+     *      use the protocol.
      */
     mod_res_perms_t protocols;
 };
@@ -133,26 +133,26 @@ struct mod_res_agent_msg_permissions {
 
 /*!
  * \brief Bitmask of the resources for each protocol:command disabled for
- * the agent.
+ *      the agent.
  *
  * \details Each protocol will manage a unique number of commands, so
- * we specify different size tables.
+ *      we specify different size tables.
  *
  * If the permissions table is not set then the agent is deemed
- * to be allowed access that protocol:command:resource. They will
- * be checked in order protocol->command->resource.
+ *      to be allowed access that protocol:command:resource. They will
+ *      be checked in order protocol->command->resource.
  *
  * In order for a protocol to be disabled for an agent, the
- * bit must be SET in the agent_protocol_permissions table.
+ *      bit must be SET in the agent_protocol_permissions table.
  *
  * In order for a command to be disabled for an agent, the
- * bit must be SET in the agent_cmd_permissions table.
+ *      bit must be SET in the agent_cmd_permissions table.
  *
  * In order for a resource to be disabled for an agent, the
- * bit must be SET in the agent_permission table.
+ *      bit must be SET in the agent_permission table.
  *
  * \note The VERSION/ATTRIBUTES/MSG_ATTRIBUTES commands
- * are available to all agents.
+ *      are available to all agents.
  *
  * \note The BASE and SYSTEM_POWER protocols are managed by
  *      agent:protocol:command, there are no resource

@@ -80,7 +80,7 @@ struct mod_scmi_system_power_config {
  * \details The SCMI policy handlers are weak definitions to allow a platform
  *      to implement a policy appropriate to that platform. The SCMI
  *      system power policy functions may be overridden in the
- * `product/<platform>/src` directory.
+ *      `product/<platform>/src` directory.
  *
  * \note The `state` data may be modified by the policy handler.
  * \note See `product/juno/src/juno_scmi_clock.c` for an example policy

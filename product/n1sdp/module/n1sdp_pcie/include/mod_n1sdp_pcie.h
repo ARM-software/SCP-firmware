@@ -24,7 +24,7 @@
  * \brief Driver support for N1SDP PCIe Root Complex & End Point devices.
  *
  * \details This module provides driver support for enabling and configuring
- * the PCIe peripheral either in root complex mode or in end point mode.
+ *      the PCIe peripheral either in root complex mode or in end point mode.
  *
  * \{
  */
@@ -108,7 +108,7 @@ struct n1sdp_pcie_init_api {
      *
      * \param id Identifier of the PCIe instance
      * \param ep_mode Identifier to configure the controller
-     * in root port or endpoint mode
+     *      in root port or endpoint mode
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard error codes.
@@ -137,7 +137,7 @@ struct n1sdp_pcie_init_api {
 
     /*!
      * \brief API to enable Virtual Channel 1 and map to
-     * specified Traffic class. This API is used in multichip mode.
+     *      specified Traffic class. This API is used in multichip mode.
      *
      * \param id Identifier of the PCIe instance
      * \param vc1_tc Traffic class to be mapped to VC1
@@ -154,10 +154,10 @@ struct n1sdp_pcie_init_api {
 struct n1sdp_pcie_ccix_config_api {
     /*!
      * \brief Enable the optimized tlp (Transaction Layer Packet)
-     * for the ccix root complex
+     *      for the ccix root complex
      *
      * \param enable Enable optimized tlp (true) or disable it (false)
-     * and thus enable pcie compatible header
+     *      and thus enable pcie compatible header
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard error codes.

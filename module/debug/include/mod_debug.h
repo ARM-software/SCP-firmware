@@ -81,7 +81,7 @@ struct mod_debug_api {
      * \param id Debug device identifier.
      *
      * \param enable Targeted state for Debug, true for enabled, false
-     * otherwise.
+     *      otherwise.
      *
      * \param user_id The user requesting the Debug functionality.
      *
@@ -90,7 +90,7 @@ struct mod_debug_api {
      * \retval ::FWK_E_PARAM One or more parameters were incorrect.
      * \retval ::FWK_E_BUSY Another request is already being processed.
      * \retval ::FWK_E_ACCESS The specified user doesn't have the permission to
-     * perform the requested action.
+     *      perform the requested action.
      * \return One of the standard framework error codes.
      */
     int (*set_enabled)(fwk_id_t id, bool enable, enum scp_debug_user user_id);
@@ -101,7 +101,7 @@ struct mod_debug_api {
      * \param id Debug device identifier.
      *
      * \param[out] enabled State of Debug, true for enabled, false
-     * otherwise.
+     *      otherwise.
      *
      * \param user_id The user requesting the Debug enabled status.
      *
@@ -110,7 +110,7 @@ struct mod_debug_api {
      * \retval ::FWK_E_PARAM One or more parameters were incorrect.
      * \retval ::FWK_E_BUSY Another request is already being processed.
      * \retval ::FWK_E_ACCESS The specified user doesn't have the permission to
-     * perform the requested action.
+     *      perform the requested action.
      * \return One of the standard framework error codes.
      */
     int (*get_enabled)(fwk_id_t id, bool *enabled, enum scp_debug_user user_id);
@@ -146,7 +146,7 @@ struct mod_debug_driver_api {
      * \param id Debug driver identifier.
      *
      * \param enable Targeted state the driver true for enabled, false
-     * otherwise.
+     *      otherwise.
      *
      * \param user_id The user requesting the Debug driver functionality.
      *
@@ -163,7 +163,7 @@ struct mod_debug_driver_api {
      * \param id Debug driver identifier.
      *
      * \param[out] enabled State of Debug, true for enabled, false
-     * otherwise.
+     *      otherwise.
      *
      * \param user_id The user requesting the Debug driver enabled status.
      *

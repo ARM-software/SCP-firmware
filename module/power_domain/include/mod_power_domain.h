@@ -29,7 +29,7 @@
  * \defgroup GroupPowerDomain Power Domains
  *
  * \details Support for querying and setting the power state of power domains
- * such as CPU, cluster and GPU power domains.
+ *      such as CPU, cluster and GPU power domains.
  *
  * \{
  */
@@ -842,8 +842,8 @@ struct pd_set_state_response {
      * \brief Copy of the "composite_state" request parameter
      *
      * \details The composite state that defines the power state that the power
-     * domain, target of the request, had to be put into and possibly the power
-     * states the ancestors of the power domain had to be put into.
+     *      domain, target of the request, had to be put into and possibly the
+     *      power states the ancestors of the power domain had to be put into.
      */
     uint32_t composite_state;
 };
@@ -860,8 +860,8 @@ struct pd_get_state_response {
      * \brief Copy of the "state" request parameter
      *
      * \details The power state of the power domain target of the request or
-     * the composite state of the power domain and its ancestors depending on
-     * the value of the "composite" request parameter.
+     *      the composite state of the power domain and its ancestors depending
+     *      on the value of the "composite" request parameter.
      */
     uint32_t state;
 };

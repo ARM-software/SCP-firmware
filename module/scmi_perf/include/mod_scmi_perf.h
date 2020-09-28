@@ -152,7 +152,7 @@ enum scmi_perf_api_idx {
  * \details The SCMI policy handlers are weak definitions to allow a platform
  *      to implement a policy appropriate to that platform. The SCMI
  *      performance policy functions may be overridden in the
- * `product/<platform>/src` directory.
+ *      `product/<platform>/src` directory.
  *
  * \note The `level`/`range` values may be changed by the policy handlers.
  * \note See `product/juno/src/juno_scmi_clock.c` for an example policy

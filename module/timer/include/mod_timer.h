@@ -213,7 +213,7 @@ struct mod_timer_api {
      * \param dev_id Element identifier that identifies the timer device.
      * \param timestamp Timestamp to compare to the current timer value.
      * \param[out] remaining_ticks The remaining number of ticks before
-     * the timer value reaches the given timestamp.
+     *      the timer value reaches the given timestamp.
      *
      * \retval ::FWK_SUCCESS Operation succeeded.
      * \retval ::FWK_E_PARAM The remaining_ticks pointer was invalid.

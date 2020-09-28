@@ -26,7 +26,7 @@
  * \brief Provides an API to access firmware image partitions.
  *
  * \details This module provides a table of descriptors that each describe a
- * block of firmware image entry in the underlying storage.
+ *      block of firmware image entry in the underlying storage.
  *
  * \{
  */

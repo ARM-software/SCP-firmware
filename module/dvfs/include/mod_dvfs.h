@@ -108,7 +108,7 @@ struct mod_dvfs_domain_config {
     /*! \brief Allow inexact performance levels.
      *
      * \note It will set any immediately higher than the requested value if it
-     * is possible, otherwise it will set the highest possible.
+     *      is possible, otherwise it will set the highest possible.
      */
     bool approximate_level;
 };
