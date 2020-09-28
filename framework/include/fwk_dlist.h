@@ -15,12 +15,12 @@
 
 /*!
  * \addtogroup GroupLibFramework Framework
- * @{
+ * \{
  */
 
 /*!
  * \addtogroup GroupLinkedList Linked Lists
- * @{
+ * \{
  */
 
 /*!
@@ -112,11 +112,11 @@ void __fwk_dlist_insert(
  */
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* FWK_DLIST_H */

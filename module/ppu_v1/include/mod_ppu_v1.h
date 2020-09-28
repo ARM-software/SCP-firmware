@@ -21,12 +21,12 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupModulePPUv1 PPUv1 Driver
- * @{
+ * \{
  */
 
 /*!
@@ -181,11 +181,11 @@ struct ppu_v1_boot_api {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_PPU_V1_H */

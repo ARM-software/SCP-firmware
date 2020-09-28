@@ -17,7 +17,7 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
@@ -25,7 +25,7 @@
  *
  * \details Driver module for the generic timer.
  *
- * @{
+ * \{
  */
 
 /*!
@@ -64,11 +64,11 @@ struct fwk_time_driver mod_gtimer_driver(
     const struct mod_gtimer_dev_config *cfg);
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_GTIMER_H */

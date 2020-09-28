@@ -15,13 +15,13 @@
 
 /*!
  * \addtogroup GroupLibFramework Framework
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupThread Threading
  *
- * @{
+ * \{
  */
 
 /*!
@@ -94,11 +94,11 @@ int fwk_thread_put_event_and_wait(
 #endif
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* FWK_MULTI_THREAD_H */

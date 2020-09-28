@@ -15,7 +15,7 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
@@ -23,7 +23,7 @@
  *
  * \details A driver for clock devices that are part of a PIK.
  *
- * @{
+ * \{
  */
 
 /*!
@@ -280,11 +280,11 @@ struct mod_pik_clock_dev_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_PIK_CLOCK_H */

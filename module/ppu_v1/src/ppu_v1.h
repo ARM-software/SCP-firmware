@@ -10,7 +10,7 @@
 
 /*!
  * \cond
- * @{
+ * \{
  */
 
 #include <mod_timer.h>
@@ -476,7 +476,7 @@ unsigned int ppu_v1_get_arch_id(struct ppu_v1_reg *ppu);
 
 /*!
  * \endcond
- * @}
+ * \}
  */
 
 #endif  /* PPU_V1_H */

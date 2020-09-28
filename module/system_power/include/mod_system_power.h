@@ -23,7 +23,7 @@
  * \ingroup GroupModules Modules
  * \defgroup GroupSystemPower System Power Support
  *
- * @{
+ * \{
  */
 
 /*! Additional system_power power states */
@@ -164,7 +164,7 @@ static const fwk_id_t mod_system_power_api_id_pd_driver_input =
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_SYSTEM_POWER_H */

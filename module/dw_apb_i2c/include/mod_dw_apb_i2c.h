@@ -18,14 +18,14 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupModuleI2CController I2C Controller
  *
  * \brief Driver for I2C device.
- * @{
+ * \{
  */
 
 /*!
@@ -55,11 +55,11 @@ static const fwk_id_t mod_dw_apb_i2c_api_id_driver = FWK_ID_API_INIT(
     FWK_MODULE_IDX_DW_APB_I2C, MOD_DW_APB_I2C_API_IDX_DRIVER);
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_DW_APB_I2C_H */

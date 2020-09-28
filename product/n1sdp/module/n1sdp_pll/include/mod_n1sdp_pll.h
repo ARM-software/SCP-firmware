@@ -14,7 +14,7 @@
 
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules
- * @{
+ * \{
  */
 
 /*!
@@ -22,7 +22,7 @@
  *
  * \details A driver for PLL hardware in N1SDP product.
  *
- * @{
+ * \{
  */
 
 /*! Timeout value to wait for a PLL to lock. */
@@ -95,11 +95,11 @@ struct n1sdp_pll_module_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_N1SDP_PLL_H */

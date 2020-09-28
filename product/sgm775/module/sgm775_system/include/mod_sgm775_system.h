@@ -13,13 +13,13 @@
 
 /*!
  * \addtogroup GroupSGM775Module SGM775 Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupSGM775System SGM775 System Support
  *
- * @{
+ * \{
  */
 
 /*!
@@ -34,11 +34,11 @@ enum mod_sgm775_system_api_idx {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_SGM775_SYSTEM_H */

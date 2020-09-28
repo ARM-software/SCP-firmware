@@ -18,7 +18,7 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
@@ -27,7 +27,7 @@
  * \details Provides a framework for the structured storage of data that is
  *      shared between the SCP Firmware and application processor firmware.
  *
- * @{
+ * \{
  */
 
 /*
@@ -227,11 +227,11 @@ struct mod_sds_api {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_SDS_H */

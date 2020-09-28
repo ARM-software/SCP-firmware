@@ -16,7 +16,7 @@
 #include <stdint.h>
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules
- * @{
+ * \{
  */
 
 /*!
@@ -63,11 +63,11 @@ struct mod_n1sdp_scp2pcc_api {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_N1SDP_SCP2PCC_H */

@@ -17,12 +17,12 @@
 
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupN1SDPScmiAgent SCMI Agent Support
- * @{
+ * \{
  */
 
 /*!
@@ -121,11 +121,11 @@ enum mod_scmi_agent_api_idx {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_SCMI_AGENT_H */

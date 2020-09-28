@@ -13,12 +13,12 @@
 
 /*!
  * \addtogroup GroupLibFramework Framework
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupStatus Return Codes
- * @{
+ * \{
  */
 
 /*! Success, request is pending */
@@ -91,11 +91,11 @@
 const char *fwk_status_str(int status);
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* FWK_STATUS_H */

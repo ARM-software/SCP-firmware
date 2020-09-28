@@ -15,7 +15,7 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
@@ -23,7 +23,7 @@
  *
  * \details A service module providing support for loading firmware images.
  *
- * @{
+ * \{
  */
 
 /*!
@@ -98,11 +98,11 @@ struct mod_bootloader_api {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_BOOTLOADER_H */

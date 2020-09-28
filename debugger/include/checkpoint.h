@@ -12,7 +12,7 @@
 
 /*!
  * \addtogroup GroupCLIDebugger
- * @{
+ * \{
  */
 
 /*!
@@ -162,7 +162,7 @@ void checkpoint(checkpoint_st *c, char *file, int32_t line, char *tag);
 #endif
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* CHECKPOINT_H */

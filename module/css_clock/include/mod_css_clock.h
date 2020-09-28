@@ -16,7 +16,7 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
@@ -24,7 +24,7 @@
  *
  * \details A driver for Arm Compute Sub-System clock devices.
  *
- * @{
+ * \{
  */
 
 /*!
@@ -184,11 +184,11 @@ struct mod_css_clock_direct_api {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_CSS_CLOCK_H */

@@ -15,12 +15,12 @@
 
 /*!
  * \addtogroup GroupTC0Module TC0 Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupTC0System TC0 System Support
- * @{
+ * \{
  */
 
 /*!
@@ -54,11 +54,11 @@ enum mod_tc0_system_api_idx {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_TC0_SYSTEM_H */

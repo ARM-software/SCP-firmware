@@ -16,7 +16,7 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
@@ -25,7 +25,7 @@
  * \brief Arm Coherent Mesh Network (CMN) BOOKER module
  *
  * \details This module adds support for the CMN_BOOKER interconnect
- * @{
+ * \{
  */
 
 /*!
@@ -131,11 +131,11 @@ struct mod_cmn_booker_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_CMN_BOOKER_H */

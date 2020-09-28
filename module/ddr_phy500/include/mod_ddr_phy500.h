@@ -19,12 +19,12 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
  * \addtogroup GroupDDR DDR PHY500 Driver
- * @{
+ * \{
  */
 
 /*!
@@ -33,7 +33,7 @@
 struct mod_ddr_phy500_reg {
     /*!
      * \cond
-     * @{
+     * \{
      */
     FWK_RW  uint32_t      INIT_COMPLETE;
     FWK_RW  uint32_t      MEMORY_WIDTH;
@@ -61,7 +61,7 @@ struct mod_ddr_phy500_reg {
     FWK_RW  uint32_t      T_CTRL_UPD_MIN;
     /*!
      * \endcond
-     * @}
+     * \}
      */
 };
 
@@ -98,11 +98,11 @@ struct mod_ddr_phy500_module_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_DDR_PHY500_H */

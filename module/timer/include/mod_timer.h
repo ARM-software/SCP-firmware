@@ -19,7 +19,7 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
@@ -30,7 +30,7 @@
  * \details Provides functionality for setting timer events, tracking elapsed
  *      time, and synchronously delaying execution.
  *
- * @{
+ * \{
  */
 
 /*!
@@ -310,11 +310,11 @@ struct mod_timer_alarm_api {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_TIMER_H */

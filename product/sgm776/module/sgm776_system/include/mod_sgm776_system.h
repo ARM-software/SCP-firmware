@@ -13,13 +13,13 @@
 
 /*!
  * \addtogroup GroupSGM776Module SGM776 Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupSGM776System SGM776 System Support
  *
- * @{
+ * \{
  */
 
 /*!
@@ -34,11 +34,11 @@ enum mod_sgm776_system_api_idx {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_SGM776_SYSTEM_H */

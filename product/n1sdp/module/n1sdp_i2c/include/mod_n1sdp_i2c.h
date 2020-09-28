@@ -22,7 +22,7 @@
 
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules
- * @{
+ * \{
  */
 
 /*!
@@ -245,11 +245,11 @@ static const fwk_id_t mod_n1sdp_i2c_notification_id_slave_error =
                              MOD_N1SDP_I2C_NOTIFICATION_IDX_ERROR);
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_N1SDP_I2C_H */

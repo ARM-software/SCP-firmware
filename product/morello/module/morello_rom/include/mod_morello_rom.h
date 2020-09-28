@@ -14,12 +14,12 @@
 
 /*!
  * \addtogroup GroupMORELLOModule MORELLO Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupMORELLORom MORELLO SCP ROM Support
- * @{
+ * \{
  */
 
 /*!
@@ -34,11 +34,11 @@ struct morello_rom_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_MORELLO_ROM_H */

@@ -21,7 +21,7 @@
 /*!
  * \ingroup GroupMSYSModule
  * \defgroup GroupMSYSROM ROM Support
- * @{
+ * \{
  */
 
 /*!
@@ -58,11 +58,11 @@ static const fwk_id_t mod_msys_rom_notification_id_systop =
                              MOD_MSYS_ROM_NOTIFICATION_IDX_POWER_SYSTOP);
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_MSYS_ROM_H */

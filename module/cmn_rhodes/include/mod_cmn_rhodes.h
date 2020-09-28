@@ -16,7 +16,7 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
@@ -25,7 +25,7 @@
  * \brief Arm Coherent Mesh Network (CMN) RHODES module
  *
  * \details This module adds support for the CMN_RHODES interconnect
- * @{
+ * \{
  */
 
 /*! Maximum CCIX Protocol Links supported by CCIX Gateway (CXG) */
@@ -258,11 +258,11 @@ struct mod_cmn_rhodes_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_CMN_RHODES_H */

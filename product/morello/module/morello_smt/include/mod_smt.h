@@ -20,7 +20,7 @@
  * \details These policies define attributes that affect how the channel is
  * treated by the SMT component.
  *
- * @{
+ * \{
  */
 
 /*! No policies */
@@ -33,7 +33,7 @@
 #define MOD_SMT_POLICY_INIT_MAILBOX ((uint32_t)(1 << 1))
 
 /*!
- * @}
+ * \}
  */
 
 /*!

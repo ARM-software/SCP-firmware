@@ -17,12 +17,12 @@
 
 /*!
  * \addtogroup GroupLibFramework Framework
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupArch Architecture Interface
- * @{
+ * \{
  */
 
 /*!
@@ -215,11 +215,11 @@ struct fwk_arch_init_driver {
 int fwk_arch_init(const struct fwk_arch_init_driver *driver);
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* FWK_ARCH_H */

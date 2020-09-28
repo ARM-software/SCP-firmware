@@ -13,12 +13,12 @@
 
 /*!
  * \addtogroup GroupMORELLOModule MORELLO Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupMORELLOMCPSystem MORELLO MCP System Support
- * @{
+ * \{
  */
 
 /*!
@@ -32,11 +32,11 @@ enum mcp_system_event {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_MORELLO_MCP_SYSTEM_H */

@@ -13,12 +13,12 @@
 
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupN1SDPMCPSystem N1SDP MCP System Support
- * @{
+ * \{
  */
 
 /*!
@@ -32,11 +32,11 @@ enum mcp_system_event {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_N1SDP_MCP_SYSTEM_H */

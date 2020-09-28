@@ -15,12 +15,12 @@
 
 /*!
  * \addtogroup GroupN1SDPModule N1SDP Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupModuleN1SDPRemotePD N1SDP Remote PD Management Driver
- * @{
+ * \{
  */
 
 /*!
@@ -43,11 +43,11 @@ enum mod_n1sdp_remote_pd_api {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_N1SDP_REMOTE_PD_H */

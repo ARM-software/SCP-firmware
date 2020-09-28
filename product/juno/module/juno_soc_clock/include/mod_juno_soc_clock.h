@@ -15,7 +15,7 @@
 
 /*!
  * \addtogroup GroupJunoModule Juno Product Modules
- * @{
+ * \{
  */
 
 /*!
@@ -23,7 +23,7 @@
  *
  * \details A driver for clocks of the Juno SoC.
  *
- * @{
+ * \{
  */
 
 /*!
@@ -52,11 +52,11 @@ struct mod_juno_soc_clock_dev_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_JUNO_SOC_CLOCK_H */

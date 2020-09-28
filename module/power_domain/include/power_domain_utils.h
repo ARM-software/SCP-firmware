@@ -13,7 +13,7 @@
 
 /*!
  * \addtogroup GroupPowerDomain
- * @{
+ * \{
  */
 
 #include <fwk_element.h>
@@ -55,7 +55,7 @@ const struct fwk_element *create_power_domain_element_table(
     size_t static_table_size);
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* POWER_DOMAIN_UTILS_H */

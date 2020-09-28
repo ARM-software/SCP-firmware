@@ -13,7 +13,7 @@
 
 /*!
  * \addtogroup GroupSYNQUACERModule SYNQUACER Product Modules
- * @{
+ * \{
  */
 
 /*!
@@ -23,7 +23,7 @@
  *
  * \details This module implements a device driver for the F_UART3
  *
- * @{
+ * \{
  */
 
 /*!
@@ -59,11 +59,11 @@ struct mod_f_uart3_element_cfg {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_F_UART3_H */

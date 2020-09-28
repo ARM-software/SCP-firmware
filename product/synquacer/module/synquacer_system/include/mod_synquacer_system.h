@@ -12,7 +12,7 @@
 
 /*!
  * \addtogroup GroupSYNQUACERModule SYNQUACER Product Modules
- * @{
+ * \{
  */
 
 /*!
@@ -22,7 +22,7 @@
  *
  * \details This module implements a SynQuacer system driver
  *
- * @{
+ * \{
  */
 
 /*!
@@ -78,11 +78,11 @@ struct synquacer_system_ctx {
 extern struct synquacer_system_ctx synquacer_system_ctx;
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_SYNQUACER_SYSTEM_H */

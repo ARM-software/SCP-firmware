@@ -22,7 +22,7 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
@@ -30,7 +30,7 @@
  *
  * \details Support for transmitting and receiving data through I2C Bus
  *     peripherals
- * @{
+ * \{
  */
 
 /*!
@@ -284,11 +284,11 @@ static const fwk_id_t mod_i2c_event_id_request_tx_rx = FWK_ID_EVENT_INIT(
  */
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_I2C_H */

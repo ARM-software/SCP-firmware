@@ -14,14 +14,14 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupModuleRegSensor Register Sensor Driver
  *
  * \brief Driver for simple, register-based sensors.
- * @{
+ * \{
  */
 
 /*! \brief Element configuration */
@@ -34,11 +34,11 @@ struct mod_reg_sensor_dev_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_REG_SENSOR_H */

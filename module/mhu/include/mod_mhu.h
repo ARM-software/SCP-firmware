@@ -17,12 +17,12 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupMHU Message Handling Unit (MHU) Driver
- * @{
+ * \{
  */
 
 /*!
@@ -44,11 +44,11 @@ struct mod_mhu_device_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_MHU_H */

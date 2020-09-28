@@ -18,12 +18,12 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupModulePPUv0 PPUv0 Driver
- * @{
+ * \{
  */
 
 /*!
@@ -80,11 +80,11 @@ struct mod_ppu_v0_pd_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_PPU_V0_H */

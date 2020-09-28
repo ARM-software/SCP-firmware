@@ -22,7 +22,7 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
@@ -31,7 +31,7 @@
  * \details Support for querying and setting the power state of power domains
  * such as CPU, cluster and GPU power domains.
  *
- * @{
+ * \{
  */
 
 /*!
@@ -886,11 +886,11 @@ static const fwk_id_t mod_pd_public_event_id_get_state =
  */
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_POWER_DOMAIN_H */

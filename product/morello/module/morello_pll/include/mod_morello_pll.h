@@ -14,7 +14,7 @@
 
 /*!
  * \addtogroup GroupMORELLOModule MORELLO Product Modules
- * @{
+ * \{
  */
 
 /*!
@@ -22,7 +22,7 @@
  *
  * \details A driver for PLL hardware in MORELLO product.
  *
- * @{
+ * \{
  */
 
 /*! Timeout value to wait for a PLL to lock. */
@@ -95,11 +95,11 @@ struct morello_pll_module_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_MORELLO_PLL_H */

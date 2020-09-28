@@ -17,7 +17,7 @@
 
 /*!
  * \addtogroup GroupSYNQUACERModule SYNQUACER Product Modules
- * @{
+ * \{
  */
 
 /*!
@@ -27,7 +27,7 @@
  *
  * \details This module implements a SCMI vendor extension protocol.
  *
- * @{
+ * \{
  */
 
 /*! SCMI protocol id for vendor extension message. */
@@ -99,11 +99,11 @@ struct scmi_vendor_ext_memory_info_get_resp {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* INTERNAL_SCMI_VENDOR_EXT_H */

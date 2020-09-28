@@ -21,12 +21,12 @@
 
 /*!
  * \addtogroup GroupSGM775Module SGM775 Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \addtogroup GroupSGM775_DMC SGM775 DMC-500 Driver
- * @{
+ * \{
  */
 
 /*!
@@ -35,7 +35,7 @@
 struct mod_sgm775_dmc500_reg {
     /*!
      * \cond
-     * @{
+     * \{
      */
     FWK_R   uint32_t SI0_SI_STATUS;
     FWK_R   uint32_t SI0_SI_INTERRUPT_STATUS;
@@ -404,9 +404,9 @@ struct mod_sgm775_dmc500_reg {
     FWK_R   uint32_t COMPONENT_ID_2;
     FWK_R   uint32_t COMPONENT_ID_3;
     /*!
-    * \endcond
-    * @}
-    */
+     * \endcond
+     * \}
+     */
 };
 
 /*!
@@ -463,11 +463,11 @@ struct mod_sgm775_dmc500_module_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_SGM775_DMC500_H */

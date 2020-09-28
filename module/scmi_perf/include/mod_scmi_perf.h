@@ -19,12 +19,12 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupSCMI_PERF SCMI Performance Domain Management Protocol
- * @{
+ * \{
  */
 
 /*!
@@ -232,15 +232,15 @@ int scmi_perf_limits_set_policy(
     fwk_id_t domain_id);
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* SCP_SCMI_PERF_H */

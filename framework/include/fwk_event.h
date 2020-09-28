@@ -21,12 +21,12 @@
 
 /*!
  * \addtogroup GroupLibFramework Framework
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupEvent Events
- * @{
+ * \{
  */
 
 /*!
@@ -99,11 +99,11 @@ struct fwk_event {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* FWK_EVENT_H */

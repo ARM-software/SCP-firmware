@@ -21,12 +21,12 @@
 
 /*!
  * \addtogroup GroupLibFramework Framework
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupModule Modules
- * @{
+ * \{
  */
 
 /*!
@@ -581,11 +581,11 @@ int fwk_module_adapter(const struct fwk_io_adapter **adapter, fwk_id_t id);
 void fwk_module_init(void);
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* FWK_MODULE_H */

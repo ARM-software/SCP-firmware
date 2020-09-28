@@ -15,12 +15,12 @@
 
 /*!
  * \addtogroup GroupModules Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupSCMI_PERF SCMI Sensor Management Protocol
- * @{
+ * \{
  */
 
 #define SCMI_PROTOCOL_VERSION_SENSOR UINT32_C(0x10000)
@@ -151,11 +151,11 @@ enum scmi_sensor_api_idx {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* INTERNAL_SCMI_SENSOR_H */

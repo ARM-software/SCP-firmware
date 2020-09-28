@@ -15,12 +15,12 @@
 
 /*!
  * \addtogroup GroupSGI575Module SGI575 Product Modules
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupSGI575System SGI575 System Support
- * @{
+ * \{
  */
 
 /*!
@@ -54,11 +54,11 @@ enum mod_sgi575_system_api_idx {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_SGI575_SYSTEM_H */

@@ -18,7 +18,7 @@
 
 /*!
  * \addtogroup GroupSYNQUACERModule SYNQUACER Product Modules
- * @{
+ * \{
  */
 
 /*!
@@ -32,7 +32,7 @@
  *     2) Synquacer needs special handling when PPU is set to OFF.
  *     3) need special handling for setting MOD_PD_TYPE_SYSTEM to OFF.
  *
- * @{
+ * \{
  */
 
 /*!
@@ -63,11 +63,11 @@ struct mod_ppu_v0_pd_config {
 };
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* MOD_PPU_V0_H */

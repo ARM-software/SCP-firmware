@@ -19,12 +19,12 @@
 
 /*!
  * \addtogroup GroupLibFramework Framework
- * @{
+ * \{
  */
 
 /*!
  * \defgroup GroupInterrupt Interrupt Management
- * @{
+ * \{
  */
 
 /*!
@@ -200,11 +200,11 @@ int fwk_interrupt_set_isr_param(unsigned int interrupt,
 int fwk_interrupt_get_current(unsigned int *interrupt);
 
 /*!
- * @}
+ * \}
  */
 
 /*!
- * @}
+ * \}
  */
 
 #endif /* FWK_INTERRUPT_H */
