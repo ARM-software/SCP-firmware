@@ -171,8 +171,9 @@ struct mod_sds_api {
      * \param size Size, in bytes, of the data to be written.
      *
      * \retval ::FWK_SUCCESS Data was successfully written to the structure.
-     * \retval ::FWK_E_PARAM The data pointer parameter was NULL.
-     * \retval ::FWK_E_PARAM An invalid structure identifier was provided.
+     * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+     *      - The `data` parameter was a null pointer value.
+     *      - An invalid structure identifier was provided.
      * \retval ::FWK_E_RANGE The field extends outside of the structure bounds.
      */
     int (*struct_write)(uint32_t structure_id, unsigned int offset,
@@ -205,8 +206,9 @@ struct mod_sds_api {
      *       parameter.
      *
      * \retval ::FWK_SUCCESS Data was successfully read from the structure.
-     * \retval ::FWK_E_PARAM The data pointer parameter was NULL.
-     * \retval ::FWK_E_PARAM An invalid structure identifier was provided.
+     * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+     *      - The `data` parameter was a null pointer value.
+     *      - An invalid structure identifier was provided.
      * \retval ::FWK_E_RANGE The field extends outside of the structure bounds.
      */
     int (*struct_read)(uint32_t structure_id, unsigned int offset, void *data,

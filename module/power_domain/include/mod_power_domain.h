@@ -415,8 +415,9 @@ struct mod_pd_public_api {
      * \retval ::FWK_SUCCESS The type of the power domain was returned.
      * \retval ::FWK_E_INIT The module has not been initialized.
      * \retval ::FWK_E_STATE The power domain module is in an invalid state.
-     * \retval ::FWK_E_PARAM The power domain identifier is unknown.
-     * \retval ::FWK_E_PARAM The pointer 'type' is equal to NULL.
+     * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+     *      - The `pd_id` parameter was not a valid system entity identifier.
+     *      - The `type` parameter was a null pointer value.
      */
     int (*get_domain_type)(fwk_id_t pd_id, enum mod_pd_type *type);
 
@@ -433,8 +434,9 @@ struct mod_pd_public_api {
      *      returned.
      * \retval ::FWK_E_INIT The module has not been initialized.
      * \retval ::FWK_E_STATE The power domain module is in an invalid state.
-     * \retval ::FWK_E_PARAM The power domain identifier is unknown.
-     * \retval ::FWK_E_PARAM The pointer 'parent_pd_id' is equal to NULL.
+     * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+     *      - The `pd_id` parameter was not a valid system entity identifier.
+     *      - The `parent_pd_id` parameter was a null pointer value.
      */
     int (*get_domain_parent_id)(fwk_id_t pd_id, fwk_id_t *parent_pd_id);
 };
@@ -458,8 +460,9 @@ struct mod_pd_restricted_api {
      * \retval ::FWK_SUCCESS The type of the power domain was returned.
      * \retval ::FWK_E_INIT The module has not been initialized.
      * \retval ::FWK_E_STATE The power domain module is in an invalid state.
-     * \retval ::FWK_E_PARAM The power domain identifier is unknown.
-     * \retval ::FWK_E_PARAM The pointer 'type' is equal to NULL.
+     * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+     *      - The `pd_id` parameter was not a valid system entity identifier.
+     *      - The `type` parameter was a null pointer value.
      */
     int (*get_domain_type)(fwk_id_t pd_id, enum mod_pd_type *type);
 
@@ -476,8 +479,9 @@ struct mod_pd_restricted_api {
      *      returned.
      * \retval ::FWK_E_INIT The module has not been initialized.
      * \retval ::FWK_E_STATE The power domain module is in an invalid state.
-     * \retval ::FWK_E_PARAM The power domain identifier is unknown.
-     * \retval ::FWK_E_PARAM The pointer 'parent_pd_id' is equal to NULL.
+     * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+     *      - The `pd_id` parameter was not a valid system entity identifier.
+     *      - The `parent_pd_id` parameter was a null pointer value.
      */
     int (*get_domain_parent_id)(fwk_id_t pd_id, fwk_id_t *parent_pd_id);
 
@@ -541,8 +545,9 @@ struct mod_pd_restricted_api {
      * \retval ::FWK_E_ACCESS Invalid access, the framework has rejected the
      *      call to the API.
      * \retval ::FWK_E_HANDLER The function is not called from a thread.
-     * \retval ::FWK_E_PARAM The power domain identifier is unknown.
-     * \retval ::FWK_E_PARAM The pointer 'state' is equal to NULL.
+     * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+     *      - The `pd_id` parameter was not a valid system entity identifier.
+     *      - The `state` parameter was a null pointer value.
      */
     int (*get_state)(fwk_id_t pd_id, unsigned int *state);
 

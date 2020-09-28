@@ -132,8 +132,10 @@ struct mod_smt_to_transport_api {
      *      is secure, or false if it is non-secure.
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
-     * \retval ::FWK_E_PARAM The channel_id parameter is invalid.
-     * \retval ::FWK_E_PARAM The secure parameter is NULL.
+     * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+     *      - The `channel_id` parameter was not a valid system entity
+     *        identifier.
+     *      - The `secure` parameter was a null pointer value.
      * \return One of the standard error codes for implementation-defined
      *      errors.
      */
@@ -146,8 +148,10 @@ struct mod_smt_to_transport_api {
      * \param[out] size Maximum payload size in bytes.
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
-     * \retval ::FWK_E_PARAM The channel_id parameter is invalid.
-     * \retval ::FWK_E_PARAM The size parameter is NULL.
+     * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+     *      - The `channel_id` parameter was not a valid system entity
+     *        identifier.
+     *      - The `size` parameter was a null pointer value.
      * \return One of the standard error codes for implementation-defined
      *      errors.
      */
@@ -160,8 +164,10 @@ struct mod_smt_to_transport_api {
      * \param[out] message_header Pointer to the message header.
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
-     * \retval ::FWK_E_PARAM The channel_id parameter is invalid.
-     * \retval ::FWK_E_PARAM The message_header parameter is NULL.
+     * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+     *      - The `channel_id` parameter was not a valid system entity
+     *        identifier.
+     *      - The `message_header` parameter was a null pointer value.
      * \retval ::FWK_E_ACCESS No message is available to read.
      * \return One of the standard error codes for implementation-defined
      *      errors.
@@ -177,8 +183,10 @@ struct mod_smt_to_transport_api {
      *      parameter should be ignored.
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
-     * \retval ::FWK_E_PARAM The channel_id parameter is invalid.
-     * \retval ::FWK_E_PARAM The payload parameter is NULL.
+     * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+     *      - The `channel_id` parameter was not a valid system entity
+     *        identifier.
+     *      - The `payload` parameter was a null pointer value.
      * \retval ::FWK_E_ACCESS No message is available to read.
      * \return One of the standard error codes for implementation-defined
      *      errors.
@@ -195,9 +203,11 @@ struct mod_smt_to_transport_api {
      * \param size Size of the payload data.
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
-     * \retval ::FWK_E_PARAM The payload parameter is NULL.
-     * \retval ::FWK_E_PARAM The offset and size provided are not within the
-     *      bounds of the payload area.
+     * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+     *      - The `channel_id` parameter was not a valid system entity
+     *        identifier.
+     *      - The offset and isze provided are not within the bounds of the
+     *        payload area.
      * \return One of the standard error codes for implementation-defined
      *      errors.
      */
@@ -213,9 +223,10 @@ struct mod_smt_to_transport_api {
      * \param size Size of the payload source.
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
-     * \retval ::FWK_E_PARAM The channel_id parameter is invalid.
-     * \retval ::FWK_E_PARAM The size parameter is less than the size of one
-     *      payload entry.
+     * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+     *      - The `channel_id` parameter was not a valid system entity
+     *        identifier.
+     *      - The size given is less than the size of one payload entry.
      * \retval ::FWK_E_ACCESS No message is available to respond to.
      * \return One of the standard error codes for implementation-defined
      *      errors.
@@ -248,8 +259,8 @@ struct mod_smt_from_transport_api {
      * \param service_id Service identifier.
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
-     * \retval ::FWK_E_PARAM The channel_id parameter is invalid.
-     * \retval ::FWK_E_PARAM The secure parameter is NULL.
+     * \retval ::FWK_E_PARAM The `service_id` parameter is not a valid system
+     *      entity identifier.
      * \return One of the standard error codes for implementation-defined
      *      errors.
      */

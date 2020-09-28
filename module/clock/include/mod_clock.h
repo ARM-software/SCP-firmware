@@ -422,8 +422,9 @@ struct mod_clock_api {
      * \retval ::FWK_SUCCESS The operation succeeded.
      * \retval ::FWK_PENDING The request is pending. The requested rate will be
      *      provided via a response event.
-     * \retval ::FWK_E_PARAM The clock identifier was invalid.
-     * \retval ::FWK_E_PARAM The rate pointer was NULL.
+     * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+     *      - The `clock_id` parameter was not a valid system entity identifier.
+     *      - The `rate` parameter was a null pointer value.
      * \retval ::FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
      *      supported.
      * \return One of the standard framework error codes.
@@ -440,8 +441,9 @@ struct mod_clock_api {
      * \param[out] rate The rate, in Hertz, corresponding to the index.
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
-     * \retval ::FWK_E_PARAM The clock identifier was invalid.
-     * \retval ::FWK_E_PARAM The rate pointer was NULL.
+     * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+     *      - The `clock_id` parameter was not a valid system entity identifier.
+     *      - The `rate` parameter was a null pointer value.
      * \return One of the standard framework error codes.
      */
     int (*get_rate_from_index)(fwk_id_t clock_id, unsigned int rate_index,
@@ -474,8 +476,9 @@ struct mod_clock_api {
      * \retval ::FWK_SUCCESS The operation succeeded.
      * \retval ::FWK_PENDING The request is pending. The requested state will be
      *      provided via a response event.
-     * \retval ::FWK_E_PARAM The clock identifier was invalid.
-     * \retval ::FWK_E_PARAM The state pointer was NULL.
+     * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+     *      - The `clock_id` parameter was not a valid system entity identifier.
+     *      - The `state` parameter was a null pointer value.
      * \retval ::FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
      *      supported.
      * \return One of the standard framework error codes.
@@ -490,8 +493,9 @@ struct mod_clock_api {
      * \param[out] info The clock device properties.
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
-     * \retval ::FWK_E_PARAM The clock identifier was invalid.
-     * \retval ::FWK_E_PARAM The info pointer was NULL.
+     * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+     *      - The `clock_id` parameter was not a valid system entity identifier.
+     *      - The `info` parameter was a null pointer value.
      * \return One of the standard framework error codes.
      */
     int (*get_info)(fwk_id_t clock_id, struct mod_clock_info *info);

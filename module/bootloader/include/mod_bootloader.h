@@ -81,18 +81,16 @@ struct mod_bootloader_api {
      * \retval ::FWK_SUCCESS The RAM Firmware image was copied successfully.
      * \retval ::FWK_E_ALIGN The given image offset is not properly aligned.
      * \retval ::FWK_E_DATA The image did not pass checksum validation.
-     * \retval ::FWK_E_PARAM The config structure pointer is invalid.
-     * \retval ::FWK_E_PARAM One or more config structure fields are invalid.
-     * \retval ::FWK_E_SIZE The given image size is below the minimum possible
-     *      size.
-     * \retval ::FWK_E_SIZE The image is too large for the destination memory
-     *      area.
-     * \retval ::FWK_E_SIZE The given image offset is beyond the source memory
-     *      area.
-     * \retval ::FWK_E_SIZE The header's size field does not match the given
-     *      size.
-     * \retval ::FWK_E_SIZE Part of the image lies outside of the source
-     *      memory area.
+     * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+     *      - The image source address is invalid.
+     *      - The image destination address is invalid.
+     *      - The image size is invalid.
+     * \retval ::FWK_E_SIZE A size-related issue was encountered:
+     *      - The given image size is below the minimum possible size.
+     *      - The image is too large for the destination memory area.
+     *      - The given image offset is beyond the source memory area.
+     *      - The header's size field does not match the given size.
+     *      - Part of the image lies outside of the source memory area.
      */
     int (*load_image)(void);
 };

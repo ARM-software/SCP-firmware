@@ -76,9 +76,9 @@ int fwk_thread_create(fwk_id_t id);
  *
  * \retval ::FWK_SUCCESS The event was successfully processed.
  * \retval ::FWK_E_STATE The execution is not started.
- * \retval ::FWK_E_PARAM One or more of the parameters were invalid.
- * \retval ::FWK_E_PARAM One or more fields in the \p event parameter were
- *      invalid.
+ * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+ *      - The `event` parameter was a null pointer value.
+ *      - One or more fields of the event were invalid.
  * \retval ::FWK_E_ACCESS The API is called from an ISR, called from the common
  *      thread, or the event targets the calling thread.
  */

@@ -564,8 +564,9 @@ int fwk_module_bind(fwk_id_t target_id, fwk_id_t api_id, const void *api);
  * \return Status code representing the result of the operation.
  *
  * \retval ::FWK_SUCCESS The operation succeeded.
- * \retval ::FWK_E_PARAM The `adapter` parameter was a null pointer value.
- * \retval ::FWK_E_PARAM The `id` parameter did not resolve to a valid entity.
+ * \retval ::FWK_E_PARAM An invalid parameter was encountered:
+ *      - The `adapter` parameter was a null pointer value.
+ *      - The `id` parameter did not resolve to a valid entity.
  */
 int fwk_module_adapter(const struct fwk_io_adapter **adapter, fwk_id_t id);
 
