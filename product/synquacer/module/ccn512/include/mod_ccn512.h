@@ -36,7 +36,6 @@
 typedef struct {
     /*!
      * \cond
-     * \{
      */
     ccn5xx_mn_reg_t MN_ID_34;
     ccn5xx_dbg_reg_t DEBUG_ID_34;
@@ -94,7 +93,6 @@ typedef struct {
     ccn5xx_rni_reg_t RNI_ID_28;
     /*!
      * \endcond
-     * \}
      */
 } ccn512_reg_t;
 

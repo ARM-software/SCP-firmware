@@ -88,8 +88,4 @@ struct mod_system_pll_dev_config {
  * \}
  */
 
-/*!
- * \}
- */
-
 #endif /* MOD_SYSTEM_PLL_H */

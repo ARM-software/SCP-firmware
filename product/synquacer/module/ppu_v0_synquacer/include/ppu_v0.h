@@ -10,7 +10,6 @@
 
 /*!
  * \cond
- * \{
  */
 
 #include <fwk_macros.h>
@@ -142,7 +141,6 @@ int ppu_v0_get_power_mode(struct ppu_v0_reg *ppu, enum ppu_v0_mode *mode);
 
 /*!
  * \endcond
- * \}
  */
 
 #endif /* PPU_V0_H */

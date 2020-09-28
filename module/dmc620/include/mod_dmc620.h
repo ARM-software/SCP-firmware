@@ -44,7 +44,6 @@
 struct mod_dmc620_access_address_next {
     /*!
      * \cond
-     * \{
      */
     FWK_RW    uint32_t    MIN_31_00;
     FWK_RW    uint32_t    MIN_43_32;
@@ -52,7 +51,6 @@ struct mod_dmc620_access_address_next {
     FWK_RW    uint32_t    MAX_43_32;
     /*!
      * \endcond
-     * \}
      */
 };
 
@@ -62,7 +60,6 @@ struct mod_dmc620_access_address_next {
 struct mod_dmc620_access_address_now {
     /*!
      * \cond
-     * \{
      */
     FWK_R   uint32_t    MIN_31_00;
     FWK_R   uint32_t    MIN_43_32;
@@ -70,7 +67,6 @@ struct mod_dmc620_access_address_now {
     FWK_R   uint32_t    MAX_43_32;
     /*!
      * \endcond
-     * \}
      */
 };
 
@@ -80,7 +76,6 @@ struct mod_dmc620_access_address_now {
 struct mod_dmc620_pmu_counter {
     /*!
      * \cond
-     * \{
      */
     FWK_RW uint32_t MASK_31_00;
     FWK_RW uint32_t MASK_63_32;
@@ -94,7 +89,6 @@ struct mod_dmc620_pmu_counter {
     uint32_t RESERVED2;
     /*!
      * \endcond
-     * \}
      */
 };
 
@@ -104,7 +98,6 @@ struct mod_dmc620_pmu_counter {
 struct mod_dmc620_reg {
     /*!
      * \cond
-     * \{
      */
     FWK_R   uint32_t    MEMC_STATUS;
     FWK_R   uint32_t    MEMC_CONFIG;
@@ -560,7 +553,6 @@ struct mod_dmc620_reg {
     FWK_R   uint32_t    COMPONENT_ID_3;
     /*!
      * \endcond
-     * \}
      */
 };
 
