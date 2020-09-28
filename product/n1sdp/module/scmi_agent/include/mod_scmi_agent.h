@@ -79,7 +79,7 @@ struct mod_scmi_agent_api {
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard error codes for implementation-defined
-     * errors.
+     *      errors.
      */
     int (*get_protocol_version)(fwk_id_t agent_id, uint32_t *version);
 
@@ -91,7 +91,7 @@ struct mod_scmi_agent_api {
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard error codes for implementation-defined
-     * errors.
+     *      errors.
      */
     int (*get_clock_status)(fwk_id_t agent_id, uint32_t *clock_status);
 
@@ -104,7 +104,7 @@ struct mod_scmi_agent_api {
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard error codes for implementation-defined
-     * errors.
+     *      errors.
      */
     int (*get_chipid_info)(fwk_id_t agent_id, uint8_t *multichip_mode,
                            uint8_t *chipid);

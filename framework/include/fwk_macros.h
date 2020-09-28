@@ -145,7 +145,7 @@
  * \param b The second value to compare.
  *
  * \note The __auto_type extension is used to normalize the types and to protect
- * against double evaluation.
+ *      against double evaluation.
  *
  * \return The smallest value from a and b. If both are equal, b is returned.
  */
@@ -164,7 +164,7 @@
  * \param b The second value to compare.
  *
  * \note The __auto_type extension is used to normalize the types and to protect
- * against double evaluation.
+ *      against double evaluation.
  *
  * \return The largest value from a and b. If both are equal, b is returned.
  */
@@ -179,10 +179,10 @@
  * \brief Firmware version in UINT32_T format
  *
  * \details The macro encodes a 'major, minor and patch' based version data
- * into a 32 bits value using the following schema:
- * [31:24] Major field
- * [23:16] Minor field
- *  [15:0] Patch field
+ *      into a 32 bits value using the following schema:
+ *      [31:24] Major field
+ *      [23:16] Minor field
+ *       [15:0] Patch field
  *
  * \return None.
  */

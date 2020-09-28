@@ -29,8 +29,7 @@
  *      Technical Reference Manual for details on the specific registers that
  *      are programmed here.
  *
- * \sa
- * https://developer.arm.com/docs/100568/latest/programmers-model/register-summary
+ * \sa https://developer.arm.com/docs/100568/latest/programmers-model/register-summary
  * \{
  */
 

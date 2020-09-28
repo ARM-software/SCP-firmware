@@ -18,7 +18,7 @@
  * \name Channel policies
  *
  * \details These policies define attributes that affect how the channel is
- * treated by the SMT component.
+ *      treated by the SMT component.
  *
  * \{
  */
@@ -96,7 +96,7 @@ struct mod_smt_driver_api {
      * \retval ::FWK_SUCCESS The operation succeeded
      * \retval ::FWK_E_PARAM The device_id parameter is invalid
      * \return One of the standard error codes for implementation-defined
-     * errors
+     *      errors
      */
     int (*raise_interrupt)(fwk_id_t device_id);
 };
@@ -114,14 +114,14 @@ struct mod_smt_driver_input_api {
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard error codes for implementation-defined
-     * errors.
+     *      errors.
      */
     int (*signal_message)(fwk_id_t channel_id);
 };
 
 /*!
  * \brief SMT transport  API.
- * SMT transport API for Non SCMI Shared Memory Transport messages
+ *      SMT transport API for Non SCMI Shared Memory Transport messages
  */
 struct mod_smt_to_transport_api {
     /*!
@@ -129,13 +129,13 @@ struct mod_smt_to_transport_api {
      *
      * \param channel_id Channel identifier.
      * \param[out] secure Channel security state. True if the channel
-     * is secure, or false if it is non-secure.
+     *      is secure, or false if it is non-secure.
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
      * \retval ::FWK_E_PARAM The channel_id parameter is invalid.
      * \retval ::FWK_E_PARAM The secure parameter is NULL.
      * \return One of the standard error codes for implementation-defined
-     * errors.
+     *      errors.
      */
     int (*get_secure)(fwk_id_t channel_id, bool *secure);
 
@@ -149,7 +149,7 @@ struct mod_smt_to_transport_api {
      * \retval ::FWK_E_PARAM The channel_id parameter is invalid.
      * \retval ::FWK_E_PARAM The size parameter is NULL.
      * \return One of the standard error codes for implementation-defined
-     * errors.
+     *      errors.
      */
     int (*get_max_payload_size)(fwk_id_t channel_id, size_t *size);
 
@@ -164,7 +164,7 @@ struct mod_smt_to_transport_api {
      * \retval ::FWK_E_PARAM The message_header parameter is NULL.
      * \retval ::FWK_E_ACCESS No message is available to read.
      * \return One of the standard error codes for implementation-defined
-     * errors.
+     *      errors.
      */
     int (*get_message_header)(fwk_id_t channel_id, uint32_t *message_header);
 
@@ -174,14 +174,14 @@ struct mod_smt_to_transport_api {
      * \param channel_id Channel identifier.
      * \param[out] payload Pointer to the payload.
      * \param[out] size Payload size. May be NULL, in which case the
-     * parameter should be ignored.
+     *      parameter should be ignored.
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
      * \retval ::FWK_E_PARAM The channel_id parameter is invalid.
      * \retval ::FWK_E_PARAM The payload parameter is NULL.
      * \retval ::FWK_E_ACCESS No message is available to read.
      * \return One of the standard error codes for implementation-defined
-     * errors.
+     *      errors.
      */
     int (*get_payload)(fwk_id_t channel_id, const void **payload,
                        size_t *size);
@@ -197,9 +197,9 @@ struct mod_smt_to_transport_api {
      * \retval ::FWK_SUCCESS The operation succeeded.
      * \retval ::FWK_E_PARAM The payload parameter is NULL.
      * \retval ::FWK_E_PARAM The offset and size provided are not within the
-     * bounds of the payload area.
+     *      bounds of the payload area.
      * \return One of the standard error codes for implementation-defined
-     * errors.
+     *      errors.
      */
     int (*write_payload)(fwk_id_t channel_id, size_t offset,
                          const void *payload, size_t size);
@@ -209,16 +209,16 @@ struct mod_smt_to_transport_api {
      *
      * \param channel_id Channel identifier.
      * \param payload Payload data to write, or NULL if a payload has already
-     * been written.
+     *      been written.
      * \param size Size of the payload source.
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
      * \retval ::FWK_E_PARAM The channel_id parameter is invalid.
      * \retval ::FWK_E_PARAM The size parameter is less than the size of one
-     * payload entry.
+     *      payload entry.
      * \retval ::FWK_E_ACCESS No message is available to respond to.
      * \return One of the standard error codes for implementation-defined
-     * errors.
+     *      errors.
      */
     int (*respond)(fwk_id_t channel_id, const void *payload, size_t size);
 };
@@ -230,14 +230,15 @@ struct mod_smt_to_transport_api {
 struct mod_smt_from_transport_api {
     /*!
      * \brief Signal to a service that a incoming message for it has incorrect
-     * length and payload size and so the incoming message has been dropped.
+     *      length and payload size and so the incoming message has been
+     *      dropped.
      *
      * \param service_id service identifier.
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
      * \retval ::FWK_E_PARAM The service_id parameter is invalid.
      * \return One of the standard error codes for implementation-defined
-     * errors.
+     *      errors.
      */
     int (*signal_error)(fwk_id_t service_id);
 
@@ -250,7 +251,7 @@ struct mod_smt_from_transport_api {
      * \retval ::FWK_E_PARAM The channel_id parameter is invalid.
      * \retval ::FWK_E_PARAM The secure parameter is NULL.
      * \return One of the standard error codes for implementation-defined
-     * errors.
+     *      errors.
      */
     int (*signal_message)(fwk_id_t service_id);
 };

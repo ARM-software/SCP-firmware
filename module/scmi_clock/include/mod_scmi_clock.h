@@ -114,7 +114,7 @@ struct mod_scmi_clock_config {
  * \details The SCMI policy handlers are weak definitions to allow a platform
  *      to implement a policy appropriate to that platform. The SCMI
  *      clock policy functions may be overridden in the
- * `product/<platform>/src` directory.
+ *      `product/<platform>/src` directory.
  *
  * \note The `rate`/`round_mode`/`state` values may be changed by the policy
  *      handlers.

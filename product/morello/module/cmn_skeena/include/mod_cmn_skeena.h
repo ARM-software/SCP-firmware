@@ -148,8 +148,8 @@ struct mod_cmn_skeena_config {
     /*!
      * \brief HN-F with CAL support flag
      * \details When set to true, enables HN-F with CAL support. This flag will
-     * be used only if HN-F is found to be connected to CAL (When connected to
-     * a CAL port, node id of HN-F will be a odd number).
+     *      be used only if HN-F is found to be connected to CAL (When connected
+     *      to a CAL port, node id of HN-F will be a odd number).
      */
     bool hnf_cal_mode;
 };
