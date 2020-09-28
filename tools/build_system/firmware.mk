@@ -83,13 +83,19 @@ FIRMWARE_DIR := $(PRODUCT_DIR)/$(FIRMWARE)
 TARGET := $(BIN_DIR)/$(FIRMWARE)
 TARGET_BIN := $(TARGET).bin
 TARGET_ELF := $(TARGET).elf
+TARGET_SREC := $(TARGET).srec
+ifeq ($(BS_LINKER),ARM)
+TARGET_GOAL := $(TARGET_BIN)
+else
+TARGET_GOAL := $(TARGET_SREC)
+endif
 
 vpath %.c $(FIRMWARE_DIR)
 vpath %.S $(FIRMWARE_DIR)
 vpath %.c $(PRODUCT_DIR)/src
 vpath %.S $(PRODUCT_DIR)/src
 
-goal: $(TARGET_BIN)
+goal: $(TARGET_GOAL)
 
 ifneq ($(BS_ARCH_CPU),host)
     ifeq ($(BS_LINKER),ARM)
@@ -335,4 +341,8 @@ $(TARGET_BIN): $(TARGET_ELF) | $$(@D)/
 	$(call show-action,BIN,$@)
 	$(OBJCOPY) $< $(OCFLAGS) $@
 	cp $@ $(BIN_DIR)/firmware.bin
+
+$(TARGET_SREC): $(TARGET_BIN)
+	$(call show-action,SREC,$@)
+	$(OBJCOPY) -O srec $(TARGET_ELF) $(basename $@).srec
 endif
