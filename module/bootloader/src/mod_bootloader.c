@@ -71,6 +71,8 @@ static int load_image(void)
 
     bool sds = false;
 
+    if (module_ctx.module_config == NULL)
+        return FWK_E_PARAM;
     if (module_ctx.module_config->source_base == 0)
         return FWK_E_PARAM;
     if (module_ctx.module_config->destination_base == 0)
