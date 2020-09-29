@@ -16,11 +16,12 @@ BS_FIRMWARE_MODULE_HEADERS_ONLY := \
 BS_FIRMWARE_MODULES := \
     pl011 \
     clock \
-    mscp_rom
+    bootloader \
+    isys_rom
 
 BS_FIRMWARE_SOURCES := \
     config_pl011.c \
     config_clock.c \
-    config_rddanielxlr_rom.c
+    config_bootloader.c
 
 include $(BS_DIR)/firmware.mk
