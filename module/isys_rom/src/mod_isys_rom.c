@@ -15,6 +15,8 @@
 #include <fwk_status.h>
 #include <fwk_thread.h>
 
+#include <fmw_cmsis.h>
+
 struct mod_isys_rom_ctx {
     const struct mod_bootloader_api *bootloader_api;
 } ctx;
@@ -72,6 +74,9 @@ static int mod_isys_rom_process_event(
     FWK_LOG_CRIT(
         "[ISYS-ROM] Failed to load RAM firmware image: %s",
         fwk_status_str(status));
+
+    while (1)
+        __WFI();
 
     return FWK_SUCCESS;
 }
