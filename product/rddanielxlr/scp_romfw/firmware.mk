@@ -20,13 +20,14 @@ BS_FIRMWARE_MODULES := \
     pcid \
     pl011 \
     clock \
-    mscp_rom \
+    bootloader \
+    isys_rom
 
 BS_FIRMWARE_SOURCES := \
     config_sid.c \
     config_system_info.c \
     config_pl011.c \
     config_clock.c \
-    config_scp_rom.c \
+    config_bootloader.c
 
 include $(BS_DIR)/firmware.mk
