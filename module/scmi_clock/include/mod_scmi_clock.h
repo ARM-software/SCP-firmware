@@ -69,6 +69,15 @@ struct mod_scmi_clock_device {
      *      that is defined by the \c clock module.
      */
     fwk_id_t element_id;
+
+    /*! \brief Startup clock status flag.
+     *
+     *  \details State of the clock at startup. If set, it specifies that
+     *       this clock starts running. This flag does not affect the actual
+     *       state of the clock, but it provides an indication for the initial
+     *       internal state map.
+     */
+    bool starts_enabled;
 };
 
 /*!
