@@ -8,33 +8,56 @@
  *     Memory management.
  */
 
+#include <fwk_assert.h>
 #include <fwk_mm.h>
 
 #include <stdlib.h>
 
 void *fwk_mm_alloc(size_t num, size_t size)
 {
+    void *ptr = malloc(num * size);
+
+    if (ptr == NULL)
+        fwk_trap();
+
+    return ptr;
+}
+
+void *fwk_mm_alloc_notrap(size_t num, size_t size)
+{
     return malloc(num * size);
 }
 
 void *fwk_mm_alloc_aligned(size_t alignment, size_t num, size_t size)
 {
-    return aligned_alloc(alignment, num * size);
+    void *ptr = aligned_alloc(alignment, num * size);
+
+    if (ptr == NULL)
+        fwk_trap();
+
+    return ptr;
 }
 
 void *fwk_mm_calloc(size_t num, size_t size)
 {
-    return calloc(num, size);
+    void *ptr = calloc(num, size);
+    if (ptr == NULL)
+        fwk_trap();
+
+    return ptr;
 }
 
 void *fwk_mm_calloc_aligned(size_t alignment, size_t num, size_t size)
 {
     void *ptr = fwk_mm_alloc_aligned(alignment, num, size);
 
-    if (ptr != NULL)
+    if (ptr != NULL) {
         memset(ptr, 0, num * size);
 
-    return ptr;
+        return ptr;
+    }
+
+    fwk_trap();
 }
 
 void *fwk_mm_realloc(void *ptr, size_t num, size_t size)
