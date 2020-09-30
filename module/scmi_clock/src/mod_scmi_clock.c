@@ -411,7 +411,9 @@ FWK_WEAK int mod_scmi_clock_config_set_policy(
     /* Pointer to a table of agent:clock states */
     static uint8_t *agent_clock_state = NULL;
 
-    unsigned int agent_id;
+    const struct mod_scmi_clock_agent *agent;
+
+    unsigned int agent_id, clock_id, idx;
     int status = FWK_SUCCESS;
     uint8_t clock_state;
 
@@ -427,6 +429,22 @@ FWK_WEAK int mod_scmi_clock_config_set_policy(
         /* Allocate table of clock reference counts */
         clock_count = fwk_mm_calloc(
             (unsigned int)scmi_clock_ctx.clock_devices, sizeof(uint32_t));
+
+        /* Set all clocks as running if required */
+        for (agent_id = 0;
+             agent_id < (unsigned int)scmi_clock_ctx.config->agent_count;
+             agent_id++) {
+            agent = &scmi_clock_ctx.agent_table[agent_id];
+            for (clock_id = 0; clock_id < (unsigned int)agent->device_count;
+                 clock_id++) {
+                if (agent->device_table[clock_id].starts_enabled) {
+                    idx = (agent_id * scmi_clock_ctx.clock_devices) + clock_id;
+                    agent_clock_state[idx] = MOD_CLOCK_STATE_RUNNING;
+
+                    clock_count[clock_id]++;
+                }
+            }
+        }
     }
 
     /*
