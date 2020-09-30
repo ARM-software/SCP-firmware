@@ -39,10 +39,7 @@
  *      for any object type with fundamental alignment.
  *
  * \details If the product of `num` and `size` is zero, the behavior of
- *      ::fwk_mm_alloc() is implementation-defined. For example, a null pointer
- *      may be returned. Alternatively, a non-null pointer may be returned; but
- *      such a pointer should not be dereferenced, and should be passed to
- *      ::fwk_mm_free() to avoid memory leaks.
+ *      ::fwk_mm_alloc() is implementation-defined.
  *
  * \note ::fwk_mm_alloc() is thread-safe: it behaves as though only accessing
  *      the memory locations visible through its argument, and not any static
@@ -65,10 +62,28 @@
  *      memory. To avoid a memory leak, the returned pointer must be
  *      deallocated with ::fwk_mm_free() or ::fwk_mm_realloc().
  *
- * \return On failure, returns a null pointer.
+ * \return On failure, traps.
  */
 void *fwk_mm_alloc(size_t num, size_t size) FWK_LEAF FWK_NOTHROW FWK_ALLOC
     FWK_ALLOC_SIZE2(1, 2) FWK_WARN_UNUSED;
+
+/*!
+ * \brief Allocates memory for an array of `num` objects of `size`. Does not
+ *      trap on failure.
+ *
+ * \details Identical to fwk_mm_alloc(), but does not trap.
+ *
+ * \param[in] num Number of objects.
+ * \param[in] size Size of each object.
+ *
+ * \return On success, returns the pointer to the beginning of newly allocated
+ *      memory. To avoid a memory leak, the returned pointer must be
+ *      deallocated with ::fwk_mm_free() or ::fwk_mm_realloc().
+ *
+ * \return On failure, returns a null pointer.
+ */
+void *fwk_mm_alloc_notrap(size_t num, size_t size) FWK_LEAF
+    FWK_NOTHROW FWK_ALLOC FWK_ALLOC_SIZE2(1, 2) FWK_WARN_UNUSED;
 
 /*!
  * \brief Allocates memory for an array of `num` objects of `size` whose
@@ -100,7 +115,7 @@ void *fwk_mm_alloc(size_t num, size_t size) FWK_LEAF FWK_NOTHROW FWK_ALLOC
  *      memory. To avoid a memory leak, the returned pointer must be
  *      deallocated with ::fwk_mm_free() or ::fwk_mm_realloc().
  *
- * \return On failure, returns a null pointer.
+ * \return On failure, traps.
  */
 void *fwk_mm_alloc_aligned(size_t alignment, size_t num, size_t size) FWK_LEAF
     FWK_NOTHROW FWK_ALLOC FWK_ALLOC_ALIGN(1)
@@ -115,9 +130,7 @@ void *fwk_mm_alloc_aligned(size_t alignment, size_t num, size_t size) FWK_LEAF
  *      object type.
  *
  * \details If the product of `num` and `size` is zero, the behavior is
- *      implementation-defined (a null pointer may be returned, or some
- *      non-null pointer may be returned that may not be used to access
-        storage).
+ *      implementation-defined.
  *
  * \note ::fwk_mm_calloc() is thread-safe: it behaves as though only accessing
  *      the memory locations visible through its argument, and not any static
@@ -140,7 +153,7 @@ void *fwk_mm_alloc_aligned(size_t alignment, size_t num, size_t size) FWK_LEAF
  *      memory. To avoid a memory leak, the returned pointer must be
  *      deallocated with ::fwk_mm_free() or ::fwk_mm_realloc().
  *
- * \return On failure, returns a null pointer.
+ * \return On failure, traps.
  */
 void *fwk_mm_calloc(size_t num, size_t size) FWK_LEAF FWK_NOTHROW FWK_ALLOC
     FWK_ALLOC_SIZE2(1, 2) FWK_WARN_UNUSED;
@@ -172,7 +185,7 @@ void *fwk_mm_calloc(size_t num, size_t size) FWK_LEAF FWK_NOTHROW FWK_ALLOC
  *      memory. To avoid a memory leak, the returned pointer must be
  *      deallocated with ::fwk_mm_free() or ::fwk_mm_realloc().
  *
- * \return On failure, returns a null pointer.
+ * \return On failure, traps.
  */
 void *fwk_mm_calloc_aligned(size_t alignment, size_t num, size_t size) FWK_LEAF
     FWK_NOTHROW FWK_ALLOC FWK_ALLOC_ALIGN(1)

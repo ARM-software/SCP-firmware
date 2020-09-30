@@ -308,7 +308,7 @@ int fwk_io_vprintf(
     if (length < 0) /* Possibly invalid format string? */
         return FWK_E_STATE;
 
-    buffer = fwk_mm_alloc(sizeof(buffer[0]), length + 1);
+    buffer = fwk_mm_alloc_notrap(sizeof(buffer[0]), length + 1);
     if (buffer == NULL) /* Not enough memory for the string buffer */
         return FWK_E_NOMEM;
 
