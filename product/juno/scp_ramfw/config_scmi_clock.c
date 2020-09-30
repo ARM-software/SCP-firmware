@@ -20,31 +20,37 @@ static const struct mod_scmi_clock_device agent_device_table_ospm[] = {
         /* Big */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_BIGCLK),
+        .starts_enabled = true,
     },
     {
         /* Little */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_LITTLECLK),
+        .starts_enabled = true,
     },
     {
         /* GPU */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_GPUCLK),
+        .starts_enabled = true,
     },
     {
         /* HDLCD0 */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_HDLCD0),
+        .starts_enabled = true,
     },
     {
         /* HDLCD1 */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_HDLCD1),
+        .starts_enabled = true,
     },
     {
         /* I2S */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, JUNO_CLOCK_IDX_I2SCLK),
+        .starts_enabled = true,
     },
 };
 
