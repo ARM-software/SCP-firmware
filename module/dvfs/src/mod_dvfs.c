@@ -890,9 +890,9 @@ static int dvfs_handle_psu_set_voltage_resp(struct mod_dvfs_domain_ctx *ctx,
 
     if (ctx->state == DVFS_DOMAIN_SET_FREQUENCY) {
         status = ctx->apis.clock->set_rate(
-           ctx->config->clock_id,
-           ctx->request.new_opp.frequency,
-           MOD_CLOCK_ROUND_MODE_NONE);
+            ctx->config->clock_id,
+            (uint64_t)ctx->request.new_opp.frequency * FWK_KHZ,
+            MOD_CLOCK_ROUND_MODE_NONE);
         if (status == FWK_PENDING) {
             ctx->state = DVFS_DOMAIN_SET_OPP_DONE;
             return status;
