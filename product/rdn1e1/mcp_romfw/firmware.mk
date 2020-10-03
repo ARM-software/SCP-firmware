@@ -14,10 +14,13 @@ BS_FIRMWARE_MODULE_HEADERS_ONLY := \
     power_domain
 
 BS_FIRMWARE_MODULES := \
+    bootloader \
+    isys_rom \
     pl011 \
     clock
 
 BS_FIRMWARE_SOURCES := \
+    config_bootloader.c \
     config_clock.c \
     config_pl011.c
 
