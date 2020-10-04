@@ -25,6 +25,7 @@ EXCLUDE_DIRECTORIES = [
     'build',
     'tools',
     'cmsis',
+    'product/rcar/src/CMSIS-FreeRTOS',
 ]
 
 #
