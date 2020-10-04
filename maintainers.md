@@ -55,3 +55,7 @@ maintainers. The platforms listed here represent the exceptions to this rule.
 #### SynQuacer (synquacer)
 
 - [Masahisa Kojima](https://github.com/masahisak) (masahisa.kojima@linaro.org)
+
+#### R-Car (rcar)
+
+- [Nicolas Royer](https://github.com/n-royer) (nroyer@baylibre.com)
