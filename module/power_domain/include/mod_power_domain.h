@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -756,6 +756,7 @@ static const fwk_id_t mod_pd_api_id_driver_input =
     FWK_ID_API_INIT(FWK_MODULE_IDX_POWER_DOMAIN, MOD_PD_API_IDX_DRIVER_INPUT);
 #endif
 
+#ifdef BUILD_HAS_NOTIFICATION
 /*!
  * \brief Notification indices.
  */
@@ -797,6 +798,7 @@ static const fwk_id_t mod_pd_notification_id_pre_shutdown =
         MOD_PD_NOTIFICATION_IDX_PRE_SHUTDOWN);
 
 #endif
+#endif /* BUILD_HAS_NOTIFICATION */
 
 /*!
  * \brief Power Domain public events indices
