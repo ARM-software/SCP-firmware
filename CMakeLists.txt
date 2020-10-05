@@ -45,6 +45,15 @@ set(CMAKE_C_STANDARD_REQUIRED TRUE)
 set(CMAKE_C_EXTENSIONS TRUE)
 
 #
+# We use `__declspec` when available, but Clang needs to explicitly enable
+# support for it before we can use them.
+#
+
+if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
+    string(APPEND CMAKE_C_FLAGS " -fms-extensions")
+endif()
+
+#
 # Set up global inclusions and exclusions for source file quality assurance
 # tools. This is intended to filter in external directories (e.g. out-of-tree
 # modules) and filter out third-party directories.
