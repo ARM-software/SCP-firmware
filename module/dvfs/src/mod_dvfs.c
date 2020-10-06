@@ -201,7 +201,7 @@ static const struct mod_dvfs_opp *get_opp_for_voltage(
     for (opp_idx = 0; opp_idx < ctx->opp_count; opp_idx++) {
         opp = &ctx->config->opps[opp_idx];
 
-        if (opp->level != voltage)
+        if (opp->voltage != voltage)
             continue;
 
         return opp;
