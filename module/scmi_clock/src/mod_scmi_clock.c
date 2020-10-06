@@ -374,7 +374,7 @@ static void set_request_respond(fwk_id_t service_id, int status)
 {
     struct scmi_clock_generic_p2a return_values = { 0 };
 
-    if (status == FWK_E_RANGE)
+    if (status == FWK_E_RANGE || status == FWK_E_PARAM)
         return_values.status = SCMI_INVALID_PARAMETERS;
     else if (status == FWK_E_SUPPORT)
         return_values.status = SCMI_NOT_SUPPORTED;
