@@ -204,6 +204,24 @@ enum scmi_reset_domain_response_id {
 };
 
 /*!
+ * \brief SCMI Voltage Domain Protocol
+ */
+#define MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN UINT32_C(0x17)
+
+/*!
+ * \brief SCMI Voltage Domain Protocol Message IDs
+ */
+enum scmi_voltd_command_id {
+    MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES = 0x003,
+    MOD_SCMI_VOLTD_DESCRIBE_LEVELS = 0x004,
+    MOD_SCMI_VOLTD_CONFIG_SET = 0x005,
+    MOD_SCMI_VOLTD_CONFIG_GET = 0x006,
+    MOD_SCMI_VOLTD_LEVEL_SET = 0x007,
+    MOD_SCMI_VOLTD_LEVEL_GET = 0x008,
+    MOD_SCMI_VOLTD_COMMAND_COUNT,
+};
+
+/*!
  * \}
  */
 
