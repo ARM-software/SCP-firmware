@@ -25,9 +25,7 @@ const struct fwk_module_config config_pl011 = {
                     .baud_rate_bps = 115200,
                     .clock_rate_hz = 24 * FWK_MHZ,
                     .clock_id = FWK_ID_NONE_INIT,
-                    .pd_id = FWK_ID_ELEMENT_INIT(
-                        FWK_MODULE_IDX_POWER_DOMAIN,
-                        PD_STATIC_DEV_IDX_SYSTOP),
+                    .pd_id = FWK_ID_NONE_INIT,
                 },
         },
 
