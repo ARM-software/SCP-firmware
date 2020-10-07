@@ -852,6 +852,11 @@ static int scmi_clock_rate_set_handler(fwk_id_t service_id,
     round_auto = parameters->flags & SCMI_CLOCK_RATE_SET_ROUND_AUTO_MASK;
     asynchronous = parameters->flags & SCMI_CLOCK_RATE_SET_ASYNC_MASK;
 
+    if ((parameters->flags & ~SCMI_CLOCK_RATE_SET_FLAGS_MASK) != 0) {
+        return_values.status = SCMI_INVALID_PARAMETERS;
+        goto exit;
+    }
+
     status = get_clock_device_entry(service_id,
                                     parameters->clock_id,
                                     &clock_device,
