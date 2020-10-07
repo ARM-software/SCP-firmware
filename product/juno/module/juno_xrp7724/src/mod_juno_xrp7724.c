@@ -16,6 +16,7 @@
 #include <fwk_assert.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -874,7 +875,7 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
             ctx->juno_xrp7724_dev_psu.psu_set_voltage) ||
             ((adc_val - PSU_TARGET_MARGIN_MV) >
             ctx->juno_xrp7724_dev_psu.psu_set_voltage)) {
-                status = FWK_E_DEVICE;
+            FWK_LOG_INFO("[XRP7724] Voltage set out of margin");
         } else {
             ctx->juno_xrp7724_dev_psu.current_voltage =
                 ctx->juno_xrp7724_dev_psu.psu_set_voltage;
