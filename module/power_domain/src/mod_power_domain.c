@@ -624,7 +624,7 @@ static bool initiate_power_state_pre_transition_notification(struct pd_ctx *pd)
     struct mod_pd_power_state_pre_transition_notification_params *params;
 
     if (pd->config->disable_state_transition_notifications == true)
-        false;
+        return false;
 
     state = pd->requested_state;
     if (!check_power_state_pre_transition_notification(pd, state))
