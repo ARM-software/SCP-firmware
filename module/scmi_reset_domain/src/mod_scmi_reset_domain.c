@@ -308,6 +308,12 @@ static int reset_request_handler(fwk_id_t service_id,
 
     params = *(const struct scmi_reset_domain_request_a2p *)payload;
 
+    if ((params.flags & ~SCMI_RESET_DOMAIN_FLAGS_MASK) != 0) {
+        status = FWK_SUCCESS;
+        outmsg.status = SCMI_INVALID_PARAMETERS;
+        goto exit;
+    }
+
     status = scmi_rd_ctx.scmi_api->get_agent_id(service_id, &agent_id);
     if (status != FWK_SUCCESS)
         goto exit;
