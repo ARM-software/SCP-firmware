@@ -552,7 +552,7 @@ static int scmi_reset_message_handler(fwk_id_t protocol_id,
     fwk_assert(payload != NULL);
 
     if (message_id >= FWK_ARRAY_SIZE(msg_handler_table)) {
-        return_value = SCMI_NOT_SUPPORTED;
+        return_value = SCMI_NOT_FOUND;
         goto error;
     }
 
