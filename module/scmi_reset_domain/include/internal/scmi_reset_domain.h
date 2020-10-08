@@ -24,7 +24,7 @@
  * \{
  */
 
-#define SCMI_PROTOCOL_VERSION_RESET_DOMAIN  UINT32_C(0x20000)
+#define SCMI_PROTOCOL_VERSION_RESET_DOMAIN UINT32_C(0x10000)
 
 #define SCMI_RESET_STATE_ARCH               (0 << 31)
 #define SCMI_RESET_STATE_IMPL               (1 << 31)
