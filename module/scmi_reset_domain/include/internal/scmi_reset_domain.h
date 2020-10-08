@@ -71,6 +71,9 @@ struct scmi_reset_domain_attributes_p2a {
     (SCMI_RESET_DOMAIN_ASYNC | SCMI_RESET_DOMAIN_EXPLICIT | \
      SCMI_RESET_DOMAIN_AUTO)
 
+#define SCMI_RESET_DOMAIN_RESET_STATE_TYPE_MASK (1UL << 31)
+#define SCMI_RESET_DOMAIN_RESET_STATE_ID_MASK UINT32_C(0x7FFFFFFF)
+
 struct scmi_reset_domain_request_a2p {
     uint32_t domain_id;
     uint32_t flags;

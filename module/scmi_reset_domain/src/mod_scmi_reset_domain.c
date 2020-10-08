@@ -314,6 +314,17 @@ static int reset_request_handler(fwk_id_t service_id,
         goto exit;
     }
 
+    /**
+     * Verify that the reset state ID is 0 when the reset
+     * state type is Architectural.
+     */
+    if (((params.reset_state & SCMI_RESET_DOMAIN_RESET_STATE_TYPE_MASK) == 0) &&
+        ((params.reset_state & SCMI_RESET_DOMAIN_RESET_STATE_ID_MASK) != 0)) {
+        status = FWK_SUCCESS;
+        outmsg.status = SCMI_INVALID_PARAMETERS;
+        goto exit;
+    }
+
     status = scmi_rd_ctx.scmi_api->get_agent_id(service_id, &agent_id);
     if (status != FWK_SUCCESS)
         goto exit;
