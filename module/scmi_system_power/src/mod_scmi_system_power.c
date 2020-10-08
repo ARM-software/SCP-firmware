@@ -441,7 +441,6 @@ static int scmi_sys_power_state_notify_handler(fwk_id_t service_id,
                                                const uint32_t *payload)
 {
     unsigned int agent_id;
-    enum scmi_agent_type agent_type;
     const struct scmi_sys_power_state_notify_a2p *parameters;
     struct scmi_sys_power_state_notify_p2a return_values = {
         .status = SCMI_GENERIC_ERROR,
@@ -451,15 +450,6 @@ static int scmi_sys_power_state_notify_handler(fwk_id_t service_id,
     status = scmi_sys_power_ctx.scmi_api->get_agent_id(service_id, &agent_id);
     if (status != FWK_SUCCESS)
         goto exit;
-
-    status = scmi_sys_power_ctx.scmi_api->get_agent_type(agent_id, &agent_type);
-    if (status != FWK_SUCCESS)
-        goto exit;
-
-    if (agent_type == SCMI_AGENT_TYPE_PSCI) {
-        return_values.status = SCMI_NOT_SUPPORTED;
-        goto exit;
-    }
 
     parameters = (const struct scmi_sys_power_state_notify_a2p *)payload;
 
