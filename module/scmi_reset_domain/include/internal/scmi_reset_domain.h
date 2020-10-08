@@ -67,6 +67,9 @@ struct scmi_reset_domain_attributes_p2a {
 #define SCMI_RESET_DOMAIN_ASYNC      (1 << 2)
 #define SCMI_RESET_DOMAIN_EXPLICIT   (1 << 1)
 #define SCMI_RESET_DOMAIN_AUTO       (1 << 0)
+#define SCMI_RESET_DOMAIN_FLAGS_MASK \
+    (SCMI_RESET_DOMAIN_ASYNC | SCMI_RESET_DOMAIN_EXPLICIT | \
+     SCMI_RESET_DOMAIN_AUTO)
 
 struct scmi_reset_domain_request_a2p {
     uint32_t domain_id;
