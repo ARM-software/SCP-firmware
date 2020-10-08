@@ -3,6 +3,78 @@ SCP-firmware Change Log
 
 Copyright (c) 2019-2020, Arm Limited and Contributors. All rights reserved.
 
+SCP-firmware - version 2.7.0
+============================
+
+New features
+------------
+
+- Support for the following platforms has been added:
+    - Total Compute (tc0) platform
+    - Renesas R-Car
+    - RD-Daniel Config-XLR
+
+- Support for interactive debugger and CLI has been added.
+
+- New modules:
+    - Voltage Domain driver and related SCMIv3 protocol driver
+    - gtimer: Add framework time driver implementation
+    - module: statistics: add basic functionality
+    - fip: Introduce 'fip' parser module
+
+- SCMI Enhancements:
+    - SCMI: Resource Permissions Module
+    - SCMIv2: Implement SCMIv2 fast channels performance protocol API
+    - SCMIv2: Implement notifications for SCMIv2
+    - scmi_perf: Add support for performance statistics
+    - SCMI: Clock Protocol policy handler
+    - SCMI: Performance Protocol policy handler
+    - SCMI: Power Domain Protocol policy handler
+    - SCMI: System Power Protocol policy handler
+    - SCMI: Reset Domain Protocol policy handler
+    - SCMI: Base Protocol Permissions
+    - SCMI: Clock Protocol Permissions
+    - SCMI: System Power Protocol Permissions
+    - SCMI: Power Domain Protocol Permissions
+    - SCMI: Performance Protocol Permissions
+    - SCMI: Sensor Protocol Permissions
+    - SCMI: Reset Domain Protocol Permissions
+    - SCMI: Device permissions
+
+- Framework:
+    - fwk: Use standard library memory allocator
+    - fwk: Integrate logging functionality into the framework
+    - fwk/thread: Single-threaded mode for blocking events
+    - fwk: Introduce input/output component
+
+Changed
+-------
+
+- Documentation:
+    - doc: SCP Firmware Threat Model
+    - doc: Add clang-format configuration
+    - doc: Recreate Doxyfile with Doxywizard
+
+- Framework:
+    - fwk: Remove dependency on RTX threads
+    - fwk: Add support for static element tables
+    - fwk: Rework assertion logic
+    - fwk: Initialize module context structures early
+
+- Modules:
+    - bootloader: Add support for SDS-less boot
+    - DVFS: Allow inexact performance levels.
+    - DVFS/SCMI-perf: Abstract performance levels.
+    - scmi_system_power: Add graceful system power support
+    - bootloader: Unify bootloader messages
+    - module/scmi: Add SCMI notifications handling APIs
+
+Notes
+-----
+
+This release implements full SCMI v2 support but we do not guarantee complete
+compliance wth the SCMI v2.0 specification at the moment.
+
 SCP-firmware - version 2.6.0
 ============================
 

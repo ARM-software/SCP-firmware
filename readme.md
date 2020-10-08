@@ -1,4 +1,4 @@
-SCP-firmware - version 2.6
+SCP-firmware - version 2.7
 ==========================
 
 Copyright (c) 2011-2020, Arm Limited. All rights reserved.
@@ -46,9 +46,12 @@ Functionality
     - Performance domain management (Dynamic voltage and frequency scaling)
     - Clock management
     - Sensor management
+    - Reset domain management
+    - Voltage domain management
 - System Control and Management Interface (SCMI, platform-side)
 - Support for the GNU Arm Embedded and Arm Compiler 6 toolchains
 - Support for platforms with several control processors
+- Interactive debugging
 
 Platforms
 ---------
@@ -65,6 +68,10 @@ Virtual Platforms (FVPs):
   RdN1EdgeX2 FVP)
 - RD-Daniel Config-M reference design  (Please contact Arm directly to obtain the
   RdDaniel-CfgM FVP)
+- RD-Daniel Config-XLR reference design  (Please contact Arm directly to obtain the
+  RdDaniel-CfgXLR FVP)
+- Renesas R-Car platform
+- Total Compute (tc0) platform (Please contact Arm directly to obtain the TC0 FVP)
 
 License
 -------
