@@ -808,7 +808,7 @@ static int scmi_pd_power_state_notify_handler(
      * agent that is notified"
      */
     if (pd_type != MOD_PD_TYPE_DEVICE && pd_type != MOD_PD_TYPE_DEVICE_DEBUG) {
-        return_values.status = SCMI_DENIED;
+        return_values.status = SCMI_NOT_SUPPORTED;
         goto exit;
     }
 
