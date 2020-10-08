@@ -436,6 +436,12 @@ static int reset_notify_handler(fwk_id_t service_id,
         goto exit;
     }
 
+    if ((parameters->notify_enable & ~SCMI_RESET_DOMAIN_DO_NOTIFY) != 0) {
+        status = FWK_SUCCESS;
+        outmsg.status = SCMI_INVALID_PARAMETERS;
+        goto exit;
+    }
+
     if (parameters->notify_enable)
         scmi_rd_ctx.scmi_notification_api->scmi_notification_add_subscriber(
             MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN,
