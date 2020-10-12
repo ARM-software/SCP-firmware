@@ -1,3 +1,6 @@
+// No checking
+*:*
+
 // Depending on how the project is compiled, some code
 // snippets are unused. So, some of the functions are not called.
 unusedFunction
@@ -52,6 +55,3 @@ memleak:framework/test/fwk_test.c:145
 // Cppcheck does not inspect these conditions deeply enough to know that the
 // dereference can only occur if the check succeeds
 nullPointerRedundantCheck:framework/src/fwk_io.c
-
-// No checking
-*:*
