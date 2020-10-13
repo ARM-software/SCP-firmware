@@ -691,18 +691,23 @@ static int scmi_base_protocol_attributes_handler(fwk_id_t service_id,
                                                  const uint32_t *payload)
 {
     size_t protocol_count;
-#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
     int status;
+    unsigned int agent_id;
+
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
     size_t global_protocol_count;
     enum mod_res_perms_permissions perms;
-    unsigned int agent_id;
     uint8_t protocol_id;
     unsigned int index;
+#else
+    enum scmi_agent_type agent_type;
+#endif
 
     status = get_agent_id(service_id, &agent_id);
     if (status != FWK_SUCCESS)
         return status;
 
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
     for (index = 0, protocol_count = 0, global_protocol_count = 0;
          (index < FWK_ARRAY_SIZE(scmi_ctx.scmi_protocol_id_to_idx)) &&
          (global_protocol_count < scmi_ctx.protocol_count);
@@ -725,7 +730,21 @@ static int scmi_base_protocol_attributes_handler(fwk_id_t service_id,
         global_protocol_count++;
     }
 #else
-    protocol_count = scmi_ctx.protocol_count;
+    status = get_agent_type(agent_id, &agent_type);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    /*
+     * PSCI agents are only allowed access to certain protocols defined
+     * for the platform.
+     */
+    if (agent_type == SCMI_AGENT_TYPE_PSCI) {
+        fwk_assert(
+            scmi_ctx.protocol_count > scmi_ctx.config->dis_protocol_count_psci);
+        protocol_count =
+            scmi_ctx.protocol_count - scmi_ctx.config->dis_protocol_count_psci;
+    } else
+        protocol_count = scmi_ctx.protocol_count;
 #endif
 
     struct scmi_protocol_attributes_p2a return_values = {
@@ -848,9 +867,19 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
     uint8_t protocol_id;
 #ifdef BUILD_HAS_RESOURCE_PERMISSIONS
     enum mod_res_perms_permissions perms;
+#else
+    unsigned int dis_protocol_list_psci_index;
+    unsigned int protocol_count_psci;
+    enum scmi_agent_type agent_type;
+#endif
     unsigned int agent_id;
 
     status = get_agent_id(service_id, &agent_id);
+    if (status != FWK_SUCCESS)
+        goto error;
+
+#ifndef BUILD_HAS_RESOURCE_PERMISSIONS
+    status = get_agent_type(agent_id, &agent_type);
     if (status != FWK_SUCCESS)
         goto error;
 #endif
@@ -872,8 +901,26 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
     parameters = (const struct scmi_base_discover_list_protocols_a2p *)payload;
     skip = parameters->skip;
 
+#ifdef BUILD_HAS_RESOURCE_PERMISSIONS
     protocol_count_max = (scmi_ctx.protocol_count < (skip + entry_count)) ?
                          scmi_ctx.protocol_count : (skip + entry_count);
+#else
+
+    if (agent_type == SCMI_AGENT_TYPE_PSCI) {
+        fwk_assert(
+            scmi_ctx.protocol_count > scmi_ctx.config->dis_protocol_count_psci);
+
+        protocol_count_psci =
+            scmi_ctx.protocol_count - scmi_ctx.config->dis_protocol_count_psci;
+
+        protocol_count_max = (protocol_count_psci < (skip + entry_count)) ?
+            protocol_count_psci :
+            (skip + entry_count);
+    } else
+        protocol_count_max = (scmi_ctx.protocol_count < (skip + entry_count)) ?
+            scmi_ctx.protocol_count :
+            (skip + entry_count);
+#endif
 
     for (index = 0,
         protocol_count = 0,
@@ -896,6 +943,43 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
 
         if (perms == MOD_RES_PERMS_ACCESS_DENIED) {
             continue;
+        }
+#else
+        /*
+         * PSCI agents are only allowed access certain protocols defined
+         * for the platform.
+         */
+        if (agent_type == SCMI_AGENT_TYPE_PSCI) {
+            /*
+             * assert if a valid list of disabled protocols is supplied in case
+             * the number of the disabled protocols is not zero. In case the
+             * number of the disabled protocols is zero , then no list needs to
+             * be supplied
+             */
+            fwk_assert(
+                (scmi_ctx.config->dis_protocol_list_psci != NULL) ||
+                (scmi_ctx.config->dis_protocol_count_psci == 0));
+
+            /*
+             * check if the current protocol is within the disabled protocols
+             * list.
+             */
+            for (dis_protocol_list_psci_index = 0;
+                 dis_protocol_list_psci_index <
+                 scmi_ctx.config->dis_protocol_count_psci;
+                 dis_protocol_list_psci_index++) {
+                if (protocol_id ==
+                    scmi_ctx.config
+                        ->dis_protocol_list_psci[dis_protocol_list_psci_index])
+                    break;
+            }
+
+            /*
+             * don't include the protocol in case it is in the disabled list
+             */
+            if (dis_protocol_list_psci_index !=
+                scmi_ctx.config->dis_protocol_count_psci)
+                continue;
         }
 #endif
 

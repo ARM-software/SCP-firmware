@@ -73,6 +73,20 @@ struct mod_scmi_config {
      */
     unsigned int protocol_count_max;
 
+#ifndef BUILD_HAS_RESOURCE_PERMISSIONS
+    /*!
+     *  \brief Number of the disabled SCMI protocols for the PSCI agent.
+     *         If set to zero then all protocols are allowed for a PSCI agent.
+     */
+    unsigned int dis_protocol_count_psci;
+
+    /*!
+     *  \brief list protocols disabled for the PSCI agent , limited
+     *       by protocol_count_psci
+     */
+    const uint32_t *dis_protocol_list_psci;
+#endif
+
     /*!
      *  \brief Number of agents in the system. Must be smaller than or equal to
      *       SCMI_AGENT_ID_MAX.

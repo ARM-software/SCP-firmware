@@ -90,6 +90,11 @@ struct fwk_module_config config_scmi = {
     .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_element_table),
     .data = &((struct mod_scmi_config){
         .protocol_count_max = 9,
+#ifndef BUILD_HAS_RESOURCE_PERMISSIONS
+        /* No protocols are disabled for PSCI agents */
+        .dis_protocol_count_psci = 0,
+        .dis_protocol_list_psci = NULL,
+#endif
         .agent_count = FWK_ARRAY_SIZE(agent_table) - 1,
         .agent_table = agent_table,
         .vendor_identifier = "arm",
