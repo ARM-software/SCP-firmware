@@ -87,6 +87,9 @@ const struct fwk_module_config config_scmi = {
     .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_service_table),
     .data = &((struct mod_scmi_config){
         .protocol_count_max = 9,
+#ifndef BUILD_HAS_RESOURCE_PERMISSIONS
+#    error "Please configure the disabled protocols for PSCI agents"
+#endif
         .agent_count = FWK_ARRAY_SIZE(agent_table),
         .agent_table = agent_table,
         .vendor_identifier = "arm",
