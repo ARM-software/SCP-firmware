@@ -322,8 +322,8 @@ static void program_hnf_ldid_to_chi_node_id_reg(
         for (agentid = remote_agentid_start; agentid <= remote_agentid_end;
              agentid++) {
             /* Each 64-bit register holds 2 sets of config data, 32 bits each */
-            reg_index = agentid / 2;
-            reg_bit_offset = agentid % 2;
+            reg_index = ctx->remote_rnf_ldid_value / 2;
+            reg_bit_offset = ctx->remote_rnf_ldid_value % 2;
 
             for (i = 0; i < ctx->hnf_count; i++) {
                 hnf_reg = (struct cmn650_hnf_reg *)ctx->hnf_node[i];
@@ -336,6 +336,8 @@ static void program_hnf_ldid_to_chi_node_id_reg(
                          (UINT64_C(0x1) << HNF_RN_PHYS_RN_ID_VALID_SHIFT_VAL))
                      << (reg_bit_offset * NUM_BITS_RESERVED_FOR_PHYS_ID));
             }
+
+            ctx->remote_rnf_ldid_value++;
         }
     }
 }

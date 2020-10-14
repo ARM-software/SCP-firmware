@@ -710,6 +710,9 @@ static int cmn650_ccix_setup(void)
     unsigned int idx;
     const struct mod_cmn650_config *config = ctx->config;
 
+    /* Remote RNF LDID value begins from local chip's last RNF LDID value + 1 */
+    ctx->remote_rnf_ldid_value = ctx->rnf_count;
+
     /* Do configuration for CCIX Gateway Nodes and enable the links */
     for (idx = 0; idx < config->ccix_table_count; idx++)
         ccix_setup(chip_id, ctx, &config->ccix_config_table[idx]);
