@@ -75,6 +75,12 @@ struct cmn650_device_ctx {
      */
     struct cxla_reg_tuple *cxla_reg_table;
 
+    /*
+     * remote_rnf_ldid_value keeps track of the ldid of the remote RNF agents
+     * which are to be programmed on the HNF's RN_PHYS_ID registers.
+     */
+    unsigned int remote_rnf_ldid_value;
+
     /* Timer module API */
     struct mod_timer_api *timer_api;
 
