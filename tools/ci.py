@@ -428,6 +428,24 @@ def main():
     result = subprocess.call(cmd, shell=True)
     results.append(('Product morello release build (ARM)', result))
 
+    banner('Test building rcar product')
+
+    cmd = \
+        'CC=aarch64-none-elf-gcc ' \
+        'PRODUCT=rcar ' \
+        'MODE=debug ' \
+        'make clean all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product rcar debug build (ARM)', result))
+
+    cmd = \
+        'CC=aarch64-none-elf-gcc ' \
+        'PRODUCT=rcar ' \
+        'MODE=release ' \
+        'make clean all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product rcar release build (ARM)', result))
+
     banner('Tests summary')
 
     total_success = 0
