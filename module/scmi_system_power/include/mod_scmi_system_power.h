@@ -63,6 +63,9 @@ struct mod_scmi_system_power_config {
 
     /*!
      * \brief Identifier of the alarm for graceful request timeout.
+     *
+     * \note This alarm is optional, if it is not used it must be set to
+     * FWK_ID_NONE
      */
     fwk_id_t alarm_id;
 
