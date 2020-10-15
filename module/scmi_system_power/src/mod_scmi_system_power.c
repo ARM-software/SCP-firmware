@@ -516,12 +516,16 @@ FWK_WEAK int scmi_sys_power_state_set_policy(
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
             scmi_sys_power_state_notify(service_id, *state, false);
 #endif
-            scmi_sys_power_ctx.alarm_api->start(
-                scmi_sys_power_ctx.config->alarm_id,
-                scmi_sys_power_ctx.config->graceful_timeout,
-                MOD_TIMER_ALARM_TYPE_ONCE,
-                graceful_timer_callback,
-                *state);
+
+            if (scmi_sys_power_ctx.alarm_api)
+                scmi_sys_power_ctx.alarm_api->start(
+                    scmi_sys_power_ctx.config->alarm_id,
+                    scmi_sys_power_ctx.config->graceful_timeout,
+                    MOD_TIMER_ALARM_TYPE_ONCE,
+                    graceful_timer_callback,
+                    *state);
+            else
+                graceful_timer_callback(*state);
         }
     }
 
@@ -704,16 +708,17 @@ static int scmi_sys_power_bind(fwk_id_t id, unsigned int round)
      * If notifications is supported a timer is required to handle graceful
      * requests.
      */
-    status = fwk_module_bind(
-        scmi_sys_power_ctx.config->alarm_id,
-        MOD_TIMER_API_ID_ALARM,
-        &scmi_sys_power_ctx.alarm_api);
-    if (status != FWK_SUCCESS)
-        return status;
-    return scmi_sys_power_init_notifications();
-#else
-    return FWK_SUCCESS;
+    if (!fwk_id_is_equal(scmi_sys_power_ctx.config->alarm_id, FWK_ID_NONE)) {
+        status = fwk_module_bind(
+            scmi_sys_power_ctx.config->alarm_id,
+            MOD_TIMER_API_ID_ALARM,
+            &scmi_sys_power_ctx.alarm_api);
+        if (status != FWK_SUCCESS)
+            return status;
+        return scmi_sys_power_init_notifications();
+    }
 #endif
+    return FWK_SUCCESS;
 }
 
 static int scmi_sys_power_process_bind_request(fwk_id_t source_id,
