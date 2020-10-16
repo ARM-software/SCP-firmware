@@ -876,6 +876,8 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
             ((adc_val - PSU_TARGET_MARGIN_MV) >
             ctx->juno_xrp7724_dev_psu.psu_set_voltage)) {
             FWK_LOG_INFO("[XRP7724] Voltage set out of margin");
+
+            status = FWK_E_DEVICE;
         } else {
             ctx->juno_xrp7724_dev_psu.current_voltage =
                 ctx->juno_xrp7724_dev_psu.psu_set_voltage;
