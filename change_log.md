@@ -63,8 +63,8 @@ Changed
 
 - Modules:
     - bootloader: Add support for SDS-less boot
-    - DVFS: Allow inexact performance levels.
-    - DVFS/SCMI-perf: Abstract performance levels.
+    - DVFS: Allow inexact performance levels
+    - DVFS/SCMI-perf: Abstract performance levels
     - scmi_system_power: Add graceful system power support
     - bootloader: Unify bootloader messages
     - module/scmi: Add SCMI notifications handling APIs
@@ -73,7 +73,7 @@ Notes
 -----
 
 This release implements full SCMI v2 support but we do not guarantee complete
-compliance wth the SCMI v2.0 specification at the moment.
+compliance with the SCMI v2.0 specification at the moment.
 
 SCP-firmware - version 2.6.0
 ============================
