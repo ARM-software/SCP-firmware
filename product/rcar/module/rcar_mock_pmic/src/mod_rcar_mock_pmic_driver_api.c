@@ -57,14 +57,11 @@ static int api_set_voltage(fwk_id_t device_id, uint32_t voltage)
     val = DIV_ROUND(voltage, BD9571MWV_STEP_MV * 1000);
     val &= REG_DATA_DVFS_SetVID_MASK;
 
-#if 0
     int ret;
-    /* Not supported because I2C used in kernel */
     ret = rcar_iic_dvfs_send(SLAVE_ADDR_PMIC, REG_ADDR_DVFS_SetVID, val);
     if (ret) {
         return ret;
     }
-#endif
 
     ctx->voltage = voltage;
     return FWK_SUCCESS;
