@@ -10,6 +10,7 @@
 #include <rcar_mmap.h>
 #include <rcar_pwc.h>
 #include <rcar_scmi.h>
+#include <rcar_sds.h>
 
 #include <mod_clock.h>
 #include <mod_rcar_clock.h>
@@ -45,12 +46,16 @@ struct rcar_system_dev_ctx {
 struct rcar_system_ctx {
     struct rcar_system_dev_ctx *dev_ctx_table;
     unsigned int dev_count;
+    struct mod_sds_api *sds_api;
 };
 
 static struct rcar_system_ctx module_ctx;
 
 /*-----------------------------------------------------------*/
 #define P_STATUS (_shutdown_request)
+
+static fwk_id_t sds_feature_availability_id =
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, RCAR_SDS_RAM_FEATURES_IDX);
 
 /* SCMI services required to enable the messaging stack */
 static unsigned int scmi_notification_table[] = {
@@ -68,7 +73,17 @@ IMPORT_SYM(unsigned long, __sram_copy_start__, SRAM_COPY_START);
 
 static int messaging_stack_ready(void)
 {
-    return 0;
+    const uint32_t feature_flags = RCAR_SDS_FEATURE_FIRMWARE_MASK;
+
+    const struct mod_sds_structure_desc *sds_structure_desc =
+        fwk_module_get_data(sds_feature_availability_id);
+
+    /*
+     * Write SDS Feature Availability to signal the completion of the messaging
+     * stack
+     */
+    return module_ctx.sds_api->struct_write(sds_structure_desc->id,
+        0, (void *)(&feature_flags), sds_structure_desc->size);
 }
 
 bool is_available_shutdown_req(uint32_t req)
@@ -126,10 +141,11 @@ void vApplicationIdleHook(void)
                     ctx->api->resume();
             }
 
-            reg_sensor_resume();
             mod_rcar_scif_resume();
+            messaging_stack_ready();
             gic_init();
             vConfigureTickInterrupt();
+            reg_sensor_resume();
             fwk_interrupt_global_enable();
             break;
         case R_RESET:
@@ -210,10 +226,13 @@ static int rcar_system_bind(fwk_id_t id, unsigned int round)
     if (round == 1)
         return FWK_SUCCESS;
 
-    if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT))
-        /* Only element binding is supported */
-        return FWK_SUCCESS;
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+        /* Module */
+        return fwk_module_bind(fwk_module_id_sds,
+                           FWK_ID_API(FWK_MODULE_IDX_SDS, 0),
+                           &module_ctx.sds_api);
 
+    /* Elements */
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(id);
 
     return fwk_module_bind(
@@ -255,7 +274,14 @@ static int rcar_system_start(fwk_id_t id)
             return status;
     }
 
-    return FWK_SUCCESS;
+    /*
+     * Subscribe to the SDS initialized notification so we can correctly let the
+     * PSCI agent know that the SCMI stack is initialized.
+     */
+    return fwk_notification_subscribe(
+        mod_sds_notification_id_initialized,
+        fwk_module_id_sds,
+        id);
 }
 
 static int rcar_system_process_notification(
@@ -263,17 +289,26 @@ static int rcar_system_process_notification(
     struct fwk_event *resp_event)
 {
     static unsigned int scmi_notification_count = 0;
+    static bool sds_notification_received = false;
 
     if (!fwk_expect(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE)))
         return FWK_E_PARAM;
 
     if (fwk_id_is_equal(event->id, mod_scmi_notification_id_initialized))
         scmi_notification_count++;
+    else if (fwk_id_is_equal(event->id,
+                               mod_sds_notification_id_initialized))
+        sds_notification_received = true;
+    else
+        return FWK_E_PARAM;
 
-    if (scmi_notification_count == FWK_ARRAY_SIZE(scmi_notification_table)) {
+    sds_notification_received = true;
+    if ((scmi_notification_count == FWK_ARRAY_SIZE(scmi_notification_table)) &&
+        sds_notification_received) {
         messaging_stack_ready();
 
         scmi_notification_count = 0;
+        sds_notification_received = false;
     }
 
     return FWK_SUCCESS;
