@@ -93,6 +93,19 @@ static int mstp_clock_resume(void)
     uint32_t mstp_id;
     struct rcar_mstp_clock_dev_ctx *ctx;
 
+    mmio_write_32(SMSTPCR0, SMSTPCR0_VALUE);
+    mmio_write_32(SMSTPCR1, SMSTPCR1_VALUE);
+    mmio_write_32(SMSTPCR2, SMSTPCR2_VALUE);
+    mmio_write_32(SMSTPCR3, SMSTPCR3_VALUE);
+    mmio_write_32(SMSTPCR4, SMSTPCR4_VALUE);
+    mmio_write_32(SMSTPCR5, SMSTPCR5_VALUE);
+    mmio_write_32(SMSTPCR6, SMSTPCR6_VALUE);
+    mmio_write_32(SMSTPCR7, SMSTPCR7_VALUE);
+    mmio_write_32(SMSTPCR8, SMSTPCR8_VALUE);
+    mmio_write_32(SMSTPCR9, SMSTPCR9_VALUE);
+    mmio_write_32(SMSTPCR10, SMSTPCR10_VALUE);
+    mmio_write_32(SMSTPCR11, SMSTPCR11_VALUE);
+
     for (mstp_id = CLK_ID_MSTP_START; mstp_id < CLK_ID_MSTP_END; mstp_id++) {
         element_id.element.element_idx = mstp_id;
         ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(element_id);
