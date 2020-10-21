@@ -90,6 +90,34 @@ static const uint16_t smstpcr[] = {
 #define CPG_SMSTPCR9 9
 #define CPG_SMSTPCR10 10
 
+/* System Module Stop Control Register Address */
+#define SMSTPCR0    (CPG_BASE + 0x0130U)
+#define SMSTPCR1    (CPG_BASE + 0x0134U)
+#define SMSTPCR2    (CPG_BASE + 0x0138U)
+#define SMSTPCR3    (CPG_BASE + 0x013CU)
+#define SMSTPCR4    (CPG_BASE + 0x0140U)
+#define SMSTPCR5    (CPG_BASE + 0x0144U)
+#define SMSTPCR6    (CPG_BASE + 0x0148U)
+#define SMSTPCR7    (CPG_BASE + 0x014CU)
+#define SMSTPCR8    (CPG_BASE + 0x0990U)
+#define SMSTPCR9    (CPG_BASE + 0x0994U)
+#define SMSTPCR10   (CPG_BASE + 0x0998U)
+#define SMSTPCR11   (CPG_BASE + 0x099CU)
+
+/* System Module Stop Control Register Init Value */
+#define SMSTPCR0_VALUE  (0x00210000U)
+#define SMSTPCR1_VALUE  (0xFFFFFFFFU)
+#define SMSTPCR2_VALUE  (0x040E2FDCU)
+#define SMSTPCR3_VALUE  (0xFFFFFBDFU)
+#define SMSTPCR4_VALUE  (0x80000004U)
+#define SMSTPCR5_VALUE  (0xC3BFFFFFU)
+#define SMSTPCR6_VALUE  (0xFFFFFFFFU)
+#define SMSTPCR7_VALUE  (0xFFFFFFFFU)
+#define SMSTPCR8_VALUE  (0x01F1FFF5U)
+#define SMSTPCR9_VALUE  (0xFFFFFFFFU)
+#define SMSTPCR10_VALUE (0xFFFEFFE0U)
+#define SMSTPCR11_VALUE (0x000000B7U)
+
 /*!
  * @endcond
  */
