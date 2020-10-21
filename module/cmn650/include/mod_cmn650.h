@@ -200,6 +200,24 @@ struct mod_cmn650_ccix_config {
 
     /*! SMP Mode */
     bool smp_mode;
+
+    /*! Port Aggregation Mode */
+    bool port_aggregate;
+
+    /*!
+     * \brief Logical ID (LDID) of the CCIX Gateway to which port aggregation
+     *      pair to be created
+     */
+    unsigned int port_aggregate_ldid;
+
+    /*! HAID of the CCIX Gateway to which port aggregation pair to be created */
+    unsigned int port_aggregate_haid;
+
+    /*!
+     * \brief Target HAID of remote CXG gateway for CXRA SAM Address region for
+     *      the port aggregated CXG block
+     */
+    unsigned int port_aggregate_remote_haid[CMN650_MAX_RA_SAM_ADDR_REGION];
 };
 
 /*!
