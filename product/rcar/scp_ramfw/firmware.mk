@@ -40,7 +40,8 @@ BS_FIRMWARE_MODULES := \
     scmi_sensor \
     scmi_system_power \
     scmi_apcore \
-    scmi_reset_domain
+    scmi_reset_domain \
+    sds
 
 ifeq ($(BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS),yes)
     BS_FIRMWARE_MODULES += resource_perms
@@ -74,7 +75,8 @@ BS_FIRMWARE_SOURCES := \
     config_reset_domain.c \
     config_rcar_reset.c \
     config_rcar_system_power.c \
-    config_rcar_system.c
+    config_rcar_system.c \
+    config_sds.c
 
 ifeq ($(BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS),yes)
     BS_FIRMWARE_SOURCES += config_resource_perms.c
