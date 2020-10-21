@@ -436,8 +436,9 @@ static int cmn650_setup_sam(struct cmn650_rnsam_reg *rnsam)
     unsigned int idx;
     unsigned int region_io_count = 0;
     unsigned int region_sys_count = 0;
-    unsigned int cxra_ldid;
-    unsigned int cxra_node_id;
+    unsigned int cxra_ldid, cpa_cxra_ldid;
+    unsigned int cxra_node_id, cpa_cxra_node_id;
+    unsigned int port_aggregate_group_id = 0;
     unsigned int scg_regions_enabled[MAX_SCG_COUNT] = { 0, 0, 0, 0 };
     uint64_t base;
     const struct mod_cmn650_mem_region_map *region;
@@ -571,6 +572,59 @@ static int cmn650_setup_sam(struct cmn650_rnsam_reg *rnsam)
             rnsam->NON_HASH_TGT_NODEID[group] |=
                 (cxra_node_id & CMN650_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK)
                 << bit_pos;
+
+            /* CPA Programming */
+            if (config->ccix_config_table[idx].port_aggregate) {
+                FWK_LOG_INFO("Enabling CML Port Aggregation:");
+                FWK_LOG_INFO(
+                    " CXRA Node ID: %d as CPA Group ID: %d",
+                    cxra_node_id,
+                    port_aggregate_group_id);
+
+                group =
+                    region_io_count / CML_PORT_AGGR_MODE_CTRL_REGIONS_PER_GROUP;
+                bit_pos = region_io_count *
+                    CML_PORT_AGGR_MODE_CTRL_PAG_WIDTH_PER_REGION;
+
+                rnsam->CML_PORT_AGGR_MODE_CTRL[group] |=
+                    ((UINT64_C(0x1) << (bit_pos)) |
+                     ((uint64_t)port_aggregate_group_id
+                      << (bit_pos + CML_PORT_AGGR_MODE_CTRL_PAG_GRPID_OFFSET)));
+
+                /* Considering only 2 ports per group */
+                rnsam->CML_PORT_AGGR_CTRL |= UINT64_C(0x1)
+                    << (port_aggregate_group_id *
+                        CML_PORT_AGGR_CTRL_NUM_CXG_PAG_WIDTH);
+
+                cpa_cxra_ldid =
+                    config->ccix_config_table[idx].port_aggregate_ldid;
+                cpa_cxra_node_id = ctx->cxg_ra_reg_table[cpa_cxra_ldid].node_id;
+
+                /* Considering only 2 ports per group */
+                group = (port_aggregate_group_id * NUM_PORTS_PER_CPA_GROUP) /
+                    CMN_PORT_AGGR_GRP_PAG_TGTID_PER_GROUP;
+                bit_pos =
+                    ((port_aggregate_group_id * NUM_PORTS_PER_CPA_GROUP) *
+                     CMN_PORT_AGGR_GRP_PAG_TGTID_WIDTH);
+
+                rnsam->CML_PORT_AGGR_GRP[group] |= ((uint64_t)cxra_node_id)
+                    << bit_pos;
+
+                group =
+                    ((port_aggregate_group_id * NUM_PORTS_PER_CPA_GROUP) + 1) /
+                    CMN_PORT_AGGR_GRP_PAG_TGTID_PER_GROUP;
+                bit_pos =
+                    ((((port_aggregate_group_id * NUM_PORTS_PER_CPA_GROUP) +
+                       1) *
+                      CMN_PORT_AGGR_GRP_PAG_TGTID_WIDTH) %
+                     CMN_PORT_AGGR_GRP_PAG_TGTID_WIDTH_PER_GROUP);
+
+                rnsam->CML_PORT_AGGR_GRP[group] |= (uint64_t)cpa_cxra_node_id
+                    << bit_pos;
+
+                /* Increment the group id for the next group */
+                port_aggregate_group_id++;
+            }
 
             region_io_count++;
             break;

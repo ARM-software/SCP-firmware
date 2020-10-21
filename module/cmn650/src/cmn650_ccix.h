@@ -93,4 +93,24 @@ struct cxg_wait_condition_data {
 #define SAM_ADDR_TARGET_HAID_SHIFT            (52)
 #define SAM_ADDR_REG_VALID_MASK               UINT64_C(0x8000000000000000)
 
+/*
+ * Used by RNSAM and HNSAM CPA registers
+ *
+ * CPA - CCIX Port Aggregation
+ * PAG - Port Aggregation Group
+ * GRPID - Group ID
+ */
+
+#define HNF_RN_PHYS_CPA_GRP_RA_SHIFT_VAL 17
+#define HNF_RN_PHYS_CPA_EN_RA_SHIFT_VAL  30
+
+#define CML_PORT_AGGR_MODE_CTRL_REGIONS_PER_GROUP    9
+#define CML_PORT_AGGR_MODE_CTRL_PAG_WIDTH_PER_REGION 6
+#define CML_PORT_AGGR_MODE_CTRL_PAG_GRPID_OFFSET     1
+#define CML_PORT_AGGR_CTRL_NUM_CXG_PAG_WIDTH         12
+#define CMN_PORT_AGGR_GRP_PAG_TGTID_PER_GROUP        5
+#define CMN_PORT_AGGR_GRP_PAG_TGTID_WIDTH            12
+#define CMN_PORT_AGGR_GRP_PAG_TGTID_WIDTH_PER_GROUP  60
+#define NUM_PORTS_PER_CPA_GROUP                      2
+
 #endif /* CMN650_CCIX_H */
