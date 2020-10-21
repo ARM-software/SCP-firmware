@@ -36,6 +36,7 @@ BS_FIRMWARE_MODULES := \
     scmi_power_domain \
     scmi_clock \
     scmi_sensor \
+    scmi_system_power \
     scmi_apcore
 
 ifeq ($(BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS),yes)
@@ -62,6 +63,7 @@ BS_FIRMWARE_SOURCES := \
     config_smt.c \
     config_scmi.c \
     config_scmi_perf.c \
+    config_scmi_system_power.c \
     config_scmi_clock.c \
     config_scmi_apcore.c \
     config_scmi_power_domain.c \
