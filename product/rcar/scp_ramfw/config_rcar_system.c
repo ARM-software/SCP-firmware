@@ -8,12 +8,10 @@
 #include <clock_devices.h>
 #include <clock_mstp_devices.h>
 #include <clock_sd_devices.h>
-#include <config_rcar_power_domain.h>
 #include <rcar_core.h>
 
 #include <mod_clock.h>
 #include <mod_rcar_clock.h>
-#include <mod_rcar_power_domain.h>
 #include <mod_rcar_system.h>
 
 #include <fwk_element.h>

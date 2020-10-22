@@ -8,12 +8,12 @@
 #include <clock_devices.h>
 #include <clock_mstp_devices.h>
 #include <clock_sd_devices.h>
-#include <config_rcar_power_domain.h>
+#include <config_power_domain.h>
 #include <rcar_core.h>
 
 #include <mod_clock.h>
 #include <mod_rcar_clock.h>
-#include <mod_rcar_power_domain.h>
+#include <mod_power_domain.h>
 
 #include <fwk_element.h>
 #include <fwk_module.h>
@@ -1746,7 +1746,7 @@ static const struct fwk_element *clock_get_dev_desc_table(fwk_id_t module_id)
         dev_config =
             (struct mod_clock_dev_config *)clock_dev_desc_table[i].data;
         dev_config->pd_source_id = FWK_ID_ELEMENT(
-            FWK_MODULE_IDX_RCAR_POWER_DOMAIN,
+            FWK_MODULE_IDX_POWER_DOMAIN,
             CONFIG_POWER_DOMAIN_CHILD_COUNT + core_count);
     }
     return clock_dev_desc_table;
@@ -1756,10 +1756,10 @@ struct fwk_module_config config_clock = {
     .elements = FWK_MODULE_DYNAMIC_ELEMENTS(clock_get_dev_desc_table),
     .data = &((struct mod_clock_config){
         .pd_transition_notification_id = FWK_ID_NOTIFICATION_INIT(
-            FWK_MODULE_IDX_RCAR_POWER_DOMAIN,
+            FWK_MODULE_IDX_POWER_DOMAIN,
             MOD_PD_NOTIFICATION_IDX_POWER_STATE_TRANSITION),
         .pd_pre_transition_notification_id = FWK_ID_NOTIFICATION_INIT(
-            FWK_MODULE_IDX_RCAR_POWER_DOMAIN,
+            FWK_MODULE_IDX_POWER_DOMAIN,
             MOD_PD_NOTIFICATION_IDX_POWER_STATE_PRE_TRANSITION),
     }),
 };

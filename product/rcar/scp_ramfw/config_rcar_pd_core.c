@@ -6,12 +6,12 @@
  */
 
 #include <config_rcar_pd_core.h>
-#include <config_rcar_power_domain.h>
+#include <config_power_domain.h>
 #include <rcar_core.h>
 #include <rcar_mmap.h>
 
 #include <mod_rcar_pd_core.h>
-#include <mod_rcar_power_domain.h>
+#include <mod_power_domain.h>
 
 #include <fwk_assert.h>
 #include <fwk_element.h>
@@ -42,7 +42,7 @@ static const char *cluster_pd_name_table[2] = {
 /* Module configuration data */
 static struct mod_rcar_pd_core_config rcar_pd_core_config_data = {
     .pd_notification_id = FWK_ID_NOTIFICATION_INIT(
-        FWK_MODULE_IDX_RCAR_POWER_DOMAIN,
+        FWK_MODULE_IDX_POWER_DOMAIN,
         MOD_PD_NOTIFICATION_IDX_POWER_STATE_TRANSITION),
 };
 
@@ -141,7 +141,7 @@ static const struct fwk_element *rcar_pd_core_get_element_table(fwk_id_t mod)
      * module which is dynamically defined based on the number of cores.
      */
     rcar_pd_core_config_data.pd_source_id = fwk_id_build_element_id(
-        fwk_module_id_rcar_power_domain,
+        fwk_module_id_power_domain,
         core_count + CONFIG_POWER_DOMAIN_CHILD_CLUSTER0);
 
     return element_table;

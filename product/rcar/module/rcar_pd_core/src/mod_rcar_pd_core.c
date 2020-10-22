@@ -10,7 +10,6 @@
 #include <rcar_pd_core.h>
 
 #include <mod_rcar_pd_core.h>
-#include <mod_rcar_power_domain.h>
 #include <mod_system_power.h>
 
 #include <fwk_assert.h>
@@ -231,7 +230,7 @@ static int rcar_core_bind(fwk_id_t id, unsigned int round)
 
     /* Nothing to do during the first round of calls where the power module
        will bind to the power domains of this module. */
-    if (round == 0)
+    if ((round == 0) || fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
         return FWK_SUCCESS;
 
 #if 0
@@ -265,7 +264,7 @@ static int rcar_core_bind(fwk_id_t id, unsigned int round)
         return FWK_SUCCESS;
 
     switch (fwk_id_get_module_idx(pd_ctx->bound_id)) {
-    case FWK_MODULE_IDX_RCAR_POWER_DOMAIN:
+    case FWK_MODULE_IDX_POWER_DOMAIN:
         return fwk_module_bind(
             pd_ctx->bound_id,
             mod_pd_api_id_driver_input,
@@ -314,7 +313,7 @@ static int rcar_core_process_bind_request(
     }
 
     is_power_domain_module =
-        (fwk_id_get_module_idx(source_id) == FWK_MODULE_IDX_RCAR_POWER_DOMAIN);
+        (fwk_id_get_module_idx(source_id) == FWK_MODULE_IDX_POWER_DOMAIN);
     is_system_power_module =
         (fwk_id_get_module_idx(source_id) == FWK_MODULE_IDX_SYSTEM_POWER);
 
