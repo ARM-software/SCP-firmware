@@ -8,7 +8,7 @@
 #ifndef MOD_RCAR_PD_SYSC_H
 #define MOD_RCAR_PD_SYSC_H
 
-#include <mod_rcar_power_domain.h>
+#include <mod_power_domain.h>
 
 #include <stdbool.h>
 #include <stdint.h>

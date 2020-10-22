@@ -8,7 +8,7 @@
 #ifndef MOD_RCAR_PD_CORE_H
 #define MOD_RCAR_PD_CORE_H
 
-#include <mod_rcar_power_domain.h>
+#include <mod_power_domain.h>
 
 #include <fwk_id.h>
 
@@ -16,6 +16,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define CPU_PWR_OFF         (0x00000003U)
+#define MODE_L2_DOWN        (0x00000002U)
 #define CORE_PER_CLUSTER_COUNT_MAX 8
 
 /*!

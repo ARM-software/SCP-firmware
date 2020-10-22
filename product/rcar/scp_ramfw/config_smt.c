@@ -5,13 +5,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <config_rcar_power_domain.h>
+#include <config_power_domain.h>
 #include <rcar_core.h>
 #include <rcar_mfismh.h>
 #include <rcar_scmi.h>
 #include <software_mmap.h>
 
-#include <mod_rcar_power_domain.h>
+#include <mod_power_domain.h>
 #include <mod_smt.h>
 
 #include <fwk_element.h>
@@ -67,7 +67,7 @@ static const struct fwk_element *smt_get_element_table(fwk_id_t module_id)
     for (idx = 0; idx < RCAR_SCMI_SERVICE_IDX_COUNT; idx++) {
         config = (struct mod_smt_channel_config *)(smt_element_table[idx].data);
         config->pd_source_id = FWK_ID_ELEMENT(
-            FWK_MODULE_IDX_RCAR_POWER_DOMAIN,
+            FWK_MODULE_IDX_POWER_DOMAIN,
             CONFIG_POWER_DOMAIN_CHILD_COUNT + rcar_core_get_count());
     }
 

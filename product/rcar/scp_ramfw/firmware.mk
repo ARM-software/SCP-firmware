@@ -26,7 +26,7 @@ BS_FIRMWARE_MODULES := \
     rcar_pmic \
     rcar_mock_pmic \
     rcar_mfismh \
-    rcar_power_domain \
+    power_domain \
     rcar_pd_sysc \
     rcar_pd_core \
     rcar_reg_sensor \
@@ -43,7 +43,7 @@ endif
 BS_FIRMWARE_SOURCES := \
     rcar_core.c \
     config_rcar_scif.c \
-    config_rcar_power_domain.c \
+    config_power_domain.c \
     config_rcar_pd_sysc.c \
     config_rcar_pd_core.c \
     config_sensor.c \

@@ -10,7 +10,7 @@
 #include <rcar_mmap.h>
 #include <rcar_pd_core.h>
 
-#include <mod_rcar_power_domain.h>
+#include <mod_rcar_pd_core.h>
 
 #include <fwk_assert.h>
 #include <fwk_status.h>

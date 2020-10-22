@@ -9,7 +9,6 @@
 #include <mmio.h>
 
 #include <mod_clock.h>
-#include <mod_rcar_power_domain.h>
 #include <mod_rcar_sd_clock.h>
 
 #include <fwk_assert.h>
