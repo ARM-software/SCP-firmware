@@ -67,7 +67,7 @@ else ifeq ($(BS_TOOLCHAIN),LLVM)
     # therefore we are enforcing the use of it manually.
     export LD := $(shell $(CC) --print-prog-name=ld.lld)
 else
-    export AR := $(shell $(CC) --print-prog-name gcc-ar)
+    export AR := $(shell $(CC) --print-prog-name ar)
     export OBJCOPY := $(shell $(CC) --print-prog-name objcopy)
     export SIZE := $(shell $(CC) --print-prog-name size)
 endif
