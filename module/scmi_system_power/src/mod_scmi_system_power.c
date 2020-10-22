@@ -163,7 +163,7 @@ static void graceful_timer_callback(uintptr_t scmi_system_state)
 
     FWK_LOG_INFO("SCMI_SYS_POWER: Graceful request timeout...");
     FWK_LOG_INFO(
-        "SCMI_SYS_POWER: Forcing SCMI SYSTEM STATE %d", scmi_system_state);
+        "SCMI_SYS_POWER: Forcing SCMI SYSTEM STATE %d", (int)scmi_system_state);
 
     scmi_sys_power_ctx.start_graceful_process = false;
 
