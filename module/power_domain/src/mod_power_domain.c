@@ -761,7 +761,7 @@ static void process_set_state_request(
     unsigned int nb_pds, pd_index, state;
     struct pd_ctx *pd, *pd_in_charge_of_response;
     const struct pd_ctx *parent;
-    const uint32_t *state_mask_table;
+    const uint32_t *state_mask_table = NULL;
 
     req_params = (struct pd_set_state_request *)event->params;
     resp_params = (struct pd_set_state_response *)resp_event->params;
@@ -947,7 +947,7 @@ static int complete_system_suspend(struct pd_ctx *target_pd)
             << shift;
         pd = pd->parent;
         level++;
-    } while ((pd != NULL) && (level < table_size));
+    } while ((pd != NULL) && (level < (unsigned int)table_size));
 
     /*
      * Finally, we need to update the highest valid level in the composite
