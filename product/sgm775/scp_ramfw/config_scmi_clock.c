@@ -20,21 +20,25 @@ static const struct mod_scmi_clock_device agent_device_table_ospm[] = {
         /* VPU */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_VPU),
+        .starts_enabled = true,
     },
     {
         /* DPU */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_DPU),
+        .starts_enabled = true,
     },
     {
         /* PIXEL_0 */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_PIXEL_0),
+        .starts_enabled = true,
     },
     {
         /* PIXEL_1 */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_PIXEL_1),
+        .starts_enabled = true,
     },
 };
 
