@@ -205,6 +205,10 @@ static const struct mod_cmn650_ccix_config ccix_config_table_chip_0[] = {
             },
         },
         .smp_mode = true,
+        .port_aggregate = true,
+        .port_aggregate_ldid = CCIX_PORT_1,
+        .port_aggregate_haid = (RNF_PER_CHIP * CHIP_0) + CCIX_PORT_1,
+        .port_aggregate_remote_haid = {(RNF_PER_CHIP * CHIP_1) + CCIX_PORT_1}
     },
     {
         .ldid = CCIX_PORT_2,
@@ -230,6 +234,10 @@ static const struct mod_cmn650_ccix_config ccix_config_table_chip_0[] = {
             },
         },
         .smp_mode = true,
+        .port_aggregate = true,
+        .port_aggregate_ldid = CCIX_PORT_3,
+        .port_aggregate_haid = (RNF_PER_CHIP * CHIP_0) + CCIX_PORT_3,
+        .port_aggregate_remote_haid = {(RNF_PER_CHIP * CHIP_2) + CCIX_PORT_1}
     },
     {
         .ldid = CCIX_PORT_4,
@@ -255,6 +263,10 @@ static const struct mod_cmn650_ccix_config ccix_config_table_chip_0[] = {
             },
         },
         .smp_mode = true,
+        .port_aggregate = true,
+        .port_aggregate_ldid = CCIX_PORT_5,
+        .port_aggregate_haid = (RNF_PER_CHIP * CHIP_0) + CCIX_PORT_5,
+        .port_aggregate_remote_haid = {(RNF_PER_CHIP * CHIP_3) + CCIX_PORT_1}
     }
 };
 
@@ -284,6 +296,10 @@ static const struct mod_cmn650_ccix_config ccix_config_table_chip_1[] = {
             },
         },
         .smp_mode = true,
+        .port_aggregate = true,
+        .port_aggregate_ldid = CCIX_PORT_1,
+        .port_aggregate_haid = (RNF_PER_CHIP * CHIP_1) + CCIX_PORT_1,
+        .port_aggregate_remote_haid = {(RNF_PER_CHIP * CHIP_0) + CCIX_PORT_1}
     },
     {
         .ldid = CCIX_PORT_2,
@@ -309,6 +325,10 @@ static const struct mod_cmn650_ccix_config ccix_config_table_chip_1[] = {
             },
         },
         .smp_mode = true,
+        .port_aggregate = true,
+        .port_aggregate_ldid = CCIX_PORT_3,
+        .port_aggregate_haid = (RNF_PER_CHIP * CHIP_1) + CCIX_PORT_3,
+        .port_aggregate_remote_haid = {(RNF_PER_CHIP * CHIP_2) + CCIX_PORT_3}
     },
     {
         .ldid = CCIX_PORT_4,
@@ -334,6 +354,10 @@ static const struct mod_cmn650_ccix_config ccix_config_table_chip_1[] = {
             },
         },
         .smp_mode = true,
+        .port_aggregate = true,
+        .port_aggregate_ldid = CCIX_PORT_5,
+        .port_aggregate_haid = (RNF_PER_CHIP * CHIP_1) + CCIX_PORT_5,
+        .port_aggregate_remote_haid = {(RNF_PER_CHIP * CHIP_3) + CCIX_PORT_3}
     },
 };
 
@@ -363,6 +387,10 @@ static const struct mod_cmn650_ccix_config ccix_config_table_chip_2[] = {
             },
         },
         .smp_mode = true,
+        .port_aggregate = true,
+        .port_aggregate_ldid = CCIX_PORT_1,
+        .port_aggregate_haid = (RNF_PER_CHIP * CHIP_2) + CCIX_PORT_1,
+        .port_aggregate_remote_haid = {(RNF_PER_CHIP * CHIP_0) + CCIX_PORT_3}
     },
     {
         .ldid = CCIX_PORT_2,
@@ -388,6 +416,10 @@ static const struct mod_cmn650_ccix_config ccix_config_table_chip_2[] = {
             },
         },
         .smp_mode = true,
+        .port_aggregate = true,
+        .port_aggregate_ldid = CCIX_PORT_3,
+        .port_aggregate_haid = (RNF_PER_CHIP * CHIP_2) + CCIX_PORT_3,
+        .port_aggregate_remote_haid = {(RNF_PER_CHIP * CHIP_1) + CCIX_PORT_3}
     },
     {
         .ldid = CCIX_PORT_4,
@@ -413,6 +445,10 @@ static const struct mod_cmn650_ccix_config ccix_config_table_chip_2[] = {
             },
         },
         .smp_mode = true,
+        .port_aggregate = true,
+        .port_aggregate_ldid = CCIX_PORT_5,
+        .port_aggregate_haid = (RNF_PER_CHIP * CHIP_2) + CCIX_PORT_5,
+        .port_aggregate_remote_haid = {(RNF_PER_CHIP * CHIP_3) + CCIX_PORT_5}
     },
 };
 
@@ -442,6 +478,10 @@ static const struct mod_cmn650_ccix_config ccix_config_table_chip_3[] = {
             },
         },
         .smp_mode = true,
+        .port_aggregate = true,
+        .port_aggregate_ldid = CCIX_PORT_1,
+        .port_aggregate_haid = (RNF_PER_CHIP * CHIP_3) + CCIX_PORT_1,
+        .port_aggregate_remote_haid = {(RNF_PER_CHIP * CHIP_0) + CCIX_PORT_5}
     },
     {
         .ldid = CCIX_PORT_2,
@@ -467,6 +507,10 @@ static const struct mod_cmn650_ccix_config ccix_config_table_chip_3[] = {
             },
         },
         .smp_mode = true,
+        .port_aggregate = true,
+        .port_aggregate_ldid = CCIX_PORT_3,
+        .port_aggregate_haid = (RNF_PER_CHIP * CHIP_3) + CCIX_PORT_3,
+        .port_aggregate_remote_haid = {(RNF_PER_CHIP * CHIP_1) + CCIX_PORT_5}
     },
     {
         .ldid = CCIX_PORT_4,
@@ -492,6 +536,10 @@ static const struct mod_cmn650_ccix_config ccix_config_table_chip_3[] = {
             },
         },
         .smp_mode = true,
+        .port_aggregate = true,
+        .port_aggregate_ldid = CCIX_PORT_5,
+        .port_aggregate_haid = (RNF_PER_CHIP * CHIP_3) + CCIX_PORT_5,
+        .port_aggregate_remote_haid = {(RNF_PER_CHIP * CHIP_2) + CCIX_PORT_5}
     },
 };
 
