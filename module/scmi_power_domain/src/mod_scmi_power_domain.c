@@ -368,8 +368,14 @@ static int scmi_pd_power_domain_attributes_handler(fwk_id_t service_id,
     case MOD_PD_TYPE_DEVICE:
         /*
          * Support only synchronous POWER_STATE_SET for devices for any agent.
+         * Notifications are also supported for this power domain type.
          */
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+        return_values.attributes = SCMI_PD_POWER_STATE_SET_SYNC |
+            SCMI_PD_POWER_STATE_CHANGE_NOTIFICATIONS;
+#else
         return_values.attributes = SCMI_PD_POWER_STATE_SET_SYNC;
+#endif
         break;
 
     case MOD_PD_TYPE_SYSTEM:
