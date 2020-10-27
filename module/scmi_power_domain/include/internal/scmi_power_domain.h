@@ -59,6 +59,7 @@ struct scmi_pd_power_domain_attributes_a2p {
     uint32_t domain_id;
 };
 
+#define SCMI_PD_POWER_STATE_CHANGE_NOTIFICATIONS (1UL << 31)
 #define SCMI_PD_POWER_STATE_SET_ASYNC    (1 << 30)
 #define SCMI_PD_POWER_STATE_SET_SYNC     (1 << 29)
 
