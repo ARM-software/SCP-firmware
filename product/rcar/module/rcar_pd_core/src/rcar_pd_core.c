@@ -22,8 +22,6 @@ void rcar_pwrc_cpuoff(unsigned int core)
     uintptr_t off_reg;
     uint32_t cpu_no;
 
-    mdelay(300);
-
     if (core & CLUSTER_CPU_MASK) {
         /* A53 side                */
         off_reg = (uintptr_t)RCAR_CA53CPU0CR;
