@@ -31,43 +31,70 @@ static const struct fwk_element element_table[] = {
                 MOD_SMT_API_IDX_SCMI_TRANSPORT),
             .transport_notification_init_id =
                 FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
-                    MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
+                MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCMI_AGENT_ID_PSCI,
         },
     },
-
-    [RCAR_SCMI_SERVICE_IDX_OSPM_0] = {
-        .name = "OSPM 0",
+    [RCAR_SCMI_SERVICE_IDX_OSPM] = {
+        .name = "OSPM",
         .data = &(struct mod_scmi_service_config) {
             .transport_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_SMT,
-                RCAR_SCMI_SERVICE_IDX_OSPM_0),
+                RCAR_SCMI_SERVICE_IDX_OSPM),
             .transport_api_id = FWK_ID_API_INIT(
                 FWK_MODULE_IDX_SMT,
                 MOD_SMT_API_IDX_SCMI_TRANSPORT),
             .transport_notification_init_id =
                 FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
-                    MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
+                MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCMI_AGENT_ID_OSPM,
         },
     },
-/*
-    [RCAR_SCMI_SERVICE_IDX_OSPM_1] = {
-        .name = "OSPM 1",
+    [RCAR_SCMI_SERVICE_IDX_VMM] = {
+        .name = "VMM",
         .data = &(struct mod_scmi_service_config) {
             .transport_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_SMT,
-                RCAR_SCMI_SERVICE_IDX_OSPM_1),
+                RCAR_SCMI_SERVICE_IDX_VMM),
             .transport_api_id = FWK_ID_API_INIT(
                 FWK_MODULE_IDX_SMT,
                 MOD_SMT_API_IDX_SCMI_TRANSPORT),
             .transport_notification_init_id =
                 FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
-                    MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
-            .scmi_agent_id = SCMI_AGENT_ID_OSPM,
+                MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
+            .scmi_agent_id = SCMI_AGENT_ID_VMM,
         },
     },
-*/
+    [RCAR_SCMI_SERVICE_IDX_VM1] = {
+        .name = "VM1",
+        .data = &(struct mod_scmi_service_config) {
+            .transport_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_SMT,
+                RCAR_SCMI_SERVICE_IDX_VM1),
+            .transport_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_SMT,
+                MOD_SMT_API_IDX_SCMI_TRANSPORT),
+            .transport_notification_init_id =
+                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
+                MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
+            .scmi_agent_id = SCMI_AGENT_ID_VM1,
+        },
+    },
+    [RCAR_SCMI_SERVICE_IDX_VM2] = {
+        .name = "VM2",
+        .data = &(struct mod_scmi_service_config) {
+            .transport_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_SMT,
+                RCAR_SCMI_SERVICE_IDX_VM2),
+            .transport_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_SMT,
+                MOD_SMT_API_IDX_SCMI_TRANSPORT),
+            .transport_notification_init_id =
+                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
+                MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
+            .scmi_agent_id = SCMI_AGENT_ID_VM2,
+        },
+    },
     [RCAR_SCMI_SERVICE_IDX_COUNT] = { 0 },
 };
 
@@ -84,6 +111,18 @@ static const struct mod_scmi_agent agent_table[] = {
     [SCMI_AGENT_ID_PSCI] = {
         .type = SCMI_AGENT_TYPE_PSCI,
         .name = "PSCI",
+    },
+    [SCMI_AGENT_ID_VMM] = {
+        .type = SCMI_AGENT_TYPE_OSPM,
+        .name = "VMM",
+    },
+    [SCMI_AGENT_ID_VM1] = {
+        .type = SCMI_AGENT_TYPE_OSPM,
+        .name = "VM1",
+    },
+    [SCMI_AGENT_ID_VM2] = {
+        .type = SCMI_AGENT_TYPE_OSPM,
+        .name = "VM2",
     },
 };
 

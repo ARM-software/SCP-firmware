@@ -20,6 +20,8 @@ enum rcar_irq {
     MFIS_AREICR1_IRQ = 257,
     MFIS_AREICR2_IRQ = 258,
     MFIS_AREICR3_IRQ = 259,
+    MFIS_AREICR4_IRQ = 260,
+    MFIS_AREICR5_IRQ = 261,
     /**/ /* The following numbers are virtual IID */
     SMCMH_IRQ_START = 1024,
     SMCMH_SECURE_IRQ = SMCMH_IRQ_START, /* SMC Secure */

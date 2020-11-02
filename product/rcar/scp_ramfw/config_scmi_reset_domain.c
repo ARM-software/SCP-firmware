@@ -1089,6 +1089,18 @@ static const struct mod_scmi_reset_domain_agent agent_table[] = {
         .device_table = agent_device_table_ospm,
         .agent_domain_count = FWK_ARRAY_SIZE(agent_device_table_ospm),
     },
+    [SCMI_AGENT_ID_VMM] = {
+        .device_table = agent_device_table_ospm,
+        .agent_domain_count = FWK_ARRAY_SIZE(agent_device_table_ospm),
+    },
+    [SCMI_AGENT_ID_VM1] = {
+        .device_table = agent_device_table_ospm,
+        .agent_domain_count = FWK_ARRAY_SIZE(agent_device_table_ospm),
+    },
+    [SCMI_AGENT_ID_VM2] = {
+        .device_table = agent_device_table_ospm,
+        .agent_domain_count = FWK_ARRAY_SIZE(agent_device_table_ospm),
+    },
 };
 
 const struct fwk_module_config config_scmi_reset_domain = {

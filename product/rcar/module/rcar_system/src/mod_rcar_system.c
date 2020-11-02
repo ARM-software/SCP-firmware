@@ -60,7 +60,10 @@ static fwk_id_t sds_feature_availability_id =
 /* SCMI services required to enable the messaging stack */
 static unsigned int scmi_notification_table[] = {
     RCAR_SCMI_SERVICE_IDX_PSCI,
-    RCAR_SCMI_SERVICE_IDX_OSPM_0,
+    RCAR_SCMI_SERVICE_IDX_OSPM,
+    RCAR_SCMI_SERVICE_IDX_VMM,
+    RCAR_SCMI_SERVICE_IDX_VM1,
+    RCAR_SCMI_SERVICE_IDX_VM2,
 };
 
 IMPORT_SYM(unsigned long, __system_ram_start__, SYSTEM_RAM_START);
