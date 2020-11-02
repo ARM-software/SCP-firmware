@@ -436,7 +436,7 @@ def main():
         'MODE=debug ' \
         'make clean all -j'
     result = subprocess.call(cmd, shell=True)
-    results.append(('Product rcar debug build (ARM)', result))
+    results.append(('Product rcar debug build (GCC-AArch64)', result))
 
     cmd = \
         'CC=aarch64-none-elf-gcc ' \
@@ -444,7 +444,7 @@ def main():
         'MODE=release ' \
         'make clean all -j'
     result = subprocess.call(cmd, shell=True)
-    results.append(('Product rcar release build (ARM)', result))
+    results.append(('Product rcar release build (GCC-AArch64)', result))
 
     banner('Tests summary')
 
