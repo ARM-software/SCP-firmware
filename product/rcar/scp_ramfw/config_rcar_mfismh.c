@@ -23,11 +23,29 @@ static const struct fwk_element mfismh_element_table[] = {
                                        &((struct mod_rcar_mfismh_device_config){
                                            .irq = MFIS_AREICR2_IRQ,
                                        }) },
-    [RCAR_MFISMH_DEVICE_IDX_NS_L] = { .name = "MSIFMH_NS_L",
+    [RCAR_MFISMH_DEVICE_IDX_NS_1] = { .name = "MSIFMH_NS_1",
                                       .sub_element_count = 1,
                                       .data = &((
                                           struct mod_rcar_mfismh_device_config){
                                           .irq = MFIS_AREICR1_IRQ,
+                                      }) },
+    [RCAR_MFISMH_DEVICE_IDX_NS_2] = { .name = "MSIFMH_NS_2",
+                                      .sub_element_count = 1,
+                                      .data = &((
+                                          struct mod_rcar_mfismh_device_config){
+                                          .irq = MFIS_AREICR3_IRQ,
+                                      }) },
+    [RCAR_MFISMH_DEVICE_IDX_NS_3] = { .name = "MSIFMH_NS_3",
+                                      .sub_element_count = 1,
+                                      .data = &((
+                                          struct mod_rcar_mfismh_device_config){
+                                          .irq = MFIS_AREICR4_IRQ,
+                                      }) },
+    [RCAR_MFISMH_DEVICE_IDX_NS_4] = { .name = "MSIFMH_NS_4",
+                                      .sub_element_count = 1,
+                                      .data = &((
+                                          struct mod_rcar_mfismh_device_config){
+                                          .irq = MFIS_AREICR5_IRQ,
                                       }) },
     [RCAR_MFISMH_DEVICE_IDX_COUNT] = {},
 };
