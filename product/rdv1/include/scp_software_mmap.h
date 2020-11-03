@@ -56,4 +56,11 @@
     (SCP_SCMI_PAYLOAD_NS_P2A_BASE + SCP_SCMI_PAYLOAD_SIZE)
 #define SCP_SDS_NONSECURE_SIZE (1024)
 
+/*
+ * SCMI Fastchannel memory region. Fastchannel Size as per SCMI v2
+ * specification
+ */
+#define SCP_SCMI_FAST_CHANNEL_BASE \
+    (SCP_SDS_NONSECURE_BASE + SCP_SDS_NONSECURE_SIZE)
+
 #endif /* SCP_SOFTWARE_MMAP_H */
