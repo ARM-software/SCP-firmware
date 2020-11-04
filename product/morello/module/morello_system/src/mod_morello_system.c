@@ -16,6 +16,7 @@
 #include "morello_scp_mmap.h"
 #include "morello_scp_pik.h"
 #include "morello_scp_scmi.h"
+#include "morello_scp_system_mmap.h"
 #include "morello_sds.h"
 
 #include <mod_clock.h>
@@ -348,7 +349,10 @@ static int morello_system_init_primary_core(void)
     if (morello_get_chipid() == 0x0) {
         struct mod_fip_entry_data entry;
         status = morello_system_ctx.fip_api->get_entry(
-            MOD_FIP_TOC_ENTRY_TFA_BL31, &entry);
+            MOD_FIP_TOC_ENTRY_TFA_BL31,
+            &entry,
+            SCP_QSPI_FLASH_BASE_ADDR,
+            SCP_QSPI_FLASH_SIZE);
 
         if (status != FWK_SUCCESS) {
             FWK_LOG_INFO(

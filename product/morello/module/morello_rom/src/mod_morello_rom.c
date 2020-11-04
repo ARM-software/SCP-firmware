@@ -121,7 +121,10 @@ static int morello_rom_process_event(
 {
     struct mod_fip_entry_data entry;
     int status = morello_rom_ctx.fip_api->get_entry(
-        morello_rom_ctx.rom_config->image_type, &entry);
+        morello_rom_ctx.rom_config->image_type,
+        &entry,
+        morello_rom_ctx.rom_config->fip_base_address,
+        morello_rom_ctx.rom_config->fip_nvm_size);
     const char *image_type =
         get_image_type_str(morello_rom_ctx.rom_config->image_type);
 

@@ -20,18 +20,6 @@
 #include <string.h>
 
 /*
- * Module context
- */
-struct fip_ctx {
-    /* Memory-mapped base address of the FIP */
-    struct fip_toc *toc;
-    /* FIP module configuration data */
-    const struct mod_fip_config *config;
-};
-
-static struct fip_ctx module_ctx;
-
-/*
  * Static helpers
  */
 static int fip_entry_type_to_uuid(
@@ -78,17 +66,29 @@ static bool validate_fip_toc(const struct fip_toc *const toc)
  */
 static int fip_get_entry(
     enum mod_fip_toc_entry_type type,
-    struct mod_fip_entry_data *const entry_data)
+    struct mod_fip_entry_data *const entry_data,
+    uintptr_t base,
+    size_t limit)
 {
     uintptr_t address;
     struct fip_uuid target_uuid;
     struct fip_toc_entry *toc_entry;
     int status;
+    struct fip_toc *toc = (void *)base;
 
-    if (!module_ctx.toc)
-        return FWK_E_INIT;
+    if (!validate_fip_toc(toc)) {
+        /*
+         * The error log message here requires the platform to enable an
+         * always-on logging mechanism in order to detect this failure in
+         * early stages, such as in ROM code.
+         */
+        FWK_LOG_ERR(
+            "[FIP] Invalid FIP ToC header name: [0x%08" PRIX32 "]",
+            toc->header.name);
+        return FWK_E_PARAM;
+    }
 
-    toc_entry = module_ctx.toc->entry;
+    toc_entry = toc->entry;
 
     status = fip_entry_type_to_uuid(type, &target_uuid);
     if (status != FWK_SUCCESS)
@@ -106,16 +106,12 @@ static int fip_get_entry(
 
     /* Sanity checks of the retrieved entry data */
     if (__builtin_add_overflow(
-            (uintptr_t)module_ctx.toc,
-            (uintptr_t)toc_entry->offset_address,
-            &address)) {
+            (uintptr_t)toc, (uintptr_t)toc_entry->offset_address, &address)) {
         return FWK_E_DATA;
     }
 
-    if ((uintptr_t)toc_entry->offset_address + toc_entry->size >
-        module_ctx.config->fip_nvm_size) {
+    if ((uintptr_t)toc_entry->offset_address + toc_entry->size > limit)
         return FWK_E_SIZE;
-    }
 
     entry_data->base = (void *)address;
     entry_data->size = toc_entry->size;
@@ -135,26 +131,6 @@ static int fip_init(
     unsigned int element_count,
     const void *data)
 {
-    const struct mod_fip_config *config = data;
-    if ((config == NULL) || (element_count > 0))
-        return FWK_E_PANIC;
-
-    struct fip_toc *toc = (void *)config->fip_base_address;
-    if (!validate_fip_toc(toc)) {
-        /*
-         * The error log message here requires the platform to enable an
-         * always-on logging mechanism in order to detect this failure in
-         * early stages, such as in ROM code.
-         */
-        FWK_LOG_ERR(
-            "[FIP] Invalid FIP ToC header name: [0x%08" PRIX32 "]",
-            toc->header.name);
-        return FWK_E_INIT;
-    }
-
-    module_ctx.toc = toc;
-    module_ctx.config = config;
-
     return FWK_SUCCESS;
 }
 
@@ -167,6 +143,8 @@ static int fip_process_bind_request(
     *api = &fip_api;
     return FWK_SUCCESS;
 }
+
+const struct fwk_module_config config_fip = { 0 };
 
 const struct fwk_module module_fip = {
     .name = "FIP Parser",

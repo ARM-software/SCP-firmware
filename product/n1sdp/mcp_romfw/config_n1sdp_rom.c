@@ -14,6 +14,8 @@
 
 const struct fwk_module_config config_n1sdp_rom = {
     .data = &((struct n1sdp_rom_config){
+        .fip_base_address = MCP_QSPI_FLASH_BASE_ADDR,
+        .fip_nvm_size = MCP_QSPI_FLASH_SIZE,
         .ramfw_base = MCP_RAM0_BASE,
         .image_type = MOD_FIP_TOC_ENTRY_MCP_BL2,
     })

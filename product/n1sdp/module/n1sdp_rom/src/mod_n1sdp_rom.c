@@ -122,7 +122,10 @@ static int n1sdp_rom_process_event(const struct fwk_event *event,
 {
     struct mod_fip_entry_data entry;
     int status = n1sdp_rom_ctx.fip_api->get_entry(
-        n1sdp_rom_ctx.rom_config->image_type, &entry);
+        n1sdp_rom_ctx.rom_config->image_type,
+        &entry,
+        n1sdp_rom_ctx.rom_config->fip_base_address,
+        n1sdp_rom_ctx.rom_config->fip_nvm_size);
     const char *image_type =
         get_image_type_str(n1sdp_rom_ctx.rom_config->image_type);
 

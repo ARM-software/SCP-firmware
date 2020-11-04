@@ -21,7 +21,6 @@ BS_FIRMWARE_MODULES := \
     clock
 
 BS_FIRMWARE_SOURCES := \
-    config_fip.c \
     config_n1sdp_rom.c \
     config_clock.c \
     config_pl011.c
