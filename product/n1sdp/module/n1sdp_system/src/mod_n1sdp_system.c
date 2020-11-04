@@ -16,6 +16,7 @@
 #include "n1sdp_scp_mmap.h"
 #include "n1sdp_scp_pik.h"
 #include "n1sdp_scp_scmi.h"
+#include "n1sdp_scp_system_mmap.h"
 #include "n1sdp_sds.h"
 
 #include <internal/n1sdp_scp2pcc.h>
@@ -403,7 +404,10 @@ static int n1sdp_system_init_primary_core(void)
     if (n1sdp_get_chipid() == 0x0) {
         struct mod_fip_entry_data entry;
         status = n1sdp_system_ctx.fip_api->get_entry(
-            MOD_FIP_TOC_ENTRY_TFA_BL31, &entry);
+            MOD_FIP_TOC_ENTRY_TFA_BL31,
+            &entry,
+            SCP_QSPI_FLASH_BASE_ADDR,
+            SCP_QSPI_FLASH_SIZE);
         if (status != FWK_SUCCESS) {
             FWK_LOG_INFO(
                 "[N1SDP SYSTEM] Failed to locate AP TF_BL31, error: %d\n",

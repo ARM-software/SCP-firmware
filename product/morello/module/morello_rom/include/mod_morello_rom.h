@@ -10,6 +10,7 @@
 
 #include <mod_fip.h>
 
+#include <stddef.h>
 #include <stdint.h>
 
 /*!
@@ -26,6 +27,15 @@
  * \brief Module configuration data.
  */
 struct morello_rom_config {
+    /*!
+     * Base address of memory-mapped non-volatile platform storage; FIP ToC
+     * starts at this address.
+     */
+    uintptr_t fip_base_address;
+
+    /*! Size of underlying memory-mapped non-volatile platform storage. */
+    size_t fip_nvm_size;
+
     /*! Base address of the RAM to which SCP BL2 will be copied to */
     const uintptr_t ramfw_base;
 

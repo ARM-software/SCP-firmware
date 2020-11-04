@@ -71,7 +71,6 @@ BS_FIRMWARE_SOURCES := \
     config_pik_clock.c \
     config_css_clock.c \
     config_clock.c \
-    config_fip.c \
     config_psu.c \
     config_mock_psu.c \
     config_dvfs.c \

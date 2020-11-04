@@ -52,19 +52,6 @@ enum mod_fip_toc_entry_type {
  */
 
 /*!
- * \brief FIP Module configuration.
- */
-struct mod_fip_config {
-    /*!
-     * Base address of memory-mapped non-volatile platform storage; FIP ToC
-     * starts at this address.
-     */
-    uintptr_t fip_base_address;
-    /*! Size of underlying memory-mapped non-volatile platform storage. */
-    size_t fip_nvm_size;
-};
-
-/*!
  * \brief A memory-mapped FIP entry data (desribes a firmware image).
  */
 struct mod_fip_entry_data {
@@ -85,6 +72,8 @@ struct mod_fip_api {
      *
      * \param type FIP ToC entry type.
      * \param[out] entry Updated if the type of entry requested is found.
+     * \param base Base address where FIP ToC resides.
+     * \param limit Maximum size of the media where FIP ToC resides.
 
      * \retval ::FWK_SUCCESS Entry found and \p entry updated.
      * \retval ::FWK_E_INIT Underlying storage could not be parsed (during
@@ -95,7 +84,9 @@ struct mod_fip_api {
      */
     int (*get_entry)(
         enum mod_fip_toc_entry_type type,
-        struct mod_fip_entry_data *entry);
+        struct mod_fip_entry_data *entry,
+        uintptr_t base,
+        size_t limit);
 };
 
 /*!

@@ -76,7 +76,6 @@ BS_FIRMWARE_SOURCES := \
     config_pik_clock.c \
     config_css_clock.c \
     config_clock.c \
-    config_fip.c \
     config_n1sdp_pcie.c \
     config_n1sdp_scp2pcc.c \
     config_sensor.c \
