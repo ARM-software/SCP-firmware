@@ -29,6 +29,9 @@ typedef enum IRQn {
     DebugMonitor_IRQn = -4,
     PendSV_IRQn = -2,
     SysTick_IRQn = -1,
+
+    TIMREFCLK_IRQ = 33, /* REFCLK Physical Timer */
+
 } IRQn_Type;
 
 #include <core_cm7.h>
