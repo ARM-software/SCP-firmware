@@ -335,6 +335,9 @@ cmake_dependent_option(
     "${SCP_ENABLE_SCMI_NOTIFICATIONS_INIT}" "DEFINED SCP_ENABLE_SCMI_NOTIFICATIONS_INIT"
     "${SCP_ENABLE_SCMI_NOTIFICATIONS}")
 
+# Include firmware specific build options
+    include("${SCP_FIRMWARE_SOURCE_DIR}/Buildoptions.cmake" OPTIONAL)
+
 #
 # Wrap `add_executable` in a way that allows us to do some extra processing on
 # the firmware target.(e.g. flat binary generation) This is necessary
