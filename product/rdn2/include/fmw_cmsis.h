@@ -30,6 +30,7 @@ typedef enum IRQn {
     PendSV_IRQn = -2,
     SysTick_IRQn = -1,
 
+    SOC_WAKEUP0_IRQ = 16, /* SoC Expansion Wakeup */
     TIMREFCLK_IRQ = 33, /* REFCLK Physical Timer */
     PPU_CORES0_IRQ =
         50, /* Consolidated PPU Interrupt for cores 1-32, 129-160 */
