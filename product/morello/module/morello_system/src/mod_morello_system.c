@@ -331,12 +331,29 @@ static int morello_system_init_primary_core(void)
     unsigned int core_idx;
     unsigned int cluster_idx;
     unsigned int cluster_count;
+    uint32_t rvbar_low;
+    uint32_t rvbar_high;
     uintptr_t fip_base;
     size_t fip_size;
 
+    /*
+     * SCC BOOT_GPR2 & BOOT_GPR3 registers are used to set user specific
+     * RVBAR addresses. If both registers are set to 0 then a fixed trusted
+     * SRAM based is used.
+     */
+    if ((SCC->BOOT_GPR2 == 0) && (SCC->BOOT_GPR3 == 0)) {
+        rvbar_low = (AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET);
+        rvbar_high = 0;
+    } else {
+        rvbar_low = SCC->BOOT_GPR2;
+        rvbar_high = SCC->BOOT_GPR3;
+    }
+
     FWK_LOG_INFO(
-        "[MORELLO SYSTEM] Setting AP Reset Address to 0x%08" PRIX32,
-        (AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET));
+        "[MORELLO SYSTEM] Setting AP Reset Address to 0x%08" PRIX32
+        "%08" PRIX32,
+        rvbar_high,
+        rvbar_low);
 
     cluster_count = morello_core_get_cluster_count();
     for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
@@ -344,8 +361,9 @@ static int morello_system_init_primary_core(void)
              core_idx < morello_core_get_core_per_cluster_count(cluster_idx);
              core_idx++) {
             PIK_CLUSTER(cluster_idx)->STATIC_CONFIG[core_idx].RVBARADDR_LW =
-                (AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET);
-            PIK_CLUSTER(cluster_idx)->STATIC_CONFIG[core_idx].RVBARADDR_UP = 0;
+                rvbar_low;
+            PIK_CLUSTER(cluster_idx)->STATIC_CONFIG[core_idx].RVBARADDR_UP =
+                rvbar_high;
         }
     }
 
