@@ -1,0 +1,101 @@
+#
+# Arm SCP/MCP Software
+# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+#
+# Create the firmware target.
+#
+
+add_executable(juno-bl2)
+
+target_include_directories(
+    juno-bl2 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include"
+                    "${CMAKE_CURRENT_SOURCE_DIR}")
+
+# cmake-lint: disable=E1122
+
+target_sources(
+    juno-bl2
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_sds.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_pl011.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_soc_clock_ram.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_dvfs.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_cdcel937.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_hdlcd.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_ddr_phy400.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_dmc400.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_ram.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_ppu.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_system_power.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_power_domain.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_mhu.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_smt.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_clock.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_perf.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_system_power.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_i2c.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_adc.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_xrp7724.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_sensor.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_reg_sensor.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_psu.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_mock_psu.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_pvt.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_thermal.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_power_domain.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_mock_clock.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/../src/juno_utils.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/../src/juno_id.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/../src/juno_scmi_clock.c")
+
+if(SCP_ENABLE_MULTITHREADING)
+    target_sources(juno-bl2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c")
+    target_link_libraries(juno-bl2 PRIVATE cmsis::rtos2-rtx)
+endif()
+
+if(SCP_ENABLE_DEBUG_UNIT)
+    target_sources(
+        juno-bl2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_debug.c"
+                         "${CMAKE_CURRENT_SOURCE_DIR}/config_debug.c")
+endif()
+
+if(SCP_ENABLE_SCMI_RESET)
+    target_sources(
+        juno-bl2
+        PRIVATE
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_reset_domain.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_reset_domain.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_reset_domain.c")
+endif()
+
+if(SCP_ENABLE_STATISTICS)
+    target_sources(juno-bl2
+                   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_stats.c")
+endif()
+
+if(${SCP_ENABLE_RESOURCE_PERMISSIONS})
+    target_sources(
+        juno-bl2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_resource_perms.c")
+endif()
+
+#
+# Some of our firmware includes require CMSIS.
+#
+
+target_link_libraries(juno-bl2 PUBLIC cmsis::core-m)
+
+#
+# We explicitly add the CMSIS include directories to our interfaceinclude
+# directories. Each module target adds these include directories totheir own,
+# allowing them to include any firmware includes we expose.
+#
+
+target_include_directories(
+    juno-bl2
+    PUBLIC $<TARGET_PROPERTY:cmsis::core-m,INTERFACE_INCLUDE_DIRECTORIES>)
