@@ -43,6 +43,7 @@
 
 #include <inttypes.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -330,6 +331,8 @@ static int morello_system_init_primary_core(void)
     unsigned int core_idx;
     unsigned int cluster_idx;
     unsigned int cluster_count;
+    uintptr_t fip_base;
+    size_t fip_size;
 
     FWK_LOG_INFO(
         "[MORELLO SYSTEM] Setting AP Reset Address to 0x%08" PRIX32,
@@ -348,12 +351,17 @@ static int morello_system_init_primary_core(void)
 
     if (morello_get_chipid() == 0x0) {
         struct mod_fip_entry_data entry;
-        status = morello_system_ctx.fip_api->get_entry(
-            MOD_FIP_TOC_ENTRY_TFA_BL31,
-            &entry,
-            SCP_QSPI_FLASH_BASE_ADDR,
-            SCP_QSPI_FLASH_SIZE);
+        if (SCC->BOOT_GPR0 != 0x0) {
+            fip_base = SCC->BOOT_GPR0;
+            /* Assume maximum size limit */
+            fip_size = 0xFFFFFFFF;
+        } else {
+            fip_base = SCP_QSPI_FLASH_BASE_ADDR;
+            fip_size = SCP_QSPI_FLASH_SIZE;
+        }
 
+        status = morello_system_ctx.fip_api->get_entry(
+            MOD_FIP_TOC_ENTRY_TFA_BL31, &entry, fip_base, fip_size);
         if (status != FWK_SUCCESS) {
             FWK_LOG_INFO(
                 "[MORELLO SYSTEM] Failed to locate AP TF_BL31, error: %d\n",
