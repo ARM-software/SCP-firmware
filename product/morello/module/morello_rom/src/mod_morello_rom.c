@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "morello_scp_pik.h"
+
 #include <mod_fip.h>
 #include <mod_morello_rom.h>
 
@@ -20,6 +22,7 @@
 #include <fmw_cmsis.h>
 
 #include <inttypes.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -120,11 +123,30 @@ static int morello_rom_process_event(
     struct fwk_event *resp)
 {
     struct mod_fip_entry_data entry;
-    int status = morello_rom_ctx.fip_api->get_entry(
-        morello_rom_ctx.rom_config->image_type,
-        &entry,
-        morello_rom_ctx.rom_config->fip_base_address,
-        morello_rom_ctx.rom_config->fip_nvm_size);
+    uintptr_t fip_base;
+    size_t fip_size;
+    int status;
+
+    /*
+     * SCP ROM has the flexibility to choose where to look for FIP header
+     * based on the SCC BOOT_GPR0 register. If SCC BOOT_GPR0 has non-zero
+     * value use that as FIP storage else use the base address passed from
+     * config file.
+     */
+    if ((morello_rom_ctx.rom_config->image_type == MOD_FIP_TOC_ENTRY_SCP_BL2) &&
+        (SCC->BOOT_GPR0 != 0x0)) {
+        fip_base = SCC->BOOT_GPR0;
+        /* Assume maximum size limit */
+        fip_size = 0xFFFFFFFF;
+    } else {
+        fip_base = morello_rom_ctx.rom_config->fip_base_address;
+        fip_size = morello_rom_ctx.rom_config->fip_nvm_size;
+    }
+
+    FWK_LOG_INFO("[ROM] Trying to identify FIP at 0x%X\n", fip_base);
+
+    status = morello_rom_ctx.fip_api->get_entry(
+        morello_rom_ctx.rom_config->image_type, &entry, fip_base, fip_size);
     const char *image_type =
         get_image_type_str(morello_rom_ctx.rom_config->image_type);
 
