@@ -32,12 +32,15 @@ BS_FIRMWARE_MODULES := \
     rcar_pd_core \
     rcar_reg_sensor \
     sensor \
+    reset_domain \
+    rcar_reset \
     scmi_perf \
     scmi_power_domain \
     scmi_clock \
     scmi_sensor \
     scmi_system_power \
-    scmi_apcore
+    scmi_apcore \
+    scmi_reset_domain
 
 ifeq ($(BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS),yes)
     BS_FIRMWARE_MODULES += resource_perms
@@ -67,6 +70,9 @@ BS_FIRMWARE_SOURCES := \
     config_scmi_clock.c \
     config_scmi_apcore.c \
     config_scmi_power_domain.c \
+    config_scmi_reset_domain.c \
+    config_reset_domain.c \
+    config_rcar_reset.c \
     config_rcar_system_power.c \
     config_rcar_system.c
 
