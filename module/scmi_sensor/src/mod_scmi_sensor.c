@@ -242,9 +242,8 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
 
     if (SCMI_SENSOR_DESCS_MAX(max_payload_size) == 0) {
         /* Can't even fit one sensor description in the payload */
-        fwk_unexpected();
         status = FWK_E_SIZE;
-        goto exit;
+        goto exit_unexpected;
     }
 
     parameters =
@@ -271,22 +270,19 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
         sensor_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, desc_index);
         if (!fwk_module_is_valid_element_id(sensor_id)) {
             /* domain_idx did not map to a sensor device */
-            fwk_unexpected();
             return_values.status = SCMI_NOT_FOUND;
-            goto exit;
+            goto exit_unexpected;
         }
 
         status = scmi_sensor_ctx.sensor_api->get_info(sensor_id, &sensor_info);
         if (status != FWK_SUCCESS) {
             /* Unable to get sensor info */
-            fwk_unexpected();
-            goto exit;
+            goto exit_unexpected;
         }
 
         if (sensor_info.hal_info.type >= MOD_SENSOR_TYPE_COUNT) {
             /* Invalid sensor type */
-            fwk_unexpected();
-            goto exit;
+            goto exit_unexpected;
         }
 
         if ((sensor_info.hal_info.unit_multiplier <
@@ -294,8 +290,7 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
             (sensor_info.hal_info.unit_multiplier >
              SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_UNIT_MULTIPLIER_MAX)) {
             /* Sensor unit multiplier out of range */
-            fwk_unexpected();
-            goto exit;
+            goto exit_unexpected;
         }
 
         if ((sensor_info.hal_info.update_interval_multiplier <
@@ -303,21 +298,18 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
             (sensor_info.hal_info.update_interval_multiplier >
              SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_UPDATE_MULTIPLIER_MAX)) {
             /* Sensor update interval multiplier is out of range */
-            fwk_unexpected();
-            goto exit;
+            goto exit_unexpected;
         }
 
         if (sensor_info.hal_info.update_interval >=
             SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_UPDATE_INTERVAL_MASK) {
             /* Update interval is too big to fit in its mask */
-            fwk_unexpected();
-            goto exit;
+            goto exit_unexpected;
         }
         if (sensor_info.trip_point.count >=
             SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_NUM_TRIP_POINTS_MASK) {
             /* Number of trip points is too big to fit in its mask */
-            fwk_unexpected();
-            goto exit;
+            goto exit_unexpected;
         }
 
         desc.sensor_attributes_low = SCMI_SENSOR_DESC_ATTRIBUTES_LOW(
@@ -342,8 +334,7 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
             payload_size, &desc, sizeof(struct scmi_sensor_desc));
         if (status != FWK_SUCCESS) {
             /* Failed to write sensor description into message payload */
-            fwk_unexpected();
-            goto exit;
+            goto exit_unexpected;
         }
     }
 
@@ -357,7 +348,10 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
         &return_values, sizeof(return_values));
     if (status != FWK_SUCCESS)
         return_values.status = SCMI_GENERIC_ERROR;
+    goto exit;
 
+exit_unexpected:
+    fwk_unexpected();
 exit:
     scmi_sensor_ctx.scmi_api->respond(service_id,
         (return_values.status == SCMI_SUCCESS) ?
