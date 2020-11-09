@@ -417,6 +417,15 @@ enum fwk_id_type {
 typedef union __fwk_id fwk_id_t;
 
 /*!
+ * \brief Generic optional identifier.
+ *
+ * \details Optionals identifiers are fwk_id_t elements which can be left
+ *      undefined. This are only intended to be used for configuration
+ *      proposes and should not be used to bypass fwk_id_t checks.
+ */
+typedef fwk_id_t fwk_optional_id_t;
+
+/*!
  * \brief Check if the identifier is of a certain identifier type.
  *
  * \param id Identifier.
@@ -447,6 +456,17 @@ enum fwk_id_type fwk_id_get_type(fwk_id_t id) FWK_CONST FWK_LEAF FWK_NOTHROW;
  * \retval false The identifiers do not refer to the same entity.
  */
 bool fwk_id_is_equal(fwk_id_t left, fwk_id_t right) FWK_CONST FWK_LEAF
+    FWK_NOTHROW;
+
+/*!
+ * \brief Check if an optional identifier is defined.
+ *
+ * \param id Optional identifier.
+ *
+ * \retval true The optional identifiers is defined.
+ * \retval false The optional identifiers is not defined.
+ */
+bool fwk_optional_id_is_defined(fwk_optional_id_t id) FWK_CONST FWK_LEAF
     FWK_NOTHROW;
 
 /*!
