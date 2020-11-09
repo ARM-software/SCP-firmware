@@ -98,6 +98,20 @@ static void test_not_equal_shared_module(void)
     assert(!fwk_id_is_equal(left, right));
 }
 
+static void test_defined_optional_id(void)
+{
+    fwk_optional_id_t opt_id = FWK_ID_NONE_INIT;
+
+    assert(fwk_optional_id_is_defined(opt_id));
+}
+
+static void test_undefined_optional_id(void)
+{
+    fwk_optional_id_t opt_id = (fwk_optional_id_t){ 0 };
+
+    assert(!fwk_optional_id_is_defined(opt_id));
+}
+
 static const struct fwk_test_case_desc test_case_table[] = {
     FWK_TEST_CASE(test_equal_module_id),
     FWK_TEST_CASE(test_not_equal_module_id),
@@ -110,6 +124,8 @@ static const struct fwk_test_case_desc test_case_table[] = {
     FWK_TEST_CASE(test_equal_notification_id),
     FWK_TEST_CASE(test_not_equal_notification_id),
     FWK_TEST_CASE(test_not_equal_shared_module),
+    FWK_TEST_CASE(test_defined_optional_id),
+    FWK_TEST_CASE(test_undefined_optional_id),
 };
 
 struct fwk_test_suite_desc test_suite = {

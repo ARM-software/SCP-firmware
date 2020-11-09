@@ -191,6 +191,12 @@ bool fwk_id_is_equal(fwk_id_t left, fwk_id_t right)
     return left.value == right.value;
 }
 
+bool fwk_optional_id_is_defined(fwk_optional_id_t id)
+{
+    fwk_assert(id.common.type < __FWK_ID_TYPE_COUNT);
+    return id.common.type != __FWK_ID_TYPE_INVALID;
+}
+
 fwk_id_t fwk_id_build_module_id(fwk_id_t id)
 {
     fwk_assert(id.common.type != __FWK_ID_TYPE_INVALID);
