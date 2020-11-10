@@ -199,7 +199,7 @@ SECTIONS {
     __STACK_SIZE__ = SIZEOF(.stack);
     __STACK_END__ = __STACK_START__ + __STACK_SIZE__;
     __STACK_TOP__ = __STACK_END__;
-    __STACK_SP3_SIZE__ = 0x800;
+    __STACK_SP3_SIZE__ = 0x400;
     __STACK_SP0_TOP__ = __STACK_END__ - __STACK_SP3_SIZE__;
 
     __DATA_LMA_START__ = LOADADDR(.data);

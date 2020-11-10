@@ -11,6 +11,6 @@
 #include <rcar_mmap_scp.h>
 
 #define SCP_ROM_SIZE (64 * 1024) /* for SCP romfw */
-#define SCP_RAM_SIZE (256 * 1024) /* for SCP ramfw */
+#define SCP_RAM_SIZE (384 * 1024) /* for SCP ramfw */
 
 #endif /* SYSTEM_MMAP_SCP_H */
