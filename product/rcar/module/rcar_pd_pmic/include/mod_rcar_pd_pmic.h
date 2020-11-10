@@ -28,6 +28,15 @@
  */
 
 /*!
+ * \brief APIs provided by the driver.
+ */
+enum mod_rcar_pd_pmic_api_type {
+    MOD_RCAR_PD_PMIC_API_TYPE_PUBLIC,
+    MOD_RCAR_PD_PMIC_API_TYPE_SYSTEM,
+    MOD_RCAR_PD_PMIC_API_COUNT,
+};
+
+/*!
  * \brief Configuration data of a power domain of the PMIC module.
  */
 struct mod_rcar_pd_pmic_config {

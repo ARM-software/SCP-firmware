@@ -40,6 +40,15 @@ struct mod_reg_sensor_dev_config {
  * @cond
  */
 
+/*!
+ * \brief APIs provided by the driver.
+ */
+enum mod_rcar_reg_sensor_api_type {
+    MOD_RCAR_REG_SENSOR_API_TYPE_PUBLIC,
+    MOD_RCAR_REG_SENSOR_API_TYPE_SYSTEM,
+    MOD_RCAR_REG_SENSOR_API_COUNT,
+};
+
 /* Register base */
 #define GEN3_THERMAL_BASE (PERIPHERAL_BASE + 0x198000)
 #define GEN3_THERMAL_OFFSET (0x8000)
@@ -139,8 +148,6 @@ struct rcar_gen3_thermal_tsc {
 #define IS_SENSOR_ADR(adr) ((adr & ~SENSOR_ADR_MASK) == SENSOR_ADR_BASE)
 #define CV_ADR2INDEX(adr) (int)(((adr & SENSOR_ADR_MASK) >> 15) - 3)
 #define ADR2INDEX(adr) (IS_SENSOR_ADR(adr) ? CV_ADR2INDEX(adr) : (-1))
-
-void reg_sensor_resume();
 
 /*!
  * @endcond

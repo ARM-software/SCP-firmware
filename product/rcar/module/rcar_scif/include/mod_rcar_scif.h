@@ -47,13 +47,20 @@ struct mod_rcar_scif_element_cfg {
 };
 
 /*!
+ * \brief APIs provided by the driver.
+ */
+enum mod_rcar_scif_api_type {
+    MOD_RCAR_SCIF_API_TYPE_NORMAL,
+    MOD_RCAR_SCIF_API_TYPE_SYSTEM,
+    MOD_RCAR_SCIF_API_COUNT,
+};
+
+/*!
  * \}
  */
 
 /*!
  * \}
  */
-
-int mod_rcar_scif_resume();
 
 #endif /* MOD_RCAR_SCIF_H */

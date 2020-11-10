@@ -169,14 +169,6 @@ struct mod_rcar_clock_drv_api {
      * \return One of the standard framework error codes.
      */
     int (*process_power_transition)(fwk_id_t clock_id, unsigned int state);
-
-    /*!
-     * \brief Handle the resume of a clock's power domain.
-     *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \return One of the standard framework error codes.
-     */
-    int (*resume)(void);
 };
 
 /*!
@@ -187,6 +179,7 @@ enum mod_rcar_clock_api_type {
     MOD_RCAR_CLOCK_API_TYPE_CLOCK,
     /*! A low-level API for direct control of CSS clocks */
     MOD_RCAR_CLOCK_API_TYPE_CSS,
+    MOD_RCAR_CLOCK_API_TYPE_SYSTEM,
     MOD_RCAR_CLOCK_API_COUNT,
 };
 

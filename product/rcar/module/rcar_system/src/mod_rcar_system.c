@@ -39,7 +39,7 @@
 /* Device context */
 struct rcar_system_dev_ctx {
     const struct mod_rcar_system_dev_config *config;
-    struct mod_rcar_clock_drv_api *api;
+    struct mod_rcar_system_drv_api *api;
 };
 
 /* Module context */
@@ -144,11 +144,9 @@ void vApplicationIdleHook(void)
                     ctx->api->resume();
             }
 
-            mod_rcar_scif_resume();
             messaging_stack_ready();
             gic_init();
             vConfigureTickInterrupt();
-            reg_sensor_resume();
             fwk_interrupt_global_enable();
             break;
         case R_RESET:
@@ -180,7 +178,7 @@ static int rcar_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
         break;
     }
 
-    return FWK_SUCCESS;
+    return FWK_PENDING;
 }
 
 static const struct mod_system_power_driver_api

@@ -11,6 +11,7 @@
 
 #include <mod_reg_sensor.h>
 #include <mod_sensor.h>
+#include <mod_rcar_system.h>
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
@@ -112,7 +113,7 @@ static int rcar_gen3_thermal_get_temp(void *devdata, int *temp)
  */
 static int get_value(fwk_id_t id, uint64_t *value)
 {
-    int tmp;
+    int tmp = 0;
     int64_t *ivalue;
 
     if (value == NULL) {
@@ -144,9 +145,25 @@ static int get_info(fwk_id_t id, struct mod_sensor_info *info)
     return FWK_SUCCESS;
 }
 
+static int reg_sensor_resume(void)
+{
+    int i;
+
+    for (i = 0; i < TSC_MAX_NUM; i++) {
+        if (tscs[i]) {
+            rcar_gen3_thermal_write(tscs[i], REG_GEN3_THCTR, THCTR_THSST);
+        }
+    }
+    return FWK_SUCCESS;
+}
+
 static const struct mod_sensor_driver_api reg_sensor_api = {
     .get_value = get_value,
     .get_info = get_info,
+};
+
+static const struct mod_rcar_system_drv_api api_system = {
+    .resume = reg_sensor_resume,
 };
 
 /*
@@ -209,30 +226,28 @@ static int reg_sensor_element_init(
     return FWK_SUCCESS;
 }
 
-void reg_sensor_resume()
-{
-    int i;
-
-    for (i = 0; i < TSC_MAX_NUM; i++) {
-        if (tscs[i]) {
-            rcar_gen3_thermal_write(tscs[i], REG_GEN3_THCTR, THCTR_THSST);
-        }
-    }
-}
-
 static int reg_sensor_process_bind_request(
     fwk_id_t source_id,
     fwk_id_t target_id,
     fwk_id_t api_type,
     const void **api)
 {
-    *api = &reg_sensor_api;
+
+    switch (fwk_id_get_api_idx(api_type)) {
+    case MOD_RCAR_REG_SENSOR_API_TYPE_SYSTEM:
+        *api = &api_system;
+        break;
+    default:
+        *api = &reg_sensor_api;
+        break;
+    }
+
     return FWK_SUCCESS;
 }
 
 const struct fwk_module module_rcar_reg_sensor = {
     .name = "Rcar Thermal Sensor",
-    .api_count = 1,
+    .api_count = MOD_RCAR_REG_SENSOR_API_COUNT,
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = reg_sensor_init,
     .start = reg_sensor_start,

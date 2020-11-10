@@ -11,6 +11,7 @@
 
 #include <mod_clock.h>
 #include <mod_rcar_sd_clock.h>
+#include <mod_rcar_system.h>
 
 #include <fwk_assert.h>
 #include <fwk_element.h>
@@ -159,6 +160,11 @@ static int sd_clock_set_state(
     uint32_t value;
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
+
+    /* No operation if the HW doesn't allow clock state change */
+    if (!ctx->config->stop_clk)
+        return FWK_SUCCESS;
+
     value = mmio_read_32(ctx->config->control_reg);
     if (MOD_CLOCK_STATE_RUNNING == target_state)
         value &= ~(BIT(ctx->config->stop_clk_bit));
@@ -284,8 +290,11 @@ static const struct mod_rcar_clock_drv_api api_clock = {
     .set_state = sd_clock_set_state,
     .get_state = sd_clock_get_state,
     .get_range = sd_clock_get_range,
-    .resume = sd_clock_resume,
 };
+
+static const struct mod_rcar_system_drv_api api_system = {
+     .resume = sd_clock_resume,
+ };
 
 /*
  * Framework handler functions
@@ -399,13 +408,27 @@ static int sd_clock_process_bind_request(
     fwk_id_t api_id,
     const void **api)
 {
-    *api = &api_clock;
+
+    switch (fwk_id_get_api_idx(api_id)) {
+    case MOD_RCAR_CLOCK_API_TYPE_SYSTEM:
+        *api = &api_system;
+        break;
+    default:
+        *api = &api_clock;
+        break;
+    }
+
     return FWK_SUCCESS;
 }
 
 static int sd_clock_start(fwk_id_t id)
 {
     int ret = FWK_SUCCESS;
+
+    /* for Not Module */
+    if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+        return ret;
+
     ret = sd_clock_resume();
     return ret;
 }
