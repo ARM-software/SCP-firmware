@@ -5,13 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <config_rcar_mock_pmic.h>
 #include <mod_rcar_mock_pmic.h>
 
 #include <fwk_element.h>
 #include <fwk_module.h>
 
 static const struct fwk_element element_table[] = {
-    {
+    [MOD_RCAR_MOCK_PMIC_ELEMENT_IDX_LITTLE] = {
         .name = "CPU_GROUP_LITTLE",
         .data =
             &(const struct mod_rcar_mock_pmic_device_config){
@@ -19,7 +20,7 @@ static const struct fwk_element element_table[] = {
                 .default_voltage = 820000,
             },
     },
-    {
+    [MOD_RCAR_MOCK_PMIC_ELEMENT_IDX_BIG] = {
         .name = "CPU_GROUP_BIG",
         .data =
             &(const struct mod_rcar_mock_pmic_device_config){
@@ -27,16 +28,8 @@ static const struct fwk_element element_table[] = {
                 .default_voltage = 830000,
             },
     },
-    {
+    [MOD_RCAR_MOCK_PMIC_ELEMENT_IDX_GPU] = {
         .name = "GPU",
-        .data =
-            &(const struct mod_rcar_mock_pmic_device_config){
-                .default_enabled = true,
-                .default_voltage = 100,
-            },
-    },
-    {
-        .name = "VPU",
         .data =
             &(const struct mod_rcar_mock_pmic_device_config){
                 .default_enabled = true,

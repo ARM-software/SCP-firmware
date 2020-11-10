@@ -9,8 +9,9 @@
 #define MOD_RCAR_MOCK_PMIC_DRIVER_API_PRIVATE_H
 
 #include <mod_rcar_pmic.h>
+#include <mod_psu.h>
 
-extern const struct mod_rcar_pmic_driver_api __mod_rcar_mock_pmic_driver_api;
+extern const struct mod_psu_driver_api __mod_rcar_mock_pmic_driver_api;
 
 /* Default limits measured in millivolts and milliamps */
 #define BD9571MWV_MIN_MV 750

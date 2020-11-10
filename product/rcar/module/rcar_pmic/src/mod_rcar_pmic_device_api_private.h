@@ -9,8 +9,9 @@
 #define MOD_RCAR_PMIC_DEVICE_API_PRIVATE_H
 
 #include <mod_rcar_pmic.h>
+#include <mod_psu.h>
 
 /* Module API implementation */
-extern const struct mod_rcar_pmic_device_api __mod_rcar_pmic_device_api;
+extern const struct mod_psu_driver_api __mod_rcar_pmic_device_api;
 
 #endif /* MOD_RCAR_PMIC_DEVICE_API_PRIVATE_H */
