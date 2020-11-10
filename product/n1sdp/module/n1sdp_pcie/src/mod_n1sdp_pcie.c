@@ -206,7 +206,12 @@ static int n1sdp_pcie_phy_init(fwk_id_t id)
     if (dev_ctx == NULL)
         return FWK_E_PARAM;
 
-    gen_speed = dev_ctx->config->ccix_capable ? PCIE_GEN_4 : PCIE_GEN_3;
+    if ((n1sdp_get_chipid() != 0x0) || !dev_ctx->config->ccix_capable ||
+        pcie_ctx.c2c_api->is_slave_alive())
+        gen_speed = PCIE_GEN_3;
+    else
+        gen_speed = PCIE_GEN_4;
+
     lane_count = LAN_COUNT_IN_X_16;
 
     FWK_LOG_INFO("[%s] Initializing PHY...", pcie_type[did]);
@@ -239,7 +244,12 @@ static int n1sdp_pcie_controller_init(fwk_id_t id, bool ep_mode)
     if (dev_ctx == NULL)
         return FWK_E_PARAM;
 
-    gen_speed = dev_ctx->config->ccix_capable ? PCIE_GEN_4 : PCIE_GEN_3;
+    if ((n1sdp_get_chipid() != 0x0) || !dev_ctx->config->ccix_capable ||
+        pcie_ctx.c2c_api->is_slave_alive())
+        gen_speed = PCIE_GEN_3;
+    else
+        gen_speed = PCIE_GEN_4;
+
     lane_count = LAN_COUNT_IN_X_16;
 
     if (ep_mode) {
@@ -282,12 +292,18 @@ static int n1sdp_pcie_link_training(fwk_id_t id, bool ep_mode)
     if (dev_ctx == NULL)
         return FWK_E_PARAM;
 
-    gen_speed = dev_ctx->config->ccix_capable ? PCIE_GEN_4 : PCIE_GEN_3;
+    if ((n1sdp_get_chipid() != 0x0) || !dev_ctx->config->ccix_capable ||
+        pcie_ctx.c2c_api->is_slave_alive()) {
+        gen_speed = PCIE_GEN_3;
+        down_stream_tx_preset = PCIE_RC_TX_PRESET_VALUE;
+        up_stream_tx_preset = PCIE_RC_TX_PRESET_VALUE;
+    } else {
+        gen_speed = PCIE_GEN_4;
+        down_stream_tx_preset = CCIX_RC_TX_PRESET_VALUE;
+        up_stream_tx_preset = CCIX_RC_TX_PRESET_VALUE;
+    }
+
     lane_count = LAN_COUNT_IN_X_16;
-    down_stream_tx_preset = dev_ctx->config->ccix_capable ?
-                            CCIX_RC_TX_PRESET_VALUE : PCIE_RC_TX_PRESET_VALUE;
-    up_stream_tx_preset = dev_ctx->config->ccix_capable ?
-                          CCIX_RC_TX_PRESET_VALUE : PCIE_RC_TX_PRESET_VALUE;
 
     if (gen_speed >= PCIE_GEN_3 && !ep_mode) {
         FWK_LOG_INFO(
