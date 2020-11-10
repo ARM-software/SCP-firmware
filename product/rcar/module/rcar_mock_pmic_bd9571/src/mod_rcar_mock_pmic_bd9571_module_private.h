@@ -6,8 +6,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef MOD_RCAR_MOCK_PMIC_MODULE_PRIVATE_H
-#define MOD_RCAR_MOCK_PMIC_MODULE_PRIVATE_H
+#ifndef MOD_RCAR_MOCK_PMIC_BD9571_MODULE_PRIVATE_H
+#define MOD_RCAR_MOCK_PMIC_BD9571_MODULE_PRIVATE_H
 
 #include <fwk_id.h>
 
@@ -21,4 +21,4 @@ struct mod_rcar_mock_pmic_device_ctx {
 struct mod_rcar_mock_pmic_device_ctx *__mod_rcar_mock_pmic_get_valid_device_ctx(
     fwk_id_t device_id);
 
-#endif /* MOD_RCAR_MOCK_PMIC_MODULE_PRIVATE_H */
+#endif /* MOD_RCAR_MOCK_PMIC_BD9571_MODULE_PRIVATE_H */

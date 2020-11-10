@@ -6,10 +6,10 @@
  */
 
 #include <config_power_domain.h>
-#include <config_rcar_pd_pmic.h>
+#include <config_rcar_pd_pmic_bd9571.h>
 
 #include <mod_power_domain.h>
-#include <mod_rcar_pd_pmic.h>
+#include <mod_rcar_pd_pmic_bd9571.h>
 #include <mod_rcar_pmic.h>
 #include <mod_rcar_system.h>
 
@@ -85,8 +85,8 @@ static int pd_pmic_resume(void)
 
     pd_ctx = &rcar_pmic_ctx.pd_ctx_table[
                     RCAR_PD_PMIC_ELEMENT_IDX_PMIC_DDR_BKUP];
-    pd_ctx->pd_driver_input_api->report_power_state_transition(
-        pd_ctx->bound_id, MOD_PD_STATE_OFF);
+    pd_ctx->pd_driver_input_api->set_state_async(
+        pd_ctx->bound_id, false, MOD_PD_STATE_OFF);
 
     return FWK_SUCCESS;
 }
@@ -202,7 +202,7 @@ static int rcar_pmic_process_bind_request(
     return FWK_SUCCESS;
 }
 
-const struct fwk_module module_rcar_pd_pmic = {
+const struct fwk_module module_rcar_pd_pmic_bd9571 = {
     .name = "RCAR_PD_PMIC",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_RCAR_PD_PMIC_API_COUNT,

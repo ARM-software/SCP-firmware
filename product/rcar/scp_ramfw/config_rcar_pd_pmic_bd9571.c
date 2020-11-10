@@ -5,12 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <rcar_irq.h>
+#include <config_rcar_pd_pmic_bd9571.h>
+#include <config_power_domain.h>
+
+#include <mod_rcar_pd_pmic_bd9571.h>
+
 #include <fwk_element.h>
 #include <fwk_module.h>
-#include <mod_rcar_pd_pmic.h>
-#include <rcar_irq.h>
-#include <config_rcar_pd_pmic.h>
-#include <config_power_domain.h>
 
 static struct fwk_element rcar_pd_pmic_element_table[] = {
     [RCAR_PD_PMIC_ELEMENT_IDX_PMIC_DDR_BKUP] = {
@@ -34,6 +36,6 @@ static const struct fwk_element *rcar_pd_pmic_get_element_table(fwk_id_t mod)
 /*
  * Power module configuration data
  */
-const struct fwk_module_config config_rcar_pd_pmic = {
+const struct fwk_module_config config_rcar_pd_pmic_bd9571 = {
     .elements = FWK_MODULE_DYNAMIC_ELEMENTS(rcar_pd_pmic_get_element_table),
 };

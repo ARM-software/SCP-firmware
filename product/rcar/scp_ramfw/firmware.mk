@@ -29,12 +29,12 @@ BS_FIRMWARE_MODULES := \
     rcar_arch_timer \
     timer \
     rcar_pmic \
-    rcar_mock_pmic \
+    rcar_mock_pmic_bd9571 \
     rcar_mfismh \
     power_domain \
     rcar_pd_sysc \
     rcar_pd_core \
-    rcar_pd_pmic \
+    rcar_pd_pmic_bd9571 \
     rcar_reg_sensor \
     sensor \
     reset_domain \
@@ -58,7 +58,7 @@ BS_FIRMWARE_SOURCES := \
     config_power_domain.c \
     config_rcar_pd_sysc.c \
     config_rcar_pd_core.c \
-    config_rcar_pd_pmic.c \
+    config_rcar_pd_pmic_bd9571.c \
     config_sensor.c \
     config_clock.c \
     config_rcar_clock.c \
@@ -68,7 +68,7 @@ BS_FIRMWARE_SOURCES := \
     config_dvfs.c \
     config_psu.c \
     config_rcar_pmic.c \
-    config_rcar_mock_pmic.c \
+    config_rcar_mock_pmic_bd9571.c \
     config_rcar_mfismh.c \
     config_timer.c \
     config_smt.c \

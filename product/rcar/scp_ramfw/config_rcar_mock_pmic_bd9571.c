@@ -6,8 +6,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <config_rcar_mock_pmic.h>
-#include <mod_rcar_mock_pmic.h>
+#include <config_rcar_mock_pmic_bd9571.h>
+#include <mod_rcar_mock_pmic_bd9571.h>
 
 #include <fwk_element.h>
 #include <fwk_module.h>
@@ -52,7 +52,7 @@ static const struct fwk_element *get_element_table(fwk_id_t module_id)
     return element_table;
 }
 
-struct fwk_module_config config_rcar_mock_pmic = {
+struct fwk_module_config config_rcar_mock_pmic_bd9571 = {
     .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_element_table),
     .data = NULL,
 };

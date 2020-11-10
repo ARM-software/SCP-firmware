@@ -6,9 +6,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <mod_rcar_mock_pmic_private.h>
-
-#include <mod_rcar_mock_pmic.h>
+#include <mod_rcar_mock_pmic_bd9571_private.h>
+#include <mod_rcar_mock_pmic_bd9571.h>
 
 #include <fwk_assert.h>
 #include <fwk_macros.h>
@@ -74,7 +73,7 @@ struct mod_rcar_mock_pmic_device_ctx *__mod_rcar_mock_pmic_get_valid_device_ctx(
 }
 
 /* Module description */
-const struct fwk_module module_rcar_mock_pmic = {
+const struct fwk_module module_rcar_mock_pmic_bd9571 = {
     .name = "MOCK_PSU",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_RCAR_MOCK_PMIC_API_COUNT,

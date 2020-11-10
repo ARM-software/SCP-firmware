@@ -6,8 +6,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef MOD_RCAR_MOCK_PMIC_H
-#define MOD_RCAR_MOCK_PMIC_H
+#ifndef MOD_RCAR_MOCK_PMIC_BD9571_H
+#define MOD_RCAR_MOCK_PMIC_BD9571_H
 
 #include <fwk_module_idx.h>
 
@@ -58,7 +58,7 @@ enum mod_rcar_mock_pmic_api_idx {
 
 /*! Driver API identifier */
 static const fwk_id_t mod_rcar_mock_pmic_api_id_psu_driver = FWK_ID_API_INIT(
-    FWK_MODULE_IDX_RCAR_MOCK_PMIC,
+    FWK_MODULE_IDX_RCAR_MOCK_PMIC_BD9571,
     MOD_RCAR_MOCK_PMIC_API_IDX_PSU_DRIVER);
 
 /*!
@@ -69,4 +69,4 @@ static const fwk_id_t mod_rcar_mock_pmic_api_id_psu_driver = FWK_ID_API_INIT(
  * \}
  */
 
-#endif /* MOD_RCAR_MOCK_PMIC_H */
+#endif /* MOD_RCAR_MOCK_PMIC_BD9571_H */

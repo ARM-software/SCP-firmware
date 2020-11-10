@@ -18,4 +18,4 @@ enum mod_rcar_mock_pmic_element_idx {
     MOD_RCAR_MOCK_PMIC_ELEMENT_IDX_COUNT
 };
 
-#endif /* CONFIG_RCAR_MOCK_PMIC_H */
+#endif /* CONFIG_RCAR_MOCK_PMIC_BD9571_H */
