@@ -31,6 +31,7 @@ BS_FIRMWARE_MODULES := \
     power_domain \
     rcar_pd_sysc \
     rcar_pd_core \
+    rcar_pd_pmic \
     rcar_reg_sensor \
     sensor \
     reset_domain \
@@ -54,6 +55,7 @@ BS_FIRMWARE_SOURCES := \
     config_power_domain.c \
     config_rcar_pd_sysc.c \
     config_rcar_pd_core.c \
+    config_rcar_pd_pmic.c \
     config_sensor.c \
     config_clock.c \
     config_rcar_clock.c \

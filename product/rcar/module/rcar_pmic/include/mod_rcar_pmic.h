@@ -31,85 +31,75 @@
  */
 struct mod_rcar_pmic_device_api {
     /*!
-     * \brief Get the enabled state of a device.
+     * \brief Get whether the device is enabled or not.
      *
-     * \param device_id Identifier of the device to get the state of.
-     * \param [out] enabled \c true if the device is enabled, or \c if it is
-     *      disabled.
+     * \param[in] device_id Identifier of the device to get the state of.
+     * \param[out] enabled `true` if the device is enabled, otherwise `false`.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
-     * \retval FWK_E_STATE The element cannot accept the request.
-     * \retval FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_E_STATE The device cannot currently accept the request.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     *
+     * \return Status code representing the result of the operation.
      */
     int (*get_enabled)(fwk_id_t device_id, bool *enabled);
 
     /*!
-     * \brief Set the enabled state of a device.
+     * \brief Enable or disable the device.
      *
-     * \param device_id Identifier of the device to set the state of.
-     * \param enable \c true to enable the device, or \c false to disable it.
+     * \param[in] device_id Identifier of the device to set the state of.
+     * \param[in] enable `true` to enable the device, or `false` to disable it.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
-     * \retval FWK_E_STATE The element cannot accept the request.
-     * \retval FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_E_STATE The device cannot currently accept the request.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     *
+     * \return Status code representing the result of the operation.
      */
     int (*set_enabled)(fwk_id_t device_id, bool enable);
 
     /*!
-     * \brief Set the enabled state of a device.
-     *
-     * \param device_id Identifier of the device to set the state of.
-     * \param enable \c true to enable the device, or \c false to disable it.
-     *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
-     * \retval FWK_E_STATE The element cannot accept the request.
-     * \retval FWK_E_NOMEM The event queue is full.
-     * \retval FWK_E_PANIC An error in the framework occurred.
-     */
-    int (*set_enabled_async)(fwk_id_t device_id, bool enable);
-
-    /*!
      * \brief Get the voltage of a device.
      *
-     * \param device_id Identifier of the device to get the voltage of.
-     * \param [out] voltage Voltage in mV.
+     * \param[in] device_id Identifier of the device to get the voltage of.
+     * \param[out] voltage Voltage in millivolts (mV).
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
-     * \retval FWK_E_STATE The element cannot accept the request.
-     * \retval FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_E_STATE The device cannot currently accept the request.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     *
+     * \return Status code representing the result of the operation.
      */
-    int (*get_voltage)(fwk_id_t device_id, uint64_t *voltage);
+    int (*get_voltage)(fwk_id_t device_id, uint32_t *voltage);
 
     /*!
      * \brief Set the voltage of a device.
      *
-     * \param device_id Identifier of the device to set the voltage of.
-     * \param voltage New voltage in mV.
+     * \param[in] device_id Identifier of the device to set the voltage of.
+     * \param[in] voltage New voltage in millivolts (mV).
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
-     * \retval FWK_E_STATE The element cannot accept the request.
-     * \retval FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_E_STATE The device cannot currently accept the request.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     *
+     * \return Status code representing the result of the operation.
      */
-    int (*set_voltage)(fwk_id_t device_id, uint64_t voltage);
+    int (*set_voltage)(fwk_id_t device_id, uint32_t voltage);
 
     /*!
-     * \brief Set the voltage of a device.
+     * \brief Set the DDR Backup mode.
      *
-     * \param device_id Identifier of the device to set the voltage of.
-     * \param voltage New voltage in mV.
+     * \param[in] device_id Identifier of the device to set the DDR BKP mode of.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_E_PARAM One or more parameters were invalid.
-     * \retval FWK_E_STATE The element cannot accept the request.
-     * \retval FWK_E_NOMEM The event queue is full.
-     * \retval FWK_E_PANIC An error in the framework occurred.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \return One of the other driver-defined error codes.
      */
-    int (*set_voltage_async)(fwk_id_t device_id, uint64_t voltage);
+    int (*set_pmic)(fwk_id_t device_id, unsigned int state);
+
 };
 
 /*!
@@ -117,49 +107,85 @@ struct mod_rcar_pmic_device_api {
  */
 struct mod_rcar_pmic_driver_api {
     /*!
-     * \brief Set the enabled state of a device.
+     * \brief Get whether the device is enabled or not.
      *
-     * \param id Identifier of the device to set the state of.
-     * \param enable \c true to enable the device, or \c false to disable it.
+     * \param[in] device_id Identifier of the device to get the state of.
+     * \param[out] enabled `true` if the device is enabled, otherwise `false`.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \return One of the other driver-defined error codes.
+     * \retval ::FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_E_STATE The device cannot currently accept the request.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     *
+     * \return Status code representing the result of the operation.
      */
-    int (*set_enabled)(fwk_id_t id, bool enable);
+    int (*get_enabled)(fwk_id_t device_id, bool *enabled);
 
     /*!
-     * \brief Get the enabled state of a device.
+     * \brief Enable or disable the device.
      *
-     * \param id Identifier of the device to get the state of.
-     * \param [out] enabled \c true if the device is enabled, or \c if it is
-     *      disabled.
+     * \param[in] device_id Identifier of the device to set the state of.
+     * \param[in] enable `true` to enable the device, or `false` to disable it.
      *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \return One of the other driver-defined error codes.
+     * \retval ::FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_E_STATE The device cannot currently accept the request.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     *
+     * \return Status code representing the result of the operation.
      */
-    int (*get_enabled)(fwk_id_t id, bool *enabled);
-
-    /*!
-     * \brief Set the voltage of a device.
-     *
-     * \param id Identifier of the device to set the voltage of.
-     * \param voltage New voltage in millivolts (mV).
-     *
-     * \retval FWK_SUCCESS The operation succeeded.
-     * \return One of the other driver-defined error codes.
-     */
-    int (*set_voltage)(fwk_id_t id, uint64_t voltage);
+    int (*set_enabled)(fwk_id_t device_id, bool enable);
 
     /*!
      * \brief Get the voltage of a device.
      *
-     * \param id Identifier of the device to get the voltage of.
-     * \param [out] voltage Voltage in millivolts (mV).
+     * \param[in] device_id Identifier of the device to get the voltage of.
+     * \param[out] voltage Voltage in millivolts (mV).
      *
-     * \retval FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_E_STATE The device cannot currently accept the request.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     *
+     * \return Status code representing the result of the operation.
+     */
+    int (*get_voltage)(fwk_id_t device_id, uint32_t *voltage);
+
+    /*!
+     * \brief Set the voltage of a device.
+     *
+     * \param[in] device_id Identifier of the device to set the voltage of.
+     * \param[in] voltage New voltage in millivolts (mV).
+     *
+     * \retval ::FWK_E_HANDLER An error occurred in the device driver.
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_E_STATE The device cannot currently accept the request.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     *
+     * \return Status code representing the result of the operation.
+     */
+    int (*set_voltage)(fwk_id_t device_id, uint32_t voltage);
+
+    /*!
+     * \brief Set the DDR Bakup mode.
+     *
+     * \param[in] device_id Identifier of the device to set the DDR BKP mode of.
+     *
+     * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the other driver-defined error codes.
      */
-    int (*get_voltage)(fwk_id_t id, uint64_t *voltage);
+    int (*set_pmic)(fwk_id_t device_id, unsigned int state);
+};
+
+/*!
+ * \brief Indices.
+ */
+enum rcar_pmic_id {
+    RCAR_PMIC_CPU_LITTLE,
+    RCAR_PMIC_CPU_BIG,
+    RCAR_PMIC_CPU_DDR_BKUP,
+    RCAR_PMIC_CPU_GPU,
+    RCAR_PMIC_CPU_VPU
 };
 
 /*!
