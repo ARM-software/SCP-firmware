@@ -46,6 +46,9 @@ struct rcar_sysc_pd_ctx {
 
 /* Module context */
 struct rcar_sysc_ctx {
+    /* Number of pd_sysc domains */
+    unsigned int pd_sysc_count;
+
     /* Table of the power domain contexts */
     struct rcar_sysc_pd_ctx *pd_ctx_table;
 

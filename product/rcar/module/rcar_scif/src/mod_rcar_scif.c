@@ -12,6 +12,7 @@
 #include <system_mmap.h>
 
 #include <mod_rcar_scif.h>
+#include <mod_rcar_system.h>
 
 #include <fwk_mm.h>
 #include <fwk_module.h>
@@ -129,7 +130,7 @@ static int mod_rcar_scif_set_baud_rate(
     return FWK_SUCCESS;
 }
 
-int mod_rcar_scif_resume()
+static int mod_rcar_scif_resume(void)
 {
     return mod_rcar_scif_set_baud_rate(current_cfg);
 }
@@ -269,14 +270,31 @@ static int mod_rcar_scif_io_close(const struct fwk_io_stream *stream)
     return FWK_SUCCESS;
 }
 
+static const struct mod_rcar_system_drv_api api_system = {
+    .resume = mod_rcar_scif_resume,
+};
+
+static int scif_process_bind_request(fwk_id_t requester_id, fwk_id_t target_id,
+    fwk_id_t api_id, const void **api)
+{
+    switch (fwk_id_get_api_idx(api_id)) {
+    case MOD_RCAR_SCIF_API_TYPE_SYSTEM:
+        *api = &api_system;
+        break;
+    default:
+        break;
+    }
+
+    return FWK_SUCCESS;
+}
+
 const struct fwk_module module_rcar_scif = {
     .name = "RCAR SCIF",
     .type = FWK_MODULE_TYPE_DRIVER,
-
+    .api_count = MOD_RCAR_SCIF_API_COUNT,
     .init = mod_rcar_scif_init,
     .element_init = mod_rcar_scif_element_init,
     .start = mod_rcar_scif_start,
-
     .adapter =
         (struct fwk_io_adapter){
             .open = mod_rcar_scif_io_open,
@@ -284,4 +302,5 @@ const struct fwk_module module_rcar_scif = {
             .putch = mod_rcar_scif_io_putch,
             .close = mod_rcar_scif_io_close,
         },
+    .process_bind_request = scif_process_bind_request,
 };

@@ -6,10 +6,12 @@
  */
 
 #include <config_power_domain.h>
+#include <config_rcar_pd_pmic.h>
 
 #include <mod_power_domain.h>
 #include <mod_rcar_pd_pmic.h>
 #include <mod_rcar_pmic.h>
+#include <mod_rcar_system.h>
 
 #include <fwk_id.h>
 #include <fwk_assert.h>
@@ -77,10 +79,25 @@ static int pd_reset(fwk_id_t pd_id)
     return FWK_SUCCESS;
 }
 
+static int pd_pmic_resume(void)
+{
+    struct rcar_pmic_pd_ctx *pd_ctx;
+
+    pd_ctx = &rcar_pmic_ctx.pd_ctx_table[
+                    RCAR_PD_PMIC_ELEMENT_IDX_PMIC_DDR_BKUP];
+    pd_ctx->pd_driver_input_api->report_power_state_transition(
+        pd_ctx->bound_id, MOD_PD_STATE_OFF);
+
+    return FWK_SUCCESS;
+}
 static const struct mod_pd_driver_api pd_driver = {
     .set_state = pd_set_state,
     .get_state = pd_get_state,
     .reset = pd_reset,
+};
+
+static const struct mod_rcar_system_drv_api api_system = {
+    .resume = pd_pmic_resume,
 };
 
 /*
@@ -153,28 +170,33 @@ static int rcar_pmic_bind(fwk_id_t id, unsigned int round)
 
 static int rcar_pmic_process_bind_request(
     fwk_id_t source_id,
-    fwk_id_t target_id, fwk_id_t not_used,
+    fwk_id_t target_id, fwk_id_t api_id,
     const void **api)
 {
     struct rcar_pmic_pd_ctx *pd_ctx;
 
     pd_ctx = rcar_pmic_ctx.pd_ctx_table + fwk_id_get_element_idx(target_id);
 
-    switch (pd_ctx->config->pd_type) {
-    case RCAR_PD_TYPE_DEVICE:
-    case RCAR_PD_TYPE_DEVICE_DEBUG:
-        if (fwk_id_get_module_idx(source_id) == FWK_MODULE_IDX_POWER_DOMAIN) {
-            pd_ctx->bound_id = source_id;
-            *api = &pd_driver;
-            break;
+    if (fwk_id_get_api_idx(api_id) == MOD_RCAR_PD_PMIC_API_TYPE_SYSTEM) {
+        *api = &api_system;
+    } else {
+        switch (pd_ctx->config->pd_type) {
+        case RCAR_PD_TYPE_DEVICE:
+        case RCAR_PD_TYPE_DEVICE_DEBUG:
+            if (fwk_id_get_module_idx(source_id) ==
+                FWK_MODULE_IDX_POWER_DOMAIN) {
+                pd_ctx->bound_id = source_id;
+                *api = &pd_driver;
+                break;
+            }
+            assert(false);
+            return FWK_E_ACCESS;
+
+        default:
+            (void)pd_driver;
+            return FWK_E_SUPPORT;
         }
 
-        assert(false);
-        return FWK_E_ACCESS;
-
-    default:
-        (void)pd_driver;
-        return FWK_E_SUPPORT;
     }
 
     return FWK_SUCCESS;
@@ -183,7 +205,7 @@ static int rcar_pmic_process_bind_request(
 const struct fwk_module module_rcar_pd_pmic = {
     .name = "RCAR_PD_PMIC",
     .type = FWK_MODULE_TYPE_DRIVER,
-    .api_count = 1,
+    .api_count = MOD_RCAR_PD_PMIC_API_COUNT,
     .init = rcar_pmic_mod_init,
     .element_init = rcar_pmic_pd_init,
     .bind = rcar_pmic_bind,

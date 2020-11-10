@@ -17,6 +17,7 @@
 #include <mod_power_domain.h>
 #include <mod_rcar_pd_core.h>
 #include <mod_rcar_pd_sysc.h>
+#include <mod_rcar_pd_pmic.h>
 
 #include <fwk_element.h>
 #include <fwk_macros.h>
@@ -204,7 +205,8 @@ static struct fwk_element rcar_power_domain_static_element_table[] = {
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_RCAR_PD_PMIC,
                 RCAR_PD_PMIC_ELEMENT_IDX_PMIC_DDR_BKUP),
-            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_PMIC, 0),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_PMIC,
+                MOD_RCAR_PD_PMIC_API_TYPE_PUBLIC),
             .allowed_state_mask_table = toplevel_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(toplevel_allowed_state_mask_table)

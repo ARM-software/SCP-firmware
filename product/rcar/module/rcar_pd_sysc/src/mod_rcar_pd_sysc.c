@@ -10,6 +10,7 @@
 
 #include <mod_rcar_pd_sysc.h>
 #include <mod_system_power.h>
+#include <mod_rcar_system.h>
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
@@ -75,10 +76,40 @@ static int pd_reset(fwk_id_t pd_id)
     return FWK_SUCCESS;
 }
 
+static int pd_sys_resume(void)
+{
+    unsigned int pd_idx;
+    struct rcar_sysc_pd_ctx *pd_ctx;
+    fwk_id_t pd_id;
+
+    for (pd_idx = 0; pd_idx < rcar_sysc_ctx.pd_sysc_count; pd_idx++) {
+        pd_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_RCAR_PD_SYSC, pd_idx);
+        pd_ctx = rcar_sysc_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
+
+        switch (pd_ctx->config->pd_type) {
+        case RCAR_PD_TYPE_DEVICE:
+        case RCAR_PD_TYPE_DEVICE_DEBUG:
+        case RCAR_PD_TYPE_SYSTEM:
+            if (pd_ctx->config->always_on)
+                rcar_sysc_power(pd_ctx, MOD_PD_STATE_ON);
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    return FWK_SUCCESS;
+}
+
 static const struct mod_pd_driver_api pd_driver = {
     .set_state = pd_set_state,
     .get_state = pd_get_state,
     .reset = pd_reset,
+};
+
+static const struct mod_rcar_system_drv_api api_system = {
+    .resume = pd_sys_resume,
 };
 
 /*
@@ -94,6 +125,8 @@ static int rcar_sysc_mod_init(
         fwk_mm_calloc(pd_count, sizeof(struct rcar_sysc_pd_ctx));
     if (rcar_sysc_ctx.pd_ctx_table == NULL)
         return FWK_E_NOMEM;
+
+    rcar_sysc_ctx.pd_sysc_count = pd_count;
 
     return FWK_SUCCESS;
 }
@@ -178,34 +211,38 @@ static int rcar_sysc_bind(fwk_id_t id, unsigned int round)
 static int rcar_sysc_process_bind_request(
     fwk_id_t source_id,
     fwk_id_t target_id,
-    fwk_id_t not_used,
+    fwk_id_t api_id,
     const void **api)
 {
     struct rcar_sysc_pd_ctx *pd_ctx;
 
     pd_ctx = rcar_sysc_ctx.pd_ctx_table + fwk_id_get_element_idx(target_id);
 
-    switch (pd_ctx->config->pd_type) {
-    case RCAR_PD_TYPE_SYSTEM:
-    case RCAR_PD_TYPE_DEVICE:
-    case RCAR_PD_TYPE_DEVICE_DEBUG:
-    case RCAR_PD_TYPE_ALWAYS_ON:
-        if (fwk_id_get_module_idx(source_id) ==
-            FWK_MODULE_IDX_POWER_DOMAIN) {
-            pd_ctx->bound_id = source_id;
-            *api = &pd_driver;
-            break;
+    if (fwk_id_get_api_idx(api_id) == MOD_RCAR_PD_SYSC_API_TYPE_SYSTEM) {
+        *api = &api_system;
+    } else {
+        switch (pd_ctx->config->pd_type) {
+        case RCAR_PD_TYPE_SYSTEM:
+        case RCAR_PD_TYPE_DEVICE:
+        case RCAR_PD_TYPE_DEVICE_DEBUG:
+        case RCAR_PD_TYPE_ALWAYS_ON:
+            if (fwk_id_get_module_idx(source_id) ==
+                                        FWK_MODULE_IDX_POWER_DOMAIN) {
+                pd_ctx->bound_id = source_id;
+                *api = &pd_driver;
+                break;
+            }
+            if (fwk_id_get_module_idx(source_id) ==
+                                        FWK_MODULE_IDX_SYSTEM_POWER) {
+                *api = &pd_driver;
+                break;
+            }
+            assert(false);
+            return FWK_E_ACCESS;
+        default:
+            (void)pd_driver;
+            return FWK_E_SUPPORT;
         }
-        if (fwk_id_get_module_idx(source_id) == FWK_MODULE_IDX_SYSTEM_POWER) {
-            *api = &pd_driver;
-            break;
-        }
-        assert(false);
-        return FWK_E_ACCESS;
-
-    default:
-        (void)pd_driver;
-        return FWK_E_SUPPORT;
     }
 
     return FWK_SUCCESS;
@@ -214,7 +251,7 @@ static int rcar_sysc_process_bind_request(
 const struct fwk_module module_rcar_pd_sysc = {
     .name = "RCAR_PD_SYSC",
     .type = FWK_MODULE_TYPE_DRIVER,
-    .api_count = 1,
+    .api_count = MOD_RCAR_PD_SYSC_API_COUNT,
     .init = rcar_sysc_mod_init,
     .element_init = rcar_sysc_pd_init,
     .bind = rcar_sysc_bind,

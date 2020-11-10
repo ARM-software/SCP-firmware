@@ -31,6 +31,8 @@ enum rcar_scmi_pd_domain_id {
     PD_RCAR_A3VC,
     PD_RCAR_CR7,
     PD_RCAR_A3VP,
+    PD_RCAR_PMIC_DDR_BKUP,
+    PD_RCAR_ALWAYS_ON,
     PD_RCAR_COUNT,
 };
 

@@ -53,6 +53,13 @@ extern void vConfigureTickInterrupt(void);
 extern void _save_system(void);
 
 /*!
+ * \brief rcar system module interface.
+ */
+struct mod_rcar_system_drv_api {
+    int (*resume)(void);
+};
+
+/*!
  * @endcond
  */
 

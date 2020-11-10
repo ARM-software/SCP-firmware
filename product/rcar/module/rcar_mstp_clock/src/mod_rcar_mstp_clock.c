@@ -13,6 +13,7 @@
 #include <mod_clock.h>
 #include <mod_rcar_clock.h>
 #include <mod_rcar_mstp_clock.h>
+#include <mod_rcar_system.h>
 
 #include <fwk_assert.h>
 #include <fwk_element.h>
@@ -143,11 +144,14 @@ static int mstp_clock_get_range(fwk_id_t dev_id, struct mod_clock_range *range)
 static const struct mod_rcar_clock_drv_api api_clock = {
     .set_state = mstp_clock_set_state,
     .get_state = mstp_clock_get_state,
-    .resume = mstp_clock_resume,
     .set_rate = mstp_clock_set_rate,
     .get_rate = mstp_clock_get_rate,
     .get_rate_from_index = mstp_clock_get_rate_from_index,
     .get_range = mstp_clock_get_range,
+};
+
+static const struct mod_rcar_system_drv_api api_system = {
+    .resume = mstp_clock_resume,
 };
 
 /*
@@ -202,7 +206,15 @@ static int mstp_clock_process_bind_request(
     fwk_id_t api_id,
     const void **api)
 {
-    *api = &api_clock;
+    switch (fwk_id_get_api_idx(api_id)) {
+    case MOD_RCAR_CLOCK_API_TYPE_SYSTEM:
+        *api = &api_system;
+        break;
+    default:
+        *api = &api_clock;
+        break;
+    }
+
     return FWK_SUCCESS;
 }
 
