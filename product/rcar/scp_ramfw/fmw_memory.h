@@ -18,6 +18,6 @@
 #define FMW_MEM0_SIZE SCP_RAM_SIZE
 #define FMW_MEM0_BASE SCP_RAM_BASE
 
-#define FMW_STACK_SIZE (4 * 1024)
+#define FMW_STACK_SIZE (2 * 1024)
 
 #endif /* FMW_MEMORY_H */
