@@ -5,13 +5,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef MOD_RCAR_PD_PMIC_H
-#define MOD_RCAR_PD_PMIC_H
+#ifndef MOD_RCAR_PD_PMIC_BD9571H
+#define MOD_RCAR_PD_PMIC_BD9571H
 
 #include <config_power_domain.h>
 
 #include <mod_power_domain.h>
-#include <mod_rcar_pd_pmic.h>
 #include <mod_rcar_pmic.h>
 
 #include <stdbool.h>
@@ -91,4 +90,4 @@ struct rcar_pmic_ctx {
  * @}
  */
 
-#endif /* MOD_RCAR_PD_PMIC_H */
+#endif /* MOD_RCAR_PD_PMIC_BD9571H */

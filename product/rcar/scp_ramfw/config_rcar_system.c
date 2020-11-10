@@ -10,7 +10,7 @@
 #include <clock_mstp_devices.h>
 #include <clock_sd_devices.h>
 #include <rcar_core.h>
-#include <config_rcar_pd_pmic.h>
+#include <config_rcar_pd_pmic_bd9571.h>
 
 #include <mod_clock.h>
 #include <mod_rcar_clock.h>
@@ -18,7 +18,7 @@
 #include <mod_reg_sensor.h>
 #include <mod_rcar_scif.h>
 #include <mod_rcar_pd_sysc.h>
-#include <mod_rcar_pd_pmic.h>
+#include <mod_rcar_pd_pmic_bd9571.h>
 
 #include <fwk_element.h>
 #include <fwk_module.h>
@@ -66,10 +66,10 @@ static struct fwk_element rcar_system_element_table[] = {
     {
         .name = "pmic",
         .data = &((struct mod_rcar_system_dev_config) {
-            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_RCAR_PD_PMIC,
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_RCAR_PD_PMIC_BD9571,
                 RCAR_PD_PMIC_ELEMENT_IDX_PMIC_DDR_BKUP),
             .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_RCAR_PD_PMIC,
+                FWK_MODULE_IDX_RCAR_PD_PMIC_BD9571,
                 MOD_RCAR_PD_PMIC_API_TYPE_SYSTEM),
         }),
     },

@@ -6,8 +6,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef MOD_RCAR_MOCK_PMIC_DRIVER_API_PRIVATE_H
-#define MOD_RCAR_MOCK_PMIC_DRIVER_API_PRIVATE_H
+#ifndef MOD_RCAR_MOCK_PMIC_BD9571_DRIVER_API_PRIVATE_H
+#define MOD_RCAR_MOCK_PMIC_BD9571_DRIVER_API_PRIVATE_H
 
 #include <mod_rcar_pmic.h>
 #include <mod_psu.h>
@@ -30,4 +30,4 @@ extern const struct mod_rcar_pmic_driver_api __mod_rcar_mock_pmic_driver_api;
 
 extern int32_t rcar_iic_dvfs_send(uint8_t slave, uint8_t regr, uint8_t data);
 
-#endif /* MOD_RCAR_MOCK_PMIC_DRIVER_API_PRIVATE_H */
+#endif /* MOD_RCAR_MOCK_PMIC_BD9571_DRIVER_API_PRIVATE_H */

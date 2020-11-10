@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-BS_LIB_NAME := RCAR_PS_SYSC
-BS_LIB_SOURCES = mod_rcar_pd_pmic.c
+BS_LIB_NAME := RCAR_PD_PMIC_BD9571
+BS_LIB_SOURCES = mod_rcar_pd_pmic_bd9571.c
 
 include $(BS_DIR)/lib.mk

@@ -9,7 +9,7 @@
 #include <config_power_domain.h>
 #include <config_rcar_pd_sysc.h>
 #include <config_rcar_pd_core.h>
-#include <config_rcar_pd_pmic.h>
+#include <config_rcar_pd_pmic_bd9571.h>
 #include <power_domain_utils.h>
 #include <rcar_core.h>
 
@@ -17,7 +17,7 @@
 #include <mod_power_domain.h>
 #include <mod_rcar_pd_core.h>
 #include <mod_rcar_pd_sysc.h>
-#include <mod_rcar_pd_pmic.h>
+#include <mod_rcar_pd_pmic_bd9571.h>
 
 #include <fwk_element.h>
 #include <fwk_macros.h>
@@ -203,9 +203,9 @@ static struct fwk_element rcar_power_domain_static_element_table[] = {
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
             .driver_id = FWK_ID_ELEMENT_INIT(
-                FWK_MODULE_IDX_RCAR_PD_PMIC,
+                FWK_MODULE_IDX_RCAR_PD_PMIC_BD9571,
                 RCAR_PD_PMIC_ELEMENT_IDX_PMIC_DDR_BKUP),
-            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_PMIC,
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_PMIC_BD9571,
                 MOD_RCAR_PD_PMIC_API_TYPE_PUBLIC),
             .allowed_state_mask_table = toplevel_allowed_state_mask_table,
             .allowed_state_mask_table_size =

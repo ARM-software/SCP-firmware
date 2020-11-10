@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <mod_rcar_mock_pmic_private.h>
+#include <mod_rcar_mock_pmic_bd9571_private.h>
 #include <mod_psu.h>
 #include <mod_power_domain.h>
 
