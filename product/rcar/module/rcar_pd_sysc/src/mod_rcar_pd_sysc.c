@@ -30,20 +30,25 @@ static struct rcar_sysc_ctx rcar_sysc_ctx;
  */
 static int pd_set_state(fwk_id_t pd_id, unsigned int state)
 {
-    int status = FWK_SUCCESS;
     struct rcar_sysc_pd_ctx *pd_ctx;
+    int ret = FWK_SUCCESS;
 
     pd_ctx = rcar_sysc_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
 
+    if (pd_ctx->config->always_on)
+        return FWK_E_SUPPORT;
+
     switch (state) {
     case MOD_PD_STATE_ON:
-        status = rcar_sysc_power(pd_ctx, true);
-        pd_ctx->current_state = state;
+        ret = rcar_sysc_power(pd_ctx, true);
+        pd_ctx->pd_driver_input_api->report_power_state_transition(
+            pd_ctx->bound_id, MOD_PD_STATE_ON);
         break;
 
     case MOD_PD_STATE_OFF:
-        status = rcar_sysc_power(pd_ctx, false);
-        pd_ctx->current_state = state;
+        ret = rcar_sysc_power(pd_ctx, false);
+        pd_ctx->pd_driver_input_api->report_power_state_transition(
+            pd_ctx->bound_id, MOD_PD_STATE_OFF);
         break;
 
     default:
@@ -51,7 +56,7 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
         return FWK_E_PARAM;
     }
 
-    return status;
+    return ret;
 }
 
 static int pd_get_state(fwk_id_t pd_id, unsigned int *state)
@@ -59,8 +64,8 @@ static int pd_get_state(fwk_id_t pd_id, unsigned int *state)
     struct rcar_sysc_pd_ctx *pd_ctx;
 
     pd_ctx = rcar_sysc_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
+    rcar_sysc_power_get(pd_ctx, state);
 
-    *state = pd_ctx->current_state;
     return FWK_SUCCESS;
 }
 
@@ -100,7 +105,7 @@ static int rcar_sysc_pd_init(
     const struct mod_rcar_pd_sysc_config *config = data;
     struct rcar_sysc_pd_ctx *pd_ctx;
 
-    if (config->pd_type >= MOD_PD_TYPE_COUNT)
+    if (config->pd_type >= RCAR_PD_TYPE_COUNT)
         return FWK_E_DATA;
 
     pd_ctx = rcar_sysc_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
@@ -108,10 +113,18 @@ static int rcar_sysc_pd_init(
     pd_ctx->bound_id = FWK_ID_NONE;
 
     switch (config->pd_type) {
-    case MOD_PD_TYPE_DEVICE:
-    case MOD_PD_TYPE_DEVICE_DEBUG:
-    case MOD_PD_TYPE_SYSTEM:
+    case RCAR_PD_TYPE_DEVICE:
+    case RCAR_PD_TYPE_DEVICE_DEBUG:
+    case RCAR_PD_TYPE_SYSTEM:
+        if (config->always_on)
+            rcar_sysc_power(pd_ctx, true);
+
         return FWK_SUCCESS;
+
+    case RCAR_PD_TYPE_ALWAYS_ON:
+        pd_ctx->current_state = MOD_PD_STATE_ON;
+        return FWK_SUCCESS;
+
     default:
         return FWK_E_SUPPORT;
     }
@@ -172,15 +185,10 @@ static int rcar_sysc_process_bind_request(
     pd_ctx = rcar_sysc_ctx.pd_ctx_table + fwk_id_get_element_idx(target_id);
 
     switch (pd_ctx->config->pd_type) {
-    case MOD_PD_TYPE_SYSTEM:
-        if (!fwk_id_is_equal(pd_ctx->bound_id, FWK_ID_NONE)) {
-            assert(false);
-            return FWK_E_ACCESS;
-        }
-        /* Fallthrough */
-
-    case MOD_PD_TYPE_DEVICE:
-    case MOD_PD_TYPE_DEVICE_DEBUG:
+    case RCAR_PD_TYPE_SYSTEM:
+    case RCAR_PD_TYPE_DEVICE:
+    case RCAR_PD_TYPE_DEVICE_DEBUG:
+    case RCAR_PD_TYPE_ALWAYS_ON:
         if (fwk_id_get_module_idx(source_id) ==
             FWK_MODULE_IDX_POWER_DOMAIN) {
             pd_ctx->bound_id = source_id;

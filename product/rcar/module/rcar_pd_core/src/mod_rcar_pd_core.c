@@ -44,11 +44,15 @@ static int rcar_pd_set_state(fwk_id_t pd_id, unsigned int state)
     case MOD_PD_STATE_ON:
         rcar_pwrc_cpuon(core);
         pd_ctx->current_state = state;
+        pd_ctx->pd_driver_input_api->report_power_state_transition(
+            pd_ctx->bound_id, MOD_PD_STATE_ON);
         break;
 
     case MOD_PD_STATE_OFF:
         rcar_pwrc_cpuoff(core);
         pd_ctx->current_state = state;
+        pd_ctx->pd_driver_input_api->report_power_state_transition(
+            pd_ctx->bound_id, MOD_PD_STATE_OFF);
         break;
 
     default:
@@ -100,11 +104,15 @@ static int rcar_core_pd_set_state(fwk_id_t core_pd_id, unsigned int state)
     case MOD_PD_STATE_OFF:
         rcar_pwrc_cpuoff(core);
         pd_ctx->current_state = state;
+        pd_ctx->pd_driver_input_api->report_power_state_transition(
+            pd_ctx->bound_id, MOD_PD_STATE_OFF);
         break;
 
     case MOD_PD_STATE_ON:
         rcar_pwrc_cpuon(core);
         pd_ctx->current_state = state;
+        pd_ctx->pd_driver_input_api->report_power_state_transition(
+            pd_ctx->bound_id, MOD_PD_STATE_ON);
         break;
 
     case MOD_PD_STATE_SLEEP:
@@ -186,28 +194,31 @@ static int rcar_pd_init(fwk_id_t pd_id, unsigned int unused, const void *data)
     const struct mod_rcar_pd_core_pd_config *config = data;
     struct rcar_pd_sysc_pd_ctx *pd_ctx;
 
-    if (config->pd_type >= MOD_PD_TYPE_COUNT)
+    if (config->pd_type >= RCAR_PD_TYPE_COUNT)
         return FWK_E_DATA;
 
     pd_ctx = rcar_pd_sysc_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
     pd_ctx->config = config;
     pd_ctx->bound_id = FWK_ID_NONE;
 
-    if (config->pd_type == MOD_PD_TYPE_CLUSTER) {
+    if (config->pd_type == RCAR_PD_TYPE_CLUSTER) {
         pd_ctx->data =
             fwk_mm_calloc(1, sizeof(struct rcar_pd_sysc_cluster_pd_ctx));
         if (pd_ctx->data == NULL)
             return FWK_E_NOMEM;
     }
 
-    if (config->default_power_on) {
+    if (config->always_on) {
         switch (config->pd_type) {
-        case MOD_PD_TYPE_DEVICE:
+        case RCAR_PD_TYPE_DEVICE:
             /* Fall through */
-        case MOD_PD_TYPE_DEVICE_DEBUG:
+        case RCAR_PD_TYPE_DEVICE_DEBUG:
             /* Fall through */
-        case MOD_PD_TYPE_SYSTEM:
-            break; // To Do. add (Default Power ON?)
+        case RCAR_PD_TYPE_SYSTEM:
+        case RCAR_PD_TYPE_CORE:
+        case RCAR_PD_TYPE_CLUSTER:
+            pd_ctx->current_state = MOD_PD_STATE_ON;
+            break;
 
         default:
             assert(false);
@@ -246,7 +257,7 @@ static int rcar_core_bind(fwk_id_t id, unsigned int round)
     pd_ctx = rcar_pd_sysc_ctx.pd_ctx_table + fwk_id_get_element_idx(id);
 
     if (!fwk_id_is_equal(pd_ctx->config->observer_id, FWK_ID_NONE)) {
-        if (pd_ctx->config->pd_type != MOD_PD_TYPE_CLUSTER) {
+        if (pd_ctx->config->pd_type != RCAR_PD_TYPE_CLUSTER) {
             /* State observation only supported for clusters */
             assert(false);
             return FWK_E_SUPPORT;
@@ -306,7 +317,7 @@ static int rcar_core_process_bind_request(
     pd_ctx = rcar_pd_sysc_ctx.pd_ctx_table + fwk_id_get_element_idx(target_id);
 
     /* Allow multiple binding only for device power domain for now */
-    if ((pd_ctx->config->pd_type != MOD_PD_TYPE_DEVICE) &&
+    if ((pd_ctx->config->pd_type != RCAR_PD_TYPE_DEVICE) &&
         (!fwk_id_is_equal(pd_ctx->bound_id, FWK_ID_NONE))) {
         assert(false);
         return FWK_E_ACCESS;
@@ -318,7 +329,7 @@ static int rcar_core_process_bind_request(
         (fwk_id_get_module_idx(source_id) == FWK_MODULE_IDX_SYSTEM_POWER);
 
     switch (pd_ctx->config->pd_type) {
-    case MOD_PD_TYPE_CORE:
+    case RCAR_PD_TYPE_CORE:
         if (is_power_domain_module) {
             *api = &core_pd_driver;
             pd_ctx->bound_id = source_id;
@@ -326,7 +337,7 @@ static int rcar_core_process_bind_request(
         }
         break;
 
-    case MOD_PD_TYPE_CLUSTER:
+    case RCAR_PD_TYPE_CLUSTER:
         if (is_power_domain_module) {
             *api = &cluster_pd_driver;
             pd_ctx->bound_id = source_id;
@@ -334,7 +345,7 @@ static int rcar_core_process_bind_request(
         }
         break;
 
-    case MOD_PD_TYPE_SYSTEM:
+    case RCAR_PD_TYPE_SYSTEM:
         if (is_power_domain_module || is_system_power_module) {
             *api = &pd_driver;
             pd_ctx->bound_id = source_id;
@@ -377,10 +388,10 @@ static int rcar_core_process_notification(
         fwk_id_get_element_idx(event->target_id);
 
     switch (pd_ctx->config->pd_type) {
-    case MOD_PD_TYPE_CORE:
+    case RCAR_PD_TYPE_CORE:
         return rcar_core_pd_init(pd_ctx);
 
-    case MOD_PD_TYPE_CLUSTER:
+    case RCAR_PD_TYPE_CLUSTER:
         return rcar_cluster_pd_init(pd_ctx);
 
     default:

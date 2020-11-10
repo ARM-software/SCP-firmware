@@ -32,7 +32,32 @@ enum rcar_powerdomain_child_index {
     CONFIG_POWER_DOMAIN_CHILD_A3VC,
     CONFIG_POWER_DOMAIN_CHILD_CR7,
     CONFIG_POWER_DOMAIN_CHILD_A3VP,
-    CONFIG_POWER_DOMAIN_CHILD_COUNT
+    CONFIG_POWER_DOMAIN_CHILD_ALWAYS_ON,
+    CONFIG_POWER_DOMAIN_CHILD_SYSTOP,
+
+    /* Number of defined elements */
+    CONFIG_POWER_DOMAIN_CHILD_COUNT,
+
+    CONFIG_POWER_DOMAIN_CHILD_NONE = (0xFFFFFFFFU),
+};
+
+/*!
+ * \brief Types of rcar power domain.
+ */
+enum rcar_pd_type {
+    /*! Processor. */
+    RCAR_PD_TYPE_CORE,
+    /*! Processor cluster. */
+    RCAR_PD_TYPE_CLUSTER,
+    /*! Generic device. */
+    RCAR_PD_TYPE_ALWAYS_ON,
+    RCAR_PD_TYPE_DEVICE,
+    /*! Debug device. */
+    RCAR_PD_TYPE_DEVICE_DEBUG,
+    /*! System. */
+    RCAR_PD_TYPE_SYSTEM,
+    /*! Number of power domain types. */
+    RCAR_PD_TYPE_COUNT
 };
 
 #endif /* CONFIG_POWER_DOMAIN_H */

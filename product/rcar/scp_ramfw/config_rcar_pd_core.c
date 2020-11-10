@@ -51,7 +51,7 @@ static struct fwk_element rcar_pd_core_system_element_table[] = {
         {
             .name = "SYS0",
             .data = &((struct mod_rcar_pd_core_pd_config){
-                .pd_type = MOD_PD_TYPE_SYSTEM,
+                .pd_type = RCAR_PD_TYPE_SYSTEM,
                 .observer_id = FWK_ID_NONE_INIT,
             }),
         },
@@ -59,7 +59,7 @@ static struct fwk_element rcar_pd_core_system_element_table[] = {
         {
             .name = "SYS1",
             .data = &((struct mod_rcar_pd_core_pd_config){
-                .pd_type = MOD_PD_TYPE_SYSTEM,
+                .pd_type = RCAR_PD_TYPE_SYSTEM,
                 .observer_id = FWK_ID_NONE_INIT,
             }),
         },
@@ -108,10 +108,15 @@ static const struct fwk_element *rcar_pd_core_get_element_table(fwk_id_t mod)
         element->name = core_pd_name_table[core_idx];
         element->data = pd_config;
 
-        pd_config->pd_type = MOD_PD_TYPE_CORE;
+        pd_config->pd_type = RCAR_PD_TYPE_CORE;
         pd_config->cluster_id =
             FWK_ID_ELEMENT(FWK_MODULE_IDX_RCAR_PD_CORE, cluster_idx);
         pd_config->observer_id = FWK_ID_NONE;
+        if (core_idx == RCAR_PD_CORE_ELEMENT_IDX_CPU0)
+            pd_config->always_on = true;
+        else
+            pd_config->always_on = false;
+
         core_element_count++;
     }
 
@@ -125,9 +130,14 @@ static const struct fwk_element *rcar_pd_core_get_element_table(fwk_id_t mod)
 
         element->name = cluster_pd_name_table[cluster_idx];
         element->data = pd_config;
-        pd_config->pd_type = MOD_PD_TYPE_CLUSTER;
+        pd_config->pd_type = RCAR_PD_TYPE_CLUSTER;
         pd_config->observer_id = FWK_ID_NONE;
         pd_config->observer_api = FWK_ID_NONE;
+        if (cluster_idx == RCAR_PD_CORE_ELEMENT_IDX_CLU0)
+            pd_config->always_on = true;
+        else
+            pd_config->always_on = false;
+
         core_element_count++;
     }
 

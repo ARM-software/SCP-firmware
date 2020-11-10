@@ -95,10 +95,17 @@ int rcar_sysc_power(struct rcar_sysc_pd_ctx *pd_ctx, bool on)
 
     mmio_write_32((SYSC_BASE_ADDR + SYSCISCR), isr_mask);
 
+    if (on)
+        pd_ctx->current_state = MOD_PD_STATE_ON;
+    else
+        pd_ctx->current_state = MOD_PD_STATE_OFF;
+
     return ret;
 }
 
 int rcar_sysc_power_get(struct rcar_sysc_pd_ctx *pd_ctx, unsigned int *statee)
 {
+    *statee = pd_ctx->current_state;
+
     return FWK_SUCCESS;
 }

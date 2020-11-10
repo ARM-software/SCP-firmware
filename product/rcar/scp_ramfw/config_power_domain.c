@@ -14,6 +14,7 @@
 #include <mod_system_power.h>
 #include <mod_power_domain.h>
 #include <mod_rcar_pd_core.h>
+#include <mod_rcar_pd_sysc.h>
 
 #include <fwk_element.h>
 #include <fwk_macros.h>
@@ -70,7 +71,8 @@ static struct fwk_element rcar_power_domain_static_element_table[] = {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_RCAR_PD_SYSC, RCAR_PD_SYSC_ELEMENT_IDX_A3IR),
-            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC, 0),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC,
+                MOD_RCAR_PD_SYSC_API_TYPE_PUBLIC),
             .allowed_state_mask_table = toplevel_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(toplevel_allowed_state_mask_table)
@@ -82,7 +84,8 @@ static struct fwk_element rcar_power_domain_static_element_table[] = {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_RCAR_PD_SYSC, RCAR_PD_SYSC_ELEMENT_IDX_3DGE),
-            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC, 0),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC,
+                MOD_RCAR_PD_SYSC_API_TYPE_PUBLIC),
             .allowed_state_mask_table = toplevel_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(toplevel_allowed_state_mask_table)
@@ -94,7 +97,8 @@ static struct fwk_element rcar_power_domain_static_element_table[] = {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_RCAR_PD_SYSC, RCAR_PD_SYSC_ELEMENT_IDX_3DGD),
-            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC, 0),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC,
+                MOD_RCAR_PD_SYSC_API_TYPE_PUBLIC),
             .allowed_state_mask_table = toplevel_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(toplevel_allowed_state_mask_table)
@@ -106,7 +110,8 @@ static struct fwk_element rcar_power_domain_static_element_table[] = {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_RCAR_PD_SYSC, RCAR_PD_SYSC_ELEMENT_IDX_3DGC),
-            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC, 0),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC,
+                MOD_RCAR_PD_SYSC_API_TYPE_PUBLIC),
             .allowed_state_mask_table = toplevel_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(toplevel_allowed_state_mask_table)
@@ -118,7 +123,8 @@ static struct fwk_element rcar_power_domain_static_element_table[] = {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_RCAR_PD_SYSC, RCAR_PD_SYSC_ELEMENT_IDX_3DGB),
-            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC, 0),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC,
+                MOD_RCAR_PD_SYSC_API_TYPE_PUBLIC),
             .allowed_state_mask_table = toplevel_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(toplevel_allowed_state_mask_table)
@@ -130,7 +136,8 @@ static struct fwk_element rcar_power_domain_static_element_table[] = {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_RCAR_PD_SYSC, RCAR_PD_SYSC_ELEMENT_IDX_3DGA),
-            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC, 0),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC,
+                MOD_RCAR_PD_SYSC_API_TYPE_PUBLIC),
             .allowed_state_mask_table = toplevel_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(toplevel_allowed_state_mask_table)
@@ -142,7 +149,8 @@ static struct fwk_element rcar_power_domain_static_element_table[] = {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_RCAR_PD_SYSC, RCAR_PD_SYSC_ELEMENT_IDX_A2VC1),
-            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC, 0),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC,
+                MOD_RCAR_PD_SYSC_API_TYPE_PUBLIC),
             .allowed_state_mask_table = toplevel_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(toplevel_allowed_state_mask_table)
@@ -154,7 +162,8 @@ static struct fwk_element rcar_power_domain_static_element_table[] = {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_RCAR_PD_SYSC, RCAR_PD_SYSC_ELEMENT_IDX_A3VC),
-            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC, 0),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC,
+                MOD_RCAR_PD_SYSC_API_TYPE_PUBLIC),
             .allowed_state_mask_table = toplevel_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(toplevel_allowed_state_mask_table)
@@ -166,7 +175,8 @@ static struct fwk_element rcar_power_domain_static_element_table[] = {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_RCAR_PD_SYSC, RCAR_PD_SYSC_ELEMENT_IDX_CR7),
-            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC, 0),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC,
+                MOD_RCAR_PD_SYSC_API_TYPE_PUBLIC),
             .allowed_state_mask_table = toplevel_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(toplevel_allowed_state_mask_table)
@@ -178,24 +188,40 @@ static struct fwk_element rcar_power_domain_static_element_table[] = {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_RCAR_PD_SYSC, RCAR_PD_SYSC_ELEMENT_IDX_A3VP),
-            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC, 0),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC,
+                MOD_RCAR_PD_SYSC_API_TYPE_PUBLIC),
             .allowed_state_mask_table = toplevel_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(toplevel_allowed_state_mask_table)
         }),
     },
-    [CONFIG_POWER_DOMAIN_CHILD_COUNT] = {
-        .name = "SYSTOP",
+    [CONFIG_POWER_DOMAIN_CHILD_ALWAYS_ON] = {
+        .name = "always-on",
         .data = &((struct mod_power_domain_element_config) {
+            .attributes.pd_type = MOD_PD_TYPE_DEVICE,
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_RCAR_PD_SYSC, RCAR_PD_SYSC_ELEMENT_IDX_ALWAYS_ON),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC,
+                MOD_RCAR_PD_SYSC_API_TYPE_PUBLIC),
+            .allowed_state_mask_table = toplevel_allowed_state_mask_table,
+            .allowed_state_mask_table_size =
+                FWK_ARRAY_SIZE(toplevel_allowed_state_mask_table)
+        }),
+    },
+    [CONFIG_POWER_DOMAIN_CHILD_SYSTOP] = {
+        .name = "SYSTOP",
+        .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_SYSTEM,
+            .parent_idx = CONFIG_POWER_DOMAIN_CHILD_NONE,
             .driver_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SYSTEM_POWER),
             .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SYSTEM_POWER,
                 MOD_SYSTEM_POWER_API_IDX_PD_DRIVER),
             .allowed_state_mask_table = systop_allowed_state_mask_table,
             .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(systop_allowed_state_mask_table)
-        }),
+                FWK_ARRAY_SIZE(systop_allowed_state_mask_table),
+        },
     },
+    [CONFIG_POWER_DOMAIN_CHILD_COUNT] = { 0 },
 };
 
 /*

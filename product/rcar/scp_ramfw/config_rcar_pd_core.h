@@ -17,6 +17,9 @@ enum rcar_pd_core_element_idx {
     RCAR_PD_CORE_ELEMENT_IDX_CPU5,
     RCAR_PD_CORE_ELEMENT_IDX_CPU6,
     RCAR_PD_CORE_ELEMENT_IDX_CPU7,
+};
+
+enum rcar_pd_cluster_element_idx {
     RCAR_PD_CORE_ELEMENT_IDX_CLU0,
     RCAR_PD_CORE_ELEMENT_IDX_CLU1
 };
