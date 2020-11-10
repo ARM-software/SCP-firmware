@@ -119,12 +119,12 @@ static int mstp_clock_set_rate(
     uint64_t rate,
     enum mod_clock_round_mode round_mode)
 {
-    return FWK_E_PARAM;
+    return FWK_SUCCESS;
 }
 
 static int mstp_clock_get_rate(fwk_id_t dev_id, uint64_t *rate)
 {
-    return FWK_E_PARAM;
+    return FWK_SUCCESS;
 }
 
 static int mstp_clock_get_rate_from_index(
@@ -132,12 +132,12 @@ static int mstp_clock_get_rate_from_index(
     unsigned int rate_index,
     uint64_t *rate)
 {
-    return FWK_E_PARAM;
+    return FWK_SUCCESS;
 }
 
 static int mstp_clock_get_range(fwk_id_t dev_id, struct mod_clock_range *range)
 {
-    return FWK_E_PARAM;
+    return FWK_SUCCESS;
 }
 
 static const struct mod_rcar_clock_drv_api api_clock = {
