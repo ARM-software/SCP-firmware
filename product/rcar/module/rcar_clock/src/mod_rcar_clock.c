@@ -1148,6 +1148,10 @@ static int rcar_clock_process_bind_request(
 }
 static int rcar_clock_start(fwk_id_t id)
 {
+    /* for Not Module */
+    if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+        return FWK_SUCCESS;
+
     rcar_dvfs_opp_init();
     return FWK_SUCCESS;
 }

@@ -227,7 +227,8 @@ static int mfismh_start(fwk_id_t id)
     int status;
     struct mfismh_device_ctx *device_ctx;
 
-    if (fwk_id_get_type(id) == FWK_ID_TYPE_MODULE)
+    /* for Module */
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
         return FWK_SUCCESS;
 
     device_ctx = &mfismh_ctx.device_ctx_table[fwk_id_get_element_idx(id)];
