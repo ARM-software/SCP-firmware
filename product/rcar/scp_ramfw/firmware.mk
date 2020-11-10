@@ -21,6 +21,8 @@ BS_FIRMWARE_MODULES := \
     rcar_mstp_clock \
     rcar_system_power \
     rcar_dvfs \
+    rcar_arch_timer \
+    timer \
     rcar_pmic \
     rcar_mock_pmic \
     rcar_mfismh \
@@ -53,6 +55,7 @@ BS_FIRMWARE_SOURCES := \
     config_rcar_pmic.c \
     config_rcar_mock_pmic.c \
     config_rcar_mfismh.c \
+    config_timer.c \
     config_smt.c \
     config_scmi.c \
     config_scmi_clock.c \

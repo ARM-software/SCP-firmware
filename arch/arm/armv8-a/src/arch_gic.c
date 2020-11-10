@@ -21,7 +21,7 @@
 #    define RCAR_MFIS_MIN U(256)
 #    define RCAR_MFIS_NO U(8)
 #    define RCAR_MFIS_MAX (RCAR_MFIS_MIN + RCAR_MFIS_NO)
-#    define IS_SUPPORT_INT(n) ((n >= RCAR_MFIS_MIN) && (n <= RCAR_MFIS_MAX))
+#    define IS_SUPPORT_INT(n) ((n >= RCAR_MFIS_MIN) && (n < RCAR_MFIS_MAX))
 #    define EFECTIVE_NO(n) (n - RCAR_MFIS_MIN)
 #else
 #    define IS_SUPPORT_INT(n) ((n >= SMCMH_IRQ_START) && (n < SMCMH_IRQ_END))
@@ -344,6 +344,9 @@ void gic_init(void)
     gicd_set_ipriorityr(
         RCAR_GICD_BASE, VIRTUAL_TIMER_IRQ, GIC_HIGHEST_SEC_PRIORITY);
     gicd_set_isenabler(RCAR_GICD_BASE, VIRTUAL_TIMER_IRQ);
+    gicd_set_ipriorityr(
+        RCAR_GICD_BASE, NS_PHYSICAL_TIMER_IRQ, GIC_HIGHEST_SEC_PRIORITY);
+    gicd_set_isenabler(RCAR_GICD_BASE, NS_PHYSICAL_TIMER_IRQ);
     gic_cpuif_enable();
 }
 
