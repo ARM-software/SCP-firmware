@@ -9,6 +9,7 @@
 #define MOD_RCAR_PMIC_DEVICE_CTX_PRIVATE_H
 
 #include <mod_rcar_pmic.h>
+#include <mod_psu.h>
 
 #include <fwk_id.h>
 
@@ -19,7 +20,7 @@ struct mod_rcar_pmic_device_ctx {
 
     struct {
         /* Driver API */
-        const struct mod_rcar_pmic_driver_api *driver;
+        const struct mod_psu_driver_api *driver;
     } apis;
 };
 

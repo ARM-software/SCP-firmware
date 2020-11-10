@@ -6,6 +6,7 @@
  */
 
 #include <mod_rcar_mock_pmic_private.h>
+#include <mod_psu.h>
 
 #include <fwk_id.h>
 
@@ -39,7 +40,7 @@ static int api_get_enabled(fwk_id_t device_id, bool *enabled)
     return FWK_SUCCESS;
 }
 
-static int api_set_voltage(fwk_id_t device_id, uint64_t voltage)
+static int api_set_voltage(fwk_id_t device_id, uint32_t voltage)
 {
     struct mod_rcar_mock_pmic_device_ctx *ctx;
     uint8_t val;
@@ -68,7 +69,7 @@ static int api_set_voltage(fwk_id_t device_id, uint64_t voltage)
     return FWK_SUCCESS;
 }
 
-static int api_get_voltage(fwk_id_t device_id, uint64_t *voltage)
+static int api_get_voltage(fwk_id_t device_id, uint32_t *voltage)
 {
     struct mod_rcar_mock_pmic_device_ctx *ctx;
 
@@ -81,7 +82,7 @@ static int api_get_voltage(fwk_id_t device_id, uint64_t *voltage)
     return FWK_SUCCESS;
 }
 
-const struct mod_rcar_pmic_driver_api __mod_rcar_mock_pmic_driver_api = {
+const struct mod_psu_driver_api __mod_rcar_mock_pmic_driver_api = {
     .set_enabled = api_set_enabled,
     .get_enabled = api_get_enabled,
     .set_voltage = api_set_voltage,

@@ -6,6 +6,7 @@
  */
 
 #include <mod_rcar_pmic_private.h>
+#include <mod_psu.h>
 
 #include <fwk_mm.h>
 #include <fwk_module.h>
@@ -62,43 +63,7 @@ static int api_set_enabled(fwk_id_t device_id, bool enable)
     return FWK_SUCCESS;
 }
 
-static int api_set_enabled_async(fwk_id_t device_id, bool enable)
-{
-    int status;
-    struct fwk_event event;
-    struct mod_rcar_pmic_event_params_set_enabled *params;
-
-    /* This API call cannot target another module */
-    if (fwk_id_get_module_idx(device_id) != FWK_MODULE_IDX_RCAR_PMIC)
-        return FWK_E_PARAM;
-
-    /* Ensure the identifier refers to an existing element */
-    if (fwk_module_is_valid_element_id(device_id))
-        return FWK_E_PARAM;
-
-    /* Build and submit the event */
-    event = (struct fwk_event){
-        .id = mod_rcar_pmic_event_id_set_enabled,
-        .target_id = device_id,
-        .response_requested = true,
-    };
-
-    params = (void *)&event.params;
-    *params = (struct mod_rcar_pmic_event_params_set_enabled){
-        .enable = enable,
-    };
-
-    /* Submit the event for processing */
-    status = fwk_thread_put_event(&event);
-    if (status == FWK_E_NOMEM)
-        return FWK_E_NOMEM;
-    else if (status != FWK_SUCCESS)
-        return FWK_E_PANIC;
-
-    return FWK_SUCCESS;
-}
-
-static int api_get_voltage(fwk_id_t device_id, uint64_t *voltage)
+static int api_get_voltage(fwk_id_t device_id, uint32_t *voltage)
 {
     int status;
     const struct mod_rcar_pmic_device_ctx *ctx;
@@ -123,7 +88,7 @@ static int api_get_voltage(fwk_id_t device_id, uint64_t *voltage)
     return FWK_SUCCESS;
 }
 
-static int api_set_voltage(fwk_id_t device_id, uint64_t voltage)
+static int api_set_voltage(fwk_id_t device_id, uint32_t voltage)
 {
     int status;
     const struct mod_rcar_pmic_device_ctx *ctx;
@@ -148,47 +113,10 @@ static int api_set_voltage(fwk_id_t device_id, uint64_t voltage)
     return FWK_SUCCESS;
 }
 
-static int api_set_voltage_async(fwk_id_t device_id, uint64_t voltage)
-{
-    int status;
-    struct fwk_event event;
-    struct mod_rcar_pmic_event_params_set_voltage *params;
-
-    /* This API call cannot target another module */
-    if (fwk_id_get_module_idx(device_id) != FWK_MODULE_IDX_RCAR_PMIC)
-        return FWK_E_PARAM;
-
-    /* Ensure the identifier refers to an existing element */
-    if (fwk_module_is_valid_element_id(device_id))
-        return FWK_E_PARAM;
-
-    /* Build and submit the event */
-    event = (struct fwk_event){
-        .id = mod_rcar_pmic_event_id_set_enabled,
-        .target_id = device_id,
-        .response_requested = true,
-    };
-
-    params = (void *)&event.params;
-    *params = (struct mod_rcar_pmic_event_params_set_voltage){
-        .voltage = voltage,
-    };
-
-    status = fwk_thread_put_event(&event);
-    if (status == FWK_E_NOMEM)
-        return FWK_E_NOMEM;
-    else if (status != FWK_SUCCESS)
-        return FWK_E_PANIC;
-
-    return FWK_SUCCESS;
-}
-
 /* Module API implementation */
-const struct mod_rcar_pmic_device_api __mod_rcar_pmic_device_api = {
+const struct mod_psu_driver_api __mod_rcar_pmic_device_api = {
     .get_enabled = api_get_enabled,
     .set_enabled = api_set_enabled,
-    .set_enabled_async = api_set_enabled_async,
     .get_voltage = api_get_voltage,
     .set_voltage = api_set_voltage,
-    .set_voltage_async = api_set_voltage_async,
 };

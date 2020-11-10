@@ -232,7 +232,7 @@ enum mod_rcar_pmic_event_idx {
     /*! Event index for mod_rcar_pmic_event_id_set_enabled */
     MOD_RCAR_PMIC_EVENT_IDX_SET_ENABLED,
 
-    /*! Event index for mod_psu_event_id_set_voltage */
+    /*! Event index for mod_rcar_pmic_event_id_set_voltage */
     MOD_RCAR_PMIC_EVENT_IDX_SET_VOLTAGE,
 
     /*! Number of defined events */
@@ -240,14 +240,16 @@ enum mod_rcar_pmic_event_idx {
 };
 
 /*! <tt>Set enabled</tt> event identifier */
-static const fwk_id_t mod_rcar_pmic_event_id_set_enabled = FWK_ID_EVENT_INIT(
-    FWK_MODULE_IDX_RCAR_PMIC,
-    MOD_RCAR_PMIC_EVENT_IDX_SET_ENABLED);
+static const fwk_id_t mod_rcar_pmic_event_id_set_enabled =
+    FWK_ID_EVENT_INIT(
+        FWK_MODULE_IDX_RCAR_PMIC,
+        MOD_RCAR_PMIC_EVENT_IDX_SET_ENABLED);
 
 /*! <tt>Set voltage</tt> event identifier */
-static const fwk_id_t mod_psu_event_id_set_voltage = FWK_ID_EVENT_INIT(
-    FWK_MODULE_IDX_RCAR_PMIC,
-    MOD_RCAR_PMIC_EVENT_IDX_SET_VOLTAGE);
+static const fwk_id_t mod_rcar_pmic_event_id_set_voltage =
+     FWK_ID_EVENT_INIT(
+         FWK_MODULE_IDX_RCAR_PMIC,
+         MOD_RCAR_PMIC_EVENT_IDX_SET_VOLTAGE);
 
 /*!
  * \}

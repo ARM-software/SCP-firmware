@@ -43,16 +43,6 @@ static const struct fwk_element element_table[] = {
                     FWK_MODULE_IDX_RCAR_MOCK_PMIC,
                     MOD_RCAR_MOCK_PMIC_API_IDX_PSU_DRIVER) },
     },
-    {
-        .name = "VPU",
-        .data =
-            &(const struct mod_rcar_pmic_device_config){
-                .driver_id =
-                    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_RCAR_MOCK_PMIC, 3),
-                .driver_api_id = FWK_ID_API_INIT(
-                    FWK_MODULE_IDX_RCAR_MOCK_PMIC,
-                    MOD_RCAR_MOCK_PMIC_API_IDX_PSU_DRIVER) },
-    },
     { 0 }
 };
 

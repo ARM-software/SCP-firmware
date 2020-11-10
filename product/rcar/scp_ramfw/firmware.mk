@@ -20,7 +20,8 @@ BS_FIRMWARE_MODULES := \
     rcar_sd_clock \
     rcar_mstp_clock \
     rcar_system_power \
-    rcar_dvfs \
+    dvfs \
+    psu \
     rcar_arch_timer \
     timer \
     rcar_pmic \
@@ -31,6 +32,7 @@ BS_FIRMWARE_MODULES := \
     rcar_pd_core \
     rcar_reg_sensor \
     sensor \
+    scmi_perf \
     scmi_power_domain \
     scmi_clock \
     scmi_sensor \
@@ -51,13 +53,15 @@ BS_FIRMWARE_SOURCES := \
     config_rcar_clock.c \
     config_rcar_sd_clock.c \
     config_rcar_mstp_clock.c \
-    config_rcar_dvfs.c \
+    config_dvfs.c \
+    config_psu.c \
     config_rcar_pmic.c \
     config_rcar_mock_pmic.c \
     config_rcar_mfismh.c \
     config_timer.c \
     config_smt.c \
     config_scmi.c \
+    config_scmi_perf.c \
     config_scmi_clock.c \
     config_scmi_apcore.c \
     config_scmi_power_domain.c \
