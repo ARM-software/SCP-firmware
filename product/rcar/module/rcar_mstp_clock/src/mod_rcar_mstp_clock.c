@@ -195,6 +195,11 @@ static int mstp_clock_process_bind_request(
 static int mstp_clock_start(fwk_id_t id)
 {
     int ret = FWK_SUCCESS;
+
+    /* for Not Module */
+    if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+        return ret;
+
     ret = mstp_clock_resume();
     return ret;
 }
