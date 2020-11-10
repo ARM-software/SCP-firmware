@@ -8,6 +8,8 @@
 #ifndef MOD_RCAR_PD_CORE_H
 #define MOD_RCAR_PD_CORE_H
 
+#include <config_power_domain.h>
+
 #include <mod_power_domain.h>
 
 #include <fwk_id.h>
@@ -71,7 +73,7 @@ struct mod_rcar_pd_core_config {
  */
 struct mod_rcar_pd_core_pd_config {
     /*! Power domain type */
-    enum mod_pd_type pd_type;
+    enum rcar_pd_type pd_type;
 
     /*! descriptor */
     struct mod_rcar_pd_sysc ppu;
@@ -104,6 +106,10 @@ struct mod_rcar_pd_core_pd_config {
      *     \ref observer_id.
      */
     fwk_id_t observer_api;
+    /*!
+     * Flag indicating if this domain should be powered on during element init.
+     */
+    bool always_on;
 };
 
 /*!

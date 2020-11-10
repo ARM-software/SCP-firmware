@@ -8,6 +8,8 @@
 #ifndef MOD_RCAR_PD_SYSC_H
 #define MOD_RCAR_PD_SYSC_H
 
+#include <config_power_domain.h>
+
 #include <mod_power_domain.h>
 
 #include <stdbool.h>
@@ -59,7 +61,7 @@ struct rcar_sysc_ctx {
  */
 struct mod_rcar_pd_sysc_config {
     /*! Power domain type */
-    enum mod_pd_type pd_type;
+    enum rcar_pd_type pd_type;
     /*! Offset of PWRSR register for this area */
     unsigned int chan_offs;
     /*! Bit in PWR* (except for PWRUP in PWRSR) */
@@ -70,7 +72,16 @@ struct mod_rcar_pd_sysc_config {
     /*!
      * Flag indicating if this domain should be powered on during element init.
      */
-    bool default_power_on;
+    bool always_on;
+};
+
+/*!
+ * \brief API indices
+ */
+enum mod_rcar_pd_sys_api_type {
+    MOD_RCAR_PD_SYSC_API_TYPE_PUBLIC,
+    MOD_RCAR_PD_SYSC_API_TYPE_SYSTEM,
+    MOD_RCAR_PD_SYSC_API_COUNT,
 };
 
 /*!
