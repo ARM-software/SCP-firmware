@@ -7,6 +7,7 @@
  */
 
 #include <system_mmap.h>
+#include <config_sensor.h>
 
 #include <mod_reg_sensor.h>
 #include <mod_sensor.h>
@@ -16,19 +17,6 @@
 #include <fwk_module_idx.h>
 
 #include <stddef.h>
-
-enum REG_SENSOR_DEVICES {
-    REG_SENSOR_DEV_SOC_TEMP1,
-    REG_SENSOR_DEV_SOC_TEMP2,
-    REG_SENSOR_DEV_SOC_TEMP3,
-    REG_SENSOR_DEV_COUNT,
-};
-enum SENSOR_DEVICES {
-    R8A7795_SNSR_THERMAL1,
-    R8A7795_SNSR_THERMAL2,
-    R8A7795_SNSR_THERMAL3,
-    R8A7795_SNSR_COUNT,
-};
 
 /*
  * Register Sensor driver config
