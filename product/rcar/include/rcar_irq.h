@@ -14,6 +14,7 @@ enum rcar_irq {
     /**/
     MIN_IRQ = 16,
     VIRTUAL_TIMER_IRQ = 27,
+    NS_PHYSICAL_TIMER_IRQ = 30,
     /**/
     MFIS_AREICR1_IRQ = 257,
     MFIS_AREICR2_IRQ = 258,
