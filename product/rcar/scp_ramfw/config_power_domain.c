@@ -9,6 +9,7 @@
 #include <config_power_domain.h>
 #include <config_rcar_pd_sysc.h>
 #include <config_rcar_pd_core.h>
+#include <config_rcar_pd_pmic.h>
 #include <power_domain_utils.h>
 #include <rcar_core.h>
 
@@ -196,12 +197,26 @@ static struct fwk_element rcar_power_domain_static_element_table[] = {
                 FWK_ARRAY_SIZE(toplevel_allowed_state_mask_table)
         }),
     },
+    [CONFIG_POWER_DOMAIN_CHILD_DDR_BKUP] = {
+        .name = "pmic_ddr_bkup",
+        .data = &((struct mod_power_domain_element_config) {
+            .attributes.pd_type = MOD_PD_TYPE_DEVICE,
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_RCAR_PD_PMIC,
+                RCAR_PD_PMIC_ELEMENT_IDX_PMIC_DDR_BKUP),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_PMIC, 0),
+            .allowed_state_mask_table = toplevel_allowed_state_mask_table,
+            .allowed_state_mask_table_size =
+                FWK_ARRAY_SIZE(toplevel_allowed_state_mask_table)
+        }),
+    },
     [CONFIG_POWER_DOMAIN_CHILD_ALWAYS_ON] = {
         .name = "always-on",
         .data = &((struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
             .driver_id = FWK_ID_ELEMENT_INIT(
-                FWK_MODULE_IDX_RCAR_PD_SYSC, RCAR_PD_SYSC_ELEMENT_IDX_ALWAYS_ON),
+                FWK_MODULE_IDX_RCAR_PD_SYSC,
+                RCAR_PD_SYSC_ELEMENT_IDX_ALWAYS_ON),
             .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_PD_SYSC,
                 MOD_RCAR_PD_SYSC_API_TYPE_PUBLIC),
             .allowed_state_mask_table = toplevel_allowed_state_mask_table,

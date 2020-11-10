@@ -21,7 +21,7 @@ struct mod_rcar_pmic_device_ctx {
 
     struct {
         /* Driver API */
-        const struct mod_psu_driver_api *driver;
+        const struct mod_rcar_pmic_driver_api *driver;
     } apis;
 };
 

@@ -29,6 +29,13 @@ static const struct fwk_element element_table[] = {
                 .default_voltage = 830000,
             },
     },
+    [MOD_RCAR_MOCK_PMIC_ELEMENT_IDX_PMIC_DDR_BKUP] = {
+        .name = "PMIC_DDR_BKUP",
+        .data =
+            &(const struct mod_rcar_mock_pmic_device_config) {
+                .default_enabled = false,
+            },
+    },
     [MOD_RCAR_MOCK_PMIC_ELEMENT_IDX_GPU] = {
         .name = "GPU",
         .data =
