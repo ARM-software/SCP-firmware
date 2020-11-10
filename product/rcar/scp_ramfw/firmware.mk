@@ -19,6 +19,7 @@ BS_FIRMWARE_MODULES := \
     rcar_clock \
     rcar_sd_clock \
     rcar_mstp_clock \
+    rcar_ext_clock \
     rcar_system_power \
     dvfs \
     psu \
@@ -58,6 +59,7 @@ BS_FIRMWARE_SOURCES := \
     config_rcar_clock.c \
     config_rcar_sd_clock.c \
     config_rcar_mstp_clock.c \
+    config_rcar_ext_clock.c \
     config_dvfs.c \
     config_psu.c \
     config_rcar_pmic.c \

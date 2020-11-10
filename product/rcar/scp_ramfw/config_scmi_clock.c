@@ -962,6 +962,66 @@ static const struct mod_scmi_clock_device agent_device_table_ospm[] = {
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_SCU_SRC0),
     },
+    {
+        /* x12_clk */
+        .element_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_X12_CLK),
+    },
+    {
+        /* x21_clk */
+        .element_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_X21_CLK),
+    },
+    {
+        /* x22_clk */
+        .element_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_X22_CLK),
+    },
+    {
+        /* x23_clk */
+        .element_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_X23_CLK),
+    },
+    {
+        /* audio_clkout */
+        .element_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_AUDIO_CLKOUT),
+    },
+    {
+        /* audio_clk_a */
+        .element_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_AUDIO_CLK_A),
+    },
+    {
+        /* audio_clk_c */
+        .element_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_AUDIO_CLK_C),
+    },
+    {
+        /* can_clk */
+        .element_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_CAN_CLK),
+    },
+    {
+        /* pcie_bus_clk */
+        .element_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_PCIE_BUS_CLK),
+    },
+    {
+        /* scif_clk */
+        .element_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_SCIF_CLK),
+    },
+    {
+        /* usb3s0_clk */
+        .element_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_USB3S0_CLK),
+    },
+    {
+        /* usb_extal_clk */
+        .element_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_USB_EXTAL_CLK),
+    },
 };
 
 static const struct mod_scmi_clock_agent agent_table[] = {

@@ -9,6 +9,7 @@
 #include <clock_devices.h>
 #include <clock_mstp_devices.h>
 #include <clock_sd_devices.h>
+#include <clock_ext_devices.h>
 #include <config_power_domain.h>
 #include <rcar_core.h>
 
@@ -1728,6 +1729,114 @@ static struct fwk_element clock_dev_desc_table[] = {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_RCAR_MSTP_CLOCK,
                                        CLOCK_MSTP_DEV_IDX_SCU_SRC0),
             .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_MSTP_CLOCK,
+                                       MOD_RCAR_CLOCK_API_TYPE_CLOCK),
+        }),
+    },
+    [CLOCK_DEV_IDX_X12_CLK] = {
+        .name = "x12_clk",
+        .data = &((struct mod_clock_dev_config) {
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       CLOCK_EXT_DEV_IDX_X12_CLK),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       MOD_RCAR_CLOCK_API_TYPE_CLOCK),
+        }),
+    },
+    [CLOCK_DEV_IDX_X21_CLK] = {
+        .name = "x21_clk",
+        .data = &((struct mod_clock_dev_config) {
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       CLOCK_EXT_DEV_IDX_X21_CLK),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       MOD_RCAR_CLOCK_API_TYPE_CLOCK),
+        }),
+    },
+    [CLOCK_DEV_IDX_X22_CLK] = {
+        .name = "x22_clk",
+        .data = &((struct mod_clock_dev_config) {
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       CLOCK_EXT_DEV_IDX_X22_CLK),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       MOD_RCAR_CLOCK_API_TYPE_CLOCK),
+        }),
+    },
+    [CLOCK_DEV_IDX_X23_CLK] = {
+        .name = "x23_clk",
+        .data = &((struct mod_clock_dev_config) {
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       CLOCK_EXT_DEV_IDX_X23_CLK),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       MOD_RCAR_CLOCK_API_TYPE_CLOCK),
+        }),
+    },
+    [CLOCK_DEV_IDX_AUDIO_CLKOUT] = {
+        .name = "audio_clkout",
+        .data = &((struct mod_clock_dev_config) {
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       CLOCK_EXT_DEV_IDX_AUDIO_CLKOUT),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       MOD_RCAR_CLOCK_API_TYPE_CLOCK),
+        }),
+    },
+    [CLOCK_DEV_IDX_AUDIO_CLK_A] = {
+        .name = "audio_clk_a",
+        .data = &((struct mod_clock_dev_config) {
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       CLOCK_EXT_DEV_IDX_AUDIO_CLK_A),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       MOD_RCAR_CLOCK_API_TYPE_CLOCK),
+        }),
+    },
+    [CLOCK_DEV_IDX_AUDIO_CLK_C] = {
+        .name = "audio_clk_c",
+        .data = &((struct mod_clock_dev_config) {
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       CLOCK_EXT_DEV_IDX_AUDIO_CLK_C),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       MOD_RCAR_CLOCK_API_TYPE_CLOCK),
+        }),
+    },
+    [CLOCK_DEV_IDX_CAN_CLK] = {
+        .name = "can_clk",
+        .data = &((struct mod_clock_dev_config) {
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       CLOCK_EXT_DEV_IDX_CAN_CLK),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       MOD_RCAR_CLOCK_API_TYPE_CLOCK),
+        }),
+    },
+    [CLOCK_DEV_IDX_PCIE_BUS_CLK] = {
+        .name = "pcie_bus_clk",
+        .data = &((struct mod_clock_dev_config) {
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       CLOCK_EXT_DEV_IDX_PCIE_BUS_CLK),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       MOD_RCAR_CLOCK_API_TYPE_CLOCK),
+        }),
+    },
+    [CLOCK_DEV_IDX_SCIF_CLK] = {
+        .name = "scif_clk",
+        .data = &((struct mod_clock_dev_config) {
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       CLOCK_EXT_DEV_IDX_SCIF_CLK),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       MOD_RCAR_CLOCK_API_TYPE_CLOCK),
+        }),
+    },
+    [CLOCK_DEV_IDX_USB3S0_CLK] = {
+        .name = "usb3s0_clk",
+        .data = &((struct mod_clock_dev_config) {
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       CLOCK_EXT_DEV_IDX_USB3S0_CLK),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       MOD_RCAR_CLOCK_API_TYPE_CLOCK),
+        }),
+    },
+    [CLOCK_DEV_IDX_USB_EXTAL_CLK] = {
+        .name = "usb_extal_clk",
+        .data = &((struct mod_clock_dev_config) {
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
+                                       CLOCK_EXT_DEV_IDX_USB_EXTAL_CLK),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_EXT_CLOCK,
                                        MOD_RCAR_CLOCK_API_TYPE_CLOCK),
         }),
     },

@@ -73,17 +73,20 @@ IMPORT_SYM(unsigned long, __sram_copy_start__, SRAM_COPY_START);
 
 static int messaging_stack_ready(void)
 {
-    const uint32_t feature_flags = RCAR_SDS_FEATURE_FIRMWARE_MASK;
+    const uint32_t rcar_sys_flags = RCAR_SDS_FEATURE_FIRMWARE_MASK;
 
     const struct mod_sds_structure_desc *sds_structure_desc =
         fwk_module_get_data(sds_feature_availability_id);
+
+    if (sds_structure_desc == NULL)
+        return FWK_E_PARAM;
 
     /*
      * Write SDS Feature Availability to signal the completion of the messaging
      * stack
      */
     return module_ctx.sds_api->struct_write(sds_structure_desc->id,
-        0, (void *)(&feature_flags), sds_structure_desc->size);
+        0, (const void *)(&rcar_sys_flags), sds_structure_desc->size);
 }
 
 bool is_available_shutdown_req(uint32_t req)
