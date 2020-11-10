@@ -19,8 +19,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define PMIC_ROHM_BD9571 1
-
 /* Suspend to ram   */
 #define DBSC4_REG_BASE (0xE6790000U)
 #define DBSC4_REG_DBSYSCNT0 (DBSC4_REG_BASE + 0x0100U)
@@ -52,15 +50,15 @@
 #define DBSC4_SET_DBSYSCNT0_WRITE_ENABLE (0x00001234U)
 #define DBSC4_SET_DBSYSCNT0_WRITE_DISABLE (0x00000000U)
 
-#if PMIC_ROHM_BD9571
-#    define BIT_BKUP_CTRL_OUT ((uint8_t)(1U << 4))
-#    define PMIC_RETRY_MAX (100U)
-#    define PMIC_BKUP_MODE_CNT (0x20U)
-#    define PMIC_QLLM_CNT (0x27U)
-#    define DVFS_SET_VID_0V (0x00)
-#    define P_ALL_OFF (0x80)
-#endif /* PMIC_ROHM_BD9571 */
+#define BIT_BKUP_CTRL_OUT ((uint8_t)(1U << 4))
+#define PMIC_RETRY_MAX (100U)
+#define PMIC_BKUP_MODE_CNT (0x20U)
+#define PMIC_QLLM_CNT (0x27U)
+#define DVFS_SET_VID_0V (0x00)
+#define P_ALL_OFF (0x80)
 
+#define SRESCR_CODE (0x5AA5U << 16)
+#define BIT_SOFTRESET (1U << 15)
 #define SCTLR_EL3_M_BIT ((uint32_t)1U << 0)
 #define RCAR_CONV_MICROSEC (1000000U)
 
@@ -163,15 +161,12 @@ static void FWK_SECTION(".system_ram") rcar_pwrc_set_self_refresh(void)
 
 void FWK_SECTION(".system_ram") FWK_NOINLINE rcar_pwrc_go_suspend_to_ram(void)
 {
-#if PMIC_ROHM_BD9571
     int32_t rc = -1, qllm = -1;
     uint8_t mode;
     uint32_t i;
-#endif /* PMIC_ROHM_BD9571 */
 
     rcar_pwrc_set_self_refresh();
 
-#if PMIC_ROHM_BD9571
     /* Set QLLM Cnt Disable */
     for (i = 0; (i < PMIC_RETRY_MAX) && (qllm != 0); i++)
         qllm = rcar_iic_dvfs_send(PMIC, PMIC_QLLM_CNT, 0);
@@ -184,7 +179,6 @@ void FWK_SECTION(".system_ram") FWK_NOINLINE rcar_pwrc_go_suspend_to_ram(void)
             rc = rcar_iic_dvfs_send(PMIC, PMIC_BKUP_MODE_CNT, mode);
         }
     }
-#endif /* PMIC_ROHM_BD9571 */
 
     wfi();
 
@@ -214,6 +208,10 @@ void rcar_system_off(void)
 
 void rcar_system_reset(void)
 {
+#if RCAR_SOFTWARE_RESET
+    mmio_write_32(RCAR_SRESCR, SRESCR_CODE | BIT_SOFTRESET);
+#else
     if (rcar_iic_dvfs_send(PMIC, BKUP_MODE_CNT, P_ALL_OFF))
         panic();
+#endif /* RCAR_SOFTWARE_RESET */
 }

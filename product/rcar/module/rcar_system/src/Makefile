@@ -13,4 +13,8 @@ BS_LIB_SOURCES = mod_rcar_system.c \
                  rcar_call_sram.S \
                  FreeRTOS_tick_config.c
 
+ifeq ($(RCAR_SOFTWARE_RESET),1)
+    DEFINES += RCAR_SOFTWARE_RESET=1
+endif
+
 include $(BS_DIR)/lib.mk
