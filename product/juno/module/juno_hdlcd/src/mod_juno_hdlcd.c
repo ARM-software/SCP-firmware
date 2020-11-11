@@ -164,6 +164,10 @@ static int juno_hdlcd_set_rate(fwk_id_t clock_id, uint64_t rate,
 
     ctx = ctx_table + fwk_id_get_element_idx(clock_id);
 
+    /* Only the first 32-bits are taken */
+    if (rate > UINT32_MAX)
+        return FWK_E_RANGE;
+
     status = round_rate(ctx, round_mode, rate, &rounded_rate);
     if (status != FWK_SUCCESS)
         return status;
