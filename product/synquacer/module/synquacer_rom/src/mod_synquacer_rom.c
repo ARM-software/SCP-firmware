@@ -16,6 +16,8 @@
 #include <fwk_status.h>
 #include <fwk_thread.h>
 
+#include <fmw_cmsis.h>
+
 #include <stdint.h>
 #include <string.h>
 
@@ -42,6 +44,9 @@ static void jump_to_ramfw(void)
     fwk_interrupt_global_disable();
 
     ramfw_reset_handler = (void (*)(void))(*reset_base);
+
+    /* Set the vector table offset register to ramfw vector table */
+    SCB->VTOR = rom_config->ramfw_base;
 
     /*
      * Execute the RAM firmware's reset handler to pass control from ROM
