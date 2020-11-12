@@ -95,8 +95,8 @@ static void mod_f_uart3_enable(fwk_id_t id)
 {
     const struct mod_f_uart3_element_cfg *cfg = fwk_module_get_data(id);
 
-    struct f_uart3_reg *reg = (void *)cfg->reg_base;
-    struct f_uart3_dla_reg *dla_reg = (void *)cfg->dla_reg_base;
+    struct f_uart3_reg *reg;
+    struct f_uart3_dla_reg *dla_reg;
 
     fwk_assert(cfg != NULL);
 
