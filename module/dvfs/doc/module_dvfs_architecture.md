@@ -1,5 +1,5 @@
 \ingroup GroupModules Modules
-\defgroup GroupDVFS DVFS HAL
+\defgroup GroupDvfs Dynamic Voltage and Frequency Scaling (DVFS)
 
 # DVFS Module Architecture            {#module_dvfs_architecture_architecture}
 
