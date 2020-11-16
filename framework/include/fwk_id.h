@@ -426,6 +426,16 @@ typedef union __fwk_id fwk_id_t;
 typedef fwk_id_t fwk_optional_id_t;
 
 /*!
+ * \brief Check if the identifier type is valid.
+ *
+ * \param id Identifier.
+ *
+ * \retval true The identifier type is valid.
+ * \retval false The identifier type is not valid.
+ */
+bool fwk_id_type_is_valid(fwk_id_t id) FWK_CONST FWK_LEAF FWK_NOTHROW;
+
+/*!
  * \brief Check if the identifier is of a certain identifier type.
  *
  * \param id Identifier.
