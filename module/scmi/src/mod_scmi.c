@@ -1524,6 +1524,11 @@ static int scmi_process_event(const struct fwk_event *event,
     const void *payload;
     size_t payload_size;
     unsigned int protocol_idx;
+#ifndef BUILD_HAS_RESOURCE_PERMISSIONS
+    enum scmi_agent_type agent_type;
+    unsigned int agent_id;
+    unsigned int dis_protocol_list_psci_index;
+#endif
     struct scmi_protocol *protocol;
     const char *service_name;
     const char *message_type_name;
@@ -1575,6 +1580,46 @@ static int scmi_process_event(const struct fwk_event *event,
                      sizeof(int32_t));
         return FWK_SUCCESS;
     }
+
+#ifndef BUILD_HAS_RESOURCE_PERMISSIONS
+    status = get_agent_id(event->target_id, &agent_id);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR("[SCMI] %s: Unable to get agent id", service_name);
+        return status;
+    }
+
+    status = get_agent_type(agent_id, &agent_type);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR("[SCMI] %s: Unable to get agent type", service_name);
+        return status;
+    }
+
+    if (agent_type == SCMI_AGENT_TYPE_PSCI) {
+        /*
+         * check if the current protocol is within the disabled protocols
+         * list for PSCI agent.
+         */
+        for (dis_protocol_list_psci_index = 0; dis_protocol_list_psci_index <
+             scmi_ctx.config->dis_protocol_count_psci;
+             dis_protocol_list_psci_index++) {
+            if (ctx->scmi_protocol_id ==
+                scmi_ctx.config
+                    ->dis_protocol_list_psci[dis_protocol_list_psci_index]) {
+                FWK_LOG_ERR(
+                    "[SCMI] %s: %s [%" PRIu16
+                    "(0x%x:0x%x)] requested a denied protocol",
+                    service_name,
+                    message_type_name,
+                    ctx->scmi_token,
+                    ctx->scmi_protocol_id,
+                    ctx->scmi_message_id);
+                ctx->respond(
+                    transport_id, &(int32_t){ SCMI_DENIED }, sizeof(int32_t));
+                return FWK_SUCCESS;
+            }
+        }
+    }
+#endif
 
     protocol = &scmi_ctx.protocol_table[protocol_idx];
     status = protocol->message_handler(protocol->id, event->target_id,
