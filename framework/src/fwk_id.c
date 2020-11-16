@@ -175,6 +175,15 @@ bool fwk_id_is_type(fwk_id_t id, enum fwk_id_type type)
     return id.common.type == type;
 }
 
+bool fwk_id_type_is_valid(fwk_id_t id)
+{
+    if ((id.common.type != __FWK_ID_TYPE_INVALID) &&
+        (id.common.type < __FWK_ID_TYPE_COUNT))
+        return true;
+
+    return false;
+}
+
 enum fwk_id_type fwk_id_get_type(fwk_id_t id)
 {
     fwk_assert(id.common.type != __FWK_ID_TYPE_INVALID);
