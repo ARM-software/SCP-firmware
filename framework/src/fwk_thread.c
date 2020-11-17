@@ -9,6 +9,7 @@
  */
 
 #include <internal/fwk_module.h>
+#include <internal/fwk_signal.h>
 #include <internal/fwk_single_thread.h>
 #include <internal/fwk_thread.h>
 #include <internal/fwk_thread_delayed_resp.h>
@@ -48,35 +49,9 @@ enum thread_interrupt_states {
 };
 
 /*
- * Framework signal support
- *
- * Signals always take precedence over events and will be processed before
- * any events on the event queues are processed.
+ * Signal support
  */
-#if FMW_SIGNAL_MAX > 8
-#    define FWK_MODULE_SIGNAL_COUNT FMW_SIGNAL_MAX
-#else
-#    define FWK_MODULE_SIGNAL_COUNT 8
-#endif
-
-struct signal {
-    fwk_id_t source_id; /* Module or element source of signal */
-    fwk_id_t target_id; /* Module or element target for signal */
-    fwk_id_t signal_id; /* Signal ID */
-};
-
-struct fwk_signal_ctx {
-    /* array of pending signals */
-    struct signal signals[FWK_MODULE_SIGNAL_COUNT];
-
-    /* number of pending signals */
-    int pending_signals;
-
-    /* signal we are currently handling */
-    struct signal current_signal;
-};
-
-static struct fwk_signal_ctx fwk_signal_ctx;
+static struct __fwk_signal_ctx fwk_signal_ctx;
 
 /*
  * Static functions

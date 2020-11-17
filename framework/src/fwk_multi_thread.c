@@ -10,6 +10,7 @@
 #include <internal/fwk_id.h>
 #include <internal/fwk_module.h>
 #include <internal/fwk_multi_thread.h>
+#include <internal/fwk_signal.h>
 #include <internal/fwk_thread.h>
 #include <internal/fwk_thread_delayed_resp.h>
 
