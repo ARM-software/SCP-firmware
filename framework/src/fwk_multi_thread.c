@@ -776,6 +776,7 @@ int fwk_thread_put_event(struct fwk_event *event)
     int status = FWK_E_PARAM;
     struct __fwk_thread_ctx *thread_ctx;
     unsigned int interrupt;
+    int thread_interrupt_status;
 
     if (!ctx.initialized) {
         status = FWK_E_INIT;
@@ -789,14 +790,15 @@ int fwk_thread_put_event(struct fwk_event *event)
     if (thread_ctx == NULL)
         goto error;
 
-    if ((fwk_interrupt_get_current(&interrupt) != FWK_SUCCESS) &&
-        (ctx.current_event != NULL))
+    thread_interrupt_status = fwk_interrupt_get_current(&interrupt);
+    if ((thread_interrupt_status != FWK_SUCCESS) && (ctx.current_event != NULL))
         event->source_id = ctx.current_event->target_id;
     else {
         if (!fwk_module_is_valid_entity_id(event->source_id))
             goto error;
     }
 
+#ifdef BUILD_MODE_DEBUG
     if (event->is_notification) {
         if (!fwk_module_is_valid_notification_id(event->id))
             goto error;
@@ -820,9 +822,10 @@ int fwk_thread_put_event(struct fwk_event *event)
                 goto error;
         }
     }
+#endif
 
     /* Call from a thread */
-    if (fwk_interrupt_get_current(&interrupt) != FWK_SUCCESS) {
+    if (thread_interrupt_status != FWK_SUCCESS) {
         event->is_delayed_response = event->is_response;
         return put_event(thread_ctx, event);
     }
