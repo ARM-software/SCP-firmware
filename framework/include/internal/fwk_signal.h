@@ -18,20 +18,22 @@
  * any events on the event queues are processed.
  */
 struct signal {
-    fwk_id_t source_id; /* Module or element source of signal */
-    fwk_id_t target_id; /* Module or element target for signal */
-    fwk_id_t signal_id; /* Signal ID */
+    FWK_RW fwk_id_t source_id; /* Module or element source of signal */
+    FWK_RW fwk_id_t target_id; /* Module or element target for signal */
+    FWK_RW fwk_id_t signal_id; /* Signal ID */
 };
 
 struct __fwk_signal_ctx {
-    /* array of pending signals */
-    struct signal signals[FWK_MODULE_SIGNAL_COUNT];
-
     /* number of pending signals */
     int pending_signals;
 
+#ifndef BUILD_HAS_MULTITHREADING
     /* signal we are currently handling */
     struct signal current_signal;
+#endif
+
+    /* array of pending signals */
+    struct signal signals[FWK_MODULE_SIGNAL_COUNT];
 };
 
 #endif /* FWK_INTERNAL_SIGNAL_H */
