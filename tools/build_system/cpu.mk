@@ -41,7 +41,6 @@ ifneq ($(findstring $(BS_FIRMWARE_CPU),$(ARMV7M_CPUS)),)
     endif
 
     LDFLAGS_ARM += --target=arm-arm-none-eabi
-    LDFLAGS_LLVM += --target=arm-arm-none-eabi
     CFLAGS_CLANG += --target=arm-arm-none-eabi
 
     CFLAGS += -mfloat-abi=soft # No hardware floating point support
@@ -49,7 +48,10 @@ else ifneq ($(findstring $(BS_FIRMWARE_CPU),$(ARMV8A_CPUS)),)
     BS_ARCH_VENDOR := arm
     BS_ARCH_ARCH := armv8-a
 
-    CFLAGS +=  -fno-builtin -mstrict-align
+    CFLAGS_CLANG += -Wno-asm-operand-widths --target=aarch64-none-elf
+    CFLAGS_GCC += -mstrict-align
+    CFLAGS += -fno-builtin
+
     DEP_CFLAGS_GCC += -DAARCH64
     DEP_ASFLAGS_GCC += -D__ASSEMBLY__
 else ifeq ($(BS_FIRMWARE_CPU),host)

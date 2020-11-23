@@ -181,7 +181,7 @@ SECTIONS {
     } > mem1 /* .bss follows .data in mem1 */
 #endif
 
-    .stack : {
+    .stack (NOLOAD) : {
         . = . + STACK_SIZE;
     } > stack
     __RW_END__ = .;
@@ -213,6 +213,4 @@ SECTIONS {
     __HEAP_START__ = __BSS_START__ + __BSS_SIZE__;
     __HEAP_END__ = __STACK_START__;
     __HEAP_SIZE__ = __HEAP_END__ - __HEAP_START__;
-
-
 }

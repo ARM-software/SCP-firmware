@@ -62,6 +62,10 @@ else ifeq ($(BS_TOOLCHAIN),LLVM)
     export AR := $(shell $(CC) --print-prog-name llvm-ar)
     export OBJCOPY := $(shell $(CC) --print-prog-name llvm-objcopy)
     export SIZE := $(shell $(CC) --print-prog-name llvm-size)
+
+    # Clang currently does not use LLD for all the ARM targets,
+    # therefore we are enforcing the use of it manually.
+    export LD := $(shell $(CC) --print-prog-name=ld.lld)
 else
     export AR := $(shell $(CC) --print-prog-name gcc-ar)
     export OBJCOPY := $(shell $(CC) --print-prog-name objcopy)
@@ -96,16 +100,27 @@ else
     LDFLAGS_ARM += -Wl,--scatter=$(SCATTER_PP)
     LDFLAGS_GCC += -Wl,--script=$(SCATTER_PP)
 
-    CFLAGS  += -mcpu=$(BS_ARCH_CPU)
-    ASFLAGS_GCC += -mcpu=$(BS_ARCH_CPU)
-    LDFLAGS_GCC += -mcpu=$(BS_ARCH_CPU)
-    LDFLAGS_ARM += -mcpu=$(BS_ARCH_CPU)
+    ifeq ($(BS_TOOLCHAIN),LLVM)
+        # big.LITTLE tuning is not supported by LLVM
+        ifneq ($(findstring .,$(BS_ARCH_CPU)),)
+            CFLAGS  += -march=$(BS_ARCH_ARCH)
+            ASFLAGS_GCC += -march=$(BS_ARCH_ARCH)
+        else
+            CFLAGS  += -mcpu=$(BS_ARCH_CPU)
+            ASFLAGS_GCC += -mcpu=$(BS_ARCH_CPU)
+        endif
+    else
+        CFLAGS  += -mcpu=$(BS_ARCH_CPU)
+        ASFLAGS_GCC += -mcpu=$(BS_ARCH_CPU)
+        LDFLAGS_GCC += -mcpu=$(BS_ARCH_CPU)
+        LDFLAGS_ARM += -mcpu=$(BS_ARCH_CPU)
+    endif
 
     # Optional architectural mode parameter
     ifneq ($(BS_ARCH_MODE),)
         CFLAGS  += -m$(BS_ARCH_MODE)
         ASFLAGS_GCC += -m$(BS_ARCH_MODE)
-        LDFLAGS_GCC += -m$(BS_ARCH_MODE)
+        LDFLAGS_GNU += -m$(BS_ARCH_MODE)
         LDFLAGS_ARM += -m$(BS_ARCH_MODE)
     endif
 endif
@@ -161,25 +176,31 @@ LDFLAGS_GCC += -Wl,--undefined=arch_exceptions
 LDFLAGS_ARM += -Wl,--undefined=arch_exceptions
 
 ifeq ($(BS_TOOLCHAIN),LLVM)
-    # Use lld when we are using the LLVM toolchain
-    LDFLAGS_GCC += -fuse-ld=lld
+    ifneq ($(BS_ARCH_ARCH),armv8-a)
+        ifeq ($(SYSROOT_CC),)
+            $(error "You must define SYSROOT_CC. Aborting...")
+        endif
 
-    ifeq ($(SYSROOT_CC),)
-        $(error "You must define SYSROOT_CC. Aborting...")
+        SYSROOT := $(shell $(SYSROOT_CC) -print-sysroot)
+        SYSROOT_CMD := $(SYSROOT_CC) -mcpu=$(BS_ARCH_CPU)
+
+        LDFLAGS_GCC += -L$(SYSROOT)/lib/$(shell $(SYSROOT_CMD) -print-multi-directory)
+
+        BUILTIN_LIBS_GCC := \
+            $(shell $(SYSROOT_CMD) --print-file-name=crti.o) \
+            $(shell $(SYSROOT_CMD) --print-file-name=crtbegin.o) \
+            $(shell $(SYSROOT_CMD) --print-file-name=crt0.o) \
+            $(shell $(SYSROOT_CMD) --print-file-name=crtend.o) \
+            $(shell $(SYSROOT_CMD) --print-file-name=crtn.o)
+    else
+        ifeq ($(SYSROOT),)
+            $(error "You must define SYSROOT. Aborting...")
+        endif
+
+        LDFLAGS_GCC += -L$(SYSROOT)/lib
     endif
 
-    SYSROOT := $(shell $(SYSROOT_CC) -print-sysroot)
-    SYSROOT_CMD := $(SYSROOT_CC) -mcpu=$(BS_ARCH_CPU)
-
-    CFLAGS += --sysroot=$(SYSROOT)
-    LDFLAGS_GCC += -L$(SYSROOT)/lib/$(shell $(SYSROOT_CMD) -print-multi-directory)
-
-    BUILTIN_LIBS_GCC := \
-        $(shell $(SYSROOT_CMD) --print-file-name=crti.o) \
-        $(shell $(SYSROOT_CMD) --print-file-name=crtbegin.o) \
-        $(shell $(SYSROOT_CMD) --print-file-name=crt0.o) \
-        $(shell $(SYSROOT_CMD) --print-file-name=crtend.o) \
-        $(shell $(SYSROOT_CMD) --print-file-name=crtn.o)
+    CFLAGS += --sysroot=$(SYSROOT) -I$(SYSROOT)/include
 endif
 
 ifneq ($(BS_ARCH_ARCH),armv8-a)
@@ -189,6 +210,8 @@ ifneq ($(BS_ARCH_ARCH),armv8-a)
         else
             LIBS_GROUP_END += -lc -lnosys
         endif
+
+        LDFLAGS_GCC += -L$(shell $(CC) -print-resource-dir)/lib/baremetal
 
         BUILTIN_LIBS_GCC += -nostdlib -lclang_rt.builtins-$(CLANG_BUILTINS_ARCH)
     else
@@ -256,7 +279,15 @@ ASFLAGS += $(addprefix -I,$(INCLUDES)) $(addprefix -D,$(DEFINES))
 #
 ASFLAGS += $(ASFLAGS_GCC)
 ARFLAGS = $(ARFLAGS_GCC)
-LDFLAGS += $(LDFLAGS_$(BS_LINKER)) $(LDFLAGS_$(BS_TOOLCHAIN))
+
+ifeq ($(BS_TOOLCHAIN),LLVM)
+    # Remove all pass to linker flags as we are using the linker directly
+    TO_REMOVE := -Wl,
+    LDFLAGS += $(subst $(TO_REMOVE),,$(LDFLAGS_$(BS_LINKER))) $(LDFLAGS_$(BS_TOOLCHAIN))
+else
+    LDFLAGS += $(LDFLAGS_$(BS_LINKER)) $(LDFLAGS_$(BS_TOOLCHAIN))
+endif
+
 DEP_CFLAGS = $(DEP_CFLAGS_GCC)
 DEP_ASFLAGS = $(DEP_ASFLAGS_GCC)
 BUILTIN_LIBS = $(BUILTIN_LIBS_$(BS_LINKER))
