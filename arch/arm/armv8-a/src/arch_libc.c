@@ -258,3 +258,13 @@ int snprintf(char *str, size_t size, const char *format, ...)
     va_end(args);
     return counter;
 }
+
+void __assert_fail(
+    const char *assertion,
+    const char *file,
+    unsigned int line,
+    const char *function)
+{
+    while (1)
+        continue;
+}
