@@ -9,7 +9,7 @@
     .globl _freertos_vector_table
     .extern _entrypoint
 
-.section .vectors
+.section .vectors, "ax"
 .balign 2048
 _vector_table:
 
