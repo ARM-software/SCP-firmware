@@ -61,7 +61,7 @@
  *      statement.
  */
 
-#if defined(__has_declspec_attribute) && !defined(__ARMCC_VERSION)
+#if defined(__has_declspec_attribute) && !defined(__clang__)
 #    define FWK_HAS_MS_ATTRIBUTE(ATTRIBUTE) __has_declspec_attribute(ATTRIBUTE)
 #else
 #    define FWK_HAS_MS_ATTRIBUTE(ATTRIBUTE) 0

@@ -28,12 +28,20 @@ ifneq ($(findstring $(BS_FIRMWARE_CPU),$(ARMV7M_CPUS)),)
         # newlib-nano library. Selecting nano.specs results in use of
         # newlib-nano as standard C library. This will generate lesser code size
         # but with cuts in some features that were added after C89.
-        LDFLAGS_GCC += --specs=nano.specs
+        LDFLAGS_GNU += --specs=nano.specs
     else
-        LDFLAGS_GCC += --specs=nosys.specs
+        LDFLAGS_GNU += --specs=nosys.specs
+    endif
+
+    # Compiler RT builtins architecture
+    ifeq ($(BS_FIRMWARE_CPU),cortex-m7)
+        CLANG_BUILTINS_ARCH := armv7em
+    else
+        CLANG_BUILTINS_ARCH := armv7m
     endif
 
     LDFLAGS_ARM += --target=arm-arm-none-eabi
+    LDFLAGS_LLVM += --target=arm-arm-none-eabi
     CFLAGS_CLANG += --target=arm-arm-none-eabi
 
     CFLAGS += -mfloat-abi=soft # No hardware floating point support

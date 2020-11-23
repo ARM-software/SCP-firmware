@@ -85,10 +85,13 @@ TARGET := $(BIN_DIR)/$(FIRMWARE)
 TARGET_BIN := $(TARGET).bin
 TARGET_ELF := $(TARGET).elf
 TARGET_SREC := $(TARGET).srec
+
 ifeq ($(BS_LINKER),ARM)
-TARGET_GOAL := $(TARGET_BIN)
+    TARGET_GOAL := $(TARGET_BIN)
+else ifeq ($(BS_TOOLCHAIN),LLVM)
+    TARGET_GOAL := $(TARGET_BIN)
 else
-TARGET_GOAL := $(TARGET_SREC)
+    TARGET_GOAL := $(TARGET_SREC)
 endif
 
 vpath %.c $(FIRMWARE_DIR)
@@ -330,6 +333,7 @@ LDFLAGS_GCC +=  \
         $(MODULE_LIBS_y) \
         $(LIBS_y) \
         $(OBJECTS) \
+        $(LIBS_GROUP_END) \
     -Wl,--end-group
 
 LDFLAGS_ARM += \
