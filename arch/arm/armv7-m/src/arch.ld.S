@@ -87,6 +87,16 @@ SECTIONS {
         *(.text .text.*)
     } > x
 
+#ifdef __clang__
+    .eh_frame : {
+        (.eh_frame)
+    } > x
+
+    .ARM.exidx : {
+        (.ARM.exidx)
+    } > x
+#endif
+
     /*
      * .init and .fini below refer to sections containing functions meant to
      * run before program startup and after program shutdown. While we don't use
@@ -105,8 +115,14 @@ SECTIONS {
 
     .init_array : {
         __init_array_start = .;
-        KEEP(*(.init_array))
+        KEEP(*(.init_array*))
         __init_array_end = .;
+    } > r
+
+    .fini_array : {
+        __fini_array_start = .;
+        KEEP(*(.fini_array))
+        __fini_array_end = .;
     } > r
 
     .rodata : {

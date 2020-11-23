@@ -58,6 +58,10 @@ ifeq ($(BS_LINKER),ARM)
     export AR := $(shell $(CC) --print-prog-name armar)
     export OBJCOPY := $(shell $(CC) --print-prog-name fromelf)
     export SIZE := $(shell $(CC) --print-prog-name size)
+else ifeq ($(BS_TOOLCHAIN),LLVM)
+    export AR := $(shell $(CC) --print-prog-name llvm-ar)
+    export OBJCOPY := $(shell $(CC) --print-prog-name llvm-objcopy)
+    export SIZE := $(shell $(CC) --print-prog-name llvm-size)
 else
     export AR := $(shell $(CC) --print-prog-name gcc-ar)
     export OBJCOPY := $(shell $(CC) --print-prog-name objcopy)
@@ -156,8 +160,40 @@ LDFLAGS_GCC += -Wl,--cref
 LDFLAGS_GCC += -Wl,--undefined=arch_exceptions
 LDFLAGS_ARM += -Wl,--undefined=arch_exceptions
 
+ifeq ($(BS_TOOLCHAIN),LLVM)
+    # Use lld when we are using the LLVM toolchain
+    LDFLAGS_GCC += -fuse-ld=lld
+
+    ifeq ($(SYSROOT_CC),)
+        $(error "You must define SYSROOT_CC. Aborting...")
+    endif
+
+    SYSROOT := $(shell $(SYSROOT_CC) -print-sysroot)
+    SYSROOT_CMD := $(SYSROOT_CC) -mcpu=$(BS_ARCH_CPU)
+
+    CFLAGS += --sysroot=$(SYSROOT)
+    LDFLAGS_GCC += -L$(SYSROOT)/lib/$(shell $(SYSROOT_CMD) -print-multi-directory)
+
+    BUILTIN_LIBS_GCC := \
+        $(shell $(SYSROOT_CMD) --print-file-name=crti.o) \
+        $(shell $(SYSROOT_CMD) --print-file-name=crtbegin.o) \
+        $(shell $(SYSROOT_CMD) --print-file-name=crt0.o) \
+        $(shell $(SYSROOT_CMD) --print-file-name=crtend.o) \
+        $(shell $(SYSROOT_CMD) --print-file-name=crtn.o)
+endif
+
 ifneq ($(BS_ARCH_ARCH),armv8-a)
-    BUILTIN_LIBS_GCC := -lc -lgcc
+    ifeq ($(BS_TOOLCHAIN),LLVM)
+        ifeq ($(BS_FIRMWARE_USE_NEWLIB_NANO_SPECS),yes)
+            LIBS_GROUP_END += -lc_nano
+        else
+            LIBS_GROUP_END += -lc -lnosys
+        endif
+
+        BUILTIN_LIBS_GCC += -nostdlib -lclang_rt.builtins-$(CLANG_BUILTINS_ARCH)
+    else
+        BUILTIN_LIBS_GCC := -lc -lgcc
+    endif
 else
     BUILTIN_LIBS_GCC := -nostdlib
 endif
@@ -220,7 +256,7 @@ ASFLAGS += $(addprefix -I,$(INCLUDES)) $(addprefix -D,$(DEFINES))
 #
 ASFLAGS += $(ASFLAGS_GCC)
 ARFLAGS = $(ARFLAGS_GCC)
-LDFLAGS += $(LDFLAGS_$(BS_LINKER))
+LDFLAGS += $(LDFLAGS_$(BS_LINKER)) $(LDFLAGS_$(BS_TOOLCHAIN))
 DEP_CFLAGS = $(DEP_CFLAGS_GCC)
 DEP_ASFLAGS = $(DEP_ASFLAGS_GCC)
 BUILTIN_LIBS = $(BUILTIN_LIBS_$(BS_LINKER))
