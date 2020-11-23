@@ -150,7 +150,7 @@ osThreadId_t __wrap_osThreadNew(osThreadFunc_t func, void *argument,
                                 const osThreadAttr_t *attr)
 {
     static unsigned int call_count = 0;
-    assert(call_count < 3);
+    assert(call_count < 4);
 
     (void) argument;
     (void) attr;

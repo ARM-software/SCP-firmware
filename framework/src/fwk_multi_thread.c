@@ -47,6 +47,7 @@
 #define SIGNAL_EVENT_PROCESSED 0x04
 #define SIGNAL_NO_READY_THREAD 0x08
 #define SIGNAL_CHECK_LOGS 0x10
+#define SIGNAL_CHECK_FWK_SIGNALS 0x20
 
 static struct __fwk_multi_thread_ctx ctx;
 static const char err_msg_line[] = "[FWK] Error %d @%d";
@@ -446,6 +447,93 @@ static struct __fwk_thread_ctx *launch_next_event_processing(
     return NULL;
 }
 
+/*
+ * Framework Signals support
+ */
+void thread_signals_init()
+{
+    struct __fwk_signal_ctx *signal_ctx;
+    int i = 0;
+
+    signal_ctx = &ctx.fwk_signal_ctx;
+    for (i = 0; i < FWK_MODULE_SIGNAL_COUNT; i++) {
+        signal_ctx->signals[i].source_id = FWK_ID_NONE;
+        signal_ctx->signals[i].target_id = FWK_ID_NONE;
+        signal_ctx->signals[i].signal_id = FWK_ID_NONE;
+    };
+    signal_ctx->pending_signals = 0;
+}
+
+int execute_signal_handler(fwk_id_t target_id, fwk_id_t signal_id)
+{
+    const struct fwk_module *module;
+    int status;
+
+    module = fwk_module_get_ctx(target_id)->desc;
+    if (!module->process_signal)
+        return FWK_E_PARAM;
+    status = module->process_signal(target_id, signal_id);
+    if ((status != FWK_SUCCESS) && (status != FWK_PENDING)) {
+        FWK_LOG_CRIT(
+            "[FWK] Process signal (%s: %s -> %s) (%d)\n",
+            module->name,
+            FWK_ID_STR(signal_id),
+            FWK_ID_STR(target_id),
+            status);
+    }
+
+    return status;
+}
+
+void process_thread_signals(struct __fwk_thread_ctx *thread_ctx)
+{
+    struct __fwk_thread_ctx *target_ctx;
+    struct __fwk_signal_ctx *signal_ctx;
+    struct signal signal;
+    int i;
+
+    signal_ctx = &ctx.fwk_signal_ctx;
+
+    if (signal_ctx->pending_signals > 0) {
+        for (i = 0; i < FWK_MODULE_SIGNAL_COUNT; i++) {
+            if (!fwk_id_is_equal(
+                    signal_ctx->signals[i].target_id, FWK_ID_NONE)) {
+                signal = signal_ctx->signals[i];
+                ctx.current_signal = &signal_ctx->signals[i];
+                ctx.current_thread_ctx = thread_ctx;
+                execute_signal_handler(signal.target_id, signal.signal_id);
+
+                target_ctx = thread_get_ctx(signal.target_id);
+                if (!fwk_list_is_empty(&target_ctx->event_queue))
+                    osThreadFlagsSet(
+                        target_ctx->os_thread_id, SIGNAL_EVENT_TO_PROCESS);
+                fwk_interrupt_global_disable();
+                signal_ctx->pending_signals--;
+                signal_ctx->signals[i].target_id = FWK_ID_NONE;
+                fwk_interrupt_global_enable();
+
+                if (signal_ctx->pending_signals == 0)
+                    break;
+            }
+        }
+        ctx.current_signal = NULL;
+    }
+}
+
+void signal_thread(void *arg)
+{
+    while (true) {
+        (void)osThreadFlagsWait(
+            SIGNAL_CHECK_FWK_SIGNALS, osFlagsWaitAll, osWaitForever);
+
+        /*
+         * At this point we've received a signal from one of the other threads
+         * that there might be signals we need to process.
+         */
+        process_thread_signals(&ctx.signal_thread_ctx);
+    }
+}
+
 static void thread_function(struct __fwk_thread_ctx *thread_ctx,
                             struct __fwk_thread_ctx *next_thread_ctx)
 {
@@ -666,6 +754,22 @@ int __fwk_thread_init(size_t event_count)
         goto error;
     }
 
+    /* Initialize the signal processing thread */
+    thread_attr = (osThreadAttr_t){
+        .stack_size = FMW_STACK_SIZE,
+        .priority = osPriorityHigh,
+    };
+
+    ctx.signal_thread_ctx.os_thread_id =
+        osThreadNew(signal_thread, NULL, &thread_attr);
+
+    if (ctx.signal_thread_ctx.os_thread_id == NULL) {
+        status = FWK_E_OS;
+        goto error;
+    }
+
+    thread_signals_init();
+
     ctx.initialized = true;
 
     return FWK_SUCCESS;
@@ -873,8 +977,12 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
 
     if (ctx.current_event != NULL)
         event->source_id = ctx.current_event->target_id;
-    else if (!fwk_module_is_valid_entity_id(event->source_id))
-            goto error;
+    else if (ctx.current_signal != NULL)
+        event->source_id = ctx.current_signal->source_id;
+    else if (
+        (!fwk_id_type_is_valid(event->source_id)) ||
+        (!fwk_module_is_valid_entity_id(event->source_id)))
+        goto error;
 
     event->is_response = false;
     event->is_delayed_response = false;
@@ -921,9 +1029,47 @@ error:
 }
 
 int fwk_thread_put_signal(
-    fwk_id_t source_id,
-    fwk_id_t target_id,
+    const fwk_id_t source_id,
+    const fwk_id_t target_id,
     fwk_id_t signal_id)
 {
-    return FWK_E_SUPPORT;
+    struct __fwk_signal_ctx *signal_ctx;
+    int signal_idx;
+    uint32_t flags;
+
+    if (!ctx.running)
+        return FWK_E_SUPPORT;
+
+    signal_ctx = &ctx.fwk_signal_ctx;
+
+    fwk_interrupt_global_disable();
+
+    /*
+     * Find an available slot in the signals array
+     */
+    for (signal_idx = 0; signal_idx < FWK_MODULE_SIGNAL_COUNT; signal_idx++) {
+        if (fwk_id_is_equal(
+                signal_ctx->signals[signal_idx].target_id, FWK_ID_NONE)) {
+            signal_ctx->signals[signal_idx].source_id = source_id;
+            signal_ctx->signals[signal_idx].target_id = target_id;
+            signal_ctx->signals[signal_idx].signal_id = signal_id;
+            break;
+        }
+    }
+
+    if (signal_idx == FWK_MODULE_SIGNAL_COUNT) {
+        fwk_interrupt_global_enable();
+        return FWK_E_BUSY;
+    }
+
+    signal_ctx->pending_signals++;
+    fwk_interrupt_global_enable();
+    flags = osThreadFlagsSet(
+        ctx.signal_thread_ctx.os_thread_id, SIGNAL_CHECK_FWK_SIGNALS);
+    if ((int32_t)flags < 0) {
+        FWK_LOG_CRIT(err_msg_func, FWK_E_OS, __func__);
+        return FWK_E_OS;
+    }
+
+    return FWK_SUCCESS;
 }
