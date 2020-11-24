@@ -191,6 +191,14 @@ struct mod_clock_dev_config {
      *     to receive notifications from the power domain module.
      */
     fwk_id_t pd_source_id;
+
+    /*!
+     * \brief Assigned clock parent optional identifier.
+     *
+     * \details If the clock parent is not defined, it will not be connected
+     *      to the tree of clocks and it will be left as a single node.
+     */
+    fwk_optional_id_t parent_id;
 };
 
 /*!

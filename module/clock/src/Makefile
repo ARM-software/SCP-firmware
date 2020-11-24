@@ -6,6 +6,6 @@
 #
 
 BS_LIB_NAME := Clock HAL
-BS_LIB_SOURCES := mod_clock.c
+BS_LIB_SOURCES := mod_clock.c clock_tree_management.c
 
 include $(BS_DIR)/lib.mk
