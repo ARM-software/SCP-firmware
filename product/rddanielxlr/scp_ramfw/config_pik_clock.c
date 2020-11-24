@@ -115,7 +115,7 @@ static const struct fwk_element pik_clock_element_table[] = {
             .is_group_member = true,
             .control_reg = &CLUSTER_PIK_PTR(1)->CORECLK[0].CTRL,
             .divext_reg = &CLUSTER_PIK_PTR(1)->CORECLK[0].DIV,
-            .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[0].MOD,
+            .modulator_reg = &CLUSTER_PIK_PTR(1)->CORECLK[0].MOD,
             .rate_table = rate_table_cpu_group,
             .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group),
         }),
