@@ -13,6 +13,7 @@
 #include <fwk_assert.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
+#include <fwk_list.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_notification.h>
@@ -312,6 +313,8 @@ static int clock_init(fwk_id_t module_id, unsigned int element_count,
     module_ctx.config = config;
     module_ctx.dev_ctx_table = fwk_mm_calloc(element_count,
                                              sizeof(struct clock_dev_ctx));
+    module_ctx.dev_count = element_count;
+
     return FWK_SUCCESS;
 }
 
@@ -323,6 +326,8 @@ static int clock_dev_init(fwk_id_t element_id, unsigned int sub_element_count,
 
     ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(element_id)];
     ctx->config = dev_config;
+    fwk_list_init(&ctx->children_list);
+    ctx->id = element_id;
 
     return FWK_SUCCESS;
 }
@@ -352,9 +357,9 @@ static int clock_start(fwk_id_t id)
     int status;
     struct clock_dev_ctx *ctx;
 
-    /* Nothing to be done at the module level */
+    /* Clock tree is initialized */
     if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
-        return FWK_SUCCESS;
+        return clock_connect_tree(&module_ctx);
     }
 
     ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(id)];

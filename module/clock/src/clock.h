@@ -11,9 +11,13 @@
 #include <mod_clock.h>
 
 #include <fwk_id.h>
+#include <fwk_list.h>
 
 /* Device context */
 struct clock_dev_ctx {
+    /* Identifier of the clock */
+    fwk_id_t id;
+
     /* Pointer to the element configuration data */
     const struct mod_clock_dev_config *config;
 
@@ -38,6 +42,29 @@ struct clock_dev_ctx {
         /* Cookie for the response event */
         uint32_t cookie;
     } request;
+
+    /* Parent identifier */
+    fwk_id_t parent_id;
+
+    /* List all clock children if any */
+    struct fwk_slist children_list;
+
+    /*
+     * Node in the parent list if not the root
+     */
+    struct fwk_slist_node child_node;
+
+    /* Clock state transition */
+    struct {
+        /* Number of pending responses */
+        uint32_t pending_responses;
+
+        /* Clock state transition */
+        uint32_t state;
+    } state_transition;
+
+    /* Reference count */
+    uint32_t ref_count;
 };
 
 /* Module context */
@@ -47,10 +74,16 @@ struct clock_ctx {
 
     /* Table of elements context */
     struct clock_dev_ctx *dev_ctx_table;
+
+    /* Number of clocks devices */
+    uint32_t dev_count;
 };
 
 /* Get context helper function */
 void clock_get_ctx(fwk_id_t clock_id, struct clock_dev_ctx **ctx);
+
+/* Connect clock tree interconnecting parent to children nodes */
+int clock_connect_tree(struct clock_ctx *module_ctx);
 
 /*
  * Clock event indexes.
