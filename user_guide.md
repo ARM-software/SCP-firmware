@@ -23,18 +23,27 @@ required:
 - [Python 3] (*3.6.9* or later)
 
 [GNU Make]: https://www.gnu.org/software/make/
-[GNU Make]: https://www.python.org/downloads/release/python-369/
+[Python 3]: https://www.python.org/downloads/release/python-369/
 
-Additionally, the firmware may be built using one of two compilers:
+Additionally, the firmware may be built using one of three compilers:
 
 - [GNU Arm Embedded Toolchain] (*9-2019-q4* or later)
 - [Arm Compiler 6] (*6.13* or later)
+- [LLVM Toolchain] (*11* or later)
 
 [GNU Arm Embedded Toolchain]: https://developer.arm.com/open-source/gnu-toolchain/gnu-rm
 [Arm Compiler 6]: https://developer.arm.com/tools-and-software/embedded/arm-compiler/downloads/version-6
+[LLVM Toolchain]: https://releases.llvm.org/download.html
 
 For Juno, it is required to have a more recent of GNU Arm embedded toolchain.
 We recommend to use at least the following release: 9-2019-q4-major.
+
+If building using the LLVM toolchain, the [GNU Arm Embedded Toolchain] is also
+required for the Arm standard library and headers that ship with it. When
+building for a ARMv7 target the respective Arm [Compiler-RT builtins] are
+also required.
+
+[Compiler-RT builtins]: https://compiler-rt.llvm.org/
 
 The following tools are recommended but not required:
 
@@ -172,6 +181,60 @@ For more guidance and information on the build system, refer to the full set of
 documentation included in the *Build System* chapter of the Doxygen-generated
 documentation.
 
+### Building with LLVM
+
+When building with the LLVM toolchain, it is mandatory to pass the required
+standard library and headers. These are taken from the
+[GNU Arm Embedded Toolchain]. According to the desired product and target the
+required environment variables differ.
+
+#### ARMv7
+
+When building for an ARMv7 product the GNU Arm Embedded Toolchain compiler must
+be passed under the `SYSROOT_CC` environment variable.
+
+Building example for all of the SGM-775 targets:
+
+```sh
+make SYSROOT_CC=arm-none-eabi-gcc CC=clang-11 PRODUCT=sgm775
+```
+
+__Note:__ if the Compiler-RT builtins are placed in a non conventional folder,
+their absolute path must be passed to LDFLAGS as follows:
+
+```sh
+make LDFLAGS=-L/path/to/compiler-rt-builtins SYSROOT_CC=arm-none-eabi-gcc CC=clang-11 PRODUCT=sgm775
+```
+
+Otherwise, the Compiler-RT builtins for baremetal are usually placed in:
+
+```sh
+/path/to/clang/resource/dir/lib/baremetal
+```
+
+For a LLVM 11 installation on Ubuntu this could be:
+
+```sh
+/usr/lib/llvm-11/lib/clang/11.0.1/lib/baremetal
+```
+
+You can discover the resource dir of your Clang 11 installation by running:
+
+```sh
+clang-11 -print-resource-dir
+```
+
+#### ARMv8
+
+When building for an ARMv8 product the sysroot path of the GNU Arm Embedded
+Toolchain must be passed under the `SYSROOT` environment variable.
+
+Building example for all of the R-Car targets:
+
+```sh
+make SYSROOT=/opt/gcc-arm-9.2-2019.12-x86_64-aarch64-none-elf/aarch64-none-elf CC=clang-11 PRODUCT=rcar
+```
+
 ## Running the SCP firmware on SGM platforms
 
 For an introduction to the System Guidance for Mobile (SGM) platforms, please
@@ -198,6 +261,9 @@ cd ${SCP_PATH} && \
 export SCP_ROM_PATH=${SCP_PATH}/build/product/sgm775/scp_romfw/debug/bin/scp_romfw.bin
 export SCP_RAM_PATH=${SCP_PATH}/build/product/sgm775/scp_ramfw/debug/bin/scp_ramfw.bin
 ```
+
+__Note:__ If building with LLVM, make sure to pass the required environment
+variables to `make` as noted in [Building with LLVM](#building-with-llvm).
 
 ### Booting the firmware
 
@@ -305,6 +371,9 @@ export SCP_ROM_PATH=${SCP_PATH}/build/product/sgi575/scp_romfw/debug/bin/scp_rom
 export SCP_RAM_PATH=${SCP_PATH}/build/product/sgi575/scp_ramfw/debug/bin/scp_ramfw.bin
 export MCP_ROM_PATH=${SCP_PATH}/build/product/sgi575/mcp_romfw/debug/bin/mcp_romfw.bin
 ```
+
+__Note:__ If building with LLVM, make sure to pass the required environment
+variables to `make` as noted in [Building with LLVM](#building-with-llvm).
 
 ### Creating the NOR flash image
 
