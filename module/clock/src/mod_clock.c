@@ -23,38 +23,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/* Device context */
-struct clock_dev_ctx {
-    /* Pointer to the element configuration data */
-    const struct mod_clock_dev_config *config;
-
-    /* Driver API */
-    struct mod_clock_drv_api *api;
-
-    /* Cookie for the pre-transition notification response */
-    unsigned int pd_pre_power_transition_notification_cookie;
-
-    /* Counter of notifications sent */
-    unsigned int transition_pending_notifications_sent;
-
-    /* Status of the pending transition */
-    unsigned int transition_pending_response_status;
-
-    /* A request is on-going */
-    bool is_request_ongoing;
-
-    /* Cookie for the response event */
-    uint32_t cookie;
-};
-
-/* Module context */
-struct clock_ctx {
-    /* Pointer to the module configuration data */
-    const struct mod_clock_config *config;
-
-    /* Table of elements context */
-    struct clock_dev_ctx *dev_ctx_table;
-};
 
 static struct clock_ctx module_ctx;
 
@@ -74,16 +42,15 @@ static int process_response_event(const struct fwk_event *event)
 
     ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(event->target_id)];
 
-    status = fwk_thread_get_delayed_response(event->target_id,
-                                             ctx->cookie,
-                                             &resp_event);
+    status = fwk_thread_get_delayed_response(
+        event->target_id, ctx->request.cookie, &resp_event);
     if (status != FWK_SUCCESS) {
         return status;
     }
 
     resp_params->status = event_params->status;
     resp_params->value = event_params->value;
-    ctx->is_request_ongoing = false;
+    ctx->request.is_ongoing = false;
 
     return fwk_thread_put_event(&resp_event);
 }
@@ -95,7 +62,7 @@ static int process_request_event(const struct fwk_event *event,
 
     ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(event->target_id)];
 
-    ctx->cookie = event->cookie;
+    ctx->request.cookie = event->cookie;
     resp_event->is_delayed_response = true;
 
     return FWK_SUCCESS;
@@ -120,16 +87,16 @@ static int create_async_request(
         return status;
     }
 
-    ctx->is_request_ongoing = true;
+    ctx->request.is_ongoing = true;
 
-     /*
-      * Signal the result of the request is pending and will arrive later
-      * through an event.
-      */
+    /*
+     * Signal the result of the request is pending and will arrive later
+     * through an event.
+     */
     return FWK_PENDING;
 }
 
-static void get_ctx(fwk_id_t clock_id, struct clock_dev_ctx **ctx)
+void clock_get_ctx(fwk_id_t clock_id, struct clock_dev_ctx **ctx)
 {
     fwk_assert(fwk_module_is_valid_element_id(clock_id));
 
@@ -140,8 +107,9 @@ static void get_ctx(fwk_id_t clock_id, struct clock_dev_ctx **ctx)
  * Driver response API.
  */
 
-void request_complete(fwk_id_t dev_id,
-                      struct mod_clock_driver_resp_params *response)
+void clock_request_complete(
+    fwk_id_t dev_id,
+    struct mod_clock_driver_resp_params *response)
 {
     int status;
     struct fwk_event event;
@@ -171,7 +139,7 @@ void request_complete(fwk_id_t dev_id,
 }
 
 static struct mod_clock_driver_response_api clock_driver_response_api = {
-    .request_complete = request_complete,
+    .request_complete = clock_request_complete,
 };
 
 /*
@@ -184,10 +152,10 @@ static int clock_set_rate(fwk_id_t clock_id, uint64_t rate,
     int status;
     struct clock_dev_ctx *ctx;
 
-    get_ctx(clock_id, &ctx);
+    clock_get_ctx(clock_id, &ctx);
 
     /* Concurrency is not supported */
-    if (ctx->is_request_ongoing) {
+    if (ctx->request.is_ongoing) {
         return FWK_E_BUSY;
     }
 
@@ -207,14 +175,14 @@ static int clock_get_rate(fwk_id_t clock_id, uint64_t *rate)
     int status;
     struct clock_dev_ctx *ctx;
 
-    get_ctx(clock_id, &ctx);
+    clock_get_ctx(clock_id, &ctx);
 
     if (rate == NULL) {
         return FWK_E_PARAM;
     }
 
     /* Concurrency is not supported */
-    if (ctx->is_request_ongoing) {
+    if (ctx->request.is_ongoing) {
         return FWK_E_BUSY;
     }
 
@@ -234,7 +202,7 @@ static int clock_get_rate_from_index(fwk_id_t clock_id, unsigned int rate_index,
 {
     struct clock_dev_ctx *ctx;
 
-    get_ctx(clock_id, &ctx);
+    clock_get_ctx(clock_id, &ctx);
 
     if (rate == NULL) {
         return FWK_E_PARAM;
@@ -249,10 +217,10 @@ static int clock_set_state(fwk_id_t clock_id, enum mod_clock_state state)
     int status;
     struct clock_dev_ctx *ctx;
 
-    get_ctx(clock_id, &ctx);
+    clock_get_ctx(clock_id, &ctx);
 
     /* Concurrency is not supported */
-    if (ctx->is_request_ongoing) {
+    if (ctx->request.is_ongoing) {
         return FWK_E_BUSY;
     }
 
@@ -272,14 +240,14 @@ static int clock_get_state(fwk_id_t clock_id, enum mod_clock_state *state)
     int status;
     struct clock_dev_ctx *ctx;
 
-    get_ctx(clock_id, &ctx);
+    clock_get_ctx(clock_id, &ctx);
 
     if (state == NULL) {
         return FWK_E_PARAM;
     }
 
     /* Concurrency is not supported */
-    if (ctx->is_request_ongoing) {
+    if (ctx->request.is_ongoing) {
         return FWK_E_BUSY;
     }
 
@@ -299,7 +267,7 @@ static int clock_get_info(fwk_id_t clock_id, struct mod_clock_info *info)
     int status;
     struct clock_dev_ctx *ctx;
 
-    get_ctx(clock_id, &ctx);
+    clock_get_ctx(clock_id, &ctx);
 
     if (info == NULL) {
         return FWK_E_PARAM;
@@ -491,11 +459,11 @@ static int clock_process_pd_pre_transition_notification(
     pd_resp_params->status = status;
 
     if (status != FWK_SUCCESS) {
-        ctx->transition_pending_notifications_sent = 0;
+        ctx->pd_notif.transition_pending_sent = 0;
         return status;
     }
 
-    ctx->transition_pending_response_status = FWK_SUCCESS;
+    ctx->pd_notif.transition_pending_response_status = FWK_SUCCESS;
     out_params =
         (struct clock_notification_params *)outbound_event.params;
 
@@ -512,17 +480,16 @@ static int clock_process_pd_pre_transition_notification(
 
     /* Notify subscribers of the pending clock state change */
     status = fwk_notification_notify(
-        &outbound_event,
-        &(ctx->transition_pending_notifications_sent));
+        &outbound_event, &(ctx->pd_notif.transition_pending_sent));
     if (status != FWK_SUCCESS) {
         pd_resp_params->status = status;
         return status;
     }
 
-    if (ctx->transition_pending_notifications_sent > 0) {
+    if (ctx->pd_notif.transition_pending_sent > 0) {
         /* There are one or more subscribers that must respond */
         resp_event->is_delayed_response = true;
-        ctx->pd_pre_power_transition_notification_cookie = event->cookie;
+        ctx->pd_notif.pre_power_transition_cookie = event->cookie;
     }
 
     return status;
@@ -578,7 +545,7 @@ static int clock_process_notification_response(
     struct fwk_event pd_response_event = {
         .id = module_ctx.config->pd_pre_transition_notification_id,
         .target_id = ctx->config->pd_source_id,
-        .cookie = ctx->pd_pre_power_transition_notification_cookie,
+        .cookie = ctx->pd_notif.pre_power_transition_cookie,
         .is_notification = true,
         .is_response = true,
         .is_delayed_response = true,
@@ -588,7 +555,7 @@ static int clock_process_notification_response(
                                mod_clock_notification_id_state_change_pending));
 
     /* At least one notification response must be outstanding */
-    if (!fwk_expect(ctx->transition_pending_notifications_sent != 0)) {
+    if (!fwk_expect(ctx->pd_notif.transition_pending_sent != 0)) {
         return FWK_E_PANIC;
     }
 
@@ -603,10 +570,10 @@ static int clock_process_notification_response(
      * that is pending.
      */
     if (resp_params->status != FWK_SUCCESS) {
-        ctx->transition_pending_response_status = resp_params->status;
+        ctx->pd_notif.transition_pending_response_status = resp_params->status;
     }
 
-    if ((--(ctx->transition_pending_notifications_sent)) == 0) {
+    if ((--(ctx->pd_notif.transition_pending_sent)) == 0) {
         /*
          * If this is the final response then the response to the power domain
          * notification can be sent.
@@ -614,7 +581,8 @@ static int clock_process_notification_response(
         pd_resp_params =
             (struct mod_pd_power_state_pre_transition_notification_resp_params
                  *)pd_response_event.params;
-        pd_resp_params->status = ctx->transition_pending_response_status;
+        pd_resp_params->status =
+            ctx->pd_notif.transition_pending_response_status;
         fwk_thread_put_event(&pd_response_event);
     }
 
