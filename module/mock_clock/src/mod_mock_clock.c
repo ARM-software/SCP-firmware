@@ -228,10 +228,16 @@ static int mod_mock_clock_element_init(
             return FWK_E_DATA;
 
         last_rate = rate;
+
+        /* If a default rate is set, let it be so */
+        if (cfg->default_rate == rate) {
+            ctx->current_rate_index = rate_index;
+            ctx->rate_initialized = true;
+            ctx->state = MOD_CLOCK_STATE_RUNNING;
+        }
     }
 
     ctx->config = cfg;
-    ctx->state = MOD_CLOCK_STATE_RUNNING;
 
     return FWK_SUCCESS;
 }

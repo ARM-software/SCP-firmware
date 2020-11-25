@@ -50,6 +50,9 @@ struct mod_mock_clock_element_cfg {
 
     /*! The number of rates in the rate lookup table. */
     unsigned int rate_count;
+
+    /*! The default rate value if the clock device is running at startup. */
+    uint32_t default_rate;
 };
 
 /*!
