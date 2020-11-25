@@ -25,6 +25,7 @@ static const struct fwk_element element_table[] = {
             .data = &(const struct mod_mock_clock_element_cfg){
                     .rate_table = i2s_rate_table,
                     .rate_count = FWK_ARRAY_SIZE(i2s_rate_table),
+                    .default_rate = 1536000,
                 },
         },
     [MOD_MOCK_CLOCK_ELEMENT_IDX_COUNT] = { 0 }, /* Termination description. */
