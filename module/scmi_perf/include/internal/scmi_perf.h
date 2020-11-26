@@ -271,8 +271,8 @@ struct scmi_perf_level_changed {
 struct scmi_perf_limits_changed {
     uint32_t agent_id;
     uint32_t domain_id;
-    uint32_t range_min;
     uint32_t range_max;
+    uint32_t range_min;
 };
 
 /*
