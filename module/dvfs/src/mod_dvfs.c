@@ -600,16 +600,16 @@ static int dvfs_set_level_limits(
 
     ctx->level_limits = *limits;
 
-    if ((new_opp->level == ctx->current_opp.level) &&
-        (new_opp->frequency == ctx->current_opp.frequency) &&
-        (new_opp->voltage == ctx->current_opp.voltage)) {
-        return FWK_SUCCESS;
-    }
-
     /* notify the HAL that the limits have been updated */
     if (ctx->apis.perf_updated_api) {
         ctx->apis.perf_updated_api->notify_limits_updated(
             ctx->domain_id, cookie, limits->minimum, limits->maximum);
+    }
+
+    if ((new_opp->level == ctx->current_opp.level) &&
+        (new_opp->frequency == ctx->current_opp.frequency) &&
+        (new_opp->voltage == ctx->current_opp.voltage)) {
+        return FWK_SUCCESS;
     }
 
     if (ctx->state != DVFS_DOMAIN_STATE_IDLE) {
