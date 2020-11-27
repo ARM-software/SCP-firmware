@@ -149,6 +149,23 @@ enum mod_scmi_clock_policy_status {
 };
 
 /*!
+ * \brief Directive for Policy handler.
+ *
+ * \details These values are passed to the policy handlers to indicate
+ *      whether the policy handler is being invoked prior to the operation
+ *      processing the message or on completion of the message. If the message
+ *      handler has completed it is safe to commit any changes the policy
+ *      handler may need to make to any internal state.
+ */
+enum mod_scmi_clock_policy_commit {
+    /*! The message handler has not run yet */
+    MOD_SCMI_CLOCK_PRE_MESSAGE_HANDLER,
+
+    /*! The message handler has completed */
+    MOD_SCMI_CLOCK_POST_MESSAGE_HANDLER,
+};
+
+/*!
  * \brief SCMI Clock Set Rate command policy.
  *
  * \details This function determines whether the SCMI message handler should
@@ -169,6 +186,7 @@ enum mod_scmi_clock_policy_status {
  * \param[in, out] round_mode Rounding operation to perform, if required, to
  *      achieve the given rate.
  * \param[in, out] rate Desired frequency in hertz.
+ * \param[in] policy_commit Whether the message handler has completed or not.
  * \param[in] service_id Identifier of the agent making the request.
  * \param[in] clock_dev_id SCMI clock device identifier.
  *
@@ -180,6 +198,7 @@ int mod_scmi_clock_rate_set_policy(
     enum mod_scmi_clock_policy_status *policy_status,
     enum mod_clock_round_mode *round_mode,
     uint64_t *rate,
+    enum mod_scmi_clock_policy_commit policy_commit,
     fwk_id_t service_id,
     uint32_t clock_dev_id);
 
@@ -196,6 +215,7 @@ int mod_scmi_clock_rate_set_policy(
  *
  * \param[out] policy_status Whether the command should be accepted or not.
  * \param[in, out] state Pointer to one of the valid clock states.
+ * \param[in] policy_commit Whether the message handler has completed or not.
  * \param[in] service_id Identifier of the agent making the request.
  * \param[in] clock_dev_id Identifier of the clock.
  *
@@ -206,6 +226,7 @@ int mod_scmi_clock_rate_set_policy(
 int mod_scmi_clock_config_set_policy(
     enum mod_scmi_clock_policy_status *policy_status,
     enum mod_clock_state *state,
+    enum mod_scmi_clock_policy_commit policy_commit,
     fwk_id_t service_id,
     uint32_t clock_dev_id);
 
