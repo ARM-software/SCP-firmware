@@ -56,12 +56,8 @@ static struct mod_res_agent_msg_permissions agent_msg_permissions[] = {
         .messages[MOD_RES_PERMS_SCMI_SYS_POWER_MESSAGE_IDX] = 0x0,
         /* Performance */
         .messages[MOD_RES_PERMS_SCMI_PERF_MESSAGE_IDX] = 0x0,
-        /*
-         * sgm775 denies access to CONFIG_SET
-         */
-        .messages[MOD_RES_PERMS_SCMI_CLOCK_MESSAGE_IDX] =
-            MOD_RES_PERMS_ACCESS_DENIED <<
-            (MOD_SCMI_CLOCK_CONFIG_SET - MOD_SCMI_CLOCK_ATTRIBUTES),
+        /* Clock */
+        .messages[MOD_RES_PERMS_SCMI_CLOCK_MESSAGE_IDX] = 0x0,
         /* Sensors */
         .messages[MOD_RES_PERMS_SCMI_SENSOR_MESSAGE_IDX] = 0x0,
         /* Reset Domains */
@@ -91,11 +87,7 @@ static struct mod_res_agent_msg_permissions agent_msg_permissions[] = {
                   MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
              (1 << (MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL -
                   MOD_SCMI_PERF_DOMAIN_ATTRIBUTES))),
-            /*
-             * sgm775 denies access to CONFIG_SET
-             */
-        .messages[4] =
-            (1 << (MOD_SCMI_CLOCK_CONFIG_SET - MOD_SCMI_CLOCK_ATTRIBUTES)),
+        .messages[4] = 0x0, /* Clock */
         .messages[5] = 0x0, /* Sensors */
         },
 };
