@@ -20,6 +20,7 @@ int mod_scmi_clock_rate_set_policy(
     enum mod_scmi_clock_policy_status *policy_status,
     enum mod_clock_round_mode *round_mode,
     uint64_t *rate,
+    enum mod_scmi_clock_policy_commit policy_commit,
     fwk_id_t service_id,
     uint32_t clock_dev_id)
 {

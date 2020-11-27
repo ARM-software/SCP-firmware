@@ -39,6 +39,21 @@ struct clock_operations {
      * A 'none' value indicates that there is no pending request.
      */
     fwk_id_t service_id;
+
+    /*
+     * The state to be set in this operation.
+     */
+    enum mod_clock_state state;
+
+    /*
+     * The clock device for this operation.
+     */
+    uint32_t clock_dev_id;
+
+    /*
+     * Request type for this operation.
+     */
+    enum scmi_clock_request_type request;
 };
 
 struct scmi_clock_ctx {
@@ -268,10 +283,33 @@ static int set_agent_clock_state(
 /*
  * Helper for clock operations
  */
-static inline void clock_ops_set_busy(unsigned int clock_dev_idx,
-                                      fwk_id_t service_id)
+static void clock_ops_set_busy(
+    unsigned int clock_dev_idx,
+    fwk_id_t service_id,
+    uint32_t clock_dev_id,
+    enum mod_clock_state state,
+    enum scmi_clock_request_type request)
 {
     scmi_clock_ctx.clock_ops[clock_dev_idx].service_id = service_id;
+    scmi_clock_ctx.clock_ops[clock_dev_idx].state = state;
+    scmi_clock_ctx.clock_ops[clock_dev_idx].clock_dev_id = clock_dev_id;
+    scmi_clock_ctx.clock_ops[clock_dev_idx].request = request;
+}
+
+static void clock_ops_update_state(unsigned int clock_dev_idx, int status)
+{
+    enum mod_scmi_clock_policy_status policy_status;
+
+    if ((status == FWK_SUCCESS) &&
+        (scmi_clock_ctx.clock_ops[clock_dev_idx].request ==
+         SCMI_CLOCK_REQUEST_SET_STATE)) {
+        mod_scmi_clock_config_set_policy(
+            &policy_status,
+            &scmi_clock_ctx.clock_ops[clock_dev_idx].state,
+            MOD_SCMI_CLOCK_POST_MESSAGE_HANDLER,
+            scmi_clock_ctx.clock_ops[clock_dev_idx].service_id,
+            scmi_clock_ctx.clock_ops[clock_dev_idx].clock_dev_id);
+    }
 }
 
 static inline void clock_ops_set_available(unsigned int clock_dev_idx)
@@ -392,6 +430,7 @@ FWK_WEAK int mod_scmi_clock_rate_set_policy(
     enum mod_scmi_clock_policy_status *policy_status,
     enum mod_clock_round_mode *round_mode,
     uint64_t *rate,
+    enum mod_scmi_clock_policy_commit policy_commit,
     fwk_id_t service_id,
     uint32_t clock_dev_id)
 {
@@ -403,6 +442,7 @@ FWK_WEAK int mod_scmi_clock_rate_set_policy(
 FWK_WEAK int mod_scmi_clock_config_set_policy(
     enum mod_scmi_clock_policy_status *policy_status,
     enum mod_clock_state *state,
+    enum mod_scmi_clock_policy_commit policy_commit,
     fwk_id_t service_id,
     uint32_t clock_dev_id)
 {
@@ -463,11 +503,13 @@ FWK_WEAK int mod_scmi_clock_config_set_policy(
             return FWK_E_STATE;
 
         /* set the clock state for this agent to RUNNING */
-        set_agent_clock_state(
-            agent_clock_state,
-            MOD_CLOCK_STATE_RUNNING,
-            service_id,
-            clock_dev_id);
+        if (policy_commit == MOD_SCMI_CLOCK_POST_MESSAGE_HANDLER) {
+            set_agent_clock_state(
+                agent_clock_state,
+                MOD_CLOCK_STATE_RUNNING,
+                service_id,
+                clock_dev_id);
+        }
 
         /*
          * Only allow the clock to be stopped if clock_count == 0
@@ -477,7 +519,8 @@ FWK_WEAK int mod_scmi_clock_config_set_policy(
          */
         if (clock_count[clock_dev_id] != 0)
             status = FWK_E_STATE;
-        clock_count[clock_dev_id]++;
+        if (policy_commit == MOD_SCMI_CLOCK_POST_MESSAGE_HANDLER)
+            clock_count[clock_dev_id]++;
         break;
 
     case MOD_CLOCK_STATE_STOPPED:
@@ -498,11 +541,13 @@ FWK_WEAK int mod_scmi_clock_config_set_policy(
             return FWK_E_STATE;
 
         /* set the clock state for this agent to STOPPED */
-        set_agent_clock_state(
-            agent_clock_state,
-            MOD_CLOCK_STATE_STOPPED,
-            service_id,
-            clock_dev_id);
+        if (policy_commit == MOD_SCMI_CLOCK_POST_MESSAGE_HANDLER) {
+            set_agent_clock_state(
+                agent_clock_state,
+                MOD_CLOCK_STATE_STOPPED,
+                service_id,
+                clock_dev_id);
+        }
 
         /*
          * Only allow the clock to be stopped if ref_clk_count == 0
@@ -510,9 +555,10 @@ FWK_WEAK int mod_scmi_clock_config_set_policy(
          *
          * This is the last agent to set the clock STOPPED.
          */
-        clock_count[clock_dev_id]--;
-        if (clock_count[clock_dev_id])
+        if (clock_count[clock_dev_id] != 1)
             status = FWK_E_STATE;
+        if (policy_commit == MOD_SCMI_CLOCK_POST_MESSAGE_HANDLER)
+            clock_count[clock_dev_id]--;
         break;
 
     default:
@@ -582,15 +628,18 @@ static int scmi_clock_permissions_handler(
 /*
  * Helper to create events for processing pending requests
  */
-static int create_event_request(fwk_id_t clock_id,
-                                fwk_id_t service_id,
-                                enum scmi_clock_request_type request,
-                                void *data)
+static int create_event_request(
+    fwk_id_t clock_id,
+    fwk_id_t service_id,
+    enum scmi_clock_request_type request,
+    void *data,
+    uint32_t clock_idx)
 {
     int status;
     union event_request_data request_data;
     unsigned int clock_dev_idx = fwk_id_get_element_idx(clock_id);
     struct event_request_params *params;
+    enum mod_clock_state state = MOD_CLOCK_STATE_COUNT;
 
     if (!clock_ops_is_available(clock_dev_idx))
         return FWK_E_BUSY;
@@ -630,6 +679,7 @@ static int create_event_request(fwk_id_t clock_id,
         struct event_set_state_request_data *state_data =
             (struct event_set_state_request_data *)data;
         request_data.set_state_data.state = state_data->state;
+        state = state_data->state;
 
         params->request_data = request_data;
         }
@@ -647,7 +697,7 @@ static int create_event_request(fwk_id_t clock_id,
     if (status != FWK_SUCCESS)
         return status;
 
-    clock_ops_set_busy(clock_dev_idx, service_id);
+    clock_ops_set_busy(clock_dev_idx, service_id, clock_idx, state, request);
 
     return FWK_SUCCESS;
 }
@@ -755,10 +805,12 @@ static int scmi_clock_attributes_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    status = create_event_request(clock_device->element_id,
-                                  service_id,
-                                  SCMI_CLOCK_REQUEST_GET_STATE,
-                                  NULL);
+    status = create_event_request(
+        clock_device->element_id,
+        service_id,
+        SCMI_CLOCK_REQUEST_GET_STATE,
+        NULL,
+        parameters->clock_id);
     if (status == FWK_E_BUSY) {
         return_values.status = SCMI_BUSY;
         status = FWK_SUCCESS;
@@ -803,10 +855,12 @@ static int scmi_clock_rate_get_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    status = create_event_request(clock_device->element_id,
-                                  service_id,
-                                  SCMI_CLOCK_REQUEST_GET_RATE,
-                                  NULL);
+    status = create_event_request(
+        clock_device->element_id,
+        service_id,
+        SCMI_CLOCK_REQUEST_GET_RATE,
+        NULL,
+        parameters->clock_id);
     if (status == FWK_E_BUSY) {
         return_values.status = SCMI_BUSY;
         status = FWK_SUCCESS;
@@ -886,7 +940,12 @@ static int scmi_clock_rate_set_handler(fwk_id_t service_id,
      * Note that rate and round_mode may be modified by the policy handler.
      */
     status = mod_scmi_clock_rate_set_policy(
-        &policy_status, &round_mode, &rate, service_id, parameters->clock_id);
+        &policy_status,
+        &round_mode,
+        &rate,
+        MOD_SCMI_CLOCK_PRE_MESSAGE_HANDLER,
+        service_id,
+        parameters->clock_id);
 
     if (status != FWK_SUCCESS) {
         return_values.status = SCMI_GENERIC_ERROR;
@@ -903,10 +962,12 @@ static int scmi_clock_rate_set_handler(fwk_id_t service_id,
         .round_mode = round_mode,
     };
 
-    status = create_event_request(clock_device->element_id,
-                                  service_id,
-                                  SCMI_CLOCK_REQUEST_SET_RATE,
-                                  &data);
+    status = create_event_request(
+        clock_device->element_id,
+        service_id,
+        SCMI_CLOCK_REQUEST_SET_RATE,
+        &data,
+        parameters->clock_id);
     if (status == FWK_E_BUSY) {
         return_values.status = SCMI_BUSY;
         status = FWK_SUCCESS;
@@ -972,7 +1033,11 @@ static int scmi_clock_config_set_handler(fwk_id_t service_id,
      * Note that data.state may be modified by the policy handler.
      */
     status = mod_scmi_clock_config_set_policy(
-        &policy_status, &data.state, service_id, parameters->clock_id);
+        &policy_status,
+        &data.state,
+        MOD_SCMI_CLOCK_PRE_MESSAGE_HANDLER,
+        service_id,
+        parameters->clock_id);
     if (status != FWK_SUCCESS) {
         return_values.status = SCMI_GENERIC_ERROR;
         goto exit;
@@ -982,10 +1047,12 @@ static int scmi_clock_config_set_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    status = create_event_request(clock_device->element_id,
-                                  service_id,
-                                  SCMI_CLOCK_REQUEST_SET_STATE,
-                                  &data);
+    status = create_event_request(
+        clock_device->element_id,
+        service_id,
+        SCMI_CLOCK_REQUEST_SET_STATE,
+        &data,
+        parameters->clock_id);
     if (status == FWK_E_BUSY) {
         return_values.status = SCMI_BUSY;
         status = FWK_SUCCESS;
@@ -1349,6 +1416,7 @@ static int process_request_event(const struct fwk_event *event)
         if (status != FWK_PENDING) {
             /* Request completed */
             set_request_respond(service_id, status);
+            clock_ops_update_state(clock_dev_idx, status);
             status = FWK_SUCCESS;
         }
         break;
@@ -1400,6 +1468,7 @@ static int process_response_event(const struct fwk_event *event)
         case MOD_CLOCK_EVENT_IDX_SET_RATE_REQUEST:
         case MOD_CLOCK_EVENT_IDX_SET_STATE_REQUEST:
             set_request_respond(service_id, FWK_SUCCESS);
+            clock_ops_update_state(clock_dev_idx, FWK_SUCCESS);
 
             break;
 
