@@ -218,22 +218,57 @@ static int clock_set_state(fwk_id_t clock_id, enum mod_clock_state state)
     int status;
     struct clock_dev_ctx *ctx;
 
-    clock_get_ctx(clock_id, &ctx);
+#ifdef BUILD_HAS_CLOCK_TREE_MGMT
+    struct fwk_event event;
+    struct clock_set_state_params *event_params;
+#endif
 
+    clock_get_ctx(clock_id, &ctx);
     /* Concurrency is not supported */
     if (ctx->request.is_ongoing) {
         return FWK_E_BUSY;
     }
 
+#ifdef BUILD_HAS_CLOCK_TREE_MGMT
+    if (ctx->state_transition.state != CLOCK_STATE_TRANSITION_IDLE) {
+        return FWK_E_BUSY;
+    }
+
+    if (clock_is_single_node(ctx)) {
+        status = ctx->api->set_state(ctx->config->driver_id, state);
+        if (status == FWK_PENDING) {
+            return create_async_request(
+                ctx, clock_id, mod_clock_event_id_set_state_request);
+        }
+        return status;
+    }
+
+    status = create_async_request(
+        ctx, clock_id, mod_clock_event_id_set_state_request);
+    if (status != FWK_PENDING) {
+        return status;
+    }
+
+    event = (struct fwk_event){
+        .target_id = clock_id,
+        .id = mod_clock_event_id_set_state_pre_request,
+    };
+    event_params = (struct clock_set_state_params *)event.params;
+    event_params->target_state = state;
+    ctx->state_transition.is_transition_initiator = true;
+    status = fwk_thread_put_event(&event);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+    return FWK_PENDING;
+#else
     status = ctx->api->set_state(ctx->config->driver_id, state);
     if (status == FWK_PENDING) {
         return create_async_request(
-            ctx,
-            clock_id,
-            mod_clock_event_id_set_state_request);
-    } else {
-        return status;
+            ctx, clock_id, mod_clock_event_id_set_state_request);
     }
+    return status;
+#endif
 }
 
 static int clock_get_state(fwk_id_t clock_id, enum mod_clock_state *state)
@@ -644,6 +679,11 @@ static int clock_process_event(const struct fwk_event *event,
     case MOD_CLOCK_EVENT_IDX_SET_STATE_REQUEST:
     case MOD_CLOCK_EVENT_IDX_GET_STATE_REQUEST:
         return process_request_event(event, resp_event);
+
+#ifdef BUILD_HAS_CLOCK_TREE_MGMT
+    case CLOCK_EVENT_IDX_SET_STATE_PRE_REQUEST:
+        return clock_management_process_state(event);
+#endif
 
     case CLOCK_EVENT_IDX_RESPONSE:
         return process_response_event(event);

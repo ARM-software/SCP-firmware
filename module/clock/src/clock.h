@@ -10,6 +10,7 @@
 
 #include <mod_clock.h>
 
+#include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_list.h>
 
@@ -59,9 +60,12 @@ struct clock_dev_ctx {
     struct {
         /* Number of pending responses */
         uint32_t pending_responses;
-
         /* Clock state transition */
         uint32_t state;
+        /* Clock id caller to transition */
+        fwk_id_t caller_id;
+        /* Flag indicating if this clock is the starter of transition */
+        bool is_transition_initiator;
     } state_transition;
 
     /* Reference count */
@@ -81,10 +85,46 @@ struct clock_ctx {
     uint32_t dev_count;
 };
 
+/* Set state event parameters */
+struct clock_set_state_params {
+    uint32_t target_state;
+    int caller_status;
+};
+
+/* Set rate event parameters */
+struct clock_set_rate_params {
+    uint64_t input_rate;
+};
+
+/* List of state transition management state */
+enum clock_state_transition_stage {
+    /* This is the idle state */
+    CLOCK_STATE_TRANSITION_IDLE,
+
+    /* This state wait for parent run response */
+    CLOCK_STATE_TRANSITION_WAIT_PARENT,
+
+    /* Number of states in a transition */
+    CLOCK_STATE_TRANSITION_COUNT
+};
+
 /* Get context helper function */
 void clock_get_ctx(fwk_id_t clock_id, struct clock_dev_ctx **ctx);
 
+/* Clock request complete function */
+void clock_request_complete(
+    fwk_id_t dev_id,
+    struct mod_clock_driver_resp_params *response);
+
 #ifdef BUILD_HAS_CLOCK_TREE_MGMT
+/* Clock tree management state machine for setting state */
+int clock_management_process_state(const struct fwk_event *event);
+
+/* Check if a clock is a single node. It returns true or false whether Clock is
+ * a single node or not.
+ */
+bool clock_is_single_node(struct clock_dev_ctx *ctx);
+
 /* Connect clock tree interconnecting parent to children nodes */
 int clock_connect_tree(struct clock_ctx *module_ctx);
 #endif
@@ -94,6 +134,11 @@ int clock_connect_tree(struct clock_ctx *module_ctx);
  */
 enum clock_event_idx {
     CLOCK_EVENT_IDX_RESPONSE = MOD_CLOCK_EVENT_IDX_COUNT,
+
+#ifdef BUILD_HAS_CLOCK_TREE_MGMT
+    CLOCK_EVENT_IDX_SET_STATE_PRE_REQUEST,
+#endif
+
     CLOCK_EVENT_IDX_COUNT
 };
 
@@ -104,5 +149,13 @@ enum clock_event_idx {
 /* Identifier of the response event */
 static const fwk_id_t mod_clock_event_id_response =
     FWK_ID_EVENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_EVENT_IDX_RESPONSE);
+
+#ifdef BUILD_HAS_CLOCK_TREE_MGMT
+/* Identifier of the set state pre-request */
+static const fwk_id_t mod_clock_event_id_set_state_pre_request =
+    FWK_ID_EVENT_INIT(
+        FWK_MODULE_IDX_CLOCK,
+        CLOCK_EVENT_IDX_SET_STATE_PRE_REQUEST);
+#endif
 
 #endif /* CLOCK_H */
