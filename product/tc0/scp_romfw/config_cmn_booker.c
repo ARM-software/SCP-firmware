@@ -91,6 +91,16 @@ static const struct mod_cmn_booker_mem_region_map mmap[] = {
         .type = MOD_CMN_BOOKER_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HND,
     },
+    {
+        /*
+         * Peripherals
+         * Map: 0x01_0000_0000 - 0x01_03FF_FFFF (64 MB)
+         */
+        .base = UINT64_C(0x0100000000),
+        .size = UINT64_C(64) * FWK_MIB,
+        .type = MOD_CMN_BOOKER_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_HND,
+    },
 };
 
 const struct fwk_module_config config_cmn_booker = {
