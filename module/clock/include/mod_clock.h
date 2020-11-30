@@ -572,7 +572,7 @@ enum mod_clock_event_idx {
     MOD_CLOCK_EVENT_IDX_COUNT
 };
 
- /*!
+/*!
  * \brief Request event identifiers.
  *
  * \details These identifiers are used by the clients that expect to receive a
