@@ -231,8 +231,8 @@ unsigned int fwk_id_get_module_idx(fwk_id_t id)
 
 unsigned int fwk_id_get_element_idx(fwk_id_t element_id)
 {
-    assert((element_id.common.type == __FWK_ID_TYPE_ELEMENT) ||
-           (element_id.common.type == __FWK_ID_TYPE_SUB_ELEMENT));
+    fwk_assert((element_id.common.type == __FWK_ID_TYPE_ELEMENT) ||
+               (element_id.common.type == __FWK_ID_TYPE_SUB_ELEMENT));
 
     return element_id.element.element_idx;
 }

@@ -16,7 +16,6 @@
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
 
-#include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
 

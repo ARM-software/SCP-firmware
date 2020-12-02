@@ -572,7 +572,7 @@ static int smt_process_notification(
     unsigned int notifications_sent;
     int status;
 
-    assert(fwk_id_is_equal(event->id,
+    fwk_assert(fwk_id_is_equal(event->id,
         mod_pd_notification_id_power_state_transition));
     fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT));
 

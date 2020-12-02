@@ -451,7 +451,7 @@ static bool is_valid_composite_state(struct pd_ctx *target_pd,
     const uint32_t *state_mask_table;
     unsigned int table_size;
 
-    assert(target_pd != NULL);
+    fwk_assert(target_pd != NULL);
 
     if (!pd->cs_support)
         goto error;
