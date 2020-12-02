@@ -58,6 +58,7 @@ static const struct mod_reset_domain_drv_api reset_api = {
     .set_reset_state = set_reset_state,
 };
 
+#ifdef BUILD_HAS_NOTIFICATION
 static int reset_issued_notify(fwk_id_t dev_id,
                                uint32_t reset_state,
                                uintptr_t cookie)
@@ -108,6 +109,7 @@ static int rd_process_event(
     return reset_issued_notify(params->dev_id,
                                params->reset_state, params->cookie);
 }
+#endif /* BUILD_HAS_NOTIFICATION */
 
 /*
  * Framework handlers
@@ -177,11 +179,15 @@ const struct fwk_module module_reset_domain = {
     .name = "Reset domain",
     .type = FWK_MODULE_TYPE_HAL,
     .api_count = MOD_RESET_DOMAIN_API_COUNT,
+#ifdef BUILD_HAS_NOTIFICATION
     .notification_count = MOD_RESET_DOMAIN_NOTIFICATION_IDX_COUNT,
+#endif
     .event_count = MOD_RESET_DOMAIN_EVENT_IDX_COUNT,
     .init = rd_init,
     .element_init = rd_element_init,
     .bind = rd_bind,
     .process_bind_request = rd_process_bind_request,
+#ifdef BUILD_HAS_NOTIFICATION
     .process_event = rd_process_event,
+#endif
 };
