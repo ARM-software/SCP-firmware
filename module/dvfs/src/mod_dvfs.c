@@ -664,6 +664,7 @@ static void dvfs_complete_respond(struct mod_dvfs_domain_ctx *ctx,
         return_opp = true;
 
     if (ctx->cookie != 0) {
+#ifdef BUILD_HAS_MULTITHREADING
         /*
          * The request was handled asynchronously, retrieve
          * the delayed_response and return it to the caller
@@ -682,6 +683,9 @@ static void dvfs_complete_respond(struct mod_dvfs_domain_ctx *ctx,
             fwk_thread_put_event(&read_req_event);
         }
         ctx->cookie = 0;
+#else
+        fwk_unexpected();
+#endif
     } else if (resp_event != NULL) {
         /*
          * The request is being handled synchronously, return
