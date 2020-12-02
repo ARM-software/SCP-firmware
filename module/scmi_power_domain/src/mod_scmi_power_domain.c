@@ -615,8 +615,7 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
         ops_set_busy(pd_id, service_id);
 
         return FWK_SUCCESS;
-    #endif
-
+#endif /* BUILD_HAS_MOD_DEBUG */
     case MOD_PD_TYPE_DEVICE:
         if (!is_sync) {
             return_values.status = SCMI_NOT_SUPPORTED;
@@ -694,7 +693,7 @@ static int scmi_pd_power_state_get_handler(fwk_id_t service_id,
 #ifdef BUILD_HAS_MOD_DEBUG
     struct fwk_event event;
     struct event_request_params *event_params;
-    #endif
+#endif
 
     parameters = (const struct scmi_pd_power_state_get_a2p *)payload;
 
@@ -738,7 +737,7 @@ static int scmi_pd_power_state_get_handler(fwk_id_t service_id,
         ops_set_busy(pd_id, service_id);
 
         return FWK_SUCCESS;
-    #endif
+#endif
     case MOD_PD_TYPE_DEVICE:
 
         status = scmi_pd_ctx.pd_api->get_state(pd_id, &pd_power_state);
@@ -1035,7 +1034,7 @@ static int scmi_pd_init(fwk_id_t module_id, unsigned int element_count,
 {
 #ifdef BUILD_HAS_MOD_DEBUG
     struct mod_scmi_pd_config *config = (struct mod_scmi_pd_config *)data;
-    #endif
+#endif
 
     if (element_count != 0)
         return FWK_E_SUPPORT;
@@ -1061,7 +1060,7 @@ static int scmi_pd_init(fwk_id_t module_id, unsigned int element_count,
         scmi_pd_ctx.debug_id = config->debug_id;
     } else
         return FWK_E_DATA;
-    #endif
+#endif
 
     /* Allocate a table of scmi_pd operations */
     scmi_pd_ctx.ops =
@@ -1128,7 +1127,7 @@ static int scmi_pd_bind(fwk_id_t id, unsigned int round)
         &scmi_pd_ctx.debug_api);
     if (status != FWK_SUCCESS)
         return status;
-    #endif
+#endif
 
 #ifdef BUILD_HAS_RESOURCE_PERMISSIONS
     status = fwk_module_bind(
