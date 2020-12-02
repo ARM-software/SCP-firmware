@@ -320,6 +320,10 @@ static int process_request(struct mod_i2c_dev_ctx *ctx, fwk_id_t event_id)
         ctx->state = MOD_I2C_DEV_RX;
         drv_status = driver_api->receive_as_master(driver_id, &ctx->request);
         break;
+
+    default:
+        fwk_unexpected();
+	break;
     }
 
     return drv_status;
