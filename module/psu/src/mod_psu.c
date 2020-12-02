@@ -400,10 +400,15 @@ static int mod_psu_process_event(
     case MOD_PSU_IMPL_EVENT_IDX_RESPONSE:
         ctx->op.state = MOD_PSU_STATE_IDLE;
 
+#ifdef BUILD_HAS_MULTITHREADING
         status = fwk_thread_get_delayed_response(
             event->target_id,
             ctx->op.cookie,
             &hal_event);
+#else
+        status = FWK_E_PARAM;
+#endif
+
         if (status != FWK_SUCCESS)
             return status;
 
