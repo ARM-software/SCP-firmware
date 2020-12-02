@@ -780,6 +780,7 @@ static const fwk_id_t mod_pd_api_id_driver_input =
     FWK_ID_API_INIT(FWK_MODULE_IDX_POWER_DOMAIN, MOD_PD_API_IDX_DRIVER_INPUT);
 #endif
 
+#ifdef BUILD_HAS_NOTIFICATION
 /*!
  * \brief Notification indices.
  */
@@ -885,6 +886,7 @@ static const fwk_id_t mod_pd_public_event_id_get_state =
     FWK_ID_EVENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN,
                       MOD_PD_PUBLIC_EVENT_IDX_GET_STATE);
 #endif
+#endif /* BUILD_HAS_NOTIFICATION */
 
 /*!
  * \}
