@@ -424,10 +424,7 @@ additional binary is generated:
     firmware, and is chain-loaded from the burned-in ROM on the physical board
     (not necessary for the FVP).
 
-We recommend using the latest release of Trusted Firmware-A (version 2.2 as of
-writing). Please note that using a debug version of the firmware is currently
-only supported on the `integration` branch of Trusted Firmware-A, as additional
-fixes are required to support the larger image size.
+We recommend using the latest release of Trusted Firmware-A (2.3 or later).
 
 ### Booting the firmware
 
