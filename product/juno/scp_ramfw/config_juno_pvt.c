@@ -69,14 +69,14 @@ static struct mod_sensor_info info_pvt_temp = {
     .type = MOD_SENSOR_TYPE_DEGREES_C,
     .update_interval = 0,
     .update_interval_multiplier = 0,
-    .unit_multiplier = 0,
+    .unit_multiplier = -3,
 };
 
 static struct mod_sensor_info info_pvt_volt = {
     .type = MOD_SENSOR_TYPE_VOLTS,
     .update_interval = 0,
     .update_interval_multiplier = 0,
-    .unit_multiplier = 0,
+    .unit_multiplier = -3,
 };
 
 static const struct mod_juno_pvt_dev_config dev_config_big[] = {
