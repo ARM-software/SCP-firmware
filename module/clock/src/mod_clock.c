@@ -138,8 +138,8 @@ static void get_ctx(fwk_id_t clock_id, struct clock_dev_ctx **ctx)
  * Driver response API.
  */
 
-void request_complete(fwk_id_t dev_id,
-                      struct mod_clock_driver_resp_params *response)
+static void request_complete(fwk_id_t dev_id,
+                             struct mod_clock_driver_resp_params *response)
 {
     int status;
     struct fwk_event event;
