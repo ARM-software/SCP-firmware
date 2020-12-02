@@ -8,6 +8,7 @@
  *     Juno PVT Sensors driver.
  */
 
+#include "config_power_domain.h"
 #include "juno_id.h"
 #include "juno_pvt.h"
 #include "pvt_sensor_calibration.h"
@@ -71,6 +72,9 @@ struct pvt_ctx {
 
     /* Flag indicating whether the driver is disabled */
     bool driver_is_disabled;
+
+    /* Elements count */
+    unsigned int elem_count;
 };
 
 /*
@@ -137,6 +141,9 @@ enum pvt_event_idx {
 
 static struct pvt_ctx mod_ctx;
 static struct pvt_dev_ctx *dev_ctx;
+
+static fwk_id_t dbgsys_pd_id =
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN, POWER_DOMAIN_IDX_DBGSYS);
 
 /*
  * Static helper functions
@@ -449,6 +456,8 @@ static int juno_pvt_init(fwk_id_t module_id,
     if (status != FWK_SUCCESS)
         return status;
 
+    mod_ctx.elem_count = element_count;
+
     return FWK_SUCCESS;
 }
 
@@ -572,6 +581,11 @@ static int pvt_start(fwk_id_t id)
             return FWK_E_PARAM;
         }
 
+        status = fwk_notification_subscribe(
+            mod_pd_notification_id_power_state_transition, dbgsys_pd_id, id);
+        if (status != FWK_SUCCESS)
+            return status;
+
         return FWK_SUCCESS;
     }
 
@@ -647,6 +661,48 @@ error:
     mod_ctx.driver_is_disabled = true;
 
     return status;
+}
+
+/*
+ * On Juno, the PPU denies to turn off clusters when DBGSYS is turned ON.
+ * In such case, disable all the notifications since no transitions for clusters
+ * will take place anymore.
+ */
+static int unsubscribe_cluster_notif(void)
+{
+    struct pvt_dev_ctx *group_ctx;
+    struct mod_juno_pvt_dev_config *sensor_cfg;
+    fwk_id_t id;
+    int status;
+
+    for (unsigned int i = 0; i < mod_ctx.elem_count; i++) {
+        if ((i != JUNO_PVT_GROUP_BIG) && (i != JUNO_PVT_GROUP_LITTLE))
+            continue;
+
+        group_ctx = &dev_ctx[i];
+
+        sensor_cfg = group_ctx->sensor_cfg_table;
+
+        id = FWK_ID_ELEMENT(FWK_MODULE_IDX_JUNO_PVT, i);
+
+        status = fwk_notification_unsubscribe(
+            mod_pd_notification_id_power_state_pre_transition,
+            sensor_cfg->group->pd_id,
+            id);
+        if (status != FWK_SUCCESS)
+            return status;
+
+        status = fwk_notification_unsubscribe(
+            mod_pd_notification_id_power_state_transition,
+            sensor_cfg->group->pd_id,
+            id);
+        if (status != FWK_SUCCESS)
+            return status;
+
+        group_ctx->pd_state_on = true;
+    }
+
+    return FWK_SUCCESS;
 }
 
 static int pvt_process_event(const struct fwk_event *event,
@@ -767,6 +823,17 @@ static int pvt_process_notification(const struct fwk_event *event,
         *post_state_params;
     struct mod_pd_power_state_pre_transition_notification_resp_params
         *resp_params;
+
+    if (fwk_id_is_equal(event->source_id, dbgsys_pd_id)) {
+        post_state_params =
+            (struct mod_pd_power_state_transition_notification_params *)
+                event->params;
+
+        if (post_state_params->state == MOD_PD_STATE_ON)
+            return unsubscribe_cluster_notif();
+
+        return FWK_SUCCESS;
+    }
 
     group_ctx = &dev_ctx[fwk_id_get_element_idx(event->target_id)];
 
