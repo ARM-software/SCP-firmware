@@ -395,6 +395,10 @@ static int mod_pl011_process_power_notification(
 
         break;
     }
+
+    default:
+        fwk_unexpected();
+	break;
     }
 
     return status;
@@ -497,6 +501,10 @@ static int mod_pl011_process_clock_notification(
         status = mod_pl011_clock_change_pending(event, resp_event);
 
         break;
+
+    default:
+        fwk_unexpected();
+	break;
     }
 
     return status;
