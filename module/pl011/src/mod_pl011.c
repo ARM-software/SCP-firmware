@@ -345,10 +345,10 @@ static int mod_pl011_process_power_notification(
 
         pd_pre_transition_params =
             (struct mod_pd_power_state_pre_transition_notification_params *)
-                event->params;
+                (void *)event->params;
         pd_resp_params =
             (struct mod_pd_power_state_pre_transition_notification_resp_params
-                 *)resp_event->params;
+                 *)(void *)resp_event->params;
 
         switch (pd_pre_transition_params->target_state) {
 #    ifdef BUILD_HAS_MOD_SYSTEM_POWER
@@ -373,7 +373,7 @@ static int mod_pl011_process_power_notification(
     case MOD_PD_NOTIFICATION_IDX_POWER_STATE_TRANSITION: {
         struct mod_pd_power_state_transition_notification_params *params =
             (struct mod_pd_power_state_transition_notification_params *)
-                event->params;
+                (void *)event->params;
 
         if (params->state != MOD_PD_STATE_ON)
             status = FWK_SUCCESS;
@@ -387,7 +387,7 @@ static int mod_pl011_process_power_notification(
         struct mod_pd_pre_shutdown_notif_resp_params
             *pd_pre_shutdown_resp_params =
                 (struct mod_pd_pre_shutdown_notif_resp_params *)
-                    resp_event->params;
+                    (void *)resp_event->params;
 
         status = mod_pl011_powering_down(event->target_id);
 

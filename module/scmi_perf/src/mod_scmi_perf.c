@@ -621,7 +621,7 @@ static int scmi_perf_limits_get_handler(fwk_id_t service_id,
         .id = scmi_perf_get_limits,
     };
 
-    evt_params = (struct scmi_perf_event_parameters *)event.params;
+    evt_params = (struct scmi_perf_event_parameters *)(void *)event.params;
     evt_params->domain_id = domain_id;
 
     status = fwk_thread_put_event(&event);
@@ -739,7 +739,7 @@ static int scmi_perf_level_get_handler(fwk_id_t service_id,
         .id = scmi_perf_get_level,
     };
 
-    evt_params = (struct scmi_perf_event_parameters *)event.params;
+    evt_params = (struct scmi_perf_event_parameters *)(void *)event.params;
     evt_params->domain_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS,
         parameters->domain_id);
 
@@ -775,7 +775,7 @@ static int scmi_perf_limits_notify(fwk_id_t service_id,
         .status = SCMI_GENERIC_ERROR,
     };
 
-    parameters = (const struct scmi_perf_notify_limits_a2p *)payload;
+    parameters = (const struct scmi_perf_notify_limits_a2p *)(void *)payload;
     id = parameters->domain_id;
     if (id >= scmi_perf_ctx.domain_count) {
         status = FWK_SUCCESS;
@@ -831,7 +831,7 @@ static int scmi_perf_level_notify(fwk_id_t service_id,
         .status = SCMI_GENERIC_ERROR,
     };
 
-    parameters = (const struct scmi_perf_notify_level_a2p *)payload;
+    parameters = (const struct scmi_perf_notify_level_a2p *)(void *)payload;
     id = parameters->domain_id;
     if (id >= scmi_perf_ctx.domain_count) {
         status = FWK_SUCCESS;
@@ -895,7 +895,7 @@ static int scmi_perf_describe_fast_channels(fwk_id_t service_id,
     };
     uint32_t chan_size, chan_index;
 
-    parameters = (const struct scmi_perf_describe_fc_a2p *)payload;
+    parameters = (const struct scmi_perf_describe_fc_a2p *)(void *)payload;
 
     /* Validate the domain identifier */
     if (parameters->domain_id >= scmi_perf_ctx.domain_count) {
@@ -1491,7 +1491,7 @@ static int process_request_event(const struct fwk_event *event)
 
     /* request event to DVFS HAL */
     if (fwk_id_is_equal(event->id, scmi_perf_get_level)) {
-        params = (struct scmi_perf_event_parameters *)event->params;
+        params = (struct scmi_perf_event_parameters *)(void *)event->params;
 
         status = scmi_perf_ctx.dvfs_api->get_current_opp(params->domain_id,
                                                        &opp);
@@ -1522,7 +1522,7 @@ static int process_request_event(const struct fwk_event *event)
     }
 
     if (fwk_id_is_equal(event->id, scmi_perf_get_limits)) {
-        params = (struct scmi_perf_event_parameters *)event->params;
+        params = (struct scmi_perf_event_parameters *)(void *)event->params;
 
         status = scmi_perf_ctx.dvfs_api->get_level_limits(
             params->domain_id, &limits);
@@ -1567,7 +1567,7 @@ static int process_response_event(const struct fwk_event *event)
 
     if (fwk_id_is_equal(event->id, mod_dvfs_event_id_get_opp)) {
         params_level = (struct mod_dvfs_params_response *)
-            event->params;
+            (void *)event->params;
         return_values_level = (struct scmi_perf_level_get_p2a) {
             .status = params_level->status,
             .performance_level = params_level->performance_level,

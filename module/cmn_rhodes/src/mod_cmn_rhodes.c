@@ -875,7 +875,7 @@ static int cmn_rhodes_process_notification(
                                mod_clock_notification_id_state_changed));
     fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT));
 
-    params = (struct clock_notification_params *)event->params;
+    params = (struct clock_notification_params *)(void *)event->params;
     if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
         cmn_rhodes_setup();
         cmn_rhodes_ccix_setup();

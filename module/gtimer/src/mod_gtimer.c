@@ -271,7 +271,7 @@ static int gtimer_process_notification(
         fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed));
     fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT));
 
-    params = (struct clock_notification_params *)event->params;
+    params = (struct clock_notification_params *)(void *)event->params;
 
     if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
         ctx = mod_gtimer_ctx.table + fwk_id_get_element_idx(event->target_id);

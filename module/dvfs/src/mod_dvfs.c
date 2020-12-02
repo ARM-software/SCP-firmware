@@ -661,8 +661,9 @@ static void dvfs_complete_respond(struct mod_dvfs_domain_ctx *ctx,
          * the delayed_response and return it to the caller
          * with the data.
          */
-        resp_params = (struct mod_dvfs_params_response *)
-            &read_req_event.params;
+        resp_params =
+             (struct mod_dvfs_params_response *)
+            (void *)read_req_event.params;
         status = fwk_thread_get_delayed_response(ctx->domain_id,
                                                  ctx->cookie,
                                                  &read_req_event);
@@ -680,7 +681,7 @@ static void dvfs_complete_respond(struct mod_dvfs_domain_ctx *ctx,
          * the data to the caller in the resp_event.
          */
         resp_params =
-            (struct mod_dvfs_params_response *)resp_event->params;
+            (struct mod_dvfs_params_response *)(void *)resp_event->params;
         resp_params->status = req_status;
         if (return_opp)
             resp_params->performance_level = ctx->current_opp.level;
@@ -883,7 +884,7 @@ static int dvfs_handle_psu_set_voltage_resp(struct mod_dvfs_domain_ctx *ctx,
 {
     int status = FWK_SUCCESS;
     struct mod_psu_driver_response *psu_response =
-        (struct mod_psu_driver_response *)event->params;
+        (struct mod_psu_driver_response *)(void *)event->params;
 
     if (psu_response->status != FWK_SUCCESS)
         return dvfs_complete(ctx, NULL, psu_response->status);
@@ -920,7 +921,7 @@ static int dvfs_handle_clk_set_freq_resp(struct mod_dvfs_domain_ctx *ctx,
 {
     int status;
     struct mod_clock_driver_resp_params *clock_response =
-        (struct mod_clock_driver_resp_params *)event->params;
+        (struct mod_clock_driver_resp_params *)(void *)event->params;
 
     if (clock_response->status != FWK_SUCCESS)
         return dvfs_complete(ctx, NULL, clock_response->status);
@@ -1037,7 +1038,7 @@ static int mod_dvfs_process_event(const struct fwk_event *event,
          * Handle get_voltage() asynchronously, cookie will have been saved
          * above so we can safely discard the resp_event.
          */
-        psu_response = (struct mod_psu_driver_response *)event->params;
+        psu_response = (struct mod_psu_driver_response *)(void *)event->params;
         status = dvfs_handle_psu_get_voltage_resp(ctx, NULL,
             psu_response->status, psu_response->voltage);
         if (status == FWK_PENDING)

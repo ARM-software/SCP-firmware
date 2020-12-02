@@ -129,7 +129,7 @@ static int msys_rom_process_event(const struct fwk_event *event,
     /* Notify any subscribers of the SYSTOP power domain state change */
     notification_params =
         (struct mod_pd_power_state_transition_notification_params *)
-            systop_on_event.params;
+            (void *)systop_on_event.params;
     notification_params->state = MOD_PD_STATE_ON;
 
     status = fwk_notification_notify(&systop_on_event, &ctx.notification_count);

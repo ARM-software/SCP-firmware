@@ -95,7 +95,7 @@ static int set_enabled(fwk_id_t id, bool enable, enum scp_debug_user user_id)
             .response_requested = true,
         };
 
-        req_params = (struct mod_debug_request_params *)&req.params;
+        req_params = (struct mod_debug_request_params *)(void *)req.params;
         req_params->user_id = user_id;
         req_params->enable = enable;
 
@@ -138,7 +138,7 @@ static int get_enabled(fwk_id_t id, bool *enable, enum scp_debug_user user_id)
             .response_requested = true,
         };
 
-        req_params = (struct mod_debug_request_params *)&req.params;
+        req_params = (struct mod_debug_request_params *)(void *)req.params;
         req_params->user_id = user_id;
 
         status = fwk_thread_put_event(&req);
@@ -192,7 +192,7 @@ static int enable_request(fwk_id_t id,
         .id = mod_debug_event_id_req_drv,
     };
 
-    req_params = (struct mod_debug_request_params *)&req.params;
+    req_params = (struct mod_debug_request_params *)(void *)req.params;
     req_params->user_id = user_id;
     req_params->enable = enable;
 
@@ -210,7 +210,7 @@ static void request_complete(fwk_id_t id,
     struct fwk_event event;
     struct debug_dev_ctx *ctx;
     struct mod_debug_response_params *resp_params =
-        (struct mod_debug_response_params *)event.params;
+        (struct mod_debug_response_params *)(void *)event.params;
 
     fwk_assert(response != NULL);
 
@@ -347,9 +347,9 @@ static int respond(const struct fwk_event *event)
     int status;
     struct fwk_event response;
     struct mod_debug_response_params *resp_params =
-        (struct mod_debug_response_params *)response.params;
+        (struct mod_debug_response_params *)(void *)response.params;
     struct mod_debug_response_params *req_result =
-        (struct mod_debug_response_params *)event->params;
+        (struct mod_debug_response_params *)(void *)event->params;
     struct debug_dev_ctx *ctx =
         &ctx_table[fwk_id_get_element_idx(event->target_id)];
 
@@ -379,7 +379,7 @@ static int mod_debug_process_event(const struct fwk_event *event,
     case MOD_DEBUG_PUBLIC_EVENT_IDX_REQ_ENABLE_GET:
     case MOD_DEBUG_PUBLIC_EVENT_IDX_REQ_ENABLE_SET:
     case MOD_DEBUG_EVENT_IDX_REQ_DRV:
-        req_params = (struct mod_debug_request_params *)event->params;
+        req_params = (struct mod_debug_request_params *)(void *)event->params;
         ctx->requester = req_params->user_id;
 
         /* Request from USER_AP we will need to respond */
@@ -403,7 +403,7 @@ static int mod_debug_process_event(const struct fwk_event *event,
         break;
 
     case MOD_DEBUG_EVENT_IDX_SET_COMPLETE:
-        req_result = (struct mod_debug_response_params *)event->params;
+        req_result = (struct mod_debug_response_params *)(void *)event->params;
 
         if (req_result->status == FWK_SUCCESS)
             mark_user(event->target_id, req_result->enabled, ctx->requester);

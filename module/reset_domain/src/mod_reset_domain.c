@@ -73,7 +73,7 @@ static int reset_issued_notify(fwk_id_t dev_id,
 
     struct mod_reset_domain_notification_event_params* params =
         (struct mod_reset_domain_notification_event_params*)
-        notification_event.params;
+        (void *)notification_event.params;
 
     /* Loop through device context table to get the associated domain_id */
     for (i = 0; i < module_reset_ctx.dev_count; i++) {
@@ -99,7 +99,7 @@ static int rd_process_event(
     struct fwk_event *resp)
 {
     struct mod_reset_domain_autoreset_event_params* params =
-        (struct mod_reset_domain_autoreset_event_params*)event->params;
+        (struct mod_reset_domain_autoreset_event_params*)(void *)event->params;
 
     if (!fwk_id_is_equal(mod_reset_domain_autoreset_event_id,
                          event->id))

@@ -372,11 +372,11 @@ static int mod_psu_process_event(
     struct fwk_event hal_event;
 
     const struct mod_psu_driver_response *params =
-        (struct mod_psu_driver_response *)event->params;
+        (struct mod_psu_driver_response *)(void *)event->params;
     struct mod_psu_response *resp_params =
-        (struct mod_psu_response *)resp_event->params;
+        (struct mod_psu_response *)(void *)resp_event->params;
     struct mod_psu_response *hal_params =
-        (struct mod_psu_response *)&hal_event.params;
+        (struct mod_psu_response *)(void *)hal_event.params;
 
     const struct mod_psu_element_cfg *cfg;
     struct mod_psu_element_ctx *ctx;

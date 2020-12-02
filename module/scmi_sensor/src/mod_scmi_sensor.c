@@ -537,7 +537,7 @@ static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
         .id = mod_scmi_sensor_event_id_get_request,
     };
 
-    params = (struct scmi_sensor_event_parameters *)event.params;
+    params = (struct scmi_sensor_event_parameters *)(void *)event.params;
     params->sensor_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR,
                                        sensor_idx);
 
@@ -852,7 +852,7 @@ static int scmi_sensor_process_event(const struct fwk_event *event,
 
     /* Request event to sensor HAL */
     if (fwk_id_is_equal(event->id, mod_scmi_sensor_event_id_get_request)) {
-        params = (struct scmi_sensor_event_parameters *)event->params;
+        params = (struct scmi_sensor_event_parameters *)(void *)event->params;
 
         status = scmi_sensor_ctx.sensor_api->get_value(params->sensor_id,
                                                        &sensor_value);
@@ -884,7 +884,7 @@ static int scmi_sensor_process_event(const struct fwk_event *event,
     /* Response event from sensor HAL */
     if (fwk_id_is_equal(event->id, mod_sensor_event_id_read_request)) {
         struct mod_sensor_event_params *params =
-            (struct mod_sensor_event_params *)event->params;
+            (struct mod_sensor_event_params *)(void *)event->params;
 
         return_values = (struct scmi_sensor_protocol_reading_get_p2a) {
             .sensor_value_low = (uint32_t)params->value,

@@ -66,7 +66,7 @@ static int create_i2c_request(fwk_id_t dev_id,
     int status;
     struct fwk_event event;
     struct mod_i2c_request *event_param =
-        (struct mod_i2c_request *)event.params;
+        (struct mod_i2c_request *)(void *)event.params;
 
     /* The slave address should be on 7 bits */
     if (!fwk_expect(request->slave_address < 0x80))
@@ -182,7 +182,7 @@ static void transaction_completed(fwk_id_t dev_id, int i2c_status)
     int status;
     struct fwk_event event;
     struct mod_i2c_event_param* param =
-        (struct mod_i2c_event_param *)event.params;
+        (struct mod_i2c_event_param *)(void *)event.params;
 
     event = (struct fwk_event) {
         .target_id = dev_id,
@@ -283,7 +283,7 @@ static int respond_to_caller(
     int status;
     struct fwk_event resp;
     struct mod_i2c_event_param *param =
-        (struct mod_i2c_event_param *)resp.params;
+        (struct mod_i2c_event_param *)(void *)resp.params;
 
     status = fwk_thread_get_first_delayed_response(dev_id, &resp);
     if (status != FWK_SUCCESS)
@@ -371,12 +371,13 @@ static int process_next_request(fwk_id_t dev_id, struct mod_i2c_dev_ctx *ctx)
     if (status != FWK_SUCCESS)
         return status;
 
-    request = (struct mod_i2c_request *)delayed_response.params;
+    request = (struct mod_i2c_request *)(void *)delayed_response.params;
     ctx->request = *request;
 
     drv_status = process_request(ctx, delayed_response.id);
     if (drv_status != FWK_PENDING) {
-        event_param = (struct mod_i2c_event_param *)delayed_response.params;
+        event_param = (struct mod_i2c_event_param *)(void *)
+            delayed_response.params;
         event_param->status = drv_status;
 
         status = fwk_thread_put_event(&delayed_response);
@@ -404,7 +405,8 @@ static int mod_i2c_process_event(const struct fwk_event *event,
 
     if (is_request) {
         if (ctx->state == MOD_I2C_DEV_PANIC) {
-            event_param = (struct mod_i2c_event_param *)resp_event->params;
+            event_param = (struct mod_i2c_event_param *)
+                (void *)resp_event->params;
             event_param->status = FWK_E_PANIC;
 
             return FWK_SUCCESS;
@@ -414,7 +416,7 @@ static int mod_i2c_process_event(const struct fwk_event *event,
             return FWK_SUCCESS;
         }
 
-        request = (struct mod_i2c_request *)event->params;
+        request = (struct mod_i2c_request *)(void *)event->params;
         ctx->request = *request;
 
         drv_status = process_request(ctx, event->id);
@@ -423,7 +425,8 @@ static int mod_i2c_process_event(const struct fwk_event *event,
             resp_event->is_delayed_response = true;
         else {
             /* The request has succeeded or failed, respond now */
-            resp_param = (struct mod_i2c_event_param *)resp_event->params;
+            resp_param = (struct mod_i2c_event_param *)
+                (void *)resp_event->params;
 
             resp_param->status = (drv_status == FWK_SUCCESS) ?
                                  FWK_SUCCESS : FWK_E_DEVICE;
@@ -435,7 +438,7 @@ static int mod_i2c_process_event(const struct fwk_event *event,
 
     switch (fwk_id_get_event_idx(event->id)) {
     case MOD_I2C_EVENT_IDX_REQUEST_COMPLETED:
-        event_param = (struct mod_i2c_event_param *)event->params;
+        event_param = (struct mod_i2c_event_param *)(void *)event->params;
 
         if ((ctx->state == MOD_I2C_DEV_TX) || (ctx->state == MOD_I2C_DEV_RX)) {
             status = respond_to_caller(dev_id, ctx, event_param->status);
