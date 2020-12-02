@@ -37,12 +37,14 @@ static struct {
 static struct fwk_io_stream *fwk_log_stream;
 
 #ifdef FWK_LOG_BUFFERED
-static FWK_CONSTRUCTOR void fwk_log_stream_init(void)
+static void fwk_log_stream_init(void)
 {
     static char storage[FMW_LOG_BUFFER_SIZE];
 
     fwk_ring_init(&fwk_log_ctx.ring, storage, sizeof(storage));
 }
+
+FWK_INIT_CONSTRUCTOR(fwk_notification_init);
 #endif
 
 int fwk_log_init(void)

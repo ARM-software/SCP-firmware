@@ -40,11 +40,13 @@ static const struct fwk_element config_stdio_elements[] = {
     [CONFIG_STDIO_ELEMENT_IDX_COUNT] = { 0 },
 };
 
-static FWK_CONSTRUCTOR void config_stdio_init(void)
+static void config_stdio_init(void)
 {
     config_stdio_element_cfg[CONFIG_STDIO_ELEMENT_IDX_STDIN].stream = stdin;
     config_stdio_element_cfg[CONFIG_STDIO_ELEMENT_IDX_STDOUT].stream = stdout;
 }
+
+FWK_INIT_CONSTRUCTOR(config_stdio_init);
 
 const struct fwk_module_config config_stdio = {
     .elements = FWK_MODULE_STATIC_ELEMENTS_PTR(config_stdio_elements),
