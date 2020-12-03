@@ -13,6 +13,10 @@
 #include <assert.h>
 #include <stdbool.h>
 
+#ifndef __USE_ISOC11
+#define static_assert _Static_assert
+#endif
+
 /*!
  * \addtogroup GroupLibFramework
  * \defgroup GroupAssert Assertion Helpers
