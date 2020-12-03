@@ -30,10 +30,20 @@
 #include <stdbool.h>
 #include <string.h>
 
-static struct __fwk_thread_ctx ctx;
+#ifdef BUILD_OPTEE
+#include <kernel/thread.h>
+#endif
 
-static const char err_msg_line[] = "[FWK] Error %d in %s @%d";
-static const char err_msg_func[] = "[FWK] Error %d in %s";
+static struct __fwk_thread_ctx global_ctx;
+
+#if defined(BUILD_OPTEE)
+#include <compiler.h>
+#else
+#define __maybe_unused
+#endif /* BUILD_OPTEE */
+
+static const char __maybe_unused err_msg_line[] = "[FWK] Error %d in %s @%d";
+static const char __maybe_unused err_msg_func[] = "[FWK] Error %d in %s";
 
 /* States for put_event_and_wait */
 enum wait_states {
@@ -46,6 +56,41 @@ enum thread_interrupt_states {
     INTERRUPT_THREAD = 1,
     NOT_INTERRUPT_THREAD = 2,
 };
+
+static struct __fwk_thread_ctx *thread_ctx[CFG_NUM_THREADS];
+
+struct __fwk_thread_ctx *__fwk_thread_get_ctx(void)
+{
+    struct  __fwk_thread_ctx *tmp;
+    int thread_id = thread_get_id();
+
+    return thread_ctx[thread_id];
+}
+
+void fwk_set_thread_ctx(fwk_id_t id)
+{
+    struct  __fwk_thread_ctx *tmp = NULL;
+    int thread_id = thread_get_id();
+
+    /* Find a thread context */
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
+        tmp = fwk_module_get_ctx(id)->thread_ctx;
+    }
+
+    /* Find an element or sub-element context */
+    if (!tmp &&
+            (fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT) ||
+             fwk_id_is_type(id, FWK_ID_TYPE_SUB_ELEMENT))) {
+        tmp = fwk_module_get_element_ctx(id)->thread_ctx;
+    }
+
+    /* Use global one if nothig else */
+    if (!tmp)
+        tmp = &global_ctx;
+
+    /* Save thread context */
+    thread_ctx[thread_id] = tmp;
+}
 
 /*
  * Static functions
@@ -64,12 +109,15 @@ enum thread_interrupt_states {
 static struct fwk_event *duplicate_event(struct fwk_event *event)
 {
     struct fwk_event *allocated_event = NULL;
+    struct __fwk_thread_ctx *ctx;
 
     fwk_assert(event != NULL);
 
+    ctx = __fwk_thread_get_ctx();
+
     fwk_interrupt_global_disable();
     allocated_event = FWK_LIST_GET(
-        fwk_list_pop_head(&ctx.free_event_queue), struct fwk_event, slist_node);
+        fwk_list_pop_head(&ctx->free_event_queue), struct fwk_event, slist_node);
     fwk_interrupt_global_enable();
 
     if (allocated_event == NULL) {
@@ -86,6 +134,7 @@ static struct fwk_event *duplicate_event(struct fwk_event *event)
 }
 
 static int put_event(
+    struct __fwk_thread_ctx *ctx,
     struct fwk_event *event,
     enum thread_interrupt_states intr_state)
 {
@@ -112,8 +161,8 @@ static int put_event(
             sizeof(allocated_event->params));
 
         /* Is this the event put_event_and_wait is waiting for ? */
-        if (ctx.waiting_event_processing_completion &&
-            (ctx.cookie == event->cookie))
+        if (ctx->waiting_event_processing_completion &&
+            (ctx->cookie == event->cookie))
             is_wakeup_event = true;
     } else {
         allocated_event = duplicate_event(event);
@@ -121,10 +170,10 @@ static int put_event(
             return FWK_E_NOMEM;
     }
 
-    allocated_event->cookie = event->cookie = ctx.event_cookie_counter++;
+    allocated_event->cookie = event->cookie = ctx->event_cookie_counter++;
 
     if (is_wakeup_event)
-       ctx.cookie = event->cookie;
+       ctx->cookie = event->cookie;
 
     if (intr_state == UNKNOWN_THREAD) {
         status = fwk_interrupt_get_current(&interrupt);
@@ -134,9 +183,9 @@ static int put_event(
             intr_state = INTERRUPT_THREAD;
     }
     if (intr_state == NOT_INTERRUPT_THREAD)
-        fwk_list_push_tail(&ctx.event_queue, &allocated_event->slist_node);
+        fwk_list_push_tail(&ctx->event_queue, &allocated_event->slist_node);
     else
-        fwk_list_push_tail(&ctx.isr_event_queue, &allocated_event->slist_node);
+        fwk_list_push_tail(&ctx->isr_event_queue, &allocated_event->slist_node);
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
     FWK_LOG_TRACE(
@@ -152,12 +201,14 @@ static int put_event(
 
 static void free_event(struct fwk_event *event)
 {
+    struct __fwk_thread_ctx *ctx = __fwk_thread_get_ctx();
+
     fwk_interrupt_global_disable();
-    fwk_list_push_tail(&ctx.free_event_queue, &event->slist_node);
+    fwk_list_push_tail(&ctx->free_event_queue, &event->slist_node);
     fwk_interrupt_global_enable();
 }
 
-static void process_next_event(void)
+static void process_next_event(struct __fwk_thread_ctx *ctx)
 {
     int status;
     struct fwk_event *event, *allocated_event, async_response_event = { 0 };
@@ -165,9 +216,8 @@ static void process_next_event(void)
     int (*process_event)(const struct fwk_event *event,
                          struct fwk_event *resp_event);
 
-
-    ctx.current_event = event = FWK_LIST_GET(
-        fwk_list_pop_head(&ctx.event_queue), struct fwk_event, slist_node);
+    ctx->current_event = event = FWK_LIST_GET(
+        fwk_list_pop_head(&ctx->event_queue), struct fwk_event, slist_node);
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
     FWK_LOG_TRACE(
@@ -195,7 +245,7 @@ static void process_next_event(void)
         async_response_event.is_response = true;
         async_response_event.response_requested = false;
         if (!async_response_event.is_delayed_response)
-            put_event(&async_response_event, UNKNOWN_THREAD);
+            put_event(ctx, &async_response_event, UNKNOWN_THREAD);
         else {
             allocated_event = duplicate_event(&async_response_event);
             if (allocated_event != NULL) {
@@ -216,17 +266,17 @@ static void process_next_event(void)
         }
     }
 
-    ctx.current_event = NULL;
+    ctx->current_event = NULL;
     free_event(event);
     return;
 }
 
-static bool process_isr(void)
+static bool process_isr(struct __fwk_thread_ctx *ctx)
 {
     struct fwk_event *isr_event;
 
     fwk_interrupt_global_disable();
-    isr_event = FWK_LIST_GET(fwk_list_pop_head(&ctx.isr_event_queue),
+    isr_event = FWK_LIST_GET(fwk_list_pop_head(&ctx->isr_event_queue),
                              struct fwk_event, slist_node);
     fwk_interrupt_global_enable();
 
@@ -241,7 +291,7 @@ static bool process_isr(void)
         FWK_ID_STR(isr_event->target_id));
 #endif
 
-    fwk_list_push_tail(&ctx.event_queue, &isr_event->slist_node);
+    fwk_list_push_tail(&ctx->event_queue, &isr_event->slist_node);
 
     return true;
 }
@@ -250,57 +300,61 @@ static bool process_isr(void)
  * Private interface functions
  */
 
+#ifdef BUILD_OPTEE
+int __fwk_thread_init(size_t event_count, fwk_id_t id)
+#else
 int __fwk_thread_init(size_t event_count)
+#endif
 {
     struct fwk_event *event_table, *event;
+    struct __fwk_thread_ctx *ctx = __fwk_thread_get_ctx();
 
     event_table = fwk_mm_calloc(event_count, sizeof(struct fwk_event));
 
     /* All the event structures are free to be used. */
-    fwk_list_init(&ctx.free_event_queue);
-    fwk_list_init(&ctx.event_queue);
-    fwk_list_init(&ctx.isr_event_queue);
+    fwk_list_init(&ctx->free_event_queue);
+    fwk_list_init(&ctx->event_queue);
+    fwk_list_init(&ctx->isr_event_queue);
 
     for (event = event_table;
          event < (event_table + event_count);
          event++)
-        fwk_list_push_tail(&ctx.free_event_queue, &event->slist_node);
+        fwk_list_push_tail(&ctx->free_event_queue, &event->slist_node);
 
-    ctx.initialized = true;
+    ctx->initialized = true;
 
     return FWK_SUCCESS;
 }
 
 noreturn void __fwk_thread_run(void)
 {
-    for (;;) {
-        while (!fwk_list_is_empty(&ctx.event_queue))
-            process_next_event();
+    struct __fwk_thread_ctx *ctx = __fwk_thread_get_ctx();
 
-        if (process_isr())
+    for (;;) {
+        while (!fwk_list_is_empty(&ctx->event_queue))
+            process_next_event(ctx);
+
+        if (process_isr(ctx))
             continue;
 
         fwk_log_unbuffer();
     }
 }
 
-struct __fwk_thread_ctx *__fwk_thread_get_ctx(void)
-{
-    return &ctx;
-}
-
 void __fwk_run_event(void)
 {
-    for (;;) {
-        while (!fwk_list_is_empty(ctx.event_queue))
-            process_next_event();
+    struct __fwk_thread_ctx *ctx = __fwk_thread_get_ctx();
 
-        if (fwk_list_is_empty(ctx.isr_event_queue)) {
+    for (;;) {
+        while (!fwk_list_is_empty(&ctx->event_queue))
+            process_next_event(ctx);
+
+        if (fwk_list_is_empty(&ctx->isr_event_queue)) {
             fwk_log_unbuffer();
             return;
 	}
 
-       if (process_isr())
+       if (process_isr(ctx))
             continue;
 
         fwk_log_unbuffer();
@@ -309,7 +363,7 @@ void __fwk_run_event(void)
 
 const struct fwk_event *__fwk_thread_get_current_event(void)
 {
-    return ctx.current_event;
+    return __fwk_thread_get_ctx()->current_event;
 }
 
 #ifdef BUILD_HAS_NOTIFICATION
@@ -318,7 +372,7 @@ int __fwk_thread_put_notification(struct fwk_event *event)
     event->is_response = false;
     event->is_notification = true;
 
-    return put_event(event, UNKNOWN_THREAD);
+    return put_event(__fwk_thread_get_ctx(), event, UNKNOWN_THREAD);
 }
 #endif
 
@@ -331,9 +385,10 @@ int fwk_thread_put_event(struct fwk_event *event)
     int status = FWK_E_PARAM;
     unsigned int interrupt;
     enum thread_interrupt_states intr_state;
+    struct __fwk_thread_ctx *ctx = __fwk_thread_get_ctx();
 
 #ifdef BUILD_MODE_DEBUG
-    if (!ctx.initialized) {
+    if (!ctx->initialized) {
         status = FWK_E_INIT;
         goto error;
     }
@@ -348,8 +403,8 @@ int fwk_thread_put_event(struct fwk_event *event)
     else
         intr_state = INTERRUPT_THREAD;
 
-    if ((intr_state == NOT_INTERRUPT_THREAD) && (ctx.current_event != NULL))
-        event->source_id = ctx.current_event->target_id;
+    if ((intr_state == NOT_INTERRUPT_THREAD) && (ctx->current_event != NULL))
+        event->source_id = ctx->current_event->target_id;
     else if (!fwk_module_is_valid_entity_id(event->source_id)) {
         status = FWK_E_PARAM;
         goto error;
@@ -382,7 +437,7 @@ int fwk_thread_put_event(struct fwk_event *event)
     }
 #endif
 
-    return put_event(event, intr_state);
+    return put_event(ctx, event, intr_state);
 
 error:
     FWK_LOG_CRIT(err_msg_func, status, __func__);
@@ -400,10 +455,11 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
     struct fwk_event *allocated_event;
     int status = FWK_E_PARAM;
     enum wait_states wait_state = WAITING_FOR_EVENT;
+    struct __fwk_thread_ctx *ctx = __fwk_thread_get_ctx();
 #ifdef BUILD_MODE_DEBUG
     unsigned int interrupt;
 
-    if (!ctx.initialized) {
+    if (!ctx->initialized) {
         status = FWK_E_INIT;
         goto error;
     }
@@ -420,8 +476,8 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
     }
 #endif
 
-    if (ctx.current_event != NULL)
-        event->source_id = ctx.current_event->target_id;
+    if (ctx->current_event != NULL)
+        event->source_id = ctx->current_event->target_id;
     else if (!fwk_module_is_valid_entity_id(event->source_id)) {
         FWK_LOG_ERR(
             "[FWK] deprecated put_event_and_wait (%s: %s -> %s)\n",
@@ -432,12 +488,12 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
     }
 
     /* No support for nested put_event_and_wait calls */
-    if (ctx.waiting_event_processing_completion) {
+    if (ctx->waiting_event_processing_completion) {
         status = FWK_E_BUSY;
         goto error;
     }
-    ctx.waiting_event_processing_completion = true;
-    ctx.previous_event = ctx.current_event;
+    ctx->waiting_event_processing_completion = true;
+    ctx->previous_event = ctx->current_event;
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
     FWK_LOG_TRACE(
@@ -452,34 +508,34 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
     event->response_requested = true;
     event->is_notification = false;
 
-    status = put_event(event, NOT_INTERRUPT_THREAD);
+    status = put_event(ctx, event, NOT_INTERRUPT_THREAD);
     if (status != FWK_SUCCESS)
         goto exit;
 
-    ctx.cookie = event->cookie;
+    ctx->cookie = event->cookie;
 
     for (;;) {
 
-        if (fwk_list_is_empty(&ctx.event_queue)) {
-            process_isr();
+        if (fwk_list_is_empty(&ctx->event_queue)) {
+            process_isr(ctx);
             continue;
         }
 
-        ctx.current_event = next_event = FWK_LIST_GET(fwk_list_head(
-            &ctx.event_queue), struct fwk_event, slist_node);
+        ctx->current_event = next_event = FWK_LIST_GET(fwk_list_head(
+            &ctx->event_queue), struct fwk_event, slist_node);
 
-        if (next_event->cookie != ctx.cookie) {
+        if (next_event->cookie != ctx->cookie) {
             /*
             * Process any events waiting on the event_queue until
             * we get to the event from the waiting call.
             */
-            process_next_event();
+            process_next_event(ctx);
             continue;
         }
 
         /* This is either the original event or the response event */
         next_event = FWK_LIST_GET(
-            fwk_list_pop_head(&ctx.event_queue), struct fwk_event, slist_node);
+            fwk_list_pop_head(&ctx->event_queue), struct fwk_event, slist_node);
 
         if (wait_state == WAITING_FOR_EVENT) {
             module = fwk_module_get_ctx(next_event->target_id)->desc;
@@ -503,10 +559,10 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
             response_event.is_response = true;
             response_event.response_requested = false;
             if (!response_event.is_delayed_response) {
-                status = put_event(&response_event, UNKNOWN_THREAD);
+                status = put_event(ctx, &response_event, UNKNOWN_THREAD);
                 if (status != FWK_SUCCESS)
                     goto exit;
-                ctx.cookie = response_event.cookie;
+                ctx->cookie = response_event.cookie;
             } else {
                 allocated_event = duplicate_event(&response_event);
                 if (allocated_event != NULL) {
@@ -518,7 +574,7 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
                     status = FWK_E_NOMEM;
                     goto exit;
                 }
-                ctx.cookie = allocated_event->cookie;
+                ctx->cookie = allocated_event->cookie;
             }
 
             wait_state = WAITING_FOR_RESPONSE;
@@ -528,7 +584,7 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
              * Check for any interrupt events that might have been
              * queued while the event was being executed.
              */
-            process_isr();
+            process_isr(ctx);
             continue;
         }
 
@@ -546,8 +602,8 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
     }
 
 exit:
-    ctx.current_event = ctx.previous_event;
-    ctx.waiting_event_processing_completion = false;
+    ctx->current_event = ctx->previous_event;
+    ctx->waiting_event_processing_completion = false;
     if (status == FWK_SUCCESS)
         return status;
 error:

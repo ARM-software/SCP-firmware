@@ -533,6 +533,7 @@ static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
 
     /* The get_value request is processed within the event being generated */
     struct fwk_event event = {
+        .source_id = service_id,
         .target_id = fwk_module_id_scmi_sensor,
         .id = mod_scmi_sensor_event_id_get_request,
     };

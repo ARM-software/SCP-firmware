@@ -73,4 +73,40 @@ struct __fwk_thread_ctx {
  */
 struct __fwk_thread_ctx *__fwk_thread_get_ctx(void);
 
+// Added OP-TEE
+/*!
+ * \brief Put an event in a module or element thread queue and wait for it to
+ *      be processed.
+ *
+ * \details This framework API function can only be called from a module or
+ *      element's thread. The calling thread is suspended until the event
+ *      has been completely processed. As a consequence, this function cannot
+ *      be called during the pre-runtime phases.
+ *
+ *      The identifier of the event's source is filled in by the framework
+ *      with the identifier of the entity calling the function. Thus there is
+ *      no need for the caller to fill this event's field in.
+ *
+ *      The event identifier and target identifier are validated and must
+ *      belong to the same module.
+ *
+ *      Warning: As this API could have serious adverse effects on system
+ *               performance and throughput, this API has been deprecated
+ *               and should not be used in single-threaded mode.
+ *
+ * \param event Event to put into the queue for processing. Must not be \c NULL.
+ * \param[out] resp_event The response event. Must not be \c NULL.
+ *
+ * \retval FWK_SUCCESS The event was successfully processed.
+ * \retval FWK_E_STATE The execution is not started.
+ * \retval FWK_E_PARAM One or more of the parameters were invalid.
+ * \retval FWK_E_PARAM One or more fields in the \p event parameter were
+ *      invalid.
+ * \retval FWK_E_ACCESS The API is called from an ISR, called from the common
+ *      thread, or the event targets the calling thread.
+ */
+int fwk_thread_put_event_and_wait(struct fwk_event *event,
+    struct fwk_event *resp_event)
+    __attribute__((deprecated));
+
 #endif /* FWK_INTERNAL_SINGLE_THREAD_H */

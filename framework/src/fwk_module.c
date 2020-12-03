@@ -11,24 +11,36 @@
 #include <internal/fwk_id.h>
 #include <internal/fwk_module.h>
 #include <internal/fwk_thread.h>
+#ifdef BUILD_HAS_MULTITHREADING
+#include <internal/fwk_multi_thread.h>
+#else
+#include <internal/fwk_single_thread.h>
+#endif
 
 #include <fwk_assert.h>
 #include <fwk_cli_dbg.h>
 #include <fwk_dlist.h>
+#include <fwk_element.h>
 #include <fwk_list.h>
 #include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
+#include <fwk_thread.h>
 
 #include <stdbool.h>
 
+#ifdef BUILD_OPTEE
+/* Optimize a bit the integration */
+#    define FWK_MODULE_EVENT_COUNT 16
+#else
 #if FMW_NOTIFICATION_MAX > 64
 #    define FWK_MODULE_EVENT_COUNT FMW_NOTIFICATION_MAX
 #else
 #    define FWK_MODULE_EVENT_COUNT 64
 #endif
+#endif /*BUILD_OPTEE*/
 
 #define FWK_MODULE_BIND_ROUND_MAX 1
 
@@ -189,6 +201,18 @@ static void fwk_module_init_elements(struct fwk_module_ctx *ctx)
 
         status = desc->element_init(
             element_id, element->sub_element_count, element->data);
+
+#ifdef BUILD_OPTEE
+        if (status == FWK_PENDING) {
+            fwk_id_t none_id = FWK_ID_NONE_INIT;
+
+            ctx->thread_ctx = fwk_mm_calloc(1, sizeof(struct __fwk_thread_ctx));
+            fwk_set_thread_ctx(element_id);
+            status = __fwk_thread_init(FWK_MODULE_EVENT_COUNT, element_id);
+            fwk_set_thread_ctx(none_id);
+        }
+#endif
+
         if (!fwk_expect(status == FWK_SUCCESS))
             fwk_trap();
 
@@ -394,6 +418,7 @@ int fwk_module_start(void)
 {
     int status;
     unsigned int bind_round;
+    fwk_id_t none_id = FWK_ID_NONE_INIT;
 
     if (fwk_module_ctx.initialized) {
         FWK_LOG_CRIT(fwk_module_err_msg_func, FWK_E_STATE, __func__);
@@ -402,7 +427,9 @@ int fwk_module_start(void)
 
     CLI_DEBUGGER();
 
-    status = __fwk_thread_init(FWK_MODULE_EVENT_COUNT);
+    // OP-TEE hack: device ID as argument to set the thread context
+    fwk_set_thread_ctx(none_id);
+    status = __fwk_thread_init(FWK_MODULE_EVENT_COUNT, none_id);
     if (status != FWK_SUCCESS)
         return status;
 

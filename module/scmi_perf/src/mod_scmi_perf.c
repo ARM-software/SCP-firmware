@@ -617,6 +617,7 @@ static int scmi_perf_limits_get_handler(fwk_id_t service_id,
 
     /* The get_limits request is processed within the event being generated */
     struct fwk_event event = {
+        .source_id = service_id,
         .target_id = fwk_module_id_scmi_perf,
         .id = scmi_perf_get_limits,
     };
@@ -735,6 +736,7 @@ static int scmi_perf_level_get_handler(fwk_id_t service_id,
 
     /* The get_level request is processed within the event being generated */
     struct fwk_event event = {
+        .source_id = service_id,
         .target_id = fwk_module_id_scmi_perf,
         .id = scmi_perf_get_level,
     };
