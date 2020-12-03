@@ -576,18 +576,35 @@ FWK_WEAK int mod_scmi_clock_config_set_policy(
 /*
  * SCMI Resource Permissions handler
  */
-static unsigned int get_clock_id(const uint32_t *payload)
+static unsigned int get_clock_id(
+    const uint32_t *payload,
+    unsigned int message_id)
 {
+    unsigned int clock_id;
+
     /*
-     * Every SCMI Clock message is formatted with the clock ID
-     * as the first message element. We will use the clock_attributes
+     * Every SCMI Clock message - but CLOCK_RATE_SET - is formatted with the
+     * clock ID as the first message element. We will use the clock_attributes
      * message as a basic format to retrieve the clock ID to avoid
      * unnecessary code.
      */
-    const struct scmi_clock_attributes_a2p *parameters =
-        (const struct scmi_clock_attributes_a2p *)payload;
+    switch (message_id) {
+    case MOD_SCMI_CLOCK_RATE_SET: {
+        const struct scmi_clock_rate_set_a2p *parameters =
+            (const struct scmi_clock_rate_set_a2p *)payload;
 
-    return parameters->clock_id;
+        clock_id = parameters->clock_id;
+    } break;
+
+    default: {
+        const struct scmi_clock_attributes_a2p *parameters =
+            (const struct scmi_clock_attributes_a2p *)payload;
+
+        clock_id = parameters->clock_id;
+    } break;
+    }
+
+    return clock_id;
 }
 
 static int scmi_clock_permissions_handler(
@@ -612,7 +629,7 @@ static int scmi_clock_permissions_handler(
         return FWK_E_ACCESS;
     }
 
-    clock_id = get_clock_id(payload);
+    clock_id = get_clock_id(payload, message_id);
 
     perms = scmi_clock_ctx.res_perms_api->agent_has_resource_permission(
         agent_id, MOD_SCMI_PROTOCOL_ID_CLOCK, message_id, clock_id);
