@@ -289,6 +289,24 @@ struct __fwk_thread_ctx *__fwk_thread_get_ctx(void)
     return &ctx;
 }
 
+void __fwk_run_event(void)
+{
+    for (;;) {
+        while (!fwk_list_is_empty(ctx.event_queue))
+            process_next_event();
+
+        if (fwk_list_is_empty(ctx.isr_event_queue)) {
+            fwk_log_unbuffer();
+            return;
+	}
+
+       if (process_isr())
+            continue;
+
+        fwk_log_unbuffer();
+    }
+}
+
 const struct fwk_event *__fwk_thread_get_current_event(void)
 {
     return ctx.current_event;

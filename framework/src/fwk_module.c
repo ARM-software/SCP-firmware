@@ -426,7 +426,11 @@ int fwk_module_start(void)
 
     FWK_LOG_CRIT("[FWK] Module initialization complete!");
 
+#ifdef BUILD_OPTEE
+    __fwk_run_event();
+#else
     __fwk_thread_run();
+#endif
 
     return FWK_SUCCESS;
 }

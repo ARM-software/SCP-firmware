@@ -32,6 +32,16 @@ int __fwk_thread_init(size_t event_count);
  */
 noreturn void __fwk_thread_run(void);
 
+#ifdef BUILD_OPTEE
+/* Hack: Added by OP-TEE to process messages but not endlessly */
+/*
+ * \brief Processing events already raised by modules and interrupt handlers.
+ *
+ * \return The function does not return.
+ */
+void __fwk_run_event(void);
+#endif
+
 /*
  * \brief Get the event being currently processed.
  *
