@@ -3,6 +3,7 @@ BasedOnStyle: Chromium
 AlignAfterOpenBracket: AlwaysBreak
 AlignConsecutiveAssignments: 'false'
 AlignConsecutiveDeclarations: 'false'
+AlignConsecutiveMacros: 'true'
 AlignEscapedNewlines: 'DontAlign'
 AlignOperands: 'false'
 AlignTrailingComments: 'false'
