@@ -633,6 +633,70 @@ def main():
     result = subprocess.call(cmd, shell=True)
     results.append(('Product rdv1mc debug build (LLVM)', result))
 
+    banner('Test building rdn2 product')
+
+    subprocess.run('make clean', shell=True)
+
+    cmd = \
+        'CC=arm-none-eabi-gcc ' \
+        'PRODUCT=rdn2 ' \
+        'MODE=release ' \
+        'make clean all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product rdn2 release build (GCC)', result))
+
+    subprocess.run('make clean', shell=True)
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=rdn2 ' \
+        'MODE=release ' \
+        'make clean all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product rdn2 release build (ARM)', result))
+
+    subprocess.run('make clean', shell=True)
+
+    cmd = \
+        'SYSROOT_CC=arm-none-eabi-gcc ' \
+        'CC=clang-11 ' \
+        'PRODUCT=rdn2 ' \
+        'MODE=release ' \
+        'make all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product rdn2 release build (LLVM)', result))
+
+    subprocess.run('make clean', shell=True)
+
+    cmd = \
+        'CC=arm-none-eabi-gcc ' \
+        'PRODUCT=rdn2 ' \
+        'MODE=debug ' \
+        'make clean all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product rdn2 debug build (GCC)', result))
+
+    subprocess.run('make clean', shell=True)
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=rdn2 ' \
+        'MODE=debug ' \
+        'make clean all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product rdn2 debug build (ARM)', result))
+
+    subprocess.run('make clean', shell=True)
+
+    cmd = \
+        'SYSROOT_CC=arm-none-eabi-gcc ' \
+        'CC=clang-11 ' \
+        'PRODUCT=rdn2 ' \
+        'MODE=debug ' \
+        'make all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product rdn2 debug build (LLVM)', result))
+
     banner('Test building tc0 product')
 
     subprocess.run('make clean', shell=True)
