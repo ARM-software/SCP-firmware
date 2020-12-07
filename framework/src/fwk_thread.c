@@ -95,6 +95,7 @@ static int put_event(
     int status;
 
     if (event->is_delayed_response) {
+#ifdef BUILD_HAS_NOTIFICATION
         allocated_event = __fwk_thread_search_delayed_response(
             event->source_id, event->cookie);
         if (allocated_event == NULL) {
@@ -115,6 +116,9 @@ static int put_event(
         if (ctx.waiting_event_processing_completion &&
             (ctx.cookie == event->cookie))
             is_wakeup_event = true;
+#else
+        return FWK_E_PANIC;
+#endif
     } else {
         allocated_event = duplicate_event(event);
         if (allocated_event == NULL)
@@ -197,6 +201,7 @@ static void process_next_event(void)
         if (!async_response_event.is_delayed_response)
             put_event(&async_response_event, UNKNOWN_THREAD);
         else {
+#ifdef BUILD_HAS_NOTIFICATION
             allocated_event = duplicate_event(&async_response_event);
             if (allocated_event != NULL) {
                 fwk_list_push_tail(
@@ -204,6 +209,10 @@ static void process_next_event(void)
                         async_response_event.source_id),
                     &allocated_event->slist_node);
             }
+#else
+            FWK_LOG_CRIT(err_msg_line, status, __func__, __LINE__);
+            fwk_unexpected();
+#endif
         }
     } else {
         status = process_event(event, &async_response_event);
@@ -490,6 +499,7 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
                     goto exit;
                 ctx.cookie = response_event.cookie;
             } else {
+#ifdef BUILD_HAS_NOTIFICATION
                 allocated_event = duplicate_event(&response_event);
                 if (allocated_event != NULL) {
                     fwk_list_push_head(
@@ -501,6 +511,9 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
                     goto exit;
                 }
                 ctx.cookie = allocated_event->cookie;
+#else
+                return FWK_E_PANIC;
+#endif
             }
 
             wait_state = WAITING_FOR_RESPONSE;
