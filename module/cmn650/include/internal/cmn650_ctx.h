@@ -5,23 +5,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
- *      CMN_RHODES Context structure Interface
+ *      CMN650 Context structure Interface
  */
 
-#ifndef INTERNAL_CMN_RHODES_CTX_H
-#define INTERNAL_CMN_RHODES_CTX_H
+#ifndef INTERNAL_CMN650_CTX_H
+#define INTERNAL_CMN650_CTX_H
 
-#include <cmn_rhodes.h>
+#include <cmn650.h>
 
-#include <mod_cmn_rhodes.h>
+#include <mod_cmn650.h>
 
 #include <stdbool.h>
 #include <stdint.h>
 
-struct cmn_rhodes_device_ctx {
-    const struct mod_cmn_rhodes_config *config;
+struct cmn650_device_ctx {
+    const struct mod_cmn650_config *config;
 
-    struct cmn_rhodes_cfgm_reg *root;
+    struct cmn650_cfgm_reg *root;
 
     /* Number of HN-F (system cache) nodes in the system */
     unsigned int hnf_count;
@@ -45,7 +45,7 @@ struct cmn_rhodes_device_ctx {
      * parameters are known
      */
     unsigned int internal_rnsam_count;
-    struct cmn_rhodes_rnsam_reg **internal_rnsam_table;
+    struct cmn650_rnsam_reg **internal_rnsam_table;
 
     /* Count of RN Nodes for the use in CCIX programming */
     unsigned int rnd_count;
@@ -81,4 +81,4 @@ struct cmn_rhodes_device_ctx {
     bool initialized;
 };
 
-#endif /* INTERNAL_CMN_RHODES_CTX_H */
+#endif /* INTERNAL_CMN650_CTX_H */

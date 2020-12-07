@@ -8,7 +8,7 @@
 #include "clock_soc.h"
 #include "scp_css_mmap.h"
 
-#include <mod_cmn_rhodes.h>
+#include <mod_cmn650.h>
 
 #include <fwk_id.h>
 #include <fwk_macros.h>
@@ -20,7 +20,7 @@
 #include <stdint.h>
 
 /*
- * CMN_RHODES nodes
+ * CMN650 nodes
  */
 #define MEM_CNTRL0_ID 12
 #define MEM_CNTRL1_ID 136
@@ -48,7 +48,7 @@ static const unsigned int snf_table[] = {
     MEM_CNTRL3_ID, /* Maps to HN-F logical node 15 */
 };
 
-static const struct mod_cmn_rhodes_mem_region_map mmap[] = {
+static const struct mod_cmn650_mem_region_map mmap[] = {
     {
         /*
          * System cache backed region
@@ -56,7 +56,7 @@ static const struct mod_cmn_rhodes_mem_region_map mmap[] = {
          */
         .base = UINT64_C(0x000000000000),
         .size = UINT64_C(4) * FWK_TIB,
-        .type = MOD_CMN_RHODES_MEM_REGION_TYPE_SYSCACHE,
+        .type = MOD_CMN650_MEM_REGION_TYPE_SYSCACHE,
     },
     {
         /*
@@ -65,7 +65,7 @@ static const struct mod_cmn_rhodes_mem_region_map mmap[] = {
          */
         .base = UINT64_C(0x000000000000),
         .size = UINT64_C(128) * FWK_MIB,
-        .type = MOD_CMN_RHODES_REGION_TYPE_SYSCACHE_SUB,
+        .type = MOD_CMN650_REGION_TYPE_SYSCACHE_SUB,
         .node_id = NODE_ID_SBSX,
     },
     {
@@ -75,7 +75,7 @@ static const struct mod_cmn_rhodes_mem_region_map mmap[] = {
          */
         .base = UINT64_C(0x0008000000),
         .size = UINT64_C(128) * FWK_MIB,
-        .type = MOD_CMN_RHODES_MEM_REGION_TYPE_IO,
+        .type = MOD_CMN650_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HND,
     },
     {
@@ -85,7 +85,7 @@ static const struct mod_cmn_rhodes_mem_region_map mmap[] = {
          */
         .base = UINT64_C(0x0010000000),
         .size = UINT64_C(256) * FWK_MIB,
-        .type = MOD_CMN_RHODES_MEM_REGION_TYPE_IO,
+        .type = MOD_CMN650_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HND,
     },
     {
@@ -95,7 +95,7 @@ static const struct mod_cmn_rhodes_mem_region_map mmap[] = {
          */
         .base = UINT64_C(0x0020000000),
         .size = UINT64_C(512) * FWK_MIB,
-        .type = MOD_CMN_RHODES_MEM_REGION_TYPE_IO,
+        .type = MOD_CMN650_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HND,
     },
     {
@@ -105,16 +105,16 @@ static const struct mod_cmn_rhodes_mem_region_map mmap[] = {
          */
         .base = UINT64_C(0x0040000000),
         .size = UINT64_C(1) * FWK_GIB,
-        .type = MOD_CMN_RHODES_MEM_REGION_TYPE_IO,
+        .type = MOD_CMN650_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HND,
     },
 };
 
-static const struct fwk_element cmn_rhodes_device_table[] = {
+static const struct fwk_element cmn650_device_table[] = {
     [0] = {
-        .name = "Chip-0 CMN-Rhodes Mesh Config",
-        .data = &((struct mod_cmn_rhodes_config){
-                .base = SCP_CMN_RHODES_BASE,
+        .name = "Chip-0 CMN-650 Mesh Config",
+        .data = &((struct mod_cmn650_config){
+                .base = SCP_CMN650_BASE,
                 .mesh_size_x = 3,
                 .mesh_size_y = 5,
                 .hnd_node_id = NODE_ID_HND,
@@ -131,11 +131,11 @@ static const struct fwk_element cmn_rhodes_device_table[] = {
     [1] = { 0 }
 };
 
-static const struct fwk_element *cmn_rhodes_get_device_table(fwk_id_t module_id)
+static const struct fwk_element *cmn650_get_device_table(fwk_id_t module_id)
 {
-    return cmn_rhodes_device_table;
+    return cmn650_device_table;
 }
 
-const struct fwk_module_config config_cmn_rhodes = {
-    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(cmn_rhodes_get_device_table),
+const struct fwk_module_config config_cmn650 = {
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(cmn650_get_device_table),
 };

@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef MOD_CMN_RHODES_H
-#define MOD_CMN_RHODES_H
+#ifndef MOD_CMN650_H
+#define MOD_CMN650_H
 
 #include <fwk_id.h>
 
@@ -20,60 +20,60 @@
  */
 
 /*!
- * \defgroup GroupModuleCMN_RHODES CMN_RHODES
+ * \defgroup GroupModuleCMN650 CMN650
  *
- * \brief Arm Coherent Mesh Network (CMN) RHODES module
+ * \brief Arm Coherent Mesh Network (CMN) 650 module
  *
- * \details This module adds support for the CMN_RHODES interconnect
+ * \details This module adds support for the CMN650 interconnect
  * \{
  */
 
 /*! Maximum CCIX Protocol Links supported by CCIX Gateway (CXG) */
-#define CMN_RHODES_MAX_CCIX_PROTOCOL_LINKS  3
+#define CMN650_MAX_CCIX_PROTOCOL_LINKS 3
 
 /*! Maximum RA SAM Address regions */
-#define CMN_RHODES_MAX_RA_SAM_ADDR_REGION   8
+#define CMN650_MAX_RA_SAM_ADDR_REGION 8
 
 /*!
  * \brief Module API indices
  */
-enum mod_cmn_rhodes_api_idx {
+enum mod_cmn650_api_idx {
     /*! Index of the PPU_V1 power state observer API */
-    MOD_CMN_RHODES_API_IDX_PPU_OBSERVER,
+    MOD_CMN650_API_IDX_PPU_OBSERVER,
 
     /*! Number of APIs */
-    MOD_CMN_RHODES_API_COUNT
+    MOD_CMN650_API_COUNT
 };
 
 /*!
  * \brief Memory region configuration type
  */
-enum mod_cmn_rhodes_mem_region_type {
+enum mod_cmn650_mem_region_type {
     /*! Input/Output region (serviced by dedicated HN-I and HN-D nodes) */
-    MOD_CMN_RHODES_MEM_REGION_TYPE_IO,
+    MOD_CMN650_MEM_REGION_TYPE_IO,
 
     /*!
      * Region backed by the system cache (serviced by all HN-F nodes in the
      * system)
      */
-    MOD_CMN_RHODES_MEM_REGION_TYPE_SYSCACHE,
+    MOD_CMN650_MEM_REGION_TYPE_SYSCACHE,
 
     /*!
      * Sub region of the system cache for non-hashed access (serviced by
      * dedicated SN-F nodes).
      */
-    MOD_CMN_RHODES_REGION_TYPE_SYSCACHE_SUB,
+    MOD_CMN650_REGION_TYPE_SYSCACHE_SUB,
 
     /*!
      * Region used for CCIX access (serviced by the CXRA nodes).
      */
-    MOD_CMN_RHODES_REGION_TYPE_CCIX,
+    MOD_CMN650_REGION_TYPE_CCIX,
 };
 
 /*!
  * \brief Memory region map descriptor
  */
-struct mod_cmn_rhodes_mem_region_map {
+struct mod_cmn650_mem_region_map {
     /*! Base address */
     uint64_t base;
 
@@ -81,12 +81,12 @@ struct mod_cmn_rhodes_mem_region_map {
     uint64_t size;
 
     /*! Region configuration type */
-    enum mod_cmn_rhodes_mem_region_type type;
+    enum mod_cmn650_mem_region_type type;
 
     /*!
      * \brief Target node identifier
      *
-     * \note Not used for ::MOD_CMN_RHODES_REGION_TYPE_SYSCACHE_SUB memory
+     * \note Not used for ::MOD_CMN650_REGION_TYPE_SYSCACHE_SUB memory
      *      regions as it uses the pool of HN-F nodes available in the system.
      */
     unsigned int node_id;
@@ -101,14 +101,14 @@ struct mod_cmn_rhodes_mem_region_map {
  *      holds the start and end Agent IDs for each link. The remote AgentID to
  *      LinkID LUT registers (por_{cxg_ra,cxg_ha,
  *      cxla}_agentid_to_linkid_reg<X>) will be configured sequentially from
- *      ::mod_cmn_rhodes_agentid_to_linkid_map::remote_agentid_start and
- *      ::mod_cmn_rhodes_agentid_to_linkid_map::remote_agentid_end values. For
+ *      ::mod_cmn650_agentid_to_linkid_map::remote_agentid_start and
+ *      ::mod_cmn650_agentid_to_linkid_map::remote_agentid_end values. For
  *      all three links, corresponding to these remote Agent IDs, HN-F's
  *      RN_PHYS_ID registers will be programmed with the node id of the CXG
  *      Gateway block.
  *
  */
-struct mod_cmn_rhodes_agentid_to_linkid_map {
+struct mod_cmn650_agentid_to_linkid_map {
     /*! Remote Agent ID start */
     unsigned int remote_agentid_start;
 
@@ -120,7 +120,7 @@ struct mod_cmn_rhodes_agentid_to_linkid_map {
  * \brief Remote Memory region map descriptor which will be used by CXRA SAM
  *      programming
  */
-struct mod_cmn_rhodes_ra_mem_region_map {
+struct mod_cmn650_ra_mem_region_map {
     /*! Base address */
     uint64_t base;
 
@@ -135,14 +135,14 @@ struct mod_cmn_rhodes_ra_mem_region_map {
  * \brief CCIX Gateway block descriptor
  *
  * \details Each CCIX Gateway block (CXG) can have up to eight remote memory map
- *      ::mod_cmn_rhodes_ra_mem_region_map descriptors and can have three links
+ *      ::mod_cmn650_ra_mem_region_map descriptors and can have three links
  *      which can target range of remote agent ids. User is expected to assign
- *      an Home AgentID (HAID) ::mod_cmn_rhodes_ccix_config::haid for each
+ *      an Home AgentID (HAID) ::mod_cmn650_ccix_config::haid for each
  *      logical ids of the CXG blocks. Overall structure of the descriptor is
  *      shown below:
  *
  *         +----------------------------------------------------------+
- *         | mod_cmn_rhodes_ccix_config<ldid>                         |
+ *         | mod_cmn650_ccix_config<ldid>                             |
  *         |                                                          |
  *         |   HAID = haid                                            |
  *         +----------------------------------------------------------+
@@ -174,7 +174,7 @@ struct mod_cmn_rhodes_ra_mem_region_map {
  *         |                                  |                       |
  *         +----------------------------------+-----------------------+
  */
-struct mod_cmn_rhodes_ccix_config {
+struct mod_cmn650_ccix_config {
     /*! Logical ID of the CXG block to which this configuration applies */
     unsigned int ldid;
 
@@ -185,27 +185,27 @@ struct mod_cmn_rhodes_ccix_config {
     unsigned int remote_rnf_count;
 
     /*! Table of region memory map entries */
-    const struct mod_cmn_rhodes_mem_region_map remote_mmap_table;
+    const struct mod_cmn650_mem_region_map remote_mmap_table;
 
     /*! Table of remote region memory map entries */
-    const struct mod_cmn_rhodes_ra_mem_region_map
-        ra_mmap_table[CMN_RHODES_MAX_RA_SAM_ADDR_REGION];
+    const struct mod_cmn650_ra_mem_region_map
+        ra_mmap_table[CMN650_MAX_RA_SAM_ADDR_REGION];
 
-    /*! Number of entries in the ::mod_cmn_rhodes_ccix_config::ra_mmap_table */
+    /*! Number of entries in the ::mod_cmn650_ccix_config::ra_mmap_table */
     size_t ra_mmap_count;
 
     /*! Table of remote agent ids start and end backed by the links */
-    struct mod_cmn_rhodes_agentid_to_linkid_map
-        remote_agentid_to_linkid_map[CMN_RHODES_MAX_CCIX_PROTOCOL_LINKS];
+    struct mod_cmn650_agentid_to_linkid_map
+        remote_agentid_to_linkid_map[CMN650_MAX_CCIX_PROTOCOL_LINKS];
 
     /*! SMP Mode */
     bool smp_mode;
 };
 
 /*!
- * \brief CMN_RHODES configuration data
+ * \brief CMN650 configuration data
  */
-struct mod_cmn_rhodes_config {
+struct mod_cmn650_config {
     /*! Peripheral base address. */
     uintptr_t base;
 
@@ -227,21 +227,21 @@ struct mod_cmn_rhodes_config {
      */
     const unsigned int *snf_table;
 
-    /*! Number of entries in the ::mod_cmn_rhodes_config::snf_table */
+    /*! Number of entries in the ::mod_cmn650_config::snf_table */
     size_t snf_count;
 
     /*! Table of region memory map entries */
-    const struct mod_cmn_rhodes_mem_region_map *mmap_table;
+    const struct mod_cmn650_mem_region_map *mmap_table;
 
-    /*! Number of entries in the ::mod_cmn_rhodes_config::mmap_table */
+    /*! Number of entries in the ::mod_cmn650_config::mmap_table */
     size_t mmap_count;
 
     /*! Table of CCIX configuration */
-    const struct mod_cmn_rhodes_ccix_config *ccix_config_table;
+    const struct mod_cmn650_ccix_config *ccix_config_table;
 
     /*!
      * \brief Number of entries in the
-     *      ::mod_cmn_rhodes_config::ccix_config_table table.
+     *      ::mod_cmn650_config::ccix_config_table table.
      */
     const size_t ccix_table_count;
 
@@ -268,4 +268,4 @@ struct mod_cmn_rhodes_config {
  * \}
  */
 
-#endif /* MOD_CMN_RHODES_H */
+#endif /* MOD_CMN650_H */

@@ -8,14 +8,14 @@
 #include "clock_soc.h"
 #include "scp_css_mmap.h"
 
-#include <mod_cmn_rhodes.h>
+#include <mod_cmn650.h>
 
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 
 /*
- * CMN_RHODES nodes
+ * CMN650 nodes
  */
 #define MEM_CNTRL0_ID 332
 #define MEM_CNTRL1_ID 333
@@ -115,7 +115,7 @@ static const unsigned int snf_table_1_3[] = {
     MEM_CNTRL7_ID, /* Maps to HN-F logical node 31 */
 };
 
-static const struct mod_cmn_rhodes_mem_region_map mmap[] = {
+static const struct mod_cmn650_mem_region_map mmap[] = {
     {
         /*
          * System cache backed region
@@ -123,7 +123,7 @@ static const struct mod_cmn_rhodes_mem_region_map mmap[] = {
          */
         .base = UINT64_C(0x000000000000),
         .size = UINT64_C(16) * FWK_TIB,
-        .type = MOD_CMN_RHODES_MEM_REGION_TYPE_SYSCACHE,
+        .type = MOD_CMN650_MEM_REGION_TYPE_SYSCACHE,
     },
     {
         /*
@@ -132,7 +132,7 @@ static const struct mod_cmn_rhodes_mem_region_map mmap[] = {
          */
         .base = UINT64_C(0x000000000000),
         .size = UINT64_C(128) * FWK_MIB,
-        .type = MOD_CMN_RHODES_REGION_TYPE_SYSCACHE_SUB,
+        .type = MOD_CMN650_REGION_TYPE_SYSCACHE_SUB,
         .node_id = NODE_ID_SBSX,
     },
     {
@@ -142,7 +142,7 @@ static const struct mod_cmn_rhodes_mem_region_map mmap[] = {
          */
         .base = UINT64_C(0x0008000000),
         .size = UINT64_C(128) * FWK_MIB,
-        .type = MOD_CMN_RHODES_MEM_REGION_TYPE_IO,
+        .type = MOD_CMN650_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HND,
     },
     {
@@ -152,7 +152,7 @@ static const struct mod_cmn_rhodes_mem_region_map mmap[] = {
          */
         .base = UINT64_C(0x0010000000),
         .size = UINT64_C(256) * FWK_MIB,
-        .type = MOD_CMN_RHODES_MEM_REGION_TYPE_IO,
+        .type = MOD_CMN650_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HND,
     },
     {
@@ -162,7 +162,7 @@ static const struct mod_cmn_rhodes_mem_region_map mmap[] = {
          */
         .base = UINT64_C(0x0020000000),
         .size = UINT64_C(512) * FWK_MIB,
-        .type = MOD_CMN_RHODES_MEM_REGION_TYPE_IO,
+        .type = MOD_CMN650_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HND,
     },
     {
@@ -172,7 +172,7 @@ static const struct mod_cmn_rhodes_mem_region_map mmap[] = {
          */
         .base = UINT64_C(0x0040000000),
         .size = UINT64_C(1) * FWK_GIB,
-        .type = MOD_CMN_RHODES_MEM_REGION_TYPE_IO,
+        .type = MOD_CMN650_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HND,
     },
 };
@@ -180,7 +180,7 @@ static const struct mod_cmn_rhodes_mem_region_map mmap[] = {
 /* CCIX Related configuration data */
 
 /* Chip-0 Config data */
-static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_0[] = {
+static const struct mod_cmn650_ccix_config ccix_config_table_chip_0[] = {
     {
         .ldid = CCIX_PORT_0,
         .haid = (RNF_PER_CHIP * CHIP_0) + CCIX_PORT_0,
@@ -188,7 +188,7 @@ static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_0[] = {
         .remote_mmap_table = {
             .base = UINT64_C(0x40000000000),
             .size = UINT64_C(4) * FWK_TIB,
-            .type = MOD_CMN_RHODES_REGION_TYPE_CCIX,
+            .type = MOD_CMN650_REGION_TYPE_CCIX,
         },
         .ra_mmap_table = {
             {
@@ -213,7 +213,7 @@ static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_0[] = {
         .remote_mmap_table = {
             .base = UINT64_C(0x80000000000),
             .size = UINT64_C(4) * FWK_TIB,
-            .type = MOD_CMN_RHODES_REGION_TYPE_CCIX,
+            .type = MOD_CMN650_REGION_TYPE_CCIX,
         },
         .ra_mmap_table = {
             {
@@ -238,7 +238,7 @@ static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_0[] = {
         .remote_mmap_table = {
             .base = UINT64_C(0xC0000000000),
             .size = UINT64_C(4) * FWK_TIB,
-            .type = MOD_CMN_RHODES_REGION_TYPE_CCIX,
+            .type = MOD_CMN650_REGION_TYPE_CCIX,
         },
         .ra_mmap_table = {
             {
@@ -259,7 +259,7 @@ static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_0[] = {
 };
 
 /* Chip-1 Config data */
-static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_1[] = {
+static const struct mod_cmn650_ccix_config ccix_config_table_chip_1[] = {
     {
         .ldid = CCIX_PORT_0,
         .haid = (RNF_PER_CHIP * CHIP_1) + CCIX_PORT_0,
@@ -267,7 +267,7 @@ static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_1[] = {
         .remote_mmap_table = {
             .base = UINT64_C(0x000000000),
             .size = UINT64_C(4) * FWK_TIB,
-            .type = MOD_CMN_RHODES_REGION_TYPE_CCIX,
+            .type = MOD_CMN650_REGION_TYPE_CCIX,
         },
         .ra_mmap_table = {
             {
@@ -292,7 +292,7 @@ static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_1[] = {
         .remote_mmap_table = {
             .base = UINT64_C(0x80000000000),
             .size = UINT64_C(4) * FWK_TIB,
-            .type = MOD_CMN_RHODES_REGION_TYPE_CCIX,
+            .type = MOD_CMN650_REGION_TYPE_CCIX,
         },
         .ra_mmap_table = {
             {
@@ -317,7 +317,7 @@ static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_1[] = {
         .remote_mmap_table = {
             .base = UINT64_C(0xC0000000000),
             .size = UINT64_C(4) * FWK_TIB,
-            .type = MOD_CMN_RHODES_REGION_TYPE_CCIX,
+            .type = MOD_CMN650_REGION_TYPE_CCIX,
         },
         .ra_mmap_table = {
             {
@@ -338,7 +338,7 @@ static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_1[] = {
 };
 
 /* Chip-2 Config data */
-static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_2[] = {
+static const struct mod_cmn650_ccix_config ccix_config_table_chip_2[] = {
     {
         .ldid = CCIX_PORT_0,
         .haid = (RNF_PER_CHIP * CHIP_2) + CCIX_PORT_0,
@@ -346,7 +346,7 @@ static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_2[] = {
         .remote_mmap_table = {
             .base = UINT64_C(0x000000000),
             .size = UINT64_C(4) * FWK_TIB,
-            .type = MOD_CMN_RHODES_REGION_TYPE_CCIX,
+            .type = MOD_CMN650_REGION_TYPE_CCIX,
         },
         .ra_mmap_table = {
             {
@@ -371,7 +371,7 @@ static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_2[] = {
         .remote_mmap_table = {
             .base = UINT64_C(0x40000000000),
             .size = UINT64_C(4) * FWK_TIB,
-            .type = MOD_CMN_RHODES_REGION_TYPE_CCIX,
+            .type = MOD_CMN650_REGION_TYPE_CCIX,
         },
         .ra_mmap_table = {
             {
@@ -396,7 +396,7 @@ static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_2[] = {
         .remote_mmap_table = {
             .base = UINT64_C(0xC0000000000),
             .size = UINT64_C(4) * FWK_TIB,
-            .type = MOD_CMN_RHODES_REGION_TYPE_CCIX,
+            .type = MOD_CMN650_REGION_TYPE_CCIX,
         },
         .ra_mmap_table = {
             {
@@ -417,7 +417,7 @@ static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_2[] = {
 };
 
 /* Chip-3 Config data */
-static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_3[] = {
+static const struct mod_cmn650_ccix_config ccix_config_table_chip_3[] = {
     {
         .ldid = CCIX_PORT_0,
         .haid = (RNF_PER_CHIP * CHIP_3) + CCIX_PORT_0,
@@ -425,7 +425,7 @@ static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_3[] = {
         .remote_mmap_table = {
             .base = UINT64_C(0x000000000),
             .size = UINT64_C(4) * FWK_TIB,
-            .type = MOD_CMN_RHODES_REGION_TYPE_CCIX,
+            .type = MOD_CMN650_REGION_TYPE_CCIX,
         },
         .ra_mmap_table = {
             {
@@ -450,7 +450,7 @@ static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_3[] = {
         .remote_mmap_table = {
             .base = UINT64_C(0x40000000000),
             .size = UINT64_C(4) * FWK_TIB,
-            .type = MOD_CMN_RHODES_REGION_TYPE_CCIX,
+            .type = MOD_CMN650_REGION_TYPE_CCIX,
         },
         .ra_mmap_table = {
             {
@@ -475,7 +475,7 @@ static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_3[] = {
         .remote_mmap_table = {
             .base = UINT64_C(0x80000000000),
             .size = UINT64_C(4) * FWK_TIB,
-            .type = MOD_CMN_RHODES_REGION_TYPE_CCIX,
+            .type = MOD_CMN650_REGION_TYPE_CCIX,
         },
         .ra_mmap_table = {
             {
@@ -495,11 +495,11 @@ static const struct mod_cmn_rhodes_ccix_config ccix_config_table_chip_3[] = {
     },
 };
 
-static const struct fwk_element cmn_rhodes_device_table[] = {
+static const struct fwk_element cmn650_device_table[] = {
     [0] = {
-        .name = "Chip-0 CMN-Rhodes Mesh Config",
-        .data = &((struct mod_cmn_rhodes_config){
-                .base = SCP_CMN_RHODES_BASE,
+        .name = "Chip-0 CMN-650 Mesh Config",
+        .data = &((struct mod_cmn650_config){
+                .base = SCP_CMN650_BASE,
                 .mesh_size_x = 6,
                 .mesh_size_y = 6,
                 .hnd_node_id = NODE_ID_HND,
@@ -516,9 +516,9 @@ static const struct fwk_element cmn_rhodes_device_table[] = {
             }),
     },
     [1] = {
-        .name = "Chip-1 CMN-Rhodes Mesh Config",
-        .data = &((struct mod_cmn_rhodes_config){
-                .base = SCP_CMN_RHODES_BASE,
+        .name = "Chip-1 CMN-650 Mesh Config",
+        .data = &((struct mod_cmn650_config){
+                .base = SCP_CMN650_BASE,
                 .mesh_size_x = 6,
                 .mesh_size_y = 6,
                 .hnd_node_id = NODE_ID_HND,
@@ -535,9 +535,9 @@ static const struct fwk_element cmn_rhodes_device_table[] = {
             }),
     },
     [2] = {
-        .name = "Chip-2 CMN-Rhodes Mesh Config",
-        .data = &((struct mod_cmn_rhodes_config){
-                .base = SCP_CMN_RHODES_BASE,
+        .name = "Chip-2 CMN-650 Mesh Config",
+        .data = &((struct mod_cmn650_config){
+                .base = SCP_CMN650_BASE,
                 .mesh_size_x = 6,
                 .mesh_size_y = 6,
                 .hnd_node_id = NODE_ID_HND,
@@ -554,9 +554,9 @@ static const struct fwk_element cmn_rhodes_device_table[] = {
             }),
     },
     [3] = {
-        .name = "Chip-3 CMN-Rhodes Mesh Config",
-        .data = &((struct mod_cmn_rhodes_config){
-                .base = SCP_CMN_RHODES_BASE,
+        .name = "Chip-3 CMN-650 Mesh Config",
+        .data = &((struct mod_cmn650_config){
+                .base = SCP_CMN650_BASE,
                 .mesh_size_x = 6,
                 .mesh_size_y = 6,
                 .hnd_node_id = NODE_ID_HND,
@@ -575,11 +575,11 @@ static const struct fwk_element cmn_rhodes_device_table[] = {
     [4] = { 0 }
 };
 
-static const struct fwk_element *cmn_rhodes_get_device_table(fwk_id_t module_id)
+static const struct fwk_element *cmn650_get_device_table(fwk_id_t module_id)
 {
-    return cmn_rhodes_device_table;
+    return cmn650_device_table;
 }
 
-const struct fwk_module_config config_cmn_rhodes = {
-    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(cmn_rhodes_get_device_table),
+const struct fwk_module_config config_cmn650 = {
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(cmn650_get_device_table),
 };
