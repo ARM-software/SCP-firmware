@@ -138,6 +138,15 @@ int fwk_thread_is_delayed_response_list_empty(fwk_id_t id, bool *is_empty);
  * \return Status code representing the result of the operation.
  */
 int fwk_thread_get_first_delayed_response(fwk_id_t id, struct fwk_event *event);
+
+#ifdef BUILD_OPTEE
+/*!
+ * \brief Set a thread context for processing incoming message.
+ *
+ * \param[in] id Identifier of the module/element that has a message to process.
+ */
+void fwk_set_thread_ctx(fwk_id_t id);
+#endif
 /*!
  * \}
  */

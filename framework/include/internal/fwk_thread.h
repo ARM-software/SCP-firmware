@@ -22,7 +22,12 @@
  * \retval ::FWK_SUCCESS The thread framework component was initialized.
  * \retval ::FWK_E_NOMEM Insufficient memory available for event queues.
  */
+#ifdef BUILD_OPTEE
+/* Hack: thread as per context: add the device ID as argument */
+int __fwk_thread_init(size_t event_count, fwk_id_t id);
+#else
 int __fwk_thread_init(size_t event_count);
+#endif
 
 /*
  * \brief Begin waiting for and processing events raised by modules and
@@ -31,6 +36,16 @@ int __fwk_thread_init(size_t event_count);
  * \return The function does not return.
  */
 noreturn void __fwk_thread_run(void);
+
+#ifdef BUILD_OPTEE
+/* Hack: Added by OP-TEE to process messages but not endlessly */
+/*
+ * \brief Processing events already raised by modules and interrupt handlers.
+ *
+ * \return The function does not return.
+ */
+void __fwk_run_event(void);
+#endif
 
 /*
  * \brief Get the event being currently processed.
