@@ -21,7 +21,7 @@ BS_FIRMWARE_MODULES := \
     clock \
     gtimer \
     timer \
-    cmn_rhodes \
+    cmn650 \
     ppu_v1 \
     system_power \
     mhu2 \
@@ -50,7 +50,7 @@ BS_FIRMWARE_SOURCES := \
     config_sds.c \
     config_timer.c \
     config_gtimer.c \
-    config_cmn_rhodes.c \
+    config_cmn650.c \
     config_scmi_system_power.c \
     config_scmi_power_domain.c \
     config_system_pll.c \
