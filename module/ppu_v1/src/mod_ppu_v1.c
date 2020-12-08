@@ -958,7 +958,7 @@ static int ppu_v1_process_notification(
     (void)module_config;
 
     params = (struct mod_pd_power_state_transition_notification_params *)
-        event->params;
+        (void *)event->params;
 
     if (params->state != MOD_PD_STATE_ON)
         return FWK_SUCCESS;

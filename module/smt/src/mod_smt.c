@@ -572,12 +572,12 @@ static int smt_process_notification(
     unsigned int notifications_sent;
     int status;
 
-    assert(fwk_id_is_equal(event->id,
+    fwk_assert(fwk_id_is_equal(event->id,
         mod_pd_notification_id_power_state_transition));
     fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT));
 
     params = (struct mod_pd_power_state_transition_notification_params *)
-        event->params;
+        (void *)event->params;
 
     channel_ctx =
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(event->target_id)];

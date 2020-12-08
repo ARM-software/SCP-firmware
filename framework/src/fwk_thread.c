@@ -218,7 +218,6 @@ static void process_next_event(void)
 
     ctx.current_event = NULL;
     free_event(event);
-    return;
 }
 
 static bool process_isr(void)

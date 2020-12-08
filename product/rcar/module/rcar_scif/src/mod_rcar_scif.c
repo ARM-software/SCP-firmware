@@ -12,13 +12,13 @@
 
 #include <mod_rcar_scif.h>
 
+#include <fwk_assert.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
 
-#include <assert.h>
 
 struct mod_rcar_scif_element_ctx {
     /* Whether the device has an open file stream */
@@ -72,7 +72,7 @@ static int mod_rcar_scif_set_baud_rate(
     uint32_t status;
     int i;
 
-    assert(reg);
+    fwk_assert(reg);
     current_cfg = cfg;
 
     if (reg == (void *)BOARD_UART1_BASE) {

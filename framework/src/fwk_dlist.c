@@ -72,7 +72,7 @@ void __fwk_dlist_remove(
     fwk_assert(node->prev != NULL);
     fwk_assert(node->next != NULL);
 
-    assert(__fwk_slist_contains(
+    fwk_assert(__fwk_slist_contains(
         (struct fwk_slist *)list,
         (struct fwk_slist_node *)node));
 
@@ -103,7 +103,7 @@ void __fwk_dlist_insert(
     fwk_assert(node->prev != NULL);
     fwk_assert(node->next != NULL);
 
-    assert(__fwk_slist_contains(
+    fwk_assert(__fwk_slist_contains(
         (struct fwk_slist *)list,
         (struct fwk_slist_node *)node));
 

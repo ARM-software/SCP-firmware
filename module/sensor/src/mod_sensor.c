@@ -220,7 +220,7 @@ static void reading_complete(fwk_id_t dev_id,
     struct fwk_event event;
     struct sensor_dev_ctx *ctx;
     struct mod_sensor_event_params *event_params =
-        (struct mod_sensor_event_params *)event.params;
+        (struct mod_sensor_event_params *)(void *)event.params;
 
     if (!fwk_expect(fwk_id_get_module_idx(dev_id) == FWK_MODULE_IDX_SENSOR))
         return;
@@ -375,9 +375,9 @@ static int sensor_process_event(const struct fwk_event *event,
     struct sensor_dev_ctx *ctx;
     struct fwk_event read_req_event;
     struct mod_sensor_event_params *event_params =
-        (struct mod_sensor_event_params *)(event->params);
+        (struct mod_sensor_event_params *)(void *)event->params;
     struct mod_sensor_event_params *resp_params =
-        (struct mod_sensor_event_params *)(read_req_event.params);
+        (struct mod_sensor_event_params *)(void *)read_req_event.params;
 
     if (!fwk_module_is_valid_element_id(event->target_id))
         return FWK_E_PARAM;

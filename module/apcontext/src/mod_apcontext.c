@@ -85,7 +85,7 @@ static int apcontext_process_notification(const struct fwk_event *event,
         fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed));
     fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
 
-    params = (struct clock_notification_params *)event->params;
+    params = (struct clock_notification_params *)(void *)event->params;
 
     /*
      * Zero AP context area when the system is initialized for the first time
