@@ -13,6 +13,10 @@
 #include <assert.h>
 #include <stdbool.h>
 
+#ifndef __USE_ISOC11
+#define static_assert _Static_assert
+#endif
+
 /*!
  * \addtogroup GroupLibFramework
  * \defgroup GroupAssert Assertion Helpers
@@ -197,11 +201,23 @@
  * \return The value of `condition`.
  */
 
+#ifdef BUILD_OPTEE
+/*
+ * When building OP-TEE, implementation of assert() macro cannot be
+ * used as a condition evaluation hence fwk_expect() wraps helper function
+ * _fwk_expect() to produce a nice error trace when the assertion fails.
+ */
+bool _fwk_expect(bool cond, const char *file, unsigned int line,
+		 const char *func);
+#define fwk_expect(condition) \
+	_fwk_expect((condition), __FILE__, __LINE__, __func__)
+#else
 #if defined(NDEBUG) || defined(BUILD_TESTS)
 #    define fwk_expect(condition) __builtin_expect((condition), 1)
 #else
 #    define fwk_expect(condition) (fwk_check(condition), 1)
 #endif
+#endif /* BUILD_OPTEE */
 
 /*!
  * \}

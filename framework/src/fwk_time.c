@@ -17,12 +17,14 @@ struct {
     const void *driver_ctx; /* Time driver context */
 } fwk_time_ctx;
 
-FWK_CONSTRUCTOR void fwk_time_init(void)
+static void fwk_time_init(void)
 {
     struct fwk_time_driver driver = fmw_time_driver(&fwk_time_ctx.driver_ctx);
 
     memcpy(&fwk_time_ctx.driver, &driver, sizeof(driver));
 }
+
+FWK_INIT_CONSTRUCTOR(fwk_time_init);
 
 fwk_timestamp_t fwk_time_current(void)
 {

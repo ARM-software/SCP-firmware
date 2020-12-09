@@ -207,9 +207,22 @@
  * \see https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-constructor-function-attribute
  */
 
+#ifdef BUILD_OPTEE
+#include <initcall.h>
+#    define FWK_INIT_CONSTRUCTOR(_label) \
+	static TEE_Result fwk_init_constructor_##_label(void) \
+	{				\
+		_label();		\
+					\
+		return TEE_SUCCESS;	\
+	} \
+	service_init(fwk_init_constructor_##_label);
+#else
 #if FWK_HAS_GNU_ATTRIBUTE(__constructor__)
 #    define FWK_CONSTRUCTOR __attribute__((__constructor__))
+#    define FWK_INIT_CONSTRUCTOR(_label) void FWK_CONSTRUCTOR (_label)(void);
 #endif
+#endif /* BUILD_OPTEE */
 
 /*!
  * \def FWK_PACKED

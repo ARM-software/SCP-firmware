@@ -147,7 +147,7 @@ static void send_notifications(struct fwk_event *notification_event,
  * Private interface functions
  */
 
-static FWK_CONSTRUCTOR void fwk_notification_init(void)
+static void fwk_notification_init(void)
 {
     static struct __fwk_notification_subscription
         subscriptions[FMW_NOTIFICATION_MAX];
@@ -162,6 +162,8 @@ static FWK_CONSTRUCTOR void fwk_notification_init(void)
             &ctx.free_subscription_dlist, &subscriptions[i].dlist_node);
     }
 }
+
+FWK_INIT_CONSTRUCTOR(fwk_notification_init);
 
 void __fwk_notification_reset(void)
 {
