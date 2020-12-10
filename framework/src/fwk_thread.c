@@ -148,9 +148,9 @@ static int put_event(
     FWK_LOG_TRACE(
         "[FWK] Sent %" PRIu32 ": %s @ %s -> %s",
         event->cookie,
-        FWK_ID_STR(event->id),
-        FWK_ID_STR(event->source_id),
-        FWK_ID_STR(event->target_id));
+        FWK_ID_STR(allocated_event->id),
+        FWK_ID_STR(allocated_event->source_id),
+        FWK_ID_STR(allocated_event->target_id));
 #endif
 
     return FWK_SUCCESS;
