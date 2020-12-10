@@ -576,11 +576,9 @@ FWK_WEAK int mod_scmi_clock_config_set_policy(
 /*
  * SCMI Resource Permissions handler
  */
-static unsigned int get_clock_id(
-    const uint32_t *payload,
-    unsigned int message_id)
+static uint32_t get_clock_id(const uint32_t *payload, unsigned int message_id)
 {
-    unsigned int clock_id;
+    uint32_t clock_id;
 
     /*
      * Every SCMI Clock message - but CLOCK_RATE_SET - is formatted with the
@@ -614,7 +612,8 @@ static int scmi_clock_permissions_handler(
     unsigned int message_id)
 {
     enum mod_res_perms_permissions perms;
-    unsigned int agent_id, clock_id;
+    unsigned int agent_id;
+    uint32_t clock_id;
     int status;
 
     status = scmi_clock_ctx.scmi_api->get_agent_id(service_id, &agent_id);
