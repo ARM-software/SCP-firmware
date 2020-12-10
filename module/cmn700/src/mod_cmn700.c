@@ -515,7 +515,7 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
     else
         hnf_count = ctx->hnf_count;
 
-    group_count = cmn700_hnf_cache_group_count(ctx->hnf_count);
+    group_count = cmn700_hnf_cache_group_count(hnf_count);
     for (group = 0; group < group_count; group++)
         rnsam->SYS_CACHE_GRP_HN_NODEID[group] = ctx->hnf_cache_group[group];
 
