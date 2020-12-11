@@ -17,18 +17,17 @@
 #include <fmw_cmsis.h>
 
 static const struct fwk_element mhu_element_table[] = {
-    [SCP_PLATFORM_MHU_DEVICE_IDX_SCP_AP_S_CLUS0] = { .name = "MHU_SCP_AP_S",
-                                                     .sub_element_count = 1,
-                                                     .data = &((
-                                                         struct
-                                                         mod_mhu2_channel_config){
-                                                         .irq = MHU_AP_SEC_IRQ,
-                                                         .recv =
-                                                             SCP_MHU_SCP_AP_RCV_S_CLUS0,
-                                                         .send =
-                                                             SCP_MHU_SCP_AP_SND_S_CLUS0,
-                                                         .channel = 0,
-                                                     }) },
+    [SCP_PLATFORM_MHU_DEVICE_IDX_SCP_AP_S_CLUS0] = {
+        .name = "MHU_SCP_AP_S",
+        .sub_element_count = 1,
+        .data = &((
+            struct mod_mhu2_channel_config) {
+                .irq = MHU_AP_SEC_IRQ,
+                .recv = SCP_MHU_SCP_AP_RCV_S_CLUS0,
+                .send = SCP_MHU_SCP_AP_SND_S_CLUS0,
+                .channel = 0,
+        }),
+    },
     [SCP_PLATFORM_MHU_DEVICE_IDX_COUNT] = { 0 },
 };
 
