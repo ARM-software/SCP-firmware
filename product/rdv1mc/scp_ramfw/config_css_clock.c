@@ -19,6 +19,33 @@
 
 #include <stdbool.h>
 
+#define MEMBER_TABLE_CPU_GROUP(n) \
+    static const fwk_id_t member_table_cpu_group_##n[] = { \
+        FWK_ID_ELEMENT_INIT( \
+            FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS##n##_CPU0), \
+    }
+
+#define CLOCK_CSS_CPU_GROUP(n) \
+    [CLOCK_CSS_IDX_CPU_GROUP##n] = { \
+        .name = "CPU_GROUP_" #n, \
+        .data = &((struct mod_css_clock_dev_config){ \
+            .clock_type = MOD_CSS_CLOCK_TYPE_INDEXED, \
+            .rate_table = rate_table_cpu_group, \
+            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group), \
+            .clock_switching_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_SYSREFCLK, \
+            .pll_id = FWK_ID_ELEMENT_INIT( \
+                FWK_MODULE_IDX_SYSTEM_PLL, CLOCK_PLL_IDX_CPU##n), \
+            .pll_api_id = FWK_ID_API_INIT( \
+                FWK_MODULE_IDX_SYSTEM_PLL, MOD_SYSTEM_PLL_API_TYPE_DEFAULT), \
+            .member_table = member_table_cpu_group_##n, \
+            .member_count = FWK_ARRAY_SIZE(member_table_cpu_group_##n), \
+            .member_api_id = FWK_ID_API_INIT( \
+                FWK_MODULE_IDX_PIK_CLOCK, MOD_PIK_CLOCK_API_TYPE_CSS), \
+            .initial_rate = 2600 * FWK_MHZ, \
+            .modulation_supported = true, \
+        }), \
+    }
+
 static const struct mod_css_clock_rate rate_table_cpu_group[] = {
     {
         /* Super Underdrive */
@@ -72,99 +99,14 @@ static const struct mod_css_clock_rate rate_table_cpu_group[] = {
     },
 };
 
-static const fwk_id_t member_table_cpu_group_0[] = {
-    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS0_CPU0),
-};
-
-static const fwk_id_t member_table_cpu_group_1[] = {
-    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS1_CPU0),
-};
-
-static const fwk_id_t member_table_cpu_group_2[] = {
-    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS2_CPU0),
-};
-
-static const fwk_id_t member_table_cpu_group_3[] = {
-    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS3_CPU0),
-};
+MEMBER_TABLE_CPU_GROUP(0);
+MEMBER_TABLE_CPU_GROUP(1);
+MEMBER_TABLE_CPU_GROUP(2);
+MEMBER_TABLE_CPU_GROUP(3);
 
 static const struct fwk_element css_clock_element_table[] = {
-    [CLOCK_CSS_IDX_CPU_GROUP0] = {
-        .name = "CPU_GROUP_0",
-        .data = &((struct mod_css_clock_dev_config) {
-            .clock_type = MOD_CSS_CLOCK_TYPE_INDEXED,
-            .rate_table = rate_table_cpu_group,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group),
-            .clock_switching_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_SYSREFCLK,
-            .pll_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SYSTEM_PLL,
-                CLOCK_PLL_IDX_CPU0),
-            .pll_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SYSTEM_PLL,
-                MOD_SYSTEM_PLL_API_TYPE_DEFAULT),
-            .member_table = member_table_cpu_group_0,
-            .member_count = FWK_ARRAY_SIZE(member_table_cpu_group_0),
-            .member_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PIK_CLOCK,
-                MOD_PIK_CLOCK_API_TYPE_CSS),
-            .initial_rate = 2600 * FWK_MHZ,
-            .modulation_supported = true,
-        }),
-    },
-    [CLOCK_CSS_IDX_CPU_GROUP1] = {
-        .name = "CPU_GROUP_1",
-        .data = &((struct mod_css_clock_dev_config) {
-            .clock_type = MOD_CSS_CLOCK_TYPE_INDEXED,
-            .rate_table = rate_table_cpu_group,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group),
-            .clock_switching_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_SYSREFCLK,
-            .pll_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SYSTEM_PLL,
-                CLOCK_PLL_IDX_CPU1),
-            .pll_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SYSTEM_PLL,
-                MOD_SYSTEM_PLL_API_TYPE_DEFAULT),
-            .member_table = member_table_cpu_group_1,
-            .member_count = FWK_ARRAY_SIZE(member_table_cpu_group_1),
-            .member_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PIK_CLOCK,
-                MOD_PIK_CLOCK_API_TYPE_CSS),
-            .initial_rate = 2600 * FWK_MHZ,
-            .modulation_supported = true,
-        }),
-    },
-     [CLOCK_CSS_IDX_CPU_GROUP2] = {
-        .name = "CPU_GROUP_2",
-        .data = &((struct mod_css_clock_dev_config) {
-            .clock_type = MOD_CSS_CLOCK_TYPE_INDEXED,
-            .rate_table = rate_table_cpu_group,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group),
-            .clock_switching_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_SYSREFCLK,
-            .pll_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SYSTEM_PLL,
-                CLOCK_PLL_IDX_CPU2),
-            .pll_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SYSTEM_PLL,
-                MOD_SYSTEM_PLL_API_TYPE_DEFAULT),
-            .member_table = member_table_cpu_group_2,
-            .member_count = FWK_ARRAY_SIZE(member_table_cpu_group_2),
-            .member_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PIK_CLOCK,
-                MOD_PIK_CLOCK_API_TYPE_CSS),
-            .initial_rate = 2600 * FWK_MHZ,
-            .modulation_supported = true,
-        }),
-    },
-    [CLOCK_CSS_IDX_CPU_GROUP3] = {
-        .name = "CPU_GROUP_3",
-        .data = &((struct mod_css_clock_dev_config) {
-            .clock_type = MOD_CSS_CLOCK_TYPE_INDEXED,
-            .rate_table = rate_table_cpu_group,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group),
-            .clock_switching_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_SYSREFCLK,
-            .pll_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SYSTEM_PLL,
-                CLOCK_PLL_IDX_CPU3),
-            .pll_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SYSTEM_PLL,
-                MOD_SYSTEM_PLL_API_TYPE_DEFAULT),
-            .member_table = member_table_cpu_group_3,
-            .member_count = FWK_ARRAY_SIZE(member_table_cpu_group_3),
-            .member_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PIK_CLOCK,
-                MOD_PIK_CLOCK_API_TYPE_CSS),
-            .initial_rate = 2600 * FWK_MHZ,
-            .modulation_supported = true,
-        }),
-    },
+    CLOCK_CSS_CPU_GROUP(0),        CLOCK_CSS_CPU_GROUP(1),
+    CLOCK_CSS_CPU_GROUP(2),        CLOCK_CSS_CPU_GROUP(3),
     [CLOCK_CSS_IDX_COUNT] = { 0 }, /* Termination description. */
 };
 
