@@ -42,7 +42,7 @@ maintainers. The platforms listed here represent the exceptions to this rule.
 - [Manoj Kumar](https://github.com/manojkumar-arm) (manoj.kumar3@arm.com)
 - [Sudipto Paul](https://github.com/sudpau01) (sudipto.paul@arm.com)
 
-#### RD-V1 (rdv1, rddanielxlr)
+#### RD-V1 (rdv1, rdv1mc)
 
 - [Thomas Abraham](https://github.com/omasab) (thomas.abraham@arm.com)
 

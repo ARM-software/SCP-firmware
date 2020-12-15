@@ -326,39 +326,39 @@ def main():
     result = subprocess.call(cmd, shell=True)
     results.append(('Product rdv1 debug build (ARM)', result))
 
-    banner('Test building rddanielxlr product')
+    banner('Test building rdv1mc product')
 
     cmd = \
         'CC=arm-none-eabi-gcc ' \
-        'PRODUCT=rddanielxlr ' \
+        'PRODUCT=rdv1mc ' \
         'MODE=release ' \
         'make clean all -j'
     result = subprocess.call(cmd, shell=True)
-    results.append(('Product rddanielxlr release build (GCC)', result))
+    results.append(('Product rdv1mc release build (GCC)', result))
 
     cmd = \
         'CC=armclang ' \
-        'PRODUCT=rddanielxlr ' \
+        'PRODUCT=rdv1mc ' \
         'MODE=release ' \
         'make clean all -j'
     result = subprocess.call(cmd, shell=True)
-    results.append(('Product rddanielxlr release build (ARM)', result))
+    results.append(('Product rdv1mc release build (ARM)', result))
 
     cmd = \
         'CC=arm-none-eabi-gcc ' \
-        'PRODUCT=rddanielxlr ' \
+        'PRODUCT=rdv1mc ' \
         'MODE=debug ' \
         'make clean all -j'
     result = subprocess.call(cmd, shell=True)
-    results.append(('Product rddanielxlr debug build (GCC)', result))
+    results.append(('Product rdv1mc debug build (GCC)', result))
 
     cmd = \
         'CC=armclang ' \
-        'PRODUCT=rddanielxlr ' \
+        'PRODUCT=rdv1mc ' \
         'MODE=debug ' \
         'make clean all -j'
     result = subprocess.call(cmd, shell=True)
-    results.append(('Product rddanielxlr debug build (ARM)', result))
+    results.append(('Product rdv1mc debug build (ARM)', result))
 
     banner('Test building tc0 product')
 

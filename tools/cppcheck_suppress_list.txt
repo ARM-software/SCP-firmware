@@ -43,8 +43,8 @@ preprocessorErrorDirective:framework/test/fwk_module_idx.h:14
 preprocessorErrorDirective:arch/arm/src/arch_mm.c:16
 
 // This memory has a static lifetime
-memleak:product/rddanielxlr/scp_ramfw/config_power_domain.c:156
-memleak:product/rddanielxlr/scp_ramfw/config_ppu_v1.c:87
+memleak:product/rdv1mc/scp_ramfw/config_power_domain.c:156
+memleak:product/rdv1mc/scp_ramfw/config_ppu_v1.c:87
 memleak:product/tc0/scp_ramfw/config_power_domain.c:114
 memleak:product/tc0/scp_ramfw/config_ppu_v1.c:87
 memleak:product/tc0/scp_romfw/config_ppu_v1.c:81
