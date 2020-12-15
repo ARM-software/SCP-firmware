@@ -19,6 +19,17 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 
+#define CLOCK_CPU_GROUP(n) \
+    [CLOCK_IDX_CPU_GROUP##n] = { \
+        .name = "CPU_GROUP" #n, \
+        .data = &((struct mod_clock_dev_config){ \
+            .driver_id = FWK_ID_ELEMENT_INIT( \
+                FWK_MODULE_IDX_CSS_CLOCK, CLOCK_CSS_IDX_CPU_GROUP##n), \
+            .api_id = FWK_ID_API_INIT( \
+                FWK_MODULE_IDX_CSS_CLOCK, MOD_CSS_CLOCK_API_TYPE_CLOCK), \
+        }), \
+    }
+
 static const struct fwk_element clock_dev_desc_table[] = {
     [CLOCK_IDX_INTERCONNECT] = {
         .name = "Interconnect",
@@ -29,42 +40,10 @@ static const struct fwk_element clock_dev_desc_table[] = {
                 MOD_PIK_CLOCK_API_TYPE_CLOCK),
         }),
     },
-    [CLOCK_IDX_CPU_GROUP0] = {
-        .name = "CPU_GROUP0",
-        .data = &((struct mod_clock_dev_config) {
-            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CSS_CLOCK,
-                CLOCK_CSS_IDX_CPU_GROUP0),
-            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_CSS_CLOCK,
-                MOD_CSS_CLOCK_API_TYPE_CLOCK),
-        }),
-    },
-    [CLOCK_IDX_CPU_GROUP1] = {
-        .name = "CPU_GROUP1",
-        .data = &((struct mod_clock_dev_config) {
-            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CSS_CLOCK,
-                CLOCK_CSS_IDX_CPU_GROUP1),
-            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_CSS_CLOCK,
-                MOD_CSS_CLOCK_API_TYPE_CLOCK),
-        }),
-    },
-    [CLOCK_IDX_CPU_GROUP2] = {
-        .name = "CPU_GROUP2",
-        .data = &((struct mod_clock_dev_config) {
-            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CSS_CLOCK,
-                CLOCK_CSS_IDX_CPU_GROUP2),
-            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_CSS_CLOCK,
-                MOD_CSS_CLOCK_API_TYPE_CLOCK),
-        }),
-    },
-    [CLOCK_IDX_CPU_GROUP3] = {
-        .name = "CPU_GROUP3",
-        .data = &((struct mod_clock_dev_config) {
-            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CSS_CLOCK,
-                CLOCK_CSS_IDX_CPU_GROUP3),
-            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_CSS_CLOCK,
-                MOD_CSS_CLOCK_API_TYPE_CLOCK),
-        }),
-    },
+    CLOCK_CPU_GROUP(0),
+    CLOCK_CPU_GROUP(1),
+    CLOCK_CPU_GROUP(2),
+    CLOCK_CPU_GROUP(3),
     { 0 }, /* Termination description. */
 };
 
