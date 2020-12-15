@@ -67,8 +67,7 @@ Virtual Platforms (FVPs):
 - RD-N1-Edge Dual-Chip reference design  (Please contact Arm directly to obtain the
   RdN1EdgeX2 FVP)
 - RD-V1 reference design  (Please contact Arm directly to obtain the RD_V1 FVP)
-- RD-Daniel Config-XLR reference design  (Please contact Arm directly to obtain the
-  RdDaniel-CfgXLR FVP)
+- RD-V1-MC reference design  (Please contact Arm directly to obtain the RD_V1_Multichip FVP)
 - Renesas R-Car platform
 - Total Compute (tc0) platform (Please contact Arm directly to obtain the TC0 FVP)
 
