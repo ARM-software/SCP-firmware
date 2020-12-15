@@ -66,8 +66,7 @@ Virtual Platforms (FVPs):
 - Juno reference design (Please contact Arm directly to obtain the Juno FVP)
 - RD-N1-Edge Dual-Chip reference design  (Please contact Arm directly to obtain the
   RdN1EdgeX2 FVP)
-- RD-Daniel Config-M reference design  (Please contact Arm directly to obtain the
-  RdDaniel-CfgM FVP)
+- RD-V1 reference design  (Please contact Arm directly to obtain the RD_V1 FVP)
 - RD-Daniel Config-XLR reference design  (Please contact Arm directly to obtain the
   RdDaniel-CfgXLR FVP)
 - Renesas R-Car platform
