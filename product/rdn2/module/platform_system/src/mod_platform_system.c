@@ -15,6 +15,7 @@
 #include "scp_css_mmap.h"
 #include "scp_pik.h"
 
+#include <mod_apremap.h>
 #include <mod_clock.h>
 #include <mod_platform_system.h>
 #include <mod_power_domain.h>
@@ -57,6 +58,9 @@ struct platform_system_ctx {
 
     /* SDS API pointer */
     const struct mod_sds_api *sds_api;
+
+    /* CMN Address Translation API */
+    const struct mod_apremap_cmn_atrans_api *apremap_cmn_atrans_api;
 };
 
 struct platform_system_isr {
@@ -225,6 +229,13 @@ static int platform_system_bind(fwk_id_t id, unsigned int round)
     if (status != FWK_SUCCESS)
         return status;
 
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_APREMAP),
+        FWK_ID_API(FWK_MODULE_IDX_APREMAP, MOD_APREMAP_API_IDX_CMN_ATRANS),
+        &platform_system_ctx.apremap_cmn_atrans_api);
+    if (status != FWK_SUCCESS)
+        return status;
+
     return fwk_module_bind(
         fwk_module_id_sds,
         FWK_ID_API(FWK_MODULE_IDX_SDS, 0),
@@ -252,6 +263,12 @@ static int platform_system_start(fwk_id_t id)
         id);
     if (status != FWK_SUCCESS)
         return status;
+
+    /*
+     * This platform has the CMN configuration register in the AP address space
+     * which can be accessed by enabling the CMN Address Translation.
+     */
+    platform_system_ctx.apremap_cmn_atrans_api->enable();
 
     FWK_LOG_INFO("[PLATFORM SYSTEM] Requesting SYSTOP initialization...");
 
