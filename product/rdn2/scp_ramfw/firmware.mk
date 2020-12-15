@@ -11,6 +11,7 @@ BS_FIRMWARE_HAS_NOTIFICATION := yes
 
 BS_FIRMWARE_MODULES := \
     armv7m_mpu \
+    apremap \
     sid \
     system_info \
     pcid \
@@ -36,6 +37,7 @@ BS_FIRMWARE_MODULES := \
 
 BS_FIRMWARE_SOURCES := \
     config_system_power.c \
+    config_apremap.c \
     config_sid.c \
     config_system_info.c \
     rtx_config.c \
