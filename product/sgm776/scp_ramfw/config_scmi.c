@@ -67,6 +67,16 @@ static const struct fwk_element *get_service_table(fwk_id_t module_id)
     return service_table;
 }
 
+#ifndef BUILD_HAS_RESOURCE_PERMISSIONS
+
+/* PSCI agent has no access to clock, perf and sensor protocol */
+static const uint32_t dis_protocol_list_psci[] = {
+    MOD_SCMI_PROTOCOL_ID_SENSOR,
+    MOD_SCMI_PROTOCOL_ID_CLOCK,
+    MOD_SCMI_PROTOCOL_ID_PERF,
+};
+#endif
+
 static const struct mod_scmi_agent agent_table[] = {
     [SCMI_AGENT_ID_OSPM] = {
         .type = SCMI_AGENT_TYPE_OSPM,
@@ -83,7 +93,8 @@ struct fwk_module_config config_scmi = {
         &(struct mod_scmi_config){
             .protocol_count_max = 9,
 #ifndef BUILD_HAS_RESOURCE_PERMISSIONS
-#    error "Please configure the disabled protocols for PSCI agents"
+            .dis_protocol_count_psci = FWK_ARRAY_SIZE(dis_protocol_list_psci),
+            .dis_protocol_list_psci = dis_protocol_list_psci,
 #endif
             .agent_count = FWK_ARRAY_SIZE(agent_table) - 1,
             .agent_table = agent_table,
