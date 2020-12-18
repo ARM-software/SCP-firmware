@@ -499,8 +499,10 @@ FWK_WEAK int mod_scmi_clock_config_set_policy(
     switch (*state) {
     case MOD_CLOCK_STATE_RUNNING:
         /* The agent has already requested to set state to RUNNING */
-        if (clock_state == MOD_CLOCK_STATE_RUNNING)
-            return FWK_E_STATE;
+        if (clock_state == MOD_CLOCK_STATE_RUNNING) {
+            status = FWK_SUCCESS;
+            break;
+        }
 
         /* set the clock state for this agent to RUNNING */
         if (policy_commit == MOD_SCMI_CLOCK_POST_MESSAGE_HANDLER) {
