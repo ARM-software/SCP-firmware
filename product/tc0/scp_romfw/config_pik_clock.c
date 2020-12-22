@@ -85,7 +85,6 @@ static const struct mod_pik_clock_rate rate_table_uartclk[] = {
 static const struct fwk_element
     pik_clock_element_table[] =
         {
-
             [CLOCK_PIK_IDX_CLUS0_CPU0] =
                 {
                     .name = "CLUS0_CPU0",
@@ -95,6 +94,45 @@ static const struct fwk_element
                         .control_reg = &CLUSTER_PIK_PTR(0)->CORECLK[0].CTRL,
                         .divext_reg = &CLUSTER_PIK_PTR(0)->CORECLK[0].DIV,
                         .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[0].MOD,
+                        .rate_table = rate_table_cpu_group,
+                        .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group),
+                    }),
+                },
+            [CLOCK_PIK_IDX_CLUS0_CPU1] =
+                {
+                    .name = "CLUS0_CPU1",
+                    .data = &((struct mod_pik_clock_dev_config){
+                        .type = MOD_PIK_CLOCK_TYPE_CLUSTER,
+                        .is_group_member = true,
+                        .control_reg = &CLUSTER_PIK_PTR(0)->CORECLK[1].CTRL,
+                        .divext_reg = &CLUSTER_PIK_PTR(0)->CORECLK[1].DIV,
+                        .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[1].MOD,
+                        .rate_table = rate_table_cpu_group,
+                        .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group),
+                    }),
+                },
+            [CLOCK_PIK_IDX_CLUS0_CPU2] =
+                {
+                    .name = "CLUS0_CPU2",
+                    .data = &((struct mod_pik_clock_dev_config){
+                        .type = MOD_PIK_CLOCK_TYPE_CLUSTER,
+                        .is_group_member = true,
+                        .control_reg = &CLUSTER_PIK_PTR(0)->CORECLK[2].CTRL,
+                        .divext_reg = &CLUSTER_PIK_PTR(0)->CORECLK[2].DIV,
+                        .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[2].MOD,
+                        .rate_table = rate_table_cpu_group,
+                        .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group),
+                    }),
+                },
+            [CLOCK_PIK_IDX_CLUS0_CPU3] =
+                {
+                    .name = "CLUS0_CPU3",
+                    .data = &((struct mod_pik_clock_dev_config){
+                        .type = MOD_PIK_CLOCK_TYPE_CLUSTER,
+                        .is_group_member = true,
+                        .control_reg = &CLUSTER_PIK_PTR(0)->CORECLK[3].CTRL,
+                        .divext_reg = &CLUSTER_PIK_PTR(0)->CORECLK[3].DIV,
+                        .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[3].MOD,
                         .rate_table = rate_table_cpu_group,
                         .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group),
                     }),
