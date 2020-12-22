@@ -151,7 +151,7 @@ static void fwk_id_format(
 
 struct __fwk_id_fmt __fwk_id_str(fwk_id_t id)
 {
-    struct __fwk_id_fmt fmt;
+    struct __fwk_id_fmt fmt = { { 0 } };
 
     fwk_id_format(fmt.str, sizeof(fmt.str), id, false);
 
@@ -160,7 +160,7 @@ struct __fwk_id_fmt __fwk_id_str(fwk_id_t id)
 
 struct fwk_id_verbose_fmt fwk_id_verbose_str(fwk_id_t id)
 {
-    struct fwk_id_verbose_fmt fmt;
+    struct fwk_id_verbose_fmt fmt = { { 0 } };
 
     fwk_id_format(fmt.str, sizeof(fmt.str), id, true);
 
