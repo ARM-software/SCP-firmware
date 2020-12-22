@@ -333,7 +333,7 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
     int status;
     unsigned int agent_id;
     const struct scmi_perf_domain_attributes_a2p *parameters;
-    uint32_t permissions;
+    uint32_t permissions = 0;
     fwk_id_t domain_id;
     struct mod_dvfs_opp opp;
     struct scmi_perf_domain_attributes_p2a return_values = {

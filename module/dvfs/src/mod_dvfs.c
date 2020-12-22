@@ -683,7 +683,7 @@ static void dvfs_complete_respond(
     int status;
     struct fwk_event read_req_event;
     struct mod_dvfs_params_response *resp_params;
-    bool return_opp;
+    bool return_opp = false;
 
     if ((ctx->state == DVFS_DOMAIN_GET_OPP) && (req_status == FWK_SUCCESS))
         return_opp = true;
