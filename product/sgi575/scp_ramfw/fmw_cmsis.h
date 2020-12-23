@@ -10,4 +10,6 @@
 
 #include <fmw_cmsis_scp.h>
 
+extern uint32_t SystemCoreClock;
+
 #endif /* FMW_CMSIS_H */
