@@ -16,6 +16,7 @@
 # 'Module.cmake' file from within, which describes the module.
 #
 
+list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/apcontext")
 list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/bootloader")
 list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/clock")
 list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/css_clock")
