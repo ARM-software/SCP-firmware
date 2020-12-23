@@ -390,7 +390,7 @@ static int dvfs_handle_pending_request(struct mod_dvfs_domain_ctx *ctx)
     return status;
 }
 
-static int dvfs_create_pending_level_request(
+static void dvfs_create_pending_level_request(
     struct mod_dvfs_domain_ctx *ctx,
     uintptr_t cookie,
     const struct mod_dvfs_opp *new_opp,
@@ -399,12 +399,12 @@ static int dvfs_create_pending_level_request(
     if (ctx->request_pending) {
         if ((new_opp->frequency == ctx->pending_request.new_opp.frequency) &&
             (new_opp->voltage == ctx->pending_request.new_opp.voltage)) {
-            return FWK_SUCCESS;
+            return;
         }
     } else {
         if ((new_opp->frequency == ctx->current_opp.frequency) &&
             (new_opp->voltage == ctx->current_opp.voltage)) {
-            return FWK_SUCCESS;
+            return;
         }
 
         ctx->pending_request.num_retries = 0;
@@ -422,8 +422,8 @@ static int dvfs_create_pending_level_request(
     if (retry_request) {
         ctx->pending_request.retry_request = retry_request;
     }
+
     ctx->pending_request.cookie = cookie;
-    return FWK_SUCCESS;
 }
 
 /*
@@ -624,7 +624,9 @@ static int dvfs_set_level(fwk_id_t domain_id, uintptr_t cookie, uint32_t level)
     }
 
     if (ctx->state != DVFS_DOMAIN_STATE_IDLE) {
-        return dvfs_create_pending_level_request(ctx, cookie, new_opp, false);
+        dvfs_create_pending_level_request(ctx, cookie, new_opp, false);
+
+        return FWK_SUCCESS;
     }
 
     if ((new_opp->level == ctx->current_opp.level) &&
@@ -679,7 +681,8 @@ static int dvfs_set_level_limits(
     }
 
     if (ctx->state != DVFS_DOMAIN_STATE_IDLE) {
-        return dvfs_create_pending_level_request(ctx, cookie, new_opp, true);
+        dvfs_create_pending_level_request(ctx, cookie, new_opp, true);
+        return FWK_SUCCESS;
     }
 
     if (fwk_interrupt_get_current(&interrupt) == FWK_SUCCESS) {
