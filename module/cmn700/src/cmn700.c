@@ -161,8 +161,8 @@ bool get_rnsam_nonhash_range_comp_en_mode(void *rnsam_reg)
 {
     struct cmn700_rnsam_reg *rnsam = rnsam_reg;
     return (rnsam->UNIT_INFO[0] &
-            CMN700_RNSAM_UNIT_INFO_HTG_RANGE_COMP_EN_MASK) >>
-        CMN700_RNSAM_UNIT_INFO_HTG_RANGE_COMP_EN_POS;
+            CMN700_RNSAM_UNIT_INFO_NONHASH_RANGE_COMP_EN_MASK) >>
+        CMN700_RNSAM_UNIT_INFO_NONHASH_RANGE_COMP_EN_POS;
 }
 
 bool get_rnsam_htg_range_comp_en_mode(void *rnsam_reg)
