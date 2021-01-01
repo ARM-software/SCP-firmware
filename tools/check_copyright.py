@@ -58,7 +58,7 @@ COMPANY_FULL_NAME_PATTERN = \
 LICENSE_PATTERN = \
     '{0} {1} SCP/MCP Software$\n'\
     '({0} Copyright \\(c\\) (?P<years>[0-9]{{4}}(-[0-9]{{4}})?), {2}.'\
-    ' All rights reserved.$\n)+'\
+    ' All rights(( )|(\n{0} ))reserved.$\n)+'\
     '{0}$\n'\
     '{0} SPDX-License-Identifier: BSD-3-Clause$\n'\
     .format(COMMENT_PATTERN, COMPANY_PATTERN, COMPANY_FULL_NAME_PATTERN)
