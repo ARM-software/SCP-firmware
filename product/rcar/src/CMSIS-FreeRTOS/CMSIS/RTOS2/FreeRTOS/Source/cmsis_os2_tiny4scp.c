@@ -1,6 +1,7 @@
 /* --------------------------------------------------------------------------
  * Copyright (c) 2013-2019 Arm Limited. All rights reserved.
- * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
+ * Copyright (c) 2020-2021, Renesas Electronics Corporation. All rights
+ *reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *

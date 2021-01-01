@@ -1,7 +1,8 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2020, Arm Limited and Contributors. All rights reserved.
- * Copyright (c) 2019-2020, Renesas Electronics Corporation. All rights reserved.
+ * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2021, Renesas Electronics Corporation. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
