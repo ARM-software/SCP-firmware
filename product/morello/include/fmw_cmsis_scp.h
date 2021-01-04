@@ -8,6 +8,8 @@
 #ifndef FMW_CMSIS_SCP_H
 #define FMW_CMSIS_SCP_H
 
+#include <stdint.h>
+
 #define __CHECK_DEVICE_DEFINES
 #define __CM7_REV 0x0000U
 #define __FPU_PRESENT 0U
@@ -19,6 +21,8 @@
 #define __Vendor_SysTickConfig 0U
 
 #define SCP_WDOG_IRQ FWK_INTERRUPT_NMI /* SCP Watchdog (SP805) */
+
+extern uint32_t SystemCoreClock; /*!< System Clock Frequency (Core Clock)*/
 
 typedef enum IRQn {
     Reset_IRQn = -15,
