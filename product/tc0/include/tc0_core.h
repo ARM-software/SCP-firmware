@@ -10,9 +10,9 @@
 
 #include <fwk_assert.h>
 
-#define TC0_CORE_PER_CLUSTER_MAX 4
+#define TC0_CORE_PER_CLUSTER_MAX 8
 
-#define CORES_PER_CLUSTER 4
+#define CORES_PER_CLUSTER  8
 #define NUMBER_OF_CLUSTERS 1
 
 static inline unsigned int tc0_core_get_cluster_count(void)
