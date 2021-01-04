@@ -29,6 +29,9 @@
 /* Maximum PPU cluster name size including the null terminator */
 #define PPU_CLUS_NAME_SIZE 6
 
+/* Cluster ID for Theodul DSU */
+#define CLUSTER_ID 0
+
 /* Module configuration data */
 static struct mod_ppu_v1_config ppu_v1_config_data = {
     .pd_notification_id = FWK_ID_NOTIFICATION_INIT(
@@ -62,7 +65,6 @@ static const struct fwk_element *ppu_v1_get_element_table(fwk_id_t module_id)
     struct fwk_element *element_table, *element;
     struct mod_ppu_v1_pd_config *pd_config_table, *pd_config;
     unsigned int core_idx;
-    unsigned int cluster_idx;
     unsigned int core_count;
     unsigned int cluster_count;
     unsigned int core_element_count = 0;
@@ -89,52 +91,42 @@ static const struct fwk_element *ppu_v1_get_element_table(fwk_id_t module_id)
     if (pd_config_table == NULL)
         return NULL;
 
-    for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
-        for (core_idx = 0;
-             core_idx < tc0_core_get_core_per_cluster_count(cluster_idx);
-             core_idx++) {
-            element = &element_table[core_element_count];
-            pd_config = &pd_config_table[core_element_count];
+    for (core_idx = 0;
+         core_idx < tc0_core_get_core_per_cluster_count(CLUSTER_ID);
+         core_idx++) {
+        element = &element_table[core_element_count];
+        pd_config = &pd_config_table[core_element_count];
 
-            element->name = fwk_mm_alloc(PPU_CORE_NAME_SIZE, 1);
-            if (element->name == NULL)
-                return NULL;
-
-            snprintf(
-                (char *)element->name,
-                PPU_CORE_NAME_SIZE,
-                "CLUS%uCORE%u",
-                cluster_idx,
-                core_idx);
-
-            element->data = pd_config;
-
-            pd_config->pd_type = MOD_PD_TYPE_CORE;
-            pd_config->ppu.reg_base = SCP_PPU_CORE_BASE(cluster_idx, core_idx);
-            pd_config->ppu.irq = FWK_INTERRUPT_NONE;
-            pd_config->cluster_id = FWK_ID_ELEMENT(
-                FWK_MODULE_IDX_PPU_V1, (core_count + cluster_idx));
-            pd_config->observer_id = FWK_ID_NONE;
-            core_element_count++;
-        }
-
-        element = &element_table[core_count + cluster_idx];
-        pd_config = &pd_config_table[core_count + cluster_idx];
-
-        element->name = fwk_mm_alloc(PPU_CLUS_NAME_SIZE, 1);
+        element->name = fwk_mm_alloc(PPU_CORE_NAME_SIZE, 1);
         if (element->name == NULL)
             return NULL;
 
-        snprintf(
-            (char *)element->name, PPU_CLUS_NAME_SIZE, "CLUS%u", cluster_idx);
+        snprintf((char *)element->name, PPU_CORE_NAME_SIZE, "CORE%u", core_idx);
 
         element->data = pd_config;
 
-        pd_config->pd_type = MOD_PD_TYPE_CLUSTER;
-        pd_config->ppu.reg_base = SCP_PPU_CLUSTER_BASE(cluster_idx);
+        pd_config->pd_type = MOD_PD_TYPE_CORE;
+        pd_config->ppu.reg_base = SCP_PPU_CORE_BASE(core_idx);
         pd_config->ppu.irq = FWK_INTERRUPT_NONE;
+        pd_config->cluster_id =
+            FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1, core_count);
         pd_config->observer_id = FWK_ID_NONE;
+        core_element_count++;
     }
+
+    element = &element_table[core_count];
+    pd_config = &pd_config_table[core_count];
+
+    element->name = fwk_mm_alloc(PPU_CLUS_NAME_SIZE, 1);
+    if (element->name == NULL)
+        return NULL;
+
+    element->data = pd_config;
+
+    pd_config->pd_type = MOD_PD_TYPE_CLUSTER;
+    pd_config->ppu.reg_base = SCP_PPU_CLUSTER_BASE;
+    pd_config->ppu.irq = FWK_INTERRUPT_NONE;
+    pd_config->observer_id = FWK_ID_NONE;
 
     memcpy(
         &element_table[core_count + cluster_count],

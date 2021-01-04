@@ -92,7 +92,7 @@ static const struct fwk_element *tc0_ppu_v1_get_element_table(
     element->data = pd_config;
 
     pd_config->pd_type = MOD_PD_TYPE_CORE;
-    pd_config->ppu.reg_base = SCP_PPU_CORE_BASE(0, 0);
+    pd_config->ppu.reg_base = SCP_PPU_CORE_BASE(0);
     pd_config->ppu.irq = FWK_INTERRUPT_NONE;
     pd_config->cluster_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1, 1);
     pd_config->observer_id = FWK_ID_NONE;
@@ -110,7 +110,7 @@ static const struct fwk_element *tc0_ppu_v1_get_element_table(
     element->data = pd_config;
 
     pd_config->pd_type = MOD_PD_TYPE_CLUSTER;
-    pd_config->ppu.reg_base = SCP_PPU_CLUSTER_BASE(0);
+    pd_config->ppu.reg_base = SCP_PPU_CLUSTER_BASE;
     pd_config->ppu.irq = FWK_INTERRUPT_NONE;
 
     pd_config->observer_id = fwk_module_id_cmn_booker;
