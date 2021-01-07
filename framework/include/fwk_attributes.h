@@ -499,7 +499,7 @@
  * \see https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html
  */
 
-#if FWK_HAS_GNU_ATTRIBUTE(__access__)
+#if FWK_HAS_GNU_ATTRIBUTE(__access__) && __GNUC__ >= 11
 #    define FWK_UNTOUCHED(REF_POS) __attribute__((__access__(none, REF_POS)))
 #else
 #    define FWK_UNTOUCHED(REF_POS)
