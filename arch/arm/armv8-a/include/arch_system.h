@@ -15,7 +15,7 @@
 #define R_OFF (0xAAAA5555)
 #define R_CLEAR (0)
 
-#ifdef __ASSEMBLY__
+#ifdef __ASSEMBLER__
 .extern _boot_flag.extern _shutdown_request
 #else
 extern volatile uint32_t _boot_flag;
