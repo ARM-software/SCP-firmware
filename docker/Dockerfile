@@ -9,8 +9,9 @@ FROM ubuntu:20.04 as ci
 
 ARG ARM_GNU_RM_URL="https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2020q2/gcc-arm-none-eabi-9-2020-q2-update-x86_64-linux.tar.bz2"
 ARG ARM_COMPILER_6_URL="https://developer.arm.com/-/media/Files/downloads/compiler/DS500-BN-00026-r5p0-16rel1.tgz"
-ARG DOXYGEN_URL="http://doxygen.nl/files/doxygen-1.8.20.linux.bin.tar.gz"
+ARG DOXYGEN_URL="https://deac-ams.dl.sourceforge.net/project/doxygen/rel-1.8.20/doxygen-1.8.20.linux.bin.tar.gz"
 ARG CMAKE_URL="https://github.com/Kitware/CMake/releases/download/v3.18.3/cmake-3.18.3-Linux-x86_64.tar.gz"
+ARG AARCH64_GCC_URL="https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/9.2-2019.12/binrel/gcc-arm-9.2-2019.12-x86_64-aarch64-none-elf.tar.xz"
 ARG CPPCHECK_SRC_URL="git://github.com/danmar/cppcheck.git"
 ARG IWYU_SRC_URL="https://github.com/include-what-you-use/include-what-you-use.git"
 
@@ -22,7 +23,7 @@ RUN apt-get update && \
     apt-get dist-upgrade -y && \
     apt-get install -y --no-install-recommends \
         bundler gcc g++ gpg-agent git gosu lsb-release make ninja-build \
-        python3 python3-pip software-properties-common wget && \
+        xz-utils python3 python3-pip software-properties-common wget && \
     wget -nv -O - -c "https://apt.llvm.org/llvm.sh" | bash && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -68,6 +69,14 @@ RUN mkdir "/opt/cmake" && \
         "/etc/profile.d/50-scp-firmware-env.sh"
 
 ENV PATH="/opt/cmake/bin:${PATH}"
+
+RUN mkdir "/opt/aarch64-gcc" && \
+    wget -nv -O - -c "${AARCH64_GCC_URL}" | \
+    tar -Jxf - -C "/opt/aarch64-gcc" --strip-components=1 && \
+    echo 'export PATH=/opt/aarch64-gcc/bin:${PATH}' >> \
+        "/etc/profile.d/50-scp-firmware-env.sh"
+
+ENV PATH="/opt/aarch64-gcc/bin:${PATH}"
 
 RUN cwd=$PWD && mkdir "/opt/cppcheck" && cd "/opt/cppcheck" && \
     git clone --depth 1 "${CPPCHECK_SRC_URL}" source && \
