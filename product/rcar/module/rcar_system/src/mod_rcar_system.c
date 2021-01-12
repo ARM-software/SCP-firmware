@@ -97,6 +97,12 @@ void rcar_system_code_copy_to_system_ram(void)
         (SYSTEM_RAM_END - SYSTEM_RAM_START));
 }
 
+int _platform_init(void *params)
+{
+    rcar_system_code_copy_to_system_ram();
+    return FWK_SUCCESS;
+}
+
 void vApplicationIdleHook(void)
 {
     uint32_t req;
