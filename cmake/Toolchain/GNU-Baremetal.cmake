@@ -9,9 +9,19 @@ include("${CMAKE_CURRENT_LIST_DIR}/GNU-Base.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/Generic-Baremetal.cmake")
 
 foreach(language IN ITEMS ASM C CXX)
-    string(APPEND CMAKE_${language}_FLAGS_INIT
-           "-mcpu=${CMAKE_SYSTEM_PROCESSOR} ")
-    string(APPEND CMAKE_${language}_FLAGS_INIT "-mthumb ")
+
+    if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+        if(DEFINED SCP_AARCH64_PROCESSOR_TARGET)
+            string(APPEND CMAKE_${language}_FLAGS_INIT
+               "-mcpu=${SCP_AARCH64_PROCESSOR_TARGET} ")
+        endif()
+    endif()
+
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "cortex-m[37]")
+        string(APPEND CMAKE_${language}_FLAGS_INIT "-mthumb ")
+        string(APPEND CMAKE_${language}_FLAGS_INIT
+            "-mcpu=${CMAKE_SYSTEM_PROCESSOR} ")
+    endif()
 
     string(APPEND CMAKE_${language}_FLAGS_INIT "-ffunction-sections ")
     string(APPEND CMAKE_${language}_FLAGS_INIT "-fdata-sections ")

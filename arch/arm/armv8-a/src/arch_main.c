@@ -6,9 +6,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <mod_rcar_system.h>
-
 #include <fwk_arch.h>
+#include <fwk_attributes.h>
 #include <fwk_noreturn.h>
 #include <fwk_status.h>
 
@@ -16,6 +15,11 @@
 #include <arch_helpers.h>
 
 #include <stdbool.h>
+
+FWK_WEAK int _platform_init(void *params)
+{
+    return FWK_SUCCESS;
+}
 
 /*
  * Error handler for failures that occur during early initialization.
@@ -34,7 +38,7 @@ void arm_main(void)
 {
     int status;
 
-    rcar_system_code_copy_to_system_ram();
+    _platform_init(NULL);
 
 #ifdef BUILD_MODE_DEBUG
     uint32_t cntv_ctl = 0;
