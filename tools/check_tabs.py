@@ -32,19 +32,20 @@ EXCLUDE_DIRECTORIES = [
 # Exclude patterns (applied to files only)
 #
 EXCLUDE = [
-    'Makefile',
-    '*.mk',
-    '*.html',
-    '*.xml',
-    '*.css',
-    '*.gif',
-    '*.dat',
-    '*.swp',
-    '*.pyc',
-    '.gitmodules',
-    '*.svg',
-    '*.a',
-    '*.pdf',
+    "Makefile",
+    "*.mk",
+    "*.html",
+    "*.xml",
+    "*.css",
+    "*.gif",
+    "*.dat",
+    "*.swp",
+    "*.pyc",
+    ".gitmodules",
+    "*.svg",
+    "*.a",
+    "*.pdf",
+    "Makefile.*"
 ]
 
 

@@ -33,17 +33,18 @@ EXCLUDE_DIRECTORIES = [
 # Exclude patterns (applied to files only)
 #
 EXCLUDE = [
-    '*.html',
-    '*.xml',
-    '*.css',
-    '*.gif',
-    '*.dat',
-    '*.pyc',
-    '*.jar',
-    '*.md',
-    '*.swp',
-    '*.a',
-    '*.pdf',
+    "*.html",
+    "*.xml",
+    "*.css",
+    "*.gif",
+    "*.dat",
+    "*.pyc",
+    "*.jar",
+    "*.md",
+    "*.swp",
+    "*.a",
+    "*.pdf",
+    ".*"
 ]
 
 KEYWORDS = [
