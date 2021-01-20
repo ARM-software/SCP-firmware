@@ -50,15 +50,15 @@
 /*
  * Platform information structure used by BL31
  */
-struct morello_platform_info {
-    /* If multichip mode */
-    bool multichip_mode;
+struct FWK_PACKED morello_platform_info {
+    /* Local DDR memory size in bytes */
+    uint64_t local_ddr_size;
+    /* Remote DDR memory size in bytes */
+    uint64_t remote_ddr_size;
     /* Total number of slave chips  */
     uint8_t slave_count;
-    /* Local ddr size in GB */
-    uint8_t local_ddr_size;
-    /* Remote ddr size in GB */
-    uint8_t remote_ddr_size;
+    /* If multichip mode */
+    bool multichip_mode;
 };
 
 /*
@@ -288,16 +288,19 @@ static int morello_system_fill_platform_info(void)
 {
     const struct mod_sds_structure_desc *sds_structure_desc =
         fwk_module_get_data(sds_platform_info_id);
+    uint64_t size = 0;
 
     /* Force single chip mode with 8GB DDR DRAM */
     sds_platform_info.slave_count = 0;
     sds_platform_info.multichip_mode = 0;
     sds_platform_info.remote_ddr_size = 0;
-    sds_platform_info.local_ddr_size = 8;
+    sds_platform_info.local_ddr_size = 8ULL * FWK_GIB;
 
+    size = sds_platform_info.local_ddr_size + sds_platform_info.remote_ddr_size;
     FWK_LOG_INFO(
-        "    Total DDR Size: %d GB",
-        sds_platform_info.local_ddr_size + sds_platform_info.remote_ddr_size);
+        "[MORELLO SYSTEM] Total DDR Size in Bytes: 0x%" PRIX32 "%08" PRIX32,
+        (uint32_t)(size >> 32),
+        (uint32_t)size);
 
     return morello_system_ctx.sds_api->struct_write(
         sds_structure_desc->id,
