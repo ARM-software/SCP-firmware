@@ -117,7 +117,9 @@ struct cmn650_rnsam_reg {
     FWK_RW uint64_t NON_HASH_TGT_NODEID[5];
            uint8_t  RESERVED4[0xE00 - 0xDA8];
     FWK_RW uint64_t SYS_CACHE_GRP_REGION[4];
-           uint8_t  RESERVED5[0xEA0 - 0xE20];
+           uint8_t  RESERVED5[0xE80 - 0xE20];
+    FWK_RW uint64_t RNSAM_HASH_ADDR_MASK_REG;
+           uint8_t  RESERVED17[0xEA0 - 0xE88];
     FWK_RW uint64_t SYS_CACHE_GRP_HN_COUNT;
            uint8_t  RESERVED6[0xF00 - 0xEA8];
     FWK_RW uint64_t SYS_CACHE_GRP_HN_NODEID[16];
@@ -128,6 +130,20 @@ struct cmn650_rnsam_reg {
            uint64_t GIC_MEM_REGION;
            uint8_t  RESERVED9[0x1120 - 0x1110];
     FWK_RW uint64_t SYS_CACHE_GRP_CAL_MODE;
+           uint8_t  RESERVED10[0x1140 - 0x1128];
+    FWK_RW uint64_t SYS_CACHE_GRP_SN_SAM_CFG[2];
+           uint8_t  RESERVED11[0x1180 - 0x1150];
+    FWK_RW uint64_t SYS_CACHE_GRP_HN_CPA_EN;
+           uint8_t  RESERVED12[0x1190 - 0x1188];
+    FWK_RW uint64_t SYS_CACHE_GRP_HN_CPA_GRP;
+           uint8_t  RESERVED13[0x11A0 - 0x1198];
+    FWK_RW uint64_t CML_PORT_AGGR_MODE_CTRL[2];
+           uint8_t  RESERVED14[0x11C0 - 0x11B0];
+    FWK_RW uint64_t CML_PORT_AGGR_GRP_ADD_MASK[5];
+           uint8_t  RESERVED15[0x11F0 - 0x11E8];
+    FWK_RW uint64_t CML_PORT_AGGR_GRP[2];
+           uint8_t  RESERVED16[0x1208 - 0x1200];
+    FWK_RW uint64_t CML_PORT_AGGR_CTRL;
 };
 
 /*
@@ -139,12 +155,20 @@ struct cmn650_hnf_reg {
     FWK_R  uint64_t CHILD_INFO;
            uint8_t  RESERVED1[0x900 - 0x88];
     FWK_R  uint64_t UNIT_INFO;
-           uint8_t  RESERVED2[0xD00 - 0x908];
+           uint8_t  RESERVED2[0xCF0 - 0x908];
+    FWK_RW uint64_t HN_SAM_HASH_ADDR_MASK_REG;
+           uint8_t  RESERVED8[0xD00 - 0xCF8];
     FWK_RW uint64_t SAM_CONTROL;
     FWK_RW uint64_t SAM_MEMREGION[2];
            uint8_t  RESERVED3[0xD28 - 0xD18];
-    FWK_RW uint64_t RN_PHYS_ID[32];
-           uint8_t  RESERVED4[0x1C00 - 0xE28];
+    FWK_RW uint64_t RN_PHYS_ID[64];
+           uint8_t  RESERVED4[0xF80 - 0xF28];
+    FWK_RW uint64_t CML_PORT_AGGR_GRP_ADD_MASK[5];
+           uint8_t  RESERVED5[0xFB0 - 0xFA8];
+    FWK_RW uint64_t CML_PORT_AGGR_GRP[2];
+           uint8_t  RESERVED6[0xFD0 - 0xFC0];
+    FWK_RW uint64_t CML_PORT_AGGR_CTRL;
+           uint8_t  RESERVED7[0x1C00 - 0xFD8];
     FWK_RW uint64_t PPU_PWPR;
 };
 
