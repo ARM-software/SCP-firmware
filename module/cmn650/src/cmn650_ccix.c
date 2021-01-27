@@ -18,8 +18,12 @@
 
 #define MOD_NAME "[CMN650_CCIX] "
 
-/* RAID value common to all function */
-static uint8_t raid_value;
+struct mod_cmn650_ccix_ctx {
+    /* RAID value common to all function */
+    uint8_t raid_value;
+};
+
+static struct mod_cmn650_ccix_ctx cmn650_ccix_ctx;
 
 /* Pointer to the current CCIX configuration data */
 static const struct mod_cmn650_ccix_config *config;
@@ -121,8 +125,7 @@ static void program_cxg_ra_rnf_ldid_to_raid_reg(
     /* Set corresponding valid bit */
     cxg_ra_reg->CXG_RA_RNF_LDID_TO_RAID_VAL |= ((uint64_t)0x1 << ldid_value);
 
-    /* Increment the global raid_value */
-    raid_value++;
+    cmn650_ccix_ctx.raid_value++;
 }
 
 static void program_cxg_ra_rni_ldid_to_raid_reg(
@@ -147,8 +150,7 @@ static void program_cxg_ra_rni_ldid_to_raid_reg(
     /* Set corresponding valid bit */
     cxg_ra_reg->CXG_RA_RNI_LDID_TO_RAID_VAL |= ((uint64_t)0x1 << ldid_value);
 
-    /* Increment the global raid_value */
-    raid_value++;
+    cmn650_ccix_ctx.raid_value++;
 }
 
 static void program_cxg_ra_rnd_ldid_to_raid_reg(
@@ -173,8 +175,7 @@ static void program_cxg_ra_rnd_ldid_to_raid_reg(
     /* Set corresponding valid bit */
     cxg_ra_reg->CXG_RA_RND_LDID_TO_RAID_VAL |= ((uint64_t)0x1 << ldid_value);
 
-    /* Increment the global raid_value */
-    raid_value++;
+    cmn650_ccix_ctx.raid_value++;
 }
 
 static void program_agentid_to_linkid_reg(
@@ -560,11 +561,11 @@ int ccix_setup(
      * In order to assign unique AgentIDs across multiple chips, chip_id is used
      * as factor to offset the AgentID value
      */
-    raid_value = 0;
+    cmn650_ccix_ctx.raid_value = 0;
     offset_id = chip_id * local_ra_cnt;
 
     for (rnf_ldid = 0; rnf_ldid < ctx->rnf_count; rnf_ldid++) {
-        agentid = raid_value + offset_id;
+        agentid = cmn650_ccix_ctx.raid_value + offset_id;
 
         /* Program RAID values in CXRA LDID to RAID LUT */
         program_cxg_ra_rnf_ldid_to_raid_reg(ctx, rnf_ldid, agentid);
@@ -612,23 +613,23 @@ int ccix_setup(
     /* Program the unique HAID for the CXHA block */
     program_cxg_ha_id(ctx, ccix_config->haid);
 
-    raid_value = 0;
+    cmn650_ccix_ctx.raid_value = 0;
     offset_id = chip_id * local_ra_cnt;
 
     for (rnd_ldid = 0; rnd_ldid < ctx->rnd_count; rnd_ldid++) {
         /* Determine agentid of the remote agents */
-        agentid = raid_value + offset_id;
+        agentid = cmn650_ccix_ctx.raid_value + offset_id;
 
         /* Program RAID values in CXRA LDID to RAID LUT */
         program_cxg_ra_rnd_ldid_to_raid_reg(ctx, rnd_ldid, agentid);
     }
 
-    raid_value = 0;
+    cmn650_ccix_ctx.raid_value = 0;
     offset_id = chip_id * local_ra_cnt;
 
     for (rni_ldid = 0; rni_ldid < ctx->rni_count; rni_ldid++) {
         /* Determine agentid of the remote agents */
-        agentid = raid_value + offset_id;
+        agentid = cmn650_ccix_ctx.raid_value + offset_id;
 
         /* Program RAID values in CXRA LDID to RAID LUT */
         program_cxg_ra_rni_ldid_to_raid_reg(ctx, rni_ldid, agentid);
