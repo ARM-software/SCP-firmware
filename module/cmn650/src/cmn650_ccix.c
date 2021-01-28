@@ -582,6 +582,13 @@ int ccix_setup(
      */
     unique_remote_rnf_ldid_value = ctx->rnf_count;
 
+    if (ccix_config->remote_rnf_count && (ctx->rnf_count == 0)) {
+        FWK_LOG_ERR(
+            MOD_NAME "Remote RN-F Count can't be %u when RN-F count is zero",
+            ccix_config->remote_rnf_count);
+        fwk_unexpected();
+    }
+
     for (i = 0; i < ccix_config->remote_rnf_count; i++) {
         /*
          * The remote_agentid should not include the current chip's AgentIDs.
