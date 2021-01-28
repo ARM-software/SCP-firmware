@@ -59,13 +59,14 @@ ifeq ($(BS_LINKER),ARM)
     export OBJCOPY := $(shell $(CC) --print-prog-name fromelf)
     export SIZE := $(shell $(CC) --print-prog-name size)
 else ifeq ($(BS_TOOLCHAIN),LLVM)
-    export AR := $(shell $(CC) --print-prog-name llvm-ar)
-    export OBJCOPY := $(shell $(CC) --print-prog-name llvm-objcopy)
-    export SIZE := $(shell $(CC) --print-prog-name llvm-size)
+    export LLVM_BIN_DIR := $(shell $(CC) --print-resource-dir)/../../../bin
+    export AR := $(LLVM_BIN_DIR)/llvm-ar
+    export OBJCOPY := $(LLVM_BIN_DIR)/llvm-objcopy
+    export SIZE := $(LLVM_BIN_DIR)/llvm-size
 
     # Clang currently does not use LLD for all the ARM targets,
     # therefore we are enforcing the use of it manually.
-    export LD := $(shell $(CC) --print-prog-name=ld.lld)
+    export LD := $(LLVM_BIN_DIR)/ld.lld
 else
     export AR := $(shell $(CC) --print-prog-name ar)
     export OBJCOPY := $(shell $(CC) --print-prog-name objcopy)
