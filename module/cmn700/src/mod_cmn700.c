@@ -369,7 +369,8 @@ static void cmn700_configure(void)
 
                 if (!(get_device_type(xp, xp_port) == DEVICE_TYPE_CXRH) &&
                     !(get_device_type(xp, xp_port) == DEVICE_TYPE_CXHA) &&
-                    !(get_device_type(xp, xp_port) == DEVICE_TYPE_CXRA)) {
+                    !(get_device_type(xp, xp_port) == DEVICE_TYPE_CXRA) &&
+                    !(get_device_type(xp, xp_port) == DEVICE_TYPE_CCG)) {
                     fwk_assert(xrnsam_entry < ctx->external_rnsam_count);
 
                     ctx->external_rnsam_table[xrnsam_entry].node_id = node_id;
