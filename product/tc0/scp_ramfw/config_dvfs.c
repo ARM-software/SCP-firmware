@@ -6,6 +6,8 @@
  */
 
 #include "clock_soc.h"
+#include "tc0_dvfs.h"
+#include "tc0_psu.h"
 #include "tc0_timer.h"
 
 #include <mod_dvfs.h>
@@ -16,38 +18,72 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 
-static struct mod_dvfs_opp opps[] = { {
-                                          .level = 946 * 1000000UL,
-                                          .frequency = 946 * FWK_KHZ,
-                                          .voltage = 550,
-                                      },
-                                      {
-                                          .level = 1419 * 1000000UL,
-                                          .frequency = 1419 * FWK_KHZ,
-                                          .voltage = 650,
-                                      },
-                                      {
-                                          .level = 1893 * 1000000UL,
-                                          .frequency = 1893 * FWK_KHZ,
-                                          .voltage = 750,
-                                      },
-                                      {
-                                          .level = 2271 * 1000000UL,
-                                          .frequency = 2271 * FWK_KHZ,
-                                          .voltage = 850,
-                                      },
-                                      {
-                                          .level = 2650 * 1000000UL,
-                                          .frequency = 2650 * FWK_KHZ,
-                                          .voltage = 950,
-                                      },
-                                      { 0 } };
+static struct mod_dvfs_opp operating_points_klein[] = {
+    {
+        .level = 768 * 1000000UL,
+        .frequency = 768 * FWK_KHZ,
+        .voltage = 550,
+    },
+    {
+        .level = 1153 * 1000000UL,
+        .frequency = 1153 * FWK_KHZ,
+        .voltage = 650,
+    },
+    {
+        .level = 1537 * 1000000UL,
+        .frequency = 1537 * FWK_KHZ,
+        .voltage = 750,
+    },
+    {
+        .level = 1844 * 1000000UL,
+        .frequency = 1844 * FWK_KHZ,
+        .voltage = 850,
+    },
+    {
+        .level = 2152 * 1000000UL,
+        .frequency = 2152 * FWK_KHZ,
+        .voltage = 950,
+    },
+    { 0 }
+};
 
-static const struct mod_dvfs_domain_config cpu_group = {
-    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, 0),
-    .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_CPU_GROUP0),
-    .alarm_id =
-        FWK_ID_SUB_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0, CONFIG_TIMER_DVFS_CPU),
+static struct mod_dvfs_opp operating_points_matterhorn[] = {
+    {
+        .level = 946 * 1000000UL,
+        .frequency = 946 * FWK_KHZ,
+        .voltage = 550,
+    },
+    {
+        .level = 1419 * 1000000UL,
+        .frequency = 1419 * FWK_KHZ,
+        .voltage = 650,
+    },
+    {
+        .level = 1893 * 1000000UL,
+        .frequency = 1893 * FWK_KHZ,
+        .voltage = 750,
+    },
+    {
+        .level = 2271 * 1000000UL,
+        .frequency = 2271 * FWK_KHZ,
+        .voltage = 850,
+    },
+    {
+        .level = 2650 * 1000000UL,
+        .frequency = 2650 * FWK_KHZ,
+        .voltage = 950,
+    },
+    { 0 }
+};
+
+static const struct mod_dvfs_domain_config cpu_group_klein = {
+    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, PSU_ELEMENT_IDX_KLEIN),
+    .clock_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_CPU_GROUP_KLEIN),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
+        FWK_MODULE_IDX_TIMER,
+        0,
+        CONFIG_TIMER_DVFS_CPU_KLEIN),
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
     .updates_api_id = FWK_ID_API_INIT(
         FWK_MODULE_IDX_SCMI_PERF,
@@ -55,13 +91,38 @@ static const struct mod_dvfs_domain_config cpu_group = {
     .retry_ms = 1,
     .latency = 1200,
     .sustained_idx = 2,
-    .opps = opps,
+    .opps = operating_points_klein,
 };
 
-static const struct fwk_element element_table[] = { [0] =
+static const struct mod_dvfs_domain_config cpu_group_matterhorn = {
+    .psu_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, PSU_ELEMENT_IDX_MATTERHORN),
+    .clock_id = FWK_ID_ELEMENT_INIT(
+        FWK_MODULE_IDX_CLOCK,
+        CLOCK_IDX_CPU_GROUP_MATTERHORN),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
+        FWK_MODULE_IDX_TIMER,
+        0,
+        CONFIG_TIMER_DVFS_CPU_MATTERHORN),
+    .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
+    .updates_api_id = FWK_ID_API_INIT(
+        FWK_MODULE_IDX_SCMI_PERF,
+        MOD_SCMI_PERF_DVFS_UPDATE_API),
+    .retry_ms = 1,
+    .latency = 1200,
+    .sustained_idx = 2,
+    .opps = operating_points_matterhorn,
+};
+
+static const struct fwk_element element_table[] = { [DVFS_ELEMENT_IDX_KLEIN] =
                                                         {
-                                                            .name = "CPU_GROUP",
-                                                            .data = &cpu_group,
+                                                            .name = "CPU_GROUP_KLEIN",
+                                                            .data = &cpu_group_klein,
+                                                        },
+                                                    [DVFS_ELEMENT_IDX_MATTERHORN] =
+                                                        {
+                                                            .name = "CPU_GROUP_MATTERHORN",
+                                                            .data = &cpu_group_matterhorn,
                                                         },
                                                     { 0 } };
 

@@ -19,9 +19,9 @@
 /*
  * Rate lookup tables
  */
-static struct mod_pik_clock_rate rate_table_cpu_group[] = {
+static struct mod_pik_clock_rate rate_table_cpu_group_klein[] = {
     {
-        .rate = 1750 * FWK_MHZ,
+        .rate = 1537 * FWK_MHZ,
         .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
         .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .divider = 1, /* Rate adjusted via CPU PLL */
@@ -94,8 +94,8 @@ static const struct fwk_element
                         .control_reg = &CLUSTER_PIK_PTR(0)->CORECLK[0].CTRL,
                         .divext_reg = &CLUSTER_PIK_PTR(0)->CORECLK[0].DIV,
                         .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[0].MOD,
-                        .rate_table = rate_table_cpu_group,
-                        .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group),
+                        .rate_table = rate_table_cpu_group_klein,
+                        .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_klein),
                     }),
                 },
             [CLOCK_PIK_IDX_CLUS0_CPU1] =
@@ -107,8 +107,8 @@ static const struct fwk_element
                         .control_reg = &CLUSTER_PIK_PTR(0)->CORECLK[1].CTRL,
                         .divext_reg = &CLUSTER_PIK_PTR(0)->CORECLK[1].DIV,
                         .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[1].MOD,
-                        .rate_table = rate_table_cpu_group,
-                        .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group),
+                        .rate_table = rate_table_cpu_group_klein,
+                        .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_klein),
                     }),
                 },
             [CLOCK_PIK_IDX_CLUS0_CPU2] =
@@ -120,8 +120,8 @@ static const struct fwk_element
                         .control_reg = &CLUSTER_PIK_PTR(0)->CORECLK[2].CTRL,
                         .divext_reg = &CLUSTER_PIK_PTR(0)->CORECLK[2].DIV,
                         .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[2].MOD,
-                        .rate_table = rate_table_cpu_group,
-                        .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group),
+                        .rate_table = rate_table_cpu_group_klein,
+                        .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_klein),
                     }),
                 },
             [CLOCK_PIK_IDX_CLUS0_CPU3] =
@@ -133,8 +133,8 @@ static const struct fwk_element
                         .control_reg = &CLUSTER_PIK_PTR(0)->CORECLK[3].CTRL,
                         .divext_reg = &CLUSTER_PIK_PTR(0)->CORECLK[3].DIV,
                         .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[3].MOD,
-                        .rate_table = rate_table_cpu_group,
-                        .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group),
+                        .rate_table = rate_table_cpu_group_klein,
+                        .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_klein),
                     }),
                 },
             [CLOCK_PIK_IDX_INTERCONNECT] =
