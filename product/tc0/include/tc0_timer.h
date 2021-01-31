@@ -9,7 +9,8 @@
 #define CONFIG_TIMER_H
 
 enum config_timer_refclk_sub_element_idx {
-    CONFIG_TIMER_DVFS_CPU,
+    CONFIG_TIMER_DVFS_CPU_KLEIN,
+    CONFIG_TIMER_DVFS_CPU_MATTERHORN,
     CONFIG_TIMER_SUB_ELEMENT_IDX_COUNT,
 };
 

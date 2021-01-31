@@ -35,13 +35,13 @@ static const struct fwk_element clock_dev_desc_table[] = {
 
             }),
         },
-    [CLOCK_IDX_CPU_GROUP0] =
+    [CLOCK_IDX_CPU_GROUP_KLEIN] =
         {
-            .name = "CPU_GROUP0",
+            .name = "CPU_GROUP_KLEIN",
             .data = &((struct mod_clock_dev_config){
                 .driver_id = FWK_ID_ELEMENT_INIT(
                     FWK_MODULE_IDX_CSS_CLOCK,
-                    CLOCK_CSS_IDX_CPU_GROUP0),
+                    CLOCK_CSS_IDX_CPU_GROUP_KLEIN),
                 .api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_CSS_CLOCK,
                     MOD_CSS_CLOCK_API_TYPE_CLOCK),

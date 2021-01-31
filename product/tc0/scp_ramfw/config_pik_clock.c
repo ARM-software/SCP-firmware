@@ -21,9 +21,18 @@
 /*
  * Rate lookup tables
  */
-static struct mod_pik_clock_rate rate_table_cpu_group[] = {
+static struct mod_pik_clock_rate rate_table_cpu_group_klein[] = {
     {
-        .rate = 1750 * FWK_MHZ,
+        .rate = 1537 * FWK_MHZ,
+        .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
+        .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
+        .divider = 1, /* Rate adjusted via CPU PLL */
+    },
+};
+
+static struct mod_pik_clock_rate rate_table_cpu_group_matterhorn[] = {
+    {
+        .rate = 1893 * FWK_MHZ,
         .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
         .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .divider = 1, /* Rate adjusted via CPU PLL */
@@ -103,8 +112,8 @@ static const struct fwk_element pik_clock_element_table[] = {
             .control_reg = &CLUSTER_PIK_PTR(0)->CORECLK[0].CTRL,
             .divext_reg = &CLUSTER_PIK_PTR(0)->CORECLK[0].DIV,
             .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[0].MOD,
-            .rate_table = rate_table_cpu_group,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group),
+            .rate_table = rate_table_cpu_group_klein,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_klein),
         }),
     },
     [CLOCK_PIK_IDX_CLUS0_CPU1] = {
@@ -115,8 +124,8 @@ static const struct fwk_element pik_clock_element_table[] = {
             .control_reg = &CLUSTER_PIK_PTR(0)->CORECLK[1].CTRL,
             .divext_reg = &CLUSTER_PIK_PTR(0)->CORECLK[1].DIV,
             .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[1].MOD,
-            .rate_table = rate_table_cpu_group,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group),
+            .rate_table = rate_table_cpu_group_klein,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_klein),
         }),
     },
     [CLOCK_PIK_IDX_CLUS0_CPU2] = {
@@ -127,8 +136,8 @@ static const struct fwk_element pik_clock_element_table[] = {
             .control_reg = &CLUSTER_PIK_PTR(0)->CORECLK[2].CTRL,
             .divext_reg = &CLUSTER_PIK_PTR(0)->CORECLK[2].DIV,
             .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[2].MOD,
-            .rate_table = rate_table_cpu_group,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group),
+            .rate_table = rate_table_cpu_group_klein,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_klein),
         }),
     },
     [CLOCK_PIK_IDX_CLUS0_CPU3] = {
@@ -139,8 +148,56 @@ static const struct fwk_element pik_clock_element_table[] = {
             .control_reg = &CLUSTER_PIK_PTR(0)->CORECLK[3].CTRL,
             .divext_reg = &CLUSTER_PIK_PTR(0)->CORECLK[3].DIV,
             .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[3].MOD,
-            .rate_table = rate_table_cpu_group,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group),
+            .rate_table = rate_table_cpu_group_klein,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_klein),
+        }),
+    },
+    [CLOCK_PIK_IDX_CLUS0_CPU4] = {
+        .name = "CLUS0_CPU4",
+        .data = &((struct mod_pik_clock_dev_config) {
+            .type = MOD_PIK_CLOCK_TYPE_CLUSTER,
+            .is_group_member = true,
+            .control_reg = &CLUSTER_PIK_PTR(0)->CORECLK[4].CTRL,
+            .divext_reg = &CLUSTER_PIK_PTR(0)->CORECLK[4].DIV,
+            .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[4].MOD,
+            .rate_table = rate_table_cpu_group_matterhorn,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_matterhorn),
+        }),
+    },
+    [CLOCK_PIK_IDX_CLUS0_CPU5] = {
+        .name = "CLUS0_CPU5",
+        .data = &((struct mod_pik_clock_dev_config) {
+            .type = MOD_PIK_CLOCK_TYPE_CLUSTER,
+            .is_group_member = true,
+            .control_reg = &CLUSTER_PIK_PTR(0)->CORECLK[5].CTRL,
+            .divext_reg = &CLUSTER_PIK_PTR(0)->CORECLK[5].DIV,
+            .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[5].MOD,
+            .rate_table = rate_table_cpu_group_matterhorn,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_matterhorn),
+        }),
+    },
+    [CLOCK_PIK_IDX_CLUS0_CPU6] = {
+        .name = "CLUS0_CPU6",
+        .data = &((struct mod_pik_clock_dev_config) {
+            .type = MOD_PIK_CLOCK_TYPE_CLUSTER,
+            .is_group_member = true,
+            .control_reg = &CLUSTER_PIK_PTR(0)->CORECLK[6].CTRL,
+            .divext_reg = &CLUSTER_PIK_PTR(0)->CORECLK[6].DIV,
+            .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[6].MOD,
+            .rate_table = rate_table_cpu_group_matterhorn,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_matterhorn),
+        }),
+    },
+    [CLOCK_PIK_IDX_CLUS0_CPU7] = {
+        .name = "CLUS0_CPU7",
+        .data = &((struct mod_pik_clock_dev_config) {
+            .type = MOD_PIK_CLOCK_TYPE_CLUSTER,
+            .is_group_member = true,
+            .control_reg = &CLUSTER_PIK_PTR(0)->CORECLK[7].CTRL,
+            .divext_reg = &CLUSTER_PIK_PTR(0)->CORECLK[7].DIV,
+            .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[7].MOD,
+            .rate_table = rate_table_cpu_group_matterhorn,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_matterhorn),
         }),
     },
     [CLOCK_PIK_IDX_INTERCONNECT] = {

@@ -5,6 +5,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <tc0_mock_psu.h>
+#include <tc0_psu.h>
+
 #include <mod_mock_psu.h>
 #include <mod_psu.h>
 
@@ -13,11 +16,20 @@
 #include <fwk_module_idx.h>
 
 static const struct fwk_element element_table[] = {
-    {
-        .name = "DVFS_GROUP0",
+    [PSU_ELEMENT_IDX_KLEIN] = {
+        .name = "DVFS_GROUP_KLEIN",
         .data =
             &(const struct mod_psu_element_cfg){
-                .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MOCK_PSU, 0),
+                .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MOCK_PSU, MOCK_PSU_ELEMENT_IDX_KLEIN),
+                .driver_api_id = FWK_ID_API_INIT(
+                    FWK_MODULE_IDX_MOCK_PSU,
+                    MOD_MOCK_PSU_API_IDX_DRIVER) },
+    },
+    [PSU_ELEMENT_IDX_MATTERHORN] = {
+        .name = "DVFS_GROUP_MATTERHORN",
+        .data =
+            &(const struct mod_psu_element_cfg){
+                .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MOCK_PSU, MOCK_PSU_ELEMENT_IDX_MATTERHORN),
                 .driver_api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_MOCK_PSU,
                     MOD_MOCK_PSU_API_IDX_DRIVER) },
