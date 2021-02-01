@@ -161,10 +161,6 @@ LIBRARY_MODULES := \
 LIBRARY_MODULES := \
     $(patsubst $(PRODUCT_MODULES_DIR)/%/lib,%,$(LIBRARY_MODULES))
 
-# Prefer sources over pre-built libraries for modules that provide both
-LIBRARY_MODULES := \
-    $(filter-out $(SOURCE_MODULES),$(LIBRARY_MODULES))
-
 # Select the library modules for the current firmware
 LIBRARY_MODULES := $(filter $(FIRMWARE_MODULES_LIST),$(LIBRARY_MODULES))
 
@@ -263,7 +259,7 @@ MODULE_LIBS_y += $(patsubst %, \
 MODULE_LIBS_y += $(foreach module,$(LIBRARY_MODULES_STANDARD), \
     $(MODULES_DIR)/$(module)/lib/mod_$(module).a)
 MODULE_LIBS_y += $(foreach module,$(LIBRARY_MODULES_PRODUCT), \
-    $(PRODUCT_MODULES_DIR)/$(module)/lib/mod_$(module).a)
+    $(PRODUCT_MODULES_DIR)/$(module)/lib/*.a)
 
 # Create a list of include directories from the selected modules and libraries
 MODULE_INCLUDES += $(patsubst %,$(MODULES_DIR)/%/include, \
