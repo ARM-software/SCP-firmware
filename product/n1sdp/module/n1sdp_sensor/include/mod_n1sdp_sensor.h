@@ -27,6 +27,17 @@
  */
 
 /*!
+ * \brief Sensor type
+ */
+enum sensor_type {
+    /*! Temperature sensor */
+    MOD_N1SDP_TEMP_SENSOR,
+
+    /*! Voltage sensor */
+    MOD_N1SDP_VOLT_SENSOR,
+};
+
+/*!
  * \brief Temperature sensor indices.
  */
 enum mod_n1sdp_temp_sensor_idx {
