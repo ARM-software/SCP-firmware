@@ -23,8 +23,8 @@ export TOOLS_DIR := $(TOP_DIR)/tools
 export BS_DIR := $(TOOLS_DIR)/build_system
 export PRODUCTS_DIR := $(TOP_DIR)/product
 export MODULES_DIR := $(TOP_DIR)/module
-export CMSIS_DIR := $(TOP_DIR)/cmsis/CMSIS/Core
-export OS_DIR := $(TOP_DIR)/cmsis/CMSIS/RTOS2
+export CMSIS_DIR := $(TOP_DIR)/contrib/cmsis/git/CMSIS/Core
+export OS_DIR := $(TOP_DIR)/contrib/cmsis/git/CMSIS/RTOS2
 export DBG_DIR := $(TOP_DIR)/debugger
 
 BUILD_STRING := $(shell $(TOOLS_DIR)/build_string.py 2>/dev/null)
