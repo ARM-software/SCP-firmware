@@ -1,3 +1,6 @@
 [submodule "cmsis"]
 	path = contrib/cmsis/git
 	url = https://github.com/ARM-software/CMSIS_5
+[submodule "run-clang-format"]
+	path = contrib/run-clang-format/git
+	url = https://github.com/Sarcasm/run-clang-format.git
