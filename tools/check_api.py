@@ -30,6 +30,7 @@ EXCLUDE_DIRECTORIES = [
     'build',
     'tools',
     'contrib/cmsis/git',
+    "contrib/run-clang-format/git",
     'product/rcar/src/CMSIS-FreeRTOS',
 ]
 
