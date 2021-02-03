@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <dimm_spd.h>
+#include "dimm_spd.h"
 
 #include <mod_n1sdp_dmc620.h>
 #include <mod_n1sdp_i2c.h>
