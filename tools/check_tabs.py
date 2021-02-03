@@ -23,7 +23,7 @@ import fnmatch
 EXCLUDE_DIRECTORIES = [
     '.git',
     'build',
-    'cmsis',
+    'contrib/cmsis/git',
     'product/rcar/src/CMSIS-FreeRTOS',
 ]
 

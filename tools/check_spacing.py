@@ -24,7 +24,7 @@ EXCLUDE_DIRECTORIES = [
     '.git',
     'build',
     'tools',
-    'cmsis',
+    'contrib/cmsis/git',
     'product/rcar/src/CMSIS-FreeRTOS',
 ]
 
