@@ -722,7 +722,7 @@ int ccix_enter_dvm_domain(
     wait_data.linkid = linkid;
 
     FWK_LOG_INFO(MOD_NAME "Entering DVM domain for link %d...", linkid);
-    /* Enter system coherency by setting DVMDOMAIN request bit */
+    /* DVM domain entry by setting DVMDOMAIN request bit */
     cxg_ra_reg->LINK_REGS[linkid].CXG_PRTCL_LINK_CTRL |=
         CXG_LINK_CTRL_DVMDOMAIN_REQ_MASK;
 
