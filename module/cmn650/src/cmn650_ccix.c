@@ -443,7 +443,7 @@ static int enable_and_start_ccix_link_up_sequence(
         cxg_link_wait_condition,
         &wait_data);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_INFO(MOD_NAME "Enabling CCIX link %d... Failed", linkid);
+        FWK_LOG_ERR(MOD_NAME "Enabling CCIX link %d... Failed", linkid);
         return status;
     }
     FWK_LOG_INFO(MOD_NAME "Enabling CCIX link %d... Done", linkid);
@@ -457,7 +457,7 @@ static int enable_and_start_ccix_link_up_sequence(
         cxg_link_wait_condition,
         &wait_data);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_INFO(MOD_NAME "Verifying link down status... Failed");
+        FWK_LOG_ERR(MOD_NAME "Verifying link down status... Failed");
         return status;
     }
 
@@ -469,7 +469,7 @@ static int enable_and_start_ccix_link_up_sequence(
         cxg_link_wait_condition,
         &wait_data);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_INFO(MOD_NAME "Verifying link down status... Failed");
+        FWK_LOG_ERR(MOD_NAME "Verifying link down status... Failed");
         return status;
     }
 
@@ -481,7 +481,7 @@ static int enable_and_start_ccix_link_up_sequence(
         cxg_link_wait_condition,
         &wait_data);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_INFO(MOD_NAME "Verifying link down status... Failed");
+        FWK_LOG_ERR(MOD_NAME "Verifying link down status... Failed");
         return status;
     }
     FWK_LOG_INFO(MOD_NAME "Verifying link down status... Done");
@@ -499,7 +499,7 @@ static int enable_and_start_ccix_link_up_sequence(
         cxg_link_wait_condition,
         &wait_data);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_INFO(MOD_NAME "Bringing up link... Failed");
+        FWK_LOG_ERR(MOD_NAME "Bringing up link... Failed");
         return status;
     }
 
@@ -511,7 +511,7 @@ static int enable_and_start_ccix_link_up_sequence(
         cxg_link_wait_condition,
         &wait_data);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_INFO(MOD_NAME "Bringing up link... Failed");
+        FWK_LOG_ERR(MOD_NAME "Bringing up link... Failed");
         return status;
     }
     FWK_LOG_INFO(MOD_NAME "Bringing up link... Done");
@@ -693,7 +693,7 @@ int ccix_enter_system_coherency(
         cxg_link_wait_condition,
         &wait_data);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_INFO(
+        FWK_LOG_ERR(
             MOD_NAME "Entering system coherency for link %d... Failed", linkid);
         return status;
     }
@@ -734,7 +734,7 @@ int ccix_enter_dvm_domain(
         cxg_link_wait_condition,
         &wait_data);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_INFO(
+        FWK_LOG_ERR(
             MOD_NAME "Entering DVM domain for link %d... Failed", linkid);
         return status;
     }
