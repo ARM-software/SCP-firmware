@@ -127,6 +127,11 @@ endif()
 include(CMakeDependentOption)
 
 # Common build options
+
+set(SCP_ENABLE_OVERRIDE_FIRMWARE_NAME
+    ${SCP_ENABLE_OVERRIDE_FIRMWARE_NAME_INIT} CACHE STRING
+    "Override firmware binary name")
+
 cmake_dependent_option(
     SCP_ENABLE_MULTITHREADING "Enable the multithreading subsystem?"
     "${SCP_ENABLE_MULTITHREADING_INIT}"
@@ -160,9 +165,15 @@ if(SCP_FIRMWARE)
     # systems).
     #
 
+    if("${SCP_ENABLE_OVERRIDE_FIRMWARE_NAME}" STREQUAL "")
+        set(SCP_FIRMWARE_NAME ${SCP_FIRMWARE_TARGET})
+    else()
+        set(SCP_FIRMWARE_NAME ${SCP_ENABLE_OVERRIDE_FIRMWARE_NAME})
+    endif()
+
     set_target_properties(
         ${SCP_FIRMWARE_TARGET} PROPERTIES EXCLUDE_FROM_ALL FALSE
-                                          OUTPUT_NAME "${SCP_FIRMWARE_TARGET}"
+                                          OUTPUT_NAME "${SCP_FIRMWARE_NAME}"
                                           RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
     #
