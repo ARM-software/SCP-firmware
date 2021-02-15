@@ -10,10 +10,13 @@ BS_FIRMWARE_HAS_MULTITHREADING := yes
 BS_FIRMWARE_HAS_NOTIFICATION := yes
 BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS := yes
 BS_FIRMWARE_USE_NEWLIB_NANO_SPECS := yes
+BS_FIRMWARE_HAS_FAST_CHANNELS := no
 
 BS_FIRMWARE_MODULES := \
     armv7m_mpu \
     pl011 \
+    gtimer \
+    timer \
     ppu_v1 \
     system_power \
     mhu2 \
@@ -30,8 +33,6 @@ BS_FIRMWARE_MODULES := \
     dvfs \
     scmi_clock \
     scmi_perf \
-    gtimer \
-    timer \
     mock_psu \
     psu \
     tc0_system
