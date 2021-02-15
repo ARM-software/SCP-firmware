@@ -82,6 +82,12 @@ Getting started
 See user_guide.md for instructions on how to get, install, build and use
 SCP-firmware on supported Arm platforms.
 
+CMake
+-----
+
+SCP-Firmware now support building with CMake. See doc/cmake_readme.md for
+details.
+
 Feedback and Support
 --------------------
 
