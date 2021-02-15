@@ -1,0 +1,4 @@
+cmake_dependent_option(
+    SCP_ENABLE_FAST_CHANNELS "Enable the SCMI Fast Channels ?"
+    "${SCP_ENABLE_FAST_CHANNELS_INIT}" "DEFINED SCP_ENABLE_FAST_CHANNELS_INIT"
+    "${SCP_ENABLE_FAST_CHANNELS}")
