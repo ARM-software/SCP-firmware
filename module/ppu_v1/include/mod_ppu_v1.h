@@ -44,6 +44,30 @@ enum mod_ppu_v1_api_idx {
 };
 
 /*!
+ * \brief PPU_V1 OPERATING MODES
+ */
+enum ppu_v1_opmode {
+    PPU_V1_OPMODE_00,
+    PPU_V1_OPMODE_01,
+    PPU_V1_OPMODE_02,
+    PPU_V1_OPMODE_03,
+    PPU_V1_OPMODE_04,
+    PPU_V1_OPMODE_05,
+    PPU_V1_OPMODE_06,
+    PPU_V1_OPMODE_07,
+    PPU_V1_OPMODE_08,
+    PPU_V1_OPMODE_09,
+    PPU_V1_OPMODE_10,
+    PPU_V1_OPMODE_11,
+    PPU_V1_OPMODE_12,
+    PPU_V1_OPMODE_13,
+    PPU_V1_OPMODE_14,
+    PPU_V1_OPMODE_15,
+    /* No valid operating modes after this line */
+    PPU_V1_OPMODE_COUNT
+};
+
+/*!
  * \brief Power domain PPU descriptor.
  */
 struct mod_ppu_v1 {
@@ -105,6 +129,11 @@ struct mod_ppu_v1_pd_config {
      *  the value of this field is undefined.
      */
     fwk_id_t cluster_id;
+
+    /*!
+     *  Product specific ppu opmode.
+     */
+    enum ppu_v1_opmode opmode;
 
     /*!
      * Flag indicating if this domain should be powered on during element
