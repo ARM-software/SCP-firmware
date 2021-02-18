@@ -456,6 +456,8 @@ static void cluster_on(struct ppu_v1_pd_ctx *pd_ctx)
                                       PPU_V1_MODE_ON,
                                       PPU_V1_EDGE_SENSITIVITY_MASKED);
 
+    ppu_v1_request_operating_mode(ppu, pd_ctx->config->opmode);
+
     ppu_v1_set_power_mode(ppu, PPU_V1_MODE_ON, pd_ctx->timer_ctx);
     status = pd_ctx->pd_driver_input_api->report_power_state_transition(
         pd_ctx->bound_id, MOD_PD_STATE_ON);

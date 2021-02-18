@@ -12,6 +12,7 @@
  * \cond
  */
 
+#include <mod_ppu_v1.h>
 #include <mod_timer.h>
 
 #include <fwk_macros.h>
@@ -73,27 +74,6 @@ enum ppu_v1_mode {
     PPU_V1_MODE_DBG_RECOV   = 10,
     /* No valid modes after this line */
     PPU_V1_MODE_COUNT
-};
-
-enum ppu_v1_opmode {
-    PPU_V1_OPMODE_00,
-    PPU_V1_OPMODE_01,
-    PPU_V1_OPMODE_02,
-    PPU_V1_OPMODE_03,
-    PPU_V1_OPMODE_04,
-    PPU_V1_OPMODE_05,
-    PPU_V1_OPMODE_06,
-    PPU_V1_OPMODE_07,
-    PPU_V1_OPMODE_08,
-    PPU_V1_OPMODE_09,
-    PPU_V1_OPMODE_10,
-    PPU_V1_OPMODE_11,
-    PPU_V1_OPMODE_12,
-    PPU_V1_OPMODE_13,
-    PPU_V1_OPMODE_14,
-    PPU_V1_OPMODE_15,
-    /* No valid operating modes after this line */
-    PPU_V1_OPMODE_COUNT
 };
 
 enum ppu_v1_op_devactive {
