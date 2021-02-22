@@ -308,7 +308,8 @@ OBJECTS := $(addprefix $(OBJ_DIR)/, \
            $(patsubst %.S,%.o, \
            $(patsubst %.s,%.o, \
            $(patsubst %.c,%.o, \
-           $(SOURCES)))))
+           $(patsubst $(BUILD_FIRMWARE_DIR)%,%, \
+           $(SOURCES))))))
 
 #
 # Module code generation
@@ -336,6 +337,10 @@ $(LIB): $(OBJECTS) | $$(@D)/
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 $(OBJ_DIR)/%.o: %.c $(EXTRA_DEP) | $$(@D)/
+	$(call show-action,CC,$<)
+	$(CC) -c $(CFLAGS) $(DEP_CFLAGS)  $< -o $@
+
+$(OBJ_DIR)/%.o: $(BUILD_FIRMWARE_DIR)%.c $(EXTRA_DEP) | $$(@D)/
 	$(call show-action,CC,$<)
 	$(CC) -c $(CFLAGS) $(DEP_CFLAGS)  $< -o $@
 
