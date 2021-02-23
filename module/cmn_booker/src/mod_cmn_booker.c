@@ -535,8 +535,14 @@ static int cmn_booker_init(fwk_id_t module_id, unsigned int element_count,
     if (config->snf_count > CMN_BOOKER_HNF_CACHE_GROUP_ENTRIES_MAX)
         return FWK_E_DATA;
 
-    ctx->root = get_root_node(config->base, config->hnd_node_id,
-        config->mesh_size_x, config->mesh_size_y);
+    fwk_assert(config->ports_per_xp < MAX_PORTS_COUNT);
+
+    ctx->root = get_root_node(
+        config->base,
+        config->hnd_node_id,
+        config->mesh_size_x,
+        config->mesh_size_y,
+        config->ports_per_xp);
 
     ctx->config = config;
 

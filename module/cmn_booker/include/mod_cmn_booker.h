@@ -127,6 +127,13 @@ struct mod_cmn_booker_config {
      *      to a CAL port, node id of HN-F will be a odd number).
      */
     bool hnf_cal_mode;
+
+    /*! \
+     * \brief Number of device ports per XP
+     * \details The calculation for CFGM base address depends on the number of
+     *      ports per cross point
+     */
+    unsigned int ports_per_xp;
 };
 
 /*!

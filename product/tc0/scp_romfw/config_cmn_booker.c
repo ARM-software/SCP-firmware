@@ -116,5 +116,6 @@ const struct fwk_module_config config_cmn_booker = {
         .clock_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_INTERCONNECT),
         .hnf_cal_mode = false,
+        .ports_per_xp = 4,
     }),
 };
