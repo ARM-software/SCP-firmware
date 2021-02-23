@@ -22,6 +22,8 @@
 #define MAX_RNI_COUNT 32
 #define MAX_RNF_COUNT 64
 
+#define MAX_PORTS_COUNT 6
+
 /* Maximum System Cache Group regions supported by CMN-BOOKER */
 #define MAX_SCG_COUNT 4
 
@@ -417,12 +419,16 @@ unsigned int get_node_pos_y(void *node_base);
  * \param base CMN BOOKER peripheral base address
  * \param hnd_node_id HN-D node identifier containing the global configuration
  * \param mesh_size_x Size of the mesh along the x-axis
- * \param mesh_size_y Size of the mesh along the x-axis
+ * \param mesh_size_y Size of the mesh along the y-axis
+ * \param mesh_size_y Device ports per XP
  *
  * \return Pointer to the root node descriptor
  */
-struct cmn_booker_cfgm_reg *get_root_node(uintptr_t base,
-    unsigned int hnd_node_id, unsigned int mesh_size_x,
-    unsigned int mesh_size_y);
+struct cmn_booker_cfgm_reg *get_root_node(
+    uintptr_t base,
+    unsigned int hnd_node_id,
+    unsigned int mesh_size_x,
+    unsigned int mesh_size_y,
+    unsigned int ports_per_xp);
 
 #endif /* CMN_BOOKER_H */
