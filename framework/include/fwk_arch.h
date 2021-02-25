@@ -178,6 +178,14 @@ struct fwk_arch_interrupt_driver {
      * \retval ::FWK_E_STATE An interrupt is not currently being serviced.
      */
     int (*get_current)(unsigned int *interrupt);
+
+    /*!
+     * \brief Check if in interrupt context.
+     *
+     * \retval :: \c true if in an interrupt context.
+     * \retval :: \c false not in an interrupt context.
+     */
+    bool (*is_interrupt_context)(void);
 };
 
 /*!

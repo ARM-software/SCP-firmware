@@ -549,15 +549,29 @@ static inline uint64_t el_implemented(unsigned int el)
 #define read_cpacr() read_cpacr_el1()
 #define write_cpacr(_v) write_cpacr_el1(_v)
 
+/*
+ * This variable is used to ensure spurious nested calls won't
+ * enable interrupts. This is been defined in arch_main.c
+ */
+extern unsigned int critical_section_nest_level;
+
 /*!
  * \brief Enables global CPU interrupts.
  *
  * \note inline is necessary as this call can be used in performance sensitive
  *     path
  */
-inline static void arch_interrupts_enable()
+inline static void arch_interrupts_enable(unsigned int not_used)
 {
-    enable_irq();
+    /* Decrement critical_section_nest_level only if in critical section */
+    if (critical_section_nest_level > 0) {
+        critical_section_nest_level--;
+    }
+
+    /* Enable interrupts globally if now outside critical section */
+    if (critical_section_nest_level == 0) {
+        enable_irq();
+    }
 }
 
 /*!
@@ -566,9 +580,16 @@ inline static void arch_interrupts_enable()
  * \note inline is necessary as this call can be used in performance sensitive
  *     path
  */
-inline static void arch_interrupts_disable()
+inline static  unsigned int arch_interrupts_disable()
 {
-    disable_irq();
+    critical_section_nest_level++;
+
+    /* If now in outer-most critical section, disable interrupts globally */
+    if (critical_section_nest_level == 1) {
+        disable_irq();
+    }
+
+    return 0;
 }
 
 /*!

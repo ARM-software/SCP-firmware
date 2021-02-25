@@ -8,15 +8,31 @@
 #ifndef ARCH_HELPERS_H
 #define ARCH_HELPERS_H
 
+#include <fmw_cmsis.h>
+
+/*
+ * This variable is used to ensure spurious nested calls won't
+ * enable interrupts. This is been defined in arch_main.c
+ */
+extern unsigned int critical_section_nest_level;
+
 /*!
  * \brief Enables global CPU interrupts.
  *
  * \note inline is necessary as this call can be used in performance sensitive
  *     path
  */
-inline static void arch_interrupts_enable(void)
+inline static void arch_interrupts_enable(unsigned int not_used)
 {
-    __asm volatile("cpsie i" : : : "memory");
+   /* Decrement critical_section_nest_level only if in critical section */
+    if (critical_section_nest_level > 0) {
+        critical_section_nest_level--;
+    }
+
+    /* Enable interrupts globally if now outside critical section */
+    if (critical_section_nest_level == 0) {
+        __enable_irq();
+    }
 }
 
 /*!
@@ -25,9 +41,16 @@ inline static void arch_interrupts_enable(void)
  * \note inline is necessary as this call can be used in performance sensitive
  *     path
  */
-inline static void arch_interrupts_disable(void)
+inline static unsigned int arch_interrupts_disable(void)
 {
-    __asm volatile("cpsid i" : : : "memory");
+    critical_section_nest_level++;
+
+    /* If now in outer-most critical section, disable interrupts globally */
+    if (critical_section_nest_level == 1) {
+        __disable_irq();
+    }
+
+    return 0;
 }
 
 /*!

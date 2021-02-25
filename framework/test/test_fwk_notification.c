@@ -79,8 +79,8 @@ int __wrap_fwk_interrupt_global_disable(void)
     return FWK_SUCCESS;
 }
 
-static int interrupt_get_current_return_val;
-int __wrap_fwk_interrupt_get_current(unsigned int *interrupt)
+static bool interrupt_get_current_return_val;
+bool __wrap_fwk_is_interrupt_context(void)
 {
     return interrupt_get_current_return_val;
 }
@@ -108,7 +108,7 @@ static void test_case_setup(void)
 
     is_valid_entity_id_return_val = true;
     is_valid_notification_id_return_val = true;
-    interrupt_get_current_return_val = FWK_E_STATE;
+    interrupt_get_current_return_val = false;
     fwk_mm_calloc_return_val = true;
     get_current_event_return_val = NULL;
     notification_event_count = 0;
@@ -130,12 +130,12 @@ static void test_fwk_notification_subscribe(void)
     int result;
 
     /* Call from an ISR */
-    interrupt_get_current_return_val = FWK_SUCCESS;
+    interrupt_get_current_return_val = true;
     result = fwk_notification_subscribe(FWK_ID_NOTIFICATION(0x2, 0x3),
                                         FWK_ID_ELEMENT(0x2, 0x9),
                                         FWK_ID_MODULE(0x4));
     assert(result == FWK_E_HANDLER);
-    interrupt_get_current_return_val = FWK_E_STATE;
+    interrupt_get_current_return_val = false;
 
     /* Invalid entity ID */
     is_valid_entity_id_return_val = false;
@@ -189,12 +189,12 @@ static void test_fwk_notification_unsubscribe(void)
     int result;
 
     /* Call from an ISR */
-    interrupt_get_current_return_val = FWK_SUCCESS;
+    interrupt_get_current_return_val = true;
     result = fwk_notification_unsubscribe(FWK_ID_NOTIFICATION(0x2, 0x3),
                                           FWK_ID_ELEMENT(0x2, 0x9),
                                           FWK_ID_MODULE(0x4));
     assert(result == FWK_E_HANDLER);
-    interrupt_get_current_return_val = FWK_E_STATE;
+    interrupt_get_current_return_val = false;
 
     /* Invalid entity ID */
     is_valid_entity_id_return_val = false;
@@ -266,11 +266,11 @@ static void test_fwk_notification_notify(void)
     unsigned int count;
 
     /* Call from an ISR, invalid source identifier */
-    interrupt_get_current_return_val = FWK_SUCCESS;
+    interrupt_get_current_return_val = true;
     is_valid_entity_id_return_val = false;
     result = fwk_notification_notify(&notification_event, &count);
     assert(result == FWK_E_PARAM);
-    interrupt_get_current_return_val = FWK_E_STATE;
+    interrupt_get_current_return_val = false;
     is_valid_entity_id_return_val = true;
 
     /* Current event, incompatible notification and source identifier. */

@@ -12,7 +12,7 @@
  * \brief Enables global CPU interrupts. (stub)
  *
  */
-inline static void arch_interrupts_enable(void)
+inline static void arch_interrupts_enable(unsigned int not_used)
 {
 }
 
@@ -20,7 +20,7 @@ inline static void arch_interrupts_enable(void)
  * \brief Disables global CPU interrupts. (stub)
  *
  */
-inline static void arch_interrupts_disable(void)
+inline static unsigned int arch_interrupts_disable(void)
 {
 }
 

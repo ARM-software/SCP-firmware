@@ -654,6 +654,7 @@ timeout:
 static int ddr_retraining(fwk_id_t id)
 {
     int status;
+    unsigned int flags;
     const struct mod_juno_dmc400_element_config *element_config;
     const struct mod_juno_dmc400_module_config *module_config;
     struct mod_juno_dmc400_reg *dmc;
@@ -662,7 +663,7 @@ static int ddr_retraining(fwk_id_t id)
     element_config = fwk_module_get_data(id);
     dmc = (struct mod_juno_dmc400_reg *)element_config->dmc;
 
-    fwk_interrupt_global_disable();
+    flags = fwk_interrupt_global_disable();
 
     dmc->MEMC_CMD = DMC400_CMD_CONFIG;
     status = ctx.timer_api->wait(module_config->timer_id,
@@ -680,7 +681,7 @@ static int ddr_retraining(fwk_id_t id)
 
     dmc->MEMC_CMD = DMC400_CMD_GO;
 
-    fwk_interrupt_global_enable();
+    fwk_interrupt_global_enable(flags);
 
     status = fwk_interrupt_enable((unsigned int)PHY_TRAINING_IRQ);
     if (status != FWK_SUCCESS) {
@@ -953,6 +954,7 @@ static int juno_dmc400_bind(fwk_id_t id, unsigned int round)
 static int juno_dmc400_start(fwk_id_t id)
 {
     int status;
+    unsigned int flags;
     const struct mod_juno_dmc400_element_config *element_config;
     struct mod_juno_dmc400_reg *dmc;
 
@@ -996,14 +998,14 @@ static int juno_dmc400_start(fwk_id_t id)
         return status;
     }
 
-    fwk_interrupt_global_disable();
+    flags = fwk_interrupt_global_disable();
 
     status = ddr_training(id);
     if (status != FWK_SUCCESS) {
         return status;
     }
 
-    fwk_interrupt_global_enable();
+    fwk_interrupt_global_enable(flags);
 
     status = fwk_interrupt_set_isr(
         (unsigned int)PHY_TRAINING_IRQ, ddr_phy_irq_handler);

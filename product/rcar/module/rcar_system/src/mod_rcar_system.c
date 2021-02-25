@@ -130,9 +130,10 @@ void vApplicationIdleHook(void)
     struct rcar_system_dev_ctx *ctx;
     fwk_id_t element_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, 0);
     uint32_t i;
+    unsigned int flags;
 
     if (is_available_shutdown_req(P_STATUS)) {
-        fwk_interrupt_global_disable();
+        flags = fwk_interrupt_global_disable();
         req = P_STATUS;
         P_STATUS = R_CLEAR;
         switch (req) {
@@ -156,7 +157,7 @@ void vApplicationIdleHook(void)
             messaging_stack_ready();
             gic_init();
             vConfigureTickInterrupt();
-            fwk_interrupt_global_enable();
+            fwk_interrupt_global_enable(flags);
             break;
         case R_RESET:
             rcar_system_reset();

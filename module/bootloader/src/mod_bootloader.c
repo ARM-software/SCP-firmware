@@ -173,7 +173,7 @@ static int load_image(void)
         }
     }
 
-    fwk_interrupt_global_disable(); /* We are relocating the vector table */
+    (void)fwk_interrupt_global_disable(); /* We are relocating the vector table */
 
     FWK_LOG_INFO("[BOOTLOADER] Booting RAM firmware...");
     FWK_LOG_FLUSH();
