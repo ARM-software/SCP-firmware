@@ -7,7 +7,9 @@
 
 #include "config_power_domain.h"
 #include "n1sdp_core.h"
+#include "n1sdp_scc_reg.h"
 #include "n1sdp_scp_mmap.h"
+#include "n1sdp_scp_pik.h"
 
 #include <mod_cmn600.h>
 #include <mod_power_domain.h>
@@ -135,6 +137,10 @@ static const struct fwk_element *ppu_v1_get_element_table(fwk_id_t module_id)
                                              MOD_CMN600_API_IDX_PPU_OBSERVER);
         pd_config->post_ppu_on_param =
             (void *)&cluster_idx_to_node_id[cluster_idx];
+        pd_config->opmode =
+            (SCC->BOOT_GPR1 & SCC_BOOTGPR1_L3_CACHE_ENABLE_MASK) ?
+            PPU_V1_OPMODE_04 :
+            PPU_V1_OPMODE_00;
     }
 
     memcpy(&element_table[core_count + cluster_count],
