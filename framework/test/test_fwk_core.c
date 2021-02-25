@@ -163,7 +163,7 @@ static void test___fwk_init(void)
         &((((struct fwk_event *)(fwk_mm_calloc_val)) + 1)->slist_node));
 }
 
-static void test___fwk_run(void)
+static void test___fwk_run_main_loop(void)
 {
     int result;
     struct fwk_event *free_event, *allocated_event;
@@ -218,7 +218,7 @@ static void test___fwk_run(void)
 
     /* Event1 processing */
     if (setjmp(test_context) == FWK_SUCCESS)
-        __fwk_run();
+        __fwk_run_main_loop();
     assert(ctx->isr_event_queue.head == &(event3.slist_node));
     assert(ctx->isr_event_queue.tail == &(notification1.slist_node));
     assert(ctx->event_queue.head == &(event2.slist_node));
@@ -237,7 +237,7 @@ static void test___fwk_run(void)
 
     /* Event2 processing */
     if (setjmp(test_context) == FWK_SUCCESS)
-        __fwk_run();
+        __fwk_run_main_loop();
     assert(ctx->isr_event_queue.head == &(event3.slist_node));
     assert(ctx->isr_event_queue.tail == &(notification1.slist_node));
     assert(ctx->event_queue.head == &(allocated_event->slist_node));
@@ -256,7 +256,7 @@ static void test___fwk_run(void)
 
     /* Response to Event1 processing */
     if (setjmp(test_context) == FWK_SUCCESS)
-        __fwk_run();
+        __fwk_run_main_loop();
     assert(ctx->isr_event_queue.head == &(event3.slist_node));
     assert(ctx->isr_event_queue.tail == &(notification1.slist_node));
     assert(fwk_list_is_empty(&ctx->event_queue));
@@ -276,7 +276,7 @@ static void test___fwk_run(void)
 
     /* Extract ISR Event3 and process it */
     if (setjmp(test_context) == FWK_SUCCESS)
-        __fwk_run();
+        __fwk_run_main_loop();
     assert(ctx->isr_event_queue.head == &(notification1.slist_node));
     assert(ctx->isr_event_queue.tail == &(notification1.slist_node));
     assert(fwk_list_is_empty(&ctx->event_queue));
@@ -296,7 +296,7 @@ static void test___fwk_run(void)
     fwk_list_push_tail(&ctx->free_event_queue, &(allocated_event->slist_node));
     free_event_queue_break = true;
     if (setjmp(test_context) == FWK_SUCCESS)
-        __fwk_run();
+        __fwk_run_main_loop();
     assert(fwk_list_is_empty(&ctx->isr_event_queue));
     assert(ctx->event_queue.head == &(allocated_event->slist_node));
     assert(ctx->event_queue.tail == &(allocated_event->slist_node));
@@ -313,7 +313,7 @@ static void test___fwk_run(void)
 
     /* Process response to Notification1 */
     if (setjmp(test_context) == FWK_SUCCESS)
-        __fwk_run();
+        __fwk_run_main_loop();
     assert(fwk_list_is_empty(&ctx->isr_event_queue));
     assert(fwk_list_is_empty(&ctx->event_queue));
 
@@ -522,7 +522,7 @@ static void test___fwk_put_notification(void)
 
 static const struct fwk_test_case_desc test_case_table[] = {
     FWK_TEST_CASE(test___fwk_init),
-    FWK_TEST_CASE(test___fwk_run),
+    FWK_TEST_CASE(test___fwk_run_main_loop),
     FWK_TEST_CASE(test_fwk_put_event),
     FWK_TEST_CASE(test_fwk_put_event_light),
     FWK_TEST_CASE(test___fwk_put_notification)

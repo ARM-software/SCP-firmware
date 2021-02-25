@@ -446,8 +446,6 @@ int fwk_module_start(void)
 
     FWK_LOG_CRIT("[FWK] Module initialization complete!");
 
-    __fwk_run();
-
     return FWK_SUCCESS;
 }
 

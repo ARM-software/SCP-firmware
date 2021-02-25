@@ -67,6 +67,13 @@
              : __fwk_put_event, struct fwk_event_light * \
              : __fwk_put_event_light)(event)
 
+
+
+/*!
+ * \brief Processing events already raised by modules and interrupt handlers.
+ */
+void fwk_process_event_queue(void);
+
 /*!
  * \brief Get a copy of a delayed response event.
  *

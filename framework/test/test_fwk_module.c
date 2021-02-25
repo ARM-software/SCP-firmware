@@ -200,7 +200,7 @@ int __wrap___fwk_init(size_t event_count)
     return init_return_val;
 }
 
-void __wrap___fwk_run(void)
+void __wrap___fwk_run_main_loop(void)
 {
 }
 
