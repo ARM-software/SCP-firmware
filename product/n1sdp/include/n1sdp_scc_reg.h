@@ -215,4 +215,6 @@ struct scc_reg {
 #define SCC_SYS_MAN_RESET_CCIX_POS       UINT32_C(11)
 #define SCC_SYS_MAN_RESET_PCIE_POS       UINT32_C(10)
 
+#define SCC_BOOTGPR1_L3_CACHE_ENABLE_MASK UINT32_C(0x1)
+
 #endif /* N1SDP_SCC_REG_H */
