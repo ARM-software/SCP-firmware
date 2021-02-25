@@ -331,6 +331,10 @@ include(CMakeDependentOption)
 
 # Common build options
 
+if(SCP_ARCHITECTURE STREQUAL "optee")
+    set(SCP_ENABLE_SUB_SYSTEM_MODE_INIT TRUE)
+endif()
+
 set(SCP_ENABLE_OVERRIDE_FIRMWARE_NAME
     ${SCP_ENABLE_OVERRIDE_FIRMWARE_NAME_INIT}
     CACHE STRING "Override firmware binary name")
