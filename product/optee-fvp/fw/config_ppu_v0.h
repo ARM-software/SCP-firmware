@@ -1,0 +1,29 @@
+/*
+ * Arm SCP/MCP Software
+ * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+#ifndef CONFIG_PPU_V0_H
+#define CONFIG_PPU_V0_H
+
+enum ppu_v0_element_idx {
+    PPU_V0_ELEMENT_IDX_CPU0,
+    PPU_V0_ELEMENT_IDX_CPU1,
+    PPU_V0_ELEMENT_IDX_CPU2,
+    PPU_V0_ELEMENT_IDX_CPU3,
+    PPU_V0_ELEMENT_IDX_CLUSTER0,
+    PPU_V0_ELEMENT_IDX_CLUSTER1,
+    PPU_V0_ELEMENT_IDX_DBGTOP,
+    PPU_V0_ELEMENT_IDX_DPU0TOP,
+    PPU_V0_ELEMENT_IDX_DPU1TOP,
+    PPU_V0_ELEMENT_IDX_GPUTOP,
+    PPU_V0_ELEMENT_IDX_VPUTOP,
+    PPU_V0_ELEMENT_IDX_SYS0,
+    PPU_V0_ELEMENT_IDX_SYS1,
+    PPU_V0_ELEMENT_IDX_SYSTEM,
+    PPU_V0_ELEMENT_IDX_COUNT
+};
+
+#endif /* CONFIG_PPU_V0_H */
