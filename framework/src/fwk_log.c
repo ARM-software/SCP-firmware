@@ -55,7 +55,7 @@ int fwk_log_init(void)
         fwk_log_stream = fwk_io_stdout;
     else if (!fwk_id_is_equal(FMW_LOG_DRAIN_ID, FWK_ID_NONE)) {
         status = fwk_io_open(&stream, FMW_LOG_DRAIN_ID, FWK_IO_MODE_WRITE);
-        if (!fwk_expect(status == FWK_SUCCESS))
+        if (fwk_expect(status == FWK_SUCCESS))
             fwk_log_stream = &stream;
     }
 
