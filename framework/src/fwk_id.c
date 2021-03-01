@@ -222,6 +222,14 @@ fwk_id_t fwk_id_build_element_id(fwk_id_t id, unsigned int element_idx)
     return FWK_ID_ELEMENT(id.common.module_idx, element_idx);
 }
 
+fwk_id_t fwk_id_build_sub_element_id(fwk_id_t id, unsigned int sub_element_idx)
+{
+    fwk_assert(id.common.type == __FWK_ID_TYPE_ELEMENT);
+
+    return FWK_ID_SUB_ELEMENT(
+        id.common.module_idx, id.element.element_idx, sub_element_idx);
+}
+
 fwk_id_t fwk_id_build_api_id(fwk_id_t id, unsigned int api_idx)
 {
     fwk_assert(id.common.type != __FWK_ID_TYPE_INVALID);

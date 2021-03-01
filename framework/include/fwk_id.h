@@ -561,6 +561,23 @@ fwk_id_t fwk_id_build_element_id(fwk_id_t id, unsigned int element_idx)
     FWK_CONST FWK_LEAF FWK_NOTHROW;
 
 /*!
+ * \brief Retrieve the identifier of a sub-element for a given element
+ *      identifier and sub-element index.
+ *
+ * \details The given identifier must be an element identifier and the
+ *      function will be used to build an sub-element identifier for a
+ *      sub-element with the given index that is owned by that element.
+ *
+ * \param id Identifier.
+ * \param sub_element_idx Sub-element index.
+ *
+ * \return Sub-element identifier associated with the sub-element index for the
+ *      element.
+ */
+fwk_id_t fwk_id_build_sub_element_id(fwk_id_t id, unsigned int sub_element_idx)
+    FWK_CONST FWK_LEAF FWK_NOTHROW;
+
+/*!
  * \brief Retrieve the identifier of an API for a given identifier and
  *      API index.
  *
