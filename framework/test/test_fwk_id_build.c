@@ -116,6 +116,14 @@ static void test_element_from_element_and_index(void)
     assert(fwk_id_is_equal(element_id, FWK_ID_ELEMENT(42, 58)));
 }
 
+static void test_sub_element_from_element_and_index(void)
+{
+    fwk_id_t element_id = FWK_ID_ELEMENT_INIT(42, 64);
+    fwk_id_t sub_element_id = fwk_id_build_sub_element_id(element_id, 58);
+
+    assert(fwk_id_is_equal(sub_element_id, FWK_ID_SUB_ELEMENT(42, 64, 58)));
+}
+
 static const struct fwk_test_case_desc test_case_table[] = {
     FWK_TEST_CASE(test_overlapping_fields),
     FWK_TEST_CASE(test_build_module),
@@ -127,6 +135,7 @@ static const struct fwk_test_case_desc test_case_table[] = {
     FWK_TEST_CASE(test_module_from_element),
     FWK_TEST_CASE(test_element_from_module_and_index),
     FWK_TEST_CASE(test_element_from_element_and_index),
+    FWK_TEST_CASE(test_sub_element_from_element_and_index),
 };
 
 struct fwk_test_suite_desc test_suite = {
