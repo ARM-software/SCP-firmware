@@ -10,4 +10,5 @@
 BS_PRODUCT_NAME := rdv1
 BS_FIRMWARE_LIST := scp_romfw \
                     scp_ramfw \
-                    mcp_romfw
+                    mcp_romfw \
+                    mcp_ramfw
