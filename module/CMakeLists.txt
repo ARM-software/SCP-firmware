@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -70,9 +70,9 @@ list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/scmi_reset_domain")
 list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/mock_clock")
 list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/voltage_domain")
 list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/mock_voltage_domain")
-list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/mpmm")
 list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/traffic_cop")
-
+list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/mpmm")
+list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/thermal_mgmt")
 
 foreach(source_dir IN LISTS SCP_MODULE_PATHS)
     unset(SCP_MODULE)
