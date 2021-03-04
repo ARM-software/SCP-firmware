@@ -45,11 +45,11 @@ enum mod_scmi_perf_permissions {
  * \brief Fast channels address index
  */
 enum mod_scmi_perf_fast_channels_addr_index {
-    MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET,
-    MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET,
-    MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET,
-    MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET,
-    MOD_SCMI_PERF_FAST_CHANNEL_ADDR_INDEX_COUNT
+    MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET = 0,
+    MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET = 1,
+    MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET = 2,
+    MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET = 3,
+    MOD_SCMI_PERF_FAST_CHANNEL_ADDR_INDEX_COUNT = 4
 };
 /*!
  *\brief Per-Domain Fast Channel Limit in shared memory.
@@ -135,13 +135,13 @@ struct mod_scmi_perf_config {
  */
 enum scmi_perf_api_idx {
     /*! Index for the SCMI protocol API */
-    MOD_SCMI_PERF_PROTOCOL_API,
+    MOD_SCMI_PERF_PROTOCOL_API = 0,
 
     /*! Index of the updates notification API */
-    MOD_SCMI_PERF_DVFS_UPDATE_API,
+    MOD_SCMI_PERF_DVFS_UPDATE_API = 1,
 
     /*! Number of APIs */
-    MOD_SCMI_PERF_API_COUNT
+    MOD_SCMI_PERF_API_COUNT = 2
 };
 
 /*!
@@ -170,10 +170,10 @@ enum scmi_perf_api_idx {
  */
 enum mod_scmi_perf_policy_status {
     /*! Do not execute the message handler */
-    MOD_SCMI_PERF_SKIP_MESSAGE_HANDLER,
+    MOD_SCMI_PERF_SKIP_MESSAGE_HANDLER = 0,
 
     /*! Execute the message handler */
-    MOD_SCMI_PERF_EXECUTE_MESSAGE_HANDLER,
+    MOD_SCMI_PERF_EXECUTE_MESSAGE_HANDLER = 1,
 };
 
 /*!
