@@ -186,9 +186,9 @@
  *
  * \return None.
  */
-#define FWK_BUILD_VERSION (((BUILD_VERSION_MAJOR & 0xff) << 24) | \
-                           ((BUILD_VERSION_MINOR & 0xff) << 16) | \
-                            (BUILD_VERSION_PATCH & 0xffff))
+#define FWK_BUILD_VERSION \
+    (((BUILD_VERSION_MAJOR & 0xffU) << 24) | \
+     ((BUILD_VERSION_MINOR & 0xffU) << 16) | (BUILD_VERSION_PATCH & 0xffffU))
 
 /*!
  * \internal

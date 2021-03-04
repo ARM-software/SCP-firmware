@@ -120,7 +120,7 @@ static int raise_interrupt(fwk_id_t slot_id)
     slot = fwk_id_get_sub_element_idx(slot_id);
     reg = (struct mhu_reg *)device_ctx->config->out;
 
-    reg->SET |= (1 << slot);
+    reg->SET |= (1U << slot);
 
     return FWK_SUCCESS;
 }
@@ -206,11 +206,11 @@ static int mhu_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
     device_ctx = &mhu_ctx.device_ctx_table[fwk_id_get_element_idx(target_id)];
     slot = fwk_id_get_sub_element_idx(target_id);
 
-    if (device_ctx->bound_slots & (1 << slot))
+    if (device_ctx->bound_slots & (1U << slot))
         return FWK_E_ACCESS;
 
     device_ctx->smt_channel_table[slot].id = source_id;
-    device_ctx->bound_slots |= 1 << slot;
+    device_ctx->bound_slots |= 1U << slot;
 
     *api = &mhu_mod_smt_driver_api;
 
