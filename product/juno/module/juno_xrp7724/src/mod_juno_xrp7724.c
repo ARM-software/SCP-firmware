@@ -817,7 +817,7 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
         ctx->transmit_data[0] = PSU_PWR_SET_VOLTAGE_CHx +
             ctx->config->psu_bus_idx;
         ctx->transmit_data[1] = (uint8_t)(set_value >> 8);
-        ctx->transmit_data[2] = (uint8_t)(set_value & 0xFF);
+        ctx->transmit_data[2] = (uint8_t)(set_value & 0xFFU);
 
         status = module_ctx.i2c_api->transmit_as_master(
             module_config->i2c_hal_id, module_config->slave_address,

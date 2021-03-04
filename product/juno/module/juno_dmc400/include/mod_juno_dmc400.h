@@ -306,22 +306,22 @@ struct mod_juno_dmc400_reg {
 /*!
  * \brief Target memory channel 0.
  */
-#define DIRECT_CMD_CHANNEL_0_ADDR                   UINT32_C(0 << 24)
+#define DIRECT_CMD_CHANNEL_0_ADDR UINT32_C(0U << 24)
 
 /*!
  * \brief Target memory channel 1.
  */
-#define DIRECT_CMD_CHANNEL_1_ADDR                   UINT32_C(1 << 24)
+#define DIRECT_CMD_CHANNEL_1_ADDR UINT32_C(1U << 24)
 
 /*!
  * \brief Target chip select 0.
  */
-#define DIRECT_CMD_CHIP_0_ADDR                      UINT32_C(0 << 20)
+#define DIRECT_CMD_CHIP_0_ADDR UINT32_C(0U << 20)
 
 /*!
  * \brief Target chip select 1.
  */
-#define DIRECT_CMD_CHIP_1_ADDR                      UINT32_C(1 << 20)
+#define DIRECT_CMD_CHIP_1_ADDR UINT32_C(1U << 20)
 
 /*!
  * \brief Program to send a request for write leveling training.
@@ -331,22 +331,22 @@ struct mod_juno_dmc400_reg {
 /*!
  * \brief Program target channel 0 for write leveling training.
  */
-#define WRITE_LEVELING_CHANNEL_0                    UINT32_C(0 << 28)
+#define WRITE_LEVELING_CHANNEL_0 UINT32_C(0U << 28)
 
 /*!
  * \brief Program target channel 1 for write leveling training.
  */
-#define WRITE_LEVELING_CHANNEL_1                    UINT32_C(1 << 28)
+#define WRITE_LEVELING_CHANNEL_1 UINT32_C(1U << 28)
 
 /*!
  * \brief Program target chip 0 for write leveling training.
  */
-#define WRITE_LEVELING_CHIP_0                       UINT32_C(0 << 24)
+#define WRITE_LEVELING_CHIP_0 UINT32_C(0U << 24)
 
 /*!
  * \brief Program target chip 1 for write leveling training.
  */
-#define WRITE_LEVELING_CHIP_1                       UINT32_C(1 << 24)
+#define WRITE_LEVELING_CHIP_1 UINT32_C(1U << 24)
 
 /*!
  * \brief Send a request for read gate training.
@@ -361,22 +361,22 @@ struct mod_juno_dmc400_reg {
 /*!
  * \brief Program target channel 0 for read leveling training.
  */
-#define READ_LEVELING_CHANNEL_0                     UINT32_C(0 << 28)
+#define READ_LEVELING_CHANNEL_0 UINT32_C(0U << 28)
 
 /*!
  * \brief Program target channel 1 for read leveling training.
  */
-#define READ_LEVELING_CHANNEL_1                     UINT32_C(1 << 28)
+#define READ_LEVELING_CHANNEL_1 UINT32_C(1U << 28)
 
 /*!
  * \brief Program target chip 0 for read leveling training.
  */
-#define READ_LEVELING_CHIP_0                        UINT32_C(0 << 24)
+#define READ_LEVELING_CHIP_0 UINT32_C(0U << 24)
 
 /*!
  * \brief Program target chip 1 for read leveling training.
  */
-#define READ_LEVELING_CHIP_1                        UINT32_C(1 << 24)
+#define READ_LEVELING_CHIP_1 UINT32_C(1U << 24)
 
 /*!
  * \brief DMC-400 module configuration.
