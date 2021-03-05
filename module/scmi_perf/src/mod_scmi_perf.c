@@ -392,8 +392,14 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
         .attributes = SCMI_PERF_DOMAIN_ATTRIBUTES(
             notifications,
             notifications,
-            !!(permissions & MOD_SCMI_PERF_PERMS_SET_LEVEL),
-            !!(permissions & MOD_SCMI_PERF_PERMS_SET_LIMITS),
+            ((permissions & (uint32_t)MOD_SCMI_PERF_PERMS_SET_LEVEL) !=
+             (uint32_t)0) ?
+                1U :
+                0U,
+            ((permissions & (uint32_t)MOD_SCMI_PERF_PERMS_SET_LIMITS) !=
+             (uint32_t)0) ?
+                1U :
+                0U,
             fast_channels),
         .rate_limit = 0, /* Unsupported */
         .sustained_freq = opp.frequency,
