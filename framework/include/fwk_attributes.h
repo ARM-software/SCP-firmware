@@ -34,6 +34,23 @@
  */
 
 /*!
+ * \def FWK_HAS_BUILTIN
+ *
+ * \brief Check whether the compiler supports a given builtin.
+ *
+ * \param[in] BUILTIN Builtin name.
+ *
+ * \returns A value usable in the expression of a preprocessor `if` or `elif`
+ *      statement.
+ */
+
+#ifdef __has_builtin
+#    define FWK_HAS_BUILTIN(BUILTIN) __has_builtin(BUILTIN)
+#else
+#    define FWK_HAS_BUILTIN(BUILTIN) 0
+#endif
+
+/*!
  * \def FWK_HAS_GNU_ATTRIBUTE
  *
  * \brief Check whether the compiler supports a given GNU attribute.
