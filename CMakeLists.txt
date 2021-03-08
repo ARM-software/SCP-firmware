@@ -145,6 +145,39 @@ cmake_dependent_option(
     TRUE "SCP_IPO_SUPPORTED" FALSE)
 
 #
+# Set up Cppcheck if it's available.
+#
+
+find_program(CMAKE_C_CPPCHECK NAMES "cppcheck")
+
+if(NOT CMAKE_C_CPPCHECK)
+    unset(CMAKE_C_CPPCHECK CACHE)
+endif()
+
+if(CMAKE_C_CPPCHECK)
+    # cmake-format: off
+
+    list(APPEND CMAKE_C_CPPCHECK "--quiet")
+    list(APPEND CMAKE_C_CPPCHECK "--suppressions-list=${CMAKE_CURRENT_SOURCE_DIR}/.cppcheck.txt")
+    list(APPEND CMAKE_C_CPPCHECK "--enable=all")
+    list(APPEND CMAKE_C_CPPCHECK "--inconclusive")
+    list(APPEND CMAKE_C_CPPCHECK "--inline-suppr")
+    list(APPEND CMAKE_C_CPPCHECK "--check-config")
+
+    if(SCP_ARCHITECTURE STREQUAL "armv7-m")
+        list(APPEND CMAKE_C_CPPCHECK "--library=${CMAKE_CURRENT_SOURCE_DIR}/.armv7m.cppcheck.cfg")
+    endif()
+
+    if(CMAKE_C_COMPILER_ID STREQUAL "ARMClang")
+        list(APPEND CMAKE_C_CPPCHECK "--library=${CMAKE_CURRENT_SOURCE_DIR}/.armclang.cppcheck.cfg")
+    else()
+        list(APPEND CMAKE_C_CPPCHECK "--library=${CMAKE_CURRENT_SOURCE_DIR}/.gnu.cppcheck.cfg")
+    endif()
+
+    # cmake-format: on
+endif()
+
+#
 # If the firmware developer has given us initial values for these configuration
 # options, we can expose them to the user.
 #

@@ -11,6 +11,7 @@ ARG ARM_GNU_RM_URL="https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2
 ARG ARM_COMPILER_6_URL="https://developer.arm.com/-/media/Files/downloads/compiler/DS500-BN-00026-r5p0-16rel1.tgz"
 ARG DOXYGEN_URL="http://doxygen.nl/files/doxygen-1.8.20.linux.bin.tar.gz"
 ARG CMAKE_URL="https://github.com/Kitware/CMake/releases/download/v3.18.3/cmake-3.18.3-Linux-x86_64.tar.gz"
+ARG CPPCHECK_SRC_URL="git://github.com/danmar/cppcheck.git"
 
 ENV ARMLMD_LICENSE_FILE=
 
@@ -64,6 +65,16 @@ RUN mkdir "/opt/cmake" && \
         "/etc/profile.d/50-scp-firmware-env.sh"
 
 ENV PATH="/opt/cmake/bin:${PATH}"
+
+RUN cwd=$PWD && mkdir "/opt/cppcheck" && cd "/opt/cppcheck" && \
+    git clone --depth 1 "${CPPCHECK_SRC_URL}" source && \
+    cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX=/opt/cppcheck \
+        -DFILESDIR=/opt/cppcheck ./source && \
+    cmake --build . -- install && cd $cwd && \
+    echo 'export PATH=/opt/cppcheck/bin:${PATH}' >> \
+        "/etc/profile.d/50-scp-fimrware-env.sh"
+
+ENV PATH="/opt/cppcheck/bin:${PATH}"
 
 COPY rootfs/usr/local/bin/init /usr/local/bin/init
 RUN  chmod 755 "/usr/local/bin/init"
