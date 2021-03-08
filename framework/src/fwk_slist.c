@@ -27,7 +27,7 @@ struct fwk_slist_node *__fwk_slist_head(const struct fwk_slist *list)
 {
     fwk_assert(list != NULL);
 
-    if (fwk_list_is_empty(list))
+    if (__fwk_slist_is_empty(list))
         return NULL;
 
     return list->head;
@@ -82,7 +82,7 @@ struct fwk_slist_node *__fwk_slist_pop_head(struct fwk_slist *list)
 
     fwk_assert(list != NULL);
 
-    if (fwk_list_is_empty(list))
+    if (__fwk_slist_is_empty(list))
         return NULL;
 
     popped = list->head;
