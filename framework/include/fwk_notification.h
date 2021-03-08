@@ -16,7 +16,7 @@
 #include <fwk_macros.h>
 
 #if FWK_HAS_INCLUDE(<fmw_notification.h>)
-#    include <fmw_notification.h>
+#    include <fmw_notification.h> /* cppcheck-suppress missingIncludeSystem */
 #endif
 
 /*!

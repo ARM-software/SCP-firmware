@@ -13,7 +13,7 @@
 #include <fwk_macros.h>
 
 #if FWK_HAS_INCLUDE(<fmw_log.h>)
-#    include <fmw_log.h>
+#    include <fmw_log.h> /* cppcheck-suppress missingIncludeSystem */
 #endif
 
 /*!

@@ -54,12 +54,13 @@ struct fwk_event *__fwk_thread_search_delayed_response(
 {
     struct fwk_slist *delayed_response_list;
     struct fwk_slist_node *delayed_response_node;
-    struct fwk_event *delayed_response;
 
     delayed_response_list = __fwk_thread_get_delayed_response_list(id);
     delayed_response_node = fwk_list_head(delayed_response_list);
 
     while (delayed_response_node != NULL) {
+        struct fwk_event *delayed_response;
+
         delayed_response =
             FWK_LIST_GET(delayed_response_node, struct fwk_event, slist_node);
         if (delayed_response->cookie == cookie)
