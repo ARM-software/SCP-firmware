@@ -39,8 +39,8 @@ static void fwk_id_format(
 
     size_t length = 0;
 
-    fwk_id_t module_id = FWK_ID_NONE_INIT;
-    fwk_id_t element_id = FWK_ID_NONE_INIT;
+    fwk_id_t module_id;
+    fwk_id_t element_id;
 
     unsigned int indices[] = { 0, 0, 0 };
 
@@ -146,7 +146,7 @@ static void fwk_id_format(
         break;
     }
 
-    length += snprintf(buffer + length, buffer_size - length, "]");
+    snprintf(buffer + length, buffer_size - length, "]");
 }
 
 struct __fwk_id_fmt __fwk_id_str(fwk_id_t id)

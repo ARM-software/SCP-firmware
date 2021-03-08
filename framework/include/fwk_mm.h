@@ -64,8 +64,8 @@
  *
  * \return On failure, traps.
  */
-void *fwk_mm_alloc(size_t num, size_t size) FWK_LEAF FWK_NOTHROW FWK_ALLOC
-    FWK_ALLOC_SIZE2(1, 2) FWK_WARN_UNUSED;
+FWK_LEAF FWK_NOTHROW FWK_ALLOC FWK_ALLOC_SIZE2(1, 2) FWK_WARN_UNUSED
+    void *fwk_mm_alloc(size_t num, size_t size);
 
 /*!
  * \brief Allocates memory for an array of `num` objects of `size`. Does not
@@ -82,8 +82,8 @@ void *fwk_mm_alloc(size_t num, size_t size) FWK_LEAF FWK_NOTHROW FWK_ALLOC
  *
  * \return On failure, returns a null pointer.
  */
-void *fwk_mm_alloc_notrap(size_t num, size_t size) FWK_LEAF
-    FWK_NOTHROW FWK_ALLOC FWK_ALLOC_SIZE2(1, 2) FWK_WARN_UNUSED;
+FWK_LEAF FWK_NOTHROW FWK_ALLOC FWK_ALLOC_SIZE2(1, 2) FWK_WARN_UNUSED
+    void *fwk_mm_alloc_notrap(size_t num, size_t size);
 
 /*!
  * \brief Allocates memory for an array of `num` objects of `size` whose
@@ -117,9 +117,9 @@ void *fwk_mm_alloc_notrap(size_t num, size_t size) FWK_LEAF
  *
  * \return On failure, traps.
  */
-void *fwk_mm_alloc_aligned(size_t alignment, size_t num, size_t size) FWK_LEAF
-    FWK_NOTHROW FWK_ALLOC FWK_ALLOC_ALIGN(1)
-        FWK_ALLOC_SIZE2(2, 3) FWK_WARN_UNUSED;
+FWK_LEAF
+FWK_NOTHROW FWK_ALLOC FWK_ALLOC_ALIGN(1) FWK_ALLOC_SIZE2(2, 3) FWK_WARN_UNUSED
+    void *fwk_mm_alloc_aligned(size_t alignment, size_t num, size_t size);
 
 /*!
  * \brief Allocates memory for an array of `num` objects of `size` and
@@ -155,8 +155,8 @@ void *fwk_mm_alloc_aligned(size_t alignment, size_t num, size_t size) FWK_LEAF
  *
  * \return On failure, traps.
  */
-void *fwk_mm_calloc(size_t num, size_t size) FWK_LEAF FWK_NOTHROW FWK_ALLOC
-    FWK_ALLOC_SIZE2(1, 2) FWK_WARN_UNUSED;
+FWK_LEAF FWK_NOTHROW FWK_ALLOC FWK_ALLOC_SIZE2(1, 2) FWK_WARN_UNUSED
+    void *fwk_mm_calloc(size_t num, size_t size);
 
 /*!
  * \brief Allocates memory for an array of num objects of size whose alignment
@@ -187,9 +187,9 @@ void *fwk_mm_calloc(size_t num, size_t size) FWK_LEAF FWK_NOTHROW FWK_ALLOC
  *
  * \return On failure, traps.
  */
-void *fwk_mm_calloc_aligned(size_t alignment, size_t num, size_t size) FWK_LEAF
-    FWK_NOTHROW FWK_ALLOC FWK_ALLOC_ALIGN(1)
-        FWK_ALLOC_SIZE2(2, 3) FWK_WARN_UNUSED;
+FWK_LEAF
+FWK_NOTHROW FWK_ALLOC FWK_ALLOC_ALIGN(1) FWK_ALLOC_SIZE2(2, 3) FWK_WARN_UNUSED
+    void *fwk_mm_calloc_aligned(size_t alignment, size_t num, size_t size);
 
 /*!
  * \brief Reallocates the given area of memory. It must be previously
@@ -247,8 +247,8 @@ void *fwk_mm_calloc_aligned(size_t alignment, size_t num, size_t size) FWK_LEAF
  *      remains valid and may need to be deallocated with ::fwk_mm_free() or
  *      ::fwk_mm_realloc().
  */
-void *fwk_mm_realloc(void *ptr, size_t num, size_t size) FWK_LEAF FWK_NOTHROW
-    FWK_ALLOC_SIZE2(2, 3) FWK_WARN_UNUSED;
+FWK_LEAF FWK_NOTHROW FWK_ALLOC_SIZE2(2, 3) FWK_WARN_UNUSED
+    void *fwk_mm_realloc(void *ptr, size_t num, size_t size);
 
 /*!
  * \brief Deallocates the space previously allocated by ::fwk_mm_alloc(),
@@ -273,7 +273,7 @@ void *fwk_mm_realloc(void *ptr, size_t num, size_t size) FWK_LEAF FWK_NOTHROW
  *
  * \param[in] ptr Pointer to the block of memory to free.
  */
-void fwk_mm_free(void *ptr) FWK_LEAF FWK_NOTHROW;
+FWK_LEAF FWK_NOTHROW void fwk_mm_free(void *ptr);
 
 /*!
  * \}

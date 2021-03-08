@@ -303,8 +303,9 @@ int fwk_io_vprintf(
         return FWK_E_PARAM;
 
     va_copy(length_args, args);
-
     length = vsnprintf(NULL, 0, format, length_args);
+    va_end(length_args);
+
     if (length < 0) /* Possibly invalid format string? */
         return FWK_E_STATE;
 

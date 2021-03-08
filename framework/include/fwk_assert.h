@@ -8,6 +8,7 @@
 #ifndef FWK_ASSERT_H
 #define FWK_ASSERT_H
 
+#include <fwk_attributes.h>
 #include <fwk_noreturn.h>
 
 #include <assert.h>
@@ -77,7 +78,7 @@
  *      program is undefined.
  */
 
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(__clang_analyzer__)
 #    define fwk_unreachable() __builtin_unreachable()
 #else
 #    define fwk_unreachable() fwk_assert("Unreachable code reached!" && 0)
@@ -111,7 +112,7 @@
  *      function will return `FWK_E_STATE`.
  */
 
-#if defined(NDEBUG) || defined(BUILD_TESTS)
+#if defined(NDEBUG) || defined(BUILD_TESTS) || defined(__clang_analyzer__)
 #    define fwk_unexpected() ((void)0)
 #else
 #    define fwk_unexpected() fwk_assert("Unexpected code reached!" && 0)
@@ -133,7 +134,15 @@
  */
 
 #ifdef NDEBUG
-#    define fwk_assert(condition) ((void)(condition))
+#    if FWK_HAS_BUILTIN(__builtin_assume)
+#        define fwk_assert(condition) \
+            do { \
+                bool c = (condition); \
+                __builtin_assume(c); \
+            } while (0)
+#    else
+#        define fwk_assert(condition) ((void)(condition))
+#    endif
 #else
 #    define fwk_assert(condition) assert(condition)
 #endif

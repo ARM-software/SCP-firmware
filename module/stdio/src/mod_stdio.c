@@ -101,7 +101,7 @@ static int mod_stdio_getc(const struct fwk_io_stream *stream, char *ch)
 
     int ich = fgetc(ctx->stream);
 
-    *ch = ich;
+    *ch = (char)ich;
 
     if (ferror(ctx->stream))
         return FWK_E_OS;
