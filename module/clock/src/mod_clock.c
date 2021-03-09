@@ -326,8 +326,11 @@ static int clock_dev_init(fwk_id_t element_id, unsigned int sub_element_count,
 
     ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(element_id)];
     ctx->config = dev_config;
+
+#ifdef BUILD_HAS_CLOCK_TREE_MGMT
     fwk_list_init(&ctx->children_list);
     ctx->id = element_id;
+#endif
 
     return FWK_SUCCESS;
 }
@@ -359,7 +362,11 @@ static int clock_start(fwk_id_t id)
 
     /* Clock tree is initialized */
     if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
+#ifdef BUILD_HAS_CLOCK_TREE_MGMT
         return clock_connect_tree(&module_ctx);
+#else
+        return FWK_SUCCESS;
+#endif
     }
 
     ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(id)];

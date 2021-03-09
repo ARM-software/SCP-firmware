@@ -5,24 +5,25 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "clock.h"
+#ifdef BUILD_HAS_CLOCK_TREE_MGMT
+#    include "clock.h"
 
-#include <mod_clock.h>
+#    include <mod_clock.h>
 
-#include <fwk_assert.h>
-#include <fwk_event.h>
-#include <fwk_id.h>
-#include <fwk_list.h>
-#include <fwk_log.h>
-#include <fwk_mm.h>
-#include <fwk_module.h>
-#include <fwk_notification.h>
-#include <fwk_status.h>
-#include <fwk_thread.h>
+#    include <fwk_assert.h>
+#    include <fwk_event.h>
+#    include <fwk_id.h>
+#    include <fwk_list.h>
+#    include <fwk_log.h>
+#    include <fwk_mm.h>
+#    include <fwk_module.h>
+#    include <fwk_notification.h>
+#    include <fwk_status.h>
+#    include <fwk_thread.h>
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
+#    include <stdbool.h>
+#    include <stddef.h>
+#    include <stdint.h>
 
 /* Sub-routine of 'clock_start()' Build the clock tree */
 int clock_connect_tree(struct clock_ctx *module_ctx)
@@ -66,3 +67,5 @@ int clock_connect_tree(struct clock_ctx *module_ctx)
 
     return FWK_SUCCESS;
 }
+
+#endif
