@@ -38,11 +38,11 @@
 
 /* The frequencies should match with the frequencies configured for css clock */
 static struct mod_dvfs_opp opps[] = {
-    { .level = 1313 * 1000000UL, .frequency = 1313 * FWK_KHZ, .voltage = 800 },
-    { .level = 1531 * 1000000UL, .frequency = 1531 * FWK_KHZ, .voltage = 850 },
-    { .level = 1750 * 1000000UL, .frequency = 1750 * FWK_KHZ, .voltage = 900 },
-    { .level = 2100 * 1000000UL, .frequency = 2100 * FWK_KHZ, .voltage = 950 },
-    { .level = 2600 * 1000000UL, .frequency = 2600 * FWK_KHZ, .voltage = 1000 },
+    { .level = 65UL, .frequency = 1313 * FWK_KHZ, .voltage = 800 },
+    { .level = 75UL, .frequency = 1531 * FWK_KHZ, .voltage = 850 },
+    { .level = 85UL, .frequency = 1750 * FWK_KHZ, .voltage = 900 },
+    { .level = 105UL, .frequency = 2100 * FWK_KHZ, .voltage = 950 },
+    { .level = 130UL, .frequency = 2600 * FWK_KHZ, .voltage = 1000 },
     { 0 }
 };
 
