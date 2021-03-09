@@ -107,7 +107,7 @@ static inline bool is_addr_second_1gb_block(uint64_t addr)
  */
 static inline bool is_addr_above_2gb(uint64_t addr)
 {
-    return ((addr >= (1 * FWK_GIB)) && (addr < (2 * FWK_GIB)));
+    return (addr >= (2 * FWK_GIB));
 }
 
 /*
