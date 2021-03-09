@@ -37,6 +37,10 @@ ifeq ($(BUILD_HAS_SCMI_SENSOR_EVENTS),yes)
     endif
 endif
 
+ifeq ($(BUILD_HAS_CLOCK_TREE_MGMT),yes)
+    DEFINES += BUILD_HAS_CLOCK_TREE_MGMT
+endif
+
 export AS := $(CC)
 export LD := $(CC)
 

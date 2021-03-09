@@ -61,6 +61,10 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(framework PUBLIC BUILD_MODE_DEBUG)
 endif()
 
+if(SCP_ENABLE_CLOCK_TREE_MGMT)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_CLOCK_TREE_MGMT")
+endif()
+
 #
 # Handle the framework logging filter level.
 #

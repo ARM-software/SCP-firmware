@@ -104,6 +104,8 @@ The following parameters are optional (default is 'no' when omitted):
 * __BUILD_HAS_SCMI_SENSOR_EVENTS__ <yes|no> - SCMI Sensor trip points. When
   set to yes, the platform supports the configuration of trip points and
   generates SCMI notifications on cross-over events for the trip points.
+* __BS_FIRMWARE_HAS_CLOCK_TREE_MGMT__ <yes|no> - Clock tree management. When set
+to yes, the platform can provide support for clock tree management.
 
 The format of the __BS_FIRMWARE_MODULES__ parameter can be seen in the following
 example:
@@ -260,6 +262,12 @@ SCMI Sensor Event Notifications       {#section_scmi_sensor_event_notifications}
 
 When building a firmware and its dependencies, the BUILD_HAS_SCMI_SENSOR_EVENTS
 parameter controls if SCMI event notifications are enabled.
+
+Clock Tree Management                           {#section_clock_tree_management}
+===============================
+
+When building a firmware and its dependencies, the BUILD_HAS_CLOCK_TREE_MGMT
+parameter controls if Clock Tree Management is enabled.
 
 Definitions
 ===========

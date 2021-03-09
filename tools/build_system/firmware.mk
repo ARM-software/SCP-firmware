@@ -226,6 +226,12 @@ else
     BUILD_HAS_SCMI_SENSOR_EVENTS := no
 endif
 
+ifeq ($(BS_FIRMWARE_HAS_CLOCK_TREE_MGMT),yes)
+    BUILD_HAS_CLOCK_TREE_MGMT := yes
+else
+    BUILD_HAS_CLOCK_TREE_MGMT := no
+endif
+
 # Add directories to the list of targets to build
 LIB_TARGETS_y += $(patsubst %,$(MODULES_DIR)/%/src, \
                             $(BUILD_STANDARD_MODULES))

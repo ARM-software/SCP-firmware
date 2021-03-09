@@ -15,9 +15,6 @@
 
 /* Device context */
 struct clock_dev_ctx {
-    /* Identifier of the clock */
-    fwk_id_t id;
-
     /* Pointer to the element configuration data */
     const struct mod_clock_dev_config *config;
 
@@ -43,6 +40,10 @@ struct clock_dev_ctx {
         uint32_t cookie;
     } request;
 
+#ifdef BUILD_HAS_CLOCK_TREE_MGMT
+    /* Identifier of the clock */
+    fwk_id_t id;
+
     /* Parent identifier */
     fwk_id_t parent_id;
 
@@ -65,6 +66,7 @@ struct clock_dev_ctx {
 
     /* Reference count */
     uint32_t ref_count;
+#endif
 };
 
 /* Module context */
@@ -82,8 +84,10 @@ struct clock_ctx {
 /* Get context helper function */
 void clock_get_ctx(fwk_id_t clock_id, struct clock_dev_ctx **ctx);
 
+#ifdef BUILD_HAS_CLOCK_TREE_MGMT
 /* Connect clock tree interconnecting parent to children nodes */
 int clock_connect_tree(struct clock_ctx *module_ctx);
+#endif
 
 /*
  * Clock event indexes.
