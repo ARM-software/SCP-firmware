@@ -300,6 +300,13 @@ static int put_event_request(
     return fwk_thread_put_event(&req);
 }
 
+static void dvfs_cleanup_request(struct mod_dvfs_domain_ctx *ctx)
+{
+    ctx->pending_request = (struct mod_dvfs_request){ 0 };
+    ctx->request = (struct mod_dvfs_request){ 0 };
+    ctx->state = DVFS_DOMAIN_STATE_IDLE;
+}
+
 static int dvfs_set_level_start(
     struct mod_dvfs_domain_ctx *ctx,
     uintptr_t cookie,
@@ -308,6 +315,17 @@ static int dvfs_set_level_start(
     uint8_t num_retries)
 {
     int status;
+
+    if ((new_opp->frequency == ctx->request.new_opp.frequency) &&
+        (new_opp->voltage == ctx->request.new_opp.voltage)) {
+        /*
+         * There are no new requests to be completed and there are no pending
+         * requests. Clean up the domain ctx here.
+         */
+        dvfs_cleanup_request(ctx);
+
+        return FWK_SUCCESS;
+    }
 
     ctx->request.cookie = cookie, ctx->request.new_opp = *new_opp;
     ctx->request.retry_request = retry_request;
@@ -806,9 +824,7 @@ static int dvfs_complete(
          * The request has completed and there are no pending requests.
          * Clean up the domain ctx here.
          */
-        ctx->pending_request = (struct mod_dvfs_request){ 0 };
-        ctx->request = (struct mod_dvfs_request){ 0 };
-        ctx->state = DVFS_DOMAIN_STATE_IDLE;
+        dvfs_cleanup_request(ctx);
     }
 
     return status;
