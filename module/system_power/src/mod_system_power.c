@@ -200,7 +200,7 @@ static int shutdown(
     /* Shutdown external PPUs */
     ext_ppus_shutdown(system_shutdown);
 
-    system_power_ctx.requested_state = MOD_PD_STATE_OFF;
+    system_power_ctx.requested_state = (unsigned int)MOD_PD_STATE_OFF;
 
     /* Shutdown system PPUs */
     status = shutdown_system_power_ppus(system_shutdown);
@@ -229,7 +229,7 @@ static int system_power_set_state(fwk_id_t pd_id, unsigned int state)
     system_power_ctx.requested_state = state;
 
     switch (state) {
-    case MOD_PD_STATE_ON:
+    case (unsigned int)MOD_PD_STATE_ON:
         status = disable_all_irqs();
         if (status != FWK_SUCCESS) {
             return status;
@@ -244,7 +244,7 @@ static int system_power_set_state(fwk_id_t pd_id, unsigned int state)
 
         break;
 
-    case MOD_SYSTEM_POWER_POWER_STATE_SLEEP0:
+    case (unsigned int)MOD_SYSTEM_POWER_POWER_STATE_SLEEP0:
         ext_ppus_set_state(MOD_PD_STATE_OFF);
 
         fwk_interrupt_clear_pending(soc_wakeup_irq);
@@ -282,7 +282,7 @@ static int system_power_set_state(fwk_id_t pd_id, unsigned int state)
 
         break;
 
-    case MOD_PD_STATE_OFF:
+    case (unsigned int)MOD_PD_STATE_OFF:
         status = disable_all_irqs();
         if (status != FWK_SUCCESS) {
             return status;
@@ -554,7 +554,7 @@ static int system_power_start(fwk_id_t id)
 const struct fwk_module module_system_power = {
     .name = "SYSTEM_POWER",
     .type = FWK_MODULE_TYPE_DRIVER,
-    .api_count = MOD_SYSTEM_POWER_API_COUNT,
+    .api_count = (unsigned int)MOD_SYSTEM_POWER_API_COUNT,
     .init = system_power_mod_init,
     .element_init = system_power_mod_element_init,
     .bind = system_power_bind,

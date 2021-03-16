@@ -514,7 +514,7 @@ static int smt_process_bind_request(fwk_id_t source_id,
     channel_ctx =
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(target_id)];
 
-    switch (fwk_id_get_api_idx(api_id)) {
+    switch ((enum mod_smt_api_idx)fwk_id_get_api_idx(api_id)) {
     case MOD_SMT_API_IDX_DRIVER_INPUT:
         /* Driver input API */
 
@@ -635,8 +635,8 @@ static int smt_process_notification(
 const struct fwk_module module_smt = {
     .name = "smt",
     .type = FWK_MODULE_TYPE_SERVICE,
-    .api_count = MOD_SMT_API_IDX_COUNT,
-    .notification_count = MOD_SMT_NOTIFICATION_IDX_COUNT,
+    .api_count = (unsigned int)MOD_SMT_API_IDX_COUNT,
+    .notification_count = (unsigned int)MOD_SMT_NOTIFICATION_IDX_COUNT,
     .init = smt_init,
     .element_init = smt_channel_init,
     .bind = smt_bind,

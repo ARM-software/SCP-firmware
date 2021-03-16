@@ -314,7 +314,7 @@ static int process_request(struct mod_i2c_dev_ctx *ctx, fwk_id_t event_id)
     const struct mod_i2c_driver_api *driver_api = ctx->driver_api;
     fwk_id_t driver_id = ctx->config->driver_id;
 
-    switch (fwk_id_get_event_idx(event_id)) {
+    switch ((enum mod_i2c_event_idx)fwk_id_get_event_idx(event_id)) {
     case MOD_I2C_EVENT_IDX_REQUEST_TRANSMIT:
         ctx->state = MOD_I2C_DEV_TX;
         drv_status = driver_api->transmit_as_master(driver_id, &ctx->request);
@@ -333,6 +333,9 @@ static int process_request(struct mod_i2c_dev_ctx *ctx, fwk_id_t event_id)
     case MOD_I2C_EVENT_IDX_REQUEST_RECEIVE:
         ctx->state = MOD_I2C_DEV_RX;
         drv_status = driver_api->receive_as_master(driver_id, &ctx->request);
+        break;
+
+    default:
         break;
     }
 
@@ -451,7 +454,7 @@ static int mod_i2c_process_event(const struct fwk_event *event,
         return FWK_SUCCESS;
     }
 
-    switch (fwk_id_get_event_idx(event->id)) {
+    switch ((enum mod_i2c_internal_event_idx)fwk_id_get_event_idx(event->id)) {
     case MOD_I2C_EVENT_IDX_REQUEST_COMPLETED:
         event_param = (struct mod_i2c_event_param *)event->params;
 
@@ -507,8 +510,8 @@ static int mod_i2c_process_event(const struct fwk_event *event,
 const struct fwk_module module_i2c = {
     .name = "I2C",
     .type = FWK_MODULE_TYPE_HAL,
-    .api_count = MOD_I2C_API_IDX_COUNT,
-    .event_count = MOD_I2C_EVENT_IDX_TOTAL_COUNT,
+    .api_count = (unsigned int)MOD_I2C_API_IDX_COUNT,
+    .event_count = (unsigned int)MOD_I2C_EVENT_IDX_TOTAL_COUNT,
     .init = mod_i2c_init,
     .element_init = mod_i2c_dev_init,
     .bind = mod_i2c_bind,

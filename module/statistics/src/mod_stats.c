@@ -180,7 +180,8 @@ _allocate_stats_context(int domain_count, int used_domains)
 
     stats = fwk_mm_calloc(1, sizeof(struct mod_stats_info));
     stats->context = fwk_mm_calloc(1, sizeof(struct mod_stats_context));
-    stats->context->se_index_map = fwk_mm_calloc(domain_count, sizeof(int));
+    stats->context->se_index_map =
+        (int *)fwk_mm_calloc((size_t)domain_count, sizeof(int));
 
     stats->mode = STATS_SETUP;
 
@@ -200,11 +201,14 @@ _allocate_stats_context(int domain_count, int used_domains)
     se_map_size *= sizeof(struct mod_stats_domain_stats_data *);
     se_map_size += sizeof(struct mod_stats_map);
 
-    stats->context->se_stats_map = fwk_mm_calloc(1, se_map_size);
+    stats->context->se_stats_map =
+        (struct mod_stats_map *)fwk_mm_calloc(1, (size_t)se_map_size);
     se_map = stats->context->se_stats_map;
 
-    se_map->se_level_count = fwk_mm_calloc(used_domains, sizeof(int));
-    se_map->se_curr_level = fwk_mm_calloc(used_domains, sizeof(uint32_t));
+    se_map->se_level_count =
+        (int *)fwk_mm_calloc((size_t)used_domains, sizeof(int));
+    se_map->se_curr_level =
+        (uint32_t *)fwk_mm_calloc((size_t)used_domains, sizeof(uint32_t));
 
     return stats;
 }
@@ -230,7 +234,7 @@ static int stats_init_module(fwk_id_t module_id,
     }
 
     stats->desc_header->signature = stats->type_signature;
-    stats->desc_header->domain_count = domain_count;
+    stats->desc_header->domain_count = (uint16_t)domain_count;
 
     return FWK_SUCCESS;
 }
@@ -309,7 +313,7 @@ static int stats_add_domain(fwk_id_t module_id,
         return FWK_E_PARAM;
     }
 
-    domain_stats->level_count = level_count;
+    domain_stats->level_count = (uint16_t)level_count;
 
     for (i = 0; i < level_count; i++) {
         level_stats = &domain_stats->level[i];
@@ -381,7 +385,7 @@ stats_update_domain(fwk_id_t module_id, fwk_id_t domain_id, uint32_t level_id)
     level_stats = &domain_stats->level[level_id];
     level_stats->usage_count++;
     domain_stats->ts_last_change_us = ts_now_us;
-    domain_stats->curr_level_id = level_id;
+    domain_stats->curr_level_id = (uint16_t)level_id;
     se_map->se_curr_level[stats_id] = level_id;
 
     fwk_interrupt_global_enable();
@@ -597,5 +601,5 @@ const struct fwk_module module_statistics = {
     .start = stats_start,
     .bind = stats_bind,
     .process_bind_request = process_bind_request,
-    .api_count = MOD_STATS_API_IDX_COUNT,
+    .api_count = (unsigned int)MOD_STATS_API_IDX_COUNT,
 };

@@ -318,7 +318,7 @@ static bool is_valid_state(const struct pd_ctx *pd, unsigned int state)
 
 static unsigned int normalize_state(unsigned int state)
 {
-    switch (state) {
+    switch ((enum mod_pd_state)state) {
     case MOD_PD_STATE_OFF:
         return (MOD_PD_STATE_COUNT_MAX + 1);
 
@@ -435,7 +435,7 @@ static int get_highest_level_from_composite_state(
         for (level = 0; ((level < table_size) && (pd != NULL));
              level++, pd = pd->parent) {
             state = get_level_state_from_composite_state(
-                state_mask_table, composite_state, level);
+                state_mask_table, composite_state, (int)level);
             if (!is_valid_state(pd, state)) {
                 break;
             }
@@ -443,14 +443,14 @@ static int get_highest_level_from_composite_state(
         level--;
     }
 
-    return level;
+    return (int)level;
 }
 
 static bool is_valid_composite_state(struct pd_ctx *target_pd,
                                      uint32_t composite_state)
 {
     unsigned int level, highest_level;
-    unsigned int state, child_state = MOD_PD_STATE_OFF;
+    unsigned int state, child_state = (unsigned int)MOD_PD_STATE_OFF;
     struct pd_ctx *pd = target_pd;
     struct pd_ctx *child = NULL;
     const uint32_t *state_mask_table;
@@ -462,7 +462,8 @@ static bool is_valid_composite_state(struct pd_ctx *target_pd,
         goto error;
     }
 
-    highest_level = get_highest_level_from_composite_state(pd, composite_state);
+    highest_level = (unsigned int)get_highest_level_from_composite_state(
+        pd, composite_state);
 
     state_mask_table = pd->composite_state_mask_table;
     table_size = pd->composite_state_mask_table_size;
@@ -477,7 +478,7 @@ static bool is_valid_composite_state(struct pd_ctx *target_pd,
         }
 
         state = get_level_state_from_composite_state(
-            state_mask_table, composite_state, level);
+            state_mask_table, composite_state, (int)level);
 
         if (!is_valid_state(pd, state)) {
             goto error;
@@ -802,8 +803,8 @@ static void process_set_state_request(
      * than the highest power level.
      */
     lowest_level = 0;
-    highest_level =
-        get_highest_level_from_composite_state(lowest_pd, composite_state);
+    highest_level = (unsigned int)get_highest_level_from_composite_state(
+        lowest_pd, composite_state);
     nb_pds = highest_level + 1U;
 
     status = FWK_SUCCESS;
@@ -831,7 +832,7 @@ static void process_set_state_request(
 
         if (composite_state_operation) {
             state = get_level_state_from_composite_state(
-                state_mask_table, composite_state, level);
+                state_mask_table, composite_state, (int)level);
         } else {
             state = composite_state;
         }
@@ -962,7 +963,7 @@ static int complete_system_suspend(struct pd_ctx *target_pd)
     }
 
     state_mask_table = pd->composite_state_mask_table;
-    table_size = pd->composite_state_mask_table_size;
+    table_size = (int)pd->composite_state_mask_table_size;
 
     mod_pd_ctx.system_suspend.suspend_ongoing = true;
 
@@ -1020,7 +1021,7 @@ static void process_get_state_request(struct pd_ctx *pd,
         resp_params->state = pd->current_state;
     } else {
         state_mask_table = pd->composite_state_mask_table;
-        table_size = pd->composite_state_mask_table_size;
+        table_size = (int)pd->composite_state_mask_table_size;
 
         /*
          * Traverse the PD tree bottom-up from current power domain to the top,
@@ -1276,7 +1277,8 @@ static void process_system_suspend_request(
             mod_pd_ctx.system_suspend.last_core_pd = last_core_pd;
             mod_pd_ctx.system_suspend.state = req_params->state;
             last_core_pd->requested_state =
-                last_core_pd->state_requested_to_driver = MOD_PD_STATE_OFF;
+                last_core_pd->state_requested_to_driver =
+                    (unsigned int)MOD_PD_STATE_OFF;
         }
     }
 
@@ -1330,9 +1332,8 @@ void perform_shutdown(
             FWK_LOG_INFO("[PD] %s shutdown", fwk_module_get_name(pd_id));
         }
 
-        pd->requested_state =
-            pd->state_requested_to_driver =
-            pd->current_state = MOD_PD_STATE_OFF;
+        pd->requested_state = pd->state_requested_to_driver =
+            pd->current_state = (unsigned int)MOD_PD_STATE_OFF;
     }
 
     /*
@@ -1873,11 +1874,11 @@ static int pd_start(fwk_id_t id)
         return FWK_SUCCESS;
     }
 
-    for (index = mod_pd_ctx.pd_count - 1; index >= 0; index--) {
+    for (index = (int)(mod_pd_ctx.pd_count - 1); index >= 0; index--) {
         pd = &mod_pd_ctx.pd_ctx_table[index];
-        pd->requested_state = MOD_PD_STATE_OFF;
-        pd->state_requested_to_driver = MOD_PD_STATE_OFF;
-        pd->current_state = MOD_PD_STATE_OFF;
+        pd->requested_state = (unsigned int)MOD_PD_STATE_OFF;
+        pd->state_requested_to_driver = (unsigned int)MOD_PD_STATE_OFF;
+        pd->current_state = (unsigned int)MOD_PD_STATE_OFF;
 
         /*
          * If the power domain parent is powered down, don't call the driver
@@ -1919,7 +1920,7 @@ static int pd_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
     struct pd_ctx *pd;
     unsigned int id_idx;
 
-    switch (fwk_id_get_api_idx(api_id)) {
+    switch ((enum mod_pd_api_idx)fwk_id_get_api_idx(api_id)) {
     case MOD_PD_API_IDX_PUBLIC:
         if (!fwk_id_is_type(target_id, FWK_ID_TYPE_MODULE)) {
             return FWK_E_ACCESS;
@@ -1975,14 +1976,14 @@ static int pd_process_event(const struct fwk_event *event,
     }
 
     switch (fwk_id_get_event_idx(event->id)) {
-    case MOD_PD_PUBLIC_EVENT_IDX_SET_STATE:
+    case (unsigned int)MOD_PD_PUBLIC_EVENT_IDX_SET_STATE:
         fwk_assert(pd != NULL);
 
         process_set_state_request(pd, event, resp);
 
         return FWK_SUCCESS;
 
-    case MOD_PD_PUBLIC_EVENT_IDX_GET_STATE:
+    case (unsigned int)MOD_PD_PUBLIC_EVENT_IDX_GET_STATE:
         fwk_assert(pd != NULL);
 
         process_get_state_request(pd,
@@ -1991,14 +1992,14 @@ static int pd_process_event(const struct fwk_event *event,
 
         return FWK_SUCCESS;
 
-    case PD_EVENT_IDX_RESET:
+    case (unsigned int)PD_EVENT_IDX_RESET:
         fwk_assert(pd != NULL);
 
         process_reset_request(pd, (struct pd_response *)resp->params);
 
         return FWK_SUCCESS;
 
-    case PD_EVENT_IDX_REPORT_POWER_STATE_TRANSITION:
+    case (unsigned int)PD_EVENT_IDX_REPORT_POWER_STATE_TRANSITION:
         fwk_assert(pd != NULL);
 
         process_power_state_transition_report(pd,
@@ -2006,14 +2007,14 @@ static int pd_process_event(const struct fwk_event *event,
 
         return FWK_SUCCESS;
 
-    case PD_EVENT_IDX_SYSTEM_SUSPEND:
+    case (unsigned int)PD_EVENT_IDX_SYSTEM_SUSPEND:
         process_system_suspend_request(
             (struct pd_system_suspend_request *)event->params,
             (struct pd_response *)resp->params);
 
         return FWK_SUCCESS;
 
-    case PD_EVENT_IDX_SYSTEM_SHUTDOWN:
+    case (unsigned int)PD_EVENT_IDX_SYSTEM_SHUTDOWN:
         process_system_shutdown_request(event, resp);
 
         return FWK_SUCCESS;
@@ -2183,10 +2184,10 @@ static int pd_process_notification(const struct fwk_event *event,
 const struct fwk_module module_power_domain = {
     .name = "POWER DOMAIN",
     .type = FWK_MODULE_TYPE_HAL,
-    .api_count = MOD_PD_API_IDX_COUNT,
-    .event_count = PD_EVENT_COUNT,
+    .api_count = (unsigned int)MOD_PD_API_IDX_COUNT,
+    .event_count = (unsigned int)PD_EVENT_COUNT,
 #ifdef BUILD_HAS_NOTIFICATION
-    .notification_count = MOD_PD_NOTIFICATION_COUNT,
+    .notification_count = (unsigned int)MOD_PD_NOTIFICATION_COUNT,
 #endif
     .init = pd_init,
     .element_init = pd_power_domain_init,

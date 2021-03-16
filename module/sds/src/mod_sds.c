@@ -157,8 +157,10 @@ static bool header_is_valid(const volatile struct region_descriptor *region,
     return true;
 }
 
-static bool validate_structure_access(uint32_t structure_size, uint32_t offset,
-                                      size_t access_size)
+static bool validate_structure_access(
+    uint32_t structure_size,
+    uint32_t offset,
+    size_t access_size)
 {
     if ((offset >= structure_size) || (access_size > structure_size)) {
         return FWK_E_PARAM;
@@ -297,7 +299,7 @@ static int struct_alloc(const struct mod_sds_structure_desc *struct_desc)
 
     /* Zero the memory reserved for the structure, avoiding the header */
     for (unsigned int i = 0; i < padded_size; i++) {
-        (*free_mem_base)[i] = 0u;
+        (*free_mem_base)[i] = '\0';
     }
     *free_mem_base += padded_size;
     *free_mem_size -= padded_size;
@@ -520,8 +522,8 @@ static int init_sds(void)
 
     element_count = fwk_module_get_element_count(fwk_module_id_sds);
     for (element_idx = 0; element_idx < element_count; ++element_idx) {
-        struct_desc = fwk_module_get_data(
-            fwk_id_build_element_id(fwk_module_id_sds, element_idx));
+        struct_desc = fwk_module_get_data(fwk_id_build_element_id(
+            fwk_module_id_sds, (unsigned int)element_idx));
 
         status = struct_init(struct_desc);
         if (status != FWK_SUCCESS) {
@@ -698,7 +700,7 @@ const struct fwk_module module_sds = {
     .type = FWK_MODULE_TYPE_SERVICE,
     .api_count = 1,
     .event_count = 0,
-    .notification_count = MOD_SDS_NOTIFICATION_IDX_COUNT,
+    .notification_count = (unsigned int)MOD_SDS_NOTIFICATION_IDX_COUNT,
     .init = sds_init,
     .element_init = sds_element_init,
     .process_bind_request = sds_process_bind_request,
