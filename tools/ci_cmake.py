@@ -90,7 +90,9 @@ def main():
 
     banner("Test building host product")
 
-    products = ['host', 'juno', 'rdv1', 'sgm775']
+    products = ['host', 'juno', 'morello', 'n1sdp', 'rdv1', 'rdv1mc',
+                'rdn1e1', 'sgi575', 'sgm775', 'sgm776', 'tc0',
+                'rdn2']
 
     build_types = ['debug', 'release']
     toolchains = ['GNU', 'ArmClang']
