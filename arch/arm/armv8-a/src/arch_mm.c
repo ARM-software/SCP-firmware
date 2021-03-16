@@ -14,6 +14,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#if FWK_HAS_INCLUDE(<sys / features.h>)
+#    include <sys/features.h>
+#endif
+
 extern char __HEAP_START__;
 extern char __HEAP_END__;
 
