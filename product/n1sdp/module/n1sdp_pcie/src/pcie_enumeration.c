@@ -14,9 +14,8 @@
  * fault when reading the configuration space.
  */
 
+#include "n1sdp_pcie.h"
 #include "n1sdp_scp_mmap.h"
-
-#include <n1sdp_pcie.h>
 
 #include <mod_n1sdp_pcie.h>
 
