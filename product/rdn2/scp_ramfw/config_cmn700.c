@@ -32,6 +32,7 @@
 #define MEM_CNTRL7_ID 298
 
 #define NODE_ID_HND  260
+#define NODE_ID_HNI0 0
 #define NODE_ID_SBSX 196
 
 static const unsigned int snf_table[] = {
@@ -97,7 +98,7 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
         .base = UINT64_C(0x0008000000),
         .size = UINT64_C(128) * FWK_MIB,
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
-        .node_id = NODE_ID_HND,
+        .node_id = NODE_ID_HNI0,
     },
     {
         /*
