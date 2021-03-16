@@ -7,10 +7,9 @@
 
 #include "config_clock.h"
 #include "n1sdp_core.h"
+#include "n1sdp_pcie.h"
 #include "n1sdp_scc_reg.h"
 #include "n1sdp_scp_pik.h"
-
-#include <n1sdp_pcie.h>
 
 #include <internal/pcie_ctrl_apb_reg.h>
 

@@ -8,10 +8,9 @@
  *     N1SDP DMC-620 driver
  */
 
+#include "dimm_spd.h"
 #include "n1sdp_pik_system.h"
 #include "n1sdp_scp_pik.h"
-
-#include <dimm_spd.h>
 
 #include <mod_clock.h>
 #include <mod_n1sdp_dmc620.h>
