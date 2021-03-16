@@ -369,7 +369,7 @@ static int mod_psu_process_bind_request(
         return FWK_E_PARAM;
     }
 
-    switch (fwk_id_get_api_idx(api_id)) {
+    switch ((enum mod_psu_api_idx)fwk_id_get_api_idx(api_id)) {
     case MOD_PSU_API_IDX_DEVICE:
         *api = &mod_psu_device_api;
 
@@ -378,6 +378,8 @@ static int mod_psu_process_bind_request(
     case MOD_PSU_API_IDX_DRIVER_RESPONSE:
         *api = &mod_psu_driver_response_api;
 
+        break;
+    default:
         break;
     }
 
@@ -409,17 +411,17 @@ static int mod_psu_process_event(
     }
 
     switch (fwk_id_get_event_idx(event->id)) {
-    case MOD_PSU_EVENT_IDX_GET_ENABLED:
-    case MOD_PSU_EVENT_IDX_GET_VOLTAGE:
-    case MOD_PSU_EVENT_IDX_SET_ENABLED:
-    case MOD_PSU_EVENT_IDX_SET_VOLTAGE:
+    case (unsigned int)MOD_PSU_EVENT_IDX_GET_ENABLED:
+    case (unsigned int)MOD_PSU_EVENT_IDX_GET_VOLTAGE:
+    case (unsigned int)MOD_PSU_EVENT_IDX_SET_ENABLED:
+    case (unsigned int)MOD_PSU_EVENT_IDX_SET_VOLTAGE:
         ctx->op.cookie = event->cookie;
 
         resp_event->is_delayed_response = true;
 
         break;
 
-    case MOD_PSU_IMPL_EVENT_IDX_RESPONSE:
+    case (unsigned int)MOD_PSU_IMPL_EVENT_IDX_RESPONSE:
         ctx->op.state = MOD_PSU_STATE_IDLE;
 
         status = fwk_thread_get_delayed_response(
@@ -434,7 +436,7 @@ static int mod_psu_process_event(
             .status = params->status,
         };
 
-        switch (fwk_id_get_event_idx(hal_event.id)) {
+        switch ((enum mod_psu_event_idx)fwk_id_get_event_idx(hal_event.id)) {
         case MOD_PSU_EVENT_IDX_GET_ENABLED:
             hal_params->enabled = params->enabled;
 
@@ -469,9 +471,9 @@ const struct fwk_module module_psu = {
     .element_init = mod_psu_element_init,
     .bind = mod_psu_bind,
 
-    .api_count = MOD_PSU_API_IDX_COUNT,
+    .api_count = (unsigned int)MOD_PSU_API_IDX_COUNT,
     .process_bind_request = mod_psu_process_bind_request,
 
-    .event_count = MOD_PSU_IMPL_EVENT_IDX_COUNT,
+    .event_count = (unsigned int)MOD_PSU_IMPL_EVENT_IDX_COUNT,
     .process_event = mod_psu_process_event,
 };

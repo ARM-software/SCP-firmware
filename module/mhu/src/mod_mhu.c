@@ -92,7 +92,7 @@ static void mhu_isr(void)
 
     /* Loop over all the slots */
     while (reg->STAT != 0) {
-        slot = __builtin_ctz(reg->STAT);
+        slot = (unsigned int)__builtin_ctz(reg->STAT);
 
         /*
          * If the slot is bound to an SMT channel, signal the message to the

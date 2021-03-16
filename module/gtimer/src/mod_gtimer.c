@@ -125,8 +125,8 @@ static int set_timer(fwk_id_t dev_id, uint64_t timestamp)
 
     ctx = mod_gtimer_ctx.table + fwk_id_get_element_idx(dev_id);
 
-    ctx->hw_timer->P_CVALL = timestamp & 0xFFFFFFFF;
-    ctx->hw_timer->P_CVALH = timestamp >> 32;
+    ctx->hw_timer->P_CVALL = (uint32_t)(timestamp & 0xFFFFFFFFUL);
+    ctx->hw_timer->P_CVALH = (uint32_t)(timestamp >> 32UL);
 
     return FWK_SUCCESS;
 }

@@ -642,7 +642,8 @@ static int clock_process_notification_response(
      * that is pending.
      */
     if (resp_params->status != FWK_SUCCESS) {
-        ctx->pd_notif.transition_pending_response_status = resp_params->status;
+        ctx->pd_notif.transition_pending_response_status =
+            (unsigned int)resp_params->status;
     }
 
     if ((--(ctx->pd_notif.transition_pending_sent)) == 0) {
@@ -654,7 +655,7 @@ static int clock_process_notification_response(
             (struct mod_pd_power_state_pre_transition_notification_resp_params
                  *)pd_response_event.params;
         pd_resp_params->status =
-            ctx->pd_notif.transition_pending_response_status;
+            (int)ctx->pd_notif.transition_pending_response_status;
         fwk_thread_put_event(&pd_response_event);
     }
 
@@ -699,21 +700,21 @@ static int clock_process_event(const struct fwk_event *event,
     }
 
     switch (fwk_id_get_event_idx(event->id)) {
-    case MOD_CLOCK_EVENT_IDX_SET_RATE_REQUEST:
-    case MOD_CLOCK_EVENT_IDX_GET_RATE_REQUEST:
-    case MOD_CLOCK_EVENT_IDX_SET_STATE_REQUEST:
-    case MOD_CLOCK_EVENT_IDX_GET_STATE_REQUEST:
+    case (unsigned int)MOD_CLOCK_EVENT_IDX_SET_RATE_REQUEST:
+    case (unsigned int)MOD_CLOCK_EVENT_IDX_GET_RATE_REQUEST:
+    case (unsigned int)MOD_CLOCK_EVENT_IDX_SET_STATE_REQUEST:
+    case (unsigned int)MOD_CLOCK_EVENT_IDX_GET_STATE_REQUEST:
         return process_request_event(event, resp_event);
 
 #ifdef BUILD_HAS_CLOCK_TREE_MGMT
-    case CLOCK_EVENT_IDX_SET_STATE_PRE_REQUEST:
+    case (unsigned int)CLOCK_EVENT_IDX_SET_STATE_PRE_REQUEST:
         return clock_management_process_state(event);
 
-    case CLOCK_EVENT_IDX_SET_RATE_PRE_REQUEST:
+    case (unsigned int)CLOCK_EVENT_IDX_SET_RATE_PRE_REQUEST:
         return clock_management_process_rate(event);
 #endif
 
-    case CLOCK_EVENT_IDX_RESPONSE:
+    case (unsigned int)CLOCK_EVENT_IDX_RESPONSE:
         return process_response_event(event);
 
     default:
@@ -724,9 +725,9 @@ static int clock_process_event(const struct fwk_event *event,
 const struct fwk_module module_clock = {
     .name = "Clock HAL",
     .type = FWK_MODULE_TYPE_HAL,
-    .api_count = MOD_CLOCK_API_COUNT,
-    .event_count = CLOCK_EVENT_IDX_COUNT,
-    .notification_count = MOD_CLOCK_NOTIFICATION_IDX_COUNT,
+    .api_count = (unsigned int)MOD_CLOCK_API_COUNT,
+    .event_count = (unsigned int)CLOCK_EVENT_IDX_COUNT,
+    .notification_count = (unsigned int)MOD_CLOCK_NOTIFICATION_IDX_COUNT,
     .init = clock_init,
     .element_init = clock_dev_init,
     .bind = clock_bind,

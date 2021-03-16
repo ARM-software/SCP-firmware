@@ -89,7 +89,8 @@ static int mod_mock_clock_set_rate(
         return FWK_E_PARAM;
     }
 
-    ctx->current_rate_index = rate_entry - ctx->config->rate_table;
+    ctx->current_rate_index =
+        (unsigned int)(rate_entry - ctx->config->rate_table);
 
     ctx->rate_initialized = true;
 
@@ -310,6 +311,6 @@ const struct fwk_module module_mock_clock = {
     .init = mod_mock_clock_init,
     .element_init = mod_mock_clock_element_init,
 
-    .api_count = MOD_MOCK_CLOCK_API_COUNT,
+    .api_count = (unsigned int)MOD_MOCK_CLOCK_API_COUNT,
     .process_bind_request = mod_mock_clock_process_bind_request,
 };

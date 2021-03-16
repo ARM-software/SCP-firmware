@@ -1284,7 +1284,7 @@ static int dvfs_element_init(
     fwk_assert(ctx->config->opps != NULL);
 
     /* Initialize the context */
-    ctx->opp_count = count_opps(ctx->config->opps);
+    ctx->opp_count = (size_t)count_opps(ctx->config->opps);
     fwk_assert(ctx->opp_count > 0);
 
     /* Level limits default to the minimum and maximum available */
@@ -1389,6 +1389,6 @@ const struct fwk_module module_dvfs = {
     .process_bind_request = dvfs_process_bind_request,
     .process_event = mod_dvfs_process_event,
     .process_signal = mod_dvfs_process_signal,
-    .api_count = MOD_DVFS_API_IDX_COUNT,
-    .event_count = MOD_DVFS_INTERNAL_EVENT_IDX_COUNT,
+    .api_count = (unsigned int)MOD_DVFS_API_IDX_COUNT,
+    .event_count = (unsigned int)MOD_DVFS_INTERNAL_EVENT_IDX_COUNT,
 };

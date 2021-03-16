@@ -342,7 +342,7 @@ static int dw_apb_i2c_start(fwk_id_t id)
 
 const struct fwk_module module_dw_apb_i2c = {
     .name = "DW APB I2C",
-    .api_count = MOD_DW_APB_I2C_API_IDX_COUNT,
+    .api_count = (unsigned int)MOD_DW_APB_I2C_API_IDX_COUNT,
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = dw_apb_i2c_init,
     .element_init = dw_apb_i2c_element_init,

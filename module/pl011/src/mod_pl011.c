@@ -59,7 +59,7 @@ static int mod_pl011_init_ctx(struct mod_pl011_ctx *ctx)
 
     fwk_assert(!mod_pl011_ctx.initialized);
 
-    element_count = fwk_module_get_element_count(fwk_module_id_pl011);
+    element_count = (size_t)fwk_module_get_element_count(fwk_module_id_pl011);
     if (element_count == 0) {
         return FWK_SUCCESS;
     }
@@ -116,7 +116,7 @@ static void mod_pl011_set_baud_rate(const struct mod_pl011_element_cfg *cfg)
     fwk_assert((PL011_UARTCLK_MAX * UINT64_C(4)) < UINT32_MAX);
 
     /* Ensure baud rate is not higher than the clock can support */
-    clock_rate_x4 = cfg->clock_rate_hz * 4;
+    clock_rate_x4 = (uint32_t)(cfg->clock_rate_hz * 4);
     fwk_assert(cfg->baud_rate_bps <= clock_rate_x4);
 
     /* Calculate integer and fractional divisors */
@@ -136,7 +136,7 @@ static void mod_pl011_set_baud_rate(const struct mod_pl011_element_cfg *cfg)
      */
     fwk_assert((divisor_integer == 0xFFFF) == (divisor_fractional == 0));
 
-    reg->IBRD = divisor_integer;
+    reg->IBRD = (uint16_t)divisor_integer;
     reg->FBRD = divisor_fractional;
 }
 
@@ -173,7 +173,7 @@ static void mod_pl011_putch(fwk_id_t id, char ch)
         continue;
     }
 
-    reg->DR = ch;
+    reg->DR = (uint16_t)ch;
 }
 
 static bool mod_pl011_getch(fwk_id_t id, char *ch)
@@ -191,7 +191,7 @@ static bool mod_pl011_getch(fwk_id_t id, char *ch)
         return false;
     }
 
-    *ch = reg->DR;
+    *ch = (char)reg->DR;
 
     return true;
 }
@@ -351,7 +351,7 @@ static int mod_pl011_process_power_notification(
     int status = FWK_SUCCESS;
 
     switch (fwk_id_get_notification_idx(event->id)) {
-    case MOD_PD_NOTIFICATION_IDX_POWER_STATE_PRE_TRANSITION: {
+    case (unsigned int)MOD_PD_NOTIFICATION_IDX_POWER_STATE_PRE_TRANSITION: {
         struct mod_pd_power_state_pre_transition_notification_params
             *pd_pre_transition_params;
         struct mod_pd_power_state_pre_transition_notification_resp_params
@@ -366,11 +366,11 @@ static int mod_pl011_process_power_notification(
 
         switch (pd_pre_transition_params->target_state) {
 #    ifdef BUILD_HAS_MOD_SYSTEM_POWER
-        case MOD_SYSTEM_POWER_POWER_STATE_SLEEP0:
+        case (unsigned int)MOD_SYSTEM_POWER_POWER_STATE_SLEEP0:
             FWK_FALLTHROUGH;
 #    endif
 
-        case MOD_PD_STATE_OFF:
+        case (unsigned int)MOD_PD_STATE_OFF:
             status = mod_pl011_powering_down(event->target_id);
 
             pd_resp_params->status = status; /* Inform the power domain */
@@ -384,7 +384,7 @@ static int mod_pl011_process_power_notification(
         break;
     }
 
-    case MOD_PD_NOTIFICATION_IDX_POWER_STATE_TRANSITION: {
+    case (unsigned int)MOD_PD_NOTIFICATION_IDX_POWER_STATE_TRANSITION: {
         struct mod_pd_power_state_transition_notification_params *params =
             (struct mod_pd_power_state_transition_notification_params *)
                 event->params;
@@ -398,7 +398,7 @@ static int mod_pl011_process_power_notification(
         break;
     }
 
-    case MOD_PD_NOTIFICATION_IDX_PRE_SHUTDOWN: {
+    case (unsigned int)MOD_PD_NOTIFICATION_IDX_PRE_SHUTDOWN: {
         struct mod_pd_pre_shutdown_notif_resp_params
             *pd_pre_shutdown_resp_params =
                 (struct mod_pd_pre_shutdown_notif_resp_params *)
@@ -508,12 +508,12 @@ static int mod_pl011_process_clock_notification(
     int status = FWK_SUCCESS;
 
     switch (fwk_id_get_notification_idx(event->id)) {
-    case MOD_CLOCK_NOTIFICATION_IDX_STATE_CHANGED:
+    case (unsigned int)MOD_CLOCK_NOTIFICATION_IDX_STATE_CHANGED:
         status = mod_pl011_clock_changed(event);
 
         break;
 
-    case MOD_CLOCK_NOTIFICATION_IDX_STATE_CHANGE_PENDING:
+    case (unsigned int)MOD_CLOCK_NOTIFICATION_IDX_STATE_CHANGE_PENDING:
         status = mod_pl011_clock_change_pending(event, resp_event);
 
         break;
@@ -533,7 +533,7 @@ static int mod_pl011_process_notification(
 
     fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT));
 
-    module_idx = fwk_id_get_module_idx(event->id);
+    module_idx = (enum fwk_module_idx)fwk_id_get_module_idx(event->id);
 
     switch (module_idx) {
 #ifdef BUILD_HAS_MOD_POWER_DOMAIN

@@ -420,6 +420,6 @@ const struct fwk_module module_mock_psu = {
     .element_init = mod_mock_psu_element_init,
     .bind = mod_mock_psu_bind,
 
-    .api_count = MOD_MOCK_PSU_API_IDX_COUNT,
+    .api_count = (unsigned int)MOD_MOCK_PSU_API_IDX_COUNT,
     .process_bind_request = mod_mock_psu_process_bind_request,
 };

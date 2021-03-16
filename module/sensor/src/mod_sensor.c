@@ -404,8 +404,7 @@ static int sensor_process_event(const struct fwk_event *event,
 
     ctx = ctx_table + fwk_id_get_element_idx(event->target_id);
 
-    switch (fwk_id_get_event_idx(event->id)) {
-
+    switch ((enum mod_sensor_event_idx)fwk_id_get_event_idx(event->id)) {
     case SENSOR_EVENT_IDX_READ_REQUEST:
         ctx->cookie = event->cookie;
         resp_event->is_delayed_response = true;
@@ -432,8 +431,8 @@ static int sensor_process_event(const struct fwk_event *event,
 
 const struct fwk_module module_sensor = {
     .name = "SENSOR",
-    .api_count = MOD_SENSOR_API_IDX_COUNT,
-    .event_count = SENSOR_EVENT_IDX_COUNT,
+    .api_count = (unsigned int)MOD_SENSOR_API_IDX_COUNT,
+    .event_count = (unsigned int)SENSOR_EVENT_IDX_COUNT,
     .type = FWK_MODULE_TYPE_HAL,
     .init = sensor_init,
     .element_init = sensor_dev_init,
