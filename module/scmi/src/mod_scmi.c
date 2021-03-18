@@ -740,7 +740,7 @@ static int scmi_base_protocol_attributes_handler(fwk_id_t service_id,
      */
     if (agent_type == SCMI_AGENT_TYPE_PSCI) {
         fwk_assert(
-            scmi_ctx.protocol_count > scmi_ctx.config->dis_protocol_count_psci);
+            scmi_ctx.protocol_count >= scmi_ctx.config->dis_protocol_count_psci);
         protocol_count =
             scmi_ctx.protocol_count - scmi_ctx.config->dis_protocol_count_psci;
     } else
@@ -908,7 +908,7 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
 
     if (agent_type == SCMI_AGENT_TYPE_PSCI) {
         fwk_assert(
-            scmi_ctx.protocol_count > scmi_ctx.config->dis_protocol_count_psci);
+            scmi_ctx.protocol_count >= scmi_ctx.config->dis_protocol_count_psci);
 
         protocol_count_psci =
             scmi_ctx.protocol_count - scmi_ctx.config->dis_protocol_count_psci;
