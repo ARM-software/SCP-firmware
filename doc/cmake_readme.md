@@ -36,11 +36,11 @@ below instruction to build the SCP firmware using CMake.
 > - AArch64 GCC for A-class controllers
 >
 > ```sh
-> $ mkdir ~/home/$USER/toolchain
-> $ cd ~/home/$USER/toolchain
+> $ mkdir /home/$USER/toolchain
+> $ cd /home/$USER/toolchain
 > $ wget https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/10.2-2020.11/binrel/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf.tar.xz
 > $ tar xf gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf.tar.xz
-> $ export PATH=~/home/$USER/toolchain/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin:$PATH
+> $ export PATH=/home/$USER/toolchain/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin:$PATH
 > Make sure whenever your run cmake commands for aarch64 target keep above
 > in path
 > ```
