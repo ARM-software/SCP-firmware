@@ -29,6 +29,7 @@ static const struct fwk_element element_table[] = {
     PSU_ELEMENT_IDX(5),
     PSU_ELEMENT_IDX(6),
     PSU_ELEMENT_IDX(7),
+#if (PLATFORM_VARIANT == 0)
     PSU_ELEMENT_IDX(8),
     PSU_ELEMENT_IDX(9),
     PSU_ELEMENT_IDX(10),
@@ -37,6 +38,7 @@ static const struct fwk_element element_table[] = {
     PSU_ELEMENT_IDX(13),
     PSU_ELEMENT_IDX(14),
     PSU_ELEMENT_IDX(15),
+#endif
     { 0 },
 };
 

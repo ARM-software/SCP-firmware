@@ -17,7 +17,11 @@ static const struct fwk_element subsystem_table[] = {
     { .name = "RD-N2",
       .data =
           &(struct mod_sid_subsystem_config){
+#if (PLATFORM_VARIANT == 0)
               .part_number = 0x7B7,
+#else
+              .part_number = 0x7B6,
+#endif
           } },
     { 0 },
 };

@@ -13,7 +13,11 @@
 #define PLATFORM_CORE_PER_CLUSTER_MAX 1
 
 #define CORES_PER_CLUSTER  1
-#define NUMBER_OF_CLUSTERS 16
+#if (PLATFORM_VARIANT == 0)
+#    define NUMBER_OF_CLUSTERS 16
+#else
+#    define NUMBER_OF_CLUSTERS 8
+#endif
 
 static inline unsigned int platform_get_cluster_count(void)
 {

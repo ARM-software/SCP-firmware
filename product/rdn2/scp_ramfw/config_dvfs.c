@@ -52,6 +52,7 @@ static const struct mod_dvfs_domain_config cpu4 = DVFS_DOMAIN_CPU_GROUP_IDX(4);
 static const struct mod_dvfs_domain_config cpu5 = DVFS_DOMAIN_CPU_GROUP_IDX(5);
 static const struct mod_dvfs_domain_config cpu6 = DVFS_DOMAIN_CPU_GROUP_IDX(6);
 static const struct mod_dvfs_domain_config cpu7 = DVFS_DOMAIN_CPU_GROUP_IDX(7);
+#if (PLATFORM_VARIANT == 0)
 static const struct mod_dvfs_domain_config cpu8 = DVFS_DOMAIN_CPU_GROUP_IDX(8);
 static const struct mod_dvfs_domain_config cpu9 = DVFS_DOMAIN_CPU_GROUP_IDX(9);
 static const struct mod_dvfs_domain_config cpu10 =
@@ -66,6 +67,7 @@ static const struct mod_dvfs_domain_config cpu14 =
     DVFS_DOMAIN_CPU_GROUP_IDX(14);
 static const struct mod_dvfs_domain_config cpu15 =
     DVFS_DOMAIN_CPU_GROUP_IDX(15);
+#endif
 
 static const struct fwk_element element_table[] = {
     DVFS_ELEMENT_IDX(0),
@@ -76,6 +78,7 @@ static const struct fwk_element element_table[] = {
     DVFS_ELEMENT_IDX(5),
     DVFS_ELEMENT_IDX(6),
     DVFS_ELEMENT_IDX(7),
+#if (PLATFORM_VARIANT == 0)
     DVFS_ELEMENT_IDX(8),
     DVFS_ELEMENT_IDX(9),
     DVFS_ELEMENT_IDX(10),
@@ -84,6 +87,7 @@ static const struct fwk_element element_table[] = {
     DVFS_ELEMENT_IDX(13),
     DVFS_ELEMENT_IDX(14),
     DVFS_ELEMENT_IDX(15),
+#endif
     { 0 },
 };
 
