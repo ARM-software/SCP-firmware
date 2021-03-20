@@ -22,19 +22,36 @@
 /*
  * CMN700 nodes
  */
-#define MEM_CNTRL0_ID 64
-#define MEM_CNTRL1_ID 128
-#define MEM_CNTRL2_ID 192
-#define MEM_CNTRL3_ID 256
-#define MEM_CNTRL4_ID 108
-#define MEM_CNTRL5_ID 172
-#define MEM_CNTRL6_ID 234
-#define MEM_CNTRL7_ID 298
+#if (PLATFORM_VARIANT == 0)
+#    define MEM_CNTRL0_ID 64
+#    define MEM_CNTRL1_ID 128
+#    define MEM_CNTRL2_ID 192
+#    define MEM_CNTRL3_ID 256
+#    define MEM_CNTRL4_ID 108
+#    define MEM_CNTRL5_ID 172
+#    define MEM_CNTRL6_ID 234
+#    define MEM_CNTRL7_ID 298
 
-#define NODE_ID_HND  260
-#define NODE_ID_HNI0 0
-#define NODE_ID_SBSX 196
+#    define NODE_ID_HND  260
+#    define NODE_ID_HNI0 0
+#    define NODE_ID_SBSX 196
 
+#    define MESH_SIZE_X 6
+#    define MESH_SIZE_Y 6
+
+#elif (PLATFORM_VARIANT == 1)
+#    define MEM_CNTRL0_ID 32
+#    define MEM_CNTRL1_ID 64
+
+#    define NODE_ID_HND  68
+#    define NODE_ID_HNI0 0
+#    define NODE_ID_SBSX 66
+
+#    define MESH_SIZE_X 3
+#    define MESH_SIZE_Y 3
+#endif
+
+#if (PLATFORM_VARIANT == 0)
 static const unsigned int snf_table[] = {
     MEM_CNTRL0_ID, /* Maps to HN-F logical node 0  */
     MEM_CNTRL0_ID, /* Maps to HN-F logical node 1  */
@@ -69,6 +86,18 @@ static const unsigned int snf_table[] = {
     MEM_CNTRL7_ID, /* Maps to HN-F logical node 30  */
     MEM_CNTRL7_ID, /* Maps to HN-F logical node 31  */
 };
+#elif (PLATFORM_VARIANT == 1)
+static const unsigned int snf_table[] = {
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 0  */
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 1  */
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 2  */
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 3  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 4  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 5  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 6  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 7  */
+};
+#endif
 
 static const struct mod_cmn700_mem_region_map mmap[] = {
     {
@@ -166,8 +195,8 @@ static const struct fwk_element cmn700_device_table[] = {
     [0] = { .name = "CMN700 Mesh Config",
             .data = &((struct mod_cmn700_config){
                 .base = SCP_CMN700_BASE,
-                .mesh_size_x = 6,
-                .mesh_size_y = 6,
+                .mesh_size_x = MESH_SIZE_X,
+                .mesh_size_y = MESH_SIZE_Y,
                 .hnd_node_id = NODE_ID_HND,
                 .snf_table = snf_table,
                 .snf_count = FWK_ARRAY_SIZE(snf_table),

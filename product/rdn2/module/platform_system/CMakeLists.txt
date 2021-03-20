@@ -8,13 +8,18 @@ add_library(${SCP_MODULE_TARGET} SCP_MODULE)
 
 # SCP_PLATFORM_VARIANT value for supported RD-N2 platform variants:
 # - '0' for RD-N2 platform
+# - '1' for RD-N2-Cfg1 platform
 
 if (SCP_PLATFORM_VARIANT STREQUAL "0")
       target_compile_definitions(${SCP_MODULE_TARGET}
                                  PUBLIC -DPLATFORM_VARIANT=0)
+elseif (SCP_PLATFORM_VARIANT STREQUAL "1")
+      target_compile_definitions(${SCP_MODULE_TARGET}
+                                 PUBLIC -DPLATFORM_VARIANT=1)
 else()
       message(FATAL_ERROR "Please set SCP_PLATFORM_VARIANT to \n"
-                                "'0' for RD-N2 \n")
+                                "'0' for RD-N2 \n"
+                                "'1' for RD-N2-Cfg1 \n")
 endif()
 
 target_include_directories(${SCP_MODULE_TARGET}

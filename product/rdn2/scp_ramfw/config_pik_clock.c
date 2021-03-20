@@ -117,6 +117,7 @@ static const struct fwk_element pik_clock_element_table[] = {
     CLOCK_PLL_CLUSn_CPU(5),
     CLOCK_PLL_CLUSn_CPU(6),
     CLOCK_PLL_CLUSn_CPU(7),
+#if (PLATFORM_VARIANT == 0)
     CLOCK_PLL_CLUSn_CPU(8),
     CLOCK_PLL_CLUSn_CPU(9),
     CLOCK_PLL_CLUSn_CPU(10),
@@ -125,6 +126,7 @@ static const struct fwk_element pik_clock_element_table[] = {
     CLOCK_PLL_CLUSn_CPU(13),
     CLOCK_PLL_CLUSn_CPU(14),
     CLOCK_PLL_CLUSn_CPU(15),
+#endif
     [CLOCK_PIK_IDX_DMC] = {
         .name = "DMC",
         .data = &((struct mod_pik_clock_dev_config) {

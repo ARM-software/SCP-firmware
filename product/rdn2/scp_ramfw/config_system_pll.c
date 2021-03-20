@@ -39,6 +39,7 @@ static const struct fwk_element system_pll_element_table[] = {
     CLOCK_PLL_IDX_CPU(5),
     CLOCK_PLL_IDX_CPU(6),
     CLOCK_PLL_IDX_CPU(7),
+#if (PLATFORM_VARIANT == 0)
     CLOCK_PLL_IDX_CPU(8),
     CLOCK_PLL_IDX_CPU(9),
     CLOCK_PLL_IDX_CPU(10),
@@ -47,6 +48,7 @@ static const struct fwk_element system_pll_element_table[] = {
     CLOCK_PLL_IDX_CPU(13),
     CLOCK_PLL_IDX_CPU(14),
     CLOCK_PLL_IDX_CPU(15),
+#endif
     [CLOCK_PLL_IDX_SYS] = {
         .name = "SYS_PLL",
         .data = &((struct mod_system_pll_dev_config) {

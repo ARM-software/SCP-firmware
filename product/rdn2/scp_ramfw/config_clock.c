@@ -39,6 +39,7 @@ static const struct fwk_element clock_dev_desc_table[] = {
     CLOCK_CPU_GROUP(5),
     CLOCK_CPU_GROUP(6),
     CLOCK_CPU_GROUP(7),
+#if (PLATFORM_VARIANT == 0)
     CLOCK_CPU_GROUP(8),
     CLOCK_CPU_GROUP(9),
     CLOCK_CPU_GROUP(10),
@@ -47,6 +48,7 @@ static const struct fwk_element clock_dev_desc_table[] = {
     CLOCK_CPU_GROUP(13),
     CLOCK_CPU_GROUP(14),
     CLOCK_CPU_GROUP(15),
+#endif
     [CLOCK_IDX_INTERCONNECT] = {
         .name = "Interconnect",
         .data = &((struct mod_clock_dev_config) {

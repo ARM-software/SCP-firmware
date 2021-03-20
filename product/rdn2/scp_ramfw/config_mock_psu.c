@@ -32,6 +32,7 @@ static const struct fwk_element element_table[] = {
     MOCK_PSU_ELEMENT_IDX(5),
     MOCK_PSU_ELEMENT_IDX(6),
     MOCK_PSU_ELEMENT_IDX(7),
+#if (PLATFORM_VARIANT == 0)
     MOCK_PSU_ELEMENT_IDX(8),
     MOCK_PSU_ELEMENT_IDX(9),
     MOCK_PSU_ELEMENT_IDX(10),
@@ -40,6 +41,7 @@ static const struct fwk_element element_table[] = {
     MOCK_PSU_ELEMENT_IDX(13),
     MOCK_PSU_ELEMENT_IDX(14),
     MOCK_PSU_ELEMENT_IDX(15),
+#endif
     { 0 },
 };
 
