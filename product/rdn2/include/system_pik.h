@@ -34,8 +34,8 @@ struct pik_system_reg {
     FWK_RW  uint32_t  DMCCLK_CTRL;
     FWK_RW  uint32_t  DMCCLK_DIV1;
             uint8_t   RESERVED5[0x8A0 - 0x888];
-    FWK_RW  uint32_t  UARTCLK_CTRL;
-    FWK_RW  uint32_t  UARTCLK_DIV1;
+    FWK_RW  uint32_t  APUARTCLK_CTRL;
+    FWK_RW  uint32_t  APUARTCLK_DIV1;
             uint8_t   RESERVED6[0x8B0 - 0x8A8];
     FWK_R   uint32_t  IONCICLK_CTRL;
     FWK_W   uint32_t  IONCICLK_DIV1;
@@ -43,14 +43,14 @@ struct pik_system_reg {
     FWK_RW  uint32_t  TCU0CLK_CTRL;
     FWK_RW  uint32_t  TCU0CLK_DIV1;
             uint8_t   RESERVED8[0x940 - 0x908];
-    FWK_W   uint32_t  TCUx_CLK_DISABLE;
-    FWK_W   uint32_t  NCIx_CLK_DISABLE;
+    FWK_W   uint32_t  TCUx_CLK_ENABLE;
+    FWK_W   uint32_t  NCIx_CLK_ENABLE;
             uint8_t   RESERVED9[0xA00 - 0x948];
     FWK_R   uint32_t  CLKFORCE_STATUS;
     FWK_W   uint32_t  CLKFORCE_SET;
     FWK_W   uint32_t  CLKFORCE_CLR;
             uint8_t   RESERVED10[0xB0C - 0xA0C];
-    FWK_RW  uint32_t  SYSTOP_RST_DLY;
+    FWK_RW  uint32_t  PD_SYSTOP_RST_DLY;
     FWK_RW  uint32_t  IOMACRO_OVERRIDE;
             uint8_t   RESERVED11[0xFC0 - 0xB14];
     FWK_R   uint32_t  PIK_CONFIG;
