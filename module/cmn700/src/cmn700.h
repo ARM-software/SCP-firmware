@@ -257,8 +257,9 @@ struct cmn700_mxp_reg {
 #define CMN700_MXP_PORT_CONNECT_INFO_CAL_CONNECTED_POS  7
 #define CMN700_MXP_PORT_CONNECT_INFO_DEVICE_TYPE_MASK   UINT64_C(0x1F)
 
-#define CMN700_ROOT_NODE_OFFSET_PORT_POS 16
-#define CMN700_ROOT_NODE_OFFSET_Y_POS    22
+#define CMN700_ROOT_NODE_OFFSET_PORT_POS     16
+#define CMN700_ROOT_NODE_4_BIT_ENCODING_MASK 0x30
+#define CMN700_ROOT_NODE_OFFSET_Y_POS        22
 
 /*
  * Retrieve the number of device ports connected to the cross point

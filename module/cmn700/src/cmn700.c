@@ -358,7 +358,11 @@ struct cmn700_cfgm_reg *get_root_node(
      * Determine the number of bits used to represent each node coordinate based
      * on the mesh size as per CMN700 specification.
      */
-    encoding_bits = ((mesh_size_x > 4) || (mesh_size_y > 4)) ? 3 : 2;
+    if ((mesh_size_x > 8) && (mesh_size_y > 8)) {
+        encoding_bits = 4;
+    } else {
+        encoding_bits = ((mesh_size_x > 4) || (mesh_size_y > 4)) ? 3 : 2;
+    }
 
     /* Extract node coordinates from the node identifier */
 
@@ -373,6 +377,16 @@ struct cmn700_cfgm_reg *get_root_node(
     offset = (node_pos_y << CMN700_ROOT_NODE_OFFSET_Y_POS) |
         (node_pos_x << (CMN700_ROOT_NODE_OFFSET_Y_POS + encoding_bits)) |
         (node_port << CMN700_ROOT_NODE_OFFSET_PORT_POS);
+
+    /*
+     * For 4 bits encoding and HND on device with 2 device ports, set bits [5:4]
+     * of root node base pointer.
+     */
+    if (encoding_bits == 4) {
+        offset |=
+            (CMN700_ROOT_NODE_4_BIT_ENCODING_MASK
+             << CMN700_ROOT_NODE_OFFSET_PORT_POS);
+    }
 
     return (struct cmn700_cfgm_reg *)(base + offset);
 }
