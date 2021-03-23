@@ -111,7 +111,7 @@ static int system_state_get(enum scmi_system_state *system_state)
         return status;
     }
 
-    switch (state) {
+    switch ((enum mod_pd_state)state) {
     case MOD_PD_STATE_OFF:
         *system_state = SCMI_SYSTEM_STATE_SHUTDOWN;
         break;
@@ -186,7 +186,7 @@ static int scmi_sys_power_version_handler(fwk_id_t service_id,
                                           const uint32_t *payload)
 {
     struct scmi_protocol_version_p2a return_values = {
-        .status = SCMI_SUCCESS,
+        .status = (int32_t)SCMI_SUCCESS,
         .version = SCMI_PROTOCOL_VERSION_SYS_POWER,
     };
 
@@ -202,7 +202,7 @@ static int scmi_sys_power_attributes_handler(fwk_id_t service_id,
                                              const uint32_t *payload)
 {
     struct scmi_protocol_attributes_p2a return_values = {
-        .status = SCMI_SUCCESS,
+        .status = (int32_t)SCMI_SUCCESS,
         .attributes = 0,
     };
 
@@ -230,7 +230,7 @@ static int scmi_sys_power_msg_attributes_handler(fwk_id_t service_id,
  */
 #ifndef BUILD_HAS_SCMI_NOTIFICATIONS
     if (message_id == MOD_SCMI_SYS_POWER_STATE_NOTIFY) {
-        return_values.status = SCMI_NOT_SUPPORTED;
+        return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
 
         goto exit;
     }
@@ -238,8 +238,7 @@ static int scmi_sys_power_msg_attributes_handler(fwk_id_t service_id,
 
     if ((message_id >= FWK_ARRAY_SIZE(handler_table)) ||
         (handler_table[message_id] == NULL)) {
-
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
         goto exit;
     }
 
@@ -270,7 +269,7 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
     int status = FWK_SUCCESS;
     const struct scmi_sys_power_state_set_a2p *parameters;
     struct scmi_sys_power_state_set_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR,
+        .status = (int32_t)SCMI_GENERIC_ERROR,
     };
     unsigned int agent_id;
     enum scmi_agent_type agent_type;
@@ -281,7 +280,7 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
     parameters = (const struct scmi_sys_power_state_set_a2p *)payload;
 
     if (parameters->flags & (uint32_t)(~STATE_SET_FLAGS_MASK)) {
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         goto exit;
     }
 
@@ -297,8 +296,7 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
 
     if ((agent_type != SCMI_AGENT_TYPE_PSCI) &&
         (agent_type != SCMI_AGENT_TYPE_MANAGEMENT)) {
-
-        return_values.status = SCMI_NOT_SUPPORTED;
+        return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
         goto exit;
     }
 
@@ -312,17 +310,17 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
         &policy_status,
         &scmi_system_state,
         service_id,
-        (parameters->flags & (uint32_t)STATE_SET_FLAGS_GRACEFUL_REQUEST));
+        (parameters->flags & (uint32_t)STATE_SET_FLAGS_GRACEFUL_REQUEST) != 0);
 
     if (status != FWK_SUCCESS) {
-        return_values.status = SCMI_GENERIC_ERROR;
+        return_values.status = (int32_t)SCMI_GENERIC_ERROR;
         goto exit;
     }
     if (policy_status == MOD_SCMI_SYS_POWER_SKIP_MESSAGE_HANDLER) {
-        return_values.status = SCMI_SUCCESS;
+        return_values.status = (int32_t)SCMI_SUCCESS;
         goto exit;
     }
-    switch (scmi_system_state) {
+    switch ((enum scmi_system_state)scmi_system_state) {
     case SCMI_SYSTEM_STATE_SHUTDOWN:
     case SCMI_SYSTEM_STATE_COLD_RESET:
     case SCMI_SYSTEM_STATE_WARM_RESET:
@@ -346,7 +344,7 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
         if (status != FWK_SUCCESS) {
             if (status == FWK_E_STATE) {
                 status = FWK_SUCCESS;
-                return_values.status = SCMI_DENIED;
+                return_values.status = (int32_t)SCMI_DENIED;
             }
             goto exit;
         }
@@ -356,8 +354,7 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
         if ((agent_type != SCMI_AGENT_TYPE_MANAGEMENT) ||
             (scmi_sys_power_ctx.config->system_view !=
              MOD_SCMI_SYSTEM_VIEW_OSPM)) {
-
-            return_values.status = SCMI_NOT_SUPPORTED;
+            return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
             goto exit;
         }
 
@@ -368,8 +365,7 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
 
         if ((scmi_system_state != SCMI_SYSTEM_STATE_SHUTDOWN) &&
             (scmi_system_state != SCMI_SYSTEM_STATE_SUSPEND)) {
-
-            return_values.status = SCMI_DENIED;
+            return_values.status = (int32_t)SCMI_DENIED;
             goto exit;
         }
 
@@ -382,7 +378,7 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
         break;
 
     default:
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         goto exit;
     };
 
@@ -396,11 +392,11 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
         scmi_sys_power_state_notify(
             service_id,
             scmi_system_state,
-            parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST);
+            (parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST) != 0);
     }
 #endif
 
-    return_values.status = SCMI_SUCCESS;
+    return_values.status = (int32_t)SCMI_SUCCESS;
 
 exit:
     scmi_sys_power_ctx.scmi_api->respond(service_id, &return_values,
@@ -418,7 +414,7 @@ static int scmi_sys_power_state_get_handler(fwk_id_t service_id,
 {
     int status = FWK_SUCCESS;
     struct scmi_sys_power_state_get_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR,
+        .status = (int32_t)SCMI_GENERIC_ERROR,
     };
     enum scmi_system_state system_state;
     unsigned int agent_id;
@@ -434,7 +430,7 @@ static int scmi_sys_power_state_get_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    return_values.status = SCMI_NOT_SUPPORTED;
+    return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
     if (scmi_sys_power_ctx.config->system_view == MOD_SCMI_SYSTEM_VIEW_FULL) {
         goto exit;
     } else {
@@ -471,7 +467,7 @@ static int scmi_sys_power_state_notify_handler(fwk_id_t service_id,
     unsigned int agent_id;
     const struct scmi_sys_power_state_notify_a2p *parameters;
     struct scmi_sys_power_state_notify_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR,
+        .status = (int32_t)SCMI_GENERIC_ERROR,
     };
     int status;
 
@@ -483,7 +479,7 @@ static int scmi_sys_power_state_notify_handler(fwk_id_t service_id,
     parameters = (const struct scmi_sys_power_state_notify_a2p *)payload;
 
     if (parameters->flags & (~STATE_NOTIFY_FLAGS_MASK)) {
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         goto exit;
     }
 
@@ -493,7 +489,7 @@ static int scmi_sys_power_state_notify_handler(fwk_id_t service_id,
         scmi_sys_power_ctx.system_power_notifications[agent_id] = FWK_ID_NONE;
     }
 
-    return_values.status = SCMI_SUCCESS;
+    return_values.status = (int32_t)SCMI_SUCCESS;
 
 exit:
     scmi_sys_power_ctx.scmi_api->respond(service_id, &return_values,
@@ -599,7 +595,7 @@ static int scmi_sys_power_permissions_handler(
 static int scmi_sys_power_get_scmi_protocol_id(fwk_id_t protocol_id,
                                                uint8_t *scmi_protocol_id)
 {
-    *scmi_protocol_id = MOD_SCMI_PROTOCOL_ID_SYS_POWER;
+    *scmi_protocol_id = (uint8_t)MOD_SCMI_PROTOCOL_ID_SYS_POWER;
 
     return FWK_SUCCESS;
 }
@@ -622,13 +618,13 @@ static int scmi_sys_power_handler(fwk_id_t protocol_id,
     fwk_assert(payload != NULL);
 
     if (message_id >= FWK_ARRAY_SIZE(handler_table)) {
-        return_value = SCMI_NOT_FOUND;
+        return_value = (int32_t)SCMI_NOT_FOUND;
         goto error;
     }
 
     if (payload_size != payload_size_table[message_id]) {
         /* Incorrect payload size or message is not supported */
-        return_value = SCMI_PROTOCOL_ERROR;
+        return_value = (int32_t)SCMI_PROTOCOL_ERROR;
         goto error;
     }
 
@@ -636,7 +632,7 @@ static int scmi_sys_power_handler(fwk_id_t protocol_id,
     status = scmi_sys_power_permissions_handler(
         service_id, payload, payload_size, message_id);
     if (status != FWK_SUCCESS) {
-        return_value = SCMI_DENIED;
+        return_value = (int32_t)SCMI_DENIED;
         goto error;
     }
 #endif
@@ -679,8 +675,8 @@ static int scmi_sys_power_init_notifications(void)
     }
     fwk_assert(scmi_sys_power_ctx.agent_count != 0);
 
-    scmi_sys_power_ctx.system_power_notifications = fwk_mm_calloc(
-        scmi_sys_power_ctx.agent_count, sizeof(fwk_id_t));
+    scmi_sys_power_ctx.system_power_notifications =
+        fwk_mm_calloc((size_t)scmi_sys_power_ctx.agent_count, sizeof(fwk_id_t));
 
     for (i = 0; i < scmi_sys_power_ctx.agent_count; i++) {
         scmi_sys_power_ctx.system_power_notifications[i] = FWK_ID_NONE;

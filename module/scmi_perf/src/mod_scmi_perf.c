@@ -267,7 +267,7 @@ static int scmi_perf_protocol_version_handler(fwk_id_t service_id,
                                               const uint32_t *payload)
 {
     struct scmi_protocol_version_p2a return_values = {
-        .status = SCMI_SUCCESS,
+        .status = (int32_t)SCMI_SUCCESS,
         .version = SCMI_PROTOCOL_VERSION_PERF,
     };
 
@@ -281,7 +281,7 @@ static int scmi_perf_protocol_attributes_handler(fwk_id_t service_id,
                                                  const uint32_t *payload)
 {
     struct scmi_perf_protocol_attributes_p2a return_values = {
-        .status = SCMI_SUCCESS,
+        .status = (int32_t)SCMI_SUCCESS,
         .attributes =
             SCMI_PERF_PROTOCOL_ATTRIBUTES(true, scmi_perf_ctx.domain_count),
     };
@@ -317,7 +317,7 @@ static int scmi_perf_protocol_message_attributes_handler(fwk_id_t service_id,
             .status = SCMI_SUCCESS,
         };
     } else {
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
     }
 
     return_values.attributes = 0;
@@ -345,7 +345,7 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
     fwk_id_t domain_id;
     struct mod_dvfs_opp opp;
     struct scmi_perf_domain_attributes_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR,
+        .status = (int32_t)SCMI_GENERIC_ERROR,
     };
     bool notifications = false;
     bool fast_channels = false;
@@ -355,7 +355,7 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
     /* Validate the domain identifier */
     if (parameters->domain_id >= scmi_perf_ctx.domain_count) {
         status = FWK_SUCCESS;
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
 
         goto exit;
     }
@@ -370,11 +370,11 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
         ((uint32_t)MOD_SCMI_PERF_PERMS_SET_LEVEL);
 #else
     status = scmi_perf_permissions_handler(
-        service_id, payload, MOD_SCMI_PERF_LIMITS_SET);
+        service_id, payload, (unsigned int)MOD_SCMI_PERF_LIMITS_SET);
     if (status == FWK_SUCCESS)
-        permissions = MOD_SCMI_PERF_PERMS_SET_LIMITS;
+        permissions = (uint8_t)MOD_SCMI_PERF_PERMS_SET_LIMITS;
     status = scmi_perf_permissions_handler(
-        service_id, payload, MOD_SCMI_PERF_LEVEL_SET);
+        service_id, payload, (unsigned int)MOD_SCMI_PERF_LEVEL_SET);
     if (status == FWK_SUCCESS)
         permissions |= MOD_SCMI_PERF_PERMS_SET_LEVEL;
 #endif
@@ -441,7 +441,7 @@ static int scmi_perf_describe_levels_handler(fwk_id_t service_id,
     struct mod_dvfs_opp opp;
     uint16_t latency;
     struct scmi_perf_describe_levels_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR,
+        .status = (int32_t)SCMI_GENERIC_ERROR,
     };
 
     payload_size = sizeof(return_values);
@@ -462,7 +462,7 @@ static int scmi_perf_describe_levels_handler(fwk_id_t service_id,
 
     /* Validate the domain identifier */
     if (parameters->domain_id >= scmi_perf_ctx.domain_count) {
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
 
         goto exit;
     }
@@ -477,7 +477,7 @@ static int scmi_perf_describe_levels_handler(fwk_id_t service_id,
     /* Validate level index */
     level_index = parameters->level_index;
     if (level_index >= opp_count) {
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
 
         goto exit;
     }
@@ -548,7 +548,7 @@ static int scmi_perf_limits_set_handler(fwk_id_t service_id,
     uint32_t range_min, range_max;
     fwk_id_t domain_id;
     struct scmi_perf_limits_set_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR,
+        .status = (int32_t)SCMI_GENERIC_ERROR,
     };
     enum mod_scmi_perf_policy_status policy_status;
 
@@ -556,7 +556,7 @@ static int scmi_perf_limits_set_handler(fwk_id_t service_id,
 
     if (parameters->domain_id >= scmi_perf_ctx.domain_count) {
         status = FWK_SUCCESS;
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
 
         goto exit;
     }
@@ -567,7 +567,7 @@ static int scmi_perf_limits_set_handler(fwk_id_t service_id,
     }
 
     if (parameters->range_min > parameters->range_max) {
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         goto exit;
     }
 
@@ -579,11 +579,11 @@ static int scmi_perf_limits_set_handler(fwk_id_t service_id,
         &range_max, agent_id, domain_id);
 
     if (status != FWK_SUCCESS) {
-        return_values.status = SCMI_GENERIC_ERROR;
+        return_values.status = (int32_t)SCMI_GENERIC_ERROR;
         goto exit;
     }
     if (policy_status == MOD_SCMI_PERF_SKIP_MESSAGE_HANDLER) {
-        return_values.status = SCMI_SUCCESS;
+        return_values.status = (int32_t)SCMI_SUCCESS;
         goto exit;
     }
     status = scmi_perf_ctx.dvfs_api->set_level_limits(
@@ -595,11 +595,10 @@ static int scmi_perf_limits_set_handler(fwk_id_t service_id,
     /*
      * Return immediately to the caller, fire-and-forget.
      */
-
     if ((status == FWK_SUCCESS) || (status == FWK_PENDING)) {
-        return_values.status = SCMI_SUCCESS;
+        return_values.status = (int32_t)SCMI_SUCCESS;
     } else {
-        return_values.status = SCMI_OUT_OF_RANGE;
+        return_values.status = (int32_t)SCMI_OUT_OF_RANGE;
     }
 
 exit:
@@ -618,13 +617,13 @@ static int scmi_perf_limits_get_handler(fwk_id_t service_id,
     const struct scmi_perf_limits_get_a2p *parameters;
     struct scmi_perf_event_parameters *evt_params;
     struct scmi_perf_limits_get_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR,
+        .status = (int32_t)SCMI_GENERIC_ERROR,
     };
 
     parameters = (const struct scmi_perf_limits_get_a2p *)payload;
     if (parameters->domain_id >= scmi_perf_ctx.domain_count) {
         status = FWK_SUCCESS;
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
 
         goto exit;
     }
@@ -635,7 +634,7 @@ static int scmi_perf_limits_get_handler(fwk_id_t service_id,
     if (!fwk_id_is_equal(
             scmi_perf_ctx.perf_ops_table[parameters->domain_id].service_id,
             FWK_ID_NONE)){
-        return_values.status = SCMI_BUSY;
+        return_values.status = (int32_t)SCMI_BUSY;
         status = FWK_SUCCESS;
 
         goto exit;
@@ -652,7 +651,7 @@ static int scmi_perf_limits_get_handler(fwk_id_t service_id,
 
     status = fwk_thread_put_event(&event);
     if (status != FWK_SUCCESS) {
-        return_values.status = SCMI_GENERIC_ERROR;
+        return_values.status = (int32_t)SCMI_GENERIC_ERROR;
 
         goto exit;
     }
@@ -677,7 +676,7 @@ static int scmi_perf_level_set_handler(fwk_id_t service_id,
     const struct scmi_perf_level_set_a2p *parameters;
     fwk_id_t domain_id;
     struct scmi_perf_level_set_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR,
+        .status = (int32_t)SCMI_GENERIC_ERROR,
     };
     uint32_t perf_level;
     enum mod_scmi_perf_policy_status policy_status;
@@ -685,7 +684,7 @@ static int scmi_perf_level_set_handler(fwk_id_t service_id,
 
     if (parameters->domain_id >= scmi_perf_ctx.domain_count) {
         status = FWK_SUCCESS;
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
 
         goto exit;
     }
@@ -705,11 +704,11 @@ static int scmi_perf_level_set_handler(fwk_id_t service_id,
         domain_id);
 
     if (status != FWK_SUCCESS) {
-        return_values.status = SCMI_GENERIC_ERROR;
+        return_values.status = (int32_t)SCMI_GENERIC_ERROR;
         goto exit;
     }
     if (policy_status == MOD_SCMI_PERF_SKIP_MESSAGE_HANDLER) {
-        return_values.status = SCMI_SUCCESS;
+        return_values.status = (int32_t)SCMI_SUCCESS;
         goto exit;
     }
     status = scmi_perf_ctx.dvfs_api->set_level(domain_id, agent_id, perf_level);
@@ -718,9 +717,9 @@ static int scmi_perf_level_set_handler(fwk_id_t service_id,
      * Return immediately to the caller, fire-and-forget.
      */
     if ((status == FWK_SUCCESS) || (status == FWK_PENDING)) {
-        return_values.status = SCMI_SUCCESS;
+        return_values.status = (int32_t)SCMI_SUCCESS;
     } else if (status == FWK_E_RANGE) {
-        return_values.status = SCMI_OUT_OF_RANGE;
+        return_values.status = (int32_t)SCMI_OUT_OF_RANGE;
     }
 
 exit:
@@ -738,15 +737,15 @@ static int scmi_perf_level_get_handler(fwk_id_t service_id,
     const struct scmi_perf_level_get_a2p *parameters;
     struct scmi_perf_event_parameters *evt_params;
     struct scmi_perf_level_get_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR,
+        .status = (int32_t)SCMI_GENERIC_ERROR,
     };
 
-    return_values.status = SCMI_GENERIC_ERROR;
+    return_values.status = (int32_t)SCMI_GENERIC_ERROR;
 
     parameters = (const struct scmi_perf_level_get_a2p *)payload;
     if (parameters->domain_id >= scmi_perf_ctx.domain_count) {
         status = FWK_SUCCESS;
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
 
         goto exit;
     }
@@ -755,7 +754,7 @@ static int scmi_perf_level_get_handler(fwk_id_t service_id,
     if (!fwk_id_is_equal(
             scmi_perf_ctx.perf_ops_table[parameters->domain_id].service_id,
             FWK_ID_NONE)){
-        return_values.status = SCMI_BUSY;
+        return_values.status = (int32_t)SCMI_BUSY;
         status = FWK_SUCCESS;
 
         goto exit;
@@ -773,7 +772,7 @@ static int scmi_perf_level_get_handler(fwk_id_t service_id,
 
     status = fwk_thread_put_event(&event);
     if (status != FWK_SUCCESS) {
-        return_values.status = SCMI_GENERIC_ERROR;
+        return_values.status = (int32_t)SCMI_GENERIC_ERROR;
 
         goto exit;
     }
@@ -800,14 +799,14 @@ static int scmi_perf_limits_notify(fwk_id_t service_id,
     unsigned int id;
     const struct scmi_perf_notify_limits_a2p *parameters;
     struct scmi_perf_notify_limits_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR,
+        .status = (int32_t)SCMI_GENERIC_ERROR,
     };
 
     parameters = (const struct scmi_perf_notify_limits_a2p *)payload;
     id = parameters->domain_id;
     if (id >= scmi_perf_ctx.domain_count) {
         status = FWK_SUCCESS;
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
 
         goto exit;
     }
@@ -815,7 +814,7 @@ static int scmi_perf_limits_notify(fwk_id_t service_id,
     if ((parameters->notify_enable &
          ~SCMI_PERF_NOTIFY_LIMITS_NOTIFY_ENABLE_MASK) != 0x0) {
         status = FWK_SUCCESS;
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
 
         goto exit;
     }
@@ -840,7 +839,7 @@ static int scmi_perf_limits_notify(fwk_id_t service_id,
                 MOD_SCMI_PERF_NOTIFY_LIMITS);
     }
 
-    return_values.status = SCMI_SUCCESS;
+    return_values.status = (int32_t)SCMI_SUCCESS;
 
 exit:
     scmi_perf_ctx.scmi_api->respond(service_id, &return_values,
@@ -858,14 +857,14 @@ static int scmi_perf_level_notify(fwk_id_t service_id,
     unsigned int id;
     const struct scmi_perf_notify_level_a2p *parameters;
     struct scmi_perf_notify_level_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR,
+        .status = (int32_t)SCMI_GENERIC_ERROR,
     };
 
     parameters = (const struct scmi_perf_notify_level_a2p *)payload;
     id = parameters->domain_id;
     if (id >= scmi_perf_ctx.domain_count) {
         status = FWK_SUCCESS;
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
 
         goto exit;
     }
@@ -873,7 +872,7 @@ static int scmi_perf_level_notify(fwk_id_t service_id,
     if ((parameters->notify_enable &
          ~SCMI_PERF_NOTIFY_LEVEL_NOTIFY_ENABLE_MASK) != 0x0) {
         status = FWK_SUCCESS;
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
 
         goto exit;
     }
@@ -900,7 +899,7 @@ static int scmi_perf_level_notify(fwk_id_t service_id,
                 MOD_SCMI_PERF_NOTIFY_LEVEL);
     }
 
-    return_values.status = SCMI_SUCCESS;
+    return_values.status = (int32_t)SCMI_SUCCESS;
 
 exit:
     scmi_perf_ctx.scmi_api->respond(service_id, &return_values,
@@ -1080,7 +1079,7 @@ FWK_WEAK int scmi_perf_level_set_policy(
 static int scmi_perf_get_scmi_protocol_id(fwk_id_t protocol_id,
                                           uint8_t *scmi_protocol_id)
 {
-    *scmi_protocol_id = MOD_SCMI_PROTOCOL_ID_PERF;
+    *scmi_protocol_id = (uint8_t)MOD_SCMI_PROTOCOL_ID_PERF;
 
     return FWK_SUCCESS;
 }
@@ -1099,12 +1098,12 @@ static int scmi_perf_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     fwk_assert(payload != NULL);
 
     if (message_id >= FWK_ARRAY_SIZE(handler_table)) {
-        return_value = SCMI_NOT_FOUND;
+        return_value = (int32_t)SCMI_NOT_FOUND;
         goto error;
     }
 
     if (payload_size != payload_size_table[message_id]) {
-        return_value = SCMI_PROTOCOL_ERROR;
+        return_value = (int32_t)SCMI_PROTOCOL_ERROR;
         goto error;
     }
 
@@ -1112,9 +1111,9 @@ static int scmi_perf_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     status = scmi_perf_permissions_handler(service_id, payload, message_id);
     if (status != FWK_SUCCESS) {
         if (status == FWK_E_PARAM)
-            return_value = SCMI_NOT_FOUND;
+            return_value = (int32_t)SCMI_NOT_FOUND;
         else
-            return_value = SCMI_DENIED;
+            return_value = (int32_t)SCMI_DENIED;
         goto error;
     }
 #endif
@@ -1141,7 +1140,7 @@ static void scmi_perf_respond(
     fwk_id_t domain_id,
     int size)
 {
-    int idx = fwk_id_get_element_idx(domain_id);
+    int idx = (int)fwk_id_get_element_idx(domain_id);
     fwk_id_t service_id;
 
     /*
@@ -1179,7 +1178,7 @@ static void scmi_perf_notify_limits_updated(
     const struct mod_scmi_perf_domain_config *domain;
     struct mod_scmi_perf_fast_channel_limit *get_limit;
 
-    idx = fwk_id_get_element_idx(domain_id);
+    idx = (int)fwk_id_get_element_idx(domain_id);
 
     domain = &(*scmi_perf_ctx.config->domains)[idx];
     if (domain->fast_channels_addr_scp != NULL) {
@@ -1194,7 +1193,7 @@ static void scmi_perf_notify_limits_updated(
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     limits_changed.agent_id = (uint32_t)cookie;
-    limits_changed.domain_id = idx;
+    limits_changed.domain_id = (uint32_t)idx;
     limits_changed.range_min = range_min;
     limits_changed.range_max = range_max;
 
@@ -1229,7 +1228,7 @@ static void scmi_perf_notify_level_updated(
     int status;
 #endif
 
-    idx = fwk_id_get_element_idx(domain_id);
+    idx = (int)fwk_id_get_element_idx(domain_id);
 
 #ifdef BUILD_HAS_MOD_STATISTICS
     status = scmi_perf_ctx.dvfs_api->get_level_id(domain_id, level, &level_id);
@@ -1250,7 +1249,7 @@ static void scmi_perf_notify_level_updated(
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     level_changed.agent_id = (uint32_t)cookie;
-    level_changed.domain_id = idx;
+    level_changed.domain_id = (uint32_t)idx;
     level_changed.performance_level = level;
 
     scmi_perf_ctx.scmi_notification_api->scmi_notification_notify(
@@ -1288,11 +1287,11 @@ static int scmi_perf_init(fwk_id_t module_id, unsigned int element_count,
         return FWK_E_SUPPORT;
     }
 
-    scmi_perf_ctx.perf_ops_table = fwk_mm_calloc(return_val,
-        sizeof(struct perf_operations));
+    scmi_perf_ctx.perf_ops_table =
+        fwk_mm_calloc((size_t)return_val, sizeof(struct perf_operations));
 
     scmi_perf_ctx.config = config;
-    scmi_perf_ctx.domain_count = return_val;
+    scmi_perf_ctx.domain_count = (uint32_t)return_val;
 #ifdef BUILD_HAS_FAST_CHANNELS
     scmi_perf_ctx.fast_channels_alarm_id = config->fast_channels_alarm_id;
     if (config->fast_channels_rate_limit < SCMI_PERF_FC_MIN_RATE_LIMIT) {
@@ -1399,7 +1398,7 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
 static int scmi_perf_process_bind_request(fwk_id_t source_id,
     fwk_id_t target_id, fwk_id_t api_id, const void **api)
 {
-    switch (fwk_id_get_api_idx(api_id)) {
+    switch ((enum scmi_perf_api_idx)fwk_id_get_api_idx(api_id)) {
     case MOD_SCMI_PERF_PROTOCOL_API:
         *api = &scmi_perf_mod_scmi_to_protocol_api;
         break;
@@ -1525,7 +1524,7 @@ static int scmi_perf_start(fwk_id_t id)
 #endif
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    status = scmi_init_notifications(scmi_perf_ctx.domain_count);
+    status = scmi_init_notifications((int)scmi_perf_ctx.domain_count);
     if (status != FWK_SUCCESS) {
         return status;
     }
@@ -1559,8 +1558,10 @@ static int process_request_event(const struct fwk_event *event)
                 .performance_level = opp.level,
             };
 
-            scmi_perf_respond(&return_values_level, params->domain_id,
-                              sizeof(return_values_level));
+            scmi_perf_respond(
+                &return_values_level,
+                params->domain_id,
+                (int)sizeof(return_values_level));
 
             return status;
         } else if (status == FWK_PENDING) {
@@ -1571,8 +1572,10 @@ static int process_request_event(const struct fwk_event *event)
                 .status = SCMI_HARDWARE_ERROR,
             };
 
-            scmi_perf_respond(&return_values_level, params->domain_id,
-                              sizeof(return_values_level.status));
+            scmi_perf_respond(
+                &return_values_level,
+                params->domain_id,
+                (int)sizeof(return_values_level.status));
 
             return FWK_E_DEVICE;
         }
@@ -1591,8 +1594,10 @@ static int process_request_event(const struct fwk_event *event)
                 .range_max = limits.maximum,
             };
 
-            scmi_perf_respond(&return_values_limits, params->domain_id,
-                              sizeof(return_values_limits));
+            scmi_perf_respond(
+                &return_values_limits,
+                params->domain_id,
+                (int)sizeof(return_values_limits));
 
             return status;
         } else if (status == FWK_PENDING) {
@@ -1603,8 +1608,10 @@ static int process_request_event(const struct fwk_event *event)
                 .status = SCMI_HARDWARE_ERROR,
             };
 
-            scmi_perf_respond(&return_values_limits, params->domain_id,
-                              sizeof(return_values_limits.status));
+            scmi_perf_respond(
+                &return_values_limits,
+                params->domain_id,
+                (int)sizeof(return_values_limits.status));
 
             return FWK_E_DEVICE;
         }
@@ -1629,10 +1636,12 @@ static int process_response_event(const struct fwk_event *event)
             .status = params_level->status,
             .performance_level = params_level->performance_level,
         };
-        scmi_perf_respond(&return_values_level, event->source_id,
+        scmi_perf_respond(
+            &return_values_level,
+            event->source_id,
             (return_values_level.status == SCMI_SUCCESS) ?
-            sizeof(return_values_level) :
-            sizeof(return_values_level.status));
+                (int)sizeof(return_values_level) :
+                (int)sizeof(return_values_level.status));
     }
 
     return FWK_SUCCESS;
@@ -1659,8 +1668,8 @@ static int scmi_perf_process_event(const struct fwk_event *event,
 /* SCMI Performance Management Protocol Definition */
 const struct fwk_module module_scmi_perf = {
     .name = "SCMI Performance Management Protocol",
-    .api_count = MOD_SCMI_PERF_API_COUNT,
-    .event_count = SCMI_PERF_EVENT_IDX_COUNT,
+    .api_count = (unsigned int)MOD_SCMI_PERF_API_COUNT,
+    .event_count = (unsigned int)SCMI_PERF_EVENT_IDX_COUNT,
     .type = FWK_MODULE_TYPE_PROTOCOL,
     .init = scmi_perf_init,
     .bind = scmi_perf_bind,
