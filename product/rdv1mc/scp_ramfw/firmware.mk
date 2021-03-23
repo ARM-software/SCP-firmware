@@ -33,7 +33,9 @@ BS_FIRMWARE_MODULES := \
     power_domain \
     scmi_power_domain \
     scmi_system_power \
-    platform_system
+    platform_system \
+    psu \
+    mock_psu
 
 BS_FIRMWARE_SOURCES := \
     config_system_power.c \
@@ -57,6 +59,8 @@ BS_FIRMWARE_SOURCES := \
     config_pik_clock.c \
     config_css_clock.c \
     config_clock.c \
-    config_apcontext.c
+    config_apcontext.c \
+    config_psu.c \
+    config_mock_psu.c
 
 include $(BS_DIR)/firmware.mk
