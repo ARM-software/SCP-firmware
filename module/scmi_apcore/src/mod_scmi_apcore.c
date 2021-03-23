@@ -123,7 +123,7 @@ static int scmi_apcore_protocol_version_handler(fwk_id_t service_id,
     const uint32_t *payload)
 {
     struct scmi_protocol_version_p2a return_values = {
-        .status = SCMI_SUCCESS,
+        .status = (int32_t)SCMI_SUCCESS,
         .version = MOD_SCMI_PROTOCOL_VERSION_APCORE,
     };
 
@@ -139,7 +139,7 @@ static int scmi_apcore_protocol_attributes_handler(fwk_id_t service_id,
     const uint32_t *payload)
 {
     struct scmi_protocol_attributes_p2a return_values = {
-        .status = SCMI_SUCCESS,
+        .status = (int32_t)SCMI_SUCCESS,
         .attributes = 0,
     };
 
@@ -167,7 +167,7 @@ static int scmi_apcore_protocol_message_attributes_handler(fwk_id_t service_id,
     const struct scmi_protocol_message_attributes_a2p *parameters;
     unsigned int message_id;
     struct scmi_protocol_message_attributes_p2a return_values = {
-        .status = SCMI_SUCCESS,
+        .status = (int32_t)SCMI_SUCCESS,
         .attributes = 0,
     };
 
@@ -177,7 +177,7 @@ static int scmi_apcore_protocol_message_attributes_handler(fwk_id_t service_id,
 
     if ((message_id >= FWK_ARRAY_SIZE(handler_table)) ||
         (handler_table[message_id] == NULL)) {
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
     }
 
     response_size = (return_values.status == SCMI_SUCCESS) ?
@@ -200,7 +200,7 @@ static int scmi_apcore_reset_address_set_handler(fwk_id_t service_id,
     enum scmi_agent_type agent_type;
     const struct scmi_apcore_reset_address_set_a2p *parameters;
     struct scmi_apcore_reset_address_set_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR
+        .status = (int32_t)SCMI_GENERIC_ERROR
     };
 
     parameters = (const struct scmi_apcore_reset_address_set_a2p *)payload;
@@ -217,13 +217,13 @@ static int scmi_apcore_reset_address_set_handler(fwk_id_t service_id,
 
     /* Only the PSCI agent may set the reset address */
     if (agent_type != SCMI_AGENT_TYPE_PSCI) {
-        return_values.status = SCMI_DENIED;
+        return_values.status = (int32_t)SCMI_DENIED;
         goto exit;
     }
 
     /* An agent previously requested that the configuration be locked */
     if (scmi_apcore_ctx.locked) {
-        return_values.status = SCMI_DENIED;
+        return_values.status = (int32_t)SCMI_DENIED;
         goto exit;
     }
 
@@ -234,7 +234,7 @@ static int scmi_apcore_reset_address_set_handler(fwk_id_t service_id,
     if ((parameters->reset_address_high != 0) &&
         (scmi_apcore_ctx.config->reset_register_width ==
          MOD_SCMI_APCORE_REG_WIDTH_32)) {
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         goto exit;
     }
 
@@ -242,11 +242,11 @@ static int scmi_apcore_reset_address_set_handler(fwk_id_t service_id,
     if (scmi_apcore_ctx.config->reset_register_width ==
         MOD_SCMI_APCORE_REG_WIDTH_32) {
         if ((parameters->reset_address_low % 4) != 0) {
-            return_values.status = SCMI_INVALID_PARAMETERS;
+            return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
             goto exit;
         }
     } else if ((parameters->reset_address_low % 8) != 0) {
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         goto exit;
     }
 
@@ -256,7 +256,7 @@ static int scmi_apcore_reset_address_set_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    return_values.status = SCMI_SUCCESS;
+    return_values.status = (int32_t)SCMI_SUCCESS;
 
     /* Lock the configuration if requested */
     if (parameters->attributes & MOD_SCMI_APCORE_RESET_ADDRESS_SET_LOCK_MASK) {
@@ -281,7 +281,7 @@ static int scmi_apcore_reset_address_get_handler(fwk_id_t service_id,
     uint64_t reset_address;
     enum scmi_agent_type agent_type;
     struct scmi_apcore_reset_address_get_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR
+        .status = (int32_t)SCMI_GENERIC_ERROR
     };
 
     status = scmi_apcore_ctx.scmi_api->get_agent_id(service_id, &agent_id);
@@ -296,7 +296,7 @@ static int scmi_apcore_reset_address_get_handler(fwk_id_t service_id,
 
     /* Only the PSCI agent may get the current reset address */
     if (agent_type != SCMI_AGENT_TYPE_PSCI) {
-        return_values.status = SCMI_DENIED;
+        return_values.status = (int32_t)SCMI_DENIED;
         goto exit;
     }
 
@@ -309,14 +309,15 @@ static int scmi_apcore_reset_address_get_handler(fwk_id_t service_id,
         return_values.reset_address_high = 0;
     } else {
         reset_address = *(uint64_t *)reg_group->base_register;
-        return_values.reset_address_high = (reset_address >> 32) & UINT32_MAX;
+        return_values.reset_address_high =
+            (uint32_t)((reset_address >> 32) & UINT32_MAX);
     }
 
     return_values.reset_address_low = (uint32_t)reset_address;
 
     return_values.attributes |=
         (scmi_apcore_ctx.locked << MOD_SCMI_APCORE_RESET_ADDRESS_GET_LOCK_POS);
-    return_values.status = SCMI_SUCCESS;
+    return_values.status = (int32_t)SCMI_SUCCESS;
 
 exit:
     scmi_apcore_ctx.scmi_api->respond(
@@ -330,7 +331,7 @@ exit:
 static int scmi_apcore_get_scmi_protocol_id(fwk_id_t protocol_id,
     uint8_t *scmi_protocol_id)
 {
-    *scmi_protocol_id = MOD_SCMI_PROTOCOL_ID_APCORE;
+    *scmi_protocol_id = (uint8_t)MOD_SCMI_PROTOCOL_ID_APCORE;
 
     return FWK_SUCCESS;
 }
@@ -350,12 +351,12 @@ static int scmi_apcore_message_handler(
     fwk_assert(payload != NULL);
 
     if (message_id >= FWK_ARRAY_SIZE(handler_table)) {
-        return_value = SCMI_NOT_FOUND;
+        return_value = (int32_t)SCMI_NOT_FOUND;
         goto error;
     }
 
     if (payload_size != payload_size_table[message_id]) {
-        return_value = SCMI_PROTOCOL_ERROR;
+        return_value = (int32_t)SCMI_PROTOCOL_ERROR;
         goto error;
     }
 

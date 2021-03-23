@@ -251,9 +251,9 @@ static int scmi_device_state_to_pd_state(uint32_t scmi_state,
 
     if (scmi_state_id == SCMI_PD_DEVICE_STATE_ID) {
         if (ctx_lost) {
-            *pd_state = MOD_PD_STATE_OFF;
+            *pd_state = (unsigned int)MOD_PD_STATE_OFF;
         } else {
-            *pd_state = MOD_PD_STATE_ON;
+            *pd_state = (unsigned int)MOD_PD_STATE_ON;
         }
     } else {
         /* Implementation Defined state */
@@ -279,7 +279,7 @@ static int scmi_pd_protocol_version_handler(fwk_id_t service_id,
                                             const uint32_t *payload)
 {
     struct scmi_protocol_version_p2a return_values = {
-        .status = SCMI_SUCCESS,
+        .status = (int32_t)SCMI_SUCCESS,
         .version = SCMI_PROTOCOL_VERSION_POWER_DOMAIN,
     };
 
@@ -293,7 +293,7 @@ static int scmi_pd_protocol_attributes_handler(fwk_id_t service_id,
                                                const uint32_t *payload)
 {
     struct scmi_pd_protocol_attributes_p2a return_values = {
-        .status = SCMI_SUCCESS,
+        .status = (int32_t)SCMI_SUCCESS,
     };
 
     return_values.attributes = scmi_pd_ctx.domain_count;
@@ -315,20 +315,20 @@ static int scmi_pd_power_domain_attributes_handler(fwk_id_t service_id,
     unsigned int agent_id;
     enum scmi_agent_type agent_type;
     struct scmi_pd_power_domain_attributes_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR,
+        .status = (int32_t)SCMI_GENERIC_ERROR,
     };
 
     parameters = (const struct scmi_pd_power_domain_attributes_a2p *)payload;
 
     domain_idx = parameters->domain_id;
     if (domain_idx > UINT16_MAX) {
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
         goto exit;
     }
 
     pd_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, domain_idx);
     if (!fwk_module_is_valid_element_id(pd_id)) {
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
         goto exit;
     }
 
@@ -387,7 +387,7 @@ static int scmi_pd_power_domain_attributes_handler(fwk_id_t service_id,
         break;
 
     case MOD_PD_TYPE_SYSTEM:
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
         /* Fallthrough. */
 
     default:
@@ -397,7 +397,7 @@ static int scmi_pd_power_domain_attributes_handler(fwk_id_t service_id,
     strncpy((char *)return_values.name, fwk_module_get_name(pd_id),
             sizeof(return_values.name) - 1);
 
-    return_values.status = SCMI_SUCCESS;
+    return_values.status = (int32_t)SCMI_SUCCESS;
 
 exit:
     scmi_pd_ctx.scmi_api->respond(service_id, &return_values,
@@ -412,7 +412,7 @@ static int scmi_pd_protocol_message_attributes_handler(
 {
     const struct scmi_protocol_message_attributes_a2p *parameters;
     struct scmi_protocol_message_attributes_p2a return_values = {
-        .status = SCMI_NOT_FOUND,
+        .status = (int32_t)SCMI_NOT_FOUND,
     };
 
     parameters = (const struct scmi_protocol_message_attributes_a2p *)
@@ -420,7 +420,7 @@ static int scmi_pd_protocol_message_attributes_handler(
 
     if ((parameters->message_id < FWK_ARRAY_SIZE(handler_table)) &&
         (handler_table[parameters->message_id] != NULL)) {
-        return_values.status = SCMI_SUCCESS;
+        return_values.status = (int32_t)SCMI_SUCCESS;
     }
 
     scmi_pd_ctx.scmi_api->respond(service_id, &return_values,
@@ -481,7 +481,7 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
     fwk_id_t pd_id;
     unsigned int pd_power_state;
     struct scmi_pd_power_state_set_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR
+        .status = (int32_t)SCMI_GENERIC_ERROR
     };
     enum mod_pd_type pd_type;
     uint32_t power_state;
@@ -505,7 +505,7 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
 
     domain_idx = parameters->domain_id;
     if (domain_idx > UINT16_MAX) {
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
         goto exit;
     }
 
@@ -513,14 +513,14 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
         ((parameters->power_state &
           ~SCMI_PD_POWER_STATE_SET_POWER_STATE_MASK) != 0x0U)) {
         status = FWK_SUCCESS;
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
 
         goto exit;
     }
 
     pd_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, domain_idx);
     if (!fwk_module_is_valid_element_id(pd_id)) {
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
         goto exit;
     }
 
@@ -532,9 +532,8 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
     if (((pd_type == MOD_PD_TYPE_CORE) ||
          (pd_type == MOD_PD_TYPE_CLUSTER)) &&
         (agent_type != SCMI_AGENT_TYPE_PSCI)) {
-
-         return_values.status = SCMI_NOT_SUPPORTED;
-         goto exit;
+        return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
+        goto exit;
     }
 
     power_state = parameters->power_state;
@@ -542,11 +541,11 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
         agent_id, pd_id);
 
     if (status != FWK_SUCCESS) {
-        return_values.status = SCMI_GENERIC_ERROR;
+        return_values.status = (int32_t)SCMI_GENERIC_ERROR;
         goto exit;
     }
     if (policy_status == MOD_SCMI_PD_SKIP_MESSAGE_HANDLER) {
-        return_values.status = SCMI_SUCCESS;
+        return_values.status = (int32_t)SCMI_SUCCESS;
         goto exit;
     }
 
@@ -558,13 +557,13 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
          */
         status = scmi_power_scp_set_core_state(pd_id, power_state);
         if (status == FWK_E_PARAM) {
-            return_values.status = SCMI_INVALID_PARAMETERS;
+            return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         }
         break;
 
     case MOD_PD_TYPE_CLUSTER:
         if (!is_sync) {
-            return_values.status = SCMI_NOT_SUPPORTED;
+            return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
             goto exit;
         }
 
@@ -636,7 +635,7 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
 
     case MOD_PD_TYPE_DEVICE:
         if (!is_sync) {
-            return_values.status = SCMI_NOT_SUPPORTED;
+            return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
             goto exit;
         }
 
@@ -644,7 +643,7 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
                                                &pd_power_state);
         if (status != FWK_SUCCESS) {
             status = FWK_SUCCESS;
-            return_values.status = SCMI_INVALID_PARAMETERS;
+            return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
             goto exit;
         }
 
@@ -677,7 +676,7 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
         break;
 
     case MOD_PD_TYPE_SYSTEM:
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
         /* Fallthrough. */
 
     default:
@@ -685,7 +684,7 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
     }
 
     if (status == FWK_SUCCESS) {
-        return_values.status = SCMI_SUCCESS;
+        return_values.status = (int32_t)SCMI_SUCCESS;
     }
 
 exit:
@@ -704,7 +703,7 @@ static int scmi_pd_power_state_get_handler(fwk_id_t service_id,
     unsigned int domain_idx;
     fwk_id_t pd_id;
     struct scmi_pd_power_state_get_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR
+        .status = (int32_t)SCMI_GENERIC_ERROR
     };
     enum mod_pd_type pd_type;
     unsigned int pd_power_state;
@@ -718,13 +717,13 @@ static int scmi_pd_power_state_get_handler(fwk_id_t service_id,
 
     domain_idx = parameters->domain_id;
     if (domain_idx > UINT16_MAX) {
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
         goto exit;
     }
 
     pd_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, domain_idx);
     if (!fwk_module_is_valid_element_id(pd_id)) {
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
         goto exit;
     }
 
@@ -771,7 +770,7 @@ static int scmi_pd_power_state_get_handler(fwk_id_t service_id,
         break;
 
     case MOD_PD_TYPE_SYSTEM:
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
         /* Fallthrough. */
 
     default:
@@ -779,7 +778,7 @@ static int scmi_pd_power_state_get_handler(fwk_id_t service_id,
     }
 
     if (status == FWK_SUCCESS) {
-        return_values.status = SCMI_SUCCESS;
+        return_values.status = (int32_t)SCMI_SUCCESS;
         return_values.power_state = power_state;
     }
 
@@ -804,30 +803,30 @@ static int scmi_pd_power_state_notify_handler(
     fwk_id_t pd_id;
     const struct scmi_pd_power_state_notify_a2p *parameters;
     struct scmi_pd_power_state_notify_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR,
+        .status = (int32_t)SCMI_GENERIC_ERROR,
     };
 
     parameters = (const struct scmi_pd_power_state_notify_a2p *)payload;
     domain_idx = parameters->domain_id;
     if (domain_idx >= scmi_pd_ctx.domain_count) {
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
         goto exit;
     }
 
     pd_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, domain_idx);
     if (!fwk_module_is_valid_element_id(pd_id)) {
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
         goto exit;
     }
 
     status = scmi_pd_ctx.pd_api->get_domain_type(pd_id, &pd_type);
     if (status != FWK_SUCCESS) {
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
         goto exit;
     }
 
     if ((parameters->notify_enable & ~SCMI_PD_NOTIFY_ENABLE_MASK) != 0x0) {
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         goto exit;
     }
 
@@ -840,13 +839,13 @@ static int scmi_pd_power_state_notify_handler(
      * agent that is notified"
      */
     if (pd_type != MOD_PD_TYPE_DEVICE && pd_type != MOD_PD_TYPE_DEVICE_DEBUG) {
-        return_values.status = SCMI_NOT_SUPPORTED;
+        return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
         goto exit;
     }
 
     status = scmi_pd_ctx.scmi_api->get_agent_id(service_id, &agent_id);
     if (status != FWK_SUCCESS) {
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
         goto exit;
     }
 
@@ -864,7 +863,7 @@ static int scmi_pd_power_state_notify_handler(
             command_id);
     }
 
-    return_values.status = SCMI_SUCCESS;
+    return_values.status = (int32_t)SCMI_SUCCESS;
 
 exit:
     scmi_pd_ctx.scmi_api->respond(
@@ -919,7 +918,7 @@ static unsigned int get_pd_domain_id(
     const struct scmi_pd_power_state_set_a2p *params_set;
     const struct scmi_pd_power_state_get_a2p *params_get;
 
-    switch (message_id) {
+    switch ((enum scmi_pd_command_id)message_id) {
     case MOD_SCMI_PD_POWER_STATE_SET:
         params_set = (const struct scmi_pd_power_state_set_a2p *)payload;
         return params_set->domain_id;
@@ -951,7 +950,7 @@ static int scmi_pd_permissions_handler(
 
     status = scmi_pd_ctx.scmi_api->get_agent_id(service_id, &agent_id);
     if (status != FWK_SUCCESS) {
-        *return_values = SCMI_GENERIC_ERROR;
+        *return_values = (int32_t)SCMI_GENERIC_ERROR;
         return FWK_E_PARAM;
     }
 
@@ -966,19 +965,19 @@ static int scmi_pd_permissions_handler(
 
     domain_id = get_pd_domain_id(payload, message_id);
     if (domain_id > UINT16_MAX) {
-        *return_values = SCMI_NOT_FOUND;
+        *return_values = (int32_t)SCMI_NOT_FOUND;
         return FWK_E_ACCESS;
     }
 
     pd_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, domain_id);
     if (!fwk_module_is_valid_element_id(pd_id)) {
-        *return_values = SCMI_NOT_FOUND;
+        *return_values = (int32_t)SCMI_NOT_FOUND;
         return FWK_E_ACCESS;
     }
 
     status = scmi_pd_ctx.pd_api->get_domain_type(pd_id, &pd_type);
     if (status != FWK_SUCCESS) {
-        *return_values = SCMI_GENERIC_ERROR;
+        *return_values = (int32_t)SCMI_GENERIC_ERROR;
         return FWK_E_ACCESS;
     }
 
@@ -989,7 +988,7 @@ static int scmi_pd_permissions_handler(
         return FWK_SUCCESS;
     }
 
-    *return_values = SCMI_DENIED;
+    *return_values = (int32_t)SCMI_DENIED;
     return FWK_E_ACCESS;
 }
 
@@ -1001,7 +1000,7 @@ static int scmi_pd_permissions_handler(
 static int scmi_pd_get_scmi_protocol_id(fwk_id_t protocol_id,
                                         uint8_t *scmi_protocol_id)
 {
-    *scmi_protocol_id = MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN;
+    *scmi_protocol_id = (uint8_t)MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN;
 
     return FWK_SUCCESS;
 }
@@ -1020,12 +1019,12 @@ static int scmi_pd_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     fwk_assert(payload != NULL);
 
     if (message_id >= FWK_ARRAY_SIZE(handler_table)) {
-        return_value = SCMI_NOT_FOUND;
+        return_value = (int32_t)SCMI_NOT_FOUND;
         goto error;
     }
 
     if (payload_size != payload_size_table[message_id]) {
-        return_value = SCMI_PROTOCOL_ERROR;
+        return_value = (int32_t)SCMI_PROTOCOL_ERROR;
         goto error;
     }
 
@@ -1065,8 +1064,8 @@ static int scmi_pd_init(fwk_id_t module_id, unsigned int element_count,
         return FWK_E_SUPPORT;
     }
 
-    scmi_pd_ctx.domain_count = fwk_module_get_element_count(
-        fwk_module_id_power_domain);
+    scmi_pd_ctx.domain_count =
+        (unsigned int)fwk_module_get_element_count(fwk_module_id_power_domain);
     if (scmi_pd_ctx.domain_count <= 1) {
         return FWK_E_SUPPORT;
     }

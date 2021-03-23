@@ -226,27 +226,30 @@ static uint32_t scmi_message_header(uint8_t message_id,
 
 static uint16_t read_message_id(uint32_t message_header)
 {
-    return (message_header & SCMI_MESSAGE_HEADER_MESSAGE_ID_MASK) >>
-        SCMI_MESSAGE_HEADER_MESSAGE_ID_POS;
+    return (uint16_t)(
+        ((message_header & SCMI_MESSAGE_HEADER_MESSAGE_ID_MASK) >>
+         SCMI_MESSAGE_HEADER_MESSAGE_ID_POS));
 }
 
 static uint8_t read_message_type(uint32_t message_header)
 {
-    return (message_header & SCMI_MESSAGE_HEADER_MESSAGE_TYPE_MASK) >>
-        SCMI_MESSAGE_HEADER_MESSAGE_TYPE_POS;
+    return (uint8_t)(
+        ((message_header & SCMI_MESSAGE_HEADER_MESSAGE_TYPE_MASK) >>
+         SCMI_MESSAGE_HEADER_MESSAGE_TYPE_POS));
 }
-
 
 static uint8_t read_protocol_id(uint32_t message_header)
 {
-    return (message_header & SCMI_MESSAGE_HEADER_PROTOCOL_ID_MASK) >>
-        SCMI_MESSAGE_HEADER_PROTOCOL_ID_POS;
+    return (uint8_t)(
+        ((message_header & SCMI_MESSAGE_HEADER_PROTOCOL_ID_MASK) >>
+         SCMI_MESSAGE_HEADER_PROTOCOL_ID_POS));
 }
 
 static uint16_t read_token(uint32_t message_header)
 {
-    return (message_header & SCMI_MESSAGE_HEADER_TOKEN_MASK) >>
-        SCMI_MESSAGE_HEADER_TOKEN_POS;
+    return (uint16_t)(
+        ((message_header & SCMI_MESSAGE_HEADER_TOKEN_MASK) >>
+         SCMI_MESSAGE_HEADER_TOKEN_POS));
 }
 
 static const char *message_type_to_str(enum mod_scmi_message_type message_type)
@@ -308,7 +311,7 @@ static int get_agent_count(int *agent_count)
     }
 
     /* Include the platform in the count */
-    *agent_count = scmi_ctx.config->agent_count + 1;
+    *agent_count = (int)(scmi_ctx.config->agent_count + 1);
 
     return FWK_SUCCESS;
 }
@@ -451,9 +454,11 @@ static void scmi_notify(fwk_id_t id, int protocol_id, int message_id,
         return; /* No notification service configured */
     }
 
-    message_header = scmi_message_header(message_id,
-        MOD_SCMI_MESSAGE_TYPE_NOTIFICATION,
-        protocol_id, 0);
+    message_header = scmi_message_header(
+        (uint8_t)message_id,
+        (uint8_t)MOD_SCMI_MESSAGE_TYPE_NOTIFICATION,
+        (uint8_t)protocol_id,
+        0);
 
     p2a_ctx->transmit(p2a_ctx->transport_id, message_header, payload, size);
 }
@@ -499,10 +504,10 @@ static int scmi_notification_init(
     subscribers->element_count = element_count;
     subscribers->operation_count = operation_count;
 
-    total_count = operation_count * element_count * agent_count;
+    total_count = (int)(operation_count * element_count * agent_count);
 
     subscribers->agent_service_ids =
-        fwk_mm_calloc(total_count, sizeof(fwk_id_t));
+        fwk_mm_calloc((size_t)total_count, sizeof(fwk_id_t));
 
     /*
      * Mark all operations_idx as invalid. This will be updated
@@ -538,8 +543,7 @@ static int scmi_notification_service_idx(
      * 3. Get the offset of the 2nd array within the first array.
      */
     return (
-        agent_idx + element_idx * agent_count +
-        operation_idx * element_count * agent_count);
+        int)(agent_idx + element_idx * agent_count + operation_idx * element_count * agent_count);
 }
 
 static int scmi_notification_add_subscriber(
@@ -570,10 +574,10 @@ static int scmi_notification_add_subscriber(
         MOD_SCMI_PROTOCOL_OPERATION_IDX_INVALID) {
         operation_idx = subscribers->operation_idx++;
         fwk_assert(operation_idx < subscribers->operation_count);
-        subscribers->operation_id_to_idx[operation_id] = operation_idx;
+        subscribers->operation_id_to_idx[operation_id] = (uint8_t)operation_idx;
     }
 
-    service_id_idx = scmi_notification_service_idx(
+    service_id_idx = (unsigned int)scmi_notification_service_idx(
         agent_idx,
         element_idx,
         operation_idx,
@@ -601,7 +605,7 @@ static int scmi_notification_remove_subscriber(
 
     operation_idx = subscribers->operation_id_to_idx[operation_id];
 
-    service_id_idx = scmi_notification_service_idx(
+    service_id_idx = (unsigned int)scmi_notification_service_idx(
         agent_idx,
         element_idx,
         operation_idx,
@@ -644,7 +648,7 @@ static int scmi_notification_notify(
     for (i = 0; i < subscribers->element_count; i++) {
         /* Skip agent 0, platform agent */
         for (j = 1; j < subscribers->agent_count; j++) {
-            service_id_idx = scmi_notification_service_idx(
+            service_id_idx = (unsigned int)scmi_notification_service_idx(
                 j,
                 i,
                 operation_idx,
@@ -656,8 +660,8 @@ static int scmi_notification_notify(
             if (!fwk_id_is_equal(service_id, FWK_ID_NONE)) {
                 scmi_notify(
                     service_id,
-                    protocol_id,
-                    scmi_response_id,
+                    (int)protocol_id,
+                    (int)scmi_response_id,
                     payload_p2a,
                     payload_size);
             }
@@ -685,7 +689,7 @@ static int scmi_base_protocol_version_handler(fwk_id_t service_id,
                                               const uint32_t *payload)
 {
     struct scmi_protocol_version_p2a return_values = {
-        .status = SCMI_SUCCESS,
+        .status = (int32_t)SCMI_SUCCESS,
         .version = SCMI_PROTOCOL_VERSION_BASE,
     };
 
@@ -728,7 +732,7 @@ static int scmi_base_protocol_attributes_handler(fwk_id_t service_id,
             continue;
         }
 
-        protocol_id = index;
+        protocol_id = (uint8_t)index;
 
         /*
          * Check that the agent has the permission to access the protocol
@@ -763,7 +767,7 @@ static int scmi_base_protocol_attributes_handler(fwk_id_t service_id,
 #endif
 
     struct scmi_protocol_attributes_p2a return_values = {
-        .status = SCMI_SUCCESS,
+        .status = (int32_t)SCMI_SUCCESS,
     };
 
     return_values.attributes = SCMI_BASE_PROTOCOL_ATTRIBUTES(
@@ -783,7 +787,7 @@ static int scmi_base_protocol_message_attributes_handler(fwk_id_t service_id,
     struct scmi_protocol_message_attributes_a2p *parameters;
     unsigned int message_id;
     struct scmi_protocol_message_attributes_p2a return_values = {
-        .status = SCMI_NOT_FOUND,
+        .status = (int32_t)SCMI_NOT_FOUND,
     };
 
     parameters = (struct scmi_protocol_message_attributes_a2p *)payload;
@@ -791,7 +795,7 @@ static int scmi_base_protocol_message_attributes_handler(fwk_id_t service_id,
 
     if ((message_id < FWK_ARRAY_SIZE(base_handler_table)) &&
         (base_handler_table[message_id] != NULL)) {
-        return_values.status = SCMI_SUCCESS;
+        return_values.status = (int32_t)SCMI_SUCCESS;
     }
 
     /* For this protocol, all commands have an attributes value of 0, which
@@ -812,7 +816,7 @@ static int scmi_base_discover_vendor_handler(fwk_id_t service_id,
                                              const uint32_t *payload)
 {
     struct scmi_base_discover_vendor_p2a return_values = {
-        .status = SCMI_SUCCESS,
+        .status = (int32_t)SCMI_SUCCESS,
     };
 
     if (scmi_ctx.config->vendor_identifier != NULL) {
@@ -833,7 +837,7 @@ static int scmi_base_discover_sub_vendor_handler(fwk_id_t service_id,
                                                  const uint32_t *payload)
 {
     struct scmi_base_discover_sub_vendor_p2a return_values = {
-        .status = SCMI_SUCCESS,
+        .status = (int32_t)SCMI_SUCCESS,
     };
 
     if (scmi_ctx.config->sub_vendor_identifier != NULL) {
@@ -854,8 +858,7 @@ static int scmi_base_discover_implementation_version_handler(
     fwk_id_t service_id, const uint32_t *payload)
 {
     struct scmi_protocol_version_p2a return_values = {
-        .status = SCMI_SUCCESS,
-        .version = FWK_BUILD_VERSION
+        .status = (int32_t)SCMI_SUCCESS, .version = FWK_BUILD_VERSION
     };
 
     respond(service_id, &return_values, sizeof(return_values));
@@ -872,7 +875,7 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
     int status;
     const struct scmi_base_discover_list_protocols_a2p *parameters;
     struct scmi_base_discover_list_protocols_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR,
+        .status = (int32_t)SCMI_GENERIC_ERROR,
         .num_protocols = 0,
     };
     unsigned int skip;
@@ -955,7 +958,7 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
             continue;
         }
 
-        protocol_id = index;
+        protocol_id = (uint8_t)index;
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
         /*
@@ -1023,11 +1026,11 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
     }
 
     if (skip > protocol_count) {
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         goto error;
     }
 
-    return_values.status = SCMI_SUCCESS;
+    return_values.status = (int32_t)SCMI_SUCCESS;
     return_values.num_protocols = avail_protocol_count;
 
     status = write_payload(service_id, 0,
@@ -1058,7 +1061,7 @@ static int scmi_base_discover_agent_handler(fwk_id_t service_id,
 {
     const struct scmi_base_discover_agent_a2p *parameters;
     struct scmi_base_discover_agent_p2a return_values = {
-        .status = SCMI_NOT_FOUND,
+        .status = (int32_t)SCMI_NOT_FOUND,
     };
     const struct mod_scmi_agent *agent;
 
@@ -1080,7 +1083,7 @@ static int scmi_base_discover_agent_handler(fwk_id_t service_id,
     }
 #endif
 
-    return_values.status = SCMI_SUCCESS;
+    return_values.status = (int32_t)SCMI_SUCCESS;
 
     if (parameters->agent_id == MOD_SCMI_PLATFORM_ID) {
         static const char name[] = "platform";
@@ -1156,7 +1159,7 @@ static int scmi_base_set_device_permissions(
 {
     const struct scmi_base_set_device_permissions_a2p *parameters;
     struct scmi_base_set_device_permissions_p2a return_values = {
-        .status = SCMI_NOT_FOUND,
+        .status = (int32_t)SCMI_NOT_FOUND,
     };
     int status = FWK_SUCCESS;
 
@@ -1168,12 +1171,12 @@ static int scmi_base_set_device_permissions(
     }
 
     if (parameters->agent_id == MOD_SCMI_PLATFORM_ID) {
-        return_values.status = SCMI_SUCCESS;
+        return_values.status = (int32_t)SCMI_SUCCESS;
         goto exit;
     }
 
     if (parameters->flags & ~MOD_RES_PERMS_PERMISSIONS_MASK) {
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         status = FWK_E_PARAM;
         goto exit;
     }
@@ -1183,16 +1186,16 @@ static int scmi_base_set_device_permissions(
 
     switch (status) {
     case FWK_SUCCESS:
-        return_values.status = SCMI_SUCCESS;
+        return_values.status = (int32_t)SCMI_SUCCESS;
         break;
     case FWK_E_PARAM:
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         break;
     case FWK_E_ACCESS:
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
         break;
     default:
-        return_values.status = SCMI_NOT_SUPPORTED;
+        return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
         break;
     }
 
@@ -1215,7 +1218,7 @@ static int scmi_base_set_protocol_permissions(
 {
     const struct scmi_base_set_protocol_permissions_a2p *parameters;
     struct scmi_base_set_protocol_permissions_p2a return_values = {
-        .status = SCMI_NOT_FOUND,
+        .status = (int32_t)SCMI_NOT_FOUND,
     };
     int status = FWK_SUCCESS;
 
@@ -1227,18 +1230,18 @@ static int scmi_base_set_protocol_permissions(
     }
 
     if (parameters->agent_id == MOD_SCMI_PLATFORM_ID) {
-        return_values.status = SCMI_SUCCESS;
+        return_values.status = (int32_t)SCMI_SUCCESS;
         goto exit;
     }
 
     if (parameters->flags & ~MOD_RES_PERMS_PERMISSIONS_MASK) {
         status = FWK_E_PARAM;
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         goto exit;
     }
 
     if (parameters->command_id == MOD_SCMI_PROTOCOL_ID_BASE) {
-        return_values.status = SCMI_DENIED;
+        return_values.status = (int32_t)SCMI_DENIED;
         goto exit;
     }
 
@@ -1250,16 +1253,16 @@ static int scmi_base_set_protocol_permissions(
 
     switch (status) {
     case FWK_SUCCESS:
-        return_values.status = SCMI_SUCCESS;
+        return_values.status = (int32_t)SCMI_SUCCESS;
         break;
     case FWK_E_PARAM:
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         break;
     case FWK_E_ACCESS:
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
         break;
     default:
-        return_values.status = SCMI_NOT_SUPPORTED;
+        return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
         break;
     }
 
@@ -1282,7 +1285,7 @@ static int scmi_base_reset_agent_config(
 {
     const struct scmi_base_reset_agent_config_a2p *parameters;
     struct scmi_base_reset_agent_config_p2a return_values = {
-        .status = SCMI_NOT_FOUND,
+        .status = (int32_t)SCMI_NOT_FOUND,
     };
     int status;
 
@@ -1293,12 +1296,12 @@ static int scmi_base_reset_agent_config(
     }
 
     if (parameters->agent_id == MOD_SCMI_PLATFORM_ID) {
-        return_values.status = SCMI_SUCCESS;
+        return_values.status = (int32_t)SCMI_SUCCESS;
         goto exit;
     }
 
     if (parameters->flags & ~MOD_RES_PERMS_PERMISSIONS_MASK) {
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         goto exit;
     }
 
@@ -1307,16 +1310,16 @@ static int scmi_base_reset_agent_config(
 
     switch (status) {
     case FWK_SUCCESS:
-        return_values.status = SCMI_SUCCESS;
+        return_values.status = (int32_t)SCMI_SUCCESS;
         break;
     case FWK_E_PARAM:
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         break;
     case FWK_E_ACCESS:
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
         break;
     default:
-        return_values.status = SCMI_NOT_SUPPORTED;
+        return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
         break;
     }
 
@@ -1378,19 +1381,19 @@ static int scmi_base_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     fwk_assert(payload != NULL);
 
     if (message_id >= FWK_ARRAY_SIZE(base_handler_table)) {
-        return_value = SCMI_NOT_FOUND;
+        return_value = (int32_t)SCMI_NOT_FOUND;
         goto error;
     }
 
     if (payload_size != base_payload_size_table[message_id]) {
-        return_value = SCMI_PROTOCOL_ERROR;
+        return_value = (int32_t)SCMI_PROTOCOL_ERROR;
         goto error;
     }
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     if (scmi_base_permissions_handler(
             service_id, payload, payload_size, message_id) != FWK_SUCCESS) {
-        return_value = SCMI_DENIED;
+        return_value = (int32_t)SCMI_DENIED;
         goto error;
     }
 #endif
@@ -1543,7 +1546,7 @@ static int scmi_bind(fwk_id_t id, unsigned int round)
         }
 
         scmi_ctx.scmi_protocol_id_to_idx[scmi_protocol_id] =
-            protocol_idx + PROTOCOL_TABLE_RESERVED_ENTRIES_COUNT;
+            (uint8_t)(protocol_idx + PROTOCOL_TABLE_RESERVED_ENTRIES_COUNT);
         protocol->message_handler = protocol_api->message_handler;
     }
 
@@ -1568,7 +1571,7 @@ static int scmi_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
 
     api_idx = fwk_id_get_api_idx(api_id);
 
-    switch (api_idx) {
+    switch ((enum mod_scmi_api_idx)api_idx) {
     case MOD_SCMI_API_IDX_PROTOCOL:
         if (!fwk_id_is_type(target_id, FWK_ID_TYPE_MODULE)) {
             return FWK_E_SUPPORT;
@@ -1654,7 +1657,8 @@ static int scmi_process_event(const struct fwk_event *event,
 
     ctx->scmi_protocol_id = read_protocol_id(message_header);
     ctx->scmi_message_id = read_message_id(message_header);
-    ctx->scmi_message_type = read_message_type(message_header);
+    ctx->scmi_message_type =
+        (enum mod_scmi_message_type)read_message_type(message_header);
     ctx->scmi_token = read_token(message_header);
 
     FWK_LOG_TRACE(
@@ -1810,11 +1814,11 @@ static int scmi_process_notification(const struct fwk_event *event,
 /* SCMI module definition */
 const struct fwk_module module_scmi = {
     .name = "SCMI",
-    .api_count = MOD_SCMI_API_IDX_COUNT,
+    .api_count = (unsigned int)MOD_SCMI_API_IDX_COUNT,
     .event_count = 1,
-    #ifdef BUILD_HAS_NOTIFICATION
-    .notification_count = MOD_SCMI_NOTIFICATION_IDX_COUNT,
-    #endif
+#ifdef BUILD_HAS_NOTIFICATION
+    .notification_count = (unsigned int)MOD_SCMI_NOTIFICATION_IDX_COUNT,
+#endif
     .type = FWK_MODULE_TYPE_SERVICE,
     .init = scmi_init,
     .element_init = scmi_service_init,
@@ -1822,7 +1826,7 @@ const struct fwk_module module_scmi = {
     .start = scmi_start,
     .process_bind_request = scmi_process_bind_request,
     .process_event = scmi_process_event,
-    #ifdef BUILD_HAS_NOTIFICATION
+#ifdef BUILD_HAS_NOTIFICATION
     .process_notification = scmi_process_notification,
-    #endif
+#endif
 };

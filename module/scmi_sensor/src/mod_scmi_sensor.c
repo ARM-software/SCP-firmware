@@ -167,7 +167,7 @@ static int scmi_sensor_protocol_version_handler(fwk_id_t service_id,
                                                 const uint32_t *payload)
 {
     struct scmi_protocol_version_p2a return_values = {
-        .status = SCMI_SUCCESS,
+        .status = (int32_t)SCMI_SUCCESS,
         .version = SCMI_PROTOCOL_VERSION_SENSOR,
     };
 
@@ -181,7 +181,7 @@ static int scmi_sensor_protocol_attributes_handler(fwk_id_t service_id,
                                                    const uint32_t *payload)
 {
     struct scmi_sensor_protocol_attributes_p2a return_values = {
-        .status = SCMI_SUCCESS,
+        .status = (int32_t)SCMI_SUCCESS,
         .attributes = scmi_sensor_ctx.sensor_count,
         .sensor_reg_len = 0, /* Unsupported */
     };
@@ -209,7 +209,7 @@ static int scmi_sensor_protocol_msg_attributes_handler(fwk_id_t service_id,
             .attributes = 0,
         };
     } else {
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
     }
 
     scmi_sensor_ctx.scmi_api->respond(service_id, &return_values,
@@ -231,7 +231,7 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
     unsigned int num_descs, desc_index, desc_index_max;
     struct mod_sensor_scmi_info sensor_info;
     struct scmi_sensor_protocol_description_get_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR,
+        .status = (int32_t)SCMI_GENERIC_ERROR,
     };
     fwk_id_t sensor_id;
 
@@ -254,7 +254,7 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
     desc_index = parameters->desc_index;
 
     if (desc_index >= scmi_sensor_ctx.sensor_count) {
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         goto exit;
     }
 
@@ -273,7 +273,7 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
         sensor_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, desc_index);
         if (!fwk_module_is_valid_element_id(sensor_id)) {
             /* domain_idx did not map to a sensor device */
-            return_values.status = SCMI_NOT_FOUND;
+            return_values.status = (int32_t)SCMI_NOT_FOUND;
             goto exit_unexpected;
         }
 
@@ -350,7 +350,7 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
     status = scmi_sensor_ctx.scmi_api->write_payload(service_id, 0,
         &return_values, sizeof(return_values));
     if (status != FWK_SUCCESS) {
-        return_values.status = SCMI_GENERIC_ERROR;
+        return_values.status = (int32_t)SCMI_GENERIC_ERROR;
     }
     goto exit;
 
@@ -500,19 +500,20 @@ static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
     int status;
 
     parameters = (const struct scmi_sensor_protocol_reading_get_a2p *)payload;
-    return_values.status = SCMI_GENERIC_ERROR;
+    return_values.status = (int32_t)SCMI_GENERIC_ERROR;
 
     if (parameters->sensor_id >= scmi_sensor_ctx.sensor_count) {
         /* Sensor does not exist */
         status = FWK_SUCCESS;
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
         goto exit;
     }
 
     flags = parameters->flags;
+
     if ((flags & ~SCMI_SENSOR_PROTOCOL_READING_GET_ASYNC_FLAG_MASK) !=
         (uint32_t)0) {
-        return_values.status = SCMI_INVALID_PARAMETERS;
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         status = FWK_SUCCESS;
         goto exit;
     }
@@ -520,7 +521,7 @@ static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
     /* Reject asynchronous read requests for now */
     if ((flags & SCMI_SENSOR_PROTOCOL_READING_GET_ASYNC_FLAG_MASK) !=
         (uint32_t)0) {
-        return_values.status = SCMI_NOT_SUPPORTED;
+        return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
         status = FWK_SUCCESS;
         goto exit;
     }
@@ -531,7 +532,7 @@ static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
     if (!fwk_id_is_equal(
             scmi_sensor_ctx.sensor_ops_table[sensor_idx].service_id,
             FWK_ID_NONE)){
-        return_values.status = SCMI_BUSY;
+        return_values.status = (int32_t)SCMI_BUSY;
         status = FWK_SUCCESS;
 
         goto exit;
@@ -549,7 +550,7 @@ static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
 
     status = fwk_thread_put_event(&event);
     if (status != FWK_SUCCESS) {
-        return_values.status = SCMI_GENERIC_ERROR;
+        return_values.status = (int32_t)SCMI_GENERIC_ERROR;
 
         goto exit;
     }
@@ -573,7 +574,7 @@ exit:
 static int scmi_sensor_get_scmi_protocol_id(fwk_id_t protocol_id,
                                             uint8_t *scmi_protocol_id)
 {
-    *scmi_protocol_id = MOD_SCMI_PROTOCOL_ID_SENSOR;
+    *scmi_protocol_id = (uint8_t)MOD_SCMI_PROTOCOL_ID_SENSOR;
 
     return FWK_SUCCESS;
 }
@@ -652,13 +653,13 @@ static int scmi_sensor_message_handler(fwk_id_t protocol_id,
     fwk_assert(payload != NULL);
 
     if (message_id >= FWK_ARRAY_SIZE(handler_table)) {
-        return_value = SCMI_NOT_FOUND;
+        return_value = (int32_t)SCMI_NOT_FOUND;
         goto error;
     }
 
     if (payload_size != payload_size_table[message_id]) {
         /* Incorrect payload size or message is not supported */
-        return_value = SCMI_PROTOCOL_ERROR;
+        return_value = (int32_t)SCMI_PROTOCOL_ERROR;
         goto error;
     }
 
@@ -667,11 +668,11 @@ static int scmi_sensor_message_handler(fwk_id_t protocol_id,
         service_id, payload, payload_size, message_id);
     if (status != FWK_SUCCESS) {
         if (status == FWK_E_ACCESS) {
-            return_value = SCMI_DENIED;
+            return_value = (int32_t)SCMI_DENIED;
         } else if (message_id == MOD_SCMI_SENSOR_DESCRIPTION_GET) {
-            return_value = SCMI_INVALID_PARAMETERS;
+            return_value = (int32_t)SCMI_INVALID_PARAMETERS;
         } else {
-            return_value = SCMI_NOT_FOUND;
+            return_value = (int32_t)SCMI_NOT_FOUND;
         }
         goto error;
     }
@@ -727,7 +728,7 @@ static int scmi_sensor_init(fwk_id_t module_id,
         return FWK_E_SUPPORT;
     }
 
-    scmi_sensor_ctx.sensor_count = fwk_module_get_element_count(
+    scmi_sensor_ctx.sensor_count = (unsigned int)fwk_module_get_element_count(
         FWK_ID_MODULE(FWK_MODULE_IDX_SENSOR));
     if (scmi_sensor_ctx.sensor_count == 0) {
         return FWK_E_SUPPORT;
@@ -830,7 +831,7 @@ static int scmi_sensor_start(fwk_id_t id)
     int status = FWK_SUCCESS;
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    status = scmi_init_notifications(scmi_sensor_ctx.sensor_count);
+    status = scmi_init_notifications((int)scmi_sensor_ctx.sensor_count);
     if (status != FWK_SUCCESS) {
         return status;
     }
@@ -844,7 +845,7 @@ static int scmi_sensor_process_bind_request(fwk_id_t source_id,
                                             fwk_id_t api_id,
                                             const void **api)
 {
-    switch (fwk_id_get_api_idx(api_id)) {
+    switch ((enum scmi_sensor_api_idx)fwk_id_get_api_idx(api_id)) {
     case SCMI_SENSOR_API_IDX_REQUEST:
         if (!fwk_id_is_equal(source_id, FWK_ID_MODULE(FWK_MODULE_IDX_SCMI))) {
             return FWK_E_ACCESS;
@@ -912,9 +913,9 @@ static int scmi_sensor_process_event(const struct fwk_event *event,
         };
 
         if (params->status == FWK_SUCCESS) {
-            return_values.status = SCMI_SUCCESS;
+            return_values.status = (int32_t)SCMI_SUCCESS;
         } else {
-            return_values.status = SCMI_HARDWARE_ERROR;
+            return_values.status = (int32_t)SCMI_HARDWARE_ERROR;
         }
 
         scmi_sensor_respond(&return_values, event->source_id);
@@ -925,8 +926,8 @@ static int scmi_sensor_process_event(const struct fwk_event *event,
 
 const struct fwk_module module_scmi_sensor = {
     .name = "SCMI sensor management",
-    .api_count = SCMI_SENSOR_API_IDX_COUNT,
-    .event_count = SCMI_SENSOR_EVENT_IDX_COUNT,
+    .api_count = (unsigned int)SCMI_SENSOR_API_IDX_COUNT,
+    .event_count = (unsigned int)SCMI_SENSOR_EVENT_IDX_COUNT,
     .type = FWK_MODULE_TYPE_PROTOCOL,
     .init = scmi_sensor_init,
     .bind = scmi_sensor_bind,
