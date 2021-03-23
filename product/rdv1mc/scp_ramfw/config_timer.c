@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "rd_alarm_idx.h"
+
 #include <mod_timer.h>
 
 #include <fwk_element.h>
@@ -24,7 +26,7 @@ static const struct fwk_element timer_dev_table[] = {
             .id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_GTIMER, 0),
             .timer_irq = TIMREFCLK_IRQ,
         }),
-        .sub_element_count = 8, /* Number of alarms */
+        .sub_element_count = RD_ALARM_IDX_COUNT, /* Number of alarms */
     },
     [1] = { 0 },
 };
