@@ -1,7 +1,7 @@
-SCP-firmware - version 2.7
+SCP-firmware - version 2.8
 ==========================
 
-Copyright (c) 2011-2020, Arm Limited. All rights reserved.
+Copyright (c) 2011-2021, Arm Limited. All rights reserved.
 
 References
 ----------
@@ -43,13 +43,13 @@ Functionality
 - Runtime services:
     - Power domain management
     - System power management
-    - Performance domain management (Dynamic voltage and frequency scaling)
+    - Performance domain management (Dynamic Voltage and Frequency Scaling)
     - Clock management
     - Sensor management
     - Reset domain management
     - Voltage domain management
 - System Control and Management Interface (SCMI, platform-side)
-- Support for the GNU Arm Embedded and Arm Compiler 6 toolchains
+- Support for the GNU Arm Embedded, Arm Compiler 6 and LLVM toolchains
 - Support for platforms with several control processors
 - Interactive debugging (with Command Line Interface)
 
@@ -57,7 +57,7 @@ Platforms
 ---------
 
 Various builds of the release have been tested on the following ARM Fixed
-Virtual Platforms (FVPs):
+Virtual Platforms (FVPs or boards where possible):
 
 - System Guidance for Mobile platform SGM-775 (Version 11.3 Build 42)
 - System Guidance for Infrastruture SGI-575 (Version 11.3 Build 42)
@@ -70,6 +70,7 @@ Virtual Platforms (FVPs):
 - RD-V1-MC reference design  (Please contact Arm directly to obtain the RD_V1_Multichip FVP)
 - Renesas R-Car platform
 - Total Compute (tc0) platform (Please contact Arm directly to obtain the TC0 FVP)
+- Morello (Please see Arm's Ecosystem FVPs Developer page)
 
 License
 -------
@@ -85,7 +86,7 @@ SCP-firmware on supported Arm platforms.
 CMake
 -----
 
-SCP-Firmware now support building with CMake. See doc/cmake_readme.md for
+SCP-firmware now supports building with CMake. See doc/cmake_readme.md for
 details.
 
 Feedback and Support

@@ -3,6 +3,93 @@ SCP-firmware Change Log
 
 Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
 
+SCP-firmware - version 2.8.0
+============================
+
+New features
+------------
+
+- Support for the following platforms has been added:
+    - Morello platform
+    - RD-N2 platform (initial support)
+
+- New modules:
+    - apremap (AP remap)
+    - CMN-700 interconnect
+    - mock_clock
+
+- Framework:
+    - fwk: Add fwk_thread_signal API
+    - fwk: Add MT fwk_thread_put_signal API
+    - framework: add optional identifier support
+
+- Renamings:
+    - RD-Daniel is now RD-V1
+    - RD-Daniel Config-XLR is now RD-V1-MC
+    - module: rename cmn_rhodes to cmn-650
+
+- MISRA C:2012
+    - Mandatory fixes have been resolved
+
+- SCMI:
+    - Sensor protocol: Add support for SENSOR_TRIP_POINT_CONFIG
+    - Sensor protocol: Add support for SENSOR_TRIP_POINT_NOTIFY
+
+- Build system:
+    - Support for CMake has been added.
+
+- Doc:
+    - Add cmake_readme.md
+
+Changed
+-------
+
+- Documentation:
+    - doc: SCP Firmware Threat Model
+    - user_guide: Add LLVM instructions
+    - user_guide: Update prerequisite of TF-A version
+    - maintainers: Update maintainers and codeowners
+
+- Framework:
+    - fwk_multi_thread: Minor optimisation in MT fwk_thread_put_event
+    - fwk sub-element index to identifier getter
+    - fwk: Add a check for valid fwk_id type to the framework
+    - fwk_thread: Log allocated event instead of submitted event
+    - fwk_multi_thread: Log allocated event instead of submitted event
+
+- Modules:
+    - bootloader: ensure module config is provided
+    - cmn-650: Add support for port aggregation
+    - dvfs: Add signal_handler to DVFS
+    - isys_rom: idle on failure to boot from ram firmware
+    - fip: move fip config parameters to caller module
+    - ppu_v1: Assigning opmode from product configurations
+    - isys_rom: use fwk_trap() for idling
+    - scmi: Deny access for PSCI agent for configured protocols
+    - scmi_system_power/boards: Add default timer_id and add extra check
+    - scmi: Assorted fixes for SCMI 2.0 compliance
+
+- Platforms:
+    - juno: Disable Resource Permissions for juno
+    - juno: Disable Debug Module by default
+    - juno/sensor: Rename sensors
+    - n1sdp: Separated Driver code from mod_n1sdp_sensor.c
+    - n1sdp:Enable L3 cache from BOOTGPR1 reg
+    - rcar: Various additions for timers, power domain, dvfs, system power
+    - sgm775: Enable access to CLOCK_CONFIG_SET command
+    - RD-X platforms: migrate to isys_rom
+    - sgi575/rdn1e1: Add disabled PSCI protocols without resource permissions
+    - sgm775/sgm776/tc0: Add disabled PSCI protocols without resource
+    permissions
+    - tc0: Add support for Theodul cluster
+    - tc0: add clock and dvfs support for all cores
+    - product/rdv1mc: add port aggregation related config data
+
+Notes
+-----
+CMake: please note that cmake is consolidation phase and the current make build
+system is still supported. We strongly encourage contributors to move to cmake.
+
 SCP-firmware - version 2.7.0
 ============================
 
