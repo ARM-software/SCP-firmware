@@ -973,7 +973,7 @@ static uint32_t cli_get_command(
         if (flag_escape_sequence == true) {
             /* Prevent escape buffer overflow, Only save first 7 bytes data of
              * escape sequences. */
-            if(escape_index >= 7) {
+            if (escape_index >= 7) {
                 escape[escape_index] = c;
                 escape[escape_index + 1] = 0;
                 escape_index = escape_index + 1;
