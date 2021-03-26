@@ -390,6 +390,7 @@ static void respond(fwk_id_t service_id, const void *payload, size_t size)
      * specification it should be like that for all commands.
      */
     if ((payload != NULL) && (*((int32_t *)payload) < SCMI_SUCCESS)) {
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
         FWK_LOG_ERR(
             "[SCMI] %s: %s [%" PRIu16
             " (0x%x:0x%x)] returned with an error (%d)",
@@ -399,7 +400,12 @@ static void respond(fwk_id_t service_id, const void *payload, size_t size)
             ctx->scmi_protocol_id,
             ctx->scmi_message_id,
             *((int *)payload));
+#else
+        (void)service_name;
+        (void)message_type_name;
+#endif
     } else {
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
         FWK_LOG_TRACE(
             "[SCMI] %s: %s [%" PRIu16
             " (0x%x:0x%x)] returned successfully",
@@ -408,10 +414,12 @@ static void respond(fwk_id_t service_id, const void *payload, size_t size)
             ctx->scmi_token,
             ctx->scmi_protocol_id,
             ctx->scmi_message_id);
+#endif
     }
 
     status = ctx->respond(ctx->transport_id, payload, size);
     if (status != FWK_SUCCESS) {
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
         FWK_LOG_ERR(
             "[SCMI] %s: %s [%" PRIu16
             " (0x%x:0x%x)] failed to respond (%s)",
@@ -421,6 +429,7 @@ static void respond(fwk_id_t service_id, const void *payload, size_t size)
             ctx->scmi_protocol_id,
             ctx->scmi_message_id,
             fwk_status_str(status));
+#endif
     }
 }
 
@@ -1645,13 +1654,21 @@ static int scmi_process_event(const struct fwk_event *event,
 
     status = transport_api->get_message_header(transport_id, &message_header);
     if (status != FWK_SUCCESS) {
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
         FWK_LOG_ERR("[SCMI] %s: Unable to read message header", service_name);
+#else
+        (void)service_name;
+#endif
         return status;
     }
 
     status = transport_api->get_payload(transport_id, &payload, &payload_size);
     if (status != FWK_SUCCESS) {
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
         FWK_LOG_ERR("[SCMI] %s: Unable to read message payload", service_name);
+#else
+        (void)service_name;
+#endif
         return status;
     }
 
@@ -1661,6 +1678,7 @@ static int scmi_process_event(const struct fwk_event *event,
         (enum mod_scmi_message_type)read_message_type(message_header);
     ctx->scmi_token = read_token(message_header);
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
     FWK_LOG_TRACE(
         "[SCMI] %s: %s [%" PRIu16 " (0x%x:0x%x)] was received",
         service_name,
@@ -1668,10 +1686,15 @@ static int scmi_process_event(const struct fwk_event *event,
         ctx->scmi_token,
         ctx->scmi_protocol_id,
         ctx->scmi_message_id);
+#else
+    (void)service_name;
+    (void)message_type_name;
+#endif
 
     protocol_idx = scmi_ctx.scmi_protocol_id_to_idx[ctx->scmi_protocol_id];
 
     if (protocol_idx == 0) {
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
         FWK_LOG_ERR(
             "[SCMI] %s: %s [%" PRIu16
             "(0x%x:0x%x)] requested an unsupported protocol",
@@ -1680,6 +1703,7 @@ static int scmi_process_event(const struct fwk_event *event,
             ctx->scmi_token,
             ctx->scmi_protocol_id,
             ctx->scmi_message_id);
+#endif
         ctx->respond(transport_id, &(int32_t) { SCMI_NOT_SUPPORTED },
                      sizeof(int32_t));
         return FWK_SUCCESS;
@@ -1688,13 +1712,17 @@ static int scmi_process_event(const struct fwk_event *event,
 #ifndef BUILD_HAS_MOD_RESOURCE_PERMS
     status = get_agent_id(event->target_id, &agent_id);
     if (status != FWK_SUCCESS) {
+#    if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
         FWK_LOG_ERR("[SCMI] %s: Unable to get agent id", service_name);
+#    endif
         return status;
     }
 
     status = get_agent_type(agent_id, &agent_type);
     if (status != FWK_SUCCESS) {
+#    if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
         FWK_LOG_ERR("[SCMI] %s: Unable to get agent type", service_name);
+#    endif
         return status;
     }
 
@@ -1709,6 +1737,7 @@ static int scmi_process_event(const struct fwk_event *event,
             if (ctx->scmi_protocol_id ==
                 scmi_ctx.config
                     ->dis_protocol_list_psci[dis_protocol_list_psci_index]) {
+#    if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
                 FWK_LOG_ERR(
                     "[SCMI] %s: %s [%" PRIu16
                     "(0x%x:0x%x)] requested a denied protocol",
@@ -1717,6 +1746,7 @@ static int scmi_process_event(const struct fwk_event *event,
                     ctx->scmi_token,
                     ctx->scmi_protocol_id,
                     ctx->scmi_message_id);
+#    endif
                 ctx->respond(
                     transport_id, &(int32_t){ SCMI_DENIED }, sizeof(int32_t));
                 return FWK_SUCCESS;
@@ -1730,6 +1760,7 @@ static int scmi_process_event(const struct fwk_event *event,
         payload, payload_size, ctx->scmi_message_id);
 
     if (status != FWK_SUCCESS) {
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
         FWK_LOG_ERR(
             "[SCMI] %s: %s [%" PRIu16 " (0x%x:0x%x)] handler error (%s)",
             service_name,
@@ -1738,7 +1769,7 @@ static int scmi_process_event(const struct fwk_event *event,
             ctx->scmi_protocol_id,
             ctx->scmi_message_id,
             fwk_status_str(status));
-
+#endif
         return FWK_SUCCESS;
     }
 
