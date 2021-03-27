@@ -41,6 +41,11 @@ if(SCP_ENABLE_MULTITHREADING)
     target_link_libraries(rdn2-mcp-bl2 PRIVATE cmsis::rtos2-rtx)
 endif()
 
+if(SCP_ENABLE_DEBUGGER_INIT)
+    target_compile_definitions(rdn2-mcp-bl2 PRIVATE BUILD_HAS_DEBUGGER)
+    target_sources(rdn2-mcp-bl2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_debugger_cli.c")
+endif()
+
 #
 # Some of our firmware includes require CMSIS.
 #
