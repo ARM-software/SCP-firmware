@@ -25,6 +25,8 @@ set(SCP_ENABLE_IPO_INIT FALSE)
 
 set(SCP_ARCHITECTURE "armv7-m")
 
+set(SCP_ENABLE_DEBUGGER_INIT FALSE)
+
 list(PREPEND SCP_MODULE_PATHS
     "${CMAKE_CURRENT_LIST_DIR}/../module/mcp_platform")
 
@@ -40,3 +42,7 @@ list(APPEND SCP_MODULES "pcid")
 list(APPEND SCP_MODULES "timer")
 list(APPEND SCP_MODULES "gtimer")
 list(APPEND SCP_MODULES "mcp-platform")
+
+if(SCP_ENABLE_DEBUGGER_INIT)
+    list(APPEND SCP_MODULES,"debugger-cli")
+endif()
