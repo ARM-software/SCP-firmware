@@ -14,5 +14,6 @@
 #define MCP_DTC_RAM_BASE        0x20000000
 #define MCP_UART1_BASE          0x4C002000
 #define MCP_UART2_BASE          0x4C003000
+#define MCP_PERIPHERAL_BASE     0x4C000000
 
 #endif /* MCP_MMAP_H */
