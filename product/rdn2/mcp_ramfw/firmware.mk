@@ -32,4 +32,9 @@ BS_FIRMWARE_SOURCES := \
     config_timer.c \
     config_gtimer.c
 
+ifeq ($(BUILD_HAS_DEBUGGER),yes)
+    BS_FIRMWARE_MODULES += debugger_cli
+    BS_FIRMWARE_SOURCES += config_debugger_cli.c
+endif
+
 include $(BS_DIR)/firmware.mk
