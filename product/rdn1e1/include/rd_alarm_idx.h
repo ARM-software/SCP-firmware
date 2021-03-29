@@ -7,5 +7,8 @@
 
 /* Alarm indices */
 enum rd_alarm_idx {
+#ifdef BUILD_HAS_DEBUGGER
+    RD_DEBUGGER_CLI_IDX = 2,
+#endif
     RD_ALARM_IDX_COUNT,
 };
