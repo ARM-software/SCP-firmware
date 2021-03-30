@@ -129,6 +129,14 @@ static const struct mod_scmi_perf_domain_config domains[] = {
     },
 };
 
+#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+static const struct mod_scmi_plugin_config plugins_table[] = {
+    [0] = {
+        .id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_TRAFFIC_COP),
+        .dom_type = PERF_PLUGIN_DOM_TYPE_PHYSICAL,
+    },
+};
+#endif
 const struct fwk_module_config config_scmi_perf = {
     .data = &((struct mod_scmi_perf_config){
         .domains = &domains,
@@ -142,5 +150,9 @@ const struct fwk_module_config config_scmi_perf = {
 #else
         .fast_channels_alarm_id = FWK_ID_NONE_INIT,
 #endif
-    }),
+#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+        .plugins = plugins_table,
+        .plugins_count = FWK_ARRAY_SIZE(plugins_table),
+#endif
+    })
 };
