@@ -8,6 +8,7 @@
 #include <mod_clock.h>
 #include <mod_dvfs.h>
 #include <mod_psu.h>
+#include <mod_scmi_perf.h>
 #include <mod_timer.h>
 
 #include <fwk_assert.h>
@@ -120,9 +121,6 @@ struct mod_dvfs_domain_ctx {
 
         /* Alarm API for pending requests */
         const struct mod_timer_alarm_api *alarm_api;
-
-        /* DVFS perf updates notification API */
-        struct mod_dvfs_perf_updated_api *perf_updated_api;
     } apis;
 
     /* Number of operating points */
@@ -156,6 +154,9 @@ static struct mod_dvfs_ctx {
 
     /* DVFS config data */
     struct mod_dvfs_config *config;
+
+    /* API to provide performance updates */
+    struct mod_scmi_perf_updated_api *scmi_perf_updated_api;
 
     /* DVFS device context table */
     struct mod_dvfs_domain_ctx (*domain_ctx)[];
@@ -686,11 +687,8 @@ static int dvfs_set_level_limits(
 
     ctx->level_limits = *limits;
 
-    /* notify the HAL that the limits have been updated */
-    if (ctx->apis.perf_updated_api != NULL) {
-        ctx->apis.perf_updated_api->notify_limits_updated(
-            ctx->domain_id, cookie, limits->minimum, limits->maximum);
-    }
+    dvfs_ctx.scmi_perf_updated_api->notify_limits_updated(
+        ctx->domain_id, cookie, limits->minimum, limits->maximum);
 
     if ((new_opp->level == ctx->current_opp.level) &&
         (new_opp->frequency == ctx->current_opp.frequency) &&
@@ -806,10 +804,8 @@ static int dvfs_complete(
 
     /* notify the HAL that the level has been updated */
     if ((req_status == FWK_SUCCESS) && (ctx->state != DVFS_DOMAIN_GET_OPP)) {
-        if (ctx->apis.perf_updated_api != NULL) {
-            ctx->apis.perf_updated_api->notify_level_updated(
-                ctx->domain_id, ctx->request.cookie, ctx->current_opp.level);
-        }
+        dvfs_ctx.scmi_perf_updated_api->notify_level_updated(
+            ctx->domain_id, ctx->request.cookie, ctx->current_opp.level);
     }
 
     /*
@@ -1327,17 +1323,6 @@ static int dvfs_bind_element(fwk_id_t domain_id, unsigned int round)
         return FWK_E_PANIC;
     }
 
-    /* Bind to a notification module if required */
-    if (!(fwk_id_is_equal(ctx->config->notification_id, FWK_ID_NONE))) {
-        status = fwk_module_bind(
-            ctx->config->notification_id,
-            ctx->config->updates_api_id,
-            &ctx->apis.perf_updated_api);
-        if (status != FWK_SUCCESS) {
-            return FWK_E_PANIC;
-        }
-    }
-
     /* Bind to the alarm HAL if required */
     if (ctx->config->retry_ms > 0) {
         status = fwk_module_bind(
@@ -1354,6 +1339,8 @@ static int dvfs_bind_element(fwk_id_t domain_id, unsigned int round)
 
 static int dvfs_bind(fwk_id_t id, unsigned int round)
 {
+    int status;
+
     /* Only handle the first round */
     if (round > 0) {
         return FWK_SUCCESS;
@@ -1362,6 +1349,15 @@ static int dvfs_bind(fwk_id_t id, unsigned int round)
     /* Bind our elements */
     if (fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
         return dvfs_bind_element(id, round);
+    }
+
+    /* Bind to SCMI Perf to provide updates */
+    status = fwk_module_bind(
+        fwk_module_id_scmi_perf,
+        FWK_ID_API(FWK_MODULE_IDX_SCMI_PERF, MOD_SCMI_PERF_DVFS_UPDATE_API),
+        &dvfs_ctx.scmi_perf_updated_api);
+    if (status != FWK_SUCCESS) {
+        return FWK_E_PANIC;
     }
 
     return FWK_SUCCESS;

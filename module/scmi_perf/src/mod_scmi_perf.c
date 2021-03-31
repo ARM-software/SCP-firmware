@@ -1265,7 +1265,7 @@ static void scmi_perf_notify_level_updated(
 #endif
 }
 
-static struct mod_dvfs_perf_updated_api perf_update_api = {
+static struct mod_scmi_perf_updated_api perf_update_api = {
     .notify_limits_updated = scmi_perf_notify_limits_updated,
     .notify_level_updated = scmi_perf_notify_level_updated,
 };
@@ -1409,6 +1409,11 @@ static int scmi_perf_process_bind_request(fwk_id_t source_id,
         break;
 
     case MOD_SCMI_PERF_DVFS_UPDATE_API:
+        if (!fwk_id_is_equal(source_id, fwk_module_id_dvfs)) {
+            /* Only DVFS can use this API */
+            return FWK_E_ACCESS;
+        }
+
         *api = &perf_update_api;
         break;
 

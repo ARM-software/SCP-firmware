@@ -214,40 +214,6 @@ struct mod_dvfs_domain_api {
 };
 
 /*!
- * \brief DVFS updates notification API.
- *
- * \details API used by the domain to notify the HAL when either the
- *      limits or level has been changed.
- */
-struct mod_dvfs_perf_updated_api {
-    /*!
-     * \brief Inform the HAL that the domain limits have been updated.
-     *
-     * \param domain_id Domain identifier.
-     * \param cookie Context-specific value.
-     * \param range_min Min allowed performance level.
-     * \param range_max Max allowed performance level.
-     */
-    void (*notify_limits_updated)(
-        fwk_id_t domain_id,
-        uintptr_t cookie,
-        uint32_t range_min,
-        uint32_t range_max);
-
-    /*!
-     * \brief Inform the HAL that the domain level has been updated.
-     *
-     * \param domain_id Domain identifier.
-     * \param cookie Context-specific value.
-     * \param level The new performance level of the domain.
-     */
-    void (*notify_level_updated)(
-        fwk_id_t domain_id,
-        uintptr_t cookie,
-        uint32_t level);
-};
-
-/*!
  * \}
  */
 
