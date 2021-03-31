@@ -14,7 +14,6 @@
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
-#include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -599,10 +598,6 @@ static int dvfs_get_current_opp(fwk_id_t domain_id, struct mod_dvfs_opp *opp)
 
     return status;
 }
-
-/*
- * DVFS module asynchronous API functions
- */
 
 /*
  * DVFS module asynchronous API functions
@@ -1225,10 +1220,6 @@ static int mod_dvfs_process_event(
 
     return FWK_E_PARAM;
 }
-
-/*
- * Module framework support
- */
 
 /*
  * The DVFS voltage/frequency must be set to the sustained OPP at startup
