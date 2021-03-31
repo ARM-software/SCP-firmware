@@ -129,9 +129,6 @@ struct mod_dvfs_domain_ctx {
     /* Current operating point */
     struct mod_dvfs_opp current_opp;
 
-    /* Current level limits */
-    struct mod_dvfs_level_limits level_limits;
-
     /* Current request details */
     struct mod_dvfs_request request;
 
@@ -191,23 +188,19 @@ static const struct mod_dvfs_opp *get_opp_for_level(
     const struct mod_dvfs_domain_ctx *ctx,
     uint32_t level)
 {
-    size_t opp_idx;
     const struct mod_dvfs_opp *opp;
+    size_t opp_idx;
 
     for (opp_idx = 0; opp_idx < ctx->opp_count; opp_idx++) {
         opp = &ctx->config->opps[opp_idx];
 
-        if (ctx->config->approximate_level && (opp->level < level)) {
-            continue;
-        } else if (opp->level != level) {
+        if (opp->level != level) {
             continue;
         }
 
         return opp;
     }
-    if (ctx->config->approximate_level) {
-        return &ctx->config->opps[ctx->opp_count - 1];
-    }
+
     return NULL;
 }
 
@@ -229,51 +222,6 @@ static const struct mod_dvfs_opp *get_opp_for_voltage(
     }
 
     return NULL;
-}
-
-static bool is_opp_within_limits(
-    const struct mod_dvfs_opp *opp,
-    const struct mod_dvfs_level_limits *limits)
-{
-    return (opp->level >= limits->minimum) && (opp->level <= limits->maximum);
-}
-
-static bool are_limits_valid(
-    const struct mod_dvfs_domain_ctx *ctx,
-    const struct mod_dvfs_level_limits *limits)
-{
-    if (limits->minimum > limits->maximum) {
-        return false;
-    }
-
-    if (get_opp_for_level(ctx, limits->minimum) == NULL) {
-        return false;
-    }
-
-    if (get_opp_for_level(ctx, limits->maximum) == NULL) {
-        return false;
-    }
-
-    return true;
-}
-
-static const struct mod_dvfs_opp *adjust_opp_for_new_limits(
-    const struct mod_dvfs_domain_ctx *ctx,
-    const struct mod_dvfs_opp *opp,
-    const struct mod_dvfs_level_limits *limits)
-{
-    uint32_t needle;
-
-    if (opp->level < limits->minimum) {
-        needle = limits->minimum;
-    } else if (opp->level > limits->maximum) {
-        needle = limits->maximum;
-    } else {
-        /* No transition necessary */
-        return opp;
-    }
-
-    return get_opp_for_level(ctx, needle);
 }
 
 /*
@@ -556,25 +504,6 @@ static int dvfs_get_latency(fwk_id_t domain_id, uint16_t *latency)
     return FWK_SUCCESS;
 }
 
-static int dvfs_get_level_limits(
-    fwk_id_t domain_id,
-    struct mod_dvfs_level_limits *limits)
-{
-    struct mod_dvfs_domain_ctx *ctx;
-
-    if (limits == NULL) {
-        return FWK_E_PARAM;
-    }
-
-    ctx = get_domain_ctx(domain_id);
-    if (ctx == NULL) {
-        return FWK_E_PARAM;
-    }
-
-    *limits = ctx->level_limits;
-    return FWK_SUCCESS;
-}
-
 /*
  * dvfs_get_current_opp() may be either synchronous or asynchronous
  */
@@ -638,19 +567,13 @@ static int dvfs_set_level(fwk_id_t domain_id, uintptr_t cookie, uint32_t level)
         return FWK_E_RANGE;
     }
 
-    if (!is_opp_within_limits(new_opp, &ctx->level_limits)) {
-        return FWK_E_RANGE;
-    }
-
     if (ctx->state != DVFS_DOMAIN_STATE_IDLE) {
         dvfs_create_pending_level_request(ctx, cookie, new_opp, false);
 
         return FWK_SUCCESS;
     }
 
-    if ((new_opp->level == ctx->current_opp.level) &&
-        (new_opp->frequency == ctx->current_opp.frequency) &&
-        (new_opp->voltage == ctx->current_opp.voltage)) {
+    if (level == ctx->current_opp.level) {
         return FWK_SUCCESS;
     }
 
@@ -662,53 +585,6 @@ static int dvfs_set_level(fwk_id_t domain_id, uintptr_t cookie, uint32_t level)
     return dvfs_set_level_start(ctx, cookie, new_opp, false, 0);
 }
 
-static int dvfs_set_level_limits(
-    fwk_id_t domain_id,
-    uintptr_t cookie,
-    const struct mod_dvfs_level_limits *limits)
-{
-    struct mod_dvfs_domain_ctx *ctx;
-    const struct mod_dvfs_opp *new_opp;
-    unsigned int interrupt;
-
-    ctx = get_domain_ctx(domain_id);
-    if (ctx == NULL) {
-        return FWK_E_PARAM;
-    }
-
-    if (!are_limits_valid(ctx, limits)) {
-        return FWK_E_PARAM;
-    }
-
-    new_opp = adjust_opp_for_new_limits(ctx, &ctx->current_opp, limits);
-    if (new_opp == NULL) {
-        return FWK_E_PARAM;
-    }
-
-    ctx->level_limits = *limits;
-
-    dvfs_ctx.scmi_perf_updated_api->notify_limits_updated(
-        ctx->domain_id, cookie, limits->minimum, limits->maximum);
-
-    if ((new_opp->level == ctx->current_opp.level) &&
-        (new_opp->frequency == ctx->current_opp.frequency) &&
-        (new_opp->voltage == ctx->current_opp.voltage)) {
-        return FWK_SUCCESS;
-    }
-
-    if (ctx->state != DVFS_DOMAIN_STATE_IDLE) {
-        dvfs_create_pending_level_request(ctx, cookie, new_opp, true);
-        return FWK_SUCCESS;
-    }
-
-    if (fwk_interrupt_get_current(&interrupt) == FWK_SUCCESS) {
-        ctx->request.set_source_id = true;
-    } else {
-        ctx->request.set_source_id = false;
-    }
-    return dvfs_set_level_start(ctx, cookie, new_opp, true, 0);
-}
-
 static const struct mod_dvfs_domain_api mod_dvfs_domain_api = {
     .get_current_opp = dvfs_get_current_opp,
     .get_sustained_opp = dvfs_get_sustained_opp,
@@ -717,8 +593,6 @@ static const struct mod_dvfs_domain_api mod_dvfs_domain_api = {
     .get_opp_count = dvfs_get_opp_count,
     .get_latency = dvfs_get_latency,
     .set_level = dvfs_set_level,
-    .get_level_limits = dvfs_get_level_limits,
-    .set_level_limits = dvfs_set_level_limits,
 };
 
 /*
@@ -1292,12 +1166,6 @@ static int dvfs_element_init(
     /* Initialize the context */
     ctx->opp_count = (size_t)count_opps(ctx->config->opps);
     fwk_assert(ctx->opp_count > 0);
-
-    /* Level limits default to the minimum and maximum available */
-    ctx->level_limits = (struct mod_dvfs_level_limits){
-        .minimum = ctx->config->opps[0].level,
-        .maximum = ctx->config->opps[ctx->opp_count - 1].level,
-    };
 
     return FWK_SUCCESS;
 }

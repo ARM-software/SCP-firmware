@@ -76,6 +76,14 @@ enum mod_scmi_perf_fast_channel_memory_offset {
 };
 
 /*!
+ * \brief Performance limits.
+ */
+struct mod_scmi_perf_level_limits {
+    uint32_t minimum; /*!< Minimum permitted level */
+    uint32_t maximum; /*!< Maximum permitted level */
+};
+
+/*!
  * \brief Performance domain configuration data.
  */
 struct mod_scmi_perf_domain_config {
@@ -126,6 +134,15 @@ struct mod_scmi_perf_config {
 
     /*! Flag indicating statistics in use */
     bool stats_enabled;
+
+    /*!
+     * \brief Whether approximate levels are allowed to be requested.
+     *
+     * \details When set to true, and no exact match with requested level is
+     * found, the next upper level will be used as performance level, as long as
+     * it is within current limits.
+     */
+    bool approximate_level;
 };
 
 /*!
