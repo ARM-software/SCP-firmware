@@ -27,14 +27,6 @@
  */
 
 /*!
- * \brief Level limits.
- */
-struct mod_dvfs_level_limits {
-    uint32_t minimum; /*!< Minimum permitted level */
-    uint32_t maximum; /*!< Maximum permitted level */
-};
-
-/*!
  * \brief Operating Performance Point (OPP).
  */
 struct mod_dvfs_opp {
@@ -104,13 +96,6 @@ struct mod_dvfs_domain_config {
      *      ascending order.
      */
     struct mod_dvfs_opp *opps;
-
-    /*! \brief Allow inexact performance levels.
-     *
-     * \note It will set any immediately higher than the requested value if it
-     *      is possible, otherwise it will set the highest possible.
-     */
-    bool approximate_level;
 };
 
 /*!
@@ -189,28 +174,6 @@ struct mod_dvfs_domain_api {
      * \param level Requested level.
      */
     int (*set_level)(fwk_id_t domain_id, uintptr_t cookie, uint32_t level);
-
-    /*!
-     * \brief Get the level of a domain.
-     *
-     * \param domain_id Element identifier of the domain.
-     * \param [out] limits Current level limits.
-     */
-    int (*get_level_limits)(
-        fwk_id_t domain_id,
-        struct mod_dvfs_level_limits *limits);
-
-    /*!
-     * \brief Set the level of a domain.
-     *
-     * \param domain_id Element identifier of the domain.
-     * \param cookie Context-specific value.
-     * \param limits Pointer to the new limits.
-     */
-    int (*set_level_limits)(
-        fwk_id_t domain_id,
-        uintptr_t cookie,
-        const struct mod_dvfs_level_limits *limits);
 };
 
 /*!
