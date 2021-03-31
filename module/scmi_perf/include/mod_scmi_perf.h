@@ -145,6 +145,40 @@ enum scmi_perf_api_idx {
 };
 
 /*!
+ * \brief SCMI Perf updates notification API.
+ *
+ * \details API used by DVFS to notify the Perf layer when either the
+ *      limits or level has been changed.
+ */
+struct mod_scmi_perf_updated_api {
+    /*!
+     * \brief Inform SCMI Perf that the domain limits have been updated.
+     *
+     * \param domain_id Domain identifier.
+     * \param cookie Context-specific value.
+     * \param range_min Min allowed performance level.
+     * \param range_max Max allowed performance level.
+     */
+    void (*notify_limits_updated)(
+        fwk_id_t domain_id,
+        uintptr_t cookie,
+        uint32_t range_min,
+        uint32_t range_max);
+
+    /*!
+     * \brief Inform SCMI Perf that the domain level has been updated.
+     *
+     * \param domain_id Domain identifier.
+     * \param cookie Context-specific value.
+     * \param level The new performance level of the domain.
+     */
+    void (*notify_level_updated)(
+        fwk_id_t domain_id,
+        uintptr_t cookie,
+        uint32_t level);
+};
+
+/*!
  * \defgroup GroupScmiPerformancePolicyHandlers Policy Handlers
  *
  * \brief SCMI Performance Policy Handlers.

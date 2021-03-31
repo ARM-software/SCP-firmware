@@ -30,9 +30,6 @@
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, DVFS_ELEMENT_IDX_CPU##n), \
         .clock_id = \
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_CPU_GROUP##n), \
-        .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF), \
-        .updates_api_id = FWK_ID_API_INIT( \
-            FWK_MODULE_IDX_SCMI_PERF, MOD_SCMI_PERF_DVFS_UPDATE_API), \
         .retry_ms = 0, .latency = 1200, .sustained_idx = 2, .opps = opps \
     }
 

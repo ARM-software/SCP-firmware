@@ -22,10 +22,6 @@
 static const struct mod_dvfs_domain_config cpu_group_0 = {
     .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, 0),
     .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_CPU_GROUP0),
-    .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .updates_api_id = FWK_ID_API_INIT(
-        FWK_MODULE_IDX_SCMI_PERF,
-        MOD_SCMI_PERF_DVFS_UPDATE_API),
     .latency = 1200,
     .sustained_idx = 2,
     .opps =
@@ -67,10 +63,6 @@ static const struct mod_dvfs_domain_config cpu_group_0 = {
 static const struct mod_dvfs_domain_config cpu_group_1 = {
     .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, 0),
     .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_CPU_GROUP1),
-    .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .updates_api_id = FWK_ID_API_INIT(
-        FWK_MODULE_IDX_SCMI_PERF,
-        MOD_SCMI_PERF_DVFS_UPDATE_API),
     .latency = 1200,
     .sustained_idx = 2,
     .opps =

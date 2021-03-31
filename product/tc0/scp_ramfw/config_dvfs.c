@@ -113,10 +113,6 @@ static const struct mod_dvfs_domain_config cpu_group_klein = {
         FWK_MODULE_IDX_TIMER,
         0,
         CONFIG_TIMER_DVFS_CPU_KLEIN),
-    .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .updates_api_id = FWK_ID_API_INIT(
-        FWK_MODULE_IDX_SCMI_PERF,
-        MOD_SCMI_PERF_DVFS_UPDATE_API),
     .retry_ms = 1,
     .latency = 1200,
     .sustained_idx = 2,
@@ -133,10 +129,6 @@ static const struct mod_dvfs_domain_config cpu_group_matterhorn = {
         FWK_MODULE_IDX_TIMER,
         0,
         CONFIG_TIMER_DVFS_CPU_MATTERHORN),
-    .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .updates_api_id = FWK_ID_API_INIT(
-        FWK_MODULE_IDX_SCMI_PERF,
-        MOD_SCMI_PERF_DVFS_UPDATE_API),
     .retry_ms = 1,
     .latency = 1200,
     .sustained_idx = 2,
@@ -154,10 +146,6 @@ static const struct mod_dvfs_domain_config cpu_group_matterhorn_elp_arm = {
         FWK_MODULE_IDX_TIMER,
         0,
         CONFIG_TIMER_DVFS_CPU_MATTERHORN_ELP_ARM),
-    .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
-    .updates_api_id = FWK_ID_API_INIT(
-        FWK_MODULE_IDX_SCMI_PERF,
-        MOD_SCMI_PERF_DVFS_UPDATE_API),
     .retry_ms = 1,
     .latency = 1200,
     .sustained_idx = 2,
