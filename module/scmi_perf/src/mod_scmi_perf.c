@@ -134,7 +134,7 @@ struct scmi_perf_ctx {
     /* SCMI Performance Module Configuration */
     const struct mod_scmi_perf_config *config;
 
-    /* Number of power domains */
+    /* Number of performance domains */
     uint32_t domain_count;
 
     /* SCMI module API */
