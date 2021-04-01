@@ -71,10 +71,18 @@ struct scmi_base_discover_agent_a2p {
     uint32_t agent_id;
 };
 
+#if (SCMI_PROTOCOL_VERSION_BASE >= UINT32_C(0x20000))
+struct scmi_base_discover_agent_p2a {
+    int32_t status;
+    uint32_t agent_id;
+    char name[16];
+};
+#else
 struct scmi_base_discover_agent_p2a {
     int32_t status;
     char name[16];
 };
+#endif
 
 /*
  * BASE_SET_DEVICE_PERMISSIONS
