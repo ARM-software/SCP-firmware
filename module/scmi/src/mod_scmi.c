@@ -1035,10 +1035,21 @@ static int scmi_base_discover_agent_handler(fwk_id_t service_id,
     };
     const struct mod_scmi_agent *agent;
 
+#if (SCMI_PROTOCOL_VERSION_BASE >= UINT32_C(0x20000))
+    unsigned int agent_id;
+    int status;
+#endif
+
     parameters = (const struct scmi_base_discover_agent_a2p *)payload;
 
+#if (SCMI_PROTOCOL_VERSION_BASE >= UINT32_C(0x20000))
+    if ((parameters->agent_id > scmi_ctx.config->agent_count) &&
+        (parameters->agent_id != 0xFFFFFFFF))
+        goto exit;
+#else
     if (parameters->agent_id > scmi_ctx.config->agent_count)
         goto exit;
+#endif
 
     return_values.status = SCMI_SUCCESS;
 
@@ -1050,8 +1061,44 @@ static int scmi_base_discover_agent_handler(fwk_id_t service_id,
             "return_values.name is not large enough to contain name");
 
         memcpy(return_values.name, name, sizeof(name));
+
+#if (SCMI_PROTOCOL_VERSION_BASE >= UINT32_C(0x20000))
+        return_values.agent_id = MOD_SCMI_PLATFORM_ID;
+#endif
+
         goto exit;
     }
+
+#if (SCMI_PROTOCOL_VERSION_BASE >= UINT32_C(0x20000))
+    if (parameters->agent_id == 0xFFFFFFFF) {
+        /*
+         * An agent can discover its own agent_id and name by passing agent_id
+         * of 0xFFFFFFFF. In this case, the command returns the agent_id and
+         * name of the calling agent.
+         */
+
+        status = get_agent_id(service_id, &agent_id);
+        if (status != FWK_SUCCESS)
+            return FWK_E_ACCESS;
+
+        return_values.agent_id = (uint32_t)agent_id;
+
+        strncpy(
+            &return_values.name[0],
+            fwk_module_get_name(service_id),
+            sizeof(return_values.name) - 1);
+
+        goto exit;
+    }
+#endif
+
+#if (SCMI_PROTOCOL_VERSION_BASE >= UINT32_C(0x20000))
+    /*
+     * agent_id is identical to the agent_id field passed via the calling
+     * parameters.
+     */
+    return_values.agent_id = parameters->agent_id;
+#endif
 
     agent = &scmi_ctx.config->agent_table[parameters->agent_id];
 
