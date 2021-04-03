@@ -187,6 +187,9 @@ static void fwk_module_init_elements(struct fwk_module_ctx *ctx)
         if (!fwk_expect(element->data != NULL))
             fwk_trap();
 
+#if BUILD_HAS_DEBUGGER
+        cli_printf(NONE, "[init] +--element idx: %u\n", i);
+#endif
         status = desc->element_init(
             element_id, element->sub_element_count, element->data);
         if (!fwk_expect(status == FWK_SUCCESS))
@@ -235,6 +238,10 @@ static void fwk_module_init_module(struct fwk_module_ctx *ctx)
         fwk_module_init_element_ctxs(ctx, elements, notification_count);
     }
 
+#if BUILD_HAS_DEBUGGER
+    cli_printf(NONE, "\n[init] module: %s\n", desc->name);
+#endif
+
     status = desc->init(ctx->id, ctx->element_count, config->data);
     if (!fwk_expect(status == FWK_SUCCESS))
         fwk_trap();
@@ -271,6 +278,9 @@ static int fwk_module_bind_elements(
          element_idx++) {
         fwk_module_ctx.bind_id =
             fwk_id_build_element_id(module_ctx->id, element_idx);
+#if BUILD_HAS_DEBUGGER
+        cli_printf(NONE, "[bind] +--element idx: %u\n", element_idx);
+#endif
         status = module->bind(fwk_module_ctx.bind_id, round);
         if (!fwk_expect(status == FWK_SUCCESS)) {
             FWK_LOG_CRIT(fwk_module_err_msg_func, status, __func__);
@@ -300,6 +310,9 @@ static int fwk_module_bind_module(
     }
 
     fwk_module_ctx.bind_id = module_ctx->id;
+#if BUILD_HAS_DEBUGGER
+    cli_printf(NONE, "\n[bind] module: %s\n", module->name);
+#endif
     status = module->bind(module_ctx->id, round);
     if (!fwk_expect(status == FWK_SUCCESS)) {
         FWK_LOG_CRIT(fwk_module_err_msg_func, status, __func__);
@@ -339,6 +352,9 @@ static int fwk_module_start_elements(struct fwk_module_ctx *module_ctx)
          element_idx++) {
 
         if (module->start != NULL) {
+#if BUILD_HAS_DEBUGGER
+            cli_printf(NONE, "[start] +--element idx: %u\n", element_idx);
+#endif
             status = module->start(
                 fwk_id_build_element_id(module_ctx->id, element_idx));
             if (!fwk_expect(status == FWK_SUCCESS)) {
@@ -362,6 +378,9 @@ static int fwk_module_start_module(struct fwk_module_ctx *module_ctx)
     module = module_ctx->desc;
 
     if (module->start != NULL) {
+#if BUILD_HAS_DEBUGGER
+        cli_printf(NONE, "\n[start] module: %s\n", module->name);
+#endif
         status = module->start(module_ctx->id);
         if (!fwk_expect(status == FWK_SUCCESS)) {
             FWK_LOG_CRIT(fwk_module_err_msg_func, status, __func__);
