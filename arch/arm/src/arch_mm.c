@@ -38,23 +38,27 @@ static struct arch_mm_ctx {
 
 int posix_memalign(void **memptr, size_t alignment, size_t size)
 {
-    if (alignment == 0)
+    if (alignment == 0) {
         return EINVAL;
+    }
 
     /* Enforce power-of-two alignment */
-    if ((alignment & (alignment - 1)) != 0)
+    if ((alignment & (alignment - 1)) != 0) {
         return EINVAL;
+    }
 
-    if ((alignment % sizeof(void *)) != 0)
+    if ((alignment % sizeof(void *)) != 0) {
         return EINVAL;
+    }
 
     if (size == 0) {
         *memptr = NULL;
     } else {
         *memptr = _memalign_r(_REENT, alignment, size);
 
-        if (*memptr == NULL)
+        if (*memptr == NULL) {
             return ENOMEM;
+        }
     }
 
     return 0;
