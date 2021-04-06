@@ -43,6 +43,7 @@ noreturn void arch_exception_reset(void)
 
 noreturn FWK_WEAK void arch_exception_invalid(void)
 {
-    while (true)
+    while (true) {
         __WFI();
+    }
 }
