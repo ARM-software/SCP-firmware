@@ -19,8 +19,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define SCMI_VERSION 0x10000
-
 /* SCMI service context */
 struct scmi_service_ctx {
     /* Pointer to SCMI service configuration data */
