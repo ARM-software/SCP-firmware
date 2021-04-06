@@ -806,6 +806,11 @@ static int scmi_pd_power_state_notify_handler(
         goto exit;
     }
 
+    if ((parameters->notify_enable & ~SCMI_PD_NOTIFY_ENABLE_MASK) != 0x0) {
+        return_values.status = SCMI_INVALID_PARAMETERS;
+        goto exit;
+    }
+
     /* We are supporting SCMI notifications only for DEVICE type
      * power domains. Core and cluster changes power states very frequently
      * hence notifying power states of core/cluster is cpu intensive
@@ -816,11 +821,6 @@ static int scmi_pd_power_state_notify_handler(
      */
     if (pd_type != MOD_PD_TYPE_DEVICE && pd_type != MOD_PD_TYPE_DEVICE_DEBUG) {
         return_values.status = SCMI_NOT_SUPPORTED;
-        goto exit;
-    }
-
-    if ((parameters->notify_enable & ~SCMI_PD_NOTIFY_ENABLE_MASK) != 0x0) {
-        return_values.status = SCMI_INVALID_PARAMETERS;
         goto exit;
     }
 
