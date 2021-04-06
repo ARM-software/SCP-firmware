@@ -22,8 +22,9 @@
 /* Platform-dependent backend for the _Exit() function */
 void _exit(int status)
 {
-    while (true)
+    while (true) {
         __WFI();
+    }
 }
 #endif
 

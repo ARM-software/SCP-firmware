@@ -66,8 +66,9 @@ static int global_disable(void)
 
 static int is_enabled(unsigned int interrupt, bool *enabled)
 {
-    if (interrupt >= irq_count)
+    if (interrupt >= irq_count) {
         return FWK_E_PARAM;
+    }
 
     *enabled = NVIC_GetEnableIRQ(interrupt);
 
@@ -76,8 +77,9 @@ static int is_enabled(unsigned int interrupt, bool *enabled)
 
 static int enable(unsigned int interrupt)
 {
-    if (interrupt >= irq_count)
+    if (interrupt >= irq_count) {
         return FWK_E_PARAM;
+    }
 
     NVIC_EnableIRQ(interrupt);
 
@@ -86,8 +88,9 @@ static int enable(unsigned int interrupt)
 
 static int disable(unsigned int interrupt)
 {
-    if (interrupt >= irq_count)
+    if (interrupt >= irq_count) {
         return FWK_E_PARAM;
+    }
 
     NVIC_DisableIRQ(interrupt);
 
@@ -96,8 +99,9 @@ static int disable(unsigned int interrupt)
 
 static int is_pending(unsigned int interrupt, bool *pending)
 {
-    if (interrupt >= irq_count)
+    if (interrupt >= irq_count) {
         return FWK_E_PARAM;
+    }
 
     *pending = NVIC_GetPendingIRQ(interrupt);
 
@@ -106,8 +110,9 @@ static int is_pending(unsigned int interrupt, bool *pending)
 
 static int set_pending(unsigned int interrupt)
 {
-    if (interrupt >= irq_count)
+    if (interrupt >= irq_count) {
         return FWK_E_PARAM;
+    }
 
     NVIC_SetPendingIRQ(interrupt);
 
@@ -116,8 +121,9 @@ static int set_pending(unsigned int interrupt)
 
 static int clear_pending(unsigned int interrupt)
 {
-    if (interrupt >= irq_count)
+    if (interrupt >= irq_count) {
         return FWK_E_PARAM;
+    }
 
     NVIC_ClearPendingIRQ(interrupt);
 
@@ -126,8 +132,9 @@ static int clear_pending(unsigned int interrupt)
 
 static int set_isr_irq(unsigned int interrupt, void (*isr)(void))
 {
-    if (interrupt >= irq_count)
+    if (interrupt >= irq_count) {
         return FWK_E_PARAM;
+    }
 
     NVIC_SetVector(interrupt, (uint32_t)isr);
 
@@ -140,8 +147,9 @@ static int set_isr_irq_param(
     uintptr_t parameter)
 {
     struct callback *entry;
-    if (interrupt >= irq_count)
+    if (interrupt >= irq_count) {
         return FWK_E_PARAM;
+    }
 
     entry = &callback[NVIC_USER_IRQ_OFFSET + interrupt - 1];
     entry->func = isr;
@@ -187,15 +195,17 @@ static int get_current(unsigned int *interrupt)
     *interrupt = __get_IPSR();
 
     /* Not an interrupt */
-    if (*interrupt == 0)
+    if (*interrupt == 0) {
         return FWK_E_STATE;
+    }
 
-    if (*interrupt == (NVIC_USER_IRQ_OFFSET + (int)NonMaskableInt_IRQn))
+    if (*interrupt == (NVIC_USER_IRQ_OFFSET + (int)NonMaskableInt_IRQn)) {
         *interrupt = FWK_INTERRUPT_NMI;
-    else if (*interrupt < NVIC_USER_IRQ_OFFSET)
+    } else if (*interrupt < NVIC_USER_IRQ_OFFSET) {
         *interrupt = FWK_INTERRUPT_EXCEPTION;
-    else
+    } else {
         *interrupt -= NVIC_USER_IRQ_OFFSET;
+    }
 
     return FWK_SUCCESS;
 }
@@ -230,8 +240,9 @@ int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
     uint32_t *vector;
     char irq;
 
-    if (driver == NULL)
+    if (driver == NULL) {
         return FWK_E_PARAM;
+    }
 
     /* Find the number of interrupt lines implemented in hardware */
     ictr_intlinesnum = SCnSCB->ICTR & SCnSCB_ICTR_INTLINESNUM_Msk;
