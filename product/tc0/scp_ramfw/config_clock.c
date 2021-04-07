@@ -56,6 +56,18 @@ static const struct fwk_element clock_dev_desc_table[] = {
                     MOD_CSS_CLOCK_API_TYPE_CLOCK),
             }),
         },
+    [CLOCK_IDX_CPU_GROUP_MATTERHORN_ELP_ARM] =
+        {
+            .name = "CPU_GROUP_MATTERHORN_ELP_ARM",
+            .data = &((struct mod_clock_dev_config){
+                .driver_id = FWK_ID_ELEMENT_INIT(
+                    FWK_MODULE_IDX_CSS_CLOCK,
+                    CLOCK_CSS_IDX_CPU_GROUP_MATTERHORN_ELP_ARM),
+                .api_id = FWK_ID_API_INIT(
+                    FWK_MODULE_IDX_CSS_CLOCK,
+                    MOD_CSS_CLOCK_API_TYPE_CLOCK),
+            }),
+        },
     [CLOCK_IDX_DPU] =
         {
             .name = "DPU",

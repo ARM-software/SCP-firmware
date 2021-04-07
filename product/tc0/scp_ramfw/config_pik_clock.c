@@ -39,6 +39,15 @@ static struct mod_pik_clock_rate rate_table_cpu_group_matterhorn[] = {
     },
 };
 
+static struct mod_pik_clock_rate rate_table_cpu_group_matterhorn_elp_arm[] = {
+    {
+        .rate = 2176 * FWK_MHZ,
+        .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
+        .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
+        .divider = 1, /* Rate adjusted via CPU PLL */
+    },
+};
+
 static const struct mod_pik_clock_rate rate_table_sys_intclk[] = {
     {
         .rate = 2000 * FWK_MHZ,
@@ -196,8 +205,8 @@ static const struct fwk_element pik_clock_element_table[] = {
             .control_reg = &CLUSTER_PIK_PTR(0)->CORECLK[7].CTRL,
             .divext_reg = &CLUSTER_PIK_PTR(0)->CORECLK[7].DIV,
             .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[7].MOD,
-            .rate_table = rate_table_cpu_group_matterhorn,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_matterhorn),
+            .rate_table = rate_table_cpu_group_matterhorn_elp_arm,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_matterhorn_elp_arm),
         }),
     },
     [CLOCK_PIK_IDX_INTERCONNECT] = {

@@ -37,8 +37,21 @@ static const struct fwk_element system_pll_element_table[] =
                 .data = &((struct mod_system_pll_dev_config){
                     .control_reg = (void *)SCP_PLL_CPU4,
                     .status_reg = (void *)&SCP_PIK_PTR->PLL_STATUS[1],
-                    .lock_flag_mask = PLL_STATUS_CPUPLLLOCK(0),
+                    .lock_flag_mask = PLL_STATUS_CPUPLLLOCK(4),
                     .initial_rate = 1893 * FWK_MHZ,
+                    .min_rate = MOD_SYSTEM_PLL_MIN_RATE,
+                    .max_rate = MOD_SYSTEM_PLL_MAX_RATE,
+                    .min_step = MOD_SYSTEM_PLL_MIN_INTERVAL,
+                }),
+            },
+        [CLOCK_PLL_IDX_CPU_MATTERHORN_ELP_ARM] =
+            {
+                .name = "CPU_PLL_MATTERHORN_ELP_ARM",
+                .data = &((struct mod_system_pll_dev_config){
+                    .control_reg = (void *)SCP_PLL_CPU7,
+                    .status_reg = (void *)&SCP_PIK_PTR->PLL_STATUS[1],
+                    .lock_flag_mask = PLL_STATUS_CPUPLLLOCK(7),
+                    .initial_rate = 2176 * FWK_MHZ,
                     .min_rate = MOD_SYSTEM_PLL_MIN_RATE,
                     .max_rate = MOD_SYSTEM_PLL_MAX_RATE,
                     .min_step = MOD_SYSTEM_PLL_MIN_INTERVAL,

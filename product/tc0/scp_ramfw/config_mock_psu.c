@@ -41,6 +41,20 @@ static const struct fwk_element element_table[] = {
                 .default_voltage = 550,
             },
     },
+    [MOCK_PSU_ELEMENT_IDX_MATTERHORN_ELP_ARM] = {
+        .name = "DVFS_GROUP_MATTERHORN_ELP_ARM",
+        .data =
+            &(const struct mod_mock_psu_element_cfg){
+                .async_alarm_id = FWK_ID_NONE_INIT,
+                .async_alarm_api_id = FWK_ID_NONE_INIT,
+
+                .async_response_id = FWK_ID_NONE_INIT,
+                .async_response_api_id = FWK_ID_NONE_INIT,
+
+                .default_enabled = true,
+                .default_voltage = 550,
+            },
+    },
     { 0 }
 };
 

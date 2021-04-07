@@ -34,6 +34,16 @@ static const struct fwk_element element_table[] = {
                     FWK_MODULE_IDX_MOCK_PSU,
                     MOD_MOCK_PSU_API_IDX_DRIVER) },
     },
+    [PSU_ELEMENT_IDX_MATTERHORN_ELP_ARM] = {
+        .name = "DVFS_GROUP_MATTERHORN_ELP_ARM",
+        .data =
+            &(const struct mod_psu_element_cfg){
+                .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MOCK_PSU, MOCK_PSU_ELEMENT_IDX_MATTERHORN_ELP_ARM),
+                .driver_api_id = FWK_ID_API_INIT(
+                    FWK_MODULE_IDX_MOCK_PSU,
+                    MOD_MOCK_PSU_API_IDX_DRIVER) },
+    },
+
     { 0 }
 };
 
