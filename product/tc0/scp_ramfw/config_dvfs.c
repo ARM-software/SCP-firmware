@@ -76,6 +76,35 @@ static struct mod_dvfs_opp operating_points_matterhorn[] = {
     { 0 }
 };
 
+static struct mod_dvfs_opp operating_points_matterhorn_elp_arm[] = {
+    {
+        .level = 1088 * 1000000UL,
+        .frequency = 1088 * FWK_KHZ,
+        .voltage = 550,
+    },
+    {
+        .level = 1632 * 1000000UL,
+        .frequency = 1632 * FWK_KHZ,
+        .voltage = 650,
+    },
+    {
+        .level = 2176 * 1000000UL,
+        .frequency = 2176 * FWK_KHZ,
+        .voltage = 750,
+    },
+    {
+        .level = 2612 * 1000000UL,
+        .frequency = 2612 * FWK_KHZ,
+        .voltage = 850,
+    },
+    {
+        .level = 3047 * 1000000UL,
+        .frequency = 3047 * FWK_KHZ,
+        .voltage = 950,
+    },
+    { 0 }
+};
+
 static const struct mod_dvfs_domain_config cpu_group_klein = {
     .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, PSU_ELEMENT_IDX_KLEIN),
     .clock_id =
@@ -114,6 +143,27 @@ static const struct mod_dvfs_domain_config cpu_group_matterhorn = {
     .opps = operating_points_matterhorn,
 };
 
+static const struct mod_dvfs_domain_config cpu_group_matterhorn_elp_arm = {
+    .psu_id = FWK_ID_ELEMENT_INIT(
+        FWK_MODULE_IDX_PSU,
+        PSU_ELEMENT_IDX_MATTERHORN_ELP_ARM),
+    .clock_id = FWK_ID_ELEMENT_INIT(
+        FWK_MODULE_IDX_CLOCK,
+        CLOCK_IDX_CPU_GROUP_MATTERHORN_ELP_ARM),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
+        FWK_MODULE_IDX_TIMER,
+        0,
+        CONFIG_TIMER_DVFS_CPU_MATTERHORN_ELP_ARM),
+    .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
+    .updates_api_id = FWK_ID_API_INIT(
+        FWK_MODULE_IDX_SCMI_PERF,
+        MOD_SCMI_PERF_DVFS_UPDATE_API),
+    .retry_ms = 1,
+    .latency = 1200,
+    .sustained_idx = 2,
+    .opps = operating_points_matterhorn_elp_arm,
+};
+
 static const struct fwk_element element_table[] = { [DVFS_ELEMENT_IDX_KLEIN] =
                                                         {
                                                             .name = "CPU_GROUP_KLEIN",
@@ -123,6 +173,11 @@ static const struct fwk_element element_table[] = { [DVFS_ELEMENT_IDX_KLEIN] =
                                                         {
                                                             .name = "CPU_GROUP_MATTERHORN",
                                                             .data = &cpu_group_matterhorn,
+                                                        },
+                                                    [DVFS_ELEMENT_IDX_MATTERHORN_ELP_ARM] =
+                                                        {
+                                                            .name = "CPU_GROUP_MATTERHORN_ELP_ARM",
+                                                            .data = &cpu_group_matterhorn_elp_arm,
                                                         },
                                                     { 0 } };
 

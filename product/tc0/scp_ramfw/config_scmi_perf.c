@@ -17,6 +17,7 @@
 static const struct mod_scmi_perf_domain_config domains[] = {
     [DVFS_ELEMENT_IDX_KLEIN] = {},
     [DVFS_ELEMENT_IDX_MATTERHORN] = {},
+    [DVFS_ELEMENT_IDX_MATTERHORN_ELP_ARM] = {},
 };
 
 const struct fwk_module_config config_scmi_perf = {
