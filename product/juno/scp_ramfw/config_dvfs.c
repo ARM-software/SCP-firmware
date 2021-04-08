@@ -445,7 +445,7 @@ static const struct fwk_element element_table_r2[] = {
 static const struct fwk_element *dvfs_get_element_table(fwk_id_t module_id)
 {
     int status;
-    enum juno_idx_revision revision;
+    enum juno_idx_revision revision = (enum juno_idx_revision)0U;
 
     status = juno_id_get_revision(&revision);
     fwk_assert(status == FWK_SUCCESS);

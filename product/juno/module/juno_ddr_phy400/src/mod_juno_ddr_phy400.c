@@ -154,7 +154,9 @@ static bool ddr_phy_idle_check(void *data)
     struct mod_juno_ddr_phy400_ptm_reg *phy_ptm =
         (struct mod_juno_ddr_phy400_ptm_reg *)data;
 
-    return (!(phy_ptm->PHY_STATUS & DDR_PHY_PTM_PHY_STATUS_IDLE));
+    return (
+        (phy_ptm->PHY_STATUS & (uint32_t)DDR_PHY_PTM_PHY_STATUS_IDLE) ==
+        (uint32_t)0);
 }
 
 static int juno_ddr_phy400_config_idle(fwk_id_t element_id)

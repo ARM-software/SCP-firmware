@@ -11,7 +11,7 @@
 #ifndef JUNO_PCIE_H
 #define JUNO_PCIE_H
 
-#define PCI_BRIDGE_REVISION_ID  1
+#define PCI_BRIDGE_REVISION_ID  1U
 #define PCI_BRIDGE_CLASS        UINT32_C(0x00060400)
 
 /* Juno-specific memory translation regions */

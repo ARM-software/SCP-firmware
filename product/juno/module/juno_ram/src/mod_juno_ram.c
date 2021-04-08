@@ -34,8 +34,8 @@
 #include <stdint.h>
 
 #define TIMEOUT_RESET_PCIE_US       (1000 * 1000)
-#define SMC_INIT_CMD_SET_CS5        UINT32_C(5 << 23)
-#define SMC_INIT_CMD_UPDATE_REG     UINT32_C(2 << 21)
+#define SMC_INIT_CMD_SET_CS5        (uint32_t)(5U << 23)
+#define SMC_INIT_CMD_UPDATE_REG     (uint32_t)(2U << 21)
 #define PCSM_TRICKLE_DELAY          24
 #define PCSM_HAMMER_DELAY           9
 #define PCSM_RAM_DELAY              37
@@ -115,7 +115,7 @@ static void smc_configure(void)
     /* SMC: Switch CS5 from 32 bits to 16 bits mode. */
     smc_cycles = SMC->CS[5].CYCLES;
     smc_opmode = SMC->CS[5].OPMODE;
-    smc_opmode = (smc_opmode & 0xFFFC) | 0x01;
+    smc_opmode = (smc_opmode & (uint32_t)0xFFFC) | (uint32_t)0x01;
     SMC->SET_CYCLES = smc_cycles;
     SMC->SET_OPMODE = smc_opmode;
     SMC->DIRECT_CMD = SMC_INIT_CMD_SET_CS5 | SMC_INIT_CMD_UPDATE_REG;

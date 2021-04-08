@@ -120,15 +120,15 @@ static void init_ddr_chip(struct mod_juno_dmc400_reg *dmc, uint32_t dev)
 {
     dmc->DIRECT_CMD = dev;
     dmc_delay_cycles(20);
-    dmc->DIRECT_CMD = 0x10020018 | dev;
+    dmc->DIRECT_CMD = 0x10020018U | dev;
     dmc_delay_cycles(1);
-    dmc->DIRECT_CMD = 0x10030000 | dev;
+    dmc->DIRECT_CMD = 0x10030000U | dev;
     dmc_delay_cycles(1);
-    dmc->DIRECT_CMD = 0x10010046 | dev;
+    dmc->DIRECT_CMD = 0x10010046U | dev;
     dmc_delay_cycles(1);
-    dmc->DIRECT_CMD = 0x10000D70 | dev;
+    dmc->DIRECT_CMD = 0x10000D70U | dev;
     dmc_delay_cycles(60);
-    dmc->DIRECT_CMD = 0x50000400 | dev;
+    dmc->DIRECT_CMD = 0x50000400U | dev;
     dmc_delay_cycles(1);
 }
 

@@ -127,7 +127,7 @@ int juno_id_get_variant(enum juno_idx_variant *variant)
     }
 
     /* NOTE: SYSTOP must be powered ON for this register to be accessible. */
-    var = (V2M_SYS_REGS->ID & V2M_SYS_REGS_ID_VAR_MASK) >>
+    var = (V2M_SYS_REGS->ID & (uint32_t)V2M_SYS_REGS_ID_VAR_MASK) >>
         V2M_SYS_REGS_ID_VAR_POS;
 
     if (!fwk_expect(var < JUNO_IDX_VARIANT_COUNT))

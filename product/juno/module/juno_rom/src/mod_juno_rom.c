@@ -116,7 +116,7 @@ static int power_cluster_and_cores_from_boot_map(
      * core N must be powered on)
      */
     for (i = 0; i < core_ppu_table_size; ++i) {
-        if (boot_map & (1 << i)) {
+        if ((boot_map & (1U << i)) != 0U) {
             status = ctx.ppu_api->set_state_and_wait(
                 core_ppu_table[i],
                 MOD_PD_STATE_ON);
@@ -336,8 +336,8 @@ static int juno_rom_process_event(
         NIC400->REMAP |= NIC400_REMAP_TLX_EN;
 
     /* Set alternative AP ROM address (if applicable) */
-    if (SCC->APP_ALT_BOOT != 0) {
-        if ((SCC->APP_ALT_BOOT & 0x3) != 0) {
+    if (SCC->APP_ALT_BOOT != (uint32_t)0) {
+        if ((SCC->APP_ALT_BOOT & (uint32_t)0x3) != (uint32_t)0) {
             FWK_LOG_ERR(
                 "[ROM] ERROR: Alternative AP ROM address does not have 4 byte "
                 "alignment");

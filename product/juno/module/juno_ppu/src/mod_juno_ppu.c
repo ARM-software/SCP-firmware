@@ -29,15 +29,17 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define PPU_SET_STATE_AND_WAIT_TIMEOUT_US   (100 * 1000)
+#define PPU_SET_STATE_AND_WAIT_TIMEOUT_US (100U * 1000U)
 
-#define PPU_ALARM_TIMEOUT_SUSPEND_MS        5
+#define PPU_ALARM_TIMEOUT_SUSPEND_MS 5U
 
-#define CPU_WAKEUP_COMPOSITE_STATE  MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, \
-                                                           0, \
-                                                           MOD_PD_STATE_ON, \
-                                                           MOD_PD_STATE_ON, \
-                                                           MOD_PD_STATE_ON)
+#define CPU_WAKEUP_COMPOSITE_STATE \
+    MOD_PD_COMPOSITE_STATE( \
+        (unsigned int)MOD_PD_LEVEL_2, \
+        0U, \
+        (unsigned int)MOD_PD_STATE_ON, \
+        (unsigned int)MOD_PD_STATE_ON, \
+        (unsigned int)MOD_PD_STATE_ON)
 
 struct set_power_status_check_params {
     enum ppu_mode mode;

@@ -377,7 +377,7 @@ static int set_rate_write_pll_config(struct juno_cdcel937_dev_ctx *ctx)
         P = 0;
 
     /* Calculate N', N' = N * 2^P */
-    Nd = N * (1 << P);
+    Nd = N * (1U << P);
 
     /* Calculate Q, Q = int(N' / M) */
     Q = Nd / M;
