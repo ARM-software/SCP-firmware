@@ -286,8 +286,8 @@ static void pvt_interrupt_handler(uintptr_t param)
 
     sensor_cfg->group->regs->IRQ_CLEAR = IRQ_MASK_ALL;
 
-    if ((sensor_cfg->group->regs->SENSOR_DATA_VALID &
-        (1 << sensor_cfg->index))) {
+    if (((sensor_cfg->group->regs->SENSOR_DATA_VALID &
+          (uint32_t)(1U << sensor_cfg->index))) != (uint32_t)0) {
         osc_counter = sensor_cfg->group->regs->SENSOR_DATA[sensor_cfg->index] &
             SAMPLE_VALUE_MASK;
     } else {
@@ -771,7 +771,7 @@ static int pvt_process_event(const struct fwk_event *event,
             return respond(group_ctx);
 
         /* Initiate measurement for group/sensor */
-        group->regs->SENSOR_ENABLE = (1 << sensor_cfg->index);
+        group->regs->SENSOR_ENABLE = (uint32_t)(1U << sensor_cfg->index);
         group->regs->SAMPLE_WINDOW =
             sensor_ctx->sample_window & SAMPLE_WINDOW_MASK;
         group->regs->MEASUREMENT_ENABLE = PVTGROUP_MEASUREMENT_ENABLE;

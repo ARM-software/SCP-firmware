@@ -56,22 +56,26 @@ int juno_soc_clock_ram_pll_set(struct pll_reg *pll,
     fwk_assert(pll != NULL);
     fwk_assert(pll_setting != NULL);
 
-    fwk_assert((pll_setting->nf >= 2) && (pll_setting->nf <= PLL_NF_MAX));
-    fwk_assert((pll_setting->nr >= 1) && (pll_setting->nr <= PLL_NR_MAX));
-    fwk_assert((pll_setting->od >= 1) && (pll_setting->od <= PLL_OD_MAX));
+    fwk_assert(
+        (pll_setting->nf >= (uint16_t)2) && (pll_setting->nf <= PLL_NF_MAX));
+    fwk_assert(
+        (pll_setting->nr >= (uint8_t)1) && (pll_setting->nr <= PLL_NR_MAX));
+    fwk_assert(
+        (pll_setting->od >= (uint8_t)1) && (pll_setting->od <= PLL_OD_MAX));
 
     pll->REG0 = PLL_REG0_PLL_RESET |
-            ((pll_setting->nf - 1) << PLL_REG0_NF_POS) |
-            (1 << PLL_REG0_ENSAT_POS);
+        ((pll_setting->nf - (uint16_t)1) << PLL_REG0_NF_POS) |
+        ((uint32_t)1 << PLL_REG0_ENSAT_POS);
 
-    pll->REG1 = ((pll_setting->nr - 1) |
-            ((pll_setting->od - 1) << PLL_REG1_OD_POS) |
-            ((pll_setting->nf / 2) - 1) << PLL_REG1_NB_POS);
+    pll->REG1 =
+        ((pll_setting->nr - (uint8_t)1) |
+         ((pll_setting->od - (uint8_t)1) << PLL_REG1_OD_POS) |
+         ((pll_setting->nf / (uint16_t)2) - (uint16_t)1) << PLL_REG1_NB_POS);
 
     pll->REG0 &= ~PLL_REG0_PLL_RESET;
 
     /* Wait for the PLL to lock */
-    while (!(pll->REG1 & PLL_REG1_LOCK_STATUS))
+    while ((pll->REG1 & PLL_REG1_LOCK_STATUS) == (uint32_t)0)
         continue;
 
     return FWK_SUCCESS;

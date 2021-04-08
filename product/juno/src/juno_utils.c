@@ -22,8 +22,8 @@
 
 #define SMC_INIT_SET_CYCLES         UINT32_C(0x000251FF)
 #define SMC_INIT_SET_OP_MODE        UINT32_C(0x00000046)
-#define SMC_INIT_CMD_SET_CS3        UINT32_C(3 << 23)
-#define SMC_INIT_CMD_UPDATE_REG     UINT32_C(2 << 21)
+#define SMC_INIT_CMD_SET_CS3        UINT32_C(3U << 23)
+#define SMC_INIT_CMD_UPDATE_REG     UINT32_C(2U << 21)
 
 void juno_utils_open_snoop_gate_and_wait(volatile uint32_t *snoop_ctrl)
 {

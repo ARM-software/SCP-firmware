@@ -21,22 +21,22 @@
 #include <stddef.h>
 
 /* All Juno variants but A */
-#define COL_BITS                2
-#define ROW_BITS                5
-#define BANK_BITS               3
-#define CHIP_BITS               0
-#define CHANN_BITS              1
+#define COL_BITS   2U
+#define ROW_BITS   5U
+#define BANK_BITS  3U
+#define CHIP_BITS  0U
+#define CHANN_BITS 1U
 
 /* Juno variant A only */
-#define COL_BITS_VARIANT_A      1
-#define ROW_BITS_VARIANT_A      5
-#define BANK_BITS_VARIANT_A     3
-#define CHIP_BITS_VARIANT_A     1
-#define CHANN_BITS_VARIANT_A    1
+#define COL_BITS_VARIANT_A   1U
+#define ROW_BITS_VARIANT_A   5U
+#define BANK_BITS_VARIANT_A  3U
+#define CHIP_BITS_VARIANT_A  1U
+#define CHANN_BITS_VARIANT_A 1U
 
 /* DDR layout */
-#define DDR_CHIP_COUNT              1
-#define DDR_CHIP_COUNT_VARIANT_A    2
+#define DDR_CHIP_COUNT           1U
+#define DDR_CHIP_COUNT_VARIANT_A 2U
 
 static struct fwk_element juno_dmc400_element_table[] = {
     [0] = {
