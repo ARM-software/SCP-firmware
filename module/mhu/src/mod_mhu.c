@@ -95,13 +95,13 @@ static void mhu_isr(void)
          * If the slot is bound to an SMT channel, signal the message to the
          * SMT channel.
          */
-        if (device_ctx->bound_slots & (1 << slot)) {
+        if ((device_ctx->bound_slots & (uint32_t)(1U << slot)) != (uint32_t)0) {
             smt_channel = &device_ctx->smt_channel_table[slot];
             smt_channel->api->signal_message(smt_channel->id);
         }
 
         /* Acknowledge the interrupt */
-        reg->CLEAR = 1 << slot;
+        reg->CLEAR = 1U << slot;
     }
 }
 
@@ -174,11 +174,12 @@ static int mhu_bind(fwk_id_t id, unsigned int round)
     unsigned int slot;
     struct mhu_smt_channel *smt_channel;
 
-    if ((round == 1) && fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
+    if ((round == 1U) && fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
         device_ctx = &mhu_ctx.device_ctx_table[fwk_id_get_element_idx(id)];
 
         for (slot = 0; slot < MHU_SLOT_COUNT_MAX; slot++) {
-            if (!(device_ctx->bound_slots & (1 << slot)))
+            if ((device_ctx->bound_slots & (uint32_t)(1U << slot)) ==
+                (uint32_t)0)
                 continue;
 
             smt_channel = &device_ctx->smt_channel_table[slot];

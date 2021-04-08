@@ -25,11 +25,12 @@
 
 /* SoC wakeup composite state */
 #define MOD_SYSTEM_POWER_SOC_WAKEUP_STATE \
-    MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_2, \
-                           0, \
-                           MOD_PD_STATE_ON, \
-                           MOD_PD_STATE_ON, \
-                           MOD_PD_STATE_ON)
+    MOD_PD_COMPOSITE_STATE( \
+        (unsigned int)MOD_PD_LEVEL_2, \
+        0U, \
+        (unsigned int)MOD_PD_STATE_ON, \
+        (unsigned int)MOD_PD_STATE_ON, \
+        (unsigned int)MOD_PD_STATE_ON)
 
 /* Element context */
 struct system_power_dev_ctx {

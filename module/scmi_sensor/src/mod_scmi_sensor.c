@@ -314,7 +314,7 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
         }
 
         desc.sensor_attributes_low = SCMI_SENSOR_DESC_ATTRIBUTES_LOW(
-            0, /* Asyncronous reading not-supported */
+            0U, /* Asyncronous reading not-supported */
             (uint32_t)sensor_info.trip_point.count);
 
         desc.sensor_attributes_high = SCMI_SENSOR_DESC_ATTRIBUTES_HIGH(
@@ -507,14 +507,16 @@ static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
     }
 
     flags = parameters->flags;
-    if ((flags & ~SCMI_SENSOR_PROTOCOL_READING_GET_ASYNC_FLAG_MASK) != 0) {
+    if ((flags & ~SCMI_SENSOR_PROTOCOL_READING_GET_ASYNC_FLAG_MASK) !=
+        (uint32_t)0) {
         return_values.status = SCMI_INVALID_PARAMETERS;
         status = FWK_SUCCESS;
         goto exit;
     }
 
     /* Reject asynchronous read requests for now */
-    if (flags & SCMI_SENSOR_PROTOCOL_READING_GET_ASYNC_FLAG_MASK) {
+    if ((flags & SCMI_SENSOR_PROTOCOL_READING_GET_ASYNC_FLAG_MASK) !=
+        (uint32_t)0) {
         return_values.status = SCMI_NOT_SUPPORTED;
         status = FWK_SUCCESS;
         goto exit;

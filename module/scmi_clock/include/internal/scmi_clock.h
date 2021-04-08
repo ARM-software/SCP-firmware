@@ -142,13 +142,13 @@ struct scmi_clock_rate_get_p2a {
  */
 
 /* If set, set the new clock rate asynchronously */
-#define SCMI_CLOCK_RATE_SET_ASYNC_POS                0
+#define SCMI_CLOCK_RATE_SET_ASYNC_POS 0U
 /* If set, do not send a delayed asynchronous response */
-#define SCMI_CLOCK_RATE_SET_NO_DELAYED_RESPONSE_POS  1
+#define SCMI_CLOCK_RATE_SET_NO_DELAYED_RESPONSE_POS 1U
 /* Round up, if set, otherwise round down */
-#define SCMI_CLOCK_RATE_SET_ROUND_UP_POS           2
+#define SCMI_CLOCK_RATE_SET_ROUND_UP_POS 2U
 /* If set, the platform chooses the appropriate rounding mode */
-#define SCMI_CLOCK_RATE_SET_ROUND_AUTO_POS           3
+#define SCMI_CLOCK_RATE_SET_ROUND_AUTO_POS 3U
 
 #define SCMI_CLOCK_RATE_SET_ASYNC_MASK \
     (UINT32_C(0x1) << SCMI_CLOCK_RATE_SET_ASYNC_POS)

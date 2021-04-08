@@ -246,7 +246,7 @@ static int scmi_device_state_to_pd_state(uint32_t scmi_state,
     uint32_t scmi_state_id;
     bool ctx_lost;
 
-    ctx_lost = !!(scmi_state & SCMI_PD_DEVICE_STATE_TYPE);
+    ctx_lost = ((scmi_state & SCMI_PD_DEVICE_STATE_TYPE) != (uint32_t)0);
     scmi_state_id = scmi_state & SCMI_PD_DEVICE_STATE_ID_MASK;
 
     if (scmi_state_id == SCMI_PD_DEVICE_STATE_ID) {
@@ -481,7 +481,9 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
 
     parameters = (const struct scmi_pd_power_state_set_a2p *)payload;
 
-    is_sync = !(parameters->flags & SCMI_PD_POWER_STATE_SET_ASYNC_FLAG_MASK);
+    is_sync =
+        ((parameters->flags & SCMI_PD_POWER_STATE_SET_ASYNC_FLAG_MASK) ==
+         (uint32_t)0);
 
     status = scmi_pd_ctx.scmi_api->get_agent_id(service_id, &agent_id);
     if (status != FWK_SUCCESS)
@@ -497,9 +499,9 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    if (((parameters->flags & ~SCMI_PD_POWER_STATE_SET_FLAGS_MASK) != 0x0) ||
+    if (((parameters->flags & ~SCMI_PD_POWER_STATE_SET_FLAGS_MASK) != 0x0U) ||
         ((parameters->power_state &
-          ~SCMI_PD_POWER_STATE_SET_POWER_STATE_MASK) != 0x0)) {
+          ~SCMI_PD_POWER_STATE_SET_POWER_STATE_MASK) != 0x0U)) {
         status = FWK_SUCCESS;
         return_values.status = SCMI_INVALID_PARAMETERS;
 

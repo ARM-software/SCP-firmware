@@ -88,7 +88,9 @@ static int smt_get_secure(fwk_id_t channel_id, bool *secure)
     channel_ctx =
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
 
-    *secure = channel_ctx->config->policies & MOD_SMT_POLICY_SECURE;
+    *secure =
+        ((channel_ctx->config->policies & MOD_SMT_POLICY_SECURE) !=
+         (uint32_t)0);
 
     return FWK_SUCCESS;
 }
@@ -243,7 +245,7 @@ static int smt_transmit(fwk_id_t channel_id, uint32_t message_header,
      * bit, and while it is probably safe to just overwrite the data
      * the agent could be in the process of reading.
      */
-    if (!(memory->status & MOD_SMT_MAILBOX_STATUS_FREE_MASK))
+    if ((memory->status & MOD_SMT_MAILBOX_STATUS_FREE_MASK) == (uint32_t)0)
         return FWK_E_BUSY;
 
     memory->message_header = message_header;
@@ -589,12 +591,13 @@ static int smt_process_notification(
         return FWK_SUCCESS;
     }
 
-    if (channel_ctx->config->policies & MOD_SMT_POLICY_INIT_MAILBOX) {
+    if ((channel_ctx->config->policies & MOD_SMT_POLICY_INIT_MAILBOX) !=
+        (uint32_t)0) {
         /* Initialize mailbox */
         *((struct mod_smt_memory *)channel_ctx->config->mailbox_address) =
-            (struct mod_smt_memory) {
-            .status = (1 << MOD_SMT_MAILBOX_STATUS_FREE_POS)
-        };
+            (struct mod_smt_memory){
+                .status = (1U << MOD_SMT_MAILBOX_STATUS_FREE_POS)
+            };
 
         /* Notify that this mailbox is initialized */
         struct fwk_event smt_channels_initialized_notification = {

@@ -26,8 +26,8 @@ enum scmi_sys_power_notification_id {
  * SYSTEM_POWER_STATE_SET
  */
 
-#define STATE_SET_FLAGS_MASK 0x1
-#define STATE_SET_FLAGS_GRACEFUL_REQUEST 0x1
+#define STATE_SET_FLAGS_MASK             0x1U
+#define STATE_SET_FLAGS_GRACEFUL_REQUEST 0x1U
 
 enum scmi_system_state {
     SCMI_SYSTEM_STATE_SHUTDOWN,
