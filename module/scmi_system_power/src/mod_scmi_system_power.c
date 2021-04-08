@@ -275,7 +275,7 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
 
     parameters = (const struct scmi_sys_power_state_set_a2p *)payload;
 
-    if (parameters->flags & (~STATE_SET_FLAGS_MASK)) {
+    if (parameters->flags & (uint32_t)(~STATE_SET_FLAGS_MASK)) {
         return_values.status = SCMI_INVALID_PARAMETERS;
         goto exit;
     }
@@ -305,7 +305,7 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
         &policy_status,
         &scmi_system_state,
         service_id,
-        (parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST));
+        (parameters->flags & (uint32_t)STATE_SET_FLAGS_GRACEFUL_REQUEST));
 
     if (status != FWK_SUCCESS) {
         return_values.status = SCMI_GENERIC_ERROR;

@@ -313,7 +313,7 @@ static const char * const default_state_name_table[] = {
 static bool is_valid_state(const struct pd_ctx *pd, unsigned int state)
 {
     return (state < MOD_PD_STATE_COUNT_MAX) &&
-            ((pd->valid_state_mask & (1 << state)) != 0);
+        ((pd->valid_state_mask & ((uint32_t)1 << state)) != (uint32_t)0);
 }
 
 static unsigned int normalize_state(unsigned int state)
@@ -348,8 +348,9 @@ static bool is_allowed_by_child(const struct pd_ctx *child,
     if (parent_state >= child->allowed_state_mask_table_size)
         return false;
 
-    return ((child->allowed_state_mask_table[parent_state]
-            & (1 << child_state)) != 0);
+    return (
+        (child->allowed_state_mask_table[parent_state] &
+         ((uint32_t)1 << child_state)) != (uint32_t)0);
 }
 
 static bool is_allowed_by_children(const struct pd_ctx *pd, unsigned int state)
@@ -385,10 +386,10 @@ static unsigned int number_of_bits_to_shift(uint32_t mask)
 {
     unsigned int num_bits = 0;
 
-    if (!mask)
+    if (mask == (uint32_t)0)
         return 0;
 
-    while (!(mask & 1)) {
+    while ((mask & (uint32_t)1) == (uint32_t)0) {
         mask = mask >> 1;
         num_bits++;
     }
@@ -443,8 +444,7 @@ static int get_highest_level_from_composite_state(
 static bool is_valid_composite_state(struct pd_ctx *target_pd,
                                      uint32_t composite_state)
 {
-    enum mod_pd_level level;
-    enum mod_pd_level highest_level;
+    unsigned int level, highest_level;
     unsigned int state, child_state = MOD_PD_STATE_OFF;
     struct pd_ctx *pd = target_pd;
     struct pd_ctx *child = NULL;
@@ -757,7 +757,7 @@ static void process_set_state_request(
     struct pd_set_state_response *resp_params;
     uint32_t composite_state;
     bool up, first_power_state_transition_initiated, composite_state_operation;
-    enum mod_pd_level lowest_level, highest_level, level;
+    unsigned int lowest_level, highest_level, level;
     unsigned int nb_pds, pd_index, state;
     struct pd_ctx *pd, *pd_in_charge_of_response;
     const struct pd_ctx *parent;
@@ -782,7 +782,7 @@ static void process_set_state_request(
     lowest_level = 0;
     highest_level =
         get_highest_level_from_composite_state(lowest_pd, composite_state);
-    nb_pds = highest_level + 1;
+    nb_pds = highest_level + 1U;
 
     status = FWK_SUCCESS;
     pd = lowest_pd;
@@ -914,7 +914,7 @@ static void process_set_state_request(
  */
 static int complete_system_suspend(struct pd_ctx *target_pd)
 {
-    enum mod_pd_level level;
+    unsigned int level;
     unsigned int shift, composite_state = 0;
     struct pd_ctx *pd = target_pd;
     struct fwk_event event, resp_event;
@@ -938,7 +938,7 @@ static int complete_system_suspend(struct pd_ctx *target_pd)
      * to build the composite state with MOD_PD_STATE_OFF power state for all
      * levels but the last one.
      */
-    level = 0;
+    level = 0U;
     do {
         shift = number_of_bits_to_shift(state_mask_table[level]);
         composite_state |=
@@ -976,9 +976,9 @@ static void process_get_state_request(struct pd_ctx *pd,
     const struct pd_get_state_request *req_params,
     struct pd_get_state_response *resp_params)
 {
-    enum mod_pd_level level = 0;
+    unsigned int level = 0U;
     struct pd_ctx *const base_pd = pd;
-    unsigned int composite_state = 0;
+    unsigned int composite_state = 0U;
     uint32_t shift;
     const uint32_t *state_mask_table;
     int table_size, cs_idx = 0;

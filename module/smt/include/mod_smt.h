@@ -27,10 +27,10 @@
 #define MOD_SMT_POLICY_NONE         ((uint32_t)0)
 
 /*! This channel is secure */
-#define MOD_SMT_POLICY_SECURE       ((uint32_t)(1 << 0))
+#define MOD_SMT_POLICY_SECURE ((uint32_t)(1U << 0))
 
 /*! The mailbox for this channel requires initialization */
-#define MOD_SMT_POLICY_INIT_MAILBOX ((uint32_t)(1 << 1))
+#define MOD_SMT_POLICY_INIT_MAILBOX ((uint32_t)(1U << 1))
 
 /*!
  * \}

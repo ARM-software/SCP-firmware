@@ -359,8 +359,8 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
         goto exit;
 
 #ifndef BUILD_HAS_MOD_RESOURCE_PERMS
-    permissions =
-        MOD_SCMI_PERF_PERMS_SET_LIMITS | MOD_SCMI_PERF_PERMS_SET_LEVEL;
+    permissions = ((uint32_t)MOD_SCMI_PERF_PERMS_SET_LIMITS) |
+        ((uint32_t)MOD_SCMI_PERF_PERMS_SET_LEVEL);
 #else
     status = scmi_perf_permissions_handler(
         service_id, payload, MOD_SCMI_PERF_LIMITS_SET);
@@ -390,8 +390,8 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
     return_values = (struct scmi_perf_domain_attributes_p2a){
         .status = SCMI_SUCCESS,
         .attributes = SCMI_PERF_DOMAIN_ATTRIBUTES(
-            notifications,
-            notifications,
+            (uint32_t)notifications,
+            (uint32_t)notifications,
             ((permissions & (uint32_t)MOD_SCMI_PERF_PERMS_SET_LEVEL) !=
              (uint32_t)0) ?
                 1U :
@@ -400,7 +400,7 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
              (uint32_t)0) ?
                 1U :
                 0U,
-            fast_channels),
+            (uint32_t)fast_channels),
         .rate_limit = 0, /* Unsupported */
         .sustained_freq = opp.frequency,
         .sustained_perf_level = opp.level,

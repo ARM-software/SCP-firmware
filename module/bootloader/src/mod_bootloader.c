@@ -99,7 +99,7 @@ static int load_image(void)
 
             if (status != FWK_SUCCESS)
                 return status;
-            if (image_flags & IMAGE_FLAGS_VALID_MASK)
+            if ((image_flags & (uint32_t)IMAGE_FLAGS_VALID_MASK) != (uint32_t)0)
                 break;
         }
 

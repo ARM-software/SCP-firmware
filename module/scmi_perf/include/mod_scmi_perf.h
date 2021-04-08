@@ -35,10 +35,10 @@ enum mod_scmi_perf_permissions {
     MOD_SCMI_PERF_PERMS_NONE = 0,
 
     /*! Permission to set performance level */
-    MOD_SCMI_PERF_PERMS_SET_LEVEL  = (1 << 0),
+    MOD_SCMI_PERF_PERMS_SET_LEVEL = (1U << 0),
 
     /*! Permission to set performance limits */
-    MOD_SCMI_PERF_PERMS_SET_LIMITS = (1 << 1),
+    MOD_SCMI_PERF_PERMS_SET_LIMITS = (1U << 1),
 };
 
 /*!

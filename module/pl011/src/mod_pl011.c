@@ -595,7 +595,8 @@ static int mod_pl011_io_putch(const struct fwk_io_stream *stream, char ch)
     if (!ctx->powered || !ctx->clocked)
         return FWK_E_PWRSTATE;
 
-    if ((ch == '\n') && !(stream->mode & FWK_IO_MODE_BINARY))
+    if ((ch == '\n') &&
+        (((unsigned int)stream->mode & (unsigned int)FWK_IO_MODE_BINARY)) == 0U)
         mod_pl011_putch(stream->id, '\r'); /* Prepend carriage return */
 
     mod_pl011_putch(stream->id, ch);

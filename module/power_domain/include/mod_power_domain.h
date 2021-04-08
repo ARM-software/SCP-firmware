@@ -238,7 +238,7 @@ enum mod_pd_state_mask {
 /*!
  * \brief Mask for a composite power state.
  */
-#define MOD_PD_CS_STATE_MASK ((1 << MOD_PD_CS_STATE_BITS_PER_LEVEL) - 1)
+#define MOD_PD_CS_STATE_MASK ((1U << MOD_PD_CS_STATE_BITS_PER_LEVEL) - 1U)
 
 /*!
  * \brief Shifts for the states and child policies fields in a composite

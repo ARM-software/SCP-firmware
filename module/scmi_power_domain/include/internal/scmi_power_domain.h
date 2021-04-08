@@ -25,11 +25,11 @@
 
 #define SCMI_PROTOCOL_VERSION_POWER_DOMAIN UINT32_C(0x20000)
 
-#define SCMI_PD_DEVICE_STATE_ID_OFF    0
-#define SCMI_PD_DEVICE_STATE_ID_ON     0
-#define SCMI_PD_DEVICE_STATE_ID 0
-#define SCMI_PD_DEVICE_STATE_ID_MASK   0xFFFFFFF
-#define SCMI_PD_DEVICE_STATE_TYPE      (1 << 30)
+#define SCMI_PD_DEVICE_STATE_ID_OFF  0U
+#define SCMI_PD_DEVICE_STATE_ID_ON   0U
+#define SCMI_PD_DEVICE_STATE_ID      0U
+#define SCMI_PD_DEVICE_STATE_ID_MASK 0xFFFFFFFU
+#define SCMI_PD_DEVICE_STATE_TYPE    (1U << 30)
 
 /*!
  * \brief SCMI Power Domain Protocol Notifications message ids.
@@ -60,8 +60,8 @@ struct scmi_pd_power_domain_attributes_a2p {
 };
 
 #define SCMI_PD_POWER_STATE_CHANGE_NOTIFICATIONS (1UL << 31)
-#define SCMI_PD_POWER_STATE_SET_ASYNC    (1 << 30)
-#define SCMI_PD_POWER_STATE_SET_SYNC     (1 << 29)
+#define SCMI_PD_POWER_STATE_SET_ASYNC            (1U << 30)
+#define SCMI_PD_POWER_STATE_SET_SYNC             (1U << 29)
 
 struct scmi_pd_power_domain_attributes_p2a {
     int32_t status;
@@ -73,8 +73,8 @@ struct scmi_pd_power_domain_attributes_p2a {
  * POWER_STATE_SET
  */
 
-#define SCMI_PD_POWER_STATE_SET_ASYNC_FLAG_MASK    (1 << 0)
-#define SCMI_PD_POWER_STATE_SET_FLAGS_MASK (1 << 0)
+#define SCMI_PD_POWER_STATE_SET_ASYNC_FLAG_MASK  (1U << 0)
+#define SCMI_PD_POWER_STATE_SET_FLAGS_MASK       (1U << 0)
 #define SCMI_PD_POWER_STATE_SET_POWER_STATE_MASK UINT32_C(0x4FFFFFFF)
 
 struct scmi_pd_power_state_set_a2p {

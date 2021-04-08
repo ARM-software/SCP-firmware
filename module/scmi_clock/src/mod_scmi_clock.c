@@ -340,8 +340,8 @@ static void get_state_respond(fwk_id_t clock_dev_id,
     struct scmi_clock_attributes_p2a return_values = { 0 };
 
     if (status == FWK_SUCCESS) {
-        return_values.attributes =
-            SCMI_CLOCK_ATTRIBUTES(*clock_state == MOD_CLOCK_STATE_RUNNING);
+        return_values.attributes = SCMI_CLOCK_ATTRIBUTES(
+            (uint32_t)(*clock_state == MOD_CLOCK_STATE_RUNNING));
 
         strncpy(return_values.clock_name,
                 fwk_module_get_name(clock_dev_id),
