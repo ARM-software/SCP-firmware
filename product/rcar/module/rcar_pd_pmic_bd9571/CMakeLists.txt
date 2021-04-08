@@ -12,8 +12,8 @@ target_include_directories(${SCP_MODULE_TARGET}
 
 target_sources(
     ${SCP_MODULE_TARGET}
-    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_rcar_pd_core.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/rcar_pd_core.c")
+    PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_rcar_pd_pmic_bd9571.c")
 
 target_link_libraries(${SCP_MODULE_TARGET}
-    PRIVATE  module-rcar-system-power ${SCP_ARCHITECTURE_TARGET})
+    PRIVATE module-rcar-pmic module-rcar-system module-power-domain)

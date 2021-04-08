@@ -5,6 +5,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-set(SCP_MODULE "rcar-mock-pmic")
+set(SCP_MODULE "rcar-mock-pmic-bd9571")
 
-set(SCP_MODULE_TARGET "module-rcar-mock-pmic")
+set(SCP_MODULE_TARGET "module-rcar-mock-pmic-bd9571")
