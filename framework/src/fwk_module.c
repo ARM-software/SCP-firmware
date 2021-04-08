@@ -127,7 +127,11 @@ static void fwk_module_init_element_ctxs(
 
 void fwk_module_init(void)
 {
-    for (enum fwk_module_idx i = 0; i < FWK_MODULE_IDX_COUNT; i++) {
+    /*
+     * The loop index i gets the values corresponding to the
+     * enum fwk_module_idx
+     */
+    for (uint32_t i = 0U; i < (uint32_t)FWK_MODULE_IDX_COUNT; i++) {
         struct fwk_module_ctx *ctx = &fwk_module_ctx.module_ctx_table[i];
 
         fwk_id_t id = FWK_ID_MODULE(i);
@@ -253,7 +257,7 @@ static void fwk_module_init_module(struct fwk_module_ctx *ctx)
 
 static void fwk_module_init_modules(void)
 {
-    for (enum fwk_module_idx i = 0; i < FWK_MODULE_IDX_COUNT; i++)
+    for (unsigned int i = 0U; i < (unsigned int)FWK_MODULE_IDX_COUNT; i++)
         fwk_module_init_module(&fwk_module_ctx.module_ctx_table[i]);
 }
 
@@ -665,7 +669,7 @@ int fwk_module_bind(fwk_id_t target_id, fwk_id_t api_id, const void *api)
     return FWK_SUCCESS;
 
 error:
-    fwk_check(false);
+    fwk_check((bool)false);
     FWK_LOG_CRIT(fwk_module_err_msg_func, status, __func__);
     return status;
 }

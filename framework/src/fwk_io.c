@@ -73,7 +73,8 @@ int fwk_io_init(void)
             status = fwk_io_open(
                 &stdin_stream,
                 FMW_IO_STDIN_ID,
-                FWK_IO_MODE_READ | FWK_IO_MODE_WRITE);
+                ((unsigned int)FWK_IO_MODE_READ) |
+                    ((unsigned int)FWK_IO_MODE_WRITE));
             if (fwk_expect(status == FWK_SUCCESS)) {
                 fwk_io_stdin = &stdin_stream;
                 fwk_io_stdout = &stdin_stream;
@@ -106,8 +107,8 @@ int fwk_io_open(
 {
     int status;
 
-    bool read = mode & FWK_IO_MODE_READ;
-    bool write = mode & FWK_IO_MODE_WRITE;
+    bool read = (((unsigned int)mode & (unsigned int)FWK_IO_MODE_READ) != 0U);
+    bool write = (((unsigned int)mode & (unsigned int)FWK_IO_MODE_WRITE) != 0U);
 
     if (!fwk_expect(stream != NULL))
         return FWK_E_PARAM;
@@ -158,7 +159,9 @@ int fwk_io_getch(const struct fwk_io_stream *stream, char *ch)
     if (!fwk_expect(stream->adapter != NULL))
         return FWK_E_STATE; /* The stream is not open */
 
-    if (!fwk_expect(stream->mode & FWK_IO_MODE_READ))
+    if (!fwk_expect(
+            (((unsigned int)stream->mode) & ((unsigned int)FWK_IO_MODE_READ)) !=
+            0U))
         return FWK_E_SUPPORT; /* Stream not open for read operations */
 
     fwk_assert(stream->adapter->getch != NULL);
@@ -182,7 +185,9 @@ int fwk_io_putch(const struct fwk_io_stream *stream, char ch)
     if (!fwk_expect(stream->adapter != NULL))
         return FWK_E_STATE; /* The stream is not open */
 
-    if (!fwk_expect(stream->mode & FWK_IO_MODE_WRITE))
+    if (!fwk_expect(
+            (((unsigned int)stream->mode) &
+             ((unsigned int)FWK_IO_MODE_WRITE)) != 0U))
         return FWK_E_SUPPORT; /* Stream not open for read operations */
 
     fwk_assert(stream->adapter->putch != NULL);

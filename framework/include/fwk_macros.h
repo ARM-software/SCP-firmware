@@ -187,8 +187,9 @@
  * \return None.
  */
 #define FWK_BUILD_VERSION \
-    (((BUILD_VERSION_MAJOR & 0xffU) << 24) | \
-     ((BUILD_VERSION_MINOR & 0xffU) << 16) | (BUILD_VERSION_PATCH & 0xffffU))
+    ((((unsigned int)BUILD_VERSION_MAJOR & 0xffU) << 24) | \
+     (((unsigned int)BUILD_VERSION_MINOR & 0xffU) << 16) | \
+     ((unsigned int)BUILD_VERSION_PATCH & 0xffffU))
 
 /*!
  * \internal
