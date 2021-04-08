@@ -163,7 +163,7 @@ static int set_isr_nmi_param(void (*isr)(uintptr_t param), uintptr_t parameter)
 {
     struct callback *entry;
 
-    entry = &callback[NVIC_USER_IRQ_OFFSET + NonMaskableInt_IRQn - 1];
+    entry = &callback[NVIC_USER_IRQ_OFFSET + (int)NonMaskableInt_IRQn - 1];
     entry->func = isr;
     entry->param = parameter;
 
@@ -190,7 +190,7 @@ static int get_current(unsigned int *interrupt)
     if (*interrupt == 0)
         return FWK_E_STATE;
 
-    if (*interrupt == (NVIC_USER_IRQ_OFFSET + NonMaskableInt_IRQn))
+    if (*interrupt == (NVIC_USER_IRQ_OFFSET + (int)NonMaskableInt_IRQn))
         *interrupt = FWK_INTERRUPT_NMI;
     else if (*interrupt < NVIC_USER_IRQ_OFFSET)
         *interrupt = FWK_INTERRUPT_EXCEPTION;
@@ -229,7 +229,7 @@ int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
     uint32_t align_word;
 
     uint32_t *vector;
-    IRQn_Type irq;
+    unsigned int irq;
 
     if (driver == NULL)
         return FWK_E_PARAM;
@@ -255,7 +255,7 @@ int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
      */
 
     /* Calculate the next power of two */
-    align_entries = UINT32_C(1) << (32 - __CLZ(isr_count - 1));
+    align_entries = UINT32_C(1) << (32U - __CLZ(isr_count - 1U));
 
     /* Calculate alignment on a word boundary */
     align_word = align_entries * sizeof(vector[0]);
@@ -277,13 +277,13 @@ int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
     SCB->VTOR = (uint32_t)vector;
 
     /* Initialize IRQs */
-    for (irq = 0; irq < (IRQn_Type)irq_count; irq++) {
+    for (irq = 0; irq < irq_count; irq++) {
         /* Ensure IRQs are disabled during boot sequence */
-        NVIC_DisableIRQ(irq);
-        NVIC_ClearPendingIRQ(irq);
+        NVIC_DisableIRQ((IRQn_Type)irq);
+        NVIC_ClearPendingIRQ((IRQn_Type)irq);
 
         /* Initialize all IRQ entries to point to the irq_invalid() handler */
-        NVIC_SetVector(irq, (uint32_t)irq_invalid);
+        NVIC_SetVector((IRQn_Type)irq, (uint32_t)irq_invalid);
     }
 
     __enable_irq();
