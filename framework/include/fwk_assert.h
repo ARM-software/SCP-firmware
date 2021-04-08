@@ -81,7 +81,7 @@
 #if defined(NDEBUG) || defined(__clang_analyzer__)
 #    define fwk_unreachable() __builtin_unreachable()
 #else
-#    define fwk_unreachable() fwk_assert(false)
+#    define fwk_unreachable() fwk_assert((bool)false)
 #endif
 
 /*!
@@ -115,7 +115,7 @@
 #if defined(NDEBUG) || defined(BUILD_TESTS) || defined(__clang_analyzer__)
 #    define fwk_unexpected() ((void)0)
 #else
-#    define fwk_unexpected() fwk_assert(false)
+#    define fwk_unexpected() fwk_assert((bool)false)
 #endif
 
 /*!
