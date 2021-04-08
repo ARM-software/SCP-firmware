@@ -12,8 +12,9 @@ target_include_directories(${SCP_MODULE_TARGET}
 
 target_sources(
     ${SCP_MODULE_TARGET}
-    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_rcar_mock_pmic_driver_api.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_rcar_mock_pmic_module.c")
+    PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_rcar_mock_pmic_bd9571_driver_api.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_rcar_mock_pmic_bd9571_module.c")
 
 target_link_libraries(${SCP_MODULE_TARGET}
-    PRIVATE module-rcar-pmic)
+    PRIVATE module-rcar-pmic module-power-domain)

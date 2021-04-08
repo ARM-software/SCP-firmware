@@ -8,9 +8,7 @@ add_library(${SCP_MODULE_TARGET} SCP_MODULE)
 
 target_include_directories(${SCP_MODULE_TARGET}
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
-    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src"
-    PUBLIC "${CMAKE_SOURCE_DIR}/arch/arm/armv8-a/include/lib"
-    PUBLIC "${CMAKE_SOURCE_DIR}/arch/arm/armv8-a/include")
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 target_sources(
     ${SCP_MODULE_TARGET}
@@ -22,5 +20,6 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/src/rcar_call_sram.S")
 
 target_link_libraries(${SCP_MODULE_TARGET}
-    PRIVATE module-rcar-clock module-rcar-reg-sensor module-sensor
-            module-rcar-scif module-scmi module-system-power)
+    PRIVATE module-sds module-rcar-clock module-rcar-reg-sensor module-sensor
+            module-rcar-scif module-scmi module-system-power
+            ${SCP_ARCHITECTURE_TARGET})
