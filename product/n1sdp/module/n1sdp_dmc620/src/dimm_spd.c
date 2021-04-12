@@ -43,28 +43,32 @@ static int spd_read(struct mod_n1sdp_i2c_master_api_polled *i2c_api,
 
     status = i2c_api->write((FWK_ID_ELEMENT(FWK_MODULE_IDX_N1SDP_I2C, 0)),
                             WRITE_PAGE0, data, SPD_W_TRANSFER_SIZE, SPD_STOP);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     for (i = SPD_PAGE0_START; i <= MAX_SPD_PAGE0; i++) {
         status = i2c_api->read((FWK_ID_ELEMENT(FWK_MODULE_IDX_N1SDP_I2C, 0)),
                                address, (char *)&spd_data[i],
                                SPD_R_TRANSFER_SIZE);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     status = i2c_api->write((FWK_ID_ELEMENT(FWK_MODULE_IDX_N1SDP_I2C, 0)),
                             WRITE_PAGE1, data, SPD_W_TRANSFER_SIZE, SPD_STOP);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     for (i = SPD_PAGE1_START; i <= MAX_SPD_PAGE1; i++) {
         status = i2c_api->read((FWK_ID_ELEMENT(FWK_MODULE_IDX_N1SDP_I2C, 0)),
                                address, (char *)&spd_data[i],
                                SPD_R_TRANSFER_SIZE);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return FWK_SUCCESS;
@@ -81,21 +85,25 @@ static int chk_ddr4_dimms(unsigned int speed,
     dimm0_dram_param = (uint8_t *)dimm0;
     dimm1_dram_param = (uint8_t *)dimm1;
 
-    if (memcmp(dimm0_dram_param, dimm1_dram_param, 125) != 0)
+    if (memcmp(dimm0_dram_param, dimm1_dram_param, 125) != 0) {
         return FWK_E_DATA;
+    }
 
     switch (speed) {
     case 800:
-        if ((dimm0_dram_param[18] > 0x0A) || (dimm1_dram_param[18] > 0x0A))
+        if ((dimm0_dram_param[18] > 0x0A) || (dimm1_dram_param[18] > 0x0A)) {
             return FWK_E_DATA;
+        }
         break;
     case 1200:
-        if ((dimm0_dram_param[18] > 0x07) || (dimm1_dram_param[18] > 0x07))
+        if ((dimm0_dram_param[18] > 0x07) || (dimm1_dram_param[18] > 0x07)) {
             return FWK_E_DATA;
+        }
         break;
     case 1333:
-        if ((dimm0_dram_param[18] > 0x06) || (dimm1_dram_param[18] > 0x06))
+        if ((dimm0_dram_param[18] > 0x06) || (dimm1_dram_param[18] > 0x06)) {
             return FWK_E_DATA;
+        }
         break;
     default:
         fwk_unexpected();
@@ -116,8 +124,9 @@ static void dimm_device_data(uint8_t *spd_data, uint8_t dimm_id)
             "    Manufacturer ID = 0x%x 0x%x", spd_data[320], spd_data[321]);
 
         j = 0;
-        for (i = 329; i <= 348; i++)
+        for (i = 329; i <= 348; i++) {
             part_num[j++] = spd_data[i];
+        }
 
         FWK_LOG_INFO("    Module part number = %s", part_num);
 
@@ -449,8 +458,9 @@ int dimm_spd_init_check(struct mod_n1sdp_i2c_master_api_polled *i2c_api,
     spd_read(i2c_api, DIMM1_SPD_SLAVE, (uint8_t *)&ddr4_dimm1);
 
     status = chk_ddr4_dimms(ddr->speed, &ddr4_dimm0, &ddr4_dimm1);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     dmc_clk_freq = ddr->speed * UINT32_C(1000000);
     dmc_clk_period = 1.0f / dmc_clk_freq;
@@ -472,27 +482,32 @@ int dimm_spd_address_control(uint32_t *temp_reg, struct dimm_info *ddr)
 
     temp = ddr4_dimm0.dram_param.sdram_addr;
     status = get_dimm_col_bits(temp, temp_reg);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = get_dimm_row_bits(temp, temp_reg);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     temp = ddr4_dimm0.dram_param.sdram_density_banks;
     status = get_dimm_bank_addr_grp_bits(temp, temp_reg);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     temp = ddr4_dimm0.dram_param.mod_org;
     status = get_dimm_rank_bits(temp, temp_reg, ddr);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     temp = ddr4_dimm0.dram_param.sdram_pkg_type;
     status = get_dimm_cid_bits(temp, temp_reg);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return FWK_SUCCESS;
 }
@@ -504,8 +519,9 @@ int dimm_spd_format_control(uint32_t *temp_reg)
 
     temp = ddr4_dimm0.dram_param.mod_mem_bus_width;
     status = get_dimm_memory_width(temp, temp_reg);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return FWK_SUCCESS;
 }
@@ -517,22 +533,26 @@ int dimm_spd_memory_type(uint32_t *temp_reg, struct dimm_info *ddr)
 
     temp = ddr4_dimm0.dram_param.kb_dram_type;
     status = get_dimm_memory_type_nxt(temp, temp_reg);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = get_dimm_row_bits(temp, temp_reg);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     temp = ddr4_dimm0.dram_param.sdram_density_banks;
     status = get_dimm_bank_grp_bits(temp, temp_reg);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     temp = ddr4_dimm0.dram_param.mod_org;
     status = get_dimm_memory_device_width_next_bits(temp, temp_reg, ddr);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return FWK_SUCCESS;
 }
@@ -570,8 +590,9 @@ int dimm_spd_t_rfc(uint32_t *temp_reg)
 
     if (multi_rank == true) {
         status = dimm_spd_t_refi(&tmp_value);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         *temp_reg |= (T_RFCFC_NEXT_MASK &
                      ((uint32_t)((float)tmp_value/t_refi) << 20));
@@ -747,36 +768,40 @@ int dimm_spd_calculate_dimm_size_gb(uint32_t *size_gb)
     temp = ddr4_dimm0.dram_param.sdram_density_banks;
     temp = (temp & SPD_SDRAM_DENSITY_MASK) >> SPD_SDRAM_DENSITY_POS;
 
-    if (temp <= 7)
+    if (temp <= 7) {
         size = (uint64_t)(1 << temp) * 256UL * FWK_MIB;
-    else if (temp == 0x8)
+    } else if (temp == 0x8) {
         size = 12UL * FWK_GIB;
-    else if (temp == 0x9)
+    } else if (temp == 0x9) {
         size = 24UL * FWK_GIB;
-    else
+    } else {
         return FWK_E_DEVICE;
+    }
 
     size = size / 8UL;
     temp = ddr4_dimm0.dram_param.mod_mem_bus_width;
     temp = (temp & SPD_PRI_BUS_WIDTH_BITS_MASK) >> SPD_PRI_BUS_WIDTH_BITS_POS;
-    if (temp <= 3)
+    if (temp <= 3) {
         size = size * (uint64_t)((1 << temp) * 8UL);
-    else
+    } else {
         return FWK_E_DEVICE;
+    }
 
     temp = ddr4_dimm0.dram_param.mod_org;
     temp = (temp & SDRAM_DEVICE_WIDTH_MASK) >> SDRAM_DEVICE_WIDTH_POS;
-    if (temp <= 3)
+    if (temp <= 3) {
         size = size / (uint64_t)((1 << temp) * 4);
-    else
+    } else {
         return FWK_E_DEVICE;
+    }
 
     temp = ddr4_dimm0.dram_param.mod_org;
     temp = (temp & SPD_PKG_RANK_BITS_MASK) >> SPD_PKG_RANK_BITS_OFFSET;
-    if (temp <= 7)
+    if (temp <= 7) {
         size = size * (uint64_t)(temp + 1);
-    else
+    } else {
         return FWK_E_DEVICE;
+    }
 
     *size_gb = size / FWK_GIB;
     return FWK_SUCCESS;

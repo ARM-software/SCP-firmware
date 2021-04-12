@@ -322,8 +322,9 @@ int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
                                  PCIE_PHY_PLL_LOCK_TIMEOUT,
                                  pcie_wait_condition,
                                  &wait_data);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
         break;
 
     /* PCIe RC reset request */
@@ -343,8 +344,9 @@ int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
                                  PCIE_CTRL_RC_RESET_TIMEOUT,
                                  pcie_wait_condition,
                                  &wait_data);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
         break;
 
     /* PCIe link training request */
@@ -354,8 +356,9 @@ int pcie_init(struct pcie_ctrl_apb_reg *ctrl_apb,
                                  PCIE_LINK_TRAINING_TIMEOUT,
                                  pcie_wait_condition,
                                  &wait_data);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
         break;
 
     default:
@@ -402,8 +405,9 @@ int axi_outbound_region_setup(uint32_t axi_config_base_addr,
     volatile uint32_t *ptr;
     int count;
 
-    if (region_count >= AXI_OB_REGIONS_MAX)
+    if (region_count >= AXI_OB_REGIONS_MAX) {
         return FWK_E_RANGE;
+    }
 
     memset((void *)&ob_config, 0, sizeof(struct axi_ob_config));
 
@@ -430,8 +434,9 @@ int axi_outbound_region_setup(uint32_t axi_config_base_addr,
 
     ptr = (volatile uint32_t *)&ob_config;
 
-    for (count = 0; count < AXI_OB_REGISTER_COUNT; count++)
+    for (count = 0; count < AXI_OB_REGISTER_COUNT; count++) {
         region_address[count] = ptr[count];
+    }
 
     return FWK_SUCCESS;
 }
@@ -443,10 +448,10 @@ int axi_inbound_region_setup(uint32_t axi_config_base_addr,
 {
     uint32_t offset;
 
-    if ((bar >= AXI_IB_REGIONS_MAX) ||
-        (region_size > AXI_ADDR_NUM_BITS_MAX) ||
-        (__builtin_ctz(axi_base_addr) < AXI_LOW_ADDR_BIT_POS))
+    if ((bar >= AXI_IB_REGIONS_MAX) || (region_size > AXI_ADDR_NUM_BITS_MAX) ||
+        (__builtin_ctz(axi_base_addr) < AXI_LOW_ADDR_BIT_POS)) {
         return FWK_E_PARAM;
+    }
 
     offset = AXI_IB_REGION_REGS_OFFSET + (bar * AXI_IB_REGISTER_SET_SIZE);
     *(uint32_t *)(axi_config_base_addr + offset) = (uint32_t)axi_base_addr |
@@ -460,8 +465,9 @@ int pcie_rp_ep_config_write_word(uint32_t base,
                                  uint32_t offset,
                                  uint32_t value)
 {
-    if ((offset % 4))
+    if ((offset % 4)) {
         return FWK_E_PARAM;
+    }
 
     base |= ROOT_PORT_WRITE_ENABLE;
     *(volatile uint32_t *)(base + offset) = value;
@@ -473,8 +479,9 @@ int pcie_rp_ep_config_read_word(uint32_t base,
                                 uint32_t offset,
                                 uint32_t *value)
 {
-    if ((offset % 4) || (value == NULL))
+    if ((offset % 4) || (value == NULL)) {
         return FWK_E_PARAM;
+    }
 
     *value = *(volatile uint32_t *)(base + offset);
 
@@ -502,10 +509,11 @@ int pcie_set_gen_tx_preset(uint32_t rp_ep_config_apb_base,
     nibble = (gen == PCIE_GEN_3) ? GEN3_PRESET : GEN4_PRESET;
 
     for (i = 0, j = 0; i < 32; i += nibble, j++) {
-        if (j%2 == 0)
+        if (j % 2 == 0) {
             preset_value |= (down_stream_tx_preset << i);
-        else
+        } else {
             preset_value |= (up_stream_tx_preset << i);
+        }
     }
 
     for (offset = offset_min; offset < offset_max; offset += 0x4) {
@@ -514,8 +522,9 @@ int pcie_set_gen_tx_preset(uint32_t rp_ep_config_apb_base,
         pcie_rp_ep_config_read_word(rp_ep_config_apb_base,
                                     offset, &reg_value);
 
-        if (reg_value != preset_value)
+        if (reg_value != preset_value) {
             return FWK_E_DATA;
+        }
     }
     return FWK_SUCCESS;
 }
@@ -554,8 +563,9 @@ int pcie_skip_ext_cap(uint32_t base, uint16_t ext_cap_id)
 int pcie_vc_setup(uint32_t base, uint8_t vc1_tc)
 {
     /* VC1 Traffic class cannot be greater than 7 or equal to 0 */
-    if ((vc1_tc > 7) || (vc1_tc == 0))
+    if ((vc1_tc > 7) || (vc1_tc == 0)) {
         return FWK_E_PARAM;
+    }
 
     /* Map all other TCs to VC0 */
     *(volatile uint32_t *)(base + PCIE_VC_RESOURCE_CTRL_0_OFFSET) =

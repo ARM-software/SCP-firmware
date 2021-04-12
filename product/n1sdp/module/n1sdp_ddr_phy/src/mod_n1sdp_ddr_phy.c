@@ -209,8 +209,9 @@ static void delay_ms(uint32_t ms)
 {
     volatile uint32_t i = 0;
     while (ms) {
-        for (i = 0; i < 6000; i++)
+        for (i = 0; i < 6000; i++) {
             ;
+        }
         ms--;
     }
 }
@@ -231,8 +232,9 @@ uint32_t dci_write_dram(struct mod_dmc620_reg *dmc, uint32_t *scp_address,
     dmc->DIRECT_ADDR = 0x00000002;
     dmc->DIRECT_CMD = (rank_1_hot << 16) | 0x000B;
 
-    while ((dmc->MEMC_STATUS & MOD_DMC620_MEMC_STATUS_MGR_ACTIVE) != 0)
+    while ((dmc->MEMC_STATUS & MOD_DMC620_MEMC_STATUS_MGR_ACTIVE) != 0) {
         ;
+    }
 
     // Set DCI_STRB
     dmc->DCI_STRB = 0x0000000F;
@@ -243,8 +245,9 @@ uint32_t dci_write_dram(struct mod_dmc620_reg *dmc, uint32_t *scp_address,
     dmc->DIRECT_ADDR = 0x00000000;
 
     // Fill the write buffer
-    for (count = 0; count < size_32 ; count++)
+    for (count = 0; count < size_32; count++) {
         dmc->DCI_DATA = scp_address[count];
+    }
 
     // Set the column address to 0
     dmc->DIRECT_ADDR = 0x00000000;
@@ -255,16 +258,18 @@ uint32_t dci_write_dram(struct mod_dmc620_reg *dmc, uint32_t *scp_address,
     // Issue WRITE command
     dmc->DIRECT_CMD = (rank_1_hot << 16) | 0x0008;
 
-    while ((dmc->MEMC_STATUS & MOD_DMC620_MEMC_STATUS_MGR_ACTIVE) != 0)
+    while ((dmc->MEMC_STATUS & MOD_DMC620_MEMC_STATUS_MGR_ACTIVE) != 0) {
         ;
+    }
 
     // Issue precharge direct command
     dmc->DIRECT_ADDR = 0x00000010;
     dmc->DIRECT_CMD = (rank_1_hot << 16) | 0x0002;
     dmc->DIRECT_ADDR = 0x00000000;
 
-    while ((dmc->MEMC_STATUS & MOD_DMC620_MEMC_STATUS_MGR_ACTIVE) != 0)
+    while ((dmc->MEMC_STATUS & MOD_DMC620_MEMC_STATUS_MGR_ACTIVE) != 0) {
         ;
+    }
 
     return FWK_SUCCESS;
 }
@@ -291,12 +296,14 @@ uint32_t dci_read_dram(struct mod_dmc620_reg *dmc, uint32_t *scp_address,
     // Issue READ command
     dmc->DIRECT_CMD = (rank_1_hot << 16) | 0x0007;
 
-    while ((dmc->MEMC_STATUS & MOD_DMC620_MEMC_STATUS_MGR_ACTIVE) != 0)
+    while ((dmc->MEMC_STATUS & MOD_DMC620_MEMC_STATUS_MGR_ACTIVE) != 0) {
         ;
+    }
 
     // Copy read data back to buffer
-    for (count = 0; count < size_32 ; count++)
+    for (count = 0; count < size_32; count++) {
         scp_address[count] = dmc->DCI_DATA;
+    }
 
     // Issue precharge direct command
     dmc->DIRECT_ADDR = 0x00000010;
@@ -386,8 +393,9 @@ static int write_eye_detect_single_rank(fwk_id_t element_id,
     } else if (dmc_id == 1) {
         dmc = (struct mod_dmc620_reg *)SCP_DMC1;
         ddr_phy_base = SCP_DDR_PHY1;
-    } else
+    } else {
         fwk_unexpected();
+    }
 
     best_vrefdq_mr6 = -1;
     for (slice = 0; slice < NUM_SLICES; slice++) {
@@ -466,8 +474,9 @@ static int write_eye_detect_single_rank(fwk_id_t element_id,
             num_completed = 0;
             delay = DEFAULT_DELAY;
             while (num_completed != NUM_DQ_BITS) {
-                if ((delay < DELAY_MIN) || (delay > DELAY_MAX))
+                if ((delay < DELAY_MIN) || (delay > DELAY_MAX)) {
                     break;
+                }
 
                 for (slice = 0; slice < NUM_SLICES; slice++) {
                     for (bit = 0; bit < NUM_BITS_PER_SLICE; bit++) {
@@ -500,12 +509,14 @@ static int write_eye_detect_single_rank(fwk_id_t element_id,
                     wr_data = wr_data_all[data_pattern];
                     ret_code = dci_write_dram(dmc, wr_data,
                                               DCI_FIFO_SIZE, rank, 0);
-                    if (ret_code != FWK_SUCCESS)
+                    if (ret_code != FWK_SUCCESS) {
                         return ret_code;
+                    }
                     ret_code = dci_read_dram(dmc, rd_data,
                                              DCI_FIFO_SIZE, rank, 0);
-                    if (ret_code != FWK_SUCCESS)
+                    if (ret_code != FWK_SUCCESS) {
                         return ret_code;
+                    }
 
                     for (dfi_beat = 0;
                          dfi_beat < NUM_DFI_BEATS_TO_CHECK;
@@ -518,8 +529,9 @@ static int write_eye_detect_single_rank(fwk_id_t element_id,
                                 start_bit = (dqs_edge * 64) +
                                              (slice * NUM_BITS_PER_SLICE);
 
-                                if (slice == NUM_SLICES - 1)
+                                if (slice == NUM_SLICES - 1) {
                                     start_bit += (dqs_edge % 2 == 0) ? 64 : 8;
+                                }
 
                                 word_num = (start_bit / 32) +
                                             dfi_beat_word_offset;
@@ -595,21 +607,25 @@ static int write_eye_detect_single_rank(fwk_id_t element_id,
         for (slice = 0; slice < NUM_SLICES; slice++) {
             min_width = DELAY_MAX;
             num_good_eyes_in_slice = 0;
-            for (i = 0; i < NUM_BITS_PER_SLICE; i++)
+            for (i = 0; i < NUM_BITS_PER_SLICE; i++) {
                 sorted_mids[i] = DELAY_MAX;
+            }
             for (bit = 0; bit < NUM_BITS_PER_SLICE; bit++) {
                 eye = &wrdq_eyes[slice][bit];
-                if (!eye->min_found && !eye->max_found)
+                if (!eye->min_found && !eye->max_found) {
                     break;
+                }
                 eye->width = eye->max - eye->min;
-                if (eye->width < min_width)
+                if (eye->width < min_width) {
                     min_width = eye->width;
+                }
 
                 eye->mid = (eye->min + eye->max) / 2;
                 for (s = 0; s < (int)NUM_BITS_PER_SLICE; s++) {
                     if (eye->mid < sorted_mids[s]) {
-                        for (t = num_good_eyes_in_slice-1; t >= 0; t--)
+                        for (t = num_good_eyes_in_slice - 1; t >= 0; t--) {
                             sorted_mids[t+1] = sorted_mids[t];
+                        }
                         sorted_mids[s] = eye->mid;
                         break;
                     }
@@ -625,8 +641,9 @@ static int write_eye_detect_single_rank(fwk_id_t element_id,
         better_slices = 0;
         for (slice = 0; slice < NUM_SLICES; slice++) {
             if (slice_eye_stats[slice].min_width >
-                best_slice_eye_stats[slice].min_width)
+                best_slice_eye_stats[slice].min_width) {
                 better_slices++;
+            }
         }
         if (better_slices == NUM_SLICES) {
             best_vrefdq_mr6 = vrefdq_mr6;
@@ -635,16 +652,18 @@ static int write_eye_detect_single_rank(fwk_id_t element_id,
             memcpy(best_slice_eye_stats, slice_eye_stats,
                 sizeof(struct slice_eye_stat)*NUM_SLICES);
         }
-        if (!sweep_vrefdq)
+        if (!sweep_vrefdq) {
             break;
+        }
     }
 
     if (best_vrefdq_mr6 != -1) {
         for (slice = 0; slice < NUM_SLICES; slice++) {
             for (bit = 0; bit < NUM_BITS_PER_SLICE; bit++) {
                 eye = &best_wrdq_eyes[slice][bit];
-                if (eye->max == 0)
+                if (eye->max == 0) {
                     analysis_ret_code = FWK_E_RANGE;
+                }
             }
         }
     }
@@ -693,8 +712,9 @@ static int write_eye_detect_single_rank(fwk_id_t element_id,
         *(uint32_t *)(ddr_phy_base + (4 * denali_index)) = wr_val;
     }
 
-    if (ret_code != FWK_SUCCESS)
-      return ret_code;
+    if (ret_code != FWK_SUCCESS) {
+        return ret_code;
+    }
 
     return analysis_ret_code;
 }
@@ -768,8 +788,9 @@ static int n1sdp_ddr_phy_post_training_configure(fwk_id_t element_id,
         value = rddqs_latency_adjust_value +
                 ((rddqs_gate_slave_delay_value & 0x00000100) >> 8) +
                 rptr_update_value;
-        if (value > rddata_valid_value)
+        if (value > rddata_valid_value) {
             rddata_valid_value = value;
+        }
     }
     if (info->dimm_mem_width == 4) {
         for (i = 0; i < 9; i++) {
@@ -781,8 +802,9 @@ static int n1sdp_ddr_phy_post_training_configure(fwk_id_t element_id,
             value = rddqs_x4_latency_adjust_value +
                     ((rddqs_x4_gate_slave_delay_value & 0x00000100) >> 8) +
                     rptr_update_value;
-            if (value > rddata_valid_value)
+            if (value > rddata_valid_value) {
                 rddata_valid_value = value;
+            }
         }
     }
 
@@ -817,8 +839,9 @@ static int n1sdp_ddr_phy_post_training_configure(fwk_id_t element_id,
         }
     }
 
-    if (info->number_of_ranks > 1)
+    if (info->number_of_ranks > 1) {
         adjust_per_rank_rptr_update_value(phy_addr, info);
+    }
 
     if (info->speed >= 1333) {
         FWK_LOG_INFO("[DDR-PHY] Performing write eye training...");
@@ -917,10 +940,11 @@ static int n1sdp_verify_phy_status(fwk_id_t element_id,
                 *(uint32_t *)(phy_base + (4 * (17 + (i * 256)))) = value1;
                 for (j = 0; j < num_slices; j++) {
                     value1 = *(uint32_t *)(phy_base + (4 * (34 + (i * 256))));
-                    if (j <= 16)
+                    if (j <= 16) {
                         value1 = (value1 & 0xFF00FFFF) | (j << 16);
-                    else
+                    } else {
                         value1 = (value1 & 0xFF00FFFF) | (0x18 << 16);
+                    }
 
                     *(uint32_t *)(phy_base + (4 * (34 + (i * 256)))) = value1;
                     value1 = *(uint32_t *)(phy_base + (4 * (47 + (i * 256))));
@@ -1085,10 +1109,11 @@ static int n1sdp_read_eye_phy_obs_regs(fwk_id_t element_id,
             *(uint32_t *)(phy_addr + (4 * (17 + (i * 256)))) = value;
             for (j = 0; j < num_dq_slices; j++) {
                 value = *(uint32_t *)(phy_addr + (4 * (34 + (i * 256))));
-                if (j <= 16)
+                if (j <= 16) {
                     value = (value & 0xFF00FFFF) | (j << 16);
-                else
+                } else {
                     value = (value & 0xFF00FFFF) | (0x18 << 16);
+                }
 
                 *(uint32_t *)(phy_addr + (4 * (34 + (i * 256)))) = value;
             }
@@ -1103,12 +1128,14 @@ static int n1sdp_phy_obs_regs(fwk_id_t element_id,
     int status;
 
     status = n1sdp_wrlvl_phy_obs_regs(element_id, rank, info);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = n1sdp_read_gate_phy_obs_regs(element_id, rank, info);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return n1sdp_read_eye_phy_obs_regs(element_id, info);
 }
@@ -1143,12 +1170,14 @@ static int n1sdp_ddr_phy_element_init(fwk_id_t element_id, unsigned int unused,
 static int n1sdp_ddr_phy_bind(fwk_id_t id, unsigned int round)
 {
     /* Skip the second round (rounds are zero-indexed) */
-    if (round == 1)
+    if (round == 1) {
         return FWK_SUCCESS;
+    }
 
     /* Nothing to be done for element-level binding */
-    if (fwk_module_is_valid_element_id(id))
+    if (fwk_module_is_valid_element_id(id)) {
         return FWK_SUCCESS;
+    }
 
     return FWK_SUCCESS;
 }
@@ -1157,8 +1186,9 @@ static int n1sdp_ddr_phy_process_bind_request(fwk_id_t requester_id,
     fwk_id_t id, fwk_id_t api_type, const void **api)
 {
     /* Binding to elements is not permitted. */
-    if (fwk_module_is_valid_element_id(id))
+    if (fwk_module_is_valid_element_id(id)) {
         return FWK_E_ACCESS;
+    }
 
     *api = &n1sdp_ddr_phy_api;
 

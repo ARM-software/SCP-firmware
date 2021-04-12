@@ -138,11 +138,13 @@ static void i2c_isr(uintptr_t data)
     isr = ctx->reg->ISR;
     ctx->reg->ISR = isr;
 
-    if (isr == 0)
+    if (isr == 0) {
         return;
+    }
 
-    if (isr & I2C_ISR_ERROR_MASK)
+    if (isr & I2C_ISR_ERROR_MASK) {
         goto i2c_error;
+    }
 
     switch (ctx->irq_data_ctx.state) {
     case MOD_N1SDP_I2C_STATE_TX:
@@ -167,18 +169,20 @@ static void i2c_isr(uintptr_t data)
         }
 
         /* Make sure transaction sizes align. */
-        if (ctx->reg->SR & I2C_SR_RXDV_MASK)
+        if (ctx->reg->SR & I2C_SR_RXDV_MASK) {
             goto i2c_error;
+        }
 
         /* If master, reload TSR if more data expected. */
         if ((ctx->config->mode == MOD_N1SDP_I2C_MASTER_MODE) &&
             (ctx->irq_data_ctx.index < ctx->irq_data_ctx.size)) {
             if ((ctx->irq_data_ctx.size - ctx->irq_data_ctx.index) >
-                I2C_TSR_TANSFER_SIZE)
+                I2C_TSR_TANSFER_SIZE) {
                 ctx->reg->TSR = I2C_TSR_TANSFER_SIZE;
-            else
+            } else {
                 ctx->reg->TSR = (ctx->irq_data_ctx.size -
                                  ctx->irq_data_ctx.index);
+            }
         }
         break;
 
@@ -189,19 +193,22 @@ static void i2c_isr(uintptr_t data)
     /* Check for completion interrupt */
     if (isr & I2C_ISR_COMP_MASK) {
         /* Make sure the correct amount of data was transferred */
-        if (ctx->irq_data_ctx.index != ctx->irq_data_ctx.size)
+        if (ctx->irq_data_ctx.index != ctx->irq_data_ctx.size) {
             goto i2c_error;
+        }
 
         ctx->irq_data_ctx.busy = false;
         I2C_REG_W(ctx->reg->AR, I2C_AR_ADD7_MASK, I2C_AR_ADD7_SHIFT, 0);
 
         /* Run completion callback */
         if ((ctx->irq_data_ctx.state == MOD_N1SDP_I2C_STATE_TX) &&
-            (ctx->i2c_callback))
+            (ctx->i2c_callback)) {
             ctx->i2c_callback(ctx, MOD_N1SDP_I2C_NOTIFICATION_IDX_TX);
-        else if ((ctx->irq_data_ctx.state == MOD_N1SDP_I2C_STATE_RX) &&
-                 (ctx->i2c_callback))
+        } else if (
+            (ctx->irq_data_ctx.state == MOD_N1SDP_I2C_STATE_RX) &&
+            (ctx->i2c_callback)) {
             ctx->i2c_callback(ctx, MOD_N1SDP_I2C_NOTIFICATION_IDX_RX);
+        }
 
         /* Reset I2C driver state */
         ctx->reg->IDR = 0xFFFF;
@@ -212,8 +219,9 @@ static void i2c_isr(uintptr_t data)
     return;
 
 i2c_error:
-    if (ctx->i2c_callback)
+    if (ctx->i2c_callback) {
         ctx->i2c_callback(ctx, MOD_N1SDP_I2C_NOTIFICATION_IDX_ERROR);
+    }
 
     ctx->reg->IDR = 0xFFFF;
     I2C_REG_RMW(ctx->reg->CR, I2C_CR_CLRFIFO_MASK, I2C_CR_CLRFIFO_SHIFT,
@@ -245,9 +253,10 @@ static int i2c_master_read_polled(fwk_id_t device_id,
     I2C_REG_RMW(device_ctx->reg->CR, I2C_CR_RW_MASK, I2C_CR_RW_SHIFT,
                 I2C_RW_READ);
 
-    if (!device_ctx->perform_repeat_start)
+    if (!device_ctx->perform_repeat_start) {
         I2C_REG_RMW(device_ctx->reg->CR, I2C_CR_CLRFIFO_MASK,
                     I2C_CR_CLRFIFO_SHIFT, I2C_CLRFIFO_ON);
+    }
 
     clear_isr(device_ctx);
 
@@ -263,9 +272,12 @@ static int i2c_master_read_polled(fwk_id_t device_id,
     while (!complete && (timeout != 0)) {
         if (I2C_REG_R(device_ctx->reg->SR, I2C_SR_RXDV_MASK,
                       I2C_SR_RXDV_SHIFT)) {
-            if (I2C_REG_R(device_ctx->reg->ISR, I2C_ISR_COMP_MASK,
-                          I2C_ISR_COMP_SHIFT))
+            if (I2C_REG_R(
+                    device_ctx->reg->ISR,
+                    I2C_ISR_COMP_MASK,
+                    I2C_ISR_COMP_SHIFT)) {
                 complete = true;
+            }
         }
         timeout--;
     }
@@ -354,8 +366,9 @@ static int i2c_master_write_polled(fwk_id_t device_id, uint16_t address,
         if (sr == 0) {
             isr = I2C_REG_R(device_ctx->reg->ISR, I2C_ISR_COMP_MASK,
                             I2C_ISR_COMP_SHIFT);
-            if (isr != 0)
+            if (isr != 0) {
                 complete = true;
+            }
         }
         timeout--;
     }
@@ -400,8 +413,9 @@ static int i2c_slave_write_irq(fwk_id_t device_id,
 
     fwk_assert((length != 0) && (data != NULL));
 
-    if (device_ctx->irq_data_ctx.busy)
+    if (device_ctx->irq_data_ctx.busy) {
         return FWK_E_BUSY;
+    }
 
     device_ctx->irq_data_ctx.state = MOD_N1SDP_I2C_STATE_TX;
     device_ctx->irq_data_ctx.data = data;
@@ -436,8 +450,9 @@ static int i2c_slave_read_irq(fwk_id_t device_id,
 
     fwk_assert((length != 0) && (data != NULL));
 
-    if (device_ctx->irq_data_ctx.busy)
+    if (device_ctx->irq_data_ctx.busy) {
         return FWK_E_BUSY;
+    }
 
     device_ctx->irq_data_ctx.state = MOD_N1SDP_I2C_STATE_RX;
     device_ctx->irq_data_ctx.data = data;
@@ -453,8 +468,9 @@ static int i2c_slave_read_irq(fwk_id_t device_id,
     I2C_REG_W(device_ctx->reg->AR, I2C_AR_ADD7_MASK, I2C_AR_ADD7_SHIFT,
               device_ctx->config->slave_addr);
 
-    if (length < (I2C_TSR_TANSFER_SIZE - 2))
+    if (length < (I2C_TSR_TANSFER_SIZE - 2)) {
         device_ctx->reg->TSR = length;
+    }
 
     /* Clear any pending IRQs and re-enable interrupts */
     device_ctx->reg->ISR = I2C_ISR_MASK;
@@ -481,8 +497,9 @@ static void i2c_init(struct n1sdp_i2c_dev_ctx *device_ctx,
 
     divider = (aclk / (I2C_HZ * hz)) - I2C_DIV;
 
-    if (divider > I2C_DIV_MAX)
+    if (divider > I2C_DIV_MAX) {
         divider = (divider / I2C_DIV_VAL) | (I2C_DIV_VAL1 << I2C_DIV_SHIFT);
+    }
 
     I2C_REG_RMW(device_ctx->reg->CR, I2C_CR_DIV_MASK, I2C_CR_DIV_SHIFT,
                 divider);
@@ -494,8 +511,9 @@ static void i2c_init(struct n1sdp_i2c_dev_ctx *device_ctx,
 static int n1sdp_i2c_init(fwk_id_t module_id, unsigned int element_count,
     const void *data)
 {
-    if (element_count == 0)
+    if (element_count == 0) {
         return FWK_E_DATA;
+    }
 
     i2c_ctx.device_ctx_table = fwk_mm_calloc(element_count,
         sizeof(i2c_ctx.device_ctx_table[0]));
@@ -509,18 +527,21 @@ static int n1sdp_i2c_element_init(fwk_id_t element_id, unsigned int unused,
     struct mod_n1sdp_i2c_device_config *config;
     struct n1sdp_i2c_dev_ctx *device_ctx;
 
-    if (data == NULL)
+    if (data == NULL) {
         return FWK_E_PARAM;
+    }
 
     config = (struct mod_n1sdp_i2c_device_config *)data;
 
     if ((config->addr_size != MOD_N1SDP_I2C_ADDRESS_7_BIT) ||
-        (config->ack_en != MOD_N1SDP_I2C_ACK_ENABLE))
+        (config->ack_en != MOD_N1SDP_I2C_ACK_ENABLE)) {
         return FWK_E_SUPPORT;
+    }
 
     device_ctx = &i2c_ctx.device_ctx_table[fwk_id_get_element_idx(element_id)];
-    if (device_ctx == NULL)
+    if (device_ctx == NULL) {
         return FWK_E_DATA;
+    }
 
     device_ctx->config = config;
     device_ctx->reg = (struct i2c_reg *)config->reg_base;
@@ -581,13 +602,15 @@ static int n1sdp_i2c_start(fwk_id_t id)
     unsigned int i2c_element_id;
 
     /* Nothing to do for module */
-    if (!fwk_module_is_valid_element_id(id))
+    if (!fwk_module_is_valid_element_id(id)) {
         return FWK_SUCCESS;
+    }
 
     i2c_element_id = fwk_id_get_element_idx(id);
     device_ctx = &i2c_ctx.device_ctx_table[i2c_element_id];
-    if (device_ctx == NULL)
+    if (device_ctx == NULL) {
         return FWK_E_DATA;
+    }
 
     device_ctx->i2c_id = i2c_element_id;
 
@@ -595,16 +618,19 @@ static int n1sdp_i2c_start(fwk_id_t id)
         i2c_irq = device_ctx->config->irq;
         status = fwk_interrupt_set_isr_param(i2c_irq, i2c_isr,
                                              (uintptr_t)device_ctx);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return FWK_E_DEVICE;
+        }
 
         status = fwk_interrupt_clear_pending(i2c_irq);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return FWK_E_DEVICE;
+        }
 
         status = fwk_interrupt_enable(i2c_irq);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return FWK_E_DEVICE;
+        }
 
         device_ctx->i2c_callback = i2c_callback_fn;
     }
