@@ -41,8 +41,9 @@ static void wrdmemcpy(void *destination, const void *source, unsigned int num)
 {
     unsigned int index;
 
-    for (index = 0; index < num; index++)
+    for (index = 0; index < num; index++) {
         ((unsigned int *)destination)[index] = ((unsigned int *)source)[index];
+    }
 }
 
 static void reset_shared_memory(void)
@@ -72,8 +73,9 @@ static int mem_msg_send_message(void *data, uint16_t size, uint16_t type)
     unsigned int index;
     struct mem_msg_packet_st *packet = NULL;
 
-    if (type == SCP2PCC_TYPE_SHUTDOWN)
+    if (type == SCP2PCC_TYPE_SHUTDOWN) {
         FWK_LOG_INFO("Shutdown request to PCC");
+    }
 
     /* Check parameters. */
     if ((size > MSG_PAYLOAD_SIZE) ||
@@ -87,8 +89,9 @@ static int mem_msg_send_message(void *data, uint16_t size, uint16_t type)
 
         /* Attempt to set alive value and try again. */
         *(scp2pcc_ctx.config->shared_alive_address) = MSG_ALIVE_VALUE;
-        if (*(scp2pcc_ctx.config->shared_alive_address) != MSG_ALIVE_VALUE)
+        if (*(scp2pcc_ctx.config->shared_alive_address) != MSG_ALIVE_VALUE) {
             return FWK_E_STATE;
+        }
 
         /* If successful, reset shared memory. */
         reset_shared_memory();
@@ -103,8 +106,9 @@ static int mem_msg_send_message(void *data, uint16_t size, uint16_t type)
 
         if (packet->type == MSG_UNUSED_MESSAGE_TYPE) {
             /* Unused packet found, copy data payload. */
-            if (data != NULL)
+            if (data != NULL) {
                 wrdmemcpy((void *)&packet->payload, data, (size / 4));
+            }
 
             /* Set size. */
             wrdmemset((void *)&packet->size, size);
@@ -131,8 +135,9 @@ static const struct mod_n1sdp_scp2pcc_api n1sdp_scp2pcc_api = {
 static int n1sdp_scp2pcc_init(fwk_id_t module_id, unsigned int unused,
     const void *data)
 {
-    if (data == NULL)
+    if (data == NULL) {
         return FWK_E_PARAM;
+    }
 
     scp2pcc_ctx.config = (struct mem_msg_config_st *)data;
 

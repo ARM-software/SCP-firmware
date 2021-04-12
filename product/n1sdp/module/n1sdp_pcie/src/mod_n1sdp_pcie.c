@@ -117,22 +117,25 @@ static int n1sdp_pcie_ccix_enable_opt_tlp(bool enable)
         }
     }
 
-    if (config == NULL)
+    if (config == NULL) {
         return FWK_E_DATA;
+    }
 
     /* Configure for the optimized header or pcie compatible header*/
-    if (enable)
+    if (enable) {
         value = (CCIX_CTRL_CAW | CCIX_CTRL_EN_OPT_TLP | CCIX_CTRL_CSTT_V0_V1 |
                  CCIX_VENDER_ID);
-    else
+    } else {
         value = (CCIX_CTRL_CAW | CCIX_VENDER_ID);
+    }
 
     FWK_LOG_INFO("[CCIX] CCIX_CONTROL: 0x%" PRIX32, value);
 
     *(uint32_t *)(dev_ctx->lm_apb + PCIE_LM_RC_CCIX_CTRL_REG) = value;
 
-    if (enable)
+    if (enable) {
         dev_ctx->ctrl_apb->CCIX_CTRL = 0x1;
+    }
 
     return FWK_SUCCESS;
 }
@@ -153,8 +156,9 @@ static int n1sdp_pcie_power_on(fwk_id_t id)
 
     did = fwk_id_get_element_idx(id);
     dev_ctx = &pcie_ctx.device_ctx_table[did];
-    if (dev_ctx == NULL)
+    if (dev_ctx == NULL) {
         return FWK_E_PARAM;
+    }
 
     FWK_LOG_INFO("[%s] Powering ON controller...", pcie_type[did]);
     wait_data.ctrl_apb = NULL;
@@ -202,14 +206,16 @@ static int n1sdp_pcie_phy_init(fwk_id_t id)
 
     did = fwk_id_get_element_idx(id);
     dev_ctx = &pcie_ctx.device_ctx_table[did];
-    if (dev_ctx == NULL)
+    if (dev_ctx == NULL) {
         return FWK_E_PARAM;
+    }
 
     if ((n1sdp_get_chipid() != 0x0) || !dev_ctx->config->ccix_capable ||
-        pcie_ctx.c2c_api->is_slave_alive())
+        pcie_ctx.c2c_api->is_slave_alive()) {
         gen_speed = PCIE_GEN_3;
-    else
+    } else {
         gen_speed = PCIE_GEN_4;
+    }
 
     lane_count = LAN_COUNT_IN_X_16;
 
@@ -240,14 +246,16 @@ static int n1sdp_pcie_controller_init(fwk_id_t id, bool ep_mode)
 
     did = fwk_id_get_element_idx(id);
     dev_ctx = &pcie_ctx.device_ctx_table[did];
-    if (dev_ctx == NULL)
+    if (dev_ctx == NULL) {
         return FWK_E_PARAM;
+    }
 
     if ((n1sdp_get_chipid() != 0x0) || !dev_ctx->config->ccix_capable ||
-        pcie_ctx.c2c_api->is_slave_alive())
+        pcie_ctx.c2c_api->is_slave_alive()) {
         gen_speed = PCIE_GEN_3;
-    else
+    } else {
         gen_speed = PCIE_GEN_4;
+    }
 
     lane_count = LAN_COUNT_IN_X_16;
 
@@ -288,8 +296,9 @@ static int n1sdp_pcie_link_training(fwk_id_t id, bool ep_mode)
 
     did = fwk_id_get_element_idx(id);
     dev_ctx = &pcie_ctx.device_ctx_table[did];
-    if (dev_ctx == NULL)
+    if (dev_ctx == NULL) {
         return FWK_E_PARAM;
+    }
 
     if ((n1sdp_get_chipid() != 0x0) || !dev_ctx->config->ccix_capable ||
         pcie_ctx.c2c_api->is_slave_alive()) {
@@ -406,8 +415,9 @@ static int n1sdp_pcie_rc_setup(fwk_id_t id)
 
     did = fwk_id_get_element_idx(id);
     dev_ctx = &pcie_ctx.device_ctx_table[did];
-    if (dev_ctx == NULL)
+    if (dev_ctx == NULL) {
         return FWK_E_PARAM;
+    }
 
     FWK_LOG_INFO("[%s] Setup Type0 configuration...", pcie_type[did]);
     if (dev_ctx->config->ccix_capable)
@@ -427,12 +437,13 @@ static int n1sdp_pcie_rc_setup(fwk_id_t id)
     FWK_LOG_INFO("[%s] Done", pcie_type[did]);
 
     FWK_LOG_INFO("[%s] Setup Type1 configuration...", pcie_type[did]);
-    if (dev_ctx->config->ccix_capable)
+    if (dev_ctx->config->ccix_capable) {
         ecam_base_addr = dev_ctx->config->axi_slave_base32 +
                          CCIX_AXI_ECAM_TYPE1_OFFSET;
-    else
+    } else {
         ecam_base_addr = dev_ctx->config->axi_slave_base32 +
                          PCIE_AXI_ECAM_TYPE1_OFFSET;
+    }
     status = axi_outbound_region_setup(dev_ctx->rc_axi_config_apb,
                  (ecam_base_addr - SCP_AP_AXI_OFFSET),
                  __builtin_ctz(AXI_ECAM_TYPE1_SIZE),
@@ -444,12 +455,13 @@ static int n1sdp_pcie_rc_setup(fwk_id_t id)
     FWK_LOG_INFO("[%s] Done", pcie_type[did]);
 
     FWK_LOG_INFO("[%s] Setup MMIO32 configuration...", pcie_type[did]);
-    if (dev_ctx->config->ccix_capable)
+    if (dev_ctx->config->ccix_capable) {
         ecam_base_addr = dev_ctx->config->axi_slave_base32 +
                              CCIX_AXI_MMIO32_OFFSET;
-    else
+    } else {
         ecam_base_addr = dev_ctx->config->axi_slave_base32 +
                              PCIE_AXI_MMIO32_OFFSET;
+    }
     status = axi_outbound_region_setup(dev_ctx->rc_axi_config_apb,
                  (ecam_base_addr - SCP_AP_AXI_OFFSET),
                  __builtin_ctz(AXI_MMIO32_SIZE),
@@ -461,12 +473,13 @@ static int n1sdp_pcie_rc_setup(fwk_id_t id)
     FWK_LOG_INFO("[%s] Done", pcie_type[did]);
 
     FWK_LOG_INFO("[%s] Setup IO configuration...", pcie_type[did]);
-    if (dev_ctx->config->ccix_capable)
+    if (dev_ctx->config->ccix_capable) {
         ecam_base_addr = dev_ctx->config->axi_slave_base32 +
                              CCIX_AXI_IO_OFFSET;
-    else
+    } else {
         ecam_base_addr = dev_ctx->config->axi_slave_base32 +
                              PCIE_AXI_IO_OFFSET;
+    }
     status = axi_outbound_region_setup(dev_ctx->rc_axi_config_apb,
                  (ecam_base_addr - SCP_AP_AXI_OFFSET),
                  __builtin_ctz(AXI_IO_SIZE),
@@ -519,17 +532,19 @@ static int n1sdp_pcie_rc_setup(fwk_id_t id)
 
     FWK_LOG_INFO("[%s] Skipping ATS capability...", pcie_type[did]);
     status = pcie_skip_ext_cap(dev_ctx->rp_ep_config_apb, EXT_CAP_ID_ATS);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         FWK_LOG_INFO("[%s] Not found!", pcie_type[did]);
-    else
+    } else {
         FWK_LOG_INFO("[%s] Done", pcie_type[did]);
+    }
 
     FWK_LOG_INFO("[%s] Skipping PRI capability...", pcie_type[did]);
     status = pcie_skip_ext_cap(dev_ctx->rp_ep_config_apb, EXT_CAP_ID_PRI);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         FWK_LOG_INFO("[%s] Not found!", pcie_type[did]);
-    else
+    } else {
         FWK_LOG_INFO("[%s] Done", pcie_type[did]);
+    }
 
     /*
      * Wait until devices connected in downstream ports
@@ -550,11 +565,13 @@ static int n1sdp_pcie_vc1_setup(fwk_id_t id, uint8_t vc1_tc)
     int status;
 
     dev_ctx = &pcie_ctx.device_ctx_table[fwk_id_get_element_idx(id)];
-    if (dev_ctx == NULL)
+    if (dev_ctx == NULL) {
         return FWK_E_PARAM;
+    }
 
-    if (!dev_ctx->config->ccix_capable || (vc1_tc > 7) || (vc1_tc == 0))
+    if (!dev_ctx->config->ccix_capable || (vc1_tc > 7) || (vc1_tc == 0)) {
         return FWK_E_PARAM;
+    }
 
     config_base_addr = dev_ctx->rp_ep_config_apb;
 
@@ -608,33 +625,39 @@ static int n1sdp_pcie_setup(fwk_id_t id)
     int status;
 
     dev_ctx = &pcie_ctx.device_ctx_table[fwk_id_get_element_idx(id)];
-    if (dev_ctx == NULL)
+    if (dev_ctx == NULL) {
         return FWK_E_PARAM;
+    }
 
     /* PCIe controller power ON */
     status = n1sdp_pcie_power_on(id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* PCIe PHY initialization */
     status = n1sdp_pcie_phy_init(id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* PCIe controller initialization */
     status = n1sdp_pcie_controller_init(id, false);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* Link training */
     status = n1sdp_pcie_link_training(id, false);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return dev_ctx->config->ccix_capable ? FWK_SUCCESS : status;
+    }
 
     /* Root Complex setup */
     status = n1sdp_pcie_rc_setup(id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return FWK_SUCCESS;
 }
@@ -645,8 +668,9 @@ static int n1sdp_pcie_setup(fwk_id_t id)
 static int n1sdp_pcie_init(fwk_id_t module_id, unsigned int element_count,
     const void *data)
 {
-    if (element_count == 0)
+    if (element_count == 0) {
         return FWK_E_DATA;
+    }
 
     pcie_ctx.device_ctx_table = fwk_mm_calloc(element_count,
         sizeof(pcie_ctx.device_ctx_table[0]));
@@ -662,14 +686,16 @@ static int n1sdp_pcie_element_init(fwk_id_t element_id, unsigned int unused,
     struct n1sdp_pcie_dev_ctx *dev_ctx;
     struct n1sdp_pcie_dev_config *config;
 
-    if (data == NULL)
+    if (data == NULL) {
         return FWK_E_PARAM;
+    }
 
     config = (struct n1sdp_pcie_dev_config *)data;
 
     dev_ctx = &pcie_ctx.device_ctx_table[fwk_id_get_element_idx(element_id)];
-    if (dev_ctx == NULL)
+    if (dev_ctx == NULL) {
         return FWK_E_DATA;
+    }
 
     dev_ctx->config = config;
 
@@ -696,14 +722,16 @@ static int n1sdp_pcie_bind(fwk_id_t id, unsigned int round)
         status = fwk_module_bind(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
             FWK_ID_API(FWK_MODULE_IDX_TIMER, MOD_TIMER_API_IDX_TIMER),
             &pcie_ctx.timer_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_C2C),
             FWK_ID_API(FWK_MODULE_IDX_N1SDP_C2C, N1SDP_C2C_API_IDX_SLAVE_INFO),
             &pcie_ctx.c2c_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
     return FWK_SUCCESS;
 }
@@ -722,8 +750,9 @@ static int n1sdp_pcie_start(fwk_id_t id)
     }
 
     dev_ctx = &pcie_ctx.device_ctx_table[fwk_id_get_element_idx(id)];
-    if (dev_ctx == NULL)
+    if (dev_ctx == NULL) {
         return FWK_E_PARAM;
+    }
 
     return fwk_notification_subscribe(
         mod_clock_notification_id_state_changed,
@@ -755,8 +784,9 @@ static int n1sdp_pcie_process_notification(const struct fwk_event *event,
 
     dev_ctx = &pcie_ctx.device_ctx_table[
                   fwk_id_get_element_idx(event->target_id)];
-    if (dev_ctx == NULL)
+    if (dev_ctx == NULL) {
         return FWK_E_PARAM;
+    }
 
     /*
      * The CCIX RP should not be initialized by n1sdp_pcie_setup() function
@@ -767,8 +797,9 @@ static int n1sdp_pcie_process_notification(const struct fwk_event *event,
      *        then it will be initialized by C2C module in RP mode.
      */
     if (dev_ctx->config->ccix_capable) {
-        if (pcie_ctx.c2c_api->is_slave_alive() || (n1sdp_get_chipid() != 0))
+        if (pcie_ctx.c2c_api->is_slave_alive() || (n1sdp_get_chipid() != 0)) {
             return FWK_SUCCESS;
+        }
     }
 
     return n1sdp_pcie_setup(event->target_id);

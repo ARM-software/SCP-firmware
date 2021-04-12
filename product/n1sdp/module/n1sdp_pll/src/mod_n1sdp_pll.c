@@ -72,11 +72,13 @@ static int pll_set_rate(struct n1sdp_pll_dev_ctx *ctx, uint64_t rate,
 
     config = ctx->config;
 
-    if (ctx->current_state == MOD_CLOCK_STATE_STOPPED)
+    if (ctx->current_state == MOD_CLOCK_STATE_STOPPED) {
         return FWK_E_PWRSTATE;
+    }
 
-    if ((rate < MOD_N1SDP_PLL_RATE_MIN) || (rate > MOD_N1SDP_PLL_RATE_MAX))
+    if ((rate < MOD_N1SDP_PLL_RATE_MIN) || (rate > MOD_N1SDP_PLL_RATE_MAX)) {
         return FWK_E_RANGE;
+    }
 
     /* Assume initial refdiv and postdiv to be 1 */
     refdiv = MOD_N1SDP_PLL_REFDIV_MIN;
@@ -118,8 +120,9 @@ result:
     while ((*config->control_reg1 &
            (UINT32_C(1) << PLL_LOCK_STATUS_POS)) == 0) {
         wait_cycles--;
-        if (wait_cycles == 0)
+        if (wait_cycles == 0) {
             return FWK_E_TIMEOUT;
+        }
     }
 
     /* Store the current configured PLL rate */
@@ -137,8 +140,9 @@ static int n1sdp_pll_set_rate(fwk_id_t dev_id, uint64_t rate,
 {
     struct n1sdp_pll_dev_ctx *ctx = NULL;
 
-    if (!fwk_module_is_valid_element_id(dev_id))
+    if (!fwk_module_is_valid_element_id(dev_id)) {
         return FWK_E_PARAM;
+    }
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
 
@@ -149,8 +153,9 @@ static int n1sdp_pll_get_rate(fwk_id_t dev_id, uint64_t *rate)
 {
     struct n1sdp_pll_dev_ctx *ctx = NULL;
 
-    if ((!fwk_module_is_valid_element_id(dev_id)) || (rate == NULL))
+    if ((!fwk_module_is_valid_element_id(dev_id)) || (rate == NULL)) {
         return FWK_E_PARAM;
+    }
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
     *rate = ctx->current_rate;
@@ -168,8 +173,9 @@ static int n1sdp_pll_get_rate_from_index(fwk_id_t dev_id,
 
 static int n1sdp_pll_set_state(fwk_id_t dev_id, enum mod_clock_state state)
 {
-    if (state == MOD_CLOCK_STATE_RUNNING)
+    if (state == MOD_CLOCK_STATE_RUNNING) {
         return FWK_SUCCESS;
+    }
 
     /* PLLs can only be stopped by a parent power domain state change. */
     return FWK_E_SUPPORT;
@@ -179,8 +185,9 @@ static int n1sdp_pll_get_state(fwk_id_t dev_id, enum mod_clock_state *state)
 {
     struct n1sdp_pll_dev_ctx *ctx = NULL;
 
-    if ((!fwk_module_is_valid_element_id(dev_id)) || (state == NULL))
+    if ((!fwk_module_is_valid_element_id(dev_id)) || (state == NULL)) {
         return FWK_E_PARAM;
+    }
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
     *state = ctx->current_state;
@@ -190,8 +197,9 @@ static int n1sdp_pll_get_state(fwk_id_t dev_id, enum mod_clock_state *state)
 
 static int n1sdp_pll_get_range(fwk_id_t dev_id, struct mod_clock_range *range)
 {
-    if ((!fwk_module_is_valid_element_id(dev_id)) || (range == NULL))
+    if ((!fwk_module_is_valid_element_id(dev_id)) || (range == NULL)) {
         return FWK_E_PARAM;
+    }
 
     range->rate_type = MOD_CLOCK_RATE_TYPE_CONTINUOUS;
     range->min = MOD_N1SDP_PLL_RATE_MIN;
@@ -206,13 +214,15 @@ static int n1sdp_pll_power_state_change(fwk_id_t dev_id, unsigned int state)
     uint64_t rate;
     struct n1sdp_pll_dev_ctx *ctx = NULL;
 
-    if (!fwk_module_is_valid_element_id(dev_id))
+    if (!fwk_module_is_valid_element_id(dev_id)) {
         return FWK_E_PARAM;
+    }
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
 
-    if (state != MOD_PD_STATE_ON)
+    if (state != MOD_PD_STATE_ON) {
         return FWK_SUCCESS;
+    }
 
     ctx->current_state = MOD_CLOCK_STATE_RUNNING;
 
@@ -235,14 +245,16 @@ static int n1sdp_pll_power_state_pending_change(
 {
     struct n1sdp_pll_dev_ctx *ctx = NULL;
 
-    if (!fwk_module_is_valid_element_id(dev_id))
+    if (!fwk_module_is_valid_element_id(dev_id)) {
         return FWK_E_PARAM;
+    }
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
 
-    if (next_state == MOD_PD_STATE_OFF)
+    if (next_state == MOD_PD_STATE_OFF) {
         /* Just mark the PLL as stopped */
         ctx->current_state = MOD_CLOCK_STATE_STOPPED;
+    }
 
     return FWK_SUCCESS;
 }
@@ -268,8 +280,9 @@ static int n1sdp_pll_init(fwk_id_t module_id, unsigned int element_count,
     size_t i;
     struct n1sdp_pll_custom_freq_param_entry *freq_entry;
 
-    if ((element_count == 0) || (config == NULL))
+    if ((element_count == 0) || (config == NULL)) {
         return FWK_E_PARAM;
+    }
 
     module_ctx.dev_count = element_count;
 
@@ -285,8 +298,9 @@ static int n1sdp_pll_init(fwk_id_t module_id, unsigned int element_count,
             (freq_entry->refdiv < MOD_N1SDP_PLL_REFDIV_MIN) ||
             (freq_entry->refdiv > MOD_N1SDP_PLL_REFDIV_MAX) ||
             (freq_entry->postdiv < MOD_N1SDP_PLL_POSTDIV_MIN) ||
-            (freq_entry->postdiv > MOD_N1SDP_PLL_POSTDIV_MAX))
+            (freq_entry->postdiv > MOD_N1SDP_PLL_POSTDIV_MAX)) {
             return FWK_E_RANGE;
+        }
     }
 
     return FWK_SUCCESS;
@@ -303,12 +317,13 @@ static int n1sdp_pll_element_init(fwk_id_t element_id, unsigned int unused,
 
     /* Check for valid element configuration data */
     if ((ctx->config->control_reg0 == NULL) ||
-        (ctx->config->control_reg1 == NULL) ||
-        (ctx->config->ref_rate == 0))
+        (ctx->config->control_reg1 == NULL) || (ctx->config->ref_rate == 0)) {
         return FWK_E_PARAM;
+    }
 
-    if (ctx->config->defer_initialization)
+    if (ctx->config->defer_initialization) {
         return FWK_SUCCESS;
+    }
 
     ctx->initialized = true;
     ctx->current_state = MOD_CLOCK_STATE_RUNNING;
