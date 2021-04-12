@@ -545,9 +545,8 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
         rnsam->SYS_CACHE_GRP_SN_NODEID[group] = ctx->sn_nodeid_group[group];
 
     /* Enable RNSAM */
-    rnsam->STATUS = ((uint64_t)config->hnd_node_id
-                     << CMN700_RNSAM_STATUS_DEFAULT_NODEID_POS) |
-        CMN700_RNSAM_STATUS_UNSTALL;
+    rnsam->STATUS = (rnsam->STATUS | CMN700_RNSAM_STATUS_UNSTALL) &
+        ~(CMN700_RNSAM_STATUS_USE_DEFAULT_TARGET_ID);
     __sync_synchronize();
 
     return FWK_SUCCESS;
