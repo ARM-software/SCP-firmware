@@ -102,8 +102,9 @@ static void ppu_cores_isr(unsigned int first, uint32_t status)
         core_idx = __builtin_ctz(status);
         status &= ~(1 << core_idx);
 
-        if ((first + core_idx) >= tc0_core_get_core_count())
+        if ((first + core_idx) >= tc0_core_get_core_count()) {
             continue;
+        }
 
         tc0_system_ctx.ppu_v1_isr_api->ppu_interrupt_handler(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1, first + core_idx));
@@ -193,8 +194,9 @@ static int tc0_system_mod_init(
     for (idx = 0; idx < FWK_ARRAY_SIZE(isrs); idx++) {
         isr = &isrs[idx];
         status = fwk_interrupt_set_isr(isr->interrupt, isr->handler);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     tc0_system_ctx.pik_scp_reg = (struct pik_scp_reg *)SCP_PIK_SCP_BASE;
@@ -206,22 +208,25 @@ static int tc0_system_bind(fwk_id_t id, unsigned int round)
 {
     int status;
 
-    if (round > 0)
+    if (round > 0) {
         return FWK_SUCCESS;
+    }
 
     status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_POWER_DOMAIN),
         FWK_ID_API(FWK_MODULE_IDX_POWER_DOMAIN, MOD_PD_API_IDX_RESTRICTED),
         &tc0_system_ctx.mod_pd_restricted_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_PPU_V1),
         FWK_ID_API(FWK_MODULE_IDX_PPU_V1, MOD_PPU_V1_API_IDX_ISR),
         &tc0_system_ctx.ppu_v1_isr_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return fwk_module_bind(
         fwk_module_id_sds,
@@ -256,8 +261,9 @@ static int tc0_system_start(fwk_id_t id)
             fwk_id_build_element_id(
                 fwk_module_id_scmi, scmi_notification_table[i]),
             id);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     /*
@@ -266,8 +272,9 @@ static int tc0_system_start(fwk_id_t id)
      */
     status = fwk_notification_subscribe(
         mod_sds_notification_id_initialized, fwk_module_id_sds, id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return tc0_system_ctx.mod_pd_restricted_api->set_state_async(
         FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
@@ -294,8 +301,9 @@ int tc0_system_process_notification(
     } else if (fwk_id_is_equal(
                    event->id, mod_sds_notification_id_initialized)) {
         sds_notification_received = true;
-    } else
+    } else {
         return FWK_E_PARAM;
+    }
 
     if ((scmi_notification_count == FWK_ARRAY_SIZE(scmi_notification_table)) &&
         sds_notification_received) {

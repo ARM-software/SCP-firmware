@@ -27,8 +27,9 @@ uint32_t SystemCoreClock = CLOCK_RATE_REFCLK;
  */
 __NO_RETURN void osRtxIdleThread(void *argument)
 {
-    while (true)
+    while (true) {
         __WFI();
+    }
 }
 
 /*
