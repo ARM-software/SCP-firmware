@@ -104,8 +104,9 @@ static int remote_pd_set_state(fwk_id_t pd_id, unsigned int state)
         status = remote_pd_ctx.c2c_pd_api->set_state(
             N1SDP_C2C_CMD_POWER_DOMAIN_OFF, (uint8_t)element_id,
             (uint8_t)dev_ctx->config->pd_type);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         status = dev_ctx->pd_driver_input_api->report_power_state_transition(
             dev_ctx->bound_id, MOD_PD_STATE_OFF);
@@ -116,8 +117,9 @@ static int remote_pd_set_state(fwk_id_t pd_id, unsigned int state)
         status = remote_pd_ctx.c2c_pd_api->set_state(
             N1SDP_C2C_CMD_POWER_DOMAIN_ON, (uint8_t)element_id,
             (uint8_t)dev_ctx->config->pd_type);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         status = dev_ctx->pd_driver_input_api->report_power_state_transition(
             dev_ctx->bound_id, MOD_PD_STATE_ON);
@@ -138,8 +140,9 @@ static int remote_pd_reset(fwk_id_t pd_id)
     int status;
 
     status = remote_pd_set_state(pd_id, MOD_PD_STATE_OFF);
-    if (status == FWK_SUCCESS)
+    if (status == FWK_SUCCESS) {
         status = remote_pd_set_state(pd_id, MOD_PD_STATE_ON);
+    }
 
     return status;
 }
@@ -171,11 +174,13 @@ static const struct mod_pd_driver_api remote_pd_driver = {
 static int remote_pd_init(fwk_id_t module_id, unsigned int device_count,
                           const void *unused)
 {
-    if (!n1sdp_is_multichip_enabled() || (n1sdp_get_chipid() != 0x0))
+    if (!n1sdp_is_multichip_enabled() || (n1sdp_get_chipid() != 0x0)) {
         return FWK_SUCCESS;
+    }
 
-    if (device_count == 0)
+    if (device_count == 0) {
         return FWK_E_PARAM;
+    }
 
     remote_pd_ctx.dev_ctx_table = fwk_mm_calloc(device_count,
         sizeof(remote_pd_ctx.dev_ctx_table[0]));
@@ -192,8 +197,9 @@ static int remote_pd_element_init(fwk_id_t device_id, unsigned int slot_count,
         (struct mod_n1sdp_remote_pd_config *)data;
     struct n1sdp_remote_pd_device_ctx *dev_ctx;
 
-    if (!n1sdp_is_multichip_enabled() || (n1sdp_get_chipid() != 0x0))
+    if (!n1sdp_is_multichip_enabled() || (n1sdp_get_chipid() != 0x0)) {
         return FWK_SUCCESS;
+    }
 
     dev_ctx = &remote_pd_ctx.dev_ctx_table[fwk_id_get_element_idx(device_id)];
     dev_ctx->config = config;
@@ -206,16 +212,18 @@ static int remote_pd_bind(fwk_id_t id, unsigned int round)
     int status;
     struct n1sdp_remote_pd_device_ctx *dev_ctx;
 
-    if (!n1sdp_is_multichip_enabled() || (n1sdp_get_chipid() != 0x0))
+    if (!n1sdp_is_multichip_enabled() || (n1sdp_get_chipid() != 0x0)) {
         return FWK_SUCCESS;
+    }
 
     if ((round == 0) && fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_C2C),
                                  FWK_ID_API(FWK_MODULE_IDX_N1SDP_C2C,
                                             N1SDP_C2C_API_IDX_PD),
                                  &remote_pd_ctx.c2c_pd_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     if ((round == 1) && fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
@@ -223,8 +231,9 @@ static int remote_pd_bind(fwk_id_t id, unsigned int round)
         status = fwk_module_bind(dev_ctx->bound_id,
                                  mod_pd_api_id_driver_input,
                                  &dev_ctx->pd_driver_input_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return FWK_SUCCESS;
@@ -237,11 +246,13 @@ static int remote_pd_process_bind_request(fwk_id_t source_id,
 {
     struct n1sdp_remote_pd_device_ctx *dev_ctx;
 
-    if (!n1sdp_is_multichip_enabled() || (n1sdp_get_chipid() != 0x0))
+    if (!n1sdp_is_multichip_enabled() || (n1sdp_get_chipid() != 0x0)) {
         return FWK_E_ACCESS;
+    }
 
-    if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT))
+    if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT)) {
         return FWK_E_ACCESS;
+    }
 
     dev_ctx = &remote_pd_ctx.dev_ctx_table[fwk_id_get_element_idx(target_id)];
 

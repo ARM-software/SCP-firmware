@@ -474,10 +474,11 @@ static struct fwk_element n1sdp_pd_multi_chip_element_table[] = {
 static const struct fwk_element *n1sdp_power_domain_get_element_table
     (fwk_id_t module_id)
 {
-    if (n1sdp_is_multichip_enabled() && (n1sdp_get_chipid() == 0x0))
+    if (n1sdp_is_multichip_enabled() && (n1sdp_get_chipid() == 0x0)) {
         return n1sdp_pd_multi_chip_element_table;
-    else
+    } else {
         return n1sdp_pd_single_chip_element_table;
+    }
 }
 
 /*

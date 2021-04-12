@@ -58,8 +58,9 @@ static void n1sdp_sensor_timer_callback(uintptr_t unused)
 
             t_dev_ctx->sensor_data_buffer[t_dev_ctx->buf_index++] = value;
 
-            if (t_dev_ctx->buf_index == PVT_HISTORY_LEN)
+            if (t_dev_ctx->buf_index == PVT_HISTORY_LEN) {
                 t_dev_ctx->buf_index = 0;
+            }
         }
     }
     /* Start new sample. */
@@ -74,8 +75,9 @@ static void n1sdp_sensor_timer_callback(uintptr_t unused)
 
             v_dev_ctx->sensor_data_buffer[v_dev_ctx->buf_index++] = value;
 
-            if (v_dev_ctx->buf_index == PVT_HISTORY_LEN)
+            if (v_dev_ctx->buf_index == PVT_HISTORY_LEN) {
                 v_dev_ctx->buf_index = 0;
+            }
         }
     }
     /* Start new sample. */
@@ -98,14 +100,16 @@ static int get_value(fwk_id_t element_id, uint64_t *value)
 
     if (id < t_sensor_count) {
         t_dev_ctx = &sensor_ctx.t_dev_ctx_table[id];
-        if (t_dev_ctx == NULL)
+        if (t_dev_ctx == NULL) {
             return FWK_E_DATA;
+        }
 
         buf_value = t_dev_ctx->sensor_data_buffer[t_dev_ctx->buf_index];
     } else {
         v_dev_ctx = &sensor_ctx.v_dev_ctx_table[id - t_sensor_count];
-        if (v_dev_ctx == NULL)
+        if (v_dev_ctx == NULL) {
             return FWK_E_DATA;
+        }
 
         buf_value = v_dev_ctx->sensor_data_buffer[v_dev_ctx->buf_index];
     }
@@ -128,8 +132,9 @@ static int n1sdp_sensor_init(
 {
     fwk_assert(data != NULL);
 
-    if (element_count == 0)
+    if (element_count == 0) {
         return FWK_E_DATA;
+    }
 
     sensor_ctx.module_config = (struct mod_n1sdp_sensor_config *)data;
 
@@ -137,15 +142,17 @@ static int n1sdp_sensor_init(
         sensor_ctx.module_config->t_sensor_count,
         sizeof(sensor_ctx.t_dev_ctx_table[0]));
 
-    if (sensor_ctx.t_dev_ctx_table == NULL)
+    if (sensor_ctx.t_dev_ctx_table == NULL) {
         return FWK_E_NOMEM;
+    }
 
     sensor_ctx.v_dev_ctx_table = fwk_mm_calloc(
         sensor_ctx.module_config->v_sensor_count,
         sizeof(sensor_ctx.v_dev_ctx_table[0]));
 
-    if (sensor_ctx.v_dev_ctx_table == NULL)
+    if (sensor_ctx.v_dev_ctx_table == NULL) {
         return FWK_E_NOMEM;
+    }
 
     return FWK_SUCCESS;
 }
@@ -170,30 +177,34 @@ static int n1sdp_sensor_element_init(
         t_config = (struct mod_n1sdp_temp_sensor_config *)data;
 
         t_dev_ctx = &sensor_ctx.t_dev_ctx_table[id];
-        if (t_dev_ctx == NULL)
+        if (t_dev_ctx == NULL) {
             return FWK_E_DATA;
+        }
 
         t_dev_ctx->config = t_config;
 
         t_dev_ctx->sensor_data_buffer =
             fwk_mm_calloc(PVT_HISTORY_LEN, sizeof(int32_t));
-        if (t_dev_ctx->sensor_data_buffer == NULL)
+        if (t_dev_ctx->sensor_data_buffer == NULL) {
             return FWK_E_NOMEM;
+        }
 
         t_dev_ctx->buf_index = 0;
     } else {
         v_config = (struct mod_n1sdp_volt_sensor_config *)data;
 
         v_dev_ctx = &sensor_ctx.v_dev_ctx_table[id - t_sensor_count];
-        if (v_dev_ctx == NULL)
+        if (v_dev_ctx == NULL) {
             return FWK_E_DATA;
+        }
 
         v_dev_ctx->config = v_config;
 
         v_dev_ctx->sensor_data_buffer =
             fwk_mm_calloc(PVT_HISTORY_LEN, sizeof(int32_t));
-        if (v_dev_ctx->sensor_data_buffer == NULL)
+        if (v_dev_ctx->sensor_data_buffer == NULL) {
             return FWK_E_NOMEM;
+        }
 
         v_dev_ctx->buf_index = 0;
     }
@@ -212,15 +223,17 @@ static int n1sdp_sensor_bind(fwk_id_t id, unsigned int round)
                 sensor_ctx.module_config->alarm_api,
                 &sensor_ctx.timer_alarm_api);
 
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
 
             status = fwk_module_bind(
                 FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SCP2PCC),
                 FWK_ID_API(FWK_MODULE_IDX_N1SDP_SCP2PCC, 0),
                 &sensor_ctx.scp2pcc_api);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
         }
     }
     return FWK_SUCCESS;
@@ -253,8 +266,9 @@ static int n1sdp_sensor_start(fwk_id_t id)
             &n1sdp_sensor_timer_callback,
             0);
 
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         FWK_LOG_INFO(
             "[PVT] Started driver version %d.%d\n",

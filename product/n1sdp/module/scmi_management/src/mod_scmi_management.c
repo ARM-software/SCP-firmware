@@ -120,8 +120,9 @@ static int scmi_management_protocol_message_attributes_handler(
     message_id = parameters->message_id;
 
     if ((message_id >= FWK_ARRAY_SIZE(handler_table)) ||
-        (handler_table[message_id] == NULL))
+        (handler_table[message_id] == NULL)) {
         return_values.status = SCMI_NOT_FOUND;
+    }
 
     response_size = (return_values.status == SCMI_SUCCESS) ?
         sizeof(return_values) : sizeof(return_values.status);
@@ -146,13 +147,15 @@ static int scmi_management_clock_status_get_handler(fwk_id_t service_id,
     };
 
     status = scmi_management_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     status = scmi_management_ctx.scmi_api->get_agent_type(agent_id,
                                                           &agent_type);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     /* Only the Management agent may get the clock status */
     if (agent_type != SCMI_AGENT_TYPE_MANAGEMENT) {
@@ -185,13 +188,15 @@ static int scmi_management_chipid_info_get_handler(fwk_id_t service_id,
     };
 
     status = scmi_management_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     status = scmi_management_ctx.scmi_api->get_agent_type(agent_id,
                                                           &agent_type);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     /* Only the Management agent may get the CHIP ID information */
     if (agent_type != SCMI_AGENT_TYPE_MANAGEMENT) {
@@ -279,8 +284,9 @@ static int scmi_management_init(fwk_id_t module_id, unsigned int unused,
 
 static int scmi_management_bind(fwk_id_t id, unsigned int round)
 {
-    if (round == 1)
+    if (round == 1) {
         return FWK_SUCCESS;
+    }
 
     /* Bind to the SCMI module, storing an API pointer for later use. */
     return fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
@@ -292,8 +298,9 @@ static int scmi_management_process_bind_request(fwk_id_t source_id,
     fwk_id_t target_id, fwk_id_t api_id, const void **api)
 {
     /* Only accept binding requests from the SCMI module. */
-    if (!fwk_id_is_equal(source_id, FWK_ID_MODULE(FWK_MODULE_IDX_SCMI)))
+    if (!fwk_id_is_equal(source_id, FWK_ID_MODULE(FWK_MODULE_IDX_SCMI))) {
         return FWK_E_ACCESS;
+    }
 
     *api = &scmi_management_mod_scmi_to_protocol_api;
 

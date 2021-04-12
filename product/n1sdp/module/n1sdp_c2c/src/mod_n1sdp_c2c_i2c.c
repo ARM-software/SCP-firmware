@@ -227,8 +227,9 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
 
     if (run_in_slave) {
         status = n1sdp_c2c_master_tx_command(cmd);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     FWK_LOG_INFO("[C2C] %s in master...", cmd_str[cmd]);
@@ -243,8 +244,9 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
         }
         if (run_in_slave) {
             status = n1sdp_c2c_master_rx_response();
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
             if (n1sdp_c2c_ctx.master_rx_data[0] != N1SDP_C2C_SUCCESS) {
                 FWK_LOG_INFO("[C2C] Command failed in slave!");
                 return FWK_E_STATE;
@@ -261,8 +263,9 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
         }
         if (run_in_slave) {
             status = n1sdp_c2c_master_rx_response();
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
             if (n1sdp_c2c_ctx.master_rx_data[0] != N1SDP_C2C_SUCCESS) {
                 FWK_LOG_INFO("[C2C] Command failed in slave!");
                 return FWK_E_STATE;
@@ -279,8 +282,9 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
         }
         if (run_in_slave) {
             status = n1sdp_c2c_master_rx_response();
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
             if (n1sdp_c2c_ctx.master_rx_data[0] != N1SDP_C2C_SUCCESS) {
                 FWK_LOG_INFO("[C2C] Command failed in slave!");
                 return FWK_E_STATE;
@@ -297,8 +301,9 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
         }
         if (run_in_slave) {
             status = n1sdp_c2c_master_rx_response();
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
             if (n1sdp_c2c_ctx.master_rx_data[0] != N1SDP_C2C_SUCCESS) {
                 FWK_LOG_INFO("[C2C] Command failed in slave!");
                 return FWK_E_STATE;
@@ -315,8 +320,9 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
         }
         if (run_in_slave) {
             status = n1sdp_c2c_master_rx_response();
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
             if (n1sdp_c2c_ctx.master_rx_data[0] != N1SDP_C2C_SUCCESS) {
                 FWK_LOG_INFO("[C2C] Command failed in slave!");
                 return FWK_E_STATE;
@@ -333,8 +339,9 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
         }
         if (run_in_slave) {
             status = n1sdp_c2c_master_rx_response();
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
             if (n1sdp_c2c_ctx.master_rx_data[0] != N1SDP_C2C_SUCCESS) {
                 FWK_LOG_INFO("[C2C] Command failed in slave!");
                 return FWK_E_STATE;
@@ -351,8 +358,9 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
         }
         if (run_in_slave) {
             status = n1sdp_c2c_master_rx_response();
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
             if (n1sdp_c2c_ctx.master_rx_data[0] != N1SDP_C2C_SUCCESS) {
                 FWK_LOG_INFO("[C2C] Command failed in slave!");
                 return FWK_E_STATE;
@@ -383,8 +391,9 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
         }
         if (run_in_slave) {
             status = n1sdp_c2c_master_rx_response();
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
             if (n1sdp_c2c_ctx.master_rx_data[0] != N1SDP_C2C_SUCCESS) {
                 FWK_LOG_INFO("[C2C] Command failed in slave!");
                 return FWK_E_STATE;
@@ -401,8 +410,9 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
         }
         if (run_in_slave) {
             status = n1sdp_c2c_master_rx_response();
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
             if (n1sdp_c2c_ctx.master_rx_data[0] != N1SDP_C2C_SUCCESS) {
                 FWK_LOG_INFO("[C2C] Command failed in slave!");
                 return FWK_E_STATE;
@@ -419,8 +429,9 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
         }
         if (run_in_slave) {
             status = n1sdp_c2c_master_rx_response();
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
             if (n1sdp_c2c_ctx.master_rx_data[0] != N1SDP_C2C_SUCCESS) {
                 FWK_LOG_INFO("[C2C] Command failed in slave!");
                 return FWK_E_STATE;
@@ -437,8 +448,9 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
         }
         if (run_in_slave) {
             status = n1sdp_c2c_master_rx_response();
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
             if (n1sdp_c2c_ctx.master_rx_data[0] != N1SDP_C2C_SUCCESS) {
                 FWK_LOG_INFO("[C2C] Command failed in slave!");
                 return FWK_E_STATE;
@@ -449,8 +461,9 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
     case N1SDP_C2C_CMD_GET_SLV_DDR_SIZE:
         if (run_in_slave) {
             status = n1sdp_c2c_master_rx_response();
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
             if (n1sdp_c2c_ctx.master_rx_data[0] != N1SDP_C2C_SUCCESS) {
                 FWK_LOG_INFO("[C2C] Command failed in slave!");
                 return FWK_E_STATE;
@@ -470,8 +483,9 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
         }
         if (run_in_slave) {
             status = n1sdp_c2c_master_rx_response();
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
             if (n1sdp_c2c_ctx.master_rx_data[0] != N1SDP_C2C_SUCCESS) {
                 FWK_LOG_INFO("[C2C] Command failed in slave!");
                 return FWK_E_STATE;
@@ -493,68 +507,81 @@ static int n1sdp_c2c_multichip_init(void)
 
     status = n1sdp_c2c_multichip_run_command(N1SDP_C2C_CMD_PCIE_POWER_ON,
                                              true);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = n1sdp_c2c_multichip_run_command(N1SDP_C2C_CMD_PCIE_PHY_INIT,
                                              true);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = n1sdp_c2c_multichip_run_command(N1SDP_C2C_CMD_PCIE_CCIX_CONFIG,
                                              true);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = n1sdp_c2c_multichip_run_command(N1SDP_C2C_CMD_PCIE_CTRL_INIT,
                                              true);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = n1sdp_c2c_multichip_run_command(N1SDP_C2C_CMD_PCIE_LINK_TRAIN,
                                              true);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = n1sdp_c2c_multichip_run_command(N1SDP_C2C_CMD_PCIE_RC_SETUP,
                                              false);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = n1sdp_c2c_multichip_run_command(N1SDP_C2C_CMD_PCIE_VC1_CONFIG,
                                              false);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = n1sdp_c2c_multichip_run_command(N1SDP_C2C_CMD_CMN600_SET_CONFIG,
                                              true);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = n1sdp_c2c_multichip_run_command(
         N1SDP_C2C_CMD_CMN600_XCHANGE_CREDITS, true);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = n1sdp_c2c_multichip_run_command(
         N1SDP_C2C_CMD_CMN600_ENTER_SYS_COHERENCY, true);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = n1sdp_c2c_multichip_run_command(
         N1SDP_C2C_CMD_CMN600_ENTER_DVM_DOMAIN, true);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = n1sdp_c2c_multichip_run_command(N1SDP_C2C_CMD_GET_SLV_DDR_SIZE,
                                              true);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = n1sdp_c2c_multichip_run_command(N1SDP_C2C_CMD_TIMER_SYNC,
                                              true);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return FWK_SUCCESS;
 }
@@ -598,36 +625,41 @@ static int n1sdp_c2c_process_command(void)
     case N1SDP_C2C_CMD_PCIE_POWER_ON:
         status = n1sdp_c2c_ctx.pcie_init_api->power_on(
             n1sdp_c2c_ctx.config->ccix_id);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             goto error;
+        }
         break;
 
     case N1SDP_C2C_CMD_PCIE_PHY_INIT:
         status = n1sdp_c2c_ctx.pcie_init_api->phy_init(
             n1sdp_c2c_ctx.config->ccix_id);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             goto error;
+        }
         break;
 
     case N1SDP_C2C_CMD_PCIE_CTRL_INIT:
         status = n1sdp_c2c_ctx.pcie_init_api->controller_init(
             n1sdp_c2c_ctx.config->ccix_id, true);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             goto error;
+        }
         break;
 
     case N1SDP_C2C_CMD_PCIE_LINK_TRAIN:
         status = n1sdp_c2c_ctx.pcie_init_api->link_training(
             n1sdp_c2c_ctx.config->ccix_id, true);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             goto error;
+        }
         break;
 
     case N1SDP_C2C_CMD_PCIE_CCIX_CONFIG:
         status = n1sdp_c2c_ctx.ccix_config_api->enable_opt_tlp(
             CCIX_OPT_TLP_EN);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             goto error;
+        }
         break;
 
     case N1SDP_C2C_CMD_CMN600_SET_CONFIG:
@@ -645,35 +677,40 @@ static int n1sdp_c2c_process_command(void)
         remote_config.remote_ha_mmap[0].base = 0;
         remote_config.remote_ha_mmap[0].size = (4ULL * FWK_TIB);
         status = n1sdp_c2c_ctx.cmn600_api->set_config(&remote_config);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             goto error;
+        }
         break;
 
     case N1SDP_C2C_CMD_CMN600_XCHANGE_CREDITS:
         status = n1sdp_c2c_ctx.cmn600_api->exchange_protocol_credit(
             CMN600_CCIX_LINK_ID);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             goto error;
+        }
         break;
 
     case N1SDP_C2C_CMD_CMN600_ENTER_SYS_COHERENCY:
         status = n1sdp_c2c_ctx.cmn600_api->enter_system_coherency(
             CMN600_CCIX_LINK_ID);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             goto error;
+        }
         break;
 
     case N1SDP_C2C_CMD_CMN600_ENTER_DVM_DOMAIN:
         status = n1sdp_c2c_ctx.cmn600_api->enter_dvm_domain(
             CMN600_CCIX_LINK_ID);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             goto error;
+        }
         break;
 
     case N1SDP_C2C_CMD_GET_SLV_DDR_SIZE:
         status = n1sdp_c2c_ctx.dmc620_api->get_mem_size_gb(&ddr_size_gb);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             goto error;
+        }
         n1sdp_c2c_ctx.slave_tx_data[1] = (uint8_t)ddr_size_gb;
         break;
 
@@ -689,8 +726,9 @@ static int n1sdp_c2c_process_command(void)
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
                 MOD_PD_COMPOSITE_STATE(
                     MOD_PD_LEVEL_0, 0, 0, 0, MOD_PD_STATE_OFF));
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 goto error;
+            }
             break;
 
         case MOD_PD_TYPE_CLUSTER:
@@ -698,16 +736,18 @@ static int n1sdp_c2c_process_command(void)
             status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
                 MOD_PD_STATE_OFF);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 goto error;
+            }
             break;
 
         case MOD_PD_TYPE_SYSTEM:
             status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
                 MOD_PD_STATE_OFF);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 goto error;
+            }
             break;
 
         default:
@@ -732,8 +772,9 @@ static int n1sdp_c2c_process_command(void)
                     MOD_PD_STATE_ON,
                     MOD_PD_STATE_ON,
                     MOD_PD_STATE_ON));
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 goto error;
+            }
             break;
 
         case MOD_PD_TYPE_CLUSTER:
@@ -741,16 +782,18 @@ static int n1sdp_c2c_process_command(void)
             status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
                 MOD_PD_STATE_ON);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 goto error;
+            }
             break;
 
         case MOD_PD_TYPE_SYSTEM:
             status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
                 MOD_PD_STATE_ON);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 goto error;
+            }
             break;
 
         default:
@@ -767,8 +810,9 @@ static int n1sdp_c2c_process_command(void)
         status = n1sdp_c2c_ctx.pd_api->get_state(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
             &state);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             goto error;
+        }
 
         n1sdp_c2c_ctx.slave_tx_data[1] = (uint8_t)state;
         break;
@@ -776,8 +820,9 @@ static int n1sdp_c2c_process_command(void)
     case N1SDP_C2C_CMD_TIMER_SYNC:
         status = n1sdp_c2c_ctx.tsync_api->slave_sync(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_N1SDP_TIMER_SYNC, 0));
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             goto error;
+        }
         break;
 
     case N1SDP_C2C_CMD_SHUTDOWN_OR_REBOOT:
@@ -814,10 +859,11 @@ static int n1sdp_c2c_process_command(void)
     }
 
 error:
-    if (status == FWK_SUCCESS)
+    if (status == FWK_SUCCESS) {
         n1sdp_c2c_ctx.slave_tx_data[0] = N1SDP_C2C_SUCCESS;
-    else
+    } else {
         n1sdp_c2c_ctx.slave_tx_data[0] = N1SDP_C2C_ERROR;
+    }
 
     status = n1sdp_c2c_ctx.slave_api->write(
         n1sdp_c2c_ctx.config->i2c_id,
@@ -869,8 +915,9 @@ static int n1sdp_c2c_pd_set_state(enum n1sdp_c2c_cmd cmd, uint8_t pd_id,
     n1sdp_c2c_ctx.master_tx_data[1] = pd_id;
     n1sdp_c2c_ctx.master_tx_data[2] = pd_type;
     status = n1sdp_c2c_master_tx_command((uint8_t)cmd);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /*
      * PD command in slave will take some time to complete so master
@@ -879,16 +926,18 @@ static int n1sdp_c2c_pd_set_state(enum n1sdp_c2c_cmd cmd, uint8_t pd_id,
     retries = C2C_MASTER_RETRIES;
     do {
         status = n1sdp_c2c_master_rx_response();
-        if (status == FWK_SUCCESS)
+        if (status == FWK_SUCCESS) {
             break;
+        }
 
         retries--;
         n1sdp_c2c_ctx.timer_api->delay(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
                                        C2C_MASTER_RETRY_DELAY_US);
     } while (retries != 0);
 
-    if ((retries == 0) && (status != FWK_SUCCESS))
+    if ((retries == 0) && (status != FWK_SUCCESS)) {
         return status;
+    }
 
     if (n1sdp_c2c_ctx.master_rx_data[0] != N1SDP_C2C_SUCCESS) {
         FWK_LOG_INFO("[C2C] PD request failed!");
@@ -908,8 +957,9 @@ static int n1sdp_c2c_pd_get_state(enum n1sdp_c2c_cmd cmd, uint8_t pd_id,
 
     n1sdp_c2c_ctx.master_tx_data[1] = pd_id;
     status = n1sdp_c2c_master_tx_command((uint8_t)cmd);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /*
      * PD command in slave will take some time to complete so master
@@ -918,16 +968,18 @@ static int n1sdp_c2c_pd_get_state(enum n1sdp_c2c_cmd cmd, uint8_t pd_id,
     retries = C2C_MASTER_RETRIES;
     do {
         status = n1sdp_c2c_master_rx_response();
-        if (status == FWK_SUCCESS)
+        if (status == FWK_SUCCESS) {
             break;
+        }
         retries--;
 
         n1sdp_c2c_ctx.timer_api->delay(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
                                        C2C_MASTER_RETRY_DELAY_US);
     } while (retries != 0);
 
-    if ((retries == 0) && (status != FWK_SUCCESS))
+    if ((retries == 0) && (status != FWK_SUCCESS)) {
         return status;
+    }
 
     /*
      * master_rx_data[0] contains return status code
@@ -968,100 +1020,114 @@ static const struct n1sdp_c2c_pd_api pd_api = {
 static int n1sdp_c2c_init(fwk_id_t module_id, unsigned int unused,
     const void *data)
 {
-    if (data == NULL)
+    if (data == NULL) {
         return FWK_E_PARAM;
+    }
 
     n1sdp_c2c_ctx.config = (struct n1sdp_c2c_dev_config *)data;
 
     n1sdp_c2c_ctx.mc_mode = n1sdp_is_multichip_enabled();
-    if (!n1sdp_c2c_ctx.mc_mode)
+    if (!n1sdp_c2c_ctx.mc_mode) {
         return FWK_SUCCESS;
+    }
 
     n1sdp_c2c_ctx.chip_id = n1sdp_get_chipid();
 
-    if (n1sdp_c2c_ctx.chip_id == 0x0)
+    if (n1sdp_c2c_ctx.chip_id == 0x0) {
         return FWK_SUCCESS;
-    else
+    } else {
         return fwk_thread_create(module_id);
+    }
 }
 
 static int n1sdp_c2c_bind(fwk_id_t id, unsigned int round)
 {
     int status;
 
-    if (!n1sdp_c2c_ctx.mc_mode)
+    if (!n1sdp_c2c_ctx.mc_mode) {
         return FWK_SUCCESS;
+    }
 
     if (round == 0) {
         status = fwk_module_bind(n1sdp_c2c_ctx.config->ccix_id,
                                  FWK_ID_API(FWK_MODULE_IDX_N1SDP_PCIE,
                                             N1SDP_PCIE_API_IDX_PCIE_INIT),
                                  &n1sdp_c2c_ctx.pcie_init_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         status = fwk_module_bind(n1sdp_c2c_ctx.config->ccix_id,
                                  FWK_ID_API(FWK_MODULE_IDX_N1SDP_PCIE,
                                             N1SDP_PCIE_API_IDX_CCIX_CONFIG),
                                  &n1sdp_c2c_ctx.ccix_config_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_CMN600),
                                  FWK_ID_API(FWK_MODULE_IDX_CMN600,
                                             MOD_CMN600_API_IDX_CCIX_CONFIG),
                                  &n1sdp_c2c_ctx.cmn600_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         status = fwk_module_bind(fwk_module_id_power_domain,
                                  mod_pd_api_id_restricted,
                                  &n1sdp_c2c_ctx.pd_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_DMC620),
                                  FWK_ID_API(FWK_MODULE_IDX_N1SDP_DMC620,
                                             MOD_DMC620_API_IDX_MEM_INFO),
                                  &n1sdp_c2c_ctx.dmc620_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         status = fwk_module_bind(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
                                  FWK_ID_API(FWK_MODULE_IDX_TIMER,
                                             MOD_TIMER_API_IDX_TIMER),
                                  &n1sdp_c2c_ctx.timer_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         status = fwk_module_bind(
             FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_TIMER_SYNC),
             FWK_ID_API(FWK_MODULE_IDX_N1SDP_TIMER_SYNC,
                        N1SDP_TIMER_SYNC_API_IDX_TSYNC),
             &n1sdp_c2c_ctx.tsync_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SCP2PCC),
                                  FWK_ID_API(FWK_MODULE_IDX_N1SDP_SCP2PCC, 0),
                                  &n1sdp_c2c_ctx.scp2pcc_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         if (n1sdp_c2c_ctx.chip_id == 0) {
             status = fwk_module_bind(n1sdp_c2c_ctx.config->i2c_id,
                 FWK_ID_API(FWK_MODULE_IDX_N1SDP_I2C,
                            MOD_N1SDP_I2C_API_MASTER_POLLED),
                 &n1sdp_c2c_ctx.master_api);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
         } else {
             status = fwk_module_bind(n1sdp_c2c_ctx.config->i2c_id,
                                      FWK_ID_API(FWK_MODULE_IDX_N1SDP_I2C,
                                                 MOD_N1SDP_I2C_API_SLAVE_IRQ),
                                      &n1sdp_c2c_ctx.slave_api);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
         }
     }
 
@@ -1089,22 +1155,26 @@ static int n1sdp_c2c_start(fwk_id_t id)
 {
     int status;
 
-    if (!n1sdp_c2c_ctx.mc_mode)
+    if (!n1sdp_c2c_ctx.mc_mode) {
         return FWK_SUCCESS;
+    }
 
-    if (fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT))
+    if (fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
         return FWK_SUCCESS;
+    }
 
     status = fwk_notification_subscribe(
         mod_clock_notification_id_state_changed,
         FWK_ID_ELEMENT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_INTERCONNECT), id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_notification_subscribe(mod_n1sdp_i2c_notification_id_slave_rx,
                                         n1sdp_c2c_ctx.config->i2c_id, id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return fwk_notification_subscribe(mod_n1sdp_i2c_notification_id_slave_tx,
                                       n1sdp_c2c_ctx.config->i2c_id, id);
@@ -1119,8 +1189,9 @@ static int n1sdp_c2c_process_notification(const struct fwk_event *event,
         status = n1sdp_c2c_check_remote();
         if (status == FWK_SUCCESS && (n1sdp_c2c_ctx.chip_id == 0)) {
             status = n1sdp_c2c_multichip_init();
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 n1sdp_c2c_ctx.slave_alive = false;
+            }
         }
         /*
          * Unsubscribe from notification as C2C initialization will be done

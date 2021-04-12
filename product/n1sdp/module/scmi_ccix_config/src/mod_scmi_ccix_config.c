@@ -124,8 +124,9 @@ static int scmi_ccix_config_protocol_msg_attributes_handler(fwk_id_t service_id,
             /* All commands have an attributes value of 0 */
             .attributes = 0,
         };
-    } else
+    } else {
         return_values.status = SCMI_NOT_FOUND;
+    }
 
     scmi_ccix_config_ctx.scmi_api->respond(service_id, &return_values,
         (return_values.status == SCMI_SUCCESS) ?
@@ -148,13 +149,15 @@ static int scmi_ccix_config_protocol_get_handler(fwk_id_t service_id,
     return_values.status = SCMI_SUCCESS;
 
     status = scmi_ccix_config_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     status = scmi_ccix_config_ctx.scmi_api->get_agent_type(agent_id,
         &agent_type);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     /* Only the OSPM agent allowed */
     if (agent_type != SCMI_AGENT_TYPE_OSPM) {
@@ -165,8 +168,9 @@ static int scmi_ccix_config_protocol_get_handler(fwk_id_t service_id,
 
     status = scmi_ccix_config_ctx.scmi_api->get_max_payload_size(service_id,
         &max_payload_size);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     if (sizeof(return_values) > max_payload_size) {
         return_values.status = SCMI_OUT_OF_RANGE;
@@ -236,13 +240,15 @@ static int scmi_ccix_config_protocol_set_handler(fwk_id_t service_id,
     params = (const struct scmi_ccix_config_protocol_set_a2p *)payload;
 
     status = scmi_ccix_config_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     status = scmi_ccix_config_ctx.scmi_api->get_agent_type(agent_id,
         &agent_type);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     /* Only the OSPM agent allowed */
     if (agent_type != SCMI_AGENT_TYPE_OSPM) {
@@ -253,8 +259,9 @@ static int scmi_ccix_config_protocol_set_handler(fwk_id_t service_id,
 
     status = scmi_ccix_config_ctx.scmi_api->get_max_payload_size(service_id,
         &max_payload_size);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     if (sizeof(*params) > max_payload_size) {
         return_values.status = SCMI_OUT_OF_RANGE;
@@ -410,8 +417,9 @@ static int scmi_ccix_config_bind(fwk_id_t id, unsigned int round)
 {
     int status;
 
-    if (round == 1)
+    if (round == 1) {
         return FWK_SUCCESS;
+    }
 
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
         FWK_ID_API(FWK_MODULE_IDX_SCMI, MOD_SCMI_API_IDX_PROTOCOL),
@@ -448,8 +456,9 @@ static int scmi_ccix_config_process_bind_request(fwk_id_t source_id,
     fwk_id_t api_id,
     const void **api)
 {
-    if (!fwk_id_is_equal(source_id, FWK_ID_MODULE(FWK_MODULE_IDX_SCMI)))
+    if (!fwk_id_is_equal(source_id, FWK_ID_MODULE(FWK_MODULE_IDX_SCMI))) {
         return FWK_E_ACCESS;
+    }
 
     *api = &scmi_ccix_config_protocol_api;
 

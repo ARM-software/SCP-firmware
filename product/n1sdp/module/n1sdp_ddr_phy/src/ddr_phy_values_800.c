@@ -36,10 +36,11 @@ void ddr_phy_config_800(struct mod_n1sdp_ddr_phy_reg *ddr_phy,
 {
     fwk_assert((ddr_phy != NULL) && (info != NULL));
 
-    if (info->number_of_ranks == 1)
+    if (info->number_of_ranks == 1) {
         PHY_PAD_VREF_CTRL_DQ_1600 = 0x1234;
-    else
+    } else {
         PHY_PAD_VREF_CTRL_DQ_1600 = 0x1260;
+    }
 
     ddr_phy->DENALI_PHY_00_DATA = 0x76543210;
     ddr_phy->DENALI_PHY_01_DATA = 0x0004C008;
@@ -91,10 +92,11 @@ void ddr_phy_config_800(struct mod_n1sdp_ddr_phy_reg *ddr_phy,
     ddr_phy->DENALI_PHY_47_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_48_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_49_DATA = 0x00000000;
-    if (info->dimm_mem_width == 4)
+    if (info->dimm_mem_width == 4) {
         ddr_phy->DENALI_PHY_50_DATA = 0x00000000;
-    else
+    } else {
         ddr_phy->DENALI_PHY_50_DATA = 0x00010000;
+    }
     ddr_phy->DENALI_PHY_51_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_52_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_53_DATA = 0x00000000;
@@ -243,10 +245,11 @@ void ddr_phy_config_800(struct mod_n1sdp_ddr_phy_reg *ddr_phy,
     ddr_phy->DENALI_PHY_303_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_304_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_305_DATA = 0x00000000;
-    if (info->dimm_mem_width == 4)
+    if (info->dimm_mem_width == 4) {
         ddr_phy->DENALI_PHY_306_DATA = 0x00000000;
-    else
+    } else {
         ddr_phy->DENALI_PHY_306_DATA = 0x00010000;
+    }
     ddr_phy->DENALI_PHY_307_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_308_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_309_DATA = 0x00000000;
@@ -395,10 +398,11 @@ void ddr_phy_config_800(struct mod_n1sdp_ddr_phy_reg *ddr_phy,
     ddr_phy->DENALI_PHY_559_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_560_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_561_DATA = 0x00000000;
-    if (info->dimm_mem_width == 4)
+    if (info->dimm_mem_width == 4) {
         ddr_phy->DENALI_PHY_562_DATA = 0x00000000;
-    else
+    } else {
         ddr_phy->DENALI_PHY_562_DATA = 0x00010000;
+    }
     ddr_phy->DENALI_PHY_563_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_564_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_565_DATA = 0x00000000;
@@ -547,10 +551,11 @@ void ddr_phy_config_800(struct mod_n1sdp_ddr_phy_reg *ddr_phy,
     ddr_phy->DENALI_PHY_815_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_816_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_817_DATA = 0x00000000;
-    if (info->dimm_mem_width == 4)
+    if (info->dimm_mem_width == 4) {
         ddr_phy->DENALI_PHY_818_DATA = 0x00000000;
-    else
+    } else {
         ddr_phy->DENALI_PHY_818_DATA = 0x00010000;
+    }
     ddr_phy->DENALI_PHY_819_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_820_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_821_DATA = 0x00000000;
@@ -699,10 +704,11 @@ void ddr_phy_config_800(struct mod_n1sdp_ddr_phy_reg *ddr_phy,
     ddr_phy->DENALI_PHY_1071_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1072_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1073_DATA = 0x00000000;
-    if (info->dimm_mem_width == 4)
+    if (info->dimm_mem_width == 4) {
         ddr_phy->DENALI_PHY_1074_DATA = 0x00000000;
-    else
+    } else {
         ddr_phy->DENALI_PHY_1074_DATA = 0x00010000;
+    }
     ddr_phy->DENALI_PHY_1075_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1076_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1077_DATA = 0x00000000;
@@ -851,10 +857,11 @@ void ddr_phy_config_800(struct mod_n1sdp_ddr_phy_reg *ddr_phy,
     ddr_phy->DENALI_PHY_1327_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1328_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1329_DATA = 0x00000000;
-    if (info->dimm_mem_width == 4)
+    if (info->dimm_mem_width == 4) {
         ddr_phy->DENALI_PHY_1330_DATA = 0x00000000;
-    else
+    } else {
         ddr_phy->DENALI_PHY_1330_DATA = 0x00010000;
+    }
     ddr_phy->DENALI_PHY_1331_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1332_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1333_DATA = 0x00000000;
@@ -1003,10 +1010,11 @@ void ddr_phy_config_800(struct mod_n1sdp_ddr_phy_reg *ddr_phy,
     ddr_phy->DENALI_PHY_1583_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1584_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1585_DATA = 0x00000000;
-    if (info->dimm_mem_width == 4)
+    if (info->dimm_mem_width == 4) {
         ddr_phy->DENALI_PHY_1586_DATA = 0x00000000;
-    else
+    } else {
         ddr_phy->DENALI_PHY_1586_DATA = 0x00010000;
+    }
     ddr_phy->DENALI_PHY_1587_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1588_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1589_DATA = 0x00000000;
@@ -1155,10 +1163,11 @@ void ddr_phy_config_800(struct mod_n1sdp_ddr_phy_reg *ddr_phy,
     ddr_phy->DENALI_PHY_1839_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1840_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1841_DATA = 0x00000000;
-    if (info->dimm_mem_width == 4)
+    if (info->dimm_mem_width == 4) {
         ddr_phy->DENALI_PHY_1842_DATA = 0x00000000;
-    else
+    } else {
         ddr_phy->DENALI_PHY_1842_DATA = 0x00010000;
+    }
     ddr_phy->DENALI_PHY_1843_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1844_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_1845_DATA = 0x00000000;
@@ -1307,10 +1316,11 @@ void ddr_phy_config_800(struct mod_n1sdp_ddr_phy_reg *ddr_phy,
     ddr_phy->DENALI_PHY_2095_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_2096_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_2097_DATA = 0x00000000;
-    if (info->dimm_mem_width == 4)
+    if (info->dimm_mem_width == 4) {
         ddr_phy->DENALI_PHY_2098_DATA = 0x00000000;
-    else
+    } else {
         ddr_phy->DENALI_PHY_2098_DATA = 0x00010000;
+    }
     ddr_phy->DENALI_PHY_2099_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_2100_DATA = 0x00000000;
     ddr_phy->DENALI_PHY_2101_DATA = 0x00000000;

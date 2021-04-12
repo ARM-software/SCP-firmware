@@ -102,12 +102,13 @@ void pcie_init_bdf_table(struct n1sdp_pcie_dev_config *config)
     struct bdf_table *table;
 
     /* Set BDF table pointer based on the root complex */
-    if (config->ccix_capable)
+    if (config->ccix_capable) {
         table = (struct bdf_table *)(SCP_NONTRUSTED_RAM_BASE +
                                      CCIX_BDF_TABLE_OFFSET);
-    else
+    } else {
         table = (struct bdf_table *)(SCP_NONTRUSTED_RAM_BASE +
                                      PCIE_BDF_TABLE_OFFSET);
+    }
 
     table->rp_config_base_addr = config->global_config_base -
                                      SCP_AP_AXI_OFFSET;
@@ -133,8 +134,9 @@ static uint8_t pcie_bus_scan(uint32_t ecam_addr,
          * config space of device 0 for all other device numbers on bus 1
          */
         if (((pri_bnum == PCIE_PRIMARY_BUS_NUM_START) && (dev_num != 0)) ||
-            ((pri_bnum == CCIX_PRIMARY_BUS_NUM_START) && (dev_num != 0)))
+            ((pri_bnum == CCIX_PRIMARY_BUS_NUM_START) && (dev_num != 0))) {
             break;
+        }
         /* Loop over all functions on dev_num device */
         for (fn_num = 0; fn_num < FUNCTIONS_PER_DEVICE_MAX; fn_num++) {
             bdf_addr = (pri_bnum << BDF_ADDR_SHIFT_BUS) |
@@ -156,10 +158,11 @@ static uint8_t pcie_bus_scan(uint32_t ecam_addr,
 
             /* If function 0 of any device has invalid VID break the loop */
             if ((vid & 0xFFFF) == 0xFFFF) {
-                if (fn_num == 0)
+                if (fn_num == 0) {
                     break;
-                else
+                } else {
                     continue;
+                }
             }
 
             /*
@@ -215,12 +218,13 @@ void pcie_bus_enumeration(struct n1sdp_pcie_dev_config *config)
     struct bdf_table *table;
 
     /* Set BDF table pointer based on the root complex */
-    if (config->ccix_capable)
+    if (config->ccix_capable) {
         table = (struct bdf_table *)(SCP_NONTRUSTED_RAM_BASE +
                                      CCIX_BDF_TABLE_OFFSET);
-    else
+    } else {
         table = (struct bdf_table *)(SCP_NONTRUSTED_RAM_BASE +
                                      PCIE_BDF_TABLE_OFFSET);
+    }
 
     pcie_init_bdf_table(config);
 
@@ -322,8 +326,9 @@ FWK_NOINLINE /* only one location where the checked load happen */
         : "=r"(err), "=r"(dst)
         : "r"(src)
         : "r0");
-    if (err == CHECKED_READ_U32__ERROR_VALUE)
+    if (err == CHECKED_READ_U32__ERROR_VALUE) {
         return false;
+    }
     *value = dst;
     return true;
 }
@@ -357,7 +362,9 @@ void arch_exception_invalid(void)
         : "=r"(context));
 
     const int exception = *ICSR & ICSR_VECTACTIVE;
-    if (!exception_handler(exception, context))
-        while (true)
+    if (!exception_handler(exception, context)) {
+        while (true) {
             __WFI();
+        }
+    }
 }

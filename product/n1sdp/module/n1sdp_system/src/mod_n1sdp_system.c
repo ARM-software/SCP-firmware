@@ -169,8 +169,9 @@ static void ppu_cores_isr(void)
         core_idx = __builtin_ctz(status);
         status &= ~(1 << core_idx);
 
-        if (core_idx >= n1sdp_core_get_core_count())
+        if (core_idx >= n1sdp_core_get_core_count()) {
             continue;
+        }
 
         n1sdp_system_ctx.ppu_v1_isr_api->ppu_interrupt_handler(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1, core_idx));
@@ -426,20 +427,23 @@ static int n1sdp_system_init_primary_core(void)
 
         status = n1sdp_system_copy_to_ap_sram(
             AP_CORE_RESET_ADDR, entry.base, entry.size);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return FWK_E_PANIC;
+        }
 
         /* Fill BL33 image information structure */
         FWK_LOG_INFO("[N1SDP SYSTEM] Filling BL33 information...");
         status = n1sdp_system_fill_bl33_info();
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         /* Fill Platform information structure */
         FWK_LOG_INFO("[N1SDP SYSTEM] Collecting Platform information...");
         status = n1sdp_system_fill_platform_info();
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         /* Enable non-secure CoreSight debug access */
         FWK_LOG_INFO(
@@ -462,8 +466,9 @@ static int n1sdp_system_init_primary_core(void)
                 MOD_PD_STATE_ON,
                 MOD_PD_STATE_ON,
                 MOD_PD_STATE_ON));
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return FWK_SUCCESS;
@@ -496,8 +501,9 @@ static int n1sdp_system_mod_init(fwk_id_t module_id, unsigned int unused,
     for (idx = 0; idx < FWK_ARRAY_SIZE(isrs); idx++) {
         isr = &isrs[idx];
         status = fwk_interrupt_set_isr(isr->interrupt, isr->handler);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return FWK_SUCCESS;
@@ -507,51 +513,59 @@ static int n1sdp_system_bind(fwk_id_t id, unsigned int round)
 {
     int status;
 
-    if (round > 0)
+    if (round > 0) {
         return FWK_SUCCESS;
+    }
 
     status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_FIP),
         FWK_ID_API(FWK_MODULE_IDX_FIP, 0),
         &n1sdp_system_ctx.fip_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_DMC620),
          FWK_ID_API(FWK_MODULE_IDX_N1SDP_DMC620, MOD_DMC620_API_IDX_MEM_INFO),
          &n1sdp_system_ctx.dmc620_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_POWER_DOMAIN),
         FWK_ID_API(FWK_MODULE_IDX_POWER_DOMAIN, MOD_PD_API_IDX_RESTRICTED),
         &n1sdp_system_ctx.mod_pd_restricted_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_PPU_V1),
         FWK_ID_API(FWK_MODULE_IDX_PPU_V1, MOD_PPU_V1_API_IDX_ISR),
         &n1sdp_system_ctx.ppu_v1_isr_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_C2C),
         FWK_ID_API(FWK_MODULE_IDX_N1SDP_C2C, N1SDP_C2C_API_IDX_SLAVE_INFO),
         &n1sdp_system_ctx.c2c_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_C2C),
         FWK_ID_API(FWK_MODULE_IDX_N1SDP_C2C, N1SDP_C2C_API_IDX_PD),
         &n1sdp_system_ctx.c2c_pd_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_SCP2PCC),
         FWK_ID_API(FWK_MODULE_IDX_N1SDP_SCP2PCC, 0),
         &n1sdp_system_ctx.scp2pcc_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return fwk_module_bind(fwk_module_id_sds,
         FWK_ID_API(FWK_MODULE_IDX_SDS, 0),
@@ -585,8 +599,9 @@ static int n1sdp_system_start(fwk_id_t id)
         mod_clock_notification_id_state_changed,
         FWK_ID_ELEMENT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_INTERCONNECT),
         id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_interrupt_set_isr(CDBG_PWR_UP_REQ_IRQ, cdbg_pwrupreq_handler);
     if (status == FWK_SUCCESS) {
@@ -604,10 +619,12 @@ static int n1sdp_system_start(fwk_id_t id)
             CS_CNTCONTROL->CS_CNTCR |= (1 << 0);
             CS_CNTCONTROL->CS_CNTCVLW = 0x00000000;
             CS_CNTCONTROL->CS_CNTCVUP = 0x0000FFFF;
-        } else
+        } else {
             FWK_LOG_ERR("[N1SDP SYSTEM] CSYS PWR UP REQ IRQ register failed");
-    } else
+        }
+    } else {
         FWK_LOG_ERR("[N1SDP SYSTEM] CDBG PWR UP REQ IRQ register failed");
+    }
 
     FWK_LOG_INFO("[N1SDP SYSTEM] Requesting SYSTOP initialization...");
 
@@ -623,8 +640,9 @@ static int n1sdp_system_start(fwk_id_t id)
             fwk_id_build_element_id(fwk_module_id_scmi,
                 scmi_notification_table[i]),
             id);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     /*
@@ -635,8 +653,9 @@ static int n1sdp_system_start(fwk_id_t id)
         mod_sds_notification_id_initialized,
         fwk_module_id_sds,
         id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     if (n1sdp_is_multichip_enabled() && (n1sdp_get_chipid() == 0x0)) {
         composite_state = MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_3,
@@ -676,8 +695,9 @@ static int n1sdp_system_process_notification(const struct fwk_event *event,
          */
         if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
             status = n1sdp_system_init_primary_core();
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
 
             /*
              * Unsubscribe to interconnect clock state change notification as
@@ -694,8 +714,9 @@ static int n1sdp_system_process_notification(const struct fwk_event *event,
     } else if (fwk_id_is_equal(event->id,
                                mod_sds_notification_id_initialized)) {
         sds_notification_received = true;
-    } else
+    } else {
         return FWK_E_PARAM;
+    }
 
     if ((scmi_notification_count == FWK_ARRAY_SIZE(scmi_notification_table)) &&
         sds_notification_received) {

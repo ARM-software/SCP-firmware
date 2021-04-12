@@ -66,8 +66,9 @@ void dmc620_abort_recover(struct mod_dmc620_reg *dmc)
 
     /* Wait for DMC to enter aborted state */
     FWK_LOG_INFO("[DDR] Waiting for DMC to enter abort state...");
-    while ((dmc->MEMC_STATUS & 0x00000007) != 0x4)
+    while ((dmc->MEMC_STATUS & 0x00000007) != 0x4) {
         continue;
+    }
 
     FWK_LOG_INFO("[DDR] DONE");
 
@@ -81,8 +82,9 @@ void dmc620_abort_recover(struct mod_dmc620_reg *dmc)
 
     /* Wait for state transition to complete */
     FWK_LOG_INFO("[DDR] Waiting for DMC state transition...");
-    while ((dmc->MEMC_STATUS & 0x00000007) != 0x5)
+    while ((dmc->MEMC_STATUS & 0x00000007) != 0x5) {
         continue;
+    }
 
     FWK_LOG_INFO("[DDR] DONE");
 
@@ -92,8 +94,9 @@ void dmc620_abort_recover(struct mod_dmc620_reg *dmc)
 
     /* Wait for state transition to complete */
     FWK_LOG_INFO("[DDR] Waiting for DMC state transition...");
-    while ((dmc->MEMC_STATUS & 0x00000007) != current_state)
+    while ((dmc->MEMC_STATUS & 0x00000007) != current_state) {
         continue;
+    }
 
     FWK_LOG_INFO("[DDR] DONE");
 
@@ -356,21 +359,24 @@ static int ddr_training(struct mod_dmc620_reg *dmc,
         FWK_LOG_INFO("[DDR] Write leveling rank %d... ", i);
 
         /* Clear interrupt status if any */
-        if (dmc->INTERRUPT_STATUS != 0)
+        if (dmc->INTERRUPT_STATUS != 0) {
             dmc->INTERRUPT_CLR = 0xFFFFFFFF;
+        }
 
         /* Set training command */
         dmc->DIRECT_ADDR = DDR_ADDR_TRAIN_TYPE_WR_LVL;
         if (dmc->DIRECT_ADDR != DDR_ADDR_TRAIN_TYPE_WR_LVL) {
-            for (j = 1; j <= ddr_info.number_of_ranks; j++)
+            for (j = 1; j <= ddr_info.number_of_ranks; j++) {
                 ddr_phy_api->wrlvl_phy_obs_regs(ddr_id, j, info);
+            }
             return FWK_E_DEVICE;
         }
         dmc->DIRECT_CMD  = ((1 << (i + 15)) | 0x000A);
         status = ddr_poll_training_status(dmc);
         if (status != FWK_SUCCESS) {
-            for (j = 1; j <= ddr_info.number_of_ranks; j++)
+            for (j = 1; j <= ddr_info.number_of_ranks; j++) {
                 ddr_phy_api->wrlvl_phy_obs_regs(ddr_id, j, info);
+            }
             return status;
         }
         ddr_phy_api->wrlvl_phy_obs_regs(ddr_id, i, info);
@@ -379,8 +385,9 @@ static int ddr_training(struct mod_dmc620_reg *dmc,
 
     FWK_LOG_INFO("[DDR] Read gate training");
     /* Clear interrupt status if any */
-    if (dmc->INTERRUPT_STATUS != 0)
+    if (dmc->INTERRUPT_STATUS != 0) {
         dmc->INTERRUPT_CLR = 0xFFFFFFFF;
+    }
 
     FWK_LOG_INFO("[DDR] A side...");
 
@@ -400,14 +407,16 @@ static int ddr_training(struct mod_dmc620_reg *dmc,
 
     status = ddr_poll_training_status(dmc);
     if (status != FWK_SUCCESS) {
-        for (j = 1; j <= ddr_info.number_of_ranks; j++)
+        for (j = 1; j <= ddr_info.number_of_ranks; j++) {
             ddr_phy_api->read_gate_phy_obs_regs(ddr_id, j, info);
+        }
         return status;
     }
 
     /* Clear interrupt status if any */
-    if (dmc->INTERRUPT_STATUS != 0)
+    if (dmc->INTERRUPT_STATUS != 0) {
         dmc->INTERRUPT_CLR = 0xFFFFFFFF;
+    }
 
 #if DDR_TRAIN_TWO_RANKS
     FWK_LOG_INFO("[DDR] B side...");
@@ -430,14 +439,16 @@ static int ddr_training(struct mod_dmc620_reg *dmc,
         return status;
 #endif
 
-    for (j = 1; j <= ddr_info.number_of_ranks; j++)
+    for (j = 1; j <= ddr_info.number_of_ranks; j++) {
         ddr_phy_api->read_gate_phy_obs_regs(ddr_id, j, info);
+    }
 
     FWK_LOG_INFO("[DDR] Read eye training");
 
     /* Clear interrupt status if any */
-    if (dmc->INTERRUPT_STATUS != 0)
+    if (dmc->INTERRUPT_STATUS != 0) {
         dmc->INTERRUPT_CLR = 0xFFFFFFFF;
+    }
 
     FWK_LOG_INFO("[DDR] A side...");
 
@@ -457,14 +468,16 @@ static int ddr_training(struct mod_dmc620_reg *dmc,
 
     status = ddr_poll_training_status(dmc);
     if (status != FWK_SUCCESS) {
-        for (j = 1; j <= ddr_info.number_of_ranks; j++)
+        for (j = 1; j <= ddr_info.number_of_ranks; j++) {
             ddr_phy_api->phy_obs_regs(ddr_id, j, info);
+        }
         return status;
     }
 
     /* Clear interrupt status if any */
-    if (dmc->INTERRUPT_STATUS != 0)
+    if (dmc->INTERRUPT_STATUS != 0) {
         dmc->INTERRUPT_CLR = 0xFFFFFFFF;
+    }
 
     FWK_LOG_INFO("[DDR] B side...");
 
@@ -483,14 +496,16 @@ static int ddr_training(struct mod_dmc620_reg *dmc,
 
     status = ddr_poll_training_status(dmc);
     if (status != FWK_SUCCESS) {
-        for (j = 1; j <= ddr_info.number_of_ranks; j++)
+        for (j = 1; j <= ddr_info.number_of_ranks; j++) {
             ddr_phy_api->phy_obs_regs(ddr_id, j, info);
+        }
         return status;
     }
 
     /* Clear interrupt status if any */
-    if (dmc->INTERRUPT_STATUS != 0)
+    if (dmc->INTERRUPT_STATUS != 0) {
         dmc->INTERRUPT_CLR = 0xFFFFFFFF;
+    }
 
     FWK_LOG_INFO("[DDR] MC initiated update...");
 
@@ -498,13 +513,15 @@ static int ddr_training(struct mod_dmc620_reg *dmc,
     dmc->DIRECT_CMD  = ((ddr_info.ranks_to_train << 16) | 0x000A);
 
     status = ddr_poll_training_status(dmc);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     dmc->DIRECT_CMD  = ((ddr_info.ranks_to_train << 16) | 0x000C);
 
-    for (j = 1; j <= ddr_info.number_of_ranks; j++)
+    for (j = 1; j <= ddr_info.number_of_ranks; j++) {
         ddr_phy_api->phy_obs_regs(ddr_id, j, info);
+    }
 
     return FWK_SUCCESS;
 }
@@ -515,23 +532,27 @@ static int dmc620_verify_phy_status(fwk_id_t ddr_id)
 
     status = ddr_phy_api->verify_phy_status(ddr_id,
         DDR_ADDR_TRAIN_TYPE_WR_LVL, &ddr_info);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = ddr_phy_api->verify_phy_status(ddr_id,
         DDR_ADDR_TRAIN_TYPE_RD_GATE, &ddr_info);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = ddr_phy_api->verify_phy_status(ddr_id,
         DDR_ADDR_TRAIN_TYPE_RD_EYE, &ddr_info);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = ddr_phy_api->verify_phy_status(ddr_id,
         DDR_ADDR_TRAIN_TYPE_VREF, &ddr_info);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return FWK_SUCCESS;
 }
@@ -540,8 +561,9 @@ static void delay_ms(uint32_t ms)
 {
     volatile uint32_t i = 0;
     while (ms) {
-        for (i = 0; i < 6000; i++)
+        for (i = 0; i < 6000; i++) {
             ;
+        }
         ms--;
     }
 }
@@ -554,8 +576,9 @@ static void execute_ddr_cmd(struct mod_dmc620_reg *dmc,
     dmc->DIRECT_ADDR = addr;
     dmc->DIRECT_CMD = cmd;
 
-    if (ms != 0)
+    if (ms != 0) {
         delay_ms(ms);
+    }
 
     status = dmc620_poll_dmc_status(dmc);
     if (status != FWK_SUCCESS) {
@@ -573,8 +596,9 @@ static int direct_ddr_cmd(struct mod_dmc620_reg *dmc)
     int status;
 
     /* Clear interrupt status if any */
-    if (dmc->INTERRUPT_STATUS != 0)
+    if (dmc->INTERRUPT_STATUS != 0) {
         dmc->INTERRUPT_CLR = 0xFFFFFFFF;
+    }
 
     execute_ddr_cmd(dmc, 0x00000004, 0x0001000A, 0);
     execute_ddr_cmd(dmc, 0x00000006,
@@ -588,8 +612,9 @@ static int direct_ddr_cmd(struct mod_dmc620_reg *dmc)
                     ((ddr_info.ranks_to_train << 16) | 0x000B), 0);
     execute_ddr_cmd(dmc, 0x0000002A, 0x0001000D, 0);
 
-    for (count = 0; count < 12; count++)
+    for (count = 0; count < 12; count++) {
         execute_ddr_cmd(dmc, 0x00000200, 0x0001000D, 1);
+    }
 
     execute_ddr_cmd(dmc, 0x00000000,
                     ((ddr_info.ranks_to_train << 16) | 0x0000), 0);
@@ -642,45 +667,51 @@ static int direct_ddr_cmd(struct mod_dmc620_reg *dmc)
     /* RC03, CA and CS Signals Driver Characteristics Control Word */
     addr = 0;
     if (ddr_info.number_of_ranks == 1) {
-        if (ddr_info.dimm_mem_width == 4)
+        if (ddr_info.dimm_mem_width == 4) {
             addr = 0x00000035;
-        else
+        } else {
             addr = 0x00000030;
+        }
     } else {
-        if (ddr_info.dimm_mem_width == 4)
+        if (ddr_info.dimm_mem_width == 4) {
             addr = 0x0000003A;
-        else
+        } else {
             addr = 0x00000035;
+        }
     }
     execute_ddr_cmd(dmc, addr, 0x0001070F, 5);
 
     /* RC04, ODT and CKE Signal Driver Characteristics Control Word */
     addr = 0;
     if (ddr_info.number_of_ranks == 1) {
-        if (ddr_info.dimm_mem_width == 4)
+        if (ddr_info.dimm_mem_width == 4) {
             addr = 0x00000045;
-        else
+        } else {
             addr = 0x00000040;
+        }
     } else {
-        if (ddr_info.dimm_mem_width == 4)
+        if (ddr_info.dimm_mem_width == 4) {
             addr = 0x0000004A;
-        else
+        } else {
             addr = 0x00000045;
+        }
     }
     execute_ddr_cmd(dmc, addr, 0x0001070F, 5);
 
     /* RC05, Clock Driver Characteristics Control Word */
     addr = 0;
     if (ddr_info.number_of_ranks == 1) {
-        if (ddr_info.dimm_mem_width == 4)
+        if (ddr_info.dimm_mem_width == 4) {
             addr = 0x00000055;
-        else
+        } else {
             addr = 0x00000050;
+        }
     } else {
-        if (ddr_info.dimm_mem_width == 4)
+        if (ddr_info.dimm_mem_width == 4) {
             addr = 0x0000005A;
-        else
+        } else {
             addr = 0x00000055;
+        }
     }
     execute_ddr_cmd(dmc, addr, 0x0001070F, 5);
 
@@ -692,22 +723,25 @@ static int direct_ddr_cmd(struct mod_dmc620_reg *dmc)
     addr = 0;
     switch (ddr_info.speed) {
     case 800:
-        if (ddr_info.number_of_ranks == 1)
+        if (ddr_info.number_of_ranks == 1) {
             addr = 0x00000497;
-        else
+        } else {
             addr = 0x000004A3;
+        }
         break;
     case 1200:
-        if (ddr_info.number_of_ranks == 1)
+        if (ddr_info.number_of_ranks == 1) {
             addr = 0x00000894;
-        else
+        } else {
             addr = 0x000008A3;
+        }
         break;
     case 1333:
-        if (ddr_info.number_of_ranks == 1)
+        if (ddr_info.number_of_ranks == 1) {
             addr = 0x00000C95;
-        else
+        } else {
             addr = 0x00000CA3;
+        }
         break;
     default:
         fwk_unexpected();
@@ -720,8 +754,9 @@ static int direct_ddr_cmd(struct mod_dmc620_reg *dmc)
     delay_ms(1);
     dmc->DIRECT_CMD = ((ddr_info.ranks_to_train << 16) | 0x0601);
     status = dmc620_poll_dmc_status(dmc);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     addr = addr & 0xFFFFFF7F;
     execute_ddr_cmd(dmc, addr,
@@ -789,14 +824,16 @@ static int direct_ddr_cmd(struct mod_dmc620_reg *dmc)
     }
     dmc->T_WTR_NEXT = addr;
 
-    for (count = 0; count < 12; count++)
+    for (count = 0; count < 12; count++) {
         execute_ddr_cmd(dmc, 0x00000200, 0x0001000D, 0);
+    }
 
     execute_ddr_cmd(dmc, 0x00000400,
                     ((ddr_info.ranks_to_train << 16) | 0x0005), 0);
 
-    for (count = 0; count < 12; count++)
+    for (count = 0; count < 12; count++) {
         execute_ddr_cmd(dmc, 0x00000200, 0x0001000D, 0);
+    }
 
     return FWK_SUCCESS;
 }
@@ -846,16 +883,18 @@ static int dmc620_post_init(void)
 
         FWK_LOG_INFO("[DDR] Verifying PHY status for DMC %d...", i);
         status = dmc620_verify_phy_status(element_config->ddr_id);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
         FWK_LOG_INFO("[DDR] Done");
     }
 
     for (i = 0; i < count; i++) {
         id = FWK_ID_ELEMENT(FWK_MODULE_IDX_N1SDP_DMC620, i);
         element_config = fwk_module_get_data(id);
-        for (j = 1; j <= ddr_info.number_of_ranks; j++)
+        for (j = 1; j <= ddr_info.number_of_ranks; j++) {
             ddr_phy_api->phy_obs_regs(element_config->ddr_id, j, &ddr_info);
+        }
     }
 
     return FWK_SUCCESS;
@@ -870,8 +909,9 @@ static int dmc620_config(struct mod_dmc620_reg *dmc, fwk_id_t ddr_id)
     dmc_id = fwk_id_get_element_idx(ddr_id);
     if (dmc_id == 0) {
         status = dmc620_pre_init();
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     FWK_LOG_INFO("[DDR] Initialising DMC620 at 0x%x", (uintptr_t)dmc);
@@ -997,20 +1037,22 @@ static int dmc620_config(struct mod_dmc620_reg *dmc, fwk_id_t ddr_id)
     }
     dmc->T_ACT_WINDOW_NEXT = value;
 
-    if ((ddr_info.speed == 1333) || (ddr_info.speed == 1200))
+    if ((ddr_info.speed == 1333) || (ddr_info.speed == 1200)) {
         dmc->T_RTR_NEXT = 0x24090704;
-    else
+    } else {
         dmc->T_RTR_NEXT = 0x14060604;
+    }
 
     dmc->T_RTW_NEXT = 0x001B1B1B;
     dmc->T_RTP_NEXT = 0x00000008;
     dmc->T_WR_NEXT = 0x00000029;
     dmc->T_WTR_NEXT = 0x001B1B1B;
 
-    if ((ddr_info.speed == 1333) || (ddr_info.speed == 1200))
+    if ((ddr_info.speed == 1333) || (ddr_info.speed == 1200)) {
         dmc->T_WTW_NEXT = 0x24090704;
-    else
+    } else {
         dmc->T_WTW_NEXT = 0x14060604;
+    }
 
     dmc->T_XMPD_NEXT = 0x00000480;
     dmc->T_EP_NEXT = 0x00000006;
@@ -1109,8 +1151,9 @@ static int dmc620_config(struct mod_dmc620_reg *dmc, fwk_id_t ddr_id)
         continue;
 
     status = ddr_phy_api->configure(ddr_id, &ddr_info);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     dmc->MEMC_CMD = MOD_DMC620_MEMC_CMD_CONFIG;
     while ((dmc->MEMC_STATUS & MOD_DMC620_MEMC_CMD) !=
@@ -1128,21 +1171,25 @@ static int dmc620_config(struct mod_dmc620_reg *dmc, fwk_id_t ddr_id)
     FWK_LOG_INFO("[DDR] Sending direct DDR commands");
 
     status = direct_ddr_cmd(dmc);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = ddr_training(dmc, ddr_id, &ddr_info);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = ddr_phy_api->post_training_configure(ddr_id, &ddr_info);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     FWK_LOG_INFO("[DDR] Enable DIMM refresh...");
     status = enable_dimm_refresh(dmc);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* Switch to READY */
     FWK_LOG_INFO("[DDR] Setting DMC to READY mode");
@@ -1156,8 +1203,9 @@ static int dmc620_config(struct mod_dmc620_reg *dmc, fwk_id_t ddr_id)
 
     if (dmc_id == 1) {
         status = dmc620_post_init();
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return FWK_SUCCESS;
@@ -1174,8 +1222,9 @@ static int dmc620_get_mem_size_gb(uint32_t *size)
 
     size_gb = 0;
     status = dimm_spd_calculate_dimm_size_gb(&size_gb);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     *size = size_gb * 2;
     return FWK_SUCCESS;
@@ -1211,33 +1260,38 @@ static int mod_dmc620_bind(fwk_id_t id, unsigned int round)
     const struct mod_dmc620_module_config *module_config;
 
     /* Nothing to do in the second round of calls. */
-    if (round == 1)
+    if (round == 1) {
         return FWK_SUCCESS;
+    }
 
     /* Nothing to do in case of elements. */
-    if (fwk_module_is_valid_element_id(id))
+    if (fwk_module_is_valid_element_id(id)) {
         return FWK_SUCCESS;
+    }
 
     module_config = fwk_module_get_data(fwk_module_id_n1sdp_dmc620);
     fwk_assert(module_config != NULL);
 
     status = fwk_module_bind(module_config->ddr_module_id,
                              module_config->ddr_api_id, &ddr_phy_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_module_bind(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
         FWK_ID_API(FWK_MODULE_IDX_TIMER, MOD_TIMER_API_IDX_TIMER),
         &timer_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_I2C),
                              FWK_ID_API(FWK_MODULE_IDX_N1SDP_I2C,
                                         MOD_N1SDP_I2C_API_MASTER_POLLED),
                              &i2c_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return FWK_SUCCESS;
 }
@@ -1298,8 +1352,9 @@ static int mod_dmc620_process_notification(
 
     params = (struct clock_notification_params *)event->params;
 
-    if (params->new_state == MOD_CLOCK_STATE_RUNNING)
+    if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
         return dmc620_notify_system_state_transition_resume(event->target_id);
+    }
 
     return FWK_SUCCESS;
 }

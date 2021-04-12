@@ -73,16 +73,18 @@ static void timer_sync_isr(uintptr_t data)
     uint32_t timeout;
 
     dev_ctx = (struct tsync_device_ctx *)data;
-    if (dev_ctx == NULL)
+    if (dev_ctx == NULL) {
         return;
+    }
 
     timeout = INT_STATUS_TIMEOUT;
     while (dev_ctx->reg->SLVCHIP_GCNT_INT_STATUS &
            SLVCHIP_GCNT_INT_STATUS_INT_MASK) {
         dev_ctx->reg->SLVCHIP_GCNT_INT_CLR = SLVCHIP_GCNT_INT_CLR_MASK;
         timeout--;
-        if (timeout == 0)
+        if (timeout == 0) {
             return;
+        }
     }
     dev_ctx->reg->SLVCHIP_GCNT_SYNC_CTRL = 0;
     dev_ctx->reg->SLVCHIP_GCNT_SYNC_CTRL = SLV_GCNT_SYNC_CTRL_EN_MASK;
@@ -129,19 +131,22 @@ static int n1sdp_sync_master_timer(fwk_id_t id)
 
     retries = SYNC_RETRIES;
     do {
-        if (is_timer_synced(device_ctx))
+        if (is_timer_synced(device_ctx)) {
             break;
+        }
         tsync_ctx.timer_api->delay(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
                                    SYNC_CHECK_INTERVAL_US);
         retries--;
-        if ((retries % 10) == 0)
+        if ((retries % 10) == 0) {
             FWK_LOG_INFO("[N1SDP_TIMER_SYNC] Retries: %u", retries);
+        }
     } while (retries != 0);
 
-    if ((retries == 0) && (!is_timer_synced(device_ctx)))
+    if ((retries == 0) && (!is_timer_synced(device_ctx))) {
         FWK_LOG_INFO("[N1SDP_TIMER_SYNC] Timeout!");
-    else
+    } else {
         FWK_LOG_INFO("[N1SDP_TIMER_SYNC] Synced");
+    }
 
     return FWK_SUCCESS;
 }
@@ -181,8 +186,9 @@ const struct n1sdp_timer_sync_api n1sdp_tsync_api = {
 static int n1sdp_timer_sync_init(fwk_id_t module_id, unsigned int device_count,
     const void *unused)
 {
-    if (device_count == 0)
+    if (device_count == 0) {
         return FWK_E_PARAM;
+    }
 
     tsync_ctx.device_ctx_table = fwk_mm_calloc(device_count,
         sizeof(tsync_ctx.device_ctx_table[0]));
@@ -197,8 +203,9 @@ static int n1sdp_timer_sync_device_init(fwk_id_t device_id,
         (struct mod_n1sdp_tsync_config *)data;
     struct tsync_device_ctx *device_ctx;
 
-    if (config->reg == 0)
+    if (config->reg == 0) {
         return FWK_E_PARAM;
+    }
 
     device_ctx = &tsync_ctx.device_ctx_table[
         fwk_id_get_element_idx(device_id)];
@@ -222,14 +229,16 @@ static int n1sdp_timer_sync_bind(fwk_id_t id, unsigned int round)
             FWK_ID_API(FWK_MODULE_IDX_N1SDP_SYSTEM,
                        MOD_N1SDP_SYSTEM_API_IDX_AP_MEMORY_ACCESS),
             &tsync_ctx.ap_mem_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         status = fwk_module_bind(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
             FWK_ID_API(FWK_MODULE_IDX_TIMER, MOD_TIMER_API_IDX_TIMER),
             &tsync_ctx.timer_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return FWK_SUCCESS;
