@@ -74,8 +74,9 @@ static int sgm775_ddr_phy500_process_bind_request(fwk_id_t requester_id,
     fwk_id_t id, fwk_id_t api_id, const void **api)
 {
     /* Only binding to module is permitted */
-    if (!fwk_module_is_valid_module_id(id))
+    if (!fwk_module_is_valid_module_id(id)) {
         return FWK_E_ACCESS;
+    }
 
     *((const void**)api) = &ddr_phy500_api;
 

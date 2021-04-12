@@ -63,8 +63,9 @@ static int mod_sgm775_dmc500_bind(fwk_id_t id, unsigned int round)
     const struct mod_sgm775_dmc500_module_config *module_config;
 
     /* Nothing to do in the second round of calls. */
-    if (round == 1)
+    if (round == 1) {
         return FWK_SUCCESS;
+    }
 
     if (fwk_module_is_valid_module_id(id)) {
 
@@ -74,15 +75,17 @@ static int mod_sgm775_dmc500_bind(fwk_id_t id, unsigned int round)
         /* Bind to the timer */
         status = fwk_module_bind(module_config->timer_id,
             FWK_ID_API(FWK_MODULE_IDX_TIMER, 0), &timer_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         /* Bind to the DDR-PHY specific module */
         status =
             fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_SGM775_DDR_PHY500),
                 FWK_ID_API(FWK_MODULE_IDX_SGM775_DDR_PHY500, 0), &ddr_phy_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return FWK_SUCCESS;
@@ -94,8 +97,9 @@ static int mod_sgm775_dmc500_start(fwk_id_t id)
     struct mod_sgm775_dmc500_reg *dmc;
 
     /* Nothing to start for the module */
-    if (fwk_module_is_valid_module_id(id))
+    if (fwk_module_is_valid_module_id(id)) {
         return FWK_SUCCESS;
+    }
 
     element_config = fwk_module_get_data(id);
     dmc = (struct mod_sgm775_dmc500_reg *)element_config->dmc;
@@ -262,8 +266,9 @@ static int sgm775_dmc500_config(struct mod_sgm775_dmc500_reg *dmc,
     dmc->PHY_CONFIG = 0x01000001;
 
     status = ddr_phy_api->configure(ddr_phy_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     dmc->PHY_CONFIG = 0x01000001;
     dmc->PHY_CONFIG = 0x01000000;
@@ -300,12 +305,14 @@ static int sgm775_dmc500_config(struct mod_sgm775_dmc500_reg *dmc,
 
     status = timer_api->time_to_timestamp(module_config->timer_id,
                                           TIMEOUT_DMC_INIT_US, &timeout);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = timer_api->get_counter(module_config->timer_id, &counter);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     timeout += counter;
 
@@ -313,11 +320,13 @@ static int sgm775_dmc500_config(struct mod_sgm775_dmc500_reg *dmc,
         MOD_DMC500_MI_STATUS_IDLE) {
         status = timer_api->remaining(module_config->timer_id, timeout,
                                       &remaining_ticks);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
-        if (remaining_ticks == 0)
+        if (remaining_ticks == 0) {
             goto timeout;
+        }
     }
 
     dmc->MI_STATE_CONTROL = 0x00000000;
@@ -330,11 +339,13 @@ static int sgm775_dmc500_config(struct mod_sgm775_dmc500_reg *dmc,
     while ((dmc->QUEUE_STATUS & MOD_DMC500_QUEUE_STATUS_STALL_ACK) != 0) {
         status = timer_api->remaining(module_config->timer_id, timeout,
                                       &remaining_ticks);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
-        if (remaining_ticks == 0)
+        if (remaining_ticks == 0) {
             goto timeout;
+        }
     }
 
     FWK_LOG_INFO("[DDR] Waiting for SI0 stall = 0...");
@@ -342,11 +353,13 @@ static int sgm775_dmc500_config(struct mod_sgm775_dmc500_reg *dmc,
     while ((dmc->SI0_SI_STATUS & MOD_DMC500_SI_STATUS_STALL_ACK) != 0) {
         status = timer_api->remaining(module_config->timer_id, timeout,
                                       &remaining_ticks);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
-        if (remaining_ticks == 0)
+        if (remaining_ticks == 0) {
             goto timeout;
+        }
     }
 
     FWK_LOG_INFO("[DDR] Waiting for SI1 stall = 0...");
@@ -354,11 +367,13 @@ static int sgm775_dmc500_config(struct mod_sgm775_dmc500_reg *dmc,
     while ((dmc->SI1_SI_STATUS & MOD_DMC500_SI_STATUS_STALL_ACK) != 0) {
         status = timer_api->remaining(module_config->timer_id, timeout,
                                       &remaining_ticks);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
-        if (remaining_ticks == 0)
+        if (remaining_ticks == 0) {
             goto timeout;
+        }
     }
 
     FWK_LOG_INFO("[DDR] DMC init done.");
