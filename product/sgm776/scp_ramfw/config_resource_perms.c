@@ -133,8 +133,9 @@ enum mod_res_perms_permissions mod_res_plat_agent_message_permissions(
     uint32_t message_id)
 {
     if ((protocol_id == MOD_SCMI_PROTOCOL_ID_APCORE) &&
-        (message_id <= MOD_SCMI_APCORE_RESET_ADDRESS_GET))
+        (message_id <= MOD_SCMI_APCORE_RESET_ADDRESS_GET)) {
         return MOD_RES_PERMS_ACCESS_ALLOWED;
+    }
 
     return MOD_RES_PERMS_ACCESS_DENIED;
 }
@@ -152,8 +153,9 @@ enum mod_res_perms_permissions mod_res_plat_agent_resource_permissions(
     uint32_t resource_id)
 {
     if ((protocol_id == MOD_SCMI_PROTOCOL_ID_APCORE) &&
-        (message_id <= MOD_SCMI_APCORE_RESET_ADDRESS_GET))
+        (message_id <= MOD_SCMI_APCORE_RESET_ADDRESS_GET)) {
         return MOD_RES_PERMS_ACCESS_ALLOWED;
+    }
 
     return MOD_RES_PERMS_ACCESS_DENIED;
 }
