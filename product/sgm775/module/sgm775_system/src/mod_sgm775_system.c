@@ -89,8 +89,9 @@ static int sgm775_system_init(fwk_id_t module_id, unsigned int unused,
 
 static int sgm775_system_bind(fwk_id_t id, unsigned int round)
 {
-    if (round > 0)
+    if (round > 0) {
         return FWK_SUCCESS;
+    }
 
     return fwk_module_bind(fwk_module_id_sds,
                            FWK_ID_API(FWK_MODULE_IDX_SDS, 0),
@@ -122,8 +123,9 @@ static int sgm775_system_start(fwk_id_t id)
             fwk_id_build_element_id(fwk_module_id_scmi,
                 scmi_notification_table[i]),
             id);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     /*
@@ -142,8 +144,9 @@ static int sgm775_system_process_notification(const struct fwk_event *event,
     static unsigned int scmi_notification_count = 0;
     static bool sds_notification_received = false;
 
-    if (!fwk_expect(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE)))
+    if (!fwk_expect(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE))) {
         return FWK_E_PARAM;
+    }
 
     if (fwk_id_is_equal(event->id,
                                mod_scmi_notification_id_initialized)) {
@@ -151,8 +154,9 @@ static int sgm775_system_process_notification(const struct fwk_event *event,
     } else if (fwk_id_is_equal(event->id,
                                mod_sds_notification_id_initialized)) {
         sds_notification_received = true;
-    } else
+    } else {
         return FWK_E_PARAM;
+    }
 
     if ((scmi_notification_count == FWK_ARRAY_SIZE(scmi_notification_table)) &&
         sds_notification_received) {
