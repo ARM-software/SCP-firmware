@@ -104,8 +104,9 @@ static void ppu_cores_isr(unsigned int first, uint32_t status)
         core_idx = __builtin_ctz(status);
         status &= ~(1 << core_idx);
 
-        if ((first + core_idx) >= sgi575_core_get_core_count())
+        if ((first + core_idx) >= sgi575_core_get_core_count()) {
             continue;
+        }
 
         sgi575_system_ctx.ppu_v1_isr_api->ppu_interrupt_handler(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1, first + core_idx));
@@ -196,8 +197,9 @@ static int sgi575_system_mod_init(fwk_id_t module_id, unsigned int unused,
     for (idx = 0; idx < FWK_ARRAY_SIZE(isrs); idx++) {
         isr = &isrs[idx];
         status = fwk_interrupt_set_isr(isr->interrupt, isr->handler);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     sgi575_system_ctx.pik_scp_reg = (struct pik_scp_reg *)SCP_PIK_SCP_BASE;
@@ -209,20 +211,23 @@ static int sgi575_system_bind(fwk_id_t id, unsigned int round)
 {
     int status;
 
-    if (round > 0)
+    if (round > 0) {
         return FWK_SUCCESS;
+    }
 
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_POWER_DOMAIN),
         FWK_ID_API(FWK_MODULE_IDX_POWER_DOMAIN, MOD_PD_API_IDX_RESTRICTED),
         &sgi575_system_ctx.mod_pd_restricted_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_PPU_V1),
         FWK_ID_API(FWK_MODULE_IDX_PPU_V1, MOD_PPU_V1_API_IDX_ISR),
         &sgi575_system_ctx.ppu_v1_isr_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return fwk_module_bind(fwk_module_id_sds,
         FWK_ID_API(FWK_MODULE_IDX_SDS, 0),
@@ -245,8 +250,9 @@ static int sgi575_system_start(fwk_id_t id)
         mod_clock_notification_id_state_changed,
         FWK_ID_ELEMENT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_INTERCONNECT),
         id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     FWK_LOG_INFO("[SGI575 SYSTEM] Requesting SYSTOP initialization...");
 
@@ -262,8 +268,9 @@ static int sgi575_system_start(fwk_id_t id)
             fwk_id_build_element_id(fwk_module_id_scmi,
                 scmi_notification_table[i]),
             id);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     /*
@@ -274,8 +281,9 @@ static int sgi575_system_start(fwk_id_t id)
         mod_sds_notification_id_initialized,
         fwk_module_id_sds,
         id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return sgi575_system_ctx.mod_pd_restricted_api->set_state_async(
         FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
@@ -320,8 +328,9 @@ int sgi575_system_process_notification(const struct fwk_event *event,
                     MOD_PD_STATE_ON,
                     MOD_PD_STATE_ON,
                     MOD_PD_STATE_ON));
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
 
             /* Unsubscribe to the notification */
             return fwk_notification_unsubscribe(event->id, event->source_id,
@@ -335,8 +344,9 @@ int sgi575_system_process_notification(const struct fwk_event *event,
     } else if (fwk_id_is_equal(event->id,
                                mod_sds_notification_id_initialized)) {
         sds_notification_received = true;
-    } else
+    } else {
         return FWK_E_PARAM;
+    }
 
     if ((scmi_notification_count == FWK_ARRAY_SIZE(scmi_notification_table)) &&
         sds_notification_received) {
