@@ -120,6 +120,9 @@ void clock_request_complete(
 /* Clock tree management state machine for setting state */
 int clock_management_process_state(const struct fwk_event *event);
 
+/* Clock tree management state machine for setting rate */
+int clock_management_process_rate(const struct fwk_event *event);
+
 /* Check if a clock is a single node. It returns true or false whether Clock is
  * a single node or not.
  */
@@ -137,6 +140,7 @@ enum clock_event_idx {
 
 #ifdef BUILD_HAS_CLOCK_TREE_MGMT
     CLOCK_EVENT_IDX_SET_STATE_PRE_REQUEST,
+    CLOCK_EVENT_IDX_SET_RATE_PRE_REQUEST,
 #endif
 
     CLOCK_EVENT_IDX_COUNT
@@ -156,6 +160,12 @@ static const fwk_id_t mod_clock_event_id_set_state_pre_request =
     FWK_ID_EVENT_INIT(
         FWK_MODULE_IDX_CLOCK,
         CLOCK_EVENT_IDX_SET_STATE_PRE_REQUEST);
+
+/* Identifier of the set rate pre-request */
+static const fwk_id_t mod_clock_event_id_set_rate_pre_request =
+    FWK_ID_EVENT_INIT(
+        FWK_MODULE_IDX_CLOCK,
+        CLOCK_EVENT_IDX_SET_RATE_PRE_REQUEST);
 #endif
 
 #endif /* CLOCK_H */

@@ -40,6 +40,21 @@ static int clk_mgmt_send_event_set(
     return fwk_thread_put_event(&event);
 }
 
+static int clk_mgmt_send_event_rate(
+    struct clock_set_rate_params *params,
+    fwk_id_t target)
+{
+    struct fwk_event event;
+
+    event = (struct fwk_event){
+        .target_id = target,
+        .id = mod_clock_event_id_set_rate_pre_request,
+    };
+    memcpy(event.params, params, sizeof(struct clock_set_rate_params));
+
+    return fwk_thread_put_event(&event);
+}
+
 static int clk_mgmt_complete_response(
     struct clock_dev_ctx *ctx,
     struct clock_set_state_params *event_params)
@@ -247,6 +262,40 @@ int clock_management_process_state(const struct fwk_event *event)
         return FWK_E_STATE;
     }
 
+    return FWK_SUCCESS;
+}
+
+int clock_management_process_rate(const struct fwk_event *event)
+{
+    struct clock_set_rate_params *event_params =
+        (struct clock_set_rate_params *)event->params;
+    struct clock_dev_ctx *ctx;
+    struct clock_dev_ctx *child = NULL;
+    struct fwk_slist *c_node = NULL;
+    uint64_t in_rate, out_rate;
+    int status;
+
+    clock_get_ctx(event->target_id, &ctx);
+    in_rate = event_params->input_rate;
+
+    /*
+     * Every child node receive new rate input rate and update its internal
+     * output rate to match with its internal settings.
+     */
+    FWK_LIST_FOR_EACH(
+        &ctx->children_list, c_node, struct clock_dev_ctx, child_node, child)
+    {
+        if (child->api->update_input_rate != NULL) {
+            status = child->api->update_input_rate(
+                child->config->driver_id, in_rate, &out_rate);
+            if (status != FWK_SUCCESS) {
+                return status;
+            }
+
+            event_params->input_rate = out_rate;
+            clk_mgmt_send_event_rate(event_params, child->id);
+        }
+    }
     return FWK_SUCCESS;
 }
 

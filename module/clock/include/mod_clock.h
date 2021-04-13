@@ -393,6 +393,37 @@ struct mod_clock_drv_api {
      * \return One of the standard framework error codes.
      */
     int (*process_power_transition)(fwk_id_t clock_id, unsigned int state);
+
+    /*!
+     * \brief Update the output rate according to the specified input
+     *     value. It is just to keep track of the current input/output. It
+     *     should not be used to change any setting.
+     *
+     * \note This function is optional. If it is not needed, the pointer may be
+     *     set to NULL. This function must be synchronous and every status
+     *     return different from FWK_SUCCESS will be handle as an error.
+     *
+     *     Behaviour example:
+     *          In  -> 300MHz
+     *          Out <- 150MHz - /2 divider.
+     *
+     *          New input:
+     *          In  -> 600MHz
+     *          Out <- 300MHz (result) Preserve /2 divider.
+     *
+     * \param clock_id Clock device identifier.
+     *
+     * \param in_rate Desired input parent rate in Hertz.
+     *
+     * \param[out] out_rate The current clock rate in Hertz.
+     *
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \return One of the standard framework error codes.
+     */
+    int (*update_input_rate)(
+        fwk_id_t clock_id,
+        uint64_t in_rate,
+        uint64_t *out_rate);
 };
 
 /*!

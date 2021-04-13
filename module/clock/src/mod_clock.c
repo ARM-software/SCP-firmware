@@ -153,6 +153,11 @@ static int clock_set_rate(fwk_id_t clock_id, uint64_t rate,
     int status;
     struct clock_dev_ctx *ctx;
 
+#ifdef BUILD_HAS_CLOCK_TREE_MGMT
+    struct fwk_event event;
+    struct clock_set_rate_params *event_params;
+#endif
+
     clock_get_ctx(clock_id, &ctx);
 
     /* Concurrency is not supported */
@@ -160,15 +165,35 @@ static int clock_set_rate(fwk_id_t clock_id, uint64_t rate,
         return FWK_E_BUSY;
     }
 
+#ifdef BUILD_HAS_CLOCK_TREE_MGMT
+
+    status = ctx->api->set_rate(ctx->config->driver_id, rate, round_mode);
+    if (status == FWK_PENDING) {
+        return create_async_request(
+            ctx, clock_id, mod_clock_event_id_set_rate_request);
+    }
+    if (clock_is_single_node(ctx)) {
+        return status;
+    }
+
+    event = (struct fwk_event){
+        .target_id = clock_id,
+        .id = mod_clock_event_id_set_rate_pre_request,
+    };
+    event_params = (struct clock_set_rate_params *)event.params;
+    event_params->input_rate = rate;
+
+    return fwk_thread_put_event(&event);
+#else
     status = ctx->api->set_rate(ctx->config->driver_id, rate, round_mode);
     if (status == FWK_PENDING) {
         return create_async_request(
             ctx,
             clock_id,
             mod_clock_event_id_set_rate_request);
-    } else {
-        return status;
     }
+    return status;
+#endif
 }
 
 static int clock_get_rate(fwk_id_t clock_id, uint64_t *rate)
@@ -683,6 +708,9 @@ static int clock_process_event(const struct fwk_event *event,
 #ifdef BUILD_HAS_CLOCK_TREE_MGMT
     case CLOCK_EVENT_IDX_SET_STATE_PRE_REQUEST:
         return clock_management_process_state(event);
+
+    case CLOCK_EVENT_IDX_SET_RATE_PRE_REQUEST:
+        return clock_management_process_rate(event);
 #endif
 
     case CLOCK_EVENT_IDX_RESPONSE:
