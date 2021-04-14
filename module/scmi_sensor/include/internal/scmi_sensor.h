@@ -19,7 +19,7 @@
  */
 
 /*!
- * \defgroup GroupSCMI_PERF SCMI Sensor Management Protocol
+ * \defgroup GroupSCMI_SENSOR SCMI Sensor Management Protocol
  * \{
  */
 
