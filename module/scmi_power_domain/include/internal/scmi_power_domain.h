@@ -19,7 +19,7 @@
  */
 
 /*!
- * \defgroup GroupSCMI_PERF SCMI Power Domain Management Protocol
+ * \defgroup GroupSCMIPowerDomain SCMI Power Domain Management Protocol
  * \{
  */
 
