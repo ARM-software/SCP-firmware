@@ -183,6 +183,35 @@ static int mod_mock_clock_process_power_transition(
     return FWK_SUCCESS;
 }
 
+static int mod_mock_clock_update_input_rate(
+    fwk_id_t clock_id,
+    uint64_t input_rate,
+    uint64_t *output_rate)
+{
+    struct mod_mock_clock_element_ctx *ctx;
+    const struct mod_mock_clock_rate *rate_entry;
+    int status;
+
+    ctx = mod_mock_clock_get_ctx(clock_id);
+
+    if (ctx->state == MOD_CLOCK_STATE_STOPPED || !ctx->rate_initialized) {
+        return FWK_E_STATE;
+    }
+    /*
+     * Performs the same operation as set_rate synchronously
+     */
+    status = get_rate_entry(ctx, input_rate, &rate_entry);
+    if (status != FWK_SUCCESS) {
+        return FWK_E_PARAM;
+    }
+
+    ctx->current_rate_index = rate_entry - ctx->config->rate_table;
+
+    mod_mock_clock_get_rate(clock_id, output_rate);
+
+    return FWK_SUCCESS;
+}
+
 static const struct mod_clock_drv_api mod_mock_clock_driver_api = {
     .set_rate = mod_mock_clock_set_rate,
     .get_rate = mod_mock_clock_get_rate,
@@ -191,6 +220,7 @@ static const struct mod_clock_drv_api mod_mock_clock_driver_api = {
     .get_state = mod_mock_clock_get_state,
     .get_range = mod_mock_clock_get_range,
     .process_power_transition = mod_mock_clock_process_power_transition,
+    .update_input_rate = mod_mock_clock_update_input_rate,
 };
 
 static const struct mod_clock_driver_response_api
