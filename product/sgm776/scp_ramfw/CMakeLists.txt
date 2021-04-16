@@ -75,3 +75,10 @@ target_link_libraries(sgm776-bl2 PUBLIC cmsis::core-m)
 target_include_directories(
     sgm776-bl2
     PUBLIC $<TARGET_PROPERTY:cmsis::core-m,INTERFACE_INCLUDE_DIRECTORIES>)
+
+if(SCP_ENABLE_RESOURCE_PERMISSIONS)
+    list(APPEND SCP_MODULES "resource-perms")
+endif()
+
+set(SCP_MODULES ${SCP_MODULES} PARENT_SCOPE)
+set(SCP_MODULE_PATHS ${SCP_MODULE_PATHS} PARENT_SCOPE)

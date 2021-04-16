@@ -7,7 +7,3 @@
 
 set(SCP_MODULE "debug")
 set(SCP_MODULE_TARGET "module-debug")
-
-if(SCP_ENABLE_DEBUG_UNIT)
-    list(APPEND SCP_MODULES "debug")
-endif()

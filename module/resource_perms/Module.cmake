@@ -7,7 +7,3 @@
 
 set(SCP_MODULE "resource-perms")
 set(SCP_MODULE_TARGET "module-resource-perms")
-
-if(SCP_ENABLE_RESOURCE_PERMISSIONS)
-    list(APPEND SCP_MODULES "resource-perms")
-endif()

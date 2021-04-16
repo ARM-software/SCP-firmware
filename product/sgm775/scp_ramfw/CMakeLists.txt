@@ -83,3 +83,14 @@ target_link_libraries(sgm775-bl2 PUBLIC cmsis::core-m)
 target_include_directories(
     sgm775-bl2
     PUBLIC $<TARGET_PROPERTY:cmsis::core-m,INTERFACE_INCLUDE_DIRECTORIES>)
+
+if(SCP_ENABLE_RESOURCE_PERMISSIONS)
+    list(APPEND SCP_MODULES "resource-perms")
+endif()
+
+if(SCP_ENABLE_DEBUGGER)
+    list(APPEND SCP_MODULES "debugger-cli")
+endif()
+
+set(SCP_MODULES ${SCP_MODULES} PARENT_SCOPE)
+set(SCP_MODULE_PATHS ${SCP_MODULE_PATHS} PARENT_SCOPE)

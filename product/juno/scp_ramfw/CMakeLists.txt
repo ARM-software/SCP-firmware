@@ -99,3 +99,25 @@ target_link_libraries(juno-bl2 PUBLIC cmsis::core-m)
 target_include_directories(
     juno-bl2
     PUBLIC $<TARGET_PROPERTY:cmsis::core-m,INTERFACE_INCLUDE_DIRECTORIES>)
+
+if(SCP_ENABLE_DEBUG_UNIT)
+    list(APPEND SCP_MODULES "debug")
+    list(APPEND SCP_MODULES "juno-debug")
+endif()
+
+if(SCP_ENABLE_SCMI_RESET)
+    list(APPEND SCP_MODULES "reset-domain")
+    list(APPEND SCP_MODULES "scmi-reset-domain")
+    list(APPEND SCP_MODULES "juno-reset-domain")
+endif()
+
+if(SCP_ENABLE_RESOURCE_PERMISSIONS)
+    list(APPEND SCP_MODULES "resource-perms")
+endif()
+
+if(SCP_ENABLE_STATISTICS)
+    list(APPEND SCP_MODULES "statistics")
+endif()
+
+set(SCP_MODULES ${SCP_MODULES} PARENT_SCOPE)
+set(SCP_MODULE_PATHS ${SCP_MODULE_PATHS} PARENT_SCOPE)

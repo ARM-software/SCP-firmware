@@ -8,7 +8,3 @@
 set(SCP_MODULE "juno-reset-domain")
 
 set(SCP_MODULE_TARGET "module-juno-reset-domain")
-
-if(SCP_ENABLE_SCMI_RESET)
-    list(APPEND SCP_MODULES "juno-reset-domain")
-endif()

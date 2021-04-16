@@ -92,7 +92,3 @@ list(APPEND SCP_MODULES "n1sdp-pcie")
 list(APPEND SCP_MODULES "ssc")
 list(APPEND SCP_MODULES "system-info")
 list(APPEND SCP_MODULES "n1sdp-system")
-
-if(SCP_ENABLE_DEBUGGER)
-    list(APPEND SCP_MODULES,"debugger-cli")
-endif()

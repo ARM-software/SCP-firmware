@@ -87,3 +87,16 @@ target_include_directories(rcar-bl2
 
 target_include_directories(rcar-bl2
     PUBLIC $<TARGET_PROPERTY:cmsis::core-m,INTERFACE_INCLUDE_DIRECTORIES>)
+
+if(SCP_ENABLE_SCMI_RESET)
+    list(APPEND SCP_MODULES "reset-domain")
+    list(APPEND SCP_MODULES "rcar-reset")
+    list(APPEND SCP_MODULES "scmi-reset-domain")
+endif()
+
+if(SCP_ENABLE_RESOURCE_PERMISSIONS)
+    list(APPEND SCP_MODULES "resource-perms")
+endif()
+
+set(SCP_MODULES ${SCP_MODULES} PARENT_SCOPE)
+set(SCP_MODULE_PATHS ${SCP_MODULE_PATHS} PARENT_SCOPE)

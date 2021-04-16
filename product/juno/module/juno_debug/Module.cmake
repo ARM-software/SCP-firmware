@@ -8,7 +8,3 @@
 set(SCP_MODULE "juno-debug")
 
 set(SCP_MODULE_TARGET "module-juno-debug")
-
-if(SCP_ENABLE_DEBUG_UNIT)
-    list(APPEND SCP_MODULES "juno-debug")
-endif()
