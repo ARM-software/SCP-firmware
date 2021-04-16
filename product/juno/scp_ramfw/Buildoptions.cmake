@@ -17,3 +17,8 @@ cmake_dependent_option(
     SCP_ENABLE_STATISTICS "Enable the performance statistics?"
     "${SCP_ENABLE_STATISTICS_INIT}" "DEFINED SCP_ENABLE_STATISTICS_INIT"
     "${SCP_ENABLE_STATISTICS}")
+
+cmake_dependent_option(
+    SCP_ENABLE_PMI "Enable the performance measurement and instrumentation?"
+    "${SCP_ENABLE_PMI_INIT}" "DEFINED SCP_ENABLE_PMI_INIT"
+    "${SCP_ENABLE_PMI}")

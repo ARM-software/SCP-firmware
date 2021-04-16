@@ -34,6 +34,8 @@ set(SCP_ENABLE_STATISTICS_INIT FALSE)
 
 set(SCP_ENABLE_IPO_INIT FALSE)
 
+set(SCP_ENABLE_PMI_INIT FALSE)
+
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/juno_reset_domain")
 list(PREPEND SCP_MODULE_PATHS
@@ -61,6 +63,10 @@ list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/juno_xrp7724")
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/juno_hdlcd")
+list(PREPEND SCP_MODULE_PATHS
+     "${CMAKE_SOURCE_DIR}/module/dwt_pmi")
+list(PREPEND SCP_MODULE_PATHS
+     "${CMAKE_SOURCE_DIR}/module/pmi")
 
 # The order of the modules in the following list is the order in which the
 # modules are initialized, bound, started during the pre-runtime phase.

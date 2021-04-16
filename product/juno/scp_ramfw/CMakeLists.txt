@@ -84,6 +84,12 @@ if(${SCP_ENABLE_RESOURCE_PERMISSIONS})
         juno-bl2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_resource_perms.c")
 endif()
 
+if(SCP_ENABLE_PMI)
+    target_sources(
+        juno-bl2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_dwt_pmi.c"
+                         "${CMAKE_CURRENT_SOURCE_DIR}/config_pmi.c")
+endif()
+
 #
 # Some of our firmware includes require CMSIS.
 #
