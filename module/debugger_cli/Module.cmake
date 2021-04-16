@@ -7,7 +7,3 @@
 
 set(SCP_MODULE "debugger-cli")
 set(SCP_MODULE_TARGET "module-debugger-cli")
-
-if(SCP_ENABLE_DEBUGGER)
-    list(APPEND SCP_MODULES "debugger-cli")
-endif()

@@ -7,7 +7,3 @@
 
 set(SCP_MODULE "scmi-reset-domain")
 set(SCP_MODULE_TARGET "module-scmi-reset-domain")
-
-if(SCP_ENABLE_SCMI_RESET)
-    list(APPEND SCP_MODULES "scmi-reset-domain")
-endif()

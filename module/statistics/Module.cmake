@@ -7,7 +7,3 @@
 
 set(SCP_MODULE "statistics")
 set(SCP_MODULE_TARGET "module-statistics")
-
-if(SCP_ENABLE_STATISTICS)
-    list(APPEND SCP_MODULES "statistics")
-endif()
