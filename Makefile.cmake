@@ -217,6 +217,18 @@ help:
 	@echo "        Default: $(DEFAULT_TOOLCHAIN)"
 	@echo "        Specify Toolchain to build the firmware."
 	@echo ""
+	@echo "    EXTRA_CONFIG_ARGS"
+	@echo "        Value: <cmake configuration parameters>"
+	@echo "        Default: "
+	@echo "        Pass extra arguments directly to cmake configuration stage."
+	@echo "        Multiplle extra args can be added with += or by passing the arguments as a string"
+	@echo ""
+	@echo "    EXTRA_BUILD_ARGS"
+	@echo "        Value: <cmake build parameters>"
+	@echo "        Default: "
+	@echo "        Pass extra arguments directly to cmake build stage."
+	@echo "        Multiplle extra args can be added with += or by passing the arguments as a string"
+	@echo ""
 
 
 .SECONDEXPANSION:
@@ -225,13 +237,13 @@ help:
 all: $(FIRMWARE_TARGETS)
 
 firmware-%: $(PRODUCT_BUILD_PATH)/$$@/CMakeCache.txt
-	$(CMAKE) --build $(<D)/ $(CMAKE_BUILD_VERBOSE_OPTION)
+	$(CMAKE) --build $(<D)/ $(CMAKE_BUILD_VERBOSE_OPTION) $(EXTRA_BUILD_ARGS)
 
 .PRECIOUS: $(PRODUCT_BUILD_PATH)/firmware-%/CMakeCache.txt
 
 $(PRODUCT_BUILD_PATH)/firmware-%/CMakeCache.txt:  $(PRODUCT_DIR)/%/Firmware.cmake
 	$(RM) $(@D)
-	$(CMAKE) -B $(@D) -DSCP_FIRMWARE_SOURCE_DIR:PATH=$(PRODUCT_DIR)/$* $(CMAKE_COMMAND_OPTION)
+	$(CMAKE) -B $(@D) -DSCP_FIRMWARE_SOURCE_DIR:PATH=$(PRODUCT_DIR)/$* $(CMAKE_COMMAND_OPTION) $(EXTRA_CONFIG_ARGS)
 
 .PHONY: clean
 clean:
