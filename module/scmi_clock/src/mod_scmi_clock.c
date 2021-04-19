@@ -517,8 +517,7 @@ FWK_WEAK int mod_scmi_clock_config_set_policy(
     case MOD_CLOCK_STATE_RUNNING:
         /* The agent has already requested to set state to RUNNING */
         if (clock_state == MOD_CLOCK_STATE_RUNNING) {
-            status = FWK_SUCCESS;
-            break;
+            return FWK_SUCCESS;
         }
 
         /* set the clock state for this agent to RUNNING */
@@ -547,9 +546,9 @@ FWK_WEAK int mod_scmi_clock_config_set_policy(
     case MOD_CLOCK_STATE_STOPPED:
         /* The agent has already requested to set state to STOPPED */
         if (clock_state == MOD_CLOCK_STATE_STOPPED) {
-            status = FWK_SUCCESS;
-            break;
+            return FWK_SUCCESS;
         }
+
         /* error to try and stop a stopped clock */
         if (clock_count[clock_dev_id] == 0) {
             scmi_clock_ctx.scmi_api->get_agent_id(service_id, &agent_id);
