@@ -223,6 +223,17 @@ struct fwk_arch_init_driver {
 int fwk_arch_init(const struct fwk_arch_init_driver *driver);
 
 /*!
+ * \brief Stop the framework library.
+ *
+ * \details Before terminating the SCP-firmware, the modules and their elements
+ * get the opportunity to release or reset some resources.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_PANIC Unrecoverable error.
+ */
+int fwk_arch_deinit(void);
+
+/*!
  * \brief Architecture defined suspend, will wakup on receiving interrupt
  *
  */
