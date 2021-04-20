@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -221,6 +221,29 @@ struct fwk_module {
      * \return One of the other module-defined error codes.
      */
     int (*start)(fwk_id_t id);
+
+    /*!
+     * \brief Pointer to the stop function.
+     *
+     * \details This function is called by the framework for the module and then
+     *      for all of its elements during the stop stage. Elements are
+     *      stopped in the order they are declared in the module configuration
+     *      data.
+     *
+     *      The framework does not mandate a particular purpose for this
+     *      function. It may be used to perform any final processing of the
+     *      module and its elements before entering the suspend phase.
+     *
+     * \note This function is \b optional and aims to release software
+     * resources or to set hardware resources in a proper state before
+     * terminating the SCP software.
+     *
+     * \param id Identifier of the module or element to start.
+     *
+     * \retval ::FWK_SUCCESS The module or element was successfully started.
+     * \return One of the other module-defined error codes.
+     */
+    int (*stop)(fwk_id_t id);
 
     /*!
      * \brief Pointer to the bind request processing function.
