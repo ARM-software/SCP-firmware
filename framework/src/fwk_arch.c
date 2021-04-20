@@ -105,6 +105,18 @@ int fwk_arch_init(const struct fwk_arch_init_driver *driver)
     return FWK_SUCCESS;
 }
 
+int fwk_arch_deinit(void)
+{
+    int status;
+
+    status = fwk_module_stop();
+    if (!fwk_expect(status == FWK_SUCCESS)) {
+        return FWK_E_PANIC;
+    }
+
+    return FWK_SUCCESS;
+}
+
 void fwk_arch_suspend(void)
 {
     /* On some arm plaforms, wfe is supported architecturally, however

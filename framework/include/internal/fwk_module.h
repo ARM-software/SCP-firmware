@@ -90,6 +90,18 @@ struct fwk_element_ctx {
  */
 int fwk_module_start(void);
 
+/*!
+ * \internal
+ *
+ * \brief Stop the module component.
+ *
+ * \details Stop each module and its elements, running through their
+ *      stop routines.
+ *
+ * \return Status code representing the result of the operation.
+ */
+int fwk_module_stop(void);
+
 /*
  * \brief Get a pointer to the context of a module or element.
  *

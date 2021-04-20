@@ -36,7 +36,8 @@
 enum fwk_module_stage {
     MODULE_STAGE_INITIALIZE,
     MODULE_STAGE_BIND,
-    MODULE_STAGE_START
+    MODULE_STAGE_START,
+    MODULE_STAGE_STOP
 };
 
 static struct {
@@ -445,6 +446,87 @@ int fwk_module_start(void)
     fwk_module_ctx.initialized = true;
 
     FWK_LOG_CRIT("[FWK] Module initialization complete!");
+
+    return FWK_SUCCESS;
+}
+
+static int fwk_module_stop_elements(struct fwk_module_context *fwk_mod_ctx)
+{
+    int status;
+    const struct fwk_module *module;
+    unsigned int element_idx;
+
+    module = fwk_mod_ctx->desc;
+
+    for (element_idx = 0; element_idx < fwk_mod_ctx->element_count;
+         element_idx++) {
+        if (module->stop != NULL) {
+            status = module->stop(
+                fwk_id_build_element_id(fwk_mod_ctx->id, element_idx));
+            if (!fwk_expect(status == FWK_SUCCESS)) {
+                FWK_LOG_CRIT(fwk_module_err_msg_func, status, __func__);
+                return status;
+            }
+        }
+
+        fwk_mod_ctx->element_ctx_table[element_idx].state =
+            FWK_MODULE_STATE_SUSPENDED;
+    }
+
+    return FWK_SUCCESS;
+}
+
+static int fwk_module_stop_module(struct fwk_module_context *fwk_mod_ctx)
+{
+    int status;
+    const struct fwk_module *module;
+
+    module = fwk_mod_ctx->desc;
+
+    if (module->stop != NULL) {
+        status = module->stop(fwk_mod_ctx->id);
+        if (!fwk_expect(status == FWK_SUCCESS)) {
+            FWK_LOG_CRIT(fwk_module_err_msg_func, status, __func__);
+            return status;
+        }
+    }
+
+    fwk_mod_ctx->state = FWK_MODULE_STATE_SUSPENDED;
+
+    return fwk_module_stop_elements(fwk_mod_ctx);
+}
+
+static int stop_modules(void)
+{
+    int status;
+    unsigned int module_idx;
+    struct fwk_module_context *fwk_mod_ctx;
+
+    for (module_idx = 0; module_idx < FWK_MODULE_IDX_COUNT; module_idx++) {
+        fwk_mod_ctx = &fwk_module_ctx.module_ctx_table[module_idx];
+        status = fwk_module_stop_module(fwk_mod_ctx);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+    }
+
+    return FWK_SUCCESS;
+}
+
+int fwk_module_stop(void)
+{
+    int status;
+
+    if (!fwk_module_ctx.initialized) {
+        FWK_LOG_CRIT(fwk_module_err_msg_func, FWK_E_STATE, __func__);
+        return FWK_E_STATE;
+    }
+
+    fwk_module_ctx.stage = MODULE_STAGE_STOP;
+    status = stop_modules();
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
 
     return FWK_SUCCESS;
 }
