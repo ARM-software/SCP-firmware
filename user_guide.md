@@ -272,7 +272,7 @@ processor secure world firmware needs to be available to load it. Arm maintains
 the [Arm Trusted Firmware-A (TF-A)] project, which handles this case. The
 remaining instructions assume you are using Trusted Firmware-A.
 
-[Arm Trusted Firmware-A (TF-A)]: https://github.com/ARM-software/arm-trusted-firmware
+[Arm Trusted Firmware-A (TF-A)]: https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git
 
 On SGM platforms, the SCP images are given alternative names when used in the
 context of TF-A:
@@ -292,23 +292,23 @@ The FIP format acts as a container for a number of commonly-used images in the
 TF-A boot flow. Documentation for the FIP format can be found in the [TF-A
 firmware design documentation].
 
-[TF-A firmware design documentation]: https://github.com/ARM-software/arm-trusted-firmware/blob/cfb3f73344217aa000aaff9d84baad7527af75bf/docs/design/firmware-design.rst#firmware-image-package-fip
+[TF-A firmware design documentation]: https://trustedfirmware-a.readthedocs.io/en/latest/design/firmware-design.html?highlight=fip#firmware-image-package-fip
 
 An example command line to build Arm Trusted Firmware-A for AArch64 is given
 below. Note that you will need to have installed [the prerequisites for building
 Arm Trusted Firmware-A for SGM-775].
 
-[the prerequisites for building Arm Trusted Firmware-A for SGM-775]: https://github.com/ARM-software/arm-trusted-firmware/blob/v2.1/docs/user-guide.rst#tools
+[the prerequisites for building Arm Trusted Firmware-A for SGM-775]:  https://trustedfirmware-a.readthedocs.io/en/latest/getting_started/docs-build.html
 
 ```sh
 export TFA_PATH=<your Trusted Firmware-A path>
 
-git clone -b v2.1 https://github.com/ARM-software/arm-trusted-firmware.git ${TFA_PATH}
+git clone https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git ${TFA_PATH}
 
 cd ${TFA_PATH}
 
 make CROSS_COMPILE=aarch64-linux-gnu- DEBUG=1 LOG_LEVEL=30 PLAT=sgm775 CSS_USE_SCMI_SDS_DRIVER=1 \
-    bl1 bl2 fiptool
+    bl1 bl2 fip
 
 export BL1_PATH=${TFA_PATH}/build/sgm775/debug/bl1.bin
 export BL2_PATH=${TFA_PATH}/build/sgm775/debug/bl2.bin
@@ -317,10 +317,12 @@ export FIP_PATH=/tmp/fip.bin
 ./tools/fiptool/fiptool create \
     --tb-fw ${BL2_PATH} \
     --scp-fw ${SCP_RAM_PATH} \
-        ${FIP_PATH}
+        ${FIP_PATH} \
+    --fw-config ${TFA_PATH}/build/sgm775/debug/fdts/sgm775_fw_config.dtb \
+    --tb-fw-config ${TFA_PATH}/build/sgm775/debug/fdts/sgm775_tb_fw_config.dtb
 ```
 
-Note that `CSS_USE_SCMI_SDS_DRIVER` is a work-around for the fact that the v2.1
+Note that `CSS_USE_SCMI_SDS_DRIVER` is a work-around for the fact that TF-A
 utilises **SCPI** instead of **SCMI** by default, which is not a supported
 configuration for SCP-firmware.
 
@@ -347,7 +349,7 @@ please refer to [System Guidance for Infrastructure (SGI)].
 For an introduction to the Neoverse Reference Design (RD) platforms, please
 refer to [Neoverse Reference Designs].
 
-[Neoverse Reference Designs]: https://community.arm.com/developer/tools-software/oss-platforms/w/docs/387/system-guidance-for-infrastructure-sgi
+[Neoverse Reference Designs]: https://developer.arm.com/tools-and-software/development-boards/neoverse-reference-design
 
 The instructions within this section use SGI-575 as an example platform, but
 they are relevant for all SGI and Neoverse Reference Design platforms.
@@ -411,7 +413,7 @@ For an introduction to the Juno Development Board, please refer to
 The instructions within this section are similar to those used for SGM
 platforms, with minor differences.
 
-[the Arm Developer documentation]: https://developer.arm.com/tools-and-software/development-boards/juno-development-board
+[the Arm Developer documentation]: https://community.arm.com/developer/tools-software/oss-platforms/w/docs/485/juno
 
 ### Building the images
 
@@ -424,7 +426,7 @@ additional binary is generated:
     firmware, and is chain-loaded from the burned-in ROM on the physical board
     (not necessary for the FVP).
 
-We recommend using the latest release of Trusted Firmware-A (2.3 or later).
+We recommend using the latest release of Trusted Firmware-A.
 
 ### Booting the firmware
 
@@ -461,7 +463,7 @@ board.
 You can see the progress of the boot by connecting the UART to your host PC
 (please follow the instructions in the Juno [Getting Started Guide]).
 
-[Getting Started Guide]: https://static.docs.arm.com/den0928/f/DEN0928F_juno_arm_development_platform_gsg.pdf
+[Getting Started Guide]: https://developer.arm.com/documentation/dui0928/e
 
 ## Software stack
 
