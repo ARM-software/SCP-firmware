@@ -10,6 +10,7 @@
 
 #include <fwk_macros.h>
 
+#define CLOCK_RATE_REFCLK    (100UL * FWK_MHZ)
 #define CLOCK_RATE_SYSPLLCLK (2000UL * FWK_MHZ)
 
 /*
@@ -64,6 +65,17 @@ enum mod_clusclock_source_tc1 {
     MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC1_PLL3 = 0x10,
     /*! Number of valid clock sources */
     MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC1_MAX
+};
+
+/*
+ * CSS clock indexes.
+ */
+enum clock_css_idx {
+    CLOCK_CSS_IDX_CPU_GROUP_KLEIN,
+    CLOCK_CSS_IDX_CPU_GROUP_MAKALU,
+    CLOCK_CSS_IDX_CPU_GROUP_MAKALU_ELP,
+    CLOCK_CSS_IDX_DPU,
+    CLOCK_CSS_IDX_COUNT
 };
 
 #endif /* CLOCK_SOC_H */
