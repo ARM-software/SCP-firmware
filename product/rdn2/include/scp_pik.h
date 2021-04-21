@@ -41,9 +41,7 @@ struct pik_scp_reg {
             uint8_t   RESERVED6[0x820 - 0x818];
     FWK_RW  uint32_t  ACLK_CTRL;
     FWK_RW  uint32_t  ACLK_DIV1;
-            uint8_t   RESERVED7[0xA10 - 0x828];
-    FWK_R   uint32_t  PLL_STATUS[17];
-            uint8_t   RESERVED8[0xA60 - 0xA54];
+            uint8_t   RESERVED7[0xA60 - 0x828];
     FWK_R   uint32_t  CONS_MMUTCU_INT_STATUS;
     FWK_R   uint32_t  CONS_MMUTCU_INT_CLR;
     FWK_R   uint32_t  CONS_MMUTBU_INT_STATUS0;
