@@ -78,4 +78,17 @@ enum clock_css_idx {
     CLOCK_CSS_IDX_COUNT
 };
 
+/*
+ * Clock indexes.
+ */
+enum clock_idx {
+    CLOCK_IDX_CPU_GROUP_KLEIN,
+    CLOCK_IDX_CPU_GROUP_MAKALU,
+    CLOCK_IDX_CPU_GROUP_MAKALU_ELP,
+    CLOCK_IDX_DPU,
+    CLOCK_IDX_PIXEL_0,
+    CLOCK_IDX_PIXEL_1,
+    CLOCK_IDX_COUNT
+};
+
 #endif /* CLOCK_SOC_H */
