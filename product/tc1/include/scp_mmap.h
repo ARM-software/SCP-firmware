@@ -8,6 +8,14 @@
 #ifndef SCP_MMAP_H
 #define SCP_MMAP_H
 
+/* SCP ROM and RAM base addresses */
+#define SCP_BOOT_ROM_BASE 0x00000000
+#define SCP_RAM_BASE      0x10000000
+
+/* SCP ROM and RAM firmware size loaded on main memory */
+#define SCP_BOOT_ROM_SIZE (512 * 1024)
+#define SCP_RAM_SIZE      (512 * 1024)
+
 /* SCP trusted and non-trusted RAM base address */
 #define SCP_TRUSTED_RAM_BASE    (SCP_SYSTEM_ACCESS_PORT1_BASE + 0x04000000)
 #define SCP_NONTRUSTED_RAM_BASE (SCP_SYSTEM_ACCESS_PORT1_BASE + 0x06000000)
@@ -56,6 +64,12 @@
 #define SCP_PLL_CPU0 (SCP_PLL_BASE + 0x00000100)
 #define SCP_PLL_CPU1 (SCP_PLL_BASE + 0x00000104)
 #define SCP_PLL_CPU2 (SCP_PLL_BASE + 0x00000108)
+
+/* AP Context Area */
+#define SCP_AP_CONTEXT_BASE \
+    (SCP_AP_SHARED_SECURE_BASE + SCP_AP_SHARED_SECURE_SIZE - \
+     SCP_AP_CONTEXT_SIZE)
+#define SCP_AP_CONTEXT_SIZE (64)
 
 /* SDS Memory Region */
 #define SCP_SDS_MEM_BASE (SCP_AP_SHARED_SECURE_BASE)
