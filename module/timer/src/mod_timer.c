@@ -86,8 +86,9 @@ static int _time_to_timestamp(struct dev_ctx *ctx,
     fwk_assert(timestamp != NULL);
 
     status = ctx->driver->get_frequency(ctx->driver_dev_id, &frequency);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     *timestamp = ((uint64_t)frequency * microseconds) / 1000000;
 
@@ -105,12 +106,14 @@ static int _timestamp_from_now(struct dev_ctx *ctx,
     fwk_assert(timestamp != NULL);
 
     status = _time_to_timestamp(ctx, microseconds, timestamp);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = ctx->driver->get_counter(ctx->driver_dev_id, &counter);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     *timestamp += counter;
 
@@ -128,14 +131,16 @@ static int _remaining(const struct dev_ctx *ctx,
     fwk_assert(remaining_ticks != NULL);
 
     status = ctx->driver->get_counter(ctx->driver_dev_id, &counter);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return status;
+    }
 
     /* If timestamp is in the past, remaining_ticks is set to zero. */
-    if (timestamp < counter)
+    if (timestamp < counter) {
         *remaining_ticks = 0;
-    else
+    } else {
         *remaining_ticks = timestamp - counter;
+    }
 
     return FWK_SUCCESS;
 }
@@ -194,8 +199,9 @@ static int get_frequency(fwk_id_t dev_id, uint32_t *frequency)
 
     ctx = &ctx_table[fwk_id_get_element_idx(dev_id)];
 
-    if (frequency == NULL)
+    if (frequency == NULL) {
         return FWK_E_PARAM;
+    }
 
     return ctx->driver->get_frequency(ctx->driver_dev_id, frequency);
 }
@@ -206,8 +212,9 @@ static int time_to_timestamp(fwk_id_t dev_id,
 {
     struct dev_ctx *ctx;
 
-    if (timestamp == NULL)
+    if (timestamp == NULL) {
         return FWK_E_PARAM;
+    }
 
     ctx = &ctx_table[fwk_id_get_element_idx(dev_id)];
 
@@ -220,8 +227,9 @@ static int get_counter(fwk_id_t dev_id, uint64_t *counter)
 
     ctx = &ctx_table[fwk_id_get_element_idx(dev_id)];
 
-    if (counter == NULL)
+    if (counter == NULL) {
         return FWK_E_PARAM;
+    }
 
     /* Read counter */
     return ctx->driver->get_counter(ctx->driver_dev_id, counter);
@@ -236,13 +244,15 @@ static int delay(fwk_id_t dev_id, uint32_t microseconds)
     ctx = &ctx_table[fwk_id_get_element_idx(dev_id)];
 
     status = _timestamp_from_now(ctx, microseconds, &counter_limit);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     do {
         status = ctx->driver->get_counter(ctx->driver_dev_id, &counter);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     } while (counter < counter_limit);
 
     return FWK_SUCCESS;
@@ -260,26 +270,29 @@ static int wait(fwk_id_t dev_id,
     ctx = &ctx_table[fwk_id_get_element_idx(dev_id)];
 
     status = _timestamp_from_now(ctx, microseconds, &counter_limit);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     while (true) {
-
-        if (cond(data))
+        if (cond(data)) {
             return FWK_SUCCESS;
+        }
 
         status = ctx->driver->get_counter(ctx->driver_dev_id, &counter);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return FWK_E_DEVICE;
+        }
 
         /*
          * If the time to wait is over, check condition one last time.
          */
         if (counter > counter_limit) {
-            if (cond(data))
+            if (cond(data)) {
                 return FWK_SUCCESS;
-            else
+            } else {
                 return FWK_E_TIMEOUT;
+            }
         }
     }
 }
@@ -292,8 +305,9 @@ static int remaining(fwk_id_t dev_id,
 
     ctx = &ctx_table[fwk_id_get_element_idx(dev_id)];
 
-    if (remaining_ticks == NULL)
+    if (remaining_ticks == NULL) {
         return FWK_E_PARAM;
+    }
 
     return _remaining(ctx, timestamp, remaining_ticks);
 }
@@ -307,11 +321,13 @@ static int get_next_alarm_remaining(fwk_id_t dev_id,
     const struct alarm_ctx *alarm_ctx;
     const struct fwk_dlist_node *alarm_ctx_node;
 
-    if (has_alarm == NULL)
+    if (has_alarm == NULL) {
         return FWK_E_PARAM;
+    }
 
-    if (remaining_ticks == NULL)
+    if (remaining_ticks == NULL) {
         return FWK_E_PARAM;
+    }
 
     ctx = &ctx_table[fwk_id_get_element_idx(dev_id)];
 
@@ -394,8 +410,9 @@ static int alarm_stop(fwk_id_t alarm_id)
 
     alarm->started = false;
 
-    if (!alarm->activated)
+    if (!alarm->activated) {
         return FWK_SUCCESS;
+    }
 
     /*
      * If the alarm is stopped while the interrupts are globally disabled, an
@@ -441,8 +458,9 @@ static int alarm_start(fwk_id_t alarm_id,
     ctx = ctx_table + fwk_id_get_element_idx(alarm_id);
     alarm = &ctx->alarm_pool[fwk_id_get_sub_element_idx(alarm_id)];
 
-    if (alarm->started)
+    if (alarm->started) {
         alarm_stop(alarm_id);
+    }
 
     alarm->started = true;
 
@@ -458,8 +476,9 @@ static int alarm_start(fwk_id_t alarm_id,
     status = _timestamp_from_now(ctx,
                                  alarm->microseconds,
                                  &alarm->timestamp);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* Disable timer interrupts to work with the active queue */
     ctx->driver->disable(ctx->driver_dev_id);
@@ -542,8 +561,9 @@ static int timer_device_init(fwk_id_t element_id, unsigned int alarm_count,
     ctx = ctx_table + fwk_id_get_element_idx(element_id);
     ctx->config = data;
 
-    if (alarm_count > 0)
+    if (alarm_count > 0) {
         ctx->alarm_pool = fwk_mm_calloc(alarm_count, sizeof(struct alarm_ctx));
+    }
 
     return FWK_SUCCESS;
 }
@@ -556,11 +576,13 @@ static int timer_bind(fwk_id_t id, unsigned int round)
     unsigned int driver_module_idx;
 
     /* Nothing to do after the initial round. */
-    if (round > 0)
+    if (round > 0) {
         return FWK_SUCCESS;
+    }
 
-    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         return FWK_SUCCESS;
+    }
 
     ctx = ctx_table + fwk_id_get_element_idx(id);
     ctx->driver_dev_id = ctx->config->id;
@@ -570,15 +592,15 @@ static int timer_bind(fwk_id_t id, unsigned int round)
     status = fwk_module_bind(ctx->driver_dev_id,
                              FWK_ID_API(driver_module_idx, 0),
                              &driver);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* Check that the driver API is completely fulfilled */
-    if (driver->enable == NULL      ||
-        driver->disable == NULL     ||
-        driver->get_counter == NULL ||
-        driver->get_frequency == NULL)
+    if (driver->enable == NULL || driver->disable == NULL ||
+        driver->get_counter == NULL || driver->get_frequency == NULL) {
         return FWK_E_DEVICE;
+    }
 
     ctx->driver = driver;
 
@@ -628,8 +650,9 @@ static int timer_start(fwk_id_t id)
 {
     struct dev_ctx *ctx;
 
-    if (!fwk_module_is_valid_element_id(id))
+    if (!fwk_module_is_valid_element_id(id)) {
         return FWK_SUCCESS;
+    }
 
     ctx = ctx_table + fwk_id_get_element_idx(id);
 

@@ -32,8 +32,9 @@ static int get_ctx_if_valid_call(fwk_id_t id,
 {
     fwk_assert(ctx != NULL);
 
-    if (!fwk_expect(data != NULL))
+    if (!fwk_expect(data != NULL)) {
         return FWK_E_PARAM;
+    }
 
     *ctx = ctx_table + fwk_id_get_element_idx(id);
 
@@ -107,12 +108,14 @@ static int get_value(fwk_id_t id, uint64_t *value)
     struct fwk_event req;
 
     status = get_ctx_if_valid_call(id, value, &ctx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* Concurrent readings are not supported */
-    if (ctx->read_busy)
+    if (ctx->read_busy) {
         return FWK_E_BUSY;
+    }
 
     status = ctx->driver_api->get_value(ctx->config->driver_id, value);
     if (status == FWK_PENDING) {
@@ -132,8 +135,9 @@ static int get_value(fwk_id_t id, uint64_t *value)
               * an event.
               */
             return FWK_PENDING;
-        } else
+        } else {
             return status;
+        }
     } else if (status == FWK_SUCCESS) {
 #ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
         trip_point_process(id, *value);
@@ -141,8 +145,9 @@ static int get_value(fwk_id_t id, uint64_t *value)
         return FWK_SUCCESS;
     }
 
-    else
+    else {
         return FWK_E_DEVICE;
+    }
 }
 
 static int get_info(fwk_id_t id, struct mod_sensor_scmi_info *info)
@@ -151,12 +156,14 @@ static int get_info(fwk_id_t id, struct mod_sensor_scmi_info *info)
     struct sensor_dev_ctx *ctx;
 
     status = get_ctx_if_valid_call(id, info, &ctx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = ctx->driver_api->get_info(ctx->config->driver_id, &info->hal_info);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return FWK_E_DEVICE;
+    }
     info->trip_point = ctx->config->trip_point;
 
     return FWK_SUCCESS;
@@ -173,8 +180,9 @@ static int sensor_get_trip_point(
 
     ctx = ctx_table + fwk_id_get_element_idx(id);
 
-    if (trip_point_idx >= ctx->config->trip_point.count)
+    if (trip_point_idx >= ctx->config->trip_point.count) {
         return FWK_E_PARAM;
+    }
 
     *params = ctx->trip_point_ctx[trip_point_idx].params;
 
@@ -188,13 +196,15 @@ static int sensor_set_trip_point(
 {
     struct sensor_dev_ctx *ctx;
 
-    if (params == NULL)
+    if (params == NULL) {
         return FWK_E_PARAM;
+    }
 
     ctx = ctx_table + fwk_id_get_element_idx(id);
 
-    if (trip_point_idx >= ctx->config->trip_point.count)
+    if (trip_point_idx >= ctx->config->trip_point.count) {
         return FWK_E_PARAM;
+    }
 
     ctx->trip_point_ctx[trip_point_idx].params = *params;
 
@@ -222,8 +232,9 @@ static void reading_complete(fwk_id_t dev_id,
     struct mod_sensor_event_params *event_params =
         (struct mod_sensor_event_params *)event.params;
 
-    if (!fwk_expect(fwk_id_get_module_idx(dev_id) == FWK_MODULE_IDX_SENSOR))
+    if (!fwk_expect(fwk_id_get_module_idx(dev_id) == FWK_MODULE_IDX_SENSOR)) {
         return;
+    }
 
     ctx = &ctx_table[fwk_id_get_element_idx(dev_id)];
 
@@ -239,8 +250,9 @@ static void reading_complete(fwk_id_t dev_id,
 #ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
         trip_point_process(dev_id, response->value);
 #endif
-    } else
+    } else {
         event_params->status = FWK_E_DEVICE;
+    }
 
     status = fwk_thread_put_event(&event);
     fwk_assert(status == FWK_SUCCESS);
@@ -284,8 +296,9 @@ static int sensor_dev_init(fwk_id_t element_id,
     if (config->trip_point.count > 0) {
         ctx->trip_point_ctx = fwk_mm_calloc(
             config->trip_point.count, sizeof(struct sensor_trip_point_ctx));
-    } else
+    } else {
         ctx->trip_point_ctx = NULL;
+    }
     return FWK_SUCCESS;
 }
 
@@ -302,12 +315,14 @@ static int sensor_bind(fwk_id_t id, unsigned int round)
         return FWK_SUCCESS;
     }
     if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
-        if (sensor_mod_ctx.config == NULL)
+        if (sensor_mod_ctx.config == NULL) {
             return FWK_SUCCESS;
+        }
 
         if (fwk_id_is_equal(
-                sensor_mod_ctx.config->notification_id, FWK_ID_NONE))
+                sensor_mod_ctx.config->notification_id, FWK_ID_NONE)) {
             return FWK_SUCCESS;
+        }
 
         return fwk_module_bind(
             sensor_mod_ctx.config->notification_id,
@@ -319,12 +334,14 @@ static int sensor_bind(fwk_id_t id, unsigned int round)
     status = fwk_module_bind(ctx->config->driver_id,
         ctx->config->driver_api_id,
         &driver);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* Validate driver API */
-    if ((driver == NULL) || (driver->get_value == NULL))
+    if ((driver == NULL) || (driver->get_value == NULL)) {
         return FWK_E_DATA;
+    }
 
     ctx->driver_api = driver;
 
@@ -346,8 +363,9 @@ static int sensor_process_bind_request(fwk_id_t source_id,
     }
 
     if (fwk_id_is_equal(api_id, mod_sensor_api_id_driver_response)) {
-        if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT))
+        if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT)) {
             return FWK_E_PARAM;
+        }
 
         ctx = ctx_table + fwk_id_get_element_idx(target_id);
         driver_id = ctx->config->driver_id;
@@ -361,8 +379,9 @@ static int sensor_process_bind_request(fwk_id_t source_id,
             *api = &sensor_driver_response_api;
 
             return FWK_SUCCESS;
-        } else
+        } else {
             return FWK_E_ACCESS;
+        }
     }
 
     return FWK_E_PARAM;
@@ -379,8 +398,9 @@ static int sensor_process_event(const struct fwk_event *event,
     struct mod_sensor_event_params *resp_params =
         (struct mod_sensor_event_params *)(read_req_event.params);
 
-    if (!fwk_module_is_valid_element_id(event->target_id))
+    if (!fwk_module_is_valid_element_id(event->target_id)) {
         return FWK_E_PARAM;
+    }
 
     ctx = ctx_table + fwk_id_get_element_idx(event->target_id);
 
@@ -398,8 +418,9 @@ static int sensor_process_event(const struct fwk_event *event,
         status = fwk_thread_get_delayed_response(event->target_id,
                                                  ctx->cookie,
                                                  &read_req_event);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         *resp_params = *event_params;
         return fwk_thread_put_event(&read_req_event);

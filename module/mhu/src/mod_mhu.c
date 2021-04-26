@@ -73,17 +73,20 @@ static void mhu_isr(void)
     struct mhu_smt_channel *smt_channel;
 
     status = fwk_interrupt_get_current(&interrupt);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return;
+    }
 
     for (device_idx = 0; device_idx < mhu_ctx.device_count; device_idx++) {
         device_ctx = &mhu_ctx.device_ctx_table[device_idx];
-        if (device_ctx->config->irq == interrupt)
+        if (device_ctx->config->irq == interrupt) {
             break;
+        }
     }
 
-    if (device_idx >= mhu_ctx.device_count)
+    if (device_idx >= mhu_ctx.device_count) {
         return;
+    }
 
     reg = (struct mhu_reg *)device_ctx->config->in;
 
@@ -136,8 +139,9 @@ const struct mod_smt_driver_api mhu_mod_smt_driver_api = {
 static int mhu_init(fwk_id_t module_id, unsigned int device_count,
                     const void *unused)
 {
-    if (device_count == 0)
+    if (device_count == 0) {
         return FWK_E_PARAM;
+    }
 
     mhu_ctx.device_ctx_table = fwk_mm_calloc(device_count,
         sizeof(mhu_ctx.device_ctx_table[0]));
@@ -153,8 +157,9 @@ static int mhu_device_init(fwk_id_t device_id, unsigned int slot_count,
     struct mod_mhu_device_config *config = (struct mod_mhu_device_config *)data;
     struct mhu_device_ctx *device_ctx;
 
-    if ((config->in == 0) || (config->out == 0))
+    if ((config->in == 0) || (config->out == 0)) {
         return FWK_E_PARAM;
+    }
 
     device_ctx = &mhu_ctx.device_ctx_table[fwk_id_get_element_idx(device_id)];
 
@@ -179,16 +184,18 @@ static int mhu_bind(fwk_id_t id, unsigned int round)
 
         for (slot = 0; slot < MHU_SLOT_COUNT_MAX; slot++) {
             if ((device_ctx->bound_slots & (uint32_t)(1U << slot)) ==
-                (uint32_t)0)
+                (uint32_t)0) {
                 continue;
+            }
 
             smt_channel = &device_ctx->smt_channel_table[slot];
 
             status = fwk_module_bind(smt_channel->id,
                 FWK_ID_API(FWK_MODULE_IDX_SMT, MOD_SMT_API_IDX_DRIVER_INPUT),
                 &smt_channel->api);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
         }
     }
 
@@ -201,14 +208,16 @@ static int mhu_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
     struct mhu_device_ctx *device_ctx;
     unsigned int slot;
 
-    if (!fwk_id_is_type(target_id, FWK_ID_TYPE_SUB_ELEMENT))
+    if (!fwk_id_is_type(target_id, FWK_ID_TYPE_SUB_ELEMENT)) {
         return FWK_E_ACCESS;
+    }
 
     device_ctx = &mhu_ctx.device_ctx_table[fwk_id_get_element_idx(target_id)];
     slot = fwk_id_get_sub_element_idx(target_id);
 
-    if (device_ctx->bound_slots & (1U << slot))
+    if (device_ctx->bound_slots & (1U << slot)) {
         return FWK_E_ACCESS;
+    }
 
     device_ctx->smt_channel_table[slot].id = source_id;
     device_ctx->bound_slots |= 1U << slot;
@@ -223,18 +232,21 @@ static int mhu_start(fwk_id_t id)
     int status;
     struct mhu_device_ctx *device_ctx;
 
-    if (fwk_id_get_type(id) == FWK_ID_TYPE_MODULE)
+    if (fwk_id_get_type(id) == FWK_ID_TYPE_MODULE) {
         return FWK_SUCCESS;
+    }
 
     device_ctx = &mhu_ctx.device_ctx_table[fwk_id_get_element_idx(id)];
 
     if (device_ctx->bound_slots != 0) {
         status = fwk_interrupt_set_isr(device_ctx->config->irq, &mhu_isr);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
         status = fwk_interrupt_enable(device_ctx->config->irq);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return FWK_SUCCESS;

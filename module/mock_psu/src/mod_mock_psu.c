@@ -68,14 +68,17 @@ static int mod_mock_psu_get_cfg_ctx(
     const struct mod_mock_psu_element_cfg **cfg,
     struct mod_mock_psu_element_ctx **ctx)
 {
-    if (fwk_id_get_module_idx(element_id) != FWK_MODULE_IDX_MOCK_PSU)
+    if (fwk_id_get_module_idx(element_id) != FWK_MODULE_IDX_MOCK_PSU) {
         return FWK_E_PARAM;
+    }
 
-    if (ctx != NULL)
+    if (ctx != NULL) {
         *ctx = mod_mock_psu_get_ctx(element_id);
+    }
 
-    if (cfg != NULL)
+    if (cfg != NULL) {
         *cfg = fwk_module_get_data(element_id);
+    }
 
     return FWK_SUCCESS;
 }
@@ -92,8 +95,9 @@ static void mod_mock_psu_alarm_callback(uintptr_t element_idx)
     struct mod_psu_driver_response response;
 
     status = mod_mock_psu_get_cfg_ctx(element_id, &cfg, &ctx);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return;
+    }
 
     response = (struct mod_psu_driver_response){
         .status = FWK_SUCCESS,
@@ -141,8 +145,9 @@ static int mod_mock_psu_trigger(
     struct mod_mock_psu_element_ctx *ctx;
 
     status = mod_mock_psu_get_cfg_ctx(element_id, &cfg, &ctx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     status = ctx->apis.alarm->start(
         cfg->async_alarm_id,
@@ -155,8 +160,9 @@ static int mod_mock_psu_trigger(
         status = FWK_PENDING;
 
         ctx->op = op;
-    } else
+    } else {
         status = FWK_E_HANDLER;
+    }
 
 exit:
     return status;
@@ -172,8 +178,9 @@ static int mod_mock_psu_get_enabled(
     struct mod_mock_psu_element_ctx *ctx;
 
     status = mod_mock_psu_get_cfg_ctx(element_id, &cfg, &ctx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     if (ctx->apis.alarm == NULL) {
         *enabled = ctx->state.enabled;
@@ -187,8 +194,9 @@ static int mod_mock_psu_get_enabled(
         };
 
         status = mod_mock_psu_trigger(element_id, op);
-    } else
+    } else {
         status = FWK_E_BUSY;
+    }
 
 exit:
     return status;
@@ -204,8 +212,9 @@ static int mod_mock_psu_set_enabled(
     struct mod_mock_psu_element_ctx *ctx;
 
     status = mod_mock_psu_get_cfg_ctx(element_id, &cfg, &ctx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     if (ctx->apis.alarm == NULL) {
         ctx->state.enabled = enabled;
@@ -220,8 +229,9 @@ static int mod_mock_psu_set_enabled(
         };
 
         status = mod_mock_psu_trigger(element_id, op);
-    } else
+    } else {
         status = FWK_E_BUSY;
+    }
 
 exit:
     return status;
@@ -235,8 +245,9 @@ static int mod_mock_psu_get_voltage(fwk_id_t element_id, uint32_t *voltage)
     struct mod_mock_psu_element_ctx *ctx;
 
     status = mod_mock_psu_get_cfg_ctx(element_id, &cfg, &ctx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     if (ctx->apis.alarm == NULL) {
         *voltage = ctx->state.voltage;
@@ -250,8 +261,9 @@ static int mod_mock_psu_get_voltage(fwk_id_t element_id, uint32_t *voltage)
         };
 
         status = mod_mock_psu_trigger(element_id, op);
-    } else
+    } else {
         status = FWK_E_BUSY;
+    }
 
 exit:
     return status;
@@ -265,8 +277,9 @@ static int mod_mock_psu_set_voltage(fwk_id_t element_id, uint32_t voltage)
     struct mod_mock_psu_element_ctx *ctx;
 
     status = mod_mock_psu_get_cfg_ctx(element_id, &cfg, &ctx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     if (ctx->apis.alarm == NULL) {
         ctx->state.voltage = voltage;
@@ -281,8 +294,9 @@ static int mod_mock_psu_set_voltage(fwk_id_t element_id, uint32_t voltage)
         };
 
         status = mod_mock_psu_trigger(element_id, op);
-    } else
+    } else {
         status = FWK_E_BUSY;
+    }
 
 exit:
     return status;
@@ -349,8 +363,9 @@ static int mod_mock_psu_bind(fwk_id_t id, unsigned int round)
                 cfg->async_alarm_id,
                 cfg->async_alarm_api_id,
                 &ctx->apis.alarm);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 goto exit;
+            }
 
             status = fwk_module_bind(
                 cfg->async_response_id,
@@ -371,11 +386,13 @@ static int mod_mock_psu_process_bind_request(
 {
     const struct mod_mock_psu_element_cfg *cfg;
 
-    if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT))
+    if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT)) {
         return FWK_E_ACCESS;
+    }
 
-    if (!fwk_id_is_equal(api_id, mod_mock_psu_api_id_driver))
+    if (!fwk_id_is_equal(api_id, mod_mock_psu_api_id_driver)) {
         return FWK_E_ACCESS;
+    }
 
     cfg = fwk_module_get_data(target_id);
 
@@ -385,8 +402,9 @@ static int mod_mock_psu_process_bind_request(
          * accept bind requests from is the entity that we have configured to be
          * our designated driver respondee.
          */
-        if (!fwk_id_is_equal(source_id, cfg->async_response_id))
+        if (!fwk_id_is_equal(source_id, cfg->async_response_id)) {
             return FWK_E_ACCESS;
+        }
     }
 
     *api = &mod_mock_psu_driver_api;

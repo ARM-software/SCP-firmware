@@ -124,8 +124,9 @@ static int smt_get_message_header(fwk_id_t channel_id, uint32_t *header)
     channel_ctx =
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
 
-    if (!channel_ctx->locked)
+    if (!channel_ctx->locked) {
         return FWK_E_ACCESS;
+    }
 
     *header = channel_ctx->in->message_header;
 
@@ -146,8 +147,9 @@ static int smt_get_payload(fwk_id_t channel_id,
     channel_ctx =
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
 
-    if (!channel_ctx->locked)
+    if (!channel_ctx->locked) {
         return FWK_E_ACCESS;
+    }
 
     *payload = channel_ctx->in->payload;
 
@@ -177,8 +179,9 @@ static int smt_write_payload(fwk_id_t channel_id,
         return FWK_E_PARAM;
     }
 
-    if (!channel_ctx->locked)
+    if (!channel_ctx->locked) {
         return FWK_E_ACCESS;
+    }
 
     memcpy(((uint8_t*)channel_ctx->out->payload) + offset, payload, size);
 
@@ -218,8 +221,9 @@ static int smt_respond(fwk_id_t channel_id, const void *payload, size_t size)
 
     fwk_interrupt_global_enable();
 
-    if (memory->flags & MOD_SMT_MAILBOX_FLAGS_IENABLED_MASK)
+    if (memory->flags & MOD_SMT_MAILBOX_FLAGS_IENABLED_MASK) {
         channel_ctx->driver_api->raise_interrupt(channel_ctx->driver_id);
+    }
 
     return FWK_SUCCESS;
 }
@@ -231,8 +235,9 @@ static int smt_transmit(fwk_id_t channel_id, uint32_t message_header,
     struct smt_channel_ctx *channel_ctx;
     struct mod_smt_memory *memory;
 
-    if (payload == NULL)
+    if (payload == NULL) {
         return FWK_E_DATA;
+    }
 
     channel_ctx =
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
@@ -245,8 +250,9 @@ static int smt_transmit(fwk_id_t channel_id, uint32_t message_header,
      * bit, and while it is probably safe to just overwrite the data
      * the agent could be in the process of reading.
      */
-    if ((memory->status & MOD_SMT_MAILBOX_STATUS_FREE_MASK) == (uint32_t)0)
+    if ((memory->status & MOD_SMT_MAILBOX_STATUS_FREE_MASK) == (uint32_t)0) {
         return FWK_E_BUSY;
+    }
 
     memory->message_header = message_header;
 
@@ -300,8 +306,9 @@ static int smt_slave_handler(struct smt_channel_ctx *channel_ctx)
     int status;
 
     /* Check if we are already processing */
-    if (channel_ctx->locked)
+    if (channel_ctx->locked) {
         return FWK_E_STATE;
+    }
 
     memory = ((struct mod_smt_memory*)channel_ctx->config->mailbox_address);
     in = channel_ctx->in;
@@ -340,12 +347,13 @@ static int smt_slave_handler(struct smt_channel_ctx *channel_ctx)
 
         out->status |= MOD_SMT_MAILBOX_STATUS_ERROR_MASK;
 
-        if (channel_ctx->is_scmi_channel)
+        if (channel_ctx->is_scmi_channel) {
             status = channel_ctx->smt_signal.scmi_api->signal_error(
                          channel_ctx->service_id);
-        else
+        } else {
             status = channel_ctx->smt_signal.signal_api->signal_error(
                          channel_ctx->service_id);
+        }
 
         return status;
     }
@@ -355,15 +363,17 @@ static int smt_slave_handler(struct smt_channel_ctx *channel_ctx)
     memcpy(in->payload, memory->payload, payload_size);
 
     /* Let subscribed service handle the message */
-    if (channel_ctx->is_scmi_channel)
+    if (channel_ctx->is_scmi_channel) {
         status = channel_ctx->smt_signal.scmi_api->signal_message(
                     channel_ctx->service_id);
-    else
+    } else {
         status = channel_ctx->smt_signal.signal_api->signal_message(
                     channel_ctx->service_id);
+    }
 
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_HANDLER;
+    }
 
     return FWK_SUCCESS;
 }
@@ -449,15 +459,17 @@ static int smt_bind(fwk_id_t id, unsigned int round)
     struct smt_channel_ctx *channel_ctx;
 
     if (round == 0) {
-        if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+        if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
             return FWK_SUCCESS;
+        }
 
         channel_ctx = &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(id)];
         status = fwk_module_bind(channel_ctx->config->driver_id,
                                  channel_ctx->config->driver_api_id,
                                  &channel_ctx->driver_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
         channel_ctx->driver_id = channel_ctx->config->driver_id;
     }
 
@@ -477,8 +489,9 @@ static int smt_bind(fwk_id_t id, unsigned int round)
                                     &channel_ctx->smt_signal.signal_api);
             channel_ctx->is_scmi_channel = false;
         }
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return FWK_SUCCESS;
@@ -553,8 +566,9 @@ static int smt_start(fwk_id_t id)
 {
     struct smt_channel_ctx *ctx;
 
-    if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT))
+    if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
         return FWK_SUCCESS;
+    }
 
     ctx = &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(id)];
 
@@ -585,8 +599,9 @@ static int smt_process_notification(
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(event->target_id)];
 
     if (params->state != MOD_PD_STATE_ON) {
-        if (params->state == MOD_PD_STATE_OFF)
+        if (params->state == MOD_PD_STATE_OFF) {
             channel_ctx->smt_mailbox_ready = false;
+        }
 
         return FWK_SUCCESS;
     }
@@ -609,8 +624,9 @@ static int smt_process_notification(
 
         status = fwk_notification_notify(&smt_channels_initialized_notification,
             &notifications_sent);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return FWK_SUCCESS;

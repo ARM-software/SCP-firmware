@@ -58,14 +58,17 @@ static int mod_psu_get_cfg_ctx(
     const struct mod_psu_element_cfg **cfg,
     struct mod_psu_element_ctx **ctx)
 {
-    if (fwk_id_get_module_idx(element_id) != FWK_MODULE_IDX_PSU)
+    if (fwk_id_get_module_idx(element_id) != FWK_MODULE_IDX_PSU) {
         return FWK_E_PARAM;
+    }
 
-    if (ctx != NULL)
+    if (ctx != NULL) {
         *ctx = mod_psu_get_element_ctx(element_id);
+    }
 
-    if (cfg != NULL)
+    if (cfg != NULL) {
         *cfg = fwk_module_get_data(element_id);
+    }
 
     return FWK_SUCCESS;
 }
@@ -78,8 +81,9 @@ static int mod_psu_get_enabled(fwk_id_t element_id, bool *enabled)
     struct mod_psu_element_ctx *ctx;
 
     status = mod_psu_get_cfg_ctx(element_id, &cfg, &ctx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     if (ctx->op.state != MOD_PSU_STATE_IDLE) {
         status = FWK_E_BUSY;
@@ -101,10 +105,12 @@ static int mod_psu_get_enabled(fwk_id_t element_id, bool *enabled)
             ctx->op.state = MOD_PSU_STATE_BUSY;
 
             status = FWK_PENDING;
-        } else
+        } else {
             status = FWK_E_STATE;
-    } else if (status != FWK_SUCCESS)
+        }
+    } else if (status != FWK_SUCCESS) {
         status = FWK_E_HANDLER;
+    }
 
 exit:
     return status;
@@ -118,8 +124,9 @@ static int mod_psu_set_enabled(fwk_id_t element_id, bool enabled)
     struct mod_psu_element_ctx *ctx;
 
     status = mod_psu_get_cfg_ctx(element_id, &cfg, &ctx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     if (ctx->op.state != MOD_PSU_STATE_IDLE) {
         status = FWK_E_BUSY;
@@ -141,10 +148,12 @@ static int mod_psu_set_enabled(fwk_id_t element_id, bool enabled)
             ctx->op.state = MOD_PSU_STATE_BUSY;
 
             status = FWK_PENDING;
-        } else
+        } else {
             status = FWK_E_STATE;
-    } else if (status != FWK_SUCCESS)
+        }
+    } else if (status != FWK_SUCCESS) {
         status = FWK_E_HANDLER;
+    }
 
 exit:
     return status;
@@ -158,8 +167,9 @@ static int mod_psu_get_voltage(fwk_id_t element_id, uint32_t *voltage)
     struct mod_psu_element_ctx *ctx;
 
     status = mod_psu_get_cfg_ctx(element_id, &cfg, &ctx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     if (ctx->op.state != MOD_PSU_STATE_IDLE) {
         status = FWK_E_BUSY;
@@ -181,10 +191,12 @@ static int mod_psu_get_voltage(fwk_id_t element_id, uint32_t *voltage)
             ctx->op.state = MOD_PSU_STATE_BUSY;
 
             status = FWK_PENDING;
-        } else
+        } else {
             status = FWK_E_STATE;
-    } else if (status != FWK_SUCCESS)
+        }
+    } else if (status != FWK_SUCCESS) {
         status = FWK_E_HANDLER;
+    }
 
 exit:
     return status;
@@ -198,8 +210,9 @@ static int mod_psu_set_voltage(fwk_id_t element_id, uint32_t voltage)
     struct mod_psu_element_ctx *ctx;
 
     status = mod_psu_get_cfg_ctx(element_id, &cfg, &ctx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     if (ctx->op.state != MOD_PSU_STATE_IDLE) {
         status = FWK_E_BUSY;
@@ -221,10 +234,12 @@ static int mod_psu_set_voltage(fwk_id_t element_id, uint32_t voltage)
             ctx->op.state = MOD_PSU_STATE_BUSY;
 
             status = FWK_PENDING;
-        } else
+        } else {
             status = FWK_E_STATE;
-    } else if (status != FWK_SUCCESS)
+        }
+    } else if (status != FWK_SUCCESS) {
         status = FWK_E_HANDLER;
+    }
 
 exit:
     return status;
@@ -249,8 +264,9 @@ static void mod_psu_respond(
     struct fwk_event event;
 
     status = mod_psu_get_cfg_ctx(element_id, &cfg, &ctx);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return;
+    }
 
     event = (struct fwk_event){
         .id = mod_psu_impl_event_id_response,
@@ -262,8 +278,9 @@ static void mod_psu_respond(
     memcpy(event.params, &response, sizeof(response));
 
     status = fwk_thread_put_event(&event);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         ctx->op.state = MOD_PSU_STATE_IDLE;
+    }
 }
 
 static const struct mod_psu_driver_response_api mod_psu_driver_response_api = {
@@ -310,15 +327,17 @@ static int mod_psu_bind_element(fwk_id_t element_id, unsigned int round)
     const struct mod_psu_element_ctx *ctx;
     const struct mod_psu_element_cfg *cfg;
 
-    if (round > 0)
+    if (round > 0) {
         goto exit;
+    }
 
     ctx = mod_psu_get_element_ctx(element_id);
     cfg = fwk_module_get_data(element_id);
 
     status = fwk_module_bind(cfg->driver_id, cfg->driver_api_id, &ctx->driver);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     if ((ctx->driver->set_enabled == NULL) ||
         (ctx->driver->get_enabled == NULL) ||
@@ -333,8 +352,9 @@ exit:
 
 static int mod_psu_bind(fwk_id_t id, unsigned int round)
 {
-    if (fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT))
+    if (fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
         return mod_psu_bind_element(id, round);
+    }
 
     return FWK_SUCCESS;
 }
@@ -345,8 +365,9 @@ static int mod_psu_process_bind_request(
     fwk_id_t api_id,
     const void **api)
 {
-    if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT))
+    if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT)) {
         return FWK_E_PARAM;
+    }
 
     switch (fwk_id_get_api_idx(api_id)) {
     case MOD_PSU_API_IDX_DEVICE:
@@ -383,8 +404,9 @@ static int mod_psu_process_event(
 
     resp_params->status =
         mod_psu_get_cfg_ctx(event->target_id, &cfg, &ctx);
-    if (resp_params->status != FWK_SUCCESS)
+    if (resp_params->status != FWK_SUCCESS) {
         goto exit;
+    }
 
     switch (fwk_id_get_event_idx(event->id)) {
     case MOD_PSU_EVENT_IDX_GET_ENABLED:
@@ -404,8 +426,9 @@ static int mod_psu_process_event(
             event->target_id,
             ctx->op.cookie,
             &hal_event);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         *hal_params = (struct mod_psu_response){
             .status = params->status,

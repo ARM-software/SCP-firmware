@@ -46,8 +46,9 @@ static int create_core_cluster_pd_element_table(
     pd_config_table = fwk_mm_calloc(
         core_count + cluster_count,
         sizeof(struct mod_power_domain_element_config));
-    if (pd_config_table == NULL)
+    if (pd_config_table == NULL) {
         return FWK_E_NOMEM;
+    }
 
     for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
         for (core_idx = 0; core_idx < cores_per_clusters; core_idx++) {
@@ -105,15 +106,17 @@ const struct fwk_element *create_power_domain_element_table(
     int status;
 
     if ((core_count % cluster_count != 0) || (core_count > MAX_CORES_COUNT) ||
-        (static_table_size > MAX_STATIC_ELEMENTS_COUNT))
+        (static_table_size > MAX_STATIC_ELEMENTS_COUNT)) {
         return NULL;
+    }
 
     element_table = fwk_mm_calloc(
         core_count + cluster_count + static_table_size + 1, /* Terminator */
         sizeof(struct fwk_element));
 
-    if (element_table == NULL)
+    if (element_table == NULL) {
         return element_table;
+    }
 
     status = create_core_cluster_pd_element_table(
         element_table,
@@ -126,8 +129,9 @@ const struct fwk_element *create_power_domain_element_table(
         cluster_state_table,
         cluster_state_table_size);
 
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return NULL;
+    }
 
     memcpy(
         element_table + (core_count + cluster_count),

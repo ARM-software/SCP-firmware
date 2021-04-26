@@ -58,13 +58,15 @@ static int set_enabled(fwk_id_t id, bool enable, enum scp_debug_user user_id)
     int status;
     struct mod_debug_request_params *req_params;
 
-    if (!fwk_expect(user_id < SCP_DEBUG_USER_COUNT))
+    if (!fwk_expect(user_id < SCP_DEBUG_USER_COUNT)) {
         return FWK_E_PARAM;
+    }
 
     ctx = &ctx_table[fwk_id_get_element_idx(id)];
 
-    if (ctx->state != DEBUG_IDLE)
+    if (ctx->state != DEBUG_IDLE) {
         return FWK_E_BUSY;
+    }
 
     user_mask = (1 << user_id);
 
@@ -73,8 +75,9 @@ static int set_enabled(fwk_id_t id, bool enable, enum scp_debug_user user_id)
      * enabled it.
      */
     if ((enable && (ctx->debug_users_mask & user_mask)) ||
-        (!enable && (!(ctx->debug_users_mask & user_mask))))
+        (!enable && (!(ctx->debug_users_mask & user_mask)))) {
         return FWK_E_ACCESS;
+    }
 
     status = ctx->driver_api->set_enabled(ctx->config->driver_id,
                                           enable, user_id);
@@ -106,8 +109,9 @@ static int set_enabled(fwk_id_t id, bool enable, enum scp_debug_user user_id)
         }
 
         return status;
-    } else if (status != FWK_SUCCESS)
-          return status;
+    } else if (status != FWK_SUCCESS) {
+        return status;
+    }
 
     mark_user(id, enable, user_id);
 
@@ -121,13 +125,15 @@ static int get_enabled(fwk_id_t id, bool *enable, enum scp_debug_user user_id)
     int status;
     struct mod_debug_request_params *req_params;
 
-    if ((enable == NULL) || !fwk_expect(user_id < SCP_DEBUG_USER_COUNT))
+    if ((enable == NULL) || !fwk_expect(user_id < SCP_DEBUG_USER_COUNT)) {
         return FWK_E_PARAM;
+    }
 
     ctx = &ctx_table[fwk_id_get_element_idx(id)];
 
-    if (ctx->state != DEBUG_IDLE)
+    if (ctx->state != DEBUG_IDLE) {
         return FWK_E_BUSY;
+    }
 
     status = ctx->driver_api->get_enabled(ctx->config->driver_id,
                                           enable, user_id);
@@ -227,10 +233,11 @@ static void request_complete(fwk_id_t id,
         .target_id = id,
     };
 
-    if (ctx->state == DEBUG_GET)
+    if (ctx->state == DEBUG_GET) {
         event.id = mod_debug_event_id_get_complete;
-    else
+    } else {
         event.id = mod_debug_event_id_set_complete;
+    }
 
     resp_params->status = response->status;
     resp_params->enabled = response->enabled;
@@ -255,8 +262,9 @@ static int mod_debug_init(
     fwk_assert(element_count > 0);
 
     ctx_table = fwk_mm_calloc(element_count, sizeof(struct debug_dev_ctx));
-    if (ctx_table == NULL)
+    if (ctx_table == NULL) {
         return FWK_E_NOMEM;
+    }
 
     return FWK_SUCCESS;
 }
@@ -285,8 +293,9 @@ static int mod_debug_bind(fwk_id_t id, unsigned int round)
     struct debug_dev_ctx *ctx;
     struct mod_debug_dev_config *dev_cfg;
 
-    if ((round > 0) || fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+    if ((round > 0) || fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         return FWK_SUCCESS;
+    }
 
     ctx = &ctx_table[fwk_id_get_element_idx(id)];
     dev_cfg = ctx->config;
@@ -296,12 +305,15 @@ static int mod_debug_bind(fwk_id_t id, unsigned int round)
         dev_cfg->driver_id,
         dev_cfg->driver_api_id,
         &driver_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* Validate driver API */
-    if ((driver_api->set_enabled == NULL) || (driver_api->get_enabled == NULL))
+    if ((driver_api->set_enabled == NULL) ||
+        (driver_api->get_enabled == NULL)) {
         return FWK_E_DATA;
+    }
 
     ctx->driver_api = driver_api;
 
@@ -320,8 +332,9 @@ static int mod_debug_process_bind_request(
     api_idx = fwk_id_get_api_idx(api_id);
 
     /* Only binding to elements is allowed */
-    if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT))
+    if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT)) {
         return FWK_E_ACCESS;
+    }
 
     ctx = &ctx_table[fwk_id_get_element_idx(target_id)];
 
@@ -332,8 +345,9 @@ static int mod_debug_process_bind_request(
         return FWK_SUCCESS;
 
     case MOD_DEBUG_API_IDX_DRIVER_INPUT:
-        if (fwk_id_is_equal(source_id, ctx->config->driver_id))
+        if (fwk_id_is_equal(source_id, ctx->config->driver_id)) {
             *api = &driver_input_api;
+        }
 
         return FWK_SUCCESS;
 
@@ -357,8 +371,9 @@ static int respond(const struct fwk_event *event)
 
     status = fwk_thread_get_delayed_response(event->target_id, ctx->cookie,
                                              &response);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     resp_params->status = req_result->status;
     resp_params->enabled = req_result->enabled;
@@ -395,18 +410,21 @@ static int mod_debug_process_event(const struct fwk_event *event,
          */
         status = set_enabled(ctx->config->driver_id, req_params->enable,
                             req_params->user_id);
-        if (status == FWK_PENDING)
+        if (status == FWK_PENDING) {
             break;
-        if (status != FWK_SUCCESS)
+        }
+        if (status != FWK_SUCCESS) {
             return FWK_E_DEVICE;
+        }
 
         break;
 
     case MOD_DEBUG_EVENT_IDX_SET_COMPLETE:
         req_result = (struct mod_debug_response_params *)event->params;
 
-        if (req_result->status == FWK_SUCCESS)
+        if (req_result->status == FWK_SUCCESS) {
             mark_user(event->target_id, req_result->enabled, ctx->requester);
+        }
 
         return respond(event);
 

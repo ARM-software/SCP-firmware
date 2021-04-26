@@ -45,8 +45,9 @@ static int get_info(fwk_id_t id, struct mod_sensor_info *info)
     config = config_table[fwk_id_get_element_idx(id)];
     fwk_assert(config != NULL);
 
-    if (info == NULL)
+    if (info == NULL) {
         return FWK_E_PARAM;
+    }
 
     *info = *(config->info);
 
@@ -77,8 +78,9 @@ static int reg_sensor_element_init(fwk_id_t element_id,
     struct mod_reg_sensor_dev_config *config =
         (struct mod_reg_sensor_dev_config *)data;
 
-    if (config->reg == 0)
+    if (config->reg == 0) {
         return FWK_E_DATA;
+    }
 
     config_table[fwk_id_get_element_idx(element_id)] = config;
 

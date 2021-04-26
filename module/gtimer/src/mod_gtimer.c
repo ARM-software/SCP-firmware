@@ -108,8 +108,9 @@ static int set_timer(fwk_id_t dev_id, uint64_t timestamp)
     int status;
 
     status = get_counter(dev_id, &counter);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /*
      * If an alarm's period is very small, the timer device could be configured
@@ -151,8 +152,9 @@ static int get_frequency(fwk_id_t dev_id, uint32_t *frequency)
 {
     struct dev_ctx *ctx;
 
-    if (frequency == NULL)
+    if (frequency == NULL) {
         return FWK_E_PARAM;
+    }
 
     ctx = mod_gtimer_ctx.table + fwk_id_get_element_idx(dev_id);
 
@@ -223,8 +225,9 @@ static int gtimer_process_bind_request(fwk_id_t requester_id,
                                        const void **api)
 {
     /* No binding to the module */
-    if (fwk_module_is_valid_module_id(id))
+    if (fwk_module_is_valid_module_id(id)) {
         return FWK_E_ACCESS;
+    }
 
     *api = &module_api;
 
@@ -243,8 +246,9 @@ static int gtimer_start(fwk_id_t id)
 {
     struct dev_ctx *ctx;
 
-    if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT))
+    if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
         return FWK_SUCCESS;
+    }
 
     ctx = mod_gtimer_ctx.table + fwk_id_get_element_idx(id);
 
@@ -254,8 +258,9 @@ static int gtimer_start(fwk_id_t id)
             mod_clock_notification_id_state_changed,
             ctx->config->clock_id,
             id);
-    } else
+    } else {
         gtimer_control_init(ctx);
+    }
 
     return FWK_SUCCESS;
 }
