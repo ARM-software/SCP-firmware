@@ -144,9 +144,10 @@ static int scmi_apcore_protocol_attributes_handler(fwk_id_t service_id,
     };
 
     if (scmi_apcore_ctx.config->reset_register_width ==
-        MOD_SCMI_APCORE_REG_WIDTH_64)
+        MOD_SCMI_APCORE_REG_WIDTH_64) {
         return_values.attributes |=
             MOD_SCMI_APCORE_PROTOCOL_ATTRIBUTES_64BIT_MASK;
+    }
 
     scmi_apcore_ctx.scmi_api->respond(
         service_id,
@@ -175,8 +176,9 @@ static int scmi_apcore_protocol_message_attributes_handler(fwk_id_t service_id,
     message_id = parameters->message_id;
 
     if ((message_id >= FWK_ARRAY_SIZE(handler_table)) ||
-        (handler_table[message_id] == NULL))
+        (handler_table[message_id] == NULL)) {
         return_values.status = SCMI_NOT_FOUND;
+    }
 
     response_size = (return_values.status == SCMI_SUCCESS) ?
         sizeof(return_values) : sizeof(return_values.status);
@@ -204,12 +206,14 @@ static int scmi_apcore_reset_address_set_handler(fwk_id_t service_id,
     parameters = (const struct scmi_apcore_reset_address_set_a2p *)payload;
 
     status = scmi_apcore_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     status = scmi_apcore_ctx.scmi_api->get_agent_type(agent_id, &agent_type);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     /* Only the PSCI agent may set the reset address */
     if (agent_type != SCMI_AGENT_TYPE_PSCI) {
@@ -248,14 +252,16 @@ static int scmi_apcore_reset_address_set_handler(fwk_id_t service_id,
 
     status = set_reset_address(
         parameters->reset_address_low, parameters->reset_address_high);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     return_values.status = SCMI_SUCCESS;
 
     /* Lock the configuration if requested */
-    if (parameters->attributes & MOD_SCMI_APCORE_RESET_ADDRESS_SET_LOCK_MASK)
+    if (parameters->attributes & MOD_SCMI_APCORE_RESET_ADDRESS_SET_LOCK_MASK) {
         scmi_apcore_ctx.locked = true;
+    }
 
 exit:
     scmi_apcore_ctx.scmi_api->respond(
@@ -279,12 +285,14 @@ static int scmi_apcore_reset_address_get_handler(fwk_id_t service_id,
     };
 
     status = scmi_apcore_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     status = scmi_apcore_ctx.scmi_api->get_agent_type(agent_id, &agent_type);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     /* Only the PSCI agent may get the current reset address */
     if (agent_type != SCMI_AGENT_TYPE_PSCI) {
@@ -377,14 +385,18 @@ static int scmi_apcore_init(fwk_id_t module_id, unsigned int element_count,
     const struct mod_scmi_apcore_config *config =
         (const struct mod_scmi_apcore_config *)data;
 
-    if (config == NULL)
+    if (config == NULL) {
         return FWK_E_PARAM;
-    if (config->reset_register_group_table == NULL)
+    }
+    if (config->reset_register_group_table == NULL) {
         return FWK_E_PARAM;
-    if (config->reset_register_group_count == 0)
+    }
+    if (config->reset_register_group_count == 0) {
         return FWK_E_PARAM;
-    if (config->reset_register_width >= MOD_SCMI_APCORE_REG_WIDTH_COUNT)
+    }
+    if (config->reset_register_width >= MOD_SCMI_APCORE_REG_WIDTH_COUNT) {
         return FWK_E_PARAM;
+    }
 
     scmi_apcore_ctx.config = config;
 
@@ -393,8 +405,9 @@ static int scmi_apcore_init(fwk_id_t module_id, unsigned int element_count,
 
 static int scmi_apcore_bind(fwk_id_t id, unsigned int round)
 {
-    if (round == 1)
+    if (round == 1) {
         return FWK_SUCCESS;
+    }
 
     /* Bind to the SCMI module, storing an API pointer for later use. */
     return fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
@@ -406,8 +419,9 @@ static int scmi_apcore_process_bind_request(fwk_id_t source_id,
     fwk_id_t target_id, fwk_id_t api_id, const void **api)
 {
     /* Only accept binding requests from the SCMI module. */
-    if (!fwk_id_is_equal(source_id, FWK_ID_MODULE(FWK_MODULE_IDX_SCMI)))
+    if (!fwk_id_is_equal(source_id, FWK_ID_MODULE(FWK_MODULE_IDX_SCMI))) {
         return FWK_E_ACCESS;
+    }
 
     *api = &scmi_apcore_mod_scmi_to_protocol_api;
 
