@@ -75,8 +75,9 @@ static int mod_mock_clock_set_rate(
 
     ctx = mod_mock_clock_get_ctx(clock_id);
 
-    if (ctx->state == MOD_CLOCK_STATE_STOPPED)
+    if (ctx->state == MOD_CLOCK_STATE_STOPPED) {
         return FWK_E_STATE;
+    }
 
     /*
      * Look up the divider and source settings. We do not perform any rounding
@@ -84,8 +85,9 @@ static int mod_mock_clock_set_rate(
      * be refused with an FWK_E_PARAM error code.
      */
     status = get_rate_entry(ctx, rate, &rate_entry);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_PARAM;
+    }
 
     ctx->current_rate_index = rate_entry - ctx->config->rate_table;
 
@@ -100,8 +102,9 @@ static int mod_mock_clock_get_rate(fwk_id_t clock_id, uint64_t *rate)
 
     ctx = mod_mock_clock_get_ctx(clock_id);
 
-    if (!ctx->rate_initialized)
+    if (!ctx->rate_initialized) {
         return FWK_E_STATE;
+    }
 
     *rate = ctx->config->rate_table[ctx->current_rate_index].rate;
 
@@ -117,8 +120,9 @@ static int mod_mock_clock_get_rate_from_index(
 
     ctx = mod_mock_clock_get_ctx(clock_id);
 
-    if (rate_index >= ctx->config->rate_count)
+    if (rate_index >= ctx->config->rate_count) {
         return FWK_E_PARAM;
+    }
 
     *rate = ctx->config->rate_table[rate_index].rate;
 
@@ -224,8 +228,9 @@ static int mod_mock_clock_element_init(
         rate = cfg->rate_table[rate_index].rate;
 
         /* The rate entries must be in ascending order */
-        if (rate < last_rate)
+        if (rate < last_rate) {
             return FWK_E_DATA;
+        }
 
         last_rate = rate;
 
@@ -250,8 +255,9 @@ static int mod_mock_clock_process_bind_request(
 {
     enum mod_mock_clock_api_type api_type = fwk_id_get_api_idx(api_id);
 
-    if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT))
+    if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT)) {
         return FWK_E_ACCESS;
+    }
 
     switch (api_type) {
     case MOD_MOCK_CLOCK_API_TYPE_DRIVER:

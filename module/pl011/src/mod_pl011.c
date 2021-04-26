@@ -60,12 +60,14 @@ static int mod_pl011_init_ctx(struct mod_pl011_ctx *ctx)
     fwk_assert(!mod_pl011_ctx.initialized);
 
     element_count = fwk_module_get_element_count(fwk_module_id_pl011);
-    if (element_count == 0)
+    if (element_count == 0) {
         return FWK_SUCCESS;
+    }
 
     ctx->elements = fwk_mm_alloc(element_count, sizeof(ctx->elements[0]));
-    if (!fwk_expect(ctx->elements != NULL))
+    if (!fwk_expect(ctx->elements != NULL)) {
         return FWK_E_NOMEM;
+    }
 
     for (size_t i = 0; i < element_count; i++) {
         const struct mod_pl011_element_cfg *cfg =
@@ -212,8 +214,9 @@ static int mod_pl011_init(
     unsigned int element_count,
     const void *data)
 {
-    if (mod_pl011_ctx.initialized)
+    if (mod_pl011_ctx.initialized) {
         return FWK_SUCCESS;
+    }
 
     return mod_pl011_init_ctx(&mod_pl011_ctx);
 }
@@ -232,8 +235,9 @@ static int mod_pl011_start(fwk_id_t id)
 
     const struct mod_pl011_element_cfg *cfg;
 
-    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         return FWK_SUCCESS;
+    }
 
     cfg = fwk_module_get_data(id);
 
@@ -247,15 +251,17 @@ static int mod_pl011_start(fwk_id_t id)
     if (!fwk_id_is_equal(cfg->pd_id, FWK_ID_NONE)) {
         status = fwk_notification_subscribe(
             mod_pd_notification_id_power_state_transition, cfg->pd_id, id);
-        if (!fwk_expect(status == FWK_SUCCESS))
+        if (!fwk_expect(status == FWK_SUCCESS)) {
             return FWK_E_HANDLER;
+        }
 
         status = fwk_notification_subscribe(
             mod_pd_notification_id_pre_shutdown,
             fwk_module_id_power_domain,
             id);
-        if (!fwk_expect(status == FWK_SUCCESS))
+        if (!fwk_expect(status == FWK_SUCCESS)) {
             return FWK_E_HANDLER;
+        }
     }
 #endif
 
@@ -269,8 +275,9 @@ static int mod_pl011_start(fwk_id_t id)
     if (!fwk_id_is_equal(cfg->clock_id, FWK_ID_NONE)) {
         status = fwk_notification_subscribe(
             mod_clock_notification_id_state_changed, cfg->clock_id, id);
-        if (!fwk_expect(status == FWK_SUCCESS))
+        if (!fwk_expect(status == FWK_SUCCESS)) {
             return FWK_E_HANDLER;
+        }
     }
 #endif
 
@@ -294,13 +301,15 @@ static int mod_pl011_powering_down(fwk_id_t id)
     /* We don't care about the pre-transition power on notification */
     status = fwk_notification_unsubscribe(
         mod_pd_notification_id_power_state_pre_transition, cfg->pd_id, id);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return FWK_E_HANDLER;
+    }
 
     status = fwk_notification_subscribe(
         mod_pd_notification_id_power_state_transition, cfg->pd_id, id);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return FWK_E_HANDLER;
+    }
 
     return FWK_SUCCESS;
 }
@@ -318,14 +327,16 @@ static int mod_pl011_powered_on(fwk_id_t id)
     /* We need only the pre-transition in order to prepare for power down */
     status = fwk_notification_unsubscribe(
         mod_pd_notification_id_power_state_transition, cfg->pd_id, id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_notification_subscribe(
         mod_pd_notification_id_power_state_pre_transition, cfg->pd_id, id);
 
-    if (ctx->clocked) /* Re-enable if no clock domain is configured */
+    if (ctx->clocked) { /* Re-enable if no clock domain is configured */
         mod_pl011_enable(id);
+    }
 
     return status;
 }
@@ -375,10 +386,11 @@ static int mod_pl011_process_power_notification(
             (struct mod_pd_power_state_transition_notification_params *)
                 event->params;
 
-        if (params->state != MOD_PD_STATE_ON)
+        if (params->state != MOD_PD_STATE_ON) {
             status = FWK_SUCCESS;
-        else
+        } else {
             status = mod_pl011_powered_on(event->target_id);
+        }
 
         break;
     }
@@ -432,15 +444,17 @@ static int mod_pl011_clock_change_pending(
         mod_clock_notification_id_state_change_pending,
         cfg->clock_id,
         event->target_id);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return FWK_E_OS;
+    }
 
     status = fwk_notification_subscribe(
         mod_clock_notification_id_state_changed,
         cfg->clock_id,
         event->target_id);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return FWK_E_OS;
+    }
 
     return FWK_SUCCESS;
 }
@@ -465,18 +479,21 @@ static int mod_pl011_clock_changed(const struct fwk_event *event)
         mod_clock_notification_id_state_changed,
         cfg->clock_id,
         event->target_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_OS;
+    }
 
     status = fwk_notification_subscribe(
         mod_clock_notification_id_state_change_pending,
         cfg->clock_id,
         event->target_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_OS;
+    }
 
-    if (ctx->powered) /* Re-enable if no clock domain is configured */
+    if (ctx->powered) { /* Re-enable if no clock domain is configured */
         mod_pl011_enable(event->target_id);
+    }
 
     return FWK_SUCCESS;
 }
@@ -543,23 +560,27 @@ static int mod_pl011_io_open(const struct fwk_io_stream *stream)
 
     struct mod_pl011_element_ctx *ctx;
 
-    if (!fwk_id_is_type(stream->id, FWK_ID_TYPE_ELEMENT))
+    if (!fwk_id_is_type(stream->id, FWK_ID_TYPE_ELEMENT)) {
         return FWK_E_SUPPORT;
+    }
 
     if (!mod_pl011_ctx.initialized) {
         status = mod_pl011_init_ctx(&mod_pl011_ctx);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return FWK_E_STATE;
+        }
     }
 
     ctx = &mod_pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
-    if (ctx->open) /* Refuse to open the same device twice */
+    if (ctx->open) { /* Refuse to open the same device twice */
         return FWK_E_BUSY;
+    }
 
     ctx->open = true;
 
-    if (ctx->powered && ctx->clocked)
+    if (ctx->powered && ctx->clocked) {
         mod_pl011_enable(stream->id); /* Enable the device if possible */
+    }
 
     return FWK_SUCCESS;
 }
@@ -575,12 +596,14 @@ static int mod_pl011_io_getch(
 
     fwk_assert(ctx->open);
 
-    if (!ctx->powered || !ctx->clocked)
+    if (!ctx->powered || !ctx->clocked) {
         return FWK_E_PWRSTATE;
+    }
 
     ok = mod_pl011_getch(stream->id, ch);
-    if (!ok)
+    if (!ok) {
         return FWK_PENDING;
+    }
 
     return FWK_SUCCESS;
 }
@@ -592,12 +615,15 @@ static int mod_pl011_io_putch(const struct fwk_io_stream *stream, char ch)
 
     fwk_assert(ctx->open);
 
-    if (!ctx->powered || !ctx->clocked)
+    if (!ctx->powered || !ctx->clocked) {
         return FWK_E_PWRSTATE;
+    }
 
     if ((ch == '\n') &&
-        (((unsigned int)stream->mode & (unsigned int)FWK_IO_MODE_BINARY)) == 0U)
+        (((unsigned int)stream->mode & (unsigned int)FWK_IO_MODE_BINARY)) ==
+            0U) {
         mod_pl011_putch(stream->id, '\r'); /* Prepend carriage return */
+    }
 
     mod_pl011_putch(stream->id, ch);
 

@@ -55,12 +55,14 @@ static int disable_i2c(struct dw_apb_i2c_ctx *ctx)
     i2c_reg = ctx->i2c_reg;
 
     /* Check whether the device is already disabled */
-    if (is_i2c_disabled(i2c_reg))
+    if (is_i2c_disabled(i2c_reg)) {
         return FWK_SUCCESS;
+    }
 
     /* The bus should be idle */
-    if ((ctx->i2c_reg->IC_STATUS & IC_STATUS_MST_ACTIVITY_MASK) != 0)
+    if ((ctx->i2c_reg->IC_STATUS & IC_STATUS_MST_ACTIVITY_MASK) != 0) {
         return FWK_E_DEVICE;
+    }
 
     /* Disable the I2C device */
     ctx->i2c_reg->IC_ENABLE = IC_ENABLE_STATUS_DISABLED;
@@ -68,8 +70,9 @@ static int disable_i2c(struct dw_apb_i2c_ctx *ctx)
     /* Wait until the device is disabled */
     status = timer_api->wait(timer_id, I2C_TIMEOUT_US, is_i2c_disabled,
         i2c_reg);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_TIMEOUT;
+    }
 
     return FWK_SUCCESS;
 }
@@ -83,8 +86,9 @@ static int enable_i2c(struct dw_apb_i2c_ctx *ctx, uint8_t slave_address)
 
     /* Disable the I2C device to configure it */
     status = disable_i2c(ctx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_DEVICE;
+    }
 
     /* Program the slave address */
     i2c_reg->IC_TAR = (slave_address & IC_TAR_ADDRESS);
@@ -118,15 +122,17 @@ static void i2c_isr(uintptr_t data)
         if (ctx->read_on_going) {
             ctx->read_on_going = false;
             /* Read the data from the device buffer */
-            for (i = 0; i < ctx->byte_count; i++)
+            for (i = 0; i < ctx->byte_count; i++) {
                 ctx->data[i] =
                     (uint8_t)(i2c_reg->IC_DATA_CMD & IC_DATA_CMD_DATA_MASK);
+            }
         }
     }
 
     /* The transaction has been aborted */
-    if (i2c_reg->IC_INTR_STAT & IC_INTR_TX_ABRT_MASK)
+    if (i2c_reg->IC_INTR_STAT & IC_INTR_TX_ABRT_MASK) {
         i2c_reg->IC_CLR_TX_ABRT;
+    }
 
     ctx->i2c_api->transaction_completed(ctx->i2c_id, i2c_status);
 }
@@ -141,25 +147,28 @@ static int transmit_as_master(fwk_id_t dev_id,
     unsigned int sent_bytes;
     struct dw_apb_i2c_ctx *ctx;
 
-
-    if (transmit_request->transmit_byte_count > I2C_TRANSMIT_BUFFER_LENGTH)
+    if (transmit_request->transmit_byte_count > I2C_TRANSMIT_BUFFER_LENGTH) {
         return FWK_E_SUPPORT;
+    }
 
-    if (transmit_request->slave_address == 0)
+    if (transmit_request->slave_address == 0) {
         return FWK_E_PARAM;
+    }
 
     ctx = ctx_table + fwk_id_get_element_idx(dev_id);
 
     status = enable_i2c(ctx, transmit_request->slave_address);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_DEVICE;
+    }
 
     /* The program of the I2C controller cannot be interrupted. */
     fwk_interrupt_global_disable();
 
     for (sent_bytes = 0; sent_bytes < transmit_request->transmit_byte_count;
-        sent_bytes++)
+         sent_bytes++) {
         ctx->i2c_reg->IC_DATA_CMD = transmit_request->transmit_data[sent_bytes];
+    }
 
     fwk_interrupt_global_enable();
 
@@ -179,12 +188,13 @@ static int receive_as_master(fwk_id_t dev_id,
     unsigned int i;
     struct dw_apb_i2c_ctx *ctx;
 
-
-    if (receive_request->receive_byte_count > I2C_RECEIVE_BUFFER_LENGTH)
+    if (receive_request->receive_byte_count > I2C_RECEIVE_BUFFER_LENGTH) {
         return FWK_E_SUPPORT;
+    }
 
-    if (receive_request->slave_address == 0)
+    if (receive_request->slave_address == 0) {
         return FWK_E_PARAM;
+    }
 
     ctx = ctx_table + fwk_id_get_element_idx(dev_id);
 
@@ -193,15 +203,17 @@ static int receive_as_master(fwk_id_t dev_id,
     ctx->read_on_going = true;
 
     status = enable_i2c(ctx, receive_request->slave_address);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_DEVICE;
+    }
 
     /* The program of the I2C controller cannot be interrupted. */
     fwk_interrupt_global_disable();
 
     /* Program the I2C controller with the expected reply length in bytes. */
-    for (i = 0; i < receive_request->receive_byte_count; i++)
+    for (i = 0; i < receive_request->receive_byte_count; i++) {
         ctx->i2c_reg->IC_DATA_CMD = IC_DATA_CMD_READ;
+    }
 
     fwk_interrupt_global_enable();
 
@@ -238,8 +250,9 @@ static int dw_apb_i2c_element_init(fwk_id_t element_id,
     struct mod_dw_apb_i2c_dev_config *config =
         (struct mod_dw_apb_i2c_dev_config *)data;
 
-    if (config->reg == 0)
+    if (config->reg == 0) {
         return FWK_E_DATA;
+    }
 
     ctx_table[fwk_id_get_element_idx(element_id)].config = config;
     ctx_table[fwk_id_get_element_idx(element_id)].i2c_reg =
@@ -254,16 +267,18 @@ static int dw_apb_i2c_bind(fwk_id_t id, unsigned int round)
     struct dw_apb_i2c_ctx *ctx;
     const struct mod_dw_apb_i2c_dev_config *config;
 
-    if (!fwk_module_is_valid_element_id(id) || (round == 0))
+    if (!fwk_module_is_valid_element_id(id) || (round == 0)) {
         return FWK_SUCCESS;
+    }
 
     ctx = ctx_table + fwk_id_get_element_idx(id);
     config = ctx->config;
 
     status = fwk_module_bind(config->timer_id, MOD_TIMER_API_ID_TIMER,
         &ctx->timer_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return fwk_module_bind(ctx->i2c_id, mod_i2c_api_id_driver_response,
         &ctx->i2c_api);
@@ -276,13 +291,15 @@ static int dw_apb_i2c_process_bind_request(fwk_id_t source_id,
 {
     struct dw_apb_i2c_ctx *ctx;
 
-    if (!fwk_module_is_valid_element_id(target_id))
+    if (!fwk_module_is_valid_element_id(target_id)) {
         return FWK_E_PARAM;
+    }
 
     ctx = ctx_table + fwk_id_get_element_idx(target_id);
 
-    if (!fwk_id_is_equal(api_id, mod_dw_apb_i2c_api_id_driver))
+    if (!fwk_id_is_equal(api_id, mod_dw_apb_i2c_api_id_driver)) {
         return FWK_E_PARAM;
+    }
 
     ctx->i2c_id = source_id;
 
@@ -298,23 +315,27 @@ static int dw_apb_i2c_start(fwk_id_t id)
     unsigned int i2c_irq;
 
     /* Nothing to do for the module */
-    if (!fwk_module_is_valid_element_id(id))
+    if (!fwk_module_is_valid_element_id(id)) {
         return FWK_SUCCESS;
+    }
 
     ctx = ctx_table + fwk_id_get_element_idx(id);
     i2c_irq = ctx->config->i2c_irq;
 
     status = fwk_interrupt_set_isr_param(i2c_irq, i2c_isr, (uintptr_t)ctx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_DEVICE;
+    }
 
     status = fwk_interrupt_clear_pending(i2c_irq);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_DEVICE;
+    }
 
     status = fwk_interrupt_enable(i2c_irq);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_DEVICE;
+    }
 
     return FWK_SUCCESS;
 }

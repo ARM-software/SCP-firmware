@@ -108,10 +108,11 @@ static void ext_ppus_shutdown(enum mod_pd_system_shutdown system_shutdown)
         api = system_power_ctx.ext_ppu_apis[i];
         ppu_id = system_power_ctx.config->ext_ppus[i].ppu_id;
 
-        if (api->shutdown != NULL)
+        if (api->shutdown != NULL) {
             api->shutdown(ppu_id, system_shutdown);
-        else
+        } else {
             api->set_state(ppu_id, MOD_PD_STATE_OFF);
+        }
     }
 }
 
@@ -129,8 +130,9 @@ static int set_system_power_state(unsigned int state)
 
         status = dev_ctx->sys_ppu_api->set_state(dev_ctx->config->sys_ppu_id,
                                                  sys_state_table[state]);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return FWK_SUCCESS;
@@ -152,15 +154,16 @@ static int shutdown_system_power_ppus(
         api = dev_ctx->sys_ppu_api;
         ppu_id = dev_ctx->config->sys_ppu_id;
 
-        if (api->shutdown != NULL)
+        if (api->shutdown != NULL) {
             status = api->shutdown(ppu_id, system_shutdown);
-        else {
+        } else {
             state = dev_ctx->config->sys_state_table[MOD_PD_STATE_OFF];
 
             status = api->set_state(ppu_id, state);
         }
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return FWK_SUCCESS;
@@ -175,8 +178,9 @@ static int disable_all_irqs(void)
     if (system_power_ctx.driver_api->platform_interrupts != NULL) {
         status = system_power_ctx.driver_api->platform_interrupts(
             MOD_SYSTEM_POWER_PLATFORM_INTERRUPT_CMD_DISABLE);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             status = FWK_E_DEVICE;
+        }
     }
 
     return status;
@@ -189,8 +193,9 @@ static int shutdown(
     int status;
 
     status = disable_all_irqs();
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* Shutdown external PPUs */
     ext_ppus_shutdown(system_shutdown);
@@ -199,8 +204,9 @@ static int shutdown(
 
     /* Shutdown system PPUs */
     status = shutdown_system_power_ppus(system_shutdown);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return FWK_SUCCESS;
 }
@@ -214,8 +220,9 @@ static int system_power_set_state(fwk_id_t pd_id, unsigned int state)
     int status;
     unsigned int soc_wakeup_irq;
 
-    if (!fwk_expect(state < MOD_SYSTEM_POWER_POWER_STATE_COUNT))
+    if (!fwk_expect(state < MOD_SYSTEM_POWER_POWER_STATE_COUNT)) {
         return FWK_E_PARAM;
+    }
 
     soc_wakeup_irq = system_power_ctx.config->soc_wakeup_irq;
 
@@ -224,12 +231,14 @@ static int system_power_set_state(fwk_id_t pd_id, unsigned int state)
     switch (state) {
     case MOD_PD_STATE_ON:
         status = disable_all_irqs();
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         status = set_system_power_state(state);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         ext_ppus_set_state(MOD_PD_STATE_ON);
 
@@ -244,41 +253,47 @@ static int system_power_set_state(fwk_id_t pd_id, unsigned int state)
             status =
                 system_power_ctx.driver_api->platform_interrupts(
                     MOD_SYSTEM_POWER_PLATFORM_INTERRUPT_CMD_CLEAR_PENDING);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return FWK_E_DEVICE;
+            }
         }
 
         status = set_system_power_state(state);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         /* Store the identifier of the power domain of the last standing core */
         status = system_power_ctx.mod_pd_driver_input_api->
             get_last_core_pd_id(&system_power_ctx.last_core_pd_id);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         fwk_interrupt_enable(soc_wakeup_irq);
 
         if (system_power_ctx.driver_api->platform_interrupts != NULL) {
             status = system_power_ctx.driver_api->platform_interrupts(
                 MOD_SYSTEM_POWER_PLATFORM_INTERRUPT_CMD_ENABLE);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return FWK_E_DEVICE;
+            }
         }
 
         break;
 
     case MOD_PD_STATE_OFF:
         status = disable_all_irqs();
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         ext_ppus_set_state(MOD_PD_STATE_OFF);
 
         status = set_system_power_state(state);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         break;
 
@@ -307,8 +322,9 @@ static int system_power_shutdown(fwk_id_t pd_id,
     int status;
 
     status = shutdown(pd_id, system_shutdown);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return system_power_ctx.driver_api->system_shutdown(system_shutdown);
 }
@@ -319,8 +335,9 @@ static void soc_wakeup_handler(void)
     uint32_t state = MOD_SYSTEM_POWER_SOC_WAKEUP_STATE;
 
     status = disable_all_irqs();
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         fwk_trap();
+    }
 
     status = system_power_ctx.mod_pd_restricted_api->set_state_async(
         system_power_ctx.last_core_pd_id, false, state);
@@ -345,8 +362,9 @@ static int system_power_report_power_state_transition(fwk_id_t dev_id,
 
     sys_ppu_transition_count++;
 
-    if (sys_ppu_transition_count < system_power_ctx.dev_count)
+    if (sys_ppu_transition_count < system_power_ctx.dev_count) {
         return FWK_SUCCESS;
+    }
 
     system_power_ctx.state = system_power_ctx.requested_state;
 
@@ -410,8 +428,9 @@ static int system_power_mod_element_init(fwk_id_t element_id,
     dev_ctx->config = data;
 
     /* Ensure a system state table is provided */
-    if (dev_ctx->config->sys_state_table == NULL)
+    if (dev_ctx->config->sys_state_table == NULL) {
         return FWK_E_DATA;
+    }
 
     return FWK_SUCCESS;
 }
@@ -424,8 +443,9 @@ static int system_power_bind(fwk_id_t id, unsigned int round)
     struct system_power_dev_ctx *dev_ctx;
 
     if (round == 1) {
-        if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+        if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
             return FWK_SUCCESS;
+        }
 
         /*
          * During the first round of binding, the power domain module should
@@ -448,15 +468,17 @@ static int system_power_bind(fwk_id_t id, unsigned int round)
                 config->ext_ppus[i].ppu_id,
                 config->ext_ppus[i].api_id,
                 &system_power_ctx.ext_ppu_apis[i]);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
         }
 
         status = fwk_module_bind(config->driver_id,
             config->driver_api_id,
             &system_power_ctx.driver_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         return fwk_module_bind(fwk_module_id_power_domain,
             mod_pd_api_id_restricted,
@@ -479,10 +501,11 @@ static int system_power_process_bind_request(fwk_id_t requester_id,
     struct system_power_dev_ctx *dev_ctx;
 
     if (fwk_id_is_equal(api_id, mod_system_power_api_id_pd_driver)) {
-
-        if (!fwk_id_is_equal(fwk_id_build_module_id(requester_id),
-                             fwk_module_id_power_domain))
+        if (!fwk_id_is_equal(
+                fwk_id_build_module_id(requester_id),
+                fwk_module_id_power_domain)) {
             return FWK_E_ACCESS;
+        }
 
         *api = &system_power_power_domain_driver_api;
          system_power_ctx.mod_pd_system_id = requester_id;
@@ -494,8 +517,9 @@ static int system_power_process_bind_request(fwk_id_t requester_id,
              * If requester_id refers to a system PPU configured by any one of
              * our elements, break when dev_idx reaches that element.
              */
-            if (fwk_id_is_equal(requester_id, dev_ctx->config->sys_ppu_id))
+            if (fwk_id_is_equal(requester_id, dev_ctx->config->sys_ppu_id)) {
                 break;
+            }
         }
         if (dev_idx >= system_power_ctx.dev_count) {
             /* Requester_id does not refer to any configured system PPU */
@@ -515,8 +539,9 @@ static int system_power_start(fwk_id_t id)
     if (system_power_ctx.driver_api->platform_interrupts != NULL) {
         status = system_power_ctx.driver_api->platform_interrupts(
             MOD_SYSTEM_POWER_PLATFORM_INTERRUPT_CMD_INIT);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     /* Configure initial power state */
