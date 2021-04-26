@@ -27,8 +27,9 @@ struct fwk_slist_node *__fwk_slist_head(const struct fwk_slist *list)
 {
     fwk_assert(list != NULL);
 
-    if (__fwk_slist_is_empty(list))
+    if (__fwk_slist_is_empty(list)) {
         return NULL;
+    }
 
     return list->head;
 }
@@ -41,8 +42,9 @@ bool __fwk_slist_is_empty(const struct fwk_slist *list)
 
     is_empty = list->head == (struct fwk_slist_node *)list;
 
-    if (is_empty)
+    if (is_empty) {
         fwk_assert(list->tail == list->head);
+    }
 
     return is_empty;
 }
@@ -58,8 +60,9 @@ void __fwk_slist_push_head(
     new->next = list->head;
 
     list->head = new;
-    if (list->tail == (struct fwk_slist_node *)list)
+    if (list->tail == (struct fwk_slist_node *)list) {
         list->tail = new;
+    }
 }
 
 void __fwk_slist_push_tail(
@@ -82,12 +85,14 @@ struct fwk_slist_node *__fwk_slist_pop_head(struct fwk_slist *list)
 
     fwk_assert(list != NULL);
 
-    if (__fwk_slist_is_empty(list))
+    if (__fwk_slist_is_empty(list)) {
         return NULL;
+    }
 
     popped = list->head;
-    if (popped->next == (struct fwk_slist_node *)list)
+    if (popped->next == (struct fwk_slist_node *)list) {
         list->tail = (struct fwk_slist_node *)list;
+    }
 
     list->head = popped->next;
 
@@ -122,8 +127,9 @@ void __fwk_slist_remove(
         if (node_iter->next == node) {
             node_iter->next = node->next;
 
-            if (node->next == (struct fwk_slist_node *)list)
+            if (node->next == (struct fwk_slist_node *)list) {
                 list->tail = (struct fwk_slist_node *)node_iter;
+            }
 
             node->next = NULL;
 
@@ -148,8 +154,9 @@ bool __fwk_slist_contains(
     node_iter = (struct fwk_slist_node *)list;
 
     while (node_iter->next != (struct fwk_slist_node *)list) {
-        if (node_iter->next == node)
+        if (node_iter->next == node) {
             return true;
+        }
 
         node_iter = node_iter->next;
     }

@@ -88,14 +88,14 @@ static struct fwk_event *duplicate_event(struct fwk_event *event)
     fwk_assert(event != NULL);
 
     fwk_interrupt_global_disable();
-    allocated_event = FWK_LIST_GET(fwk_list_pop_head(&ctx.event_free_queue),
-                                   struct fwk_event, slist_node);
+    allocated_event = FWK_LIST_GET(
+        fwk_list_pop_head(&ctx.event_free_queue), struct fwk_event, slist_node);
     fwk_interrupt_global_enable();
 
     if (allocated_event != NULL) {
         *allocated_event = *event;
 
-        allocated_event->slist_node = (struct fwk_slist_node) { 0 };
+        allocated_event->slist_node = (struct fwk_slist_node){ 0 };
 
         return allocated_event;
     }
@@ -119,10 +119,11 @@ static struct __fwk_thread_ctx *thread_get_ctx(fwk_id_t id)
 
     if (fwk_module_is_valid_element_id(id)) {
         element_ctx = fwk_module_get_element_ctx(id);
-        if (element_ctx->thread_ctx != NULL)
+        if (element_ctx->thread_ctx != NULL) {
             return element_ctx->thread_ctx;
-        else
+        } else {
             id = FWK_ID_MODULE(id.element.module_idx);
+        }
     }
 
     if (fwk_module_is_valid_module_id(id)) {
@@ -151,8 +152,9 @@ static int put_isr_event(struct fwk_event *event)
     uint32_t flags;
 
     allocated_event = duplicate_event(event);
-    if (allocated_event == NULL)
+    if (allocated_event == NULL) {
         return FWK_E_NOMEM;
+    }
 
     /*
      * Assumption: there are no interrupt priorities, at least among interrupts
@@ -190,11 +192,13 @@ static int put_isr_event(struct fwk_event *event)
 static bool is_thread_wakeup_event(struct __fwk_thread_ctx *thread_ctx,
                                    struct fwk_event *event)
 {
-    if (!thread_ctx->waiting_event_processing_completion)
+    if (!thread_ctx->waiting_event_processing_completion) {
         return false;
+    }
 
-    if (!event->is_response)
+    if (!event->is_response) {
         return false;
+    }
 
     return thread_ctx->response_event->cookie == event->cookie;
 }
@@ -226,8 +230,9 @@ static int put_event(struct __fwk_thread_ctx *target_thread_ctx,
     if (event->is_delayed_response) {
         allocated_event = __fwk_thread_search_delayed_response(
             event->source_id, event->cookie);
-        if (allocated_event == NULL)
+        if (allocated_event == NULL) {
             goto error;
+        }
 
         fwk_list_remove(
             __fwk_thread_get_delayed_response_list(event->source_id),
@@ -238,8 +243,9 @@ static int put_event(struct __fwk_thread_ctx *target_thread_ctx,
         allocated_event->is_thread_wakeup_event = event->is_thread_wakeup_event;
     } else {
         allocated_event = duplicate_event(event);
-        if (allocated_event == NULL)
+        if (allocated_event == NULL) {
             return FWK_E_NOMEM;
+        }
     }
 
     allocated_event->cookie = event->cookie = ctx.event_cookie_counter++;
@@ -254,11 +260,11 @@ static int put_event(struct __fwk_thread_ctx *target_thread_ctx,
         fwk_list_push_tail(&target_thread_ctx->event_queue,
                            &allocated_event->slist_node);
 
-        if (is_empty &&
-            (target_thread_ctx != ctx.current_thread_ctx) &&
-            (!(target_thread_ctx->waiting_event_processing_completion)))
-            fwk_list_push_tail(&ctx.thread_ready_queue,
-                               &target_thread_ctx->slist_node);
+        if (is_empty && (target_thread_ctx != ctx.current_thread_ctx) &&
+            (!(target_thread_ctx->waiting_event_processing_completion))) {
+            fwk_list_push_tail(
+                &ctx.thread_ready_queue, &target_thread_ctx->slist_node);
+        }
     }
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
     FWK_LOG_TRACE(
@@ -294,8 +300,8 @@ static void process_event_requiring_response(struct fwk_event *event)
     module = fwk_module_get_ctx(event->target_id)->desc;
     source_thread_ctx = thread_get_ctx(event->source_id);
 
-    process_event = event->is_notification ?
-        module->process_notification : module->process_event;
+    process_event = event->is_notification ? module->process_notification :
+                                             module->process_event;
 
     resp_event = *event;
     resp_event.source_id = event->target_id;
@@ -303,14 +309,15 @@ static void process_event_requiring_response(struct fwk_event *event)
     resp_event.is_delayed_response = false;
 
     status = process_event(event, &resp_event);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         FWK_LOG_CRIT(err_msg_line, status, __LINE__);
+    }
 
     resp_event.is_response = true;
     resp_event.response_requested = false;
-    if (!resp_event.is_delayed_response)
+    if (!resp_event.is_delayed_response) {
         put_event(source_thread_ctx, &resp_event);
-    else {
+    } else {
         allocated_event = duplicate_event(&resp_event);
         if (allocated_event != NULL) {
             fwk_list_push_tail(
@@ -354,14 +361,15 @@ static void process_next_thread_event(struct __fwk_thread_ctx *thread_ctx)
         FWK_ID_STR(event->target_id));
 #endif
 
-    if (event->response_requested)
+    if (event->response_requested) {
         process_event_requiring_response(event);
-    else {
+    } else {
         module = fwk_module_get_ctx(event->target_id)->desc;
-        if (event->is_notification)
+        if (event->is_notification) {
             status = module->process_notification(event, &async_resp_event);
-        else
+        } else {
             status = module->process_event(event, &async_resp_event);
+        }
         if (status != FWK_SUCCESS) {
             FWK_LOG_ERR(
                 "[FWK] %s%s%s error: %s %s -> %s",
@@ -380,8 +388,9 @@ static void process_next_thread_event(struct __fwk_thread_ctx *thread_ctx)
 
     free_event(event);
 
-    if (!fwk_list_is_empty(&thread_ctx->event_queue))
+    if (!fwk_list_is_empty(&thread_ctx->event_queue)) {
         fwk_list_push_tail(&ctx.thread_ready_queue, &thread_ctx->slist_node);
+    }
 }
 
 /*
@@ -409,8 +418,9 @@ static struct __fwk_thread_ctx *launch_next_event_processing(
             fwk_list_pop_head(&ctx.thread_ready_queue),
             struct __fwk_thread_ctx, slist_node);
 
-        if (next_thread_ctx == current_thread_ctx)
+        if (next_thread_ctx == current_thread_ctx) {
             return current_thread_ctx;
+        }
 
         event = FWK_LIST_GET(fwk_list_head(&next_thread_ctx->event_queue),
                              struct fwk_event, slist_node);
@@ -429,8 +439,9 @@ static struct __fwk_thread_ctx *launch_next_event_processing(
         } else {
             flags = osThreadFlagsSet(next_thread_ctx->os_thread_id,
                                      SIGNAL_EVENT_TO_PROCESS);
-            if ((int32_t)flags >= 0)
+            if ((int32_t)flags >= 0) {
                 return next_thread_ctx;
+            }
         }
 
         FWK_LOG_CRIT(err_msg_line, FWK_E_OS, __LINE__);
@@ -470,8 +481,9 @@ int execute_signal_handler(fwk_id_t target_id, fwk_id_t signal_id)
     int status;
 
     module = fwk_module_get_ctx(target_id)->desc;
-    if (!module->process_signal)
+    if (!module->process_signal) {
         return FWK_E_PARAM;
+    }
     status = module->process_signal(target_id, signal_id);
     if ((status != FWK_SUCCESS) && (status != FWK_PENDING)) {
         FWK_LOG_CRIT(
@@ -504,16 +516,18 @@ void process_thread_signals(struct __fwk_thread_ctx *thread_ctx)
                 execute_signal_handler(signal.target_id, signal.signal_id);
 
                 target_ctx = thread_get_ctx(signal.target_id);
-                if (!fwk_list_is_empty(&target_ctx->event_queue))
+                if (!fwk_list_is_empty(&target_ctx->event_queue)) {
                     osThreadFlagsSet(
                         target_ctx->os_thread_id, SIGNAL_EVENT_TO_PROCESS);
+                }
                 fwk_interrupt_global_disable();
                 signal_ctx->pending_signals--;
                 signal_ctx->signals[i].target_id = FWK_ID_NONE;
                 fwk_interrupt_global_enable();
 
-                if (signal_ctx->pending_signals == 0)
+                if (signal_ctx->pending_signals == 0) {
                     break;
+                }
             }
         }
         ctx.current_signal = NULL;
@@ -559,11 +573,12 @@ static void thread_function(struct __fwk_thread_ctx *thread_ctx,
                 FWK_LOG_CRIT(err_msg_line, FWK_E_OS, __LINE__);
                 continue;
             }
-            if (flags & SIGNAL_NO_READY_THREAD)
+            if (flags & SIGNAL_NO_READY_THREAD) {
                 return;
+            }
         }
 
-       /* Process the first event of the thread event queue */
+        /* Process the first event of the thread event queue */
         next_thread_ctx = NULL;
         process_next_thread_event(thread_ctx);
         next_thread_ctx = launch_next_event_processing(thread_ctx);
@@ -576,8 +591,9 @@ static void thread_function(struct __fwk_thread_ctx *thread_ctx,
          * (next_thread_ctx != thread_ctx), the present thread has successfully
          * signalled it to the other thread, loop to wait for a wake-up signal.
          */
-        if (next_thread_ctx != NULL)
+        if (next_thread_ctx != NULL) {
             continue;
+        }
 
         /*
          * No event to process for the time being. If the current thread is the
@@ -585,17 +601,20 @@ static void thread_function(struct __fwk_thread_ctx *thread_ctx,
          * next ISR event. Otherwise, signal the common thread with a
          * SIGNAL_NO_READY_THREAD signal that it has to get the next ISR event.
          */
-        if (thread_ctx == &ctx.common_thread_ctx)
+        if (thread_ctx == &ctx.common_thread_ctx) {
             return;
+        }
         flags = osThreadFlagsSet(
             ctx.common_thread_ctx.os_thread_id, SIGNAL_NO_READY_THREAD);
-        if ((int32_t)flags < 0)
+        if ((int32_t)flags < 0) {
             FWK_LOG_CRIT(err_msg_line, FWK_E_OS, __LINE__);
+        }
 
         /* Let the logging thread know we might have messages to process */
         flags = osThreadFlagsSet(ctx.log_thread_id, SIGNAL_CHECK_LOGS);
-        if ((int32_t)flags < 0)
+        if ((int32_t)flags < 0) {
             FWK_LOG_CRIT(err_msg_line, FWK_E_OS, __LINE__);
+        }
     }
 }
 
@@ -620,8 +639,9 @@ static void get_next_isr_event(void)
             fwk_interrupt_global_enable();
             flags = osThreadFlagsWait(
                 SIGNAL_ISR_EVENT, osFlagsWaitAll, osWaitForever);
-            if (flags != SIGNAL_ISR_EVENT)
+            if (flags != SIGNAL_ISR_EVENT) {
                 FWK_LOG_CRIT(err_msg_line, FWK_E_OS, __LINE__);
+            }
             continue;
         }
 
@@ -645,17 +665,17 @@ static void get_next_isr_event(void)
         isr_event->cookie = ctx.event_cookie_counter++;
 
         if (isr_event->is_thread_wakeup_event) {
-            fwk_list_push_head(&target_thread_ctx->event_queue,
-                               &isr_event->slist_node);
+            fwk_list_push_head(
+                &target_thread_ctx->event_queue, &isr_event->slist_node);
         } else {
-            fwk_list_push_tail(&target_thread_ctx->event_queue,
-                               &isr_event->slist_node);
+            fwk_list_push_tail(
+                &target_thread_ctx->event_queue, &isr_event->slist_node);
         }
 
         if (!(target_thread_ctx->waiting_event_processing_completion) ||
             isr_event->is_thread_wakeup_event) {
-            fwk_list_push_head(&ctx.thread_ready_queue,
-                               &target_thread_ctx->slist_node);
+            fwk_list_push_head(
+                &ctx.thread_ready_queue, &target_thread_ctx->slist_node);
             break;
         }
     }
@@ -670,8 +690,9 @@ static void common_thread_function(void *arg)
     for (;;) {
         next_thread_ctx = launch_next_event_processing(&ctx.common_thread_ctx);
 
-        if (next_thread_ctx != NULL)
+        if (next_thread_ctx != NULL) {
             thread_function(&ctx.common_thread_ctx, next_thread_ctx);
+        }
 
         get_next_isr_event();
     }
@@ -696,10 +717,11 @@ static void logging_thread(void *arg)
          */
 
         status = fwk_log_unbuffer();
-        if (status == FWK_SUCCESS)
+        if (status == FWK_SUCCESS) {
             osThreadFlagsClear(SIGNAL_CHECK_LOGS);
-        else if (status != FWK_PENDING)
+        } else if (status != FWK_PENDING) {
             FWK_LOG_WARN("[FWK] Warning: unable to unbuffer logged message");
+        }
     }
 }
 
@@ -731,9 +753,10 @@ int __fwk_thread_init(size_t event_count)
     fwk_list_init(&(ctx.event_isr_queue));
     fwk_list_init(&(ctx.common_thread_ctx.event_queue));
     for (event = event_table, event_table_end = event_table + event_count;
-         event < event_table_end; event++)
-        fwk_list_push_tail(&ctx.event_free_queue,
-                           &event->slist_node);
+         event < event_table_end;
+         event++) {
+        fwk_list_push_tail(&ctx.event_free_queue, &event->slist_node);
+    }
 
     ctx.common_thread_ctx.os_thread_id = osThreadNew(common_thread_function,
         &ctx.common_thread_ctx, &thread_attr);
@@ -781,15 +804,16 @@ error:
 
 struct __fwk_multi_thread_ctx *__fwk_multi_thread_get_ctx(void)
 {
-   return &ctx;
+    return &ctx;
 }
 
 noreturn void __fwk_thread_run(void)
 {
     osKernelStart();
 
-    while (true)
+    while (true) {
         continue;
+    }
 }
 
 const struct fwk_event *__fwk_thread_get_current_event(void)
@@ -807,8 +831,9 @@ int __fwk_thread_put_notification(struct fwk_event *event)
     event->is_delayed_response = false;
 
     /* Call from a thread */
-    if (fwk_interrupt_get_current(&interrupt) != FWK_SUCCESS)
+    if (fwk_interrupt_get_current(&interrupt) != FWK_SUCCESS) {
         return put_event(thread_get_ctx(event->target_id), event);
+    }
 
     /* Call from an ISR */
     if (!fwk_module_is_valid_entity_id(event->source_id)) {
@@ -837,11 +862,11 @@ int fwk_thread_create(fwk_id_t id)
         goto error;
     }
 
-    if (fwk_module_is_valid_element_id(id))
+    if (fwk_module_is_valid_element_id(id)) {
         p_thread_ctx = &fwk_module_get_element_ctx(id)->thread_ctx;
-    else if (fwk_module_is_valid_module_id(id))
+    } else if (fwk_module_is_valid_module_id(id)) {
         p_thread_ctx = &fwk_module_get_ctx(id)->thread_ctx;
-    else {
+    } else {
         status = FWK_E_PARAM;
         goto error;
     }
@@ -859,8 +884,8 @@ int fwk_thread_create(fwk_id_t id)
 
     fwk_list_init(&thread_ctx->event_queue);
     thread_ctx->id = id;
-    thread_ctx->os_thread_id = osThreadNew(specific_thread_function, thread_ctx,
-                                           &thread_attr);
+    thread_ctx->os_thread_id =
+        osThreadNew(specific_thread_function, thread_ctx, &thread_attr);
 
     if (thread_ctx->os_thread_id == NULL) {
         status = FWK_E_OS;
@@ -888,43 +913,54 @@ int fwk_thread_put_event(struct fwk_event *event)
         goto error;
     }
 
-    if (event == NULL)
+    if (event == NULL) {
         goto error;
+    }
 
     thread_ctx = thread_get_ctx(event->target_id);
-    if (thread_ctx == NULL)
+    if (thread_ctx == NULL) {
         goto error;
+    }
 
     thread_interrupt_status = fwk_interrupt_get_current(&interrupt);
-    if ((thread_interrupt_status != FWK_SUCCESS) && (ctx.current_event != NULL))
+    if ((thread_interrupt_status != FWK_SUCCESS) &&
+        (ctx.current_event != NULL)) {
         event->source_id = ctx.current_event->target_id;
-    else {
-        if (!fwk_module_is_valid_entity_id(event->source_id))
+    } else {
+        if (!fwk_module_is_valid_entity_id(event->source_id)) {
             goto error;
+        }
     }
 
 #ifdef BUILD_MODE_DEBUG
     if (event->is_notification) {
-        if (!fwk_module_is_valid_notification_id(event->id))
+        if (!fwk_module_is_valid_notification_id(event->id)) {
             goto error;
-        if ((!event->is_response) || (event->response_requested))
+        }
+        if ((!event->is_response) || (event->response_requested)) {
             goto error;
+        }
         if (fwk_id_get_module_idx(event->target_id) !=
-            fwk_id_get_module_idx(event->id))
-             goto error;
-    } else {
-        if (!fwk_module_is_valid_event_id(event->id))
+            fwk_id_get_module_idx(event->id)) {
             goto error;
+        }
+    } else {
+        if (!fwk_module_is_valid_event_id(event->id)) {
+            goto error;
+        }
         if (event->is_response) {
             if (fwk_id_get_module_idx(event->source_id) !=
-                fwk_id_get_module_idx(event->id))
+                fwk_id_get_module_idx(event->id)) {
                 goto error;
-            if (event->response_requested)
+            }
+            if (event->response_requested) {
                 goto error;
+            }
         } else {
             if (fwk_id_get_module_idx(event->target_id) !=
-                fwk_id_get_module_idx(event->id))
+                fwk_id_get_module_idx(event->id)) {
                 goto error;
+            }
         }
     }
 #endif
@@ -958,15 +994,18 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
         goto error;
     }
 
-    if ((event == NULL) || (resp_event == NULL))
+    if ((event == NULL) || (resp_event == NULL)) {
         goto error;
+    }
 
     target_thread_ctx = thread_get_ctx(event->target_id);
-    if (target_thread_ctx == NULL)
+    if (target_thread_ctx == NULL) {
         goto error;
+    }
 
-    if (!fwk_module_is_valid_event_id(event->id))
+    if (!fwk_module_is_valid_event_id(event->id)) {
         goto error;
+    }
 
     if ((fwk_interrupt_get_current(&interrupt) == FWK_SUCCESS) ||
         (ctx.current_thread_ctx == &ctx.common_thread_ctx) ||
@@ -975,22 +1014,24 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
         goto error;
     }
 
-    if (ctx.current_event != NULL)
+    if (ctx.current_event != NULL) {
         event->source_id = ctx.current_event->target_id;
-    else if (ctx.current_signal != NULL)
+    } else if (ctx.current_signal != NULL) {
         event->source_id = ctx.current_signal->source_id;
-    else if (
+    } else if (
         (!fwk_id_type_is_valid(event->source_id)) ||
-        (!fwk_module_is_valid_entity_id(event->source_id)))
+        (!fwk_module_is_valid_entity_id(event->source_id))) {
         goto error;
+    }
 
     event->is_response = false;
     event->is_delayed_response = false;
     event->response_requested = true;
     event->is_notification = false;
     status = put_event(target_thread_ctx, event);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     resp_event->cookie = event->cookie;
     ctx.current_thread_ctx->response_event = resp_event;
@@ -1006,8 +1047,8 @@ int fwk_thread_put_event_and_wait(struct fwk_event *event,
     launch_next_event_processing(ctx.current_thread_ctx);
 
     /* Wait the completion of 'processed_event' */
-    flags = osThreadFlagsWait(SIGNAL_EVENT_PROCESSED,
-                              osFlagsWaitAll, osWaitForever);
+    flags = osThreadFlagsWait(
+        SIGNAL_EVENT_PROCESSED, osFlagsWaitAll, osWaitForever);
 
     calling_thread_ctx->response_event = NULL;
     calling_thread_ctx->waiting_event_processing_completion = false;
@@ -1037,8 +1078,9 @@ int fwk_thread_put_signal(
     int signal_idx;
     uint32_t flags;
 
-    if (!ctx.running)
+    if (!ctx.running) {
         return FWK_E_SUPPORT;
+    }
 
     signal_ctx = &ctx.fwk_signal_ctx;
 

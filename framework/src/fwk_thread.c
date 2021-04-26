@@ -119,30 +119,35 @@ static int put_event(
 
         /* Is this the event put_event_and_wait is waiting for ? */
         if (ctx.waiting_event_processing_completion &&
-            (ctx.cookie == event->cookie))
+            (ctx.cookie == event->cookie)) {
             is_wakeup_event = true;
+        }
     } else {
         allocated_event = duplicate_event(event);
-        if (allocated_event == NULL)
+        if (allocated_event == NULL) {
             return FWK_E_NOMEM;
+        }
     }
 
     allocated_event->cookie = event->cookie = ctx.event_cookie_counter++;
 
-    if (is_wakeup_event)
+    if (is_wakeup_event) {
         ctx.cookie = event->cookie;
+    }
 
     if (intr_state == UNKNOWN_THREAD) {
         status = fwk_interrupt_get_current(&interrupt);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             intr_state = NOT_INTERRUPT_THREAD;
-        else
+        } else {
             intr_state = INTERRUPT_THREAD;
+        }
     }
-    if (intr_state == NOT_INTERRUPT_THREAD)
+    if (intr_state == NOT_INTERRUPT_THREAD) {
         fwk_list_push_tail(&ctx.event_queue, &allocated_event->slist_node);
-    else
+    } else {
         fwk_list_push_tail(&ctx.isr_event_queue, &allocated_event->slist_node);
+    }
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
     FWK_LOG_TRACE(
@@ -162,8 +167,9 @@ static int execute_signal_handler(fwk_id_t target_id, fwk_id_t signal_id)
     int status;
 
     module = fwk_module_get_ctx(target_id)->desc;
-    if (module->process_signal == 0)
+    if (module->process_signal == 0) {
         return FWK_E_PARAM;
+    }
     status = module->process_signal(target_id, signal_id);
     if ((status != FWK_SUCCESS) && (status != FWK_PENDING)) {
         FWK_LOG_CRIT(
@@ -254,14 +260,15 @@ static void process_next_event(void)
         async_response_event.is_delayed_response = false;
 
         status = process_event(event, &async_response_event);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             FWK_LOG_CRIT(err_msg_line, status, __func__, __LINE__);
+        }
 
         async_response_event.is_response = true;
         async_response_event.response_requested = false;
-        if (!async_response_event.is_delayed_response)
+        if (!async_response_event.is_delayed_response) {
             put_event(&async_response_event, UNKNOWN_THREAD);
-        else {
+        } else {
             allocated_event = duplicate_event(&async_response_event);
             if (allocated_event != NULL) {
                 fwk_list_push_tail(
@@ -296,8 +303,9 @@ static bool process_isr(void)
         fwk_list_pop_head(&ctx.isr_event_queue), struct fwk_event, slist_node);
     fwk_interrupt_global_enable();
 
-    if (isr_event == NULL)
+    if (isr_event == NULL) {
         return false;
+    }
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
     FWK_LOG_TRACE(
@@ -328,8 +336,9 @@ int __fwk_thread_init(size_t event_count)
     fwk_list_init(&ctx.event_queue);
     fwk_list_init(&ctx.isr_event_queue);
 
-    for (event = event_table; event < (event_table + event_count); event++)
+    for (event = event_table; event < (event_table + event_count); event++) {
         fwk_list_push_tail(&ctx.free_event_queue, &event->slist_node);
+    }
 
     for (i = 0; i < FWK_MODULE_SIGNAL_COUNT; i++) {
         fwk_signal_ctx.signals[i].source_id = FWK_ID_NONE;
@@ -353,8 +362,9 @@ noreturn void __fwk_thread_run(void)
             fwk_process_signal();
         }
 
-        if (process_isr())
+        if (process_isr()) {
             continue;
+        }
 
         fwk_log_unbuffer();
     }
@@ -396,19 +406,21 @@ int fwk_thread_put_event(struct fwk_event *event)
         goto error;
     }
 
-    if (event == NULL)
+    if (event == NULL) {
         goto error;
+    }
 #endif
 
     status = fwk_interrupt_get_current(&interrupt);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         intr_state = NOT_INTERRUPT_THREAD;
-    else
+    } else {
         intr_state = INTERRUPT_THREAD;
+    }
 
-    if ((intr_state == NOT_INTERRUPT_THREAD) && (ctx.current_event != NULL))
+    if ((intr_state == NOT_INTERRUPT_THREAD) && (ctx.current_event != NULL)) {
         event->source_id = ctx.current_event->target_id;
-    else if (
+    } else if (
         !fwk_id_type_is_valid(event->source_id) ||
         !fwk_module_is_valid_entity_id(event->source_id)) {
         if (!fwk_id_is_equal(
@@ -423,26 +435,33 @@ int fwk_thread_put_event(struct fwk_event *event)
 #ifdef BUILD_MODE_DEBUG
     status = FWK_E_PARAM;
     if (event->is_notification) {
-        if (!fwk_module_is_valid_notification_id(event->id))
+        if (!fwk_module_is_valid_notification_id(event->id)) {
             goto error;
-        if ((!event->is_response) || (event->response_requested))
+        }
+        if ((!event->is_response) || (event->response_requested)) {
             goto error;
+        }
         if (fwk_id_get_module_idx(event->target_id) !=
-            fwk_id_get_module_idx(event->id))
+            fwk_id_get_module_idx(event->id)) {
             goto error;
+        }
     } else {
-        if (!fwk_module_is_valid_event_id(event->id))
+        if (!fwk_module_is_valid_event_id(event->id)) {
             goto error;
+        }
         if (event->is_response) {
             if (fwk_id_get_module_idx(event->source_id) !=
-                fwk_id_get_module_idx(event->id))
+                fwk_id_get_module_idx(event->id)) {
                 goto error;
-            if (event->response_requested)
+            }
+            if (event->response_requested) {
                 goto error;
+            }
         } else {
             if (fwk_id_get_module_idx(event->target_id) !=
-                fwk_id_get_module_idx(event->id))
+                fwk_id_get_module_idx(event->id)) {
                 goto error;
+            }
         }
     }
 #endif
@@ -474,11 +493,13 @@ int fwk_thread_put_event_and_wait(
         goto error;
     }
 
-    if ((event == NULL) || (resp_event == NULL))
+    if ((event == NULL) || (resp_event == NULL)) {
         goto error;
+    }
 
-    if (!fwk_module_is_valid_event_id(event->id))
+    if (!fwk_module_is_valid_event_id(event->id)) {
         goto error;
+    }
 
     if (fwk_interrupt_get_current(&interrupt) == FWK_SUCCESS) {
         status = FWK_E_STATE;
@@ -486,16 +507,16 @@ int fwk_thread_put_event_and_wait(
     }
 #endif
 
-    if (ctx.current_event != NULL)
+    if (ctx.current_event != NULL) {
         event->source_id = ctx.current_event->target_id;
-    else if (
+    } else if (
         !fwk_id_type_is_valid(event->source_id) ||
         !fwk_module_is_valid_entity_id(event->source_id)) {
         if (fwk_id_type_is_valid(fwk_signal_ctx.current_signal.target_id) &&
             !fwk_id_is_equal(
-                fwk_signal_ctx.current_signal.target_id, FWK_ID_NONE))
+                fwk_signal_ctx.current_signal.target_id, FWK_ID_NONE)) {
             event->source_id = fwk_signal_ctx.current_signal.source_id;
-        else {
+        } else {
             FWK_LOG_ERR(
                 "[FWK] deprecated put_event_and_wait (%s: %s -> %s)\n",
                 FWK_ID_STR(event->id),
@@ -527,8 +548,9 @@ int fwk_thread_put_event_and_wait(
     event->is_notification = false;
 
     status = put_event(event, NOT_INTERRUPT_THREAD);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     ctx.cookie = event->cookie;
 
@@ -567,8 +589,9 @@ int fwk_thread_put_event_and_wait(
 
             /* Execute the event handler */
             status = process_event(next_event, &response_event);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 goto exit;
+            }
 
             /*
              * The response event goes onto the queue now
@@ -579,8 +602,9 @@ int fwk_thread_put_event_and_wait(
             response_event.response_requested = false;
             if (!response_event.is_delayed_response) {
                 status = put_event(&response_event, UNKNOWN_THREAD);
-                if (status != FWK_SUCCESS)
+                if (status != FWK_SUCCESS) {
                     goto exit;
+                }
                 ctx.cookie = response_event.cookie;
             } else {
                 allocated_event = duplicate_event(&response_event);
@@ -625,8 +649,9 @@ int fwk_thread_put_event_and_wait(
 exit:
     ctx.current_event = ctx.previous_event;
     ctx.waiting_event_processing_completion = false;
-    if (status == FWK_SUCCESS)
+    if (status == FWK_SUCCESS) {
         return status;
+    }
 error:
     FWK_LOG_CRIT(err_msg_func, status, __func__);
     return status;

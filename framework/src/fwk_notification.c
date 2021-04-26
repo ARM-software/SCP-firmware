@@ -97,8 +97,9 @@ static struct __fwk_notification_subscription *search_subscription(
             struct __fwk_notification_subscription, dlist_node);
 
         if (fwk_id_is_equal(subscription->source_id, source_id) &&
-            fwk_id_is_equal(subscription->target_id, target_id))
+            fwk_id_is_equal(subscription->target_id, target_id)) {
             return subscription;
+        }
     }
 
     return NULL;
@@ -131,15 +132,17 @@ static void send_notifications(struct fwk_event *notification_event,
         subscription = FWK_LIST_GET(node,
             struct __fwk_notification_subscription, dlist_node);
 
-        if (!fwk_id_is_equal(subscription->source_id,
-                             notification_event->source_id))
+        if (!fwk_id_is_equal(
+                subscription->source_id, notification_event->source_id)) {
             continue;
+        }
 
         notification_event->target_id = subscription->target_id;
 
         status = __fwk_thread_put_notification(notification_event);
-        if (status == FWK_SUCCESS)
+        if (status == FWK_SUCCESS) {
             (*count)++;
+        }
     }
 }
 
@@ -273,8 +276,9 @@ int fwk_notification_notify(struct fwk_event *notification_event,
     unsigned int interrupt;
     const struct fwk_event *current_event;
 
-    if ((notification_event == NULL) || (count == NULL))
+    if ((notification_event == NULL) || (count == NULL)) {
         return FWK_E_PARAM;
+    }
 
     if (fwk_interrupt_get_current(&interrupt) == FWK_SUCCESS) {
         if (!fwk_module_is_valid_entity_id(notification_event->source_id)) {
