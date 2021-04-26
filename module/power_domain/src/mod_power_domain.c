@@ -345,8 +345,9 @@ static bool is_shallower_state(unsigned int state,
 static bool is_allowed_by_child(const struct pd_ctx *child,
     unsigned int parent_state, unsigned int child_state)
 {
-    if (parent_state >= child->allowed_state_mask_table_size)
+    if (parent_state >= child->allowed_state_mask_table_size) {
         return false;
+    }
 
     return (
         (child->allowed_state_mask_table[parent_state] &
@@ -361,8 +362,9 @@ static bool is_allowed_by_children(const struct pd_ctx *pd, unsigned int state)
     FWK_LIST_FOR_EACH(
         &pd->children_list, c_node, struct pd_ctx, child_node, child)
     {
-        if (!is_allowed_by_child(child, state, child->requested_state))
+        if (!is_allowed_by_child(child, state, child->requested_state)) {
             return false;
+        }
     }
 
     return true;
@@ -386,8 +388,9 @@ static unsigned int number_of_bits_to_shift(uint32_t mask)
 {
     unsigned int num_bits = 0;
 
-    if (mask == (uint32_t)0)
+    if (mask == (uint32_t)0) {
         return 0;
+    }
 
     while ((mask & (uint32_t)1) == (uint32_t)0) {
         mask = mask >> 1;
@@ -418,8 +421,9 @@ static int get_highest_level_from_composite_state(
     const uint32_t *state_mask_table;
     unsigned int table_size;
 
-    if (!pd->cs_support)
+    if (!pd->cs_support) {
         return 0;
+    }
 
     if (pd->composite_state_levels_mask) {
         shift = number_of_bits_to_shift(pd->composite_state_levels_mask);
@@ -432,8 +436,9 @@ static int get_highest_level_from_composite_state(
              level++, pd = pd->parent) {
             state = get_level_state_from_composite_state(
                 state_mask_table, composite_state, level);
-            if (!is_valid_state(pd, state))
+            if (!is_valid_state(pd, state)) {
                 break;
+            }
         }
         level--;
     }
@@ -453,29 +458,35 @@ static bool is_valid_composite_state(struct pd_ctx *target_pd,
 
     assert(target_pd != NULL);
 
-    if (!pd->cs_support)
+    if (!pd->cs_support) {
         goto error;
+    }
 
     highest_level = get_highest_level_from_composite_state(pd, composite_state);
 
     state_mask_table = pd->composite_state_mask_table;
     table_size = pd->composite_state_mask_table_size;
 
-    if (highest_level >= table_size)
+    if (highest_level >= table_size) {
         goto error;
+    }
 
     for (level = 0; level <= highest_level; level++) {
-        if (pd == NULL)
+        if (pd == NULL) {
             goto error;
+        }
 
         state = get_level_state_from_composite_state(
             state_mask_table, composite_state, level);
 
-        if (!is_valid_state(pd, state))
+        if (!is_valid_state(pd, state)) {
             goto error;
+        }
 
-        if ((child != NULL) && !is_allowed_by_child(child, state, child_state))
+        if ((child != NULL) &&
+            !is_allowed_by_child(child, state, child_state)) {
             goto error;
+        }
 
         child = pd;
         child_state = state;
@@ -512,8 +523,9 @@ static bool is_upwards_transition_propagation(const struct pd_ctx *lowest_pd,
     highest_level =
         get_highest_level_from_composite_state(lowest_pd, composite_state);
 
-    if (!lowest_pd->cs_support)
+    if (!lowest_pd->cs_support) {
         return is_deeper_state(composite_state, lowest_pd->requested_state);
+    }
 
     state_mask_table = lowest_pd->composite_state_mask_table;
 
@@ -521,8 +533,9 @@ static bool is_upwards_transition_propagation(const struct pd_ctx *lowest_pd,
          level++, pd = pd->parent) {
         state = get_level_state_from_composite_state(
             state_mask_table, composite_state, level);
-        if (state == pd->requested_state)
+        if (state == pd->requested_state) {
             continue;
+        }
 
         return is_deeper_state(state, pd->requested_state);
     }
@@ -544,8 +557,9 @@ static int connect_pd_tree(void)
         }
 
         parent = pd->parent = &mod_pd_ctx.pd_ctx_table[pd->config->parent_idx];
-        if (parent == NULL)
+        if (parent == NULL) {
             return FWK_E_DATA;
+        }
         fwk_list_push_tail(&parent->children_list, &pd->child_node);
     }
 
@@ -568,15 +582,17 @@ static bool is_allowed_by_parent_and_children(struct pd_ctx *pd,
 
     parent = pd->parent;
     if (parent != NULL) {
-        if (!is_allowed_by_child(pd, parent->current_state, state))
+        if (!is_allowed_by_child(pd, parent->current_state, state)) {
             return false;
+        }
     }
 
     FWK_LIST_FOR_EACH(
         &pd->children_list, c_node, struct pd_ctx, child_node, child)
     {
-        if (!is_allowed_by_child(child, state, child->current_state))
+        if (!is_allowed_by_child(child, state, child->current_state)) {
             return false;
+        }
     }
 
     return true;
@@ -623,19 +639,23 @@ static bool initiate_power_state_pre_transition_notification(struct pd_ctx *pd)
     };
     struct mod_pd_power_state_pre_transition_notification_params *params;
 
-    if (pd->config->disable_state_transition_notifications == true)
+    if (pd->config->disable_state_transition_notifications == true) {
         return false;
+    }
 
     state = pd->requested_state;
-    if (!check_power_state_pre_transition_notification(pd, state))
+    if (!check_power_state_pre_transition_notification(pd, state)) {
         return false;
+    }
 
     /*
      * If still waiting for some responses on the previous power state
      * pre-transition notification, wait for them before to issue the next one.
      */
-    if (pd->power_state_pre_transition_notification_ctx.pending_responses != 0)
+    if (pd->power_state_pre_transition_notification_ctx.pending_responses !=
+        0) {
         return true;
+    }
 
     params = (struct mod_pd_power_state_pre_transition_notification_params *)
         notification_event.params;
@@ -724,15 +744,17 @@ static void respond(struct pd_ctx *pd, int resp_status)
     struct pd_set_state_response *resp_params =
         (struct pd_set_state_response *)(&resp_event.params);
 
-    if (!pd->response.pending)
+    if (!pd->response.pending) {
         return;
+    }
 
     status = fwk_thread_get_delayed_response(
         pd->id, pd->response.cookie, &resp_event);
     pd->response.pending = false;
 
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return;
+    }
 
     resp_params->composite_state = req_params->composite_state;
     resp_params->status = resp_status;
@@ -788,31 +810,35 @@ static void process_set_state_request(
     pd = lowest_pd;
 
     composite_state_operation = pd->cs_support;
-    if (composite_state_operation)
+    if (composite_state_operation) {
         state_mask_table = pd->composite_state_mask_table;
+    }
 
     for (pd_index = 0; pd_index < nb_pds; pd_index++, pd = pd->parent) {
-        if (up)
+        if (up) {
             level = pd_index;
-        else {
+        } else {
             /*
              * When walking down the power domain tree, get the context of the
              * next power domain to process as well as its level.
              */
             pd = lowest_pd;
-            for (level = lowest_level;
-                 level < (highest_level - pd_index); level++)
+            for (level = lowest_level; level < (highest_level - pd_index);
+                 level++) {
                 pd = pd->parent;
+            }
         }
 
-        if (composite_state_operation)
+        if (composite_state_operation) {
             state = get_level_state_from_composite_state(
                 state_mask_table, composite_state, level);
-        else
+        } else {
             state = composite_state;
+        }
 
-        if (state == pd->requested_state)
+        if (state == pd->requested_state) {
             continue;
+        }
 
         /*
          * Check that the requested power state is compatible with the states
@@ -825,8 +851,9 @@ static void process_set_state_request(
             break;
         }
 
-        if (!is_allowed_by_children(pd, state))
+        if (!is_allowed_by_children(pd, state)) {
             continue;
+        }
 
         /*
          * A new valid power state is requested for the power domain. Send any
@@ -836,8 +863,9 @@ static void process_set_state_request(
         pd->power_state_pre_transition_notification_ctx.valid = false;
         respond(pd, FWK_E_OVERWRITTEN);
 
-        if (pd->state_requested_to_driver == state)
+        if (pd->state_requested_to_driver == state) {
             continue;
+        }
 
         /*
          * The driver must be called thus the processing of the set state
@@ -856,8 +884,9 @@ static void process_set_state_request(
          * now. It will be initiated on completion of the transition of one
          * of its ancestor or descendant.
          */
-        if (first_power_state_transition_initiated)
-           continue;
+        if (first_power_state_transition_initiated) {
+            continue;
+        }
 
         /*
          * If the parent or a child is not currently in a power state
@@ -865,15 +894,17 @@ static void process_set_state_request(
          * initiate the transition now as well. It will be initiated when the
          * parent and the children are in a proper state.
          */
-        if (!is_allowed_by_parent_and_children(pd, state))
-           continue;
+        if (!is_allowed_by_parent_and_children(pd, state)) {
+            continue;
+        }
 
         /*
          * Defer the power state transition if power state pre-transition
          * notification responses need to be waited for.
          */
-        if (initiate_power_state_pre_transition_notification(pd))
+        if (initiate_power_state_pre_transition_notification(pd)) {
             continue;
+        }
 
         status = initiate_power_state_transition(pd);
         if (status != FWK_SUCCESS) {
@@ -888,8 +919,9 @@ static void process_set_state_request(
         first_power_state_transition_initiated = true;
     }
 
-    if (!event->response_requested)
+    if (!event->response_requested) {
         return;
+    }
 
     if (pd_in_charge_of_response != NULL) {
         resp_event->is_delayed_response = true;
@@ -925,8 +957,9 @@ static int complete_system_suspend(struct pd_ctx *target_pd)
     const uint32_t *state_mask_table;
     int table_size;
 
-    if (!pd->cs_support)
+    if (!pd->cs_support) {
         return FWK_E_PARAM;
+    }
 
     state_mask_table = pd->composite_state_mask_table;
     table_size = pd->composite_state_mask_table_size;
@@ -983,9 +1016,9 @@ static void process_get_state_request(struct pd_ctx *pd,
     const uint32_t *state_mask_table;
     int table_size, cs_idx = 0;
 
-    if (!pd->cs_support)
+    if (!pd->cs_support) {
         resp_params->state = pd->current_state;
-    else {
+    } else {
         state_mask_table = pd->composite_state_mask_table;
         table_size = pd->composite_state_mask_table_size;
 
@@ -1032,15 +1065,17 @@ static void process_reset_request(struct pd_ctx *pd,
     struct fwk_slist *c_node = NULL;
 
     status = FWK_E_PWRSTATE;
-    if (pd->requested_state == MOD_PD_STATE_OFF)
+    if (pd->requested_state == MOD_PD_STATE_OFF) {
         goto exit;
+    }
 
     FWK_LIST_FOR_EACH(
         &pd->children_list, c_node, struct pd_ctx, child_node, child)
     {
         if ((child->requested_state != MOD_PD_STATE_OFF) ||
-            (child->current_state != MOD_PD_STATE_OFF))
+            (child->current_state != MOD_PD_STATE_OFF)) {
             goto exit;
+        }
     }
 
     status = pd->driver_api->reset(pd->driver_id);
@@ -1061,19 +1096,23 @@ static void process_power_state_transition_report_deeper_state(
     struct pd_ctx *parent = pd->parent;
     unsigned int requested_state;
 
-    if (parent == NULL)
+    if (parent == NULL) {
         return;
+    }
 
     requested_state = parent->requested_state;
 
-    if (parent->state_requested_to_driver == requested_state)
+    if (parent->state_requested_to_driver == requested_state) {
         return;
+    }
 
-    if (!is_allowed_by_parent_and_children(parent, requested_state))
+    if (!is_allowed_by_parent_and_children(parent, requested_state)) {
         return;
+    }
 
-    if (!initiate_power_state_pre_transition_notification(parent))
+    if (!initiate_power_state_pre_transition_notification(parent)) {
         initiate_power_state_transition(parent);
+    }
 }
 
 /*
@@ -1093,14 +1132,17 @@ static void process_power_state_transition_report_shallower_state(
         &pd->children_list, c_node, struct pd_ctx, child_node, child)
     {
         requested_state = child->requested_state;
-        if (child->state_requested_to_driver == requested_state)
+        if (child->state_requested_to_driver == requested_state) {
             continue;
+        }
 
-        if (!is_allowed_by_parent_and_children(child, requested_state))
+        if (!is_allowed_by_parent_and_children(child, requested_state)) {
             return;
+        }
 
-        if (!initiate_power_state_pre_transition_notification(child))
+        if (!initiate_power_state_pre_transition_notification(child)) {
             initiate_power_state_transition(child);
+        }
     }
 }
 
@@ -1122,8 +1164,9 @@ static void process_power_state_transition_report(struct pd_ctx *pd,
     };
     struct mod_pd_power_state_transition_notification_params *params;
 
-    if (new_state == pd->requested_state)
+    if (new_state == pd->requested_state) {
         respond(pd, FWK_SUCCESS);
+    }
 
     previous_state = pd->current_state;
     pd->current_state = new_state;
@@ -1170,10 +1213,11 @@ static void process_power_state_transition_report(struct pd_ctx *pd,
          return;
     }
 
-    if (is_deeper_state(new_state, previous_state))
+    if (is_deeper_state(new_state, previous_state)) {
         process_power_state_transition_report_deeper_state(pd);
-    else if (is_shallower_state(new_state, previous_state))
+    } else if (is_shallower_state(new_state, previous_state)) {
         process_power_state_transition_report_shallower_state(pd);
+    }
 }
 
 /*
@@ -1200,8 +1244,9 @@ static void process_system_suspend_request(
     for (pd_idx = 0; pd_idx < mod_pd_ctx.pd_count; pd_idx++) {
         pd = &mod_pd_ctx.pd_ctx_table[pd_idx];
         if ((pd->requested_state == MOD_PD_STATE_OFF) &&
-            (pd->current_state == MOD_PD_STATE_OFF))
+            (pd->current_state == MOD_PD_STATE_OFF)) {
             continue;
+        }
 
         if (pd->config->attributes.pd_type == MOD_PD_TYPE_CORE) {
             if (last_core_pd != NULL) {
@@ -1268,20 +1313,22 @@ void perform_shutdown(
             }
         } else {
             if ((api->deny != NULL) &&
-                api->deny(pd->driver_id, MOD_PD_STATE_OFF))
+                api->deny(pd->driver_id, MOD_PD_STATE_OFF)) {
                 status = FWK_E_DEVICE;
-            else
+            } else {
                 status = api->set_state(pd->driver_id, MOD_PD_STATE_OFF);
+            }
         }
 
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             FWK_LOG_ERR(
                 "[PD] Shutdown of %s returned %s (%d)",
                 fwk_module_get_name(pd_id),
                 fwk_status_str(status),
                 status);
-        else
+        } else {
             FWK_LOG_INFO("[PD] %s shutdown", fwk_module_get_name(pd_id));
+        }
 
         pd->requested_state =
             pd->state_requested_to_driver =
@@ -1382,11 +1429,13 @@ static int pd_get_domain_type(fwk_id_t pd_id, enum mod_pd_type *type)
 {
     struct pd_ctx *pd;
 
-    if (type == NULL)
+    if (type == NULL) {
         return FWK_E_PARAM;
+    }
 
-    if (!fwk_module_is_valid_element_id(pd_id))
+    if (!fwk_module_is_valid_element_id(pd_id)) {
         return FWK_E_PARAM;
+    }
 
     pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
 
@@ -1399,11 +1448,13 @@ static int pd_get_domain_parent_id(fwk_id_t pd_id, fwk_id_t *parent_pd_id)
 {
     const struct pd_ctx *pd;
 
-    if (parent_pd_id == NULL)
+    if (parent_pd_id == NULL) {
         return FWK_E_PARAM;
+    }
 
-    if (!fwk_module_is_valid_element_id(pd_id))
+    if (!fwk_module_is_valid_element_id(pd_id)) {
         return FWK_E_PARAM;
+    }
 
     pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
 
@@ -1428,11 +1479,13 @@ static int pd_set_state(fwk_id_t pd_id, uint32_t state)
     pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
 
     if (pd->cs_support) {
-        if (!is_valid_composite_state(pd, state))
+        if (!is_valid_composite_state(pd, state)) {
             return FWK_E_PARAM;
+        }
     } else {
-        if (!is_valid_state(pd, state))
+        if (!is_valid_state(pd, state)) {
             return FWK_E_PARAM;
+        }
     }
 
     req = (struct fwk_event) {
@@ -1445,8 +1498,9 @@ static int pd_set_state(fwk_id_t pd_id, uint32_t state)
     req_params->composite_state = state;
 
     status = fwk_thread_put_event_and_wait(&req, &resp);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return resp_params->status;
 }
@@ -1464,11 +1518,13 @@ static int pd_set_state_async(
     pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
 
     if (pd->cs_support) {
-        if (!is_valid_composite_state(pd, state))
+        if (!is_valid_composite_state(pd, state)) {
             return FWK_E_PARAM;
+        }
     } else {
-        if (!is_valid_state(pd, state))
+        if (!is_valid_state(pd, state)) {
             return FWK_E_PARAM;
+        }
     }
 
     req = (struct fwk_event) {
@@ -1494,8 +1550,9 @@ static int pd_get_state(fwk_id_t pd_id, unsigned int *state)
     struct pd_get_state_response *resp_params =
         (struct pd_get_state_response *)(&resp.params);
 
-    if (state == NULL)
+    if (state == NULL) {
         return FWK_E_PARAM;
+    }
 
     req = (struct fwk_event) {
         .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
@@ -1506,11 +1563,13 @@ static int pd_get_state(fwk_id_t pd_id, unsigned int *state)
     req_params->composite = false;
 
     status = fwk_thread_put_event_and_wait(&req, &resp);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
-    if (resp_params->status != FWK_SUCCESS)
+    if (resp_params->status != FWK_SUCCESS) {
         return resp_params->status;
+    }
 
     *state = resp_params->state;
 
@@ -1530,8 +1589,9 @@ static int pd_reset(fwk_id_t pd_id)
     };
 
     status = fwk_thread_put_event_and_wait(&req, &resp);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return resp_params->status;
 }
@@ -1554,8 +1614,9 @@ static int pd_system_suspend(unsigned int state)
     req_params->state = state;
 
     status = fwk_thread_put_event_and_wait(&req, &resp);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return resp_params->status;
 }
@@ -1576,8 +1637,9 @@ static int pd_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
     req_params->system_shutdown = system_shutdown;
 
     status = fwk_thread_put_event(&req);
-    if (status == FWK_SUCCESS)
+    if (status == FWK_SUCCESS) {
         return FWK_PENDING;
+    }
 
     return status;
 }
@@ -1630,11 +1692,13 @@ static int pd_report_power_state_transition(fwk_id_t pd_id, unsigned int state)
 static int pd_get_last_core_pd_id(fwk_id_t *last_core_pd_id)
 {
     bool system_suspend_ongoing = mod_pd_ctx.system_suspend.suspend_ongoing;
-    if (last_core_pd_id == NULL)
+    if (last_core_pd_id == NULL) {
         return FWK_E_PARAM;
+    }
 
-    if (!system_suspend_ongoing)
+    if (!system_suspend_ongoing) {
         return FWK_E_PWRSTATE;
+    }
 
     *last_core_pd_id = mod_pd_ctx.system_suspend.last_core_pd->id;
 
@@ -1673,14 +1737,16 @@ static const struct mod_pd_driver_input_api pd_driver_input_api = {
 static int pd_init(fwk_id_t module_id, unsigned int dev_count,
                    const void *data)
 {
-    if ((data == NULL) || (dev_count == 0))
+    if ((data == NULL) || (dev_count == 0)) {
         return FWK_E_PARAM;
+    }
 
     mod_pd_ctx.config = (struct mod_power_domain_config *)data;
 
     if ((mod_pd_ctx.config->authorized_id_table == NULL) &&
-        (mod_pd_ctx.config->authorized_id_table_size != 0))
+        (mod_pd_ctx.config->authorized_id_table_size != 0)) {
         return FWK_E_PARAM;
+    }
 
     mod_pd_ctx.pd_ctx_table = fwk_mm_calloc(dev_count, sizeof(struct pd_ctx));
 
@@ -1702,20 +1768,22 @@ static int pd_power_domain_init(fwk_id_t pd_id, unsigned int unused,
 
     fwk_list_init(&pd->children_list);
 
-    if (pd_config->attributes.pd_type >=
-        MOD_PD_TYPE_COUNT)
+    if (pd_config->attributes.pd_type >= MOD_PD_TYPE_COUNT) {
         return FWK_E_PARAM;
+    }
 
     if ((pd_config->allowed_state_mask_table == NULL) ||
-        (pd_config->allowed_state_mask_table_size == 0))
+        (pd_config->allowed_state_mask_table_size == 0)) {
         return FWK_E_PARAM;
+    }
 
     pd->allowed_state_mask_table = pd_config->allowed_state_mask_table;
     pd->allowed_state_mask_table_size =
         pd_config->allowed_state_mask_table_size;
 
-    for (state = 0; state < pd->allowed_state_mask_table_size; state++)
+    for (state = 0; state < pd->allowed_state_mask_table_size; state++) {
         pd->valid_state_mask |= pd->allowed_state_mask_table[state];
+    }
 
     if ((pd_config->composite_state_mask_table != NULL) &&
         (pd_config->composite_state_mask_table_size > 0)) {
@@ -1734,8 +1802,9 @@ static int pd_power_domain_init(fwk_id_t pd_id, unsigned int unused,
             << MOD_PD_CS_LEVEL_SHIFT;
         pd->cs_support = true;
 
-    } else
+    } else {
         pd->cs_support = false;
+    }
 
     pd->id = pd_id;
     pd->config = pd_config;
@@ -1748,8 +1817,9 @@ static int pd_post_init(fwk_id_t module_id)
     int status;
 
     status = connect_pd_tree();
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return FWK_SUCCESS;
 }
@@ -1762,26 +1832,29 @@ static int pd_bind(fwk_id_t id, unsigned int round)
     struct mod_pd_driver_api *driver_api = NULL;
 
     /* Nothing to do but during the first round of calls */
-    if (round != 0)
+    if (round != 0) {
         return FWK_SUCCESS;
+    }
 
-    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         return FWK_SUCCESS;
+    }
 
     pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(id)];
     config = pd->config;
 
     status = fwk_module_bind(config->driver_id, config->api_id, &driver_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     pd->driver_id = config->driver_id;
-    if ((driver_api->set_state == NULL) ||
-        (driver_api->get_state == NULL) ||
+    if ((driver_api->set_state == NULL) || (driver_api->get_state == NULL) ||
         (driver_api->reset == NULL) ||
         ((config->attributes.pd_type == MOD_PD_TYPE_CORE) &&
-         (driver_api->prepare_core_for_system_suspend == NULL)))
+         (driver_api->prepare_core_for_system_suspend == NULL))) {
         return FWK_E_PARAM;
+    }
 
     pd->driver_api = driver_api;
 
@@ -1796,8 +1869,9 @@ static int pd_start(fwk_id_t id)
     unsigned int state;
 
     /* Nothing to do for elements */
-    if (fwk_module_is_valid_element_id(id))
+    if (fwk_module_is_valid_element_id(id)) {
         return FWK_SUCCESS;
+    }
 
     for (index = mod_pd_ctx.pd_count - 1; index >= 0; index--) {
         pd = &mod_pd_ctx.pd_ctx_table[index];
@@ -1812,8 +1886,9 @@ static int pd_start(fwk_id_t id)
          * this case.
          */
         if ((pd->parent != NULL) &&
-            (pd->parent->requested_state == MOD_PD_STATE_OFF))
+            (pd->parent->requested_state == MOD_PD_STATE_OFF)) {
             continue;
+        }
 
         /* Get the current power state of the power domain from its driver. */
         status = pd->driver_api->get_state(pd->driver_id, &state);
@@ -1827,8 +1902,9 @@ static int pd_start(fwk_id_t id)
         } else {
             pd->requested_state = pd->state_requested_to_driver = state;
 
-            if (state == MOD_PD_STATE_OFF)
+            if (state == MOD_PD_STATE_OFF) {
                 continue;
+            }
 
             report_power_state_transition(pd, state);
         }
@@ -1845,14 +1921,16 @@ static int pd_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
 
     switch (fwk_id_get_api_idx(api_id)) {
     case MOD_PD_API_IDX_PUBLIC:
-        if (!fwk_id_is_type(target_id, FWK_ID_TYPE_MODULE))
+        if (!fwk_id_is_type(target_id, FWK_ID_TYPE_MODULE)) {
             return FWK_E_ACCESS;
+        }
         *api = &pd_public_api;
         break;
 
     case MOD_PD_API_IDX_RESTRICTED:
-        if (!fwk_id_is_type(target_id, FWK_ID_TYPE_MODULE))
+        if (!fwk_id_is_type(target_id, FWK_ID_TYPE_MODULE)) {
             return FWK_E_ACCESS;
+        }
         if (mod_pd_ctx.config->authorized_id_table_size == 0) {
             *api = &pd_restricted_api;
             return FWK_SUCCESS;
@@ -1870,11 +1948,13 @@ static int pd_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
         return FWK_E_ACCESS;
 
     case MOD_PD_API_IDX_DRIVER_INPUT:
-        if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT))
+        if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT)) {
             return FWK_E_ACCESS;
+        }
         pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(target_id)];
-        if (!fwk_id_is_equal(source_id, pd->driver_id))
+        if (!fwk_id_is_equal(source_id, pd->driver_id)) {
             return FWK_E_ACCESS;
+        }
         *api = &pd_driver_input_api;
         break;
 
@@ -1890,8 +1970,9 @@ static int pd_process_event(const struct fwk_event *event,
 {
     struct pd_ctx *pd = NULL;
 
-    if (fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT))
+    if (fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT)) {
         pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(event->target_id)];
+    }
 
     switch (fwk_id_get_event_idx(event->id)) {
     case MOD_PD_PUBLIC_EVENT_IDX_SET_STATE:
@@ -1976,8 +2057,10 @@ static int process_power_state_pre_transition_notification_response(
     }
 
     pd->power_state_pre_transition_notification_ctx.pending_responses--;
-    if (pd->power_state_pre_transition_notification_ctx.pending_responses != 0)
+    if (pd->power_state_pre_transition_notification_ctx.pending_responses !=
+        0) {
         return FWK_SUCCESS;
+    }
 
     if (pd->power_state_pre_transition_notification_ctx.valid == true) {
         /*
@@ -1987,8 +2070,9 @@ static int process_power_state_pre_transition_notification_response(
          * transition, proceed with it.
          */
         if (pd->power_state_pre_transition_notification_ctx.response_status ==
-            FWK_SUCCESS)
+            FWK_SUCCESS) {
             initiate_power_state_transition(pd);
+        }
     } else {
         /*
          * All the notification responses have been received but the
@@ -1996,11 +2080,13 @@ static int process_power_state_pre_transition_notification_response(
          * processings for the new requested state.
          */
         if ((pd->requested_state == pd->state_requested_to_driver) ||
-            (!is_allowed_by_parent_and_children(pd, pd->requested_state)))
+            (!is_allowed_by_parent_and_children(pd, pd->requested_state))) {
             return FWK_SUCCESS;
+        }
 
-        if (!initiate_power_state_pre_transition_notification(pd))
+        if (!initiate_power_state_pre_transition_notification(pd)) {
             initiate_power_state_transition(pd);
+        }
     }
 
     return FWK_SUCCESS;
@@ -2017,8 +2103,9 @@ static int process_power_state_transition_notification_response(
     }
 
     pd->power_state_transition_notification_ctx.pending_responses--;
-    if (pd->power_state_transition_notification_ctx.pending_responses != 0)
+    if (pd->power_state_transition_notification_ctx.pending_responses != 0) {
         return FWK_SUCCESS;
+    }
 
     if (pd->power_state_transition_notification_ctx.state ==
         pd->current_state) {
@@ -2032,10 +2119,11 @@ static int process_power_state_transition_notification_response(
         /*
          * Complete the report state change now that we have all notifications
          */
-        if (is_deeper_state(pd->current_state, previous_state))
+        if (is_deeper_state(pd->current_state, previous_state)) {
             process_power_state_transition_report_deeper_state(pd);
-        else if (is_shallower_state(pd->current_state, previous_state))
+        } else if (is_shallower_state(pd->current_state, previous_state)) {
             process_power_state_transition_report_shallower_state(pd);
+        }
 
         return FWK_SUCCESS;
     }
@@ -2070,8 +2158,9 @@ static int pd_process_notification(const struct fwk_event *event,
         return FWK_E_SUPPORT;
     }
 
-    if (fwk_id_is_equal(event->id, mod_pd_notification_id_pre_shutdown))
+    if (fwk_id_is_equal(event->id, mod_pd_notification_id_pre_shutdown)) {
         return process_pre_shutdown_notification_response();
+    }
 
     if (!fwk_module_is_valid_element_id(event->target_id)) {
         fwk_unexpected();
@@ -2080,9 +2169,10 @@ static int pd_process_notification(const struct fwk_event *event,
 
     pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(event->target_id)];
 
-    if (fwk_id_is_equal(event->id,
-                        mod_pd_notification_id_power_state_transition))
+    if (fwk_id_is_equal(
+            event->id, mod_pd_notification_id_power_state_transition)) {
         return process_power_state_transition_notification_response(pd);
+    }
 
     return process_power_state_pre_transition_notification_response(pd,
         (struct mod_pd_power_state_pre_transition_notification_resp_params *)

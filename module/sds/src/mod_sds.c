@@ -129,25 +129,30 @@ static bool header_is_valid(const volatile struct region_descriptor *region,
 {
     const volatile char *region_tail, *struct_tail;
 
-    if (header->id == 0)
+    if (header->id == 0) {
         return false; /* Zero is not a valid identifier */
+    }
 
-    if ((header->id >> MOD_SDS_ID_VERSION_MAJOR_POS) == 0)
+    if ((header->id >> MOD_SDS_ID_VERSION_MAJOR_POS) == 0) {
         return false; /* 0 is not a valid major version */
+    }
 
-    if (header->size < MIN_ALIGNED_STRUCT_SIZE)
+    if (header->size < MIN_ALIGNED_STRUCT_SIZE) {
         return false; /* Padded structure size is less than the minimum */
+    }
 
     region_tail = (const volatile char *)region + region->region_size;
     struct_tail = (const volatile char *)header
         + sizeof(struct structure_header)
         + header->size;
-    if (struct_tail > region_tail)
+    if (struct_tail > region_tail) {
         /* Structure exceeds the capacity of the SDS Memory Region */
         return false;
+    }
 
-    if ((header->size % MIN_STRUCT_ALIGNMENT) != 0)
+    if ((header->size % MIN_STRUCT_ALIGNMENT) != 0) {
         return false; /* Structure does not meet alignment requirements */
+    }
 
     return true;
 }
@@ -155,11 +160,13 @@ static bool header_is_valid(const volatile struct region_descriptor *region,
 static bool validate_structure_access(uint32_t structure_size, uint32_t offset,
                                       size_t access_size)
 {
-    if ((offset >= structure_size) || (access_size > structure_size))
+    if ((offset >= structure_size) || (access_size > structure_size)) {
         return FWK_E_PARAM;
+    }
 
-    if ((structure_size - offset) < access_size)
+    if ((structure_size - offset) < access_size) {
         return FWK_E_PARAM;
+    }
 
     return FWK_SUCCESS;
 }
@@ -205,8 +212,9 @@ static int get_structure_info(uint32_t structure_id,
        for (struct_idx = 0; struct_idx < struct_count; struct_idx++) {
            current_header = (volatile struct structure_header *)(
                 region_base + offset);
-           if (!header_is_valid(region_desc, current_header))
+           if (!header_is_valid(region_desc, current_header)) {
                return FWK_E_DATA;
+           }
 
            if (current_header->id == structure_id) {
                if (structure_base != NULL) {
@@ -220,8 +228,9 @@ static int get_structure_info(uint32_t structure_id,
 
            offset += current_header->size;
            offset += sizeof(struct structure_header);
-           if (offset >= region_size)
+           if (offset >= region_size) {
                return FWK_E_RANGE;
+           }
        }
    }
 
@@ -287,8 +296,9 @@ static int struct_alloc(const struct mod_sds_structure_desc *struct_desc)
     *free_mem_size -= sizeof(*header);
 
     /* Zero the memory reserved for the structure, avoiding the header */
-    for (unsigned int i = 0; i < padded_size; i++)
+    for (unsigned int i = 0; i < padded_size; i++) {
         (*free_mem_base)[i] = 0u;
+    }
     *free_mem_base += padded_size;
     *free_mem_size -= padded_size;
 
@@ -325,11 +335,13 @@ static int reinitialize_memory_region(
     volatile struct region_descriptor *region_desc;
 
     region_desc = (volatile struct region_descriptor *)(region_config->base);
-    if (region_desc->signature != REGION_SIGNATURE)
+    if (region_desc->signature != REGION_SIGNATURE) {
         return FWK_E_DATA;
+    }
 
-    if (region_desc->version_major != SUPPORTED_VERSION_MAJOR)
+    if (region_desc->version_major != SUPPORTED_VERSION_MAJOR) {
         return FWK_E_DATA;
+    }
 
     mem_used = sizeof(struct region_descriptor);
     for (struct_idx = 0; struct_idx < region_desc->structure_count;
@@ -337,17 +349,20 @@ static int reinitialize_memory_region(
         header = (volatile struct structure_header *)(
             (volatile char *)region_config->base + mem_used);
 
-        if (!header_is_valid(region_desc, header))
+        if (!header_is_valid(region_desc, header)) {
             return FWK_E_DATA; /* Unexpected invalid header */
+        }
 
         mem_used += header->size;
         mem_used += sizeof(struct structure_header);
-        if (mem_used > region_desc->region_size)
+        if (mem_used > region_desc->region_size) {
             return FWK_E_SIZE;
+        }
     }
 
-    if (mem_used > region_config->size)
+    if (mem_used > region_config->size) {
         return FWK_E_SIZE;
+    }
 
     /*
      * The SDS memory region size might differ between ROM and RAM images. In
@@ -373,8 +388,9 @@ static int create_memory_region(const struct mod_sds_region_desc* region_config,
 {
     volatile struct region_descriptor *region_desc;
 
-    if (region_config->size < MIN_REGION_SIZE)
+    if (region_config->size < MIN_REGION_SIZE) {
         return FWK_E_NOMEM;
+    }
 
     region_desc = (volatile struct region_descriptor *)region_config->base;
     region_desc->signature = REGION_SIGNATURE;
@@ -405,15 +421,18 @@ static int struct_write(uint32_t structure_id, unsigned int offset,
 
     /* Look up the Structure Header by its identifier */
     status = get_structure_info(structure_id, &header, &structure_base);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = validate_structure_access(header.size, offset, size);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
-    for (unsigned int i = 0; i < size; i++)
+    for (unsigned int i = 0; i < size; i++) {
         structure_base[offset + i] = ((const char*)data)[i];
+    }
 
     return FWK_SUCCESS;
 }
@@ -427,8 +446,9 @@ static int struct_finalize(uint32_t structure_id)
 
     /* Check that the structure being finalized exists */
     status = get_structure_info(structure_id, &header, &structure_base);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* Update the valid flag of the header within the SDS Memory Region */
     header_mem = (volatile struct structure_header *)(
@@ -445,20 +465,23 @@ static int struct_init(const struct mod_sds_structure_desc *struct_desc)
     /* If the structure does not already exist, allocate it. */
     if (!structure_exists(struct_desc->id)) {
         status = struct_alloc(struct_desc);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     if (struct_desc->payload != NULL) {
         status = struct_write(struct_desc->id, 0, struct_desc->payload,
                               struct_desc->size);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     /* Finalize the structure immediately if required */
-    if (struct_desc->finalize)
+    if (struct_desc->finalize) {
         status = struct_finalize(struct_desc->id);
+    }
 
     return status;
 }
@@ -489,8 +512,9 @@ static int init_sds(void)
         status = reinitialize_memory_region(region_config, region_idx);
         if (status != FWK_SUCCESS) {
             status = create_memory_region(region_config, region_idx);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
         }
     }
 
@@ -500,8 +524,9 @@ static int init_sds(void)
             fwk_id_build_element_id(fwk_module_id_sds, element_idx));
 
         status = struct_init(struct_desc);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return fwk_notification_notify(&notification_event, &notification_count);
@@ -514,11 +539,13 @@ static int init_sds(void)
 static int sds_struct_write(uint32_t structure_id, unsigned int offset,
                             const void *data, size_t size)
 {
-    if (data == NULL)
+    if (data == NULL) {
         return FWK_E_PARAM;
+    }
 
-    if (size == 0)
+    if (size == 0) {
         return FWK_E_PARAM;
+    }
 
     return struct_write(structure_id, offset, data, size);
 }
@@ -530,24 +557,28 @@ static int sds_struct_read(uint32_t structure_id, unsigned int offset,
     volatile char *structure_base;
     struct structure_header header;
 
-
-    if (data == NULL)
+    if (data == NULL) {
         return FWK_E_PARAM;
+    }
 
-    if (size == 0)
+    if (size == 0) {
         return FWK_E_PARAM;
+    }
 
     /* Check if a structure with this ID exists */
     status = get_structure_info(structure_id, &header, &structure_base);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = validate_structure_access(header.size, offset, size);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
-    for (unsigned int i = 0; i < size; i++)
+    for (unsigned int i = 0; i < size; i++) {
         ((char*)data)[i] = structure_base[offset + i];
+    }
 
     return FWK_SUCCESS;
 }
@@ -574,8 +605,9 @@ static int sds_init(fwk_id_t module_id, unsigned int element_count,
     void *region_base;
     unsigned int region_idx;
 
-    if (data == NULL)
+    if (data == NULL) {
         return FWK_E_PANIC;
+    }
 
     config = (const struct mod_sds_config *)data;
 
@@ -583,15 +615,18 @@ static int sds_init(fwk_id_t module_id, unsigned int element_count,
 
     for (region_idx = 0; region_idx < config->region_count; region_idx++) {
         region_base = config->regions[region_idx].base;
-        if (region_base == NULL)
+        if (region_base == NULL) {
             return FWK_E_PARAM;
-        if (((uintptr_t)region_base % MIN_STRUCT_ALIGNMENT) > 0)
+        }
+        if (((uintptr_t)region_base % MIN_STRUCT_ALIGNMENT) > 0) {
             return FWK_E_PARAM;
+        }
     }
 
     ctx.regions = fwk_mm_alloc(config->region_count, sizeof(ctx.regions[0]));
-    if (ctx.regions == NULL)
+    if (ctx.regions == NULL) {
         return FWK_E_NOMEM;
+    }
 
     return FWK_SUCCESS;
 }
@@ -605,8 +640,9 @@ static int sds_element_init(fwk_id_t element_id, unsigned int unused,
 static int sds_process_bind_request(fwk_id_t requester_id, fwk_id_t id,
                                     fwk_id_t api_id, const void **api)
 {
-    if (!fwk_module_is_valid_module_id(requester_id))
+    if (!fwk_module_is_valid_module_id(requester_id)) {
         return FWK_E_ACCESS;
+    }
 
     *api = &module_api;
     return FWK_SUCCESS;
@@ -618,8 +654,9 @@ static int sds_start(fwk_id_t id)
     const struct mod_sds_config *config;
 #endif
 
-    if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+    if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         return FWK_SUCCESS;
+    }
 
 #ifdef BUILD_HAS_MOD_CLOCK
     config = fwk_module_get_data(fwk_module_id_sds);
@@ -647,8 +684,9 @@ static int sds_process_notification(
     fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
 
     params = (struct clock_notification_params *)event->params;
-    if (params->new_state != MOD_CLOCK_STATE_RUNNING)
+    if (params->new_state != MOD_CLOCK_STATE_RUNNING) {
         return FWK_SUCCESS;
+    }
 
     return init_sds();
 }
