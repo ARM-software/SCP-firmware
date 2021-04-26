@@ -107,8 +107,9 @@ static int system_state_get(enum scmi_system_state *system_state)
 
     status = scmi_sys_power_ctx.pd_api->get_state(
         scmi_sys_power_ctx.system_power_domain_id, &state);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     switch (state) {
     case MOD_PD_STATE_OFF:
@@ -281,12 +282,14 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
     }
 
     status = scmi_sys_power_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     status = scmi_sys_power_ctx.scmi_api->get_agent_type(agent_id, &agent_type);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     if ((agent_type != SCMI_AGENT_TYPE_PSCI) &&
         (agent_type != SCMI_AGENT_TYPE_MANAGEMENT)) {
@@ -328,8 +331,9 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
              * the calling agent. This is a fire-and-forget situation.
              */
             return FWK_SUCCESS;
-        } else
+        } else {
             goto exit;
+        }
         break;
 
     case SCMI_SYSTEM_STATE_SUSPEND:
@@ -354,8 +358,9 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
         }
 
         status = system_state_get((enum scmi_system_state *)&scmi_system_state);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             goto exit;
+        }
 
         if ((scmi_system_state != SCMI_SYSTEM_STATE_SHUTDOWN) &&
             (scmi_system_state != SCMI_SYSTEM_STATE_SUSPEND)) {
@@ -367,8 +372,9 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
         status = scmi_sys_power_ctx.pd_api->set_state(
             scmi_sys_power_ctx.config->wakeup_power_domain_id,
             scmi_sys_power_ctx.config->wakeup_composite_state);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             goto exit;
+        }
         break;
 
     default:
@@ -414,23 +420,27 @@ static int scmi_sys_power_state_get_handler(fwk_id_t service_id,
     enum scmi_agent_type agent_type;
 
     status = scmi_sys_power_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     status = scmi_sys_power_ctx.scmi_api->get_agent_type(agent_id, &agent_type);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     return_values.status = SCMI_NOT_SUPPORTED;
-    if (scmi_sys_power_ctx.config->system_view == MOD_SCMI_SYSTEM_VIEW_FULL)
+    if (scmi_sys_power_ctx.config->system_view == MOD_SCMI_SYSTEM_VIEW_FULL) {
         goto exit;
-    else {
-        if (agent_type == SCMI_AGENT_TYPE_PSCI)
+    } else {
+        if (agent_type == SCMI_AGENT_TYPE_PSCI) {
             goto exit;
+        }
 
         status = system_state_get(&system_state);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             goto exit;
+        }
 
         return_values = (struct scmi_sys_power_state_get_p2a) {
             .status = SCMI_SUCCESS,
@@ -512,23 +522,25 @@ FWK_WEAK int scmi_sys_power_state_set_policy(
 
         if (!scmi_sys_power_ctx.start_graceful_process) {
             /* Only shutdown command is enabled */
-            if (*state != SCMI_SYSTEM_STATE_SHUTDOWN)
+            if (*state != SCMI_SYSTEM_STATE_SHUTDOWN) {
                 return FWK_SUCCESS;
+            }
             /* Starting the graceful request process */
             scmi_sys_power_ctx.start_graceful_process = true;
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
             scmi_sys_power_state_notify(service_id, *state, false);
 #endif
 
-            if (scmi_sys_power_ctx.alarm_api)
+            if (scmi_sys_power_ctx.alarm_api) {
                 scmi_sys_power_ctx.alarm_api->start(
                     scmi_sys_power_ctx.config->alarm_id,
                     scmi_sys_power_ctx.config->graceful_timeout,
                     MOD_TIMER_ALARM_TYPE_ONCE,
                     graceful_timer_callback,
                     *state);
-            else
+            } else {
                 graceful_timer_callback(*state);
+            }
         }
     }
 
@@ -551,11 +563,13 @@ static int scmi_sys_power_permissions_handler(
     int status;
 
     status = scmi_sys_power_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_ACCESS;
+    }
 
-    if (message_id < 3)
+    if (message_id < 3) {
         return FWK_SUCCESS;
+    }
 
     /*
      * We check that the agent has permssions to access the command
@@ -563,10 +577,11 @@ static int scmi_sys_power_permissions_handler(
     perms = scmi_sys_power_ctx.res_perms_api->agent_has_message_permission(
         agent_id, MOD_SCMI_PROTOCOL_ID_BASE, message_id);
 
-    if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
+    if (perms == MOD_RES_PERMS_ACCESS_ALLOWED) {
         return FWK_SUCCESS;
-    else
+    } else {
         return FWK_E_ACCESS;
+    }
 }
 
 #endif
@@ -673,35 +688,40 @@ static int scmi_sys_power_bind(fwk_id_t id, unsigned int round)
     int status;
     int pd_count;
 
-    if (round != 0)
+    if (round != 0) {
         return FWK_SUCCESS;
+    }
 
     /* Bind to SCMI module */
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
                              FWK_ID_API(FWK_MODULE_IDX_SCMI,
                                         MOD_SCMI_API_IDX_PROTOCOL),
                              &scmi_sys_power_ctx.scmi_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
         FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS, MOD_RES_PERM_RESOURCE_PERMS),
         &scmi_sys_power_ctx.res_perms_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 #endif
 
     /* Bind to POWER DOMAIN module */
     status = fwk_module_bind(fwk_module_id_power_domain,
         mod_pd_api_id_restricted, &scmi_sys_power_ctx.pd_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     pd_count = fwk_module_get_element_count(fwk_module_id_power_domain);
-    if (pd_count <= 0)
+    if (pd_count <= 0) {
         return FWK_E_SUPPORT;
+    }
 
     scmi_sys_power_ctx.system_power_domain_id =
         FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, pd_count - 1);
@@ -727,8 +747,9 @@ static int scmi_sys_power_bind(fwk_id_t id, unsigned int round)
 static int scmi_sys_power_process_bind_request(fwk_id_t source_id,
     fwk_id_t _target_id, fwk_id_t api_id, const void **api)
 {
-    if (!fwk_id_is_equal(source_id, FWK_ID_MODULE(FWK_MODULE_IDX_SCMI)))
+    if (!fwk_id_is_equal(source_id, FWK_ID_MODULE(FWK_MODULE_IDX_SCMI))) {
         return FWK_E_ACCESS;
+    }
 
     *api = &scmi_sys_power_mod_scmi_to_protocol;
 

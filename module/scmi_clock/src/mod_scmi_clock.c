@@ -164,15 +164,18 @@ static int get_agent_entry(
     int status;
     unsigned int agent_id;
 
-    if (agent == NULL)
+    if (agent == NULL) {
         return FWK_E_PARAM;
+    }
 
     status = scmi_clock_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
-    if (agent_id >= scmi_clock_ctx.config->agent_count)
+    if (agent_id >= scmi_clock_ctx.config->agent_count) {
         return FWK_E_PARAM;
+    }
 
     *agent =
         (struct mod_scmi_clock_agent *)&scmi_clock_ctx.agent_table[agent_id];
@@ -194,22 +197,26 @@ static int get_clock_device_entry(
     int status;
     const struct mod_scmi_clock_agent *agent_entry;
 
-    if (clock_device == NULL)
+    if (clock_device == NULL) {
         return FWK_E_PARAM;
+    }
 
     status = get_agent_entry(service_id, &agent_entry);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
-    if (clock_idx >= agent_entry->device_count)
+    if (clock_idx >= agent_entry->device_count) {
         return FWK_E_RANGE;
+    }
 
     *clock_device = &agent_entry->device_table[clock_idx];
 
     fwk_assert(fwk_module_is_valid_element_id((*clock_device)->element_id));
 
-    if (agent != NULL)
+    if (agent != NULL) {
         *agent = agent_entry;
+    }
 
     return FWK_SUCCESS;
 }
@@ -230,15 +237,18 @@ static int get_agent_clock_state(
     int status;
 
     status = get_agent_entry(service_id, &agent_entry);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
-    if (clock_idx >= agent_entry->device_count)
+    if (clock_idx >= agent_entry->device_count) {
         return FWK_E_RANGE;
+    }
 
     status = scmi_clock_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     idx = (agent_id * scmi_clock_ctx.clock_devices) + clock_idx;
 
@@ -263,15 +273,18 @@ static int set_agent_clock_state(
     int status;
 
     status = get_agent_entry(service_id, &agent_entry);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
-    if (clock_idx >= agent_entry->device_count)
+    if (clock_idx >= agent_entry->device_count) {
         return FWK_E_RANGE;
+    }
 
     status = scmi_clock_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     idx = (agent_id * scmi_clock_ctx.clock_devices) + clock_idx;
 
@@ -394,11 +407,13 @@ static void request_response(int response_status,
         .status = SCMI_GENERIC_ERROR
     };
 
-    if (response_status == FWK_E_SUPPORT)
+    if (response_status == FWK_E_SUPPORT) {
         return_values.status = SCMI_NOT_SUPPORTED;
+    }
 
-    if (response_status == FWK_E_RANGE)
+    if (response_status == FWK_E_RANGE) {
         return_values.status = SCMI_INVALID_PARAMETERS;
+    }
 
     scmi_clock_ctx.scmi_api->respond(service_id,
                                      &return_values,
@@ -412,14 +427,15 @@ static void set_request_respond(fwk_id_t service_id, int status)
 {
     struct scmi_clock_generic_p2a return_values = { 0 };
 
-    if (status == FWK_E_RANGE || status == FWK_E_PARAM)
+    if (status == FWK_E_RANGE || status == FWK_E_PARAM) {
         return_values.status = SCMI_INVALID_PARAMETERS;
-    else if (status == FWK_E_SUPPORT)
+    } else if (status == FWK_E_SUPPORT) {
         return_values.status = SCMI_NOT_SUPPORTED;
-    else if (status != FWK_SUCCESS)
+    } else if (status != FWK_SUCCESS) {
         return_values.status = SCMI_GENERIC_ERROR;
-    else
+    } else {
         return_values.status = SCMI_SUCCESS;
+    }
 
     scmi_clock_ctx.scmi_api->respond(service_id,
                                      &return_values,
@@ -493,8 +509,9 @@ FWK_WEAK int mod_scmi_clock_config_set_policy(
      */
     status = get_agent_clock_state(
         &clock_state, service_id, clock_dev_id, agent_clock_state);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     switch (*state) {
     case MOD_CLOCK_STATE_RUNNING:
@@ -519,10 +536,12 @@ FWK_WEAK int mod_scmi_clock_config_set_policy(
          *
          * This is the first agent to set the clock RUNNING.
          */
-        if (clock_count[clock_dev_id] != 0)
+        if (clock_count[clock_dev_id] != 0) {
             status = FWK_E_STATE;
-        if (policy_commit == MOD_SCMI_CLOCK_POST_MESSAGE_HANDLER)
+        }
+        if (policy_commit == MOD_SCMI_CLOCK_POST_MESSAGE_HANDLER) {
             clock_count[clock_dev_id]++;
+        }
         break;
 
     case MOD_CLOCK_STATE_STOPPED:
@@ -558,18 +577,21 @@ FWK_WEAK int mod_scmi_clock_config_set_policy(
          *
          * This is the last agent to set the clock STOPPED.
          */
-        if (clock_count[clock_dev_id] != 1)
+        if (clock_count[clock_dev_id] != 1) {
             status = FWK_E_STATE;
-        if (policy_commit == MOD_SCMI_CLOCK_POST_MESSAGE_HANDLER)
+        }
+        if (policy_commit == MOD_SCMI_CLOCK_POST_MESSAGE_HANDLER) {
             clock_count[clock_dev_id]--;
+        }
         break;
 
     default:
         return FWK_E_PARAM;
     }
 
-    if (status == FWK_SUCCESS)
+    if (status == FWK_SUCCESS) {
         *policy_status = MOD_SCMI_CLOCK_EXECUTE_MESSAGE_HANDLER;
+    }
 
     return FWK_SUCCESS;
 }
@@ -620,14 +642,16 @@ static int scmi_clock_permissions_handler(
     int status;
 
     status = scmi_clock_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_ACCESS;
+    }
 
     if (message_id < 3) {
         perms = scmi_clock_ctx.res_perms_api->agent_has_protocol_permission(
             agent_id, MOD_SCMI_PROTOCOL_ID_CLOCK);
-        if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
+        if (perms == MOD_RES_PERMS_ACCESS_ALLOWED) {
             return FWK_SUCCESS;
+        }
         return FWK_E_ACCESS;
     }
 
@@ -636,10 +660,11 @@ static int scmi_clock_permissions_handler(
     perms = scmi_clock_ctx.res_perms_api->agent_has_resource_permission(
         agent_id, MOD_SCMI_PROTOCOL_ID_CLOCK, message_id, clock_id);
 
-    if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
+    if (perms == MOD_RES_PERMS_ACCESS_ALLOWED) {
         return FWK_SUCCESS;
-    else
+    } else {
         return FWK_E_ACCESS;
+    }
 }
 
 #endif
@@ -660,8 +685,9 @@ static int create_event_request(
     struct event_request_params *params;
     enum mod_clock_state state = MOD_CLOCK_STATE_COUNT;
 
-    if (!clock_ops_is_available(clock_dev_idx))
+    if (!clock_ops_is_available(clock_dev_idx)) {
         return FWK_E_BUSY;
+    }
 
     struct fwk_event event = {
         .target_id = fwk_module_id_scmi_clock,
@@ -713,8 +739,9 @@ static int create_event_request(
     params->clock_dev_id = clock_id;
 
     status = fwk_thread_put_event(&event);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     clock_ops_set_busy(clock_dev_idx, service_id, clock_idx, state, request);
 
@@ -836,8 +863,9 @@ static int scmi_clock_attributes_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     return FWK_SUCCESS;
 
@@ -886,8 +914,9 @@ static int scmi_clock_rate_get_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     return FWK_SUCCESS;
 
@@ -946,8 +975,9 @@ static int scmi_clock_rate_set_handler(fwk_id_t service_id,
     }
 
     status = scmi_clock_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     rate = ((uint64_t)(parameters->rate[1]) << 32) |
         (uint64_t)parameters->rate[0];
@@ -993,8 +1023,9 @@ static int scmi_clock_rate_set_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     return FWK_SUCCESS;
 
@@ -1045,8 +1076,9 @@ static int scmi_clock_config_set_handler(fwk_id_t service_id,
     };
 
     status = scmi_clock_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     /*
      * Note that data.state may be modified by the policy handler.
@@ -1078,8 +1110,9 @@ static int scmi_clock_config_set_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     return FWK_SUCCESS;
 
@@ -1133,13 +1166,15 @@ static int scmi_clock_describe_rates_handler(fwk_id_t service_id,
      */
     status = scmi_clock_ctx.scmi_api->get_max_payload_size(
         service_id, &max_payload_size);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     status = scmi_clock_ctx.clock_api->get_info(clock_device->element_id,
                                                 &info);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     if (info.range.rate_type == MOD_CLOCK_RATE_TYPE_DISCRETE) {
         /* The clock has a discrete list of frequencies */
@@ -1187,16 +1222,18 @@ static int scmi_clock_describe_rates_handler(fwk_id_t service_id,
                 clock_device->element_id,
                 index + i,
                 &rate);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 goto exit;
+            }
 
             scmi_rate.low = (uint32_t)rate;
             scmi_rate.high = (uint32_t)(rate >> 32);
 
             status = scmi_clock_ctx.scmi_api->write_payload(service_id,
                 payload_size, &scmi_rate, sizeof(scmi_rate));
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 goto exit;
+            }
         }
     } else {
         /* The clock has a linear stepping */
@@ -1225,8 +1262,9 @@ static int scmi_clock_describe_rates_handler(fwk_id_t service_id,
 
         status = scmi_clock_ctx.scmi_api->write_payload(service_id,
             payload_size, &clock_range, sizeof(clock_range));
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             goto exit;
+        }
         payload_size += sizeof(clock_range);
     }
 
@@ -1310,16 +1348,18 @@ static int scmi_clock_init(fwk_id_t module_id, unsigned int element_count,
     const struct mod_scmi_clock_config *config =
         (const struct mod_scmi_clock_config *)data;
 
-    if ((config == NULL) || (config->agent_table == NULL))
+    if ((config == NULL) || (config->agent_table == NULL)) {
         return FWK_E_PARAM;
+    }
 
     scmi_clock_ctx.config = config;
     scmi_clock_ctx.max_pending_transactions = config->max_pending_transactions;
     scmi_clock_ctx.agent_table = config->agent_table;
 
     clock_devices = fwk_module_get_element_count(fwk_module_id_clock);
-    if (clock_devices == FWK_E_PARAM)
+    if (clock_devices == FWK_E_PARAM) {
         return FWK_E_PANIC;
+    }
 
     scmi_clock_ctx.clock_devices = clock_devices;
 
@@ -1329,8 +1369,9 @@ static int scmi_clock_init(fwk_id_t module_id, unsigned int element_count,
         sizeof(struct clock_operations));
 
     /* Initialize table */
-    for (unsigned int i = 0; i < (unsigned int)clock_devices; i++)
+    for (unsigned int i = 0; i < (unsigned int)clock_devices; i++) {
         scmi_clock_ctx.clock_ops[i].service_id = FWK_ID_NONE;
+    }
 
     return FWK_SUCCESS;
 }
@@ -1339,22 +1380,25 @@ static int scmi_clock_bind(fwk_id_t id, unsigned int round)
 {
     int status;
 
-    if (round == 1)
+    if (round == 1) {
         return FWK_SUCCESS;
+    }
 
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
         FWK_ID_API(FWK_MODULE_IDX_SCMI, MOD_SCMI_API_IDX_PROTOCOL),
         &scmi_clock_ctx.scmi_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
         FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS, MOD_RES_PERM_RESOURCE_PERMS),
         &scmi_clock_ctx.res_perms_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 #endif
 
     return fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_CLOCK),
@@ -1364,8 +1408,9 @@ static int scmi_clock_bind(fwk_id_t id, unsigned int round)
 static int scmi_clock_process_bind_request(fwk_id_t source_id,
     fwk_id_t target_id, fwk_id_t api_id, const void **api)
 {
-    if (!fwk_id_is_equal(source_id, FWK_ID_MODULE(FWK_MODULE_IDX_SCMI)))
+    if (!fwk_id_is_equal(source_id, FWK_ID_MODULE(FWK_MODULE_IDX_SCMI))) {
         return FWK_E_ACCESS;
+    }
 
     *api = &scmi_clock_mod_scmi_to_protocol_api;
 
@@ -1443,11 +1488,13 @@ static int process_request_event(const struct fwk_event *event)
         return FWK_E_PARAM;
     }
 
-    if (status == FWK_PENDING)
+    if (status == FWK_PENDING) {
         return FWK_SUCCESS;
+    }
 
-    if (status == FWK_SUCCESS)
+    if (status == FWK_SUCCESS) {
         clock_ops_set_available(clock_dev_idx);
+    }
 
     return status;
 }
@@ -1464,9 +1511,9 @@ static int process_response_event(const struct fwk_event *event)
     clock_dev_idx = fwk_id_get_element_idx(event->source_id);
     service_id = clock_ops_get_service(clock_dev_idx);
 
-    if (params->status != FWK_SUCCESS)
+    if (params->status != FWK_SUCCESS) {
         request_response(params->status, service_id);
-    else {
+    } else {
         switch (fwk_id_get_event_idx(event->id)) {
         case MOD_CLOCK_EVENT_IDX_GET_STATE_REQUEST:
             clock_state = params->value.state;
