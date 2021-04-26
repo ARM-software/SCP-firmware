@@ -10,8 +10,9 @@
 #if defined(__ARMCC_VERSION)
 void __aeabi_assert(const char *expr, const char *file, int line)
 {
-    while (1)
+    while (1) {
         continue;
+    }
 }
 #elif defined(__NEWLIB__)
 void __assert_func(
@@ -20,7 +21,8 @@ void __assert_func(
     const char *function,
     const char *assertion)
 {
-    while (1)
+    while (1) {
         continue;
+    }
 }
 #endif

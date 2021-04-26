@@ -17,8 +17,9 @@ void *fwk_mm_alloc(size_t num, size_t size)
 {
     void *ptr = malloc(num * size);
 
-    if (ptr == NULL)
+    if (ptr == NULL) {
         fwk_trap();
+    }
 
     return ptr;
 }
@@ -32,8 +33,9 @@ void *fwk_mm_alloc_aligned(size_t alignment, size_t num, size_t size)
 {
     void *ptr = aligned_alloc(alignment, num * size);
 
-    if (ptr == NULL)
+    if (ptr == NULL) {
         fwk_trap();
+    }
 
     return ptr;
 }
@@ -41,8 +43,9 @@ void *fwk_mm_alloc_aligned(size_t alignment, size_t num, size_t size)
 void *fwk_mm_calloc(size_t num, size_t size)
 {
     void *ptr = calloc(num, size);
-    if (ptr == NULL)
+    if (ptr == NULL) {
         fwk_trap();
+    }
 
     return ptr;
 }

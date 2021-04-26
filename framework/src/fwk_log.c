@@ -51,12 +51,13 @@ int fwk_log_init(void)
 
     int status = FWK_SUCCESS;
 
-    if (fwk_id_is_equal(FMW_LOG_DRAIN_ID, FMW_IO_STDOUT_ID))
+    if (fwk_id_is_equal(FMW_LOG_DRAIN_ID, FMW_IO_STDOUT_ID)) {
         fwk_log_stream = fwk_io_stdout;
-    else if (!fwk_id_is_equal(FMW_LOG_DRAIN_ID, FWK_ID_NONE)) {
+    } else if (!fwk_id_is_equal(FMW_LOG_DRAIN_ID, FWK_ID_NONE)) {
         status = fwk_io_open(&stream, FMW_LOG_DRAIN_ID, FWK_IO_MODE_WRITE);
-        if (fwk_expect(status == FWK_SUCCESS))
+        if (fwk_expect(status == FWK_SUCCESS)) {
             fwk_log_stream = &stream;
+        }
     }
 
     return status;
@@ -73,8 +74,9 @@ static bool fwk_log_buffer(struct fwk_ring *ring, const char *message)
      * of each message does not exceed `UCHAR_MAX`.
      */
 
-    if ((sizeof(length) + length) > fwk_ring_get_free(ring))
+    if ((sizeof(length) + length) > fwk_ring_get_free(ring)) {
         return false; /* Not enough buffer space */
+    }
 
     fwk_ring_push(ring, (char *)&length, sizeof(length));
     fwk_ring_push(ring, message, length);
@@ -147,8 +149,9 @@ static void fwk_log_vsnprintf(
      */
 
     newline = strchr(buffer, '\n');
-    if (newline == NULL)
+    if (newline == NULL) {
         newline = buffer + length;
+    }
 
     /*
      * Lastly, we follow through on the termination with a proper carriage
@@ -187,12 +190,14 @@ static bool fwk_log_banner(void)
 
         fwk_log_snprintf(sizeof(buffer), buffer, "%s", banner);
 
-        if (fwk_io_puts(fwk_log_stream, buffer) != FWK_SUCCESS)
+        if (fwk_io_puts(fwk_log_stream, buffer) != FWK_SUCCESS) {
             return false;
+        }
 
         banner = strchr(banner, '\n');
-        if (banner != NULL)
+        if (banner != NULL) {
             banner++;
+        }
     }
 
     return true;
@@ -215,8 +220,9 @@ void fwk_log_printf(const char *format, ...)
      * succeeds.
      */
 
-    if (!banner)
+    if (!banner) {
         banner = fwk_log_banner();
+    }
 
     va_start(args, format);
     fwk_log_vsnprintf(sizeof(buffer), buffer, format, &args);
@@ -241,8 +247,9 @@ void fwk_log_printf(const char *format, ...)
     }
 #else
     int status = fwk_io_puts(fwk_log_stream, buffer);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         fwk_log_ctx.dropped++;
+    }
 #endif
 
     fwk_interrupt_global_enable();

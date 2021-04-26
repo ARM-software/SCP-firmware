@@ -43,10 +43,11 @@ const char *fwk_status_str(int status)
 
     unsigned int error_idx = (unsigned int)(-status);
 
-    if ((status < 0) && (error_idx < FWK_ARRAY_SIZE(error_string)))
+    if ((status < 0) && (error_idx < FWK_ARRAY_SIZE(error_string))) {
         return error_string[error_idx];
-    else if ((status >= 0) && (status < (int)FWK_ARRAY_SIZE(status_string)))
+    } else if ((status >= 0) && (status < (int)FWK_ARRAY_SIZE(status_string))) {
         return status_string[status];
+    }
 
     return unknown;
 }

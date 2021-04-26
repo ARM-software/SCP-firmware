@@ -49,8 +49,9 @@ static void fwk_id_format(
 
     fwk_assert(buffer_size > 0);
 
-    if (id.common.type >= FWK_ARRAY_SIZE(types))
+    if (id.common.type >= FWK_ARRAY_SIZE(types)) {
         id.common.type = __FWK_ID_TYPE_INVALID;
+    }
 
     indices[0] = id.common.module_idx;
 
@@ -178,8 +179,9 @@ bool fwk_id_is_type(fwk_id_t id, enum fwk_id_type type)
 bool fwk_id_type_is_valid(fwk_id_t id)
 {
     if ((id.common.type != __FWK_ID_TYPE_INVALID) &&
-        (id.common.type < __FWK_ID_TYPE_COUNT))
+        (id.common.type < __FWK_ID_TYPE_COUNT)) {
         return true;
+    }
 
     return false;
 }

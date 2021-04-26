@@ -28,11 +28,13 @@ static int check_api_call(fwk_id_t id, void *data)
 {
     unsigned int interrupt;
 
-    if (fwk_interrupt_get_current(&interrupt) == FWK_SUCCESS)
+    if (fwk_interrupt_get_current(&interrupt) == FWK_SUCCESS) {
         return FWK_E_ACCESS;
+    }
 
-    if ((!fwk_module_is_valid_entity_id(id)) || (data == NULL))
+    if ((!fwk_module_is_valid_entity_id(id)) || (data == NULL)) {
         return FWK_E_PARAM;
+    }
 
     return FWK_SUCCESS;
 }
@@ -42,8 +44,9 @@ static int check_api_call(fwk_id_t id, void *data)
  */
 struct fwk_slist *__fwk_thread_get_delayed_response_list(fwk_id_t id)
 {
-    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         return &fwk_module_get_ctx(id)->delayed_response_list;
+    }
 
     return &fwk_module_get_element_ctx(id)->delayed_response_list;
 }
@@ -63,8 +66,9 @@ struct fwk_event *__fwk_thread_search_delayed_response(
 
         delayed_response =
             FWK_LIST_GET(delayed_response_node, struct fwk_event, slist_node);
-        if (delayed_response->cookie == cookie)
+        if (delayed_response->cookie == cookie) {
             return delayed_response;
+        }
 
         delayed_response_node =
             fwk_list_next(delayed_response_list, delayed_response_node);
@@ -85,8 +89,9 @@ int fwk_thread_get_delayed_response(
     struct fwk_event *delayed_response;
 
     status = check_api_call(id, event);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto error;
+    }
 
     delayed_response = __fwk_thread_search_delayed_response(id, cookie);
     if (delayed_response == NULL) {
@@ -112,8 +117,9 @@ int fwk_thread_is_delayed_response_list_empty(
     struct fwk_slist_node *delayed_response_node;
 
     status = check_api_call(id, is_empty);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto error;
+    }
 
     delayed_response_list = __fwk_thread_get_delayed_response_list(id);
     delayed_response_node = fwk_list_head(delayed_response_list);
@@ -136,8 +142,9 @@ int fwk_thread_get_first_delayed_response(
     struct fwk_slist_node *delayed_response_node;
 
     status = check_api_call(id, event);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto error;
+    }
 
     delayed_response_list = __fwk_thread_get_delayed_response_list(id);
     delayed_response_node = fwk_list_head(delayed_response_list);
@@ -145,8 +152,9 @@ int fwk_thread_get_first_delayed_response(
     if (delayed_response_node != NULL) {
         *event =
            *(FWK_LIST_GET(delayed_response_node, struct fwk_event, slist_node));
-    } else
+    } else {
         return FWK_E_STATE;
+    }
 
     return FWK_SUCCESS;
 
