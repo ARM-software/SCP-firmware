@@ -303,8 +303,9 @@ static const struct mod_scmi_from_transport_api mod_scmi_from_transport_api = {
 
 static int get_agent_count(int *agent_count)
 {
-    if (agent_count == NULL)
+    if (agent_count == NULL) {
         return FWK_E_PARAM;
+    }
 
     /* Include the platform in the count */
     *agent_count = scmi_ctx.config->agent_count + 1;
@@ -317,8 +318,9 @@ static int get_agent_id(fwk_id_t service_id, unsigned int *agent_id)
 {
     struct scmi_service_ctx *ctx;
 
-    if (agent_id == NULL)
+    if (agent_id == NULL) {
         return FWK_E_PARAM;
+    }
 
     ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(service_id)];
 
@@ -332,8 +334,9 @@ static int get_agent_type(uint32_t scmi_agent_id,
 {
     if ((agent_type == NULL) ||
         (scmi_agent_id > scmi_ctx.config->agent_count) ||
-        (scmi_agent_id == MOD_SCMI_PLATFORM_ID))
+        (scmi_agent_id == MOD_SCMI_PLATFORM_ID)) {
         return FWK_E_PARAM;
+    }
 
     *agent_type = scmi_ctx.config->agent_table[scmi_agent_id].type;
 
@@ -344,8 +347,9 @@ static int get_max_payload_size(fwk_id_t service_id, size_t *size)
 {
     struct scmi_service_ctx *ctx;
 
-    if (size == NULL)
+    if (size == NULL) {
         return FWK_E_PARAM;
+    }
 
     ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(service_id)];
 
@@ -428,20 +432,24 @@ static void scmi_notify(fwk_id_t id, int protocol_id, int message_id,
      * the agent used to request notificatiosn on. This ID is
      * linked to a P2A channel by the scmi_p2a_id.
      */
-    if (fwk_id_is_equal(id, FWK_ID_NONE))
+    if (fwk_id_is_equal(id, FWK_ID_NONE)) {
         return;
+    }
 
     ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(id)];
-    if (ctx == NULL)
+    if (ctx == NULL) {
         return;
+    }
     /* ctx is the original A2P service channel */
-    if (fwk_id_is_equal(ctx->config->scmi_p2a_id, FWK_ID_NONE))
+    if (fwk_id_is_equal(ctx->config->scmi_p2a_id, FWK_ID_NONE)) {
         return;
+    }
     /* Get the P2A service channel for A2P ctx */
     p2a_ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(
         ctx->config->scmi_p2a_id)];
-    if ((p2a_ctx == NULL) || (p2a_ctx->transmit == NULL))
+    if ((p2a_ctx == NULL) || (p2a_ctx->transmit == NULL)) {
         return; /* No notification service configured */
+    }
 
     message_header = scmi_message_header(message_id,
         MOD_SCMI_MESSAGE_TYPE_NOTIFICATION,
@@ -705,8 +713,9 @@ static int scmi_base_protocol_attributes_handler(fwk_id_t service_id,
 #endif
 
     status = get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     for (index = 0, protocol_count = 0, global_protocol_count = 0;
@@ -714,8 +723,9 @@ static int scmi_base_protocol_attributes_handler(fwk_id_t service_id,
          (global_protocol_count < scmi_ctx.protocol_count);
          index++) {
         if ((scmi_ctx.scmi_protocol_id_to_idx[index] == 0) ||
-            (index == MOD_SCMI_PROTOCOL_ID_BASE))
+            (index == MOD_SCMI_PROTOCOL_ID_BASE)) {
             continue;
+        }
 
         protocol_id = index;
 
@@ -725,15 +735,17 @@ static int scmi_base_protocol_attributes_handler(fwk_id_t service_id,
         perms = scmi_ctx.res_perms_api->agent_has_protocol_permission(
             agent_id, protocol_id);
 
-        if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
+        if (perms == MOD_RES_PERMS_ACCESS_ALLOWED) {
             protocol_count++;
+        }
 
         global_protocol_count++;
     }
 #else
     status = get_agent_type(agent_id, &agent_type);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /*
      * PSCI agents are only allowed access to certain protocols defined
@@ -744,8 +756,9 @@ static int scmi_base_protocol_attributes_handler(fwk_id_t service_id,
             scmi_ctx.protocol_count > scmi_ctx.config->dis_protocol_count_psci);
         protocol_count =
             scmi_ctx.protocol_count - scmi_ctx.config->dis_protocol_count_psci;
-    } else
+    } else {
         protocol_count = scmi_ctx.protocol_count;
+    }
 #endif
 
     struct scmi_protocol_attributes_p2a return_values = {
@@ -776,8 +789,9 @@ static int scmi_base_protocol_message_attributes_handler(fwk_id_t service_id,
     message_id = parameters->message_id;
 
     if ((message_id < FWK_ARRAY_SIZE(base_handler_table)) &&
-        (base_handler_table[message_id] != NULL))
+        (base_handler_table[message_id] != NULL)) {
         return_values.status = SCMI_SUCCESS;
+    }
 
     /* For this protocol, all commands have an attributes value of 0, which
      * has already been set by the initialization of "return_values".
@@ -800,10 +814,11 @@ static int scmi_base_discover_vendor_handler(fwk_id_t service_id,
         .status = SCMI_SUCCESS,
     };
 
-    if (scmi_ctx.config->vendor_identifier != NULL)
+    if (scmi_ctx.config->vendor_identifier != NULL) {
         strncpy(return_values.vendor_identifier,
                 scmi_ctx.config->vendor_identifier,
                 sizeof(return_values.vendor_identifier) - 1);
+    }
 
     respond(service_id, &return_values, sizeof(return_values));
 
@@ -820,10 +835,11 @@ static int scmi_base_discover_sub_vendor_handler(fwk_id_t service_id,
         .status = SCMI_SUCCESS,
     };
 
-    if (scmi_ctx.config->sub_vendor_identifier != NULL)
+    if (scmi_ctx.config->sub_vendor_identifier != NULL) {
         strncpy(return_values.sub_vendor_identifier,
                 scmi_ctx.config->sub_vendor_identifier,
                 sizeof(return_values.sub_vendor_identifier) - 1);
+    }
 
     respond(service_id, &return_values, sizeof(return_values));
 
@@ -876,18 +892,21 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
     unsigned int agent_id;
 
     status = get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto error;
+    }
 
 #ifndef BUILD_HAS_MOD_RESOURCE_PERMS
     status = get_agent_type(agent_id, &agent_type);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto error;
+    }
 #endif
 
     status = get_max_payload_size(service_id, &max_payload_size);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto error;
+    }
 
     if (max_payload_size <
         (sizeof(struct scmi_base_discover_list_protocols_p2a)
@@ -917,10 +936,11 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
         protocol_count_max = (protocol_count_psci < (skip + entry_count)) ?
             protocol_count_psci :
             (skip + entry_count);
-    } else
+    } else {
         protocol_count_max = (scmi_ctx.protocol_count < (skip + entry_count)) ?
             scmi_ctx.protocol_count :
             (skip + entry_count);
+    }
 #endif
 
     for (index = 0,
@@ -930,8 +950,9 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
          (protocol_count < protocol_count_max);
          index++) {
         if ((scmi_ctx.scmi_protocol_id_to_idx[index] == 0) ||
-            (index == MOD_SCMI_PROTOCOL_ID_BASE))
+            (index == MOD_SCMI_PROTOCOL_ID_BASE)) {
             continue;
+        }
 
         protocol_id = index;
 
@@ -970,28 +991,32 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
                  scmi_ctx.config->dis_protocol_count_psci;
                  dis_protocol_list_psci_index++) {
                 if (protocol_id ==
-                    scmi_ctx.config
-                        ->dis_protocol_list_psci[dis_protocol_list_psci_index])
+                    scmi_ctx.config->dis_protocol_list_psci
+                        [dis_protocol_list_psci_index]) {
                     break;
+                }
             }
 
             /*
              * don't include the protocol in case it is in the disabled list
              */
             if (dis_protocol_list_psci_index !=
-                scmi_ctx.config->dis_protocol_count_psci)
+                scmi_ctx.config->dis_protocol_count_psci) {
                 continue;
+            }
         }
 #endif
 
         protocol_count++;
-        if (protocol_count <= skip)
+        if (protocol_count <= skip) {
             continue;
+        }
 
         status = write_payload(service_id, payload_size, &protocol_id,
                                sizeof(protocol_id));
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             goto error;
+        }
         payload_size += sizeof(protocol_id);
         avail_protocol_count++;
     }
@@ -1006,8 +1031,9 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
 
     status = write_payload(service_id, 0,
                            &return_values, sizeof(return_values));
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto error;
+    }
 
     payload_size = FWK_ALIGN_NEXT(payload_size, sizeof(uint32_t));
 
@@ -1044,11 +1070,13 @@ static int scmi_base_discover_agent_handler(fwk_id_t service_id,
 
 #if (SCMI_PROTOCOL_VERSION_BASE >= UINT32_C(0x20000))
     if ((parameters->agent_id > scmi_ctx.config->agent_count) &&
-        (parameters->agent_id != 0xFFFFFFFF))
+        (parameters->agent_id != 0xFFFFFFFF)) {
         goto exit;
+    }
 #else
-    if (parameters->agent_id > scmi_ctx.config->agent_count)
+    if (parameters->agent_id > scmi_ctx.config->agent_count) {
         goto exit;
+    }
 #endif
 
     return_values.status = SCMI_SUCCESS;
@@ -1078,8 +1106,9 @@ static int scmi_base_discover_agent_handler(fwk_id_t service_id,
          */
 
         status = get_agent_id(service_id, &agent_id);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return FWK_E_ACCESS;
+        }
 
         return_values.agent_id = (uint32_t)agent_id;
 
@@ -1258,8 +1287,9 @@ static int scmi_base_reset_agent_config(
 
     parameters = (const struct scmi_base_reset_agent_config_a2p *)payload;
 
-    if (parameters->agent_id > scmi_ctx.config->agent_count)
+    if (parameters->agent_id > scmi_ctx.config->agent_count) {
         goto exit;
+    }
 
     if (parameters->agent_id == MOD_SCMI_PLATFORM_ID) {
         return_values.status = SCMI_SUCCESS;
@@ -1313,11 +1343,13 @@ static int scmi_base_permissions_handler(
     int status;
 
     status = get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_ACCESS;
+    }
 
-    if (message_id < 3)
+    if (message_id < 3) {
         return FWK_SUCCESS;
+    }
 
     /*
      * Check that the agent has permissions to access the message.
@@ -1325,10 +1357,11 @@ static int scmi_base_permissions_handler(
     perms = scmi_ctx.res_perms_api->agent_has_message_permission(
         agent_id, MOD_SCMI_PROTOCOL_ID_BASE, message_id);
 
-    if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
+    if (perms == MOD_RES_PERMS_ACCESS_ALLOWED) {
         return FWK_SUCCESS;
-    else
+    } else {
         return FWK_E_ACCESS;
+    }
 }
 
 #endif
@@ -1380,12 +1413,14 @@ static int scmi_init(fwk_id_t module_id, unsigned int service_count,
     unsigned int agent_idx;
     const struct mod_scmi_agent *agent;
 
-    if (config == NULL)
+    if (config == NULL) {
         return FWK_E_PARAM;
+    }
 
     if ((config->agent_count == 0) ||
-        (config->agent_count > MOD_SCMI_AGENT_ID_MAX))
+        (config->agent_count > MOD_SCMI_AGENT_ID_MAX)) {
         return FWK_E_PARAM;
+    }
 
     /*
      * Loop over the agent descriptors. The MOD_SCMI_PLATFORM_ID(0) entry of
@@ -1395,8 +1430,9 @@ static int scmi_init(fwk_id_t module_id, unsigned int service_count,
          agent_idx <= config->agent_count;
          agent_idx++) {
         agent = &config->agent_table[agent_idx];
-        if (agent->type >= SCMI_AGENT_TYPE_COUNT)
+        if (agent->type >= SCMI_AGENT_TYPE_COUNT) {
             return FWK_E_PARAM;
+        }
     }
 
     scmi_ctx.protocol_table = fwk_mm_calloc(
@@ -1424,8 +1460,9 @@ static int scmi_service_init(fwk_id_t service_id, unsigned int unused,
     struct scmi_service_ctx *ctx;
 
     if ((config->scmi_agent_id == MOD_SCMI_PLATFORM_ID) ||
-        (config->scmi_agent_id > scmi_ctx.config->agent_count))
+        (config->scmi_agent_id > scmi_ctx.config->agent_count)) {
         return FWK_E_PARAM;
+    }
 
     ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(service_id)];
     ctx->config = config;
@@ -1448,21 +1485,24 @@ static int scmi_bind(fwk_id_t id, unsigned int round)
     uint8_t scmi_protocol_id;
 
     if (round == 0) {
-        if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+        if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
             return FWK_SUCCESS;
+        }
 
         ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(id)];
         status = fwk_module_bind(ctx->config->transport_id,
                                  ctx->config->transport_api_id, &transport_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         if ((transport_api->get_secure == NULL) ||
             (transport_api->get_max_payload_size == NULL) ||
             (transport_api->get_message_header == NULL) ||
             (transport_api->get_payload == NULL) ||
-            (transport_api->write_payload == NULL))
+            (transport_api->write_payload == NULL)) {
             return FWK_E_DATA;
+        }
 
         ctx->transport_api = transport_api;
         ctx->transport_id = ctx->config->transport_id;
@@ -1472,8 +1512,9 @@ static int scmi_bind(fwk_id_t id, unsigned int round)
         return FWK_SUCCESS;
     }
 
-    if (fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT))
+    if (fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
         return FWK_SUCCESS;
+    }
 
     for (protocol_idx = 0;
          protocol_idx < scmi_ctx.protocol_count; protocol_idx++) {
@@ -1482,19 +1523,23 @@ static int scmi_bind(fwk_id_t id, unsigned int round)
 
         status = fwk_module_bind(protocol->id,
             FWK_ID_API(fwk_id_get_module_idx(protocol->id), 0), &protocol_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         if ((protocol_api->get_scmi_protocol_id == NULL) ||
-            (protocol_api->message_handler == NULL))
+            (protocol_api->message_handler == NULL)) {
             return FWK_E_DATA;
+        }
         status = protocol_api->get_scmi_protocol_id(protocol->id,
                                                     &scmi_protocol_id);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
-        if (scmi_ctx.scmi_protocol_id_to_idx[scmi_protocol_id] != 0)
+        if (scmi_ctx.scmi_protocol_id_to_idx[scmi_protocol_id] != 0) {
             return FWK_E_STATE;
+        }
 
         scmi_ctx.scmi_protocol_id_to_idx[scmi_protocol_id] =
             protocol_idx + PROTOCOL_TABLE_RESERVED_ENTRIES_COUNT;
@@ -1506,8 +1551,9 @@ static int scmi_bind(fwk_id_t id, unsigned int round)
         FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
         FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS, MOD_RES_PERM_RESOURCE_PERMS),
         &scmi_ctx.res_perms_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 #endif
 
     return FWK_SUCCESS;
@@ -1523,11 +1569,13 @@ static int scmi_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
 
     switch (api_idx) {
     case MOD_SCMI_API_IDX_PROTOCOL:
-        if (!fwk_id_is_type(target_id, FWK_ID_TYPE_MODULE))
+        if (!fwk_id_is_type(target_id, FWK_ID_TYPE_MODULE)) {
             return FWK_E_SUPPORT;
+        }
 
-        if (scmi_ctx.protocol_count >= scmi_ctx.config->protocol_count_max)
+        if (scmi_ctx.protocol_count >= scmi_ctx.config->protocol_count_max) {
             return FWK_E_NOMEM;
+        }
 
         scmi_ctx.protocol_table[PROTOCOL_TABLE_RESERVED_ENTRIES_COUNT +
                                 scmi_ctx.protocol_count++].id = source_id;
@@ -1535,12 +1583,14 @@ static int scmi_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
         break;
 
     case MOD_SCMI_API_IDX_TRANSPORT:
-        if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT))
+        if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT)) {
             return FWK_E_SUPPORT;
+        }
 
         ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(target_id)];
-        if (!fwk_id_is_equal(source_id, ctx->transport_id))
+        if (!fwk_id_is_equal(source_id, ctx->transport_id)) {
             return FWK_E_ACCESS;
+        }
 
         *api = &mod_scmi_from_transport_api;
         break;
@@ -1737,8 +1787,9 @@ static int scmi_process_notification(const struct fwk_event *event,
     fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT));
 
     config = fwk_module_get_data(event->target_id);
-    if (config == NULL)
+    if (config == NULL) {
         return FWK_E_PARAM;
+    }
 
     fwk_assert(fwk_id_is_equal(event->id,
                                config->transport_notification_init_id));
