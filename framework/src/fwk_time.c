@@ -26,8 +26,9 @@ FWK_CONSTRUCTOR void fwk_time_init(void)
 
 fwk_timestamp_t fwk_time_current(void)
 {
-    if (fwk_time_ctx.driver.timestamp == NULL)
+    if (fwk_time_ctx.driver.timestamp == NULL) {
         return FWK_NS(0);
+    }
 
     return fwk_time_ctx.driver.timestamp(fwk_time_ctx.driver_ctx);
 }

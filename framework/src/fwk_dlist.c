@@ -56,8 +56,9 @@ struct fwk_dlist_node *__fwk_dlist_pop_head(struct fwk_dlist *list)
 
     list->head->prev = (struct fwk_dlist_node *)list;
 
-    if (popped != NULL)
+    if (popped != NULL) {
         popped->prev = NULL;
+    }
 
     return popped;
 }

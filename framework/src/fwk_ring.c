@@ -43,10 +43,11 @@ size_t fwk_ring_get_length(const struct fwk_ring *ring)
 {
     fwk_assert(ring != NULL);
 
-    if ((ring->tail >= ring->head) && !ring->full)
+    if ((ring->tail >= ring->head) && !ring->full) {
         return (ring->tail - ring->head);
-    else
+    } else {
         return ((ring->capacity - ring->head) + ring->tail);
+    }
 }
 
 size_t fwk_ring_get_free(const struct fwk_ring *ring)
@@ -96,12 +97,13 @@ size_t fwk_ring_peek(
     fwk_assert(buffer != NULL);
 
     buffer_size = FWK_MIN(buffer_size, fwk_ring_get_length(ring));
-    if (buffer_size == 0)
+    if (buffer_size == 0) {
         return buffer_size;
+    }
 
-    if (fwk_ring_offset(ring, ring->head + buffer_size) > ring->head)
+    if (fwk_ring_offset(ring, ring->head + buffer_size) > ring->head) {
         memcpy(buffer, ring->storage + ring->head, buffer_size);
-    else {
+    } else {
         size_t chunk_size = ring->capacity - ring->head;
 
         memcpy(buffer, ring->storage + ring->head, chunk_size);
@@ -121,8 +123,9 @@ size_t fwk_ring_push(
     fwk_assert(ring != NULL);
     fwk_assert(buffer != NULL);
 
-    if (buffer_size == 0)
+    if (buffer_size == 0) {
         return buffer_size;
+    }
 
     if (buffer_size > ring->capacity) {
         /*
@@ -136,9 +139,9 @@ size_t fwk_ring_push(
 
     remaining = fwk_ring_get_free(ring);
 
-    if (fwk_ring_offset(ring, ring->tail + buffer_size) > ring->tail)
+    if (fwk_ring_offset(ring, ring->tail + buffer_size) > ring->tail) {
         memcpy(ring->storage + ring->tail, buffer, buffer_size);
-    else {
+    } else {
         size_t chunk_size = ring->capacity - ring->tail;
 
         memcpy(ring->storage + ring->tail, buffer, chunk_size);

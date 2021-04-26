@@ -82,20 +82,23 @@ int fwk_io_init(void)
         } else {
             status =
                 fwk_io_open(&stdin_stream, FMW_IO_STDIN_ID, FWK_IO_MODE_READ);
-            if (fwk_expect(status == FWK_SUCCESS))
+            if (fwk_expect(status == FWK_SUCCESS)) {
                 fwk_io_stdin = &stdin_stream;
+            }
         }
     }
 
     if (configure_stdout && !stdout_is_stdin) {
         status =
             fwk_io_open(&stdout_stream, FMW_IO_STDOUT_ID, FWK_IO_MODE_WRITE);
-        if (fwk_expect(status == FWK_SUCCESS))
+        if (fwk_expect(status == FWK_SUCCESS)) {
             fwk_io_stdout = &stdout_stream;
+        }
     }
 
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         status = FWK_E_DEVICE;
+    }
 
     return status;
 }
@@ -110,8 +113,9 @@ int fwk_io_open(
     bool read = (((unsigned int)mode & (unsigned int)FWK_IO_MODE_READ) != 0U);
     bool write = (((unsigned int)mode & (unsigned int)FWK_IO_MODE_WRITE) != 0U);
 
-    if (!fwk_expect(stream != NULL))
+    if (!fwk_expect(stream != NULL)) {
         return FWK_E_PARAM;
+    }
 
     *stream = (struct fwk_io_stream){
         .adapter = NULL,
@@ -119,27 +123,33 @@ int fwk_io_open(
         .mode = mode,
     };
 
-    if (!fwk_expect(read || write))
+    if (!fwk_expect(read || write)) {
         return FWK_E_PARAM; /* Neither reading nor writing requested */
+    }
 
     status = fwk_module_adapter(&stream->adapter, id);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return FWK_E_PARAM; /* System entity doesn't exist */
+    }
 
     fwk_assert(stream->adapter != NULL);
 
-    if (!fwk_expect(stream->adapter->open != NULL))
+    if (!fwk_expect(stream->adapter->open != NULL)) {
         return FWK_E_SUPPORT; /* Stream adapter is not implemented */
+    }
 
-    if (!fwk_expect(!read || (stream->adapter->getch != NULL)))
+    if (!fwk_expect(!read || (stream->adapter->getch != NULL))) {
         return FWK_E_SUPPORT; /* Reads requested but no read interface */
+    }
 
-    if (!fwk_expect(!write || (stream->adapter->putch != NULL)))
+    if (!fwk_expect(!write || (stream->adapter->putch != NULL))) {
         return FWK_E_SUPPORT; /* Writes requested but no write interface */
+    }
 
     status = stream->adapter->open(stream);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_HANDLER;
+    }
 
     return FWK_SUCCESS;
 }
@@ -148,29 +158,34 @@ int fwk_io_getch(const struct fwk_io_stream *stream, char *ch)
 {
     int status;
 
-    if (!fwk_expect(stream != NULL))
+    if (!fwk_expect(stream != NULL)) {
         return FWK_E_PARAM;
+    }
 
-    if (!fwk_expect(ch != NULL))
+    if (!fwk_expect(ch != NULL)) {
         return FWK_E_PARAM;
+    }
 
     *ch = 0;
 
-    if (!fwk_expect(stream->adapter != NULL))
+    if (!fwk_expect(stream->adapter != NULL)) {
         return FWK_E_STATE; /* The stream is not open */
+    }
 
     if (!fwk_expect(
             (((unsigned int)stream->mode) & ((unsigned int)FWK_IO_MODE_READ)) !=
-            0U))
+            0U)) {
         return FWK_E_SUPPORT; /* Stream not open for read operations */
+    }
 
     fwk_assert(stream->adapter->getch != NULL);
 
     status = stream->adapter->getch(stream, ch);
-    if (status == FWK_PENDING)
+    if (status == FWK_PENDING) {
         return FWK_PENDING;
-    else if (status != FWK_SUCCESS)
+    } else if (status != FWK_SUCCESS) {
         return FWK_E_HANDLER;
+    }
 
     return FWK_SUCCESS;
 }
@@ -179,22 +194,26 @@ int fwk_io_putch(const struct fwk_io_stream *stream, char ch)
 {
     int status;
 
-    if (!fwk_expect(stream != NULL))
+    if (!fwk_expect(stream != NULL)) {
         return FWK_E_PARAM;
+    }
 
-    if (!fwk_expect(stream->adapter != NULL))
+    if (!fwk_expect(stream->adapter != NULL)) {
         return FWK_E_STATE; /* The stream is not open */
+    }
 
     if (!fwk_expect(
             (((unsigned int)stream->mode) &
-             ((unsigned int)FWK_IO_MODE_WRITE)) != 0U))
+             ((unsigned int)FWK_IO_MODE_WRITE)) != 0U)) {
         return FWK_E_SUPPORT; /* Stream not open for read operations */
+    }
 
     fwk_assert(stream->adapter->putch != NULL);
 
     status = stream->adapter->putch(stream, ch);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_HANDLER;
+    }
 
     return FWK_SUCCESS;
 }
@@ -210,19 +229,23 @@ int fwk_io_read(
 
     char *cbuffer = buffer;
 
-    if (read != NULL)
+    if (read != NULL) {
         *read = 0;
-
-    for (size_t i = 0; (i < count) && (status == FWK_SUCCESS); i++) {
-        for (size_t j = 0; (j < size) && (status == FWK_SUCCESS); j++)
-            status = fwk_io_getch(stream, cbuffer++);
-
-        if ((status == FWK_SUCCESS) && (read != NULL))
-            *read += 1;
     }
 
-    if ((status == FWK_PENDING) && (read == NULL))
+    for (size_t i = 0; (i < count) && (status == FWK_SUCCESS); i++) {
+        for (size_t j = 0; (j < size) && (status == FWK_SUCCESS); j++) {
+            status = fwk_io_getch(stream, cbuffer++);
+        }
+
+        if ((status == FWK_SUCCESS) && (read != NULL)) {
+            *read += 1;
+        }
+    }
+
+    if ((status == FWK_PENDING) && (read == NULL)) {
         return FWK_E_DATA; /* Reached end-of-stream */
+    }
 
     return status;
 }
@@ -238,18 +261,22 @@ int fwk_io_write(
 
     const char *cbuffer = buffer;
 
-    if (!fwk_expect(cbuffer != NULL))
+    if (!fwk_expect(cbuffer != NULL)) {
         return FWK_E_PARAM;
+    }
 
-    if (written != NULL)
+    if (written != NULL) {
         *written = 0;
+    }
 
     for (size_t i = 0; (i < count) && (status == FWK_SUCCESS); i++) {
-        for (size_t j = 0; (j < size) && (status == FWK_SUCCESS); j++)
+        for (size_t j = 0; (j < size) && (status == FWK_SUCCESS); j++) {
             status = fwk_io_putch(stream, *cbuffer++);
+        }
 
-        if ((status == FWK_SUCCESS) && (written != NULL))
+        if ((status == FWK_SUCCESS) && (written != NULL)) {
             *written += 1;
+        }
     }
 
     return status;
@@ -259,14 +286,17 @@ int fwk_io_close(struct fwk_io_stream *stream)
 {
     int status;
 
-    if (!fwk_expect(stream != NULL))
+    if (!fwk_expect(stream != NULL)) {
         return FWK_E_PARAM;
+    }
 
-    if (!fwk_expect(stream->adapter != NULL))
+    if (!fwk_expect(stream->adapter != NULL)) {
         return FWK_SUCCESS; /* The stream is not open */
+    }
 
-    if (stream->adapter->close == NULL)
+    if (stream->adapter->close == NULL) {
         return FWK_SUCCESS; /* Nothing else to do */
+    }
 
     status = stream->adapter->close(stream);
 
@@ -276,8 +306,9 @@ int fwk_io_close(struct fwk_io_stream *stream)
         .mode = 0,
     };
 
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_HANDLER;
+    }
 
     return FWK_SUCCESS;
 }
@@ -286,8 +317,9 @@ int fwk_io_puts(
     const struct fwk_io_stream *restrict stream,
     const char *restrict str)
 {
-    if (!fwk_expect(str != NULL))
+    if (!fwk_expect(str != NULL)) {
         return FWK_E_PARAM;
+    }
 
     return fwk_io_write(stream, NULL, str, sizeof(char), strlen(str));
 }
@@ -304,25 +336,29 @@ int fwk_io_vprintf(
 
     char *buffer;
 
-    if (!fwk_expect(format != NULL))
+    if (!fwk_expect(format != NULL)) {
         return FWK_E_PARAM;
+    }
 
     va_copy(length_args, args);
     length = vsnprintf(NULL, 0, format, length_args);
     va_end(length_args);
 
-    if (length < 0) /* Possibly invalid format string? */
+    if (length < 0) { /* Possibly invalid format string? */
         return FWK_E_STATE;
+    }
 
     buffer = fwk_mm_alloc_notrap(sizeof(buffer[0]), length + 1);
-    if (buffer == NULL) /* Not enough memory for the string buffer */
+    if (buffer == NULL) { /* Not enough memory for the string buffer */
         return FWK_E_NOMEM;
+    }
 
     length = vsnprintf(buffer, length + 1, format, args);
-    if (length >= 0)
+    if (length >= 0) {
         status = fwk_io_puts(stream, buffer); /* Write out the buffer */
-    else
+    } else {
         status = FWK_E_STATE;
+    }
 
     fwk_mm_free(buffer);
 

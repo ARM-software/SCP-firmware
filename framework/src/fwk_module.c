@@ -67,8 +67,9 @@ static size_t fwk_module_count_elements(const struct fwk_element *elements)
 {
     size_t count = 0;
 
-    for (; elements[count].name != NULL; count++)
+    for (; elements[count].name != NULL; count++) {
         continue;
+    }
 
     return count;
 }
@@ -77,11 +78,13 @@ static size_t fwk_module_count_elements(const struct fwk_element *elements)
 static void fwk_module_init_subscriptions(struct fwk_dlist **list, size_t count)
 {
     *list = fwk_mm_calloc(count, sizeof((*list)[0]));
-    if (!fwk_expect(*list != NULL))
+    if (!fwk_expect(*list != NULL)) {
         fwk_trap();
+    }
 
-    for (size_t i = 0; i < count; i++)
+    for (size_t i = 0; i < count; i++) {
         fwk_list_init(&((*list)[i]));
+    }
 }
 #endif
 
@@ -116,8 +119,9 @@ static void fwk_module_init_element_ctxs(
 
     ctx->element_ctx_table =
         fwk_mm_calloc(ctx->element_count, sizeof(ctx->element_ctx_table[0]));
-    if (!fwk_expect(ctx->element_ctx_table != NULL))
+    if (!fwk_expect(ctx->element_ctx_table != NULL)) {
         fwk_trap();
+    }
 
     for (size_t i = 0; i < ctx->element_count; i++) {
         fwk_module_init_element_ctx(
@@ -177,8 +181,9 @@ static void fwk_module_init_elements(struct fwk_module_ctx *ctx)
 
     const struct fwk_module *desc = ctx->desc;
 
-    if (!fwk_expect(desc->element_init != NULL))
+    if (!fwk_expect(desc->element_init != NULL)) {
         fwk_trap();
+    }
 
     for (size_t i = 0; i < ctx->element_count; i++) {
         fwk_id_t element_id = fwk_id_build_element_id(ctx->id, i);
@@ -188,13 +193,15 @@ static void fwk_module_init_elements(struct fwk_module_ctx *ctx)
         fwk_module_ctx.bind_id = element_id;
 
         /* Each element must have a valid pointer to specific data */
-        if (!fwk_expect(element->data != NULL))
+        if (!fwk_expect(element->data != NULL)) {
             fwk_trap();
+        }
 
         status = desc->element_init(
             element_id, element->sub_element_count, element->data);
-        if (!fwk_expect(status == FWK_SUCCESS))
+        if (!fwk_expect(status == FWK_SUCCESS)) {
             fwk_trap();
+        }
 
         ctx->state = FWK_MODULE_STATE_INITIALIZED;
     }
@@ -207,30 +214,36 @@ static void fwk_module_init_module(struct fwk_module_ctx *ctx)
     const struct fwk_module *desc = ctx->desc;
     const struct fwk_module_config *config = ctx->config;
 
-    if (!fwk_expect(desc->name != NULL))
+    if (!fwk_expect(desc->name != NULL)) {
         fwk_trap();
+    }
 
-    if (!fwk_expect(desc->type < FWK_MODULE_TYPE_COUNT))
+    if (!fwk_expect(desc->type < FWK_MODULE_TYPE_COUNT)) {
         fwk_trap();
+    }
 
-    if (!fwk_expect(desc->init != NULL))
+    if (!fwk_expect(desc->init != NULL)) {
         fwk_trap();
+    }
 
     if (!fwk_expect(
-            (desc->api_count == 0) == (desc->process_bind_request == NULL)))
+            (desc->api_count == 0) == (desc->process_bind_request == NULL))) {
         fwk_trap();
+    }
 
     if (config->elements.type == FWK_MODULE_ELEMENTS_TYPE_DYNAMIC) {
         size_t notification_count = 0;
 
         const struct fwk_element *elements = NULL;
 
-        if (!fwk_expect(config->elements.generator != NULL))
+        if (!fwk_expect(config->elements.generator != NULL)) {
             fwk_trap();
+        }
 
         elements = config->elements.generator(ctx->id);
-        if (!fwk_expect(elements != NULL))
+        if (!fwk_expect(elements != NULL)) {
             fwk_trap();
+        }
 
 #ifdef BUILD_HAS_NOTIFICATION
         notification_count = desc->notification_count;
@@ -240,16 +253,19 @@ static void fwk_module_init_module(struct fwk_module_ctx *ctx)
     }
 
     status = desc->init(ctx->id, ctx->element_count, config->data);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         fwk_trap();
+    }
 
-    if (ctx->element_count > 0)
+    if (ctx->element_count > 0) {
         fwk_module_init_elements(ctx);
+    }
 
     if (desc->post_init != NULL) {
         status = desc->post_init(ctx->id);
-        if (!fwk_expect(status == FWK_SUCCESS))
+        if (!fwk_expect(status == FWK_SUCCESS)) {
             fwk_trap();
+        }
     }
 
     ctx->state = FWK_MODULE_STATE_INITIALIZED;
@@ -257,8 +273,9 @@ static void fwk_module_init_module(struct fwk_module_ctx *ctx)
 
 static void fwk_module_init_modules(void)
 {
-    for (unsigned int i = 0U; i < (unsigned int)FWK_MODULE_IDX_COUNT; i++)
+    for (unsigned int i = 0U; i < (unsigned int)FWK_MODULE_IDX_COUNT; i++) {
         fwk_module_init_module(&fwk_module_ctx.module_ctx_table[i]);
+    }
 }
 
 static int fwk_module_bind_elements(
@@ -310,8 +327,9 @@ static int fwk_module_bind_module(
         return status;
     }
 
-    if (round == FWK_MODULE_BIND_ROUND_MAX)
+    if (round == FWK_MODULE_BIND_ROUND_MAX) {
         module_ctx->state = FWK_MODULE_STATE_BOUND;
+    }
 
     return fwk_module_bind_elements(module_ctx, round);
 }
@@ -325,8 +343,9 @@ static int fwk_module_bind_modules(unsigned int round)
     for (module_idx = 0; module_idx < FWK_MODULE_IDX_COUNT; module_idx++) {
         module_ctx = &fwk_module_ctx.module_ctx_table[module_idx];
         status = fwk_module_bind_module(module_ctx, round);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return FWK_SUCCESS;
@@ -387,8 +406,9 @@ static int start_modules(void)
     for (module_idx = 0; module_idx < FWK_MODULE_IDX_COUNT; module_idx++) {
         module_ctx = &fwk_module_ctx.module_ctx_table[module_idx];
         status = fwk_module_start_module(module_ctx);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return FWK_SUCCESS;
@@ -407,8 +427,9 @@ int fwk_module_start(void)
     CLI_DEBUGGER();
 
     status = __fwk_thread_init(FWK_MODULE_EVENT_COUNT);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     fwk_module_ctx.stage = MODULE_STAGE_INITIALIZE;
     fwk_module_init_modules();
@@ -417,14 +438,16 @@ int fwk_module_start(void)
     for (bind_round = 0; bind_round <= FWK_MODULE_BIND_ROUND_MAX;
          bind_round++) {
         status = fwk_module_bind_modules(bind_round);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     fwk_module_ctx.stage = MODULE_STAGE_START;
     status = start_modules();
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     fwk_module_ctx.initialized = true;
 
@@ -449,17 +472,19 @@ struct fwk_element_ctx *fwk_module_get_element_ctx(fwk_id_t element_id)
 
 int fwk_module_get_state(fwk_id_t id, enum fwk_module_state *state)
 {
-    if (state == NULL)
+    if (state == NULL) {
         return FWK_E_PARAM;
+    }
 
     if (fwk_module_is_valid_element_id(id) ||
-        fwk_module_is_valid_sub_element_id(id))
+        fwk_module_is_valid_sub_element_id(id)) {
         *state = fwk_module_get_element_ctx(id)->state;
-    else {
-        if (fwk_module_is_valid_module_id(id))
+    } else {
+        if (fwk_module_is_valid_module_id(id)) {
             *state = fwk_module_get_ctx(id)->state;
-        else
+        } else {
             return FWK_E_PARAM;
+        }
     }
 
     return FWK_SUCCESS;
@@ -472,11 +497,13 @@ void fwk_module_reset(void)
 
 bool fwk_module_is_valid_module_id(fwk_id_t id)
 {
-    if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+    if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         return false;
+    }
 
-    if (fwk_id_get_module_idx(id) >= FWK_MODULE_IDX_COUNT)
+    if (fwk_id_get_module_idx(id) >= FWK_MODULE_IDX_COUNT) {
         return false;
+    }
 
     return true;
 }
@@ -485,12 +512,14 @@ bool fwk_module_is_valid_element_id(fwk_id_t id)
 {
     unsigned int module_idx;
 
-    if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT))
+    if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
         return false;
+    }
 
     module_idx = fwk_id_get_module_idx(id);
-    if (module_idx >= FWK_MODULE_IDX_COUNT)
+    if (module_idx >= FWK_MODULE_IDX_COUNT) {
         return false;
+    }
 
     return (
         fwk_id_get_element_idx(id) <
@@ -503,17 +532,20 @@ bool fwk_module_is_valid_sub_element_id(fwk_id_t id)
     struct fwk_module_ctx *module_ctx;
     unsigned int element_idx;
 
-    if (!fwk_id_is_type(id, FWK_ID_TYPE_SUB_ELEMENT))
+    if (!fwk_id_is_type(id, FWK_ID_TYPE_SUB_ELEMENT)) {
         return false;
+    }
 
     module_idx = fwk_id_get_module_idx(id);
-    if (module_idx >= FWK_MODULE_IDX_COUNT)
+    if (module_idx >= FWK_MODULE_IDX_COUNT) {
         return false;
+    }
     module_ctx = &fwk_module_ctx.module_ctx_table[module_idx];
 
     element_idx = fwk_id_get_element_idx(id);
-    if (element_idx >= module_ctx->element_count)
+    if (element_idx >= module_ctx->element_count) {
         return false;
+    }
 
     return (fwk_id_get_sub_element_idx(id) <
             module_ctx->element_ctx_table[element_idx].sub_element_count);
@@ -542,12 +574,14 @@ bool fwk_module_is_valid_api_id(fwk_id_t id)
 {
     unsigned int module_idx;
 
-    if (!fwk_id_is_type(id, FWK_ID_TYPE_API))
+    if (!fwk_id_is_type(id, FWK_ID_TYPE_API)) {
         return false;
+    }
 
     module_idx = fwk_id_get_module_idx(id);
-    if (module_idx >= FWK_MODULE_IDX_COUNT)
+    if (module_idx >= FWK_MODULE_IDX_COUNT) {
         return false;
+    }
 
     return (
         fwk_id_get_api_idx(id) <
@@ -558,12 +592,14 @@ bool fwk_module_is_valid_event_id(fwk_id_t id)
 {
     unsigned int module_idx;
 
-    if (!fwk_id_is_type(id, FWK_ID_TYPE_EVENT))
+    if (!fwk_id_is_type(id, FWK_ID_TYPE_EVENT)) {
         return false;
+    }
 
     module_idx = fwk_id_get_module_idx(id);
-    if (module_idx >= FWK_MODULE_IDX_COUNT)
+    if (module_idx >= FWK_MODULE_IDX_COUNT) {
         return false;
+    }
 
     return (
         fwk_id_get_event_idx(id) <
@@ -575,12 +611,14 @@ bool fwk_module_is_valid_notification_id(fwk_id_t id)
 #ifdef BUILD_HAS_NOTIFICATION
     unsigned int module_idx;
 
-    if (!fwk_id_is_type(id, FWK_ID_TYPE_NOTIFICATION))
+    if (!fwk_id_is_type(id, FWK_ID_TYPE_NOTIFICATION)) {
         return false;
+    }
 
     module_idx = fwk_id_get_module_idx(id);
-    if (module_idx >= FWK_MODULE_IDX_COUNT)
+    if (module_idx >= FWK_MODULE_IDX_COUNT) {
         return false;
+    }
 
     return (
         fwk_id_get_notification_idx(id) <
@@ -592,26 +630,29 @@ bool fwk_module_is_valid_notification_id(fwk_id_t id)
 
 int fwk_module_get_element_count(fwk_id_t id)
 {
-    if (fwk_module_is_valid_module_id(id))
+    if (fwk_module_is_valid_module_id(id)) {
         return fwk_module_get_ctx(id)->element_count;
-    else
+    } else {
         return FWK_E_PARAM;
+    }
 }
 
 int fwk_module_get_sub_element_count(fwk_id_t element_id)
 {
-    if (fwk_module_is_valid_element_id(element_id))
+    if (fwk_module_is_valid_element_id(element_id)) {
         return fwk_module_get_element_ctx(element_id)->sub_element_count;
-    else
+    } else {
         return FWK_E_PARAM;
+    }
 }
 
 const char *fwk_module_get_name(fwk_id_t id)
 {
-    if (fwk_module_is_valid_element_id(id))
+    if (fwk_module_is_valid_element_id(id)) {
         return fwk_module_get_element_ctx(id)->desc->name;
-    else if (fwk_module_is_valid_module_id(id))
+    } else if (fwk_module_is_valid_module_id(id)) {
         return fwk_module_get_ctx(id)->desc->name;
+    }
 
     return NULL;
 }
@@ -619,10 +660,11 @@ const char *fwk_module_get_name(fwk_id_t id)
 const void *fwk_module_get_data(fwk_id_t id)
 {
     if (fwk_module_is_valid_element_id(id) ||
-        fwk_module_is_valid_sub_element_id(id))
+        fwk_module_is_valid_sub_element_id(id)) {
         return fwk_module_get_element_ctx(id)->desc->data;
-    else if (fwk_module_is_valid_module_id(id))
+    } else if (fwk_module_is_valid_module_id(id)) {
         return fwk_module_get_ctx(id)->config->data;
+    }
 
     return NULL;
 }
@@ -632,18 +674,21 @@ int fwk_module_bind(fwk_id_t target_id, fwk_id_t api_id, const void *api)
     int status = FWK_E_PARAM;
     struct fwk_module_ctx *module_ctx;
 
-    if (!fwk_module_is_valid_entity_id(target_id))
+    if (!fwk_module_is_valid_entity_id(target_id)) {
         goto error;
+    }
 
-    if (!fwk_module_is_valid_api_id(api_id))
+    if (!fwk_module_is_valid_api_id(api_id)) {
         goto error;
+    }
 
-    if (fwk_id_get_module_idx(target_id) !=
-        fwk_id_get_module_idx(api_id))
+    if (fwk_id_get_module_idx(target_id) != fwk_id_get_module_idx(api_id)) {
         goto error;
+    }
 
-    if (api == NULL)
+    if (api == NULL) {
         goto error;
+    }
 
     module_ctx = fwk_module_get_ctx(target_id);
 
@@ -678,13 +723,15 @@ int fwk_module_adapter(const struct fwk_io_adapter **adapter, fwk_id_t id)
 {
     unsigned int idx;
 
-    if (adapter == NULL)
+    if (adapter == NULL) {
         return FWK_E_PARAM;
+    }
 
     *adapter = NULL;
 
-    if (!fwk_module_is_valid_entity_id(id))
+    if (!fwk_module_is_valid_entity_id(id)) {
         return FWK_E_PARAM;
+    }
 
     idx = fwk_id_get_module_idx(id);
 

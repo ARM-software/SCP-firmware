@@ -33,13 +33,15 @@ static int fwk_arch_interrupt_init(int (*interrupt_init_handler)(
      * architecture layer.
      */
     status = interrupt_init_handler(&driver);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_PANIC;
+    }
 
     /* Initialize the interrupt management component */
     status = fwk_interrupt_init(driver);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_PANIC;
+    }
 
     return FWK_SUCCESS;
 }
@@ -48,30 +50,36 @@ int fwk_arch_init(const struct fwk_arch_init_driver *driver)
 {
     int status;
 
-    if (driver == NULL)
+    if (driver == NULL) {
         return FWK_E_PARAM;
+    }
 
-    if (driver->interrupt == NULL)
+    if (driver->interrupt == NULL) {
         return FWK_E_PARAM;
+    }
 
     fwk_module_init();
 
     status = fwk_io_init();
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return FWK_E_PANIC;
+    }
 
     status = fwk_log_init();
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return FWK_E_PANIC;
+    }
 
     /* Initialize interrupt management */
     status = fwk_arch_interrupt_init(driver->interrupt);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return FWK_E_PANIC;
+    }
 
     status = fwk_module_start();
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return FWK_E_PANIC;
+    }
 
     return FWK_SUCCESS;
 }
