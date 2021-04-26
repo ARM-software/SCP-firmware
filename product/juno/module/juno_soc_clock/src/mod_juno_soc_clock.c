@@ -77,12 +77,14 @@ static void pll_init(void)
                               SCP_CONFIG_SCP_STATUS_BIGINPLLLOCK;
 
     /* Release All system PLLs from reset */
-    for (pll_idx = 0; pll_idx < PLL_IDX_COUNT; pll_idx++)
+    for (pll_idx = 0; pll_idx < PLL_IDX_COUNT; pll_idx++) {
         SCC->PLL[pll_idx].REG0 &= ~PLL_REG0_PLL_RESET;
+    }
 
     /* Wait for PLLs to lock */
-    while ((SCP_CONFIG->SCP_STATUS & pll_mask) != pll_mask)
+    while ((SCP_CONFIG->SCP_STATUS & pll_mask) != pll_mask) {
         continue;
+    }
 }
 
 static void set_div(volatile uint32_t * const control_reg, uint32_t divider)
@@ -115,8 +117,9 @@ static int juno_soc_clock_init(fwk_id_t module_id, unsigned int clock_count,
     enum juno_idx_revision revision;
 
     status = juno_id_get_revision(&revision);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return status;
+    }
 
     pll_init();
 
@@ -158,8 +161,9 @@ static int juno_soc_clock_init(fwk_id_t module_id, unsigned int clock_count,
         CLOCK_RATE_SYSCLK / TRACECLKIN_CONTROL_CLOCK);
     set_div(&SCP_CONFIG->PCLKDBG_CONTROL, 1);
 
-    if (revision != JUNO_IDX_REVISION_R0)
+    if (revision != JUNO_IDX_REVISION_R0) {
         set_div(&SCC->SAXICLK, CLOCK_RATE_SYSCLK / SAXICLK_CLOCK);
+    }
     set_source(&SCC->SAXICLK, CLKSEL_SYSCLK);
 
     set_div(&SCC->FAXICLK, CLOCK_RATE_SYSCLK / FAXICLK_CLOCK);

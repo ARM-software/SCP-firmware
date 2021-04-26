@@ -167,8 +167,9 @@ static int process_pvt_calibration(struct pvt_sub_dev_ctx *sensor_ctx,
     int freq_b;
     int slope_m;
 
-    if ((cal_45C == 0) || (cal_85C == 0))
+    if ((cal_45C == 0) || (cal_85C == 0)) {
         return FWK_E_PARAM;
+    }
 
     /* Convert into kHz */
     freq_45 = cal_45C * 10;
@@ -176,8 +177,9 @@ static int process_pvt_calibration(struct pvt_sub_dev_ctx *sensor_ctx,
 
     /* Find the slope */
     slope_m = (freq_85 - freq_45) / (85 - 45);
-    if (!fwk_expect(slope_m != 0))
+    if (!fwk_expect(slope_m != 0)) {
         return FWK_E_PARAM;
+    }
 
     /* Find the intercept of the line */
     freq_b = freq_85 - (slope_m * 85);
@@ -189,16 +191,19 @@ static int process_pvt_calibration(struct pvt_sub_dev_ctx *sensor_ctx,
      * freq_fs must always be bigger than or equal to REFCLK_KHZ or
      * sample_window calculation won't work.
      */
-    if (freq_fs < REFCLK_KHZ)
+    if (freq_fs < REFCLK_KHZ) {
         return FWK_E_RANGE;
+    }
 
-    if (freq_fs == 0)
+    if (freq_fs == 0) {
         return FWK_E_PARAM;
+    }
 
     /* Calculate sample window to fit the full scale reading */
     sample_window = (SAMPLE_WINDOW_MASK * REFCLK_KHZ) / freq_fs;
-    if (sample_window > SAMPLE_WINDOW_MASK)
+    if (sample_window > SAMPLE_WINDOW_MASK) {
         return FWK_E_PARAM;
+    }
 
     /* Store constants for run-time calculations */
     sensor_ctx->slope_m = slope_m;
@@ -226,8 +231,9 @@ static int process_osc_calibration(struct pvt_sub_dev_ctx *sensor_ctx,
     unsigned int sample_window;
     unsigned int slope_m;
 
-    if ((cal_810 == 0) || (cal_900 == 0))
+    if ((cal_810 == 0) || (cal_900 == 0)) {
         return FWK_E_PARAM;
+    }
 
     /* Convert into kHz */
     freq_810 = cal_810 * 20;
@@ -246,16 +252,19 @@ static int process_osc_calibration(struct pvt_sub_dev_ctx *sensor_ctx,
      * freq_fs must be always bigger than or equal to REFCLK_KHZ or
      * sample_window calculation won't work.
      */
-    if (freq_fs < REFCLK_KHZ)
+    if (freq_fs < REFCLK_KHZ) {
         return FWK_E_RANGE;
+    }
 
-    if (freq_fs == 0)
+    if (freq_fs == 0) {
         return FWK_E_PARAM;
+    }
 
     /* Calculate sample window to fit the full scale reading */
     sample_window = (SAMPLE_WINDOW_MASK * REFCLK_KHZ) / freq_fs;
-    if (sample_window > SAMPLE_WINDOW_MASK)
+    if (sample_window > SAMPLE_WINDOW_MASK) {
         return FWK_E_PARAM;
+    }
 
     /* Store constants for the run-time calculations */
     sensor_ctx->slope_m = slope_m;
@@ -300,8 +309,9 @@ static void pvt_interrupt_handler(uintptr_t param)
 
     sensor_ctx->last_reading = osc_counter;
 
-    if (!fwk_expect(sensor_ctx->sample_window != 0))
+    if (!fwk_expect(sensor_ctx->sample_window != 0)) {
         goto exit;
+    }
 
     freq_khz = (osc_counter * REFCLK_KHZ) / sensor_ctx->sample_window;
 
@@ -311,10 +321,10 @@ static void pvt_interrupt_handler(uintptr_t param)
         sensor_ctx->slope_m;
 
     if (sensor_cfg->type == JUNO_PVT_TYPE_TEMP) {
-
         if ((mod_ctx.board_rev == JUNO_IDX_REVISION_R1) ||
-            (mod_ctx.board_rev == JUNO_IDX_REVISION_R2))
+            (mod_ctx.board_rev == JUNO_IDX_REVISION_R2)) {
             sensor_value -= R1_TEMP_OFFSET;
+        }
 
         value = (uint64_t)sensor_value;
         status = FWK_SUCCESS;
@@ -324,8 +334,9 @@ static void pvt_interrupt_handler(uintptr_t param)
 
         value = (uint64_t)sensor_value;
         status = FWK_SUCCESS;
-    } else
+    } else {
         status = FWK_E_PARAM;
+    }
 
 exit:
     event = (struct fwk_event) {
@@ -372,8 +383,9 @@ static int get_info(fwk_id_t id, struct mod_sensor_info *info)
     struct mod_juno_pvt_dev_config *sensor_cfg;
     struct pvt_dev_ctx *group_ctx;
 
-    if (mod_ctx.driver_is_disabled)
+    if (mod_ctx.driver_is_disabled) {
         return FWK_E_DEVICE;
+    }
 
     group_ctx = &dev_ctx[fwk_id_get_element_idx(id)];
     sensor_cfg = &group_ctx->sensor_cfg_table[fwk_id_get_sub_element_idx(id)];
@@ -392,14 +404,16 @@ static int get_value(fwk_id_t id, uint64_t *value)
     struct fwk_event read_req;
     int status;
 
-    if (mod_ctx.driver_is_disabled)
+    if (mod_ctx.driver_is_disabled) {
         return FWK_E_DEVICE;
+    }
 
     elt_idx = fwk_id_get_element_idx(id);
     group_ctx = &dev_ctx[elt_idx];
 
-    if (!group_ctx->pd_state_on)
+    if (!group_ctx->pd_state_on) {
         return FWK_E_PWRSTATE;
+    }
 
     if (fwk_id_is_equal(group_ctx->sensor_read_id, FWK_ID_NONE)) {
         /* No other sensors within the group are being read, mark this one */
@@ -418,8 +432,9 @@ static int get_value(fwk_id_t id, uint64_t *value)
         status = FWK_E_BUSY;
     }
 
-    if (status == FWK_SUCCESS)
+    if (status == FWK_SUCCESS) {
         return FWK_PENDING;
+    }
 
     return status;
 }
@@ -440,21 +455,25 @@ static int juno_pvt_init(fwk_id_t module_id,
     int status;
     enum juno_idx_platform plat;
 
-    if (element_count == 0)
+    if (element_count == 0) {
         return FWK_E_PARAM;
+    }
 
     dev_ctx = fwk_mm_calloc(element_count, sizeof(struct pvt_dev_ctx));
 
     status = juno_id_get_platform(&plat);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
-    if (plat == JUNO_IDX_PLATFORM_FVP)
+    if (plat == JUNO_IDX_PLATFORM_FVP) {
         mod_ctx.driver_is_disabled = true;
+    }
 
     status = juno_id_get_revision(&mod_ctx.board_rev);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     mod_ctx.elem_count = element_count;
 
@@ -467,12 +486,14 @@ static int juno_pvt_element_init(fwk_id_t element_id,
 {
     struct pvt_dev_ctx *group_ctx;
 
-    if (mod_ctx.driver_is_disabled)
+    if (mod_ctx.driver_is_disabled) {
         return FWK_SUCCESS;
+    }
 
     /* When no sub-elements are defined, the group is not defined */
-    if (sub_element_count == 0)
+    if (sub_element_count == 0) {
         return FWK_SUCCESS;
+    }
 
     group_ctx = &dev_ctx[fwk_id_get_element_idx(element_id)];
 
@@ -493,23 +514,25 @@ static int juno_pvt_bind(fwk_id_t id, unsigned int round)
     struct pvt_sub_dev_ctx *sensor_ctx;
 
     /* Bind in the second round */
-    if ((round == 0) ||
-        mod_ctx.driver_is_disabled ||
-        fwk_module_is_valid_module_id(id))
+    if ((round == 0) || mod_ctx.driver_is_disabled ||
+        fwk_module_is_valid_module_id(id)) {
         return FWK_SUCCESS;
+    }
 
     group_ctx = &dev_ctx[fwk_id_get_element_idx(id)];
 
     sub_element_count = fwk_module_get_sub_element_count(id);
-    if (sub_element_count < 0)
+    if (sub_element_count < 0) {
         return FWK_E_DATA;
+    }
 
     /*
      * When no sub-elements are defined, there sensor group does not require
      * binding.
      */
-    if (sub_element_count == 0)
+    if (sub_element_count == 0) {
         return FWK_SUCCESS;
+    }
 
     /*
      * Bind to sensor HAL module
@@ -523,8 +546,9 @@ static int juno_pvt_bind(fwk_id_t id, unsigned int round)
     status = fwk_module_bind(sensor_ctx->sensor_hal_id,
                              mod_sensor_api_id_driver_response,
                              &group_ctx->driver_response_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return FWK_SUCCESS;
 }
@@ -540,8 +564,9 @@ static int juno_pvt_process_bind_request(fwk_id_t source_id,
     if ((!fwk_module_is_valid_element_id(source_id)) ||
         (!fwk_module_is_valid_sub_element_id(target_id)) ||
         (fwk_id_get_module_idx(source_id) != FWK_MODULE_IDX_SENSOR) ||
-        (mod_ctx.driver_is_disabled))
+        (mod_ctx.driver_is_disabled)) {
         return FWK_E_ACCESS;
+    }
 
     group_ctx = &dev_ctx[fwk_id_get_element_idx(target_id)];
     sensor_ctx = &group_ctx->sensor_ctx_table[
@@ -565,8 +590,9 @@ static int pvt_start(fwk_id_t id)
     uint16_t calibration_b;
     uint8_t sub_elem_ix;
 
-    if (mod_ctx.driver_is_disabled)
+    if (mod_ctx.driver_is_disabled) {
         return FWK_SUCCESS;
+    }
 
     if (fwk_module_is_valid_module_id(id)) {
 
@@ -583,8 +609,9 @@ static int pvt_start(fwk_id_t id)
 
         status = fwk_notification_subscribe(
             mod_pd_notification_id_power_state_transition, dbgsys_pd_id, id);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         return FWK_SUCCESS;
     }
@@ -592,15 +619,17 @@ static int pvt_start(fwk_id_t id)
     group_ctx = &dev_ctx[fwk_id_get_element_idx(id)];
 
     sub_element_count = fwk_module_get_sub_element_count(id);
-    if (sub_element_count < 0)
+    if (sub_element_count < 0) {
         return FWK_E_DATA;
+    }
 
     /*
      * When no sub-elements are defined, there are no sensors to be
      * calibrated.
      */
-    if (sub_element_count == 0)
+    if (sub_element_count == 0) {
         return FWK_SUCCESS;
+    }
 
     sensor_cfg = group_ctx->sensor_cfg_table;
 
@@ -635,8 +664,9 @@ static int pvt_start(fwk_id_t id)
             break;
         }
 
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             goto error;
+        }
     }
 
     sensor_cfg = group_ctx->sensor_cfg_table;
@@ -645,15 +675,17 @@ static int pvt_start(fwk_id_t id)
                 mod_pd_notification_id_power_state_pre_transition,
                 sensor_cfg->group->pd_id,
                 id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_notification_subscribe(
                 mod_pd_notification_id_power_state_transition,
                 sensor_cfg->group->pd_id,
                 id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return FWK_SUCCESS;
 
@@ -676,8 +708,9 @@ static int unsubscribe_cluster_notif(void)
     int status;
 
     for (unsigned int i = 0; i < mod_ctx.elem_count; i++) {
-        if ((i != JUNO_PVT_GROUP_BIG) && (i != JUNO_PVT_GROUP_LITTLE))
+        if ((i != JUNO_PVT_GROUP_BIG) && (i != JUNO_PVT_GROUP_LITTLE)) {
             continue;
+        }
 
         group_ctx = &dev_ctx[i];
 
@@ -689,15 +722,17 @@ static int unsubscribe_cluster_notif(void)
             mod_pd_notification_id_power_state_pre_transition,
             sensor_cfg->group->pd_id,
             id);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         status = fwk_notification_unsubscribe(
             mod_pd_notification_id_power_state_transition,
             sensor_cfg->group->pd_id,
             id);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         group_ctx->pd_state_on = true;
     }
@@ -737,14 +772,16 @@ static int pvt_process_event(const struct fwk_event *event,
         group = sensor_cfg->group;
 
         if ((group->regs->GROUP_INFO & PVTGROUP_GROUP_INFO_LOC) !=
-            PVTGROUP_GROUP_INFO_LOC_GROUP_LITE)
+            PVTGROUP_GROUP_INFO_LOC_GROUP_LITE) {
             return respond(group_ctx);
+        }
 
         sensor_count = (group->regs->GROUP_INFO &
                         PVTGROUP_SENSOR_COUNT_MASK) >> 1;
 
-        if (sensor_count < group->sensor_count)
+        if (sensor_count < group->sensor_count) {
             return respond(group_ctx);
+        }
 
         /*
          * Configure the group before reading a sensor within it.
@@ -757,18 +794,21 @@ static int pvt_process_event(const struct fwk_event *event,
         group->regs->SSI_RATE_DIV = 0;
 
         status = fwk_interrupt_clear_pending(group->irq);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return respond(group_ctx);
+        }
 
         status = fwk_interrupt_set_isr_param(group->irq,
                                              &pvt_interrupt_handler,
                                              (uintptr_t)group_ctx);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return respond(group_ctx);
+        }
 
         status = fwk_interrupt_enable(group->irq);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return respond(group_ctx);
+        }
 
         /* Initiate measurement for group/sensor */
         group->regs->SENSOR_ENABLE = (uint32_t)(1U << sensor_cfg->index);
@@ -794,14 +834,16 @@ static int pvt_process_event(const struct fwk_event *event,
                 status = fwk_thread_get_delayed_response(event->target_id,
                                                          group_ctx->cookie,
                                                          &resp_notif);
-                if (status != FWK_SUCCESS)
+                if (status != FWK_SUCCESS) {
                     return FWK_E_PANIC;
+                }
 
                 pd_resp_params->status = FWK_SUCCESS;
 
                 status = fwk_thread_put_event(&resp_notif);
-                if (status != FWK_SUCCESS)
+                if (status != FWK_SUCCESS) {
                     return FWK_E_PANIC;
+                }
             }
 
             return FWK_SUCCESS;
@@ -829,8 +871,9 @@ static int pvt_process_notification(const struct fwk_event *event,
             (struct mod_pd_power_state_transition_notification_params *)
                 event->params;
 
-        if (post_state_params->state == MOD_PD_STATE_ON)
+        if (post_state_params->state == MOD_PD_STATE_ON) {
             return unsubscribe_cluster_notif();
+        }
 
         return FWK_SUCCESS;
     }
@@ -842,8 +885,9 @@ static int pvt_process_notification(const struct fwk_event *event,
         pre_state_params =
             (struct mod_pd_power_state_pre_transition_notification_params *)
                 event->params;
-        if (pre_state_params->target_state == MOD_PD_STATE_OFF)
+        if (pre_state_params->target_state == MOD_PD_STATE_OFF) {
             group_ctx->pd_state_on = false;
+        }
 
         if (!fwk_id_is_equal(group_ctx->sensor_read_id, FWK_ID_NONE)) {
             /* Read request ongoing, delay the response */
@@ -869,10 +913,12 @@ static int pvt_process_notification(const struct fwk_event *event,
         post_state_params =
             (struct mod_pd_power_state_transition_notification_params *)
                 event->params;
-        if (post_state_params->state == MOD_PD_STATE_ON)
+        if (post_state_params->state == MOD_PD_STATE_ON) {
             group_ctx->pd_state_on = true;
-    } else
+        }
+    } else {
         return FWK_E_PARAM;
+    }
 
     return FWK_SUCCESS;
 }

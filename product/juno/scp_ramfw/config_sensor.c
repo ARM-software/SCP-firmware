@@ -322,12 +322,13 @@ static const struct fwk_element *get_sensor_element_table(fwk_id_t module_id)
     struct fwk_element *element_table;
 
     status = juno_id_get_platform(&platform_id);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return NULL;
+    }
 
-    if (platform_id == JUNO_IDX_PLATFORM_FVP)
+    if (platform_id == JUNO_IDX_PLATFORM_FVP) {
         return sensor_element_table_fvp;
-    else {
+    } else {
         sensor_elem_table_size = FWK_ARRAY_SIZE(sensor_element_table_r0);
 
         #if USE_FULL_SET_SENSORS
@@ -369,8 +370,9 @@ static const struct fwk_element *get_sensor_element_table(fwk_id_t module_id)
         element_table = fwk_mm_calloc(
             (sensor_elem_table_size + 1),
             sizeof(struct fwk_element));
-        if (element_table == NULL)
+        if (element_table == NULL) {
             return NULL;
+        }
 
         memcpy(element_table,
                sensor_element_table_r0,

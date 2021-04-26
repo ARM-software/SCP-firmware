@@ -361,8 +361,9 @@ static int juno_soc_clock_set_rate(fwk_id_t clock_id,
 
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
-    if (ctx->state == MOD_CLOCK_STATE_STOPPED)
+    if (ctx->state == MOD_CLOCK_STATE_STOPPED) {
         return FWK_E_STATE;
+    }
 
     /*
      * Look up the divider and source settings. We do not perform any rounding
@@ -370,12 +371,14 @@ static int juno_soc_clock_set_rate(fwk_id_t clock_id,
      * be refused with an FWK_E_PARAM error code.
      */
     status = get_rate_entry(ctx, rate, &rate_entry);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_PARAM;
+    }
 
     status = set_rate(ctx, rate_entry);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_DEVICE;
+    }
 
     ctx->current_rate_index = rate_entry - ctx->config->rate_table;
 
@@ -391,10 +394,11 @@ static int juno_soc_clock_get_rate(fwk_id_t clock_id,
 
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
-    if (!ctx->rate_initialized)
+    if (!ctx->rate_initialized) {
         *rate = 0;
-    else
+    } else {
         *rate = ctx->config->rate_table[ctx->current_rate_index].rate;
+    }
 
     return FWK_SUCCESS;
 }
@@ -407,8 +411,9 @@ static int juno_soc_clock_get_rate_from_index(fwk_id_t clock_id,
 
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
-    if (rate_index >= ctx->config->rate_count)
+    if (rate_index >= ctx->config->rate_count) {
         return FWK_E_PARAM;
+    }
 
     *rate = ctx->config->rate_table[rate_index].rate;
 
@@ -423,8 +428,9 @@ static int juno_soc_clock_set_state(fwk_id_t clock_id,
 
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
-    if (ctx->state == state)
+    if (ctx->state == state) {
         return FWK_SUCCESS;
+    }
 
     if (state == MOD_CLOCK_STATE_RUNNING) {
         /*
@@ -434,8 +440,9 @@ static int juno_soc_clock_set_state(fwk_id_t clock_id,
         if (ctx->rate_initialized) {
             status = set_rate(ctx,
                  &ctx->config->rate_table[ctx->current_rate_index]);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return FWK_E_DEVICE;
+            }
         }
     } else {
         cluster_clock_sel_set(ctx->config->clock_control,
@@ -535,8 +542,9 @@ static int juno_soc_clock_element_init(fwk_id_t element_id,
         rate = config->rate_table[rate_index].rate;
 
         /* The rate entries must be in ascending order */
-        if (rate < last_rate)
+        if (rate < last_rate) {
             return FWK_E_DATA;
+        }
 
         last_rate = rate;
     }
@@ -554,17 +562,20 @@ static int juno_soc_clock_bind(fwk_id_t id, unsigned int round)
     /*
      * Only bind in first round of calls
      */
-    if (round > 0)
+    if (round > 0) {
         return FWK_SUCCESS;
+    }
 
-    if (fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT))
+    if (fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
         return FWK_SUCCESS;
+    }
 
     /* Bind to the timer component */
     status = fwk_module_bind(juno_soc_clock_timer_id,
         MOD_TIMER_API_ID_TIMER, &module_ctx.timer_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_HANDLER;
+    }
 
     return FWK_SUCCESS;
 }
@@ -573,8 +584,9 @@ static int juno_soc_clock_start(fwk_id_t id)
 {
     int status;
 
-    if (fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT))
+    if (fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
         return FWK_SUCCESS;
+    }
 
     /* HW Errata: Overwrite default clock */
     clock_div_set(&SCC->PCIEACLK, SYSINCLK / PCIEACLK_DEFAULT_FREQ);
@@ -597,8 +609,9 @@ static int juno_soc_clock_start(fwk_id_t id)
         module_ctx.config->systop_pd_id,
         id);
 
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* Subscribe to the debug power domain transition */
     return fwk_notification_subscribe(
@@ -657,10 +670,11 @@ static int process_systop_notification(const struct fwk_event *event,
 static int juno_soc_clock_process_notification(const struct fwk_event *event,
                                                struct fwk_event *resp_event)
 {
-    if (fwk_id_is_equal(event->source_id, module_ctx.config->debug_pd_id))
+    if (fwk_id_is_equal(event->source_id, module_ctx.config->debug_pd_id)) {
         return process_debug_notification(event, resp_event);
-    else
+    } else {
         return process_systop_notification(event, resp_event);
+    }
 }
 
 const struct fwk_module module_juno_soc_clock_ram = {

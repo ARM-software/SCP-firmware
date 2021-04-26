@@ -186,10 +186,11 @@ static int set_gpio(fwk_id_t id, struct juno_xrp7724_dev_ctx *ctx)
     status = module_ctx.i2c_api->transmit_as_master(
         module_ctx.config->i2c_hal_id, module_ctx.config->slave_address,
         ctx->transmit_data, GPIO_WRITE_TRANSMIT_LENGTH);
-    if (status == FWK_PENDING)
+    if (status == FWK_PENDING) {
         status = FWK_SUCCESS;
-    else
+    } else {
         status = FWK_E_DEVICE;
+    }
 
     return status;
 }
@@ -238,8 +239,9 @@ static int juno_xrp7724_shutdown(void)
     module_ctx.gpio_request = JUNO_XRP7724_GPIO_REQUEST_MODE_SHUTDOWN;
 
     status = fwk_thread_put_event(&event);
-    if (status == FWK_SUCCESS)
+    if (status == FWK_SUCCESS) {
         return FWK_PENDING;
+    }
 
     return status;
 }
@@ -265,8 +267,9 @@ static int juno_xrp7724_reset(void)
     module_ctx.gpio_request = JUNO_XRP7724_GPIO_REQUEST_ASSERT_COLD_RESET;
 
     status = fwk_thread_put_event(&event);
-    if (status == FWK_SUCCESS)
+    if (status == FWK_SUCCESS) {
         return FWK_PENDING;
+    }
 
     return status;
 }
@@ -284,8 +287,9 @@ static int juno_xrp7724_sensor_get_value(fwk_id_t id, uint64_t *value)
     int status;
     struct fwk_event event;
 
-    if (module_ctx.sensor_request != JUNO_XRP7724_SENSOR_REQUEST_IDLE)
+    if (module_ctx.sensor_request != JUNO_XRP7724_SENSOR_REQUEST_IDLE) {
         return FWK_E_BUSY;
+    }
 
     event = (struct fwk_event) {
         .target_id = id,
@@ -338,8 +342,10 @@ static int juno_xrp7724_set_enabled(fwk_id_t id, bool enabled)
      * We only have a single I2C bus so only one I2C request is allowed
      * at any one time.
      */
-    if (ctx->juno_xrp7724_dev_psu.psu_request != JUNO_XRP7724_PSU_REQUEST_IDLE)
+    if (ctx->juno_xrp7724_dev_psu.psu_request !=
+        JUNO_XRP7724_PSU_REQUEST_IDLE) {
         return FWK_E_BUSY;
+    }
 
     event = (struct fwk_event) {
         .target_id = id,
@@ -349,8 +355,9 @@ static int juno_xrp7724_set_enabled(fwk_id_t id, bool enabled)
     param->enabled = enabled;
 
     status = fwk_thread_put_event(&event);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     ctx->juno_xrp7724_dev_psu.psu_request =
         JUNO_XRP7724_PSU_REQUEST_SET_ENABLED;
@@ -362,8 +369,9 @@ static int juno_xrp7724_get_enabled(fwk_id_t id, bool *enabled)
 {
     const struct juno_xrp7724_dev_ctx *ctx;
 
-    if (enabled == NULL)
+    if (enabled == NULL) {
         return FWK_E_PARAM;
+    }
 
     ctx = &ctx_table[fwk_id_get_element_idx(id)];
     fwk_assert(ctx->config->type == MOD_JUNO_XRP7724_ELEMENT_TYPE_PSU);
@@ -386,14 +394,17 @@ static int juno_xrp7724_set_voltage(fwk_id_t id, uint32_t voltage)
         (struct psu_set_voltage_param *)event.params;
 
     /* Platform voltage cap */
-    if (voltage > PSU_MAX_VOUT_MV)
+    if (voltage > PSU_MAX_VOUT_MV) {
         return FWK_E_RANGE;
+    }
 
     ctx = &ctx_table[fwk_id_get_element_idx(id)];
     fwk_assert(ctx->config->type == MOD_JUNO_XRP7724_ELEMENT_TYPE_PSU);
 
-    if (ctx->juno_xrp7724_dev_psu.psu_request != JUNO_XRP7724_PSU_REQUEST_IDLE)
+    if (ctx->juno_xrp7724_dev_psu.psu_request !=
+        JUNO_XRP7724_PSU_REQUEST_IDLE) {
         return FWK_E_BUSY;
+    }
 
     if (ctx->juno_xrp7724_dev_psu.current_voltage != 0 &&
         ctx->juno_xrp7724_dev_psu.current_voltage == voltage) {
@@ -413,8 +424,9 @@ static int juno_xrp7724_set_voltage(fwk_id_t id, uint32_t voltage)
      */
     fine_adj = ((voltage - mvref) * 1000) / PSU_VOUT_STEP_FINE_UV;
 
-    if (fine_adj > PSU_MAX_FINE_ADJUST)
+    if (fine_adj > PSU_MAX_FINE_ADJUST) {
         fine_adj = PSU_MAX_FINE_ADJUST;
+    }
 
     set_value = (fine_adj << PSU_FINE_ADJUST_POS) | coarse_val;
 
@@ -427,8 +439,9 @@ static int juno_xrp7724_set_voltage(fwk_id_t id, uint32_t voltage)
     param->voltage = voltage;
 
     status = fwk_thread_put_event(&event);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     ctx->juno_xrp7724_dev_psu.psu_request =
         JUNO_XRP7724_PSU_REQUEST_SET_VOLTAGE;
@@ -442,14 +455,17 @@ static int juno_xrp7724_get_voltage(fwk_id_t id, uint32_t *voltage)
     struct fwk_event event;
     struct juno_xrp7724_dev_ctx *ctx;
 
-    if (voltage == NULL)
+    if (voltage == NULL) {
         return FWK_E_PARAM;
+    }
 
     ctx = &ctx_table[fwk_id_get_element_idx(id)];
     fwk_assert(ctx->config->type == MOD_JUNO_XRP7724_ELEMENT_TYPE_PSU);
 
-    if (ctx->juno_xrp7724_dev_psu.psu_request != JUNO_XRP7724_PSU_REQUEST_IDLE)
+    if (ctx->juno_xrp7724_dev_psu.psu_request !=
+        JUNO_XRP7724_PSU_REQUEST_IDLE) {
         return FWK_E_BUSY;
+    }
 
     if (ctx->juno_xrp7724_dev_psu.current_voltage != 0) {
         *voltage = ctx->juno_xrp7724_dev_psu.current_voltage;
@@ -462,8 +478,9 @@ static int juno_xrp7724_get_voltage(fwk_id_t id, uint32_t *voltage)
     };
 
     status = fwk_thread_put_event(&event);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     ctx->juno_xrp7724_dev_psu.psu_request =
         JUNO_XRP7724_PSU_REQUEST_READ_VOLTAGE;
@@ -496,8 +513,9 @@ static int juno_xrp7724_init(fwk_id_t module_id,
         sizeof(struct juno_xrp7724_dev_ctx));
 
     status = juno_id_get_platform(&platform_id);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return FWK_E_PANIC;
+    }
 
     if (platform_id == JUNO_IDX_PLATFORM_FVP) {
         /* XRP7724 hardware is only available in the board */
@@ -519,13 +537,15 @@ static int juno_xrp7724_element_init(fwk_id_t element_id,
     ctx->config = (struct mod_juno_xrp7724_dev_config *)data;
 
     if (ctx->config->type == MOD_JUNO_XRP7724_ELEMENT_TYPE_SENSOR) {
-        if (ctx->config->sensor_info == NULL)
+        if (ctx->config->sensor_info == NULL) {
             return FWK_E_DATA;
+        }
     }
 
     if (ctx->config->type == MOD_JUNO_XRP7724_ELEMENT_TYPE_PSU) {
-        if (ctx->config->psu_bus_idx >= PSU_CHANNEL_COUNT)
+        if (ctx->config->psu_bus_idx >= PSU_CHANNEL_COUNT) {
             return FWK_E_DATA;
+        }
         ctx->juno_xrp7724_dev_psu.is_psu_channel_enabled = true;
         ctx->juno_xrp7724_dev_psu.element_id = element_id;
         ctx->alarm_hal_id = ctx->config->alarm_hal_id;
@@ -541,21 +561,24 @@ static int juno_xrp7724_bind(fwk_id_t id, unsigned int round)
     const struct juno_xrp7724_dev_ctx *ctx;
 
     /* Only bind in first round of calls and if the driver is available */
-    if ((round > 0) || (module_ctx.driver_skipped))
+    if ((round > 0) || (module_ctx.driver_skipped)) {
         return FWK_SUCCESS;
+    }
 
     if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         /* Bind to I2C HAL */
         status = fwk_module_bind(config->i2c_hal_id, mod_i2c_api_id_i2c,
             &module_ctx.i2c_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return FWK_E_HANDLER;
+        }
 
         /* Bind to timer HAL */
         status = fwk_module_bind(config->timer_hal_id, MOD_TIMER_API_ID_TIMER,
             &module_ctx.timer_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return FWK_E_HANDLER;
+        }
 
         return FWK_SUCCESS;
     }
@@ -566,28 +589,31 @@ static int juno_xrp7724_bind(fwk_id_t id, unsigned int round)
         status = fwk_module_bind(ctx->config->driver_response_id,
             ctx->config->driver_response_api_id,
             &module_ctx.sensor_driver_response_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return FWK_E_HANDLER;
+        }
     }
 
     if (ctx->config->type == MOD_JUNO_XRP7724_ELEMENT_TYPE_PSU) {
         status = fwk_module_bind(ctx->config->driver_response_id,
             ctx->config->driver_response_api_id,
             &module_ctx.psu_driver_response_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return FWK_E_HANDLER;
+        }
 
         status = fwk_module_bind(ctx->config->psu_adc_id,
             mod_sensor_api_id_sensor, &module_ctx.adc_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return FWK_E_HANDLER;
+        }
 
         /* Bind to the alarm HAL */
         status = fwk_module_bind(
             ctx->alarm_hal_id, MOD_TIMER_API_ID_ALARM, &ctx->alarm_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return FWK_E_HANDLER;
-
+        }
     }
 
     return FWK_SUCCESS;
@@ -598,14 +624,15 @@ static int juno_xrp7724_process_bind_request(fwk_id_t source_id,
                                              fwk_id_t api_id,
                                              const void **api)
 {
-    if (fwk_id_is_equal(api_id, mod_juno_xrp7724_api_id_system_mode))
+    if (fwk_id_is_equal(api_id, mod_juno_xrp7724_api_id_system_mode)) {
         *api = &system_mode_api;
-    else if (fwk_id_is_equal(api_id, mod_juno_xrp7724_api_id_sensor))
+    } else if (fwk_id_is_equal(api_id, mod_juno_xrp7724_api_id_sensor)) {
         *api = &sensor_driver_api;
-    else if (fwk_id_is_equal(api_id, mod_juno_xrp7724_api_id_psu))
+    } else if (fwk_id_is_equal(api_id, mod_juno_xrp7724_api_id_psu)) {
         *api = &psu_driver_api;
-    else
+    } else {
         return FWK_E_PARAM;
+    }
 
     return FWK_SUCCESS;
 }
@@ -642,8 +669,9 @@ static int juno_xrp7724_gpio_process_request(fwk_id_t id, int response_status)
          * The shutdown operation is aborted if the first command has not been
          * sent successfully.
          */
-        if (response_status != FWK_SUCCESS)
+        if (response_status != FWK_SUCCESS) {
             break;
+        }
 
         /*
          * The shutdown assert command is delayed to ensure that the mode change
@@ -653,8 +681,9 @@ static int juno_xrp7724_gpio_process_request(fwk_id_t id, int response_status)
 
         /* Send the assert command */
         status = set_gpio(config->gpio_assert_id, ctx);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             break;
+        }
 
         module_ctx.gpio_request = JUNO_XRP7724_GPIO_REQUEST_DONE;
 
@@ -674,8 +703,9 @@ static int juno_xrp7724_gpio_process_request(fwk_id_t id, int response_status)
         return FWK_SUCCESS;
 
     case JUNO_XRP7724_GPIO_REQUEST_DONE:
-        if (response_status != FWK_SUCCESS)
+        if (response_status != FWK_SUCCESS) {
             break;
+        }
 
         /*
          * Allow some time to the hardware to apply the reset or shutdown
@@ -699,8 +729,9 @@ static int juno_xrp7724_gpio_process_request(fwk_id_t id, int response_status)
     module_ctx.gpio_request = JUNO_XRP7724_GPIO_REQUEST_IDLE;
 
     status = fwk_thread_get_delayed_response(id, ctx->cookie, &resp_event);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_PANIC;
+    }
 
     return fwk_thread_put_event(&resp_event);
 }
@@ -728,8 +759,9 @@ static int juno_xrp7724_sensor_process_request(fwk_id_t id, int status)
             return FWK_SUCCESS;
         }
 
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             break;
+        }
 
         /* FALLTHRU */
     case JUNO_XRP7724_SENSOR_REQUEST_CONVERT_VALUE:
@@ -784,11 +816,13 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
         status = module_ctx.i2c_api->transmit_then_receive_as_master(
             module_config->i2c_hal_id, module_config->slave_address,
             ctx->transmit_data, ctx->receive_data, 1, PSU_READ_LENGTH);
-        if (status == FWK_PENDING)
+        if (status == FWK_PENDING) {
             return FWK_SUCCESS;
+        }
 
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             break;
+        }
 
         /* FALLTHRU */
 
@@ -822,18 +856,21 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
         status = module_ctx.i2c_api->transmit_as_master(
             module_config->i2c_hal_id, module_config->slave_address,
             ctx->transmit_data, PSU_WRITE_LENGTH);
-        if (status == FWK_PENDING)
+        if (status == FWK_PENDING) {
             return FWK_SUCCESS;
+        }
 
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             break;
+        }
 
         /* FALLTHRU */
 
     case JUNO_XRP7724_PSU_REQUEST_WAIT_FOR_VOLTAGE:
         /* Check I2C response status */
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             break;
+        }
 
         /*
          * If the channel is currently enabled then the voltage will ramp to the
@@ -847,8 +884,9 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
             status = ctx->alarm_api->start(ctx->alarm_hal_id,
                 PSU_RAMP_DELAY_SET_MS, MOD_TIMER_ALARM_TYPE_ONCE,
                 alarm_callback, (uintptr_t)ctx);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 break;
+            }
 
             ctx->juno_xrp7724_dev_psu.psu_request =
                  JUNO_XRP7724_PSU_REQUEST_COMPARE_VOLTAGE;
@@ -868,8 +906,9 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
     case JUNO_XRP7724_PSU_REQUEST_COMPARE_VOLTAGE:
         status = module_ctx.adc_api->get_value(ctx->config->psu_adc_id,
                                               &adc_val);
-        if (status != FWK_SUCCESS)
-                break;
+        if (status != FWK_SUCCESS) {
+            break;
+        }
 
         if (((adc_val + PSU_TARGET_MARGIN_MV) <
             ctx->juno_xrp7724_dev_psu.psu_set_voltage) ||
@@ -899,11 +938,13 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
         status = module_ctx.i2c_api->transmit_as_master(
             module_config->i2c_hal_id, module_config->slave_address,
             ctx->transmit_data, PSU_WRITE_LENGTH);
-        if (status == FWK_PENDING)
+        if (status == FWK_PENDING) {
             return FWK_SUCCESS;
+        }
 
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             break;
+        }
 
         /* FALLTHRU */
 
@@ -924,14 +965,16 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
                 status = ctx->alarm_api->start(
                     ctx->alarm_hal_id, PSU_RAMP_DELAY_ENABLE_MS,
                     MOD_TIMER_ALARM_TYPE_ONCE, alarm_callback, (uintptr_t)ctx);
-                if (status != FWK_SUCCESS)
+                if (status != FWK_SUCCESS) {
                     break;
+                }
 
                 ctx->juno_xrp7724_dev_psu.psu_request =
                     JUNO_XRP7724_PSU_REQUEST_DONE_ENABLED;
                 return FWK_SUCCESS;
-            } else
+            } else {
                 status = FWK_SUCCESS;
+            }
         }
 
         break;
@@ -971,8 +1014,9 @@ static int juno_xrp7724_process_event(const struct fwk_event *event,
     case MOD_JUNO_XRP7724_ELEMENT_TYPE_GPIO:
         status = juno_xrp7724_gpio_process_request(event->target_id,
             param->status);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return FWK_E_DEVICE;
+        }
 
         if (fwk_id_is_equal(event->id, juno_xrp7724_event_id_request)) {
             resp_event->is_delayed_response = true;

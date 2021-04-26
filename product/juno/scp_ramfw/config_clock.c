@@ -112,8 +112,9 @@ static const struct fwk_element *clock_get_dev_desc_table(fwk_id_t module_id)
     struct mod_clock_dev_config *dev_cfg;
 
     status = juno_id_get_platform(&platform_id);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return NULL;
+    }
 
     /*
      * When running under an FVP the I2S clock does not fully function,

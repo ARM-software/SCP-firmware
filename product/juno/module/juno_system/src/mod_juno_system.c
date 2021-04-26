@@ -159,8 +159,9 @@ static int juno_system_module_init(fwk_id_t module_id,
     fwk_assert(element_count == 0);
 
     status = juno_id_get_platform(&juno_system_ctx.platform_id);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return FWK_E_PANIC;
+    }
 
     return FWK_SUCCESS;
 }
@@ -169,29 +170,30 @@ static int juno_system_bind(fwk_id_t id, unsigned int round)
 {
     int status;
 
-    if (round > 0)
+    if (round > 0) {
         return FWK_SUCCESS;
+    }
 
     status = fwk_module_bind(fwk_module_id_sds,
                              FWK_ID_API(FWK_MODULE_IDX_SDS, 0),
                              &juno_system_ctx.sds_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_HANDLER;
+    }
 
-    if (juno_system_ctx.platform_id != JUNO_IDX_PLATFORM_RTL)
+    if (juno_system_ctx.platform_id != JUNO_IDX_PLATFORM_RTL) {
         return FWK_SUCCESS;
-    else {
+    } else {
+        status = fwk_module_bind(
+            gpu_psu_id, psu_api_id, &juno_system_ctx.psu_ctx.api);
+        if (status != FWK_SUCCESS) {
+            return FWK_E_PANIC;
+        }
 
-    status = fwk_module_bind(
-        gpu_psu_id,
-        psu_api_id,
-        &juno_system_ctx.psu_ctx.api);
-    if (status != FWK_SUCCESS)
-        return FWK_E_PANIC;
-
-    return fwk_module_bind(fwk_module_id_juno_xrp7724,
-        mod_juno_xrp7724_api_id_system_mode,
-        &juno_system_ctx.juno_xrp7724_api);
+        return fwk_module_bind(
+            fwk_module_id_juno_xrp7724,
+            mod_juno_xrp7724_api_id_system_mode,
+            &juno_system_ctx.juno_xrp7724_api);
     }
 }
 
@@ -217,15 +219,17 @@ static int juno_system_start(fwk_id_t id)
         mod_pd_notification_id_power_state_pre_transition,
         gpu_pd_id,
         id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_notification_subscribe(
         mod_pd_notification_id_power_state_transition,
         gpu_pd_id,
         id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /*
      * Subscribe to these SCMI channels in order to know when they have all
@@ -239,8 +243,9 @@ static int juno_system_start(fwk_id_t id)
             fwk_id_build_element_id(fwk_module_id_scmi,
                 scmi_notification_table[i]),
             id);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     /*
@@ -272,13 +277,14 @@ static int juno_system_process_notification(const struct fwk_event *event,
         goto exit;
     }
 
-    if (fwk_id_is_equal(event->id, mod_scmi_notification_id_initialized))
+    if (fwk_id_is_equal(event->id, mod_scmi_notification_id_initialized)) {
         scmi_notification_count++;
-    else if (fwk_id_is_equal(event->id, mod_sds_notification_id_initialized))
+    } else if (fwk_id_is_equal(
+                   event->id, mod_sds_notification_id_initialized)) {
         sds_notification_received = true;
-    else if (fwk_id_is_equal(
-                 event->id,
-                 mod_pd_notification_id_power_state_pre_transition)) {
+    } else if (fwk_id_is_equal(
+                   event->id,
+                   mod_pd_notification_id_power_state_pre_transition)) {
         state_pre_params =
             (struct mod_pd_power_state_pre_transition_notification_params *)
                 event->params;
@@ -287,10 +293,12 @@ static int juno_system_process_notification(const struct fwk_event *event,
             resp_event->params;
 
         if (fwk_id_is_equal(event->source_id, gpu_pd_id)) {
-            if (state_pre_params->target_state == MOD_PD_STATE_ON)
+            if (state_pre_params->target_state == MOD_PD_STATE_ON) {
                 status = process_gpu_power_state(event, resp_event, true);
-        } else
+            }
+        } else {
             status = FWK_E_PARAM;
+        }
 
         pd_resp_params->status = status;
     } else if (fwk_id_is_equal(
@@ -299,10 +307,12 @@ static int juno_system_process_notification(const struct fwk_event *event,
             event->params;
 
         if (fwk_id_is_equal(event->source_id, gpu_pd_id)) {
-            if (params->state == MOD_PD_STATE_OFF)
+            if (params->state == MOD_PD_STATE_OFF) {
                 status = process_gpu_power_state(event, resp_event, false);
-        } else
+            }
+        } else {
             status = FWK_E_PARAM;
+        }
     } else {
         status = FWK_E_PARAM;
 
@@ -335,8 +345,9 @@ static int juno_system_process_event(
         /* Response event from the PSU module */
         psu_params = (struct mod_psu_driver_response *)event->params;
 
-        if (!juno_system_ctx.psu_ctx.response_delayed)
+        if (!juno_system_ctx.psu_ctx.response_delayed) {
             return psu_params->status;
+        }
 
         juno_system_ctx.psu_ctx.response_delayed = false;
 
@@ -349,8 +360,9 @@ static int juno_system_process_event(
          */
         status = fwk_thread_get_delayed_response(
             fwk_module_id_juno_system, juno_system_ctx.psu_ctx.cookie, &resp);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         pd_resp_params->status = psu_params->status;
         return fwk_thread_put_event(&resp);

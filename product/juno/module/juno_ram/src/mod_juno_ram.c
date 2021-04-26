@@ -77,11 +77,13 @@ static int pcie_add_translation_table_entry(
      * If 'size' is not a power of two, get the smallest power of two greater
      * than 'size'.
      */
-    if ((size & (size - 1)) != 0)
+    if ((size & (size - 1)) != 0) {
         log2_upper_bound++;
+    }
 
-    if (!fwk_expect((log2_upper_bound >= 12) && (log2_upper_bound <= 64)))
+    if (!fwk_expect((log2_upper_bound >= 12) && (log2_upper_bound <= 64))) {
         return FWK_E_PANIC;
+    }
 
     entry->SRC_ADDR_LO = (uint32_t)source_addr |
                          (((log2_upper_bound - 1) << 1) | PCIE_ATR_IMPL);
@@ -170,8 +172,9 @@ static int pcie_configure(void)
     enum juno_idx_revision revision_id = JUNO_IDX_REVISION_COUNT;
 
     status = juno_id_get_revision(&revision_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_PANIC;
+    }
 
     if ((revision_id != JUNO_IDX_REVISION_R0) &&
         ((SCC->GPR0 & SCC_GPR0_PCIE_AP_MANAGED) == 0)) {
@@ -204,8 +207,9 @@ static int pcie_configure(void)
             GICV2M_MSI_BASE,
             GICV2M_MSI_SIZE,
             PCIE_TRSL_PARAM_AXIDEVICE);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         /* PCIE Window 0 - Translation: System memory support */
         status = pcie_add_translation_table_entry(
@@ -214,8 +218,9 @@ static int pcie_configure(void)
             JUNO_SYSTEM_MEMORY_BASE,
             JUNO_SYSTEM_MEMORY_SIZE,
             PCIE_TRSL_PARAM_AXIMEMORY);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         status = pcie_add_translation_table_entry(
             &PCIE_ROOT->ATR_PCIE_WIN0[2],
@@ -223,8 +228,9 @@ static int pcie_configure(void)
             JUNO_EXTRA_SYSTEM_MEMORY_BASE,
             JUNO_EXTRA_SYSTEM_MEMORY_SIZE,
             PCIE_TRSL_PARAM_AXIMEMORY);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         /* AXI4 Slave - Translation: PCI ECAM support */
         status = pcie_add_translation_table_entry(
@@ -233,8 +239,9 @@ static int pcie_configure(void)
             PCI_ECAM_BASE,
             PCI_ECAM_SIZE,
             PCIE_TRSL_PARAM_PCIE_CONF);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         /* AXI4 Slave - Translation: PCI IO support */
         status = pcie_add_translation_table_entry(
@@ -243,8 +250,9 @@ static int pcie_configure(void)
             PCI_IO_BASE,
             PCI_IO_SIZE,
             PCIE_TRSL_PARAM_PCIE_IO);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         /* AXI4 Slave - Translation: PCI MEM32 support */
         status = pcie_add_translation_table_entry(
@@ -253,8 +261,9 @@ static int pcie_configure(void)
             PCI_MEM32_BASE,
             PCI_MEM32_SIZE,
             PCIE_TRSL_PARAM_PCIE_MEMORY);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         /* AXI4 Slave - Translation: PCI MEM64 support */
         status = pcie_add_translation_table_entry(
@@ -263,8 +272,9 @@ static int pcie_configure(void)
             PCI_MEM64_BASE,
             PCI_MEM64_SIZE,
             PCIE_TRSL_PARAM_PCIE_MEMORY);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
         /* Add credits */
         PCIE_ROOT->CS.PCIE_VC_CRED_0 = 0x00F0B818;
@@ -280,8 +290,9 @@ static int pcie_configure(void)
             TIMEOUT_RESET_PCIE_US,
             pcie_check_reset_completed,
             NULL);
-        if (!fwk_expect(status == FWK_SUCCESS))
+        if (!fwk_expect(status == FWK_SUCCESS)) {
             return FWK_E_PANIC;
+        }
 
         /* Wait for the link to be up */
         status = ctx.timer_api->wait(
@@ -289,8 +300,9 @@ static int pcie_configure(void)
             TIMEOUT_RESET_PCIE_US,
             pcie_check_link_up,
             NULL);
-        if (!fwk_expect(status == FWK_SUCCESS))
+        if (!fwk_expect(status == FWK_SUCCESS)) {
             return FWK_E_PANIC;
+        }
 
         /* Set up interrupt mask - Application Processor */
         PCIE_ROOT->IE.IMASK_LOCAL = (PCIE_INT_LINES | PCIE_INT_MSI);
@@ -303,11 +315,13 @@ static int initialize_peripherals(void)
 {
     int status = FWK_SUCCESS;
 
-    if (ctx.periph_initialized)
+    if (ctx.periph_initialized) {
         return status;
+    }
 
-    if (ctx.platform == JUNO_IDX_PLATFORM_RTL)
+    if (ctx.platform == JUNO_IDX_PLATFORM_RTL) {
         status = pcie_configure();
+    }
 
     smc_configure();
 
@@ -333,8 +347,9 @@ static int juno_ram_init(
 
 static int juno_ram_bind(fwk_id_t id, unsigned int round)
 {
-    if (round != 0)
+    if (round != 0) {
         return FWK_SUCCESS;
+    }
 
     return fwk_module_bind(ctx.config->timer_id, MOD_TIMER_API_ID_TIMER,
         &ctx.timer_api);
@@ -356,8 +371,9 @@ static int juno_ram_start(fwk_id_t id)
     fwk_assert(fwk_module_is_valid_module_id(id));
 
     status = juno_id_get_platform(&ctx.platform);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return FWK_E_PANIC;
+    }
 
     if (ctx.platform == JUNO_IDX_PLATFORM_RTL) {
         nic400_configure();
@@ -372,8 +388,9 @@ static int juno_ram_start(fwk_id_t id)
         mod_pd_notification_id_power_state_transition,
         pd_source_id,
         id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return initialize_peripherals();
 }
@@ -395,11 +412,13 @@ static int juno_ram_process_notification(
             (pd_params->state == MOD_SYSTEM_POWER_POWER_STATE_SLEEP0)) {
             /* PD-sensitive peripherals will require re-init */
             ctx.periph_initialized = false;
-        } else if (pd_params->state == MOD_PD_STATE_ON)
+        } else if (pd_params->state == MOD_PD_STATE_ON) {
             status = initialize_peripherals();
+        }
 
-    } else
+    } else {
         status = FWK_E_PARAM;
+    }
 
     return status;
 }
