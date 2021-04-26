@@ -91,23 +91,27 @@ static int power_cluster_and_cores_from_boot_map(
 
     fwk_assert(core_ppu_table != NULL);
 
-    if (boot_map == 0)
+    if (boot_map == 0) {
         return FWK_SUCCESS;
+    }
 
     /* Turn on the cluster */
     status = ctx.ppu_api->set_state_and_wait(cluster_ppu, MOD_PD_STATE_ON);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_DEVICE;
+    }
 
     /* Assign the specified snoop for this cluster */
     if (fwk_id_get_element_idx(cluster_ppu) ==
-        fwk_id_get_element_idx(little_cluster_ppu))
+        fwk_id_get_element_idx(little_cluster_ppu)) {
         snoop_ctrl = &SCP_CONFIG->LITTLE_SNOOP_CONTROL;
-    else if (fwk_id_get_element_idx(cluster_ppu) ==
-        fwk_id_get_element_idx(big_cluster_ppu))
+    } else if (
+        fwk_id_get_element_idx(cluster_ppu) ==
+        fwk_id_get_element_idx(big_cluster_ppu)) {
         snoop_ctrl = &SCP_CONFIG->BIG_SNOOP_CONTROL;
-    else
+    } else {
         return FWK_E_PANIC;
+    }
 
     juno_utils_open_snoop_gate_and_wait(snoop_ctrl);
 
@@ -121,8 +125,9 @@ static int power_cluster_and_cores_from_boot_map(
                 core_ppu_table[i],
                 MOD_PD_STATE_ON);
 
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return FWK_E_DEVICE;
+            }
         }
     }
 
@@ -152,8 +157,9 @@ static void css_clock_cluster_div_set(volatile uint32_t *clk,
     *clk = (*clk & ~(div_set_mask)) | div_set;
 
     if (wait) {
-        while ((*clk & div_check_mask) != div_check)
+        while ((*clk & div_check_mask) != div_check) {
             continue;
+        }
     }
 }
 
@@ -165,8 +171,9 @@ static void css_clock_cluster_sel_set(volatile uint32_t *clk,
 
     if (wait) {
         while ((*clk & CLUSTERCLK_CONTROL_CRNTCLK) !=
-            (source << CRNT_CLK_DIV_POS))
+               (source << CRNT_CLK_DIV_POS)) {
             continue;
+        }
     }
 }
 
@@ -231,8 +238,9 @@ static int juno_rom_init(
     unsigned int element_count,
     const void *data)
 {
-    if (!fwk_expect(data != NULL))
+    if (!fwk_expect(data != NULL)) {
         return FWK_E_PARAM;
+    }
 
     /* Enable all clocks */
     SCP_CONFIG->CLOCK_ENABLE_SET = SCP_CONFIG_CLOCK_ENABLE_ALL;
@@ -248,20 +256,23 @@ static int juno_rom_bind(fwk_id_t id, unsigned int round)
 {
     int status;
 
-    if (round != 0)
+    if (round != 0) {
         return FWK_SUCCESS;
+    }
 
     status = fwk_module_bind(fwk_module_id_juno_ppu,
         mod_juno_ppu_api_id_rom, &ctx.ppu_api);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return FWK_E_PANIC;
+    }
 
     status = fwk_module_bind(
         fwk_module_id_bootloader,
         FWK_ID_API(FWK_MODULE_IDX_BOOTLOADER, 0),
         &ctx.bootloader_api);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return FWK_E_PANIC;
+    }
 
     return FWK_SUCCESS;
 }
@@ -276,14 +287,15 @@ static int juno_rom_start(fwk_id_t id)
         .id = mod_juno_rom_event_id_run,
     };
 
-    #ifndef BUILD_MODE_DEBUG
+#ifndef BUILD_MODE_DEBUG
     juno_wdog_rom_halt_on_debug_config();
     juno_wdog_rom_enable();
-    #endif
+#endif
 
     status = juno_debug_rom_init(ctx.ppu_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return fwk_thread_put_event(&event);
 }
@@ -332,8 +344,9 @@ static int juno_rom_process_event(
     }
 
     /* Set NIC400 ThinLinks interface state */
-    if (SCC->NIC400_TLX & SCC_TLX_MST_ENABLE)
+    if (SCC->NIC400_TLX & SCC_TLX_MST_ENABLE) {
         NIC400->REMAP |= NIC400_REMAP_TLX_EN;
+    }
 
     /* Set alternative AP ROM address (if applicable) */
     if (SCC->APP_ALT_BOOT != (uint32_t)0) {
@@ -358,21 +371,22 @@ static int juno_rom_process_event(
     memset((void *)ctx.config->ap_context_base, 0, ctx.config->ap_context_size);
 
     /* Send SYSTOP ON notification */
-    systop_on_event = (struct fwk_event) {
-        .response_requested = true,
-        .id = mod_juno_rom_notification_id_systop,
-        .source_id = FWK_ID_NONE
-    };
+    systop_on_event =
+        (struct fwk_event){ .response_requested = true,
+                            .id = mod_juno_rom_notification_id_systop,
+                            .source_id = FWK_ID_NONE };
 
     notification_params = (void *)systop_on_event.params;
     notification_params->state = MOD_PD_STATE_ON;
 
     status = fwk_notification_notify(&systop_on_event, &ctx.notification_count);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return FWK_E_PANIC;
+    }
 
-    if (ctx.notification_count == 0)
+    if (ctx.notification_count == 0) {
         return deferred_setup();
+    }
 
     return FWK_SUCCESS;
 }
@@ -385,12 +399,14 @@ static int juno_rom_process_notification(
     fwk_assert(event->is_response == true);
 
     /* At least one notification response must be outstanding */
-    if (!fwk_expect(ctx.notification_count > 0))
+    if (!fwk_expect(ctx.notification_count > 0)) {
         return FWK_E_PANIC;
+    }
 
     /* Complete remaining setup now that all subscribers have responded */
-    if ((--ctx.notification_count) == 0)
+    if ((--ctx.notification_count) == 0) {
         return deferred_setup();
+    }
 
     return FWK_SUCCESS;
 }

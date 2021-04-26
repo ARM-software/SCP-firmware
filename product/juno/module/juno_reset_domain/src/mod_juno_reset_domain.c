@@ -53,8 +53,9 @@ static int handle_uart_reset_set_state(struct juno_reset_dev_ctx *dev_ctx)
     struct mod_juno_reset_uart_config* uart_config =
         (struct mod_juno_reset_uart_config*)dev_ctx->config;
 
-    if (dev_ctx->reset_state == DEVICE_STATE_RESET)
+    if (dev_ctx->reset_state == DEVICE_STATE_RESET) {
         return FWK_E_STATE;
+    }
 
     /* Reset UART device */
     dev_ctx->reset_state = DEVICE_STATE_RESET;
@@ -87,26 +88,28 @@ static int juno_set_reset_state(fwk_id_t dev_id,
                                 uintptr_t cookie)
 {
     int status;
-    struct juno_reset_dev_ctx* dev_ctx;
-    struct mod_reset_domain_autoreset_event_params* params;
+    struct juno_reset_dev_ctx *dev_ctx;
+    struct mod_reset_domain_autoreset_event_params *params;
     struct fwk_event autoreset_event = {
         .id = mod_reset_domain_autoreset_event_id,
         .target_id = fwk_module_id_reset_domain,
     };
     unsigned int domain_idx = fwk_id_get_element_idx(dev_id);
 
-    if (domain_idx >= JUNO_RESET_DOMAIN_IDX_COUNT)
+    if (domain_idx >= JUNO_RESET_DOMAIN_IDX_COUNT) {
         return FWK_E_PARAM;
+    }
 
     dev_ctx = &module_juno_reset_ctx.dev_ctx_table[domain_idx];
 
     if (domain_idx == JUNO_RESET_DOMAIN_IDX_UART) {
         status = handle_uart_reset_set_state(dev_ctx);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
-        params = (struct mod_reset_domain_autoreset_event_params*)
-                 autoreset_event.params;
+        params = (struct mod_reset_domain_autoreset_event_params *)
+                     autoreset_event.params;
         params->dev_id = dev_id;
         params->reset_state = reset_state;
         params->cookie = cookie;
@@ -165,8 +168,9 @@ static int juno_reset_domain_process_bind_request(fwk_id_t source_id,
 
     if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT) ||
         !fwk_id_is_equal(api_id, mod_juno_reset_domain_api_id_driver) ||
-        api == NULL)
+        api == NULL) {
         return FWK_E_PARAM;
+    }
 
     *api = &juno_reset_domain_drv_api;
 

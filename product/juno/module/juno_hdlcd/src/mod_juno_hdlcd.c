@@ -80,10 +80,11 @@ static int round_rate(struct juno_hdlcd_dev_ctx *ctx,
 
     case MOD_CLOCK_ROUND_MODE_NEAREST:
         /* Select the rounded rate that is closest to the given rate */
-        if ((rate - round_down) > (round_up - rate))
+        if ((rate - round_down) > (round_up - rate)) {
             *rounded_rate = round_up;
-        else
+        } else {
             *rounded_rate = round_down;
+        }
         break;
 
     case MOD_CLOCK_ROUND_MODE_DOWN:
@@ -99,8 +100,9 @@ static int round_rate(struct juno_hdlcd_dev_ctx *ctx,
 
     }
 
-    if ((*rounded_rate % ctx->config->min_step) != 0)
+    if ((*rounded_rate % ctx->config->min_step) != 0) {
         return FWK_E_RANGE;
+    }
 
     return FWK_SUCCESS;
 }
@@ -138,8 +140,9 @@ void juno_hdlcd_request_complete(fwk_id_t dev_id,
 
     ctx = ctx_table + fwk_id_get_element_idx(module_ctx.request_clock_id);
 
-    if (response_param->status == FWK_SUCCESS)
+    if (response_param->status == FWK_SUCCESS) {
         enable_pll(module_ctx.request_clock_id, ctx);
+    }
 
     ctx->driver_response_api->request_complete(ctx->config->clock_hal_id,
         response_param);
@@ -165,20 +168,24 @@ static int juno_hdlcd_set_rate(fwk_id_t clock_id, uint64_t rate,
     ctx = ctx_table + fwk_id_get_element_idx(clock_id);
 
     /* Only the first 32-bits are taken */
-    if (rate > UINT32_MAX)
+    if (rate > UINT32_MAX) {
         return FWK_E_RANGE;
+    }
 
     status = round_rate(ctx, round_mode, rate, &rounded_rate);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     if ((rounded_rate < ctx->config->min_rate) ||
-        (rounded_rate > ctx->config->max_rate))
+        (rounded_rate > ctx->config->max_rate)) {
         return FWK_E_RANGE;
+    }
 
     if (platform == JUNO_IDX_PLATFORM_RTL) {
-        if (!fwk_id_is_equal(module_ctx.request_clock_id, FWK_ID_NONE))
+        if (!fwk_id_is_equal(module_ctx.request_clock_id, FWK_ID_NONE)) {
             return FWK_E_BUSY;
+        }
     }
 
     /*
@@ -226,8 +233,9 @@ static int juno_hdlcd_set_rate(fwk_id_t clock_id, uint64_t rate,
     /* Find entry on the look-up table */
     ctx->index = (clock_rate - PXL_CLK_IN_RATE) / (500 * FWK_KHZ);
     if ((ctx->index < 0) ||
-        ((unsigned int)ctx->index >= ctx->config->lookup_table_count))
+        ((unsigned int)ctx->index >= ctx->config->lookup_table_count)) {
         return FWK_E_RANGE;
+    }
 
     FWK_LOG_INFO(
         "[HDLCD%u] Entry index:%d",
@@ -246,8 +254,9 @@ static int juno_hdlcd_set_rate(fwk_id_t clock_id, uint64_t rate,
             FWK_LOG_ERR("[HDLCD] Failed to set board clock");
             return FWK_E_DEVICE;
         }
-        if (status == FWK_PENDING)
+        if (status == FWK_PENDING) {
             module_ctx.request_clock_id = clock_id;
+        }
         return status;
     }
 
@@ -264,10 +273,12 @@ static int juno_hdlcd_get_rate(fwk_id_t clock_id, uint64_t *rate)
 
     /* Find out the clock source in use */
     if ((*ctx->config->scc_control & SCC_HDLCD_CONTROL_PXLCLK_SEL) ==
-        SCC_HDLCD_CONTROL_PXLCLK_SEL_CLKIN)
+        SCC_HDLCD_CONTROL_PXLCLK_SEL_CLKIN) {
         *rate = PXL_CLK_IN_RATE;
-    else
+
+    } else {
         *rate = module_ctx.current_pll_rate;
+    }
 
     /* All frequencies are double the target pixel clock frequency */
     *rate /= 2;
@@ -285,8 +296,9 @@ static int juno_hdlcd_get_rate_from_index(fwk_id_t clock_id,
 static int juno_hdlcd_set_state(fwk_id_t clock_id,
                                 enum mod_clock_state state)
 {
-    if (state != MOD_CLOCK_STATE_RUNNING)
+    if (state != MOD_CLOCK_STATE_RUNNING) {
         return FWK_E_SUPPORT;
+    }
 
     return FWK_SUCCESS;
 }
@@ -346,10 +358,12 @@ static int juno_hdlcd_dev_init(fwk_id_t element_id,
     fwk_assert(config->min_rate != 0);
     fwk_assert(config->max_rate != 0);
 
-    if (min_rate == 0)
+    if (min_rate == 0) {
         min_rate = config->min_rate;
-    if (max_rate == 0)
+    }
+    if (max_rate == 0) {
         max_rate = config->max_rate;
+    }
 
     /*
      * All the HDLCD clocks should have the same max_rate and the same min_rate
@@ -369,26 +383,30 @@ static int juno_hdlcd_bind(fwk_id_t id, unsigned int round)
     struct juno_hdlcd_dev_ctx *ctx;
 
     /* Only bind in first round of calls */
-    if (round > 0)
+    if (round > 0) {
         return FWK_SUCCESS;
+    }
 
-    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         return FWK_SUCCESS;
+    }
 
     ctx = ctx_table + fwk_id_get_element_idx(id);
 
     /* Bind to clock HAL */
     status = fwk_module_bind(ctx->config->clock_hal_id,
         ctx->config->clock_api_id, &ctx->driver_response_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_HANDLER;
+    }
 
     /* Bind to the driver API */
     if (platform == JUNO_IDX_PLATFORM_RTL) {
         status = fwk_module_bind(ctx->config->driver_id,
             ctx->config->driver_api_id, &ctx->driver_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return FWK_E_HANDLER;
+        }
     }
 
     return FWK_SUCCESS;
@@ -399,13 +417,14 @@ static int juno_hdlcd_process_bind_request(fwk_id_t source_id,
                                            fwk_id_t api_id,
                                            const void **api)
 {
-    if (fwk_id_is_equal(api_id, mod_juno_hdlcd_api_id_clock_driver))
+    if (fwk_id_is_equal(api_id, mod_juno_hdlcd_api_id_clock_driver)) {
         *api = &clock_driver_api;
-    else if (fwk_id_is_equal(api_id,
-        mod_juno_hdlcd_api_id_hdlcd_driver_response))
+    } else if (fwk_id_is_equal(
+                   api_id, mod_juno_hdlcd_api_id_hdlcd_driver_response)) {
         *api = &hdlcd_driver_response_api;
-    else
+    } else {
         return FWK_E_HANDLER;
+    }
 
     return FWK_SUCCESS;
 }
@@ -417,12 +436,14 @@ static int juno_hdlcd_start(fwk_id_t id)
     unsigned int od;
     int status;
 
-    if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+    if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         return FWK_SUCCESS;
+    }
 
     status = juno_id_get_platform(&platform);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* Read current PLL frequency */
     nf = ((SCC->PLL[PLL_IDX_HDLCD].REG0 & PLL_REG0_NF) >> PLL_REG0_NF_POS) + 1;

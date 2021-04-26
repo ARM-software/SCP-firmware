@@ -95,17 +95,20 @@ static int juno_thermal_init(
     fwk_assert(element_count == 1);
 
     status = juno_id_get_platform(&platform_id);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return FWK_E_PANIC;
+    }
 
     is_platform_fvp = (platform_id == JUNO_IDX_PLATFORM_FVP);
 
-    if (is_platform_fvp)
+    if (is_platform_fvp) {
         return FWK_SUCCESS;
+    }
 
     ctx_table = fwk_mm_calloc(element_count, sizeof(struct thermal_dev_ctx));
-    if (ctx_table == NULL)
+    if (ctx_table == NULL) {
         return FWK_E_NOMEM;
+    }
 
     return FWK_SUCCESS;
 }
@@ -118,8 +121,9 @@ static int juno_thermal_element_init(
     struct thermal_dev_ctx *ctx;
     fwk_id_t sensor_id;
 
-    if (is_platform_fvp)
+    if (is_platform_fvp) {
         return FWK_SUCCESS;
+    }
 
     ctx = &ctx_table[fwk_id_get_element_idx(element_id)];
     ctx->config = (struct mod_juno_thermal_element_config *)data;
@@ -127,10 +131,11 @@ static int juno_thermal_element_init(
     sensor_id = ctx->config->sensor_id;
 
     /* Validate identifiers */
-    if (fwk_id_get_module_idx(sensor_id) != FWK_MODULE_IDX_SENSOR)
+    if (fwk_id_get_module_idx(sensor_id) != FWK_MODULE_IDX_SENSOR) {
         return FWK_E_DATA;
-    else
+    } else {
         return FWK_SUCCESS;
+    }
 }
 
 static int juno_thermal_bind(fwk_id_t id, unsigned int round)
@@ -138,8 +143,9 @@ static int juno_thermal_bind(fwk_id_t id, unsigned int round)
     int status;
     struct thermal_dev_ctx *ctx;
 
-    if ((round > 0) || is_platform_fvp)
+    if ((round > 0) || is_platform_fvp) {
         return FWK_SUCCESS;
+    }
 
     if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         /* Bind to power domain - only binding to module is allowed */
@@ -153,15 +159,17 @@ static int juno_thermal_bind(fwk_id_t id, unsigned int round)
         ctx->config->alarm_id,
         MOD_TIMER_API_ID_ALARM,
         &ctx->alarm_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_PANIC;
+    }
 
     status = fwk_module_bind(
         ctx->config->sensor_id,
         mod_sensor_api_id_sensor,
         &ctx->sensor_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_PANIC;
+    }
 
     return FWK_SUCCESS;
 }
@@ -172,8 +180,9 @@ static int juno_thermal_start(fwk_id_t id)
     struct thermal_dev_ctx *ctx;
 
     /* Nothing to start for module */
-    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE) || is_platform_fvp)
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE) || is_platform_fvp) {
         return FWK_SUCCESS;
+    }
 
     ctx = &ctx_table[fwk_id_get_element_idx(id)];
 
@@ -181,8 +190,9 @@ static int juno_thermal_start(fwk_id_t id)
         mod_pd_notification_id_power_state_pre_transition,
         systop_pd_id,
         id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = ctx->alarm_api->start(
         ctx->config->alarm_id,
@@ -222,22 +232,25 @@ static int juno_thermal_process_event(
             status = check_threshold_breach(
                 value,
                 ctx->config->thermal_threshold_mdc);
-        } else if (status == FWK_PENDING)
+        } else if (status == FWK_PENDING) {
             return FWK_SUCCESS;
+        }
 
     /* Response event from sensor HAL */
     } else if (fwk_id_is_equal(event->id, mod_sensor_event_id_read_request)) {
         struct mod_sensor_event_params *params =
         (struct mod_sensor_event_params *)event->params;
 
-        if (params->status != FWK_SUCCESS)
+        if (params->status != FWK_SUCCESS) {
             return params->status;
+        }
         status = check_threshold_breach(
             params->value,
             ctx->config->thermal_threshold_mdc);
 
-    } else
+    } else {
         return FWK_E_PARAM;
+    }
 
     return status;
 }
@@ -292,8 +305,9 @@ static int juno_thermal_process_notification(
                 systop_pd_id,
                 event->target_id);
 
-        } else
+        } else {
             status = FWK_SUCCESS;
+        }
 
         pd_resp_params->status = status;
 
@@ -317,26 +331,30 @@ static int juno_thermal_process_notification(
                 MOD_TIMER_ALARM_TYPE_PERIODIC,
                 juno_thermal_alarm_callback,
                 (uintptr_t)fwk_id_get_element_idx(event->target_id));
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
 
             status = fwk_notification_unsubscribe(
                 mod_pd_notification_id_power_state_transition,
                 systop_pd_id,
                 event->target_id);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
 
             status = fwk_notification_subscribe(
                 mod_pd_notification_id_power_state_pre_transition,
                 systop_pd_id,
                 event->target_id);
-        } else
+        } else {
             status = FWK_SUCCESS;
+        }
 
         return status;
-    } else
+    } else {
         return FWK_E_PARAM;
+    }
 }
 
 const struct fwk_module module_juno_thermal = {

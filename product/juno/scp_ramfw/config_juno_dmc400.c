@@ -69,14 +69,16 @@ static const struct fwk_element *juno_dmc400_get_element_table
         juno_dmc400_element_table[0].data;
 
     status = juno_id_get_revision(&revision);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return NULL;
+    }
 
     /* On R2 boards only, the DDR is different for variants A and B */
     if (revision == JUNO_IDX_REVISION_R2) {
         status = juno_id_get_variant(&variant_id);
-        if (!fwk_expect(status == FWK_SUCCESS))
+        if (!fwk_expect(status == FWK_SUCCESS)) {
             return NULL;
+        }
     }
 
     if (variant_id == JUNO_IDX_VARIANT_A) {
@@ -100,8 +102,9 @@ static const struct fwk_element *juno_dmc400_get_element_table
     }
 
     status = juno_id_get_platform(&platform_id);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return NULL;
+    }
 
     dmc400_config->is_platform_fvp =
         (platform_id == JUNO_IDX_PLATFORM_FVP);

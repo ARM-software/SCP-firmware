@@ -50,8 +50,9 @@ static const struct fwk_element *get_juno_debug_elem_table(fwk_id_t module_id)
     struct mod_juno_debug_dev_config *juno_debug_config;
 
     status = juno_id_get_revision(&revision);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return NULL;
+    }
 
     juno_debug_config = (struct mod_juno_debug_dev_config *)
         juno_debug_element_table[0].data;

@@ -29,8 +29,9 @@ __NO_RETURN void osRtxIdleThread(void *argument)
 {
     (void)argument;
 
-    while (true)
+    while (true) {
         __WFI();
+    }
 }
 
 /*

@@ -457,8 +457,9 @@ static const struct fwk_element *juno_soc_clock_ram_get_element_table
     enum juno_idx_revision revision;
 
     status = juno_id_get_revision(&revision);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return NULL;
+    }
 
     big_cluster_clock_config.rate_table = big_cluster_rate_tables[revision];
     big_cluster_clock_config.rate_count = big_cluster_rate_counts[revision];

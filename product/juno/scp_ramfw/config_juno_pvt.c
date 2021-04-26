@@ -237,10 +237,11 @@ static const struct fwk_element *get_pvt_juno_element_table(fwk_id_t id)
     enum juno_idx_revision rev;
 
     status = juno_id_get_revision(&rev);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return NULL;
+    }
 
-    #if USE_FULL_SET_SENSORS
+#if USE_FULL_SET_SENSORS
 
     if (rev == JUNO_IDX_REVISION_R0) {
         sensor_group[JUNO_PVT_GROUP_BIG].sensor_count = 1;
@@ -257,8 +258,9 @@ static const struct fwk_element *get_pvt_juno_element_table(fwk_id_t id)
     sensor_group[JUNO_PVT_GROUP_BIG].sensor_count = 1;
     sensor_group[JUNO_PVT_GROUP_LITTLE].sensor_count = 1;
 
-    if (rev != JUNO_IDX_REVISION_R0)
+    if (rev != JUNO_IDX_REVISION_R0) {
         pvt_juno_element_table[JUNO_PVT_GROUP_SOC].data = &dev_config_soc_r1_r2;
+    }
 
     return pvt_juno_element_table;
     #endif

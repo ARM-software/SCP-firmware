@@ -42,12 +42,14 @@ void juno_soc_clock_ram_pll_init(void)
                               SCP_CONFIG_SCP_STATUS_BIGINPLLLOCK;
 
     /* Release all system PLLs from reset */
-    for (pll_idx = 0; pll_idx < PLL_IDX_COUNT; pll_idx++)
+    for (pll_idx = 0; pll_idx < PLL_IDX_COUNT; pll_idx++) {
         SCC->PLL[pll_idx].REG0 &= ~PLL_REG0_PLL_RESET;
+    }
 
     /* Wait for PLLs to lock */
-    while ((SCP_CONFIG->SCP_STATUS & pll_mask) != pll_mask)
+    while ((SCP_CONFIG->SCP_STATUS & pll_mask) != pll_mask) {
         continue;
+    }
 }
 
 int juno_soc_clock_ram_pll_set(struct pll_reg *pll,
@@ -75,8 +77,9 @@ int juno_soc_clock_ram_pll_set(struct pll_reg *pll,
     pll->REG0 &= ~PLL_REG0_PLL_RESET;
 
     /* Wait for the PLL to lock */
-    while ((pll->REG1 & PLL_REG1_LOCK_STATUS) == (uint32_t)0)
+    while ((pll->REG1 & PLL_REG1_LOCK_STATUS) == (uint32_t)0) {
         continue;
+    }
 
     return FWK_SUCCESS;
 }
@@ -88,8 +91,9 @@ int juno_soc_clock_ram_pll_get(struct pll_reg *pll, uint32_t refclk_hz,
     unsigned int ref_div;
     unsigned int output_div;
 
-    if ((pll == NULL) || (freq_hz == NULL))
+    if ((pll == NULL) || (freq_hz == NULL)) {
         return FWK_E_PARAM;
+    }
 
     feedback_div = ((pll->REG0 & PLL_REG0_NF) >> PLL_REG0_NF_POS) + 1;
     ref_div = ((pll->REG1 & PLL_REG1_NR) >> PLL_REG1_NR_POS) + 1;

@@ -450,10 +450,12 @@ static const struct fwk_element *dvfs_get_element_table(fwk_id_t module_id)
     status = juno_id_get_revision(&revision);
     fwk_assert(status == FWK_SUCCESS);
 
-    if (revision == JUNO_IDX_REVISION_R0)
+    if (revision == JUNO_IDX_REVISION_R0) {
         return element_table_r0;
-    if (revision == JUNO_IDX_REVISION_R1)
+    }
+    if (revision == JUNO_IDX_REVISION_R1) {
         return element_table_r1;
+    }
     return element_table_r2;
 }
 
