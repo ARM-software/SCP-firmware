@@ -112,8 +112,9 @@ static void dmc_delay_cycles(uint32_t dmc_cycles)
 {
     unsigned int i;
 
-    for (i = 0; i < (dmc_cycles / ctx.dmc_refclk_ratio); i++)
+    for (i = 0; i < (dmc_cycles / ctx.dmc_refclk_ratio); i++) {
         __NOP();
+    }
 }
 
 static void init_ddr_chip(struct mod_juno_dmc400_reg *dmc, uint32_t dev)
@@ -190,12 +191,14 @@ static int ddr_phy_init(fwk_id_t id)
     dmc = (struct mod_juno_dmc400_reg *)element_config->dmc;
 
     status = ctx.ddr_phy_api->configure_ddr(element_config->ddr_phy_0_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = ctx.ddr_phy_api->configure_ddr(element_config->ddr_phy_1_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* Initialize PHYs */
     dmc->USER_CONFIG0 |= DMC_USER_CONFIG_DFI_INIT_START;
@@ -207,8 +210,9 @@ static int ddr_phy_init(fwk_id_t id)
                                      DMC400_PHY_INIT_WAIT_TIMEOUT_US,
                                      dmc_user_config_dfi_check,
                                      dmc);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     /* Remove initialization request */
@@ -231,23 +235,27 @@ static int ddr_clk_init(fwk_id_t id)
 
     /* Clock divider */
     status = ddr_clock_div_set(module_config->timer_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* Clock source */
     status = ddr_clock_sel_set(module_config->timer_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* Clock enable */
     status = ddr_clock_enable(module_config->timer_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* Set DDR PHY PLLs after DMCCLK is stable */
     status = ctx.ddr_phy_api->configure_clk(fwk_module_id_juno_ddr_phy400);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     ddr_remove_poreset(dmc);
 
@@ -404,12 +412,14 @@ static int ddr_training(fwk_id_t id)
     status = ctx.timer_api->time_to_timestamp(module_config->timer_id,
                                               DMC400_TRAINING_TIMEOUT_US,
                                               &timeout);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = ctx.timer_api->get_counter(module_config->timer_id, &counter);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     timeout += counter;
 
@@ -434,10 +444,12 @@ static int ddr_training(fwk_id_t id)
         DMC_CHANNEL_STATUS_M0_IDLE) {
         status = ctx.timer_api->remaining(module_config->timer_id, timeout,
                                           &remaining_ticks);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
-        if (remaining_ticks == 0)
+        }
+        if (remaining_ticks == 0) {
             goto timeout;
+        }
     }
 
     /* Channel 1, chip 0 */
@@ -448,10 +460,12 @@ static int ddr_training(fwk_id_t id)
         DMC_CHANNEL_STATUS_M1_IDLE) {
         status = ctx.timer_api->remaining(module_config->timer_id, timeout,
                                           &remaining_ticks);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
-        if (remaining_ticks == 0)
+        }
+        if (remaining_ticks == 0) {
             goto timeout;
+        }
     }
 
     if (element_config->ddr_chip_count > 1) {
@@ -463,10 +477,12 @@ static int ddr_training(fwk_id_t id)
             DMC_CHANNEL_STATUS_M0_IDLE) {
             status = ctx.timer_api->remaining(module_config->timer_id, timeout,
                                               &remaining_ticks);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
-            if (remaining_ticks == 0)
+            }
+            if (remaining_ticks == 0) {
                 goto timeout;
+            }
         }
 
         /* Channel 1, chip 1 */
@@ -477,10 +493,12 @@ static int ddr_training(fwk_id_t id)
             DMC_CHANNEL_STATUS_M1_IDLE) {
             status = ctx.timer_api->remaining(module_config->timer_id, timeout,
                                               &remaining_ticks);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
-            if (remaining_ticks == 0)
+            }
+            if (remaining_ticks == 0) {
                 goto timeout;
+            }
         }
     }
 
@@ -496,10 +514,12 @@ static int ddr_training(fwk_id_t id)
         DMC_CHANNEL_STATUS_M0_IDLE) {
         status = ctx.timer_api->remaining(module_config->timer_id, timeout,
                                           &remaining_ticks);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
-        if (remaining_ticks == 0)
+        }
+        if (remaining_ticks == 0) {
             goto timeout;
+        }
     }
 
     /* Channel 1, chip 0 */
@@ -510,10 +530,12 @@ static int ddr_training(fwk_id_t id)
         DMC_CHANNEL_STATUS_M1_IDLE) {
         status = ctx.timer_api->remaining(module_config->timer_id, timeout,
                                           &remaining_ticks);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
-        if (remaining_ticks == 0)
+        }
+        if (remaining_ticks == 0) {
             goto timeout;
+        }
     }
 
     if (element_config->ddr_chip_count > 1) {
@@ -525,10 +547,12 @@ static int ddr_training(fwk_id_t id)
             DMC_CHANNEL_STATUS_M0_IDLE) {
             status = ctx.timer_api->remaining(module_config->timer_id, timeout,
                                               &remaining_ticks);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
-            if (remaining_ticks == 0)
+            }
+            if (remaining_ticks == 0) {
                 goto timeout;
+            }
         }
 
         /* Channel 1, chip 1 */
@@ -539,10 +563,12 @@ static int ddr_training(fwk_id_t id)
             DMC_CHANNEL_STATUS_M1_IDLE) {
             status = ctx.timer_api->remaining(module_config->timer_id, timeout,
                                               &remaining_ticks);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
-            if (remaining_ticks == 0)
+            }
+            if (remaining_ticks == 0) {
                 goto timeout;
+            }
         }
     }
 
@@ -558,10 +584,12 @@ static int ddr_training(fwk_id_t id)
         DMC_CHANNEL_STATUS_M0_IDLE) {
         status = ctx.timer_api->remaining(module_config->timer_id, timeout,
                                           &remaining_ticks);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
-        if (remaining_ticks == 0)
+        }
+        if (remaining_ticks == 0) {
             goto timeout;
+        }
     }
 
     /* Channel 1, chip 0 */
@@ -572,10 +600,12 @@ static int ddr_training(fwk_id_t id)
         DMC_CHANNEL_STATUS_M1_IDLE) {
         status = ctx.timer_api->remaining(module_config->timer_id, timeout,
                                           &remaining_ticks);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
-        if (remaining_ticks == 0)
+        }
+        if (remaining_ticks == 0) {
             goto timeout;
+        }
     }
 
     if (element_config->ddr_chip_count > 1) {
@@ -587,10 +617,12 @@ static int ddr_training(fwk_id_t id)
             DMC_CHANNEL_STATUS_M0_IDLE) {
             status = ctx.timer_api->remaining(module_config->timer_id, timeout,
                                               &remaining_ticks);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
-            if (remaining_ticks == 0)
+            }
+            if (remaining_ticks == 0) {
                 goto timeout;
+            }
         }
 
         /* Channel 1, chip 1 */
@@ -601,10 +633,12 @@ static int ddr_training(fwk_id_t id)
             DMC_CHANNEL_STATUS_M1_IDLE) {
             status = ctx.timer_api->remaining(module_config->timer_id, timeout,
                                               &remaining_ticks);
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
-            if (remaining_ticks == 0)
+            }
+            if (remaining_ticks == 0) {
                 goto timeout;
+            }
         }
 
     }
@@ -635,12 +669,14 @@ static int ddr_retraining(fwk_id_t id)
                                  DMC400_CONFIG_WAIT_TIMEOUT_US,
                                  ddr_cmd_config_check,
                                  dmc);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = ddr_training(id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     dmc->MEMC_CMD = DMC400_CMD_GO;
 
@@ -670,8 +706,9 @@ static int ddr_wake(fwk_id_t id)
     /* Disable PHY retention */
     status = ctx.ddr_phy_api->configure_retention(fwk_module_id_juno_ddr_phy400,
                                                   false);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     dmc_delay_cycles(64);
 
@@ -685,8 +722,9 @@ static int ddr_wake(fwk_id_t id)
                                  DMC400_CONFIG_WAIT_TIMEOUT_US,
                                  ddr_cmd_config_check,
                                  dmc);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     ddr_chip_count = element_config->ddr_chip_count;
     for (channel = 0; channel < DDR_CHANNEL_COUNT; channel++) {
@@ -703,8 +741,9 @@ static int ddr_wake(fwk_id_t id)
                                  DMC400_CONFIG_WAIT_TIMEOUT_US,
                                  ddr_cmd_go_check,
                                  dmc);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     dmc_delay_cycles(64);
 
@@ -723,16 +762,19 @@ static int ddr_resume(const struct mod_juno_dmc400_element_config *config,
     dmc = (struct mod_juno_dmc400_reg *)config->dmc;
 
     status = ddr_clk_init(id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = ddr_phy_init(id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = ddr_dmc_init(id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* Sleep the DMC */
     dmc->MEMC_CMD = DMC400_CMD_SLEEP;
@@ -740,19 +782,22 @@ static int ddr_resume(const struct mod_juno_dmc400_element_config *config,
                                  DMC400_CONFIG_WAIT_TIMEOUT_US,
                                  ddr_cmd_sleep_check,
                                  dmc);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = ddr_wake(id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_notification_unsubscribe(
         mod_pd_notification_id_power_state_transition,
         config->pd_id,
         id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return fwk_notification_subscribe(
         mod_pd_notification_id_power_state_pre_transition,
@@ -771,8 +816,9 @@ static int ddr_suspend(const struct mod_juno_dmc400_element_config *config,
     dmc = (struct mod_juno_dmc400_reg *)config->dmc;
 
     status = fwk_interrupt_disable(PHY_TRAINING_IRQ);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_STATE;
+    }
 
     /* Set low power mode */
     dmc->MEMC_CMD = DMC400_CMD_SLEEP;
@@ -785,25 +831,29 @@ static int ddr_suspend(const struct mod_juno_dmc400_element_config *config,
 
     /* Wait for the PHYs to be idle */
     status = ctx.ddr_phy_api->configure_idle(config->ddr_phy_0_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = ctx.ddr_phy_api->configure_idle(config->ddr_phy_1_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* Enable PHY retention */
     status = ctx.ddr_phy_api->configure_retention(fwk_module_id_juno_ddr_phy400,
                                                   true);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_notification_unsubscribe(
         mod_pd_notification_id_power_state_pre_transition,
         config->pd_id,
         id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return fwk_notification_subscribe(
         mod_pd_notification_id_power_state_transition,
@@ -868,26 +918,30 @@ static int juno_dmc400_bind(fwk_id_t id, unsigned int round)
     const struct mod_juno_dmc400_module_config *module_config;
 
     /* Nothing to do in the second round of calls */
-    if (round >= 1)
+    if (round >= 1) {
         return FWK_SUCCESS;
+    }
 
     /* Nothing to do in case of elements */
-    if (fwk_module_is_valid_element_id(id))
+    if (fwk_module_is_valid_element_id(id)) {
         return FWK_SUCCESS;
+    }
 
     module_config = fwk_module_get_data(fwk_module_id_juno_dmc400);
     fwk_assert(module_config != NULL);
 
     status = fwk_module_bind(module_config->ddr_phy_module_id,
                              module_config->ddr_phy_api_id, &ctx.ddr_phy_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_module_bind(module_config->timer_id,
                              FWK_ID_API(FWK_MODULE_IDX_TIMER, 0),
                              &ctx.timer_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return FWK_SUCCESS;
 }
@@ -899,8 +953,9 @@ static int juno_dmc400_start(fwk_id_t id)
     struct mod_juno_dmc400_reg *dmc;
 
     /* Nothing to start for the module */
-    if (fwk_module_is_valid_module_id(id))
+    if (fwk_module_is_valid_module_id(id)) {
         return FWK_SUCCESS;
+    }
 
     if (SCC->GPR0 & SCC_GPR0_DDR_DISABLE) {
         FWK_LOG_INFO("[DMC] GPR_0 disable flag set: skipping init");
@@ -911,8 +966,9 @@ static int juno_dmc400_start(fwk_id_t id)
     element_config = fwk_module_get_data(id);
 
     dmc = (struct mod_juno_dmc400_reg *)element_config->dmc;
-    if (!fwk_expect(dmc != NULL))
+    if (!fwk_expect(dmc != NULL)) {
         return FWK_E_PARAM;
+    }
 
     fwk_assert(CLKDIV > 0);
 
@@ -922,32 +978,38 @@ static int juno_dmc400_start(fwk_id_t id)
     FWK_LOG_INFO("[DMC] Initializing DMC-400 at 0x%x", (uintptr_t)dmc);
 
     status = ddr_clk_init(id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = ddr_phy_init(id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = ddr_dmc_init(id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     fwk_interrupt_global_disable();
 
     status = ddr_training(id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     fwk_interrupt_global_enable();
 
     status = fwk_interrupt_set_isr(PHY_TRAINING_IRQ, ddr_phy_irq_handler);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_STATE;
+    }
 
     status = fwk_interrupt_clear_pending(PHY_TRAINING_IRQ);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_STATE;
+    }
 
     fwk_interrupt_enable(PHY_TRAINING_IRQ);
 
@@ -978,8 +1040,9 @@ static int juno_dmc400_process_notification(const struct fwk_event *event,
     struct mod_pd_power_state_pre_transition_notification_resp_params
         *pd_resp_params;
 
-    if (!fwk_module_is_valid_element_id(event->target_id))
+    if (!fwk_module_is_valid_element_id(event->target_id)) {
         return FWK_E_PARAM;
+    }
 
     element_config = fwk_module_get_data(event->target_id);
 
@@ -988,10 +1051,11 @@ static int juno_dmc400_process_notification(const struct fwk_event *event,
         pd_transition_params =
             (const struct mod_pd_power_state_transition_notification_params *)
                 event->params;
-        if (pd_transition_params->state != MOD_PD_STATE_ON)
+        if (pd_transition_params->state != MOD_PD_STATE_ON) {
             return FWK_SUCCESS;
-        else
+        } else {
             return ddr_resume(element_config, event->target_id);
+        }
     } else if (fwk_id_is_equal(event->id,
         mod_pd_notification_id_power_state_pre_transition)) {
         pd_pre_transition_params =
@@ -1009,18 +1073,20 @@ static int juno_dmc400_process_notification(const struct fwk_event *event,
             pd_resp_params->status = status;
 
             return status;
-        }
-        else
+        } else {
             return FWK_SUCCESS;
-    } else
+        }
+    } else {
         return FWK_E_HANDLER;
+    }
 }
 
 static int juno_dmc400_process_event(const struct fwk_event *event,
                                      struct fwk_event *resp)
 {
-    if (fwk_id_get_event_idx(event->id) >= JUNO_DMC400_EVENT_IDX_COUNT)
+    if (fwk_id_get_event_idx(event->id) >= JUNO_DMC400_EVENT_IDX_COUNT) {
         return FWK_E_PARAM;
+    }
 
     return ddr_retraining(event->target_id);
 }

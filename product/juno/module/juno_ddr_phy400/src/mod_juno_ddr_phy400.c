@@ -40,15 +40,17 @@ static int juno_ddr_phy400_config_ddr(fwk_id_t element_id)
     const struct mod_juno_ddr_phy400_element_config *element_config;
 
     element_config = fwk_module_get_data(element_id);
-    if (element_config == NULL)
+    if (element_config == NULL) {
         return FWK_E_DATA;
+    }
 
     phy_ptm = (struct mod_juno_ddr_phy400_ptm_reg *)element_config->ddr_phy_ptm;
     phy_c3a = (struct mod_juno_ddr_phy400_c3a_reg *)element_config->ddr_phy_c3a;
     phy_bl0 = (struct mod_juno_ddr_phy400_bl_reg *)element_config->ddr_phy_bl0;
 
-    if ((phy_ptm == NULL) || (phy_c3a == NULL) || (phy_bl0 == NULL))
+    if ((phy_ptm == NULL) || (phy_c3a == NULL) || (phy_bl0 == NULL)) {
         return FWK_E_DATA;
+    }
 
     /* All writes to BL0 are copied to BL1-3 */
     phy_ptm->BL_APB_CTRL = 0x00000001;
@@ -168,8 +170,9 @@ static int juno_ddr_phy400_config_idle(fwk_id_t element_id)
     module_config = fwk_module_get_data(fwk_module_id_juno_ddr_phy400);
 
     element_config = fwk_module_get_data(element_id);
-    if (element_config == NULL)
+    if (element_config == NULL) {
         return FWK_E_DATA;
+    }
 
     phy_ptm = (struct mod_juno_ddr_phy400_ptm_reg *)element_config->ddr_phy_ptm;
 
@@ -224,20 +227,23 @@ static int juno_ddr_phy400_bind(fwk_id_t id, unsigned int round)
     const struct mod_juno_ddr_phy400_config *module_config;
 
     /* Skip the second round */
-    if (round == 1)
+    if (round == 1) {
         return FWK_SUCCESS;
+    }
 
     /* Nothing to be done for element-level binding */
-    if (fwk_module_is_valid_element_id(id))
+    if (fwk_module_is_valid_element_id(id)) {
         return FWK_SUCCESS;
+    }
 
     module_config = fwk_module_get_data(fwk_module_id_juno_ddr_phy400);
     fwk_assert(module_config != NULL);
 
     status = fwk_module_bind(module_config->timer_id,
         MOD_TIMER_API_ID_TIMER, &timer_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_HANDLER;
+    }
 
     return FWK_SUCCESS;
 }
@@ -248,8 +254,9 @@ static int juno_ddr_phy400_process_bind_request(fwk_id_t requester_id,
                                                 const void **api)
 {
     /* Binding to elements is not permitted. */
-    if (fwk_module_is_valid_element_id(id))
+    if (fwk_module_is_valid_element_id(id)) {
         return FWK_E_ACCESS;
+    }
 
     *api = &ddr_phy400_api;
 

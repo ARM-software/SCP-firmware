@@ -149,8 +149,9 @@ static const struct fwk_element *get_element_table(fwk_id_t module_id)
     platid.platform_identifier = SSC->SSC_VERSION;
 
     status = juno_id_get_platform(&platform_id);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return NULL;
+    }
     platid.platform_type_identifier = (uint32_t)platform_id;
 
     /*

@@ -54,34 +54,41 @@ static void juno_debug_rom_set_clocks(void)
      * Setup ATCLK
      */
     juno_utils_atclk_clock_div_set(JUNO_DEBUG_ROM_DIVIDER_ATCLK);
-    while (!juno_utils_atclk_clock_div_set_check(JUNO_DEBUG_ROM_DIVIDER_ATCLK))
+    while (
+        !juno_utils_atclk_clock_div_set_check(JUNO_DEBUG_ROM_DIVIDER_ATCLK)) {
         continue;
+    }
 
     juno_utils_atclk_clock_sel_set(SCP_CONFIG_STDCLK_CONTROL_CLKSEL_SYSINCLK);
     while (!juno_utils_atclk_clock_sel_set_check(
-        SCP_CONFIG_STDCLK_CONTROL_CLKSEL_SYSINCLK))
+        SCP_CONFIG_STDCLK_CONTROL_CLKSEL_SYSINCLK)) {
         continue;
+    }
 
     /*
      * Setup TRACECLKIN
      */
     juno_utils_traceclk_clock_div_set(JUNO_DEBUG_ROM_DIVIDER_TRACECLK);
     while (!juno_utils_traceclk_clock_div_set_check(
-        JUNO_DEBUG_ROM_DIVIDER_TRACECLK))
+        JUNO_DEBUG_ROM_DIVIDER_TRACECLK)) {
         continue;
+    }
 
     juno_utils_traceclk_clock_sel_set(
         SCP_CONFIG_STDCLK_CONTROL_CLKSEL_SYSINCLK);
     while (!juno_utils_traceclk_clock_sel_set_check(
-        SCP_CONFIG_STDCLK_CONTROL_CLKSEL_SYSINCLK))
+        SCP_CONFIG_STDCLK_CONTROL_CLKSEL_SYSINCLK)) {
         continue;
+    }
 
     /*
      * Setup PCLKDBG
      */
     juno_utils_pclkdbg_clock_div_set(JUNO_DEBUG_ROM_DIVIDER_PCLK);
-    while (!juno_utils_pclkdbg_clock_div_set_check(JUNO_DEBUG_ROM_DIVIDER_PCLK))
+    while (
+        !juno_utils_pclkdbg_clock_div_set_check(JUNO_DEBUG_ROM_DIVIDER_PCLK)) {
         continue;
+    }
 }
 
 /*
@@ -175,8 +182,9 @@ static void juno_debug_cdbg_rst_req_isr(void)
 
     /* Wait for CoreSight to de-assert request */
     while ((SCP_CONFIG->DEBUG_STATUS & SCP_CONFIG_DEBUG_STATUS_CDBGRSTREQ) ==
-        SCP_CONFIG_DEBUG_STATUS_CDBGRSTREQ)
+           SCP_CONFIG_DEBUG_STATUS_CDBGRSTREQ) {
         continue;
+    }
 
     /* De-assert reset */
     SCP_CONFIG->SYS_MANUAL_RESET.SET = SCP_CONFIG_SYS_MANUAL_RESET_DBGSYSRESET;
@@ -211,18 +219,21 @@ int juno_debug_rom_init(const struct mod_juno_ppu_rom_api *rom_ppu_api)
 
     status = fwk_interrupt_set_isr(CDBG_PWR_UP_REQ_IRQ,
         juno_debug_cdbg_pwr_up_req_isr);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_interrupt_set_isr(CSYS_PWR_UP_REQ_IRQ,
         juno_debug_csys_pwr_up_req_isr);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     status = fwk_interrupt_set_isr(CDBG_RST_REQ_IRQ,
         juno_debug_cdbg_rst_req_isr);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     fwk_interrupt_enable(CDBG_PWR_UP_REQ_IRQ);
     fwk_interrupt_enable(CDBG_RST_REQ_IRQ);

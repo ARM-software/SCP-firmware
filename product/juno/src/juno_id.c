@@ -27,8 +27,9 @@ int juno_id_get_platform(enum juno_idx_platform *platform)
 {
     unsigned int plat;
 
-    if (!fwk_expect(platform != NULL))
+    if (!fwk_expect(platform != NULL)) {
         return FWK_E_PARAM;
+    }
 
     plat = (SCC->GPR0 & SCC_GPR0_PLATFORM_ID_PLAT) >>
         SCC_GPR0_PLATFORM_ID_PLAT_POS;
@@ -65,8 +66,9 @@ int juno_id_get_revision(enum juno_idx_revision *revision)
     }
 
     status = juno_id_get_platform(&platform);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     if (platform != JUNO_IDX_PLATFORM_RTL) {
         revision_cached = JUNO_IDX_REVISION_R0;
@@ -106,8 +108,9 @@ int juno_id_get_variant(enum juno_idx_variant *variant)
     unsigned int var;
     int status;
 
-    if (!fwk_expect(variant != NULL))
+    if (!fwk_expect(variant != NULL)) {
         return FWK_E_PARAM;
+    }
 
     if (variant_cached != JUNO_IDX_VARIANT_COUNT) {
         *variant = variant_cached;
@@ -116,8 +119,9 @@ int juno_id_get_variant(enum juno_idx_variant *variant)
     }
 
     status = juno_id_get_platform(&platform);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_PANIC;
+    }
 
     if (platform != JUNO_IDX_PLATFORM_RTL) {
         variant_cached = JUNO_IDX_VARIANT_A;
@@ -130,8 +134,9 @@ int juno_id_get_variant(enum juno_idx_variant *variant)
     var = (V2M_SYS_REGS->ID & (uint32_t)V2M_SYS_REGS_ID_VAR_MASK) >>
         V2M_SYS_REGS_ID_VAR_POS;
 
-    if (!fwk_expect(var < JUNO_IDX_VARIANT_COUNT))
+    if (!fwk_expect(var < JUNO_IDX_VARIANT_COUNT)) {
         return FWK_E_DATA;
+    }
 
     variant_cached = (enum juno_idx_variant)var;
     *variant = variant_cached;

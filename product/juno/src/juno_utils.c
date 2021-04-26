@@ -30,8 +30,9 @@ void juno_utils_open_snoop_gate_and_wait(volatile uint32_t *snoop_ctrl)
     fwk_assert(snoop_ctrl != NULL);
 
     *snoop_ctrl = SNOOP_CONTROL_L2ACCREQ;
-    while ((*snoop_ctrl & SNOOP_CONTROL_L2ACCACK) == 0)
+    while ((*snoop_ctrl & SNOOP_CONTROL_L2ACCACK) == 0) {
         continue;
+    }
 }
 
 void juno_utils_close_snoop_gate(volatile uint32_t *snoop_ctrl)
@@ -144,8 +145,9 @@ void juno_utils_system_clock_enable(uint32_t mask)
     fwk_assert((mask & ~SCP_CONFIG_CLOCK_ENABLE_ALL) == 0);
 
     SCP_CONFIG->CLOCK_ENABLE_SET |= mask;
-    while ((SCP_CONFIG->CLOCK_ENABLE_STATUS & mask) != mask)
+    while ((SCP_CONFIG->CLOCK_ENABLE_STATUS & mask) != mask) {
         continue;
+    }
 }
 
 void juno_utils_smc_init(void)

@@ -185,8 +185,9 @@ static const struct fwk_element *juno_cdcel937_get_element_table(
     struct mod_juno_cdcel937_dev_config *config;
 
     status = juno_id_get_platform(&platform_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return NULL;
+    }
 
     /* If running under a FVP, direct interactions to the mocked elements */
     if (platform_id == JUNO_IDX_PLATFORM_FVP) {
@@ -203,10 +204,10 @@ static const struct fwk_element *juno_cdcel937_get_element_table(
 
     /* Add the lookup table to the HDLCD elements */
     for (int i = 0; i < JUNO_CLOCK_CDCEL937_IDX_COUNT; i++) {
-
         if (i == JUNO_CLOCK_CDCEL937_IDX_I2SCLK ||
-            i == JUNO_CLOCK_CDCEL937_IDX_HDLCDPXL)
+            i == JUNO_CLOCK_CDCEL937_IDX_HDLCDPXL) {
             continue;
+        }
 
         config = (struct mod_juno_cdcel937_dev_config *)
                     (juno_cdcel937_element_table[i].data);

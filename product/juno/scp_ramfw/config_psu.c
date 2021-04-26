@@ -110,13 +110,15 @@ static const struct fwk_element *psu_get_dev_desc_table(fwk_id_t module_id)
     enum juno_idx_platform platform_id = JUNO_IDX_PLATFORM_COUNT;
 
     status = juno_id_get_platform(&platform_id);
-    if (!fwk_expect(status == FWK_SUCCESS))
+    if (!fwk_expect(status == FWK_SUCCESS)) {
         return NULL;
+    }
 
-    if (platform_id == JUNO_IDX_PLATFORM_FVP)
+    if (platform_id == JUNO_IDX_PLATFORM_FVP) {
         return psu_element_table_fvp;
-    else
+    } else {
         return psu_dev_desc_table;
+    }
 }
 
 struct fwk_module_config config_psu = {

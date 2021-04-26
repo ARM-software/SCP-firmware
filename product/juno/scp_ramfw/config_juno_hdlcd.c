@@ -79,8 +79,9 @@ static const struct fwk_element *juno_hdlcd_get_element_table(
     uintptr_t hdlcd_lookup = HDLCD_PRESET_TABLE_BASE;
 
     status = juno_id_get_platform(&platform_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return NULL;
+    }
 
     for (i = 0; i < JUNO_HDLCD_ELEMENT_COUNT; i++) {
         config = (struct mod_juno_hdlcd_dev_config *)

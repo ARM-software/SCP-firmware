@@ -103,11 +103,13 @@ static int set_block_access_length(struct juno_cdcel937_dev_ctx *ctx,
     int status;
     struct cfg_reg6 config6;
 
-    if (length == 0)
+    if (length == 0) {
         return FWK_E_RANGE;
-    if (length > 127)
+    }
+    if (length > 127) {
         /* 7 bit field limits maximum access length */
         return FWK_E_RANGE;
+    }
 
     config6.reg[0] = 0;
     write_field(config6.reg, CFG_REG6_BCOUNT, (uint8_t)length);
@@ -121,8 +123,9 @@ static int set_block_access_length(struct juno_cdcel937_dev_ctx *ctx,
 
     status = module_ctx.i2c_api->transmit_as_master(module_config->i2c_hal_id,
         ctx->config->slave_address, i2c_transmit, 2);
-    if (status != FWK_PENDING)
+    if (status != FWK_PENDING) {
         return FWK_E_DEVICE;
+    }
 
     return status;
 }
@@ -133,8 +136,9 @@ static int write_configuration(struct juno_cdcel937_dev_ctx *ctx,
 {
     int status;
 
-    if (base > 0x40)
+    if (base > 0x40) {
         return FWK_E_RANGE;
+    }
 
     i2c_transmit[0] = (JUNO_CDCEL937_TRANSFER_MODE_BLOCK |
                       (base & JUNO_CDCEL937_I2C_BYTE_OFFSET_MASK));
@@ -149,8 +153,9 @@ static int write_configuration(struct juno_cdcel937_dev_ctx *ctx,
 
     status = module_ctx.i2c_api->transmit_as_master(module_config->i2c_hal_id,
         ctx->config->slave_address, i2c_transmit, 10);
-    if (status != FWK_PENDING)
+    if (status != FWK_PENDING) {
         return FWK_E_DEVICE;
+    }
 
     return status;
 }
@@ -162,8 +167,9 @@ static int read_configuration(struct juno_cdcel937_dev_ctx *ctx,
     int status;
     const uint8_t block_access_length = 8;
 
-    if (base > 0x40)
+    if (base > 0x40) {
         return FWK_E_RANGE;
+    }
 
     i2c_transmit[0] = (JUNO_CDCEL937_TRANSFER_MODE_BLOCK |
                    (base & JUNO_CDCEL937_I2C_BYTE_OFFSET_MASK));
@@ -172,8 +178,9 @@ static int read_configuration(struct juno_cdcel937_dev_ctx *ctx,
     status = module_ctx.i2c_api->transmit_then_receive_as_master(
         module_config->i2c_hal_id, ctx->config->slave_address, i2c_transmit,
         config->reg, 1, block_access_length + 1);
-    if (status != FWK_PENDING)
+    if (status != FWK_PENDING) {
         return FWK_E_DEVICE;
+    }
 
     return status;
 }
@@ -252,8 +259,9 @@ static int get_rounded_rate(struct juno_cdcel937_dev_ctx *ctx,
     uint64_t rounded_up_rate;
     uint64_t rounded_down_rate;
 
-    if (ctx->config->rate_type != MOD_CLOCK_RATE_TYPE_CONTINUOUS)
+    if (ctx->config->rate_type != MOD_CLOCK_RATE_TYPE_CONTINUOUS) {
         return FWK_E_SUPPORT;
+    }
 
     rounded_down_rate = FWK_ALIGN_PREVIOUS(rate, ctx->config->min_step);
     rounded_up_rate = FWK_ALIGN_NEXT(rate, ctx->config->min_step);
@@ -265,12 +273,13 @@ static int get_rounded_rate(struct juno_cdcel937_dev_ctx *ctx,
 
     case MOD_CLOCK_ROUND_MODE_NEAREST:
         /* Select the rounded rate that is closest to the given rate */
-        if ((*rounded_rate % ctx->config->min_step) == 0)
+        if ((*rounded_rate % ctx->config->min_step) == 0) {
             *rounded_rate = rate;
-        else if ((rate - rounded_down_rate) > (rounded_up_rate - rate))
+        } else if ((rate - rounded_down_rate) > (rounded_up_rate - rate)) {
             *rounded_rate = rounded_up_rate;
-        else
+        } else {
             *rounded_rate = rounded_down_rate;
+        }
         break;
 
     case MOD_CLOCK_ROUND_MODE_DOWN:
@@ -287,8 +296,9 @@ static int get_rounded_rate(struct juno_cdcel937_dev_ctx *ctx,
     }
 
     /* Control that the obtained rate uses the correct precision. */
-    if ((*rounded_rate % ctx->config->min_step) != 0)
+    if ((*rounded_rate % ctx->config->min_step) != 0) {
         return FWK_E_RANGE;
+    }
 
     return FWK_SUCCESS;
 }
@@ -300,23 +310,26 @@ static int set_rate_read_pll_config(struct juno_cdcel937_dev_ctx *ctx)
     enum juno_cdcel937_output_type type;
 
     status = output_type_from_output_id(ctx->config->output_id, &type);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_PARAM;
+    }
 
-    #if USE_OUTPUT_Y1
+#if USE_OUTPUT_Y1
     if (type == JUNO_CDCEL937_OUTPUT_TYPE_Y1)
         return FWK_E_PARAM;
     #endif
 
     status = pll_base_from_output_id(ctx->config->output_id, &base_address);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_PARAM;
+    }
 
     /* The first 4 bytes of the PLL config register are not needed */
     base_address += 0x4;
     status = read_configuration(ctx, base_address, &ctx->pll_config);
-    if ((status != FWK_PENDING) && (status != FWK_SUCCESS))
+    if ((status != FWK_PENDING) && (status != FWK_SUCCESS)) {
         return FWK_E_DEVICE;
+    }
 
     return status;
 }
@@ -334,22 +347,25 @@ static int set_rate_write_pll_config(struct juno_cdcel937_dev_ctx *ctx)
     pll_config = ctx->pll_config;
 
     status = output_type_from_output_id(ctx->config->output_id, &type);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_PARAM;
+    }
 
-    if (ctx->config->lookup_table_count == 0)
+    if (ctx->config->lookup_table_count == 0) {
         status = get_preset_low_precision(ctx->rate, &preset);
-    else if (ctx->index < 0)
+    } else if (ctx->index < 0) {
         status = search_preset(ctx, ctx->rate, &preset);
-    else {
-        if ((unsigned int)ctx->index >= ctx->config->lookup_table_count)
+    } else {
+        if ((unsigned int)ctx->index >= ctx->config->lookup_table_count) {
             return FWK_E_PARAM;
+        }
 
         preset = ctx->config->lookup_table[ctx->index].preset;
     }
 
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_PARAM;
+    }
 
     M = preset.M;
     N = preset.N;
@@ -365,16 +381,17 @@ static int set_rate_write_pll_config(struct juno_cdcel937_dev_ctx *ctx)
 
     /* Calculate P, P = 4 - int(log2 N/M) */
     V = N / M;
-    if (V < 2)
+    if (V < 2) {
         P = 4;
-    else if (V < 3)
+    } else if (V < 3) {
         P = 3;
-    else if (V < 6)
+    } else if (V < 6) {
         P = 2;
-    else if (V < 12)
+    } else if (V < 12) {
         P = 1;
-    else
+    } else {
         P = 0;
+    }
 
     /* Calculate N', N' = N * 2^P */
     Nd = N * (1U << P);
@@ -393,38 +410,42 @@ static int set_rate_write_pll_config(struct juno_cdcel937_dev_ctx *ctx)
     write_field(pll_config.reg, PLL_CFG_REG_Q_LOW, Q);
     write_field(pll_config.reg, PLL_CFG_REG_P, P);
 
-    if (type == JUNO_CDCEL937_OUTPUT_TYPE_LOW)
+    if (type == JUNO_CDCEL937_OUTPUT_TYPE_LOW) {
         /* Even outputs: Y2, Y4, Y6 */
         write_field(pll_config.reg, PLL_CFG_REG_PDIV_X, pdiv);
-    else
+    } else {
         /* Odd outputs: Y3, Y5, Y7 */
         write_field(pll_config.reg, PLL_CFG_REG_PDIV_Y, pdiv);
+    }
 
     /* VCO range may need updating when fVCO changes */
-    if (fvco < 125)
+    if (fvco < 125) {
         write_field(pll_config.reg, PLL_CFG_REG_VCO_RANGE,
                    JUNO_CDCEL937_VCO_RANGE_LOWEST);
-    else if (fvco < 150)
+    } else if (fvco < 150) {
         write_field(pll_config.reg, PLL_CFG_REG_VCO_RANGE,
                    JUNO_CDCEL937_VCO_RANGE_LOW);
-    else if (fvco < 175)
+    } else if (fvco < 175) {
         write_field(pll_config.reg, PLL_CFG_REG_VCO_RANGE,
                    JUNO_CDCEL937_VCO_RANGE_HIGH);
-    else
+    } else {
         write_field(pll_config.reg, PLL_CFG_REG_VCO_RANGE,
                    JUNO_CDCEL937_VCO_RANGE_HIGHEST);
+    }
 
     status = pll_base_from_output_id(ctx->config->output_id, &base_address);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_PARAM;
+    }
 
     /* The first 4 bytes of the PLL config register are not needed */
     base_address += 0x4;
 
     /* Write back the modified structure */
     status = write_configuration(ctx, base_address, &pll_config);
-    if ((status != FWK_PENDING) && (status != FWK_SUCCESS))
+    if ((status != FWK_PENDING) && (status != FWK_SUCCESS)) {
         return FWK_E_DEVICE;
+    }
 
     return status;
 }
@@ -437,20 +458,24 @@ static int create_set_rate_request(fwk_id_t clock_id,
     int status;
     struct fwk_event event;
 
-    if (rate < JUNO_CDCEL937_OUTPUT_MIN_FREQ)
+    if (rate < JUNO_CDCEL937_OUTPUT_MIN_FREQ) {
         return FWK_E_RANGE;
-    if (rate > JUNO_CDCEL937_OUTPUT_MAX_FREQ)
+    }
+    if (rate > JUNO_CDCEL937_OUTPUT_MAX_FREQ) {
         return FWK_E_RANGE;
+    }
 
     /*
      * If the clock rate has already the wanted value the setting process is
      * skipped.
      */
-    if (ctx->rate_hz == rate)
+    if (ctx->rate_hz == rate) {
         return FWK_SUCCESS;
+    }
 
-    if (ctx->state != JUNO_CDCEL937_DEVICE_IDLE)
+    if (ctx->state != JUNO_CDCEL937_DEVICE_IDLE) {
         return FWK_E_BUSY;
+    }
 
     event = (struct fwk_event) {
         .target_id = clock_id,
@@ -461,8 +486,9 @@ static int create_set_rate_request(fwk_id_t clock_id,
     ctx->index = index;
 
     status = fwk_thread_put_event(&event);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_DEVICE;
+    }
 
     ctx->state = JUNO_CDCEL937_DEVICE_SET_RATE_SET_BLOCK_ACCESS_LENGTH;
 
@@ -573,8 +599,9 @@ static int rate_set_block_access_length(struct juno_cdcel937_dev_ctx *ctx)
     const uint8_t block_access_length = 8;
 
     status = set_block_access_length(ctx, block_access_length);
-    if (status != FWK_PENDING)
+    if (status != FWK_PENDING) {
         return FWK_E_DEVICE;
+    }
 
     return status;
 }
@@ -585,14 +612,16 @@ static int get_rate_read_pll_config(struct juno_cdcel937_dev_ctx *ctx)
     uint8_t base_address;
 
     status = pll_base_from_output_id(ctx->config->output_id, &base_address);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* The first 4 bytes of the PLL config register are not needed */
     base_address += 0x4;
     status = read_configuration(ctx, base_address, &ctx->pll_config);
-    if ((status != FWK_PENDING) && (status != FWK_SUCCESS))
+    if ((status != FWK_PENDING) && (status != FWK_SUCCESS)) {
         return FWK_E_DEVICE;
+    }
 
     return status;
 }
@@ -604,8 +633,9 @@ static int get_rate_calc(struct juno_cdcel937_dev_ctx *ctx)
     enum juno_cdcel937_output_type type;
 
     status = output_type_from_output_id(ctx->config->output_id, &type);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     if (type == JUNO_CDCEL937_OUTPUT_TYPE_LOW) {
         /* Even outputs: Y2, Y4, Y6 */
@@ -649,8 +679,9 @@ static int create_get_rate_request(fwk_id_t clock_id,
     int status;
     struct fwk_event event;
 
-    if (ctx->state != JUNO_CDCEL937_DEVICE_IDLE)
-            return FWK_E_BUSY;
+    if (ctx->state != JUNO_CDCEL937_DEVICE_IDLE) {
+        return FWK_E_BUSY;
+    }
 
     event = (struct fwk_event) {
         .target_id = clock_id,
@@ -658,8 +689,9 @@ static int create_get_rate_request(fwk_id_t clock_id,
     };
 
     status = fwk_thread_put_event(&event);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_DEVICE;
+    }
 
     ctx->state = JUNO_CDCEL937_DEVICE_GET_RATE_SET_BLOCK_ACCESS_LENGTH;
 
@@ -681,8 +713,9 @@ static int juno_cdcel937_set_rate(fwk_id_t clock_id,
 
     if (ctx->config->rate_type == MOD_CLOCK_RATE_TYPE_CONTINUOUS) {
         status = get_rounded_rate(ctx, rate, round_mode, &rounded_rate);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     /*
@@ -702,8 +735,9 @@ static int juno_cdcel937_get_rate(fwk_id_t clock_id,
 
     if (ctx->rate_set == false) {
         status = create_get_rate_request(clock_id, ctx);
-        if ((status != FWK_PENDING) && (status != FWK_SUCCESS))
+        if ((status != FWK_PENDING) && (status != FWK_SUCCESS)) {
             return FWK_E_DEVICE;
+        }
         return status;
     }
 
@@ -720,8 +754,9 @@ static int juno_cdcel937_get_rate_from_index(fwk_id_t clock_id,
 
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
-    if (rate_index >= ctx->config->lookup_table_count)
+    if (rate_index >= ctx->config->lookup_table_count) {
         return FWK_E_PARAM;
+    }
 
     *rate = ctx->config->lookup_table[rate_index].rate_hz;
 
@@ -731,8 +766,9 @@ static int juno_cdcel937_get_rate_from_index(fwk_id_t clock_id,
 static int juno_cdcel937_set_state(fwk_id_t clock_id,
                                    enum mod_clock_state state)
 {
-    if (state != MOD_CLOCK_STATE_RUNNING)
+    if (state != MOD_CLOCK_STATE_RUNNING) {
         return FWK_E_SUPPORT;
+    }
 
     /*
      * The clock is always on, only allow state to be set RUNNING
@@ -788,8 +824,9 @@ static int juno_cdcel937_set_rate_from_index(fwk_id_t clock_id,
 
     ctx = &ctx_table[fwk_id_get_element_idx(clock_id)];
 
-    if ((index < 0) || (unsigned int)index >= ctx->config->lookup_table_count)
+    if ((index < 0) || (unsigned int)index >= ctx->config->lookup_table_count) {
         return FWK_E_PARAM;
+    }
 
     rate = ctx->config->lookup_table[index].rate_hz;
 
@@ -856,16 +893,18 @@ static int juno_cdcel937_bind(fwk_id_t id, unsigned int round)
     /*
      * Only bind in first round of calls
      */
-    if (round > 0)
+    if (round > 0) {
         return FWK_SUCCESS;
+    }
 
     if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         /* Bind to I2C HAL */
         status = fwk_module_bind(module_config->i2c_hal_id,
                                  mod_i2c_api_id_i2c,
                                  &module_ctx.i2c_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return FWK_E_HANDLER;
+        }
 
         return FWK_SUCCESS;
     }
@@ -876,8 +915,9 @@ static int juno_cdcel937_bind(fwk_id_t id, unsigned int round)
     status = fwk_module_bind(ctx->config->clock_hal_id,
                              ctx->config->clock_api_id,
                              &ctx->driver_response_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return FWK_E_HANDLER;
+    }
 
     return FWK_SUCCESS;
 }
@@ -887,12 +927,13 @@ static int juno_cdcel937_process_bind_request(fwk_id_t source_id,
                                               fwk_id_t api_id,
                                               const void **api)
 {
-    if (fwk_id_is_equal(api_id, mod_juno_cdcel937_api_id_clock_driver))
+    if (fwk_id_is_equal(api_id, mod_juno_cdcel937_api_id_clock_driver)) {
         *api = &clock_driver_api;
-    else if (fwk_id_is_equal(api_id, mod_juno_cdcel937_api_id_hdlcd_driver))
+    } else if (fwk_id_is_equal(api_id, mod_juno_cdcel937_api_id_hdlcd_driver)) {
         *api = &hdlcd_driver_api;
-    else
+    } else {
         return FWK_E_ACCESS;
+    }
 
     return FWK_SUCCESS;
 }
@@ -965,10 +1006,11 @@ static int juno_cdcel937_process_event(const struct fwk_event *event,
 
     case JUNO_CDCEL937_DEVICE_GET_RATE_SET_BLOCK_ACCESS_LENGTH:
         status = output_type_from_output_id(ctx->config->output_id, &type);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             break;
+        }
 
-        #if USE_OUTPUT_Y1
+#if USE_OUTPUT_Y1
         if (type == JUNO_CDCEL937_OUTPUT_TYPE_Y1) {
             status = get_rate_y1_set_block_access_length(ctx);
             if (status == FWK_PENDING) {

@@ -41,10 +41,11 @@ static int get_value(fwk_id_t id, uint64_t *value)
 
         adc_quantity = ((uint64_t)adc_value) * JUNO_ADC_AMPS_MULTIPLIER;
 
-        if ((dev_type == ADC_DEV_BIG) || (dev_type == ADC_DEV_GPU))
+        if ((dev_type == ADC_DEV_BIG) || (dev_type == ADC_DEV_GPU)) {
             adc_quantity /= ADC_CURRENT_CONST1;
-        else
+        } else {
             adc_quantity /= ADC_CURRENT_CONST2;
+        }
 
         *value = adc_quantity;
 
@@ -66,10 +67,11 @@ static int get_value(fwk_id_t id, uint64_t *value)
 
         adc_quantity = ((uint64_t)adc_value) * JUNO_ADC_WATTS_MULTIPLIER;
 
-        if ((dev_type == ADC_DEV_BIG) || (dev_type == ADC_DEV_GPU))
+        if ((dev_type == ADC_DEV_BIG) || (dev_type == ADC_DEV_GPU)) {
             adc_quantity /= ADC_POWER_CONST1;
-        else
+        } else {
             adc_quantity /= ADC_POWER_CONST2;
+        }
 
         *value = adc_quantity;
 
@@ -79,10 +81,11 @@ static int get_value(fwk_id_t id, uint64_t *value)
         adc_quantity = V2M_SYS_REGS->ADC_ENERGY[dev_type] *
             JUNO_ADC_JOULE_MULTIPLIER;
 
-        if ((dev_type == ADC_DEV_BIG) || (dev_type == ADC_DEV_GPU))
+        if ((dev_type == ADC_DEV_BIG) || (dev_type == ADC_DEV_GPU)) {
             adc_quantity /= ADC_ENERGY_CONST1;
-        else
+        } else {
             adc_quantity /= ADC_ENERGY_CONST2;
+        }
 
         *value = adc_quantity;
 
@@ -99,8 +102,9 @@ static int get_info(fwk_id_t id, struct mod_sensor_info *info)
 
     config = fwk_module_get_data(id);
 
-    if (!fwk_expect(config->info != NULL))
+    if (!fwk_expect(config->info != NULL)) {
         return FWK_E_DATA;
+    }
 
     *info = *(config->info);
 
@@ -119,8 +123,9 @@ static int juno_adc_init(fwk_id_t module_id,
                          unsigned int element_count,
                          const void *data)
 {
-    if (!fwk_expect(element_count > 0))
+    if (!fwk_expect(element_count > 0)) {
         return FWK_E_DATA;
+    }
 
     return FWK_SUCCESS;
 }
@@ -137,15 +142,18 @@ static int juno_adc_process_bind_request(fwk_id_t source_id,
                                          fwk_id_t api_id,
                                          const void **api)
 {
-    if (!fwk_module_is_valid_sub_element_id(target_id))
+    if (!fwk_module_is_valid_sub_element_id(target_id)) {
         return FWK_E_ACCESS;
+    }
 
     if (fwk_id_get_module_idx(source_id) !=
-        fwk_id_get_module_idx(fwk_module_id_sensor))
+        fwk_id_get_module_idx(fwk_module_id_sensor)) {
         return FWK_E_ACCESS;
+    }
 
-    if (!fwk_id_is_equal(api_id, mod_juno_adc_api_id_driver))
+    if (!fwk_id_is_equal(api_id, mod_juno_adc_api_id_driver)) {
         return FWK_E_ACCESS;
+    }
 
     *api = &adc_sensor_api;
 
