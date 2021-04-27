@@ -37,16 +37,8 @@ git clang-format
 
 ### Braces
 
-Conditional statements with a single line of code should not use braces,
-preferring indentation only:
-
-```c
-if (condition)
-    function_call();
-```
-
-Any sequence of statements that spans multiple lines must be surrounded by
-braces:
+Conditional statements and iteration statements with a single line or
+multiple lines of code must be surrounded by braces:
 
 ```c
 if (condition) {
@@ -57,7 +49,7 @@ if (condition) {
 }
 ```
 
-These rules apply independently of whether they are part of an if-else chain:
+This rule applies also to an if-else chain:
 
 ```c
 if (condition) {
@@ -65,15 +57,17 @@ if (condition) {
         long_variable_name_x,
         long_variable_name_y,
         long_variable_name_z);
-} else
+} else {
     function_call_b();
+}
 ```
 
 Empty loop statements must use `continue`:
 
 ```c
-while (condition)
+while (condition) {
   continue;
+}
 ```
 
 ### Operators
@@ -93,15 +87,17 @@ Do not rely on the implicit precedence and associativity of operators. Use
 parentheses to make precedence and associativity explicit:
 
 ```c
-if ((a == 'a') || (x == 'x'))
+if ((a == 'a') || (x == 'x')) {
     do_something();
+}
 ```
 
 Parentheses around a unary operator and its operand may be omitted:
 
 ```c
-if (!a && *b)
+if (!a && *b) {
     do_something();
+}
 ```
 
 ## Conventions

@@ -156,15 +156,17 @@ Do not rely on the implicit precedence and associativity of C operators. Use
 parenthesis to make precedence and associativity explicit:
 
 \code
-if ((a == 'a') || (x == 'x'))
+if ((a == 'a') || (x == 'x')) {
     do_something();
+}
 \endcode
 
 Parenthesis around a unary operator and its operand may be omitted:
 
 \code
-if (!a || &a)
+if (!a || &a) {
     do_something();
+}
 \endcode
 
 Macros and Constants
