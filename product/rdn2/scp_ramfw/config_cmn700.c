@@ -83,7 +83,7 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
     {
         /*
          * Boot region
-         * Map: 0x0000_0000_0000 - 0x0000_0001_FFFF (128 MB)
+         * Map: 0x0000_0000_0000 - 0x0000_07FF_FFFF (128 MB)
          */
         .base = UINT64_C(0x000000000000),
         .size = UINT64_C(128) * FWK_MIB,
