@@ -11,6 +11,10 @@
 #include <fwk_log.h>
 #include <fwk_math.h>
 
+#include <inttypes.h>
+
+#define MOD_NAME "[CMN700] "
+
 /*
  * Encoding bits size of the X and Y position in the Node info value.
  * If X and Y dimension are less than 4, encoding bits size will be 2.
@@ -213,7 +217,6 @@ void configure_region(
     volatile uint64_t *reg_cfg2;
 
     fwk_assert(rnsam_reg);
-    fwk_assert((base % size) == 0);
 
     reg = (sam_type == SAM_TYPE_NON_HASH_MEM_REGION) ?
         &rnsam->NON_HASH_MEM_REGION[region_idx] :
@@ -226,6 +229,14 @@ void configure_region(
     prog_start_and_end_addr = (sam_type == SAM_TYPE_NON_HASH_MEM_REGION) ?
         get_rnsam_nonhash_range_comp_en_mode(rnsam) :
         get_rnsam_htg_range_comp_en_mode(rnsam);
+
+    if ((!prog_start_and_end_addr) && ((base % size) != 0)) {
+        FWK_LOG_ERR(
+            MOD_NAME "Base: 0x%" PRIx64 " should align with Size: 0x%" PRIx64,
+            base,
+            size);
+        fwk_unexpected();
+    }
 
     /* Get the LSB mask from LSB bit position defining minimum region size */
     lsb_addr_mask = get_rnsam_lsb_addr_mask(rnsam, sam_type);
