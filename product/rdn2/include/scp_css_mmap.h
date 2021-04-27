@@ -40,4 +40,14 @@
 #define SCP_MHU_SCP_AP_SND_S_CLUS0 (0x45020000)
 #define SCP_MHU_SCP_AP_RCV_S_CLUS0 (0x45030000)
 
+/*
+ * Macro to convert the AP address to SCP address to access through System
+ * Access Port 0
+ */
+#define SCP_SYSTEM_ACCESS_PORT0_ADDR(addr) (addr + 0x20000000)
+
+/* PCIe Related memory map */
+#define PCIE_INTEG_CTRL_REG_BASE(idx) \
+    (SCP_SYSTEM_ACCESS_PORT0_ADDR(0x40D00000 + (idx * 0x2000000)))
+
 #endif /* SCP_CSS_MMAP_H */

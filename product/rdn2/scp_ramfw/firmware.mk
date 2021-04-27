@@ -24,6 +24,7 @@ BS_FIRMWARE_MODULES := \
     timer \
     cmn700 \
     apcontext \
+    pcie_integ_ctrl \
     ppu_v1 \
     system_power \
     mhu2 \
@@ -63,6 +64,7 @@ BS_FIRMWARE_SOURCES := \
     config_css_clock.c \
     config_clock.c \
     config_apcontext.c \
+    config_pcie_integ_ctrl.c \
     config_scmi_power_domain.c \
     config_psu.c \
     config_mock_psu.c \
