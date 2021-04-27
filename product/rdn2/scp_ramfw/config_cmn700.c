@@ -155,7 +155,7 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
          * Ethernet Controller PL91x
          * Map: 0x10_5C00_0000 - 0x10_5FFF_FFFF (64 MB)
          */
-        .base = UINT64_C(0x1050000000),
+        .base = UINT64_C(0x105C000000),
         .size = UINT64_C(64) * FWK_MIB,
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HND,
