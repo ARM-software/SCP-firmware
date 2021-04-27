@@ -53,6 +53,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_css_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_apcontext.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_pcie_integ_ctrl.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_apremap.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_power_domain.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_system_info.c"
