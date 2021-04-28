@@ -24,6 +24,12 @@
 
 /* Maximum System Cache Group regions supported by CMN-700 */
 #define MAX_SCG_COUNT 4
+/* Maximum Non Hash Mem Group regions supported by CMN-700 */
+#define MAX_NON_HASH_MEM_COUNT 60
+/* Maximum Non Hash Mem Group regions in first group */
+#define NON_HASH_MEM_REG_COUNT 24
+/* Maximum Non Hash Mem Group regions in second group */
+#define NON_HASH_MEM_REG_GRP2_COUNT 40
 
 /* SAM Granularity of RN-SAM and HN-F SAM */
 #define SAM_GRANULARITY (64 * FWK_MIB)
@@ -101,8 +107,8 @@ struct cmn700_rnsam_reg {
             uint8_t   RESERVED1[0x900 - 0x88];
     FWK_R   uint64_t  UNIT_INFO[2];
             uint8_t   RESERVED2[0xC00 - 0x910];
-    FWK_RW  uint64_t  NON_HASH_MEM_REGION[24];
-    FWK_RW  uint64_t  NON_HASH_MEM_REGION_CFG2[24];
+    FWK_RW  uint64_t  NON_HASH_MEM_REGION[NON_HASH_MEM_REG_COUNT];
+    FWK_RW  uint64_t  NON_HASH_MEM_REGION_CFG2[NON_HASH_MEM_REG_COUNT];
     FWK_RW  uint64_t  NON_HASH_TGT_NODEID[16];
     FWK_RW  uint64_t  SYS_CACHE_GRP_REGION[4];
     FWK_RW  uint64_t  HASHED_TGT_GRP_CFG1_REGION[4];
@@ -117,7 +123,11 @@ struct cmn700_rnsam_reg {
             uint8_t   RESERVED9[0x1120 - 0x1110];
     FWK_RW  uint64_t  SYS_CACHE_GRP_CAL_MODE;
     FWK_RW  uint64_t  HASHED_TARGET_GRP_CAL_MODE[3];
-            uint8_t   RESERVED10[0x3100 - 0x1140];
+            uint8_t   RESERVED10[0x20C0 - 0x1140];
+    FWK_RW  uint64_t  NON_HASH_MEM_REGION_GRP2[NON_HASH_MEM_REG_GRP2_COUNT];
+            uint8_t   RESERVED11[0x24C0 - 0x2200];
+    FWK_RW  uint64_t  NON_HASH_MEM_REGION_CFG2_GRP2[NON_HASH_MEM_REG_GRP2_COUNT];
+            uint8_t   RESERVED12[0x3100 - 0x2600];
     FWK_RW  uint64_t  HASHED_TGT_GRP_CFG2_REGION[32];
 };
 

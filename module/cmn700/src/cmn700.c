@@ -218,12 +218,46 @@ void configure_region(
 
     fwk_assert(rnsam_reg);
 
-    reg = (sam_type == SAM_TYPE_NON_HASH_MEM_REGION) ?
-        &rnsam->NON_HASH_MEM_REGION[region_idx] :
-        &rnsam->SYS_CACHE_GRP_REGION[region_idx];
-    reg_cfg2 = (sam_type == SAM_TYPE_NON_HASH_MEM_REGION) ?
-        &rnsam->NON_HASH_MEM_REGION_CFG2[region_idx] :
-        &rnsam->HASHED_TGT_GRP_CFG2_REGION[region_idx];
+    if ((sam_type == SAM_TYPE_NON_HASH_MEM_REGION) &&
+        (region_idx >= MAX_NON_HASH_MEM_COUNT)) {
+        FWK_LOG_ERR(
+            MOD_NAME
+            "Region idx: %d should be less than max non hash region count of "
+            "%d",
+            region_idx,
+            MAX_NON_HASH_MEM_COUNT);
+        fwk_unexpected();
+    } else if (
+        (sam_type == SAM_TYPE_SYS_CACHE_GRP_REGION) &&
+        (region_idx >= MAX_SCG_COUNT)) {
+        FWK_LOG_ERR(
+            MOD_NAME
+            "Region idx: %d should be less then max SCG region count of %d",
+            region_idx,
+            MAX_SCG_COUNT);
+        fwk_unexpected();
+    }
+
+    if (region_idx < NON_HASH_MEM_REG_COUNT) {
+        reg = (sam_type == SAM_TYPE_NON_HASH_MEM_REGION) ?
+            &rnsam->NON_HASH_MEM_REGION[region_idx] :
+            &rnsam->SYS_CACHE_GRP_REGION[region_idx];
+        reg_cfg2 = (sam_type == SAM_TYPE_NON_HASH_MEM_REGION) ?
+            &rnsam->NON_HASH_MEM_REGION_CFG2[region_idx] :
+            &rnsam->HASHED_TGT_GRP_CFG2_REGION[region_idx];
+    } else {
+        /*
+         * If region_idx is >= NON_HASH_MEM_REG_COUNT, sam_type should not be
+         * SAM_TYPE_SYS_CACHE_GRP_REGION since only four regions are supported
+         * in SCG.
+         */
+        fwk_assert(sam_type == SAM_TYPE_NON_HASH_MEM_REGION);
+
+        reg = &rnsam->NON_HASH_MEM_REGION_GRP2
+                   [region_idx - NON_HASH_MEM_REG_COUNT];
+        reg_cfg2 = &rnsam->NON_HASH_MEM_REGION_CFG2_GRP2
+                        [region_idx - NON_HASH_MEM_REG_COUNT];
+    }
 
     /* Check if the start and end address has to be programmed */
     prog_start_and_end_addr = (sam_type == SAM_TYPE_NON_HASH_MEM_REGION) ?
