@@ -549,4 +549,26 @@ static inline uint64_t el_implemented(unsigned int el)
 #define read_cpacr() read_cpacr_el1()
 #define write_cpacr(_v) write_cpacr_el1(_v)
 
+/*!
+ * \brief Enables global CPU interrupts.
+ *
+ * \note inline is necessary as this call can be used in performance sensitive
+ *     path
+ */
+inline static void arch_interrupts_enable()
+{
+    enable_irq();
+}
+
+/*!
+ * \brief Disables global CPU interrupts.
+
+ * \note inline is necessary as this call can be used in performance sensitive
+ *     path
+ */
+inline static void arch_interrupts_disable()
+{
+    disable_irq();
+}
+
 #endif /* ARCH_HELPERS_H */
