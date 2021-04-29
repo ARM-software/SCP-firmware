@@ -12,10 +12,22 @@
 #define FWK_INTERRUPT_H
 
 #include <fwk_arch.h>
+#include <fwk_macros.h>
+#include <fwk_status.h>
+
+#if FWK_HAS_INCLUDE(<arch_helpers.h>)
+#    include <arch_helpers.h>
+#endif
 
 #include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
+
+/*
+ * This variable is used to ensure spurious nested calls won't
+ * enable interrupts. This is been defined in fwk_interrupt.c
+ */
+extern unsigned int critical_section_nest_level;
 
 /*!
  * \addtogroup GroupLibFramework Framework
@@ -70,19 +82,33 @@ int fwk_interrupt_init(const struct fwk_arch_interrupt_driver *driver);
 
 /*!
  * \brief Enable interrupts.
- *
- * \retval ::FWK_SUCCESS Operation succeeded.
- * \retval ::FWK_E_INIT The component has not been initialized.
+
  */
-int fwk_interrupt_global_enable(void);
+inline static void fwk_interrupt_global_enable(void)
+{
+    /* Decrement critical_section_nest_level only if in critical section */
+    if (critical_section_nest_level > 0) {
+        critical_section_nest_level--;
+    }
+
+    /* Enable interrupts globally if now outside critical section */
+    if (critical_section_nest_level == 0) {
+        arch_interrupts_enable();
+    }
+}
 
 /*!
  * \brief Disable interrupts.
- *
- * \retval ::FWK_SUCCESS Operation succeeded.
- * \retval ::FWK_E_INIT The component has not been initialized.
  */
-int fwk_interrupt_global_disable(void);
+inline static void fwk_interrupt_global_disable(void)
+{
+    critical_section_nest_level++;
+
+    /* If now in outer-most critical section, disable interrupts globally */
+    if (critical_section_nest_level == 1) {
+        arch_interrupts_disable();
+    }
+}
 
 /*!
  * \brief Test whether an interrupt is enabled.

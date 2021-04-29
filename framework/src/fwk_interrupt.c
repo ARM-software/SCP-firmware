@@ -19,7 +19,13 @@
 
 static bool initialized;
 static const struct fwk_arch_interrupt_driver *fwk_interrupt_driver;
-static unsigned int critical_section_nest_level;
+
+/*
+ * This variable is used to ensure spurious nested calls won't
+ * enable interrupts. This is been accessed from inline function defined in
+ * fwk_interrupt.h
+ */
+unsigned int critical_section_nest_level;
 
 int fwk_interrupt_init(const struct fwk_arch_interrupt_driver *driver)
 {
@@ -72,41 +78,6 @@ int fwk_interrupt_init(const struct fwk_arch_interrupt_driver *driver)
 
     fwk_interrupt_driver = driver;
     initialized = true;
-
-    return FWK_SUCCESS;
-}
-
-int fwk_interrupt_global_enable(void)
-{
-    if (!initialized) {
-        return FWK_E_INIT;
-    }
-
-    /* Decrement critical_section_nest_level only if in critical section */
-    if (critical_section_nest_level > 0) {
-        critical_section_nest_level--;
-    }
-
-    /* Enable interrupts globally if now outside critical section */
-    if (critical_section_nest_level == 0) {
-        return fwk_interrupt_driver->global_enable();
-    }
-
-    return FWK_SUCCESS;
-}
-
-int fwk_interrupt_global_disable(void)
-{
-    if (!initialized) {
-        return FWK_E_INIT;
-    }
-
-    critical_section_nest_level++;
-
-    /* If now in outer-most critical section, disable interrupts globally */
-    if (critical_section_nest_level == 1) {
-        return fwk_interrupt_driver->global_disable();
-    }
 
     return FWK_SUCCESS;
 }

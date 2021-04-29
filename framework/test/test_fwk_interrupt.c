@@ -33,8 +33,6 @@ static int set_isr_nmi_return_val;
 static int set_isr_nmi_param_return_val;
 static int set_isr_fault_return_val;
 static int get_current_return_val;
-static unsigned int global_enable_call_count;
-static unsigned int global_disable_call_count;
 
 static void fake_isr(void)
 {
@@ -48,13 +46,11 @@ static void fake_isr_param(uintptr_t param)
 
 static int global_enable(void)
 {
-    global_enable_call_count++;
     return FWK_SUCCESS;
 }
 
 static int global_disable(void)
 {
-    global_disable_call_count++;
     return FWK_SUCCESS;
 }
 
@@ -153,8 +149,6 @@ static void test_case_setup(void)
     set_isr_nmi_param_return_val = FWK_E_HANDLER;
     set_isr_fault_return_val = FWK_E_HANDLER;
     get_current_return_val = FWK_E_HANDLER;
-    global_disable_call_count = 0;
-    global_enable_call_count = 0;
 }
 
 static void test_fwk_interrupt_before_init(void)
@@ -162,12 +156,6 @@ static void test_fwk_interrupt_before_init(void)
     int result;
     unsigned int interrupt = 1;
     bool state;
-
-    result = fwk_interrupt_global_enable();
-    assert(result == FWK_E_INIT);
-
-    result = fwk_interrupt_global_disable();
-    assert(result == FWK_E_INIT);
 
     result = fwk_interrupt_is_enabled(interrupt, &state);
     assert(result == FWK_E_INIT);
@@ -218,10 +206,10 @@ static void test_fwk_interrupt_init(void)
 static void test_fwk_interrupt_critical_section(void)
 {
     fwk_interrupt_global_disable();
-    assert(global_disable_call_count == 1);
+    assert(critical_section_nest_level == 1);
 
     fwk_interrupt_global_enable();
-    assert(global_enable_call_count == 1);
+    assert(critical_section_nest_level == 0);
 }
 
 static void test_fwk_interrupt_is_enabled(void)
@@ -348,22 +336,22 @@ static void test_fwk_interrupt_get_current(void)
 static void test_fwk_interrupt_nested_critical_section(void)
 {
     fwk_interrupt_global_disable();
-    assert(global_disable_call_count == 1);
+    assert(critical_section_nest_level == 1);
 
     fwk_interrupt_global_disable();
-    assert(global_disable_call_count == 1);
+    assert(critical_section_nest_level == 2);
 
     fwk_interrupt_global_disable();
-    assert(global_disable_call_count == 1);
+    assert(critical_section_nest_level == 3);
 
     fwk_interrupt_global_enable();
-    assert(global_enable_call_count == 0);
+    assert(critical_section_nest_level == 2);
 
     fwk_interrupt_global_enable();
-    assert(global_enable_call_count == 0);
+    assert(critical_section_nest_level == 1);
 
     fwk_interrupt_global_enable();
-    assert(global_enable_call_count == 1);
+    assert(critical_section_nest_level == 0);
 }
 
 static const struct fwk_test_case_desc test_case_table[] = {
