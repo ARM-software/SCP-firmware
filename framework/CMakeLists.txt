@@ -208,3 +208,5 @@ endforeach()
 if(SCP_ENABLE_DEBUGGER)
     target_link_libraries(framework PUBLIC debugger)
 endif()
+
+target_link_libraries(framework INTERFACE ${SCP_ARCHITECTURE_TARGET})
