@@ -391,7 +391,7 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
     const struct mod_scmi_perf_domain_config *domain =
         &(*scmi_perf_ctx.config->domains)[parameters->domain_id];
 
-    if (domain->fast_channels_addr_scp != 0x0)
+    if (domain->fast_channels_addr_scp != NULL)
         fast_channels = true;
 #endif
     return_values = (struct scmi_perf_domain_attributes_p2a){
@@ -932,7 +932,7 @@ static int scmi_perf_describe_fast_channels(fwk_id_t service_id,
 
     domain = &(*scmi_perf_ctx.config->domains)[parameters->domain_id];
 
-    if (domain->fast_channels_addr_scp == 0x0) {
+    if (domain->fast_channels_addr_scp == NULL) {
         return_values.status = SCMI_NOT_SUPPORTED;
 
         goto exit;
@@ -974,7 +974,7 @@ static int scmi_perf_describe_fast_channels(fwk_id_t service_id,
         goto exit;
 
     }
-    if (domain->fast_channels_addr_ap == 0x0 ||
+    if (domain->fast_channels_addr_ap == NULL ||
         domain->fast_channels_addr_ap[chan_index] == 0x0) {
         return_values.status = SCMI_NOT_SUPPORTED;
         goto exit;
@@ -1008,7 +1008,7 @@ static void fast_channel_callback(uintptr_t param)
 
     for (i = 0; i < scmi_perf_ctx.domain_count; i++) {
         domain = &(*scmi_perf_ctx.config->domains)[i];
-        if (domain->fast_channels_addr_scp != 0x0) {
+        if (domain->fast_channels_addr_scp != NULL) {
             set_limit = (struct mod_scmi_perf_fast_channel_limit
                              *)((uintptr_t)domain->fast_channels_addr_scp
                                     [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET]);
@@ -1018,11 +1018,11 @@ static void fast_channel_callback(uintptr_t param)
             /*
              * Check for set_level
              */
-            if (set_level != 0x0 && *set_level != 0) {
+            if (set_level != NULL && *set_level != 0) {
                 scmi_perf_ctx.dvfs_api->set_level(
                     FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, i), 0, *set_level);
             }
-            if (set_limit != 0) {
+            if (set_limit != NULL) {
                 if ((set_limit->range_max == 0) && (set_limit->range_min == 0))
                     continue;
                 scmi_perf_ctx.dvfs_api->set_level_limits(
@@ -1174,11 +1174,11 @@ static void scmi_perf_notify_limits_updated(
     idx = fwk_id_get_element_idx(domain_id);
 
     domain = &(*scmi_perf_ctx.config->domains)[idx];
-    if (domain->fast_channels_addr_scp != 0x0) {
+    if (domain->fast_channels_addr_scp != NULL) {
         get_limit = (struct mod_scmi_perf_fast_channel_limit
                          *)((uintptr_t)domain->fast_channels_addr_scp
                                 [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET]);
-        if (get_limit != 0x0) { /* note: get_limit may not be defined */
+        if (get_limit != NULL) { /* note: get_limit may not be defined */
             get_limit->range_max = range_max;
             get_limit->range_min = range_min;
         }
@@ -1231,10 +1231,10 @@ static void scmi_perf_notify_level_updated(
 #endif
 
     domain = &(*scmi_perf_ctx.config->domains)[idx];
-    if (domain->fast_channels_addr_scp != 0x0) {
+    if (domain->fast_channels_addr_scp != NULL) {
         get_level = (uint32_t *)((uintptr_t)domain->fast_channels_addr_scp
                                      [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET]);
-        if (get_level != 0x0) { /* note: get_level may not be defined */
+        if (get_level != NULL) { /* note: get_level may not be defined */
             *get_level = level;
         }
     }
@@ -1485,10 +1485,10 @@ static int scmi_perf_start(fwk_id_t id)
 
     for (i = 0; i < scmi_perf_ctx.domain_count; i++) {
         domain = &(*scmi_perf_ctx.config->domains)[i];
-        if (domain->fast_channels_addr_scp != 0x0) {
+        if (domain->fast_channels_addr_scp != NULL) {
             for (j = 0; j < MOD_SCMI_PERF_FAST_CHANNEL_ADDR_INDEX_COUNT; j++) {
                 fc_elem = (void *)(uintptr_t)domain->fast_channels_addr_scp[j];
-                if (fc_elem != 0x0)
+                if (fc_elem != NULL)
                     memset(fc_elem, 0, fast_channel_elem_size[j]);
             }
         }

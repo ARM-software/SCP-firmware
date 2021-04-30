@@ -158,7 +158,7 @@ static int protocol_message_attributes_handler(fwk_id_t service_id,
     params = *(const struct scmi_protocol_message_attributes_a2p *)payload;
 
     if ((params.message_id < FWK_ARRAY_SIZE(msg_handler_table)) &&
-        msg_handler_table[params.message_id]) {
+        (msg_handler_table[params.message_id] != NULL)) {
         outmsg.status = SCMI_SUCCESS;
         outmsg_size = sizeof(outmsg);
     }

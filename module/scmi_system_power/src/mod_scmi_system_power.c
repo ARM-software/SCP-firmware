@@ -531,7 +531,7 @@ FWK_WEAK int scmi_sys_power_state_set_policy(
             scmi_sys_power_state_notify(service_id, *state, false);
 #endif
 
-            if (scmi_sys_power_ctx.alarm_api) {
+            if (scmi_sys_power_ctx.alarm_api != NULL) {
                 scmi_sys_power_ctx.alarm_api->start(
                     scmi_sys_power_ctx.config->alarm_id,
                     scmi_sys_power_ctx.config->graceful_timeout,
