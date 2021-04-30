@@ -167,7 +167,7 @@ static int execute_signal_handler(fwk_id_t target_id, fwk_id_t signal_id)
     int status;
 
     module = fwk_module_get_ctx(target_id)->desc;
-    if (module->process_signal == 0) {
+    if (module->process_signal == NULL) {
         return FWK_E_PARAM;
     }
     status = module->process_signal(target_id, signal_id);
