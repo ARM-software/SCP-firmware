@@ -672,7 +672,7 @@ static int dvfs_set_level_limits(
     ctx->level_limits = *limits;
 
     /* notify the HAL that the limits have been updated */
-    if (ctx->apis.perf_updated_api) {
+    if (ctx->apis.perf_updated_api != NULL) {
         ctx->apis.perf_updated_api->notify_limits_updated(
             ctx->domain_id, cookie, limits->minimum, limits->maximum);
     }
@@ -790,7 +790,7 @@ static int dvfs_complete(
 
     /* notify the HAL that the level has been updated */
     if ((req_status == FWK_SUCCESS) && (ctx->state != DVFS_DOMAIN_GET_OPP)) {
-        if (ctx->apis.perf_updated_api) {
+        if (ctx->apis.perf_updated_api != NULL) {
             ctx->apis.perf_updated_api->notify_level_updated(
                 ctx->domain_id, ctx->request.cookie, ctx->current_opp.level);
         }

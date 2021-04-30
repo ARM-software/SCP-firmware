@@ -292,14 +292,14 @@ static int cmn600_discovery(void)
     FWK_LOG_INFO(MOD_NAME "Total RN-D nodes: %d", ctx->rnf_count);
     FWK_LOG_INFO(MOD_NAME "Total RN-I nodes: %d", ctx->rni_count);
 
-    if (ctx->cxla_reg) {
+    if (ctx->cxla_reg != NULL) {
         FWK_LOG_INFO(MOD_NAME "CCIX CXLA node at: 0x%p", (void *)ctx->cxla_reg);
     }
-    if (ctx->cxg_ra_reg) {
+    if (ctx->cxg_ra_reg != NULL) {
         FWK_LOG_INFO(
             MOD_NAME "CCIX CXRA node at: 0x%p", (void *)ctx->cxg_ra_reg);
     }
-    if (ctx->cxg_ha_reg) {
+    if (ctx->cxg_ha_reg != NULL) {
         FWK_LOG_INFO(
             MOD_NAME "CCIX CXHA node at: 0x%p", (void *)ctx->cxg_ha_reg);
     }
