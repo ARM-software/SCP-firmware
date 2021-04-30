@@ -227,9 +227,8 @@ int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
     uint32_t ictr_intlinesnum;
     uint32_t align_entries;
     uint32_t align_word;
-
     uint32_t *vector;
-    unsigned int irq;
+    char irq;
 
     if (driver == NULL)
         return FWK_E_PARAM;
@@ -277,7 +276,7 @@ int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
     SCB->VTOR = (uint32_t)vector;
 
     /* Initialize IRQs */
-    for (irq = 0; irq < irq_count; irq++) {
+    for (irq = 0; irq < (char)irq_count; irq++) {
         /* Ensure IRQs are disabled during boot sequence */
         NVIC_DisableIRQ((IRQn_Type)irq);
         NVIC_ClearPendingIRQ((IRQn_Type)irq);
