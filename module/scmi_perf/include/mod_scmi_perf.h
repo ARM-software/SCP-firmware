@@ -84,7 +84,7 @@ struct mod_scmi_perf_domain_config {
      *
      * \details Platform Domain fast channel address
      *
-     * \note May be set to 0x0, in which case support for fast
+     * \note May be set to NULL, in which case support for fast
      *       channels is disabled for the platform.
      */
     uint64_t *fast_channels_addr_scp;
