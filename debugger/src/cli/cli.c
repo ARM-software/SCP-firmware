@@ -971,13 +971,9 @@ static uint32_t cli_get_command(
 
         /* Dealing with escape sequences. */
         if (flag_escape_sequence == true) {
-            /* Prevent escape buffer overflow, Only save first 7 bytes data of
-             * escape sequences. */
-            if (escape_index >= 7) {
-                escape[escape_index] = c;
-                escape[escape_index + 1] = 0;
-                escape_index = escape_index + 1;
-            }
+            escape[escape_index] = c;
+            escape[escape_index + 1] = 0;
+            escape_index = escape_index + 1;
 
             /* Escape sequences end with a letter. */
             if ((c > 0x40 && c < 0x5B) || (c > 0x60 && c < 0x7B)) {
