@@ -10,6 +10,8 @@
 #include <fwk_assert.h>
 #include <fwk_math.h>
 
+#include <stddef.h>
+
 static unsigned int encoding_bits;
 static unsigned int mask_bits;
 
@@ -126,7 +128,7 @@ void configure_region(
 {
     uint64_t value;
 
-    fwk_assert(reg);
+    fwk_assert(reg != NULL);
     fwk_assert((base % size) == 0);
 
     value = CMN_SKEENA_RNSAM_REGION_ENTRY_VALID;
