@@ -10,6 +10,8 @@
 #include <fwk_assert.h>
 #include <fwk_math.h>
 
+#include <stddef.h>
+
 /*
  * Encoding bits size of the X and Y position in the Node info value.
  * If X and Y dimension are less than 4, encoding bits size will be 2.
@@ -130,7 +132,7 @@ void configure_region(volatile uint64_t *reg, uint64_t base, uint64_t size,
 {
     uint64_t value;
 
-    fwk_assert(reg);
+    fwk_assert(reg != NULL);
     fwk_assert((base % size) == 0);
 
     value = CMN_BOOKER_RNSAM_REGION_ENTRY_VALID;
