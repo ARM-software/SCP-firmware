@@ -402,6 +402,12 @@ static int n1sdp_system_init_primary_core(void)
         }
     }
 
+    /* Enable non-secure CoreSight debug access */
+    FWK_LOG_INFO(
+        "[N1SDP SYSTEM] Enabling CoreSight debug non-secure access");
+    *(volatile uint32_t
+          *)(AP_SCP_SRAM_OFFSET + NIC_400_SEC_0_CSAPBM_OFFSET) = 0xFFFFFFFF;
+
     if (n1sdp_get_chipid() == 0x0) {
         struct mod_fip_entry_data entry;
         status = n1sdp_system_ctx.fip_api->get_entry(
@@ -444,12 +450,6 @@ static int n1sdp_system_init_primary_core(void)
         if (status != FWK_SUCCESS) {
             return status;
         }
-
-        /* Enable non-secure CoreSight debug access */
-        FWK_LOG_INFO(
-            "[N1SDP SYSTEM] Enabling CoreSight debug non-secure access");
-        *(volatile uint32_t *)(AP_SCP_SRAM_OFFSET +
-                               NIC_400_SEC_0_CSAPBM_OFFSET) = 0xFFFFFFFF;
 
         mod_pd_restricted_api = n1sdp_system_ctx.mod_pd_restricted_api;
 
