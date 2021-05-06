@@ -50,6 +50,18 @@ Certain checks have been manually suppressed. Checks are generally only
 disabled if they have been triaged as false positives. The list of suppressed
 checks can be found [here](../tools/cppcheck_suppress_list.txt).
 
+MISRAC-2012
+-----------
+The SCP-firmware is gradually achieving compliance with MISRAC-2012. To date,
+the mandatory rules have been resolved.
+
+In order to provide a reference, Juno platform is taken as a first platform to
+provide compliance. At the same time, a MISRAC-2012 checker will run upon PR
+submission.
+
+Please note that new patches will have to be compliant with the current status
+of compliance.
+
 C Standard Library
 ------------------
 When developing a module, only the following headers of the C standard library
