@@ -57,6 +57,17 @@ if(SCP_ENABLE_NOTIFICATIONS)
     target_compile_definitions(framework PUBLIC "BUILD_HAS_NOTIFICATION")
 endif()
 
+if(SCP_ENABLE_SCMI_NOTIFICATIONS)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_SCMI_NOTIFICATIONS")
+    if(SCP_ENABLE_SCMI_SENSOR_EVENTS)
+        target_compiler_definitions(framework PUBLIC "BUILD_HAS_SCMI_SENSOR_EVENTS")
+    endif()
+endif()
+
+if(SCP_ENABLE_FAST_CHANNELS)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_FAST_CHANNELS")
+endif()
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(framework PUBLIC BUILD_MODE_DEBUG)
 endif()
