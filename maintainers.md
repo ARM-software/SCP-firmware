@@ -37,11 +37,17 @@ maintainers. The platforms listed here represent the exceptions to this rule.
 #### N1SDP (n1sdp)
 
 - [Manoj Kumar](https://github.com/manojkumar-arm) (manoj.kumar3@arm.com)
-- [Sudipto Paul](https://github.com/sudpau01) (sudipto.paul@arm.com)
+- [Deepak Pandey](https://github.com/deepan02) (deepak.pandey@arm.com)
 
-#### RD-V1 (rdv1, rdv1mc)
+#### Morello (morello)
+
+- [Manoj Kumar](https://github.com/manojkumar-arm) (manoj.kumar3@arm.com)
+- [Deepak Pandey](https://github.com/deepan02) (deepak.pandey@arm.com)
+
+#### RD platforms (rdv1, rdv1mc, rdn1e1, rdn2)
 
 - [Thomas Abraham](https://github.com/omasab) (thomas.abraham@arm.com)
+- [Vijayenthiran Subramaniam](https://github.com/vijayenthiran-arm) (Vijayenthiran.Subramaniam@arm.com)
 
 #### Total Compute (tc0)
 
@@ -52,6 +58,8 @@ maintainers. The platforms listed here represent the exceptions to this rule.
 #### SynQuacer (synquacer)
 
 - [Masahisa Kojima](https://github.com/masahisak) (masahisa.kojima@linaro.org)
+
+### Renesas
 
 #### R-Car (rcar)
 
