@@ -759,8 +759,9 @@ static int scmi_init_notifications(int sensor_count)
 
     status =
         scmi_sensor_ctx.scmi_api->get_agent_count(&scmi_sensor_ctx.agent_count);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     fwk_assert(scmi_sensor_ctx.agent_count != 0);
 
@@ -816,8 +817,9 @@ static int scmi_sensor_bind(fwk_id_t id, unsigned int round)
         FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
         FWK_ID_API(FWK_MODULE_IDX_SCMI, MOD_SCMI_API_IDX_NOTIFICATION),
         &scmi_sensor_ctx.scmi_notification_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 #endif
 
     return FWK_SUCCESS;
@@ -829,8 +831,9 @@ static int scmi_sensor_start(fwk_id_t id)
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     status = scmi_init_notifications(scmi_sensor_ctx.sensor_count);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 #endif
 
     return status;

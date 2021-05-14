@@ -1114,8 +1114,9 @@ static int scmi_init_notifications(unsigned int domains)
     int status;
 
     status = scmi_pd_ctx.scmi_api->get_agent_count(&scmi_pd_ctx.agent_count);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
     fwk_assert(scmi_pd_ctx.agent_count != 0);
 
     status = scmi_pd_ctx.scmi_notification_api->scmi_notification_init(
@@ -1124,8 +1125,9 @@ static int scmi_init_notifications(unsigned int domains)
         domains,
         MOD_SCMI_PD_NOTIFICATION_COUNT);
 
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     return FWK_SUCCESS;
 }
@@ -1151,8 +1153,9 @@ static int scmi_pd_bind(fwk_id_t id, unsigned int round)
         FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
         FWK_ID_API(FWK_MODULE_IDX_SCMI, MOD_SCMI_API_IDX_NOTIFICATION),
         &scmi_pd_ctx.scmi_notification_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 #endif
 
 #ifdef BUILD_HAS_MOD_DEBUG
@@ -1370,8 +1373,9 @@ static int scmi_pd_start(fwk_id_t id)
     int status = FWK_SUCCESS;
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     status = scmi_init_notifications(scmi_pd_ctx.domain_count);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 #endif
     return status;
 }

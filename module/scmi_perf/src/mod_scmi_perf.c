@@ -323,8 +323,9 @@ static int scmi_perf_protocol_message_attributes_handler(fwk_id_t service_id,
     return_values.attributes = 0;
 #ifdef BUILD_HAS_FAST_CHANNELS
     if ((parameters->message_id <= MOD_SCMI_PERF_LEVEL_GET) &&
-        (parameters->message_id >= MOD_SCMI_PERF_LIMITS_SET))
+        (parameters->message_id >= MOD_SCMI_PERF_LIMITS_SET)) {
         return_values.attributes = 1; /* Fast Channel available */
+    }
 #endif
 
     scmi_perf_ctx.scmi_api->respond(service_id, &return_values,
@@ -391,8 +392,9 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
     const struct mod_scmi_perf_domain_config *domain =
         &(*scmi_perf_ctx.config->domains)[parameters->domain_id];
 
-    if (domain->fast_channels_addr_scp != NULL)
+    if (domain->fast_channels_addr_scp != NULL) {
         fast_channels = true;
+    }
 #endif
     return_values = (struct scmi_perf_domain_attributes_p2a){
         .status = SCMI_SUCCESS,
@@ -819,22 +821,24 @@ static int scmi_perf_limits_notify(fwk_id_t service_id,
     }
 
     status = scmi_perf_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
-    if (parameters->notify_enable)
+    if (parameters->notify_enable) {
         scmi_perf_ctx.scmi_notification_api->scmi_notification_add_subscriber(
             MOD_SCMI_PROTOCOL_ID_PERF,
             id,
             MOD_SCMI_PERF_NOTIFY_LIMITS,
             service_id);
-    else
+    } else {
         scmi_perf_ctx.scmi_notification_api
             ->scmi_notification_remove_subscriber(
                 MOD_SCMI_PROTOCOL_ID_PERF,
                 agent_id,
                 id,
                 MOD_SCMI_PERF_NOTIFY_LIMITS);
+    }
 
     return_values.status = SCMI_SUCCESS;
 
@@ -877,22 +881,24 @@ static int scmi_perf_level_notify(fwk_id_t service_id,
     id = parameters->domain_id;
 
     status = scmi_perf_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
-    if (parameters->notify_enable)
+    if (parameters->notify_enable) {
         scmi_perf_ctx.scmi_notification_api->scmi_notification_add_subscriber(
             MOD_SCMI_PROTOCOL_ID_PERF,
             id,
             MOD_SCMI_PERF_NOTIFY_LEVEL,
             service_id);
-    else
+    } else {
         scmi_perf_ctx.scmi_notification_api
             ->scmi_notification_remove_subscriber(
                 MOD_SCMI_PROTOCOL_ID_PERF,
                 agent_id,
                 id,
                 MOD_SCMI_PERF_NOTIFY_LEVEL);
+    }
 
     return_values.status = SCMI_SUCCESS;
 
@@ -1023,8 +1029,10 @@ static void fast_channel_callback(uintptr_t param)
                     FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, i), 0, *set_level);
             }
             if (set_limit != NULL) {
-                if ((set_limit->range_max == 0) && (set_limit->range_min == 0))
+                if ((set_limit->range_max == 0) &&
+                    (set_limit->range_min == 0)) {
                     continue;
+                }
                 scmi_perf_ctx.dvfs_api->set_level_limits(
                     FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, i),
                     0,
@@ -1225,9 +1233,10 @@ static void scmi_perf_notify_level_updated(
 
 #ifdef BUILD_HAS_MOD_STATISTICS
     status = scmi_perf_ctx.dvfs_api->get_level_id(domain_id, level, &level_id);
-    if (status == FWK_SUCCESS)
+    if (status == FWK_SUCCESS) {
         scmi_perf_ctx.stats_api->update_domain(fwk_module_id_scmi_perf,
             FWK_ID_ELEMENT(FWK_MODULE_IDX_SCMI_PERF, idx), level_id);
+    }
 #endif
 
     domain = &(*scmi_perf_ctx.config->domains)[idx];
@@ -1286,11 +1295,12 @@ static int scmi_perf_init(fwk_id_t module_id, unsigned int element_count,
     scmi_perf_ctx.domain_count = return_val;
 #ifdef BUILD_HAS_FAST_CHANNELS
     scmi_perf_ctx.fast_channels_alarm_id = config->fast_channels_alarm_id;
-    if (config->fast_channels_rate_limit < SCMI_PERF_FC_MIN_RATE_LIMIT)
+    if (config->fast_channels_rate_limit < SCMI_PERF_FC_MIN_RATE_LIMIT) {
         scmi_perf_ctx.fast_channels_rate_limit = SCMI_PERF_FC_MIN_RATE_LIMIT;
-    else
+    } else {
         scmi_perf_ctx.fast_channels_rate_limit =
             config->fast_channels_rate_limit;
+    }
 #endif
 
     /* Initialize table */
@@ -1308,8 +1318,9 @@ static int scmi_init_notifications(int domains)
 
     status = scmi_perf_ctx.scmi_api->get_agent_count(
         &scmi_perf_ctx.agent_count);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     fwk_assert(scmi_perf_ctx.agent_count != 0);
 
@@ -1343,8 +1354,9 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
         FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
         FWK_ID_API(FWK_MODULE_IDX_SCMI, MOD_SCMI_API_IDX_NOTIFICATION),
         &scmi_perf_ctx.scmi_notification_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 #endif
 
 #ifdef BUILD_HAS_FAST_CHANNELS
@@ -1352,8 +1364,9 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
         FWK_ID_NONE)) {
         status = fwk_module_bind(scmi_perf_ctx.config->fast_channels_alarm_id,
             MOD_TIMER_API_ID_ALARM, &scmi_perf_ctx.fc_alarm_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return FWK_E_PANIC;
+        }
     }
 #endif
 
@@ -1362,8 +1375,9 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
         status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_STATISTICS),
             FWK_ID_API(FWK_MODULE_IDX_STATISTICS, MOD_STATS_API_IDX_STATS),
             &scmi_perf_ctx.stats_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return FWK_E_PANIC;
+        }
     }
 #endif
 
@@ -1409,21 +1423,24 @@ static int scmi_perf_stats_start(void)
     int stats_domains = 0;
     unsigned int i;
 
-    if (!scmi_perf_ctx.config->stats_enabled)
+    if (!scmi_perf_ctx.config->stats_enabled) {
         return FWK_E_SUPPORT;
+    }
 
     /* Count how many domains have statistics */
     for (i = 0; i < scmi_perf_ctx.domain_count; i++) {
         domain = &(*scmi_perf_ctx.config->domains)[i];
-        if (domain->stats_collected)
+        if (domain->stats_collected) {
             stats_domains++;
+        }
     }
 
     status = scmi_perf_ctx.stats_api->init_stats(fwk_module_id_scmi_perf,
         scmi_perf_ctx.domain_count, stats_domains);
 
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     for (i = 0; i < scmi_perf_ctx.domain_count; i++) {
         domain = &(*scmi_perf_ctx.config->domains)[i];
@@ -1436,16 +1453,18 @@ static int scmi_perf_stats_start(void)
             status = scmi_perf_ctx.dvfs_api->get_opp_count(domain_id,
                 &opp_count);
 
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
 
             status = scmi_perf_ctx.stats_api->add_domain(
                 fwk_module_id_scmi_perf,
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_SCMI_PERF, i),
                 (int)opp_count);
 
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
+            }
         }
     }
 
@@ -1470,17 +1489,19 @@ static int scmi_perf_start(fwk_id_t id)
     if (!fwk_id_is_equal(scmi_perf_ctx.config->fast_channels_alarm_id,
         FWK_ID_NONE)) {
         if (scmi_perf_ctx.config->fast_channels_rate_limit <
-            SCMI_PERF_FC_MIN_RATE_LIMIT)
+            SCMI_PERF_FC_MIN_RATE_LIMIT) {
             fc_interval_msecs = (uint32_t)SCMI_PERF_FC_MIN_RATE_LIMIT / 1000;
-        else
+        } else {
             fc_interval_msecs = (uint32_t)
             scmi_perf_ctx.config->fast_channels_rate_limit / 1000;
+        }
         status = scmi_perf_ctx.fc_alarm_api->start(
             scmi_perf_ctx.config->fast_channels_alarm_id,
             fc_interval_msecs, MOD_TIMER_ALARM_TYPE_PERIODIC,
             fast_channel_callback, (uintptr_t)0);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     for (i = 0; i < scmi_perf_ctx.domain_count; i++) {
@@ -1488,8 +1509,9 @@ static int scmi_perf_start(fwk_id_t id)
         if (domain->fast_channels_addr_scp != NULL) {
             for (j = 0; j < MOD_SCMI_PERF_FAST_CHANNEL_ADDR_INDEX_COUNT; j++) {
                 fc_elem = (void *)(uintptr_t)domain->fast_channels_addr_scp[j];
-                if (fc_elem != NULL)
+                if (fc_elem != NULL) {
                     memset(fc_elem, 0, fast_channel_elem_size[j]);
+                }
             }
         }
     }
@@ -1497,14 +1519,16 @@ static int scmi_perf_start(fwk_id_t id)
 
 #ifdef BUILD_HAS_MOD_STATISTICS
     status = scmi_perf_stats_start();
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 #endif
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     status = scmi_init_notifications(scmi_perf_ctx.domain_count);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 #endif
 
     return status;
