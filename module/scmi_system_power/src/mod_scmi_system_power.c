@@ -137,20 +137,24 @@ static void scmi_sys_power_state_notify(fwk_id_t service_id,
     int status, i;
 
     status = scmi_sys_power_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return;
+    }
 
     return_values.agent_id = (uint32_t)agent_id;
     return_values.system_state = system_state;
-    if (forceful)
+    if (forceful) {
         return_values.flags = 0;
-    else
+    } else {
         return_values.flags = 1;
+    }
 
     for (i = 0; i < scmi_sys_power_ctx.agent_count; i++) {
         id =  scmi_sys_power_ctx.system_power_notifications[i];
-        if (fwk_id_is_equal(id, FWK_ID_NONE) || fwk_id_is_equal(id, service_id))
+        if (fwk_id_is_equal(id, FWK_ID_NONE) ||
+            fwk_id_is_equal(id, service_id)) {
             continue;
+        }
 
         scmi_sys_power_ctx.scmi_api->notify(id,
             MOD_SCMI_PROTOCOL_ID_SYS_POWER, SCMI_SYS_POWER_STATE_SET_NOTIFY,
@@ -388,11 +392,12 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
      * requests the notifications are sent before executing the command.
      */
     if (!(parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST) ||
-        (scmi_system_state != SCMI_SYSTEM_STATE_SHUTDOWN))
+        (scmi_system_state != SCMI_SYSTEM_STATE_SHUTDOWN)) {
         scmi_sys_power_state_notify(
             service_id,
             scmi_system_state,
             parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST);
+    }
 #endif
 
     return_values.status = SCMI_SUCCESS;
@@ -471,8 +476,9 @@ static int scmi_sys_power_state_notify_handler(fwk_id_t service_id,
     int status;
 
     status = scmi_sys_power_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         goto exit;
+    }
 
     parameters = (const struct scmi_sys_power_state_notify_a2p *)payload;
 
@@ -481,10 +487,11 @@ static int scmi_sys_power_state_notify_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    if (parameters->flags & STATE_NOTIFY_FLAGS_MASK)
+    if (parameters->flags & STATE_NOTIFY_FLAGS_MASK) {
         scmi_sys_power_ctx.system_power_notifications[agent_id] = service_id;
-    else
+    } else {
         scmi_sys_power_ctx.system_power_notifications[agent_id] = FWK_ID_NONE;
+    }
 
     return_values.status = SCMI_SUCCESS;
 
@@ -665,18 +672,19 @@ static int scmi_sys_power_init_notifications(void)
     int status;
     int i;
 
-
     status = scmi_sys_power_ctx.scmi_api->get_agent_count(
         &scmi_sys_power_ctx.agent_count);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
     fwk_assert(scmi_sys_power_ctx.agent_count != 0);
 
     scmi_sys_power_ctx.system_power_notifications = fwk_mm_calloc(
         scmi_sys_power_ctx.agent_count, sizeof(fwk_id_t));
 
-    for (i = 0; i < scmi_sys_power_ctx.agent_count; i++)
+    for (i = 0; i < scmi_sys_power_ctx.agent_count; i++) {
         scmi_sys_power_ctx.system_power_notifications[i] = FWK_ID_NONE;
+    }
 
     return FWK_SUCCESS;
 
@@ -736,8 +744,9 @@ static int scmi_sys_power_bind(fwk_id_t id, unsigned int round)
             scmi_sys_power_ctx.config->alarm_id,
             MOD_TIMER_API_ID_ALARM,
             &scmi_sys_power_ctx.alarm_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
         return scmi_sys_power_init_notifications();
     }
 #endif

@@ -557,8 +557,9 @@ static int scmi_notification_add_subscriber(
         notification_subscribers(protocol_id);
 
     status = get_agent_id(service_id, &agent_idx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     fwk_assert(operation_id < MOD_SCMI_PROTOCOL_MAX_OPERATION_ID);
     /*
@@ -1597,8 +1598,9 @@ static int scmi_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     case MOD_SCMI_API_IDX_NOTIFICATION:
-        if (!fwk_id_is_type(target_id, FWK_ID_TYPE_MODULE))
+        if (!fwk_id_is_type(target_id, FWK_ID_TYPE_MODULE)) {
             return FWK_E_SUPPORT;
+        }
 
         *api = &mod_scmi_notification_api;
         break;
