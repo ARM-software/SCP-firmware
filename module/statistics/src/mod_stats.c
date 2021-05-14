@@ -48,12 +48,14 @@ static struct mod_stats_ctx stats_ctx;
 static struct mod_stats_info *get_module_stats_info(fwk_id_t module_id)
 {
     if (fwk_id_get_module_idx(module_id) ==
-        fwk_id_get_module_idx(fwk_module_id_scmi_perf))
+        fwk_id_get_module_idx(fwk_module_id_scmi_perf)) {
         return stats_ctx.perf_stats;
+    }
 
     if (fwk_id_get_module_idx(module_id) ==
-        fwk_id_get_module_idx(fwk_module_id_scmi_power_domain))
+        fwk_id_get_module_idx(fwk_module_id_scmi_power_domain)) {
         return stats_ctx.power_stats;
+    }
 
     return NULL;
 }
@@ -94,8 +96,9 @@ static int allocate_domain_stats(fwk_id_t module_id,
     uint32_t idx;
 
     stats = get_module_stats_info(module_id);
-    if (!stats)
+    if (!stats) {
         return FWK_E_PARAM;
+    }
 
     idx = fwk_id_get_element_idx(domain_id);
     desc_header = stats->desc_header;
@@ -183,8 +186,9 @@ _allocate_stats_context(int domain_count, int used_domains)
 
     /* Set default values indicating that the domain is not used in
      * statistics collection */
-    for (i = 0; i < domain_count; i++)
+    for (i = 0; i < domain_count; i++) {
         stats->context->se_index_map[i] = FWK_E_SUPPORT;
+    }
 
     stats->context->se_total_num = domain_count;
     stats->context->se_used_num = used_domains;
@@ -221,8 +225,9 @@ static int stats_init_module(fwk_id_t module_id,
     fwk_assert(ret == FWK_SUCCESS);
 
     ret = _allocate_header(stats, domain_count);
-    if (ret != FWK_SUCCESS)
+    if (ret != FWK_SUCCESS) {
         return ret;
+    }
 
     stats->desc_header->signature = stats->type_signature;
     stats->desc_header->domain_count = domain_count;
@@ -235,8 +240,9 @@ static int stats_start_module(fwk_id_t module_id)
     struct mod_stats_info *stats;
 
     stats = get_module_stats_info(module_id);
-    if (!stats)
+    if (!stats) {
         return FWK_E_PARAM;
+    }
 
     if (stats->mode == STATS_SETUP) {
         if (stats->context->last_stats_id == stats->context->se_used_num) {
@@ -261,14 +267,16 @@ get_domain_section_data(fwk_id_t module_id, fwk_id_t domain_id)
 
     idx = fwk_id_get_element_idx(domain_id);
     stats = get_module_stats_info(module_id);
-    if (!stats)
+    if (!stats) {
         return NULL;
+    }
 
     fwk_assert((int)idx < stats->context->se_total_num);
 
     stats_id = stats->context->se_index_map[idx];
-    if (stats_id != FWK_E_SUPPORT)
+    if (stats_id != FWK_E_SUPPORT) {
         domain_stats = stats->context->se_stats_map->se_stats[stats_id];
+    }
 
     return domain_stats;
 }
@@ -285,18 +293,21 @@ static int stats_add_domain(fwk_id_t module_id,
 
     idx = fwk_id_get_element_idx(domain_id);
     stats = get_module_stats_info(module_id);
-    if (!stats)
+    if (!stats) {
         return FWK_E_PARAM;
+    }
 
     fwk_assert((int)idx < stats->context->se_total_num);
 
     ret = allocate_domain_stats(module_id, domain_id, level_count);
-    if (ret != FWK_SUCCESS)
+    if (ret != FWK_SUCCESS) {
         return ret;
+    }
 
     domain_stats = get_domain_section_data(module_id, domain_id);
-    if (domain_stats == NULL)
+    if (domain_stats == NULL) {
         return FWK_E_PARAM;
+    }
 
     domain_stats->level_count = level_count;
 
@@ -334,23 +345,27 @@ stats_update_domain(fwk_id_t module_id, fwk_id_t domain_id, uint32_t level_id)
     int stats_id;
 
     stats = get_module_stats_info(module_id);
-    if (!stats)
+    if (!stats) {
         return FWK_E_PARAM;
+    }
 
-    if (stats->mode != STATS_INITIALIZED)
+    if (stats->mode != STATS_INITIALIZED) {
         return FWK_E_SUPPORT;
+    }
 
     domain_stats = get_domain_section_data(module_id, domain_id);
-    if (domain_stats == NULL)
+    if (domain_stats == NULL) {
         return FWK_E_PARAM;
+    }
 
     idx = fwk_id_get_element_idx(domain_id);
 
     se_map = stats->context->se_stats_map;
     stats_id = stats->context->se_index_map[idx];
 
-    if ((int)level_id >= se_map->se_level_count[stats_id])
+    if ((int)level_id >= se_map->se_level_count[stats_id]) {
         return FWK_E_PARAM;
+    }
 
     ts_now_us = _get_curret_ts_us();
 
@@ -384,11 +399,13 @@ get_statistics_desc(fwk_id_t module_id,
     uint64_t ap_stats_addr;
 
     stats = get_module_stats_info(module_id);
-    if (!stats)
+    if (!stats) {
         return FWK_E_PARAM;
+    }
 
-    if (stats->mode != STATS_INITIALIZED)
+    if (stats->mode != STATS_INITIALIZED) {
         return FWK_E_SUPPORT;
+    }
 
     ap_stats_addr = stats_ctx.config->ap_stats_addr;
     ap_stats_addr += stats->desc_header_offset;
@@ -420,17 +437,20 @@ static void update_all_domains_current_level(fwk_id_t module_id)
     int stats_id, i;
 
     stats = get_module_stats_info(module_id);
-    if (!stats)
+    if (!stats) {
         return;
+    }
 
-    if (stats->mode != STATS_INITIALIZED)
+    if (stats->mode != STATS_INITIALIZED) {
         return;
+    }
 
     for (i = 0; i < stats->context->se_total_num; i++) {
         domain_id = FWK_ID_ELEMENT(fwk_id_get_module_idx(module_id), i);
         domain_stats = get_domain_section_data(module_id, domain_id);
-        if (!domain_stats)
+        if (!domain_stats) {
             continue;
+        }
 
         se_map = stats->context->se_stats_map;
         stats_id = stats->context->se_index_map[i];
@@ -511,8 +531,9 @@ static int stats_start(fwk_id_t id)
             STATS_UPDATE_PERIOD_MS, MOD_TIMER_ALARM_TYPE_PERIODIC,
             periodic_update_callback, (uintptr_t)0);
 
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     } else {
         FWK_LOG_ERR("[STATS]: failed to start period updates\n");
         return FWK_E_SUPPORT;
@@ -525,14 +546,16 @@ static int stats_bind(fwk_id_t id, unsigned int round)
 {
     int status;
 
-    if (round >= 1)
+    if (round >= 1) {
         return FWK_SUCCESS;
+    }
 
     if (!fwk_id_is_equal(stats_ctx.config->alarm_id, FWK_ID_NONE)) {
         status = fwk_module_bind(stats_ctx.config->alarm_id,
             MOD_TIMER_API_ID_ALARM, &stats_ctx.alarm_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return FWK_E_PANIC;
+        }
     }
 
     return FWK_SUCCESS;
@@ -544,20 +567,23 @@ static int process_bind_request(fwk_id_t source_id,
     const void **api)
 {
     /* Only allow binding to the module */
-    if (!fwk_id_is_equal(target_id, fwk_module_id_statistics))
+    if (!fwk_id_is_equal(target_id, fwk_module_id_statistics)) {
         return FWK_E_PARAM;
+    }
 
     *api = &mod_stats_api;
 
     /* Request from SCMI Performance domain statistics */
     if (fwk_id_get_module_idx(source_id) ==
-        fwk_id_get_module_idx(fwk_module_id_scmi_perf))
+        fwk_id_get_module_idx(fwk_module_id_scmi_perf)) {
         return register_module_stats(fwk_module_id_scmi_perf);
+    }
 
     /* Request from SCMI Power domain statistics*/
     if (fwk_id_get_module_idx(source_id) ==
-        fwk_id_get_module_idx(fwk_module_id_scmi_power_domain))
+        fwk_id_get_module_idx(fwk_module_id_scmi_power_domain)) {
         return register_module_stats(fwk_module_id_scmi_power_domain);
+    }
 
     return FWK_E_PARAM;
 }

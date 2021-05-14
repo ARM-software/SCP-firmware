@@ -169,8 +169,9 @@ static void mod_pl011_putch(fwk_id_t id, char ch)
     fwk_assert(ctx->powered);
     fwk_assert(ctx->clocked);
 
-    while (reg->FR & PL011_FR_TXFF)
+    while (reg->FR & PL011_FR_TXFF) {
         continue;
+    }
 
     reg->DR = ch;
 }
@@ -186,8 +187,9 @@ static bool mod_pl011_getch(fwk_id_t id, char *ch)
     fwk_assert(ctx->powered);
     fwk_assert(ctx->clocked);
 
-    if (reg->FR & PL011_FR_RXFE)
+    if (reg->FR & PL011_FR_RXFE) {
         return false;
+    }
 
     *ch = reg->DR;
 
@@ -205,8 +207,9 @@ static void mod_pl011_flush(fwk_id_t id)
     fwk_assert(ctx->powered);
     fwk_assert(ctx->clocked);
 
-    while (reg->FR & PL011_FR_BUSY)
+    while (reg->FR & PL011_FR_BUSY) {
         continue;
+    }
 }
 
 static int mod_pl011_init(

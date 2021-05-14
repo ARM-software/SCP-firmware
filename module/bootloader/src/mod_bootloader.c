@@ -71,14 +71,18 @@ static int load_image(void)
 
     bool sds = false;
 
-    if (module_ctx.module_config == NULL)
+    if (module_ctx.module_config == NULL) {
         return FWK_E_PARAM;
-    if (module_ctx.module_config->source_base == 0)
+    }
+    if (module_ctx.module_config->source_base == 0) {
         return FWK_E_PARAM;
-    if (module_ctx.module_config->destination_base == 0)
+    }
+    if (module_ctx.module_config->destination_base == 0) {
         return FWK_E_PARAM;
-    if (module_ctx.module_config->source_size == 0)
+    }
+    if (module_ctx.module_config->source_size == 0) {
         return FWK_E_PARAM;
+    }
 
 #ifdef BUILD_HAS_MOD_SDS
     sds = module_ctx.module_config->sds_struct_id != 0;
@@ -97,10 +101,13 @@ static int load_image(void)
                 &image_flags,
                 sizeof(image_flags));
 
-            if (status != FWK_SUCCESS)
+            if (status != FWK_SUCCESS) {
                 return status;
-            if ((image_flags & (uint32_t)IMAGE_FLAGS_VALID_MASK) != (uint32_t)0)
+            }
+            if ((image_flags & (uint32_t)IMAGE_FLAGS_VALID_MASK) !=
+                (uint32_t)0) {
                 break;
+            }
         }
 
         /*
@@ -113,23 +120,28 @@ static int load_image(void)
             &image_offset,
             sizeof(image_offset));
 
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
         status = module_ctx.sds_api->struct_read(
             module_ctx.module_config->sds_struct_id,
             BOOTLOADER_STRUCT_IMAGE_SIZE_POS,
             &image_size,
             sizeof(image_size));
 
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
 
-        if (image_size == 0)
+        if (image_size == 0) {
             return FWK_E_SIZE;
-        if ((image_offset % 4) != 0)
+        }
+        if ((image_offset % 4) != 0) {
             return FWK_E_ALIGN;
-        if (image_offset > module_ctx.module_config->source_size)
+        }
+        if (image_offset > module_ctx.module_config->source_size) {
             return FWK_E_SIZE;
+        }
 
         /* Read the image header now that its base address is known */
         image_base = (const uint8_t *)module_ctx.module_config->source_base +
@@ -141,8 +153,9 @@ static int load_image(void)
     }
 
     if (module_ctx.module_config->destination_size > 0) {
-        if (image_size > module_ctx.module_config->destination_size)
+        if (image_size > module_ctx.module_config->destination_size) {
             return FWK_E_SIZE;
+        }
     }
 
     fwk_interrupt_global_disable(); /* We are relocating the vector table */
@@ -180,12 +193,14 @@ static int bootloader_bind(fwk_id_t id, unsigned int call_number)
     int status;
 
     /* Only the first round of binding is used (round number is zero-indexed) */
-    if (call_number == 1)
+    if (call_number == 1) {
         return FWK_SUCCESS;
+    }
 
-    if (fwk_module_is_valid_element_id(id))
+    if (fwk_module_is_valid_element_id(id)) {
         /* No element-level binding required */
         return FWK_SUCCESS;
+    }
 
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_SDS),
                              FWK_ID_API(FWK_MODULE_IDX_SDS, 0),
@@ -198,11 +213,13 @@ static int bootloader_bind(fwk_id_t id, unsigned int call_number)
 static int bootloader_process_bind_request(fwk_id_t requester_id, fwk_id_t id,
     fwk_id_t api_id, const void **api)
 {
-    if (api == NULL)
+    if (api == NULL) {
         return FWK_E_PARAM;
+    }
 
-    if (!fwk_module_is_valid_module_id(id))
+    if (!fwk_module_is_valid_module_id(id)) {
         return FWK_E_PARAM;
+    }
 
     *api = &bootloader_api;
     return FWK_SUCCESS;
