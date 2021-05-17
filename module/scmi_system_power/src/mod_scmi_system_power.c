@@ -391,7 +391,7 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
      * Only send notifications if this is a forceful request. For graceful
      * requests the notifications are sent before executing the command.
      */
-    if (!(parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST) ||
+    if (((parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST) == 0U) ||
         (scmi_system_state != SCMI_SYSTEM_STATE_SHUTDOWN)) {
         scmi_sys_power_state_notify(
             service_id,
