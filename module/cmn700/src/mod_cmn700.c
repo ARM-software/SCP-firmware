@@ -18,6 +18,7 @@
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_log.h>
+#include <fwk_math.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -25,6 +26,7 @@
 #include <fwk_status.h>
 
 #include <inttypes.h>
+#include <stdint.h>
 
 #define MOD_NAME "[CMN700] "
 
@@ -52,10 +54,19 @@ static void process_node_hnf(struct cmn700_hnf_reg *hnf)
     unsigned int node_id;
     unsigned int region_idx;
     unsigned int region_sub_count = 0;
+    unsigned int hnf_count_per_cluster;
+    unsigned int hnf_cluster_index;
+    unsigned int snf_count_per_cluster;
+    unsigned int snf_idx_in_cluster;
+    unsigned int snf_table_idx;
+    unsigned int top_address_bit0, top_address_bit1;
+    enum mod_cmn700_hnf_to_snf_mem_strip_mode sn_mode;
     uint64_t base;
+    uint64_t sam_control;
     static unsigned int cal_mode_factor = 1;
     const struct mod_cmn700_mem_region_map *region;
     const struct mod_cmn700_config *config = ctx->config;
+    const struct mod_cmn700_hierarchical_hashing *hier_hash_cfg;
 
     logical_id = get_node_logical_id(hnf);
     node_id = get_node_id(hnf);
@@ -68,8 +79,6 @@ static void process_node_hnf(struct cmn700_hnf_reg *hnf)
         /* Factor to manipulate the group and bit_pos */
         cal_mode_factor = 2;
     }
-
-    fwk_assert(logical_id < config->snf_count);
 
     group = logical_id /
         (CMN700_HNF_CACHE_GROUP_ENTRIES_PER_GROUP * cal_mode_factor);
@@ -94,8 +103,63 @@ static void process_node_hnf(struct cmn700_hnf_reg *hnf)
             << bit_pos;
     }
 
-    /* Set target node */
-    hnf->SAM_CONTROL = config->snf_table[logical_id];
+    hier_hash_cfg = &(config->hierarchical_hashing_config);
+
+    /* SN mode with Hierarchical Hashing */
+    if (config->hierarchical_hashing_enable && hier_hash_cfg->sn_mode) {
+        sn_mode = hier_hash_cfg->sn_mode;
+        top_address_bit0 = hier_hash_cfg->top_address_bit0;
+        top_address_bit1 = hier_hash_cfg->top_address_bit1;
+
+        snf_count_per_cluster =
+            config->snf_count / hier_hash_cfg->hnf_cluster_count;
+
+        /*
+         * For now, 3-SN mode (three SN-Fs per cluster) is supported, other
+         * modes are not tested.
+         */
+        fwk_assert(snf_count_per_cluster == 3);
+
+        /* Number of HN-Fs in a cluster */
+        hnf_count_per_cluster =
+            ctx->hnf_count / hier_hash_cfg->hnf_cluster_count;
+
+        /* Choose the cluster idx based on the HN-Fs LDID value */
+        hnf_cluster_index = logical_id / hnf_count_per_cluster;
+
+        if (top_address_bit1 <= top_address_bit0) {
+            FWK_LOG_ERR(
+                MOD_NAME
+                "top_address_bit1: %d should be greater than top_address_bit0: "
+                "%d",
+                top_address_bit1,
+                top_address_bit0);
+            fwk_unexpected();
+        }
+
+        sam_control =
+            ((UINT64_C(1) << CMN700_HNF_SAM_CONTROL_SN_MODE_POS(sn_mode)) |
+             ((uint64_t)top_address_bit0
+              << CMN700_HNF_SAM_CONTROL_TOP_ADDR_BIT0_POS) |
+             ((uint64_t)top_address_bit1
+              << CMN700_HNF_SAM_CONTROL_TOP_ADDR_BIT1_POS));
+
+        for (snf_idx_in_cluster = 0; snf_idx_in_cluster < snf_count_per_cluster;
+             snf_idx_in_cluster++) {
+            snf_table_idx = (hnf_cluster_index * snf_count_per_cluster) +
+                snf_idx_in_cluster;
+            sam_control |=
+                ((uint64_t)config->snf_table[snf_table_idx]
+                 << CMN700_HNF_SAM_CONTROL_SN_NODE_ID_POS(snf_idx_in_cluster));
+        }
+
+        hnf->SAM_CONTROL = sam_control;
+    } else {
+        fwk_assert(logical_id < config->snf_count);
+
+        /* Set target node */
+        hnf->SAM_CONTROL = config->snf_table[logical_id];
+    }
 
     /*
      * Map sub-regions to this HN-F node
@@ -411,6 +475,8 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
     unsigned int group;
     unsigned int group_count;
     unsigned int hnf_count;
+    unsigned int hnf_count_per_cluster;
+    unsigned int hnf_cluster_count;
     unsigned int region_idx;
     unsigned int region_io_count = 0;
     unsigned int region_sys_count = 0;
@@ -418,6 +484,7 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
     uint64_t base;
     const struct mod_cmn700_mem_region_map *region;
     const struct mod_cmn700_config *config = ctx->config;
+    const struct mod_cmn700_hierarchical_hashing *hier_hash_cfg;
 
     FWK_LOG_INFO(MOD_NAME "Configuring SAM for node %d", get_node_id(rnsam));
 
@@ -543,6 +610,37 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
 
     for (group = 0; group < group_count; group++)
         rnsam->SYS_CACHE_GRP_SN_NODEID[group] = ctx->sn_nodeid_group[group];
+
+    /* Hierarchical Hashing support */
+    if (config->hierarchical_hashing_enable) {
+        hier_hash_cfg = &(config->hierarchical_hashing_config);
+
+        /* Total number of HN-F clusters */
+        hnf_cluster_count = hier_hash_cfg->hnf_cluster_count;
+
+        /* Number of HN-Fs in a cluster */
+        hnf_count_per_cluster = hnf_count / hnf_cluster_count;
+
+        rnsam->HASHED_TARGET_GRP_HASH_CNTL[SAM_SCG0] =
+            ((CMN700_RNSAM_HIERARCHICAL_HASH_EN_MASK
+              << CMN700_RNSAM_HIERARCHICAL_HASH_EN_POS) |
+             (fwk_math_log2(hnf_count_per_cluster)
+              << CMN700_RNSAM_HIER_ENABLE_ADDRESS_STRIPING_POS) |
+             (hnf_cluster_count << CMN700_RNSAM_HIER_HASH_CLUSTERS_POS) |
+             (hnf_count_per_cluster << CMN700_RNSAM_HIER_HASH_NODES_POS));
+
+        rnsam->SYS_CACHE_GRP_SN_ATTR = hier_hash_cfg->sn_mode
+            << CMN700_RNSAM_SN_MODE_SYS_CACHE_POS(SAM_SCG0);
+
+        /* For now, SCG0 is supported */
+        rnsam->SYS_CACHE_GRP_SN_SAM_CFG[SAM_SCG0] =
+            ((hier_hash_cfg->top_address_bit0
+              << CMN700_RNSAM_TOP_ADDRESS_BIT0_POS(SAM_SCG0)) |
+             (hier_hash_cfg->top_address_bit1
+              << CMN700_RNSAM_TOP_ADDRESS_BIT1_POS(SAM_SCG0)) |
+             (hier_hash_cfg->top_address_bit2
+              << CMN700_RNSAM_TOP_ADDRESS_BIT2_POS(SAM_SCG0)));
+    }
 
     /* Enable RNSAM */
     rnsam->STATUS = (rnsam->STATUS | CMN700_RNSAM_STATUS_UNSTALL) &

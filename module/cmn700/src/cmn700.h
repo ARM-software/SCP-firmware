@@ -97,6 +97,14 @@ enum sam_node_type {
     SAM_NODE_TYPE_COUNT
 };
 
+enum sam_scg_index {
+    SAM_SCG0 = 0,
+    SAM_SCG1,
+    SAM_SCG2,
+    SAM_SCG3,
+    SAM_SCG_COUNT
+};
+
 /*
  * Request Node System Address Map (RN-SAM) registers
  */
@@ -114,21 +122,26 @@ struct cmn700_rnsam_reg {
     FWK_RW  uint64_t  HASHED_TGT_GRP_CFG1_REGION[4];
             uint8_t   RESERVED5[0xEA0 - 0xE40];
     FWK_RW  uint64_t  SYS_CACHE_GRP_HN_COUNT;
-            uint8_t   RESERVED6[0xF00 - 0xEA8];
+            uint8_t   RESERVED6[0xEB0 - 0xEA8];
+    FWK_RW  uint64_t  SYS_CACHE_GRP_SN_ATTR;
+            uint8_t   RESERVED7[0xF00 - 0xEB8];
     FWK_RW  uint64_t  SYS_CACHE_GRP_HN_NODEID[16];
-            uint8_t   RESERVED7[0x1000 - 0xF80];
+            uint8_t   RESERVED8[0x1000 - 0xF80];
     FWK_RW  uint64_t  SYS_CACHE_GRP_SN_NODEID[32];
     FWK_RW  uint64_t  STATUS;
             uint64_t  GIC_MEM_REGION;
             uint8_t   RESERVED9[0x1120 - 0x1110];
     FWK_RW  uint64_t  SYS_CACHE_GRP_CAL_MODE;
     FWK_RW  uint64_t  HASHED_TARGET_GRP_CAL_MODE[3];
-            uint8_t   RESERVED10[0x20C0 - 0x1140];
+    FWK_RW  uint64_t  SYS_CACHE_GRP_SN_SAM_CFG[4];
+            uint8_t   RESERVED10[0x20C0 - 0x1160];
     FWK_RW  uint64_t  NON_HASH_MEM_REGION_GRP2[NON_HASH_MEM_REG_GRP2_COUNT];
             uint8_t   RESERVED11[0x24C0 - 0x2200];
     FWK_RW  uint64_t  NON_HASH_MEM_REGION_CFG2_GRP2[NON_HASH_MEM_REG_GRP2_COUNT];
             uint8_t   RESERVED12[0x3100 - 0x2600];
     FWK_RW  uint64_t  HASHED_TGT_GRP_CFG2_REGION[32];
+            uint8_t   RESERVED13[0x3400 - 0x3200];
+    FWK_RW  uint64_t  HASHED_TARGET_GRP_HASH_CNTL[32];
 };
 
 #define HNF_RN_CLUSTER_MAX    128
@@ -222,11 +235,29 @@ struct cmn700_mxp_reg {
 #define CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK            UINT64_C(0x0FFF)
 #define CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP     4
 
+/* Used by RNSAM Hierarchical hashing registers */
+#define CMN700_RNSAM_HIERARCHICAL_HASH_EN_POS         2
+#define CMN700_RNSAM_HIERARCHICAL_HASH_EN_MASK        UINT64_C(0x01)
+#define CMN700_RNSAM_HIER_ENABLE_ADDRESS_STRIPING_POS 3
+#define CMN700_RNSAM_HIER_HASH_CLUSTERS_POS           8
+#define CMN700_RNSAM_HIER_HASH_NODES_POS              16
+#define CMN700_RNSAM_SN_MODE_SYS_CACHE_POS(scg_grp)   (4 + (scg_grp * 16))
+#define CMN700_RNSAM_TOP_ADDRESS_BIT0_POS(scg_grp)    (0 + (scg_grp * 24))
+#define CMN700_RNSAM_TOP_ADDRESS_BIT1_POS(scg_grp)    (8 + (scg_grp * 24))
+#define CMN700_RNSAM_TOP_ADDRESS_BIT2_POS(scg_grp)    (16 + (scg_grp * 24))
+
 #define CMN700_HNF_UNIT_INFO_HNSAM_RCOMP_EN_MASK 0x10000000
 #define CMN700_HNF_UNIT_INFO_HNSAM_RCOMP_EN_POS  28
 #define CMN700_HNF_SAM_MEMREGION_SIZE_POS        12
 #define CMN700_HNF_SAM_MEMREGION_BASE_POS        26
 #define CMN700_HNF_SAM_MEMREGION_VALID           UINT64_C(0x8000000000000000)
+
+/* Used by HN-F SAM_CONTROL register */
+#define CMN700_HNF_SAM_CONTROL_SN_MODE_POS(sn_mode)   (36 + sn_mode - 1)
+#define CMN700_HNF_SAM_CONTROL_TOP_ADDR_BIT0_POS      40
+#define CMN700_HNF_SAM_CONTROL_TOP_ADDR_BIT1_POS      48
+#define CMN700_HNF_SAM_CONTROL_TOP_ADDR_BIT2_POS      56
+#define CMN700_HNF_SAM_CONTROL_SN_NODE_ID_POS(sn_idx) (sn_idx * 12)
 
 #define CMN700_HNF_CACHE_GROUP_ENTRIES_MAX       128
 #define CMN700_HNF_CACHE_GROUP_ENTRIES_PER_GROUP 4

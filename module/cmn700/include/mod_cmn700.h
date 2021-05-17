@@ -73,6 +73,58 @@ struct mod_cmn700_mem_region_map {
 };
 
 /*!
+ * \brief HN-F to SN-F memory striping modes
+ */
+enum mod_cmn700_hnf_to_snf_mem_strip_mode {
+    MOD_CMN700_1_SN_MODE,
+    MOD_CMN700_3_SN_MODE,
+    MOD_CMN700_6_SN_MODE,
+    MOD_CMN700_5_SN_MODE,
+};
+
+/*!
+ * \brief Hierarchical hashing configuration
+ */
+struct mod_cmn700_hierarchical_hashing {
+    /*!
+     * \brief Number of HN-Fs per cluster.
+     *
+     * \note The value should not account for \ref
+     * mod_cmn700_config.hnf_cal_mode
+     */
+    unsigned int hnf_cluster_count;
+
+    /*!
+     * \brief HN-F to SN-F hashing mode.
+     */
+    enum mod_cmn700_hnf_to_snf_mem_strip_mode sn_mode;
+
+    /*!
+     * \brief Top PA address bit 0 to use for striping
+     *
+     * \note top_address_bit0 should match with the value in HN-F to SN-F strip
+     * setting
+     */
+    unsigned int top_address_bit0;
+
+    /*!
+     * \brief Top PA address bit 1 to use for striping
+     *
+     * \note top_address_bit1 should match with the value in HN-F to SN-F strip
+     * setting
+     */
+    unsigned int top_address_bit1;
+
+    /*!
+     * \brief Top PA address bit 2 to use for striping
+     *
+     * \note top_address_bit2 should match with the value in HN-F to SN-F strip
+     * setting
+     */
+    unsigned int top_address_bit2;
+};
+
+/*!
  * \brief CMN700 configuration data
  */
 struct mod_cmn700_config {
@@ -99,6 +151,12 @@ struct mod_cmn700_config {
 
     /*! Number of entries in the \ref snf_table */
     size_t snf_count;
+
+    /*! Hierarchical hashing support */
+    bool hierarchical_hashing_enable;
+
+    /*! Hierarchical hashing configuration */
+    struct mod_cmn700_hierarchical_hashing hierarchical_hashing_config;
 
     /*! Table of region memory map entries */
     const struct mod_cmn700_mem_region_map *mmap_table;
