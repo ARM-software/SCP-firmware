@@ -96,7 +96,7 @@ static int allocate_domain_stats(fwk_id_t module_id,
     uint32_t idx;
 
     stats = get_module_stats_info(module_id);
-    if (!stats) {
+    if (stats == NULL) {
         return FWK_E_PARAM;
     }
 
@@ -240,7 +240,7 @@ static int stats_start_module(fwk_id_t module_id)
     struct mod_stats_info *stats;
 
     stats = get_module_stats_info(module_id);
-    if (!stats) {
+    if (stats == NULL) {
         return FWK_E_PARAM;
     }
 
@@ -267,7 +267,7 @@ get_domain_section_data(fwk_id_t module_id, fwk_id_t domain_id)
 
     idx = fwk_id_get_element_idx(domain_id);
     stats = get_module_stats_info(module_id);
-    if (!stats) {
+    if (stats == NULL) {
         return NULL;
     }
 
@@ -293,7 +293,7 @@ static int stats_add_domain(fwk_id_t module_id,
 
     idx = fwk_id_get_element_idx(domain_id);
     stats = get_module_stats_info(module_id);
-    if (!stats) {
+    if (stats == NULL) {
         return FWK_E_PARAM;
     }
 
@@ -345,7 +345,7 @@ stats_update_domain(fwk_id_t module_id, fwk_id_t domain_id, uint32_t level_id)
     int stats_id;
 
     stats = get_module_stats_info(module_id);
-    if (!stats) {
+    if (stats == NULL) {
         return FWK_E_PARAM;
     }
 
@@ -399,7 +399,7 @@ get_statistics_desc(fwk_id_t module_id,
     uint64_t ap_stats_addr;
 
     stats = get_module_stats_info(module_id);
-    if (!stats) {
+    if (stats == NULL) {
         return FWK_E_PARAM;
     }
 
@@ -437,7 +437,7 @@ static void update_all_domains_current_level(fwk_id_t module_id)
     int stats_id, i;
 
     stats = get_module_stats_info(module_id);
-    if (!stats) {
+    if (stats == NULL) {
         return;
     }
 
@@ -448,7 +448,7 @@ static void update_all_domains_current_level(fwk_id_t module_id)
     for (i = 0; i < stats->context->se_total_num; i++) {
         domain_id = FWK_ID_ELEMENT(fwk_id_get_module_idx(module_id), i);
         domain_stats = get_domain_section_data(module_id, domain_id);
-        if (!domain_stats) {
+        if (domain_stats == NULL) {
             continue;
         }
 
