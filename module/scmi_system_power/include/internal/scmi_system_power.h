@@ -60,7 +60,7 @@ struct scmi_sys_power_state_get_p2a {
  * SYSTEM_POWER_STATE_NOTIFY
  */
 
-#define STATE_NOTIFY_FLAGS_MASK 0x1
+#define STATE_NOTIFY_FLAGS_MASK 0x1U
 
 struct scmi_sys_power_state_notify_a2p {
     uint32_t flags;
