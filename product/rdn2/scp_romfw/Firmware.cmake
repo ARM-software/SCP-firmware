@@ -25,6 +25,8 @@ set(SCP_ENABLE_IPO_INIT FALSE)
 
 set(SCP_ARCHITECTURE "armv7-m")
 
+set(SCP_ENABLE_NEWLIB_NANO FALSE)
+
 # The order of the modules in the following list is the order in which the
 # modules are initialized, bound, started during the pre-runtime phase.
 # any change in the order will cause firmware initialization errors.
