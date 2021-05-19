@@ -1,0 +1,63 @@
+/*
+ * Arm SCP/MCP Software
+ * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+#ifndef FAKE_PIK_SCP_H
+#define FAKE_PIK_SCP_H
+
+#include <stdint.h>
+#include <fwk_macros.h>
+
+/*!
+ * \brief SCP PIK register definitions
+ */
+struct pik_scp_reg {
+          uint32_t RESERVED0[4];
+  FWK_RW  uint32_t RESET_SYNDROME;
+  FWK_RW  uint32_t WIC_CTRL;
+  FWK_R   uint32_t WIC_STATUS;
+          uint8_t  RESERVED1[0xA00 - 0x1C];
+  FWK_R   uint32_t CLKFORCE_STATUS;
+  FWK_RW  uint32_t CLKFORCE_SET;
+  FWK_RW  uint32_t CLKFORCE_CLR;
+          uint32_t RESERVED2;
+  FWK_R   uint32_t PLL_STATUS0;
+  FWK_R   uint32_t PLL_STATUS1;
+          uint8_t  RESERVED3[0xFC0 - 0xA18];
+  FWK_R   uint32_t PIK_CONFIG;
+          uint32_t RESERVED4[3];
+  FWK_R   uint32_t PID4;
+  FWK_R   uint32_t PID5;
+  FWK_R   uint32_t PID6;
+  FWK_R   uint32_t PID7;
+  FWK_R   uint32_t PID0;
+  FWK_R   uint32_t PID1;
+  FWK_R   uint32_t PID2;
+  FWK_R   uint32_t PID3;
+  FWK_R   uint32_t ID0;
+  FWK_R   uint32_t ID1;
+  FWK_R   uint32_t ID2;
+  FWK_R   uint32_t ID3;
+};
+
+#define PLL_STATUS0_REFCLK              UINT32_C(0x00000001)
+#define PLL_STATUS0_BCPUPLLLOCK         UINT32_C(0x00000002)
+#define PLL_STATUS0_LCPUPLLLOCK         UINT32_C(0x00000004)
+#define PLL_STATUS0_GPUPLLLOCK          UINT32_C(0x00000008)
+#define PLL_STATUS0_VIDEOPLLLOCK        UINT32_C(0x00000010)
+#define PLL_STATUS0_SYSPLLLOCK          UINT32_C(0x00000020)
+#define PLL_STATUS0_DISPLAYPLLLOCK      UINT32_C(0x00000040)
+
+#define PLL_STATUS1_CPUPLLLOCK(CPU, PLL)  \
+                                      ((uint32_t)((1 << (PLL)) << ((CPU) * 8)))
+
+#define RESET_SYNDROME_PORESET          UINT32_C(0x01)
+#define RESET_SYNDROME_WDOGRESET_SCP    UINT32_C(0x02)
+#define RESET_SYNDROME_WDOGRESET_SYS    UINT32_C(0x04)
+#define RESET_SYNDROME_SYSRESETREQ      UINT32_C(0x08)
+#define RESET_SYNDROME_SCPM3LOCKUP      UINT32_C(0x10)
+
+#endif  /* FAKE_PIK_SCP_H */
