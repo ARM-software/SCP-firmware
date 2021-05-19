@@ -33,7 +33,7 @@ static struct mod_pik_clock_rate rate_table_cpu_group_klein[] = {
 static struct mod_pik_clock_rate rate_table_cpu_group_matterhorn[] = {
     {
         .rate = 1893 * FWK_MHZ,
-        .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
+        .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL1,
         .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .divider = 1, /* Rate adjusted via CPU PLL */
     },
@@ -42,7 +42,7 @@ static struct mod_pik_clock_rate rate_table_cpu_group_matterhorn[] = {
 static struct mod_pik_clock_rate rate_table_cpu_group_matterhorn_elp_arm[] = {
     {
         .rate = 2176 * FWK_MHZ,
-        .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
+        .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL2,
         .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .divider = 1, /* Rate adjusted via CPU PLL */
     },

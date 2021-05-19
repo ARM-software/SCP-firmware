@@ -86,7 +86,7 @@ static const struct fwk_element css_clock_element_table[] = {
                 .rate_table = rate_table_cpu_group_klein,
                 .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_klein),
                 .clock_switching_source =
-                    MOD_PIK_CLOCK_CLUSCLK_SOURCE_SYSREFCLK,
+                    MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
                 .pll_id = FWK_ID_ELEMENT_INIT(
                     FWK_MODULE_IDX_SYSTEM_PLL,
                     CLOCK_PLL_IDX_CPU_KLEIN),
