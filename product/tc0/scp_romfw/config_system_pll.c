@@ -21,7 +21,7 @@ static const struct fwk_element system_pll_element_table[] = {
         {
             .name = "CPU_PLL_KLEIN",
             .data = &((struct mod_system_pll_dev_config){
-                .control_reg = (void *)SCP_PLL_CPU0,
+                .control_reg = (void *)SCP_PLL_CPU_TYPE0,
                 .status_reg = (void *)&SCP_PIK_PTR->PLL_STATUS[1],
                 .lock_flag_mask = PLL_STATUS_CPUPLLLOCK(0),
                 .initial_rate = 1537 * FWK_MHZ,
