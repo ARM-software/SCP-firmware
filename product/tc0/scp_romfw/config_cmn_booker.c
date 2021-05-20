@@ -113,8 +113,9 @@ const struct fwk_module_config config_cmn_booker = {
         .snf_count = FWK_ARRAY_SIZE(snf_table),
         .mmap_table = mmap,
         .mmap_count = FWK_ARRAY_SIZE(mmap),
-        .clock_id =
-            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_INTERCONNECT),
+        .clock_id = FWK_ID_ELEMENT_INIT(
+            FWK_MODULE_IDX_CLOCK,
+            CLOCK_IDX_CPU_GROUP_KLEIN),
         .hnf_cal_mode = false,
         .ports_per_xp = 4,
     }),

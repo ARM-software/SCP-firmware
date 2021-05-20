@@ -7,7 +7,6 @@
 
 #include "clock_soc.h"
 #include "cpu_pik.h"
-#include "scp_pik.h"
 #include "system_pik.h"
 
 #include <mod_pik_clock.h>
@@ -25,24 +24,6 @@ static struct mod_pik_clock_rate rate_table_cpu_group_klein[] = {
         .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
         .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .divider = 1, /* Rate adjusted via CPU PLL */
-    },
-};
-
-static const struct mod_pik_clock_rate rate_table_sys_intclk[] = {
-    {
-        .rate = 2000 * FWK_MHZ,
-        .source = MOD_PIK_CLOCK_INTCLK_SOURCE_INTPLL,
-        .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
-        .divider = 1,
-    },
-};
-
-static const struct mod_pik_clock_rate rate_table_scp[] = {
-    {
-        .rate = 2000 * FWK_MHZ,
-        .source = MOD_PIK_CLOCK_MSCLOCK_SOURCE_SYSPLLCLK,
-        .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_SYS,
-        .divider = CLOCK_RATE_SYSPLLCLK / (2000 * FWK_MHZ),
     },
 };
 
@@ -135,32 +116,6 @@ static const struct fwk_element
                         .modulator_reg = &CLUSTER_PIK_PTR(0)->CORECLK[3].MOD,
                         .rate_table = rate_table_cpu_group_klein,
                         .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_klein),
-                    }),
-                },
-            [CLOCK_PIK_IDX_INTERCONNECT] =
-                {
-                    .name = "INTERCONNECT",
-                    .data = &((struct mod_pik_clock_dev_config){
-                        .type = MOD_PIK_CLOCK_TYPE_MULTI_SOURCE,
-                        .is_group_member = false,
-                        .control_reg = &SYSTEM_PIK_PTR->INTCLK_CTRL,
-                        .divext_reg = &SYSTEM_PIK_PTR->INTCLK_DIV1,
-                        .rate_table = rate_table_sys_intclk,
-                        .rate_count = FWK_ARRAY_SIZE(rate_table_sys_intclk),
-                        .initial_rate = 2000 * FWK_MHZ,
-                    }),
-                },
-            [CLOCK_PIK_IDX_SCP] =
-                {
-                    .name = "SCP",
-                    .data = &((struct mod_pik_clock_dev_config){
-                        .type = MOD_PIK_CLOCK_TYPE_MULTI_SOURCE,
-                        .is_group_member = false,
-                        .control_reg = &SCP_PIK_PTR->CORECLK_CTRL,
-                        .divsys_reg = &SCP_PIK_PTR->CORECLK_DIV1,
-                        .rate_table = rate_table_scp,
-                        .rate_count = FWK_ARRAY_SIZE(rate_table_scp),
-                        .initial_rate = 2000 * FWK_MHZ,
                     }),
                 },
             [CLOCK_PIK_IDX_GIC] =

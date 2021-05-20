@@ -20,18 +20,6 @@
 #include <fwk_module_idx.h>
 
 static const struct fwk_element clock_dev_desc_table[] = {
-    [CLOCK_IDX_INTERCONNECT] =
-        {
-            .name = "Interconnect",
-            .data = &((struct mod_clock_dev_config){
-                .driver_id = FWK_ID_ELEMENT_INIT(
-                    FWK_MODULE_IDX_PIK_CLOCK,
-                    CLOCK_PIK_IDX_INTERCONNECT),
-                .api_id = FWK_ID_API_INIT(
-                    FWK_MODULE_IDX_PIK_CLOCK,
-                    MOD_PIK_CLOCK_API_TYPE_CLOCK),
-            }),
-        },
     [CLOCK_IDX_CPU_GROUP_KLEIN] =
         {
             .name = "CPU_GROUP_KLEIN",
