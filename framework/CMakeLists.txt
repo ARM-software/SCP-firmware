@@ -40,6 +40,9 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/src/stdlib.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_core.c")
 
+if(SCP_ENABLE_CMSIS)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_CMSIS")
+endif()
 
 if(SCP_ENABLE_SUB_SYSTEM_MODE)
     target_compile_definitions(framework PUBLIC "BUILD_HAS_SUB_SYSTEM_MODE")
@@ -240,3 +243,5 @@ if(SCP_ENABLE_DEBUGGER)
 endif()
 
 target_link_libraries(framework INTERFACE ${SCP_ARCHITECTURE_TARGET})
+
+target_link_libraries(framework INTERFACE ${SCP_FIRMWARE_TARGET})

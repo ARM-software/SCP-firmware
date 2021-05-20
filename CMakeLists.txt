@@ -331,6 +331,11 @@ include(CMakeDependentOption)
 
 # Common build options
 
+if(SCP_ARCHITECTURE STREQUAL "zephyr")
+    set(SCP_ENABLE_SUB_SYSTEM_MODE_INIT TRUE)
+    set(SCP_ENABLE_CMSIS_INIT TRUE)
+endif()
+
 if(SCP_ARCHITECTURE STREQUAL "optee")
     set(SCP_ENABLE_SUB_SYSTEM_MODE_INIT TRUE)
 endif()
