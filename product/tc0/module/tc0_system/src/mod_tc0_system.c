@@ -42,9 +42,6 @@ static unsigned int scmi_notification_table[] = {
 
 /* Module context */
 struct tc0_system_ctx {
-    /* Pointer to the SCP PIK registers */
-    struct pik_scp_reg *pik_scp_reg;
-
     /* Pointer to the Interrupt Service Routine API of the PPU_V1 module */
     const struct ppu_v1_isr_api *ppu_v1_isr_api;
 
@@ -91,78 +88,6 @@ static int messaging_stack_ready(void)
 }
 
 /*
- *  PPU Interrupt Service Routines for cluster and core power domains
- */
-
-static void ppu_cores_isr(unsigned int first, uint32_t status)
-{
-    unsigned int core_idx;
-
-    while (status != 0) {
-        core_idx = __builtin_ctz(status);
-        status &= ~(1 << core_idx);
-
-        if ((first + core_idx) >= tc0_core_get_core_count()) {
-            continue;
-        }
-
-        tc0_system_ctx.ppu_v1_isr_api->ppu_interrupt_handler(
-            FWK_ID_ELEMENT(FWK_MODULE_IDX_PPU_V1, first + core_idx));
-    }
-}
-
-static void ppu_cores_isr_0(void)
-{
-    ppu_cores_isr(0, tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[0]);
-    ppu_cores_isr(128, tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[4]);
-}
-
-static void ppu_cores_isr_1(void)
-{
-    ppu_cores_isr(32, tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[1]);
-    ppu_cores_isr(160, tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[5]);
-}
-
-static void ppu_cores_isr_2(void)
-{
-    ppu_cores_isr(64, tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[2]);
-    ppu_cores_isr(192, tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[6]);
-}
-
-static void ppu_cores_isr_3(void)
-{
-    ppu_cores_isr(96, tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[3]);
-    ppu_cores_isr(224, tc0_system_ctx.pik_scp_reg->CPU_PPU_INT_STATUS[7]);
-}
-
-static void ppu_clusters_isr(void)
-{
-    uint32_t status = tc0_system_ctx.pik_scp_reg->CLUS_PPU_INT_STATUS;
-    unsigned int cluster_idx;
-
-    while (status != 0) {
-        cluster_idx = __builtin_ctz(status);
-
-        tc0_system_ctx.ppu_v1_isr_api->ppu_interrupt_handler(FWK_ID_ELEMENT(
-            FWK_MODULE_IDX_PPU_V1, tc0_core_get_core_count() + cluster_idx));
-
-        status &= ~(1 << cluster_idx);
-    }
-}
-
-/*
- *  PPU Interrupt Service Routine table
- */
-
-static struct tc0_system_isr isrs[] = {
-    [0] = { .interrupt = PPU_CORES0_IRQ, .handler = ppu_cores_isr_0 },
-    [1] = { .interrupt = PPU_CORES1_IRQ, .handler = ppu_cores_isr_1 },
-    [2] = { .interrupt = PPU_CORES2_IRQ, .handler = ppu_cores_isr_2 },
-    [3] = { .interrupt = PPU_CORES3_IRQ, .handler = ppu_cores_isr_3 },
-    [4] = { .interrupt = PPU_CLUSTERS_IRQ, .handler = ppu_clusters_isr },
-};
-
-/*
  * System power's driver API
  */
 
@@ -187,20 +112,6 @@ static int tc0_system_mod_init(
     unsigned int unused,
     const void *unused2)
 {
-    int status;
-    unsigned int idx;
-    struct tc0_system_isr *isr;
-
-    for (idx = 0; idx < FWK_ARRAY_SIZE(isrs); idx++) {
-        isr = &isrs[idx];
-        status = fwk_interrupt_set_isr(isr->interrupt, isr->handler);
-        if (status != FWK_SUCCESS) {
-            return status;
-        }
-    }
-
-    tc0_system_ctx.pik_scp_reg = (struct pik_scp_reg *)SCP_PIK_SCP_BASE;
-
     return FWK_SUCCESS;
 }
 

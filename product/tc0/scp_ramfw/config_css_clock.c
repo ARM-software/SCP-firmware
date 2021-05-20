@@ -22,7 +22,7 @@ static const struct mod_css_clock_rate rate_table_cpu_group_klein[] = {
         /* Super Underdrive */
         .rate = 768 * FWK_MHZ,
         .pll_rate = 768 * FWK_MHZ,
-        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
         .clock_mod_numerator = 1,
@@ -32,7 +32,7 @@ static const struct mod_css_clock_rate rate_table_cpu_group_klein[] = {
         /* Underdrive */
         .rate = 1153 * FWK_MHZ,
         .pll_rate = 1153 * FWK_MHZ,
-        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
         .clock_mod_numerator = 1,
@@ -42,7 +42,7 @@ static const struct mod_css_clock_rate rate_table_cpu_group_klein[] = {
         /* Nominal */
         .rate = 1537 * FWK_MHZ,
         .pll_rate = 1537 * FWK_MHZ,
-        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
         .clock_mod_numerator = 1,
@@ -52,7 +52,7 @@ static const struct mod_css_clock_rate rate_table_cpu_group_klein[] = {
         /* Overdrive */
         .rate = 1844 * FWK_MHZ,
         .pll_rate = 1844 * FWK_MHZ,
-        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
         .clock_mod_numerator = 1,
@@ -62,7 +62,7 @@ static const struct mod_css_clock_rate rate_table_cpu_group_klein[] = {
         /* Super Overdrive */
         .rate = 2152 * FWK_MHZ,
         .pll_rate = 2152 * FWK_MHZ,
-        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
         .clock_mod_numerator = 1,
@@ -75,7 +75,7 @@ static const struct mod_css_clock_rate rate_table_cpu_group_matterhorn[] = {
         /* Super Underdrive */
         .rate = 946 * FWK_MHZ,
         .pll_rate = 946 * FWK_MHZ,
-        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL1,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_PLL1,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
         .clock_mod_numerator = 1,
@@ -85,7 +85,7 @@ static const struct mod_css_clock_rate rate_table_cpu_group_matterhorn[] = {
         /* Underdrive */
         .rate = 1419 * FWK_MHZ,
         .pll_rate = 1419 * FWK_MHZ,
-        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL1,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_PLL1,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
         .clock_mod_numerator = 1,
@@ -95,7 +95,7 @@ static const struct mod_css_clock_rate rate_table_cpu_group_matterhorn[] = {
         /* Nominal */
         .rate = 1893 * FWK_MHZ,
         .pll_rate = 1893 * FWK_MHZ,
-        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL1,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_PLL1,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
         .clock_mod_numerator = 1,
@@ -105,7 +105,7 @@ static const struct mod_css_clock_rate rate_table_cpu_group_matterhorn[] = {
         /* Overdrive */
         .rate = 2271 * FWK_MHZ,
         .pll_rate = 2271 * FWK_MHZ,
-        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL1,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_PLL1,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
         .clock_mod_numerator = 1,
@@ -115,7 +115,7 @@ static const struct mod_css_clock_rate rate_table_cpu_group_matterhorn[] = {
         /* Super Overdrive */
         .rate = 2650 * FWK_MHZ,
         .pll_rate = 2650 * FWK_MHZ,
-        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL1,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_PLL1,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
         .clock_mod_numerator = 1,
@@ -129,7 +129,7 @@ static const struct mod_css_clock_rate
             /* Super Underdrive */
             .rate = 1088 * FWK_MHZ,
             .pll_rate = 1088 * FWK_MHZ,
-            .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL2,
+            .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_PLL2,
             .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
             .clock_div = 1,
             .clock_mod_numerator = 1,
@@ -139,7 +139,7 @@ static const struct mod_css_clock_rate
             /* Underdrive */
             .rate = 1632 * FWK_MHZ,
             .pll_rate = 1632 * FWK_MHZ,
-            .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL2,
+            .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_PLL2,
             .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
             .clock_div = 1,
             .clock_mod_numerator = 1,
@@ -149,7 +149,7 @@ static const struct mod_css_clock_rate
             /* Nominal */
             .rate = 2176 * FWK_MHZ,
             .pll_rate = 2176 * FWK_MHZ,
-            .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL2,
+            .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_PLL2,
             .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
             .clock_div = 1,
             .clock_mod_numerator = 1,
@@ -159,7 +159,7 @@ static const struct mod_css_clock_rate
             /* Overdrive */
             .rate = 2612 * FWK_MHZ,
             .pll_rate = 2612 * FWK_MHZ,
-            .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL2,
+            .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_PLL2,
             .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
             .clock_div = 1,
             .clock_mod_numerator = 1,
@@ -169,7 +169,7 @@ static const struct mod_css_clock_rate
             /* Super Overdrive */
             .rate = 3047 * FWK_MHZ,
             .pll_rate = 3047 * FWK_MHZ,
-            .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL2,
+            .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_PLL2,
             .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
             .clock_div = 1,
             .clock_mod_numerator = 1,

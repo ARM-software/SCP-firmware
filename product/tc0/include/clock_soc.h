@@ -21,7 +21,6 @@ enum clock_pll_idx {
     CLOCK_PLL_IDX_CPU_MATTERHORN,
     CLOCK_PLL_IDX_CPU_MATTERHORN_ELP_ARM,
     CLOCK_PLL_IDX_SYS,
-    CLOCK_PLL_IDX_INTERCONNECT,
     CLOCK_PLL_IDX_DPU,
     CLOCK_PLL_IDX_PIX0,
     CLOCK_PLL_IDX_PIX1,
@@ -32,7 +31,6 @@ enum clock_pll_idx {
  * PIK clock indexes.
  */
 enum clock_pik_idx {
-    CLOCK_PIK_IDX_INTERCONNECT,
     CLOCK_PIK_IDX_CLUS0_CPU0,
     CLOCK_PIK_IDX_CLUS0_CPU1,
     CLOCK_PIK_IDX_CLUS0_CPU2,
@@ -41,13 +39,32 @@ enum clock_pik_idx {
     CLOCK_PIK_IDX_CLUS0_CPU5,
     CLOCK_PIK_IDX_CLUS0_CPU6,
     CLOCK_PIK_IDX_CLUS0_CPU7,
-    CLOCK_PIK_IDX_SCP,
     CLOCK_PIK_IDX_GIC,
     CLOCK_PIK_IDX_PCLKSCP,
     CLOCK_PIK_IDX_SYSPERCLK,
     CLOCK_PIK_IDX_UARTCLK,
     CLOCK_PIK_IDX_DPU,
     CLOCK_PIK_IDX_COUNT
+};
+
+/*!
+ * \brief Selectable clock sources for TC0 cluster clocks.
+ */
+enum mod_clusclock_source_tc0 {
+    /*! The clock is gated */
+    MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_GATED = 0x0,
+    /*! The clock source is set to the system reference clock */
+    MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_SYSREFCLK = 0x1,
+    /*! The clock source is set to a private cluster PLL */
+    MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_PLL0 = 0x2,
+    /*! The clock source is set to a private cluster PLL */
+    MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_PLL1 = 0x4,
+    /*! The clock source is set to a private cluster PLL */
+    MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_PLL2 = 0x8,
+    /*! The clock source is set to a private cluster PLL */
+    MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_PLL3 = 0x10,
+    /*! Number of valid clock sources */
+    MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC0_MAX
 };
 
 /*
@@ -65,7 +82,6 @@ enum clock_css_idx {
  * Clock indexes.
  */
 enum clock_idx {
-    CLOCK_IDX_INTERCONNECT,
     CLOCK_IDX_CPU_GROUP_KLEIN,
     CLOCK_IDX_CPU_GROUP_MATTERHORN,
     CLOCK_IDX_CPU_GROUP_MATTERHORN_ELP_ARM,
