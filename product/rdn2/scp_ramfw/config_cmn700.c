@@ -159,13 +159,13 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
     },
     {
         /*
-         * Peripherals, PCIe 32-bit MMIO
-         * Map: 0x00_4000_0000 - 0x00_7FFF_FFFF (1 GB)
+         * Peripherals, NCI GPV Memory Map 0
+         * Map: 0x00_4000_0000 - 0x00_41FF_FFFF (32 MB)
          */
         .base = UINT64_C(0x0040000000),
-        .size = UINT64_C(1) * FWK_GIB,
+        .size = UINT64_C(32) * FWK_MIB,
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
-        .node_id = NODE_ID_HND,
+        .node_id = NODE_ID_HNP0,
     },
     {
         /*
