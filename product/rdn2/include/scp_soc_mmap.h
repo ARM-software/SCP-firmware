@@ -39,4 +39,9 @@
 #    define SCP_PLL_CPU15 (SCP_PLL_BASE + 0x0000013C)
 #endif
 
+/* PCIe ECAM and MMIO addresses */
+#define AP_PCIE_ECAM_BASE  (0x1010000000ULL)
+#define AP_PCIE_MMIOL_BASE (0x60000000)
+#define AP_PCIE_MMIOH_BASE (0x4000000000ULL)
+
 #endif /* SCP_SOC_MMAP_H */
