@@ -6,7 +6,9 @@
  */
 
 #include "clock_soc.h"
+#include "platform_def.h"
 #include "scp_css_mmap.h"
+#include "scp_soc_mmap.h"
 
 #include <mod_cmn700.h>
 
@@ -34,6 +36,10 @@
 
 #    define NODE_ID_HND  260
 #    define NODE_ID_HNI0 0
+#    define NODE_ID_HNP0 324
+#    define NODE_ID_HNP1 340
+#    define NODE_ID_HNP2 348
+#    define NODE_ID_HNP3 362
 #    define NODE_ID_SBSX 196
 
 #    define MESH_SIZE_X 6
@@ -45,6 +51,8 @@
 
 #    define NODE_ID_HND  68
 #    define NODE_ID_HNI0 0
+#    define NODE_ID_HNP0 2
+#    define NODE_ID_HNP1 3
 #    define NODE_ID_SBSX 66
 
 #    define MESH_SIZE_X 3
@@ -161,14 +169,118 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
     },
     {
         /*
-         * PCIe ECAM0
-         * Map: 0x10_1000_0000 - 0x10_1FFF_FFFF (256 MB)
+         * Peripherals, PCIe 32-bit MMIO to IO Macro 0
          */
-        .base = UINT64_C(0x1010000000),
-        .size = UINT64_C(256) * FWK_MIB,
+        .base = AP_PCIE_MMIOL_BASE,
+        .size = AP_PCIE_MMIOL_SIZE_PER_RC,
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
-        .node_id = NODE_ID_HND,
+        .node_id = NODE_ID_HNP0,
     },
+    {
+        /*
+         * Peripherals, PCIe 32-bit MMIO to IO Macro 1
+         */
+        .base = AP_PCIE_MMIOL_BASE + (1 * AP_PCIE_MMIOL_SIZE_PER_RC),
+        .size = AP_PCIE_MMIOL_SIZE_PER_RC,
+        .type = MOD_CMN700_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_HNP1,
+    },
+#if (PLATFORM_VARIANT == 0)
+    {
+        /*
+         * Peripherals, PCIe 32-bit MMIO to IO Macro 2
+         */
+        .base = AP_PCIE_MMIOL_BASE + (2 * AP_PCIE_MMIOL_SIZE_PER_RC),
+        .size = AP_PCIE_MMIOL_SIZE_PER_RC,
+        .type = MOD_CMN700_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_HNP2,
+    },
+    {
+        /*
+         * Peripherals, PCIe 32-bit MMIO to IO Macro 3
+         */
+        .base = AP_PCIE_MMIOL_BASE + (3 * AP_PCIE_MMIOL_SIZE_PER_RC),
+        .size = AP_PCIE_MMIOL_SIZE_PER_RC,
+        .type = MOD_CMN700_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_HNP3,
+    },
+#endif
+    {
+        /*
+         * PCIe ECAM0 to IO Macro 0
+         */
+        .base = AP_PCIE_ECAM_BASE,
+        .size = AP_PCIE_ECAM_SIZE_PER_RC,
+        .type = MOD_CMN700_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_HNP0,
+    },
+    {
+        /*
+         * PCIe ECAM0 to IO Macro 1
+         */
+        .base = AP_PCIE_ECAM_BASE + (1 * AP_PCIE_ECAM_SIZE_PER_RC),
+        .size = AP_PCIE_ECAM_SIZE_PER_RC,
+        .type = MOD_CMN700_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_HNP1,
+    },
+#if (PLATFORM_VARIANT == 0)
+    {
+        /*
+         * PCIe ECAM0 to IO Macro 2
+         */
+        .base = AP_PCIE_ECAM_BASE + (2 * AP_PCIE_ECAM_SIZE_PER_RC),
+        .size = AP_PCIE_ECAM_SIZE_PER_RC,
+        .type = MOD_CMN700_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_HNP2,
+    },
+    {
+        /*
+         * PCIe ECAM0 to IO Macro 3
+         */
+        .base = AP_PCIE_ECAM_BASE + (3 * AP_PCIE_ECAM_SIZE_PER_RC),
+        .size = AP_PCIE_ECAM_SIZE_PER_RC,
+        .type = MOD_CMN700_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_HNP3,
+    },
+#endif
+    {
+        /*
+         * Peripherals, PCIe 64-bit MMIO to IO Macro 0
+         */
+        .base = AP_PCIE_MMIOH_BASE,
+        .size = AP_PCIE_MMIOH_SIZE_PER_RC,
+        .type = MOD_CMN700_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_HNP0,
+    },
+    {
+        /*
+         * Peripherals, PCIe 64-bit MMIO to IO Macro 1
+         */
+        .base = AP_PCIE_MMIOH_BASE + (1 * AP_PCIE_MMIOH_SIZE_PER_RC),
+        .size = AP_PCIE_MMIOH_SIZE_PER_RC,
+        .type = MOD_CMN700_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_HNP1,
+    },
+#if (PLATFORM_VARIANT == 0)
+    {
+        /*
+         * Peripherals, PCIe 64-bit MMIO to IO Macro 2
+         */
+        .base = AP_PCIE_MMIOH_BASE + (2 * AP_PCIE_MMIOH_SIZE_PER_RC),
+        .size = AP_PCIE_MMIOH_SIZE_PER_RC,
+        .type = MOD_CMN700_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_HNP2,
+    },
+    {
+        /*
+         * Peripherals, PCIe 64-bit MMIO to IO Macro 3
+         */
+        .base = AP_PCIE_MMIOH_BASE + (3 * AP_PCIE_MMIOH_SIZE_PER_RC),
+        .size = AP_PCIE_MMIOH_SIZE_PER_RC,
+        .type = MOD_CMN700_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_HNP3,
+    },
+#endif
     {
         /*
          * Non Secure NOR Flash 0/1
