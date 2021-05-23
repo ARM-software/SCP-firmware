@@ -40,6 +40,7 @@
 #    define NODE_ID_HNP1 340
 #    define NODE_ID_HNP2 348
 #    define NODE_ID_HNP3 362
+#    define NODE_ID_HNP4 364
 #    define NODE_ID_SBSX 196
 
 #    define MESH_SIZE_X 6
@@ -167,6 +168,48 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HNP0,
     },
+    {
+        /*
+         * Peripherals, NCI GPV Memory Map 1
+         * Map: 0x00_4200_0000 - 0x00_43FF_FFFF (32 MB)
+         */
+        .base = UINT64_C(0x0042000000),
+        .size = UINT64_C(32) * FWK_MIB,
+        .type = MOD_CMN700_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_HNP1,
+    },
+#if (PLATFORM_VARIANT == 0)
+    {
+        /*
+         * Peripherals, NCI GPV Memory Map 2
+         * Map: 0x00_4400_0000 - 0x00_45FF_FFFF (32 MB)
+         */
+        .base = UINT64_C(0x0044000000),
+        .size = UINT64_C(32) * FWK_MIB,
+        .type = MOD_CMN700_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_HNP2,
+    },
+    {
+        /*
+         * Peripherals, NCI GPV Memory Map 3
+         * Map: 0x00_4600_0000 - 0x00_47FF_FFFF (32 MB)
+         */
+        .base = UINT64_C(0x0046000000),
+        .size = UINT64_C(32) * FWK_MIB,
+        .type = MOD_CMN700_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_HNP3,
+    },
+    {
+        /*
+         * Peripherals, NCI GPV Memory Map 3
+         * Map: 0x00_4800_0000 - 0x00_49FF_FFFF (32 MB)
+         */
+        .base = UINT64_C(0x0048000000),
+        .size = UINT64_C(32) * FWK_MIB,
+        .type = MOD_CMN700_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_HNP4,
+    },
+#endif
     {
         /*
          * Peripherals, PCIe 32-bit MMIO to IO Macro 0
