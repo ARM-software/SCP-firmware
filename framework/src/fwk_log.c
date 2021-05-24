@@ -125,7 +125,7 @@ static void fwk_log_vsnprintf(
     duration_us = (uint32_t)fwk_time_duration_us(duration % FWK_S(1));
 
     /* Generate the timestamp at the beginning of the buffer */
-    length = snprintf(
+    length = (size_t)snprintf(
         buffer,
         buffer_size,
         "[%5" PRIu32 ".%06" PRIu32 "] ",
@@ -148,7 +148,7 @@ static void fwk_log_vsnprintf(
      * on a line-by-line basis.
      */
 
-    newline = strchr(buffer, '\n');
+    newline = strchr(buffer, (int)'\n');
     if (newline == NULL) {
         newline = buffer + length;
     }
@@ -194,7 +194,7 @@ static bool fwk_log_banner(void)
             return false;
         }
 
-        banner = strchr(banner, '\n');
+        banner = strchr(banner, (int)'\n');
         if (banner != NULL) {
             banner++;
         }

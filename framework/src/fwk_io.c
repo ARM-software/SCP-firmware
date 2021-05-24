@@ -43,7 +43,8 @@ static struct fwk_io_stream fwk_io_null = {
         },
 
     .id = FWK_ID_NONE,
-    .mode = FWK_IO_MODE_READ | FWK_IO_MODE_WRITE | FWK_IO_MODE_BINARY,
+    .mode = (enum fwk_io_mode)(
+        FWK_IO_MODE_READ | FWK_IO_MODE_WRITE | FWK_IO_MODE_BINARY),
 };
 
 struct fwk_io_stream *fwk_io_stdin = &fwk_io_null;
@@ -73,8 +74,9 @@ int fwk_io_init(void)
             status = fwk_io_open(
                 &stdin_stream,
                 FMW_IO_STDIN_ID,
-                ((unsigned int)FWK_IO_MODE_READ) |
-                    ((unsigned int)FWK_IO_MODE_WRITE));
+                (enum fwk_io_mode)(
+                    ((unsigned int)FWK_IO_MODE_READ) |
+                    ((unsigned int)FWK_IO_MODE_WRITE)));
             if (fwk_expect(status == FWK_SUCCESS)) {
                 fwk_io_stdin = &stdin_stream;
                 fwk_io_stdout = &stdin_stream;
@@ -166,7 +168,7 @@ int fwk_io_getch(const struct fwk_io_stream *stream, char *ch)
         return FWK_E_PARAM;
     }
 
-    *ch = 0;
+    *ch = '\0';
 
     if (!fwk_expect(stream->adapter != NULL)) {
         return FWK_E_STATE; /* The stream is not open */
@@ -348,12 +350,12 @@ int fwk_io_vprintf(
         return FWK_E_STATE;
     }
 
-    buffer = fwk_mm_alloc_notrap(sizeof(buffer[0]), length + 1);
+    buffer = fwk_mm_alloc_notrap(sizeof(buffer[0]), (size_t)(length + 1));
     if (buffer == NULL) { /* Not enough memory for the string buffer */
         return FWK_E_NOMEM;
     }
 
-    length = vsnprintf(buffer, length + 1, format, args);
+    length = vsnprintf(buffer, (size_t)(length + 1), format, args);
     if (length >= 0) {
         status = fwk_io_puts(stream, buffer); /* Write out the buffer */
     } else {

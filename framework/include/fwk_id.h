@@ -69,7 +69,7 @@ enum fwk_id_type {
 #define FWK_ID_NONE_INIT \
     { \
         .common = { \
-            .type = __FWK_ID_TYPE_NONE, \
+            .type = (uint32_t)__FWK_ID_TYPE_NONE, \
         }, \
     }
 
@@ -112,8 +112,8 @@ enum fwk_id_type {
 #define FWK_ID_MODULE_INIT(MODULE_IDX) \
     { \
         .common = { \
-            .type = __FWK_ID_TYPE_MODULE, \
-            .module_idx = MODULE_IDX, \
+            .type = (uint32_t)__FWK_ID_TYPE_MODULE, \
+            .module_idx = (uint32_t)MODULE_IDX, \
         }, \
     }
 
@@ -156,9 +156,9 @@ enum fwk_id_type {
 #define FWK_ID_ELEMENT_INIT(MODULE_IDX, ELEMENT_IDX) \
     { \
         .element = { \
-            .type = __FWK_ID_TYPE_ELEMENT, \
-            .module_idx = MODULE_IDX, \
-            .element_idx = ELEMENT_IDX, \
+            .type = (uint32_t)__FWK_ID_TYPE_ELEMENT, \
+            .module_idx = (uint32_t)MODULE_IDX, \
+            .element_idx = (uint32_t)ELEMENT_IDX, \
         }, \
     }
 
@@ -206,10 +206,10 @@ enum fwk_id_type {
 #define FWK_ID_SUB_ELEMENT_INIT(MODULE_IDX, ELEMENT_IDX, SUB_ELEMENT_IDX) \
     { \
         .sub_element = { \
-            .type = __FWK_ID_TYPE_SUB_ELEMENT, \
-            .module_idx = MODULE_IDX, \
-            .element_idx = ELEMENT_IDX, \
-            .sub_element_idx = SUB_ELEMENT_IDX, \
+            .type = (uint32_t)__FWK_ID_TYPE_SUB_ELEMENT, \
+            .module_idx = (uint32_t)MODULE_IDX, \
+            .element_idx = (uint32_t)ELEMENT_IDX, \
+            .sub_element_idx = (uint32_t)SUB_ELEMENT_IDX, \
         }, \
     }
 
@@ -257,9 +257,9 @@ enum fwk_id_type {
 #define FWK_ID_API_INIT(MODULE_IDX, API_IDX) \
     { \
         .api = { \
-            .type = __FWK_ID_TYPE_API, \
-            .module_idx = MODULE_IDX, \
-            .api_idx = API_IDX, \
+            .type = (uint32_t)__FWK_ID_TYPE_API, \
+            .module_idx = (uint32_t)MODULE_IDX, \
+            .api_idx = (uint32_t)API_IDX, \
         }, \
     }
 
@@ -304,9 +304,9 @@ enum fwk_id_type {
 #define FWK_ID_EVENT_INIT(MODULE_IDX, EVENT_IDX) \
     { \
         .event = { \
-            .type = __FWK_ID_TYPE_EVENT, \
-            .module_idx = MODULE_IDX, \
-            .event_idx = EVENT_IDX, \
+            .type = (uint32_t)__FWK_ID_TYPE_EVENT, \
+            .module_idx = (uint32_t)MODULE_IDX, \
+            .event_idx = (uint32_t)EVENT_IDX, \
         }, \
     }
 
@@ -351,9 +351,9 @@ enum fwk_id_type {
 #define FWK_ID_SIGNAL_INIT(MODULE_IDX, SIGNAL_IDX) \
     { \
         .signal = { \
-            .type = __FWK_ID_TYPE_SIGNAL, \
-            .module_idx = MODULE_IDX, \
-            .signal_idx = SIGNAL_IDX, \
+            .type = (uint32_t)__FWK_ID_TYPE_SIGNAL, \
+            .module_idx = (uint32_t)MODULE_IDX, \
+            .signal_idx = (uint32_t)SIGNAL_IDX, \
         }, \
     }
 
@@ -400,9 +400,9 @@ enum fwk_id_type {
 #define FWK_ID_NOTIFICATION_INIT(MODULE_IDX, NOTIFICATION_IDX) \
     { \
         .notification = { \
-            .type = __FWK_ID_TYPE_NOTIFICATION, \
-            .module_idx = MODULE_IDX, \
-            .notification_idx = NOTIFICATION_IDX, \
+            .type = (uint32_t)__FWK_ID_TYPE_NOTIFICATION, \
+            .module_idx = (uint32_t)MODULE_IDX, \
+            .notification_idx = (uint32_t)NOTIFICATION_IDX, \
         }, \
     }
 
