@@ -631,7 +631,7 @@ bool fwk_module_is_valid_notification_id(fwk_id_t id)
 int fwk_module_get_element_count(fwk_id_t id)
 {
     if (fwk_module_is_valid_module_id(id)) {
-        return fwk_module_get_ctx(id)->element_count;
+        return (int)fwk_module_get_ctx(id)->element_count;
     } else {
         return FWK_E_PARAM;
     }
@@ -640,7 +640,7 @@ int fwk_module_get_element_count(fwk_id_t id)
 int fwk_module_get_sub_element_count(fwk_id_t element_id)
 {
     if (fwk_module_is_valid_element_id(element_id)) {
-        return fwk_module_get_element_ctx(element_id)->sub_element_count;
+        return (int)fwk_module_get_element_ctx(element_id)->sub_element_count;
     } else {
         return FWK_E_PARAM;
     }

@@ -50,12 +50,12 @@ static void fwk_id_format(
     fwk_assert(buffer_size > 0);
 
     if (id.common.type >= FWK_ARRAY_SIZE(types)) {
-        id.common.type = __FWK_ID_TYPE_INVALID;
+        id.common.type = (uint32_t)__FWK_ID_TYPE_INVALID;
     }
 
     indices[0] = id.common.module_idx;
 
-    switch (id.common.type) {
+    switch ((enum __fwk_id_type)id.common.type) {
     case __FWK_ID_TYPE_SUB_ELEMENT:
         indices[2] = id.sub_element.sub_element_idx;
 
@@ -86,7 +86,7 @@ static void fwk_id_format(
     module_id = FWK_ID_MODULE(indices[0]);
     module_name = fwk_module_get_name(module_id);
 
-    switch (id.common.type) {
+    switch ((enum __fwk_id_type)id.common.type) {
     case __FWK_ID_TYPE_ELEMENT:
     case __FWK_ID_TYPE_SUB_ELEMENT:
         element_id = FWK_ID_ELEMENT(indices[0], indices[1]);
@@ -101,7 +101,7 @@ static void fwk_id_format(
     length += snprintf(
         buffer + length, buffer_size - length, "[%s", types[id.common.type]);
 
-    switch (id.common.type) {
+    switch ((enum __fwk_id_type)id.common.type) {
     case __FWK_ID_TYPE_MODULE:
     case __FWK_ID_TYPE_ELEMENT:
     case __FWK_ID_TYPE_SUB_ELEMENT:
@@ -120,7 +120,7 @@ static void fwk_id_format(
         break;
     }
 
-    switch (id.common.type) {
+    switch ((enum __fwk_id_type)id.common.type) {
     case __FWK_ID_TYPE_ELEMENT:
     case __FWK_ID_TYPE_SUB_ELEMENT:
     case __FWK_ID_TYPE_API:
@@ -138,7 +138,7 @@ static void fwk_id_format(
         break;
     }
 
-    switch (id.common.type) {
+    switch ((enum __fwk_id_type)id.common.type) {
     case __FWK_ID_TYPE_SUB_ELEMENT:
         length +=
             snprintf(buffer + length, buffer_size - length, ":%u", indices[2]);
@@ -191,7 +191,7 @@ enum fwk_id_type fwk_id_get_type(fwk_id_t id)
     fwk_assert(id.common.type != __FWK_ID_TYPE_INVALID);
     fwk_assert(id.common.type < __FWK_ID_TYPE_COUNT);
 
-    return id.common.type;
+    return (enum fwk_id_type)id.common.type;
 }
 
 bool fwk_id_is_equal(fwk_id_t left, fwk_id_t right)

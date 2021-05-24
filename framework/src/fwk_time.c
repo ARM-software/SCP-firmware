@@ -62,12 +62,12 @@ fwk_duration_s_t fwk_time_duration_s(fwk_duration_ns_t duration)
 
 fwk_duration_m_t fwk_time_duration_m(fwk_duration_ns_t duration)
 {
-    return duration / FWK_M(1);
+    return (uint32_t)(duration / FWK_M(1));
 }
 
 fwk_duration_h_t fwk_time_duration_h(fwk_duration_ns_t duration)
 {
-    return duration / FWK_H(1);
+    return (uint32_t)(duration / FWK_H(1));
 }
 
 FWK_WEAK struct fwk_time_driver fmw_time_driver(const void **ctx)
