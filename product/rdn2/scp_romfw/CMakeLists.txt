@@ -11,6 +11,17 @@
 
 add_executable(rdn2-bl1)
 
+# SCP_PLATFORM_VARIANT value for supported RD-N2 platform variants:
+# - '0' for RD-N2 platform
+
+if (SCP_PLATFORM_VARIANT STREQUAL "0")
+      target_compile_definitions(rdn2-bl1
+                                 PUBLIC -DPLATFORM_VARIANT=0)
+else()
+      message(FATAL_ERROR "Please set SCP_PLATFORM_VARIANT to \n"
+                                "'0' for RD-N2 \n")
+endif()
+
 target_include_directories(
     rdn2-bl1 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include"
                     "${CMAKE_CURRENT_SOURCE_DIR}")
