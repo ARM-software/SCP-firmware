@@ -157,7 +157,7 @@ static bool header_is_valid(const volatile struct region_descriptor *region,
     return true;
 }
 
-static bool validate_structure_access(
+static int validate_structure_access(
     uint32_t structure_size,
     uint32_t offset,
     size_t access_size)
