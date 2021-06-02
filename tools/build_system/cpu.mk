@@ -58,7 +58,7 @@ else ifeq ($(BS_FIRMWARE_CPU),host)
     BS_ARCH_VENDOR := none
     BS_ARCH_ARCH := host
 else
-    $(erro "$(BS_FIRMWARE_CPU) is not a supported CPU. Aborting...")
+    $(error "$(BS_FIRMWARE_CPU) is not a supported CPU. Aborting...")
 endif
 
 endif
