@@ -64,6 +64,7 @@ static int load_image(void)
 
     uint32_t image_flags;
     uint32_t image_offset;
+    uint32_t zero_flag = 0;
 #endif
 
     const uint8_t *image_base;
@@ -109,7 +110,19 @@ static int load_image(void)
                 break;
             }
         }
+        /*
+         * Clear the image flag, so that at reboot if the RAM contents are
+         * retained, then it would need to be set again by AP.
+         */
+        status = module_ctx.sds_api->struct_write(
+            module_ctx.module_config->sds_struct_id,
+            BOOTLOADER_STRUCT_VALID_POS,
+            &zero_flag,
+            sizeof(zero_flag));
 
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
         /*
          * The image metadata from Trusted Firmware can now be read and
          * validated.
