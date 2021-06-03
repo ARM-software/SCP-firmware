@@ -379,8 +379,9 @@ static int mod_psu_process_bind_request(
         *api = &mod_psu_driver_response_api;
 
         break;
+
     default:
-        break;
+        return FWK_E_PARAM;
     }
 
     return FWK_SUCCESS;
