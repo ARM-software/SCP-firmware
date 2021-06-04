@@ -200,15 +200,17 @@ static bool fwk_process_signal()
                 break;
             }
         }
-        fwk_interrupt_global_enable();
 
         if (i == FWK_MODULE_SIGNAL_COUNT) {
             fwk_signal_ctx.current_signal.target_id = FWK_ID_NONE;
+            fwk_interrupt_global_enable();
             return false;
         }
 
         fwk_signal_ctx.pending_signals--;
         fwk_signal_ctx.signals[i].target_id = FWK_ID_NONE;
+        fwk_interrupt_global_enable();
+
         execute_signal_handler(signal.target_id, signal.signal_id);
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
