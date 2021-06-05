@@ -19,7 +19,8 @@ target_include_directories(
 
 target_sources(
     sgi575-mcp-bl1 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_pl011.c"
-                           "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c")
+                           "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"
+                           "${CMAKE_CURRENT_SOURCE_DIR}/config_bootloader.c")
 
 #
 # Some of our firmware includes require CMSIS.

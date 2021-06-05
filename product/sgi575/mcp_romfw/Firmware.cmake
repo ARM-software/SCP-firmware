@@ -27,3 +27,5 @@ set(SCP_ARCHITECTURE "armv7-m")
 
 list(APPEND SCP_MODULES "pl011")
 list(APPEND SCP_MODULES "clock")
+list(APPEND SCP_MODULES "bootloader")
+list(APPEND SCP_MODULES "isys-rom")
