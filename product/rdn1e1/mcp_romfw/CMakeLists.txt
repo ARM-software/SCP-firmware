@@ -18,7 +18,8 @@ target_include_directories(
 # cmake-lint: disable=E1122
 
 target_sources(
-    rdn1e1-mcp-bl1 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"
+    rdn1e1-mcp-bl1 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_bootloader.c"
+                           "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"
                            "${CMAKE_CURRENT_SOURCE_DIR}/config_pl011.c")
 
 #

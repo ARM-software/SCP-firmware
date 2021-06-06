@@ -29,5 +29,7 @@ set(SCP_ARCHITECTURE "armv7-m")
 # modules are initialized, bound, started during the pre-runtime phase.
 # any change in the order will cause firmware initialization errors.
 
+list(APPEND SCP_MODULES "bootloader")
+list(APPEND SCP_MODULES "isys-rom")
 list(APPEND SCP_MODULES "pl011")
 list(APPEND SCP_MODULES "clock")
