@@ -92,11 +92,16 @@ static int get_value(fwk_id_t element_id, uint64_t *value)
     struct n1sdp_temp_sensor_ctx *t_dev_ctx;
     struct n1sdp_volt_sensor_ctx *v_dev_ctx;
     unsigned int id;
-    uint8_t t_sensor_count;
+    uint8_t t_sensor_count, v_sensor_count;
     int32_t buf_value;
 
     id = fwk_id_get_element_idx(element_id);
     t_sensor_count = sensor_ctx.module_config->t_sensor_count;
+    v_sensor_count = sensor_ctx.module_config->v_sensor_count;
+
+    if (id >= (t_sensor_count + v_sensor_count)) {
+        return FWK_E_PARAM;
+    }
 
     if (id < t_sensor_count) {
         t_dev_ctx = &sensor_ctx.t_dev_ctx_table[id];
@@ -104,14 +109,18 @@ static int get_value(fwk_id_t element_id, uint64_t *value)
             return FWK_E_DATA;
         }
 
-        buf_value = t_dev_ctx->sensor_data_buffer[t_dev_ctx->buf_index];
+        buf_value = t_dev_ctx->sensor_data_buffer
+                        [t_dev_ctx->buf_index == 0 ? PVT_HISTORY_LEN - 1 :
+                                                     t_dev_ctx->buf_index - 1];
     } else {
         v_dev_ctx = &sensor_ctx.v_dev_ctx_table[id - t_sensor_count];
         if (v_dev_ctx == NULL) {
             return FWK_E_DATA;
         }
 
-        buf_value = v_dev_ctx->sensor_data_buffer[v_dev_ctx->buf_index];
+        buf_value = v_dev_ctx->sensor_data_buffer
+                        [v_dev_ctx->buf_index == 0 ? PVT_HISTORY_LEN - 1 :
+                                                     v_dev_ctx->buf_index - 1];
     }
     *value = (uint64_t)buf_value;
 
