@@ -164,22 +164,24 @@ static const struct mod_dvfs_domain_config cpu_group_matterhorn_elp_arm = {
     .opps = operating_points_matterhorn_elp_arm,
 };
 
-static const struct fwk_element element_table[] = { [DVFS_ELEMENT_IDX_KLEIN] =
-                                                        {
-                                                            .name = "CPU_GROUP_KLEIN",
-                                                            .data = &cpu_group_klein,
-                                                        },
-                                                    [DVFS_ELEMENT_IDX_MATTERHORN] =
-                                                        {
-                                                            .name = "CPU_GROUP_MATTERHORN",
-                                                            .data = &cpu_group_matterhorn,
-                                                        },
-                                                    [DVFS_ELEMENT_IDX_MATTERHORN_ELP_ARM] =
-                                                        {
-                                                            .name = "CPU_GROUP_MATTERHORN_ELP_ARM",
-                                                            .data = &cpu_group_matterhorn_elp_arm,
-                                                        },
-                                                    { 0 } };
+static const struct fwk_element element_table[] = {
+    [DVFS_ELEMENT_IDX_KLEIN] =
+        {
+            .name = "CPU_GROUP_KLEIN",
+            .data = &cpu_group_klein,
+        },
+    [DVFS_ELEMENT_IDX_MATTERHORN] =
+        {
+            .name = "CPU_GROUP_MATTERHORN",
+            .data = &cpu_group_matterhorn,
+        },
+    [DVFS_ELEMENT_IDX_MATTERHORN_ELP_ARM] =
+        {
+            .name = "CPU_GROUP_MATTERHORN_ELP_ARM",
+            .data = &cpu_group_matterhorn_elp_arm,
+        },
+    { 0 },
+};
 
 static const struct fwk_element *dvfs_get_element_table(fwk_id_t module_id)
 {
