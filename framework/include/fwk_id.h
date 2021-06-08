@@ -603,8 +603,19 @@ fwk_id_t fwk_id_build_api_id(fwk_id_t id, unsigned int api_idx)
  * \param id Identifier.
  *
  * \return Module index.
+ *
+ * \note Since this function is used very frequently, inlining is useful
+ *     to avoid function call overhead. The inlining is applicable only in
+ *     release build.
  */
+#if !defined(NDEBUG)
 unsigned int fwk_id_get_module_idx(fwk_id_t id) FWK_CONST FWK_LEAF FWK_NOTHROW;
+#else
+inline static unsigned int fwk_id_get_module_idx(fwk_id_t id)
+{
+    return id.common.module_idx;
+}
+#endif
 
 /*!
  * \brief Retrieve the index of an element from its identifier or the identifier
@@ -613,9 +624,20 @@ unsigned int fwk_id_get_module_idx(fwk_id_t id) FWK_CONST FWK_LEAF FWK_NOTHROW;
  * \param element_id Element or sub-element identifier.
  *
  * \return Element index.
+ *
+ * \note Since this function is used very frequently, inlining is useful
+ *     to avoid function call overhead. The inlining is applicable only in
+ *     release build.
  */
+#if !defined(NDEBUG)
 unsigned int fwk_id_get_element_idx(fwk_id_t element_id) FWK_CONST FWK_LEAF
     FWK_NOTHROW;
+#else
+inline static unsigned int fwk_id_get_element_idx(fwk_id_t element_id)
+{
+    return element_id.element.element_idx;
+}
+#endif
 
 /*!
  * \brief Retrieve the index of a sub-element from its identifier.
@@ -623,9 +645,20 @@ unsigned int fwk_id_get_element_idx(fwk_id_t element_id) FWK_CONST FWK_LEAF
  * \param sub_element_id Sub-element identifier.
  *
  * \return Sub-element index.
+ *
+ * \note Since this function is used very frequently, inlining is useful
+ *     to avoid function call overhead. The inlining is applicable only in
+ *     release build.
  */
+#if !defined(NDEBUG)
 unsigned int fwk_id_get_sub_element_idx(
     fwk_id_t sub_element_id) FWK_CONST FWK_LEAF FWK_NOTHROW;
+#else
+inline static unsigned int fwk_id_get_sub_element_idx(fwk_id_t sub_element_id)
+{
+    return sub_element_id.sub_element.sub_element_idx;
+}
+#endif
 
 /*!
  * \brief Retrieve the index of an API from its identifier.
