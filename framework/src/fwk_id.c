@@ -240,6 +240,11 @@ fwk_id_t fwk_id_build_api_id(fwk_id_t id, unsigned int api_idx)
     return FWK_ID_API(id.common.module_idx, api_idx);
 }
 
+/*
+ * Following functions are enabled only for debug build, release build
+ * will use inline equivalents, see fwk_id.h
+ */
+#if !defined(NDEBUG)
 unsigned int fwk_id_get_module_idx(fwk_id_t id)
 {
     fwk_assert(id.common.type != __FWK_ID_TYPE_INVALID);
@@ -262,6 +267,7 @@ unsigned int fwk_id_get_sub_element_idx(fwk_id_t sub_element_id)
 
     return sub_element_id.sub_element.sub_element_idx;
 }
+#endif
 
 unsigned int fwk_id_get_api_idx(fwk_id_t api_id)
 {
