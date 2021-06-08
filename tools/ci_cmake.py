@@ -19,6 +19,10 @@ import sys
 from docker.errors import DockerException
 
 
+def prod_variant(variant):
+    return 'EXTRA_CONFIG_ARGS+=-DSCP_PLATFORM_VARIANT={}'.format(variant)
+
+
 def banner(text):
     columns = 80
     title = " {} ".format(text)
@@ -93,6 +97,9 @@ def main():
     products = ['host', 'juno', 'morello', 'n1sdp', 'rdv1', 'rdv1mc',
                 'rdn1e1', 'sgi575', 'sgm775', 'sgm776', 'tc0',
                 'rdn2']
+    platform_variant = {
+        'rdn2': ['0']
+    }
 
     build_types = ['debug', 'release']
     toolchains = ['GNU', 'ArmClang']
@@ -108,10 +115,20 @@ def main():
                 cmd += 'PRODUCT={} TOOLCHAIN={} MODE={}'.format(product,
                                                                 toolchain,
                                                                 build_type)
-                result = subprocess.call(cmd, shell=True)
-                results.append(("Product {} build ({})".format(product,
-                                                               toolchain),
-                                result))
+                if product in platform_variant:
+                    for variant in platform_variant[product]:
+                        cmd_variant = cmd + ' ' + prod_variant(variant)
+                        result = subprocess.call(cmd_variant, shell=True)
+                        results.append(("Product {} build ({})".format(
+                            product,
+                            toolchain),
+                            result))
+                else:
+                    result = subprocess.call(cmd, shell=True)
+                    results.append(("Product {} build ({})".format(
+                        product,
+                        toolchain),
+                        result))
 
     banner('Tests summary')
 
