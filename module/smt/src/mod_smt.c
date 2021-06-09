@@ -586,7 +586,7 @@ static int smt_process_notification(
     struct mod_pd_power_state_transition_notification_params *params;
     struct smt_channel_ctx *channel_ctx;
     unsigned int notifications_sent;
-    int status;
+    int status = FWK_SUCCESS;
 
     assert(fwk_id_is_equal(event->id,
         mod_pd_notification_id_power_state_transition));
@@ -602,34 +602,29 @@ static int smt_process_notification(
         if (params->state == MOD_PD_STATE_OFF) {
             channel_ctx->smt_mailbox_ready = false;
         }
+    } else {
+        if ((channel_ctx->config->policies & MOD_SMT_POLICY_INIT_MAILBOX) !=
+            (uint32_t)0) {
+            /* Initialize mailbox */
+            *((struct mod_smt_memory *)channel_ctx->config->mailbox_address) =
+                (struct mod_smt_memory){
+                    .status = (1U << MOD_SMT_MAILBOX_STATUS_FREE_POS)
+                };
 
-        return FWK_SUCCESS;
-    }
-
-    if ((channel_ctx->config->policies & MOD_SMT_POLICY_INIT_MAILBOX) !=
-        (uint32_t)0) {
-        /* Initialize mailbox */
-        *((struct mod_smt_memory *)channel_ctx->config->mailbox_address) =
-            (struct mod_smt_memory){
-                .status = (1U << MOD_SMT_MAILBOX_STATUS_FREE_POS)
+            /* Notify that this mailbox is initialized */
+            struct fwk_event smt_channels_initialized_notification = {
+                .id = mod_smt_notification_id_initialized,
+                .source_id = FWK_ID_NONE
             };
 
-        /* Notify that this mailbox is initialized */
-        struct fwk_event smt_channels_initialized_notification = {
-            .id = mod_smt_notification_id_initialized,
-            .source_id = FWK_ID_NONE
-        };
+            channel_ctx->smt_mailbox_ready = true;
 
-        channel_ctx->smt_mailbox_ready = true;
-
-        status = fwk_notification_notify(&smt_channels_initialized_notification,
-            &notifications_sent);
-        if (status != FWK_SUCCESS) {
-            return status;
+            status = fwk_notification_notify(
+                &smt_channels_initialized_notification, &notifications_sent);
         }
     }
 
-    return FWK_SUCCESS;
+    return status;
 }
 
 const struct fwk_module module_smt = {
