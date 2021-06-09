@@ -38,6 +38,10 @@ cmake_dependent_option(
 
 if(SCP_ENABLE_NEWLIB_NANO)
     target_link_options(arch-armv7m PUBLIC "--specs=nano.specs")
+else()
+    if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+        target_link_options(arch-armv7m PUBLIC "--specs=nosys.specs")
+    endif()
 endif()
 
 #
