@@ -127,8 +127,42 @@ static int get_value(fwk_id_t element_id, uint64_t *value)
     return FWK_SUCCESS;
 }
 
+static int get_info(fwk_id_t element_id, struct mod_sensor_info *info)
+{
+    struct mod_sensor_info *return_info;
+    unsigned int id;
+    uint8_t t_sensor_count, v_sensor_count;
+    const struct mod_n1sdp_temp_sensor_config *t_config;
+    const struct mod_n1sdp_volt_sensor_config *v_config;
+
+    id = fwk_id_get_element_idx(element_id);
+    t_sensor_count = sensor_ctx.module_config->t_sensor_count;
+    v_sensor_count = sensor_ctx.module_config->v_sensor_count;
+
+    if (id >= (t_sensor_count + v_sensor_count)) {
+        return FWK_E_PARAM;
+    }
+
+    if (id < t_sensor_count) {
+        t_config = fwk_module_get_data(element_id);
+        return_info = t_config->info;
+    } else {
+        v_config = fwk_module_get_data(element_id);
+        return_info = v_config->info;
+    }
+
+    if (!fwk_expect(return_info != NULL)) {
+        return FWK_E_DATA;
+    }
+
+    *info = *return_info;
+
+    return FWK_SUCCESS;
+}
+
 static const struct mod_sensor_driver_api n1sdp_sensor_api = {
     .get_value = get_value,
+    .get_info = get_info,
 };
 
 /*
