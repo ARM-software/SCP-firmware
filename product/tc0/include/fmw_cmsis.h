@@ -44,6 +44,8 @@ typedef enum IRQn {
     PPU_CORES2_IRQ = 66, /* PPU core 2 IRQ */
     PPU_CORES3_IRQ = 67, /* PPU core 3 IRQ */
     PPU_CLUSTERS_IRQ = 54, /* Consolidated clusters PPU */
+
+    IRQn_MAX = INT16_MAX,
 } IRQn_Type;
 
 #include <core_cm3.h>
