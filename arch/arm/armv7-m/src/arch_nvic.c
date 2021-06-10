@@ -9,6 +9,7 @@
  */
 
 #include <fwk_arch.h>
+#include <fwk_assert.h>
 #include <fwk_interrupt.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
@@ -19,13 +20,30 @@
 
 #include <fmw_cmsis.h>
 
+#include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
-static unsigned int isr_count;
-static unsigned int irq_count;
+/* We use short enums, so avoid truncation of larger unsigned IRQ numbers */
+#define IRQN_TYPE_MAX \
+    ((uint64_t)(((UINT64_C(1) << (sizeof(IRQn_Type) * CHAR_BIT)) - 1U) / 2U))
+
+static uint32_t isr_count;
+static uint32_t irq_count;
+
+static_assert(
+    UINT32_MAX >= IRQN_TYPE_MAX,
+    "`uint32_t` cannot hold all possible IRQ numbers");
+
+static_assert(
+    UINT_MAX >= IRQN_TYPE_MAX,
+    "`unsigned int` cannot hold all possible IRQ numbers");
+
+static_assert(
+    sizeof(IRQn_Type) >= sizeof(int16_t),
+    "`IRQn_Type` cannot hold all possible IRQ numbers");
 
 /*
  * For interrupts with parameters, their entry in the vector table points to a
@@ -238,7 +256,7 @@ int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
     uint32_t align_entries;
     uint32_t align_word;
     uint32_t *vector;
-    char irq;
+    uint32_t irq;
 
     if (driver == NULL) {
         return FWK_E_PARAM;
@@ -248,6 +266,13 @@ int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
     ictr_intlinesnum = SCnSCB->ICTR & SCnSCB_ICTR_INTLINESNUM_Msk;
     irq_count = (ictr_intlinesnum + 1) * 32;
     isr_count = NVIC_USER_IRQ_OFFSET + irq_count;
+
+    /*
+     * irq_count holds the amount of IRQ meanwhile IRQN_TYPE_MAX holds the
+     * maximum IRQ number (for type size), that is the reason there is a +1 in
+     * the comparison.
+     */
+    fwk_assert(irq_count <= (IRQN_TYPE_MAX + 1));
 
     /*
      * Allocate and initialize a table for the callback functions and their
@@ -287,7 +312,7 @@ int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
     SCB->VTOR = (uint32_t)vector;
 
     /* Initialize IRQs */
-    for (irq = 0; irq < (char)irq_count; irq++) {
+    for (irq = 0; irq < irq_count; irq++) {
         /* Ensure IRQs are disabled during boot sequence */
         NVIC_DisableIRQ((IRQn_Type)irq);
         NVIC_ClearPendingIRQ((IRQn_Type)irq);
