@@ -88,7 +88,7 @@ static int is_enabled(unsigned int interrupt, bool *enabled)
         return FWK_E_PARAM;
     }
 
-    *enabled = NVIC_GetEnableIRQ(interrupt);
+    *enabled = NVIC_GetEnableIRQ((enum IRQn)interrupt) != 0;
 
     return FWK_SUCCESS;
 }
@@ -99,7 +99,7 @@ static int enable(unsigned int interrupt)
         return FWK_E_PARAM;
     }
 
-    NVIC_EnableIRQ(interrupt);
+    NVIC_EnableIRQ((enum IRQn)interrupt);
 
     return FWK_SUCCESS;
 }
@@ -110,7 +110,7 @@ static int disable(unsigned int interrupt)
         return FWK_E_PARAM;
     }
 
-    NVIC_DisableIRQ(interrupt);
+    NVIC_DisableIRQ((enum IRQn)interrupt);
 
     return FWK_SUCCESS;
 }
@@ -121,7 +121,7 @@ static int is_pending(unsigned int interrupt, bool *pending)
         return FWK_E_PARAM;
     }
 
-    *pending = NVIC_GetPendingIRQ(interrupt);
+    *pending = NVIC_GetPendingIRQ((enum IRQn)interrupt) != 0;
 
     return FWK_SUCCESS;
 }
@@ -132,7 +132,7 @@ static int set_pending(unsigned int interrupt)
         return FWK_E_PARAM;
     }
 
-    NVIC_SetPendingIRQ(interrupt);
+    NVIC_SetPendingIRQ((enum IRQn)interrupt);
 
     return FWK_SUCCESS;
 }
@@ -143,7 +143,7 @@ static int clear_pending(unsigned int interrupt)
         return FWK_E_PARAM;
     }
 
-    NVIC_ClearPendingIRQ(interrupt);
+    NVIC_ClearPendingIRQ((enum IRQn)interrupt);
 
     return FWK_SUCCESS;
 }
@@ -154,7 +154,7 @@ static int set_isr_irq(unsigned int interrupt, void (*isr)(void))
         return FWK_E_PARAM;
     }
 
-    NVIC_SetVector(interrupt, (uint32_t)isr);
+    NVIC_SetVector((enum IRQn)interrupt, (uint32_t)isr);
 
     return FWK_SUCCESS;
 }
@@ -173,7 +173,7 @@ static int set_isr_irq_param(
     entry->func = isr;
     entry->param = parameter;
 
-    NVIC_SetVector(interrupt, (uint32_t)irq_global);
+    NVIC_SetVector((enum IRQn)interrupt, (uint32_t)irq_global);
 
     return FWK_SUCCESS;
 }
