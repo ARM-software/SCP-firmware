@@ -56,6 +56,11 @@ if(SCP_ENABLE_MULTITHREADING)
     target_link_libraries(morello-fvp-bl2 PRIVATE cmsis::rtos2-rtx)
 endif()
 
+if(SCP_ENABLE_DEBUGGER_INIT)
+    target_compile_definitions(morello-fvp-bl2 PRIVATE BUILD_HAS_DEBUGGER)
+    target_sources(morello-fvp-bl2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_debugger_cli.c")
+endif()
+
 #
 # Some of our firmware includes require CMSIS.
 #
@@ -71,3 +76,10 @@ target_link_libraries(morello-fvp-bl2 PUBLIC cmsis::core-m)
 target_include_directories(
     morello-fvp-bl2
     PUBLIC $<TARGET_PROPERTY:cmsis::core-m,INTERFACE_INCLUDE_DIRECTORIES>)
+
+if(SCP_ENABLE_DEBUGGER_INIT)
+    list(APPEND SCP_MODULES "debugger-cli")
+endif()
+
+set(SCP_MODULES ${SCP_MODULES} PARENT_SCOPE)
+set(SCP_MODULE_PATHS ${SCP_MODULE_PATHS} PARENT_SCOPE)
