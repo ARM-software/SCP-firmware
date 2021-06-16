@@ -60,7 +60,7 @@ struct field {
  */
 #define FIELD(_name, _mask) \
     static const struct field _name = { \
-        .reg_idx = _name##_IDX, \
+        .reg_idx = (uint32_t)_name##_IDX, \
         .mask = _mask, \
         .pos = __builtin_ctz(_mask), \
     }

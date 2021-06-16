@@ -49,7 +49,7 @@ static const struct fwk_element juno_xrp7724_element_table[] = {
     },
     [MOD_JUNO_XRP7724_ELEMENT_IDX_GPIO] = {
         .name = "",
-        .sub_element_count = MOD_JUNO_XRP7724_GPIO_IDX_COUNT,
+        .sub_element_count = (size_t) MOD_JUNO_XRP7724_GPIO_IDX_COUNT,
         .data = &(const struct mod_juno_xrp7724_dev_config) {
             .type = MOD_JUNO_XRP7724_ELEMENT_TYPE_GPIO,
         },

@@ -39,11 +39,11 @@ static fwk_id_t sds_feature_availability_id =
 
 /* SCMI services required to enable the messaging stack */
 static unsigned int scmi_notification_table[] = {
-    JUNO_SCMI_SERVICE_IDX_PSCI_A2P,
-    JUNO_SCMI_SERVICE_IDX_OSPM_A2P_0,
-    JUNO_SCMI_SERVICE_IDX_OSPM_A2P_1,
+    (unsigned int)JUNO_SCMI_SERVICE_IDX_PSCI_A2P,
+    (unsigned int)JUNO_SCMI_SERVICE_IDX_OSPM_A2P_0,
+    (unsigned int)JUNO_SCMI_SERVICE_IDX_OSPM_A2P_1,
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    JUNO_SCMI_SERVICE_IDX_OSPM_P2A,
+    (unsigned int)JUNO_SCMI_SERVICE_IDX_OSPM_P2A,
 #endif
 };
 

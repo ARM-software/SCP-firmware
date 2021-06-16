@@ -23,7 +23,7 @@ static const struct fwk_element element_table[] = {
         .name = "",
         .sub_element_count = 1,
         .data = &(struct mod_mhu_device_config) {
-            .irq = MHU_SECURE_IRQ,
+            .irq = (unsigned int) MHU_SECURE_IRQ,
             .in = MHU_CPU_INTR_S_BASE,
             .out = MHU_SCP_INTR_S_BASE,
         },
@@ -32,7 +32,7 @@ static const struct fwk_element element_table[] = {
         .name = "",
         .sub_element_count = 2,
         .data = &(struct mod_mhu_device_config) {
-            .irq = MHU_HIGH_PRIO_IRQ,
+            .irq = (unsigned int) MHU_HIGH_PRIO_IRQ,
             .in = MHU_CPU_INTR_H_BASE,
             .out = MHU_SCP_INTR_H_BASE,
         },
@@ -41,7 +41,7 @@ static const struct fwk_element element_table[] = {
         .name = "",
         .sub_element_count = 1,
         .data = &(struct mod_mhu_device_config) {
-            .irq = MHU_LOW_PRIO_IRQ,
+            .irq = (unsigned int) MHU_LOW_PRIO_IRQ,
             .in = MHU_CPU_INTR_L_BASE,
             .out = MHU_SCP_INTR_L_BASE,
         },

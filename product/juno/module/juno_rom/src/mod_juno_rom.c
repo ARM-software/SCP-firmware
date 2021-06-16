@@ -377,7 +377,7 @@ static int juno_rom_process_event(
                             .source_id = FWK_ID_NONE };
 
     notification_params = (void *)systop_on_event.params;
-    notification_params->state = MOD_PD_STATE_ON;
+    notification_params->state = (unsigned int)MOD_PD_STATE_ON;
 
     status = fwk_notification_notify(&systop_on_event, &ctx.notification_count);
     if (!fwk_expect(status == FWK_SUCCESS)) {
@@ -414,8 +414,8 @@ static int juno_rom_process_notification(
 const struct fwk_module module_juno_rom = {
     .name = "Juno ROM",
     .type = FWK_MODULE_TYPE_SERVICE,
-    .event_count = MOD_JUNO_ROM_EVENT_COUNT,
-    .notification_count = MOD_JUNO_ROM_NOTIFICATION_COUNT,
+    .event_count = (unsigned int)MOD_JUNO_ROM_EVENT_COUNT,
+    .notification_count = (unsigned int)MOD_JUNO_ROM_NOTIFICATION_COUNT,
     .init = juno_rom_init,
     .bind = juno_rom_bind,
     .start = juno_rom_start,

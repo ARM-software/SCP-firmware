@@ -43,7 +43,7 @@ static_assert(FWK_ARRAY_SIZE(sds_module_regions) == JUNO_SDS_REGION_COUNT,
 
 static const struct mod_sds_config sds_module_config = {
     .regions = sds_module_regions,
-    .region_count = JUNO_SDS_REGION_COUNT,
+    .region_count = (unsigned int)JUNO_SDS_REGION_COUNT,
     .clock_id = FWK_ID_NONE_INIT,
 };
 
@@ -51,9 +51,9 @@ static const struct fwk_element element_table[] = {
     [JUNO_SDS_ROM_CPU_INFO_IDX] = {
         .name = "CPU Info",
         .data = &(struct mod_sds_structure_desc) {
-            .id = JUNO_SDS_CPU_INFO,
+            .id = (uint32_t) JUNO_SDS_CPU_INFO,
             .size = JUNO_SDS_CPU_INFO_SIZE,
-            .region_id = JUNO_SDS_REGION_SECURE,
+            .region_id = (uint32_t) JUNO_SDS_REGION_SECURE,
             .payload = &primary_cpu,
             .finalize = true,
         },
@@ -62,9 +62,9 @@ static const struct fwk_element element_table[] = {
     [JUNO_SDS_ROM_VERSION_IDX] = {
         .name = "ROM Version",
         .data = &(struct mod_sds_structure_desc) {
-            .id = JUNO_SDS_ROM_VERSION,
+            .id = (uint32_t) JUNO_SDS_ROM_VERSION,
             .size = JUNO_SDS_ROM_VERSION_SIZE,
-            .region_id = JUNO_SDS_REGION_SECURE,
+            .region_id = (uint32_t) JUNO_SDS_REGION_SECURE,
             .payload = &version_packed,
             .finalize = true,
         },
@@ -73,9 +73,9 @@ static const struct fwk_element element_table[] = {
     [JUNO_SDS_ROM_PLATFORM_ID_IDX] = {
         .name = "Platform ID",
         .data = &(struct mod_sds_structure_desc) {
-            .id = JUNO_SDS_PLATFORM_ID,
+            .id = (uint32_t) JUNO_SDS_PLATFORM_ID,
             .size = JUNO_SDS_PLATFORM_ID_SIZE,
-            .region_id = JUNO_SDS_REGION_SECURE,
+            .region_id = (uint32_t) JUNO_SDS_REGION_SECURE,
             .payload = &platid,
             .finalize = true,
         },
@@ -84,9 +84,9 @@ static const struct fwk_element element_table[] = {
     [JUNO_SDS_ROM_RESET_SYNDROME_IDX] = {
         .name = "Reset Syndrome",
         .data = &(struct mod_sds_structure_desc) {
-            .id = JUNO_SDS_RESET_SYNDROME,
+            .id = (uint32_t) JUNO_SDS_RESET_SYNDROME,
             .size = JUNO_SDS_RESET_SYNDROME_SIZE,
-            .region_id = JUNO_SDS_REGION_SECURE,
+            .region_id = (uint32_t) JUNO_SDS_REGION_SECURE,
             .payload = &reset_syndrome,
             .finalize = true,
         },
@@ -95,9 +95,9 @@ static const struct fwk_element element_table[] = {
     [JUNO_SDS_ROM_BOOTLOADER_IDX] = {
         .name = "Bootloader",
         .data = &(struct mod_sds_structure_desc) {
-            .id = JUNO_SDS_BOOTLOADER,
+            .id = (uint32_t) JUNO_SDS_BOOTLOADER,
             .size = JUNO_SDS_BOOTLOADER_SIZE,
-            .region_id = JUNO_SDS_REGION_SECURE,
+            .region_id = (uint32_t) JUNO_SDS_REGION_SECURE,
             .finalize = true,
         },
     },
@@ -105,20 +105,20 @@ static const struct fwk_element element_table[] = {
     [JUNO_SDS_ROM_FEATURES_IDX] = {
         .name = "Features",
         .data = &(struct mod_sds_structure_desc) {
-            .id = JUNO_SDS_FEATURE_AVAILABILITY,
+            .id = (uint32_t) JUNO_SDS_FEATURE_AVAILABILITY,
             .size = JUNO_SDS_FEATURE_AVAILABILITY_SIZE,
-            .region_id = JUNO_SDS_REGION_SECURE,
+            .region_id = (uint32_t) JUNO_SDS_REGION_SECURE,
             .finalize = true,
         },
     },
 
-    #ifdef BUILD_MODE_DEBUG
+#ifdef BUILD_MODE_DEBUG
     [JUNO_SDS_ROM_BOOT_COUNTER_IDX] = {
         .name = "Boot Counters",
         .data = &(struct mod_sds_structure_desc) {
-            .id = JUNO_SDS_CPU_BOOTCTR,
+            .id = (uint32_t) JUNO_SDS_CPU_BOOTCTR,
             .size = JUNO_SDS_CPU_BOOTCTR_SIZE,
-            .region_id = JUNO_SDS_REGION_SECURE,
+            .region_id = (uint32_t) JUNO_SDS_REGION_SECURE,
             .finalize = true,
         },
     },
@@ -126,13 +126,13 @@ static const struct fwk_element element_table[] = {
     [JUNO_SDS_ROM_CPU_FLAGS_IDX] = {
         .name = "CPU Flags",
         .data = &(struct mod_sds_structure_desc) {
-            .id = JUNO_SDS_CPU_FLAGS,
+            .id = (uint32_t) JUNO_SDS_CPU_FLAGS,
             .size = JUNO_SDS_CPU_FLAGS_SIZE,
-            .region_id = JUNO_SDS_REGION_SECURE,
+            .region_id = (uint32_t) JUNO_SDS_REGION_SECURE,
             .finalize = true,
         },
     },
-    #endif
+#endif
 
     [JUNO_SDS_ROM_IDX_COUNT] = { 0 }, /* Termination description */
 };

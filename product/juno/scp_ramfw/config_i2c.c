@@ -22,13 +22,14 @@
 static const struct fwk_element dw_apb_i2c_element_table[] = {
     [0] = {
         .name = "",
-        .data = &(struct mod_dw_apb_i2c_dev_config) {
-            .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
-            .i2c_irq = I2C_IRQ,
-            .reg = (uintptr_t)I2C_BASE,
-        }
+        .data =
+            &(struct mod_dw_apb_i2c_dev_config){
+                .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
+                .i2c_irq = (unsigned int)I2C_IRQ,
+                .reg = (uintptr_t)I2C_BASE,
+        },
     },
-    [1] = {0},
+    [1] = { 0 },
 };
 
 static const struct fwk_element *dw_apb_i2c_get_element_table(

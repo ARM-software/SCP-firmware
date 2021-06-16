@@ -41,10 +41,10 @@ struct fwk_module_config config_gtimer = {
 static const struct fwk_element timer_element_table[] = {
     [0] = {
         .name = "REFCLK",
-        .sub_element_count = JUNO_ALARM_IDX_COUNT,
+        .sub_element_count = (size_t) JUNO_ALARM_IDX_COUNT,
         .data = &(struct mod_timer_dev_config) {
             .id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_GTIMER, 0),
-            .timer_irq = TIMREFCLK_IRQ,
+            .timer_irq = (unsigned int) TIMREFCLK_IRQ,
         },
     },
     [1] = { 0 },

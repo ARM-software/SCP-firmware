@@ -172,20 +172,20 @@ static int process_pvt_calibration(struct pvt_sub_dev_ctx *sensor_ctx,
     }
 
     /* Convert into kHz */
-    freq_45 = cal_45C * 10;
-    freq_85 = cal_85C * 10;
+    freq_45 = (unsigned int)(cal_45C * 10);
+    freq_85 = (unsigned int)(cal_85C * 10);
 
     /* Find the slope */
-    slope_m = (freq_85 - freq_45) / (85 - 45);
+    slope_m = (int)((freq_85 - freq_45) / (85 - 45));
     if (!fwk_expect(slope_m != 0)) {
         return FWK_E_PARAM;
     }
 
     /* Find the intercept of the line */
-    freq_b = freq_85 - (slope_m * 85);
+    freq_b = (int)(freq_85 - (slope_m * 85));
 
     /* Use line equation to find full-scale frequency */
-    freq_fs = (slope_m * FULL_SCALE_TEMP) + freq_b;
+    freq_fs = (unsigned int)((slope_m * FULL_SCALE_TEMP) + freq_b);
 
     /*
      * freq_fs must always be bigger than or equal to REFCLK_KHZ or
@@ -236,8 +236,8 @@ static int process_osc_calibration(struct pvt_sub_dev_ctx *sensor_ctx,
     }
 
     /* Convert into kHz */
-    freq_810 = cal_810 * 20;
-    freq_900 = cal_900 * 20;
+    freq_810 = (unsigned int)(cal_810 * 20);
+    freq_900 = (unsigned int)(cal_900 * 20);
 
     /* Find the slope */
     slope_m = (freq_900 - freq_810) / (900 - 810);
@@ -267,8 +267,8 @@ static int process_osc_calibration(struct pvt_sub_dev_ctx *sensor_ctx,
     }
 
     /* Store constants for the run-time calculations */
-    sensor_ctx->slope_m = slope_m;
-    sensor_ctx->freq_b = freq_b;
+    sensor_ctx->slope_m = (int)slope_m;
+    sensor_ctx->freq_b = (int)freq_b;
     sensor_ctx->sample_window = sample_window;
 
     return FWK_SUCCESS;
@@ -289,7 +289,8 @@ static void pvt_interrupt_handler(uintptr_t param)
     uint8_t sub_elt_idx;
 
     group_ctx = (struct pvt_dev_ctx *)param;
-    sub_elt_idx = fwk_id_get_sub_element_idx(group_ctx->sensor_read_id);
+    sub_elt_idx =
+        (uint8_t)fwk_id_get_sub_element_idx(group_ctx->sensor_read_id);
     sensor_cfg = &group_ctx->sensor_cfg_table[sub_elt_idx];
     sensor_ctx = &group_ctx->sensor_ctx_table[sub_elt_idx];
 
@@ -313,12 +314,12 @@ static void pvt_interrupt_handler(uintptr_t param)
         goto exit;
     }
 
-    freq_khz = (osc_counter * REFCLK_KHZ) / sensor_ctx->sample_window;
+    freq_khz = (int)((osc_counter * REFCLK_KHZ) / sensor_ctx->sample_window);
 
     fwk_assert(sensor_ctx->slope_m != 0);
 
-    sensor_value = ((freq_khz - sensor_ctx->freq_b) * 1000) /
-        sensor_ctx->slope_m;
+    sensor_value = (uint32_t)(
+        ((freq_khz - sensor_ctx->freq_b) * 1000) / sensor_ctx->slope_m);
 
     if (sensor_cfg->type == JUNO_PVT_TYPE_TEMP) {
         if ((mod_ctx.board_rev == JUNO_IDX_REVISION_R1) ||
@@ -408,7 +409,7 @@ static int get_value(fwk_id_t id, uint64_t *value)
         return FWK_E_DEVICE;
     }
 
-    elt_idx = fwk_id_get_element_idx(id);
+    elt_idx = (uint8_t)fwk_id_get_element_idx(id);
     group_ctx = &dev_ctx[elt_idx];
 
     if (!group_ctx->pd_state_on) {
@@ -750,7 +751,7 @@ static int pvt_process_event(const struct fwk_event *event,
     struct mod_sensor_driver_resp_params *isr_params =
         (struct mod_sensor_driver_resp_params *)event->params;
     struct fwk_event resp_notif;
-    uint8_t elt_idx = fwk_id_get_element_idx(event->target_id);
+    uint8_t elt_idx = (uint8_t)fwk_id_get_element_idx(event->target_id);
     unsigned int sub_elt_idx;
     unsigned int sensor_count;
     struct mod_pd_power_state_pre_transition_notification_resp_params
@@ -764,8 +765,7 @@ static int pvt_process_event(const struct fwk_event *event,
     sub_elt_idx = fwk_id_get_sub_element_idx(group_ctx->sensor_read_id);
     sensor_ctx = &group_ctx->sensor_ctx_table[sub_elt_idx];
 
-    switch (fwk_id_get_event_idx(event->id)) {
-
+    switch ((enum pvt_event_idx)fwk_id_get_event_idx(event->id)) {
     case JUNO_PVT_EVENT_IDX_READ_REQUEST:
         sensor_cfg = &group_ctx->sensor_cfg_table[sub_elt_idx];
 
@@ -927,7 +927,7 @@ const struct fwk_module module_juno_pvt = {
     .name = "Juno PVT Driver",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = 1,
-    .event_count = JUNO_PVT_EVENT_IDX_COUNT,
+    .event_count = (unsigned int)JUNO_PVT_EVENT_IDX_COUNT,
     .init = juno_pvt_init,
     .element_init = juno_pvt_element_init,
     .bind = juno_pvt_bind,

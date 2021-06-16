@@ -43,96 +43,104 @@ static_assert(FWK_ARRAY_SIZE(sds_module_regions) == JUNO_SDS_REGION_COUNT,
 
 static const struct mod_sds_config sds_module_config = {
     .regions = sds_module_regions,
-    .region_count = JUNO_SDS_REGION_COUNT,
+    .region_count = (unsigned int)JUNO_SDS_REGION_COUNT,
     .clock_id = FWK_ID_NONE_INIT,
 };
 
 static const struct fwk_element element_table[] = {
     {
         .name = "CPU Info",
-        .data = &(struct mod_sds_structure_desc) {
-            .id = JUNO_SDS_CPU_INFO,
-            .size = JUNO_SDS_CPU_INFO_SIZE,
-            .region_id = JUNO_SDS_REGION_SECURE,
-            .payload = &primary_cpu,
-            .finalize = true,
-        },
+        .data =
+            &(struct mod_sds_structure_desc){
+                .id = (uint32_t)JUNO_SDS_CPU_INFO,
+                .size = JUNO_SDS_CPU_INFO_SIZE,
+                .region_id = (uint32_t)JUNO_SDS_REGION_SECURE,
+                .payload = &primary_cpu,
+                .finalize = true,
+            },
     },
 
     {
         .name = "ROM Version",
-        .data = &(struct mod_sds_structure_desc) {
-            .id = JUNO_SDS_ROM_VERSION,
-            .size = JUNO_SDS_ROM_VERSION_SIZE,
-            .region_id = JUNO_SDS_REGION_SECURE,
-            .payload = &version_packed,
-            .finalize = true,
-        },
+        .data =
+            &(struct mod_sds_structure_desc){
+                .id = (uint32_t)JUNO_SDS_ROM_VERSION,
+                .size = JUNO_SDS_ROM_VERSION_SIZE,
+                .region_id = (uint32_t)JUNO_SDS_REGION_SECURE,
+                .payload = &version_packed,
+                .finalize = true,
+            },
     },
 
     {
         .name = "Platform ID",
-        .data = &(struct mod_sds_structure_desc) {
-            .id = JUNO_SDS_PLATFORM_ID,
-            .size = JUNO_SDS_PLATFORM_ID_SIZE,
-            .region_id = JUNO_SDS_REGION_SECURE,
-            .payload = &platid,
-            .finalize = true,
-        },
+        .data =
+            &(struct mod_sds_structure_desc){
+                .id = (uint32_t)JUNO_SDS_PLATFORM_ID,
+                .size = JUNO_SDS_PLATFORM_ID_SIZE,
+                .region_id = (uint32_t)JUNO_SDS_REGION_SECURE,
+                .payload = &platid,
+                .finalize = true,
+            },
     },
 
     {
         .name = "Reset Syndrome",
-        .data = &(struct mod_sds_structure_desc) {
-            .id = JUNO_SDS_RESET_SYNDROME,
-            .size = JUNO_SDS_RESET_SYNDROME_SIZE,
-            .region_id = JUNO_SDS_REGION_SECURE,
-            .payload = &reset_syndrome,
-            .finalize = true,
-        },
+        .data =
+            &(struct mod_sds_structure_desc){
+                .id = (uint32_t)JUNO_SDS_RESET_SYNDROME,
+                .size = JUNO_SDS_RESET_SYNDROME_SIZE,
+                .region_id = (uint32_t)JUNO_SDS_REGION_SECURE,
+                .payload = &reset_syndrome,
+                .finalize = true,
+            },
     },
 
     {
         .name = "Bootloader",
-        .data = &(struct mod_sds_structure_desc) {
-            .id = JUNO_SDS_BOOTLOADER,
-            .size = JUNO_SDS_BOOTLOADER_SIZE,
-            .region_id = JUNO_SDS_REGION_SECURE,
-            .finalize = true,
-        },
+        .data =
+            &(struct mod_sds_structure_desc){
+                .id = (uint32_t)JUNO_SDS_BOOTLOADER,
+                .size = JUNO_SDS_BOOTLOADER_SIZE,
+                .region_id = (uint32_t)JUNO_SDS_REGION_SECURE,
+                .finalize = true,
+            },
     },
 
     {
         .name = "Features",
-        .data = &(struct mod_sds_structure_desc) {
-            .id = JUNO_SDS_FEATURE_AVAILABILITY,
-            .size = JUNO_SDS_FEATURE_AVAILABILITY_SIZE,
-            .region_id = JUNO_SDS_REGION_SECURE,
-            .finalize = true,
-        },
+        .data =
+            &(struct mod_sds_structure_desc){
+                .id = (uint32_t)JUNO_SDS_FEATURE_AVAILABILITY,
+                .size = JUNO_SDS_FEATURE_AVAILABILITY_SIZE,
+                .region_id = (uint32_t)JUNO_SDS_REGION_SECURE,
+                .finalize = true,
+            },
     },
 
-    #ifdef BUILD_MODE_DEBUG
+#ifdef BUILD_MODE_DEBUG
     {
         .name = "Boot Counters",
-        .data = &(struct mod_sds_structure_desc) {
-            .id = JUNO_SDS_CPU_BOOTCTR,
-            .size = JUNO_SDS_CPU_BOOTCTR_SIZE,
-            .region_id = JUNO_SDS_REGION_SECURE,
-            .finalize = true,
-        },
+        .data =
+            &(struct mod_sds_structure_desc){
+                .id = (uint32_t)JUNO_SDS_CPU_BOOTCTR,
+                .size = JUNO_SDS_CPU_BOOTCTR_SIZE,
+                .region_id = (uint32_t)JUNO_SDS_REGION_SECURE,
+                .finalize = true,
+            },
     },
 
     {
         .name = "CPU Flags",
-        .data = &(struct mod_sds_structure_desc) {
-            .id = JUNO_SDS_CPU_FLAGS,
-            .size = JUNO_SDS_CPU_FLAGS_SIZE,
-            .region_id = JUNO_SDS_REGION_SECURE,
-            .finalize = true,
-        },
+        .data =
+            &(struct mod_sds_structure_desc){
+                .id = (uint32_t)JUNO_SDS_CPU_FLAGS,
+                .size = JUNO_SDS_CPU_FLAGS_SIZE,
+                .region_id = (uint32_t)JUNO_SDS_REGION_SECURE,
+                .finalize = true,
+            },
     },
-    #endif
+#endif
 
     { 0 }, /* Termination description */
 };

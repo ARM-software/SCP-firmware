@@ -32,9 +32,10 @@ static const uint32_t systop_pd_allowed_state_mask_table[] = {
  * only) depending on the systop states.
  */
 static const uint32_t toplevel_pd_allowed_state_mask_table[] = {
-    [MOD_PD_STATE_OFF] = MOD_PD_STATE_OFF_MASK,
-    [MOD_PD_STATE_ON] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK,
-    [MOD_SYSTEM_POWER_POWER_STATE_SLEEP0] = MOD_PD_STATE_OFF_MASK,
+    [MOD_PD_STATE_OFF] = (uint32_t)MOD_PD_STATE_OFF_MASK,
+    [MOD_PD_STATE_ON] =
+        (uint32_t)(MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK),
+    [MOD_SYSTEM_POWER_POWER_STATE_SLEEP0] = (uint32_t)MOD_PD_STATE_OFF_MASK,
 };
 
 /*
@@ -42,15 +43,16 @@ static const uint32_t toplevel_pd_allowed_state_mask_table[] = {
  * systop states.
  */
 static const uint32_t cluster_pd_allowed_state_mask_table[] = {
-    [MOD_PD_STATE_OFF] = MOD_PD_STATE_OFF_MASK,
-    [MOD_PD_STATE_ON] = JUNO_CLUSTER_VALID_STATE_MASK,
-    [MOD_SYSTEM_POWER_POWER_STATE_SLEEP0] = MOD_PD_STATE_OFF_MASK,
+    [MOD_PD_STATE_OFF] = (uint32_t)MOD_PD_STATE_OFF_MASK,
+    [MOD_PD_STATE_ON] = (uint32_t)JUNO_CLUSTER_VALID_STATE_MASK,
+    [MOD_SYSTEM_POWER_POWER_STATE_SLEEP0] = (uint32_t)MOD_PD_STATE_OFF_MASK,
 };
 
 /* Masks of the allowed states for a core depending on the cluster states. */
 static const uint32_t core_pd_allowed_state_mask_table[] = {
-    [MOD_PD_STATE_OFF] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_SLEEP_MASK,
-    [MOD_PD_STATE_ON] = JUNO_CORE_VALID_STATE_MASK,
+    [MOD_PD_STATE_OFF] =
+        (uint32_t)(MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_SLEEP_MASK),
+    [MOD_PD_STATE_ON] = (uint32_t)JUNO_CORE_VALID_STATE_MASK,
 };
 
 /* Tree indices for children of a cluster power domain */
@@ -74,7 +76,7 @@ static struct fwk_element element_table[] = {
         .name = "BIG_CPU0",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CORE,
-            .parent_idx = POWER_DOMAIN_IDX_BIG_SSTOP,
+            .parent_idx = (uint32_t) POWER_DOMAIN_IDX_BIG_SSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_BIG_CPU0),
@@ -91,7 +93,7 @@ static struct fwk_element element_table[] = {
         .name = "BIG_CPU1",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CORE,
-            .parent_idx = POWER_DOMAIN_IDX_BIG_SSTOP,
+            .parent_idx = (uint32_t) POWER_DOMAIN_IDX_BIG_SSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_BIG_CPU1),
@@ -108,7 +110,7 @@ static struct fwk_element element_table[] = {
         .name = "LITTLE_CPU0",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CORE,
-            .parent_idx = POWER_DOMAIN_IDX_LITTLE_SSTOP,
+            .parent_idx = (uint32_t) POWER_DOMAIN_IDX_LITTLE_SSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_LITTLE_CPU0),
@@ -125,7 +127,7 @@ static struct fwk_element element_table[] = {
         .name = "LITTLE_CPU1",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CORE,
-            .parent_idx = POWER_DOMAIN_IDX_LITTLE_SSTOP,
+            .parent_idx = (uint32_t) POWER_DOMAIN_IDX_LITTLE_SSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_LITTLE_CPU1),
@@ -142,7 +144,7 @@ static struct fwk_element element_table[] = {
         .name = "LITTLE_CPU2",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CORE,
-            .parent_idx = POWER_DOMAIN_IDX_LITTLE_SSTOP,
+            .parent_idx = (uint32_t) POWER_DOMAIN_IDX_LITTLE_SSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_LITTLE_CPU2),
@@ -159,7 +161,7 @@ static struct fwk_element element_table[] = {
         .name = "LITTLE_CPU3",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CORE,
-            .parent_idx = POWER_DOMAIN_IDX_LITTLE_SSTOP,
+            .parent_idx = (uint32_t) POWER_DOMAIN_IDX_LITTLE_SSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_LITTLE_CPU3),
@@ -176,7 +178,7 @@ static struct fwk_element element_table[] = {
         .name = "BIG_SSTOP",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .parent_idx = POWER_DOMAIN_IDX_SYSTOP,
+            .parent_idx = (uint32_t) POWER_DOMAIN_IDX_SYSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_BIG_SSTOP),
@@ -192,7 +194,7 @@ static struct fwk_element element_table[] = {
         .name = "LITTLE_SSTOP",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_CLUSTER,
-            .parent_idx = POWER_DOMAIN_IDX_SYSTOP,
+            .parent_idx = (uint32_t) POWER_DOMAIN_IDX_SYSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_LITTLE_SSTOP),
@@ -208,7 +210,7 @@ static struct fwk_element element_table[] = {
         .name = "GPUTOP",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE,
-            .parent_idx = POWER_DOMAIN_IDX_SYSTOP,
+            .parent_idx = (uint32_t) POWER_DOMAIN_IDX_SYSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_GPUTOP),
@@ -224,7 +226,7 @@ static struct fwk_element element_table[] = {
         .name = "DBGSYS",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_DEVICE_DEBUG,
-            .parent_idx = POWER_DOMAIN_IDX_SYSTOP,
+            .parent_idx = (uint32_t) POWER_DOMAIN_IDX_SYSTOP,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_JUNO_PPU,
                 JUNO_PPU_DEV_IDX_DBGSYS),
@@ -240,7 +242,7 @@ static struct fwk_element element_table[] = {
         .name = "SYSTOP",
         .data = &(struct mod_power_domain_element_config) {
             .attributes.pd_type = MOD_PD_TYPE_SYSTEM,
-            .parent_idx = POWER_DOMAIN_IDX_NONE,
+            .parent_idx = (uint32_t) POWER_DOMAIN_IDX_NONE,
             .driver_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SYSTEM_POWER),
             .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SYSTEM_POWER,
                 MOD_SYSTEM_POWER_API_IDX_PD_DRIVER),

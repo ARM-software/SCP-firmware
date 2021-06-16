@@ -29,7 +29,7 @@ static const struct fwk_element element_table[] = {
             .transport_notification_init_id =
                 FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
                     MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
-            .scmi_agent_id = JUNO_SCMI_AGENT_IDX_PSCI,
+            .scmi_agent_id = (unsigned int) JUNO_SCMI_AGENT_IDX_PSCI,
             .scmi_p2a_id = FWK_ID_NONE_INIT,
         },
     },
@@ -46,7 +46,7 @@ static const struct fwk_element element_table[] = {
             .transport_notification_init_id =
                 FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
                     MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
-            .scmi_agent_id = JUNO_SCMI_AGENT_IDX_OSPM,
+            .scmi_agent_id = (unsigned int) JUNO_SCMI_AGENT_IDX_OSPM,
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
             .scmi_p2a_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_SCMI,
@@ -69,7 +69,7 @@ static const struct fwk_element element_table[] = {
             .transport_notification_init_id =
                 FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
                     MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
-            .scmi_agent_id = JUNO_SCMI_AGENT_IDX_OSPM,
+            .scmi_agent_id = (unsigned int) JUNO_SCMI_AGENT_IDX_OSPM,
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
             .scmi_p2a_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_SCMI,
@@ -93,7 +93,7 @@ static const struct fwk_element element_table[] = {
             .transport_notification_init_id =
                 FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
                     MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
-            .scmi_agent_id = JUNO_SCMI_AGENT_IDX_OSPM,
+            .scmi_agent_id = (unsigned int) JUNO_SCMI_AGENT_IDX_OSPM,
             .scmi_p2a_id = FWK_ID_NONE_INIT,
         },
     },

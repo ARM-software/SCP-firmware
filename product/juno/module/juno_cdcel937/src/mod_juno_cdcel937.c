@@ -216,9 +216,9 @@ static int get_preset_low_precision(uint64_t rate,
 
     fwk_assert(freq <= 230);
 
-    preset->PDIV = UINT32_C(230) / freq;
-    preset->N = freq * preset->PDIV;
-    preset->M = 24;
+    preset->PDIV = (uint16_t)(UINT32_C(230) / freq);
+    preset->N = (uint16_t)(freq * preset->PDIV);
+    preset->M = (uint16_t)24;
 
     return FWK_SUCCESS;
 }
@@ -402,20 +402,20 @@ static int set_rate_write_pll_config(struct juno_cdcel937_dev_ctx *ctx)
     /* Calculate R, R = N' - (M  * Q) */
     R = Nd - (M * Q);
 
-    write_field(pll_config.reg, PLL_CFG_REG_N_HIGH, N >> 4);
-    write_field(pll_config.reg, PLL_CFG_REG_N_LOW, N);
-    write_field(pll_config.reg, PLL_CFG_REG_R_HIGH, R >> 5);
-    write_field(pll_config.reg, PLL_CFG_REG_R_LOW, R);
-    write_field(pll_config.reg, PLL_CFG_REG_Q_HIGH, Q >> 3);
-    write_field(pll_config.reg, PLL_CFG_REG_Q_LOW, Q);
-    write_field(pll_config.reg, PLL_CFG_REG_P, P);
+    write_field(pll_config.reg, PLL_CFG_REG_N_HIGH, (uint8_t)(N >> 4));
+    write_field(pll_config.reg, PLL_CFG_REG_N_LOW, (uint8_t)N);
+    write_field(pll_config.reg, PLL_CFG_REG_R_HIGH, (uint8_t)(R >> 5));
+    write_field(pll_config.reg, PLL_CFG_REG_R_LOW, (uint8_t)R);
+    write_field(pll_config.reg, PLL_CFG_REG_Q_HIGH, (uint8_t)(Q >> 3));
+    write_field(pll_config.reg, PLL_CFG_REG_Q_LOW, (uint8_t)Q);
+    write_field(pll_config.reg, PLL_CFG_REG_P, (uint8_t)P);
 
     if (type == JUNO_CDCEL937_OUTPUT_TYPE_LOW) {
         /* Even outputs: Y2, Y4, Y6 */
-        write_field(pll_config.reg, PLL_CFG_REG_PDIV_X, pdiv);
+        write_field(pll_config.reg, PLL_CFG_REG_PDIV_X, (uint8_t)pdiv);
     } else {
         /* Odd outputs: Y3, Y5, Y7 */
-        write_field(pll_config.reg, PLL_CFG_REG_PDIV_Y, pdiv);
+        write_field(pll_config.reg, PLL_CFG_REG_PDIV_Y, (uint8_t)pdiv);
     }
 
     /* VCO range may need updating when fVCO changes */
@@ -878,7 +878,7 @@ static int juno_cdcel937_dev_init(fwk_id_t element_id,
     ctx = &ctx_table[fwk_id_get_element_idx(element_id)];
 
     ctx->config = config;
-    ctx->rate_hz = -1;
+    ctx->rate_hz = UINT64_MAX;
     ctx->rate_set = false;
     ctx->state = JUNO_CDCEL937_DEVICE_IDLE;
 
@@ -1121,8 +1121,8 @@ static int juno_cdcel937_process_event(const struct fwk_event *event,
 
 const struct fwk_module module_juno_cdcel937 = {
     .name = "JUNO CDCEL937",
-    .api_count = MOD_JUNO_CDCEL937_API_COUNT,
-    .event_count = JUNO_CDCEL937_EVENT_IDX_COUNT,
+    .api_count = (unsigned int)MOD_JUNO_CDCEL937_API_COUNT,
+    .event_count = (unsigned int)JUNO_CDCEL937_EVENT_IDX_COUNT,
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = juno_cdcel937_init,
     .element_init = juno_cdcel937_dev_init,

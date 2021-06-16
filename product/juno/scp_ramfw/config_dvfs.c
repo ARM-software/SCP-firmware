@@ -50,37 +50,39 @@ static const struct mod_dvfs_domain_config cpu_group_little_r0 = {
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 2,
-    .opps = (struct mod_dvfs_opp[]){ {
-                                         .level = 450 * 1000000UL,
-                                         .frequency = 450 * FWK_KHZ,
-                                         .voltage = 820,
-                                         .power = (0.14 * 450 * 0.820 * 0.820),
-                                     },
-                                     {
-                                         .level = 575 * 1000000UL,
-                                         .frequency = 575 * FWK_KHZ,
-                                         .voltage = 850,
-                                         .power = (0.14 * 575 * 0.850 * 0.850),
-                                     },
-                                     {
-                                         .level = 700 * 1000000UL,
-                                         .frequency = 700 * FWK_KHZ,
-                                         .voltage = 900,
-                                         .power = (0.14 * 700 * 0.900 * 0.900),
-                                     },
-                                     {
-                                         .level = 775 * 1000000UL,
-                                         .frequency = 775 * FWK_KHZ,
-                                         .voltage = 950,
-                                         .power = (0.14 * 775 * 0.950 * 0.950),
-                                     },
-                                     {
-                                         .level = 850 * 1000000UL,
-                                         .frequency = 850 * FWK_KHZ,
-                                         .voltage = 1000,
-                                         .power = (0.14 * 850 * 1.000 * 1.000),
-                                     },
-                                     { 0 } }
+    .opps =
+        (struct mod_dvfs_opp[]){
+            {
+                .level = 450 * 1000000UL,
+                .frequency = 450 * FWK_KHZ,
+                .voltage = 820,
+                .power = (uint32_t)(0.14 * 450 * 0.820 * 0.820),
+            },
+            {
+                .level = 575 * 1000000UL,
+                .frequency = 575 * FWK_KHZ,
+                .voltage = 850,
+                .power = (uint32_t)(0.14 * 575 * 0.850 * 0.850),
+            },
+            {
+                .level = 700 * 1000000UL,
+                .frequency = 700 * FWK_KHZ,
+                .voltage = 900,
+                .power = (uint32_t)(0.14 * 700 * 0.900 * 0.900),
+            },
+            {
+                .level = 775 * 1000000UL,
+                .frequency = 775 * FWK_KHZ,
+                .voltage = 950,
+                .power = (uint32_t)(0.14 * 775 * 0.950 * 0.950),
+            },
+            {
+                .level = 850 * 1000000UL,
+                .frequency = 850 * FWK_KHZ,
+                .voltage = 1000,
+                .power = (uint32_t)(0.14 * 850 * 1.000 * 1.000),
+            },
+            { 0 } }
 };
 
 static const struct mod_dvfs_domain_config cpu_group_little_r1 = {
@@ -99,13 +101,16 @@ static const struct mod_dvfs_domain_config cpu_group_little_r1 = {
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 0,
-    .opps = (struct mod_dvfs_opp[]){ {
-                                         .level = 650 * 1000000UL,
-                                         .frequency = 650 * FWK_KHZ,
-                                         .voltage = 800,
-                                         .power = (0.14 * 650 * 0.800 * 0.800),
-                                     },
-                                     { 0 } }
+    .opps =
+        (struct mod_dvfs_opp[]){
+            {
+                .level = 650 * 1000000UL,
+                .frequency = 650 * FWK_KHZ,
+                .voltage = 800,
+                .power = (uint32_t)(0.14 * 650 * 0.800 * 0.800),
+            },
+            { 0 },
+        }
 };
 
 static const struct mod_dvfs_domain_config cpu_group_little_r2 = {
@@ -124,25 +129,27 @@ static const struct mod_dvfs_domain_config cpu_group_little_r2 = {
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 1,
-    .opps = (struct mod_dvfs_opp[]){ {
-                                         .level = 450 * 1000000UL,
-                                         .frequency = 450 * FWK_KHZ,
-                                         .voltage = 820,
-                                         .power = (0.14 * 450 * 0.820 * 0.820),
-                                     },
-                                     {
-                                         .level = 800 * 1000000UL,
-                                         .frequency = 800 * FWK_KHZ,
-                                         .voltage = 900,
-                                         .power = (0.14 * 800 * 0.900 * 0.900),
-                                     },
-                                     {
-                                         .level = 950 * 1000000UL,
-                                         .frequency = 950 * FWK_KHZ,
-                                         .voltage = 1000,
-                                         .power = (0.14 * 950 * 1.000 * 1.000),
-                                     },
-                                     { 0 } }
+    .opps =
+        (struct mod_dvfs_opp[]){
+            {
+                .level = 450 * 1000000UL,
+                .frequency = 450 * FWK_KHZ,
+                .voltage = 820,
+                .power = (uint32_t)(0.14 * 450 * 0.820 * 0.820),
+            },
+            {
+                .level = 800 * 1000000UL,
+                .frequency = 800 * FWK_KHZ,
+                .voltage = 900,
+                .power = (uint32_t)(0.14 * 800 * 0.900 * 0.900),
+            },
+            {
+                .level = 950 * 1000000UL,
+                .frequency = 950 * FWK_KHZ,
+                .voltage = 1000,
+                .power = (uint32_t)(0.14 * 950 * 1.000 * 1.000),
+            },
+            { 0 } }
 };
 
 static const struct mod_dvfs_domain_config cpu_group_big_r0 = {
@@ -160,37 +167,39 @@ static const struct mod_dvfs_domain_config cpu_group_big_r0 = {
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 2,
-    .opps = (struct mod_dvfs_opp[]){ {
-                                         .level = 450 * 1000000UL,
-                                         .frequency = 450 * FWK_KHZ,
-                                         .voltage = 820,
-                                         .power = (0.53 * 450 * 0.820 * 0.820),
-                                     },
-                                     {
-                                         .level = 625 * 1000000UL,
-                                         .frequency = 625 * FWK_KHZ,
-                                         .voltage = 850,
-                                         .power = (0.53 * 625 * 0.850 * 0.850),
-                                     },
-                                     {
-                                         .level = 800 * 1000000UL,
-                                         .frequency = 800 * FWK_KHZ,
-                                         .voltage = 900,
-                                         .power = (0.53 * 800 * 0.900 * 0.900),
-                                     },
-                                     {
-                                         .level = 950 * 1000000UL,
-                                         .frequency = 950 * FWK_KHZ,
-                                         .voltage = 950,
-                                         .power = (0.53 * 950 * 0.950 * 0.950),
-                                     },
-                                     {
-                                         .level = 1100 * 1000000UL,
-                                         .frequency = 1100 * FWK_KHZ,
-                                         .voltage = 1000,
-                                         .power = (0.53 * 1100 * 1.000 * 1.000),
-                                     },
-                                     { 0 } }
+    .opps =
+        (struct mod_dvfs_opp[]){
+            {
+                .level = 450 * 1000000UL,
+                .frequency = 450 * FWK_KHZ,
+                .voltage = 820,
+                .power = (uint32_t)(0.53 * 450 * 0.820 * 0.820),
+            },
+            {
+                .level = 625 * 1000000UL,
+                .frequency = 625 * FWK_KHZ,
+                .voltage = 850,
+                .power = (uint32_t)(0.53 * 625 * 0.850 * 0.850),
+            },
+            {
+                .level = 800 * 1000000UL,
+                .frequency = 800 * FWK_KHZ,
+                .voltage = 900,
+                .power = (uint32_t)(0.53 * 800 * 0.900 * 0.900),
+            },
+            {
+                .level = 950 * 1000000UL,
+                .frequency = 950 * FWK_KHZ,
+                .voltage = 950,
+                .power = (uint32_t)(0.53 * 950 * 0.950 * 0.950),
+            },
+            {
+                .level = 1100 * 1000000UL,
+                .frequency = 1100 * FWK_KHZ,
+                .voltage = 1000,
+                .power = (uint32_t)(0.53 * 1100 * 1.000 * 1.000),
+            },
+            { 0 } }
 };
 
 static const struct mod_dvfs_domain_config cpu_group_big_r1 = {
@@ -208,25 +217,27 @@ static const struct mod_dvfs_domain_config cpu_group_big_r1 = {
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 1,
-    .opps = (struct mod_dvfs_opp[]){ {
-                                         .level = 600 * 1000000UL,
-                                         .frequency = 600 * FWK_KHZ,
-                                         .voltage = 800,
-                                         .power = (0.53 * 600 * 0.800 * 0.800),
-                                     },
-                                     {
-                                         .level = 900 * 1000000UL,
-                                         .frequency = 900 * FWK_KHZ,
-                                         .voltage = 900,
-                                         .power = (0.53 * 900 * 0.900 * 0.900),
-                                     },
-                                     {
-                                         .level = 1150 * 1000000UL,
-                                         .frequency = 1150 * FWK_KHZ,
-                                         .voltage = 1000,
-                                         .power = (0.53 * 1150 * 1.000 * 1.000),
-                                     },
-                                     { 0 } }
+    .opps =
+        (struct mod_dvfs_opp[]){
+            {
+                .level = 600 * 1000000UL,
+                .frequency = 600 * FWK_KHZ,
+                .voltage = 800,
+                .power = (uint32_t)(0.53 * 600 * 0.800 * 0.800),
+            },
+            {
+                .level = 900 * 1000000UL,
+                .frequency = 900 * FWK_KHZ,
+                .voltage = 900,
+                .power = (uint32_t)(0.53 * 900 * 0.900 * 0.900),
+            },
+            {
+                .level = 1150 * 1000000UL,
+                .frequency = 1150 * FWK_KHZ,
+                .voltage = 1000,
+                .power = (uint32_t)(0.53 * 1150 * 1.000 * 1.000),
+            },
+            { 0 } }
 };
 
 static const struct mod_dvfs_domain_config cpu_group_big_r2 = {
@@ -244,25 +255,27 @@ static const struct mod_dvfs_domain_config cpu_group_big_r2 = {
     .retry_ms = 1,
     .latency = 1450,
     .sustained_idx = 1,
-    .opps = (struct mod_dvfs_opp[]){ {
-                                         .level = 600 * 1000000UL,
-                                         .frequency = 600 * FWK_KHZ,
-                                         .voltage = 820,
-                                         .power = (0.45 * 600 * 0.820 * 0.820),
-                                     },
-                                     {
-                                         .level = 1000 * 1000000UL,
-                                         .frequency = 1000 * FWK_KHZ,
-                                         .voltage = 900,
-                                         .power = (0.45 * 1000 * 0.900 * 0.900),
-                                     },
-                                     {
-                                         .level = 1200 * 1000000UL,
-                                         .frequency = 1200 * FWK_KHZ,
-                                         .voltage = 1000,
-                                         .power = (0.45 * 1200 * 1.000 * 1.000),
-                                     },
-                                     { 0 } }
+    .opps =
+        (struct mod_dvfs_opp[]){
+            {
+                .level = 600 * 1000000UL,
+                .frequency = 600 * FWK_KHZ,
+                .voltage = 820,
+                .power = (uint32_t)(0.45 * 600 * 0.820 * 0.820),
+            },
+            {
+                .level = 1000 * 1000000UL,
+                .frequency = 1000 * FWK_KHZ,
+                .voltage = 900,
+                .power = (uint32_t)(0.45 * 1000 * 0.900 * 0.900),
+            },
+            {
+                .level = 1200 * 1000000UL,
+                .frequency = 1200 * FWK_KHZ,
+                .voltage = 1000,
+                .power = (uint32_t)(0.45 * 1200 * 1.000 * 1.000),
+            },
+            { 0 } }
 };
 
 static const struct mod_dvfs_domain_config gpu_r0 = {
@@ -281,37 +294,38 @@ static const struct mod_dvfs_domain_config gpu_r0 = {
     .latency = 1450,
     .sustained_idx = 4,
     .opps =
-        (struct mod_dvfs_opp[]){ {
-                                     .level = 450 * 1000000UL,
-                                     .frequency = 450 * FWK_KHZ,
-                                     .voltage = 820,
-                                     .power = (4.6875 * 450 * 0.820 * 0.820),
-                                 },
-                                 {
-                                     .level = 487500 * 1000UL,
-                                     .frequency = 487500,
-                                     .voltage = 825,
-                                     .power = (4.6875 * 487.5 * 0.825 * 0.825),
-                                 },
-                                 {
-                                     .level = 525 * 1000000UL,
-                                     .frequency = 525 * FWK_KHZ,
-                                     .voltage = 850,
-                                     .power = (4.6875 * 525 * 0.850 * 0.850),
-                                 },
-                                 {
-                                     .level = 562500 * 1000UL,
-                                     .frequency = 562500,
-                                     .voltage = 875,
-                                     .power = (4.6875 * 562.5 * 0.875 * 0.875),
-                                 },
-                                 {
-                                     .level = 600 * 1000000UL,
-                                     .frequency = 600 * FWK_KHZ,
-                                     .voltage = 900,
-                                     .power = (4.6875 * 600 * 0.900 * 0.900),
-                                 },
-                                 { 0 } }
+        (struct mod_dvfs_opp[]){
+            {
+                .level = 450 * 1000000UL,
+                .frequency = 450 * FWK_KHZ,
+                .voltage = 820,
+                .power = (uint32_t)(4.6875 * 450 * 0.820 * 0.820),
+            },
+            {
+                .level = 487500 * 1000UL,
+                .frequency = 487500,
+                .voltage = 825,
+                .power = (uint32_t)(4.6875 * 487.5 * 0.825 * 0.825),
+            },
+            {
+                .level = 525 * 1000000UL,
+                .frequency = 525 * FWK_KHZ,
+                .voltage = 850,
+                .power = (uint32_t)(4.6875 * 525 * 0.850 * 0.850),
+            },
+            {
+                .level = 562500 * 1000UL,
+                .frequency = 562500,
+                .voltage = 875,
+                .power = (uint32_t)(4.6875 * 562.5 * 0.875 * 0.875),
+            },
+            {
+                .level = 600 * 1000000UL,
+                .frequency = 600 * FWK_KHZ,
+                .voltage = 900,
+                .power = (uint32_t)(4.6875 * 600 * 0.900 * 0.900),
+            },
+            { 0 } }
 };
 
 static const struct mod_dvfs_domain_config gpu_r1 = {
@@ -330,37 +344,38 @@ static const struct mod_dvfs_domain_config gpu_r1 = {
     .latency = 1450,
     .sustained_idx = 4,
     .opps =
-        (struct mod_dvfs_opp[]){ {
-                                     .level = 450 * 1000000UL,
-                                     .frequency = 450 * FWK_KHZ,
-                                     .voltage = 820,
-                                     .power = (4.6875 * 450 * 0.820 * 0.820),
-                                 },
-                                 {
-                                     .level = 487500 * 1000UL,
-                                     .frequency = 487500,
-                                     .voltage = 825,
-                                     .power = (4.6875 * 487.5 * 0.825 * 0.825),
-                                 },
-                                 {
-                                     .level = 525 * 1000000UL,
-                                     .frequency = 525 * FWK_KHZ,
-                                     .voltage = 850,
-                                     .power = (4.6875 * 525 * 0.850 * 0.850),
-                                 },
-                                 {
-                                     .level = 562500 * 1000UL,
-                                     .frequency = 562500,
-                                     .voltage = 875,
-                                     .power = (4.6875 * 562.5 * 0.875 * 0.875),
-                                 },
-                                 {
-                                     .level = 600 * 1000000UL,
-                                     .frequency = 600 * FWK_KHZ,
-                                     .voltage = 900,
-                                     .power = (4.6875 * 600 * 0.900 * 0.900),
-                                 },
-                                 { 0 } }
+        (struct mod_dvfs_opp[]){
+            {
+                .level = 450 * 1000000UL,
+                .frequency = 450 * FWK_KHZ,
+                .voltage = 820,
+                .power = (uint32_t)(4.6875 * 450 * 0.820 * 0.820),
+            },
+            {
+                .level = 487500 * 1000UL,
+                .frequency = 487500,
+                .voltage = 825,
+                .power = (uint32_t)(4.6875 * 487.5 * 0.825 * 0.825),
+            },
+            {
+                .level = 525 * 1000000UL,
+                .frequency = 525 * FWK_KHZ,
+                .voltage = 850,
+                .power = (uint32_t)(4.6875 * 525 * 0.850 * 0.850),
+            },
+            {
+                .level = 562500 * 1000UL,
+                .frequency = 562500,
+                .voltage = 875,
+                .power = (uint32_t)(4.6875 * 562.5 * 0.875 * 0.875),
+            },
+            {
+                .level = 600 * 1000000UL,
+                .frequency = 600 * FWK_KHZ,
+                .voltage = 900,
+                .power = (uint32_t)(4.6875 * 600 * 0.900 * 0.900),
+            },
+            { 0 } }
 };
 
 static const struct mod_dvfs_domain_config gpu_r2 = {
@@ -379,19 +394,20 @@ static const struct mod_dvfs_domain_config gpu_r2 = {
     .latency = 1450,
     .sustained_idx = 1,
     .opps =
-        (struct mod_dvfs_opp[]){ {
-                                     .level = 450 * 1000000UL,
-                                     .frequency = 450 * FWK_KHZ,
-                                     .voltage = 820,
-                                     .power = (4.6875 * 450 * 0.820 * 0.820),
-                                 },
-                                 {
-                                     .level = 600 * 1000000UL,
-                                     .frequency = 600 * FWK_KHZ,
-                                     .voltage = 900,
-                                     .power = (4.6875 * 600 * 0.900 * 0.900),
-                                 },
-                                 { 0 } }
+        (struct mod_dvfs_opp[]){
+            {
+                .level = 450 * 1000000UL,
+                .frequency = 450 * FWK_KHZ,
+                .voltage = 820,
+                .power = (uint32_t)(4.6875 * 450 * 0.820 * 0.820),
+            },
+            {
+                .level = 600 * 1000000UL,
+                .frequency = 600 * FWK_KHZ,
+                .voltage = 900,
+                .power = (uint32_t)(4.6875 * 600 * 0.900 * 0.900),
+            },
+            { 0 } }
 };
 
 static const struct fwk_element element_table_r0[] = {
