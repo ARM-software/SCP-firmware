@@ -380,7 +380,8 @@ static int juno_soc_clock_set_rate(fwk_id_t clock_id,
         return FWK_E_DEVICE;
     }
 
-    ctx->current_rate_index = rate_entry - ctx->config->rate_table;
+    ctx->current_rate_index =
+        (unsigned int)(rate_entry - ctx->config->rate_table);
 
     ctx->rate_initialized = true;
 
@@ -647,7 +648,7 @@ static int process_debug_notification(const struct fwk_event *event,
      */
     fwk_assert(params->state != MOD_PD_STATE_OFF);
 
-    module_ctx.debug_pd_state = MOD_PD_STATE_ON;
+    module_ctx.debug_pd_state = (unsigned int)MOD_PD_STATE_ON;
 
     return FWK_SUCCESS;
 }

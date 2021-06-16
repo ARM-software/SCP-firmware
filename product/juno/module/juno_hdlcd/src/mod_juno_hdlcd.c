@@ -70,8 +70,9 @@ static int round_rate(struct juno_hdlcd_dev_ctx *ctx,
                      uint32_t rate,
                      uint32_t *rounded_rate)
 {
-    uint32_t round_up = FWK_ALIGN_NEXT(rate, ctx->config->min_step);
-    uint32_t round_down = FWK_ALIGN_PREVIOUS(rate, ctx->config->min_step);
+    uint32_t round_up = (uint32_t)(FWK_ALIGN_NEXT(rate, ctx->config->min_step));
+    uint32_t round_down =
+        (uint32_t)(FWK_ALIGN_PREVIOUS(rate, ctx->config->min_step));
 
     switch (round_mode) {
     case MOD_CLOCK_ROUND_MODE_NONE:
@@ -172,7 +173,7 @@ static int juno_hdlcd_set_rate(fwk_id_t clock_id, uint64_t rate,
         return FWK_E_RANGE;
     }
 
-    status = round_rate(ctx, round_mode, rate, &rounded_rate);
+    status = round_rate(ctx, round_mode, (uint32_t)rate, &rounded_rate);
     if (status != FWK_SUCCESS) {
         return status;
     }
@@ -231,7 +232,7 @@ static int juno_hdlcd_set_rate(fwk_id_t clock_id, uint64_t rate,
      * PLL is already using it
      */
     /* Find entry on the look-up table */
-    ctx->index = (clock_rate - PXL_CLK_IN_RATE) / (500 * FWK_KHZ);
+    ctx->index = (int)((clock_rate - PXL_CLK_IN_RATE) / (500 * FWK_KHZ));
     if ((ctx->index < 0) ||
         ((unsigned int)ctx->index >= ctx->config->lookup_table_count)) {
         return FWK_E_RANGE;
@@ -450,8 +451,8 @@ static int juno_hdlcd_start(fwk_id_t id)
     nr = ((SCC->PLL[PLL_IDX_HDLCD].REG1 & PLL_REG1_NR) >> PLL_REG1_NR_POS) + 1;
     od = ((SCC->PLL[PLL_IDX_HDLCD].REG1 & PLL_REG1_OD) >> PLL_REG1_OD_POS) + 1;
 
-    module_ctx.current_pll_rate = ((uint64_t)(PXL_REF_CLK_RATE) * nf) /
-                                  (nr * od);
+    module_ctx.current_pll_rate =
+        (uint32_t)(((uint64_t)(PXL_REF_CLK_RATE)*nf) / (nr * od));
     module_ctx.request_clock_id = FWK_ID_NONE;
 
     return FWK_SUCCESS;
@@ -459,7 +460,7 @@ static int juno_hdlcd_start(fwk_id_t id)
 
 const struct fwk_module module_juno_hdlcd = {
     .name = "JUNO HDLCD",
-    .api_count = MOD_JUNO_HDLCD_API_COUNT,
+    .api_count = (unsigned int)MOD_JUNO_HDLCD_API_COUNT,
     .type = FWK_MODULE_TYPE_HAL,
     .init = juno_hdlcd_init,
     .element_init = juno_hdlcd_dev_init,

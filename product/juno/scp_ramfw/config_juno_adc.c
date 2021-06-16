@@ -17,7 +17,7 @@
 static const struct fwk_element adc_juno_element_table[] = {
     [ADC_TYPE_VOLT] = {
         .name = "",
-        .sub_element_count = ADC_DEV_TYPE_COUNT,
+        .sub_element_count = (size_t) ADC_DEV_TYPE_COUNT,
         .data = &((struct mod_juno_adc_dev_config) {
             .info = &((struct mod_sensor_info) {
                 .type = MOD_SENSOR_TYPE_VOLTS,
@@ -26,7 +26,7 @@ static const struct fwk_element adc_juno_element_table[] = {
         }),
     },
 
-    #if USE_FULL_SET_SENSORS
+#if USE_FULL_SET_SENSORS
     [ADC_TYPE_CURRENT] = {
         .name = "",
         .sub_element_count = ADC_DEV_TYPE_COUNT,
@@ -57,7 +57,7 @@ static const struct fwk_element adc_juno_element_table[] = {
             }),
         }),
     },
-    #endif
+#endif
 
     [ADC_TYPE_COUNT] = { 0 },
 };

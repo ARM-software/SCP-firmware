@@ -32,33 +32,33 @@
 static struct juno_group_desc sensor_group[] = {
     [JUNO_PVT_GROUP_BIG] = {
         .regs = PVT_REG_BIG,
-        .irq = BIG_PVT_IRQ,
+        .irq = (unsigned int) BIG_PVT_IRQ,
         .pd_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN,
                                      POWER_DOMAIN_IDX_BIG_SSTOP),
     },
     [JUNO_PVT_GROUP_LITTLE] = {
         .regs = PVT_REG_LITTLE,
-        .irq = LITTLE_PVT_IRQ,
+        .irq = (unsigned int) LITTLE_PVT_IRQ,
         .pd_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN,
                                      POWER_DOMAIN_IDX_LITTLE_SSTOP),
     },
     [JUNO_PVT_GROUP_GPU] = {
         .regs = PVT_REG_GPU,
-        .irq = GPU_PVT_IRQ,
+        .irq = (unsigned int) GPU_PVT_IRQ,
         .sensor_count = 2,
         .pd_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN,
                                      POWER_DOMAIN_IDX_GPUTOP),
     },
     [JUNO_PVT_GROUP_SOC] = {
         .regs = PVT_REG_SOC,
-        .irq = SOC_PVT_IRQ,
+        .irq = (unsigned int) SOC_PVT_IRQ,
         .sensor_count = 1,
         .pd_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN,
                                      POWER_DOMAIN_IDX_SYSTOP),
     },
     [JUNO_PVT_GROUP_STDCELL] = {
         .regs = PVT_REG_STDCELL,
-        .irq = STD_CELL_PVT_IRQ,
+        .irq = (unsigned int) STD_CELL_PVT_IRQ,
         .sensor_count = 1,
         .pd_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN,
                                      POWER_DOMAIN_IDX_SYSTOP),

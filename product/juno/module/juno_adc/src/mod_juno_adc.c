@@ -32,9 +32,9 @@ static int get_value(fwk_id_t id, uint64_t *value)
     uint64_t adc_quantity;
     enum juno_adc_dev_type dev_type;
 
-    dev_type = fwk_id_get_sub_element_idx(id);
+    dev_type = (enum juno_adc_dev_type)fwk_id_get_sub_element_idx(id);
 
-    switch (fwk_id_get_element_idx(id)) {
+    switch ((enum juno_adc_sensor_type)fwk_id_get_element_idx(id)) {
     case ADC_TYPE_CURRENT:
         adc_value = V2M_SYS_REGS->ADC_CURRENT[dev_type] &
                     JUNO_ADC_SYS_REG_AMPS_MASK;
@@ -163,7 +163,7 @@ static int juno_adc_process_bind_request(fwk_id_t source_id,
 const struct fwk_module module_juno_adc = {
     .name = "Juno ADC Driver",
     .type = FWK_MODULE_TYPE_DRIVER,
-    .api_count = MOD_JUNO_ADC_API_IDX_COUNT,
+    .api_count = (unsigned int)MOD_JUNO_ADC_API_IDX_COUNT,
     .init = juno_adc_init,
     .element_init = juno_adc_element_init,
     .process_bind_request = juno_adc_process_bind_request

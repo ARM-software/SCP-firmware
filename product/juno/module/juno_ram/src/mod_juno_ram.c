@@ -87,12 +87,12 @@ static int pcie_add_translation_table_entry(
 
     entry->SRC_ADDR_LO = (uint32_t)source_addr |
                          (((log2_upper_bound - 1) << 1) | PCIE_ATR_IMPL);
-    entry->SRC_ADDR_UP = source_addr >> 32;
+    entry->SRC_ADDR_UP = (uint32_t)(source_addr >> 32);
 
     entry->TRSL_ADDR_LO = (uint32_t)translated_addr;
-    entry->TRSL_ADDR_UP = translated_addr >> 32;
+    entry->TRSL_ADDR_UP = (uint32_t)(translated_addr >> 32);
 
-    entry->TRSL_PARAM = translation_parameter;
+    entry->TRSL_PARAM = (uint32_t)translation_parameter;
 
     return FWK_SUCCESS;
 }

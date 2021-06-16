@@ -35,7 +35,7 @@ static_assert(FWK_ARRAY_SIZE(sds_module_regions) == JUNO_SDS_REGION_COUNT,
 
 static const struct mod_sds_config sds_module_config = {
     .regions = sds_module_regions,
-    .region_count = JUNO_SDS_REGION_COUNT,
+    .region_count = (unsigned int)JUNO_SDS_REGION_COUNT,
     .clock_id = FWK_ID_NONE_INIT,
 };
 
@@ -43,9 +43,9 @@ static const struct fwk_element element_table[] = {
     [JUNO_SDS_RAM_VERSION_IDX] = {
         .name = "",
         .data = &(struct mod_sds_structure_desc) {
-            .id = JUNO_SDS_RAM_VERSION,
+            .id = (uint32_t) JUNO_SDS_RAM_VERSION,
             .size = JUNO_SDS_RAM_VERSION_SIZE,
-            .region_id = JUNO_SDS_REGION_SECURE,
+            .region_id = (uint32_t) JUNO_SDS_REGION_SECURE,
             .payload = &version_packed,
             .finalize = true,
         },
@@ -53,9 +53,9 @@ static const struct fwk_element element_table[] = {
     [JUNO_SDS_RAM_FEATURES_IDX] = {
         .name = "",
         .data = &(struct mod_sds_structure_desc) {
-            .id = JUNO_SDS_FEATURE_AVAILABILITY,
+            .id = (uint32_t) JUNO_SDS_FEATURE_AVAILABILITY,
             .size = sizeof(feature_flags),
-            .region_id = JUNO_SDS_REGION_SECURE,
+            .region_id = (uint32_t) JUNO_SDS_REGION_SECURE,
             .payload = &feature_flags,
             .finalize = true,
         },

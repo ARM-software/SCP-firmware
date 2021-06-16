@@ -18,7 +18,7 @@ static const struct mod_bootloader_config bootloader_module_config = {
     .source_size = 256 * 1024,
     .destination_base = SCP_RAM_BASE,
     .destination_size = SCP_RAM_SIZE,
-    .sds_struct_id = JUNO_SDS_BOOTLOADER,
+    .sds_struct_id = (uint32_t)JUNO_SDS_BOOTLOADER,
 };
 
 struct fwk_module_config config_bootloader = {

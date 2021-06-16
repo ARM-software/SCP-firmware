@@ -50,11 +50,11 @@ struct set_power_status_check_params {
  * Internal variables
  */
 static unsigned int ppu_mode_to_pd_state[] = {
-    [PPU_MODE_OFF] = MOD_PD_STATE_OFF,
-    [PPU_MODE_ON] = MOD_PD_STATE_ON,
+    [PPU_MODE_OFF] = (unsigned int)MOD_PD_STATE_OFF,
+    [PPU_MODE_ON] = (unsigned int)MOD_PD_STATE_ON,
     /* Only CSS can be placed in MEM_RET */
-    [PPU_MODE_MEM_RET] = MOD_SYSTEM_POWER_POWER_STATE_SLEEP0,
-    [PPU_MODE_WARM_RESET] = MOD_PD_STATE_ON,
+    [PPU_MODE_MEM_RET] = (unsigned int)MOD_SYSTEM_POWER_POWER_STATE_SLEEP0,
+    [PPU_MODE_WARM_RESET] = (unsigned int)MOD_PD_STATE_ON,
 };
 
 static enum ppu_mode pd_state_to_ppu_mode[] = {
@@ -171,7 +171,7 @@ static int ppu_request_state(struct ppu_ctx *ppu_ctx,
 
     fwk_assert(check_mode(mode));
 
-    reg->POWER_POLICY = mode;
+    reg->POWER_POLICY = (uint32_t)mode;
 
     return FWK_SUCCESS;
 }
@@ -191,7 +191,7 @@ static int ppu_set_state_and_wait(struct ppu_ctx *ppu_ctx,
 
     fwk_assert(check_mode(mode));
 
-    reg->POWER_POLICY = mode;
+    reg->POWER_POLICY = (uint32_t)mode;
 
     params.mode = mode;
     params.reg = reg;
@@ -276,7 +276,7 @@ static int pd_set_state(fwk_id_t ppu_id, unsigned int state)
 
     mode = pd_state_to_ppu_mode[state];
 
-    switch (state) {
+    switch ((enum mod_pd_state)state) {
     case MOD_PD_STATE_ON:
     case MOD_PD_STATE_OFF:
         status = ppu_set_state_and_wait(ppu_ctx, mode);
@@ -378,7 +378,7 @@ static int dbgsys_set_state(fwk_id_t ppu_id, unsigned int state)
         return FWK_E_PANIC;
     }
 
-    juno_ppu_ctx.dbgsys_state = MOD_PD_STATE_ON;
+    juno_ppu_ctx.dbgsys_state = (unsigned int)MOD_PD_STATE_ON;
 
     return FWK_SUCCESS;
 }
@@ -409,7 +409,7 @@ static int css_set_state(fwk_id_t ppu_id, unsigned int state)
     mode = pd_state_to_ppu_mode[state];
 
     switch (state) {
-    case MOD_PD_STATE_ON:
+    case (unsigned int)MOD_PD_STATE_ON:
         /* Resuming from emulated sleep, nothing to do */
         if (juno_ppu_ctx.css_state == JUNO_POWER_DOMAIN_CSS_SLEEP0_EMU) {
             juno_ppu_ctx.css_state = state;
@@ -429,15 +429,16 @@ static int css_set_state(fwk_id_t ppu_id, unsigned int state)
 
         break;
 
-    case MOD_PD_STATE_OFF:
+    case (unsigned int)MOD_PD_STATE_OFF:
         if (juno_ppu_ctx.dbgsys_state == MOD_PD_STATE_ON) {
-            juno_ppu_ctx.css_state = JUNO_POWER_DOMAIN_CSS_SLEEP0_EMU;
+            juno_ppu_ctx.css_state =
+                (unsigned int)JUNO_POWER_DOMAIN_CSS_SLEEP0_EMU;
 
             break;
         }
         /* Fall through */
 
-    case MOD_SYSTEM_POWER_POWER_STATE_SLEEP0:
+    case (unsigned int)MOD_SYSTEM_POWER_POWER_STATE_SLEEP0:
         FWK_LOG_FLUSH();
 
         enable_scp_remap();
@@ -451,7 +452,7 @@ static int css_set_state(fwk_id_t ppu_id, unsigned int state)
 
         break;
 
-    case MOD_SYSTEM_POWER_POWER_STATE_SLEEP1:
+    case (unsigned int)MOD_SYSTEM_POWER_POWER_STATE_SLEEP1:
         return FWK_E_SUPPORT;
 
     default:
@@ -511,7 +512,7 @@ static int cluster_set_state(fwk_id_t ppu_id, unsigned int state)
 
     mode = pd_state_to_ppu_mode[state];
 
-    switch (state) {
+    switch ((enum mod_pd_state)state) {
     case MOD_PD_STATE_ON:
         status = ppu_set_state_and_wait(ppu_ctx, mode);
         if (status != FWK_SUCCESS) {
@@ -589,7 +590,7 @@ static int core_set_state(fwk_id_t ppu_id, unsigned int state)
 
     mode = pd_state_to_ppu_mode[state];
 
-    switch (state) {
+    switch ((enum mod_pd_state)state) {
     case MOD_PD_STATE_OFF:
         status = ppu_set_state_and_wait(ppu_ctx, mode);
         if (status != FWK_SUCCESS) {
@@ -825,9 +826,9 @@ static int juno_ppu_module_init(fwk_id_t module_id,
     juno_ppu_ctx.ppu_ctx_table = fwk_mm_calloc(element_count,
         sizeof(struct ppu_ctx));
 
-    juno_ppu_ctx.css_state = MOD_PD_STATE_ON;
+    juno_ppu_ctx.css_state = (unsigned int)MOD_PD_STATE_ON;
 
-    juno_ppu_ctx.dbgsys_state = MOD_PD_STATE_OFF;
+    juno_ppu_ctx.dbgsys_state = (unsigned int)MOD_PD_STATE_OFF;
 
 #ifdef BUILD_HAS_MOD_TIMER
     fwk_assert(data != NULL);
@@ -962,7 +963,7 @@ static int juno_ppu_process_bind_request(fwk_id_t requester_id,
     struct ppu_ctx *ppu_ctx;
     const struct mod_juno_ppu_element_config *dev_config;
 
-    switch (fwk_id_get_api_idx(api_id)) {
+    switch ((enum mod_juno_ppu_api_idx)fwk_id_get_api_idx(api_id)) {
     case MOD_JUNO_PPU_API_IDX_PD:
         ppu_ctx = juno_ppu_ctx.ppu_ctx_table + fwk_id_get_element_idx(id);
 
@@ -1093,7 +1094,7 @@ static int juno_ppu_start(fwk_id_t id)
 const struct fwk_module module_juno_ppu = {
     .name = "Juno PPU",
     .type = FWK_MODULE_TYPE_DRIVER,
-    .api_count = MOD_JUNO_PPU_API_COUNT,
+    .api_count = (unsigned int)MOD_JUNO_PPU_API_COUNT,
     .init = juno_ppu_module_init,
     .element_init = juno_ppu_element_init,
     .bind = juno_ppu_bind,

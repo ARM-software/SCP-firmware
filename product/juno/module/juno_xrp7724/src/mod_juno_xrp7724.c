@@ -176,7 +176,7 @@ static int set_gpio(fwk_id_t id, struct juno_xrp7724_dev_ctx *ctx)
     int status;
 
     ctx->transmit_data[0] = GPIO_WRITE_CMD;
-    ctx->transmit_data[1] = fwk_id_get_sub_element_idx(id);
+    ctx->transmit_data[1] = (uint8_t)fwk_id_get_sub_element_idx(id);
     ctx->transmit_data[2] = SET_GPIO_MASK;
 
     /*
@@ -422,13 +422,13 @@ static int juno_xrp7724_set_voltage(fwk_id_t id, uint32_t voltage)
      * The truncation means in the worst case, we get just under 2.5mV of
      * undervoltage.
      */
-    fine_adj = ((voltage - mvref) * 1000) / PSU_VOUT_STEP_FINE_UV;
+    fine_adj = (uint8_t)(((voltage - mvref) * 1000) / PSU_VOUT_STEP_FINE_UV);
 
     if (fine_adj > PSU_MAX_FINE_ADJUST) {
         fine_adj = PSU_MAX_FINE_ADJUST;
     }
 
-    set_value = (fine_adj << PSU_FINE_ADJUST_POS) | coarse_val;
+    set_value = (uint16_t)((fine_adj << PSU_FINE_ADJUST_POS) | coarse_val);
 
     event = (struct fwk_event) {
         .target_id = id,
@@ -810,8 +810,8 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
         ctx->juno_xrp7724_dev_psu.psu_request =
             JUNO_XRP7724_PSU_REQUEST_CONVERT_VOLTAGE;
 
-        ctx->transmit_data[0] = PSU_PWR_GET_VOLTAGE_CHx +
-            ctx->config->psu_bus_idx;
+        ctx->transmit_data[0] =
+            (uint8_t)(PSU_PWR_GET_VOLTAGE_CHx + ctx->config->psu_bus_idx);
 
         status = module_ctx.i2c_api->transmit_then_receive_as_master(
             module_config->i2c_hal_id, module_config->slave_address,
@@ -831,8 +831,9 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
          * If the I2C transaction completed successfully convert the voltage
          */
         if (status == FWK_SUCCESS) {
-            driver_response.voltage = (((uint16_t)ctx->receive_data[0] << 8) |
-                ctx->receive_data[1]) * PSU_MVOUT_SCALE_READ;
+            driver_response.voltage = (uint32_t)(
+                (((uint16_t)ctx->receive_data[0] << 8) | ctx->receive_data[1]) *
+                PSU_MVOUT_SCALE_READ);
 
             ctx->juno_xrp7724_dev_psu.current_voltage =
                 driver_response.voltage;
@@ -848,8 +849,8 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
         ctx->juno_xrp7724_dev_psu.psu_set_voltage =
             ((struct psu_set_voltage_param *)event_params)->voltage;
 
-        ctx->transmit_data[0] = PSU_PWR_SET_VOLTAGE_CHx +
-            ctx->config->psu_bus_idx;
+        ctx->transmit_data[0] =
+            (uint8_t)(PSU_PWR_SET_VOLTAGE_CHx + ctx->config->psu_bus_idx);
         ctx->transmit_data[1] = (uint8_t)(set_value >> 8);
         ctx->transmit_data[2] = (uint8_t)(set_value & 0xFFU);
 
@@ -932,8 +933,9 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
             ((struct psu_set_enabled_param *)event_params)->enabled;
         ctx->transmit_data[0] = PSU_PWR_ENABLE_SUPPLY,
         ctx->transmit_data[1] = ctx->config->psu_bus_idx;
-        ctx->transmit_data[2] = ctx->juno_xrp7724_dev_psu.psu_set_enabled ?
-            PSU_CHANNEL_ENABLED : PSU_CHANNEL_DISABLED;
+        ctx->transmit_data[2] = (uint8_t)(
+            ctx->juno_xrp7724_dev_psu.psu_set_enabled ? PSU_CHANNEL_ENABLED :
+                                                        PSU_CHANNEL_DISABLED);
 
         status = module_ctx.i2c_api->transmit_as_master(
             module_config->i2c_hal_id, module_config->slave_address,
@@ -1040,8 +1042,8 @@ static int juno_xrp7724_process_event(const struct fwk_event *event,
 
 const struct fwk_module module_juno_xrp7724 = {
     .name = "JUNO XRP7724",
-    .api_count = MOD_JUNO_XRP7724_API_IDX_COUNT,
-    .event_count = JUNO_XRP7724_EVENT_IDX_COUNT,
+    .api_count = (unsigned int)MOD_JUNO_XRP7724_API_IDX_COUNT,
+    .event_count = (unsigned int)JUNO_XRP7724_EVENT_IDX_COUNT,
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = juno_xrp7724_init,
     .element_init = juno_xrp7724_element_init,

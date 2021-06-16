@@ -682,7 +682,7 @@ static int ddr_retraining(fwk_id_t id)
 
     fwk_interrupt_global_enable();
 
-    fwk_interrupt_enable(PHY_TRAINING_IRQ);
+    fwk_interrupt_enable((unsigned int)PHY_TRAINING_IRQ);
 
     FWK_LOG_INFO("[DMC] Re-training done");
 
@@ -815,7 +815,7 @@ static int ddr_suspend(const struct mod_juno_dmc400_element_config *config,
     module_config = fwk_module_get_data(fwk_module_id_juno_dmc400);
     dmc = (struct mod_juno_dmc400_reg *)config->dmc;
 
-    status = fwk_interrupt_disable(PHY_TRAINING_IRQ);
+    status = fwk_interrupt_disable((unsigned int)PHY_TRAINING_IRQ);
     if (status != FWK_SUCCESS) {
         return FWK_E_STATE;
     }
@@ -876,7 +876,7 @@ static void ddr_phy_irq_handler(void)
      */
     fwk_assert(revision == JUNO_IDX_REVISION_R0);
 
-    fwk_interrupt_disable(PHY_TRAINING_IRQ);
+    fwk_interrupt_disable((unsigned int)PHY_TRAINING_IRQ);
 
     req_event = (struct fwk_event) {
         .source_id = id,
@@ -1001,17 +1001,18 @@ static int juno_dmc400_start(fwk_id_t id)
 
     fwk_interrupt_global_enable();
 
-    status = fwk_interrupt_set_isr(PHY_TRAINING_IRQ, ddr_phy_irq_handler);
+    status = fwk_interrupt_set_isr(
+        (unsigned int)PHY_TRAINING_IRQ, ddr_phy_irq_handler);
     if (status != FWK_SUCCESS) {
         return FWK_E_STATE;
     }
 
-    status = fwk_interrupt_clear_pending(PHY_TRAINING_IRQ);
+    status = fwk_interrupt_clear_pending((unsigned int)PHY_TRAINING_IRQ);
     if (status != FWK_SUCCESS) {
         return FWK_E_STATE;
     }
 
-    fwk_interrupt_enable(PHY_TRAINING_IRQ);
+    fwk_interrupt_enable((unsigned int)PHY_TRAINING_IRQ);
 
     /* Configure Integration Tests */
     dmc->INTEG_CFG = 0x00000000;
@@ -1095,7 +1096,7 @@ struct fwk_module module_juno_dmc400 = {
     .name = "JUNO DMC-400",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = 0,
-    .event_count = JUNO_DMC400_EVENT_IDX_COUNT,
+    .event_count = (unsigned int)JUNO_DMC400_EVENT_IDX_COUNT,
     .init = juno_dmc400_init,
     .element_init = juno_dmc400_element_init,
     .bind = juno_dmc400_bind,
