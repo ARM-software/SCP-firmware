@@ -21,6 +21,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define FREQ_TOLERANCE_HZ 10000
+
 /* Device context */
 struct morello_pll_dev_ctx {
     /* Configuration data of the PLL instance */
@@ -59,58 +61,102 @@ static int pll_set_rate(
     uint64_t rate,
     enum mod_clock_round_mode unused)
 {
-    uint64_t rounded_rate;
-    uint16_t fbdiv;
-    uint8_t refdiv;
-    uint8_t postdiv;
+    float fbdiv_f, fvco, fout;
+    uint16_t fbdiv_d;
+    uint8_t postdiv1, postdiv2, refdiv;
+    int64_t diff;
     uint32_t wait_cycles;
-    uint16_t rate_val_mhz;
     const struct mod_morello_pll_dev_config *config = NULL;
-    struct morello_pll_custom_freq_param_entry *freq_entry = NULL;
-    size_t i;
 
     fwk_assert(ctx != NULL);
     fwk_assert(rate <= ((uint64_t)UINT16_MAX * FWK_MHZ));
 
     config = ctx->config;
 
-    if (ctx->current_state == MOD_CLOCK_STATE_STOPPED)
+    if (ctx->current_state == MOD_CLOCK_STATE_STOPPED) {
         return FWK_E_PWRSTATE;
+    }
 
-    if ((rate < MOD_MORELLO_PLL_RATE_MIN) || (rate > MOD_MORELLO_PLL_RATE_MAX))
-        return FWK_E_RANGE;
-
-    /* Assume initial refdiv and postdiv to be 1 */
-    refdiv = MOD_MORELLO_PLL_REFDIV_MIN;
-    postdiv = MOD_MORELLO_PLL_POSTDIV_MIN;
-    fbdiv = rate / config->ref_rate;
-    rounded_rate = fbdiv * config->ref_rate;
-
-    /*
-     * If required output value is not exact multiplication of reference
-     * clock value then look for the frequency in custom frequencies table.
-     */
-    if (rounded_rate != rate) {
-        rate_val_mhz = (uint16_t)(rate / FWK_MHZ);
-        for (i = 0; i < module_ctx.mod_config->custom_freq_table_size; i++) {
-            freq_entry = &module_ctx.mod_config->custom_freq_table[i];
-            if (freq_entry->freq_value_mhz == rate_val_mhz) {
-                fbdiv = freq_entry->fbdiv;
-                refdiv = freq_entry->refdiv;
-                postdiv = freq_entry->postdiv;
-                goto result;
-            }
-        }
-        /* Custom frequency table does not have matching frequency */
+    if ((rate < MOD_MORELLO_PLL_RATE_MIN) ||
+        (rate > MOD_MORELLO_PLL_RATE_MAX)) {
         return FWK_E_RANGE;
     }
 
-result:
+    /*
+     * If requested frequency is integer multiple of reference frequency
+     * then the fbdiv_d calculation is a simple division provided it is
+     * within the valid range.
+     */
+    if ((rate % config->ref_rate) == 0) {
+        fbdiv_d = rate / config->ref_rate;
+        if ((fbdiv_d >= MOD_MORELLO_PLL_FBDIV_MIN) &&
+            (fbdiv_d <= MOD_MORELLO_PLL_FBDIV_MAX)) {
+            refdiv = 1;
+            postdiv1 = 1;
+            postdiv2 = 1;
+            goto write_pll_params;
+        }
+    }
+
+    for (postdiv2 = MOD_MORELLO_PLL_POSTDIV_MIN;
+         postdiv2 <= MOD_MORELLO_PLL_POSTDIV_MAX;
+         postdiv2++) {
+        for (postdiv1 = MOD_MORELLO_PLL_POSTDIV_MIN;
+             postdiv1 <= MOD_MORELLO_PLL_POSTDIV_MAX;
+             postdiv1++) {
+            for (refdiv = MOD_MORELLO_PLL_REFDIV_MIN;
+                 refdiv <= MOD_MORELLO_PLL_REFDIV_MAX;
+                 refdiv++) {
+                /* Check if REF input is valid */
+                if (((float)config->ref_rate / (float)refdiv) <
+                    (float)MOD_MORELLO_PLL_REF_MIN) {
+                    continue;
+                }
+
+                fbdiv_f = (float)(rate * postdiv1 * postdiv2 * refdiv) /
+                    (float)config->ref_rate;
+                fbdiv_d = (uint16_t)fbdiv_f;
+
+                /* Round fbdiv_d to nearest integer */
+                fbdiv_d =
+                    ((fbdiv_f - (float)fbdiv_d) < 0.5) ? fbdiv_d : fbdiv_d + 1;
+
+                /* Check if fbdiv_d is in valid range */
+                if ((fbdiv_d < MOD_MORELLO_PLL_FBDIV_MIN) ||
+                    (fbdiv_d > MOD_MORELLO_PLL_FBDIV_MAX)) {
+                    continue;
+                }
+
+                fvco =
+                    (((float)config->ref_rate / (float)refdiv) *
+                     (float)fbdiv_d);
+                /* Check if VCO output is in valid range */
+                if ((fvco < (float)MOD_MORELLO_PLL_FVCO_MIN) ||
+                    (fvco > (float)MOD_MORELLO_PLL_FVCO_MAX)) {
+                    continue;
+                }
+
+                fout = fvco / (float)postdiv1 / (float)postdiv2;
+                diff = (uint64_t)fout - rate;
+                if (diff < 0) {
+                    diff = diff * -1;
+                }
+
+                if (diff <= FREQ_TOLERANCE_HZ) {
+                    goto write_pll_params;
+                }
+            }
+        }
+    }
+    /* We have reached end of loop without valid parameters */
+    return FWK_E_SUPPORT;
+
+write_pll_params:
     /* Configure PLL settings */
     *config->control_reg0 =
-        (fbdiv << PLL_FBDIV_BIT_POS) | (refdiv << PLL_REFDIV_POS);
+        (fbdiv_d << PLL_FBDIV_BIT_POS) | (refdiv << PLL_REFDIV_POS);
     *config->control_reg1 =
-        (postdiv << PLL_POSTDIV1_POS) | (1 << PLL_POSTDIV2_POS);
+        (postdiv1 << PLL_POSTDIV1_POS) | (postdiv2 << PLL_POSTDIV2_POS);
 
     /* Enable PLL settings */
     *config->control_reg0 |= (UINT32_C(1) << PLL_PLLEN_POS);
@@ -120,8 +166,9 @@ result:
     while ((*config->control_reg1 & (UINT32_C(1) << PLL_LOCK_STATUS_POS)) ==
            0) {
         wait_cycles--;
-        if (wait_cycles == 0)
+        if (wait_cycles == 0) {
             return FWK_E_TIMEOUT;
+        }
     }
 
     /* Store the current configured PLL rate */
@@ -141,8 +188,9 @@ static int morello_pll_set_rate(
 {
     struct morello_pll_dev_ctx *ctx = NULL;
 
-    if (!fwk_module_is_valid_element_id(dev_id))
+    if (!fwk_module_is_valid_element_id(dev_id)) {
         return FWK_E_PARAM;
+    }
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
 
@@ -153,8 +201,9 @@ static int morello_pll_get_rate(fwk_id_t dev_id, uint64_t *rate)
 {
     struct morello_pll_dev_ctx *ctx = NULL;
 
-    if ((!fwk_module_is_valid_element_id(dev_id)) || (rate == NULL))
+    if ((!fwk_module_is_valid_element_id(dev_id)) || (rate == NULL)) {
         return FWK_E_PARAM;
+    }
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
     *rate = ctx->current_rate;
@@ -173,8 +222,9 @@ static int morello_pll_get_rate_from_index(
 
 static int morello_pll_set_state(fwk_id_t dev_id, enum mod_clock_state state)
 {
-    if (state == MOD_CLOCK_STATE_RUNNING)
+    if (state == MOD_CLOCK_STATE_RUNNING) {
         return FWK_SUCCESS;
+    }
 
     /* PLLs can only be stopped by a parent power domain state change. */
     return FWK_E_SUPPORT;
@@ -184,8 +234,9 @@ static int morello_pll_get_state(fwk_id_t dev_id, enum mod_clock_state *state)
 {
     struct morello_pll_dev_ctx *ctx = NULL;
 
-    if ((!fwk_module_is_valid_element_id(dev_id)) || (state == NULL))
+    if ((!fwk_module_is_valid_element_id(dev_id)) || (state == NULL)) {
         return FWK_E_PARAM;
+    }
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
     *state = ctx->current_state;
@@ -195,8 +246,9 @@ static int morello_pll_get_state(fwk_id_t dev_id, enum mod_clock_state *state)
 
 static int morello_pll_get_range(fwk_id_t dev_id, struct mod_clock_range *range)
 {
-    if ((!fwk_module_is_valid_element_id(dev_id)) || (range == NULL))
+    if ((!fwk_module_is_valid_element_id(dev_id)) || (range == NULL)) {
         return FWK_E_PARAM;
+    }
 
     range->rate_type = MOD_CLOCK_RATE_TYPE_CONTINUOUS;
     range->min = MOD_MORELLO_PLL_RATE_MIN;
@@ -211,13 +263,15 @@ static int morello_pll_power_state_change(fwk_id_t dev_id, unsigned int state)
     uint64_t rate;
     struct morello_pll_dev_ctx *ctx = NULL;
 
-    if (!fwk_module_is_valid_element_id(dev_id))
+    if (!fwk_module_is_valid_element_id(dev_id)) {
         return FWK_E_PARAM;
+    }
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
 
-    if (state != MOD_PD_STATE_ON)
+    if (state != MOD_PD_STATE_ON) {
         return FWK_SUCCESS;
+    }
 
     ctx->current_state = MOD_CLOCK_STATE_RUNNING;
 
@@ -240,14 +294,16 @@ static int morello_pll_power_state_pending_change(
 {
     struct morello_pll_dev_ctx *ctx = NULL;
 
-    if (!fwk_module_is_valid_element_id(dev_id))
+    if (!fwk_module_is_valid_element_id(dev_id)) {
         return FWK_E_PARAM;
+    }
 
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(dev_id);
 
-    if (next_state == MOD_PD_STATE_OFF)
+    if (next_state == MOD_PD_STATE_OFF) {
         /* Just mark the PLL as stopped */
         ctx->current_state = MOD_CLOCK_STATE_STOPPED;
+    }
 
     return FWK_SUCCESS;
 }
@@ -270,32 +326,18 @@ static const struct mod_clock_drv_api morello_pll_api = {
 static int morello_pll_init(
     fwk_id_t module_id,
     unsigned int element_count,
-    const void *config)
+    const void *data)
 {
-    size_t i;
-    struct morello_pll_custom_freq_param_entry *freq_entry;
-
-    if ((element_count == 0) || (config == NULL))
+    if (element_count == 0) {
         return FWK_E_PARAM;
+    }
 
     module_ctx.dev_count = element_count;
 
     module_ctx.dev_ctx_table =
         fwk_mm_calloc(element_count, sizeof(struct morello_pll_dev_ctx));
-    if (module_ctx.dev_ctx_table == NULL)
+    if (module_ctx.dev_ctx_table == NULL) {
         return FWK_E_NOMEM;
-
-    module_ctx.mod_config = config;
-    /* Validate custom frequency table entries */
-    for (i = 0; i < module_ctx.mod_config->custom_freq_table_size; i++) {
-        freq_entry = &module_ctx.mod_config->custom_freq_table[i];
-        if ((freq_entry->fbdiv < MOD_MORELLO_PLL_FBDIV_MIN) ||
-            (freq_entry->fbdiv > MOD_MORELLO_PLL_FBDIV_MAX) ||
-            (freq_entry->refdiv < MOD_MORELLO_PLL_REFDIV_MIN) ||
-            (freq_entry->refdiv > MOD_MORELLO_PLL_REFDIV_MAX) ||
-            (freq_entry->postdiv < MOD_MORELLO_PLL_POSTDIV_MIN) ||
-            (freq_entry->postdiv > MOD_MORELLO_PLL_POSTDIV_MAX))
-            return FWK_E_RANGE;
     }
 
     return FWK_SUCCESS;
@@ -314,11 +356,13 @@ static int morello_pll_element_init(
 
     /* Check for valid element configuration data */
     if ((ctx->config->control_reg0 == NULL) ||
-        (ctx->config->control_reg1 == NULL) || (ctx->config->ref_rate == 0))
+        (ctx->config->control_reg1 == NULL) || (ctx->config->ref_rate == 0)) {
         return FWK_E_PARAM;
+    }
 
-    if (ctx->config->defer_initialization)
+    if (ctx->config->defer_initialization) {
         return FWK_SUCCESS;
+    }
 
     ctx->initialized = true;
     ctx->current_state = MOD_CLOCK_STATE_RUNNING;

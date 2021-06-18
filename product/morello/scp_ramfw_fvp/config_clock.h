@@ -13,7 +13,9 @@
 /*
  * DDR Subsystem clock in MHz
  */
-#define DDR_CLOCK_MHZ 1333
+/* 1333 MHz */
+#define DDR_CLOCK_MHZ (4000.0 / 3)
+/* (4400.0/3) for 1466MHz */
 
 /*
  * SCC & PIK clock rates.
