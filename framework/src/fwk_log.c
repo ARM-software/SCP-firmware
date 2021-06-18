@@ -178,12 +178,16 @@ static void fwk_log_snprintf(
 
 static bool fwk_log_banner(void)
 {
+#ifndef FMW_LOG_MINIMAL_BANNER
     const char *banner =
         " ___  ___ ___      __ _\n"
         "/ __|/ __| _ \\___ / _(_)_ _ _ ____ __ ____ _ _ _ ___\n"
         "\\__ | (__|  _|___|  _| | '_| '  \\ V  V / _` | '_/ -_)\n"
         "|___/\\___|_|     |_| |_|_| |_|_|_\\_/\\_/\\__,_|_| \\___|\n"
         "\n" BUILD_VERSION_DESCRIBE_STRING "\n";
+#else
+    const char *banner = "SCP-firmware " BUILD_VERSION_DESCRIBE_STRING "\n";
+#endif
 
     while (banner != NULL) {
         char buffer[FMW_LOG_COLUMNS + sizeof(FWK_LOG_TERMINATOR)];
