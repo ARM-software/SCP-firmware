@@ -30,8 +30,11 @@
 #define PLL_POSTDIV2_POS 28
 #define PLL_LOCK_STATUS_POS 31
 
+/*! The minimum reference frequency post REFDIV stage */
+#define MOD_MORELLO_PLL_REF_MIN (2UL * FWK_MHZ)
+
 /*! The minimum frequency that the PLL hardware can output. */
-#define MOD_MORELLO_PLL_RATE_MIN (50UL * FWK_MHZ)
+#define MOD_MORELLO_PLL_RATE_MIN (16UL * FWK_MHZ)
 
 /*! The maximum frequency that the PLL hardware can output. */
 #define MOD_MORELLO_PLL_RATE_MAX (3200UL * FWK_MHZ)
@@ -43,6 +46,11 @@
 #define MOD_MORELLO_PLL_FBDIV_MIN 16
 /*! The maximum feedback divider value */
 #define MOD_MORELLO_PLL_FBDIV_MAX 1600
+
+/*! The minimum frequency output that post divider requires. */
+#define MOD_MORELLO_PLL_FVCO_MIN (800UL * FWK_MHZ)
+/*! The maximum frequency output that post divider handles. */
+#define MOD_MORELLO_PLL_FVCO_MAX (3200UL * FWK_MHZ)
 
 /*! The minimum reference clock divider value */
 #define MOD_MORELLO_PLL_REFDIV_MIN 1

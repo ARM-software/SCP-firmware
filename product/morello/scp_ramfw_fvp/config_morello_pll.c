@@ -16,15 +16,6 @@
 #include <fwk_macros.h>
 #include <fwk_module.h>
 
-static struct morello_pll_custom_freq_param_entry freq_table[] = {
-    {
-        .freq_value_mhz = 1333,
-        .fbdiv = 160,
-        .refdiv = 3,
-        .postdiv = 2,
-    },
-};
-
 static const struct fwk_element morello_pll_element_table[] = {
     [CLOCK_PLL_IDX_CPU0] =
         {
@@ -97,8 +88,4 @@ static const struct fwk_element *morello_pll_get_element_table(
 
 const struct fwk_module_config config_morello_pll = {
     .elements = FWK_MODULE_DYNAMIC_ELEMENTS(morello_pll_get_element_table),
-    .data = &((struct morello_pll_module_config){
-        .custom_freq_table = freq_table,
-        .custom_freq_table_size = FWK_ARRAY_SIZE(freq_table),
-    }),
 };
