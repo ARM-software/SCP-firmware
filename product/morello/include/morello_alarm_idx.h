@@ -7,6 +7,7 @@
 
 /* Alarm indices */
 enum morello_alarm_idx {
+    MORELLO_PCIE_ALARM_IDX,
 #ifdef BUILD_HAS_DEBUGGER
     MORELLO_DEBUGGER_CLI_ALARM_IDX,
 #endif
