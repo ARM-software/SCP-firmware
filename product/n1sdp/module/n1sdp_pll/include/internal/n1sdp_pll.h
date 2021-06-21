@@ -44,6 +44,11 @@
 /*! The maximum feedback divider value */
 #define MOD_N1SDP_PLL_FBDIV_MAX      1600
 
+/*! The minimum frequency output that post divider requires. */
+#define MOD_N1SDP_PLL_FVCO_MIN (800UL * FWK_MHZ)
+/*! The maximum frequency output that post divider handles. */
+#define MOD_N1SDP_PLL_FVCO_MAX (3200UL * FWK_MHZ)
+
 /*! The minimum reference clock divider value */
 #define MOD_N1SDP_PLL_REFDIV_MIN     1
 /*! The maximum reference clock divider value */
