@@ -20,4 +20,5 @@ target_link_libraries(
             module-power-domain
             module-ppu-v1
             module-scmi
-            module-system-power)
+            module-system-power
+            module-dmc-bing)

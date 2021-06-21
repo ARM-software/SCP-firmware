@@ -20,6 +20,7 @@
 #include "morello_sds.h"
 
 #include <mod_clock.h>
+#include <mod_dmc_bing.h>
 #include <mod_fip.h>
 #include <mod_morello_system.h>
 #include <mod_power_domain.h>
@@ -289,12 +290,19 @@ static int morello_system_fill_platform_info(void)
     const struct mod_sds_structure_desc *sds_structure_desc =
         fwk_module_get_data(sds_platform_info_id);
     uint64_t size = 0;
+    int status;
 
-    /* Force single chip mode with 8GB DDR DRAM */
+    /* Force single chip mode */
     sds_platform_info.slave_count = 0;
     sds_platform_info.multichip_mode = 0;
     sds_platform_info.remote_ddr_size = 0;
-    sds_platform_info.local_ddr_size = 8ULL * FWK_GIB;
+
+    status = morello_system_ctx.dmc_bing_api->get_mem_size(&size);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_INFO("Error calculating local DDR memory size!");
+        return status;
+    }
+    sds_platform_info.local_ddr_size = size;
 
     size = sds_platform_info.local_ddr_size + sds_platform_info.remote_ddr_size;
     (void)size;
@@ -511,6 +519,13 @@ static int morello_system_bind(fwk_id_t id, unsigned int round)
         FWK_ID_MODULE(FWK_MODULE_IDX_PPU_V1),
         FWK_ID_API(FWK_MODULE_IDX_PPU_V1, MOD_PPU_V1_API_IDX_ISR),
         &morello_system_ctx.ppu_v1_isr_api);
+    if (status != FWK_SUCCESS)
+        return status;
+
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_DMC_BING),
+        FWK_ID_API(FWK_MODULE_IDX_DMC_BING, MOD_DDR_API_IDX_MEM_INFO),
+        &morello_system_ctx.dmc_bing_api);
     if (status != FWK_SUCCESS)
         return status;
 

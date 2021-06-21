@@ -15,6 +15,7 @@
 #include <fwk_macros.h>
 #include <fwk_module.h>
 
+#include <stdbool.h>
 #include <stdint.h>
 
 /*!
@@ -193,7 +194,8 @@ struct mod_dmc_bing_reg {
     FWK_RW uint32_t T_RFC_NEXT;
     FWK_RW uint32_t T_MRR_NEXT;
     FWK_RW uint32_t T_MRW_NEXT;
-    uint8_t RESERVED12[0x218 - 0x210];
+    FWK_RW uint32_t REFRESH_ENABLE_NEXT;
+    uint32_t RESERVED12;
     FWK_RW uint32_t T_RCD_NEXT;
     FWK_RW uint32_t T_RAS_NEXT;
     FWK_RW uint32_t T_RP_NEXT;
@@ -208,7 +210,7 @@ struct mod_dmc_bing_reg {
     FWK_RW uint32_t T_WR_NEXT;
     FWK_RW uint32_t T_WTR_NEXT;
     FWK_RW uint32_t T_WTW_NEXT;
-    uint32_t RESERVED15;
+    FWK_RW uint32_t T_CLOCK_CONTROL_NEXT;
     FWK_RW uint32_t T_XMPD_NEXT;
     FWK_RW uint32_t T_EP_NEXT;
     FWK_RW uint32_t T_XP_NEXT;
@@ -390,7 +392,15 @@ struct mod_dmc_bing_reg {
     FWK_RW uint32_t PMU_OVERFLOW_STATUS_CLK;
     struct mod_dmc_bing_pmu_counter PMC_CLKDIV2_COUNT[8];
     struct mod_dmc_bing_pmu_counter PMC_CLK_COUNT[2];
-    uint8_t RESERVED60[0xE00 - 0xBA0];
+    uint8_t RESERVED60[0xD00 - 0xBA0];
+    FWK_RW uint32_t CAPABILITY_CTRL;
+    FWK_W uint32_t TAG_CACHE_CTRL;
+    FWK_RW uint32_t TAG_CACHE_CFG;
+    FWK_RW uint32_t MEMORY_ACCESS_CTRL;
+    FWK_RW uint32_t MEMORY_ADDRESS_CTRL;
+    FWK_RW uint32_t MEMORY_ADDRESS_CTRL2;
+    FWK_RW uint32_t BING_SPL_CTRL_REG;
+    uint8_t RESERVED90[0xE00 - 0xD1C];
     FWK_RW uint32_t INTEG_CFG;
     uint32_t RESERVED61;
     FWK_W uint32_t INTEG_OUTPUTS;
@@ -557,29 +567,24 @@ struct mod_dmc_bing_reg {
 };
 
 /*!
+ * \brief Mask to get the current state of DMC
+ */
+#define MOD_DMC_BING_MEMC_STATUS UINT32_C(0x00000007)
+
+/*!
  * \brief Mask to get the memc_cmd bitfield
  */
 #define MOD_DMC_BING_MEMC_CMD UINT32_C(0x00000007)
 
 /*!
- * \brief Command to enter into the CONFIG architectural state
+ * \brief MEMC command MGR active status bit
  */
-#define MOD_DMC_BING_MEMC_CMD_CONFIG UINT32_C(0x00000000)
+#define MOD_DMC_BING_MEMC_STATUS_MGR_ACTIVE UINT32_C(0x00000100)
 
 /*!
- * \brief Command to enter the SLEEP architectural state
+ * \brief DMC channel M0 idle status bit
  */
-#define MOD_DMC_BING_MEMC_CMD_SLEEP UINT32_C(0x00000001)
-
-/*!
- * \brief Command to enter the READY architectural state
- */
-#define MOD_DMC_BING_MEMC_CMD_GO UINT32_C(0x00000003)
-
-/*!
- * \brief Command to perform any direct_cmd operations
- */
-#define MOD_DMC_BING_MEMC_CMD_EXECUTE UINT32_C(0x00000004)
+#define MOD_DMC_BING_CHANNEL_STATUS_M0_IDLE UINT32_C(0x00000001)
 
 /*!
  * \brief Enable ECC detection on reads
@@ -607,52 +612,206 @@ struct mod_dmc_bing_reg {
 #define DMC_ERR0CTRL0_CFI_ENABLE UINT32_C(0x00000100)
 
 /*!
+ * \brief DMC Bank Hash enable bit in ADDRESS_CONTROL register
+ */
+#define DMC_ADDR_CTLR_BANK_HASH_ENABLE UINT32_C(0x10000000)
+
+/*!
+ * \brief DDR training timeout in microseconds
+ */
+#define DMC_TRAINING_TIMEOUT UINT32_C(5000)
+
+/*!
+ * \brief DDR training command for rank 1
+ */
+#define DDR_CMD_TRAIN_RANK_1 UINT32_C(0x0001000A)
+/*!
+ * \brief DDR training command for rank 2
+ */
+#define DDR_CMD_TRAIN_RANK_2 UINT32_C(0x0002000A)
+
+/*!
+ * \brief DDR training data slices position
+ */
+#define DDR_ADDR_DATA_SLICES_POS 12
+/*!
+ * \brief Bing operation in server mode
+ */
+#define BING_OPMODE_SERVER 0
+/*!
+ * \brief Bing operation in client mode
+ */
+#define BING_OPMODE_CLIENT 1
+/*!
+ * \brief Offset for Abort Register
+ */
+#define DMC_BING_ABORT_REG_OFFSET UINT32_C(0x10000)
+
+/*!
+ * \brief Deassert Abort Request
+ */
+#define DEASSERT_ABORT_REQUEST 0
+/*!
+ * \brief Assert Abort Request
+ */
+#define ASSERT_ABORT_REQUEST 1
+
+/*!
  * \brief Element configuration.
  */
 struct mod_dmc_bing_element_config {
     /*! Base address of the DMC-BING device's registers */
-    uintptr_t dmc;
-    /*! Element identifier of the associated DDR PHY-500 device */
-    fwk_id_t ddr_id;
+    uintptr_t dmc_bing_base;
+    /*! Base address of the DDR PHY registers */
+    uintptr_t ddr_phy_base;
     /*! Identifier of the clock that this element depends on */
     fwk_id_t clock_id;
 };
 
 /*!
- * \brief API of the DDR PHY associated to the DMC
+ * \brief Structure defining the connected DIMM's parameters.
  */
-struct mod_dmc_ddr_phy_api {
+struct dimm_info {
+    /*! Current speed at which the DIMMs are configured & trained */
+    uint16_t speed;
+
+    /*! Number of ranks in DIMM */
+    uint8_t number_of_ranks;
+
+    /*! Number of ranks to train */
+    uint8_t ranks_to_train;
+
+    /*! DIMM memory width */
+    uint8_t dimm_mem_width;
+
+    /*! CAS Write Latency value */
+    uint32_t cwl_value;
+};
+
+/*!
+ * \brief API to expose DDR memory size.
+ */
+struct mod_dmc_bing_mem_info_api {
     /*!
-     * \brief Configure a DDR physical device
+     * \brief Pointer to function that gets DDR memory size in bytes.
      *
-     * \param element_id Element identifier corresponding to the device to
-     *      configure.
+     * \param size Pointer where memory size will be stored.
      *
-     * \retval ::FWK_SUCCESS if the operation succeed.
+     * \retval FWK_SUCCESS if the operation succeed.
      * \return one of the error code otherwise.
      */
-    int (*configure)(fwk_id_t element_id);
+    int (*get_mem_size)(uint64_t *size);
+};
+
+/*!
+ * \brief API indices.
+ */
+enum mod_dmc_bing_api_idx {
+    /*! API index for getting memory information */
+    MOD_DDR_API_IDX_MEM_INFO,
+
+    /*! Number of exposed interfaces */
+    MOD_DDR_API_COUNT,
 };
 
 /*!
  * \brief DMC-BING module configuration.
  */
 struct mod_dmc_bing_module_config {
-    /*! DDR PHY module ID*/
-    fwk_id_t ddr_module_id;
-    /*! DDR PHY API ID*/
-    fwk_id_t ddr_api_id;
-    /*! Default value for the dmc register */
-    struct mod_dmc_bing_reg *dmc_val;
-    /*! Pointer to a product-specific function that issues direct commands */
-    void (*direct_ddr_cmd)(struct mod_dmc_bing_reg *dmc);
+    /*! DDR operating frequency */
+    uint16_t ddr_speed;
+    /*! Bing operating mode */
+    uint8_t opmode;
+    /*! Bing ECC control */
+    bool enable_ecc;
 };
 
 /*!
- * \brief DMC-BING module description.
+ * \brief Identifiers of DMC-Bing configuration stages.
  */
-extern const struct fwk_module module_dmc_bing;
+enum mod_dmc_bing_config_stage {
+    /*! DMC-Bing DIMM training MGR active stage */
+    DMC_BING_CONFIG_STAGE_TRAINING_MGR_ACTIVE,
 
+    /*! DMC-Bing DIMM training channel M0 idle stage */
+    DMC_BING_CONFIG_STAGE_TRAINING_M0_IDLE,
+
+    /*! DMC-Bing configuration stages */
+    DMC_BING_CONFIG_STAGE_COUNT,
+};
+
+/*!
+ * \brief Structure defining data to be passed to timer API.
+ */
+struct mod_dmc_bing_wait_condition_data {
+    /*! Pointer to DMC-Bing module registers */
+    void *dmc;
+
+    /*! DMC-Bing configuration stage identifier */
+    enum mod_dmc_bing_config_stage stage;
+};
+
+/*!
+ * \brief Identifiers of the DMC-Bing Commands.
+ */
+enum mod_dmc_bing_memc_cmd {
+    /*! Command to enter into the CONFIG state */
+    MOD_DMC_BING_MEMC_CMD_CONFIG,
+
+    /*! Command to enter into the SLEEP state */
+    MOD_DMC_BING_MEMC_CMD_SLEEP,
+
+    /*! Command to enter into the PAUSED state */
+    MOD_DMC_BING_MEMC_CMD_PAUSED,
+
+    /*! Command to enter into the READY state */
+    MOD_DMC_BING_MEMC_CMD_GO,
+
+    /*! Command to perform direct_cmd operations */
+    MOD_DMC_BING_MEMC_CMD_EXECUTE,
+
+    /*! Command to perform direct_cmd operations and updates the registers */
+    MOD_DMC_BING_MEMC_CMD_EXECUTE_DRAIN,
+
+    /*! Command to enter into RECOVER from ABORTED state */
+    MOD_DMC_BING_MEMC_CMD_ABORT_CLR,
+
+    /*! DMC-Bing Commands */
+    MOD_DMC_BING_MEMC_CMD_COUNT,
+};
+
+/*!
+ * \brief Identifiers of the current state of DMC-Bing.
+ */
+enum mod_dmc_bing_state {
+    DMC_BING_CONFIG_STATE,
+    DMC_BING_LOW_POWER_STATE,
+    DMC_BING_PAUSED_STATE,
+    DMC_BING_READY_STATE,
+    DMC_BING_ABORTED_STATE,
+    DMC_BING_RECOVER_STATE,
+    DMC_BING_STATE_COUNT,
+};
+
+/*!
+ * \brief Identifiers of the current state of DMC-Bing.
+ */
+enum mod_dmc_ddr_training_type {
+    /*! Read data eye training */
+    DDR_ADDR_TRAIN_TYPE_RD_EYE = 1,
+
+    /*! Read gate training */
+    DDR_ADDR_TRAIN_TYPE_RD_GATE,
+
+    /*! Write levelling training */
+    DDR_ADDR_TRAIN_TYPE_WR_LVL,
+
+    /*! VREF training */
+    DDR_ADDR_TRAIN_TYPE_VREF,
+
+    /*! Training type count */
+    DDR_ADDR_TRAIN_TYPE_COUNT,
+};
 /*!
  * \}
  */
