@@ -206,7 +206,8 @@ static int mod_mock_clock_update_input_rate(
         return FWK_E_PARAM;
     }
 
-    ctx->current_rate_index = rate_entry - ctx->config->rate_table;
+    ctx->current_rate_index =
+        (unsigned int)(rate_entry - ctx->config->rate_table);
 
     mod_mock_clock_get_rate(clock_id, output_rate);
 
