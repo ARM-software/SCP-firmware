@@ -180,6 +180,7 @@ arrayIndexOutOfBounds:*product/rdv1mc/module/platform_system/src/mod_platform_sy
 objectIndex:*product/n1sdp/module/n1sdp_pcie/src/n1sdp_pcie.c:438
 objectIndex:*product/morello/module/morello_pcie/src/morello_pcie.c:390
 knownConditionTrueFalse:*product/n1sdp/module/n1sdp_dmc620/src/mod_n1sdp_dmc620.c:85
+syntaxError:*product/morello/scp_ramfw_soc/config_resource_perms.c:54
 
 // Suppress CMSIS errors
 *:*/CMSIS*/*
