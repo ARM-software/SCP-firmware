@@ -11,4 +11,5 @@ BS_FIRMWARE_LIST := \
     mcp_ramfw_fvp \
     scp_romfw \
     mcp_romfw \
-    scp_ramfw_soc
+    scp_ramfw_soc \
+    mcp_ramfw_soc
