@@ -168,7 +168,6 @@ SCP_ENABLE_PLUGIN_HANDLER_INIT (CMake).
 implemented (and enabled).
 - This entire mechanism for adding/removing plugins is not supported with the
 traditional SCMI SMT/doorbell transport.
-- Only one performance plugin is supported, for now.
 
 ## Configuration Example 1 (plugin with physical/DVFS domains view)
 
@@ -255,3 +254,31 @@ Note that a plugin in this case can choose either logical or physical view.
 
 This example is for cases when only the logical domains aggregation policy is
 required.
+
+## Configuration Example 4 (2 plugins with physical domain view)
+
+    static const struct mod_scmi_perf_domain_config domains[] = {
+        [DVFS_DOMAIN_0] = {
+            .fast_channels_addr_scp = (uint64_t[]) { ... },
+            .fast_channels_addr_ap = (uint64_t[]) { ... },
+        },
+    };
+
+    static const struct mod_scmi_plugin_config plugins_table[] = {
+        [0] = {
+            .id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_<PLUGIN>),
+            .dom_type = PERF_PLUGIN_DOM_TYPE_PHYSICAL,
+        },
+        [1] = {
+            .id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_<PLUGIN>),
+            .dom_type = PERF_PLUGIN_DOM_TYPE_PHYSICAL,
+        },
+    };
+
+    struct fwk_module_config config_scmi_perf = {
+        .data = &((struct mod_scmi_perf_config){
+            ...
+            .plugins = plugins_table,
+            .plugins_count = FWK_ARRAY_SIZE(plugins_table)
+        }),
+    };
