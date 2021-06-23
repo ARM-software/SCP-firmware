@@ -52,7 +52,7 @@ struct perf_plugins_dev_ctx {
 };
 
 struct perf_plugins_ctx {
-    struct perf_plugins_api *plugins_api;
+    struct perf_plugins_api **plugins_api_table;
 
     const struct mod_scmi_perf_config *config;
 
@@ -173,9 +173,18 @@ static void plugins_policy_sync_level_limits(
         }
     }
 
+    /*
+     * Now we apply the same policy against the temporary results for the
+     * plugins updates so far.
+     */
+    if (needle_lim_min > dev_ctx->lmin) {
+        dev_ctx->lmin = needle_lim_min;
+    }
+    if (needle_lim_max < dev_ctx->lmax) {
+        dev_ctx->lmax = needle_lim_max;
+    }
+
     dev_ctx->max = level_table[phy_dom];
-    dev_ctx->lmin = needle_lim_min;
-    dev_ctx->lmax = needle_lim_max;
 }
 
 static void plugins_policy_update(struct fc_perf_update *fc_update)
@@ -183,8 +192,6 @@ static void plugins_policy_update(struct fc_perf_update *fc_update)
     struct perf_plugins_dev_ctx *dev_ctx;
 
     dev_ctx = get_ctx(fc_update->domain_id);
-
-    plugins_policy_sync_level_limits(dev_ctx);
 
     fc_update->level = dev_ctx->max;
     fc_update->adj_min_limit = dev_ctx->lmin;
@@ -305,6 +312,10 @@ static void store_and_aggregate(struct fc_perf_update *fc_update)
         phy_dom.level[0] = 0;
         phy_dom.max_limit[0] = UINT32_MAX;
         phy_dom.min_limit[0] = 0;
+
+        /* as well as ctx */
+        dev_ctx->lmin = 0;
+        dev_ctx->lmax = UINT32_MAX;
     }
 
     domain_aggregate(&this_dom, &phy_dom);
@@ -338,17 +349,24 @@ void perf_plugins_handler_update(struct fc_perf_update *fc_update)
             /* domains coordination only */
             plugins_policy_update_no_plugins(fc_update);
         } else {
-            dom_type = perf_plugins_ctx.config->plugins[0].dom_type;
+            for (size_t i = 0; i < perf_plugins_ctx.config->plugins_count;
+                 i++) {
+                dom_type =
+                    (unsigned int)perf_plugins_ctx.config->plugins[i].dom_type;
+                assign_data_for_plugins(
+                    fc_update->domain_id, &perf_snapshot, dom_type);
 
-            assign_data_for_plugins(
-                fc_update->domain_id, &perf_snapshot, dom_type);
+                api = perf_plugins_ctx.plugins_api_table[i];
+                status = api->update(&perf_snapshot);
+                if (status != FWK_SUCCESS) {
+                    FWK_LOG_TRACE(
+                        "[P-Handler] Update: Plugin%u returned error %i",
+                        i,
+                        status);
+                }
 
-            api = perf_plugins_ctx.plugins_api;
-            status = api->update(&perf_snapshot);
-            if (status != FWK_SUCCESS) {
-                FWK_LOG_TRACE("[P-Handler] %s @%d", __func__, __LINE__);
+                plugins_policy_sync_level_limits(dev_ctx);
             }
-
             plugins_policy_update(fc_update);
         }
     } else {
@@ -371,12 +389,17 @@ void perf_plugins_handler_report(struct perf_plugins_perf_report *data)
         return;
     }
 
-    api = perf_plugins_ctx.plugins_api;
+    for (size_t i = 0; i < perf_plugins_ctx.config->plugins_count; i++) {
+        api = perf_plugins_ctx.plugins_api_table[i];
 
-    if (api->report != NULL) {
-        status = api->report(data);
-        if (status != FWK_SUCCESS) {
-            FWK_LOG_TRACE("[P-Handler] %s @%d", __func__, __LINE__);
+        if (api->report != NULL) {
+            status = api->report(data);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_TRACE(
+                    "[P-Handler] Report: Plugin%u returned error %i",
+                    i,
+                    status);
+            }
         }
     }
 }
@@ -392,9 +415,12 @@ int perf_plugins_handler_init(const struct mod_scmi_perf_config *config)
 
     dvfs_doms_count =
         fwk_module_get_element_count(FWK_ID_MODULE(FWK_MODULE_IDX_DVFS));
+    if (dvfs_doms_count <= 0) {
+        return FWK_E_SUPPORT;
+    }
 
-    perf_plugins_ctx.dev_ctx =
-        fwk_mm_calloc(dvfs_doms_count, sizeof(struct perf_plugins_dev_ctx));
+    perf_plugins_ctx.dev_ctx = fwk_mm_calloc(
+        (size_t)dvfs_doms_count, sizeof(struct perf_plugins_dev_ctx));
 
     /*
      * Iterate all over the SCMI performance domain table to build the number of
@@ -421,7 +447,7 @@ int perf_plugins_handler_init(const struct mod_scmi_perf_config *config)
      *
      * At the same time, initialise min and max.
      */
-    for (int i = 0; i < dvfs_doms_count; i++) {
+    for (size_t i = 0; i < (size_t)dvfs_doms_count; i++) {
         dev_ctx = &perf_plugins_ctx.dev_ctx[i];
 
         all_doms_count = dev_ctx->log_dom_count + 1;
@@ -488,22 +514,30 @@ int perf_plugins_handler_bind(void)
 {
     fwk_id_t plugin_id;
     const struct mod_scmi_perf_config *config = perf_plugins_ctx.config;
+    int status;
 
     if (config->plugins_count == 0) {
         return FWK_SUCCESS;
     }
 
-    if (config->plugins_count > 1) {
-        /* We only support one plugin for now */
-        return FWK_E_SUPPORT;
+    perf_plugins_ctx.plugins_api_table =
+        fwk_mm_calloc(config->plugins_count, sizeof(struct perf_plugins_api *));
+
+    /* Bind to all the performance plugins */
+    for (size_t i = 0; i < config->plugins_count; i++) {
+        plugin_id = config->plugins[i].id;
+
+        status = fwk_module_bind(
+            plugin_id,
+            FWK_ID_API(
+                fwk_id_get_module_idx(plugin_id), MOD_SCMI_PERF_PLUGIN_API),
+            &perf_plugins_ctx.plugins_api_table[i]);
+        if (status != FWK_SUCCESS) {
+            return FWK_E_PARAM;
+        }
     }
 
-    plugin_id = config->plugins[0].id;
-
-    return fwk_module_bind(
-        plugin_id,
-        FWK_ID_API(fwk_id_get_module_idx(plugin_id), MOD_SCMI_PERF_PLUGIN_API),
-        &perf_plugins_ctx.plugins_api);
+    return FWK_SUCCESS;
 }
 
 int perf_plugins_handler_process_bind_request(
