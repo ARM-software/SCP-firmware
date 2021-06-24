@@ -21,6 +21,7 @@ BS_FIRMWARE_MODULES := \
     morello_pll \
     ppu_v1 \
     system_power \
+    cdns_i2c \
     dmc_bing \
     mhu \
     smt \
@@ -80,6 +81,7 @@ BS_FIRMWARE_SOURCES := \
     config_scmi_management.c \
     config_resource_perms.c \
     config_morello_pcie.c \
+    config_cdns_i2c.c
 
 ifeq ($(BUILD_HAS_DEBUGGER),yes)
     BS_FIRMWARE_MODULES += debugger_cli
