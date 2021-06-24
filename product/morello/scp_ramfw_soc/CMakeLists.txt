@@ -50,6 +50,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_apcontext.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_resource_perms.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_morello_pcie.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_cdns_i2c.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/morello_core.c")
 
 if(SCP_ENABLE_MULTITHREADING)
