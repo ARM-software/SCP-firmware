@@ -146,8 +146,9 @@ static int mod_res_protocol_id_to_index(
     uint32_t *protocol_idx)
 {
     if ((protocol_id >= MOD_SCMI_PLATFORM_PROTOCOL_ID_MIN) &&
-        (protocol_id <= MOD_SCMI_PLATFORM_PROTOCOL_ID_MAX))
+        (protocol_id <= MOD_SCMI_PLATFORM_PROTOCOL_ID_MAX)) {
         return mod_res_plat_protocol_id_to_index(protocol_id, protocol_idx);
+    }
 
     switch (protocol_id) {
     case MOD_SCMI_PROTOCOL_ID_BASE:
@@ -205,67 +206,83 @@ static int mod_res_message_id_to_index(
     *message_idx = -1;
 
     if ((protocol_id >= MOD_SCMI_PLATFORM_PROTOCOL_ID_MIN) &&
-        (protocol_id <= MOD_SCMI_PLATFORM_PROTOCOL_ID_MAX))
+        (protocol_id <= MOD_SCMI_PLATFORM_PROTOCOL_ID_MAX)) {
         return mod_res_plat_message_id_to_index(
             protocol_id, message_id, message_idx);
+    }
 
-    if (message_id < 3)
+    if (message_id < 3) {
         return FWK_SUCCESS;
+    }
 
     switch (protocol_id) {
     case MOD_SCMI_PROTOCOL_ID_BASE:
-        if (message_id >= MOD_SCMI_BASE_COMMAND_COUNT)
+        if (message_id >= MOD_SCMI_BASE_COMMAND_COUNT) {
             return FWK_E_PARAM;
-        if (message_id == MOD_SCMI_BASE_NOTIFY_ERRORS)
+        }
+        if (message_id == MOD_SCMI_BASE_NOTIFY_ERRORS) {
             *message_idx = 0;
+        }
         return FWK_SUCCESS;
 
     case MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN:
-        if (message_id >= MOD_SCMI_PD_POWER_COMMAND_COUNT)
+        if (message_id >= MOD_SCMI_PD_POWER_COMMAND_COUNT) {
             return FWK_E_PARAM;
+        }
         if ((message_id >= MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES) &&
-            (message_id <= MOD_SCMI_PD_POWER_STATE_NOTIFY))
+            (message_id <= MOD_SCMI_PD_POWER_STATE_NOTIFY)) {
             *message_idx = message_id - MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES;
+        }
         return FWK_SUCCESS;
 
     case MOD_SCMI_PROTOCOL_ID_SYS_POWER:
-        if (message_id >= MOD_SCMI_SYS_POWER_COMMAND_COUNT)
+        if (message_id >= MOD_SCMI_SYS_POWER_COMMAND_COUNT) {
             return FWK_E_PARAM;
+        }
         if ((message_id >= MOD_SCMI_SYS_POWER_STATE_SET) &&
-            (message_id <= MOD_SCMI_SYS_POWER_STATE_NOTIFY))
+            (message_id <= MOD_SCMI_SYS_POWER_STATE_NOTIFY)) {
             *message_idx = message_id - MOD_SCMI_SYS_POWER_STATE_SET;
+        }
         return FWK_SUCCESS;
 
     case MOD_SCMI_PROTOCOL_ID_PERF:
-        if (message_id >= MOD_SCMI_PERF_COMMAND_COUNT)
+        if (message_id >= MOD_SCMI_PERF_COMMAND_COUNT) {
             return FWK_E_PARAM;
+        }
         if ((message_id >= MOD_SCMI_PERF_DOMAIN_ATTRIBUTES) &&
-            (message_id <= MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL))
+            (message_id <= MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL)) {
             *message_idx = message_id - MOD_SCMI_PERF_DOMAIN_ATTRIBUTES;
+        }
         return FWK_SUCCESS;
 
     case MOD_SCMI_PROTOCOL_ID_CLOCK:
-        if (message_id >= MOD_SCMI_CLOCK_COMMAND_COUNT)
+        if (message_id >= MOD_SCMI_CLOCK_COMMAND_COUNT) {
             return FWK_E_PARAM;
+        }
         if ((message_id >= MOD_SCMI_CLOCK_ATTRIBUTES) &&
-            (message_id <= MOD_SCMI_CLOCK_CONFIG_SET))
+            (message_id <= MOD_SCMI_CLOCK_CONFIG_SET)) {
             *message_idx = message_id - MOD_SCMI_CLOCK_ATTRIBUTES;
+        }
         return FWK_SUCCESS;
 
     case MOD_SCMI_PROTOCOL_ID_SENSOR:
-        if (message_id >= MOD_SCMI_SENSOR_COMMAND_COUNT)
+        if (message_id >= MOD_SCMI_SENSOR_COMMAND_COUNT) {
             return FWK_E_PARAM;
+        }
         if ((message_id >= MOD_SCMI_SENSOR_DESCRIPTION_GET) &&
-            (message_id <= MOD_SCMI_SENSOR_READING_GET))
+            (message_id <= MOD_SCMI_SENSOR_READING_GET)) {
             *message_idx = message_id - MOD_SCMI_SENSOR_DESCRIPTION_GET;
+        }
         return FWK_SUCCESS;
 
     case MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN:
-        if (message_id >= MOD_SCMI_RESET_COMMAND_COUNT)
+        if (message_id >= MOD_SCMI_RESET_COMMAND_COUNT) {
             return FWK_E_PARAM;
+        }
         if ((message_id >= MOD_SCMI_RESET_DOMAIN_ATTRIBUTES) &&
-            (message_id <= MOD_SCMI_RESET_NOTIFY))
+            (message_id <= MOD_SCMI_RESET_NOTIFY)) {
             *message_idx = message_id - MOD_SCMI_RESET_DOMAIN_ATTRIBUTES;
+        }
         return FWK_SUCCESS;
 
     default:
@@ -324,12 +341,14 @@ static int mod_res_resource_id_to_index(
     *resource_idx = -1;
 
     if ((protocol_id >= MOD_SCMI_PLATFORM_PROTOCOL_ID_MIN) &&
-        (protocol_id <= MOD_SCMI_PLATFORM_PROTOCOL_ID_MAX))
+        (protocol_id <= MOD_SCMI_PLATFORM_PROTOCOL_ID_MAX)) {
         return mod_res_plat_resource_id_to_index(
             agent_id, protocol_id, message_id, resource_id, resource_idx);
+    }
 
-    if (message_id < 3)
+    if (message_id < 3) {
         return FWK_SUCCESS;
+    }
 
     /*
      * Each table is organised as
@@ -408,8 +427,9 @@ static int mod_res_resource_id_to_index(
     }
 
     status = mod_res_agent_id_to_index(agent_id, &agent_idx);
-    if ((status != FWK_SUCCESS) || (agent_idx >= res_perms_ctx.agent_count))
+    if ((status != FWK_SUCCESS) || (agent_idx >= res_perms_ctx.agent_count)) {
         return FWK_E_PARAM;
+    }
 
     resource_size = MOD_RES_PERMS_RESOURCE_ELEMENT(resource_size) + 1;
 
@@ -465,29 +485,34 @@ static enum mod_res_perms_permissions agent_protocol_permissions(
 
     /* No Agent:Protocol permissions management */
     if ((agent_id == 0) || (res_perms_ctx.agent_permissions == NULL) ||
-        (res_perms_ctx.agent_permissions->agent_protocol_permissions == NULL))
+        (res_perms_ctx.agent_permissions->agent_protocol_permissions == NULL)) {
         return MOD_RES_PERMS_ACCESS_ALLOWED;
+    }
 
     if ((protocol_id >= MOD_SCMI_PLATFORM_PROTOCOL_ID_MIN) &&
-        (protocol_id <= MOD_SCMI_PLATFORM_PROTOCOL_ID_MAX))
+        (protocol_id <= MOD_SCMI_PLATFORM_PROTOCOL_ID_MAX)) {
         return mod_res_plat_agent_protocol_permissions(agent_id, protocol_id);
+    }
 
     status = mod_res_agent_id_to_index(agent_id, &agent_idx);
-    if ((status != FWK_SUCCESS) || (agent_idx >= res_perms_ctx.agent_count))
+    if ((status != FWK_SUCCESS) || (agent_idx >= res_perms_ctx.agent_count)) {
         return MOD_RES_PERMS_ACCESS_DENIED;
+    }
 
     status = mod_res_protocol_id_to_index(protocol_id, &protocol_idx);
     if ((status != FWK_SUCCESS) ||
-        (protocol_idx >= res_perms_ctx.protocol_count))
+        (protocol_idx >= res_perms_ctx.protocol_count)) {
         return MOD_RES_PERMS_ACCESS_DENIED;
+    }
 
     perms =
         res_perms_ctx.agent_permissions->agent_protocol_permissions[agent_idx]
             .protocols;
 
     /* Agent:Protocol access denied */
-    if (perms & (1 << protocol_idx))
+    if (perms & (1 << protocol_idx)) {
         return MOD_RES_PERMS_ACCESS_DENIED;
+    }
 
     return MOD_RES_PERMS_ACCESS_ALLOWED;
 }
@@ -517,44 +542,53 @@ static enum mod_res_perms_permissions agent_message_permissions(
     int status;
 
     /* No permissions management */
-    if ((agent_id == 0) || (res_perms_ctx.agent_permissions == NULL))
+    if ((agent_id == 0) || (res_perms_ctx.agent_permissions == NULL)) {
         return MOD_RES_PERMS_ACCESS_ALLOWED;
+    }
 
     if ((protocol_id >= MOD_SCMI_PLATFORM_PROTOCOL_ID_MIN) &&
-        (protocol_id <= MOD_SCMI_PLATFORM_PROTOCOL_ID_MAX))
+        (protocol_id <= MOD_SCMI_PLATFORM_PROTOCOL_ID_MAX)) {
         return mod_res_plat_agent_message_permissions(
             agent_id, protocol_id, message_id);
+    }
 
     /* Agent:Protocol access denied */
     protocol_perms = agent_protocol_permissions(agent_id, protocol_id);
-    if (protocol_perms == MOD_RES_PERMS_ACCESS_DENIED)
+    if (protocol_perms == MOD_RES_PERMS_ACCESS_DENIED) {
         return MOD_RES_PERMS_ACCESS_DENIED;
+    }
 
     /* No Agent:Protocol:command permissions management */
-    if (res_perms_ctx.agent_permissions->agent_msg_permissions == NULL)
+    if (res_perms_ctx.agent_permissions->agent_msg_permissions == NULL) {
         return MOD_RES_PERMS_ACCESS_ALLOWED;
+    }
 
     status = mod_res_message_id_to_index(protocol_id, message_id, &message_idx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return MOD_RES_PERMS_ACCESS_DENIED;
+    }
 
-    if (message_idx < 0)
+    if (message_idx < 0) {
         return MOD_RES_PERMS_ACCESS_ALLOWED;
+    }
 
     status = mod_res_agent_id_to_index(agent_id, &agent_idx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return MOD_RES_PERMS_ACCESS_DENIED;
+    }
 
     status = mod_res_protocol_id_to_index(protocol_id, &protocol_idx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return MOD_RES_PERMS_ACCESS_DENIED;
+    }
 
     perms = res_perms_ctx.agent_permissions->agent_msg_permissions[agent_idx]
                 .messages[protocol_idx];
 
     /* Agent:Protocol:message access denied */
-    if (perms & (1 << message_idx))
+    if (perms & (1 << message_idx)) {
         return MOD_RES_PERMS_ACCESS_DENIED;
+    }
 
     return MOD_RES_PERMS_ACCESS_ALLOWED;
 }
@@ -590,46 +624,56 @@ static enum mod_res_perms_permissions agent_resource_permissions(
     int status;
 
     /* No permissions management */
-    if ((agent_id == 0) || (res_perms_ctx.agent_permissions == NULL))
+    if ((agent_id == 0) || (res_perms_ctx.agent_permissions == NULL)) {
         return MOD_RES_PERMS_ACCESS_ALLOWED;
+    }
 
     if ((protocol_id >= MOD_SCMI_PLATFORM_PROTOCOL_ID_MIN) &&
-        (protocol_id <= MOD_SCMI_PLATFORM_PROTOCOL_ID_MAX))
+        (protocol_id <= MOD_SCMI_PLATFORM_PROTOCOL_ID_MAX)) {
         return mod_res_plat_agent_resource_permissions(
             agent_id, protocol_id, message_id, resource_id);
+    }
 
     /* Agent:Protocol:command access denied */
     message_perms =
         agent_message_permissions(agent_id, protocol_id, message_id);
-    if (message_perms == MOD_RES_PERMS_ACCESS_DENIED)
+    if (message_perms == MOD_RES_PERMS_ACCESS_DENIED) {
         return MOD_RES_PERMS_ACCESS_DENIED;
+    }
 
     status = mod_res_message_id_to_index(protocol_id, message_id, &message_idx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return MOD_RES_PERMS_ACCESS_DENIED;
-    if (message_idx < 0)
+    }
+    if (message_idx < 0) {
         return MOD_RES_PERMS_ACCESS_ALLOWED;
+    }
 
     status = mod_res_agent_id_to_index(agent_id, &agent_idx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return MOD_RES_PERMS_ACCESS_DENIED;
+    }
 
     status = mod_res_resource_id_to_index(
         agent_id, protocol_id, message_id, resource_id, &resource_idx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return MOD_RES_PERMS_ACCESS_DENIED;
-    if (resource_idx < 0)
+    }
+    if (resource_idx < 0) {
         return MOD_RES_PERMS_ACCESS_ALLOWED;
+    }
 
     switch (protocol_id) {
     case MOD_SCMI_PROTOCOL_ID_BASE:
         return MOD_RES_PERMS_ACCESS_DENIED;
 
     case MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN:
-        if (res_perms_ctx.agent_permissions->scmi_pd_perms == NULL)
+        if (res_perms_ctx.agent_permissions->scmi_pd_perms == NULL) {
             return MOD_RES_PERMS_ACCESS_ALLOWED;
-        if (resource_id >= res_perms_ctx.pd_count)
+        }
+        if (resource_id >= res_perms_ctx.pd_count) {
             return MOD_RES_PERMS_ACCESS_DENIED;
+        }
         perms = res_perms_ctx.agent_permissions->scmi_pd_perms[resource_idx];
         break;
 
@@ -637,36 +681,44 @@ static enum mod_res_perms_permissions agent_resource_permissions(
         return MOD_RES_PERMS_ACCESS_DENIED;
 
     case MOD_SCMI_PROTOCOL_ID_PERF:
-        if (res_perms_ctx.agent_permissions->scmi_perf_perms == NULL)
+        if (res_perms_ctx.agent_permissions->scmi_perf_perms == NULL) {
             return MOD_RES_PERMS_ACCESS_ALLOWED;
-        if (resource_id >= res_perms_ctx.perf_count)
+        }
+        if (resource_id >= res_perms_ctx.perf_count) {
             return MOD_RES_PERMS_ACCESS_DENIED;
+        }
         perms = res_perms_ctx.agent_permissions->scmi_perf_perms[resource_idx];
         break;
 
     case MOD_SCMI_PROTOCOL_ID_CLOCK:
-        if (res_perms_ctx.agent_permissions->scmi_clock_perms == NULL)
+        if (res_perms_ctx.agent_permissions->scmi_clock_perms == NULL) {
             return MOD_RES_PERMS_ACCESS_ALLOWED;
-        if (resource_id >= res_perms_ctx.clock_count)
+        }
+        if (resource_id >= res_perms_ctx.clock_count) {
             return MOD_RES_PERMS_ACCESS_DENIED;
+        }
         perms = res_perms_ctx.agent_permissions->scmi_clock_perms[resource_idx];
         break;
 
     case MOD_SCMI_PROTOCOL_ID_SENSOR:
-        if (res_perms_ctx.agent_permissions->scmi_sensor_perms == NULL)
+        if (res_perms_ctx.agent_permissions->scmi_sensor_perms == NULL) {
             return MOD_RES_PERMS_ACCESS_ALLOWED;
-        if (resource_id >= res_perms_ctx.sensor_count)
+        }
+        if (resource_id >= res_perms_ctx.sensor_count) {
             return MOD_RES_PERMS_ACCESS_DENIED;
+        }
         perms =
             res_perms_ctx.agent_permissions->scmi_sensor_perms[resource_idx];
         break;
 
 #ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
     case MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN:
-        if (res_perms_ctx.agent_permissions->scmi_reset_domain_perms == NULL)
+        if (res_perms_ctx.agent_permissions->scmi_reset_domain_perms == NULL) {
             return MOD_RES_PERMS_ACCESS_ALLOWED;
-        if (resource_id >= res_perms_ctx.reset_domain_count)
+        }
+        if (resource_id >= res_perms_ctx.reset_domain_count) {
             return MOD_RES_PERMS_ACCESS_DENIED;
+        }
         perms = res_perms_ctx.agent_permissions
                     ->scmi_reset_domain_perms[resource_idx];
         break;
@@ -677,8 +729,9 @@ static enum mod_res_perms_permissions agent_resource_permissions(
     }
 
     /* Agent:Protocol:message:resource access denied */
-    if ((perms & (1 << (MOD_RES_PERMS_RESOURCE_BIT(resource_id)))))
+    if ((perms & (1 << (MOD_RES_PERMS_RESOURCE_BIT(resource_id))))) {
         return MOD_RES_PERMS_ACCESS_DENIED;
+    }
 
     return MOD_RES_PERMS_ACCESS_ALLOWED;
 }
@@ -700,8 +753,9 @@ static int set_agent_resource_message_perms(
 
     status = mod_res_resource_id_to_index(
         agent_id, protocol_id, message_idx, resource_id, &resource_idx);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     permissions = perms[resource_idx];
 
@@ -709,10 +763,11 @@ static int set_agent_resource_message_perms(
         ((flags == 0) ? MOD_RES_PERMS_ACCESS_DENIED :
                         MOD_RES_PERMS_ACCESS_ALLOWED);
 
-    if (flags == MOD_RES_PERMS_ACCESS_ALLOWED)
+    if (flags == MOD_RES_PERMS_ACCESS_ALLOWED) {
         permissions &= ~(1 << (MOD_RES_PERMS_RESOURCE_BIT(resource_id)));
-    else
+    } else {
         permissions |= (1 << (MOD_RES_PERMS_RESOURCE_BIT(resource_id)));
+    }
 
     perms[resource_idx] = permissions;
 
@@ -727,10 +782,12 @@ static int set_agent_resource_pd_permissions(
     int status;
     int32_t message_idx;
 
-    if (res_perms_ctx.agent_permissions->scmi_pd_perms == NULL)
+    if (res_perms_ctx.agent_permissions->scmi_pd_perms == NULL) {
         return FWK_SUCCESS;
-    if (resource_id >= res_perms_ctx.pd_count)
+    }
+    if (resource_id >= res_perms_ctx.pd_count) {
         return FWK_E_ACCESS;
+    }
 
     /* Do a backup before making the changes if required */
     if ((res_perms_ctx.config->pd_cmd_count != 0) &&
@@ -759,8 +816,9 @@ static int set_agent_resource_pd_permissions(
             res_perms_ctx.agent_permissions->scmi_pd_perms,
             flags);
 
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return FWK_SUCCESS;
@@ -774,10 +832,12 @@ static int set_agent_resource_perf_permissions(
     int status;
     int32_t message_idx;
 
-    if (res_perms_ctx.agent_permissions->scmi_perf_perms == NULL)
+    if (res_perms_ctx.agent_permissions->scmi_perf_perms == NULL) {
         return FWK_SUCCESS;
-    if (resource_id >= res_perms_ctx.perf_count)
+    }
+    if (resource_id >= res_perms_ctx.perf_count) {
         return FWK_E_ACCESS;
+    }
 
     /* Do a backup before making the changes if required */
     if ((res_perms_ctx.config->perf_cmd_count != 0) &&
@@ -806,8 +866,9 @@ static int set_agent_resource_perf_permissions(
             res_perms_ctx.agent_permissions->scmi_perf_perms,
             flags);
 
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return FWK_SUCCESS;
@@ -821,10 +882,12 @@ static int set_agent_resource_clock_permissions(
     int status;
     int32_t message_idx;
 
-    if (res_perms_ctx.agent_permissions->scmi_clock_perms == NULL)
+    if (res_perms_ctx.agent_permissions->scmi_clock_perms == NULL) {
         return FWK_SUCCESS;
-    if (resource_id >= res_perms_ctx.clock_count)
+    }
+    if (resource_id >= res_perms_ctx.clock_count) {
         return FWK_E_ACCESS;
+    }
 
     /* Do a backup before making the changes if required */
     if ((res_perms_ctx.config->clock_cmd_count != 0) &&
@@ -853,8 +916,9 @@ static int set_agent_resource_clock_permissions(
             res_perms_ctx.agent_permissions->scmi_clock_perms,
             flags);
 
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return FWK_SUCCESS;
@@ -870,10 +934,12 @@ static int set_agent_resource_reset_permissions(
     int status;
     int32_t message_idx;
 
-    if (res_perms_ctx.agent_permissions->scmi_reset_domain_perms == NULL)
+    if (res_perms_ctx.agent_permissions->scmi_reset_domain_perms == NULL) {
         return FWK_SUCCESS;
-    if (resource_id >= res_perms_ctx.reset_domain_count)
+    }
+    if (resource_id >= res_perms_ctx.reset_domain_count) {
         return FWK_E_ACCESS;
+    }
 
     /* Do a backup before making the changes if required */
     if ((res_perms_ctx.config->reset_domain_cmd_count != 0) &&
@@ -905,8 +971,9 @@ static int set_agent_resource_reset_permissions(
             res_perms_ctx.agent_permissions->scmi_reset_domain_perms,
             flags);
 
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return FWK_SUCCESS;
@@ -922,10 +989,12 @@ static int set_agent_resource_sensor_permissions(
     int status;
     int32_t message_idx;
 
-    if (res_perms_ctx.agent_permissions->scmi_sensor_perms == NULL)
+    if (res_perms_ctx.agent_permissions->scmi_sensor_perms == NULL) {
         return FWK_SUCCESS;
-    if (resource_id >= res_perms_ctx.sensor_count)
+    }
+    if (resource_id >= res_perms_ctx.sensor_count) {
         return FWK_E_ACCESS;
+    }
 
     /* Do a backup before making the changes if required */
     if ((res_perms_ctx.config->sensor_cmd_count != 0) &&
@@ -954,8 +1023,9 @@ static int set_agent_resource_sensor_permissions(
             res_perms_ctx.agent_permissions->scmi_sensor_perms,
             flags);
 
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
     return FWK_SUCCESS;
@@ -1002,12 +1072,13 @@ static int mod_res_agent_set_permissions(
         break;
     }
 
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         FWK_LOG_WARN(
             "[perms] set_permissions for agent %d type %d device %d failed\n",
             (int)agent_id,
             (int)type,
             (int)resource_id);
+    }
 
     return status;
 }
@@ -1024,39 +1095,46 @@ static int mod_res_agent_set_device_permission(
 
     /* No device permissons */
     if ((res_perms_ctx.device_count == 0) ||
-        (res_perms_ctx.domain_devices == NULL))
+        (res_perms_ctx.domain_devices == NULL)) {
         return FWK_E_ACCESS;
+    }
 
-    if (device_id >= res_perms_ctx.device_count)
+    if (device_id >= res_perms_ctx.device_count) {
         return FWK_E_PARAM;
+    }
 
-    if ((flags != 0) && (flags != 1))
+    if ((flags != 0) && (flags != 1)) {
         return FWK_E_PARAM;
+    }
 
     /* Find device */
     for (i = 0; i < res_perms_ctx.device_count; i++) {
-        if (res_perms_ctx.domain_devices[i].device_id == device_id)
+        if (res_perms_ctx.domain_devices[i].device_id == device_id) {
             break;
+        }
     }
 
-    if (i == res_perms_ctx.device_count)
+    if (i == res_perms_ctx.device_count) {
         return FWK_E_ACCESS;
+    }
 
     dev = res_perms_ctx.domain_devices[i].domain_devices;
     while (dev->type != MOD_RES_DOMAIN_DEVICE_INVALID) {
-        if (fwk_id_is_equal(dev->device_id, FWK_ID_NONE))
+        if (fwk_id_is_equal(dev->device_id, FWK_ID_NONE)) {
             return FWK_SUCCESS;
+        }
 
         resource_id = fwk_id_get_element_idx(dev->device_id);
 
         status = mod_res_agent_set_permissions(
             dev->type, agent_id, resource_id, flags);
 
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             FWK_LOG_WARN(
                 "[perms] set_permissions for agent %d device %d failed\n",
                 (int)agent_id,
                 (int)i);
+        }
 
         /* next domain device */
         dev++;
@@ -1082,23 +1160,28 @@ static int mod_res_agent_set_device_protocol_permission(
 
     /* No device permissons */
     if ((res_perms_ctx.device_count == 0) ||
-        (res_perms_ctx.domain_devices == NULL))
+        (res_perms_ctx.domain_devices == NULL)) {
         return FWK_E_ACCESS;
+    }
 
-    if (device_id >= res_perms_ctx.device_count)
+    if (device_id >= res_perms_ctx.device_count) {
         return FWK_E_PARAM;
+    }
 
-    if ((flags != 0) && (flags != 1))
+    if ((flags != 0) && (flags != 1)) {
         return FWK_E_PARAM;
+    }
 
     /* Find device */
     for (i = 0; i < res_perms_ctx.device_count; i++) {
-        if (res_perms_ctx.domain_devices[i].device_id == device_id)
+        if (res_perms_ctx.domain_devices[i].device_id == device_id) {
             break;
+        }
     }
 
-    if (i == res_perms_ctx.device_count)
+    if (i == res_perms_ctx.device_count) {
         return FWK_E_ACCESS;
+    }
 
     switch (protocol_id) {
     case MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN:
@@ -1124,8 +1207,9 @@ static int mod_res_agent_set_device_protocol_permission(
 
     dev = res_perms_ctx.domain_devices[i].domain_devices;
     while (dev->type != MOD_RES_DOMAIN_DEVICE_INVALID) {
-        if (fwk_id_is_equal(dev->device_id, FWK_ID_NONE))
+        if (fwk_id_is_equal(dev->device_id, FWK_ID_NONE)) {
             return FWK_SUCCESS;
+        }
 
         if (dev->type != dev_type) {
             dev++;
@@ -1137,11 +1221,12 @@ static int mod_res_agent_set_device_protocol_permission(
         status = mod_res_agent_set_permissions(
             dev->type, agent_id, resource_id, flags);
 
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             FWK_LOG_WARN(
                 "[perms] set_permissions for agent %d device %d failed\n",
                 (int)agent_id,
                 (int)i);
+        }
 
         /* next domain device */
         dev++;
@@ -1205,8 +1290,9 @@ static void mod_res_agent_copy_config(
                 i, /* message id */
                 j, /* resource id */
                 &resource_idx);
-            if ((status != FWK_SUCCESS) || (resource_idx < 0))
+            if ((status != FWK_SUCCESS) || (resource_idx < 0)) {
                 continue;
+            }
             perms[resource_idx] = backup_perms[resource_idx];
         }
     }
@@ -1216,14 +1302,17 @@ static int mod_res_agent_reset_config(uint32_t agent_id, uint32_t flags)
 {
     /* No device permissons */
     if ((res_perms_ctx.device_count == 0) ||
-        (res_perms_ctx.domain_devices == NULL))
+        (res_perms_ctx.domain_devices == NULL)) {
         return FWK_E_ACCESS;
+    }
 
-    if (flags == 0)
+    if (flags == 0) {
         return FWK_SUCCESS;
+    }
 
-    if (agent_id >= res_perms_ctx.agent_count)
+    if (agent_id >= res_perms_ctx.agent_count) {
         return FWK_E_ACCESS;
+    }
 
     if (res_perms_backup.scmi_pd_perms != NULL) {
         mod_res_agent_copy_config(
@@ -1290,8 +1379,9 @@ static int mod_res_perms_process_bind_request(
     const void **api)
 {
     /* Only allow binding to the module */
-    if (!fwk_id_is_equal(target_id, fwk_module_id_resource_perms))
+    if (!fwk_id_is_equal(target_id, fwk_module_id_resource_perms)) {
         return FWK_E_PARAM;
+    }
 
     /* We don't do any permissions management */
     *api = &res_perms_api;
