@@ -296,7 +296,10 @@ static const uint32_t core_composite_state_mask_table[] = {
  * Internal variables
  */
 static struct mod_pd_ctx mod_pd_ctx;
+
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
 static const char driver_error_msg[] = "[PD] Driver error %s (%d) in %s @%d";
+#endif
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
 static const char * const default_state_name_table[] = {
@@ -1302,6 +1305,7 @@ void perform_shutdown(
         pd_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, pd_idx);
         api = pd->driver_api;
 
+        (void)pd_id;
         FWK_LOG_INFO("[PD] Shutting down %s", fwk_module_get_name(pd_id));
 
         if (api->shutdown != NULL) {
@@ -1894,12 +1898,14 @@ static int pd_start(fwk_id_t id)
         /* Get the current power state of the power domain from its driver. */
         status = pd->driver_api->get_state(pd->driver_id, &state);
         if (status != FWK_SUCCESS) {
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
             FWK_LOG_ERR(
                 driver_error_msg,
                 fwk_status_str(status),
                 status,
                 __func__,
                 __LINE__);
+#endif
         } else {
             pd->requested_state = pd->state_requested_to_driver = state;
 
