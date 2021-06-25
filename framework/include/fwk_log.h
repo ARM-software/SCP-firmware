@@ -184,33 +184,6 @@
  */
 
 /*!
- * \internal
- *
- * \brief Void the result of an expression.
- *
- * \details This is used to prevent the compiler from complaining about unused
- *      variables when filtering logging calls at preprocessing time.
- *
- * \param[in] EXPR The expression to void.
- */
-#define FWK_LOG_VOID_EXPR(EXPR) ((void)(EXPR));
-
-/*!
- * \internal
- *
- * \brief Void the result of multiple expressions.
- *
- * \details This is used to prevent the compiler from complaining about unused
- *      variables when filtering logging calls at preprocessing time.
- *
- * \param[in] ... The expressions to void.
- */
-#define FWK_LOG_VOID(...) \
-    do { \
-        FWK_MAP(FWK_LOG_VOID_EXPR, __VA_ARGS__) \
-    } while (0)
-
-/*!
  * \brief Flush the logging backend.
  *
  * \details Flushing ensures that all data buffered by either the framework or
@@ -234,7 +207,7 @@
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
 #    define FWK_LOG_TRACE(...) fwk_log_printf(__VA_ARGS__)
 #else
-#    define FWK_LOG_TRACE(...) FWK_LOG_VOID(__VA_ARGS__)
+#    define FWK_LOG_TRACE(...)
 #endif
 
 /*!
@@ -248,7 +221,7 @@
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
 #    define FWK_LOG_INFO(...) fwk_log_printf(__VA_ARGS__)
 #else
-#    define FWK_LOG_INFO(...) FWK_LOG_VOID(__VA_ARGS__)
+#    define FWK_LOG_INFO(...)
 #endif
 
 /*!
@@ -262,7 +235,7 @@
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_WARN
 #    define FWK_LOG_WARN(...) fwk_log_printf(__VA_ARGS__)
 #else
-#    define FWK_LOG_WARN(...) FWK_LOG_VOID(__VA_ARGS__)
+#    define FWK_LOG_WARN(...)
 #endif
 
 /*!
@@ -276,7 +249,7 @@
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
 #    define FWK_LOG_ERR(...) fwk_log_printf(__VA_ARGS__)
 #else
-#    define FWK_LOG_ERR(...) FWK_LOG_VOID(__VA_ARGS__)
+#    define FWK_LOG_ERR(...)
 #endif
 
 /*!
@@ -290,7 +263,7 @@
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_CRIT
 #    define FWK_LOG_CRIT(...) fwk_log_printf(__VA_ARGS__)
 #else
-#    define FWK_LOG_CRIT(...) FWK_LOG_VOID(__VA_ARGS__)
+#    define FWK_LOG_CRIT(...)
 #endif
 
 /*!
