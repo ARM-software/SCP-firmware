@@ -246,10 +246,11 @@ static int cmn_skeena_discovery(void)
                 }
 
                 FWK_LOG_INFO(
-                    MOD_NAME "  %s ID:%d, LID:%d",
+                    MOD_NAME "  %s ID:%d, LID:%d @0x%" PRIX32,
                     get_node_type_name(get_node_type(node)),
                     get_node_id(node),
-                    get_node_logical_id(node));
+                    get_node_logical_id(node),
+                    (uint32_t)node);
             }
         }
     }
@@ -283,20 +284,18 @@ static int cmn_skeena_discovery(void)
     FWK_LOG_INFO(
         MOD_NAME "Total external RN-SAM nodes: %d", ctx->external_rnsam_count);
     FWK_LOG_INFO(MOD_NAME "Total HN-F nodes: %d", ctx->hnf_count);
-    FWK_LOG_INFO(MOD_NAME "Total RN-F nodes: %d", ctx->rnd_count);
-    FWK_LOG_INFO(MOD_NAME "Total RN-D nodes: %d", ctx->rnf_count);
+    FWK_LOG_INFO(MOD_NAME "Total RN-F nodes: %d", ctx->rnf_count);
+    FWK_LOG_INFO(MOD_NAME "Total RN-D nodes: %d", ctx->rnd_count);
     FWK_LOG_INFO(MOD_NAME "Total RN-I nodes: %d", ctx->rni_count);
 
     if (ctx->cxla_reg != NULL) {
-        FWK_LOG_INFO(MOD_NAME "CCIX CXLA node at: 0x%p", (void *)ctx->cxla_reg);
+        FWK_LOG_INFO(MOD_NAME "CCIX CXLA node at: %p", (void *)ctx->cxla_reg);
     }
     if (ctx->cxg_ra_reg != NULL) {
-        FWK_LOG_INFO(
-            MOD_NAME "CCIX CXRA node at: 0x%p", (void *)ctx->cxg_ra_reg);
+        FWK_LOG_INFO(MOD_NAME "CCIX CXRA node at: %p", (void *)ctx->cxg_ra_reg);
     }
     if (ctx->cxg_ha_reg != NULL) {
-        FWK_LOG_INFO(
-            MOD_NAME "CCIX CXHA node at: 0x%p", (void *)ctx->cxg_ha_reg);
+        FWK_LOG_INFO(MOD_NAME "CCIX CXHA node at: %p", (void *)ctx->cxg_ha_reg);
     }
     return FWK_SUCCESS;
 }
@@ -385,7 +384,10 @@ int cmn_skeena_setup_sam(struct cmn_skeena_rnsam_reg *rnsam)
     unsigned int scg_region = 0;
     unsigned int scg_regions_enabled[CMN_SKEENA_MAX_NUM_SCG] = { 0, 0, 0, 0 };
 
-    FWK_LOG_INFO(MOD_NAME "Configuring SAM for node %d", get_node_id(rnsam));
+    FWK_LOG_INFO(
+        MOD_NAME "Configuring RN-SAM for node id %d at 0x%" PRIX32,
+        get_node_id(rnsam),
+        (uint32_t)rnsam);
 
     for (region_idx = 0; region_idx < config->mmap_count; region_idx++) {
         region = &config->mmap_table[region_idx];
