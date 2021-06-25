@@ -237,8 +237,9 @@ static int scmi_perf_permissions_handler(
     if (message_id < 3) {
         perms = scmi_perf_ctx.res_perms_api->agent_has_protocol_permission(
             agent_id, MOD_SCMI_PROTOCOL_ID_PERF);
-        if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
+        if (perms == MOD_RES_PERMS_ACCESS_ALLOWED) {
             return FWK_SUCCESS;
+        }
         return FWK_E_ACCESS;
     }
 
@@ -371,12 +372,14 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
 #else
     status = scmi_perf_permissions_handler(
         service_id, payload, (unsigned int)MOD_SCMI_PERF_LIMITS_SET);
-    if (status == FWK_SUCCESS)
+    if (status == FWK_SUCCESS) {
         permissions = (uint8_t)MOD_SCMI_PERF_PERMS_SET_LIMITS;
+    }
     status = scmi_perf_permissions_handler(
         service_id, payload, (unsigned int)MOD_SCMI_PERF_LEVEL_SET);
-    if (status == FWK_SUCCESS)
+    if (status == FWK_SUCCESS) {
         permissions |= MOD_SCMI_PERF_PERMS_SET_LEVEL;
+    }
 #endif
 
     domain_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, parameters->domain_id);
@@ -1110,10 +1113,11 @@ static int scmi_perf_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     status = scmi_perf_permissions_handler(service_id, payload, message_id);
     if (status != FWK_SUCCESS) {
-        if (status == FWK_E_PARAM)
+        if (status == FWK_E_PARAM) {
             return_value = (int32_t)SCMI_NOT_FOUND;
-        else
+        } else {
             return_value = (int32_t)SCMI_DENIED;
+        }
         goto error;
     }
 #endif
@@ -1385,8 +1389,9 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
         FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
         FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS, MOD_RES_PERM_RESOURCE_PERMS),
         &scmi_perf_ctx.res_perms_api);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 #endif
 
     return fwk_module_bind(
