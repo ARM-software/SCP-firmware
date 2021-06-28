@@ -47,6 +47,7 @@ typedef enum IRQn {
     PPU_CLUSTERS_IRQ = 54, /* Consolidated clusters PPU */
     MHU_AP_SEC_IRQ = 83, /* MHU secure IRQ between SCP and AP */
 
+    IRQn_MAX = INT16_MAX,
 } IRQn_Type;
 
 #include <core_cm7.h>
