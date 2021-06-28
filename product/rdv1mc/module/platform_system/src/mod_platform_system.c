@@ -350,11 +350,12 @@ int platform_system_process_notification(
             /* Unsubscribe to the notification */
             return fwk_notification_unsubscribe(
                 event->id, event->source_id, event->target_id);
-        } else
+        } else {
             FWK_LOG_INFO(
                 "[PLATFORM SYSTEM] Detected as Slave chip: %d, "
                 "wait for SCMI\n",
                 chip_id);
+        }
 
         return FWK_SUCCESS;
     } else if (fwk_id_is_equal(
