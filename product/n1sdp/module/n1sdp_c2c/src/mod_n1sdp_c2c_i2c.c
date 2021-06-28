@@ -60,6 +60,7 @@
 #define CCIX_PROP_MAX_PACK_SIZE_256          1
 #define CCIX_PROP_MAX_PACK_SIZE_512          2
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
 static const char * const cmd_str[] = {
     [N1SDP_C2C_CMD_CHECK_SLAVE] = "Check slave alive",
     [N1SDP_C2C_CMD_PCIE_POWER_ON] = "PCIe power ON",
@@ -81,6 +82,9 @@ static const char * const cmd_str[] = {
     [N1SDP_C2C_CMD_POWER_DOMAIN_GET_STATE] = "Get power state",
     [N1SDP_C2C_CMD_SHUTDOWN_OR_REBOOT] = "Shutdown/Reboot",
 };
+#else
+static const char *const cmd_str[] = { "" };
+#endif
 
 /* Module context */
 struct n1sdp_c2c_ctx {
@@ -151,6 +155,7 @@ static int n1sdp_c2c_master_tx_command(uint8_t cmd)
 {
     int status;
 
+    (void)cmd_str;
     FWK_LOG_INFO("[C2C] %s in slave...", cmd_str[cmd]);
 
     n1sdp_c2c_ctx.master_tx_data[0] = cmd;
@@ -232,6 +237,7 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
         }
     }
 
+    (void)cmd_str;
     FWK_LOG_INFO("[C2C] %s in master...", cmd_str[cmd]);
 
     switch (cmd) {
