@@ -32,6 +32,18 @@
 
 #define MOD_NAME "[CMN600] "
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
+static const char *const mmap_type_name[] = {
+    [MOD_CMN600_MEMORY_REGION_TYPE_IO] = "I/O",
+    [MOD_CMN600_MEMORY_REGION_TYPE_SYSCACHE] = "System Cache",
+    [MOD_CMN600_REGION_TYPE_SYSCACHE_SUB] = "Sub-System Cache",
+    [MOD_CMN600_REGION_TYPE_CCIX] = "CCIX",
+    [MOD_CMN600_REGION_TYPE_SYSCACHE_NONHASH] = "System Cache Non-hash",
+};
+#else
+static const char *const mmap_type_name[] = { "" };
+#endif
+
 static inline size_t cmn600_hnf_cache_group_count(size_t hnf_count)
 {
     return (hnf_count + CMN600_HNF_CACHE_GROUP_ENTRIES_PER_GROUP - 1) /
@@ -367,14 +379,6 @@ static void cmn600_configure(void)
     }
 }
 
-static const char * const mmap_type_name[] = {
-    [MOD_CMN600_MEMORY_REGION_TYPE_IO] = "I/O",
-    [MOD_CMN600_MEMORY_REGION_TYPE_SYSCACHE] = "System Cache",
-    [MOD_CMN600_REGION_TYPE_SYSCACHE_SUB] = "Sub-System Cache",
-    [MOD_CMN600_REGION_TYPE_CCIX] = "CCIX",
-    [MOD_CMN600_REGION_TYPE_SYSCACHE_NONHASH] = "System Cache Non-hash",
-};
-
 int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
 {
     unsigned int region_idx;
@@ -407,6 +411,7 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
         } else
             base = region->base;
 
+        (void)mmap_type_name;
         FWK_LOG_INFO(
             MOD_NAME "  [0x%08" PRIX32 "%08" PRIX32
             " - 0x%08" PRIX32 "%08" PRIX32 "] %s",
@@ -804,6 +809,7 @@ int cmn600_start(fwk_id_t id)
 
     ctx->chip_id = chip_id;
 
+    (void)mc_mode;
     FWK_LOG_INFO(MOD_NAME "Multichip mode: %s", mc_mode ? "yes" : "no");
     FWK_LOG_INFO(MOD_NAME "Chip ID: %d", chip_id);
 
