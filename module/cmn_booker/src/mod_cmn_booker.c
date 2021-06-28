@@ -27,6 +27,16 @@
 
 #define MOD_NAME "[CMN_BOOKER] "
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
+static const char *const mmap_type_name[] = {
+    [MOD_CMN_BOOKER_MEM_REGION_TYPE_IO] = "I/O",
+    [MOD_CMN_BOOKER_MEM_REGION_TYPE_SYSCACHE] = "System Cache",
+    [MOD_CMN_BOOKER_REGION_TYPE_SYSCACHE_SUB] = "Sub-System Cache",
+};
+#else
+static const char *const mmap_type_name[] = { "" };
+#endif
+
 static struct cmn_booker_ctx *ctx;
 
 static void process_node_hnf(struct cmn_booker_hnf_reg *hnf)
@@ -289,12 +299,6 @@ static void cmn_booker_configure(void)
     }
 }
 
-static const char * const mmap_type_name[] = {
-    [MOD_CMN_BOOKER_MEM_REGION_TYPE_IO] = "I/O",
-    [MOD_CMN_BOOKER_MEM_REGION_TYPE_SYSCACHE] = "System Cache",
-    [MOD_CMN_BOOKER_REGION_TYPE_SYSCACHE_SUB] = "Sub-System Cache",
-};
-
 static int cmn_booker_setup_sam(struct cmn_booker_rnsam_reg *rnsam)
 {
     unsigned int bit_pos;
@@ -313,6 +317,7 @@ static int cmn_booker_setup_sam(struct cmn_booker_rnsam_reg *rnsam)
     for (region_idx = 0; region_idx < config->mmap_count; region_idx++) {
         region = &config->mmap_table[region_idx];
 
+        (void)mmap_type_name;
         FWK_LOG_INFO(
             MOD_NAME "  [0x%x%x - 0x%x%x] %s",
             HIGH_WORD(region->base), LOW_WORD(region->base),
