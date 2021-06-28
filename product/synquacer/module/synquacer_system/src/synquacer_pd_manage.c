@@ -257,12 +257,13 @@ static void sni_power_domain_on_mp(uint32_t dev_bitmap)
 
     /* waiting pmu-on */
     r = pmu_wait(pmu_bitmap, true);
-    if (r != 0)
+    if (r != 0) {
         FWK_LOG_ERR(
             "[PPU] sni-pmu timeout expected:(0x%08" PRIx32
             ") result: (0x%08" PRIx32 ").",
             pmu_bitmap,
             pmu_read_pd_power_status());
+    }
 
     /* adb400 reset clear */
     if ((dev_bitmap & DEV_BMAP_PCIE_BLK) != 0)
