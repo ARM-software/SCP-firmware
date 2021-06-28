@@ -149,6 +149,7 @@ static int morello_rom_process_event(
         morello_rom_ctx.rom_config->image_type, &entry, fip_base, fip_size);
     const char *image_type =
         get_image_type_str(morello_rom_ctx.rom_config->image_type);
+    (void)image_type;
 
     if (status != FWK_SUCCESS) {
         FWK_LOG_INFO(
