@@ -358,11 +358,12 @@ int synquacer_main(void)
             MOD_PD_STATE_ON,
             MOD_PD_STATE_ON));
 
-    if (status == FWK_SUCCESS)
+    if (status == FWK_SUCCESS) {
         FWK_LOG_INFO("[SYNQUACER SYSTEM] finished powering up AP");
-    else
+    } else {
         FWK_LOG_ERR(
             "[SYNQUACER SYSTEM] failed to power up AP. status=%d", status);
+    }
 
     return status;
 }

@@ -35,10 +35,12 @@ extern const struct mod_f_i2c_api *f_i2c_api;
 
 #define CONFIG_DDR_ERROR_FORCE_STOP
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
 static char *dimm_module_type[] = { "Extended DIMM", "RDIMM",    "UDIMM",
                                     "SO-DIMM",       "LRDIMM",   "Mini-RDIMM",
                                     "Mini-UDIMM",    "Reserved", "72b-SO-RDIMM",
                                     "72b-SO-UDIMM" };
+#endif
 
 typedef struct spd_ddr_info_s {
     uint8_t base_module_type;
@@ -338,12 +340,15 @@ bool fw_spd_ddr_info_get(spd_ddr_info_t *spd_ddr_info_p)
              (4 * (1 << sdram_width)) * logical_ranks_per_dimm)
             << 8;
         spd_ddr_info_p->slot_bitmap |= (1 << check_dimm_slot);
+
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
         FWK_LOG_INFO(
             "[SYSTEM] slot DIMM%d: %" PRIu32 "MB %s %s",
             check_dimm_slot,
             spd_ddr_info_p->sdram_slot_total[check_dimm_slot],
             dimm_module_type[spd_ddr_info_p->base_module_type],
             ((spd_ddr_info_p->ecc_available) ? "ECC" : "non-ECC"));
+#endif
 
         /* dq_map_control data make */
         for (i = 0; i < 5; i++) {
@@ -821,8 +826,9 @@ static void dram_init_for_ecc(void)
     for (dst_ddr_addr = DRAM_AREA_1_START_ADDR, dma_dst_addr = 0x80000000U;
          (dst_ddr_addr < DRAM_AREA_1_END_ADDR) && (dram_size != 0);
          dma_dst_addr += DMA330_ERASE_BLOCK_SIZE) {
-        if ((dst_ddr_addr & 0x3fffffffULL) == 0)
+        if ((dst_ddr_addr & 0x3fffffffULL) == 0) {
             FWK_LOG_INFO("[DDR] +");
+        }
 
         dma330_zero_clear(0xce000000U, dma_dst_addr);
         dst_ddr_addr += DMA330_ERASE_BLOCK_SIZE;
@@ -833,8 +839,9 @@ static void dram_init_for_ecc(void)
     for (dst_ddr_addr = DRAM_AREA_2_START_ADDR, dma_dst_addr = 0x80000000U;
          (dst_ddr_addr < DRAM_AREA_2_END_ADDR) && (dram_size != 0);
          dma_dst_addr += DMA330_ERASE_BLOCK_SIZE) {
-        if ((dst_ddr_addr & 0x3fffffffULL) == 0)
+        if ((dst_ddr_addr & 0x3fffffffULL) == 0) {
             FWK_LOG_INFO("[DDR] -");
+        }
 
         if ((dst_ddr_addr & 0x1fffffffULL) == 0) {
             dmab_mmu500_init(dst_ddr_addr);
@@ -850,8 +857,9 @@ static void dram_init_for_ecc(void)
     for (dst_ddr_addr = DRAM_AREA_3_START_ADDR, dma_dst_addr = 0x80000000U;
          (dst_ddr_addr < DRAM_AREA_3_END_ADDR) && (dram_size != 0);
          dma_dst_addr += DMA330_ERASE_BLOCK_SIZE) {
-        if ((dst_ddr_addr & 0x3fffffffULL) == 0)
+        if ((dst_ddr_addr & 0x3fffffffULL) == 0) {
             FWK_LOG_INFO("[DDR] x");
+        }
 
         if ((dst_ddr_addr & 0x1fffffffULL) == 0) {
             dmab_mmu500_init(dst_ddr_addr);
