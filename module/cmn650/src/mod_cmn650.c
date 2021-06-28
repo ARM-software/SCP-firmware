@@ -30,6 +30,17 @@
 
 #define MOD_NAME "[CMN650] "
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
+static const char *const mmap_type_name[] = {
+    [MOD_CMN650_MEM_REGION_TYPE_IO] = "I/O",
+    [MOD_CMN650_MEM_REGION_TYPE_SYSCACHE] = "System Cache",
+    [MOD_CMN650_REGION_TYPE_SYSCACHE_SUB] = "Sub-System Cache",
+    [MOD_CMN650_REGION_TYPE_CCIX] = "CCIX",
+};
+#else
+static const char *const mmap_type_name[] = { "" };
+#endif
+
 static struct cmn650_device_ctx *ctx;
 
 /* Chip Information */
@@ -419,13 +430,6 @@ static void cmn650_configure(void)
     }
 }
 
-static const char *const mmap_type_name[] = {
-    [MOD_CMN650_MEM_REGION_TYPE_IO] = "I/O",
-    [MOD_CMN650_MEM_REGION_TYPE_SYSCACHE] = "System Cache",
-    [MOD_CMN650_REGION_TYPE_SYSCACHE_SUB] = "Sub-System Cache",
-    [MOD_CMN650_REGION_TYPE_CCIX] = "CCIX",
-};
-
 static int cmn650_setup_sam(struct cmn650_rnsam_reg *rnsam)
 {
     unsigned int bit_pos;
@@ -445,6 +449,8 @@ static int cmn650_setup_sam(struct cmn650_rnsam_reg *rnsam)
     const struct mod_cmn650_config *config = ctx->config;
 
     FWK_LOG_INFO(MOD_NAME "Configuring SAM for node %d", get_node_id(rnsam));
+
+    (void)mmap_type_name;
 
     for (region_idx = 0; region_idx < config->mmap_count; region_idx++) {
         region = &config->mmap_table[region_idx];
