@@ -164,11 +164,10 @@ if(CMAKE_C_CPPCHECK)
     # cmake-format: off
 
     list(APPEND CMAKE_C_CPPCHECK "--quiet")
-    list(APPEND CMAKE_C_CPPCHECK "--suppressions-list=${CMAKE_CURRENT_SOURCE_DIR}/.cppcheck.txt")
+    list(APPEND CMAKE_C_CPPCHECK "--suppressions-list=${CMAKE_CURRENT_SOURCE_DIR}/tools/cppcheck_suppress_list.txt")
     list(APPEND CMAKE_C_CPPCHECK "--enable=all")
     list(APPEND CMAKE_C_CPPCHECK "--inconclusive")
     list(APPEND CMAKE_C_CPPCHECK "--inline-suppr")
-    list(APPEND CMAKE_C_CPPCHECK "--check-config")
 
     if(SCP_ARCHITECTURE STREQUAL "armv7-m")
         list(APPEND CMAKE_C_CPPCHECK "--library=${CMAKE_CURRENT_SOURCE_DIR}/.armv7m.cppcheck.cfg")
