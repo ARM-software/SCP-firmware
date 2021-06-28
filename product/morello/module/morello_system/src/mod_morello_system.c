@@ -297,6 +297,7 @@ static int morello_system_fill_platform_info(void)
     sds_platform_info.local_ddr_size = 8ULL * FWK_GIB;
 
     size = sds_platform_info.local_ddr_size + sds_platform_info.remote_ddr_size;
+    (void)size;
     FWK_LOG_INFO(
         "[MORELLO SYSTEM] Total DDR Size in Bytes: 0x%" PRIX32 "%08" PRIX32,
         (uint32_t)(size >> 32),
@@ -568,11 +569,13 @@ static int morello_system_start(fwk_id_t id)
             CS_CNTCONTROL->CS_CNTCR |= (1 << 0);
             CS_CNTCONTROL->CS_CNTCVLW = 0x00000000;
             CS_CNTCONTROL->CS_CNTCVUP = 0x0000FFFF;
-        } else
+        } else {
             FWK_LOG_INFO(
                 "[MORELLO SYSTEM] CSYS PWR UP REQ IRQ register failed");
-    } else
+        }
+    } else {
         FWK_LOG_INFO("[MORELLO SYSTEM] CDBG PWR UP REQ IRQ register failed");
+    }
 
     FWK_LOG_INFO("[MORELLO SYSTEM] Requesting SYSTOP initialization...");
 

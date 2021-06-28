@@ -413,6 +413,7 @@ static void cmn_skeena_configure(void)
     }
 }
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
 static const char *const mmap_type_name[] = {
     [MOD_CMN_SKEENA_MEMORY_REGION_TYPE_IO] = "I/O",
     [MOD_CMN_SKEENA_MEMORY_REGION_TYPE_SYSCACHE] = "System Cache",
@@ -420,6 +421,7 @@ static const char *const mmap_type_name[] = {
     [MOD_CMN_SKEENA_REGION_TYPE_CCIX] = "CCIX",
     [MOD_CMN_SKEENA_REGION_TYPE_SYSCACHE_NONHASH] = "System Cache Non-hash",
 };
+#endif
 
 int cmn_skeena_setup_sam(struct cmn_skeena_rnsam_reg *rnsam)
 {
@@ -460,6 +462,7 @@ int cmn_skeena_setup_sam(struct cmn_skeena_rnsam_reg *rnsam)
         } else
             base = region->base;
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
         FWK_LOG_INFO(
             MOD_NAME "  [0x%08" PRIX32 "%08" PRIX32 " - 0x%08" PRIX32
                      "%08" PRIX32 "] %s",
@@ -468,6 +471,7 @@ int cmn_skeena_setup_sam(struct cmn_skeena_rnsam_reg *rnsam)
             (uint32_t)((base + region->size - 1) >> 32),
             (uint32_t)(base + region->size - 1),
             mmap_type_name[region->type]);
+#endif
 
         switch (region->type) {
         case MOD_CMN_SKEENA_MEMORY_REGION_TYPE_IO:
@@ -917,6 +921,7 @@ int cmn_skeena_start(fwk_id_t id)
 
     ctx->chip_id = chip_id;
 
+    (void)mc_mode;
     FWK_LOG_INFO(MOD_NAME "Multichip mode: %s", mc_mode ? "yes" : "no");
     FWK_LOG_INFO(MOD_NAME "Chip ID: %d", chip_id);
 
