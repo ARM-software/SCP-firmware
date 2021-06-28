@@ -31,7 +31,7 @@ analyser identifies potential issues, the patch will be automatically rejected.
 
 To invoke `cppcheck` manually, use:
 
-\code
+``` bash
 cppcheck --xml \
          --enable=all \
          --force \
@@ -41,7 +41,7 @@ cppcheck --xml \
          -i cmsis \
          -U__CSMC__ \
          ${WORKDIR}
-\endcode
+```
 
 The CMSIS submodule is not checked. Errors are printed in XML format on the
 error output.
@@ -49,6 +49,26 @@ error output.
 Certain checks have been manually suppressed. Checks are generally only
 disabled if they have been triaged as false positives. The list of suppressed
 checks can be found [here](../tools/cppcheck_suppress_list.txt).
+
+## Static analysis using `cmake`
+
+When this project is build using `cmake`, `cppcheck` is performed automatically for the current build using the list of suppressed checks
+mentioned in the previous section.
+`cppcheck` can be run standalone with the current build configuration using
+the following commands:
+
+``` bash
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
+      -B ${BUILD_DIR} ... <cmake configuation extra parameters>
+
+cmake --build ${BUILD_DIR} -- -n
+
+cppcheck --xml \
+         --enable=all \
+         --force \
+         --suppressions-list="${WORKDIR}/tools/cppcheck_suppress_list.txt" \
+         --project="${BUILD_DIR}/compile_commands.json"
+```
 
 MISRAC-2012
 -----------
