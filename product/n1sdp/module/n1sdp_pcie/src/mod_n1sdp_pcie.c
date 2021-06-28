@@ -97,7 +97,11 @@ struct n1sdp_pcie_ctx {
 
 struct n1sdp_pcie_ctx pcie_ctx;
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
 static const char * const pcie_type[2] = {"PCIe", "CCIX"};
+#else
+static const char *const pcie_type[] = { "" };
+#endif
 
 /*
  * CCIX configuration API
@@ -359,6 +363,7 @@ static int n1sdp_pcie_link_training(fwk_id_t id, bool ep_mode)
 
     neg_config = (dev_ctx->ctrl_apb->RP_CONFIG_OUT &
         RP_CONFIG_OUT_NEGOTIATED_SPD_MASK) >> RP_CONFIG_OUT_NEGOTIATED_SPD_POS;
+    (void)neg_config;
     FWK_LOG_INFO(
         "[%s] Negotiated speed: GEN%d", pcie_type[did], neg_config + 1);
 
@@ -676,6 +681,14 @@ static int n1sdp_pcie_init(fwk_id_t module_id, unsigned int element_count,
         sizeof(pcie_ctx.device_ctx_table[0]));
 
     pcie_ctx.pcie_instance_count = element_count;
+
+    /*
+     * pcie_type is used only for logging purposes in this file. Depending on
+     * the chosen LOG_LEVEL at build time, the variable could be resolved as
+     * unused. We mark the variable as unused here to prevent the warning being
+     * raised in the above cases.
+     */
+    (void)pcie_type;
 
     return FWK_SUCCESS;
 }

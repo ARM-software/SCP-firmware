@@ -128,6 +128,7 @@ static void dimm_device_data(uint8_t *spd_data, uint8_t dimm_id)
             part_num[j++] = spd_data[i];
         }
 
+        (void)part_num;
         FWK_LOG_INFO("    Module part number = %s", part_num);
 
         FWK_LOG_INFO(

@@ -126,14 +126,20 @@ static int n1sdp_rom_process_event(const struct fwk_event *event,
         &entry,
         n1sdp_rom_ctx.rom_config->fip_base_address,
         n1sdp_rom_ctx.rom_config->fip_nvm_size);
+
     const char *image_type =
         get_image_type_str(n1sdp_rom_ctx.rom_config->image_type);
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
     if (status != FWK_SUCCESS) {
         FWK_LOG_INFO(
             "[ROM] Failed to locate %s_BL2, error: %d\n", image_type, status);
         return status;
     }
+#else
+    (void)status;
+    (void)image_type;
+#endif
 
     FWK_LOG_INFO("[ROM] Located %s_BL2:\n", image_type);
     FWK_LOG_INFO("[ROM]   address: %p\n", entry.base);
