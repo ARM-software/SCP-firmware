@@ -425,6 +425,9 @@ int cmn_skeena_setup_sam(struct cmn_skeena_rnsam_reg *rnsam)
 {
     unsigned int region_idx;
     unsigned int region_io_count = 0;
+    unsigned int node_id_io_count = 0;
+    bool region_io_set_1 = false;
+    bool node_id_io_set_1 = false;
     unsigned int region_sys_count = 0;
     const struct mod_cmn_skeena_memory_region_map *region;
     const struct mod_cmn_skeena_config *config = ctx->config;
@@ -472,8 +475,9 @@ int cmn_skeena_setup_sam(struct cmn_skeena_rnsam_reg *rnsam)
             /*
              * Configure memory region
              */
-            if (region_io_count >
-                CMN_SKEENA_RNSAM_MAX_NON_HASH_MEM_REGION_ENTRIES) {
+            if (region_io_set_1 &&
+                (region_io_count >
+                 (CMN_SKEENA_RNSAM_MAX_NON_HASH_MEM_REGION_ENTRIES / 2))) {
                 FWK_LOG_ERR(
                     MOD_NAME
                     "Non-Hashed Memory can have maximum of %d regions only",
@@ -490,29 +494,67 @@ int cmn_skeena_setup_sam(struct cmn_skeena_rnsam_reg *rnsam)
                 (region->type == MOD_CMN_SKEENA_MEMORY_REGION_TYPE_IO) ?
                 SAM_NODE_TYPE_HN_I :
                 SAM_NODE_TYPE_CXRA;
-            configure_region(
-                &rnsam->NON_HASH_MEM_REGION0[group],
-                bit_pos,
-                base,
-                region->size,
-                sam_node_type);
+            if (region_io_set_1) {
+                configure_region(
+                    &rnsam->NON_HASH_MEM_REGION1[group],
+                    bit_pos,
+                    base,
+                    region->size,
+                    sam_node_type);
+            } else {
+                configure_region(
+                    &rnsam->NON_HASH_MEM_REGION0[group],
+                    bit_pos,
+                    base,
+                    region->size,
+                    sam_node_type);
+            }
             /*
              * Configure target node
              */
-            group = region_io_count /
+            group = node_id_io_count /
                 CMN_SKEENA_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP;
             bit_pos = CMN_SKEENA_RNSAM_NON_HASH_TGT_NODEID_ENTRY_BITS_WIDTH *
-                (region_io_count %
+                (node_id_io_count %
                  CMN_SKEENA_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP);
 
-            rnsam->NON_HASH_TGT_NODEID0[group] &=
-                ~(CMN_SKEENA_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK << bit_pos);
-            rnsam->NON_HASH_TGT_NODEID0[group] |=
-                (region->node_id &
-                 CMN_SKEENA_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK)
-                << bit_pos;
+            if (node_id_io_set_1) {
+                rnsam->NON_HASH_TGT_NODEID1[group] &= ~(
+                    CMN_SKEENA_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK << bit_pos);
+                rnsam->NON_HASH_TGT_NODEID1[group] |=
+                    (region->node_id &
+                     CMN_SKEENA_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK)
+                    << bit_pos;
+            } else {
+                rnsam->NON_HASH_TGT_NODEID0[group] &= ~(
+                    CMN_SKEENA_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK << bit_pos);
+                rnsam->NON_HASH_TGT_NODEID0[group] |=
+                    (region->node_id &
+                     CMN_SKEENA_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK)
+                    << bit_pos;
+            }
 
+            /*
+             * NON_HASH_MEM_REGION and NON_HASH_TGT_NODEID registers are not
+             * contiguous in RN-SAM memory map. It is divided into two sets.
+             * NON_HASH_MEM_REGION registers are grouped as 5 registers in
+             * in 2 sets each that can hold 10 regions in each set. Similarly
+             * NON_HASH_TGT_NODEID is divided into 2 sets. First set containing
+             * 3 registers (holding 12 target IDs) and second set containing 2
+             * registers (holding 8 target IDs).
+             */
             region_io_count++;
+            if (region_io_count ==
+                (5 * CMN_SKEENA_RNSAM_REGION_ENTRIES_PER_GROUP)) {
+                region_io_count = 0;
+                region_io_set_1 = true;
+            }
+            node_id_io_count++;
+            if (node_id_io_count ==
+                (3 * CMN_SKEENA_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP)) {
+                node_id_io_count = 0;
+                node_id_io_set_1 = true;
+            }
             break;
 
         case MOD_CMN_SKEENA_MEMORY_REGION_TYPE_SYSCACHE:
