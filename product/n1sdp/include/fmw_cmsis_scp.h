@@ -286,7 +286,9 @@ typedef enum IRQn {
     CCIX_PWR_STATE_CHANGE_IRQ = 236, /* CCIX power state change interrupt */
     PCIE_AER_IRQ = 237, /* PCIe address enable interrupt */
     PCIE_LOCAL_INT_REST_IRQ = 238, /* PCIe local error & status interrupt */
-    PCIE_LOCAL_INT_RAS_IRQ = 239 /* PCIe local RAS interrupt */
+    PCIE_LOCAL_INT_RAS_IRQ = 239, /* PCIe local RAS interrupt */
+
+    IRQn_MAX = INT16_MAX,
 } IRQn_Type;
 
 #include <core_cm7.h>
