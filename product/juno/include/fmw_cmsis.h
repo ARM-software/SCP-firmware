@@ -158,6 +158,8 @@ typedef enum IRQn {
     SCP_EXT_INTR29_IRQ = 125, /* SCP Customer Extension */
     SCP_EXT_INTR30_IRQ = 126, /* SCP Customer Extension */
     SCP_EXT_INTR31_IRQ = 127, /* SCP Customer Extension */
+
+    IRQn_MAX = INT16_MAX,
 } IRQn_Type;
 
 #include <core_cm3.h>
