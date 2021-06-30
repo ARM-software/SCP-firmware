@@ -509,7 +509,7 @@ DEFINE_RENAME_SYSREG_RW_FUNCS(apiakeylo_el1, APIAKeyLo_EL1)
 
 static inline unsigned int get_current_el(void)
 {
-    return GET_EL(read_CurrentEl());
+    return (unsigned int)GET_EL(read_CurrentEl());
 }
 
 /*

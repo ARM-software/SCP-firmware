@@ -18,7 +18,7 @@ void *memset(void *s, int c, size_t count)
 {
     char *xs = s;
     while (count--)
-        *xs++ = c;
+        *xs++ = (char)c;
     return s;
 }
 
@@ -42,7 +42,7 @@ char *strncpy(char *dest, const char *src, size_t n)
     for (i = 0; i < n && src[i] != 0; i++)
         dest[i] = src[i];
     for (; i < n; i++)
-        dest[i] = 0;
+        dest[i] = '\0';
 
     return dest;
 }
@@ -109,7 +109,7 @@ static void int_to_str(int i, char *buf, int base)
 
 static int isdigit(char c)
 {
-    return (c >= '0' && c <= '9');
+    return (int)(c >= '0' && c <= '9');
 }
 
 static int handle_num(char type, char *buf, va_list *args)
@@ -178,8 +178,16 @@ int vsnprintf(char *str, size_t n, const char *format, va_list args)
                 not_implemented = 1;
                 break;
             }
-        case '1' ... '9':
-            min_length = (unsigned int)(*pos - '0');
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+            min_length = (int)(*pos - '0');
 
             if (handle_num(*(pos + 1), num_buf, &args)) {
                 if (*(pos - 1) == '0')
@@ -189,7 +197,7 @@ int vsnprintf(char *str, size_t n, const char *format, va_list args)
                 break;
             }
 
-            num_length = strlen(num_buf);
+            num_length = (int)strlen(num_buf);
 
             if (num_length < min_length) {
                 while (num_length >= 0)
@@ -247,7 +255,7 @@ int vsnprintf(char *str, size_t n, const char *format, va_list args)
         length--;
     }
 
-    return length;
+    return (int)length;
 }
 
 int snprintf(char *str, size_t size, const char *format, ...)

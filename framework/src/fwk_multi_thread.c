@@ -554,9 +554,10 @@ static void thread_function(struct __fwk_thread_ctx *thread_ctx,
     uint32_t flags;
     uint32_t signals;
 
-    signals = (thread_ctx == &ctx.common_thread_ctx) ?
-              (SIGNAL_EVENT_TO_PROCESS | SIGNAL_NO_READY_THREAD) :
-              SIGNAL_EVENT_TO_PROCESS;
+    signals = (uint32_t)(
+        (thread_ctx == &ctx.common_thread_ctx) ?
+            (SIGNAL_EVENT_TO_PROCESS | SIGNAL_NO_READY_THREAD) :
+            SIGNAL_EVENT_TO_PROCESS);
 
     for (;;) {
         /*
@@ -739,7 +740,7 @@ int __fwk_thread_init(size_t event_count)
     };
 
     fwk_interrupt_global_enable();
-    status = osKernelInitialize();
+    status = (int)osKernelInitialize();
     if (status != osOK) {
         status = FWK_E_OS;
         goto error;

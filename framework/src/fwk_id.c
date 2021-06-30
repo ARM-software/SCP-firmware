@@ -35,6 +35,8 @@ static void fwk_id_format(char *buffer, size_t buffer_size, fwk_id_t id)
 
     size_t length = 0;
 
+    enum __fwk_id_type com_id_type = (enum __fwk_id_type)id.common.type;
+
     unsigned int indices[] = { 0, 0, 0 };
 
     fwk_assert(buffer_size > 0);
@@ -51,7 +53,7 @@ static void fwk_id_format(char *buffer, size_t buffer_size, fwk_id_t id)
 
     indices[0] = id.common.module_idx;
 
-    switch ((enum __fwk_id_type)id.common.type) {
+    switch (com_id_type) {
     case __FWK_ID_TYPE_SUB_ELEMENT:
         indices[2] = id.sub_element.sub_element_idx;
 
@@ -88,7 +90,7 @@ static void fwk_id_format(char *buffer, size_t buffer_size, fwk_id_t id)
         types[id.common.type],
         indices[0]);
 
-    switch ((enum __fwk_id_type)id.common.type) {
+    switch (com_id_type) {
     case __FWK_ID_TYPE_ELEMENT:
     case __FWK_ID_TYPE_SUB_ELEMENT:
     case __FWK_ID_TYPE_API:
@@ -104,7 +106,7 @@ static void fwk_id_format(char *buffer, size_t buffer_size, fwk_id_t id)
         break;
     }
 
-    switch ((enum __fwk_id_type)id.common.type) {
+    switch (com_id_type) {
     case __FWK_ID_TYPE_SUB_ELEMENT:
         length +=
             snprintf(buffer + length, buffer_size - length, ":%u", indices[2]);

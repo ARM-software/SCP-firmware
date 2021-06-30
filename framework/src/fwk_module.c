@@ -186,7 +186,7 @@ static void fwk_module_init_elements(struct fwk_module_ctx *ctx)
     }
 
     for (size_t i = 0; i < ctx->element_count; i++) {
-        fwk_id_t element_id = fwk_id_build_element_id(ctx->id, i);
+        fwk_id_t element_id = fwk_id_build_element_id(ctx->id, (unsigned int)i);
 
         const struct fwk_element *element = ctx->element_ctx_table[i].desc;
 

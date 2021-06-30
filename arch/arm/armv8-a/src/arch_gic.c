@@ -274,7 +274,7 @@ static void gicd_set_ipriorityr(
     unsigned int id,
     unsigned int pri)
 {
-    uint8_t val = pri & GIC_PRI_MASK;
+    uint8_t val = (uint8_t)(pri & GIC_PRI_MASK);
 
     mmio_write_8(base + GICD_IPRIORITYR + id, val);
 }
@@ -343,11 +343,15 @@ void gic_cpuif_disable(void)
 void gic_init(void)
 {
     gicd_set_ipriorityr(
-        RCAR_GICD_BASE, VIRTUAL_TIMER_IRQ, GIC_HIGHEST_SEC_PRIORITY);
-    gicd_set_isenabler(RCAR_GICD_BASE, VIRTUAL_TIMER_IRQ);
+        RCAR_GICD_BASE,
+        (unsigned int)VIRTUAL_TIMER_IRQ,
+        GIC_HIGHEST_SEC_PRIORITY);
+    gicd_set_isenabler(RCAR_GICD_BASE, (unsigned int)VIRTUAL_TIMER_IRQ);
     gicd_set_ipriorityr(
-        RCAR_GICD_BASE, NS_PHYSICAL_TIMER_IRQ, GIC_HIGHEST_SEC_PRIORITY);
-    gicd_set_isenabler(RCAR_GICD_BASE, NS_PHYSICAL_TIMER_IRQ);
+        RCAR_GICD_BASE,
+        (unsigned int)NS_PHYSICAL_TIMER_IRQ,
+        GIC_HIGHEST_SEC_PRIORITY);
+    gicd_set_isenabler(RCAR_GICD_BASE, (unsigned int)NS_PHYSICAL_TIMER_IRQ);
     gic_cpuif_enable();
 }
 
@@ -404,7 +408,8 @@ static int is_pending(unsigned int interrupt, bool *pending)
 
     bit = interrupt % 32;
     *pending =
-        (gicd_read_ispendr(RCAR_GICD_BASE, interrupt) & (1 << bit)) ? 1 : 0;
+        ((gicd_read_ispendr(RCAR_GICD_BASE, interrupt) & (1 << bit)) ? true :
+                                                                       false);
 
     return FWK_SUCCESS;
 }
@@ -417,7 +422,7 @@ static int set_pending(unsigned int interrupt)
         return FWK_E_PARAM;
 
     bit = interrupt % 32;
-    gicd_write_ispendr(RCAR_GICD_BASE, interrupt, 1 << bit);
+    gicd_write_ispendr(RCAR_GICD_BASE, interrupt, 1U << bit);
 
     return FWK_SUCCESS;
 }
@@ -430,7 +435,7 @@ static int clear_pending(unsigned int interrupt)
         return FWK_E_PARAM;
 
     bit = interrupt % 32;
-    gicd_write_icpendr(RCAR_GICD_BASE, interrupt, 1 << bit);
+    gicd_write_icpendr(RCAR_GICD_BASE, interrupt, 1U << bit);
 
     return FWK_SUCCESS;
 }
