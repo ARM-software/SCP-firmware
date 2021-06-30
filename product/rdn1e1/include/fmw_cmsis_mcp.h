@@ -8,6 +8,7 @@
 #ifndef FMW_CMSIS_MCP_H
 #define FMW_CMSIS_MCP_H
 
+#include <stdint.h>
 
 #define __CHECK_DEVICE_DEFINES
 #define __CM7_REV 0x0000U
@@ -274,7 +275,9 @@ typedef enum IRQn {
     MCP_EXT_INTR28_IRQ = 236, /* MCP Customer Extension */
     MCP_EXT_INTR29_IRQ = 237, /* MCP Customer Extension */
     MCP_EXT_INTR30_IRQ = 238, /* MCP Customer Extension */
-    MCP_EXT_INTR31_IRQ = 239 /* MCP Customer Extension */
+    MCP_EXT_INTR31_IRQ = 239, /* MCP Customer Extension */
+
+    IRQn_MAX = INT16_MAX,
 } IRQn_Type;
 
 #include <core_cm7.h>
