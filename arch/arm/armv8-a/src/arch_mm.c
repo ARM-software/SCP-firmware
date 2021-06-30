@@ -53,7 +53,7 @@ void *_sbrk(intptr_t increment)
 #ifndef USE_NEWLIB
 void *malloc(size_t size)
 {
-    void *mem = _sbrk(size);
+    void *mem = _sbrk((intptr_t)size);
 
     if (mem == ((void *)-1))
         mem = NULL;
