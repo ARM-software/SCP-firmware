@@ -8,6 +8,7 @@
 #ifndef FMW_CMSIS_SCP_H
 #define FMW_CMSIS_SCP_H
 
+#include <stdint.h>
 
 #define __CHECK_DEVICE_DEFINES
 #define __CM7_REV 0x0000U
@@ -282,7 +283,9 @@ typedef enum IRQn {
     SCP_EXT_INTR28_IRQ = 236, /* SCP Customer Extension */
     SCP_EXT_INTR29_IRQ = 237, /* SCP Customer Extension */
     SCP_EXT_INTR30_IRQ = 238, /* SCP Customer Extension */
-    SCP_EXT_INTR31_IRQ = 239 /* SCP Customer Extension */
+    SCP_EXT_INTR31_IRQ = 239, /* SCP Customer Extension */
+
+    IRQn_MAX = INT16_MAX,
 } IRQn_Type;
 
 #include <core_cm7.h>
