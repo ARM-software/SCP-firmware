@@ -288,6 +288,8 @@ typedef enum IRQn {
     RESERVED237_IRQ = 237, /* Reserved */
     RESERVED238_IRQ = 238, /* Reserved */
     RESERVED239_IRQ = 239, /* Reserved */
+
+    IRQn_MAX = INT16_MAX,
 } IRQn_Type;
 
 #include <core_cm7.h>
