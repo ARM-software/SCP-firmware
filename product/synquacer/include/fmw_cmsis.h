@@ -105,6 +105,8 @@ typedef enum IRQn {
 
     NETSEC0_IRQn = 212, /*!< NETSEC0 INTA */
     NETSEC1_IRQn = 214, /*!< NETSEC1 INTA */
+
+    IRQn_MAX = INT16_MAX,
 } IRQn_Type;
 
 #include <core_cm3.h>
