@@ -79,7 +79,7 @@ static int reset_issued_notify(fwk_id_t dev_id,
     for (i = 0; i < module_reset_ctx.dev_count; i++) {
         reset_ctx = &module_reset_ctx.dev_ctx_table[i];
         if (fwk_id_is_equal(reset_ctx->config->driver_id, dev_id)) {
-            domain_id = i;
+            domain_id = (int)i;
             break;
         }
     }
@@ -87,7 +87,7 @@ static int reset_issued_notify(fwk_id_t dev_id,
     if (domain_id < 0)
         return FWK_E_PARAM;
 
-    params->domain_id = domain_id;
+    params->domain_id = (uint32_t)domain_id;
     params->reset_state = reset_state;
     params->cookie = cookie;
 
@@ -161,7 +161,10 @@ static int rd_process_bind_request(fwk_id_t source_id,
                                    fwk_id_t api_id,
                                    const void **api)
 {
-    switch (fwk_id_get_api_idx(api_id)) {
+    enum mod_reset_domain_api_type api_id_type =
+        (enum mod_reset_domain_api_type)fwk_id_get_api_idx(api_id);
+
+    switch (api_id_type) {
     case MOD_RESET_DOMAIN_API_TYPE_HAL:
         *api = &reset_api;
         break;
@@ -175,9 +178,9 @@ static int rd_process_bind_request(fwk_id_t source_id,
 
 const struct fwk_module module_reset_domain = {
     .type = FWK_MODULE_TYPE_HAL,
-    .api_count = MOD_RESET_DOMAIN_API_COUNT,
-    .notification_count = MOD_RESET_DOMAIN_NOTIFICATION_IDX_COUNT,
-    .event_count = MOD_RESET_DOMAIN_EVENT_IDX_COUNT,
+    .api_count = (unsigned int)MOD_RESET_DOMAIN_API_COUNT,
+    .notification_count = (unsigned int)MOD_RESET_DOMAIN_NOTIFICATION_IDX_COUNT,
+    .event_count = (unsigned int)MOD_RESET_DOMAIN_EVENT_IDX_COUNT,
     .init = rd_init,
     .element_init = rd_element_init,
     .bind = rd_bind,

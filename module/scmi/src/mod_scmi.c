@@ -175,14 +175,14 @@ static const unsigned int base_payload_size_table[] = {
     [MOD_SCMI_PROTOCOL_VERSION] = 0,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
-        sizeof(struct scmi_protocol_message_attributes_a2p),
+        (unsigned int)sizeof(struct scmi_protocol_message_attributes_a2p),
     [MOD_SCMI_BASE_DISCOVER_VENDOR] = 0,
     [MOD_SCMI_BASE_DISCOVER_SUB_VENDOR] = 0,
     [MOD_SCMI_BASE_DISCOVER_IMPLEMENTATION_VERSION] = 0,
     [MOD_SCMI_BASE_DISCOVER_LIST_PROTOCOLS] =
-        sizeof(struct scmi_base_discover_list_protocols_a2p),
+        (unsigned int)sizeof(struct scmi_base_discover_list_protocols_a2p),
     [MOD_SCMI_BASE_DISCOVER_AGENT] =
-        sizeof(struct scmi_base_discover_agent_a2p),
+        (unsigned int)sizeof(struct scmi_base_discover_agent_a2p),
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     [MOD_SCMI_BASE_SET_DEVICE_PERMISSIONS] =
         sizeof(struct scmi_base_set_device_permissions_a2p),
@@ -779,7 +779,7 @@ static int scmi_base_protocol_attributes_handler(fwk_id_t service_id,
         .status = (int32_t)SCMI_SUCCESS,
     };
 
-    return_values.attributes = SCMI_BASE_PROTOCOL_ATTRIBUTES(
+    return_values.attributes = (uint32_t)SCMI_BASE_PROTOCOL_ATTRIBUTES(
         protocol_count, scmi_ctx.config->agent_count);
 
     respond(service_id, &return_values, sizeof(return_values));
@@ -1040,7 +1040,7 @@ static int scmi_base_discover_list_protocols_handler(fwk_id_t service_id,
     }
 
     return_values.status = (int32_t)SCMI_SUCCESS;
-    return_values.num_protocols = avail_protocol_count;
+    return_values.num_protocols = (uint32_t)avail_protocol_count;
 
     status = write_payload(service_id, 0,
                            &return_values, sizeof(return_values));
@@ -1577,10 +1577,13 @@ static int scmi_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
 {
     unsigned int api_idx;
     struct scmi_service_ctx *ctx;
+    enum mod_scmi_api_idx api_id_type;
 
     api_idx = fwk_id_get_api_idx(api_id);
 
-    switch ((enum mod_scmi_api_idx)api_idx) {
+    api_id_type = (enum mod_scmi_api_idx)api_idx;
+
+    switch (api_id_type) {
     case MOD_SCMI_API_IDX_PROTOCOL:
         if (!fwk_id_is_type(target_id, FWK_ID_TYPE_MODULE)) {
             return FWK_E_SUPPORT;

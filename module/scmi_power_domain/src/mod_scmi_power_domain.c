@@ -168,11 +168,13 @@ static unsigned int payload_size_table[] = {
     [MOD_SCMI_PROTOCOL_VERSION] = 0,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
-        sizeof(struct scmi_protocol_message_attributes_a2p),
+        (unsigned int)sizeof(struct scmi_protocol_message_attributes_a2p),
     [MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES] =
-        sizeof(struct scmi_pd_power_domain_attributes_a2p),
-    [MOD_SCMI_PD_POWER_STATE_SET] = sizeof(struct scmi_pd_power_state_set_a2p),
-    [MOD_SCMI_PD_POWER_STATE_GET] = sizeof(struct scmi_pd_power_state_get_a2p),
+        (unsigned int)sizeof(struct scmi_pd_power_domain_attributes_a2p),
+    [MOD_SCMI_PD_POWER_STATE_SET] =
+        (unsigned int)sizeof(struct scmi_pd_power_state_set_a2p),
+    [MOD_SCMI_PD_POWER_STATE_GET] =
+        (unsigned int)sizeof(struct scmi_pd_power_state_get_a2p),
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     [MOD_SCMI_PD_POWER_STATE_NOTIFY] =
@@ -920,7 +922,10 @@ static unsigned int get_pd_domain_id(
     const struct scmi_pd_power_state_set_a2p *params_set;
     const struct scmi_pd_power_state_get_a2p *params_get;
 
-    switch ((enum scmi_pd_command_id)message_id) {
+    enum scmi_pd_command_id message_id_type =
+        (enum scmi_pd_command_id)message_id;
+
+    switch (message_id_type) {
     case MOD_SCMI_PD_POWER_STATE_SET:
         params_set = (const struct scmi_pd_power_state_set_a2p *)payload;
         return params_set->domain_id;

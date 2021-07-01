@@ -67,9 +67,9 @@ static const unsigned int payload_size_table[] = {
     [MOD_SCMI_PROTOCOL_VERSION] = 0,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
-        sizeof(struct scmi_protocol_message_attributes_a2p),
+        (unsigned int)sizeof(struct scmi_protocol_message_attributes_a2p),
     [MOD_SCMI_APCORE_RESET_ADDRESS_SET] =
-        sizeof(struct scmi_apcore_reset_address_set_a2p),
+        (unsigned int)sizeof(struct scmi_apcore_reset_address_set_a2p),
     [MOD_SCMI_APCORE_RESET_ADDRESS_GET] = 0,
 };
 

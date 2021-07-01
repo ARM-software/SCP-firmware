@@ -173,7 +173,7 @@ static struct mod_dvfs_domain_ctx *get_domain_ctx(fwk_id_t domain_id)
     }
 }
 
-static int count_opps(const struct mod_dvfs_opp *opps)
+static size_t count_opps(const struct mod_dvfs_opp *opps)
 {
     const struct mod_dvfs_opp *opp = &opps[0];
 
@@ -181,7 +181,7 @@ static int count_opps(const struct mod_dvfs_opp *opps)
         opp++;
     }
 
-    return opp - &opps[0];
+    return (size_t)(opp - &opps[0]);
 }
 
 static const struct mod_dvfs_opp *get_opp_for_level(
@@ -1164,7 +1164,7 @@ static int dvfs_element_init(
     fwk_assert(ctx->config->opps != NULL);
 
     /* Initialize the context */
-    ctx->opp_count = (size_t)count_opps(ctx->config->opps);
+    ctx->opp_count = count_opps(ctx->config->opps);
     fwk_assert(ctx->opp_count > 0);
 
     return FWK_SUCCESS;

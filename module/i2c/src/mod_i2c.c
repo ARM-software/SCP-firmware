@@ -313,8 +313,10 @@ static int process_request(struct mod_i2c_dev_ctx *ctx, fwk_id_t event_id)
     int drv_status = FWK_E_PARAM;
     const struct mod_i2c_driver_api *driver_api = ctx->driver_api;
     fwk_id_t driver_id = ctx->config->driver_id;
+    enum mod_i2c_event_idx event_id_type =
+        (enum mod_i2c_event_idx)fwk_id_get_event_idx(event_id);
 
-    switch ((enum mod_i2c_event_idx)fwk_id_get_event_idx(event_id)) {
+    switch (event_id_type) {
     case MOD_I2C_EVENT_IDX_REQUEST_TRANSMIT:
         ctx->state = MOD_I2C_DEV_TX;
         drv_status = driver_api->transmit_as_master(driver_id, &ctx->request);
@@ -418,6 +420,8 @@ static int mod_i2c_process_event(const struct fwk_event *event,
     struct mod_i2c_request *request;
     struct mod_i2c_event_param *event_param, *resp_param;
 
+    enum mod_i2c_internal_event_idx event_id_type;
+
     dev_id = event->target_id;
     get_ctx(dev_id, &ctx);
 
@@ -454,7 +458,10 @@ static int mod_i2c_process_event(const struct fwk_event *event,
         return FWK_SUCCESS;
     }
 
-    switch ((enum mod_i2c_internal_event_idx)fwk_id_get_event_idx(event->id)) {
+    event_id_type =
+        (enum mod_i2c_internal_event_idx)fwk_id_get_event_idx(event->id);
+
+    switch (event_id_type) {
     case MOD_I2C_EVENT_IDX_REQUEST_COMPLETED:
         event_param = (struct mod_i2c_event_param *)event->params;
 

@@ -102,15 +102,19 @@ static unsigned int payload_size_table[] = {
     [MOD_SCMI_PROTOCOL_VERSION] = 0,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
-        sizeof(struct scmi_protocol_message_attributes_a2p),
+        (unsigned int)sizeof(struct scmi_protocol_message_attributes_a2p),
     [MOD_SCMI_PERF_DOMAIN_ATTRIBUTES] =
-        sizeof(struct scmi_perf_domain_attributes_a2p),
+        (unsigned int)sizeof(struct scmi_perf_domain_attributes_a2p),
     [MOD_SCMI_PERF_DESCRIBE_LEVELS] =
-        sizeof(struct scmi_perf_describe_levels_a2p),
-    [MOD_SCMI_PERF_LEVEL_SET] = sizeof(struct scmi_perf_level_set_a2p),
-    [MOD_SCMI_PERF_LEVEL_GET] = sizeof(struct scmi_perf_level_get_a2p),
-    [MOD_SCMI_PERF_LIMITS_SET] = sizeof(struct scmi_perf_limits_set_a2p),
-    [MOD_SCMI_PERF_LIMITS_GET] = sizeof(struct scmi_perf_limits_get_a2p),
+        (unsigned int)sizeof(struct scmi_perf_describe_levels_a2p),
+    [MOD_SCMI_PERF_LEVEL_SET] =
+        (unsigned int)sizeof(struct scmi_perf_level_set_a2p),
+    [MOD_SCMI_PERF_LEVEL_GET] =
+        (unsigned int)sizeof(struct scmi_perf_level_get_a2p),
+    [MOD_SCMI_PERF_LIMITS_SET] =
+        (unsigned int)sizeof(struct scmi_perf_limits_set_a2p),
+    [MOD_SCMI_PERF_LIMITS_GET] =
+        (unsigned int)sizeof(struct scmi_perf_limits_get_a2p),
 #ifdef BUILD_HAS_FAST_CHANNELS
     [MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL] =
         sizeof(struct scmi_perf_describe_fc_a2p),
@@ -742,11 +746,12 @@ static int scmi_perf_describe_levels_handler(fwk_id_t service_id,
     }
 
     /* Identify the maximum number of performance levels we can send at once */
-    num_levels =
-        (SCMI_PERF_LEVELS_MAX(max_payload_size) <
-            (opp_count - level_index)) ?
-        SCMI_PERF_LEVELS_MAX(max_payload_size) :
-            (opp_count - level_index);
+    if (SCMI_PERF_LEVELS_MAX(max_payload_size) < (opp_count - level_index)) {
+        num_levels = (unsigned int)SCMI_PERF_LEVELS_MAX(max_payload_size);
+    } else {
+        num_levels = (unsigned int)(opp_count - level_index);
+    }
+
     level_index_max = (level_index + num_levels - 1);
 
     status = scmi_perf_ctx.dvfs_api->get_latency(domain_id, &latency);
@@ -888,7 +893,7 @@ static int scmi_perf_limits_get_handler(fwk_id_t service_id,
     domain_id = get_dependency_id(parameters->domain_id);
     domain_ctx = get_ctx(domain_id);
 
-    return_values.status = SCMI_SUCCESS;
+    return_values.status = (int32_t)SCMI_SUCCESS;
     return_values.range_min = domain_ctx->level_limits.minimum;
     return_values.range_max = domain_ctx->level_limits.maximum;
 
@@ -1626,7 +1631,7 @@ static int scmi_perf_init(fwk_id_t module_id, unsigned int element_count,
         config->perf_doms_count, sizeof(struct scmi_perf_domain_ctx));
 
     scmi_perf_ctx.config = config;
-    scmi_perf_ctx.domain_count = config->perf_doms_count;
+    scmi_perf_ctx.domain_count = (uint32_t)config->perf_doms_count;
 #ifdef BUILD_HAS_FAST_CHANNELS
     scmi_perf_ctx.fast_channels_alarm_id = config->fast_channels_alarm_id;
     if (config->fast_channels_rate_limit < SCMI_PERF_FC_MIN_RATE_LIMIT) {
@@ -1745,7 +1750,10 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
 static int scmi_perf_process_bind_request(fwk_id_t source_id,
     fwk_id_t target_id, fwk_id_t api_id, const void **api)
 {
-    switch ((enum scmi_perf_api_idx)fwk_id_get_api_idx(api_id)) {
+    enum scmi_perf_api_idx api_id_type =
+        (enum scmi_perf_api_idx)fwk_id_get_api_idx(api_id);
+
+    switch (api_id_type) {
     case MOD_SCMI_PERF_PROTOCOL_API:
         *api = &scmi_perf_mod_scmi_to_protocol_api;
         break;

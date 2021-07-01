@@ -398,13 +398,17 @@ static int sensor_process_event(const struct fwk_event *event,
     struct mod_sensor_event_params *resp_params =
         (struct mod_sensor_event_params *)(read_req_event.params);
 
+    enum mod_sensor_event_idx event_id_type;
+
     if (!fwk_module_is_valid_element_id(event->target_id)) {
         return FWK_E_PARAM;
     }
 
     ctx = ctx_table + fwk_id_get_element_idx(event->target_id);
 
-    switch ((enum mod_sensor_event_idx)fwk_id_get_event_idx(event->id)) {
+    event_id_type = (enum mod_sensor_event_idx)fwk_id_get_event_idx(event->id);
+
+    switch (event_id_type) {
     case SENSOR_EVENT_IDX_READ_REQUEST:
         ctx->cookie = event->cookie;
         resp_event->is_delayed_response = true;

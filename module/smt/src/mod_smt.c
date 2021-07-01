@@ -216,7 +216,7 @@ static int smt_respond(fwk_id_t channel_id, const void *payload, size_t size)
 
     channel_ctx->locked = false;
 
-    memory->length = sizeof(memory->message_header) + size;
+    memory->length = (volatile uint32_t)(sizeof(memory->message_header) + size);
     memory->status |= MOD_SMT_MAILBOX_STATUS_FREE_MASK;
 
     fwk_interrupt_global_enable();
@@ -265,7 +265,7 @@ static int smt_transmit(fwk_id_t channel_id, uint32_t message_header,
     /* Copy the payload */
     memcpy(memory->payload, payload, size);
 
-    memory->length = sizeof(memory->message_header) + size;
+    memory->length = (volatile uint32_t)(sizeof(memory->message_header) + size);
     memory->status &= ~MOD_SMT_MAILBOX_STATUS_FREE_MASK;
 
     /* Notify the agent */
@@ -504,6 +504,8 @@ static int smt_process_bind_request(fwk_id_t source_id,
 {
     struct smt_channel_ctx *channel_ctx;
 
+    enum mod_smt_api_idx api_id_type;
+
     /* Only bind to a channel (not the whole module) */
     if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT)) {
         /* Tried to bind to something other than a specific channel */
@@ -514,7 +516,9 @@ static int smt_process_bind_request(fwk_id_t source_id,
     channel_ctx =
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(target_id)];
 
-    switch ((enum mod_smt_api_idx)fwk_id_get_api_idx(api_id)) {
+    api_id_type = (enum mod_smt_api_idx)fwk_id_get_api_idx(api_id);
+
+    switch (api_id_type) {
     case MOD_SMT_API_IDX_DRIVER_INPUT:
         /* Driver input API */
 
