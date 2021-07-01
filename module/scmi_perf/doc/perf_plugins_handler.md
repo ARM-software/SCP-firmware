@@ -153,6 +153,49 @@ values at every tick (SCMI FastChannels) and it can modify the limits if it
 wishes to affect the original request coming from the SCMI interface. It is
 optional for the plugin to update the values.
 
+It is also possible for a plugin to receive a full snapshot of the performance
+level and limits for all the performance domains. This can be chosen in the
+module configuration. In this case, a plugin will be called once at every
+tick period.
+
+Possible configurations & data received:
+
+    +----------------------+------------------------------------------------+
+    | config->dom_type     | data received                                  |
+    | (plugin_domain_type) | (perf_plugins_perf_update)                     |
+    +----------------------+------------------------------------------------+
+    | _TYPE_PHYSICAL       | Single physical domain.                        |
+    |                      | A plugin gets a call for each physical domain  |
+    |                      | every tick period.                             |
+    |                      |                                                |
+    |                      | Example, 3 physical domains:                   |
+    |                      | A plugin which implements the `update` function|
+    |                      | will be called 3 times (at every tick period): |
+    |                      | 1st call with data for domain 0                |
+    |                      | 2nd call with data for domain 1                |
+    |                      | 3rd call with data for domain 2                |
+    +----------------------+------------------------------------------------+
+    | _TYPE_LOGICAL        | Array of logical domains (within same physical)|
+    |                      | A plugin gets a call for each set of logical   |
+    |                      | domains every tick period.                     |
+    |                      |                                                |
+    |                      | Example, 1 physical domain with 3 logical      |
+    |                      | domains:                                       |
+    |                      | A plugin which implements the `update` function|
+    |                      | will be called 1 time (at every tick period):  |
+    |                      | 1st call with data array for logical domains 0,|
+    +----------------------+------------------------------------------------+
+    | _TYPE_FULL           | Array of physical domains                      |
+    |                      | A plugin gets called once for all the physical |
+    |                      | domains every tick period.                     |
+    |                      |                                                |
+    |                      | Example, 3 physical domains:                   |
+    |                      | A plugin which implements the `update` function|
+    |                      | will be called once (at every tick period):    |
+    |                      | 1st call with data array for domain 0, 1 and 2 |
+    +----------------------+------------------------------------------------+
+
+
 ## Use
 
 Each plugin is expected to implement the update() function as specified in the
@@ -168,6 +211,12 @@ SCP_ENABLE_PLUGIN_HANDLER_INIT (CMake).
 implemented (and enabled).
 - This entire mechanism for adding/removing plugins is not supported with the
 traditional SCMI SMT/doorbell transport.
+- The order in which the plugins are listed in the plugins table (module's
+configuration )is the order in which they will be called by the plugins handler.
+However, plugins whose view is _TYPE_FULL should be placed as last entries in
+the table of plugins in the module's configuration. This is to ensure that all
+the other plugins have run before a consolidated full picture of the
+level/limits can be shared with the remaining plugins.
 
 ## Configuration Example 1 (plugin with physical/DVFS domains view)
 
@@ -282,3 +331,48 @@ required.
             .plugins_count = FWK_ARRAY_SIZE(plugins_table)
         }),
     };
+
+## Configuration Example 5 (3 plugins with different domain view)
+
+    static const struct mod_scmi_perf_domain_config domains[] = {
+        [DVFS_DOMAIN_0] = {
+            .fast_channels_addr_scp = (uint64_t[]) { ... },
+            .fast_channels_addr_ap = (uint64_t[]) { ... },
+        },
+        ...
+        [DVFS_DOMAIN_n] = { ... },
+    };
+
+    static const struct mod_scmi_plugin_config plugins_table[] = {
+        [0] = {
+            .id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_<PLUGIN0>),
+            .dom_type = PERF_PLUGIN_DOM_TYPE_<PHYSICAL/LOGICAL>,
+        },
+        [1] = {
+            .id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_<PLUGIN1>),
+            .dom_type = PERF_PLUGIN_DOM_TYPE_<PHYSICAL/LOGICAL>,
+        },
+        /*
+         * This plugin id needs to be placed as last entry because its view is
+         * _TYPE_FULL (see restrictions section).
+         */
+        [2] = {
+            .id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_<PLUGIN2>),
+            .dom_type = PERF_PLUGIN_DOM_TYPE_FULL,
+        },
+    };
+
+    struct fwk_module_config config_scmi_perf = {
+        .data = &((struct mod_scmi_perf_config){
+            ...
+            .plugins = plugins_table,
+            .plugins_count = FWK_ARRAY_SIZE(plugins_table)
+        }),
+    };
+
+NOTE: In this example no.5 the order of plugin callbacks is the following:
+- plugin 0 with physical/logical domain 0
+- plugin 1 with physical/logical domain 0
+- plugin 0 with physical/logical domain n
+- plugin 1 with physical/logical domain n
+- plugin 2 with physical/logical all domains

@@ -60,7 +60,52 @@ struct fc_perf_update {
     uint32_t adj_min_limit;
 };
 
-void perf_plugins_handler_update(struct fc_perf_update *freq_update);
+/*!
+ * \brief FastChannel mirror
+ *
+ * \details Fastchannels addresses in memory are not necessarily contiguous,
+ *      thus copy them into a temporary area for easy handling. Also for the
+ *      purpose of managing performance requests, get_ are not required.
+ */
+struct fast_channels_mirror {
+    uint32_t level;
+    struct mod_scmi_perf_fast_channel_limit limits;
+};
+
+/*!
+ * \brief Performance Plugins Handler Update
+ *
+ * \details Call the update logic for the Plugins Handler. This logic will take
+ *      care of the aggregation of values for all the domains and all the
+ *      plugins.
+ *
+ * \param perf_dom_idx Performance domain index
+ * \param fc_update FastChannel data. The Plugins Handler expects to receive the
+ *      latest FastChannels values for the above particular performance domain
+ *      and runst its internal logic of storing and aggregating. This is an
+ *      input to the Plugins Handler.
+ */
+void perf_plugins_handler_update(
+    unsigned int perf_dom_idx,
+    struct fc_perf_update *fc_update);
+
+/*!
+ * \brief Performance Plugins Handler Get
+ *
+ * \details Get the performance update for a performance domain. For a given
+ *      domain, the final aggregated values are provided in the fc_perf_update
+ *      container. It is meant to be called after all the updates have run.
+ *
+ * \param perf_dom_idx Performance domain index
+ * \param fc_update FastChannel data. The Plugins Handler expects to receive
+ *      the latest FastChannels values for the above particular performance
+ *      domain and runst its internal logic of storing and aggregating. This is
+ *      an input and an output to/from the Plugins Handler.
+ */
+void perf_plugins_handler_get(
+    unsigned int perf_dom_idx,
+    struct fc_perf_update *fc_update);
+
 void perf_plugins_handler_report(struct perf_plugins_perf_report *data);
 
 fwk_id_t perf_plugins_get_dependency_id(unsigned int dom_idx);

@@ -277,6 +277,22 @@ static inline struct scmi_perf_domain_ctx *get_ctx(fwk_id_t domain_id)
     return &scmi_perf_ctx.domain_ctx_table[fwk_id_get_element_idx(domain_id)];
 }
 
+#ifdef BUILD_HAS_FAST_CHANNELS
+static inline struct mod_scmi_perf_fast_channel_limit *get_fc_set_limit_addr(
+    const struct mod_scmi_perf_domain_config *domain)
+{
+    return (struct mod_scmi_perf_fast_channel_limit
+                *)((uintptr_t)domain->fast_channels_addr_scp
+                       [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET]);
+}
+static inline uint32_t *get_fc_set_level_addr(
+    const struct mod_scmi_perf_domain_config *domain)
+{
+    return (uint32_t *)((uintptr_t)domain->fast_channels_addr_scp
+                            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET]);
+}
+#endif
+
 static inline int opp_for_level_found(
     uint32_t *level,
     struct opp_table *opp_table,
@@ -1298,15 +1314,14 @@ static void fast_channel_callback(uintptr_t param)
     unsigned int i;
     int status;
 
+#    ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+    struct fc_perf_update update;
+
     for (i = 0; i < scmi_perf_ctx.domain_count; i++) {
         domain = &(*scmi_perf_ctx.config->domains)[i];
         if (domain->fast_channels_addr_scp != NULL) {
-            set_limit = (struct mod_scmi_perf_fast_channel_limit
-                             *)((uintptr_t)domain->fast_channels_addr_scp
-                                    [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET]);
-            set_level =
-                (uint32_t *)((uintptr_t)domain->fast_channels_addr_scp
-                                 [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET]);
+            set_limit = get_fc_set_limit_addr(domain);
+            set_level = get_fc_set_level_addr(domain);
 
             domain_ctx = &scmi_perf_ctx.domain_ctx_table[i];
 
@@ -1320,15 +1335,43 @@ static void fast_channel_callback(uintptr_t param)
 
             tlevel = (set_level != NULL) ? *set_level : domain_ctx->curr_level;
 
-#    ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
-            struct fc_perf_update update = {
+            update = (struct fc_perf_update){
                 .domain_id = get_dependency_id(i),
                 .level = tlevel,
                 .max_limit = tmax,
                 .min_limit = tmin,
             };
 
-            perf_plugins_handler_update(&update);
+            perf_plugins_handler_update(i, &update);
+        }
+    }
+
+    for (i = 0; i < scmi_perf_ctx.domain_count; i++) {
+        domain = &(*scmi_perf_ctx.config->domains)[i];
+        if (domain->fast_channels_addr_scp != NULL) {
+            set_limit = get_fc_set_limit_addr(domain);
+            set_level = get_fc_set_level_addr(domain);
+
+            domain_ctx = &scmi_perf_ctx.domain_ctx_table[i];
+
+            if (set_limit != NULL) {
+                tmax = set_limit->range_max;
+                tmin = set_limit->range_min;
+            } else {
+                tmax = domain_ctx->level_limits.maximum;
+                tmin = domain_ctx->level_limits.minimum;
+            }
+
+            tlevel = (set_level != NULL) ? *set_level : domain_ctx->curr_level;
+
+            update = (struct fc_perf_update){
+                .domain_id = get_dependency_id(i),
+                .level = tlevel,
+                .max_limit = tmax,
+                .min_limit = tmin,
+            };
+
+            perf_plugins_handler_get(i, &update);
 
             tlevel = update.level;
             tmax = update.adj_max_limit;
@@ -1347,7 +1390,26 @@ static void fast_channel_callback(uintptr_t param)
             if (status != FWK_SUCCESS) {
                 FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
             }
+
 #    else
+
+    for (i = 0; i < scmi_perf_ctx.domain_count; i++) {
+        domain = &(*scmi_perf_ctx.config->domains)[i];
+        if (domain->fast_channels_addr_scp != NULL) {
+            set_limit = get_fc_set_limit_addr(domain);
+            set_level = get_fc_set_level_addr(domain);
+
+            domain_ctx = &scmi_perf_ctx.domain_ctx_table[i];
+
+            if (set_limit != NULL) {
+                tmax = set_limit->range_max;
+                tmin = set_limit->range_min;
+            } else {
+                tmax = domain_ctx->level_limits.maximum;
+                tmin = domain_ctx->level_limits.minimum;
+            }
+
+            tlevel = (set_level != NULL) ? *set_level : domain_ctx->curr_level;
 
             /*
              * Check for set_level
@@ -1373,6 +1435,7 @@ static void fast_channel_callback(uintptr_t param)
                     FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
                 }
             }
+
 #    endif
         }
     }
