@@ -206,7 +206,7 @@ static int mod_res_message_id_to_index(
 
     if ((protocol_id >= MOD_SCMI_PLATFORM_PROTOCOL_ID_MIN) &&
         (protocol_id <= MOD_SCMI_PLATFORM_PROTOCOL_ID_MAX))
-        return mod_res_message_id_to_index(
+        return mod_res_plat_message_id_to_index(
             protocol_id, message_id, message_idx);
 
     if (message_id < 3)
