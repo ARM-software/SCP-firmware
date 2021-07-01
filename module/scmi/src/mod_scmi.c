@@ -1184,7 +1184,7 @@ static int scmi_base_set_device_permissions(
         goto exit;
     }
 
-    if (parameters->flags & ~MOD_RES_PERMS_PERMISSIONS_MASK) {
+    if (parameters->flags & ~(uint32_t)MOD_RES_PERMS_PERMISSIONS_MASK) {
         return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         status = FWK_E_PARAM;
         goto exit;
@@ -1243,7 +1243,7 @@ static int scmi_base_set_protocol_permissions(
         goto exit;
     }
 
-    if (parameters->flags & ~MOD_RES_PERMS_PERMISSIONS_MASK) {
+    if (parameters->flags & ~(uint32_t)MOD_RES_PERMS_PERMISSIONS_MASK) {
         status = FWK_E_PARAM;
         return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         goto exit;
@@ -1309,7 +1309,7 @@ static int scmi_base_reset_agent_config(
         goto exit;
     }
 
-    if (parameters->flags & ~MOD_RES_PERMS_PERMISSIONS_MASK) {
+    if (parameters->flags & ~(uint32_t)MOD_RES_PERMS_PERMISSIONS_MASK) {
         return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         goto exit;
     }

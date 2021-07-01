@@ -26,16 +26,16 @@
 typedef uint16_t mod_res_perms_t;
 
 #define MOD_RES_PERMS_TYPE_BITS (sizeof(mod_res_perms_t) * CHAR_BIT)
-#define MOD_RES_PERMS_TYPE_SHIFT (4)
-#define MOD_RES_PERMS_TYPE_MASK ((1 << MOD_RES_PERMS_TYPE_SHIFT) - 1)
+#define MOD_RES_PERMS_TYPE_SHIFT (4U)
+#define MOD_RES_PERMS_TYPE_MASK  ((1U << MOD_RES_PERMS_TYPE_SHIFT) - 1U)
 
 /*! Find the array element for the resource */
 #define MOD_RES_PERMS_RESOURCE_ELEMENT(resource_id) \
-    (resource_id >> MOD_RES_PERMS_TYPE_SHIFT)
+    (uint32_t)(resource_id >> MOD_RES_PERMS_TYPE_SHIFT)
 
 /*! Find the bit in the array element for the resource */
 #define MOD_RES_PERMS_RESOURCE_BIT(resource_id) \
-    (resource_id & MOD_RES_PERMS_TYPE_MASK)
+    (uint32_t)(resource_id & MOD_RES_PERMS_TYPE_MASK)
 
 /*!
  * \brief Bits to set to deny Protocol permissions. Note that the default

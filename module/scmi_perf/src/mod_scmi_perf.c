@@ -378,7 +378,7 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
     status = scmi_perf_permissions_handler(
         service_id, payload, (unsigned int)MOD_SCMI_PERF_LEVEL_SET);
     if (status == FWK_SUCCESS) {
-        permissions |= MOD_SCMI_PERF_PERMS_SET_LEVEL;
+        permissions |= (uint32_t)MOD_SCMI_PERF_PERMS_SET_LEVEL;
     }
 #endif
 
