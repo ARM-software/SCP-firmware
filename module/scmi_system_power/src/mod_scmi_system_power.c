@@ -84,9 +84,9 @@ static const unsigned int payload_size_table[] = {
     [MOD_SCMI_PROTOCOL_VERSION] = 0,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
-        sizeof(struct scmi_protocol_message_attributes_a2p),
+        (unsigned int)sizeof(struct scmi_protocol_message_attributes_a2p),
     [MOD_SCMI_SYS_POWER_STATE_SET] =
-        sizeof(struct scmi_sys_power_state_set_a2p),
+        (unsigned int)sizeof(struct scmi_sys_power_state_set_a2p),
     [MOD_SCMI_SYS_POWER_STATE_GET] = 0,
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     [MOD_SCMI_SYS_POWER_STATE_NOTIFY] =
@@ -104,6 +104,7 @@ static int system_state_get(enum scmi_system_state *system_state)
 {
     int status;
     unsigned int state;
+    enum mod_pd_state state_type;
 
     status = scmi_sys_power_ctx.pd_api->get_state(
         scmi_sys_power_ctx.system_power_domain_id, &state);
@@ -111,7 +112,9 @@ static int system_state_get(enum scmi_system_state *system_state)
         return status;
     }
 
-    switch ((enum mod_pd_state)state) {
+    state_type = (enum mod_pd_state)state;
+
+    switch (state_type) {
     case MOD_PD_STATE_OFF:
         *system_state = SCMI_SYSTEM_STATE_SHUTDOWN;
         break;
@@ -276,6 +279,7 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
     enum mod_pd_system_shutdown system_shutdown;
     uint32_t scmi_system_state;
     enum mod_scmi_sys_power_policy_status policy_status;
+    enum scmi_system_state sys_state_type;
 
     parameters = (const struct scmi_sys_power_state_set_a2p *)payload;
 
@@ -320,7 +324,10 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
         return_values.status = (int32_t)SCMI_SUCCESS;
         goto exit;
     }
-    switch ((enum scmi_system_state)scmi_system_state) {
+
+    sys_state_type = (enum scmi_system_state)scmi_system_state;
+
+    switch (sys_state_type) {
     case SCMI_SYSTEM_STATE_SHUTDOWN:
     case SCMI_SYSTEM_STATE_COLD_RESET:
     case SCMI_SYSTEM_STATE_WARM_RESET:

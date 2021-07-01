@@ -144,13 +144,17 @@ static const unsigned int payload_size_table[] = {
     [MOD_SCMI_PROTOCOL_VERSION] = 0,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
-        sizeof(struct scmi_protocol_message_attributes_a2p),
-    [MOD_SCMI_CLOCK_ATTRIBUTES] = sizeof(struct scmi_clock_attributes_a2p),
-    [MOD_SCMI_CLOCK_RATE_GET] = sizeof(struct scmi_clock_rate_get_a2p),
-    [MOD_SCMI_CLOCK_RATE_SET] = sizeof(struct scmi_clock_rate_set_a2p),
-    [MOD_SCMI_CLOCK_CONFIG_SET] = sizeof(struct scmi_clock_config_set_a2p),
+        (unsigned int)sizeof(struct scmi_protocol_message_attributes_a2p),
+    [MOD_SCMI_CLOCK_ATTRIBUTES] =
+        (unsigned int)sizeof(struct scmi_clock_attributes_a2p),
+    [MOD_SCMI_CLOCK_RATE_GET] =
+        (unsigned int)sizeof(struct scmi_clock_rate_get_a2p),
+    [MOD_SCMI_CLOCK_RATE_SET] =
+        (unsigned int)sizeof(struct scmi_clock_rate_set_a2p),
+    [MOD_SCMI_CLOCK_CONFIG_SET] =
+        (unsigned int)sizeof(struct scmi_clock_config_set_a2p),
     [MOD_SCMI_CLOCK_DESCRIBE_RATES] =
-        sizeof(struct scmi_clock_describe_rates_a2p),
+        (unsigned int)sizeof(struct scmi_clock_describe_rates_a2p),
 };
 
 /*
@@ -1155,7 +1159,7 @@ static int scmi_clock_describe_rates_handler(fwk_id_t service_id,
 
     parameters = (const struct scmi_clock_describe_rates_a2p*)payload;
     index = parameters->rate_index;
-    payload_size = sizeof(return_values);
+    payload_size = (uint32_t)sizeof(return_values);
 
     status = get_clock_device_entry(service_id,
                                     parameters->clock_id,
@@ -1224,8 +1228,8 @@ static int scmi_clock_describe_rates_handler(fwk_id_t service_id,
             );
 
         /* Set each rate entry in the payload to the associated frequency */
-        for (i = 0; i < rate_count; i++,
-                payload_size += sizeof(struct scmi_clock_rate)) {
+        for (i = 0; i < rate_count;
+             i++, payload_size += (uint32_t)sizeof(struct scmi_clock_rate)) {
             status = scmi_clock_ctx.clock_api->get_rate_from_index(
                 clock_device->element_id,
                 index + i,
@@ -1273,7 +1277,7 @@ static int scmi_clock_describe_rates_handler(fwk_id_t service_id,
         if (status != FWK_SUCCESS) {
             goto exit;
         }
-        payload_size += sizeof(clock_range);
+        payload_size += (uint32_t)sizeof(clock_range);
     }
 
     return_values.status = (int32_t)SCMI_SUCCESS;
@@ -1435,12 +1439,15 @@ static int process_request_event(const struct fwk_event *event)
     struct event_set_rate_request_data set_rate_data;
     struct event_set_state_request_data set_state_data;
     fwk_id_t service_id;
+    enum scmi_clock_event_idx event_id_type;
 
     params = (struct event_request_params *)event->params;
     clock_dev_idx = fwk_id_get_element_idx(params->clock_dev_id);
     service_id = clock_ops_get_service(clock_dev_idx);
 
-    switch ((enum scmi_clock_event_idx)fwk_id_get_event_idx(event->id)) {
+    event_id_type = (enum scmi_clock_event_idx)fwk_id_get_event_idx(event->id);
+
+    switch (event_id_type) {
     case SCMI_CLOCK_EVENT_IDX_GET_STATE:
         status = scmi_clock_ctx.clock_api->get_state(params->clock_dev_id,
                                                      &clock_state);
@@ -1515,6 +1522,7 @@ static int process_response_event(const struct fwk_event *event)
     fwk_id_t service_id;
     enum mod_clock_state clock_state;
     uint64_t rate;
+    enum mod_clock_event_idx event_id_type;
 
     clock_dev_idx = fwk_id_get_element_idx(event->source_id);
     service_id = clock_ops_get_service(clock_dev_idx);
@@ -1522,7 +1530,10 @@ static int process_response_event(const struct fwk_event *event)
     if (params->status != FWK_SUCCESS) {
         request_response(params->status, service_id);
     } else {
-        switch ((enum mod_clock_event_idx)fwk_id_get_event_idx(event->id)) {
+        event_id_type =
+            (enum mod_clock_event_idx)fwk_id_get_event_idx(event->id);
+
+        switch (event_id_type) {
         case MOD_CLOCK_EVENT_IDX_GET_STATE_REQUEST:
             clock_state = params->value.state;
 

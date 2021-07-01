@@ -321,7 +321,9 @@ static bool is_valid_state(const struct pd_ctx *pd, unsigned int state)
 
 static unsigned int normalize_state(unsigned int state)
 {
-    switch ((enum mod_pd_state)state) {
+    enum mod_pd_state state_type = (enum mod_pd_state)state;
+
+    switch (state_type) {
     case MOD_PD_STATE_OFF:
         return (MOD_PD_STATE_COUNT_MAX + 1);
 
@@ -433,7 +435,7 @@ static int get_highest_level_from_composite_state(
         level = (pd->composite_state_levels_mask & composite_state) >> shift;
     } else {
         state_mask_table = pd->composite_state_mask_table;
-        table_size = pd->composite_state_mask_table_size;
+        table_size = (unsigned int)pd->composite_state_mask_table_size;
 
         for (level = 0; ((level < table_size) && (pd != NULL));
              level++, pd = pd->parent) {
@@ -469,7 +471,7 @@ static bool is_valid_composite_state(struct pd_ctx *target_pd,
         pd, composite_state);
 
     state_mask_table = pd->composite_state_mask_table;
-    table_size = pd->composite_state_mask_table_size;
+    table_size = (unsigned int)pd->composite_state_mask_table_size;
 
     if (highest_level >= table_size) {
         goto error;
@@ -1928,7 +1930,10 @@ static int pd_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
     struct pd_ctx *pd;
     unsigned int id_idx;
 
-    switch ((enum mod_pd_api_idx)fwk_id_get_api_idx(api_id)) {
+    enum mod_pd_api_idx api_id_type =
+        (enum mod_pd_api_idx)fwk_id_get_api_idx(api_id);
+
+    switch (api_id_type) {
     case MOD_PD_API_IDX_PUBLIC:
         if (!fwk_id_is_type(target_id, FWK_ID_TYPE_MODULE)) {
             return FWK_E_ACCESS;

@@ -365,11 +365,15 @@ static int mod_psu_process_bind_request(
     fwk_id_t api_id,
     const void **api)
 {
+    enum mod_psu_api_idx event_id_type;
+
     if (!fwk_id_is_type(target_id, FWK_ID_TYPE_ELEMENT)) {
         return FWK_E_PARAM;
     }
 
-    switch ((enum mod_psu_api_idx)fwk_id_get_api_idx(api_id)) {
+    event_id_type = (enum mod_psu_api_idx)fwk_id_get_api_idx(api_id);
+
+    switch (event_id_type) {
     case MOD_PSU_API_IDX_DEVICE:
         *api = &mod_psu_device_api;
 
@@ -394,6 +398,8 @@ static int mod_psu_process_event(
     int status = FWK_SUCCESS;
 
     struct fwk_event hal_event;
+
+    enum mod_psu_event_idx hal_event_id_type;
 
     const struct mod_psu_driver_response *params =
         (struct mod_psu_driver_response *)event->params;
@@ -437,7 +443,10 @@ static int mod_psu_process_event(
             .status = params->status,
         };
 
-        switch ((enum mod_psu_event_idx)fwk_id_get_event_idx(hal_event.id)) {
+        hal_event_id_type =
+            (enum mod_psu_event_idx)fwk_id_get_event_idx(hal_event.id);
+
+        switch (hal_event_id_type) {
         case MOD_PSU_EVENT_IDX_GET_ENABLED:
             hal_params->enabled = params->enabled;
 

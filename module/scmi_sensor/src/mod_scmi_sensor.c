@@ -118,9 +118,9 @@ static unsigned int payload_size_table[] = {
     [MOD_SCMI_PROTOCOL_VERSION] = 0,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
-        sizeof(struct scmi_protocol_message_attributes_a2p),
+        (unsigned int)sizeof(struct scmi_protocol_message_attributes_a2p),
     [MOD_SCMI_SENSOR_DESCRIPTION_GET] =
-        sizeof(struct scmi_sensor_protocol_description_get_a2p),
+        (unsigned int)sizeof(struct scmi_sensor_protocol_description_get_a2p),
 #ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
     [MOD_SCMI_SENSOR_TRIP_POINT_NOTIFY] =
         sizeof(struct scmi_sensor_trip_point_notify_a2p),
@@ -128,7 +128,7 @@ static unsigned int payload_size_table[] = {
         sizeof(struct scmi_sensor_trip_point_config_a2p),
 #endif
     [MOD_SCMI_SENSOR_READING_GET] =
-        sizeof(struct scmi_sensor_protocol_reading_get_a2p),
+        (unsigned int)sizeof(struct scmi_sensor_protocol_reading_get_a2p),
 };
 
 /*
@@ -258,7 +258,8 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    num_descs = FWK_MIN(SCMI_SENSOR_DESCS_MAX(max_payload_size),
+    num_descs = (unsigned int)FWK_MIN(
+        SCMI_SENSOR_DESCS_MAX(max_payload_size),
         (scmi_sensor_ctx.sensor_count - desc_index));
     desc_index_max = (desc_index + num_descs - 1);
 
@@ -846,7 +847,10 @@ static int scmi_sensor_process_bind_request(fwk_id_t source_id,
                                             fwk_id_t api_id,
                                             const void **api)
 {
-    switch ((enum scmi_sensor_api_idx)fwk_id_get_api_idx(api_id)) {
+    enum scmi_sensor_api_idx api_id_type =
+        (enum scmi_sensor_api_idx)fwk_id_get_api_idx(api_id);
+
+    switch (api_id_type) {
     case SCMI_SENSOR_API_IDX_REQUEST:
         if (!fwk_id_is_equal(source_id, FWK_ID_MODULE(FWK_MODULE_IDX_SCMI))) {
             return FWK_E_ACCESS;

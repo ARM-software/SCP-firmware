@@ -96,10 +96,11 @@ static unsigned int payload_size_table[] = {
     [MOD_SCMI_PROTOCOL_VERSION] = 0,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
-         sizeof(struct scmi_protocol_message_attributes_a2p),
+        (unsigned int)sizeof(struct scmi_protocol_message_attributes_a2p),
     [MOD_SCMI_RESET_DOMAIN_ATTRIBUTES] =
-         sizeof(struct scmi_reset_domain_attributes_a2p),
-    [MOD_SCMI_RESET_REQUEST] = sizeof(struct scmi_reset_domain_request_a2p),
+        (unsigned int)sizeof(struct scmi_reset_domain_attributes_a2p),
+    [MOD_SCMI_RESET_REQUEST] =
+        (unsigned int)sizeof(struct scmi_reset_domain_request_a2p),
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     [MOD_SCMI_RESET_NOTIFY] = sizeof(struct scmi_reset_domain_notify_a2p),
 #endif
@@ -113,7 +114,7 @@ static int protocol_version_handler(fwk_id_t service_id,
                                     const uint32_t *payload)
 {
     struct scmi_protocol_version_p2a outmsg = {
-        .status = SCMI_SUCCESS,
+        .status = (int32_t)SCMI_SUCCESS,
         .version = SCMI_PROTOCOL_VERSION_RESET_DOMAIN,
     };
 
@@ -126,7 +127,7 @@ static int protocol_attributes_handler(fwk_id_t service_id,
                                        const uint32_t *payload)
 {
     struct scmi_reset_domain_protocol_attributes_p2a outmsg = {
-        .status = SCMI_SUCCESS,
+        .status = (int32_t)SCMI_SUCCESS,
     };
     int status = 0;
     unsigned int agent_id = 0;
@@ -150,7 +151,7 @@ static int protocol_message_attributes_handler(fwk_id_t service_id,
                                                const uint32_t *payload)
 {
     struct scmi_protocol_message_attributes_p2a outmsg = {
-        .status = SCMI_NOT_FOUND,
+        .status = (int32_t)SCMI_NOT_FOUND,
     };
     size_t outmsg_size = sizeof(outmsg.status);
     struct scmi_protocol_message_attributes_a2p params = { 0 };
@@ -159,7 +160,7 @@ static int protocol_message_attributes_handler(fwk_id_t service_id,
 
     if ((params.message_id < FWK_ARRAY_SIZE(msg_handler_table)) &&
         (msg_handler_table[params.message_id] != NULL)) {
-        outmsg.status = SCMI_SUCCESS;
+        outmsg.status = (int32_t)SCMI_SUCCESS;
         outmsg_size = sizeof(outmsg);
     }
 
@@ -251,7 +252,7 @@ static int reset_attributes_handler(fwk_id_t service_id,
     struct mod_reset_domain_dev_config *reset_dev_config = NULL;
     struct scmi_reset_domain_attributes_a2p params = { 0 };
     struct scmi_reset_domain_attributes_p2a outmsg = {
-        .status = SCMI_GENERIC_ERROR,
+        .status = (int32_t)SCMI_GENERIC_ERROR,
     };
     size_t outmsg_size = sizeof(outmsg.status);
     int status = FWK_SUCCESS;
@@ -260,7 +261,7 @@ static int reset_attributes_handler(fwk_id_t service_id,
 
     status = get_reset_device(service_id, params.domain_id, &reset_device);
     if (status != FWK_SUCCESS) {
-        outmsg.status = SCMI_NOT_FOUND;
+        outmsg.status = (int32_t)SCMI_NOT_FOUND;
         goto exit;
     }
 
@@ -269,10 +270,10 @@ static int reset_attributes_handler(fwk_id_t service_id,
     /*
      * Currently: no support for async reset.
      */
-    outmsg.flags &= ~SCMI_RESET_DOMAIN_ATTR_ASYNC;
+    outmsg.flags &= (uint32_t)~SCMI_RESET_DOMAIN_ATTR_ASYNC;
 
     if (reset_dev_config->capabilities & MOD_RESET_DOMAIN_CAP_NOTIFICATION)
-        outmsg.flags |= SCMI_RESET_DOMAIN_ATTR_NOTIF;
+        outmsg.flags |= (uint32_t)SCMI_RESET_DOMAIN_ATTR_NOTIF;
 
     outmsg.latency = reset_dev_config->latency;
 
@@ -281,7 +282,7 @@ static int reset_attributes_handler(fwk_id_t service_id,
         fwk_module_get_element_name(reset_device->element_id),
         sizeof(outmsg.name) - 1);
 
-    outmsg.status = SCMI_SUCCESS;
+    outmsg.status = (int32_t)SCMI_SUCCESS;
     outmsg_size = sizeof(outmsg);
 
 exit:
@@ -298,7 +299,7 @@ static int reset_request_handler(fwk_id_t service_id,
     struct mod_reset_domain_dev_config *reset_dev_config;
     struct scmi_reset_domain_request_a2p params = { 0 };
     struct scmi_reset_domain_request_p2a outmsg = {
-        .status = SCMI_NOT_FOUND
+        .status = (int32_t)SCMI_NOT_FOUND
     };
     enum mod_reset_domain_mode mode = MOD_RESET_DOMAIN_MODE_EXPLICIT_DEASSERT;
 
@@ -312,7 +313,7 @@ static int reset_request_handler(fwk_id_t service_id,
 
     if ((params.flags & ~SCMI_RESET_DOMAIN_FLAGS_MASK) != 0) {
         status = FWK_SUCCESS;
-        outmsg.status = SCMI_INVALID_PARAMETERS;
+        outmsg.status = (int32_t)SCMI_INVALID_PARAMETERS;
         goto exit;
     }
 
@@ -323,7 +324,7 @@ static int reset_request_handler(fwk_id_t service_id,
     if (((params.reset_state & SCMI_RESET_DOMAIN_RESET_STATE_TYPE_MASK) == 0) &&
         ((params.reset_state & SCMI_RESET_DOMAIN_RESET_STATE_ID_MASK) != 0)) {
         status = FWK_SUCCESS;
-        outmsg.status = SCMI_INVALID_PARAMETERS;
+        outmsg.status = (int32_t)SCMI_INVALID_PARAMETERS;
         goto exit;
     }
 
@@ -357,15 +358,14 @@ static int reset_request_handler(fwk_id_t service_id,
         if (!(reset_dev_config->modes &
             (MOD_RESET_DOMAIN_MODE_EXPLICIT_ASSERT |
             MOD_RESET_DOMAIN_MODE_EXPLICIT_DEASSERT))) {
-
-            outmsg.status = SCMI_NOT_SUPPORTED;
+            outmsg.status = (int32_t)SCMI_NOT_SUPPORTED;
             goto exit;
         } else {
            if (params.flags & SCMI_RESET_DOMAIN_EXPLICIT)
                mode = MOD_RESET_DOMAIN_MODE_EXPLICIT_ASSERT;
         }
     } else {
-        mode = SCMI_RESET_DOMAIN_AUTO;
+        mode = (enum mod_reset_domain_mode)SCMI_RESET_DOMAIN_AUTO;
     }
 
     /* Handle async reset request. */
@@ -373,7 +373,7 @@ static int reset_request_handler(fwk_id_t service_id,
         /* Async reset request is valid only in auto reset mode
          */
         if (!(params.flags & SCMI_RESET_DOMAIN_AUTO)) {
-            outmsg.status = SCMI_INVALID_PARAMETERS;
+            outmsg.status = (int32_t)SCMI_INVALID_PARAMETERS;
             goto exit;
         }
 
@@ -382,8 +382,7 @@ static int reset_request_handler(fwk_id_t service_id,
          */
         if (!(reset_dev_config->modes &
             MOD_RESET_DOMAIN_MODE_AUTO_RESET_ASYNC)) {
-
-            outmsg.status = SCMI_NOT_SUPPORTED;
+            outmsg.status = (int32_t)SCMI_NOT_SUPPORTED;
             goto exit;
         } else {
             mode |= MOD_RESET_DOMAIN_MODE_AUTO_RESET_ASYNC;
@@ -395,26 +394,26 @@ static int reset_request_handler(fwk_id_t service_id,
         &mode, &reset_state, agent_id, params.domain_id);
 
     if (status != FWK_SUCCESS) {
-        outmsg.status = SCMI_GENERIC_ERROR;
+        outmsg.status = (int32_t)SCMI_GENERIC_ERROR;
         goto exit;
     }
     if (policy_status == MOD_SCMI_RESET_DOMAIN_SKIP_MESSAGE_HANDLER) {
-        outmsg.status = SCMI_SUCCESS;
+        outmsg.status = (int32_t)SCMI_SUCCESS;
         goto exit;
     }
 
-    outmsg.status = SCMI_NOT_SUPPORTED;
+    outmsg.status = (int32_t)SCMI_NOT_SUPPORTED;
     status = reset_api->set_reset_state(reset_device->element_id,
                                         mode,
                                         reset_state,
                                         (uintptr_t)agent_id);
     if (status != FWK_SUCCESS) {
         if (status == FWK_E_STATE)
-            outmsg.status = SCMI_HARDWARE_ERROR;
+            outmsg.status = (int32_t)SCMI_HARDWARE_ERROR;
         goto exit;
     }
 
-    outmsg.status = SCMI_SUCCESS;
+    outmsg.status = (int32_t)SCMI_SUCCESS;
     outmsg_size = sizeof(outmsg);
 
 exit:
@@ -571,12 +570,12 @@ static int scmi_reset_message_handler(fwk_id_t protocol_id,
     fwk_assert(payload != NULL);
 
     if (message_id >= FWK_ARRAY_SIZE(msg_handler_table)) {
-        return_value = SCMI_NOT_FOUND;
+        return_value = (int32_t)SCMI_NOT_FOUND;
         goto error;
     }
 
     if (payload_size != payload_size_table[message_id]) {
-        return_value = SCMI_PROTOCOL_ERROR;
+        return_value = (int32_t)SCMI_PROTOCOL_ERROR;
         goto error;
     }
 
@@ -638,6 +637,7 @@ static int scmi_reset_init_notifications(void)
 static int scmi_reset_bind(fwk_id_t id, unsigned int round)
 {
     int status;
+    int rst_dom_count;
 
     if (round == 1)
         return FWK_SUCCESS;
@@ -658,10 +658,14 @@ static int scmi_reset_bind(fwk_id_t id, unsigned int round)
         return status;
 #endif
 
-    scmi_rd_ctx.plat_reset_domain_count = fwk_module_get_element_count(
+    rst_dom_count = fwk_module_get_element_count(
         FWK_ID_MODULE(FWK_MODULE_IDX_RESET_DOMAIN));
-    if (scmi_rd_ctx.plat_reset_domain_count == 0)
+
+    if (rst_dom_count <= 0) {
         return FWK_E_SUPPORT;
+    } else {
+        scmi_rd_ctx.plat_reset_domain_count = (uint8_t)rst_dom_count;
+    }
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     status = fwk_module_bind(
@@ -681,7 +685,7 @@ static int scmi_reset_process_bind_request(fwk_id_t source_id,
                                            fwk_id_t target_id,
                                            fwk_id_t api_id, const void **api)
 {
-    switch (fwk_id_get_api_idx(api_id)) {
+    switch ((enum scmi_reset_domain_api_idx)fwk_id_get_api_idx(api_id)) {
     case MOD_SCMI_RESET_DOMAIN_PROTOCOL_API:
         *api = &scmi_reset_mod_scmi_to_protocol_api;
         break;
@@ -733,7 +737,7 @@ static int scmi_reset_start(fwk_id_t id)
 
 /* SCMI Reset Domain Management Protocol Definition */
 const struct fwk_module module_scmi_reset_domain = {
-    .api_count = MOD_SCMI_RESET_DOMAIN_API_COUNT,
+    .api_count = (unsigned int)MOD_SCMI_RESET_DOMAIN_API_COUNT,
     .type = FWK_MODULE_TYPE_PROTOCOL,
     .init = scmi_reset_init,
     .bind = scmi_reset_bind,

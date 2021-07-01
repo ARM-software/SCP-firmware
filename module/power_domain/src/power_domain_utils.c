@@ -139,7 +139,8 @@ const struct fwk_element *create_power_domain_element_table(
         static_table_size * sizeof(struct fwk_element));
 
     /* Calculate SYSTOP index */
-    systop_idx = core_count + cluster_count + static_table_size - 1;
+    systop_idx =
+        (unsigned int)(core_count + cluster_count + static_table_size - 1);
 
     /* Set Power Domain Parent for all SYSTOP children */
     for (element_idx = core_count; element_idx < systop_idx; element_idx++) {

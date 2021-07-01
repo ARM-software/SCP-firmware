@@ -272,7 +272,8 @@ static int struct_alloc(const struct mod_sds_structure_desc *struct_desc)
     fwk_assert(config != NULL);
     fwk_assert(region_idx < config->region_count);
 
-    padded_size = FWK_ALIGN_NEXT(struct_desc->size, MIN_STRUCT_ALIGNMENT);
+    padded_size =
+        (unsigned int)FWK_ALIGN_NEXT(struct_desc->size, MIN_STRUCT_ALIGNMENT);
 
     region_desc = (volatile struct region_descriptor *)(
         config->regions[region_idx].base);
@@ -345,7 +346,7 @@ static int reinitialize_memory_region(
         return FWK_E_DATA;
     }
 
-    mem_used = sizeof(struct region_descriptor);
+    mem_used = (uint32_t)sizeof(struct region_descriptor);
     for (struct_idx = 0; struct_idx < region_desc->structure_count;
         struct_idx++) {
         header = (volatile struct structure_header *)(
@@ -356,7 +357,7 @@ static int reinitialize_memory_region(
         }
 
         mem_used += header->size;
-        mem_used += sizeof(struct structure_header);
+        mem_used += (uint32_t)sizeof(struct structure_header);
         if (mem_used > region_desc->region_size) {
             return FWK_E_SIZE;
         }
@@ -374,7 +375,7 @@ static int reinitialize_memory_region(
      *     image;
      *   - region_desc->region_size is the old size from the ROM image;
      */
-    region_desc->region_size = region_config->size;
+    region_desc->region_size = (uint32_t)region_config->size;
     ctx.regions[region_idx].free_mem_size = region_config->size - mem_used;
     ctx.regions[region_idx].free_mem_base =
         (volatile char *)region_config->base + mem_used;
@@ -399,7 +400,7 @@ static int create_memory_region(const struct mod_sds_region_desc* region_config,
     region_desc->structure_count = 0;
     region_desc->version_major = SUPPORTED_VERSION_MAJOR;
     region_desc->version_minor = SUPPORTED_VERSION_MINOR;
-    region_desc->region_size = region_config->size;
+    region_desc->region_size = (uint32_t)region_config->size;
 
     ctx.regions[region_idx].free_mem_size = region_config->size
         - sizeof(struct region_descriptor);
