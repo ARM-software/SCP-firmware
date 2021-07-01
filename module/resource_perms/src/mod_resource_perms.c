@@ -231,7 +231,8 @@ static int mod_res_message_id_to_index(
         }
         if ((message_id >= MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_PD_POWER_STATE_NOTIFY)) {
-            *message_idx = message_id - MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES;
+            *message_idx =
+                message_id - (uint32_t)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES;
         }
         return FWK_SUCCESS;
 
@@ -241,7 +242,7 @@ static int mod_res_message_id_to_index(
         }
         if ((message_id >= MOD_SCMI_SYS_POWER_STATE_SET) &&
             (message_id <= MOD_SCMI_SYS_POWER_STATE_NOTIFY)) {
-            *message_idx = message_id - MOD_SCMI_SYS_POWER_STATE_SET;
+            *message_idx = message_id - (uint32_t)MOD_SCMI_SYS_POWER_STATE_SET;
         }
         return FWK_SUCCESS;
 
@@ -251,7 +252,8 @@ static int mod_res_message_id_to_index(
         }
         if ((message_id >= MOD_SCMI_PERF_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL)) {
-            *message_idx = message_id - MOD_SCMI_PERF_DOMAIN_ATTRIBUTES;
+            *message_idx =
+                message_id - (uint32_t)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES;
         }
         return FWK_SUCCESS;
 
@@ -261,7 +263,7 @@ static int mod_res_message_id_to_index(
         }
         if ((message_id >= MOD_SCMI_CLOCK_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_CLOCK_CONFIG_SET)) {
-            *message_idx = message_id - MOD_SCMI_CLOCK_ATTRIBUTES;
+            *message_idx = message_id - (uint32_t)MOD_SCMI_CLOCK_ATTRIBUTES;
         }
         return FWK_SUCCESS;
 
@@ -271,7 +273,8 @@ static int mod_res_message_id_to_index(
         }
         if ((message_id >= MOD_SCMI_SENSOR_DESCRIPTION_GET) &&
             (message_id <= MOD_SCMI_SENSOR_READING_GET)) {
-            *message_idx = message_id - MOD_SCMI_SENSOR_DESCRIPTION_GET;
+            *message_idx =
+                message_id - (uint32_t)MOD_SCMI_SENSOR_DESCRIPTION_GET;
         }
         return FWK_SUCCESS;
 
@@ -281,7 +284,8 @@ static int mod_res_message_id_to_index(
         }
         if ((message_id >= MOD_SCMI_RESET_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_RESET_NOTIFY)) {
-            *message_idx = message_id - MOD_SCMI_RESET_DOMAIN_ATTRIBUTES;
+            *message_idx =
+                message_id - (uint32_t)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES;
         }
         return FWK_SUCCESS;
 
@@ -368,9 +372,10 @@ static int mod_res_resource_id_to_index(
     case MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN:
         if ((message_id >= MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_PD_POWER_STATE_NOTIFY)) {
-            message_count = MOD_SCMI_PD_POWER_STATE_NOTIFY -
-                MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES + 1;
-            message_offset = message_id - MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES;
+            message_count = (int)MOD_SCMI_PD_POWER_STATE_NOTIFY -
+                (int)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES + 1U;
+            message_offset =
+                message_id - (uint32_t)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES;
             resource_size = res_perms_ctx.pd_count;
             break;
         }
@@ -379,9 +384,10 @@ static int mod_res_resource_id_to_index(
     case MOD_SCMI_PROTOCOL_ID_PERF:
         if ((message_id >= MOD_SCMI_PERF_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL)) {
-            message_count = MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL -
-                MOD_SCMI_PERF_DOMAIN_ATTRIBUTES + 1;
-            message_offset = message_id - MOD_SCMI_PERF_DOMAIN_ATTRIBUTES;
+            message_count = (int)MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL -
+                (int)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES + 1U;
+            message_offset =
+                message_id - (uint32_t)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES;
             resource_size = res_perms_ctx.perf_count;
             break;
         }
@@ -390,9 +396,9 @@ static int mod_res_resource_id_to_index(
     case MOD_SCMI_PROTOCOL_ID_CLOCK:
         if ((message_id >= MOD_SCMI_CLOCK_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_CLOCK_CONFIG_SET)) {
-            message_count =
-                MOD_SCMI_CLOCK_CONFIG_SET - MOD_SCMI_CLOCK_ATTRIBUTES + 1;
-            message_offset = message_id - MOD_SCMI_CLOCK_ATTRIBUTES;
+            message_count = (int)MOD_SCMI_CLOCK_CONFIG_SET -
+                (int)MOD_SCMI_CLOCK_ATTRIBUTES + 1U;
+            message_offset = message_id - (uint32_t)MOD_SCMI_CLOCK_ATTRIBUTES;
             resource_size = res_perms_ctx.clock_count;
             break;
         }
@@ -401,9 +407,10 @@ static int mod_res_resource_id_to_index(
     case MOD_SCMI_PROTOCOL_ID_SENSOR:
         if ((message_id >= MOD_SCMI_SENSOR_DESCRIPTION_GET) &&
             (message_id <= MOD_SCMI_SENSOR_READING_GET)) {
-            message_count = MOD_SCMI_SENSOR_READING_GET -
-                MOD_SCMI_SENSOR_DESCRIPTION_GET + 1;
-            message_offset = message_id - MOD_SCMI_SENSOR_DESCRIPTION_GET;
+            message_count = (int)MOD_SCMI_SENSOR_READING_GET -
+                (int)MOD_SCMI_SENSOR_DESCRIPTION_GET + 1U;
+            message_offset =
+                message_id - (uint32_t)MOD_SCMI_SENSOR_DESCRIPTION_GET;
             resource_size = res_perms_ctx.sensor_count;
             break;
         }
@@ -413,9 +420,10 @@ static int mod_res_resource_id_to_index(
     case MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN:
         if ((message_id >= MOD_SCMI_RESET_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_RESET_NOTIFY)) {
-            message_count =
-                MOD_SCMI_RESET_NOTIFY - MOD_SCMI_RESET_DOMAIN_ATTRIBUTES + 1;
-            message_offset = message_id - MOD_SCMI_RESET_DOMAIN_ATTRIBUTES;
+            message_count = (int)MOD_SCMI_RESET_NOTIFY -
+                (int)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES + 1U;
+            message_offset =
+                message_id - (uint32_t)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES;
             resource_size = res_perms_ctx.reset_domain_count;
             break;
         }
@@ -431,7 +439,8 @@ static int mod_res_resource_id_to_index(
         return FWK_E_PARAM;
     }
 
-    resource_size = MOD_RES_PERMS_RESOURCE_ELEMENT(resource_size) + 1;
+    resource_size =
+        MOD_RES_PERMS_RESOURCE_ELEMENT((unsigned int)resource_size) + 1U;
 
     /*
      * message_count: the number of messages for the agent.
@@ -510,7 +519,7 @@ static enum mod_res_perms_permissions agent_protocol_permissions(
             .protocols;
 
     /* Agent:Protocol access denied */
-    if (perms & (1 << protocol_idx)) {
+    if (perms & (1U << protocol_idx)) {
         return MOD_RES_PERMS_ACCESS_DENIED;
     }
 
@@ -586,7 +595,7 @@ static enum mod_res_perms_permissions agent_message_permissions(
                 .messages[protocol_idx];
 
     /* Agent:Protocol:message access denied */
-    if (perms & (1 << message_idx)) {
+    if (perms & (1U << (uint32_t)message_idx)) {
         return MOD_RES_PERMS_ACCESS_DENIED;
     }
 
@@ -729,7 +738,7 @@ static enum mod_res_perms_permissions agent_resource_permissions(
     }
 
     /* Agent:Protocol:message:resource access denied */
-    if ((perms & (1 << (MOD_RES_PERMS_RESOURCE_BIT(resource_id))))) {
+    if ((perms & (1U << (MOD_RES_PERMS_RESOURCE_BIT(resource_id))))) {
         return MOD_RES_PERMS_ACCESS_DENIED;
     }
 
@@ -764,9 +773,9 @@ static int set_agent_resource_message_perms(
                         MOD_RES_PERMS_ACCESS_ALLOWED);
 
     if (flags == MOD_RES_PERMS_ACCESS_ALLOWED) {
-        permissions &= ~(1 << (MOD_RES_PERMS_RESOURCE_BIT(resource_id)));
+        permissions &= ~(1U << (MOD_RES_PERMS_RESOURCE_BIT(resource_id)));
     } else {
-        permissions |= (1 << (MOD_RES_PERMS_RESOURCE_BIT(resource_id)));
+        permissions |= (1U << (MOD_RES_PERMS_RESOURCE_BIT(resource_id)));
     }
 
     perms[resource_idx] = permissions;
