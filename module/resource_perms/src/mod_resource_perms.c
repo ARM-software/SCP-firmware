@@ -1208,9 +1208,9 @@ static int mod_res_agent_set_device_protocol_permission(
     case MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN:
         dev_type = MOD_RES_RESET_DOMAIN_DEVICE;
         break;
-    default:
     case MOD_SCMI_PROTOCOL_ID_BASE:
     case MOD_SCMI_PROTOCOL_ID_SYS_POWER:
+    default:
         return FWK_E_ACCESS;
     }
 
