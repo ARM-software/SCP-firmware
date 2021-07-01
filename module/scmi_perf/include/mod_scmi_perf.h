@@ -134,9 +134,36 @@ struct mod_scmi_perf_domain_config {
  *      documentation for further details.
  */
 enum plugin_domain_type {
+    /*!
+     * \brief Plugin domain type physical
+     *
+     * \details A plugin which requires to have a physical domain' data should
+     *      choose this option. Note that the plugin will receive `n` updates,
+     *      where n is the number of physical domains.
+     */
     PERF_PLUGIN_DOM_TYPE_PHYSICAL,
+
+    /*!
+     * \brief Plugin domain type logical
+     *
+     * \details A plugin which requires to have all the logical domains' data
+     *      that belong to a physical domain should choose this option. Note
+     *      that the plugin will receive `n` updates where `n` is the number of
+     *      physical domains.
+     */
     PERF_PLUGIN_DOM_TYPE_LOGICAL,
 
+    /*!
+     * \brief Plugin domain type full
+     *
+     * \details A plugin which requires to have all the physical domains' data
+     *      in one go should choose this option. Note that the plugin will
+     *      receive 1 updates at every iteration. See documentation for further
+     *      details.
+     */
+    PERF_PLUGIN_DOM_TYPE_FULL,
+
+    /*! The number of domain types available for plugins */
     PERF_PLUGIN_DOM_TYPE_COUNT,
 };
 
@@ -345,7 +372,7 @@ int scmi_perf_limits_set_policy(
  *
  * \details This dataset is shared with the plugins. It contains the data
  *      collected from fast-channels and provides a way for the plugins to
- *      request an adjusted level/limit for the performance driver.
+ *      request an adjusted limit for the performance driver.
  *      Depending ond the plugin's domain view (physical or logical), levels and
  *      limits can be scalars or arrays.
  */
@@ -365,7 +392,10 @@ struct perf_plugins_perf_update {
     /*!
      * \brief Adjusted performance max limit(s).
      *
-     * \details A performance plugin should overwrite these values if wishes to
+     * \details This is an input/output for the plugin.
+     *      This table contains the aggregated adjusted values set out by
+     *      previous plugins. Plugins can use this info for their algorithms.
+     *      A performance plugin should overwrite these values if wishes to
      *      affect the performance limit for targeted domains.
      */
     uint32_t *adj_max_limit;
@@ -373,7 +403,10 @@ struct perf_plugins_perf_update {
     /*!
      * \brief Adjusted performance min limit(s).
      *
-     * \details A performance plugin should overwrite these valuee if wishes to
+     * \details This is an input/output for the plugin.
+     *      This table contains the aggregated adjusted values set out by
+     *      previous plugins. Plugins can use this info for their algorithms.
+     *      A performance plugin should overwrite these values if wishes to
      *      affect the performance limit for targeted domains.
      */
     uint32_t *adj_min_limit;
@@ -452,7 +485,13 @@ struct perf_plugins_api {
      *      the current performance level and limits for the given domain and,
      *      when necessary, can apply (write) new limits in the `adjusted`
      *      fields. This is expected to be done for each of the relevant
-     *      performance domains that the plugin is concerned.
+     *      performance domains that the plugin is concerned, unless its view
+     *      is _FULL. In the latter case, the callback will execute once only in
+     *      the tick period and the plugin will be provided with the entire blob
+     *      of performance level/limits for all the domains.
+     *      This is made available for plugins whose algorithm needs to take
+     *      into account all the performance domains collectively in order to
+     *      make a sane decision of the limits to be applied.
      *
      * \param data Performance data
      * \retval ::FWK_SUCCESS or one of FWK_E_* error codes.

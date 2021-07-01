@@ -8,9 +8,11 @@
  *      SCMI Performance Plugins Handler
  *
  *      This module is an extension of the SCMI-Performance module to support
- *      the addition of optional performance-related modules (plugins).
- *      It can also be used when the domains exposed by SCMI is different from
- *      the real frequency domains available in hardware.
+ *      the addition of optional performance-related modules (plugins). Such
+ *      modules can affect the final performance of one or more domains.
+ *      It can also be used when the domains exposed by SCMI are different from
+ *      the real frequency domains available in hardware as this layer can
+ *      perform the domain aggregation.
  */
 
 #include "perf_plugins_handler.h"
@@ -70,6 +72,10 @@ struct perf_plugins_ctx {
      * It assumes that DVFS ignores the identifier to be a sub-element.
      */
     fwk_id_t *dep_id_table;
+
+    struct perf_plugins_perf_update full_perf_table;
+
+    size_t dvfs_doms_count;
 };
 
 static struct perf_plugins_ctx perf_plugins_ctx;
@@ -138,53 +144,100 @@ static struct perf_plugins_handler_api handler_api = {
     .plugin_set_limits = plugin_set_limits,
 };
 
+/*
+ * Write back the adjusted values for use by the next plugins.
+ * Note that for logical oomains, the aggregated values are written.
+ */
+static void write_back_adj_values(
+    struct perf_plugins_dev_ctx *dev_ctx,
+    size_t phy_dom_idx)
+{
+    for (unsigned int i = 0; i < (dev_ctx->log_dom_count + 1); i++) {
+        dev_ctx->perf_table.adj_min_limit[i] = dev_ctx->lmin;
+        dev_ctx->perf_table.adj_max_limit[i] = dev_ctx->lmax;
+    }
+
+    perf_plugins_ctx.full_perf_table.adj_min_limit[phy_dom_idx] = dev_ctx->lmin;
+    perf_plugins_ctx.full_perf_table.adj_max_limit[phy_dom_idx] = dev_ctx->lmax;
+}
+
 static void plugins_policy_sync_level_limits(
-    struct perf_plugins_dev_ctx *dev_ctx)
+    struct perf_plugins_dev_ctx *dev_ctx,
+    enum plugin_domain_type dom_type)
 {
     uint32_t *adj_max_limit_table, *adj_min_limit_table;
+    uint32_t *adj_min_lim_full_table, *adj_max_lim_full_table;
     uint32_t needle_lim_max, needle_lim_min;
-    unsigned int phy_dom;
+    unsigned int phy_dom, phy_dom_idx;
     uint32_t *level_table, *min_limit_table, *max_limit_table;
+
+    adj_min_lim_full_table = perf_plugins_ctx.full_perf_table.adj_min_limit;
+    adj_max_lim_full_table = perf_plugins_ctx.full_perf_table.adj_max_limit;
 
     adj_max_limit_table = dev_ctx->perf_table.adj_max_limit;
     adj_min_limit_table = dev_ctx->perf_table.adj_min_limit;
 
-    phy_dom = dev_ctx->log_dom_count;
-    level_table = dev_ctx->perf_table.level;
-    min_limit_table = dev_ctx->perf_table.min_limit;
-    max_limit_table = dev_ctx->perf_table.max_limit;
+    if (dom_type != PERF_PLUGIN_DOM_TYPE_FULL) {
+        phy_dom = dev_ctx->log_dom_count;
+        level_table = dev_ctx->perf_table.level;
+        min_limit_table = dev_ctx->perf_table.min_limit;
+        max_limit_table = dev_ctx->perf_table.max_limit;
 
-    /*
-     * Conservative approach for adjusted values:
-     * - pick the max for the min limit
-     * - pick the min for the max limit
-     */
-    needle_lim_min = min_limit_table[phy_dom];
-    needle_lim_max = max_limit_table[phy_dom];
+        /*
+         * Conservative approach for adjusted values:
+         * - pick the max for the min limit
+         * - pick the min for the max limit
+         */
+        needle_lim_min = min_limit_table[phy_dom];
+        needle_lim_max = max_limit_table[phy_dom];
 
-    /* Find min/max on adjusted values, physical included */
-    for (unsigned int i = 0; i < (phy_dom + 1); i++) {
-        if (adj_min_limit_table[i] >= needle_lim_min) {
-            needle_lim_min = adj_min_limit_table[i];
+        /* Find min/max on adjusted values, physical included */
+        for (unsigned int i = 0; i < (phy_dom + 1); i++) {
+            if (adj_min_limit_table[i] >= needle_lim_min) {
+                needle_lim_min = adj_min_limit_table[i];
+            }
+
+            if (adj_max_limit_table[i] <= needle_lim_max) {
+                needle_lim_max = adj_max_limit_table[i];
+            }
         }
 
-        if (adj_max_limit_table[i] <= needle_lim_max) {
-            needle_lim_max = adj_max_limit_table[i];
+        /*
+         * Now we apply the same policy against the temporary results for the
+         * plugins updates so far.
+         */
+        if (needle_lim_min > dev_ctx->lmin) {
+            dev_ctx->lmin = needle_lim_min;
+        }
+        if (needle_lim_max < dev_ctx->lmax) {
+            dev_ctx->lmax = needle_lim_max;
+        }
+
+        dev_ctx->max = level_table[phy_dom];
+
+        phy_dom_idx = fwk_id_get_element_idx(dev_ctx->perf_table.domain_id);
+        write_back_adj_values(dev_ctx, (size_t)phy_dom_idx);
+
+    } else {
+        /*
+         * This needs to iterate over all the domains, since we are at the last
+         * domain and this plugin may have changed the limits for all the
+         * domains.
+         */
+        for (size_t i = 0; i < perf_plugins_ctx.dvfs_doms_count; i++) {
+            dev_ctx = get_ctx(FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, i));
+
+            /* Update with adjusted min-max */
+            if (adj_min_lim_full_table[i] > dev_ctx->lmin) {
+                dev_ctx->lmin = adj_min_lim_full_table[i];
+            }
+            if (adj_max_lim_full_table[i] < dev_ctx->lmax) {
+                dev_ctx->lmax = adj_max_lim_full_table[i];
+            }
+
+            write_back_adj_values(dev_ctx, i);
         }
     }
-
-    /*
-     * Now we apply the same policy against the temporary results for the
-     * plugins updates so far.
-     */
-    if (needle_lim_min > dev_ctx->lmin) {
-        dev_ctx->lmin = needle_lim_min;
-    }
-    if (needle_lim_max < dev_ctx->lmax) {
-        dev_ctx->lmax = needle_lim_max;
-    }
-
-    dev_ctx->max = level_table[phy_dom];
 }
 
 static void plugins_policy_update(struct fc_perf_update *fc_update)
@@ -236,7 +289,7 @@ static inline void get_perf_table(
 static void assign_data_for_plugins(
     fwk_id_t id,
     struct perf_plugins_perf_update *snapshot,
-    unsigned int mode)
+    enum plugin_domain_type dom_type)
 {
     struct perf_plugins_dev_ctx *dev_ctx;
     unsigned int dom_idx;
@@ -244,7 +297,19 @@ static void assign_data_for_plugins(
     dev_ctx = get_ctx(id);
 
     /* Determine the first entry on the table */
-    if (mode == PERF_PLUGIN_DOM_TYPE_LOGICAL) {
+    if (dom_type == PERF_PLUGIN_DOM_TYPE_FULL) {
+        snapshot->level = &perf_plugins_ctx.full_perf_table.level[0];
+
+        snapshot->max_limit = &perf_plugins_ctx.full_perf_table.max_limit[0];
+        snapshot->min_limit = &perf_plugins_ctx.full_perf_table.min_limit[0];
+
+        snapshot->adj_max_limit =
+            &perf_plugins_ctx.full_perf_table.adj_max_limit[0];
+        snapshot->adj_min_limit =
+            &perf_plugins_ctx.full_perf_table.adj_min_limit[0];
+
+        return;
+    } else if (dom_type == PERF_PLUGIN_DOM_TYPE_LOGICAL) {
         /* Provide the beginning of the table */
         dom_idx = 0;
     } else {
@@ -261,7 +326,7 @@ static void assign_data_for_plugins(
     get_perf_table(snapshot, dev_ctx, dom_idx);
 }
 
-static void domain_aggregate(
+static inline void domain_aggregate(
     struct perf_plugins_perf_update *this_dom,
     struct perf_plugins_perf_update *phy_dom)
 {
@@ -292,6 +357,7 @@ static void store_and_aggregate(struct fc_perf_update *fc_update)
     struct perf_plugins_dev_ctx *dev_ctx;
     struct perf_plugins_perf_update this_dom;
     struct perf_plugins_perf_update phy_dom;
+    unsigned int phy_ix;
 
     dev_ctx = get_ctx(fc_update->domain_id);
 
@@ -322,54 +388,97 @@ static void store_and_aggregate(struct fc_perf_update *fc_update)
 
     phy_dom.adj_max_limit[0] = phy_dom.max_limit[0];
     phy_dom.adj_min_limit[0] = phy_dom.min_limit[0];
+
+    if (this_dom_idx == (phy_dom_idx - 1)) {
+        /* Copy values, all-performance table */
+        phy_ix = fwk_id_get_element_idx(fc_update->domain_id);
+
+        perf_plugins_ctx.full_perf_table.level[phy_ix] = phy_dom.level[0];
+
+        perf_plugins_ctx.full_perf_table.max_limit[phy_ix] =
+            phy_dom.max_limit[0];
+        perf_plugins_ctx.full_perf_table.min_limit[phy_ix] =
+            phy_dom.min_limit[0];
+
+        perf_plugins_ctx.full_perf_table.adj_max_limit[phy_ix] =
+            phy_dom.adj_max_limit[0];
+        perf_plugins_ctx.full_perf_table.adj_min_limit[phy_ix] =
+            phy_dom.adj_min_limit[0];
+    }
 }
 
-void perf_plugins_handler_update(struct fc_perf_update *fc_update)
+void perf_plugins_handler_update(
+    unsigned int perf_dom_idx,
+    struct fc_perf_update *fc_update)
 {
     struct perf_plugins_api *api;
     struct perf_plugins_perf_update perf_snapshot;
     unsigned int this_dom_idx, last_logical_dom_idx;
     struct perf_plugins_dev_ctx *dev_ctx;
-    unsigned int dom_type;
+    enum plugin_domain_type dom_type;
+    const struct mod_scmi_perf_config *config;
     int status;
 
-    dev_ctx = get_ctx(fc_update->domain_id);
-
     store_and_aggregate(fc_update);
+
+    dev_ctx = get_ctx(fc_update->domain_id);
 
     this_dom_idx = fwk_id_get_sub_element_idx(fc_update->domain_id);
     last_logical_dom_idx = dev_ctx->log_dom_count - 1;
 
-    if (this_dom_idx == last_logical_dom_idx) {
-        /*
-         * EITHER last logical domain OR it's only physical domain,
-         * call the plugin with the data snapshot for this domain.
-         */
-        if (perf_plugins_ctx.config->plugins_count == 0) {
-            /* domains coordination only */
-            plugins_policy_update_no_plugins(fc_update);
-        } else {
-            for (size_t i = 0; i < perf_plugins_ctx.config->plugins_count;
-                 i++) {
-                dom_type =
-                    (unsigned int)perf_plugins_ctx.config->plugins[i].dom_type;
-                assign_data_for_plugins(
-                    fc_update->domain_id, &perf_snapshot, dom_type);
+    config = perf_plugins_ctx.config;
 
-                api = perf_plugins_ctx.plugins_api_table[i];
-                status = api->update(&perf_snapshot);
-                if (status != FWK_SUCCESS) {
-                    FWK_LOG_TRACE(
-                        "[P-Handler] Update: Plugin%u returned error %i",
-                        i,
-                        status);
-                }
+    /*
+     * EITHER last logical domain OR it's only physical domain,
+     * call the plugin - if any - with the data snapshot for this domain.
+     */
+    if ((this_dom_idx == last_logical_dom_idx) &&
+        (config->plugins_count != 0)) {
+        for (size_t i = 0; i < config->plugins_count; i++) {
+            dom_type = config->plugins[i].dom_type;
 
-                plugins_policy_sync_level_limits(dev_ctx);
+            if ((perf_dom_idx != (config->perf_doms_count - 1)) &&
+                (dom_type == PERF_PLUGIN_DOM_TYPE_FULL)) {
+                /*
+                 * For plugins that need the full snapshot, wait until the
+                 * last performance domain.
+                 */
+                continue;
             }
-            plugins_policy_update(fc_update);
+
+            assign_data_for_plugins(
+                fc_update->domain_id, &perf_snapshot, dom_type);
+
+            api = perf_plugins_ctx.plugins_api_table[i];
+            status = api->update(&perf_snapshot);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_TRACE(
+                    "[P-Handler] Update: Plugin%u returned error %i",
+                    i,
+                    status);
+            }
+
+            plugins_policy_sync_level_limits(dev_ctx, dom_type);
         }
-    } else {
+    }
+}
+
+void perf_plugins_handler_get(
+    unsigned int perf_dom_idx,
+    struct fc_perf_update *fc_update)
+{
+    unsigned int this_dom_idx, last_logical_dom_idx;
+    const struct mod_scmi_perf_config *config;
+    struct perf_plugins_dev_ctx *dev_ctx;
+
+    dev_ctx = get_ctx(fc_update->domain_id);
+
+    this_dom_idx = fwk_id_get_sub_element_idx(fc_update->domain_id);
+    last_logical_dom_idx = dev_ctx->log_dom_count - 1;
+
+    config = perf_plugins_ctx.config;
+
+    if (this_dom_idx != last_logical_dom_idx) {
         /*
          * Any other logical domain, no need to forward the request to DVFS,
          * thus use previous values.
@@ -377,6 +486,13 @@ void perf_plugins_handler_update(struct fc_perf_update *fc_update)
         fc_update->level = dev_ctx->max;
         fc_update->adj_max_limit = dev_ctx->lmax;
         fc_update->adj_min_limit = dev_ctx->lmin;
+    } else {
+        if (config->plugins_count == 0) {
+            /* domains coordination only */
+            plugins_policy_update_no_plugins(fc_update);
+        } else {
+            plugins_policy_update(fc_update);
+        }
     }
 }
 
@@ -404,12 +520,24 @@ void perf_plugins_handler_report(struct perf_plugins_perf_report *data)
     }
 }
 
+static void perf_plugins_alloc_tables(
+    struct perf_plugins_perf_update *table,
+    size_t count)
+{
+    table->level = fwk_mm_calloc(count, sizeof(uint32_t));
+    table->max_limit = fwk_mm_calloc(count, sizeof(uint32_t));
+    table->adj_max_limit = fwk_mm_calloc(count, sizeof(uint32_t));
+    table->min_limit = fwk_mm_calloc(count, sizeof(uint32_t));
+    table->adj_min_limit = fwk_mm_calloc(count, sizeof(uint32_t));
+}
+
 int perf_plugins_handler_init(const struct mod_scmi_perf_config *config)
 {
     const struct mod_scmi_perf_domain_config *domain;
     int dvfs_doms_count;
     struct perf_plugins_dev_ctx *dev_ctx;
-    unsigned int all_doms_count, pgroup, ldom = 0;
+    unsigned int pgroup, ldom = 0;
+    size_t all_doms_count;
     unsigned int phy_group;
     bool has_phy_group;
 
@@ -418,6 +546,8 @@ int perf_plugins_handler_init(const struct mod_scmi_perf_config *config)
     if (dvfs_doms_count <= 0) {
         return FWK_E_SUPPORT;
     }
+
+    perf_plugins_ctx.dvfs_doms_count = (size_t)dvfs_doms_count;
 
     perf_plugins_ctx.dev_ctx = fwk_mm_calloc(
         (size_t)dvfs_doms_count, sizeof(struct perf_plugins_dev_ctx));
@@ -447,25 +577,31 @@ int perf_plugins_handler_init(const struct mod_scmi_perf_config *config)
      *
      * At the same time, initialise min and max.
      */
-    for (size_t i = 0; i < (size_t)dvfs_doms_count; i++) {
+    for (size_t i = 0; i < perf_plugins_ctx.dvfs_doms_count; i++) {
         dev_ctx = &perf_plugins_ctx.dev_ctx[i];
 
-        all_doms_count = dev_ctx->log_dom_count + 1;
+        all_doms_count = (size_t)(dev_ctx->log_dom_count + 1);
 
-        dev_ctx->perf_table.level =
-            fwk_mm_calloc(all_doms_count, sizeof(uint32_t));
-        dev_ctx->perf_table.max_limit =
-            fwk_mm_calloc(all_doms_count, sizeof(uint32_t));
-        dev_ctx->perf_table.adj_max_limit =
-            fwk_mm_calloc(all_doms_count, sizeof(uint32_t));
-        dev_ctx->perf_table.min_limit =
-            fwk_mm_calloc(all_doms_count, sizeof(uint32_t));
-        dev_ctx->perf_table.adj_min_limit =
-            fwk_mm_calloc(all_doms_count, sizeof(uint32_t));
+        perf_plugins_alloc_tables(&dev_ctx->perf_table, all_doms_count);
 
         dev_ctx->lmin = 0;
         dev_ctx->lmax = UINT32_MAX;
+        dev_ctx->perf_table.domain_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, i);
     }
+
+    /*
+     * Allocate a table to store the physical/aggregated values for each of the
+     * physical domain for plugins that require the full picture of performance.
+     */
+    perf_plugins_alloc_tables(
+        &perf_plugins_ctx.full_perf_table, perf_plugins_ctx.dvfs_doms_count);
+
+    /*
+     * The data provided for a full snapshot will always have a module
+     * identifier.
+     */
+    perf_plugins_ctx.full_perf_table.domain_id =
+        FWK_ID_MODULE(FWK_MODULE_IDX_SCMI_PERF);
 
     /* Allocate a table of dependency domains identifiers */
     perf_plugins_ctx.dep_id_table =
@@ -550,4 +686,4 @@ int perf_plugins_handler_process_bind_request(
 
     return FWK_SUCCESS;
 }
-#endif // BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+#endif /* BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER */
