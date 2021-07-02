@@ -234,7 +234,7 @@ static void free_event(struct fwk_event *event)
 static void process_next_event(void)
 {
     int status;
-    struct fwk_event *event, *allocated_event, async_response_event = { 0 };
+    struct fwk_event *event, *allocated_event, async_response_event;
     const struct fwk_module *module;
     int (*process_event)(
         const struct fwk_event *event, struct fwk_event *resp_event);
@@ -256,6 +256,7 @@ static void process_next_event(void)
                                              module->process_event;
 
     if (event->response_requested) {
+        memset(&async_response_event, 0, sizeof(async_response_event));
         async_response_event = *event;
         async_response_event.source_id = event->target_id;
         async_response_event.target_id = event->source_id;
