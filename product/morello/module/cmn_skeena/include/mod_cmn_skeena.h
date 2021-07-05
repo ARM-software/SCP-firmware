@@ -101,6 +101,43 @@ struct mod_cmn_skeena_memory_region_map {
 };
 
 /*!
+ * \brief HN-I region attributes
+ */
+#define CMN_SKEENA_HNI_REG_PHY_MEM_EN      UINT64_C(0x0400000000000000)
+#define CMN_SKEENA_HNI_REG_SER_ALL_WR      UINT64_C(0x0800000000000000)
+#define CMN_SKEENA_HNI_REG_SER_DEVNE_WR    UINT64_C(0x1000000000000000)
+#define CMN_SKEENA_HNI_REG_EARLY_RDACK_EN  UINT64_C(0x2000000000000000)
+#define CMN_SKEENA_HNI_REG_EARLY_WRCOMP_EN UINT64_C(0x4000000000000000)
+#define CMN_SKEENA_HNI_REG_VALID           UINT64_C(0x8000000000000000)
+
+/*!
+ * \brief RN-I Configuration
+ */
+#define CMN_SKEENA_RNI_PCIE_MSTR_POS 5
+#define CMN_SKEENA_RNI_PCIE_MSTR_PRE \
+    (UINT64_C(1) << CMN_SKEENA_RNI_PCIE_MSTR_POS)
+
+/*!
+ * \brief HN-I Memory region map descriptor
+ */
+struct mod_cmn_skeena_hni_region_map {
+    /*! Base address */
+    uint64_t base;
+
+    /*! Region size in bytes */
+    uint64_t size;
+
+    /*! Region configuration flags */
+    uint64_t flags;
+
+    /*! HN-I region node ID to which this region to be configured */
+    unsigned int node_id;
+
+    /*! Region number to be programmed */
+    uint8_t region_num;
+};
+
+/*!
  * \brief CMN_SKEENA configuration data
  */
 struct mod_cmn_skeena_config {
@@ -136,6 +173,18 @@ struct mod_cmn_skeena_config {
 
     /*! Number of entries in the ::mod_cmn_skeena_config::mmap_table */
     size_t mmap_count;
+
+    /*! Table of RN-I node IDs with PCIe master connected */
+    const unsigned int *rni_pcie_table;
+
+    /*! Number of entries in the ::mod_cmn_skeena_config::rni_pcie_table */
+    size_t rni_pcie_count;
+
+    /*! Table of HN-I region memory map entries */
+    const struct mod_cmn_skeena_hni_region_map *hni_mmap_table;
+
+    /*! Number of entries in the ::mod_cmn_skeena_config::hni_mmap_table */
+    size_t hni_mmap_count;
 
     /*! Address space of the chip */
     uint64_t chip_addr_space;

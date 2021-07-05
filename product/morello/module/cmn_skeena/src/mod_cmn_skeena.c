@@ -20,6 +20,7 @@
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_log.h>
+#include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -127,6 +128,51 @@ static void process_node_hnf(struct cmn_skeena_hnf_reg *hnf)
     /* Configure the system cache RAM PPU */
     hnf->PPU_PWPR = CMN_SKEENA_PPU_PWPR_POLICY_ON |
         CMN_SKEENA_PPU_PWPR_OPMODE_FAM | CMN_SKEENA_PPU_PWPR_DYN_EN;
+}
+
+static void process_node_rni(
+    const struct mod_cmn_skeena_config *config,
+    void *node,
+    unsigned int node_id)
+{
+    struct cmn_skeena_rni_reg *rni;
+    unsigned int i;
+
+    fwk_assert((config != NULL) && (node != NULL));
+
+    rni = (struct cmn_skeena_rni_reg *)node;
+    if (config->rni_pcie_count != 0) {
+        for (i = 0; i < config->rni_pcie_count; i++) {
+            if (config->rni_pcie_table[i] == node_id)
+                rni->CFG_CTL |= CMN_SKEENA_RNI_PCIE_MSTR_PRE;
+        }
+    }
+}
+
+static void process_node_hni(
+    const struct mod_cmn_skeena_config *config,
+    void *node,
+    unsigned int node_id)
+{
+    const struct mod_cmn_skeena_hni_region_map *region;
+    struct cmn_skeena_hni_reg *hni;
+    unsigned int i;
+    uint64_t region_size;
+
+    fwk_assert((config != NULL) && (node != NULL));
+
+    hni = (struct cmn_skeena_hni_reg *)node;
+    if (config->hni_mmap_count != 0) {
+        for (i = 0; i < config->hni_mmap_count; i++) {
+            region = &config->hni_mmap_table[i];
+            if (region->node_id == node_id) {
+                region_size = __builtin_ctz(region->size / (4ULL * FWK_KIB));
+                hni->SAM_ADDRREGION_CFG[region->region_num] =
+                    (region_size | (region_size << 10) |
+                     ((region->base >> 12) << 20) | region->flags);
+            }
+        }
+    }
 }
 
 /*
@@ -356,6 +402,12 @@ static void cmn_skeena_configure(void)
                     irnsam_entry++;
                 } else if (node_type == NODE_TYPE_HN_F)
                     process_node_hnf(node);
+                else if (
+                    (node_type == NODE_TYPE_RN_D) ||
+                    (node_type == NODE_TYPE_RN_I))
+                    process_node_rni(config, node, get_node_id(node));
+                else if (node_type == NODE_TYPE_HN_I)
+                    process_node_hni(config, node, get_node_id(node));
             }
         }
     }
