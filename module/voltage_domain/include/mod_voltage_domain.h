@@ -22,32 +22,38 @@
 /*!
  * \defgroup GroupVoltageDomain Voltage domain HAL
  *
- * \details A Hardware Abstraction Layer for configuring voltage
- * domains regulators.
- *
+ * \details A Hardware Abstraction Layer for controlling voltage
+ *     domains regulators.
  * @{
  */
 
-/*! Mask for voltage domain mode type in domain configuration */
-#define MOD_VOLTD_MODE_TYPE_MASK        BIT(3)
+/*!
+ * \brief Voltage domain mode IDs.
+ */
+enum mod_voltd_mode_id {
+    /*! Voltage domain is Off */
+    MOD_VOLTD_MODE_ID_OFF,
 
-/*! Mask value for implementation mode type in domain configuration */
-#define MOD_VOLTD_MODE_TYPE_IMPL        BIT(3)
+    /*! Voltage domain is On */
+    MOD_VOLTD_MODE_ID_ON,
+};
 
-/*! Mask value for architecture mode type in domain configuration */
-#define MOD_VOLTD_MODE_TYPE_ARCH        0
+/*!
+ * \brief Voltage domain mode types of operation.
+ */
+enum mod_voltd_mode_type {
+    /*! Voltage domain is in Architectural mode */
+    MOD_VOLTD_MODE_TYPE_ARCH,
 
-/*! Enabled domain configuration mode */
-#define MOD_VOLTD_MODE_ON               7
-
-/*! Disabled domain configuration mode */
-#define MOD_VOLTD_MODE_OFF              0
+    /*! Voltage domain is in Implementation defined mode */
+    MOD_VOLTD_MODE_TYPE_IMPL
+};
 
 /*!
  * \brief APIs that the module makes available to entities requesting binding.
  */
 enum mod_voltd_api_type {
-    /*! Voltage Domaon (voltd) HAL */
+    /*! Voltage Domain (voltd) HAL */
     MOD_VOLTD_API_TYPE_HAL,
 
     /*! Number of defined APIs */
@@ -58,10 +64,12 @@ enum mod_voltd_api_type {
  * \brief Voltage level description types.
  */
 enum mod_voltd_voltage_level_type {
-    /*! The voltage domain has a discrete set of rates that it can attain */
+    /*! The voltage domain has a discrete set of levels that it can attain */
     MOD_VOLTD_VOLTAGE_LEVEL_DISCRETE,
 
-    /*! The voltage domain has a continuous range of rates with a constant step */
+    /*!
+     * The voltage domain has a continuous range of levels with a constant step
+     */
     MOD_VOLTD_VOLTAGE_LEVEL_CONTINUOUS,
 };
 
@@ -84,17 +92,17 @@ struct mod_voltd_range {
     enum mod_voltd_voltage_level_type level_type;
 
     /*! Minimum voltage level (in uV) */
-    int min_uv;
+    int32_t min_uv;
 
     /*! Maximum voltage level (in uV) */
-    int max_uv;
+    int32_t max_uv;
 
     /*!
      * The number of uV by which the level can be incremented at each step
      * throughout the domain's range. Valid only when level_type is equal to
      * \ref mod_voltd_voltage_level_type.MOD_VOLTD_VOLTAGE_LEVEL_CONTINUOUS.
      */
-    int step_uv;
+    int32_t step_uv;
 
     /*! The number of unique voltage levels that the domain can attain */
     size_t level_count;
@@ -105,7 +113,7 @@ struct mod_voltd_range {
  *
  * \details This structure is intended to store voltage domain information that
  *     is static and which does not change during runtime. Dynamic information,
- *     such as the current voltage domain configuration, are exposed through
+ *     such as the current voltage domain mode id, are exposed through
  *     functions in the voltage domain and voltage domain driver APIs.
  */
 struct mod_voltd_info {
@@ -114,17 +122,12 @@ struct mod_voltd_info {
 
     /*! Range of supported voltage levels */
     struct mod_voltd_range level_range;
-
-    /*! Number of discrete voltage levels supported */
-    size_t level_count;
 };
 
 /*!
  * \brief Voltage domain driver interface.
  */
 struct mod_voltd_drv_api {
-    /*! Name of the driver */
-    const char *name;
 
     /*!
      * \brief Set a new voltage level by providing a a level in microvolts.
@@ -138,7 +141,7 @@ struct mod_voltd_drv_api {
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
-    int (*set_level)(fwk_id_t voltd_id, int level_uv);
+    int (*set_level)(fwk_id_t voltd_id, int32_t level_uv);
 
     /*!
      * \brief Get the current voltage level of a domain in microvolts (uV).
@@ -152,35 +155,40 @@ struct mod_voltd_drv_api {
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
-    int (*get_level)(fwk_id_t voltd_id, int *level_uv);
+    int (*get_level)(fwk_id_t voltd_id, int32_t *level_uv);
 
     /*!
      * \brief Set the running configuration of a voltage domain.
      *
      * \param voltd_id Voltage domain device identifier.
      *
-     * \param config One of the valid domain configuration IDs.
+     * \param mode_type Mode type of voltage domain operation either
+     *      Architectural or Implementation Defined.
+     *
+     * \param mode_id One of the valid voltage domain mode IDs.
      *
      * \retval FWK_PENDING The request is pending. The driver will provide the
      *      requested value later through the driver response API.
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
-    int (*set_config)(fwk_id_t voltd_id, uint32_t config);
+    int (*set_config)(fwk_id_t voltd_id, uint8_t mode_type, uint8_t mode_id);
 
     /*!
      * \brief Get the running configuration of a voltage domain.
      *
      * \param voltd_id Voltage domain device identifier.
      *
-     * \param[out] config The current voltage domain configuration.
+     * \param[out] mode_type The current mode type of operation.
+     *
+     * \param[out] mode_id The current voltage domain mode ID.
      *
      * \retval FWK_PENDING The request is pending. The driver will provide the
      *      requested value later through the driver response API.
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
-    int (*get_config)(fwk_id_t voltd_id, uint32_t *config);
+    int (*get_config)(fwk_id_t voltd_id, uint8_t *mode_type, uint8_t *mode_id);
 
     /*!
      * \brief Get information a voltage domain element.
@@ -206,8 +214,10 @@ struct mod_voltd_drv_api {
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
-    int (*get_level_from_index)(fwk_id_t elt_id, unsigned int index,
-                                int *level_uv);
+     int (*get_level_from_index)(
+         fwk_id_t elt_id,
+         unsigned int index,
+         int32_t *level_uv);
 };
 
 /*!
@@ -219,7 +229,7 @@ struct mod_voltd_api {
      *
      * \param voltd_id Voltage domain device identifier.
      *
-     * \param rate The desired voltage level in microvolts (uV).
+     * \param level_uv The desired voltage level in microvolts (uV).
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_PENDING The request is pending. The result for this operation
@@ -229,32 +239,35 @@ struct mod_voltd_api {
      *      supported.
      * \return One of the standard framework error codes.
      */
-    int (*set_level)(fwk_id_t voltd_id, int level_uv);
+    int (*set_level)(fwk_id_t voltd_id, int32_t level_uv);
 
     /*!
-     * \brief Get the current rate of a voltd in Hertz (Hz).
+     * \brief Get the current level of a voltd in micro volt (uV).
      *
      * \param voltd_id Voltage domain device identifier.
      *
-     * \param[out] rate The current voltage level in microvolts.
+     * \param[out] level_uv The current voltage level in microvolts.
      *
      * \retval FWK_SUCCESS The operation succeeded.
-     * \retval FWK_PENDING The request is pending. The requested rate will be
+     * \retval FWK_PENDING The request is pending. The requested level will be
      *      provided via a response event.
-     * \retval FWK_E_PARAM The voltage domain identifier was invalid.
-     * \retval FWK_E_PARAM The rate pointer was NULL.
+     * \retval FWK_E_PARAM The voltage domain identifier was invalid or
+     *      the level pointer was NULL.
      * \retval FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
      *      supported.
      * \return One of the standard framework error codes.
      */
-    int (*get_level)(fwk_id_t voltd_id, int *level_uv);
+    int (*get_level)(fwk_id_t voltd_id, int32_t *level_uv);
 
     /*!
      * \brief Set the running configuration of a voltage domain.
      *
      * \param voltd_id Voltage domain device identifier.
      *
-     * \param config One of the valid voltage domain configurations.
+     * \param mode_type Mode type of voltage domain operation either
+     *      Architectural or Implementation Defined.
+     *
+     * \param mode_id One of the valid voltage domain mode IDs.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_PENDING The request is pending. The result for this operation
@@ -264,28 +277,31 @@ struct mod_voltd_api {
      *      supported.
      * \return One of the standard framework error codes.
      */
-    int (*set_config)(fwk_id_t voltd_id, uint32_t config);
+    int (*set_config)(fwk_id_t voltd_id, uint8_t mode_type, uint8_t mode_id);
 
     /*!
      * \brief Get the running configuration of a voltage domain.
      *
      * \param voltd_id Voltage domain device identifier.
      *
-     * \param[out] config The current voltage domain configuration.
+     * \param[out] mode_type Mode type of operation either Architectural or
+     *      Implementation Defined.
+     *
+     * \param[out] mode_id The current voltage domain mode ID.
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_PENDING The request is pending. The requested configuration
-     *      will beprovided via a response event.
-     * \retval FWK_E_PARAM The voltage domain identifier was invalid.
-     * \retval FWK_E_PARAM The configuration pointer was NULL.
+     *      will be provided via a response event.
+     * \retval FWK_E_PARAM The voltage domain identifier was invalid,
+     *      the mode_id pointer was NULL or the mode_type pointer was NULL.
      * \retval FWK_E_SUPPORT Deferred handling of asynchronous drivers is not
      *      supported.
      * \return One of the standard framework error codes.
      */
-    int (*get_config)(fwk_id_t voltd_id, uint32_t *config);
+    int (*get_config)(fwk_id_t voltd_id, uint8_t *mode_type, uint8_t *mode_id);
 
     /*!
-     * \brief Get information a voltage domain element.
+     * \brief Get information about a voltage domain element.
      *
      * \param voltd_id Voltage domain device identifier.
      *
@@ -294,7 +310,7 @@ struct mod_voltd_api {
      * \retval FWK_SUCCESS The operation succeeded.
      * \return One of the standard framework error codes.
      */
-     int (*get_info)(fwk_id_t voltd_id, struct mod_voltd_info *info);
+    int (*get_info)(fwk_id_t voltd_id, struct mod_voltd_info *info);
 
     /*!
      * \brief Get a voltage level in microvolts from an index in the range.
@@ -307,11 +323,13 @@ struct mod_voltd_api {
      *
      * \retval FWK_SUCCESS The operation succeeded.
      * \retval FWK_E_PARAM The voltage domain identifier was invalid.
-     * \retval FWK_E_PARAM The rate pointer was NULL.
+     *      the level pointer was NULL.
      * \return One of the standard framework error codes.
      */
-    int (*get_level_from_index)(fwk_id_t voltd_id, unsigned int index,
-                                int *level_uv);
+    int (*get_level_from_index)(
+        fwk_id_t voltd_id,
+        unsigned int index,
+        int32_t *level_uv);
 };
 
 /*!

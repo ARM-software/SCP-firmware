@@ -50,7 +50,7 @@ static void get_ctx(fwk_id_t voltd_id, struct voltd_dev_ctx **ctx)
  * Module API functions
  */
 
-static int voltd_set_level(fwk_id_t voltd_id, int level_uv)
+static int voltd_set_level(fwk_id_t voltd_id, int32_t level_uv)
 {
     struct voltd_dev_ctx *ctx;
 
@@ -62,7 +62,7 @@ static int voltd_set_level(fwk_id_t voltd_id, int level_uv)
     return ctx->api->set_level(ctx->config->driver_id, level_uv);
 }
 
-static int voltd_get_level(fwk_id_t voltd_id, int *level_uv)
+static int voltd_get_level(fwk_id_t voltd_id, int32_t *level_uv)
 {
     struct voltd_dev_ctx *ctx;
 
@@ -77,7 +77,10 @@ static int voltd_get_level(fwk_id_t voltd_id, int *level_uv)
     return ctx->api->get_level(ctx->config->driver_id, level_uv);
 }
 
-static int voltd_set_config(fwk_id_t voltd_id, uint32_t config)
+static int voltd_set_config(
+    fwk_id_t voltd_id,
+    uint8_t mode_type,
+    uint8_t mode_id)
 {
     struct voltd_dev_ctx *ctx;
 
@@ -86,22 +89,25 @@ static int voltd_set_config(fwk_id_t voltd_id, uint32_t config)
     if (!ctx->api->set_config)
         return FWK_E_SUPPORT;
 
-    return ctx->api->set_config(ctx->config->driver_id, config);
+    return ctx->api->set_config(ctx->config->driver_id, mode_type, mode_id);
 }
 
-static int voltd_get_config(fwk_id_t voltd_id, uint32_t *config)
+static int voltd_get_config(
+    fwk_id_t voltd_id,
+    uint8_t *mode_type,
+    uint8_t *mode_id)
 {
     struct voltd_dev_ctx *ctx;
 
     get_ctx(voltd_id, &ctx);
 
-    if (config == NULL)
+    if (mode_id == NULL)
         return FWK_E_PARAM;
 
     if (!ctx->api->get_config)
         return FWK_E_SUPPORT;
 
-    return ctx->api->get_config(ctx->config->driver_id, config);
+    return ctx->api->get_config(ctx->config->driver_id, mode_type, mode_id);
 }
 
 static int voltd_get_info(fwk_id_t voltd_id, struct mod_voltd_info *info)
@@ -121,8 +127,10 @@ static int voltd_get_info(fwk_id_t voltd_id, struct mod_voltd_info *info)
     return status;
 }
 
-static int voltd_get_level_from_index(fwk_id_t dev_id, unsigned int index,
-                                      int *level_uv)
+static int voltd_get_level_from_index(
+    fwk_id_t dev_id,
+    unsigned int index,
+    int32_t *level_uv)
 {
     struct voltd_dev_ctx *ctx = NULL;
 
