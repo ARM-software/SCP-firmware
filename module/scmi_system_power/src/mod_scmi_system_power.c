@@ -173,6 +173,7 @@ static void scmi_sys_power_state_notify(fwk_id_t service_id,
 static void graceful_timer_callback(uintptr_t scmi_system_state)
 {
     enum mod_pd_system_shutdown system_shutdown;
+    int status;
 
     FWK_LOG_INFO("SCMI_SYS_POWER: Graceful request timeout...");
     FWK_LOG_INFO(
@@ -182,7 +183,10 @@ static void graceful_timer_callback(uintptr_t scmi_system_state)
 
     if (scmi_system_state == SCMI_SYSTEM_STATE_SHUTDOWN) {
         system_shutdown = system_state2system_shutdown[scmi_system_state];
-        scmi_sys_power_ctx.pd_api->system_shutdown(system_shutdown);
+        status = scmi_sys_power_ctx.pd_api->system_shutdown(system_shutdown);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_TRACE("SCMI_SYS_POWER: %s @%d", __func__, __LINE__);
+        }
     }
 }
 
@@ -529,6 +533,8 @@ FWK_WEAK int scmi_sys_power_state_set_policy(
     fwk_id_t service_id,
     bool graceful)
 {
+    int status;
+
     *policy_status = MOD_SCMI_SYS_POWER_EXECUTE_MESSAGE_HANDLER;
 
     if (graceful) {
@@ -546,12 +552,15 @@ FWK_WEAK int scmi_sys_power_state_set_policy(
 #endif
 
             if (scmi_sys_power_ctx.alarm_api != NULL) {
-                scmi_sys_power_ctx.alarm_api->start(
+                status = scmi_sys_power_ctx.alarm_api->start(
                     scmi_sys_power_ctx.config->alarm_id,
                     scmi_sys_power_ctx.config->graceful_timeout,
                     MOD_TIMER_ALARM_TYPE_ONCE,
                     graceful_timer_callback,
                     *state);
+                if (status != FWK_SUCCESS) {
+                    FWK_LOG_TRACE("SCMI_SYS_POWER: %s @%d", __func__, __LINE__);
+                }
             } else {
                 graceful_timer_callback(*state);
             }

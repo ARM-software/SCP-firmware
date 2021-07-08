@@ -25,6 +25,7 @@
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
+#include <fwk_string.h>
 #include <fwk_thread.h>
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
@@ -36,7 +37,6 @@
 #endif
 
 #include <inttypes.h>
-#include <string.h>
 
 struct scmi_protocol {
     /* SCMI protocol message handler */
@@ -440,6 +440,7 @@ static void scmi_notify(fwk_id_t id, int protocol_id, int message_id,
 {
     const struct scmi_service_ctx *ctx, *p2a_ctx;
     uint32_t message_header;
+    int status;
 
     /*
      * The ID is the identifier of the service channel which
@@ -471,7 +472,11 @@ static void scmi_notify(fwk_id_t id, int protocol_id, int message_id,
         (uint8_t)protocol_id,
         0);
 
-    p2a_ctx->transmit(p2a_ctx->transport_id, message_header, payload, size);
+    status =
+        p2a_ctx->transmit(p2a_ctx->transport_id, message_header, payload, size);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI] %s @%d", __func__, __LINE__);
+    }
 }
 
 static const struct mod_scmi_from_protocol_api mod_scmi_from_protocol_api = {
@@ -524,7 +529,7 @@ static int scmi_notification_init(
      * Mark all operations_idx as invalid. This will be updated
      * whenever an agent subscribes to a notification for an operation.
      */
-    memset(
+    fwk_str_memset(
         subscribers->operation_id_to_idx,
         MOD_SCMI_PROTOCOL_OPERATION_IDX_INVALID,
         MOD_SCMI_PROTOCOL_MAX_OPERATION_ID);
@@ -831,9 +836,10 @@ static int scmi_base_discover_vendor_handler(fwk_id_t service_id,
     };
 
     if (scmi_ctx.config->vendor_identifier != NULL) {
-        strncpy(return_values.vendor_identifier,
-                scmi_ctx.config->vendor_identifier,
-                sizeof(return_values.vendor_identifier) - 1);
+        fwk_str_strncpy(
+            return_values.vendor_identifier,
+            scmi_ctx.config->vendor_identifier,
+            sizeof(return_values.vendor_identifier) - 1);
     }
 
     respond(service_id, &return_values, sizeof(return_values));
@@ -852,9 +858,10 @@ static int scmi_base_discover_sub_vendor_handler(fwk_id_t service_id,
     };
 
     if (scmi_ctx.config->sub_vendor_identifier != NULL) {
-        strncpy(return_values.sub_vendor_identifier,
-                scmi_ctx.config->sub_vendor_identifier,
-                sizeof(return_values.sub_vendor_identifier) - 1);
+        fwk_str_strncpy(
+            return_values.sub_vendor_identifier,
+            scmi_ctx.config->sub_vendor_identifier,
+            sizeof(return_values.sub_vendor_identifier) - 1);
     }
 
     respond(service_id, &return_values, sizeof(return_values));
@@ -1103,7 +1110,7 @@ static int scmi_base_discover_agent_handler(fwk_id_t service_id,
             sizeof(return_values.name) >= sizeof(name),
             "return_values.name is not large enough to contain name");
 
-        memcpy(return_values.name, name, sizeof(name));
+        fwk_str_memcpy(return_values.name, name, sizeof(name));
 
 #if (SCMI_PROTOCOL_VERSION_BASE >= UINT32_C(0x20000))
         return_values.agent_id = MOD_SCMI_PLATFORM_ID;
@@ -1127,7 +1134,7 @@ static int scmi_base_discover_agent_handler(fwk_id_t service_id,
 
         return_values.agent_id = (uint32_t)agent_id;
 
-        strncpy(
+        fwk_str_strncpy(
             &return_values.name[0],
             fwk_module_get_element_name(service_id),
             sizeof(return_values.name) - 1);
@@ -1146,10 +1153,10 @@ static int scmi_base_discover_agent_handler(fwk_id_t service_id,
 
     agent = &scmi_ctx.config->agent_table[parameters->agent_id];
 
-    strncpy(return_values.name,
-            (agent->name != NULL) ? agent->name :
-            default_agent_names[agent->type],
-            sizeof(return_values.name) - 1);
+    fwk_str_strncpy(
+        return_values.name,
+        (agent->name != NULL) ? agent->name : default_agent_names[agent->type],
+        sizeof(return_values.name) - 1);
 
 exit:
     respond(service_id, &return_values,
@@ -1709,8 +1716,11 @@ static int scmi_process_event(const struct fwk_event *event,
             ctx->scmi_protocol_id,
             ctx->scmi_message_id);
 #endif
-        ctx->respond(transport_id, &(int32_t) { SCMI_NOT_SUPPORTED },
-                     sizeof(int32_t));
+        status = ctx->respond(
+            transport_id, &(int32_t){ SCMI_NOT_SUPPORTED }, sizeof(int32_t));
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_TRACE("[SCMI] %s @%d", __func__, __LINE__);
+        }
         return FWK_SUCCESS;
     }
 
@@ -1752,8 +1762,11 @@ static int scmi_process_event(const struct fwk_event *event,
                     ctx->scmi_protocol_id,
                     ctx->scmi_message_id);
 #    endif
-                ctx->respond(
+                status = ctx->respond(
                     transport_id, &(int32_t){ SCMI_DENIED }, sizeof(int32_t));
+                if (status != FWK_SUCCESS) {
+                    FWK_LOG_TRACE("[SCMI] %s @%d", __func__, __LINE__);
+                }
                 return FWK_SUCCESS;
             }
         }

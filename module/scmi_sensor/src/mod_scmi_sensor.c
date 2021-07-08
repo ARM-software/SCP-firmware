@@ -17,16 +17,17 @@
 #include <fwk_assert.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
+#include <fwk_string.h>
 #include <fwk_thread.h>
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <string.h>
 
 #define MOD_SCMI_SENSOR_NOTIFICATION_COUNT 1
 
@@ -332,7 +333,7 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
          * Copy sensor name into description struct. Copy n-1 chars to ensure a
          * NULL terminator at the end. (struct has been zeroed out)
          */
-        strncpy(
+        fwk_str_strncpy(
             desc.sensor_name,
             fwk_module_get_element_name(sensor_id),
             sizeof(desc.sensor_name) - 1);
@@ -701,17 +702,22 @@ static void scmi_sensor_notify_trip_point(
 {
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     struct scmi_sensor_trip_point_event_p2a trip_point_event;
+    int status;
+
     trip_point_event.sensor_id = fwk_id_get_element_idx(sensor_id);
     trip_point_event.agent_id = 0x0;
     trip_point_event.trip_point_desc =
         SCMI_SENSOR_TRIP_POINT_EVENT_DESC(state, trip_point_idx);
 
-    scmi_sensor_ctx.scmi_notification_api->scmi_notification_notify(
+    status = scmi_sensor_ctx.scmi_notification_api->scmi_notification_notify(
         MOD_SCMI_PROTOCOL_ID_SENSOR,
         MOD_SCMI_SENSOR_TRIP_POINT_NOTIFY,
         SCMI_SENSOR_TRIP_POINT_EVENT,
         &trip_point_event,
         sizeof(trip_point_event));
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-SENS] %s @%d", __func__, __LINE__);
+    }
 #endif
 }
 static struct mod_sensor_trip_point_api sensor_trip_point_api = {

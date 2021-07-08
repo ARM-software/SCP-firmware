@@ -320,6 +320,7 @@ void perf_plugins_handler_update(struct fc_perf_update *fc_update)
     unsigned int this_dom_idx, last_logical_dom_idx;
     struct perf_plugins_dev_ctx *dev_ctx;
     unsigned int dom_type;
+    int status;
 
     dev_ctx = get_ctx(fc_update->domain_id);
 
@@ -343,7 +344,10 @@ void perf_plugins_handler_update(struct fc_perf_update *fc_update)
                 fc_update->domain_id, &perf_snapshot, dom_type);
 
             api = perf_plugins_ctx.plugins_api;
-            api->update(&perf_snapshot);
+            status = api->update(&perf_snapshot);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_TRACE("[P-Handler] %s @%d", __func__, __LINE__);
+            }
 
             plugins_policy_update(fc_update);
         }
@@ -361,6 +365,7 @@ void perf_plugins_handler_update(struct fc_perf_update *fc_update)
 void perf_plugins_handler_report(struct perf_plugins_perf_report *data)
 {
     struct perf_plugins_api *api;
+    int status;
 
     if (perf_plugins_ctx.config->plugins_count == 0) {
         return;
@@ -369,7 +374,10 @@ void perf_plugins_handler_report(struct perf_plugins_perf_report *data)
     api = perf_plugins_ctx.plugins_api;
 
     if (api->report != NULL) {
-        api->report(data);
+        status = api->report(data);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_TRACE("[P-Handler] %s @%d", __func__, __LINE__);
+        }
     }
 }
 

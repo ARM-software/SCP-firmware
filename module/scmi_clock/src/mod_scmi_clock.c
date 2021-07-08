@@ -24,10 +24,10 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
+#include <fwk_string.h>
 #include <fwk_thread.h>
 
 #include <stdbool.h>
-#include <string.h>
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 #    include <mod_resource_perms.h>
@@ -318,16 +318,20 @@ static void clock_ops_set_busy(
 static void clock_ops_update_state(unsigned int clock_dev_idx, int status)
 {
     enum mod_scmi_clock_policy_status policy_status;
+    int set_policy_status;
 
     if ((status == FWK_SUCCESS) &&
         (scmi_clock_ctx.clock_ops[clock_dev_idx].request ==
          SCMI_CLOCK_REQUEST_SET_STATE)) {
-        mod_scmi_clock_config_set_policy(
+        set_policy_status = mod_scmi_clock_config_set_policy(
             &policy_status,
             &scmi_clock_ctx.clock_ops[clock_dev_idx].state,
             MOD_SCMI_CLOCK_POST_MESSAGE_HANDLER,
             scmi_clock_ctx.clock_ops[clock_dev_idx].service_id,
             scmi_clock_ctx.clock_ops[clock_dev_idx].clock_dev_id);
+        if (set_policy_status != FWK_SUCCESS) {
+            FWK_LOG_TRACE("[SCMI-CLK] %s @%d", __func__, __LINE__);
+        }
     }
 }
 
@@ -362,7 +366,7 @@ static void get_state_respond(fwk_id_t clock_dev_id,
         return_values.attributes = SCMI_CLOCK_ATTRIBUTES(
             (uint32_t)(*clock_state == MOD_CLOCK_STATE_RUNNING));
 
-        strncpy(
+        fwk_str_strncpy(
             return_values.clock_name,
             fwk_module_get_element_name(clock_dev_id),
             sizeof(return_values.clock_name) - 1);
@@ -561,7 +565,12 @@ FWK_WEAK int mod_scmi_clock_config_set_policy(
 
         /* error to try and stop a stopped clock */
         if (clock_count[clock_dev_id] == 0) {
-            scmi_clock_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+            /*
+             * Here we ignore whether the agent_id will be correctly returned as
+             * we will return an error regardless
+             */
+            (void)scmi_clock_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+
             FWK_LOG_WARN(
                 "[SCMI-CLK] Invalid STOP request agent:"
                 " %d clock_id: %d state:%d\n",

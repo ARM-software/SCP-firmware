@@ -24,11 +24,11 @@
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
+#include <fwk_string.h>
 #include <fwk_thread.h>
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <string.h>
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 #    include <mod_resource_perms.h>
@@ -398,7 +398,7 @@ static int scmi_pd_power_domain_attributes_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    strncpy(
+    fwk_str_strncpy(
         (char *)return_values.name,
         fwk_module_get_element_name(pd_id),
         sizeof(return_values.name) - 1);
@@ -461,17 +461,21 @@ static void scmi_pd_power_state_notify(
 {
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     struct scmi_pd_power_state_notification_message_p2a message;
+    int status;
 
     message.agent_id = agent_id;
     message.domain_id = domain_id;
     message.power_state = power_state;
 
-    scmi_pd_ctx.scmi_notification_api->scmi_notification_notify(
+    status = scmi_pd_ctx.scmi_notification_api->scmi_notification_notify(
         MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN,
         command_id,
         notification_message_id,
         &message,
         sizeof(message));
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-power] %s @%d", __func__, __LINE__);
+    }
 #endif
 }
 
@@ -856,17 +860,23 @@ static int scmi_pd_power_state_notify_handler(
     }
 
     if (parameters->notify_enable) {
-        scmi_pd_ctx.scmi_notification_api->scmi_notification_add_subscriber(
-            MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN,
-            domain_idx,
-            command_id,
-            service_id);
+        status =
+            scmi_pd_ctx.scmi_notification_api->scmi_notification_add_subscriber(
+                MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN,
+                domain_idx,
+                command_id,
+                service_id);
     } else {
-        scmi_pd_ctx.scmi_notification_api->scmi_notification_remove_subscriber(
-            MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN,
-            agent_id,
-            domain_idx,
-            command_id);
+        status = scmi_pd_ctx.scmi_notification_api
+                     ->scmi_notification_remove_subscriber(
+                         MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN,
+                         agent_id,
+                         domain_idx,
+                         command_id);
+    }
+    if (status != FWK_SUCCESS) {
+        return_values.status = (int32_t)SCMI_GENERIC_ERROR;
+        goto exit;
     }
 
     return_values.status = (int32_t)SCMI_SUCCESS;
