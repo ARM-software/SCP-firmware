@@ -37,7 +37,7 @@ void software_init_hook(void)
     char *end = &__data_end__;
 
     if (load != start) {
-        memcpy(start, load, (size_t)(end - start));
+        (void)memcpy(start, load, (size_t)(end - start));
     }
 }
 #endif
