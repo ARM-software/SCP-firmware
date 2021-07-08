@@ -541,7 +541,6 @@ static int juno_debug_process_event(const struct fwk_event *event,
 
         switch (fwk_id_get_event_idx(event->id)) {
         /* Response event from PD */
-        case MOD_PD_PUBLIC_EVENT_IDX_GET_STATE:
         case MOD_PD_PUBLIC_EVENT_IDX_SET_STATE:
             pd_set_resp_params = (struct pd_set_state_response *)event->params;
 

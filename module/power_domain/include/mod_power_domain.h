@@ -518,11 +518,7 @@ struct mod_pd_restricted_api {
      * \param[out] state The power domain state.
      *
      * \retval ::FWK_SUCCESS The power state was returned.
-     * \retval ::FWK_E_ACCESS Invalid access, the framework has rejected the
-     *      call to the API.
-     * \retval ::FWK_E_HANDLER The function is not called from a thread.
      * \retval ::FWK_E_PARAM An invalid parameter was encountered:
-     *      - The `pd_id` parameter was not a valid system entity identifier.
      *      - The `state` parameter was a null pointer value.
      */
     int (*get_state)(fwk_id_t pd_id, unsigned int *state);
@@ -809,9 +805,6 @@ enum mod_pd_public_event_idx {
     /*! Set state request event */
     MOD_PD_PUBLIC_EVENT_IDX_SET_STATE,
 
-    /*! Get state request event */
-    MOD_PD_PUBLIC_EVENT_IDX_GET_STATE,
-
     /*! Number of public Power Domain events */
     MOD_PD_PUBLIC_EVENT_IDX_COUNT,
 };
@@ -866,10 +859,6 @@ static const fwk_id_t mod_pd_public_event_id_set_state =
     FWK_ID_EVENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN,
                       MOD_PD_PUBLIC_EVENT_IDX_SET_STATE);
 
-/*! Identifier of the public event get_state identifier */
-static const fwk_id_t mod_pd_public_event_id_get_state =
-    FWK_ID_EVENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN,
-                      MOD_PD_PUBLIC_EVENT_IDX_GET_STATE);
 #endif
 
 /*!
