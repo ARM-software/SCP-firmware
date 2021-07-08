@@ -21,7 +21,7 @@ FWK_CONSTRUCTOR void fwk_time_init(void)
 {
     struct fwk_time_driver driver = fmw_time_driver(&fwk_time_ctx.driver_ctx);
 
-    memcpy(&fwk_time_ctx.driver, &driver, sizeof(driver));
+    (void)memcpy(&fwk_time_ctx.driver, &driver, sizeof(driver));
 }
 
 fwk_timestamp_t fwk_time_current(void)

@@ -160,7 +160,7 @@ static void fwk_log_vsnprintf(
      * the next line at the first column.
      */
 
-    memcpy(newline, FWK_LOG_TERMINATOR, sizeof(FWK_LOG_TERMINATOR));
+    (void)memcpy(newline, FWK_LOG_TERMINATOR, sizeof(FWK_LOG_TERMINATOR));
 }
 
 static void fwk_log_snprintf(
@@ -211,7 +211,7 @@ void fwk_log_printf(const char *format, ...)
 
     va_list args;
 
-    fwk_interrupt_global_disable(); /* Facilitate reentrancy */
+    (void)fwk_interrupt_global_disable(); /* Facilitate reentrancy */
 
     /*
      * We don't have any way for the log drain entity to communicate that it is
@@ -252,7 +252,7 @@ void fwk_log_printf(const char *format, ...)
     }
 #endif
 
-    fwk_interrupt_global_enable();
+    (void)fwk_interrupt_global_enable();
 }
 
 int fwk_log_unbuffer(void)

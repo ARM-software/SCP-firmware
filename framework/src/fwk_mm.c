@@ -55,7 +55,7 @@ void *fwk_mm_calloc_aligned(size_t alignment, size_t num, size_t size)
     void *ptr = fwk_mm_alloc_aligned(alignment, num, size);
 
     if (ptr != NULL) {
-        memset(ptr, 0, num * size);
+        (void)memset(ptr, 0, num * size);
 
         return ptr;
     }
