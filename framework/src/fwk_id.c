@@ -151,7 +151,7 @@ static void fwk_id_format(
         break;
     }
 
-    snprintf(buffer + length, buffer_size - length, "]");
+    (void)snprintf(buffer + length, buffer_size - length, "]");
 }
 
 struct __fwk_id_fmt __fwk_id_str(fwk_id_t id)

@@ -73,10 +73,10 @@ static struct fwk_event *duplicate_event(struct fwk_event *event)
 
     fwk_assert(event != NULL);
 
-    fwk_interrupt_global_disable();
+    (void)fwk_interrupt_global_disable();
     allocated_event = FWK_LIST_GET(
         fwk_list_pop_head(&ctx.free_event_queue), struct fwk_event, slist_node);
-    fwk_interrupt_global_enable();
+    (void)fwk_interrupt_global_enable();
 
     if (allocated_event == NULL) {
         FWK_LOG_CRIT(err_msg_func, FWK_E_NOMEM, __func__);
@@ -112,7 +112,7 @@ static int put_event(
             __fwk_thread_get_delayed_response_list(event->source_id),
             &allocated_event->slist_node);
 
-        memcpy(
+        (void)memcpy(
             allocated_event->params,
             event->params,
             sizeof(allocated_event->params));
@@ -189,7 +189,7 @@ static bool fwk_process_signal()
     int i = 0;
 
     while (fwk_signal_ctx.pending_signals > 0) {
-        fwk_interrupt_global_disable();
+        (void)fwk_interrupt_global_disable();
         for (; i < FWK_MODULE_SIGNAL_COUNT; i++) {
             if (!fwk_id_is_equal(
                     fwk_signal_ctx.signals[i].target_id, FWK_ID_NONE)) {
@@ -203,15 +203,15 @@ static bool fwk_process_signal()
 
         if (i == FWK_MODULE_SIGNAL_COUNT) {
             fwk_signal_ctx.current_signal.target_id = FWK_ID_NONE;
-            fwk_interrupt_global_enable();
+            (void)fwk_interrupt_global_enable();
             return false;
         }
 
         fwk_signal_ctx.pending_signals--;
         fwk_signal_ctx.signals[i].target_id = FWK_ID_NONE;
-        fwk_interrupt_global_enable();
+        (void)fwk_interrupt_global_enable();
 
-        execute_signal_handler(signal.target_id, signal.signal_id);
+        (void)execute_signal_handler(signal.target_id, signal.signal_id);
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
         FWK_LOG_TRACE(
@@ -226,9 +226,9 @@ static bool fwk_process_signal()
 
 static void free_event(struct fwk_event *event)
 {
-    fwk_interrupt_global_disable();
+    (void)fwk_interrupt_global_disable();
     fwk_list_push_tail(&ctx.free_event_queue, &event->slist_node);
-    fwk_interrupt_global_enable();
+    (void)fwk_interrupt_global_enable();
 }
 
 static void process_next_event(void)
@@ -269,7 +269,7 @@ static void process_next_event(void)
         async_response_event.is_response = true;
         async_response_event.response_requested = false;
         if (!async_response_event.is_delayed_response) {
-            put_event(&async_response_event, UNKNOWN_THREAD);
+            (void)put_event(&async_response_event, UNKNOWN_THREAD);
         } else {
             allocated_event = duplicate_event(&async_response_event);
             if (allocated_event != NULL) {
@@ -300,10 +300,10 @@ static bool process_isr(void)
 {
     struct fwk_event *isr_event;
 
-    fwk_interrupt_global_disable();
+    (void)fwk_interrupt_global_disable();
     isr_event = FWK_LIST_GET(
         fwk_list_pop_head(&ctx.isr_event_queue), struct fwk_event, slist_node);
-    fwk_interrupt_global_enable();
+    (void)fwk_interrupt_global_enable();
 
     if (isr_event == NULL) {
         return false;
@@ -357,18 +357,18 @@ int __fwk_thread_init(size_t event_count)
 noreturn void __fwk_thread_run(void)
 {
     for (;;) {
-        fwk_process_signal();
+        (void)fwk_process_signal();
 
         while (!fwk_list_is_empty(&ctx.event_queue)) {
             process_next_event();
-            fwk_process_signal();
+            (void)fwk_process_signal();
         }
 
         if (process_isr()) {
             continue;
         }
 
-        fwk_log_unbuffer();
+        (void)fwk_log_unbuffer();
     }
 }
 
@@ -557,10 +557,10 @@ int fwk_thread_put_event_and_wait(
     ctx.cookie = event->cookie;
 
     for (;;) {
-        fwk_process_signal();
+        (void)fwk_process_signal();
         if (fwk_list_is_empty(&ctx.event_queue)) {
-            fwk_process_signal();
-            process_isr();
+            (void)fwk_process_signal();
+            (void)process_isr();
             continue;
         }
 
@@ -629,7 +629,7 @@ int fwk_thread_put_event_and_wait(
              * Check for any interrupt events that might have been
              * queued while the event was being executed.
              */
-            process_isr();
+            (void)process_isr();
             continue;
         }
 
@@ -638,7 +638,7 @@ int fwk_thread_put_event_and_wait(
              * The response event has been received, return to
              * the caller.
              */
-            memcpy(
+            (void)memcpy(
                 resp_event->params,
                 next_event->params,
                 sizeof(resp_event->params));
@@ -669,7 +669,7 @@ int fwk_thread_put_signal(
 {
     int signal_idx;
 
-    fwk_interrupt_global_disable();
+    (void)fwk_interrupt_global_disable();
 
     /*
      * Find an available slot in the signals array
@@ -685,12 +685,12 @@ int fwk_thread_put_signal(
     }
 
     if (signal_idx == FWK_MODULE_SIGNAL_COUNT) {
-        fwk_interrupt_global_enable();
+        (void)fwk_interrupt_global_enable();
         return FWK_E_BUSY;
     }
 
     fwk_signal_ctx.pending_signals++;
-    fwk_interrupt_global_enable();
+    (void)fwk_interrupt_global_enable();
 
     return FWK_SUCCESS;
 }

@@ -216,9 +216,9 @@ int fwk_notification_subscribe(fwk_id_t notification_id, fwk_id_t source_id,
     subscription->source_id = source_id;
     subscription->target_id = target_id;
 
-    fwk_interrupt_global_disable();
+    (void)fwk_interrupt_global_disable();
     fwk_list_push_tail(subscription_dlist, &subscription->dlist_node);
-    fwk_interrupt_global_enable();
+    (void)fwk_interrupt_global_enable();
 
     return FWK_SUCCESS;
 
@@ -257,9 +257,9 @@ int fwk_notification_unsubscribe(fwk_id_t notification_id, fwk_id_t source_id,
         goto error;
     }
 
-    fwk_interrupt_global_disable();
+    (void)fwk_interrupt_global_disable();
     fwk_list_remove(subscription_dlist, &subscription->dlist_node);
-    fwk_interrupt_global_enable();
+    (void)fwk_interrupt_global_enable();
     fwk_list_push_tail(&ctx.free_subscription_dlist, &subscription->dlist_node);
 
     return FWK_SUCCESS;

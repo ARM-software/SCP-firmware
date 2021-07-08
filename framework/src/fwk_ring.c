@@ -102,12 +102,13 @@ size_t fwk_ring_peek(
     }
 
     if (fwk_ring_offset(ring, ring->head + buffer_size) > ring->head) {
-        memcpy(buffer, ring->storage + ring->head, buffer_size);
+        (void)memcpy(buffer, ring->storage + ring->head, buffer_size);
     } else {
         size_t chunk_size = ring->capacity - ring->head;
 
-        memcpy(buffer, ring->storage + ring->head, chunk_size);
-        memcpy(buffer + chunk_size, ring->storage, buffer_size - chunk_size);
+        (void)memcpy(buffer, ring->storage + ring->head, chunk_size);
+        (void)memcpy(
+            buffer + chunk_size, ring->storage, buffer_size - chunk_size);
     }
 
     return buffer_size;
@@ -140,12 +141,13 @@ size_t fwk_ring_push(
     remaining = fwk_ring_get_free(ring);
 
     if (fwk_ring_offset(ring, ring->tail + buffer_size) > ring->tail) {
-        memcpy(ring->storage + ring->tail, buffer, buffer_size);
+        (void)memcpy(ring->storage + ring->tail, buffer, buffer_size);
     } else {
         size_t chunk_size = ring->capacity - ring->tail;
 
-        memcpy(ring->storage + ring->tail, buffer, chunk_size);
-        memcpy(ring->storage, buffer + chunk_size, buffer_size - chunk_size);
+        (void)memcpy(ring->storage + ring->tail, buffer, chunk_size);
+        (void)memcpy(
+            ring->storage, buffer + chunk_size, buffer_size - chunk_size);
     }
 
     ring->tail = fwk_ring_offset(ring, ring->tail + buffer_size);
