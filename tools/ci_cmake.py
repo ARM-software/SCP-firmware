@@ -115,6 +115,8 @@ def main():
                 cmd += 'PRODUCT={} TOOLCHAIN={} MODE={}'.format(product,
                                                                 toolchain,
                                                                 build_type)
+                cmd += ' -j$(nproc)'
+
                 if product in platform_variant:
                     for variant in platform_variant[product]:
                         cmd_variant = cmd + ' ' + prod_variant(variant)
