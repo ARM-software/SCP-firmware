@@ -79,6 +79,8 @@ static void fwk_id_format(
     case __FWK_ID_TYPE_NOTIFICATION:
         indices[1] = id.notification.notification_idx;
 
+        break;
+
     default:
         break;
     }
@@ -115,6 +117,7 @@ static void fwk_id_format(
             length += snprintf(
                 buffer + length, buffer_size - length, " %u", indices[0]);
         }
+        break;
 
     default:
         break;
@@ -133,6 +136,7 @@ static void fwk_id_format(
             length += snprintf(
                 buffer + length, buffer_size - length, ":%u", indices[1]);
         }
+        break;
 
     default:
         break;
@@ -142,7 +146,7 @@ static void fwk_id_format(
     case __FWK_ID_TYPE_SUB_ELEMENT:
         length +=
             snprintf(buffer + length, buffer_size - length, ":%u", indices[2]);
-
+        break;
     default:
         break;
     }

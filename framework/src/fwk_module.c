@@ -553,21 +553,26 @@ bool fwk_module_is_valid_sub_element_id(fwk_id_t id)
 
 bool fwk_module_is_valid_entity_id(fwk_id_t id)
 {
+    bool return_status = false;
+
     switch (fwk_id_get_type(id)) {
     case FWK_ID_TYPE_MODULE:
-        return fwk_module_is_valid_module_id(id);
+        return_status = fwk_module_is_valid_module_id(id);
+        break;
 
     case FWK_ID_TYPE_ELEMENT:
-        return fwk_module_is_valid_element_id(id);
+        return_status = fwk_module_is_valid_element_id(id);
+        break;
 
     case FWK_ID_TYPE_SUB_ELEMENT:
-        return fwk_module_is_valid_sub_element_id(id);
+        return_status = fwk_module_is_valid_sub_element_id(id);
+        break;
 
     default:
         break;
     }
 
-    return false;
+    return return_status;
 }
 
 bool fwk_module_is_valid_api_id(fwk_id_t id)
