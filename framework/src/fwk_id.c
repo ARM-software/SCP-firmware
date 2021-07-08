@@ -22,7 +22,7 @@
 
 static void fwk_id_format(char *buffer, size_t buffer_size, fwk_id_t id)
 {
-    static const char *types[] = {
+    static const char *types[__FWK_ID_TYPE_COUNT] = {
         [__FWK_ID_TYPE_INVALID] = "INV",
         [__FWK_ID_TYPE_NONE] = "NON",
         [__FWK_ID_TYPE_MODULE] = "MOD",
