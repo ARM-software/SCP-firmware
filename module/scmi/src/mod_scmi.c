@@ -151,7 +151,9 @@ static int scmi_base_reset_agent_config(
     const uint32_t *payload);
 #endif
 
-static int (*const base_handler_table[])(fwk_id_t, const uint32_t *) = {
+static int (*const base_handler_table[MOD_SCMI_BASE_COMMAND_COUNT])(
+    fwk_id_t,
+    const uint32_t *) = {
     [MOD_SCMI_PROTOCOL_VERSION] = scmi_base_protocol_version_handler,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = scmi_base_protocol_attributes_handler,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
@@ -171,29 +173,30 @@ static int (*const base_handler_table[])(fwk_id_t, const uint32_t *) = {
 #endif
 };
 
-static const unsigned int base_payload_size_table[] = {
-    [MOD_SCMI_PROTOCOL_VERSION] = 0,
-    [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
-    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
-        (unsigned int)sizeof(struct scmi_protocol_message_attributes_a2p),
-    [MOD_SCMI_BASE_DISCOVER_VENDOR] = 0,
-    [MOD_SCMI_BASE_DISCOVER_SUB_VENDOR] = 0,
-    [MOD_SCMI_BASE_DISCOVER_IMPLEMENTATION_VERSION] = 0,
-    [MOD_SCMI_BASE_DISCOVER_LIST_PROTOCOLS] =
-        (unsigned int)sizeof(struct scmi_base_discover_list_protocols_a2p),
-    [MOD_SCMI_BASE_DISCOVER_AGENT] =
-        (unsigned int)sizeof(struct scmi_base_discover_agent_a2p),
+static const unsigned int
+    base_payload_size_table[MOD_SCMI_BASE_COMMAND_COUNT] = {
+        [MOD_SCMI_PROTOCOL_VERSION] = 0,
+        [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
+        [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+            (unsigned int)sizeof(struct scmi_protocol_message_attributes_a2p),
+        [MOD_SCMI_BASE_DISCOVER_VENDOR] = 0,
+        [MOD_SCMI_BASE_DISCOVER_SUB_VENDOR] = 0,
+        [MOD_SCMI_BASE_DISCOVER_IMPLEMENTATION_VERSION] = 0,
+        [MOD_SCMI_BASE_DISCOVER_LIST_PROTOCOLS] =
+            (unsigned int)sizeof(struct scmi_base_discover_list_protocols_a2p),
+        [MOD_SCMI_BASE_DISCOVER_AGENT] =
+            (unsigned int)sizeof(struct scmi_base_discover_agent_a2p),
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
-    [MOD_SCMI_BASE_SET_DEVICE_PERMISSIONS] =
-        sizeof(struct scmi_base_set_device_permissions_a2p),
-    [MOD_SCMI_BASE_SET_PROTOCOL_PERMISSIONS] =
-        sizeof(struct scmi_base_set_protocol_permissions_a2p),
-    [MOD_SCMI_BASE_RESET_AGENT_CONFIG] =
-        sizeof(struct scmi_base_reset_agent_config_a2p),
+        [MOD_SCMI_BASE_SET_DEVICE_PERMISSIONS] =
+            sizeof(struct scmi_base_set_device_permissions_a2p),
+        [MOD_SCMI_BASE_SET_PROTOCOL_PERMISSIONS] =
+            sizeof(struct scmi_base_set_protocol_permissions_a2p),
+        [MOD_SCMI_BASE_RESET_AGENT_CONFIG] =
+            sizeof(struct scmi_base_reset_agent_config_a2p),
 #endif
-};
+    };
 
-static const char * const default_agent_names[] = {
+static const char *const default_agent_names[SCMI_AGENT_TYPE_COUNT] = {
     [SCMI_AGENT_TYPE_PSCI] = "PSCI",
     [SCMI_AGENT_TYPE_MANAGEMENT] = "MANAGEMENT",
     [SCMI_AGENT_TYPE_OSPM] = "OSPM",

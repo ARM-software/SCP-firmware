@@ -146,7 +146,9 @@ static const fwk_id_t mod_scmi_pd_event_id_dbg_enable_get =
 
 static struct scmi_pd_ctx scmi_pd_ctx;
 
-static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
+static int (*handler_table[MOD_SCMI_PD_POWER_COMMAND_COUNT])(
+    fwk_id_t,
+    const uint32_t *) = {
     [MOD_SCMI_PROTOCOL_VERSION] = scmi_pd_protocol_version_handler,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = scmi_pd_protocol_attributes_handler,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
@@ -164,7 +166,7 @@ static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
 #endif
 };
 
-static unsigned int payload_size_table[] = {
+static unsigned int payload_size_table[MOD_SCMI_PD_POWER_COMMAND_COUNT] = {
     [MOD_SCMI_PROTOCOL_VERSION] = 0,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
@@ -184,9 +186,9 @@ static unsigned int payload_size_table[] = {
 #endif
 };
 
-static uint32_t pd_state_to_scmi_dev_state[] = {
-    [MOD_PD_STATE_OFF] = SCMI_PD_DEVICE_STATE_ID_OFF |
-                         SCMI_PD_DEVICE_STATE_TYPE,
+static uint32_t pd_state_to_scmi_dev_state[MOD_PD_STATE_COUNT] = {
+    [MOD_PD_STATE_OFF] =
+        SCMI_PD_DEVICE_STATE_ID_OFF | SCMI_PD_DEVICE_STATE_TYPE,
     [MOD_PD_STATE_ON] = SCMI_PD_DEVICE_STATE_ID_ON,
     /* In case of more supported device states review the map functions */
 };

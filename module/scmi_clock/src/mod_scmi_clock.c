@@ -128,7 +128,9 @@ static int scmi_clock_describe_rates_handler(fwk_id_t service_id,
  */
 static struct scmi_clock_ctx scmi_clock_ctx;
 
-static int (*const handler_table[])(fwk_id_t, const uint32_t *) = {
+static int (*const handler_table[MOD_SCMI_CLOCK_COMMAND_COUNT])(
+    fwk_id_t,
+    const uint32_t *) = {
     [MOD_SCMI_PROTOCOL_VERSION] = scmi_clock_protocol_version_handler,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = scmi_clock_protocol_attributes_handler,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
@@ -140,7 +142,7 @@ static int (*const handler_table[])(fwk_id_t, const uint32_t *) = {
     [MOD_SCMI_CLOCK_DESCRIBE_RATES] = scmi_clock_describe_rates_handler,
 };
 
-static const unsigned int payload_size_table[] = {
+static const unsigned int payload_size_table[MOD_SCMI_CLOCK_COMMAND_COUNT] = {
     [MOD_SCMI_PROTOCOL_VERSION] = 0,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
