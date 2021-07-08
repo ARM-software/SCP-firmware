@@ -332,7 +332,7 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
          * Copy sensor name into description struct. Copy n-1 chars to ensure a
          * NULL terminator at the end. (struct has been zeroed out)
          */
-        strncpy(
+        (void)strncpy(
             desc.sensor_name,
             fwk_module_get_element_name(sensor_id),
             sizeof(desc.sensor_name) - 1);

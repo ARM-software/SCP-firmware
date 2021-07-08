@@ -677,7 +677,7 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
     };
 
     /* Copy the domain name into the mailbox */
-    strncpy(
+    (void)strncpy(
         (char *)return_values.name,
         fwk_module_get_element_name(domain_id),
         sizeof(return_values.name) - 1);

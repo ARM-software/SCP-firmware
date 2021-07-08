@@ -182,7 +182,7 @@ static void graceful_timer_callback(uintptr_t scmi_system_state)
 
     if (scmi_system_state == SCMI_SYSTEM_STATE_SHUTDOWN) {
         system_shutdown = system_state2system_shutdown[scmi_system_state];
-        scmi_sys_power_ctx.pd_api->system_shutdown(system_shutdown);
+        (void)scmi_sys_power_ctx.pd_api->system_shutdown(system_shutdown);
     }
 }
 
@@ -546,7 +546,7 @@ FWK_WEAK int scmi_sys_power_state_set_policy(
 #endif
 
             if (scmi_sys_power_ctx.alarm_api != NULL) {
-                scmi_sys_power_ctx.alarm_api->start(
+                (void)scmi_sys_power_ctx.alarm_api->start(
                     scmi_sys_power_ctx.config->alarm_id,
                     scmi_sys_power_ctx.config->graceful_timeout,
                     MOD_TIMER_ALARM_TYPE_ONCE,

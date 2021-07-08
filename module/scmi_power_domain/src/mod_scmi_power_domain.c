@@ -398,7 +398,7 @@ static int scmi_pd_power_domain_attributes_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    strncpy(
+    (void)strncpy(
         (char *)return_values.name,
         fwk_module_get_element_name(pd_id),
         sizeof(return_values.name) - 1);
