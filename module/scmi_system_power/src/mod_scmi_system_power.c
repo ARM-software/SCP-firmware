@@ -68,7 +68,9 @@ static int scmi_sys_power_state_notify_handler(fwk_id_t service_id,
  */
 static struct scmi_sys_power_ctx scmi_sys_power_ctx;
 
-static int (*const handler_table[])(fwk_id_t, const uint32_t *) = {
+static int (*const handler_table[MOD_SCMI_SYS_POWER_COMMAND_COUNT])(
+    fwk_id_t,
+    const uint32_t *) = {
     [MOD_SCMI_PROTOCOL_VERSION] = scmi_sys_power_version_handler,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = scmi_sys_power_attributes_handler,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
@@ -80,25 +82,27 @@ static int (*const handler_table[])(fwk_id_t, const uint32_t *) = {
 #endif
 };
 
-static const unsigned int payload_size_table[] = {
-    [MOD_SCMI_PROTOCOL_VERSION] = 0,
-    [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
-    [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
-        (unsigned int)sizeof(struct scmi_protocol_message_attributes_a2p),
-    [MOD_SCMI_SYS_POWER_STATE_SET] =
-        (unsigned int)sizeof(struct scmi_sys_power_state_set_a2p),
-    [MOD_SCMI_SYS_POWER_STATE_GET] = 0,
+static const unsigned int
+    payload_size_table[MOD_SCMI_SYS_POWER_COMMAND_COUNT] = {
+        [MOD_SCMI_PROTOCOL_VERSION] = 0,
+        [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
+        [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
+            (unsigned int)sizeof(struct scmi_protocol_message_attributes_a2p),
+        [MOD_SCMI_SYS_POWER_STATE_SET] =
+            (unsigned int)sizeof(struct scmi_sys_power_state_set_a2p),
+        [MOD_SCMI_SYS_POWER_STATE_GET] = 0,
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    [MOD_SCMI_SYS_POWER_STATE_NOTIFY] =
-        sizeof(struct scmi_sys_power_state_notify_a2p),
+        [MOD_SCMI_SYS_POWER_STATE_NOTIFY] =
+            sizeof(struct scmi_sys_power_state_notify_a2p),
 #endif
-};
+    };
 
-static enum mod_pd_system_shutdown system_state2system_shutdown[] = {
-    [SCMI_SYSTEM_STATE_SHUTDOWN] = MOD_PD_SYSTEM_SHUTDOWN,
-    [SCMI_SYSTEM_STATE_COLD_RESET] = MOD_PD_SYSTEM_COLD_RESET,
-    [SCMI_SYSTEM_STATE_WARM_RESET] = MOD_PD_SYSTEM_WARM_RESET,
-};
+static enum mod_pd_system_shutdown
+    system_state2system_shutdown[SCMI_SYSTEM_STATE_MAX] = {
+        [SCMI_SYSTEM_STATE_SHUTDOWN] = MOD_PD_SYSTEM_SHUTDOWN,
+        [SCMI_SYSTEM_STATE_COLD_RESET] = MOD_PD_SYSTEM_COLD_RESET,
+        [SCMI_SYSTEM_STATE_WARM_RESET] = MOD_PD_SYSTEM_WARM_RESET,
+    };
 
 static int system_state_get(enum scmi_system_state *system_state)
 {

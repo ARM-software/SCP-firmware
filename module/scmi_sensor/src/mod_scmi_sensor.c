@@ -101,7 +101,9 @@ static const fwk_id_t mod_scmi_sensor_event_id_get_request =
  */
 static struct scmi_sensor_ctx scmi_sensor_ctx;
 
-static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
+static int (*handler_table[MOD_SCMI_SENSOR_COMMAND_COUNT])(
+    fwk_id_t,
+    const uint32_t *) = {
     [MOD_SCMI_PROTOCOL_VERSION] = scmi_sensor_protocol_version_handler,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = scmi_sensor_protocol_attributes_handler,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
@@ -114,7 +116,7 @@ static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
     [MOD_SCMI_SENSOR_READING_GET] = scmi_sensor_reading_get_handler
 };
 
-static unsigned int payload_size_table[] = {
+static unsigned int payload_size_table[MOD_SCMI_SENSOR_COMMAND_COUNT] = {
     [MOD_SCMI_PROTOCOL_VERSION] = 0,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =

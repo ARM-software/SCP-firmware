@@ -78,7 +78,8 @@ static void scmi_perf_notify_limits_updated(
     uint32_t range_min,
     uint32_t range_max);
 
-static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
+static int (
+    *handler_table[MOD_SCMI_PERF_COMMAND_COUNT])(fwk_id_t, const uint32_t *) = {
     [MOD_SCMI_PROTOCOL_VERSION] = scmi_perf_protocol_version_handler,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = scmi_perf_protocol_attributes_handler,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
@@ -98,7 +99,7 @@ static int (*handler_table[])(fwk_id_t, const uint32_t *) = {
 #endif
 };
 
-static unsigned int payload_size_table[] = {
+static unsigned int payload_size_table[MOD_SCMI_PERF_COMMAND_COUNT] = {
     [MOD_SCMI_PROTOCOL_VERSION] = 0,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
