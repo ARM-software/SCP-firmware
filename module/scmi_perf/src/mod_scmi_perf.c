@@ -21,16 +21,17 @@
 #include <fwk_assert.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
+#include <fwk_string.h>
 #include <fwk_thread.h>
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <string.h>
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 #    include <mod_resource_perms.h>
@@ -424,6 +425,7 @@ void perf_eval_performance(
     uint32_t *level)
 {
     struct scmi_perf_domain_ctx *domain_ctx;
+    int status;
 
     if (limits->minimum > limits->maximum) {
         return;
@@ -433,7 +435,10 @@ void perf_eval_performance(
 
     if ((limits->minimum == domain_ctx->level_limits.minimum) &&
         (limits->maximum == domain_ctx->level_limits.maximum)) {
-        find_opp_for_level(domain_ctx, level, true);
+        status = find_opp_for_level(domain_ctx, level, true);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+        }
         return;
     }
 
@@ -450,7 +455,10 @@ void perf_eval_performance(
     domain_ctx->level_limits.minimum = limits->minimum;
     domain_ctx->level_limits.maximum = limits->maximum;
 
-    find_opp_for_level(domain_ctx, level, true);
+    status = find_opp_for_level(domain_ctx, level, true);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+    }
 }
 #endif
 
@@ -539,6 +547,9 @@ static int scmi_perf_protocol_version_handler(fwk_id_t service_id,
 static int scmi_perf_protocol_attributes_handler(fwk_id_t service_id,
                                                  const uint32_t *payload)
 {
+#ifdef BUILD_HAS_MOD_STATISTICS
+    int status;
+#endif
     struct scmi_perf_protocol_attributes_p2a return_values = {
         .status = (int32_t)SCMI_SUCCESS,
         .attributes =
@@ -547,8 +558,11 @@ static int scmi_perf_protocol_attributes_handler(fwk_id_t service_id,
     uint32_t addr_low = 0, addr_high = 0, len = 0;
 
 #ifdef BUILD_HAS_MOD_STATISTICS
-    scmi_perf_ctx.stats_api->get_statistics_desc(
+    status = scmi_perf_ctx.stats_api->get_statistics_desc(
         fwk_module_id_scmi_perf, &addr_low, &addr_high, &len);
+    if (status != FWK_SUCCESS) {
+        return_values.status = (int32_t)SCMI_GENERIC_ERROR;
+    }
 #endif
 
     return_values.statistics_len = len;
@@ -677,7 +691,7 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
     };
 
     /* Copy the domain name into the mailbox */
-    strncpy(
+    fwk_str_strncpy(
         (char *)return_values.name,
         fwk_module_get_element_name(domain_id),
         sizeof(return_values.name) - 1);
@@ -1064,18 +1078,22 @@ static int scmi_perf_limits_notify(fwk_id_t service_id,
     }
 
     if (parameters->notify_enable) {
-        scmi_perf_ctx.scmi_notification_api->scmi_notification_add_subscriber(
-            MOD_SCMI_PROTOCOL_ID_PERF,
-            id,
-            MOD_SCMI_PERF_NOTIFY_LIMITS,
-            service_id);
+        status = scmi_perf_ctx.scmi_notification_api
+                     ->scmi_notification_add_subscriber(
+                         MOD_SCMI_PROTOCOL_ID_PERF,
+                         id,
+                         MOD_SCMI_PERF_NOTIFY_LIMITS,
+                         service_id);
     } else {
-        scmi_perf_ctx.scmi_notification_api
-            ->scmi_notification_remove_subscriber(
-                MOD_SCMI_PROTOCOL_ID_PERF,
-                agent_id,
-                id,
-                MOD_SCMI_PERF_NOTIFY_LIMITS);
+        status = scmi_perf_ctx.scmi_notification_api
+                     ->scmi_notification_remove_subscriber(
+                         MOD_SCMI_PROTOCOL_ID_PERF,
+                         agent_id,
+                         id,
+                         MOD_SCMI_PERF_NOTIFY_LIMITS);
+    }
+    if (status != FWK_SUCCESS) {
+        goto exit;
     }
 
     return_values.status = (int32_t)SCMI_SUCCESS;
@@ -1124,18 +1142,22 @@ static int scmi_perf_level_notify(fwk_id_t service_id,
     }
 
     if (parameters->notify_enable) {
-        scmi_perf_ctx.scmi_notification_api->scmi_notification_add_subscriber(
-            MOD_SCMI_PROTOCOL_ID_PERF,
-            id,
-            MOD_SCMI_PERF_NOTIFY_LEVEL,
-            service_id);
+        status = scmi_perf_ctx.scmi_notification_api
+                     ->scmi_notification_add_subscriber(
+                         MOD_SCMI_PROTOCOL_ID_PERF,
+                         id,
+                         MOD_SCMI_PERF_NOTIFY_LEVEL,
+                         service_id);
     } else {
-        scmi_perf_ctx.scmi_notification_api
-            ->scmi_notification_remove_subscriber(
-                MOD_SCMI_PROTOCOL_ID_PERF,
-                agent_id,
-                id,
-                MOD_SCMI_PERF_NOTIFY_LEVEL);
+        status = scmi_perf_ctx.scmi_notification_api
+                     ->scmi_notification_remove_subscriber(
+                         MOD_SCMI_PROTOCOL_ID_PERF,
+                         agent_id,
+                         id,
+                         MOD_SCMI_PERF_NOTIFY_LEVEL);
+    }
+    if (status != FWK_SUCCESS) {
+        goto exit;
     }
 
     return_values.status = (int32_t)SCMI_SUCCESS;
@@ -1253,6 +1275,7 @@ static void fast_channel_callback(uintptr_t param)
     uint32_t *set_level;
     uint32_t tlevel, tmax, tmin;
     unsigned int i;
+    int status;
 
     for (i = 0; i < scmi_perf_ctx.domain_count; i++) {
         domain = &(*scmi_perf_ctx.config->domains)[i];
@@ -1298,26 +1321,36 @@ static void fast_channel_callback(uintptr_t param)
                 }),
                 &tlevel);
 
-            scmi_perf_ctx.dvfs_api->set_level(get_dependency_id(i), 0, tlevel);
+            status = scmi_perf_ctx.dvfs_api->set_level(
+                get_dependency_id(i), 0, tlevel);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+            }
 #    else
 
             /*
              * Check for set_level
              */
             if (set_level != NULL && tlevel > 0) {
-                perf_set_level(get_dependency_id(i), 0, tlevel);
+                status = perf_set_level(get_dependency_id(i), 0, tlevel);
+                if (status != FWK_SUCCESS) {
+                    FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+                }
             }
             if (set_limit != NULL) {
                 if ((tmax == 0) && (tmin == 0)) {
                     continue;
                 }
-                perf_set_limits(
+                status = perf_set_limits(
                     get_dependency_id(i),
                     0,
                     &((struct mod_scmi_perf_level_limits){
                         .minimum = tmin,
                         .maximum = tmax,
                     }));
+                if (status != FWK_SUCCESS) {
+                    FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+                }
             }
 #    endif
         }
@@ -1457,6 +1490,9 @@ static void scmi_perf_notify_limits_updated(
     unsigned int idx;
     const struct mod_scmi_perf_domain_config *domain;
     struct mod_scmi_perf_fast_channel_limit *get_limit;
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    int status;
+#endif
 
     idx = fwk_id_get_element_idx(domain_id);
 
@@ -1487,12 +1523,15 @@ static void scmi_perf_notify_limits_updated(
     limits_changed.range_min = range_min;
     limits_changed.range_max = range_max;
 
-    scmi_perf_ctx.scmi_notification_api->scmi_notification_notify(
+    status = scmi_perf_ctx.scmi_notification_api->scmi_notification_notify(
         MOD_SCMI_PROTOCOL_ID_PERF,
         MOD_SCMI_PERF_NOTIFY_LIMITS,
         SCMI_PERF_LIMITS_CHANGED,
         &limits_changed,
         sizeof(limits_changed));
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+    }
 #endif
 }
 
@@ -1517,20 +1556,27 @@ static void scmi_perf_notify_level_updated(
 
 #ifdef BUILD_HAS_MOD_STATISTICS
     size_t level_id;
-    int status;
 #endif
 #ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
     fwk_id_t dep_dom_id;
 #endif
 #if defined(BUILD_HAS_MOD_STATISTICS) || defined(BUILD_HAS_SCMI_NOTIFICATIONS)
     int idx = (int)fwk_id_get_element_idx(domain_id);
+    int status;
 #endif
 
 #ifdef BUILD_HAS_MOD_STATISTICS
     status = scmi_perf_ctx.dvfs_api->get_level_id(domain_id, level, &level_id);
     if (status == FWK_SUCCESS) {
-        scmi_perf_ctx.stats_api->update_domain(fwk_module_id_scmi_perf,
-            FWK_ID_ELEMENT(FWK_MODULE_IDX_SCMI_PERF, idx), level_id);
+        status = scmi_perf_ctx.stats_api->update_domain(
+            fwk_module_id_scmi_perf,
+            FWK_ID_ELEMENT(FWK_MODULE_IDX_SCMI_PERF, idx),
+            level_id);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+        }
+    } else {
+        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
     }
 #endif
 
@@ -1582,12 +1628,15 @@ static void scmi_perf_notify_level_updated(
     level_changed.domain_id = (uint32_t)idx;
     level_changed.performance_level = level;
 
-    scmi_perf_ctx.scmi_notification_api->scmi_notification_notify(
+    status = scmi_perf_ctx.scmi_notification_api->scmi_notification_notify(
         MOD_SCMI_PROTOCOL_ID_PERF,
         MOD_SCMI_PERF_NOTIFY_LEVEL,
         SCMI_PERF_LEVEL_CHANGED,
         &level_changed,
         sizeof(level_changed));
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+    }
 #endif
 
     domain_ctx = get_ctx(domain_id);
@@ -1962,7 +2011,8 @@ static int scmi_perf_start(fwk_id_t id)
                             return status;
                         }
 
-                        memcpy(fc_elem, &opp.level, fast_channel_elem_size[j]);
+                        fwk_str_memcpy(
+                            fc_elem, &opp.level, fast_channel_elem_size[j]);
                     } else {
                         /* _LIMIT_SET or _LIMIT_GET */
                         domain_ctx = &scmi_perf_ctx.domain_ctx_table[i];
@@ -1987,7 +2037,7 @@ static int scmi_perf_start(fwk_id_t id)
             for (j = 0; j < MOD_SCMI_PERF_FAST_CHANNEL_ADDR_INDEX_COUNT; j++) {
                 fc_elem = (void *)(uintptr_t)domain->fast_channels_addr_scp[j];
                 if (fc_elem != NULL) {
-                    memset(fc_elem, 0, fast_channel_elem_size[j]);
+                    fwk_str_memset(fc_elem, 0, fast_channel_elem_size[j]);
                 }
             }
         }
