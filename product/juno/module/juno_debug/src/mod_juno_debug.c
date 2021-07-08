@@ -53,7 +53,6 @@ static struct mod_timer_api *timer_api;
 
 enum juno_debug_state {
     IDLE,
-    GET_STATE,
     SET_STATE_DBGSYS,
     SET_STATE_BIG_SSTOP,
     SET_STATE_LITTLE_SSTOP,
@@ -350,9 +349,6 @@ static int process_enable_request(fwk_id_t id)
     /* Check if DBGSYS has already been powered-on */
     status = dev_ctx.pd_api->get_state(config->pd_dbgsys_id, &power_state);
     if (status != FWK_SUCCESS) {
-        if (status == FWK_PENDING) {
-            dev_ctx.state = GET_STATE;
-        }
         return status;
     }
 
@@ -526,7 +522,6 @@ static int juno_debug_process_event(const struct fwk_event *event,
     struct mod_debug_response_params dbg_resp_params;
     const struct mod_juno_debug_dev_config *config =
         fwk_module_get_data(event->target_id);
-    struct pd_get_state_response *pd_get_resp_params;
     struct pd_set_state_response *pd_set_resp_params;
     struct juno_css_debug_dev *juno_css_debug_dev = config->clk_settings;
 
@@ -541,54 +536,15 @@ static int juno_debug_process_event(const struct fwk_event *event,
 
         switch (fwk_id_get_event_idx(event->id)) {
         /* Response event from PD */
-        case MOD_PD_PUBLIC_EVENT_IDX_GET_STATE:
         case MOD_PD_PUBLIC_EVENT_IDX_SET_STATE:
             pd_set_resp_params = (struct pd_set_state_response *)event->params;
 
-            if (dev_ctx.state != GET_STATE &&
-                pd_set_resp_params->status != FWK_SUCCESS) {
+            if (pd_set_resp_params->status != FWK_SUCCESS) {
                 status = pd_set_resp_params->status;
                 break;
             }
 
             switch (dev_ctx.state) {
-            case GET_STATE:
-                pd_get_resp_params =
-                    (struct pd_get_state_response *)event->params;
-
-                if (pd_get_resp_params->status != FWK_SUCCESS) {
-                    status = pd_get_resp_params->status;
-                    break;
-                }
-
-                if (pd_get_resp_params->state == MOD_PD_STATE_ON) {
-                    /*
-                     * This request originated from an IRQ, therefore
-                     * acknowledgment is required and the ISR needs to be
-                     * re-enabled.
-                     */
-                    if (dev_ctx.user_id == SCP_DEBUG_USER_DAP) {
-                        set_ack_debug_pwrup_req();
-                    }
-
-                    status = FWK_SUCCESS;
-                    break;
-
-                }
-
-                juno_utils_system_clock_enable(debug_clk_mask);
-
-                /* Turn on DBGSYS */
-                status = turn_on_pd(config->pd_dbgsys_id, SET_STATE_DBGSYS);
-                if (status == FWK_PENDING) {
-                    return FWK_SUCCESS;
-                }
-
-                if (status != FWK_SUCCESS) {
-                    break;
-                }
-
-                /* FALLTHRU */
             case SET_STATE_DBGSYS:
                 /* Turn on BIG_SSTOP */
                 status = turn_on_pd(config->pd_big_sstop_id,

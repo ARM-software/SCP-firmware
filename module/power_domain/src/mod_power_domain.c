@@ -245,19 +245,6 @@ struct pd_set_state_request {
 };
 
 /*
- * MOD_PD_PUBLIC_EVENT_IDX_GET_STATE
- * Parameters of the get state request event
- */
-struct pd_get_state_request {
-    /*
-     * Flag indicating if the composite state of the power domain and its
-     * ancestors has to be returned (composite=true) or just the power domain
-     * state (composite=false).
-     */
-    bool composite;
-};
-
-/*
  * PD_EVENT_IDX_REPORT_POWER_STATE_TRANSITION
  * Parameters of the power state transition report event
  */
@@ -1014,15 +1001,12 @@ static int complete_system_suspend(struct pd_ctx *target_pd)
 }
 
 /*
- * Process a 'get composite state' request.
+ * Process a 'get state' request.
  *
  * pd Description of the target of the 'get state' request
- * req_params Parameters of the 'get state' request
- * resp_params Parameters of the 'get state' request response to be filled in
+ * state the required state to be filled in
  */
-static void process_get_state_request(struct pd_ctx *pd,
-    const struct pd_get_state_request *req_params,
-    struct pd_get_state_response *resp_params)
+static void process_get_state_request(struct pd_ctx *pd, unsigned int *state)
 {
     unsigned int level = 0U;
     struct pd_ctx *const base_pd = pd;
@@ -1032,7 +1016,7 @@ static void process_get_state_request(struct pd_ctx *pd,
     int table_size, cs_idx = 0;
 
     if (!pd->cs_support) {
-        resp_params->state = pd->current_state;
+        *state = pd->current_state;
     } else {
         state_mask_table = pd->composite_state_mask_table;
         table_size = (int)pd->composite_state_mask_table_size;
@@ -1060,10 +1044,8 @@ static void process_get_state_request(struct pd_ctx *pd,
             composite_state |= (--level) << shift;
         }
 
-        resp_params->state = composite_state;
+        *state = composite_state;
     }
-
-    resp_params->status = FWK_SUCCESS;
 }
 
 /*
@@ -1535,36 +1517,15 @@ static int pd_set_state(fwk_id_t pd_id, bool response_requested, uint32_t state)
 
 static int pd_get_state(fwk_id_t pd_id, unsigned int *state)
 {
-    int status;
-    struct fwk_event req;
-    struct fwk_event resp;
-    struct pd_get_state_request *req_params =
-        (struct pd_get_state_request *)(&req.params);
-    struct pd_get_state_response *resp_params =
-        (struct pd_get_state_response *)(&resp.params);
+    struct pd_ctx *pd = NULL;
 
     if (state == NULL) {
         return FWK_E_PARAM;
     }
 
-    req = (struct fwk_event) {
-        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
-                           MOD_PD_PUBLIC_EVENT_IDX_GET_STATE),
-        .target_id = pd_id,
-    };
+    pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
 
-    req_params->composite = false;
-
-    status = fwk_thread_put_event_and_wait(&req, &resp);
-    if (status != FWK_SUCCESS) {
-        return status;
-    }
-
-    if (resp_params->status != FWK_SUCCESS) {
-        return resp_params->status;
-    }
-
-    *state = resp_params->state;
+    process_get_state_request(pd, state);
 
     return FWK_SUCCESS;
 }
@@ -1951,15 +1912,6 @@ static int pd_process_event(const struct fwk_event *event,
         fwk_assert(pd != NULL);
 
         process_set_state_request(pd, event, resp);
-
-        return FWK_SUCCESS;
-
-    case (unsigned int)MOD_PD_PUBLIC_EVENT_IDX_GET_STATE:
-        fwk_assert(pd != NULL);
-
-        process_get_state_request(pd,
-            (struct pd_get_state_request *)event->params,
-            (struct pd_get_state_response *)resp->params);
 
         return FWK_SUCCESS;
 
