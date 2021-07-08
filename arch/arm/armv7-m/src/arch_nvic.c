@@ -247,7 +247,7 @@ static const struct fwk_arch_interrupt_driver arch_nvic_driver = {
 
 static void irq_invalid(void)
 {
-    disable(__get_IPSR());
+    (void)disable(__get_IPSR());
 }
 
 int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
@@ -299,7 +299,7 @@ int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
     vector = fwk_mm_calloc_aligned(align_word, isr_count, sizeof(vector[0]));
 
     /* Copy the processor exception table over to the new vector table */
-    memcpy(
+    (void)memcpy(
         vector,
         (const void *)SCB->VTOR,
         NVIC_USER_IRQ_OFFSET * sizeof(vector[0]));
