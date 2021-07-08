@@ -10,6 +10,7 @@ import check_copyright
 import check_doc
 import check_spacing
 import check_tabs
+import check_framework
 import docker
 import os
 import signal
@@ -17,6 +18,48 @@ import subprocess
 import sys
 
 from docker.errors import DockerException
+
+
+code_validations = [
+    check_copyright,
+    check_spacing,
+    check_tabs,
+    check_doc,
+    check_framework,
+]
+
+build_types = [
+    'debug',
+    'release',
+]
+
+toolchains = [
+    'GNU',
+    'ArmClang',
+]
+
+products = [
+    'host',
+    'juno',
+    'morello',
+    'n1sdp',
+    'rdv1',
+    'rdv1mc',
+    'rdn1e1',
+    'sgi575',
+    'sgm775',
+    'sgm776',
+    'synquacer',
+    'tc0',
+    'rcar',
+    'rdn2',
+]
+
+platform_variant = {
+    'rdn2': [
+        '0'
+    ],
+}
 
 
 def prod_variant(variant):
@@ -56,9 +99,51 @@ def dockerize(client):
     signal.signal(signal.SIGINT, sigint_handler)
 
 
-def main():
-    results = []
+def generate_build_info():
+    build_info = []
+    for product in products:
+        for toolchain in toolchains:
+            if product == 'rcar' and toolchain == 'ArmClang':
+                continue
+            for build_type in build_types:
 
+                cmd = 'make -f Makefile.cmake '
+                cmd += 'PRODUCT={} TOOLCHAIN={} MODE={}'.format(product,
+                                                                toolchain,
+                                                                build_type)
+                cmd += ' -j$(nproc)'
+
+                if product in platform_variant:
+                    for variant in platform_variant[product]:
+                        cmd += ' ' + prod_variant(variant)
+                        desc = "Product {}.{} build ({})".format(
+                            product,
+                            variant,
+                            toolchain)
+                        build_info.append((product, desc, cmd))
+                else:
+                    desc = "Product {} build ({})".format(
+                            product,
+                            toolchain)
+                    build_info.append((product, desc, cmd))
+    return build_info
+
+
+def start_build(build_info):
+    build_status = []
+    for product, desc, cmd in build_info:
+        build = subprocess.Popen(
+                                cmd,
+                                shell=True,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE)
+        build_status.append((product, desc, build))
+    return build_status
+
+
+def main():
+    # This code is only applicable if there is valid docker instance
+    # On CI there is no docker instance at the moment
     try:
         client = docker.from_env()
 
@@ -73,64 +158,24 @@ def main():
     except DockerException:
         pass
 
-    banner("Code validation")
+    results = []
 
-    result = check_copyright.main()
-    results.append(("Check copyright", result))
+    banner('Code validation')
 
-    result = check_spacing.main()
-    results.append(("Check spacing", result))
+    for code_validation in code_validations:
+        result = code_validation.main()
+        test_name = code_validation.__name__.split('_')[-1]
+        results.append(('Check {}'.format(test_name), result))
 
-    result = check_tabs.main()
-    results.append(("Check tabs", result))
+    build_status = start_build(generate_build_info())
 
-    result = check_doc.main()
-    results.append(("Check doc", result))
-
-    banner("Build and run framework tests")
-
-    result = subprocess.call("CC=gcc make clean test", shell=True)
-    results.append(("Framework tests", result))
-
-    banner("Test building host product")
-
-    products = ['host', 'juno', 'morello', 'n1sdp', 'rdv1', 'rdv1mc',
-                'rdn1e1', 'sgi575', 'sgm775', 'sgm776', 'tc0',
-                'rdn2']
-    platform_variant = {
-        'rdn2': ['0']
-    }
-
-    build_types = ['debug', 'release']
-    toolchains = ['GNU', 'ArmClang']
-
-    for product in products:
-        banner("Test building {} product".format(product))
-        for toolchain in toolchains:
-            if product == 'rcar' and toolchain == 'ArmClang':
-                continue
-            for build_type in build_types:
-
-                cmd = 'make -f Makefile.cmake '
-                cmd += 'PRODUCT={} TOOLCHAIN={} MODE={}'.format(product,
-                                                                toolchain,
-                                                                build_type)
-                cmd += ' -j$(nproc)'
-
-                if product in platform_variant:
-                    for variant in platform_variant[product]:
-                        cmd_variant = cmd + ' ' + prod_variant(variant)
-                        result = subprocess.call(cmd_variant, shell=True)
-                        results.append(("Product {} build ({})".format(
-                            product,
-                            toolchain),
-                            result))
-                else:
-                    result = subprocess.call(cmd, shell=True)
-                    results.append(("Product {} build ({})".format(
-                        product,
-                        toolchain),
-                        result))
+    for product, desc, build in build_status:
+        banner('Test building {} product'.format(product))
+        (stdout, stderr) = build.communicate()
+        print(stdout.decode())
+        print(stderr.decode())
+        result = build.wait()
+        results.append((desc, result))
 
     banner('Tests summary')
 
