@@ -390,7 +390,7 @@ static int morello_system_init_primary_core(void)
             "[MORELLO SYSTEM] Booting primary core at %lu MHz...",
             PIK_CLK_RATE_CLUS0_CPU / FWK_MHZ);
 
-        status = mod_pd_restricted_api->set_state_async(
+        status = mod_pd_restricted_api->set_state(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
             false,
             MOD_PD_COMPOSITE_STATE(
@@ -576,7 +576,7 @@ static int morello_system_start(fwk_id_t id)
     composite_state = MOD_PD_COMPOSITE_STATE(
         MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON, MOD_PD_STATE_OFF, MOD_PD_STATE_OFF);
 
-    return morello_system_ctx.mod_pd_restricted_api->set_state_async(
+    return morello_system_ctx.mod_pd_restricted_api->set_state(
         FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0), false, composite_state);
 }
 

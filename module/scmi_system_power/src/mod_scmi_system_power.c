@@ -382,6 +382,7 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
 
         status = scmi_sys_power_ctx.pd_api->set_state(
             scmi_sys_power_ctx.config->wakeup_power_domain_id,
+            false,
             scmi_sys_power_ctx.config->wakeup_composite_state);
         if (status != FWK_SUCCESS) {
             goto exit;

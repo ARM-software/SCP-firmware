@@ -101,8 +101,8 @@ static void soc_wakeup_handler(void)
     uint32_t state = MOD_PD_COMPOSITE_STATE(
         MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON, MOD_PD_STATE_ON, MOD_PD_STATE_ON);
 
-    status = system_power_ctx.mod_pd_restricted_api->set_state_async(
-        pd_id, false, state);
+    status =
+        system_power_ctx.mod_pd_restricted_api->set_state(pd_id, false, state);
     assert(status == FWK_SUCCESS);
     (void)status;
 }

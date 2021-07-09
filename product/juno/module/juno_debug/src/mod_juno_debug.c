@@ -246,7 +246,7 @@ static int turn_on_pd(fwk_id_t pd_id, enum juno_debug_state next_state)
 {
     int status;
 
-    status = dev_ctx.pd_api->set_state(pd_id, MOD_PD_STATE_ON);
+    status = dev_ctx.pd_api->set_state(pd_id, true, MOD_PD_STATE_ON);
     if (status == FWK_PENDING) {
         dev_ctx.state = next_state;
     }

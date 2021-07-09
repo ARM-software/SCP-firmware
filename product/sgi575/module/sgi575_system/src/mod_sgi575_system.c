@@ -285,7 +285,7 @@ static int sgi575_system_start(fwk_id_t id)
         return status;
     }
 
-    return sgi575_system_ctx.mod_pd_restricted_api->set_state_async(
+    return sgi575_system_ctx.mod_pd_restricted_api->set_state(
         FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
         false,
         MOD_PD_COMPOSITE_STATE(
@@ -319,7 +319,7 @@ int sgi575_system_process_notification(const struct fwk_event *event,
 
             mod_pd_restricted_api = sgi575_system_ctx.mod_pd_restricted_api;
 
-            status = mod_pd_restricted_api->set_state_async(
+            status = mod_pd_restricted_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
                 false,
                 MOD_PD_COMPOSITE_STATE(
