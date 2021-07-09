@@ -486,30 +486,6 @@ struct mod_pd_restricted_api {
     int (*get_domain_parent_id)(fwk_id_t pd_id, fwk_id_t *parent_pd_id);
 
     /*!
-     * \brief Set the state of a power domain and possibly of one or several of
-     *        its ancestors.
-     *
-     * \note The function sets the state of the power domain identified by
-     *      'pd_id' and possibly of one or several of its ancestors. When the
-     *      function returns the state transition is completed.
-     *
-     * \param pd_id Identifier of the power domain whose state has to be set.
-     *
-     * \param state State the power domain has to be put into and
-     *      possibly the state(s) its ancestor(s) has(have) to be put into. The
-     *      module will ensure that, for each power state transition, the parent
-     *      and the children of the power domain involved are in a state where
-     *      the transition can be completed.
-     *
-     * \retval ::FWK_SUCCESS The power state transition was completed.
-     * \retval ::FWK_E_ACCESS Invalid access, the framework has rejected the
-     *      call to the API.
-     * \retval ::FWK_E_HANDLER The function is not called from a thread.
-     * \retval ::FWK_E_PARAM One or more parameters were invalid.
-     */
-    int (*set_state)(fwk_id_t pd_id, uint32_t state);
-
-    /*!
      * \brief Request an asynchronous power state transition.
      *
      * \warning Successful completion of this function does not indicate
@@ -532,7 +508,7 @@ struct mod_pd_restricted_api {
      *      call to the API.
      * \retval ::FWK_E_PARAM One or more parameters were invalid.
      */
-    int (*set_state_async)(fwk_id_t pd_id, bool resp_requested, uint32_t state);
+    int (*set_state)(fwk_id_t pd_id, bool resp_requested, uint32_t state);
 
     /*!
      * \brief Get the state of a given power domain.
@@ -616,7 +592,7 @@ struct mod_pd_restricted_api {
  */
 struct mod_pd_driver_input_api {
     /*!
-     * \brief Request an asynchronous composite power state transition.
+     * \brief Request an composite power state transition.
      *
      * \warning Successful completion of this function does not indicate
      *      completion of a transition, but instead that a request has been
@@ -638,7 +614,7 @@ struct mod_pd_driver_input_api {
      *      call to the API.
      * \retval ::FWK_E_PARAM One or more parameters were invalid.
      */
-    int (*set_state_async)(
+    int (*set_state)(
         fwk_id_t pd_id,
         bool resp_requested,
         uint32_t composite_state);

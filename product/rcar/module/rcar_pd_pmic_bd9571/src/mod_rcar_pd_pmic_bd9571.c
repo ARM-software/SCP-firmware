@@ -85,7 +85,7 @@ static int pd_pmic_resume(void)
 
     pd_ctx = &rcar_pmic_ctx.pd_ctx_table[
                     RCAR_PD_PMIC_ELEMENT_IDX_PMIC_DDR_BKUP];
-    pd_ctx->pd_driver_input_api->set_state_async(
+    pd_ctx->pd_driver_input_api->set_state(
         pd_ctx->bound_id, false, MOD_PD_STATE_OFF);
 
     return FWK_SUCCESS;

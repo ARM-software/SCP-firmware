@@ -441,7 +441,7 @@ static int scmi_power_scp_set_core_state(fwk_id_t pd_id,
 {
     int status;
 
-    status = scmi_pd_ctx.pd_api->set_state_async(pd_id, false, composite_state);
+    status = scmi_pd_ctx.pd_api->set_state(pd_id, false, composite_state);
     if (status != FWK_SUCCESS) {
         FWK_LOG_ERR(
             "[SCMI:power] Failed to send core set request (error %s (%d))",
@@ -572,18 +572,19 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
         break;
 
     case MOD_PD_TYPE_CLUSTER:
-        if (!is_sync) {
+        /* sync support is removed */
+        if (is_sync) {
             return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
             goto exit;
         }
 
-        status = scmi_pd_ctx.pd_api->set_state(pd_id, power_state);
+        status = scmi_pd_ctx.pd_api->set_state(pd_id, false, power_state);
         break;
-
 
     case MOD_PD_TYPE_DEVICE_DEBUG:
 #ifdef BUILD_HAS_MOD_DEBUG
-        if (!is_sync) {
+        /* sync support is removed */
+        if (is_sync) {
             return_values.status = SCMI_NOT_SUPPORTED;
             goto exit;
         }
@@ -644,7 +645,7 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
     #endif
 
     case MOD_PD_TYPE_DEVICE:
-        if (!is_sync) {
+        if (is_sync) {
             return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
             goto exit;
         }
@@ -672,7 +673,7 @@ static int scmi_pd_power_state_set_handler(fwk_id_t service_id,
             agent_id,
             power_state);
 
-        status = scmi_pd_ctx.pd_api->set_state(pd_id, pd_power_state);
+        status = scmi_pd_ctx.pd_api->set_state(pd_id, false, pd_power_state);
 
         if (status == FWK_SUCCESS) {
             scmi_pd_power_state_notify(

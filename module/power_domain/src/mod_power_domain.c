@@ -1501,51 +1501,7 @@ static int pd_get_domain_parent_id(fwk_id_t pd_id, fwk_id_t *parent_pd_id)
 }
 
 /* Functions specific to the restricted API */
-
-static int pd_set_state(fwk_id_t pd_id, uint32_t state)
-{
-    int status;
-    struct pd_ctx *pd;
-    struct fwk_event req;
-    struct fwk_event resp;
-    struct pd_set_state_request *req_params =
-        (struct pd_set_state_request *)(&req.params);
-    struct pd_set_state_response *resp_params =
-        (struct pd_set_state_response *)(&resp.params);
-
-    pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
-
-    if (pd->cs_support) {
-        if (!is_valid_composite_state(pd, state)) {
-            return FWK_E_PARAM;
-        }
-    } else {
-        if (!is_valid_state(pd, state)) {
-            return FWK_E_PARAM;
-        }
-    }
-
-    req = (struct fwk_event) {
-        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
-                           MOD_PD_PUBLIC_EVENT_IDX_SET_STATE),
-        .source_id = pd->driver_id,
-        .target_id = pd_id,
-    };
-
-    req_params->composite_state = state;
-
-    status = fwk_thread_put_event_and_wait(&req, &resp);
-    if (status != FWK_SUCCESS) {
-        return status;
-    }
-
-    return resp_params->status;
-}
-
-static int pd_set_state_async(
-    fwk_id_t pd_id,
-    bool response_requested,
-    uint32_t state)
+static int pd_set_state(fwk_id_t pd_id, bool response_requested, uint32_t state)
 {
     struct pd_ctx *pd;
     struct fwk_event req;
@@ -1754,7 +1710,6 @@ static const struct mod_pd_restricted_api pd_restricted_api = {
     .get_domain_parent_id = pd_get_domain_parent_id,
 
     .set_state = pd_set_state,
-    .set_state_async = pd_set_state_async,
     .get_state = pd_get_state,
     .reset = pd_reset,
     .system_suspend = pd_system_suspend,
@@ -1762,7 +1717,7 @@ static const struct mod_pd_restricted_api pd_restricted_api = {
 };
 
 static const struct mod_pd_driver_input_api pd_driver_input_api = {
-    .set_state_async = pd_set_state_async,
+    .set_state = pd_set_state,
     .reset_async = pd_reset_async,
     .report_power_state_transition = pd_report_power_state_transition,
     .get_last_core_pd_id = pd_get_last_core_pd_id,

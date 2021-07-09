@@ -332,7 +332,7 @@ static int platform_system_start(fwk_id_t id)
         return status;
     }
 
-    status = platform_system_ctx.mod_pd_restricted_api->set_state_async(
+    status = platform_system_ctx.mod_pd_restricted_api->set_state(
         FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
         false,
         MOD_PD_COMPOSITE_STATE(
@@ -368,7 +368,7 @@ int platform_system_process_notification(
 
             mod_pd_restricted_api = platform_system_ctx.mod_pd_restricted_api;
 
-            status = mod_pd_restricted_api->set_state_async(
+            status = mod_pd_restricted_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
                 false,
                 MOD_PD_COMPOSITE_STATE(

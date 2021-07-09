@@ -730,6 +730,7 @@ static int n1sdp_c2c_process_command(void)
         case MOD_PD_TYPE_CORE:
             status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
+                false,
                 MOD_PD_COMPOSITE_STATE(
                     MOD_PD_LEVEL_0, 0, 0, 0, MOD_PD_STATE_OFF));
             if (status != FWK_SUCCESS) {
@@ -741,6 +742,7 @@ static int n1sdp_c2c_process_command(void)
         case MOD_PD_TYPE_DEVICE_DEBUG:
             status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
+                false,
                 MOD_PD_STATE_OFF);
             if (status != FWK_SUCCESS) {
                 goto error;
@@ -750,6 +752,7 @@ static int n1sdp_c2c_process_command(void)
         case MOD_PD_TYPE_SYSTEM:
             status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
+                false,
                 MOD_PD_STATE_OFF);
             if (status != FWK_SUCCESS) {
                 goto error;
@@ -772,6 +775,7 @@ static int n1sdp_c2c_process_command(void)
         case MOD_PD_TYPE_CORE:
             status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
+                false,
                 MOD_PD_COMPOSITE_STATE(
                     MOD_PD_LEVEL_2,
                     0,
@@ -787,6 +791,7 @@ static int n1sdp_c2c_process_command(void)
         case MOD_PD_TYPE_DEVICE_DEBUG:
             status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
+                false,
                 MOD_PD_STATE_ON);
             if (status != FWK_SUCCESS) {
                 goto error;
@@ -796,6 +801,7 @@ static int n1sdp_c2c_process_command(void)
         case MOD_PD_TYPE_SYSTEM:
             status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
+                false,
                 MOD_PD_STATE_ON);
             if (status != FWK_SUCCESS) {
                 goto error;
