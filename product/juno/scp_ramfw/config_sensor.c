@@ -374,10 +374,11 @@ static const struct fwk_element *get_sensor_element_table(fwk_id_t module_id)
             return NULL;
         }
 
-        memcpy(element_table,
-               sensor_element_table_r0,
-               sizeof(sensor_element_table_r0));
-        #endif
+        (void)memcpy(
+            element_table,
+            sensor_element_table_r0,
+            sizeof(sensor_element_table_r0));
+#endif
 
         return element_table;
     }

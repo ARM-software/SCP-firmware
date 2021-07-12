@@ -677,7 +677,7 @@ static int juno_xrp7724_gpio_process_request(fwk_id_t id, int response_status)
          * The shutdown assert command is delayed to ensure that the mode change
          * has been applied by the hardware device.
          */
-        module_ctx.timer_api->delay(config->timer_hal_id, GPIO_DELAY_US);
+        (void)module_ctx.timer_api->delay(config->timer_hal_id, GPIO_DELAY_US);
 
         /* Send the assert command */
         status = set_gpio(config->gpio_assert_id, ctx);
@@ -711,7 +711,7 @@ static int juno_xrp7724_gpio_process_request(fwk_id_t id, int response_status)
          * Allow some time to the hardware to apply the reset or shutdown
          * command
          */
-        module_ctx.timer_api->delay(config->timer_hal_id, GPIO_DELAY_US);
+        (void)module_ctx.timer_api->delay(config->timer_hal_id, GPIO_DELAY_US);
 
         /* The board should have been reset or shut down at this point */
 

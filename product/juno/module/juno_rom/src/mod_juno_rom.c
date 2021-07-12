@@ -368,7 +368,8 @@ static int juno_rom_process_event(
         SCP_CONFIG_LITTLE_STATIC_CONFIG_BARRIERDISABLE;
 
     /* Zero the AP context area */
-    memset((void *)ctx.config->ap_context_base, 0, ctx.config->ap_context_size);
+    (void)memset(
+        (void *)ctx.config->ap_context_base, 0, ctx.config->ap_context_size);
 
     /* Send SYSTOP ON notification */
     systop_on_event =
