@@ -682,7 +682,10 @@ static int ddr_retraining(fwk_id_t id)
 
     fwk_interrupt_global_enable();
 
-    fwk_interrupt_enable((unsigned int)PHY_TRAINING_IRQ);
+    status = fwk_interrupt_enable((unsigned int)PHY_TRAINING_IRQ);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
 
     FWK_LOG_INFO("[DMC] Re-training done");
 
@@ -876,7 +879,8 @@ static void ddr_phy_irq_handler(void)
      */
     fwk_assert(revision == JUNO_IDX_REVISION_R0);
 
-    fwk_interrupt_disable((unsigned int)PHY_TRAINING_IRQ);
+    status = fwk_interrupt_disable((unsigned int)PHY_TRAINING_IRQ);
+    fwk_assert(status == FWK_SUCCESS);
 
     req_event = (struct fwk_event) {
         .source_id = id,
@@ -1012,7 +1016,10 @@ static int juno_dmc400_start(fwk_id_t id)
         return FWK_E_STATE;
     }
 
-    fwk_interrupt_enable((unsigned int)PHY_TRAINING_IRQ);
+    status = fwk_interrupt_enable((unsigned int)PHY_TRAINING_IRQ);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
 
     /* Configure Integration Tests */
     dmc->INTEG_CFG = 0x00000000;

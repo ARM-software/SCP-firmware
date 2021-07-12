@@ -321,7 +321,10 @@ static int juno_system_process_notification(const struct fwk_event *event,
 
     if ((scmi_notification_count == FWK_ARRAY_SIZE(scmi_notification_table)) &&
         sds_notification_received) {
-        messaging_stack_ready();
+        status = messaging_stack_ready();
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
 
         scmi_notification_count = 0;
         sds_notification_received = false;

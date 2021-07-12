@@ -27,6 +27,7 @@
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
+#include <fwk_string.h>
 #include <fwk_thread.h>
 
 #include <stdbool.h>
@@ -369,7 +370,8 @@ static int juno_rom_process_event(
         SCP_CONFIG_LITTLE_STATIC_CONFIG_BARRIERDISABLE;
 
     /* Zero the AP context area */
-    memset((void *)ctx.config->ap_context_base, 0, ctx.config->ap_context_size);
+    fwk_str_memset(
+        (void *)ctx.config->ap_context_base, 0, ctx.config->ap_context_size);
 
     /* Send SYSTOP ON notification */
     systop_on_event =

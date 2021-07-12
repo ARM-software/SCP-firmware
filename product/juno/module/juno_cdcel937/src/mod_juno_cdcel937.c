@@ -20,11 +20,11 @@
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_status.h>
+#include <fwk_string.h>
 #include <fwk_thread.h>
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <string.h>
 
 static const struct mod_juno_cdcel937_config *module_config;
 static struct juno_cdcel937_module_ctx module_ctx;
@@ -149,7 +149,7 @@ static int write_configuration(struct juno_cdcel937_dev_ctx *ctx,
      * field at the beginning. This was used earlier because the chip sends
      * the transaction length (in bytes) at the beginning of each read.
      */
-    memcpy(&i2c_transmit[2], &(config->reg[1]), 8);
+    fwk_str_memcpy(&i2c_transmit[2], &(config->reg[1]), 8);
 
     status = module_ctx.i2c_api->transmit_as_master(module_config->i2c_hal_id,
         ctx->config->slave_address, i2c_transmit, 10);

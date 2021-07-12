@@ -22,6 +22,7 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
+#include <fwk_string.h>
 
 #include <string.h>
 
@@ -374,10 +375,11 @@ static const struct fwk_element *get_sensor_element_table(fwk_id_t module_id)
             return NULL;
         }
 
-        memcpy(element_table,
-               sensor_element_table_r0,
-               sizeof(sensor_element_table_r0));
-        #endif
+        fwk_str_memcpy(
+            element_table,
+            sensor_element_table_r0,
+            sizeof(sensor_element_table_r0));
+#endif
 
         return element_table;
     }
