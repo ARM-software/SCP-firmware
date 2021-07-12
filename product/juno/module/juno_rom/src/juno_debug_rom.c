@@ -213,9 +213,20 @@ int juno_debug_rom_init(const struct mod_juno_ppu_rom_api *rom_ppu_api)
             SCP_CONFIG_DEBUG_CONTROL_CDBGPWRUPACK) != 0);
     }
 
-    fwk_interrupt_clear_pending((unsigned int)CDBG_PWR_UP_REQ_IRQ);
-    fwk_interrupt_clear_pending((unsigned int)CDBG_RST_REQ_IRQ);
-    fwk_interrupt_clear_pending((unsigned int)CSYS_PWR_UP_REQ_IRQ);
+    status = fwk_interrupt_clear_pending((unsigned int)CDBG_PWR_UP_REQ_IRQ);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    status = fwk_interrupt_clear_pending((unsigned int)CDBG_RST_REQ_IRQ);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    status = fwk_interrupt_clear_pending((unsigned int)CSYS_PWR_UP_REQ_IRQ);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
 
     status = fwk_interrupt_set_isr(
         (unsigned int)CDBG_PWR_UP_REQ_IRQ, juno_debug_cdbg_pwr_up_req_isr);
@@ -235,9 +246,20 @@ int juno_debug_rom_init(const struct mod_juno_ppu_rom_api *rom_ppu_api)
         return status;
     }
 
-    fwk_interrupt_enable((unsigned int)CDBG_PWR_UP_REQ_IRQ);
-    fwk_interrupt_enable((unsigned int)CDBG_RST_REQ_IRQ);
-    fwk_interrupt_enable((unsigned int)CSYS_PWR_UP_REQ_IRQ);
+    status = fwk_interrupt_enable((unsigned int)CDBG_PWR_UP_REQ_IRQ);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    status = fwk_interrupt_enable((unsigned int)CDBG_RST_REQ_IRQ);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    status = fwk_interrupt_enable((unsigned int)CSYS_PWR_UP_REQ_IRQ);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
 
     return FWK_SUCCESS;
 }
