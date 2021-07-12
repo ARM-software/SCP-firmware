@@ -15,6 +15,7 @@
 
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
+#include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -100,7 +101,10 @@ static void mhu_isr(void)
          */
         if ((device_ctx->bound_slots & (uint32_t)(1U << slot)) != (uint32_t)0) {
             smt_channel = &device_ctx->smt_channel_table[slot];
-            smt_channel->api->signal_message(smt_channel->id);
+            status = smt_channel->api->signal_message(smt_channel->id);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_TRACE("[MHU] %s @%d", __func__, __LINE__);
+            }
         }
 
         /* Acknowledge the interrupt */

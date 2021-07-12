@@ -9,15 +9,14 @@
 #include <mod_timer.h>
 
 #include <fwk_assert.h>
-#include <fwk_log.h>
 #include <fwk_interrupt.h>
+#include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
+#include <fwk_string.h>
 #include <fwk_time.h>
-
-#include <string.h>
 
 /* 'PERF' = 0x50455246 in SCP little-endian */
 #define STATS_SIGN_PERF 0x50455246
@@ -506,7 +505,8 @@ static int stats_init(fwk_id_t module_id, unsigned int element_count,
     fwk_assert(config->ap_stats_addr != 0);
 
     /* Make sure that there is no stale data */
-    memset((void *)config->scp_stats_addr, 0, config->stats_region_size);
+    fwk_str_memset(
+        (void *)config->scp_stats_addr, 0, config->stats_region_size);
 
     stats_ctx.config = config;
     stats_ctx.avail_mem_offset = 0;
