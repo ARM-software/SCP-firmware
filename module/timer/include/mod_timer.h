@@ -240,6 +240,7 @@ struct mod_timer_api {
      *
      * \retval ::FWK_SUCCESS Operation succeeded.
      * \retval ::FWK_E_PARAM One of the parameters is invalid.
+     * \retval ::FWK_E_DEVICE The timer driver failed.
      * \return One of the other specific error codes described by the framework.
      */
     int (*get_next_alarm_remaining)(fwk_id_t dev_id,
@@ -279,7 +280,9 @@ struct mod_timer_alarm_api {
      *
      * \retval ::FWK_E_ACCESS The function was called from an interrupt handler
      *      OR could not attain call context.
+     * \retval ::FWK_E_DEVICE The timer driver failed.
      * \retval ::FWK_SUCCESS The alarm was started.
+     * \return One of the other specific error codes described by the framework.
      */
     int (*start)(fwk_id_t alarm_id,
                  unsigned int milliseconds,
@@ -300,11 +303,13 @@ struct mod_timer_alarm_api {
      *     previously been bound to.
      *
      * \retval ::FWK_SUCCESS The alarm was stopped.
+     * \retval ::FWK_E_DEVICE The timer driver failed.
      * \retval ::FWK_E_STATE The alarm was already stopped.
      * \retval ::FWK_E_ACCESS The function was called from an interrupt handler
      *      different from the interrupt handler of the timer the alarm is
      *      associated to OR could not attain call context.
      * \retval ::FWK_E_INIT The component has not been initialized.
+     * \return One of the other specific error codes described by the framework.
      */
     int (*stop)(fwk_id_t alarm_id);
 };

@@ -148,14 +148,23 @@ static int _remaining(const struct dev_ctx *ctx,
 static void _configure_timer_with_next_alarm(struct dev_ctx *ctx)
 {
     struct alarm_ctx *alarm_head;
+    int status;
 
     fwk_assert(ctx != NULL);
 
     alarm_head = (struct alarm_ctx *)fwk_list_head(&ctx->alarms_active);
     if (alarm_head != NULL) {
         /* Configure timer device */
-        ctx->driver->set_timer(ctx->driver_dev_id, alarm_head->timestamp);
-        ctx->driver->enable(ctx->driver_dev_id);
+        status =
+            ctx->driver->set_timer(ctx->driver_dev_id, alarm_head->timestamp);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_TRACE("[Timer] %s @%d", __func__, __LINE__);
+        }
+
+        status = ctx->driver->enable(ctx->driver_dev_id);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_TRACE("[Timer] %s @%d", __func__, __LINE__);
+        }
     }
 }
 
@@ -316,7 +325,7 @@ static int get_next_alarm_remaining(fwk_id_t dev_id,
                                     bool *has_alarm,
                                     uint64_t *remaining_ticks)
 {
-    int status = FWK_E_PARAM;
+    int status, exit_status;
     const struct dev_ctx *ctx;
     const struct alarm_ctx *alarm_ctx;
     const struct fwk_dlist_node *alarm_ctx_node;
@@ -335,7 +344,10 @@ static int get_next_alarm_remaining(fwk_id_t dev_id,
      * The timer interrupt is disabled to ensure that the alarm list is not
      * modified while we are trying to read it below.
      */
-    ctx->driver->disable(ctx->driver_dev_id);
+    status = ctx->driver->disable(ctx->driver_dev_id);
+    if (status != FWK_SUCCESS) {
+        return FWK_E_DEVICE;
+    }
 
     *has_alarm = !fwk_list_is_empty(&ctx->alarms_active);
 
@@ -343,12 +355,17 @@ static int get_next_alarm_remaining(fwk_id_t dev_id,
         alarm_ctx_node = fwk_list_head(&ctx->alarms_active);
         alarm_ctx = FWK_LIST_GET(alarm_ctx_node, struct alarm_ctx, node);
 
-        status = _remaining(ctx, alarm_ctx->timestamp, remaining_ticks);
+        exit_status = _remaining(ctx, alarm_ctx->timestamp, remaining_ticks);
+    } else {
+        exit_status = FWK_E_PARAM;
     }
 
-    ctx->driver->enable(ctx->driver_dev_id);
+    status = ctx->driver->enable(ctx->driver_dev_id);
+    if (status != FWK_SUCCESS) {
+        return FWK_E_DEVICE;
+    }
 
-    return status;
+    return exit_status;
 }
 
 static const struct mod_timer_api timer_api = {
@@ -401,11 +418,18 @@ static int alarm_stop(fwk_id_t alarm_id)
     alarm = &ctx->alarm_pool[fwk_id_get_sub_element_idx(alarm_id)];
 
     /* Prevent possible data races with the timer interrupt */
-    ctx->driver->disable(ctx->driver_dev_id);
+    status = ctx->driver->disable(ctx->driver_dev_id);
+    if (status != FWK_SUCCESS) {
+        return FWK_E_DEVICE;
+    }
 
     if (!alarm->started) {
-        ctx->driver->enable(ctx->driver_dev_id);
-        return FWK_E_STATE;
+        status = ctx->driver->enable(ctx->driver_dev_id);
+        if (status != FWK_SUCCESS) {
+            return FWK_E_DEVICE;
+        } else {
+            return FWK_E_STATE;
+        }
     }
 
     alarm->started = false;
@@ -423,7 +447,10 @@ static int alarm_stop(fwk_id_t alarm_id)
      * cleared here. If the interrupt was triggered by another alarm, it will be
      * re-triggered when the timer interrupt is re-enabled.
      */
-    fwk_interrupt_clear_pending(ctx->config->timer_irq);
+    status = fwk_interrupt_clear_pending(ctx->config->timer_irq);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
 
     fwk_list_remove(&ctx->alarms_active, (struct fwk_dlist_node *)alarm);
     alarm->activated = false;
@@ -459,7 +486,10 @@ static int alarm_start(fwk_id_t alarm_id,
     alarm = &ctx->alarm_pool[fwk_id_get_sub_element_idx(alarm_id)];
 
     if (alarm->started) {
-        alarm_stop(alarm_id);
+        status = alarm_stop(alarm_id);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
     }
 
     alarm->started = true;
@@ -481,7 +511,10 @@ static int alarm_start(fwk_id_t alarm_id,
     }
 
     /* Disable timer interrupts to work with the active queue */
-    ctx->driver->disable(ctx->driver_dev_id);
+    status = ctx->driver->disable(ctx->driver_dev_id);
+    if (status != FWK_SUCCESS) {
+        return FWK_E_DEVICE;
+    }
 
     _insert_alarm_ctx_into_active_queue(ctx, alarm);
 
@@ -505,8 +538,15 @@ static void timer_isr(uintptr_t ctx_ptr)
     fwk_assert(ctx != NULL);
 
     /* Disable timer interrupts to work with the active queue */
-    ctx->driver->disable(ctx->driver_dev_id);
-    fwk_interrupt_clear_pending(ctx->config->timer_irq);
+    status = ctx->driver->disable(ctx->driver_dev_id);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[Timer] %s @%d", __func__, __LINE__);
+    }
+
+    status = fwk_interrupt_clear_pending(ctx->config->timer_irq);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[Timer] %s @%d", __func__, __LINE__);
+    }
 
     alarm = (struct alarm_ctx *)fwk_list_pop_head(&ctx->alarms_active);
 
@@ -649,6 +689,7 @@ static int timer_process_bind_request(fwk_id_t requester_id,
 static int timer_start(fwk_id_t id)
 {
     struct dev_ctx *ctx;
+    int status;
 
     if (!fwk_module_is_valid_element_id(id)) {
         return FWK_SUCCESS;
@@ -658,12 +699,13 @@ static int timer_start(fwk_id_t id)
 
     fwk_list_init(&ctx->alarms_active);
 
-    fwk_interrupt_set_isr_param(ctx->config->timer_irq,
-                                timer_isr,
-                                (uintptr_t)ctx);
-    fwk_interrupt_enable(ctx->config->timer_irq);
+    status = fwk_interrupt_set_isr_param(
+        ctx->config->timer_irq, timer_isr, (uintptr_t)ctx);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
 
-    return FWK_SUCCESS;
+    return fwk_interrupt_enable(ctx->config->timer_irq);
 }
 
 /* Module descriptor */

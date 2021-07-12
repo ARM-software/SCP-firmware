@@ -14,9 +14,8 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
+#include <fwk_string.h>
 #include <fwk_thread.h>
-
-#include <string.h>
 
 enum mod_psu_state {
     MOD_PSU_STATE_IDLE,
@@ -275,7 +274,7 @@ static void mod_psu_respond(
         .target_id = element_id,
     };
 
-    memcpy(event.params, &response, sizeof(response));
+    fwk_str_memcpy(event.params, &response, sizeof(response));
 
     status = fwk_thread_put_event(&event);
     if (!fwk_expect(status == FWK_SUCCESS)) {

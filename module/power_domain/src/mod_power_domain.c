@@ -645,6 +645,7 @@ static bool initiate_power_state_pre_transition_notification(struct pd_ctx *pd)
         .source_id = FWK_ID_NONE
     };
     struct mod_pd_power_state_pre_transition_notification_params *params;
+    int status;
 
     if (pd->config->disable_state_transition_notifications == true) {
         return false;
@@ -670,8 +671,12 @@ static bool initiate_power_state_pre_transition_notification(struct pd_ctx *pd)
     params->target_state = state;
 
     notification_event.source_id = pd->id;
-    fwk_notification_notify(&notification_event,
+    status = fwk_notification_notify(
+        &notification_event,
         &pd->power_state_pre_transition_notification_ctx.pending_responses);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[PD] %s @%d", __func__, __LINE__);
+    }
 
     pd->power_state_pre_transition_notification_ctx.state = state;
     pd->power_state_pre_transition_notification_ctx.response_status =
@@ -766,7 +771,10 @@ static void respond(struct pd_ctx *pd, int resp_status)
     resp_params->composite_state = req_params->composite_state;
     resp_params->status = resp_status;
 
-    fwk_thread_put_event(&resp_event);
+    status = fwk_thread_put_event(&resp_event);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[PD] %s @%d", __func__, __LINE__);
+    }
 }
 
 /*
@@ -1102,6 +1110,7 @@ static void process_power_state_transition_report_deeper_state(
 {
     struct pd_ctx *parent = pd->parent;
     unsigned int requested_state;
+    int status;
 
     if (parent == NULL) {
         return;
@@ -1118,7 +1127,10 @@ static void process_power_state_transition_report_deeper_state(
     }
 
     if (!initiate_power_state_pre_transition_notification(parent)) {
-        initiate_power_state_transition(parent);
+        status = initiate_power_state_transition(parent);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_TRACE("[PD] %s @%d", __func__, __LINE__);
+        }
     }
 }
 
@@ -1134,6 +1146,7 @@ static void process_power_state_transition_report_shallower_state(
     struct pd_ctx *child = NULL;
     unsigned int requested_state;
     struct fwk_slist *c_node = NULL;
+    int status;
 
     FWK_LIST_FOR_EACH(
         &pd->children_list, c_node, struct pd_ctx, child_node, child)
@@ -1148,7 +1161,10 @@ static void process_power_state_transition_report_shallower_state(
         }
 
         if (!initiate_power_state_pre_transition_notification(child)) {
-            initiate_power_state_transition(child);
+            status = initiate_power_state_transition(child);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_TRACE("[PD] %s @%d", __func__, __LINE__);
+            }
         }
     }
 }
@@ -1170,6 +1186,7 @@ static void process_power_state_transition_report(struct pd_ctx *pd,
         .source_id = FWK_ID_NONE
     };
     struct mod_pd_power_state_transition_notification_params *params;
+    int status;
 
     if (new_state == pd->requested_state) {
         respond(pd, FWK_SUCCESS);
@@ -1184,14 +1201,21 @@ static void process_power_state_transition_report(struct pd_ctx *pd,
             notification_event.params;
         params->state = new_state;
         pd->power_state_transition_notification_ctx.state = new_state;
-        fwk_notification_notify(&notification_event,
+        status = fwk_notification_notify(
+            &notification_event,
             &pd->power_state_transition_notification_ctx.pending_responses);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_TRACE("[PD] %s @%d", __func__, __LINE__);
+        }
     }
 
     if ((mod_pd_ctx.system_suspend.last_core_off_ongoing) &&
         (pd == mod_pd_ctx.system_suspend.last_core_pd)) {
         mod_pd_ctx.system_suspend.last_core_off_ongoing = false;
-        complete_system_suspend(pd);
+        status = complete_system_suspend(pd);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_TRACE("[PD] %s @%d", __func__, __LINE__);
+        }
 
         return;
     }
@@ -1378,6 +1402,7 @@ static bool check_and_notify_system_shutdown(
     enum mod_pd_system_shutdown system_shutdown)
 {
     struct mod_pd_pre_shutdown_notif_params *params;
+    int status;
 
     struct fwk_event notification = {
         .id = mod_pd_notification_id_pre_shutdown,
@@ -1388,9 +1413,11 @@ static bool check_and_notify_system_shutdown(
     params = (struct mod_pd_pre_shutdown_notif_params *)notification.params;
     params->system_shutdown = system_shutdown;
 
-    fwk_notification_notify(
-        &notification,
-        &mod_pd_ctx.system_shutdown.notifications_count);
+    status = fwk_notification_notify(
+        &notification, &mod_pd_ctx.system_shutdown.notifications_count);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[PD] %s @%d", __func__, __LINE__);
+    }
 
     return (mod_pd_ctx.system_shutdown.notifications_count != 0);
 }
@@ -1918,7 +1945,10 @@ static int pd_start(fwk_id_t id)
                 continue;
             }
 
-            report_power_state_transition(pd, state);
+            status = report_power_state_transition(pd, state);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_TRACE("[PD] %s @%d", __func__, __LINE__);
+            }
         }
     }
 
@@ -2086,7 +2116,7 @@ static int process_power_state_pre_transition_notification_response(
          */
         if (pd->power_state_pre_transition_notification_ctx.response_status ==
             FWK_SUCCESS) {
-            initiate_power_state_transition(pd);
+            return initiate_power_state_transition(pd);
         }
     } else {
         /*
@@ -2100,7 +2130,7 @@ static int process_power_state_pre_transition_notification_response(
         }
 
         if (!initiate_power_state_pre_transition_notification(pd)) {
-            initiate_power_state_transition(pd);
+            return initiate_power_state_transition(pd);
         }
     }
 
@@ -2156,10 +2186,9 @@ static int process_power_state_transition_notification_response(
     params->state = pd->current_state;
 
     pd->power_state_transition_notification_ctx.state = pd->current_state;
-    fwk_notification_notify(&notification_event,
+    return fwk_notification_notify(
+        &notification_event,
         &pd->power_state_transition_notification_ctx.pending_responses);
-
-    return FWK_SUCCESS;
 }
 
 static int pd_process_notification(const struct fwk_event *event,

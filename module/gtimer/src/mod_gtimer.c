@@ -189,6 +189,7 @@ static int gtimer_device_init(fwk_id_t element_id, unsigned int unused,
                               const void *data)
 {
     struct dev_ctx *ctx;
+    int status;
 
     ctx = mod_gtimer_ctx.table + fwk_id_get_element_idx(element_id);
 
@@ -206,7 +207,8 @@ static int gtimer_device_init(fwk_id_t element_id, unsigned int unused,
     ctx->hw_counter = (struct cntctl_reg *)ctx->config->hw_counter;
     ctx->control    = (struct cntcontrol_reg *)ctx->config->control;
 
-    disable(element_id);
+    status = disable(element_id);
+    fwk_assert(status == FWK_SUCCESS);
 
     ctx->hw_counter->ACR = CNTCTL_ACR_RPCT |
                            CNTCTL_ACR_RVCT |

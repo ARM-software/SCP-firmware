@@ -18,9 +18,9 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
+#include <fwk_string.h>
 
 #include <inttypes.h>
-#include <string.h>
 
 struct res_perms_ctx {
     /*! platform config data */
@@ -850,7 +850,7 @@ static int set_agent_resource_pd_permissions(
             res_perms_ctx.agent_count * res_perms_ctx.config->pd_cmd_count *
                 res_perms_ctx.config->pd_resource_count,
             sizeof(mod_res_perms_t));
-        memcpy(
+        fwk_str_memcpy(
             res_perms_backup.scmi_pd_perms,
             res_perms_ctx.agent_permissions->scmi_pd_perms,
             res_perms_ctx.agent_count * res_perms_ctx.config->pd_cmd_count *
@@ -900,7 +900,7 @@ static int set_agent_resource_perf_permissions(
             res_perms_ctx.agent_count * res_perms_ctx.config->perf_cmd_count *
                 res_perms_ctx.config->perf_resource_count,
             sizeof(mod_res_perms_t));
-        memcpy(
+        fwk_str_memcpy(
             res_perms_backup.scmi_perf_perms,
             res_perms_ctx.agent_permissions->scmi_perf_perms,
             res_perms_ctx.agent_count * res_perms_ctx.config->perf_cmd_count *
@@ -950,7 +950,7 @@ static int set_agent_resource_clock_permissions(
             res_perms_ctx.agent_count * res_perms_ctx.config->clock_cmd_count *
                 res_perms_ctx.config->clock_resource_count,
             sizeof(mod_res_perms_t));
-        memcpy(
+        fwk_str_memcpy(
             res_perms_backup.scmi_clock_perms,
             res_perms_ctx.agent_permissions->scmi_clock_perms,
             res_perms_ctx.agent_count * res_perms_ctx.config->clock_cmd_count *
@@ -1004,7 +1004,7 @@ static int set_agent_resource_reset_permissions(
                     res_perms_ctx.config->reset_domain_cmd_count *
                     res_perms_ctx.config->reset_domain_resource_count,
                 sizeof(mod_res_perms_t));
-        memcpy(
+        fwk_str_memcpy(
             res_perms_backup.scmi_reset_domain_perms,
             res_perms_ctx.agent_permissions->scmi_reset_domain_perms,
             res_perms_ctx.agent_count *
@@ -1057,7 +1057,7 @@ static int set_agent_resource_voltd_permissions(
             res_perms_ctx.agent_count * res_perms_ctx.config->voltd_cmd_count *
                 res_perms_ctx.config->voltd_resource_count,
             sizeof(mod_res_perms_t));
-        memcpy(
+        fwk_str_memcpy(
             res_perms_backup.scmi_voltd_perms,
             res_perms_ctx.agent_permissions->scmi_voltd_perms,
             res_perms_ctx.agent_count * res_perms_ctx.config->voltd_cmd_count *
@@ -1107,7 +1107,7 @@ static int set_agent_resource_sensor_permissions(
             res_perms_ctx.agent_count * res_perms_ctx.config->sensor_cmd_count *
                 res_perms_ctx.config->sensor_resource_count,
             sizeof(mod_res_perms_t));
-        memcpy(
+        fwk_str_memcpy(
             res_perms_backup.scmi_sensor_perms,
             res_perms_ctx.agent_permissions->scmi_sensor_perms,
             res_perms_ctx.agent_count * res_perms_ctx.config->sensor_cmd_count *

@@ -209,9 +209,7 @@ static int mod_mock_clock_update_input_rate(
     ctx->current_rate_index =
         (unsigned int)(rate_entry - ctx->config->rate_table);
 
-    mod_mock_clock_get_rate(clock_id, output_rate);
-
-    return FWK_SUCCESS;
+    return mod_mock_clock_get_rate(clock_id, output_rate);
 }
 
 static const struct mod_clock_drv_api mod_mock_clock_driver_api = {
