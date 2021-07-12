@@ -183,7 +183,8 @@ static int smt_write_payload(fwk_id_t channel_id,
         return FWK_E_ACCESS;
     }
 
-    memcpy(((uint8_t*)channel_ctx->out->payload) + offset, payload, size);
+    (void)memcpy(
+        ((uint8_t *)channel_ctx->out->payload) + offset, payload, size);
 
     return FWK_SUCCESS;
 }
@@ -201,9 +202,10 @@ static int smt_respond(fwk_id_t channel_id, const void *payload, size_t size)
     *memory = *channel_ctx->out;
 
     /* Copy the payload from either the write buffer or the payload parameter */
-    memcpy(memory->payload,
-           (payload == NULL ? channel_ctx->out->payload : payload),
-           size);
+    (void)memcpy(
+        memory->payload,
+        (payload == NULL ? channel_ctx->out->payload : payload),
+        size);
 
     /*
      * NOTE: Disable interrupts for a brief period to ensure interrupts are not
@@ -212,17 +214,17 @@ static int smt_respond(fwk_id_t channel_id, const void *payload, size_t size)
      * period anyway, but this guard is included to protect against a
      * misbehaving agent.
      */
-    fwk_interrupt_global_disable();
+    (void)fwk_interrupt_global_disable();
 
     channel_ctx->locked = false;
 
     memory->length = (volatile uint32_t)(sizeof(memory->message_header) + size);
     memory->status |= MOD_SMT_MAILBOX_STATUS_FREE_MASK;
 
-    fwk_interrupt_global_enable();
+    (void)fwk_interrupt_global_enable();
 
     if (memory->flags & MOD_SMT_MAILBOX_FLAGS_IENABLED_MASK) {
-        channel_ctx->driver_api->raise_interrupt(channel_ctx->driver_id);
+        (void)channel_ctx->driver_api->raise_interrupt(channel_ctx->driver_id);
     }
 
     return FWK_SUCCESS;
@@ -263,13 +265,13 @@ static int smt_transmit(fwk_id_t channel_id, uint32_t message_header,
     memory->flags = 0;
 
     /* Copy the payload */
-    memcpy(memory->payload, payload, size);
+    (void)memcpy(memory->payload, payload, size);
 
     memory->length = (volatile uint32_t)(sizeof(memory->message_header) + size);
     memory->status &= ~MOD_SMT_MAILBOX_STATUS_FREE_MASK;
 
     /* Notify the agent */
-    channel_ctx->driver_api->raise_interrupt(channel_ctx->driver_id);
+    (void)channel_ctx->driver_api->raise_interrupt(channel_ctx->driver_id);
 
     return FWK_SUCCESS;
 }
@@ -360,7 +362,7 @@ static int smt_slave_handler(struct smt_channel_ctx *channel_ctx)
 
     /* Copy payload from shared memory to read buffer */
     payload_size = in->length - sizeof(in->message_header);
-    memcpy(in->payload, memory->payload, payload_size);
+    (void)memcpy(in->payload, memory->payload, payload_size);
 
     /* Let subscribed service handle the message */
     if (channel_ctx->is_scmi_channel) {

@@ -100,7 +100,7 @@ static void mhu_isr(void)
          */
         if ((device_ctx->bound_slots & (uint32_t)(1U << slot)) != (uint32_t)0) {
             smt_channel = &device_ctx->smt_channel_table[slot];
-            smt_channel->api->signal_message(smt_channel->id);
+            (void)smt_channel->api->signal_message(smt_channel->id);
         }
 
         /* Acknowledge the interrupt */

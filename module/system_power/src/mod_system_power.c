@@ -91,9 +91,8 @@ static void ext_ppus_set_state(enum mod_pd_state state)
     unsigned int i;
 
     for (i = 0; i < system_power_ctx.config->ext_ppus_count; i++) {
-        system_power_ctx.ext_ppu_apis[i]->set_state(
-            system_power_ctx.config->ext_ppus[i].ppu_id,
-            state);
+        (void)system_power_ctx.ext_ppu_apis[i]->set_state(
+            system_power_ctx.config->ext_ppus[i].ppu_id, state);
     }
 }
 
@@ -109,9 +108,9 @@ static void ext_ppus_shutdown(enum mod_pd_system_shutdown system_shutdown)
         ppu_id = system_power_ctx.config->ext_ppus[i].ppu_id;
 
         if (api->shutdown != NULL) {
-            api->shutdown(ppu_id, system_shutdown);
+            (void)api->shutdown(ppu_id, system_shutdown);
         } else {
-            api->set_state(ppu_id, MOD_PD_STATE_OFF);
+            (void)api->set_state(ppu_id, MOD_PD_STATE_OFF);
         }
     }
 }
@@ -173,7 +172,7 @@ static int disable_all_irqs(void)
 {
     int status = FWK_SUCCESS;
 
-    fwk_interrupt_disable(system_power_ctx.config->soc_wakeup_irq);
+    (void)fwk_interrupt_disable(system_power_ctx.config->soc_wakeup_irq);
 
     if (system_power_ctx.driver_api->platform_interrupts != NULL) {
         status = system_power_ctx.driver_api->platform_interrupts(
@@ -247,7 +246,7 @@ static int system_power_set_state(fwk_id_t pd_id, unsigned int state)
     case (unsigned int)MOD_SYSTEM_POWER_POWER_STATE_SLEEP0:
         ext_ppus_set_state(MOD_PD_STATE_OFF);
 
-        fwk_interrupt_clear_pending(soc_wakeup_irq);
+        (void)fwk_interrupt_clear_pending(soc_wakeup_irq);
 
         if (system_power_ctx.driver_api->platform_interrupts != NULL) {
             status =
@@ -270,7 +269,7 @@ static int system_power_set_state(fwk_id_t pd_id, unsigned int state)
             return status;
         }
 
-        fwk_interrupt_enable(soc_wakeup_irq);
+        (void)fwk_interrupt_enable(soc_wakeup_irq);
 
         if (system_power_ctx.driver_api->platform_interrupts != NULL) {
             status = system_power_ctx.driver_api->platform_interrupts(

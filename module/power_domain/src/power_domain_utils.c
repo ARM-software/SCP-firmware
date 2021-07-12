@@ -55,7 +55,7 @@ static int create_core_cluster_pd_element_table(
             element = &element_table[core_element_counter];
             pd_config = &pd_config_table[core_element_counter];
             element->name = fwk_mm_alloc(PD_NAME_SIZE, 1);
-            snprintf(
+            (void)snprintf(
                 (char *)element->name,
                 PD_NAME_SIZE,
                 "CLUS%uCORE%u",
@@ -75,7 +75,8 @@ static int create_core_cluster_pd_element_table(
         element = &element_table[cluster_idx + core_count];
         pd_config = &pd_config_table[cluster_idx + core_count];
         element->name = fwk_mm_alloc(PD_NAME_SIZE, 1);
-        snprintf((char *)element->name, PD_NAME_SIZE, "CLUS%u", cluster_idx);
+        (void)snprintf(
+            (char *)element->name, PD_NAME_SIZE, "CLUS%u", cluster_idx);
         element->data = pd_config;
         pd_config->attributes.pd_type = MOD_PD_TYPE_CLUSTER;
         pd_config->driver_id =
@@ -133,7 +134,7 @@ const struct fwk_element *create_power_domain_element_table(
         return NULL;
     }
 
-    memcpy(
+    (void)memcpy(
         element_table + (core_count + cluster_count),
         static_table,
         static_table_size * sizeof(struct fwk_element));

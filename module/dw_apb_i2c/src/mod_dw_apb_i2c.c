@@ -163,14 +163,14 @@ static int transmit_as_master(fwk_id_t dev_id,
     }
 
     /* The program of the I2C controller cannot be interrupted. */
-    fwk_interrupt_global_disable();
+    (void)fwk_interrupt_global_disable();
 
     for (sent_bytes = 0; sent_bytes < transmit_request->transmit_byte_count;
          sent_bytes++) {
         ctx->i2c_reg->IC_DATA_CMD = transmit_request->transmit_data[sent_bytes];
     }
 
-    fwk_interrupt_global_enable();
+    (void)fwk_interrupt_global_enable();
 
     /*
      * The data has been pushed to the I2C FIFO for transmission to the
@@ -208,14 +208,14 @@ static int receive_as_master(fwk_id_t dev_id,
     }
 
     /* The program of the I2C controller cannot be interrupted. */
-    fwk_interrupt_global_disable();
+    (void)fwk_interrupt_global_disable();
 
     /* Program the I2C controller with the expected reply length in bytes. */
     for (i = 0; i < receive_request->receive_byte_count; i++) {
         ctx->i2c_reg->IC_DATA_CMD = IC_DATA_CMD_READ;
     }
 
-    fwk_interrupt_global_enable();
+    (void)fwk_interrupt_global_enable();
 
     /*
      * The command has been sent to the I2C for requesting data from

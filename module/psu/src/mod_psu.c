@@ -275,7 +275,7 @@ static void mod_psu_respond(
         .target_id = element_id,
     };
 
-    memcpy(event.params, &response, sizeof(response));
+    (void)memcpy(event.params, &response, sizeof(response));
 
     status = fwk_thread_put_event(&event);
     if (!fwk_expect(status == FWK_SUCCESS)) {

@@ -209,7 +209,7 @@ static int mod_mock_clock_update_input_rate(
     ctx->current_rate_index =
         (unsigned int)(rate_entry - ctx->config->rate_table);
 
-    mod_mock_clock_get_rate(clock_id, output_rate);
+    (void)mod_mock_clock_get_rate(clock_id, output_rate);
 
     return FWK_SUCCESS;
 }

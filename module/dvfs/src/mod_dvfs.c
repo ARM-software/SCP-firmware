@@ -279,7 +279,7 @@ static void dvfs_flush_pending_request(struct mod_dvfs_domain_ctx *ctx)
 {
     if (ctx->request_pending) {
         ctx->request_pending = false;
-        dvfs_set_level_start(
+        (void)dvfs_set_level_start(
             ctx,
             ctx->pending_request.cookie,
             &ctx->pending_request.new_opp,
@@ -301,7 +301,7 @@ static void alarm_callback(uintptr_t param)
         .response_requested = ctx->pending_request.response_required,
     };
 
-    fwk_thread_put_event(&req);
+    (void)fwk_thread_put_event(&req);
 }
 
 static int dvfs_handle_pending_request(struct mod_dvfs_domain_ctx *ctx)
@@ -606,7 +606,7 @@ static void dvfs_complete_respond(
             if (return_opp) {
                 resp_params->performance_level = ctx->current_opp.level;
             }
-            fwk_thread_put_event(&read_req_event);
+            (void)fwk_thread_put_event(&read_req_event);
         }
         ctx->cookie = 0;
     } else if (resp_event != NULL) {
@@ -663,7 +663,7 @@ static int dvfs_complete(
      * here to prevent another request being processed ahead of this one.
      */
     if (ctx->request_pending) {
-        dvfs_handle_pending_request(ctx);
+        (void)dvfs_handle_pending_request(ctx);
     } else {
         /*
          * The request has completed and there are no pending requests.
@@ -1046,7 +1046,7 @@ static int dvfs_start(fwk_id_t id)
     if (status == FWK_SUCCESS) {
         ctx = get_domain_ctx(id);
         ctx->request.set_source_id = true;
-        dvfs_set_level_start(ctx, 0, &sustained_opp, true, 0);
+        (void)dvfs_set_level_start(ctx, 0, &sustained_opp, true, 0);
     }
 
     return status;

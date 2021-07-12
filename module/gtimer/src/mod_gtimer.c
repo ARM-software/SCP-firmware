@@ -206,7 +206,7 @@ static int gtimer_device_init(fwk_id_t element_id, unsigned int unused,
     ctx->hw_counter = (struct cntctl_reg *)ctx->config->hw_counter;
     ctx->control    = (struct cntcontrol_reg *)ctx->config->control;
 
-    disable(element_id);
+    (void)disable(element_id);
 
     ctx->hw_counter->ACR = CNTCTL_ACR_RPCT |
                            CNTCTL_ACR_RVCT |

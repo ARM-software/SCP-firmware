@@ -656,7 +656,7 @@ static int clock_process_notification_response(
                  *)pd_response_event.params;
         pd_resp_params->status =
             (int)ctx->pd_notif.transition_pending_response_status;
-        fwk_thread_put_event(&pd_response_event);
+        (void)fwk_thread_put_event(&pd_response_event);
     }
 
     return FWK_SUCCESS;
