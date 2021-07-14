@@ -1569,49 +1569,21 @@ static int pd_get_state(fwk_id_t pd_id, unsigned int *state)
     return FWK_SUCCESS;
 }
 
-static int pd_reset(fwk_id_t pd_id)
-{
-    int status;
-    struct fwk_event req;
-    struct fwk_event resp;
-    struct pd_response *resp_params = (struct pd_response *)(&resp.params);
-
-    req = (struct fwk_event) {
-        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_RESET),
-        .target_id = pd_id,
-    };
-
-    status = fwk_thread_put_event_and_wait(&req, &resp);
-    if (status != FWK_SUCCESS) {
-        return status;
-    }
-
-    return resp_params->status;
-}
-
 static int pd_system_suspend(unsigned int state)
 {
-    int status;
     struct fwk_event req;
-    struct fwk_event resp;
     struct pd_system_suspend_request *req_params =
         (struct pd_system_suspend_request *)(&req.params);
-    struct pd_response *resp_params = (struct pd_response *)(&resp.params);
 
-    req = (struct fwk_event) {
-        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
-                           PD_EVENT_IDX_SYSTEM_SUSPEND),
+    req = (struct fwk_event){
+        .id = FWK_ID_EVENT(
+            FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_SYSTEM_SUSPEND),
         .target_id = fwk_module_id_power_domain,
     };
 
     req_params->state = state;
 
-    status = fwk_thread_put_event_and_wait(&req, &resp);
-    if (status != FWK_SUCCESS) {
-        return status;
-    }
-
-    return resp_params->status;
+    return fwk_thread_put_event(&req);
 }
 
 static int pd_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
@@ -1639,14 +1611,14 @@ static int pd_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
 
 /* Functions specific to the driver input API */
 
-static int pd_reset_async(fwk_id_t pd_id, bool response_requested)
+static int pd_reset(fwk_id_t pd_id, bool response_requested)
 {
-    struct fwk_event req;
+    struct fwk_event_light req;
     struct pd_ctx *pd;
 
     pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
 
-    req = (struct fwk_event) {
+    req = (struct fwk_event_light){
         .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_RESET),
         .source_id = pd->driver_id,
         .target_id = pd_id,
@@ -1718,7 +1690,7 @@ static const struct mod_pd_restricted_api pd_restricted_api = {
 
 static const struct mod_pd_driver_input_api pd_driver_input_api = {
     .set_state = pd_set_state,
-    .reset_async = pd_reset_async,
+    .reset = pd_reset,
     .report_power_state_transition = pd_report_power_state_transition,
     .get_last_core_pd_id = pd_get_last_core_pd_id,
 };
