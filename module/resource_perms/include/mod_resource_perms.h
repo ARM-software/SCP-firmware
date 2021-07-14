@@ -67,6 +67,10 @@ enum mod_res_perms_protocol_deny {
     MOD_RES_PERMS_SCMI_RESET_DOMAIN_PROTOCOL_DENIED =
         MOD_RES_PERMS_ACCESS_DENIED
         << (MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN - MOD_RES_PERMS_PROTOCOL_OFFSET),
+    MOD_RES_PERMS_SCMI_VOLTAGE_DOMAIN_PROTOCOL_DENIED =
+        MOD_RES_PERMS_ACCESS_DENIED
+        << (MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN -
+            MOD_RES_PERMS_PROTOCOL_OFFSET),
 };
 
 /*!
@@ -102,6 +106,8 @@ enum mod_res_perms_message_idx {
         MOD_SCMI_PROTOCOL_ID_SENSOR - MOD_RES_PERMS_MESSAGE_OFFSET,
     MOD_RES_PERMS_SCMI_RESET_DOMAIN_MESSAGE_IDX =
         MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN - MOD_RES_PERMS_MESSAGE_OFFSET,
+    MOD_RES_PERMS_SCMI_VOLTAGE_DOMAIN_MESSAGE_IDX =
+        MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN - MOD_RES_PERMS_MESSAGE_OFFSET,
 };
 
 /*!
@@ -120,6 +126,8 @@ enum mod_res_perms_message_bitmask_base {
     MOD_RES_PERMS_SCMI_SENSOR_BITMASK_IDX = MOD_SCMI_SENSOR_DESCRIPTION_GET,
     MOD_RES_PERMS_SCMI_RESET_DOMAIN_BITMASK_IDX =
         MOD_SCMI_RESET_DOMAIN_ATTRIBUTES,
+    MOD_RES_PERMS_SCMI_VOLTAGE_DOMAIN_BITMASK_IDX =
+        MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES,
 };
 
 /*!
@@ -270,6 +278,29 @@ enum mod_res_reset_domain_permissions_idx {
 };
 
 /*!
+ * \brief SCMI Voltage Domain Management Protocol Message index offset
+ */
+#define MOD_RES_PERMS_VOLTD_PERMS_OFFSET MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES
+
+/*!
+ * \brief SCMI Reset Domain Management Protocol Message Indices
+ */
+enum mod_res_voltage_domain_permissions_idx {
+    MOD_RES_PERMS_SCMI_VOLTD_DOMAIN_ATTRIBUTES_IDX =
+        MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES - MOD_RES_PERMS_VOLTD_PERMS_OFFSET,
+    MOD_RES_PERMS_SCMI_VOLTD_DESCRIBE_LEVELS_IDX =
+        MOD_SCMI_VOLTD_DESCRIBE_LEVELS - MOD_RES_PERMS_VOLTD_PERMS_OFFSET,
+    MOD_RES_PERMS_SCMI_VOLTD_CONFIG_SET_IDX =
+        MOD_SCMI_VOLTD_CONFIG_SET - MOD_RES_PERMS_VOLTD_PERMS_OFFSET,
+    MOD_RES_PERMS_SCMI_VOLTD_CONFIG_GET_IDX =
+        MOD_SCMI_VOLTD_CONFIG_GET - MOD_RES_PERMS_VOLTD_PERMS_OFFSET,
+    MOD_RES_PERMS_SCMI_VOLTD_LEVEL_SET_IDX =
+        MOD_SCMI_VOLTD_LEVEL_SET - MOD_RES_PERMS_VOLTD_PERMS_OFFSET,
+    MOD_RES_PERMS_SCMI_VOLTD_LEVEL_GET_IDX =
+        MOD_SCMI_VOLTD_LEVEL_GET - MOD_RES_PERMS_VOLTD_PERMS_OFFSET,
+};
+
+/*!
  * \brief SCMI Domain Types
  */
 enum mod_res_domain_device_types {
@@ -278,6 +309,7 @@ enum mod_res_domain_device_types {
     MOD_RES_CLOCK_DOMAIN_DEVICE,
     MOD_RES_SENSOR_DOMAIN_DEVICE,
     MOD_RES_RESET_DOMAIN_DEVICE,
+    MOD_RES_VOLTAGE_DOMAIN_DEVICE,
     MOD_RES_PLATFORM_DOMAIN_DEVICE,
     MOD_RES_DOMAIN_DEVICE_INVALID
 };
@@ -336,6 +368,8 @@ struct mod_res_agent_permission {
     /*! \brief Reset Domain:Resource permissions. */
     mod_res_perms_t *scmi_reset_domain_perms;
 #endif
+    /*! \brief Voltage Domain:Resource permissions. */
+    mod_res_perms_t *scmi_voltd_perms;
 };
 
 /*!
@@ -507,6 +541,15 @@ struct mod_res_resource_perms_config {
     /*! \brief Number of reset domain resources supported by the platform. */
     uint32_t reset_domain_resource_count;
 #endif
+
+    /*! \brief Number of voltage domains supported by the platform. */
+    uint32_t voltd_count;
+
+    /*! \brief Number of voltage domain commands supported by the platform. */
+    uint32_t voltd_cmd_count;
+
+    /*! \brief Number of voltage domain resources supported by the platform. */
+    uint32_t voltd_resource_count;
 
     /*! \brief Number of devices supported by the platform. */
     uint32_t device_count;
