@@ -78,7 +78,22 @@ struct scmi_voltd_level_set_p2a {
 /*
  * Voltage Domain Config Set
  */
-#define SCMI_VOLTD_CONFIG_MODE_MASK     0x0f
+#define SCMI_VOLTD_CONFIG_MODE_TYPE_POS  0x03U
+#define SCMI_VOLTD_CONFIG_MODE_TYPE_BIT  (1U << SCMI_VOLTD_CONFIG_MODE_TYPE_POS)
+#define SCMI_VOLTD_CONFIG_MODE_TYPE_IMPL SCMI_VOLTD_CONFIG_MODE_TYPE_BIT
+#define SCMI_VOLTD_CONFIG_MODE_ID_MASK   (SCMI_VOLTD_CONFIG_MODE_TYPE_BIT - 1U)
+#define SCMI_VOLTD_CONFIG_MODE_TYPE_MASK \
+    ((uint32_t) ~(SCMI_VOLTD_CONFIG_MODE_ID_MASK))
+
+enum scmi_voltd_mode_type {
+    SCMI_VOLTD_MODE_TYPE_ARCH = 0x0U,
+    SCMI_VOLTD_MODE_TYPE_IMPL = 0x08U,
+};
+
+enum scmi_voltd_mode_id {
+    SCMI_VOLTD_MODE_ID_OFF = 0x0U,
+    SCMI_VOLTD_MODE_ID_ON = 0x07U,
+};
 
 struct scmi_voltd_config_set_a2p {
     uint32_t domain_id;

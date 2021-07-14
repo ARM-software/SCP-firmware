@@ -154,7 +154,7 @@ static int get_device(fwk_id_t service_id, unsigned int elt_idx,
     if (status != FWK_SUCCESS)
         return status;
 
-    if (elt_idx >= agent->device_count)
+    if (elt_idx >= agent->domain_count)
         return FWK_E_RANGE;
 
     device = &agent->device_table[elt_idx];
@@ -246,8 +246,9 @@ static int scmi_voltd_protocol_attributes_handler(fwk_id_t service_id,
     if (get_agent_entry(service_id, &agent) != FWK_SUCCESS)
         goto exit;
 
-    fwk_assert(agent->device_count < SCMI_VOLTD_PROTOCOL_ATTRIBUTES_VOLTD_COUNT_MAX);
-    outmsg.attributes = SCMI_VOLTD_PROTOCOL_ATTRIBUTES(agent->device_count);
+    fwk_assert(
+        agent->domain_count < SCMI_VOLTD_PROTOCOL_ATTRIBUTES_VOLTD_COUNT_MAX);
+    outmsg.attributes = SCMI_VOLTD_PROTOCOL_ATTRIBUTES(agent->domain_count);
     outmsg.status = SCMI_SUCCESS;
     outmsg_size = sizeof(outmsg);
 
@@ -293,7 +294,6 @@ static int scmi_voltd_domain_attributes_handler(fwk_id_t service_id,
         .status = SCMI_NOT_FOUND,
     };
     size_t outmsg_size = sizeof(outmsg.status);
-    uint32_t config = 0;
     int status = 0;
 
     inmsg = (const struct scmi_voltd_attributes_a2p *)(void *)payload;
@@ -305,7 +305,7 @@ static int scmi_voltd_domain_attributes_handler(fwk_id_t service_id,
     strncpy(
         outmsg.name,
         fwk_module_get_element_name(device->element_id),
-        sizeof(outmsg.name));
+        sizeof(outmsg.name) - 1);
 
     outmsg.status = SCMI_SUCCESS;
     outmsg_size = sizeof(outmsg);
@@ -316,40 +316,68 @@ exit:
 }
 
 /*
- * Voltage domain configuration state
+ * Voltage domain configuration mode id
  */
 static int scmi_voltd_config_get_handler(fwk_id_t service_id,
     const uint32_t *payload)
 {
     int status = 0;
-    const struct mod_scmi_voltd_agent *agent = NULL;
     const struct mod_scmi_voltd_device *device = NULL;
     const struct scmi_voltd_config_get_a2p *inmsg = NULL;
     struct scmi_voltd_config_get_p2a outmsg = {
         .status = SCMI_GENERIC_ERROR,
     };
     size_t outmsg_size = sizeof(outmsg.status);
-    uint32_t config = 0;
+
+    uint8_t mode_id = (uint8_t)MOD_VOLTD_MODE_ID_OFF;
+    uint8_t mode_type = (uint8_t)MOD_VOLTD_MODE_TYPE_ARCH;
+    enum mod_voltd_mode_id voltd_mode_id;
+    enum mod_voltd_mode_type voltd_mode_type;
 
     inmsg = (const struct scmi_voltd_config_get_a2p*)(void *)payload;
 
     status = get_device(service_id, inmsg->domain_id, &device, NULL);
-    if (status != FWK_SUCCESS) {
-        outmsg.status = SCMI_NOT_FOUND;
-        goto exit;
+    if (status == FWK_SUCCESS) {
+        status = scmi_voltd_ctx.voltd_api->get_config(
+            device->element_id, &mode_type, &mode_id);
     }
 
-    status = scmi_voltd_ctx.voltd_api->get_config(device->element_id,
-                                                  &config);
-    if (status != FWK_SUCCESS)
-        goto exit;
+    if (status == FWK_SUCCESS) {
+        voltd_mode_type = (enum mod_voltd_mode_type)mode_type;
+        switch (voltd_mode_type) {
+        case MOD_VOLTD_MODE_TYPE_ARCH: {
+            voltd_mode_id = (enum mod_voltd_mode_id)mode_id;
+            switch (voltd_mode_id) {
+            case MOD_VOLTD_MODE_ID_OFF:
+                outmsg.config = (uint32_t)SCMI_VOLTD_MODE_ID_OFF;
+                break;
+            case MOD_VOLTD_MODE_ID_ON:
+                outmsg.config = (uint32_t)SCMI_VOLTD_MODE_ID_ON;
+                break;
+            default:
+                status = FWK_E_STATE;
+                break;
+            }
+            break;
+        }
+        case MOD_VOLTD_MODE_TYPE_IMPL:
+            outmsg.config = SCMI_VOLTD_CONFIG_MODE_TYPE_BIT | (uint32_t)mode_id;
+            break;
+        default:
+            status = FWK_E_STATE;
+            break;
+        }
+    }
 
-    outmsg.config = config;
+    if (status == FWK_SUCCESS) {
+        outmsg.status = SCMI_SUCCESS;
+        outmsg_size = sizeof(outmsg);
+    } else if (status == FWK_E_STATE) {
+        outmsg.status = SCMI_GENERIC_ERROR;
+    } else {
+        outmsg.status = SCMI_NOT_FOUND;
+    }
 
-    outmsg.status = SCMI_SUCCESS;
-    outmsg_size = sizeof(outmsg);
-
-exit:
     scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
     return FWK_SUCCESS;
 }
@@ -358,30 +386,65 @@ static int scmi_voltd_config_set_handler(fwk_id_t service_id,
     const uint32_t *payload)
 {
     int status = 0;
-    const struct mod_scmi_voltd_agent *agent = NULL;
     const struct mod_scmi_voltd_device *device = NULL;
     const struct scmi_voltd_config_set_a2p *inmsg = NULL;
     struct scmi_voltd_config_set_p2a outmsg = {
         .status = SCMI_GENERIC_ERROR,
     };
     size_t outmsg_size = sizeof(outmsg.status);
+    uint8_t mode_type = (uint8_t)MOD_VOLTD_MODE_TYPE_ARCH;
+    uint8_t mode_id = (uint8_t)MOD_VOLTD_MODE_ID_OFF;
+    enum scmi_voltd_mode_type scmi_mode_type = SCMI_VOLTD_MODE_TYPE_ARCH;
+    enum scmi_voltd_mode_id scmi_mode_id = SCMI_VOLTD_MODE_ID_OFF;
 
     inmsg = (const struct scmi_voltd_config_set_a2p*)payload;
 
     status = get_device(service_id, inmsg->domain_id, &device, NULL);
-    if (status != FWK_SUCCESS) {
+    if (status == FWK_SUCCESS) {
+        scmi_mode_type = (enum scmi_voltd_mode_type)(
+            inmsg->config & SCMI_VOLTD_CONFIG_MODE_TYPE_MASK);
+        mode_id = (uint8_t)(inmsg->config & SCMI_VOLTD_CONFIG_MODE_ID_MASK);
+
+        switch (scmi_mode_type) {
+        case SCMI_VOLTD_MODE_TYPE_ARCH: {
+            mode_type = (uint8_t)MOD_VOLTD_MODE_TYPE_ARCH;
+            scmi_mode_id = (enum scmi_voltd_mode_id)(mode_id);
+
+            switch (scmi_mode_id) {
+            case SCMI_VOLTD_MODE_ID_OFF:
+                mode_id = (uint8_t)MOD_VOLTD_MODE_ID_OFF;
+                break;
+            case SCMI_VOLTD_MODE_ID_ON:
+                mode_id = (uint8_t)MOD_VOLTD_MODE_ID_ON;
+                break;
+            default:
+                status = FWK_E_PARAM;
+                break;
+            }
+            break;
+        }
+        case SCMI_VOLTD_MODE_TYPE_IMPL:
+            mode_type = (uint8_t)MOD_VOLTD_MODE_TYPE_IMPL;
+            break;
+        default:
+            status = FWK_E_PARAM;
+            break;
+        }
+    } else {
         outmsg.status = SCMI_NOT_FOUND;
-        goto exit;
     }
 
-    status = scmi_voltd_ctx.voltd_api->set_config(device->element_id,
-                                                  inmsg->config);
-    if (status != FWK_SUCCESS)
-        goto exit;
+    if (status == FWK_SUCCESS) {
+        status = scmi_voltd_ctx.voltd_api->set_config(
+            device->element_id, mode_type, mode_id);
+    }
 
-    outmsg.status = SCMI_SUCCESS;
+    if (status == FWK_SUCCESS) {
+        outmsg.status = SCMI_SUCCESS;
+    } else {
+        outmsg.status = SCMI_INVALID_PARAMETERS;
+    }
 
-exit:
     scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
     return FWK_SUCCESS;
 }
@@ -393,7 +456,6 @@ static int scmi_voltd_level_get_handler(fwk_id_t service_id,
                                         const uint32_t *payload)
 {
     int status = 0;
-    const struct mod_scmi_voltd_agent *agent = NULL;
     const struct mod_scmi_voltd_device *device = NULL;
     const struct scmi_voltd_level_get_a2p *inmsg = NULL;
     struct scmi_voltd_level_get_p2a outmsg = {
@@ -428,9 +490,8 @@ static int scmi_voltd_level_set_handler(fwk_id_t service_id,
     const uint32_t *payload)
 {
     int status = 0;
-    const struct mod_scmi_voltd_agent *agent = NULL;
-    const struct mod_scmi_voltd_device *device = NULL;
     const struct scmi_voltd_level_set_a2p *inmsg = NULL;
+    const struct mod_scmi_voltd_device *device = NULL;
     struct scmi_voltd_level_set_p2a outmsg = {
         .status = SCMI_GENERIC_ERROR,
     };
@@ -446,10 +507,17 @@ static int scmi_voltd_level_set_handler(fwk_id_t service_id,
 
     status = scmi_voltd_ctx.voltd_api->set_level(device->element_id,
                                                  inmsg->voltage_level);
-    if (status != FWK_SUCCESS)
-        goto exit;
 
-    outmsg.status = SCMI_SUCCESS;
+    switch (status) {
+    case FWK_SUCCESS:
+        outmsg.status = SCMI_SUCCESS;
+        break;
+    case FWK_E_RANGE:
+        outmsg.status = SCMI_INVALID_PARAMETERS;
+        break;
+    default:
+        break;
+    }
 
 exit:
     scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
@@ -463,7 +531,6 @@ static int scmi_voltd_describe_levels_handler(fwk_id_t service_id,
     const uint32_t *payload)
 {
     int status = 0;
-    const struct mod_scmi_voltd_agent *agent = NULL;
     const struct mod_scmi_voltd_device *device = NULL;
     const struct scmi_voltd_describe_levels_a2p *inmsg = NULL;
     struct scmi_voltd_describe_levels_p2a outmsg = {
@@ -545,11 +612,9 @@ static int scmi_voltd_describe_levels_handler(fwk_id_t service_id,
         }
     } else {
         /* The voltage domain has a linear level stepping */
-        int32_t voltd_range[3] = {
-            info.level_range.min_uv,
-            info.level_range.max_uv,
-            info.level_range.step_uv
-        };
+        int32_t voltd_range[3] = { info.level_range.min_uv,
+                                   info.level_range.max_uv,
+                                   info.level_range.step_uv };
 
         /* Is the payload area large enough to return the complete triplet? */
         if (max_level_items < 3) {
@@ -613,7 +678,7 @@ static int scmi_voltd_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
         goto error;
     }
 
-#ifdefBUILD_HAS_MOD_RESOURCE_PERMS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     if (scmi_voltd_permissions_handler(service_id, payload, payload_size,
                                        message_id) != FWK_SUCCESS) {
         outmsg = SCMI_DENIED;
@@ -674,7 +739,7 @@ static int scmi_voltd_bind(fwk_id_t id, unsigned int round)
     if (status != FWK_SUCCESS)
         return status;
 
-#ifdefBUILD_HAS_MOD_RESOURCE_PERMS
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
                              FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS,
                                         MOD_RES_PERM_RESOURCE_PERMS),

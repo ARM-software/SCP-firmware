@@ -90,7 +90,7 @@ struct mod_scmi_voltd_agent {
      * \brief The number of \c mod_scmi_voltd_device structures in the table
      *      pointed to by \c device_table.
      */
-    uint8_t device_count;
+    uint32_t domain_count;
 };
 
 /*!
@@ -106,10 +106,6 @@ struct mod_scmi_voltd_config {
     /*! Number of agents in \ref agent_table */
     size_t agent_count;
 };
-
-/*!
- * \}
- */
 
 /*!
  * \}
