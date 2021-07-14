@@ -52,6 +52,9 @@ struct res_perms_ctx {
     uint32_t reset_domain_count;
 #endif
 
+    /*! Number of voltage domain resources for the platform. */
+    uint32_t voltd_count;
+
     /*!
      * The  default is for an agent to have permission to access any
      * resource. In order to deny permissions to an agent the table
@@ -94,6 +97,9 @@ struct res_perms_backup {
     /*! \brief Reset Domain:Resource permissions. */
     mod_res_perms_t *scmi_reset_domain_perms;
 #endif
+
+    /*! \brief Voltage Domain:Resource permissions. */
+    mod_res_perms_t *scmi_voltd_perms;
 };
 
 static struct res_perms_ctx res_perms_ctx;
@@ -158,6 +164,7 @@ static int mod_res_protocol_id_to_index(
     case MOD_SCMI_PROTOCOL_ID_CLOCK:
     case MOD_SCMI_PROTOCOL_ID_SENSOR:
     case MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN:
+    case MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN:
         *protocol_idx = protocol_id - MOD_SCMI_PROTOCOL_ID_BASE;
         return FWK_SUCCESS;
     default:
@@ -286,6 +293,17 @@ static int mod_res_message_id_to_index(
             (message_id <= MOD_SCMI_RESET_NOTIFY)) {
             *message_idx =
                 message_id - (uint32_t)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES;
+        }
+        return FWK_SUCCESS;
+
+    case MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN:
+        if (message_id >= MOD_SCMI_VOLTD_COMMAND_COUNT) {
+            return FWK_E_PARAM;
+        }
+        if ((message_id >= MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES) &&
+            (message_id <= MOD_SCMI_VOLTD_LEVEL_GET)) {
+            *message_idx =
+                message_id - (uint32_t)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES;
         }
         return FWK_SUCCESS;
 
@@ -429,6 +447,18 @@ static int mod_res_resource_id_to_index(
         }
         return FWK_E_PARAM;
 #endif
+
+    case MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN:
+        if ((message_id >= MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES) &&
+            (message_id <= MOD_SCMI_VOLTD_LEVEL_GET)) {
+            message_count = (int)MOD_SCMI_VOLTD_LEVEL_GET -
+                (int)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES + 1U;
+            message_offset =
+                message_id - (uint32_t)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES;
+            resource_size = res_perms_ctx.voltd_count;
+            break;
+        }
+        return FWK_E_PARAM;
 
     default:
         return FWK_E_PARAM;
@@ -733,6 +763,16 @@ static enum mod_res_perms_permissions agent_resource_permissions(
         break;
 #endif
 
+    case MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN:
+        if (res_perms_ctx.agent_permissions->scmi_voltd_perms == NULL) {
+            return MOD_RES_PERMS_ACCESS_ALLOWED;
+        }
+        if (resource_id >= res_perms_ctx.voltd_count) {
+            return MOD_RES_PERMS_ACCESS_DENIED;
+        }
+        perms = res_perms_ctx.agent_permissions->scmi_voltd_perms[resource_idx];
+        break;
+
     default:
         return MOD_RES_PERMS_ACCESS_DENIED;
     }
@@ -990,6 +1030,56 @@ static int set_agent_resource_reset_permissions(
 
 #endif
 
+static int set_agent_resource_voltd_permissions(
+    uint32_t agent_id,
+    uint32_t resource_id,
+    enum mod_res_perms_permissions flags)
+{
+    int status;
+    int32_t message_idx;
+
+    if (res_perms_ctx.agent_permissions->scmi_voltd_perms == NULL) {
+        return FWK_SUCCESS;
+    }
+    if (resource_id >= res_perms_ctx.voltd_count) {
+        return FWK_E_ACCESS;
+    }
+
+    /* Do a backup before making the changes if required */
+    if ((res_perms_ctx.config->voltd_cmd_count != 0) &&
+        (res_perms_ctx.config->voltd_resource_count != 0) &&
+        (res_perms_backup.scmi_voltd_perms == NULL)) {
+        res_perms_backup.scmi_voltd_perms = (mod_res_perms_t *)fwk_mm_alloc(
+            res_perms_ctx.agent_count * res_perms_ctx.config->voltd_cmd_count *
+                res_perms_ctx.config->voltd_resource_count,
+            sizeof(mod_res_perms_t));
+        memcpy(
+            res_perms_backup.scmi_voltd_perms,
+            res_perms_ctx.agent_permissions->scmi_voltd_perms,
+            res_perms_ctx.agent_count * res_perms_ctx.config->voltd_cmd_count *
+                res_perms_ctx.config->voltd_resource_count *
+                sizeof(mod_res_perms_t));
+    }
+
+    for (message_idx = MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES;
+         message_idx <= MOD_SCMI_VOLTD_LEVEL_GET;
+         message_idx++) {
+        status = set_agent_resource_message_perms(
+            agent_id,
+            MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN,
+            message_idx,
+            resource_id,
+            res_perms_ctx.agent_permissions->scmi_voltd_perms,
+            flags);
+
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+    }
+
+    return FWK_SUCCESS;
+}
+
 static int set_agent_resource_sensor_permissions(
     uint32_t agent_id,
     uint32_t resource_id,
@@ -1075,6 +1165,11 @@ static int mod_res_agent_set_permissions(
             set_agent_resource_reset_permissions(agent_id, resource_id, flags);
         break;
 #endif
+
+    case MOD_RES_VOLTAGE_DOMAIN_DEVICE:
+        status =
+            set_agent_resource_voltd_permissions(agent_id, resource_id, flags);
+        break;
 
     default:
         status = FWK_E_ACCESS;
@@ -1208,6 +1303,9 @@ static int mod_res_agent_set_device_protocol_permission(
     case MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN:
         dev_type = MOD_RES_RESET_DOMAIN_DEVICE;
         break;
+    case MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN:
+        dev_type = MOD_RES_VOLTAGE_DOMAIN_DEVICE;
+        break;
     case MOD_SCMI_PROTOCOL_ID_BASE:
     case MOD_SCMI_PROTOCOL_ID_SYS_POWER:
     default:
@@ -1287,6 +1385,10 @@ static void mod_res_agent_copy_config(
         resource_count = res_perms_ctx.config->reset_domain_resource_count;
         break;
 #endif
+    case MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN:
+        cmd_count = MOD_SCMI_VOLTD_COMMAND_COUNT;
+        resource_count = res_perms_ctx.config->voltd_resource_count;
+        break;
     default:
         return;
     }
@@ -1365,6 +1467,14 @@ static int mod_res_agent_reset_config(uint32_t agent_id, uint32_t flags)
     }
 #endif
 
+    if (res_perms_backup.scmi_voltd_perms != NULL) {
+        mod_res_agent_copy_config(
+            agent_id,
+            res_perms_ctx.agent_permissions->scmi_voltd_perms,
+            res_perms_backup.scmi_voltd_perms,
+            MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN);
+    }
+
     return FWK_SUCCESS;
 }
 
@@ -1419,6 +1529,7 @@ static int mod_res_perms_resources_init(
 #ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
         res_perms_ctx.reset_domain_count = config->reset_domain_count;
 #endif
+        res_perms_ctx.voltd_count = config->voltd_count;
         res_perms_ctx.domain_devices =
             (struct mod_res_device *)config->domain_devices;
     }
