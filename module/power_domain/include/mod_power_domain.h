@@ -528,21 +528,25 @@ struct mod_pd_restricted_api {
     int (*get_state)(fwk_id_t pd_id, unsigned int *state);
 
     /*!
-     * \brief Reset of a power domain.
+     * \brief Request for a power domain to be reset.
      *
-     * \note The function resets the power domain identified by 'pd_id'. When
-     *      the function returns the power domain reset is completed.
+     * \note The function queues a reset request. When the function returns the
+     *      power domain has not been reset, the reset has just been requested
+     *      to the power domain module.
      *
      * \param pd_id Identifier of the power domain to reset.
      *
-     * \retval ::FWK_SUCCESS Power state retrieving request transmitted.
+     * \param resp_requested True if the caller wants to be notified with an
+     *      event response at the end of the reset request processing.
+     *
+     * \retval ::FWK_SUCCESS Reset request transmitted.
      * \retval ::FWK_E_ACCESS Invalid access, the framework has rejected the
      *      call to the API.
      * \retval ::FWK_E_HANDLER The function is not called from a thread.
      * \retval ::FWK_E_NOMEM Failed to allocate a request descriptor.
      * \retval ::FWK_E_PARAM The power domain identifier is unknown.
      */
-    int (*reset)(fwk_id_t pd_id);
+    int (*reset)(fwk_id_t pd_id, bool resp_requested);
 
     /*!
      * \brief Suspend the system.
@@ -638,7 +642,7 @@ struct mod_pd_driver_input_api {
      * \retval ::FWK_E_NOMEM Failed to allocate a request descriptor.
      * \retval ::FWK_E_PARAM The power domain identifier is unknown.
      */
-    int (*reset_async)(fwk_id_t pd_id, bool resp_requested);
+    int (*reset)(fwk_id_t pd_id, bool resp_requested);
 
     /*!
      * \brief Report a power domain state transition.
