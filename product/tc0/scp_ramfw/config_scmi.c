@@ -79,6 +79,7 @@ static const uint32_t dis_protocol_list_psci[] = {
     MOD_SCMI_PROTOCOL_ID_SENSOR,
     MOD_SCMI_PROTOCOL_ID_CLOCK,
     MOD_SCMI_PROTOCOL_ID_PERF,
+    MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN,
 };
 #endif
 

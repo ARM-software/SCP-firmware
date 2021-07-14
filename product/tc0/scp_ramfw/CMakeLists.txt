@@ -36,6 +36,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_dvfs.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_psu.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_mock_voltage_domain.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_mock_psu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_system_pll.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_pik_clock.c"

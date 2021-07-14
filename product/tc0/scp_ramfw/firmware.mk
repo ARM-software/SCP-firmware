@@ -28,12 +28,15 @@ BS_FIRMWARE_MODULES := \
     css_clock \
     clock \
     power_domain \
+    voltage_domain \
     scmi_power_domain \
     scmi_system_power \
+    scmi_voltage_domain \
     dvfs \
     scmi_clock \
     scmi_perf \
     mock_psu \
+    mock_voltage_domain \
     psu \
     tc0_system
 
@@ -47,6 +50,8 @@ BS_FIRMWARE_SOURCES := \
     config_armv7m_mpu.c \
     config_pl011.c \
     config_power_domain.c \
+    config_voltage_domain.c \
+    config_mock_voltage_domain.c \
     config_ppu_v1.c \
     config_mhu2.c \
     config_smt.c \
@@ -64,7 +69,8 @@ BS_FIRMWARE_SOURCES := \
     config_pik_clock.c \
     config_css_clock.c \
     config_clock.c \
-    config_scmi_power_domain.c
+    config_scmi_power_domain.c \
+    config_scmi_voltage_domain.c
 
 ifeq ($(BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS),yes)
     BS_FIRMWARE_SOURCES += config_resource_perms.c
