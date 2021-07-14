@@ -35,7 +35,8 @@ static struct mod_res_agent_protocol_permissions agent_protocol_permissions[] =
             {
                 .protocols = MOD_RES_PERMS_SCMI_CLOCK_PROTOCOL_DENIED |
                     MOD_RES_PERMS_SCMI_PERF_PROTOCOL_DENIED |
-                    MOD_RES_PERMS_SCMI_SENSOR_PROTOCOL_DENIED,
+                    MOD_RES_PERMS_SCMI_SENSOR_PROTOCOL_DENIED |
+                    MOD_RES_PERMS_SCMI_VOLTAGE_DOMAIN_PROTOCOL_DENIED,
             },
     };
 
@@ -59,6 +60,9 @@ static struct mod_res_agent_msg_permissions
                     .messages[MOD_RES_PERMS_SCMI_SENSOR_MESSAGE_IDX] = 0x0,
                     .messages[MOD_RES_PERMS_SCMI_RESET_DOMAIN_MESSAGE_IDX] =
                         0x0,
+                    .messages[MOD_RES_PERMS_SCMI_VOLTAGE_DOMAIN_MESSAGE_IDX] =
+                        0x0,
+
                 },
             [AGENT_IDX(SCP_SCMI_AGENT_ID_PSCI)] =
                 {
@@ -100,6 +104,8 @@ static struct mod_res_agent_msg_permissions
                     .messages[MOD_RES_PERMS_SCMI_SENSOR_MESSAGE_IDX] = 0x0,
                     .messages[MOD_RES_PERMS_SCMI_RESET_DOMAIN_MESSAGE_IDX] =
                         0x0,
+                    .messages[MOD_RES_PERMS_SCMI_VOLTAGE_DOMAIN_MESSAGE_IDX] =
+                        0x0,
                 },
         };
 
@@ -113,6 +119,6 @@ struct fwk_module_config config_resource_perms = {
         &(struct mod_res_resource_perms_config){
             .agent_permissions = (uintptr_t)&agent_permissions,
             .agent_count = SCP_SCMI_AGENT_ID_COUNT,
-            .protocol_count = 6,
+            .protocol_count = 8,
         },
 };
