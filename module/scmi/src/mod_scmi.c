@@ -286,7 +286,7 @@ static int signal_error(fwk_id_t service_id)
 
 static int signal_message(fwk_id_t service_id)
 {
-    struct fwk_event event = (struct fwk_event) {
+    struct fwk_event_light event = (struct fwk_event_light){
         .id = FWK_ID_EVENT(FWK_MODULE_IDX_SCMI, 0),
         .source_id = FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
         .target_id = service_id,
