@@ -216,9 +216,9 @@ static int put_event_request(
     fwk_id_t event_id,
     enum mod_dvfs_domain_state state)
 {
-    struct fwk_event req;
+    struct fwk_event_light req;
 
-    req = (struct fwk_event){
+    req = (struct fwk_event_light){
         .target_id = ctx->domain_id,
         .id = event_id,
         .response_requested = ctx->request.response_required,
@@ -292,9 +292,9 @@ static void dvfs_flush_pending_request(struct mod_dvfs_domain_ctx *ctx)
 static void alarm_callback(uintptr_t param)
 {
     struct mod_dvfs_domain_ctx *ctx = (struct mod_dvfs_domain_ctx *)param;
-    struct fwk_event req;
+    struct fwk_event_light req;
 
-    req = (struct fwk_event){
+    req = (struct fwk_event_light){
         .target_id = ctx->domain_id,
         .source_id = ctx->domain_id,
         .id = mod_dvfs_event_id_retry,
