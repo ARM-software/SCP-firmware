@@ -11,6 +11,8 @@
 #ifndef FWK_THREAD_H
 #define FWK_THREAD_H
 
+#include <internal/fwk_thread.h>
+
 #include <fwk_event.h>
 #include <fwk_id.h>
 
@@ -64,7 +66,10 @@
  *
  * \return Status code representing the result of the operation.
  */
-int fwk_thread_put_event(struct fwk_event *event);
+#define fwk_thread_put_event(event) \
+    _Generic((event), struct fwk_event * \
+             : __fwk_thread_put_event, struct fwk_event_light * \
+             : __fwk_thread_put_event_light)(event)
 
 /*!
  * \brief Get a copy of a delayed response event.

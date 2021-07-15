@@ -386,6 +386,77 @@ static void test_fwk_thread_put_event(void)
     assert(result_event->is_notification == false);
 }
 
+static void test_fwk_thread_put_event_light(void)
+{
+    int result;
+    struct fwk_event *result_event;
+
+    struct fwk_event_light event1 = {
+        .source_id = FWK_ID_MODULE(0x1),
+        .target_id = FWK_ID_MODULE(0x2),
+        .response_requested = true,
+        .id = FWK_ID_EVENT(0x2, 7),
+    };
+
+    struct fwk_event_light event2 = {
+        .source_id = FWK_ID_MODULE(0x3),
+        .target_id = FWK_ID_MODULE(0x4),
+        .response_requested = false,
+        .id = FWK_ID_EVENT(0x4, 7),
+    };
+
+    /* Thread not initialized */
+    result = fwk_thread_put_event(&event2);
+    assert(result == FWK_E_INIT);
+
+    result = __fwk_thread_init(2);
+    assert(result == FWK_SUCCESS);
+
+    /* Invalid entity ID */
+    is_valid_entity_id_return_val = false;
+    result = fwk_thread_put_event(&event2);
+    assert(result == FWK_E_PARAM);
+    is_valid_entity_id_return_val = true;
+
+    /* Invalid event ID */
+    is_valid_event_id_return_val = false;
+    result = fwk_thread_put_event(&event2);
+    assert(result == FWK_E_PARAM);
+    is_valid_event_id_return_val = true;
+
+    /* Incompatible target and event identifier */
+    event2.id = FWK_ID_EVENT(0x2, 7);
+    result = fwk_thread_put_event(&event2);
+    assert(result == FWK_E_PARAM);
+
+    /* Valid event id */
+    result = fwk_thread_put_event(&event1);
+    assert(result == FWK_SUCCESS);
+    /* Framework always queue light event by converting in a standard event */
+    result_event = FWK_LIST_GET(
+        fwk_list_pop_head(&ctx->event_queue), struct fwk_event, slist_node);
+    assert(fwk_id_is_equal(result_event->source_id, event1.source_id));
+    assert(fwk_id_is_equal(result_event->target_id, event1.target_id));
+    assert(result_event->is_response == false);
+    assert(result_event->response_requested == event1.response_requested);
+    assert(result_event->is_notification == false);
+
+    event2.id = FWK_ID_EVENT(0x4, 7);
+    interrupt_get_current_return_val = FWK_SUCCESS;
+    result = fwk_thread_put_event(&event2);
+    assert(result == FWK_SUCCESS);
+    assert(fwk_list_is_empty(&ctx->free_event_queue));
+
+    /* Framework always queue light event by converting in a standard event */
+    result_event = FWK_LIST_GET(
+        fwk_list_pop_head(&ctx->isr_event_queue), struct fwk_event, slist_node);
+    assert(fwk_id_is_equal(result_event->source_id, event2.source_id));
+    assert(fwk_id_is_equal(result_event->target_id, event2.target_id));
+    assert(result_event->is_response == false);
+    assert(result_event->response_requested == event2.response_requested);
+    assert(result_event->is_notification == false);
+}
+
 static void test___fwk_thread_put_notification(void)
 {
     int result;
@@ -437,6 +508,7 @@ static const struct fwk_test_case_desc test_case_table[] = {
     FWK_TEST_CASE(test___fwk_thread_init),
     FWK_TEST_CASE(test___fwk_thread_run),
     FWK_TEST_CASE(test_fwk_thread_put_event),
+    FWK_TEST_CASE(test_fwk_thread_put_event_light),
     FWK_TEST_CASE(test___fwk_thread_put_notification)
 };
 
