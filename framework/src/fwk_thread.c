@@ -55,13 +55,17 @@ enum thread_interrupt_states {
  * Duplicate an event.
  *
  * \param event Pointer to the event to duplicate.
+ * \param event_type Type of the event structure as defined in
+ *     \c fwk_event_type
  *
  * \pre \p event must not be NULL
  *
  * \return The pointer to the duplicated event, NULL if the allocation to
  *      duplicate the event failed.
  */
-static struct fwk_event *duplicate_event(struct fwk_event *event)
+static struct fwk_event *duplicate_event(
+    void *event,
+    enum fwk_event_type event_type)
 {
     struct fwk_event *allocated_event = NULL;
 
@@ -78,55 +82,76 @@ static struct fwk_event *duplicate_event(struct fwk_event *event)
 
         return NULL;
     }
+    if (event_type == FWK_EVENT_TYPE_LIGHT) {
+        struct fwk_event_light *light_event = (struct fwk_event_light *)event;
+        allocated_event->id = light_event->id;
+        allocated_event->source_id = light_event->source_id;
+        allocated_event->target_id = light_event->target_id;
+        allocated_event->is_notification = false;
+        allocated_event->response_requested = light_event->response_requested;
+        allocated_event->is_delayed_response = false;
+        allocated_event->is_response = false;
+    } else {
+        *allocated_event = *((struct fwk_event *)event);
+    }
 
-    *allocated_event = *event;
     allocated_event->slist_node = (struct fwk_slist_node){ 0 };
 
     return allocated_event;
 }
 
 static int put_event(
-    struct fwk_event *event,
-    enum thread_interrupt_states intr_state)
+    void *event,
+    enum thread_interrupt_states intr_state,
+    enum fwk_event_type event_type)
 {
     struct fwk_event *allocated_event;
     unsigned int interrupt;
     bool is_wakeup_event = false;
     int status;
 
-    if (event->is_delayed_response) {
+    struct fwk_event *std_event = NULL;
+
+    if (event_type == FWK_EVENT_TYPE_STD) {
+        std_event = (struct fwk_event *)event;
+    }
+
+    if (std_event != NULL && std_event->is_delayed_response) {
         allocated_event = __fwk_thread_search_delayed_response(
-            event->source_id, event->cookie);
+            std_event->source_id, std_event->cookie);
         if (allocated_event == NULL) {
             FWK_LOG_CRIT(err_msg_func, FWK_E_NOMEM, __func__);
             return FWK_E_PARAM;
         }
 
         fwk_list_remove(
-            __fwk_thread_get_delayed_response_list(event->source_id),
+            __fwk_thread_get_delayed_response_list(std_event->source_id),
             &allocated_event->slist_node);
 
         (void)memcpy(
             allocated_event->params,
-            event->params,
+            std_event->params,
             sizeof(allocated_event->params));
 
         /* Is this the event put_event_and_wait is waiting for ? */
         if (ctx.waiting_event_processing_completion &&
-            (ctx.cookie == event->cookie)) {
+            (ctx.cookie == std_event->cookie)) {
             is_wakeup_event = true;
         }
     } else {
-        allocated_event = duplicate_event(event);
+        allocated_event = duplicate_event(event, event_type);
         if (allocated_event == NULL) {
             return FWK_E_NOMEM;
         }
     }
 
-    allocated_event->cookie = event->cookie = ctx.event_cookie_counter++;
+    if (std_event != NULL) {
+        allocated_event->cookie = ctx.event_cookie_counter++;
+        std_event->cookie = allocated_event->cookie;
 
-    if (is_wakeup_event) {
-        ctx.cookie = event->cookie;
+        if (is_wakeup_event) {
+            ctx.cookie = std_event->cookie;
+        }
     }
 
     if (intr_state == UNKNOWN_THREAD) {
@@ -146,7 +171,7 @@ static int put_event(
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
     FWK_LOG_TRACE(
         "[FWK] Sent %" PRIu32 ": %s @ %s -> %s",
-        event->cookie,
+        std_event != NULL ? std_event->cookie : 0,
         FWK_ID_STR(allocated_event->id),
         FWK_ID_STR(allocated_event->source_id),
         FWK_ID_STR(allocated_event->target_id));
@@ -201,9 +226,11 @@ static void process_next_event(void)
         async_response_event.is_response = true;
         async_response_event.response_requested = false;
         if (!async_response_event.is_delayed_response) {
-            (void)put_event(&async_response_event, UNKNOWN_THREAD);
+            (void)put_event(
+                &async_response_event, UNKNOWN_THREAD, FWK_EVENT_TYPE_STD);
         } else {
-            allocated_event = duplicate_event(&async_response_event);
+            allocated_event =
+                duplicate_event(&async_response_event, FWK_EVENT_TYPE_STD);
             if (allocated_event != NULL) {
                 fwk_list_push_tail(
                     __fwk_thread_get_delayed_response_list(
@@ -309,7 +336,7 @@ int __fwk_thread_put_notification(struct fwk_event *event)
     event->is_response = false;
     event->is_notification = true;
 
-    return put_event(event, UNKNOWN_THREAD);
+    return put_event(event, UNKNOWN_THREAD, FWK_EVENT_TYPE_STD);
 }
 #endif
 
@@ -317,7 +344,7 @@ int __fwk_thread_put_notification(struct fwk_event *event)
  * Public interface functions
  */
 
-int fwk_thread_put_event(struct fwk_event *event)
+int __fwk_thread_put_event(struct fwk_event *event)
 {
     int status = FWK_E_PARAM;
     unsigned int interrupt;
@@ -384,7 +411,60 @@ int fwk_thread_put_event(struct fwk_event *event)
     }
 #endif
 
-    return put_event(event, intr_state);
+    return put_event(event, intr_state, FWK_EVENT_TYPE_STD);
+
+error:
+    FWK_LOG_CRIT(err_msg_func, status, __func__);
+    return status;
+}
+
+int __fwk_thread_put_event_light(struct fwk_event_light *event)
+{
+    int status = FWK_E_PARAM;
+    unsigned int interrupt;
+    enum thread_interrupt_states intr_state;
+
+#ifdef BUILD_MODE_DEBUG
+    if (!ctx.initialized) {
+        status = FWK_E_INIT;
+        goto error;
+    }
+
+    if (event == NULL) {
+        goto error;
+    }
+#endif
+
+    status = fwk_interrupt_get_current(&interrupt);
+    if (status != FWK_SUCCESS) {
+        intr_state = NOT_INTERRUPT_THREAD;
+    } else {
+        intr_state = INTERRUPT_THREAD;
+    }
+
+    if ((intr_state == NOT_INTERRUPT_THREAD) && (ctx.current_event != NULL)) {
+        event->source_id = ctx.current_event->target_id;
+    } else if (
+        !fwk_id_type_is_valid(event->source_id) ||
+        !fwk_module_is_valid_entity_id(event->source_id)) {
+        status = FWK_E_PARAM;
+        goto error;
+    }
+
+#ifdef BUILD_MODE_DEBUG
+    status = FWK_E_PARAM;
+
+    if (!fwk_module_is_valid_event_id(event->id)) {
+        goto error;
+    }
+
+    if (fwk_id_get_module_idx(event->target_id) !=
+        fwk_id_get_module_idx(event->id)) {
+        goto error;
+    }
+
+#endif
+    return put_event(event, intr_state, FWK_EVENT_TYPE_LIGHT);
 
 error:
     FWK_LOG_CRIT(err_msg_func, status, __func__);
@@ -459,7 +539,7 @@ int fwk_thread_put_event_and_wait(
     event->response_requested = true;
     event->is_notification = false;
 
-    status = put_event(event, NOT_INTERRUPT_THREAD);
+    status = put_event(event, NOT_INTERRUPT_THREAD, FWK_EVENT_TYPE_STD);
     if (status != FWK_SUCCESS) {
         goto exit;
     }
@@ -511,13 +591,15 @@ int fwk_thread_put_event_and_wait(
             response_event.is_response = true;
             response_event.response_requested = false;
             if (!response_event.is_delayed_response) {
-                status = put_event(&response_event, UNKNOWN_THREAD);
+                status = put_event(
+                    &response_event, UNKNOWN_THREAD, FWK_EVENT_TYPE_STD);
                 if (status != FWK_SUCCESS) {
                     goto exit;
                 }
                 ctx.cookie = response_event.cookie;
             } else {
-                allocated_event = duplicate_event(&response_event);
+                allocated_event =
+                    duplicate_event(&response_event, FWK_EVENT_TYPE_STD);
                 if (allocated_event != NULL) {
                     fwk_list_push_head(
                         __fwk_thread_get_delayed_response_list(

@@ -354,6 +354,21 @@ information between the source and target entity. This memory is intended to be
 written to and read through a C structure. The size (bytes) of this space is
 defined by *FWK_EVENT_PARAMETERS_SIZE* in fwk_event.h.
 
+### Light Events
+
+As described in *Events* above, Objects of type ```struct fwk_event```
+contains a block of memory to store the parameters. However, this block
+is not always needed for simple use cases.
+If ```struct fwk_event``` object is allocated and initialized partially
+on the stack, the parameter block also gets initialized which may not
+be efficient for performance sensitive use cases. The framework
+provides an additional event type ```struct fwk_event_light``` which
+does not contain this block of memory for parameters and few other
+fields(cookie, is_response, is_notification, is_delayed_response, and
+is_thread_wakeup_event). Apart from this, from the user's view the
+ *Light Events* behaves as same as *Events*. Also, note that these type
+of events can not be used in notifications and delayed response use cases.
+
 #### Notifications
 
 Notifications are used when a module wants to notify other modules of a change

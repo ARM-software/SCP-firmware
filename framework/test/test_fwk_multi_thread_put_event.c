@@ -333,7 +333,7 @@ static void test_put_event_invalid_event(void)
 {
     int status;
 
-    status = fwk_thread_put_event(NULL);
+    status = fwk_thread_put_event((struct fwk_event *)NULL);
     assert(status == FWK_E_PARAM);
 
     assert(ctx->event_cookie_counter == 0);

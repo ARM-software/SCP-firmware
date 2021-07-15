@@ -11,6 +11,8 @@
 #ifndef FWK_EVENT_H
 #define FWK_EVENT_H
 
+#include <internal/fwk_event.h>
+
 #include <fwk_align.h>
 #include <fwk_id.h>
 #include <fwk_list.h>
@@ -96,6 +98,37 @@ struct fwk_event {
 
     /*! Table of event parameters */
     alignas(max_align_t) uint8_t params[FWK_EVENT_PARAMETERS_SIZE];
+};
+
+/*!
+ * \brief Light event.
+ *
+ * \details Light events are used only in cases where very little information
+ *      is needed by the target module and in a use case where creating and
+ *      initializing a <tt> struct fwk_event </tt> type object can affect
+ *      the performance of the use case(e.g. DVFS).
+ *      The framework copies the light event information in a pre-allocated
+ *      <tt> struct fwk_event </tt> type object before it starts processing
+ *      the event.
+ */
+struct fwk_event_light {
+    /*! Identifier of the event source */
+    fwk_id_t source_id;
+
+    /*! Identifier of the event target */
+    fwk_id_t target_id;
+
+    /*!
+     * \brief Event identifier.
+     *
+     * \details Each module or element may define its own set of events. The
+     *      event identifier must therefore be interpreted in the context of its
+     *      target.
+     */
+    fwk_id_t id;
+
+    /*! Flag indicating whether the event source expects a response */
+    bool response_requested;
 };
 
 /*!
