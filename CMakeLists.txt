@@ -151,35 +151,36 @@ cmake_dependent_option(
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 #
-# Set up Cppcheck if it's available.
+# Set up Cppcheck if it's available and enabled.
 #
+if (NOT DISABLE_CPPCHECK)
+    find_program(CMAKE_C_CPPCHECK NAMES "cppcheck")
 
-find_program(CMAKE_C_CPPCHECK NAMES "cppcheck")
-
-if(NOT CMAKE_C_CPPCHECK)
-    unset(CMAKE_C_CPPCHECK CACHE)
-endif()
-
-if(CMAKE_C_CPPCHECK)
-    # cmake-format: off
-
-    list(APPEND CMAKE_C_CPPCHECK "--quiet")
-    list(APPEND CMAKE_C_CPPCHECK "--suppressions-list=${CMAKE_CURRENT_SOURCE_DIR}/tools/cppcheck_suppress_list.txt")
-    list(APPEND CMAKE_C_CPPCHECK "--enable=all")
-    list(APPEND CMAKE_C_CPPCHECK "--inconclusive")
-    list(APPEND CMAKE_C_CPPCHECK "--inline-suppr")
-
-    if(SCP_ARCHITECTURE STREQUAL "armv7-m")
-        list(APPEND CMAKE_C_CPPCHECK "--library=${CMAKE_CURRENT_SOURCE_DIR}/.armv7m.cppcheck.cfg")
+    if(NOT CMAKE_C_CPPCHECK)
+        unset(CMAKE_C_CPPCHECK CACHE)
     endif()
 
-    if(CMAKE_C_COMPILER_ID STREQUAL "ARMClang")
-        list(APPEND CMAKE_C_CPPCHECK "--library=${CMAKE_CURRENT_SOURCE_DIR}/.armclang.cppcheck.cfg")
-    else()
-        list(APPEND CMAKE_C_CPPCHECK "--library=${CMAKE_CURRENT_SOURCE_DIR}/.gnu.cppcheck.cfg")
-    endif()
+    if(CMAKE_C_CPPCHECK)
+        # cmake-format: off
 
-    # cmake-format: on
+        list(APPEND CMAKE_C_CPPCHECK "--quiet")
+        list(APPEND CMAKE_C_CPPCHECK "--suppressions-list=${CMAKE_CURRENT_SOURCE_DIR}/tools/cppcheck_suppress_list.txt")
+        list(APPEND CMAKE_C_CPPCHECK "--enable=all")
+        list(APPEND CMAKE_C_CPPCHECK "--inconclusive")
+        list(APPEND CMAKE_C_CPPCHECK "--inline-suppr")
+
+        if(SCP_ARCHITECTURE STREQUAL "armv7-m")
+            list(APPEND CMAKE_C_CPPCHECK "--library=${CMAKE_CURRENT_SOURCE_DIR}/.armv7m.cppcheck.cfg")
+        endif()
+
+        if(CMAKE_C_COMPILER_ID STREQUAL "ARMClang")
+            list(APPEND CMAKE_C_CPPCHECK "--library=${CMAKE_CURRENT_SOURCE_DIR}/.armclang.cppcheck.cfg")
+        else()
+            list(APPEND CMAKE_C_CPPCHECK "--library=${CMAKE_CURRENT_SOURCE_DIR}/.gnu.cppcheck.cfg")
+        endif()
+
+        # cmake-format: on
+    endif()
 endif()
 
 #
