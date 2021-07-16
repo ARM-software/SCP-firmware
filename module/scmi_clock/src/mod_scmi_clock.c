@@ -523,11 +523,14 @@ FWK_WEAK int mod_scmi_clock_config_set_policy(
 
         /* set the clock state for this agent to RUNNING */
         if (policy_commit == MOD_SCMI_CLOCK_POST_MESSAGE_HANDLER) {
-            set_agent_clock_state(
+            status = set_agent_clock_state(
                 agent_clock_state,
                 (uint8_t)MOD_CLOCK_STATE_RUNNING,
                 service_id,
                 clock_dev_id);
+            if (status != FWK_SUCCESS) {
+                return status;
+            }
         }
 
         /*
@@ -564,11 +567,14 @@ FWK_WEAK int mod_scmi_clock_config_set_policy(
 
         /* set the clock state for this agent to STOPPED */
         if (policy_commit == MOD_SCMI_CLOCK_POST_MESSAGE_HANDLER) {
-            set_agent_clock_state(
+            status = set_agent_clock_state(
                 agent_clock_state,
                 (uint8_t)MOD_CLOCK_STATE_STOPPED,
                 service_id,
                 clock_dev_id);
+            if (status != FWK_SUCCESS) {
+                return status;
+            }
         }
 
         /*
