@@ -47,7 +47,8 @@ list(PREPEND SCP_MODULE_PATHS
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/n1sdp_sensor")
 list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/n1sdp_c2c")
-list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/n1sdp_i2c")
+list(PREPEND SCP_MODULE_PATHS
+     "${CMAKE_CURRENT_LIST_DIR}/../../../module/cdns_i2c")
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/n1sdp_timer_sync")
 list(PREPEND SCP_MODULE_PATHS
@@ -64,7 +65,7 @@ list(APPEND SCP_MODULES "ppu-v1")
 list(APPEND SCP_MODULES "ppu-v0")
 list(APPEND SCP_MODULES "system-power")
 list(APPEND SCP_MODULES "n1sdp-pll")
-list(APPEND SCP_MODULES "n1sdp-i2c")
+list(APPEND SCP_MODULES "cdns-i2c")
 list(APPEND SCP_MODULES "n1sdp-dmc620")
 list(APPEND SCP_MODULES "n1sdp-ddr-phy")
 list(APPEND SCP_MODULES "mhu")

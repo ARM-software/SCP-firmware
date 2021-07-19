@@ -17,4 +17,4 @@ target_sources(
 )
 
 target_link_libraries(${SCP_MODULE_TARGET}
-    PRIVATE module-n1sdp-i2c module-clock module-timer)
+    PRIVATE module-cdns-i2c module-clock module-timer)

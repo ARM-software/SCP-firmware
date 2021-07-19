@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-BS_LIB_NAME := N1SDP I2C
-BS_LIB_SOURCES += mod_n1sdp_i2c.c
+BS_LIB_NAME := Cadence I2C
+BS_LIB_SOURCES += mod_cdns_i2c.c
 
 include $(BS_DIR)/lib.mk

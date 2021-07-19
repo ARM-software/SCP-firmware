@@ -13,11 +13,11 @@
 
 #include <internal/n1sdp_scp2pcc.h>
 
+#include <mod_cdns_i2c.h>
 #include <mod_clock.h>
 #include <mod_cmn600.h>
 #include <mod_n1sdp_c2c_i2c.h>
 #include <mod_n1sdp_dmc620.h>
-#include <mod_n1sdp_i2c.h>
 #include <mod_n1sdp_pcie.h>
 #include <mod_n1sdp_scp2pcc.h>
 #include <mod_n1sdp_timer_sync.h>
@@ -92,10 +92,10 @@ struct n1sdp_c2c_ctx {
     struct n1sdp_c2c_dev_config *config;
 
     /* I2C Master API ID */
-    struct mod_n1sdp_i2c_master_api_polled *master_api;
+    struct mod_cdns_i2c_master_api_polled *master_api;
 
     /* I2C Slave API ID */
-    struct mod_n1sdp_i2c_slave_api_irq *slave_api;
+    struct mod_cdns_i2c_slave_api_irq *slave_api;
 
     /* PCIe init API */
     struct n1sdp_pcie_init_api *pcie_init_api;
@@ -1119,18 +1119,19 @@ static int n1sdp_c2c_bind(fwk_id_t id, unsigned int round)
         }
 
         if (n1sdp_c2c_ctx.chip_id == 0) {
-            status = fwk_module_bind(n1sdp_c2c_ctx.config->i2c_id,
-                FWK_ID_API(FWK_MODULE_IDX_N1SDP_I2C,
-                           MOD_N1SDP_I2C_API_MASTER_POLLED),
+            status = fwk_module_bind(
+                n1sdp_c2c_ctx.config->i2c_id,
+                FWK_ID_API(
+                    FWK_MODULE_IDX_CDNS_I2C, MOD_CDNS_I2C_API_MASTER_POLLED),
                 &n1sdp_c2c_ctx.master_api);
             if (status != FWK_SUCCESS) {
                 return status;
             }
         } else {
-            status = fwk_module_bind(n1sdp_c2c_ctx.config->i2c_id,
-                                     FWK_ID_API(FWK_MODULE_IDX_N1SDP_I2C,
-                                                MOD_N1SDP_I2C_API_SLAVE_IRQ),
-                                     &n1sdp_c2c_ctx.slave_api);
+            status = fwk_module_bind(
+                n1sdp_c2c_ctx.config->i2c_id,
+                FWK_ID_API(FWK_MODULE_IDX_CDNS_I2C, MOD_CDNS_I2C_API_SLAVE_IRQ),
+                &n1sdp_c2c_ctx.slave_api);
             if (status != FWK_SUCCESS) {
                 return status;
             }
@@ -1176,14 +1177,18 @@ static int n1sdp_c2c_start(fwk_id_t id)
         return status;
     }
 
-    status = fwk_notification_subscribe(mod_n1sdp_i2c_notification_id_slave_rx,
-                                        n1sdp_c2c_ctx.config->i2c_id, id);
+    status = fwk_notification_subscribe(
+        mod_cdns_i2c_notification_id_slave_rx,
+        n1sdp_c2c_ctx.config->i2c_id,
+        id);
     if (status != FWK_SUCCESS) {
         return status;
     }
 
-    return fwk_notification_subscribe(mod_n1sdp_i2c_notification_id_slave_tx,
-                                      n1sdp_c2c_ctx.config->i2c_id, id);
+    return fwk_notification_subscribe(
+        mod_cdns_i2c_notification_id_slave_tx,
+        n1sdp_c2c_ctx.config->i2c_id,
+        id);
 }
 
 static int n1sdp_c2c_process_notification(const struct fwk_event *event,
@@ -1205,11 +1210,11 @@ static int n1sdp_c2c_process_notification(const struct fwk_event *event,
          */
         return fwk_notification_unsubscribe(event->id, event->source_id,
                                             event->target_id);
-    } else if (fwk_id_is_equal(event->id,
-                               mod_n1sdp_i2c_notification_id_slave_rx)) {
+    } else if (fwk_id_is_equal(
+                   event->id, mod_cdns_i2c_notification_id_slave_rx)) {
         return n1sdp_c2c_process_command();
-    } else if (fwk_id_is_equal(event->id,
-                               mod_n1sdp_i2c_notification_id_slave_tx)) {
+    } else if (fwk_id_is_equal(
+                   event->id, mod_cdns_i2c_notification_id_slave_tx)) {
         return n1sdp_c2c_wait_for_next_command();
     }
 

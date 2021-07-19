@@ -5,6 +5,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-set(SCP_MODULE "n1sdp-i2c")
+set(SCP_MODULE "cdns-i2c")
 
-set(SCP_MODULE_TARGET "module-n1sdp-i2c")
+set(SCP_MODULE_TARGET "module-cdns-i2c")
