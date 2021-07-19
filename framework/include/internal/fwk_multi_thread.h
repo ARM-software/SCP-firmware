@@ -10,7 +10,6 @@
 
 #include <cmsis_os2.h>
 
-#include <internal/fwk_signal.h>
 #include <internal/fwk_thread.h>
 
 #include <fwk_event.h>
@@ -120,21 +119,6 @@ struct __fwk_multi_thread_ctx {
      * Logging thread
      */
     osThreadId_t log_thread_id;
-
-    /*
-     * Signal currently being processed
-     */
-    FWK_RW struct signal *current_signal;
-
-    /*
-     * Signal handler thread
-     */
-    struct __fwk_thread_ctx signal_thread_ctx;
-
-    /*
-     * Storage for signals handling
-     */
-    struct __fwk_signal_ctx fwk_signal_ctx;
 };
 
 /*

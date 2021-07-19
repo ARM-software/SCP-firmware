@@ -9,7 +9,6 @@
  */
 
 #include <internal/fwk_module.h>
-#include <internal/fwk_signal.h>
 #include <internal/fwk_single_thread.h>
 #include <internal/fwk_thread.h>
 #include <internal/fwk_thread_delayed_resp.h>
@@ -47,11 +46,6 @@ enum thread_interrupt_states {
     INTERRUPT_THREAD = 1,
     NOT_INTERRUPT_THREAD = 2,
 };
-
-/*
- * Signal support
- */
-static struct __fwk_signal_ctx fwk_signal_ctx;
 
 /*
  * Static functions
@@ -161,69 +155,6 @@ static int put_event(
     return FWK_SUCCESS;
 }
 
-static int execute_signal_handler(fwk_id_t target_id, fwk_id_t signal_id)
-{
-    const struct fwk_module *module;
-    int status;
-
-    module = fwk_module_get_ctx(target_id)->desc;
-    if (module->process_signal == NULL) {
-        return FWK_E_PARAM;
-    }
-    status = module->process_signal(target_id, signal_id);
-    if ((status != FWK_SUCCESS) && (status != FWK_PENDING)) {
-        FWK_LOG_CRIT(
-            "[FWK] Process signal ([%u]: %s -> %s) (%d)\n",
-            fwk_id_get_module_idx(target_id),
-            FWK_ID_STR(signal_id),
-            FWK_ID_STR(target_id),
-            status);
-    }
-
-    return status;
-}
-
-static bool fwk_process_signal()
-{
-    struct signal signal;
-    int i = 0;
-
-    while (fwk_signal_ctx.pending_signals > 0) {
-        (void)fwk_interrupt_global_disable();
-        for (; i < FWK_MODULE_SIGNAL_COUNT; i++) {
-            if (!fwk_id_is_equal(
-                    fwk_signal_ctx.signals[i].target_id, FWK_ID_NONE)) {
-                signal.source_id = fwk_signal_ctx.signals[i].source_id;
-                signal.target_id = fwk_signal_ctx.signals[i].target_id;
-                signal.signal_id = fwk_signal_ctx.signals[i].signal_id;
-                fwk_signal_ctx.current_signal = fwk_signal_ctx.signals[i];
-                break;
-            }
-        }
-
-        if (i == FWK_MODULE_SIGNAL_COUNT) {
-            fwk_signal_ctx.current_signal.target_id = FWK_ID_NONE;
-            (void)fwk_interrupt_global_enable();
-            return false;
-        }
-
-        fwk_signal_ctx.pending_signals--;
-        fwk_signal_ctx.signals[i].target_id = FWK_ID_NONE;
-        (void)fwk_interrupt_global_enable();
-
-        (void)execute_signal_handler(signal.target_id, signal.signal_id);
-
-#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
-        FWK_LOG_TRACE(
-            "[FWK] Pulled signal (%s: %s)\n",
-            FWK_ID_STR(signal.target_id),
-            FWK_ID_STR(signal.signal_id));
-#endif
-    }
-
-    return true;
-}
-
 static void free_event(struct fwk_event *event)
 {
     (void)fwk_interrupt_global_disable();
@@ -330,7 +261,6 @@ static bool process_isr(void)
 int __fwk_thread_init(size_t event_count)
 {
     struct fwk_event *event_table, *event;
-    int i;
 
     event_table = fwk_mm_calloc(event_count, sizeof(struct fwk_event));
 
@@ -343,13 +273,6 @@ int __fwk_thread_init(size_t event_count)
         fwk_list_push_tail(&ctx.free_event_queue, &event->slist_node);
     }
 
-    for (i = 0; i < FWK_MODULE_SIGNAL_COUNT; i++) {
-        fwk_signal_ctx.signals[i].source_id = FWK_ID_NONE;
-        fwk_signal_ctx.signals[i].target_id = FWK_ID_NONE;
-        fwk_signal_ctx.signals[i].signal_id = FWK_ID_NONE;
-    };
-    fwk_signal_ctx.current_signal.target_id = FWK_ID_NONE;
-    fwk_signal_ctx.pending_signals = 0;
     ctx.initialized = true;
 
     return FWK_SUCCESS;
@@ -358,11 +281,8 @@ int __fwk_thread_init(size_t event_count)
 noreturn void __fwk_thread_run(void)
 {
     for (;;) {
-        (void)fwk_process_signal();
-
         while (!fwk_list_is_empty(&ctx.event_queue)) {
             process_next_event();
-            (void)fwk_process_signal();
         }
 
         if (process_isr()) {
@@ -426,13 +346,8 @@ int fwk_thread_put_event(struct fwk_event *event)
     } else if (
         !fwk_id_type_is_valid(event->source_id) ||
         !fwk_module_is_valid_entity_id(event->source_id)) {
-        if (!fwk_id_is_equal(
-                fwk_signal_ctx.current_signal.target_id, FWK_ID_NONE)) {
-            event->source_id = fwk_signal_ctx.current_signal.source_id;
-        } else {
-            status = FWK_E_PARAM;
-            goto error;
-        }
+        status = FWK_E_PARAM;
+        goto error;
     }
 
 #ifdef BUILD_MODE_DEBUG
@@ -515,18 +430,12 @@ int fwk_thread_put_event_and_wait(
     } else if (
         !fwk_id_type_is_valid(event->source_id) ||
         !fwk_module_is_valid_entity_id(event->source_id)) {
-        if (fwk_id_type_is_valid(fwk_signal_ctx.current_signal.target_id) &&
-            !fwk_id_is_equal(
-                fwk_signal_ctx.current_signal.target_id, FWK_ID_NONE)) {
-            event->source_id = fwk_signal_ctx.current_signal.source_id;
-        } else {
-            FWK_LOG_ERR(
-                "[FWK] deprecated put_event_and_wait (%s: %s -> %s)\n",
-                FWK_ID_STR(event->id),
-                FWK_ID_STR(event->source_id),
-                FWK_ID_STR(event->target_id));
-            goto error;
-        }
+        FWK_LOG_ERR(
+            "[FWK] deprecated put_event_and_wait (%s: %s -> %s)\n",
+            FWK_ID_STR(event->id),
+            FWK_ID_STR(event->source_id),
+            FWK_ID_STR(event->target_id));
+        goto error;
     }
 
     /* No support for nested put_event_and_wait calls */
@@ -558,9 +467,7 @@ int fwk_thread_put_event_and_wait(
     ctx.cookie = event->cookie;
 
     for (;;) {
-        (void)fwk_process_signal();
         if (fwk_list_is_empty(&ctx.event_queue)) {
-            (void)fwk_process_signal();
             (void)process_isr();
             continue;
         }
@@ -658,40 +565,4 @@ exit:
 error:
     FWK_LOG_CRIT(err_msg_func, status, __func__);
     return status;
-}
-
-/*
- * Post a signal
- */
-int fwk_thread_put_signal(
-    const fwk_id_t source_id,
-    const fwk_id_t target_id,
-    fwk_id_t signal_id)
-{
-    int signal_idx;
-
-    (void)fwk_interrupt_global_disable();
-
-    /*
-     * Find an available slot in the signals array
-     */
-    for (signal_idx = 0; signal_idx < FWK_MODULE_SIGNAL_COUNT; signal_idx++) {
-        if (fwk_id_is_equal(
-                fwk_signal_ctx.signals[signal_idx].target_id, FWK_ID_NONE)) {
-            fwk_signal_ctx.signals[signal_idx].source_id = source_id;
-            fwk_signal_ctx.signals[signal_idx].target_id = target_id;
-            fwk_signal_ctx.signals[signal_idx].signal_id = signal_id;
-            break;
-        }
-    }
-
-    if (signal_idx == FWK_MODULE_SIGNAL_COUNT) {
-        (void)fwk_interrupt_global_enable();
-        return FWK_E_BUSY;
-    }
-
-    fwk_signal_ctx.pending_signals++;
-    (void)fwk_interrupt_global_enable();
-
-    return FWK_SUCCESS;
 }
