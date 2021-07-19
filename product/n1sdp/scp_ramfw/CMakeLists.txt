@@ -28,7 +28,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_power_domain.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_ppu_v0.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_ppu_v1.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_n1sdp_i2c.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_cdns_i2c.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_n1sdp_dmc620.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_n1sdp_ddr_phy.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_mhu.c"

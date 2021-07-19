@@ -7,8 +7,8 @@
 
 #include "dimm_spd.h"
 
+#include <mod_cdns_i2c.h>
 #include <mod_n1sdp_dmc620.h>
-#include <mod_n1sdp_i2c.h>
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
@@ -34,38 +34,52 @@ static struct ddr4_spd ddr4_dimm1;
  * Internal APIs used by SPD functions
  */
 
-static int spd_read(struct mod_n1sdp_i2c_master_api_polled *i2c_api,
-    int address, uint8_t *spd_data)
+static int spd_read(
+    struct mod_cdns_i2c_master_api_polled *i2c_api,
+    int address,
+    uint8_t *spd_data)
 {
     char data[2] = {0};
     int i;
     int status;
 
-    status = i2c_api->write((FWK_ID_ELEMENT(FWK_MODULE_IDX_N1SDP_I2C, 0)),
-                            WRITE_PAGE0, data, SPD_W_TRANSFER_SIZE, SPD_STOP);
+    status = i2c_api->write(
+        (FWK_ID_ELEMENT(FWK_MODULE_IDX_CDNS_I2C, 0)),
+        WRITE_PAGE0,
+        data,
+        SPD_W_TRANSFER_SIZE,
+        SPD_STOP);
     if (status != FWK_SUCCESS) {
         return status;
     }
 
     for (i = SPD_PAGE0_START; i <= MAX_SPD_PAGE0; i++) {
-        status = i2c_api->read((FWK_ID_ELEMENT(FWK_MODULE_IDX_N1SDP_I2C, 0)),
-                               address, (char *)&spd_data[i],
-                               SPD_R_TRANSFER_SIZE);
+        status = i2c_api->read(
+            (FWK_ID_ELEMENT(FWK_MODULE_IDX_CDNS_I2C, 0)),
+            address,
+            (char *)&spd_data[i],
+            SPD_R_TRANSFER_SIZE);
         if (status != FWK_SUCCESS) {
             return status;
         }
     }
 
-    status = i2c_api->write((FWK_ID_ELEMENT(FWK_MODULE_IDX_N1SDP_I2C, 0)),
-                            WRITE_PAGE1, data, SPD_W_TRANSFER_SIZE, SPD_STOP);
+    status = i2c_api->write(
+        (FWK_ID_ELEMENT(FWK_MODULE_IDX_CDNS_I2C, 0)),
+        WRITE_PAGE1,
+        data,
+        SPD_W_TRANSFER_SIZE,
+        SPD_STOP);
     if (status != FWK_SUCCESS) {
         return status;
     }
 
     for (i = SPD_PAGE1_START; i <= MAX_SPD_PAGE1; i++) {
-        status = i2c_api->read((FWK_ID_ELEMENT(FWK_MODULE_IDX_N1SDP_I2C, 0)),
-                               address, (char *)&spd_data[i],
-                               SPD_R_TRANSFER_SIZE);
+        status = i2c_api->read(
+            (FWK_ID_ELEMENT(FWK_MODULE_IDX_CDNS_I2C, 0)),
+            address,
+            (char *)&spd_data[i],
+            SPD_R_TRANSFER_SIZE);
         if (status != FWK_SUCCESS) {
             return status;
         }
@@ -450,8 +464,9 @@ static uint32_t cal_dly_wth_rounding(int32_t spd_val, int32_t spd_val_fine)
 /*
  * APIs invoked by DMC-620 core functions
  */
-int dimm_spd_init_check(struct mod_n1sdp_i2c_master_api_polled *i2c_api,
-                         struct dimm_info *ddr)
+int dimm_spd_init_check(
+    struct mod_cdns_i2c_master_api_polled *i2c_api,
+    struct dimm_info *ddr)
 {
     int status;
 

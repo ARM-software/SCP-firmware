@@ -8,8 +8,8 @@
 #ifndef DIMM_SPD_H
 #define DIMM_SPD_H
 
+#include <mod_cdns_i2c.h>
 #include <mod_n1sdp_dmc620.h>
-#include <mod_n1sdp_i2c.h>
 
 #include <fwk_attributes.h>
 
@@ -362,8 +362,9 @@ struct FWK_PACKED ddr4_spd {
  * retval - FWK_SUCCESS - if the operation is succeeded
  *          FWK_E_DATA - if the SPD data is wrong
  */
-int dimm_spd_init_check(struct mod_n1sdp_i2c_master_api_polled *i2c_api,
-                         struct dimm_info *ddr);
+int dimm_spd_init_check(
+    struct mod_cdns_i2c_master_api_polled *i2c_api,
+    struct dimm_info *ddr);
 
 /*
  * Brief - Function to print the DIMM card information

@@ -10,4 +10,4 @@ target_include_directories(${SCP_MODULE_TARGET}
                            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 target_sources(${SCP_MODULE_TARGET}
-               PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_n1sdp_i2c.c")
+               PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_cdns_i2c.c")

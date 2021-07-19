@@ -12,9 +12,9 @@
 #include "n1sdp_pik_system.h"
 #include "n1sdp_scp_pik.h"
 
+#include <mod_cdns_i2c.h>
 #include <mod_clock.h>
 #include <mod_n1sdp_dmc620.h>
-#include <mod_n1sdp_i2c.h>
 #include <mod_timer.h>
 
 #include <fwk_assert.h>
@@ -37,7 +37,7 @@
 
 static struct mod_dmc_ddr_phy_api *ddr_phy_api;
 static struct mod_timer_api *timer_api;
-static struct mod_n1sdp_i2c_master_api_polled *i2c_api;
+static struct mod_cdns_i2c_master_api_polled *i2c_api;
 static struct dimm_info ddr_info;
 
 /*
@@ -1285,10 +1285,10 @@ static int mod_dmc620_bind(fwk_id_t id, unsigned int round)
         return status;
     }
 
-    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_I2C),
-                             FWK_ID_API(FWK_MODULE_IDX_N1SDP_I2C,
-                                        MOD_N1SDP_I2C_API_MASTER_POLLED),
-                             &i2c_api);
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_CDNS_I2C),
+        FWK_ID_API(FWK_MODULE_IDX_CDNS_I2C, MOD_CDNS_I2C_API_MASTER_POLLED),
+        &i2c_api);
     if (status != FWK_SUCCESS) {
         return status;
     }

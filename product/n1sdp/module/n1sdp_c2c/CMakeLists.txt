@@ -14,5 +14,5 @@ target_sources(${SCP_MODULE_TARGET}
 
 target_link_libraries(${SCP_MODULE_TARGET}
     PRIVATE module-power-domain module-n1sdp-scp2pcc module-clock module-cmn600
-            module-n1sdp-dmc620 module-n1sdp-i2c module-n1sdp-pcie
+            module-n1sdp-dmc620 module-cdns-i2c module-n1sdp-pcie
             module-n1sdp-timer-sync module-timer)
