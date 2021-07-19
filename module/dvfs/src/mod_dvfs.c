@@ -18,7 +18,6 @@
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <fwk_signal.h>
 #include <fwk_status.h>
 #include <fwk_thread.h>
 
@@ -38,21 +37,6 @@ enum mod_dvfs_internal_event_idx {
 /* Retry request event identifier */
 static const fwk_id_t mod_dvfs_event_id_retry =
     FWK_ID_EVENT_INIT(FWK_MODULE_IDX_DVFS, MOD_DVFS_INTERNAL_EVENT_IDX_RETRY);
-
-enum mod_dvfs_signal_idx {
-    /* set level signal */
-    MOD_DVFS_SIGNAL_IDX_SET,
-    MOD_DVFS_SIGNAL_IDX_RETRY,
-    MOD_DVFS_SIGNAL_IDX_COUNT,
-};
-
-/* Level Set signal identifier */
-static const fwk_id_t mod_dvfs_signal_id_set =
-    FWK_ID_SIGNAL_INIT(FWK_MODULE_IDX_DVFS, MOD_DVFS_SIGNAL_IDX_SET);
-
-/* Retry signal identifier */
-static const fwk_id_t mod_dvfs_signal_id_retry =
-    FWK_ID_SIGNAL_INIT(FWK_MODULE_IDX_DVFS, MOD_DVFS_SIGNAL_IDX_RETRY);
 
 /*!
  * \brief Domain states for GET_OPP/SET_OPP.
@@ -283,12 +267,8 @@ static int dvfs_set_level_start(
 
     ctx->state = DVFS_DOMAIN_SET_OPP;
 
-    status = fwk_thread_put_signal(
-        ctx->domain_id, ctx->domain_id, mod_dvfs_signal_id_set);
-    if ((status == FWK_E_SUPPORT) || (status == FWK_E_BUSY)) {
-        status =
-            put_event_request(ctx, mod_dvfs_event_id_set, DVFS_DOMAIN_SET_OPP);
-    }
+    status = put_event_request(ctx, mod_dvfs_event_id_set, DVFS_DOMAIN_SET_OPP);
+
     return status;
 }
 
@@ -312,21 +292,16 @@ static void dvfs_flush_pending_request(struct mod_dvfs_domain_ctx *ctx)
 static void alarm_callback(uintptr_t param)
 {
     struct mod_dvfs_domain_ctx *ctx = (struct mod_dvfs_domain_ctx *)param;
-    int status;
     struct fwk_event req;
 
-    status = fwk_thread_put_signal(
-        ctx->domain_id, ctx->domain_id, mod_dvfs_signal_id_retry);
-    if ((status == FWK_E_SUPPORT) || (status == FWK_E_BUSY)) {
-        req = (struct fwk_event){
-            .target_id = ctx->domain_id,
-            .source_id = ctx->domain_id,
-            .id = mod_dvfs_event_id_retry,
-            .response_requested = ctx->pending_request.response_required,
-        };
+    req = (struct fwk_event){
+        .target_id = ctx->domain_id,
+        .source_id = ctx->domain_id,
+        .id = mod_dvfs_event_id_retry,
+        .response_requested = ctx->pending_request.response_required,
+    };
 
-        fwk_thread_put_event(&req);
-    }
+    fwk_thread_put_event(&req);
 }
 
 static int dvfs_handle_pending_request(struct mod_dvfs_domain_ctx *ctx)
@@ -925,63 +900,6 @@ static int dvfs_handle_clk_set_freq_resp(
  * DVFS Module Framework Support
  */
 
-static int mod_dvfs_process_signal(
-    const fwk_id_t target_id,
-    const fwk_id_t signal_id)
-{
-    int status = FWK_SUCCESS;
-    struct mod_dvfs_domain_ctx *ctx;
-    uint32_t voltage;
-
-    ctx = get_domain_ctx(target_id);
-    if (ctx == NULL) {
-        return FWK_E_PARAM;
-    }
-
-    /*
-     * local DVFS event from dvfs_set_level()
-     */
-    if (fwk_id_is_equal(signal_id, mod_dvfs_signal_id_set)) {
-        if (ctx->current_opp.voltage != 0) {
-            voltage = ctx->current_opp.voltage;
-            status = FWK_SUCCESS;
-        } else {
-            status = ctx->apis.psu->get_voltage(ctx->config->psu_id, &voltage);
-            if (status == FWK_PENDING) {
-                return FWK_SUCCESS;
-            }
-        }
-
-        /*
-         * Handle get_voltage() synchronously
-         */
-        status = dvfs_handle_psu_get_voltage_resp(ctx, NULL, status, voltage);
-        if (status == FWK_PENDING) {
-            return FWK_SUCCESS;
-        }
-        return status;
-    }
-
-    /*
-     * local DVFS signal from alarm_callback() generated when alarm set by
-     * dvfs_handle_pending_request() fires
-     */
-    if (fwk_id_is_equal(signal_id, mod_dvfs_signal_id_retry)) {
-        ctx->request.set_source_id = false;
-        ctx->request_pending = false;
-        status = dvfs_set_level_start(
-            ctx,
-            ctx->pending_request.cookie,
-            &ctx->pending_request.new_opp,
-            ctx->pending_request.retry_request,
-            ctx->pending_request.num_retries);
-        ctx->pending_request = (struct mod_dvfs_request){ 0 };
-        return status;
-    }
-
-    return FWK_E_PARAM;
-}
-
 static int mod_dvfs_process_event(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
@@ -1261,7 +1179,6 @@ const struct fwk_module module_dvfs = {
     .bind = dvfs_bind,
     .process_bind_request = dvfs_process_bind_request,
     .process_event = mod_dvfs_process_event,
-    .process_signal = mod_dvfs_process_signal,
     .api_count = (unsigned int)MOD_DVFS_API_IDX_COUNT,
     .event_count = (unsigned int)MOD_DVFS_INTERNAL_EVENT_IDX_COUNT,
 };

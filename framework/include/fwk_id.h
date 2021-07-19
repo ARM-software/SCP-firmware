@@ -47,8 +47,6 @@ enum fwk_id_type {
     FWK_ID_TYPE_EVENT = __FWK_ID_TYPE_EVENT,
     /*! Notification */
     FWK_ID_TYPE_NOTIFICATION = __FWK_ID_TYPE_NOTIFICATION,
-    /*! Signal */
-    FWK_ID_TYPE_SIGNAL = __FWK_ID_TYPE_SIGNAL,
 };
 
 /*!
@@ -331,53 +329,6 @@ enum fwk_id_type {
  */
 #define FWK_ID_EVENT(MODULE_IDX, EVENT_IDX) \
     ((fwk_id_t)FWK_ID_EVENT_INIT(MODULE_IDX, EVENT_IDX))
-
-/*!
- * \brief Build a signal identifier from a module index and a signal index.
- *
- * \note This macro expands to a designated initializer, and can be used to
- *      initialize a ::fwk_id_t.
- *
- * \details Example usage:
- *      \code{.c}
- *      static const fwk_id_t my_signal = FWK_ID_SIGNAL_INIT(42, 56);
- *      \endcode
- *
- * \param MODULE_IDX Module index.
- * \param SIGNAL_IDX Signal index.
- *
- * \return Signal identifier.
- */
-#define FWK_ID_SIGNAL_INIT(MODULE_IDX, SIGNAL_IDX) \
-    { \
-        .signal = { \
-            .type = (uint32_t)__FWK_ID_TYPE_SIGNAL, \
-            .module_idx = (uint32_t)MODULE_IDX, \
-            .signal_idx = (uint32_t)SIGNAL_IDX, \
-        }, \
-    }
-
-/*!
- * \brief Build a signal identifier from a module index and a signal index.
- *
- * \note This macro expands to a compound literal, and can be used as an lvalue
- *      expression returning type ::fwk_id_t.
- *
- * \details Example usage:
- *      \code{.c}
- *      fwk_id_t get_signal_42_56(void)
- *      {
- *          return FWK_ID_SIGNAL(42, 56);
- *      }
- *      \endcode
- *
- * \param MODULE_IDX Module index.
- * \param SIGNAL_IDX Signal index.
- *
- * \return Signal identifier.
- */
-#define FWK_ID_SIGNAL(MODULE_IDX, SIGNAL_IDX) \
-    ((fwk_id_t)FWK_ID_SIGNAL_INIT(MODULE_IDX, SIGNAL_IDX))
 
 /*!
  * \brief Build a notification identifier from a module index and a
