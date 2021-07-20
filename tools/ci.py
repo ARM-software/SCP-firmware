@@ -761,6 +761,70 @@ def main():
     result = subprocess.call(cmd, shell=True)
     results.append(('Product tc0 debug build (LLVM)', result))
 
+    banner('Test building tc1 product')
+
+    subprocess.run('make clean', shell=True)
+
+    cmd = \
+        'CC=arm-none-eabi-gcc ' \
+        'PRODUCT=tc1 ' \
+        'MODE=release ' \
+        'make all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product tc1 release build (GCC)', result))
+
+    subprocess.run('make clean', shell=True)
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=tc1 ' \
+        'MODE=release ' \
+        'make all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product tc1 release build (ARM)', result))
+
+    subprocess.run('make clean', shell=True)
+
+    cmd = \
+        'SYSROOT_CC=arm-none-eabi-gcc ' \
+        'CC=clang-11 ' \
+        'PRODUCT=tc1 ' \
+        'MODE=release ' \
+        'make all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product tc1 release build (LLVM)', result))
+
+    subprocess.run('make clean', shell=True)
+
+    cmd = \
+        'CC=arm-none-eabi-gcc ' \
+        'PRODUCT=tc1 ' \
+        'MODE=debug ' \
+        'make all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product tc1 debug build (GCC)', result))
+
+    subprocess.run('make clean', shell=True)
+
+    cmd = \
+        'CC=armclang ' \
+        'PRODUCT=tc1 ' \
+        'MODE=debug ' \
+        'make all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product tc1 debug build (ARM)', result))
+
+    subprocess.run('make clean', shell=True)
+
+    cmd = \
+        'SYSROOT_CC=arm-none-eabi-gcc ' \
+        'CC=clang-11 ' \
+        'PRODUCT=tc1 ' \
+        'MODE=debug ' \
+        'make all -j'
+    result = subprocess.call(cmd, shell=True)
+    results.append(('Product tc1 debug build (LLVM)', result))
+
     banner('Test building morello product')
 
     subprocess.run('make clean', shell=True)
