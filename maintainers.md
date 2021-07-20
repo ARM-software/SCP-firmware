@@ -49,9 +49,10 @@ maintainers. The platforms listed here represent the exceptions to this rule.
 - [Thomas Abraham](https://github.com/omasab) (thomas.abraham@arm.com)
 - [Vijayenthiran Subramaniam](https://github.com/vijayenthiran-arm) (Vijayenthiran.Subramaniam@arm.com)
 
-#### Total Compute (tc0)
+#### Total Compute (tc0, tc1)
 
-- [Tushar Khandelwal](https://github.com/tusharkhandelwal2) (tushar.khandelwal@arm.com)
+- [Usama Arif](https://github.com/uarif1) (usama.arif@arm.com)
+- [Lakshmi Kailasanathan](https://github.com/lakkai) (lakshmi.kailasanathan@arm.com)
 
 ### Socionext
 
