@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -51,7 +51,7 @@ struct scmi_pd_operations {
     unsigned int agent_id;
 };
 
-struct scmi_pd_ctx {
+struct mod_scmi_pd_ctx {
     /* Number of power domains */
     unsigned int domain_count;
 
@@ -153,7 +153,7 @@ static const fwk_id_t mod_scmi_pd_event_id_set_request = FWK_ID_EVENT_INIT(
  * Internal variables
  */
 
-static struct scmi_pd_ctx scmi_pd_ctx;
+static struct mod_scmi_pd_ctx scmi_pd_ctx;
 
 static int (*handler_table[MOD_SCMI_PD_POWER_COMMAND_COUNT])(
     fwk_id_t,

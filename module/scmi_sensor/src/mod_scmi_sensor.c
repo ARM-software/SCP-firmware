@@ -43,7 +43,7 @@ struct sensor_operations {
     fwk_id_t service_id;
 };
 
-struct scmi_sensor_ctx {
+struct mod_scmi_sensor_ctx {
     /* Number of sensors */
     unsigned int sensor_count;
 
@@ -108,7 +108,7 @@ static const fwk_id_t mod_scmi_sensor_event_id_get_request =
 /*
  * Internal variables.
  */
-static struct scmi_sensor_ctx scmi_sensor_ctx;
+static struct mod_scmi_sensor_ctx scmi_sensor_ctx;
 
 static int (*handler_table[MOD_SCMI_SENSOR_COMMAND_COUNT])(
     fwk_id_t,

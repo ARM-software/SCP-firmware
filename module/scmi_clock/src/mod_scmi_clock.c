@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -56,7 +56,7 @@ struct clock_operations {
     enum scmi_clock_request_type request;
 };
 
-struct scmi_clock_ctx {
+struct mod_scmi_clock_ctx {
     /*! SCMI Clock Module Configuration */
     const struct mod_scmi_clock_config *config;
 
@@ -126,7 +126,7 @@ static int scmi_clock_describe_rates_handler(fwk_id_t service_id,
 /*
  * Internal variables.
  */
-static struct scmi_clock_ctx scmi_clock_ctx;
+static struct mod_scmi_clock_ctx scmi_clock_ctx;
 
 static int (*const handler_table[MOD_SCMI_CLOCK_COMMAND_COUNT])(
     fwk_id_t,
@@ -704,7 +704,7 @@ static int create_event_request(
     int status;
     union event_request_data request_data;
     unsigned int clock_dev_idx = fwk_id_get_element_idx(clock_id);
-    struct event_request_params *params;
+    struct scmi_clock_event_request_params *params;
     enum mod_clock_state state = MOD_CLOCK_STATE_COUNT;
 
     if (!clock_ops_is_available(clock_dev_idx)) {
@@ -715,7 +715,7 @@ static int create_event_request(
         .target_id = fwk_module_id_scmi_clock,
     };
 
-    params = (struct event_request_params *)event.params;
+    params = (struct scmi_clock_event_request_params *)event.params;
 
     switch (request) {
     case SCMI_CLOCK_REQUEST_GET_STATE:
@@ -1445,7 +1445,7 @@ static int scmi_clock_process_bind_request(fwk_id_t source_id,
 
 static int process_request_event(const struct fwk_event *event)
 {
-    struct event_request_params *params;
+    struct scmi_clock_event_request_params *params;
     unsigned int clock_dev_idx;
     int status;
     enum mod_clock_state clock_state;
@@ -1455,7 +1455,7 @@ static int process_request_event(const struct fwk_event *event)
     fwk_id_t service_id;
     enum scmi_clock_event_idx event_id_type;
 
-    params = (struct event_request_params *)event->params;
+    params = (struct scmi_clock_event_request_params *)event->params;
     clock_dev_idx = fwk_id_get_element_idx(params->clock_dev_id);
     service_id = clock_ops_get_service(clock_dev_idx);
 

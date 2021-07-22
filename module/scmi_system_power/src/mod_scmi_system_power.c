@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -31,7 +31,7 @@
 
 #define INVALID_AGENT_ID UINT32_MAX
 
-struct scmi_sys_power_ctx {
+struct mod_scmi_sys_power_ctx {
     const struct mod_scmi_system_power_config *config;
     const struct mod_scmi_from_protocol_api *scmi_api;
     const struct mod_pd_restricted_api *pd_api;
@@ -66,7 +66,7 @@ static int scmi_sys_power_state_notify_handler(fwk_id_t service_id,
 /*
  * Internal variables
  */
-static struct scmi_sys_power_ctx scmi_sys_power_ctx;
+static struct mod_scmi_sys_power_ctx scmi_sys_power_ctx;
 
 static int (*const handler_table[MOD_SCMI_SYS_POWER_COMMAND_COUNT])(
     fwk_id_t,
@@ -170,19 +170,20 @@ static void scmi_sys_power_state_notify(fwk_id_t service_id,
 }
 #endif
 
-static void graceful_timer_callback(uintptr_t scmi_system_state)
+static void graceful_timer_callback(uintptr_t mod_scmi_system_state)
 {
     enum mod_pd_system_shutdown system_shutdown;
     int status;
 
     FWK_LOG_INFO("SCMI_SYS_POWER: Graceful request timeout...");
     FWK_LOG_INFO(
-        "SCMI_SYS_POWER: Forcing SCMI SYSTEM STATE %d", (int)scmi_system_state);
+        "SCMI_SYS_POWER: Forcing SCMI SYSTEM STATE %d",
+        (int)mod_scmi_system_state);
 
     scmi_sys_power_ctx.start_graceful_process = false;
 
-    if (scmi_system_state == SCMI_SYSTEM_STATE_SHUTDOWN) {
-        system_shutdown = system_state2system_shutdown[scmi_system_state];
+    if (mod_scmi_system_state == SCMI_SYSTEM_STATE_SHUTDOWN) {
+        system_shutdown = system_state2system_shutdown[mod_scmi_system_state];
         status = scmi_sys_power_ctx.pd_api->system_shutdown(system_shutdown);
         if (status != FWK_SUCCESS) {
             FWK_LOG_TRACE("SCMI_SYS_POWER: %s @%d", __func__, __LINE__);
@@ -285,7 +286,7 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
     unsigned int agent_id;
     enum scmi_agent_type agent_type;
     enum mod_pd_system_shutdown system_shutdown;
-    uint32_t scmi_system_state;
+    uint32_t mod_scmi_system_state;
     enum mod_scmi_sys_power_policy_status policy_status;
     enum scmi_system_state sys_state_type;
 
@@ -312,15 +313,15 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    scmi_system_state = parameters->system_state;
+    mod_scmi_system_state = parameters->system_state;
 
     /*
-     * Note that the scmi_system_state value may be changed by the policy
+     * Note that the mod_scmi_system_state value may be changed by the policy
      * handler.
      */
     status = scmi_sys_power_state_set_policy(
         &policy_status,
-        &scmi_system_state,
+        &mod_scmi_system_state,
         service_id,
         (parameters->flags & (uint32_t)STATE_SET_FLAGS_GRACEFUL_REQUEST) != 0);
 
@@ -333,14 +334,13 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    sys_state_type = (enum scmi_system_state)scmi_system_state;
+    sys_state_type = (enum scmi_system_state)mod_scmi_system_state;
 
     switch (sys_state_type) {
     case SCMI_SYSTEM_STATE_SHUTDOWN:
     case SCMI_SYSTEM_STATE_COLD_RESET:
     case SCMI_SYSTEM_STATE_WARM_RESET:
-        system_shutdown =
-            system_state2system_shutdown[scmi_system_state];
+        system_shutdown = system_state2system_shutdown[mod_scmi_system_state];
         status = scmi_sys_power_ctx.pd_api->system_shutdown(system_shutdown);
         if (status == FWK_PENDING) {
             /*
@@ -373,13 +373,14 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
             goto exit;
         }
 
-        status = system_state_get((enum scmi_system_state *)&scmi_system_state);
+        status =
+            system_state_get((enum scmi_system_state *)&mod_scmi_system_state);
         if (status != FWK_SUCCESS) {
             goto exit;
         }
 
-        if ((scmi_system_state != SCMI_SYSTEM_STATE_SHUTDOWN) &&
-            (scmi_system_state != SCMI_SYSTEM_STATE_SUSPEND)) {
+        if ((mod_scmi_system_state != SCMI_SYSTEM_STATE_SHUTDOWN) &&
+            (mod_scmi_system_state != SCMI_SYSTEM_STATE_SUSPEND)) {
             return_values.status = (int32_t)SCMI_DENIED;
             goto exit;
         }
@@ -404,10 +405,10 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
      * requests the notifications are sent before executing the command.
      */
     if (((parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST) == 0U) ||
-        (scmi_system_state != SCMI_SYSTEM_STATE_SHUTDOWN)) {
+        (mod_scmi_system_state != SCMI_SYSTEM_STATE_SHUTDOWN)) {
         scmi_sys_power_state_notify(
             service_id,
-            scmi_system_state,
+            mod_scmi_system_state,
             (parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST) != 0);
     }
 #endif
