@@ -9,6 +9,9 @@
 
 find_package(Doxygen OPTIONAL_COMPONENTS dot mscgen dia)
 
+if(NOT DOXYGEN_FOUND OR DOXYGEN_VERSION VERSION_LESS 1.8.13)
+    return()
+endif()
 #
 # This fairly monstrous block of code actually does a deceptively simple
 # operation: it collects all the sources, include directories and definitions
