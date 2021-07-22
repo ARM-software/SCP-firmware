@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -135,7 +135,7 @@ struct fwk_element_ctx *__wrap_fwk_module_get_element_ctx(fwk_id_t id)
     return NULL;
 }
 
-struct fwk_module_ctx *__wrap_fwk_module_get_ctx(fwk_id_t id)
+struct fwk_module_context *__wrap_fwk_module_get_ctx(fwk_id_t id)
 {
     (void) id;
     return NULL;

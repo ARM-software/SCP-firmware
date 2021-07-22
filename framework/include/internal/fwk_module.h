@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -22,7 +22,7 @@
 /*
  * Module context.
  */
-struct fwk_module_ctx {
+struct fwk_module_context {
     /* Module identifier */
     fwk_id_t id;
 
@@ -105,7 +105,7 @@ int fwk_module_start(void);
  *
  * \return Pointer to the module context.
  */
-struct fwk_module_ctx *fwk_module_get_ctx(fwk_id_t id);
+struct fwk_module_context *fwk_module_get_ctx(fwk_id_t id);
 
 /*
  * \brief Get the state of a module or element.

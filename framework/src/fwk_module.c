@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -44,7 +44,7 @@ static struct {
     bool initialized;
 
     /* Table of module contexts */
-    struct fwk_module_ctx module_ctx_table[FWK_MODULE_IDX_COUNT];
+    struct fwk_module_context module_ctx_table[FWK_MODULE_IDX_COUNT];
 
     /* Pre-runtime phase stage */
     enum fwk_module_stage stage;
@@ -111,7 +111,7 @@ static void fwk_module_init_element_ctx(
 }
 
 static void fwk_module_init_element_ctxs(
-    struct fwk_module_ctx *ctx,
+    struct fwk_module_context *ctx,
     const struct fwk_element *elements,
     size_t notification_count)
 {
@@ -136,14 +136,14 @@ void fwk_module_init(void)
      * enum fwk_module_idx
      */
     for (uint32_t i = 0U; i < (uint32_t)FWK_MODULE_IDX_COUNT; i++) {
-        struct fwk_module_ctx *ctx = &fwk_module_ctx.module_ctx_table[i];
+        struct fwk_module_context *ctx = &fwk_module_ctx.module_ctx_table[i];
 
         fwk_id_t id = FWK_ID_MODULE(i);
 
         const struct fwk_module *desc = module_table[i];
         const struct fwk_module_config *config = module_config_table[i];
 
-        *ctx = (struct fwk_module_ctx){
+        *ctx = (struct fwk_module_context){
             .id = id,
 
             .desc = desc,
@@ -175,7 +175,7 @@ void fwk_module_init(void)
     }
 }
 
-static void fwk_module_init_elements(struct fwk_module_ctx *ctx)
+static void fwk_module_init_elements(struct fwk_module_context *ctx)
 {
     int status;
 
@@ -207,7 +207,7 @@ static void fwk_module_init_elements(struct fwk_module_ctx *ctx)
     }
 }
 
-static void fwk_module_init_module(struct fwk_module_ctx *ctx)
+static void fwk_module_init_module(struct fwk_module_context *ctx)
 {
     int status;
 
@@ -274,7 +274,7 @@ static void fwk_module_init_modules(void)
 }
 
 static int fwk_module_bind_elements(
-    struct fwk_module_ctx *module_ctx,
+    struct fwk_module_context *module_ctx,
     unsigned int round)
 {
     int status;
@@ -303,7 +303,7 @@ static int fwk_module_bind_elements(
 }
 
 static int fwk_module_bind_module(
-    struct fwk_module_ctx *module_ctx,
+    struct fwk_module_context *module_ctx,
     unsigned int round)
 {
     int status;
@@ -333,7 +333,7 @@ static int fwk_module_bind_modules(unsigned int round)
 {
     int status;
     unsigned int module_idx;
-    struct fwk_module_ctx *module_ctx;
+    struct fwk_module_context *module_ctx;
 
     for (module_idx = 0; module_idx < FWK_MODULE_IDX_COUNT; module_idx++) {
         module_ctx = &fwk_module_ctx.module_ctx_table[module_idx];
@@ -346,7 +346,7 @@ static int fwk_module_bind_modules(unsigned int round)
     return FWK_SUCCESS;
 }
 
-static int fwk_module_start_elements(struct fwk_module_ctx *module_ctx)
+static int fwk_module_start_elements(struct fwk_module_context *module_ctx)
 {
     int status;
     const struct fwk_module *module;
@@ -372,7 +372,7 @@ static int fwk_module_start_elements(struct fwk_module_ctx *module_ctx)
     return FWK_SUCCESS;
 }
 
-static int fwk_module_start_module(struct fwk_module_ctx *module_ctx)
+static int fwk_module_start_module(struct fwk_module_context *module_ctx)
 {
     int status;
     const struct fwk_module *module;
@@ -396,7 +396,7 @@ static int start_modules(void)
 {
     int status;
     unsigned int module_idx;
-    struct fwk_module_ctx *module_ctx;
+    struct fwk_module_context *module_ctx;
 
     for (module_idx = 0; module_idx < FWK_MODULE_IDX_COUNT; module_idx++) {
         module_ctx = &fwk_module_ctx.module_ctx_table[module_idx];
@@ -453,14 +453,14 @@ int fwk_module_start(void)
     return FWK_SUCCESS;
 }
 
-struct fwk_module_ctx *fwk_module_get_ctx(fwk_id_t id)
+struct fwk_module_context *fwk_module_get_ctx(fwk_id_t id)
 {
     return &fwk_module_ctx.module_ctx_table[fwk_id_get_module_idx(id)];
 }
 
 struct fwk_element_ctx *fwk_module_get_element_ctx(fwk_id_t element_id)
 {
-    struct fwk_module_ctx *module_ctx = fwk_module_get_ctx(element_id);
+    struct fwk_module_context *module_ctx = fwk_module_get_ctx(element_id);
 
     return &module_ctx->element_ctx_table[element_id.element.element_idx];
 }
@@ -524,7 +524,7 @@ bool fwk_module_is_valid_element_id(fwk_id_t id)
 bool fwk_module_is_valid_sub_element_id(fwk_id_t id)
 {
     unsigned int module_idx;
-    struct fwk_module_ctx *module_ctx;
+    struct fwk_module_context *module_ctx;
     unsigned int element_idx;
 
     if (!fwk_id_is_type(id, FWK_ID_TYPE_SUB_ELEMENT)) {
@@ -672,7 +672,7 @@ const void *fwk_module_get_data(fwk_id_t id)
 int fwk_module_bind(fwk_id_t target_id, fwk_id_t api_id, const void *api)
 {
     int status = FWK_E_PARAM;
-    struct fwk_module_ctx *module_ctx;
+    struct fwk_module_context *module_ctx;
 
     if (!fwk_module_is_valid_entity_id(target_id)) {
         goto error;
