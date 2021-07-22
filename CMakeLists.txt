@@ -514,8 +514,7 @@ if(SCP_FIRMWARE)
     #
     # Load in the documentation generation.
     #
-
-    add_subdirectory("doc")
+    add_subdirectory("doc" EXCLUDE_FROM_ALL)
 endif()
 
 #
