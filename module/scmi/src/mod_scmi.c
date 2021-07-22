@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -85,7 +85,7 @@ struct scmi_notification_subscribers {
 
 #endif
 
-struct scmi_ctx {
+struct mod_scmi_ctx {
     /* SCMI module configuration data */
     struct mod_scmi_config *config;
 
@@ -203,7 +203,7 @@ static const char *const default_agent_names[SCMI_AGENT_TYPE_COUNT] = {
     [SCMI_AGENT_TYPE_OTHER] = "OTHER",
 };
 
-static struct scmi_ctx scmi_ctx;
+static struct mod_scmi_ctx scmi_ctx;
 
 /*
  * Utility functions
@@ -298,7 +298,7 @@ static int signal_message(fwk_id_t service_id)
     return fwk_thread_put_event(&event);
 }
 
-static const struct mod_scmi_from_transport_api mod_scmi_from_transport_api = {
+static const struct mod_scmi_from_transport_api scmi_from_transport_api = {
     .signal_error = signal_error,
     .signal_message = signal_message,
 };
@@ -479,7 +479,7 @@ static void scmi_notify(fwk_id_t id, int protocol_id, int message_id,
     }
 }
 
-static const struct mod_scmi_from_protocol_api mod_scmi_from_protocol_api = {
+static const struct mod_scmi_from_protocol_api scmi_from_protocol_api = {
     .get_agent_count = get_agent_count,
     .get_agent_id = get_agent_id,
     .get_agent_type = get_agent_type,
@@ -1604,7 +1604,7 @@ static int scmi_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
 
         scmi_ctx.protocol_table[PROTOCOL_TABLE_RESERVED_ENTRIES_COUNT +
                                 scmi_ctx.protocol_count++].id = source_id;
-        *api = &mod_scmi_from_protocol_api;
+        *api = &scmi_from_protocol_api;
         break;
 
     case MOD_SCMI_API_IDX_TRANSPORT:
@@ -1617,7 +1617,7 @@ static int scmi_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
             return FWK_E_ACCESS;
         }
 
-        *api = &mod_scmi_from_transport_api;
+        *api = &scmi_from_transport_api;
         break;
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS

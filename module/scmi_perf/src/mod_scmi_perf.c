@@ -145,7 +145,7 @@ struct perf_operations {
     fwk_id_t service_id;
 };
 
-struct opp_table {
+struct pref_opp_table {
     /* Pointer to DVFS OPP table */
     struct mod_dvfs_opp *opps;
 
@@ -167,10 +167,10 @@ struct scmi_perf_domain_ctx {
     uint32_t curr_level;
 
     /* Tables of OPPs */
-    struct opp_table *opp_table;
+    struct pref_opp_table *opp_table;
 };
 
-struct scmi_perf_ctx {
+struct mod_scmi_perf_ctx {
     /* SCMI Performance Module Configuration */
     const struct mod_scmi_perf_config *config;
 
@@ -216,17 +216,16 @@ struct scmi_perf_ctx {
 
     struct scmi_perf_domain_ctx *domain_ctx_table;
 
-    struct opp_table *opp_table;
+    struct pref_opp_table *opp_table;
 
     unsigned int dvfs_doms_count;
 };
 
-static struct scmi_perf_ctx scmi_perf_ctx;
+static struct mod_scmi_perf_ctx scmi_perf_ctx;
 
 /* Event indices */
 enum scmi_perf_event_idx {
     SCMI_PERF_EVENT_IDX_LEVEL_GET_REQUEST,
-
     SCMI_PERF_EVENT_IDX_COUNT,
 };
 
@@ -295,7 +294,7 @@ static inline uint32_t *get_fc_set_level_addr(
 
 static inline int opp_for_level_found(
     uint32_t *level,
-    struct opp_table *opp_table,
+    struct pref_opp_table *opp_table,
     size_t i)
 {
     *level = opp_table->opps[i].level;
@@ -308,7 +307,7 @@ static int find_opp_for_level(
     uint32_t *level,
     bool use_nearest)
 {
-    struct opp_table *opp_table;
+    struct pref_opp_table *opp_table;
     size_t i;
     uint32_t opp_level, limit_max;
 
@@ -1980,13 +1979,13 @@ static int scmi_perf_start(fwk_id_t id)
     unsigned int i;
 
     const struct mod_dvfs_domain_config *dvfs_config;
-    struct opp_table *opp_table = NULL;
+    struct pref_opp_table *opp_table = NULL;
     const struct mod_scmi_perf_domain_config *domain_cfg;
     unsigned int dom_idx;
     bool has_phy_group;
 
-    scmi_perf_ctx.opp_table =
-        fwk_mm_calloc(scmi_perf_ctx.dvfs_doms_count, sizeof(struct opp_table));
+    scmi_perf_ctx.opp_table = fwk_mm_calloc(
+        scmi_perf_ctx.dvfs_doms_count, sizeof(struct pref_opp_table));
 
     for (i = 0; i < scmi_perf_ctx.dvfs_doms_count; i++) {
         opp_table = &scmi_perf_ctx.opp_table[i];

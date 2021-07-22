@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -63,7 +63,7 @@ union event_request_data {
 /*
  * Parameters of the event being processed
  */
-struct event_request_params {
+struct scmi_clock_event_request_params {
     fwk_id_t clock_dev_id;
     union event_request_data request_data;
 };
