@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -54,16 +54,16 @@ static_assert(
  * Entry indices are offset by -1 relative to their interrupt numbers, as no
  * interrupt may have an interrupt number of zero.
  */
-struct callback {
+struct irq_callback {
     void (*func)(uintptr_t param);
     uintptr_t param;
 };
 
-static struct callback *callback;
+static struct irq_callback *callback;
 
 static void irq_global(void)
 {
-    struct callback *entry = &callback[__get_IPSR() - 1];
+    struct irq_callback *entry = &callback[__get_IPSR() - 1];
 
     entry->func(entry->param);
 }
@@ -164,7 +164,7 @@ static int set_isr_irq_param(
     void (*isr)(uintptr_t param),
     uintptr_t parameter)
 {
-    struct callback *entry;
+    struct irq_callback *entry;
     if (interrupt >= irq_count) {
         return FWK_E_PARAM;
     }
@@ -187,7 +187,7 @@ static int set_isr_nmi(void (*isr)(void))
 
 static int set_isr_nmi_param(void (*isr)(uintptr_t param), uintptr_t parameter)
 {
-    struct callback *entry;
+    struct irq_callback *entry;
 
     entry = &callback[NVIC_USER_IRQ_OFFSET + (int)NonMaskableInt_IRQn - 1];
     entry->func = isr;

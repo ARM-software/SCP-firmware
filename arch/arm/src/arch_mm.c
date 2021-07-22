@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -27,7 +27,7 @@ extern char __stackheap_end__;
 /*!
  * \brief Architecture memory manager context.
  */
-static struct arch_mm_ctx {
+static struct arch_mm_ctx_str {
     /*!
      * \brief Current heap break address.
      */
