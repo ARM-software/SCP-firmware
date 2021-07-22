@@ -1,7 +1,7 @@
 
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -37,7 +37,7 @@ static struct fwk_element fake_element;
 static struct fwk_element_ctx fake_element_ctx;
 static struct __fwk_thread_ctx fake_thread_module_ctx;
 static struct fwk_module fake_module;
-static struct fwk_module_ctx fake_module_ctx;
+static struct fwk_module_context fake_module_ctx;
 
 /* Wrapped OS functions */
 osStatus_t __wrap_osKernelStart(void)
@@ -150,7 +150,7 @@ struct fwk_element_ctx *__wrap_fwk_module_get_element_ctx(fwk_id_t id)
     return &fake_element_ctx;
 }
 
-struct fwk_module_ctx *__wrap_fwk_module_get_ctx(fwk_id_t id)
+struct fwk_module_context *__wrap_fwk_module_get_ctx(fwk_id_t id)
 {
     (void) id;
     return &fake_module_ctx;
@@ -179,7 +179,7 @@ static void test_case_setup(void)
 
     fake_thread_element_ctx.os_thread_id = (osThreadId_t)ELEM_THREAD_ID;
     fake_thread_module_ctx.os_thread_id = (osThreadId_t)MODULE_THREAD_ID;
-    fake_module_ctx = (struct fwk_module_ctx){ };
+    fake_module_ctx = (struct fwk_module_context){};
     fake_module_ctx.desc = &fake_module;
     fake_module_ctx.thread_ctx = NULL;
 

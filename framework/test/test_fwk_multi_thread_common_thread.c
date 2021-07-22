@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -41,7 +41,7 @@ static struct __fwk_multi_thread_ctx *ctx;
 /* Mock module */
 static struct __fwk_thread_ctx fake_thread_module_ctx;
 static struct fwk_module fake_module;
-static struct fwk_module_ctx fake_module_ctx;
+static struct fwk_module_context fake_module_ctx;
 
 static unsigned int process_event_call_count;
 static struct fwk_event *process_event_event_to_put;
@@ -220,7 +220,7 @@ struct fwk_element_ctx *__wrap_fwk_module_get_element_ctx(fwk_id_t id)
     return NULL;
 }
 
-struct fwk_module_ctx *__wrap_fwk_module_get_ctx(fwk_id_t id)
+struct fwk_module_context *__wrap_fwk_module_get_ctx(fwk_id_t id)
 {
     (void) id;
     return &fake_module_ctx;

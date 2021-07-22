@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -129,7 +129,7 @@ static struct fwk_event *duplicate_event(
  */
 static struct __fwk_thread_ctx *thread_get_ctx(fwk_id_t id)
 {
-    struct fwk_module_ctx *module_ctx;
+    struct fwk_module_context *module_ctx;
     struct fwk_element_ctx *element_ctx;
 
     if (fwk_module_is_valid_element_id(id)) {
