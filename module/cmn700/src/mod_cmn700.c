@@ -233,6 +233,8 @@ static int cmn700_discovery(void)
     cxg_ha_reg_count = 0;
     cxla_reg_count = 0;
 
+    set_encoding_and_masking_bits(config);
+
     FWK_LOG_INFO(MOD_NAME "Starting discovery...");
     FWK_LOG_TRACE(MOD_NAME "Rootnode Base address: 0x%x", (uintptr_t)ctx->root);
 
@@ -760,11 +762,7 @@ static int cmn700_device_init(
     if (device_ctx->config->snf_count > CMN700_HNF_CACHE_GROUP_ENTRIES_MAX)
         return FWK_E_DATA;
 
-    device_ctx->root = get_root_node(
-        device_ctx->config->base,
-        device_ctx->config->hnd_node_id,
-        device_ctx->config->mesh_size_x,
-        device_ctx->config->mesh_size_y);
+    device_ctx->root = (struct cmn700_cfgm_reg *)device_ctx->config->base;
 
     return FWK_SUCCESS;
 }
