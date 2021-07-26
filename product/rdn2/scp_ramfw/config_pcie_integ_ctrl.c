@@ -27,6 +27,7 @@
             .reg_base = PCIE_INTEG_CTRL_REG_BASE(idx), \
             .x16_ecam_mmio_mmap = { \
                 .valid = true, \
+                .allow_ns_access = true, \
                 .ecam1_start_addr = RD_N2_PCIE_INTEG_START_ADDR(idx, \
                     AP_PCIE_ECAM_BASE, ecam_size), \
                 .ecam1_end_addr = RD_N2_PCIE_INTEG_END_ADDR(idx, \

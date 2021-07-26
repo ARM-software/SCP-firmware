@@ -40,6 +40,13 @@ struct pcie_ecam_mmio_mmap {
     /*! Valid flag to indicate if the mapping is valid to program */
     bool valid;
 
+    /*! Allow non-secure access
+     *
+     * By default only secure accesses are allowed. Set this to true to allow
+     * non-secure access as well.
+     */
+    bool allow_ns_access;
+
     /*! ECAM1 start address */
     uint64_t ecam1_start_addr;
 
