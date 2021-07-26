@@ -11,6 +11,8 @@
 #ifndef CMN700_H
 #define CMN700_H
 
+#include <mod_cmn700.h>
+
 #include <fwk_macros.h>
 
 #include <stdbool.h>
@@ -542,20 +544,13 @@ unsigned int get_node_pos_x(void *node_base);
 unsigned int get_node_pos_y(void *node_base);
 
 /*
- * Get the root node descriptor based on the peripheral base, HN-D node
- * identifier and mesh size.
+ * Set encoding and masking bits based on the mesh size. These are used while
+ * calculating the x and y pos based on the node_id.
  *
- * \param base CMN-700 peripheral base address
- * \param hnd_node_id HN-D node identifier containing the global configuration
- * \param mesh_size_x Size of the mesh along the x-axis
- * \param mesh_size_y Size of the mesh along the x-axis
+ * \param config Config data of this module.
  *
- * \return Pointer to the root node descriptor
+ * \return None
  */
-struct cmn700_cfgm_reg *get_root_node(
-    uintptr_t base,
-    unsigned int hnd_node_id,
-    unsigned int mesh_size_x,
-    unsigned int mesh_size_y);
+void set_encoding_and_masking_bits(const struct mod_cmn700_config *config);
 
 #endif /* CMN700_H */

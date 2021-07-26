@@ -343,16 +343,13 @@ unsigned int get_node_pos_y(void *node_base)
     return (get_node_id(node) >> CMN700_NODE_ID_Y_POS) & mask_bits;
 }
 
-struct cmn700_cfgm_reg *get_root_node(
-    uintptr_t base,
-    unsigned int hnd_node_id,
-    unsigned int mesh_size_x,
-    unsigned int mesh_size_y)
+void set_encoding_and_masking_bits(const struct mod_cmn700_config *config)
 {
-    unsigned int node_pos_x;
-    unsigned int node_pos_y;
-    unsigned int node_port;
-    uintptr_t offset;
+    unsigned int mesh_size_x;
+    unsigned int mesh_size_y;
+
+    mesh_size_x = config->mesh_size_x;
+    mesh_size_y = config->mesh_size_y;
 
     /*
      * Determine the number of bits used to represent each node coordinate based
@@ -367,26 +364,4 @@ struct cmn700_cfgm_reg *get_root_node(
     /* Extract node coordinates from the node identifier */
 
     mask_bits = (1 << encoding_bits) - 1;
-    node_pos_y = (hnd_node_id >> CMN700_NODE_ID_Y_POS) & mask_bits;
-    node_pos_x =
-        (hnd_node_id >> (CMN700_NODE_ID_Y_POS + encoding_bits)) & mask_bits;
-    node_port =
-        (hnd_node_id >> CMN700_NODE_ID_PORT_POS) & CMN700_NODE_ID_PORT_MASK;
-
-    /* Calculate node address offset */
-    offset = (node_pos_y << CMN700_ROOT_NODE_OFFSET_Y_POS) |
-        (node_pos_x << (CMN700_ROOT_NODE_OFFSET_Y_POS + encoding_bits)) |
-        (node_port << CMN700_ROOT_NODE_OFFSET_PORT_POS);
-
-    /*
-     * For 4 bits encoding and HND on device with 2 device ports, set bits [5:4]
-     * of root node base pointer.
-     */
-    if (encoding_bits == 4) {
-        offset |=
-            (CMN700_ROOT_NODE_4_BIT_ENCODING_MASK
-             << CMN700_ROOT_NODE_OFFSET_PORT_POS);
-    }
-
-    return (struct cmn700_cfgm_reg *)(base + offset);
 }
