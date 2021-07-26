@@ -50,16 +50,16 @@ static inline void pcie_integ_ctrl_configure_registers(
     struct pcie_ctrl_reg_set *reg,
     const struct pcie_ecam_mmio_mmap *cfg)
 {
-    reg->ECAM1_START_ADDR =
-        PCIE_INTEG_CTRL_REG_START_ADDR_EN(cfg->ecam1_start_addr);
+    reg->ECAM1_START_ADDR = PCIE_INTEG_CTRL_REG_START_ADDR_EN(
+        cfg->ecam1_start_addr, cfg->allow_ns_access);
     reg->ECAM1_END_ADDR = PCIE_INTEG_CTRL_REG_END_ADDR(cfg->ecam1_end_addr);
 
-    reg->MMIOL_START_ADDR =
-        PCIE_INTEG_CTRL_REG_START_ADDR_EN(cfg->mmiol_start_addr);
+    reg->MMIOL_START_ADDR = PCIE_INTEG_CTRL_REG_START_ADDR_EN(
+        cfg->mmiol_start_addr, cfg->allow_ns_access);
     reg->MMIOL_END_ADDR = PCIE_INTEG_CTRL_REG_END_ADDR(cfg->mmiol_end_addr);
 
-    reg->MMIOH_START_ADDR =
-        PCIE_INTEG_CTRL_REG_START_ADDR_EN(cfg->mmioh_start_addr);
+    reg->MMIOH_START_ADDR = PCIE_INTEG_CTRL_REG_START_ADDR_EN(
+        cfg->mmioh_start_addr, cfg->allow_ns_access);
     reg->MMIOH_END_ADDR = PCIE_INTEG_CTRL_REG_END_ADDR(cfg->mmioh_end_addr);
 }
 

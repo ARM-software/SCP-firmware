@@ -48,13 +48,15 @@ struct pcie_ctrl_reg {
 };
 
 #define PCIE_INTEG_CTRL_REG_ADDR_POS 1
+#define PCIE_INTEG_CTRL_REG_SEC_ACC_CTRL_DIS_POS 29
 #define PCIE_INTEG_CTRL_REG_EN       1
 
 #define PCIE_INTEG_CTRL_REG_START_ADDR(addr) \
     (((addr) >> 20) << PCIE_INTEG_CTRL_REG_ADDR_POS)
 
-#define PCIE_INTEG_CTRL_REG_START_ADDR_EN(addr) \
-    (PCIE_INTEG_CTRL_REG_START_ADDR(addr) | PCIE_INTEG_CTRL_REG_EN)
+#define PCIE_INTEG_CTRL_REG_START_ADDR_EN(addr, non_secure_access) \
+    (PCIE_INTEG_CTRL_REG_START_ADDR(addr) | PCIE_INTEG_CTRL_REG_EN | \
+     ((non_secure_access) << PCIE_INTEG_CTRL_REG_SEC_ACC_CTRL_DIS_POS))
 
 #define PCIE_INTEG_CTRL_REG_END_ADDR(addr) ((addr) >> 20)
 
