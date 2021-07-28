@@ -601,7 +601,10 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
         rnsam->SYS_CACHE_GRP_HN_NODEID[group] = ctx->hnf_cache_group[group];
 
     /* Program the number of HNFs */
-    rnsam->SYS_CACHE_GRP_HN_COUNT = hnf_count;
+    for (region_idx = 0; region_idx < region_sys_count; region_idx++) {
+        rnsam->SYS_CACHE_GRP_HN_COUNT |= (hnf_count / region_sys_count)
+            << CMN700_RNSAM_SYS_CACHE_GRP_HN_CNT_POS(region_idx);
+    }
 
     /*
      * If CAL mode is enabled by the configuration program the SCG CAL Mode
