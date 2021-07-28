@@ -290,9 +290,6 @@ static int system_pll_element_init(fwk_id_t element_id, unsigned int unused,
     struct system_pll_dev_ctx *ctx;
     const struct mod_system_pll_dev_config *dev_config = data;
 
-    if (!fwk_module_is_valid_element_id(element_id))
-        return FWK_E_PARAM;
-
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(element_id);
 
     ctx->config = dev_config;
