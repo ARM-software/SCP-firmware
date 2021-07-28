@@ -353,9 +353,6 @@ static int css_clock_element_init(fwk_id_t element_id,
     struct css_clock_dev_ctx *ctx;
     const struct mod_css_clock_dev_config *dev_config = data;
 
-    if (!fwk_module_is_valid_element_id(element_id))
-        return FWK_E_PARAM;
-
     ctx = module_ctx.dev_ctx_table + fwk_id_get_element_idx(element_id);
 
     if (dev_config->clock_type == MOD_CSS_CLOCK_TYPE_INDEXED) {
