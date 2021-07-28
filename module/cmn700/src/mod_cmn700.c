@@ -635,27 +635,38 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
         hnf_cluster_count = hier_hash_cfg->hnf_cluster_count;
 
         /* Number of HN-Fs in a cluster */
-        hnf_count_per_cluster = hnf_count / hnf_cluster_count;
+        hnf_count_per_cluster =
+            (hnf_count / hnf_cluster_count) / region_sys_count;
 
-        rnsam->HASHED_TARGET_GRP_HASH_CNTL[SAM_SCG0] =
-            ((CMN700_RNSAM_HIERARCHICAL_HASH_EN_MASK
-              << CMN700_RNSAM_HIERARCHICAL_HASH_EN_POS) |
-             (fwk_math_log2(hnf_count_per_cluster)
-              << CMN700_RNSAM_HIER_ENABLE_ADDRESS_STRIPING_POS) |
-             (hnf_cluster_count << CMN700_RNSAM_HIER_HASH_CLUSTERS_POS) |
-             (hnf_count_per_cluster << CMN700_RNSAM_HIER_HASH_NODES_POS));
+        /*
+         * For each SCG/HTG region, configure the hierarchical hashing mode with
+         * number of clusters, hnf count per cluster, hashing address bits etc.
+         * and enable hierarchical hashing for each SCG/HTG region.
+         */
+        for (region_idx = 0; region_idx < region_sys_count; region_idx++) {
+            rnsam->HASHED_TARGET_GRP_HASH_CNTL[region_idx] =
+                ((CMN700_RNSAM_HIERARCHICAL_HASH_EN_MASK
+                  << CMN700_RNSAM_HIERARCHICAL_HASH_EN_POS) |
+                 (fwk_math_log2(hnf_count_per_cluster)
+                  << CMN700_RNSAM_HIER_ENABLE_ADDRESS_STRIPING_POS) |
+                 (hnf_cluster_count << CMN700_RNSAM_HIER_HASH_CLUSTERS_POS) |
+                 (hnf_count_per_cluster << CMN700_RNSAM_HIER_HASH_NODES_POS));
 
-        rnsam->SYS_CACHE_GRP_SN_ATTR = hier_hash_cfg->sn_mode
-            << CMN700_RNSAM_SN_MODE_SYS_CACHE_POS(SAM_SCG0);
+            group =
+                region_idx / CMN700_RNSAM_SYS_CACHE_GRP_SN_ATTR_ENTRIES_PER_GRP;
+            rnsam->SYS_CACHE_GRP_SN_ATTR[group] |= hier_hash_cfg->sn_mode
+                << CMN700_RNSAM_SN_MODE_SYS_CACHE_POS(region_idx);
 
-        /* For now, SCG0 is supported */
-        rnsam->SYS_CACHE_GRP_SN_SAM_CFG[SAM_SCG0] =
-            ((hier_hash_cfg->top_address_bit0
-              << CMN700_RNSAM_TOP_ADDRESS_BIT0_POS(SAM_SCG0)) |
-             (hier_hash_cfg->top_address_bit1
-              << CMN700_RNSAM_TOP_ADDRESS_BIT1_POS(SAM_SCG0)) |
-             (hier_hash_cfg->top_address_bit2
-              << CMN700_RNSAM_TOP_ADDRESS_BIT2_POS(SAM_SCG0)));
+            group = region_idx /
+                CMN700_RNSAM_SYS_CACHE_GRP_SN_SAM_CFG_ENTRIES_PER_GRP;
+            rnsam->SYS_CACHE_GRP_SN_SAM_CFG[group] |=
+                ((hier_hash_cfg->top_address_bit0
+                  << CMN700_RNSAM_TOP_ADDRESS_BIT0_POS(region_idx)) |
+                 (hier_hash_cfg->top_address_bit1
+                  << CMN700_RNSAM_TOP_ADDRESS_BIT1_POS(region_idx)) |
+                 (hier_hash_cfg->top_address_bit2
+                  << CMN700_RNSAM_TOP_ADDRESS_BIT2_POS(region_idx)));
+        }
     }
 
     /* Enable RNSAM */
