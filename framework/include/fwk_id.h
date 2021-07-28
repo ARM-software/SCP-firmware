@@ -446,21 +446,6 @@ enum fwk_id_type {
 #define FWK_ID_STR(ID) (__fwk_id_str(ID).str)
 
 /*!
- * \brief Build a verbose string representation of an identifier.
- *
- * \details Strings returned by this macro describe the integer parts of an
- *      identifier and include the names of its parts that represent system
- *      entities.
- *
- * \param ID Identifier.
- *
- * \return String representation of the identifier.
- *
- * \hideinitializer
- */
-#define FWK_ID_VERBOSE_STR(ID) (fwk_id_verbose_str(ID).str)
-
-/*!
  * \brief Generic identifier.
  */
 typedef union __fwk_id fwk_id_t;

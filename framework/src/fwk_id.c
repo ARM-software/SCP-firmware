@@ -20,11 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 
-static void fwk_id_format(
-    char *buffer,
-    size_t buffer_size,
-    fwk_id_t id,
-    bool verbose)
+static void fwk_id_format(char *buffer, size_t buffer_size, fwk_id_t id)
 {
     static const char *types[] = {
         [__FWK_ID_TYPE_INVALID] = "INV",
@@ -39,18 +35,18 @@ static void fwk_id_format(
 
     size_t length = 0;
 
-    fwk_id_t module_id;
-    fwk_id_t element_id;
-
     unsigned int indices[] = { 0, 0, 0 };
-
-    const char *module_name = NULL;
-    const char *element_name = NULL;
 
     fwk_assert(buffer_size > 0);
 
-    if (id.common.type >= FWK_ARRAY_SIZE(types)) {
-        id.common.type = (uint32_t)__FWK_ID_TYPE_INVALID;
+    if (id.common.type >= FWK_ARRAY_SIZE(types) ||
+        id.common.type == (uint32_t)__FWK_ID_TYPE_INVALID) {
+        (void)snprintf(
+            buffer,
+            buffer_size,
+            "[%s]",
+            types[(uint32_t)__FWK_ID_TYPE_INVALID]);
+        return;
     }
 
     indices[0] = id.common.module_idx;
@@ -85,43 +81,12 @@ static void fwk_id_format(
         break;
     }
 
-    module_id = FWK_ID_MODULE(indices[0]);
-    module_name = fwk_module_get_name(module_id);
-
-    switch ((enum __fwk_id_type)id.common.type) {
-    case __FWK_ID_TYPE_ELEMENT:
-    case __FWK_ID_TYPE_SUB_ELEMENT:
-        element_id = FWK_ID_ELEMENT(indices[0], indices[1]);
-        element_name = fwk_module_get_name(element_id);
-
-        break;
-
-    default:
-        break;
-    }
-
     length += snprintf(
-        buffer + length, buffer_size - length, "[%s", types[id.common.type]);
-
-    switch ((enum __fwk_id_type)id.common.type) {
-    case __FWK_ID_TYPE_MODULE:
-    case __FWK_ID_TYPE_ELEMENT:
-    case __FWK_ID_TYPE_SUB_ELEMENT:
-    case __FWK_ID_TYPE_API:
-    case __FWK_ID_TYPE_EVENT:
-    case __FWK_ID_TYPE_NOTIFICATION:
-        if (verbose && (module_name != NULL)) {
-            length += snprintf(
-                buffer + length, buffer_size - length, " \"%s\"", module_name);
-        } else {
-            length += snprintf(
-                buffer + length, buffer_size - length, " %u", indices[0]);
-        }
-        break;
-
-    default:
-        break;
-    }
+        buffer + length,
+        buffer_size - length,
+        "[%s %u",
+        types[id.common.type],
+        indices[0]);
 
     switch ((enum __fwk_id_type)id.common.type) {
     case __FWK_ID_TYPE_ELEMENT:
@@ -129,13 +94,10 @@ static void fwk_id_format(
     case __FWK_ID_TYPE_API:
     case __FWK_ID_TYPE_EVENT:
     case __FWK_ID_TYPE_NOTIFICATION:
-        if (verbose && (element_name != NULL)) {
-            length += snprintf(
-                buffer + length, buffer_size - length, ":\"%s\"", element_name);
-        } else {
-            length += snprintf(
-                buffer + length, buffer_size - length, ":%u", indices[1]);
-        }
+    case __FWK_ID_TYPE_SIGNAL:
+        length +=
+            snprintf(buffer + length, buffer_size - length, ":%u", indices[1]);
+
         break;
 
     default:
@@ -146,7 +108,9 @@ static void fwk_id_format(
     case __FWK_ID_TYPE_SUB_ELEMENT:
         length +=
             snprintf(buffer + length, buffer_size - length, ":%u", indices[2]);
+
         break;
+
     default:
         break;
     }
@@ -158,16 +122,7 @@ struct __fwk_id_fmt __fwk_id_str(fwk_id_t id)
 {
     struct __fwk_id_fmt fmt = { { 0 } };
 
-    fwk_id_format(fmt.str, sizeof(fmt.str), id, false);
-
-    return fmt;
-}
-
-struct fwk_id_verbose_fmt fwk_id_verbose_str(fwk_id_t id)
-{
-    struct fwk_id_verbose_fmt fmt = { { 0 } };
-
-    fwk_id_format(fmt.str, sizeof(fmt.str), id, true);
+    fwk_id_format(fmt.str, sizeof(fmt.str), id);
 
     return fmt;
 }
