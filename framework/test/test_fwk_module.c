@@ -241,7 +241,6 @@ static void test_case_setup(void)
     config_module0.fake_val = 8;
     config_module1.fake_val = 9;
 
-    fake_module_desc0.name = "FAKE MODULE 0";
     fake_module_desc0.api_count = 2;
     fake_module_desc0.event_count = 0;
     fake_module_desc0.notification_count = 3;
@@ -253,7 +252,6 @@ static void test_case_setup(void)
     fake_module_desc0.start = start;
     fake_module_desc0.process_bind_request = process_bind_request;
 
-    fake_module_desc1.name = "FAKE MODULE 1";
     fake_module_desc1.api_count = 0;
     fake_module_desc1.event_count = 3;
     fake_module_desc1.notification_count = 0;

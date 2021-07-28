@@ -225,7 +225,6 @@ static int mod_ccn512_process_bind_request(
 }
 
 const struct fwk_module module_ccn512 = {
-    .name = "ccn512",
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = mod_ccn512_init,
     .element_init = mod_ccn512_element_init,

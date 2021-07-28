@@ -639,7 +639,6 @@ static int n1sdp_i2c_start(fwk_id_t id)
 }
 
 const struct fwk_module module_n1sdp_i2c = {
-    .name = "N1SDP_I2C",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_N1SDP_I2C_API_COUNT,
     .notification_count = MOD_N1SDP_I2C_NOTIFICATION_COUNT,

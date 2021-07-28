@@ -325,7 +325,6 @@ static int rcar_system_process_notification(
 }
 
 const struct fwk_module module_rcar_system = {
-    .name = "RCAR_SYSTEM",
     .api_count = MOD_RCAR_SYSTEM_API_COUNT,
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = rcar_system_init,

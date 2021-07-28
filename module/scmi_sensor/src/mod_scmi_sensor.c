@@ -329,9 +329,10 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
          * Copy sensor name into description struct. Copy n-1 chars to ensure a
          * NULL terminator at the end. (struct has been zeroed out)
          */
-        strncpy(desc.sensor_name,
-                fwk_module_get_name(sensor_id),
-                sizeof(desc.sensor_name) - 1);
+        strncpy(
+            desc.sensor_name,
+            fwk_module_get_element_name(sensor_id),
+            sizeof(desc.sensor_name) - 1);
 
         status = scmi_sensor_ctx.scmi_api->write_payload(service_id,
             payload_size, &desc, sizeof(struct scmi_sensor_desc));
@@ -925,7 +926,6 @@ static int scmi_sensor_process_event(const struct fwk_event *event,
 }
 
 const struct fwk_module module_scmi_sensor = {
-    .name = "SCMI sensor management",
     .api_count = (unsigned int)SCMI_SENSOR_API_IDX_COUNT,
     .event_count = (unsigned int)SCMI_SENSOR_EVENT_IDX_COUNT,
     .type = FWK_MODULE_TYPE_PROTOCOL,

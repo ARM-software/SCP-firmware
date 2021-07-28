@@ -527,7 +527,6 @@ static int smt_process_notification(
 #endif
 
 const struct fwk_module module_n1sdp_smt = {
-    .name = "N1SDP SMT",
     .type = FWK_MODULE_TYPE_SERVICE,
     .api_count = MOD_SMT_API_IDX_COUNT,
     .init = smt_init,

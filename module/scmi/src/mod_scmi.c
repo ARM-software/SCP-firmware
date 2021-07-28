@@ -379,7 +379,7 @@ static void respond(fwk_id_t service_id, const void *payload, size_t size)
 
     ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(service_id)];
 
-    service_name = fwk_module_get_name(service_id);
+    service_name = fwk_module_get_element_name(service_id);
     message_type_name = message_type_to_str(ctx->scmi_message_type);
 
     /*
@@ -1127,7 +1127,7 @@ static int scmi_base_discover_agent_handler(fwk_id_t service_id,
 
         strncpy(
             &return_values.name[0],
-            fwk_module_get_name(service_id),
+            fwk_module_get_element_name(service_id),
             sizeof(return_values.name) - 1);
 
         goto exit;
@@ -1649,7 +1649,7 @@ static int scmi_process_event(const struct fwk_event *event,
     transport_api = ctx->transport_api;
     transport_id = ctx->transport_id;
 
-    service_name = fwk_module_get_name(event->target_id);
+    service_name = fwk_module_get_element_name(event->target_id);
     message_type_name = message_type_to_str(ctx->scmi_message_type);
 
     status = transport_api->get_message_header(transport_id, &message_header);
@@ -1844,7 +1844,6 @@ static int scmi_process_notification(const struct fwk_event *event,
 
 /* SCMI module definition */
 const struct fwk_module module_scmi = {
-    .name = "SCMI",
     .api_count = (unsigned int)MOD_SCMI_API_IDX_COUNT,
     .event_count = 1,
 #ifdef BUILD_HAS_NOTIFICATION

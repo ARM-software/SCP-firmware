@@ -263,7 +263,6 @@ static int remote_pd_process_bind_request(fwk_id_t source_id,
 }
 
 const struct fwk_module module_n1sdp_remote_pd = {
-    .name = "N1SDP Remote PD",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = N1SDP_REMOTE_PD_API_COUNT,
     .init = remote_pd_init,

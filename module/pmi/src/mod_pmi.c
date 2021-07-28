@@ -104,7 +104,6 @@ static int pmi_bind_request(
 }
 
 const struct fwk_module module_pmi = {
-    .name = "PMI",
     .type = FWK_MODULE_TYPE_HAL,
     .init = pmi_init,
     .bind = pmi_bind,

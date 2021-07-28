@@ -249,7 +249,6 @@ static int rcar_sysc_process_bind_request(
 }
 
 const struct fwk_module module_rcar_pd_sysc = {
-    .name = "RCAR_PD_SYSC",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_RCAR_PD_SYSC_API_COUNT,
     .init = rcar_sysc_mod_init,

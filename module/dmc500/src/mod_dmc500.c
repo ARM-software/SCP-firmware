@@ -84,7 +84,6 @@ static int mod_dmc500_start(fwk_id_t id)
 }
 
 const struct fwk_module module_dmc500 = {
-    .name = "DMC500",
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = mod_dmc500_init,
     .element_init = mod_dmc500_element_init,

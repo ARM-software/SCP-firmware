@@ -762,7 +762,6 @@ static int scmi_sys_power_process_bind_request(fwk_id_t source_id,
 }
 
 const struct fwk_module module_scmi_system_power = {
-    .name = "SCMI System Power Management Protocol",
     .api_count = 1,
     .type = FWK_MODULE_TYPE_PROTOCOL,
     .init = scmi_sys_power_init,

@@ -434,7 +434,6 @@ static int sd_clock_start(fwk_id_t id)
 }
 
 const struct fwk_module module_rcar_sd_clock = {
-    .name = "SD Clock Driver",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_RCAR_CLOCK_API_COUNT,
     .event_count = 0,

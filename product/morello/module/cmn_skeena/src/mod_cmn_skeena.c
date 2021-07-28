@@ -949,7 +949,6 @@ static int cmn_skeena_process_notification(
 }
 
 const struct fwk_module module_cmn_skeena = {
-    .name = "CMN SKEENA",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_CMN_SKEENA_API_COUNT,
     .init = cmn_skeena_init,

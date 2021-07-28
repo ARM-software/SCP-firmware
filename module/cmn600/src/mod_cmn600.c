@@ -839,7 +839,6 @@ static int cmn600_process_notification(
 }
 
 const struct fwk_module module_cmn600 = {
-    .name = "CMN600",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_CMN600_API_COUNT,
     .init = cmn600_init,

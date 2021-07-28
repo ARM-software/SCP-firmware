@@ -108,7 +108,6 @@ static int mod_sgm775_dmc500_start(fwk_id_t id)
 }
 
 const struct fwk_module module_sgm775_dmc500 = {
-    .name = "SGM775_DMC500",
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = mod_sgm775_dmc500_init,
     .element_init = mod_sgm775_dmc500_element_init,

@@ -672,7 +672,6 @@ static int juno_debug_process_event(const struct fwk_event *event,
 }
 
 struct fwk_module module_juno_debug = {
-    .name = "JUNO DEBUG",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_JUNO_DEBUG_API_IDX_COUNT,
     .event_count = JUNO_DEBUG_EVENT_IDX_COUNT,

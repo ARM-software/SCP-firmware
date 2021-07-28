@@ -924,7 +924,6 @@ static int pvt_process_notification(const struct fwk_event *event,
 }
 
 const struct fwk_module module_juno_pvt = {
-    .name = "Juno PVT Driver",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = 1,
     .event_count = (unsigned int)JUNO_PVT_EVENT_IDX_COUNT,

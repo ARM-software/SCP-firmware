@@ -161,7 +161,6 @@ static int juno_adc_process_bind_request(fwk_id_t source_id,
 }
 
 const struct fwk_module module_juno_adc = {
-    .name = "Juno ADC Driver",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = (unsigned int)MOD_JUNO_ADC_API_IDX_COUNT,
     .init = juno_adc_init,

@@ -1254,7 +1254,6 @@ static int dvfs_process_bind_request(
 
 /* Module description */
 const struct fwk_module module_dvfs = {
-    .name = "DVFS",
     .type = FWK_MODULE_TYPE_HAL,
     .init = dvfs_init,
     .element_init = dvfs_element_init,

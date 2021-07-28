@@ -332,7 +332,6 @@ static int n1sdp_sensor_process_bind_request(
 }
 
 const struct fwk_module module_n1sdp_sensor = {
-    .name = "N1SDP Sensor",
     .api_count = 1,
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = n1sdp_sensor_init,

@@ -147,7 +147,6 @@ static int fip_process_bind_request(
 const struct fwk_module_config config_fip = { 0 };
 
 const struct fwk_module module_fip = {
-    .name = "FIP Parser",
     .type = FWK_MODULE_TYPE_SERVICE,
     .api_count = 1,
     .init = fip_init,

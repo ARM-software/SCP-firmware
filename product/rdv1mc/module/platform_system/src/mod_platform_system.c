@@ -379,7 +379,6 @@ int platform_system_process_notification(
 }
 
 const struct fwk_module module_platform_system = {
-    .name = "PLATFORM_SYSTEM",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_PLATFORM_SYSTEM_API_COUNT,
     .init = platform_system_mod_init,

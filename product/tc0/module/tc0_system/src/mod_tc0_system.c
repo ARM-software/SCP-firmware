@@ -228,7 +228,6 @@ int tc0_system_process_notification(
 }
 
 const struct fwk_module module_tc0_system = {
-    .name = "TC0_SYSTEM",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_TC0_SYSTEM_API_COUNT,
     .init = tc0_system_mod_init,

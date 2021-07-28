@@ -673,8 +673,10 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
     };
 
     /* Copy the domain name into the mailbox */
-    strncpy((char *)return_values.name,
-        fwk_module_get_name(domain_id), sizeof(return_values.name) - 1);
+    strncpy(
+        (char *)return_values.name,
+        fwk_module_get_element_name(domain_id),
+        sizeof(return_values.name) - 1);
 
 exit:
     scmi_perf_ctx.scmi_api->respond(service_id, &return_values,
@@ -2099,7 +2101,6 @@ static int scmi_perf_process_event(const struct fwk_event *event,
 
 /* SCMI Performance Management Protocol Definition */
 const struct fwk_module module_scmi_perf = {
-    .name = "SCMI Performance Management Protocol",
     .api_count = (unsigned int)MOD_SCMI_PERF_API_COUNT,
     .event_count = (unsigned int)SCMI_PERF_EVENT_IDX_COUNT,
     .type = FWK_MODULE_TYPE_PROTOCOL,

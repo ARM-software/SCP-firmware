@@ -1217,7 +1217,6 @@ static int n1sdp_c2c_process_notification(const struct fwk_event *event,
 }
 
 const struct fwk_module module_n1sdp_c2c = {
-    .name = "N1SDP C2C",
     .type = FWK_MODULE_TYPE_PROTOCOL,
     .api_count = N1SDP_C2C_API_COUNT,
     .init = n1sdp_c2c_init,

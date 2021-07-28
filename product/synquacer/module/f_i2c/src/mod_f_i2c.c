@@ -57,7 +57,6 @@ static int f_i2c_start(fwk_id_t id)
 }
 
 const struct fwk_module module_f_i2c = {
-    .name = "f_i2c",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = 1,
     .init = f_i2c_init,

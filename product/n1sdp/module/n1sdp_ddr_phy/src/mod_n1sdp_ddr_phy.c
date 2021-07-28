@@ -1196,7 +1196,6 @@ static int n1sdp_ddr_phy_process_bind_request(fwk_id_t requester_id,
 }
 
 const struct fwk_module module_n1sdp_ddr_phy = {
-    .name = "N1SDP DDR-PHY",
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = n1sdp_ddr_phy_init,
     .element_init = n1sdp_ddr_phy_element_init,

@@ -1428,7 +1428,6 @@ static int mod_res_perms_resources_init(
 
 /* Module description */
 const struct fwk_module module_resource_perms = {
-    .name = "RESOURCE_PERMS",
     .type = FWK_MODULE_TYPE_SERVICE,
     .init = mod_res_perms_resources_init,
     .process_bind_request = mod_res_perms_process_bind_request,

@@ -593,7 +593,6 @@ static int process_bind_request(fwk_id_t source_id,
 }
 
 const struct fwk_module module_statistics = {
-    .name = "STATS",
     .type = FWK_MODULE_TYPE_SERVICE,
     .init = stats_init,
     .element_init = stats_element_init,

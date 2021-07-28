@@ -339,7 +339,6 @@ static int n1sdp_pll_process_bind_request(fwk_id_t requester_id, fwk_id_t id,
 }
 
 const struct fwk_module module_n1sdp_pll = {
-    .name = "N1SDP PLL Driver",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_N1SDP_PLL_API_COUNT,
     .event_count = 0,

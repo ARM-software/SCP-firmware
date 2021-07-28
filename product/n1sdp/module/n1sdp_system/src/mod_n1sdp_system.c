@@ -730,7 +730,6 @@ static int n1sdp_system_process_notification(const struct fwk_event *event,
 }
 
 const struct fwk_module module_n1sdp_system = {
-    .name = "N1SDP_SYSTEM",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_N1SDP_SYSTEM_API_COUNT,
     .init = n1sdp_system_mod_init,

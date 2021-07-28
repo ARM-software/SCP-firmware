@@ -105,7 +105,6 @@ static int synquacer_rom_process_event(
 
 /* Module descriptor */
 const struct fwk_module module_synquacer_rom = {
-    .name = "synquacer_ROM",
     .type = FWK_MODULE_TYPE_SERVICE,
     .event_count = ROM_EVENT_COUNT,
     .init = synquacer_rom_init,

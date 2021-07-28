@@ -1092,7 +1092,6 @@ static int juno_ppu_start(fwk_id_t id)
 }
 
 const struct fwk_module module_juno_ppu = {
-    .name = "Juno PPU",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = (unsigned int)MOD_JUNO_PPU_API_COUNT,
     .init = juno_ppu_module_init,

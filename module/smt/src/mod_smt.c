@@ -628,7 +628,6 @@ static int smt_process_notification(
 }
 
 const struct fwk_module module_smt = {
-    .name = "smt",
     .type = FWK_MODULE_TYPE_SERVICE,
     .api_count = (unsigned int)MOD_SMT_API_IDX_COUNT,
     .notification_count = (unsigned int)MOD_SMT_NOTIFICATION_IDX_COUNT,

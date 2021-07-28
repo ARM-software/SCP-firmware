@@ -315,7 +315,6 @@ static int scmi_vendor_ext_process_bind_request(
 }
 
 const struct fwk_module module_scmi_vendor_ext = {
-    .name = "SCMI vendor_ext management",
     .api_count = 1,
     .type = FWK_MODULE_TYPE_PROTOCOL,
     .init = scmi_vendor_ext_init,

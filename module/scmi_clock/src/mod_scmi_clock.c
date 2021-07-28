@@ -356,9 +356,10 @@ static void get_state_respond(fwk_id_t clock_dev_id,
         return_values.attributes = SCMI_CLOCK_ATTRIBUTES(
             (uint32_t)(*clock_state == MOD_CLOCK_STATE_RUNNING));
 
-        strncpy(return_values.clock_name,
-                fwk_module_get_name(clock_dev_id),
-                sizeof(return_values.clock_name) - 1);
+        strncpy(
+            return_values.clock_name,
+            fwk_module_get_element_name(clock_dev_id),
+            sizeof(return_values.clock_name) - 1);
 
         return_values.status = (int32_t)SCMI_SUCCESS;
         response_size = sizeof(return_values);
@@ -1567,7 +1568,6 @@ static int scmi_clock_process_event(const struct fwk_event *event,
 
 /* SCMI Clock Management Protocol Definition */
 const struct fwk_module module_scmi_clock = {
-    .name = "SCMI Clock Management Protocol",
     .api_count = 1,
     .event_count = (unsigned int)SCMI_CLOCK_EVENT_IDX_COUNT,
     .type = FWK_MODULE_TYPE_PROTOCOL,

@@ -214,10 +214,6 @@ static void fwk_module_init_module(struct fwk_module_ctx *ctx)
     const struct fwk_module *desc = ctx->desc;
     const struct fwk_module_config *config = ctx->config;
 
-    if (!fwk_expect(desc->name != NULL)) {
-        fwk_trap();
-    }
-
     if (!fwk_expect(desc->type < FWK_MODULE_TYPE_COUNT)) {
         fwk_trap();
     }
@@ -651,12 +647,10 @@ int fwk_module_get_sub_element_count(fwk_id_t element_id)
     }
 }
 
-const char *fwk_module_get_name(fwk_id_t id)
+const char *fwk_module_get_element_name(fwk_id_t id)
 {
     if (fwk_module_is_valid_element_id(id)) {
         return fwk_module_get_element_ctx(id)->desc->name;
-    } else if (fwk_module_is_valid_module_id(id)) {
-        return fwk_module_get_ctx(id)->desc->name;
     }
 
     return NULL;

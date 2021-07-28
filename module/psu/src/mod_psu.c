@@ -465,7 +465,6 @@ exit:
 }
 
 const struct fwk_module module_psu = {
-    .name = "psu",
     .type = FWK_MODULE_TYPE_HAL,
 
     .init = mod_psu_init,

@@ -459,7 +459,6 @@ static int juno_hdlcd_start(fwk_id_t id)
 }
 
 const struct fwk_module module_juno_hdlcd = {
-    .name = "JUNO HDLCD",
     .api_count = (unsigned int)MOD_JUNO_HDLCD_API_COUNT,
     .type = FWK_MODULE_TYPE_HAL,
     .init = juno_hdlcd_init,

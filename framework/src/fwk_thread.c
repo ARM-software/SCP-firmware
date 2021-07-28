@@ -173,8 +173,8 @@ static int execute_signal_handler(fwk_id_t target_id, fwk_id_t signal_id)
     status = module->process_signal(target_id, signal_id);
     if ((status != FWK_SUCCESS) && (status != FWK_PENDING)) {
         FWK_LOG_CRIT(
-            "[FWK] Process signal (%s: %s -> %s) (%d)\n",
-            module->name,
+            "[FWK] Process signal ([%u]: %s -> %s) (%d)\n",
+            fwk_id_get_module_idx(target_id),
             FWK_ID_STR(signal_id),
             FWK_ID_STR(target_id),
             status);

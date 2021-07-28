@@ -508,7 +508,6 @@ static int mod_i2c_process_event(const struct fwk_event *event,
 }
 
 const struct fwk_module module_i2c = {
-    .name = "I2C",
     .type = FWK_MODULE_TYPE_HAL,
     .api_count = (unsigned int)MOD_I2C_API_IDX_COUNT,
     .event_count = (unsigned int)MOD_I2C_EVENT_IDX_TOTAL_COUNT,

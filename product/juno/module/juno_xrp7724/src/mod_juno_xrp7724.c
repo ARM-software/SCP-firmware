@@ -1041,7 +1041,6 @@ static int juno_xrp7724_process_event(const struct fwk_event *event,
 }
 
 const struct fwk_module module_juno_xrp7724 = {
-    .name = "JUNO XRP7724",
     .api_count = (unsigned int)MOD_JUNO_XRP7724_API_IDX_COUNT,
     .event_count = (unsigned int)JUNO_XRP7724_EVENT_IDX_COUNT,
     .type = FWK_MODULE_TYPE_DRIVER,

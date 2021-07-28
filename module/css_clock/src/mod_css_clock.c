@@ -426,7 +426,6 @@ static int css_clock_process_bind_request(fwk_id_t source_id,
 }
 
 const struct fwk_module module_css_clock = {
-    .name = "Subsystem Clock Driver",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_CSS_CLOCK_API_COUNT,
     .event_count = 0,

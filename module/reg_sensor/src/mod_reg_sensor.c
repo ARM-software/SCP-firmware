@@ -97,7 +97,6 @@ static int reg_sensor_process_bind_request(fwk_id_t source_id,
 }
 
 const struct fwk_module module_reg_sensor = {
-    .name = "Register Sensor",
     .api_count = 1,
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = reg_sensor_init,

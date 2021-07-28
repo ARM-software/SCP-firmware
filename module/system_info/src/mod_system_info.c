@@ -98,7 +98,6 @@ static int system_info_process_bind_request(fwk_id_t requester_id,
 }
 
 const struct fwk_module module_system_info = {
-    .name = "SYSTEM ID INFORMATION",
     .type = FWK_MODULE_TYPE_HAL,
     .init = system_info_init,
     .bind = system_info_bind,

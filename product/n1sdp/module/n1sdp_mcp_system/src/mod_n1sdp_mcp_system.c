@@ -136,7 +136,6 @@ static int n1sdp_mcp_system_process_event(const struct fwk_event *event,
 }
 
 const struct fwk_module module_n1sdp_mcp_system = {
-    .name = "N1SDP_MCP_SYSTEM",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = 0,
     .event_count = MOD_MCP_SYSTEM_EVENT_COUNT,

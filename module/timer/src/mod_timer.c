@@ -668,7 +668,6 @@ static int timer_start(fwk_id_t id)
 
 /* Module descriptor */
 const struct fwk_module module_timer = {
-    .name = "Timer HAL",
     .api_count = (unsigned int)MOD_TIMER_API_COUNT,
     .type = FWK_MODULE_TYPE_HAL,
     .init = timer_init,

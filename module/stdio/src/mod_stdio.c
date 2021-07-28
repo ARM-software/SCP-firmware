@@ -145,7 +145,6 @@ static int mod_stdio_close(const struct fwk_io_stream *stream)
 }
 
 const struct fwk_module module_stdio = {
-    .name = "stdio",
     .type = FWK_MODULE_TYPE_DRIVER,
 
     .init = mod_stdio_init,

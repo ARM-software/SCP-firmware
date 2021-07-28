@@ -164,7 +164,6 @@ static int get_frequency(fwk_id_t dev_id, uint32_t *frequency)
 }
 
 static const struct mod_timer_driver_api module_api = {
-    .name = "Generic Timer Driver",
     .enable = enable,
     .disable = disable,
     .set_timer = set_timer,
@@ -290,7 +289,6 @@ static int gtimer_process_notification(
  * Module descriptor
  */
 const struct fwk_module module_gtimer = {
-    .name = "Generic Timer Driver",
     .api_count = 1,
     .event_count = 0,
     .type = FWK_MODULE_TYPE_DRIVER,

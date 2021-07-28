@@ -314,7 +314,6 @@ static int scmi_management_process_bind_request(
 }
 
 const struct fwk_module module_scmi_management = {
-    .name = "SCMI Management Protocol",
     .api_count = 1,
     .type = FWK_MODULE_TYPE_PROTOCOL,
     .init = scmi_management_init,

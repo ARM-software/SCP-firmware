@@ -262,7 +262,6 @@ static int scmi_agent_process_event(const struct fwk_event *event,
 }
 
 const struct fwk_module module_scmi_agent = {
-    .name = "SCMI AGENT",
     .type = FWK_MODULE_TYPE_SERVICE,
     .api_count = MOD_SCMI_AGENT_API_IDX_COUNT,
     .event_count = MOD_SCMI_AGENT_EVENT_COUNT,

@@ -358,7 +358,6 @@ static int juno_thermal_process_notification(
 }
 
 const struct fwk_module module_juno_thermal = {
-    .name = "JUNO THERMAL",
     .type = FWK_MODULE_TYPE_SERVICE,
     .event_count = (unsigned int)MOD_JUNO_THERMAL_EVENT_IDX_COUNT,
     .init = juno_thermal_init,

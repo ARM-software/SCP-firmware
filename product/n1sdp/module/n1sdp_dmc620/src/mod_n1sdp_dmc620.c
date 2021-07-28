@@ -1360,7 +1360,6 @@ static int mod_dmc620_process_notification(
 }
 
 const struct fwk_module module_n1sdp_dmc620 = {
-    .name = "N1SDP-DMC620",
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = mod_dmc620_init,
     .element_init = mod_dmc620_element_init,

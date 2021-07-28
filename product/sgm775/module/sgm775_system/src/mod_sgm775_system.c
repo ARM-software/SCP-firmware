@@ -170,7 +170,6 @@ static int sgm775_system_process_notification(const struct fwk_event *event,
 }
 
 const struct fwk_module module_sgm775_system = {
-    .name = "SGM775_SYSTEM",
     .api_count = MOD_SGM775_SYSTEM_API_COUNT,
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = sgm775_system_init,

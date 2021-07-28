@@ -118,7 +118,6 @@ static int mod_dmc_bing_process_notification(
 }
 
 const struct fwk_module module_dmc_bing = {
-    .name = "DMC BING",
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = mod_dmc_bing_init,
     .element_init = mod_dmc_bing_element_init,

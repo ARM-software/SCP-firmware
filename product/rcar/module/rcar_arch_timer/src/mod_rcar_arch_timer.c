@@ -214,7 +214,6 @@ static int arch_timer_process_notification(
  * Module descriptor
  */
 const struct fwk_module module_rcar_arch_timer = {
-    .name = "Arch Timer Driver",
     .api_count = 1,
     .event_count = 0,
     .type = FWK_MODULE_TYPE_DRIVER,

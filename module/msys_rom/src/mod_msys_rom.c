@@ -166,7 +166,6 @@ static int msys_rom_process_notification(
 
 /* Module descriptor */
 const struct fwk_module module_msys_rom = {
-    .name = "MSYS_ROM",
     .type = FWK_MODULE_TYPE_SERVICE,
     .event_count = ROM_EVENT_COUNT,
     .notification_count = MOD_MSYS_ROM_NOTIFICATION_COUNT,

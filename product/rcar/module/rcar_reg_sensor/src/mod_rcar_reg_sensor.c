@@ -246,7 +246,6 @@ static int reg_sensor_process_bind_request(
 }
 
 const struct fwk_module module_rcar_reg_sensor = {
-    .name = "Rcar Thermal Sensor",
     .api_count = MOD_RCAR_REG_SENSOR_API_COUNT,
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = reg_sensor_init,

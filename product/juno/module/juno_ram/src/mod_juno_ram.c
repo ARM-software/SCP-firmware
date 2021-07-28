@@ -424,7 +424,6 @@ static int juno_ram_process_notification(
 }
 
 const struct fwk_module module_juno_ram = {
-    .name = "Juno RAM",
     .type = FWK_MODULE_TYPE_SERVICE,
     .init = juno_ram_init,
     .bind = juno_ram_bind,

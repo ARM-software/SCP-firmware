@@ -306,7 +306,6 @@ static int mod_mock_clock_process_bind_request(
 }
 
 const struct fwk_module module_mock_clock = {
-    .name = "mock_clock",
     .type = FWK_MODULE_TYPE_DRIVER,
 
     .init = mod_mock_clock_init,
