@@ -228,6 +228,7 @@ struct cmn700_mxp_reg {
 #define CMN700_RNSAM_REGION_ENTRY_VALID                        UINT64_C(0x01)
 #define CMN700_RNSAM_REGION_ENTRIES_PER_GROUP                  1
 #define CMN700_RNSAM_SYS_CACHE_GRP_SN_NODEID_ENTRIES_PER_GROUP 4
+#define CMN700_RNSAM_SYS_CACHE_GRP_HN_CNT_POS(scg_grp)         (8 * (scg_grp))
 #define CMN700_RNSAM_SCG_HNF_CAL_MODE_EN                       UINT64_C(0x01)
 #define CMN700_RNSAM_SCG_HNF_CAL_MODE_SHIFT                    16
 #define CMN700_RNSAM_STATUS_UNSTALL                            UINT64_C(0x02)
