@@ -125,8 +125,8 @@ struct cmn700_rnsam_reg {
             uint8_t   RESERVED5[0xEA0 - 0xE40];
     FWK_RW  uint64_t  SYS_CACHE_GRP_HN_COUNT;
             uint8_t   RESERVED6[0xEB0 - 0xEA8];
-    FWK_RW  uint64_t  SYS_CACHE_GRP_SN_ATTR;
-            uint8_t   RESERVED7[0xF00 - 0xEB8];
+    FWK_RW  uint64_t  SYS_CACHE_GRP_SN_ATTR[2];
+            uint8_t   RESERVED7[0xF00 - 0xEC0];
     FWK_RW  uint64_t  SYS_CACHE_GRP_HN_NODEID[16];
             uint8_t   RESERVED8[0x1000 - 0xF80];
     FWK_RW  uint64_t  SYS_CACHE_GRP_SN_NODEID[32];
@@ -244,10 +244,13 @@ struct cmn700_mxp_reg {
 #define CMN700_RNSAM_HIER_ENABLE_ADDRESS_STRIPING_POS 3
 #define CMN700_RNSAM_HIER_HASH_CLUSTERS_POS           8
 #define CMN700_RNSAM_HIER_HASH_NODES_POS              16
-#define CMN700_RNSAM_SN_MODE_SYS_CACHE_POS(scg_grp)   (4 + (scg_grp * 16))
-#define CMN700_RNSAM_TOP_ADDRESS_BIT0_POS(scg_grp)    (0 + (scg_grp * 24))
-#define CMN700_RNSAM_TOP_ADDRESS_BIT1_POS(scg_grp)    (8 + (scg_grp * 24))
-#define CMN700_RNSAM_TOP_ADDRESS_BIT2_POS(scg_grp)    (16 + (scg_grp * 24))
+#define CMN700_RNSAM_SN_MODE_SYS_CACHE_POS(scg_grp)   ((4 + ((scg_grp)*16)) % 64)
+#define CMN700_RNSAM_TOP_ADDRESS_BIT0_POS(scg_grp)    ((0 + ((scg_grp)*24)) % 64)
+#define CMN700_RNSAM_TOP_ADDRESS_BIT1_POS(scg_grp)    ((8 + ((scg_grp)*24)) % 64)
+#define CMN700_RNSAM_TOP_ADDRESS_BIT2_POS(scg_grp)    ((16 + ((scg_grp)*24)) % 64)
+
+#define CMN700_RNSAM_SYS_CACHE_GRP_SN_ATTR_ENTRIES_PER_GRP    4
+#define CMN700_RNSAM_SYS_CACHE_GRP_SN_SAM_CFG_ENTRIES_PER_GRP 2
 
 #define CMN700_HNF_UNIT_INFO_HNSAM_RCOMP_EN_MASK 0x10000000
 #define CMN700_HNF_UNIT_INFO_HNSAM_RCOMP_EN_POS  28
