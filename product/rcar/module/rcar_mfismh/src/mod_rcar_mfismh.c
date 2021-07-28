@@ -248,7 +248,6 @@ static int mfismh_start(fwk_id_t id)
 
 /* MFISMH module definition */
 const struct fwk_module module_rcar_mfismh = {
-    .name = "RCAR MFISMH",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = 1,
     .init = mfismh_init,

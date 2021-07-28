@@ -241,7 +241,6 @@ static int mhu_start(fwk_id_t id)
 
 /* MHU module definition */
 const struct fwk_module module_n1sdp_mhu = {
-    .name = "N1SDP MHU",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = 1,
     .init = mhu_init,

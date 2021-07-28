@@ -981,7 +981,6 @@ static int ppu_v1_process_notification(
 }
 
 const struct fwk_module module_ppu_v1 = {
-    .name = "PPU_V1",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_PPU_V1_API_IDX_COUNT,
     .init = ppu_v1_mod_init,

@@ -163,7 +163,6 @@ static int n1sdp_scp2pcc_start(fwk_id_t id)
 }
 
 const struct fwk_module module_n1sdp_scp2pcc = {
-    .name = "N1SDP_SCP2PCC",
     .api_count = 1,
     .type = FWK_MODULE_TYPE_PROTOCOL,
     .init = n1sdp_scp2pcc_init,

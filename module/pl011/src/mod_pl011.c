@@ -651,7 +651,6 @@ static int mod_pl011_close(const struct fwk_io_stream *stream)
 }
 
 const struct fwk_module module_pl011 = {
-    .name = "pl011",
     .type = FWK_MODULE_TYPE_DRIVER,
 
     .init = mod_pl011_init,

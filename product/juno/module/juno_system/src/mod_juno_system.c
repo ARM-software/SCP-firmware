@@ -372,7 +372,6 @@ static int juno_system_process_event(
 }
 
 const struct fwk_module module_juno_system = {
-    .name = "Juno SYSTEM",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = 1,
     .init = juno_system_module_init,

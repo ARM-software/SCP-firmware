@@ -854,7 +854,6 @@ static int cmn700_process_notification(
 }
 
 const struct fwk_module module_cmn700 = {
-    .name = "CMN700",
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = cmn700_init,
     .element_init = cmn700_device_init,

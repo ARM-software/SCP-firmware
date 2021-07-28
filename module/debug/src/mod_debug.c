@@ -440,7 +440,6 @@ static int mod_debug_process_event(const struct fwk_event *event,
 }
 
 const struct fwk_module module_debug = {
-    .name = "DEBUG",
     .api_count = MOD_DEBUG_API_IDX_COUNT,
     .event_count = MOD_DEBUG_EVENT_COUNT,
     .type = FWK_MODULE_TYPE_HAL,

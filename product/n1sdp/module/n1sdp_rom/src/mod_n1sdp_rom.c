@@ -160,7 +160,6 @@ static int n1sdp_rom_process_event(const struct fwk_event *event,
 
 /* Module descriptor */
 const struct fwk_module module_n1sdp_rom = {
-    .name = "N1SDP SCP ROM",
     .type = FWK_MODULE_TYPE_SERVICE,
     .event_count = ROM_EVENT_COUNT,
     .init = n1sdp_rom_init,

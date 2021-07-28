@@ -238,7 +238,6 @@ int mod_f_uart3_close(const struct fwk_io_stream *stream)
 }
 
 const struct fwk_module module_f_uart3 = {
-    .name = "f-uart3",
     .type = FWK_MODULE_TYPE_DRIVER,
 
     .init = mod_f_uart3_init,

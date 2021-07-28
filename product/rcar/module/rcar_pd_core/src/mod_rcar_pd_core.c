@@ -401,7 +401,6 @@ static int rcar_core_process_notification(
 }
 
 const struct fwk_module module_rcar_pd_core = {
-    .name = "RCAR_PD_CORE",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_RCAR_PD_SYSC_API_IDX_COUNT,
     .init = rcar_mod_init,

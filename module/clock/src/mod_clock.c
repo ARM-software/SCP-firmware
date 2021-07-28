@@ -339,7 +339,7 @@ static int clock_get_info(fwk_id_t clock_id, struct mod_clock_info *info)
         return status;
     }
 
-    info->name = fwk_module_get_name(clock_id);
+    info->name = fwk_module_get_element_name(clock_id);
 
     return FWK_SUCCESS;
 }
@@ -723,7 +723,6 @@ static int clock_process_event(const struct fwk_event *event,
 }
 
 const struct fwk_module module_clock = {
-    .name = "Clock HAL",
     .type = FWK_MODULE_TYPE_HAL,
     .api_count = (unsigned int)MOD_CLOCK_API_COUNT,
     .event_count = (unsigned int)CLOCK_EVENT_IDX_COUNT,

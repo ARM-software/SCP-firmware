@@ -546,7 +546,6 @@ static int smt_process_notification(
 #endif
 
 const struct fwk_module module_morello_smt = {
-    .name = "MORELLO SMT",
     .type = FWK_MODULE_TYPE_SERVICE,
     .api_count = MOD_SMT_API_IDX_COUNT,
     .init = smt_init,

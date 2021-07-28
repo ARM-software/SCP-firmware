@@ -116,7 +116,7 @@ static int voltd_get_info(fwk_id_t voltd_id, struct mod_voltd_info *info)
     status = ctx->api->get_info(ctx->config->driver_id, info);
 
     if (status == FWK_SUCCESS && info->name == NULL)
-        info->name = fwk_module_get_name(voltd_id);
+        info->name = fwk_module_get_element_name(voltd_id);
 
     return status;
 }
@@ -207,7 +207,6 @@ static int voltd_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
 }
 
 const struct fwk_module module_voltage_domain = {
-    .name = "Voltage Domain (VOLTD) HAL",
     .type = FWK_MODULE_TYPE_HAL,
     .api_count = MOD_VOLTD_API_COUNT,
     .init = voltd_init,

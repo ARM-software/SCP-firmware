@@ -302,8 +302,10 @@ static int scmi_voltd_domain_attributes_handler(fwk_id_t service_id,
     if (status != FWK_SUCCESS)
         goto exit;
 
-    strncpy(outmsg.name, fwk_module_get_name(device->element_id),
-            sizeof(outmsg.name));
+    strncpy(
+        outmsg.name,
+        fwk_module_get_element_name(device->element_id),
+        sizeof(outmsg.name));
 
     outmsg.status = SCMI_SUCCESS;
     outmsg_size = sizeof(outmsg);
@@ -699,7 +701,6 @@ static int scmi_voltd_process_bind_request(fwk_id_t source_id,
 
 /* SCMI Voltage Domain Management Protocol Definition */
 const struct fwk_module module_scmi_voltage_domain = {
-    .name = "SCMI Voltage Domain Management Protocol",
     .api_count = 1,
     .type = FWK_MODULE_TYPE_PROTOCOL,
     .init = scmi_voltd_init,

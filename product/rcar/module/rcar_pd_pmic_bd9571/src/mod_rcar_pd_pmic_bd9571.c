@@ -203,7 +203,6 @@ static int rcar_pmic_process_bind_request(
 }
 
 const struct fwk_module module_rcar_pd_pmic_bd9571 = {
-    .name = "RCAR_PD_PMIC",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_RCAR_PD_PMIC_API_COUNT,
     .init = rcar_pmic_mod_init,

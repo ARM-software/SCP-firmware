@@ -120,7 +120,7 @@ static int sid_subsystem_init(
     subsystem_config = data;
     if (subsystem_config->part_number == info.system_part_number) {
         info.system_idx = fwk_id_get_element_idx(subsystem_id);
-        info.name = fwk_module_get_name(
+        info.name = fwk_module_get_element_name(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_SID, info.system_idx));
 
         /* Populate the system info structure */
@@ -150,7 +150,6 @@ static int sid_process_bind_request(fwk_id_t requester_id, fwk_id_t targer_id,
 }
 
 const struct fwk_module module_sid = {
-    .name = "SID",
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = sid_init,
     .element_init = sid_subsystem_init,

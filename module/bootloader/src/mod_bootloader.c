@@ -239,7 +239,6 @@ static int bootloader_process_bind_request(fwk_id_t requester_id, fwk_id_t id,
 }
 
 const struct fwk_module module_bootloader = {
-    .name = "Bootloader",
     .type = FWK_MODULE_TYPE_SERVICE,
     .api_count = 1,
     .event_count = 0,

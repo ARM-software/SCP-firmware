@@ -216,7 +216,6 @@ static int process_bind_request(
 }
 
 const struct fwk_module module_dwt_pmi = {
-    .name = "DWT-PMI",
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = dwt_pmi_init,
     .process_bind_request = process_bind_request,

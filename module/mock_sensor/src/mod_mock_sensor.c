@@ -130,7 +130,6 @@ static int mock_sensor_process_bind_request(fwk_id_t source_id,
 }
 
 const struct fwk_module module_mock_sensor = {
-    .name = "Mock Sensor",
     .api_count = 1,
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = mock_sensor_init,

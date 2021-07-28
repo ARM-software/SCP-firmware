@@ -819,7 +819,6 @@ static int n1sdp_pcie_process_notification(const struct fwk_event *event,
 }
 
 const struct fwk_module module_n1sdp_pcie = {
-    .name = "N1SDP PCIe",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = N1SDP_PCIE_API_COUNT,
     .init = n1sdp_pcie_init,

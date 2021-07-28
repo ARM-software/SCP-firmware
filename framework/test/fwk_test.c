@@ -125,15 +125,11 @@ int main(void)
     unsigned int successful_tests;
 
     for (enum fwk_module_idx i = 0; i < FWK_MODULE_IDX_COUNT; i++) {
-        char *name = malloc(64);
-
-        snprintf(name, 64, "fake%d", i);
 
         struct fwk_module *module = malloc(sizeof(*module));
         struct fwk_module_config *config = malloc(sizeof(*config));
 
         *module = (struct fwk_module){
-            .name = name,
             .type = FWK_MODULE_TYPE_SERVICE,
             .init = fake_init,
         };

@@ -187,7 +187,6 @@ static int juno_soc_clock_init(fwk_id_t module_id, unsigned int clock_count,
 }
 
 const struct fwk_module module_juno_soc_clock = {
-    .name = "Juno SoC Clock Driver",
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = juno_soc_clock_init,
 };

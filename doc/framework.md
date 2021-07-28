@@ -154,7 +154,6 @@ generate any events nor any notifications.
 
 ```
 const struct fwk_module mod_modulename = {
-    .name = "Example Module",
     .type = FWK_MODULE_TYPE_SERVICE,
     .api_count = 1,
     .event_count = 0,

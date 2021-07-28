@@ -113,7 +113,6 @@ struct mod_rcar_pmic_device_ctx *__mod_rcar_pmic_get_valid_device_ctx(
 
 /* Module description */
 const struct fwk_module module_rcar_pmic = {
-    .name = "RCAR_PMIC",
     .type = FWK_MODULE_TYPE_HAL,
     .init = rcar_pmic_init,
     .element_init = rcar_pmic_element_init,

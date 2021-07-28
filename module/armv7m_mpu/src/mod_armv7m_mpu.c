@@ -35,7 +35,6 @@ static int armv7m_mpu_init(
 
 /* Module description */
 const struct fwk_module module_armv7m_mpu = {
-    .name = "ARMV7M_MPU",
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = armv7m_mpu_init,
 };

@@ -230,7 +230,6 @@ static int system_power_process_bind_request(
 }
 
 const struct fwk_module module_rcar_system_power = {
-    .name = "SYSTEM_POWER",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_SYSTEM_POWER_API_COUNT,
     .init = system_power_mod_init,

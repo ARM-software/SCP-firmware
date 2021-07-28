@@ -264,7 +264,6 @@ static int juno_ddr_phy400_process_bind_request(fwk_id_t requester_id,
 }
 
 const struct fwk_module module_juno_ddr_phy400 = {
-    .name = "JUNO DDR-PHY400",
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = juno_ddr_phy400_init,
     .element_init = juno_ddr_phy400_element_init,

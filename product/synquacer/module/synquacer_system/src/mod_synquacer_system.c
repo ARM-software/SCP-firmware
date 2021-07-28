@@ -152,7 +152,6 @@ int synquacer_process_event(
 }
 
 const struct fwk_module module_synquacer_system = {
-    .name = "SYNQUACER_SYSTEM",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = 1,
     .event_count = 1,

@@ -337,7 +337,6 @@ static int morello_pll_process_bind_request(
 }
 
 const struct fwk_module module_morello_pll = {
-    .name = "MORELLO PLL Driver",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_MORELLO_PLL_API_COUNT,
     .event_count = 0,

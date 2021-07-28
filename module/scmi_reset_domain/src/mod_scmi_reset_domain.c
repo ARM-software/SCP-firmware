@@ -276,8 +276,10 @@ static int reset_attributes_handler(fwk_id_t service_id,
 
     outmsg.latency = reset_dev_config->latency;
 
-    strncpy((char *)outmsg.name, fwk_module_get_name(reset_device->element_id),
-            sizeof(outmsg.name) - 1);
+    strncpy(
+        (char *)outmsg.name,
+        fwk_module_get_element_name(reset_device->element_id),
+        sizeof(outmsg.name) - 1);
 
     outmsg.status = SCMI_SUCCESS;
     outmsg_size = sizeof(outmsg);
@@ -731,7 +733,6 @@ static int scmi_reset_start(fwk_id_t id)
 
 /* SCMI Reset Domain Management Protocol Definition */
 const struct fwk_module module_scmi_reset_domain = {
-    .name = "SCMI Reset Domain Management Protocol",
     .api_count = MOD_SCMI_RESET_DOMAIN_API_COUNT,
     .type = FWK_MODULE_TYPE_PROTOCOL,
     .init = scmi_reset_init,

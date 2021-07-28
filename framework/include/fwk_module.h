@@ -72,9 +72,6 @@ enum fwk_module_state {
  * \brief Module descriptor.
  */
 struct fwk_module {
-    /*! Module name */
-    const char *name;
-
     /*! Module type */
     enum fwk_module_type type;
 
@@ -526,14 +523,14 @@ int fwk_module_get_element_count(fwk_id_t module_id);
 int fwk_module_get_sub_element_count(fwk_id_t element_id);
 
 /*!
- * \brief Get the name of a module or element.
+ * \brief Get the name of a element.
  *
- * \param id Identifier of the module or element.
+ * \param id Identifier of the  element.
  *
- * \return The pointer to the module or element name, NULL if the identifier is
+ * \return The pointer to the element name, NULL if the identifier is
  *      not valid.
  */
-const char *fwk_module_get_name(fwk_id_t id);
+const char *fwk_module_get_element_name(fwk_id_t id);
 
 /*!
  * \brief Get the configuration data of a module or element.

@@ -552,7 +552,6 @@ static int system_power_start(fwk_id_t id)
 }
 
 const struct fwk_module module_system_power = {
-    .name = "SYSTEM_POWER",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = (unsigned int)MOD_SYSTEM_POWER_API_COUNT,
     .init = system_power_mod_init,

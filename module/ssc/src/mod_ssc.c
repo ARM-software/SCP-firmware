@@ -89,7 +89,6 @@ static int ssc_process_bind_request(fwk_id_t requester_id, fwk_id_t targer_id,
 }
 
 const struct fwk_module module_ssc = {
-    .name = "Serial Security Control",
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = ssc_init,
     .process_bind_request = ssc_process_bind_request,

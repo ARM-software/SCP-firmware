@@ -53,7 +53,6 @@ static int sgm776_system_process_bind_request(fwk_id_t source_id,
 }
 
 const struct fwk_module module_sgm776_system = {
-    .name = "sgm776_SYSTEM",
     .api_count = MOD_SGM776_SYSTEM_API_COUNT,
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = sgm776_system_init,

@@ -326,7 +326,6 @@ static int ppu_v0_process_bind_request(fwk_id_t source_id,
 }
 
 const struct fwk_module module_ppu_v0 = {
-    .name = "PPU_V0",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = 1,
     .init = ppu_v0_mod_init,

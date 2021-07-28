@@ -185,7 +185,6 @@ static int juno_reset_domain_start(fwk_id_t id)
 }
 
 struct fwk_module module_juno_reset_domain = {
-    .name = "JUNO RESET DOMAIN",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_JUNO_RESET_DOMAIN_API_IDX_COUNT,
     .init = juno_reset_domain_init,

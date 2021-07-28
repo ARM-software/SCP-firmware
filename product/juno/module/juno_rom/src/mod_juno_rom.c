@@ -412,7 +412,6 @@ static int juno_rom_process_notification(
 }
 
 const struct fwk_module module_juno_rom = {
-    .name = "Juno ROM",
     .type = FWK_MODULE_TYPE_SERVICE,
     .event_count = (unsigned int)MOD_JUNO_ROM_EVENT_COUNT,
     .notification_count = (unsigned int)MOD_JUNO_ROM_NOTIFICATION_COUNT,

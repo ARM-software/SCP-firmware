@@ -736,7 +736,6 @@ static int pik_clock_process_bind_request(
 }
 
 const struct fwk_module module_synquacer_pik_clock = {
-    .name = "SynQuacer PIK Clock Driver",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_PIK_CLOCK_API_COUNT,
     .event_count = 0,

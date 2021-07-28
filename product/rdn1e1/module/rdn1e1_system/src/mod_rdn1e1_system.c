@@ -419,7 +419,6 @@ int rdn1e1_system_process_notification(const struct fwk_event *event,
 }
 
 const struct fwk_module module_rdn1e1_system = {
-    .name = "RDN1E1_SYSTEM",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_RDN1E1_SYSTEM_API_COUNT,
     .init = rdn1e1_system_mod_init,

@@ -360,7 +360,6 @@ int sgi575_system_process_notification(const struct fwk_event *event,
 }
 
 const struct fwk_module module_sgi575_system = {
-    .name = "SGI575_SYSTEM",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_SGI575_SYSTEM_API_COUNT,
     .init = sgi575_system_mod_init,

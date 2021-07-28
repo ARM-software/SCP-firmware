@@ -253,7 +253,6 @@ static int n1sdp_timer_sync_process_bind_request(fwk_id_t source_id,
 }
 
 const struct fwk_module module_n1sdp_timer_sync = {
-    .name = "N1SDP Timer Sync",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = N1SDP_TIMER_SYNC_API_COUNT,
     .init = n1sdp_timer_sync_init,

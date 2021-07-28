@@ -32,7 +32,6 @@ static int mod_mcp_platform_start(fwk_id_t id)
 }
 
 const struct fwk_module module_mcp_platform = {
-    .name = "mcp_platform",
     .type = FWK_MODULE_TYPE_SERVICE,
     .init = mod_mcp_platform_init,
     .start = mod_mcp_platform_start,

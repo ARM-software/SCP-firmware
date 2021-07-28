@@ -466,7 +466,6 @@ static int scmi_ccix_config_process_bind_request(fwk_id_t source_id,
 }
 
 const struct fwk_module module_scmi_ccix_config = {
-    .name = "SCMI CCIX Config Management Protocol",
     .api_count = 1,
     .type = FWK_MODULE_TYPE_PROTOCOL,
     .init = scmi_ccix_config_init,

@@ -413,7 +413,6 @@ static int mod_mock_psu_process_bind_request(
 }
 
 const struct fwk_module module_mock_psu = {
-    .name = "mock_psu",
     .type = FWK_MODULE_TYPE_DRIVER,
 
     .init = mod_mock_psu_init,

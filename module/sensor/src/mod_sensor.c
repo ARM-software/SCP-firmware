@@ -430,7 +430,6 @@ static int sensor_process_event(const struct fwk_event *event,
 }
 
 const struct fwk_module module_sensor = {
-    .name = "SENSOR",
     .api_count = (unsigned int)MOD_SENSOR_API_IDX_COUNT,
     .event_count = (unsigned int)SENSOR_EVENT_IDX_COUNT,
     .type = FWK_MODULE_TYPE_HAL,

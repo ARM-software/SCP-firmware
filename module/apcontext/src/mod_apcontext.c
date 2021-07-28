@@ -103,7 +103,6 @@ static int apcontext_process_notification(const struct fwk_event *event,
 }
 
 const struct fwk_module module_apcontext = {
-    .name = "APContext",
     .type = FWK_MODULE_TYPE_SERVICE,
     .init = apcontext_init,
     .start = apcontext_start,

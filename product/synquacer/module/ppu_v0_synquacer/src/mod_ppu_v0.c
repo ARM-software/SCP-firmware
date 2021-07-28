@@ -375,7 +375,6 @@ static int ppu_v0_process_bind_request(
 }
 
 const struct fwk_module module_ppu_v0_synquacer = {
-    .name = "PPU_V0_SYNQUACER",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = 1,
     .init = ppu_v0_mod_init,

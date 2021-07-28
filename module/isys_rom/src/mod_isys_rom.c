@@ -79,7 +79,6 @@ static int mod_isys_rom_process_event(
 }
 
 const struct fwk_module module_isys_rom = {
-    .name = "isys-rom",
     .type = FWK_MODULE_TYPE_SERVICE,
 
     .init = mod_isys_init,

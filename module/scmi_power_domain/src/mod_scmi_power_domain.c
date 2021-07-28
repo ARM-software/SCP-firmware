@@ -394,8 +394,10 @@ static int scmi_pd_power_domain_attributes_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    strncpy((char *)return_values.name, fwk_module_get_name(pd_id),
-            sizeof(return_values.name) - 1);
+    strncpy(
+        (char *)return_values.name,
+        fwk_module_get_element_name(pd_id),
+        sizeof(return_values.name) - 1);
 
     return_values.status = (int32_t)SCMI_SUCCESS;
 
@@ -1381,7 +1383,6 @@ static int scmi_pd_start(fwk_id_t id)
 
 /* SCMI Power Domain Management Protocol Definition */
 const struct fwk_module module_scmi_power_domain = {
-    .name = "SCMI Power Domain Management Protocol",
     .api_count = 1,
     .type = FWK_MODULE_TYPE_PROTOCOL,
     .init = scmi_pd_init,

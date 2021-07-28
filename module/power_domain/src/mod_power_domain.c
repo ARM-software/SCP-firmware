@@ -502,7 +502,7 @@ static bool is_valid_composite_state(struct pd_ctx *target_pd,
 error:
     FWK_LOG_ERR(
         "[PD] Invalid composite state for %s: 0x%" PRIX32,
-        fwk_module_get_name(target_pd->id),
+        fwk_module_get_element_name(target_pd->id),
         composite_state);
     return false;
 }
@@ -699,7 +699,7 @@ static int initiate_power_state_transition(struct pd_ctx *pd)
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
         FWK_LOG_TRACE(
             "[PD] Transition of %s to state <%s> denied by driver",
-            fwk_module_get_name(pd->id),
+            fwk_module_get_element_name(pd->id),
             get_state_name(pd, state));
 #endif
         return FWK_E_DEVICE;
@@ -711,7 +711,7 @@ static int initiate_power_state_transition(struct pd_ctx *pd)
     if (status == FWK_SUCCESS) {
         FWK_LOG_TRACE(
             "[PD] Transition of %s from <%s> to <%s> succeeded",
-            fwk_module_get_name(pd->id),
+            fwk_module_get_element_name(pd->id),
             get_state_name(pd, pd->state_requested_to_driver),
             get_state_name(pd, state));
     }
@@ -721,7 +721,7 @@ static int initiate_power_state_transition(struct pd_ctx *pd)
     if (status != FWK_SUCCESS) {
         FWK_LOG_ERR(
             "[PD] Transition of %s from <%s> to <%s> failed: %s",
-            fwk_module_get_name(pd->id),
+            fwk_module_get_element_name(pd->id),
             get_state_name(pd, pd->state_requested_to_driver),
             get_state_name(pd, state),
             fwk_status_str(status));
@@ -1306,7 +1306,8 @@ void perform_shutdown(
         api = pd->driver_api;
 
         (void)pd_id;
-        FWK_LOG_INFO("[PD] Shutting down %s", fwk_module_get_name(pd_id));
+        FWK_LOG_INFO(
+            "[PD] Shutting down %s", fwk_module_get_element_name(pd_id));
 
         if (api->shutdown != NULL) {
             status = pd->driver_api->shutdown(pd->driver_id, system_shutdown);
@@ -1329,11 +1330,12 @@ void perform_shutdown(
         if (status != FWK_SUCCESS) {
             FWK_LOG_ERR(
                 "[PD] Shutdown of %s returned %s (%d)",
-                fwk_module_get_name(pd_id),
+                fwk_module_get_element_name(pd_id),
                 fwk_status_str(status),
                 status);
         } else {
-            FWK_LOG_INFO("[PD] %s shutdown", fwk_module_get_name(pd_id));
+            FWK_LOG_INFO(
+                "[PD] %s shutdown", fwk_module_get_element_name(pd_id));
         }
 
         pd->requested_state = pd->state_requested_to_driver =
@@ -2188,7 +2190,6 @@ static int pd_process_notification(const struct fwk_event *event,
 
 /* Module definition */
 const struct fwk_module module_power_domain = {
-    .name = "POWER DOMAIN",
     .type = FWK_MODULE_TYPE_HAL,
     .api_count = (unsigned int)MOD_PD_API_IDX_COUNT,
     .event_count = (unsigned int)PD_EVENT_COUNT,

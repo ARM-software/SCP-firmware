@@ -696,7 +696,6 @@ static int sds_process_notification(
 
 /* Module descriptor */
 const struct fwk_module module_sds = {
-    .name = "Shared Data Storage",
     .type = FWK_MODULE_TYPE_SERVICE,
     .api_count = 1,
     .event_count = 0,

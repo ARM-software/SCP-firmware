@@ -74,7 +74,6 @@ struct mod_rcar_mock_pmic_device_ctx *__mod_rcar_mock_pmic_get_valid_device_ctx(
 
 /* Module description */
 const struct fwk_module module_rcar_mock_pmic_bd9571 = {
-    .name = "MOCK_PSU",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_RCAR_MOCK_PMIC_API_COUNT,
     .init = mock_psu_init,

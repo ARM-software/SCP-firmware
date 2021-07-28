@@ -117,7 +117,6 @@ static int ddr_phy500_process_bind_request(fwk_id_t requester_id, fwk_id_t id,
 }
 
 const struct fwk_module module_ddr_phy500 = {
-    .name = "DDR-PHY500",
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = ddr_phy500_init,
     .element_init = ddr_phy500_element_init,

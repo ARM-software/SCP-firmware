@@ -1120,7 +1120,6 @@ static int juno_cdcel937_process_event(const struct fwk_event *event,
 }
 
 const struct fwk_module module_juno_cdcel937 = {
-    .name = "JUNO CDCEL937",
     .api_count = (unsigned int)MOD_JUNO_CDCEL937_API_COUNT,
     .event_count = (unsigned int)JUNO_CDCEL937_EVENT_IDX_COUNT,
     .type = FWK_MODULE_TYPE_DRIVER,

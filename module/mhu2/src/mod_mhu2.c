@@ -271,7 +271,6 @@ static int mhu2_start(fwk_id_t id)
 
 /* MHU v2 module definition */
 const struct fwk_module module_mhu2 = {
-    .name = "MHU2",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_MHU2_API_IDX_COUNT,
     .init = mhu2_init,

@@ -174,7 +174,6 @@ static int rd_process_bind_request(fwk_id_t source_id,
 }
 
 const struct fwk_module module_reset_domain = {
-    .name = "Reset domain",
     .type = FWK_MODULE_TYPE_HAL,
     .api_count = MOD_RESET_DOMAIN_API_COUNT,
     .notification_count = MOD_RESET_DOMAIN_NOTIFICATION_IDX_COUNT,

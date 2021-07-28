@@ -431,7 +431,6 @@ static int scmi_apcore_process_bind_request(fwk_id_t source_id,
 
 /* SCMI Clock Management Protocol Definition */
 const struct fwk_module module_scmi_apcore = {
-    .name = "SCMI Core Configuration Protocol",
     .api_count = 1,
     .type = FWK_MODULE_TYPE_PROTOCOL,
     .init = scmi_apcore_init,

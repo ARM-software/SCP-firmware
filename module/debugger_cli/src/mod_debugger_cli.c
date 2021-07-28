@@ -111,7 +111,6 @@ static int debugger_cli_process_event(const struct fwk_event *event,
 }
 
 const struct fwk_module module_debugger_cli = {
-    .name = "DEBUGGER_CLI",
     .type = FWK_MODULE_TYPE_SERVICE,
     .event_count = DEBUGGER_CLI_INTERNAL_EVENT_IDX_COUNT,
     .api_count = 0,

@@ -55,7 +55,6 @@ static int hsspi_start(fwk_id_t id)
 }
 
 const struct fwk_module module_hsspi = {
-    .name = "hsspi",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = 1,
     .init = hsspi_controller_init,

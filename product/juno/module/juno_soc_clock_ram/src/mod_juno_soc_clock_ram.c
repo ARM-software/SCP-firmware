@@ -679,7 +679,6 @@ static int juno_soc_clock_process_notification(const struct fwk_event *event,
 }
 
 const struct fwk_module module_juno_soc_clock_ram = {
-    .name = "Juno SoC Clock Driver",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = 1,
     .init = juno_soc_clock_init,

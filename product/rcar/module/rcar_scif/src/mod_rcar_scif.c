@@ -289,7 +289,6 @@ static int scif_process_bind_request(fwk_id_t requester_id, fwk_id_t target_id,
 }
 
 const struct fwk_module module_rcar_scif = {
-    .name = "RCAR SCIF",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_RCAR_SCIF_API_COUNT,
     .init = mod_rcar_scif_init,

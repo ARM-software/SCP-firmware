@@ -84,7 +84,6 @@ static int sgm775_ddr_phy500_process_bind_request(fwk_id_t requester_id,
 }
 
 const struct fwk_module module_sgm775_ddr_phy500 = {
-    .name = "SGM775-DDR-PHY500",
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = sgm775_ddr_phy500_init,
     .element_init = sgm775_ddr_phy500_element_init,

@@ -664,7 +664,6 @@ static int morello_system_process_notification(
 }
 
 const struct fwk_module module_morello_system = {
-    .name = "MORELLO_SYSTEM",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_MORELLO_SYSTEM_API_COUNT,
     .init = morello_system_mod_init,

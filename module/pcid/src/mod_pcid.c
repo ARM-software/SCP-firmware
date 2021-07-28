@@ -33,7 +33,6 @@ static int pcid_init(fwk_id_t module_id,
 
 const struct fwk_module_config config_pcid = { 0 };
 const struct fwk_module module_pcid = {
-    .name = "PCID",
     .type = FWK_MODULE_TYPE_SERVICE,
     .init = pcid_init,
 };

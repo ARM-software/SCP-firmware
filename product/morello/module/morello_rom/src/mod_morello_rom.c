@@ -178,7 +178,6 @@ static int morello_rom_process_event(
 
 /* Module descriptor */
 const struct fwk_module module_morello_rom = {
-    .name = "MORELLO SCP ROM",
     .type = FWK_MODULE_TYPE_SERVICE,
     .event_count = ROM_EVENT_COUNT,
     .init = morello_rom_init,

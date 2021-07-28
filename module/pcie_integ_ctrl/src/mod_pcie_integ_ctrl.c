@@ -207,7 +207,6 @@ static int pcie_integ_ctrl_process_notification(
 }
 
 const struct fwk_module module_pcie_integ_ctrl = {
-    .name = "PCIe Integration Control",
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = pcie_integ_ctrl_init,
     .element_init = pcie_integ_ctrl_element_init,

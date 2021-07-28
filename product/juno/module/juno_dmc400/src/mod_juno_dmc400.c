@@ -1093,7 +1093,6 @@ static int juno_dmc400_process_event(const struct fwk_event *event,
 }
 
 struct fwk_module module_juno_dmc400 = {
-    .name = "JUNO DMC-400",
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = 0,
     .event_count = (unsigned int)JUNO_DMC400_EVENT_IDX_COUNT,

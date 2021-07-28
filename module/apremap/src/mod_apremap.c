@@ -476,7 +476,6 @@ static int apremap_process_bind_request(
  * multi-core or multi-threaded MSCP platform.
  */
 const struct fwk_module module_apremap = {
-    .name = "AP Remap",
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = apremap_init,
     .process_bind_request = apremap_process_bind_request,

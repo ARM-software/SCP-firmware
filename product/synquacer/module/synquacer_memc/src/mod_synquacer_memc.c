@@ -73,7 +73,6 @@ static int synquacer_memc_config(void)
 }
 
 const struct fwk_module module_synquacer_memc = {
-    .name = "synquacer_memc",
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = mod_synquacer_memc_init,
     .element_init = mod_synquacer_memc_element_init,
