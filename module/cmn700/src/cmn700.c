@@ -104,10 +104,18 @@ bool is_child_external(void *node_base, unsigned int child_index)
     return !!(node->CHILD_POINTER[child_index] & (1U << 31));
 }
 
-unsigned int get_port_number(unsigned int child_node_id)
+unsigned int get_port_number(
+    unsigned int child_node_id,
+    unsigned int xp_port_cnt)
 {
-    return (child_node_id >> CMN700_NODE_ID_PORT_POS) &
-        CMN700_NODE_ID_PORT_MASK;
+    if (xp_port_cnt == 2) {
+        return (child_node_id >> CMN700_NODE_ID_PORT_POS) &
+            CMN700_NODE_ID_PORT_MASK;
+    } else {
+        /* For port counts 3 and 4 */
+        return (child_node_id >> CMN700_MULTI_PORTS_NODE_ID_PORT_POS) &
+            CMN700_MULTI_PORTS_NODE_ID_PORT_MASK;
+    }
 }
 
 unsigned int get_device_type(void *mxp_base, int port)
