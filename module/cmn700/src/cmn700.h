@@ -283,6 +283,10 @@ struct cmn700_mxp_reg {
 #define CMN700_NODE_ID_PORT_MASK 0x1
 #define CMN700_NODE_ID_Y_POS     3
 
+/* For XP with 3 or 4 ports */
+#define CMN700_MULTI_PORTS_NODE_ID_PORT_POS  1
+#define CMN700_MULTI_PORTS_NODE_ID_PORT_MASK 0x3
+
 #define CMN700_MXP_NODE_INFO_NUM_DEVICE_PORT_MASK UINT64_C(0xF000000000000)
 #define CMN700_MXP_NODE_INFO_NUM_DEVICE_PORT_POS  48
 
@@ -397,10 +401,13 @@ bool is_child_external(void *node_base, unsigned int child_index);
  * Returns the port number from the child node id.
  *
  * \param child_node_id Child node id calculated from the child pointer.
+ * \param xp_port_cnt Number of ports in the XP.
  *
  * \retval port number
  */
-unsigned int get_port_number(unsigned int child_node_id);
+unsigned int get_port_number(
+    unsigned int child_node_id,
+    unsigned int xp_port_cnt);
 
 /*
  * Returns the device type from the MXP's port connect info register.

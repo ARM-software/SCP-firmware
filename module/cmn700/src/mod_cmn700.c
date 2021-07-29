@@ -259,7 +259,9 @@ static int cmn700_discovery(void)
             node = get_child_node(config->base, xp, node_idx);
 
             if (is_child_external(xp, node_idx)) { /* External nodes */
-                xp_port = get_port_number(get_child_node_id(xp, node_idx));
+                xp_port = get_port_number(
+                    get_child_node_id(xp, node_idx),
+                    get_node_device_port_count(xp));
 
                 /*
                  * If the device type is CXRH, CXHA, or CXRA, then the external
@@ -307,7 +309,8 @@ static int cmn700_discovery(void)
                      * Crosspoint (XP) is one of the RNF types and determine the
                      * RN-F count (if CAL connected RN-F, double the count).
                      */
-                    xp_port = get_port_number(get_node_id(node));
+                    xp_port = get_port_number(
+                        get_node_id(node), get_node_device_port_count(xp));
 
                     if (is_device_type_rnf(xp, xp_port)) {
                         if (is_cal_connected(xp, xp_port)) {
@@ -441,7 +444,9 @@ static void cmn700_configure(void)
             node = get_child_node(config->base, xp, node_idx);
             if (is_child_external(xp, node_idx)) {
                 node_id = get_child_node_id(xp, node_idx);
-                xp_port = get_port_number(get_child_node_id(xp, node_idx));
+                xp_port = get_port_number(
+                    get_child_node_id(xp, node_idx),
+                    get_node_device_port_count(xp));
 
                 if (!(get_device_type(xp, xp_port) == DEVICE_TYPE_CXRH) &&
                     !(get_device_type(xp, xp_port) == DEVICE_TYPE_CXHA) &&
