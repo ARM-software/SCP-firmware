@@ -30,12 +30,6 @@ static const struct mod_sds_region_desc sds_module_regions[] = {
         .base = (void*)SCP_SDS_SECURE_BASE,
         .size = SCP_SDS_SECURE_SIZE,
     },
-#ifdef BUILD_MODE_DEBUG
-    [PLATFORM_SDS_REGION_NONSECURE] = {
-        .base = (void *)SCP_SDS_NONSECURE_BASE,
-        .size = SCP_SDS_NONSECURE_SIZE,
-    },
-#endif
 };
 
 static_assert(
@@ -51,7 +45,7 @@ const struct mod_sds_config sds_module_config = {
 };
 
 static struct fwk_element sds_element_table[] = {
-    {
+    [PLATFORM_SDS_CPU_INFO_IDX] = {
         .name = "CPU Info",
         .data = &((struct mod_sds_structure_desc){
             .id = PLATFORM_SDS_CPU_INFO,
@@ -60,17 +54,27 @@ static struct fwk_element sds_element_table[] = {
             .finalize = true,
         }),
     },
-    {
-        .name = "Firmware version",
+    [PLATFORM_SDS_ROM_VERSION_IDX] = {
+        .name = "ROM firmware version",
         .data = &((struct mod_sds_structure_desc){
-            .id = PLATFORM_SDS_FIRMWARE_VERSION,
-            .size = PLATFORM_SDS_FIRMWARE_VERSION_SIZE,
+            .id = PLATFORM_SDS_ROM_VERSION,
+            .size = PLATFORM_SDS_ROM_VERSION_SIZE,
             .payload = &version_packed,
             .region_id = PLATFORM_SDS_REGION_SECURE,
             .finalize = true,
         }),
     },
-    {
+    [PLATFORM_SDS_RAM_VERSION_IDX] = {
+        .name = "RAM firmware version",
+        .data = &((struct mod_sds_structure_desc){
+            .id = PLATFORM_SDS_RAM_VERSION,
+            .size = PLATFORM_SDS_RAM_VERSION_SIZE,
+            .payload = &version_packed,
+            .region_id = PLATFORM_SDS_REGION_SECURE,
+            .finalize = true,
+        }),
+    },
+    [PLATFORM_SDS_RESET_SYNDROME_IDX] = {
         .name = "Reset Syndrome",
         .data = &((struct mod_sds_structure_desc){
             .id = PLATFORM_SDS_RESET_SYNDROME,
@@ -80,7 +84,7 @@ static struct fwk_element sds_element_table[] = {
             .finalize = true,
         }),
     },
-    {
+    [PLATFORM_SDS_FEATURE_AVAILABILITY_IDX] = {
         .name = "Feature Availability",
         .data = &((struct mod_sds_structure_desc){
             .id = PLATFORM_SDS_FEATURE_AVAILABILITY,
@@ -90,42 +94,15 @@ static struct fwk_element sds_element_table[] = {
             .finalize = true,
         }),
     },
-#ifdef BUILD_MODE_DEBUG
-    {
-        .name = "Boot Counters",
-        .data = &((struct mod_sds_structure_desc){
-            .id = PLATFORM_SDS_CPU_BOOTCTR,
-            .size = PLATFORM_SDS_CPU_BOOTCTR_SIZE,
-            .region_id = PLATFORM_SDS_REGION_NONSECURE,
-            .finalize = true,
-        }),
-    },
-    {
-        .name = "CPU Flags",
-        .data = &((struct mod_sds_structure_desc){
-            .id = PLATFORM_SDS_CPU_FLAGS,
-            .size = PLATFORM_SDS_CPU_FLAGS_SIZE,
-            .region_id = PLATFORM_SDS_REGION_NONSECURE,
-            .finalize = true,
-        }),
-    },
-#endif
-    { 0 }, /* Termination description. */
+    [PLATFORM_SDS_IDX_COUNT] = { 0 }, /* Termination description. */
 };
 
 static_assert(
     SCP_SDS_SECURE_SIZE > PLATFORM_SDS_CPU_INFO_SIZE +
-            PLATFORM_SDS_FIRMWARE_VERSION_SIZE +
+            PLATFORM_SDS_ROM_VERSION_SIZE + PLATFORM_SDS_RAM_VERSION_SIZE +
             PLATFORM_SDS_RESET_SYNDROME_SIZE +
             PLATFORM_SDS_FEATURE_AVAILABILITY_SIZE,
     "SDS structures too large for SDS S-RAM.\n");
-
-#ifdef BUILD_MODE_DEBUG
-static_assert(
-    SCP_SDS_NONSECURE_SIZE >
-        PLATFORM_SDS_CPU_BOOTCTR_SIZE + PLATFORM_SDS_CPU_FLAGS_SIZE,
-    "SDS structures too large for SDS NS-RAM.\n");
-#endif
 
 static const struct fwk_element *sds_get_element_table(fwk_id_t module_id)
 {
