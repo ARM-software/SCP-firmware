@@ -121,6 +121,8 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
         .base = UINT64_C(0x000000000000),
         .size = UINT64_C(4) * FWK_TIB,
         .type = MOD_CMN700_MEM_REGION_TYPE_SYSCACHE,
+        .hnf_pos_start = { 0, 0, 0 },
+        .hnf_pos_end = { MESH_SIZE_X - 1, MESH_SIZE_Y - 1, 1 },
     },
     {
         /*

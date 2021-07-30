@@ -50,6 +50,8 @@ static const struct mod_system_info *system_info;
 static unsigned int chip_id;
 static bool multi_chip_mode;
 
+static struct node_pos *hnf_node_pos;
+
 static inline size_t cmn700_hnf_cache_group_count(size_t hnf_count)
 {
     return (hnf_count + CMN700_HNF_CACHE_GROUP_ENTRIES_PER_GROUP - 1) /
@@ -58,10 +60,7 @@ static inline size_t cmn700_hnf_cache_group_count(size_t hnf_count)
 
 static void process_node_hnf(struct cmn700_hnf_reg *hnf)
 {
-    unsigned int bit_pos;
-    unsigned int group;
     unsigned int logical_id;
-    unsigned int node_id;
     unsigned int region_idx;
     unsigned int region_sub_count = 0;
     unsigned int hnf_count_per_cluster;
@@ -73,45 +72,11 @@ static void process_node_hnf(struct cmn700_hnf_reg *hnf)
     enum mod_cmn700_hnf_to_snf_mem_strip_mode sn_mode;
     uint64_t base;
     uint64_t sam_control;
-    static unsigned int cal_mode_factor = 1;
     const struct mod_cmn700_mem_region_map *region;
     const struct mod_cmn700_config *config = ctx->config;
     const struct mod_cmn700_hierarchical_hashing *hier_hash_cfg;
 
     logical_id = get_node_logical_id(hnf);
-    node_id = get_node_id(hnf);
-
-    /*
-     * If CAL mode is set, only even numbered hnf node should be added to the
-     * sys_cache_grp_hn_nodeid registers.
-     */
-    if (config->hnf_cal_mode == true && (node_id % 2 == 1)) {
-        /* Factor to manipulate the group and bit_pos */
-        cal_mode_factor = 2;
-    }
-
-    group = logical_id /
-        (CMN700_HNF_CACHE_GROUP_ENTRIES_PER_GROUP * cal_mode_factor);
-    bit_pos = (CMN700_HNF_CACHE_GROUP_ENTRY_BITS_WIDTH / cal_mode_factor) *
-        ((logical_id %
-          (CMN700_HNF_CACHE_GROUP_ENTRIES_PER_GROUP * cal_mode_factor)));
-
-    /*
-     * If CAL mode is set, add only even numbered hnd node to
-     * sys_cache_grp_hn_nodeid registers
-     */
-    if (config->hnf_cal_mode == true) {
-        if (node_id % 2 == 0) {
-            ctx->hnf_cache_group[group] += ((uint64_t)get_node_id(hnf))
-                << bit_pos;
-            ctx->sn_nodeid_group[group] +=
-                ((uint64_t)config->snf_table[logical_id]) << bit_pos;
-        }
-    } else {
-        ctx->hnf_cache_group[group] += ((uint64_t)get_node_id(hnf)) << bit_pos;
-        ctx->sn_nodeid_group[group] += ((uint64_t)config->snf_table[logical_id])
-            << bit_pos;
-    }
 
     hier_hash_cfg = &(config->hierarchical_hashing_config);
 
@@ -413,7 +378,7 @@ static int cmn700_discovery(void)
 
 static void cmn700_configure(void)
 {
-    unsigned int hnf_entry;
+    unsigned int logical_id;
     unsigned int node_count;
     unsigned int node_id;
     unsigned int node_idx;
@@ -428,7 +393,6 @@ static void cmn700_configure(void)
 
     fwk_assert(get_node_type(ctx->root) == NODE_TYPE_CFG);
 
-    hnf_entry = 0;
     irnsam_entry = 0;
     xrnsam_entry = 0;
 
@@ -442,11 +406,11 @@ static void cmn700_configure(void)
         node_count = get_node_child_count(xp);
         for (node_idx = 0; node_idx < node_count; node_idx++) {
             node = get_child_node(config->base, xp, node_idx);
+            xp_port = get_port_number(
+                get_child_node_id(xp, node_idx),
+                get_node_device_port_count(xp));
             if (is_child_external(xp, node_idx)) {
                 node_id = get_child_node_id(xp, node_idx);
-                xp_port = get_port_number(
-                    get_child_node_id(xp, node_idx),
-                    get_node_device_port_count(xp));
 
                 if (!(get_device_type(xp, xp_port) == DEVICE_TYPE_CXRH) &&
                     !(get_device_type(xp, xp_port) == DEVICE_TYPE_CXHA) &&
@@ -470,8 +434,15 @@ static void cmn700_configure(void)
 
                     irnsam_entry++;
                 } else if (node_type == NODE_TYPE_HN_F) {
-                    fwk_assert(hnf_entry < ctx->hnf_count);
-                    ctx->hnf_node[hnf_entry++] = (uintptr_t)(void *)node;
+                    logical_id = get_node_logical_id(node);
+                    fwk_assert(logical_id < ctx->hnf_count);
+
+                    ctx->hnf_node[logical_id] = (uintptr_t)(void *)node;
+
+                    hnf_node_pos[logical_id].pos_x = get_node_pos_x(node);
+                    hnf_node_pos[logical_id].pos_y = get_node_pos_y(node);
+                    hnf_node_pos[logical_id].port_num =
+                        get_port_number(node_id, xp_port);
 
                     process_node_hnf(node);
                 }
@@ -480,14 +451,52 @@ static void cmn700_configure(void)
     }
 }
 
+/* Helper function to check if hnf is inside the SCG/HTG square/rectangle */
+bool is_hnf_inside_rect(
+    struct node_pos hnf_node_pos,
+    const struct mod_cmn700_mem_region_map *region)
+{
+    struct node_pos region_hnf_pos_start;
+    struct node_pos region_hnf_pos_end;
+
+    region_hnf_pos_start = region->hnf_pos_start;
+    region_hnf_pos_end = region->hnf_pos_end;
+
+    if (((hnf_node_pos.pos_x >= region_hnf_pos_start.pos_x) &&
+         (hnf_node_pos.pos_y >= region_hnf_pos_start.pos_y) &&
+         (hnf_node_pos.pos_x <= region_hnf_pos_end.pos_x) &&
+         (hnf_node_pos.pos_y <= region_hnf_pos_end.pos_y) &&
+         (hnf_node_pos.port_num <= region_hnf_pos_end.port_num))) {
+        if (hnf_node_pos.pos_y == region_hnf_pos_start.pos_y) {
+            if (hnf_node_pos.port_num >= region_hnf_pos_start.port_num) {
+                return true;
+            } else {
+                return false;
+            }
+        } else if (hnf_node_pos.pos_y == region_hnf_pos_end.pos_y) {
+            if (hnf_node_pos.port_num <= region_hnf_pos_end.port_num) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
 static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
 {
     unsigned int bit_pos;
     unsigned int group;
     unsigned int group_count;
     unsigned int hnf_count;
+    unsigned int hnf_count_in_scg;
     unsigned int hnf_count_per_cluster;
     unsigned int hnf_cluster_count;
+    unsigned int hnf_nodeid;
+    unsigned int hn_nodeid_reg_bits_idx = 0;
+    unsigned int logical_id;
     unsigned int region_idx;
     unsigned int region_io_count = 0;
     unsigned int region_sys_count = 0;
@@ -568,6 +577,53 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
             scg_regions_enabled[region_sys_count] = 1;
 
             region_sys_count++;
+
+            hnf_count_in_scg = 0;
+            for (logical_id = 0; logical_id < ctx->hnf_count; logical_id++) {
+                hnf_nodeid = get_node_id((void *)ctx->hnf_node[logical_id]);
+
+                if ((config->hnf_cal_mode) && (hnf_nodeid % 2 == 1)) {
+                    /* No need include odd node ids if cal mode is set */
+                    continue;
+                }
+
+                group = hn_nodeid_reg_bits_idx /
+                    CMN700_HNF_CACHE_GROUP_ENTRIES_PER_GROUP;
+
+                bit_pos = CMN700_HNF_CACHE_GROUP_ENTRY_BITS_WIDTH *
+                    ((hn_nodeid_reg_bits_idx %
+                      (CMN700_HNF_CACHE_GROUP_ENTRIES_PER_GROUP)));
+
+                if (is_hnf_inside_rect(hnf_node_pos[logical_id], region)) {
+                    if (config->hnf_cal_mode) {
+                        /*
+                         * If CAL mode is set, add only even numbered hnd node
+                         * to sys_cache_grp_hn_nodeid registers.
+                         */
+                        if (hnf_nodeid % 2 == 0) {
+                            rnsam->SYS_CACHE_GRP_HN_NODEID[group] +=
+                                (uint64_t)hnf_nodeid << bit_pos;
+                            ctx->sn_nodeid_group[group] +=
+                                ((uint64_t)config->snf_table[logical_id])
+                                << bit_pos;
+                            hnf_count_in_scg++;
+                            hn_nodeid_reg_bits_idx++;
+                        }
+                    } else {
+                        rnsam->SYS_CACHE_GRP_HN_NODEID[group] +=
+                            (uint64_t)hnf_nodeid << bit_pos;
+                        ctx->sn_nodeid_group[group] +=
+                            ((uint64_t)config->snf_table[logical_id])
+                            << bit_pos;
+                        hnf_count_in_scg++;
+                        hn_nodeid_reg_bits_idx++;
+                    }
+                }
+            }
+
+            rnsam->SYS_CACHE_GRP_HN_COUNT |= ((uint64_t)hnf_count_in_scg)
+                << CMN700_RNSAM_SYS_CACHE_GRP_HN_CNT_POS(region_sys_count - 1);
+
             break;
 
         case MOD_CMN700_REGION_TYPE_SYSCACHE_SUB:
@@ -595,16 +651,6 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
         hnf_count = ctx->hnf_count / 2;
     else
         hnf_count = ctx->hnf_count;
-
-    group_count = cmn700_hnf_cache_group_count(hnf_count);
-    for (group = 0; group < group_count; group++)
-        rnsam->SYS_CACHE_GRP_HN_NODEID[group] = ctx->hnf_cache_group[group];
-
-    /* Program the number of HNFs */
-    for (region_idx = 0; region_idx < region_sys_count; region_idx++) {
-        rnsam->SYS_CACHE_GRP_HN_COUNT |= (hnf_count / region_sys_count)
-            << CMN700_RNSAM_SYS_CACHE_GRP_HN_CNT_POS(region_idx);
-    }
 
     /*
      * If CAL mode is enabled by the configuration program the SCG CAL Mode
@@ -711,6 +757,7 @@ static int cmn700_setup(void)
              */
             ctx->hnf_node =
                 fwk_mm_calloc(ctx->hnf_count, sizeof(*ctx->hnf_node));
+            hnf_node_pos = fwk_mm_calloc(ctx->hnf_count, sizeof(*hnf_node_pos));
             if (ctx->hnf_node == NULL)
                 return FWK_E_NOMEM;
             ctx->hnf_cache_group = fwk_mm_calloc(

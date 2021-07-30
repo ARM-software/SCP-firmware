@@ -49,6 +49,20 @@ enum mod_cmn700_mem_region_type {
 };
 
 /*!
+ * \brief Coordinate (x, y, port no) of a node in the mesh
+ */
+struct node_pos {
+    /*! x position of the node in the mesh */
+    unsigned int pos_x;
+
+    /*! y position of the node in the mesh */
+    unsigned int pos_y;
+
+    /*! port position of the node in the xp */
+    unsigned int port_num;
+};
+
+/*!
  * \brief Memory region map descriptor
  */
 struct mod_cmn700_mem_region_map {
@@ -70,6 +84,63 @@ struct mod_cmn700_mem_region_map {
      * system
      */
     unsigned int node_id;
+
+    /*!
+     * \brief HN-F start and end positions of a SCG/HTG
+     *
+     * \details Each SCG/HTG covers an address range and this address range can
+     * be made to target a group of HN-Fs. These group of HN-Fs are typically
+     * bound by an arbitrary rectangle/square in the mesh. To aid automatic
+     * programming of the HN-Fs in SCG/HTG along with the discovery process,
+     * each SCG/HTG takes hnf_pos_start and hnf_pos_end. HN-F nodes which are
+     * bounded by this range will be assigned to the respective SCG/HTG. This
+     * eliminates the process of manually looking at the mesh and assigning the
+     * HN-F node ids to a SCG/HTG.
+     *
+     *                                        hnf_pos_end
+     *                                             xx
+     *                                            xx
+     *                                           xx
+     *                    ┌─────────────────────xx
+     *                    │                     │
+     *                    │                     │
+     *                    │                     │
+     *                    │                     │
+     *                    │    nth- SCG/HTG     │
+     *                    │                     │
+     *                    │                     │
+     *                    │                     │
+     *                    │                     │
+     *                   xx─────────────────────┘
+     *                  xx
+     *                 xx
+     *                xx
+     *         hnf_pos_start
+     */
+
+    /*!
+     * \brief HN-F's bottom left node position
+     *
+     * \details \ref hnf_pos_start is the HN-F's bottom left node position in
+     * the rectangle covering the HN-Fs for a SCG/HTG
+     *
+     * \note To be used only with \ref
+     * mod_cmn700_mem_region_type.MOD_CMN700_MEM_REGION_TYPE_SYSCACHE memory
+     * regions.
+     */
+    struct node_pos hnf_pos_start;
+
+    /*!
+     * \brief HN-F's top right node position
+     *
+     * \details \ref hnf_pos_start is the HN-F's bottom left node position in
+     * the rectangle covering the HN-Fs for a SCG/HTG
+     *
+     * \note To be used only with \ref
+     * mod_cmn700_mem_region_type.MOD_CMN700_MEM_REGION_TYPE_SYSCACHE memory
+     * regions.
+     */
+    struct node_pos hnf_pos_end;
 };
 
 /*!
