@@ -79,6 +79,9 @@ static fwk_id_t sds_feature_availability_id = FWK_ID_ELEMENT_INIT(
     FWK_MODULE_IDX_SDS,
     PLATFORM_SDS_FEATURE_AVAILABILITY_IDX);
 
+static fwk_id_t sds_reset_syndrome_id =
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, PLATFORM_SDS_RESET_SYNDROME_IDX);
+
 /*
  *  SCMI Messaging stack
  */
@@ -96,6 +99,28 @@ static int messaging_stack_ready(void)
         sds_structure_desc->id,
         0,
         (void *)(&feature_flags),
+        sds_structure_desc->size);
+}
+
+/*
+ * The SCP PIK address space (0x5000.0000 to 0x5FFF.FFFF) should be read with
+ * 32-bit aligned addresses. SDS module performs reads at byte-aligned address.
+ * So this helper function is used to first read the Reset Syndrome value from
+ * the RESET_SYNDROME register and update the reset syndrome value using SDS
+ * write API.
+ */
+static int update_sds_reset_syndrome(void)
+{
+    uint32_t reset_syndrome;
+    const struct mod_sds_structure_desc *sds_structure_desc =
+        fwk_module_get_data(sds_reset_syndrome_id);
+
+    /* Write SDS Reset Syndrome value */
+    reset_syndrome = SCP_PIK_PTR->RESET_SYNDROME;
+    return platform_system_ctx.sds_api->struct_write(
+        sds_structure_desc->id,
+        0,
+        (void *)(&reset_syndrome),
         sds_structure_desc->size);
 }
 
@@ -381,6 +406,12 @@ int platform_system_process_notification(
 
         scmi_notification_count = 0;
         sds_notification_received = false;
+
+        status = update_sds_reset_syndrome();
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR("[PLATFORM SYSTEM] Failed to update reset syndrome");
+            return status;
+        }
     }
 
     return FWK_SUCCESS;
