@@ -75,8 +75,9 @@ static const uint32_t feature_flags =
     (PLATFORM_SDS_FEATURE_FIRMWARE_MASK | PLATFORM_SDS_FEATURE_DMC_MASK |
      PLATFORM_SDS_FEATURE_MESSAGING_MASK);
 
-static fwk_id_t sds_feature_availability_id =
-    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, 3);
+static fwk_id_t sds_feature_availability_id = FWK_ID_ELEMENT_INIT(
+    FWK_MODULE_IDX_SDS,
+    PLATFORM_SDS_FEATURE_AVAILABILITY_IDX);
 
 /*
  *  SCMI Messaging stack
