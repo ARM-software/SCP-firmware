@@ -79,7 +79,6 @@ static struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc){
             .id = PLATFORM_SDS_RESET_SYNDROME,
             .size = PLATFORM_SDS_RESET_SYNDROME_SIZE,
-            .payload = (void *)(&SCP_PIK_PTR->RESET_SYNDROME),
             .region_id = PLATFORM_SDS_REGION_SECURE,
             .finalize = true,
         }),
