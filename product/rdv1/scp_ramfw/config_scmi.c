@@ -52,7 +52,7 @@ const struct fwk_module_config config_scmi = {
     .data =
         &(struct mod_scmi_config){
             .protocol_count_max = 9,
-            .agent_count = FWK_ARRAY_SIZE(agent_table),
+            .agent_count = FWK_ARRAY_SIZE(agent_table) - 1,
             .agent_table = agent_table,
             .vendor_identifier = "arm",
             .sub_vendor_identifier = "arm",
