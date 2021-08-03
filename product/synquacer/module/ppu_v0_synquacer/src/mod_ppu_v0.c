@@ -135,15 +135,6 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
             break;
         }
 
-        /*
-         * As it is not guaranteed that the PACTIVE signals of the core are low
-         * as the core may not be in WFI for example, deactivate the check of
-         * the PACTIVE signals by the PPU logic and the handshake with the core
-         * P-channel before to ask for the core to be powered off.
-         */
-        pd_ctx->ppu->POWER_CFG &= ~PPU_PCR_DEV_ACTIVE_EN;
-        pd_ctx->ppu->POWER_CFG &= ~PPU_PCR_DEV_REQ_EN;
-
         ppu_v0_set_power_mode(pd_ctx->ppu, PPU_V0_MODE_OFF);
         status = pd_ctx->pd_driver_input_api->report_power_state_transition(
             pd_ctx->bound_id, MOD_PD_STATE_OFF);
@@ -190,6 +181,44 @@ static int pd_reset(fwk_id_t pd_id)
     return status;
 }
 
+static int pd_shutdown(fwk_id_t pd_id,
+                    enum mod_pd_system_shutdown system_shutdown)
+{
+    int status;
+    struct ppu_v0_pd_ctx *pd_ctx;
+
+    pd_ctx = ppu_v0_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
+
+    if (pd_ctx->config->pd_type == MOD_PD_TYPE_SYSTEM) {
+        FWK_LOG_INFO(
+            "[PPUV0] SYNQUACER SYSTEM module will shutdown the system");
+        return FWK_SUCCESS;
+    }
+
+
+    if (pd_ctx->config->pd_type == MOD_PD_TYPE_CORE) {
+        /*
+         * As it is not guaranteed that the PACTIVE signals of the core are low
+         * as the core may not be in WFI for example, deactivate the check of
+         * the PACTIVE signals by the PPU logic and the handshake with the core
+         * P-channel before to ask for the core to be powered off.
+         */
+        pd_ctx->ppu->POWER_CFG &= ~PPU_PCR_DEV_ACTIVE_EN;
+        pd_ctx->ppu->POWER_CFG &= ~PPU_PCR_DEV_REQ_EN;
+    }
+
+    status = ppu_v0_set_power_mode(pd_ctx->ppu, PPU_V0_MODE_WARM_RESET);
+
+    FWK_LOG_INFO(
+        "[PPUV0] shutdown reg=(0x%p) state=(0x%x)",
+        (void *)pd_ctx->ppu,
+        PPU_V0_MODE_WARM_RESET);
+
+    fwk_assert(status == FWK_SUCCESS);
+
+    return status;
+}
+
 static int ppu_v0_prepare_core_for_system_suspend(fwk_id_t core_pd_id)
 {
     struct ppu_v0_pd_ctx *pd_ctx;
@@ -205,6 +234,7 @@ static const struct mod_pd_driver_api pd_driver = {
     .get_state = pd_get_state,
     .reset = pd_reset,
     .prepare_core_for_system_suspend = ppu_v0_prepare_core_for_system_suspend,
+    .shutdown = pd_shutdown,
 };
 
 /*
