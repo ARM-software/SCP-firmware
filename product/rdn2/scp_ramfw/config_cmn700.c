@@ -43,6 +43,8 @@
 #    define NODE_ID_HNP4 364
 #    define NODE_ID_SBSX 196
 
+#    define NODE_ID_NON_PCIE_IO_MACRO NODE_ID_HNP4
+
 #    define MESH_SIZE_X 6
 #    define MESH_SIZE_Y 6
 
@@ -55,6 +57,8 @@
 #    define NODE_ID_HNP0 2
 #    define NODE_ID_HNP1 3
 #    define NODE_ID_SBSX 66
+
+#    define NODE_ID_NON_PCIE_IO_MACRO NODE_ID_HNP1
 
 #    define MESH_SIZE_X 3
 #    define MESH_SIZE_Y 3
@@ -343,6 +347,16 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
         .size = UINT64_C(64) * FWK_MIB,
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HND,
+    },
+    {
+        /*
+         * Non-PCIe IO Macro
+         * Map: 0xC000_0000_0000 - 0xC000_3FFF_FFFF (1 GB)
+         */
+        .base = UINT64_C(0xC00000000000),
+        .size = UINT64_C(1) * FWK_GIB,
+        .type = MOD_CMN700_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_NON_PCIE_IO_MACRO,
     },
 };
 

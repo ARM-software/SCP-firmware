@@ -47,6 +47,12 @@
         }) \
     }
 
+#if (PLATFORM_VARIANT == 0) /* RD-N2 */
+#    define NON_PCIE_IO_MACRO_REG_BASE PCIE_INTEG_CTRL_REG_BASE(4)
+#elif (PLATFORM_VARIANT == 1) /* RD-N2-Cfg1 */
+#    define NON_PCIE_IO_MACRO_REG_BASE PCIE_INTEG_CTRL_REG_BASE(1)
+#endif
+
 static const struct fwk_element pcie_integ_ctrl_element_table[] = {
     IO_MACRO_ELEMENT_CONFIG(
         0,
@@ -77,6 +83,43 @@ static const struct fwk_element pcie_integ_ctrl_element_table[] = {
         AP_PCIE_MMIOL_SIZE_PER_RC,
         AP_PCIE_MMIOH_SIZE_PER_RC),
 #endif
+
+    {
+        .name = "Non-PCIe IO Macro",
+        .data = &((struct mod_pcie_integ_ctrl_config) {
+            .reg_base = NON_PCIE_IO_MACRO_REG_BASE,
+            /* PL011_UART0 (64 KB) and MEM0 (4 MB) */
+            .x4_0_ecam_mmio_mmap = {
+                .valid = true,
+                .allow_ns_access = true,
+                .mmioh_start_addr = 0xC00000000000,
+                .mmioh_end_addr = 0xC0000040FFFF,
+            },
+            /* PL330_DMA0_NS (64 KB) and PL330_DMA0_NS (64 KB) */
+            .x4_1_ecam_mmio_mmap = {
+                .valid = true,
+                .allow_ns_access = true,
+                .mmioh_start_addr = 0xC00010000000,
+                .mmioh_end_addr = 0xC0001001FFFF,
+            },
+            /* PL011_UART1 (64 KB) */
+            .x8_ecam_mmio_mmap = {
+                .valid = true,
+                .allow_ns_access = true,
+                .mmioh_start_addr = 0xC00020000000,
+                .mmioh_end_addr = 0xC0002000FFFF,
+            },
+            /* PL330_DMA0_NS (64 KB), PL330_DMA0_NS(64 KB) and MEM1 (4 MB) */
+            .x16_ecam_mmio_mmap = {
+                .valid = true,
+                .allow_ns_access = true,
+                .mmioh_start_addr = 0xC00030000000,
+                .mmioh_end_addr = 0xC0003041FFFF,
+            },
+            .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
+                CLOCK_IDX_INTERCONNECT),
+        }),
+    },
 
     { 0 }
 };
