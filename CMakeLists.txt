@@ -335,6 +335,11 @@ cmake_dependent_option(
     "${SCP_ENABLE_SCMI_NOTIFICATIONS_INIT}" "DEFINED SCP_ENABLE_SCMI_NOTIFICATIONS_INIT"
     "${SCP_ENABLE_SCMI_NOTIFICATIONS}")
 
+cmake_dependent_option(
+    SCP_ENABLE_SCMI_SENSOR_EVENTS "Enable the SCMI sensor events?"
+    "${SCP_ENABLE_SCMI_SENSOR_EVENTS_INIT}" "DEFINED SCP_ENABLE_SCMI_SENSOR_EVENTS_INIT"
+    "${SCP_ENABLE_SCMI_SENSOR_EVENTS}")
+
 # Include firmware specific build options
     include("${SCP_FIRMWARE_SOURCE_DIR}/Buildoptions.cmake" OPTIONAL)
 
