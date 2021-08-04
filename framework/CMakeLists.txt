@@ -60,7 +60,7 @@ endif()
 if(SCP_ENABLE_SCMI_NOTIFICATIONS)
     target_compile_definitions(framework PUBLIC "BUILD_HAS_SCMI_NOTIFICATIONS")
     if(SCP_ENABLE_SCMI_SENSOR_EVENTS)
-        target_compiler_definitions(framework PUBLIC "BUILD_HAS_SCMI_SENSOR_EVENTS")
+        target_compile_definitions(framework PUBLIC "BUILD_HAS_SCMI_SENSOR_EVENTS")
     endif()
 endif()
 

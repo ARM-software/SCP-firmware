@@ -115,6 +115,8 @@ few common options can be configured.
 It can be also used to provide some platform specific settings.
 e.g. For ARM Juno platform. See below
 
+- SCP_ENABLE_SCMI_SENSOR_EVENTS_INIT: Enable/disable SCMI sensor events.
+
 - SCP_ENABLE_FAST_CHANNELS_INIT: Enable/disable Juno Fast channels.
 
 - SCP_ENABLE_DEBUG_UNIT_INIT: Enable/disable Juno debug unit.
