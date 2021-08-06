@@ -87,6 +87,13 @@ options available.
 > $ make -f Makefile.cmake help
 > ```
 
+### Build and execute framework tests
+See below to build and execute framework tests
+
+> ```sh
+> $ make -f Makefile.cmake test
+> ```
+
 **LIMITATIONS**
 
 - CMake build of rdn2 platform is not working. It requires further
