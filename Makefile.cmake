@@ -23,6 +23,8 @@ export MD := mkdir -p
 export CP := cp -r
 export DOC := doxygen
 export CMAKE := cmake
+export CTEST := ctest
+export CD := cd
 
 #
 # Default options
@@ -99,7 +101,7 @@ endif
 #
 PRODUCTS := $(shell ls $(PRODUCTS_DIR) 2>/dev/null)
 
-PRODUCT_INDEPENDENT_GOALS := clean help
+PRODUCT_INDEPENDENT_GOALS := clean help test
 
 ifneq ($(filter-out $(PRODUCT_INDEPENDENT_GOALS), $(MAKECMDGOALS)),)
     ifeq ($(PRODUCT),)
@@ -251,4 +253,8 @@ clean:
 
 .PHONY: test
 test:
-	$(MAKE) -C $(FWK_DIR)/test all
+	$(CMAKE) -B ${BUILD_PATH}/framework/test $(FWK_DIR)/test -G Ninja
+	$(CMAKE) --build ${BUILD_PATH}/framework/test
+	# --test-dir option of ctest is not available before ctest 3.20
+	# so use workaround to change the test dir and run the tests from there
+	${CD} ${BUILD_PATH}/framework/test && ${CTEST} -V
