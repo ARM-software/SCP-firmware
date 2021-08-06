@@ -205,7 +205,7 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
     },
     {
         /*
-         * Peripherals, NCI GPV Memory Map 3
+         * Peripherals, NCI GPV Memory Map 4
          * Map: 0x00_4800_0000 - 0x00_49FF_FFFF (32 MB)
          */
         .base = UINT64_C(0x0048000000),
