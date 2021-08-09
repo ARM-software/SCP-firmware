@@ -42,6 +42,24 @@ struct external_rnsam_tuple {
     struct cmn700_rnsam_reg *node;
 };
 
+/* Pair of CCG Request Agent (CCG_RA) register and its node-id */
+struct ccg_ra_reg_tuple {
+    unsigned int node_id;
+    struct cmn700_ccg_ra_reg *ccg_ra_reg;
+};
+
+/* Pair of CCG Request Agent (CCG_HA) register and its node-id */
+struct ccg_ha_reg_tuple {
+    unsigned int node_id;
+    struct cmn700_ccg_ha_reg *ccg_ha_reg;
+};
+
+/* Pair of CCG Link Agent (CCLA) register and its node-id */
+struct ccla_reg_tuple {
+    unsigned int node_id;
+    struct cmn700_ccla_reg *ccla_reg;
+};
+
 enum node_type {
     NODE_TYPE_INVALID   = 0x0,
     NODE_TYPE_DVM       = 0x1,
@@ -170,6 +188,126 @@ struct cmn700_hnf_reg {
             uint8_t   RESERVED6[0x3C00 - 0x1C08];
     FWK_RW  uint64_t
         HNF_RN_CLUSTER_PHYSID[HNF_RN_CLUSTER_MAX][HNF_RN_PHYIDS_REG_MAX];
+};
+
+/*
+ * CCG Gateway (CCG) protocol link control & status registers
+ */
+struct ccg_link_regs {
+    FWK_RW uint64_t CCG_CCPRTCL_LINK_CTRL;
+    FWK_R uint64_t CCG_CCPRTCL_LINK_STATUS;
+};
+
+/*
+ * CCG Requesting Agent (RA) registers
+ */
+struct cmn700_ccg_ra_reg {
+    FWK_R  uint64_t CCG_RA_NODE_INFO;
+           uint8_t  RESERVED0[0x80 - 0x8];
+    FWK_R  uint64_t CCG_RA_CHILD_INFO;
+           uint8_t  RESERVED1[0x900 - 0x88];
+    FWK_R  uint64_t CCG_RA_UNIT_INFO;
+           uint8_t  RESERVED2[0x980 - 0x908];
+    FWK_RW uint64_t CCG_RA_SEC_REG_GRP_OVERRIDE;
+           uint8_t  RESERVED3[0xA00 - 0x988];
+    FWK_RW uint64_t CCG_RA_CFG_CTRL;
+    FWK_RW uint64_t CCG_RA_AUX_CTRL;
+           uint8_t  RESERVED4[0xC00 - 0xA10];
+    FWK_RW uint64_t CCG_RA_SAM_ADDR_REGION_REG[8];
+           uint8_t  RESERVED5[0xD00 - 0xC40];
+    FWK_RW uint64_t CCG_RA_AGENTID_TO_LINKID_VAL;
+           uint8_t  RESERVED6[0xD10 - 0xD08];
+    FWK_RW uint64_t CCG_RA_AGENTID_TO_LINKID_REG[8];
+           uint8_t  RESERVED7[0xE00 - 0xD50];
+    FWK_RW uint64_t CCG_RA_RNI_LDID_TO_EXP_RAID_REG[10];
+           uint8_t  RESERVED8[0xF00 - 0xE50];
+    FWK_RW uint64_t CCG_RA_RND_LDID_TO_EXP_RAID_REG[10];
+           uint8_t  RESERVED9[0x1000 - 0xF50];
+    FWK_RW uint64_t CCG_RA_RNF_LDID_TO_EXP_RAID_REG[128];
+    FWK_RW uint64_t CCG_RA_RNF_LDID_TO_NODEID_REG[128];
+    FWK_RW uint64_t CCG_RA_RNF_LDID_TO_OVRD_LDID_REG[128];
+           struct ccg_link_regs LINK_REGS[3];
+           uint8_t  RESERVED10[0x2000 - 0x1C30];
+    FWK_RW uint64_t CCG_RA_PMU_EVENT_SEL;
+};
+
+/*
+ * CCG Gateway (CCG) Home Agent (HA) registers
+ */
+struct cmn700_ccg_ha_reg {
+    FWK_R  uint64_t CCG_HA_NODE_INFO;
+    FWK_RW uint64_t CCG_HA_ID;
+           uint8_t  RESERVED0[0x80 - 0x10];
+    FWK_R  uint64_t CCG_HA_CHILD_INFO;
+           uint8_t  RESERVED1[0x900 - 0x88];
+    FWK_R  uint64_t CCG_HA_UNIT_INFO[2];
+           uint8_t  RESERVED2[0x980 - 0x910];
+    FWK_RW uint64_t CCG_HA_SEC_REG_GRP_OVERRIDE;
+           uint8_t  RESERVED3[0xA00 - 0x988];
+    FWK_RW uint64_t CCG_HA_CFG_CTRL;
+    FWK_RW uint64_t CCG_HA_AUX_CTRL;
+           uint8_t  RESERVED4[0xC00 - 0xA10];
+    FWK_RW uint64_t CCG_HA_RNF_EXP_RAID_TO_LDID_REG[256];
+           uint8_t  RESERVED5[0x1C00 - 0x1400];
+           struct ccg_link_regs LINK_REGS[3];
+           uint8_t  RESERVED6[0x1F00 - 0x1C30];
+    FWK_RW uint64_t CCG_HA_AGENTID_TO_LINKID_REG[8];
+           uint8_t  RESERVED7[0x1FF8 - 0x1F40];
+    FWK_RW uint64_t CCG_HA_AGENTID_TO_LINKID_VAL;
+    FWK_RW uint64_t CCG_HA_PMU_EVENT_SEL;
+};
+
+/*
+ * CCG Gateway (CCG) Link Agent (LA) registers
+ */
+struct cmn700_ccla_reg {
+    FWK_R  uint64_t CCLA_NODE_INFO;
+           uint8_t  RESERVED0[0x80 - 0x8];
+    FWK_R  uint64_t CCLA_CHILD_INFO;
+           uint8_t  RESERVED1[0x910 - 0x88];
+    FWK_R  uint64_t CCLA_UNIT_INFO;
+           uint8_t  RESERVED2[0x988 - 0x918];
+    FWK_RW uint64_t CCLA_SEC_REG_GRP_OVERRIDE;
+           uint8_t  RESERVED3[0xB00 - 0x990];
+    FWK_RW uint64_t CCLA_CFG_CTL;
+    FWK_RW uint64_t CCLA_AUX_CTRL;
+           uint8_t  RESERVED4[0xC00 - 0xB10];
+    FWK_R  uint64_t CCLA_CCIX_PROP_CAPABILITIES;
+    FWK_RW uint64_t CCLA_CXS_ATTR_CAPABILITIES;
+           uint8_t  RESERVED5[0xD00 - 0xC10];
+    FWK_RW uint64_t CCLA_PERMSG_PYLD_0_63;
+    FWK_RW uint64_t CCLA_PERMSG_PYLD_64_127;
+    FWK_RW uint64_t CCLA_PERMSG_PYLD_128_191;
+    FWK_RW uint64_t CCLA_PERMSG_PYLD_192_255;
+    FWK_RW uint64_t CCLA_PERMSG_CTL;
+    FWK_RW uint64_t CCLA_ERR_AGENT_ID;
+    FWK_RW uint64_t CCLA_AGENTID_TO_PORTID_REG[8];
+    FWK_RW uint64_t CCLA_AGENTID_TO_PORTID_VAL;
+           uint8_t  RESERVED6[0xE00 - 0xD88];
+    FWK_RW uint64_t CCLA_PORTFWD_CTL;
+    FWK_R  uint64_t CCLA_PORTFWD_STATUS;
+    FWK_RW uint64_t CCLA_CXL_LINK_RX_CREDIT_CTL;
+    FWK_R  uint64_t CCLA_CXL_LINK_RX_CREDIT_RETURN_STAT;
+    FWK_R  uint64_t CCLA_CXL_LINK_TX_CREDIT_STAT;
+    FWK_RW uint64_t CCLA_CXL_LINK_LAYER_DEFEATURE;
+    FWK_RW uint64_t CCLA_ULL_CTL;
+    FWK_R  uint64_t CCLA_ULL_STATUS;
+    FWK_RW uint64_t CCLA_CXL_LL_ERRINJECT_CTL;
+    FWK_R  uint64_t CCLA_CXL_LL_ERRINJECT_STAT;
+           uint8_t  RESERVED7[0x2008 - 0xE40];
+    FWK_RW uint64_t CCLA_PMU_EVENT_SEL;
+           uint8_t  RESERVED8[0x3000 - 0x2010];
+    FWK_R  uint64_t CCLA_ERRFR;
+    FWK_RW uint64_t CCLA_ERRCTLR;
+    FWK_W  uint64_t CCLA_ERRSTATUS;
+    FWK_RW uint64_t CCLA_ERRADDR;
+    FWK_RW uint64_t CCLA_ERRMISC;
+           uint8_t  RESERVED9[0x3100 - 0x3028];
+    FWK_R  uint64_t CCLA_ERRFR_NS;
+    FWK_RW uint64_t CCLA_ERRCTLR_NS;
+    FWK_W  uint64_t CCLA_ERRSTATUS_NS;
+    FWK_RW uint64_t CCLA_ERRADDR_NS;
+    FWK_RW uint64_t CCLA_ERRMISC_NS;
 };
 
 /*

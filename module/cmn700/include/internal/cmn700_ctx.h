@@ -52,6 +52,35 @@ struct cmn700_device_ctx {
     unsigned int rnf_count;
     unsigned int rni_count;
 
+    /* CCG specific members */
+
+    /* Node count of CCG_RA, CCG_HA, CCLA nodes each. */
+    size_t ccg_node_count;
+
+    /*
+     * CCG_RA register and node_id pairs. The driver keeps a list of tuples of
+     * pointers to the CCG_RA registers.
+     */
+    struct ccg_ra_reg_tuple *ccg_ra_reg_table;
+
+    /*
+     * CCG_HA register and node_id pairs. The driver keeps a list of tuples of
+     * pointers to the CCG_HA registers.
+     */
+    struct ccg_ha_reg_tuple *ccg_ha_reg_table;
+
+    /*
+     * CCLA register and node_id pairs. The driver keeps a list of tuples of
+     * pointers to the CXLA registers.
+     */
+    struct ccla_reg_tuple *ccla_reg_table;
+
+    /*
+     * remote_rnf_ldid_value keeps track of the ldid of the remote RNF agents
+     * which are to be programmed on the HNF's RN_PHYS_ID registers.
+     */
+    unsigned int remote_rnf_ldid_value;
+
     /* Timer module API */
     struct mod_timer_api *timer_api;
 
