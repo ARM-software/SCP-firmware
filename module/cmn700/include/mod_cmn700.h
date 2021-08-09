@@ -28,6 +28,12 @@
  * @{
  */
 
+/*! Maximum CCG Protocol Links supported */
+#define CMN700_MAX_CCG_PROTOCOL_LINKS 3
+
+/*! Maximum RA SAM Address regions */
+#define CMN700_MAX_RA_SAM_ADDR_REGION 8
+
 /*!
  * \brief Memory region configuration type
  */
@@ -46,6 +52,11 @@ enum mod_cmn700_mem_region_type {
      * dedicated SN-F nodes).
      */
     MOD_CMN700_REGION_TYPE_SYSCACHE_SUB,
+
+    /*!
+     * Region used for CCG access (serviced by the CCRA nodes).
+     */
+    MOD_CMN700_REGION_TYPE_CCG,
 };
 
 /*!
@@ -196,6 +207,133 @@ struct mod_cmn700_hierarchical_hashing {
 };
 
 /*!
+ * \brief Remote Agent to Link ID mapping
+ *
+ * \details Each CCG nodes can communicate up to three remote CCG protocol
+ *      links. Each remote agent, identified by their AgentID (RAID or HAID)
+ *      will be behind one of these three links. This structure holds the start
+ *      and end Agent IDs for each link. The remote AgentID to LinkID LUT
+ *      registers (por_{ccg_ra,ccg_ha, ccla}_agentid_to_linkid_reg<X>) will be
+ *      configured sequentially from
+ *      ::mod_cmn700_agentid_to_linkid_map::remote_agentid_start and
+ *      ::mod_cmn700_agentid_to_linkid_map::remote_agentid_end values. For
+ *      all three links, corresponding to these remote Agent IDs, HN-F's
+ *      RN_PHYS_ID registers will be programmed with the node id of the CCG
+ *      block.
+ */
+struct mod_cmn700_agentid_to_linkid_map {
+    /*! Remote Agent ID start */
+    unsigned int remote_agentid_start;
+
+    /*! Remote Agent ID end */
+    unsigned int remote_agentid_end;
+};
+
+/*!
+ * \brief Remote Memory region map descriptor which will be used by CCRA SAM
+ *      programming
+ */
+struct mod_cmn700_ra_mem_region_map {
+    /*! Base address */
+    uint64_t base;
+
+    /*! Region size in bytes */
+    uint64_t size;
+
+    /*! Target HAID of remote CCG for CCRA SAM Address region */
+    unsigned int remote_haid;
+};
+
+/*!
+ * \brief CCG block descriptor
+ *
+ * \details Each CCG block can have up to eight remote memory map
+ *      ::mod_cmn700_ra_mem_region_map descriptors and can have three links
+ *      which can target range of remote agent ids. User is expected to assign
+ *      an Home AgentID (HAID) ::mod_cmn700_ccg_config::haid for each
+ *      logical ids of the CCG blocks. Overall structure of the descriptor is
+ *      shown below:
+ *
+ *         +----------------------------------------------------------+
+ *         | mod_cmn700_ccg_config<ldid>                              |
+ *         |                                                          |
+ *         |   HAID = haid                                            |
+ *         +----------------------------------+-----------------------+
+ *         | ra_mmap_table0                   | agentid_to_linkid_map0|
+ *         |                                  |  remote_agent_id_start|
+ *         | base..base+size --> remote_haid  |  .                    |
+ *         |                                  |  .                    |
+ *         +----------------------------------+  .                    |
+ *         | ra_mmap_table1                   |  .                    |
+ *         |                                  |  remote_agent_id_end  |
+ *         | base..base+size --> remote_haid  |                       |
+ *         |                                  +-----------------------+
+ *         +----------------------------------+ agentid_to_linkid_map1|
+ *         | .                                |  remote_agent_id_start|
+ *         | .                                |  .                    |
+ *         | .                                |  .                    |
+ *         | .                                |  .                    |
+ *         | .                                |  .                    |
+ *         | .                                |  remote_agent_id_end  |
+ *         +----------------------------------+                       |
+ *         | ra_mmap_table6                   +-----------------------+
+ *         |                                  | agentid_to_linkid_map2|
+ *         | base..base+size --> remote_haid  |  remote_agent_id_start|
+ *         |                                  |  .                    |
+ *         +----------------------------------+  .                    |
+ *         | ra_mmap_table7                   |  .                    |
+ *         |                                  |  .                    |
+ *         | base..base+size --> remote_haid  |  remote_agent_id_end  |
+ *         |                                  |                       |
+ *         +----------------------------------+-----------------------+
+ */
+struct mod_cmn700_ccg_config {
+    /*! Logical ID of the CCG block to which this configuration applies */
+    unsigned int ldid;
+
+    /*! Unique HAID in a multi-chip system. This has to be assigned manually */
+    unsigned int haid;
+
+    /*! Number of remote RN Caching agents. */
+    unsigned int remote_rnf_count;
+
+    /*! Table of region memory map entries */
+    const struct mod_cmn700_mem_region_map remote_mmap_table;
+
+    /*! Table of remote region memory map entries */
+    const struct mod_cmn700_ra_mem_region_map
+        ra_mmap_table[CMN700_MAX_RA_SAM_ADDR_REGION];
+
+    /*! Number of entries in the ::mod_cmn700_ccg_config::ra_mmap_table */
+    size_t ra_mmap_count;
+
+    /*! Table of remote agent ids start and end backed by the links */
+    struct mod_cmn700_agentid_to_linkid_map
+        remote_agentid_to_linkid_map[CMN700_MAX_CCG_PROTOCOL_LINKS];
+
+    /*! SMP Mode */
+    bool smp_mode;
+
+    /*! Port Aggregation Mode */
+    bool port_aggregate;
+
+    /*!
+     * \brief Logical ID (LDID) of the CCG to which port aggregation pair to be
+     *      created
+     */
+    unsigned int port_aggregate_ldid;
+
+    /*! HAID of the CCG to which port aggregation pair to be created */
+    unsigned int port_aggregate_haid;
+
+    /*!
+     * \brief Target HAID of remote CCG for CCRA SAM Address region for
+     *      the port aggregated CCG block
+     */
+    unsigned int port_aggregate_remote_haid[CMN700_MAX_RA_SAM_ADDR_REGION];
+};
+
+/*!
  * \brief CMN700 configuration data
  */
 struct mod_cmn700_config {
@@ -234,6 +372,15 @@ struct mod_cmn700_config {
 
     /*! Number of entries in the \ref mmap_table */
     size_t mmap_count;
+
+    /*! Table of CCG configuration */
+    const struct mod_cmn700_ccg_config *ccg_config_table;
+
+    /*!
+     * \brief Number of entries in the
+     *      ::mod_cmn700_config::ccg_config_table table.
+     */
+    const size_t ccg_table_count;
 
     /*! Address space size of the chip */
     uint64_t chip_addr_space;

@@ -6,6 +6,7 @@
  */
 
 #include <cmn700.h>
+#include <cmn700_ccg.h>
 
 #include <internal/cmn700_ctx.h>
 
@@ -182,6 +183,9 @@ static void process_node_hnf(struct cmn700_hnf_reg *hnf)
  */
 static int cmn700_discovery(void)
 {
+    unsigned int ccg_ra_reg_count;
+    unsigned int ccg_ha_reg_count;
+    unsigned int ccla_reg_count;
     unsigned int cxg_ra_reg_count;
     unsigned int cxg_ha_reg_count;
     unsigned int cxla_reg_count;
@@ -194,6 +198,9 @@ static int cmn700_discovery(void)
     struct node_header *node;
     const struct mod_cmn700_config *config = ctx->config;
 
+    ccg_ra_reg_count = 0;
+    ccg_ha_reg_count = 0;
+    ccla_reg_count = 0;
     cxg_ra_reg_count = 0;
     cxg_ha_reg_count = 0;
     cxla_reg_count = 0;
@@ -241,6 +248,7 @@ static int cmn700_discovery(void)
                         MOD_NAME "  Found CXLA at node ID: %d",
                         get_child_node_id(xp, node_idx));
                 } else if (get_device_type(xp, xp_port) == DEVICE_TYPE_CCG) {
+                    ccla_reg_count++;
                     FWK_LOG_INFO(
                         MOD_NAME "  Found CCG at node ID: %d",
                         get_child_node_id(xp, node_idx));
@@ -314,6 +322,22 @@ static int cmn700_discovery(void)
                     ctx->rni_count++;
                     break;
 
+                case NODE_TYPE_CCRA:
+                    ccg_ra_reg_count++;
+                    break;
+
+                case NODE_TYPE_CCHA:
+                    ccg_ha_reg_count++;
+                    break;
+
+                /* CCLA should not be an internal node */
+                case NODE_TYPE_CCLA:
+                    FWK_LOG_ERR(MOD_NAME
+                                "CXLA node should not be internal node, "
+                                "discovery failed");
+                    return FWK_E_DEVICE;
+                    break;
+
                 case NODE_TYPE_CXRA:
                     cxg_ra_reg_count++;
                     break;
@@ -352,6 +376,8 @@ static int cmn700_discovery(void)
         return FWK_E_DATA;
     }
 
+    ctx->ccg_node_count = ccg_ra_reg_count;
+
     if (ctx->rnf_count > MAX_RNF_COUNT) {
         FWK_LOG_ERR(
             MOD_NAME "rnf count %d > max limit (%d)\n",
@@ -372,6 +398,10 @@ static int cmn700_discovery(void)
         MOD_NAME "Total CCIX Request Agent nodes: %d", cxg_ra_reg_count);
     FWK_LOG_INFO(MOD_NAME "Total CCIX Home Agent nodes: %d", cxg_ha_reg_count);
     FWK_LOG_INFO(MOD_NAME "Total CCIX Link Agent nodes: %d", cxla_reg_count);
+    FWK_LOG_INFO(
+        MOD_NAME "Total CCG Request Agent nodes: %d", ccg_ra_reg_count);
+    FWK_LOG_INFO(MOD_NAME "Total CCG Home Agent nodes: %d", ccg_ha_reg_count);
+    FWK_LOG_INFO(MOD_NAME "Total CCG Link Agent nodes: %d", ccla_reg_count);
 
     return FWK_SUCCESS;
 }
@@ -380,6 +410,7 @@ static void cmn700_configure(void)
 {
     unsigned int logical_id;
     unsigned int node_count;
+    unsigned int ldid;
     unsigned int node_id;
     unsigned int node_idx;
     unsigned int xp_count;
@@ -418,6 +449,11 @@ static void cmn700_configure(void)
                     !(get_device_type(xp, xp_port) == DEVICE_TYPE_CCG)) {
                     fwk_assert(xrnsam_entry < ctx->external_rnsam_count);
 
+                    ldid = get_node_logical_id(node);
+                    ctx->ccla_reg_table[ldid].node_id = node_id;
+                    ctx->ccla_reg_table[ldid].ccla_reg =
+                        (struct cmn700_ccla_reg *)node;
+
                     ctx->external_rnsam_table[xrnsam_entry].node_id = node_id;
                     ctx->external_rnsam_table[xrnsam_entry].node = node;
 
@@ -432,6 +468,22 @@ static void cmn700_configure(void)
                     ctx->internal_rnsam_table[irnsam_entry] = node;
 
                     irnsam_entry++;
+                } else if (node_type == NODE_TYPE_CCRA) {
+                    ldid = get_node_logical_id(node);
+                    fwk_assert(ldid < ctx->ccg_node_count);
+
+                    /* Use ldid as index of the ccg_ra table */
+                    ctx->ccg_ra_reg_table[ldid].node_id = node_id;
+                    ctx->ccg_ra_reg_table[ldid].ccg_ra_reg =
+                        (struct cmn700_ccg_ra_reg *)node;
+                } else if (node_type == NODE_TYPE_CCHA) {
+                    ldid = get_node_logical_id(node);
+                    fwk_assert(ldid < ctx->ccg_node_count);
+
+                    /* Use ldid as index of the ccg_ra table */
+                    ctx->ccg_ha_reg_table[ldid].node_id = node_id;
+                    ctx->ccg_ha_reg_table[ldid].ccg_ha_reg =
+                        (struct cmn700_ccg_ha_reg *)node;
                 } else if (node_type == NODE_TYPE_HN_F) {
                     logical_id = get_node_logical_id(node);
                     fwk_assert(logical_id < ctx->hnf_count);
@@ -487,6 +539,8 @@ bool is_hnf_inside_rect(
 static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
 {
     unsigned int bit_pos;
+    unsigned int cxra_ldid;
+    unsigned int cxra_node_id;
     unsigned int group;
     unsigned int group_count;
     unsigned int hnf_count;
@@ -559,7 +613,7 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
              */
             FWK_LOG_INFO(
                 MOD_NAME "  [0x%" PRIx64 " - 0x%" PRIx64 "] %s",
-                region->base,
+                base,
                 region->base + region->size - 1,
                 mmap_type_name[region->type]);
 
@@ -628,7 +682,7 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
         case MOD_CMN700_REGION_TYPE_SYSCACHE_SUB:
             FWK_LOG_INFO(
                 MOD_NAME "  [0x%" PRIx64 " - 0x%" PRIx64 "] %s",
-                region->base,
+                base,
                 region->base + region->size - 1,
                 mmap_type_name[region->type]);
 
@@ -641,6 +695,54 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
         }
     }
 
+    /* Do configuration for CCG Nodes */
+    for (size_t idx = 0; idx < config->ccg_table_count; idx++) {
+        region = &config->ccg_config_table[idx].remote_mmap_table;
+
+        FWK_LOG_INFO(
+            MOD_NAME "  [0x%" PRIx64 " - 0x%" PRIx64 "] %s",
+            region->base,
+            region->base + region->size - 1,
+            mmap_type_name[region->type]);
+
+        switch (region->type) {
+        case MOD_CMN700_REGION_TYPE_CCG:
+            /*
+             * Configure memory region
+             */
+            configure_region(
+                rnsam,
+                region_io_count,
+                region->base,
+                region->size,
+                SAM_NODE_TYPE_CXRA,
+                SAM_TYPE_NON_HASH_MEM_REGION);
+
+            /*
+             * Configure target node
+             */
+            cxra_ldid = config->ccg_config_table[idx].ldid;
+            cxra_node_id = ctx->ccg_ra_reg_table[cxra_ldid].node_id;
+            group = region_io_count /
+                CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP;
+            bit_pos = CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRY_BITS_WIDTH *
+                (region_io_count %
+                 CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP);
+
+            rnsam->NON_HASH_TGT_NODEID[group] &=
+                ~(CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK << bit_pos);
+            rnsam->NON_HASH_TGT_NODEID[group] |=
+                (cxra_node_id & CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK)
+                << bit_pos;
+
+            region_io_count++;
+            break;
+
+        default:
+            fwk_unexpected();
+            return FWK_E_DATA;
+        }
+    }
     /*
      * If CAL mode is enabled, then only the even numbered HN-F nodes are
      * programmed to the SYS_CACHE registers. Hence reduce the HN-F count by
@@ -767,6 +869,16 @@ static int cmn700_setup(void)
                     CMN700_RNSAM_SYS_CACHE_GRP_SN_NODEID_ENTRIES_PER_GROUP,
                 sizeof(*ctx->sn_nodeid_group));
         }
+
+        /* Allocate resource for the CCG nodes */
+        if (ctx->ccg_node_count != 0) {
+            ctx->ccg_ra_reg_table = fwk_mm_calloc(
+                ctx->ccg_node_count, sizeof(*ctx->ccg_ra_reg_table));
+            ctx->ccg_ha_reg_table = fwk_mm_calloc(
+                ctx->ccg_node_count, sizeof(*ctx->ccg_ha_reg_table));
+            ctx->ccla_reg_table = fwk_mm_calloc(
+                ctx->ccg_node_count, sizeof(*ctx->ccla_reg_table));
+        }
     }
 
     cmn700_configure();
@@ -780,6 +892,30 @@ static int cmn700_setup(void)
     ctx->initialized = true;
 
     return FWK_SUCCESS;
+}
+
+static void cmn700_ccg_setup(void)
+{
+    unsigned int idx;
+    const struct mod_cmn700_config *config = ctx->config;
+
+    /* Remote RNF LDID value begins from local chip's last RNF LDID value + 1 */
+    ctx->remote_rnf_ldid_value = ctx->rnf_count;
+
+    /* Do configuration for CCG Nodes and enable the links */
+    for (idx = 0; idx < config->ccg_table_count; idx++) {
+        ccg_setup(chip_id, ctx, &config->ccg_config_table[idx]);
+    }
+
+    /*
+     * Exchange protocol credits and enter system coherecy and dvm domain for
+     * multichip SMP mode operation.
+     */
+    for (idx = 0; idx < config->ccg_table_count; idx++) {
+        ccg_exchange_protocol_credit(ctx, &config->ccg_config_table[idx]);
+        ccg_enter_system_coherency(ctx, &config->ccg_config_table[idx]);
+        ccg_enter_dvm_domain(ctx, &config->ccg_config_table[idx]);
+    }
 }
 
 /*
@@ -890,6 +1026,7 @@ int cmn700_start(fwk_id_t id)
 
     if (fwk_id_is_equal(ctx->config->clock_id, FWK_ID_NONE)) {
         cmn700_setup();
+        cmn700_ccg_setup();
         return FWK_SUCCESS;
     }
 
@@ -911,6 +1048,7 @@ static int cmn700_process_notification(
     params = (struct clock_notification_params *)event->params;
     if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
         cmn700_setup();
+        cmn700_ccg_setup();
     }
 
     return FWK_SUCCESS;
