@@ -148,7 +148,7 @@ struct mod_apremap_cmn_atrans_api {
 /*!
  * \brief Module API indicies.
  */
-enum mod_system_info_api_idx {
+enum mod_apremap_api_idx {
     MOD_APREMAP_API_IDX_AP_MEM_RW,
     MOD_APREMAP_API_IDX_CMN_ATRANS,
     MOD_APREMAP_API_COUNT,
