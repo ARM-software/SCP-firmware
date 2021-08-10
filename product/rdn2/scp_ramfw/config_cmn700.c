@@ -223,6 +223,7 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HNP0,
     },
+#if (PLATFORM_VARIANT == 0)
     {
         /*
          * Peripherals, PCIe 32-bit MMIO to IO Macro 1
@@ -232,7 +233,6 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HNP1,
     },
-#if (PLATFORM_VARIANT == 0)
     {
         /*
          * Peripherals, PCIe 32-bit MMIO to IO Macro 2
@@ -261,6 +261,7 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HNP0,
     },
+#if (PLATFORM_VARIANT == 0)
     {
         /*
          * PCIe ECAM0 to IO Macro 1
@@ -270,7 +271,6 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HNP1,
     },
-#if (PLATFORM_VARIANT == 0)
     {
         /*
          * PCIe ECAM0 to IO Macro 2
@@ -299,6 +299,7 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HNP0,
     },
+#if (PLATFORM_VARIANT == 0)
     {
         /*
          * Peripherals, PCIe 64-bit MMIO to IO Macro 1
@@ -308,7 +309,6 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HNP1,
     },
-#if (PLATFORM_VARIANT == 0)
     {
         /*
          * Peripherals, PCIe 64-bit MMIO to IO Macro 2
