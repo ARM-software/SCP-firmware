@@ -78,7 +78,7 @@ static size_t fwk_module_count_elements(const struct fwk_element *elements)
 static void fwk_module_init_subscriptions(struct fwk_dlist **list, size_t count)
 {
     *list = fwk_mm_calloc(count, sizeof((*list)[0]));
-    if (!fwk_expect(*list != NULL)) {
+    if (*list == NULL) {
         fwk_trap();
     }
 
@@ -119,7 +119,7 @@ static void fwk_module_init_element_ctxs(
 
     ctx->element_ctx_table =
         fwk_mm_calloc(ctx->element_count, sizeof(ctx->element_ctx_table[0]));
-    if (!fwk_expect(ctx->element_ctx_table != NULL)) {
+    if (ctx->element_ctx_table == NULL) {
         fwk_trap();
     }
 
@@ -181,7 +181,7 @@ static void fwk_module_init_elements(struct fwk_module_ctx *ctx)
 
     const struct fwk_module *desc = ctx->desc;
 
-    if (!fwk_expect(desc->element_init != NULL)) {
+    if (desc->element_init == NULL) {
         fwk_trap();
     }
 
@@ -193,13 +193,13 @@ static void fwk_module_init_elements(struct fwk_module_ctx *ctx)
         fwk_module_ctx.bind_id = element_id;
 
         /* Each element must have a valid pointer to specific data */
-        if (!fwk_expect(element->data != NULL)) {
+        if (element->data == NULL) {
             fwk_trap();
         }
 
         status = desc->element_init(
             element_id, element->sub_element_count, element->data);
-        if (!fwk_expect(status == FWK_SUCCESS)) {
+        if (status != FWK_SUCCESS) {
             fwk_trap();
         }
 
@@ -214,16 +214,15 @@ static void fwk_module_init_module(struct fwk_module_ctx *ctx)
     const struct fwk_module *desc = ctx->desc;
     const struct fwk_module_config *config = ctx->config;
 
-    if (!fwk_expect(desc->type < FWK_MODULE_TYPE_COUNT)) {
+    if (desc->type >= FWK_MODULE_TYPE_COUNT) {
         fwk_trap();
     }
 
-    if (!fwk_expect(desc->init != NULL)) {
+    if (desc->init == NULL) {
         fwk_trap();
     }
 
-    if (!fwk_expect(
-            (desc->api_count == 0) == (desc->process_bind_request == NULL))) {
+    if ((desc->api_count == 0) != (desc->process_bind_request == NULL)) {
         fwk_trap();
     }
 
@@ -232,12 +231,12 @@ static void fwk_module_init_module(struct fwk_module_ctx *ctx)
 
         const struct fwk_element *elements = NULL;
 
-        if (!fwk_expect(config->elements.generator != NULL)) {
+        if (config->elements.generator == NULL) {
             fwk_trap();
         }
 
         elements = config->elements.generator(ctx->id);
-        if (!fwk_expect(elements != NULL)) {
+        if (elements == NULL) {
             fwk_trap();
         }
 
@@ -249,7 +248,7 @@ static void fwk_module_init_module(struct fwk_module_ctx *ctx)
     }
 
     status = desc->init(ctx->id, ctx->element_count, config->data);
-    if (!fwk_expect(status == FWK_SUCCESS)) {
+    if (status != FWK_SUCCESS) {
         fwk_trap();
     }
 
@@ -259,7 +258,7 @@ static void fwk_module_init_module(struct fwk_module_ctx *ctx)
 
     if (desc->post_init != NULL) {
         status = desc->post_init(ctx->id);
-        if (!fwk_expect(status == FWK_SUCCESS)) {
+        if (status != FWK_SUCCESS) {
             fwk_trap();
         }
     }
