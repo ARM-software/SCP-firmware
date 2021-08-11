@@ -115,7 +115,7 @@ int fwk_io_open(
     bool read = (((unsigned int)mode & (unsigned int)FWK_IO_MODE_READ) != 0U);
     bool write = (((unsigned int)mode & (unsigned int)FWK_IO_MODE_WRITE) != 0U);
 
-    if (!fwk_expect(stream != NULL)) {
+    if (stream == NULL) {
         return FWK_E_PARAM;
     }
 
@@ -125,26 +125,26 @@ int fwk_io_open(
         .mode = mode,
     };
 
-    if (!fwk_expect(read || write)) {
+    if (!read && !write) {
         return FWK_E_PARAM; /* Neither reading nor writing requested */
     }
 
     status = fwk_module_adapter(&stream->adapter, id);
-    if (!fwk_expect(status == FWK_SUCCESS)) {
+    if (status != FWK_SUCCESS) {
         return FWK_E_PARAM; /* System entity doesn't exist */
     }
 
     fwk_assert(stream->adapter != NULL);
 
-    if (!fwk_expect(stream->adapter->open != NULL)) {
+    if (stream->adapter->open == NULL) {
         return FWK_E_SUPPORT; /* Stream adapter is not implemented */
     }
 
-    if (!fwk_expect(!read || (stream->adapter->getch != NULL))) {
+    if ((read && (stream->adapter->getch == NULL))) {
         return FWK_E_SUPPORT; /* Reads requested but no read interface */
     }
 
-    if (!fwk_expect(!write || (stream->adapter->putch != NULL))) {
+    if (write && (stream->adapter->putch == NULL)) {
         return FWK_E_SUPPORT; /* Writes requested but no write interface */
     }
 
@@ -160,23 +160,22 @@ int fwk_io_getch(const struct fwk_io_stream *stream, char *ch)
 {
     int status;
 
-    if (!fwk_expect(stream != NULL)) {
+    if (stream == NULL) {
         return FWK_E_PARAM;
     }
 
-    if (!fwk_expect(ch != NULL)) {
+    if (ch == NULL) {
         return FWK_E_PARAM;
     }
 
     *ch = '\0';
 
-    if (!fwk_expect(stream->adapter != NULL)) {
+    if (stream->adapter == NULL) {
         return FWK_E_STATE; /* The stream is not open */
     }
 
-    if (!fwk_expect(
-            (((unsigned int)stream->mode) & ((unsigned int)FWK_IO_MODE_READ)) !=
-            0U)) {
+    if ((((unsigned int)stream->mode) & ((unsigned int)FWK_IO_MODE_READ)) ==
+        0U) {
         return FWK_E_SUPPORT; /* Stream not open for read operations */
     }
 
@@ -196,18 +195,17 @@ int fwk_io_putch(const struct fwk_io_stream *stream, char ch)
 {
     int status;
 
-    if (!fwk_expect(stream != NULL)) {
+    if (stream == NULL) {
         return FWK_E_PARAM;
     }
 
-    if (!fwk_expect(stream->adapter != NULL)) {
+    if (stream->adapter == NULL) {
         return FWK_E_STATE; /* The stream is not open */
     }
 
-    if (!fwk_expect(
-            (((unsigned int)stream->mode) &
-             ((unsigned int)FWK_IO_MODE_WRITE)) != 0U)) {
-        return FWK_E_SUPPORT; /* Stream not open for read operations */
+    if ((((unsigned int)stream->mode) & ((unsigned int)FWK_IO_MODE_WRITE)) ==
+        0U) {
+        return FWK_E_SUPPORT; /* Stream not open for write operations */
     }
 
     fwk_assert(stream->adapter->putch != NULL);
@@ -263,7 +261,7 @@ int fwk_io_write(
 
     const char *cbuffer = buffer;
 
-    if (!fwk_expect(cbuffer != NULL)) {
+    if (cbuffer == NULL) {
         return FWK_E_PARAM;
     }
 
@@ -288,11 +286,11 @@ int fwk_io_close(struct fwk_io_stream *stream)
 {
     int status;
 
-    if (!fwk_expect(stream != NULL)) {
+    if (stream == NULL) {
         return FWK_E_PARAM;
     }
 
-    if (!fwk_expect(stream->adapter != NULL)) {
+    if (stream->adapter == NULL) {
         return FWK_SUCCESS; /* The stream is not open */
     }
 
@@ -319,7 +317,7 @@ int fwk_io_puts(
     const struct fwk_io_stream *restrict stream,
     const char *restrict str)
 {
-    if (!fwk_expect(str != NULL)) {
+    if (str == NULL) {
         return FWK_E_PARAM;
     }
 
@@ -338,7 +336,7 @@ int fwk_io_vprintf(
 
     char *buffer;
 
-    if (!fwk_expect(format != NULL)) {
+    if (format == NULL) {
         return FWK_E_PARAM;
     }
 
