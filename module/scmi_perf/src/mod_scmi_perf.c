@@ -74,7 +74,6 @@ static int scmi_perf_level_notify(
 /* Forward declaration */
 static void scmi_perf_notify_limits_updated(
     fwk_id_t domain_id,
-    uintptr_t cookie,
     uint32_t range_min,
     uint32_t range_max);
 
@@ -395,7 +394,7 @@ int perf_set_limits(
     }
 
     scmi_perf_notify_limits_updated(
-        domain_id, 0, limits->minimum, limits->maximum);
+        domain_id, limits->minimum, limits->maximum);
 
     domain_ctx->level_limits.minimum = limits->minimum;
     domain_ctx->level_limits.maximum = limits->maximum;
@@ -439,7 +438,7 @@ void perf_eval_performance(
     }
 
     scmi_perf_notify_limits_updated(
-        domain_id, 0, limits->minimum, limits->maximum);
+        domain_id, limits->minimum, limits->maximum);
 
     /* adjust_opp_for_new_limits */
     if (*level < limits->minimum) {
@@ -1447,7 +1446,6 @@ static void scmi_perf_respond(
  */
 static void scmi_perf_notify_limits_updated(
     fwk_id_t domain_id,
-    uintptr_t cookie,
     uint32_t range_min,
     uint32_t range_max)
 {
@@ -1482,7 +1480,7 @@ static void scmi_perf_notify_limits_updated(
 #endif
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    limits_changed.agent_id = (uint32_t)cookie;
+    limits_changed.agent_id = (uint32_t)0;
     limits_changed.domain_id = (uint32_t)idx;
     limits_changed.range_min = range_min;
     limits_changed.range_max = range_max;
