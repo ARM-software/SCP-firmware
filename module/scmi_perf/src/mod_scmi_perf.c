@@ -1452,11 +1452,11 @@ static void scmi_perf_notify_limits_updated(
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     struct scmi_perf_limits_changed limits_changed;
 #endif
-    int idx;
+    unsigned int idx;
     const struct mod_scmi_perf_domain_config *domain;
     struct mod_scmi_perf_fast_channel_limit *get_limit;
 
-    idx = (int)fwk_id_get_element_idx(domain_id);
+    idx = fwk_id_get_element_idx(domain_id);
 
     domain = &(*scmi_perf_ctx.config->domains)[idx];
     if (domain->fast_channels_addr_scp != NULL) {
