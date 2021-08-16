@@ -367,9 +367,11 @@ static int clock_init(fwk_id_t module_id, unsigned int element_count,
         return FWK_SUCCESS;
     }
 
+#ifdef BUILD_HAS_NOTIFICATION
     if (config == NULL) {
         return FWK_E_PARAM;
     }
+#endif
 
     mod_clock_ctx.config = config;
     mod_clock_ctx.dev_ctx_table =
@@ -418,7 +420,9 @@ static int clock_bind(fwk_id_t id, unsigned int round)
 
 static int clock_start(fwk_id_t id)
 {
+#ifdef BUILD_HAS_NOTIFICATION
     int status;
+#endif
     struct clock_dev_ctx *ctx;
 
     /* Clock tree is initialized */
@@ -436,6 +440,7 @@ static int clock_start(fwk_id_t id)
         return FWK_SUCCESS;
     }
 
+#ifdef BUILD_HAS_NOTIFICATION
     if ((ctx->api->process_power_transition != NULL) &&
         (fwk_id_is_type(
             mod_clock_ctx.config->pd_transition_notification_id,
@@ -461,6 +466,7 @@ static int clock_start(fwk_id_t id)
             return status;
         }
     }
+#endif
 
     return FWK_SUCCESS;
 }
@@ -496,6 +502,8 @@ static int clock_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
         return FWK_E_ACCESS;
     }
 }
+
+#ifdef BUILD_HAS_NOTIFICATION
 
 static int clock_process_pd_pre_transition_notification(
     struct clock_dev_ctx *ctx,
@@ -693,6 +701,7 @@ static int clock_process_notification(
         return FWK_E_HANDLER;
     }
 }
+#endif /* BUILD_HAS_NOTIFICATION */
 
 static int clock_process_event(const struct fwk_event *event,
                                struct fwk_event *resp_event)
@@ -728,12 +737,16 @@ const struct fwk_module module_clock = {
     .type = FWK_MODULE_TYPE_HAL,
     .api_count = (unsigned int)MOD_CLOCK_API_COUNT,
     .event_count = (unsigned int)CLOCK_EVENT_IDX_COUNT,
+#ifdef BUILD_HAS_NOTIFICATION
     .notification_count = (unsigned int)MOD_CLOCK_NOTIFICATION_IDX_COUNT,
+#endif
     .init = clock_init,
     .element_init = clock_dev_init,
     .bind = clock_bind,
     .start = clock_start,
     .process_bind_request = clock_process_bind_request,
+#ifdef BUILD_HAS_NOTIFICATION
     .process_notification = clock_process_notification,
+#endif
     .process_event = clock_process_event,
 };
