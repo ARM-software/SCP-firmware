@@ -1127,6 +1127,7 @@ static int dvfs_bind_element(fwk_id_t domain_id, unsigned int round)
 
     /* Bind to the alarm HAL if required */
     if (ctx->config->retry_ms > 0) {
+#if BUILD_HAS_MOD_TIMER
         status = fwk_module_bind(
             ctx->config->alarm_id,
             MOD_TIMER_API_ID_ALARM,
@@ -1134,6 +1135,9 @@ static int dvfs_bind_element(fwk_id_t domain_id, unsigned int round)
         if (status != FWK_SUCCESS) {
             return FWK_E_PANIC;
         }
+#else
+        return FWK_E_PANIC;
+#endif
     }
 
     return FWK_SUCCESS;
