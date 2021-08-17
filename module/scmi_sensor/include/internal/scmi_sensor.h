@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -22,8 +22,11 @@
  * \defgroup GroupSCMI_SENSOR SCMI Sensor Management Protocol
  * \{
  */
-
-#define SCMI_PROTOCOL_VERSION_SENSOR UINT32_C(0x10000)
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+#    define SCMI_PROTOCOL_VERSION_SENSOR UINT32_C(0x20000)
+#else
+#    define SCMI_PROTOCOL_VERSION_SENSOR UINT32_C(0x10000)
+#endif
 
 /*
  * PROTOCOL_ATTRIBUTES

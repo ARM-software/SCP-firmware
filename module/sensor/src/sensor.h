@@ -55,6 +55,8 @@ struct sensor_mod_ctx {
     struct mod_sensor_trip_point_api *sensor_trip_point_api;
 };
 
+struct sensor_dev_ctx *sensor_get_ctx(fwk_id_t id);
+
 /*
  * Sensor event indexes
  */
