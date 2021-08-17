@@ -48,6 +48,10 @@ struct sensor_dev_ctx {
     } concurrency_readings;
 
     struct mod_sensor_data last_read;
+
+#ifdef BUILD_HAS_SENSOR_TIMESTAMP
+    struct mod_sensor_timestamp_info timestamp;
+#endif
 };
 
 struct sensor_mod_ctx {
@@ -72,6 +76,22 @@ enum mod_sensor_event_idx {
 static const fwk_id_t mod_sensor_event_id_read_complete =
     FWK_ID_EVENT_INIT(FWK_MODULE_IDX_SENSOR,
                       SENSOR_EVENT_IDX_READ_COMPLETE);
+
+#ifdef BUILD_HAS_SENSOR_TIMESTAMP
+
+int sensor_timestamp_dev_init(fwk_id_t id, struct sensor_dev_ctx *ctx);
+
+int sensor_set_timestamp_config(
+    fwk_id_t id,
+    const struct mod_sensor_timestamp_info *config);
+
+int sensor_get_timestamp_config(
+    fwk_id_t id,
+    struct mod_sensor_timestamp_info *config);
+
+uint64_t sensor_get_timestamp(fwk_id_t id);
+
+#endif
 
 /*!
  * \endcond
