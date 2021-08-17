@@ -49,6 +49,10 @@ ifeq ($(BUILD_HAS_SCMI_SENSOR_V2),yes)
     DEFINES += BUILD_HAS_SCMI_SENSOR_V2
 endif
 
+ifeq ($(BUILD_HAS_SENSOR_TIMESTAMP),yes)
+    DEFINES += BUILD_HAS_SENSOR_TIMESTAMP
+endif
+
 export AS := $(CC)
 export LD := $(CC)
 

@@ -83,6 +83,11 @@ endif()
 
 if(SCP_ENABLE_SCMI_SENSOR_V2)
     target_compile_definitions(framework PUBLIC "BUILD_HAS_SCMI_SENSOR_V2")
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_SENSOR_TIMESTAMP")
+endif()
+
+if(SCP_ENABLE_SENSOR_TIMESTAMP)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_SENSOR_TIMESTAMP")
 endif()
 
 #

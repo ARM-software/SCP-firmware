@@ -234,8 +234,15 @@ else
     BUILD_HAS_CLOCK_TREE_MGMT := no
 endif
 
+ifeq ($(BS_FIRMWARE_HAS_SENSOR_TIMESTAMP),yes)
+    BUILD_HAS_SENSOR_TIMESTAMP := yes
+else
+    BUILD_HAS_SENSOR_TIMESTAMP := no
+endif
+
 ifeq ($(BS_FIRMWARE_HAS_SCMI_SENSOR_V2), yes)
     BUILD_HAS_SCMI_SENSOR_V2 := yes
+    BUILD_HAS_SENSOR_TIMESTAMP := yes
 else
     BUILD_HAS_SCMI_SENSOR_V2 := no
 endif

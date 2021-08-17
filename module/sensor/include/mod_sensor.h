@@ -132,6 +132,28 @@ struct mod_sensor_trip_point_info {
     uint32_t count;
 };
 
+#ifdef BUILD_HAS_SENSOR_TIMESTAMP
+/*!
+ * \brief Structure containing all timestamp information.
+ */
+struct mod_sensor_timestamp_info {
+    /*! Sensor timestamp support */
+    bool timestamp_support;
+
+    /*! Sensor timestamp enabled */
+    bool enabled;
+
+    /*!
+     * \brief Sensor timestamp exponent value
+     *
+     * \details It is the power-of-10 multiplier that is applied to the
+     *      sensor timestamps (timestamp x 10 ^ [timestamp exponent] ) to
+     *      represent it in seconds.
+     */
+    int8_t exponent;
+};
+#endif
+
 /*!
  * \brief Structure containing all sensor driver information.
  *
@@ -186,6 +208,11 @@ struct mod_sensor_scmi_info {
 
     /*! Sensor trip information */
     struct mod_sensor_trip_point_info trip_point;
+
+#ifdef BUILD_HAS_SENSOR_TIMESTAMP
+    /*! Sensor timestamp information */
+    struct mod_sensor_timestamp_info timestamp;
+#endif
 };
 
 /*!
@@ -235,6 +262,11 @@ struct mod_sensor_dev_config {
 
     /*! Sensor trip information */
     struct mod_sensor_trip_point_info trip_point;
+
+#ifdef BUILD_HAS_SENSOR_TIMESTAMP
+    /*! Sensor timestamp default values configuration */
+    struct mod_sensor_timestamp_info timestamp;
+#endif
 };
 
 /*!
@@ -249,6 +281,11 @@ struct mod_sensor_data {
 
     /*! Status of the response event */
     int status;
+
+#ifdef BUILD_HAS_SENSOR_TIMESTAMP
+    /*! Timestamp value */
+    uint64_t timestamp;
+#endif
 };
 
 /*!
@@ -364,6 +401,39 @@ struct mod_sensor_api {
         fwk_id_t id,
         uint32_t trip_point_idx,
         struct mod_sensor_trip_point_params *params);
+
+#ifdef BUILD_HAS_SENSOR_TIMESTAMP
+    /*!
+     * \brief Configure timestamp
+     *
+     * \details Set timestamp configuration
+     *
+     * \param id Specific sensor device id.
+     * \param config Timestamp configuration structure.
+     *
+     * \retval FWK_SUCCESS Operation succeeded.
+     * \retval FWK_E_SUPPORT Operation not supported by sensor.
+     * \return One of the standard framework error codes.
+     */
+    int (*set_timestamp_config)(
+        fwk_id_t id,
+        const struct mod_sensor_timestamp_info *config);
+
+    /*!
+     * \brief Read timestamp configuration
+     *
+     * \details Get timestamp configuration
+     *
+     * \param id Specific sensor device id.
+     * \param[out] config Timestamp configuration structure.
+     *
+     * \retval FWK_SUCCESS Operation succeeded.
+     * \return One of the standard framework error codes.
+     */
+    int (*get_timestamp_config)(
+        fwk_id_t id,
+        struct mod_sensor_timestamp_info *config);
+#endif
 };
 
 /*!

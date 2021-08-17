@@ -145,7 +145,9 @@ static int get_data(fwk_id_t id, struct mod_sensor_data *data)
 #ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
             trip_point_process(id, &ctx->last_read);
 #endif
-
+#ifdef BUILD_HAS_SENSOR_TIMESTAMP
+            ctx->last_read.timestamp = sensor_get_timestamp(id);
+#endif
             sensor_data_copy(data, &ctx->last_read);
 
             return status;
@@ -198,6 +200,15 @@ static int get_info(fwk_id_t id, struct mod_sensor_scmi_info *info)
     }
     info->trip_point = ctx->config->trip_point;
 
+#ifdef BUILD_HAS_SENSOR_TIMESTAMP
+    status = sensor_get_timestamp_config(id, &info->timestamp);
+    if (status == FWK_E_SUPPORT) {
+        info->timestamp.timestamp_support = false;
+    } else {
+        return status;
+    }
+#endif
+
     return FWK_SUCCESS;
 }
 
@@ -245,12 +256,16 @@ static int sensor_set_trip_point(
     return FWK_SUCCESS;
 }
 
-static struct mod_sensor_api sensor_api = { .get_data = get_data,
-                                            .get_info = get_info,
-                                            .get_trip_point =
-                                                sensor_get_trip_point,
-                                            .set_trip_point =
-                                                sensor_set_trip_point };
+static struct mod_sensor_api sensor_api = {
+    .get_data = get_data,
+    .get_info = get_info,
+    .get_trip_point = sensor_get_trip_point,
+    .set_trip_point = sensor_set_trip_point,
+#ifdef BUILD_HAS_SENSOR_TIMESTAMP
+    .set_timestamp_config = sensor_set_timestamp_config,
+    .get_timestamp_config = sensor_get_timestamp_config,
+#endif
+};
 
 /*
  * Driver response API.
@@ -276,6 +291,9 @@ static void reading_complete(fwk_id_t dev_id,
     if (response != NULL) {
         ctx->last_read.status = response->status;
         ctx->last_read.value = response->value;
+#ifdef BUILD_HAS_SENSOR_TIMESTAMP
+        ctx->last_read.timestamp = sensor_get_timestamp(dev_id);
+#endif
 
 #ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
         trip_point_process(dev_id, &ctx->last_read);
@@ -305,6 +323,7 @@ static int sensor_init(
     struct mod_sensor_config *config;
 
     ctx_table = fwk_mm_calloc(element_count, sizeof(ctx_table[0]));
+    fwk_str_memset(&sensor_mod_ctx, 0, sizeof(sensor_mod_ctx));
     config = (struct mod_sensor_config *)data;
 
     sensor_mod_ctx.config = config;
@@ -335,7 +354,11 @@ static int sensor_dev_init(fwk_id_t element_id,
     /* Pre-init last read with an invalid status */
     ctx->last_read.status = FWK_E_DEVICE;
 
+#ifdef BUILD_HAS_SENSOR_TIMESTAMP
+    return sensor_timestamp_dev_init(element_id, ctx);
+#else
     return FWK_SUCCESS;
+#endif
 }
 
 static int sensor_bind(fwk_id_t id, unsigned int round)
