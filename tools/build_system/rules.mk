@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -43,6 +43,10 @@ endif
 
 ifeq ($(BUILD_HAS_CLOCK_TREE_MGMT),yes)
     DEFINES += BUILD_HAS_CLOCK_TREE_MGMT
+endif
+
+ifeq ($(BUILD_HAS_SCMI_SENSOR_V2),yes)
+    DEFINES += BUILD_HAS_SCMI_SENSOR_V2
 endif
 
 export AS := $(CC)

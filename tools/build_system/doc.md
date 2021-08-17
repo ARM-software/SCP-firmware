@@ -109,6 +109,8 @@ to yes, the platform can provide support for clock tree management.
 * __BS_FIRMWARE_HAS_PERF_PLUGIN_HANDLER__ <yes|no> - Performance Plugin Handler
   Support. When set to yes, performance plugins (modules) can be interposed
   in the performance request chain.
+* __BS_FIRMWARE_HAS_SCMI_SENSOR_V2__ <yes|no> - SCMI Sensor V2 protocol
+  Support. When set to yes, SCMI Sensor V2 protocol is enabled.
 
 The format of the __BS_FIRMWARE_MODULES__ parameter can be seen in the following
 example:
@@ -265,6 +267,12 @@ SCMI Sensor Event Notifications       {#section_scmi_sensor_event_notifications}
 
 When building a firmware and its dependencies, the BUILD_HAS_SCMI_SENSOR_EVENTS
 parameter controls if SCMI event notifications are enabled.
+
+SCMI Sensor protocol V2                       {#section_scmi_sensor_protocol_v2}
+=======================
+
+When building a firmware and its dependencies, the BUILD_HAS_SCMI_SENSOR_V2
+parameter controls if SCMI Sensor protocol V2 is enabled.
 
 Clock Tree Management                           {#section_clock_tree_management}
 ===============================

@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -232,6 +232,12 @@ ifeq ($(BS_FIRMWARE_HAS_CLOCK_TREE_MGMT),yes)
     BUILD_HAS_CLOCK_TREE_MGMT := yes
 else
     BUILD_HAS_CLOCK_TREE_MGMT := no
+endif
+
+ifeq ($(BS_FIRMWARE_HAS_SCMI_SENSOR_V2), yes)
+    BUILD_HAS_SCMI_SENSOR_V2 := yes
+else
+    BUILD_HAS_SCMI_SENSOR_V2 := no
 endif
 
 # Add directories to the list of targets to build

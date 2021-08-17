@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -79,6 +79,10 @@ endif()
 
 if(SCP_ENABLE_CLOCK_TREE_MGMT)
     target_compile_definitions(framework PUBLIC "BUILD_HAS_CLOCK_TREE_MGMT")
+endif()
+
+if(SCP_ENABLE_SCMI_SENSOR_V2)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_SCMI_SENSOR_V2")
 endif()
 
 #
