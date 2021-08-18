@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -51,6 +51,7 @@ struct thermal_dev_ctx {
     const struct mod_juno_thermal_element_config *config;
     const struct mod_sensor_api *sensor_api;
     const struct mod_timer_alarm_api *alarm_api;
+    struct mod_sensor_data sensor_data;
 };
 
 static const fwk_id_t mod_juno_thermal_event_id_timer =
@@ -221,32 +222,27 @@ static int juno_thermal_process_event(
 {
     struct thermal_dev_ctx *ctx;
     int status;
-    uint64_t value;
 
     ctx = &ctx_table[fwk_id_get_element_idx(event->target_id)];
 
     /* Event from timer callback */
     if (fwk_id_is_equal(event->id, mod_juno_thermal_event_id_timer)) {
-        status = ctx->sensor_api->get_value(ctx->config->sensor_id, &value);
+        status = ctx->sensor_api->get_data(
+            ctx->config->sensor_id, &ctx->sensor_data);
         if (status == FWK_SUCCESS) {
             status = check_threshold_breach(
-                value,
-                ctx->config->thermal_threshold_mdc);
+                ctx->sensor_data.value, ctx->config->thermal_threshold_mdc);
         } else if (status == FWK_PENDING) {
             return FWK_SUCCESS;
         }
 
     /* Response event from sensor HAL */
     } else if (fwk_id_is_equal(event->id, mod_sensor_event_id_read_request)) {
-        struct mod_sensor_event_params *params =
-        (struct mod_sensor_event_params *)event->params;
-
-        if (params->status != FWK_SUCCESS) {
-            return params->status;
+        if (ctx->sensor_data.status != FWK_SUCCESS) {
+            return ctx->sensor_data.status;
         }
         status = check_threshold_breach(
-            params->value,
-            ctx->config->thermal_threshold_mdc);
+            ctx->sensor_data.value, ctx->config->thermal_threshold_mdc);
 
     } else {
         return FWK_E_PARAM;
