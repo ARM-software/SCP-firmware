@@ -47,7 +47,7 @@ struct sensor_dev_ctx {
         bool dequeuing;
     } concurrency_readings;
 
-    struct mod_sensor_event_params last_read;
+    struct mod_sensor_data last_read;
 };
 
 struct sensor_mod_ctx {

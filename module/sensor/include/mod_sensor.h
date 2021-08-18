@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -238,6 +238,20 @@ struct mod_sensor_dev_config {
 };
 
 /*!
+ * \brief Sensor data.
+ *
+ * \details Sensor data structure that contains all related value reading
+ *      information.
+ */
+struct mod_sensor_data {
+    /*! Sensor value */
+    uint64_t value;
+
+    /*! Status of the response event */
+    int status;
+};
+
+/*!
  * \brief Sensor module configuration.
  *
  * \details Configuration structure sensor module.
@@ -286,22 +300,22 @@ struct mod_sensor_driver_api {
  */
 struct mod_sensor_api {
     /*!
-     * \brief Read sensor value.
+     * \brief Read sensor data.
      *
-     * \details Read current sensor value.
+     * \details Read current sensor data.
      *
      * \param id Specific sensor device id.
-     * \param[out] value The sensor value.
+     * \param[out] data Sensor struct data will be returned.
      *
      * \retval ::FWK_SUCCESS Operation succeeded.
      * \retval ::FWK_E_DEVICE Driver error.
-     * \retval ::FWK_E_BUSY At least one reading of the sensor value is already
+     * \retval ::FWK_E_BUSY At least one reading of the sensor data is already
      *      on-going.
-     * \retval ::FWK_PENDING The request is pending. The requested value will be
+     * \retval ::FWK_PENDING The request is pending. The requested data will be
      *      provided via a response event.
      * \return One of the standard framework error codes.
      */
-    int (*get_value)(fwk_id_t id, uint64_t *value);
+    int (*get_data)(fwk_id_t id, struct mod_sensor_data *data);
 
     /*!
      * \brief Get sensor information.
@@ -418,11 +432,8 @@ static const fwk_id_t mod_sensor_api_id_driver_response =
  * \brief Shared event parameters.
  */
 struct mod_sensor_event_params {
-    /*! Sensor value */
-    uint64_t value;
-
-    /*! Status of the response event */
-    int status;
+    /*! Sensor value pointer */
+    struct mod_sensor_data *sensor_data;
 };
 
 /*!

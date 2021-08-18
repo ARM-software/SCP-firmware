@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -806,7 +806,7 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
     const uint8_t *event_params, int status)
 {
     uint16_t set_value;
-    uint64_t adc_val;
+    struct mod_sensor_data adc_val;
     struct juno_xrp7724_dev_ctx *ctx;
     struct mod_psu_driver_response driver_response;
     const struct mod_juno_xrp7724_config *module_config = module_ctx.config;
@@ -913,16 +913,16 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
          break;
 
     case JUNO_XRP7724_PSU_REQUEST_COMPARE_VOLTAGE:
-        status = module_ctx.adc_api->get_value(ctx->config->psu_adc_id,
-                                              &adc_val);
+        status =
+            module_ctx.adc_api->get_data(ctx->config->psu_adc_id, &adc_val);
         if (status != FWK_SUCCESS) {
             break;
         }
 
-        if (((adc_val + PSU_TARGET_MARGIN_MV) <
-            ctx->juno_xrp7724_dev_psu.psu_set_voltage) ||
-            ((adc_val - PSU_TARGET_MARGIN_MV) >
-            ctx->juno_xrp7724_dev_psu.psu_set_voltage)) {
+        if (((adc_val.value + PSU_TARGET_MARGIN_MV) <
+             ctx->juno_xrp7724_dev_psu.psu_set_voltage) ||
+            ((adc_val.value - PSU_TARGET_MARGIN_MV) >
+             ctx->juno_xrp7724_dev_psu.psu_set_voltage)) {
             FWK_LOG_INFO("[XRP7724] Voltage set out of margin");
 
             status = FWK_E_DEVICE;

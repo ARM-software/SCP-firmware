@@ -49,6 +49,13 @@ static int get_ctx_if_valid_call(fwk_id_t id,
     return FWK_SUCCESS;
 }
 
+static inline void sensor_data_copy(
+    struct mod_sensor_data *dest,
+    const struct mod_sensor_data *origin)
+{
+    fwk_str_memcpy(dest, origin, sizeof(struct mod_sensor_data));
+}
+
 #ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
 static bool trip_point_evaluate(
     struct sensor_trip_point_ctx *ctx,
@@ -87,7 +94,7 @@ static bool trip_point_evaluate(
 #endif
 
 #ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
-static void trip_point_process(fwk_id_t id, uint64_t value)
+static void trip_point_process(fwk_id_t id, struct mod_sensor_data *data)
 {
     struct sensor_dev_ctx *ctx;
     unsigned int i;
@@ -96,7 +103,7 @@ static void trip_point_process(fwk_id_t id, uint64_t value)
     ctx = ctx_table + fwk_id_get_element_idx(id);
 
     for (i = 0; i < ctx->config->trip_point.count; i++) {
-        if (trip_point_evaluate(&(ctx->trip_point_ctx[i]), value)) {
+        if (trip_point_evaluate(&(ctx->trip_point_ctx[i]), data->value)) {
             /* Handle trip point event*/
             if (sensor_mod_ctx.sensor_trip_point_api != NULL)
                 sensor_mod_ctx.sensor_trip_point_api->notify_sensor_trip_point(
@@ -109,31 +116,38 @@ static void trip_point_process(fwk_id_t id, uint64_t value)
 /*
  * Module API
  */
-static int get_value(fwk_id_t id, uint64_t *value)
+static int get_data(fwk_id_t id, struct mod_sensor_data *data)
 {
     int status;
     struct sensor_dev_ctx *ctx;
     struct fwk_event req;
+    struct mod_sensor_event_params *event_params =
+        (struct mod_sensor_event_params *)req.params;
 
-    status = get_ctx_if_valid_call(id, value, &ctx);
+    status = get_ctx_if_valid_call(id, data, &ctx);
     if (status != FWK_SUCCESS) {
         return status;
     }
 
     if (ctx->concurrency_readings.dequeuing) {
         /* Prevent new reading request while dequeuing pending readings
-         * cached value is returned
+         * cached data is returned
          */
-        *value = ctx->last_read.value;
+        sensor_data_copy(data, &ctx->last_read);
         return ctx->last_read.status;
     }
 
     if (ctx->concurrency_readings.pending_requests == 0) {
-        status = ctx->driver_api->get_value(ctx->config->driver_id, value);
+        status = ctx->driver_api->get_value(
+            ctx->config->driver_id, &ctx->last_read.value);
+        ctx->last_read.status = status;
         if (status == FWK_SUCCESS) {
 #ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
-            trip_point_process(id, *value);
+            trip_point_process(id, &ctx->last_read);
 #endif
+
+            sensor_data_copy(data, &ctx->last_read);
+
             return status;
         } else if (status != FWK_PENDING) {
             return status;
@@ -150,6 +164,9 @@ static int get_value(fwk_id_t id, uint64_t *value)
         .id = mod_sensor_event_id_read_request,
         .response_requested = true,
     };
+
+    /* Save data address to copy return values in there */
+    event_params->sensor_data = data;
 
     status = fwk_thread_put_event(&req);
     if (status != FWK_SUCCESS) {
@@ -228,7 +245,7 @@ static int sensor_set_trip_point(
     return FWK_SUCCESS;
 }
 
-static struct mod_sensor_api sensor_api = { .get_value = get_value,
+static struct mod_sensor_api sensor_api = { .get_data = get_data,
                                             .get_info = get_info,
                                             .get_trip_point =
                                                 sensor_get_trip_point,
@@ -244,8 +261,6 @@ static void reading_complete(fwk_id_t dev_id,
     int status = FWK_SUCCESS;
     struct fwk_event event;
     struct sensor_dev_ctx *ctx;
-    struct mod_sensor_event_params *event_params =
-        (struct mod_sensor_event_params *)event.params;
 
     if (!fwk_expect(fwk_id_get_module_idx(dev_id) == FWK_MODULE_IDX_SENSOR)) {
         return;
@@ -259,17 +274,16 @@ static void reading_complete(fwk_id_t dev_id,
     };
 
     if (response != NULL) {
-        event_params->status = response->status;
-        event_params->value = response->value;
+        ctx->last_read.status = response->status;
+        ctx->last_read.value = response->value;
+
 #ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
-        trip_point_process(dev_id, response->value);
+        trip_point_process(dev_id, &ctx->last_read);
 #endif
     } else {
-        event_params->status = FWK_E_DEVICE;
+        ctx->last_read.status = FWK_E_DEVICE;
     }
 
-    ctx->last_read.status = event_params->status;
-    ctx->last_read.value = event_params->value;
     ctx->concurrency_readings.dequeuing = true;
 
     status = fwk_thread_put_event(&event);
@@ -411,13 +425,14 @@ static int sensor_process_bind_request(fwk_id_t source_id,
 
 static int process_pending_requests(
     fwk_id_t dev_id,
-    struct mod_sensor_event_params *event_params)
+    const struct mod_sensor_data *event_params)
 {
     int status;
     bool list_is_empty;
     struct fwk_event delayed_response;
+    struct mod_sensor_event_params *response_params =
+        (struct mod_sensor_event_params *)delayed_response.params;
     struct sensor_dev_ctx *ctx;
-    struct mod_sensor_event_params response_params = { 0 };
 
     status = fwk_thread_is_delayed_response_list_empty(dev_id, &list_is_empty);
     if (status != FWK_SUCCESS) {
@@ -434,18 +449,7 @@ static int process_pending_requests(
             return status;
         }
 
-        if (event_params != NULL) {
-            fwk_str_memcpy(
-                delayed_response.params,
-                event_params,
-                sizeof(struct mod_sensor_event_params));
-        } else {
-            response_params.status = FWK_E_DEVICE;
-            fwk_str_memcpy(
-                delayed_response.params,
-                &response_params,
-                sizeof(struct mod_sensor_event_params));
-        }
+        sensor_data_copy(response_params->sensor_data, &ctx->last_read);
 
         status = fwk_thread_put_event(&delayed_response);
         if (status != FWK_SUCCESS) {
@@ -471,7 +475,8 @@ static int sensor_process_event(const struct fwk_event *event,
     int status;
     struct sensor_dev_ctx *ctx;
     struct fwk_event read_req_event;
-
+    struct mod_sensor_event_params *event_params =
+        (struct mod_sensor_event_params *)read_req_event.params;
     enum mod_sensor_event_idx event_id_type;
 
     if (!fwk_module_is_valid_element_id(event->target_id)) {
@@ -503,14 +508,9 @@ static int sensor_process_event(const struct fwk_event *event,
             return status;
         }
 
-        fwk_str_memcpy(
-            read_req_event.params,
-            event->params,
-            sizeof(struct mod_sensor_event_params));
-        fwk_str_memcpy(
-            &ctx->last_read,
-            event->params,
-            sizeof(struct mod_sensor_event_params));
+        sensor_data_copy(
+            (struct mod_sensor_data *)event_params->sensor_data,
+            &ctx->last_read);
 
         status = fwk_thread_put_event(&read_req_event);
         if (status != FWK_SUCCESS) {
@@ -523,7 +523,7 @@ static int sensor_process_event(const struct fwk_event *event,
          * or the event queue is empty.
          */
         return process_pending_requests(
-            event->target_id, (struct mod_sensor_event_params *)event->params);
+            event->target_id, (const struct mod_sensor_data *)event->params);
 
     default:
         return FWK_E_PARAM;

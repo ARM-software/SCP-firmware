@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -55,6 +55,9 @@ struct scmi_sensor_ctx {
 
     /* Pointer to a table of sensor operations */
     struct sensor_operations *sensor_ops_table;
+
+    /* Array of sensor values */
+    struct mod_sensor_data *sensor_values;
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     /* SCMI Resource Permissions API */
@@ -542,7 +545,7 @@ static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    /* The get_value request is processed within the event being generated */
+    /* The get_data request is processed within the event being generated */
     struct fwk_event event = {
         .target_id = fwk_module_id_scmi_sensor,
         .id = mod_scmi_sensor_event_id_get_request,
@@ -743,6 +746,9 @@ static int scmi_sensor_init(fwk_id_t module_id,
         return FWK_E_SUPPORT;
     }
 
+    scmi_sensor_ctx.sensor_values = fwk_mm_calloc(
+        scmi_sensor_ctx.sensor_count, sizeof(struct mod_sensor_data));
+
     /* SCMI protocol uses a 16 bit number to store the number of sensors.
      * So expose no more than 0xFFFF number of sensors. */
     if (scmi_sensor_ctx.sensor_count > UINT16_MAX) {
@@ -875,26 +881,31 @@ static int scmi_sensor_process_bind_request(fwk_id_t source_id,
     return FWK_SUCCESS;
 }
 
+static inline struct mod_sensor_data *get_sensor_data(fwk_id_t sensor_id)
+{
+    return &scmi_sensor_ctx.sensor_values[fwk_id_get_element_idx(sensor_id)];
+}
+
 static int scmi_sensor_process_event(const struct fwk_event *event,
                                      struct fwk_event *resp_event)
 {
     int status;
-    uint64_t sensor_value;
     struct scmi_sensor_event_parameters *scmi_params;
+    struct mod_sensor_data *sensor_data;
     struct scmi_sensor_protocol_reading_get_p2a return_values;
 
     /* Request event to sensor HAL */
     if (fwk_id_is_equal(event->id, mod_scmi_sensor_event_id_get_request)) {
         scmi_params = (struct scmi_sensor_event_parameters *)event->params;
-
-        status = scmi_sensor_ctx.sensor_api->get_value(
-            scmi_params->sensor_id, &sensor_value);
+        sensor_data = get_sensor_data(scmi_params->sensor_id);
+        status = scmi_sensor_ctx.sensor_api->get_data(
+            scmi_params->sensor_id, sensor_data);
         if (status == FWK_SUCCESS) {
             /* Sensor value is ready */
-            return_values = (struct scmi_sensor_protocol_reading_get_p2a) {
+            return_values = (struct scmi_sensor_protocol_reading_get_p2a){
                 .status = SCMI_SUCCESS,
-                .sensor_value_low = (uint32_t)sensor_value,
-                .sensor_value_high = (uint32_t)(sensor_value >> 32),
+                .sensor_value_low = (uint32_t)sensor_data->value,
+                .sensor_value_high = (uint32_t)(sensor_data->value >> 32),
             };
 
             scmi_sensor_respond(&return_values, scmi_params->sensor_id);
@@ -916,15 +927,14 @@ static int scmi_sensor_process_event(const struct fwk_event *event,
 
     /* Response event from sensor HAL */
     if (fwk_id_is_equal(event->id, mod_sensor_event_id_read_request)) {
-        struct mod_sensor_event_params *params =
-            (struct mod_sensor_event_params *)event->params;
+        sensor_data = get_sensor_data(event->source_id);
 
-        return_values = (struct scmi_sensor_protocol_reading_get_p2a) {
-            .sensor_value_low = (uint32_t)params->value,
-            .sensor_value_high = (uint32_t)(params->value >> 32),
+        return_values = (struct scmi_sensor_protocol_reading_get_p2a){
+            .sensor_value_low = (uint32_t)sensor_data->value,
+            .sensor_value_high = (uint32_t)(sensor_data->value >> 32),
         };
 
-        if (params->status == FWK_SUCCESS) {
+        if (sensor_data->status == FWK_SUCCESS) {
             return_values.status = (int32_t)SCMI_SUCCESS;
         } else {
             return_values.status = (int32_t)SCMI_HARDWARE_ERROR;
