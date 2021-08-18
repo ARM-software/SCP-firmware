@@ -906,6 +906,10 @@ static int scmi_sensor_process_event(const struct fwk_event *event,
                 .status = SCMI_SUCCESS,
                 .sensor_value_low = (uint32_t)sensor_data->value,
                 .sensor_value_high = (uint32_t)(sensor_data->value >> 32),
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+                .timestamp_low = (uint32_t)sensor_data->timestamp,
+                .timestamp_high = (uint32_t)(sensor_data->timestamp >> 32),
+#endif
             };
 
             scmi_sensor_respond(&return_values, scmi_params->sensor_id);
@@ -932,6 +936,10 @@ static int scmi_sensor_process_event(const struct fwk_event *event,
         return_values = (struct scmi_sensor_protocol_reading_get_p2a){
             .sensor_value_low = (uint32_t)sensor_data->value,
             .sensor_value_high = (uint32_t)(sensor_data->value >> 32),
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+            .timestamp_low = (uint32_t)sensor_data->timestamp,
+            .timestamp_high = (uint32_t)(sensor_data->timestamp >> 32),
+#endif
         };
 
         if (sensor_data->status == FWK_SUCCESS) {

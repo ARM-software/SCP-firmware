@@ -75,6 +75,10 @@ struct scmi_sensor_protocol_reading_get_p2a {
     int32_t status;
     uint32_t sensor_value_low;
     uint32_t sensor_value_high;
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+    uint32_t timestamp_low;
+    uint32_t timestamp_high;
+#endif
 };
 
 /*
