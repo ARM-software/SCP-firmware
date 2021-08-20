@@ -120,6 +120,13 @@ enum mod_sensor_type {
     MOD_SENSOR_TYPE_SQUARE_FEET,
     MOD_SENSOR_TYPE_SQUARE_CENTIMETERS,
     MOD_SENSOR_TYPE_SQUARE_METERS,
+    MOD_SENSOR_TYPE_RADIANS_PER_SECOND,
+    MOD_SENSOR_TYPE_BEATS_PER_MINUTE,
+    MOD_SENSOR_TYPE_METERS_PER_SECOND_SQUARED,
+    MOD_SENSOR_TYPE_METERS_PER_SECOND,
+    MOD_SENSOR_TYPE_CUBIC_METER_PER_SECOND,
+    MOD_SENSOR_TYPE_MILLIMETERS_OF_MERCURY,
+    MOD_SENSOR_TYPE_RADIANS_PER_SECOND_SQUARED,
     MOD_SENSOR_TYPE_OEM_UNIT = 0xFF,
     MOD_SENSOR_TYPE_COUNT
 };
@@ -131,6 +138,41 @@ struct mod_sensor_trip_point_info {
     /*! Sensor trip point count */
     uint32_t count;
 };
+
+#ifdef BUILD_HAS_SENSOR_EXT_ATTRIBS
+
+/*!
+ * \brief Structure containing all extended attributes for multi axis
+ *        information.
+ *
+ * \details Sensor information structure used to configure the sensor multi
+ *          axis values.
+ */
+struct mod_sensor_axis_attributes {
+    /*! Axis resolution value */
+    uint32_t axis_resolution;
+
+    /*! Axis minimum range */
+    int64_t axis_min_range;
+
+    /*! Axis maximum range */
+    int64_t axis_max_range;
+};
+
+/*!
+ * \brief Structure containing all sensor property information.
+ *
+ * \details Sensor information structure used to configure the sensor
+ *          property values.
+ */
+struct mod_sensor_ext_properties {
+    /*! Sensor power value */
+    uint32_t sensor_power;
+
+    /*! Further sensor property values */
+    struct mod_sensor_axis_attributes sensor_property_vals;
+};
+#endif
 
 #ifdef BUILD_HAS_SENSOR_TIMESTAMP
 /*!
@@ -177,6 +219,13 @@ struct mod_sensor_axis_info {
      *      ```
      */
     int unit_multiplier;
+#    ifdef BUILD_HAS_SENSOR_EXT_ATTRIBS
+    /*! Extended attributes */
+    bool extended_attribs;
+
+    /*! Multi axis property values */
+    struct mod_sensor_axis_attributes multi_axis_properties;
+#    endif
 };
 #endif
 
@@ -221,6 +270,13 @@ struct mod_sensor_info {
      *      ```
      */
     int unit_multiplier;
+#ifdef BUILD_HAS_SENSOR_EXT_ATTRIBS
+    /*! Extended attributes information */
+    bool ext_attributes;
+
+    /*! Sensor property values */
+    struct mod_sensor_ext_properties sensor_properties;
+#endif
 };
 
 /*!
@@ -253,7 +309,6 @@ struct mod_sensor_complete_info {
         /*! Number of axis configured */
         unsigned int axis_count;
     } multi_axis;
-
 #endif
 };
 
