@@ -113,6 +113,8 @@ to yes, the platform can provide support for clock tree management.
   Support. When set to yes, SCMI Sensor V2 protocol is enabled.
 * __BS_FIRMWARE_HAS_SENSOR_TIMESTAMP__ <yes|no> - Sensor timestamp. When set to
 yes, the platform supports Sensor timestamp feature.
+* __BS_FIRMWARE_HAS_SENSOR_MULTI_AXIS__ <yes|no> - Sensor multi axis. When set
+to yes, the platform supports Sensor multi axis feature.
 
 The format of the __BS_FIRMWARE_MODULES__ parameter can be seen in the following
 example:

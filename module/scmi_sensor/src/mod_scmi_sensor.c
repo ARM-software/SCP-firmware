@@ -235,7 +235,7 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
                (const struct scmi_sensor_protocol_description_get_a2p *)payload;
     struct scmi_sensor_desc desc = { 0 };
     unsigned int num_descs, desc_index, desc_index_max;
-    struct mod_sensor_scmi_info sensor_info;
+    struct mod_sensor_complete_info sensor_info;
     struct scmi_sensor_protocol_description_get_p2a return_values = {
         .status = (int32_t)SCMI_GENERIC_ERROR,
     };
@@ -436,7 +436,7 @@ static int scmi_sensor_trip_point_config_handler(
 {
     struct scmi_sensor_trip_point_config_a2p *parameters;
     struct scmi_sensor_trip_point_config_p2a return_values;
-    struct mod_sensor_scmi_info sensor_info;
+    struct mod_sensor_complete_info sensor_info;
     struct mod_sensor_trip_point_params trip_point_param;
     fwk_id_t sensor_id;
     uint32_t trip_point_idx;
