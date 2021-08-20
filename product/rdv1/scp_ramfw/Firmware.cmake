@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -13,7 +13,7 @@ set(SCP_TOOLCHAIN_INIT "GNU")
 set(SCP_FIRMWARE_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}")
 
 set(SCP_GENERATE_FLAT_BINARY TRUE)
-set(SCP_ARCHITECTURE "armv7-m")
+set(SCP_ARCHITECTURE "arm-m")
 
 set(SCP_ENABLE_NOTIFICATIONS TRUE)
 

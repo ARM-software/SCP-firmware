@@ -45,18 +45,21 @@ static void arch_init_ccr(void)
      * Set up the Configuration Control Register (CCR) in the System Control
      * Block (1) by setting the following flag bits:
      *
-     * DIV_0_TRP   [4]: Enable trapping on division by zero.
+     * DIV_0_TRP   [4]: Enable trapping on division by zero. (1)(2)
      * STKALIGN    [9]: Enable automatic DWORD stack-alignment on exception
-     *                  entry (2).
+     *                  entry (3).
      *
      * All other bits are left in their default state.
      *
      * (1) ARM® v7-M Architecture Reference Manual, section B3.2.8.
-     * (2) ARM® v7-M Architecture Reference Manual, section B1.5.7.
+     * (2) Arm® v8-M Architecture Reference Manual, section D1.2.9.
+     * (3) ARM® v7-M Architecture Reference Manual, section B1.5.7.
      */
 
     SCB->CCR |= SCB_CCR_DIV_0_TRP_Msk;
+#ifdef ARMV7M
     SCB->CCR |= SCB_CCR_STKALIGN_Msk;
+#endif
 }
 
 int main(void)

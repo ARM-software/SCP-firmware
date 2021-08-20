@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -20,7 +20,7 @@ set(SCP_ENABLE_NOTIFICATIONS_INIT TRUE)
 
 set(SCP_ENABLE_IPO_INIT FALSE)
 
-set(SCP_ARCHITECTURE "armv7-m")
+set(SCP_ARCHITECTURE "arm-m")
 
 set(SCP_ENABLE_NEWLIB_NANO FALSE)
 
