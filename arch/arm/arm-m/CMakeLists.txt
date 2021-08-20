@@ -5,22 +5,33 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-add_library(arch-armv7m)
+add_library(arch-arm-m)
 
-target_include_directories(arch-armv7m
+#
+# Determine which architecture shall be supported according to
+# the used CPU
+#
+
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "cortex-m(33|55)")
+    target_compile_definitions(arch-arm-m PUBLIC "ARMV8M")
+else()
+    target_compile_definitions(arch-arm-m PUBLIC "ARMV7M")
+endif()
+
+target_include_directories(arch-arm-m
                            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 # cmake-lint: disable=E1122
 
 target_sources(
-    arch-armv7m
+    arch-arm-m
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/arch_exceptions.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/src/arch_handlers.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/src/arch_main.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/src/arch_nvic.c"
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../src/arch_mm.c")
 
-target_link_libraries(arch-armv7m PUBLIC cmsis::core-m)
+target_link_libraries(arch-arm-m PUBLIC cmsis::core-m)
 
 
 #
@@ -36,15 +47,15 @@ cmake_dependent_option(
 
 if(SCP_ENABLE_NEWLIB_NANO)
     if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-        target_link_options(arch-armv7m PUBLIC "--specs=nano.specs")
+        target_link_options(arch-arm-m PUBLIC "--specs=nano.specs")
     elseif(CMAKE_C_COMPILER_ID STREQUAL "Clang")
-        target_link_libraries(arch-armv7m PUBLIC c_nano)
+        target_link_libraries(arch-arm-m PUBLIC c_nano)
     endif()
 else()
     if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-        target_link_options(arch-armv7m PUBLIC "--specs=nosys.specs")
+        target_link_options(arch-arm-m PUBLIC "--specs=nosys.specs")
     elseif(CMAKE_C_COMPILER_ID STREQUAL "Clang")
-        target_link_libraries(arch-armv7m PUBLIC c)
+        target_link_libraries(arch-arm-m PUBLIC c)
     endif()
 endif()
 
@@ -53,15 +64,15 @@ endif()
 # functions that the standard library relies on.
 #
 
-target_link_options(arch-armv7m PUBLIC "LINKER:--undefined=arch_exceptions")
+target_link_options(arch-arm-m PUBLIC "LINKER:--undefined=arch_exceptions")
 
 if(CMAKE_C_COMPILER_ID STREQUAL "ARMClang")
-    target_link_options(arch-armv7m
+    target_link_options(arch-arm-m
                         PUBLIC "LINKER:--entry=arch_exception_reset")
 endif()
 
 if(SCP_HAVE_NEWLIB)
-    target_link_options(arch-armv7m PUBLIC "LINKER:--undefined=posix_memalign"
+    target_link_options(arch-arm-m PUBLIC "LINKER:--undefined=posix_memalign"
                                            "LINKER:--undefined=_sbrk")
 endif()
 
@@ -89,4 +100,4 @@ else()
     set(scp_lds "${CMAKE_CURRENT_SOURCE_DIR}/src/arch.ld.S")
 endif()
 
-scp_target_linker_script(arch-armv7m "${scp_lds}")
+scp_target_linker_script(arch-arm-m "${scp_lds}")
