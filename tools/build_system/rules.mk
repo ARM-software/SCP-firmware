@@ -49,6 +49,10 @@ ifeq ($(BUILD_HAS_SENSOR_MULTI_AXIS),yes)
     DEFINES += BUILD_HAS_SENSOR_MULTI_AXIS
 endif
 
+ifeq ($(BUILD_HAS_SENSOR_EXT_ATTRIBS),yes)
+    DEFINES += BUILD_HAS_SENSOR_EXT_ATTRIBS
+endif
+
 export AS := $(CC)
 export LD := $(CC)
 

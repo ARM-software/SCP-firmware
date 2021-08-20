@@ -60,6 +60,12 @@ struct sensor_dev_ctx {
 #ifdef BUILD_HAS_SENSOR_TIMESTAMP
     struct mod_sensor_timestamp_info timestamp;
 #endif
+
+#ifdef BUILD_HAS_SENSOR_EXT_ATTRIBS
+    bool mod_extended_attrib;
+
+    struct mod_sensor_ext_properties sensor_property_values;
+#endif
 };
 
 struct mod_sensor_ctx {
@@ -108,7 +114,6 @@ int sensor_get_axis_info(
     fwk_id_t id,
     uint32_t axis,
     struct mod_sensor_axis_info *info);
-
 #endif
 
 /*!
