@@ -6,8 +6,6 @@
         "target": "dev",
     },
 
-    "remoteUser": "user",
-
     "workspaceMount": "source=${localWorkspaceFolder},target=/scp-firmware,type=bind,consistency=default",
     "workspaceFolder": "/scp-firmware",
 
