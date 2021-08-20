@@ -11,6 +11,4 @@ target_include_directories(${SCP_MODULE_TARGET}
                            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 target_sources(${SCP_MODULE_TARGET}
-               PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_mock_voltage_domain.c")
-
-target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-voltage-domain module-timer)
+               PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_voltage_domain.c")
