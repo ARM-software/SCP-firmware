@@ -1,13 +1,13 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
  *      Common linker script configuration options.
  *
- * There are three supported memory layouts for the ARMv7-M architecture:
+ * There are three supported memory layouts for the ARM-M architectures:
  *
  * Layout 1 - Single region:
  *      This layout uses a single read/write/execute memory region for all data.
@@ -34,8 +34,8 @@
 #ifndef ARCH_SCATTER_H
 #define ARCH_SCATTER_H
 
-#define ARCH_MEM_MODE_SINGLE_REGION 0
-#define ARCH_MEM_MODE_DUAL_REGION_RELOCATION 1
+#define ARCH_MEM_MODE_SINGLE_REGION             0
+#define ARCH_MEM_MODE_DUAL_REGION_RELOCATION    1
 #define ARCH_MEM_MODE_DUAL_REGION_NO_RELOCATION 2
 
 #include <fmw_memory.h>

@@ -5,12 +5,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
- *      ARMv7-M exception handlers.
+ *      ARM-M exception handlers.
  */
 
-#include <fwk_attributes.h>
+#include "arch_exceptions.h"
 
-#include <arch_exceptions.h>
+#include <fwk_attributes.h>
 
 #include <fmw_cmsis.h>
 
@@ -49,7 +49,7 @@ extern char __stackheap_end__;
 #endif
 
 /*
- * Set up the exception table. The structure below is is added to the
+ * Set up the exception table. The structure below is added to the
  * .exceptions section which will be explicitly placed at the beginning of the
  * binary by the linker script.
  */
@@ -72,6 +72,10 @@ const struct {
             (uintptr_t)(arch_exception_invalid),
         [NVIC_USER_IRQ_OFFSET + UsageFault_IRQn - 1] =
             (uintptr_t)(arch_exception_invalid),
+#ifdef ARMV8M
+        [NVIC_USER_IRQ_OFFSET + SecureFault_IRQn - 1] =
+            (uintptr_t)(arch_exception_invalid),
+#endif
         [NVIC_USER_IRQ_OFFSET + DebugMonitor_IRQn - 1] =
             (uintptr_t)(arch_exception_invalid),
 

@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -41,13 +41,17 @@ foreach(language IN ITEMS ASM C CXX)
                "-I\"${LLVM_SYSROOT_PATH}/include\" ")
     endif()
 
-    if(CMAKE_SYSTEM_PROCESSOR MATCHES "cortex-m[37]")
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "cortex-m(3|7|33|55)")
         set(BUILD_TARGET "-mcpu=${CMAKE_SYSTEM_PROCESSOR} -mthumb ")
         string(APPEND CMAKE_${language}_FLAGS_INIT "${BUILD_TARGET}")
         if(CMAKE_SYSTEM_PROCESSOR MATCHES "cortex-m7")
             set(CLANG_BUILTINS_ARCH "armv7em")
-        else()
+        elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "cortex-m33")
+            set(CLANG_BUILTINS_ARCH "armv8m.main")
+        elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "cortex-m3")
             set(CLANG_BUILTINS_ARCH "armv7m")
+        elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "cortex-m55")
+            set(CLANG_BUILTINS_ARCH "armv8.1m.main")
         endif()
     endif()
 
