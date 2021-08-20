@@ -153,6 +153,32 @@ struct mod_sensor_timestamp_info {
     int8_t exponent;
 };
 #endif
+#ifdef BUILD_HAS_SENSOR_MULTI_AXIS
+/*!
+ * \brief Structure containing infomation for a specific sensor axis
+ *
+ * \details Sensor axis information structure used to configure the sensor HAL.
+ */
+struct mod_sensor_axis_info {
+    /*! Sensor axis name */
+    const char *name;
+
+    /*! SCMI sensor type */
+    enum mod_sensor_type type;
+
+    /*!
+     * \brief Power-of-10 multiplier applied to the unit specified by
+     *      ::mod_sensor_info::type.
+     *
+     * \details Used per:
+     *
+     *      ```none
+     *      unit * 10^(unit_multiplier)
+     *      ```
+     */
+    int unit_multiplier;
+};
+#endif
 
 /*!
  * \brief Structure containing all sensor driver information.
@@ -202,8 +228,13 @@ struct mod_sensor_info {
  *
  * \details Sensor information structure used serve SCMI requests.
  */
-struct mod_sensor_scmi_info {
-    /*! Sensor HAL information */
+struct mod_sensor_complete_info {
+    /*!
+     * \brief Sensor HAL information.
+     *
+     * \details If multi axis configuration is supported not all parameters will
+     *      be filled here.
+     */
     struct mod_sensor_info hal_info;
 
     /*! Sensor trip information */
@@ -212,6 +243,17 @@ struct mod_sensor_scmi_info {
 #ifdef BUILD_HAS_SENSOR_TIMESTAMP
     /*! Sensor timestamp information */
     struct mod_sensor_timestamp_info timestamp;
+#endif
+
+#ifdef BUILD_HAS_SENSOR_MULTI_AXIS
+    /*! Sensor multi axis information */
+    struct {
+        /*! Multi axis supported feature */
+        bool support;
+        /*! Number of axis configured */
+        unsigned int axis_count;
+    } multi_axis;
+
 #endif
 };
 
@@ -276,15 +318,25 @@ struct mod_sensor_dev_config {
  *      information.
  */
 struct mod_sensor_data {
-    /*! Sensor value */
-    uint64_t value;
-
     /*! Status of the response event */
     int status;
+
+    /*! Sensor value */
+    union {
+        /*! Sensor N-axis value */
+        uint64_t *axis_value;
+        /*! Sensor scalar value */
+        uint64_t value;
+    };
 
 #ifdef BUILD_HAS_SENSOR_TIMESTAMP
     /*! Timestamp value */
     uint64_t timestamp;
+#endif
+
+#ifdef BUILD_HAS_SENSOR_MULTI_AXIS
+    /*! Number of axis */
+    uint32_t axis_count;
 #endif
 };
 
@@ -330,6 +382,32 @@ struct mod_sensor_driver_api {
      * \return One of the standard framework error codes.
      */
     int (*get_info)(fwk_id_t id, struct mod_sensor_info *info);
+
+#ifdef BUILD_HAS_SENSOR_MULTI_AXIS
+    /*!
+     * \brief Get number of axis.
+     *
+     * \param id Specific sensor device id.
+     *
+     * \retval Number of axis.
+     */
+    unsigned int (*get_axis_count)(fwk_id_t id);
+
+    /*!
+     * \brief Get axis sensor information.
+     *
+     * \param id Specific sensor device id.
+     * \param axis Specific axis.
+     * \param[out] info The sensor information.
+     *
+     * \retval ::FWK_SUCCESS The information was read successfully.
+     * \return One of the standard framework error codes.
+     */
+    int (*get_axis_info)(
+        fwk_id_t id,
+        uint32_t axis,
+        struct mod_sensor_axis_info *info);
+#endif
 };
 
 /*!
@@ -366,7 +444,7 @@ struct mod_sensor_api {
      * \retval ::FWK_E_DEVICE Driver error.
      * \return One of the standard framework error codes.
      */
-    int (*get_info)(fwk_id_t id, struct mod_sensor_scmi_info *info);
+    int (*get_info)(fwk_id_t id, struct mod_sensor_complete_info *info);
 
     /*!
      * \brief Set trip point.
@@ -433,6 +511,21 @@ struct mod_sensor_api {
     int (*get_timestamp_config)(
         fwk_id_t id,
         struct mod_sensor_timestamp_info *config);
+
+    /*!
+     * \brief Get axis sensor information.
+     *
+     * \param id Specific sensor device id.
+     * \param axis Specific axis.
+     * \param[out] info The sensor information.
+     *
+     * \retval ::FWK_SUCCESS The information was read successfully.
+     * \return One of the standard framework error codes.
+     */
+    int (*get_axis_info)(
+        fwk_id_t id,
+        uint32_t axis,
+        struct mod_sensor_axis_info *info);
 #endif
 };
 
@@ -443,8 +536,13 @@ struct mod_sensor_driver_resp_params {
     /*! Status of the requested operation */
     int status;
 
-    /*! Value requested */
-    uint64_t value;
+    /*! Sensor value requested */
+    union {
+        /*! Sensor N-axis value */
+        uint64_t *axis_value;
+        /*! Sensor scalar value */
+        uint64_t value;
+    };
 };
 
 /*!

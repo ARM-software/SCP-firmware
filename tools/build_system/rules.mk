@@ -53,6 +53,10 @@ ifeq ($(BUILD_HAS_SENSOR_TIMESTAMP),yes)
     DEFINES += BUILD_HAS_SENSOR_TIMESTAMP
 endif
 
+ifeq ($(BUILD_HAS_SENSOR_MULTI_AXIS),yes)
+    DEFINES += BUILD_HAS_SENSOR_MULTI_AXIS
+endif
+
 export AS := $(CC)
 export LD := $(CC)
 

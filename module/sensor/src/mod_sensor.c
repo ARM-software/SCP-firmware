@@ -53,7 +53,21 @@ static inline void sensor_data_copy(
     struct mod_sensor_data *dest,
     const struct mod_sensor_data *origin)
 {
+#ifdef BUILD_HAS_SENSOR_MULTI_AXIS
+    uint64_t *value = dest->axis_value;
+#endif
+
     fwk_str_memcpy(dest, origin, sizeof(struct mod_sensor_data));
+
+#ifdef BUILD_HAS_SENSOR_MULTI_AXIS
+    if (dest->axis_count > 1) {
+        dest->axis_value = value;
+        fwk_str_memcpy(
+            dest->axis_value,
+            origin->axis_value,
+            sizeof(uint64_t) * dest->axis_count);
+    }
+#endif
 }
 
 #ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
@@ -101,6 +115,10 @@ static void trip_point_process(fwk_id_t id, struct mod_sensor_data *data)
 
     fwk_check(!fwk_id_is_equal(id, FWK_ID_NONE));
     ctx = ctx_table + fwk_id_get_element_idx(id);
+
+    if (!ctx->trip_point_ctx->enabled) {
+        return;
+    }
 
     for (i = 0; i < ctx->config->trip_point.count; i++) {
         if (trip_point_evaluate(&(ctx->trip_point_ctx[i]), data->value)) {
@@ -184,7 +202,7 @@ static int get_data(fwk_id_t id, struct mod_sensor_data *data)
     return FWK_PENDING;
 }
 
-static int get_info(fwk_id_t id, struct mod_sensor_scmi_info *info)
+static int get_info(fwk_id_t id, struct mod_sensor_complete_info *info)
 {
     int status;
     struct sensor_dev_ctx *ctx;
@@ -206,6 +224,12 @@ static int get_info(fwk_id_t id, struct mod_sensor_scmi_info *info)
         info->timestamp.timestamp_support = false;
     } else {
         return status;
+    }
+#endif
+#ifdef BUILD_HAS_SENSOR_MULTI_AXIS
+    if (ctx->axis_count > 1) {
+        info->multi_axis.support = true;
+        info->multi_axis.axis_count = ctx->axis_count;
     }
 #endif
 
@@ -265,6 +289,9 @@ static struct mod_sensor_api sensor_api = {
     .set_timestamp_config = sensor_set_timestamp_config,
     .get_timestamp_config = sensor_get_timestamp_config,
 #endif
+#ifdef BUILD_HAS_SENSOR_MULTI_AXIS
+    .get_axis_info = sensor_get_axis_info,
+#endif
 };
 
 /*
@@ -290,9 +317,21 @@ static void reading_complete(fwk_id_t dev_id,
 
     if (response != NULL) {
         ctx->last_read.status = response->status;
-        ctx->last_read.value = response->value;
+
 #ifdef BUILD_HAS_SENSOR_TIMESTAMP
         ctx->last_read.timestamp = sensor_get_timestamp(dev_id);
+#endif
+#ifdef BUILD_HAS_SENSOR_MULTI_AXIS
+        if (ctx->axis_count > 1) {
+            fwk_str_memcpy(
+                ctx->last_read.axis_value,
+                response->axis_value,
+                sizeof(uint64_t) * ctx->axis_count);
+        } else {
+            ctx->last_read.value = response->value;
+        }
+#else
+        ctx->last_read.value = response->value;
 #endif
 
 #ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
@@ -347,6 +386,7 @@ static int sensor_dev_init(fwk_id_t element_id,
     if (config->trip_point.count > 0) {
         ctx->trip_point_ctx = fwk_mm_calloc(
             config->trip_point.count, sizeof(struct sensor_trip_point_ctx));
+        ctx->trip_point_ctx->enabled = true;
     } else {
         ctx->trip_point_ctx = NULL;
     }
@@ -354,6 +394,9 @@ static int sensor_dev_init(fwk_id_t element_id,
     /* Pre-init last read with an invalid status */
     ctx->last_read.status = FWK_E_DEVICE;
 
+#ifndef BUILD_HAS_SENSOR_MULTI_AXIS
+    ctx->axis_count = 1;
+#endif
 #ifdef BUILD_HAS_SENSOR_TIMESTAMP
     return sensor_timestamp_dev_init(element_id, ctx);
 #else
@@ -406,6 +449,21 @@ static int sensor_bind(fwk_id_t id, unsigned int round)
 
     return FWK_SUCCESS;
 }
+#ifdef BUILD_HAS_SENSOR_MULTI_AXIS
+int sensor_start(fwk_id_t id)
+{
+    int status;
+
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
+        return FWK_SUCCESS;
+    }
+    status = sensor_axis_start(id);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+    return FWK_SUCCESS;
+}
+#endif
 
 static int sensor_process_bind_request(fwk_id_t source_id,
                                        fwk_id_t target_id,
@@ -560,6 +618,9 @@ const struct fwk_module module_sensor = {
     .init = sensor_init,
     .element_init = sensor_dev_init,
     .bind = sensor_bind,
+#ifdef BUILD_HAS_SENSOR_MULTI_AXIS
+    .start = sensor_start,
+#endif
     .process_bind_request = sensor_process_bind_request,
     .process_event = sensor_process_event,
 };

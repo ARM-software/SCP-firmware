@@ -7,10 +7,10 @@
 
 #include "sensor.h"
 
-#include <mod_sensor.h>
-
 #include <fwk_assert.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
+#include <fwk_mm.h>
 #include <fwk_status.h>
 #include <fwk_time.h>
 
@@ -110,6 +110,81 @@ uint64_t sensor_get_timestamp(fwk_id_t id)
         return timestamp / pow_unsigned(10, normalized_exponent);
     }
     return timestamp / pow_unsigned(10, -normalized_exponent);
+}
+
+#endif
+
+#ifdef BUILD_HAS_SENSOR_MULTI_AXIS
+
+int sensor_axis_start(fwk_id_t id)
+{
+    struct sensor_dev_ctx *ctx;
+    struct mod_sensor_axis_info axis_info;
+    enum mod_sensor_type type;
+    unsigned int i;
+    int status;
+
+    ctx = sensor_get_ctx(id);
+
+    if (ctx->driver_api->get_axis_count) {
+        ctx->axis_count =
+            ctx->driver_api->get_axis_count(ctx->config->driver_id);
+    } else {
+        ctx->axis_count = 1;
+    }
+    ctx->last_read.axis_value =
+        fwk_mm_calloc(ctx->axis_count, sizeof(uint64_t));
+    ctx->last_read.axis_count = ctx->axis_count;
+
+    if (ctx->config->trip_point.count > 0) {
+        for (i = 0; i < ctx->axis_count; i++) {
+            status = sensor_get_axis_info(id, i, &axis_info);
+            if (status != FWK_SUCCESS) {
+                return status;
+            }
+
+            /* Save value of first axis type */
+            if (i == 0) {
+                type = axis_info.type;
+            } else if (axis_info.type != type) {
+                ctx->trip_point_ctx->enabled = false;
+
+                /*
+                 * Valid situation where axis have different types, for that
+                 * reason trip points are disabled for this particular sensor.
+                 */
+                FWK_LOG_INFO(
+                    "[Sensor] Trip points are disable. Different axis type");
+
+                return FWK_SUCCESS;
+            }
+        }
+
+        ctx->trip_point_ctx->enabled = true;
+    }
+
+    return FWK_SUCCESS;
+}
+
+int sensor_get_axis_info(
+    fwk_id_t id,
+    uint32_t axis,
+    struct mod_sensor_axis_info *info)
+{
+    struct sensor_dev_ctx *ctx;
+
+    if (info == NULL) {
+        return FWK_E_PARAM;
+    }
+
+    ctx = sensor_get_ctx(id);
+
+    if (axis > ctx->axis_count) {
+        return FWK_E_PARAM;
+    }
+
+    ctx->driver_api->get_axis_info(ctx->config->driver_id, axis, info);
+    return FWK_SUCCESS;
 }
 
 #endif

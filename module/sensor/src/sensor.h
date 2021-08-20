@@ -27,8 +27,14 @@
  * Sensor trip point element context
  */
 struct sensor_trip_point_ctx {
+    /* Structure that describes the trip point configuration */
     struct mod_sensor_trip_point_params params;
+
+    /* This flag is used to latch status if the trip point were triggered */
     bool above_threshold;
+
+    /* This flag describes if this feature is enabled or not */
+    bool enabled;
 };
 
 /*
@@ -48,6 +54,8 @@ struct sensor_dev_ctx {
     } concurrency_readings;
 
     struct mod_sensor_data last_read;
+
+    unsigned int axis_count;
 
 #ifdef BUILD_HAS_SENSOR_TIMESTAMP
     struct mod_sensor_timestamp_info timestamp;
@@ -90,6 +98,16 @@ int sensor_get_timestamp_config(
     struct mod_sensor_timestamp_info *config);
 
 uint64_t sensor_get_timestamp(fwk_id_t id);
+#endif
+
+#ifdef BUILD_HAS_SENSOR_MULTI_AXIS
+
+int sensor_axis_start(fwk_id_t id);
+
+int sensor_get_axis_info(
+    fwk_id_t id,
+    uint32_t axis,
+    struct mod_sensor_axis_info *info);
 
 #endif
 
