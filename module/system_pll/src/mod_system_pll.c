@@ -51,7 +51,7 @@ static unsigned int freq_to_half_cycle_ps(unsigned int freq_hz)
 
     /* Check if the given frequency is a multiple of 1 KHz */
     if (freq_hz % MOD_SYSTEM_PLL_MIN_INTERVAL != 0)
-        return FWK_E_PARAM;
+        return 0;
 
     freq_khz = freq_hz / FWK_KHZ;
     if (freq_khz == 0)
