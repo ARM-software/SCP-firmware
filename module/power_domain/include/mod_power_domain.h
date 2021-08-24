@@ -816,6 +816,12 @@ enum mod_pd_public_event_idx {
     MOD_PD_PUBLIC_EVENT_IDX_COUNT,
 };
 
+/*! Set state requires a response */
+#define MOD_PD_SET_STATE_REQ_RESP true
+
+/*! Set state does not require a response */
+#define MOD_PD_SET_STATE_NO_RESP false
+
 /*!
  * \brief Parameters of the set state response event
  */

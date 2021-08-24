@@ -189,7 +189,7 @@ static int tc0_system_start(fwk_id_t id)
 
     return tc0_system_ctx.mod_pd_restricted_api->set_state(
         FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
-        false,
+        MOD_PD_SET_STATE_NO_RESP,
         MOD_PD_COMPOSITE_STATE(
             MOD_PD_LEVEL_2,
             0,
