@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -49,7 +49,7 @@ static struct mod_pl011_ctx {
     bool initialized; /* Whether the context has been initialized */
 
     struct mod_pl011_element_ctx *elements; /* Element context table */
-} mod_pl011_ctx = {
+} pl011_ctx = {
     .initialized = false,
 };
 
@@ -57,7 +57,7 @@ static int mod_pl011_init_ctx(struct mod_pl011_ctx *ctx)
 {
     size_t element_count;
 
-    fwk_assert(!mod_pl011_ctx.initialized);
+    fwk_assert(!pl011_ctx.initialized);
 
     element_count = (size_t)fwk_module_get_element_count(fwk_module_id_pl011);
     if (element_count == 0) {
@@ -91,7 +91,7 @@ static int mod_pl011_init_ctx(struct mod_pl011_ctx *ctx)
         (void)cfg;
     }
 
-    mod_pl011_ctx.initialized = true;
+    pl011_ctx.initialized = true;
 
     return FWK_SUCCESS;
 }
@@ -144,7 +144,7 @@ static void mod_pl011_enable(fwk_id_t id)
 {
     const struct mod_pl011_element_cfg *cfg = fwk_module_get_data(id);
     struct mod_pl011_element_ctx *ctx =
-        &mod_pl011_ctx.elements[fwk_id_get_element_idx(id)];
+        &pl011_ctx.elements[fwk_id_get_element_idx(id)];
 
     struct pl011_reg *reg = (void *)cfg->reg_base;
 
@@ -162,7 +162,7 @@ static void mod_pl011_putch(fwk_id_t id, char ch)
 {
     const struct mod_pl011_element_cfg *cfg = fwk_module_get_data(id);
     struct mod_pl011_element_ctx *ctx =
-        &mod_pl011_ctx.elements[fwk_id_get_element_idx(id)];
+        &pl011_ctx.elements[fwk_id_get_element_idx(id)];
 
     struct pl011_reg *reg = (void *)cfg->reg_base;
 
@@ -180,7 +180,7 @@ static bool mod_pl011_getch(fwk_id_t id, char *ch)
 {
     const struct mod_pl011_element_cfg *cfg = fwk_module_get_data(id);
     struct mod_pl011_element_ctx *ctx =
-        &mod_pl011_ctx.elements[fwk_id_get_element_idx(id)];
+        &pl011_ctx.elements[fwk_id_get_element_idx(id)];
 
     struct pl011_reg *reg = (void *)cfg->reg_base;
 
@@ -200,7 +200,7 @@ static void mod_pl011_flush(fwk_id_t id)
 {
     const struct mod_pl011_element_cfg *cfg = fwk_module_get_data(id);
     struct mod_pl011_element_ctx *ctx =
-        &mod_pl011_ctx.elements[fwk_id_get_element_idx(id)];
+        &pl011_ctx.elements[fwk_id_get_element_idx(id)];
 
     struct pl011_reg *reg = (void *)cfg->reg_base;
 
@@ -217,11 +217,11 @@ static int mod_pl011_init(
     unsigned int element_count,
     const void *data)
 {
-    if (mod_pl011_ctx.initialized) {
+    if (pl011_ctx.initialized) {
         return FWK_SUCCESS;
     }
 
-    return mod_pl011_init_ctx(&mod_pl011_ctx);
+    return mod_pl011_init_ctx(&pl011_ctx);
 }
 
 static int mod_pl011_element_init(
@@ -296,7 +296,7 @@ static int mod_pl011_powering_down(fwk_id_t id)
     int status;
 
     struct mod_pl011_element_ctx *ctx =
-        &mod_pl011_ctx.elements[fwk_id_get_element_idx(id)];
+        &pl011_ctx.elements[fwk_id_get_element_idx(id)];
     const struct mod_pl011_element_cfg *cfg = fwk_module_get_data(id);
 
     ctx->powered = false; /* This device has gone offline */
@@ -322,7 +322,7 @@ static int mod_pl011_powered_on(fwk_id_t id)
     int status;
 
     struct mod_pl011_element_ctx *ctx =
-        &mod_pl011_ctx.elements[fwk_id_get_element_idx(id)];
+        &pl011_ctx.elements[fwk_id_get_element_idx(id)];
     const struct mod_pl011_element_cfg *cfg = fwk_module_get_data(id);
 
     ctx->powered = true; /* This device is powered again */
@@ -429,7 +429,7 @@ static int mod_pl011_clock_change_pending(
         (void *)resp_event->params;
 
     struct mod_pl011_element_ctx *ctx =
-        &mod_pl011_ctx.elements[fwk_id_get_element_idx(event->target_id)];
+        &pl011_ctx.elements[fwk_id_get_element_idx(event->target_id)];
     const struct mod_pl011_element_cfg *cfg =
         fwk_module_get_data(event->target_id);
 
@@ -470,7 +470,7 @@ static int mod_pl011_clock_changed(const struct fwk_event *event)
         (const void *)event->params;
 
     struct mod_pl011_element_ctx *ctx =
-        &mod_pl011_ctx.elements[fwk_id_get_element_idx(event->target_id)];
+        &pl011_ctx.elements[fwk_id_get_element_idx(event->target_id)];
     const struct mod_pl011_element_cfg *cfg =
         fwk_module_get_data(event->target_id);
 
@@ -567,14 +567,14 @@ static int mod_pl011_io_open(const struct fwk_io_stream *stream)
         return FWK_E_SUPPORT;
     }
 
-    if (!mod_pl011_ctx.initialized) {
-        status = mod_pl011_init_ctx(&mod_pl011_ctx);
+    if (!pl011_ctx.initialized) {
+        status = mod_pl011_init_ctx(&pl011_ctx);
         if (status != FWK_SUCCESS) {
             return FWK_E_STATE;
         }
     }
 
-    ctx = &mod_pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
+    ctx = &pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
     if (ctx->open) { /* Refuse to open the same device twice */
         return FWK_E_BUSY;
     }
@@ -593,7 +593,7 @@ static int mod_pl011_io_getch(
     char *restrict ch)
 {
     const struct mod_pl011_element_ctx *ctx =
-        &mod_pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
+        &pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
 
     bool ok = true;
 
@@ -614,7 +614,7 @@ static int mod_pl011_io_getch(
 static int mod_pl011_io_putch(const struct fwk_io_stream *stream, char ch)
 {
     const struct mod_pl011_element_ctx *ctx =
-        &mod_pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
+        &pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
 
     fwk_assert(ctx->open);
 
@@ -642,7 +642,7 @@ static int mod_pl011_close(const struct fwk_io_stream *stream)
 
     mod_pl011_flush(stream->id);
 
-    ctx = &mod_pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
+    ctx = &pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
     fwk_assert(ctx->open);
 
     ctx->open = false;

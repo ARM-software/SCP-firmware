@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -570,7 +570,7 @@ static int dvfs_set_level(fwk_id_t domain_id, uintptr_t cookie, uint32_t level)
     return dvfs_set_level_start(ctx, cookie, new_opp, false, 0);
 }
 
-static const struct mod_dvfs_domain_api mod_dvfs_domain_api = {
+static const struct mod_dvfs_domain_api dvfs_domain_api = {
     .get_current_opp = dvfs_get_current_opp,
     .get_sustained_opp = dvfs_get_sustained_opp,
     .get_nth_opp = dvfs_get_nth_opp,
@@ -1181,7 +1181,7 @@ static int dvfs_process_bind_request(
     }
 
     /* We don't do any permissions management */
-    *api = &mod_dvfs_domain_api;
+    *api = &dvfs_domain_api;
 
     return FWK_SUCCESS;
 }

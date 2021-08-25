@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -41,7 +41,7 @@ struct response_ctx {
 };
 
 /* Context for the power state transition notification */
-struct power_state_transition_notification_ctx {
+struct mod_power_state_transition_notification_ctx {
     /* Number of pending notification responses */
     unsigned int pending_responses;
 
@@ -55,7 +55,7 @@ struct power_state_transition_notification_ctx {
 };
 
 /* Context for the power state pre-transition notification */
-struct power_state_pre_transition_notification_ctx {
+struct mod_power_state_pre_transition_notification_ctx {
     /* Number of pending notification responses */
     unsigned int pending_responses;
 
@@ -151,11 +151,11 @@ struct pd_ctx {
     struct response_ctx response;
 
     /* Context for the power state transition notification */
-    struct power_state_transition_notification_ctx
+    struct mod_power_state_transition_notification_ctx
         power_state_transition_notification_ctx;
 
     /* Context for the power state pre-transition notification */
-    struct power_state_pre_transition_notification_ctx
+    struct mod_power_state_pre_transition_notification_ctx
         power_state_pre_transition_notification_ctx;
 };
 
@@ -192,7 +192,7 @@ struct system_shutdown_ctx {
     uint32_t cookie;
 };
 
-struct mod_pd_ctx {
+struct mod_pd_mod_ctx {
     /* Module configuration data */
     struct mod_power_domain_config *config;
 
@@ -282,7 +282,7 @@ static const uint32_t core_composite_state_mask_table[] = {
 /*
  * Internal variables
  */
-static struct mod_pd_ctx mod_pd_ctx;
+static struct mod_pd_mod_ctx mod_pd_ctx;
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
 static const char driver_error_msg[] = "[PD] Driver error %s (%d) in %s @%d";

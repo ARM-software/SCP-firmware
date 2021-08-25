@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -53,7 +53,7 @@ struct mhu_device_ctx {
 };
 
 /* MHU context */
-struct mhu_ctx {
+struct mod_mhu_ctx {
     /* Table of device contexts */
     struct mhu_device_ctx *device_ctx_table;
 
@@ -61,7 +61,7 @@ struct mhu_ctx {
     unsigned int device_count;
 };
 
-static struct mhu_ctx mhu_ctx;
+static struct mod_mhu_ctx mhu_ctx;
 
 static void mhu_isr(void)
 {

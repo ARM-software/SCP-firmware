@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -29,17 +29,17 @@
 #define GTIMER_MIN_TIMESTAMP 2000
 
 /* Device content */
-struct dev_ctx {
+struct gtimer_dev_ctx {
     struct cntbase_reg *hw_timer;
     struct cntctl_reg *hw_counter;
     struct cntcontrol_reg *control;
     const struct mod_gtimer_dev_config *config;
 };
 
-static struct mod_gtimer_ctx {
+static struct mod_gtimer_mod_ctx {
     bool initialized; /* Whether the device context has been initialized */
 
-    struct dev_ctx *table; /* Device context table */
+    struct gtimer_dev_ctx *table; /* Device context table */
 } mod_gtimer_ctx;
 
 static uint64_t mod_gtimer_get_counter(const struct cntbase_reg *hw_timer)
@@ -68,7 +68,7 @@ static uint64_t mod_gtimer_get_counter(const struct cntbase_reg *hw_timer)
 
 static int enable(fwk_id_t dev_id)
 {
-    struct dev_ctx *ctx;
+    struct gtimer_dev_ctx *ctx;
 
     ctx = mod_gtimer_ctx.table + fwk_id_get_element_idx(dev_id);
 
@@ -80,7 +80,7 @@ static int enable(fwk_id_t dev_id)
 
 static int disable(fwk_id_t dev_id)
 {
-    struct dev_ctx *ctx;
+    struct gtimer_dev_ctx *ctx;
 
     ctx = mod_gtimer_ctx.table + fwk_id_get_element_idx(dev_id);
 
@@ -92,7 +92,7 @@ static int disable(fwk_id_t dev_id)
 
 static int get_counter(fwk_id_t dev_id, uint64_t *value)
 {
-    const struct dev_ctx *ctx;
+    const struct gtimer_dev_ctx *ctx;
 
     ctx = mod_gtimer_ctx.table + fwk_id_get_element_idx(dev_id);
 
@@ -103,7 +103,7 @@ static int get_counter(fwk_id_t dev_id, uint64_t *value)
 
 static int set_timer(fwk_id_t dev_id, uint64_t timestamp)
 {
-    struct dev_ctx *ctx;
+    struct gtimer_dev_ctx *ctx;
     uint64_t counter;
     int status;
 
@@ -133,7 +133,7 @@ static int set_timer(fwk_id_t dev_id, uint64_t timestamp)
 
 static int get_timer(fwk_id_t dev_id, uint64_t *timestamp)
 {
-    struct dev_ctx *ctx;
+    struct gtimer_dev_ctx *ctx;
     uint32_t counter_low;
     uint32_t counter_high;
 
@@ -150,7 +150,7 @@ static int get_timer(fwk_id_t dev_id, uint64_t *timestamp)
 
 static int get_frequency(fwk_id_t dev_id, uint32_t *frequency)
 {
-    struct dev_ctx *ctx;
+    struct gtimer_dev_ctx *ctx;
 
     if (frequency == NULL) {
         return FWK_E_PARAM;
@@ -180,7 +180,8 @@ static int gtimer_init(fwk_id_t module_id,
                        unsigned int element_count,
                        const void *data)
 {
-    mod_gtimer_ctx.table = fwk_mm_alloc(element_count, sizeof(struct dev_ctx));
+    mod_gtimer_ctx.table =
+        fwk_mm_alloc(element_count, sizeof(struct gtimer_dev_ctx));
 
     return FWK_SUCCESS;
 }
@@ -188,8 +189,8 @@ static int gtimer_init(fwk_id_t module_id,
 static int gtimer_device_init(fwk_id_t element_id, unsigned int unused,
                               const void *data)
 {
-    struct dev_ctx *ctx;
     int status;
+    struct gtimer_dev_ctx *ctx;
 
     ctx = mod_gtimer_ctx.table + fwk_id_get_element_idx(element_id);
 
@@ -235,7 +236,7 @@ static int gtimer_process_bind_request(fwk_id_t requester_id,
     return FWK_SUCCESS;
 }
 
-static void gtimer_control_init(struct dev_ctx *ctx)
+static void gtimer_control_init(struct gtimer_dev_ctx *ctx)
 {
     /* Set primary counter update frequency and enable counter. */
     ctx->control->CR &= ~CNTCONTROL_CR_EN;
@@ -245,7 +246,7 @@ static void gtimer_control_init(struct dev_ctx *ctx)
 
 static int gtimer_start(fwk_id_t id)
 {
-    struct dev_ctx *ctx;
+    struct gtimer_dev_ctx *ctx;
 
     if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
         return FWK_SUCCESS;
@@ -271,7 +272,7 @@ static int gtimer_process_notification(
     struct fwk_event *resp_event)
 {
     struct clock_notification_params *params;
-    struct dev_ctx *ctx;
+    struct gtimer_dev_ctx *ctx;
 
     fwk_assert(
         fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed));
