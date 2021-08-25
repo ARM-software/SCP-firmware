@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -37,7 +37,7 @@ enum mod_psu_impl_event_idx {
 static const fwk_id_t mod_psu_impl_event_id_response =
     FWK_ID_EVENT_INIT(FWK_MODULE_IDX_PSU, MOD_PSU_IMPL_EVENT_IDX_RESPONSE);
 
-static struct mod_psu_ctx {
+static struct mod_psu_mod_ctx {
     struct mod_psu_element_ctx {
         const struct mod_psu_driver_api *driver;
 
@@ -244,7 +244,7 @@ exit:
     return status;
 }
 
-static const struct mod_psu_device_api mod_psu_device_api = {
+static const struct mod_psu_device_api psu_device_api = {
     .get_enabled = mod_psu_get_enabled,
     .set_enabled = mod_psu_set_enabled,
     .get_voltage = mod_psu_get_voltage,
@@ -282,7 +282,7 @@ static void mod_psu_respond(
     }
 }
 
-static const struct mod_psu_driver_response_api mod_psu_driver_response_api = {
+static const struct mod_psu_driver_response_api psu_driver_response_api = {
     .respond = mod_psu_respond,
 };
 
@@ -374,12 +374,12 @@ static int mod_psu_process_bind_request(
 
     switch (event_id_type) {
     case MOD_PSU_API_IDX_DEVICE:
-        *api = &mod_psu_device_api;
+        *api = &psu_device_api;
 
         break;
 
     case MOD_PSU_API_IDX_DRIVER_RESPONSE:
-        *api = &mod_psu_driver_response_api;
+        *api = &psu_driver_response_api;
 
         break;
 

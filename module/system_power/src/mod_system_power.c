@@ -42,7 +42,7 @@ struct system_power_dev_ctx {
 };
 
 /* Module context */
-struct system_power_ctx {
+struct mod_system_power_ctx {
     /* System power element context table */
     struct system_power_dev_ctx *dev_ctx_table;
 
@@ -53,10 +53,10 @@ struct system_power_ctx {
     const struct mod_pd_driver_api **ext_ppu_apis;
 
     /* Power domain module restricted API pointer */
-    const struct mod_pd_restricted_api *mod_pd_restricted_api;
+    const struct mod_pd_restricted_api *pd_restricted_api;
 
     /* Power domain module driver input API pointer */
-    const struct mod_pd_driver_input_api *mod_pd_driver_input_api;
+    const struct mod_pd_driver_input_api *pd_driver_input_api;
 
     /* Driver API pointer */
     const struct mod_system_power_driver_api *driver_api;
@@ -80,7 +80,7 @@ struct system_power_ctx {
     fwk_id_t last_core_pd_id;
 };
 
-static struct system_power_ctx system_power_ctx;
+static struct mod_system_power_ctx system_power_ctx;
 
 /*
  * Static helpers
@@ -279,8 +279,8 @@ static int system_power_set_state(fwk_id_t pd_id, unsigned int state)
         }
 
         /* Store the identifier of the power domain of the last standing core */
-        status = system_power_ctx.mod_pd_driver_input_api->
-            get_last_core_pd_id(&system_power_ctx.last_core_pd_id);
+        status = system_power_ctx.pd_driver_input_api->get_last_core_pd_id(
+            &system_power_ctx.last_core_pd_id);
         if (status != FWK_SUCCESS) {
             return status;
         }
@@ -357,7 +357,7 @@ static void soc_wakeup_handler(void)
         fwk_trap();
     }
 
-    status = system_power_ctx.mod_pd_restricted_api->set_state(
+    status = system_power_ctx.pd_restricted_api->set_state(
         system_power_ctx.last_core_pd_id, false, state);
     fwk_check(status == FWK_SUCCESS);
 }
@@ -388,9 +388,8 @@ static int system_power_report_power_state_transition(fwk_id_t dev_id,
 
     sys_ppu_transition_count = 0;
 
-    return system_power_ctx.mod_pd_driver_input_api->
-        report_power_state_transition(system_power_ctx.mod_pd_system_id,
-                                      system_power_ctx.state);
+    return system_power_ctx.pd_driver_input_api->report_power_state_transition(
+        system_power_ctx.mod_pd_system_id, system_power_ctx.state);
 }
 
 static const struct mod_pd_driver_input_api
@@ -472,9 +471,10 @@ static int system_power_bind(fwk_id_t id, unsigned int round)
          * the system_power_ctx.mod_pd_system_id power domain module element to
          * report power state transitions of the system power domains.
          */
-        return fwk_module_bind(system_power_ctx.mod_pd_system_id,
-                               mod_pd_api_id_driver_input,
-                               &system_power_ctx.mod_pd_driver_input_api);
+        return fwk_module_bind(
+            system_power_ctx.mod_pd_system_id,
+            mod_pd_api_id_driver_input,
+            &system_power_ctx.pd_driver_input_api);
     }
 
     if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
@@ -498,9 +498,10 @@ static int system_power_bind(fwk_id_t id, unsigned int round)
             return status;
         }
 
-        return fwk_module_bind(fwk_module_id_power_domain,
+        return fwk_module_bind(
+            fwk_module_id_power_domain,
             mod_pd_api_id_restricted,
-            &system_power_ctx.mod_pd_restricted_api);
+            &system_power_ctx.pd_restricted_api);
     }
 
     dev_ctx = system_power_ctx.dev_ctx_table + fwk_id_get_element_idx(id);

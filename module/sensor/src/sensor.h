@@ -62,7 +62,7 @@ struct sensor_dev_ctx {
 #endif
 };
 
-struct sensor_mod_ctx {
+struct mod_sensor_ctx {
     struct mod_sensor_config *config;
     struct mod_sensor_trip_point_api *sensor_trip_point_api;
 };

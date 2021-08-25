@@ -27,7 +27,7 @@
 #include <stdint.h>
 
 static struct sensor_dev_ctx *ctx_table;
-static struct sensor_mod_ctx sensor_mod_ctx;
+static struct mod_sensor_ctx sensor_mod_ctx;
 
 struct sensor_dev_ctx *sensor_get_ctx(fwk_id_t id)
 {

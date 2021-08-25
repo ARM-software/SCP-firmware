@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -63,7 +63,7 @@ struct smt_channel_ctx {
     bool smt_mailbox_ready;
 };
 
-struct smt_ctx {
+struct mod_smt_ctx {
     /* Table of channel contexts */
     struct smt_channel_ctx *channel_ctx_table;
 
@@ -71,7 +71,7 @@ struct smt_ctx {
     unsigned int channel_count;
 };
 
-static struct smt_ctx smt_ctx;
+static struct mod_smt_ctx smt_ctx;
 
 /*
  * SCMI Transport API
