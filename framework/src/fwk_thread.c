@@ -24,11 +24,11 @@
 #include <fwk_noreturn.h>
 #include <fwk_slist.h>
 #include <fwk_status.h>
+#include <fwk_string.h>
 #include <fwk_thread.h>
 
 #include <inttypes.h>
 #include <stdbool.h>
-#include <string.h>
 
 static struct __fwk_thread_ctx ctx;
 
@@ -212,7 +212,7 @@ static void process_next_event(void)
                                              module->process_event;
 
     if (event->response_requested) {
-        memset(&async_response_event, 0, sizeof(async_response_event));
+        fwk_str_memset(&async_response_event, 0, sizeof(async_response_event));
         async_response_event = *event;
         async_response_event.source_id = event->target_id;
         async_response_event.target_id = event->source_id;
