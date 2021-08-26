@@ -212,7 +212,7 @@ static void process_next_event(void)
                                              module->process_event;
 
     if (event->response_requested) {
-        memset(&async_response_event, 0, sizeof(async_response_event));
+        (void)memset(&async_response_event, 0, sizeof(async_response_event));
         async_response_event = *event;
         async_response_event.source_id = event->target_id;
         async_response_event.target_id = event->source_id;
