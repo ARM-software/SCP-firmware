@@ -415,6 +415,34 @@ static const struct mod_smt_driver_input_api driver_input_api = {
     .signal_message = smt_signal_message,
 };
 
+static int smt_mailbox_init(struct smt_channel_ctx *ctx)
+{
+    int status = FWK_SUCCESS;
+    if ((ctx->config->policies & MOD_SMT_POLICY_INIT_MAILBOX) != (uint32_t)0) {
+        unsigned int notifications_sent;
+
+        /* Only the completer channel should initialize the shared mailbox */
+        if (ctx->config->type == MOD_SMT_CHANNEL_TYPE_COMPLETER) {
+            /* Initialize mailbox such that the requester has ownership */
+            *((struct mod_smt_memory *)ctx->config->mailbox_address) =
+                (struct mod_smt_memory){
+                    .status = (1U << MOD_SMT_MAILBOX_STATUS_FREE_POS)
+                };
+        }
+        ctx->smt_mailbox_ready = true;
+
+        /* Notify that this mailbox is initialized */
+        struct fwk_event smt_channels_initialized_notification = {
+            .id = mod_smt_notification_id_initialized,
+            .source_id = ctx->id,
+        };
+        status = fwk_notification_notify(
+            &smt_channels_initialized_notification, &notifications_sent);
+    }
+
+    return status;
+}
+
 /*
  * Framework API
  */
@@ -578,20 +606,27 @@ static int smt_start(fwk_id_t id)
 
     ctx = &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(id)];
 
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
     /* Register for power domain state transition notifications */
     return fwk_notification_subscribe(
         mod_pd_notification_id_power_state_transition,
         ctx->config->pd_source_id,
         id);
+#else
+    /* Initialize the mailbox immediately, if power domain module
+     * is not included in the firmware build.
+     */
+    return smt_mailbox_init(ctx);
+#endif
 }
 
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
 static int smt_process_notification(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
 {
     struct mod_pd_power_state_transition_notification_params *params;
     struct smt_channel_ctx *channel_ctx;
-    unsigned int notifications_sent;
     int status = FWK_SUCCESS;
 
     assert(fwk_id_is_equal(event->id,
@@ -609,29 +644,11 @@ static int smt_process_notification(
             channel_ctx->smt_mailbox_ready = false;
         }
     } else {
-        if ((channel_ctx->config->policies & MOD_SMT_POLICY_INIT_MAILBOX) !=
-            (uint32_t)0) {
-            /* Initialize mailbox */
-            *((struct mod_smt_memory *)channel_ctx->config->mailbox_address) =
-                (struct mod_smt_memory){
-                    .status = (1U << MOD_SMT_MAILBOX_STATUS_FREE_POS)
-                };
-
-            /* Notify that this mailbox is initialized */
-            struct fwk_event smt_channels_initialized_notification = {
-                .id = mod_smt_notification_id_initialized,
-                .source_id = FWK_ID_NONE
-            };
-
-            channel_ctx->smt_mailbox_ready = true;
-
-            status = fwk_notification_notify(
-                &smt_channels_initialized_notification, &notifications_sent);
-        }
+        status = smt_mailbox_init(channel_ctx);
     }
-
     return status;
 }
+#endif
 
 const struct fwk_module module_smt = {
     .type = FWK_MODULE_TYPE_SERVICE,
@@ -642,5 +659,7 @@ const struct fwk_module module_smt = {
     .bind = smt_bind,
     .start = smt_start,
     .process_bind_request = smt_process_bind_request,
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
     .process_notification = smt_process_notification,
+#endif
 };
