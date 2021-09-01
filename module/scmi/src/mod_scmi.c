@@ -259,13 +259,13 @@ static const char *message_type_to_str(enum mod_scmi_message_type message_type)
 {
     switch (message_type) {
     case MOD_SCMI_MESSAGE_TYPE_COMMAND:
-        return "Command";
+        return "Cmd";
 
     case MOD_SCMI_MESSAGE_TYPE_DELAYED_RESPONSE:
-        return "Delayed response";
+        return "Del-Resp";
 
     case MOD_SCMI_MESSAGE_TYPE_NOTIFICATION:
-        return "Notification";
+        return "Notif";
 
     default:
         return "Invalid message";
@@ -395,8 +395,7 @@ static void respond(fwk_id_t service_id, const void *payload, size_t size)
     if ((payload != NULL) && (*((int32_t *)payload) < SCMI_SUCCESS)) {
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
         FWK_LOG_ERR(
-            "[SCMI] %s: %s [%" PRIu16
-            " (0x%x:0x%x)] returned with an error (%d)",
+            "[SCMI] %s: %s [%" PRIu16 " (0x%x:0x%x)] returned error (%d)",
             service_name,
             message_type_name,
             ctx->scmi_token,
