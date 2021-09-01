@@ -166,7 +166,6 @@ if (NOT DISABLE_CPPCHECK)
         list(APPEND CMAKE_C_CPPCHECK "--quiet")
         list(APPEND CMAKE_C_CPPCHECK "--suppressions-list=${CMAKE_CURRENT_SOURCE_DIR}/tools/cppcheck_suppress_list.txt")
         list(APPEND CMAKE_C_CPPCHECK "--enable=all")
-        list(APPEND CMAKE_C_CPPCHECK "--inconclusive")
         list(APPEND CMAKE_C_CPPCHECK "--inline-suppr")
 
         if(SCP_ARCHITECTURE STREQUAL "armv7-m")
