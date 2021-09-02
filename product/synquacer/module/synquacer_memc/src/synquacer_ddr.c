@@ -11,7 +11,9 @@
 #include "synquacer_ddr.h"
 #include "synquacer_mmap.h"
 
-#include <cmsis_os2.h>
+#ifdef HAS_RTOS
+#    include <cmsis_os2.h>
+#endif
 #include <ddr_init.h>
 #include <sysdef_option.h>
 

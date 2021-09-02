@@ -182,19 +182,21 @@ HEADER_STANDARD_MODULES := $(filter $(BS_FIRMWARE_MODULE_HEADERS_ONLY), \
 HEADER_PRODUCT_MODULES := $(filter $(BS_FIRMWARE_MODULE_HEADERS_ONLY), \
                                    $(ALL_PRODUCT_MODULES))
 
+ifneq ($(findstring $(BS_FIRMWARE_CPU),$(ARMV8A_CPUS)),)
+    INCLUDES += $(OS_DIR)/Include
+    INCLUDES += $(FREERTOS_DIR)/../../Source/include
+    INCLUDES += $(FREERTOS_DIR)/../../Source/portable/GCC/ARM_CA53_64_Rcar
+else
+    INCLUDES += $(OS_DIR)/RTX/Source
+    INCLUDES += $(OS_DIR)/RTX/Include
+    INCLUDES += $(OS_DIR)/../Core/Include
+endif
+
 ifeq ($(BS_FIRMWARE_HAS_MULTITHREADING),yes)
     BUILD_SUFFIX := $(MULTHREADING_SUFFIX)
     BUILD_HAS_MULTITHREADING := yes
 
-    ifneq ($(findstring $(BS_FIRMWARE_CPU),$(ARMV8A_CPUS)),)
-        INCLUDES += $(OS_DIR)/Include
-        INCLUDES += $(FREERTOS_DIR)/../../Source/include
-        INCLUDES += $(FREERTOS_DIR)/../../Source/portable/GCC/ARM_CA53_64_Rcar
-    else
-        INCLUDES += $(OS_DIR)/RTX/Source
-        INCLUDES += $(OS_DIR)/RTX/Include
-        INCLUDES += $(OS_DIR)/../Core/Include
-    endif
+
 else
     BUILD_HAS_MULTITHREADING := no
 endif

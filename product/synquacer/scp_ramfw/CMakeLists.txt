@@ -17,7 +17,10 @@ target_include_directories(
     synquacer-bl2
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include"
            "${CMAKE_CURRENT_SOURCE_DIR}"
-           "${CMAKE_SOURCE_DIR}/contrib/cmsis/git/CMSIS/RTOS2/RTX/Include1")
+           "${CMAKE_SOURCE_DIR}/contrib/cmsis/git/CMSIS/RTOS2/RTX/Include1"
+           "${CMAKE_SOURCE_DIR}/contrib/cmsis/git/CMSIS/RTOS2/RTX/Include"
+           "${CMAKE_SOURCE_DIR}/contrib/cmsis/git/CMSIS/RTOS2/Include"
+           "${CMAKE_SOURCE_DIR}/contrib/cmsis/git/CMSIS/RTOS2/RTX/Source")
 
 target_sources(
     synquacer-bl2
@@ -39,14 +42,12 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_synquacer_memc.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_system_power.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_power_domain.c")
 
-if(SCP_ENABLE_MULTITHREADING)
-    target_sources(synquacer-bl2
-                   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c")
-    target_link_libraries(synquacer-bl2 PRIVATE cmsis::rtos2-rtx)
-endif()
+# Include RTOS dependencies.
+target_sources(synquacer-bl2
+               PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c")
+target_link_libraries(synquacer-bl2 PRIVATE cmsis::rtos2-rtx)
 
 #
 # Some of our firmware includes require CMSIS.

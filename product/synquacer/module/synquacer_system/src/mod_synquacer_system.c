@@ -120,9 +120,11 @@ static int synquacer_system_start(fwk_id_t id)
 
     FWK_LOG_INFO("[SYNQUACER SYSTEM] Request system initialization.");
 
+#ifdef BUILD_HAS_MULTITHREADING
     status = fwk_thread_create(FWK_ID_MODULE(FWK_MODULE_IDX_SYNQUACER_SYSTEM));
     if (status != FWK_SUCCESS)
         return status;
+#endif
 
     req = (struct fwk_event){
         .id = FWK_ID_EVENT(

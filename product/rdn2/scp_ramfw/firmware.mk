@@ -6,7 +6,7 @@
 #
 
 BS_FIRMWARE_CPU := cortex-m7
-BS_FIRMWARE_HAS_MULTITHREADING := yes
+BS_FIRMWARE_HAS_MULTITHREADING := no
 BS_FIRMWARE_HAS_NOTIFICATION := yes
 BS_FIRMWARE_HAS_FAST_CHANNELS := yes
 
@@ -46,7 +46,6 @@ BS_FIRMWARE_SOURCES := \
     config_apremap.c \
     config_sid.c \
     config_system_info.c \
-    rtx_config.c \
     config_armv7m_mpu.c \
     config_pl011.c \
     config_power_domain.c \
@@ -70,5 +69,9 @@ BS_FIRMWARE_SOURCES := \
     config_mock_psu.c \
     config_dvfs.c \
     config_scmi_perf.c
+
+ifeq ($(BS_FIRMWARE_HAS_MULTITHREADING),yes)
+    BS_FIRMWARE_SOURCES += rtx_config.c
+endif
 
 include $(BS_DIR)/firmware.mk

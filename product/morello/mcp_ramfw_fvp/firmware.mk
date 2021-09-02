@@ -9,7 +9,7 @@
 #
 
 BS_FIRMWARE_CPU := cortex-m7
-BS_FIRMWARE_HAS_MULTITHREADING := yes
+BS_FIRMWARE_HAS_MULTITHREADING := no
 BS_FIRMWARE_HAS_NOTIFICATION := yes
 BS_FIRMWARE_USE_NEWLIB_NANO_SPECS := yes
 
@@ -28,7 +28,6 @@ BS_FIRMWARE_MODULES := \
     morello_mcp_system
 
 BS_FIRMWARE_SOURCES := \
-    rtx_config.c \
     config_armv7m_mpu.c \
     config_pl011.c \
     config_pik_clock.c \
@@ -36,5 +35,9 @@ BS_FIRMWARE_SOURCES := \
     config_mhu.c \
     config_smt.c \
     config_scmi_agent.c
+
+ifeq ($(BS_FIRMWARE_HAS_MULTITHREADING),yes)
+    BS_FIRMWARE_SOURCES += rtx_config.c
+endif
 
 include $(BS_DIR)/firmware.mk

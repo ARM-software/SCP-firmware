@@ -19,8 +19,7 @@ target_include_directories(
 
 target_sources(
     morello-fvp-mcp-bl2
-    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_armv7m_mpu.c"
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_armv7m_mpu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_pl011.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_pik_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"

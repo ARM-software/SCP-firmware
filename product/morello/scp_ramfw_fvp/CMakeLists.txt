@@ -19,8 +19,7 @@ target_include_directories(
 
 target_sources(
     morello-fvp-bl2
-    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_armv7m_mpu.c"
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_armv7m_mpu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_ssc.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_system_info.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_power_domain.c"

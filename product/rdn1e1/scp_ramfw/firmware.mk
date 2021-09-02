@@ -6,7 +6,7 @@
 #
 
 BS_FIRMWARE_CPU := cortex-m7
-BS_FIRMWARE_HAS_MULTITHREADING := yes
+BS_FIRMWARE_HAS_MULTITHREADING := no
 BS_FIRMWARE_HAS_NOTIFICATION := yes
 BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS := yes
 BS_FIRMWARE_USE_NEWLIB_NANO_SPECS := no
@@ -54,7 +54,6 @@ BS_FIRMWARE_SOURCES := \
     config_system_power.c \
     config_sid.c \
     config_system_info.c \
-    rtx_config.c \
     config_armv7m_mpu.c \
     config_pl011.c \
     config_power_domain.c \
@@ -82,5 +81,9 @@ BS_FIRMWARE_SOURCES := \
     config_apcontext.c \
     config_scmi_power_domain.c \
     config_resource_perms.c
+
+ifeq ($(BS_FIRMWARE_HAS_MULTITHREADING),yes)
+    BS_FIRMWARE_SOURCES += rtx_config.c
+endif
 
 include $(BS_DIR)/firmware.mk

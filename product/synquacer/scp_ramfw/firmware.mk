@@ -6,7 +6,7 @@
 #
 
 BS_FIRMWARE_CPU := cortex-m3
-BS_FIRMWARE_HAS_MULTITHREADING := yes
+BS_FIRMWARE_HAS_MULTITHREADING := no
 BS_FIRMWARE_HAS_NOTIFICATION := yes
 BS_FIRMWARE_USE_NEWLIB_NANO_SPECS := yes
 
@@ -17,6 +17,9 @@ DEFINES += SET_PCIE_NON_SECURE
 #DEFINES += CA53_USE_F_UART
 
 INCLUDES += $(OS_DIR)/RTX/Include1
+INCLUDES += $(OS_DIR)/RTX/Include
+INCLUDES += $(OS_DIR)/Include
+INCLUDES += $(OS_DIR)/RTX/Source
 
 
 BS_FIRMWARE_MODULES := \
@@ -45,6 +48,7 @@ BS_FIRMWARE_MODULES := \
 
 
 BS_FIRMWARE_SOURCES := \
+    rtx_config.c \
     config_armv7m_mpu.c \
     config_ccn512.c \
     config_clock.c \
@@ -63,7 +67,6 @@ BS_FIRMWARE_SOURCES := \
     config_synquacer_memc.c \
     config_system_power.c \
     config_timer.c \
-    rtx_config.c \
     config_scmi_power_domain.c
 
 include $(BS_DIR)/firmware.mk
