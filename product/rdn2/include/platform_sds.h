@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -12,16 +12,18 @@
 
 #include <stdint.h>
 
+#define SDS_STRUCT_ID(idx) (idx | 1 << MOD_SDS_ID_VERSION_MAJOR_POS)
+
 /*
  * Structure identifiers.
  */
 enum platform_sds_struct_id {
-    PLATFORM_SDS_CPU_INFO = 1 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
-    PLATFORM_SDS_ROM_VERSION = 2 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
-    PLATFORM_SDS_RAM_VERSION = 3 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
-    PLATFORM_SDS_PLATFORM_ID = 4 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
-    PLATFORM_SDS_RESET_SYNDROME = 5 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
-    PLATFORM_SDS_FEATURE_AVAILABILITY = 6 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
+    PLATFORM_SDS_CPU_INFO = SDS_STRUCT_ID(1),
+    PLATFORM_SDS_ROM_VERSION = SDS_STRUCT_ID(2),
+    PLATFORM_SDS_RAM_VERSION = SDS_STRUCT_ID(3),
+    PLATFORM_SDS_PLATFORM_ID = SDS_STRUCT_ID(4),
+    PLATFORM_SDS_RESET_SYNDROME = SDS_STRUCT_ID(5),
+    PLATFORM_SDS_FEATURE_AVAILABILITY = SDS_STRUCT_ID(6),
 };
 
 enum platform_sds_region_idx {
