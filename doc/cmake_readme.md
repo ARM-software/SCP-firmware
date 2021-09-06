@@ -115,6 +115,8 @@ few common options can be configured.
 
 - SCP_ENABLE_RESOURCE_PERMISSIONS: Enable/disable resource permissions settings.
 
+- SCP_ENABLE_PLUGIN_HANDLER: Enable the Performance Plugin handler extension.
+
 It can be also used to provide some platform specific settings.
 e.g. For ARM Juno platform. See below
 
