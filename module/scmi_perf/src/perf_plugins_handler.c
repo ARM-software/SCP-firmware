@@ -13,8 +13,8 @@
  *      the real frequency domains available in hardware.
  */
 
-#include <perf_plugins_handler.h>
-#include <scmi_perf.h>
+#include "perf_plugins_handler.h"
+#include "scmi_perf.h"
 
 #include <mod_dvfs.h>
 

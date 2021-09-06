@@ -14,7 +14,7 @@
 #include <mod_scmi.h>
 #include <mod_scmi_perf.h>
 #ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
-#    include <perf_plugins_handler.h>
+#    include "perf_plugins_handler.h"
 #endif
 #include <mod_timer.h>
 
