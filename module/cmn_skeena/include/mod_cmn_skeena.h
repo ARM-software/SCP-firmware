@@ -22,7 +22,7 @@
 /*!
  * \defgroup GroupModuleCMN_SKEENA CMN_SKEENA
  *
- * \brief Arm Coherent Mesh Network (CMN) 600 module
+ * \brief Arm Coherent Mesh Network (CMN) Skeena module
  *
  * \details This module adds support for the CMN_SKEENA interconnect
  * \{
@@ -103,17 +103,41 @@ struct mod_cmn_skeena_memory_region_map {
 /*!
  * \brief HN-I region attributes
  */
-#define CMN_SKEENA_HNI_REG_PHY_MEM_EN      UINT64_C(0x0400000000000000)
-#define CMN_SKEENA_HNI_REG_SER_ALL_WR      UINT64_C(0x0800000000000000)
-#define CMN_SKEENA_HNI_REG_SER_DEVNE_WR    UINT64_C(0x1000000000000000)
-#define CMN_SKEENA_HNI_REG_EARLY_RDACK_EN  UINT64_C(0x2000000000000000)
+/*!
+ * Used to map a given address region to physical memory
+ */
+#define CMN_SKEENA_HNI_REG_PHY_MEM_EN UINT64_C(0x0400000000000000)
+/*!
+ * Used to serialize all writes within a given address region
+ */
+#define CMN_SKEENA_HNI_REG_SER_ALL_WR UINT64_C(0x0800000000000000)
+/*!
+ * Used to serialize Device-nGnRnE writes within a given address region
+ */
+#define CMN_SKEENA_HNI_REG_SER_DEVNE_WR UINT64_C(0x1000000000000000)
+/*!
+ * Enables sending early read receipts from HN-I in a given address region
+ */
+#define CMN_SKEENA_HNI_REG_EARLY_RDACK_EN UINT64_C(0x2000000000000000)
+/*!
+ * Enables early write acknowledgement in a given address region
+ */
 #define CMN_SKEENA_HNI_REG_EARLY_WRCOMP_EN UINT64_C(0x4000000000000000)
-#define CMN_SKEENA_HNI_REG_VALID           UINT64_C(0x8000000000000000)
+/*!
+ * Indicates whether a given address region's fields are programmed and valid
+ */
+#define CMN_SKEENA_HNI_REG_VALID UINT64_C(0x8000000000000000)
 
 /*!
  * \brief RN-I Configuration
  */
+/*!
+ * 'PCIe Root Present' bit position
+ */
 #define CMN_SKEENA_RNI_PCIE_MSTR_POS 5
+/*!
+ * Indicates whether a PCIe Root is present upstream of RNI
+ */
 #define CMN_SKEENA_RNI_PCIE_MSTR_PRE \
     (UINT64_C(1) << CMN_SKEENA_RNI_PCIE_MSTR_POS)
 

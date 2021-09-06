@@ -806,8 +806,8 @@ static int cmn_skeena_ccix_enter_dvm_domain(uint8_t link_id)
     return ccix_enter_dvm_domain(ctx, link_id);
 }
 
-static const struct mod_cmn_skeena_ccix_config_api cmn_skeena_ccix_config_api =
-    {
+static const struct mod_cmn_skeena_ccix_config_api
+    cmn_skeena_ccix_config_api = {
         .get_config = cmn_skeena_ccix_config_get,
         .set_config = cmn_skeena_ccix_config_set,
         .exchange_protocol_credit = cmn_skeena_ccix_exchange_protocol_credit,
