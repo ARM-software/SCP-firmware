@@ -86,12 +86,14 @@ else()
     set(SCP_LOG_LEVEL_DEFAULT "WARN")
 endif()
 
-set(SCP_LOG_LEVEL
-    "${SCP_LOG_LEVEL_DEFAULT}"
-    CACHE STRING "Minimum logging level.")
+if(NOT DEFINED SCP_LOG_LEVEL)
+    set(SCP_LOG_LEVEL
+        "${SCP_LOG_LEVEL_DEFAULT}"
+        CACHE STRING "Minimum logging level.")
 
-set_property(CACHE SCP_LOG_LEVEL PROPERTY STRINGS "TRACE" "INFO" "WARN" "ERROR"
-                                                  "CRIT")
+    set_property(CACHE SCP_LOG_LEVEL PROPERTY STRINGS "TRACE" "INFO" "WARN"
+                                                      "ERROR" "CRIT")
+endif()
 
 target_compile_definitions(framework
                            PUBLIC FWK_LOG_LEVEL=FWK_LOG_LEVEL_${SCP_LOG_LEVEL})
