@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -18,6 +18,7 @@
 #define SCP_REFCLK_CNTCTL_BASE   (SCP_PERIPHERAL_BASE + 0x0000)
 #define SCP_REFCLK_CNTBASE0_BASE (SCP_PERIPHERAL_BASE + 0x1000)
 #define SCP_UART_BASE            (SCP_PERIPHERAL_BASE + 0x2000)
+#define SCP_SP805_WDOG_BASE      (SCP_PERIPHERAL_BASE + 0x6000)
 #define SCP_MHU_AP_BASE          (SCP_PERIPHERAL_BASE + 0x1000000)
 
 #define SCP_PIK_SCP_BASE (SCP_PIK_BASE)
