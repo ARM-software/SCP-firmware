@@ -588,7 +588,7 @@ int dimm_spd_t_refi(uint32_t *temp_reg)
 
 int dimm_spd_t_rfc(uint32_t *temp_reg)
 {
-    uint32_t status = FWK_SUCCESS;
+    uint32_t status;
     uint32_t tmp_value = 0;
     uint32_t rfc_tmp = 0;
 

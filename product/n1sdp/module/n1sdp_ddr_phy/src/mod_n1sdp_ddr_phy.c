@@ -120,17 +120,17 @@ static int n1sdp_ddr_phy_config(fwk_id_t element_id, struct dimm_info *info)
 static void adjust_per_rank_rptr_update_value(uint32_t phy_addr,
     struct dimm_info *info)
 {
-    uint32_t i = 0;
-    uint32_t value = 0;
-    uint32_t orig_value = 0;
-    uint32_t rank_1_rddqs_latency_adjust_value = 0;
-    uint32_t rank_1_rddqs_gate_slave_delay_value = 0;
-    uint32_t rank_1_x4_rddqs_latency_adjust_value = 0;
-    uint32_t rank_1_x4_rddqs_gate_slave_delay_value = 0;
-    uint32_t rank_2_rddqs_latency_adjust_value = 0;
-    uint32_t rank_2_rddqs_gate_slave_delay_value = 0;
-    uint32_t rank_2_x4_rddqs_latency_adjust_value = 0;
-    uint32_t rank_2_x4_rddqs_gate_slave_delay_value = 0;
+    uint32_t i;
+    uint32_t value;
+    uint32_t orig_value;
+    uint32_t rank_1_rddqs_latency_adjust_value;
+    uint32_t rank_1_rddqs_gate_slave_delay_value;
+    uint32_t rank_1_x4_rddqs_latency_adjust_value;
+    uint32_t rank_1_x4_rddqs_gate_slave_delay_value;
+    uint32_t rank_2_rddqs_latency_adjust_value;
+    uint32_t rank_2_rddqs_gate_slave_delay_value;
+    uint32_t rank_2_x4_rddqs_latency_adjust_value;
+    uint32_t rank_2_x4_rddqs_gate_slave_delay_value;
 
     for (i = 0; i < 9; i++) {
         orig_value = *(uint32_t *)(phy_addr + (4 * (9 + (i * 256))));
@@ -161,7 +161,6 @@ static void adjust_per_rank_rptr_update_value(uint32_t phy_addr,
                 value = (value & 0xFFFFFC00) | 0x0FC;
                 *(uint32_t *)(phy_addr + (4 * (112 + (i * 256)))) = value;
             }
-            value = *(uint32_t *)(phy_addr + (4 * (112 + (i * 256))));
         }
         *(uint32_t *)(phy_addr + (4 * (9 + (i * 256)))) = orig_value;
     }
@@ -198,7 +197,6 @@ static void adjust_per_rank_rptr_update_value(uint32_t phy_addr,
                     value = (value & 0xFFFFFC00) | 0x0FC;
                     *(uint32_t *)(phy_addr + (4 * (116 + (i * 256)))) = value;
                 }
-                value = *(uint32_t *)(phy_addr + (4 * (116 + (i * 256))));
             }
             *(uint32_t *)(phy_addr + (4 * (9 + (i * 256)))) = orig_value;
         }
@@ -207,7 +205,7 @@ static void adjust_per_rank_rptr_update_value(uint32_t phy_addr,
 
 static void delay_ms(uint32_t ms)
 {
-    volatile uint32_t i = 0;
+    volatile uint32_t i;
     while (ms) {
         for (i = 0; i < 6000; i++) {
             ;
@@ -474,7 +472,7 @@ static int write_eye_detect_single_rank(fwk_id_t element_id,
             num_completed = 0;
             delay = DEFAULT_DELAY;
             while (num_completed != NUM_DQ_BITS) {
-                if ((delay < DELAY_MIN) || (delay > DELAY_MAX)) {
+                if (delay > DELAY_MAX) {
                     break;
                 }
 
@@ -819,7 +817,6 @@ static int n1sdp_ddr_phy_post_training_configure(fwk_id_t element_id,
         if (rptr_update_value != ((value & 0x00000F00) >> 8)) {
             value = (value & 0xFFFFF0FF) | (rptr_update_value << 8);
             *(uint32_t *)(phy_addr + (4 * (129 + (i * 256)))) = value;
-            value = *(uint32_t *)(phy_addr + (4 * (129 + (i * 256))));
         }
     }
     if (info->dimm_mem_width == 4) {
@@ -834,7 +831,6 @@ static int n1sdp_ddr_phy_post_training_configure(fwk_id_t element_id,
             if (rptr_update_value != ((value & 0x000F0000) >> 16)) {
                 value = (value & 0xFFF0FFFF) | (rptr_update_value << 16);
                 *(uint32_t *)(phy_addr + (4 * (133 + (i * 256)))) = value;
-                value = *(uint32_t *)(phy_addr + (4 * (133 + (i * 256))));
             }
         }
     }
