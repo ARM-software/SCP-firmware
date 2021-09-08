@@ -559,7 +559,7 @@ static int dmc620_verify_phy_status(fwk_id_t ddr_id)
 
 static void delay_ms(uint32_t ms)
 {
-    volatile uint32_t i = 0;
+    volatile uint32_t i;
     while (ms) {
         for (i = 0; i < 6000; i++) {
             ;
