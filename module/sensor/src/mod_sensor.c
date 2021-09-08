@@ -7,7 +7,6 @@
 
 #include "sensor.h"
 
-#include <mod_scmi_sensor.h>
 #include <mod_sensor.h>
 
 #include <fwk_assert.h>
