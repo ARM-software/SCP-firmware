@@ -153,12 +153,14 @@ int clock_management_process_state(const struct fwk_event *event)
 
             if (fwk_id_is_equal(ctx->parent_id, FWK_ID_NONE)) {
                 status = clk_mgmt_complete_transition(ctx, event_params);
+
+                /*
+                 * This should not be reached because. asynchronous drivers
+                 * are not supported.
+                 */
+                fwk_assert(status == FWK_E_SUPPORT);
+
                 if (status == FWK_E_SUPPORT) {
-                    /*
-                     * This should not be reached because. asynchronous drivers
-                     * are not supported.
-                     */
-                    fwk_assert(status == FWK_E_SUPPORT);
                     return status;
                 } else if (status == FWK_SUCCESS) {
                     ctx->ref_count++;
@@ -178,12 +180,14 @@ int clock_management_process_state(const struct fwk_event *event)
 
             if (ctx->ref_count == 0) {
                 status = clk_mgmt_complete_transition(ctx, event_params);
+
+                /*
+                 * This should not be reached because. asynchronous drivers
+                 * are not supported.
+                 */
+                fwk_assert(status == FWK_E_SUPPORT);
+
                 if (status == FWK_E_SUPPORT) {
-                    /*
-                     * This should not be reached because. asynchronous drivers
-                     * are not supported.
-                     */
-                    fwk_assert(status == FWK_E_SUPPORT);
                     return status;
                 }
 
@@ -232,12 +236,14 @@ int clock_management_process_state(const struct fwk_event *event)
         }
         if (event_params->caller_status == FWK_SUCCESS) {
             status = clk_mgmt_complete_transition(ctx, event_params);
+
+            /*
+             * This should not be reached because. asynchronous drivers
+             * are not supported.
+             */
+            fwk_assert(status == FWK_E_SUPPORT);
+
             if (status == FWK_E_SUPPORT) {
-                /*
-                 * This should not be reached because. asynchronous drivers
-                 * are not supported.
-                 */
-                fwk_assert(status == FWK_E_SUPPORT);
                 return status;
             } else if (status == FWK_SUCCESS) {
                 ctx->ref_count++;

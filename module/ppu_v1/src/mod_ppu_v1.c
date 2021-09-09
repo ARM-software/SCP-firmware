@@ -223,6 +223,7 @@ static int ppu_v1_core_pd_init(struct ppu_v1_pd_ctx *pd_ctx)
     return FWK_SUCCESS;
 }
 
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
 static int ppu_v1_core_pd_set_state(fwk_id_t core_pd_id, unsigned int state)
 {
     int status;
@@ -312,6 +313,7 @@ static int ppu_v1_core_pd_prepare_for_system_suspend(fwk_id_t core_pd_id)
 
     return FWK_SUCCESS;
 }
+#endif
 
 static void core_pd_ppu_interrupt_handler(struct ppu_v1_pd_ctx *pd_ctx)
 {
@@ -362,6 +364,7 @@ static void core_pd_ppu_interrupt_handler(struct ppu_v1_pd_ctx *pd_ctx)
     }
 }
 
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
 static const struct mod_pd_driver_api core_pd_driver = {
     .set_state = ppu_v1_core_pd_set_state,
     .get_state = ppu_v1_pd_get_state,
@@ -370,6 +373,7 @@ static const struct mod_pd_driver_api core_pd_driver = {
         ppu_v1_core_pd_prepare_for_system_suspend,
     .shutdown = ppu_v1_pd_shutdown,
 };
+#endif
 
 /*
  * Functions specific to cluster power domains
@@ -495,6 +499,7 @@ static int ppu_v1_cluster_pd_init(struct ppu_v1_pd_ctx *pd_ctx)
     return FWK_SUCCESS;
 }
 
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
 static int ppu_v1_cluster_pd_set_state(fwk_id_t cluster_pd_id,
                                        unsigned int state)
 {
@@ -537,6 +542,7 @@ static int ppu_v1_cluster_pd_set_state(fwk_id_t cluster_pd_id,
         return FWK_E_PARAM;
     }
 }
+#endif
 
 static void cluster_pd_ppu_interrupt_handler(struct ppu_v1_pd_ctx *pd_ctx)
 {
@@ -596,12 +602,14 @@ static void cluster_pd_ppu_interrupt_handler(struct ppu_v1_pd_ctx *pd_ctx)
     }
 }
 
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
 static const struct mod_pd_driver_api cluster_pd_driver = {
     .set_state = ppu_v1_cluster_pd_set_state,
     .get_state = ppu_v1_pd_get_state,
     .reset = ppu_v1_pd_reset,
     .shutdown = ppu_v1_pd_shutdown,
 };
+#endif
 
 static void ppu_interrupt_handler(uintptr_t pd_ctx_param)
 {
@@ -829,8 +837,12 @@ static int ppu_v1_process_bind_request(fwk_id_t source_id,
 {
     struct ppu_v1_pd_ctx *pd_ctx;
     unsigned int api_idx;
-    bool is_power_domain_module = false;
-    bool is_system_power_module = false;
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
+    bool is_power_domain_module;
+#endif
+#ifdef BUILD_HAS_MOD_SYSTEM_POWER
+    bool is_system_power_module;
+#endif
 
     api_idx = fwk_id_get_api_idx(api_id);
 
@@ -873,32 +885,48 @@ static int ppu_v1_process_bind_request(fwk_id_t source_id,
 
     switch (pd_ctx->config->pd_type) {
     case MOD_PD_TYPE_CORE:
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
         if (is_power_domain_module) {
             *api = &core_pd_driver;
             pd_ctx->bound_id = source_id;
             return FWK_SUCCESS;
         }
+#endif
         break;
 
     case MOD_PD_TYPE_CLUSTER:
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
         if (is_power_domain_module) {
             *api = &cluster_pd_driver;
             pd_ctx->bound_id = source_id;
             return FWK_SUCCESS;
         }
+#endif
         break;
 
     case MOD_PD_TYPE_SYSTEM:
-        if (is_power_domain_module || is_system_power_module) {
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
+        if (is_power_domain_module) {
             *api = &pd_driver;
             pd_ctx->bound_id = source_id;
             return FWK_SUCCESS;
         }
+#endif
+#ifdef BUILD_HAS_MOD_SYSTEM_POWER
+        if (is_system_power_module) {
+            *api = &pd_driver;
+            pd_ctx->bound_id = source_id;
+            return FWK_SUCCESS;
+        }
+#endif
         break;
 
     default:
-        if (is_power_domain_module)
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
+        if (is_power_domain_module) {
             pd_ctx->bound_id = source_id;
+        }
+#endif
         *api = &pd_driver;
         return FWK_SUCCESS;
     }
