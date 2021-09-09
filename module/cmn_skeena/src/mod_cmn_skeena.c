@@ -659,7 +659,7 @@ int cmn_skeena_setup_sam(struct cmn_skeena_rnsam_reg *rnsam)
 static int cmn_skeena_setup(void)
 {
     unsigned int rnsam_idx, i, ccix_mmap_idx;
-    int status = FWK_SUCCESS;
+    int status;
 
     if (!ctx->initialized) {
         status = cmn_skeena_discovery();
