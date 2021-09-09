@@ -904,7 +904,7 @@ static int mod_dvfs_process_event(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
 {
-    int status = FWK_SUCCESS;
+    int status;
     struct mod_dvfs_domain_ctx *ctx;
     struct mod_psu_driver_response *psu_response;
     uint32_t voltage;
