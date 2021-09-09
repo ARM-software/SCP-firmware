@@ -198,7 +198,7 @@ static int tc0_system_start(fwk_id_t id)
             MOD_PD_STATE_OFF));
 }
 
-int tc0_system_process_notification(
+static int tc0_system_process_notification(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
 {
