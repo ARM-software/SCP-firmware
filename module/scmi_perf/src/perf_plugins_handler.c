@@ -447,8 +447,6 @@ int perf_plugins_handler_init(const struct mod_scmi_perf_config *config)
      * for the same physical domain.
      */
     for (size_t j = 0; j < config->perf_doms_count; j++) {
-        dev_ctx = &perf_plugins_ctx.dev_ctx[j];
-
         has_phy_group = fwk_optional_id_is_defined(domain->phy_group_id);
         if (has_phy_group) {
             /* Custom mapping */
@@ -457,8 +455,6 @@ int perf_plugins_handler_init(const struct mod_scmi_perf_config *config)
 
             if (fwk_id_get_element_idx(domain->phy_group_id) != pgroup) {
                 /* Restart count of logical domains */
-                pgroup = fwk_id_get_element_idx(domain->phy_group_id);
-
                 ldom = 0;
             }
 

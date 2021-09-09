@@ -504,7 +504,6 @@ static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
     int status;
 
     parameters = (const struct scmi_sensor_protocol_reading_get_a2p *)payload;
-    return_values.status = (int32_t)SCMI_GENERIC_ERROR;
 
     if (parameters->sensor_id >= scmi_sensor_ctx.sensor_count) {
         /* Sensor does not exist */
@@ -875,15 +874,15 @@ static int scmi_sensor_process_event(const struct fwk_event *event,
 {
     int status;
     uint64_t sensor_value;
-    struct scmi_sensor_event_parameters *params;
+    struct scmi_sensor_event_parameters *scmi_params;
     struct scmi_sensor_protocol_reading_get_p2a return_values;
 
     /* Request event to sensor HAL */
     if (fwk_id_is_equal(event->id, mod_scmi_sensor_event_id_get_request)) {
-        params = (struct scmi_sensor_event_parameters *)event->params;
+        scmi_params = (struct scmi_sensor_event_parameters *)event->params;
 
-        status = scmi_sensor_ctx.sensor_api->get_value(params->sensor_id,
-                                                       &sensor_value);
+        status = scmi_sensor_ctx.sensor_api->get_value(
+            scmi_params->sensor_id, &sensor_value);
         if (status == FWK_SUCCESS) {
             /* Sensor value is ready */
             return_values = (struct scmi_sensor_protocol_reading_get_p2a) {
@@ -892,7 +891,7 @@ static int scmi_sensor_process_event(const struct fwk_event *event,
                 .sensor_value_high = (uint32_t)(sensor_value >> 32),
             };
 
-            scmi_sensor_respond(&return_values, params->sensor_id);
+            scmi_sensor_respond(&return_values, scmi_params->sensor_id);
 
             return status;
         } else if (status == FWK_PENDING) {
@@ -903,7 +902,7 @@ static int scmi_sensor_process_event(const struct fwk_event *event,
                 .status = SCMI_HARDWARE_ERROR,
             };
 
-            scmi_sensor_respond(&return_values, params->sensor_id);
+            scmi_sensor_respond(&return_values, scmi_params->sensor_id);
 
             return FWK_E_PANIC;
         }
