@@ -63,27 +63,30 @@ static struct mod_res_agent_protocol_permissions agent_protocol_permissions[] =
  */
 static struct mod_res_agent_msg_permissions agent_msg_permissions[] = {
     [AGENT_IDX(JUNO_SCMI_AGENT_IDX_OSPM)] = {
+        .messages = {
         /* Example, Base, disable unused msg 12 */
-        .messages[MOD_RES_PERMS_SCMI_BASE_MESSAGE_IDX] =
+        [MOD_RES_PERMS_SCMI_BASE_MESSAGE_IDX] =
             (1 << 12),  /* Example, Base, disable unused msg 12 */
         /* Power Domain */
-        .messages[MOD_RES_PERMS_SCMI_POWER_DOMAIN_MESSAGE_IDX] = 0x0,
+        [MOD_RES_PERMS_SCMI_POWER_DOMAIN_MESSAGE_IDX] = 0x0,
         /* System Power Domain */
-        .messages[MOD_RES_PERMS_SCMI_SYS_POWER_MESSAGE_IDX] = 0x0,
+        [MOD_RES_PERMS_SCMI_SYS_POWER_MESSAGE_IDX] = 0x0,
         /* Performance */
-        .messages[MOD_RES_PERMS_SCMI_PERF_MESSAGE_IDX] = 0x0,
+        [MOD_RES_PERMS_SCMI_PERF_MESSAGE_IDX] = 0x0,
         /* Clocks */
-        .messages[MOD_RES_PERMS_SCMI_CLOCK_MESSAGE_IDX] = 0x0,
+        [MOD_RES_PERMS_SCMI_CLOCK_MESSAGE_IDX] = 0x0,
         /* Sensors */
-        .messages[MOD_RES_PERMS_SCMI_SENSOR_MESSAGE_IDX] = 0x0,
+        [MOD_RES_PERMS_SCMI_SENSOR_MESSAGE_IDX] = 0x0,
         /* Reset Domains */
-        .messages[MOD_RES_PERMS_SCMI_RESET_DOMAIN_MESSAGE_IDX] = 0x0,
+        [MOD_RES_PERMS_SCMI_RESET_DOMAIN_MESSAGE_IDX] = 0x0,
+        }
     },
     [AGENT_IDX(JUNO_SCMI_AGENT_IDX_PSCI)] = {
-        .messages[MOD_RES_PERMS_SCMI_BASE_MESSAGE_IDX] = 0x0,
-        .messages[MOD_RES_PERMS_SCMI_POWER_DOMAIN_MESSAGE_IDX] = 0x0,
-        .messages[MOD_RES_PERMS_SCMI_SYS_POWER_MESSAGE_IDX] = 0x0,
-        .messages[MOD_RES_PERMS_SCMI_PERF_MESSAGE_IDX] =
+        .messages = {
+        [MOD_RES_PERMS_SCMI_BASE_MESSAGE_IDX] = 0x0,
+        [MOD_RES_PERMS_SCMI_POWER_DOMAIN_MESSAGE_IDX] = 0x0,
+        [MOD_RES_PERMS_SCMI_SYS_POWER_MESSAGE_IDX] = 0x0,
+        [MOD_RES_PERMS_SCMI_PERF_MESSAGE_IDX] =
             ((1 << (MOD_SCMI_PERF_DOMAIN_ATTRIBUTES -
                     MOD_RES_PERMS_SCMI_PERF_BITMASK_IDX)) |
              /* DESCRIBE_LEVELS is required for some reason ... */
@@ -104,9 +107,10 @@ static struct mod_res_agent_msg_permissions agent_msg_permissions[] = {
              (1 << (MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL -
                     MOD_RES_PERMS_SCMI_PERF_BITMASK_IDX))),
         /* Clocks, no access */
-        .messages[MOD_RES_PERMS_SCMI_CLOCK_MESSAGE_IDX] = 0xff,
-        .messages[MOD_RES_PERMS_SCMI_SENSOR_MESSAGE_IDX] = 0x0,
-        .messages[MOD_RES_PERMS_SCMI_RESET_DOMAIN_MESSAGE_IDX] = 0x0,
+        [MOD_RES_PERMS_SCMI_CLOCK_MESSAGE_IDX] = 0xff,
+        [MOD_RES_PERMS_SCMI_SENSOR_MESSAGE_IDX] = 0x0,
+        [MOD_RES_PERMS_SCMI_RESET_DOMAIN_MESSAGE_IDX] = 0x0,
+        }
     },
 };
 

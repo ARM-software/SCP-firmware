@@ -873,14 +873,16 @@ static int juno_ppu_element_init(fwk_id_t ppu_id,
 
 static int juno_ppu_bind(fwk_id_t id, unsigned int round)
 {
+#if (defined BUILD_HAS_MOD_TIMER) || (defined BUILD_HAS_MOD_POWER_DOMAIN) || \
+    (defined BUILD_HAS_MOD_SYSTEM_POWER)
     int status;
+#endif
     struct ppu_ctx *ppu_ctx;
     const struct mod_juno_ppu_element_config *dev_config;
+#ifdef BUILD_HAS_MOD_TIMER
     const struct mod_juno_ppu_config *config;
-
-    (void)config;
+#endif
     (void)dev_config;
-    (void)status;
 
     /* Bind in the second round only */
     if (round == 0) {
