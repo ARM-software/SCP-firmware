@@ -426,7 +426,6 @@ static void cmn700_configure(void)
             } else {
                 enum node_type node_type = get_node_type(node);
                 node_id = get_node_id(node);
-
                 if (node_type == NODE_TYPE_RN_SAM) {
                     fwk_assert(irnsam_entry < ctx->internal_rnsam_count);
 
@@ -656,19 +655,19 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
      * If CAL mode is enabled by the configuration program the SCG CAL Mode
      * enable register.
      */
-    if (config->hnf_cal_mode)
+    if (config->hnf_cal_mode) {
         for (region_idx = 0; region_idx < MAX_SCG_COUNT; region_idx++)
             rnsam->SYS_CACHE_GRP_CAL_MODE |= scg_regions_enabled[region_idx] *
                 (CMN700_RNSAM_SCG_HNF_CAL_MODE_EN
                  << (region_idx * CMN700_RNSAM_SCG_HNF_CAL_MODE_SHIFT));
 
     /* Program the SYS_CACHE_GRP_SN_NODEID register for PrefetchTgt */
-    if (config->hnf_cal_mode)
         group_count = config->snf_count /
             (CMN700_RNSAM_SYS_CACHE_GRP_SN_NODEID_ENTRIES_PER_GROUP * 2);
-    else
+    } else {
         group_count = config->snf_count /
             CMN700_RNSAM_SYS_CACHE_GRP_SN_NODEID_ENTRIES_PER_GROUP;
+    }
 
     for (group = 0; group < group_count; group++)
         rnsam->SYS_CACHE_GRP_SN_NODEID[group] = ctx->sn_nodeid_group[group];
@@ -726,7 +725,7 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
 static int cmn700_setup(void)
 {
     unsigned int rnsam_idx;
-    int status = FWK_SUCCESS;
+    int status;
 
     if (!ctx->initialized) {
         status = cmn700_discovery();
