@@ -557,7 +557,7 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
 static int cmn600_setup(void)
 {
     unsigned int rnsam_idx, i, ccix_mmap_idx;
-    int status = FWK_SUCCESS;
+    int status;
 
     if (!ctx->initialized) {
         status = cmn600_discovery();
