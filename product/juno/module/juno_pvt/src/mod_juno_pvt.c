@@ -195,10 +195,6 @@ static int process_pvt_calibration(struct pvt_sub_dev_ctx *sensor_ctx,
         return FWK_E_RANGE;
     }
 
-    if (freq_fs == 0) {
-        return FWK_E_PARAM;
-    }
-
     /* Calculate sample window to fit the full scale reading */
     sample_window = (SAMPLE_WINDOW_MASK * REFCLK_KHZ) / freq_fs;
     if (sample_window > SAMPLE_WINDOW_MASK) {
@@ -254,10 +250,6 @@ static int process_osc_calibration(struct pvt_sub_dev_ctx *sensor_ctx,
      */
     if (freq_fs < REFCLK_KHZ) {
         return FWK_E_RANGE;
-    }
-
-    if (freq_fs == 0) {
-        return FWK_E_PARAM;
     }
 
     /* Calculate sample window to fit the full scale reading */
@@ -631,8 +623,6 @@ static int pvt_start(fwk_id_t id)
     if (sub_element_count == 0) {
         return FWK_SUCCESS;
     }
-
-    sensor_cfg = group_ctx->sensor_cfg_table;
 
     /* Perform calibration for each sensor within the group */
     for (sub_elem_ix = 0; sub_elem_ix < (uint8_t)sub_element_count;
