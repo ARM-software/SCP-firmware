@@ -1018,8 +1018,10 @@ static int scmi_clock_rate_set_handler(fwk_id_t service_id,
     }
 
     struct event_set_rate_request_data data = {
-        .rate[0] = (uint32_t)rate,
-        .rate[1] = (uint32_t)(rate >> 32),
+        .rate = {
+                [0] = (uint32_t)rate,
+                [1] = (uint32_t)(rate >> 32),
+        },
         .round_mode = round_mode,
     };
 

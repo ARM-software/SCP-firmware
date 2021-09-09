@@ -977,11 +977,7 @@ static int scmi_perf_level_get_handler(fwk_id_t service_id,
     int status;
     const struct scmi_perf_level_get_a2p *parameters;
     struct scmi_perf_event_parameters *evt_params;
-    struct scmi_perf_level_get_p2a return_values = {
-        .status = (int32_t)SCMI_GENERIC_ERROR,
-    };
-
-    return_values.status = (int32_t)SCMI_GENERIC_ERROR;
+    struct scmi_perf_level_get_p2a return_values;
 
     parameters = (const struct scmi_perf_level_get_a2p *)payload;
     if (parameters->domain_id >= scmi_perf_ctx.domain_count) {

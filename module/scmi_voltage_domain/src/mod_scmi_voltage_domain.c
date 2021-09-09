@@ -394,7 +394,7 @@ static int scmi_voltd_config_set_handler(fwk_id_t service_id,
     size_t outmsg_size = sizeof(outmsg.status);
     uint8_t mode_type = (uint8_t)MOD_VOLTD_MODE_TYPE_ARCH;
     uint8_t mode_id = (uint8_t)MOD_VOLTD_MODE_ID_OFF;
-    enum scmi_voltd_mode_type scmi_mode_type = SCMI_VOLTD_MODE_TYPE_ARCH;
+    enum scmi_voltd_mode_type scmi_mode_type;
     enum scmi_voltd_mode_id scmi_mode_id = SCMI_VOLTD_MODE_ID_OFF;
 
     inmsg = (const struct scmi_voltd_config_set_a2p*)payload;
