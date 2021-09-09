@@ -33,9 +33,9 @@ const char checkpoint_help[] =
 
 int32_t checkpoint_f(int32_t argc, char **argv)
 {
+    uint32_t id;
+    uint32_t run_cnt;
     uint32_t i = 0;
-    uint32_t id = 0;
-    uint32_t run_cnt = 0;
 
     if ((argc == 2) && (cli_strncmp(argv[1], "list", 4) == 0)) {
         for (i = 0; i < CHECKPOINT_NUM; i++) {

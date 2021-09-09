@@ -665,7 +665,7 @@ uint32_t cli_getline(
 
 static void cli_main(void const *argument)
 {
-    int32_t status = FWK_SUCCESS;
+    int32_t status;
     uint32_t last_history_index = CLI_CONFIG_HISTORY_LENGTH - 1;
     uint32_t command_length = 0;
     bool cli_exit = false;
@@ -1201,9 +1201,9 @@ static uint32_t cli_split(
 
 static uint32_t cli_command_dispatch(char **args)
 {
-    uint32_t index = 0;
+    uint32_t index;
+    uint32_t status;
     uint32_t num_args = 0;
-    uint32_t status = FWK_SUCCESS;
     struct fwk_slist *node = NULL;
     struct command_ctx *cc = NULL;
     bool command_found;
@@ -1293,8 +1293,8 @@ static uint32_t cli_command_dispatch(char **args)
 
 static uint32_t cli_debug_output(void)
 {
+    uint32_t fifo_status;
     char c = 0;
-    uint32_t fifo_status = FWK_SUCCESS;
 
     cli_printf(
         0,
@@ -1367,11 +1367,11 @@ static void cli_snprintf_arg(
     const char *fmt,
     va_list *args)
 {
-    int bit64 = 0;
+    int bit64;
+    int fill;
     int64_t num = 0;
     uint64_t unum = 0;
     char *str = NULL;
-    int fill = 0;
     uint32_t most_significant = 0;
     char c = 0;
 

@@ -80,10 +80,10 @@ static int32_t dump_memory_f(int32_t argc, char **argv)
      * Reads aligned to 8 byte bondaries so remove lower 3 bits of address and
      * size parameters.
      */
+    uint32_t j;
     uint32_t addr = (uint32_t)(strtoul(argv[1], 0, 0) & 0xFFFFFFF8);
     uint32_t size = (uint32_t)(strtoul(argv[2], 0, 0) & 0x000003F8);
     uint32_t i = 0;
-    uint32_t j = 0;
 
     /* Sanity check. */
     if (size == 0)
