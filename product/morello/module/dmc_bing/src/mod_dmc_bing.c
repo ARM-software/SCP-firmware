@@ -369,7 +369,7 @@ static int enable_dimm_refresh(struct mod_dmc_bing_reg *dmc)
 
 static void delay_ms(uint32_t ms)
 {
-    volatile uint32_t i = 0;
+    volatile uint32_t i;
     while (ms > 0) {
         for (i = 0; i < 6000; i++)
             ;

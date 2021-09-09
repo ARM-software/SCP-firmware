@@ -51,33 +51,36 @@ static struct mod_res_agent_msg_permissions
             [AGENT_IDX(SCP_SCMI_AGENT_ID_OSPM)] =
                 {
                     /* Example, Base, disable unused msg 12 */
-                    .messages[MOD_RES_PERMS_SCMI_BASE_MESSAGE_IDX] = 0x0,
+                    .messages = {
+                    [MOD_RES_PERMS_SCMI_BASE_MESSAGE_IDX] = 0x0,
                     /* Power Domain */
-                    .messages[MOD_RES_PERMS_SCMI_POWER_DOMAIN_MESSAGE_IDX] =
+                    [MOD_RES_PERMS_SCMI_POWER_DOMAIN_MESSAGE_IDX] =
                         0x0,
                     /* System Power Domain */
-                    .messages[MOD_RES_PERMS_SCMI_SYS_POWER_MESSAGE_IDX] = 0x0,
+                    [MOD_RES_PERMS_SCMI_SYS_POWER_MESSAGE_IDX] = 0x0,
                     /* Performance */
-                    .messages[MOD_RES_PERMS_SCMI_PERF_MESSAGE_IDX] = 0x0,
+                    [MOD_RES_PERMS_SCMI_PERF_MESSAGE_IDX] = 0x0,
                     /*
                      * TODO: access to CONFIG_SET required?
                      */
-                    .messages[MOD_RES_PERMS_SCMI_CLOCK_MESSAGE_IDX] =
+                    [MOD_RES_PERMS_SCMI_CLOCK_MESSAGE_IDX] =
                         MOD_RES_PERMS_ACCESS_DENIED
                         << (MOD_SCMI_CLOCK_CONFIG_SET -
                             MOD_SCMI_CLOCK_ATTRIBUTES),
                     /* Sensors */
-                    .messages[MOD_RES_PERMS_SCMI_SENSOR_MESSAGE_IDX] = 0x0,
+                    [MOD_RES_PERMS_SCMI_SENSOR_MESSAGE_IDX] = 0x0,
                     /* Reset Domains */
-                    .messages[MOD_RES_PERMS_SCMI_RESET_DOMAIN_MESSAGE_IDX] =
+                    [MOD_RES_PERMS_SCMI_RESET_DOMAIN_MESSAGE_IDX] =
                         0x0,
+                    }
                 },
             [AGENT_IDX(SCP_SCMI_AGENT_ID_PSCI)] =
                 {
-                    .messages[0] = 0x0, /* Base */
-                    .messages[1] = 0x0, /* Power Domain */
-                    .messages[2] = 0x0, /* System Power Domain */
-                    .messages[3] =
+                    .messages = {
+                    [0] = 0x0, /* Base */
+                    [1] = 0x0, /* Power Domain */
+                    [2] = 0x0, /* System Power Domain */
+                    [3] =
                         ((1
                           << (MOD_SCMI_PERF_DOMAIN_ATTRIBUTES -
                               MOD_SCMI_PERF_DOMAIN_ATTRIBUTES)) |
@@ -109,11 +112,12 @@ static struct mod_res_agent_msg_permissions
                     /*
                      * TODO: access to CONFIG_SET required?
                      */
-                    .messages[4] =
+                    [4] =
                         (1
                          << (MOD_SCMI_CLOCK_CONFIG_SET -
                              MOD_SCMI_CLOCK_ATTRIBUTES)),
-                    .messages[5] = 0x0, /* Sensors */
+                    [5] = 0x0, /* Sensors */
+                    }
                 },
         };
 
