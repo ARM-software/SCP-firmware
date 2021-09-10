@@ -358,7 +358,7 @@ static int sd_clock_element_init(
 {
     struct rcar_sd_clock_dev_ctx *ctx;
     const struct mod_rcar_sd_clock_dev_config *dev_config = data;
-    unsigned int i = 0;
+    unsigned int i;
     uint64_t current_rate;
     uint64_t last_rate = 0;
 
