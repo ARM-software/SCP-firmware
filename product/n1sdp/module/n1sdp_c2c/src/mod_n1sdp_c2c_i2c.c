@@ -617,6 +617,7 @@ static int n1sdp_c2c_process_command(void)
     uint8_t rx_data[N1SDP_C2C_DATA_SIZE];
     uint32_t ddr_size_gb = 0;
     unsigned int state = 0;
+    bool set_state_req_resp = false;
     struct mod_cmn600_ccix_remote_node_config remote_config;
 
     memcpy(rx_data, n1sdp_c2c_ctx.slave_rx_data, N1SDP_C2C_DATA_SIZE);
@@ -725,12 +726,16 @@ static int n1sdp_c2c_process_command(void)
          * rx_data[0] - Contains the C2C command
          * rx_data[1] - Contains target power domain ID
          * rx_data[2] - Contains target power domain type (core or cluster)
+         *
+         * The power domains set_state requests a response.
+         *
          */
+        set_state_req_resp = true;
         switch (rx_data[2]) {
         case MOD_PD_TYPE_CORE:
             status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
-                MOD_PD_SET_STATE_NO_RESP,
+                MOD_PD_SET_STATE_REQ_RESP,
                 MOD_PD_COMPOSITE_STATE(
                     MOD_PD_LEVEL_0, 0, 0, 0, MOD_PD_STATE_OFF));
             if (status != FWK_SUCCESS) {
@@ -742,7 +747,7 @@ static int n1sdp_c2c_process_command(void)
         case MOD_PD_TYPE_DEVICE_DEBUG:
             status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
-                MOD_PD_SET_STATE_NO_RESP,
+                MOD_PD_SET_STATE_REQ_RESP,
                 MOD_PD_STATE_OFF);
             if (status != FWK_SUCCESS) {
                 goto error;
@@ -752,7 +757,7 @@ static int n1sdp_c2c_process_command(void)
         case MOD_PD_TYPE_SYSTEM:
             status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
-                MOD_PD_SET_STATE_NO_RESP,
+                MOD_PD_SET_STATE_REQ_RESP,
                 MOD_PD_STATE_OFF);
             if (status != FWK_SUCCESS) {
                 goto error;
@@ -770,12 +775,16 @@ static int n1sdp_c2c_process_command(void)
          * rx_data[0] - Contains the C2C command
          * rx_data[1] - Contains target power domain ID
          * rx_data[2] - Contains target power domain type (core or cluster)
+         *
+         * The power domains set_state requests a response.
+         *
          */
+        set_state_req_resp = true;
         switch (rx_data[2]) {
         case MOD_PD_TYPE_CORE:
             status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
-                MOD_PD_SET_STATE_NO_RESP,
+                MOD_PD_SET_STATE_REQ_RESP,
                 MOD_PD_COMPOSITE_STATE(
                     MOD_PD_LEVEL_2,
                     0,
@@ -791,7 +800,7 @@ static int n1sdp_c2c_process_command(void)
         case MOD_PD_TYPE_DEVICE_DEBUG:
             status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
-                MOD_PD_SET_STATE_NO_RESP,
+                MOD_PD_SET_STATE_REQ_RESP,
                 MOD_PD_STATE_ON);
             if (status != FWK_SUCCESS) {
                 goto error;
@@ -801,7 +810,7 @@ static int n1sdp_c2c_process_command(void)
         case MOD_PD_TYPE_SYSTEM:
             status = n1sdp_c2c_ctx.pd_api->set_state(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
-                MOD_PD_SET_STATE_NO_RESP,
+                MOD_PD_SET_STATE_REQ_RESP,
                 MOD_PD_STATE_ON);
             if (status != FWK_SUCCESS) {
                 goto error;
@@ -872,8 +881,19 @@ static int n1sdp_c2c_process_command(void)
 
 error:
     if (status == FWK_SUCCESS) {
-        n1sdp_c2c_ctx.slave_tx_data[0] = N1SDP_C2C_SUCCESS;
+        if (set_state_req_resp) {
+            /*
+             * The power domain will take time to transition to the new state.
+             * Listen for the event response from the power domain before
+             * writing the reply to the remote requester.
+             */
+            return FWK_SUCCESS;
+        } else {
+            /* Not a set_state command which requires a response */
+            n1sdp_c2c_ctx.slave_tx_data[0] = N1SDP_C2C_SUCCESS;
+        }
     } else {
+        /* status != FWK_SUCCESS */
         n1sdp_c2c_ctx.slave_tx_data[0] = N1SDP_C2C_ERROR;
     }
 
@@ -1226,6 +1246,27 @@ static int n1sdp_c2c_process_notification(const struct fwk_event *event,
 
     return FWK_SUCCESS;
 }
+static int n1sdp_c2c_process_event(
+    const struct fwk_event *event,
+    struct fwk_event *resp_event)
+{
+    int status;
+    unsigned int module_idx;
+
+    module_idx = fwk_id_get_module_idx(event->source_id);
+    if (module_idx == fwk_id_get_module_idx(fwk_module_id_power_domain)) {
+        status = n1sdp_c2c_ctx.slave_api->write(
+            n1sdp_c2c_ctx.config->i2c_id,
+            &n1sdp_c2c_ctx.slave_tx_data[0],
+            N1SDP_C2C_DATA_SIZE);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR("[C2C] Error setting up write transfer!");
+            return status;
+        }
+        return FWK_SUCCESS;
+    }
+    return FWK_E_PARAM;
+}
 
 const struct fwk_module module_n1sdp_c2c = {
     .type = FWK_MODULE_TYPE_PROTOCOL,
@@ -1234,5 +1275,6 @@ const struct fwk_module module_n1sdp_c2c = {
     .bind = n1sdp_c2c_bind,
     .process_bind_request = n1sdp_c2c_process_bind_request,
     .process_notification = n1sdp_c2c_process_notification,
+    .process_event = n1sdp_c2c_process_event,
     .start = n1sdp_c2c_start,
 };
