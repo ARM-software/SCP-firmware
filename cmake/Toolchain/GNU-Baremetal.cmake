@@ -28,6 +28,12 @@ foreach(language IN ITEMS ASM C CXX)
     string(APPEND CMAKE_${language}_FLAGS_INIT "-ffunction-sections ")
     string(APPEND CMAKE_${language}_FLAGS_INIT "-fdata-sections ")
     string(APPEND CMAKE_${language}_FLAGS_INIT "-fshort-enums ")
+    string(APPEND CMAKE_${language}_FLAGS_INIT "-Wall -Werror -Wextra ")
+    string(APPEND CMAKE_${language}_FLAGS_INIT
+           "-Wno-error=deprecated-declarations ")
+    string(APPEND CMAKE_${language}_FLAGS_INIT "-Wno-unused-parameter ")
+    string(APPEND CMAKE_${language}_FLAGS_INIT
+           "-Wno-missing-field-initializers ")
 
     string(APPEND CMAKE_${language}_FLAGS_DEBUG_INIT "-Og")
 endforeach()
