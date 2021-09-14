@@ -3,6 +3,97 @@ SCP-firmware Change Log
 
 Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
 
+SCP-firmware - version 2.9.0
+============================
+
+New features
+------------
+
+- Framework:
+    - Add light events
+    - fwk_log: Add option for minimal banner
+
+- New modules:
+    - Mock Voltage Domain driver
+    - PMI and DWT PMI driver
+    - PCIE integration control register
+    - CMN Skeena
+    - Cadence I2C
+
+- SCMI:
+    - scmi_perf: Add performance plugins handler extension
+
+- Build system:
+    - CMake: Add support for parallel build
+    - CMake: Add support for framework tests
+
+Changed
+-------
+
+- Documentation:
+    - clock: Add documentation for Clock Management Framework
+
+- Arch:
+    - arm: Add interrupt disable/enable inline calls
+
+- Framework:
+    - Remove Signals
+    - Remove module name parameter
+
+- Modules:
+    - clock: Add Clock Management Framework
+    - mod_resource_perms: Fix recursion on mod_res_message_id_to_index
+    - cmn700: Add support to configure additional non-hash mem regions
+    - cmn700: Update root node offset calculation for bigger mesh
+    - cmn700: Add hierarchical hashing support with 3 SN mode
+    - psu: Add error return from mod_psu_process_bind_request
+    - sds: Clear data valid flag after SCP RAM FW has been transferred
+
+- Platforms:
+    - juno/scmi_perf: Simplify configuration of FastChannels
+    - juno/software_mmap: Remove unused SCMI_FAST_CHANNEL_SIZE
+    - juno: Provide PMI and DWT PMI config
+    - n1sdp: Enable non-secure CoreSight access in C2C setup
+    - n1sdp: Add dynamic calculations of PLL parameters
+    - morello: Restructure dmc_bing module
+    - rdv1mc, sgi575: Add config for MCP
+    - Add support for tc1
+    - tc0: Add SCMI FastChannels configuration
+    - tc0: Use separate PLLs for seperate core types
+    - tc0: Add example configuration for Voltage Domain
+    - tc0: Enable DVFS for Matterhorn ELP Arm cores
+    - tc0: Update SCP PIK
+    - rdv1mc: Add support for DVFS and SCMI Perf
+    - rdv1mc: Enable fast channel
+    - rdv1mc: Add mock PSU for dvfs
+    - rdn2: Update register layout for pik's in rdn2 platform
+    - rdn2: Disable NEWLIB_NANO for RD-N2 platform
+    - rdn2: Add support for variant 1 of rdn2 platform
+    - rdn2: Add ecam and mmio memory regions in cmn700 config
+    - rdn2: Update NCI GPV region 0 in cmn700 config
+    - rdn2: Add all NCI GPV regions in cmn700 config
+    - rdn2: Add config data for pcie integ control module
+    - rdn2: Add support for mcp ramfw
+    - rdv1: Add config data for mcp romfw bootloader module
+    - rdv1: Add config data for clock module in MCP RAM firmware
+    - rdv1: Add config data for pl011 UART module in mcp ramfw
+    - rdv1: Add configuration data for MPU module in mcp ramfw
+    - rdv1: Add generic timer config data for mcp ramfw
+    - rdv1: Add timer HAL config data for mcp ramfw
+    - rdv1: Add platform specific definitions for rtx
+    - rdv1: Add mcp_platform module for rdv1
+    - rdv1: Add build support for mcp ram firmware
+    - rdv1: Add debugger CLI module config data for mcp ramfw
+    - synquacer: Add shutdown handler in ppu_v0_synquacer module
+
+- MISRA C:2012:
+    - SCMI, Framework: Fix rule 9.5 violations
+    - mod_resource_perms: Fix rule 16.5 violations
+    - module: Fix rule 10.3 violations
+    - fwk: Fix rules 11.9, 16.3 and 17.7 violations
+    - arch: Fix rule 15.6 violations
+    - arch/armv7-m: Fix rules 10.1 and 17.7 violations
+
 SCP-firmware - version 2.8.0
 ============================
 

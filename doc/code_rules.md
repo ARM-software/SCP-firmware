@@ -72,15 +72,15 @@ cppcheck --xml \
 
 MISRAC-2012
 -----------
-The SCP-firmware is gradually achieving compliance with MISRAC-2012. To date,
-the mandatory rules have been resolved.
+The SCP-firmware is attempting to achieve compliance with MISRAC-2012.
+To date, the mandatory rules have been resolved.
 
 In order to provide a reference, Juno platform is taken as a first platform to
-provide compliance. At the same time, a MISRAC-2012 checker will run upon PR
-submission.
+attempt alignment with the guidance. At the same time, a MISRAC-2012 checker
+will run upon PR submission.
 
 Please note that new patches will have to be compliant with the current status
-of compliance.
+of violations.
 
 C Standard Library
 ------------------

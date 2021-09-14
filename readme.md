@@ -1,4 +1,4 @@
-SCP-firmware - version 2.8
+SCP-firmware - version 2.9
 ==========================
 
 Copyright (c) 2011-2021, Arm Limited. All rights reserved.
@@ -71,6 +71,7 @@ Virtual Platforms (FVPs or boards where possible):
 - Renesas R-Car platform
 - Total Compute (tc0) platform (Please contact Arm directly to obtain the TC0 FVP)
 - Morello (Please see Arm's Ecosystem FVPs Developer page)
+- Total Compute (tc1) platform (Please contact Arm directly to obtain the TC1 FVP)
 
 License
 -------

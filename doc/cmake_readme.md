@@ -96,10 +96,6 @@ See below to build and execute framework tests
 
 **LIMITATIONS**
 
-- CMake build of rdn2 platform is not working. It requires further
-  investigation.
-- CMake build of platform synquacer is not tested.
-- CMake build of platform rcar is not tested.
 - ArmClang toolchain is supported but not all platforms are working.
 
 **NOTE**: Read below documentation for advanced use of development environment
