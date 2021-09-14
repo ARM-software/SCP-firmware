@@ -69,6 +69,7 @@ target_sources(
         "${CMAKE_CURRENT_SOURCE_DIR}/git/CMSIS/RTOS2/Source/os_systick.c")
 
 target_compile_definitions(rtos2-rtx INTERFACE RTX_NO_MULTITHREAD_CLIB)
+target_compile_options(rtos2-rtx INTERFACE -Wno-array-bounds)
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "cortex-m[37]")
     target_sources(
