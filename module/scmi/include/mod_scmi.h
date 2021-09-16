@@ -586,38 +586,6 @@ struct mod_scmi_from_protocol_api {
 };
 
 /*!
- * \brief Identify if an SCMI entity is the communications master for a given
- *      channel type.
- *
- * \param type Channel type.
- * \param role Entity role.
- *
- * \retval true The entity is the communications master of the channel.
- * \retval false The entity is the communications slave of the channel.
- */
-static inline bool mod_scmi_is_master(enum scmi_channel_type type,
-                                      enum scmi_role role)
-{
-    return (int)type == (int)role;
-}
-
-/*!
- * \brief Identify if an SCMI entity is the communications slave for a given
- *      channel type.
- *
- * \param type Channel type.
- * \param role Entity role.
- *
- * \retval true The entity is the communications slave of the channel.
- * \retval false The entity is the communications master of the channel.
- */
-static inline bool mod_scmi_is_slave(enum scmi_channel_type type,
-                                     enum scmi_role role)
-{
-    return (int)type != (int)role;
-}
-
-/*!
  * \brief SCMI notification indices.
  */
 enum mod_scmi_notification_idx {
