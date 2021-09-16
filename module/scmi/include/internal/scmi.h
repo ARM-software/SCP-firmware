@@ -63,9 +63,10 @@ enum scmi_agent_type {
 /*!
  * \brief Channel type.
  *
- * \details Defines the channel direction in terms of the master to the slave.
+ * \details Defines the channel direction in terms of the requester to the
+ *      completer.
  *
- * \note The integer values of this enumeration are based on the master of
+ * \note The integer values of this enumeration are based on the requester of
  *      communications in that configuration.
  */
 enum scmi_channel_type {
