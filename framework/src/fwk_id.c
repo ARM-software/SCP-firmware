@@ -96,7 +96,6 @@ static void fwk_id_format(char *buffer, size_t buffer_size, fwk_id_t id)
     case __FWK_ID_TYPE_API:
     case __FWK_ID_TYPE_EVENT:
     case __FWK_ID_TYPE_NOTIFICATION:
-    case __FWK_ID_TYPE_SIGNAL:
         length +=
             snprintf(buffer + length, buffer_size - length, ":%u", indices[1]);
 
