@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -37,6 +37,17 @@ struct mod_mock_sensor_dev_config {
 
     /*! Identifier of the alarm assigned to this element */
     fwk_id_t alarm_id;
+
+    /*! Sensor read value */
+    uint64_t *read_value;
+
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+    /*! Pointer to sensor axis information */
+    const struct mod_sensor_axis_info *axis_info;
+
+    /*! Sensor axis count */
+    uint8_t axis_count;
+#endif
 };
 
 /*!
