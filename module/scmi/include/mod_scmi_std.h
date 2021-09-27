@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -177,6 +177,9 @@ enum scmi_sensor_command_id {
     MOD_SCMI_SENSOR_TRIP_POINT_NOTIFY = 0x004,
     MOD_SCMI_SENSOR_TRIP_POINT_CONFIG = 0x005,
     MOD_SCMI_SENSOR_READING_GET = 0x006,
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+    MOD_SCMI_SENSOR_AXIS_DESCRIPTION_GET = 0x007,
+#endif
     MOD_SCMI_SENSOR_COMMAND_COUNT,
 };
 

@@ -89,6 +89,11 @@ static int scmi_sensor_trip_point_config_handler(
     fwk_id_t service_id,
     const uint32_t *payload);
 #endif
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+static int scmi_sensor_axis_desc_get_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload);
+#endif
 static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
     const uint32_t *payload);
 
@@ -117,6 +122,9 @@ static int (*handler_table[MOD_SCMI_SENSOR_COMMAND_COUNT])(
     [MOD_SCMI_SENSOR_TRIP_POINT_NOTIFY] = scmi_sensor_trip_point_notify_handler,
     [MOD_SCMI_SENSOR_TRIP_POINT_CONFIG] = scmi_sensor_trip_point_config_handler,
 #endif
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+    [MOD_SCMI_SENSOR_AXIS_DESCRIPTION_GET] = scmi_sensor_axis_desc_get_handler,
+#endif
     [MOD_SCMI_SENSOR_READING_GET] = scmi_sensor_reading_get_handler
 };
 
@@ -133,19 +141,31 @@ static unsigned int payload_size_table[MOD_SCMI_SENSOR_COMMAND_COUNT] = {
     [MOD_SCMI_SENSOR_TRIP_POINT_CONFIG] =
         sizeof(struct scmi_sensor_trip_point_config_a2p),
 #endif
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+    [MOD_SCMI_SENSOR_AXIS_DESCRIPTION_GET] =
+        (unsigned int)sizeof(struct scmi_sensor_axis_description_get_a2p),
+#endif
     [MOD_SCMI_SENSOR_READING_GET] =
         (unsigned int)sizeof(struct scmi_sensor_protocol_reading_get_a2p),
 };
 
 /*
- * Static helper for responding to SCMI.
+ * Static helper for responding to SCMI a reading get request.
  */
-static void scmi_sensor_respond(
-    struct scmi_sensor_protocol_reading_get_p2a *return_values,
-    fwk_id_t sensor_id)
+static int scmi_sensor_reading_respond(
+    fwk_id_t sensor_id,
+    const struct mod_sensor_data *sensor_data)
 {
+    struct scmi_sensor_protocol_reading_get_p2a return_values;
+    unsigned int payload_size;
+    const void *payload = NULL;
+    int status = FWK_SUCCESS;
     unsigned int sensor_idx;
     fwk_id_t service_id;
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+    struct scmi_sensor_protocol_reading_get_data axis_value;
+    unsigned int axis_idx, values_max, max_payload_size;
+#endif
 
     /*
      * The service identifier used for the response is retrieved from the
@@ -154,16 +174,94 @@ static void scmi_sensor_respond(
     sensor_idx = fwk_id_get_element_idx(sensor_id);
     service_id = scmi_sensor_ctx.sensor_ops_table[sensor_idx].service_id;
 
-    scmi_sensor_ctx.scmi_api->respond(service_id,
-        return_values,
-        (return_values->status == SCMI_SUCCESS) ?
-        sizeof(*return_values) : sizeof(return_values->status));
+    if (sensor_data->status != FWK_SUCCESS) {
+        return_values.status = (int32_t)SCMI_HARDWARE_ERROR;
+        goto exit_error;
+    }
 
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+    payload_size = sizeof(return_values);
+    status = scmi_sensor_ctx.scmi_api->get_max_payload_size(
+        service_id, &max_payload_size);
+    if (status != FWK_SUCCESS) {
+        goto exit_unexpected;
+    }
+
+    values_max = SCMI_SENSOR_READ_GET_VALUES_MAX(max_payload_size);
+    if (values_max == 0 || values_max < sensor_data->axis_count) {
+        /* Can't fit sensor axis value in the payload */
+        return_values.status = (int32_t)SCMI_GENERIC_ERROR;
+        goto exit_error;
+    }
+
+    for (axis_idx = 0; axis_idx < sensor_data->axis_count;
+         ++axis_idx, payload_size += sizeof(axis_value)) {
+        if (sensor_data->axis_count == 1) {
+            axis_value = (struct scmi_sensor_protocol_reading_get_data){
+                .sensor_value_low = (uint32_t)sensor_data->value,
+                .sensor_value_high = (uint32_t)(sensor_data->value >> 32),
+                .timestamp_low = (uint32_t)sensor_data->timestamp,
+                .timestamp_high = (uint32_t)(sensor_data->timestamp >> 32),
+            };
+        } else {
+            axis_value = (struct scmi_sensor_protocol_reading_get_data){
+                .sensor_value_low = (uint32_t)sensor_data->axis_value[axis_idx],
+                .sensor_value_high =
+                    (uint32_t)(sensor_data->axis_value[axis_idx] >> 32),
+                .timestamp_low = (uint32_t)sensor_data->timestamp,
+                .timestamp_high = (uint32_t)(sensor_data->timestamp >> 32),
+            };
+        }
+
+        status = scmi_sensor_ctx.scmi_api->write_payload(
+            service_id,
+            payload_size,
+            &axis_value,
+            sizeof(struct scmi_sensor_protocol_reading_get_data));
+        if (status != FWK_SUCCESS) {
+            /* Failed to write sensor axis value into message payload */
+            return_values.status = (int32_t)SCMI_GENERIC_ERROR;
+            goto exit_error;
+        }
+    }
+    return_values.status = (int32_t)SCMI_SUCCESS;
+
+    status = scmi_sensor_ctx.scmi_api->write_payload(
+        service_id, 0, &return_values, sizeof(return_values));
+    if (status != FWK_SUCCESS) {
+        return_values.status = (int32_t)SCMI_GENERIC_ERROR;
+        goto exit_error;
+    }
+    goto exit;
+
+#else
+    return_values = (struct scmi_sensor_protocol_reading_get_p2a){
+        .status = SCMI_SUCCESS,
+        .sensor_value_low = (uint32_t)sensor_data->value,
+        .sensor_value_high = (uint32_t)(sensor_data->value >> 32)
+    };
+    payload = &return_values;
+    payload_size = sizeof(return_values);
+    goto exit;
+#endif
+
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+exit_unexpected:
+    fwk_unexpected();
+#endif
+
+exit_error:
+    payload_size = sizeof(return_values.status);
+    payload = &return_values;
+    status = FWK_E_PANIC;
+exit:
+    scmi_sensor_ctx.scmi_api->respond(service_id, payload, payload_size);
     /*
      * Set the service identifier to 'none' to indicate the sensor is
      * available again.
      */
     scmi_sensor_ctx.sensor_ops_table[sensor_idx].service_id = FWK_ID_NONE;
+    return status;
 }
 
 /*
@@ -491,6 +589,151 @@ exit:
         service_id,
         &return_values,
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
+                                                 sizeof(return_values.status));
+
+    return status;
+}
+#endif
+
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+static int scmi_sensor_axis_desc_get_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload)
+{
+    int status;
+    size_t payload_size;
+    size_t max_payload_size;
+    const struct scmi_sensor_axis_description_get_a2p *parameters =
+        (const struct scmi_sensor_axis_description_get_a2p *)payload;
+    struct scmi_sensor_axis_desc desc = { 0 };
+    unsigned int num_descs, desc_index, desc_index_max;
+    struct mod_sensor_axis_info axis_info;
+    struct mod_sensor_complete_info sensor_info;
+    struct scmi_sensor_axis_description_get_p2a return_values = {
+        .status = (int32_t)SCMI_GENERIC_ERROR,
+    };
+    fwk_id_t sensor_id;
+
+    payload_size = sizeof(return_values);
+
+    status = scmi_sensor_ctx.scmi_api->get_max_payload_size(
+        service_id, &max_payload_size);
+    if (status != FWK_SUCCESS) {
+        return_values.status = (int32_t)SCMI_GENERIC_ERROR;
+        goto exit;
+    }
+
+    if (SCMI_SENSOR_AXIS_DESCS_MAX(max_payload_size) == 0) {
+        /* Can't even fit one sensor axis description in the payload */
+        status = FWK_E_SIZE;
+        goto exit_unexpected;
+    }
+
+    parameters = (const struct scmi_sensor_axis_description_get_a2p *)payload;
+
+    sensor_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, parameters->sensor_idx);
+    if (!fwk_module_is_valid_element_id(sensor_id)) {
+        /* domain_idx did not map to a sensor device */
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
+        goto exit;
+    }
+
+    status = scmi_sensor_ctx.sensor_api->get_info(sensor_id, &sensor_info);
+    if (status != FWK_SUCCESS) {
+        /* Unable to get sensor info */
+        return_values.status = (int32_t)SCMI_GENERIC_ERROR;
+        goto exit;
+    }
+
+    desc_index = parameters->axis_desc_index;
+
+    if (!sensor_info.multi_axis.support) {
+        return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
+        goto exit;
+    }
+
+    if (desc_index >= sensor_info.multi_axis.axis_count) {
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
+        goto exit;
+    }
+
+    num_descs = (unsigned int)FWK_MIN(
+        SCMI_SENSOR_AXIS_DESCS_MAX(max_payload_size),
+        (sensor_info.multi_axis.axis_count - desc_index));
+    desc_index_max = (desc_index + num_descs - 1);
+
+    for (; desc_index <= desc_index_max;
+         ++desc_index, payload_size += sizeof(desc)) {
+        status = scmi_sensor_ctx.sensor_api->get_axis_info(
+            sensor_id, desc_index, &axis_info);
+        if (status != FWK_SUCCESS) {
+            /* Unable to get sensor info */
+            return_values.status = (int32_t)SCMI_GENERIC_ERROR;
+            goto exit;
+        }
+
+        desc = (struct scmi_sensor_axis_desc){
+            .axis_idx = desc_index,
+            .axis_attributes_low = 0, /* None supported */
+        };
+
+        if (axis_info.type >= MOD_SENSOR_TYPE_COUNT) {
+            /* Invalid sensor type */
+            return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
+            goto exit;
+        }
+
+        if ((axis_info.unit_multiplier <
+             SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_UNIT_MULTIPLIER_MIN) ||
+            (axis_info.unit_multiplier >
+             SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_UNIT_MULTIPLIER_MAX)) {
+            /* Sensor unit multiplier out of range */
+            return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
+            goto exit;
+        }
+
+        desc.axis_attributes_high = SCMI_SENSOR_AXIS_DESC_ATTRIBUTES_HIGH(
+            axis_info.type, axis_info.unit_multiplier);
+
+        /*
+         * Copy sensor name into description struct. Copy n-1 chars to ensure a
+         * NULL terminator at the end. (struct has been zeroed out)
+         */
+        fwk_str_strncpy(
+            desc.axis_name, axis_info.name, SCMI_SENSOR_AXIS_NAME_LEN - 1);
+
+        status = scmi_sensor_ctx.scmi_api->write_payload(
+            service_id,
+            payload_size,
+            &desc,
+            sizeof(struct scmi_sensor_axis_desc));
+        if (status != FWK_SUCCESS) {
+            /* Failed to write sensor description into message payload */
+            return_values.status = (int32_t)SCMI_GENERIC_ERROR;
+            goto exit;
+        }
+    }
+
+    return_values = (struct scmi_sensor_axis_description_get_p2a){
+        .status = SCMI_SUCCESS,
+        .num_axis_flags = SCMI_SENSOR_NUM_SENSOR_FLAGS(
+            num_descs, (sensor_info.multi_axis.axis_count - desc_index_max - 1))
+    };
+
+    status = scmi_sensor_ctx.scmi_api->write_payload(
+        service_id, 0, &return_values, sizeof(return_values));
+    if (status != FWK_SUCCESS) {
+        return_values.status = (int32_t)SCMI_GENERIC_ERROR;
+    }
+    goto exit;
+
+exit_unexpected:
+    fwk_unexpected();
+exit:
+    scmi_sensor_ctx.scmi_api->respond(
+        service_id,
+        (return_values.status == SCMI_SUCCESS) ? NULL : &return_values.status,
+        (return_values.status == SCMI_SUCCESS) ? payload_size :
                                                  sizeof(return_values.status));
 
     return status;
@@ -892,7 +1135,6 @@ static int scmi_sensor_process_event(const struct fwk_event *event,
     int status;
     struct scmi_sensor_event_parameters *scmi_params;
     struct mod_sensor_data *sensor_data;
-    struct scmi_sensor_protocol_reading_get_p2a return_values;
 
     /* Request event to sensor HAL */
     if (fwk_id_is_equal(event->id, mod_scmi_sensor_event_id_get_request)) {
@@ -900,32 +1142,14 @@ static int scmi_sensor_process_event(const struct fwk_event *event,
         sensor_data = get_sensor_data(scmi_params->sensor_id);
         status = scmi_sensor_ctx.sensor_api->get_data(
             scmi_params->sensor_id, sensor_data);
-        if (status == FWK_SUCCESS) {
-            /* Sensor value is ready */
-            return_values = (struct scmi_sensor_protocol_reading_get_p2a){
-                .status = SCMI_SUCCESS,
-                .sensor_value_low = (uint32_t)sensor_data->value,
-                .sensor_value_high = (uint32_t)(sensor_data->value >> 32),
-#ifdef BUILD_HAS_SCMI_SENSOR_V2
-                .timestamp_low = (uint32_t)sensor_data->timestamp,
-                .timestamp_high = (uint32_t)(sensor_data->timestamp >> 32),
-#endif
-            };
+        if (status != FWK_PENDING) {
+            /* Sensor value is ready (successfully or not) */
+            return scmi_sensor_reading_respond(
+                scmi_params->sensor_id, sensor_data);
 
-            scmi_sensor_respond(&return_values, scmi_params->sensor_id);
-
-            return status;
-        } else if (status == FWK_PENDING) {
+        } else {
             /* Sensor value will be provided through a response event */
             return FWK_SUCCESS;
-        } else {
-            return_values = (struct scmi_sensor_protocol_reading_get_p2a) {
-                .status = SCMI_HARDWARE_ERROR,
-            };
-
-            scmi_sensor_respond(&return_values, scmi_params->sensor_id);
-
-            return FWK_E_PANIC;
         }
     }
 
@@ -933,22 +1157,7 @@ static int scmi_sensor_process_event(const struct fwk_event *event,
     if (fwk_id_is_equal(event->id, mod_sensor_event_id_read_request)) {
         sensor_data = get_sensor_data(event->source_id);
 
-        return_values = (struct scmi_sensor_protocol_reading_get_p2a){
-            .sensor_value_low = (uint32_t)sensor_data->value,
-            .sensor_value_high = (uint32_t)(sensor_data->value >> 32),
-#ifdef BUILD_HAS_SCMI_SENSOR_V2
-            .timestamp_low = (uint32_t)sensor_data->timestamp,
-            .timestamp_high = (uint32_t)(sensor_data->timestamp >> 32),
-#endif
-        };
-
-        if (sensor_data->status == FWK_SUCCESS) {
-            return_values.status = (int32_t)SCMI_SUCCESS;
-        } else {
-            return_values.status = (int32_t)SCMI_HARDWARE_ERROR;
-        }
-
-        scmi_sensor_respond(&return_values, event->source_id);
+        return scmi_sensor_reading_respond(event->source_id, sensor_data);
     }
 
     return FWK_SUCCESS;
