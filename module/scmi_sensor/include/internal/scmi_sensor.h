@@ -71,13 +71,20 @@ struct scmi_sensor_protocol_reading_get_a2p {
     uint32_t flags;
 };
 
-struct scmi_sensor_protocol_reading_get_p2a {
-    int32_t status;
+struct scmi_sensor_protocol_reading_get_data {
     uint32_t sensor_value_low;
     uint32_t sensor_value_high;
-#ifdef BUILD_HAS_SCMI_SENSOR_V2
     uint32_t timestamp_low;
     uint32_t timestamp_high;
+};
+
+struct scmi_sensor_protocol_reading_get_p2a {
+    int32_t status;
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+    struct scmi_sensor_protocol_reading_get_data data[];
+#else
+    uint32_t sensor_value_low;
+    uint32_t sensor_value_high;
 #endif
 };
 
@@ -100,6 +107,28 @@ struct scmi_sensor_trip_point_event_p2a {
             sizeof(struct scmi_sensor_protocol_description_get_p2a)) \
                 / sizeof(struct scmi_sensor_desc)) \
         : 0)
+
+/*
+ * SENSOR_AXIS_DESCRIPTION_GET
+ */
+
+#define SCMI_SENSOR_AXIS_DESCS_MAX(MAILBOX_SIZE) \
+    ((sizeof(struct scmi_sensor_axis_description_get_p2a) < MAILBOX_SIZE) ? \
+         ((MAILBOX_SIZE - \
+           sizeof(struct scmi_sensor_axis_description_get_p2a)) / \
+          sizeof(struct scmi_sensor_axis_desc)) : \
+         0)
+
+/*
+ * SENSOR_READ_GET_AXIS_VALUE
+ */
+
+#define SCMI_SENSOR_READ_GET_VALUES_MAX(MAILBOX_SIZE) \
+    ((sizeof(struct scmi_sensor_protocol_reading_get_p2a) < MAILBOX_SIZE) ? \
+         ((MAILBOX_SIZE - \
+           sizeof(struct scmi_sensor_protocol_reading_get_p2a)) / \
+          sizeof(struct scmi_sensor_protocol_reading_get_data)) : \
+         0)
 
 #define SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_ASYNC_READING_POS 31
 #define SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_NUM_TRIP_POINTS_POS 0
@@ -181,6 +210,7 @@ struct scmi_sensor_trip_point_event_p2a {
     (UINT32_C(0x1) << SCMI_SENSOR_CONFIG_FLAGS_EVENT_CONTROL_POS)
 
 #define SCMI_SENSOR_NAME_LEN    16
+#define SCMI_SENSOR_AXIS_NAME_LEN 16
 
 #define SCMI_SENSOR_TRIP_POINT_FLAGS_RESERVED1_POS 12
 #define SCMI_SENSOR_TRIP_POINT_FLAGS_ID_POS 4
@@ -210,6 +240,14 @@ struct scmi_sensor_trip_point_event_p2a {
      (((ID) << SCMI_SENSOR_TRIP_POINT_EVENT_DESC_ID_POS) & \
       SCMI_SENSOR_TRIP_POINT_EVENT_DESC_ID_MASK))
 
+#define SCMI_SENSOR_AXIS_DESC_ATTRIBUTES_HIGH(SENSOR_TYPE, UNIT_MULTIPLIER) \
+    (((((unsigned int)SENSOR_TYPE) \
+       << SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_TYPE_POS) & \
+      SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_TYPE_MASK) | \
+     ((((unsigned int)UNIT_MULTIPLIER) \
+       << SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_UNIT_MULTIPLIER_POS) & \
+      SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_UNIT_MULTIPLIER_MASK))
+
 struct scmi_sensor_desc {
     uint32_t sensor_id;
     uint32_t sensor_attributes_low;
@@ -225,6 +263,24 @@ struct scmi_sensor_protocol_description_get_p2a {
     int32_t status;
     uint32_t num_sensor_flags;
     struct scmi_sensor_desc sensor_desc[];
+};
+
+struct scmi_sensor_axis_desc {
+    uint32_t axis_idx;
+    uint32_t axis_attributes_low;
+    uint32_t axis_attributes_high;
+    char axis_name[SCMI_SENSOR_AXIS_NAME_LEN];
+};
+
+struct scmi_sensor_axis_description_get_a2p {
+    uint32_t sensor_idx;
+    uint32_t axis_desc_index;
+};
+
+struct scmi_sensor_axis_description_get_p2a {
+    int32_t status;
+    uint32_t num_axis_flags;
+    struct scmi_sensor_axis_desc axis_desc[];
 };
 
 /* Event indices */
