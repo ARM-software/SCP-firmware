@@ -18,6 +18,8 @@ static struct mod_hsspi_api module_api = {
     .hsspi_exit = HSSPI_exit,
 };
 
+const struct mod_timer_api *hsspi_timer_api;
+
 /*
  * Framework handlers
  */
@@ -28,6 +30,22 @@ static int hsspi_controller_init(
     const void *data)
 {
     return FWK_SUCCESS;
+}
+
+static int hsspi_controller_bind(fwk_id_t id, unsigned int round)
+{
+    int status;
+
+    if (round > 0) {
+        return FWK_SUCCESS;
+    }
+
+    status = fwk_module_bind(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+        FWK_ID_API(FWK_MODULE_IDX_TIMER, MOD_TIMER_API_IDX_TIMER),
+        &hsspi_timer_api);
+
+    return status;
 }
 
 static int hsspi_element_init(
@@ -58,6 +76,7 @@ const struct fwk_module module_hsspi = {
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = 1,
     .init = hsspi_controller_init,
+    .bind = hsspi_controller_bind,
     .element_init = hsspi_element_init,
     .start = hsspi_start,
     .process_bind_request = hsspi_process_bind_request,

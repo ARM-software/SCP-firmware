@@ -16,6 +16,7 @@
 #include <fwk_status.h>
 
 const struct mod_f_i2c_api *f_i2c_api;
+const struct mod_timer_api *synquacer_memc_timer_api;
 static int synquacer_memc_config(void);
 
 /* Framework API */
@@ -53,6 +54,14 @@ static int mod_synquacer_memc_bind(fwk_id_t id, unsigned int round)
         &f_i2c_api);
     if (status != FWK_SUCCESS)
         return status;
+
+    status = fwk_module_bind(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+        FWK_ID_API(FWK_MODULE_IDX_TIMER, MOD_TIMER_API_IDX_TIMER),
+        &synquacer_memc_timer_api);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
 
     return FWK_SUCCESS;
 }

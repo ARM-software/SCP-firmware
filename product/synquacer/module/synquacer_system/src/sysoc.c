@@ -96,14 +96,19 @@ int sysoc_wait_status_change(
 
     /* wait ppu power status change */
     for (i = 0, ret = FWK_E_TIMEOUT; i < SYSOC_WAIT_NUM; i++) {
+        int status;
+
         if ((readl(sysoc_addr + REG_ADDR_RSTSTA) & set_bit) == wait_bit) {
             ret = FWK_SUCCESS;
             break;
         }
         /* sleep for wait status change */
-        if (osDelay(SYSOC_WAIT_TIME_MS) != osOK) {
+        status = synquacer_system_ctx.timer_api->delay(
+                     FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                     MSEC_TO_USEC(SYSOC_WAIT_TIME_MS));
+        if (status != FWK_SUCCESS) {
             /* sleep error */
-            return FWK_E_OS;
+            return status;
         }
     }
     return ret;
@@ -201,7 +206,9 @@ void lpcm_sysoc_reset(RST_TYPE_t type, RST_BLOCK block)
             if (r == 0)
                 break;
 
-            osDelay(RESET_CHECK_CYCLE_MS);
+            synquacer_system_ctx.timer_api->delay(
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                MSEC_TO_USEC(RESET_CHECK_CYCLE_MS));
         }
         if (i == status_check_num) {
             FWK_LOG_ERR(
@@ -218,7 +225,9 @@ void lpcm_sysoc_reset(RST_TYPE_t type, RST_BLOCK block)
             if (r == sysoc_bitmap_bus)
                 break;
 
-            osDelay(RESET_CHECK_CYCLE_MS);
+            synquacer_system_ctx.timer_api->delay(
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                MSEC_TO_USEC(RESET_CHECK_CYCLE_MS));
         }
         if (i == status_check_num) {
             FWK_LOG_ERR(
@@ -235,7 +244,9 @@ void lpcm_sysoc_reset(RST_TYPE_t type, RST_BLOCK block)
             if (r == sysoc_bitmap_blk)
                 break;
 
-            osDelay(RESET_CHECK_CYCLE_MS);
+            synquacer_system_ctx.timer_api->delay(
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                MSEC_TO_USEC(RESET_CHECK_CYCLE_MS));
         }
         if (i == status_check_num) {
             FWK_LOG_ERR(
@@ -282,7 +293,9 @@ void lpcm_sysoc_reset_clear(RST_TYPE_t type, RST_BLOCK block)
             if (r == 0)
                 break;
 
-            osDelay(RESET_CHECK_CYCLE_MS);
+            synquacer_system_ctx.timer_api->delay(
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                MSEC_TO_USEC(RESET_CHECK_CYCLE_MS));
         }
         if (i == status_check_num) {
             FWK_LOG_ERR(
@@ -299,7 +312,9 @@ void lpcm_sysoc_reset_clear(RST_TYPE_t type, RST_BLOCK block)
             if (r == 0)
                 break;
 
-            osDelay(RESET_CHECK_CYCLE_MS);
+            synquacer_system_ctx.timer_api->delay(
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                MSEC_TO_USEC(RESET_CHECK_CYCLE_MS));
         }
         if (i == status_check_num) {
             FWK_LOG_ERR(
@@ -315,7 +330,9 @@ void lpcm_sysoc_reset_clear(RST_TYPE_t type, RST_BLOCK block)
             if (r == lpcm_bitmap)
                 break;
 
-            osDelay(RESET_CHECK_CYCLE_MS);
+            synquacer_system_ctx.timer_api->delay(
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                MSEC_TO_USEC(RESET_CHECK_CYCLE_MS));
         }
         if (i == status_check_num) {
             FWK_LOG_ERR(

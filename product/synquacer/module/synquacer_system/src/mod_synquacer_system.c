@@ -96,7 +96,17 @@ static int synquacer_system_bind(fwk_id_t id, unsigned int round)
             &synquacer_system_ctx.mod_pd_restricted_api);
         if (status != FWK_SUCCESS)
             return status;
+
+        status = fwk_module_bind(
+            FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+            FWK_ID_API(FWK_MODULE_IDX_TIMER, MOD_TIMER_API_IDX_TIMER),
+            &synquacer_system_ctx.timer_api);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
     }
+
+    FWK_LOG_INFO("[SYNQUACER SYSTEM] bind success\n");
 
     return FWK_SUCCESS;
 }

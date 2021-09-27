@@ -16,8 +16,6 @@
 #include <internal/reg_DDRPHY_CONFIG.h>
 #include <internal/reg_DMC520.h>
 
-#include <mod_synquacer_system.h>
-
 #include <fwk_log.h>
 
 #include <fmw_cmsis.h>
@@ -29,7 +27,6 @@
 #define pr_err(...) FWK_LOG_ERR("[DDR] " __VA_ARGS__)
 
 #define dmb __DMB
-#define usleep(usec) osDelay((usec / 1000) + 2)
 
 #define REG_DDRPHY_CONFIG_0_BA UINT32_C(0x7F210000)
 #define REG_DDRPHY_CONFIG_1_BA UINT32_C(0x7F610000)

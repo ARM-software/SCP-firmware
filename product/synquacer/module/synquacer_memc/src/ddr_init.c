@@ -13,6 +13,7 @@
 
 #include <internal/reg_DDRPHY_CONFIG.h>
 #include <internal/reg_DMC520.h>
+#include <mod_synquacer_memc.h>
 
 #include <stdint.h>
 
@@ -50,7 +51,9 @@ void Wait_for_ddr(uint32_t count)
 void usleep_en(uint32_t usec)
 {
     dmb();
-    usleep(usec);
+    synquacer_memc_timer_api->delay(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+        (usec + 2000));
     return;
 }
 

@@ -9,6 +9,7 @@
 #define MOD_SYNQUACER_SYSTEM_H
 
 #include <mod_power_domain.h>
+#include <mod_timer.h>
 
 /*!
  * \addtogroup GroupSYNQUACERModule SYNQUACER Product Modules
@@ -70,6 +71,9 @@ struct synquacer_system_ctx {
 
     /*! pointer to the hsspi module. */
     const struct mod_hsspi_api *hsspi_api;
+
+    /*! pointer to the hsspi module. */
+    const struct mod_timer_api *timer_api;
 };
 
 /*!

@@ -6,6 +6,7 @@
  */
 
 #include "low_level_access.h"
+#include "synquacer_common.h"
 
 #include <cmsis_os2.h>
 
@@ -181,7 +182,9 @@ static void sni_power_domain_workaround_mp(void)
                 PPU_PP_OFF)
                 break;
 
-            osDelay(PD_CHECK_CYCLE_MS);
+            synquacer_system_ctx.timer_api->delay(
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                MSEC_TO_USEC(PD_CHECK_CYCLE_MS));
         }
         if (j >= PD_TIMEOUT_COUNT) {
             FWK_LOG_ERR(
@@ -331,7 +334,9 @@ static void sni_power_domain_on_mp(uint32_t dev_bitmap)
                 PPU_PP_ON) {
                 break;
             }
-            osDelay(PD_CHECK_CYCLE_MS);
+            synquacer_system_ctx.timer_api->delay(
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                MSEC_TO_USEC(PD_CHECK_CYCLE_MS));
         }
         if (j >= PD_TIMEOUT_COUNT) {
             FWK_LOG_ERR(
@@ -350,7 +355,9 @@ uint32_t pmu_wait(uint32_t pmu_bitmap, bool on)
         if ((status & pmu_bitmap) == 0)
             break;
 
-        osDelay(PD_CHECK_CYCLE_MS);
+        synquacer_system_ctx.timer_api->delay(
+            FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+            MSEC_TO_USEC(PD_CHECK_CYCLE_MS));
     }
 
     return (status & pmu_bitmap);

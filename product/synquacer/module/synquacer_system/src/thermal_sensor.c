@@ -6,6 +6,7 @@
  */
 
 #include "low_level_access.h"
+#include "synquacer_common.h"
 
 #include <cmsis_os2.h>
 #include <sysdef_option.h>
@@ -55,7 +56,9 @@ int thermal_enable(void)
             if (readl(sensor_offset + THERMAL_TSDATA_VALID_X_OFFSET) == 1)
                 break;
 
-            osDelay(1);
+            synquacer_system_ctx.timer_api->delay(
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                MSEC_TO_USEC(1));
         }
     }
 
