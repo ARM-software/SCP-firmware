@@ -9,6 +9,7 @@
 #include "mmu500.h"
 #include "synquacer_config.h"
 #include "synquacer_ddr.h"
+#include "synquacer_common.h"
 #include "synquacer_mmap.h"
 
 #include <cmsis_os2.h>
@@ -20,6 +21,7 @@
 #include <internal/reg_DMA330.h>
 
 #include <mod_f_i2c.h>
+#include <mod_synquacer_memc.h>
 #include <mod_synquacer_system.h>
 
 #include <fwk_assert.h>
@@ -117,7 +119,9 @@ void fw_ddr_init(void)
         /* Tentative workaround. Need to implement retrying. */
         do {
             FWK_LOG_ERR("DDR Initialize Failed.(0x%x)", result);
-            osDelay(10000);
+            synquacer_memc_timer_api->delay(
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                MSEC_TO_USEC(10000));
         } while (1);
     }
 
@@ -667,7 +671,9 @@ static void dma330_zero_clear(
 
     while (REG_DMA330_S->DBGSTATUS != 0) {
         FWK_LOG_INFO("[SYSTEM] Wait DMA330 busy.");
-        osDelay(10);
+        synquacer_memc_timer_api->delay(
+            FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+            MSEC_TO_USEC(10));
     }
 
     REG_DMA330_S->DBGINST[0] = 0xa2U << 16;
@@ -675,8 +681,11 @@ static void dma330_zero_clear(
     REG_DMA330_S->DBGCMD = 0;
 
     /* Wait for DMA done */
-    while (REG_DMA330_S->INTMIS == 0)
-        osDelay(1U);
+    while (REG_DMA330_S->INTMIS == 0) {
+        synquacer_memc_timer_api->delay(
+            FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+            MSEC_TO_USEC(1));
+    }
 
     REG_DMA330_S->INTCLR = 0xffffffffU;
 }

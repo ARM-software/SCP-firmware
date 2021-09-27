@@ -12,7 +12,12 @@
 
 #include <fwk_id.h>
 
+#include <mod_timer.h>
+
 #include <stdint.h>
+
+extern const struct mod_timer_api *hsspi_timer_api;
+
 /*!
  * \addtogroup GroupSYNQUACERModule SYNQUACER Product Modules
  * \{

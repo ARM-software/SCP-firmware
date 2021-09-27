@@ -10,8 +10,6 @@
 #include <internal/i2c_depend.h>
 #include <internal/i2c_driver.h>
 
-#include <mod_synquacer_system.h>
-
 #include <fwk_log.h>
 #include <fwk_macros.h>
 

@@ -5,12 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "synquacer_common.h"
 #include "synquacer_mmap.h"
 
 #include <cmsis_os2.h>
 
 #include <internal/hsspi_driver.h>
 #include <internal/reg_HSSPI.h>
+#include <mod_hsspi.h>
 
 #include <mod_synquacer_system.h>
 
@@ -494,13 +496,15 @@ static void hsspi_software_reset(
         hsspi_write_command_direct(reg_hsspi, mem_hsspi, 0x66);
 
         /* Wait for SPI device ready */
-        osDelay(1);
+        hsspi_timer_api->delay(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                               MSEC_TO_USEC(1));
 
         /* Reset */
         hsspi_write_command_direct(reg_hsspi, mem_hsspi, 0x99);
 
         /* Wait for SPI device ready */
-        osDelay(1);
+        hsspi_timer_api->delay(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                               MSEC_TO_USEC(1));
 
         /* 05h : RDSR Read Status Register    */
         unRDSR.WORD = MEM_HSSPI_BYTE(mem_hsspi)[0];

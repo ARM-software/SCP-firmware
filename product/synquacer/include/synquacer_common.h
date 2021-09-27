@@ -17,6 +17,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define MSEC_TO_USEC(msec) (msec * 1000)
+
 #define DI(intsts)                  \
     do {                            \
         intsts = __get_FAULTMASK(); \

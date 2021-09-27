@@ -11,7 +11,11 @@
 #include <fwk_id.h>
 #include <fwk_macros.h>
 
+#include <mod_timer.h>
+
 #include <stdint.h>
+
+extern const struct mod_timer_api *synquacer_memc_timer_api;
 
 /*!
  * \addtogroup GroupSYNQUACERModule SYNQUACER Product Modules
