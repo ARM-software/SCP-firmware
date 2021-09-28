@@ -352,7 +352,7 @@ int platform_system_process_notification(
                 event->id, event->source_id, event->target_id);
         } else {
             FWK_LOG_INFO(
-                "[PLATFORM SYSTEM] Detected as Slave chip: %d, "
+                "[PLATFORM SYSTEM] Detected as secondary chip: %d, "
                 "wait for SCMI\n",
                 chip_id);
         }
