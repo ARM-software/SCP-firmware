@@ -38,24 +38,6 @@
 #define DDR_TRAINING_ON
 #define DDR_WAIT_TIMEOUT_US UINT32_C(1000000)
 
-/**
- * Wait until BUSY_COND becomes false or timeouts.
- * Return from the caller function with ERR_CODE if timeout occurs.
- * Continue execution otherwise.
- *
- * The expression BUSY_COND is evaluated in each repetition.
- */
-#define ddr_wait(BUSY_COND, TIMEOUT_US, ERR_CODE)      \
-    do {                                               \
-        uint32_t tick = osKernelSysTick();             \
-        while (BUSY_COND) {                            \
-            if (osKernelSysTick() - tick >=            \
-                osKernelSysTickMicroSec(TIMEOUT_US)) { \
-                return ERR_CODE;                       \
-            }                                          \
-        }                                              \
-    } while (false)
-
 extern int ddr_dual_ch_init_mp(void);
 extern int ddr_ch0_init_mp(void);
 extern int ddr_ch1_init_mp(void);

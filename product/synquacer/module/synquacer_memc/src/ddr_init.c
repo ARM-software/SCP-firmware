@@ -57,11 +57,47 @@ void usleep_en(uint32_t usec)
     return;
 }
 
+enum ddr_wait_cond_type {
+    DDR_DMC520_MEMC_STATUS,
+    DDR_DDRPHY_CONFIG_PGSR0,
+    DDR_DDRPHY_CONFIG_PGSR0_1,
+};
+
+struct ddr_wait_cond {
+    enum ddr_wait_cond_type type;
+    volatile void *reg;
+    uint32_t mask;
+    uint32_t comp_val;
+};
+
+static bool ddr_check_wait_cond(void *data)
+{
+    struct ddr_wait_cond *cond = (struct ddr_wait_cond *)data;
+
+    /* continue to wait until this function returns true */
+    switch (cond->type) {
+    case DDR_DMC520_MEMC_STATUS:
+        return ((((REG_ST_DMC520 *)cond->reg)->memc_status & cond->mask) ==
+                cond->comp_val);
+    case DDR_DDRPHY_CONFIG_PGSR0:
+        return ((((REG_ST_DDRPHY_CONFIG_t *)cond->reg)->PGSR0 & cond->mask) ==
+                cond->comp_val);
+    case DDR_DDRPHY_CONFIG_PGSR0_1:
+        return ((((REG_ST_DDRPHY_CONFIG_t *)cond->reg)->PGSR0 & cond->mask) ==
+                cond->comp_val ||
+                (((REG_ST_DDRPHY_CONFIG_t *)cond->reg)->PGSR0 & 0x4FF80000) != 0);
+    default:
+        fwk_unexpected();
+        return false;
+    }
+}
+
 int ddr_dual_ch_init_mp(void)
 {
     int ret_val;
     REG_ST_DMC520 *REG_DMC520_0;
     REG_ST_DMC520 *REG_DMC520_1;
+    struct ddr_wait_cond wait_cond;
 
     ret_val = ddr_ch0_init_mp();
     if (ret_val != 0)
@@ -76,8 +112,13 @@ int ddr_dual_ch_init_mp(void)
     REG_DMC520_1 = (REG_ST_DMC520 *)(uint32_t)REG_DMC520_1_BA;
     REG_DMC520_0->memc_cmd = 0x00000000;
 
-    ddr_wait(
-        (REG_DMC520_0->memc_status & 0x7) != 0x0, DDR_WAIT_TIMEOUT_US, 0x1001);
+    wait_cond.type = DDR_DMC520_MEMC_STATUS;
+    wait_cond.reg = REG_DMC520_0;
+    wait_cond.mask = 0x7;
+    wait_cond.comp_val = 0x0;
+    synquacer_memc_timer_api->wait(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0), DDR_WAIT_TIMEOUT_US,
+        ddr_check_wait_cond, &wait_cond);
 
     REG_DMC520_0->address_map_next = 0xFF000005;
     REG_DMC520_0->memc_status;
@@ -88,13 +129,23 @@ int ddr_dual_ch_init_mp(void)
     REG_DMC520_0->memc_status;
     REG_DMC520_0->memc_cmd = 0x00000004;
 
-    ddr_wait(
-        (REG_DMC520_0->memc_status & 0x7) != 0x3, DDR_WAIT_TIMEOUT_US, 0x1002);
+    wait_cond.type = DDR_DMC520_MEMC_STATUS;
+    wait_cond.reg = REG_DMC520_0;
+    wait_cond.mask = 0x7;
+    wait_cond.comp_val = 0x3;
+    synquacer_memc_timer_api->wait(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0), DDR_WAIT_TIMEOUT_US,
+        ddr_check_wait_cond, &wait_cond);
 
     REG_DMC520_1->memc_cmd = 0x00000000;
 
-    ddr_wait(
-        (REG_DMC520_1->memc_status & 0x7) != 0x0, DDR_WAIT_TIMEOUT_US, 0x1003);
+    wait_cond.type = DDR_DMC520_MEMC_STATUS;
+    wait_cond.reg = REG_DMC520_1;
+    wait_cond.mask = 0x7;
+    wait_cond.comp_val = 0x0;
+    synquacer_memc_timer_api->wait(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0), DDR_WAIT_TIMEOUT_US,
+        ddr_check_wait_cond, &wait_cond);
 
     REG_DMC520_1->address_map_next = 0xFF000005;
     REG_DMC520_1->memc_status;
@@ -105,8 +156,15 @@ int ddr_dual_ch_init_mp(void)
     REG_DMC520_1->memc_status;
     REG_DMC520_1->memc_cmd = 0x00000004;
 
-    ddr_wait(
-        (REG_DMC520_1->memc_status & 0x7) != 0x3, DDR_WAIT_TIMEOUT_US, 0x1004);
+    wait_cond.type = DDR_DMC520_MEMC_STATUS;
+    wait_cond.reg = REG_DMC520_1;
+    wait_cond.mask = 0x7;
+    wait_cond.comp_val = 0x3;
+    synquacer_memc_timer_api->wait(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0), DDR_WAIT_TIMEOUT_US,
+        ddr_check_wait_cond, &wait_cond);
+
+
 
     return 0;
 }
@@ -917,6 +975,8 @@ int ddr_init_phy1_mp(
     REG_ST_DDRPHY_CONFIG_t *REG_DDRPHY_CONFIG,
     int retention_en)
 {
+    struct ddr_wait_cond wait_cond;
+
     if (retention_en == 0)
         REG_DDRPHY_CONFIG->PIR =
             (REG_DDRPHY_CONFIG->PIR & 0xFFFFFF8C) | 0x00000073;
@@ -930,10 +990,13 @@ int ddr_init_phy1_mp(
     usleep_en(1);
 
     // [0]IDONE, [1]PLDONE, [2]DCDONE, [3]ZCDONE, [31]APLOCK
-    ddr_wait(
-        (REG_DDRPHY_CONFIG->PGSR0 & 0x8000000F) != 0x8000000F,
-        DDR_WAIT_TIMEOUT_US,
-        0x1001);
+    wait_cond.type = DDR_DDRPHY_CONFIG_PGSR0;
+    wait_cond.reg = REG_DDRPHY_CONFIG;
+    wait_cond.mask = 0x8000000F;
+    wait_cond.comp_val = 0x8000000F;
+    synquacer_memc_timer_api->wait(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0), DDR_WAIT_TIMEOUT_US,
+        ddr_check_wait_cond, &wait_cond);
 
     REG_DDRPHY_CONFIG->PGSR0;
     REG_DDRPHY_CONFIG->PGSR1;
@@ -949,6 +1012,7 @@ int ddr_init_sdram_mp(
     uint32_t mr6_vref_training_on;
     uint32_t mr6_vref_training_off;
     uint32_t Addr_Invert;
+    struct ddr_wait_cond wait_cond;
 
     if (retention_en == 0) {
         REG_DDRPHY_CONFIG->PIR = (REG_DDRPHY_CONFIG->PIR & 0xFFF7FE7E) |
@@ -960,10 +1024,13 @@ int ddr_init_sdram_mp(
         dmb();
         Wait_for_ddr(1);
         // [0]IDONE, [4]DIDONE
-        ddr_wait(
-            (REG_DDRPHY_CONFIG->PGSR0 & 0x00000011) != 0x00000011,
-            DDR_WAIT_TIMEOUT_US,
-            0x2001);
+        wait_cond.type = DDR_DDRPHY_CONFIG_PGSR0;
+        wait_cond.reg = REG_DDRPHY_CONFIG;
+        wait_cond.mask = 0x00000011;
+        wait_cond.comp_val = 0x00000011;
+        synquacer_memc_timer_api->wait(
+            FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0), DDR_WAIT_TIMEOUT_US,
+            ddr_check_wait_cond, &wait_cond);
 
         Addr_Invert =
             (((REG_DDRPHY_CONFIG->RDIMMCR0 & 0x1) == 0) &&
@@ -1100,6 +1167,7 @@ int ddr_init_train_mp(
 {
     int status = 0;
     uint32_t phy_status_0;
+    struct ddr_wait_cond wait_cond;
 
     REG_DDRPHY_CONFIG->PGSR0;
     REG_DDRPHY_CONFIG->PGSR1;
@@ -1155,11 +1223,13 @@ int ddr_init_train_mp(
     dmb();
 
     // [0]IDONE, [5]WLDONE, [6]QSGDONE, [7]WLADONE
-    ddr_wait(
-        ((REG_DDRPHY_CONFIG->PGSR0 & 0x000000E1) != 0x000000E1) &&
-            ((REG_DDRPHY_CONFIG->PGSR0 & 0x4FF80000) == 0),
-        DDR_WAIT_TIMEOUT_US,
-        0x3001);
+    wait_cond.type = DDR_DDRPHY_CONFIG_PGSR0_1;
+    wait_cond.reg = REG_DDRPHY_CONFIG;
+    wait_cond.mask = 0x000000E1;
+    wait_cond.comp_val = 0x000000E1;
+    synquacer_memc_timer_api->wait(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0), DDR_WAIT_TIMEOUT_US,
+        ddr_check_wait_cond, &wait_cond);
 
     if ((REG_DDRPHY_CONFIG->PGSR0 & 0x4FF80000) != 0) {
         FWK_LOG_CRIT(
@@ -1200,11 +1270,13 @@ int ddr_init_train_mp(
     Wait_for_ddr(1);
     // [0]IDONE, [8]RDDONE, [9]WDDONE, [10]REDONE, [11]WEDONE, [13]SRDDONE
     // [note] timeout : Data Bit Deskew, Data Eye, Static Read
-    ddr_wait(
-        ((REG_DDRPHY_CONFIG->PGSR0 & 0x00002F01) != 0x00002F01) &&
-            ((REG_DDRPHY_CONFIG->PGSR0 & 0x4FF80000) == 0),
-        DDR_WAIT_TIMEOUT_US,
-        0x3003);
+    wait_cond.type = DDR_DDRPHY_CONFIG_PGSR0_1;
+    wait_cond.reg = REG_DDRPHY_CONFIG;
+    wait_cond.mask = 0x00002F01;
+    wait_cond.comp_val = 0x00002F01;
+    synquacer_memc_timer_api->wait(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0), DDR_WAIT_TIMEOUT_US,
+        ddr_check_wait_cond, &wait_cond);
 
     if ((REG_DDRPHY_CONFIG->PGSR0 & 0x4FF80000) != 0) {
         FWK_LOG_CRIT("[DDR] error : Data Bit Deskew, Data Eye, Static Read");
@@ -1228,11 +1300,13 @@ int ddr_init_train_mp(
         Wait_for_ddr(20);
 
         // [14]VDONE
-        ddr_wait(
-            ((REG_DDRPHY_CONFIG->PGSR0 & 0x00004001) != 0x00004001) &&
-                ((REG_DDRPHY_CONFIG->PGSR0 & 0x4FF80000) == 0),
-            DDR_WAIT_TIMEOUT_US,
-            0x3005);
+        wait_cond.type = DDR_DDRPHY_CONFIG_PGSR0_1;
+        wait_cond.reg = REG_DDRPHY_CONFIG;
+        wait_cond.mask = 0x00004001;
+        wait_cond.comp_val = 0x00004001;
+        synquacer_memc_timer_api->wait(
+            FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0), DDR_WAIT_TIMEOUT_US,
+            ddr_check_wait_cond, &wait_cond);
 
         if ((REG_DDRPHY_CONFIG->PGSR0 & 0x4FF80000) != 0) {
             FWK_LOG_CRIT("[DDR] error : VREF Training");
@@ -1308,6 +1382,8 @@ ERROR_END:
 
 int ddr_init_mc2_mp(REG_ST_DMC520 *REG_DMC520)
 {
+    struct ddr_wait_cond wait_cond;
+
     REG_DMC520->memc_status;
     REG_DMC520->memc_config;
 
@@ -1339,8 +1415,13 @@ int ddr_init_mc2_mp(REG_ST_DMC520 *REG_DMC520)
     REG_DMC520->memc_cmd = 0x00000004;
     dmb();
 
-    ddr_wait(
-        (REG_DMC520->memc_status & 0x7) != 0x3, DDR_WAIT_TIMEOUT_US, 0x4001);
+    wait_cond.type = DDR_DMC520_MEMC_STATUS;
+    wait_cond.reg = REG_DMC520;
+    wait_cond.mask = 0x7;
+    wait_cond.comp_val = 0x3;
+    synquacer_memc_timer_api->wait(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0), DDR_WAIT_TIMEOUT_US,
+        ddr_check_wait_cond, &wait_cond);
 
     REG_DMC520->memc_status;
     REG_DMC520->memc_config;
