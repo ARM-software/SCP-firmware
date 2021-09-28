@@ -102,15 +102,6 @@ static struct fwk_element sds_element_table[] = {
             .finalize = true,
         }),
     },
-    {
-        .name = "BL33 Image Info",
-        .data = &((struct mod_sds_structure_desc){
-            .id = MORELLO_SDS_BL33_INFO,
-            .size = MORELLO_SDS_BL33_INFO_SIZE,
-            .region_id = MORELLO_SDS_REGION_SECURE,
-            .finalize = true,
-        }),
-    },
 #ifdef BUILD_MODE_DEBUG
     {
         .name = "Boot Counters",
