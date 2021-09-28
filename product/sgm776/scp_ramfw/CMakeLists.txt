@@ -42,7 +42,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_psu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_mock_psu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_dvfs.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_power_domain"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_power_domain.c"
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../src/sgm776_core.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_sid.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_system_info.c")
