@@ -21,7 +21,6 @@
 
 #include <mod_clock.h>
 #include <mod_dmc_bing.h>
-#include <mod_fip.h>
 #include <mod_morello_system.h>
 #include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
@@ -60,18 +59,6 @@ struct FWK_PACKED morello_platform_info {
     uint8_t slave_count;
     /* If multichip mode */
     bool multichip_mode;
-};
-
-/*
- * BL33 image information structure used by BL31
- */
-struct morello_bl33_info {
-    /* Source address of BL33 image */
-    uint32_t bl33_src_addr;
-    /* Load address of BL33 image */
-    uint32_t bl33_dst_addr;
-    /* BL33 image size */
-    uint32_t bl33_size;
 };
 
 /* MultiChip information */
@@ -113,11 +100,6 @@ static struct morello_platform_info sds_platform_info;
 static fwk_id_t sds_platform_info_id =
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, SDS_ELEMENT_IDX_PLATFORM_INFO);
 
-/* SDS BL33 image information */
-static struct morello_bl33_info sds_bl33_info;
-static fwk_id_t sds_bl33_info_id =
-    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, SDS_ELEMENT_IDX_BL33_INFO);
-
 /* Module context */
 struct morello_system_ctx {
     /* Pointer to the Interrupt Service Routine API of the PPU_V1 module */
@@ -125,9 +107,6 @@ struct morello_system_ctx {
 
     /* Power domain module restricted API pointer */
     struct mod_pd_restricted_api *mod_pd_restricted_api;
-
-    /* Pointer to FIP APIs */
-    const struct mod_fip_api *fip_api;
 
     /* Pointer to DMC Bing memory information API */
     const struct mod_dmc_bing_mem_info_api *dmc_bing_api;
@@ -241,28 +220,6 @@ struct mod_morello_system_ap_memory_access_api
         .disable_ap_memory_access = morello_system_disable_ap_memory_access,
     };
 
-/*
- * Function to copy into AP SRAM.
- */
-static int morello_system_copy_to_ap_sram(
-    uint32_t sram_address,
-    const void *spi_address,
-    uint32_t size)
-{
-    memcpy((void *)sram_address, spi_address, size);
-
-    if (memcmp((void *)sram_address, spi_address, size) != 0) {
-        FWK_LOG_INFO(
-            "[MORELLO SYSTEM] Copy failed at destination address: 0x%" PRIX32,
-            sram_address);
-        return FWK_E_DATA;
-    }
-    FWK_LOG_INFO(
-        "[MORELLO SYSTEM] Copied binary to SRAM address: 0x%08" PRIX32,
-        sram_address);
-    return FWK_SUCCESS;
-}
-
 void cdbg_pwrupreq_handler(void)
 {
     FWK_LOG_INFO("[MORELLO SYSTEM] Received debug power up request interrupt");
@@ -318,21 +275,6 @@ static int morello_system_fill_platform_info(void)
         sds_structure_desc->size);
 }
 
-static int morello_system_fill_bl33_info(void)
-{
-    const struct mod_sds_structure_desc *sds_structure_desc =
-        fwk_module_get_data(sds_bl33_info_id);
-
-    sds_bl33_info.bl33_src_addr = BL33_SRC_BASE_ADDR;
-    sds_bl33_info.bl33_dst_addr = BL33_DST_BASE_ADDR;
-    sds_bl33_info.bl33_size = BL33_SIZE;
-    return morello_system_ctx.sds_api->struct_write(
-        sds_structure_desc->id,
-        0,
-        (void *)(&sds_bl33_info),
-        sds_structure_desc->size);
-}
-
 /*
  * Initialize primary core during system initialization
  */
@@ -343,29 +285,12 @@ static int morello_system_init_primary_core(void)
     unsigned int core_idx;
     unsigned int cluster_idx;
     unsigned int cluster_count;
-    uint32_t rvbar_low;
-    uint32_t rvbar_high;
-    uintptr_t fip_base;
-    size_t fip_size;
-
-    /*
-     * SCC BOOT_GPR2 & BOOT_GPR3 registers are used to set user specific
-     * RVBAR addresses. If both registers are set to 0 then a fixed trusted
-     * SRAM based is used.
-     */
-    if ((SCC->BOOT_GPR2 == 0) && (SCC->BOOT_GPR3 == 0)) {
-        rvbar_low = (AP_CORE_RESET_ADDR - AP_SCP_SRAM_OFFSET);
-        rvbar_high = 0;
-    } else {
-        rvbar_low = SCC->BOOT_GPR2;
-        rvbar_high = SCC->BOOT_GPR3;
-    }
 
     FWK_LOG_INFO(
         "[MORELLO SYSTEM] Setting AP Reset Address to 0x%08" PRIX32
         "%08" PRIX32,
-        rvbar_high,
-        rvbar_low);
+        SCC->BOOT_GPR3,
+        SCC->BOOT_GPR2);
 
     cluster_count = morello_core_get_cluster_count();
     for (cluster_idx = 0; cluster_idx < cluster_count; cluster_idx++) {
@@ -373,59 +298,27 @@ static int morello_system_init_primary_core(void)
              core_idx < morello_core_get_core_per_cluster_count(cluster_idx);
              core_idx++) {
             PIK_CLUSTER(cluster_idx)->STATIC_CONFIG[core_idx].RVBARADDR_LW =
-                rvbar_low;
+                SCC->BOOT_GPR2;
             PIK_CLUSTER(cluster_idx)->STATIC_CONFIG[core_idx].RVBARADDR_UP =
-                rvbar_high;
+                SCC->BOOT_GPR3;
         }
     }
 
     if (morello_get_chipid() == 0x0) {
-        struct mod_fip_entry_data entry;
-        if (SCC->BOOT_GPR0 != 0x0) {
-            fip_base = SCC->BOOT_GPR0;
-            /* Assume maximum size limit */
-            fip_size = 0xFFFFFFFF;
-        } else {
-            fip_base = SCP_QSPI_FLASH_BASE_ADDR;
-            fip_size = SCP_QSPI_FLASH_SIZE;
-        }
-
-        status = morello_system_ctx.fip_api->get_entry(
-            MOD_FIP_TOC_ENTRY_TFA_BL31, &entry, fip_base, fip_size);
-        if (status != FWK_SUCCESS) {
-            FWK_LOG_INFO(
-                "[MORELLO SYSTEM] Failed to locate AP TF_BL31, error: %d\n",
-                status);
-            return FWK_E_PANIC;
-        }
-
-        FWK_LOG_INFO("[MORELLO SYSTEM] Located AP TF_BL31:\n");
-        FWK_LOG_INFO("[MORELLO SYSTEM]   address: %p\n", entry.base);
-        FWK_LOG_INFO("[MORELLO SYSTEM]   size   : %u\n", entry.size);
-        FWK_LOG_INFO(
-            "[MORELLO SYSTEM]   flags  : 0x%08" PRIX32 "%08" PRIX32 "\n",
-            (uint32_t)(entry.flags >> 32),
-            (uint32_t)entry.flags);
-        FWK_LOG_INFO(
-            "[MORELLO SYSTEM] Copying AP TF_BL31 to address 0x%" PRIX32 "...\n",
-            AP_CORE_RESET_ADDR);
-
-        status = morello_system_copy_to_ap_sram(
-            AP_CORE_RESET_ADDR, entry.base, entry.size);
-        if (status != FWK_SUCCESS)
-            return FWK_E_PANIC;
-
-        /* Fill BL33 image information structure */
-        FWK_LOG_INFO("[MORELLO SYSTEM] Filling BL33 information...");
-        status = morello_system_fill_bl33_info();
-        if (status != FWK_SUCCESS)
-            return status;
-
         /* Fill Platform information structure */
         FWK_LOG_INFO("[MORELLO SYSTEM] Collecting Platform information...");
         status = morello_system_fill_platform_info();
         if (status != FWK_SUCCESS)
             return status;
+
+        /*
+         * At the moment, DPU ACLK is not hooked to SCMI Clock protocol due to
+         * an issue with clock dividier configuration.
+         * As such, hard-coding the dividers here until SCMI Clock comms
+         * is fixed to work with DPU ALCK.
+         */
+        PIK_DPU->ACLKDP_DIV1 = 0;
+        PIK_DPU->ACLKDP_DIV2 = 0;
 
         /* Enable non-secure CoreSight debug access */
         FWK_LOG_INFO(
@@ -500,13 +393,6 @@ static int morello_system_bind(fwk_id_t id, unsigned int round)
 
     if (round > 0)
         return FWK_SUCCESS;
-
-    status = fwk_module_bind(
-        FWK_ID_MODULE(FWK_MODULE_IDX_FIP),
-        FWK_ID_API(FWK_MODULE_IDX_FIP, 0),
-        &morello_system_ctx.fip_api);
-    if (status != FWK_SUCCESS)
-        return status;
 
     status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_POWER_DOMAIN),

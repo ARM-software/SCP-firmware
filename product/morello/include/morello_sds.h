@@ -24,7 +24,6 @@ enum morello_sds_struct_id {
     MORELLO_SDS_CPU_BOOTCTR = 6 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
     MORELLO_SDS_CPU_FLAGS = 7 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
     MORELLO_SDS_PLATFORM_INFO = 8 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
-    MORELLO_SDS_BL33_INFO = 9 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
 };
 
 enum morello_sds_region_idx {
@@ -46,7 +45,6 @@ enum morello_sds_region_idx {
 #define MORELLO_SDS_CPU_BOOTCTR_SIZE 256
 #define MORELLO_SDS_CPU_FLAGS_SIZE 256
 #define MORELLO_SDS_PLATFORM_INFO_SIZE        18
-#define MORELLO_SDS_BL33_INFO_SIZE 12
 
 /*
  * Field masks and offsets for the MORELLO_SDS_AP_CPU_INFO structure.
@@ -80,5 +78,4 @@ struct morello_sds_platid {
  */
 #define SDS_ELEMENT_IDX_FEATURE_AVAILABILITY 3
 #define SDS_ELEMENT_IDX_PLATFORM_INFO 4
-#define SDS_ELEMENT_IDX_BL33_INFO 5
 #endif /* MORELLO_SDS_H */

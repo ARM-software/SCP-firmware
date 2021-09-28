@@ -25,33 +25,12 @@
  * \brief MORELLO system macro definitions.
  */
 
-/*!
- * MORELLO AP cores do not have internal ROM memory to boot code once they are
- * released from reset. It is the responsibility of SCP to copy the AP
- * firmware to internal/external memory and set the RVBAR register of the
- * AP cores to corresponding memory's base address and then switch ON
- * the PPU of primary core to release from reset. This macro specifies the
- * base address of the Trusted AP SRAM to which AP firmware will be copied
- * to and therefore the value to set in the RVBAR of all AP cores.
- */
-
 /*! Offset of the Trusted SRAM between AP and SCP Address Space*/
 #define AP_SCP_SRAM_OFFSET UINT32_C(0xA0000000)
-
-/*! AP Cores Reset Address in SCP Address Space */
-#define AP_CORE_RESET_ADDR UINT32_C(0xA4040000)
 
 /*! Address translation enable bit */
 #define ADDR_TRANS_EN UINT32_C(0x1)
 
-/*! Source address of BL33 image to be used by BL31 */
-#define BL33_SRC_BASE_ADDR UINT32_C(0x14200000)
-
-/*! Destination address of BL33 image to be used by BL31 */
-#define BL33_DST_BASE_ADDR UINT32_C(0xE0000000)
-
-/*! Size of BL33 image to be used by BL31 */
-#define BL33_SIZE UINT32_C(0x00200000)
 
 /*!
  * Offset of NIC-400 security 0 register for
