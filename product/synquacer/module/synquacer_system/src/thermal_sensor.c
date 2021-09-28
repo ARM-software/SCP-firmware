@@ -8,7 +8,6 @@
 #include "low_level_access.h"
 #include "synquacer_common.h"
 
-#include <cmsis_os2.h>
 #include <sysdef_option.h>
 
 #include <internal/thermal_sensor.h>

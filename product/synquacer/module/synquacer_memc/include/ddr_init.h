@@ -10,9 +10,6 @@
 
 #include "synquacer_mmap.h"
 
-#include <cmsis_os.h>
-#include <cmsis_os2.h>
-
 #include <internal/reg_DDRPHY_CONFIG.h>
 #include <internal/reg_DMC520.h>
 

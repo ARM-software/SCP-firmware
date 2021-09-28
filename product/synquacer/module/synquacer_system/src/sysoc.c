@@ -8,8 +8,6 @@
 #include "low_level_access.h"
 #include "synquacer_mmap.h"
 
-#include <cmsis_os2.h>
-
 #include <internal/reset.h>
 #include <internal/sysoc.h>
 

@@ -14,7 +14,6 @@
 #include <fwk_log.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <fwk_multi_thread.h>
 #include <fwk_status.h>
 #include <fwk_thread.h>
 
@@ -129,10 +128,6 @@ static int synquacer_system_start(fwk_id_t id)
     main_initialize();
 
     FWK_LOG_INFO("[SYNQUACER SYSTEM] Request system initialization.");
-
-    status = fwk_thread_create(FWK_ID_MODULE(FWK_MODULE_IDX_SYNQUACER_SYSTEM));
-    if (status != FWK_SUCCESS)
-        return status;
 
     req = (struct fwk_event){
         .id = FWK_ID_EVENT(
