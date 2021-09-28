@@ -39,7 +39,7 @@ static const struct mod_cmn_booker_mem_region_map mmap[7] = {
          * Map: 0x0000_0000_0000 - 0x003FF_FFFF_FFFF (4 TB)
          */
         .base = UINT64_C(0x000000000000),
-        .size = UINT64_C(4) * FWK_TIB,
+        .size = UINT64_C(1) * FWK_TIB,
         .type = MOD_CMN_BOOKER_MEM_REGION_TYPE_SYSCACHE,
     },
     {

@@ -357,6 +357,8 @@ static int cmn_booker_setup_sam(struct cmn_booker_rnsam_reg *rnsam)
             /*
              * Configure memory region
              */
+            fwk_assert(region->size <= UINT64_C(1) * FWK_TIB);
+
             configure_region(&rnsam->SYS_CACHE_GRP_REGION[region_sys_count],
                              region->base,
                              region->size,
