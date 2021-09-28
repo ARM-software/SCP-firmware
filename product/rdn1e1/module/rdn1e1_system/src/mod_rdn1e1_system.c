@@ -390,7 +390,7 @@ int rdn1e1_system_process_notification(const struct fwk_event *event,
                 return status;
         } else {
             FWK_LOG_INFO(
-                "[RDN1E1 SYSTEM] Detected as slave chip %d, "
+                "[RDN1E1 SYSTEM] Detected as secondary chip %d, "
                 "Waiting for SCMI command",
                 chip_id);
         }
