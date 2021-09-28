@@ -10,8 +10,6 @@
 
 #include "synquacer_mmap.h"
 
-#include <cmsis_os2.h>
-
 #include <stdbool.h>
 #include <stdint.h>
 

@@ -8,8 +8,6 @@
 #include "synquacer_common.h"
 #include "synquacer_mmap.h"
 
-#include <cmsis_os2.h>
-
 #include <internal/hsspi_driver.h>
 #include <internal/reg_HSSPI.h>
 #include <mod_hsspi.h>

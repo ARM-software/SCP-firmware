@@ -8,10 +8,6 @@
 #ifndef SYNQUACER_COMMON_H
 #define SYNQUACER_COMMON_H
 
-#ifdef HAS_RTOS
-#    include <cmsis_os2.h>
-#endif
-
 #include <fmw_cmsis.h>
 
 #include <stdbool.h>

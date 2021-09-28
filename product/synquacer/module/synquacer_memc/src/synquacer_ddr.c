@@ -12,7 +12,6 @@
 #include "synquacer_common.h"
 #include "synquacer_mmap.h"
 
-#include <cmsis_os2.h>
 #include <ddr_init.h>
 #include <sysdef_option.h>
 

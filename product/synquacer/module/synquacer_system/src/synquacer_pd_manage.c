@@ -8,8 +8,6 @@
 #include "low_level_access.h"
 #include "synquacer_common.h"
 
-#include <cmsis_os2.h>
-
 #include <internal/pmu.h>
 #include <internal/reg_PPU.h>
 #include <internal/reset.h>
