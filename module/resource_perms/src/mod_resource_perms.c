@@ -238,8 +238,8 @@ static int mod_res_message_id_to_index(
         }
         if ((message_id >= MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_PD_POWER_STATE_NOTIFY)) {
-            *message_idx =
-                message_id - (uint32_t)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES;
+            *message_idx = (int32_t)(
+                message_id - (uint32_t)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES);
         }
         return FWK_SUCCESS;
 
@@ -249,7 +249,8 @@ static int mod_res_message_id_to_index(
         }
         if ((message_id >= MOD_SCMI_SYS_POWER_STATE_SET) &&
             (message_id <= MOD_SCMI_SYS_POWER_STATE_NOTIFY)) {
-            *message_idx = message_id - (uint32_t)MOD_SCMI_SYS_POWER_STATE_SET;
+            *message_idx =
+                (int32_t)(message_id - (uint32_t)MOD_SCMI_SYS_POWER_STATE_SET);
         }
         return FWK_SUCCESS;
 
@@ -259,8 +260,8 @@ static int mod_res_message_id_to_index(
         }
         if ((message_id >= MOD_SCMI_PERF_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL)) {
-            *message_idx =
-                message_id - (uint32_t)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES;
+            *message_idx = (int32_t)(
+                message_id - (uint32_t)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES);
         }
         return FWK_SUCCESS;
 
@@ -270,7 +271,8 @@ static int mod_res_message_id_to_index(
         }
         if ((message_id >= MOD_SCMI_CLOCK_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_CLOCK_CONFIG_SET)) {
-            *message_idx = message_id - (uint32_t)MOD_SCMI_CLOCK_ATTRIBUTES;
+            *message_idx =
+                (int32_t)(message_id - (uint32_t)MOD_SCMI_CLOCK_ATTRIBUTES);
         }
         return FWK_SUCCESS;
 
@@ -280,8 +282,8 @@ static int mod_res_message_id_to_index(
         }
         if ((message_id >= MOD_SCMI_SENSOR_DESCRIPTION_GET) &&
             (message_id <= MOD_SCMI_SENSOR_READING_GET)) {
-            *message_idx =
-                message_id - (uint32_t)MOD_SCMI_SENSOR_DESCRIPTION_GET;
+            *message_idx = (int32_t)(
+                message_id - (uint32_t)MOD_SCMI_SENSOR_DESCRIPTION_GET);
         }
         return FWK_SUCCESS;
 
@@ -291,8 +293,8 @@ static int mod_res_message_id_to_index(
         }
         if ((message_id >= MOD_SCMI_RESET_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_RESET_NOTIFY)) {
-            *message_idx =
-                message_id - (uint32_t)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES;
+            *message_idx = (int32_t)(
+                message_id - (uint32_t)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES);
         }
         return FWK_SUCCESS;
 
@@ -302,8 +304,8 @@ static int mod_res_message_id_to_index(
         }
         if ((message_id >= MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_VOLTD_LEVEL_GET)) {
-            *message_idx =
-                message_id - (uint32_t)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES;
+            *message_idx = (int32_t)(
+                message_id - (uint32_t)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES);
         }
         return FWK_SUCCESS;
 
@@ -391,10 +393,10 @@ static int mod_res_resource_id_to_index(
         if ((message_id >= MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_PD_POWER_STATE_NOTIFY)) {
             message_count = (int)MOD_SCMI_PD_POWER_STATE_NOTIFY -
-                (int)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES + 1U;
+                (int)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES + 1;
             message_offset =
-                message_id - (uint32_t)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES;
-            resource_size = res_perms_ctx.pd_count;
+                (int)(message_id - (uint32_t)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES);
+            resource_size = (int)res_perms_ctx.pd_count;
             break;
         }
         return FWK_E_PARAM;
@@ -403,10 +405,10 @@ static int mod_res_resource_id_to_index(
         if ((message_id >= MOD_SCMI_PERF_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL)) {
             message_count = (int)MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL -
-                (int)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES + 1U;
+                (int)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES + 1;
             message_offset =
-                message_id - (uint32_t)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES;
-            resource_size = res_perms_ctx.perf_count;
+                (int)(message_id - (uint32_t)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES);
+            resource_size = (int)res_perms_ctx.perf_count;
             break;
         }
         return FWK_E_PARAM;
@@ -415,9 +417,10 @@ static int mod_res_resource_id_to_index(
         if ((message_id >= MOD_SCMI_CLOCK_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_CLOCK_CONFIG_SET)) {
             message_count = (int)MOD_SCMI_CLOCK_CONFIG_SET -
-                (int)MOD_SCMI_CLOCK_ATTRIBUTES + 1U;
-            message_offset = message_id - (uint32_t)MOD_SCMI_CLOCK_ATTRIBUTES;
-            resource_size = res_perms_ctx.clock_count;
+                (int)MOD_SCMI_CLOCK_ATTRIBUTES + 1;
+            message_offset =
+                (int)(message_id - (uint32_t)MOD_SCMI_CLOCK_ATTRIBUTES);
+            resource_size = (int)res_perms_ctx.clock_count;
             break;
         }
         return FWK_E_PARAM;
@@ -426,10 +429,10 @@ static int mod_res_resource_id_to_index(
         if ((message_id >= MOD_SCMI_SENSOR_DESCRIPTION_GET) &&
             (message_id <= MOD_SCMI_SENSOR_READING_GET)) {
             message_count = (int)MOD_SCMI_SENSOR_READING_GET -
-                (int)MOD_SCMI_SENSOR_DESCRIPTION_GET + 1U;
+                (int)MOD_SCMI_SENSOR_DESCRIPTION_GET + 1;
             message_offset =
-                message_id - (uint32_t)MOD_SCMI_SENSOR_DESCRIPTION_GET;
-            resource_size = res_perms_ctx.sensor_count;
+                (int)(message_id - (uint32_t)MOD_SCMI_SENSOR_DESCRIPTION_GET);
+            resource_size = (int)res_perms_ctx.sensor_count;
             break;
         }
         return FWK_E_PARAM;
@@ -439,10 +442,10 @@ static int mod_res_resource_id_to_index(
         if ((message_id >= MOD_SCMI_RESET_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_RESET_NOTIFY)) {
             message_count = (int)MOD_SCMI_RESET_NOTIFY -
-                (int)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES + 1U;
+                (int)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES + 1;
             message_offset =
-                message_id - (uint32_t)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES;
-            resource_size = res_perms_ctx.reset_domain_count;
+                (int)(message_id - (uint32_t)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES);
+            resource_size = (int)res_perms_ctx.reset_domain_count;
             break;
         }
         return FWK_E_PARAM;
@@ -452,10 +455,10 @@ static int mod_res_resource_id_to_index(
         if ((message_id >= MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_VOLTD_LEVEL_GET)) {
             message_count = (int)MOD_SCMI_VOLTD_LEVEL_GET -
-                (int)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES + 1U;
+                (int)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES + 1;
             message_offset =
-                message_id - (uint32_t)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES;
-            resource_size = res_perms_ctx.voltd_count;
+                (int)(message_id - (uint32_t)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES);
+            resource_size = (int)res_perms_ctx.voltd_count;
             break;
         }
         return FWK_E_PARAM;
@@ -470,7 +473,7 @@ static int mod_res_resource_id_to_index(
     }
 
     resource_size =
-        MOD_RES_PERMS_RESOURCE_ELEMENT((unsigned int)resource_size) + 1U;
+        (int)MOD_RES_PERMS_RESOURCE_ELEMENT((unsigned int)resource_size) + 1;
 
     /*
      * message_count: the number of messages for the agent.
@@ -481,9 +484,10 @@ static int mod_res_resource_id_to_index(
      * [2]: &agent[agent_idx].message[message_id]
      * [3]: &agent[agent_idx].message[message_id].resource[resource_id]
      */
-    *resource_idx = (agent_idx * message_count * resource_size) + /* [1] */
+    *resource_idx = (int32_t)(
+        (agent_idx * message_count * resource_size) + /* [1] */
         (message_offset * resource_size) + /* [2] */
-        MOD_RES_PERMS_RESOURCE_ELEMENT(resource_id); /* [3] */
+        MOD_RES_PERMS_RESOURCE_ELEMENT(resource_id)); /* [3] */
 
     return FWK_SUCCESS;
 }
@@ -854,13 +858,13 @@ static int set_agent_resource_pd_permissions(
                 sizeof(mod_res_perms_t));
     }
 
-    for (message_idx = MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES;
+    for (message_idx = (int32_t)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES;
          message_idx <= MOD_SCMI_PD_POWER_STATE_NOTIFY;
          message_idx++) {
         status = set_agent_resource_message_perms(
             agent_id,
             MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN,
-            message_idx,
+            (uint32_t)message_idx,
             resource_id,
             res_perms_ctx.agent_permissions->scmi_pd_perms,
             flags);
@@ -904,13 +908,13 @@ static int set_agent_resource_perf_permissions(
                 sizeof(mod_res_perms_t));
     }
 
-    for (message_idx = MOD_SCMI_PERF_DOMAIN_ATTRIBUTES;
+    for (message_idx = (int32_t)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES;
          message_idx <= MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL;
          message_idx++) {
         status = set_agent_resource_message_perms(
             agent_id,
             MOD_SCMI_PROTOCOL_ID_PERF,
-            message_idx,
+            (uint32_t)message_idx,
             resource_id,
             res_perms_ctx.agent_permissions->scmi_perf_perms,
             flags);
@@ -954,13 +958,13 @@ static int set_agent_resource_clock_permissions(
                 sizeof(mod_res_perms_t));
     }
 
-    for (message_idx = MOD_SCMI_CLOCK_ATTRIBUTES;
+    for (message_idx = (int32_t)MOD_SCMI_CLOCK_ATTRIBUTES;
          message_idx <= MOD_SCMI_CLOCK_CONFIG_SET;
          message_idx++) {
         status = set_agent_resource_message_perms(
             agent_id,
             MOD_SCMI_PROTOCOL_ID_CLOCK,
-            message_idx,
+            (uint32_t)message_idx,
             resource_id,
             res_perms_ctx.agent_permissions->scmi_clock_perms,
             flags);
@@ -1061,13 +1065,13 @@ static int set_agent_resource_voltd_permissions(
                 sizeof(mod_res_perms_t));
     }
 
-    for (message_idx = MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES;
+    for (message_idx = (int32_t)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES;
          message_idx <= MOD_SCMI_VOLTD_LEVEL_GET;
          message_idx++) {
         status = set_agent_resource_message_perms(
             agent_id,
             MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN,
-            message_idx,
+            (uint32_t)message_idx,
             resource_id,
             res_perms_ctx.agent_permissions->scmi_voltd_perms,
             flags);
@@ -1111,13 +1115,13 @@ static int set_agent_resource_sensor_permissions(
                 sizeof(mod_res_perms_t));
     }
 
-    for (message_idx = MOD_SCMI_SENSOR_DESCRIPTION_GET;
+    for (message_idx = (int32_t)MOD_SCMI_SENSOR_DESCRIPTION_GET;
          message_idx <= MOD_SCMI_SENSOR_READING_GET;
          message_idx++) {
         status = set_agent_resource_message_perms(
             agent_id,
             MOD_SCMI_PROTOCOL_ID_SENSOR,
-            message_idx,
+            (uint32_t)message_idx,
             resource_id,
             res_perms_ctx.agent_permissions->scmi_sensor_perms,
             flags);
@@ -1231,7 +1235,10 @@ static int mod_res_agent_set_device_permission(
         resource_id = fwk_id_get_element_idx(dev->device_id);
 
         status = mod_res_agent_set_permissions(
-            dev->type, agent_id, resource_id, flags);
+            dev->type,
+            agent_id,
+            resource_id,
+            (enum mod_res_perms_permissions)flags);
 
         if (status != FWK_SUCCESS) {
             FWK_LOG_WARN(
@@ -1326,7 +1333,10 @@ static int mod_res_agent_set_device_protocol_permission(
         resource_id = fwk_id_get_element_idx(dev->device_id);
 
         status = mod_res_agent_set_permissions(
-            dev->type, agent_id, resource_id, flags);
+            dev->type,
+            agent_id,
+            resource_id,
+            (enum mod_res_perms_permissions)flags);
 
         if (status != FWK_SUCCESS) {
             FWK_LOG_WARN(
@@ -1364,30 +1374,30 @@ static void mod_res_agent_copy_config(
 
     switch (protocol_id) {
     case MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN:
-        cmd_count = MOD_SCMI_PD_POWER_COMMAND_COUNT;
-        resource_count = res_perms_ctx.config->pd_resource_count;
+        cmd_count = (int)MOD_SCMI_PD_POWER_COMMAND_COUNT;
+        resource_count = (int)res_perms_ctx.config->pd_resource_count;
         break;
     case MOD_SCMI_PROTOCOL_ID_PERF:
-        cmd_count = MOD_SCMI_PERF_COMMAND_COUNT;
-        resource_count = res_perms_ctx.config->perf_resource_count;
+        cmd_count = (int)MOD_SCMI_PERF_COMMAND_COUNT;
+        resource_count = (int)res_perms_ctx.config->perf_resource_count;
         break;
     case MOD_SCMI_PROTOCOL_ID_CLOCK:
-        cmd_count = MOD_SCMI_CLOCK_COMMAND_COUNT;
-        resource_count = res_perms_ctx.config->clock_resource_count;
+        cmd_count = (int)MOD_SCMI_CLOCK_COMMAND_COUNT;
+        resource_count = (int)res_perms_ctx.config->clock_resource_count;
         break;
     case MOD_SCMI_PROTOCOL_ID_SENSOR:
-        cmd_count = MOD_SCMI_SENSOR_COMMAND_COUNT;
-        resource_count = res_perms_ctx.config->sensor_resource_count;
+        cmd_count = (int)MOD_SCMI_SENSOR_COMMAND_COUNT;
+        resource_count = (int)res_perms_ctx.config->sensor_resource_count;
         break;
 #ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
     case MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN:
-        cmd_count = MOD_SCMI_RESET_COMMAND_COUNT;
-        resource_count = res_perms_ctx.config->reset_domain_resource_count;
+        cmd_count = (int)MOD_SCMI_RESET_COMMAND_COUNT;
+        resource_count = (int)res_perms_ctx.config->reset_domain_resource_count;
         break;
 #endif
     case MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN:
-        cmd_count = MOD_SCMI_VOLTD_COMMAND_COUNT;
-        resource_count = res_perms_ctx.config->voltd_resource_count;
+        cmd_count = (int)MOD_SCMI_VOLTD_COMMAND_COUNT;
+        resource_count = (int)res_perms_ctx.config->voltd_resource_count;
         break;
     default:
         return;
@@ -1398,8 +1408,8 @@ static void mod_res_agent_copy_config(
             status = mod_res_resource_id_to_index(
                 agent_id,
                 protocol_id,
-                i, /* message id */
-                j, /* resource id */
+                (uint32_t)i, /* message id */
+                (uint32_t)j, /* resource id */
                 &resource_idx);
             if ((status != FWK_SUCCESS) || (resource_idx < 0)) {
                 continue;
@@ -1542,5 +1552,5 @@ const struct fwk_module module_resource_perms = {
     .type = FWK_MODULE_TYPE_SERVICE,
     .init = mod_res_perms_resources_init,
     .process_bind_request = mod_res_perms_process_bind_request,
-    .api_count = MOD_RES_PERM_API_IDX_COUNT,
+    .api_count = (unsigned int)MOD_RES_PERM_API_IDX_COUNT,
 };

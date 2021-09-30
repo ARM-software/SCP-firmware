@@ -1521,7 +1521,7 @@ static void scmi_perf_notify_level_updated(
     fwk_id_t dep_dom_id;
 #endif
 #if defined(BUILD_HAS_MOD_STATISTICS) || defined(BUILD_HAS_SCMI_NOTIFICATIONS)
-    int idx = fwk_id_get_element_idx(domain_id);
+    int idx = (int)fwk_id_get_element_idx(domain_id);
 #endif
 
 #ifdef BUILD_HAS_MOD_STATISTICS
