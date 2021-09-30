@@ -616,14 +616,15 @@ FWK_WEAK int mod_scmi_clock_config_set_policy(
 static uint32_t get_clock_id(const uint32_t *payload, unsigned int message_id)
 {
     uint32_t clock_id;
-
+    enum scmi_clock_command_id clock_id_state;
     /*
      * Every SCMI Clock message - but CLOCK_RATE_SET - is formatted with the
      * clock ID as the first message element. We will use the clock_attributes
      * message as a basic format to retrieve the clock ID to avoid
      * unnecessary code.
      */
-    switch (message_id) {
+    clock_id_state = (enum scmi_clock_command_id)message_id;
+    switch (clock_id_state) {
     case MOD_SCMI_CLOCK_RATE_SET: {
         const struct scmi_clock_rate_set_a2p *parameters =
             (const struct scmi_clock_rate_set_a2p *)payload;
@@ -1335,7 +1336,7 @@ static int scmi_clock_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     status = scmi_clock_permissions_handler(
         service_id, payload, payload_size, message_id);
     if (status != FWK_SUCCESS) {
-        return_value = SCMI_DENIED;
+        return_value = (int32_t)SCMI_DENIED;
         goto error;
     }
 #endif
