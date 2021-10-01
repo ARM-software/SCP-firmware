@@ -89,7 +89,6 @@ Changed
 - MISRA C:2012:
     - SCMI, Framework: Fix rule 9.5 violations
     - mod_resource_perms: Fix rule 16.5 violations
-    - module: Fix rule 10.3 violations
     - fwk: Fix rules 11.9, 16.3 and 17.7 violations
     - arch: Fix rule 15.6 violations
     - arch/armv7-m: Fix rules 10.1 and 17.7 violations
