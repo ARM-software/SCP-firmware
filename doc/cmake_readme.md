@@ -300,6 +300,8 @@ unfamiliar with the process of developing within containers.
 
 ### Docker {#docker}
 
+> **NOTE**: Using Docker in SCP build might show some errors.
+
 The SCP-firmware project includes a [`Dockerfile`] which can be used to set up
 an environment containing all of the necessary prerequisites required to build
 and test a firmware.
