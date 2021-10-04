@@ -388,7 +388,7 @@ should look like the following:
 
 ```sh
 $ cmake "${SCP_SOURCE_DIR}" -B "${SCP_BUILD_DIR}" \
-  -DSCP_FIRMWARE_SOURCE_DIR:PATH="${SCP_SOURCE_DIR}/product/${SCP_PRODUCT}/${SCP_FIRMWARE}"
+  -DSCP_FIRMWARE_SOURCE_DIR:PATH="${SCP_PRODUCT}/${SCP_FIRMWARE}"
   ...
 ```
 
