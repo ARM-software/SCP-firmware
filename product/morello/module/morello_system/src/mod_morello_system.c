@@ -21,6 +21,9 @@
 
 #include <mod_clock.h>
 #include <mod_dmc_bing.h>
+#if !defined(PLAT_FVP)
+#    include <mod_morello_scp2pcc.h>
+#endif
 #include <mod_morello_system.h>
 #include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
@@ -115,6 +118,11 @@ struct morello_system_ctx {
 
     /* Pointer to SDS */
     const struct mod_sds_api *sds_api;
+
+#if !defined(PLAT_FVP)
+    /* Pointer to SCP to PCC communication API */
+    const struct mod_morello_scp2pcc_api *scp2pcc_api;
+#endif
 };
 
 struct morello_system_isr {
@@ -177,6 +185,33 @@ static struct morello_system_isr isrs[] = {
 
 static int morello_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
 {
+#if !defined(PLAT_FVP)
+    int status;
+    switch (system_shutdown) {
+    case MOD_PD_SYSTEM_SHUTDOWN:
+        FWK_LOG_INFO("[MORELLO SYSTEM] Request PCC for system shutdown");
+        status = morello_system_ctx.scp2pcc_api->send(
+            NULL, 0, SCP2PCC_TYPE_SHUTDOWN);
+        break;
+
+    case MOD_PD_SYSTEM_COLD_RESET:
+        FWK_LOG_INFO("[MORELLO SYSTEM] Request PCC for system reboot");
+        status =
+            morello_system_ctx.scp2pcc_api->send(NULL, 0, SCP2PCC_TYPE_REBOOT);
+        break;
+
+    default:
+        FWK_LOG_INFO("[MORELLO SYSTEM] Unknown shutdown command!");
+        status = FWK_E_PARAM;
+        break;
+    }
+
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR("[MORELLO SYSTEM] Shutdown/Reboot request to PCC failed");
+        return status;
+    }
+#endif
+
     NVIC_SystemReset();
     return FWK_E_DEVICE;
 }
@@ -423,6 +458,16 @@ static int morello_system_bind(fwk_id_t id, unsigned int round)
         &morello_system_ctx.dmc_bing_api);
     if (status != FWK_SUCCESS)
         return status;
+
+#if !defined(PLAT_FVP)
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_MORELLO_SCP2PCC),
+        FWK_ID_API(FWK_MODULE_IDX_MORELLO_SCP2PCC, 0),
+        &morello_system_ctx.scp2pcc_api);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+#endif
 
     return fwk_module_bind(
         fwk_module_id_sds,
