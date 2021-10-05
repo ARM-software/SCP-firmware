@@ -6,6 +6,10 @@
 #
 add_library(${SCP_MODULE_TARGET} SCP_MODULE)
 
+if(SCP_ENABLE_PLAT_FVP)
+target_compile_definitions(${SCP_MODULE_TARGET}  PUBLIC -DPLAT_FVP=1)
+endif()
+
 target_include_directories(${SCP_MODULE_TARGET}
                            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
@@ -22,3 +26,7 @@ target_link_libraries(
             module-scmi
             module-system-power
             module-dmc-bing)
+
+if(NOT SCP_ENABLE_PLAT_FVP)
+target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-morello-scp2pcc)
+endif()
