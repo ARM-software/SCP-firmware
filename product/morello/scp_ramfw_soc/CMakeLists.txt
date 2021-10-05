@@ -43,6 +43,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_pik_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_css_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_morello_scp2pcc.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_psu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_mock_psu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_dvfs.c"

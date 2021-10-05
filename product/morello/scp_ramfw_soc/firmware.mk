@@ -33,6 +33,7 @@ BS_FIRMWARE_MODULES := \
     clock \
     gtimer \
     timer \
+    morello_scp2pcc \
     dvfs \
     psu \
     mock_psu \
@@ -73,6 +74,7 @@ BS_FIRMWARE_SOURCES := \
     config_pik_clock.c \
     config_css_clock.c \
     config_clock.c \
+    config_morello_scp2pcc.c \
     config_apcontext.c \
     config_dvfs.c \
     config_psu.c \
