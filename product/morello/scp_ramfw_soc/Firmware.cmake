@@ -34,6 +34,8 @@ list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/morello_pll")
 list(PREPEND SCP_MODULE_PATHS "${CMAKE_SOURCE_DIR}/module/cdns_i2c")
 list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/dmc_bing")
 list(PREPEND SCP_MODULE_PATHS
+     "${CMAKE_CURRENT_LIST_DIR}/../module/morello_scp2pcc")
+list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/morello_system")
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/scmi_management")
@@ -64,6 +66,7 @@ list(APPEND SCP_MODULES "css-clock")
 list(APPEND SCP_MODULES "clock")
 list(APPEND SCP_MODULES "gtimer")
 list(APPEND SCP_MODULES "timer")
+list(APPEND SCP_MODULES "morello-scp2pcc")
 list(APPEND SCP_MODULES "dvfs")
 list(APPEND SCP_MODULES "psu")
 list(APPEND SCP_MODULES "mock-psu")
