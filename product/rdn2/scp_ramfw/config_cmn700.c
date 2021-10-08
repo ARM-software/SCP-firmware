@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -330,6 +330,16 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
         .node_id = NODE_ID_HNP3,
     },
 #endif
+    {
+        /*
+         * CMN700 GPV
+         * Map: 0x01_4000_0000 - 0x01_7FFF_FFFF (1 GB)
+         */
+        .base = UINT64_C(0x0140000000),
+        .size = UINT64_C(1) * FWK_GIB,
+        .type = MOD_CMN700_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_HND,
+    },
     {
         /*
          * Non Secure NOR Flash 0/1
