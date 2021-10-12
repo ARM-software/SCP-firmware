@@ -108,7 +108,7 @@ static const struct mod_tcop_domain_config k_domain_conf[] = {
         .pct_size = FWK_ARRAY_SIZE(k_pct),
         .core_config = k_core_config,
     },
-    [1] = {0},
+    [1] = { { 0 } },
 };
 
 static const struct mod_tcop_domain_config m_domain_conf[] = {
@@ -120,7 +120,7 @@ static const struct mod_tcop_domain_config m_domain_conf[] = {
         .pct_size = FWK_ARRAY_SIZE(m_pct),
         .core_config = m_core_config,
     },
-    [1] = {0},
+    [1] = { { 0 } },
 };
 
 static const struct fwk_element element_table[] = {
