@@ -370,6 +370,7 @@ static int n1sdp_pcie_link_training(fwk_id_t id, bool ep_mode)
     neg_config = (dev_ctx->ctrl_apb->RP_CONFIG_OUT &
         RP_CONFIG_OUT_NEGOTIATED_LINK_WIDTH_MASK) >>
         RP_CONFIG_OUT_NEGOTIATED_LINK_WIDTH_POS;
+    (void)neg_config;
     FWK_LOG_INFO(
         "[%s] Negotiated link width: x%d",
         pcie_type[did],
@@ -399,11 +400,13 @@ static int n1sdp_pcie_link_training(fwk_id_t id, bool ep_mode)
                                     PCIE_LINK_CTRL_STATUS_OFFSET, &reg_val);
         neg_config = (reg_val >> PCIE_LINK_CTRL_NEG_SPEED_POS) &
                      PCIE_LINK_CTRL_NEG_SPEED_MASK;
+        (void)neg_config;
         FWK_LOG_INFO(
             "[%s] Re-negotiated speed: GEN%d", pcie_type[did], neg_config);
 
         neg_config = (reg_val >> PCIE_LINK_CTRL_NEG_WIDTH_POS) &
                      PCIE_LINK_CTRL_NEG_WIDTH_MASK;
+        (void)neg_config;
         FWK_LOG_INFO(
             "[%s] Re-negotiated link width: x%d", pcie_type[did], neg_config);
     }
