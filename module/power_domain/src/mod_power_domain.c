@@ -380,12 +380,13 @@ static const char *get_state_name(const struct pd_ctx *pd, unsigned int state)
 {
     static char const unknown_name[] = "Unknown";
 
-    if (state < pd->config->state_name_table_size)
+    if (state < pd->config->state_name_table_size) {
         return pd->config->state_name_table[state];
-    else if (state < FWK_ARRAY_SIZE(default_state_name_table))
+    } else if (state < FWK_ARRAY_SIZE(default_state_name_table)) {
         return default_state_name_table[state];
-    else
+    } else {
         return unknown_name;
+    }
 }
 #endif
 
