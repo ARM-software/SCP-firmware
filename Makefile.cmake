@@ -64,7 +64,7 @@ endif
 
 # Toolchain
 TOOLCHAIN ?= $(DEFAULT_TOOLCHAIN)
-ifneq ($(filter-out GNU ArmClang, $(TOOLCHAIN)),)
+ifneq ($(filter-out GNU ArmClang Clang, $(TOOLCHAIN)),)
     $(error "Invalid TOOLCHAIN parameter. Aborting...")
 endif
 
@@ -142,6 +142,7 @@ endif
 
 CMAKE_COMMAND_OPTION := $(CMAKE_BUILD_TYPE)
 CMAKE_COMMAND_OPTION += -DSCP_TOOLCHAIN="$(TOOLCHAIN)"
+CMAKE_COMMAND_OPTION += -DSCP_LLVM_SYSROOT_CC="$(LLVM_SYSROOT_CC)"
 
 ifeq ($(BUILD_SYSTEM), Ninja)
     CMAKE_COMMAND_OPTION += -G $(BUILD_SYSTEM)
@@ -215,9 +216,13 @@ help:
 	@echo "        Specify CMake to generate GNU Make or Ninja build system."
 	@echo ""
 	@echo "    TOOLCHAIN"
-	@echo "        Value: <GNU|ArmClang>"
+	@echo "        Value: <GNU|ArmClang|Clang>"
 	@echo "        Default: $(DEFAULT_TOOLCHAIN)"
 	@echo "        Specify Toolchain to build the firmware."
+	@echo ""
+	@echo "    LLVM_SYSROOT_CC"
+	@echo "        Value: <LLVM sysroot compiler path>"
+	@echo "        Specify LLVM sysroot compiler path to build the firmware."
 	@echo ""
 	@echo "    EXTRA_CONFIG_ARGS"
 	@echo "        Value: <cmake configuration parameters>"

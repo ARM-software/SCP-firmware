@@ -434,6 +434,8 @@ the `SCP_TOOLCHAIN` cache variable. Toolchain support is on a per-firmware
 basis, and the toolchains supported by the firmware are given by
 `Toolchain-${SCP_TOOLCHAIN}.cmake` files found in the firmware.
 
+When `SCP_TOOLCHAIN` is set as `Clang` `SCP_LLVM_SYSROOT_CC` must be defined.
+
 For example, a firmware supporting both GCC and Arm Compiler 6 may offer a `GNU`
 toolchain and an `ArmClang` toolchain (`Toolchain-GNU.cmake` and
 `Toolchain-ArmClang.cmake`). In this situation, for GCC you might use:
