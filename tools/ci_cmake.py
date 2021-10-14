@@ -66,10 +66,6 @@ def prod_variant(variant):
     return 'EXTRA_CONFIG_ARGS+=-DSCP_PLATFORM_VARIANT={}'.format(variant)
 
 
-def disable_cppcheck():
-    return 'EXTRA_CONFIG_ARGS+=-DDISABLE_CPPCHECK=true '
-
-
 def banner(text):
     columns = 80
     title = " {} ".format(text)
@@ -116,7 +112,6 @@ def generate_build_info():
                                                                 toolchain,
                                                                 build_type)
                 cmd += ' -j$(nproc) '
-                cmd += disable_cppcheck()
 
                 if product in platform_variant:
                     for variant in platform_variant[product]:
