@@ -77,6 +77,13 @@ if(SCP_TOOLCHAIN_INIT AND (NOT CMAKE_TOOLCHAIN_FILE))
         "${SCP_FIRMWARE_SOURCE_DIR}/Toolchain-${SCP_TOOLCHAIN}.cmake")
 endif()
 
+if(SCP_TOOLCHAIN STREQUAL "Clang" AND NOT SCP_LLVM_SYSROOT_CC)
+    message(
+        FATAL_ERROR
+            "When Clang is set as toolchain SCP_LLVM_SYSROOT_CC must be defined"
+    )
+endif()
+
 project(
     SCP
     VERSION 2.9.0
@@ -132,11 +139,13 @@ include(CMakeDependentOption)
 check_ipo_supported(RESULT SCP_IPO_SUPPORTED)
 
 cmake_dependent_option(
-    SCP_ENABLE_IPO "Enable the interprocedural optimization (IPO) if supported?"
-    "${SCP_ENABLE_IPO_INIT}" "DEFINED SCP_ENABLE_IPO_INIT"
-    "${SCP_ENABLE_IPO}")
+    SCP_ENABLE_IPO
+    "Enable the interprocedural optimization (IPO) if supported?"
+    "${SCP_ENABLE_IPO_INIT}" "DEFINED SCP_ENABLE_IPO_INIT" "${SCP_ENABLE_IPO}")
 
-if(CMAKE_CROSSCOMPILING AND (CMAKE_C_COMPILER_ID STREQUAL "GNU") AND SCP_ENABLE_IPO)
+if(CMAKE_CROSSCOMPILING
+   AND (CMAKE_C_COMPILER_ID STREQUAL "GNU")
+   AND SCP_ENABLE_IPO)
     set(SCP_IPO_SUPPORTED TRUE)
 endif()
 
@@ -153,7 +162,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 #
 # Set up Cppcheck if it's available and enabled.
 #
-if (NOT DISABLE_CPPCHECK)
+if(NOT DISABLE_CPPCHECK)
     find_program(CMAKE_C_CPPCHECK NAMES "cppcheck")
 
     if(NOT CMAKE_C_CPPCHECK)
@@ -185,7 +194,7 @@ endif()
 #
 # Set up Clang-Tidy if it's available and enabled.
 #
-if (ENABLE_CLANG_TIDY)
+if(ENABLE_CLANG_TIDY)
 
     find_program(
         CMAKE_C_CLANG_TIDY
@@ -236,7 +245,7 @@ endif()
 #
 # Set up Include What You Use ("IWYU") if it's available and enabled.
 #
-if (ENABLE_IWYU)
+if(ENABLE_IWYU)
 
     find_program(CMAKE_C_INCLUDE_WHAT_YOU_USE NAMES iwyu include-what-you-use)
 
@@ -311,8 +320,8 @@ include(CMakeDependentOption)
 # Common build options
 
 set(SCP_ENABLE_OVERRIDE_FIRMWARE_NAME
-    ${SCP_ENABLE_OVERRIDE_FIRMWARE_NAME_INIT} CACHE STRING
-    "Override firmware binary name")
+    ${SCP_ENABLE_OVERRIDE_FIRMWARE_NAME_INIT}
+    CACHE STRING "Override firmware binary name")
 
 cmake_dependent_option(
     SCP_ENABLE_MULTITHREADING "Enable the multithreading subsystem?"
@@ -325,28 +334,34 @@ cmake_dependent_option(
     "${SCP_ENABLE_NOTIFICATIONS}")
 
 cmake_dependent_option(
-    SCP_ENABLE_RESOURCE_PERMISSIONS "Enable the resource permission support?"
-    "${SCP_ENABLE_RESOURCE_PERMISSIONS_INIT}" "DEFINED SCP_ENABLE_RESOURCE_PERMISSIONS_INIT"
+    SCP_ENABLE_RESOURCE_PERMISSIONS
+    "Enable the resource permission support?"
+    "${SCP_ENABLE_RESOURCE_PERMISSIONS_INIT}"
+    "DEFINED SCP_ENABLE_RESOURCE_PERMISSIONS_INIT"
     "${SCP_ENABLE_RESOURCE_PERMISSIONS}")
 
 cmake_dependent_option(
-    SCP_ENABLE_SCMI_NOTIFICATIONS "Enable the SCMI notifications?"
-    "${SCP_ENABLE_SCMI_NOTIFICATIONS_INIT}" "DEFINED SCP_ENABLE_SCMI_NOTIFICATIONS_INIT"
+    SCP_ENABLE_SCMI_NOTIFICATIONS
+    "Enable the SCMI notifications?"
+    "${SCP_ENABLE_SCMI_NOTIFICATIONS_INIT}"
+    "DEFINED SCP_ENABLE_SCMI_NOTIFICATIONS_INIT"
     "${SCP_ENABLE_SCMI_NOTIFICATIONS}")
 
 cmake_dependent_option(
-    SCP_ENABLE_SCMI_SENSOR_EVENTS "Enable the SCMI sensor events?"
-    "${SCP_ENABLE_SCMI_SENSOR_EVENTS_INIT}" "DEFINED SCP_ENABLE_SCMI_SENSOR_EVENTS_INIT"
+    SCP_ENABLE_SCMI_SENSOR_EVENTS
+    "Enable the SCMI sensor events?"
+    "${SCP_ENABLE_SCMI_SENSOR_EVENTS_INIT}"
+    "DEFINED SCP_ENABLE_SCMI_SENSOR_EVENTS_INIT"
     "${SCP_ENABLE_SCMI_SENSOR_EVENTS}")
 
 # Include firmware specific build options
-    include("${SCP_FIRMWARE_SOURCE_DIR}/Buildoptions.cmake" OPTIONAL)
+include("${SCP_FIRMWARE_SOURCE_DIR}/Buildoptions.cmake" OPTIONAL)
 
 #
 # Wrap `add_executable` in a way that allows us to do some extra processing on
-# the firmware target.(e.g. flat binary generation) This is necessary
-# almost exclusively because  `add_custom_command` cannot be used with a target
-# created in a different directory.
+# the firmware target.(e.g. flat binary generation) This is necessary almost
+# exclusively because  `add_custom_command` cannot be used with a target created
+# in a different directory.
 #
 
 # cmake-lint: disable=C0103,C0111
@@ -434,9 +449,10 @@ if(SCP_FIRMWARE)
     endif()
 
     set_target_properties(
-        ${SCP_FIRMWARE_TARGET} PROPERTIES EXCLUDE_FROM_ALL FALSE
-                                          OUTPUT_NAME "${SCP_FIRMWARE_NAME}"
-                                          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+        ${SCP_FIRMWARE_TARGET}
+        PROPERTIES EXCLUDE_FROM_ALL FALSE
+                   OUTPUT_NAME "${SCP_FIRMWARE_NAME}"
+                   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
     #
     # Load in the CLI debugger if it was requested.

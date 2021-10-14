@@ -34,13 +34,20 @@ include(CMakeDependentOption)
 
 cmake_dependent_option(
     SCP_ENABLE_NEWLIB_NANO "Enable newlib-nano instead of newlib?" TRUE
-    "CMAKE_C_COMPILER_ID STREQUAL GNU" FALSE)
+    "CMAKE_C_COMPILER_ID STREQUAL GNU OR CMAKE_C_COMPILER_ID STREQUAL Clang"
+    FALSE)
 
 if(SCP_ENABLE_NEWLIB_NANO)
-    target_link_options(arch-armv7m PUBLIC "--specs=nano.specs")
+    if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+        target_link_options(arch-armv7m PUBLIC "--specs=nano.specs")
+    elseif(CMAKE_C_COMPILER_ID STREQUAL "Clang")
+        target_link_libraries(arch-armv7m PUBLIC c_nano)
+    endif()
 else()
     if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
         target_link_options(arch-armv7m PUBLIC "--specs=nosys.specs")
+    elseif(CMAKE_C_COMPILER_ID STREQUAL "Clang")
+        target_link_libraries(arch-armv7m PUBLIC c)
     endif()
 endif()
 
