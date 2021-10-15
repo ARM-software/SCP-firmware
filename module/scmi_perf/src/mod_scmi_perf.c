@@ -1264,7 +1264,7 @@ static void fast_channel_callback(uintptr_t param)
 
             domain_ctx = &scmi_perf_ctx.domain_ctx_table[i];
 
-            if (set_limit != 0x0) {
+            if (set_limit != NULL) {
                 tmax = set_limit->range_max;
                 tmin = set_limit->range_min;
             } else {
@@ -1272,7 +1272,7 @@ static void fast_channel_callback(uintptr_t param)
                 tmin = domain_ctx->level_limits.minimum;
             }
 
-            tlevel = (set_level != 0x0) ? *set_level : domain_ctx->curr_level;
+            tlevel = (set_level != NULL) ? *set_level : domain_ctx->curr_level;
 
 #    ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
             struct fc_perf_update update = {
