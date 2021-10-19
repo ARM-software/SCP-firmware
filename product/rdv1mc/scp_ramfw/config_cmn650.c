@@ -175,6 +175,16 @@ static const struct mod_cmn650_mem_region_map mmap[] = {
         .type = MOD_CMN650_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HND,
     },
+    {
+        /*
+         * 64-bit PCIe MMIO region
+         * Map: 0x05_0000_0000 - 0x05_FFFF_FFFF (4 GB)
+         */
+        .base = UINT64_C(0x0500000000),
+        .size = UINT64_C(4) * FWK_GIB,
+        .type = MOD_CMN650_MEM_REGION_TYPE_IO,
+        .node_id = NODE_ID_HND,
+    },
 };
 
 /* CCIX Related configuration data */
