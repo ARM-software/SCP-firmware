@@ -16,6 +16,7 @@ contributions.
 - [Girish Pathak](https://github.com/girishpathak) (girish.pathak@arm.com)
 - [Leandro Belli](https://github.com/leandro-arm) (leandro.belli@arm.com)
 - [Ahmed Gadallah](https://github.com/AhmedImbabyGadallah) (ahmed.gadallah@arm.com)
+- [Katherine Vincent](https://github.com/katvin01) (katherine.vincent@arm.com)
 
 ## Secondary Maintainers
 
