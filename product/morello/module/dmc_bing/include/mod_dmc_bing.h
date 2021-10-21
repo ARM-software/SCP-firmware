@@ -308,13 +308,13 @@ struct mod_dmc_bing_reg {
     uint32_t RESERVED33;
     FWK_RW uint32_t ERR0CTLR0;
     FWK_RW uint32_t ERR0CTLR1;
-    FWK_R uint32_t ERR0STATUS;
+    FWK_RW uint32_t ERR0STATUS;
     uint8_t RESERVED34[0x740 - 0x714];
     FWK_R uint32_t ERR1FR;
     uint32_t RESERVED35;
     FWK_R uint32_t ERR1CTLR;
     uint32_t RESERVED36;
-    FWK_R uint32_t ERR1STATUS;
+    FWK_RW uint32_t ERR1STATUS;
     uint32_t RESERVED37;
     FWK_RW uint32_t ERR1ADDR0;
     FWK_RW uint32_t ERR1ADDR1;
@@ -329,7 +329,7 @@ struct mod_dmc_bing_reg {
     uint32_t RESERVED39;
     FWK_R uint32_t ERR2CTLR;
     uint32_t RESERVED40;
-    FWK_R uint32_t ERR2STATUS;
+    FWK_RW uint32_t ERR2STATUS;
     uint32_t RESERVED41;
     FWK_RW uint32_t ERR2ADDR0;
     FWK_RW uint32_t ERR2ADDR1;
@@ -344,16 +344,18 @@ struct mod_dmc_bing_reg {
     uint32_t RESERVED43;
     FWK_R uint32_t ERR3CTLR;
     uint32_t RESERVED44;
-    FWK_R uint32_t ERR3STATUS;
+    FWK_RW uint32_t ERR3STATUS;
     uint32_t RESERVED45;
     FWK_RW uint32_t ERR3ADDR0;
     FWK_RW uint32_t ERR3ADDR1;
-    uint8_t RESERVED46[0x800 - 0x7E0];
+    FWK_R uint32_t ERR3MISC0;
+    FWK_R uint32_t ERR3MISC1;
+    uint8_t RESERVED46[0x800 - 0x7E8];
     FWK_R uint32_t ERR4FR;
     uint32_t RESERVED47;
     FWK_R uint32_t ERR4CTLR;
     uint32_t RESERVED48;
-    FWK_R uint32_t ERR4STATUS;
+    FWK_RW uint32_t ERR4STATUS;
     uint32_t RESERVED49;
     FWK_RW uint32_t ERR4ADDR0;
     FWK_RW uint32_t ERR4ADDR1;
@@ -365,7 +367,7 @@ struct mod_dmc_bing_reg {
     uint32_t RESERVED51;
     FWK_R uint32_t ERR5CTLR;
     uint32_t RESERVED52;
-    FWK_R uint32_t ERR5STATUS;
+    FWK_RW uint32_t ERR5STATUS;
     uint32_t RESERVED53;
     FWK_RW uint32_t ERR5ADDR0;
     FWK_RW uint32_t ERR5ADDR1;
@@ -377,7 +379,7 @@ struct mod_dmc_bing_reg {
     uint32_t RESERVED55;
     FWK_R uint32_t ERR6CTLR;
     uint32_t RESERVED56;
-    FWK_R uint32_t ERR6STATUS;
+    FWK_RW uint32_t ERR6STATUS;
     uint32_t RESERVED57;
     FWK_RW uint32_t ERR6ADDR0;
     FWK_RW uint32_t ERR6ADDR1;
@@ -800,6 +802,15 @@ enum mod_dmc_ddr_training_type {
     /*! Training type count */
     DDR_ADDR_TRAIN_TYPE_COUNT,
 };
+
+/*!
+ * \brief Delay Function
+ *
+ * \param ms Number of milliseconds delay required.
+ *
+ * \retval NONE
+ */
+void delay_ms(uint32_t ms);
 /*!
  * \}
  */
