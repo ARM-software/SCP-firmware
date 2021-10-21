@@ -181,7 +181,7 @@ objectIndex:*product/n1sdp/module/n1sdp_pcie/src/n1sdp_pcie.c:438
 objectIndex:*product/morello/module/morello_pcie/src/morello_pcie.c:390
 knownConditionTrueFalse:*product/n1sdp/module/n1sdp_dmc620/src/mod_n1sdp_dmc620.c:85
 syntaxError:*product/morello/scp_ramfw_soc/config_resource_perms.c:54
-syntaxError:*product/morello/module/dmc_bing/include/mod_dmc_bing.h:787
+syntaxError:*product/morello/module/dmc_bing/include/mod_dmc_bing.h:789
 
 // Suppress CMSIS errors
 *:*/CMSIS*/*
