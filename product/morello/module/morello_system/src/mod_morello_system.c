@@ -59,6 +59,8 @@ struct FWK_PACKED morello_platform_info {
     uint8_t slave_count;
     /* If multichip mode */
     bool multichip_mode;
+    /* Platform SCC configuration */
+    uint32_t scc_config;
 };
 
 /* MultiChip information */
@@ -267,6 +269,8 @@ static int morello_system_fill_platform_info(void)
         "[MORELLO SYSTEM] Total DDR Size in Bytes: 0x%" PRIX32 "%08" PRIX32,
         (uint32_t)(size >> 32),
         (uint32_t)size);
+
+    sds_platform_info.scc_config = SCC->BOOT_GPR1;
 
     return morello_system_ctx.sds_api->struct_write(
         sds_structure_desc->id,
