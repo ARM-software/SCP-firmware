@@ -54,7 +54,5 @@ const struct fwk_module_config config_dmc_bing = {
     .elements = FWK_MODULE_DYNAMIC_ELEMENTS(dmc_bing_get_element_table),
     .data = &((struct mod_dmc_bing_module_config){
         .ddr_speed = DDR_CLOCK_MHZ,
-        .opmode = BING_OPMODE_CLIENT,
-        .enable_ecc = false,
     }),
 };

@@ -436,17 +436,10 @@ static int direct_ddr_cmd(struct mod_dmc_bing_reg *dmc)
 
 static int dmc_bing_config(struct mod_dmc_bing_reg *dmc, fwk_id_t ddr_id)
 {
-    const struct mod_dmc_bing_module_config *mod_config;
     uint64_t mem_size;
-    uint64_t tag_mem_base;
     int status;
 
-    mod_config = fwk_module_get_data(FWK_ID_MODULE(FWK_MODULE_IDX_DMC_BING));
-
-    FWK_LOG_INFO(
-        "[DDR] Initialising DMC-Bing at 0x%x in %s mode",
-        (uintptr_t)dmc,
-        (mod_config->opmode == 0) ? "server" : "client");
+    FWK_LOG_INFO("[DDR] Initialising DMC-Bing at 0x%x", (uintptr_t)dmc);
 
     dmc_bing_config_interrupt(ddr_id);
 
@@ -555,42 +548,6 @@ static int dmc_bing_config(struct mod_dmc_bing_reg *dmc, fwk_id_t ddr_id)
 
     ddr_get_dimm_size(&mem_size);
 
-    if (mod_config->opmode == BING_OPMODE_CLIENT) {
-        usable_mem_size = mem_size - (mem_size / 128ULL);
-
-        /* Linear DDR address */
-        tag_mem_base = usable_mem_size;
-        tag_mem_base = tag_mem_base / 4;
-        /* Reverse translation */
-        if (tag_mem_base < 0x80000000ULL)
-            tag_mem_base += 0x80000000ULL;
-        else
-            tag_mem_base = tag_mem_base - 0x80000000ULL + 0x8080000000ULL;
-
-        dmc->CAPABILITY_CTRL = 0x1;
-        dmc->TAG_CACHE_CFG = 0x7;
-        dmc->MEMORY_ADDRESS_CTRL = (uint32_t)tag_mem_base;
-        dmc->MEMORY_ADDRESS_CTRL2 = (uint32_t)(tag_mem_base >> 32);
-        dmc->MEMORY_ACCESS_CTRL |= (1 << 16);
-
-        FWK_LOG_INFO(
-            "[DDR] Tag base set to 0x%" PRIX32 "%" PRIX32,
-            dmc->MEMORY_ADDRESS_CTRL2,
-            dmc->MEMORY_ADDRESS_CTRL);
-    } else {
-        dmc->CAPABILITY_CTRL = 0;
-        usable_mem_size = mem_size;
-    }
-
-    if (mod_config->enable_ecc) {
-        FWK_LOG_INFO("[DDR] Enabling ECC settings");
-        dmc->ERR0CTLR0 |= 0x00000001;
-        dmc->ERR0CTLR1 |= 0x00000011;
-        dmc->BING_SPL_CTRL_REG &= ~0xC;
-    } else {
-        FWK_LOG_INFO("[DDR] Using DDR without ECC");
-        dmc->BING_SPL_CTRL_REG |= 0xC;
-    }
     dmc->DIRECT_CMD = 0x0001000C;
 
     dmc->USER_CONFIG0_NEXT = 0x1;
