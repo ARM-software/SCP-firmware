@@ -264,11 +264,16 @@ static int morello_system_fill_platform_info(void)
     sds_platform_info.local_ddr_size = size;
 
     size = sds_platform_info.local_ddr_size + sds_platform_info.remote_ddr_size;
+
+    /* Account for size reserved for tag bits storage in dmc-bing client mode */
+    if (SCC->BOOT_GPR1 & 0x1) {
+        size -= (size / UINT64_C(128));
+    }
+
     (void)size;
     FWK_LOG_INFO(
-        "[MORELLO SYSTEM] Total DDR Size in Bytes: 0x%" PRIX32 "%08" PRIX32,
-        (uint32_t)(size >> 32),
-        (uint32_t)size);
+        "[MORELLO SYSTEM] Total Usable DDR Size in Megabytes: %llu",
+        (size / (1024 * 1024)));
 
     sds_platform_info.scc_config = SCC->BOOT_GPR1;
 
