@@ -635,14 +635,6 @@ struct mod_dmc_bing_reg {
  */
 #define DDR_ADDR_DATA_SLICES_POS 12
 /*!
- * \brief Bing operation in server mode
- */
-#define BING_OPMODE_SERVER 0
-/*!
- * \brief Bing operation in client mode
- */
-#define BING_OPMODE_CLIENT 1
-/*!
  * \brief Offset for Abort Register
  */
 #define DMC_BING_ABORT_REG_OFFSET UINT32_C(0x10000)
@@ -720,10 +712,6 @@ enum mod_dmc_bing_api_idx {
 struct mod_dmc_bing_module_config {
     /*! DDR operating frequency */
     uint16_t ddr_speed;
-    /*! Bing operating mode */
-    uint8_t opmode;
-    /*! Bing ECC control */
-    bool enable_ecc;
 };
 
 /*!
