@@ -392,8 +392,8 @@ static int scmi_voltd_config_set_handler(fwk_id_t service_id,
         .status = SCMI_GENERIC_ERROR,
     };
     size_t outmsg_size = sizeof(outmsg.status);
+    uint8_t mode_id;
     uint8_t mode_type = (uint8_t)MOD_VOLTD_MODE_TYPE_ARCH;
-    uint8_t mode_id = (uint8_t)MOD_VOLTD_MODE_ID_OFF;
     enum scmi_voltd_mode_type scmi_mode_type;
     enum scmi_voltd_mode_id scmi_mode_id = SCMI_VOLTD_MODE_ID_OFF;
 
@@ -430,19 +430,20 @@ static int scmi_voltd_config_set_handler(fwk_id_t service_id,
             status = FWK_E_PARAM;
             break;
         }
+
+        if (status == FWK_SUCCESS) {
+            status = scmi_voltd_ctx.voltd_api->set_config(
+                device->element_id, mode_type, mode_id);
+        }
+
+        if (status == FWK_SUCCESS) {
+            outmsg.status = SCMI_SUCCESS;
+        } else {
+            outmsg.status = SCMI_INVALID_PARAMETERS;
+        }
+
     } else {
         outmsg.status = SCMI_NOT_FOUND;
-    }
-
-    if (status == FWK_SUCCESS) {
-        status = scmi_voltd_ctx.voltd_api->set_config(
-            device->element_id, mode_type, mode_id);
-    }
-
-    if (status == FWK_SUCCESS) {
-        outmsg.status = SCMI_SUCCESS;
-    } else {
-        outmsg.status = SCMI_INVALID_PARAMETERS;
     }
 
     scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
