@@ -7,7 +7,8 @@
 
 """
 Build and check framework
-This script runs "CC=gcc make clean test" and performs all frameworks tests.
+This script runs "CC=gcc make -f Makefile.cmake test" and performs all
+frameworks tests.
 """
 
 import sys
@@ -24,7 +25,7 @@ def main():
     banner("Build and run framework tests")
 
     result = subprocess.Popen(
-        "CC=gcc make clean test",
+        "CC=gcc make -f Makefile.cmake test",
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
