@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -10,6 +10,43 @@
 #
 
 add_executable(tc0-bl2)
+
+
+# SCP_PLATFORM_VARIANT options:
+# - 'TC0_VARIANT_STD' for TC0 standard build
+# - 'TC0_VAR_EXPERIMENT_POWER' for TC0 with power/performance plugins used for
+#   evaluation purposes
+
+
+target_compile_definitions(tc0-bl2 PUBLIC -DTC0_VARIANT_STD=0)
+target_compile_definitions(tc0-bl2 PUBLIC -DTC0_VAR_EXPERIMENT_POWER=1)
+
+
+set(SCP_PLATFORM_VARIANT ${SCP_PLATFORM_VARIANT_INIT} CACHE STRING "1")
+
+
+if (SCP_PLATFORM_VARIANT STREQUAL "1")
+    message(NOTICE "SCP_PLATFORM_VARIANT set to EXPERIMENT_POWER (tc0-bl2)\n")
+
+    target_compile_definitions(tc0-bl2
+        PUBLIC -DPLATFORM_VARIANT=TC0_VAR_EXPERIMENT_POWER)
+
+    set(SCP_ENABLE_PLUGIN_HANDLER TRUE PARENT_SCOPE)
+    set(SCP_ENABLE_FAST_CHANNELS TRUE PARENT_SCOPE)
+
+# The order of the modules in the following list is appended on the list of
+# modules defined in Firmware.cmake.
+
+    list(APPEND SCP_MODULES "traffic-cop")
+    target_sources(tc0-bl2 PRIVATE "config_traffic_cop.c")
+
+else()
+    message(NOTICE "SCP_PLATFORM_VARIANT set to STANDARD (tc0-bl2)\n")
+
+    target_compile_definitions(tc0-bl2
+        PUBLIC -DPLATFORM_VARIANT=TC0_VARIANT_STD)
+endif()
+
 
 target_include_directories(
     tc0-bl2 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include"
@@ -48,6 +85,7 @@ target_sources(
 if(SCP_ENABLE_RESOURCE_PERMISSIONS)
     target_sources(tc0-bl2 PRIVATE "config_resource_perms.c")
 endif()
+
 
 #
 # Some of our firmware includes require CMSIS.

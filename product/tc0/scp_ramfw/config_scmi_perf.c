@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -129,7 +129,7 @@ static const struct mod_scmi_perf_domain_config domains[] = {
     },
 };
 
-#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+#if defined(PLATFORM_VARIANT) && (PLATFORM_VARIANT == TC0_VAR_EXPERIMENT_POWER)
 static const struct mod_scmi_plugin_config plugins_table[] = {
     [0] = {
         .id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_TRAFFIC_COP),
@@ -138,19 +138,16 @@ static const struct mod_scmi_plugin_config plugins_table[] = {
 };
 #endif
 const struct fwk_module_config config_scmi_perf = {
-    .data = &((struct mod_scmi_perf_config){
-        .domains = &domains,
-        .perf_doms_count = FWK_ARRAY_SIZE(domains),
+    .data = &((struct mod_scmi_perf_config) {
+        .domains = &domains, .perf_doms_count = FWK_ARRAY_SIZE(domains),
 #ifdef BUILD_HAS_FAST_CHANNELS
         .fast_channels_alarm_id = FWK_ID_SUB_ELEMENT_INIT(
-            FWK_MODULE_IDX_TIMER,
-            0,
-            CONFIG_TIMER_FAST_CHANNEL_TIMER_IDX),
+            FWK_MODULE_IDX_TIMER, 0, CONFIG_TIMER_FAST_CHANNEL_TIMER_IDX),
         .fast_channels_rate_limit = (2 * 1000),
 #else
         .fast_channels_alarm_id = FWK_ID_NONE_INIT,
 #endif
-#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+#if defined(PLATFORM_VARIANT) && (PLATFORM_VARIANT == TC0_VAR_EXPERIMENT_POWER)
         .plugins = plugins_table,
         .plugins_count = FWK_ARRAY_SIZE(plugins_table),
 #endif
