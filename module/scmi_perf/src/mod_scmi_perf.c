@@ -1161,15 +1161,16 @@ static int scmi_perf_describe_fast_channels(fwk_id_t service_id,
     const struct mod_scmi_perf_domain_config *domain;
     const struct scmi_perf_describe_fc_a2p *parameters;
     struct scmi_perf_describe_fc_p2a return_values = {
-        .status = SCMI_GENERIC_ERROR,
+        .status = (int32_t)SCMI_GENERIC_ERROR,
     };
     uint32_t chan_size, chan_index;
+    enum scmi_perf_command_id message_id;
 
     parameters = (const struct scmi_perf_describe_fc_a2p *)payload;
 
     /* Validate the domain identifier */
     if (parameters->domain_id >= scmi_perf_ctx.domain_count) {
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
 
         goto exit;
     }
@@ -1177,59 +1178,60 @@ static int scmi_perf_describe_fast_channels(fwk_id_t service_id,
     domain = &(*scmi_perf_ctx.config->domains)[parameters->domain_id];
 
     if (domain->fast_channels_addr_scp == NULL) {
-        return_values.status = SCMI_NOT_SUPPORTED;
+        return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
 
         goto exit;
     }
 
     if (parameters->message_id >= MOD_SCMI_PERF_COMMAND_COUNT) {
-        return_values.status = SCMI_NOT_FOUND;
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
 
         goto exit;
     }
 
-    switch (parameters->message_id) {
+    message_id = parameters->message_id;
+
+    switch (message_id) {
     case MOD_SCMI_PERF_LEVEL_GET:
-        chan_index = MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET;
+        chan_index = (uint32_t)MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET;
         chan_size =
             fast_channel_elem_size[MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET];
         break;
 
     case MOD_SCMI_PERF_LEVEL_SET:
-        chan_index = MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET;
+        chan_index = (uint32_t)MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET;
         chan_size =
             fast_channel_elem_size[MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET];
         break;
 
     case MOD_SCMI_PERF_LIMITS_SET:
-        chan_index = MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET;
+        chan_index = (uint32_t)MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET;
         chan_size =
             fast_channel_elem_size[MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET];
         break;
 
     case MOD_SCMI_PERF_LIMITS_GET:
-        chan_index = MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET;
+        chan_index = (uint32_t)MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET;
         chan_size =
             fast_channel_elem_size[MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET];
         break;
 
     default:
-        return_values.status = SCMI_NOT_SUPPORTED;
+        return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
         goto exit;
-
     }
     if (domain->fast_channels_addr_ap == NULL ||
         domain->fast_channels_addr_ap[chan_index] == 0x0) {
-        return_values.status = SCMI_NOT_SUPPORTED;
+        return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
         goto exit;
     }
-    return_values.status = SCMI_SUCCESS;
+    return_values.status = (int32_t)SCMI_SUCCESS;
     return_values.attributes = 0; /* Doorbell not supported */
     return_values.rate_limit = scmi_perf_ctx.fast_channels_rate_limit;
     return_values.chan_addr_low =
         (uint32_t)(domain->fast_channels_addr_ap[chan_index] & ~0UL);
     return_values.chan_addr_high =
-        (domain->fast_channels_addr_ap[chan_index] >> 32);
+        (uint32_t)(domain->fast_channels_addr_ap[chan_index] >> 32);
     return_values.chan_size = chan_size;
 
 exit:
