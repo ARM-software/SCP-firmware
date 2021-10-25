@@ -43,7 +43,8 @@ static struct mod_res_agent_protocol_permissions agent_protocol_permissions[] =
     {
         [AGENT_IDX(JUNO_SCMI_AGENT_IDX_OSPM)] =
             {
-                .protocols = MOD_RES_PERMS_SCMI_ALL_PROTOCOLS_ALLOWED,
+                .protocols =
+                    (mod_res_perms_t)MOD_RES_PERMS_SCMI_ALL_PROTOCOLS_ALLOWED,
             },
 
         /* PSCI agent has no access to clock, perf and sensor protocol */
@@ -477,15 +478,15 @@ static struct mod_res_domain_device devices_io[] = {
 
 static struct mod_res_device juno_devices[] = {
     {
-        .device_id = JUNO_RES_PERMS_DEVICES_CPU,
+        .device_id = (uint16_t)JUNO_RES_PERMS_DEVICES_CPU,
         .domain_devices = devices_cpu,
     },
     {
-        .device_id = JUNO_RES_PERMS_DEVICES_GPU,
+        .device_id = (uint16_t)JUNO_RES_PERMS_DEVICES_GPU,
         .domain_devices = devices_gpu,
     },
     {
-        .device_id = JUNO_RES_PERMS_DEVICES_IO,
+        .device_id = (uint16_t)JUNO_RES_PERMS_DEVICES_IO,
         .domain_devices = devices_io,
     },
     { 0 },
@@ -495,15 +496,15 @@ struct fwk_module_config config_resource_perms = {
     .data =
         &(struct mod_res_resource_perms_config){
             .agent_permissions = (uintptr_t)&agent_permissions,
-            .agent_count = JUNO_SCMI_AGENT_IDX_COUNT,
+            .agent_count = (uint32_t)JUNO_SCMI_AGENT_IDX_COUNT,
             .protocol_count = 7,
-            .clock_count = JUNO_CLOCK_IDX_COUNT,
-            .sensor_count = MOD_JUNO_R0_SENSOR_IDX_COUNT,
-            .pd_count = POWER_DOMAIN_IDX_COUNT,
-            .perf_count = DVFS_ELEMENT_IDX_COUNT,
+            .clock_count = (uint32_t)JUNO_CLOCK_IDX_COUNT,
+            .sensor_count = (uint32_t)MOD_JUNO_R0_SENSOR_IDX_COUNT,
+            .pd_count = (uint32_t)POWER_DOMAIN_IDX_COUNT,
+            .perf_count = (uint32_t)DVFS_ELEMENT_IDX_COUNT,
             .perf_cmd_count = JUNO_PERF_RESOURCE_CMDS,
             .perf_resource_count = JUNO_PERF_RESOURCE_ELEMENTS,
-            .device_count = JUNO_RES_PERMS_DEVICES_COUNT,
+            .device_count = (uint32_t)JUNO_RES_PERMS_DEVICES_COUNT,
 #ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
             .reset_domain_count = JUNO_RESET_DOMAIN_IDX_COUNT,
 #endif
