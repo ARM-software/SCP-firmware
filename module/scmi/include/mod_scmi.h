@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -290,6 +290,8 @@ struct mod_scmi_to_transport_api {
      * \param message_header Message ID.
      * \param payload Payload data to write.
      * \param size Size of the payload source.
+     * \param request_ack_by_interrupt flag to select whether acknowledgement
+     * interrupt is required for this message.
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
      * \retval ::FWK_E_PARAM An invalid parameter was encountered:
@@ -299,8 +301,12 @@ struct mod_scmi_to_transport_api {
      * \return One of the standard error codes for implementation-defined
      *      errors.
      */
-    int (*transmit)(fwk_id_t channel_id, uint32_t message_header,
-        const void *payload, size_t size);
+    int (*transmit)(
+        fwk_id_t channel_id,
+        uint32_t message_header,
+        const void *payload,
+        size_t size,
+        bool request_ack_by_interrupt);
 };
 
 /*!
@@ -583,6 +589,27 @@ struct mod_scmi_from_protocol_api {
      */
     void (*notify)(fwk_id_t service_id, int protocol_id, int message_id,
         const void *payload, size_t size);
+
+    /*!
+     * \brief Send an SCMI message
+     *
+     * \param scmi_message_id SCMI message identifier.
+     * \param scmi_protocol_id SCMI message protocol identifier.
+     * \param token SCMI message token.
+     * \param service_id SCMI service identifier.
+     * \param payload Payload data to write
+     * \param payload_size size of the payload in bytes.
+     * \param request_ack_by_interrupt flag to select whether acknowledgement
+     * interrupt is required for this message.
+     */
+    int (*scmi_send_message)(
+        uint8_t scmi_message_id,
+        uint8_t scmi_protocol_id,
+        uint8_t token,
+        fwk_id_t service_id,
+        const void *payload,
+        size_t payload_size,
+        bool request_ack_by_interrupt);
 };
 
 /*!
