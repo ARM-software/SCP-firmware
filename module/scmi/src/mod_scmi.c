@@ -437,6 +437,7 @@ static void scmi_notify(fwk_id_t id, int protocol_id, int message_id,
     const struct scmi_service_ctx *ctx, *p2a_ctx;
     uint32_t message_header;
     int status;
+    bool request_ack_by_interrupt;
 
     /*
      * The ID is the identifier of the service channel which
@@ -468,12 +469,58 @@ static void scmi_notify(fwk_id_t id, int protocol_id, int message_id,
         (uint8_t)protocol_id,
         0);
 
-    status =
-        p2a_ctx->transmit(p2a_ctx->transport_id, message_header, payload, size);
+    request_ack_by_interrupt = false;
+    status = p2a_ctx->transmit(
+        p2a_ctx->transport_id,
+        message_header,
+        payload,
+        size,
+        request_ack_by_interrupt);
     if (status != FWK_SUCCESS) {
         FWK_LOG_TRACE("[SCMI] %s @%d", __func__, __LINE__);
     }
 }
+
+int scmi_send_message(
+    uint8_t message_id,
+    uint8_t protocol_id,
+    uint8_t token,
+    fwk_id_t service_id,
+    const void *payload,
+    size_t payload_size,
+    bool request_ack_by_interrupt)
+{
+    /* All commands, synchronous or asynchronous, have a message type of 0 */
+    uint8_t message_type = 0;
+
+    /* Create the SCMI message header from the arguments */
+    uint32_t message_header =
+        scmi_message_header(message_id, message_type, protocol_id, token);
+
+    if (fwk_id_is_equal(service_id, FWK_ID_NONE)) {
+        return FWK_E_DATA;
+    }
+
+    /* Fetch scmi module context data using the service_id */
+    const struct mod_scmi_to_transport_api *transport_api;
+    const struct scmi_service_ctx *ctx;
+    ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(service_id)];
+
+    if (ctx == NULL) {
+        return FWK_E_DATA;
+    }
+
+    /* Initalize the transport api pointer to SMT module api */
+    transport_api = ctx->transport_api;
+
+    /* Send the SCMI message using the smt_transmit() API  */
+    return transport_api->transmit(
+        ctx->transport_id,
+        message_header,
+        payload,
+        payload_size,
+        request_ack_by_interrupt);
+};
 
 static const struct mod_scmi_from_protocol_api scmi_from_protocol_api = {
     .get_agent_count = get_agent_count,
@@ -483,6 +530,7 @@ static const struct mod_scmi_from_protocol_api scmi_from_protocol_api = {
     .write_payload = write_payload,
     .respond = respond,
     .notify = scmi_notify,
+    .scmi_send_message = scmi_send_message,
 };
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS

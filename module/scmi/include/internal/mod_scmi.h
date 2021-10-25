@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -41,8 +41,12 @@ struct scmi_service_ctx {
     /*
      * Copy of the pointer to the 'transmit' function within the transport API.
      */
-    int (*transmit)(fwk_id_t transport_id, uint32_t message_header,
-        const void *payload, size_t size);
+    int (*transmit)(
+        fwk_id_t transport_id,
+        uint32_t message_header,
+        const void *payload,
+        size_t size,
+        bool request_ack_by_interrupt);
 
     /* SCMI message token, used by the agent to identify individual messages */
     uint16_t scmi_token;
