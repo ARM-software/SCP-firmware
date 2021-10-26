@@ -27,6 +27,7 @@ enum core_pd_idx {
     CORE7_IDX
 };
 
+#if defined(PLATFORM_VARIANT) && (PLATFORM_VARIANT == TC0_VARIANT_STD)
 static struct mod_mpmm_pct_table k_pct[] = {
     { .cores_online = 4,
       .default_perf_limit = 1153 * 1000000UL,
@@ -114,6 +115,7 @@ static struct mod_mpmm_pct_table m_pct[] = {
                           },
                         } },
 };
+#endif
 
 static struct mod_mpmm_pct_table m_elp_pct[] = {
     { .cores_online = 1,
@@ -130,6 +132,7 @@ static struct mod_mpmm_pct_table m_elp_pct[] = {
                         } },
 };
 
+#if defined(PLATFORM_VARIANT) && (PLATFORM_VARIANT == TC0_VARIANT_STD)
 static const struct mod_mpmm_core_config k_core_config[] = {
     [0] = {
         .pd_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN, CORE0_IDX),
@@ -177,6 +180,7 @@ static const struct mod_mpmm_core_config m_core_config[] = {
         .core_starts_online = false,
         },
 };
+#endif
 
 static const struct mod_mpmm_core_config m_elp_core_config[] = {
     [0] = {
@@ -187,6 +191,7 @@ static const struct mod_mpmm_core_config m_elp_core_config[] = {
         },
 };
 
+#if defined(PLATFORM_VARIANT) && (PLATFORM_VARIANT == TC0_VARIANT_STD)
 static const struct mod_mpmm_domain_config k_domain_conf[] = {
     [0] = {
         .perf_id = FWK_ID_ELEMENT_INIT(
@@ -214,6 +219,7 @@ static const struct mod_mpmm_domain_config m_domain_conf[] = {
     },
     [1] = {0},
 };
+#endif
 
 static const struct mod_mpmm_domain_config m_elp_domain_conf[] = {
     [0] = {
@@ -230,6 +236,14 @@ static const struct mod_mpmm_domain_config m_elp_domain_conf[] = {
 };
 
 static const struct fwk_element element_table[] = {
+#if defined(PLATFORM_VARIANT) && (PLATFORM_VARIANT == TC0_VAR_EXPERIMENT_POWER)
+    [0] = {
+        .name = "MPMM_MATTERHORN_ELP_ARM_ELEM",
+        .sub_element_count = 1,
+        .data = m_elp_domain_conf,
+    },
+    [1] = { 0 },
+#else
     [0] = {
         .name = "MPMM_KLEIN_ELEM",
         .sub_element_count = 4,
@@ -246,6 +260,7 @@ static const struct fwk_element element_table[] = {
         .data = m_elp_domain_conf,
     },
     [3] = { 0 },
+#endif
 };
 
 static const struct fwk_element *mpmm_get_element_table(fwk_id_t module_id)
