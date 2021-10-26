@@ -87,7 +87,7 @@ RUN cwd=$PWD && mkdir "/opt/cppcheck" && cd "/opt/cppcheck" && \
         -DFILESDIR=/opt/cppcheck ./source && \
     cmake --build . -- install && cd $cwd && \
     echo 'export PATH=/opt/cppcheck/bin:${PATH}' >> \
-        "/etc/profile.d/50-scp-fimrware-env.sh"
+        "/etc/profile.d/50-scp-firmware-env.sh"
 
 ENV PATH="/opt/cppcheck/bin:${PATH}"
 
@@ -97,7 +97,7 @@ RUN cwd=$PWD && mkdir "/opt/iwyu" && cd "/opt/iwyu" && \
     ./iwyu-10 && cmake --build . && \
     cd bin && ln -s include-what-you-use iwyu && cd $cwd && \
     echo 'export PATH=/opt/iwyu/bin:${PATH}' >> \
-        "/etc/profile.d/50-scp-fimrware-env.sh"
+        "/etc/profile.d/50-scp-firmware-env.sh"
 
 ENV PATH="/opt/iwyu/bin:${PATH}"
 
