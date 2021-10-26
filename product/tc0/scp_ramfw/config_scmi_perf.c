@@ -135,6 +135,10 @@ static const struct mod_scmi_plugin_config plugins_table[] = {
         .id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_TRAFFIC_COP),
         .dom_type = PERF_PLUGIN_DOM_TYPE_PHYSICAL,
     },
+    [1] = {
+        .id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_MPMM),
+        .dom_type = PERF_PLUGIN_DOM_TYPE_PHYSICAL,
+    },
 };
 #endif
 const struct fwk_module_config config_scmi_perf = {

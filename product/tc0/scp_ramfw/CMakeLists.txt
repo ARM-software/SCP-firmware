@@ -40,6 +40,9 @@ if (SCP_PLATFORM_VARIANT STREQUAL "1")
     list(APPEND SCP_MODULES "traffic-cop")
     target_sources(tc0-bl2 PRIVATE "config_traffic_cop.c")
 
+    list(APPEND SCP_MODULES "mpmm")
+    target_sources(tc0-bl2 PRIVATE "config_mpmm.c")
+
 else()
     message(NOTICE "SCP_PLATFORM_VARIANT set to STANDARD (tc0-bl2)\n")
 
