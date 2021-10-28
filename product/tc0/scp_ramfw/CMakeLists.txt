@@ -49,6 +49,14 @@ if (SCP_PLATFORM_VARIANT STREQUAL "1")
     list(APPEND SCP_MODULES "reg-sensor")
     target_sources(tc0-bl2 PRIVATE "config_reg_sensor.c")
 
+    list(APPEND SCP_MODULES "thermal-mgmt")
+    target_sources(tc0-bl2 PRIVATE "config_thermal_mgmt.c")
+
+    list(APPEND SCP_MODULES "tc0-power-model")
+    list(PREPEND SCP_MODULE_PATHS
+        "${CMAKE_CURRENT_LIST_DIR}/../module/tc0_power_model")
+    target_sources(tc0-bl2 PRIVATE "config_tc0_power_model.c")
+
 else()
     message(NOTICE "SCP_PLATFORM_VARIANT set to STANDARD (tc0-bl2)\n")
 
