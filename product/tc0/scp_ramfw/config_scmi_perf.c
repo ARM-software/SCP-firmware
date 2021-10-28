@@ -139,8 +139,13 @@ static const struct mod_scmi_plugin_config plugins_table[] = {
         .id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_MPMM),
         .dom_type = PERF_PLUGIN_DOM_TYPE_PHYSICAL,
     },
+    [2] = {
+        .id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_THERMAL_MGMT),
+        .dom_type = PERF_PLUGIN_DOM_TYPE_FULL,
+    },
 };
 #endif
+
 const struct fwk_module_config config_scmi_perf = {
     .data = &((struct mod_scmi_perf_config) {
         .domains = &domains, .perf_doms_count = FWK_ARRAY_SIZE(domains),
