@@ -43,6 +43,12 @@ if (SCP_PLATFORM_VARIANT STREQUAL "1")
     list(APPEND SCP_MODULES "mpmm")
     target_sources(tc0-bl2 PRIVATE "config_mpmm.c")
 
+    list(APPEND SCP_MODULES "sensor")
+    target_sources(tc0-bl2 PRIVATE "config_sensor.c")
+
+    list(APPEND SCP_MODULES "reg-sensor")
+    target_sources(tc0-bl2 PRIVATE "config_reg_sensor.c")
+
 else()
     message(NOTICE "SCP_PLATFORM_VARIANT set to STANDARD (tc0-bl2)\n")
 
