@@ -13,7 +13,9 @@ ARG DOXYGEN_URL="https://sourceforge.net/projects/doxygen/files/rel-1.8.20/doxyg
 ARG CMAKE_URL="https://github.com/Kitware/CMake/releases/download/v3.18.3/cmake-3.18.3-Linux-x86_64.tar.gz"
 ARG AARCH64_GCC_URL="https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/9.2-2019.12/binrel/gcc-arm-9.2-2019.12-x86_64-aarch64-none-elf.tar.xz"
 ARG CPPCHECK_SRC_URL="git://github.com/danmar/cppcheck.git"
+ARG CPPCHECK_CHECKOUT_TAG = "1.90"
 ARG IWYU_SRC_URL="https://github.com/include-what-you-use/include-what-you-use.git"
+
 
 ENV ARMLMD_LICENSE_FILE=
 
@@ -79,7 +81,8 @@ RUN mkdir "/opt/aarch64-gcc" && \
 ENV PATH="/opt/aarch64-gcc/bin:${PATH}"
 
 RUN cwd=$PWD && mkdir "/opt/cppcheck" && cd "/opt/cppcheck" && \
-    git clone --depth 1 "${CPPCHECK_SRC_URL}" source && \
+    git clone --depth 1 --branch "${CPPCHECK_CHECKOUT_TAG}" \
+    "${CPPCHECK_SRC_URL}" source && \
     cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX=/opt/cppcheck \
         -DFILESDIR=/opt/cppcheck ./source && \
     cmake --build . -- install && cd $cwd && \
