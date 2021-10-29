@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -117,11 +117,11 @@ static struct mod_mpmm_pct_table m_pct[] = {
 
 static struct mod_mpmm_pct_table m_elp_pct[] = {
     { .cores_online = 1,
-      .default_perf_limit = 2621 * 1000000UL,
+      .default_perf_limit = 2612 * 1000000UL,
       .num_perf_limits = 2,
       .threshold_perf = { {
                               .threshold_bitmap = 0x2,
-                              .perf_limit = 2621 * 1000000UL,
+                              .perf_limit = 2612 * 1000000UL,
                           },
                           {
                               .threshold_bitmap = 0x1,
