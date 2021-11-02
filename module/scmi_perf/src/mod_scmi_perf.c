@@ -1189,7 +1189,7 @@ static int scmi_perf_describe_fast_channels(fwk_id_t service_id,
         goto exit;
     }
 
-    message_id = parameters->message_id;
+    message_id = (enum scmi_perf_command_id)parameters->message_id;
 
     switch (message_id) {
     case MOD_SCMI_PERF_LEVEL_GET:
