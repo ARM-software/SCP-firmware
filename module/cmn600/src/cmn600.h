@@ -1,12 +1,14 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
  *     Definitions and utility functions for the CMN600 module.
  */
+
+/* The use of "manager" may not be in sync with older versions of TRM */
 
 #ifndef CMN600_H
 #define CMN600_H
@@ -329,7 +331,7 @@ struct cmn600_sbsx_reg {
 };
 
 /*
- * Configuration slave registers
+ * Configuration manager registers
  */
 struct cmn600_cfgm_reg {
     FWK_R  uint64_t NODE_INFO;
@@ -648,7 +650,7 @@ unsigned int get_child_node_id(void *node_base, unsigned int child_index);
 /*
  * Retrieve the revision number of CMN-600.
  *
- * \param root Pointer to the CMN-600 configuration master register.
+ * \param root Pointer to the CMN-600 configuration manager register.
  *
  * \return CMN-600 revision as integer value.
  */

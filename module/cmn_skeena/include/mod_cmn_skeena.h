@@ -1,9 +1,11 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+
+/* The use of "manager" may not be in sync with older versions of TRM */
 
 #ifndef MOD_CMN_SKEENA_H
 #define MOD_CMN_SKEENA_H
@@ -198,7 +200,7 @@ struct mod_cmn_skeena_config {
     /*! Number of entries in the ::mod_cmn_skeena_config::mmap_table */
     size_t mmap_count;
 
-    /*! Table of RN-I node IDs with PCIe master connected */
+    /*! Table of RN-I node IDs with PCIe manager connected */
     const unsigned int *rni_pcie_table;
 
     /*! Number of entries in the ::mod_cmn_skeena_config::rni_pcie_table */

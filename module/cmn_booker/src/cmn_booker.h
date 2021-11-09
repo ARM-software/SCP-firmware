@@ -1,12 +1,14 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
  *     Definitions and utility functions for the CMN BOOKER module.
  */
+
+/* The use of "manager" may not be in sync with older versions of TRM */
 
 #ifndef CMN_BOOKER_H
 #define CMN_BOOKER_H
@@ -128,7 +130,7 @@ struct cmn_booker_hnf_reg {
 };
 
 /*
- * Configuration slave registers
+ * Configuration manager registers
  */
 struct cmn_booker_cfgm_reg {
     FWK_R  uint64_t NODE_INFO;
