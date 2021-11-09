@@ -1,12 +1,14 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
  *     DMC-500 driver
  */
+
+/* The use of "primary" may not be in sync with older versions of TRM */
 
 #include <mod_dmc500.h>
 #include <mod_timer.h>
@@ -206,7 +208,7 @@ static int dmc500_config(struct mod_dmc500_reg *dmc, fwk_id_t ddr_phy_id)
     dmc->REFRESH_PRIORITY = reg_val->REFRESH_PRIORITY;
     dmc->MC_UPDATE_CONTROL = reg_val->MC_UPDATE_CONTROL;
     dmc->PHY_UPDATE_CONTROL = reg_val->PHY_UPDATE_CONTROL;
-    dmc->PHY_MASTER_CONTROL = reg_val->PHY_MASTER_CONTROL;
+    dmc->PHY_PRIMARY_CONTROL = reg_val->PHY_PRIMARY_CONTROL;
     dmc->LOW_POWER_CONTROL = reg_val->LOW_POWER_CONTROL;
     dmc->PMU_QE_CONTROL = reg_val->PMU_QE_CONTROL;
     dmc->PMU_QE_MUX = reg_val->PMU_QE_MUX;

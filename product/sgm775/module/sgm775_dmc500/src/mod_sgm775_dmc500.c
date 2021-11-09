@@ -1,12 +1,14 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
  *     SGM775 DMC-500 module.
  */
+
+/* The use of "primary" may not be in sync with older versions of TRM */
 
 #include <mod_sgm775_dmc500.h>
 #include <mod_timer.h>
@@ -225,7 +227,7 @@ static int sgm775_dmc500_config(struct mod_sgm775_dmc500_reg *dmc,
     dmc->REFRESH_PRIORITY = 0x00000204;
     dmc->MC_UPDATE_CONTROL = 0x0000FF00;
     dmc->PHY_UPDATE_CONTROL = 0x15A3925F;
-    dmc->PHY_MASTER_CONTROL = 0x6875AF9A;
+    dmc->PHY_PRIMARY_CONTROL = 0x6875AF9A;
     dmc->LOW_POWER_CONTROL = 0x000E0801;
     dmc->PMU_QE_CONTROL = 0x00000C0D;
     dmc->PMU_QE_MUX = 0x05670023;
