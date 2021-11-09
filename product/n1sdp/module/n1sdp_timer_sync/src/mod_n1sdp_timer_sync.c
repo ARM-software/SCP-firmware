@@ -1,12 +1,14 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
  *      N1SDP Timer Synchronization Driver.
  */
+
+/* The use of "primary" may not be in sync with platform documentation */
 
 #include "n1sdp_scp_mmap.h"
 
@@ -117,7 +119,7 @@ void n1sdp_timer_reset_counter(struct tsync_device_ctx *ctx)
 /*
  * Timer sync module driver API
  */
-static int n1sdp_sync_master_timer(fwk_id_t id)
+static int n1sdp_sync_primary_timer(fwk_id_t id)
 {
     unsigned int retries;
     struct tsync_device_ctx *device_ctx;
@@ -175,7 +177,7 @@ static int n1sdp_sync_slave_timer(fwk_id_t id)
 }
 
 const struct n1sdp_timer_sync_api n1sdp_tsync_api = {
-    .master_sync = n1sdp_sync_master_timer,
+    .primary_sync = n1sdp_sync_primary_timer,
     .slave_sync = n1sdp_sync_slave_timer,
 };
 

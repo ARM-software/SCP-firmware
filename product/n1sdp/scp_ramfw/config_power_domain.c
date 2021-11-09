@@ -1,8 +1,13 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+/*
+ * The use of "primary" and "subordinate" may not be in sync with platform
+ * documentation
  */
 
 #include "config_power_domain.h"
@@ -81,8 +86,8 @@ struct fwk_element *element_table = NULL;
 struct mod_power_domain_element_config *pd_config_table = NULL;
 
 /*
- * The power domain tree view differs in master and slave chips in multichip
- * use case. In multichip scenario master SCP sees the power domains of both
+ * The power domain tree view differs in primary and slave chips in multichip
+ * use case. In multichip scenario primary SCP sees the power domains of both
  * local domains and slave chip's power domain as one single PD tree.
  * The view will look like:
  *

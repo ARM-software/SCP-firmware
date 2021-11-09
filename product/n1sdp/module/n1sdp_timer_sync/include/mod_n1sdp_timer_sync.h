@@ -1,12 +1,14 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
  *      N1SDP Timer Synchronization Device Driver.
  */
+
+/** The use of "primary" may not be in sync with platform documentation **/
 
 #ifndef MOD_N1SDP_TIMER_SYNC_H
 #define MOD_N1SDP_TIMER_SYNC_H
@@ -42,14 +44,14 @@ enum mod_n1sdp_timer_sync_api_idx {
  */
 struct n1sdp_timer_sync_api {
     /*!
-     * \brief API to trigger synchronization in master.
+     * \brief API to trigger synchronization in primary.
      *
      * \param id Identifier of the timer sync module.
      *
      * \retval ::FWK_SUCCESS If operation succeeds.
      * \return One of the possible error return codes.
      */
-    int (*master_sync)(fwk_id_t id);
+    int (*primary_sync)(fwk_id_t id);
     /*!
      * \brief API to trigger synchronization in slave.
      *
