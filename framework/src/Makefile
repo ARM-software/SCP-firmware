@@ -18,6 +18,7 @@ BS_LIB_SOURCES += fwk_module.c
 BS_LIB_SOURCES += fwk_ring.c
 BS_LIB_SOURCES += fwk_slist.c
 BS_LIB_SOURCES += fwk_status.c
+BS_LIB_SOURCES += fwk_string.c
 BS_LIB_SOURCES += fwk_thread_delayed_resp.c
 BS_LIB_SOURCES += fwk_time.c
 
