@@ -57,11 +57,11 @@ memleak:*framework/test/fwk_test.c:145
 // Cppcheck does not inspect these conditions deeply enough to know that the
 // dereference can only occur if the check succeeds
 nullPointerRedundantCheck:*framework/src/fwk_io.c
-nullPointerRedundantCheck:*product/sgm775/module/sgm775_dmc500/src/mod_sgm775_dmc500.c:76
+nullPointerRedundantCheck:*product/sgm775/module/sgm775_dmc500/src/mod_sgm775_dmc500.c:78
 nullPointerRedundantCheck:*product/rcar/module/rcar_reg_sensor/src/mod_rcar_reg_sensor.c:143
-nullPointerRedundantCheck:*module/dmc500/src/mod_dmc500.c:58
-nullPointerRedundantCheck:*module/dmc500/src/mod_dmc500.c:59
-nullPointerRedundantCheck:*module/dmc500/src/mod_dmc500.c:63
+nullPointerRedundantCheck:*module/dmc500/src/mod_dmc500.c:60
+nullPointerRedundantCheck:*module/dmc500/src/mod_dmc500.c:61
+nullPointerRedundantCheck:*module/dmc500/src/mod_dmc500.c:65
 nullPointerRedundantCheck:*module/mhu2/src/mod_mhu2.c:74
 nullPointerRedundantCheck:*module/pl011/src/mod_pl011.c:139
 nullPointerRedundantCheck:*module/pl011/src/mod_pl011.c:140
