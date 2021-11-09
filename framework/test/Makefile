@@ -34,6 +34,7 @@ TESTS += test_fwk_multi_thread_util
 TESTS += test_fwk_notification
 TESTS += test_fwk_ring
 TESTS += test_fwk_ring_init
+TESTS += test_fwk_string
 TESTS += test_fwk_thread
 
 COMMON_SRC := fwk_arch.c
@@ -46,6 +47,7 @@ COMMON_SRC += fwk_mm.c
 COMMON_SRC += fwk_module.c
 COMMON_SRC += fwk_ring.c
 COMMON_SRC += fwk_slist.c
+COMMON_SRC += fwk_string.c
 COMMON_SRC += fwk_test.c
 COMMON_SRC += fwk_thread_delayed_resp.c
 COMMON_SRC += fwk_time.c
@@ -77,6 +79,7 @@ test_fwk_multi_thread_util_SRC += fwk_multi_thread.c
 test_fwk_notification_SRC += fwk_thread.c
 test_fwk_ring_SRC += fwk_thread.c
 test_fwk_ring_init_SRC += fwk_thread.c
+test_fwk_string_SRC += fwk_thread.c
 test_fwk_thread_SRC += fwk_thread.c
 
 test_fwk_module_SRC += fwk_notification.c
