@@ -1,9 +1,11 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+
+/* The use of "primary" may not be in sync with platform documentation */
 
 #ifndef INTERNAL_TIMER_SYNC_H
 #define INTERNAL_TIMER_SYNC_H
@@ -16,7 +18,7 @@
  * \brief Timer Synchronization Register Definitions
  */
 struct timer_sync_reg {
-    /*! Master Generic Counter Synchronization Control Register */
+    /*! Primary Generic Counter Synchronization Control Register */
     FWK_RW uint32_t MST_GCNT_SYNC_CTRL;
 
     /*! Slave Generic Counter Synchronization Control Register */

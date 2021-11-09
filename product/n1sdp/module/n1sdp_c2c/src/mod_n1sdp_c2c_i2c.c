@@ -8,6 +8,8 @@
  *     N1SDP SCP to SCP I2C communications protocol driver
  */
 
+/* The use of "primary" may not be in sync with older versions of TRM */
+
 #include "config_clock.h"
 #include "n1sdp_core.h"
 
@@ -486,7 +488,7 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_secondary)
         break;
 
     case N1SDP_C2C_CMD_TIMER_SYNC:
-        status = n1sdp_c2c_ctx.tsync_api->master_sync(
+        status = n1sdp_c2c_ctx.tsync_api->primary_sync(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_N1SDP_TIMER_SYNC, 0));
         if (status != FWK_SUCCESS) {
             FWK_LOG_INFO("[C2C] Error!");
