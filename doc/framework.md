@@ -1,6 +1,6 @@
 # Framework Guide
 
-Copyright (c) 2011-2020, Arm Limited. All rights reserved.
+Copyright (c) 2011-2022, Arm Limited. All rights reserved.
 
 This guide covers the framework that is used to implement the SCP/MCP Software
 and which can also be used to extend the provided implementation. Each of the
@@ -519,9 +519,9 @@ allowed to bind to it, so that only a Hardware Abstraction Layer (HAL) module
 can utilize the driver.
 
 Alternatively, a driver that is of the *service* type may choose to restrict the
-service it provides to only a whitelisted set of modules within the firmware. In
+service it provides to only a allowlisted set of modules within the firmware. In
 this case the driver module can compare the identifier of the module that is
-attempting binding with its whitelist and accept or reject the bind request as
+attempting binding with its allowlist and accept or reject the bind request as
 appropriate.
 
 If a binding request is rejected then the framework will consider that an error
