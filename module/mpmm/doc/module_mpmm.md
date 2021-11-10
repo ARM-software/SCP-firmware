@@ -1,5 +1,5 @@
 \ingroup GroupModules Modules
-\defgroup GroupMPMM HAL
+\defgroup GroupMPMM Max Power Mitigation Mechanism (MPMM)
 
 Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
 
