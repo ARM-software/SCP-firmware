@@ -15,7 +15,7 @@
 
 /*!
  * \ingroup GroupModules
- *  \defgroup GroupMpmm Max Power Mitigation Mechanism (MPMM)
+ *  \defgroup GroupMPMM Max Power Mitigation Mechanism (MPMM)
  * \{
  */
 
