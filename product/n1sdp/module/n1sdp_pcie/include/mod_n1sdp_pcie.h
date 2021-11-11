@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -50,16 +50,16 @@ struct n1sdp_pcie_dev_config {
     uintptr_t msg_base;
 
     /*!
-     * Base address of the PCIe AXI slave memory region (within 32-bit address
-     * space). This region holds the ECAM space, MMIO32 & IO space.
+     * Base address of the PCIe AXI subordinate memory region (within 32-bit
+     * address space). This region holds the ECAM space, MMIO32 & IO space.
      */
-    uint32_t axi_slave_base32;
+    uint32_t axi_subordinate_base32;
 
     /*!
-     * Base address of the PCIe AXI slave memory region (in 64-bit address
+     * Base address of the PCIe AXI subordinate memory region (in 64-bit address
      * space). This region holds the MMIO64 space.
      */
-    uint64_t axi_slave_base64;
+    uint64_t axi_subordinate_base64;
 
     /*! Identifier to indicate if the PCIe controller is CCIX capable */
     bool ccix_capable;

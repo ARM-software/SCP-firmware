@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -213,7 +213,7 @@ void pcie_bus_enumeration(struct n1sdp_pcie_dev_config *config)
 {
     fwk_assert(config != NULL);
 
-    uint32_t ecam_base_addr = config->axi_slave_base32;
+    uint32_t ecam_base_addr = config->axi_subordinate_base32;
     uint8_t pri_bnum, sec_bnum, sub_bnum;
     struct bdf_table *table;
 
