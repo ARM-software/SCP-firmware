@@ -19,11 +19,11 @@
 
 static const struct fwk_element voltage_domain_element_table[] = {
     [0] = {
-        .name = "USB",
+        .name = "DUMMY_VOLTD",
         .data = &((const struct mod_voltd_dev_config){
         .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_MOCK_VOLTAGE_DOMAIN,
-                CONFIG_MOCK_VOLTAGE_DOMAIN_ELEMENT_IDX_USB),
+                CONFIG_MOCK_VOLTAGE_DOMAIN_ELEMENT_IDX_DUMMY),
         .api_id = FWK_ID_API_INIT(
                 FWK_MODULE_IDX_MOCK_VOLTAGE_DOMAIN,
                 MOD_MOCK_VOLTAGE_DOMAIN_API_IDX_VOLTD),
