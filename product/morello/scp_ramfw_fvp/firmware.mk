@@ -9,7 +9,6 @@
 #
 
 BS_FIRMWARE_CPU := cortex-m7
-BS_FIRMWARE_HAS_MULTITHREADING := yes
 BS_FIRMWARE_HAS_NOTIFICATION := yes
 BS_FIRMWARE_USE_NEWLIB_NANO_SPECS := yes
 
@@ -49,7 +48,6 @@ BS_FIRMWARE_MODULES := \
     resource_perms
 
 BS_FIRMWARE_SOURCES := \
-    rtx_config.c \
     morello_core.c \
     config_armv7m_mpu.c \
     config_ssc.c \
