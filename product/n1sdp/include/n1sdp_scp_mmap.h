@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -103,16 +103,16 @@
 #define CCIX_MSG_CFG_REG_SCP_BASE    UINT32_C(0x82850000)
 
 /*
- * PCIe and CCIX Slave AXI space visible to SCP
+ * PCIe and CCIX Subordinate AXI space visible to SCP
  */
-#define PCIE_AXI_SLAVE_SCP_BASE      UINT32_C(0x90000000)
-#define CCIX_AXI_SLAVE_SCP_BASE      UINT32_C(0x88000000)
+#define PCIE_AXI_SUBORDINATE_SCP_BASE UINT32_C(0x90000000)
+#define CCIX_AXI_SUBORDINATE_SCP_BASE UINT32_C(0x88000000)
 
 /*
- * PCIe and CCIX Slave AXI in 64-bit space visible to AP
+ * PCIe and CCIX Subordinate AXI in 64-bit space visible to AP
  */
-#define PCIE_AXI64_SLAVE_AP_BASE     UINT64_C(0x900000000)
-#define CCIX_AXI64_SLAVE_AP_BASE     UINT64_C(0x2900000000)
+#define PCIE_AXI64_SUBORDINATE_AP_BASE UINT64_C(0x900000000)
+#define CCIX_AXI64_SUBORDINATE_AP_BASE UINT64_C(0x2900000000)
 
 /*
  * 1MB window into AP memory space

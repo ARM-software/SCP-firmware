@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -232,7 +232,7 @@ static int pcie_configure(void)
             return status;
         }
 
-        /* AXI4 Slave - Translation: PCI ECAM support */
+        /* AXI4 Subordinate - Translation: PCI ECAM support */
         status = pcie_add_translation_table_entry(
             &PCIE_ROOT->ATR_AXI4_SLV0[1],
             PCI_ECAM_BASE,
@@ -243,7 +243,7 @@ static int pcie_configure(void)
             return status;
         }
 
-        /* AXI4 Slave - Translation: PCI IO support */
+        /* AXI4 Subordinate - Translation: PCI IO support */
         status = pcie_add_translation_table_entry(
             &PCIE_ROOT->ATR_AXI4_SLV0[2],
             PCI_IO_BASE,
@@ -254,7 +254,7 @@ static int pcie_configure(void)
             return status;
         }
 
-        /* AXI4 Slave - Translation: PCI MEM32 support */
+        /* AXI4 Subordinate - Translation: PCI MEM32 support */
         status = pcie_add_translation_table_entry(
             &PCIE_ROOT->ATR_AXI4_SLV0[3],
             PCI_MEM32_BASE,
@@ -265,7 +265,7 @@ static int pcie_configure(void)
             return status;
         }
 
-        /* AXI4 Slave - Translation: PCI MEM64 support */
+        /* AXI4 Subordinate - Translation: PCI MEM64 support */
         status = pcie_add_translation_table_entry(
             &PCIE_ROOT->ATR_AXI4_SLV0[4],
             PCI_MEM64_BASE,

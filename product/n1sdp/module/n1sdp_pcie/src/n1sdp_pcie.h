@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -162,7 +162,7 @@
 #define AXI_IO_SIZE                    (16 * FWK_MIB)
 
 /*
- * PCIe AXI slave ECAM memory mapping
+ * PCIe AXI subordinate ECAM memory mapping
  */
 #define PCIE_AXI_ECAM_TYPE0_OFFSET     UINT32_C(0)
 
@@ -170,24 +170,22 @@
                                            AXI_ECAM_TYPE0_SIZE)
 
 /*
- * CCIX AXI slave ECAM memory mapping
+ * CCIX AXI subordinate ECAM memory mapping
  */
 #define CCIX_AXI_ECAM_TYPE0_OFFSET     UINT32_C(0)
 
 #define CCIX_AXI_ECAM_TYPE1_OFFSET     (CCIX_AXI_ECAM_TYPE0_OFFSET + \
                                            AXI_ECAM_TYPE0_SIZE)
 
-/* PCIe AXI slave MMIO32 & IO offset addresses */
-#define PCIE_AXI_MMIO32_OFFSET         (PCIE_AXI_ECAM_TYPE1_OFFSET + \
-                                            AXI_ECAM_TYPE1_SIZE)
-#define PCIE_AXI_IO_OFFSET             (PCIE_AXI_MMIO32_OFFSET + \
-                                            AXI_MMIO32_SIZE)
+/* PCIe AXI subordinate MMIO32 & IO offset addresses */
+#define PCIE_AXI_MMIO32_OFFSET \
+    (PCIE_AXI_ECAM_TYPE1_OFFSET + AXI_ECAM_TYPE1_SIZE)
+#define PCIE_AXI_IO_OFFSET (PCIE_AXI_MMIO32_OFFSET + AXI_MMIO32_SIZE)
 
-/* CCIX AXI slave MMIO32 & IO offset addresses */
-#define CCIX_AXI_MMIO32_OFFSET         (CCIX_AXI_ECAM_TYPE1_OFFSET + \
-                                            AXI_ECAM_TYPE1_SIZE)
-#define CCIX_AXI_IO_OFFSET             (CCIX_AXI_MMIO32_OFFSET + \
-                                            AXI_MMIO32_SIZE)
+/* CCIX AXI subordinate MMIO32 & IO offset addresses */
+#define CCIX_AXI_MMIO32_OFFSET \
+    (CCIX_AXI_ECAM_TYPE1_OFFSET + AXI_ECAM_TYPE1_SIZE)
+#define CCIX_AXI_IO_OFFSET (CCIX_AXI_MMIO32_OFFSET + AXI_MMIO32_SIZE)
 
 /* AXI inbound region data */
 #define AXI_IB_REGION_BASE             UINT64_C(0)

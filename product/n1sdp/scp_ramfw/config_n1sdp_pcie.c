@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -22,8 +22,8 @@ static const struct fwk_element n1sdp_pcie_element_table[] = {
             .ctrl_base = PCIE_IP_CFG_REG_SCP_BASE,
             .global_config_base = PCIE_RC_CFG_REG_SCP_BASE,
             .msg_base = PCIE_MSG_CFG_REG_SCP_BASE,
-            .axi_slave_base32 = PCIE_AXI_SLAVE_SCP_BASE,
-            .axi_slave_base64 = PCIE_AXI64_SLAVE_AP_BASE,
+            .axi_subordinate_base32 = PCIE_AXI_SUBORDINATE_SCP_BASE,
+            .axi_subordinate_base64 = PCIE_AXI64_SUBORDINATE_AP_BASE,
             .ccix_capable = false,
         }),
     },
@@ -33,8 +33,8 @@ static const struct fwk_element n1sdp_pcie_element_table[] = {
             .ctrl_base = CCIX_IP_CFG_REG_SCP_BASE,
             .global_config_base = CCIX_RC_CFG_REG_SCP_BASE,
             .msg_base = CCIX_MSG_CFG_REG_SCP_BASE,
-            .axi_slave_base32 = CCIX_AXI_SLAVE_SCP_BASE,
-            .axi_slave_base64 = CCIX_AXI64_SLAVE_AP_BASE,
+            .axi_subordinate_base32 = CCIX_AXI_SUBORDINATE_SCP_BASE,
+            .axi_subordinate_base64 = CCIX_AXI64_SUBORDINATE_AP_BASE,
             .ccix_capable = true,
         }),
     },

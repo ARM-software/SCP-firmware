@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+/* The use of "subordinate" may not be in sync with the PCIe standard */
+
 #include "config_clock.h"
 #include "n1sdp_core.h"
 #include "n1sdp_pcie.h"
@@ -429,15 +431,16 @@ static int n1sdp_pcie_rc_setup(fwk_id_t id)
 
     FWK_LOG_INFO("[%s] Setup Type0 configuration...", pcie_type[did]);
     if (dev_ctx->config->ccix_capable)
-        ecam_base_addr = dev_ctx->config->axi_slave_base32 +
-                         CCIX_AXI_ECAM_TYPE0_OFFSET;
+        ecam_base_addr = dev_ctx->config->axi_subordinate_base32 +
+            CCIX_AXI_ECAM_TYPE0_OFFSET;
     else
-        ecam_base_addr = dev_ctx->config->axi_slave_base32 +
-                         PCIE_AXI_ECAM_TYPE0_OFFSET;
-    status = axi_outbound_region_setup(dev_ctx->rc_axi_config_apb,
-                 (ecam_base_addr - SCP_AP_AXI_OFFSET),
-                 __builtin_ctz(AXI_ECAM_TYPE0_SIZE),
-                 TRANS_TYPE_0_CFG);
+        ecam_base_addr = dev_ctx->config->axi_subordinate_base32 +
+            PCIE_AXI_ECAM_TYPE0_OFFSET;
+    status = axi_outbound_region_setup(
+        dev_ctx->rc_axi_config_apb,
+        (ecam_base_addr - SCP_AP_AXI_OFFSET),
+        __builtin_ctz(AXI_ECAM_TYPE0_SIZE),
+        TRANS_TYPE_0_CFG);
     if (status != FWK_SUCCESS) {
         FWK_LOG_INFO("[%s] Error!", pcie_type[did]);
         return status;
@@ -446,16 +449,17 @@ static int n1sdp_pcie_rc_setup(fwk_id_t id)
 
     FWK_LOG_INFO("[%s] Setup Type1 configuration...", pcie_type[did]);
     if (dev_ctx->config->ccix_capable) {
-        ecam_base_addr = dev_ctx->config->axi_slave_base32 +
-                         CCIX_AXI_ECAM_TYPE1_OFFSET;
+        ecam_base_addr = dev_ctx->config->axi_subordinate_base32 +
+            CCIX_AXI_ECAM_TYPE1_OFFSET;
     } else {
-        ecam_base_addr = dev_ctx->config->axi_slave_base32 +
-                         PCIE_AXI_ECAM_TYPE1_OFFSET;
+        ecam_base_addr = dev_ctx->config->axi_subordinate_base32 +
+            PCIE_AXI_ECAM_TYPE1_OFFSET;
     }
-    status = axi_outbound_region_setup(dev_ctx->rc_axi_config_apb,
-                 (ecam_base_addr - SCP_AP_AXI_OFFSET),
-                 __builtin_ctz(AXI_ECAM_TYPE1_SIZE),
-                 TRANS_TYPE_1_CFG);
+    status = axi_outbound_region_setup(
+        dev_ctx->rc_axi_config_apb,
+        (ecam_base_addr - SCP_AP_AXI_OFFSET),
+        __builtin_ctz(AXI_ECAM_TYPE1_SIZE),
+        TRANS_TYPE_1_CFG);
     if (status != FWK_SUCCESS) {
         FWK_LOG_INFO("[%s] Error!", pcie_type[did]);
         return status;
@@ -464,16 +468,17 @@ static int n1sdp_pcie_rc_setup(fwk_id_t id)
 
     FWK_LOG_INFO("[%s] Setup MMIO32 configuration...", pcie_type[did]);
     if (dev_ctx->config->ccix_capable) {
-        ecam_base_addr = dev_ctx->config->axi_slave_base32 +
-                             CCIX_AXI_MMIO32_OFFSET;
+        ecam_base_addr =
+            dev_ctx->config->axi_subordinate_base32 + CCIX_AXI_MMIO32_OFFSET;
     } else {
-        ecam_base_addr = dev_ctx->config->axi_slave_base32 +
-                             PCIE_AXI_MMIO32_OFFSET;
+        ecam_base_addr =
+            dev_ctx->config->axi_subordinate_base32 + PCIE_AXI_MMIO32_OFFSET;
     }
-    status = axi_outbound_region_setup(dev_ctx->rc_axi_config_apb,
-                 (ecam_base_addr - SCP_AP_AXI_OFFSET),
-                 __builtin_ctz(AXI_MMIO32_SIZE),
-                 TRANS_TYPE_MEM_IO);
+    status = axi_outbound_region_setup(
+        dev_ctx->rc_axi_config_apb,
+        (ecam_base_addr - SCP_AP_AXI_OFFSET),
+        __builtin_ctz(AXI_MMIO32_SIZE),
+        TRANS_TYPE_MEM_IO);
     if (status != FWK_SUCCESS) {
         FWK_LOG_INFO("[%s] Error!", pcie_type[did]);
         return status;
@@ -482,11 +487,11 @@ static int n1sdp_pcie_rc_setup(fwk_id_t id)
 
     FWK_LOG_INFO("[%s] Setup IO configuration...", pcie_type[did]);
     if (dev_ctx->config->ccix_capable) {
-        ecam_base_addr = dev_ctx->config->axi_slave_base32 +
-                             CCIX_AXI_IO_OFFSET;
+        ecam_base_addr =
+            dev_ctx->config->axi_subordinate_base32 + CCIX_AXI_IO_OFFSET;
     } else {
-        ecam_base_addr = dev_ctx->config->axi_slave_base32 +
-                             PCIE_AXI_IO_OFFSET;
+        ecam_base_addr =
+            dev_ctx->config->axi_subordinate_base32 + PCIE_AXI_IO_OFFSET;
     }
     status = axi_outbound_region_setup(dev_ctx->rc_axi_config_apb,
                  (ecam_base_addr - SCP_AP_AXI_OFFSET),
@@ -499,10 +504,11 @@ static int n1sdp_pcie_rc_setup(fwk_id_t id)
     FWK_LOG_INFO("[%s] Done", pcie_type[did]);
 
     FWK_LOG_INFO("[CCIX] [%s] Setup MMIO64 configuration...", pcie_type[did]);
-    status = axi_outbound_region_setup(dev_ctx->rc_axi_config_apb,
-                 dev_ctx->config->axi_slave_base64,
-                 __builtin_ctz(AXI_MMIO64_SIZE),
-                 TRANS_TYPE_MEM_IO);
+    status = axi_outbound_region_setup(
+        dev_ctx->rc_axi_config_apb,
+        dev_ctx->config->axi_subordinate_base64,
+        __builtin_ctz(AXI_MMIO64_SIZE),
+        TRANS_TYPE_MEM_IO);
     if (status != FWK_SUCCESS) {
         FWK_LOG_INFO("[%s] Error!", pcie_type[did]);
         return status;
@@ -597,7 +603,7 @@ static int n1sdp_pcie_vc1_setup(fwk_id_t id, uint8_t vc1_tc)
     *(volatile uint32_t *)(config_base_addr + PCIE_DEV_CTRL_STATUS_OFFSET) |=
         (0x2 << PCIE_DEV_CTRL_MAX_PAYLOAD_SHIFT);
 
-    config_base_addr = dev_ctx->config->axi_slave_base32 + 0x100000;
+    config_base_addr = dev_ctx->config->axi_subordinate_base32 + 0x100000;
 
     FWK_LOG_INFO(
         "[CCIX] Enabling VC1 in EP 0x%" PRIX32 "...", config_base_addr);
@@ -778,8 +784,11 @@ static int n1sdp_pcie_start(fwk_id_t id)
         id);
 }
 
-static int n1sdp_pcie_process_bind_request(fwk_id_t requester_id,
-    fwk_id_t target_id, fwk_id_t api_id, const void **api)
+static int n1sdp_pcie_process_bind_request(
+    fwk_id_t requester_id,
+    fwk_id_t subordinate_id,
+    fwk_id_t api_id,
+    const void **api)
 {
     switch (fwk_id_get_api_idx(api_id)) {
     case N1SDP_PCIE_API_IDX_PCIE_INIT:
