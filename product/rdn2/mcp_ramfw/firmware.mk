@@ -9,7 +9,6 @@
 #
 
 BS_FIRMWARE_CPU := cortex-m7
-BS_FIRMWARE_HAS_MULTITHREADING := yes
 BS_FIRMWARE_HAS_NOTIFICATION := yes
 BS_FIRMWARE_MODULE_HEADERS_ONLY := \
     power_domain \
@@ -25,7 +24,6 @@ BS_FIRMWARE_MODULES := \
     mcp_platform
 
 BS_FIRMWARE_SOURCES := \
-    rtx_config.c \
     config_armv7m_mpu.c \
     config_clock.c \
     config_pl011.c \

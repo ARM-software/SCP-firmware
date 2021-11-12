@@ -29,17 +29,11 @@ target_include_directories(
 
 target_sources(
     rdn2-mcp-bl2
-    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_armv7m_mpu.c"
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_armv7m_mpu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_pl011.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_gtimer.c")
-
-if(SCP_ENABLE_MULTITHREADING)
-    target_sources(rdn2-mcp-bl2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c")
-    target_link_libraries(rdn2-mcp-bl2 PRIVATE cmsis::rtos2-rtx)
-endif()
 
 if(SCP_ENABLE_DEBUGGER_INIT)
     target_compile_definitions(rdn2-mcp-bl2 PRIVATE BUILD_HAS_DEBUGGER)
