@@ -253,6 +253,28 @@ static crg11_state_t crg11_state[CONFIG_SOC_CRG11_NUM] = {
     }
 };
 
+int synquacer_shutdown(void)
+{
+    volatile uint32_t *gpio = (uint32_t *)CONFIG_SOC_AP_GPIO_BASE;
+    int status;
+
+    /* set PD[9] high to turn off the ATX power supply */
+    gpio[5] |= 0x2; /* set GPIO direction to output */
+    __DSB();
+    status = synquacer_system_ctx.timer_api->delay(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+        10);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR("[SYNQUACER SYSTEM] timer_api->delay error(%d).", status);
+    }
+    gpio[1] |= 0x2; /* set high */
+
+    for (;;) {
+        __WFI();
+    }
+}
+
+
 void crg11_soft_reset(uint8_t crg11_id)
 {
     writel(CRG11_CRSWR(crg11_state[crg11_id].reg_addr), 1);
@@ -262,11 +284,12 @@ static void fw_system_reset(void)
 {
     crg11_soft_reset(CONFIG_SCB_CRG11_ID_PERI);
 
-    for (;;)
+    for (;;) {
         __WFI();
+    }
 }
 
-int reboot_chip(void)
+int synquacer_reboot_chip(void)
 {
     FWK_LOG_INFO("[SYNQUACER SYSTEM] HSSPI exit start.");
     synquacer_system_ctx.hsspi_api->hsspi_exit();
