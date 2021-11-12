@@ -20,7 +20,6 @@ target_include_directories(
 target_sources(
     tc0-bl2
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_system_power.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_armv7m_mpu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_pl011.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_power_domain.c"
@@ -45,12 +44,6 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_css_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_power_domain.c")
-
-
-if(SCP_ENABLE_MULTITHREADING)
-    target_sources(tc0-bl2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c")
-    target_link_libraries(tc0-bl2 PRIVATE cmsis::rtos2-rtx)
-endif()
 
 if(SCP_ENABLE_RESOURCE_PERMISSIONS)
     target_sources(tc0-bl2 PRIVATE "config_resource_perms.c")
