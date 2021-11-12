@@ -20,7 +20,6 @@ target_include_directories(
 target_sources(
     rdv1mc-bl2
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_system_power.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_armv7m_mpu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_power_domain.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_ppu_v1.c"
@@ -41,12 +40,6 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_system_info.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_pl011.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_sid.c")
-
-
-if(SCP_ENABLE_MULTITHREADING)
-    target_sources(rdv1mc-bl2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c")
-    target_link_libraries(rdv1mc-bl2 PRIVATE cmsis::rtos2-rtx)
-endif()
 
 #
 # Some of our firmware includes require CMSIS.
