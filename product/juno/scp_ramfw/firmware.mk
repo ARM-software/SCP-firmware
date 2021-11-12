@@ -9,7 +9,6 @@
 #
 
 BS_FIRMWARE_CPU := cortex-m3
-BS_FIRMWARE_HAS_MULTITHREADING := no
 BS_FIRMWARE_HAS_NOTIFICATION := yes
 BS_FIRMWARE_HAS_SCMI_NOTIFICATIONS := no
 BS_FIRMWARE_HAS_FAST_CHANNELS := no
@@ -105,10 +104,6 @@ BS_FIRMWARE_SOURCES := \
     config_juno_thermal.c \
     config_scmi_power_domain.c \
     juno_scmi_clock.c
-
-ifeq ($(BS_FIRMWARE_HAS_MULTITHREADING),yes)
-    BS_FIRMWARE_SOURCES += rtx_config.c
-endif
 
 ifeq ($(BS_FIRMWARE_HAS_DEBUG_UNIT),yes)
     BS_FIRMWARE_SOURCES += config_juno_debug.c config_debug.c
