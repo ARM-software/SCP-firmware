@@ -61,13 +61,6 @@ if(SCP_ENABLE_RESOURCE_PERMISSIONS)
         PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_resource_perms.c")
 endif()
 
-if(SCP_ENABLE_MULTITHREADING)
-    target_sources(sgm775-bl2
-                   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c")
-
-    target_link_libraries(sgm775-bl2 PRIVATE cmsis::rtos2-rtx)
-endif()
-
 #
 # Some of our firmware includes require CMSIS.
 #
