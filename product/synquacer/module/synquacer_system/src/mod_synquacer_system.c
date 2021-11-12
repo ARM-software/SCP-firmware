@@ -27,7 +27,8 @@ enum synquacer_system_event {
     SYNQUACER_SYSTEM_EVENT_COUNT
 };
 
-int reboot_chip(void);
+int synquacer_reboot_chip(void);
+int synquacer_shutdown(void);
 void power_domain_reboot(void);
 void main_initialize(void);
 int synquacer_main(void);
@@ -39,9 +40,18 @@ int synquacer_main(void);
 static int synquacer_system_shutdown(
     enum mod_pd_system_shutdown system_shutdown)
 {
-    FWK_LOG_INFO("[SYNQUACER SYSTEM] requesting synquacer system_shutdown");
-
-    reboot_chip();
+    switch (system_shutdown) {
+    case MOD_PD_SYSTEM_SHUTDOWN:
+        FWK_LOG_INFO("[SYNQUACER SYSTEM] system is shutting down");
+        synquacer_shutdown();
+        break;
+    case MOD_PD_SYSTEM_COLD_RESET:
+        FWK_LOG_INFO("[SYNQUACER SYSTEM] system is cold reset");
+        synquacer_reboot_chip();
+        break;
+    default:
+        return FWK_E_SUPPORT;
+    }
 
     return FWK_E_DEVICE;
 }
