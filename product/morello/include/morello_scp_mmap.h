@@ -167,6 +167,8 @@
 #define SCP_SSC_BASE (SCP_SYS1_BASE + 0x2A420000)
 #define SCP_REFCLK_CNTCONTROL_BASE (SCP_SYS1_BASE + 0x2A430000)
 
+/* Base address of AP-SCP mailbox for non-secure access */
+#define SCP_AP_BASE_NS_MAILBOX_SRAM (SCP_NONTRUSTED_RAM_BASE)
 /*
  * Base addresses of MHU devices
  */
