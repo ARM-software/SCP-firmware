@@ -6,7 +6,6 @@
 #
 
 BS_FIRMWARE_CPU := cortex-m3
-BS_FIRMWARE_HAS_MULTITHREADING := no
 BS_FIRMWARE_HAS_NOTIFICATION := yes
 BS_FIRMWARE_HAS_RESOURCE_PERMISSIONS := yes
 BS_FIRMWARE_USE_NEWLIB_NANO_SPECS := yes
@@ -42,7 +41,6 @@ endif
 
 BS_FIRMWARE_SOURCES := \
     config_system_power.c \
-    rtx_config.c \
     config_armv7m_mpu.c \
     config_pl011.c \
     config_power_domain.c \
