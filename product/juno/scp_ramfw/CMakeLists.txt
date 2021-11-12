@@ -54,11 +54,6 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/juno_id.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/juno_scmi_clock.c")
 
-if(SCP_ENABLE_MULTITHREADING)
-    target_sources(juno-bl2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c")
-    target_link_libraries(juno-bl2 PRIVATE cmsis::rtos2-rtx)
-endif()
-
 if(SCP_ENABLE_DEBUG_UNIT)
     target_sources(
         juno-bl2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_debug.c"
