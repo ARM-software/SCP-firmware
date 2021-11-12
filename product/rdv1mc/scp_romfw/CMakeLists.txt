@@ -25,11 +25,6 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_sid.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_bootloader.c")
 
-if(SCP_ENABLE_MULTITHREADING)
-    target_sources(rdv1mc-bl1 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c")
-    target_link_libraries(rdv1mc-bl1 PRIVATE cmsis::rtos2-rtx)
-endif()
-
 #
 # Some of our firmware includes require CMSIS.
 #
