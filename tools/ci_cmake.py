@@ -16,6 +16,8 @@ import os
 import signal
 import subprocess
 import sys
+from product import Product, Build, Parameter
+from typing import List, Tuple
 
 from docker.errors import DockerException
 
@@ -28,42 +30,23 @@ code_validations = [
     check_framework,
 ]
 
-build_types = [
-    'debug',
-    'release',
-]
-
-toolchains = [
-    'GNU',
-    'ArmClang',
-]
-
 products = [
-    'host',
-    'juno',
-    'morello',
-    'n1sdp',
-    'rdv1',
-    'rdv1mc',
-    'rdn1e1',
-    'sgi575',
-    'sgm775',
-    'sgm776',
-    'synquacer',
-    'tc0',
-    'rcar',
-    'rdn2',
+    Product('host', toolchains=[Parameter('GNU')]),
+    Product('juno'),
+    Product('morello'),
+    Product('n1sdp'),
+    Product('rdv1'),
+    Product('rdv1mc'),
+    Product('rdn1e1'),
+    Product('sgi575'),
+    Product('sgm775'),
+    Product('sgm776'),
+    Product('synquacer'),
+    Product('tc0'),
+    Product('tc1'),
+    Product('rcar', toolchains=[Parameter('GNU')]),
+    Product('rdn2', variants=[Parameter('0')]),
 ]
-
-platform_variant = {
-    'rdn2': [
-        '0'
-    ],
-}
-
-
-def prod_variant(variant):
-    return 'EXTRA_CONFIG_ARGS+=-DSCP_PLATFORM_VARIANT={}'.format(variant)
 
 
 def banner(text):
@@ -99,86 +82,53 @@ def dockerize(client):
     signal.signal(signal.SIGINT, sigint_handler)
 
 
-def generate_build_info():
-    build_info = []
+def code_validation(checks: list) -> List[Tuple[str, int]]:
+    banner('Code validation')
+    results: List[Tuple[str, int]] = []
+    for check in checks:
+        result = check.main()
+        test_name = check.__name__.split('_')[-1]
+        results.append(('Check {}'.format(test_name), result))
+    return results
+
+
+def get_all_builds(products: List[Product]) -> List[Build]:
+    builds = []
     for product in products:
-        for toolchain in toolchains:
-            if product == 'rcar' and toolchain == 'ArmClang':
-                continue
-            for build_type in build_types:
-
-                cmd = 'make -f Makefile.cmake '
-                cmd += 'PRODUCT={} TOOLCHAIN={} MODE={}'.format(product,
-                                                                toolchain,
-                                                                build_type)
-                cmd += ' -j$(nproc) '
-
-                if product in platform_variant:
-                    for variant in platform_variant[product]:
-                        cmd += ' ' + prod_variant(variant)
-                        desc = "Product {}.{} build ({})".format(
-                            product,
-                            variant,
-                            toolchain)
-                        build_info.append((product, desc, cmd))
-                else:
-                    desc = "Product {} build ({})".format(
-                            product,
-                            toolchain)
-                    build_info.append((product, desc, cmd))
-    return build_info
+        builds.extend(product.builds)
+    return builds
 
 
-def start_build(build_info):
-    build_status = []
-    for product, desc, cmd in build_info:
-        build = subprocess.Popen(
-                                cmd,
+def start_build(build_info: List[Build]) -> List[Tuple[Build,
+                                                       subprocess.Popen]]:
+    build_status: List[Tuple[Build, subprocess.Popen]] = []
+    for build in build_info:
+        build_id = subprocess.Popen(
+                                build.command(),
                                 shell=True,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE)
-        build_status.append((product, desc, build))
+        build_status.append((build, build_id))
+        print('Test building [{}]'.format(build.tag()))
+        print('[CMD] {}'.format(build.command()))
     return build_status
 
 
-def main():
-    # This code is only applicable if there is valid docker instance
-    # On CI there is no docker instance at the moment
-    try:
-        client = docker.from_env()
-
-        banner("Spawning container")
-
-        try:
-            return dockerize(client)
-        except Exception as ex:
-            print(ex)
-
-            return 1
-    except DockerException:
-        pass
-
-    results = []
-
-    banner('Code validation')
-
-    for code_validation in code_validations:
-        result = code_validation.main()
-        test_name = code_validation.__name__.split('_')[-1]
-        results.append(('Check {}'.format(test_name), result))
-
-    build_status = start_build(generate_build_info())
-
-    for product, desc, build in build_status:
-        banner('Test building {} product'.format(product))
-        (stdout, stderr) = build.communicate()
+def wait_builds(build_status: Tuple[Build, subprocess.Popen]) -> List[Tuple[
+                                                                        str,
+                                                                        int]]:
+    results: List[Tuple[str, int]] = []
+    for build, build_id in build_status:
+        (stdout, stderr) = build_id.communicate()
         print(stdout.decode())
         print(stderr.decode())
-        result = build.wait()
-        results.append((desc, result))
+        result = build_id.wait()
+        results.append((build.tag(), result))
+    return results
 
+
+def print_results(results: List[Tuple[str, int]]) -> Tuple[int, int]:
     banner('Tests summary')
-
     total_success = 0
     for result in results:
         if result[1] == 0:
@@ -189,19 +139,42 @@ def main():
         print("{}: {}".format(result[0], verbose_result))
 
     assert total_success <= len(results)
+    return (total_success, len(results))
 
-    print(
-        "{} / {} passed ({}% pass rate)".format(
-                                                total_success, len(results),
-                                                int(total_success *
-                                                    100 / len(results))
-        )
-    )
 
-    if total_success < len(results):
-        return 1
-    else:
-        return 0
+def analyze_results(success: int, total: int) -> int:
+    print("{} / {} passed ({}% pass rate)".format(success, total,
+                                                  int(success * 100 / total)))
+    return 1 if success < total else 0
+
+
+def main():
+    # This code is only applicable if there is valid docker instance
+    # On CI there is no docker instance at the moment
+    try:
+        client = docker.from_env()
+        banner("Spawning container")
+
+        try:
+            return dockerize(client)
+        except Exception as ex:
+            print(ex)
+            return 1
+
+    except DockerException:
+        pass
+
+    results = []
+
+    results.extend(code_validation(code_validations))
+
+    banner('Test building products')
+
+    build_status = start_build(get_all_builds(products))
+
+    results.extend(wait_builds(build_status))
+
+    return analyze_results(*print_results(results))
 
 
 if __name__ == "__main__":
