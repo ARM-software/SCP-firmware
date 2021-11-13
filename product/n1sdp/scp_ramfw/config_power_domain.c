@@ -6,7 +6,7 @@
  */
 
 /*
- * The use of "primary" and "subordinate" may not be in sync with platform
+ * The use of "primary" and "secondary" may not be in sync with platform
  * documentation
  */
 
@@ -86,10 +86,10 @@ struct fwk_element *element_table = NULL;
 struct mod_power_domain_element_config *pd_config_table = NULL;
 
 /*
- * The power domain tree view differs in primary and slave chips in multichip
- * use case. In multichip scenario primary SCP sees the power domains of both
- * local domains and slave chip's power domain as one single PD tree.
- * The view will look like:
+ * The power domain tree view differs in primary and secondary chips in
+ * multichip use case. In multichip scenario primary SCP sees the power domains
+ * of both local domains and secondary chip's power domain as one single PD
+ * tree. The view will look like:
  *
  *                    -----SYSTOP (LOGICAL)-------
  *                   /                            \
@@ -102,7 +102,7 @@ struct mod_power_domain_element_config *pd_config_table = NULL;
  *   /    \      /    \             /    \      /    \
  * CPU0--CPU1--CPU2--CPU3---------CPU4--CPU5--CPU6--CPU7
  *
- * The slave chip's SCP however looks a single chip view of PD tree having
+ * The secondary chip's SCP however looks a single chip view of PD tree having
  * its own local power domains and looks like below:
  *
  *            ---SYSTOP0--

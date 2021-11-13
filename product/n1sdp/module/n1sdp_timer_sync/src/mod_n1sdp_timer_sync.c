@@ -153,7 +153,7 @@ static int n1sdp_sync_primary_timer(fwk_id_t id)
     return FWK_SUCCESS;
 }
 
-static int n1sdp_sync_slave_timer(fwk_id_t id)
+static int n1sdp_sync_secondary_timer(fwk_id_t id)
 {
     struct tsync_device_ctx *device_ctx;
     unsigned int irq;
@@ -178,7 +178,7 @@ static int n1sdp_sync_slave_timer(fwk_id_t id)
 
 const struct n1sdp_timer_sync_api n1sdp_tsync_api = {
     .primary_sync = n1sdp_sync_primary_timer,
-    .slave_sync = n1sdp_sync_slave_timer,
+    .secondary_sync = n1sdp_sync_secondary_timer,
 };
 
 /*
