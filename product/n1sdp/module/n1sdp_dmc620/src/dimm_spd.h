@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+/* The use of "secondary" may not be in sync with platform documentation */
+
 #ifndef DIMM_SPD_H
 #define DIMM_SPD_H
 
@@ -169,40 +171,39 @@
 #define SPD_PRI_BUS_WIDTH_BITS_64     0x03
 
 /* SDRAM Device width */
-#define SDRAM_DEVICE_WIDTH_MASK   0x07
-#define SDRAM_DEVICE_WIDTH_POS    0
-#define SDRAM_DEVICE_WIDTH_0      0x00
-#define SDRAM_DEVICE_WIDTH_1      0x01
-#define SDRAM_DEVICE_WIDTH_2      0x02
-#define SDRAM_DEVICE_WIDTH_3      0x03
+#define SDRAM_DEVICE_WIDTH_MASK 0x07
+#define SDRAM_DEVICE_WIDTH_POS  0
+#define SDRAM_DEVICE_WIDTH_0    0x00
+#define SDRAM_DEVICE_WIDTH_1    0x01
+#define SDRAM_DEVICE_WIDTH_2    0x02
+#define SDRAM_DEVICE_WIDTH_3    0x03
 
-#define SPD_T_MAC_MASK       0x0F
-#define SPD_T_MAC_0          0x00
-#define SPD_T_MAC_1          0x01
-#define SPD_T_MAC_2          0x02
-#define SPD_T_MAC_3          0x03
-#define SPD_T_MAC_4          0x04
-#define SPD_T_MAC_5          0x05
-#define SPD_T_MAC_6          0x06
-#define SPD_T_MAC_7          0x07
-#define SPD_T_MAC_8          0x08
+#define SPD_T_MAC_MASK 0x0F
+#define SPD_T_MAC_0    0x00
+#define SPD_T_MAC_1    0x01
+#define SPD_T_MAC_2    0x02
+#define SPD_T_MAC_3    0x03
+#define SPD_T_MAC_4    0x04
+#define SPD_T_MAC_5    0x05
+#define SPD_T_MAC_6    0x06
+#define SPD_T_MAC_7    0x07
+#define SPD_T_MAC_8    0x08
 
-#define FTB                  1U
-#define MTB                  125U
-#define DIMM0_SPD_SLAVE      0x50
-#define DIMM1_SPD_SLAVE      0x51
-#define WRITE_PAGE0          0x36
-#define WRITE_PAGE1          0x37
+#define FTB                 1U
+#define MTB                 125U
+#define DIMM0_SPD_SECONDARY 0x50
+#define DIMM1_SPD_SECONDARY 0x51
+#define WRITE_PAGE0         0x36
+#define WRITE_PAGE1         0x37
 
-#define SPD_PAGE0_START      0
-#define SPD_PAGE1_START      256
-#define MAX_SPD_PAGE0        255
-#define MAX_SPD_PAGE1        511
+#define SPD_PAGE0_START 0
+#define SPD_PAGE1_START 256
+#define MAX_SPD_PAGE0   255
+#define MAX_SPD_PAGE1   511
 
-#define SPD_W_TRANSFER_SIZE  2
-#define SPD_R_TRANSFER_SIZE  1
-#define SPD_STOP             1
-
+#define SPD_W_TRANSFER_SIZE 2
+#define SPD_R_TRANSFER_SIZE 1
+#define SPD_STOP            1
 
 /*
  * SPD - Base Configuration and DRAM Parameter structure

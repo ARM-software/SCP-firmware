@@ -847,7 +847,7 @@ static int n1sdp_c2c_process_command(void)
         break;
 
     case N1SDP_C2C_CMD_TIMER_SYNC:
-        status = n1sdp_c2c_ctx.tsync_api->slave_sync(
+        status = n1sdp_c2c_ctx.tsync_api->secondary_sync(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_N1SDP_TIMER_SYNC, 0));
         if (status != FWK_SUCCESS) {
             goto error;

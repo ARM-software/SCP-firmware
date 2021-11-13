@@ -1,12 +1,14 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
  *     N1SDP DDR-PHY driver
  */
+
+/* The use of "secondary" may not be in sync with the PHY-DDR spec */
 
 #include "n1sdp_scp_mmap.h"
 
@@ -124,13 +126,13 @@ static void adjust_per_rank_rptr_update_value(uint32_t phy_addr,
     uint32_t value;
     uint32_t orig_value;
     uint32_t rank_1_rddqs_latency_adjust_value;
-    uint32_t rank_1_rddqs_gate_slave_delay_value;
+    uint32_t rank_1_rddqs_gate_secondary_delay_value;
     uint32_t rank_1_x4_rddqs_latency_adjust_value;
-    uint32_t rank_1_x4_rddqs_gate_slave_delay_value;
+    uint32_t rank_1_x4_rddqs_gate_secondary_delay_value;
     uint32_t rank_2_rddqs_latency_adjust_value;
-    uint32_t rank_2_rddqs_gate_slave_delay_value;
+    uint32_t rank_2_rddqs_gate_secondary_delay_value;
     uint32_t rank_2_x4_rddqs_latency_adjust_value;
-    uint32_t rank_2_x4_rddqs_gate_slave_delay_value;
+    uint32_t rank_2_x4_rddqs_gate_secondary_delay_value;
 
     for (i = 0; i < 9; i++) {
         orig_value = *(uint32_t *)(phy_addr + (4 * (9 + (i * 256))));
@@ -139,20 +141,21 @@ static void adjust_per_rank_rptr_update_value(uint32_t phy_addr,
         *(uint32_t *)(phy_addr + (4 * (9 + (i * 256)))) = value;
         value = *(uint32_t *)(phy_addr + (4 * (112 + (i * 256))));
         rank_1_rddqs_latency_adjust_value = (value & 0x000F0000) >> 16;
-        rank_1_rddqs_gate_slave_delay_value = (value & 0x000003FF);
+        rank_1_rddqs_gate_secondary_delay_value = (value & 0x000003FF);
 
         value = *(uint32_t *)(phy_addr + (4 * (9 + (i * 256))));
         value = value | 0x00010000;
         *(uint32_t *)(phy_addr + (4 * (9 + (i * 256)))) = value;
         value = *(uint32_t *)(phy_addr + (4 * (112 + (i * 256))));
         rank_2_rddqs_latency_adjust_value = (value & 0x000F0000) >> 16;
-        rank_2_rddqs_gate_slave_delay_value = (value & 0x000003FF);
+        rank_2_rddqs_gate_secondary_delay_value = (value & 0x000003FF);
 
         if ((rank_1_rddqs_latency_adjust_value +
-             ((rank_1_rddqs_gate_slave_delay_value & 0x00000100) >> 8)) !=
+             ((rank_1_rddqs_gate_secondary_delay_value & 0x00000100) >> 8)) !=
             (rank_2_rddqs_latency_adjust_value +
-              ((rank_2_rddqs_gate_slave_delay_value & 0x0000100) >> 8))) {
-            if ((rank_1_rddqs_gate_slave_delay_value & 0x000003FF) < 0x100) {
+             ((rank_2_rddqs_gate_secondary_delay_value & 0x0000100) >> 8))) {
+            if ((rank_1_rddqs_gate_secondary_delay_value & 0x000003FF) <
+                0x100) {
                 value = *(uint32_t *)(phy_addr + (4 * (112 + (i * 256))));
                 value = (value & 0xFFFFFC00) | 0x104;
                 *(uint32_t *)(phy_addr + (4 * (112 + (i * 256)))) = value;
@@ -174,7 +177,7 @@ static void adjust_per_rank_rptr_update_value(uint32_t phy_addr,
 
             value = *(uint32_t *)(phy_addr + (4 * (116 + (i * 256))));
             rank_1_x4_rddqs_latency_adjust_value = (value & 0x000F0000) >> 16;
-            rank_1_x4_rddqs_gate_slave_delay_value = (value & 0x000003FF);
+            rank_1_x4_rddqs_gate_secondary_delay_value = (value & 0x000003FF);
 
             value = *(uint32_t *)(phy_addr + (4 * (9 + (i * 256))));
             value = value | 0x00010000;
@@ -182,13 +185,15 @@ static void adjust_per_rank_rptr_update_value(uint32_t phy_addr,
 
             value = *(uint32_t *)(phy_addr + (4 * (116 + (i * 256))));
             rank_2_x4_rddqs_latency_adjust_value = (value & 0x000F0000) >> 16;
-            rank_2_x4_rddqs_gate_slave_delay_value = (value & 0x000003FF);
+            rank_2_x4_rddqs_gate_secondary_delay_value = (value & 0x000003FF);
 
             if ((rank_1_x4_rddqs_latency_adjust_value +
-               ((rank_1_x4_rddqs_gate_slave_delay_value & 0x00000100) >> 8)) !=
+                 ((rank_1_x4_rddqs_gate_secondary_delay_value & 0x00000100) >>
+                  8)) !=
                 (rank_2_x4_rddqs_latency_adjust_value +
-               ((rank_2_x4_rddqs_gate_slave_delay_value & 0x0000100) >> 8))) {
-                if (rank_1_x4_rddqs_gate_slave_delay_value < 0x100) {
+                 ((rank_2_x4_rddqs_gate_secondary_delay_value & 0x0000100) >>
+                  8))) {
+                if (rank_1_x4_rddqs_gate_secondary_delay_value < 0x100) {
                     value = *(uint32_t *)(phy_addr + (4 * (116 + (i * 256))));
                     value = (value & 0xFFFFFC00) | 0x104;
                     *(uint32_t *)(phy_addr + (4 * (116 + (i * 256)))) = value;
@@ -323,7 +328,7 @@ static int write_eye_detect_single_rank(fwk_id_t element_id,
     const uint8_t BIT_WRRD_SUCCESS =
         NUM_DATA_PATTERNS * NUM_DFI_BEATS_TO_CHECK * 2;
     const uint32_t PHY_PER_CS_TRAINING_INDEX_0_REG_IDX = 9;
-    const uint32_t PHY_CLK_WRDQ0_SLAVE_DELAY_0_REG_IDX = 82;
+    const uint32_t PHY_CLK_WRDQ0_SECONDARY_DELAY_0_REG_IDX = 82;
     const uint32_t SC_PHY_MANUAL_UPDATE_REG_IDX = 2310;
 
     const uint16_t DELAY_MIN = 0x0;
@@ -425,8 +430,9 @@ static int write_eye_detect_single_rank(fwk_id_t element_id,
     for (slice = 0; slice < NUM_SLICES; slice++) {
         for (bit = 0; bit < NUM_BITS_PER_SLICE; bit += 2) {
             rd_val = 0;
-            denali_index = (PHY_CLK_WRDQ0_SLAVE_DELAY_0_REG_IDX + (bit / 2)) +
-                            (slice * 256);
+            denali_index =
+                (PHY_CLK_WRDQ0_SECONDARY_DELAY_0_REG_IDX + (bit / 2)) +
+                (slice * 256);
             rd_val = *(uint32_t *)(ddr_phy_base + (4 * denali_index));
         }
     }
@@ -485,8 +491,9 @@ static int write_eye_detect_single_rank(fwk_id_t element_id,
                             reg_val |=
                                 (cur_wrdq_delays[slice][bit - 1] & 0x7FF);
                             denali_index =
-                                (PHY_CLK_WRDQ0_SLAVE_DELAY_0_REG_IDX +
-                                 (bit / 2)) + (slice*256);
+                                (PHY_CLK_WRDQ0_SECONDARY_DELAY_0_REG_IDX +
+                                 (bit / 2)) +
+                                (slice * 256);
                             *(uint32_t *)(ddr_phy_base + (4 * denali_index)) =
                                 reg_val;
                         }
@@ -691,8 +698,9 @@ static int write_eye_detect_single_rank(fwk_id_t element_id,
                 eye_b = &best_wrdq_eyes[slice][bit + 1];
                 eye_b_mid = eye_b->mid;
                 reg_val = (eye_b_mid << 16) | eye_a_mid;
-                denali_index = (PHY_CLK_WRDQ0_SLAVE_DELAY_0_REG_IDX +
-                                (bit / 2)) + (slice * 256);
+                denali_index =
+                    (PHY_CLK_WRDQ0_SECONDARY_DELAY_0_REG_IDX + (bit / 2)) +
+                    (slice * 256);
                 *(uint32_t *)(ddr_phy_base + (4 * denali_index)) = reg_val;
             }
         }
@@ -763,9 +771,9 @@ static int n1sdp_ddr_phy_post_training_configure(fwk_id_t element_id,
     uint32_t value;
     uint32_t temp;
     uint32_t rddqs_latency_adjust_value;
-    uint32_t rddqs_gate_slave_delay_value;
+    uint32_t rddqs_gate_secondary_delay_value;
     uint32_t rddqs_x4_latency_adjust_value;
-    uint32_t rddqs_x4_gate_slave_delay_value;
+    uint32_t rddqs_x4_gate_secondary_delay_value;
     uint32_t rptr_update_value;
     uint32_t rddata_valid_value;
 
@@ -780,12 +788,12 @@ static int n1sdp_ddr_phy_post_training_configure(fwk_id_t element_id,
     for (i = 0; i < 9; i++)  {
         value = *(uint32_t *)(phy_addr + (4 * (112 + (i * 256))));
         rddqs_latency_adjust_value = (value & 0x000F0000) >> 16;
-        rddqs_gate_slave_delay_value = (value & 0x000003FF);
+        rddqs_gate_secondary_delay_value = (value & 0x000003FF);
         value = *(uint32_t *)(phy_addr + (4 * (129 + (i * 256))));
         rptr_update_value = (value & 0x00000F00) >> 8;
         value = rddqs_latency_adjust_value +
-                ((rddqs_gate_slave_delay_value & 0x00000100) >> 8) +
-                rptr_update_value;
+            ((rddqs_gate_secondary_delay_value & 0x00000100) >> 8) +
+            rptr_update_value;
         if (value > rddata_valid_value) {
             rddata_valid_value = value;
         }
@@ -794,12 +802,12 @@ static int n1sdp_ddr_phy_post_training_configure(fwk_id_t element_id,
         for (i = 0; i < 9; i++) {
             value = *(uint32_t *)(phy_addr + (4 * (116 + (i * 256))));
             rddqs_x4_latency_adjust_value = (value & 0x000F0000) >> 16;
-            rddqs_x4_gate_slave_delay_value = (value & 0x000003FF);
+            rddqs_x4_gate_secondary_delay_value = (value & 0x000003FF);
             value = *(uint32_t *)(phy_addr + (4 * (133 + (i * 256))));
             rptr_update_value = (value & 0x000F0000) >> 16;
             value = rddqs_x4_latency_adjust_value +
-                    ((rddqs_x4_gate_slave_delay_value & 0x00000100) >> 8) +
-                    rptr_update_value;
+                ((rddqs_x4_gate_secondary_delay_value & 0x00000100) >> 8) +
+                rptr_update_value;
             if (value > rddata_valid_value) {
                 rddata_valid_value = value;
             }
@@ -809,9 +817,9 @@ static int n1sdp_ddr_phy_post_training_configure(fwk_id_t element_id,
     for (i = 0; i < 9; i++)  {
         value = *(uint32_t *)(phy_addr + (4 * (112 + (i * 256))));
         rddqs_latency_adjust_value = (value & 0x000F0000) >> 16;
-        rddqs_gate_slave_delay_value = (value & 0x000003FF);
+        rddqs_gate_secondary_delay_value = (value & 0x000003FF);
         value = rddqs_latency_adjust_value +
-                ((rddqs_gate_slave_delay_value & 0x00000100) >> 8);
+            ((rddqs_gate_secondary_delay_value & 0x00000100) >> 8);
         rptr_update_value = rddata_valid_value - value;
         value = *(uint32_t *)(phy_addr + (4 * (129 + (i * 256))));
         if (rptr_update_value != ((value & 0x00000F00) >> 8)) {
@@ -823,9 +831,9 @@ static int n1sdp_ddr_phy_post_training_configure(fwk_id_t element_id,
         for (i = 0; i < 9; i++) {
             value = *(uint32_t *)(phy_addr + (4 * (116 + (i * 256))));
             rddqs_x4_latency_adjust_value = (value & 0x000F0000) >> 16;
-            rddqs_x4_gate_slave_delay_value = (value & 0x000003FF);
+            rddqs_x4_gate_secondary_delay_value = (value & 0x000003FF);
             value = rddqs_x4_latency_adjust_value +
-               ((rddqs_x4_gate_slave_delay_value & 0x00000100) >> 8);
+                ((rddqs_x4_gate_secondary_delay_value & 0x00000100) >> 8);
             rptr_update_value = rddata_valid_value - value;
             value = *(uint32_t *)(phy_addr + (4 * (133 + (i * 256))));
             if (rptr_update_value != ((value & 0x000F0000) >> 16)) {

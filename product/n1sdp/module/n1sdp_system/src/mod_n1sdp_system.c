@@ -8,6 +8,8 @@
  *     N1SDP System Support.
  */
 
+/* The use of "secondary" may not be in sync with older versions of TRM */
+
 #include "config_clock.h"
 #include "n1sdp_core.h"
 #include "n1sdp_pik_cpu.h"
@@ -57,8 +59,8 @@
 struct n1sdp_platform_info {
     /* If multichip mode */
     bool multichip_mode;
-    /* Total number of slave chips  */
-    uint8_t slave_count;
+    /* Total number of secondary chips  */
+    uint8_t secondary_count;
     /* Local ddr size in GB */
     uint8_t local_ddr_size;
     /* Remote ddr size in GB */
@@ -81,8 +83,8 @@ struct n1sdp_bl33_info {
 struct n1sdp_multichip_info {
     /* If multichip mode */
     bool mode;
-    /* Total number of slave chips  */
-    uint8_t slave_count;
+    /* Total number of secondary chips  */
+    uint8_t secondary_count;
     /* Remote ddr size in GB */
     uint8_t remote_ddr_size;
 };
@@ -331,7 +333,7 @@ static int n1sdp_system_fill_platform_info(void)
     const struct mod_sds_structure_desc *sds_structure_desc =
         fwk_module_get_data(sds_platform_info_id);
 
-    sds_platform_info.slave_count = 0;
+    sds_platform_info.secondary_count = 0;
     sds_platform_info.remote_ddr_size = 0;
 
     status = n1sdp_system_ctx.dmc620_api->get_mem_size_gb(&ddr_size_gb);
@@ -347,9 +349,9 @@ static int n1sdp_system_fill_platform_info(void)
         n1sdp_system_ctx.c2c_api->is_secondary_alive();
 
     if (sds_platform_info.multichip_mode) {
-        sds_platform_info.slave_count = 1;
-        status = n1sdp_system_ctx.c2c_api->get_ddr_size_gb
-                                           (&sds_platform_info.remote_ddr_size);
+        sds_platform_info.secondary_count = 1;
+        status = n1sdp_system_ctx.c2c_api->get_ddr_size_gb(
+            &sds_platform_info.remote_ddr_size);
         if (status != FWK_SUCCESS) {
             FWK_LOG_INFO("Error calculating Remote DDR memory size!");
             return status;

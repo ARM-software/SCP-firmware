@@ -53,14 +53,14 @@ struct n1sdp_timer_sync_api {
      */
     int (*primary_sync)(fwk_id_t id);
     /*!
-     * \brief API to trigger synchronization in slave.
+     * \brief API to trigger synchronization in secondary.
      *
      * \param id Identifier of the timer sync module.
      *
      * \retval ::FWK_SUCCESS If operation succeeds.
      * \return One of the possible error return codes.
      */
-    int (*slave_sync)(fwk_id_t id);
+    int (*secondary_sync)(fwk_id_t id);
 };
 
 /*!
