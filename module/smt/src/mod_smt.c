@@ -301,7 +301,7 @@ static const struct mod_smt_to_transport_api smt_mod_smt_to_transport_api = {
 /*
  * Driver handler API
  */
-static int smt_slave_handler(struct smt_channel_ctx *channel_ctx)
+static int smt_completer_handler(struct smt_channel_ctx *channel_ctx)
 {
     struct mod_smt_memory *memory, *in, *out;
     size_t payload_size;
@@ -399,8 +399,8 @@ static int smt_signal_message(fwk_id_t channel_id)
         /* Not supported yet */
         fwk_unexpected();
         break;
-    case MOD_SMT_CHANNEL_TYPE_SLAVE:
-        return smt_slave_handler(channel_ctx);
+    case MOD_SMT_CHANNEL_TYPE_COMPLETER:
+        return smt_completer_handler(channel_ctx);
         break;
     default:
         /* Invalid config */

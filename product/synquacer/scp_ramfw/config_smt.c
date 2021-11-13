@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -21,19 +21,19 @@
 #include <stdint.h>
 
 static const struct fwk_element smt_element_table[] = {
-    [SCP_SYNQUACER_SCMI_SERVICE_IDX_PSCI] = {
-        .name = "PSCI",
-        .data = &((struct mod_smt_channel_config) {
-            .type = MOD_SMT_CHANNEL_TYPE_SLAVE,
-            .policies = MOD_SMT_POLICY_INIT_MAILBOX | MOD_SMT_POLICY_SECURE,
-            .mailbox_address = (uintptr_t)MHU_PAYLOAD_S_BASE,
-            .mailbox_size = 256,
-            .driver_id = FWK_ID_SUB_ELEMENT_INIT(
-                FWK_MODULE_IDX_MHU,
-                SCP_SYNQUACER_MHU_DEVICE_IDX_SCP_AP_S,
-                0),
-            .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MHU, 0),
-        }) },
+    /* SCP_SYNQUACER_SCMI_SERVICE_IDX_PSCI */
+    { .name = "PSCI",
+      .data = &((struct mod_smt_channel_config){
+          .type = MOD_SMT_CHANNEL_TYPE_COMPLETER,
+          .policies = MOD_SMT_POLICY_INIT_MAILBOX | MOD_SMT_POLICY_SECURE,
+          .mailbox_address = (uintptr_t)MHU_PAYLOAD_S_BASE,
+          .mailbox_size = 256,
+          .driver_id = FWK_ID_SUB_ELEMENT_INIT(
+              FWK_MODULE_IDX_MHU,
+              SCP_SYNQUACER_MHU_DEVICE_IDX_SCP_AP_S,
+              0),
+          .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MHU, 0),
+      }) },
     [SCP_SYNQUACER_SCMI_SERVICE_IDX_COUNT] = { 0 },
 };
 

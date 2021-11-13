@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -299,7 +299,7 @@ static int smt_master_handler(struct smt_channel_ctx *channel_ctx)
     memory = ((struct mod_smt_memory*)channel_ctx->config->mailbox_address);
     in = channel_ctx->in;
 
-    /* Check if slave has released the channel */
+    /* Check if completer has released the channel */
     if (!(memory->status & MOD_SMT_MAILBOX_STATUS_FREE_MASK))
         return FWK_E_STATE;
 
@@ -324,7 +324,7 @@ static int smt_signal_message(fwk_id_t channel_id)
     case MOD_SMT_CHANNEL_TYPE_MASTER:
         return smt_master_handler(channel_ctx);
         break;
-    case MOD_SMT_CHANNEL_TYPE_SLAVE:
+    case MOD_SMT_CHANNEL_TYPE_COMPLETER:
         fwk_unexpected();
         break;
     default:

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -25,7 +25,7 @@ static const struct fwk_element smt_element_table[] = {
         .name = "PSCI",
         .data = &((
             struct mod_smt_channel_config) {
-            .type = MOD_SMT_CHANNEL_TYPE_SLAVE,
+            .type = MOD_SMT_CHANNEL_TYPE_COMPLETER,
             .policies = MOD_SMT_POLICY_INIT_MAILBOX | MOD_SMT_POLICY_SECURE,
             .mailbox_address = (uintptr_t) SCP_SCMI_PAYLOAD_S_A2P_BASE,
             .mailbox_size = SCP_SCMI_PAYLOAD_SIZE,
