@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -27,7 +27,7 @@ static const struct fwk_element
                     .name = "PSCI",
                     .data = &((struct mod_smt_channel_config){
                         .type =
-                            MOD_SMT_CHANNEL_TYPE_SLAVE,
+                            MOD_SMT_CHANNEL_TYPE_COMPLETER,
                         .policies =
                             MOD_SMT_POLICY_INIT_MAILBOX |
                             MOD_SMT_POLICY_SECURE,
@@ -50,7 +50,7 @@ static const struct fwk_element
                     .name = "OSPM",
                     .data = &((struct mod_smt_channel_config){
                         .type =
-                            MOD_SMT_CHANNEL_TYPE_SLAVE,
+                            MOD_SMT_CHANNEL_TYPE_COMPLETER,
                         .policies =
                             MOD_SMT_POLICY_INIT_MAILBOX,
                         .mailbox_address =
@@ -72,7 +72,7 @@ static const struct fwk_element
                     .name = "MCP",
                     .data = &((struct mod_smt_channel_config){
                         .type =
-                           MOD_SMT_CHANNEL_TYPE_SLAVE,
+                           MOD_SMT_CHANNEL_TYPE_COMPLETER,
                         .policies =
                            MOD_SMT_POLICY_INIT_MAILBOX |
                            MOD_SMT_POLICY_SECURE,

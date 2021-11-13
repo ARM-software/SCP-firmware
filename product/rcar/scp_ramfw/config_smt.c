@@ -1,6 +1,6 @@
 /*
  * Renesas SCP/MCP Software
- * Copyright (c) 2020-2021, Renesas Electronics Corporation. All rights
+ * Copyright (c) 2020-2022, Renesas Electronics Corporation. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -24,91 +24,71 @@
 #include <stdint.h>
 
 static const struct fwk_element smt_element_table[] = {
-    [RCAR_SCMI_SERVICE_IDX_PSCI] = { .name = "PSCI",
-                                     .data = &((struct mod_smt_channel_config){
-                                         .type = MOD_SMT_CHANNEL_TYPE_SLAVE,
-                                         .policies =
-                                             MOD_SMT_POLICY_INIT_MAILBOX |
-                                             MOD_SMT_POLICY_SECURE,
-                                         .mailbox_address =
-                                             (uintptr_t)SCMI_PAYLOAD_S_A2P_BASE,
-                                         .mailbox_size = SCMI_PAYLOAD_SIZE,
-                                         .driver_id = FWK_ID_SUB_ELEMENT_INIT(
-                                             FWK_MODULE_IDX_RCAR_MFISMH,
-                                             RCAR_MFISMH_DEVICE_IDX_S,
-                                             0),
-                                         .driver_api_id = FWK_ID_API_INIT(
-                                             FWK_MODULE_IDX_RCAR_MFISMH,
-                                             0),
-                                     }) },
-    [RCAR_SCMI_SERVICE_IDX_OSPM] =   { .name = "OSPM",
-                                       .data = &((
-                                           struct mod_smt_channel_config){
-                                           .type = MOD_SMT_CHANNEL_TYPE_SLAVE,
-                                           .policies =
-                                               MOD_SMT_POLICY_INIT_MAILBOX,
-                                           .mailbox_address = (uintptr_t)
-                                               SCMI_PAYLOAD0_NS_A2P_BASE,
-                                           .mailbox_size = SCMI_PAYLOAD_SIZE,
-                                           .driver_id = FWK_ID_SUB_ELEMENT_INIT(
-                                               FWK_MODULE_IDX_RCAR_MFISMH,
-                                               RCAR_MFISMH_DEVICE_IDX_NS_1,
-                                               0),
-                                           .driver_api_id = FWK_ID_API_INIT(
-                                               FWK_MODULE_IDX_RCAR_MFISMH,
-                                               0),
-                                       }) },
-    [RCAR_SCMI_SERVICE_IDX_VMM] =    { .name = "VMM",
-                                       .data = &((
-                                           struct mod_smt_channel_config){
-                                           .type = MOD_SMT_CHANNEL_TYPE_SLAVE,
-                                           .policies =
-                                               MOD_SMT_POLICY_INIT_MAILBOX,
-                                           .mailbox_address = (uintptr_t)
-                                               SCMI_PAYLOAD0_NS_A2P_VMM,
-                                           .mailbox_size = SCMI_PAYLOAD_SIZE,
-                                           .driver_id = FWK_ID_SUB_ELEMENT_INIT(
-                                               FWK_MODULE_IDX_RCAR_MFISMH,
-                                               RCAR_MFISMH_DEVICE_IDX_NS_2,
-                                               0),
-                                           .driver_api_id = FWK_ID_API_INIT(
-                                               FWK_MODULE_IDX_RCAR_MFISMH,
-                                               0),
-                                       }) },
-    [RCAR_SCMI_SERVICE_IDX_VM1] =    { .name = "VM1",
-                                       .data = &((
-                                           struct mod_smt_channel_config){
-                                           .type = MOD_SMT_CHANNEL_TYPE_SLAVE,
-                                           .policies =
-                                               MOD_SMT_POLICY_INIT_MAILBOX,
-                                           .mailbox_address = (uintptr_t)
-                                               SCMI_PAYLOAD0_NS_A2P_VM1,
-                                           .mailbox_size = SCMI_PAYLOAD_SIZE,
-                                           .driver_id = FWK_ID_SUB_ELEMENT_INIT(
-                                               FWK_MODULE_IDX_RCAR_MFISMH,
-                                               RCAR_MFISMH_DEVICE_IDX_NS_3,
-                                               0),
-                                           .driver_api_id = FWK_ID_API_INIT(
-                                               FWK_MODULE_IDX_RCAR_MFISMH,
-                                               0),
-                                       }) },
-    [RCAR_SCMI_SERVICE_IDX_VM2] =    { .name = "VM2",
-                                       .data = &((
-                                           struct mod_smt_channel_config){
-                                           .type = MOD_SMT_CHANNEL_TYPE_SLAVE,
-                                           .policies =
-                                               MOD_SMT_POLICY_INIT_MAILBOX,
-                                           .mailbox_address = (uintptr_t)
-                                               SCMI_PAYLOAD0_NS_A2P_VM2,
-                                           .mailbox_size = SCMI_PAYLOAD_SIZE,
-                                           .driver_id = FWK_ID_SUB_ELEMENT_INIT(
-                                               FWK_MODULE_IDX_RCAR_MFISMH,
-                                               RCAR_MFISMH_DEVICE_IDX_NS_4,
-                                               0),
-                                           .driver_api_id = FWK_ID_API_INIT(
-                                               FWK_MODULE_IDX_RCAR_MFISMH,
-                                               0),
-                                       }) },
+    /* RCAR_SCMI_SERVICE_IDX_PSCI */
+    { .name = "PSCI",
+      .data = &((struct mod_smt_channel_config){
+          .type = MOD_SMT_CHANNEL_TYPE_COMPLETER,
+          .policies = MOD_SMT_POLICY_INIT_MAILBOX | MOD_SMT_POLICY_SECURE,
+          .mailbox_address = (uintptr_t)SCMI_PAYLOAD_S_A2P_BASE,
+          .mailbox_size = SCMI_PAYLOAD_SIZE,
+          .driver_id = FWK_ID_SUB_ELEMENT_INIT(
+              FWK_MODULE_IDX_RCAR_MFISMH,
+              RCAR_MFISMH_DEVICE_IDX_S,
+              0),
+          .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_MFISMH, 0),
+      }) },
+    /* RCAR_SCMI_SERVICE_IDX_OSPM */
+    { .name = "OSPM",
+      .data = &((struct mod_smt_channel_config){
+          .type = MOD_SMT_CHANNEL_TYPE_COMPLETER,
+          .policies = MOD_SMT_POLICY_INIT_MAILBOX,
+          .mailbox_address = (uintptr_t)SCMI_PAYLOAD0_NS_A2P_BASE,
+          .mailbox_size = SCMI_PAYLOAD_SIZE,
+          .driver_id = FWK_ID_SUB_ELEMENT_INIT(
+              FWK_MODULE_IDX_RCAR_MFISMH,
+              RCAR_MFISMH_DEVICE_IDX_NS_1,
+              0),
+          .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_MFISMH, 0),
+      }) },
+    /* RCAR_SCMI_SERVICE_IDX_VMM */
+    { .name = "VMM",
+      .data = &((struct mod_smt_channel_config){
+          .type = MOD_SMT_CHANNEL_TYPE_COMPLETER,
+          .policies = MOD_SMT_POLICY_INIT_MAILBOX,
+          .mailbox_address = (uintptr_t)SCMI_PAYLOAD0_NS_A2P_VMM,
+          .mailbox_size = SCMI_PAYLOAD_SIZE,
+          .driver_id = FWK_ID_SUB_ELEMENT_INIT(
+              FWK_MODULE_IDX_RCAR_MFISMH,
+              RCAR_MFISMH_DEVICE_IDX_NS_2,
+              0),
+          .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_MFISMH, 0),
+      }) },
+    /* RCAR_SCMI_SERVICE_IDX_VM1 */
+    { .name = "VM1",
+      .data = &((struct mod_smt_channel_config){
+          .type = MOD_SMT_CHANNEL_TYPE_COMPLETER,
+          .policies = MOD_SMT_POLICY_INIT_MAILBOX,
+          .mailbox_address = (uintptr_t)SCMI_PAYLOAD0_NS_A2P_VM1,
+          .mailbox_size = SCMI_PAYLOAD_SIZE,
+          .driver_id = FWK_ID_SUB_ELEMENT_INIT(
+              FWK_MODULE_IDX_RCAR_MFISMH,
+              RCAR_MFISMH_DEVICE_IDX_NS_3,
+              0),
+          .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_MFISMH, 0),
+      }) },
+    /* RCAR_SCMI_SERVICE_IDX_VM2 */
+    { .name = "VM2",
+      .data = &((struct mod_smt_channel_config){
+          .type = MOD_SMT_CHANNEL_TYPE_COMPLETER,
+          .policies = MOD_SMT_POLICY_INIT_MAILBOX,
+          .mailbox_address = (uintptr_t)SCMI_PAYLOAD0_NS_A2P_VM2,
+          .mailbox_size = SCMI_PAYLOAD_SIZE,
+          .driver_id = FWK_ID_SUB_ELEMENT_INIT(
+              FWK_MODULE_IDX_RCAR_MFISMH,
+              RCAR_MFISMH_DEVICE_IDX_NS_4,
+              0),
+          .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_RCAR_MFISMH, 0),
+      }) },
     [RCAR_SCMI_SERVICE_IDX_COUNT] = { 0 },
 };
 

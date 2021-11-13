@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -45,8 +45,8 @@ enum mod_smt_channel_type {
     /*! Master channel */
     MOD_SMT_CHANNEL_TYPE_MASTER,
 
-    /*! Slave channel */
-    MOD_SMT_CHANNEL_TYPE_SLAVE,
+    /*! Completer channel */
+    MOD_SMT_CHANNEL_TYPE_COMPLETER,
 
     /*! Channel type count */
     MOD_SMT_CHANNEL_TYPE_COUNT,
@@ -56,7 +56,7 @@ enum mod_smt_channel_type {
  * \brief Channel config.
  */
 struct mod_smt_channel_config {
-    /*! Channel role (slave or master) */
+    /*! Channel role (completer or master) */
     enum mod_smt_channel_type type;
 
     /*! Channel policies */
