@@ -1,10 +1,12 @@
 /*
  * Renesas SCP/MCP Software
- * Copyright (c) 2020-2021, Renesas Electronics Corporation. All rights
+ * Copyright (c) 2020-2022, Renesas Electronics Corporation. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+
+/* The use of "subordinate" may not be in sync with platform documentation */
 
 #ifndef MOD_RCAR_CLOCK_H
 #define MOD_RCAR_CLOCK_H
@@ -390,8 +392,14 @@ struct op_points {
 #define Z_CLK_MAX_THRESHOLD 1500000000U
 #define Z2_CLK_MAX_THRESHOLD 1200000000U
 
-extern int32_t rcar_iic_dvfs_receive(uint8_t slave, uint8_t reg, uint8_t *data);
-extern int32_t rcar_iic_dvfs_send(uint8_t slave, uint8_t regr, uint8_t data);
+extern int32_t rcar_iic_dvfs_receive(
+    uint8_t subordinate,
+    uint8_t reg,
+    uint8_t *data);
+extern int32_t rcar_iic_dvfs_send(
+    uint8_t subordinate,
+    uint8_t regr,
+    uint8_t data);
 
 /*!
  * @endcond
