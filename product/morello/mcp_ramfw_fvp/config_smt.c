@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -20,7 +20,7 @@
 static const struct fwk_element smt_element_table[] = {
     [0] = { .name = "MANAGEMENT-S",
             .data = &((struct mod_smt_channel_config){
-                .type = MOD_SMT_CHANNEL_TYPE_MASTER,
+                .type = MOD_SMT_CHANNEL_TYPE_REQUESTER,
                 .policies = MOD_SMT_POLICY_SECURE,
                 .mailbox_address = (uintptr_t)SCMI_PAYLOAD_SCP_TO_MCP_S,
                 .mailbox_size = MCP_SCMI_PAYLOAD_SIZE,
