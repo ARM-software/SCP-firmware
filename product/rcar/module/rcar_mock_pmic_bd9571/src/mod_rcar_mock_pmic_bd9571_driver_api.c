@@ -1,10 +1,12 @@
 /*
  * Renesas SCP/MCP Software
- * Copyright (c) 2020-2021, Renesas Electronics Corporation. All rights
+ * Copyright (c) 2020-2022, Renesas Electronics Corporation. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+
+/* The use of "subordinate" may not be in sync with platform documentation */
 
 #include <mod_rcar_mock_pmic_bd9571_private.h>
 #include <mod_psu.h>
@@ -59,7 +61,7 @@ static int api_set_voltage(fwk_id_t device_id, uint32_t voltage)
     val &= REG_DATA_DVFS_SetVID_MASK;
 
     int ret;
-    ret = rcar_iic_dvfs_send(SLAVE_ADDR_PMIC, REG_ADDR_DVFS_SetVID, val);
+    ret = rcar_iic_dvfs_send(SUBORDINATE_ADDR_PMIC, REG_ADDR_DVFS_SetVID, val);
     if (ret) {
         return ret;
     }
@@ -97,7 +99,7 @@ static int api_set_pmic(fwk_id_t device_id, unsigned int state)
         val = REG_DATA_DDR_BKUP_OFF;
 
     /* Not supported because I2C used in kernel */
-    ret = rcar_iic_dvfs_send(SLAVE_ADDR_PMIC, REG_ADDR_DDR_BKUP, val);
+    ret = rcar_iic_dvfs_send(SUBORDINATE_ADDR_PMIC, REG_ADDR_DDR_BKUP, val);
     if (ret) {
         return ret;
     }

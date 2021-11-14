@@ -1,10 +1,12 @@
 /*
  * Renesas SCP/MCP Software
- * Copyright (c) 2020-2021, Renesas Electronics Corporation. All rights
+ * Copyright (c) 2020-2022, Renesas Electronics Corporation. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+
+/* The use of "subordinate" may not be in sync with platform documentation */
 
 #include <mmio.h>
 
@@ -841,7 +843,7 @@ static int set_voltage(unsigned long volt)
     val = DIV_ROUND(volt, BD9571MWV_STEP_MV * 1000);
     val &= REG_DATA_DVFS_SetVID_MASK;
 
-    ret = rcar_iic_dvfs_send(SLAVE_ADDR_PMIC, REG_ADDR_DVFS_SetVID, val);
+    ret = rcar_iic_dvfs_send(SUBORDINATE_ADDR_PMIC, REG_ADDR_DVFS_SetVID, val);
     if (ret) {
         return ret;
     }
@@ -856,7 +858,8 @@ static unsigned long get_voltage(void)
     unsigned long volt;
     int ret;
 
-    ret = rcar_iic_dvfs_receive(SLAVE_ADDR_PMIC, REG_ADDR_DVFS_SetVID, &val);
+    ret =
+      rcar_iic_dvfs_receive(SUBORDINATE_ADDR_PMIC, REG_ADDR_DVFS_SetVID, &val);
     if (ret) {
         return ret;
     }

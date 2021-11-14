@@ -1,10 +1,12 @@
 /*
  * Renesas SCP/MCP Software
- * Copyright (c) 2020-2021, Renesas Electronics Corporation. All rights
+ * Copyright (c) 2020-2022, Renesas Electronics Corporation. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+
+/* The use of "subordinate" may not be in sync with platform documentation */
 
 #include "rcar_common.h"
 #include "rcar_iic_dvfs.h"
@@ -67,8 +69,8 @@ typedef enum {
     DVFS_RETRANSMIT,
     DVFS_READ,
     DVFS_STOP_READ,
-    DVFS_SET_SLAVE_READ,
-    DVFS_SET_SLAVE,
+    DVFS_SET_SUBORDINATE_READ,
+    DVFS_SET_SUBORDINATE,
     DVFS_WRITE_ADDR,
     DVFS_WRITE_DATA,
     DVFS_CHANGE_SEND_TO_RECIEVE,
@@ -107,7 +109,7 @@ IIC_DVFS_FUNC(check_error, DVFS_STATE_T *state, uint32_t *err, uint8_t mode)
         reg = mmio_read_8(IIC_DVFS_REG_ICSR) & ~IIC_DVFS_BIT_ICSR_AL;
         mmio_write_8(IIC_DVFS_REG_ICSR, reg);
 
-        if (*state == DVFS_SET_SLAVE)
+        if (*state == DVFS_SET_SUBORDINATE)
             mmio_write_8(IIC_DVFS_REG_ICDR, IIC_DVFS_SET_DUMMY);
 
         do {
@@ -211,12 +213,16 @@ IIC_DVFS_FUNC(start, DVFS_STATE_T *state)
     mmio_write_8(IIC_DVFS_REG_ICIC, mode);
     mmio_write_8(IIC_DVFS_REG_ICCR, IIC_DVFS_SET_ICCR_START);
 
-    *state = DVFS_SET_SLAVE;
+    *state = DVFS_SET_SUBORDINATE;
 
     return result;
 }
 
-IIC_DVFS_FUNC(set_slave, DVFS_STATE_T *state, uint32_t *err, uint8_t slave)
+IIC_DVFS_FUNC(
+    set_subordinate,
+    DVFS_STATE_T *state,
+    uint32_t *err,
+    uint8_t subordinate)
 {
     uint8_t mode;
     int32_t result;
@@ -233,7 +239,7 @@ IIC_DVFS_FUNC(set_slave, DVFS_STATE_T *state, uint32_t *err, uint8_t slave)
     mode = mmio_read_8(IIC_DVFS_REG_ICIC) & ~IIC_DVFS_BIT_ICIC_DTEE;
     mmio_write_8(IIC_DVFS_REG_ICIC, mode);
 
-    address = slave << 1;
+    address = subordinate << 1;
     mmio_write_8(IIC_DVFS_REG_ICDR, address);
 
     *state = DVFS_WRITE_ADDR;
@@ -375,12 +381,16 @@ IIC_DVFS_FUNC(retransmit, DVFS_STATE_T *state, uint32_t *err)
     mode = mmio_read_8(IIC_DVFS_REG_ICIC) | IIC_DVFS_BIT_ICIC_DTEE;
     mmio_write_8(IIC_DVFS_REG_ICIC, mode);
 
-    *state = DVFS_SET_SLAVE_READ;
+    *state = DVFS_SET_SUBORDINATE_READ;
 
     return result;
 }
 
-IIC_DVFS_FUNC(set_slave_read, DVFS_STATE_T *state, uint32_t *err, uint8_t slave)
+IIC_DVFS_FUNC(
+    set_subordinate_read,
+    DVFS_STATE_T *state,
+    uint32_t *err,
+    uint8_t subordinate)
 {
     uint8_t address;
     int32_t result;
@@ -397,7 +407,7 @@ IIC_DVFS_FUNC(set_slave_read, DVFS_STATE_T *state, uint32_t *err, uint8_t slave)
     mode = mmio_read_8(IIC_DVFS_REG_ICIC) & ~IIC_DVFS_BIT_ICIC_DTEE;
     mmio_write_8(IIC_DVFS_REG_ICIC, mode);
 
-    address = ((uint8_t)(slave << 1) + DVFS_READ_MODE);
+    address = ((uint8_t)(subordinate << 1) + DVFS_READ_MODE);
     mmio_write_8(IIC_DVFS_REG_ICDR, address);
 
     *state = DVFS_CHANGE_SEND_TO_RECIEVE;
@@ -471,7 +481,7 @@ IIC_DVFS_FUNC(read, DVFS_STATE_T *state, uint8_t *reg_data)
     return DVFS_PROCESS;
 }
 
-RCAR_DVFS_API(send, uint8_t slave, uint8_t reg_addr, uint8_t reg_data)
+RCAR_DVFS_API(send, uint8_t subordinate, uint8_t reg_addr, uint8_t reg_data)
 {
     DVFS_STATE_T state = DVFS_START;
     int32_t result = DVFS_PROCESS;
@@ -485,8 +495,8 @@ RCAR_DVFS_API(send, uint8_t slave, uint8_t reg_addr, uint8_t reg_data)
         case DVFS_START:
             result = dvfs_start(&state);
             break;
-        case DVFS_SET_SLAVE:
-            result = dvfs_set_slave(&state, &err, slave);
+        case DVFS_SET_SUBORDINATE:
+            result = dvfs_set_subordinate(&state, &err, subordinate);
             break;
         case DVFS_WRITE_ADDR:
             result = dvfs_write_addr(&state, &err, reg_addr);
@@ -509,7 +519,7 @@ RCAR_DVFS_API(send, uint8_t slave, uint8_t reg_addr, uint8_t reg_data)
     return result;
 }
 
-RCAR_DVFS_API(receive, uint8_t slave, uint8_t reg, uint8_t *data)
+RCAR_DVFS_API(receive, uint8_t subordinate, uint8_t reg, uint8_t *data)
 {
     DVFS_STATE_T state = DVFS_START;
     int32_t result = DVFS_PROCESS;
@@ -523,8 +533,8 @@ RCAR_DVFS_API(receive, uint8_t slave, uint8_t reg, uint8_t *data)
         case DVFS_START:
             result = dvfs_start(&state);
             break;
-        case DVFS_SET_SLAVE:
-            result = dvfs_set_slave(&state, &err, slave);
+        case DVFS_SET_SUBORDINATE:
+            result = dvfs_set_subordinate(&state, &err, subordinate);
             break;
         case DVFS_WRITE_ADDR:
             result = dvfs_write_reg_addr_read(&state, &err, reg);
@@ -532,8 +542,8 @@ RCAR_DVFS_API(receive, uint8_t slave, uint8_t reg, uint8_t *data)
         case DVFS_RETRANSMIT:
             result = dvfs_retransmit(&state, &err);
             break;
-        case DVFS_SET_SLAVE_READ:
-            result = dvfs_set_slave_read(&state, &err, slave);
+        case DVFS_SET_SUBORDINATE_READ:
+            result = dvfs_set_subordinate_read(&state, &err, subordinate);
             break;
         case DVFS_CHANGE_SEND_TO_RECIEVE:
             result = dvfs_change_send_to_recieve(&state, &err);
