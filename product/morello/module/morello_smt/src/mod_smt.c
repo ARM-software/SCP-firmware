@@ -289,7 +289,7 @@ static const struct mod_scmi_agent_to_transport_api
 /*
  * Driver handler API
  */
-static int smt_master_handler(struct smt_channel_ctx *channel_ctx)
+static int smt_requester_handler(struct smt_channel_ctx *channel_ctx)
 {
     struct mod_smt_memory *memory, *in;
     size_t payload_size;
@@ -323,8 +323,8 @@ static int smt_signal_message(fwk_id_t channel_id)
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
 
     switch (channel_ctx->config->type) {
-    case MOD_SMT_CHANNEL_TYPE_MASTER:
-        return smt_master_handler(channel_ctx);
+    case MOD_SMT_CHANNEL_TYPE_REQUESTER:
+        return smt_requester_handler(channel_ctx);
         break;
     case MOD_SMT_CHANNEL_TYPE_COMPLETER:
         assert(false);

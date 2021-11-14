@@ -77,7 +77,7 @@ static const struct fwk_element element_table[] = {
     { .name = "",
       .data =
           &(struct mod_smt_channel_config){
-              .type = MOD_SMT_CHANNEL_TYPE_MASTER,
+              .type = MOD_SMT_CHANNEL_TYPE_REQUESTER,
               .policies = MOD_SMT_POLICY_INIT_MAILBOX,
               .mailbox_address = (uintptr_t)SCMI_PAYLOAD_HIGH_P2A_BASE,
               .mailbox_size = SCMI_PAYLOAD_SIZE,

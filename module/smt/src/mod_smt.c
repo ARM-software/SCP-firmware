@@ -395,7 +395,7 @@ static int smt_signal_message(fwk_id_t channel_id)
     }
 
     switch (channel_ctx->config->type) {
-    case MOD_SMT_CHANNEL_TYPE_MASTER:
+    case MOD_SMT_CHANNEL_TYPE_REQUESTER:
         /* Not supported yet */
         fwk_unexpected();
         break;

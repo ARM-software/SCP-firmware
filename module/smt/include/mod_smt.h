@@ -42,8 +42,8 @@
  * \details Defines the role of an entity in a channel
  */
 enum mod_smt_channel_type {
-    /*! Master channel */
-    MOD_SMT_CHANNEL_TYPE_MASTER,
+    /*! Requester channel */
+    MOD_SMT_CHANNEL_TYPE_REQUESTER,
 
     /*! Completer channel */
     MOD_SMT_CHANNEL_TYPE_COMPLETER,
@@ -56,7 +56,7 @@ enum mod_smt_channel_type {
  * \brief Channel config.
  */
 struct mod_smt_channel_config {
-    /*! Channel role (completer or master) */
+    /*! Channel role (completer or requester) */
     enum mod_smt_channel_type type;
 
     /*! Channel policies */
