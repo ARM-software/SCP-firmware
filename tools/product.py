@@ -70,6 +70,7 @@ class Product:
     toolchains: List[Parameter] = field(default_factory=lambda: [
         Parameter('GNU'),
         Parameter('ArmClang'),
+        Parameter('Clang', ('-DSCP_LLVM_SYSROOT_CC=arm-none-eabi-gcc',)),
         ])
     build_types: List[Parameter] = field(default_factory=lambda: [
         Parameter('debug'),
