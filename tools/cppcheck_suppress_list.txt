@@ -84,9 +84,9 @@ nullPointerRedundantCheck:*product/synquacer/module/ccn512/src/mod_ccn512.c:211
 
 // Cppcheck is not abe to inspect the fwk_assert deeply enough to know that
 // zero value assignment is asserted
-zerodivcond:*product/juno/module/juno_cdcel937/src/mod_juno_cdcel937.c:387
-zerodivcond:*product/juno/module/juno_cdcel937/src/mod_juno_cdcel937.c:394
-zerodivcond:*product/juno/module/juno_cdcel937/src/mod_juno_cdcel937.c:411
+zerodivcond:*product/juno/module/juno_cdcel937/src/mod_juno_cdcel937.c:390
+zerodivcond:*product/juno/module/juno_cdcel937/src/mod_juno_cdcel937.c:397
+zerodivcond:*product/juno/module/juno_cdcel937/src/mod_juno_cdcel937.c:414
 
 // Cppcheck does not interpret Assembler syntax
 syntaxError:*arch/arm/armv8-a/include/arch_system.h:19

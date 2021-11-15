@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -59,88 +59,98 @@ static struct juno_clock_lookup i2s_lookup_table[] = {
 };
 
 static const struct fwk_element juno_cdcel937_element_table[] = {
-    [JUNO_CLOCK_CDCEL937_IDX_I2SCLK] = {
-        .name = "",
-        .data = &(struct mod_juno_cdcel937_dev_config) {
-            .slave_address = 0x6D,
-            .xin_mhz = 24,
-            .clock_hal_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
-                JUNO_CLOCK_IDX_I2SCLK),
-            .clock_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_CLOCK,
-                MOD_CLOCK_API_TYPE_DRIVER_RESPONSE),
-            .min_rate = 0,
-            .max_rate = 0,
-            .min_step = 0,
-            .rate_type = MOD_CLOCK_RATE_TYPE_DISCRETE,
-            .output_id = MOD_JUNO_CDCEL937_OUTPUT_ID_Y4,
-            .lookup_table = i2s_lookup_table,
-            .lookup_table_count = FWK_ARRAY_SIZE(i2s_lookup_table),
-        }
-    },
-    [JUNO_CLOCK_CDCEL937_IDX_HDLCDREFCLK] = {
-        .name = "",
-        .data = &(struct mod_juno_cdcel937_dev_config) {
-            .slave_address = 0x6C,
-            .xin_mhz = 24,
-            .clock_hal_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
-                JUNO_CLOCK_IDX_HDLCDREFCLK),
-            .clock_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_CLOCK,
-                MOD_CLOCK_API_TYPE_DRIVER_RESPONSE),
-            .min_rate = 25 * FWK_MHZ,
-            .max_rate = 120 * FWK_MHZ,
-            .min_step = 250 * FWK_KHZ,
-            .rate_type = MOD_CLOCK_RATE_TYPE_CONTINUOUS,
-            .output_id = MOD_JUNO_CDCEL937_OUTPUT_ID_Y6,
-        }
-    },
-    [JUNO_CLOCK_CDCEL937_IDX_HDLCDPXL] = {
-        .name = "",
-        .data = &(struct mod_juno_cdcel937_dev_config) {
-            .slave_address = 0x6D,
-            .xin_mhz = 24,
-            .clock_hal_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
-                JUNO_CLOCK_IDX_HDLCDPXL),
-            .clock_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_CLOCK,
-                MOD_CLOCK_API_TYPE_DRIVER_RESPONSE),
-            .min_rate = 47500 * FWK_KHZ,
-            .max_rate = 100 * FWK_MHZ,
-            .min_step = 250 * FWK_KHZ,
-            .rate_type = MOD_CLOCK_RATE_TYPE_CONTINUOUS,
-            .output_id = MOD_JUNO_CDCEL937_OUTPUT_ID_Y2,
-        }
-    },
-    [JUNO_CLOCK_CDCEL937_IDX_HDLCD0] = {
-        .name = "",
-        .data = &(struct mod_juno_cdcel937_dev_config) {
-            .slave_address = 0x6C,
-            .xin_mhz = 24,
-            .clock_hal_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_HDLCD,
-                JUNO_CLOCK_HDLCD_IDX_HDLCD0),
-            .clock_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_JUNO_HDLCD,
-                MOD_JUNO_HDLCD_API_IDX_HDLCD_DRIVER_RESPONSE),
-            .min_rate = 25 * FWK_MHZ,
-            .max_rate = 120 * FWK_MHZ,
-            .min_step = 250 * FWK_KHZ,
-            .rate_type = MOD_CLOCK_RATE_TYPE_CONTINUOUS,
-            .output_id = MOD_JUNO_CDCEL937_OUTPUT_ID_Y6,
-        }
-    },
-    [JUNO_CLOCK_CDCEL937_IDX_HDLCD1] = {
-        .name = "",
-        .data = &(struct mod_juno_cdcel937_dev_config) {
-            .slave_address = 0x6C,
-            .xin_mhz = 24,
-            .clock_hal_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_JUNO_HDLCD,
-                JUNO_CLOCK_HDLCD_IDX_HDLCD1),
-            .clock_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_JUNO_HDLCD,
-                MOD_JUNO_HDLCD_API_IDX_HDLCD_DRIVER_RESPONSE),
-            .min_rate = 25 * FWK_MHZ,
-            .max_rate = 120 * FWK_MHZ,
-            .min_step = 250 * FWK_KHZ,
-            .rate_type = MOD_CLOCK_RATE_TYPE_CONTINUOUS,
-            .output_id = MOD_JUNO_CDCEL937_OUTPUT_ID_Y6,
-        }
-    },
+    /* JUNO_CLOCK_CDCEL937_IDX_I2SCLK */
+    { .name = "",
+      .data =
+          &(struct mod_juno_cdcel937_dev_config){
+              .target_address = 0x6D,
+              .xin_mhz = 24,
+              .clock_hal_id = FWK_ID_ELEMENT_INIT(
+                  FWK_MODULE_IDX_CLOCK,
+                  JUNO_CLOCK_IDX_I2SCLK),
+              .clock_api_id = FWK_ID_API_INIT(
+                  FWK_MODULE_IDX_CLOCK,
+                  MOD_CLOCK_API_TYPE_DRIVER_RESPONSE),
+              .min_rate = 0,
+              .max_rate = 0,
+              .min_step = 0,
+              .rate_type = MOD_CLOCK_RATE_TYPE_DISCRETE,
+              .output_id = MOD_JUNO_CDCEL937_OUTPUT_ID_Y4,
+              .lookup_table = i2s_lookup_table,
+              .lookup_table_count = FWK_ARRAY_SIZE(i2s_lookup_table),
+          } },
+    /* JUNO_CLOCK_CDCEL937_IDX_HDLCDREFCLK */
+    { .name = "",
+      .data =
+          &(struct mod_juno_cdcel937_dev_config){
+              .target_address = 0x6C,
+              .xin_mhz = 24,
+              .clock_hal_id = FWK_ID_ELEMENT_INIT(
+                  FWK_MODULE_IDX_CLOCK,
+                  JUNO_CLOCK_IDX_HDLCDREFCLK),
+              .clock_api_id = FWK_ID_API_INIT(
+                  FWK_MODULE_IDX_CLOCK,
+                  MOD_CLOCK_API_TYPE_DRIVER_RESPONSE),
+              .min_rate = 25 * FWK_MHZ,
+              .max_rate = 120 * FWK_MHZ,
+              .min_step = 250 * FWK_KHZ,
+              .rate_type = MOD_CLOCK_RATE_TYPE_CONTINUOUS,
+              .output_id = MOD_JUNO_CDCEL937_OUTPUT_ID_Y6,
+          } },
+    /* JUNO_CLOCK_CDCEL937_IDX_HDLCDPXL */
+    { .name = "",
+      .data =
+          &(struct mod_juno_cdcel937_dev_config){
+              .target_address = 0x6D,
+              .xin_mhz = 24,
+              .clock_hal_id = FWK_ID_ELEMENT_INIT(
+                  FWK_MODULE_IDX_CLOCK,
+                  JUNO_CLOCK_IDX_HDLCDPXL),
+              .clock_api_id = FWK_ID_API_INIT(
+                  FWK_MODULE_IDX_CLOCK,
+                  MOD_CLOCK_API_TYPE_DRIVER_RESPONSE),
+              .min_rate = 47500 * FWK_KHZ,
+              .max_rate = 100 * FWK_MHZ,
+              .min_step = 250 * FWK_KHZ,
+              .rate_type = MOD_CLOCK_RATE_TYPE_CONTINUOUS,
+              .output_id = MOD_JUNO_CDCEL937_OUTPUT_ID_Y2,
+          } },
+    /* JUNO_CLOCK_CDCEL937_IDX_HDLCD0 */
+    { .name = "",
+      .data =
+          &(struct mod_juno_cdcel937_dev_config){
+              .target_address = 0x6C,
+              .xin_mhz = 24,
+              .clock_hal_id = FWK_ID_ELEMENT_INIT(
+                  FWK_MODULE_IDX_JUNO_HDLCD,
+                  JUNO_CLOCK_HDLCD_IDX_HDLCD0),
+              .clock_api_id = FWK_ID_API_INIT(
+                  FWK_MODULE_IDX_JUNO_HDLCD,
+                  MOD_JUNO_HDLCD_API_IDX_HDLCD_DRIVER_RESPONSE),
+              .min_rate = 25 * FWK_MHZ,
+              .max_rate = 120 * FWK_MHZ,
+              .min_step = 250 * FWK_KHZ,
+              .rate_type = MOD_CLOCK_RATE_TYPE_CONTINUOUS,
+              .output_id = MOD_JUNO_CDCEL937_OUTPUT_ID_Y6,
+          } },
+    /* JUNO_CLOCK_CDCEL937_IDX_HDLCD1 */
+    { .name = "",
+      .data =
+          &(struct mod_juno_cdcel937_dev_config){
+              .target_address = 0x6C,
+              .xin_mhz = 24,
+              .clock_hal_id = FWK_ID_ELEMENT_INIT(
+                  FWK_MODULE_IDX_JUNO_HDLCD,
+                  JUNO_CLOCK_HDLCD_IDX_HDLCD1),
+              .clock_api_id = FWK_ID_API_INIT(
+                  FWK_MODULE_IDX_JUNO_HDLCD,
+                  MOD_JUNO_HDLCD_API_IDX_HDLCD_DRIVER_RESPONSE),
+              .min_rate = 25 * FWK_MHZ,
+              .max_rate = 120 * FWK_MHZ,
+              .min_step = 250 * FWK_KHZ,
+              .rate_type = MOD_CLOCK_RATE_TYPE_CONTINUOUS,
+              .output_id = MOD_JUNO_CDCEL937_OUTPUT_ID_Y6,
+          } },
     [JUNO_CLOCK_CDCEL937_IDX_COUNT] = { 0 },
 };
 

@@ -69,10 +69,10 @@ struct mod_i2c_request {
      */
     uint8_t receive_byte_count;
 
-     /*!
-     * \brief Address of the slave on the I2C bus.
+    /*!
+     * \brief Address of the target on the I2C bus.
      */
-    uint8_t slave_address;
+    uint8_t target_address;
 
     /*!
      * \brief Pointer to the data to transmit.
@@ -96,7 +96,7 @@ static_assert(sizeof(struct mod_i2c_request) <= FWK_EVENT_PARAMETERS_SIZE,
  */
 struct mod_i2c_driver_api {
     /*!
-     * \brief Request transmission of data as Controller to a selected slave.
+     * \brief Request transmission of data as Controller to a selected target.
      *
      * \details When the function returns the transmission may not be completed.
      *      The driver can assume the integrity of the data during the
@@ -117,7 +117,8 @@ struct mod_i2c_driver_api {
         struct mod_i2c_request *transmit_request);
 
     /*!
-     * \brief Request the reception of data as Controller from a selected slave.
+     * \brief Request the reception of data as Controller from a selected
+     * target.
      *
      * \details When the function returns the reception may not be completed.
      *      The driver can assume the integrity of the data pointer during the
@@ -142,7 +143,7 @@ struct mod_i2c_driver_api {
  */
 struct mod_i2c_api {
     /*!
-     * \brief Request transmission of data as Controller to a selected slave.
+     * \brief Request transmission of data as Controller to a selected target.
      *
      * \details When the function returns the transmission is not completed,
      *      possibly not even started. The data buffer must stay allocated
@@ -151,8 +152,8 @@ struct mod_i2c_api {
      *      a response event is sent to the client.
      *
      * \param dev_id Identifier of the I2C device
-     * \param slave_address Address of the slave on the I2C bus
-     * \param data Pointer to the data bytes to transmit to the slave
+     * \param target_address Address of the target on the I2C bus
+     * \param data Pointer to the data bytes to transmit to the target
      * \param byte_count Number of data bytes to transmit
      *
      * \retval ::FWK_PENDING The request was submitted.
@@ -163,12 +164,12 @@ struct mod_i2c_api {
      */
     int (*transmit_as_controller)(
         fwk_id_t dev_id,
-        uint8_t slave_address,
+        uint8_t target_address,
         uint8_t *data,
         uint8_t byte_count);
 
     /*!
-     * \brief Request reception of data as Controller from a selected slave.
+     * \brief Request reception of data as Controller from a selected target.
      *
      * \details When the function returns the reception is not completed,
      *      possibly not even started. The data buffer must stay allocated
@@ -177,8 +178,8 @@ struct mod_i2c_api {
      *      a response event is sent to the client.
      *
      * \param dev_id Identifier of the I2C device
-     * \param slave_address Address of the slave on the I2C bus
-     * \param data Pointer to the buffer to receive data from the slave
+     * \param target_address Address of the target on the I2C bus
+     * \param data Pointer to the buffer to receive data from the target
      * \param byte_count Number of data bytes to receive
      *
      * \retval ::FWK_PENDING The request was submitted.
@@ -189,13 +190,13 @@ struct mod_i2c_api {
      */
     int (*receive_as_controller)(
         fwk_id_t dev_id,
-        uint8_t slave_address,
+        uint8_t target_address,
         uint8_t *data,
         uint8_t byte_count);
 
     /*!
      * \brief Request the transmission followed by the reception of data as
-     *      Controller to/from a selected slave.
+     *      Controller to/from a selected target.
      *
      * \details When the function returns the transaction is not completed,
      *      possibly not even started. The data buffer must stay allocated
@@ -204,7 +205,7 @@ struct mod_i2c_api {
      *      a response event is sent to the client.
      *
      * \param dev_id Identifier of the I2C device
-     * \param slave_address Address of the slave on the I2C bus
+     * \param target_address Address of the target on the I2C bus
      * \param transmit_data Pointer to the buffer to transmit the data in the
      *      first phase.
      * \param receive_data Pointer to the buffer to receive the data in the
@@ -222,7 +223,7 @@ struct mod_i2c_api {
      */
     int (*transmit_then_receive_as_controller)(
         fwk_id_t dev_id,
-        uint8_t slave_address,
+        uint8_t target_address,
         uint8_t *transmit_data,
         uint8_t *receive_data,
         uint8_t transmit_byte_count,

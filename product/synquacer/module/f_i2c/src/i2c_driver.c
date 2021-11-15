@@ -395,7 +395,7 @@ static bool i2c_handler_normal(
             result = true;
 
     } else {
-        /* %MN0 SLAVE MODE is not supported */
+        /* %MN0 TARGET MODE is not supported */
     }
 
     return result;

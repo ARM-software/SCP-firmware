@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -27,8 +27,8 @@
  * \brief Module configuration.
  */
 struct mod_juno_xrp7724_config {
-    /*! Slave address of the I2C device */
-    unsigned int slave_address;
+    /*! Target address of the I2C device */
+    unsigned int target_address;
 
     /*! Identifier of the I2C HAL */
     fwk_id_t i2c_hal_id;

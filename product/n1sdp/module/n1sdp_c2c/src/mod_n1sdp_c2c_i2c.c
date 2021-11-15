@@ -94,8 +94,8 @@ struct n1sdp_c2c_ctx {
     /* I2C Controller API ID */
     struct mod_cdns_i2c_controller_api_polled *controller_api;
 
-    /* I2C Slave API ID */
-    struct mod_cdns_i2c_slave_api_irq *slave_api;
+    /* I2C Target API ID */
+    struct mod_cdns_i2c_target_api_irq *target_api;
 
     /* PCIe init API */
     struct n1sdp_pcie_init_api *pcie_init_api;
@@ -161,7 +161,7 @@ static int n1sdp_c2c_primary_tx_command(uint8_t cmd)
     n1sdp_c2c_ctx.primary_tx_data[0] = cmd;
     status = n1sdp_c2c_ctx.controller_api->write(
         n1sdp_c2c_ctx.config->i2c_id,
-        n1sdp_c2c_ctx.config->slave_addr,
+        n1sdp_c2c_ctx.config->target_addr,
         (char *)&n1sdp_c2c_ctx.primary_tx_data[0],
         N1SDP_C2C_DATA_SIZE,
         true);
@@ -181,7 +181,7 @@ static int n1sdp_c2c_primary_rx_response(void)
     FWK_LOG_INFO("[C2C] Waiting for response from  slave...");
     status = n1sdp_c2c_ctx.controller_api->read(
         n1sdp_c2c_ctx.config->i2c_id,
-        n1sdp_c2c_ctx.config->slave_addr,
+        n1sdp_c2c_ctx.config->target_addr,
         (char *)&n1sdp_c2c_ctx.primary_rx_data[0],
         N1SDP_C2C_DATA_SIZE);
     if (status != FWK_SUCCESS) {
@@ -215,9 +215,10 @@ static int n1sdp_c2c_check_remote(void)
         FWK_LOG_INFO("[C2C] Slave Alive!");
         return FWK_SUCCESS;
     } else {
-        status = n1sdp_c2c_ctx.slave_api->read(
+        status = n1sdp_c2c_ctx.target_api->read(
             n1sdp_c2c_ctx.config->i2c_id,
-            &n1sdp_c2c_ctx.slave_rx_data[0], N1SDP_C2C_DATA_SIZE);
+            &n1sdp_c2c_ctx.slave_rx_data[0],
+            N1SDP_C2C_DATA_SIZE);
         if (status != FWK_SUCCESS) {
             FWK_LOG_INFO("[C2C] Error setting up I2C for reception!");
             return status;
@@ -601,9 +602,10 @@ static int n1sdp_c2c_wait_for_next_command(void)
 {
     int status;
 
-    status = n1sdp_c2c_ctx.slave_api->read(n1sdp_c2c_ctx.config->i2c_id,
-                                           &n1sdp_c2c_ctx.slave_rx_data[0],
-                                           N1SDP_C2C_DATA_SIZE);
+    status = n1sdp_c2c_ctx.target_api->read(
+        n1sdp_c2c_ctx.config->i2c_id,
+        &n1sdp_c2c_ctx.slave_rx_data[0],
+        N1SDP_C2C_DATA_SIZE);
     if (status != FWK_SUCCESS) {
         FWK_LOG_INFO("[C2C] Error setting up read transfer!");
         return status;
@@ -899,9 +901,10 @@ error:
         n1sdp_c2c_ctx.slave_tx_data[0] = N1SDP_C2C_ERROR;
     }
 
-    status = n1sdp_c2c_ctx.slave_api->write(
+    status = n1sdp_c2c_ctx.target_api->write(
         n1sdp_c2c_ctx.config->i2c_id,
-        &n1sdp_c2c_ctx.slave_tx_data[0], N1SDP_C2C_DATA_SIZE);
+        &n1sdp_c2c_ctx.slave_tx_data[0],
+        N1SDP_C2C_DATA_SIZE);
     if (status != FWK_SUCCESS) {
         FWK_LOG_INFO("[C2C] Error setting up write transfer!");
         return status;
@@ -954,8 +957,8 @@ static int n1sdp_c2c_pd_set_state(enum n1sdp_c2c_cmd cmd, uint8_t pd_id,
     }
 
     /*
-     * PD command in slave will take some time to complete so primary
-     * has to retry waiting for response from slave.
+     * PD command in target will take some time to complete so primary
+     * has to retry waiting for response from target.
      */
     retries = C2C_PRIMARY_RETRIES;
     do {
@@ -997,8 +1000,8 @@ static int n1sdp_c2c_pd_get_state(enum n1sdp_c2c_cmd cmd, uint8_t pd_id,
     }
 
     /*
-     * PD command in slave will take some time to complete so primary
-     * has to retry waiting for response from slave.
+     * PD command in target will take some time to complete so primary
+     * has to retry waiting for response from target.
      */
     retries = C2C_PRIMARY_RETRIES;
     do {
@@ -1157,8 +1160,9 @@ static int n1sdp_c2c_bind(fwk_id_t id, unsigned int round)
         } else {
             status = fwk_module_bind(
                 n1sdp_c2c_ctx.config->i2c_id,
-                FWK_ID_API(FWK_MODULE_IDX_CDNS_I2C, MOD_CDNS_I2C_API_SLAVE_IRQ),
-                &n1sdp_c2c_ctx.slave_api);
+                FWK_ID_API(
+                    FWK_MODULE_IDX_CDNS_I2C, MOD_CDNS_I2C_API_TARGET_IRQ),
+                &n1sdp_c2c_ctx.target_api);
             if (status != FWK_SUCCESS) {
                 return status;
             }
@@ -1205,7 +1209,7 @@ static int n1sdp_c2c_start(fwk_id_t id)
     }
 
     status = fwk_notification_subscribe(
-        mod_cdns_i2c_notification_id_slave_rx,
+        mod_cdns_i2c_notification_id_target_rx,
         n1sdp_c2c_ctx.config->i2c_id,
         id);
     if (status != FWK_SUCCESS) {
@@ -1213,7 +1217,7 @@ static int n1sdp_c2c_start(fwk_id_t id)
     }
 
     return fwk_notification_subscribe(
-        mod_cdns_i2c_notification_id_slave_tx,
+        mod_cdns_i2c_notification_id_target_tx,
         n1sdp_c2c_ctx.config->i2c_id,
         id);
 }
@@ -1238,10 +1242,10 @@ static int n1sdp_c2c_process_notification(const struct fwk_event *event,
         return fwk_notification_unsubscribe(event->id, event->source_id,
                                             event->target_id);
     } else if (fwk_id_is_equal(
-                   event->id, mod_cdns_i2c_notification_id_slave_rx)) {
+                   event->id, mod_cdns_i2c_notification_id_target_rx)) {
         return n1sdp_c2c_process_command();
     } else if (fwk_id_is_equal(
-                   event->id, mod_cdns_i2c_notification_id_slave_tx)) {
+                   event->id, mod_cdns_i2c_notification_id_target_tx)) {
         return n1sdp_c2c_wait_for_next_command();
     }
 
@@ -1256,7 +1260,7 @@ static int n1sdp_c2c_process_event(
 
     module_idx = fwk_id_get_module_idx(event->source_id);
     if (module_idx == fwk_id_get_module_idx(fwk_module_id_power_domain)) {
-        status = n1sdp_c2c_ctx.slave_api->write(
+        status = n1sdp_c2c_ctx.target_api->write(
             n1sdp_c2c_ctx.config->i2c_id,
             &n1sdp_c2c_ctx.slave_tx_data[0],
             N1SDP_C2C_DATA_SIZE);

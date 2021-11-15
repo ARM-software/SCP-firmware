@@ -34,7 +34,7 @@ struct cdns_i2c_reg {
     /* Transfer Size Register */
     FWK_RW uint8_t TSR;
     uint8_t RESERVED5[3];
-    /* Slave Monitor Pause Register */
+    /* Target Monitor Pause Register */
     FWK_RW uint8_t SMPR;
     uint8_t RESERVED6[3];
     /* Timeout Register */
@@ -190,7 +190,7 @@ struct cdns_i2c_reg {
 #define I2C_RW_WRITE 0
 #define I2C_RW_READ  1
 
-#define I2C_MS_SLAVE      0
+#define I2C_MS_TARGET     0
 #define I2C_MS_CONTROLLER 1
 
 #define I2C_NEA_10BIT 0

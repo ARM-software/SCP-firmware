@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -51,7 +51,7 @@ struct mod_f_i2c_api {
      * \brief receive data from i2c device
      *
      * \param ch channel
-     * \param slave_address slave address
+     * \param target_address target address
      * \param address target address
      * \param data buffer to receive the data
      * \param length length to read
@@ -62,18 +62,18 @@ struct mod_f_i2c_api {
      * \retval I2C_ERR_BER Bus error.
      * \return One of the other specific error codes.
      */
-    I2C_ERR_t (*recv_data)
-    (I2C_EN_CH_t ch,
-     uint32_t slave_address,
-     uint32_t address,
-     uint8_t *data,
-     int length);
+    I2C_ERR_t (*recv_data)(
+        I2C_EN_CH_t ch,
+        uint32_t target_address,
+        uint32_t address,
+        uint8_t *data,
+        int length);
 
     /*!
      * \brief send data to i2c device
      *
      * \param ch channel
-     * \param slave_address slave address
+     * \param target_address target address
      * \param address target address
      * \param data buffer to be sent
      * \param length length to be sent
@@ -84,12 +84,12 @@ struct mod_f_i2c_api {
      * \retval I2C_ERR_BER Bus error.
      * \return One of the other specific error codes.
      */
-    I2C_ERR_t (*send_data)
-    (I2C_EN_CH_t ch,
-     uint32_t slave_address,
-     uint32_t address,
-     const uint8_t *data,
-     int length);
+    I2C_ERR_t (*send_data)(
+        I2C_EN_CH_t ch,
+        uint32_t target_address,
+        uint32_t address,
+        const uint8_t *data,
+        int length);
 };
 
 /*!

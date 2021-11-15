@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -47,8 +47,8 @@ enum mod_juno_cdcel937_output_id {
  * \brief Juno CDCEL937 device configuration
  */
 struct mod_juno_cdcel937_dev_config {
-    /*! Address of the I2C slave device */
-    uint8_t slave_address;
+    /*! Address of the I2C target device */
+    uint8_t target_address;
 
     /*! Crystal oscillator input in MHz */
     uint32_t xin_mhz;

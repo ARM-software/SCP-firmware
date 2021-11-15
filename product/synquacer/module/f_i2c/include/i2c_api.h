@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -17,14 +17,14 @@
 
 I2C_ERR_t f_i2c_api_recv_data(
     I2C_EN_CH_t ch,
-    uint32_t slave_address,
+    uint32_t target_address,
     uint32_t address,
     uint8_t *data,
     int length);
 
 I2C_ERR_t f_i2c_api_send_data(
     I2C_EN_CH_t ch,
-    uint32_t slave_address,
+    uint32_t target_address,
     uint32_t address,
     const uint8_t *data,
     int length);

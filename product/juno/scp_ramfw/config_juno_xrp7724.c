@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -127,7 +127,7 @@ static const struct fwk_element *juno_xrp7724_get_element_table(
 const struct fwk_module_config config_juno_xrp7724 = {
     .data =
         &(struct mod_juno_xrp7724_config){
-            .slave_address = 0x28,
+            .target_address = 0x28,
             .i2c_hal_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_I2C, 0),
             .timer_hal_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
             .gpio_assert_id = FWK_ID_SUB_ELEMENT_INIT(

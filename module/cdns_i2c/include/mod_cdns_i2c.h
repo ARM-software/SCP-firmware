@@ -40,7 +40,7 @@
  */
 enum mod_cdns_i2c_api {
     MOD_CDNS_I2C_API_CONTROLLER_POLLED,
-    MOD_CDNS_I2C_API_SLAVE_IRQ,
+    MOD_CDNS_I2C_API_TARGET_IRQ,
     MOD_CDNS_I2C_API_COUNT,
 };
 
@@ -57,7 +57,7 @@ enum mod_cdns_i2c_speed {
  * \brief Operating mode.
  */
 enum mod_cdns_i2c_mode {
-    MOD_CDNS_I2C_SLAVE_MODE,
+    MOD_CDNS_I2C_TARGET_MODE,
     MOD_CDNS_I2C_CONTROLLER_MODE,
 };
 
@@ -125,7 +125,7 @@ struct mod_cdns_i2c_device_config {
     /*! Acknowledge enable */
     enum mod_cdns_i2c_ack ack_en;
 
-    /*! Operating mode (Controller/Slave) */
+    /*! Operating mode (Controller/Target) */
     enum mod_cdns_i2c_mode mode;
 
     /*! Address size (7Bit/10Bit) */
@@ -134,8 +134,8 @@ struct mod_cdns_i2c_device_config {
     /*! Hold mode (ON/OFF) */
     enum mod_cdns_i2c_hold hold_mode;
 
-    /*! Slave address */
-    uint16_t slave_addr;
+    /*! Target address */
+    uint16_t target_addr;
 
     /*! I2C IRQ */
     uint8_t irq;
@@ -152,7 +152,7 @@ struct mod_cdns_i2c_controller_api_polled {
      * \brief I2C read function.
      *
      * \param device_id Element identifier.
-     * \param address Address of the slave.
+     * \param address Address of the target.
      * \param data Pointer to data buffer.
      * \param length Data size to be read in bytes.
      *
@@ -169,7 +169,7 @@ struct mod_cdns_i2c_controller_api_polled {
      * \brief I2C write function.
      *
      * \param device_id Element identifier.
-     * \param address Address of slave.
+     * \param address Address of target.
      * \param data Pointer to data buffer.
      * \param length Data size to be written in bytes.
      * \param stop When set to true indicates end of data transfer and interface
@@ -187,9 +187,9 @@ struct mod_cdns_i2c_controller_api_polled {
 };
 
 /*!
- * \brief API to access the I2C slave functions in interrupt mode.
+ * \brief API to access the I2C target functions in interrupt mode.
  */
-struct mod_cdns_i2c_slave_api_irq {
+struct mod_cdns_i2c_target_api_irq {
     /*!
      * \brief I2C read function.
      *
@@ -228,25 +228,25 @@ enum mod_cdns_i2c_notifications {
 };
 
 /*!
- * \brief Identifier for I2C slave receive callback notification.
+ * \brief Identifier for I2C target receive callback notification.
  */
-static const fwk_id_t mod_cdns_i2c_notification_id_slave_rx =
+static const fwk_id_t mod_cdns_i2c_notification_id_target_rx =
     FWK_ID_NOTIFICATION_INIT(
         FWK_MODULE_IDX_CDNS_I2C,
         MOD_CDNS_I2C_NOTIFICATION_IDX_RX);
 
 /*!
- * \brief Identifier for I2C slave transmit callback notification.
+ * \brief Identifier for I2C target transmit callback notification.
  */
-static const fwk_id_t mod_cdns_i2c_notification_id_slave_tx =
+static const fwk_id_t mod_cdns_i2c_notification_id_target_tx =
     FWK_ID_NOTIFICATION_INIT(
         FWK_MODULE_IDX_CDNS_I2C,
         MOD_CDNS_I2C_NOTIFICATION_IDX_TX);
 
 /*!
- * \brief Identifier for I2C slave error callback notification.
+ * \brief Identifier for I2C target error callback notification.
  */
-static const fwk_id_t mod_cdns_i2c_notification_id_slave_error =
+static const fwk_id_t mod_cdns_i2c_notification_id_target_error =
     FWK_ID_NOTIFICATION_INIT(
         FWK_MODULE_IDX_CDNS_I2C,
         MOD_CDNS_I2C_NOTIFICATION_IDX_ERROR);

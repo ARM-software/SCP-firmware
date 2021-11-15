@@ -18,7 +18,7 @@
 
 static I2C_ERR_t i2c_api_recv_data_i(
     I2C_EN_CH_t ch,
-    uint32_t slave_address,
+    uint32_t target_address,
     uint32_t address,
     uint8_t *data,
     int length,
@@ -26,7 +26,7 @@ static I2C_ERR_t i2c_api_recv_data_i(
 
 static I2C_ERR_t i2c_api_send_data_i(
     I2C_EN_CH_t ch,
-    uint32_t slave_address,
+    uint32_t target_address,
     uint32_t address,
     const uint8_t *data,
     int length,
@@ -59,7 +59,7 @@ I2C_ERR_t i2c_api_use_hs_mode(I2C_EN_CH_t ch, bool use_hsmode_flag)
 
 static I2C_ERR_t i2c_api_recv_data_i(
     I2C_EN_CH_t ch,
-    uint32_t slave_address,
+    uint32_t target_address,
     uint32_t address,
     uint8_t *data,
     int length,
@@ -84,9 +84,9 @@ static I2C_ERR_t i2c_api_recv_data_i(
         }
     }
 
-    i2c_packet_set_control(&packet_info->PACKET, slave_address, false);
+    i2c_packet_set_control(&packet_info->PACKET, target_address, false);
     i2c_packet_set_address(&packet_info->PACKET, address, 1);
-    i2c_packet_set_control(&packet_info->PACKET, slave_address, true);
+    i2c_packet_set_control(&packet_info->PACKET, target_address, true);
     i2c_packet_set_payload(&packet_info->PACKET, (char *)data, length);
 
     ercd = i2c_exec_transfer(packet_info);
@@ -100,14 +100,14 @@ static I2C_ERR_t i2c_api_recv_data_i(
 
 I2C_ERR_t f_i2c_api_recv_data(
     I2C_EN_CH_t ch,
-    uint32_t slave_address,
+    uint32_t target_address,
     uint32_t address,
     uint8_t *data,
     int length)
 {
     I2C_ERR_t ercd = I2C_ERR_OK;
 
-    if ((slave_address <= 0x03) || (slave_address >= 0x78))
+    if ((target_address <= 0x03) || (target_address >= 0x78))
         return I2C_ERR_PARAM;
 
     if (data == NULL)
@@ -117,14 +117,14 @@ I2C_ERR_t f_i2c_api_recv_data(
         return I2C_ERR_PARAM;
 
     ercd = i2c_api_recv_data_i(
-        ch, slave_address, address, data, length, 0x00000000);
+        ch, target_address, address, data, length, 0x00000000);
 
     return ercd;
 }
 
 static I2C_ERR_t i2c_api_send_data_i(
     I2C_EN_CH_t ch,
-    uint32_t slave_address,
+    uint32_t target_address,
     uint32_t address,
     const uint8_t *data,
     int length,
@@ -149,7 +149,7 @@ static I2C_ERR_t i2c_api_send_data_i(
         }
     }
 
-    i2c_packet_set_control(&packet_info->PACKET, slave_address, false);
+    i2c_packet_set_control(&packet_info->PACKET, target_address, false);
     i2c_packet_set_address(&packet_info->PACKET, address, 1);
     i2c_packet_set_payload(&packet_info->PACKET, (char *)data, length);
 
@@ -164,15 +164,15 @@ static I2C_ERR_t i2c_api_send_data_i(
 
 I2C_ERR_t f_i2c_api_send_data(
     I2C_EN_CH_t ch,
-    uint32_t slave_address,
+    uint32_t target_address,
     uint32_t address,
     const uint8_t *data,
     int length)
 {
     I2C_ERR_t ercd = I2C_ERR_OK;
 
-    if ((slave_address == 0x01) || (slave_address == 0x02) ||
-        (slave_address == 0x03) || (slave_address >= 0x78)) {
+    if ((target_address == 0x01) || (target_address == 0x02) ||
+        (target_address == 0x03) || (target_address >= 0x78)) {
         return I2C_ERR_PARAM;
     }
 
@@ -180,7 +180,7 @@ I2C_ERR_t f_i2c_api_send_data(
         return I2C_ERR_PARAM;
 
     ercd = i2c_api_send_data_i(
-        ch, slave_address, address, data, length, 0x00000000);
+        ch, target_address, address, data, length, 0x00000000);
 
     return ercd;
 }

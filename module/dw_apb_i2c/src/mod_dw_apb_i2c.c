@@ -77,7 +77,7 @@ static int disable_i2c(struct dw_apb_i2c_ctx *ctx)
     return FWK_SUCCESS;
 }
 
-static int enable_i2c(struct dw_apb_i2c_ctx *ctx, uint8_t slave_address)
+static int enable_i2c(struct dw_apb_i2c_ctx *ctx, uint8_t target_address)
 {
     int status;
     struct dw_apb_i2c_reg *i2c_reg;
@@ -90,8 +90,8 @@ static int enable_i2c(struct dw_apb_i2c_ctx *ctx, uint8_t slave_address)
         return FWK_E_DEVICE;
     }
 
-    /* Program the slave address */
-    i2c_reg->IC_TAR = (slave_address & IC_TAR_ADDRESS);
+    /* Program the target address */
+    i2c_reg->IC_TAR = (target_address & IC_TAR_ADDRESS);
 
     /* Enable STOP detected interrupt and TX aborted interrupt */
     i2c_reg->IC_INTR_MASK = (IC_INTR_STOP_DET_MASK | IC_INTR_TX_ABRT_MASK);
@@ -152,13 +152,13 @@ static int transmit_as_controller(
         return FWK_E_SUPPORT;
     }
 
-    if (transmit_request->slave_address == 0) {
+    if (transmit_request->target_address == 0) {
         return FWK_E_PARAM;
     }
 
     ctx = ctx_table + fwk_id_get_element_idx(dev_id);
 
-    status = enable_i2c(ctx, transmit_request->slave_address);
+    status = enable_i2c(ctx, transmit_request->target_address);
     if (status != FWK_SUCCESS) {
         return FWK_E_DEVICE;
     }
@@ -194,7 +194,7 @@ static int receive_as_controller(
         return FWK_E_SUPPORT;
     }
 
-    if (receive_request->slave_address == 0) {
+    if (receive_request->target_address == 0) {
         return FWK_E_PARAM;
     }
 
@@ -204,7 +204,7 @@ static int receive_as_controller(
     ctx->data = receive_request->receive_data;
     ctx->read_on_going = true;
 
-    status = enable_i2c(ctx, receive_request->slave_address);
+    status = enable_i2c(ctx, receive_request->target_address);
     if (status != FWK_SUCCESS) {
         return FWK_E_DEVICE;
     }

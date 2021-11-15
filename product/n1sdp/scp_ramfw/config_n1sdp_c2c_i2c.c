@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -14,7 +14,7 @@
 const struct fwk_module_config config_n1sdp_c2c = {
     .data = &((struct n1sdp_c2c_dev_config){
         .i2c_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CDNS_I2C, 1),
-        .slave_addr = 0x14,
+        .target_addr = 0x14,
         .ccix_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_N1SDP_PCIE, 1),
     }),
 };
