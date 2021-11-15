@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -63,8 +63,8 @@ enum n1sdp_c2c_cmd {
 struct n1sdp_c2c_dev_config {
     /*! Identifier of I2C device ID */
     fwk_id_t i2c_id;
-    /*! I2C slave address to be used */
-    uint8_t slave_addr;
+    /*! I2C target address to be used */
+    uint8_t target_addr;
     /*! PCIe element identifier for CCIX */
     fwk_id_t ccix_id;
 };

@@ -96,13 +96,13 @@ static void i2c_callback_fn(
         memset((void *)&transfer_event, 0, sizeof(struct fwk_event));
         switch (cb_type) {
         case MOD_CDNS_I2C_NOTIFICATION_IDX_TX:
-            transfer_event.id = mod_cdns_i2c_notification_id_slave_tx;
+            transfer_event.id = mod_cdns_i2c_notification_id_target_tx;
             break;
         case MOD_CDNS_I2C_NOTIFICATION_IDX_RX:
-            transfer_event.id = mod_cdns_i2c_notification_id_slave_rx;
+            transfer_event.id = mod_cdns_i2c_notification_id_target_rx;
             break;
         case MOD_CDNS_I2C_NOTIFICATION_IDX_ERROR:
-            transfer_event.id = mod_cdns_i2c_notification_id_slave_error;
+            transfer_event.id = mod_cdns_i2c_notification_id_target_error;
             break;
         default:
             fwk_unexpected();
@@ -426,9 +426,9 @@ static const struct mod_cdns_i2c_controller_api_polled
     };
 
 /*
- * I2C slave interrupt mode driver API
+ * I2C target interrupt mode driver API
  */
-static int i2c_slave_write_irq(
+static int i2c_target_write_irq(
     fwk_id_t device_id,
     uint8_t *data,
     uint8_t length)
@@ -461,7 +461,7 @@ static int i2c_slave_write_irq(
         device_ctx->reg->AR,
         I2C_AR_ADD7_MASK,
         I2C_AR_ADD7_SHIFT,
-        device_ctx->config->slave_addr);
+        device_ctx->config->target_addr);
 
     /* Clear any pending IRQs and re-enable interrupts */
     device_ctx->reg->ISR = I2C_ISR_MASK;
@@ -473,7 +473,10 @@ static int i2c_slave_write_irq(
     return FWK_SUCCESS;
 }
 
-static int i2c_slave_read_irq(fwk_id_t device_id, uint8_t *data, uint8_t length)
+static int i2c_target_read_irq(
+    fwk_id_t device_id,
+    uint8_t *data,
+    uint8_t length)
 {
     struct cdns_i2c_dev_ctx *device_ctx;
 
@@ -503,7 +506,7 @@ static int i2c_slave_read_irq(fwk_id_t device_id, uint8_t *data, uint8_t length)
         device_ctx->reg->AR,
         I2C_AR_ADD7_MASK,
         I2C_AR_ADD7_SHIFT,
-        device_ctx->config->slave_addr);
+        device_ctx->config->target_addr);
 
     if (length < (I2C_TSR_TANSFER_SIZE - 2)) {
         device_ctx->reg->TSR = length;
@@ -519,9 +522,9 @@ static int i2c_slave_read_irq(fwk_id_t device_id, uint8_t *data, uint8_t length)
     return FWK_SUCCESS;
 }
 
-static const struct mod_cdns_i2c_slave_api_irq i2c_slave_api_irq = {
-    .read = i2c_slave_read_irq,
-    .write = i2c_slave_write_irq,
+static const struct mod_cdns_i2c_target_api_irq i2c_target_api_irq = {
+    .read = i2c_target_read_irq,
+    .write = i2c_target_write_irq,
 };
 
 static void i2c_init(
@@ -591,12 +594,12 @@ static int cdns_i2c_element_init(
     I2C_REG_RMW(
         device_ctx->reg->CR, I2C_CR_MS_MASK, I2C_CR_MS_SHIFT, config->mode);
 
-    if (config->mode == MOD_CDNS_I2C_SLAVE_MODE) {
+    if (config->mode == MOD_CDNS_I2C_TARGET_MODE) {
         I2C_REG_W(
             device_ctx->reg->AR,
             I2C_AR_ADD7_MASK,
             I2C_AR_ADD7_SHIFT,
-            config->slave_addr);
+            config->target_addr);
     }
 
     I2C_REG_RMW(
@@ -634,8 +637,8 @@ static int cdns_i2c_process_bind_request(
     case MOD_CDNS_I2C_API_CONTROLLER_POLLED:
         *api = &i2c_controller_api_polled;
         break;
-    case MOD_CDNS_I2C_API_SLAVE_IRQ:
-        *api = &i2c_slave_api_irq;
+    case MOD_CDNS_I2C_API_TARGET_IRQ:
+        *api = &i2c_target_api_irq;
         break;
     default:
         return FWK_E_PARAM;

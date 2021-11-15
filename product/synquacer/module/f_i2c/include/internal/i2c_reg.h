@@ -24,7 +24,7 @@ typedef union {
     struct {
         uint32_t reserved1 : 1; /* B00      Reserved */
         uint32_t GCA : 1; /* B01      General Call Address */
-        uint32_t AAS : 1; /* B02      Address As Slave */
+        uint32_t AAS : 1; /* B02      Address As Target */
         uint32_t reserved2 : 2; /* B03-04   Reserved */
         uint32_t AL : 1; /* B05      Arbitration Lost */
         uint32_t reserved3 : 2; /* B06-07   Reserved */
@@ -47,7 +47,7 @@ typedef union {
         uint32_t INTE : 1; /* B01      INTerrupt Enable */
         uint32_t reserved1 : 1; /* B02      Reserved */
         uint32_t ACK : 1; /* B03      Acknowledge Enable */
-        uint32_t MSS : 1; /* B04      Controller Slave Select 1:Controller */
+        uint32_t MSS : 1; /* B04      Controller Target Select 1:Controller */
         uint32_t SCC : 1; /* B05      Start Condition Continue */
         uint32_t BEIE : 1; /* B06      Bus Error Interrupt Enable */
         uint32_t BER : 1; /* B07      Bus Error */

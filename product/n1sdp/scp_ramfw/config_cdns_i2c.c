@@ -64,8 +64,8 @@ static const struct fwk_element *get_i2c_table(fwk_id_t module_id)
 
         if ((i == CDNS_C2C_I2C_IDX) && n1sdp_is_multichip_enabled() &&
             (n1sdp_get_chipid() != 0x0)) {
-            config->mode = MOD_CDNS_I2C_SLAVE_MODE;
-            config->slave_addr = 0x14;
+            config->mode = MOD_CDNS_I2C_TARGET_MODE;
+            config->target_addr = 0x14;
         } else {
             config->mode = MOD_CDNS_I2C_CONTROLLER_MODE;
         }

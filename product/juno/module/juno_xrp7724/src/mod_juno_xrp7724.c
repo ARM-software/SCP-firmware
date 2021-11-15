@@ -185,7 +185,7 @@ static int set_gpio(fwk_id_t id, struct juno_xrp7724_dev_ctx *ctx)
      */
     status = module_ctx.i2c_api->transmit_as_controller(
         module_ctx.config->i2c_hal_id,
-        module_ctx.config->slave_address,
+        module_ctx.config->target_address,
         ctx->transmit_data,
         GPIO_WRITE_TRANSMIT_LENGTH);
     if (status == FWK_PENDING) {
@@ -760,7 +760,7 @@ static int juno_xrp7724_sensor_process_request(fwk_id_t id, int status)
         ctx->transmit_data[0] = SENSOR_READ_TEMP;
         status = module_ctx.i2c_api->transmit_then_receive_as_controller(
             module_config->i2c_hal_id,
-            module_config->slave_address,
+            module_config->target_address,
             ctx->transmit_data,
             ctx->receive_data,
             SENSOR_WRITE_LENGTH,
@@ -827,7 +827,7 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
 
         status = module_ctx.i2c_api->transmit_then_receive_as_controller(
             module_config->i2c_hal_id,
-            module_config->slave_address,
+            module_config->target_address,
             ctx->transmit_data,
             ctx->receive_data,
             1,
@@ -872,7 +872,7 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
 
         status = module_ctx.i2c_api->transmit_as_controller(
             module_config->i2c_hal_id,
-            module_config->slave_address,
+            module_config->target_address,
             ctx->transmit_data,
             PSU_WRITE_LENGTH);
         if (status == FWK_PENDING) {
@@ -957,7 +957,7 @@ static int juno_xrp7724_psu_process_request(fwk_id_t id,
 
         status = module_ctx.i2c_api->transmit_as_controller(
             module_config->i2c_hal_id,
-            module_config->slave_address,
+            module_config->target_address,
             ctx->transmit_data,
             PSU_WRITE_LENGTH);
         if (status == FWK_PENDING) {

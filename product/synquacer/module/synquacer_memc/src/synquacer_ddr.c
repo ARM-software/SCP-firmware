@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -79,7 +79,7 @@ typedef enum {
     SPD_READ_SET_PAGE_ADDR_ERROR
 } spd_read_err_code_t;
 
-static uint32_t get_i2c_slave_addr_set_page(uint32_t target_page);
+static uint32_t get_i2c_target_addr_set_page(uint32_t target_page);
 static spd_read_err_code_t read_spd(
     uint32_t slot,
     uint8_t *dst,
@@ -191,7 +191,7 @@ static void fw_ddr_change_freq(ddr_freq_t freq)
         ;
 }
 
-static uint32_t get_i2c_slave_addr_set_page(uint32_t target_page)
+static uint32_t get_i2c_target_addr_set_page(uint32_t target_page)
 {
     if (target_page == 0)
         return SPD_DTIC_SPA0;
@@ -208,8 +208,8 @@ static spd_read_err_code_t read_spd(
     uint8_t dummy = 0;
     int32_t read_len;
     uint32_t spd_page;
-    uint32_t i2c_slave_addr_read_spd;
-    uint32_t i2c_slave_addr_set_page;
+    uint32_t i2c_target_addr_read_spd;
+    uint32_t i2c_target_addr_set_page;
 
     /*
      * SPD for DDR4 consists of 512 bytes information and it is divided into
@@ -222,20 +222,20 @@ static spd_read_err_code_t read_spd(
     if (total_len > (SPD_PAGE_SIZE * SPD_NUM_OF_PAGE))
         return SPD_READ_INVALID_PARAM;
 
-    i2c_slave_addr_read_spd = slot + sysdef_option_get_i2c_for_spd_read_addr();
+    i2c_target_addr_read_spd = slot + sysdef_option_get_i2c_for_spd_read_addr();
 
     for (spd_page = 0; spd_page < SPD_NUM_OF_PAGE; spd_page++) {
         /* dummy write to switch the spd page */
-        i2c_slave_addr_set_page = get_i2c_slave_addr_set_page(spd_page);
+        i2c_target_addr_set_page = get_i2c_target_addr_set_page(spd_page);
         i2c_err = f_i2c_api->send_data(
-            I2C_EN_CH0, i2c_slave_addr_set_page, 0, &dummy, sizeof(dummy));
+            I2C_EN_CH0, i2c_target_addr_set_page, 0, &dummy, sizeof(dummy));
         if (i2c_err != I2C_ERR_OK)
             return SPD_READ_SET_PAGE_ADDR_ERROR;
 
         read_len = (total_len > SPD_PAGE_SIZE) ? SPD_PAGE_SIZE : total_len;
 
         i2c_err = f_i2c_api->recv_data(
-            I2C_EN_CH0, i2c_slave_addr_read_spd, 0, dst, read_len);
+            I2C_EN_CH0, i2c_target_addr_read_spd, 0, dst, read_len);
         if (i2c_err == I2C_ERR_UNAVAILABLE) {
             FWK_LOG_INFO("[SYSTEM] slot DIMM%" PRIu32 ": not detected", slot);
             return SPD_READ_SLOT_NONE;
@@ -243,8 +243,8 @@ static spd_read_err_code_t read_spd(
         if (i2c_err != I2C_ERR_OK) {
             FWK_LOG_INFO(
                 "[SYSTEM] Error detected while reading the first byte of SPD. "
-                "slave_addr:0x%02" PRIx32 ", errror code = %d",
-                i2c_slave_addr_read_spd,
+                "target_addr:0x%02" PRIx32 ", errror code = %d",
+                i2c_target_addr_read_spd,
                 i2c_err);
             return SPD_READ_ERROR;
         }

@@ -39,7 +39,7 @@ typedef union {
     struct {
         /** B[0] READ/WRITE */
         uint32_t BITFIELD_READ : 1;
-        /** B[7:1] SLAVE ADDRESS */
+        /** B[7:1] TARGET ADDRESS */
         uint32_t BITFIELD_ADDR : 7;
     } bit;
 } I2C_UN_SLVADDR_t;

@@ -68,8 +68,8 @@ static int create_i2c_request(fwk_id_t dev_id,
     struct mod_i2c_request *event_param =
         (struct mod_i2c_request *)event.params;
 
-    /* The slave address should be on 7 bits */
-    if (!fwk_expect(request->slave_address < 0x80)) {
+    /* The target address should be on 7 bits */
+    if (!fwk_expect(request->target_address < 0x80)) {
         return FWK_E_PARAM;
     }
 
@@ -107,7 +107,7 @@ static int create_i2c_request(fwk_id_t dev_id,
  */
 static int transmit_as_controller(
     fwk_id_t dev_id,
-    uint8_t slave_address,
+    uint8_t target_address,
     uint8_t *data,
     uint8_t byte_count)
 {
@@ -120,7 +120,7 @@ static int transmit_as_controller(
     }
 
     struct mod_i2c_request request = {
-        .slave_address = slave_address,
+        .target_address = target_address,
         .transmit_data = data,
         .transmit_byte_count = byte_count,
     };
@@ -130,7 +130,7 @@ static int transmit_as_controller(
 
 static int receive_as_controller(
     fwk_id_t dev_id,
-    uint8_t slave_address,
+    uint8_t target_address,
     uint8_t *data,
     uint8_t byte_count)
 {
@@ -143,7 +143,7 @@ static int receive_as_controller(
     }
 
     struct mod_i2c_request request = {
-        .slave_address = slave_address,
+        .target_address = target_address,
         .receive_data = data,
         .receive_byte_count = byte_count,
     };
@@ -153,7 +153,7 @@ static int receive_as_controller(
 
 static int transmit_then_receive_as_controller(
     fwk_id_t dev_id,
-    uint8_t slave_address,
+    uint8_t target_address,
     uint8_t *transmit_data,
     uint8_t *receive_data,
     uint8_t transmit_byte_count,
@@ -168,7 +168,7 @@ static int transmit_then_receive_as_controller(
     }
 
     struct mod_i2c_request request = {
-        .slave_address = slave_address,
+        .target_address = target_address,
         .transmit_data = transmit_data,
         .receive_data = receive_data,
         .transmit_byte_count = transmit_byte_count,

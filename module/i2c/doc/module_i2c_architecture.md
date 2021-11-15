@@ -31,8 +31,8 @@ queue, if any, is initiated.
 
 The following features are unsupported. Support may be added in the future.
 
-- Acting like a slave.
-- 10-bit slave addressing.
+- Acting like a target.
+- 10-bit target addressing.
 
 # Flow                                           {#module_i2c_architecture_flow}
 
@@ -76,7 +76,7 @@ The flow for a reception is similar.
 
 The client calls *transmit_as_controller* API of the I2C module.
 This function creates and sends the targeted I2C device request event which
-defines the targeted slave on the bus and the data to be transmitted. When
+defines the selected target on the bus and the data to be transmitted. When
 processing the request event, the I2C module initiates the transfer by
 programming the I2C controller through the *transmit_as_controller* API of the
 I2C driver.
