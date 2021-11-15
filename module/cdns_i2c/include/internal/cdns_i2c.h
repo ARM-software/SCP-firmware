@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -190,8 +190,8 @@ struct cdns_i2c_reg {
 #define I2C_RW_WRITE 0
 #define I2C_RW_READ  1
 
-#define I2C_MS_SLAVE  0
-#define I2C_MS_MASTER 1
+#define I2C_MS_SLAVE      0
+#define I2C_MS_CONTROLLER 1
 
 #define I2C_NEA_10BIT 0
 #define I2C_NEA_7BIT  1

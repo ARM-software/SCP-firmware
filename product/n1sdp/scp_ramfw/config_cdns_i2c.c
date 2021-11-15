@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -67,7 +67,7 @@ static const struct fwk_element *get_i2c_table(fwk_id_t module_id)
             config->mode = MOD_CDNS_I2C_SLAVE_MODE;
             config->slave_addr = 0x14;
         } else {
-            config->mode = MOD_CDNS_I2C_MASTER_MODE;
+            config->mode = MOD_CDNS_I2C_CONTROLLER_MODE;
         }
     }
 

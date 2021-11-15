@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -356,14 +356,14 @@ struct FWK_PACKED ddr4_spd {
 /*
  * Brief - Function to initialize and check DIMM SPD values
  *
- * param - i2c_api - Pointer to I2C master APIs
+ * param - i2c_api - Pointer to I2C controller APIs
  * param - ddr - Pointer to DIMM information structure
  *
  * retval - FWK_SUCCESS - if the operation is succeeded
  *          FWK_E_DATA - if the SPD data is wrong
  */
 int dimm_spd_init_check(
-    struct mod_cdns_i2c_master_api_polled *i2c_api,
+    struct mod_cdns_i2c_controller_api_polled *i2c_api,
     struct dimm_info *ddr);
 
 /*

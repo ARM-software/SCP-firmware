@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -105,10 +105,11 @@ static int create_i2c_request(fwk_id_t dev_id,
 /*
  * I2C API
  */
-static int transmit_as_master(fwk_id_t dev_id,
-                              uint8_t slave_address,
-                              uint8_t *data,
-                              uint8_t byte_count)
+static int transmit_as_controller(
+    fwk_id_t dev_id,
+    uint8_t slave_address,
+    uint8_t *data,
+    uint8_t byte_count)
 {
     if (!fwk_expect(byte_count != 0)) {
         return FWK_E_PARAM;
@@ -127,10 +128,11 @@ static int transmit_as_master(fwk_id_t dev_id,
     return create_i2c_request(dev_id, &request);
 }
 
-static int receive_as_master(fwk_id_t dev_id,
-                             uint8_t slave_address,
-                             uint8_t *data,
-                             uint8_t byte_count)
+static int receive_as_controller(
+    fwk_id_t dev_id,
+    uint8_t slave_address,
+    uint8_t *data,
+    uint8_t byte_count)
 {
     if (!fwk_expect(byte_count != 0)) {
         return FWK_E_PARAM;
@@ -149,12 +151,13 @@ static int receive_as_master(fwk_id_t dev_id,
     return create_i2c_request(dev_id, &request);
 }
 
-static int transmit_then_receive_as_master(fwk_id_t dev_id,
-                                           uint8_t slave_address,
-                                           uint8_t *transmit_data,
-                                           uint8_t *receive_data,
-                                           uint8_t transmit_byte_count,
-                                           uint8_t receive_byte_count)
+static int transmit_then_receive_as_controller(
+    fwk_id_t dev_id,
+    uint8_t slave_address,
+    uint8_t *transmit_data,
+    uint8_t *receive_data,
+    uint8_t transmit_byte_count,
+    uint8_t receive_byte_count)
 {
     if (!fwk_expect((transmit_byte_count != 0) && (receive_byte_count != 0))) {
         return FWK_E_PARAM;
@@ -176,9 +179,9 @@ static int transmit_then_receive_as_master(fwk_id_t dev_id,
 }
 
 static struct mod_i2c_api i2c_api = {
-    .transmit_as_master = transmit_as_master,
-    .receive_as_master = receive_as_master,
-    .transmit_then_receive_as_master = transmit_then_receive_as_master,
+    .transmit_as_controller = transmit_as_controller,
+    .receive_as_controller = receive_as_controller,
+    .transmit_then_receive_as_controller = transmit_then_receive_as_controller,
 };
 
 /*
@@ -254,8 +257,8 @@ static int mod_i2c_bind(fwk_id_t id, unsigned int round)
         return status;
     }
 
-    if ((ctx->driver_api->transmit_as_master == NULL) ||
-        (ctx->driver_api->receive_as_master == NULL)) {
+    if ((ctx->driver_api->transmit_as_controller == NULL) ||
+        (ctx->driver_api->receive_as_controller == NULL)) {
         return FWK_E_DATA;
     }
 
@@ -319,12 +322,14 @@ static int process_request(struct mod_i2c_dev_ctx *ctx, fwk_id_t event_id)
     switch (event_id_type) {
     case MOD_I2C_EVENT_IDX_REQUEST_TRANSMIT:
         ctx->state = MOD_I2C_DEV_TX;
-        drv_status = driver_api->transmit_as_master(driver_id, &ctx->request);
+        drv_status =
+            driver_api->transmit_as_controller(driver_id, &ctx->request);
         break;
 
     case MOD_I2C_EVENT_IDX_REQUEST_TRANSMIT_THEN_RECEIVE:
         ctx->state = MOD_I2C_DEV_TX_RX;
-        drv_status = driver_api->transmit_as_master(driver_id, &ctx->request);
+        drv_status =
+            driver_api->transmit_as_controller(driver_id, &ctx->request);
 
         if (drv_status != FWK_SUCCESS) {
             /* The request has failed or been acknowledged */
@@ -334,7 +339,8 @@ static int process_request(struct mod_i2c_dev_ctx *ctx, fwk_id_t event_id)
 
     case MOD_I2C_EVENT_IDX_REQUEST_RECEIVE:
         ctx->state = MOD_I2C_DEV_RX;
-        drv_status = driver_api->receive_as_master(driver_id, &ctx->request);
+        drv_status =
+            driver_api->receive_as_controller(driver_id, &ctx->request);
         break;
 
     default:
@@ -478,9 +484,8 @@ static int mod_i2c_process_event(const struct fwk_event *event,
                 /* The TX request succeeded, proceed with the RX */
                 ctx->state = MOD_I2C_DEV_RX;
 
-                drv_status = ctx->driver_api->receive_as_master(
-                    ctx->config->driver_id,
-                    &ctx->request);
+                drv_status = ctx->driver_api->receive_as_controller(
+                    ctx->config->driver_id, &ctx->request);
 
                 if (drv_status == FWK_PENDING) {
                     status = FWK_SUCCESS;

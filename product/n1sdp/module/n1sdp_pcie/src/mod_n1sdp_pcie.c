@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -809,7 +809,7 @@ static int n1sdp_pcie_process_notification(const struct fwk_event *event,
      * in two special cases:
      *     1. In case of slave chip as it will be initialized by C2C module
      *        in endpoint mode.
-     *     2. In case of master chip if the slave I2C is alive & responding
+     *     2. In case of controller chip if the slave I2C is alive & responding
      *        then it will be initialized by C2C module in RP mode.
      */
     if (dev_ctx->config->ccix_capable) {

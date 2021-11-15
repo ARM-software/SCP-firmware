@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -36,7 +36,7 @@ typedef union {
     struct {
         uint32_t reserved1 : 6; /* B00-05   Reserved */
         uint32_t HS : 1; /* B06      Hi Speed Mode */
-        uint32_t MAS : 1; /* B07      Master Code */
+        uint32_t MAS : 1; /* B07      Controller Code */
     } bit_F_I2C_SP1;
 } I2C_UN_BS2R_t;
 
@@ -47,7 +47,7 @@ typedef union {
         uint32_t INTE : 1; /* B01      INTerrupt Enable */
         uint32_t reserved1 : 1; /* B02      Reserved */
         uint32_t ACK : 1; /* B03      Acknowledge Enable */
-        uint32_t MSS : 1; /* B04      Master Slave Select 1:Master */
+        uint32_t MSS : 1; /* B04      Controller Slave Select 1:Controller */
         uint32_t SCC : 1; /* B05      Start Condition Continue */
         uint32_t BEIE : 1; /* B06      Bus Error Interrupt Enable */
         uint32_t BER : 1; /* B07      Bus Error */

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -121,8 +121,8 @@ static int set_block_access_length(struct juno_cdcel937_dev_ctx *ctx,
 
     i2c_transmit[1] = config6.reg[0];
 
-    status = module_ctx.i2c_api->transmit_as_master(module_config->i2c_hal_id,
-        ctx->config->slave_address, i2c_transmit, 2);
+    status = module_ctx.i2c_api->transmit_as_controller(
+        module_config->i2c_hal_id, ctx->config->slave_address, i2c_transmit, 2);
     if (status != FWK_PENDING) {
         return FWK_E_DEVICE;
     }
@@ -151,8 +151,11 @@ static int write_configuration(struct juno_cdcel937_dev_ctx *ctx,
      */
     fwk_str_memcpy(&i2c_transmit[2], &(config->reg[1]), 8);
 
-    status = module_ctx.i2c_api->transmit_as_master(module_config->i2c_hal_id,
-        ctx->config->slave_address, i2c_transmit, 10);
+    status = module_ctx.i2c_api->transmit_as_controller(
+        module_config->i2c_hal_id,
+        ctx->config->slave_address,
+        i2c_transmit,
+        10);
     if (status != FWK_PENDING) {
         return FWK_E_DEVICE;
     }
@@ -175,9 +178,13 @@ static int read_configuration(struct juno_cdcel937_dev_ctx *ctx,
                    (base & JUNO_CDCEL937_I2C_BYTE_OFFSET_MASK));
 
     /* Returned data is preceded by a 1 byte header */
-    status = module_ctx.i2c_api->transmit_then_receive_as_master(
-        module_config->i2c_hal_id, ctx->config->slave_address, i2c_transmit,
-        config->reg, 1, block_access_length + 1);
+    status = module_ctx.i2c_api->transmit_then_receive_as_controller(
+        module_config->i2c_hal_id,
+        ctx->config->slave_address,
+        i2c_transmit,
+        config->reg,
+        1,
+        block_access_length + 1);
     if (status != FWK_PENDING) {
         return FWK_E_DEVICE;
     }
@@ -197,9 +204,13 @@ static int read_configuration_y1(struct juno_cdcel937_dev_ctx *ctx,
             JUNO_CDCEL937_I2C_BYTE_OFFSET_MASK));
 
     /* Returned data is preceded by a 1 byte header */
-    status = module_ctx.i2c_api->transmit_then_receive_as_master(
-        module_config->i2c_hal_id, ctx->config->slave_address, i2c_transmit,
-        config->reg, 1, block_access_length + 1);
+    status = module_ctx.i2c_api->transmit_then_receive_as_controller(
+        module_config->i2c_hal_id,
+        ctx->config->slave_address,
+        i2c_transmit,
+        config->reg,
+        1,
+        block_access_length + 1);
     if (status != FWK_PENDING)
         return FWK_E_DEVICE;
 

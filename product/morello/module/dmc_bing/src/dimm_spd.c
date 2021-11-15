@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -35,7 +35,7 @@ struct ddr4_spd ddr4_dimm1;
  */
 
 static int spd_read(
-    struct mod_cdns_i2c_master_api_polled *i2c_api,
+    struct mod_cdns_i2c_controller_api_polled *i2c_api,
     int address,
     uint8_t *spd_data)
 {
@@ -534,7 +534,7 @@ static uint32_t cal_dly_wth_rounding(int32_t spd_val, int32_t spd_val_fine)
  * APIs invoked by DMC-620 core functions
  */
 int dimm_spd_init_check(
-    struct mod_cdns_i2c_master_api_polled *i2c_api,
+    struct mod_cdns_i2c_controller_api_polled *i2c_api,
     struct dimm_info *ddr)
 {
     int status;
