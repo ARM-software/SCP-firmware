@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -140,8 +140,9 @@ static void i2c_isr(uintptr_t data)
 /*
  * Driver API
  */
-static int transmit_as_master(fwk_id_t dev_id,
-                              struct mod_i2c_request *transmit_request)
+static int transmit_as_controller(
+    fwk_id_t dev_id,
+    struct mod_i2c_request *transmit_request)
 {
     int status;
     unsigned int sent_bytes;
@@ -181,8 +182,9 @@ static int transmit_as_master(fwk_id_t dev_id,
     return FWK_PENDING;
 }
 
-static int receive_as_master(fwk_id_t dev_id,
-                             struct mod_i2c_request *receive_request)
+static int receive_as_controller(
+    fwk_id_t dev_id,
+    struct mod_i2c_request *receive_request)
 {
     int status;
     unsigned int i;
@@ -227,8 +229,8 @@ static int receive_as_master(fwk_id_t dev_id,
 }
 
 static const struct mod_i2c_driver_api driver_api = {
-    .transmit_as_master = transmit_as_master,
-    .receive_as_master = receive_as_master
+    .transmit_as_controller = transmit_as_controller,
+    .receive_as_controller = receive_as_controller
 };
 
 /*

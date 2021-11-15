@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -91,7 +91,7 @@ typedef struct {
     I2C_TYPE TYPE;
     uint32_t I2C_BASE_ADDR;
     bool USE_HS_MODE;
-    bool MASTER_CODE_FLAG;
+    bool CONTROLLER_CODE_FLAG;
     I2C_ST_PACKET_t PACKET;
     char CTRL_BUFF[0x08];
     bool CTRL_ATTR[0x08];

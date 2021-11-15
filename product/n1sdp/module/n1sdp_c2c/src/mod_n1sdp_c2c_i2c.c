@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -91,8 +91,8 @@ struct n1sdp_c2c_ctx {
     /*  Pointer to module configuration */
     struct n1sdp_c2c_dev_config *config;
 
-    /* I2C Master API ID */
-    struct mod_cdns_i2c_master_api_polled *master_api;
+    /* I2C Controller API ID */
+    struct mod_cdns_i2c_controller_api_polled *controller_api;
 
     /* I2C Slave API ID */
     struct mod_cdns_i2c_slave_api_irq *slave_api;
@@ -159,11 +159,12 @@ static int n1sdp_c2c_master_tx_command(uint8_t cmd)
     FWK_LOG_INFO("[C2C] %s in slave...", cmd_str[cmd]);
 
     n1sdp_c2c_ctx.master_tx_data[0] = cmd;
-    status = n1sdp_c2c_ctx.master_api->write(
+    status = n1sdp_c2c_ctx.controller_api->write(
         n1sdp_c2c_ctx.config->i2c_id,
         n1sdp_c2c_ctx.config->slave_addr,
         (char *)&n1sdp_c2c_ctx.master_tx_data[0],
-        N1SDP_C2C_DATA_SIZE, true);
+        N1SDP_C2C_DATA_SIZE,
+        true);
     if (status != FWK_SUCCESS) {
         FWK_LOG_INFO("[C2C] Error!");
         return status;
@@ -177,11 +178,12 @@ static int n1sdp_c2c_master_rx_response(void)
 {
     int status;
 
-    FWK_LOG_INFO("[C2C] Waiting for response from slave...");
-    status = n1sdp_c2c_ctx.master_api->read(
+    FWK_LOG_INFO("[C2C] Waiting for response from  slave...");
+    status = n1sdp_c2c_ctx.controller_api->read(
         n1sdp_c2c_ctx.config->i2c_id,
         n1sdp_c2c_ctx.config->slave_addr,
-        (char *)&n1sdp_c2c_ctx.master_rx_data[0], N1SDP_C2C_DATA_SIZE);
+        (char *)&n1sdp_c2c_ctx.master_rx_data[0],
+        N1SDP_C2C_DATA_SIZE);
     if (status != FWK_SUCCESS) {
         FWK_LOG_INFO("[C2C] Error %d!", status);
         return status;
@@ -1144,8 +1146,9 @@ static int n1sdp_c2c_bind(fwk_id_t id, unsigned int round)
             status = fwk_module_bind(
                 n1sdp_c2c_ctx.config->i2c_id,
                 FWK_ID_API(
-                    FWK_MODULE_IDX_CDNS_I2C, MOD_CDNS_I2C_API_MASTER_POLLED),
-                &n1sdp_c2c_ctx.master_api);
+                    FWK_MODULE_IDX_CDNS_I2C,
+                    MOD_CDNS_I2C_API_CONTROLLER_POLLED),
+                &n1sdp_c2c_ctx.controller_api);
             if (status != FWK_SUCCESS) {
                 return status;
             }

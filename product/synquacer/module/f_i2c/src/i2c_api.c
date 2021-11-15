@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -14,7 +14,7 @@
 #include <stdio.h>
 
 #define FILE_GRP_ID DBG_DRV_I2C
-#define MASTER_CODE_VAL 0x04
+#define CONTROLLER_CODE_VAL 0x04
 
 static I2C_ERR_t i2c_api_recv_data_i(
     I2C_EN_CH_t ch,
@@ -75,12 +75,12 @@ static I2C_ERR_t i2c_api_recv_data_i(
 
     i2c_packet_initialize(&packet_info->PACKET);
 
-    /* Send master code, only for F_I2C_SP1 */
+    /* Send controller code, only for F_I2C_SP1 */
     if (packet_info->TYPE == I2C_TYPE_F_I2C_SP1) {
         if (packet_info->USE_HS_MODE) {
-            packet_info->MASTER_CODE_FLAG = true;
+            packet_info->CONTROLLER_CODE_FLAG = true;
             i2c_packet_set_control(
-                &packet_info->PACKET, MASTER_CODE_VAL, false);
+                &packet_info->PACKET, CONTROLLER_CODE_VAL, false);
         }
     }
 
@@ -140,12 +140,12 @@ static I2C_ERR_t i2c_api_send_data_i(
 
     i2c_packet_initialize(&packet_info->PACKET);
 
-    /* Send master code, only for F_I2C_SP1 */
+    /* Send controller code, only for F_I2C_SP1 */
     if (packet_info->TYPE == I2C_TYPE_F_I2C_SP1) {
         if (packet_info->USE_HS_MODE) {
-            packet_info->MASTER_CODE_FLAG = true;
+            packet_info->CONTROLLER_CODE_FLAG = true;
             i2c_packet_set_control(
-                &packet_info->PACKET, MASTER_CODE_VAL, false);
+                &packet_info->PACKET, CONTROLLER_CODE_VAL, false);
         }
     }
 

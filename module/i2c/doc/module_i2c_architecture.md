@@ -36,23 +36,23 @@ The following features are unsupported. Support may be added in the future.
 
 # Flow                                           {#module_i2c_architecture_flow}
 
-The following schematic describes the transaction flow for an I2C master
+The following schematic describes the transaction flow for an I2C controller
 transmission. It is assumed that all the sequence occurs without any
 concurrent access and that the driver handles the transmission asynchonously.
 The flow for a reception is similar.
 
     Client             I2C         I2C Driver     I2C ISR (Driver)
       |                 |               |               |
-      |    transmit_    |               |               |
-     +-+   as_master    |               |               |
+      |   transmit_     |               |               |
+     +-+  as_controller |               |               |
      | +-------------->+-+              |               |
      | |               | +- - +         |               |
      | +<--------------+-+    |process_ |               |
      +-+                |     |event E1 |               |
       |                 |     |         |               |
       |                +-+<- -+         |               |
-      |                | |  transmit_   |               |
-      |                | |  as_master   |               |
+      |                | | transmit_    |               |
+      |                | | as_controller|               |
       |                | +------------>+-+              |
       |                | +<------------+-+              |
       |                +-+              |               |
@@ -74,22 +74,22 @@ The flow for a reception is similar.
     ---> : Function call/return
     - -> : Asynchronous call via the event/notification interface
 
-The client calls *transmit_as_master* API of the I2C module.
+The client calls *transmit_as_controller* API of the I2C module.
 This function creates and sends the targeted I2C device request event which
 defines the targeted slave on the bus and the data to be transmitted. When
 processing the request event, the I2C module initiates the transfer by
-programming the I2C controller through the *transmit_as_master* API of the I2C
-driver.
+programming the I2C controller through the *transmit_as_controller* API of the
+I2C driver.
 
 An interrupt is asserted when the I2C transaction either completes or encounters
 an error. The I2C ISR calls the *transaction_completed* API of the I2C HAL
 module which sends a response event to indicate that transaction completed to
 the client.
 
-In the case of *transmit_then_receive_as_master*, the I2C HAL does not send a
-event at the end of the transmission. Instead it starts the reception by calling
-*receive_as_master* driver function. The event is then sent when the reception
-has completed.
+In the case of *transmit_then_receive_as_controller*, the I2C HAL does not send
+a event at the end of the transmission. Instead it starts the reception by 
+calling *receive_as_controller* driver function. The event is then sent when
+the reception has completed.
 
 # Concurrent accesses             {#module_i2c_architecture_concurrent_accesses}
 
@@ -100,8 +100,8 @@ illustrated by the following schematic:
 
     Client             I2C
       |                 |
-      |    transmit_    |
-     +-+   as_master    |
+      |   transmit_     |
+     +-+  as_controller |
      | +-------------->+-+
      | |               | +- - +
      | +<--------------+-+    |process_
@@ -134,8 +134,8 @@ initiated is a reception request.
       |  event E1  |    |               |              | |
       |            +- >+-+              |              +-+
       |                | |              |               |
-      |                | |  receive_    |               |
-      |                | |  as_master   |               |
+      |                | | receive_     |               |
+      |                | | as_controller|               |
       |                | +------------>+-+              |
       |                | +<------------+-+              |
      +-+<- - - - - - - + |              |               |

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -37,7 +37,7 @@
 
 static struct mod_dmc_ddr_phy_api *ddr_phy_api;
 static struct mod_timer_api *timer_api;
-static struct mod_cdns_i2c_master_api_polled *i2c_api;
+static struct mod_cdns_i2c_controller_api_polled *i2c_api;
 static struct dimm_info ddr_info;
 
 /*
@@ -1287,7 +1287,7 @@ static int mod_dmc620_bind(fwk_id_t id, unsigned int round)
 
     status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_CDNS_I2C),
-        FWK_ID_API(FWK_MODULE_IDX_CDNS_I2C, MOD_CDNS_I2C_API_MASTER_POLLED),
+        FWK_ID_API(FWK_MODULE_IDX_CDNS_I2C, MOD_CDNS_I2C_API_CONTROLLER_POLLED),
         &i2c_api);
     if (status != FWK_SUCCESS) {
         return status;

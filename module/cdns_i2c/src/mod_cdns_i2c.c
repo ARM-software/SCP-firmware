@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -171,8 +171,8 @@ static void i2c_isr(uintptr_t data)
             goto i2c_error;
         }
 
-        /* If master, reload TSR if more data expected. */
-        if ((ctx->config->mode == MOD_CDNS_I2C_MASTER_MODE) &&
+        /* If controller, reload TSR if more data expected. */
+        if ((ctx->config->mode == MOD_CDNS_I2C_CONTROLLER_MODE) &&
             (ctx->irq_data_ctx.index < ctx->irq_data_ctx.size)) {
             if ((ctx->irq_data_ctx.size - ctx->irq_data_ctx.index) >
                 I2C_TSR_TANSFER_SIZE) {
@@ -238,9 +238,9 @@ i2c_error:
  */
 
 /*
- * I2C master polled mode driver API
+ * I2C controller polled mode driver API
  */
-static int i2c_master_read_polled(
+static int i2c_controller_read_polled(
     fwk_id_t device_id,
     uint16_t address,
     char *data,
@@ -325,7 +325,7 @@ static int i2c_master_read_polled(
     return FWK_SUCCESS;
 }
 
-static int i2c_master_write_polled(
+static int i2c_controller_write_polled(
     fwk_id_t device_id,
     uint16_t address,
     const char *data,
@@ -419,10 +419,11 @@ static int i2c_master_write_polled(
     return FWK_SUCCESS;
 }
 
-static const struct mod_cdns_i2c_master_api_polled i2c_master_api_polled = {
-    .read = i2c_master_read_polled,
-    .write = i2c_master_write_polled,
-};
+static const struct mod_cdns_i2c_controller_api_polled
+    i2c_controller_api_polled = {
+        .read = i2c_controller_read_polled,
+        .write = i2c_controller_write_polled,
+    };
 
 /*
  * I2C slave interrupt mode driver API
@@ -630,8 +631,8 @@ static int cdns_i2c_process_bind_request(
     const void **api)
 {
     switch (fwk_id_get_api_idx(api_id)) {
-    case MOD_CDNS_I2C_API_MASTER_POLLED:
-        *api = &i2c_master_api_polled;
+    case MOD_CDNS_I2C_API_CONTROLLER_POLLED:
+        *api = &i2c_controller_api_polled;
         break;
     case MOD_CDNS_I2C_API_SLAVE_IRQ:
         *api = &i2c_slave_api_irq;

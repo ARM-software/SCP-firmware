@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -96,7 +96,7 @@ static_assert(sizeof(struct mod_i2c_request) <= FWK_EVENT_PARAMETERS_SIZE,
  */
 struct mod_i2c_driver_api {
     /*!
-     * \brief Request transmission of data as Master to a selected slave.
+     * \brief Request transmission of data as Controller to a selected slave.
      *
      * \details When the function returns the transmission may not be completed.
      *      The driver can assume the integrity of the data during the
@@ -112,11 +112,12 @@ struct mod_i2c_driver_api {
      * \retval ::FWK_E_PARAM One or more parameters were invalid.
      * \return One of the standard framework status codes.
      */
-    int (*transmit_as_master)(
-        fwk_id_t dev_id, struct mod_i2c_request *transmit_request);
+    int (*transmit_as_controller)(
+        fwk_id_t dev_id,
+        struct mod_i2c_request *transmit_request);
 
     /*!
-     * \brief Request the reception of data as Master from a selected slave.
+     * \brief Request the reception of data as Controller from a selected slave.
      *
      * \details When the function returns the reception may not be completed.
      *      The driver can assume the integrity of the data pointer during the
@@ -131,8 +132,9 @@ struct mod_i2c_driver_api {
      * \retval ::FWK_E_PARAM One or more parameters were invalid.
      * \return One of the standard framework status codes.
      */
-    int (*receive_as_master)(
-        fwk_id_t dev_id, struct mod_i2c_request *receive_request);
+    int (*receive_as_controller)(
+        fwk_id_t dev_id,
+        struct mod_i2c_request *receive_request);
 };
 
 /*!
@@ -140,7 +142,7 @@ struct mod_i2c_driver_api {
  */
 struct mod_i2c_api {
     /*!
-     * \brief Request transmission of data as Master to a selected slave.
+     * \brief Request transmission of data as Controller to a selected slave.
      *
      * \details When the function returns the transmission is not completed,
      *      possibly not even started. The data buffer must stay allocated
@@ -159,11 +161,14 @@ struct mod_i2c_api {
      * \retval ::FWK_E_DEVICE The transmission is aborted due to a device error.
      * \return One of the standard framework status codes.
      */
-    int (*transmit_as_master)(fwk_id_t dev_id, uint8_t slave_address,
-        uint8_t *data, uint8_t byte_count);
+    int (*transmit_as_controller)(
+        fwk_id_t dev_id,
+        uint8_t slave_address,
+        uint8_t *data,
+        uint8_t byte_count);
 
     /*!
-     * \brief Request reception of data as Master from a selected slave.
+     * \brief Request reception of data as Controller from a selected slave.
      *
      * \details When the function returns the reception is not completed,
      *      possibly not even started. The data buffer must stay allocated
@@ -182,12 +187,15 @@ struct mod_i2c_api {
      * \retval ::FWK_E_DEVICE The reception is aborted due to a device error.
      * \return One of the standard framework status codes.
      */
-    int (*receive_as_master)(fwk_id_t dev_id, uint8_t slave_address,
-        uint8_t *data, uint8_t byte_count);
+    int (*receive_as_controller)(
+        fwk_id_t dev_id,
+        uint8_t slave_address,
+        uint8_t *data,
+        uint8_t byte_count);
 
     /*!
      * \brief Request the transmission followed by the reception of data as
-     *      Master to/from a selected slave.
+     *      Controller to/from a selected slave.
      *
      * \details When the function returns the transaction is not completed,
      *      possibly not even started. The data buffer must stay allocated
@@ -212,9 +220,13 @@ struct mod_i2c_api {
      * \retval ::FWK_E_DEVICE The reception is aborted due to a device error.
      * \return One of the standard framework status codes.
      */
-    int (*transmit_then_receive_as_master)(fwk_id_t dev_id,
-        uint8_t slave_address, uint8_t *transmit_data, uint8_t *receive_data,
-        uint8_t transmit_byte_count, uint8_t receive_byte_count);
+    int (*transmit_then_receive_as_controller)(
+        fwk_id_t dev_id,
+        uint8_t slave_address,
+        uint8_t *transmit_data,
+        uint8_t *receive_data,
+        uint8_t transmit_byte_count,
+        uint8_t receive_byte_count);
 };
 
 /*!

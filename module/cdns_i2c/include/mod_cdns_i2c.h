@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -39,7 +39,7 @@
  * \brief I2C API ID.
  */
 enum mod_cdns_i2c_api {
-    MOD_CDNS_I2C_API_MASTER_POLLED,
+    MOD_CDNS_I2C_API_CONTROLLER_POLLED,
     MOD_CDNS_I2C_API_SLAVE_IRQ,
     MOD_CDNS_I2C_API_COUNT,
 };
@@ -58,7 +58,7 @@ enum mod_cdns_i2c_speed {
  */
 enum mod_cdns_i2c_mode {
     MOD_CDNS_I2C_SLAVE_MODE,
-    MOD_CDNS_I2C_MASTER_MODE,
+    MOD_CDNS_I2C_CONTROLLER_MODE,
 };
 
 /*!
@@ -125,7 +125,7 @@ struct mod_cdns_i2c_device_config {
     /*! Acknowledge enable */
     enum mod_cdns_i2c_ack ack_en;
 
-    /*! Operating mode (Master/Slave) */
+    /*! Operating mode (Controller/Slave) */
     enum mod_cdns_i2c_mode mode;
 
     /*! Address size (7Bit/10Bit) */
@@ -145,9 +145,9 @@ struct mod_cdns_i2c_device_config {
 };
 
 /*!
- * \brief API to access the I2C master functions in polled mode.
+ * \brief API to access the I2C controller functions in polled mode.
  */
-struct mod_cdns_i2c_master_api_polled {
+struct mod_cdns_i2c_controller_api_polled {
     /*!
      * \brief I2C read function.
      *

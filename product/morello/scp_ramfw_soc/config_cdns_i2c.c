@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -27,7 +27,7 @@ static const struct fwk_element i2c_element_desc_table[3] = {
             .reg_base = DIMM_SPD_I2C_BASE,
             .clock_rate_hz = OSC_FREQ_HZ,
             .bus_speed_hz = MOD_CDNS_I2C_SPEED_NORMAL,
-            .mode = MOD_CDNS_I2C_MASTER_MODE,
+            .mode = MOD_CDNS_I2C_CONTROLLER_MODE,
             .ack_en = MOD_CDNS_I2C_ACK_ENABLE,
             .addr_size = MOD_CDNS_I2C_ADDRESS_7_BIT,
             .hold_mode = MOD_CDNS_I2C_HOLD_ON,

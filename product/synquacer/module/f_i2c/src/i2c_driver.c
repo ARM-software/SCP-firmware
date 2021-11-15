@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -299,8 +299,8 @@ static bool i2c_handler_buserror(
 {
     bool result = false;
 
-    if (packet_info->MASTER_CODE_FLAG) {
-        packet_info->MASTER_CODE_FLAG = false;
+    if (packet_info->CONTROLLER_CODE_FLAG) {
+        packet_info->CONTROLLER_CODE_FLAG = false;
         if (!(bsr_reg->bit_COMMON.LRB))
             result = true;
     }
@@ -326,9 +326,9 @@ static bool i2c_handler_normal(
     struct I2C_REG_FUNC_TABLE *i2c_reg = &tables[packet_info->TYPE];
 
     if (bcr_reg->bit_COMMON.MSS) {
-        if (packet_info->MASTER_CODE_FLAG) {
+        if (packet_info->CONTROLLER_CODE_FLAG) {
             I2C_UN_BS2R_t unBS2R = { 0 };
-            packet_info->MASTER_CODE_FLAG = 0;
+            packet_info->CONTROLLER_CODE_FLAG = 0;
             unBS2R.DATA = GET_BS2R();
             if (!(unBS2R.bit_F_I2C_SP1.MAS)) {
                 bcr_reg->bit_COMMON.MSS = 0;
@@ -676,7 +676,7 @@ I2C_ERR_t i2c_exec_transfer(I2C_ST_PACKET_INFO_t *packet_info)
         SET_DAR(data);
         __DSB();
         bcr_reg.DATA = GET_BCR();
-        bcr_reg.bit_COMMON.MSS = 1; /* I2C=MASTER MODE */
+        bcr_reg.bit_COMMON.MSS = 1; /* I2C=CONTROLLER MODE */
         SET_BCR(bcr_reg.DATA);
         __DSB();
     }
