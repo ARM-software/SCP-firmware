@@ -722,6 +722,9 @@ static int direct_ddr_cmd(struct mod_dmc_bing_reg *dmc)
     case 1333:
         addr = 0x000000A4;
         break;
+    case 1466:
+        addr = 0x000000A5;
+        break;
     default:
         fwk_unexpected();
         break;
@@ -738,6 +741,9 @@ static int direct_ddr_cmd(struct mod_dmc_bing_reg *dmc)
         break;
     case 1333:
         addr = 0x00000347;
+        break;
+    case 1466:
+        addr = 0x00000354;
         break;
     default:
         fwk_unexpected();
@@ -822,6 +828,13 @@ static int direct_ddr_cmd(struct mod_dmc_bing_reg *dmc)
             addr = 0x00000CA3;
         }
         break;
+    case 1466:
+        if (ddr_info.number_of_ranks == 1) {
+            addr = 0x00001095;
+        } else {
+            addr = 0x000010A3;
+        }
+        break;
     default:
         fwk_unexpected();
         break;
@@ -857,6 +870,10 @@ static int direct_ddr_cmd(struct mod_dmc_bing_reg *dmc)
         addr = 0x00000820;
         ddr_info.cwl_value = 14;
         break;
+    case 1466:
+        addr = 0x00000828;
+        ddr_info.cwl_value = 16;
+        break;
     default:
         fwk_unexpected();
         break;
@@ -875,6 +892,9 @@ static int direct_ddr_cmd(struct mod_dmc_bing_reg *dmc)
         break;
     case 1333:
         addr = 0x00000B44;
+        break;
+    case 1466:
+        addr = 0x00000B50;
         break;
     default:
         fwk_unexpected();
@@ -1151,7 +1171,12 @@ int dmc_bing_pre_phy_init(struct mod_dmc_bing_reg *dmc)
     value = 0;
     dimm_spd_t_rp(&value);
     dmc->T_RP_NEXT = value;
-    dmc->T_RPALL_NEXT = 0x00000013;
+
+    if (ddr_info.speed > 1333) {
+        dmc->T_RPALL_NEXT = 0x00000016;
+    } else {
+        dmc->T_RPALL_NEXT = 0x00000013;
+    }
 
     value = 0;
     dimm_spd_t_rrd(&value);
@@ -1161,30 +1186,80 @@ int dmc_bing_pre_phy_init(struct mod_dmc_bing_reg *dmc)
     dimm_spd_t_act_window(&value);
     dmc->T_ACT_WINDOW_NEXT = value;
 
-    if ((ddr_info.speed == 1333) || (ddr_info.speed == 1200)) {
+    if (ddr_info.speed == 1466) {
+        dmc->T_RTR_NEXT = 0x24090905;
+    } else if ((ddr_info.speed == 1333) || (ddr_info.speed == 1200)) {
         dmc->T_RTR_NEXT = 0x24090704;
     } else {
         dmc->T_RTR_NEXT = 0x14060604;
     }
 
     dmc->T_RTW_NEXT = 0x001B1B1B;
-    dmc->T_RTP_NEXT = 0x00000008;
-    dmc->T_WR_NEXT = 0x00000029;
+
+    if (ddr_info.speed == 1466) {
+        dmc->T_RTP_NEXT = 0x0000000C;
+    } else {
+        dmc->T_RTP_NEXT = 0x00000008;
+    }
+
+    if (ddr_info.speed == 1466) {
+        dmc->T_WR_NEXT = 0x0000002C;
+    } else {
+        dmc->T_WR_NEXT = 0x00000029;
+    }
+
     dmc->T_WTR_NEXT = 0x001B1B1B;
 
-    if ((ddr_info.speed == 1333) || (ddr_info.speed == 1200)) {
+    if (ddr_info.speed == 1466) {
+        dmc->T_WTW_NEXT = 0x24090905;
+    } else if ((ddr_info.speed == 1333) || (ddr_info.speed == 1200)) {
         dmc->T_WTW_NEXT = 0x24090704;
     } else {
         dmc->T_WTW_NEXT = 0x14060604;
     }
 
-    dmc->T_XMPD_NEXT = 0x00000480;
-    dmc->T_EP_NEXT = 0x00000006;
-    dmc->T_XP_NEXT = 0x000e0007;
-    dmc->T_ESR_NEXT = 0x00000007;
-    dmc->T_XSR_NEXT = 0x03000384;
-    dmc->T_ESRCK_NEXT = 0x0000000a;
-    dmc->T_CKXSR_NEXT = 0x0000000a;
+    if (ddr_info.speed == 1466) {
+        dmc->T_XMPD_NEXT = 0x00000640;
+    } else {
+        dmc->T_XMPD_NEXT = 0x00000480;
+    }
+
+    if (ddr_info.speed == 1466) {
+        dmc->T_EP_NEXT = 0x00000008;
+    } else {
+        dmc->T_EP_NEXT = 0x00000006;
+    }
+
+    if (ddr_info.speed == 1466) {
+        dmc->T_XP_NEXT = 0x0016000A;
+    } else {
+        dmc->T_XP_NEXT = 0x000e0007;
+    }
+
+    if (ddr_info.speed == 1466) {
+        dmc->T_ESR_NEXT = 0x00000009;
+    } else {
+        dmc->T_ESR_NEXT = 0x00000007;
+    }
+
+    if (ddr_info.speed == 1466) {
+        dmc->T_XSR_NEXT = 0x04000240;
+    } else {
+        dmc->T_XSR_NEXT = 0x03000384;
+    }
+
+    if (ddr_info.speed == 1466) {
+        dmc->T_ESRCK_NEXT = 0x00000012;
+    } else {
+        dmc->T_ESRCK_NEXT = 0x0000000a;
+    }
+
+    if (ddr_info.speed == 1466) {
+        dmc->T_CKXSR_NEXT = 0x00000014;
+    } else {
+        dmc->T_CKXSR_NEXT = 0x0000000a;
+    }
+
     dmc->T_PARITY_NEXT = 0x00001100;
     dmc->T_ZQCS_NEXT = 0x00000090;
 
@@ -1197,6 +1272,9 @@ int dmc_bing_pre_phy_init(struct mod_dmc_bing_reg *dmc)
         break;
     case 1333:
         dmc->T_RDDATA_EN_NEXT = 0x000E000E;
+        break;
+    case 1466:
+        dmc->T_RDDATA_EN_NEXT = 0x00100010;
         break;
     default:
         fwk_unexpected();
@@ -1214,6 +1292,9 @@ int dmc_bing_pre_phy_init(struct mod_dmc_bing_reg *dmc)
         break;
     case 1333:
         dmc->T_PHYWRLAT_NEXT = 0x010A000E;
+        break;
+    case 1466:
+        dmc->T_PHYWRLAT_NEXT = 0x010A0010;
         break;
     default:
         fwk_unexpected();

@@ -13,7 +13,7 @@
 /*
  * DDR Subsystem clock in MHz
  */
-#define DDR_CLOCK_MHZ 1333UL
+#define DDR_CLOCK_MHZ (4400.0 / 3.0)
 
 #define CPU_CLOCK_SUD 2100UL
 #define CPU_CLOCK_UD  2200UL
