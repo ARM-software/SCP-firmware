@@ -420,15 +420,26 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
             goto exit_unexpected;
         }
 
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+        desc.sensor_attributes_low = SCMI_SENSOR_DESC_ATTRIBUTES_LOW(
+            0U, /* Asyncronous reading not-supported */
+            sensor_info.hal_info.ext_attributes,
+            (uint32_t)sensor_info.trip_point.count);
+#else
         desc.sensor_attributes_low = SCMI_SENSOR_DESC_ATTRIBUTES_LOW(
             0U, /* Asyncronous reading not-supported */
             (uint32_t)sensor_info.trip_point.count);
+#endif
 
         desc.sensor_attributes_high = SCMI_SENSOR_DESC_ATTRIBUTES_HIGH(
             sensor_info.hal_info.type,
             sensor_info.hal_info.unit_multiplier,
             (uint32_t)sensor_info.hal_info.update_interval_multiplier,
             (uint32_t)sensor_info.hal_info.update_interval);
+
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+        scmi_sensor_prop_set(&sensor_info, &desc);
+#endif
 
         /*
          * Copy sensor name into description struct. Copy n-1 chars to ensure a
@@ -674,7 +685,8 @@ static int scmi_sensor_axis_desc_get_handler(
 
         desc = (struct scmi_sensor_axis_desc){
             .axis_idx = desc_index,
-            .axis_attributes_low = 0, /* None supported */
+            .axis_attributes_low =
+                SCMI_SENSOR_AXIS_DESC_ATTRIBUTES_LOW(axis_info.extended_attribs)
         };
 
         if (axis_info.type >= MOD_SENSOR_TYPE_COUNT) {
@@ -694,6 +706,8 @@ static int scmi_sensor_axis_desc_get_handler(
 
         desc.axis_attributes_high = SCMI_SENSOR_AXIS_DESC_ATTRIBUTES_HIGH(
             axis_info.type, axis_info.unit_multiplier);
+
+        scmi_sensor_axis_prop_set(&axis_info, &desc);
 
         /*
          * Copy sensor name into description struct. Copy n-1 chars to ensure a

@@ -12,6 +12,15 @@
 #define INTERNAL_SCMI_SENSOR_H
 
 #include <stdint.h>
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+#    include <mod_sensor.h>
+
+#    include <fwk_id.h>
+#    include <fwk_macros.h>
+
+#    include <stddef.h>
+#    include <stdint.h>
+#endif
 
 /*!
  * \addtogroup GroupModules Modules
@@ -131,21 +140,39 @@ struct scmi_sensor_trip_point_event_p2a {
          0)
 
 #define SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_ASYNC_READING_POS 31
+#define SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_EXTENDED_ATTRIBS_POS 8
 #define SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_NUM_TRIP_POINTS_POS 0
 
 #define SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_ASYNC_READING_MASK \
     (UINT32_C(0x1) << SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_ASYNC_READING_POS)
+#define SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_EXTENDED_ATTRIBS_MASK \
+    (UINT32_C(0x1) << SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_EXTENDED_ATTRIBS_POS)
 #define SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_NUM_TRIP_POINTS_MASK \
     (UINT32_C(0xFF) << SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_NUM_TRIP_POINTS_POS)
 
-#define SCMI_SENSOR_DESC_ATTRIBUTES_LOW(ASYNCHRO_READING, NUM_TRIP_POINTS) \
-    ( \
-        (((ASYNCHRO_READING) \
-          << SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_ASYNC_READING_POS) & \
-         SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_ASYNC_READING_MASK) | \
-        (((NUM_TRIP_POINTS) \
-          << SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_NUM_TRIP_POINTS_POS) & \
-         SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_NUM_TRIP_POINTS_MASK))
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+#    define SCMI_SENSOR_DESC_ATTRIBUTES_LOW( \
+        ASYNC_READING, EXTENDED_ATTRIBUTES, NUM_TRIP_POINTS) \
+        ( \
+            (((ASYNC_READING) \
+              << SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_ASYNC_READING_POS) & \
+             SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_ASYNC_READING_MASK) | \
+            (((EXTENDED_ATTRIBUTES) \
+              << SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_EXTENDED_ATTRIBS_POS) & \
+             SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_EXTENDED_ATTRIBS_MASK) | \
+            (((NUM_TRIP_POINTS) \
+              << SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_NUM_TRIP_POINTS_POS) & \
+             SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_NUM_TRIP_POINTS_MASK))
+#else
+#    define SCMI_SENSOR_DESC_ATTRIBUTES_LOW(ASYNC_READING, NUM_TRIP_POINTS) \
+        ( \
+            (((ASYNC_READING) \
+              << SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_ASYNC_READING_POS) & \
+             SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_ASYNC_READING_MASK) | \
+            (((NUM_TRIP_POINTS) \
+              << SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_NUM_TRIP_POINTS_POS) & \
+             SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_NUM_TRIP_POINTS_MASK))
+#endif
 
 #define SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_TYPE_POS              0U
 #define SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_UNIT_MULTIPLIER_POS   11U
@@ -240,6 +267,13 @@ struct scmi_sensor_trip_point_event_p2a {
      (((ID) << SCMI_SENSOR_TRIP_POINT_EVENT_DESC_ID_POS) & \
       SCMI_SENSOR_TRIP_POINT_EVENT_DESC_ID_MASK))
 
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+#    define SCMI_SENSOR_AXIS_DESC_ATTRIBUTES_LOW(EXTENDED_ATTRIBUTES) \
+        (((EXTENDED_ATTRIBUTES) \
+          << SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_EXTENDED_ATTRIBS_POS) & \
+         SCMI_SENSOR_DESC_ATTRS_LOW_SENSOR_EXTENDED_ATTRIBS_MASK)
+#endif
+
 #define SCMI_SENSOR_AXIS_DESC_ATTRIBUTES_HIGH(SENSOR_TYPE, UNIT_MULTIPLIER) \
     (((((unsigned int)SENSOR_TYPE) \
        << SCMI_SENSOR_DESC_ATTRS_HIGH_SENSOR_TYPE_POS) & \
@@ -253,6 +287,14 @@ struct scmi_sensor_desc {
     uint32_t sensor_attributes_low;
     uint32_t sensor_attributes_high;
     char sensor_name[SCMI_SENSOR_NAME_LEN];
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+    uint32_t sensor_power;
+    uint32_t sensor_resolution;
+    int32_t sensor_min_range_low;
+    int32_t sensor_min_range_high;
+    int32_t sensor_max_range_low;
+    int32_t sensor_max_range_high;
+#endif
 };
 
 struct scmi_sensor_protocol_description_get_a2p {
@@ -270,6 +312,13 @@ struct scmi_sensor_axis_desc {
     uint32_t axis_attributes_low;
     uint32_t axis_attributes_high;
     char axis_name[SCMI_SENSOR_AXIS_NAME_LEN];
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+    uint32_t axis_resolution;
+    int32_t axis_min_range_low;
+    int32_t axis_min_range_high;
+    int32_t axis_max_range_low;
+    int32_t axis_max_range_high;
+#endif
 };
 
 struct scmi_sensor_axis_description_get_a2p {
@@ -291,6 +340,24 @@ enum scmi_sensor_event_idx {
 
 /* SCMI sensor notifications indices */
 enum scmi_sensor_notification_id { SCMI_SENSOR_TRIP_POINT_EVENT = 0x0 };
+
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
+void scmi_sensor_prop_set(
+    struct mod_sensor_complete_info *info,
+    struct scmi_sensor_desc *desc);
+
+void scmi_sensor_axis_prop_set(
+    struct mod_sensor_axis_info *axis_values,
+    struct scmi_sensor_axis_desc *desc);
+
+/* These values are the defaults taken from the SCMI spec V3.0 */
+#    define SCMI_SENSOR_EXT_ATTR_POWER          0
+#    define SCMI_SENSOR_EXT_ATTR_RESOLUTION_VAL 0
+#    define SCMI_SENSOR_EXT_ATTR_MIN_RANGE_LOW  0
+#    define SCMI_SENSOR_EXT_ATTR_MIN_RANGE_HIGH 0x80000000
+#    define SCMI_SENSOR_EXT_ATTR_MAX_RANGE_LOW  0xFFFFFFFF
+#    define SCMI_SENSOR_EXT_ATTR_MAX_RANGE_HIGH 0x7FFFFFFF
+#endif
 
 /*!
  * \}

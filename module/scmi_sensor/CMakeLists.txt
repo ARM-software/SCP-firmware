@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -11,7 +11,8 @@ target_include_directories(${SCP_MODULE_TARGET}
                            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 target_sources(${SCP_MODULE_TARGET}
-               PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_scmi_sensor.c")
+               PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_scmi_sensor.c"
+                       "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_scmi_ext_attrib.c")
 
 target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-scmi module-sensor
                                                    module-timer)
