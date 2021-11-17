@@ -15,7 +15,8 @@ BS_LIB_SOURCES += \
     morello_ddr_phy.c \
     ddr_phy_values_800.c \
     ddr_phy_values_1200.c \
-    ddr_phy_values_1333.c
+    ddr_phy_values_1333.c \
+    ddr_phy_values_1466.c
 endif
 
 include $(BS_DIR)/lib.mk

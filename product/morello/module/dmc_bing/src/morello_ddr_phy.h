@@ -56,6 +56,20 @@ void ddr_phy_config_1333(
     struct dimm_info *info,
     int dmc_id);
 
+/*
+ * \brief Function to configure and run DDR PHY at 1466MHz frequency.
+ *
+ * \param ddr_phy Pointer to DDR PHY register space.
+ * \param info Pointer to DIMM information.
+ * \param dmc_id Identifier of the DMC instance.
+ *
+ * \retval NONE
+ */
+void ddr_phy_config_1466(
+    struct mod_morello_ddr_phy_reg *ddr_phy,
+    struct dimm_info *info,
+    int dmc_id);
+
 /*!
  * \brief Configure a DDR physical device
  *

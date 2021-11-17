@@ -29,7 +29,8 @@ target_sources(${SCP_MODULE_TARGET}
                          "${CMAKE_CURRENT_SOURCE_DIR}/src/morello_ddr_phy.c"
                          "${CMAKE_CURRENT_SOURCE_DIR}/src/ddr_phy_values_800.c"
                          "${CMAKE_CURRENT_SOURCE_DIR}/src/ddr_phy_values_1200.c"
-                         "${CMAKE_CURRENT_SOURCE_DIR}/src/ddr_phy_values_1333.c")
+                         "${CMAKE_CURRENT_SOURCE_DIR}/src/ddr_phy_values_1333.c"
+                         "${CMAKE_CURRENT_SOURCE_DIR}/src/ddr_phy_values_1466.c")
 
 target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-cdns-i2c)
 endif()
