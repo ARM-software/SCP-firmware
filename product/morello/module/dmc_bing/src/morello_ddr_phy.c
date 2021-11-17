@@ -124,6 +124,9 @@ int morello_ddr_phy_config(fwk_id_t element_id, struct dimm_info *info)
         info->speed);
 
     switch (info->speed) {
+    case 1466:
+        ddr_phy_config_1466(ddr_phy, info, element_idx);
+        break;
     case 1333:
         ddr_phy_config_1333(ddr_phy, info, element_idx);
         break;
@@ -364,7 +367,7 @@ int write_eye_detect_single_rank(
 
     speed = info->speed;
     range = 1;
-    tccd_l = (speed == 800) ? 1 : (speed == 1200) ? 2 : 3;
+    tccd_l = (speed == 800) ? 1 : (speed == 1200) ? 2 : (speed == 1333) ? 3 : 4;
     direct_addr = (tccd_l << 10) | (1 << 7) | (range - 1) << 6;
     direct_cmd = ((1 << rank) << 16) | (0x6 << 8) | 1;
 
@@ -708,6 +711,9 @@ int morello_ddr_phy_post_training_configure(
 
     if (info->speed >= 1333) {
         FWK_LOG_INFO("[DDR-PHY] Performing write eye training...");
+        if (info->speed == 1466) {
+            DEFAULT_DELAY_V2 = 0x238;
+        }
         status = write_eye_detect(element_id, info, 0xF, 0x4, 0x2, 0);
         if (status != FWK_SUCCESS) {
             FWK_LOG_INFO("[DDR-PHY] FAIL!");

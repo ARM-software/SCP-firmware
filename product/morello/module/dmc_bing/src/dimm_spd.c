@@ -122,6 +122,11 @@ static int chk_ddr4_dimms(
             status = FWK_E_DATA;
         }
         break;
+    case 1466:
+        if ((dimm0_dram_param[18] > 0x06) || (dimm1_dram_param[18] > 0x06)) {
+            return FWK_E_DATA;
+        }
+        break;
     default:
         fwk_unexpected();
         break;
