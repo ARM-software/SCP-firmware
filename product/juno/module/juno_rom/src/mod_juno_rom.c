@@ -223,6 +223,7 @@ static int deferred_setup(void)
     #endif
 
     status = ctx.bootloader_api->load_image();
+    (void)status;
 
     FWK_LOG_ERR("[ROM] ERROR: Failed to load RAM firmware image: %d", status);
 
