@@ -10,6 +10,7 @@ add_library(${SCP_MODULE_TARGET} SCP_MODULE)
 # - '0' for RD-N2 platform
 # - '1' for RD-N2-Cfg1 platform
 # - '2' for RD-N2-Cfg2 platform
+# - '3' for RD-N2-Cfg3 platform
 
 if (SCP_PLATFORM_VARIANT STREQUAL "0")
       target_compile_definitions(${SCP_MODULE_TARGET}
@@ -20,11 +21,15 @@ elseif (SCP_PLATFORM_VARIANT STREQUAL "1")
 elseif (SCP_PLATFORM_VARIANT STREQUAL "2")
       target_compile_definitions(${SCP_MODULE_TARGET}
                                  PUBLIC -DPLATFORM_VARIANT=2)
+elseif (SCP_PLATFORM_VARIANT STREQUAL "3")
+      target_compile_definitions(${SCP_MODULE_TARGET}
+                                 PUBLIC -DPLATFORM_VARIANT=3)
 else()
       message(FATAL_ERROR "Please set SCP_PLATFORM_VARIANT to \n"
                                 "'0' for RD-N2 \n"
                                 "'1' for RD-N2-Cfg1 \n"
-                                "'2' for RD-N2-Cfg2 \n")
+                                "'2' for RD-N2-Cfg2 \n"
+                                "'3' for RD-N2-Cfg3 \n")
 endif()
 
 target_include_directories(${SCP_MODULE_TARGET}

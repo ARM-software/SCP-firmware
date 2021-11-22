@@ -19,6 +19,8 @@ static const struct fwk_element subsystem_table[] = {
           &(struct mod_sid_subsystem_config){
 #if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 2)
               .part_number = 0x7B7,
+#elif (PLATFORM_VARIANT == 3)
+              .part_number = 0x7F1,
 #else
               .part_number = 0x7B6,
 #endif

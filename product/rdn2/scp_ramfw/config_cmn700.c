@@ -93,9 +93,33 @@ enum rdn2cfg2_cmn700_ccg_port {
 
 #    define MESH_SIZE_X 6
 #    define MESH_SIZE_Y 6
+
+#elif (PLATFORM_VARIANT == 3)
+#    define MEM_CNTRL0_ID 16
+#    define MEM_CNTRL1_ID 1168
+#    define MEM_CNTRL2_ID 8
+#    define MEM_CNTRL3_ID 1160
+#    define MEM_CNTRL4_ID 24
+#    define MEM_CNTRL5_ID 1176
+#    define MEM_CNTRL6_ID 32
+#    define MEM_CNTRL7_ID 1184
+
+#    define NODE_ID_HND  42
+#    define NODE_ID_HNI0 256
+#    define NODE_ID_HNP0 44
+#    define NODE_ID_HNP1 298
+#    define NODE_ID_HNP2 554
+#    define NODE_ID_HNP3 682
+#    define NODE_ID_HNP4 938
+#    define NODE_ID_SBSX 172
+
+#    define NODE_ID_NON_PCIE_IO_MACRO NODE_ID_HNP4
+
+#    define MESH_SIZE_X 10
+#    define MESH_SIZE_Y 6
 #endif
 
-#if (PLATFORM_VARIANT == 0)
+#if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 3)
 static const unsigned int snf_table[] = {
     MEM_CNTRL0_ID, /* Maps to HN-F logical node 0  */
     MEM_CNTRL0_ID, /* Maps to HN-F logical node 1  */
@@ -129,6 +153,40 @@ static const unsigned int snf_table[] = {
     MEM_CNTRL7_ID, /* Maps to HN-F logical node 29  */
     MEM_CNTRL7_ID, /* Maps to HN-F logical node 30  */
     MEM_CNTRL7_ID, /* Maps to HN-F logical node 31  */
+#    if (PLATFORM_VARIANT == 3)
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 32  */
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 33  */
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 34  */
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 35  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 36  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 37  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 38  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 39  */
+    MEM_CNTRL2_ID, /* Maps to HN-F logical node 40  */
+    MEM_CNTRL2_ID, /* Maps to HN-F logical node 41  */
+    MEM_CNTRL2_ID, /* Maps to HN-F logical node 42  */
+    MEM_CNTRL2_ID, /* Maps to HN-F logical node 43  */
+    MEM_CNTRL3_ID, /* Maps to HN-F logical node 44  */
+    MEM_CNTRL3_ID, /* Maps to HN-F logical node 45  */
+    MEM_CNTRL3_ID, /* Maps to HN-F logical node 46  */
+    MEM_CNTRL3_ID, /* Maps to HN-F logical node 47  */
+    MEM_CNTRL4_ID, /* Maps to HN-F logical node 48  */
+    MEM_CNTRL4_ID, /* Maps to HN-F logical node 49  */
+    MEM_CNTRL4_ID, /* Maps to HN-F logical node 50  */
+    MEM_CNTRL4_ID, /* Maps to HN-F logical node 51  */
+    MEM_CNTRL5_ID, /* Maps to HN-F logical node 52  */
+    MEM_CNTRL5_ID, /* Maps to HN-F logical node 53  */
+    MEM_CNTRL5_ID, /* Maps to HN-F logical node 54  */
+    MEM_CNTRL5_ID, /* Maps to HN-F logical node 55  */
+    MEM_CNTRL6_ID, /* Maps to HN-F logical node 56  */
+    MEM_CNTRL6_ID, /* Maps to HN-F logical node 57  */
+    MEM_CNTRL6_ID, /* Maps to HN-F logical node 58  */
+    MEM_CNTRL6_ID, /* Maps to HN-F logical node 59  */
+    MEM_CNTRL7_ID, /* Maps to HN-F logical node 60  */
+    MEM_CNTRL7_ID, /* Maps to HN-F logical node 61  */
+    MEM_CNTRL7_ID, /* Maps to HN-F logical node 62  */
+    MEM_CNTRL7_ID, /* Maps to HN-F logical node 63  */
+#    endif
 };
 #elif (PLATFORM_VARIANT == 1)
 static const unsigned int snf_table[] = {
@@ -250,7 +308,7 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HNP1,
     },
-#if (PLATFORM_VARIANT == 0)
+#if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 3)
     {
         /*
          * Peripherals, NCI GPV Memory Map 2
@@ -291,7 +349,7 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HNP0,
     },
-#if (PLATFORM_VARIANT == 0)
+#if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 3)
     {
         /*
          * Peripherals, PCIe 32-bit MMIO to IO Macro 1
@@ -329,7 +387,7 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HNP0,
     },
-#if (PLATFORM_VARIANT == 0)
+#if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 3)
     {
         /*
          * PCIe ECAM0 to IO Macro 1
@@ -367,7 +425,7 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HNP0,
     },
-#if (PLATFORM_VARIANT == 0)
+#if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 3)
     {
         /*
          * Peripherals, PCIe 64-bit MMIO to IO Macro 1
