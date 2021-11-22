@@ -1944,8 +1944,10 @@ static int scmi_perf_start(fwk_id_t id)
     struct mod_scmi_perf_fast_channel_limit *fc_limits;
     struct mod_dvfs_opp opp;
 
-    /* Initialise FastChannels level to 0 and limits to min/max OPPs */
-
+    /*
+     * Initialise FastChannels level to sustained level and limits to min/max
+     * OPPs.
+     */
     for (i = 0; i < scmi_perf_ctx.domain_count; i++) {
         domain = &(*scmi_perf_ctx.config->domains)[i];
         if (domain->fast_channels_addr_scp != NULL) {
@@ -1960,7 +1962,7 @@ static int scmi_perf_start(fwk_id_t id)
                             return status;
                         }
 
-                        memset(fc_elem, opp.level, fast_channel_elem_size[j]);
+                        memcpy(fc_elem, &opp.level, fast_channel_elem_size[j]);
                     } else {
                         /* _LIMIT_SET or _LIMIT_GET */
                         domain_ctx = &scmi_perf_ctx.domain_ctx_table[i];
