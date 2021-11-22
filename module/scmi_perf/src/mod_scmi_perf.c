@@ -796,7 +796,7 @@ static int scmi_perf_describe_levels_handler(fwk_id_t service_id,
 exit:
     scmi_perf_ctx.scmi_api->respond(service_id,
         (return_values.status == SCMI_SUCCESS) ?
-            NULL : &return_values.status,
+            &return_values.status : NULL,
         (return_values.status == SCMI_SUCCESS) ?
             payload_size : sizeof(return_values.status));
 
