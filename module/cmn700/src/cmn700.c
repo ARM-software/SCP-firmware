@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -363,7 +363,7 @@ void set_encoding_and_masking_bits(const struct mod_cmn700_config *config)
      * Determine the number of bits used to represent each node coordinate based
      * on the mesh size as per CMN700 specification.
      */
-    if ((mesh_size_x > 8) && (mesh_size_y > 8)) {
+    if ((mesh_size_x > 8) || (mesh_size_y > 8)) {
         encoding_bits = 4;
     } else {
         encoding_bits = ((mesh_size_x > 4) || (mesh_size_y > 4)) ? 3 : 2;
