@@ -75,6 +75,9 @@ struct mod_thermal_mgmt_ctx {
     /* The total power that actors could still take */
     uint32_t tot_power_deficit;
 
+    /* The total power carried over to the next fast-loop */
+    uint32_t carry_over_power;
+
     /*
      * The power as: SUM(weight_actor * demand_power_actor)
      * Use to distribute power according to actors' weight.
@@ -231,6 +234,19 @@ static void re_allocate_power(struct mod_thermal_mgmt_dev_ctx *dev_ctx)
         dev_ctx->granted_power +=
             (dev_ctx->power_deficit * mod_ctx.tot_spare_power) /
             mod_ctx.tot_power_deficit;
+
+        if (dev_ctx->granted_power > dev_ctx->demand_power) {
+            mod_ctx.carry_over_power +=
+                dev_ctx->granted_power - dev_ctx->demand_power;
+
+            dev_ctx->granted_power = dev_ctx->demand_power;
+        } else {
+            /*
+             * The actor has received the power it requested. The amount of
+             * power left can be used in the next fast-loop.
+             */
+            mod_ctx.carry_over_power += dev_ctx->spare_power;
+        }
     }
 }
 
@@ -258,6 +274,12 @@ static void get_actor_level(
     driver_id = dev_ctx->config->driver_id;
 
     *level = driver->power_to_level(driver_id, dev_ctx->granted_power);
+}
+
+static inline bool is_power_request_satisfied(
+    struct mod_thermal_mgmt_dev_ctx *dev_ctx)
+{
+    return (dev_ctx->granted_power >= dev_ctx->demand_power);
 }
 
 static void distribute_power(uint32_t *perf_request, uint32_t *perf_limit)
@@ -315,6 +337,9 @@ static void distribute_power(uint32_t *perf_request, uint32_t *perf_limit)
      * left.
      * Finally, get the corresponding performance level and place a new limit.
      */
+    mod_ctx.tot_spare_power += mod_ctx.carry_over_power;
+    mod_ctx.carry_over_power = 0;
+
     for (dom = 0; dom < dvfs_doms_count; dom++) {
         dev_ctx = get_thermal_dev_ctx(dom);
         if (dev_ctx == NULL) {
@@ -330,7 +355,8 @@ static void distribute_power(uint32_t *perf_request, uint32_t *perf_limit)
          * limit already placed by other plugins), then there's no need to limit
          * further.
          */
-        if (new_perf_limit < perf_limit[dom]) {
+        if (!is_power_request_satisfied(dev_ctx) &&
+            (new_perf_limit < perf_limit[dom])) {
             perf_limit[dom] = new_perf_limit;
         }
     }
@@ -394,6 +420,8 @@ static int pi_control_update(void)
         mod_ctx.pi_control_needs_update = false;
 
         pi_control();
+
+        mod_ctx.tot_spare_power = 0;
     }
 
     return FWK_SUCCESS;

@@ -85,7 +85,10 @@ At each regular tick (fast loop), the Thermal Management will:
 - convert the requested performance level into power
 - attempt to distribute the power across actors based on their request and
   weights. Any spare power is collected or any shortages kept track of.
+- any carry-over power not consumed in the previous cycle is added onto the
+  available spare power
 - re-distribute any available spare power across actors based on their shortage
+- any spare power left becomes the carry-over power for the next cycle
 - convert the granted power into requested performance level
 - apply a performance limit on the actor's corresponding domain if the power
   requested could not be met
