@@ -421,6 +421,7 @@ static int sensor_bind(fwk_id_t id, unsigned int round)
             return FWK_SUCCESS;
         }
 
+#ifdef BUILD_HAS_NOTIFICATION
         if (fwk_id_is_equal(
                 sensor_mod_ctx.config->notification_id, FWK_ID_NONE)) {
             return FWK_SUCCESS;
@@ -430,6 +431,9 @@ static int sensor_bind(fwk_id_t id, unsigned int round)
             sensor_mod_ctx.config->notification_id,
             sensor_mod_ctx.config->trip_point_api_id,
             &sensor_mod_ctx.sensor_trip_point_api);
+#else
+        return FWK_SUCCESS;
+#endif
     }
     ctx = ctx_table + fwk_id_get_element_idx(id);
     /* Bind to driver */
