@@ -47,7 +47,7 @@
         }) \
     }
 
-#if (PLATFORM_VARIANT == 0) /* RD-N2 */
+#if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 3)
 #    define NON_PCIE_IO_MACRO_REG_BASE PCIE_INTEG_CTRL_REG_BASE(4)
 #elif (PLATFORM_VARIANT == 1) /* RD-N2-Cfg1 */
 #    define NON_PCIE_IO_MACRO_REG_BASE PCIE_INTEG_CTRL_REG_BASE(1)
@@ -61,7 +61,7 @@ static const struct fwk_element pcie_integ_ctrl_element_table[] = {
         AP_PCIE_MMIOL_SIZE_PER_RC,
         AP_PCIE_MMIOH_SIZE_PER_RC),
 
-#if (PLATFORM_VARIANT == 0)
+#if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 3)
     IO_MACRO_ELEMENT_CONFIG(
         1,
         PCIE_INTEG_CTRL_REG_BASE(1),

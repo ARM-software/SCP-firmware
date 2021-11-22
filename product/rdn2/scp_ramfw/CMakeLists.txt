@@ -15,6 +15,7 @@ add_executable(rdn2-bl2)
 # - '0' for RD-N2 platform
 # - '1' for RD-N2-Cfg1 platform
 # - '2' for RD-N2-Cfg2 platform
+# - '3' for RD-N2-Cfg3 platform
 
 if (SCP_PLATFORM_VARIANT STREQUAL "0")
       target_compile_definitions(rdn2-bl2
@@ -26,11 +27,15 @@ elseif (SCP_PLATFORM_VARIANT STREQUAL "2")
       target_compile_definitions(rdn2-bl2
                                  PUBLIC -DPLATFORM_VARIANT=2)
              set(SCP_LOG_LEVEL "INFO" PARENT_SCOPE)
+elseif (SCP_PLATFORM_VARIANT STREQUAL "3")
+      target_compile_definitions(rdn2-bl2
+                                 PUBLIC -DPLATFORM_VARIANT=3)
 else()
       message(FATAL_ERROR "Please set SCP_PLATFORM_VARIANT to \n"
                                 "'0' for RD-N2 \n"
                                 "'1' for RD-N2-Cfg1 \n"
-                                "'2' for RD-N2-Cfg2 \n")
+                                "'2' for RD-N2-Cfg2 \n"
+                                "'3' for RD-N2-Cfg3 \n")
 endif()
 
 target_include_directories(
