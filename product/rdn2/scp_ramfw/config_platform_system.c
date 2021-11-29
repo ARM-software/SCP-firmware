@@ -13,6 +13,8 @@
 
 struct mod_platform_system_config system_config = {
     .primary_cpu_mpid = 0,
+    .isolated_cpu_info = { .isolated_cpu_mpid_list = NULL,
+                           .isolated_cpu_count = 0 }
 };
 
 struct fwk_module_config config_platform_system = {
