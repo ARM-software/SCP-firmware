@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -92,6 +92,15 @@ static struct fwk_element sds_element_table[] = {
             .region_id = PLATFORM_SDS_REGION_SECURE,
             .finalize = true,
         }),
+    },
+    [PLATFORM_SDS_ISOLATED_CPU_MPID_LIST_IDX] = {
+        .name = "Isolated CPU MPID List",
+        .data = &((struct mod_sds_structure_desc){
+                .id = PLATFORM_SDS_ISOLATED_CPU_MPID_LIST,
+                .size = PLATFORM_SDS_ISOLATED_CPU_MPID_LIST_SIZE,
+                .region_id = PLATFORM_SDS_REGION_SECURE,
+                .finalize = true,
+                }),
     },
     [PLATFORM_SDS_IDX_COUNT] = { 0 }, /* Termination description. */
 };

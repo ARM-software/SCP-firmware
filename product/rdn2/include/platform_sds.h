@@ -8,6 +8,8 @@
 #ifndef PLATFORM_SDS_H
 #define PLATFORM_SDS_H
 
+#include <platform_core.h>
+
 #include <mod_sds.h>
 
 #include <stdint.h>
@@ -24,6 +26,7 @@ enum platform_sds_struct_id {
     PLATFORM_SDS_PLATFORM_ID = SDS_STRUCT_ID(4),
     PLATFORM_SDS_RESET_SYNDROME = SDS_STRUCT_ID(5),
     PLATFORM_SDS_FEATURE_AVAILABILITY = SDS_STRUCT_ID(6),
+    PLATFORM_SDS_ISOLATED_CPU_MPID_LIST = SDS_STRUCT_ID(128),
 };
 
 enum platform_sds_region_idx {
@@ -37,6 +40,7 @@ enum platform_sds_ram_idx {
     PLATFORM_SDS_RAM_VERSION_IDX,
     PLATFORM_SDS_RESET_SYNDROME_IDX,
     PLATFORM_SDS_FEATURE_AVAILABILITY_IDX,
+    PLATFORM_SDS_ISOLATED_CPU_MPID_LIST_IDX,
     PLATFORM_SDS_IDX_COUNT
 };
 
@@ -49,6 +53,13 @@ enum platform_sds_ram_idx {
 #define PLATFORM_SDS_PLATFORM_ID_SIZE          8
 #define PLATFORM_SDS_RESET_SYNDROME_SIZE       4
 #define PLATFORM_SDS_FEATURE_AVAILABILITY_SIZE 4
+
+/*
+ * Max size of structure listing the MPID of the isolated CPUs.
+ * size = (Number of CPUs * sizeof MPID register) + sizeof CPU count variable
+ */
+#define PLATFORM_SDS_ISOLATED_CPU_MPID_LIST_SIZE \
+    ((NUMBER_OF_CLUSTERS * sizeof(uint64_t)) + sizeof(uint64_t))
 
 /*
  * Field masks and offsets for the PLATFORM_SDS_AP_CPU_INFO structure.

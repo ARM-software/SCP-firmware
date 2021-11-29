@@ -91,6 +91,10 @@ static fwk_id_t sds_reset_syndrome_id =
 static fwk_id_t sds_cpu_info_id =
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, PLATFORM_SDS_CPU_INFO_IDX);
 
+static fwk_id_t sds_isolated_cpu_mpid_list_id = FWK_ID_ELEMENT_INIT(
+    FWK_MODULE_IDX_SDS,
+    PLATFORM_SDS_ISOLATED_CPU_MPID_LIST_IDX);
+
 /*
  *  SCMI Messaging stack
  */
@@ -147,6 +151,78 @@ static int update_primary_cpu_in_sds(void)
 
     return platform_system_ctx.sds_api->struct_write(
         sds_structure_desc->id, 0, (void *)(&primary_cpu), sizeof(primary_cpu));
+}
+
+/*
+ * Helper function to check if a cpu is in isolated CPU MPID list.
+ */
+static bool is_cpu_isolated(uint64_t cpu_mpid)
+{
+    uint64_t isolated_cpu_count;
+    uint64_t *isolated_cpu_mpid_list;
+
+    isolated_cpu_count =
+        platform_system_ctx.config->isolated_cpu_info.isolated_cpu_count;
+    isolated_cpu_mpid_list =
+        platform_system_ctx.config->isolated_cpu_info.isolated_cpu_mpid_list;
+
+    while (isolated_cpu_count != 0) {
+        if (isolated_cpu_mpid_list[isolated_cpu_count - 1] == cpu_mpid) {
+            return true;
+        }
+        isolated_cpu_count--;
+    }
+
+    return false;
+}
+
+/*
+ * Helper function to validate the configuration data received during init.
+ */
+static int validate_config_data(void)
+{
+    if (is_cpu_isolated(platform_system_ctx.config->primary_cpu_mpid)) {
+        FWK_LOG_ERR("[PLATFORM SYSTEM] Found primary CPU in isolated CPU list");
+        return FWK_E_PARAM;
+    }
+
+    return FWK_SUCCESS;
+}
+
+/*
+ * Helper function to update the isolated CPU MPID list in SDS.
+ */
+static int update_isolated_mpid_list_in_sds(void)
+{
+    const struct mod_sds_structure_desc *sds_structure_desc =
+        fwk_module_get_data(sds_isolated_cpu_mpid_list_id);
+    const struct mod_platform_system_config *config =
+        platform_system_ctx.config;
+    uint64_t isolated_cpu_count;
+    int status;
+
+    isolated_cpu_count = config->isolated_cpu_info.isolated_cpu_count;
+    if (isolated_cpu_count == 0) {
+        return FWK_SUCCESS;
+    }
+
+    status = platform_system_ctx.sds_api->struct_write(
+        sds_structure_desc->id,
+        0,
+        &isolated_cpu_count,
+        sizeof(isolated_cpu_count));
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    status = platform_system_ctx.sds_api->struct_write(
+        sds_structure_desc->id,
+        sizeof(isolated_cpu_count),
+        config->isolated_cpu_info.isolated_cpu_mpid_list,
+        (sizeof(config->isolated_cpu_info.isolated_cpu_mpid_list[0]) *
+         isolated_cpu_count));
+
+    return status;
 }
 
 /*
@@ -253,6 +329,12 @@ static int platform_system_mod_init(
     }
 
     platform_system_ctx.config = data;
+
+    status = validate_config_data();
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR("[PLATFORM SYSTEM] Configuration data is invalid");
+        return status;
+    }
 
     for (idx = 0; idx < FWK_ARRAY_SIZE(isrs); idx++) {
         isr = &isrs[idx];
@@ -501,6 +583,14 @@ int platform_system_process_notification(
             FWK_LOG_ERR(
                 "[PLATFORM SYSTEM] Failed to update primary "
                 "CPU number in SDS");
+            return status;
+        }
+
+        status = update_isolated_mpid_list_in_sds();
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(
+                "[PLATFORM SYSTEM] Failed to program isolated"
+                " cpu list in SDS");
             return status;
         }
     }
