@@ -70,16 +70,6 @@ struct mod_dvfs_domain_config {
      */
     fwk_id_t alarm_id;
 
-    /*!
-     * \brief Notifications identifier.
-     */
-    fwk_id_t notification_id;
-
-    /*!
-     * \brief Updates API identifier.
-     */
-    fwk_id_t updates_api_id;
-
     /*! Delay in milliseconds before retrying a request */
     uint16_t retry_ms;
 
