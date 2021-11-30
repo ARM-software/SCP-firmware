@@ -11,7 +11,11 @@
 #ifndef SYSTEM_MMAP_H
 #define SYSTEM_MMAP_H
 
+#ifndef DTS_COMPILE
 #include <stdint.h>
+#else
+#define UINT32_C(n) n
+#endif
 
 #define PERIPHERAL_BASE           UINT32_C(0x44000000)
 #define EXTERNAL_RAM_BASE         UINT32_C(0x60000000)

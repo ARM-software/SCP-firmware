@@ -1,0 +1,31 @@
+/*
+ * Arm SCP/MCP Software
+ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+/* base SCP .dtsi file for juno boards */
+
+/* must be first include */
+#include "base.dtsi"
+
+
+/ {
+    soc {
+	    #address-cells = <1>;
+	    #size-cells = <1>;
+
+        /* main console uart */
+       	uart1: uart@BC0A0000 {
+        	compatible = "arm,pl011";
+			reg = <0xBC0A0000 0x1000>;
+            baud_rate_bps = <115200>;
+            clock_rate_hz = <24000000>;
+/*			clocks = <&uartclk>;*/
+/*			interrupts = <7 3>; */
+/*			interrupt-names = "rx"; */
+			label = "UART1";
+	    };
+    };
+};
