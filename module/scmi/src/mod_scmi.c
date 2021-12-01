@@ -98,14 +98,15 @@ static struct mod_scmi_ctx scmi_ctx;
 static uint32_t scmi_message_header(uint8_t message_id,
     uint8_t message_type, uint8_t protocol_id, uint8_t token)
 {
-    return ((((message_id) << SCMI_MESSAGE_HEADER_MESSAGE_ID_POS) &
-        SCMI_MESSAGE_HEADER_MESSAGE_ID_MASK) |
-    (((message_type) << SCMI_MESSAGE_HEADER_MESSAGE_TYPE_POS) &
-        SCMI_MESSAGE_HEADER_MESSAGE_TYPE_MASK) |
-    (((protocol_id) << SCMI_MESSAGE_HEADER_PROTOCOL_ID_POS) &
-        SCMI_MESSAGE_HEADER_PROTOCOL_ID_MASK) |
-    (((token) << SCMI_MESSAGE_HEADER_TOKEN_POS) &
-        SCMI_MESSAGE_HEADER_TOKEN_POS));
+    return (
+        (((message_id) << SCMI_MESSAGE_HEADER_MESSAGE_ID_POS) &
+         SCMI_MESSAGE_HEADER_MESSAGE_ID_MASK) |
+        (((message_type) << SCMI_MESSAGE_HEADER_MESSAGE_TYPE_POS) &
+         SCMI_MESSAGE_HEADER_MESSAGE_TYPE_MASK) |
+        (((protocol_id) << SCMI_MESSAGE_HEADER_PROTOCOL_ID_POS) &
+         SCMI_MESSAGE_HEADER_PROTOCOL_ID_MASK) |
+        (((token) << SCMI_MESSAGE_HEADER_TOKEN_POS) &
+         SCMI_MESSAGE_HEADER_TOKEN_MASK));
 }
 
 static uint16_t read_message_id(uint32_t message_header)
@@ -136,11 +137,18 @@ static uint16_t read_token(uint32_t message_header)
          SCMI_MESSAGE_HEADER_TOKEN_POS));
 }
 
-static const char *message_type_to_str(enum mod_scmi_message_type message_type)
+static const char *get_message_type_str(const struct scmi_service_ctx *ctx)
 {
+    enum mod_scmi_message_type message_type = ctx->scmi_message_type;
     switch (message_type) {
     case MOD_SCMI_MESSAGE_TYPE_COMMAND:
-        return "Cmd";
+        if (ctx->config->scmi_entity_role == MOD_SCMI_ROLE_PLATFORM) {
+            return "Cmd";
+        } else if (ctx->config->scmi_entity_role == MOD_SCMI_ROLE_AGENT) {
+            return "Cmd-Resp";
+        } else {
+            return "";
+        }
 
     case MOD_SCMI_MESSAGE_TYPE_DELAYED_RESPONSE:
         return "Del-Resp";
@@ -264,7 +272,7 @@ static int respond(fwk_id_t service_id, const void *payload, size_t size)
     ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(service_id)];
 
     service_name = fwk_module_get_element_name(service_id);
-    message_type_name = message_type_to_str(ctx->scmi_message_type);
+    message_type_name = get_message_type_str(ctx);
 
     /*
      * Print to the error log if the message was not successfully processed.
@@ -376,6 +384,8 @@ int scmi_send_message(
     size_t payload_size,
     bool request_ack_by_interrupt)
 {
+    int status;
+
     /* All commands, synchronous or asynchronous, have a message type of 0 */
     uint8_t message_type = 0;
 
@@ -400,12 +410,33 @@ int scmi_send_message(
     transport_api = ctx->transport_api;
 
     /* Send the SCMI message using the smt_transmit() API  */
-    return transport_api->transmit(
+    status = transport_api->transmit(
         ctx->transport_id,
         message_header,
         payload,
         payload_size,
         request_ack_by_interrupt);
+
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
+    if (status == FWK_SUCCESS) {
+        FWK_LOG_TRACE(
+            "[SCMI] %s: Cmd [%" PRIu16 " (0x%x:0x%x)] was sent",
+            fwk_module_get_element_name(service_id),
+            token,
+            protocol_id,
+            message_id);
+    } else {
+        FWK_LOG_ERR(
+            "[SCMI] %s: Cmd [%" PRIu16 " (0x%x:0x%x)] failed to respond (%s)",
+            fwk_module_get_element_name(service_id),
+            token,
+            protocol_id,
+            message_id,
+            fwk_status_str(status));
+    }
+#endif
+
+    return status;
 };
 
 int response_message_handler(fwk_id_t service_id)
@@ -430,9 +461,13 @@ static const struct mod_scmi_from_protocol_api scmi_from_protocol_api = {
     .write_payload = write_payload,
     .respond = respond,
     .notify = scmi_notify,
-    .scmi_send_message = scmi_send_message,
-    .response_message_handler = response_message_handler,
 };
+
+static const struct mod_scmi_from_protocol_req_api
+    scmi_from_protocol_req_api = {
+        .scmi_send_message = scmi_send_message,
+        .response_message_handler = response_message_handler,
+    };
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
 static struct scmi_notification_subscribers *notification_subscribers(
@@ -654,8 +689,7 @@ static int scmi_init(fwk_id_t module_id, unsigned int service_count,
         return FWK_E_PARAM;
     }
 
-    if ((config->agent_count == 0u) ||
-        (config->agent_count > MOD_SCMI_AGENT_ID_MAX)) {
+    if (config->agent_count > MOD_SCMI_AGENT_ID_MAX) {
         return FWK_E_PARAM;
     }
 
@@ -675,6 +709,14 @@ static int scmi_init(fwk_id_t module_id, unsigned int service_count,
     scmi_ctx.protocol_table = fwk_mm_calloc(
         config->protocol_count_max + PROTOCOL_TABLE_RESERVED_ENTRIES_COUNT,
         sizeof(scmi_ctx.protocol_table[0]));
+
+    if (config->protocol_requester_count_max != 0) {
+        scmi_ctx.protocol_requester_table = fwk_mm_calloc(
+            config->protocol_requester_count_max,
+            sizeof(scmi_ctx.protocol_requester_table[0]));
+    } else {
+        scmi_ctx.protocol_requester_table = NULL;
+    }
 
     scmi_ctx.service_ctx_table = fwk_mm_calloc(
         service_count, sizeof(scmi_ctx.service_ctx_table[0]));
@@ -699,8 +741,9 @@ static int scmi_service_init(fwk_id_t service_id, unsigned int unused,
         (struct mod_scmi_service_config *)data;
     struct scmi_service_ctx *ctx;
 
-    if ((config->scmi_agent_id == MOD_SCMI_PLATFORM_ID) ||
-        (config->scmi_agent_id > scmi_ctx.config->agent_count)) {
+    if (((config->scmi_agent_id == MOD_SCMI_PLATFORM_ID) ||
+         (config->scmi_agent_id > scmi_ctx.config->agent_count)) &&
+        (config->scmi_entity_role == MOD_SCMI_ROLE_PLATFORM)) {
         return FWK_E_PARAM;
     }
 
@@ -716,7 +759,7 @@ static int scmi_bind(fwk_id_t id, unsigned int round)
     struct scmi_service_ctx *ctx;
     const struct mod_scmi_to_transport_api *transport_api = NULL;
     unsigned int protocol_idx;
-    struct scmi_protocol *protocol;
+    struct scmi_protocol *protocol, *protocol_req;
     struct mod_scmi_to_protocol_api *protocol_api = NULL;
     uint8_t scmi_protocol_id;
 
@@ -782,6 +825,33 @@ static int scmi_bind(fwk_id_t id, unsigned int round)
         protocol->message_handler = protocol_api->message_handler;
     }
 
+    for (protocol_idx = 0; protocol_idx < scmi_ctx.protocol_requester_count;
+         protocol_idx++) {
+        protocol_req = &scmi_ctx.protocol_requester_table[protocol_idx];
+
+        status = fwk_module_bind(
+            protocol_req->id,
+            FWK_ID_API(fwk_id_get_module_idx(protocol_req->id), 0),
+            &protocol_api);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+
+        if ((protocol_api->get_scmi_protocol_id == NULL) ||
+            (protocol_api->message_handler == NULL)) {
+            return FWK_E_DATA;
+        }
+        status = protocol_api->get_scmi_protocol_id(
+            protocol_req->id, &scmi_protocol_id);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+
+        scmi_ctx.scmi_protocol_requester_id_to_idx[scmi_protocol_id] =
+            (uint8_t)(protocol_idx);
+        protocol_req->message_handler = protocol_api->message_handler;
+    }
+
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
@@ -819,6 +889,20 @@ static int scmi_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
         scmi_ctx.protocol_table[PROTOCOL_TABLE_RESERVED_ENTRIES_COUNT +
                                 scmi_ctx.protocol_count++].id = source_id;
         *api = &scmi_from_protocol_api;
+        break;
+
+    case MOD_SCMI_API_IDX_PROTOCOL_REQ:
+        if (!fwk_id_is_type(target_id, FWK_ID_TYPE_MODULE)) {
+            return FWK_E_SUPPORT;
+        }
+        if (scmi_ctx.protocol_requester_count >=
+            scmi_ctx.config->protocol_requester_count_max) {
+            return FWK_E_PARAM;
+        }
+
+        scmi_ctx.protocol_requester_table[scmi_ctx.protocol_requester_count++]
+            .id = source_id;
+        *api = &scmi_from_protocol_req_api;
         break;
 
     case MOD_SCMI_API_IDX_TRANSPORT:
@@ -876,7 +960,6 @@ static int scmi_process_event(const struct fwk_event *event,
     transport_id = ctx->transport_id;
 
     service_name = fwk_module_get_element_name(event->target_id);
-    message_type_name = message_type_to_str(ctx->scmi_message_type);
 
     status = transport_api->get_message_header(transport_id, &message_header);
     if (status != FWK_SUCCESS) {
@@ -903,6 +986,7 @@ static int scmi_process_event(const struct fwk_event *event,
     ctx->scmi_message_type =
         (enum mod_scmi_message_type)read_message_type(message_header);
     ctx->scmi_token = read_token(message_header);
+    message_type_name = get_message_type_str(ctx);
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
     FWK_LOG_TRACE(
@@ -916,27 +1000,28 @@ static int scmi_process_event(const struct fwk_event *event,
     (void)service_name;
     (void)message_type_name;
 #endif
-
-    protocol_idx = scmi_ctx.scmi_protocol_id_to_idx[ctx->scmi_protocol_id];
-
-    if (protocol_idx == 0) {
+    if (ctx->config->scmi_entity_role == MOD_SCMI_ROLE_PLATFORM) {
+        protocol_idx = scmi_ctx.scmi_protocol_id_to_idx[ctx->scmi_protocol_id];
+        if (protocol_idx == 0) {
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
-        FWK_LOG_ERR(
-            "[SCMI] %s: %s [%" PRIu16
-            "(0x%x:0x%x)] requested an unsupported protocol",
-            service_name,
-            message_type_name,
-            ctx->scmi_token,
-            ctx->scmi_protocol_id,
-            ctx->scmi_message_id);
+            FWK_LOG_ERR(
+                "[SCMI] %s: %s [%" PRIu16
+                "(0x%x:0x%x)] requested an unsupported protocol",
+                service_name,
+                message_type_name,
+                ctx->scmi_token,
+                ctx->scmi_protocol_id,
+                ctx->scmi_message_id);
 #endif
-        status = ctx->respond(
-            transport_id, &(int32_t){ SCMI_NOT_SUPPORTED }, sizeof(int32_t));
-        if (status != FWK_SUCCESS) {
-            FWK_LOG_TRACE("[SCMI] %s @%d", __func__, __LINE__);
+            status = ctx->respond(
+                transport_id,
+                &(int32_t){ SCMI_NOT_SUPPORTED },
+                sizeof(int32_t));
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_TRACE("[SCMI] %s @%d", __func__, __LINE__);
+            }
+            return FWK_SUCCESS;
         }
-        return FWK_SUCCESS;
-    }
 
 #ifndef BUILD_HAS_MOD_RESOURCE_PERMS
     status = get_agent_id(event->target_id, &agent_id);
@@ -986,10 +1071,21 @@ static int scmi_process_event(const struct fwk_event *event,
         }
     }
 #endif
-
     protocol = &scmi_ctx.protocol_table[protocol_idx];
-    status = protocol->message_handler(protocol->id, event->target_id,
-        payload, payload_size, ctx->scmi_message_id);
+    } else if (ctx->config->scmi_entity_role == MOD_SCMI_ROLE_AGENT) {
+        protocol_idx =
+            scmi_ctx.scmi_protocol_requester_id_to_idx[ctx->scmi_protocol_id];
+        protocol = &scmi_ctx.protocol_requester_table[protocol_idx];
+    } else {
+        return FWK_E_INIT;
+    }
+
+    status = protocol->message_handler(
+        protocol->id,
+        event->target_id,
+        payload,
+        payload_size,
+        ctx->scmi_message_id);
 
     if (status != FWK_SUCCESS) {
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
@@ -1003,6 +1099,29 @@ static int scmi_process_event(const struct fwk_event *event,
             fwk_status_str(status));
 #endif
         return FWK_SUCCESS;
+    }
+
+    /*
+     * If we are receiving a command response, we need to set the transport
+     * layer that we already received the response and are free
+     */
+    if (ctx->config->scmi_entity_role == MOD_SCMI_ROLE_AGENT) {
+        status =
+            ctx->transport_api->release_transport_channel_lock(transport_id);
+        if (status != FWK_SUCCESS) {
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
+            FWK_LOG_ERR(
+                "[SCMI] %s: %s [%" PRIu16
+                " (0x%x:0x%x)] confirm reception error (%s)",
+                service_name,
+                message_type_name,
+                ctx->scmi_token,
+                ctx->scmi_protocol_id,
+                ctx->scmi_message_id,
+                fwk_status_str(status));
+#endif
+            return FWK_SUCCESS;
+        }
     }
 
     return FWK_SUCCESS;

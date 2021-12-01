@@ -79,11 +79,23 @@ struct mod_scmi_ctx {
     /* Number of bound protocols */
     unsigned int protocol_count;
 
+    /* Table of bound protocols as requesters */
+    struct scmi_protocol *protocol_requester_table;
+
+    /* Number of bound protocols as requesters */
+    unsigned int protocol_requester_count;
+
     /*
      * SCMI protocol identifier to the index of the entry in protocol_table[]
      * dedicated to the protocol.
      */
     uint8_t scmi_protocol_id_to_idx[MOD_SCMI_PROTOCOL_ID_MAX + 1];
+
+    /*
+     * SCMI protocol identifier to the index of the entry in
+     * protocol_requester_table[] dedicated to the protocol.
+     */
+    uint8_t scmi_protocol_requester_id_to_idx[MOD_SCMI_PROTOCOL_ID_MAX + 1];
 
     /* Table of service contexts */
     struct scmi_service_ctx *service_ctx_table;

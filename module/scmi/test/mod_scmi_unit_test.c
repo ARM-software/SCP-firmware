@@ -125,8 +125,6 @@ static const struct mod_scmi_from_protocol_api from_protocol_api = {
     .write_payload = mod_scmi_from_protocol_write_payload,
     .respond = mod_scmi_from_protocol_respond,
     .notify = mod_scmi_from_protocol_notify,
-    .scmi_send_message = mod_scmi_from_protocol_send_message,
-    .response_message_handler = mod_scmi_from_protocol_response_message_handler,
 };
 
 void setUp(void)

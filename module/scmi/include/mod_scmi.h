@@ -36,12 +36,18 @@
  */
 enum mod_scmi_api_idx {
     MOD_SCMI_API_IDX_PROTOCOL,
+    MOD_SCMI_API_IDX_PROTOCOL_REQ,
     MOD_SCMI_API_IDX_TRANSPORT,
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     MOD_SCMI_API_IDX_NOTIFICATION,
 #endif
     MOD_SCMI_API_IDX_COUNT,
 };
+
+/*!
+ * \brief Entity role.
+ */
+enum mod_scmi_entity_role { MOD_SCMI_ROLE_PLATFORM, MOD_SCMI_ROLE_AGENT };
 
 /*!
  * \brief Agent descriptor
@@ -72,6 +78,12 @@ struct mod_scmi_config {
      *       SCMI module.
      */
     unsigned int protocol_count_max;
+
+    /*!
+     *  \brief Maximum number of SCMI protocol requester modules that can
+     *       bind to the SCMI module.
+     */
+    unsigned int protocol_requester_count_max;
 
 #ifndef BUILD_HAS_MOD_RESOURCE_PERMS
     /*!
@@ -166,6 +178,13 @@ struct mod_scmi_service_config {
      *        here.
      */
     fwk_id_t scmi_p2a_id;
+
+    /*!
+     * \brief Entity role.
+     *
+     * \details Determine if this entity is an agent or a platform.
+     */
+    enum mod_scmi_entity_role scmi_entity_role;
 };
 
 /*!
@@ -603,7 +622,12 @@ struct mod_scmi_from_protocol_api {
      */
     void (*notify)(fwk_id_t service_id, int protocol_id, int message_id,
         const void *payload, size_t size);
+};
 
+/*!
+ * \brief SCMI protocol requester module to SCMI module API.
+ */
+struct mod_scmi_from_protocol_req_api {
     /*!
      * \brief Send an SCMI message
      *

@@ -39,8 +39,6 @@ struct mod_scmi_from_protocol_api from_protocol_api = {
     .write_payload = mod_scmi_from_protocol_api_write_payload,
     .respond = mod_scmi_from_protocol_api_respond,
     .notify = mod_scmi_from_protocol_api_notify,
-    .scmi_send_message = mod_scmi_from_protocol_api_scmi_send_message,
-    .response_message_handler = mod_scmi_from_protocol_api_response_message_handler,
 };
 
 
