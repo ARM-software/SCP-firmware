@@ -56,22 +56,24 @@
 struct FWK_PACKED morello_platform_info {
     /* Local DDR memory size in bytes */
     uint64_t local_ddr_size;
+#if !defined(PLAT_FVP)
     /* Remote DDR memory size in bytes */
     uint64_t remote_ddr_size;
-    /* Total number of slave chips  */
-    uint8_t slave_count;
+    /* Total number of remote chips  */
+    uint8_t remote_chip_count;
     /* If multichip mode */
     bool multichip_mode;
     /* Platform SCC configuration */
     uint32_t scc_config;
+#endif
 };
 
 /* MultiChip information */
 struct morello_multichip_info {
     /* If multichip mode */
     bool mode;
-    /* Total number of slave chips  */
-    uint8_t slave_count;
+    /* Total number of remote chips  */
+    uint8_t remote_chip_count;
     /* Remote ddr size in GB */
     uint8_t remote_ddr_size;
 };
@@ -286,17 +288,18 @@ static int morello_system_fill_platform_info(void)
     uint64_t size = 0;
     int status;
 
-    /* Force single chip mode */
-    sds_platform_info.slave_count = 0;
-    sds_platform_info.multichip_mode = 0;
-    sds_platform_info.remote_ddr_size = 0;
-
     status = morello_system_ctx.dmc_bing_api->get_mem_size(&size);
     if (status != FWK_SUCCESS) {
         FWK_LOG_INFO("Error calculating local DDR memory size!");
         return status;
     }
     sds_platform_info.local_ddr_size = size;
+
+#if !defined(PLAT_FVP)
+    /* Force single chip mode */
+    sds_platform_info.remote_chip_count = 0;
+    sds_platform_info.multichip_mode = 0;
+    sds_platform_info.remote_ddr_size = 0;
 
     size = sds_platform_info.local_ddr_size + sds_platform_info.remote_ddr_size;
 
@@ -311,6 +314,7 @@ static int morello_system_fill_platform_info(void)
         (size / (1024 * 1024)));
 
     sds_platform_info.scc_config = SCC->BOOT_GPR1;
+#endif
 
     return morello_system_ctx.sds_api->struct_write(
         sds_structure_desc->id,
