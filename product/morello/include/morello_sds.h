@@ -44,7 +44,11 @@ enum morello_sds_region_idx {
 #define MORELLO_SDS_FEATURE_AVAILABILITY_SIZE 4
 #define MORELLO_SDS_CPU_BOOTCTR_SIZE 256
 #define MORELLO_SDS_CPU_FLAGS_SIZE 256
-#define MORELLO_SDS_PLATFORM_INFO_SIZE        22
+#if defined(PLAT_FVP)
+#    define MORELLO_SDS_PLATFORM_INFO_SIZE 8
+#else
+#    define MORELLO_SDS_PLATFORM_INFO_SIZE 22
+#endif
 
 /*
  * Field masks and offsets for the MORELLO_SDS_AP_CPU_INFO structure.
