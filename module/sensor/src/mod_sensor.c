@@ -7,6 +7,9 @@
 
 #include "sensor.h"
 
+#ifdef BUILD_HAS_SCMI_SENSOR_EVENTS
+#    include <mod_scmi_sensor.h>
+#endif
 #include <mod_sensor.h>
 
 #include <fwk_assert.h>
