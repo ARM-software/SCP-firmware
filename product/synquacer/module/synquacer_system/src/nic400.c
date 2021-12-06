@@ -1,9 +1,11 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+
+/* Use of "subordinate" may be out of sync with older versions of TRM */
 
 #include "low_level_access.h"
 #include "synquacer_mmap.h"
@@ -23,21 +25,21 @@
 #define NIC_TOP_ADDR_SEC_REG (0x00000008)
 #define NIC_SEC_REG_OFFSET (0x04)
 
-static void nic_sec_slave_security(
+static void nic_sec_subordinate_security(
     uint32_t nic_top_addr,
-    uint32_t slave_index,
+    uint32_t subordinate_index,
     uint32_t value)
 {
     FWK_LOG_INFO(
         "%s addr 0x%08" PRIx32 " value 0x%08" PRIx32,
         __func__,
         (nic_top_addr + NIC_TOP_ADDR_SEC_REG +
-         NIC_SEC_REG_OFFSET * slave_index),
+         NIC_SEC_REG_OFFSET * subordinate_index),
         value);
 
     writel(
         (nic_top_addr + NIC_TOP_ADDR_SEC_REG +
-         NIC_SEC_REG_OFFSET * slave_index),
+         NIC_SEC_REG_OFFSET * subordinate_index),
         value);
 }
 
@@ -53,7 +55,7 @@ void nic_secure_access_ctrl_init(void)
             if (nic_config[n][m] == NIC_SETUP_SKIP)
                 continue;
 
-            nic_sec_slave_security(nic_base_addr[n], m, nic_config[n][m]);
+            nic_sec_subordinate_security(nic_base_addr[n], m, nic_config[n][m]);
         }
     }
 
@@ -62,6 +64,6 @@ void nic_secure_access_ctrl_init(void)
         if (config[n] == NIC_SETUP_SKIP)
             continue;
 
-        nic_sec_slave_security(SCBM_MV_NIC, n, config[n]);
+        nic_sec_subordinate_security(SCBM_MV_NIC, n, config[n]);
     }
 }
