@@ -1,9 +1,11 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+
+/* Use of "manager" may be out of sync with older versions of TRM */
 
 #ifndef INTERNAL_SYNQUACER_PD_H
 #define INTERNAL_SYNQUACER_PD_H
@@ -54,50 +56,50 @@
 #define ONCHIP_PCIE_PMU_NO(no) (14 + no)
 #define ONCHIP_DDR_PMU_NO(no) (16 + no)
 
-#define SNI_PPU_INFO_MP                                                       \
-    {                                                                         \
-        {                                                                     \
-            /* "DDRPHY_BLK_0" */ /* no                */ 2,                   \
-                                 /* dev_bitmap        */ DEV_BMAP_DDR0,       \
-                                 /* booting_force_off */ false,               \
-                                 /* force_off         */ false,               \
-        },                                                                    \
-            {                                                                 \
-                /* "DDRPHY_BLK_1" */ /* no                */ 3,               \
-                                     /* dev_bitmap        */ DEV_BMAP_DDR1,   \
-                                     /* booting_force_off */ false,           \
-                                     /* force_off         */ false,           \
-            },                                                                \
-            {                                                                 \
-                /* "PCIEB" */ /* no                */ 4,                      \
-                              /* dev_bitmap        */ DEV_BMAP_PCIE_BLK,      \
-                              /* booting_force_off */ false,                  \
-                              /* force_off         */ false,                  \
-            },                                                                \
-            {                                                                 \
-                /* "PCIE_BLK_0" */ /* no                */ 6,                 \
-                                   /* dev_bitmap        */ DEV_BMAP_PCIE0,    \
-                                   /* booting_force_off */ false,             \
-                                   /* force_off         */ false,             \
-            },                                                                \
-            {                                                                 \
-                /* "PCIE_BLK_1" */ /* no                */ 5,                 \
-                                   /* dev_bitmap        */ DEV_BMAP_PCIE1,    \
-                                   /* booting_force_off */ false,             \
-                                   /* force_off         */ false,             \
-            },                                                                \
-            {                                                                 \
-                /* "DMAB" */ /* no                */ 7,                       \
-                             /* dev_bitmap        */ DEV_BMAP_DMA_BLK,        \
-                             /* booting_force_off */ false,                   \
-                             /* force_off         */ false,                   \
-            },                                                                \
-            {                                                                 \
-                /* "SCB_A_MASTER" */ /* no                */ 8,               \
-                                     /* dev_bitmap        */ DEV_BMAP_SCB_AM, \
-                                     /* booting_force_off */ true,            \
-                                     /* force_off         */ true,            \
-            },                                                                \
+#define SNI_PPU_INFO_MP \
+    { \
+        { \
+            /* "DDRPHY_BLK_0" */ /* no                */ 2, \
+            /* dev_bitmap        */ DEV_BMAP_DDR0, \
+            /* booting_force_off */ false, \
+            /* force_off         */ false, \
+        }, \
+            { \
+                /* "DDRPHY_BLK_1" */ /* no                */ 3, \
+                /* dev_bitmap        */ DEV_BMAP_DDR1, \
+                /* booting_force_off */ false, \
+                /* force_off         */ false, \
+            }, \
+            { \
+                /* "PCIEB" */ /* no                */ 4, \
+                /* dev_bitmap        */ DEV_BMAP_PCIE_BLK, \
+                /* booting_force_off */ false, \
+                /* force_off         */ false, \
+            }, \
+            { \
+                /* "PCIE_BLK_0" */ /* no                */ 6, \
+                /* dev_bitmap        */ DEV_BMAP_PCIE0, \
+                /* booting_force_off */ false, \
+                /* force_off         */ false, \
+            }, \
+            { \
+                /* "PCIE_BLK_1" */ /* no                */ 5, \
+                /* dev_bitmap        */ DEV_BMAP_PCIE1, \
+                /* booting_force_off */ false, \
+                /* force_off         */ false, \
+            }, \
+            { \
+                /* "DMAB" */ /* no                */ 7, \
+                /* dev_bitmap        */ DEV_BMAP_DMA_BLK, \
+                /* booting_force_off */ false, \
+                /* force_off         */ false, \
+            }, \
+            { \
+                /* "SCB_A_MANAGER" */ /* no                */ 8, \
+                /* dev_bitmap        */ DEV_BMAP_SCB_AM, \
+                /* booting_force_off */ true, \
+                /* force_off         */ true, \
+            }, \
     }
 
 #define TRANSW_NO_PCIE 0

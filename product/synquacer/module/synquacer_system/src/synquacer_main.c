@@ -1,9 +1,11 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+
+/* Use of "manager" may be out of sync with older versions of TRM */
 
 #include "low_level_access.h"
 #include "pik_system.h"
@@ -134,7 +136,7 @@ static void scb_am_block_init(void)
 
     /*
      * set emmc/netsec1/xdmac to non-secure so that CA53 can use
-     * as a non-secure master
+     * as a non-secure manager
      */
     fw_set_sec_override(
         SEC_OVERRIDE_CONVERT_TO_NONSEC, SEC_OVERRIDE_REG_EMMC_XDMAC_NETSEC_MMU);
