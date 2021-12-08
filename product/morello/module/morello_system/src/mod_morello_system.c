@@ -368,6 +368,16 @@ static int morello_system_init_primary_core(void)
         PIK_DPU->ACLKDP_DIV1 = 0;
         PIK_DPU->ACLKDP_DIV2 = 0;
 
+        /*
+         * To achieve full speed operation (150MHz) the Trace interface outputs
+         * on the SoC require their drive strength to be increased from 8mA to
+         * 12mA and the slew rate to be changed from SLOW to FAST in the
+         * respective SCC registers. This change applies to both the data and
+         * clk signals (total = 34).
+         */
+        SCC->TRACE_PAD_CTRL0 = UINT32_C(0x3030303);
+        SCC->TRACE_PAD_CTRL1 = UINT32_C(0x303);
+
         /* Enable non-secure CoreSight debug access */
         FWK_LOG_INFO(
             "[MORELLO SYSTEM] Enabling CoreSight debug non-secure access");
