@@ -15,5 +15,6 @@ set(CMAKE_CXX_COMPILER
     clang-11
     CACHE FILEPATH "Path to the C++ compiler.")
 
-list(APPEND compiler_args
-    -DCMAKE_OBJCOPY=${LLVM_RUNTIME_OUTPUT_INTDIR}/llvm-objcopy)
+set(CMAKE_OBJCOPY
+    llvm-objcopy-11
+    CACHE FILEPATH "Path to objcopy tool.")
