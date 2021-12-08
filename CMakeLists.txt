@@ -170,8 +170,12 @@ if(NOT DISABLE_CPPCHECK)
     endif()
 
     if(CMAKE_C_CPPCHECK)
+        # Prepend cppcheck_wrapper.py before binary to perform pre and post
+        # cppcheck operations.
+        set(CPPCHECK_WRAPPER ${CMAKE_SOURCE_DIR}/tools/cppcheck_wrapper.py)
         # cmake-format: off
 
+        list(PREPEND CMAKE_C_CPPCHECK  ${CPPCHECK_WRAPPER})
         list(APPEND CMAKE_C_CPPCHECK "--quiet")
         list(APPEND CMAKE_C_CPPCHECK "--suppressions-list=${CMAKE_CURRENT_SOURCE_DIR}/tools/cppcheck_suppress_list.txt")
         list(APPEND CMAKE_C_CPPCHECK "--enable=all")
@@ -185,6 +189,10 @@ if(NOT DISABLE_CPPCHECK)
             list(APPEND CMAKE_C_CPPCHECK "--library=${CMAKE_CURRENT_SOURCE_DIR}/.armclang.cppcheck.cfg")
         else()
             list(APPEND CMAKE_C_CPPCHECK "--library=${CMAKE_CURRENT_SOURCE_DIR}/.gnu.cppcheck.cfg")
+        endif()
+
+        if(COMMAND_OUTPUT_VERBOSE)
+             list(APPEND CMAKE_C_CPPCHECK "verbose")
         endif()
 
         # cmake-format: on
