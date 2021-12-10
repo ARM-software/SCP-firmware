@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -505,30 +505,27 @@ static int ppu_v1_cluster_pd_set_state(fwk_id_t cluster_pd_id,
 {
     int status;
     struct ppu_v1_pd_ctx *pd_ctx;
-    struct ppu_v1_reg *ppu;
-    (void)ppu;
-
 
     pd_ctx = ppu_v1_ctx.pd_ctx_table + fwk_id_get_element_idx(cluster_pd_id);
-    ppu = pd_ctx->ppu;
 
     switch (state) {
     case MOD_PD_STATE_ON:
         cluster_on(pd_ctx);
-        #ifdef BUILD_HAS_MULTITHREADING
-        ppu_v1_set_input_edge_sensitivity(ppu,
-                                          PPU_V1_MODE_ON,
-                                          PPU_V1_EDGE_SENSITIVITY_FALLING_EDGE);
-        #endif
+#    ifdef BUILD_HAS_MULTITHREADING
+        ppu_v1_set_input_edge_sensitivity(
+            pd_ctx->ppu, PPU_V1_MODE_ON, PPU_V1_EDGE_SENSITIVITY_FALLING_EDGE);
+#    endif
         return FWK_SUCCESS;
 
     case MOD_PD_STATE_OFF:
         if (!cluster_off(pd_ctx)) {
             /* Cluster failed to transition to off */
-            #ifdef BUILD_HAS_MULTITHREADING
-            ppu_v1_set_input_edge_sensitivity(ppu,
-                PPU_V1_MODE_ON, PPU_V1_EDGE_SENSITIVITY_FALLING_EDGE);
-            #endif
+#    ifdef BUILD_HAS_MULTITHREADING
+            ppu_v1_set_input_edge_sensitivity(
+                pd_ctx->ppu,
+                PPU_V1_MODE_ON,
+                PPU_V1_EDGE_SENSITIVITY_FALLING_EDGE);
+#    endif
             return FWK_E_STATE;
         }
         status = pd_ctx->pd_driver_input_api->report_power_state_transition(
