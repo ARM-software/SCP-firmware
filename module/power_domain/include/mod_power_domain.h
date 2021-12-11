@@ -770,6 +770,9 @@ enum mod_pd_notification_idx {
     /*! Broadcast notification before shutdown starts */
     MOD_PD_NOTIFICATION_IDX_PRE_SHUTDOWN,
 
+    /*! Broadcast warm reset notification */
+    MOD_PD_NOTIFICATION_IDX_PRE_WARM_RESET,
+
     /*! Number of notifications defined by the power domain module */
     MOD_PD_NOTIFICATION_COUNT,
 };
@@ -797,7 +800,17 @@ static const fwk_id_t mod_pd_notification_id_pre_shutdown =
     FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_POWER_DOMAIN,
         MOD_PD_NOTIFICATION_IDX_PRE_SHUTDOWN);
 
-#endif
+/*!
+ * Identifier of the pre-warm reboot notification.
+ *
+ * \note This notification will be broadcast with module identifier only.
+ */
+static const fwk_id_t mod_pd_notification_id_pre_warm_reset =
+    FWK_ID_NOTIFICATION_INIT(
+        FWK_MODULE_IDX_POWER_DOMAIN,
+        MOD_PD_NOTIFICATION_IDX_PRE_WARM_RESET);
+
+#    endif
 #endif /* BUILD_HAS_NOTIFICATION */
 
 /*!
