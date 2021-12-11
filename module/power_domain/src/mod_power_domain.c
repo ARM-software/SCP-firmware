@@ -1392,6 +1392,24 @@ void perform_shutdown(
     return;
 }
 
+/*
+ * Process a warm reset request
+ */
+static int notify_warm_reset(void)
+{
+#ifdef BUILD_HAS_NOTIFICATION
+    unsigned int count;
+    struct fwk_event notification = {
+        .id = mod_pd_notification_id_pre_warm_reset,
+        .source_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_POWER_DOMAIN),
+    };
+
+    return fwk_notification_notify(&notification, &count);
+#else
+    return false;
+#endif
+}
+
 static bool check_and_notify_system_shutdown(
     enum mod_pd_system_shutdown system_shutdown)
 {
@@ -1435,24 +1453,31 @@ static void process_system_shutdown_request(
 
     system_shutdown = req_params->system_shutdown;
 
-    /* Check and send pre-shutdown notifications */
-    if (check_and_notify_system_shutdown(system_shutdown)) {
-        mod_pd_ctx.system_shutdown.ongoing = true;
-        mod_pd_ctx.system_shutdown.system_shutdown = system_shutdown;
+    switch (system_shutdown) {
+    case MOD_PD_SYSTEM_WARM_RESET:
+        resp_params->status = notify_warm_reset();
+        break;
 
-        mod_pd_ctx.system_shutdown.cookie = event->cookie;
-        resp->is_delayed_response = true;
+    default:
+        /* Check and send pre-shutdown notifications */
+        if (check_and_notify_system_shutdown(system_shutdown)) {
+            mod_pd_ctx.system_shutdown.ongoing = true;
+            mod_pd_ctx.system_shutdown.system_shutdown = system_shutdown;
 
-        /*
-         * The shutdown procedure will be completed once all the notification
-         * responses have been received.
-         */
-        return;
+            mod_pd_ctx.system_shutdown.cookie = event->cookie;
+            resp->is_delayed_response = true;
+
+            /*
+             * The shutdown procedure will be completed once all the
+             * notification responses have been received.
+             */
+            return;
+        }
+
+        perform_shutdown(system_shutdown, resp);
+
+        resp_params->status = FWK_E_PANIC;
     }
-
-    perform_shutdown(system_shutdown, resp);
-
-    resp_params->status = FWK_E_PANIC;
 }
 
 /*
