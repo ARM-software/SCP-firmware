@@ -26,6 +26,7 @@
 #include <mod_system_power.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
@@ -68,6 +69,9 @@ struct platform_system_ctx {
 
     /* Config containig data required for platform initialization */
     const struct mod_platform_system_config *config;
+
+    /* Count of number of warm reset completion check iterations */
+    unsigned int warm_reset_check_cnt;
 };
 
 struct platform_system_isr {
@@ -459,6 +463,17 @@ static int platform_system_start(fwk_id_t id)
         }
     }
 
+    /* Subscribe to warm reset notifications */
+    status = fwk_notification_subscribe(
+        mod_pd_notification_id_pre_warm_reset,
+        FWK_ID_MODULE(FWK_MODULE_IDX_POWER_DOMAIN),
+        id);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_WARN(
+            "[PLATFORM SYSTEM] failed to subscribe to warm reset "
+            "notification\n");
+    }
+
     /*
      * This platform has the CMN configuration register in the AP address space
      * which can be accessed by enabling the CMN Address Translation.
@@ -496,6 +511,199 @@ static int platform_system_start(fwk_id_t id)
     return status;
 }
 
+static void power_off_all_cores(void)
+{
+    unsigned int pd_idx;
+    unsigned int core_count;
+    int status;
+    struct mod_pd_restricted_api *mod_pd_restricted_api =
+        platform_system_ctx.mod_pd_restricted_api;
+
+    core_count = platform_get_core_count();
+
+    for (pd_idx = 0; pd_idx < core_count; pd_idx++) {
+        FWK_LOG_INFO(
+            "[PLATFORM SYSTEM] Powering down %s\n",
+            fwk_module_get_element_name(
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, pd_idx)));
+
+        status = mod_pd_restricted_api->set_state(
+            FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, pd_idx),
+            false,
+            MOD_PD_COMPOSITE_STATE(MOD_PD_LEVEL_0, 0, 0, 0, MOD_PD_STATE_OFF));
+
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(
+                "[PLATFORM SYSTEM] Power down of %s failed\n",
+                fwk_module_get_element_name(
+                    FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, pd_idx)));
+        }
+        fwk_assert(status == FWK_SUCCESS);
+    }
+}
+
+static int check_power_off_all_cores(void)
+{
+    unsigned int core_count;
+    unsigned int power_state;
+    unsigned int pd_idx;
+    int status = 0;
+    struct mod_pd_restricted_api *mod_pd_restricted_api =
+        platform_system_ctx.mod_pd_restricted_api;
+
+    core_count = platform_get_core_count();
+
+    /* Check if all the CPU power domain are powered down */
+    for (pd_idx = 0; pd_idx < core_count; pd_idx++) {
+        status = mod_pd_restricted_api->get_state(
+            FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, pd_idx), &power_state);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(
+                "[PLATFORM_SYSTEM] failed to get state of %s\n",
+                fwk_module_get_element_name(
+                    FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, pd_idx)));
+            return status;
+        }
+
+        /* Exit if any core is not powered down */
+        if ((power_state &
+             (MOD_PD_CS_STATE_MASK << MOD_PD_CS_LEVEL_0_STATE_SHIFT)) !=
+            MOD_PD_STATE_OFF) {
+            FWK_LOG_INFO(
+                "[PLATFORM_SYSTEM] %s not yet powered down\n",
+                fwk_module_get_element_name(
+                    FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, pd_idx)));
+            return FWK_PENDING;
+        }
+    }
+    return status;
+}
+
+static void boot_primary_core(void)
+{
+    uint8_t boot_cpu;
+    int status;
+    struct mod_pd_restricted_api *mod_pd_restricted_api =
+        platform_system_ctx.mod_pd_restricted_api;
+
+    status = messaging_stack_ready();
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_WARN(
+            "[PLATFORM_SYSTEM] Failed to update SDS feature "
+            "availability\n");
+    }
+    fwk_assert(status == FWK_SUCCESS);
+
+    status = update_sds_reset_syndrome();
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_WARN(
+            "[PLATFORM_SYSTEM] Failed to update SDS reset "
+            "syndrome\n");
+    }
+    fwk_assert(status == FWK_SUCCESS);
+
+    FWK_LOG_INFO(
+        "[PLATFORM SYSTEM] Warm reset complete. Powering up "
+        "boot cpu...\n");
+
+    /*
+     * All cores were powered down. Now power up the primary core to
+     * complete the warm reboot sequence.
+     */
+
+    boot_cpu =
+        platform_calc_core_pos(platform_system_ctx.config->primary_cpu_mpid) %
+        MAX_PE_PER_CHIP;
+
+    status = mod_pd_restricted_api->set_state(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, boot_cpu),
+        false,
+        MOD_PD_COMPOSITE_STATE(
+            MOD_PD_LEVEL_2,
+            0,
+            MOD_PD_STATE_ON,
+            MOD_PD_STATE_ON,
+            MOD_PD_STATE_ON));
+
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(
+            "[PLATFORM_SYSTEM] Failed to power up boot cpu,"
+            " issuing cold reset to recover\n");
+        /*
+         * The power up request of boot cpu power domain has failed.
+         * The warm reset cannot be completed and the system is now in
+         * an unusable state. So perform a full system cold boot reset
+         * by which the SCP will also be reset to recover from this
+         * situation.
+         */
+        status =
+            mod_pd_restricted_api->system_shutdown(MOD_PD_SYSTEM_COLD_RESET);
+        fwk_assert(status == FWK_SUCCESS);
+    }
+}
+
+static int platform_system_process_event(
+    const struct fwk_event *event,
+    struct fwk_event *resp)
+{
+    int status;
+
+    /* Event for checking power domain status */
+    struct fwk_event_light check_pd_off_event = {
+        .id = mod_platform_system_event_check_ppu_off,
+        .target_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_PLATFORM_SYSTEM),
+    };
+
+    switch (fwk_id_get_event_idx(event->id)) {
+    case MOD_PLATFORM_SYSTEM_CHECK_PD_OFF:
+        status = check_power_off_all_cores();
+        if (status != FWK_SUCCESS) {
+            /*
+             * Increment the retry count. The count is initialized in the warm
+             * reset notification handler
+             */
+            platform_system_ctx.warm_reset_check_cnt++;
+            if (platform_system_ctx.warm_reset_check_cnt >=
+                WARM_RESET_MAX_RETRIES) {
+                FWK_LOG_ERR(
+                    "[PLATFORM_SYSTEM] warm reset retries reached "
+                    "maximum attempts and failed!\n");
+                fwk_assert(
+                    platform_system_ctx.warm_reset_check_cnt <
+                    WARM_RESET_MAX_RETRIES);
+            }
+
+            /*
+             * Continue monitoring core PPUs until all the core power domains
+             * are powered down.
+             */
+            status = fwk_put_event(&check_pd_off_event);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_ERR(
+                    "[PLATFORM_SYSTEM] Failed to send event, returned "
+                    "%d\n",
+                    status);
+            }
+            fwk_assert(status == FWK_SUCCESS);
+        } else {
+            /*
+             * All the CPU power domain are powered off. Start the process to
+             * power on the first application core to complete the warm reboot
+             * sequence.
+             */
+            boot_primary_core();
+        }
+
+        break; /* MOD_PLATFORM_SYSTEM_CHECK_PD_OFF */
+    default:
+        FWK_LOG_WARN(
+            "[PLATFORM_SYSTEM] unrecognized event received, event ignored\n");
+        status = FWK_E_PARAM;
+    }
+
+    return status;
+}
+
 int platform_system_process_notification(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
@@ -507,6 +715,12 @@ int platform_system_process_notification(
     static bool sds_notification_received = false;
     uint8_t boot_cpu;
     fwk_id_t cpu_id;
+
+    /* Event for checking power domain status */
+    struct fwk_event_light check_pd_off_event = {
+        .id = mod_platform_system_event_check_ppu_off,
+        .target_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_PLATFORM_SYSTEM),
+    };
 
     fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
 
@@ -549,6 +763,35 @@ int platform_system_process_notification(
         }
 
         return FWK_SUCCESS;
+    } else if (fwk_id_is_equal(
+                   event->id, mod_pd_notification_id_pre_warm_reset)) {
+        /*
+         * Notification handler for warm reset.
+         *
+         * On receiving warm reset request, the power domain (PD) module will
+         * issue the warm reset notification. The notification is handled by
+         * the platform system module. The notification handler requests PD to
+         * power off all the CPU cores through the HAL API exposed by PD. After
+         * requesting for power off for all the cores, the platform system
+         * module will send an event to itself to check whether all core power
+         * domains are powered off. After all the core power domains are powered
+         * off, the event handler will then power up the boot CPU.
+         */
+        mod_pd_restricted_api = platform_system_ctx.mod_pd_restricted_api;
+        power_off_all_cores();
+
+        platform_system_ctx.warm_reset_check_cnt = 0;
+        status = fwk_put_event(&check_pd_off_event);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(
+                "[PLATFORM_SYSTEM] Failed to send PD power off check "
+                "event, returned %d\n",
+                status);
+            FWK_LOG_ERR("[PLATFORM_SYSTEM] Issuing cold reboot to recover.\n");
+            status = mod_pd_restricted_api->system_shutdown(
+                MOD_PD_SYSTEM_COLD_RESET);
+            fwk_assert(status == FWK_SUCCESS);
+        }
     } else if (fwk_id_is_equal(
                    event->id, mod_scmi_notification_id_initialized)) {
         scmi_notification_count++;
@@ -601,9 +844,11 @@ int platform_system_process_notification(
 const struct fwk_module module_platform_system = {
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_PLATFORM_SYSTEM_API_COUNT,
+    .event_count = (unsigned int)MOD_PLATFORM_SYSTEM_EVENT_COUNT,
     .init = platform_system_mod_init,
     .bind = platform_system_bind,
     .process_bind_request = platform_system_process_bind_request,
+    .process_event = platform_system_process_event,
     .process_notification = platform_system_process_notification,
     .start = platform_system_start,
 };

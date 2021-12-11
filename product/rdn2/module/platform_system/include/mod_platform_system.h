@@ -13,6 +13,8 @@
 
 #include <mod_power_domain.h>
 
+#define WARM_RESET_MAX_RETRIES 10
+
 /*!
  * \addtogroup GroupPLATFORMModule PLATFORM Product Modules
  * @{
@@ -52,6 +54,24 @@ enum mod_platform_system_api_idx {
     /*! Number of exposed interfaces */
     MOD_PLATFORM_SYSTEM_API_COUNT
 };
+
+/*!
+ * \brief Events used by platform system module.
+ */
+enum mod_platform_system_event_idx {
+    /*! Event requesting check for power domain OFF */
+    MOD_PLATFORM_SYSTEM_CHECK_PD_OFF,
+
+    /*! Number of defined events */
+    MOD_PLATFORM_SYSTEM_EVENT_COUNT
+};
+
+/*!
+ * \brief Event to check all CPUs are powered off.
+ */
+static const fwk_id_t mod_platform_system_event_check_ppu_off = FWK_ID_EVENT(
+    FWK_MODULE_IDX_PLATFORM_SYSTEM,
+    MOD_PLATFORM_SYSTEM_CHECK_PD_OFF);
 
 /*!
  * \brief List of isolated CPU MPIDs.
