@@ -341,15 +341,11 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
     case SCMI_SYSTEM_STATE_WARM_RESET:
         system_shutdown = system_state2system_shutdown[mod_scmi_system_state];
         status = scmi_sys_power_ctx.pd_api->system_shutdown(system_shutdown);
-        if (status == FWK_PENDING) {
-            /*
-             * The request has been acknowledged but we don't respond back to
-             * the calling agent. This is a fire-and-forget situation.
-             */
-            return FWK_SUCCESS;
-        } else {
-            goto exit;
+        if ((status == FWK_SUCCESS) || (status == FWK_PENDING)) {
+            status = FWK_SUCCESS;
+            return_values.status = (int32_t)SCMI_SUCCESS;
         }
+        goto exit;
         break;
 
     case SCMI_SYSTEM_STATE_SUSPEND:
