@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+/* The use of "subordinate" may not be in sync with platform documentation */
+
 #include <dimm_spd.h>
 
 #include <mod_cdns_i2c.h>
@@ -539,8 +541,8 @@ int dimm_spd_init_check(
 {
     int status;
 
-    spd_read(i2c_api, DIMM0_SPD_SLAVE, (uint8_t *)&ddr4_dimm0);
-    spd_read(i2c_api, DIMM1_SPD_SLAVE, (uint8_t *)&ddr4_dimm1);
+    spd_read(i2c_api, DIMM0_SPD_SUBORDINATE, (uint8_t *)&ddr4_dimm0);
+    spd_read(i2c_api, DIMM1_SPD_SUBORDINATE, (uint8_t *)&ddr4_dimm1);
 
     status = chk_ddr4_dimms(ddr->speed, &ddr4_dimm0, &ddr4_dimm1);
     if (status != FWK_SUCCESS) {

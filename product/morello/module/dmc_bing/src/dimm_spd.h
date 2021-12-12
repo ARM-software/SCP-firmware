@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+/* The use of "subordinate" may not be in sync with platform documentation */
+
 #ifndef DIMM_SPD_H
 #define DIMM_SPD_H
 
@@ -189,8 +191,8 @@
 
 #define FTB             1U
 #define MTB             125U
-#define DIMM0_SPD_SLAVE 0x50
-#define DIMM1_SPD_SLAVE 0x51
+#define DIMM0_SPD_SUBORDINATE 0x50
+#define DIMM1_SPD_SUBORDINATE 0x51
 #define WRITE_PAGE0     0x36
 #define WRITE_PAGE1     0x37
 

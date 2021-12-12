@@ -1,12 +1,14 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
  *     Morello DDR-PHY driver
  */
+
+/* The use of "subordinate" may not be in sync with platform documentation */
 
 #include "morello_scp_mmap.h"
 
@@ -42,7 +44,7 @@
 #define BIT_WRRD_SUCCESS ((NUM_DATA_PATTERNS) * (NUM_DFI_BEATS_TO_CHECK)*2)
 
 #define PHY_PER_CS_TRAINING_INDEX_0_REG_IDX UINT32_C(9)
-#define PHY_CLK_WRDQ0_SLAVE_DELAY_0_REG_IDX UINT32_C(82)
+#define PHY_CLK_WRDQ0_SUBORDINATE_DELAY_0_REG_IDX UINT32_C(82)
 #define SC_PHY_MANUAL_UPDATE_REG_IDX        UINT32_C(2310)
 
 struct wrdq_eye {
@@ -356,7 +358,8 @@ int write_eye_detect_single_rank(
     for (slice = 0; slice < NUM_SLICES; slice++) {
         for (bit = 0; bit < NUM_BITS_PER_SLICE; bit += 2) {
             rd_val = 0;
-            denali_index = (PHY_CLK_WRDQ0_SLAVE_DELAY_0_REG_IDX + (bit / 2)) +
+            denali_index =
+                (PHY_CLK_WRDQ0_SUBORDINATE_DELAY_0_REG_IDX + (bit / 2)) +
                 (slice * 256);
             rd_val = *(uint32_t *)(ddr_phy_base + (4 * denali_index));
         }
@@ -414,7 +417,7 @@ int write_eye_detect_single_rank(
                             reg_val |=
                                 (cur_wrdq_delays[slice][bit - 1] & 0x7FF);
                             denali_index =
-                                (PHY_CLK_WRDQ0_SLAVE_DELAY_0_REG_IDX +
+                                (PHY_CLK_WRDQ0_SUBORDINATE_DELAY_0_REG_IDX +
                                  (bit / 2)) +
                                 (slice * 256);
                             *(uint32_t *)(ddr_phy_base + (4 * denali_index)) =
@@ -623,7 +626,7 @@ int write_eye_detect_single_rank(
                 eye_b_mid = eye_b->mid;
                 reg_val = (eye_b_mid << 16) | eye_a_mid;
                 denali_index =
-                    (PHY_CLK_WRDQ0_SLAVE_DELAY_0_REG_IDX + (bit / 2)) +
+                    (PHY_CLK_WRDQ0_SUBORDINATE_DELAY_0_REG_IDX + (bit / 2)) +
                     (slice * 256);
                 *(uint32_t *)(ddr_phy_base + (4 * denali_index)) = reg_val;
             }
