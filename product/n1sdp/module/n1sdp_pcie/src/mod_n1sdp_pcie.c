@@ -85,8 +85,8 @@ struct n1sdp_pcie_ctx {
     /* Timer module API */
     struct mod_timer_api *timer_api;
 
-    /* C2C API to check if slave chip is connected */
-    struct n1sdp_c2c_slave_info_api *c2c_api;
+    /* C2C API to check if secondary chip is connected */
+    struct n1sdp_c2c_secondary_info_api *c2c_api;
 
     /* Table of PCIe device contexts */
     struct n1sdp_pcie_dev_ctx *device_ctx_table;
@@ -215,7 +215,7 @@ static int n1sdp_pcie_phy_init(fwk_id_t id)
     }
 
     if ((n1sdp_get_chipid() != 0x0) || !dev_ctx->config->ccix_capable ||
-        pcie_ctx.c2c_api->is_slave_alive()) {
+        pcie_ctx.c2c_api->is_secondary_alive()) {
         gen_speed = PCIE_GEN_3;
     } else {
         gen_speed = PCIE_GEN_4;
@@ -255,7 +255,7 @@ static int n1sdp_pcie_controller_init(fwk_id_t id, bool ep_mode)
     }
 
     if ((n1sdp_get_chipid() != 0x0) || !dev_ctx->config->ccix_capable ||
-        pcie_ctx.c2c_api->is_slave_alive()) {
+        pcie_ctx.c2c_api->is_secondary_alive()) {
         gen_speed = PCIE_GEN_3;
     } else {
         gen_speed = PCIE_GEN_4;
@@ -305,7 +305,7 @@ static int n1sdp_pcie_link_training(fwk_id_t id, bool ep_mode)
     }
 
     if ((n1sdp_get_chipid() != 0x0) || !dev_ctx->config->ccix_capable ||
-        pcie_ctx.c2c_api->is_slave_alive()) {
+        pcie_ctx.c2c_api->is_secondary_alive()) {
         gen_speed = PCIE_GEN_3;
         down_stream_tx_preset = PCIE_RC_TX_PRESET_VALUE;
         up_stream_tx_preset = PCIE_RC_TX_PRESET_VALUE;
@@ -742,8 +742,10 @@ static int n1sdp_pcie_bind(fwk_id_t id, unsigned int round)
             return status;
         }
 
-        status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_C2C),
-            FWK_ID_API(FWK_MODULE_IDX_N1SDP_C2C, N1SDP_C2C_API_IDX_SLAVE_INFO),
+        status = fwk_module_bind(
+            FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_C2C),
+            FWK_ID_API(
+                FWK_MODULE_IDX_N1SDP_C2C, N1SDP_C2C_API_IDX_SECONDARY_INFO),
             &pcie_ctx.c2c_api);
         if (status != FWK_SUCCESS) {
             return status;
@@ -807,13 +809,14 @@ static int n1sdp_pcie_process_notification(const struct fwk_event *event,
     /*
      * The CCIX RP should not be initialized by n1sdp_pcie_setup() function
      * in two special cases:
-     *     1. In case of slave chip as it will be initialized by C2C module
+     *     1. In case of secondary chip as it will be initialized by C2C module
      *        in endpoint mode.
-     *     2. In case of controller chip if the slave I2C is alive & responding
-     *        then it will be initialized by C2C module in RP mode.
+     *     2. In case of controller chip if the secondary I2C is alive &
+     * responding then it will be initialized by C2C module in RP mode.
      */
     if (dev_ctx->config->ccix_capable) {
-        if (pcie_ctx.c2c_api->is_slave_alive() || (n1sdp_get_chipid() != 0)) {
+        if (pcie_ctx.c2c_api->is_secondary_alive() ||
+            (n1sdp_get_chipid() != 0)) {
             return FWK_SUCCESS;
         }
     }

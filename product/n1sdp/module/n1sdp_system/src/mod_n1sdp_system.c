@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -138,8 +138,8 @@ struct n1sdp_system_ctx {
     /* Pointer to SDS */
     const struct mod_sds_api *sds_api;
 
-    /* Pointer to N1SDP C2C slave information API */
-    const struct n1sdp_c2c_slave_info_api *c2c_api;
+    /* Pointer to N1SDP C2C secondary information API */
+    const struct n1sdp_c2c_secondary_info_api *c2c_api;
 
     /* Pointer to N1SDP C2C PD API */
     const struct n1sdp_c2c_pd_api *c2c_pd_api;
@@ -213,7 +213,7 @@ static int n1sdp_system_shutdown(
     enum mod_pd_system_shutdown system_shutdown)
 {
     /* Check if we are running in multichip configuration */
-    if (n1sdp_system_ctx.c2c_api->is_slave_alive()) {
+    if (n1sdp_system_ctx.c2c_api->is_secondary_alive()) {
         n1sdp_system_ctx.c2c_pd_api->shutdown_reboot(
             N1SDP_C2C_CMD_SHUTDOWN_OR_REBOOT, system_shutdown);
     }
@@ -343,8 +343,8 @@ static int n1sdp_system_fill_platform_info(void)
     sds_platform_info.local_ddr_size = ddr_size_gb;
 
     /* Get remote chip's information */
-    sds_platform_info.multichip_mode = n1sdp_system_ctx.c2c_api->
-                                          is_slave_alive();
+    sds_platform_info.multichip_mode =
+        n1sdp_system_ctx.c2c_api->is_secondary_alive();
 
     if (sds_platform_info.multichip_mode) {
         sds_platform_info.slave_count = 1;
@@ -546,8 +546,9 @@ static int n1sdp_system_bind(fwk_id_t id, unsigned int round)
         return status;
     }
 
-    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_C2C),
-        FWK_ID_API(FWK_MODULE_IDX_N1SDP_C2C, N1SDP_C2C_API_IDX_SLAVE_INFO),
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_C2C),
+        FWK_ID_API(FWK_MODULE_IDX_N1SDP_C2C, N1SDP_C2C_API_IDX_SECONDARY_INFO),
         &n1sdp_system_ctx.c2c_api);
     if (status != FWK_SUCCESS) {
         return status;
