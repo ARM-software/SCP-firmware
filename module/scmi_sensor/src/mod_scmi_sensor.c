@@ -584,8 +584,10 @@ static int scmi_sensor_trip_point_config_handler(
         goto exit;
     }
 
-    trip_point_param.high_value = parameters->sensor_value_high;
-    trip_point_param.low_value = parameters->sensor_value_low;
+    trip_point_param.tp_value =
+        (((uint64_t)parameters->sensor_value_high << 32) & ~0U) |
+        (((uint64_t)parameters->sensor_value_low) & ~0U);
+
     trip_point_param.mode =
         (parameters->flags & SCMI_SENSOR_TRIP_POINT_FLAGS_EV_CTRL_MASK) >>
         SCMI_SENSOR_TRIP_POINT_FLAGS_EV_CTRL_POS;
