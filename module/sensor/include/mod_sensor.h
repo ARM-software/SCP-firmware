@@ -329,11 +329,8 @@ enum mod_sensor_trip_point_mode {
  *     a trip point value.
  */
 struct mod_sensor_trip_point_params {
-    /*! Sensor trip point low valuer */
-    uint32_t low_value;
-
-    /*! Sensor trip point high value */
-    uint32_t high_value;
+    /*! Sensor trip point value */
+    uint64_t tp_value;
 
     /*! Sensor trip point mode */
     enum mod_sensor_trip_point_mode mode;

@@ -78,8 +78,7 @@ static bool trip_point_evaluate(
     uint64_t threshold;
     bool new_above_threshold, trigger = false;
 
-    threshold = (((uint64_t)ctx->params.high_value << 32) & ~0U) |
-        (((uint64_t)ctx->params.low_value) & ~0U);
+    threshold = ctx->params.tp_value;
     new_above_threshold = value > threshold;
 
     switch (ctx->params.mode) {
@@ -102,6 +101,7 @@ static bool trip_point_evaluate(
     default:
         break;
     }
+
     ctx->above_threshold = new_above_threshold;
     return trigger;
 }
