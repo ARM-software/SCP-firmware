@@ -61,8 +61,8 @@
 #define CCIX_PROP_MAX_PACK_SIZE_512          2
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
-static const char * const cmd_str[] = {
-    [N1SDP_C2C_CMD_CHECK_SLAVE] = "Check slave alive",
+static const char *const cmd_str[] = {
+    [N1SDP_C2C_CMD_CHECK_SECONDARY] = "Check secondary alive",
     [N1SDP_C2C_CMD_PCIE_POWER_ON] = "PCIe power ON",
     [N1SDP_C2C_CMD_PCIE_PHY_INIT] = "PCIe PHY init",
     [N1SDP_C2C_CMD_PCIE_CTRL_INIT] = "PCIe controller init",
@@ -75,7 +75,7 @@ static const char * const cmd_str[] = {
     [N1SDP_C2C_CMD_CMN600_ENTER_SYS_COHERENCY] =
         "CMN600 enter system coherency",
     [N1SDP_C2C_CMD_CMN600_ENTER_DVM_DOMAIN] = "CMN600 enter DVM domain",
-    [N1SDP_C2C_CMD_GET_SLV_DDR_SIZE] = "Get slave DDR size",
+    [N1SDP_C2C_CMD_GET_SLV_DDR_SIZE] = "Get secondary DDR size",
     [N1SDP_C2C_CMD_TIMER_SYNC] = "Sync timer",
     [N1SDP_C2C_CMD_POWER_DOMAIN_ON] = "Power domain ON",
     [N1SDP_C2C_CMD_POWER_DOMAIN_OFF] = "Power domain OFF",
@@ -127,11 +127,11 @@ struct n1sdp_c2c_ctx {
     /* Multi chip mode flag */
     bool mc_mode;
 
-    /* Identifier if slave chip is alive or not */
-    bool slave_alive;
+    /* Identifier if secondary chip is alive or not */
+    bool secondary_alive;
 
-    /* Storage for slave DDR size in GB */
-    uint8_t slave_ddr_size_gb;
+    /* Storage for secondary DDR size in GB */
+    uint8_t secondary_ddr_size_gb;
 
     /* Storage for transmit data in primary mode */
     uint8_t primary_tx_data[N1SDP_C2C_DATA_SIZE];
@@ -139,11 +139,11 @@ struct n1sdp_c2c_ctx {
     /* Storage for received data in primary mode */
     uint8_t primary_rx_data[N1SDP_C2C_DATA_SIZE];
 
-    /* Storage for received data in slave mode */
-    uint8_t slave_rx_data[N1SDP_C2C_DATA_SIZE];
+    /* Storage for received data in secondary mode */
+    uint8_t secondary_rx_data[N1SDP_C2C_DATA_SIZE];
 
-    /* Storage for transmit data in slave mode */
-    uint8_t slave_tx_data[N1SDP_C2C_DATA_SIZE];
+    /* Storage for transmit data in secondary mode */
+    uint8_t secondary_tx_data[N1SDP_C2C_DATA_SIZE];
 };
 
 static struct n1sdp_c2c_ctx n1sdp_c2c_ctx;
@@ -156,7 +156,7 @@ static int n1sdp_c2c_primary_tx_command(uint8_t cmd)
     int status;
 
     (void)cmd_str;
-    FWK_LOG_INFO("[C2C] %s in slave...", cmd_str[cmd]);
+    FWK_LOG_INFO("[C2C] %s in secondary...", cmd_str[cmd]);
 
     n1sdp_c2c_ctx.primary_tx_data[0] = cmd;
     status = n1sdp_c2c_ctx.controller_api->write(
@@ -178,7 +178,7 @@ static int n1sdp_c2c_primary_rx_response(void)
 {
     int status;
 
-    FWK_LOG_INFO("[C2C] Waiting for response from  slave...");
+    FWK_LOG_INFO("[C2C] Waiting for response from secondary...");
     status = n1sdp_c2c_ctx.controller_api->read(
         n1sdp_c2c_ctx.config->i2c_id,
         n1sdp_c2c_ctx.config->target_addr,
@@ -198,26 +198,26 @@ static int n1sdp_c2c_check_remote(void)
     int status;
 
     if (n1sdp_c2c_ctx.chip_id == 0) {
-        status =
-            n1sdp_c2c_primary_tx_command((uint8_t)N1SDP_C2C_CMD_CHECK_SLAVE);
+        status = n1sdp_c2c_primary_tx_command(
+            (uint8_t)N1SDP_C2C_CMD_CHECK_SECONDARY);
         if (status != FWK_SUCCESS) {
-            n1sdp_c2c_ctx.slave_alive = false;
+            n1sdp_c2c_ctx.secondary_alive = false;
             return FWK_E_DEVICE;
         }
 
         status = n1sdp_c2c_primary_rx_response();
         if (status != FWK_SUCCESS) {
-            n1sdp_c2c_ctx.slave_alive = false;
+            n1sdp_c2c_ctx.secondary_alive = false;
             return status;
         }
 
-        n1sdp_c2c_ctx.slave_alive = true;
-        FWK_LOG_INFO("[C2C] Slave Alive!");
+        n1sdp_c2c_ctx.secondary_alive = true;
+        FWK_LOG_INFO("[C2C] Target Alive!");
         return FWK_SUCCESS;
     } else {
         status = n1sdp_c2c_ctx.target_api->read(
             n1sdp_c2c_ctx.config->i2c_id,
-            &n1sdp_c2c_ctx.slave_rx_data[0],
+            &n1sdp_c2c_ctx.secondary_rx_data[0],
             N1SDP_C2C_DATA_SIZE);
         if (status != FWK_SUCCESS) {
             FWK_LOG_INFO("[C2C] Error setting up I2C for reception!");
@@ -228,12 +228,12 @@ static int n1sdp_c2c_check_remote(void)
     return FWK_SUCCESS;
 }
 
-static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
+static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_secondary)
 {
     struct mod_cmn600_ccix_remote_node_config remote_config;
     int status;
 
-    if (run_in_slave) {
+    if (run_in_secondary) {
         status = n1sdp_c2c_primary_tx_command(cmd);
         if (status != FWK_SUCCESS) {
             return status;
@@ -251,13 +251,13 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
             FWK_LOG_INFO("[C2C] Error!");
             return status;
         }
-        if (run_in_slave) {
+        if (run_in_secondary) {
             status = n1sdp_c2c_primary_rx_response();
             if (status != FWK_SUCCESS) {
                 return status;
             }
             if (n1sdp_c2c_ctx.primary_rx_data[0] != N1SDP_C2C_SUCCESS) {
-                FWK_LOG_INFO("[C2C] Command failed in slave!");
+                FWK_LOG_INFO("[C2C] Command failed in secondary!");
                 return FWK_E_STATE;
             }
         }
@@ -270,13 +270,13 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
             FWK_LOG_INFO("[C2C] Error!");
             return status;
         }
-        if (run_in_slave) {
+        if (run_in_secondary) {
             status = n1sdp_c2c_primary_rx_response();
             if (status != FWK_SUCCESS) {
                 return status;
             }
             if (n1sdp_c2c_ctx.primary_rx_data[0] != N1SDP_C2C_SUCCESS) {
-                FWK_LOG_INFO("[C2C] Command failed in slave!");
+                FWK_LOG_INFO("[C2C] Command failed in secondary!");
                 return FWK_E_STATE;
             }
         }
@@ -289,13 +289,13 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
             FWK_LOG_INFO("[C2C] Error!");
             return status;
         }
-        if (run_in_slave) {
+        if (run_in_secondary) {
             status = n1sdp_c2c_primary_rx_response();
             if (status != FWK_SUCCESS) {
                 return status;
             }
             if (n1sdp_c2c_ctx.primary_rx_data[0] != N1SDP_C2C_SUCCESS) {
-                FWK_LOG_INFO("[C2C] Command failed in slave!");
+                FWK_LOG_INFO("[C2C] Command failed in secondary!");
                 return FWK_E_STATE;
             }
         }
@@ -308,13 +308,13 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
             FWK_LOG_INFO("[C2C] Error!");
             return status;
         }
-        if (run_in_slave) {
+        if (run_in_secondary) {
             status = n1sdp_c2c_primary_rx_response();
             if (status != FWK_SUCCESS) {
                 return status;
             }
             if (n1sdp_c2c_ctx.primary_rx_data[0] != N1SDP_C2C_SUCCESS) {
-                FWK_LOG_INFO("[C2C] Command failed in slave!");
+                FWK_LOG_INFO("[C2C] Command failed in secondary!");
                 return FWK_E_STATE;
             }
         }
@@ -327,13 +327,13 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
             FWK_LOG_INFO("[C2C] Error!");
             return status;
         }
-        if (run_in_slave) {
+        if (run_in_secondary) {
             status = n1sdp_c2c_primary_rx_response();
             if (status != FWK_SUCCESS) {
                 return status;
             }
             if (n1sdp_c2c_ctx.primary_rx_data[0] != N1SDP_C2C_SUCCESS) {
-                FWK_LOG_INFO("[C2C] Command failed in slave!");
+                FWK_LOG_INFO("[C2C] Command failed in secondary!");
                 return FWK_E_STATE;
             }
         }
@@ -346,13 +346,13 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
             FWK_LOG_INFO("[C2C] Error!");
             return status;
         }
-        if (run_in_slave) {
+        if (run_in_secondary) {
             status = n1sdp_c2c_primary_rx_response();
             if (status != FWK_SUCCESS) {
                 return status;
             }
             if (n1sdp_c2c_ctx.primary_rx_data[0] != N1SDP_C2C_SUCCESS) {
-                FWK_LOG_INFO("[C2C] Command failed in slave!");
+                FWK_LOG_INFO("[C2C] Command failed in secondary!");
                 return FWK_E_STATE;
             }
         }
@@ -365,13 +365,13 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
             FWK_LOG_INFO("[C2C] Error!");
             return status;
         }
-        if (run_in_slave) {
+        if (run_in_secondary) {
             status = n1sdp_c2c_primary_rx_response();
             if (status != FWK_SUCCESS) {
                 return status;
             }
             if (n1sdp_c2c_ctx.primary_rx_data[0] != N1SDP_C2C_SUCCESS) {
-                FWK_LOG_INFO("[C2C] Command failed in slave!");
+                FWK_LOG_INFO("[C2C] Command failed in secondary!");
                 return FWK_E_STATE;
             }
         }
@@ -398,13 +398,13 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
             FWK_LOG_INFO("[C2C] Error!");
             return status;
         }
-        if (run_in_slave) {
+        if (run_in_secondary) {
             status = n1sdp_c2c_primary_rx_response();
             if (status != FWK_SUCCESS) {
                 return status;
             }
             if (n1sdp_c2c_ctx.primary_rx_data[0] != N1SDP_C2C_SUCCESS) {
-                FWK_LOG_INFO("[C2C] Command failed in slave!");
+                FWK_LOG_INFO("[C2C] Command failed in secondary!");
                 return FWK_E_STATE;
             }
         }
@@ -417,13 +417,13 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
             FWK_LOG_INFO("[C2C] Error!");
             return status;
         }
-        if (run_in_slave) {
+        if (run_in_secondary) {
             status = n1sdp_c2c_primary_rx_response();
             if (status != FWK_SUCCESS) {
                 return status;
             }
             if (n1sdp_c2c_ctx.primary_rx_data[0] != N1SDP_C2C_SUCCESS) {
-                FWK_LOG_INFO("[C2C] Command failed in slave!");
+                FWK_LOG_INFO("[C2C] Command failed in secondary!");
                 return FWK_E_STATE;
             }
         }
@@ -436,13 +436,13 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
             FWK_LOG_INFO("[C2C] Error!");
             return status;
         }
-        if (run_in_slave) {
+        if (run_in_secondary) {
             status = n1sdp_c2c_primary_rx_response();
             if (status != FWK_SUCCESS) {
                 return status;
             }
             if (n1sdp_c2c_ctx.primary_rx_data[0] != N1SDP_C2C_SUCCESS) {
-                FWK_LOG_INFO("[C2C] Command failed in slave!");
+                FWK_LOG_INFO("[C2C] Command failed in secondary!");
                 return FWK_E_STATE;
             }
         }
@@ -455,31 +455,33 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
             FWK_LOG_INFO("[C2C] Error!");
             return status;
         }
-        if (run_in_slave) {
+        if (run_in_secondary) {
             status = n1sdp_c2c_primary_rx_response();
             if (status != FWK_SUCCESS) {
                 return status;
             }
             if (n1sdp_c2c_ctx.primary_rx_data[0] != N1SDP_C2C_SUCCESS) {
-                FWK_LOG_INFO("[C2C] Command failed in slave!");
+                FWK_LOG_INFO("[C2C] Command failed in secondary!");
                 return FWK_E_STATE;
             }
         }
         break;
 
     case N1SDP_C2C_CMD_GET_SLV_DDR_SIZE:
-        if (run_in_slave) {
+        if (run_in_secondary) {
             status = n1sdp_c2c_primary_rx_response();
             if (status != FWK_SUCCESS) {
                 return status;
             }
             if (n1sdp_c2c_ctx.primary_rx_data[0] != N1SDP_C2C_SUCCESS) {
-                FWK_LOG_INFO("[C2C] Command failed in slave!");
+                FWK_LOG_INFO("[C2C] Command failed in secondary!");
                 return FWK_E_STATE;
             }
-            n1sdp_c2c_ctx.slave_ddr_size_gb = n1sdp_c2c_ctx.primary_rx_data[1];
+            n1sdp_c2c_ctx.secondary_ddr_size_gb =
+                n1sdp_c2c_ctx.primary_rx_data[1];
             FWK_LOG_INFO(
-                "[C2C] Slave DDR Size: %d GB", n1sdp_c2c_ctx.slave_ddr_size_gb);
+                "[C2C] Target DDR Size: %d GB",
+                n1sdp_c2c_ctx.secondary_ddr_size_gb);
         }
         break;
 
@@ -490,13 +492,13 @@ static int n1sdp_c2c_multichip_run_command(uint8_t cmd, bool run_in_slave)
             FWK_LOG_INFO("[C2C] Error!");
             return status;
         }
-        if (run_in_slave) {
+        if (run_in_secondary) {
             status = n1sdp_c2c_primary_rx_response();
             if (status != FWK_SUCCESS) {
                 return status;
             }
             if (n1sdp_c2c_ctx.primary_rx_data[0] != N1SDP_C2C_SUCCESS) {
-                FWK_LOG_INFO("[C2C] Command failed in slave!");
+                FWK_LOG_INFO("[C2C] Command failed in secondary!");
                 return FWK_E_STATE;
             }
         }
@@ -596,7 +598,7 @@ static int n1sdp_c2c_multichip_init(void)
 }
 
 /*
- * Slave side protocol functions
+ * Target side protocol functions
  */
 static int n1sdp_c2c_wait_for_next_command(void)
 {
@@ -604,7 +606,7 @@ static int n1sdp_c2c_wait_for_next_command(void)
 
     status = n1sdp_c2c_ctx.target_api->read(
         n1sdp_c2c_ctx.config->i2c_id,
-        &n1sdp_c2c_ctx.slave_rx_data[0],
+        &n1sdp_c2c_ctx.secondary_rx_data[0],
         N1SDP_C2C_DATA_SIZE);
     if (status != FWK_SUCCESS) {
         FWK_LOG_INFO("[C2C] Error setting up read transfer!");
@@ -624,12 +626,12 @@ static int n1sdp_c2c_process_command(void)
     bool set_state_req_resp = false;
     struct mod_cmn600_ccix_remote_node_config remote_config;
 
-    memcpy(rx_data, n1sdp_c2c_ctx.slave_rx_data, N1SDP_C2C_DATA_SIZE);
+    memcpy(rx_data, n1sdp_c2c_ctx.secondary_rx_data, N1SDP_C2C_DATA_SIZE);
 
     cmd = rx_data[0];
 
     switch (cmd) {
-    case N1SDP_C2C_CMD_CHECK_SLAVE:
+    case N1SDP_C2C_CMD_CHECK_SECONDARY:
         status = FWK_SUCCESS;
         break;
 
@@ -722,14 +724,14 @@ static int n1sdp_c2c_process_command(void)
         if (status != FWK_SUCCESS) {
             goto error;
         }
-        n1sdp_c2c_ctx.slave_tx_data[1] = (uint8_t)ddr_size_gb;
+        n1sdp_c2c_ctx.secondary_tx_data[1] = (uint8_t)ddr_size_gb;
         break;
 
     case N1SDP_C2C_CMD_POWER_DOMAIN_OFF:
         /*
          * rx_data[0] - Contains the C2C command
-         * rx_data[1] - Contains target power domain ID
-         * rx_data[2] - Contains target power domain type (core or cluster)
+         * rx_data[1] - Contains secondary power domain ID
+         * rx_data[2] - Contains secondary power domain type (core or cluster)
          *
          * The power domains set_state requests a response.
          *
@@ -777,8 +779,8 @@ static int n1sdp_c2c_process_command(void)
     case N1SDP_C2C_CMD_POWER_DOMAIN_ON:
         /*
          * rx_data[0] - Contains the C2C command
-         * rx_data[1] - Contains target power domain ID
-         * rx_data[2] - Contains target power domain type (core or cluster)
+         * rx_data[1] - Contains secondary power domain ID
+         * rx_data[2] - Contains secondary power domain type (core or cluster)
          *
          * The power domains set_state requests a response.
          *
@@ -830,7 +832,7 @@ static int n1sdp_c2c_process_command(void)
     case N1SDP_C2C_CMD_POWER_DOMAIN_GET_STATE:
         /*
          * rx_data[0] - Contains the C2C command
-         * rx_data[1] - Contains target power domain ID
+         * rx_data[1] - Contains secondary power domain ID
          */
         status = n1sdp_c2c_ctx.pd_api->get_state(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, rx_data[1]),
@@ -839,7 +841,7 @@ static int n1sdp_c2c_process_command(void)
             goto error;
         }
 
-        n1sdp_c2c_ctx.slave_tx_data[1] = (uint8_t)state;
+        n1sdp_c2c_ctx.secondary_tx_data[1] = (uint8_t)state;
         break;
 
     case N1SDP_C2C_CMD_TIMER_SYNC:
@@ -894,16 +896,16 @@ error:
             return FWK_SUCCESS;
         } else {
             /* Not a set_state command which requires a response */
-            n1sdp_c2c_ctx.slave_tx_data[0] = N1SDP_C2C_SUCCESS;
+            n1sdp_c2c_ctx.secondary_tx_data[0] = N1SDP_C2C_SUCCESS;
         }
     } else {
         /* status != FWK_SUCCESS */
-        n1sdp_c2c_ctx.slave_tx_data[0] = N1SDP_C2C_ERROR;
+        n1sdp_c2c_ctx.secondary_tx_data[0] = N1SDP_C2C_ERROR;
     }
 
     status = n1sdp_c2c_ctx.target_api->write(
         n1sdp_c2c_ctx.config->i2c_id,
-        &n1sdp_c2c_ctx.slave_tx_data[0],
+        &n1sdp_c2c_ctx.secondary_tx_data[0],
         N1SDP_C2C_DATA_SIZE);
     if (status != FWK_SUCCESS) {
         FWK_LOG_INFO("[C2C] Error setting up write transfer!");
@@ -918,25 +920,24 @@ error:
  */
 
 /*
- * Slave information API
+ * Target information API
  */
-static bool n1sdp_c2c_is_slave_alive(void)
+static bool n1sdp_c2c_is_secondary_alive(void)
 {
-    return n1sdp_c2c_ctx.slave_alive;
+    return n1sdp_c2c_ctx.secondary_alive;
 }
 
 static int n1sdp_c2c_get_ddr_size_gb(uint8_t *size_gb)
 {
     fwk_assert(size_gb != NULL);
 
-    *size_gb = n1sdp_c2c_ctx.slave_ddr_size_gb;
+    *size_gb = n1sdp_c2c_ctx.secondary_ddr_size_gb;
 
     return FWK_SUCCESS;
 }
 
-
-static const struct n1sdp_c2c_slave_info_api slave_info_api = {
-    .is_slave_alive = n1sdp_c2c_is_slave_alive,
+static const struct n1sdp_c2c_secondary_info_api secondary_info_api = {
+    .is_secondary_alive = n1sdp_c2c_is_secondary_alive,
     .get_ddr_size_gb = n1sdp_c2c_get_ddr_size_gb,
 };
 
@@ -1022,7 +1023,7 @@ static int n1sdp_c2c_pd_get_state(enum n1sdp_c2c_cmd cmd, uint8_t pd_id,
 
     /*
      * primary_rx_data[0] contains return status code
-     * primary_rx_data[1] contains the current PD state in target
+     * primary_rx_data[1] contains the current PD state in secondary
      */
     if (n1sdp_c2c_ctx.primary_rx_data[0] != N1SDP_C2C_SUCCESS) {
         FWK_LOG_INFO("[C2C] PD request failed!");
@@ -1039,7 +1040,7 @@ static int n1sdp_c2c_pd_shutdown_reboot(enum n1sdp_c2c_cmd cmd,
 {
     n1sdp_c2c_ctx.primary_tx_data[1] = (uint8_t)type;
     /*
-     * Send command to slave. Don't wait for response as slave will
+     * Send command to secondary. Don't wait for response as secondary will
      * trigger shutdown/reboot sequence of SoC and I2C may not be
      * available.
      */
@@ -1176,8 +1177,8 @@ static int n1sdp_c2c_process_bind_request(fwk_id_t requester_id,
     fwk_id_t target_id, fwk_id_t api_id, const void **api)
 {
     switch (fwk_id_get_api_idx(api_id)) {
-    case N1SDP_C2C_API_IDX_SLAVE_INFO:
-        *api = &slave_info_api;
+    case N1SDP_C2C_API_IDX_SECONDARY_INFO:
+        *api = &secondary_info_api;
         break;
     case N1SDP_C2C_API_IDX_PD:
         *api = &pd_api;
@@ -1232,7 +1233,7 @@ static int n1sdp_c2c_process_notification(const struct fwk_event *event,
         if (status == FWK_SUCCESS && (n1sdp_c2c_ctx.chip_id == 0)) {
             status = n1sdp_c2c_multichip_init();
             if (status != FWK_SUCCESS) {
-                n1sdp_c2c_ctx.slave_alive = false;
+                n1sdp_c2c_ctx.secondary_alive = false;
             }
         }
         /*
@@ -1262,7 +1263,7 @@ static int n1sdp_c2c_process_event(
     if (module_idx == fwk_id_get_module_idx(fwk_module_id_power_domain)) {
         status = n1sdp_c2c_ctx.target_api->write(
             n1sdp_c2c_ctx.config->i2c_id,
-            &n1sdp_c2c_ctx.slave_tx_data[0],
+            &n1sdp_c2c_ctx.secondary_tx_data[0],
             N1SDP_C2C_DATA_SIZE);
         if (status != FWK_SUCCESS) {
             FWK_LOG_ERR("[C2C] Error setting up write transfer!");

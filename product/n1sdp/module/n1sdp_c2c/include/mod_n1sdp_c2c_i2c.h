@@ -37,7 +37,7 @@
  * \brief N1SDP C2C Handshake commands
  */
 enum n1sdp_c2c_cmd {
-    N1SDP_C2C_CMD_CHECK_SLAVE,
+    N1SDP_C2C_CMD_CHECK_SECONDARY,
     N1SDP_C2C_CMD_PCIE_POWER_ON,
     N1SDP_C2C_CMD_PCIE_PHY_INIT,
     N1SDP_C2C_CMD_PCIE_CTRL_INIT,
@@ -73,8 +73,8 @@ struct n1sdp_c2c_dev_config {
  * \brief Module API indices
  */
 enum n1sdp_c2c_api_idx {
-    /*! Index of the N1SDP C2C slave information API */
-    N1SDP_C2C_API_IDX_SLAVE_INFO,
+    /*! Index of the N1SDP C2C secondary information API */
+    N1SDP_C2C_API_IDX_SECONDARY_INFO,
 
     /*! Index of the N1SDP C2C power domain API */
     N1SDP_C2C_API_IDX_PD,
@@ -84,25 +84,25 @@ enum n1sdp_c2c_api_idx {
 };
 
 /*!
- * \brief N1SDP C2C slave information API
+ * \brief N1SDP C2C secondary information API
  */
-struct n1sdp_c2c_slave_info_api {
-   /*!
-    * \brief API to check if slave is alive or not.
-    *
-    * \retval true If slave is alive.
-    * \return false If slave is not alive.
-    */
-   bool (*is_slave_alive)(void);
-   /*!
-    * \brief API to get slave chip's DDR size in GB.
-    *
-    * \param size_gb Pointer to storage where the size is stored.
-    *
-    * \retval ::FWK_SUCCESS If operation succeeds.
-    * \return One of the possible error return codes.
-    */
-   int (*get_ddr_size_gb)(uint8_t *size_gb);
+struct n1sdp_c2c_secondary_info_api {
+    /*!
+     * \brief API to check if secondary is alive or not.
+     *
+     * \retval true If secondary is alive.
+     * \return false If secondary is not alive.
+     */
+    bool (*is_secondary_alive)(void);
+    /*!
+     * \brief API to get secondary chip's DDR size in GB.
+     *
+     * \param size_gb Pointer to storage where the size is stored.
+     *
+     * \retval ::FWK_SUCCESS If operation succeeds.
+     * \return One of the possible error return codes.
+     */
+    int (*get_ddr_size_gb)(uint8_t *size_gb);
 };
 
 /*!
@@ -113,8 +113,8 @@ struct n1sdp_c2c_pd_api {
      * \brief API to set a power state in remote chip.
      *
      * \param cmd The C2C command type to issue.
-     * \param pd_id The target power domain ID.
-     * \param pd_type The target power domain type.
+     * \param pd_id The secondary chip's power domain ID.
+     * \param pd_type The secondary chip's power domain type.
      *
      * \retval ::FWK_SUCCESS If operation succeeds.
      * \return One of the possible error return codes.
@@ -124,7 +124,7 @@ struct n1sdp_c2c_pd_api {
      * \brief API to get a power state in remote chip.
      *
      * \param cmd The C2C command type to issue.
-     * \param pd_id The target power domain ID.
+     * \param pd_id The secondary chip's power domain ID.
      * \param state Current power state in power domain pd_id.
      *
      * \retval ::FWK_SUCCESS If operation succeeds.
