@@ -19,8 +19,7 @@ target_include_directories(
 
 target_sources(
     morello-soc-bl2
-    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_armv7m_mpu.c"
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_armv7m_mpu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_ssc.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_system_info.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_power_domain.c"
@@ -53,12 +52,6 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_morello_pcie.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_cdns_i2c.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/morello_core.c")
-
-if(SCP_ENABLE_MULTITHREADING)
-    target_sources(morello-soc-bl2
-                   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c")
-    target_link_libraries(morello-soc-bl2 PRIVATE cmsis::rtos2-rtx)
-endif()
 
 if(SCP_ENABLE_DEBUGGER_INIT)
     target_compile_definitions(morello-soc-bl2 PRIVATE BUILD_HAS_DEBUGGER)

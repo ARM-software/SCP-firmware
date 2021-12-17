@@ -9,7 +9,6 @@
 #
 
 BS_FIRMWARE_CPU := cortex-m7
-BS_FIRMWARE_HAS_MULTITHREADING := no
 BS_FIRMWARE_HAS_NOTIFICATION := yes
 
 BS_FIRMWARE_MODULES := \
@@ -50,7 +49,6 @@ BS_FIRMWARE_MODULES := \
     morello_system
 
 BS_FIRMWARE_SOURCES := \
-    rtx_config.c \
     morello_core.c \
     config_armv7m_mpu.c \
     config_ssc.c \
