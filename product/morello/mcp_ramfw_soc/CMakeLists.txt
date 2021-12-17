@@ -19,20 +19,13 @@ target_include_directories(
 
 target_sources(
     morello-soc-mcp-bl2
-    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_armv7m_mpu.c"
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_armv7m_mpu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_pl011.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_pik_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_mhu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_smt.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_agent.c")
-
-if(SCP_ENABLE_MULTITHREADING)
-    target_sources(morello-soc-mcp-bl2
-                   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c")
-    target_link_libraries(morello-soc-mcp-bl2 PRIVATE cmsis::rtos2-rtx)
-endif()
 
 #
 # Some of our firmware includes require CMSIS.
