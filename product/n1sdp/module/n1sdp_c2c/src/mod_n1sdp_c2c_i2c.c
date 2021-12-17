@@ -1065,11 +1065,7 @@ static int n1sdp_c2c_init(fwk_id_t module_id, unsigned int unused,
 
     n1sdp_c2c_ctx.chip_id = n1sdp_get_chipid();
 
-    if (n1sdp_c2c_ctx.chip_id == 0x0) {
-        return FWK_SUCCESS;
-    } else {
-        return fwk_thread_create(module_id);
-    }
+    return FWK_SUCCESS;
 }
 
 static int n1sdp_c2c_bind(fwk_id_t id, unsigned int round)

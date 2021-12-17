@@ -20,7 +20,6 @@ target_include_directories(
 target_sources(
     n1sdp-bl2
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_system_power.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/n1sdp_core.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_armv7m_mpu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_ssc.c"
@@ -54,12 +53,6 @@ target_sources(
 
 if(SCP_ENABLE_DEBUGGER)
     target_sources(n1sdp-bl2 PRIVATE "config_debugger_cli.c")
-endif()
-
-if(SCP_ENABLE_MULTITHREADING)
-    target_sources(n1sdp-bl2
-                   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/rtx_config.c")
-    target_link_libraries(n1sdp-bl2 PRIVATE cmsis::rtos2-rtx)
 endif()
 
 #
