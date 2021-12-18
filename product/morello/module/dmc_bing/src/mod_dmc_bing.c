@@ -1148,7 +1148,12 @@ int dmc_bing_pre_phy_init(struct mod_dmc_bing_reg *dmc)
         return status;
     }
     dmc->MEMORY_TYPE_NEXT = value;
-    dmc->FEATURE_CONFIG = 0x00001820;
+
+    if (SCC->BOOT_GPR1 & 0x1) {
+        dmc->FEATURE_CONFIG = 0x00001920;
+    } else {
+        dmc->FEATURE_CONFIG = 0x00001820;
+    }
 
     value = 0;
     dimm_spd_t_refi(&value);
