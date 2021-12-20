@@ -18,6 +18,7 @@ import fnmatch
 import re
 import sys
 import datetime
+import subprocess
 from itertools import islice
 
 #
@@ -89,6 +90,13 @@ class ErrorYearNotCurrent(Exception):
     pass
 
 
+def is_valid_directory(filename):
+    for dir in EXCLUDE_DIRECTORIES:
+        if not filename.startswith(dir):
+            return True
+    return False
+
+
 def is_valid_file_type(filename):
     for file_type in FILE_TYPES:
         if fnmatch.fnmatch(filename, file_type):
@@ -130,35 +138,34 @@ def main():
     cwd = os.getcwd()
     print("Executing from {}".format(cwd))
 
-    for i, directory in enumerate(EXCLUDE_DIRECTORIES):
-        EXCLUDE_DIRECTORIES[i] = os.path.abspath(directory)
-        print("\tAdding to the exclude list: {}".
-              format(EXCLUDE_DIRECTORIES[i]))
+    try:
+        result = subprocess.Popen(
+            "git diff-tree --name-only --no-commit-id -r HEAD",
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+    except subprocess.CalledProcessError as e:
+        print("ERROR " + e.returncode + ": Failed to get last changed files - ")
+        return 1
 
-    for root, dirs, files in os.walk(cwd, topdown=True):
-        #
-        # Exclude directories based on the EXCLUDE_DIRECTORIES pattern list
-        #
-        dirs[:] = [d for d in dirs
-                   if os.path.join(root, d) not in EXCLUDE_DIRECTORIES]
+    for line in result.stdout:
+        filename = line.decode("utf-8").strip('\n')
 
-        for file in files:
-            filename = os.path.join(root, file)
-            if is_valid_file_type(file):
-                try:
-                    check_copyright(pattern, filename)
-                except ErrorYear:
-                    print("{}: Invalid year format.".format(filename))
-                    error_year_count += 1
+        if is_valid_file_type(filename) and is_valid_directory(filename):
+            try:
+                check_copyright(pattern, filename)
+            except ErrorYear:
+                print("{}: Invalid year format.".format(filename))
+                error_year_count += 1
 
-                except ErrorCopyright:
-                    print("{}: Invalid copyright header.".format(filename))
-                    error_copyright_count += 1
+            except ErrorCopyright:
+                print("{}: Invalid copyright header.".format(filename))
+                error_copyright_count += 1
 
-                except ErrorYearNotCurrent:
-                    print("{}: Outdated copyright year range.".
-                          format(filename))
-                    error_incorrect_year_count += 1
+            except ErrorYearNotCurrent:
+                print("{}: Outdated copyright year range.".
+                      format(filename))
+                error_incorrect_year_count += 1
 
     if error_year_count != 0 or error_copyright_count != 0 or \
        error_incorrect_year_count != 0:
@@ -171,7 +178,7 @@ def main():
 
         return 1
     else:
-        print("No errors found.")
+        print("Check copyright - No errors found.")
         return 0
 
 
