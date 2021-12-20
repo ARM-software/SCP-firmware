@@ -652,6 +652,7 @@ const char *fwk_module_get_element_name(fwk_id_t id)
         return fwk_module_get_element_ctx(id)->desc->name;
     }
 
+    fwk_unexpected();
     return NULL;
 }
 
@@ -664,6 +665,7 @@ const void *fwk_module_get_data(fwk_id_t id)
         return fwk_module_get_ctx(id)->config->data;
     }
 
+    fwk_unexpected();
     return NULL;
 }
 
