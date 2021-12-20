@@ -14,7 +14,7 @@ may use non-ASCII characters when required (e.g. Greek letters used for units).
 
 All files must begin with a license header of the following form, where first
 year describes the year the file was first upstreamed, and the second year the
-current year (which the core team will update annually):
+year when the file was last updated:
 
 Arm SCP/MCP Software
 Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
