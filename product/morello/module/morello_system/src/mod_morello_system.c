@@ -310,8 +310,8 @@ static int morello_system_fill_platform_info(void)
 
     (void)size;
     FWK_LOG_INFO(
-        "[MORELLO SYSTEM] Total Usable DDR Size in Megabytes: %llu",
-        (size / (1024 * 1024)));
+        "[MORELLO SYSTEM] Total Usable DDR Size in Megabytes: %" PRIu32,
+        (uint32_t)(size / FWK_MHZ));
 
     sds_platform_info.scc_config = SCC->BOOT_GPR1;
 #endif
