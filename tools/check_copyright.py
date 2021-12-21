@@ -44,6 +44,8 @@ FILE_TYPES = [
     '*.S',
     '*.py',
     '*.scat',
+    '*CMakeLists.txt',
+    '*.cmake',
 ]
 
 #
