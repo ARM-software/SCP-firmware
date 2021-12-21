@@ -52,8 +52,9 @@ checks can be found [here](../tools/cppcheck_suppress_list.txt).
 
 ## Static analysis using `cmake`
 
-When this project is build using `cmake`, `cppcheck` is performed automatically for the current build using the list of suppressed checks
-mentioned in the previous section.
+When this project is built using `cmake`, `cppcheck` is performed automatically
+for the current build using the list of suppressed checks mentioned in the
+previous section.
 `cppcheck` can be run standalone with the current build configuration using
 the following commands:
 
