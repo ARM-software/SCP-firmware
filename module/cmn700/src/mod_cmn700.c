@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -247,11 +247,6 @@ static int cmn700_discovery(void)
                     FWK_LOG_INFO(
                         MOD_NAME "  Found CXLA at node ID: %d",
                         get_child_node_id(xp, node_idx));
-                } else if (get_device_type(xp, xp_port) == DEVICE_TYPE_CCG) {
-                    ccla_reg_count++;
-                    FWK_LOG_INFO(
-                        MOD_NAME "  Found CCG at node ID: %d",
-                        get_child_node_id(xp, node_idx));
                 } else { /* External RN-SAM Node */
                     ctx->external_rnsam_count++;
                     FWK_LOG_INFO(
@@ -330,12 +325,8 @@ static int cmn700_discovery(void)
                     ccg_ha_reg_count++;
                     break;
 
-                /* CCLA should not be an internal node */
                 case NODE_TYPE_CCLA:
-                    FWK_LOG_ERR(MOD_NAME
-                                "CXLA node should not be internal node, "
-                                "discovery failed");
-                    return FWK_E_DEVICE;
+                    ccla_reg_count++;
                     break;
 
                 case NODE_TYPE_CXRA:
@@ -445,14 +436,8 @@ static void cmn700_configure(void)
 
                 if (!(get_device_type(xp, xp_port) == DEVICE_TYPE_CXRH) &&
                     !(get_device_type(xp, xp_port) == DEVICE_TYPE_CXHA) &&
-                    !(get_device_type(xp, xp_port) == DEVICE_TYPE_CXRA) &&
-                    !(get_device_type(xp, xp_port) == DEVICE_TYPE_CCG)) {
+                    !(get_device_type(xp, xp_port) == DEVICE_TYPE_CXRA)) {
                     fwk_assert(xrnsam_entry < ctx->external_rnsam_count);
-
-                    ldid = get_node_logical_id(node);
-                    ctx->ccla_reg_table[ldid].node_id = node_id;
-                    ctx->ccla_reg_table[ldid].ccla_reg =
-                        (struct cmn700_ccla_reg *)node;
 
                     ctx->external_rnsam_table[xrnsam_entry].node_id = node_id;
                     ctx->external_rnsam_table[xrnsam_entry].node = node;
@@ -484,6 +469,13 @@ static void cmn700_configure(void)
                     ctx->ccg_ha_reg_table[ldid].node_id = node_id;
                     ctx->ccg_ha_reg_table[ldid].ccg_ha_reg =
                         (struct cmn700_ccg_ha_reg *)node;
+                } else if (node_type == NODE_TYPE_CCLA) {
+                    ldid = get_node_logical_id(node);
+
+                    /* Use ldid as index of the ccla table */
+                    ctx->ccla_reg_table[ldid].node_id = node_id;
+                    ctx->ccla_reg_table[ldid].ccla_reg =
+                        (struct cmn700_ccla_reg *)node;
                 } else if (node_type == NODE_TYPE_HN_F) {
                     logical_id = get_node_logical_id(node);
                     fwk_assert(logical_id < ctx->hnf_count);
