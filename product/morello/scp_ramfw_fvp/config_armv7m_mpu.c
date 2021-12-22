@@ -82,8 +82,8 @@ static const ARM_MPU_Region_t regions[] = {
             ARM_MPU_REGION_SIZE_256B),
     },
     {
-        /* 0x6520_0000 - 0x6520_FFFF */
-        .RBAR = ARM_MPU_RBAR(5, SCP_AP_SHARED_NONSECURE_RAM),
+        /* 0xA600_0000 - 0xA600_FFFF */
+        .RBAR = ARM_MPU_RBAR(5, SCP_AP_BASE_NS_MAILBOX_SRAM),
         .RASR = ARM_MPU_RASR(
             1,
             ARM_MPU_AP_PRIV,
