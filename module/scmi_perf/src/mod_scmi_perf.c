@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -242,6 +242,27 @@ static const fwk_id_t scmi_perf_get_level =
  * SCMI PERF Helpers
  */
 
+/* This identifier is either:
+ * - the element type version of the one built by the perf-plugins-handler
+ *      (sub-element type)
+ * - or the DVFS domain
+ */
+static inline fwk_id_t get_dvfs_dependency_id(unsigned int el_idx)
+{
+#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+    fwk_id_t id;
+
+    id = perf_plugins_get_dependency_id(el_idx);
+    return fwk_id_build_element_id(id, el_idx);
+#else
+    return FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, el_idx);
+#endif
+}
+
+/* This identifier is either:
+ * - exactly the one built by the perf-plugins-handler (sub-element type)
+ * - or the DVFS domain
+ */
 static inline fwk_id_t get_dependency_id(unsigned int el_idx)
 {
 #ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
@@ -654,7 +675,7 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
     }
 #endif
 
-    domain_id = get_dependency_id(parameters->domain_id);
+    domain_id = get_dvfs_dependency_id(parameters->domain_id);
     status = scmi_perf_ctx.dvfs_api->get_sustained_opp(domain_id, &opp);
     if (status != FWK_SUCCESS) {
         goto exit;
