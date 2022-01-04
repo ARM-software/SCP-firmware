@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -30,31 +30,31 @@ static const struct mod_dvfs_domain_config cpu_group_0 = {
                 .level = CPU_CLOCK_SUD * 1000000UL,
                 .frequency = CPU_CLOCK_SUD * FWK_KHZ,
                 .voltage = 800,
-                .power = (0.16 * 1800 * 0.800 * 0.800),
+                .power = (0.16 * CPU_CLOCK_SUD * 0.800 * 0.800),
             },
             {
                 .level = CPU_CLOCK_UD * 1000000UL,
                 .frequency = CPU_CLOCK_UD * FWK_KHZ,
                 .voltage = 850,
-                .power = (0.16 * 1900 * 0.850 * 0.850),
+                .power = (0.16 * CPU_CLOCK_UD * 0.850 * 0.850),
             },
             {
                 .level = CPU_CLOCK_NOM * 1000000UL,
                 .frequency = CPU_CLOCK_NOM * FWK_KHZ,
                 .voltage = 900,
-                .power = (0.16 * 2000 * 0.900 * 0.900),
+                .power = (0.16 * CPU_CLOCK_NOM * 0.900 * 0.900),
             },
             {
                 .level = CPU_CLOCK_OD * 1000000UL,
                 .frequency = CPU_CLOCK_OD * FWK_KHZ,
                 .voltage = 950,
-                .power = (0.16 * 2100 * 0.950 * 0.950),
+                .power = (0.16 * CPU_CLOCK_OD * 0.950 * 0.950),
             },
             {
                 .level = CPU_CLOCK_SOD * 1000000UL,
                 .frequency = CPU_CLOCK_SOD * FWK_KHZ,
                 .voltage = 1000,
-                .power = (0.16 * 2200 * 1.000 * 1.000),
+                .power = (0.16 * CPU_CLOCK_SOD * 1.000 * 1.000),
             },
             { 0 },
         }
@@ -71,31 +71,31 @@ static const struct mod_dvfs_domain_config cpu_group_1 = {
                 .level = CPU_CLOCK_SUD * 1000000UL,
                 .frequency = CPU_CLOCK_SUD * FWK_KHZ,
                 .voltage = 800,
-                .power = (0.16 * 1800 * 0.800 * 0.800),
+                .power = (0.16 * CPU_CLOCK_SUD * 0.800 * 0.800),
             },
             {
                 .level = CPU_CLOCK_UD * 1000000UL,
                 .frequency = CPU_CLOCK_UD * FWK_KHZ,
                 .voltage = 850,
-                .power = (0.16 * 1900 * 0.850 * 0.850),
+                .power = (0.16 * CPU_CLOCK_UD * 0.850 * 0.850),
             },
             {
                 .level = CPU_CLOCK_NOM * 1000000UL,
                 .frequency = CPU_CLOCK_NOM * FWK_KHZ,
                 .voltage = 900,
-                .power = (0.16 * 2000 * 0.900 * 0.900),
+                .power = (0.16 * CPU_CLOCK_NOM * 0.900 * 0.900),
             },
             {
                 .level = CPU_CLOCK_OD * 1000000UL,
                 .frequency = CPU_CLOCK_OD * FWK_KHZ,
                 .voltage = 950,
-                .power = (0.16 * 2100 * 0.950 * 0.950),
+                .power = (0.16 * CPU_CLOCK_OD * 0.950 * 0.950),
             },
             {
                 .level = CPU_CLOCK_SOD * 1000000UL,
                 .frequency = CPU_CLOCK_SOD * FWK_KHZ,
                 .voltage = 1000,
-                .power = (0.16 * 2200 * 1.000 * 1.000),
+                .power = (0.16 * CPU_CLOCK_SOD * 1.000 * 1.000),
             },
             { 0 },
         }
