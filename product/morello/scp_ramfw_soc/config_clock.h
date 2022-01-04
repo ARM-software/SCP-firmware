@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -27,55 +27,37 @@
 /*
  * SCC & PIK clock rates.
  */
-/* 200MHz Nominal */
 #define SCC_CLK_RATE_IOFPGA_TMIF2XCLK (150 * FWK_MHZ)
-/* 200MHz Nominal */
 #define SCC_CLK_RATE_IOFPGA_TSIF2XCLK (150 * FWK_MHZ)
-/* verification value */
 #define SCC_CLK_RATE_SYSAPBCLK (120 * FWK_MHZ)
 #define SCC_CLK_RATE_SCPNICCLK (300 * FWK_MHZ)
 #define SCC_CLK_RATE_SCPI2CCLK (100 * FWK_MHZ)
-/* 480MHz Nominal */
 #define SCC_CLK_RATE_SCPQSPICLK (50 * FWK_MHZ)
 #define SCC_CLK_RATE_SENSORCLK  (100 * FWK_MHZ)
 #define SCC_CLK_RATE_MCPNICCLK  (300 * FWK_MHZ)
 #define SCC_CLK_RATE_MCPI2CCLK  (100 * FWK_MHZ)
-/* 480MHz Nominal */
 #define SCC_CLK_RATE_MCPQSPICLK (50 * FWK_MHZ)
 #define SCC_CLK_RATE_PCIEAXICLK (1200 * FWK_MHZ)
 #define SCC_CLK_RATE_CCIXAXICLK (1200 * FWK_MHZ)
 #define SCC_CLK_RATE_PCIEAPBCLK (200 * FWK_MHZ)
 #define SCC_CLK_RATE_CCIXAPBCLK (200 * FWK_MHZ)
 
-/* 2500MHz Nom */
 #define PIK_CLK_RATE_CLUS0_CPU (CPU_CLOCK_SOD * FWK_MHZ)
-/* 2500MHz Nom */
 #define PIK_CLK_RATE_CLUS1_CPU (CPU_CLOCK_SOD * FWK_MHZ)
-/* 2000MHz Nom */
 #define PIK_CLK_RATE_CLUS0 (CLUS_CLOCK_MHZ * FWK_MHZ)
-/* 2000MHz Nom */
 #define PIK_CLK_RATE_CLUS1     (CLUS_CLOCK_MHZ * FWK_MHZ)
 #define PIK_CLK_RATE_CLUS0_PPU (300 * FWK_MHZ)
 #define PIK_CLK_RATE_CLUS1_PPU (300 * FWK_MHZ)
-/* 1000MHz Nom */
 #define PIK_CLK_RATE_CLUS0_PCLK (800 * FWK_MHZ)
-/* 1000MHz Nom */
 #define PIK_CLK_RATE_CLUS0_ATCLK (800 * FWK_MHZ)
-/* 1000MHz Nom */
 #define PIK_CLK_RATE_CLUS0_GIC (800 * FWK_MHZ)
-/* 2000MHz Nom */
 #define PIK_CLK_RATE_CLUS0_AMBACLK (1200 * FWK_MHZ)
-/* 1000MHz Nom */
 #define PIK_CLK_RATE_CLUS1_PCLK (800 * FWK_MHZ)
-/* 1000MHz Nom */
 #define PIK_CLK_RATE_CLUS1_ATCLK (800 * FWK_MHZ)
-/* 1000MHz Nom */
 #define PIK_CLK_RATE_CLUS1_GIC (800 * FWK_MHZ)
-/* 2000MHz Nom */
 #define PIK_CLK_RATE_CLUS1_AMBACLK (1200 * FWK_MHZ)
 
 #define PIK_CLK_RATE_GPU (650 * FWK_MHZ)
-/* 365MHz Nom */
 #define PIK_CLK_RATE_DPU (350 * FWK_MHZ)
 
 #define PIK_CLK_RATE_SCP_CORECLK (300 * FWK_MHZ)
@@ -83,7 +65,6 @@
 #define PIK_CLK_RATE_SCP_SYNCCLK (150 * FWK_MHZ)
 
 #define PIK_CLK_RATE_SYS_PPU (300 * FWK_MHZ)
-/* 1852MHz Nom */
 #define PIK_CLK_RATE_INTERCONNECT (INT_CLOCK_MHZ * FWK_MHZ)
 #define PIK_CLK_RATE_PCLKSCP      (300 * FWK_MHZ)
 #define PIK_CLK_RATE_SYS_GIC      (800 * FWK_MHZ)
