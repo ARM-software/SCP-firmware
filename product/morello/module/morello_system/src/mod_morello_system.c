@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -310,8 +310,8 @@ static int morello_system_fill_platform_info(void)
 
     (void)size;
     FWK_LOG_INFO(
-        "[MORELLO SYSTEM] Total Usable DDR Size in Megabytes: %" PRIu32,
-        (uint32_t)(size / FWK_MHZ));
+        "[MORELLO SYSTEM] Total usable DDR size: %" PRIu32 "MB",
+        (uint32_t)(size / FWK_MIB));
 
     sds_platform_info.scc_config = SCC->BOOT_GPR1;
 #endif
