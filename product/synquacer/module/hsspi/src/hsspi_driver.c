@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -489,21 +489,21 @@ static void hsspi_software_reset(
 
     hsspi_read_command_sequence(reg_hsspi, m_awcCommandList_CMD_S, 0x05);
 
+    /* Reset Enable */
+    hsspi_write_command_direct(reg_hsspi, mem_hsspi, 0x66);
+
+    /* Wait for SPI device ready */
+    hsspi_timer_api->delay(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                           MSEC_TO_USEC(1));
+
+    /* Reset */
+    hsspi_write_command_direct(reg_hsspi, mem_hsspi, 0x99);
+
+    /* Wait for SPI device ready */
+    hsspi_timer_api->delay(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+                           MSEC_TO_USEC(1));
+
     do {
-        /* Reset Enable */
-        hsspi_write_command_direct(reg_hsspi, mem_hsspi, 0x66);
-
-        /* Wait for SPI device ready */
-        hsspi_timer_api->delay(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
-                               MSEC_TO_USEC(1));
-
-        /* Reset */
-        hsspi_write_command_direct(reg_hsspi, mem_hsspi, 0x99);
-
-        /* Wait for SPI device ready */
-        hsspi_timer_api->delay(FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
-                               MSEC_TO_USEC(1));
-
         /* 05h : RDSR Read Status Register    */
         unRDSR.WORD = MEM_HSSPI_BYTE(mem_hsspi)[0];
     } while (unRDSR.bit.WIP);
