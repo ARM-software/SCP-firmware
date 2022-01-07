@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -178,11 +178,13 @@ static int shutdown_system_power_ppus(
 
 static int disable_all_irqs(void)
 {
-    int status;
+    int status = FWK_SUCCESS;
 
-    status = fwk_interrupt_disable(system_power_ctx.config->soc_wakeup_irq);
-    if (status != FWK_SUCCESS) {
-        return FWK_E_DEVICE;
+    if (system_power_ctx.config->soc_wakeup_irq != FWK_INTERRUPT_NONE) {
+        status = fwk_interrupt_disable(system_power_ctx.config->soc_wakeup_irq);
+        if (status != FWK_SUCCESS) {
+            return FWK_E_DEVICE;
+        }
     }
 
     if (system_power_ctx.driver_api->platform_interrupts != NULL) {
