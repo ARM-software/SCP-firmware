@@ -356,6 +356,17 @@ struct cmn650_mxp_reg {
 #define CMN650_ROOT_NODE_OFFSET_PORT_POS 16
 #define CMN650_ROOT_NODE_OFFSET_Y_POS    22
 
+/* Peripheral ID Revision Numbers */
+#define CMN650_PERIPH_ID_2_REV_R0_P0 (0x00)
+#define CMN650_PERIPH_ID_2_REV_R1_P0 (0x01)
+#define CMN650_PERIPH_ID_2_REV_R1_P1 (0x02)
+#define CMN650_PERIPH_ID_2_REV_R2_P0 (0x03)
+#define CMN650_PERIPH_ID_UNKNOWN_REV (CMN650_PERIPH_ID_2_REV_R2_P0 + 1)
+
+/* Peripheral ID Revision Numbers */
+#define CMN650_PERIPH_ID_2_MASK    UINT64_C(0xFF)
+#define CMN650_PERIPH_ID_2_REV_POS 4
+
 /*
  * Retrieve the number of child nodes of a given node
  *
@@ -430,6 +441,15 @@ void *get_child_node(uintptr_t base, void *node_base, unsigned int child_index);
  * \return Physical child node identifier
  */
 unsigned int get_child_node_id(void *node_base, unsigned int child_index);
+
+/*
+ * Retrieve the revision name of CMN-650.
+ *
+ * \param root Pointer to the CMN-650 configuration master register base.
+ *
+ * \return Pointer to the CMN-650 revision name string.
+ */
+const char *get_cmn650_revision_name(struct cmn650_cfgm_reg *root);
 
 /*
  * Verify if a child node (given a parent node base and child index) is an
