@@ -580,16 +580,20 @@ struct cmn600_hni_reg {
 #define CMN600_ROOT_NODE_OFFSET_Y_POS 20
 
 /* Peripheral ID Revision Numbers */
-#define CMN600_PERIPH_ID_2_REV_R1_P0 ((0x00 << 4) + (0x0B))
-#define CMN600_PERIPH_ID_2_REV_R1_P1 ((0x01 << 4) + (0x0B))
-#define CMN600_PERIPH_ID_2_REV_R1_P2 ((0x02 << 4) + (0x0B))
-#define CMN600_PERIPH_ID_2_REV_R1_P3 ((0x03 << 4) + (0x0B))
-#define CMN600_PERIPH_ID_2_REV_R2_P0 ((0x04 << 4) + (0x0B))
-#define CMN600_PERIPH_ID_2_REV_R3_P0 ((0x05 << 4) + (0x0B))
-#define CMN600_PERIPH_ID_2_REV_R3_P1 ((0x06 << 4) + (0x0B))
+enum peripheral_id_revision {
+    CMN600_PERIPH_ID_2_REV_R1_P0,
+    CMN600_PERIPH_ID_2_REV_R1_P1,
+    CMN600_PERIPH_ID_2_REV_R1_P2,
+    CMN600_PERIPH_ID_2_REV_R1_P3,
+    CMN600_PERIPH_ID_2_REV_R2_P0,
+    CMN600_PERIPH_ID_2_REV_R3_P0,
+    CMN600_PERIPH_ID_2_REV_R3_P1,
+    CMN600_PERIPH_ID_UNKNOWN_REV,
+};
 
 /* Peripheral ID Revision Numbers */
 #define CMN600_PERIPH_ID_2_MASK UINT64_C(0xFF)
+#define CMN600_PERIPH_ID_2_REV_POS 4
 
 /*
  * Retrieve the number of child nodes of a given node
@@ -674,6 +678,15 @@ unsigned int get_child_node_id(void *node_base, unsigned int child_index);
  * \return CMN-600 revision as integer value.
  */
 unsigned int get_cmn600_revision(struct cmn600_cfgm_reg *root);
+
+/*
+ * Retrieve the revision name of CMN-600.
+ *
+ * \param root Pointer to the CMN-600 configuration manager register base.
+ *
+ * \return Pointer to the CMN-600 revision name string.
+ */
+const char *get_cmn600_revision_name(struct cmn600_cfgm_reg *root);
 
 /*
  * Verify if a child node (given a parent node base and child index) is an

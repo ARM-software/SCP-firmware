@@ -161,6 +161,8 @@ static int cmn600_discovery(void)
     struct node_header *node;
     const struct mod_cmn600_config *config = ctx->config;
 
+    FWK_LOG_INFO(
+        MOD_NAME "CMN-600 revision: %s", get_cmn600_revision_name(ctx->root));
     FWK_LOG_INFO(MOD_NAME "Starting discovery...");
 
     fwk_assert(get_node_type(ctx->root) == NODE_TYPE_CFG);

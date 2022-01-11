@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -14,6 +14,17 @@
 
 static unsigned int encoding_bits;
 static unsigned int mask_bits;
+
+static const char *const cmn600_rev_to_name[] = {
+    [CMN600_PERIPH_ID_2_REV_R1_P0] = "r1p0",
+    [CMN600_PERIPH_ID_2_REV_R1_P1] = "r1p1",
+    [CMN600_PERIPH_ID_2_REV_R1_P2] = "r1p2",
+    [CMN600_PERIPH_ID_2_REV_R1_P3] = "r1p3",
+    [CMN600_PERIPH_ID_2_REV_R2_P0] = "r2p0",
+    [CMN600_PERIPH_ID_2_REV_R3_P0] = "r3p0",
+    [CMN600_PERIPH_ID_2_REV_R3_P1] = "r3p1",
+    [CMN600_PERIPH_ID_UNKNOWN_REV] = "Unknown!",
+};
 
 unsigned int get_node_child_count(void *node_base)
 {
@@ -74,7 +85,22 @@ unsigned int get_child_node_id(void *node_base,
 
 unsigned int get_cmn600_revision(struct cmn600_cfgm_reg *root)
 {
-    return (root->PERIPH_ID[1] & CMN600_PERIPH_ID_2_MASK);
+    return (
+        (root->PERIPH_ID[1] & CMN600_PERIPH_ID_2_MASK) >>
+        CMN600_PERIPH_ID_2_REV_POS);
+}
+
+const char *get_cmn600_revision_name(struct cmn600_cfgm_reg *root)
+{
+    unsigned int revision;
+
+    revision = get_cmn600_revision(root);
+    if (revision > CMN600_PERIPH_ID_UNKNOWN_REV) {
+        revision = CMN600_PERIPH_ID_UNKNOWN_REV;
+        fwk_unexpected();
+    }
+
+    return cmn600_rev_to_name[revision];
 }
 
 bool is_cal_mode_supported(struct cmn600_cfgm_reg *root)
