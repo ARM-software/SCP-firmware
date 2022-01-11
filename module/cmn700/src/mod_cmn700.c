@@ -208,6 +208,8 @@ static int cmn700_discovery(void)
 
     set_encoding_and_masking_bits(config);
 
+    FWK_LOG_INFO(
+        MOD_NAME "CMN-700 revision: %s", get_cmn700_revision_name(ctx->root));
     FWK_LOG_INFO(MOD_NAME "Starting discovery...");
     FWK_LOG_TRACE(MOD_NAME "Rootnode Base address: 0x%x", (uintptr_t)ctx->root);
 

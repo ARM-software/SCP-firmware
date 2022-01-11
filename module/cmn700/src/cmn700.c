@@ -23,6 +23,14 @@
 static unsigned int encoding_bits;
 static unsigned int mask_bits;
 
+static const char *const cmn700_rev_to_name[] = {
+    [CMN700_PERIPH_ID_2_REV_R0_P0] = "r0p0",
+    [CMN700_PERIPH_ID_2_REV_R1_P0] = "r1p0",
+    [CMN700_PERIPH_ID_2_REV_R1_P1] = "r1p1",
+    [CMN700_PERIPH_ID_2_REV_R2_P0] = "r2p0",
+    [CMN700_PERIPH_ID_UNKNOWN_REV] = "Unknown!",
+};
+
 unsigned int get_node_device_port_count(void *node_base)
 {
     struct node_header *node = node_base;
@@ -96,6 +104,23 @@ unsigned int get_child_node_id(void *node_base, unsigned int child_index)
         ((node_pointer & 0x1) << 2) | ((node_pointer >> 2) & 0x3);
 
     return node_id;
+}
+
+unsigned int get_cmn700_revision(struct cmn700_cfgm_reg *root)
+{
+    return (root->PERIPH_ID[1] & CMN700_PERIPH_ID_2_MASK) >>
+        CMN700_PERIPH_ID_2_REV_POS;
+}
+
+const char *get_cmn700_revision_name(struct cmn700_cfgm_reg *root)
+{
+    unsigned int revision;
+
+    revision = get_cmn700_revision(root);
+    if (revision > CMN700_PERIPH_ID_UNKNOWN_REV)
+        revision = CMN700_PERIPH_ID_UNKNOWN_REV;
+
+    return cmn700_rev_to_name[revision];
 }
 
 bool is_child_external(void *node_base, unsigned int child_index)
