@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -157,6 +157,8 @@ static int cmn650_discovery(void)
     cxg_ha_reg_count = 0;
     cxla_reg_count = 0;
 
+    FWK_LOG_INFO(
+        MOD_NAME "CMN-650 revision: %s", get_cmn650_revision_name(ctx->root));
     FWK_LOG_INFO(MOD_NAME "Starting discovery...");
 
     fwk_assert(get_node_type(ctx->root) == NODE_TYPE_CFG);
