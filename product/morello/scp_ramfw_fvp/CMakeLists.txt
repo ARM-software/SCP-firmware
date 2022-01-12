@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -50,7 +50,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/morello_core.c")
 
 
-if(SCP_ENABLE_DEBUGGER_INIT)
+if(SCP_ENABLE_DEBUGGER)
     target_compile_definitions(morello-fvp-bl2 PRIVATE BUILD_HAS_DEBUGGER)
     target_sources(morello-fvp-bl2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_debugger_cli.c")
 endif()
@@ -71,7 +71,7 @@ target_include_directories(
     morello-fvp-bl2
     PUBLIC $<TARGET_PROPERTY:cmsis::core-m,INTERFACE_INCLUDE_DIRECTORIES>)
 
-if(SCP_ENABLE_DEBUGGER_INIT)
+if(SCP_ENABLE_DEBUGGER)
     list(APPEND SCP_MODULES "debugger-cli")
 endif()
 
