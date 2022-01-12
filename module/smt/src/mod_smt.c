@@ -304,7 +304,7 @@ static const struct mod_smt_to_transport_api smt_mod_smt_to_transport_api = {
 /*
  * Driver handler API
  */
-static int smt_completer_handler(struct smt_channel_ctx *channel_ctx)
+static int smt_message_handler(struct smt_channel_ctx *channel_ctx)
 {
     struct mod_smt_memory *memory, *in, *out;
     size_t payload_size;
@@ -315,29 +315,50 @@ static int smt_completer_handler(struct smt_channel_ctx *channel_ctx)
         return FWK_E_STATE;
     }
 
-    memory = ((struct mod_smt_memory*)channel_ctx->config->mailbox_address);
+    memory = ((struct mod_smt_memory *)channel_ctx->config->mailbox_address);
     in = channel_ctx->in;
     out = channel_ctx->out;
 
-    /* Check we have ownership of the mailbox */
-    if (memory->status & MOD_SMT_MAILBOX_STATUS_FREE_MASK) {
-        FWK_LOG_ERR(
-            "[SMT] Mailbox ownership error on channel %u",
-            fwk_id_get_element_idx(channel_ctx->id));
+    if (channel_ctx->config->type == MOD_SMT_CHANNEL_TYPE_COMPLETER) {
+        /* The completer type SMT channel is used for handling the requests.
+         *
+         * Check if we have the ownership of shared mailbox. We don't
+         * have the mailbox ownership if the mailbox status is 1 (free).
+         */
 
-        return FWK_E_STATE;
+        if (memory->status & MOD_SMT_MAILBOX_STATUS_FREE_MASK) {
+            FWK_LOG_ERR(
+                "[SMT] Mailbox ownership error on completer channel %u",
+                fwk_id_get_element_idx(channel_ctx->id));
+
+            return FWK_E_STATE;
+        }
+    } else if (channel_ctx->config->type == MOD_SMT_CHANNEL_TYPE_REQUESTER) {
+        /* The requester type SMT channel is used for handling the responses.
+         *
+         * Check if we have the ownership of shared mailbox. We don't
+         * have the mailbox ownership if the mailbox status is 0 (busy).
+         */
+        if ((memory->status & MOD_SMT_MAILBOX_STATUS_FREE_MASK) == 0) {
+            FWK_LOG_ERR(
+                "[SMT] Mailbox ownership error on requester channel %u",
+                fwk_id_get_element_idx(channel_ctx->id));
+
+            return FWK_E_STATE;
+        }
+    } else {
+        /* Invalid config */
+        fwk_unexpected();
     }
-
-    /* Commit to sending a response */
+    /* Mark the channel as busy */
     channel_ctx->locked = true;
 
     /* Mirror mailbox contents in read and write buffers (Payload not copied) */
-    *in  = *memory;
+    *in = *memory;
     *out = *memory;
 
     /* Ensure error bit is not set */
     out->status &= ~MOD_SMT_MAILBOX_STATUS_ERROR_MASK;
-
     /*
      * Verify:
      * 1. The length is at least as large as the message header
@@ -347,22 +368,20 @@ static int smt_completer_handler(struct smt_channel_ctx *channel_ctx)
      * Note: the payload size is permitted to be of size zero.
      */
     if ((in->length < sizeof(in->message_header)) ||
-        ((in->length - sizeof(in->message_header))
-         > channel_ctx->max_payload_size)) {
-
+        ((in->length - sizeof(in->message_header)) >
+         channel_ctx->max_payload_size)) {
         out->status |= MOD_SMT_MAILBOX_STATUS_ERROR_MASK;
 
         if (channel_ctx->is_scmi_channel) {
             status = channel_ctx->smt_signal.scmi_api->signal_error(
-                         channel_ctx->service_id);
+                channel_ctx->service_id);
         } else {
             status = channel_ctx->smt_signal.signal_api->signal_error(
-                         channel_ctx->service_id);
+                channel_ctx->service_id);
         }
 
         return status;
     }
-
     /* Copy payload from shared memory to read buffer */
     payload_size = in->length - sizeof(in->message_header);
     fwk_str_memcpy(in->payload, memory->payload, payload_size);
@@ -397,21 +416,7 @@ static int smt_signal_message(fwk_id_t channel_id)
         return FWK_SUCCESS;
     }
 
-    switch (channel_ctx->config->type) {
-    case MOD_SMT_CHANNEL_TYPE_REQUESTER:
-        /* Not supported yet */
-        fwk_unexpected();
-        break;
-    case MOD_SMT_CHANNEL_TYPE_COMPLETER:
-        return smt_completer_handler(channel_ctx);
-        break;
-    default:
-        /* Invalid config */
-        fwk_unexpected();
-        break;
-    }
-
-    return FWK_SUCCESS;
+    return smt_message_handler(channel_ctx);
 }
 
 static const struct mod_smt_driver_input_api driver_input_api = {
