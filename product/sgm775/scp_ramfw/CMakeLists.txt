@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -21,7 +21,6 @@ target_sources(
     sgm775-bl2
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_css_clock.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_debugger_cli.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_dvfs.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_mhu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_mock_psu.c"
