@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -10,8 +10,6 @@
 
 #ifndef MOD_DEBUGGER_CLI_H
 #define MOD_DEBUGGER_CLI_H
-
-#include <mod_timer.h>
 
 #include <fwk_module.h>
 
