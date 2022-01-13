@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -10,8 +10,6 @@
 
 #ifndef MOD_DMC500_H
 #define MOD_DMC500_H
-
-#include <mod_timer.h>
 
 #include <fwk_id.h>
 #include <fwk_macros.h>
