@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -52,6 +52,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_pl011.c")
 
 if(SCP_ENABLE_DEBUGGER)
+    target_compile_definitions(n1sdp-bl2 PRIVATE BUILD_HAS_DEBUGGER)
     target_sources(n1sdp-bl2 PRIVATE "config_debugger_cli.c")
 endif()
 

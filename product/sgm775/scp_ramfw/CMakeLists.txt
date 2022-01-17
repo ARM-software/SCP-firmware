@@ -50,6 +50,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_system_info.c")
 
 if(SCP_ENABLE_DEBUGGER)
+    target_compile_definitions(sgm775-bl2 PRIVATE BUILD_HAS_DEBUGGER)
     target_sources(sgm775-bl2
                    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_debugger_cli.c")
 endif()
