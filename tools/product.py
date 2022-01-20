@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -52,7 +52,6 @@ class Build:
             cmd += Build.__extra_arg__(extra)
         for extra in self.build_type.arguments:
             cmd += Build.__extra_arg__(extra)
-        cmd += ' -j$(nproc) '
         return cmd
 
     @classmethod
