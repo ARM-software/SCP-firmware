@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -94,13 +94,6 @@ def code_validation(checks: list) -> List[Tuple[str, int]]:
     return results
 
 
-def get_all_builds(products: List[Product]) -> List[Build]:
-    builds = []
-    for product in products:
-        builds.extend(product.builds)
-    return builds
-
-
 def start_build(build_info: List[Build]) -> List[Tuple[Build,
                                                        subprocess.Popen]]:
     build_status: List[Tuple[Build, subprocess.Popen]] = []
@@ -108,8 +101,9 @@ def start_build(build_info: List[Build]) -> List[Tuple[Build,
         build_id = subprocess.Popen(
                                 build.command(),
                                 shell=True,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
+                                stdout=subprocess.DEVNULL,
+                                stderr=subprocess.STDOUT)
+
         build_status.append((build, build_id))
         print('Test building [{}]'.format(build.tag()))
         print('[CMD] {}'.format(build.command()))
@@ -121,9 +115,6 @@ def wait_builds(build_status: Tuple[Build, subprocess.Popen]) -> List[Tuple[
                                                                         int]]:
     results: List[Tuple[str, int]] = []
     for build, build_id in build_status:
-        (stdout, stderr) = build_id.communicate()
-        print(stdout.decode())
-        print(stderr.decode())
         result = build_id.wait()
         results.append((build.tag(), result))
     return results
@@ -172,9 +163,9 @@ def main():
 
     banner('Test building products')
 
-    build_status = start_build(get_all_builds(products))
-
-    results.extend(wait_builds(build_status))
+    for product in products:
+        build_status = start_build(product.builds)
+        results.extend(wait_builds(build_status))
 
     return analyze_results(*print_results(results))
 
