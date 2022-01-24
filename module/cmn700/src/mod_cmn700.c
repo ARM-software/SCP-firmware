@@ -36,6 +36,7 @@ static const char *const mmap_type_name[] = {
     [MOD_CMN700_MEM_REGION_TYPE_IO] = "I/O",
     [MOD_CMN700_MEM_REGION_TYPE_SYSCACHE] = "System Cache",
     [MOD_CMN700_REGION_TYPE_SYSCACHE_SUB] = "Sub-System Cache",
+    [MOD_CMN700_REGION_TYPE_CCG] = "CCG",
 };
 #else
 static const char *const mmap_type_name[] = { "" };
