@@ -378,6 +378,14 @@ static int morello_system_init_primary_core(void)
         SCC->TRACE_PAD_CTRL0 = UINT32_C(0x3030303);
         SCC->TRACE_PAD_CTRL1 = UINT32_C(0x303);
 
+        /*
+         * To achieve full-speed operation (150MHz) on the display output on
+         * the SoC, the display pads require their slew rate to be changed from
+         * FAST to SLOW.
+         * This change is only needed for the pixel clock pad.
+         */
+        SCC->DISPLAY_PAD_CTRL0 = UINT32_C(0x01010111);
+
         /* Enable non-secure CoreSight debug access */
         FWK_LOG_INFO(
             "[MORELLO SYSTEM] Enabling CoreSight debug non-secure access");
