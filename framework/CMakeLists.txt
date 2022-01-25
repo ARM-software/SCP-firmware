@@ -137,9 +137,36 @@ foreach(idx RANGE ${SCP_MODULE_IDX_MAX})
     string(APPEND SCP_MODULE_ID_CONST_GEN "static const fwk_id_t fwk_module_id_${SCP_MODULE} = FWK_MODULE_ID_${SCP_MODULE_UPPER}_INIT;\n")
 
     string(APPEND SCP_MODULE_EXTERN_GEN "extern const struct fwk_module module_${SCP_MODULE};\n")
-    string(APPEND SCP_MODULE_EXTERN_CONFIG_GEN "extern const struct fwk_module_config config_${SCP_MODULE};\n")
+
+    # generate dt binding indexes for all modules - allow for x/ref between dt and none dt configured
+    string(APPEND SCP_MODULE_DT_BINDING_IDX "#define  FWK_MODULE_IDX_${SCP_MODULE_UPPER} ${idx}\n")
+
+
+    # configuration depends if a module is in one of the DT configured lists 
+    if(SCP_MODULE IN_LIST SCP_DT_CONFIG_MODULES_ALL)
+
+        # common dt module - or platform specific with no dynamic updates
+        string(APPEND SCP_MODULE_EXTERN_CONFIG_GEN "extern const struct fwk_module_config config_dt_${SCP_MODULE};\n")
+        string(APPEND SCP_MODULE_CONFIG_GEN "    &config_dt_${SCP_MODULE},\n")
+
+        if(SCP_MODULE IN_LIST SCP_DT_CONFIG_MODULES_DYN)
+   
+           # dynamic dt config needs additional stuff
+           string(APPEND SCP_MODULE_DT_DYN_CONFIG "#define FWK_MODULE_GEN_DYNAMIC_${SCP_MODULE_UPPER}\n")
+           string(APPEND SCP_MODULE_DT_DYN_CONFIG "extern const struct fwk_element *dyn_get_element_table_${SCP_MODULE}(fwk_id_t module_id);\n")
+           string(APPEND SCP_MODULE_DT_DYN_CONFIG "extern const struct fwk_element *_static_get_element_table_${SCP_MODULE}();\n\n")
+           
+       endif()
+       
+    else()
+
+        # standard module configuration
+        string(APPEND SCP_MODULE_EXTERN_CONFIG_GEN "extern const struct fwk_module_config config_${SCP_MODULE};\n")
+        string(APPEND SCP_MODULE_CONFIG_GEN "    &config_${SCP_MODULE},\n")
+        
+    endif()
+        
     string(APPEND SCP_MODULE_GEN "    &module_${SCP_MODULE},\n")
-    string(APPEND SCP_MODULE_CONFIG_GEN "    &config_${SCP_MODULE},\n")
 
     # cmake-format: on
 
@@ -156,6 +183,13 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/fwk_module_idx.h.in"
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_module_list.c.in"
                "${CMAKE_CURRENT_BINARY_DIR}/src/fwk_module_list.c")
+
+# configure device tree related includes
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/fwk_dt_config_dyn.h.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/include/fwk_dt_config_dyn.h")
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/fwk_dt_bindings_gen.h.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/include/fwk_dt_bindings_gen.h")
 
 target_include_directories(framework
                            PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/include")
