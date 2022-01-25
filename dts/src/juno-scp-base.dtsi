@@ -10,6 +10,8 @@
 /* must be first include */
 #include "base.dtsi"
 
+#include "juno_dt_bindings.h"
+
 
 / {
     soc {
@@ -19,13 +21,31 @@
         /* main console uart */
        	uart1: uart@BC0A0000 {
         	compatible = "arm,pl011";
-			reg = <0xBC0A0000 0x1000>;
-            baud_rate_bps = <115200>;
-            clock_rate_hz = <24000000>;
+			reg = <FPGA_UART1_BASE 0x1000>;
+            current-speed = <115200>;
+            clock-frequency = <24000000>;
+            pd-id = <POWER_DOMAIN_IDX_SYSTOP>;
 /*			clocks = <&uartclk>;*/
 /*			interrupts = <7 3>; */
 /*			interrupt-names = "rx"; */
 			label = "UART1";
 	    };
+
+
+/* another uart to validate generating arrays of elements */
+        /* main console uart */
+       	uart0: uart@BC0B0000 {
+        	compatible = "arm,pl011";
+			reg = <0xBC0b0000 0x1000>;
+            current-speed = <115200>;
+            clock-frequency = <24000000>;
+            pd-id = <POWER_DOMAIN_IDX_SYSTOP>;
+/*			clocks = <&uartclk>;*/
+/*			interrupts = <7 3>; */
+/*			interrupt-names = "rx"; */
+            label = "UART0";
+	    };
+
+
     };
 };
