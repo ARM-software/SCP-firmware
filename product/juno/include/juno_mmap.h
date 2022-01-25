@@ -13,8 +13,6 @@
 
 #include "system_mmap.h"
 
-#include <stdint.h>
-
 #define I2C_BASE                    (VENDOR_EXTENSION_BASE + 0x00000000)
 #define PVT_AON_BASE                (VENDOR_EXTENSION_BASE + 0x00001000)
 #define SCC_BASE                    (VENDOR_EXTENSION_BASE + 0x1FEFF000)
