@@ -17,10 +17,13 @@ target_include_directories(
 
 # cmake-lint: disable=E1122
 
+#            "${CMAKE_CURRENT_SOURCE_DIR}/config_pl011.c"
+
+
 target_sources(
     juno-bl2
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_sds.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_pl011.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_dt_juno_pl011.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_soc_clock_ram.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_dvfs.c"
