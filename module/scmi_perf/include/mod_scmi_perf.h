@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -431,6 +431,28 @@ struct perf_plugins_api {
      *
      * \details This function is called periodically to inform the plugin with
      *      the latest performance requests coming from SCMI.
+     *
+     * \details This callback serves the following purposes:
+     *      - periodic tick: the plugins is called at determined time intervals
+     *      that can be specified in the configuration and corresponds to the
+     *      periodicity of the FastChannels sampling.
+     *      - last performance level: the plugin has visibility of the last
+     *      updated performance level that is taken from the FastChannels.
+     *      - last performance limits: the plugin has visibility of the last
+     *      updated performance limits that are taken from the FastChannels.
+     *      - adjusted performance limits: the plugin has the opportunity to
+     *      affect the final performance limits by writing a performance limit
+     *      back to the SCMI Performance.
+     *      All the above are put together along with an identifier of the
+     *      performance domain being controlled.
+     *
+     *      A typical scenario for a plugin would be that upon every callback,
+     *      the plugin runs its own algorithm which can take advantage of the
+     *      periodicity. In this algorithm the plugin can - if required - read
+     *      the current performance level and limits for the given domain and,
+     *      when necessary, can apply (write) new limits in the `adjusted`
+     *      fields. This is expected to be done for each of the relevant
+     *      performance domains that the plugin is concerned.
      *
      * \param data Performance data
      * \retval ::FWK_SUCCESS or one of FWK_E_* error codes.

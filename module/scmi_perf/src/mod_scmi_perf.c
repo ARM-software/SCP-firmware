@@ -1836,7 +1836,7 @@ static int scmi_perf_process_bind_request(fwk_id_t source_id,
 
     case MOD_SCMI_PERF_PLUGINS_API:
 #ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
-        return perf_plugins_handler_bind_request(
+        return perf_plugins_handler_process_bind_request(
             source_id, target_id, api_id, api);
 #else
         return FWK_E_ACCESS;
