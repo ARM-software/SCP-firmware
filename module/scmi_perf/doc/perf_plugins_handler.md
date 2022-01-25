@@ -3,7 +3,7 @@
 
 # Performance Plugins Handler Architecture
 
-Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
 
 ## Overview
 The performance of a platform with respect to voltage and frequency can be
@@ -18,7 +18,7 @@ which affect the final performance level that the platform will run in.
 
 Such modules are interposed between the SCMI performance interface module and
 the DVFS module. In this manner, the above modules can affect the
-final performance level sent to DVFS.
+final performance level/limits sent to DVFS.
 
 Since there can be many modules that may be affecting the final performance
 level, a *scalable* mechanism to insert or remove modules at compile-time is
@@ -46,12 +46,12 @@ DVFS HAL.
 ### With (performance) plugins
 
 In a scenario where some additional modules need to affect the performance
-limits, these are called prior to submit the request to DVFS. The plugin handler
-calls each of the plugins with the information regarding the performance
+limits, these are called prior to submit the request to DVFS. The plugins
+handler calls each of the plugins with the information regarding the performance
 request. In the same call, plugins can adjust the performance request according
 to their internal algorithms.
 
-Once all the plugins have been called, the plugin handler will provide SCMI
+Once all the plugins have been called, the plugins handler will provide SCMI
 performance with the adjusted performance limits which, in turn, will submit the
 request to DVFS accordingly.
 
@@ -61,7 +61,7 @@ request to DVFS accordingly.
     |           |   |                                  |           |
     +-----+- - -+---v-+         +-----------+          +-----------+
           |           |         |           |
-          |  plugin   +<------->+  plugin x |
+          |  plugins  +<------->+  plugin x |
           |  handler  +<---+    |           |
           +-----------+    |    +-----------+
                            |    +-----------+
@@ -100,14 +100,17 @@ rule:
 
 ### Domain aggregation (physical/logical)
 
-Plugin_handler also implements a basic form of domain aggregation to support
+Plugins_handler also implements a basic form of domain aggregation to support
 situations where the performance domains exposed to OS through SCMI are
 different from those that are available in the platform. These are respectively
 logical (performance control) and physical (aka dependency domain).
 
 A typical example is a platform where SCP exposes per-cpu controls through SCMI
-while having fewer physical domains (DVFS on a cluster-basis or a group of CPUs
-for example).
+Performance while having fewer physical domains (DVFS on a cluster-basis or a
+group of CPUs for example). In this case, there is a need to collect and combine
+the different requests for the logical domains into a final single value that is
+the one to be applied to the physical domain. This aggregation is performed by
+the plugins handler.
 
 In the platform configuration, a plugin can choose whether its view is on
 logical or physical domains.
@@ -139,7 +142,7 @@ ignored.
 Then the same Min/Max policy described above applies when comparing values from
 OS and adjusted values from a plugin.
 
-NOTE: The plugin handler can handle the domain aggregation without the plugins.
+NOTE: The plugins handler can handle the domain aggregation without the plugins.
 If only domain aggregation is required, there is no need to have performance
 plugins.
 
@@ -157,10 +160,11 @@ perf_plugins_api documentation.
 They are also supposed to allow the scmi_performance module to bind to them and
 allow the above API to be bound.
 
-The whole feature is enabled by BS_FIRMWARE_HAS_PERF_PLUGIN_HANDLER
+The whole feature is enabled by BS_FIRMWARE_HAS_PERF_PLUGIN_HANDLER (make) or
+SCP_ENABLE_PLUGIN_HANDLER_INIT (CMake).
 
 ## Restrictions
-- A platform wishing to use the plugin handler, needs to have FastChannels
+- A platform wishing to use the plugins handler, needs to have FastChannels
 implemented (and enabled).
 - This entire mechanism for adding/removing plugins is not supported with the
 traditional SCMI SMT/doorbell transport.

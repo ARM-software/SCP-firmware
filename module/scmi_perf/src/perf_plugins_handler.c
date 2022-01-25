@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -506,7 +506,7 @@ int perf_plugins_handler_bind(void)
         &perf_plugins_ctx.plugins_api);
 }
 
-int perf_plugins_handler_bind_request(
+int perf_plugins_handler_process_bind_request(
     fwk_id_t source_id,
     fwk_id_t target_id,
     fwk_id_t api_id,
