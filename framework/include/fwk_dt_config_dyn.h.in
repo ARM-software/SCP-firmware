@@ -1,0 +1,22 @@
+/*
+ * Arm SCP/MCP Software
+ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+#ifndef FWK_DT_CONFIG_DYN_H
+#define FWK_DT_CONFIG_DYN_H
+
+#include <fwk_id.h>
+
+/* 
+ * Auto generated dynamic configuration callbacks for dts configured modules
+ * Common module config calls dyn_get_element_table_<module>(), which is provided
+ * by the product specific module code.
+ * 
+ * Product specific code uses _static_get_element_table() to reference the element
+ * table defined by device tree macros in the common code.
+ */
+@SCP_MODULE_DT_DYN_CONFIG@
+
+#endif /* FWK_DT_CONFIG_DYN_H */
