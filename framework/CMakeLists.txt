@@ -99,6 +99,10 @@ if(SCP_ENABLE_SENSOR_SIGNED_VALUE)
     target_compile_definitions(framework PUBLIC "BUILD_HAS_SENSOR_SIGNED_VALUE")
 endif()
 
+if(SCP_ENABLE_INBAND_MSG_SUPPORT)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_INBAND_MSG_SUPPORT")
+endif()
+
 #
 # Handle the framework logging filter level.
 #
