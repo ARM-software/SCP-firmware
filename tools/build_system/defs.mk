@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -10,11 +10,6 @@ BS_DEFS_MK := 1
 
 # Escape comma character
 comma = ,
-
-#
-# Suffix used for directories containing resources built with multithreading
-# support enabled
-MULTHREADING_SUFFIX := _mt
 
 #
 # Suffix used for directories containing resources built with notification
@@ -30,8 +25,6 @@ DEFINES += BUILD_VERSION_MINOR=$(VERSION_MINOR)
 DEFINES += BUILD_VERSION_PATCH=$(VERSION_PATCH)
 DEFINES += BUILD_VERSION_STRING=\"$(VERSION_STRING)\"
 DEFINES += BUILD_VERSION_DESCRIBE_STRING=\"$(VERSION_DESCRIBE_STRING)\"
-
-DEFINES += RTX_NO_MULTITHREAD_CLIB
 
 #
 # Returns a path relative to the top directory

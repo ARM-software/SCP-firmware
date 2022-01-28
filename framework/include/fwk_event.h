@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -77,15 +77,6 @@ struct fwk_event {
      * \brief Flag indicating whether the event is a delayed response
      */
     bool is_delayed_response;
-
-#ifdef BUILD_HAS_MULTITHREADING
-    /*!
-     * \internal
-     * \brief Flag indicating whether the event is a response event that a
-     *      thread is waiting for to resume execution.
-     */
-    bool is_thread_wakeup_event;
-#endif
 
     /*!
      * \brief Event identifier.

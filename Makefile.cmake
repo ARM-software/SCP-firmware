@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -36,7 +36,6 @@ DEFAULT_DEBUGGER := n
 DEFAULT_TOOLCHAIN := GNU
 DEFAULT_BUILD_SYSTEM := Ninja
 export CMSIS_DIR := $(TOP_DIR)/contrib/cmsis/git/CMSIS/Core
-export OS_DIR := $(TOP_DIR)/contrib/cmsis/git/CMSIS/RTOS2
 DEFAULT_LOG_LEVEL_debug := INFO
 DEFAULT_LOG_LEVEL_release := WARN
 

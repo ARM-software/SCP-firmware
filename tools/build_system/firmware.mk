@@ -27,12 +27,6 @@ ifeq ($(BS_FIRMWARE_HAS_NOTIFICATION),)
              Aborting...")
 endif
 
-ifneq ($(filter-out yes no,$(BS_FIRMWARE_HAS_MULTITHREADING)),)
-    $(error "Invalid parameter for BS_FIRMWARE_HAS_MULTITHREADING. \
-             Valid options are: 'yes' and 'no'. \
-             Aborting...")
-endif
-
 ifneq ($(filter-out yes no,$(BS_FIRMWARE_HAS_NOTIFICATION)),)
     $(error "Invalid parameter for BS_FIRMWARE_HAS_NOTIFICATION. \
              Valid options are: 'yes' and 'no'. \
@@ -40,7 +34,6 @@ ifneq ($(filter-out yes no,$(BS_FIRMWARE_HAS_NOTIFICATION)),)
 endif
 
 export BS_FIRMWARE_CPU
-export BS_FIRMWARE_HAS_MULTITHREADING
 export BS_FIRMWARE_HAS_NOTIFICATION
 export BS_FIRMWARE_USE_NEWLIB_NANO_SPECS
 
@@ -186,15 +179,6 @@ else
     INCLUDES += $(OS_DIR)/RTX/Include
     INCLUDES += $(OS_DIR)/../Core/Include
 endif
-
-ifeq ($(BS_FIRMWARE_HAS_MULTITHREADING),yes)
-    BUILD_SUFFIX := $(MULTHREADING_SUFFIX)
-    BUILD_HAS_MULTITHREADING := yes
-else
-    BUILD_HAS_MULTITHREADING := no
-endif
-
-export BUILD_HAS_MULTITHREADING
 
 ifeq ($(BS_FIRMWARE_HAS_NOTIFICATION),yes)
     BUILD_SUFFIX := $(BUILD_SUFFIX)$(NOTIFICATION_SUFFIX)

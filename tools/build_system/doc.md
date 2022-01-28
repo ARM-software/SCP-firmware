@@ -61,8 +61,6 @@ The firmware.mk file describes a firmware to the build system.
 
 The following parameters are mandatory:
 * __BS_FIRMWARE_CPU__ - CPU architecture.
-* __BS_FIRMWARE_HAS_MULTITHREADING__ <yes|no> - Multithreading support. When set
-  to yes, firmware will be built with multithreading support.
 * __BS_FIRMWARE_HAS_NOTIFICATION__ <yes|no> - Notification support. When set
   to yes, firmware will be built with notification support.
 * __BS_FIRMWARE_USE_NEWLIB_NANO_SPECS__ <yes|no> - Firmware is by default built
@@ -194,24 +192,6 @@ by the build system, specifically by the __gen_module_code.py__ script:
     its contents are used internally by the framework and should not normally
     be used by other units such as modules.
 
-Multithreading Support                                 {#section_multithreading}
-======================
-
-When building a firmware and its dependencies, the
-BS_FIRMWARE_HAS_MULTITHREADING parameter controls whether multithreading support
-is enabled or not.
-
-When multithreading support is enabled, the following applies:
-
-* The BUILD_HAS_MULTITHREADING definition is defined for the units being built.
-* Multithreading specific APIs are made available to the modules via the
-  framework components (see \ref GroupLibFramework).
-* The header files from the underlying software layer responsible for providing
-  the multithreading capabilities (e.g. embedded OS) are added to the include
-  path for the units being built.
-* The underlying software responsible for providing the multithreading support
-  is included in the firmware during the linking phase.
-
 Notification Support                                     {#section_notification}
 ====================
 
@@ -296,7 +276,6 @@ The build system sets the following definitions during the compilation of C
 and assembly units:
 
 * __BUILD_HOST__ - Set when the CPU target is "host".
-* __BUILD_HAS_MULTITHREADING__ - Set when the build has multithreading support.
 * __BUILD_HAS_NOTIFICATION__ - Set when the build has notification support.
 * __BUILD_STRING__ - A string containing build information (date, time and git
   commit). The string is assembled using the tool build_string.py.

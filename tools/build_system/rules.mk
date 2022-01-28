@@ -11,14 +11,6 @@ BS_RULES_MK := 1
 include $(BS_DIR)/defs.mk
 include $(BS_DIR)/cpu.mk
 
-ifeq ($(BUILD_HAS_MULTITHREADING),yes)
-    # Add the OS directory to the main INCLUDES list
-    ifeq ($(findstring $(BS_FIRMWARE_CPU),$(ARMV8A_CPUS)),)
-        INCLUDES += $(OS_DIR)/Include
-    endif
-    DEFINES += BUILD_HAS_MULTITHREADING
-endif
-
 ifeq ($(BUILD_HAS_NOTIFICATION),yes)
     DEFINES += BUILD_HAS_NOTIFICATION
 endif
@@ -95,10 +87,6 @@ ifeq ($(BS_ARCH_ARCH),host)
     CFLAGS  += -mtune=native
     ASFLAGS_GCC += -mtune=native
     LDFLAGS_GCC += -mtune=native
-
-    ifeq ($(BUILD_HAS_MULTITHREADING),yes)
-        LDFLAGS_GCC += -pthread
-    endif
 
     DEFINES += BUILD_HOST
 

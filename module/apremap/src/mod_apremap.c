@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -473,7 +473,7 @@ static int apremap_process_bind_request(
 
 /*
  * This module would require appropriate locking/interrupt handling on a
- * multi-core or multi-threaded MSCP platform.
+ * multi-core MSCP platform.
  */
 const struct fwk_module module_apremap = {
     .type = FWK_MODULE_TYPE_DRIVER,

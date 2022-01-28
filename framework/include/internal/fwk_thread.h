@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -82,9 +82,6 @@ int __fwk_thread_put_notification(struct fwk_event *event);
  *      In the case of a delayed response event, the event's 'is_response' flag
  *      must be set.
  *
- *      If multi-threading is enabled, and \p event is a delayed response, the
- *      ::fwk_event::cookie field of \p event must match that of the event
- *      it is responding to.
  *
  * \param[in] event Pointer to the event to queue. Must not be \c NULL.
  *

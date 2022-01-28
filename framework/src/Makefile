@@ -21,15 +21,10 @@ BS_LIB_SOURCES += fwk_status.c
 BS_LIB_SOURCES += fwk_string.c
 BS_LIB_SOURCES += fwk_thread_delayed_resp.c
 BS_LIB_SOURCES += fwk_time.c
+BS_LIB_SOURCES += fwk_thread.c
 
 BS_LIB_SOURCES += assert.c
 BS_LIB_SOURCES += stdlib.c
-
-ifeq ($(BUILD_HAS_MULTITHREADING),yes)
-    BS_LIB_SOURCES += fwk_multi_thread.c
-else
-    BS_LIB_SOURCES += fwk_thread.c
-endif
 
 ifeq ($(BUILD_HAS_NOTIFICATION),yes)
     BS_LIB_SOURCES += fwk_notification.c

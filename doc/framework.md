@@ -1,6 +1,6 @@
 # Framework Guide
 
-Copyright (c) 2011-2020, Arm Limited. All rights reserved.
+Copyright (c) 2011-2022, Arm Limited. All rights reserved.
 
 This guide covers the framework that is used to implement the SCP/MCP Software
 and which can also be used to extend the provided implementation. Each of the
@@ -76,19 +76,16 @@ For each firmware, linker information must be provided in a *fmw_memory.h* file:
 - FMW_MEM0_BASE: The base address of the MEM0 region, which is always
   used regardless of the memory region configuration given by *FMW_MEM_MODE*.
 - FMW_MEM0_SIZE: The size of the MEM0 region in bytes.
-- FMW_STACK_SIZE (if multithreading enabled): The size of each individual
-    thread stack in bytes.
+
 
 If a dual-region memory configuration is used then *FMW_MEM1_BASE* and
 *FMW_MEM1_SIZE* must also be defined.
 
 It is the responsibility of the firmware to define - in its Makefile - the
-architecture target for the image (using *BS_FIRMWARE_CPU*) and whether the
-firmware is multithreading-enabled (using *BS_FIRMWARE_HAS_MULTITHREADING*)
-and/or has notification support (using *BS_FIRMWARE_HAS_NOTIFICATION*). The
-firmware can optionally choose to use standard newlib or newlib-nano (optimized
-for code size) as prebuilt C library (using
-*BS_FIRMWARE_USE_NEWLIB_NANO_SPECS*).
+architecture target for the image (using *BS_FIRMWARE_CPU*) and/or has
+notification support (using *BS_FIRMWARE_HAS_NOTIFICATION*). The firmware can
+optionally choose to use standard newlib or newlib-nano (optimized for code
+size) as prebuilt C library (using *BS_FIRMWARE_USE_NEWLIB_NANO_SPECS*).
 
 An example of a simple firmware directory which contains configuration files for
 two modules, the firmware.mk file, and the linker script.
