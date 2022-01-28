@@ -33,7 +33,6 @@
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <fwk_multi_thread.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
 

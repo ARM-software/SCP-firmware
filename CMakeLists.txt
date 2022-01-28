@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -330,11 +330,6 @@ include(CMakeDependentOption)
 set(SCP_ENABLE_OVERRIDE_FIRMWARE_NAME
     ${SCP_ENABLE_OVERRIDE_FIRMWARE_NAME_INIT}
     CACHE STRING "Override firmware binary name")
-
-cmake_dependent_option(
-    SCP_ENABLE_MULTITHREADING "Enable the multithreading subsystem?"
-    "${SCP_ENABLE_MULTITHREADING_INIT}"
-    "DEFINED SCP_ENABLE_MULTITHREADING_INIT" "${SCP_ENABLE_MULTITHREADING}")
 
 cmake_dependent_option(
     SCP_ENABLE_NOTIFICATIONS "Enable the notification subsystem?"

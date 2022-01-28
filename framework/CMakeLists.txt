@@ -37,19 +37,9 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_string.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_thread_delayed_resp.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_time.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/stdlib.c")
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/stdlib.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_thread.c")
 
-if(SCP_ENABLE_MULTITHREADING)
-    target_sources(framework
-                   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_multi_thread.c")
-
-    target_compile_definitions(framework PUBLIC "BUILD_HAS_MULTITHREADING")
-
-    target_link_libraries(framework PRIVATE cmsis::rtos2)
-else()
-    target_sources(framework
-                   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_thread.c")
-endif()
 
 if(SCP_ENABLE_NOTIFICATIONS)
     target_sources(framework

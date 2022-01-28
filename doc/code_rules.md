@@ -18,10 +18,6 @@ The intent is for memory allocations to be done during the pre-runtime phase or
 early in the runtime phase based on configuration data or hardware detection.
 Allocated memory cannot be freed or reallocated.
 
-The framework provides an optional multi-threading runtime, contingent on a
-CMSIS-RTOS-based RTOS. Interaction with the RTOS happens exclusively through the
-framework.
-
 Static Analysis
 ---------------
 This project uses `cppcheck` to do a static analysis of the codebase for

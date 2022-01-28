@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -22,9 +22,6 @@ target_sources(
 
 target_link_libraries(arch-armv7m PUBLIC cmsis::core-m)
 
-if(SCP_ENABLE_MULTITHREADING)
-    target_link_libraries(arch-armv7m PRIVATE cmsis::rtos2-rtx)
-endif()
 
 #
 # Select the standard library, if we have the option.

@@ -107,8 +107,6 @@ build. SCP firmware uses this feature to configure various build options
 for a firmware target(e.g. scp_ramfw or scp_romfw). At present the following
 few common options can be configured.
 
-- SCP_ENABLE_MULTITHREADING: Enable/disable multithreading
-
 - SCP_ENABLE_NOTIFICATIONS: Enable/disable notifications within SCP firmware.
 
 - SCP_ENABLE_SCMI_NOTIFICATIONS: Enable/disable SCMI notifications

@@ -32,10 +32,6 @@
 #    include <mod_resource_perms.h>
 #endif
 
-#ifdef BUILD_HAS_MULTITHREADING
-#    include <fwk_multi_thread.h>
-#endif
-
 #include <inttypes.h>
 
 struct scmi_protocol {
@@ -1489,11 +1485,7 @@ static int scmi_service_init(fwk_id_t service_id, unsigned int unused,
     ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(service_id)];
     ctx->config = config;
 
-#ifdef BUILD_HAS_MULTITHREADING
-    return fwk_thread_create(service_id);
-#else
     return FWK_SUCCESS;
-#endif
 }
 
 static int scmi_bind(fwk_id_t id, unsigned int round)

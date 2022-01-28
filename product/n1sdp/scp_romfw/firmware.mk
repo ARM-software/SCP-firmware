@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -9,7 +9,6 @@
 #
 
 BS_FIRMWARE_CPU := cortex-m7
-BS_FIRMWARE_HAS_MULTITHREADING := no
 BS_FIRMWARE_HAS_NOTIFICATION := yes
 BS_FIRMWARE_USE_NEWLIB_NANO_SPECS := no
 

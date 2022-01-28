@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -40,11 +40,6 @@ DISABLED_APIS_LIST_NAME = \
 $(foreach api, \
           $($(DISABLED_APIS_LIST_NAME)), \
           $(eval DEFINES += BUILD_DISABLE_API_$(api)))
-
-
-ifeq ($(BS_FIRMWARE_HAS_MULTITHREADING),yes)
-    LIB_BASE := $(LIB_BASE)$(MULTHREADING_SUFFIX)
-endif
 
 ifeq ($(BS_FIRMWARE_HAS_NOTIFICATION),yes)
     LIB_BASE := $(LIB_BASE)$(NOTIFICATION_SUFFIX)

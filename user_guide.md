@@ -96,8 +96,8 @@ git clone --recurse-submodules https://github.com/ARM-software/SCP-firmware.git 
 ### Cloning dependencies
 
 Under certain configurations the SCP-firmware has a dependency on the CMSIS-Core
-and CMSIS-RTOS2 projects, which are part of the [Cortex Microcontroller System
-Interface Standard (CMSIS)] software pack. The source tree for this software is
+projects, which are part of the [Cortex Microcontroller System Interface
+Standard (CMSIS)] software pack. The source tree for this software is
 included with the firmware as a Git submodule. You can fetch all submodules from
 within the source directory with the following:
 

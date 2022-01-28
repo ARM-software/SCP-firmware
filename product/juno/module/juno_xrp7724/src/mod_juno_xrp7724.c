@@ -20,7 +20,6 @@
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <fwk_multi_thread.h>
 #include <fwk_status.h>
 #include <fwk_thread.h>
 

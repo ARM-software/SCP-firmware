@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -16,10 +16,6 @@
 
 #include <stdint.h>
 #include <string.h>
-
-#ifdef BUILD_HAS_MULTITHREADING
-#    include <rtx_os.h>
-#endif
 
 #ifdef __NEWLIB__
 /*
@@ -79,20 +75,11 @@ const struct {
         [NVIC_USER_IRQ_OFFSET + DebugMonitor_IRQn - 1] =
             (uintptr_t)(arch_exception_invalid),
 
-#ifdef BUILD_HAS_MULTITHREADING
-        [NVIC_USER_IRQ_OFFSET + SVCall_IRQn - 1] =
-            (uintptr_t)(SVC_Handler),
-        [NVIC_USER_IRQ_OFFSET + PendSV_IRQn - 1] =
-            (uintptr_t)(PendSV_Handler),
-        [NVIC_USER_IRQ_OFFSET + SysTick_IRQn - 1] =
-            (uintptr_t)(SysTick_Handler),
-#else
         [NVIC_USER_IRQ_OFFSET + SVCall_IRQn - 1] =
             (uintptr_t)(arch_exception_invalid),
         [NVIC_USER_IRQ_OFFSET + PendSV_IRQn - 1] =
             (uintptr_t)(arch_exception_invalid),
         [NVIC_USER_IRQ_OFFSET + SysTick_IRQn - 1] =
             (uintptr_t)(arch_exception_invalid),
-#endif
     },
 };
