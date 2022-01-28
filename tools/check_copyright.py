@@ -57,6 +57,14 @@ COMPANY_FULL_NAME_PATTERN = \
     '(Arm Limited and Contributors|Renesas Electronics Corporation)'
 
 #
+# git command using diff-filter to include Added (A), Copied (C), Modified (M),
+# Renamed (R), type changed (T), Unmerged (U), Unknown (X) files
+# Deleted files (D) are not included
+#
+GIT_CMD = \
+    'git diff-tree --name-only --no-commit-id -r --diff-filter=ACMRTUX HEAD'
+
+#
 # License pattern to match
 #
 LICENSE_PATTERN = \
@@ -142,7 +150,7 @@ def main():
 
     try:
         result = subprocess.Popen(
-            "git diff-tree --name-only --no-commit-id -r HEAD",
+            GIT_CMD,
             shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
