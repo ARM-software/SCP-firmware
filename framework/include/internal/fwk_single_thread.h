@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -40,30 +40,6 @@ struct __fwk_thread_ctx {
 
     /* The event currently being processed */
     struct fwk_event *current_event;
-
-    /* Event being processed when put_event_and_wait was called */
-    struct fwk_event *previous_event;
-
-    /*
-     * Flag indicating the thread is waiting for the completion of the
-     * processing of an event (true) or not (false). The thread
-     * enters this waiting state when calling the fwk_thread_put_and_wait()
-     * framework API requesting that the execution does not resume at the
-     * caller until this event processing is complete and the response
-     * received. The thread leaves this waiting state when the processing
-     * of the aforementioned event is completed. The execution of the
-     * caller is then resumed immediately: no other event processing occurs
-     * between the end of the event processing and the caller execution being
-     * resumed.
-     *
-     * Note that nested put_event_and_wait calls are not supported.
-     */
-    bool waiting_event_processing_completion;
-
-    /*
-     * The cookie of the event we are waiting for
-     */
-    uint32_t cookie;
 };
 
 /*
