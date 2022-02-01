@@ -19,6 +19,7 @@
 #include <mod_timer.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_log.h>
@@ -28,7 +29,6 @@
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
 #include <fwk_string.h>
-#include <fwk_thread.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -1058,7 +1058,7 @@ static int scmi_perf_level_get_handler(fwk_id_t service_id,
     evt_params = (struct scmi_perf_event_parameters *)event.params;
     evt_params->domain_id = get_dependency_id(parameters->domain_id);
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     if (status != FWK_SUCCESS) {
         return_values.status = (int32_t)SCMI_GENERIC_ERROR;
 

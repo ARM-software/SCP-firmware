@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -14,6 +14,7 @@
 #include <mod_scmi_agent.h>
 #include <mod_smt.h>
 
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_log.h>
@@ -21,7 +22,6 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 #include <inttypes.h>
 #include <stddef.h>
@@ -252,7 +252,7 @@ static int scmi_agent_start(fwk_id_t id)
         .id = FWK_ID_EVENT(FWK_MODULE_IDX_SCMI_AGENT, MOD_SCMI_AGENT_EVENT_RUN),
     };
 
-    return fwk_thread_put_event(&event);
+    return fwk_put_event(&event);
 }
 
 static int scmi_agent_process_bind_request(

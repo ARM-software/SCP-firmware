@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -11,6 +11,7 @@
 #include <mod_power_domain.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_list.h>
@@ -18,12 +19,10 @@
 #include <fwk_module.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-
 
 static struct clock_ctx module_ctx;
 
@@ -43,7 +42,7 @@ static int process_response_event(const struct fwk_event *event)
 
     ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(event->target_id)];
 
-    status = fwk_thread_get_delayed_response(
+    status = fwk_get_delayed_response(
         event->target_id, ctx->request.cookie, &resp_event);
     if (status != FWK_SUCCESS) {
         return status;
@@ -53,7 +52,7 @@ static int process_response_event(const struct fwk_event *event)
     resp_params->value = event_params->value;
     ctx->request.is_ongoing = false;
 
-    return fwk_thread_put_event(&resp_event);
+    return fwk_put_event(&resp_event);
 }
 
 static int process_request_event(const struct fwk_event *event,
@@ -83,7 +82,7 @@ static int create_async_request(
         .response_requested = true,
     };
 
-    status = fwk_thread_put_event(&request_event);
+    status = fwk_put_event(&request_event);
     if (status != FWK_SUCCESS) {
         return status;
     }
@@ -135,7 +134,7 @@ void clock_request_complete(
         event_params->status = FWK_E_PARAM;
     }
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     fwk_assert(status == FWK_SUCCESS);
 }
 
@@ -183,7 +182,7 @@ static int clock_set_rate(fwk_id_t clock_id, uint64_t rate,
     event_params = (struct clock_set_rate_params *)event.params;
     event_params->input_rate = rate;
 
-    return fwk_thread_put_event(&event);
+    return fwk_put_event(&event);
 #else
     status = ctx->api->set_rate(ctx->config->driver_id, rate, round_mode);
     if (status == FWK_PENDING) {
@@ -281,7 +280,7 @@ static int clock_set_state(fwk_id_t clock_id, enum mod_clock_state state)
     event_params = (struct clock_set_state_params *)event.params;
     event_params->target_state = state;
     ctx->state_transition.is_transition_initiator = true;
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     if (status != FWK_SUCCESS) {
         return status;
     }
@@ -656,7 +655,7 @@ static int clock_process_notification_response(
                  *)pd_response_event.params;
         pd_resp_params->status =
             (int)ctx->pd_notif.transition_pending_response_status;
-        return fwk_thread_put_event(&pd_response_event);
+        return fwk_put_event(&pd_response_event);
     }
 
     return FWK_SUCCESS;

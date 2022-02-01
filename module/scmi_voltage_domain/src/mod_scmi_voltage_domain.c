@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -10,12 +10,13 @@
 
 #include <internal/scmi_voltage_domain.h>
 
-#include <mod_voltage_domain.h>
 #include <mod_scmi.h>
 #include <mod_scmi_voltage_domain.h>
+#include <mod_voltage_domain.h>
 
 #include <fwk_assert.h>
 #include <fwk_attributes.h>
+#include <fwk_core.h>
 #include <fwk_id.h>
 #include <fwk_log.h>
 #include <fwk_macros.h>
@@ -23,7 +24,6 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 #include <stdbool.h>
 #include <string.h>

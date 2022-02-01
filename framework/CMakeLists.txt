@@ -35,10 +35,10 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_slist.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_status.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_string.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_thread_delayed_resp.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_delayed_resp.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_time.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/src/stdlib.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_thread.c")
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_core.c")
 
 
 if(SCP_ENABLE_NOTIFICATIONS)

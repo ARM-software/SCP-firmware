@@ -8,9 +8,9 @@
  *     Module facilities.
  */
 
+#include <internal/fwk_core.h>
 #include <internal/fwk_id.h>
 #include <internal/fwk_module.h>
-#include <internal/fwk_thread.h>
 
 #include <fwk_assert.h>
 #include <fwk_cli_dbg.h>
@@ -97,7 +97,6 @@ static void fwk_module_init_element_ctx(
         .state = FWK_MODULE_STATE_UNINITIALIZED,
         .desc = element,
         .sub_element_count = element->sub_element_count,
-        .thread_ctx = NULL,
     };
 
     fwk_list_init(&ctx->delayed_response_list);
@@ -421,7 +420,7 @@ int fwk_module_start(void)
 
     CLI_DEBUGGER();
 
-    status = __fwk_thread_init(FWK_MODULE_EVENT_COUNT);
+    status = __fwk_init(FWK_MODULE_EVENT_COUNT);
     if (status != FWK_SUCCESS) {
         return status;
     }
@@ -448,7 +447,7 @@ int fwk_module_start(void)
 
     FWK_LOG_CRIT("[FWK] Module initialization complete!");
 
-    __fwk_thread_run();
+    __fwk_run();
 
     return FWK_SUCCESS;
 }

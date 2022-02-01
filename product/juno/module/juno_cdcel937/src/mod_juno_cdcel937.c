@@ -14,6 +14,7 @@
 #include <mod_juno_hdlcd.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
@@ -21,7 +22,6 @@
 #include <fwk_module.h>
 #include <fwk_status.h>
 #include <fwk_string.h>
-#include <fwk_thread.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -499,7 +499,7 @@ static int create_set_rate_request(fwk_id_t clock_id,
     ctx->rate = rate;
     ctx->index = index;
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     if (status != FWK_SUCCESS) {
         return FWK_E_DEVICE;
     }
@@ -702,7 +702,7 @@ static int create_get_rate_request(fwk_id_t clock_id,
         .id = juno_cdcel937_event_id_get_rate,
     };
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     if (status != FWK_SUCCESS) {
         return FWK_E_DEVICE;
     }

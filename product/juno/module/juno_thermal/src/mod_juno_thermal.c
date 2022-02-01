@@ -20,6 +20,7 @@
 #include <mod_timer.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_id.h>
 #include <fwk_log.h>
 #include <fwk_mm.h>
@@ -27,7 +28,6 @@
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 enum mod_juno_thermal_event_idx {
     MOD_JUNO_THERMAL_EVENT_IDX_TIMER,
@@ -77,7 +77,7 @@ static void juno_thermal_alarm_callback(uintptr_t param)
         .id = mod_juno_thermal_event_id_timer,
     };
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     fwk_assert(status == FWK_SUCCESS);
 }
 

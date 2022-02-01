@@ -5,9 +5,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <internal/fwk_context.h>
+#include <internal/fwk_core.h>
 #include <internal/fwk_module.h>
-#include <internal/fwk_single_thread.h>
-#include <internal/fwk_thread.h>
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
@@ -87,7 +87,7 @@ int __wrap_fwk_interrupt_get_current(unsigned int *interrupt)
 
 static struct fwk_event notification_event_table[4];
 static unsigned int notification_event_count;
-int __wrap___fwk_thread_put_notification(struct fwk_event *event)
+int __wrap___fwk_put_notification(struct fwk_event *event)
 {
     assert(notification_event_count < FWK_ARRAY_SIZE(notification_event_table));
 
@@ -97,7 +97,7 @@ int __wrap___fwk_thread_put_notification(struct fwk_event *event)
 }
 
 static struct fwk_event *get_current_event_return_val;
-const struct fwk_event *__wrap___fwk_thread_get_current_event(void)
+const struct fwk_event *__wrap___fwk_get_current_event(void)
 {
     return get_current_event_return_val;
 }
@@ -273,8 +273,7 @@ static void test_fwk_notification_notify(void)
     interrupt_get_current_return_val = FWK_E_STATE;
     is_valid_entity_id_return_val = true;
 
-    /* Call from a thread, current event, incompatible notification and
-       source identifier. */
+    /* Current event, incompatible notification and source identifier. */
     current_event.target_id = FWK_ID_ELEMENT(0x2, 0x9);
     notification_event.source_id = FWK_ID_ELEMENT(0x3, 0x9);
     notification_event.id = FWK_ID_NOTIFICATION(0x2, 0x1);
@@ -283,13 +282,13 @@ static void test_fwk_notification_notify(void)
     assert(result == FWK_E_PARAM);
     get_current_event_return_val = NULL;
 
-    /* Call from a thread, no current event, invalid notification identifier. */
+    /* No current event, invalid notification identifier. */
     is_valid_notification_id_return_val = false;
     result = fwk_notification_notify(&notification_event, &count);
     assert(result == FWK_E_PARAM);
     is_valid_notification_id_return_val = true;
 
-    /* Call from a thread, no current event, incompatible notification and
+    /* No current event, incompatible notification and
        source identifier. */
     notification_event.source_id = FWK_ID_ELEMENT(0x2, 0x9);
     notification_event.id = FWK_ID_NOTIFICATION(0x1, 0x1);
@@ -364,7 +363,7 @@ static const struct fwk_test_case_desc test_case_table[] = {
 };
 
 struct fwk_test_suite_desc test_suite = {
-    .name = "fwk_thread",
+    .name = "fwk_core",
     .test_case_setup = test_case_setup,
     .test_case_teardown = test_case_teardown,
     .test_case_count = FWK_ARRAY_SIZE(test_case_table),

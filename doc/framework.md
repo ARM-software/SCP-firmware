@@ -361,10 +361,10 @@ on the stack, the parameter block also gets initialized which may not
 be efficient for performance sensitive use cases. The framework
 provides an additional event type ```struct fwk_event_light``` which
 does not contain this block of memory for parameters and few other
-fields(cookie, is_response, is_notification, is_delayed_response, and
-is_thread_wakeup_event). Apart from this, from the user's view the
- *Light Events* behaves as same as *Events*. Also, note that these type
-of events can not be used in notifications and delayed response use cases.
+fields(cookie, is_response, is_notification, and is_delayed_response).
+Apart from this, from the user's view the *Light Events* behaves as same as
+*Events*. Also, note that these type of events can not be used in notifications
+and delayed response use cases.
 
 #### Notifications
 

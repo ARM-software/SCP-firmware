@@ -7,13 +7,13 @@
 #include <mod_i2c.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 #include <stdbool.h>
 #include <string.h>
@@ -89,7 +89,7 @@ static int create_i2c_request(fwk_id_t dev_id,
         event.id = mod_i2c_event_id_request_rx;
     }
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     if (status == FWK_SUCCESS) {
         /*
          * The request has been successfully queued for later processing by the
@@ -202,7 +202,7 @@ static void transaction_completed(fwk_id_t dev_id, int i2c_status)
 
     param->status = i2c_status;
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     fwk_assert(status == FWK_SUCCESS);
 }
 
@@ -301,14 +301,14 @@ static int respond_to_caller(
     struct mod_i2c_event_param *param =
         (struct mod_i2c_event_param *)resp.params;
 
-    status = fwk_thread_get_first_delayed_response(dev_id, &resp);
+    status = fwk_get_first_delayed_response(dev_id, &resp);
     if (status != FWK_SUCCESS) {
         return status;
     }
 
     param->status = (drv_status == FWK_SUCCESS) ? FWK_SUCCESS : FWK_E_DEVICE;
 
-    return fwk_thread_put_event(&resp);
+    return fwk_put_event(&resp);
 }
 
 static int process_request(struct mod_i2c_dev_ctx *ctx, fwk_id_t event_id)
@@ -356,7 +356,7 @@ static int reload(fwk_id_t dev_id, struct mod_i2c_dev_ctx *ctx)
     bool is_empty;
     struct fwk_event event;
 
-    status = fwk_thread_is_delayed_response_list_empty(dev_id, &is_empty);
+    status = fwk_is_delayed_response_list_empty(dev_id, &is_empty);
     if (status != FWK_SUCCESS) {
         return status;
     }
@@ -369,7 +369,7 @@ static int reload(fwk_id_t dev_id, struct mod_i2c_dev_ctx *ctx)
             .target_id = dev_id,
             .id = mod_i2c_event_id_reload,
         };
-        status = fwk_thread_put_event(&event);
+        status = fwk_put_event(&event);
     }
 
    return status;
@@ -383,7 +383,7 @@ static int process_next_request(fwk_id_t dev_id, struct mod_i2c_dev_ctx *ctx)
     struct mod_i2c_request *request;
     struct mod_i2c_event_param *event_param;
 
-    status = fwk_thread_is_delayed_response_list_empty(dev_id, &is_empty);
+    status = fwk_is_delayed_response_list_empty(dev_id, &is_empty);
     if (status != FWK_SUCCESS) {
         return status;
     }
@@ -393,8 +393,7 @@ static int process_next_request(fwk_id_t dev_id, struct mod_i2c_dev_ctx *ctx)
         return FWK_SUCCESS;
     }
 
-    status = fwk_thread_get_first_delayed_response(
-        dev_id, &delayed_response);
+    status = fwk_get_first_delayed_response(dev_id, &delayed_response);
     if (status != FWK_SUCCESS) {
         return status;
     }
@@ -407,7 +406,7 @@ static int process_next_request(fwk_id_t dev_id, struct mod_i2c_dev_ctx *ctx)
         event_param = (struct mod_i2c_event_param *)delayed_response.params;
         event_param->status = drv_status;
 
-        status = fwk_thread_put_event(&delayed_response);
+        status = fwk_put_event(&delayed_response);
         if (status == FWK_SUCCESS) {
             status = reload(dev_id, ctx);
         }

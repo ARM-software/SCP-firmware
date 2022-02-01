@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -16,13 +16,13 @@
 #include <mod_power_domain.h>
 #include <mod_scmi_agent.h>
 
+#include <fwk_core.h>
 #include <fwk_id.h>
 #include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <fwk_thread.h>
 
 #include <inttypes.h>
 #include <stdint.h>
@@ -91,7 +91,7 @@ static int morello_mcp_system_start(fwk_id_t id)
             FWK_MODULE_IDX_MORELLO_MCP_SYSTEM, MOD_MCP_SYSTEM_EVENT_RUN),
     };
 
-    return fwk_thread_put_event(&event);
+    return fwk_put_event(&event);
 }
 
 static int morello_mcp_system_process_event(

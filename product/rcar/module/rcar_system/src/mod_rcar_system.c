@@ -1,6 +1,6 @@
 /*
  * Renesas SCP/MCP Software
- * Copyright (c) 2020-2021, Renesas Electronics Corporation. All rights
+ * Copyright (c) 2020-2022, Renesas Electronics Corporation. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -21,6 +21,7 @@
 #include <mod_system_power.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
@@ -30,7 +31,6 @@
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 #include <arch_gic.h>
 #include <arch_helpers.h>

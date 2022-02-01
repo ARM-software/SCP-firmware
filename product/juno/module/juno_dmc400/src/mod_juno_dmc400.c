@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -20,6 +20,7 @@
 #include <mod_timer.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_interrupt.h>
 #include <fwk_log.h>
@@ -28,7 +29,6 @@
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 #include <fmw_cmsis.h>
 
@@ -888,7 +888,7 @@ static void ddr_phy_irq_handler(void)
         .id = juno_dmc400_event_id_training,
     };
 
-    status = fwk_thread_put_event(&req_event);
+    status = fwk_put_event(&req_event);
     fwk_assert(status == FWK_SUCCESS);
 }
 

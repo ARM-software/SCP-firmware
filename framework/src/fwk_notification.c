@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -8,9 +8,9 @@
  *     Notification facilities.
  */
 
+#include <internal/fwk_core.h>
 #include <internal/fwk_module.h>
 #include <internal/fwk_notification.h>
-#include <internal/fwk_thread.h>
 
 #include <fwk_assert.h>
 #include <fwk_attributes.h>
@@ -139,7 +139,7 @@ static void send_notifications(struct fwk_event *notification_event,
 
         notification_event->target_id = subscription->target_id;
 
-        status = __fwk_thread_put_notification(notification_event);
+        status = __fwk_put_notification(notification_event);
         if (status == FWK_SUCCESS) {
             (*count)++;
         }
@@ -286,7 +286,7 @@ int fwk_notification_notify(struct fwk_event *notification_event,
             goto error;
         }
     } else {
-        current_event = __fwk_thread_get_current_event();
+        current_event = __fwk_get_current_event();
 
         if ((current_event != NULL) &&
             (!fwk_module_is_valid_entity_id(notification_event->source_id))) {

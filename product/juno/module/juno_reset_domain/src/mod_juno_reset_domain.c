@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -13,17 +13,19 @@
  *     UART peripheral.
  */
 
+#include <juno_scc.h>
+#include <system_mmap.h>
+
+#include <mod_juno_reset_domain.h>
+#include <mod_reset_domain.h>
+
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <fwk_thread.h>
 #include <fwk_status.h>
-#include <juno_scc.h>
-#include <mod_reset_domain.h>
-#include <mod_juno_reset_domain.h>
-#include <system_mmap.h>
 
 enum dev_state {
     DEVICE_STATE_NORMAL = 0,
@@ -113,7 +115,7 @@ static int juno_set_reset_state(fwk_id_t dev_id,
         params->dev_id = dev_id;
         params->reset_state = reset_state;
         params->cookie = cookie;
-        fwk_thread_put_event(&autoreset_event);
+        fwk_put_event(&autoreset_event);
     }
 
     return FWK_SUCCESS;

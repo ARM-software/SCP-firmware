@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -96,7 +96,7 @@ static bool process_bind_request_return_api;
 static bool get_element_table0_return_val;
 static bool get_element_table1_return_val;
 static int process_event_return_val;
-static int thread_init_return_val;
+static int init_return_val;
 
 static int init(fwk_id_t module_id, unsigned int element_count,
     const void *data)
@@ -194,13 +194,13 @@ void * __wrap_fwk_mm_calloc(size_t num, size_t size)
     return NULL;
 }
 
-int __wrap___fwk_thread_init(size_t event_count)
+int __wrap___fwk_init(size_t event_count)
 {
     (void) event_count;
-    return thread_init_return_val;
+    return init_return_val;
 }
 
-void __wrap___fwk_thread_run(void)
+void __wrap___fwk_run(void)
 {
 }
 
@@ -224,7 +224,7 @@ static void test_case_setup(void)
     process_bind_request_return_val = FWK_SUCCESS;
     process_bind_request_return_api = true;
     process_event_return_val = FWK_SUCCESS;
-    thread_init_return_val = FWK_SUCCESS;
+    init_return_val = FWK_SUCCESS;
 
     bind_count_call = 0;
     start_count_call = 0;

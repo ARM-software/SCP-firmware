@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -19,6 +19,7 @@
 #include <mod_sensor.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
@@ -27,7 +28,6 @@
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -344,7 +344,7 @@ exit:
     isr_params->status = status;
     isr_params->value = value;
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     fwk_assert(status == FWK_SUCCESS);
 }
 
@@ -419,7 +419,7 @@ static int get_value(fwk_id_t id, uint64_t *value)
                                JUNO_PVT_EVENT_IDX_READ_REQUEST),
         };
 
-        status = fwk_thread_put_event(&read_req);
+        status = fwk_put_event(&read_req);
     } else {
         /* At least one sensor is being read, the sensor group is busy */
         status = FWK_E_BUSY;
@@ -821,16 +821,15 @@ static int pvt_process_event(const struct fwk_event *event,
             /* Respond to the Power Domain notification */
             if (group_ctx->pd_notification_delayed) {
                 group_ctx->pd_notification_delayed = false;
-                status = fwk_thread_get_delayed_response(event->target_id,
-                                                         group_ctx->cookie,
-                                                         &resp_notif);
+                status = fwk_get_delayed_response(
+                    event->target_id, group_ctx->cookie, &resp_notif);
                 if (status != FWK_SUCCESS) {
                     return FWK_E_PANIC;
                 }
 
                 pd_resp_params->status = FWK_SUCCESS;
 
-                status = fwk_thread_put_event(&resp_notif);
+                status = fwk_put_event(&resp_notif);
                 if (status != FWK_SUCCESS) {
                     return FWK_E_PANIC;
                 }

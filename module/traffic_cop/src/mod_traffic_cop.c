@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -9,13 +9,13 @@
 #include <mod_scmi_perf.h>
 #include <mod_traffic_cop.h>
 
+#include <fwk_core.h>
 #include <fwk_id.h>
 #include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 struct mod_tcop_core_ctx {
     /* Core Identifier */
@@ -178,7 +178,7 @@ static int tcop_report(struct perf_plugins_perf_report *data)
         if (domain_ctx->core_ctx[core_idx].pd_blocked) {
             domain_ctx->core_ctx[core_idx].pd_blocked = false;
 
-            status = fwk_thread_get_delayed_response(
+            status = fwk_get_delayed_response(
                 domain_ctx->domain_id,
                 domain_ctx->core_ctx[core_idx].cookie,
                 &resp_notif);
@@ -187,7 +187,7 @@ static int tcop_report(struct perf_plugins_perf_report *data)
             }
 
             pd_resp_params->status = FWK_SUCCESS;
-            status = fwk_thread_put_event(&resp_notif);
+            status = fwk_put_event(&resp_notif);
             if (status != FWK_SUCCESS) {
                 return status;
             }

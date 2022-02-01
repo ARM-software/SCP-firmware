@@ -5,24 +5,24 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef FWK_INTERNAL_THREAD_H
-#define FWK_INTERNAL_THREAD_H
+#ifndef FWK_INTERNAL_CORE_H
+#define FWK_INTERNAL_CORE_H
 
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_noreturn.h>
-#include <fwk_thread.h>
 
 #include <stddef.h>
 
 /*
- * \brief Initialize the thread framework component.
+ * \brief Initialize the core framework component.
  *
  * \param event_count The maximum number of events in all queues at all time.
  *
- * \retval ::FWK_SUCCESS The thread framework component was initialized.
+ * \retval ::FWK_SUCCESS The core framework component was initialized.
  * \retval ::FWK_E_NOMEM Insufficient memory available for event queues.
  */
-int __fwk_thread_init(size_t event_count);
+int __fwk_init(size_t event_count);
 
 /*
  * \brief Begin waiting for and processing events raised by modules and
@@ -30,7 +30,7 @@ int __fwk_thread_init(size_t event_count);
  *
  * \return The function does not return.
  */
-noreturn void __fwk_thread_run(void);
+noreturn void __fwk_run(void);
 
 /*
  * \brief Get the event being currently processed.
@@ -38,17 +38,14 @@ noreturn void __fwk_thread_run(void);
  * \return The event being currently processed, or \c NULL if event processing
  *      has not yet begun.
  */
-const struct fwk_event *__fwk_thread_get_current_event(void);
+const struct fwk_event *__fwk_get_current_event(void);
 
 /*
  * \brief Put a notification event in one of the event queues.
  *
- * \details The thread component copies the notification event description into
+ * \details The core component copies the notification event description into
  *      its internal data and so does not keep track of the pointer passed as a
  *      parameter.
- *
- *      If the function is called from a thread, the event is put into the
- *      targeted thread queue.
  *
  *      If the function is called from an ISR, the validity of the event source
  *      identifier is checked and the event is put in the ISR event queue.
@@ -59,7 +56,7 @@ const struct fwk_event *__fwk_thread_get_current_event(void);
  * \retval ::FWK_E_PARAM The source identifier is not valid.
  * \retval ::FWK_E_NOMEM No memory space to copy the event data.
  */
-int __fwk_thread_put_notification(struct fwk_event *event);
+int __fwk_put_notification(struct fwk_event *event);
 
 /*!
  * \brief Put an event in one of the event queues.
@@ -67,11 +64,10 @@ int __fwk_thread_put_notification(struct fwk_event *event);
  * \details The framework copies the event description into its internal data
  *      and so does not keep track of the pointer passed as a parameter.
  *
- *      If the function is called from a thread the event is put into the
- *      targeted thread queue. Furthermore, in the runtime phase, the source
- *      identifier of the event is populated with the identifier of the caller,
- *      and it is therefore unnecessary for the caller to do so manually. Note
- *      that this does not occur in the pre-runtime phase.
+ *      In the runtime phase, the source identifier of the event is populated
+ *      with the identifier of the caller, and it is therefore unnecessary for
+ *      the caller to do so manually. Note that this does not occur in the
+ *      pre-runtime phase.
  *
  *      If the function is called from an ISR, the event is put in the ISR
  *      event queue.
@@ -86,7 +82,7 @@ int __fwk_thread_put_notification(struct fwk_event *event);
  * \param[in] event Pointer to the event to queue. Must not be \c NULL.
  *
  * \retval ::FWK_SUCCESS The event was queued.
- * \retval ::FWK_E_INIT The thread framework component is not initialized.
+ * \retval ::FWK_E_INIT The core framework component is not initialized.
  * \retval ::FWK_E_PARAM An invalid parameter was encountered:
  *      - The `event` parameter was a null pointer value.
  *      - One or more fields of the event were invalid.
@@ -94,7 +90,7 @@ int __fwk_thread_put_notification(struct fwk_event *event);
  *
  * \return Status code representing the result of the operation.
  */
-int __fwk_thread_put_event(struct fwk_event *event);
+int __fwk_put_event(struct fwk_event *event);
 
 /*!
  * \brief Put a light event by converting to a normal event in one of the event
@@ -104,11 +100,10 @@ int __fwk_thread_put_event(struct fwk_event *event);
  *      data(<tt> struct fwk_event </tt>) and so does not keep track of the
  *      pointer passed as a parameter.
  *
- *      If the function is called from a thread the event is put into the
- *      targeted thread queue. Furthermore, in the runtime phase, the source
- *      identifier of the event is populated with the identifier of the caller,
- *      and it is therefore unnecessary for the caller to do so manually. Note
- *      that this does not occur in the pre-runtime phase.
+ *      In the runtime phase, the source identifier of the event is populated
+ *      with the identifier of the caller, and it is therefore unnecessary for
+ *      the caller to do so manually. Note that this does not occur in the
+ *      pre-runtime phase.
  *
  *      If the function is called from an ISR, the event is put in the ISR
  *      event queue.
@@ -120,7 +115,7 @@ int __fwk_thread_put_event(struct fwk_event *event);
  * \param[in] event Pointer to the event to queue. Must not be \c NULL.
  *
  * \retval ::FWK_SUCCESS The event was queued.
- * \retval ::FWK_E_INIT The thread framework component is not initialized.
+ * \retval ::FWK_E_INIT The core framework component is not initialized.
  * \retval ::FWK_E_PARAM An invalid parameter was encountered:
  *      - The `event` parameter was a null pointer value.
  *      - One or more fields of the event were invalid.
@@ -128,6 +123,6 @@ int __fwk_thread_put_event(struct fwk_event *event);
  *
  * \return Status code representing the result of the operation.
  */
-int __fwk_thread_put_event_light(struct fwk_event_light *event);
+int __fwk_put_event_light(struct fwk_event_light *event);
 
-#endif /* FWK_INTERNAL_THREAD_H */
+#endif /* FWK_INTERNAL_CORE_H */

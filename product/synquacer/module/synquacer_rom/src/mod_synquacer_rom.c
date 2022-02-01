@@ -1,12 +1,13 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include <mod_synquacer_rom.h>
 
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
@@ -14,7 +15,6 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 #include <fmw_cmsis.h>
 
@@ -79,7 +79,7 @@ static int synquacer_rom_start(fwk_id_t id)
         .id = FWK_ID_EVENT(FWK_MODULE_IDX_SYNQUACER_ROM, ROM_EVENT_RUN),
     };
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
 
     return status;
 }

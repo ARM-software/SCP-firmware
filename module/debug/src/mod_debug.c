@@ -10,13 +10,13 @@
 #include <mod_debug.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 #include <stdbool.h>
 
@@ -102,7 +102,7 @@ static int set_enabled(fwk_id_t id, bool enable, enum scp_debug_user user_id)
         req_params->user_id = user_id;
         req_params->enable = enable;
 
-        status = fwk_thread_put_event(&req);
+        status = fwk_put_event(&req);
         if (status == FWK_SUCCESS) {
             ctx->state = DEBUG_SET;
             return FWK_PENDING;
@@ -147,7 +147,7 @@ static int get_enabled(fwk_id_t id, bool *enable, enum scp_debug_user user_id)
         req_params = (struct mod_debug_request_params *)&req.params;
         req_params->user_id = user_id;
 
-        status = fwk_thread_put_event(&req);
+        status = fwk_put_event(&req);
         if (status == FWK_SUCCESS) {
             ctx->state = DEBUG_GET;
             return FWK_PENDING;
@@ -202,7 +202,7 @@ static int enable_request(fwk_id_t id,
     req_params->user_id = user_id;
     req_params->enable = enable;
 
-    return fwk_thread_put_event(&req);
+    return fwk_put_event(&req);
 }
 
 /*
@@ -242,7 +242,7 @@ static void request_complete(fwk_id_t id,
     resp_params->status = response->status;
     resp_params->enabled = response->enabled;
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     fwk_assert(status == FWK_SUCCESS);
 }
 
@@ -369,15 +369,14 @@ static int respond(const struct fwk_event *event)
 
     ctx->state = DEBUG_IDLE;
 
-    status = fwk_thread_get_delayed_response(event->target_id, ctx->cookie,
-                                             &response);
+    status = fwk_get_delayed_response(event->target_id, ctx->cookie, &response);
     if (status != FWK_SUCCESS) {
         return status;
     }
 
     resp_params->status = req_result->status;
     resp_params->enabled = req_result->enabled;
-    return fwk_thread_put_event(&response);
+    return fwk_put_event(&response);
 }
 
 static int mod_debug_process_event(const struct fwk_event *event,

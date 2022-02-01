@@ -1,12 +1,12 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef FWK_INTERNAL_THREAD_DELAYED_RESP_H
-#define FWK_INTERNAL_THREAD_DELAYED_RESP_H
+#ifndef FWK_INTERNAL_DELAYED_RESP_H
+#define FWK_INTERNAL_DELAYED_RESP_H
 
 #include <fwk_id.h>
 
@@ -23,7 +23,7 @@
  *
  * \return A pointer to the list of delayed responses.
  */
-struct fwk_slist *__fwk_thread_get_delayed_response_list(fwk_id_t id);
+struct fwk_slist *__fwk_get_delayed_response_list(fwk_id_t id);
 
 /*!
  * \internal
@@ -39,8 +39,6 @@ struct fwk_slist *__fwk_thread_get_delayed_response_list(fwk_id_t id);
  *
  * \return A pointer to the delayed response event, \c NULL if not found.
  */
-struct fwk_event *__fwk_thread_search_delayed_response(
-    fwk_id_t id,
-    uint32_t cookie);
+struct fwk_event *__fwk_search_delayed_response(fwk_id_t id, uint32_t cookie);
 
-#endif /* FWK_INTERNAL_THREAD_DELAYED_RESP_H */
+#endif /* FWK_INTERNAL_DELAYED_RESP_H */
