@@ -11,6 +11,7 @@
 #include <mod_power_domain.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_log.h>
@@ -20,7 +21,6 @@
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 #include <inttypes.h>
 #include <stdbool.h>
@@ -746,8 +746,7 @@ static void respond(struct pd_ctx *pd, int resp_status)
         return;
     }
 
-    status = fwk_thread_get_delayed_response(
-        pd->id, pd->response.cookie, &resp_event);
+    status = fwk_get_delayed_response(pd->id, pd->response.cookie, &resp_event);
     pd->response.pending = false;
 
     if (status != FWK_SUCCESS) {
@@ -757,7 +756,7 @@ static void respond(struct pd_ctx *pd, int resp_status)
     resp_params->composite_state = req_params->composite_state;
     resp_params->status = resp_status;
 
-    status = fwk_thread_put_event(&resp_event);
+    status = fwk_put_event(&resp_event);
     if (status != FWK_SUCCESS) {
         FWK_LOG_TRACE("[PD] %s @%d", __func__, __LINE__);
     }
@@ -1357,8 +1356,10 @@ void perform_shutdown(
      * be notified.
      */
     if (resp == NULL) {
-        status = fwk_thread_get_delayed_response(fwk_module_id_power_domain,
-            mod_pd_ctx.system_shutdown.cookie, &delayed_resp);
+        status = fwk_get_delayed_response(
+            fwk_module_id_power_domain,
+            mod_pd_ctx.system_shutdown.cookie,
+            &delayed_resp);
         fwk_assert(status == FWK_SUCCESS);
 
         delayed_resp.source_id = fwk_module_id_power_domain;
@@ -1366,12 +1367,12 @@ void perform_shutdown(
         resp_params = (struct pd_response *)delayed_resp.params;
         resp_params->status = FWK_E_PANIC;
 
-        status = fwk_thread_put_event(&delayed_resp);
+        status = fwk_put_event(&delayed_resp);
     } else {
         resp_params = (struct pd_response *)resp->params;
         resp_params->status = FWK_E_PANIC;
 
-        status = fwk_thread_put_event(resp);
+        status = fwk_put_event(resp);
     }
 
     fwk_assert(status == FWK_SUCCESS);
@@ -1511,7 +1512,7 @@ static int pd_set_state(fwk_id_t pd_id, bool response_requested, uint32_t state)
 
     req_params->composite_state = state;
 
-    return fwk_thread_put_event(&req);
+    return fwk_put_event(&req);
 }
 
 static int pd_get_state(fwk_id_t pd_id, unsigned int *state)
@@ -1543,7 +1544,7 @@ static int pd_system_suspend(unsigned int state)
 
     req_params->state = state;
 
-    return fwk_thread_put_event(&req);
+    return fwk_put_event(&req);
 }
 
 static int pd_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
@@ -1561,7 +1562,7 @@ static int pd_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
 
     req_params->system_shutdown = system_shutdown;
 
-    status = fwk_thread_put_event(&req);
+    status = fwk_put_event(&req);
     if (status == FWK_SUCCESS) {
         return FWK_PENDING;
     }
@@ -1585,7 +1586,7 @@ static int pd_reset(fwk_id_t pd_id, bool response_requested)
         .response_requested = response_requested,
     };
 
-    return fwk_thread_put_event(&req);
+    return fwk_put_event(&req);
 }
 
 static int report_power_state_transition(const struct pd_ctx *pd,
@@ -1603,7 +1604,7 @@ static int report_power_state_transition(const struct pd_ctx *pd,
     };
     report_params->state = state;
 
-    return fwk_thread_put_event(&report);
+    return fwk_put_event(&report);
 }
 
 static int pd_report_power_state_transition(fwk_id_t pd_id, unsigned int state)

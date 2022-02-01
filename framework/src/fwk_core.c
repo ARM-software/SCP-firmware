@@ -5,15 +5,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
- *     Single-thread facilities.
+ *     Framework facilities.
  */
 
+#include <internal/fwk_context.h>
+#include <internal/fwk_core.h>
+#include <internal/fwk_delayed_resp.h>
 #include <internal/fwk_module.h>
-#include <internal/fwk_single_thread.h>
-#include <internal/fwk_thread.h>
-#include <internal/fwk_thread_delayed_resp.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
@@ -24,12 +25,11 @@
 #include <fwk_noreturn.h>
 #include <fwk_status.h>
 #include <fwk_string.h>
-#include <fwk_thread.h>
 
 #include <inttypes.h>
 #include <stdbool.h>
 
-static struct __fwk_thread_ctx ctx;
+static struct __fwk_ctx ctx;
 
 static const char err_msg_line[] = "[FWK] Error %d in %s @%d";
 static const char err_msg_func[] = "[FWK] Error %d in %s";
@@ -40,10 +40,10 @@ enum wait_states {
     WAITING_FOR_RESPONSE = 1,
 };
 
-enum thread_interrupt_states {
-    UNKNOWN_THREAD = 0,
-    INTERRUPT_THREAD = 1,
-    NOT_INTERRUPT_THREAD = 2,
+enum interrupt_states {
+    UNKNOWN_STATE = 0,
+    INTERRUPT_STATE = 1,
+    NOT_INTERRUPT_STATE = 2,
 };
 
 /*
@@ -101,7 +101,7 @@ static struct fwk_event *duplicate_event(
 
 static int put_event(
     void *event,
-    enum thread_interrupt_states intr_state,
+    enum interrupt_states intr_state,
     enum fwk_event_type event_type)
 {
     struct fwk_event *allocated_event;
@@ -115,7 +115,7 @@ static int put_event(
     }
 
     if (std_event != NULL && std_event->is_delayed_response) {
-        allocated_event = __fwk_thread_search_delayed_response(
+        allocated_event = __fwk_search_delayed_response(
             std_event->source_id, std_event->cookie);
         if (allocated_event == NULL) {
             FWK_LOG_CRIT(err_msg_func, FWK_E_NOMEM, __func__);
@@ -123,7 +123,7 @@ static int put_event(
         }
 
         fwk_list_remove(
-            __fwk_thread_get_delayed_response_list(std_event->source_id),
+            __fwk_get_delayed_response_list(std_event->source_id),
             &allocated_event->slist_node);
 
         (void)memcpy(
@@ -143,15 +143,15 @@ static int put_event(
         std_event->cookie = allocated_event->cookie;
     }
 
-    if (intr_state == UNKNOWN_THREAD) {
+    if (intr_state == UNKNOWN_STATE) {
         status = fwk_interrupt_get_current(&interrupt);
         if (status != FWK_SUCCESS) {
-            intr_state = NOT_INTERRUPT_THREAD;
+            intr_state = NOT_INTERRUPT_STATE;
         } else {
-            intr_state = INTERRUPT_THREAD;
+            intr_state = INTERRUPT_STATE;
         }
     }
-    if (intr_state == NOT_INTERRUPT_THREAD) {
+    if (intr_state == NOT_INTERRUPT_STATE) {
         fwk_list_push_tail(&ctx.event_queue, &allocated_event->slist_node);
     } else {
         fwk_list_push_tail(&ctx.isr_event_queue, &allocated_event->slist_node);
@@ -216,13 +216,13 @@ static void process_next_event(void)
         async_response_event.response_requested = false;
         if (!async_response_event.is_delayed_response) {
             (void)put_event(
-                &async_response_event, UNKNOWN_THREAD, FWK_EVENT_TYPE_STD);
+                &async_response_event, UNKNOWN_STATE, FWK_EVENT_TYPE_STD);
         } else {
             allocated_event =
                 duplicate_event(&async_response_event, FWK_EVENT_TYPE_STD);
             if (allocated_event != NULL) {
                 fwk_list_push_tail(
-                    __fwk_thread_get_delayed_response_list(
+                    __fwk_get_delayed_response_list(
                         async_response_event.source_id),
                     &allocated_event->slist_node);
             }
@@ -274,7 +274,7 @@ static bool process_isr(void)
  * Private interface functions
  */
 
-int __fwk_thread_init(size_t event_count)
+int __fwk_init(size_t event_count)
 {
     struct fwk_event *event_table, *event;
 
@@ -294,7 +294,7 @@ int __fwk_thread_init(size_t event_count)
     return FWK_SUCCESS;
 }
 
-noreturn void __fwk_thread_run(void)
+noreturn void __fwk_run(void)
 {
     for (;;) {
         while (!fwk_list_is_empty(&ctx.event_queue)) {
@@ -309,23 +309,23 @@ noreturn void __fwk_thread_run(void)
     }
 }
 
-struct __fwk_thread_ctx *__fwk_thread_get_ctx(void)
+struct __fwk_ctx *__fwk_get_ctx(void)
 {
     return &ctx;
 }
 
-const struct fwk_event *__fwk_thread_get_current_event(void)
+const struct fwk_event *__fwk_get_current_event(void)
 {
     return ctx.current_event;
 }
 
 #ifdef BUILD_HAS_NOTIFICATION
-int __fwk_thread_put_notification(struct fwk_event *event)
+int __fwk_put_notification(struct fwk_event *event)
 {
     event->is_response = false;
     event->is_notification = true;
 
-    return put_event(event, UNKNOWN_THREAD, FWK_EVENT_TYPE_STD);
+    return put_event(event, UNKNOWN_STATE, FWK_EVENT_TYPE_STD);
 }
 #endif
 
@@ -333,11 +333,11 @@ int __fwk_thread_put_notification(struct fwk_event *event)
  * Public interface functions
  */
 
-int __fwk_thread_put_event(struct fwk_event *event)
+int __fwk_put_event(struct fwk_event *event)
 {
     int status = FWK_E_PARAM;
     unsigned int interrupt;
-    enum thread_interrupt_states intr_state;
+    enum interrupt_states intr_state;
 
 #ifdef BUILD_MODE_DEBUG
     if (!ctx.initialized) {
@@ -352,12 +352,12 @@ int __fwk_thread_put_event(struct fwk_event *event)
 
     status = fwk_interrupt_get_current(&interrupt);
     if (status != FWK_SUCCESS) {
-        intr_state = NOT_INTERRUPT_THREAD;
+        intr_state = NOT_INTERRUPT_STATE;
     } else {
-        intr_state = INTERRUPT_THREAD;
+        intr_state = INTERRUPT_STATE;
     }
 
-    if ((intr_state == NOT_INTERRUPT_THREAD) && (ctx.current_event != NULL)) {
+    if ((intr_state == NOT_INTERRUPT_STATE) && (ctx.current_event != NULL)) {
         event->source_id = ctx.current_event->target_id;
     } else if (
         !fwk_id_type_is_valid(event->source_id) ||
@@ -407,11 +407,11 @@ error:
     return status;
 }
 
-int __fwk_thread_put_event_light(struct fwk_event_light *event)
+int __fwk_put_event_light(struct fwk_event_light *event)
 {
     int status = FWK_E_PARAM;
     unsigned int interrupt;
-    enum thread_interrupt_states intr_state;
+    enum interrupt_states intr_state;
 
 #ifdef BUILD_MODE_DEBUG
     if (!ctx.initialized) {
@@ -426,12 +426,12 @@ int __fwk_thread_put_event_light(struct fwk_event_light *event)
 
     status = fwk_interrupt_get_current(&interrupt);
     if (status != FWK_SUCCESS) {
-        intr_state = NOT_INTERRUPT_THREAD;
+        intr_state = NOT_INTERRUPT_STATE;
     } else {
-        intr_state = INTERRUPT_THREAD;
+        intr_state = INTERRUPT_STATE;
     }
 
-    if ((intr_state == NOT_INTERRUPT_THREAD) && (ctx.current_event != NULL)) {
+    if ((intr_state == NOT_INTERRUPT_STATE) && (ctx.current_event != NULL)) {
         event->source_id = ctx.current_event->target_id;
     } else if (
         !fwk_id_type_is_valid(event->source_id) ||

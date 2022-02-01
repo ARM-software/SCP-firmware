@@ -1,19 +1,19 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include <mod_bootloader.h>
 
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_log.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 struct mod_isys_rom_ctx {
     const struct mod_bootloader_api *bootloader_api;
@@ -58,7 +58,7 @@ static int mod_isys_rom_start(fwk_id_t id)
         .id = FWK_ID_EVENT(FWK_MODULE_IDX_ISYS_ROM, MOD_ISYS_ROM_EVENT_RUN),
     };
 
-    return fwk_thread_put_event(&event);
+    return fwk_put_event(&event);
 }
 
 static int mod_isys_rom_process_event(

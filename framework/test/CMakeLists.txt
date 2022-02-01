@@ -74,34 +74,34 @@ list(APPEND SCP_FWK_TEST_TARGETS test_fwk_notification)
 list(APPEND SCP_FWK_TEST_TARGETS test_fwk_ring)
 list(APPEND SCP_FWK_TEST_TARGETS test_fwk_ring_init)
 list(APPEND SCP_FWK_TEST_TARGETS test_fwk_string)
-list(APPEND SCP_FWK_TEST_TARGETS test_fwk_thread)
+list(APPEND SCP_FWK_TEST_TARGETS test_fwk_core)
 
 # Create a list of the tests that need notifications.
 list(APPEND NOTIFICATION_ENABLED_TEST test_fwk_module test_fwk_notification
-     test_fwk_thread)
+     test_fwk_core)
 
 # Some test may need its own implementation of some of the function
 # for testing purpose. Create a list per test of these functions.
 list(APPEND test_fwk_module_WRAP __fwk_notification_init)
-list(APPEND test_fwk_module_WRAP __fwk_thread_init)
-list(APPEND test_fwk_module_WRAP __fwk_thread_run)
+list(APPEND test_fwk_module_WRAP __fwk_init)
+list(APPEND test_fwk_module_WRAP __fwk_run)
 list(APPEND test_fwk_module_WRAP fwk_mm_calloc)
 
-list(APPEND test_fwk_thread_WRAP fwk_module_get_ctx)
-list(APPEND test_fwk_thread_WRAP fwk_module_get_element_ctx)
-list(APPEND test_fwk_thread_WRAP __fwk_slist_push_tail)
-list(APPEND test_fwk_thread_WRAP fwk_mm_calloc)
-list(APPEND test_fwk_thread_WRAP fwk_interrupt_get_current)
-list(APPEND test_fwk_thread_WRAP fwk_interrupt_global_disable)
-list(APPEND test_fwk_thread_WRAP fwk_interrupt_global_enable)
-list(APPEND test_fwk_thread_WRAP fwk_module_is_valid_entity_id)
-list(APPEND test_fwk_thread_WRAP fwk_module_is_valid_event_id)
-list(APPEND test_fwk_thread_WRAP fwk_module_is_valid_notification_id)
+list(APPEND test_fwk_core_WRAP fwk_module_get_ctx)
+list(APPEND test_fwk_core_WRAP fwk_module_get_element_ctx)
+list(APPEND test_fwk_core_WRAP __fwk_slist_push_tail)
+list(APPEND test_fwk_core_WRAP fwk_mm_calloc)
+list(APPEND test_fwk_core_WRAP fwk_interrupt_get_current)
+list(APPEND test_fwk_core_WRAP fwk_interrupt_global_disable)
+list(APPEND test_fwk_core_WRAP fwk_interrupt_global_enable)
+list(APPEND test_fwk_core_WRAP fwk_module_is_valid_entity_id)
+list(APPEND test_fwk_core_WRAP fwk_module_is_valid_event_id)
+list(APPEND test_fwk_core_WRAP fwk_module_is_valid_notification_id)
 
 list(APPEND test_fwk_notification_WRAP fwk_module_get_ctx)
 list(APPEND test_fwk_notification_WRAP fwk_module_get_element_ctx)
-list(APPEND test_fwk_notification_WRAP __fwk_thread_get_current_event)
-list(APPEND test_fwk_notification_WRAP __fwk_thread_put_notification)
+list(APPEND test_fwk_notification_WRAP __fwk_get_current_event)
+list(APPEND test_fwk_notification_WRAP __fwk_put_notification)
 list(APPEND test_fwk_notification_WRAP fwk_mm_calloc)
 list(APPEND test_fwk_notification_WRAP fwk_interrupt_get_current)
 list(APPEND test_fwk_notification_WRAP fwk_interrupt_global_disable)
@@ -127,7 +127,7 @@ list(APPEND COMMON_SRC ${FWK_SRC_ROOT}/fwk_ring.c)
 list(APPEND COMMON_SRC ${FWK_SRC_ROOT}/fwk_slist.c)
 list(APPEND COMMON_SRC ${FWK_SRC_ROOT}/fwk_string.c)
 list(APPEND COMMON_SRC ${FWK_TEST_SRC_ROOT}/fwk_test.c)
-list(APPEND COMMON_SRC ${FWK_SRC_ROOT}/fwk_thread_delayed_resp.c)
+list(APPEND COMMON_SRC ${FWK_SRC_ROOT}/fwk_delayed_resp.c)
 list(APPEND COMMON_SRC ${FWK_SRC_ROOT}/fwk_time.c)
 
 # CMake internal function enables testing for this directory
@@ -161,7 +161,7 @@ foreach(idx RANGE ${SCP_FWK_TEST_MAX})
 
     target_sources(${TEST_TARGET} PRIVATE ${COMMON_SRC})
 
-    target_sources(${TEST_TARGET} PRIVATE ${FWK_SRC_ROOT}/fwk_thread.c)
+    target_sources(${TEST_TARGET} PRIVATE ${FWK_SRC_ROOT}/fwk_core.c)
 
 
     # Check whether this test need notification support

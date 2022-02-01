@@ -14,6 +14,7 @@
 #include <mod_timer.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_log.h>
@@ -21,7 +22,6 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -214,7 +214,7 @@ static void alarm_callback(uintptr_t param)
         .id = juno_xrp7724_event_id_request,
     };
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     fwk_assert(status == FWK_SUCCESS);
 }
 
@@ -237,7 +237,7 @@ static int juno_xrp7724_shutdown(void)
     /* Select the mode to perform a shutdown */
     module_ctx.gpio_request = JUNO_XRP7724_GPIO_REQUEST_MODE_SHUTDOWN;
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     if (status == FWK_SUCCESS) {
         return FWK_PENDING;
     }
@@ -265,7 +265,7 @@ static int juno_xrp7724_reset(void)
      */
     module_ctx.gpio_request = JUNO_XRP7724_GPIO_REQUEST_ASSERT_COLD_RESET;
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     if (status == FWK_SUCCESS) {
         return FWK_PENDING;
     }
@@ -297,7 +297,7 @@ static int juno_xrp7724_sensor_get_value(fwk_id_t id, uint64_t *value)
 
     module_ctx.sensor_request = JUNO_XRP7724_SENSOR_REQUEST_READ_VALUE;
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     if (status != FWK_SUCCESS) {
         module_ctx.sensor_request = JUNO_XRP7724_SENSOR_REQUEST_IDLE;
         return status;
@@ -353,7 +353,7 @@ static int juno_xrp7724_set_enabled(fwk_id_t id, bool enabled)
 
     param->enabled = enabled;
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     if (status != FWK_SUCCESS) {
         return status;
     }
@@ -437,7 +437,7 @@ static int juno_xrp7724_set_voltage(fwk_id_t id, uint32_t voltage)
     param->set_value = set_value;
     param->voltage = voltage;
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     if (status != FWK_SUCCESS) {
         return status;
     }
@@ -476,7 +476,7 @@ static int juno_xrp7724_get_voltage(fwk_id_t id, uint32_t *voltage)
         .id = juno_xrp7724_event_id_request,
     };
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     if (status != FWK_SUCCESS) {
         return status;
     }
@@ -735,12 +735,12 @@ static int juno_xrp7724_gpio_process_request(fwk_id_t id, int response_status)
 
     module_ctx.gpio_request = JUNO_XRP7724_GPIO_REQUEST_IDLE;
 
-    status = fwk_thread_get_delayed_response(id, ctx->cookie, &resp_event);
+    status = fwk_get_delayed_response(id, ctx->cookie, &resp_event);
     if (status != FWK_SUCCESS) {
         return FWK_E_PANIC;
     }
 
-    return fwk_thread_put_event(&resp_event);
+    return fwk_put_event(&resp_event);
 }
 
 static int juno_xrp7724_sensor_process_request(fwk_id_t id, int status)

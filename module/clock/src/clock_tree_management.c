@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -11,6 +11,7 @@
 #    include <mod_clock.h>
 
 #    include <fwk_assert.h>
+#    include <fwk_core.h>
 #    include <fwk_event.h>
 #    include <fwk_id.h>
 #    include <fwk_list.h>
@@ -19,7 +20,6 @@
 #    include <fwk_module.h>
 #    include <fwk_notification.h>
 #    include <fwk_status.h>
-#    include <fwk_thread.h>
 
 #    include <stdbool.h>
 #    include <stddef.h>
@@ -37,7 +37,7 @@ static int clk_mgmt_send_event_set(
     };
     memcpy(event.params, params, sizeof(struct clock_set_state_params));
 
-    return fwk_thread_put_event(&event);
+    return fwk_put_event(&event);
 }
 
 static int clk_mgmt_send_event_rate(
@@ -52,7 +52,7 @@ static int clk_mgmt_send_event_rate(
     };
     memcpy(event.params, params, sizeof(struct clock_set_rate_params));
 
-    return fwk_thread_put_event(&event);
+    return fwk_put_event(&event);
 }
 
 static int clk_mgmt_complete_response(

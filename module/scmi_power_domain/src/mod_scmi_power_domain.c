@@ -15,6 +15,7 @@
 #include <mod_scmi_power_domain.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_log.h>
@@ -25,7 +26,6 @@
 #include <fwk_notification.h>
 #include <fwk_status.h>
 #include <fwk_string.h>
-#include <fwk_thread.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -626,7 +626,7 @@ static int scmi_pd_power_state_set_handler(
     event_params = (struct event_request_params *)event.params;
     event_params->pd_id = pd_id;
     event_params->pd_power_state = power_state;
-    return fwk_thread_put_event(&event);
+    return fwk_put_event(&event);
 }
 
 static int scmi_pd_power_state_get_handler(fwk_id_t service_id,
@@ -683,7 +683,7 @@ static int scmi_pd_power_state_get_handler(fwk_id_t service_id,
 
         event_params->pd_id = pd_id;
 
-        status = fwk_thread_put_event(&event);
+        status = fwk_put_event(&event);
         if (status != FWK_SUCCESS) {
             break;
         }

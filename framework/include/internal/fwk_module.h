@@ -41,10 +41,7 @@ struct fwk_module_context {
     /* Table of element contexts */
     struct fwk_element_ctx *element_ctx_table;
 
-    /* Module thread context */
-    struct __fwk_thread_ctx *thread_ctx;
-
-    #ifdef BUILD_HAS_NOTIFICATION
+#ifdef BUILD_HAS_NOTIFICATION
     /*
      * Table of notification subscription lists. One list per type of
      * notification defined by the module.
@@ -69,10 +66,7 @@ struct fwk_element_ctx {
     /* Number of sub-elements */
     size_t sub_element_count;
 
-    /* Element thread context */
-    struct __fwk_thread_ctx *thread_ctx;
-
-    #ifdef BUILD_HAS_NOTIFICATION
+#ifdef BUILD_HAS_NOTIFICATION
     /*
      * Table of notification subscription lists. One list per type of
      * notification defined by the element's module.

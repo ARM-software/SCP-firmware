@@ -5,13 +5,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
- *    Thread definitions.
+ *    Framework core definitions.
  */
 
-#ifndef FWK_THREAD_H
-#define FWK_THREAD_H
+#ifndef FWK_CORE_H
+#define FWK_CORE_H
 
-#include <internal/fwk_thread.h>
+#include <internal/fwk_core.h>
 
 #include <fwk_event.h>
 #include <fwk_id.h>
@@ -25,7 +25,7 @@
  */
 
 /*!
- * \defgroup GroupThread Threading
+ * \defgroup GroupFwkCore Core
  *
  * \{
  */
@@ -36,11 +36,10 @@
  * \details The framework copies the event description into its internal data
  *      and so does not keep track of the pointer passed as a parameter.
  *
- *      If the function is called from a thread the event is put into the
- *      targeted thread queue. Furthermore, in the runtime phase, the source
- *      identifier of the event is populated with the identifier of the caller,
- *      and it is therefore unnecessary for the caller to do so manually. Note
- *      that this does not occur in the pre-runtime phase.
+ *      In the runtime phase, the source identifier of the event is populated
+ *      with the identifier of the caller, and it is therefore unnecessary for
+ *      the caller to do so manually. Note that this does not occur in the
+ *      pre-runtime phase.
  *
  *      If the function is called from an ISR, the event is put in the ISR
  *      event queue.
@@ -55,7 +54,7 @@
  * \param[in] event Pointer to the event to queue. Must not be \c NULL.
  *
  * \retval ::FWK_SUCCESS The event was queued.
- * \retval ::FWK_E_INIT The thread framework component is not initialized.
+ * \retval ::FWK_E_INIT The core framework component is not initialized.
  * \retval ::FWK_E_PARAM An invalid parameter was encountered:
  *      - The `event` parameter was a null pointer value.
  *      - One or more fields of the event were invalid.
@@ -63,10 +62,10 @@
  *
  * \return Status code representing the result of the operation.
  */
-#define fwk_thread_put_event(event) \
+#define fwk_put_event(event) \
     _Generic((event), struct fwk_event * \
-             : __fwk_thread_put_event, struct fwk_event_light * \
-             : __fwk_thread_put_event_light)(event)
+             : __fwk_put_event, struct fwk_event_light * \
+             : __fwk_put_event_light)(event)
 
 /*!
  * \brief Get a copy of a delayed response event.
@@ -91,7 +90,7 @@
  *
  * \return Status code representing the result of the operation.
  */
-int fwk_thread_get_delayed_response(
+int fwk_get_delayed_response(
     fwk_id_t id,
     uint32_t cookie,
     struct fwk_event *event);
@@ -116,7 +115,7 @@ int fwk_thread_get_delayed_response(
  *
  * \return Status code representing the result of the operation.
  */
-int fwk_thread_is_delayed_response_list_empty(fwk_id_t id, bool *is_empty);
+int fwk_is_delayed_response_list_empty(fwk_id_t id, bool *is_empty);
 
 /*!
  * \brief Get a copy of the first delayed response event in the list of
@@ -141,7 +140,7 @@ int fwk_thread_is_delayed_response_list_empty(fwk_id_t id, bool *is_empty);
  *
  * \return Status code representing the result of the operation.
  */
-int fwk_thread_get_first_delayed_response(fwk_id_t id, struct fwk_event *event);
+int fwk_get_first_delayed_response(fwk_id_t id, struct fwk_event *event);
 
 /*!
  * \}
@@ -150,4 +149,4 @@ int fwk_thread_get_first_delayed_response(fwk_id_t id, struct fwk_event *event);
 /*!
  * \}
  */
-#endif /* FWK_THREAD_H */
+#endif /* FWK_CORE_H */

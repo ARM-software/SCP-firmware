@@ -16,6 +16,7 @@
 #include <mod_scmi_header.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_log.h>
@@ -26,7 +27,6 @@
 #include <fwk_notification.h>
 #include <fwk_status.h>
 #include <fwk_string.h>
-#include <fwk_thread.h>
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 #    include <mod_resource_perms.h>
@@ -291,7 +291,7 @@ static int signal_message(fwk_id_t service_id)
         .target_id = service_id,
     };
 
-    return fwk_thread_put_event(&event);
+    return fwk_put_event(&event);
 }
 
 static const struct mod_scmi_from_transport_api scmi_from_transport_api = {

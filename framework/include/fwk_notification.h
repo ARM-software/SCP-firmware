@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -75,11 +75,10 @@ int fwk_notification_unsubscribe(fwk_id_t notification_id, fwk_id_t source_id,
 /*!
  * \brief Send a notification to all entities that are subscribed to it.
  *
- * \note During the runtime phase, if called from a thread and if the source
- *      identifier of the notification event is not a valid entity identifier,
- *      the event source identifier is populated automatically by the framework
- *      with the identifier of the entity target of the event being currently
- *      processed.
+ * \note During the runtime phase, if the source identifier of the notification
+ *      event is not a valid entity identifier, the event source identifier is
+ *      populated automatically by the framework with the identifier of the
+ *      entity target of the event being currently processed.
  *
  * \param notification_event Pointer to the notification event. Must not be
  *      \c NULL.

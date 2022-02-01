@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef FWK_INTERNAL_SINGLE_THREAD_H
-#define FWK_INTERNAL_SINGLE_THREAD_H
+#ifndef FWK_INTERNAL_CONTEXT_H
+#define FWK_INTERNAL_CONTEXT_H
 
 #include <fwk_event.h>
 #include <fwk_list.h>
@@ -14,11 +14,11 @@
 #include <stdbool.h>
 
 /*
- * Thread component context. Exposed for testing purposes only.
+ * Context component context. Exposed for testing purposes only.
  */
 
-struct __fwk_thread_ctx {
-    /* Thread framework component initialization completed flag */
+struct __fwk_ctx {
+    /* Core framework component initialization completed flag */
     bool initialized;
 
     /*
@@ -43,10 +43,10 @@ struct __fwk_thread_ctx {
 };
 
 /*
- * \brief Get thread component context.
+ * \brief Get component context.
  *
  * \note Only for testing.
  */
-struct __fwk_thread_ctx *__fwk_thread_get_ctx(void);
+struct __fwk_ctx *__fwk_get_ctx(void);
 
-#endif /* FWK_INTERNAL_SINGLE_THREAD_H */
+#endif /* FWK_INTERNAL_CONTEXT_H */

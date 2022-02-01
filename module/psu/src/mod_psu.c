@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -8,6 +8,7 @@
 #include <mod_psu.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_mm.h>
@@ -15,7 +16,6 @@
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
 #include <fwk_string.h>
-#include <fwk_thread.h>
 
 enum mod_psu_state {
     MOD_PSU_STATE_IDLE,
@@ -99,7 +99,7 @@ static int mod_psu_get_enabled(fwk_id_t element_id, bool *enabled)
             .response_requested = true,
         };
 
-        status = fwk_thread_put_event(&request);
+        status = fwk_put_event(&request);
         if (status == FWK_SUCCESS) {
             ctx->op.state = MOD_PSU_STATE_BUSY;
 
@@ -142,7 +142,7 @@ static int mod_psu_set_enabled(fwk_id_t element_id, bool enabled)
             .response_requested = true,
         };
 
-        status = fwk_thread_put_event(&request);
+        status = fwk_put_event(&request);
         if (status == FWK_SUCCESS) {
             ctx->op.state = MOD_PSU_STATE_BUSY;
 
@@ -185,7 +185,7 @@ static int mod_psu_get_voltage(fwk_id_t element_id, uint32_t *voltage)
             .response_requested = true,
         };
 
-        status = fwk_thread_put_event(&request);
+        status = fwk_put_event(&request);
         if (status == FWK_SUCCESS) {
             ctx->op.state = MOD_PSU_STATE_BUSY;
 
@@ -228,7 +228,7 @@ static int mod_psu_set_voltage(fwk_id_t element_id, uint32_t voltage)
             .response_requested = true,
         };
 
-        status = fwk_thread_put_event(&request);
+        status = fwk_put_event(&request);
         if (status == FWK_SUCCESS) {
             ctx->op.state = MOD_PSU_STATE_BUSY;
 
@@ -276,7 +276,7 @@ static void mod_psu_respond(
 
     fwk_str_memcpy(event.params, &response, sizeof(response));
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     if (!fwk_expect(status == FWK_SUCCESS)) {
         ctx->op.state = MOD_PSU_STATE_IDLE;
     }
@@ -430,10 +430,8 @@ static int mod_psu_process_event(
     case (unsigned int)MOD_PSU_IMPL_EVENT_IDX_RESPONSE:
         ctx->op.state = MOD_PSU_STATE_IDLE;
 
-        status = fwk_thread_get_delayed_response(
-            event->target_id,
-            ctx->op.cookie,
-            &hal_event);
+        status = fwk_get_delayed_response(
+            event->target_id, ctx->op.cookie, &hal_event);
         if (status != FWK_SUCCESS) {
             return status;
         }
@@ -460,7 +458,7 @@ static int mod_psu_process_event(
             break;
         }
 
-        status = fwk_thread_put_event(&hal_event);
+        status = fwk_put_event(&hal_event);
 
         break;
 

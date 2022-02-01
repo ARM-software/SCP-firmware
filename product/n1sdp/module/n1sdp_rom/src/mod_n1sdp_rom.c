@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -8,6 +8,7 @@
 #include <mod_fip.h>
 #include <mod_n1sdp_rom.h>
 
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
@@ -15,7 +16,6 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 #include <fmw_cmsis.h>
 
@@ -105,7 +105,7 @@ static int n1sdp_rom_start(fwk_id_t id)
         .id = FWK_ID_EVENT(FWK_MODULE_IDX_N1SDP_ROM, ROM_EVENT_RUN),
     };
 
-    return fwk_thread_put_event(&event);
+    return fwk_put_event(&event);
 }
 
 static const char *get_image_type_str(enum mod_fip_toc_entry_type type)

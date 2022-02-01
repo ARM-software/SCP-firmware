@@ -21,12 +21,12 @@
 #include <mod_timer.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_interrupt.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 #include <fmw_cmsis.h>
 
@@ -271,7 +271,7 @@ static int enable_debug(fwk_id_t id, enum scp_debug_user user_id)
             .id = juno_debug_event_submit_request,
         };
 
-        status = fwk_thread_put_event(&req);
+        status = fwk_put_event(&req);
         if (status != FWK_SUCCESS) {
             return status;
         }

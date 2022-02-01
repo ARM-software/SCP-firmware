@@ -1,18 +1,19 @@
 /*
  * Renesas SCP/MCP Software
- * Copyright (c) 2020-2021, Renesas Electronics Corporation. All rights
+ * Copyright (c) 2020-2022, Renesas Electronics Corporation. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include <mod_rcar_pmic_private.h>
+
 #include <mod_psu.h>
 
+#include <fwk_core.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <fwk_thread.h>
 
 static int api_get_enabled(fwk_id_t device_id, bool *enabled)
 {

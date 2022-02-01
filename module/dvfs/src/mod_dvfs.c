@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -12,6 +12,7 @@
 #include <mod_timer.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
@@ -20,7 +21,6 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 #include <stdbool.h>
 
@@ -231,7 +231,7 @@ static int put_event_request(
 
     ctx->state = state;
 
-    return fwk_thread_put_event(&req);
+    return fwk_put_event(&req);
 }
 
 static void dvfs_cleanup_request(struct mod_dvfs_domain_ctx *ctx)
@@ -308,7 +308,7 @@ static void alarm_callback(uintptr_t param)
         .response_requested = ctx->pending_request.response_required,
     };
 
-    status = fwk_thread_put_event(&req);
+    status = fwk_put_event(&req);
     if (status != FWK_SUCCESS) {
         FWK_LOG_TRACE("[DVFS] %s @%d", __func__, __LINE__);
     }
@@ -608,7 +608,7 @@ static void dvfs_complete_respond(
          * with the data.
          */
         resp_params = (struct mod_dvfs_params_response *)&read_req_event.params;
-        status = fwk_thread_get_delayed_response(
+        status = fwk_get_delayed_response(
             ctx->domain_id, ctx->cookie, &read_req_event);
 
         if (status == FWK_SUCCESS) {
@@ -616,7 +616,7 @@ static void dvfs_complete_respond(
             if (return_opp) {
                 resp_params->performance_level = ctx->current_opp.level;
             }
-            status = fwk_thread_put_event(&read_req_event);
+            status = fwk_put_event(&read_req_event);
             if (status != FWK_SUCCESS) {
                 FWK_LOG_TRACE("[DVFS] %s @%d", __func__, __LINE__);
             }

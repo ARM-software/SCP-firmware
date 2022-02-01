@@ -16,6 +16,7 @@
 
 #include <fwk_assert.h>
 #include <fwk_attributes.h>
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_log.h>
@@ -25,7 +26,6 @@
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
 #include <fwk_string.h>
-#include <fwk_thread.h>
 
 #include <stdbool.h>
 
@@ -760,7 +760,7 @@ static int create_event_request(
 
     params->clock_dev_id = clock_id;
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     if (status != FWK_SUCCESS) {
         return status;
     }

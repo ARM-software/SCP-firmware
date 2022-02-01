@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -19,6 +19,7 @@
 #include <mod_system_power.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_macros.h>
@@ -26,7 +27,6 @@
 #include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 #include <fmw_cmsis.h>
 
@@ -361,14 +361,14 @@ static int juno_system_process_event(
         /*
          * Respond to the notification so the GPU power domain can be turned on
          */
-        status = fwk_thread_get_delayed_response(
+        status = fwk_get_delayed_response(
             fwk_module_id_juno_system, juno_system_ctx.psu_ctx.cookie, &resp);
         if (status != FWK_SUCCESS) {
             return status;
         }
 
         pd_resp_params->status = psu_params->status;
-        return fwk_thread_put_event(&resp);
+        return fwk_put_event(&resp);
     }
 
     return FWK_E_PARAM;

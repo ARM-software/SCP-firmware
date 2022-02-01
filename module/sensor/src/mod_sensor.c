@@ -13,6 +13,7 @@
 #include <mod_sensor.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_mm.h>
@@ -20,7 +21,6 @@
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
 #include <fwk_string.h>
-#include <fwk_thread.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -188,7 +188,7 @@ static int get_data(fwk_id_t id, struct mod_sensor_data *data)
     /* Save data address to copy return values in there */
     event_params->sensor_data = data;
 
-    status = fwk_thread_put_event(&req);
+    status = fwk_put_event(&req);
     if (status != FWK_SUCCESS) {
         return status;
     }
@@ -343,7 +343,7 @@ static void reading_complete(fwk_id_t dev_id,
 
     ctx->concurrency_readings.dequeuing = true;
 
-    status = fwk_thread_put_event(&event);
+    status = fwk_put_event(&event);
     fwk_assert(status == FWK_SUCCESS);
 }
 
@@ -515,7 +515,7 @@ static int process_pending_requests(
         (struct mod_sensor_event_params *)delayed_response.params;
     struct sensor_dev_ctx *ctx;
 
-    status = fwk_thread_is_delayed_response_list_empty(dev_id, &list_is_empty);
+    status = fwk_is_delayed_response_list_empty(dev_id, &list_is_empty);
     if (status != FWK_SUCCESS) {
         return status;
     }
@@ -524,21 +524,19 @@ static int process_pending_requests(
 
     for (; !list_is_empty && ctx->concurrency_readings.pending_requests > 0;
          ctx->concurrency_readings.pending_requests--) {
-        status =
-            fwk_thread_get_first_delayed_response(dev_id, &delayed_response);
+        status = fwk_get_first_delayed_response(dev_id, &delayed_response);
         if (status != FWK_SUCCESS) {
             return status;
         }
 
         sensor_data_copy(response_params->sensor_data, &ctx->last_read);
 
-        status = fwk_thread_put_event(&delayed_response);
+        status = fwk_put_event(&delayed_response);
         if (status != FWK_SUCCESS) {
             return status;
         }
 
-        status =
-            fwk_thread_is_delayed_response_list_empty(dev_id, &list_is_empty);
+        status = fwk_is_delayed_response_list_empty(dev_id, &list_is_empty);
         if (status != FWK_SUCCESS) {
             return status;
         }
@@ -582,9 +580,8 @@ static int sensor_process_event(const struct fwk_event *event,
         return FWK_SUCCESS;
 
     case SENSOR_EVENT_IDX_READ_COMPLETE:
-        status = fwk_thread_get_delayed_response(event->target_id,
-                                                 ctx->cookie,
-                                                 &read_req_event);
+        status = fwk_get_delayed_response(
+            event->target_id, ctx->cookie, &read_req_event);
         if (status != FWK_SUCCESS) {
             return status;
         }
@@ -593,7 +590,7 @@ static int sensor_process_event(const struct fwk_event *event,
             (struct mod_sensor_data *)event_params->sensor_data,
             &ctx->last_read);
 
-        status = fwk_thread_put_event(&read_req_event);
+        status = fwk_put_event(&read_req_event);
         if (status != FWK_SUCCESS) {
             return status;
         }

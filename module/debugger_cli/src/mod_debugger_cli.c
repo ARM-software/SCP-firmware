@@ -12,9 +12,9 @@
 #include <mod_timer.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
 #include <fwk_module.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 enum debugger_cli_internal_event_idx {
     DEBUGGER_CLI_INTERNAL_EVENT_IDX_ENTER_DEBUGGER,
@@ -46,7 +46,7 @@ static void alarm_callback(uintptr_t module_idx)
                 .id = debugger_cli_event_id_request
             });
 
-            status = fwk_thread_put_event(event);
+            status = fwk_put_event(event);
 
             fwk_assert(status == FWK_SUCCESS);
         }
