@@ -160,12 +160,18 @@ def main():
     results = []
 
     results.extend(code_validation(code_validations))
+    if len(list(filter(lambda x: x[1] != 0, results))):
+        print('Errors detected! Excecution stopped')
+        return analyze_results(*print_results(results))
 
     banner('Test building products')
 
     for product in products:
         build_status = start_build(product.builds)
         results.extend(wait_builds(build_status))
+        if len(list(filter(lambda x: x[1] != 0, results))):
+            print('Errors detected! Excecution stopped')
+            return analyze_results(*print_results(results))
 
     return analyze_results(*print_results(results))
 
