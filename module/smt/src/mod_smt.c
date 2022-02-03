@@ -279,6 +279,23 @@ static int smt_transmit(
     return channel_ctx->driver_api->raise_interrupt(channel_ctx->driver_id);
 }
 
+static int smt_release_channel_lock(fwk_id_t channel_id)
+{
+    /* This function will be called by the scmi module after handling a
+     * response message in order to release the channel context lock
+     * without having to call the smt_respond() function.
+     */
+    struct smt_channel_ctx *channel_ctx;
+
+    channel_ctx =
+        &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
+
+    /* Release the channel lock so that we can process the next message */
+    channel_ctx->locked = false;
+
+    return FWK_SUCCESS;
+}
+
 static const struct mod_scmi_to_transport_api smt_mod_scmi_to_transport_api = {
     .get_secure = smt_get_secure,
     .get_max_payload_size = smt_get_max_payload_size,
@@ -287,6 +304,7 @@ static const struct mod_scmi_to_transport_api smt_mod_scmi_to_transport_api = {
     .write_payload = smt_write_payload,
     .respond = smt_respond,
     .transmit = smt_transmit,
+    .release_transport_channel_lock = smt_release_channel_lock,
 };
 
 /*
