@@ -619,6 +619,15 @@ struct mod_scmi_from_protocol_api {
         const void *payload,
         size_t payload_size,
         bool request_ack_by_interrupt);
+
+    /*!
+     * \brief Handle response SCMI message
+     *
+     * \param service_id Service identifier.
+     *
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     */
+    int (*response_message_handler)(fwk_id_t service_id);
 };
 
 /*!
