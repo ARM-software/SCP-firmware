@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
+import argparse
 import check_copyright
 import check_doc
 import check_spacing
@@ -141,7 +142,11 @@ def analyze_results(success: int, total: int) -> int:
     return 1 if success < total else 0
 
 
-def main():
+def check_errors(ignore_errors: bool, results: List[Tuple[str,int]]) -> bool:
+    return not ignore_errors and len(list(filter(lambda x: x[1] != 0, results)))
+
+
+def main(ignore_errors: bool):
     # This code is only applicable if there is valid docker instance
     # On CI there is no docker instance at the moment
     try:
@@ -160,7 +165,7 @@ def main():
     results = []
 
     results.extend(code_validation(code_validations))
-    if len(list(filter(lambda x: x[1] != 0, results))):
+    if check_errors(ignore_errors, results):
         print('Errors detected! Excecution stopped')
         return analyze_results(*print_results(results))
 
@@ -169,12 +174,24 @@ def main():
     for product in products:
         build_status = start_build(product.builds)
         results.extend(wait_builds(build_status))
-        if len(list(filter(lambda x: x[1] != 0, results))):
+        if check_errors(ignore_errors, results):
             print('Errors detected! Excecution stopped')
             return analyze_results(*print_results(results))
 
     return analyze_results(*print_results(results))
 
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Perform basic checks to SCP-Firmware and build for all \
+                     supported platforms, modes and compilers.')
+
+    parser.add_argument('-i', '--ignore-errors', dest='ignore_errors',
+                        required=False, default=False, action='store_true',
+                        help='Ignore errors and continue testing.')
+
+    return parser.parse_args()
+
 
 if __name__ == "__main__":
-    sys.exit(main())
+    args = parse_args()
+    sys.exit(main(args.ignore_errors))
