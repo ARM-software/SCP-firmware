@@ -307,6 +307,15 @@ struct mod_scmi_to_transport_api {
         const void *payload,
         size_t size,
         bool request_ack_by_interrupt);
+
+    /*!
+     * \brief Release the transport channel context lock.
+     *
+     * \param channel_id Transport channel identifier.
+     *
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     */
+    int (*release_transport_channel_lock)(fwk_id_t channel_id);
 };
 
 /*!
