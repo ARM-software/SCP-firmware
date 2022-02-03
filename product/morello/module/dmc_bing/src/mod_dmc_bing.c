@@ -1105,9 +1105,9 @@ int dmc_bing_pre_phy_init(struct mod_dmc_bing_reg *dmc)
             status);
         return status;
     }
-    dmc->ADDRESS_CONTROL_NEXT = value;
-    /* CID, Rank, Row, Bank */
-    dmc->DECODE_CONTROL_NEXT = 0x001C2800;
+    dmc->ADDRESS_CONTROL_NEXT = value | DMC_ADDR_CTLR_BANK_HASH_ENABLE;
+    /* CID, Row, Rank, Bank */
+    dmc->DECODE_CONTROL_NEXT = 0x00142C10;
 
     value = 0;
     status = dimm_spd_format_control(&value);
