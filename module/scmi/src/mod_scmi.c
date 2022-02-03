@@ -522,6 +522,20 @@ int scmi_send_message(
         request_ack_by_interrupt);
 };
 
+int response_message_handler(fwk_id_t service_id)
+{
+    int status;
+    const struct scmi_service_ctx *ctx;
+
+    ctx = &scmi_ctx.service_ctx_table[fwk_id_get_element_idx(service_id)];
+
+    /* release the tranport channel lock */
+    status =
+        ctx->transport_api->release_transport_channel_lock(ctx->transport_id);
+
+    return status;
+}
+
 static const struct mod_scmi_from_protocol_api scmi_from_protocol_api = {
     .get_agent_count = get_agent_count,
     .get_agent_id = get_agent_id,
@@ -531,6 +545,7 @@ static const struct mod_scmi_from_protocol_api scmi_from_protocol_api = {
     .respond = respond,
     .notify = scmi_notify,
     .scmi_send_message = scmi_send_message,
+    .response_message_handler = response_message_handler,
 };
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
