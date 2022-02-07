@@ -24,7 +24,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-static struct clock_ctx module_ctx;
+static struct clock_ctx mod_clock_ctx;
 
 /*
  * Utility functions
@@ -40,7 +40,8 @@ static int process_response_event(const struct fwk_event *event)
     struct mod_clock_resp_params *resp_params =
         (struct mod_clock_resp_params *)resp_event.params;
 
-    ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(event->target_id)];
+    ctx =
+        &mod_clock_ctx.dev_ctx_table[fwk_id_get_element_idx(event->target_id)];
 
     status = fwk_get_delayed_response(
         event->target_id, ctx->request.cookie, &resp_event);
@@ -60,7 +61,8 @@ static int process_request_event(const struct fwk_event *event,
 {
     struct clock_dev_ctx *ctx;
 
-    ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(event->target_id)];
+    ctx =
+        &mod_clock_ctx.dev_ctx_table[fwk_id_get_element_idx(event->target_id)];
 
     ctx->request.cookie = event->cookie;
     resp_event->is_delayed_response = true;
@@ -100,7 +102,7 @@ void clock_get_ctx(fwk_id_t clock_id, struct clock_dev_ctx **ctx)
 {
     fwk_assert(fwk_module_is_valid_element_id(clock_id));
 
-    *ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(clock_id)];
+    *ctx = &mod_clock_ctx.dev_ctx_table[fwk_id_get_element_idx(clock_id)];
 }
 
 /*
@@ -119,7 +121,7 @@ void clock_request_complete(
 
     fwk_assert(fwk_module_is_valid_element_id(dev_id));
 
-    ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(dev_id)];
+    ctx = &mod_clock_ctx.dev_ctx_table[fwk_id_get_element_idx(dev_id)];
 
     event = (struct fwk_event) {
         .id = mod_clock_event_id_response,
@@ -369,10 +371,10 @@ static int clock_init(fwk_id_t module_id, unsigned int element_count,
         return FWK_E_PARAM;
     }
 
-    module_ctx.config = config;
-    module_ctx.dev_ctx_table = fwk_mm_calloc(element_count,
-                                             sizeof(struct clock_dev_ctx));
-    module_ctx.dev_count = element_count;
+    mod_clock_ctx.config = config;
+    mod_clock_ctx.dev_ctx_table =
+        fwk_mm_calloc(element_count, sizeof(struct clock_dev_ctx));
+    mod_clock_ctx.dev_count = element_count;
 
     return FWK_SUCCESS;
 }
@@ -383,7 +385,7 @@ static int clock_dev_init(fwk_id_t element_id, unsigned int sub_element_count,
     struct clock_dev_ctx *ctx;
     const struct mod_clock_dev_config *dev_config = data;
 
-    ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(element_id)];
+    ctx = &mod_clock_ctx.dev_ctx_table[fwk_id_get_element_idx(element_id)];
     ctx->config = dev_config;
 
 #ifdef BUILD_HAS_CLOCK_TREE_MGMT
@@ -407,7 +409,7 @@ static int clock_bind(fwk_id_t id, unsigned int round)
         return FWK_SUCCESS;
     }
 
-    ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(id)];
+    ctx = &mod_clock_ctx.dev_ctx_table[fwk_id_get_element_idx(id)];
 
     return fwk_module_bind(ctx->config->driver_id,
                            ctx->config->api_id,
@@ -422,13 +424,13 @@ static int clock_start(fwk_id_t id)
     /* Clock tree is initialized */
     if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
 #ifdef BUILD_HAS_CLOCK_TREE_MGMT
-        return clock_connect_tree(&module_ctx);
+        return clock_connect_tree(&mod_clock_ctx);
 #else
         return FWK_SUCCESS;
 #endif
     }
 
-    ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(id)];
+    ctx = &mod_clock_ctx.dev_ctx_table[fwk_id_get_element_idx(id)];
 
     if (fwk_id_is_type(ctx->config->pd_source_id, FWK_ID_TYPE_NONE)) {
         return FWK_SUCCESS;
@@ -436,10 +438,10 @@ static int clock_start(fwk_id_t id)
 
     if ((ctx->api->process_power_transition != NULL) &&
         (fwk_id_is_type(
-            module_ctx.config->pd_transition_notification_id,
+            mod_clock_ctx.config->pd_transition_notification_id,
             FWK_ID_TYPE_NOTIFICATION))) {
         status = fwk_notification_subscribe(
-            module_ctx.config->pd_transition_notification_id,
+            mod_clock_ctx.config->pd_transition_notification_id,
             ctx->config->pd_source_id,
             id);
         if (status != FWK_SUCCESS) {
@@ -449,10 +451,10 @@ static int clock_start(fwk_id_t id)
 
     if ((ctx->api->process_pending_power_transition != NULL) &&
         (fwk_id_is_type(
-            module_ctx.config->pd_pre_transition_notification_id,
+            mod_clock_ctx.config->pd_pre_transition_notification_id,
             FWK_ID_TYPE_NOTIFICATION))) {
         status = fwk_notification_subscribe(
-            module_ctx.config->pd_pre_transition_notification_id,
+            mod_clock_ctx.config->pd_pre_transition_notification_id,
             ctx->config->pd_source_id,
             id);
         if (status != FWK_SUCCESS) {
@@ -480,7 +482,7 @@ static int clock_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
             return FWK_E_PARAM;
         }
 
-        ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(target_id)];
+        ctx = &mod_clock_ctx.dev_ctx_table[fwk_id_get_element_idx(target_id)];
 
         if (fwk_id_is_equal(source_id, ctx->config->driver_id)) {
             *api = &clock_driver_response_api;
@@ -614,7 +616,7 @@ static int clock_process_notification_response(
     struct mod_pd_power_state_pre_transition_notification_resp_params
         *pd_resp_params;
     struct fwk_event pd_response_event = {
-        .id = module_ctx.config->pd_pre_transition_notification_id,
+        .id = mod_clock_ctx.config->pd_pre_transition_notification_id,
         .target_id = ctx->config->pd_source_id,
         .cookie = ctx->pd_notif.pre_power_transition_cookie,
         .is_notification = true,
@@ -672,18 +674,19 @@ static int clock_process_notification(
         return FWK_E_PARAM;
     }
 
-    ctx = &module_ctx.dev_ctx_table[fwk_id_get_element_idx(event->target_id)];
+    ctx =
+        &mod_clock_ctx.dev_ctx_table[fwk_id_get_element_idx(event->target_id)];
 
     if (event->is_response) {
         return clock_process_notification_response(ctx, event);
     }
 
     if (fwk_id_is_equal(
-            event->id, module_ctx.config->pd_transition_notification_id)) {
+            event->id, mod_clock_ctx.config->pd_transition_notification_id)) {
         return clock_process_pd_transition_notification(ctx, event);
     } else if (fwk_id_is_equal(
                    event->id,
-                   module_ctx.config->pd_pre_transition_notification_id)) {
+                   mod_clock_ctx.config->pd_pre_transition_notification_id)) {
         return clock_process_pd_pre_transition_notification(
             ctx, event, resp_event);
     } else {
