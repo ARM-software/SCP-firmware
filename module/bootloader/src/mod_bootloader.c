@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -45,7 +45,7 @@ struct bootloader_ctx {
 #endif
 };
 
-static struct bootloader_ctx module_ctx;
+static struct bootloader_ctx mod_bootloader_ctx;
 
 /*
  * Module API
@@ -72,21 +72,21 @@ static int load_image(void)
 
     bool sds = false;
 
-    if (module_ctx.module_config == NULL) {
+    if (mod_bootloader_ctx.module_config == NULL) {
         return FWK_E_PARAM;
     }
-    if (module_ctx.module_config->source_base == 0) {
+    if (mod_bootloader_ctx.module_config->source_base == 0) {
         return FWK_E_PARAM;
     }
-    if (module_ctx.module_config->destination_base == 0) {
+    if (mod_bootloader_ctx.module_config->destination_base == 0) {
         return FWK_E_PARAM;
     }
-    if (module_ctx.module_config->source_size == 0) {
+    if (mod_bootloader_ctx.module_config->source_size == 0) {
         return FWK_E_PARAM;
     }
 
 #ifdef BUILD_HAS_MOD_SDS
-    sds = module_ctx.module_config->sds_struct_id != 0;
+    sds = mod_bootloader_ctx.module_config->sds_struct_id != 0;
 #endif
 
     if (sds) {
@@ -96,8 +96,8 @@ static int load_image(void)
          * data valid flag.
          */
         while (true) {
-            status = module_ctx.sds_api->struct_read(
-                module_ctx.module_config->sds_struct_id,
+            status = mod_bootloader_ctx.sds_api->struct_read(
+                mod_bootloader_ctx.module_config->sds_struct_id,
                 BOOTLOADER_STRUCT_VALID_POS,
                 &image_flags,
                 sizeof(image_flags));
@@ -114,8 +114,8 @@ static int load_image(void)
          * Clear the image flag, so that at reboot if the RAM contents are
          * retained, then it would need to be set again by AP.
          */
-        status = module_ctx.sds_api->struct_write(
-            module_ctx.module_config->sds_struct_id,
+        status = mod_bootloader_ctx.sds_api->struct_write(
+            mod_bootloader_ctx.module_config->sds_struct_id,
             BOOTLOADER_STRUCT_VALID_POS,
             &zero_flag,
             sizeof(zero_flag));
@@ -127,8 +127,8 @@ static int load_image(void)
          * The image metadata from Trusted Firmware can now be read and
          * validated.
          */
-        status = module_ctx.sds_api->struct_read(
-            module_ctx.module_config->sds_struct_id,
+        status = mod_bootloader_ctx.sds_api->struct_read(
+            mod_bootloader_ctx.module_config->sds_struct_id,
             BOOTLOADER_STRUCT_IMAGE_OFFSET_POS,
             &image_offset,
             sizeof(image_offset));
@@ -136,8 +136,8 @@ static int load_image(void)
         if (status != FWK_SUCCESS) {
             return status;
         }
-        status = module_ctx.sds_api->struct_read(
-            module_ctx.module_config->sds_struct_id,
+        status = mod_bootloader_ctx.sds_api->struct_read(
+            mod_bootloader_ctx.module_config->sds_struct_id,
             BOOTLOADER_STRUCT_IMAGE_SIZE_POS,
             &image_size,
             sizeof(image_size));
@@ -152,21 +152,23 @@ static int load_image(void)
         if ((image_offset % 4) != 0) {
             return FWK_E_ALIGN;
         }
-        if (image_offset > module_ctx.module_config->source_size) {
+        if (image_offset > mod_bootloader_ctx.module_config->source_size) {
             return FWK_E_SIZE;
         }
 
         /* Read the image header now that its base address is known */
-        image_base = (const uint8_t *)module_ctx.module_config->source_base +
+        image_base =
+            (const uint8_t *)mod_bootloader_ctx.module_config->source_base +
             image_offset;
 #endif
     } else {
-        image_base = (const uint8_t *)module_ctx.module_config->source_base;
-        image_size = module_ctx.module_config->source_size;
+        image_base =
+            (const uint8_t *)mod_bootloader_ctx.module_config->source_base;
+        image_size = mod_bootloader_ctx.module_config->source_size;
     }
 
-    if (module_ctx.module_config->destination_size > 0) {
-        if (image_size > module_ctx.module_config->destination_size) {
+    if (mod_bootloader_ctx.module_config->destination_size > 0) {
+        if (image_size > mod_bootloader_ctx.module_config->destination_size) {
             return FWK_E_SIZE;
         }
     }
@@ -177,7 +179,7 @@ static int load_image(void)
     FWK_LOG_FLUSH();
 
     mod_bootloader_boot(
-        (uint8_t *)module_ctx.module_config->destination_base,
+        (uint8_t *)mod_bootloader_ctx.module_config->destination_base,
         image_base,
         image_size,
         &SCB->VTOR);
@@ -195,7 +197,7 @@ static int bootloader_init(fwk_id_t module_id, unsigned int element_count,
     const void *data)
 {
     /* Store a pointer to the module config within the module context */
-    module_ctx.module_config = data;
+    mod_bootloader_ctx.module_config = data;
 
     return FWK_SUCCESS;
 }
@@ -215,9 +217,10 @@ static int bootloader_bind(fwk_id_t id, unsigned int call_number)
         return FWK_SUCCESS;
     }
 
-    status = fwk_module_bind(FWK_ID_MODULE(FWK_MODULE_IDX_SDS),
-                             FWK_ID_API(FWK_MODULE_IDX_SDS, 0),
-                             &module_ctx.sds_api);
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_SDS),
+        FWK_ID_API(FWK_MODULE_IDX_SDS, 0),
+        &mod_bootloader_ctx.sds_api);
 
     return status;
 }
