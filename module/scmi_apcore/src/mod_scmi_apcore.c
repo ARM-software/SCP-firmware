@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -239,13 +239,7 @@ static int scmi_apcore_reset_address_set_handler(fwk_id_t service_id,
     }
 
     /* Check for alignment */
-    if (scmi_apcore_ctx.config->reset_register_width ==
-        MOD_SCMI_APCORE_REG_WIDTH_32) {
-        if ((parameters->reset_address_low % 4) != 0) {
-            return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
-            goto exit;
-        }
-    } else if ((parameters->reset_address_low % 8) != 0) {
+    if ((parameters->reset_address_low % 4) != 0) {
         return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         goto exit;
     }
