@@ -126,6 +126,9 @@ macro(include_mock_notify)
                 ${FWK_MOCKS_SRC_ROOT}/internal/Mockfwk_notification_internal.c)
 endmacro()
 
+#Append new unit tests below here
+list(APPEND UNIT_MODULE scmi)
+
 list(LENGTH UNIT_MODULE UNIT_TEST_MAX)
 
 enable_testing()
