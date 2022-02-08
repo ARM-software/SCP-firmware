@@ -89,12 +89,25 @@ the available options.
 > $ make -f Makefile.cmake help
 > ```
 
-### Build and execute framework tests
-See below to build and execute framework tests
+### Build and execute framework and module unit tests
+See below to build and execute tests
 
 > ```sh
 > $ make -f Makefile.cmake test
 > ```
+
+Alternatively, execute just framework or module tests
+
+> ```sh
+> $ make -f Makefile.cmake fwk_test
+> ```
+
+> ```sh
+> $ make -f Makefile.cmake mod_test
+> ```
+
+See unit_test/user_guide.md for more information on configuring
+module tests.
 
 **LIMITATIONS**
 

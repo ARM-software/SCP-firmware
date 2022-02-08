@@ -16,6 +16,8 @@ export BS_DIR := $(TOOLS_DIR)/build_system
 export PRODUCTS_DIR := $(TOP_DIR)/product
 export MODULES_DIR := $(TOP_DIR)/module
 export DOC_DIR := $(TOP_DIR)/doc
+export MOD_TEST_DIR := $(TOP_DIR)/unit_test
+export MOD_TEST_BUILD_DIR=$(BUILD_DIR)/unit_test
 
 #
 # Tools
@@ -27,6 +29,9 @@ export DOC := doxygen
 export CMAKE := cmake
 export CTEST := ctest
 export CD := cd
+export LCOV := lcov
+export GENHTML  := genhtml
+export PYTHON := python3
 
 #
 # Documentation paths
@@ -112,7 +117,7 @@ endif
 #
 PRODUCTS := $(shell ls $(PRODUCTS_DIR) 2>/dev/null)
 
-PRODUCT_INDEPENDENT_GOALS := clean help test doc
+PRODUCT_INDEPENDENT_GOALS := clean help test doc fwk_test mod_test
 
 ifneq ($(filter-out $(PRODUCT_INDEPENDENT_GOALS), $(MAKECMDGOALS)),)
     ifeq ($(PRODUCT),)
@@ -291,9 +296,16 @@ doc:
 	$(DOC) $(DOC_DIR)/Doxyfile
 
 .PHONY: test
-test:
+test : fwk_test mod_test
+
+.PHONY: fwk_test
+fwk_test:
 	$(CMAKE) -B ${BUILD_PATH}/framework/test $(FWK_DIR)/test -G Ninja
 	$(CMAKE) --build ${BUILD_PATH}/framework/test
 	# --test-dir option of ctest is not available before ctest 3.20
 	# so use workaround to change the test dir and run the tests from there
 	${CD} ${BUILD_PATH}/framework/test && ${CTEST} -V
+
+.PHONY: mod_test
+mod_test:
+# 	mod_test is enabled in a later commit where non-zero unit tests are enabled
