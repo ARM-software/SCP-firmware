@@ -264,6 +264,18 @@ Clock Tree Management                           {#section_clock_tree_management}
 When building a firmware and its dependencies, the BUILD_HAS_CLOCK_TREE_MGMT
 parameter controls if Clock Tree Management is enabled.
 
+Core Idle Suspend (WFE)                               {#section_idle_management}
+===============================
+
+WFE on ARM architecture makes processor suspends it's execution until it
+receives any interrupt. SCP firmware will execute this instruction when SCP
+firmware is in idle state, that is, when it has finished responding to all the
+internal events and external interrupts.
+
+Use FMW_DISABLE_ARCH_SUSPEND option to disable this execution of WFE. It
+can be defined in a platform specific fmw_arch.h file and adding this file
+in product/*/include directory.
+
 Performance Plugin Handler
 ==========================
 

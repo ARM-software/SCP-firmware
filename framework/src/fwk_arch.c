@@ -1,17 +1,23 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
  *     Framework API for the architecture layer.
  */
-
 #include <internal/fwk_module.h>
 
 #include <fwk_arch.h>
 #include <fwk_assert.h>
+
+#include <arch_helpers.h>
+
+#if FWK_HAS_INCLUDE(<fmw_arch.h>)
+#    include <fmw_arch.h>
+#endif
+
 #include <fwk_io.h>
 #include <fwk_log.h>
 #include <fwk_module.h>
@@ -82,4 +88,15 @@ int fwk_arch_init(const struct fwk_arch_init_driver *driver)
     }
 
     return FWK_SUCCESS;
+}
+
+void fwk_arch_suspend(void)
+{
+    /* On some arm plaforms, wfe is supported architecturally, however
+     * implementation is erroneous. In such platforms FMW_DISABLE_ARCH_SUSPEND
+     * needs to be defined
+     */
+#if !defined(FMW_DISABLE_ARCH_SUSPEND)
+    arch_suspend();
+#endif
 }

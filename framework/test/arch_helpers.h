@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -21,6 +21,14 @@ inline static void arch_interrupts_enable(void)
  *
  */
 inline static void arch_interrupts_disable(void)
+{
+}
+
+/*!
+ * \brief Suspend execution of current CPU.
+ *
+ */
+inline static void arch_suspend(void)
 {
 }
 

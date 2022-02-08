@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -213,6 +213,12 @@ struct fwk_arch_init_driver {
  * \retval ::FWK_E_PANIC Unrecoverable initialization error.
  */
 int fwk_arch_init(const struct fwk_arch_init_driver *driver);
+
+/*!
+ * \brief Architecture defined suspend, will wakup on receiving interrupt
+ *
+ */
+void fwk_arch_suspend(void);
 
 /*!
  * \}
