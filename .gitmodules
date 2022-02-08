@@ -4,3 +4,6 @@
 [submodule "run-clang-format"]
 	path = contrib/run-clang-format/git
 	url = https://github.com/Sarcasm/run-clang-format.git
+[submodule "contrib/cmock/git"]
+	path = contrib/cmock/git
+	url = https://github.com/ThrowTheSwitch/CMock

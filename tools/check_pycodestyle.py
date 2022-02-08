@@ -13,7 +13,7 @@ This script runs pycodestyle to check all python scripts.
 import sys
 import subprocess
 
-INCLUDE_DIRECTORIES = "tools/"
+INCLUDE_DIRECTORIES = "tools/ unit_test/utils"
 
 
 def banner(text):
