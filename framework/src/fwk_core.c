@@ -306,6 +306,7 @@ noreturn void __fwk_run(void)
         }
 
         (void)fwk_log_unbuffer();
+        fwk_arch_suspend();
     }
 }
 
