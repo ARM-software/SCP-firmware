@@ -54,7 +54,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_cdns_i2c.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/morello_core.c")
 
-if(SCP_ENABLE_DEBUGGER_INIT)
+if(SCP_ENABLE_DEBUGGER)
     target_compile_definitions(morello-soc-bl2 PRIVATE BUILD_HAS_DEBUGGER)
     target_sources(morello-soc-bl2
                    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_debugger_cli.c")
@@ -76,7 +76,7 @@ target_include_directories(
     morello-soc-bl2
     PUBLIC $<TARGET_PROPERTY:cmsis::core-m,INTERFACE_INCLUDE_DIRECTORIES>)
 
-if(SCP_ENABLE_DEBUGGER_INIT)
+if(SCP_ENABLE_DEBUGGER)
     list(APPEND SCP_MODULES "debugger-cli")
 endif()
 
