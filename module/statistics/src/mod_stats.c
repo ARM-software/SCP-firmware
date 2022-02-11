@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -420,7 +420,7 @@ get_statistics_desc(fwk_id_t module_id,
     return FWK_SUCCESS;
 }
 
-static const struct mod_stats_api mod_stats_api = {
+static const struct mod_stats_api mod_statistics_api = {
     .init_stats = stats_init_module,
     .start_stats = stats_start_module,
     .add_domain = stats_add_domain,
@@ -575,7 +575,7 @@ static int process_bind_request(fwk_id_t source_id,
         return FWK_E_PARAM;
     }
 
-    *api = &mod_stats_api;
+    *api = &mod_statistics_api;
 
     /* Request from SCMI Performance domain statistics */
     if (fwk_id_get_module_idx(source_id) ==
