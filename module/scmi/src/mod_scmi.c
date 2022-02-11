@@ -106,7 +106,7 @@ struct mod_scmi_ctx {
 #endif
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     /* Table of scmi notification subscribers */
-    struct scmi_notification_subscribers *scmi_notification_subscribers;
+    struct scmi_notification_subscribers *scmi_notif_subscribers;
 #endif
 };
 
@@ -498,7 +498,7 @@ static struct scmi_notification_subscribers *notification_subscribers(
      * accordingly.
      */
     protocol_idx -= (PROTOCOL_TABLE_RESERVED_ENTRIES_COUNT - 1);
-    return &scmi_ctx.scmi_notification_subscribers[protocol_idx];
+    return &scmi_ctx.scmi_notif_subscribers[protocol_idx];
 }
 
 static int scmi_notification_init(
@@ -683,7 +683,7 @@ static int scmi_notification_notify(
     return FWK_SUCCESS;
 }
 
-static struct mod_scmi_notification_api mod_scmi_notification_api = {
+static struct mod_scmi_notification_api mod_scmi_notif_api = {
     .scmi_notification_init = scmi_notification_init,
     .scmi_notification_add_subscriber = scmi_notification_add_subscriber,
     .scmi_notification_remove_subscriber = scmi_notification_remove_subscriber,
@@ -1618,7 +1618,7 @@ static int scmi_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
             return FWK_E_SUPPORT;
         }
 
-        *api = &mod_scmi_notification_api;
+        *api = &mod_scmi_notif_api;
         break;
 #endif
 
@@ -1795,7 +1795,7 @@ static int scmi_start(fwk_id_t id)
     if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
 #    ifdef BUILD_HAS_SCMI_NOTIFICATIONS
         /* scmi_ctx.protocol_count + 1 to include Base protocol */
-        scmi_ctx.scmi_notification_subscribers = fwk_mm_calloc(
+        scmi_ctx.scmi_notif_subscribers = fwk_mm_calloc(
             scmi_ctx.protocol_count + 1,
             sizeof(struct scmi_notification_subscribers));
 #    endif
