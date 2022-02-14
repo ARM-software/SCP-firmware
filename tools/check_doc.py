@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 """
 Check for missing documentation.
-This script runs "make doc" and checks for any output on stderr, where the
+This script runs "make -f Makefile.cmake doc" and checks for any output on stderr, where the
 Doxygen tool outputs any warnings about undocumented components.
 """
 
@@ -19,7 +19,7 @@ def main():
     print("Checking for undocumented code...")
 
     result = subprocess.Popen(
-        "make doc",
+        "make -f Makefile.cmake doc",
         shell=True,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.PIPE)
