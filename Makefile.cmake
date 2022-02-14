@@ -14,6 +14,8 @@ export FWK_DIR := $(TOP_DIR)/framework
 export TOOLS_DIR := $(TOP_DIR)/tools
 export BS_DIR := $(TOOLS_DIR)/build_system
 export PRODUCTS_DIR := $(TOP_DIR)/product
+export MODULES_DIR := $(TOP_DIR)/module
+export DOC_DIR := $(TOP_DIR)/doc
 
 #
 # Tools
@@ -25,6 +27,16 @@ export DOC := doxygen
 export CMAKE := cmake
 export CTEST := ctest
 export CD := cd
+
+#
+# Documentation paths
+#
+export BUILD_STRING := $(shell $(TOOLS_DIR)/build_string.py 2>/dev/null)
+
+export BUILD_DOC_DIR = $(BUILD_DIR)/doc
+export MODULE_INCLUDES := $(shell ls -d $(MODULES_DIR)/*/include/ 2>/dev/null)
+export MODULE_DOCS := $(shell ls -d $(MODULES_DIR)/*/doc/ 2>/dev/null)
+export MODULE_DOCS += $(shell ls -d $(PRODUCTS_DIR)/*/module/*/doc/ 2>/dev/null)
 
 #
 # Default options
@@ -100,7 +112,7 @@ endif
 #
 PRODUCTS := $(shell ls $(PRODUCTS_DIR) 2>/dev/null)
 
-PRODUCT_INDEPENDENT_GOALS := clean help test
+PRODUCT_INDEPENDENT_GOALS := clean help test doc
 
 ifneq ($(filter-out $(PRODUCT_INDEPENDENT_GOALS), $(MAKECMDGOALS)),)
     ifeq ($(PRODUCT),)
@@ -171,6 +183,7 @@ help:
 	@echo "    all             Build all firmware defined by PRODUCT=<product>"
 	@echo "    clean           Remove all built products"
 	@echo "    help            Show this documentation"
+	@echo "    doc             Generate the documentation of this project with Doxygen"
 	@echo ""
 	@echo "--------------------------------------------------------------------"
 	@echo "| Product Selection                                                |"
@@ -258,6 +271,12 @@ $(PRODUCT_BUILD_PATH)/firmware-%/CMakeCache.txt:  $(PRODUCT_DIR)/%/Firmware.cmak
 .PHONY: clean
 clean:
 	$(RM) $(BUILD_DIR)
+
+
+.PHONY: doc
+doc:
+	mkdir -p $(BUILD_DOC_DIR)
+	$(DOC) $(DOC_DIR)/Doxyfile
 
 .PHONY: test
 test:

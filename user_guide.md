@@ -134,6 +134,12 @@ top-level Makefile:
 make doc
 ```
 
+From within the SCP-firmware root directory Doxygen can also be invoked using the
+top-level Makefile.cmake:
+
+```sh
+make -f Makefile.cmake doc
+```
 ## Building SCP-firmware
 
 To build SCP-firmware for a specific product the basic command format for
