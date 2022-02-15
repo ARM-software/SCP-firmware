@@ -26,7 +26,7 @@ export MODULES_DIR := $(TOP_DIR)/module
 export CMSIS_DIR := $(TOP_DIR)/contrib/cmsis/git/CMSIS/Core
 export DBG_DIR := $(TOP_DIR)/debugger
 
-BUILD_STRING := $(shell $(TOOLS_DIR)/build_string.py 2>/dev/null)
+export BUILD_STRING := $(shell $(TOOLS_DIR)/build_string.py 2>/dev/null)
 export VERSION_STRING = v$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)
 export VERSION_DESCRIBE_STRING = $(VERSION_STRING)_$(BUILD_STRING)
 
