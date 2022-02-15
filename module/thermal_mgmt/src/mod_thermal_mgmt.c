@@ -14,13 +14,13 @@
 #include <mod_sensor.h>
 #include <mod_thermal_mgmt.h>
 
+#include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
 #include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_status.h>
-#include <fwk_thread.h>
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -372,7 +372,7 @@ static int read_temperature(void)
         .id = mod_thermal_event_id_read_temp,
     };
 
-    return fwk_thread_put_event(&event);
+    return fwk_put_event(&event);
 #else
     int status;
     uint64_t value;
