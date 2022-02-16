@@ -337,7 +337,7 @@ int clock_connect_tree(struct clock_ctx *module_ctx)
 
         fwk_list_push_tail(&parent->children_list, &clk->child_node);
 
-        status = clk->api->get_state(clk->id, &current_state);
+        status = clk->api->get_state(clk->config->driver_id, &current_state);
         if (status == FWK_PENDING) {
             FWK_LOG_WARN(
                 "[CLOCK] Async drivers not supported with clock tree mgmt");
