@@ -221,7 +221,7 @@ int clock_management_process_state(const struct fwk_event *event)
     case CLOCK_STATE_TRANSITION_WAIT_PARENT:
 
         /*
-         * The parent has sent back an event to its child once his clock has
+         * The parent has sent back an event to its child once their clock has
          * changed state successfully.
          */
         if (!fwk_id_is_equal(event->source_id, ctx->parent_id)) {
