@@ -158,7 +158,7 @@ int clock_management_process_state(const struct fwk_event *event)
                  * This should not be reached because. asynchronous drivers
                  * are not supported.
                  */
-                fwk_assert(status == FWK_E_SUPPORT);
+                fwk_assert(status != FWK_E_SUPPORT);
 
                 if (status == FWK_E_SUPPORT) {
                     return status;
@@ -185,7 +185,7 @@ int clock_management_process_state(const struct fwk_event *event)
                  * This should not be reached because. asynchronous drivers
                  * are not supported.
                  */
-                fwk_assert(status == FWK_E_SUPPORT);
+                fwk_assert(status != FWK_E_SUPPORT);
 
                 if (status == FWK_E_SUPPORT) {
                     return status;
@@ -241,7 +241,7 @@ int clock_management_process_state(const struct fwk_event *event)
              * This should not be reached because. asynchronous drivers
              * are not supported.
              */
-            fwk_assert(status == FWK_E_SUPPORT);
+            fwk_assert(status != FWK_E_SUPPORT);
 
             if (status == FWK_E_SUPPORT) {
                 return status;
