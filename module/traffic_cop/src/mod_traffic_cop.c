@@ -95,7 +95,7 @@ static uint32_t tcop_evaluate_perf_limit(struct mod_tcop_domain_ctx *ctx)
 
     FWK_LOG_WARN(
         "[TRAFFIC_COP] No entry found in the PCT for %ld online cores",
-        ctx->num_cores_online);
+        (long)ctx->num_cores_online);
 
     return 0;
 }

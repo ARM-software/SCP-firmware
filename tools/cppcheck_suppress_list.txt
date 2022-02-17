@@ -65,13 +65,16 @@ nullPointerRedundantCheck:*module/dmc500/src/mod_dmc500.c:65
 nullPointerRedundantCheck:*module/mhu2/src/mod_mhu2.c:74
 nullPointerRedundantCheck:*module/pl011/src/mod_pl011.c:139
 nullPointerRedundantCheck:*module/pl011/src/mod_pl011.c:140
+nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:609
 nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:620
+nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:642
 nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:953
 nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:954
 nullPointerRedundantCheck:*module/reg_sensor/src/mod_reg_sensor.c:52
 nullPointerRedundantCheck:*module/sds/src/mod_sds.c:273
 nullPointerRedundantCheck:*module/sds/src/mod_sds.c:279
 nullPointerRedundantCheck:*module/timer/src/mod_timer.c:541
+nullPointerRedundantCheck:*module/timer/src/mod_timer.c:551
 nullPointerRedundantCheck:*module/timer/src/mod_timer.c:546
 nullPointerRedundantCheck:*product/n1sdp/module/n1sdp_dmc620/src/mod_n1sdp_dmc620.c:1275
 nullPointerRedundantCheck:*product/n1sdp/module/n1sdp_dmc620/src/mod_n1sdp_dmc620.c:1276
