@@ -6,12 +6,12 @@
  */
 
 #ifndef MOD_TRAFFIC_COP_H
-#    define MOD_TRAFIC_COP_H
+#define MOD_TRAFFIC_COP_H
 
-#    include <fwk_id.h>
+#include <fwk_id.h>
 
-#    include <stddef.h>
-#    include <stdint.h>
+#include <stddef.h>
+#include <stdint.h>
 
 /*!
  * \ingroup GroupModules
