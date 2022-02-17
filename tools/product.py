@@ -44,8 +44,7 @@ class Build:
                                                          self.toolchain.name,
                                                          self.build_type.name)
         if self.variant:
-            cmd += Build.__extra_arg__('\"-DSCP_PLATFORM_VARIANT={}\"'.format(
-                                                            self.variant.name))
+            cmd += 'PLATFORM_VARIANT=\"{}\" '.format(self.variant.name)
             for extra in self.variant.arguments:
                 cmd += Build.__extra_arg__(extra)
         for extra in self.toolchain.arguments:
