@@ -33,7 +33,7 @@ def main():
 
     print(stdout.decode())
 
-    if stderr:
+    if result.returncode != 0:
         print(stderr.decode())
         print('FAILED')
         return 1

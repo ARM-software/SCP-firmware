@@ -142,8 +142,9 @@ def analyze_results(success: int, total: int) -> int:
     return 1 if success < total else 0
 
 
-def check_errors(ignore_errors: bool, results: List[Tuple[str,int]]) -> bool:
-    return not ignore_errors and len(list(filter(lambda x: x[1] != 0, results)))
+def check_errors(ignore_errors: bool, results: List[Tuple[str, int]]) -> bool:
+    return not ignore_errors and len(list(filter(lambda x: x[1] != 0,
+                                                 results)))
 
 
 def main(ignore_errors: bool):
@@ -179,6 +180,7 @@ def main(ignore_errors: bool):
             return analyze_results(*print_results(results))
 
     return analyze_results(*print_results(results))
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
