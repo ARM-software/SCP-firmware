@@ -98,6 +98,9 @@ struct mod_thermal_mgmt_ctx {
 
     /* Table of thermal actors */
     struct mod_thermal_mgmt_dev_ctx *dev_ctx_table;
+
+    /* Sensor data */
+    struct mod_sensor_data sensor_data;
 };
 
 #if THERMAL_HAS_ASYNC_SENSORS
@@ -377,9 +380,10 @@ static int read_temperature(void)
     int status;
     uint64_t value;
 
-    status = mod_ctx.sensor_api->get_value(mod_ctx.config->sensor_id, &value);
+    status = mod_ctx.sensor_api->get_data(
+        mod_ctx.config->sensor_id, &mod_ctx.sensor_data);
     if (status == FWK_SUCCESS) {
-        mod_ctx.cur_temp = (uint32_t)value;
+        mod_ctx.cur_temp = (uint32_t)mod_ctx.sensor_data.value;
 
         mod_ctx.pi_control_needs_update = true;
     }
@@ -573,23 +577,19 @@ static int thermal_mgmt_process_event(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
 {
-    struct mod_sensor_event_params *params;
-    uint64_t value;
     int status;
 
     if (fwk_id_is_equal(event->id, mod_thermal_event_id_read_temp)) {
         /* Temperature-reading event */
-        status =
-            mod_ctx.sensor_api->get_value(mod_ctx.config->sensor_id, &value);
+        status = mod_ctx.sensor_api->get_data(
+            mod_ctx.config->sensor_id, &mod_ctx.sensor_data);
         if (status == FWK_SUCCESS) {
-            mod_ctx.cur_temp = (uint32_t)value;
+            mod_ctx.cur_temp = (uint32_t)mod_ctx.sensor_data.value;
         }
     } else if (fwk_id_is_equal(event->id, mod_sensor_event_id_read_request)) {
         /* Response event from Sensor HAL */
-        params = (struct mod_sensor_event_params *)event->params;
-
-        if (params->status == FWK_SUCCESS) {
-            mod_ctx.cur_temp = (uint32_t)params->value;
+        if (mod_ctx.sensor_data.status == FWK_SUCCESS) {
+            mod_ctx.cur_temp = (uint32_t)mod_ctx.sensor_data.value;
             status = FWK_SUCCESS;
         } else {
             status = FWK_E_DEVICE;
