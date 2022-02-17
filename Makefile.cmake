@@ -133,7 +133,11 @@ ifneq ($(filter-out $(PRODUCT_INDEPENDENT_GOALS), $(MAKECMDGOALS)),)
 
     FIRMWARE_TARGETS := $(addprefix firmware-, $(BS_FIRMWARE_LIST))
 
-PRODUCT_BUILD_PATH := $(BUILD_PATH)/$(BS_PRODUCT_NAME)/$(TOOLCHAIN)/$(MODE)
+ifndef PLATFORM_VARIANT
+    PRODUCT_BUILD_PATH := $(BUILD_PATH)/$(BS_PRODUCT_NAME)/$(TOOLCHAIN)/$(MODE)
+else
+    PRODUCT_BUILD_PATH := $(BUILD_PATH)/$(BS_PRODUCT_NAME)/platform_variant_$(PLATFORM_VARIANT)/$(TOOLCHAIN)/$(MODE)
+endif
 
 define msg_start
 ================================================================
@@ -154,6 +158,10 @@ endif
 CMAKE_COMMAND_OPTION := $(CMAKE_BUILD_TYPE)
 CMAKE_COMMAND_OPTION += -DSCP_TOOLCHAIN="$(TOOLCHAIN)"
 CMAKE_COMMAND_OPTION += -DSCP_LLVM_SYSROOT_CC="$(LLVM_SYSROOT_CC)"
+
+ifdef PLATFORM_VARIANT
+    CMAKE_COMMAND_OPTION += -DSCP_PLATFORM_VARIANT="$(PLATFORM_VARIANT)"
+endif
 
 ifdef CMAKE_BUILD_VERBOSE_OPTION
     CMAKE_COMMAND_OPTION = -DCOMMAND_OUTPUT_VERBOSE=1
@@ -239,6 +247,10 @@ help:
 	@echo "    LLVM_SYSROOT_CC"
 	@echo "        Value: <LLVM sysroot compiler path>"
 	@echo "        Specify LLVM sysroot compiler path to build the firmware."
+	@echo ""
+	@echo "    PLATFORM_VARIANT"
+	@echo "        Value: <Platform variant>"
+	@echo "        Specify Platform variant if it is required."
 	@echo ""
 	@echo "    EXTRA_CONFIG_ARGS"
 	@echo "        Value: <cmake configuration parameters>"
