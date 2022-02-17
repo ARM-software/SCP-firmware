@@ -7,8 +7,9 @@
 
 """
 Check for missing documentation.
-This script runs "make -f Makefile.cmake doc" and checks for any output on stderr, where the
-Doxygen tool outputs any warnings about undocumented components.
+This script runs "make -f Makefile.cmake doc" and checks for any output on
+stderr, where the Doxygen tool outputs any warnings about undocumented
+components.
 """
 
 import sys
