@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -12,6 +12,8 @@ This script runs pycodestyle to check all python scripts.
 
 import sys
 import subprocess
+
+INCLUDE_DIRECTORIES = "tools/"
 
 
 def banner(text):
@@ -24,7 +26,7 @@ def main():
     banner("Build and run PyCodeStyle tests")
 
     result = subprocess.Popen(
-        "python -m pycodestyle tools/",
+        "python -m pycodestyle {}".format(INCLUDE_DIRECTORIES),
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
