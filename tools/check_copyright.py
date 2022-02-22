@@ -102,9 +102,9 @@ class ErrorYearNotCurrent(Exception):
 
 def is_valid_directory(filename):
     for dir in EXCLUDE_DIRECTORIES:
-        if not filename.startswith(dir):
-            return True
-    return False
+        if filename.startswith(dir):
+            return False
+    return True
 
 
 def is_valid_file_type(filename):
