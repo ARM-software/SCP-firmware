@@ -19,18 +19,23 @@ import re
 import sys
 import datetime
 import subprocess
+import glob
 from itertools import islice
 
 #
 # Directories to exclude
 #
+
+# Exclude all mod_test "mocks" directories
+UNIT_TEST_MOCKS = glob.glob("module/*/test/mocks")
+
 EXCLUDE_DIRECTORIES = [
     '.git',
     'build',
     'contrib/cmsis/git',
     "contrib/run-clang-format/git",
     'product/rcar/src/CMSIS-FreeRTOS',
-]
+] + UNIT_TEST_MOCKS
 
 #
 # Supported file types
