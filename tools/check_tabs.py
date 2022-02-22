@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -16,17 +16,22 @@ import subprocess
 import sys
 import tempfile
 import fnmatch
+import glob
 
 #
 # Directories to exclude
 #
+
+# Exclude all mod_test "mocks" directories
+UNIT_TEST_MOCKS = glob.glob("module/*/test/mocks")
+
 EXCLUDE_DIRECTORIES = [
     '.git',
     'build',
     'contrib/cmsis/git',
     "contrib/run-clang-format/git",
     'product/rcar/src/CMSIS-FreeRTOS',
-]
+] + UNIT_TEST_MOCKS
 
 #
 # Exclude patterns (applied to files only)

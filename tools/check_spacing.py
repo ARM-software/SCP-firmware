@@ -16,11 +16,16 @@ import subprocess
 import sys
 import tempfile
 import fnmatch
+import glob
 
 
 #
 # Directories to exclude
 #
+
+# Exclude all mod_test "mocks" directories
+UNIT_TEST_MOCKS = glob.glob("module/*/test/mocks")
+
 EXCLUDE_DIRECTORIES = [
     '.git',
     'build',
@@ -28,7 +33,7 @@ EXCLUDE_DIRECTORIES = [
     'contrib/cmsis/git',
     "contrib/run-clang-format/git",
     'product/rcar/src/CMSIS-FreeRTOS',
-]
+] + UNIT_TEST_MOCKS
 
 #
 # Exclude patterns (applied to files only)
