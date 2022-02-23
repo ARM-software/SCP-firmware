@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -16,6 +16,7 @@ import subprocess
 import sys
 import tempfile
 import fnmatch
+
 
 #
 # Directories to exclude
@@ -95,6 +96,7 @@ def main(argv=[], prog_name=''):
     correct_spaces_count = 0
     modified_files = 0
     non_unix_eol_files = 0
+    missing_new_lines_files = 0
 
     cwd = os.getcwd()
     print("Executing from {}".format(cwd))
@@ -137,7 +139,14 @@ def main(argv=[], prog_name=''):
             incorrect_spaces = 0
 
             with open(path, encoding="utf-8") as file:
-                for line, string in enumerate(file):
+                lines = file.readlines()
+                last_line_number = len(lines)-1
+                for line, string in enumerate(lines):
+                    if line == last_line_number and string[-1] != '\n':
+                        print('{} is missing a new line at the end of file'.
+                              format(path))
+                        missing_new_lines_files += 1
+
                     # Note that all newlines are converted to '\n',
                     # so the following will work regardless of
                     # what the underlying file format is using to
@@ -228,10 +237,17 @@ def main(argv=[], prog_name=''):
         print("{} files have non-UNIX or mixed line endings"
               .format(non_unix_eol_files))
 
+    if missing_new_lines_files == 0:
+        print("No files with missing newlines at EOF found")
+    else:
+        print("{} text files are missing newlines at EOF"
+              .format(missing_new_lines_files))
+
     if (trailing_spaces_count or
             trailing_lines_count or
             correct_spaces_count or
-            non_unix_eol_files):
+            non_unix_eol_files or
+            missing_new_lines_files):
         return 1
     return 0
 
