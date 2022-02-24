@@ -1,3 +1,10 @@
+#
+# Arm SCP/MCP Software
+# Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
 cmake_dependent_option(
     SCP_ENABLE_SCMI_RESET "Enable the scmi reset?"
     "${SCP_ENABLE_SCMI_RESET_INIT}" "DEFINED SCP_ENABLE_SCMI_RESET_INIT"
