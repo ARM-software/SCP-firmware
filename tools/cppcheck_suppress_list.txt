@@ -34,6 +34,7 @@ nullPointerRedundantCheck:*product/juno/*
 syntaxError:*product/synquacer/module/synquacer_system/src/mmu500.c:34
 
 // Cppcheck seems to get confused with macro substitution
+syntaxError:*framework/src/fwk_log.c:183
 syntaxError:*framework/src/fwk_log.c:187
 syntaxError:*framework/src/fwk_log.c:189
 
@@ -68,8 +69,8 @@ nullPointerRedundantCheck:*module/pl011/src/mod_pl011.c:140
 nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:609
 nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:620
 nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:642
-nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:953
-nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:954
+nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:942
+nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:943
 nullPointerRedundantCheck:*module/reg_sensor/src/mod_reg_sensor.c:52
 nullPointerRedundantCheck:*module/sds/src/mod_sds.c:273
 nullPointerRedundantCheck:*module/sds/src/mod_sds.c:279

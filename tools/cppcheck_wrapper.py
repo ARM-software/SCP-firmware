@@ -46,7 +46,7 @@ def print_msg(message, output):
         print("[{}]  {}".format(tool_name, message))
 
 
-if __name__ == '__main__':
+def main():
     # CMake create a list of argument which include path of the
     # tool(e.g. cppcheck) binary and its arguments.
     tool_path = sys.argv[1]
@@ -90,7 +90,7 @@ if __name__ == '__main__':
         print_msg("Error: failed to find"
                   " binary at {}".format(tool_path),
                   output=True)
-        exit(1)
+        return 1
 
     print_msg(cmd, output=verbose)
 
@@ -107,3 +107,8 @@ if __name__ == '__main__':
         print_msg("" + err.decode("utf-8", "ignore"), output=True)
 
     print_msg("<------", output=verbose)
+    return r.returncode
+
+
+if __name__ == '__main__':
+    sys.exit(main())
