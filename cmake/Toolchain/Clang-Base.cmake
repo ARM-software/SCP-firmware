@@ -6,15 +6,15 @@
 #
 
 set(CMAKE_ASM_COMPILER
-    clang-11
+    clang-13
     CACHE FILEPATH "Path to the assembler.")
 set(CMAKE_C_COMPILER
-    clang-11
+    clang-13
     CACHE FILEPATH "Path to the C compiler.")
 set(CMAKE_CXX_COMPILER
-    clang-11
+    clang-13
     CACHE FILEPATH "Path to the C++ compiler.")
 
 set(CMAKE_OBJCOPY
-    llvm-objcopy-11
+    llvm-objcopy-13
     CACHE FILEPATH "Path to objcopy tool.")
