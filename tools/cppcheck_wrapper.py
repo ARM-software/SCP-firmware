@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -81,7 +81,7 @@ if __name__ == '__main__':
 
         if not re.search(required_tool_version, tool_version):
             print_msg("Warning: recommended"
-                      " {} version is"
+                      " {} version is {}"
                       " but found {}".format(tool_name,
                                              required_tool_version,
                                              tool_version),
