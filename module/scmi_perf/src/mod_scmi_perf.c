@@ -1687,7 +1687,7 @@ static void scmi_perf_notify_level_updated(
                 get_level =
                     (uint32_t *)((uintptr_t)domain->fast_channels_addr_scp
                                      [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET]);
-                if (get_level != 0x0) { /* note: get_level may not be defined */
+                if (get_level != NULL) { /* get_level may not be defined */
                     *get_level = level;
                 }
             }
