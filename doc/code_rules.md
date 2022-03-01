@@ -70,11 +70,71 @@ cppcheck --xml \
 MISRAC-2012
 -----------
 The SCP-firmware is attempting to achieve compliance with MISRAC-2012.
-To date, the mandatory rules have been resolved.
 
 In order to provide a reference, Juno platform is taken as a first platform to
 attempt alignment with the guidance. At the same time, a MISRAC-2012 checker
-will run upon PR submission.
+is currently being run upon PR submissions.
+
+To date, *all* violations of the **Mandatory Rules** have been **resolved**:
+
+* Rule 9.1,
+* Rule 12.5
+* Rule 13.6
+* Rules 17.3, 17.4, 17.6,
+* Rules 19.1,
+* Rules 21.13, 21.17, 21.18, 21.19, 21.20,
+* Rules 22.2, 22.4, 22.5, 22.6
+
+Other *Required Directives* have also had *all* their violations **resolved**:
+
+* Directive 1.1
+* Directive 2.1
+* Directive 3.1
+* Directive 4.1
+* Directive 4.3
+* Directive 4.7
+* Directive 4.11
+* Directive 4.14
+
+Other *Required Rules* have also had *all* their violations **resolved**:
+
+* Rules 1.1, 1.3
+* Rule 3.2
+* Rule 4.1
+* Rules 5.2, 5.3, 5.4, 5.5, 5.6, 5.7
+* Rules 6.1, 6.2
+* Rules 7.1, 7.3, 7.4
+* Rules 8.1, 8.8, 8.10, 8.12
+* Rules 9.2, 9.4
+* Rules 10.1, 10.2, 10.3
+* Rules 11.2, 11.7, 11.9
+* Rules 13.1, 13.2, 13.5
+* Rules 14.1, 15.2, 15.3, 15.6
+* Rules 16.2, 16.5, 16.7
+* Rules 17.2, 17.7
+* Rules 18.1, 18.6
+* Rules 20.2, 20.3, 20.4, 20.6, 20.8, 20.11, 20.13, 20.14
+* Rules 21.4, 21.5
+* Rules 21.7, 21.8, 21.9, 21.10, 21.11, 21.14, 21.16
+* Rules 22.3, 22.7, 22.8, 22.9, 22.10
+
+The list of *Required Rules and Directives* that are currently being **deviated** from can be seen below:
+
+* Directives 4.10, 4.12
+* Rules 2.1
+* Rule 3.1
+* Rules 8.2, 8.4, 8.5, 8.6, 8.14
+* Rules 10.7, 10.8
+* Rules 11.1, 11.3, 11.6, 11.8
+* Rule 12.2
+* Rules 14.2, 14.3
+* Rules 16.1, 16.3, 16.4, 16.6
+* Rules 17.1, 17.7
+* Rules 18.2, 18.3, 18.7, 18.8
+* Rules 20.12
+* Rules 21.1, 21.2, 21.3, 21.6, 21.15
+
+*Advisory rules* are currently **not considered/treated**.
 
 Please note that new patches will have to be compliant with the current status
 of violations.
