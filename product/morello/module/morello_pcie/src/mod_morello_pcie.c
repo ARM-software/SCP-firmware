@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -294,13 +294,15 @@ static int morello_pcie_link_training(fwk_id_t id, bool ep_mode)
 {
     struct morello_pcie_dev_ctx *dev_ctx;
     enum pcie_gen gen_speed;
-    uint8_t neg_config;
     uint32_t reg_val;
     int status;
     unsigned int did;
     enum pcie_lane_count lane_count;
     uint32_t down_stream_tx_preset = 0;
     uint32_t up_stream_tx_preset = 0;
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
+    uint8_t neg_config;
+#endif
 
     did = fwk_id_get_element_idx(id);
     dev_ctx = &pcie_ctx.device_ctx_table[did];
@@ -366,6 +368,7 @@ static int morello_pcie_link_training(fwk_id_t id, bool ep_mode)
     }
     FWK_LOG_INFO("[%s] Done", pcie_type[did]);
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
     (void)neg_config;
     neg_config = (dev_ctx->ctrl_apb->RP_CONFIG_OUT &
                   RP_CONFIG_OUT_NEGOTIATED_SPD_MASK) >>
@@ -380,6 +383,7 @@ static int morello_pcie_link_training(fwk_id_t id, bool ep_mode)
         "[%s] Negotiated link width: x%d",
         pcie_type[did],
         fwk_math_pow2(neg_config));
+#endif
 
     if (gen_speed == PCIE_GEN_4) {
         FWK_LOG_INFO("[%s] Re-training link to GEN4 speed...", pcie_type[did]);
@@ -404,6 +408,8 @@ static int morello_pcie_link_training(fwk_id_t id, bool ep_mode)
 
         pcie_rp_ep_config_read_word(
             dev_ctx->rp_ep_config_apb, PCIE_LINK_CTRL_STATUS_OFFSET, &reg_val);
+
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
         neg_config = (reg_val >> PCIE_LINK_CTRL_NEG_SPEED_POS) &
             PCIE_LINK_CTRL_NEG_SPEED_MASK;
         FWK_LOG_INFO(
@@ -413,6 +419,7 @@ static int morello_pcie_link_training(fwk_id_t id, bool ep_mode)
             PCIE_LINK_CTRL_NEG_WIDTH_MASK;
         FWK_LOG_INFO(
             "[%s] Re-negotiated link width: x%d", pcie_type[did], neg_config);
+#endif
     }
 
     return FWK_SUCCESS;
