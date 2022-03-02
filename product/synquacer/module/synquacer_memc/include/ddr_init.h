@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -33,6 +33,7 @@
 #define REG_DMC520_3_BA UINT32_C(0x4E300000)
 
 #define DDR_TRAINING_ON
+#define DDR_DQSTRAINWA_ON
 #define DDR_WAIT_TIMEOUT_US UINT32_C(1000000)
 
 extern int ddr_dual_ch_init_mp(void);
