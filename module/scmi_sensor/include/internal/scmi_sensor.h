@@ -79,13 +79,14 @@ struct scmi_sensor_protocol_reading_get_a2p {
     uint32_t sensor_id;
     uint32_t flags;
 };
-
+#ifdef BUILD_HAS_SCMI_SENSOR_V2
 struct scmi_sensor_protocol_reading_get_data {
-    uint32_t sensor_value_low;
-    uint32_t sensor_value_high;
+    int32_t sensor_value_low;
+    int32_t sensor_value_high;
     uint32_t timestamp_low;
     uint32_t timestamp_high;
 };
+#endif
 
 struct scmi_sensor_protocol_reading_get_p2a {
     int32_t status;
