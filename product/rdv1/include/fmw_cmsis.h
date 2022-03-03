@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -19,6 +19,7 @@
 #define __DTCM_PRESENT         0U
 #define __NVIC_PRIO_BITS       3U
 #define __Vendor_SysTickConfig 0U
+#define __VTOR_PRESENT         1U
 
 extern uint32_t SystemCoreClock; /*!< System Clock Frequency (Core Clock)*/
 typedef enum IRQn {

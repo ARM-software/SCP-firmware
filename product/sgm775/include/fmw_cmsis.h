@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -11,10 +11,11 @@
 #include <stdint.h>
 
 #define __CHECK_DEVICE_DEFINES
-#define __CM3_REV 0x0201
-#define __MPU_PRESENT 1
-#define __NVIC_PRIO_BITS 3
-#define __Vendor_SysTickConfig 0
+#define __CM3_REV              0x0201U
+#define __MPU_PRESENT          1U
+#define __NVIC_PRIO_BITS       3U
+#define __Vendor_SysTickConfig 0U
+#define __VTOR_PRESENT         1U
 
 extern uint32_t SystemCoreClock; /*!< System Clock Frequency (Core Clock)*/
 
