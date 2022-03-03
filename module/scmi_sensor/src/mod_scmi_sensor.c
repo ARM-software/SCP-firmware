@@ -198,16 +198,16 @@ static int scmi_sensor_reading_respond(
          ++axis_idx, payload_size += sizeof(axis_value)) {
         if (sensor_data->axis_count == 1) {
             axis_value = (struct scmi_sensor_protocol_reading_get_data){
-                .sensor_value_low = (uint32_t)sensor_data->value,
-                .sensor_value_high = (uint32_t)(sensor_data->value >> 32),
+                .sensor_value_low = (int32_t)sensor_data->value,
+                .sensor_value_high = (int32_t)(sensor_data->value >> 32),
                 .timestamp_low = (uint32_t)sensor_data->timestamp,
                 .timestamp_high = (uint32_t)(sensor_data->timestamp >> 32),
             };
         } else {
             axis_value = (struct scmi_sensor_protocol_reading_get_data){
-                .sensor_value_low = (uint32_t)sensor_data->axis_value[axis_idx],
+                .sensor_value_low = (int32_t)sensor_data->axis_value[axis_idx],
                 .sensor_value_high =
-                    (uint32_t)(sensor_data->axis_value[axis_idx] >> 32),
+                    (int32_t)(sensor_data->axis_value[axis_idx] >> 32),
                 .timestamp_low = (uint32_t)sensor_data->timestamp,
                 .timestamp_high = (uint32_t)(sensor_data->timestamp >> 32),
             };
