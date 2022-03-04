@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -22,7 +22,7 @@ static struct mod_reg_sensor_dev_config **config_table;
 /*
  * Module API
  */
-static int get_value(fwk_id_t id, uint64_t *value)
+static int get_value(fwk_id_t id, mod_sensor_value_t *value)
 {
     struct mod_reg_sensor_dev_config *config;
 
@@ -33,7 +33,7 @@ static int get_value(fwk_id_t id, uint64_t *value)
         return FWK_E_PARAM;
     }
 
-    *value = *(uint64_t*)config->reg;
+    *value = *(mod_sensor_value_t *)config->reg;
 
     return FWK_SUCCESS;
 }

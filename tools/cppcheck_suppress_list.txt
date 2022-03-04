@@ -59,7 +59,7 @@ memleak:*framework/test/fwk_test.c:145
 // dereference can only occur if the check succeeds
 nullPointerRedundantCheck:*framework/src/fwk_io.c
 nullPointerRedundantCheck:*product/sgm775/module/sgm775_dmc500/src/mod_sgm775_dmc500.c:78
-nullPointerRedundantCheck:*product/rcar/module/rcar_reg_sensor/src/mod_rcar_reg_sensor.c:143
+nullPointerRedundantCheck:*product/rcar/module/rcar_reg_sensor/src/mod_rcar_reg_sensor.c:147
 nullPointerRedundantCheck:*module/dmc500/src/mod_dmc500.c:60
 nullPointerRedundantCheck:*module/dmc500/src/mod_dmc500.c:61
 nullPointerRedundantCheck:*module/dmc500/src/mod_dmc500.c:65

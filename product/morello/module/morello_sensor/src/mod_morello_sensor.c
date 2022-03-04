@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -105,8 +105,11 @@ static void morello_sensor_timer_callback(uintptr_t unused)
 /*
  * Module API
  */
-static int get_value(fwk_id_t element_id, uint64_t *value)
+static int get_value(fwk_id_t element_id, mod_sensor_value_t *value)
 {
+#ifdef BUILD_HAS_SENSOR_SIGNED_VALUE
+    return FWK_E_SUPPORT;
+#else
     struct morello_temp_sensor_ctx *t_dev_ctx;
     struct morello_volt_sensor_ctx *v_dev_ctx;
     unsigned int el_idx;
@@ -145,6 +148,7 @@ static int get_value(fwk_id_t element_id, uint64_t *value)
     *value = (uint64_t)buf_value;
 
     return FWK_SUCCESS;
+#endif
 }
 
 static const struct mod_sensor_driver_api morello_sensor_api = {

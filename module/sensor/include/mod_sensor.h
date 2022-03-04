@@ -139,6 +139,15 @@ struct mod_sensor_trip_point_info {
     uint32_t count;
 };
 
+/*!
+ * \brief Sensor value signedness type.
+ */
+#ifdef BUILD_HAS_SENSOR_SIGNED_VALUE
+typedef int64_t mod_sensor_value_t;
+#else
+typedef uint64_t mod_sensor_value_t;
+#endif
+
 #ifdef BUILD_HAS_SENSOR_EXT_ATTRIBS
 
 /*!
@@ -376,9 +385,9 @@ struct mod_sensor_data {
     /*! Sensor value */
     union {
         /*! Sensor N-axis value */
-        uint64_t *axis_value;
+        mod_sensor_value_t *axis_value;
         /*! Sensor scalar value */
-        uint64_t value;
+        mod_sensor_value_t value;
     };
 
 #ifdef BUILD_HAS_SENSOR_TIMESTAMP
@@ -415,14 +424,15 @@ struct mod_sensor_driver_api {
      * \brief Get sensor value.
      *
      * \param id Specific sensor device id.
-     * \param[out] value Sensor value.
+     * \param[out] value Sensor value, which can be either signed or
+     *     unsigned, depending upon the build options.
      *
      * \retval ::FWK_PENDING The request is pending. The driver will provide the
      *      requested value later through the driver response API.
      * \retval ::FWK_SUCCESS Value was read successfully.
      * \return One of the standard framework error codes.
      */
-    int (*get_value)(fwk_id_t id, uint64_t *value);
+    int (*get_value)(fwk_id_t id, mod_sensor_value_t *value);
 
     /*!
      * \brief Get sensor information.
@@ -588,12 +598,12 @@ struct mod_sensor_driver_resp_params {
     /*! Status of the requested operation */
     int status;
 
-    /*! Sensor value requested */
+    /*! Sensor value */
     union {
         /*! Sensor N-axis value */
-        uint64_t *axis_value;
+        mod_sensor_value_t *axis_value;
         /*! Sensor scalar value */
-        uint64_t value;
+        mod_sensor_value_t value;
     };
 };
 

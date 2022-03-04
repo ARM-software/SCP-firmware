@@ -39,7 +39,7 @@ struct mod_mock_sensor_dev_config {
     fwk_id_t alarm_id;
 
     /*! Sensor read value */
-    uint64_t *read_value;
+    mod_sensor_value_t *read_value;
 
 #ifdef BUILD_HAS_SCMI_SENSOR_V2
     /*! Pointer to sensor axis information */

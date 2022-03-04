@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -26,8 +26,12 @@
 /*
  * ADC driver API functions.
  */
-static int get_value(fwk_id_t id, uint64_t *value)
+
+static int get_value(fwk_id_t id, mod_sensor_value_t *value)
 {
+#ifdef BUILD_HAS_SENSOR_SIGNED_VALUE
+    return FWK_E_SUPPORT;
+#else
     uint32_t adc_value;
     uint64_t adc_quantity;
     enum juno_adc_dev_type dev_type;
@@ -36,8 +40,8 @@ static int get_value(fwk_id_t id, uint64_t *value)
 
     switch ((enum juno_adc_sensor_type)fwk_id_get_element_idx(id)) {
     case ADC_TYPE_CURRENT:
-        adc_value = V2M_SYS_REGS->ADC_CURRENT[dev_type] &
-                    JUNO_ADC_SYS_REG_AMPS_MASK;
+        adc_value =
+            V2M_SYS_REGS->ADC_CURRENT[dev_type] & JUNO_ADC_SYS_REG_AMPS_MASK;
 
         adc_quantity = ((uint64_t)adc_value) * JUNO_ADC_AMPS_MULTIPLIER;
 
@@ -52,18 +56,19 @@ static int get_value(fwk_id_t id, uint64_t *value)
         return FWK_SUCCESS;
 
     case ADC_TYPE_VOLT:
-        adc_value = V2M_SYS_REGS->ADC_VOLT[dev_type] &
-                    JUNO_ADC_SYS_REG_VOLT_MASK;
+        adc_value =
+            V2M_SYS_REGS->ADC_VOLT[dev_type] & JUNO_ADC_SYS_REG_VOLT_MASK;
 
-        adc_quantity = (((uint64_t)adc_value) * JUNO_ADC_VOLT_MULTIPLIER)
-                          / ADC_VOLT_CONST;
+        adc_quantity =
+            (((uint64_t)adc_value) * JUNO_ADC_VOLT_MULTIPLIER) / ADC_VOLT_CONST;
+
         *value = adc_quantity;
 
         return FWK_SUCCESS;
 
     case ADC_TYPE_POWER:
-        adc_value = V2M_SYS_REGS->ADC_POWER[dev_type] &
-                    JUNO_ADC_SYS_REG_POWER_MASK;
+        adc_value =
+            V2M_SYS_REGS->ADC_POWER[dev_type] & JUNO_ADC_SYS_REG_POWER_MASK;
 
         adc_quantity = ((uint64_t)adc_value) * JUNO_ADC_WATTS_MULTIPLIER;
 
@@ -78,8 +83,8 @@ static int get_value(fwk_id_t id, uint64_t *value)
         return FWK_SUCCESS;
 
     case ADC_TYPE_ENERGY:
-        adc_quantity = V2M_SYS_REGS->ADC_ENERGY[dev_type] *
-            JUNO_ADC_JOULE_MULTIPLIER;
+        adc_quantity =
+            V2M_SYS_REGS->ADC_ENERGY[dev_type] * JUNO_ADC_JOULE_MULTIPLIER;
 
         if ((dev_type == ADC_DEV_BIG) || (dev_type == ADC_DEV_GPU)) {
             adc_quantity /= ADC_ENERGY_CONST1;
@@ -94,6 +99,7 @@ static int get_value(fwk_id_t id, uint64_t *value)
     default:
         return FWK_E_PARAM;
     }
+#endif
 }
 
 static int get_info(fwk_id_t id, struct mod_sensor_info *info)
