@@ -1,6 +1,6 @@
 /*
  * Renesas SCP/MCP Software
- * Copyright (c) 2020-2021, Renesas Electronics Corporation. All rights
+ * Copyright (c) 2020-2022, Renesas Electronics Corporation. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -111,8 +111,11 @@ static int rcar_gen3_thermal_get_temp(void *devdata, int *temp)
 /*
  * Module API
  */
-static int get_value(fwk_id_t id, uint64_t *value)
+static int get_value(fwk_id_t id, mod_sensor_value_t *value)
 {
+#ifdef BUILD_HAS_SENSOR_SIGNED_VALUE
+    return FWK_E_SUPPORT;
+#else
     int tmp = 0;
     int64_t *ivalue;
 
@@ -128,6 +131,7 @@ static int get_value(fwk_id_t id, uint64_t *value)
     *ivalue = (int64_t)tmp;
 
     return FWK_SUCCESS;
+#endif
 }
 
 static int get_info(fwk_id_t id, struct mod_sensor_info *info)

@@ -62,8 +62,7 @@ static void mock_sensor_callback(uintptr_t param)
 /*
  * Module API
  */
-
-static int get_value(fwk_id_t id, uint64_t *value)
+static int get_value(fwk_id_t id, mod_sensor_value_t *value)
 {
     struct mock_sensor_dev_ctx *ctx;
     int status;

@@ -80,6 +80,7 @@ if(SCP_ENABLE_SCMI_SENSOR_V2)
     target_compile_definitions(framework PUBLIC "BUILD_HAS_SENSOR_TIMESTAMP")
     target_compile_definitions(framework PUBLIC "BUILD_HAS_SENSOR_MULTI_AXIS")
     target_compile_definitions(framework PUBLIC "BUILD_HAS_SENSOR_EXT_ATTRIBS")
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_SENSOR_SIGNED_VALUE")
 endif()
 
 if(SCP_ENABLE_SENSOR_TIMESTAMP)
@@ -92,6 +93,10 @@ endif()
 
 if(SCP_ENABLE_SENSOR_EXT_ATTRIBS)
     target_compile_definitions(framework PUBLIC "BUILD_HAS_SENSOR_EXT_ATTRIBS")
+endif()
+
+if(SCP_ENABLE_SENSOR_SIGNED_VALUE)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_SENSOR_SIGNED_VALUE")
 endif()
 
 #

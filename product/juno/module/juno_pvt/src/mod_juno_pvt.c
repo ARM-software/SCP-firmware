@@ -390,8 +390,11 @@ static int get_info(fwk_id_t id, struct mod_sensor_info *info)
     return FWK_SUCCESS;
 }
 
-static int get_value(fwk_id_t id, uint64_t *value)
+static int get_value(fwk_id_t id, mod_sensor_value_t *value)
 {
+#ifdef BUILD_HAS_SENSOR_SIGNED_VALUE
+    return FWK_E_SUPPORT;
+#else
     uint8_t elt_idx;
     struct pvt_dev_ctx *group_ctx;
     struct fwk_event read_req;
@@ -430,6 +433,7 @@ static int get_value(fwk_id_t id, uint64_t *value)
     }
 
     return status;
+#endif
 }
 
 static const struct mod_sensor_driver_api pvt_sensor_api = {

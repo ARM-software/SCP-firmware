@@ -54,7 +54,7 @@ static inline void sensor_data_copy(
     const struct mod_sensor_data *origin)
 {
 #ifdef BUILD_HAS_SENSOR_MULTI_AXIS
-    uint64_t *value = dest->axis_value;
+    mod_sensor_value_t *value = dest->axis_value;
 #endif
 
     fwk_str_memcpy(dest, origin, sizeof(struct mod_sensor_data));

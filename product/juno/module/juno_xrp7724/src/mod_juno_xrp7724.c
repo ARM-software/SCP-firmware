@@ -283,8 +283,11 @@ static const struct mod_juno_xrp7724_api_system_mode system_mode_api = {
 /*
  * Driver functions for the sensor API
  */
-static int juno_xrp7724_sensor_get_value(fwk_id_t id, uint64_t *value)
+static int juno_xrp7724_sensor_get_value(fwk_id_t id, mod_sensor_value_t *value)
 {
+#ifdef BUILD_HAS_SENSOR_SIGNED_VALUE
+    return FWK_E_SUPPORT;
+#else
     int status;
     struct fwk_event event;
 
@@ -306,6 +309,7 @@ static int juno_xrp7724_sensor_get_value(fwk_id_t id, uint64_t *value)
     }
 
     return FWK_PENDING;
+#endif
 }
 
 static int juno_xrp7724_sensor_get_info(fwk_id_t id,
