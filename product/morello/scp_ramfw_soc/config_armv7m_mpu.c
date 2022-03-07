@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -86,9 +86,10 @@ static const ARM_MPU_Region_t regions[] = {
             1,
             ARM_MPU_AP_PRIV,
             0,
+            /* Shared memory, Strongly Ordered */
             1,
-            1,
-            1,
+            0,
+            0,
             0,
             ARM_MPU_REGION_SIZE_64KB),
     },
