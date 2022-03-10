@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -46,6 +46,9 @@ struct mod_gtimer_dev_config {
 
     /*! Identifier of the clock that this device depends on */
     fwk_id_t clock_id;
+
+    /*! Skip initialisation of CNTCONTROL register */
+    bool skip_cntcontrol_init;
 };
 
 /*!

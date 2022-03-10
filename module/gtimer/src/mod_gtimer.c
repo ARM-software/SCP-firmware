@@ -254,6 +254,10 @@ static int gtimer_start(fwk_id_t id)
 
     ctx = mod_gtimer_ctx.table + fwk_id_get_element_idx(id);
 
+    if (ctx->config->skip_cntcontrol_init) {
+        return FWK_SUCCESS;
+    }
+
     if (!fwk_id_is_type(ctx->config->clock_id, FWK_ID_TYPE_NONE)) {
         /* Register for clock state notifications */
         return fwk_notification_subscribe(
