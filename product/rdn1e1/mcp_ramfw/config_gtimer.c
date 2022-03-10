@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -24,9 +24,10 @@ static const struct fwk_element gtimer_dev_table[] = {
             .data = &((struct mod_gtimer_dev_config){
                 .hw_timer = MCP_REFCLK_CNTBASE0_BASE,
                 .hw_counter = MCP_REFCLK_CNTCTL_BASE,
-                .control = MCP_REFCLK_CNTCTL_BASE,
+                .control = MCP_REFCLK_CNTCONTROL_BASE,
                 .frequency = CLOCK_RATE_REFCLK,
                 .clock_id = FWK_ID_NONE_INIT,
+                .skip_cntcontrol_init = true
         }),
     },
     [1] = { 0 },
