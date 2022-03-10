@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -40,6 +40,11 @@
  * Power control peripherals
  */
 #define MCP_PIK_BASE                  (MCP_POWER_PERIPH_BASE)
+
+/*
+ * System access port 1
+ */
+#define MCP_REFCLK_CNTCONTROL_BASE (MCP_SYS1_BASE + 0x2A430000)
 
 /*
  * Base addresses of MHU devices v2
