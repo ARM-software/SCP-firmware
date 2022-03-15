@@ -147,7 +147,9 @@ int initiate_power_state_transition(struct pd_ctx *pd)
     }
 #endif
 
-    pd->state_requested_to_driver = state;
+    if (status == FWK_SUCCESS) {
+        pd->state_requested_to_driver = state;
+    }
 
     return status;
 }
@@ -207,7 +209,7 @@ static void process_set_state_request(
     uint32_t composite_state;
     bool up, first_power_state_transition_initiated, composite_state_operation;
     unsigned int lowest_level, highest_level, level;
-    unsigned int nb_pds, pd_index, state;
+    unsigned int nb_pds, pd_index, state, prev_state;
     struct pd_ctx *pd, *pd_in_charge_of_response;
     const struct pd_ctx *parent;
     const uint32_t *state_mask_table = NULL;
@@ -286,6 +288,7 @@ static void process_set_state_request(
          * A new valid power state is requested for the power domain. Send any
          * pending response concerning the previous requested power state.
          */
+        prev_state = pd->requested_state;
         pd->requested_state = state;
         pd->power_state_pre_transition_notification_ctx.valid = false;
         send_pd_set_state_delayed_response(pd, FWK_E_OVERWRITTEN);
@@ -340,6 +343,9 @@ static void process_set_state_request(
              * no longer in charge to delay the response.
              */
             pd_in_charge_of_response = NULL;
+
+            /* The power state change failed, restore the previous state */
+            pd->requested_state = prev_state;
             break;
         }
 
@@ -539,6 +545,7 @@ void process_power_state_transition_report_deeper_state(struct pd_ctx *pd)
             FWK_LOG_DEBUG("[PD] %s @%d", __func__, __LINE__);
         }
     }
+    return;
 }
 
 /*
