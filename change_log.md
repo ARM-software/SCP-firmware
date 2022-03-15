@@ -1,7 +1,86 @@
 SCP-firmware Change Log
 =======================
 
-Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
+
+SCP-firmware - version 2.10
+============================
+
+New features
+------------
+
+- Build system:
+    - Stable CMake support has been added
+    - Make build system is being deprecated in this release, and in a future
+      release will be removed completely. No further patches related to the old
+      make build system will be accepted.
+    - LLVM support for armv7-m platforms
+
+- New modules:
+    - Max Power Mitigation Mechanism (MPMM) (initial support)
+    - Traffic Cop performance plugin (initial support)
+    - Added Thermal management (initial support)
+
+- Platforms:
+    - Morello platform support
+
+- Framework:
+    - Removed multi-threading feature, all platforms are now single threaded
+      There is no longer any thread concept, please see relevant commits for
+      details.
+    - framework: Add fwk_string interface
+
+Changed
+-------
+
+Arm is committed to making the language we use inclusive, meaningful, and
+respectful. Offensive terminology has been replaced with more inclusive
+terms throughout the codebase.
+
+The codebase now follows MISRA-2012 rules to the extent detailed in
+doc/code_rules.md.
+
+- Build system:
+    - Add target "doc" to cmake build system
+
+- Framework:
+    - fwk: Remove deprecated function put_event_and_wait
+    - fwk: Reduce SCP power consumption by suspending execution
+
+- Platforms:
+    - tc0: Add cmake support for plugins handler
+    - tc0: Add Power Model
+    - tc0: Add support for Build Variants
+    - tc0: Add PLATFORM_VARIANT feature flag
+    - sgi575/rdn1e1/rdv1/rdv1mc: add cmn650 mapping for 64-bit pcie mmio address space
+    - rdn1e1/rdv1/rdv1mc/rdn2/sgi575: fix gtimer module config in mcp ramfw
+    - synquacer: implement system power-off
+    - rdn2: add mapping for cmn700 address space
+
+- Modules:
+    - scmi_perf: clean up scmi_perf_notify_limits_updated()
+    - scmi_pd: Add power domain set state sync request handling
+    - scmi_sensor/sensor: Multi axis support
+`   - scmi_sensor/sensor: add timestamp support
+    - scmi_sensor/sensor: Extended Attributes Support
+    - perf_plugins_handler: Allow multiple plugins
+    - perf_plugins_handler: Add support for full data snapshot
+    - gtimer: add new flag for CNTCONTROL register initialization
+
+Resolved issues
+---------------
+
+- Build system:
+    - Fix SCP_ENABLE_DEBUGGER feature flag
+
+- Modules:
+    - scmi: shrink log strings to fix error messages
+    - plugins_handler: fix cmake build
+
+- Platforms:
+    - tc0: Fix Voltage Domain configuration
+    - synquacer: enable DDR DQS gate training workaround
+    - synquacer: fix spi nor flash software reset handling
 
 SCP-firmware - version 2.9.0
 ============================
