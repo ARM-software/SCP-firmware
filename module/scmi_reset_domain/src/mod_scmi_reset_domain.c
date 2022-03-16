@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -623,8 +623,7 @@ static int scmi_reset_init(fwk_id_t module_id,
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
 static int scmi_reset_init_notifications(void)
 {
-
-    fwk_assert(scmi_rd_ctx.config->agent_count != 0);
+    fwk_assert(scmi_rd_ctx.config->agent_count != 0u);
 
     return scmi_rd_ctx.scmi_notification_api->scmi_notification_init(
         MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN,

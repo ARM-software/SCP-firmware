@@ -193,7 +193,7 @@ struct mod_scmi_perf_ctx {
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     /* Number of active agents */
-    int agent_count;
+    unsigned int agent_count;
 
     /* SCMI notification API */
     const struct mod_scmi_notification_api *scmi_notification_api;
@@ -1794,7 +1794,7 @@ static int scmi_init_notifications(int domains)
         return status;
     }
 
-    fwk_assert(scmi_perf_ctx.agent_count != 0);
+    fwk_assert(scmi_perf_ctx.agent_count != 0u);
 
     status = scmi_perf_ctx.scmi_notification_api->scmi_notification_init(
         MOD_SCMI_PROTOCOL_ID_PERF,

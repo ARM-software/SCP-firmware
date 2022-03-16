@@ -39,7 +39,7 @@ struct mod_scmi_sys_power_ctx {
     bool start_graceful_process;
     struct mod_timer_alarm_api *alarm_api;
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    int agent_count;
+    unsigned int agent_count;
     fwk_id_t *system_power_notifications;
 #endif
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
@@ -138,10 +138,10 @@ static int system_state_get(enum scmi_system_state *system_state)
 static void scmi_sys_power_state_notify(fwk_id_t service_id,
     uint32_t system_state, bool forceful)
 {
-    unsigned int agent_id;
+    unsigned int agent_id, i;
     fwk_id_t id;
     struct scmi_sys_power_state_notifier return_values;
-    int status, i;
+    int status;
 
     status = scmi_sys_power_ctx.scmi_api->get_agent_id(service_id, &agent_id);
     if (status != FWK_SUCCESS) {
@@ -156,7 +156,7 @@ static void scmi_sys_power_state_notify(fwk_id_t service_id,
         return_values.flags = 1;
     }
 
-    for (i = 0; i < scmi_sys_power_ctx.agent_count; i++) {
+    for (i = 0u; i < scmi_sys_power_ctx.agent_count; i++) {
         id =  scmi_sys_power_ctx.system_power_notifications[i];
         if (fwk_id_is_equal(id, FWK_ID_NONE) ||
             fwk_id_is_equal(id, service_id)) {
@@ -688,19 +688,19 @@ static int scmi_sys_power_init(fwk_id_t module_id, unsigned int element_count,
 static int scmi_sys_power_init_notifications(void)
 {
     int status;
-    int i;
+    unsigned int i;
 
     status = scmi_sys_power_ctx.scmi_api->get_agent_count(
         &scmi_sys_power_ctx.agent_count);
     if (status != FWK_SUCCESS) {
         return status;
     }
-    fwk_assert(scmi_sys_power_ctx.agent_count != 0);
+    fwk_assert(scmi_sys_power_ctx.agent_count != 0u);
 
     scmi_sys_power_ctx.system_power_notifications =
         fwk_mm_calloc((size_t)scmi_sys_power_ctx.agent_count, sizeof(fwk_id_t));
 
-    for (i = 0; i < scmi_sys_power_ctx.agent_count; i++) {
+    for (i = 0u; i < scmi_sys_power_ctx.agent_count; i++) {
         scmi_sys_power_ctx.system_power_notifications[i] = FWK_ID_NONE;
     }
 
