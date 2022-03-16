@@ -303,14 +303,14 @@ static const struct mod_scmi_from_transport_api scmi_from_transport_api = {
  * SCMI protocol module -> SCMI module interface
  */
 
-static int get_agent_count(int *agent_count)
+static int get_agent_count(unsigned int *agent_count)
 {
     if (agent_count == NULL) {
         return FWK_E_PARAM;
     }
 
     /* Include the platform in the count */
-    *agent_count = (int)(scmi_ctx.config->agent_count + 1);
+    *agent_count = scmi_ctx.config->agent_count + 1u;
 
     return FWK_SUCCESS;
 }
@@ -1498,7 +1498,7 @@ static int scmi_init(fwk_id_t module_id, unsigned int service_count,
         return FWK_E_PARAM;
     }
 
-    if ((config->agent_count == 0) ||
+    if ((config->agent_count == 0u) ||
         (config->agent_count > MOD_SCMI_AGENT_ID_MAX)) {
         return FWK_E_PARAM;
     }

@@ -502,7 +502,7 @@ struct mod_scmi_from_protocol_api {
      * \retval ::FWK_SUCCESS The agent count was returned.
      * \retval ::FWK_E_PARAM The parameter `agent_count` is equal to `NULL`.
      */
-    int (*get_agent_count)(int *agent_count);
+    int (*get_agent_count)(unsigned int *agent_count);
 
     /*!
      * \brief Get the identifier of the agent associated with a service

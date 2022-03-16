@@ -84,7 +84,7 @@ struct mod_scmi_pd_ctx {
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     /* Number of active agents */
-    int agent_count;
+    unsigned int agent_count;
 
     /* SCMI notification API */
     const struct mod_scmi_notification_api *scmi_notification_api;
@@ -1087,7 +1087,7 @@ static int scmi_init_notifications(unsigned int domains)
     if (status != FWK_SUCCESS) {
         return status;
     }
-    fwk_assert(scmi_pd_ctx.agent_count != 0);
+    fwk_assert(scmi_pd_ctx.agent_count != 0u);
 
     status = scmi_pd_ctx.scmi_notification_api->scmi_notification_init(
         MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN,
