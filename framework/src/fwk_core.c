@@ -34,12 +34,6 @@ static struct __fwk_ctx ctx;
 static const char err_msg_line[] = "[FWK] Error %d in %s @%d";
 static const char err_msg_func[] = "[FWK] Error %d in %s";
 
-/* States for put_event_and_wait */
-enum wait_states {
-    WAITING_FOR_EVENT = 0,
-    WAITING_FOR_RESPONSE = 1,
-};
-
 enum interrupt_states {
     UNKNOWN_STATE = 0,
     INTERRUPT_STATE = 1,
