@@ -19,7 +19,8 @@ target_include_directories(
 
 target_sources(
     rdfremont-lcp
-    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_armv8m_mpu.c")
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_armv8m_mpu.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_pl011.c")
 
 #
 # Some of our firmware includes require CMSIS.
