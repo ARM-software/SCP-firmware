@@ -34,3 +34,4 @@ list(PREPEND SCP_MODULE_PATHS
 
 list(APPEND SCP_MODULES "armv8m-mpu")
 list(APPEND SCP_MODULES "lcp-platform")
+list(APPEND SCP_MODULES "pl011")
