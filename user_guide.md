@@ -20,10 +20,12 @@ To build the SCP/MCP firmware for a target product, the following tools are
 required:
 
 - [GNU Make] (*4.2* or later)
+- [CMake] (*3.18.4* or later)
 - [Python 3] (*3.6.9* or later)
 
 [GNU Make]: https://www.gnu.org/software/make/
 [Python 3]: https://www.python.org/downloads/release/python-369/
+[CMake]: https://cmake.org/
 
 Additionally, the firmware may be built using one of three compilers:
 
@@ -31,8 +33,10 @@ Additionally, the firmware may be built using one of three compilers:
 - [Arm Compiler 6] (*6.13* or later)
 - [LLVM Toolchain] (*11* or later)
 
-[GNU Arm Embedded Toolchain]: https://developer.arm.com/open-source/gnu-toolchain/gnu-rm
-[Arm Compiler 6]: https://developer.arm.com/tools-and-software/embedded/arm-compiler/downloads/version-6
+[GNU Arm Embedded Toolchain]:
+https://developer.arm.com/open-source/gnu-toolchain/gnu-rm
+[Arm Compiler 6]:
+https://developer.arm.com/tools-and-software/embedded/arm-compiler/downloads/version-6
 [LLVM Toolchain]: https://releases.llvm.org/download.html
 
 For Juno, it is required to have a more recent of GNU Arm embedded toolchain.
@@ -48,11 +52,16 @@ also required.
 The following tools are recommended but not required:
 
 - [Doxygen] (*1.8.13* or later): Required to generate supporting documentation
-- [GNU GCC] (*7.4.0* or later): Required to build framework tests that run on
-    the host system
+- [AArch64 GCC toolchain] (*6.2.1* or later): To build the Trusted Firmware in
+order to run the tests suites
+- [ARM GCC GNU-A toolchain] (*7.4.0* or later): Required to build framework
+tests that run on the host system
 
 [Doxygen]: http://www.doxygen.nl/
-[GNU GCC]: https://gcc.gnu.org/
+[AArch64 GCC toolchain]:
+http://releases.linaro.org/components/toolchain/binaries
+[ARM GCC GNU-A toolchain]:
+https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-a/downloads
 
 If building for an Arm FVP platform, you will need to ensure you have [the
 relevant FVP].
@@ -70,14 +79,18 @@ The instructions provided as a part of this guide assume you have [Git]
 
 [Git]: https://git-scm.com/
 
-Installing these prerequisites can be done on any standard Debian-based system
-with the following:
+Installing some of these prerequisites can be done on any standard Debian-based
+system with the following:
 
 ```sh
 sudo add-apt-repository ppa:team-gcc-arm-embedded/ppa
 sudo apt update
-sudo apt install build-essential doxygen gcc-arm-embedded git python3
+sudo apt install build-essential doxygen gcc-arm-embedded git python3 \
+device-tree-compiler
 ```
+
+For setting up the build system and its requirements (CMake among them), visit
+the cmake_readme.md file.
 
 For the FVP prerequisites:
 
@@ -85,12 +98,21 @@ For the FVP prerequisites:
 sudo apt install xterm
 ```
 
+For code style checks in Python scripts:
+
+```sh
+pip install pycodestyle
+pip install --upgrade pycodestyle
+sudo apt-get install pep8
+```
+
 ## Cloning the SCP-firmware source code
 
 The SCP-firmware source code can be cloned from the official GitHub repository:
 
 ```sh
-git clone --recurse-submodules https://github.com/ARM-software/SCP-firmware.git ${SCP_PATH}
+git clone --recurse-submodules https://github.com/ARM-software/SCP-firmware.git\
+ ${SCP_PATH}
 ```
 
 ### Cloning dependencies
@@ -101,7 +123,8 @@ Standard (CMSIS)] software pack. The source tree for this software is
 included with the firmware as a Git submodule. You can fetch all submodules from
 within the source directory with the following:
 
-[Cortex Microcontroller System Interface Standard (CMSIS)]: https://www.arm.com/why-arm/technologies/cmsis
+[Cortex Microcontroller System Interface Standard (CMSIS)]:
+https://www.arm.com/why-arm/technologies/cmsis
 
 ```sh
 git submodule update --init
@@ -128,14 +151,7 @@ documentation includes:
     products
 
 From within the SCP-firmware root directory Doxygen can be invoked using the
-top-level Makefile:
-
-```sh
-make doc
-```
-
-From within the SCP-firmware root directory Doxygen can also be invoked using the
-top-level Makefile.cmake:
+top-level Makefile.cmake file:
 
 ```sh
 make -f Makefile.cmake doc
@@ -146,14 +162,14 @@ To build SCP-firmware for a specific product the basic command format for
 invoking `make` (from within the source directory) is:
 
 ```sh
-make CC=<COMPILER> PRODUCT=<PRODUCT> [OPTIONS] [TARGET]
+make -f Makefile.cmake PRODUCT=<PRODUCT> [OPTIONS] [TARGET]
 ```
 
 For example, to build the RAM firmware for SGM-775 in debug mode, use the
 following:
 
 ```sh
-make CC=arm-none-eabi-gcc PRODUCT=sgm775 MODE=debug firmware-scp_ramfw
+make -f Makefile.cmake PRODUCT=sgm775 MODE=debug firmware-scp_ramfw
 ```
 
 The `all` target will be used if `[TARGET]` is omitted, which will build all the
@@ -163,7 +179,7 @@ The `help` target provides further information on the arguments that can be
 given:
 
 ```sh
-make help
+make -f Makefile.cmake help
 ```
 
 The framework includes a suite of tests that validate its core functionality.
@@ -171,16 +187,7 @@ If you installed the native GCC prerequisite, these can be run on the host
 system using:
 
 ```sh
-make test
-```
-
-For all products other than `host`, the code needs to be compiled by a
-cross-compiler. The toolchain is derived from the `CC` variable, which should
-point to the cross-compiler executable. It can be set as an environment variable
-before invoking `make`, or provided as part of the build command:
-
-```sh
-make CC=<path to the cross compiler> ...
+make -f Makefile.cmake test
 ```
 
 For more guidance and information on the build system, refer to the full set of
@@ -192,24 +199,20 @@ documentation.
 When building with the LLVM toolchain, it is mandatory to pass the required
 standard library and headers. These are taken from the
 [GNU Arm Embedded Toolchain]. According to the desired product and target the
-required environment variables differ.
+required environment variables differ. The PATH variable of the system must
+incorporate path to the required toolchain.
 
 #### ARMv7
 
-When building for an ARMv7 product the GNU Arm Embedded Toolchain compiler must
-be passed under the `SYSROOT_CC` environment variable.
-
-Building example for all of the SGM-775 targets:
-
 ```sh
-make SYSROOT_CC=arm-none-eabi-gcc CC=clang-11 PRODUCT=sgm775
+make -f Makefile.cmake PRODUCT=sgm775
 ```
 
 __Note:__ if the Compiler-RT builtins are placed in a non conventional folder,
 their absolute path must be passed to LDFLAGS as follows:
 
 ```sh
-make LDFLAGS=-L/path/to/compiler-rt-builtins SYSROOT_CC=arm-none-eabi-gcc CC=clang-11 PRODUCT=sgm775
+make -f Makefile.cmake LDFLAGS=-L/path/to/compiler-rt-builtins PRODUCT=sgm775
 ```
 
 Otherwise, the Compiler-RT builtins for baremetal are usually placed in:
@@ -238,7 +241,7 @@ Toolchain must be passed under the `SYSROOT` environment variable.
 Building example for all of the R-Car targets:
 
 ```sh
-make SYSROOT=/opt/gcc-arm-9.2-2019.12-x86_64-aarch64-none-elf/aarch64-none-elf CC=clang-11 PRODUCT=rcar
+make -f Makefile.cmake PRODUCT=rcar TOOLCHAIN=GNU
 ```
 
 ## Running the SCP firmware on SGM platforms
@@ -246,7 +249,8 @@ make SYSROOT=/opt/gcc-arm-9.2-2019.12-x86_64-aarch64-none-elf/aarch64-none-elf C
 For an introduction to the System Guidance for Mobile (SGM) platforms, please
 refer to [the Arm Developer documentation].
 
-[the Arm Developer documentation]: https://community.arm.com/developer/tools-software/oss-platforms/w/docs/388/system-guidance-for-mobile-sgm
+[the Arm Developer documentation]:
+https://community.arm.com/developer/tools-software/oss-platforms/w/docs/388/system-guidance-for-mobile-sgm
 
 The instructions within this section use SGM-775 as an example platform, but
 they are relevant for all SGM platforms.
@@ -256,35 +260,38 @@ they are relevant for all SGM platforms.
 The build system generates firmware images per the `product.mk` file associated
 with the product. For SGM platforms, two firmware images are built:
 
-- `scp_romfw.bin`: SCP ROM firmware image - handles the transfer of the RAM
+- `sgm775-bl1.bin`: SCP ROM firmware image - handles the transfer of the RAM
     firmware to private SRAM and jumps to it
-- `scp_ramfw.bin`: SCP RAM firmware image - manages the system runtime services
+- `sgm775-bl2.bin`: SCP RAM firmware image - manages the system runtime services
 
 ```sh
 cd ${SCP_PATH} && \
-    make CC=arm-none-eabi-gcc PRODUCT=sgm775 MODE=debug
+    make -f Makefile.cmake PRODUCT=sgm775 MODE=debug
 
-export SCP_ROM_PATH=${SCP_PATH}/build/product/sgm775/scp_romfw/debug/bin/scp_romfw.bin
-export SCP_RAM_PATH=${SCP_PATH}/build/product/sgm775/scp_ramfw/debug/bin/scp_ramfw.bin
+export SCP_ROM_PATH=${SCP_PATH}/build/sgm775/GNU/debug/firmware-scp_romfw/\
+bin/sgm775-bl1.bin
+export SCP_RAM_PATH=${SCP_PATH}/build/sgm775/GNU/debug/firmware-scp_ramfw/\
+bin/sgm775-bl2.bin
 ```
 
 __Note:__ If building with LLVM, make sure to pass the required environment
-variables to `make` as noted in [Building with LLVM](#building-with-llvm).
+variables as noted in [Building with LLVM](#building-with-llvm).
 
 ### Booting the firmware
 
-In order for the `scp_ramfw.bin` firmware image to be loaded, an application
+In order for the `sgm775-bl2.bin` firmware image to be loaded, an application
 processor secure world firmware needs to be available to load it. Arm maintains
 the [Arm Trusted Firmware-A (TF-A)] project, which handles this case. The
 remaining instructions assume you are using Trusted Firmware-A.
 
-[Arm Trusted Firmware-A (TF-A)]: https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git
+[Arm Trusted Firmware-A (TF-A)]:
+https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git
 
 On SGM platforms, the SCP images are given alternative names when used in the
 context of TF-A:
 
-- `scp_romfw.bin` has the alternative name `scp_bl1`
-- `scp_ramfw.bin` has the alternative name `scp_bl2`
+- `sgm775-bl1.bin` has the alternative name `scp_bl1`
+- `sgm775-bl2.bin` has the alternative name `scp_bl2`
 
 To boot the SCP firmware on SGM platforms with TF-A, you will need at minimum
 three additional images:
@@ -298,27 +305,31 @@ The FIP format acts as a container for a number of commonly-used images in the
 TF-A boot flow. Documentation for the FIP format can be found in the [TF-A
 firmware design documentation].
 
-[TF-A firmware design documentation]: https://trustedfirmware-a.readthedocs.io/en/latest/design/firmware-design.html?highlight=fip#firmware-image-package-fip
+[TF-A firmware design documentation]:
+https://trustedfirmware-a.readthedocs.io/en/latest/design/firmware-design.html?highlight=fip#firmware-image-package-fip
 
 An example command line to build Arm Trusted Firmware-A for AArch64 is given
 below. Note that you will need to have installed [the prerequisites for building
 Arm Trusted Firmware-A for SGM-775].
 
-[the prerequisites for building Arm Trusted Firmware-A for SGM-775]:  https://trustedfirmware-a.readthedocs.io/en/latest/getting_started/docs-build.html
+[the prerequisites for building Arm Trusted Firmware-A for SGM-775]:
+https://trustedfirmware-a.readthedocs.io/en/latest/getting_started/docs-build.html
 
 ```sh
 export TFA_PATH=<your Trusted Firmware-A path>
 
-git clone https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git ${TFA_PATH}
+git clone https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git \
+${TFA_PATH}
 
 cd ${TFA_PATH}
 
-make CROSS_COMPILE=aarch64-linux-gnu- DEBUG=1 LOG_LEVEL=30 PLAT=sgm775 CSS_USE_SCMI_SDS_DRIVER=1 \
-    bl1 bl2 fip
+make CROSS_COMPILE=aarch64-linux-gnu- DEBUG=1 LOG_LEVEL=30 PLAT=sgm775 \
+    CSS_USE_SCMI_SDS_DRIVER=1 SCP_BL2=<path to scp_bl2> \
+    BL33=<path to bl33file> bl1 bl2 fip
 
 export BL1_PATH=${TFA_PATH}/build/sgm775/debug/bl1.bin
 export BL2_PATH=${TFA_PATH}/build/sgm775/debug/bl2.bin
-export FIP_PATH=/tmp/fip.bin
+export FIP_PATH=${TFA_PATH}/build/sgm775/debug/fip.bin
 
 ./tools/fiptool/fiptool create \
     --tb-fw ${BL2_PATH} \
@@ -366,18 +377,21 @@ The build system generates firmware images per the `product.mk` file associated
 with the product. For SGI and Neoverse Reference Design platforms, three
 firmware images are built:
 
-- `scp_romfw.bin`: SCP ROM firmware image - loads the SCP RAM firmware from NOR
+- `sgi575-bl1.bin`: SCP ROM firmware image - loads the SCP RAM firmware from NOR
     flash into private SRAM and jumps to it
-- `scp_ramfw.bin`: SCP RAM firmware image - manages the system runtime services
-- `mcp_romfw.bin`: MCP ROM firmware image
+- `sgi575-bl2.bin`: SCP RAM firmware image - manages the system runtime services
+- `sgi575-mcp-bl1.bin`: MCP ROM firmware image
 
 ```sh
 cd ${SCP_PATH} && \
-    make CC=arm-none-eabi-gcc PRODUCT=sgi575 MODE=debug
+    make -f Makefile.cmake PRODUCT=sgi575 MODE=debug
 
-export SCP_ROM_PATH=${SCP_PATH}/build/product/sgi575/scp_romfw/debug/bin/scp_romfw.bin
-export SCP_RAM_PATH=${SCP_PATH}/build/product/sgi575/scp_ramfw/debug/bin/scp_ramfw.bin
-export MCP_ROM_PATH=${SCP_PATH}/build/product/sgi575/mcp_romfw/debug/bin/mcp_romfw.bin
+export SCP_ROM_PATH=${SCP_PATH}/build/sgi575/GNU/debug/firmware-scp_romfw/bin/\
+sgi575-bl1.bin
+export SCP_RAM_PATH=${SCP_PATH}/build/sgi575/GNU/debug/firmware-scp_ramfw/bin/\
+sgi575-bl2.bin
+export MCP_ROM_PATH=${SCP_PATH}/build/sgi575/GNU/debug/firmware-mcp_romfw/bin/\
+sgi575-mcp-bl1.bin
 ```
 
 __Note:__ If building with LLVM, make sure to pass the required environment
@@ -419,7 +433,8 @@ For an introduction to the Juno Development Board, please refer to
 The instructions within this section are similar to those used for SGM
 platforms, with minor differences.
 
-[the Arm Developer documentation]: https://community.arm.com/developer/tools-software/oss-platforms/w/docs/485/juno
+[the Arm Developer documentation]:
+https://community.arm.com/developer/tools-software/oss-platforms/w/docs/485/juno
 
 ### Building the images
 
@@ -452,7 +467,8 @@ set up with a Linaro release software stack. If this is not the case, you can
 follow the [Linaro software release instructions] and/or download a new SD card
 filesystem from the [Linaro releases page].
 
-[Linaro software release instructions]: https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms.git/about/docs/juno/user-guide.rst
+[Linaro software release instructions]:
+https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms.git/about/docs/juno/user-guide.rst
 [Linaro releases page]: https://releases.linaro.org/members/arm/platforms/
 
 Once your SD card has been set up, you can do the following to get started with
@@ -478,4 +494,5 @@ software stack on Arm platforms. This project provides a convenient wrapper
 around the various build systems involved in the software stack, including for
 SCP-firmware.
 
-[a super-project]: https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms.git/about/docs/user-guide.rst
+[a super-project]:
+https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms.git/about/docs/user-guide.rst
