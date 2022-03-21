@@ -2,13 +2,13 @@
 
 ## Introduction
 
-The SCP-Firmware project is planned to move to CMake build system in near
-future. At present the build system is in experimental state. Please follow
-below instruction to build the SCP firmware using CMake.
+The SCP-Firmware project currently uses the CMake build system.
+Please follow the instructions below to build the SCP firmware
+using CMake.
 
 ### Quick start
 
-- Prerequisite
+- Prerequisites
 
 > - Ubuntu 18.04 or later
 > - git
@@ -16,7 +16,7 @@ below instruction to build the SCP firmware using CMake.
 > ```sh
 > $ sudo apt install git
 > ```
-> - CMake version 3.18.4 or later
+> - The correct CMake version 3.18.4 or later can be installed with snap
 >
 > ```sh
 > $ sudo snap install cmake --classic
@@ -38,9 +38,11 @@ below instruction to build the SCP firmware using CMake.
 > ```sh
 > $ mkdir /home/$USER/toolchain
 > $ cd /home/$USER/toolchain
-> $ wget https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/10.2-2020.11/binrel/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf.tar.xz
+> $ wget https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-a/\
+> 10.2-2020.11/binrel/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf.tar.xz
 > $ tar xf gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf.tar.xz
-> $ export PATH=/home/$USER/toolchain/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf/bin:$PATH
+> $ export PATH=/home/$USER/toolchain/gcc-arm-10.2-2020.11-x86_64-aarch64-none-\
+> elf/bin:$PATH
 > Make sure whenever your run cmake commands for aarch64 target keep above
 > in path
 > ```
@@ -80,8 +82,8 @@ command to build all firmwares for a product
 By default all the binaries will be located at ./build/<platform> directory.
 e.g. in above case it will be under ./build/juno directory.
 
-Above command accepts number of options. Execute below instruction to get
-options available.
+The above command accepts a number of options. Execute the command below to get
+the available options.
 
 > ```sh
 > $ make -f Makefile.cmake help
@@ -109,13 +111,13 @@ few common options can be configured.
 
 - SCP_ENABLE_NOTIFICATIONS: Enable/disable notifications within SCP firmware.
 
-- SCP_ENABLE_SCMI_NOTIFICATIONS: Enable/disable SCMI notifications
+- SCP_ENABLE_SCMI_NOTIFICATIONS: Enable/disable SCMI notifications.
 
 - SCP_ENABLE_RESOURCE_PERMISSIONS: Enable/disable resource permissions settings.
 
 - SCP_ENABLE_PLUGIN_HANDLER: Enable the Performance Plugin handler extension.
 
-It can be also used to provide some platform specific settings.
+It can also be used to provide some platform specific settings.
 e.g. For ARM Juno platform. See below
 
 - SCP_ENABLE_SCMI_SENSOR_EVENTS_INIT: Enable/disable SCMI sensor events.
@@ -127,12 +129,13 @@ e.g. For ARM Juno platform. See below
 - SCP_ENABLE_STATISTICS_INIT: Enable/disable Juno statistics.
 
 ### Modifying build options
-There are number of ways to configure a specific option
+There are a number of ways to configure a specific option.
 
 - Using cmake command line option
 
 > ```sh
-> cmake -B /tmp/build  -DSCP_FIRMWARE_SOURCE_DIR:PATH=juno/scp_ramfw -DSCP_ENABLE_DEBUG_UNIT=TRUE
+> cmake -B /tmp/build  -DSCP_FIRMWARE_SOURCE_DIR:PATH=juno/scp_ramfw\
+> -DSCP_ENABLE_DEBUG_UNIT=TRUE
 > will configure cmake to build firmware for Juno platform scp_ramfw
 > firmware. with debug unit enabled
 > where
@@ -239,8 +242,10 @@ following:
 ```sh
 $ vagrant up
 Bringing machine 'default' up with 'docker' provider...
-==> default: Machine already provisioned. Run `vagrant provision` or use the `--provision`
-==> default: flag to force provisioning. Provisioners marked to run always will still run.
+==> default: Machine already provisioned. Run `vagrant provision` or use the
+`--provision`
+==> default: flag to force provisioning. Provisioners marked to run always will
+still run.
 ```
 
 > **NOTE**: The Docker container image will be built the first time you run
@@ -276,7 +281,8 @@ use Vagrant's [`docker-run`] command, e.g.:
 
 ```sh
 $ vagrant docker-run -- pwd
-==> default: Image is already built from the Dockerfile. `vagrant reload` to rebuild.
+==> default: Image is already built from the Dockerfile. `vagrant reload` to
+rebuild.
 ==> default: Creating the container...
     default:   Name: git_default_1601546529_1601546529
     default:  Image: b7c4cbfc3534
