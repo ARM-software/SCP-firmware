@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -55,6 +55,10 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_pcie_integ_ctrl.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_apremap.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_power_domain.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_psu.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_mock_psu.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_dvfs.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_perf.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_system_info.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_pl011.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_sid.c")
