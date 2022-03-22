@@ -19,6 +19,8 @@ set(SCP_ENABLE_NOTIFICATIONS TRUE)
 
 set(SCP_ENABLE_IPO_INIT FALSE)
 
+set(SCP_ENABLE_FAST_CHANNELS TRUE)
+
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/platform_system")
 
@@ -52,3 +54,7 @@ list(APPEND SCP_MODULES "power-domain")
 list(APPEND SCP_MODULES "scmi-power-domain")
 list(APPEND SCP_MODULES "scmi-system-power")
 list(APPEND SCP_MODULES "platform-system")
+list(APPEND SCP_MODULES "psu")
+list(APPEND SCP_MODULES "mock-psu")
+list(APPEND SCP_MODULES "dvfs")
+list(APPEND SCP_MODULES "scmi-perf")
