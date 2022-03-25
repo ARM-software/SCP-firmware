@@ -86,7 +86,7 @@ endif()
 
 project(
     SCP
-    VERSION 2.9.0
+    VERSION 2.10.0
     DESCRIPTION "Arm SCP/MCP Software"
     HOMEPAGE_URL
         "https://developer.arm.com/tools-and-software/open-source-software/firmware/scp-firmware"
