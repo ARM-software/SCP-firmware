@@ -38,6 +38,14 @@ class Build:
             build_str += ' - Variant {}'.format(self.variant.name)
         return build_str
 
+    def file_name(self):
+        filename = self.name + "_" + self.toolchain.name + "_" + \
+            self.build_type.name[0]
+        if self.variant:
+            filename += self.variant.name[0]
+        filename += ".txt"
+        return filename
+
     def command(self):
         cmd = 'make -f Makefile.cmake '
         cmd += 'PRODUCT={} TOOLCHAIN={} MODE={} '.format(self.name,
