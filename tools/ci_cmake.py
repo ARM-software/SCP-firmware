@@ -95,29 +95,33 @@ def code_validation(checks: list) -> List[Tuple[str, int]]:
     return results
 
 
-def start_build(build_info: List[Build]) -> List[Tuple[Build,
-                                                       subprocess.Popen]]:
+def do_build(build_info: List[Build], output_path: str) -> \
+        List[Tuple[Build, subprocess.Popen]]:
     build_status: List[Tuple[Build, subprocess.Popen]] = []
+    results: List[Tuple[str, int]] = []
+
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+
+    files = []
     for build in build_info:
+        file_path = os.path.join(output_path, build.file_name())
+        files.append(open(file_path, "w", encoding="utf-8"))
+
         build_id = subprocess.Popen(
                                 build.command(),
                                 shell=True,
-                                stdout=subprocess.DEVNULL,
+                                stdout=files[-1],
                                 stderr=subprocess.STDOUT)
 
         build_status.append((build, build_id))
         print('Test building [{}]'.format(build.tag()))
         print('[CMD] {}'.format(build.command()))
-    return build_status
 
-
-def wait_builds(build_status: Tuple[Build, subprocess.Popen]) -> List[Tuple[
-                                                                        str,
-                                                                        int]]:
-    results: List[Tuple[str, int]] = []
-    for build, build_id in build_status:
-        result = build_id.wait()
-        results.append((build.tag(), result))
+    for i, (build, build_id) in enumerate(build_status):
+        build_id.communicate()
+        results.append((build.tag(), build_id.returncode))
+        files[i].close()
     return results
 
 
@@ -147,7 +151,7 @@ def check_errors(ignore_errors: bool, results: List[Tuple[str, int]]) -> bool:
                                                  results)))
 
 
-def main(ignore_errors: bool):
+def main(ignore_errors: bool, output_path: str):
     # This code is only applicable if there is valid docker instance
     # On CI there is no docker instance at the moment
     try:
@@ -172,9 +176,12 @@ def main(ignore_errors: bool):
 
     banner('Test building products')
 
+    if output_path == "":
+        output_path = os.path.join("/tmp", "scp")
+    output_path = os.path.join(output_path, "build-output")
+
     for product in products:
-        build_status = start_build(product.builds)
-        results.extend(wait_builds(build_status))
+        results.extend(do_build(product.builds, output_path))
         if check_errors(ignore_errors, results):
             print('Errors detected! Excecution stopped')
             return analyze_results(*print_results(results))
@@ -191,9 +198,16 @@ def parse_args():
                         required=False, default=False, action='store_true',
                         help='Ignore errors and continue testing.')
 
+    parser.add_argument('-bod', '--build-output-dir', dest='output_path',
+                        required=False, default="", type=str, action='store',
+                        help='Parent directory of the "build-output" directory\
+                        , the one were the build logs will be stored in.\n \
+                        If bod is not given, the default location is /tmp/scp/\
+                        build-output')
+
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
-    sys.exit(main(args.ignore_errors))
+    sys.exit(main(args.ignore_errors, args.output_path))
