@@ -128,6 +128,7 @@ endmacro()
 
 #Append new unit tests below here
 list(APPEND UNIT_MODULE scmi)
+list(APPEND UNIT_MODULE scmi_clock)
 
 list(LENGTH UNIT_MODULE UNIT_TEST_MAX)
 
