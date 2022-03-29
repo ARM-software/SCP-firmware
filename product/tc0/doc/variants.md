@@ -16,7 +16,7 @@ The variant(s) can be chosen at build time by adding:
 make -f Makefile.cmake \
     PRODUCT=tc0 \
     MODE=<debug,release> \
-    EXTRA_CONFIG_ARGS+=-DSCP_PLATFORM_VARIANT=<0,1>
+    PLATFORM_VARIANT=<0,1>
 
 ```
 
