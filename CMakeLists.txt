@@ -408,7 +408,7 @@ macro(add_executable target)
                     COMMAND ${CMAKE_OBJCOPY}
                     ARGS -O binary
                         "$<TARGET_FILE:${target}>"
-                        "$<TARGET_FILE:${target}>.bin"
+                        "$<TARGET_FILE_DIR:${target}>/$<TARGET_FILE_BASE_NAME:${target}>.bin"
                     COMMENT "Generating flat binary ${target}.bin")
                 # cmake-format: on
             endif()
@@ -440,12 +440,12 @@ if(SCP_FIRMWARE)
         target_link_options(
             ${SCP_FIRMWARE_TARGET}
             PRIVATE "LINKER:--map"
-                    "LINKER:--list=$<TARGET_FILE:${SCP_FIRMWARE_TARGET}>.map")
+                    "LINKER:--list=$<TARGET_FILE_DIR:${SCP_FIRMWARE_TARGET}>/$<TARGET_FILE_BASE_NAME:${SCP_FIRMWARE_TARGET}>.map")
     else()
         target_link_options(
             ${SCP_FIRMWARE_TARGET}
             PRIVATE "LINKER:--cref"
-                    "LINKER:-Map=$<TARGET_FILE:${SCP_FIRMWARE_TARGET}>.map")
+                    "LINKER:-Map=$<TARGET_FILE_DIR:${SCP_FIRMWARE_TARGET}>/$<TARGET_FILE_BASE_NAME:${SCP_FIRMWARE_TARGET}>.map")
     endif()
 
     #
@@ -467,6 +467,10 @@ if(SCP_FIRMWARE)
                    OUTPUT_NAME "${SCP_FIRMWARE_NAME}"
                    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
+    set_target_properties(
+        ${SCP_FIRMWARE_TARGET}
+        PROPERTIES EXCLUDE_FROM_ALL FALSE
+        SUFFIX ".elf")
     #
     # Load in the CLI debugger if it was requested.
     #
