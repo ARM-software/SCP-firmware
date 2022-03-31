@@ -81,7 +81,7 @@ To date, *all* violations of the **Mandatory Rules** have been **resolved**:
 * Rule 12.5
 * Rule 13.6
 * Rules 17.3, 17.4, 17.6,
-* Rules 19.1,
+* Rule 19.1,
 * Rules 21.13, 21.17, 21.18, 21.19, 21.20,
 * Rules 22.2, 22.4, 22.5, 22.6
 
@@ -90,11 +90,7 @@ Other *Required Directives* have also had *all* their violations **resolved**:
 * Directive 1.1
 * Directive 2.1
 * Directive 3.1
-* Directive 4.1
-* Directive 4.3
-* Directive 4.7
-* Directive 4.11
-* Directive 4.14
+* Directives 4.1, 4.3, 4.7, 4.11, 4.14
 
 Other *Required Rules* have also had *all* their violations **resolved**:
 
@@ -114,14 +110,14 @@ Other *Required Rules* have also had *all* their violations **resolved**:
 * Rules 17.2, 17.7
 * Rules 18.1, 18.6
 * Rules 20.2, 20.3, 20.4, 20.6, 20.8, 20.11, 20.13, 20.14
-* Rules 21.4, 21.5
-* Rules 21.7, 21.8, 21.9, 21.10, 21.11, 21.14, 21.16
+* Rules 21.4, 21.5, 21.7, 21.8, 21.9, 21.10, 21.11, 21.14, 21.16
 * Rules 22.3, 22.7, 22.8, 22.9, 22.10
 
-The list of *Required Rules and Directives* that are currently being **deviated** from can be seen below:
+The list of *Required Rules and Directives* that are currently being
+**deviated** from can be seen below:
 
 * Directives 4.10, 4.12
-* Rules 2.1
+* Rule 2.1
 * Rule 3.1
 * Rules 8.2, 8.4, 8.5, 8.6, 8.14
 * Rules 10.7, 10.8
@@ -131,13 +127,13 @@ The list of *Required Rules and Directives* that are currently being **deviated*
 * Rules 16.1, 16.3, 16.4, 16.6
 * Rules 17.1, 17.7
 * Rules 18.2, 18.3, 18.7, 18.8
-* Rules 20.12
+* Rule 20.12
 * Rules 21.1, 21.2, 21.3, 21.6, 21.15
 
 *Advisory rules* are currently **not considered/treated**.
 
 Please note that new patches will have to be compliant with the current status
-of violations.
+of resolved rules/directives.
 
 C Standard Library
 ------------------
