@@ -17,6 +17,7 @@ contributions.
 - [Leandro Belli](https://github.com/leandro-arm) (leandro.belli@arm.com)
 - [Ahmed Gadallah](https://github.com/AhmedImbabyGadallah) (ahmed.gadallah@arm.com)
 - [Katherine Vincent](https://github.com/katvin01) (katherine.vincent@arm.com)
+- [Brett Warren](https://github.com/brett-warren-arm) (brett.warren@arm.com)
 
 ## Secondary Maintainers
 
@@ -52,7 +53,6 @@ maintainers. The platforms listed here represent the exceptions to this rule.
 
 #### Total Compute (tc0, tc1)
 
-- [Usama Arif](https://github.com/uarif1) (usama.arif@arm.com)
 - [Lakshmi Kailasanathan](https://github.com/lakkai) (lakshmi.kailasanathan@arm.com)
 
 ### Socionext
