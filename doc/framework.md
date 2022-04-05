@@ -81,21 +81,27 @@ For each firmware, linker information must be provided in a *fmw_memory.h* file:
 If a dual-region memory configuration is used then *FMW_MEM1_BASE* and
 *FMW_MEM1_SIZE* must also be defined.
 
-It is the responsibility of the firmware to define - in its Makefile - the
-architecture target for the image (using *BS_FIRMWARE_CPU*) and/or has
-notification support (using *BS_FIRMWARE_HAS_NOTIFICATION*). The firmware can
+It is the responsibility of the firmware to define - in its Toolchain-*.cmake -
+file the architecture target for the image
+(using set(CMAKE_SYSTEM_PROCESSOR "<processor-name>")) and/or has
+notification support in Firmware.cmake file
+(using set(SCP_ENABLE_NOTIFICATIONS_INIT TRUE/FULSE)). The firmware can
 optionally choose to use standard newlib or newlib-nano (optimized for code
-size) as prebuilt C library (using *BS_FIRMWARE_USE_NEWLIB_NANO_SPECS*).
+size) as prebuilt C library (using set(SCP_ENABLE_NEWLIB_NANO TRUE/FALSE)) in
+the same Firmware.cmake file.
 
 An example of a simple firmware directory which contains configuration files for
-two modules, the firmware.mk file, and the linker script.
+two modules, 3 CMake files and the header file fmw_memory.h which defines values
+consumed by the linker script.
 
 ```
 firmware_root/
+    CMakeLists.txt
     config_module_a.c
     config_module_b.c
-    firmware.mk
+    Firmmware.cmake
     fmw_memory.h
+    Toolchain-GNU.cmake
 ```
 
 ### Modules
