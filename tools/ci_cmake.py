@@ -151,21 +151,24 @@ def check_errors(ignore_errors: bool, results: List[Tuple[str, int]]) -> bool:
                                                  results)))
 
 
-def main(ignore_errors: bool, output_path: str):
+def main(ignore_errors: bool, output_path: str, skip_container: bool):
     # This code is only applicable if there is valid docker instance
     # On CI there is no docker instance at the moment
-    try:
-        client = docker.from_env()
-        banner("Spawning container")
-
+    if not skip_container:
         try:
-            return dockerize(client)
-        except Exception as ex:
-            print(ex)
-            return 1
+            client = docker.from_env()
+            banner("Spawning container")
 
-    except DockerException:
-        pass
+            try:
+                return dockerize(client)
+            except Exception as ex:
+                print(ex)
+                return 1
+
+        except DockerException:
+            pass
+    else:
+        banner("Skipping spawning container")
 
     results = []
 
@@ -205,9 +208,13 @@ def parse_args():
                         If bod is not given, the default location is /tmp/scp/\
                         build-output')
 
+    parser.add_argument('-sc', '--skip-container', dest='skip_container',
+                        required=False, default=False, action='store_true',
+                        help='Skip container execution.')
+
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
-    sys.exit(main(args.ignore_errors, args.output_path))
+    sys.exit(main(args.ignore_errors, args.output_path, args.skip_container))
