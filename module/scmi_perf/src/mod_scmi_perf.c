@@ -226,6 +226,9 @@ static struct mod_scmi_perf_ctx scmi_perf_ctx;
 /* Event indices */
 enum scmi_perf_event_idx {
     SCMI_PERF_EVENT_IDX_LEVEL_GET_REQUEST,
+#ifdef BUILD_HAS_FAST_CHANNELS
+    SCMI_PERF_EVENT_IDX_FAST_CHANNELS_PROCESS,
+#endif
     SCMI_PERF_EVENT_IDX_COUNT,
 };
 
@@ -1305,6 +1308,23 @@ exit:
  */
 static void fast_channel_callback(uintptr_t param)
 {
+    int status;
+    struct fwk_event_light event = (struct fwk_event_light){
+        .id = FWK_ID_EVENT_INIT(
+            FWK_MODULE_IDX_SCMI_PERF,
+            SCMI_PERF_EVENT_IDX_FAST_CHANNELS_PROCESS),
+        .source_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
+        .target_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_PERF),
+    };
+
+    status = fwk_put_event(&event);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-PERF] Error creating FC process event.");
+    }
+}
+
+static void fast_channels_process(void)
+{
     const struct mod_scmi_perf_domain_config *domain;
     struct mod_scmi_perf_fast_channel_limit *set_limit;
     struct scmi_perf_domain_ctx *domain_ctx;
@@ -2221,6 +2241,28 @@ static int process_response_event(const struct fwk_event *event)
     return FWK_SUCCESS;
 }
 
+/* Handle internal events */
+static int process_internal_event(const struct fwk_event *event)
+{
+    int status;
+    enum scmi_perf_event_idx event_idx =
+        (enum scmi_perf_event_idx)fwk_id_get_event_idx(event->id);
+
+    switch (event_idx) {
+#ifdef BUILD_HAS_FAST_CHANNELS
+    case SCMI_PERF_EVENT_IDX_FAST_CHANNELS_PROCESS:
+        fast_channels_process();
+        status = FWK_SUCCESS;
+        break;
+#endif
+    default:
+        status = FWK_E_PARAM;
+        break;
+    }
+
+    return status;
+}
+
 static int scmi_perf_process_event(const struct fwk_event *event,
                                     struct fwk_event *resp_event)
 {
@@ -2234,6 +2276,12 @@ static int scmi_perf_process_event(const struct fwk_event *event,
     if (fwk_id_get_module_idx(event->source_id) ==
         fwk_id_get_module_idx(fwk_module_id_dvfs)) {
         return process_response_event(event);
+    }
+
+    /* Response internal events */
+    if (fwk_id_get_module_idx(event->source_id) ==
+        fwk_id_get_module_idx(fwk_module_id_scmi_perf)) {
+        return process_internal_event(event);
     }
 
     return FWK_E_PARAM;
