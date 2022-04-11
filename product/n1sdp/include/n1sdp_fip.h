@@ -12,6 +12,7 @@
 
 enum mod_n1sdp_fip_toc_entry_type {
     MOD_N1SDP_FIP_TOC_ENTRY_MCP_BL2 = MOD_FIP_TOC_ENTRY_COUNT,
+    MOD_N1SDP_FIP_TOC_ENTRY_TFA_BL1,
 };
 
 #endif /* N1SDP_FIP_H */

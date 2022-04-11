@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -24,7 +24,6 @@ enum n1sdp_sds_struct_id {
     N1SDP_SDS_CPU_BOOTCTR =          6 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
     N1SDP_SDS_CPU_FLAGS =            7 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
     N1SDP_SDS_PLATFORM_INFO =        8 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
-    N1SDP_SDS_BL33_INFO =            9 | (1 << MOD_SDS_ID_VERSION_MAJOR_POS),
 };
 
 enum n1sdp_sds_region_idx {
@@ -46,7 +45,6 @@ enum n1sdp_sds_region_idx {
 #define N1SDP_SDS_CPU_BOOTCTR_SIZE           256
 #define N1SDP_SDS_CPU_FLAGS_SIZE             256
 #define N1SDP_SDS_PLATFORM_INFO_SIZE         4
-#define N1SDP_SDS_BL33_INFO_SIZE             12
 
 /*
  * Field masks and offsets for the N1SDP_SDS_AP_CPU_INFO structure.
@@ -80,5 +78,4 @@ struct n1sdp_sds_platid {
  */
 #define SDS_ELEMENT_IDX_FEATURE_AVAILABILITY  3
 #define SDS_ELEMENT_IDX_PLATFORM_INFO         4
-#define SDS_ELEMENT_IDX_BL33_INFO             5
 #endif /* N1SDP_SDS_H */

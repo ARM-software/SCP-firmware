@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -95,15 +95,6 @@ static struct fwk_element sds_element_table[] = {
         .data = &((struct mod_sds_structure_desc) {
             .id = N1SDP_SDS_PLATFORM_INFO,
             .size = N1SDP_SDS_PLATFORM_INFO_SIZE,
-            .region_id = N1SDP_SDS_REGION_SECURE,
-            .finalize = true,
-        }),
-    },
-    {
-        .name = "BL33 Image Info",
-        .data = &((struct mod_sds_structure_desc) {
-            .id = N1SDP_SDS_BL33_INFO,
-            .size = N1SDP_SDS_BL33_INFO_SIZE,
             .region_id = N1SDP_SDS_REGION_SECURE,
             .finalize = true,
         }),
