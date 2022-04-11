@@ -49,9 +49,7 @@ static struct mod_pl011_ctx {
     bool initialized; /* Whether the context has been initialized */
 
     struct mod_pl011_element_ctx *elements; /* Element context table */
-} pl011_ctx = {
-    .initialized = false,
-};
+} pl011_ctx;
 
 static int mod_pl011_init_ctx(struct mod_pl011_ctx *ctx)
 {
