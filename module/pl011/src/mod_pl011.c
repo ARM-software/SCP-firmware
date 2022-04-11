@@ -65,9 +65,6 @@ static int mod_pl011_init_ctx(struct mod_pl011_ctx *ctx)
     }
 
     ctx->elements = fwk_mm_alloc(element_count, sizeof(ctx->elements[0]));
-    if (!fwk_expect(ctx->elements != NULL)) {
-        return FWK_E_NOMEM;
-    }
 
     for (size_t i = 0; i < element_count; i++) {
         const struct mod_pl011_element_cfg *cfg =
