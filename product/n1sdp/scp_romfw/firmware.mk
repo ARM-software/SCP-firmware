@@ -24,6 +24,7 @@ BS_FIRMWARE_MODULES := \
 BS_FIRMWARE_SOURCES := \
     config_pl011.c \
     config_n1sdp_rom.c \
-    config_clock.c
+    config_clock.c \
+    config_fip.c
 
 include $(BS_DIR)/firmware.mk

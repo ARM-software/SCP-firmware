@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -21,7 +21,8 @@ target_sources(
     morello-bl1
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_pl011.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_morello_rom.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c")
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_fip.c")
 
 #
 # Some of our firmware includes require CMSIS.

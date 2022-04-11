@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <n1sdp_fip.h>
+
 #include <mod_fip.h>
 #include <mod_n1sdp_rom.h>
 
@@ -110,7 +112,7 @@ static int n1sdp_rom_start(fwk_id_t id)
 
 static const char *get_image_type_str(enum mod_fip_toc_entry_type type)
 {
-    if (type == MOD_FIP_TOC_ENTRY_MCP_BL2)
+    if (type == (enum mod_fip_toc_entry_type)MOD_N1SDP_FIP_TOC_ENTRY_MCP_BL2)
         return "MCP";
     if (type == MOD_FIP_TOC_ENTRY_SCP_BL2)
         return "SCP";
