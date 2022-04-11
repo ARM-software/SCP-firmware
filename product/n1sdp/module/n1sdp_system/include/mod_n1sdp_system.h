@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -41,19 +41,15 @@
 #define AP_SCP_SRAM_OFFSET            UINT32_C(0xA0000000)
 
 /*! AP Cores Reset Address in SCP Address Space */
-#define AP_CORE_RESET_ADDR            UINT32_C(0xA4040000)
+#define AP_CORE_RESET_ADDR UINT32_C(0xA4060000)
 
 /*! Address translation enable bit */
 #define ADDR_TRANS_EN                 UINT32_C(0x1)
 
-/*! Source address of BL33 image to be used by BL31 */
-#define BL33_SRC_BASE_ADDR            UINT32_C(0x14200000)
-
-/*! Destination address of BL33 image to be used by BL31 */
-#define BL33_DST_BASE_ADDR            UINT32_C(0xE0000000)
-
-/*! Size of BL33 image to be used by BL31 */
-#define BL33_SIZE                     UINT32_C(0x00200000)
+/* QSPI Controller constants */
+#define N1SDP_IOFPGA_SCC_BASE                0xBC130000
+#define N1SDP_IOFPGA_SCC_QSPI_MUX_REG_OFFSET (N1SDP_IOFPGA_SCC_BASE + 0x1C)
+#define N1SDP_SOC_QSPI_MUX_EN                0x1
 
 /*!
  * Offset of NIC-400 security 0 register for

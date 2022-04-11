@@ -21,6 +21,8 @@
 #include "n1sdp_scp_system_mmap.h"
 #include "n1sdp_sds.h"
 
+#include <n1sdp_fip.h>
+
 #include <internal/n1sdp_scp2pcc.h>
 
 #include <mod_clock.h>
@@ -54,7 +56,7 @@
 #include <string.h>
 
 /*
- * Platform information structure used by BL31
+ * Platform information structure used by BL2 & BL31
  */
 struct n1sdp_platform_info {
     /* If multichip mode */
@@ -65,18 +67,6 @@ struct n1sdp_platform_info {
     uint8_t local_ddr_size;
     /* Remote ddr size in GB */
     uint8_t remote_ddr_size;
-};
-
-/*
- * BL33 image information structure used by BL31
- */
-struct n1sdp_bl33_info {
-    /* Source address of BL33 image */
-    uint32_t bl33_src_addr;
-    /* Load address of BL33 image */
-    uint32_t bl33_dst_addr;
-    /* BL33 image size */
-    uint32_t bl33_size;
 };
 
 /* MultiChip information */
@@ -117,11 +107,6 @@ static fwk_id_t sds_feature_availability_id =
 static struct n1sdp_platform_info sds_platform_info;
 static fwk_id_t sds_platform_info_id =
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, SDS_ELEMENT_IDX_PLATFORM_INFO);
-
-/* SDS BL33 image information */
-static struct n1sdp_bl33_info sds_bl33_info;
-static fwk_id_t sds_bl33_info_id =
-    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, SDS_ELEMENT_IDX_BL33_INFO);
 
 /* Module context */
 struct n1sdp_system_ctx {
@@ -366,18 +351,6 @@ static int n1sdp_system_fill_platform_info(void)
         0, (void *)(&sds_platform_info), sds_structure_desc->size);
 }
 
-static int n1sdp_system_fill_bl33_info(void)
-{
-    const struct mod_sds_structure_desc *sds_structure_desc =
-        fwk_module_get_data(sds_bl33_info_id);
-
-    sds_bl33_info.bl33_src_addr = BL33_SRC_BASE_ADDR;
-    sds_bl33_info.bl33_dst_addr = BL33_DST_BASE_ADDR;
-    sds_bl33_info.bl33_size = BL33_SIZE;
-    return n1sdp_system_ctx.sds_api->struct_write(sds_structure_desc->id,
-        0, (void *)(&sds_bl33_info), sds_structure_desc->size);
-}
-
 /*
  * Initialize primary core during system initialization
  */
@@ -413,24 +386,24 @@ static int n1sdp_system_init_primary_core(void)
     if (n1sdp_get_chipid() == 0x0) {
         struct mod_fip_entry_data entry;
         status = n1sdp_system_ctx.fip_api->get_entry(
-            MOD_FIP_TOC_ENTRY_TFA_BL31,
+            (enum mod_fip_toc_entry_type)MOD_N1SDP_FIP_TOC_ENTRY_TFA_BL1,
             &entry,
             SCP_QSPI_FLASH_BASE_ADDR,
             SCP_QSPI_FLASH_SIZE);
         if (status != FWK_SUCCESS) {
             FWK_LOG_INFO(
-                "[N1SDP SYSTEM] Failed to locate AP TF_BL31, error: %d\n",
+                "[N1SDP SYSTEM] Failed to locate AP TF_BL1, error: %d\n",
                 status);
             return FWK_E_PANIC;
         }
 
-        FWK_LOG_INFO("[N1SDP SYSTEM] Located AP TF_BL31:\n");
+        FWK_LOG_INFO("[N1SDP SYSTEM] Located AP TF_BL1:\n");
         FWK_LOG_INFO("[N1SDP SYSTEM]   address: %p\n", entry.base);
         FWK_LOG_INFO("[N1SDP SYSTEM]   size   : %u\n", entry.size);
         FWK_LOG_INFO("[N1SDP SYSTEM]   flags  : 0x%08" PRIX32 "%08" PRIX32"\n",
             (uint32_t)(entry.flags >> 32),  (uint32_t)entry.flags);
         FWK_LOG_INFO(
-            "[N1SDP SYSTEM] Copying AP TF_BL31 to address 0x%"PRIx32"...\n",
+            "[N1SDP SYSTEM] Copying AP TF_BL1 to address 0x%" PRIx32 "...\n",
             AP_CORE_RESET_ADDR);
 
         status = n1sdp_system_copy_to_ap_sram(
@@ -439,12 +412,10 @@ static int n1sdp_system_init_primary_core(void)
             return FWK_E_PANIC;
         }
 
-        /* Fill BL33 image information structure */
-        FWK_LOG_INFO("[N1SDP SYSTEM] Filling BL33 information...");
-        status = n1sdp_system_fill_bl33_info();
-        if (status != FWK_SUCCESS) {
-            return status;
-        }
+        /* Enable AP access to SCP QSPI NOR */
+        FWK_LOG_INFO("[N1SDP SYSTEM] Enabling AP access to SCP QSPI NOR");
+        *(volatile uint32_t *)(N1SDP_IOFPGA_SCC_QSPI_MUX_REG_OFFSET) |=
+            N1SDP_SOC_QSPI_MUX_EN;
 
         /* Fill Platform information structure */
         FWK_LOG_INFO("[N1SDP SYSTEM] Collecting Platform information...");
