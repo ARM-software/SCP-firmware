@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -40,7 +40,6 @@ BS_FIRMWARE_MODULES := \
     scmi_power_domain \
     scmi_system_power \
     scmi_management \
-    fip \
     ssc \
     system_info \
     psu \

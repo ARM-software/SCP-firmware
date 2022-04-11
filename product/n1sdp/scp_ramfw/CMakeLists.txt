@@ -49,7 +49,8 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_n1sdp_remote_pd.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_n1sdp_timer_sync.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_power_domain.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_pl011.c")
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_pl011.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_fip.c")
 
 if(SCP_ENABLE_DEBUGGER)
     target_compile_definitions(n1sdp-bl2 PRIVATE BUILD_HAS_DEBUGGER)

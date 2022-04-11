@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -8,52 +8,82 @@
  *     Firmware Image Package (FIP) parser support.
  */
 
-#include <internal/fip.h>
-
 #include <mod_fip.h>
 
+#include <fwk_id.h>
 #include <fwk_log.h>
 #include <fwk_module.h>
 #include <fwk_status.h>
+#include <fwk_string.h>
 
 #include <inttypes.h>
 #include <string.h>
+
+static const struct fip_uuid_desc fip_uuid_desc_arr[3] = {
+    FIP_UUID_NULL,
+    FIP_UUID_SCP_BL2,
+    FIP_UUID_TFA_BL31,
+};
 
 /*
  * Static helpers
  */
 static int fip_entry_type_to_uuid(
     enum mod_fip_toc_entry_type type,
-    struct fip_uuid *uuid)
+    uint8_t *uuid)
 {
-    switch (type) {
-    case MOD_FIP_TOC_ENTRY_SCP_BL2:
-        *uuid = FIP_UUID_SCP_BL2;
-        break;
-    case MOD_FIP_TOC_ENTRY_MCP_BL2:
-        *uuid = FIP_UUID_MCP_BL2;
-        break;
-    case MOD_FIP_TOC_ENTRY_TFA_BL31:
-        *uuid = FIP_UUID_TFA_BL31;
-        break;
-    default:
-        return FWK_E_PARAM;
+    const struct mod_fip_module_config *module_config;
+    size_t i;
+
+    module_config = fwk_module_get_data(fwk_module_id_fip);
+    size_t desc_arr_size =
+        sizeof(fip_uuid_desc_arr) / sizeof(fip_uuid_desc_arr[0]);
+
+    if (type < MOD_FIP_TOC_ENTRY_COUNT) {
+        for (i = 0; i < desc_arr_size; i++) {
+            if (fip_uuid_desc_arr[i].image_type == type) {
+                fwk_str_memcpy(
+                    uuid, fip_uuid_desc_arr[i].uuid, FIP_UUID_ENTRY_SIZE);
+                return FWK_SUCCESS;
+            }
+        }
     }
 
-    return FWK_SUCCESS;
+    if (type >= MOD_FIP_TOC_ENTRY_COUNT &&
+        module_config->custom_fip_uuid_desc_arr != NULL) {
+        for (i = 0; i < module_config->custom_uuid_desc_count; i++) {
+            if (module_config->custom_fip_uuid_desc_arr[i].image_type == type) {
+                fwk_str_memcpy(
+                    uuid,
+                    module_config->custom_fip_uuid_desc_arr[i].uuid,
+                    FIP_UUID_ENTRY_SIZE);
+                return FWK_SUCCESS;
+            }
+        }
+    }
+
+    return FWK_E_PARAM;
 }
 
-static int uuid_cmp(
-    const struct fip_uuid *const a,
-    const struct fip_uuid *const b)
+static inline bool uuid_cmp(const uint8_t *a, const uint8_t *b)
 {
-    return memcmp(a, b, sizeof(*a)) == 0;
+    int match = 0;
+
+    for (unsigned int i = 0; i < FIP_UUID_ENTRY_SIZE; i++) {
+        if (a[i] == b[i]) {
+            match++;
+        } else {
+            match--;
+        }
+    }
+
+    return (match == FIP_UUID_ENTRY_SIZE);
 }
 
-static int uuid_is_null(const struct fip_uuid *const a)
+static bool uuid_is_null(const uint8_t *uuid)
 {
-    static const struct fip_uuid uuid_null = FIP_UUID_NULL;
-    return uuid_cmp(a, &uuid_null);
+    static const struct fip_uuid_desc uuid_null = FIP_UUID_NULL;
+    return uuid_cmp(uuid, uuid_null.uuid);
 }
 
 static bool validate_fip_toc(const struct fip_toc *const toc)
@@ -65,13 +95,13 @@ static bool validate_fip_toc(const struct fip_toc *const toc)
  * Module API functions
  */
 static int fip_get_entry(
-    enum mod_fip_toc_entry_type type,
+    enum mod_fip_toc_entry_type image_type,
     struct mod_fip_entry_data *const entry_data,
     uintptr_t base,
     size_t limit)
 {
     uintptr_t address;
-    struct fip_uuid target_uuid;
+    uint8_t target_uuid[FIP_UUID_ENTRY_SIZE];
     struct fip_toc_entry *toc_entry;
     int status;
     struct fip_toc *toc = (void *)base;
@@ -90,7 +120,8 @@ static int fip_get_entry(
 
     toc_entry = toc->entry;
 
-    status = fip_entry_type_to_uuid(type, &target_uuid);
+    /* Updates target_uuid field with UUID of corresponding image_type passed */
+    status = fip_entry_type_to_uuid(image_type, target_uuid);
     if (status != FWK_SUCCESS)
         return status;
 
@@ -98,8 +129,8 @@ static int fip_get_entry(
      * Traverse all FIP ToC entries until the desired entry is found or ToC
      * End Marker is reached
      */
-    while (!uuid_cmp(&toc_entry->uuid, &target_uuid)) {
-        if (uuid_is_null(&toc_entry->uuid))
+    while (!uuid_cmp(toc_entry->uuid, target_uuid)) {
+        if (uuid_is_null(toc_entry->uuid))
             return FWK_E_RANGE;
         toc_entry++;
     }
@@ -143,8 +174,6 @@ static int fip_process_bind_request(
     *api = &fip_api;
     return FWK_SUCCESS;
 }
-
-const struct fwk_module_config config_fip = { 0 };
 
 const struct fwk_module module_fip = {
     .type = FWK_MODULE_TYPE_SERVICE,

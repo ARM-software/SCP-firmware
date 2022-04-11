@@ -7,6 +7,8 @@
 
 #include "morello_scp_pik.h"
 
+#include <morello_fip.h>
+
 #include <mod_fip.h>
 #include <mod_morello_rom.h>
 
@@ -111,7 +113,7 @@ static int morello_rom_start(fwk_id_t id)
 
 static const char *get_image_type_str(enum mod_fip_toc_entry_type type)
 {
-    if (type == MOD_FIP_TOC_ENTRY_MCP_BL2)
+    if (type == (enum mod_fip_toc_entry_type)MOD_MORELLO_FIP_TOC_ENTRY_MCP_BL2)
         return "MCP";
     if (type == MOD_FIP_TOC_ENTRY_SCP_BL2)
         return "SCP";

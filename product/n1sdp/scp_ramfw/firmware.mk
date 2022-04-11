@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -84,7 +84,8 @@ BS_FIRMWARE_SOURCES := \
     config_n1sdp_remote_pd.c \
     config_n1sdp_timer_sync.c \
     config_scmi_power_domain.c \
-    config_pl011.c
+    config_pl011.c \
+    config_fip.c
 
 ifeq ($(BUILD_HAS_DEBUGGER),yes)
     BS_FIRMWARE_MODULES += debugger_cli
