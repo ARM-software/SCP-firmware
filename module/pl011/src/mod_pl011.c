@@ -51,7 +51,7 @@ static struct mod_pl011_ctx {
     struct mod_pl011_element_ctx *elements; /* Element context table */
 } pl011_ctx;
 
-static int mod_pl011_init_ctx(struct mod_pl011_ctx *ctx)
+static void mod_pl011_init_ctx(void)
 {
     size_t element_count;
 
@@ -59,16 +59,17 @@ static int mod_pl011_init_ctx(struct mod_pl011_ctx *ctx)
 
     element_count = (size_t)fwk_module_get_element_count(fwk_module_id_pl011);
     if (element_count == 0) {
-        return FWK_SUCCESS;
+        return;
     }
 
-    ctx->elements = fwk_mm_alloc(element_count, sizeof(ctx->elements[0]));
+    pl011_ctx.elements =
+        fwk_mm_alloc(element_count, sizeof(pl011_ctx.elements[0]));
 
     for (size_t i = 0; i < element_count; i++) {
         const struct mod_pl011_element_cfg *cfg =
             fwk_module_get_data(FWK_ID_ELEMENT(FWK_MODULE_IDX_PL011, i));
 
-        ctx->elements[i] = (struct mod_pl011_element_ctx){
+        pl011_ctx.elements[i] = (struct mod_pl011_element_ctx){
             .powered = true, /* Assume the device is always powered */
             .clocked = true, /* Assume the device is always clocked */
 
@@ -76,19 +77,19 @@ static int mod_pl011_init_ctx(struct mod_pl011_ctx *ctx)
         };
 
 #ifdef BUILD_HAS_MOD_POWER_DOMAIN
-        ctx->elements[i].powered = fwk_id_is_equal(cfg->pd_id, FWK_ID_NONE);
+        pl011_ctx.elements[i].powered =
+            fwk_id_is_equal(cfg->pd_id, FWK_ID_NONE);
 #endif
 
 #ifdef BUILD_HAS_MOD_CLOCK
-        ctx->elements[i].clocked = fwk_id_is_equal(cfg->clock_id, FWK_ID_NONE);
+        pl011_ctx.elements[i].clocked =
+            fwk_id_is_equal(cfg->clock_id, FWK_ID_NONE);
 #endif
 
         (void)cfg;
     }
 
     pl011_ctx.initialized = true;
-
-    return FWK_SUCCESS;
 }
 
 static void mod_pl011_set_baud_rate(const struct mod_pl011_element_cfg *cfg)
@@ -219,7 +220,9 @@ static int mod_pl011_init(
         return FWK_SUCCESS;
     }
 
-    return mod_pl011_init_ctx(&pl011_ctx);
+    mod_pl011_init_ctx();
+
+    return FWK_SUCCESS;
 }
 
 static int mod_pl011_element_init(
@@ -557,8 +560,6 @@ static int mod_pl011_process_notification(
 
 static int mod_pl011_io_open(const struct fwk_io_stream *stream)
 {
-    int status;
-
     struct mod_pl011_element_ctx *ctx;
 
     if (!fwk_id_is_type(stream->id, FWK_ID_TYPE_ELEMENT)) {
@@ -566,10 +567,7 @@ static int mod_pl011_io_open(const struct fwk_io_stream *stream)
     }
 
     if (!pl011_ctx.initialized) {
-        status = mod_pl011_init_ctx(&pl011_ctx);
-        if (status != FWK_SUCCESS) {
-            return FWK_E_STATE;
-        }
+        mod_pl011_init_ctx();
     }
 
     ctx = &pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
