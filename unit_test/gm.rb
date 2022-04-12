@@ -6,7 +6,8 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-require_relative '../contrib/cmock/git/lib/cmock.rb'
+GIT_ROOT = `git rev-parse --show-toplevel | tr -d '\n'`
+require "#{GIT_ROOT}/contrib/cmock/git/lib/cmock.rb"
 require 'optparse'
 require 'optparse/time'
 
