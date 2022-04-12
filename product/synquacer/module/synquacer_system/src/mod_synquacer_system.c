@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <mod_nor.h>
 #include <mod_power_domain.h>
 #include <mod_synquacer_system.h>
 #include <mod_system_power.h>
@@ -95,7 +96,14 @@ static int synquacer_system_bind(fwk_id_t id, unsigned int round)
         status = fwk_module_bind(
             FWK_ID_MODULE(FWK_MODULE_IDX_HSSPI),
             FWK_ID_API(FWK_MODULE_IDX_HSSPI, 0),
-            &synquacer_system_ctx.hsspi_api);
+            &synquacer_system_ctx.qspi_api);
+        if (status != FWK_SUCCESS)
+            return status;
+
+        status = fwk_module_bind(
+            FWK_ID_MODULE(FWK_MODULE_IDX_NOR),
+            FWK_ID_API(FWK_MODULE_IDX_NOR, MOD_NOR_API_TYPE_DEFAULT),
+            &synquacer_system_ctx.nor_api);
         if (status != FWK_SUCCESS)
             return status;
 

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -69,8 +69,11 @@ struct synquacer_system_ctx {
     /*! pointer to the f_i2c module. */
     const struct mod_f_i2c_api *f_i2c_api;
 
+    /*! pointer to the nor module. */
+    const struct mod_nor_api *nor_api;
+
     /*! pointer to the hsspi module. */
-    const struct mod_hsspi_api *hsspi_api;
+    const struct qspi_api *qspi_api;
 
     /*! pointer to the hsspi module. */
     const struct mod_timer_api *timer_api;

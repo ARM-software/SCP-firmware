@@ -7,6 +7,7 @@
 
 /* Use of "manager" may be out of sync with older versions of TRM */
 
+#include "bootctl_reg.h"
 #include "low_level_access.h"
 #include "pik_system.h"
 #include "synquacer_common.h"
@@ -23,6 +24,7 @@
 
 #include <mod_f_i2c.h>
 #include <mod_hsspi.h>
+#include <mod_nor.h>
 #include <mod_power_domain.h>
 #include <mod_synquacer_system.h>
 
@@ -52,6 +54,9 @@
 #define SEC_OVERRIDE_REG_NETSEC_NIC UINT8_C(20)
 
 eeprom_config_t eeprom_config;
+
+static fwk_id_t qspi_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_HSSPI, 0);
+static fwk_id_t nor_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_NOR, 0);
 
 void power_domain_coldboot(void);
 int fw_ddr_spd_param_check(void);
@@ -293,9 +298,17 @@ static void fw_system_reset(void)
 
 int synquacer_reboot_chip(void)
 {
-    FWK_LOG_INFO("[SYNQUACER SYSTEM] HSSPI exit start.");
-    synquacer_system_ctx.hsspi_api->hsspi_exit();
-    FWK_LOG_INFO("[SYNQUACER SYSTEM] HSSPI exit end.");
+    struct bootctl_reg *bootctl =
+        (struct bootctl_reg *)CONFIG_SOC_REG_ADDR_BOOT_CTL_TOP;
+
+    FWK_LOG_INFO("[SYNQUACER SYSTEM] HSSPI initialize start.");
+    synquacer_system_ctx.qspi_api->init_csmode(qspi_id);
+    synquacer_system_ctx.nor_api->reset(nor_id, 0);
+
+    /* configure BOOT_CTL as initial state */
+    bootctl->BOOT_HSSPI |= (0x1U << 1);
+    bootctl->BOOT_HSSPI &= ~(0x1U << 0);
+    FWK_LOG_INFO("[SYNQUACER SYSTEM] HSSPI initialize end.");
 
     __disable_fault_irq();
 
@@ -342,12 +355,14 @@ void main_initialize(void)
     status = fw_ddr_spd_param_check();
     fwk_assert(status == FWK_SUCCESS);
 
-    /* prepare eeprom configuration data */
-    memcpy(
+    /* read the eeprom configuration data */
+    synquacer_system_ctx.nor_api->read(
+        nor_id,
+        0,
+        MOD_NOR_READ_FAST_1_4_4_4BYTE,
+        CONFIG_SCP_CONFIG_TABLE_OFFSET + EEPROM_CONFIG_T_START_OFFSET,
         &eeprom_config,
-        (char *)(CONFIG_SCP_CONFIG_TABLE_ADDR + EEPROM_CONFIG_T_START_OFFSET),
         sizeof(eeprom_config));
-
     bus_sysoc_init();
 
     return;
@@ -357,11 +372,12 @@ static void fw_wakeup_ap(void)
 {
     ap_dev_init();
 
-    synquacer_system_ctx.hsspi_api->hsspi_init();
-    FWK_LOG_INFO("[SYNQUACER SYSTEM] Finished initializing HS-SPI controller.");
     FWK_LOG_INFO("[SYNQUACER SYSTEM] Arm tf load start.");
     fw_fip_load_arm_tf();
     FWK_LOG_INFO("[SYNQUACER SYSTEM] Arm tf load end.");
+
+    synquacer_system_ctx.nor_api->configure_mmap_read(
+        nor_id, 0, MOD_NOR_READ_FAST_1_4_4_4BYTE, true);
 }
 
 int synquacer_main(void)

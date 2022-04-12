@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -80,6 +80,8 @@
 #define CONFIG_SOC_BOOT_HSSPI_REG_ADDR UINT32_C(0x48100008)
 
 #define CONFIG_SCP_CONFIG_TABLE_ADDR UINT32_C(0xA8080000)
+#define CONFIG_SCP_CONFIG_TABLE_OFFSET (CONFIG_SCP_CONFIG_TABLE_ADDR - \
+                                        HSSPI_MEM_BASE)
 
 /* EEPROM CONFIG */
 #define CONFIG_SCB_EEPROM_SIZE UINT32_C(65536)
@@ -166,6 +168,8 @@
     }
 
 #define CONFIG_SCB_ARM_TF_BASE_ADDR UINT32_C(0xA8180000)
+#define CONFIG_SCB_ARM_TF_OFFSET    (CONFIG_SCB_ARM_TF_BASE_ADDR - \
+                                     HSSPI_MEM_BASE)
 #define CONFIG_SCB_UEFI_BASE_ADDR UINT32_C(0xA8200000)
 
 #define CONFIG_SCB_ARM_TB_BL1_BASE_ADDR UINT32_C(0xA4000000)

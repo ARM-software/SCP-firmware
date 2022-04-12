@@ -30,4 +30,5 @@ target_sources(
 target_link_libraries(
     ${SCP_MODULE_TARGET}
     PRIVATE module-ppu-v0-synquacer module-power-domain module-system-power
-            module-f-i2c module-hsspi module-synquacer-memc module-timer)
+            module-f-i2c module-hsspi module-synquacer-memc module-timer
+            module-nor)
