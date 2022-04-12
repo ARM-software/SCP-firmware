@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -8,6 +8,9 @@
 #include "synquacer_mmap.h"
 
 #include <ddr_init.h>
+
+#include <mod_nor.h>
+#include <mod_synquacer_system.h>
 
 #include <fwk_assert.h>
 #include <fwk_attributes.h>
@@ -17,6 +20,8 @@
 #include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
+
+static fwk_id_t nor_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_NOR, 0);
 
 struct FWK_PACKED fip_toc_header_s {
     uint32_t name;
@@ -69,24 +74,11 @@ typedef struct arm_tf_fip_package_s arm_tf_fip_package_t;
  * Current implementation expects bl32 is located as 4th binary
  * in the arm-tf fip package.
  */
-static void fw_fip_load_bl32(void)
+static void fw_fip_load_bl32(arm_tf_fip_package_t *fip_package_p)
 {
     uint32_t trans_addr_39_20;
-    void *src, *dst;
-    uint8_t bl32_uuid[] = UUID_SECURE_PAYLOAD_BL32;
-
-    arm_tf_fip_package_t *fip_package_p =
-        (arm_tf_fip_package_t *)CONFIG_SCB_ARM_TF_BASE_ADDR;
-
-    if (memcmp(
-            (void *)bl32_uuid,
-            (void *)fip_package_p->fip_toc_entry[BL32_TOC_ENTRY_INDEX].uuid,
-            sizeof(bl32_uuid)) != 0) {
-        FWK_LOG_ERR("[FIP] BL32 UUID is wrong, skip loading");
-        return;
-    }
-
-    FWK_LOG_ERR("[FIP] load BL32");
+    uint32_t src;
+    void *dst;
 
     /* enable DRAM access by configuring address trans register */
     trans_addr_39_20 =
@@ -94,10 +86,23 @@ static void fw_fip_load_bl32(void)
     *((volatile uint32_t *)(REG_ASH_SCP_POW_CTL + ADDR_TRANS_OFFSET)) =
         trans_addr_39_20;
 
-    src = (void *)((uint32_t)fip_package_p +
-     (uint32_t)fip_package_p->fip_toc_entry[BL32_TOC_ENTRY_INDEX].offset_addr);
+    src = CONFIG_SCB_ARM_TF_OFFSET +
+        (uint32_t)fip_package_p->fip_toc_entry[BL32_TOC_ENTRY_INDEX].offset_addr;
     dst = (void *)SCP_ADDR_TRANS_AREA;
-    memcpy(dst, src, fip_package_p->fip_toc_entry[BL32_TOC_ENTRY_INDEX].size);
+
+    FWK_LOG_INFO(
+        "[FIP] load BL32 src 0x%" PRIx32 ", dst %" PRIx32 ", size %" PRIu32,
+        HSSPI_MEM_BASE + src,
+        (uint32_t)CONFIG_SCB_ARM_TB_BL32_BASE_ADDR,
+        (uint32_t)fip_package_p->fip_toc_entry[BL32_TOC_ENTRY_INDEX].size);
+
+    synquacer_system_ctx.nor_api->read(
+        nor_id,
+        0,
+        MOD_NOR_READ_FAST_1_4_4_4BYTE,
+        src,
+        dst,
+        (uint32_t)fip_package_p->fip_toc_entry[BL32_TOC_ENTRY_INDEX].size);
 
     /* disable DRAM access */
     trans_addr_39_20 =
@@ -105,19 +110,18 @@ static void fw_fip_load_bl32(void)
     *((volatile uint32_t *)(REG_ASH_SCP_POW_CTL + ADDR_TRANS_OFFSET)) =
         trans_addr_39_20;
 
-    FWK_LOG_ERR("[FIP] BL32 is loaded");
+    FWK_LOG_INFO("[FIP] BL32 is loaded");
 }
 
 void fw_fip_load_arm_tf(void)
 {
     uint32_t i;
-
-    const uint32_t arm_tf_dst_addr[3] = { CONFIG_SCB_ARM_TB_BL1_BASE_ADDR,
-                                          CONFIG_SCB_ARM_TB_BL2_BASE_ADDR,
-                                          CONFIG_SCB_ARM_TB_BL3_BASE_ADDR };
-
-    arm_tf_fip_package_t *fip_package_p =
-        (arm_tf_fip_package_t *)CONFIG_SCB_ARM_TF_BASE_ADDR;
+    uint32_t src;
+    uint8_t bl32_uuid[] = UUID_SECURE_PAYLOAD_BL32;
+    const uint32_t arm_tf_dst_addr[] = { CONFIG_SCB_ARM_TB_BL1_BASE_ADDR,
+                                         CONFIG_SCB_ARM_TB_BL2_BASE_ADDR,
+                                         CONFIG_SCB_ARM_TB_BL3_BASE_ADDR };
+    arm_tf_fip_package_t fip_package;
 
     static_assert(
         sizeof(fip_toc_header_t) == 16, "sizeof(fip_toc_header_t) is wrong");
@@ -127,34 +131,55 @@ void fw_fip_load_arm_tf(void)
         sizeof(arm_tf_fip_package_t) == 176,
         "sizeof(arm_tf_fip_package_t) is wrong");
 
+    synquacer_system_ctx.nor_api->read(
+        nor_id,
+        0,
+        MOD_NOR_READ_FAST_1_4_4_4BYTE,
+        CONFIG_SCB_ARM_TF_OFFSET,
+        &fip_package,
+        sizeof(fip_package));
+
     for (i = 0; i < FWK_ARRAY_SIZE(arm_tf_dst_addr); i++) {
         FWK_LOG_INFO(
-            "[FIP] fip_toc_entry[%" PRIu32 "] offset_addr %" PRIx64,
+            "[FIP] fip_toc_entry[%" PRIu32 "] offset_addr %" PRIx32,
             i,
-            fip_package_p->fip_toc_entry[i].offset_addr);
+            (uint32_t)fip_package.fip_toc_entry[i].offset_addr);
 
         FWK_LOG_INFO(
-            "[FIP] fip_toc_entry[%" PRIu32 "] size        %" PRIu64,
+            "[FIP] fip_toc_entry[%" PRIu32 "] size        %" PRIu32,
             i,
-            fip_package_p->fip_toc_entry[i].size);
+            (uint32_t)fip_package.fip_toc_entry[i].size);
 
         FWK_LOG_INFO(
             "[FIP] dst addr[%" PRIu32 "]                  %" PRIx32,
             i,
             arm_tf_dst_addr[i]);
 
+        src = CONFIG_SCB_ARM_TF_OFFSET +
+            (uint32_t)fip_package.fip_toc_entry[i].offset_addr;
+
         FWK_LOG_INFO(
             "[FIP] src addr[%" PRIu32 "]                  %" PRIx32,
             i,
-            ((uint32_t)fip_package_p +
-             (uint32_t)fip_package_p->fip_toc_entry[i].offset_addr));
+            HSSPI_MEM_BASE + src);
 
-        memcpy((void *)arm_tf_dst_addr[i],
-               (void *)((uint32_t)fip_package_p +
-                        (uint32_t)fip_package_p->fip_toc_entry[i].offset_addr),
-               (uint32_t)fip_package_p->fip_toc_entry[i].size);
+        synquacer_system_ctx.nor_api->read(
+            nor_id,
+            0,
+            MOD_NOR_READ_FAST_1_4_4_4BYTE,
+            src,
+            (void *)arm_tf_dst_addr[i],
+            (uint32_t)fip_package.fip_toc_entry[i].size);
     }
 
-    if (ddr_is_secure_dram_enabled())
-        fw_fip_load_bl32();
+    if (ddr_is_secure_dram_enabled()) {
+        if (memcmp(
+                (void *)bl32_uuid,
+                (void *)fip_package.fip_toc_entry[BL32_TOC_ENTRY_INDEX].uuid,
+                sizeof(bl32_uuid)) == 0) {
+            fw_fip_load_bl32(&fip_package);
+        } else {
+            FWK_LOG_WARN("[FIP] no BL32 payload in fip image");
+        }
+    }
 }

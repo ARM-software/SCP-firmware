@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -23,12 +23,13 @@ BS_FIRMWARE_MODULES := \
     system_power \
     power_domain \
     clock \
+    hsspi \
+    nor \
     synquacer_system \
     pik_clock \
     css_clock \
     ccn512 \
     f_i2c \
-    hsspi \
     synquacer_memc \
     mhu \
     smt \
@@ -58,6 +59,9 @@ BS_FIRMWARE_SOURCES := \
     config_synquacer_memc.c \
     config_system_power.c \
     config_timer.c \
+    config_nor.c \
     config_scmi_power_domain.c
+
+include $(PRODUCT_DIR)/src/device.mk
 
 include $(BS_DIR)/firmware.mk

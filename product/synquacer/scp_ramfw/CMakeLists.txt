@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -18,6 +18,8 @@ target_include_directories(
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include"
            "${CMAKE_CURRENT_SOURCE_DIR}")
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../src/CMakeLists.txt)
+
 target_sources(
     synquacer-bl2
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_armv7m_mpu.c"
@@ -26,6 +28,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_css_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_f_i2c.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_hsspi.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_nor.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_f_uart3.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_mhu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_pik_clock.c"
