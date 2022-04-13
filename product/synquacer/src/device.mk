@@ -9,6 +9,7 @@
 # Select SPI-NOR flash memory
 #
 DEVICE_NOR = MACRONIX
+#DEVICE_NOR = MICRON
 
 #
 # set build target and macro definition for SPI-NOR
@@ -16,4 +17,7 @@ DEVICE_NOR = MACRONIX
 ifeq ($(DEVICE_NOR),MACRONIX)
 BS_FIRMWARE_SOURCES += device_nor_mx25.c
 DEFINES += DEVICE_NOR_MX25
+else ifeq ($(DEVICE_NOR),MICRON)
+BS_FIRMWARE_SOURCES += device_nor_mt25.c
+DEFINES += DEVICE_NOR_MT25
 endif

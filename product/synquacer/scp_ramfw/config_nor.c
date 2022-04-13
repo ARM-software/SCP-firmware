@@ -7,6 +7,8 @@
 
 #if defined(DEVICE_NOR_MX25)
 #    include "nor/device_nor_mx25.h"
+#elif defined(DEVICE_NOR_MT25)
+#    include "nor/device_nor_mt25.h"
 #else
 #    error \
         "not found correct definition, please check DEVICE_NOR in src/device.mk."
