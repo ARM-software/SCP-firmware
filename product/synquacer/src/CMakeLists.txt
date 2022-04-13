@@ -6,10 +6,18 @@
 #
 
 set(DEVICE_NOR "MACRONIX")
+#set(DEVICE_NOR "MICRON")
 
 if(DEVICE_NOR STREQUAL "MACRONIX")
     add_compile_definitions(PUBLIC DEVICE_NOR_MX25)
     target_sources(
         synquacer-bl2
         PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../src/device_nor_mx25.c")
+endif()
+
+if(DEVICE_NOR STREQUAL "MICRON")
+    add_compile_definitions(PUBLIC DEVICE_NOR_MT25)
+    target_sources(
+        synquacer-bl2
+        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../src/device_nor_mt25.c")
 endif()
