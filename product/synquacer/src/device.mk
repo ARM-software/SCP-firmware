@@ -10,6 +10,7 @@
 #
 DEVICE_NOR = MACRONIX
 #DEVICE_NOR = MICRON
+#DEVICE_NOR = INFINEON
 
 #
 # set build target and macro definition for SPI-NOR
@@ -20,4 +21,7 @@ DEFINES += DEVICE_NOR_MX25
 else ifeq ($(DEVICE_NOR),MICRON)
 BS_FIRMWARE_SOURCES += device_nor_mt25.c
 DEFINES += DEVICE_NOR_MT25
+else ifeq ($(DEVICE_NOR),INFINEON)
+BS_FIRMWARE_SOURCES += device_nor_s25.c
+DEFINES += DEVICE_NOR_S25
 endif
