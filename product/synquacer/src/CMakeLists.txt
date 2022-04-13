@@ -8,6 +8,7 @@
 set(DEVICE_NOR "MACRONIX")
 #set(DEVICE_NOR "MICRON")
 #set(DEVICE_NOR "INFINEON")
+#set(DEVICE_NOR "WINBOND")
 
 if(DEVICE_NOR STREQUAL "MACRONIX")
     add_compile_definitions(PUBLIC DEVICE_NOR_MX25)
@@ -28,4 +29,11 @@ if(DEVICE_NOR STREQUAL "INFINEON")
     target_sources(
         synquacer-bl2
         PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../src/device_nor_s25.c")
+endif()
+
+if(DEVICE_NOR STREQUAL "WINBOND")
+    add_compile_definitions(PUBLIC DEVICE_NOR_W25)
+    target_sources(
+        synquacer-bl2
+        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../src/device_nor_w25.c")
 endif()

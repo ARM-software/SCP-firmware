@@ -11,6 +11,8 @@
 #    include "nor/device_nor_mt25.h"
 #elif defined(DEVICE_NOR_S25)
 #    include "nor/device_nor_s25.h"
+#elif defined(DEVICE_NOR_W25)
+#    include "nor/device_nor_w25.h"
 #else
 #    error \
         "not found correct definition, please check DEVICE_NOR in src/device.mk."
