@@ -61,4 +61,41 @@ struct scmi_service_ctx {
     enum mod_scmi_message_type scmi_message_type;
 };
 
+struct scmi_protocol {
+    /* SCMI protocol message handler */
+    mod_scmi_message_handler_t *message_handler;
+
+    /* SCMI protocol framework identifier */
+    fwk_id_t id;
+};
+
+struct mod_scmi_ctx {
+    /* SCMI module configuration data */
+    struct mod_scmi_config *config;
+
+    /* Table of bound protocols */
+    struct scmi_protocol *protocol_table;
+
+    /* Number of bound protocols */
+    unsigned int protocol_count;
+
+    /*
+     * SCMI protocol identifier to the index of the entry in protocol_table[]
+     * dedicated to the protocol.
+     */
+    uint8_t scmi_protocol_id_to_idx[MOD_SCMI_PROTOCOL_ID_MAX + 1];
+
+    /* Table of service contexts */
+    struct scmi_service_ctx *service_ctx_table;
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    /* SCMI Resource Permissions API */
+    const struct mod_res_permissions_api *res_perms_api;
+#endif
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    /* Table of scmi notification subscribers */
+    struct scmi_notification_subscribers *scmi_notif_subscribers;
+#endif
+};
+
 #endif /* MOD_INTERNAL_SCMI_H */
