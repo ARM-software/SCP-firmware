@@ -117,6 +117,9 @@ few common options can be configured.
 
 - SCP_ENABLE_PLUGIN_HANDLER: Enable the Performance Plugin handler extension.
 
+- SCP_TARGET_EXCLUDE_BASE_PROTOCOL: Exclude Base Protocol functionality from the
+SCMI Module.
+
 It can also be used to provide some platform specific settings.
 e.g. For ARM Juno platform. See below
 

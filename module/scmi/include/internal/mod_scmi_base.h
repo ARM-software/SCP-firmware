@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -8,9 +8,16 @@
  *      SCMI base protocol definitions.
  */
 
-#ifndef INTERNAL_SCMI_BASE_H
-#define INTERNAL_SCMI_BASE_H
+#ifndef INTERNAL_MOD_SCMI_BASE_H
+#define INTERNAL_MOD_SCMI_BASE_H
 
+#include <internal/mod_scmi.h>
+
+#include <mod_scmi.h>
+
+#include <fwk_id.h>
+
+#include <stddef.h>
 #include <stdint.h>
 
 /*
@@ -25,10 +32,10 @@
 #define SCMI_BASE_PROTOCOL_ATTRIBUTES_NUM_AGENTS_MASK    0xFF00U
 
 #define SCMI_BASE_PROTOCOL_ATTRIBUTES(NUM_PROTOCOLS, NUM_AGENTS) \
-    ((((NUM_PROTOCOLS) << SCMI_BASE_PROTOCOL_ATTRIBUTES_NUM_PROTOCOLS_POS) \
-      & SCMI_BASE_PROTOCOL_ATTRIBUTES_NUM_PROTOCOLS_MASK) | \
-     (((NUM_AGENTS) << SCMI_BASE_PROTOCOL_ATTRIBUTES_NUM_AGENTS_POS) \
-       & SCMI_BASE_PROTOCOL_ATTRIBUTES_NUM_AGENTS_MASK))
+    ((((NUM_PROTOCOLS) << SCMI_BASE_PROTOCOL_ATTRIBUTES_NUM_PROTOCOLS_POS) & \
+      SCMI_BASE_PROTOCOL_ATTRIBUTES_NUM_PROTOCOLS_MASK) | \
+     (((NUM_AGENTS) << SCMI_BASE_PROTOCOL_ATTRIBUTES_NUM_AGENTS_POS) & \
+      SCMI_BASE_PROTOCOL_ATTRIBUTES_NUM_AGENTS_MASK))
 
 /*
  * BASE_DISCOVER_VENDOR
@@ -123,4 +130,14 @@ struct __attribute((packed)) scmi_base_reset_agent_config_p2a {
     int32_t status;
 };
 
-#endif /* INTERNAL_SCMI_BASE_H */
+int scmi_base_message_handler(
+    fwk_id_t protocol_id,
+    fwk_id_t service_id,
+    const uint32_t *payload,
+    size_t payload_size,
+    unsigned int message_id);
+
+void scmi_base_set_api(const struct mod_scmi_from_protocol_api *api);
+void scmi_base_set_shared_ctx(struct mod_scmi_ctx *scmi_ctx_param);
+
+#endif /* INTERNAL_MOD_SCMI_BASE_H */
