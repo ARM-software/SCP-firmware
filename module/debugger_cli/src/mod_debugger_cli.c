@@ -53,6 +53,30 @@ static void alarm_callback(uintptr_t module_idx)
     }
 }
 
+static int start_alarm(fwk_id_t id)
+{
+    const struct mod_debugger_cli_module_config *module_config;
+
+    /* Retrieve the module config as specified by the platform config.c file */
+    module_config = fwk_module_get_data(id);
+
+    /* Start the UART polling alarm, recurring with the given time period */
+    return alarm_api->start(module_config->alarm_id, module_config->poll_period,
+        MOD_TIMER_ALARM_TYPE_PERIODIC, alarm_callback,
+        fwk_id_get_module_idx(id));
+}
+
+static int stop_alarm(fwk_id_t id)
+{
+    const struct mod_debugger_cli_module_config *module_config;
+
+    /* Retrieve the module config as specified by the platform config.c file */
+    module_config = fwk_module_get_data(id);
+
+    /* Stop the UART polling alarm */
+    return alarm_api->stop(module_config->alarm_id);
+}
+
 static int debugger_cli_init(fwk_id_t module_id, unsigned int element_count,
     const void *data)
 {
@@ -83,27 +107,34 @@ static int debugger_cli_bind(fwk_id_t id, unsigned int round)
 
 static int debugger_cli_start(fwk_id_t id)
 {
-    const struct mod_debugger_cli_module_config *module_config;
-
-    /* Retrieve the module config as specified by the platform config.c file */
-    module_config = fwk_module_get_data(id);
-
-    /* Start the UART polling alarm, recurring with the given time period */
-    return alarm_api->start(module_config->alarm_id, module_config->poll_period,
-        MOD_TIMER_ALARM_TYPE_PERIODIC, alarm_callback,
-        fwk_id_get_module_idx(id));
+    return start_alarm(id);
 }
 
 static int debugger_cli_process_event(const struct fwk_event *event,
                                       struct fwk_event *resp_event)
 {
     int status;
+    int start_alarm_status;
 
     switch (event->id.event.event_idx) {
     case DEBUGGER_CLI_INTERNAL_EVENT_IDX_ENTER_DEBUGGER:
         /* Start the CLI, blocking the rest of the event queue */
         cli_print("[CLI_DEBUGGER_MODULE] Entering CLI\n");
+
+        status = stop_alarm(event->target_id);
+        if (status != FWK_SUCCESS) {
+            goto exit_cli;
+        }
+
         status = cli_start();
+
+        /* start the alarm regardless of the cli's return status */
+        start_alarm_status = start_alarm(event->target_id);
+        if (status == FWK_SUCCESS) {
+            status = start_alarm_status;
+        }
+
+exit_cli:
         cli_print("\n[CLI_DEBUGGER_MODULE] Exiting CLI\n");
         return status;
     default:
