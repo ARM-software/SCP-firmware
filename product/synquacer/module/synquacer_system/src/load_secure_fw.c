@@ -64,6 +64,20 @@ typedef struct arm_tf_fip_package_s arm_tf_fip_package_t;
 #define SCP_ADDR_TRANS_AREA UINT32_C(0xCB000000)
 #define BL32_TOC_ENTRY_INDEX (3)
 
+#define FIP_TOC_HEADER_NAME UINT32_C(0xAA640001)
+
+#define UUID_NULL                               \
+    {                                           \
+        0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, \
+        0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0  \
+    }
+
+#define FIP_UUID_TFA_BL2                                \
+    {                                                   \
+        0x5f, 0xf9, 0xec, 0x0b, 0x4d, 0x22, 0x3e, 0x4d, \
+        0xa5, 0x44, 0xc3, 0x9d, 0x81, 0xc7, 0x3f, 0x0a, \
+    }
+
 #define UUID_SECURE_PAYLOAD_BL32                                          \
     {                                                                     \
         0x05, 0xd0, 0xe1, 0x89, 0x53, 0xdc, 0x13, 0x47, 0x8d, 0x2b, 0x50, \
@@ -71,7 +85,58 @@ typedef struct arm_tf_fip_package_s arm_tf_fip_package_t;
     }
 
 /*
- * Current implementation expects bl32 is located as 4th binary
+ * New FIP loader for TBBR supported BL2
+ */
+void fw_fip_load_bl2(uint32_t boot_index)
+{
+    fip_toc_entry_t *toc_entry;
+    unsigned long offset;
+    uint8_t uuid_null[] = UUID_NULL;
+    uint8_t uuid_bl2[] = FIP_UUID_TFA_BL2;
+
+    arm_tf_fip_package_t fip_package;
+
+    offset = CONFIG_SCB_ARM_BL2_OFFSET + boot_index * CONFIG_SCB_FWU_BANK_SIZE;
+
+    synquacer_system_ctx.nor_api->read(
+        nor_id,
+        0,
+        MOD_NOR_READ_FAST_1_4_4_4BYTE,
+        offset,
+        &fip_package,
+        sizeof(fip_package));
+
+    if (fip_package.fip_toc_header.name != FIP_TOC_HEADER_NAME) {
+        FWK_LOG_ERR("No FIP Image found @%lx !", offset);
+        return;
+    }
+
+    toc_entry = fip_package.fip_toc_entry;
+
+    do {
+        if (memcmp((void *) uuid_null, (void *)toc_entry->uuid, 16) == 0) {
+            FWK_LOG_ERR("[FIP] BL2 not found!");
+            return;
+        }
+        if (memcmp((void *)uuid_bl2, (void *)toc_entry->uuid, 16) == 0) {
+            offset += (uint32_t)toc_entry->offset_addr;
+            FWK_LOG_INFO("[FIP] BL2 found %ubytes @%lx ",
+                         (unsigned int)toc_entry->size, offset);
+            synquacer_system_ctx.nor_api->read(
+                nor_id,
+                0,
+                MOD_NOR_READ_FAST_1_4_4_4BYTE,
+                offset,
+                (void *)CONFIG_SCB_ARM_TB_BL1_BASE_ADDR,
+                toc_entry->size);
+            return;
+        }
+        toc_entry++;
+    } while (1);
+}
+
+/*
+ * Legacy implementation expects bl32 is located as 4th binary
  * in the arm-tf fip package.
  */
 static void fw_fip_load_bl32(arm_tf_fip_package_t *fip_package_p)

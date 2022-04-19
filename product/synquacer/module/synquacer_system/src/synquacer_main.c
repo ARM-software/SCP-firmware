@@ -13,6 +13,7 @@
 #include "synquacer_common.h"
 #include "synquacer_config.h"
 #include "synquacer_mmap.h"
+#include "fwu_mdata.h"
 
 #include <boot_ctl.h>
 #include <sysdef_option.h>
@@ -61,6 +62,7 @@ static fwk_id_t nor_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_NOR, 0);
 void power_domain_coldboot(void);
 int fw_ddr_spd_param_check(void);
 void bus_sysoc_init(void);
+void fw_fip_load_bl2(uint32_t boot_index);
 void fw_fip_load_arm_tf(void);
 void smmu_wrapper_initialize(void);
 void pcie_wrapper_configure(void);
@@ -368,14 +370,101 @@ void main_initialize(void)
     return;
 }
 
+/* FWU platform metadata for SynQuacer */
+struct fwu_synquacer_metadata {
+    uint32_t boot_index;
+    uint32_t boot_count;
+} __attribute__((__packed__));
+
+static void update_platform_metadata(struct fwu_synquacer_metadata *platdata)
+{
+    struct fwu_synquacer_metadata buf;
+
+    synquacer_system_ctx.nor_api->read(nor_id, 0,
+                                       MOD_NOR_READ_FAST_1_4_4_4BYTE,
+                                       CONFIG_SCB_PLAT_METADATA_OFFS,
+                                       &buf, sizeof(buf));
+
+    if (!memcmp(platdata, &buf, sizeof(buf))) {
+        return;
+    }
+
+    synquacer_system_ctx.nor_api->erase(nor_id, 0,
+                                        MOD_NOR_ERASE_BLOCK_4BYTE,
+                                        CONFIG_SCB_PLAT_METADATA_OFFS,
+                                        sizeof(*platdata));
+    synquacer_system_ctx.nor_api->program(nor_id, 0,
+                                          MOD_NOR_PROGRAM_4BYTE,
+                                          CONFIG_SCB_PLAT_METADATA_OFFS,
+                                          platdata, sizeof(*platdata));
+    /* Read to verify and set the "read" command-sequence */
+    synquacer_system_ctx.nor_api->read(nor_id, 0,
+                                       MOD_NOR_READ_FAST_1_4_4_4BYTE,
+                                       CONFIG_SCB_PLAT_METADATA_OFFS,
+                                       &buf, sizeof(buf));
+    if (memcmp(platdata, &buf, sizeof(buf))) {
+        FWK_LOG_ERR("[FWU] Failed to update boot-index!\n");
+    }
+}
+
+static uint32_t fwu_plat_get_boot_index(void)
+{
+    struct fwu_synquacer_metadata platdata;
+    struct fwu_mdata metadata;
+
+    /* Read metadata */
+    synquacer_system_ctx.nor_api->read(nor_id, 0,
+                                       MOD_NOR_READ_FAST_1_4_4_4BYTE,
+                                       CONFIG_SCB_FWU_METADATA_OFFS,
+                                       &metadata, sizeof(metadata));
+
+    synquacer_system_ctx.nor_api->read(nor_id, 0,
+                                       MOD_NOR_READ_FAST_1_4_4_4BYTE,
+                                       CONFIG_SCB_PLAT_METADATA_OFFS,
+                                       &platdata, sizeof(platdata));
+
+    /* TODO: use CRC32 */
+    if (metadata.version != 1 ||
+        metadata.active_index > CONFIG_FWU_NUM_BANKS) {
+            platdata.boot_index = 0;
+            FWK_LOG_ERR("[FWU] FWU metadata is broken. Use default boot indx 0\n");
+    } else if (metadata.active_index != platdata.boot_index) {
+        /* Switch to new active bank as a trial. */
+        platdata.boot_index = metadata.active_index;
+        platdata.boot_count = 1;
+        FWK_LOG_INFO("[FWU] New firmware will boot. New index is %d\n",
+        (int)platdata.boot_index);
+    } else if (platdata.boot_count) {
+        /* BL33 will clear the boot_count when boot. */
+        if (platdata.boot_count < CONFIG_FWU_MAX_COUNT) {
+            platdata.boot_count++;
+    } else {
+            platdata.boot_index = metadata.previous_active_index;
+            platdata.boot_count = 0;
+            FWK_LOG_ERR("[FWU] New firmware boot trial failed. Rollback index is %d\n",
+                        (int)platdata.boot_index);
+        }
+    }
+
+    update_platform_metadata(&platdata);
+
+    return platdata.boot_index;
+}
+
 static void fw_wakeup_ap(void)
 {
     ap_dev_init();
 
-    FWK_LOG_INFO("[SYNQUACER SYSTEM] Arm tf load start.");
-    fw_fip_load_arm_tf();
-    FWK_LOG_INFO("[SYNQUACER SYSTEM] Arm tf load end.");
-
+    /* Check DSW 3-4 */
+    if (gpio_get_data((void *)CONFIG_SOC_AP_GPIO_BASE, 0) & 0x8) {
+        FWK_LOG_INFO("[SYNQUACER SYSTEM] Arm tf BL2 load start.");
+        fw_fip_load_bl2(fwu_plat_get_boot_index());
+        FWK_LOG_INFO("[SYNQUACER SYSTEM] Arm tf BL2 load end.");
+    } else {
+        FWK_LOG_INFO("[SYNQUACER SYSTEM] Arm tf load start.");
+        fw_fip_load_arm_tf();
+        FWK_LOG_INFO("[SYNQUACER SYSTEM] Arm tf load end.");
+    }
     synquacer_system_ctx.nor_api->configure_mmap_read(
         nor_id, 0, MOD_NOR_READ_FAST_1_4_4_4BYTE, true);
 }
