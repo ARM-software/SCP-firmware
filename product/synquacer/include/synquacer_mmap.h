@@ -172,6 +172,17 @@
                                      HSSPI_MEM_BASE)
 #define CONFIG_SCB_UEFI_BASE_ADDR UINT32_C(0xA8200000)
 
+/* FWU and platform metadata address */
+#define CONFIG_SCB_FWU_METADATA_OFFS        UINT32_C(0x500000)
+#define CONFIG_SCB_PLAT_METADATA_OFFS       UINT32_C(0x510000)
+#define CONFIG_SCB_FWU_BANK_SIZE            UINT32_C(0x400000)
+#define CONFIG_FWU_NUM_IMAGES_PER_BANK      1
+#define CONFIG_FWU_NUM_BANKS                2
+#define CONFIG_FWU_MAX_COUNT                3
+
+/* TBBR supported new FIP image offset */
+#define CONFIG_SCB_ARM_BL2_OFFSET           UINT32_C(0x600000)
+
 #define CONFIG_SCB_ARM_TB_BL1_BASE_ADDR UINT32_C(0xA4000000)
 #define CONFIG_SCB_ARM_TB_BL2_BASE_ADDR UINT32_C(0xA4013000)
 #define CONFIG_SCB_ARM_TB_BL3_BASE_ADDR UINT32_C(0xA401F000)
