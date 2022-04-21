@@ -12,11 +12,9 @@ BS_FIRMWARE_USE_NEWLIB_NANO_SPECS := yes
 DEFINES += PCIE_FILTER_BUS0_TYPE0_CONFIG
 DEFINES += ENABLE_OPTEE
 DEFINES += SET_PCIE_NON_SECURE
-#DEFINES += CA53_USE_F_UART
 
 BS_FIRMWARE_MODULES := \
     armv7m_mpu \
-    f_uart3 \
     gtimer \
     timer \
     ppu_v0_synquacer \
@@ -47,7 +45,6 @@ BS_FIRMWARE_SOURCES := \
     config_css_clock.c \
     config_f_i2c.c \
     config_hsspi.c \
-    config_f_uart3.c \
     config_mhu.c \
     config_pik_clock.c \
     config_power_domain.c \
@@ -61,6 +58,29 @@ BS_FIRMWARE_SOURCES := \
     config_timer.c \
     config_nor.c \
     config_scmi_power_domain.c
+
+ifeq ($(SYNQUACER_UART),uart0)
+    DEFINES += CA53_USE_F_UART
+    BS_FIRMWARE_MODULES += f_uart3
+    BS_FIRMWARE_SOURCES += config_f_uart3.c
+else
+ifeq ($(SYNQUACER_UART),uart1)
+    DEFINES += CONFIG_SCB_USE_SCP_PL011
+    BS_FIRMWARE_MODULES += pl011
+    BS_FIRMWARE_SOURCES += config_pl011.c
+else
+ifeq ($(SYNQUACER_UART),debug_uart)
+    DEFINES += CONFIG_SCB_USE_AP_PL011
+    BS_FIRMWARE_MODULES += pl011
+    BS_FIRMWARE_SOURCES += config_pl011.c
+else
+    # Default
+    DEFINES += CA53_USE_F_UART
+    BS_FIRMWARE_MODULES += f_uart3
+    BS_FIRMWARE_SOURCES += config_f_uart3.c
+endif
+endif
+endif
 
 include $(PRODUCT_DIR)/src/device.mk
 
