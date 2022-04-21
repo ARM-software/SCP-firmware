@@ -27,6 +27,7 @@ class Build:
     name: str
     toolchain: Parameter
     build_type: Parameter
+    log_level: Parameter
     variant: Parameter = None
 
     def tag(self):
@@ -34,15 +35,19 @@ class Build:
                                                         self.name,
                                                         self.toolchain.name,
                                                         self.build_type.name)
-        if (self.variant):
+        if self.variant:
             build_str += ' - Variant {}'.format(self.variant.name)
+        if self.log_level:
+            build_str += ' - Log Level {}'.format(self.log_level.name)
         return build_str
 
     def file_name(self):
         filename = self.name + "_" + self.toolchain.name + "_" + \
             self.build_type.name[0]
+        if self.log_level:
+            filename += "_" + self.log_level.name
         if self.variant:
-            filename += self.variant.name[0]
+            filename += "_" + self.variant.name[0]
         filename += ".txt"
         return filename
 
@@ -51,6 +56,8 @@ class Build:
         cmd += 'PRODUCT={} TOOLCHAIN={} MODE={} '.format(self.name,
                                                          self.toolchain.name,
                                                          self.build_type.name)
+        if self.log_level:
+            cmd += 'LOG_LEVEL={} '.format(self.log_level.name)
         if self.variant:
             cmd += 'PLATFORM_VARIANT=\"{}\" '.format(self.variant.name)
             for extra in self.variant.arguments:
@@ -82,23 +89,19 @@ class Product:
         Parameter('debug'),
         Parameter('release'),
         ])
-    variants: List[Parameter] = field(default_factory=list)
+    variants: List[Parameter] = field(default_factory=lambda: [None])
+    log_level: Parameter = None
 
     @property
     def builds(self) -> List[Build]:
         builds = []
         for toolchain in self.toolchains:
             for build_type in self.build_types:
-                if self.variants:
-                    for variant in self.variants:
-                        builds.append(Build(
-                            self.name,
-                            toolchain,
-                            build_type,
-                            variant))
-                else:
+                for variant in self.variants:
                     builds.append(Build(
                         self.name,
                         toolchain,
-                        build_type))
+                        build_type,
+                        self.log_level,
+                        variant))
         return builds
