@@ -151,7 +151,8 @@ def check_errors(ignore_errors: bool, results: List[Tuple[str, int]]) -> bool:
                                                  results)))
 
 
-def main(ignore_errors: bool, output_path: str, skip_container: bool):
+def main(ignore_errors: bool, skip_container: bool, log_level: str,
+         output_path: str):
     # This code is only applicable if there is valid docker instance
     # On CI there is no docker instance at the moment
     if not skip_container:
@@ -184,6 +185,8 @@ def main(ignore_errors: bool, output_path: str, skip_container: bool):
     output_path = os.path.join(output_path, "build-output")
 
     for product in products:
+        if log_level != "":
+            product.log_level = Parameter(log_level)
         results.extend(do_build(product.builds, output_path))
         if check_errors(ignore_errors, results):
             print('Errors detected! Excecution stopped')
@@ -201,6 +204,11 @@ def parse_args():
                         required=False, default=False, action='store_true',
                         help='Ignore errors and continue testing.')
 
+    parser.add_argument('-ll', '--log-level', dest='log_level',
+                        required=False, default="", type=str,
+                        action='store', help='Build every product with the \
+                        specified log level.')
+
     parser.add_argument('-bod', '--build-output-dir', dest='output_path',
                         required=False, default="", type=str, action='store',
                         help='Parent directory of the "build-output" directory\
@@ -217,4 +225,5 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    sys.exit(main(args.ignore_errors, args.output_path, args.skip_container))
+    sys.exit(main(args.ignore_errors, args.skip_container, args.log_level,
+                  args.output_path))
