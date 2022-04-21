@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -28,12 +28,15 @@
 #define CLOCK_RATE_SYSINCLK (1000UL * FWK_MHZ)
 #define CLOCK_RATE_REFCLK (100UL * FWK_MHZ)
 #define CLOCK_RATE_DDRPLLCLK (1066UL * FWK_MHZ)
+#define CLOCK_RATE_SCP_PL011CLK (100000 * FWK_KHZ)
 #define CLOCK_RATE_AP_PL011CLK (62500 * FWK_KHZ)
 
-#ifdef CONFIG_SCB_USE_AP_PL011
-#define CLOCK_RATE_PL011CLK CLOCK_RATE_AP_PL011CLK
+#if defined(CONFIG_SCB_USE_SCP_PL011)
+#define CLOCK_RATE_UART CLOCK_RATE_SCP_PL011CLK
+#elif defined(CONFIG_SCB_USE_AP_PL011)
+#define CLOCK_RATE_UART CLOCK_RATE_AP_PL011CLK
 #else
-#define CLOCK_RATE_PL011CLK (100000 * FWK_KHZ)
+#define CLOCK_RATE_UART (100000 * FWK_KHZ)
 #endif
 
 #endif /* SYSTEM_CLOCK_H */

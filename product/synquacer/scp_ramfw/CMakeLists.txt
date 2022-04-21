@@ -29,7 +29,6 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_f_i2c.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_hsspi.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_nor.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_f_uart3.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_mhu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_pik_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_power_domain.c"
@@ -42,6 +41,20 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_system_power.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_power_domain.c")
+
+if(SYNQUACER_UART MATCHES "uart0")
+    target_sources(synquacer-bl2
+                   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_f_uart3.c")
+elseif(SYNQUACER_UART MATCHES "uart1")
+    target_sources(synquacer-bl2
+                   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_pl011.c")
+elseif(SYNQUACER_UART MATCHES "debug_uart")
+    target_sources(synquacer-bl2
+                   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_pl011.c")
+else()
+    target_sources(synquacer-bl2
+                   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_f_uart3.c")
+endif()
 
 #
 # Some of our firmware includes require CMSIS.
