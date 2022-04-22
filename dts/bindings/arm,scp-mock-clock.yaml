@@ -1,0 +1,21 @@
+
+
+description: SCP Mock Clock
+
+compatible: "arm,scp-mock-clock"
+
+include: base.yaml
+
+properties:
+    label:
+      required: true
+
+    rate-table:
+      description: Table of frequency values
+      type: array
+      required: true
+
+    default-rate:
+      description: Default rate used for clock
+      type: int
+      required: true
