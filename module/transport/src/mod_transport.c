@@ -13,7 +13,11 @@
 #ifdef BUILD_HAS_MOD_POWER_DOMAIN
 #    include <mod_power_domain.h>
 #endif
-#include <mod_scmi.h>
+
+#ifdef BUILD_HAS_MOD_SCMI
+#    include <mod_scmi.h>
+#endif
+
 #include <mod_transport.h>
 
 #include <fwk_assert.h>
@@ -56,7 +60,17 @@ struct transport_channel_ctx {
     struct mod_transport_driver_api *driver_api;
 
     /* Service APIs to signal incoming messages or errors */
-    struct mod_scmi_from_transport_api *scmi_signal_api;
+    union mod_transport_signal_api {
+#ifdef BUILD_HAS_MOD_SCMI
+        /* For SCMI messages or errors */
+        struct mod_scmi_from_transport_api *scmi_signal_api;
+#endif
+        /* For Firmware messages or errors */
+        struct mod_transport_firmware_signal_api *firmware_signal_api;
+    } transport_signal;
+
+    /* Flag indicating the service bound to the channel is of type SCMI */
+    bool is_scmi;
 
     /* Flag indicating that the out-band mailbox is ready */
     bool out_band_mailbox_ready;
@@ -123,6 +137,10 @@ static int transport_get_message_header(fwk_id_t channel_id, uint32_t *header)
     channel_ctx =
         &transport_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
 
+    fwk_assert(
+        channel_ctx->config->transport_type !=
+        MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_NONE);
+
     if (!channel_ctx->locked) {
         return FWK_E_ACCESS;
     }
@@ -147,6 +165,10 @@ static int transport_get_payload(
     channel_ctx =
         &transport_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
 
+    fwk_assert(
+        channel_ctx->config->transport_type !=
+        MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_NONE);
+
     if (!channel_ctx->locked) {
         return FWK_E_ACCESS;
     }
@@ -168,6 +190,10 @@ static int transport_write_payload(
 
     channel_ctx =
         &transport_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
+
+    fwk_assert(
+        channel_ctx->config->transport_type !=
+        MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_NONE);
 
     if ((payload == NULL) ||
         ((offset + size) > channel_ctx->max_payload_size)) {
@@ -200,6 +226,8 @@ static int transport_respond(
         &transport_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
 
     transport_type = channel_ctx->config->transport_type;
+
+    fwk_assert(transport_type != MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_NONE);
 
     if (transport_type == MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_OUT_BAND) {
         /* Use shared mailbox for out-band messages */
@@ -288,6 +316,8 @@ static int transport_transmit(
 
     transport_type = channel_ctx->config->transport_type;
 
+    fwk_assert(transport_type != MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_NONE);
+
     if (transport_type == MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_OUT_BAND) {
         /* Use shared mailbox for out-band messages */
         buffer = ((struct mod_transport_buffer *)
@@ -360,7 +390,7 @@ static int transport_release_channel_lock(fwk_id_t channel_id)
      * If the received message is a response message, then release
      * the channel lock so that we can process the next message.
      *
-     * If this is not done, then for messages that don't require scmi module
+     * If this is not done, then for messages that don't require client module
      * to call the transport_respond() function will lead to situation
      * where the channel context is locked and never released since it is the
      * transport_respond() function that releases the channel context.
@@ -369,6 +399,22 @@ static int transport_release_channel_lock(fwk_id_t channel_id)
     return FWK_SUCCESS;
 }
 
+static int transport_trigger_interrupt(fwk_id_t channel_id)
+{
+    struct transport_channel_ctx *channel_ctx;
+
+    channel_ctx =
+        &transport_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
+
+    fwk_assert(
+        channel_ctx->config->transport_type ==
+        MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_NONE);
+
+    return channel_ctx->driver_api->trigger_event(
+        channel_ctx->config->driver_id);
+}
+
+#ifdef BUILD_HAS_MOD_SCMI
 static const struct mod_scmi_to_transport_api
     transport_mod_scmi_to_transport_api = {
         .get_secure = transport_get_secure,
@@ -380,6 +426,19 @@ static const struct mod_scmi_to_transport_api
         .transmit = transport_transmit,
         .release_transport_channel_lock = transport_release_channel_lock,
     };
+#endif
+
+static const struct mod_transport_firmware_api transport_firmware_api = {
+    .get_secure = transport_get_secure,
+    .get_max_payload_size = transport_get_max_payload_size,
+    .get_message_header = transport_get_message_header,
+    .get_payload = transport_get_payload,
+    .write_payload = transport_write_payload,
+    .respond = transport_respond,
+    .transmit = transport_transmit,
+    .release_transport_channel_lock = transport_release_channel_lock,
+    .trigger_interrupt = transport_trigger_interrupt,
+};
 
 static int transport_message_handler(struct transport_channel_ctx *channel_ctx)
 {
@@ -445,7 +504,7 @@ static int transport_message_handler(struct transport_channel_ctx *channel_ctx)
         fwk_str_memcpy(in, shared_memory, sizeof(struct mod_transport_buffer));
     }
     /*
-     * Set the channel context as locked until the scmi module completes
+     * Set the channel context as locked until the bound service completes
      * processing the message.
      */
     channel_ctx->locked = true;
@@ -476,8 +535,21 @@ static int transport_message_handler(struct transport_channel_ctx *channel_ctx)
          channel_ctx->max_payload_size)) {
         out->status |= MOD_TRANSPORT_MAILBOX_STATUS_ERROR_MASK;
 
-        status =
-            channel_ctx->scmi_signal_api->signal_error(channel_ctx->service_id);
+        if (channel_ctx->is_scmi) {
+#ifdef BUILD_HAS_MOD_SCMI
+            status =
+                channel_ctx->transport_signal.scmi_signal_api->signal_error(
+                    channel_ctx->service_id);
+#else
+            FWK_LOG_INFO(
+                "%s Error! SCMI module not included in the build\n", MOD_NAME);
+            return FWK_E_SUPPORT;
+#endif
+        } else {
+            status =
+                channel_ctx->transport_signal.firmware_signal_api->signal_error(
+                    channel_ctx->service_id);
+        }
     }
 
     if (transport_type == MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_OUT_BAND) {
@@ -491,9 +563,23 @@ static int transport_message_handler(struct transport_channel_ctx *channel_ctx)
         }
     }
 
-    /* Signal the scmi service */
-    status =
-        channel_ctx->scmi_signal_api->signal_message(channel_ctx->service_id);
+    /* Let the subscribed service handle the message */
+    if (channel_ctx->is_scmi) {
+#ifdef BUILD_HAS_MOD_SCMI
+        /* Signal the SCMI service */
+        status = channel_ctx->transport_signal.scmi_signal_api->signal_message(
+            channel_ctx->service_id);
+#else
+        FWK_LOG_INFO(
+            "%s Error! SCMI module not included in the build\n", MOD_NAME);
+        return FWK_E_SUPPORT;
+#endif
+    } else {
+        /* Signal the service */
+        status =
+            channel_ctx->transport_signal.firmware_signal_api->signal_message(
+                channel_ctx->service_id);
+    }
 
     if (status != FWK_SUCCESS) {
         return FWK_E_HANDLER;
@@ -507,10 +593,25 @@ static int transport_message_handler(struct transport_channel_ctx *channel_ctx)
  */
 static int transport_signal_message(fwk_id_t channel_id)
 {
+    int status;
     struct transport_channel_ctx *channel_ctx;
 
     channel_ctx =
         &transport_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
+
+    /*
+     * If the channel is used for events only, then signal the module.
+     * since, there wouldn't be any messages for this channel.
+     */
+    if (channel_ctx->config->transport_type ==
+        MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_NONE) {
+        /* Signal the service */
+        status =
+            channel_ctx->transport_signal.firmware_signal_api->signal_message(
+                channel_ctx->service_id);
+
+        return status;
+    }
 
     if (channel_ctx->config->transport_type ==
         MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_OUT_BAND) {
@@ -638,6 +739,13 @@ static int transport_channel_init(
         break;
 #endif
 
+    case MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_NONE:
+        /* This channel must be used for sending/receiving events only */
+        channel_ctx->in = NULL;
+        channel_ctx->out = NULL;
+        channel_ctx->max_payload_size = 0;
+        break;
+
     default:
         return FWK_E_DATA;
     }
@@ -666,7 +774,7 @@ static int transport_bind(fwk_id_t id, unsigned int round)
         }
     }
 
-    /* bind to scmi module signal API */
+    /* bind to module signal API */
     if (round == 1) {
         if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
             return FWK_SUCCESS;
@@ -675,17 +783,26 @@ static int transport_bind(fwk_id_t id, unsigned int round)
         channel_ctx =
             &transport_ctx.channel_ctx_table[fwk_id_get_element_idx(id)];
 
+#ifdef BUILD_HAS_MOD_SCMI
         if (fwk_id_is_equal(
                 fwk_id_build_module_id(channel_ctx->service_id),
                 fwk_module_id_scmi)) {
             status = fwk_module_bind(
                 channel_ctx->service_id,
                 FWK_ID_API(FWK_MODULE_IDX_SCMI, MOD_SCMI_API_IDX_TRANSPORT),
-                &channel_ctx->scmi_signal_api);
-        }
-        if (status != FWK_SUCCESS) {
+                &channel_ctx->transport_signal.scmi_signal_api);
+
+            channel_ctx->is_scmi = true;
             return status;
         }
+#endif
+        status = fwk_module_bind(
+            channel_ctx->service_id,
+            channel_ctx->config->signal_api_id,
+            &channel_ctx->transport_signal.firmware_signal_api);
+
+        channel_ctx->is_scmi = false;
+        return status;
     }
 
     return FWK_SUCCESS;
@@ -738,9 +855,17 @@ static int transport_process_bind_request(
         }
         break;
 
+#ifdef BUILD_HAS_MOD_SCMI
     case MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT:
         /* SCMI transport API */
         *api = &transport_mod_scmi_to_transport_api;
+        channel_ctx->service_id = source_id;
+        break;
+#endif
+
+    case MOD_TRANSPORT_API_IDX_FIRMWARE:
+        /* transport API for Firmware messages */
+        *api = &transport_firmware_api;
         channel_ctx->service_id = source_id;
         break;
 
