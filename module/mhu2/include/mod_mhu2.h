@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -29,8 +29,13 @@
  * \brief MHU v2 api indicies
  */
 enum mod_mhu2_api_idx {
+#ifdef BUILD_HAS_MOD_TRANSPORT
+    /*! TRANSPORT driver API */
+    MOD_MHU2_API_IDX_TRANSPORT_DRIVER,
+#else
     /*! SMT driver API */
     MOD_MHU2_API_IDX_SMT_DRIVER,
+#endif
     /*! Number of APIs */
     MOD_MHU2_API_IDX_COUNT,
 };
@@ -52,7 +57,7 @@ struct mod_mhu2_channel_config {
     /*! Base address of the registers of the outgoing MHU */
     uintptr_t send;
 
-    /*! Channel number */
+    /*! Channel number for the channel to be used as doorbell */
     unsigned int channel;
 };
 
