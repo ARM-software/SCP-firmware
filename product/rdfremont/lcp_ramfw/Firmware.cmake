@@ -27,6 +27,7 @@ set(SCP_ENABLE_DEBUGGER_INIT FALSE)
 
 list(PREPEND SCP_MODULE_PATHS
     "${CMAKE_CURRENT_LIST_DIR}/../module/mod_lcp_platform")
+list(PREPEND SCP_MODULE_PATHS "${CMAKE_SOURCE_DIR}/module/mhu3")
 
 # The order of the modules in the following list is the order in which the
 # modules are initialized, bound, started during the pre-runtime phase.
@@ -35,3 +36,4 @@ list(PREPEND SCP_MODULE_PATHS
 list(APPEND SCP_MODULES "armv8m-mpu")
 list(APPEND SCP_MODULES "lcp-platform")
 list(APPEND SCP_MODULES "pl011")
+list(APPEND SCP_MODULES "mhu3")
