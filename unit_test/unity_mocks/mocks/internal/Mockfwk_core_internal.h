@@ -40,18 +40,46 @@ void __fwk_run_main_loop_Stub(CMOCK___fwk_run_main_loop_CALLBACK Callback);
 #define __fwk_run_main_loop_StubWithCallback __fwk_run_main_loop_Stub
 #define __fwk_get_current_event_ExpectAndReturn(cmock_retval) __fwk_get_current_event_CMockExpectAndReturn(__LINE__, cmock_retval)
 void __fwk_get_current_event_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_event* cmock_to_return);
+typedef const struct fwk_event* (* CMOCK___fwk_get_current_event_CALLBACK)(int cmock_num_calls);
+void __fwk_get_current_event_AddCallback(CMOCK___fwk_get_current_event_CALLBACK Callback);
+void __fwk_get_current_event_Stub(CMOCK___fwk_get_current_event_CALLBACK Callback);
+#define __fwk_get_current_event_StubWithCallback __fwk_get_current_event_Stub
 #define __fwk_put_notification_ExpectAnyArgsAndReturn(cmock_retval) __fwk_put_notification_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void __fwk_put_notification_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define __fwk_put_notification_ExpectAndReturn(event, cmock_retval) __fwk_put_notification_CMockExpectAndReturn(__LINE__, event, cmock_retval)
 void __fwk_put_notification_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_event* event, int cmock_to_return);
+typedef int (* CMOCK___fwk_put_notification_CALLBACK)(struct fwk_event* event, int cmock_num_calls);
+void __fwk_put_notification_AddCallback(CMOCK___fwk_put_notification_CALLBACK Callback);
+void __fwk_put_notification_Stub(CMOCK___fwk_put_notification_CALLBACK Callback);
+#define __fwk_put_notification_StubWithCallback __fwk_put_notification_Stub
+#define __fwk_put_notification_ReturnThruPtr_event(event) __fwk_put_notification_CMockReturnMemThruPtr_event(__LINE__, event, sizeof(struct fwk_event))
+#define __fwk_put_notification_ReturnArrayThruPtr_event(event, cmock_len) __fwk_put_notification_CMockReturnMemThruPtr_event(__LINE__, event, cmock_len * sizeof(*event))
+#define __fwk_put_notification_ReturnMemThruPtr_event(event, cmock_size) __fwk_put_notification_CMockReturnMemThruPtr_event(__LINE__, event, cmock_size)
+void __fwk_put_notification_CMockReturnMemThruPtr_event(UNITY_LINE_TYPE cmock_line, struct fwk_event* event, size_t cmock_size);
 #define __fwk_put_event_ExpectAnyArgsAndReturn(cmock_retval) __fwk_put_event_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void __fwk_put_event_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define __fwk_put_event_ExpectAndReturn(event, cmock_retval) __fwk_put_event_CMockExpectAndReturn(__LINE__, event, cmock_retval)
 void __fwk_put_event_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_event* event, int cmock_to_return);
+typedef int (* CMOCK___fwk_put_event_CALLBACK)(struct fwk_event* event, int cmock_num_calls);
+void __fwk_put_event_AddCallback(CMOCK___fwk_put_event_CALLBACK Callback);
+void __fwk_put_event_Stub(CMOCK___fwk_put_event_CALLBACK Callback);
+#define __fwk_put_event_StubWithCallback __fwk_put_event_Stub
+#define __fwk_put_event_ReturnThruPtr_event(event) __fwk_put_event_CMockReturnMemThruPtr_event(__LINE__, event, sizeof(struct fwk_event))
+#define __fwk_put_event_ReturnArrayThruPtr_event(event, cmock_len) __fwk_put_event_CMockReturnMemThruPtr_event(__LINE__, event, cmock_len * sizeof(*event))
+#define __fwk_put_event_ReturnMemThruPtr_event(event, cmock_size) __fwk_put_event_CMockReturnMemThruPtr_event(__LINE__, event, cmock_size)
+void __fwk_put_event_CMockReturnMemThruPtr_event(UNITY_LINE_TYPE cmock_line, struct fwk_event* event, size_t cmock_size);
 #define __fwk_put_event_light_ExpectAnyArgsAndReturn(cmock_retval) __fwk_put_event_light_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void __fwk_put_event_light_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define __fwk_put_event_light_ExpectAndReturn(event, cmock_retval) __fwk_put_event_light_CMockExpectAndReturn(__LINE__, event, cmock_retval)
 void __fwk_put_event_light_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_event_light* event, int cmock_to_return);
+typedef int (* CMOCK___fwk_put_event_light_CALLBACK)(struct fwk_event_light* event, int cmock_num_calls);
+void __fwk_put_event_light_AddCallback(CMOCK___fwk_put_event_light_CALLBACK Callback);
+void __fwk_put_event_light_Stub(CMOCK___fwk_put_event_light_CALLBACK Callback);
+#define __fwk_put_event_light_StubWithCallback __fwk_put_event_light_Stub
+#define __fwk_put_event_light_ReturnThruPtr_event(event) __fwk_put_event_light_CMockReturnMemThruPtr_event(__LINE__, event, sizeof(struct fwk_event_light))
+#define __fwk_put_event_light_ReturnArrayThruPtr_event(event, cmock_len) __fwk_put_event_light_CMockReturnMemThruPtr_event(__LINE__, event, cmock_len * sizeof(*event))
+#define __fwk_put_event_light_ReturnMemThruPtr_event(event, cmock_size) __fwk_put_event_light_CMockReturnMemThruPtr_event(__LINE__, event, cmock_size)
+void __fwk_put_event_light_CMockReturnMemThruPtr_event(UNITY_LINE_TYPE cmock_line, struct fwk_event_light* event, size_t cmock_size);
 
 #if defined(__GNUC__) && !defined(__ICC) && !defined(__TMS470__)
 #if __GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 6 || (__GNUC_MINOR__ == 6 && __GNUC_PATCHLEVEL__ > 0)))
