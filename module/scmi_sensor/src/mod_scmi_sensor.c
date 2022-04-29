@@ -160,6 +160,7 @@ static int scmi_sensor_reading_respond(
     unsigned int payload_size;
     const void *payload = NULL;
     int status = FWK_SUCCESS;
+    int respond_status;
     unsigned int sensor_idx;
     fwk_id_t service_id;
 #ifdef BUILD_HAS_SCMI_SENSOR_V2
@@ -255,7 +256,11 @@ exit_error:
     payload = &return_values;
     status = FWK_E_PANIC;
 exit:
-    scmi_sensor_ctx.scmi_api->respond(service_id, payload, payload_size);
+    respond_status =
+        scmi_sensor_ctx.scmi_api->respond(service_id, payload, payload_size);
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-SENS] %s @%d", __func__, __LINE__);
+    }
     /*
      * Set the service identifier to 'none' to indicate the sensor is
      * available again.
@@ -275,10 +280,8 @@ static int scmi_sensor_protocol_version_handler(fwk_id_t service_id,
         .version = SCMI_PROTOCOL_VERSION_SENSOR,
     };
 
-    scmi_sensor_ctx.scmi_api->respond(service_id, &return_values,
-                                      sizeof(return_values));
-
-    return FWK_SUCCESS;
+    return scmi_sensor_ctx.scmi_api->respond(
+        service_id, &return_values, sizeof(return_values));
 }
 
 static int scmi_sensor_protocol_attributes_handler(fwk_id_t service_id,
@@ -290,10 +293,8 @@ static int scmi_sensor_protocol_attributes_handler(fwk_id_t service_id,
         .sensor_reg_len = 0, /* Unsupported */
     };
 
-    scmi_sensor_ctx.scmi_api->respond(service_id, &return_values,
-                                      sizeof(return_values));
-
-    return FWK_SUCCESS;
+    return scmi_sensor_ctx.scmi_api->respond(
+        service_id, &return_values, sizeof(return_values));
 }
 
 static int scmi_sensor_protocol_msg_attributes_handler(fwk_id_t service_id,
@@ -316,17 +317,17 @@ static int scmi_sensor_protocol_msg_attributes_handler(fwk_id_t service_id,
         return_values.status = (int32_t)SCMI_NOT_FOUND;
     }
 
-    scmi_sensor_ctx.scmi_api->respond(service_id, &return_values,
-        (return_values.status == SCMI_SUCCESS) ?
-        sizeof(return_values) : sizeof(return_values.status));
-
-    return FWK_SUCCESS;
+    return scmi_sensor_ctx.scmi_api->respond(
+        service_id,
+        &return_values,
+        (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
+                                                 sizeof(return_values.status));
 }
 
 static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
                                                  const uint32_t *payload)
 {
-    int status;
+    int status, respond_status;
     size_t payload_size;
     size_t max_payload_size;
     const struct scmi_sensor_protocol_description_get_a2p *parameters =
@@ -474,11 +475,15 @@ static int scmi_sensor_protocol_desc_get_handler(fwk_id_t service_id,
 exit_unexpected:
     fwk_unexpected();
 exit:
-    scmi_sensor_ctx.scmi_api->respond(service_id,
-        (return_values.status == SCMI_SUCCESS) ?
-            NULL : &return_values.status,
-        (return_values.status == SCMI_SUCCESS) ?
-            payload_size : sizeof(return_values.status));
+    respond_status = scmi_sensor_ctx.scmi_api->respond(
+        service_id,
+        (return_values.status == SCMI_SUCCESS) ? NULL : &return_values.status,
+        (return_values.status == SCMI_SUCCESS) ? payload_size :
+                                                 sizeof(return_values.status));
+
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-SENS] %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -490,7 +495,7 @@ static int scmi_sensor_trip_point_notify_handler(
 {
     uint32_t flags;
     unsigned int agent_id;
-    int status;
+    int status, respond_status;
     struct scmi_sensor_trip_point_notify_a2p *parameters;
     struct scmi_sensor_trip_point_notify_p2a return_values = {
         .status = SCMI_GENERIC_ERROR,
@@ -528,11 +533,14 @@ static int scmi_sensor_trip_point_notify_handler(
     status = FWK_SUCCESS;
 
 exit:
-    scmi_sensor_ctx.scmi_api->respond(
+    respond_status = scmi_sensor_ctx.scmi_api->respond(
         service_id,
         &return_values,
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
                                                  sizeof(return_values.status));
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-SENS] %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -549,7 +557,7 @@ static int scmi_sensor_trip_point_config_handler(
     struct mod_sensor_trip_point_params trip_point_param;
     fwk_id_t sensor_id;
     uint32_t trip_point_idx;
-    int status;
+    int status, respond_status;
 
     parameters = (struct scmi_sensor_trip_point_config_a2p *)payload;
 
@@ -598,11 +606,14 @@ static int scmi_sensor_trip_point_config_handler(
     status = FWK_SUCCESS;
 
 exit:
-    scmi_sensor_ctx.scmi_api->respond(
+    respond_status = scmi_sensor_ctx.scmi_api->respond(
         service_id,
         &return_values,
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
                                                  sizeof(return_values.status));
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-SENS] %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -613,7 +624,7 @@ static int scmi_sensor_axis_desc_get_handler(
     fwk_id_t service_id,
     const uint32_t *payload)
 {
-    int status;
+    int status, respond_status;
     size_t payload_size;
     size_t max_payload_size;
     const struct scmi_sensor_axis_description_get_a2p *parameters =
@@ -746,11 +757,14 @@ static int scmi_sensor_axis_desc_get_handler(
 exit_unexpected:
     fwk_unexpected();
 exit:
-    scmi_sensor_ctx.scmi_api->respond(
+    respond_status = scmi_sensor_ctx.scmi_api->respond(
         service_id,
         (return_values.status == SCMI_SUCCESS) ? NULL : &return_values.status,
         (return_values.status == SCMI_SUCCESS) ? payload_size :
                                                  sizeof(return_values.status));
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-SENS] %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -764,7 +778,7 @@ static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
     struct scmi_sensor_event_parameters *params;
     unsigned int sensor_idx;
     uint32_t flags;
-    int status;
+    int status, respond_status;
 
     parameters = (const struct scmi_sensor_protocol_reading_get_a2p *)payload;
 
@@ -827,9 +841,15 @@ static int scmi_sensor_reading_get_handler(fwk_id_t service_id,
     return FWK_SUCCESS;
 
 exit:
-    scmi_sensor_ctx.scmi_api->respond(service_id, &return_values,
-        (return_values.status == SCMI_SUCCESS) ?
-        sizeof(return_values) : sizeof(return_values.status));
+    respond_status = scmi_sensor_ctx.scmi_api->respond(
+        service_id,
+        &return_values,
+        (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
+                                                 sizeof(return_values.status));
+
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-SENS] %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -947,9 +967,8 @@ static int scmi_sensor_message_handler(fwk_id_t protocol_id,
     return handler_table[message_id](service_id, payload);
 
 error:
-    scmi_sensor_ctx.scmi_api->respond(service_id, &return_value,
-                                      sizeof(return_value));
-    return FWK_SUCCESS;
+    return scmi_sensor_ctx.scmi_api->respond(
+        service_id, &return_value, sizeof(return_value));
 }
 
 static struct mod_scmi_to_protocol_api scmi_sensor_mod_scmi_to_protocol_api = {

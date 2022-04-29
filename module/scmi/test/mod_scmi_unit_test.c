@@ -211,7 +211,7 @@ void test_function_scmi_base_discover_sub_vendor_handler(void)
     fwk_module_get_element_name_ExpectAndReturn(service_id, "OSPM");
 #endif
 
-    mod_scmi_from_protocol_respond_ExpectAnyArgs();
+    mod_scmi_from_protocol_respond_ExpectAnyArgsAndReturn(FWK_SUCCESS);
 
     TEST_ASSERT_EQUAL(
         FWK_SUCCESS, scmi_base_discover_sub_vendor_handler(service_id, NULL));

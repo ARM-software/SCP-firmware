@@ -164,11 +164,11 @@ typedef int (* CMOCK_mod_scmi_from_protocol_write_payload_CALLBACK)(fwk_id_t ser
 void mod_scmi_from_protocol_write_payload_AddCallback(CMOCK_mod_scmi_from_protocol_write_payload_CALLBACK Callback);
 void mod_scmi_from_protocol_write_payload_Stub(CMOCK_mod_scmi_from_protocol_write_payload_CALLBACK Callback);
 #define mod_scmi_from_protocol_write_payload_StubWithCallback mod_scmi_from_protocol_write_payload_Stub
-#define mod_scmi_from_protocol_respond_ExpectAnyArgs() mod_scmi_from_protocol_respond_CMockExpectAnyArgs(__LINE__)
-void mod_scmi_from_protocol_respond_CMockExpectAnyArgs(UNITY_LINE_TYPE cmock_line);
-#define mod_scmi_from_protocol_respond_Expect(service_id, payload, size) mod_scmi_from_protocol_respond_CMockExpect(__LINE__, service_id, payload, size)
-void mod_scmi_from_protocol_respond_CMockExpect(UNITY_LINE_TYPE cmock_line, fwk_id_t service_id, const void* payload, size_t size);
-typedef void (* CMOCK_mod_scmi_from_protocol_respond_CALLBACK)(fwk_id_t service_id, const void* payload, size_t size, int cmock_num_calls);
+#define mod_scmi_from_protocol_respond_ExpectAnyArgsAndReturn(cmock_retval) mod_scmi_from_protocol_respond_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
+void mod_scmi_from_protocol_respond_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define mod_scmi_from_protocol_respond_ExpectAndReturn(service_id, payload, size, cmock_retval) mod_scmi_from_protocol_respond_CMockExpectAndReturn(__LINE__, service_id, payload, size, cmock_retval)
+void mod_scmi_from_protocol_respond_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t service_id, const void* payload, size_t size, int cmock_to_return);
+typedef int (* CMOCK_mod_scmi_from_protocol_respond_CALLBACK)(fwk_id_t service_id, const void* payload, size_t size, int cmock_num_calls);
 void mod_scmi_from_protocol_respond_AddCallback(CMOCK_mod_scmi_from_protocol_respond_CALLBACK Callback);
 void mod_scmi_from_protocol_respond_Stub(CMOCK_mod_scmi_from_protocol_respond_CALLBACK Callback);
 #define mod_scmi_from_protocol_respond_StubWithCallback mod_scmi_from_protocol_respond_Stub

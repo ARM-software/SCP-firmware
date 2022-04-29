@@ -99,7 +99,7 @@ int mod_scmi_from_protocol_api_write_payload(fwk_id_t service_id, size_t offset,
  *      been written.
  * \param size Size of the payload.
  */
-void mod_scmi_from_protocol_api_respond(fwk_id_t service_id, const void *payload, size_t size);
+int mod_scmi_from_protocol_api_respond(fwk_id_t service_id, const void *payload, size_t size);
 
 /*!
  * \brief Send a notification to the agent on behalf on an SCMI service.

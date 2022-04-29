@@ -208,6 +208,7 @@ typedef struct _CMOCK_mod_scmi_from_protocol_respond_CALL_INSTANCE
 {
   UNITY_LINE_TYPE LineNumber;
   char ExpectAnyArgsBool;
+  int ReturnVal;
   fwk_id_t Expected_service_id;
   const void* Expected_payload;
   size_t Expected_size;
@@ -1788,7 +1789,7 @@ void mod_scmi_from_protocol_write_payload_Stub(CMOCK_mod_scmi_from_protocol_writ
   Mock.mod_scmi_from_protocol_write_payload_CallbackFunctionPointer = Callback;
 }
 
-void mod_scmi_from_protocol_respond(fwk_id_t service_id, const void* payload, size_t size)
+int mod_scmi_from_protocol_respond(fwk_id_t service_id, const void* payload, size_t size)
 {
   UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
   CMOCK_mod_scmi_from_protocol_respond_CALL_INSTANCE* cmock_call_instance;
@@ -1798,9 +1799,9 @@ void mod_scmi_from_protocol_respond(fwk_id_t service_id, const void* payload, si
   if (!Mock.mod_scmi_from_protocol_respond_CallbackBool &&
       Mock.mod_scmi_from_protocol_respond_CallbackFunctionPointer != NULL)
   {
-    Mock.mod_scmi_from_protocol_respond_CallbackFunctionPointer(service_id, payload, size, Mock.mod_scmi_from_protocol_respond_CallbackCalls++);
+    int cmock_cb_ret = Mock.mod_scmi_from_protocol_respond_CallbackFunctionPointer(service_id, payload, size, Mock.mod_scmi_from_protocol_respond_CallbackCalls++);
     UNITY_CLR_DETAILS();
-    return;
+    return cmock_cb_ret;
   }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
@@ -1824,9 +1825,10 @@ void mod_scmi_from_protocol_respond(fwk_id_t service_id, const void* payload, si
   }
   if (Mock.mod_scmi_from_protocol_respond_CallbackFunctionPointer != NULL)
   {
-    Mock.mod_scmi_from_protocol_respond_CallbackFunctionPointer(service_id, payload, size, Mock.mod_scmi_from_protocol_respond_CallbackCalls++);
+    cmock_call_instance->ReturnVal = Mock.mod_scmi_from_protocol_respond_CallbackFunctionPointer(service_id, payload, size, Mock.mod_scmi_from_protocol_respond_CallbackCalls++);
   }
   UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
 }
 
 void CMockExpectParameters_mod_scmi_from_protocol_respond(CMOCK_mod_scmi_from_protocol_respond_CALL_INSTANCE* cmock_call_instance, fwk_id_t service_id, const void* payload, size_t size);
@@ -1839,7 +1841,7 @@ void CMockExpectParameters_mod_scmi_from_protocol_respond(CMOCK_mod_scmi_from_pr
          sizeof(size_t[sizeof(size) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
 }
 
-void mod_scmi_from_protocol_respond_CMockExpectAnyArgs(UNITY_LINE_TYPE cmock_line)
+void mod_scmi_from_protocol_respond_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_scmi_from_protocol_respond_CALL_INSTANCE));
   CMOCK_mod_scmi_from_protocol_respond_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_scmi_from_protocol_respond_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
@@ -1848,10 +1850,11 @@ void mod_scmi_from_protocol_respond_CMockExpectAnyArgs(UNITY_LINE_TYPE cmock_lin
   Mock.mod_scmi_from_protocol_respond_CallInstance = CMock_Guts_MemChain(Mock.mod_scmi_from_protocol_respond_CallInstance, cmock_guts_index);
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
   cmock_call_instance->ExpectAnyArgsBool = (char)1;
 }
 
-void mod_scmi_from_protocol_respond_CMockExpect(UNITY_LINE_TYPE cmock_line, fwk_id_t service_id, const void* payload, size_t size)
+void mod_scmi_from_protocol_respond_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t service_id, const void* payload, size_t size, int cmock_to_return)
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_scmi_from_protocol_respond_CALL_INSTANCE));
   CMOCK_mod_scmi_from_protocol_respond_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_scmi_from_protocol_respond_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
@@ -1861,6 +1864,7 @@ void mod_scmi_from_protocol_respond_CMockExpect(UNITY_LINE_TYPE cmock_line, fwk_
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   CMockExpectParameters_mod_scmi_from_protocol_respond(cmock_call_instance, service_id, payload, size);
+  cmock_call_instance->ReturnVal = cmock_to_return;
 }
 
 void mod_scmi_from_protocol_respond_AddCallback(CMOCK_mod_scmi_from_protocol_respond_CALLBACK Callback)

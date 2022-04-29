@@ -254,7 +254,7 @@ static int write_payload(fwk_id_t service_id, size_t offset,
                                              offset, payload, size);
 }
 
-static void respond(fwk_id_t service_id, const void *payload, size_t size)
+static int respond(fwk_id_t service_id, const void *payload, size_t size)
 {
     int status;
     const struct scmi_service_ctx *ctx;
@@ -314,6 +314,7 @@ static void respond(fwk_id_t service_id, const void *payload, size_t size)
             fwk_status_str(status));
 #endif
     }
+    return status;
 }
 
 static void scmi_notify(fwk_id_t id, int protocol_id, int message_id,

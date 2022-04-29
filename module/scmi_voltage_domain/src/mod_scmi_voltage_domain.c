@@ -227,8 +227,8 @@ static int scmi_voltd_protocol_version_handler(fwk_id_t service_id,
         .version = SCMI_PROTOCOL_VERSION_VOLTD,
     };
 
-    scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, sizeof(outmsg));
-    return FWK_SUCCESS;
+    return scmi_voltd_ctx.scmi_api->respond(
+        service_id, &outmsg, sizeof(outmsg));
 }
 
 /*
@@ -253,8 +253,7 @@ static int scmi_voltd_protocol_attributes_handler(fwk_id_t service_id,
     outmsg_size = sizeof(outmsg);
 
 exit:
-    scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
-    return FWK_SUCCESS;
+    return scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
 }
 
 /*
@@ -278,8 +277,7 @@ static int scmi_voltd_protocol_message_attributes_handler(fwk_id_t service_id,
         outmsg_size = sizeof(outmsg);
     }
 
-    scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
-    return FWK_SUCCESS;
+    return scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
 }
 
 /*
@@ -311,8 +309,7 @@ static int scmi_voltd_domain_attributes_handler(fwk_id_t service_id,
     outmsg_size = sizeof(outmsg);
 
 exit:
-    scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
-    return FWK_SUCCESS;
+    return scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
 }
 
 /*
@@ -378,8 +375,7 @@ static int scmi_voltd_config_get_handler(fwk_id_t service_id,
         outmsg.status = SCMI_NOT_FOUND;
     }
 
-    scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
-    return FWK_SUCCESS;
+    return scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
 }
 
 static int scmi_voltd_config_set_handler(fwk_id_t service_id,
@@ -446,8 +442,7 @@ static int scmi_voltd_config_set_handler(fwk_id_t service_id,
         outmsg.status = SCMI_NOT_FOUND;
     }
 
-    scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
-    return FWK_SUCCESS;
+    return scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
 }
 
 /*
@@ -483,8 +478,7 @@ static int scmi_voltd_level_get_handler(fwk_id_t service_id,
     outmsg_size = sizeof(outmsg);
 
 exit:
-    scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
-    return FWK_SUCCESS;
+    return scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
 }
 
 static int scmi_voltd_level_set_handler(fwk_id_t service_id,
@@ -521,8 +515,7 @@ static int scmi_voltd_level_set_handler(fwk_id_t service_id,
     }
 
 exit:
-    scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
-    return FWK_SUCCESS;
+    return scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
 }
 
 /*
@@ -532,6 +525,7 @@ static int scmi_voltd_describe_levels_handler(fwk_id_t service_id,
     const uint32_t *payload)
 {
     int status = 0;
+    int respond_status;
     const struct mod_scmi_voltd_device *device = NULL;
     const struct scmi_voltd_describe_levels_a2p *inmsg = NULL;
     struct scmi_voltd_describe_levels_p2a outmsg = {
@@ -639,11 +633,16 @@ static int scmi_voltd_describe_levels_handler(fwk_id_t service_id,
         outmsg.status = SCMI_GENERIC_ERROR;
 
 exit:
-    if (outmsg.status == SCMI_SUCCESS)
-        scmi_api->respond(service_id, NULL, payload_size);
-    else
-        scmi_api->respond(service_id, &outmsg.status, sizeof(&outmsg.status));
+    if (outmsg.status == SCMI_SUCCESS) {
+        respond_status = scmi_api->respond(service_id, NULL, payload_size);
+    } else {
+        respond_status = scmi_api->respond(
+            service_id, &outmsg.status, sizeof(&outmsg.status));
+    }
 
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-VOLT] %s @%d", __func__, __LINE__);
+    }
     // Return status or return FWK_SUCCESS???
     return status;
 }
@@ -690,8 +689,8 @@ static int scmi_voltd_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     return handler_table[message_id](service_id, payload);
 
 error:
-    scmi_voltd_ctx.scmi_api->respond(service_id, &outmsg, sizeof(outmsg));
-    return FWK_SUCCESS;
+    return scmi_voltd_ctx.scmi_api->respond(
+        service_id, &outmsg, sizeof(outmsg));
 }
 
 static struct mod_scmi_to_protocol_api scmi_voltd_mod_scmi_to_protocol_api = {

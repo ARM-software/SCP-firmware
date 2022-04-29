@@ -15,6 +15,7 @@
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -127,9 +128,8 @@ static int scmi_apcore_protocol_version_handler(fwk_id_t service_id,
         .version = MOD_SCMI_PROTOCOL_VERSION_APCORE,
     };
 
-    scmi_apcore_ctx.scmi_api->respond(
+    return scmi_apcore_ctx.scmi_api->respond(
         service_id, &return_values, sizeof(return_values));
-    return FWK_SUCCESS;
 }
 
 /*
@@ -149,12 +149,8 @@ static int scmi_apcore_protocol_attributes_handler(fwk_id_t service_id,
             MOD_SCMI_APCORE_PROTOCOL_ATTRIBUTES_64BIT_MASK;
     }
 
-    scmi_apcore_ctx.scmi_api->respond(
-        service_id,
-        &return_values,
-        sizeof(return_values));
-
-    return FWK_SUCCESS;
+    return scmi_apcore_ctx.scmi_api->respond(
+        service_id, &return_values, sizeof(return_values));
 }
 
 /*
@@ -183,10 +179,8 @@ static int scmi_apcore_protocol_message_attributes_handler(fwk_id_t service_id,
     response_size = (return_values.status == SCMI_SUCCESS) ?
         sizeof(return_values) : sizeof(return_values.status);
 
-    scmi_apcore_ctx.scmi_api->respond(
+    return scmi_apcore_ctx.scmi_api->respond(
         service_id, &return_values, response_size);
-
-    return FWK_SUCCESS;
 }
 
 /*
@@ -258,9 +252,8 @@ static int scmi_apcore_reset_address_set_handler(fwk_id_t service_id,
     }
 
 exit:
-    scmi_apcore_ctx.scmi_api->respond(
+    return scmi_apcore_ctx.scmi_api->respond(
         service_id, &return_values, sizeof(return_values));
-    return status;
 }
 
 /*
@@ -269,7 +262,7 @@ exit:
 static int scmi_apcore_reset_address_get_handler(fwk_id_t service_id,
     const uint32_t *payload)
 {
-    int status;
+    int status, respond_status;
     unsigned int agent_id;
     const struct mod_scmi_apcore_reset_register_group *reg_group;
     uint64_t reset_address;
@@ -314,8 +307,13 @@ static int scmi_apcore_reset_address_get_handler(fwk_id_t service_id,
     return_values.status = (int32_t)SCMI_SUCCESS;
 
 exit:
-    scmi_apcore_ctx.scmi_api->respond(
+    respond_status = scmi_apcore_ctx.scmi_api->respond(
         service_id, &return_values, sizeof(return_values));
+
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-APCORE] %s @%d", __func__, __LINE__);
+    }
+
     return status;
 }
 
@@ -357,12 +355,8 @@ static int scmi_apcore_message_handler(
     return handler_table[message_id](service_id, payload);
 
 error:
-    scmi_apcore_ctx.scmi_api->respond(
-        service_id,
-        &return_value,
-        sizeof(return_value));
-
-    return FWK_SUCCESS;
+    return scmi_apcore_ctx.scmi_api->respond(
+        service_id, &return_value, sizeof(return_value));
 }
 
 static struct mod_scmi_to_protocol_api scmi_apcore_mod_scmi_to_protocol_api = {

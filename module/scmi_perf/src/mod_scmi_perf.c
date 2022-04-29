@@ -577,10 +577,8 @@ static int scmi_perf_protocol_version_handler(fwk_id_t service_id,
         .version = SCMI_PROTOCOL_VERSION_PERF,
     };
 
-    scmi_perf_ctx.scmi_api->respond(service_id, &return_values,
-                                    sizeof(return_values));
-
-    return FWK_SUCCESS;
+    return scmi_perf_ctx.scmi_api->respond(
+        service_id, &return_values, sizeof(return_values));
 }
 
 static int scmi_perf_protocol_attributes_handler(fwk_id_t service_id,
@@ -608,10 +606,8 @@ static int scmi_perf_protocol_attributes_handler(fwk_id_t service_id,
     return_values.statistics_address_low = addr_low;
     return_values.statistics_address_high = addr_high;
 
-    scmi_perf_ctx.scmi_api->respond(service_id, &return_values,
-                                    sizeof(return_values));
-
-    return FWK_SUCCESS;
+    return scmi_perf_ctx.scmi_api->respond(
+        service_id, &return_values, sizeof(return_values));
 }
 
 static int scmi_perf_protocol_message_attributes_handler(fwk_id_t service_id,
@@ -640,17 +636,17 @@ static int scmi_perf_protocol_message_attributes_handler(fwk_id_t service_id,
     }
 #endif
 
-    scmi_perf_ctx.scmi_api->respond(service_id, &return_values,
-        (return_values.status == SCMI_SUCCESS) ?
-        sizeof(return_values) : sizeof(return_values.status));
-
-    return FWK_SUCCESS;
+    return scmi_perf_ctx.scmi_api->respond(
+        service_id,
+        &return_values,
+        (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
+                                                 sizeof(return_values.status));
 }
 
 static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
                                                const uint32_t *payload)
 {
-    int status;
+    int status, respond_status;
     unsigned int agent_id;
     const struct scmi_perf_domain_attributes_a2p *parameters;
     uint32_t permissions = 0;
@@ -736,9 +732,15 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
         sizeof(return_values.name) - 1);
 
 exit:
-    scmi_perf_ctx.scmi_api->respond(service_id, &return_values,
-        (return_values.status == SCMI_SUCCESS) ?
-        sizeof(return_values) : sizeof(return_values.status));
+    respond_status = scmi_perf_ctx.scmi_api->respond(
+        service_id,
+        &return_values,
+        (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
+                                                 sizeof(return_values.status));
+
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -746,7 +748,7 @@ exit:
 static int scmi_perf_describe_levels_handler(fwk_id_t service_id,
                                              const uint32_t *payload)
 {
-    int status;
+    int status, respond_status;
     size_t max_payload_size;
     const struct scmi_perf_describe_levels_a2p *parameters;
     fwk_id_t domain_id;
@@ -847,11 +849,14 @@ static int scmi_perf_describe_levels_handler(fwk_id_t service_id,
         &return_values, sizeof(return_values));
 
 exit:
-    scmi_perf_ctx.scmi_api->respond(service_id,
-        (return_values.status == SCMI_SUCCESS) ?
-            NULL : &return_values.status,
-        (return_values.status == SCMI_SUCCESS) ?
-            payload_size : sizeof(return_values.status));
+    respond_status = scmi_perf_ctx.scmi_api->respond(
+        service_id,
+        (return_values.status == SCMI_SUCCESS) ? NULL : &return_values.status,
+        (return_values.status == SCMI_SUCCESS) ? payload_size :
+                                                 sizeof(return_values.status));
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -859,7 +864,7 @@ exit:
 static int scmi_perf_limits_set_handler(fwk_id_t service_id,
                                         const uint32_t *payload)
 {
-    int status;
+    int status, respond_status;
     unsigned int agent_id;
     const struct scmi_perf_limits_set_a2p *parameters;
     uint32_t range_min, range_max;
@@ -921,9 +926,14 @@ static int scmi_perf_limits_set_handler(fwk_id_t service_id,
     }
 
 exit:
-    scmi_perf_ctx.scmi_api->respond(service_id, &return_values,
-        (return_values.status == SCMI_SUCCESS) ?
-        sizeof(return_values) : sizeof(return_values.status));
+    respond_status = scmi_perf_ctx.scmi_api->respond(
+        service_id,
+        &return_values,
+        (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
+                                                 sizeof(return_values.status));
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -951,19 +961,17 @@ static int scmi_perf_limits_get_handler(fwk_id_t service_id,
     return_values.range_max = domain_ctx->level_limits.maximum;
 
 exit:
-    scmi_perf_ctx.scmi_api->respond(
+    return scmi_perf_ctx.scmi_api->respond(
         service_id,
         &return_values,
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
                                                  sizeof(return_values.status));
-
-    return FWK_SUCCESS;
 }
 
 static int scmi_perf_level_set_handler(fwk_id_t service_id,
                                        const uint32_t *payload)
 {
-    int status;
+    int status, respond_status;
     unsigned int agent_id;
     const struct scmi_perf_level_set_a2p *parameters;
     fwk_id_t domain_id;
@@ -1016,9 +1024,15 @@ static int scmi_perf_level_set_handler(fwk_id_t service_id,
     }
 
 exit:
-    scmi_perf_ctx.scmi_api->respond(service_id, &return_values,
-        (return_values.status == SCMI_SUCCESS) ?
-        sizeof(return_values) : sizeof(return_values.status));
+    respond_status = scmi_perf_ctx.scmi_api->respond(
+        service_id,
+        &return_values,
+        (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
+                                                 sizeof(return_values.status));
+
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -1026,7 +1040,7 @@ exit:
 static int scmi_perf_level_get_handler(fwk_id_t service_id,
                                        const uint32_t *payload)
 {
-    int status;
+    int status, respond_status;
     const struct scmi_perf_level_get_a2p *parameters;
     struct scmi_perf_event_parameters *evt_params;
     struct scmi_perf_level_get_p2a return_values;
@@ -1075,9 +1089,15 @@ static int scmi_perf_level_get_handler(fwk_id_t service_id,
     return FWK_SUCCESS;
 
 exit:
-    scmi_perf_ctx.scmi_api->respond(service_id, &return_values,
-        (return_values.status == SCMI_SUCCESS) ?
-        sizeof(return_values) : sizeof(return_values.status));
+    respond_status = scmi_perf_ctx.scmi_api->respond(
+        service_id,
+        &return_values,
+        (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
+                                                 sizeof(return_values.status));
+
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -1087,7 +1107,7 @@ static int scmi_perf_limits_notify(fwk_id_t service_id,
                                    const uint32_t *payload)
 {
     unsigned int agent_id;
-    int status;
+    int status, respond_status;
     unsigned int id;
     const struct scmi_perf_notify_limits_a2p *parameters;
     struct scmi_perf_notify_limits_p2a return_values = {
@@ -1138,9 +1158,15 @@ static int scmi_perf_limits_notify(fwk_id_t service_id,
     return_values.status = (int32_t)SCMI_SUCCESS;
 
 exit:
-    scmi_perf_ctx.scmi_api->respond(service_id, &return_values,
-        (return_values.status == SCMI_SUCCESS) ?
-        sizeof(return_values) : sizeof(return_values.status));
+    respond_status = scmi_perf_ctx.scmi_api->respond(
+        service_id,
+        &return_values,
+        (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
+                                                 sizeof(return_values.status));
+
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -1149,7 +1175,7 @@ static int scmi_perf_level_notify(fwk_id_t service_id,
                                    const uint32_t *payload)
 {
     unsigned int agent_id;
-    int status;
+    int status, respond_status;
     unsigned int id;
     const struct scmi_perf_notify_level_a2p *parameters;
     struct scmi_perf_notify_level_p2a return_values = {
@@ -1202,9 +1228,15 @@ static int scmi_perf_level_notify(fwk_id_t service_id,
     return_values.status = (int32_t)SCMI_SUCCESS;
 
 exit:
-    scmi_perf_ctx.scmi_api->respond(service_id, &return_values,
-        (return_values.status == SCMI_SUCCESS) ?
-        sizeof(return_values) : sizeof(return_values.status));
+    respond_status = scmi_perf_ctx.scmi_api->respond(
+        service_id,
+        &return_values,
+        (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
+                                                 sizeof(return_values.status));
+
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -1296,11 +1328,11 @@ static int scmi_perf_describe_fast_channels(fwk_id_t service_id,
     return_values.chan_size = chan_size;
 
 exit:
-    scmi_perf_ctx.scmi_api->respond(service_id, &return_values,
-        (return_values.status == SCMI_SUCCESS) ?
-        sizeof(return_values) : sizeof(return_values.status));
-
-    return FWK_SUCCESS;
+    return scmi_perf_ctx.scmi_api->respond(
+        service_id,
+        &return_values,
+        (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
+                                                 sizeof(return_values.status));
 }
 
 /*
@@ -1538,10 +1570,8 @@ static int scmi_perf_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     return handler_table[message_id](service_id, payload);
 
 error:
-    scmi_perf_ctx.scmi_api->respond(service_id, &return_value,
-                                    sizeof(return_value));
-
-    return FWK_SUCCESS;
+    return scmi_perf_ctx.scmi_api->respond(
+        service_id, &return_value, sizeof(return_value));
 }
 
 static struct mod_scmi_to_protocol_api scmi_perf_mod_scmi_to_protocol_api = {
@@ -1557,6 +1587,7 @@ static void scmi_perf_respond(
     fwk_id_t domain_id,
     int size)
 {
+    int respond_status;
     int idx = (int)fwk_id_get_element_idx(domain_id);
     fwk_id_t service_id;
 
@@ -1566,8 +1597,12 @@ static void scmi_perf_respond(
      */
     service_id = scmi_perf_ctx.perf_ops_table[idx].service_id;
 
-    scmi_perf_ctx.scmi_api->respond(service_id,
-        return_values, size);
+    respond_status =
+        scmi_perf_ctx.scmi_api->respond(service_id, return_values, size);
+
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+    }
 
     /*
      * Set the service identifier to 'none' to indicate the domain is

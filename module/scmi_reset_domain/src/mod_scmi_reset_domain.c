@@ -16,6 +16,7 @@
 
 #include <fwk_assert.h>
 #include <fwk_attributes.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
@@ -118,9 +119,7 @@ static int protocol_version_handler(fwk_id_t service_id,
         .version = SCMI_PROTOCOL_VERSION_RESET_DOMAIN,
     };
 
-    scmi_rd_ctx.scmi_api->respond(service_id, &outmsg, sizeof(outmsg));
-
-    return FWK_SUCCESS;
+    return scmi_rd_ctx.scmi_api->respond(service_id, &outmsg, sizeof(outmsg));
 }
 
 static int protocol_attributes_handler(fwk_id_t service_id,
@@ -142,9 +141,7 @@ static int protocol_attributes_handler(fwk_id_t service_id,
     outmsg.attributes = scmi_rd_ctx.config->
                             agent_table[agent_id].agent_domain_count;
 
-    scmi_rd_ctx.scmi_api->respond(service_id, &outmsg, sizeof(outmsg));
-
-    return FWK_SUCCESS;
+    return scmi_rd_ctx.scmi_api->respond(service_id, &outmsg, sizeof(outmsg));
 }
 
 static int protocol_message_attributes_handler(fwk_id_t service_id,
@@ -164,9 +161,7 @@ static int protocol_message_attributes_handler(fwk_id_t service_id,
         outmsg_size = sizeof(outmsg);
     }
 
-    scmi_rd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
-
-    return FWK_SUCCESS;
+    return scmi_rd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
 }
 
 /*
@@ -256,6 +251,7 @@ static int reset_attributes_handler(fwk_id_t service_id,
     };
     size_t outmsg_size = sizeof(outmsg.status);
     int status = FWK_SUCCESS;
+    int respond_status;
 
     params = *(const struct scmi_reset_domain_attributes_a2p *)payload;
 
@@ -286,7 +282,12 @@ static int reset_attributes_handler(fwk_id_t service_id,
     outmsg_size = sizeof(outmsg);
 
 exit:
-    scmi_rd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
+    respond_status =
+        scmi_rd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
+
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-RESET] %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -294,7 +295,7 @@ exit:
 static int reset_request_handler(fwk_id_t service_id,
                                  const uint32_t *payload)
 {
-    int status;
+    int status, respond_status;
     unsigned int agent_id;
     struct mod_reset_domain_dev_config *reset_dev_config;
     struct scmi_reset_domain_request_a2p params = { 0 };
@@ -417,7 +418,12 @@ static int reset_request_handler(fwk_id_t service_id,
     outmsg_size = sizeof(outmsg);
 
 exit:
-    scmi_rd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
+    respond_status =
+        scmi_rd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
+
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-RESET] %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -427,7 +433,7 @@ static int reset_notify_handler(fwk_id_t service_id,
                                 const uint32_t *payload)
 {
     unsigned int agent_id;
-    int status;
+    int status, respond_status;
     unsigned int domain_id;
     const struct scmi_reset_domain_notify_a2p *parameters;
     struct scmi_reset_domain_notify_p2a outmsg = {
@@ -470,10 +476,15 @@ static int reset_notify_handler(fwk_id_t service_id,
     outmsg.status = SCMI_SUCCESS;
 
 exit:
-    scmi_rd_ctx.scmi_api->respond(service_id, &outmsg,
-                                  (outmsg.status == SCMI_SUCCESS) ?
-                                  sizeof(outmsg) :
-                                  sizeof(outmsg.status));
+    respond_status = scmi_rd_ctx.scmi_api->respond(
+        service_id,
+        &outmsg,
+        (outmsg.status == SCMI_SUCCESS) ? sizeof(outmsg) :
+                                          sizeof(outmsg.status));
+
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-RESET] %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -590,9 +601,8 @@ static int scmi_reset_message_handler(fwk_id_t protocol_id,
     return msg_handler_table[message_id](service_id, payload);
 
 error:
-    scmi_rd_ctx.scmi_api->respond(service_id,
-                                  &return_value, sizeof(return_value));
-    return FWK_SUCCESS;
+    return scmi_rd_ctx.scmi_api->respond(
+        service_id, &return_value, sizeof(return_value));
 }
 
 static struct mod_scmi_to_protocol_api scmi_reset_mod_scmi_to_protocol_api = {
