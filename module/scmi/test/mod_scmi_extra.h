@@ -268,7 +268,7 @@ int mod_scmi_from_protocol_write_payload(
  *      been written.
  * \param size Size of the payload.
  */
-void mod_scmi_from_protocol_respond(
+int mod_scmi_from_protocol_respond(
     fwk_id_t service_id,
     const void *payload,
     size_t size);
