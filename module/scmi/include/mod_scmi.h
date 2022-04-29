@@ -583,8 +583,13 @@ struct mod_scmi_from_protocol_api {
      * \param payload Payload data to write, or NULL if a payload has already
      *      been written.
      * \param size Size of the payload.
+     *
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_E_SUPPORT Transport-specific message not supported.
+     * \return One of the standard error codes for implementation-defined
+     *      errors.
      */
-    void (*respond)(fwk_id_t service_id, const void *payload, size_t size);
+    int (*respond)(fwk_id_t service_id, const void *payload, size_t size);
 
     /*!
      * \brief Send a notification to the agent on behalf on an SCMI service.

@@ -202,9 +202,8 @@ static int scmi_sys_power_version_handler(fwk_id_t service_id,
         .version = SCMI_PROTOCOL_VERSION_SYS_POWER,
     };
 
-    scmi_sys_power_ctx.scmi_api->respond(service_id, &return_values,
-                                         sizeof(return_values));
-    return FWK_SUCCESS;
+    return scmi_sys_power_ctx.scmi_api->respond(
+        service_id, &return_values, sizeof(return_values));
 }
 
 /*
@@ -218,9 +217,8 @@ static int scmi_sys_power_attributes_handler(fwk_id_t service_id,
         .attributes = 0,
     };
 
-    scmi_sys_power_ctx.scmi_api->respond(service_id, &return_values,
-                                         sizeof(return_values));
-    return FWK_SUCCESS;
+    return scmi_sys_power_ctx.scmi_api->respond(
+        service_id, &return_values, sizeof(return_values));
 }
 
 /*
@@ -265,11 +263,11 @@ static int scmi_sys_power_msg_attributes_handler(fwk_id_t service_id,
     }
 
 exit:
-    scmi_sys_power_ctx.scmi_api->respond(service_id, &return_values,
+    return scmi_sys_power_ctx.scmi_api->respond(
+        service_id,
+        &return_values,
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
-        sizeof(return_values.status));
-
-    return FWK_SUCCESS;
+                                                 sizeof(return_values.status));
 }
 
 /*
@@ -279,6 +277,7 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
                                             const uint32_t *payload)
 {
     int status = FWK_SUCCESS;
+    int respond_status;
     const struct scmi_sys_power_state_set_a2p *parameters;
     struct scmi_sys_power_state_set_p2a return_values = {
         .status = (int32_t)SCMI_GENERIC_ERROR,
@@ -416,9 +415,15 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
     return_values.status = (int32_t)SCMI_SUCCESS;
 
 exit:
-    scmi_sys_power_ctx.scmi_api->respond(service_id, &return_values,
+    respond_status = scmi_sys_power_ctx.scmi_api->respond(
+        service_id,
+        &return_values,
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
-        sizeof(return_values.status));
+                                                 sizeof(return_values.status));
+
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("SCMI_SYS_POWER: %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -430,6 +435,7 @@ static int scmi_sys_power_state_get_handler(fwk_id_t service_id,
                                             const uint32_t *payload)
 {
     int status = FWK_SUCCESS;
+    int respond_status;
     struct scmi_sys_power_state_get_p2a return_values = {
         .status = (int32_t)SCMI_GENERIC_ERROR,
     };
@@ -467,9 +473,15 @@ static int scmi_sys_power_state_get_handler(fwk_id_t service_id,
     }
 
 exit:
-    scmi_sys_power_ctx.scmi_api->respond(service_id, &return_values,
+    respond_status = scmi_sys_power_ctx.scmi_api->respond(
+        service_id,
+        &return_values,
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
-        sizeof(return_values.status));
+                                                 sizeof(return_values.status));
+
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("SCMI_SYS_POWER: %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -486,7 +498,7 @@ static int scmi_sys_power_state_notify_handler(fwk_id_t service_id,
     struct scmi_sys_power_state_notify_p2a return_values = {
         .status = (int32_t)SCMI_GENERIC_ERROR,
     };
-    int status;
+    int status, respond_status;
 
     status = scmi_sys_power_ctx.scmi_api->get_agent_id(service_id, &agent_id);
     if (status != FWK_SUCCESS) {
@@ -509,9 +521,15 @@ static int scmi_sys_power_state_notify_handler(fwk_id_t service_id,
     return_values.status = (int32_t)SCMI_SUCCESS;
 
 exit:
-    scmi_sys_power_ctx.scmi_api->respond(service_id, &return_values,
+    respond_status = scmi_sys_power_ctx.scmi_api->respond(
+        service_id,
+        &return_values,
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
-        sizeof(return_values.status));
+                                                 sizeof(return_values.status));
+
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("SCMI_SYS_POWER: %s @%d", __func__, __LINE__);
+    }
 
     return FWK_SUCCESS;
 }
@@ -662,9 +680,8 @@ static int scmi_sys_power_handler(fwk_id_t protocol_id,
     return handler_table[message_id](service_id, payload);
 
 error:
-    scmi_sys_power_ctx.scmi_api->respond(service_id, &return_value,
-                                         sizeof(return_value));
-    return FWK_SUCCESS;
+    return scmi_sys_power_ctx.scmi_api->respond(
+        service_id, &return_value, sizeof(return_value));
 }
 
 static struct mod_scmi_to_protocol_api scmi_sys_power_mod_scmi_to_protocol = {

@@ -359,6 +359,7 @@ static void get_state_respond(fwk_id_t clock_dev_id,
                               enum mod_clock_state *clock_state,
                               int status)
 {
+    int respond_status;
     size_t response_size;
     struct scmi_clock_attributes_p2a return_values = { 0 };
 
@@ -379,9 +380,11 @@ static void get_state_respond(fwk_id_t clock_dev_id,
         response_size = sizeof(return_values.status);
     }
 
-    scmi_clock_ctx.scmi_api->respond(service_id,
-                                     &return_values,
-                                     response_size);
+    respond_status = scmi_clock_ctx.scmi_api->respond(
+        service_id, &return_values, response_size);
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-CLK] %s @%d", __func__, __LINE__);
+    }
 }
 
 /*
@@ -391,6 +394,7 @@ static void get_rate_respond(fwk_id_t service_id,
                              uint64_t *rate,
                              int status)
 {
+    int respond_status;
     size_t response_size;
     struct scmi_clock_rate_get_p2a return_values = { 0 };
 
@@ -406,14 +410,17 @@ static void get_rate_respond(fwk_id_t service_id,
         response_size = sizeof(return_values.status);
     }
 
-    scmi_clock_ctx.scmi_api->respond(service_id,
-                                     &return_values,
-                                     response_size);
+    respond_status = scmi_clock_ctx.scmi_api->respond(
+        service_id, &return_values, response_size);
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-CLK] %s @%d", __func__, __LINE__);
+    }
 }
 
 static void request_response(int response_status,
                              fwk_id_t service_id)
 {
+    int respond_status;
     struct scmi_clock_generic_p2a return_values = {
         .status = (int32_t)SCMI_GENERIC_ERROR
     };
@@ -426,9 +433,11 @@ static void request_response(int response_status,
         return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
     }
 
-    scmi_clock_ctx.scmi_api->respond(service_id,
-                                     &return_values,
-                                     sizeof(return_values.status));
+    respond_status = scmi_clock_ctx.scmi_api->respond(
+        service_id, &return_values, sizeof(return_values.status));
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-CLK] %s @%d", __func__, __LINE__);
+    }
 }
 
 /*
@@ -436,6 +445,7 @@ static void request_response(int response_status,
  */
 static void set_request_respond(fwk_id_t service_id, int status)
 {
+    int respond_status;
     struct scmi_clock_generic_p2a return_values = { 0 };
 
     if (status == FWK_E_RANGE || status == FWK_E_PARAM) {
@@ -448,9 +458,11 @@ static void set_request_respond(fwk_id_t service_id, int status)
         return_values.status = (int32_t)SCMI_SUCCESS;
     }
 
-    scmi_clock_ctx.scmi_api->respond(service_id,
-                                     &return_values,
-                                     sizeof(return_values.status));
+    respond_status = scmi_clock_ctx.scmi_api->respond(
+        service_id, &return_values, sizeof(return_values.status));
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-CLK] %s @%d", __func__, __LINE__);
+    }
 }
 
 FWK_WEAK int mod_scmi_clock_rate_set_policy(
@@ -744,9 +756,8 @@ static int scmi_clock_protocol_version_handler(fwk_id_t service_id,
         .version = SCMI_PROTOCOL_VERSION_CLOCK,
     };
 
-    scmi_clock_ctx.scmi_api->respond(service_id, &return_values,
-                                     sizeof(return_values));
-    return FWK_SUCCESS;
+    return scmi_clock_ctx.scmi_api->respond(
+        service_id, &return_values, sizeof(return_values));
 }
 
 /*
@@ -755,7 +766,7 @@ static int scmi_clock_protocol_version_handler(fwk_id_t service_id,
 static int scmi_clock_protocol_attributes_handler(fwk_id_t service_id,
     const uint32_t *payload)
 {
-    int status;
+    int status, respond_status;
     const struct mod_scmi_clock_agent *agent;
     struct scmi_protocol_attributes_p2a return_values = {
         .status = (int32_t)SCMI_SUCCESS,
@@ -773,8 +784,11 @@ static int scmi_clock_protocol_attributes_handler(fwk_id_t service_id,
         );
 
 exit:
-    scmi_clock_ctx.scmi_api->respond(service_id, &return_values,
-                                     sizeof(return_values));
+    respond_status = scmi_clock_ctx.scmi_api->respond(
+        service_id, &return_values, sizeof(return_values));
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-CLK] %s @%d", __func__, __LINE__);
+    }
     return status;
 }
 
@@ -805,8 +819,8 @@ static int scmi_clock_protocol_message_attributes_handler(fwk_id_t service_id,
 exit:
     response_size = (return_values.status == SCMI_SUCCESS) ?
         sizeof(return_values) : sizeof(return_values.status);
-    scmi_clock_ctx.scmi_api->respond(service_id, &return_values, response_size);
-    return FWK_SUCCESS;
+    return scmi_clock_ctx.scmi_api->respond(
+        service_id, &return_values, response_size);
 }
 
 /*
@@ -816,7 +830,7 @@ exit:
 static int scmi_clock_attributes_handler(fwk_id_t service_id,
     const uint32_t *payload)
 {
-    int status;
+    int status, respond_status;
     const struct mod_scmi_clock_agent *agent;
     const struct mod_scmi_clock_device *clock_device;
     size_t response_size;
@@ -868,7 +882,12 @@ static int scmi_clock_attributes_handler(fwk_id_t service_id,
 exit:
     response_size = (return_values.status == SCMI_SUCCESS) ?
         sizeof(return_values) : sizeof(return_values.status);
-    scmi_clock_ctx.scmi_api->respond(service_id, &return_values, response_size);
+    respond_status = scmi_clock_ctx.scmi_api->respond(
+        service_id, &return_values, response_size);
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-CLK] %s @%d", __func__, __LINE__);
+    }
+
     return status;
 }
 
@@ -878,7 +897,7 @@ exit:
 static int scmi_clock_rate_get_handler(fwk_id_t service_id,
     const uint32_t *payload)
 {
-    int status;
+    int status, respond_status;
     const struct mod_scmi_clock_agent *agent;
     const struct mod_scmi_clock_device *clock_device;
     size_t response_size;
@@ -930,7 +949,12 @@ static int scmi_clock_rate_get_handler(fwk_id_t service_id,
 exit:
     response_size = (return_values.status == SCMI_SUCCESS) ?
         sizeof(return_values) : sizeof(return_values.status);
-    scmi_clock_ctx.scmi_api->respond(service_id, &return_values, response_size);
+    respond_status = scmi_clock_ctx.scmi_api->respond(
+        service_id, &return_values, response_size);
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-CLK] %s @%d", __func__, __LINE__);
+    }
+
     return status;
 }
 
@@ -1052,8 +1076,8 @@ static int scmi_clock_rate_set_handler(fwk_id_t service_id,
 exit:
     response_size = (return_values.status == SCMI_SUCCESS) ?
         sizeof(return_values) : sizeof(return_values.status);
-    scmi_clock_ctx.scmi_api->respond(service_id, &return_values, response_size);
-    return FWK_SUCCESS;
+    return scmi_clock_ctx.scmi_api->respond(
+        service_id, &return_values, response_size);
 }
 
 /*
@@ -1150,8 +1174,8 @@ static int scmi_clock_config_set_handler(fwk_id_t service_id,
 exit:
     response_size = (return_values.status == SCMI_SUCCESS) ?
         sizeof(return_values) : sizeof(return_values.status);
-    scmi_clock_ctx.scmi_api->respond(service_id, &return_values, response_size);
-    return FWK_SUCCESS;
+    return scmi_clock_ctx.scmi_api->respond(
+        service_id, &return_values, response_size);
 }
 
 /*
@@ -1160,7 +1184,7 @@ exit:
 static int scmi_clock_describe_rates_handler(fwk_id_t service_id,
     const uint32_t *payload)
 {
-    int status;
+    int status, respond_status;
     const struct mod_scmi_clock_agent *agent;
     const struct mod_scmi_clock_device *clock_device;
     unsigned int i;
@@ -1317,11 +1341,15 @@ static int scmi_clock_describe_rates_handler(fwk_id_t service_id,
         &return_values, sizeof(return_values));
 
 exit:
-    scmi_clock_ctx.scmi_api->respond(service_id,
-        (return_values.status == SCMI_SUCCESS) ?
-            NULL : &return_values.status,
-        (return_values.status == SCMI_SUCCESS) ?
-            payload_size : sizeof(return_values.status));
+    respond_status = scmi_clock_ctx.scmi_api->respond(
+        service_id,
+        (return_values.status == SCMI_SUCCESS) ? NULL : &return_values.status,
+        (return_values.status == SCMI_SUCCESS) ? payload_size :
+                                                 sizeof(return_values.status));
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI-CLK] %s @%d", __func__, __LINE__);
+    }
+
     return status;
 }
 
@@ -1359,9 +1387,8 @@ static int scmi_clock_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     return handler_table[message_id](service_id, payload);
 
 error:
-    scmi_clock_ctx.scmi_api->respond(service_id,
-                                     &return_value, sizeof(return_value));
-    return FWK_SUCCESS;
+    return scmi_clock_ctx.scmi_api->respond(
+        service_id, &return_value, sizeof(return_value));
 }
 
 static struct mod_scmi_to_protocol_api scmi_clock_mod_scmi_to_protocol_api = {

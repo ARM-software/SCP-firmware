@@ -15,6 +15,7 @@
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
@@ -129,9 +130,8 @@ static int scmi_base_protocol_version_handler(
         .version = SCMI_PROTOCOL_VERSION_BASE,
     };
 
-    protocol_api->respond(service_id, &return_values, sizeof(return_values));
-
-    return FWK_SUCCESS;
+    return protocol_api->respond(
+        service_id, &return_values, sizeof(return_values));
 }
 
 /*
@@ -211,9 +211,8 @@ static int scmi_base_protocol_attributes_handler(
     return_values.attributes = (uint32_t)SCMI_BASE_PROTOCOL_ATTRIBUTES(
         protocol_count, shared_scmi_ctx->config->agent_count);
 
-    protocol_api->respond(service_id, &return_values, sizeof(return_values));
-
-    return FWK_SUCCESS;
+    return protocol_api->respond(
+        service_id, &return_values, sizeof(return_values));
 }
 
 /*
@@ -241,13 +240,11 @@ static int scmi_base_protocol_message_attributes_handler(
      * has already been set by the initialization of "return_values".
      */
 
-    protocol_api->respond(
+    return protocol_api->respond(
         service_id,
         &return_values,
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
                                                  sizeof(return_values.status));
-
-    return FWK_SUCCESS;
 }
 
 /*
@@ -268,9 +265,8 @@ static int scmi_base_discover_vendor_handler(
             sizeof(return_values.vendor_identifier) - 1);
     }
 
-    protocol_api->respond(service_id, &return_values, sizeof(return_values));
-
-    return FWK_SUCCESS;
+    return protocol_api->respond(
+        service_id, &return_values, sizeof(return_values));
 }
 
 /*
@@ -291,9 +287,8 @@ static int scmi_base_discover_sub_vendor_handler(
             sizeof(return_values.sub_vendor_identifier) - 1);
     }
 
-    protocol_api->respond(service_id, &return_values, sizeof(return_values));
-
-    return FWK_SUCCESS;
+    return protocol_api->respond(
+        service_id, &return_values, sizeof(return_values));
 }
 
 /*
@@ -307,9 +302,8 @@ static int scmi_base_discover_implementation_version_handler(
         .status = (int32_t)SCMI_SUCCESS, .version = FWK_BUILD_VERSION
     };
 
-    protocol_api->respond(service_id, &return_values, sizeof(return_values));
-
-    return FWK_SUCCESS;
+    return protocol_api->respond(
+        service_id, &return_values, sizeof(return_values));
 }
 
 /*
@@ -319,7 +313,7 @@ static int scmi_base_discover_list_protocols_handler(
     fwk_id_t service_id,
     const uint32_t *payload)
 {
-    int status;
+    int status, respond_status;
     const struct scmi_base_discover_list_protocols_a2p *parameters;
     struct scmi_base_discover_list_protocols_p2a return_values = {
         .status = (int32_t)SCMI_GENERIC_ERROR,
@@ -492,16 +486,17 @@ static int scmi_base_discover_list_protocols_handler(
 
     payload_size = FWK_ALIGN_NEXT(payload_size, sizeof(uint32_t));
 
-    protocol_api->respond(service_id, NULL, payload_size);
-
-    return status;
+    return protocol_api->respond(service_id, NULL, payload_size);
 
 error:
-    protocol_api->respond(
+    respond_status = protocol_api->respond(
         service_id,
         &return_values,
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
                                                  sizeof(return_values.status));
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI_BASE] %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -595,13 +590,11 @@ static int scmi_base_discover_agent_handler(
         sizeof(return_values.name) - 1);
 
 exit:
-    protocol_api->respond(
+    return protocol_api->respond(
         service_id,
         &return_values,
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
                                                  sizeof(return_values.status));
-
-    return FWK_SUCCESS;
 }
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
@@ -618,6 +611,7 @@ static int scmi_base_set_device_permissions(
         .status = (int32_t)SCMI_NOT_FOUND,
     };
     int status = FWK_SUCCESS;
+    int respond_status;
 
     parameters = (const struct scmi_base_set_device_permissions_a2p *)payload;
 
@@ -656,11 +650,15 @@ static int scmi_base_set_device_permissions(
     }
 
 exit:
-    protocol_api->respond(
+    respond_status = protocol_api->respond(
         service_id,
         &return_values,
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
                                                  sizeof(return_values.status));
+
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI_BASE] %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -677,6 +675,7 @@ static int scmi_base_set_protocol_permissions(
         .status = (int32_t)SCMI_NOT_FOUND,
     };
     int status = FWK_SUCCESS;
+    int respond_status;
 
     parameters = (const struct scmi_base_set_protocol_permissions_a2p *)payload;
 
@@ -724,11 +723,15 @@ static int scmi_base_set_protocol_permissions(
     }
 
 exit:
-    protocol_api->respond(
+    respond_status = protocol_api->respond(
         service_id,
         &return_values,
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
                                                  sizeof(return_values.status));
+
+    if (respond_status != FWK_SUCCESS) {
+        FWK_LOG_TRACE("[SCMI_BASE] %s @%d", __func__, __LINE__);
+    }
 
     return status;
 }
@@ -781,13 +784,11 @@ static int scmi_base_reset_agent_config(
     }
 
 exit:
-    protocol_api->respond(
+    return protocol_api->respond(
         service_id,
         &return_values,
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
                                                  sizeof(return_values.status));
-
-    return FWK_SUCCESS;
 }
 
 /*
@@ -863,9 +864,8 @@ int scmi_base_message_handler(
     return base_handler_table[message_id](service_id, payload);
 
 error:
-    protocol_api->respond(service_id, &return_value, sizeof(return_value));
-
-    return FWK_SUCCESS;
+    return protocol_api->respond(
+        service_id, &return_value, sizeof(return_value));
 }
 
 void scmi_base_set_api(const struct mod_scmi_from_protocol_api *api)
