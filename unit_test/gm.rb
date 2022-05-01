@@ -15,6 +15,8 @@ files = []
 cmock_options = {}
 cmock_options[:verbosity] = 3
 
+cmock_option_cfg =  "#{GIT_ROOT}/unit_test/cfg.yml"
+
 OptionParser.new do |parser|
     parser.on('-h', '--help', 'Print this help') do |help|
       puts "Usage gm.rb [options]"
@@ -28,8 +30,8 @@ OptionParser.new do |parser|
     parser.on('-f', '--file_name=PATH', "Header file to generate mocks for") do |file_name|
         files << file_name
     end
-    parser.on('-o', '--cmock_option_cfg=yaml_file', 'Mock configuration file') do |cmock_option_cfg|
-      cmock_options.merge!  CMockConfig.load_config_file_from_yaml(cmock_option_cfg)
+    parser.on('-o', '--cmock_option_cfg=yaml_file', 'Mock configuration file') do |new_cfg|
+        cmock_option_cfg = new_cfg
     end
     parser.on('-s', '--mock_suffix=mock_file_suffix', 'Mock file suffix') do |mock_suffix|
       cmock_options[:mock_suffix] = mock_suffix
@@ -38,6 +40,8 @@ OptionParser.new do |parser|
       cmock_options[:subdir] = subdir
     end
 end.parse!
+
+cmock_options.merge!  CMockConfig.load_config_file_from_yaml(cmock_option_cfg)
 
 cmock = CMock.new(cmock_options).setup_mocks(files)
 
