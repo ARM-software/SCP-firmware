@@ -22,64 +22,75 @@ static const fwk_id_t mod_thermal_event_id_read_temp = FWK_ID_EVENT_INIT(
 
 static struct mod_thermal_mgmt_ctx mod_ctx;
 
-static inline struct mod_thermal_mgmt_dev_ctx *get_dev_ctx(unsigned int dom)
+inline struct mod_thermal_mgmt_dev_ctx *get_dev_ctx(fwk_id_t id)
 {
-    return &mod_ctx.dev_ctx_table[dom];
+    return &mod_ctx.dev_ctx_table[fwk_id_get_element_idx(id)];
 }
 
-static void pi_control(void)
+inline struct mod_thermal_mgmt_actor_ctx *get_actor_ctx(
+    struct mod_thermal_mgmt_dev_ctx *dev_ctx,
+    unsigned int actor)
 {
+    return &dev_ctx->actor_ctx_table[actor];
+}
+
+static void pi_control(fwk_id_t id)
+{
+    struct mod_thermal_mgmt_dev_ctx *dev_ctx;
     int32_t err, terr, pi_power;
     int32_t k_p, k_i;
 
-    if (mod_ctx.cur_temp < mod_ctx.config->switch_on_temperature) {
+    dev_ctx = get_dev_ctx(id);
+
+    if (dev_ctx->cur_temp <
+        dev_ctx->config->pi_controller.switch_on_temperature) {
         /* The PI loop is not activated */
-        mod_ctx.integral_error = 0;
-        mod_ctx.allocatable_power = (uint32_t)mod_ctx.config->tdp;
+        dev_ctx->integral_error = 0;
+        dev_ctx->allocatable_power = (uint32_t)dev_ctx->config->tdp;
 
         return;
     }
 
-    k_i = mod_ctx.config->k_integral;
+    k_i = dev_ctx->config->pi_controller.k_integral;
 
-    err = (int32_t)mod_ctx.config->control_temperature -
-        (int32_t)mod_ctx.cur_temp;
+    err = (int32_t)dev_ctx->config->pi_controller.control_temperature -
+        (int32_t)dev_ctx->cur_temp;
 
-    k_p = (err < 0) ? mod_ctx.config->k_p_overshoot :
-                      mod_ctx.config->k_p_undershoot;
+    k_p = (err < 0) ? dev_ctx->config->pi_controller.k_p_overshoot :
+                      dev_ctx->config->pi_controller.k_p_undershoot;
 
     /* Evaluate the integral term */
-    if (((err > 0) && (mod_ctx.integral_error < (INT32_MAX - err))) ||
-        ((err < 0) && (mod_ctx.integral_error > (INT32_MIN - err)))) {
-        terr = mod_ctx.integral_error + err;
+    if (((err > 0) && (dev_ctx->integral_error < (INT32_MAX - err))) ||
+        ((err < 0) && (dev_ctx->integral_error > (INT32_MIN - err)))) {
+        terr = dev_ctx->integral_error + err;
 
-        if ((err < mod_ctx.config->integral_cutoff) &&
-            (terr < mod_ctx.config->integral_max)) {
+        if ((err < dev_ctx->config->pi_controller.integral_cutoff) &&
+            (terr < dev_ctx->config->pi_controller.integral_max)) {
             /*
              * The error is below the cutoff value and,
              * the accumulated error is still within the maximum permissible
              * value, thus continue integration.
              */
-            mod_ctx.integral_error = terr;
+            dev_ctx->integral_error = terr;
         }
     }
 
-    pi_power = (k_p * err) + (k_i * mod_ctx.integral_error);
+    pi_power = (k_p * err) + (k_i * dev_ctx->integral_error);
 
-    if (pi_power + (int32_t)mod_ctx.config->tdp > 0) {
-        mod_ctx.allocatable_power = pi_power + (uint32_t)mod_ctx.config->tdp;
+    if (pi_power + (int32_t)dev_ctx->config->tdp > 0) {
+        dev_ctx->allocatable_power = pi_power + (uint32_t)dev_ctx->config->tdp;
     } else {
-        mod_ctx.allocatable_power = 0;
+        dev_ctx->allocatable_power = 0;
     }
 }
 
-static int read_temperature(void)
+static int read_temperature(fwk_id_t id)
 {
 #if THERMAL_HAS_ASYNC_SENSORS
     /* Initiate the temperature reading sequence */
     struct fwk_event event = {
-        .source_id = FWK_ID_MODULE(FWK_MODULE_IDX_THERMAL_MGMT),
-        .target_id = FWK_ID_MODULE(FWK_MODULE_IDX_THERMAL_MGMT),
+        .source_id = id,
+        .target_id = id,
         .id = mod_thermal_event_id_read_temp,
     };
 
@@ -87,28 +98,34 @@ static int read_temperature(void)
 #else
     int status;
     uint64_t value;
+    struct mod_thermal_mgmt_dev_ctx *dev_ctx;
 
-    status = mod_ctx.sensor_api->get_data(
-        mod_ctx.config->sensor_id, &mod_ctx.sensor_data);
+    dev_ctx = get_dev_ctx(id);
+
+    status = dev_ctx->sensor_api->get_data(
+        dev_ctx->config->sensor_id, &dev_ctx->sensor_data);
     if (status == FWK_SUCCESS) {
-        mod_ctx.cur_temp = (uint32_t)mod_ctx.sensor_data.value;
+        dev_ctx->cur_temp = (uint32_t)dev_ctx->sensor_data.value;
 
-        mod_ctx.pi_control_needs_update = true;
+        dev_ctx->pi_control_needs_update = true;
     }
 
     return status;
 #endif
 }
 
-static int pi_control_update(void)
+static int pi_control_update(fwk_id_t id)
 {
+    struct mod_thermal_mgmt_dev_ctx *dev_ctx;
     int status;
 
-    mod_ctx.tick_counter++;
-    if (mod_ctx.tick_counter > mod_ctx.config->slow_loop_mult) {
-        mod_ctx.tick_counter = 0;
+    dev_ctx = get_dev_ctx(id);
 
-        if (mod_ctx.pi_control_needs_update) {
+    dev_ctx->tick_counter++;
+    if (dev_ctx->tick_counter > dev_ctx->config->slow_loop_mult) {
+        dev_ctx->tick_counter = 0;
+
+        if (dev_ctx->pi_control_needs_update) {
             /* The last reading was not processed */
             FWK_LOG_WARN("[TPM] Failed to process last reading\n");
 
@@ -122,18 +139,18 @@ static int pi_control_update(void)
          *
          * Either way we need to attempt to continue to process the loop.
          */
-        status = read_temperature();
+        status = read_temperature(id);
         if (status != FWK_SUCCESS) {
             return FWK_E_DEVICE;
         }
     }
 
-    if (mod_ctx.pi_control_needs_update) {
-        mod_ctx.pi_control_needs_update = false;
+    if (dev_ctx->pi_control_needs_update) {
+        dev_ctx->pi_control_needs_update = false;
 
-        pi_control();
+        pi_control(id);
 
-        mod_ctx.tot_spare_power = 0;
+        dev_ctx->tot_spare_power = 0;
     }
 
     return FWK_SUCCESS;
@@ -146,14 +163,22 @@ static int pi_control_update(void)
  */
 static int thermal_update(struct perf_plugins_perf_update *data)
 {
+    unsigned int dev_idx;
+    fwk_id_t dev_id;
+    struct mod_thermal_mgmt_dev_ctx *dev_ctx;
     int status;
 
-    status = pi_control_update();
-    if (status != FWK_SUCCESS) {
-        return status;
-    }
+    for (dev_idx = 0; dev_idx < mod_ctx.dev_ctx_count; dev_idx++) {
+        dev_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_THERMAL_MGMT, dev_idx);
+        dev_ctx = get_dev_ctx(dev_id);
 
-    distribute_power(data->level, data->adj_max_limit);
+        status = pi_control_update(dev_ctx->id);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+
+        distribute_power(dev_ctx->id, data->level, data->adj_max_limit);
+    }
 
     return FWK_SUCCESS;
 }
@@ -171,27 +196,9 @@ static int thermal_mgmt_init(
     unsigned int element_count,
     const void *data)
 {
-    int dvfs_doms_count;
-
-    mod_ctx.config = (struct mod_thermal_mgmt_config *)data;
-
-    /* Assume TDP until PI loop is updated */
-    mod_ctx.allocatable_power = (uint32_t)mod_ctx.config->tdp;
-
-    dvfs_doms_count =
-        fwk_module_get_element_count(FWK_ID_MODULE(FWK_MODULE_IDX_DVFS));
-    if (dvfs_doms_count <= 0) {
-        return FWK_E_SUPPORT;
-    }
-
-    mod_ctx.dvfs_doms_count = (unsigned int)dvfs_doms_count;
-
     mod_ctx.dev_ctx_table =
-        fwk_mm_calloc(element_count, sizeof(*mod_ctx.dev_ctx_table));
-
-    mod_ctx.domain_count = element_count;
-
-    power_allocation_set_shared_ctx(&mod_ctx);
+        fwk_mm_calloc(element_count, sizeof(struct mod_thermal_mgmt_dev_ctx));
+    mod_ctx.dev_ctx_count = element_count;
 
     return FWK_SUCCESS;
 }
@@ -203,33 +210,49 @@ static int thermal_mgmt_dev_init(
 {
     struct mod_thermal_mgmt_dev_config *config;
     struct mod_thermal_mgmt_dev_ctx *dev_ctx;
+    struct mod_thermal_mgmt_actor_ctx *actor_ctx;
+
     uint64_t sum_weights;
+    uint32_t actor;
 
     if (data == NULL) {
         return FWK_E_PARAM;
     }
 
     config = (struct mod_thermal_mgmt_dev_config *)data;
-
-    if (!fwk_module_is_valid_element_id(config->dvfs_domain_id)) {
-        return FWK_E_PARAM;
-    }
-
-    dev_ctx = get_dev_ctx(fwk_id_get_element_idx(element_id));
-
-    if (!fwk_id_type_is_valid(config->driver_id) ||
-        fwk_id_is_equal(config->driver_id, FWK_ID_NONE)) {
-        return FWK_E_PARAM;
-    }
-
+    dev_ctx = get_dev_ctx(element_id);
     dev_ctx->config = config;
+    dev_ctx->id = element_id;
 
-    sum_weights =
-        dev_ctx->config->weight * mod_ctx.config->tdp * mod_ctx.config->tdp;
-    if (sum_weights > UINT32_MAX) {
-        FWK_LOG_WARN(
-            "[THERMAL] WARN: Possible overflow for device %u",
-            fwk_id_get_element_idx(element_id));
+    /* Assume TDP until PI loop is updated */
+    dev_ctx->allocatable_power = (uint32_t)dev_ctx->config->tdp;
+
+    dev_ctx->actor_ctx_table = fwk_mm_calloc(
+        dev_ctx->config->thermal_actors_count,
+        sizeof(struct mod_thermal_mgmt_actor_ctx));
+
+    for (actor = 0; actor < dev_ctx->config->thermal_actors_count; actor++) {
+        /* Get actor context and set configuration */
+        actor_ctx = get_actor_ctx(dev_ctx, actor);
+        actor_ctx->config = &config->thermal_actors_table[actor];
+
+        if (!fwk_module_is_valid_element_id(
+                actor_ctx->config->dvfs_domain_id)) {
+            return FWK_E_PARAM;
+        }
+
+        if (!fwk_id_type_is_valid(actor_ctx->config->driver_id) ||
+            fwk_id_is_equal(actor_ctx->config->driver_id, FWK_ID_NONE)) {
+            return FWK_E_PARAM;
+        }
+
+        sum_weights = actor_ctx->config->weight * config->tdp * config->tdp;
+
+        if (sum_weights > UINT32_MAX) {
+            FWK_LOG_WARN(
+                "[THERMAL] WARN: Possible overflow for device %u",
+                fwk_id_get_element_idx(element_id));
+        }
     }
 
     return FWK_SUCCESS;
@@ -245,23 +268,23 @@ static int thermal_mgmt_bind(fwk_id_t id, unsigned int round)
     }
 
     if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
-        /* Bind to sensor */
-        status = fwk_module_bind(
-            mod_ctx.config->sensor_id,
-            mod_sensor_api_id_sensor,
-            &mod_ctx.sensor_api);
-        if (status != FWK_SUCCESS) {
-            return FWK_E_PANIC;
-        }
-
         return FWK_SUCCESS;
     }
 
-    dev_ctx = get_dev_ctx(fwk_id_get_element_idx(id));
+    dev_ctx = get_dev_ctx(id);
+
+    /* Bind to sensor */
+    status = fwk_module_bind(
+        dev_ctx->config->sensor_id,
+        mod_sensor_api_id_sensor,
+        &dev_ctx->sensor_api);
+    if (status != FWK_SUCCESS) {
+        return FWK_E_PANIC;
+    }
 
     /* Bind to a respective thermal driver */
     status = fwk_module_bind(
-        dev_ctx->config->driver_id,
+        FWK_ID_MODULE(fwk_id_get_module_idx(dev_ctx->config->driver_api_id)),
         dev_ctx->config->driver_api_id,
         &dev_ctx->driver_api);
     if (status != FWK_SUCCESS) {
@@ -287,19 +310,22 @@ static int thermal_mgmt_process_event(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
 {
+    struct mod_thermal_mgmt_dev_ctx *dev_ctx;
     int status;
+
+    dev_ctx = get_dev_ctx(event->target_id);
 
     if (fwk_id_is_equal(event->id, mod_thermal_event_id_read_temp)) {
         /* Temperature-reading event */
-        status = mod_ctx.sensor_api->get_data(
-            mod_ctx.config->sensor_id, &mod_ctx.sensor_data);
+        status = dev_ctx->sensor_api->get_data(
+            dev_ctx->config->sensor_id, &dev_ctx->sensor_data);
         if (status == FWK_SUCCESS) {
-            mod_ctx.cur_temp = (uint32_t)mod_ctx.sensor_data.value;
+            dev_ctx->cur_temp = (uint32_t)dev_ctx->sensor_data.value;
         }
     } else if (fwk_id_is_equal(event->id, mod_sensor_event_id_read_request)) {
         /* Response event from Sensor HAL */
-        if (mod_ctx.sensor_data.status == FWK_SUCCESS) {
-            mod_ctx.cur_temp = (uint32_t)mod_ctx.sensor_data.value;
+        if (dev_ctx->sensor_data.status == FWK_SUCCESS) {
+            dev_ctx->cur_temp = (uint32_t)dev_ctx->sensor_data.value;
             status = FWK_SUCCESS;
         } else {
             status = FWK_E_DEVICE;
@@ -309,7 +335,7 @@ static int thermal_mgmt_process_event(
     }
 
     if (status == FWK_SUCCESS) {
-        mod_ctx.pi_control_needs_update = true;
+        dev_ctx->pi_control_needs_update = true;
     } else if (status == FWK_PENDING) {
         status = FWK_SUCCESS;
     }

@@ -39,17 +39,14 @@ enum mod_thermal_api_idx {
 };
 
 /*!
- * \brief Thermal Mgmt device configuration.
+ * \brief Thermal Mgmt actors configuration.
  *
- * \details Configuration structure for individual thermal devices.
+ * \details Configuration structure for individual thermal actors.
  *      Please refer to the doc section for further details.
  */
-struct mod_thermal_mgmt_dev_config {
+struct mod_thermal_mgmt_actor_config {
     /*! Element identifier of the corresponding power model */
     fwk_id_t driver_id;
-
-    /*! Power Model API identifier */
-    fwk_id_t driver_api_id;
 
     /*! Corresponding DVFS Element identifier for this device */
     fwk_id_t dvfs_domain_id;
@@ -64,12 +61,12 @@ struct mod_thermal_mgmt_dev_config {
 };
 
 /*!
- * \brief Thermal Mgmt configuration.
+ * \brief Thermal Mgmt device configuration.
  *
- * \details Configuration structure for the whole thermal management.
+ * \details Configuration structure for individual thermal devices.
  *      Please refer to the doc section for further details.
  */
-struct mod_thermal_mgmt_config {
+struct mod_thermal_mgmt_dev_config {
     /*!
      * \brief Slow loop multiplier.
      *
@@ -87,47 +84,64 @@ struct mod_thermal_mgmt_config {
      * \details The temperature above which the PI loop runs. Below this
      *      threshold the power is allocated only on bias coefficients.
      */
-    uint32_t switch_on_temperature;
+    struct {
+        /*!
+         * \brief Switch-on temperature threshold.
+         *
+         * \details The temperature above which the PI loop runs. Below this
+         *      threshold the power is allocated only on bias coefficients.
+         */
+        uint32_t switch_on_temperature;
 
-    /*!
-     * \brief Control temperature
-     *
-     * \details The temperature that the system will achive once stabilised.
-     *      Due to the PI nature of the controller, some overshoot/undershoot
-     *      may occur.
-     *      Note that the controller can only limit the temperature by placing a
-     *      limit to the power to the heat source. It has no direct control on
-     *      the heat source itself and therefore only the upper limit can be
-     *      controlled.
-     */
-    uint32_t control_temperature;
+        /*!
+         * \brief Control temperature
+         *
+         * \details The temperature that the system will achive once stabilised.
+         *      Due to the PI nature of the controller, some
+         *      overshoot/undershoot may occur. Note that the controller can
+         *      only limit the temperature by placing a limit to the power to
+         *      the heat source. It has no direct control on the heat source
+         *      itself and therefore only the upper limit can be controlled.
+         */
+        uint32_t control_temperature;
 
-    /*!
-     * \brief Integral cut-off threshold.
-     *
-     * \details Below this value the errors are accumulated. This is useful to
-     *      avoid accumulating errors when the temperature is below the target.
-     */
-    int32_t integral_cutoff;
+        /*!
+         * \brief Integral cut-off threshold.
+         *
+         * \details Below this value the errors are accumulated. This is useful
+         *      to avoid accumulating errors when the temperature is below the
+         *      target.
+         */
+        int32_t integral_cutoff;
 
-    /*!
-     * \brief Integral maximum.
-     *
-     * \details This is the upper limit the accumulated errors.
-     */
-    int32_t integral_max;
+        /*!
+         * \brief Integral maximum.
+         *
+         * \details This is the upper limit the accumulated errors.
+         */
+        int32_t integral_max;
 
-    /*! Proportional term when undershooting (PI loop)*/
-    int32_t k_p_undershoot;
+        /*! Proportional term when undershooting (PI loop)*/
+        int32_t k_p_undershoot;
 
-    /*! Proportional term when overhooting (PI loop) */
-    int32_t k_p_overshoot;
+        /*! Proportional term when overhooting (PI loop) */
+        int32_t k_p_overshoot;
 
-    /*! Integral term (PI loop) */
-    int32_t k_integral;
+        /*! Integral term (PI loop) */
+        int32_t k_integral;
+    } pi_controller;
 
     /*! Temperature sensor identifier */
     fwk_id_t sensor_id;
+
+    /*! Power Model API identifier */
+    fwk_id_t driver_api_id;
+
+    /*! Thermal actors lookup table */
+    struct mod_thermal_mgmt_actor_config *thermal_actors_table;
+
+    /*! The number of actors in the thermal actors lookup table */
+    uint32_t thermal_actors_count;
 };
 
 /*!

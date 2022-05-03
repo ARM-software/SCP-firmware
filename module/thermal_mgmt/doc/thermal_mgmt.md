@@ -23,8 +23,11 @@ for converting power into performance levels and vice-versa.
 By allocating the correct performance level, this is reflected to the correct
 power consumed and thus the temperature is maintained at the desired level.
 
+In a system, multiple Thermal Management controllers could exist. Each of them
+is ruled by different temperature domains where they have their own dedicate
+temperature sensor.
 
-## Architecture
+## Architecture of a Thermal Management controller
 
 The main two blocks composing Thermal Mgmt are the PI (Proportional and
 Integral) control loop and the power divider.
@@ -110,9 +113,6 @@ To use the Thermal Management the following dependencies are required:
 
 ## Limitations
 
-There is a single loop for reading the temperature and evaluating the PI
-control, therefore only one temperature sensor can be monitored and only one PI
-control can run.
 Currently the implementation is in "prototype" stage and limited tests have been
 carried out.
 
@@ -125,6 +125,8 @@ carried out.
 Multiplier applied to the the base tick via the ->update callback.
 For example: if the tick period is 5ms, then a value of 20 will give the PI
 control a refresh rate at 100ms (= 5 * 20).
+
+### Per-temperature domain tunings
 
 `tdp (thermal design power)`
 The thermal design power for all the actors monitored. This can be an abstract
@@ -159,7 +161,6 @@ above control temperature)
 `k_integral`
 The integral coefficient used when multiplying with the accumulated error.
 
-
 ### Per-actor tunings
 
 `weight`
@@ -178,63 +179,66 @@ When implementing the APIs, the Power Model module should also allow incoming
 bind requests from Thermal Mgmt.
 
 
-## Configuration Example (2 actors)
+## Configuration Example (2 actors, 1 temperature domain)
 
 ```C
-static const struct fwk_element thermal_mgmt_element_table[] = {
+static struct mod_thermal_mgmt_actor_config actor_table_domain0[] = {
     [0] = {
-        .name = "ACTOR-0",
-        .data = &((const struct mod_thermal_mgmt_dev_config) {
-            .power_model_id =
-                FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PLAT_POWER_MODEL, 0),
-            .driver_id =
-                FWK_ID_API_INIT(FWK_MODULE_IDX_PLAT_POWER_MODEL, 0),
-            .dvfs_domain_id =
-                FWK_ID_ELEMENT_INIT(
-                    FWK_MODULE_IDX_DVFS, DVFS_ELEMENT_IDX_ACTOR0),
-            .weight = 100,
-        }),
+        .driver_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PLAT_POWER_MODEL, 0),
+        .dvfs_domain_id =
+            FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_DVFS, DVFS_ELEMENT_IDX_ACTOR0),
+        .weight = 100,
     },
     [1] = {
-        .name = "ACTOR-1",
-        .data = &((const struct mod_thermal_mgmt_dev_config) {
-            .power_model_id =
-                FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PLAT_POWER_MODEL, 1),
-            .driver_id =
-                FWK_ID_API_INIT(FWK_MODULE_IDX_PLAT_POWER_MODEL, 0),
-            .dvfs_domain_id =
-                FWK_ID_ELEMENT_INIT(
-                    FWK_MODULE_IDX_DVFS, DVFS_ELEMENT_IDX_ACTOR1),
-            .weight = 200,
-        }),
+        .driver_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PLAT_POWER_MODEL, 1),
+        .dvfs_domain_id =
+            FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_DVFS, DVFS_ELEMENT_IDX_ACTOR1),
+        .weight = 200,
     },
-    [2] = { 0 }, /* Termination description */
+};
+
+struct fwk_element thermal_mgmt_domains_elem_table = {
+    [0] = {
+        .name = "Thermal Domain 0",
+        .data = &((struct mod_thermal_mgmt_dev_config){
+            .slow_loop_mult = 20,
+
+            .tdp = 5000,
+            .pi_controller = {
+                .switch_on_temperature = 50,
+                .control_temperature = 60,
+                .integral_cutoff = 0,
+                .integral_max = 100,
+                .k_p_undershoot = 1,
+                .k_p_overshoot = 1,
+                .k_integral = 1,
+            },
+
+            .sensor_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SENSOR, 0),
+            .driver_api_id =
+                FWK_ID_API_INIT(FWK_MODULE_IDX_PLAT_POWER_MODEL, 0),
+            .thermal_actors_table = actor_table_domain0,
+            .thermal_actors_count = FWK_ARRAY_SIZE(actor_table_domain0),
+        }),
+        .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_thermal_mgmt_element_table),
+    },
+    [1] = { 0 } /* Termination description */
 };
 
 static const struct fwk_element *get_thermal_mgmt_element_table(
     fwk_id_t module_id)
 {
-    return thermal_mgmt_element_table;
+    return thermal_mgmt_domains_elem_table;
 }
 
 struct fwk_module_config config_thermal_mgmt = {
-    .data = &((struct mod_thermal_mgmt_config){
-        .slow_loop_mult = 20,
-
-        .tdp = 5000,
-        .switch_on_temperature = 60,
-        .control_temperature = 75,
-        .integral_cutoff = 5,
-        .integral_max = 20,
-
-        .k_p_undershoot = 1,
-        .k_p_overshoot = 1,
-        .k_integral = 1,
-
-        .sensor_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SENSOR, 0),
-    }),
-    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_thermal_mgmt_element_table),
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_element_table),
 };
+
 ```
 
 And the power model should implement the following API:

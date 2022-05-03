@@ -16,49 +16,38 @@
  * Helper functions.
  */
 
-static struct mod_thermal_mgmt_ctx *mod_thermal_ctx;
-
-inline void power_allocation_set_shared_ctx(
-    struct mod_thermal_mgmt_ctx *thermal_mgmt_mod_ctx)
-{
-    mod_thermal_ctx = thermal_mgmt_mod_ctx;
-}
-
-static struct mod_thermal_mgmt_dev_ctx *get_dev_ctx(unsigned int dom)
-{
-    return &mod_thermal_ctx->dev_ctx_table[dom];
-}
-
 static inline bool is_power_request_satisfied(
-    struct mod_thermal_mgmt_dev_ctx *dev_ctx)
+    struct mod_thermal_mgmt_actor_ctx *actor_ctx)
 {
-    return (dev_ctx->granted_power >= dev_ctx->demand_power);
+    return (actor_ctx->granted_power >= actor_ctx->demand_power);
 }
 
 static void get_actor_power(
     struct mod_thermal_mgmt_dev_ctx *dev_ctx,
+    struct mod_thermal_mgmt_actor_ctx *actor_ctx,
     uint32_t req_level)
 {
     struct mod_thermal_mgmt_driver_api *driver;
     fwk_id_t driver_id;
 
     driver = dev_ctx->driver_api;
-    driver_id = dev_ctx->config->driver_id;
+    driver_id = actor_ctx->config->driver_id;
 
-    dev_ctx->demand_power = driver->level_to_power(driver_id, req_level);
+    actor_ctx->demand_power = driver->level_to_power(driver_id, req_level);
 }
 
 static void get_actor_level(
     struct mod_thermal_mgmt_dev_ctx *dev_ctx,
+    struct mod_thermal_mgmt_actor_ctx *actor_ctx,
     uint32_t *level)
 {
     struct mod_thermal_mgmt_driver_api *driver;
     fwk_id_t driver_id;
 
     driver = dev_ctx->driver_api;
-    driver_id = dev_ctx->config->driver_id;
+    driver_id = actor_ctx->config->driver_id;
 
-    *level = driver->power_to_level(driver_id, dev_ctx->granted_power);
+    *level = driver->power_to_level(driver_id, actor_ctx->granted_power);
 }
 
 /*
@@ -66,25 +55,29 @@ static void get_actor_level(
  * An actor gets at most the power requested. Some actors may get less than
  * their demand power.
  */
-static void allocate_power(struct mod_thermal_mgmt_dev_ctx *dev_ctx)
+static void allocate_power(
+    struct mod_thermal_mgmt_dev_ctx *dev_ctx,
+    struct mod_thermal_mgmt_actor_ctx *actor_ctx)
 {
-    dev_ctx->granted_power =
-        ((dev_ctx->config->weight * dev_ctx->demand_power) *
-         mod_thermal_ctx->allocatable_power) /
-        mod_thermal_ctx->tot_weighted_demand_power;
+    actor_ctx->granted_power =
+        ((actor_ctx->config->weight * actor_ctx->demand_power) *
+         dev_ctx->allocatable_power) /
+        dev_ctx->tot_weighted_demand_power;
 
-    if (dev_ctx->granted_power > dev_ctx->demand_power) {
-        dev_ctx->spare_power = dev_ctx->granted_power - dev_ctx->demand_power;
-        dev_ctx->power_deficit = 0;
+    if (actor_ctx->granted_power > actor_ctx->demand_power) {
+        actor_ctx->spare_power =
+            actor_ctx->granted_power - actor_ctx->demand_power;
+        actor_ctx->power_deficit = 0;
 
-        dev_ctx->granted_power = dev_ctx->demand_power;
+        actor_ctx->granted_power = actor_ctx->demand_power;
     } else {
-        dev_ctx->spare_power = 0;
-        dev_ctx->power_deficit = dev_ctx->demand_power - dev_ctx->granted_power;
+        actor_ctx->spare_power = 0;
+        actor_ctx->power_deficit =
+            actor_ctx->demand_power - actor_ctx->granted_power;
     }
 
-    mod_thermal_ctx->tot_spare_power += dev_ctx->spare_power;
-    mod_thermal_ctx->tot_power_deficit += dev_ctx->power_deficit;
+    dev_ctx->tot_spare_power += actor_ctx->spare_power;
+    dev_ctx->tot_power_deficit += actor_ctx->power_deficit;
 }
 
 /*
@@ -92,84 +85,66 @@ static void allocate_power(struct mod_thermal_mgmt_dev_ctx *dev_ctx)
  * If an actor has received less than its demand power and there's a reserve of
  * power not allocated, it may get a fraction of that.
  */
-static void re_allocate_power(struct mod_thermal_mgmt_dev_ctx *dev_ctx)
+static void re_allocate_power(
+    struct mod_thermal_mgmt_dev_ctx *dev_ctx,
+    struct mod_thermal_mgmt_actor_ctx *actor_ctx)
 {
-    if (mod_thermal_ctx->tot_spare_power == 0) {
+    if (dev_ctx->tot_spare_power == 0) {
         return;
     }
 
-    if (dev_ctx->power_deficit > 0) {
+    if (actor_ctx->power_deficit > 0) {
         /*
          * The actor has been given less than requested, and it may still take
          * some power
          */
-        dev_ctx->granted_power +=
-            (dev_ctx->power_deficit * mod_thermal_ctx->tot_spare_power) /
-            mod_thermal_ctx->tot_power_deficit;
+        actor_ctx->granted_power +=
+            (actor_ctx->power_deficit * dev_ctx->tot_spare_power) /
+            dev_ctx->tot_power_deficit;
 
-        if (dev_ctx->granted_power > dev_ctx->demand_power) {
-            mod_thermal_ctx->carry_over_power +=
-                dev_ctx->granted_power - dev_ctx->demand_power;
+        if (actor_ctx->granted_power > actor_ctx->demand_power) {
+            dev_ctx->carry_over_power +=
+                actor_ctx->granted_power - actor_ctx->demand_power;
 
-            dev_ctx->granted_power = dev_ctx->demand_power;
+            actor_ctx->granted_power = actor_ctx->demand_power;
         } else {
             /*
              * The actor has received the power it requested. The amount of
              * power left can be used in the next fast-loop.
              */
-            mod_thermal_ctx->carry_over_power += dev_ctx->spare_power;
+            dev_ctx->carry_over_power += actor_ctx->spare_power;
         }
     }
 }
 
-static struct mod_thermal_mgmt_dev_ctx *get_thermal_dev_ctx(
-    unsigned int dvfs_dom_idx)
+static unsigned int get_dvfs_domain_idx(
+    struct mod_thermal_mgmt_actor_ctx *actor_ctx)
 {
-    unsigned int domain_idx;
-
-    fwk_id_t dvfs_id =
-        fwk_id_build_element_id(fwk_module_id_dvfs, dvfs_dom_idx);
-
-    /* Attempt to find the thermal domain relevant to the given dvfs domain */
-    for (domain_idx = 0; domain_idx < mod_thermal_ctx->domain_count;
-         domain_idx++) {
-        if (fwk_id_is_equal(
-                mod_thermal_ctx->dev_ctx_table[domain_idx]
-                    .config->dvfs_domain_id,
-                dvfs_id)) {
-            break;
-        }
-    }
-
-    if (domain_idx == mod_thermal_ctx->domain_count) {
-        /* There is no thermal domain corresponding to any DVFS domain */
-        return NULL;
-    }
-
-    return get_dev_ctx(domain_idx);
+    return fwk_id_get_element_idx(actor_ctx->config->dvfs_domain_id);
 }
 
-void distribute_power(uint32_t *perf_request, uint32_t *perf_limit)
+void distribute_power(fwk_id_t id, uint32_t *perf_request, uint32_t *perf_limit)
 {
     struct mod_thermal_mgmt_dev_ctx *dev_ctx;
-    unsigned int dvfs_doms_count, dom;
+    struct mod_thermal_mgmt_actor_ctx *actor_ctx;
+    unsigned int actor_idx, dom;
     uint32_t new_perf_limit, dev_perf_request;
+    uint32_t actors_count;
 
-    dvfs_doms_count = mod_thermal_ctx->dvfs_doms_count;
+    dev_ctx = get_dev_ctx(id);
 
-    mod_thermal_ctx->tot_weighted_demand_power = 0;
-    mod_thermal_ctx->tot_spare_power = 0;
-    mod_thermal_ctx->tot_power_deficit = 0;
+    actors_count = dev_ctx->config->thermal_actors_count;
+    dev_ctx->tot_weighted_demand_power = 0;
+    dev_ctx->tot_spare_power = 0;
+    dev_ctx->tot_power_deficit = 0;
 
     /*
      * STEP 0:
      * Initialise the actors' demand power.
      */
-    for (dom = 0; dom < dvfs_doms_count; dom++) {
-        dev_ctx = get_thermal_dev_ctx(dom);
-        if (dev_ctx == NULL) {
-            continue;
-        }
+    for (actor_idx = 0; actor_idx < actors_count; actor_idx++) {
+        actor_ctx = get_actor_ctx(dev_ctx, actor_idx);
+        dom = get_dvfs_domain_idx(actor_ctx);
 
         /* Here we take into account limits already placed by other plugins */
         if (perf_request[dom] > perf_limit[dom]) {
@@ -178,10 +153,10 @@ void distribute_power(uint32_t *perf_request, uint32_t *perf_limit)
             dev_perf_request = perf_request[dom];
         }
 
-        get_actor_power(dev_ctx, dev_perf_request);
+        get_actor_power(dev_ctx, actor_ctx, dev_perf_request);
 
-        mod_thermal_ctx->tot_weighted_demand_power +=
-            dev_ctx->config->weight * dev_ctx->demand_power;
+        dev_ctx->tot_weighted_demand_power +=
+            actor_ctx->config->weight * actor_ctx->demand_power;
     }
 
     /*
@@ -189,13 +164,10 @@ void distribute_power(uint32_t *perf_request, uint32_t *perf_limit)
      * The power available is allocated in proportion to the actors' weight and
      * their power demand.
      */
-    for (dom = 0; dom < dvfs_doms_count; dom++) {
-        dev_ctx = get_thermal_dev_ctx(dom);
-        if (dev_ctx == NULL) {
-            continue;
-        }
+    for (actor_idx = 0; actor_idx < actors_count; actor_idx++) {
+        actor_ctx = get_actor_ctx(dev_ctx, actor_idx);
 
-        allocate_power(dev_ctx);
+        allocate_power(dev_ctx, actor_ctx);
     }
 
     /*
@@ -204,25 +176,23 @@ void distribute_power(uint32_t *perf_request, uint32_t *perf_limit)
      * left.
      * Finally, get the corresponding performance level and place a new limit.
      */
-    mod_thermal_ctx->tot_spare_power += mod_thermal_ctx->carry_over_power;
-    mod_thermal_ctx->carry_over_power = 0;
+    dev_ctx->tot_spare_power += dev_ctx->carry_over_power;
+    dev_ctx->carry_over_power = 0;
 
-    for (dom = 0; dom < dvfs_doms_count; dom++) {
-        dev_ctx = get_thermal_dev_ctx(dom);
-        if (dev_ctx == NULL) {
-            continue;
-        }
+    for (actor_idx = 0; actor_idx < actors_count; actor_idx++) {
+        actor_ctx = get_actor_ctx(dev_ctx, actor_idx);
+        dom = get_dvfs_domain_idx(actor_ctx);
 
-        re_allocate_power(dev_ctx);
+        re_allocate_power(dev_ctx, actor_ctx);
 
-        get_actor_level(dev_ctx, &new_perf_limit);
+        get_actor_level(dev_ctx, actor_ctx, &new_perf_limit);
 
         /*
          * If we have been granted the power we requested (which is at most the
          * limit already placed by other plugins), then there's no need to limit
          * further.
          */
-        if (!is_power_request_satisfied(dev_ctx) &&
+        if (!is_power_request_satisfied(actor_ctx) &&
             (new_perf_limit < perf_limit[dom])) {
             perf_limit[dom] = new_perf_limit;
         }
