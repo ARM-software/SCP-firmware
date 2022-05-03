@@ -7,6 +7,8 @@
 :cmock:
   :verbosity: 3
   :strippables:
+    - FWK_ALLOC_ALIGN(\(([0-9]+[, ]*)+\))*
+    - FWK_WARN_UNUSED
     - FWK_CONST
     - FWK_LEAF
     - FWK_NOTHROW
@@ -14,12 +16,12 @@
     - FWK_ALLOC_2
     - FWK_ALLOC_3
     - FWK_ALLOC
-    - FWK_ALLOC_SIZE1
-    - FWK_ALLOC_SIZE2
+    - FWK_ALLOC_SIZE1(\(([0-9]+[, ]*)+\))*
+    - FWK_ALLOC_SIZE2(\(([0-9]+[, ]*)+\))*
     - FWK_DEPRECATED
     - FWK_NOINLINE
     - FWK_PURE
-    - FWK_UNTOUCHED
+    - FWK_UNTOUCHED(\(([0-9]+[, ]*)+\))*
     - noreturn
   :plugins:
     - :callback
