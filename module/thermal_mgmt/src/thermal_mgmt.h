@@ -31,12 +31,9 @@ enum mod_thermal_mgmt_event_idx {
     MOD_THERMAL_EVENT_IDX_COUNT,
 };
 
-struct mod_thermal_mgmt_dev_ctx {
-    /* Thermal device configuration */
-    struct mod_thermal_mgmt_dev_config *config;
-
-    /* Driver API */
-    struct mod_thermal_mgmt_driver_api *driver_api;
+struct mod_thermal_mgmt_actor_ctx {
+    /* Thermal actor configuration */
+    struct mod_thermal_mgmt_actor_config *config;
 
     /* When the power allocated for this actor is less than what it requested */
     uint32_t power_deficit;
@@ -51,12 +48,15 @@ struct mod_thermal_mgmt_dev_ctx {
     uint32_t spare_power;
 };
 
-struct mod_thermal_mgmt_ctx {
+struct mod_thermal_mgmt_dev_ctx {
+    /* Thermal device configuration */
+    struct mod_thermal_mgmt_dev_config *config;
+
+    /* Identifier of the thermal device */
+    fwk_id_t id;
+
     /* Tick counter for the slow loop */
     unsigned int tick_counter;
-
-    /* Thermal module configuration */
-    struct mod_thermal_mgmt_config *config;
 
     /* Current temperature */
     uint32_t cur_temp;
@@ -66,6 +66,9 @@ struct mod_thermal_mgmt_ctx {
 
     /* Sensor API */
     const struct mod_sensor_api *sensor_api;
+
+    /* Driver API */
+    struct mod_thermal_mgmt_driver_api *driver_api;
 
     /* The total power that can be re-distributed */
     uint32_t tot_spare_power;
@@ -88,24 +91,32 @@ struct mod_thermal_mgmt_ctx {
     /* Integral (accumulated) error */
     int32_t integral_error;
 
-    /* Number of DVFS domains */
-    unsigned int dvfs_doms_count;
-
-    /* Number of Thermal domains */
-    unsigned int domain_count;
-
     /* Table of thermal actors */
-    struct mod_thermal_mgmt_dev_ctx *dev_ctx_table;
+    struct mod_thermal_mgmt_actor_ctx *actor_ctx_table;
 
     /* Sensor data */
     struct mod_sensor_data sensor_data;
 };
 
+struct mod_thermal_mgmt_ctx {
+    /* Table of thermal domains */
+    struct mod_thermal_mgmt_dev_ctx *dev_ctx_table;
+
+    /* Number of thermal domains */
+    unsigned int dev_ctx_count;
+};
+
+/* Helper functions */
+struct mod_thermal_mgmt_dev_ctx *get_dev_ctx(fwk_id_t dom);
+
+struct mod_thermal_mgmt_actor_ctx *get_actor_ctx(
+    struct mod_thermal_mgmt_dev_ctx *dev_ctx,
+    unsigned int actor);
+
 /* Power allocation */
-
-void power_allocation_set_shared_ctx(
-    struct mod_thermal_mgmt_ctx *thermal_mgmt_mod_ctx);
-
-void distribute_power(uint32_t *perf_request, uint32_t *perf_limit);
+void distribute_power(
+    fwk_id_t id,
+    uint32_t *perf_request,
+    uint32_t *perf_limit);
 
 #endif /* THERMAL_MGMT_H */
