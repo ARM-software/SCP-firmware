@@ -54,7 +54,7 @@ static int set_reset_state(fwk_id_t reset_dev_id,
 }
 
 /* HAL API */
-static const struct mod_reset_domain_drv_api reset_api = {
+static const struct mod_reset_domain_api reset_api = {
     .set_reset_state = set_reset_state,
 };
 
