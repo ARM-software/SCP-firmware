@@ -142,6 +142,12 @@ struct mod_cdns_i2c_device_config {
 
     /*! Identifier where callback notifications are sent */
     fwk_id_t callback_mod_id;
+
+    /*! I2C Transfer Register Size (TSR) */
+    uint16_t max_xfr_size;
+
+    /*! I2C FIFO depth */
+    uint8_t fifo_depth;
 };
 
 /*!

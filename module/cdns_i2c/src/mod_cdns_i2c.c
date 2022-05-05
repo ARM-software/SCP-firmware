@@ -33,9 +33,6 @@
 #define I2C_DIV_VAL1  3
 #define I2C_DIV_SHIFT 6
 
-/* Timeout value */
-#define I2C_TRANSFER_TIMEOUT 10000U
-
 /* Read-modify-write a register field and leave other bits intact. */
 #define I2C_REG_RMW(reg, mask, shift, val) \
     ((reg) = (((reg) & ~(mask)) | (((val) << (shift)) & (mask))))
@@ -49,7 +46,7 @@
 /* ISR error mask */
 #define I2C_ISR_ERROR_MASK \
     (I2C_ISR_RXUNF_MASK | I2C_ISR_TXOVF_MASK | I2C_ISR_RXOVF_MASK | \
-     I2C_ISR_NACK_MASK | I2C_ISR_TO_MASK)
+     I2C_ISR_NACK_MASK | I2C_ISR_TO_MASK | I2C_ISR_ARBLOST_MASK)
 
 /* Device context */
 struct cdns_i2c_dev_ctx {
@@ -148,7 +145,7 @@ static void i2c_isr(uintptr_t data)
     case MOD_CDNS_I2C_STATE_TX:
         /* Check for data interrupt */
         if (isr & I2C_ISR_DATA_MASK) {
-            for (i = 0; (i < (I2C_TSR_TANSFER_SIZE - 2)) &&
+            for (i = 0; (i < (ctx->config->max_xfr_size - 2U)) &&
                  (ctx->irq_data_ctx.index < ctx->irq_data_ctx.size);
                  i++) {
                 ctx->reg->DR = ctx->irq_data_ctx.data[ctx->irq_data_ctx.index];
@@ -175,8 +172,8 @@ static void i2c_isr(uintptr_t data)
         if ((ctx->config->mode == MOD_CDNS_I2C_CONTROLLER_MODE) &&
             (ctx->irq_data_ctx.index < ctx->irq_data_ctx.size)) {
             if ((ctx->irq_data_ctx.size - ctx->irq_data_ctx.index) >
-                I2C_TSR_TANSFER_SIZE) {
-                ctx->reg->TSR = I2C_TSR_TANSFER_SIZE;
+                ctx->config->max_xfr_size) {
+                ctx->reg->TSR = ctx->config->max_xfr_size;
             } else {
                 ctx->reg->TSR =
                     (ctx->irq_data_ctx.size - ctx->irq_data_ctx.index);
@@ -240,15 +237,21 @@ i2c_error:
 /*
  * I2C controller polled mode driver API
  */
+
 static int i2c_controller_read_polled(
     fwk_id_t device_id,
     uint16_t address,
     char *data,
     uint16_t length)
 {
-    bool complete = false;
-    unsigned int timeout;
     struct cdns_i2c_dev_ctx *device_ctx;
+    uint16_t i;
+    uint8_t fifo_depth;
+    uint16_t tsr_reload_size = 0;
+    bool timeout = false;
+    bool complete = false;
+    bool xfr_error = false;
+    volatile uint16_t isr;
 
     fwk_assert(length != 0);
 
@@ -256,6 +259,8 @@ static int i2c_controller_read_polled(
 
     I2C_REG_RMW(
         device_ctx->reg->CR, I2C_CR_HOLD_MASK, I2C_CR_HOLD_SHIFT, I2C_HOLD_ON);
+
+    fifo_depth = device_ctx->config->fifo_depth;
 
     I2C_REG_RMW(
         device_ctx->reg->CR, I2C_CR_RW_MASK, I2C_CR_RW_SHIFT, I2C_RW_READ);
@@ -270,49 +275,119 @@ static int i2c_controller_read_polled(
 
     clear_isr(device_ctx);
 
-    /* Set the expected number of bytes to be received */
+    /*
+     * The I2C controller sends a NACK to the target when transfer size register
+     * reaches zero, irrespective of the hold bit.
+     *
+     * If receiving more than the configured TSR size, configure TSR to be 1
+     * more than the FIFO depth as that stops it from dropping down to 0 when
+     * the FIFO is full. That way we can reliably do the bookkeeping of bytes
+     * received/to receive. Chunking the transfer length in the units of FIFO
+     * depth simplifies the handling as we don't have to care for DATA bit
+     * interrrupt handling.
+     */
+    tsr_reload_size = (length > fifo_depth) ? (fifo_depth + 1) : length;
     I2C_REG_RMW(
-        device_ctx->reg->TSR, I2C_TSR_SIZE_MASK, I2C_TSR_SIZE_SHIFT, length);
+        device_ctx->reg->TSR,
+        I2C_TSR_SIZE_MASK,
+        I2C_TSR_SIZE_SHIFT,
+        tsr_reload_size);
 
     I2C_REG_RMW(
         device_ctx->reg->AR, I2C_AR_ADD7_MASK, I2C_AR_ADD7_SHIFT, address);
 
-    /* Wait for transfer completion */
-    timeout = I2C_TRANSFER_TIMEOUT;
-    while (!complete && (timeout != 0)) {
-        if (I2C_REG_R(
-                device_ctx->reg->SR, I2C_SR_RXDV_MASK, I2C_SR_RXDV_SHIFT)) {
-            if (I2C_REG_R(
-                    device_ctx->reg->ISR,
-                    I2C_ISR_COMP_MASK,
-                    I2C_ISR_COMP_SHIFT)) {
-                complete = true;
+    while (!complete && !timeout && !xfr_error) {
+        isr = I2C_REG_R(device_ctx->reg->ISR, I2C_ISR_MASK, I2C_ISR_SHIFT);
+        /*
+         * If receiving more than the configured TSR size, don't let the TSR
+         * drop to 0 as it would terminate the transfer.
+         */
+        if ((length > fifo_depth) &&
+            (I2C_REG_R(
+                 device_ctx->reg->TSR, I2C_TSR_SIZE_MASK, I2C_TSR_SIZE_SHIFT) ==
+             1)) {
+            length -= fifo_depth;
+
+            /* Set the expected number of bytes to be received */
+            tsr_reload_size = (length > fifo_depth) ? (fifo_depth + 1) : length;
+            I2C_REG_RMW(
+                device_ctx->reg->TSR,
+                I2C_TSR_SIZE_MASK,
+                I2C_TSR_SIZE_SHIFT,
+                tsr_reload_size);
+
+            for (i = 0; i < fifo_depth; i++) {
+                if (I2C_REG_R(
+                        device_ctx->reg->SR,
+                        I2C_SR_RXDV_MASK,
+                        I2C_SR_RXDV_SHIFT)) {
+                    *data++ = I2C_REG_R(
+                        device_ctx->reg->DR,
+                        I2C_DR_DATA_MASK,
+                        I2C_DR_DATA_SHIFT);
+                }
             }
         }
-        timeout--;
+
+        /* Check if we are done with the transfer */
+        if ((isr & I2C_ISR_COMP_MASK) &&
+            I2C_REG_R(
+                device_ctx->reg->TSR, I2C_TSR_SIZE_MASK, I2C_TSR_SIZE_SHIFT) ==
+                0) {
+            /*
+             *  Bytes remaining in the FIFO are the final bytes left to be read
+             *  off the FIFO.
+             */
+            for (i = 0; i < fifo_depth; i++) {
+                if (I2C_REG_R(
+                        device_ctx->reg->SR,
+                        I2C_SR_RXDV_MASK,
+                        I2C_SR_RXDV_SHIFT)) {
+                    *data++ = I2C_REG_R(
+                        device_ctx->reg->DR,
+                        I2C_DR_DATA_MASK,
+                        I2C_DR_DATA_SHIFT);
+                }
+            }
+
+            /* Clear the interrupt status bit */
+            I2C_REG_W(
+                device_ctx->reg->ISR, I2C_ISR_COMP_MASK, I2C_ISR_COMP_SHIFT, 1);
+
+            complete = true;
+        }
+
+        /* Check for any I2C interface errors */
+        if (isr & I2C_ISR_ERROR_MASK) {
+            xfr_error = true;
+        }
+
+        /* Check for transfer timeout */
+        if (I2C_REG_R(
+                device_ctx->reg->ISR, I2C_ISR_TO_MASK, I2C_ISR_TO_SHIFT)) {
+            timeout = true;
+        }
     }
 
-    if (timeout == 0) {
+    if (xfr_error == true) {
         I2C_REG_RMW(
             device_ctx->reg->CR,
             I2C_CR_HOLD_MASK,
             I2C_CR_HOLD_SHIFT,
             I2C_HOLD_OFF);
-        return FWK_E_STATE;
+        clear_isr(device_ctx);
+        return FWK_E_DEVICE;
     }
 
-    timeout = I2C_TRANSFER_TIMEOUT;
-    while ((length != 0) && (timeout != 0)) {
-        if (I2C_REG_R(
-                device_ctx->reg->SR, I2C_SR_RXDV_MASK, I2C_SR_RXDV_SHIFT)) {
-            *data++ = I2C_REG_R(
-                device_ctx->reg->DR, I2C_DR_DATA_MASK, I2C_DR_DATA_SHIFT);
-            length--;
-        }
-        timeout--;
+    if (timeout == true) {
+        I2C_REG_RMW(
+            device_ctx->reg->CR,
+            I2C_CR_HOLD_MASK,
+            I2C_CR_HOLD_SHIFT,
+            I2C_HOLD_OFF);
+        clear_isr(device_ctx);
+        return FWK_E_TIMEOUT;
     }
-
-    clear_isr(device_ctx);
 
     /* Clear the hold bit to signify the end of the read sequence */
     I2C_REG_RMW(
@@ -332,14 +407,20 @@ static int i2c_controller_write_polled(
     uint16_t length,
     bool stop)
 {
-    bool complete = false;
-    unsigned int timeout;
     struct cdns_i2c_dev_ctx *device_ctx;
-    uint16_t sr, isr;
+    volatile uint16_t isr;
+    unsigned int i;
+    uint8_t fifo_depth;
+    uint16_t tsr_reload_size = 0;
+    bool complete = false;
+    bool timeout = false;
+    bool xfr_error = false;
 
     fwk_assert(length != 0);
 
     device_ctx = &i2c_ctx.device_ctx_table[fwk_id_get_element_idx(device_id)];
+
+    fifo_depth = device_ctx->config->fifo_depth;
 
     I2C_REG_RMW(
         device_ctx->reg->CR, I2C_CR_HOLD_MASK, I2C_CR_HOLD_SHIFT, I2C_HOLD_ON);
@@ -350,8 +431,19 @@ static int i2c_controller_write_polled(
     clear_isr(device_ctx);
 
     /* Set the expected number of bytes to be transmitted */
-    I2C_REG_RMW(
-        device_ctx->reg->TSR, I2C_TSR_SIZE_MASK, I2C_TSR_SIZE_SHIFT, length);
+    if (length > fifo_depth) {
+        I2C_REG_RMW(
+            device_ctx->reg->TSR,
+            I2C_TSR_SIZE_MASK,
+            I2C_TSR_SIZE_SHIFT,
+            fifo_depth);
+    } else {
+        I2C_REG_RMW(
+            device_ctx->reg->TSR,
+            I2C_TSR_SIZE_MASK,
+            I2C_TSR_SIZE_SHIFT,
+            length);
+    }
 
     if (!device_ctx->perform_repeat_start) {
         /*
@@ -368,37 +460,97 @@ static int i2c_controller_write_polled(
     I2C_REG_RMW(
         device_ctx->reg->AR, I2C_AR_ADD7_MASK, I2C_AR_ADD7_SHIFT, address);
 
-    /* If there are further bytes to send, write to the FIFO sequentially */
-    while (length != 0) {
+    for (i = 0; (i < (fifo_depth - 1U)) && length; i++) {
         I2C_REG_RMW(
             device_ctx->reg->DR, I2C_DR_DATA_MASK, I2C_DR_DATA_SHIFT, *data++);
         length--;
     }
 
     /* Wait for transfer completion */
-    timeout = I2C_TRANSFER_TIMEOUT;
-    while (!complete && (timeout != 0)) {
-        sr =
-            I2C_REG_R(device_ctx->reg->SR, I2C_SR_TXDV_MASK, I2C_SR_TXDV_SHIFT);
-        if (sr == 0) {
-            isr = I2C_REG_R(
-                device_ctx->reg->ISR, I2C_ISR_COMP_MASK, I2C_ISR_COMP_SHIFT);
-            if (isr != 0) {
+    while (!complete && !timeout && !xfr_error) {
+        isr = I2C_REG_R(device_ctx->reg->ISR, I2C_ISR_MASK, I2C_ISR_SHIFT);
+        /*
+         * Check if FIFO is nearing empty and there is more data to be
+         * transferred
+         */
+        if (isr & I2C_ISR_DATA_MASK) {
+            /*
+             * The FIFO may still contain 2 outstanding bytes that it needs to
+             * flush out. Reload the FIFO sparing two bytes to avoid the risk of
+             * overrunning the FIFO with the remaining data. Number of bytes
+             * reloaded in the FIFO will be the new TSR value once it reaches 0.
+             *
+             */
+            for (i = 0; (i < (fifo_depth - 2U)) && length; i++) {
+                I2C_REG_RMW(
+                    device_ctx->reg->DR,
+                    I2C_DR_DATA_MASK,
+                    I2C_DR_DATA_SHIFT,
+                    *data++);
+                length--;
+            }
+
+            tsr_reload_size = i;
+
+            /* Clear DATA bit so we don't overflow the FIFO */
+            I2C_REG_W(
+                device_ctx->reg->ISR, I2C_ISR_DATA_MASK, I2C_ISR_DATA_SHIFT, 1);
+        }
+
+        /* Check for transfer complete */
+
+        if (isr & I2C_ISR_COMP_MASK) {
+            /*
+             * TSR reload size is calculated based on how many bytes were
+             * actually written to the FIFO. If the TSR reload size is 0, it
+             * either means that the the data length to be transferred was less
+             * than the I2C_TSR_SIZE_CONFIGURED, or that all the outstanding
+             * data has been transferred.
+             */
+            if (tsr_reload_size) {
+                I2C_REG_RMW(
+                    device_ctx->reg->TSR,
+                    I2C_TSR_SIZE_MASK,
+                    I2C_TSR_SIZE_SHIFT,
+                    tsr_reload_size);
+            } else {
                 complete = true;
             }
+
+            /* Clear the interrupt status bit */
+            I2C_REG_W(
+                device_ctx->reg->ISR, I2C_ISR_COMP_MASK, I2C_ISR_COMP_SHIFT, 1);
         }
-        timeout--;
+
+        /* Check for any I2C interface errors */
+        if (isr & I2C_ISR_ERROR_MASK) {
+            xfr_error = true;
+        }
+
+        /* Check for transfer timeout */
+        if (isr & I2C_ISR_TO_MASK) {
+            timeout = true;
+        }
     }
 
-    if (timeout == 0) {
-        /* Clear the hold bit to signify the end of the write sequence */
+    if (xfr_error == true) {
         I2C_REG_RMW(
             device_ctx->reg->CR,
             I2C_CR_HOLD_MASK,
             I2C_CR_HOLD_SHIFT,
             I2C_HOLD_OFF);
         clear_isr(device_ctx);
-        return FWK_E_STATE;
+        return FWK_E_DEVICE;
+    }
+
+    if (timeout == true) {
+        I2C_REG_RMW(
+            device_ctx->reg->CR,
+            I2C_CR_HOLD_MASK,
+            I2C_CR_HOLD_SHIFT,
+            I2C_HOLD_OFF);
+        clear_isr(device_ctx);
+        return FWK_E_TIMEOUT;
     }
 
     clear_isr(device_ctx);
@@ -508,7 +660,7 @@ static int i2c_target_read_irq(
         I2C_AR_ADD7_SHIFT,
         device_ctx->config->target_addr);
 
-    if (length < (I2C_TSR_TANSFER_SIZE - 2)) {
+    if (length < (device_ctx->config->max_xfr_size - 2)) {
         device_ctx->reg->TSR = length;
     }
 
