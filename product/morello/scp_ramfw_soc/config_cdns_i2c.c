@@ -32,6 +32,8 @@ static const struct fwk_element i2c_element_desc_table[3] = {
             .addr_size = MOD_CDNS_I2C_ADDRESS_7_BIT,
             .hold_mode = MOD_CDNS_I2C_HOLD_ON,
             .callback_mod_id = FWK_ID_NONE_INIT,
+            .fifo_depth = 8,
+            .max_xfr_size = 15,
         }),
     },
     [1] = {
@@ -47,6 +49,8 @@ static const struct fwk_element i2c_element_desc_table[3] = {
             .target_addr = 0x14,
             .irq = SCP_I2C0_IRQ,
             .callback_mod_id = FWK_ID_NONE_INIT,
+            .fifo_depth = 8,
+            .max_xfr_size = 15,
         }),
     },
     [2] = { 0 }, /* Termination description. */

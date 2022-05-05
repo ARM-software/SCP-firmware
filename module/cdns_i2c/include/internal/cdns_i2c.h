@@ -205,6 +205,4 @@ struct cdns_i2c_reg {
 #define I2C_CLRFIFO_OFF 0
 #define I2C_CLRFIFO_ON  1
 
-#define I2C_TSR_TANSFER_SIZE 0xF
-
 #endif /* INTERNAL_CDNS_I2C_H */
