@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -13,6 +13,8 @@ BS_FIRMWARE_HAS_NOTIFICATION := yes
 
 BS_FIRMWARE_MODULES := stdio
 
-BS_FIRMWARE_SOURCES := config_stdio.c
+BS_FIRMWARE_SOURCES := config_stdio.c \
+                       config_host.c
+
 
 include $(BS_DIR)/firmware.mk
