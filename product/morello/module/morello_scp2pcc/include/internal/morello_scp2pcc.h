@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -15,22 +15,27 @@
 
 #include <stdint.h>
 
-#define MSG_PAYLOAD_SIZE        16
-#define MSG_UNUSED_MESSAGE_TYPE 0xFFFF
-#define MSG_ALIVE_VALUE         0xDEADBEEF
+#define MORELLO_SCP2PCC_I2C_ADDRESS 0x24
 
-#define SCP2PCC_TYPE_SHUTDOWN 0x0001
-#define SCP2PCC_TYPE_REBOOT   0x0002
+#define MORELLO_SCP2PCC_MSG_LEN      24U
+#define MORELLO_SCP2PCC_MSG_DATA_LEN 16U
 
-struct FWK_PACKED mem_msg_packet {
-    /* Message type, lower 16 bits only. */
-    unsigned int type;
-    /* Valid payload size, lower 16 bits only. */
-    unsigned int size;
-    /* Sequence field used to process packets in proper order. */
-    unsigned int sequence;
-    /* Data payload. */
-    uint8_t payload[MSG_PAYLOAD_SIZE];
+/* SCP2PCC Data buffer */
+struct FWK_PACKED scp2pcc_msg_st {
+    uint8_t opcode;
+    union {
+        struct FWK_PACKED {
+            uint8_t len;
+            uint8_t rsvd[6];
+            uint8_t data[MORELLO_SCP2PCC_MSG_DATA_LEN];
+        } req;
+        struct FWK_PACKED {
+            uint8_t len;
+            uint8_t rsvd[5];
+            uint8_t status;
+            uint8_t data[MORELLO_SCP2PCC_MSG_DATA_LEN];
+        } resp;
+    };
 };
 
 #endif /* INTERNAL_MORELLO_SCP2PCC_H */

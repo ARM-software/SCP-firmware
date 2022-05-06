@@ -20,7 +20,7 @@
 
 #include <stdbool.h>
 
-static const struct fwk_element i2c_element_desc_table[3] = {
+static const struct fwk_element i2c_element_desc_table[4] = {
     [0] = {
         .name = "SPD-I2C",
         .data = &((struct mod_cdns_i2c_device_config) {
@@ -53,7 +53,22 @@ static const struct fwk_element i2c_element_desc_table[3] = {
             .max_xfr_size = 15,
         }),
     },
-    [2] = { 0 }, /* Termination description. */
+    [2] = {
+        .name = "PCC-I2C",
+        .data = &((struct mod_cdns_i2c_device_config) {
+            .reg_base = SCP_I2C2_BASE,
+            .clock_rate_hz = (100UL * FWK_MHZ),
+            .bus_speed_hz = MOD_CDNS_I2C_SPEED_NORMAL,
+            .mode = MOD_CDNS_I2C_CONTROLLER_MODE,
+            .ack_en = MOD_CDNS_I2C_ACK_ENABLE,
+            .addr_size = MOD_CDNS_I2C_ADDRESS_7_BIT,
+            .hold_mode = MOD_CDNS_I2C_HOLD_ON,
+            .callback_mod_id = FWK_ID_NONE_INIT,
+            .fifo_depth = 8,
+            .max_xfr_size = 15,
+        }),
+    },
+    [3] = { 0 }, /* Termination description. */
 };
 
 static const struct fwk_element *get_i2c_table(fwk_id_t module_id)

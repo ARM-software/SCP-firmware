@@ -189,19 +189,19 @@ static int morello_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
 {
 #if !defined(PLAT_FVP)
     int status;
+
     switch (system_shutdown) {
     case MOD_PD_SYSTEM_SHUTDOWN:
         FWK_LOG_INFO("[MORELLO SYSTEM] Request PCC for system shutdown");
         status = morello_system_ctx.scp2pcc_api->send(
-            NULL, 0, SCP2PCC_TYPE_SHUTDOWN);
+            MOD_SCP2PCC_SEND_SHUTDOWN, NULL, 0, NULL, NULL);
         break;
 
     case MOD_PD_SYSTEM_COLD_RESET:
         FWK_LOG_INFO("[MORELLO SYSTEM] Request PCC for system reboot");
-        status =
-            morello_system_ctx.scp2pcc_api->send(NULL, 0, SCP2PCC_TYPE_REBOOT);
+        status = morello_system_ctx.scp2pcc_api->send(
+            MOD_SCP2PCC_SEND_REBOOT, NULL, 0, NULL, NULL);
         break;
-
     default:
         FWK_LOG_INFO("[MORELLO SYSTEM] Unknown shutdown command!");
         status = FWK_E_PARAM;
