@@ -65,6 +65,9 @@ struct platform_system_ctx {
 
     /* System Information HAL API pointer */
     struct mod_system_info_get_info_api *system_info_api;
+
+    /* Config containig data required for platform initialization */
+    const struct mod_platform_system_config *config;
 };
 
 struct platform_system_isr {
@@ -73,7 +76,6 @@ struct platform_system_isr {
 };
 
 static struct platform_system_ctx platform_system_ctx;
-const struct fwk_module_config config_platform_system = { 0 };
 
 static const uint32_t feature_flags =
     (PLATFORM_SDS_FEATURE_FIRMWARE_MASK | PLATFORM_SDS_FEATURE_DMC_MASK |
@@ -221,11 +223,17 @@ static const struct mod_system_power_driver_api
 static int platform_system_mod_init(
     fwk_id_t module_id,
     unsigned int unused,
-    const void *unused2)
+    const void *data)
 {
     int status;
     unsigned int idx;
     struct platform_system_isr *isr;
+
+    if (data == NULL) {
+        return FWK_E_PARAM;
+    }
+
+    platform_system_ctx.config = data;
 
     for (idx = 0; idx < FWK_ARRAY_SIZE(isrs); idx++) {
         isr = &isrs[idx];
@@ -300,6 +308,8 @@ static int platform_system_start(fwk_id_t id)
 {
     const struct mod_system_info *system_info;
     uint8_t chip_id;
+    uint8_t primary_cpu;
+    uint8_t primary_chip;
     int status;
     unsigned int i;
 
@@ -310,12 +320,21 @@ static int platform_system_start(fwk_id_t id)
     }
     chip_id = system_info->chip_id;
 
+    /* Determine the chip from which the first application core boots */
+    primary_cpu =
+        platform_calc_core_pos(platform_system_ctx.config->primary_cpu_mpid);
+    primary_chip = primary_cpu / MAX_PE_PER_CHIP;
+    FWK_LOG_INFO(
+        "[PLATFORM SYSTEM] CPU-%d on Chip-%d is boot CPU",
+        primary_cpu % MAX_PE_PER_CHIP,
+        primary_chip);
+
     /*
      * Subscribe to interconnect clock state change and SDS notification only
      * for the chip on which the first application core starts the boot
      * process.
      */
-    if (chip_id == 0) {
+    if (chip_id == primary_chip) {
         /*
          * Subscribe to interconnect clock state change notification to
          * to power up the first application core.
@@ -385,6 +404,8 @@ int platform_system_process_notification(
     struct mod_pd_restricted_api *mod_pd_restricted_api;
     static unsigned int scmi_notification_count = 0;
     static bool sds_notification_received = false;
+    uint8_t boot_cpu;
+    fwk_id_t cpu_id;
 
     fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
 
@@ -396,12 +417,17 @@ int platform_system_process_notification(
          * time only
          */
         if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
-            FWK_LOG_INFO("[PLATFORM SYSTEM] Initializing the primary core...");
+            FWK_LOG_INFO("[PLATFORM SYSTEM] Powering up the boot cpu...");
+
+            boot_cpu = platform_calc_core_pos(
+                           platform_system_ctx.config->primary_cpu_mpid) %
+                MAX_PE_PER_CHIP;
+            cpu_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, boot_cpu);
 
             mod_pd_restricted_api = platform_system_ctx.mod_pd_restricted_api;
 
             status = mod_pd_restricted_api->set_state(
-                FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
+                cpu_id,
                 false,
                 MOD_PD_COMPOSITE_STATE(
                     MOD_PD_LEVEL_2,
@@ -412,7 +438,7 @@ int platform_system_process_notification(
 
             if (status != FWK_SUCCESS) {
                 FWK_LOG_ERR(
-                    "[PLATFORM SYSTEM] Failed to intialize the primary core");
+                    "[PLATFORM SYSTEM] Failed to power up the boot cpu");
                 return status;
             }
 

@@ -61,6 +61,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_pcie_integ_ctrl.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_apremap.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_power_domain.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_platform_system.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_system_info.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_pl011.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_sid.c")
