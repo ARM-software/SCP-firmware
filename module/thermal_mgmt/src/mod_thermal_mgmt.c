@@ -84,6 +84,34 @@ static void pi_control(fwk_id_t id)
     }
 }
 
+static void thermal_protection(struct mod_thermal_mgmt_dev_ctx *dev_ctx)
+{
+    if (dev_ctx->cur_temp >=
+        dev_ctx->config->temp_protection->crit_temp_threshold) {
+        FWK_LOG_CRIT(
+            "[THERMAL][%s] temp (%u) reached critical threshold!\n",
+            fwk_module_get_element_name(dev_ctx->id),
+            (unsigned int)dev_ctx->cur_temp);
+
+        if (dev_ctx->thermal_protection_api->critical != NULL) {
+            dev_ctx->thermal_protection_api->critical(
+                dev_ctx->config->temp_protection->driver_id, dev_ctx->id);
+        }
+    } else if (
+        dev_ctx->cur_temp >=
+        dev_ctx->config->temp_protection->warn_temp_threshold) {
+        FWK_LOG_WARN(
+            "[THERMAL][%s] temp (%u) reached warning threshold!\n",
+            fwk_module_get_element_name(dev_ctx->id),
+            (unsigned int)dev_ctx->cur_temp);
+
+        if (dev_ctx->thermal_protection_api->warning != NULL) {
+            dev_ctx->thermal_protection_api->warning(
+                dev_ctx->config->temp_protection->driver_id, dev_ctx->id);
+        }
+    }
+}
+
 static int read_temperature(fwk_id_t id)
 {
 #if THERMAL_HAS_ASYNC_SENSORS
@@ -114,7 +142,7 @@ static int read_temperature(fwk_id_t id)
 #endif
 }
 
-static int pi_control_update(fwk_id_t id)
+static int control_update(fwk_id_t id)
 {
     struct mod_thermal_mgmt_dev_ctx *dev_ctx;
     int status;
@@ -125,7 +153,7 @@ static int pi_control_update(fwk_id_t id)
     if (dev_ctx->tick_counter > dev_ctx->config->slow_loop_mult) {
         dev_ctx->tick_counter = 0;
 
-        if (dev_ctx->pi_control_needs_update) {
+        if (dev_ctx->control_needs_update) {
             /* The last reading was not processed */
             FWK_LOG_WARN("[TPM] Failed to process last reading\n");
 
@@ -145,12 +173,17 @@ static int pi_control_update(fwk_id_t id)
         }
     }
 
-    if (dev_ctx->pi_control_needs_update) {
-        dev_ctx->pi_control_needs_update = false;
-
-        pi_control(id);
+    if (dev_ctx->control_needs_update) {
+        dev_ctx->control_needs_update = false;
+        if (dev_ctx->config->thermal_actors_count > 0) {
+            pi_control(id);
+        }
 
         dev_ctx->tot_spare_power = 0;
+
+        if (dev_ctx->config->temp_protection != NULL) {
+            thermal_protection(dev_ctx);
+        }
     }
 
     return FWK_SUCCESS;
@@ -172,12 +205,13 @@ static int thermal_update(struct perf_plugins_perf_update *data)
         dev_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_THERMAL_MGMT, dev_idx);
         dev_ctx = get_dev_ctx(dev_id);
 
-        status = pi_control_update(dev_ctx->id);
+        status = control_update(dev_ctx->id);
         if (status != FWK_SUCCESS) {
             return status;
         }
-
-        distribute_power(dev_ctx->id, data->level, data->adj_max_limit);
+        if (dev_ctx->config->thermal_actors_count > 0) {
+            distribute_power(dev_ctx->id, data->level, data->adj_max_limit);
+        }
     }
 
     return FWK_SUCCESS;
@@ -224,12 +258,17 @@ static int thermal_mgmt_dev_init(
     dev_ctx->config = config;
     dev_ctx->id = element_id;
 
-    /* Assume TDP until PI loop is updated */
-    dev_ctx->allocatable_power = (uint32_t)dev_ctx->config->tdp;
+    if (dev_ctx->config->thermal_actors_count > 0) {
+        /* Assume TDP until PI loop is updated */
+        dev_ctx->allocatable_power = (uint32_t)dev_ctx->config->tdp;
 
-    dev_ctx->actor_ctx_table = fwk_mm_calloc(
-        dev_ctx->config->thermal_actors_count,
-        sizeof(struct mod_thermal_mgmt_actor_ctx));
+        dev_ctx->actor_ctx_table = fwk_mm_calloc(
+            dev_ctx->config->thermal_actors_count,
+            sizeof(struct mod_thermal_mgmt_actor_ctx));
+    } else if (dev_ctx->config->temp_protection == NULL) {
+        /* There is neither temperature protection enabled nor actors defined */
+        return FWK_E_PARAM;
+    }
 
     for (actor = 0; actor < dev_ctx->config->thermal_actors_count; actor++) {
         /* Get actor context and set configuration */
@@ -280,6 +319,17 @@ static int thermal_mgmt_bind(fwk_id_t id, unsigned int round)
         &dev_ctx->sensor_api);
     if (status != FWK_SUCCESS) {
         return FWK_E_PANIC;
+    }
+
+    if (dev_ctx->config->temp_protection) {
+        /* Bind to thermal protection driver */
+        status = fwk_module_bind(
+            dev_ctx->config->temp_protection->driver_id,
+            dev_ctx->config->temp_protection->driver_api_id,
+            &dev_ctx->thermal_protection_api);
+        if (status != FWK_SUCCESS) {
+            return FWK_E_PANIC;
+        }
     }
 
     /* Bind to a respective thermal driver */
@@ -335,7 +385,7 @@ static int thermal_mgmt_process_event(
     }
 
     if (status == FWK_SUCCESS) {
-        dev_ctx->pi_control_needs_update = true;
+        dev_ctx->control_needs_update = true;
     } else if (status == FWK_PENDING) {
         status = FWK_SUCCESS;
     }
