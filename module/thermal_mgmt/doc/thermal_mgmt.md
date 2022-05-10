@@ -167,6 +167,14 @@ The integral coefficient used when multiplying with the accumulated error.
 The coefficient used as an allocation factor for a specific actor. Its value can
 be "any" and expresses the corresponding weight an actor has over the others.
 
+### Thermal protection
+
+There is the possibility to configure a temperature protection that allows to
+configure two different alarms, warning and critical. They can be configured
+independently but the critical level should be above the one for warning. A
+callback can be configured for each threshold in order for an additional module
+to take action to reduce the temperature or initiate a power-down sequence.
+
 
 ## Power models
 
@@ -179,7 +187,7 @@ When implementing the APIs, the Power Model module should also allow incoming
 bind requests from Thermal Mgmt.
 
 
-## Configuration Example (2 actors, 1 temperature domain)
+## Configuration Example 1 (2 actors, 1 temperature domain)
 
 ```C
 static struct mod_thermal_mgmt_actor_config actor_table_domain0[] = {
@@ -219,6 +227,14 @@ struct fwk_element thermal_mgmt_domains_elem_table = {
             },
 
             .sensor_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SENSOR, 0),
+            .temp_protection = &((struct mod_thermal_mgmt_protection_config){
+                .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_, 0),
+                .driver_api_id = FWK_ID_API_INIT(
+                    FWK_MODULE_IDX_,
+                    0),
+                .warn_temp_threshold = 60,
+                .crit_temp_threshold = 85,
+            }),
             .driver_api_id =
                 FWK_ID_API_INIT(FWK_MODULE_IDX_PLAT_POWER_MODEL, 0),
             .thermal_actors_table = actor_table_domain0,
@@ -260,6 +276,43 @@ uint32_t plat_power_to_level(fwk_id_t domain_id, const uint32_t power)
 struct mod_thermal_mgmt_power_model_api power_model_api = {
     .level_to_power = plat_level_to_power,
     .power_to_level = plat_power_to_level,
+};
+
+```
+
+## Configuration Example 2 (thermal protection)
+
+There is the possibility to only configure the module as a thermal protection.
+
+```C
+struct fwk_element thermal_mgmt_domains_elem_table = {
+    [0] = {
+        .name = "Thermal Domain 0",
+        .data = &((struct mod_thermal_mgmt_dev_config){
+            .slow_loop_mult = 5,
+            .sensor_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SENSOR, 0),
+            .temp_protection = &((struct mod_thermal_mgmt_protection_config){
+                .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_, 0),
+                .driver_api_id = FWK_ID_API_INIT(
+                    FWK_MODULE_IDX_,
+                    0),
+                .warn_temp_threshold = 60,
+                .crit_temp_threshold = 85,
+            }),
+        }),
+        .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_thermal_mgmt_element_table),
+    },
+    [1] = { 0 } /* Termination description */
+};
+
+static const struct fwk_element *get_thermal_mgmt_element_table(
+    fwk_id_t module_id)
+{
+    return thermal_mgmt_domains_elem_table;
+}
+
+struct fwk_module_config config_thermal_mgmt = {
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_element_table),
 };
 
 ```

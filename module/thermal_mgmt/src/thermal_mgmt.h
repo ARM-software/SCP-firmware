@@ -62,7 +62,7 @@ struct mod_thermal_mgmt_dev_ctx {
     uint32_t cur_temp;
 
     /* Does the PI loop need update */
-    bool pi_control_needs_update;
+    bool control_needs_update;
 
     /* Sensor API */
     const struct mod_sensor_api *sensor_api;
@@ -96,6 +96,9 @@ struct mod_thermal_mgmt_dev_ctx {
 
     /* Sensor data */
     struct mod_sensor_data sensor_data;
+
+    /* Thermal protection API */
+    struct mod_thermal_mgmt_protection_api *thermal_protection_api;
 };
 
 struct mod_thermal_mgmt_ctx {
