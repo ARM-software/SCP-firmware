@@ -65,10 +65,6 @@ void setUp(void)
     scmi_perf_ctx.config = config_scmi_perf.data;
     scmi_perf_ctx.domain_count = scmi_perf_ctx.config->perf_doms_count;
 
-#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
-    scmi_perf_ctx.fast_channels_rate_limit = SCMI_PERF_FC_MIN_RATE_LIMIT;
-#endif
-
     fwk_id_get_api_idx_ExpectAnyArgsAndReturn(MOD_SCMI_PERF_PROTOCOL_API);
 
     module_scmi_perf.process_bind_request(
@@ -241,12 +237,7 @@ int message_attributes_handler_valid_param_respond_callback(
     return_values = (struct scmi_protocol_message_attributes_p2a *)payload;
 
     TEST_ASSERT_EQUAL((int32_t)SCMI_SUCCESS, return_values->status);
-
-#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
-    TEST_ASSERT_EQUAL(1, return_values->attributes);
-#else
     TEST_ASSERT_EQUAL(0, return_values->attributes);
-#endif
 
     return FWK_SUCCESS;
 }
@@ -328,10 +319,6 @@ int domain_attributes_handler_valid_param_respond_callback(
 
     bool notifications = false;
     bool fast_channels = false;
-
-#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
-    fast_channels = true;
-#endif
 
     uint32_t permissions = ((uint32_t)MOD_SCMI_PERF_PERMS_SET_LIMITS) |
         ((uint32_t)MOD_SCMI_PERF_PERMS_SET_LEVEL);
@@ -632,154 +619,6 @@ void utest_scmi_perf_describe_levels_handler_invalid_level_index(void)
     TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
 }
 
-#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
-
-/*
- * Test the scmi_perf_describe_fast_channels function with a set of valid
- * parameters
- */
-int describe_fast_channels_valid_params_respond_callback(
-    fwk_id_t service_id,
-    const void *payload,
-    size_t size,
-    int NumCalls)
-{
-    struct scmi_perf_describe_fc_p2a *return_values =
-        (struct scmi_perf_describe_fc_p2a *)payload;
-
-    TEST_ASSERT_EQUAL((int32_t)SCMI_SUCCESS, return_values->status);
-    TEST_ASSERT_EQUAL(0, return_values->attributes);
-    TEST_ASSERT_EQUAL(
-        scmi_perf_ctx.fast_channels_rate_limit, return_values->rate_limit);
-
-    int chan_index = (uint32_t)MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET;
-    TEST_ASSERT_EQUAL(
-        (uint32_t)(domains[0].fast_channels_addr_ap[chan_index] & ~0UL),
-        return_values->chan_addr_low);
-    TEST_ASSERT_EQUAL(
-        (uint32_t)(domains[0].fast_channels_addr_ap[chan_index] >> 32),
-        return_values->chan_addr_high);
-
-    TEST_ASSERT_EQUAL(
-        fast_channel_elem_size[MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET],
-        return_values->chan_size);
-
-    return FWK_SUCCESS;
-}
-
-void utest_scmi_perf_describe_fast_channels_valid_params(void)
-{
-    int status;
-
-    fwk_id_t service_id =
-        FWK_ID_ELEMENT_INIT(TEST_MODULE_IDX, TEST_SCMI_AGENT_IDX_0);
-
-    struct scmi_perf_describe_fc_a2p payload = {
-        .domain_id = 0,
-        .message_id = MOD_SCMI_PERF_LEVEL_GET,
-    };
-
-    mod_scmi_from_protocol_api_respond_Stub(
-        describe_fast_channels_valid_params_respond_callback);
-
-    status = to_protocol_api->message_handler(
-        (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
-        service_id,
-        (const uint32_t *)&payload,
-        payload_size_table[MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL],
-        MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL);
-
-    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
-}
-
-/*
- * Test the scmi_perf_describe_fast_channels function with an invalid
- * domain_id
- */
-int describe_fast_channels_invalid_domain_id_respond_callback(
-    fwk_id_t service_id,
-    const void *payload,
-    size_t size,
-    int NumCalls)
-{
-    struct scmi_perf_describe_fc_p2a *return_values =
-        (struct scmi_perf_describe_fc_p2a *)payload;
-
-    TEST_ASSERT_EQUAL((int32_t)SCMI_NOT_FOUND, return_values->status);
-
-    return FWK_SUCCESS;
-}
-
-void utest_scmi_perf_describe_fast_channels_invalid_domain_id(void)
-{
-    int status;
-
-    fwk_id_t service_id =
-        FWK_ID_ELEMENT_INIT(TEST_MODULE_IDX, TEST_SCMI_AGENT_IDX_0);
-
-    struct scmi_perf_describe_fc_a2p payload = {
-        .domain_id = scmi_perf_ctx.domain_count,
-        .message_id = MOD_SCMI_PERF_LEVEL_GET,
-    };
-
-    mod_scmi_from_protocol_api_respond_Stub(
-        describe_fast_channels_invalid_domain_id_respond_callback);
-
-    status = to_protocol_api->message_handler(
-        (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
-        service_id,
-        (const uint32_t *)&payload,
-        payload_size_table[MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL],
-        MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL);
-
-    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
-}
-
-/*
- * Test the scmi_perf_describe_fast_channels function with an invalid
- * message_id
- */
-int describe_fast_channels_invalid_message_id_respond_callback(
-    fwk_id_t service_id,
-    const void *payload,
-    size_t size,
-    int NumCalls)
-{
-    struct scmi_perf_describe_fc_p2a *return_values =
-        (struct scmi_perf_describe_fc_p2a *)payload;
-
-    TEST_ASSERT_EQUAL((int32_t)SCMI_NOT_FOUND, return_values->status);
-
-    return FWK_SUCCESS;
-}
-
-void utest_scmi_perf_describe_fast_channels_invalid_message_id(void)
-{
-    int status;
-
-    fwk_id_t service_id =
-        FWK_ID_ELEMENT_INIT(TEST_MODULE_IDX, TEST_SCMI_AGENT_IDX_0);
-
-    struct scmi_perf_describe_fc_a2p payload = {
-        .domain_id = 0,
-        .message_id = MOD_SCMI_PERF_COMMAND_COUNT,
-    };
-
-    mod_scmi_from_protocol_api_respond_Stub(
-        describe_fast_channels_invalid_message_id_respond_callback);
-
-    status = to_protocol_api->message_handler(
-        (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
-        service_id,
-        (const uint32_t *)&payload,
-        payload_size_table[MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL],
-        MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL);
-
-    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
-}
-
-#endif
-
 /*
  * Test the find_opp_for_level function with a valid level, without
  * use_nearest
@@ -972,10 +811,8 @@ int scmi_perf_test_main(void)
 {
     UNITY_BEGIN();
 
-#ifndef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
     RUN_TEST(utest_scmi_perf_message_handler_bad_message_id);
     RUN_TEST(utest_scmi_perf_message_handler_not_found);
-#endif
 
     RUN_TEST(utest_scmi_perf_protocol_version_handler);
     RUN_TEST(utest_scmi_perf_protocol_attributes_handler);
@@ -989,12 +826,6 @@ int scmi_perf_test_main(void)
     RUN_TEST(utest_scmi_perf_describe_levels_handler_valid_param);
     RUN_TEST(utest_scmi_perf_describe_levels_handler_invalid_domain_id);
     RUN_TEST(utest_scmi_perf_describe_levels_handler_invalid_level_index);
-
-#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
-    RUN_TEST(utest_scmi_perf_describe_fast_channels_valid_params);
-    RUN_TEST(utest_scmi_perf_describe_fast_channels_invalid_domain_id);
-    RUN_TEST(utest_scmi_perf_describe_fast_channels_invalid_message_id);
-#endif
 
     RUN_TEST(utest_find_opp_for_level_valid_level);
     RUN_TEST(utest_find_opp_for_level_invalid_level);

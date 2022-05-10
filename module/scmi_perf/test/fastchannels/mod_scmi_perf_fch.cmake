@@ -6,11 +6,11 @@
 #
 
 #
-# DEFAULT target
+# DEFAULT BUILD_HAS_SCMI_PERF_FAST_CHANNELS target
 #
 
 set(TEST_SRC mod_scmi_perf)
-set(TEST_FILE mod_scmi_perf)
+set(TEST_FILE mod_scmi_perf_fch)
 
 if(TEST_ON_TARGET)
     set(TEST_MODULE scmi_perf)
@@ -36,3 +36,6 @@ list(APPEND MOCK_REPLACEMENTS fwk_mm)
 list(APPEND MOCK_REPLACEMENTS fwk_module)
 
 include(${SCP_ROOT}/unit_test/module_common.cmake)
+
+target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC
+    "BUILD_HAS_SCMI_PERF_FAST_CHANNELS")

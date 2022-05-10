@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -11,6 +11,14 @@
 #ifndef INTERNAL_SCMI_PERF_H
 #define INTERNAL_SCMI_PERF_H
 
+#include <internal/scmi.h>
+
+#include <mod_scmi_perf.h>
+
+#include <fwk_event.h>
+#include <fwk_id.h>
+
+#include <stdbool.h>
 #include <stdint.h>
 
 #define SCMI_PROTOCOL_VERSION_PERF UINT32_C(0x20000)
@@ -23,6 +31,89 @@
 enum scmi_perf_notification_id {
     SCMI_PERF_LIMITS_CHANGED = 0x000,
     SCMI_PERF_LEVEL_CHANGED = 0x001,
+};
+
+/* Event indices */
+enum scmi_perf_event_idx {
+    SCMI_PERF_EVENT_IDX_LEVEL_GET_REQUEST,
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
+    SCMI_PERF_EVENT_IDX_FAST_CHANNELS_PROCESS,
+#endif
+    SCMI_PERF_EVENT_IDX_COUNT,
+};
+
+struct perf_operations {
+    /*
+     * Service identifier currently requesting operation.
+     * A 'none' value means that there is no pending request.
+     */
+    fwk_id_t service_id;
+};
+
+struct perf_opp_table {
+    /* Pointer to DVFS OPP table */
+    struct mod_dvfs_opp *opps;
+
+    /* Number of OPPs */
+    size_t opp_count;
+
+    /* The DVFS identifier for this OPP table */
+    fwk_id_t dvfs_id;
+};
+
+/*!
+ * \brief Domain context.
+ */
+struct scmi_perf_domain_ctx {
+    /* Current limits */
+    struct mod_scmi_perf_level_limits level_limits;
+
+    /* Current level */
+    uint32_t curr_level;
+
+    /* Tables of OPPs */
+    struct perf_opp_table *opp_table;
+};
+
+struct mod_scmi_perf_ctx {
+    /* SCMI Performance Module Configuration */
+    const struct mod_scmi_perf_config *config;
+
+    /* Number of performance domains */
+    uint32_t domain_count;
+
+    /* SCMI module API */
+    const struct mod_scmi_from_protocol_api *scmi_api;
+
+    /* DVFS module API */
+    const struct mod_dvfs_domain_api *dvfs_api;
+
+#ifdef BUILD_HAS_MOD_STATISTICS
+    /* Statistics module API */
+    const struct mod_stats_api *stats_api;
+#endif
+
+    /* Pointer to a table of operations */
+    struct perf_operations *perf_ops_table;
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    /* Number of active agents */
+    unsigned int agent_count;
+
+    /* SCMI notification API */
+    const struct mod_scmi_notification_api *scmi_notification_api;
+#endif
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    /* SCMI Resource Permissions API */
+    const struct mod_res_permissions_api *res_perms_api;
+#endif
+
+    struct scmi_perf_domain_ctx *domain_ctx_table;
+
+    struct perf_opp_table *opp_table;
+
+    unsigned int dvfs_doms_count;
 };
 
 /*
@@ -73,7 +164,7 @@ struct scmi_perf_protocol_attributes_p2a {
 #define SCMI_PERF_DOMAIN_ATTRIBUTES_LEVEL_NOTIFY_MASK \
     (UINT32_C(0x1) << SCMI_PERF_DOMAIN_ATTRIBUTES_LEVEL_NOTIFY_POS)
 
-#define SCMI_PERF_FC_MIN_RATE_LIMIT     4000
+#define SCMI_PERF_FC_MIN_RATE_LIMIT 4000U
 
 #define SCMI_PERF_DOMAIN_ATTRIBUTES_FAST_CHANNEL_MASK \
     (UINT32_C(0x1) << SCMI_PERF_DOMAIN_ATTRIBUTES_FAST_CHANNEL_POS)
@@ -294,5 +385,59 @@ struct scmi_perf_describe_fc_p2a {
     uint32_t doorbell_preserve_mask_low;
     uint32_t doorbell_preserve_mask_high;
 };
+
+fwk_id_t get_dependency_id(unsigned int el_idx);
+
+/*
+ * Interface to SCMI Perf FastChannels stub
+ */
+struct mod_scmi_perf_private_api_perf_stub {
+    int (*perf_set_level)(
+        fwk_id_t domain_id,
+        unsigned int agent_id,
+        uint32_t perf_level);
+
+    int (*perf_set_limits)(
+        fwk_id_t domain_id,
+        unsigned int agent_id,
+        const struct mod_scmi_perf_level_limits *limits);
+
+    int (*find_opp_for_level)(
+        struct scmi_perf_domain_ctx *domain_ctx,
+        uint32_t *level,
+        bool use_nearest);
+
+    void (*notify_limits_updated)(
+        fwk_id_t domain_id,
+        uint32_t range_min,
+        uint32_t range_max);
+};
+
+void perf_fch_set_fch_get_level(
+    const struct mod_scmi_perf_domain_config *domain,
+    uint32_t level);
+
+bool perf_fch_prot_msg_attributes_has_fastchannels(
+    const struct scmi_protocol_message_attributes_a2p *parameters);
+
+bool perf_fch_domain_attributes_has_fastchannels(
+    const struct scmi_perf_domain_attributes_a2p *parameters);
+
+int perf_fch_describe_fast_channels(
+    fwk_id_t service_id,
+    const uint32_t *payload);
+
+int perf_fch_init(
+    fwk_id_t module_id,
+    unsigned int element_count,
+    const void *data,
+    struct mod_scmi_perf_ctx *mod_ctx,
+    struct mod_scmi_perf_private_api_perf_stub *api);
+
+int perf_fch_bind(fwk_id_t id, unsigned int round);
+
+int perf_fch_start(fwk_id_t id);
+
+int perf_fch_process_event(const struct fwk_event *event);
 
 #endif /* INTERNAL_SCMI_PERF_H */

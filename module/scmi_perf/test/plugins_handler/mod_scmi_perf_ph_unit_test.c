@@ -25,6 +25,7 @@
 #include <config_scmi_perf.h>
 #include <perf_plugins_handler.c>
 #include <perf_plugins_handler.h>
+#include <scmi_perf_fastchannels.c>
 
 #include <mod_dvfs.h>
 #include <mod_scmi_perf.h>
@@ -127,9 +128,12 @@ void setUp(void)
     scmi_perf_ctx.config = config_scmi_perf.data;
     scmi_perf_ctx.domain_count = scmi_perf_ctx.config->perf_doms_count;
 
-    scmi_perf_ctx.fast_channels_rate_limit = SCMI_PERF_FC_MIN_RATE_LIMIT;
+    perf_fch_ctx.perf_ctx = &scmi_perf_ctx;
+    perf_fch_ctx.fast_channels_rate_limit = SCMI_PERF_FC_MIN_RATE_LIMIT;
 
     perf_config.plugins_count = FWK_ARRAY_SIZE(plugins_table);
+
+    perf_fch_ctx.api_fch_stub = &api_fch_stub;
 }
 
 void tearDown(void)
