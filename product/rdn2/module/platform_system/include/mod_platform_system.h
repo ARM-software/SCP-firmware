@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -51,6 +51,14 @@ enum mod_platform_system_api_idx {
 
     /*! Number of exposed interfaces */
     MOD_PLATFORM_SYSTEM_API_COUNT
+};
+
+/*!
+ * \brief Module configuration.
+ */
+struct mod_platform_system_config {
+    /*! MPID number of the CPU to be used as primary CPU */
+    uint64_t primary_cpu_mpid;
 };
 
 /*!

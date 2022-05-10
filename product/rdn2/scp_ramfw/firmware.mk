@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -64,6 +64,7 @@ BS_FIRMWARE_SOURCES := \
     config_apcontext.c \
     config_pcie_integ_ctrl.c \
     config_scmi_power_domain.c \
+    config_platform_system.c \
     config_psu.c \
     config_mock_psu.c \
     config_dvfs.c \
