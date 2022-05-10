@@ -11,3 +11,6 @@ include(${SCP_ROOT}/module/scmi_perf/test/module/mod_scmi_perf.cmake)
 set(TEST_MODULE scmi_perf)
 include(
     ${SCP_ROOT}/module/scmi_perf/test/plugins_handler/mod_scmi_perf_ph.cmake)
+
+set(TEST_MODULE scmi_perf)
+include(${SCP_ROOT}/module/scmi_perf/test/fastchannels/mod_scmi_perf_fch.cmake)
