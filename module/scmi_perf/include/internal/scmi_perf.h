@@ -88,27 +88,6 @@ struct mod_scmi_perf_ctx {
     /* DVFS module API */
     const struct mod_dvfs_domain_api *dvfs_api;
 
-#ifdef BUILD_HAS_MOD_STATISTICS
-    /* Statistics module API */
-    const struct mod_stats_api *stats_api;
-#endif
-
-    /* Pointer to a table of operations */
-    struct perf_operations *perf_ops_table;
-
-#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    /* Number of active agents */
-    unsigned int agent_count;
-
-    /* SCMI notification API */
-    const struct mod_scmi_notification_api *scmi_notification_api;
-#endif
-
-#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
-    /* SCMI Resource Permissions API */
-    const struct mod_res_permissions_api *res_perms_api;
-#endif
-
     struct scmi_perf_domain_ctx *domain_ctx_table;
 
     struct perf_opp_table *opp_table;
@@ -439,5 +418,41 @@ int perf_fch_bind(fwk_id_t id, unsigned int round);
 int perf_fch_start(fwk_id_t id);
 
 int perf_fch_process_event(const struct fwk_event *event);
+
+/*
+ * Interface to SCMI Perf Protocol stub
+ */
+int perf_prot_ops_init(
+    fwk_id_t module_id,
+    unsigned int element_count,
+    const void *data,
+    struct mod_scmi_perf_ctx *mod_ctx,
+    struct mod_scmi_perf_private_api_perf_stub *api);
+
+int perf_prot_ops_bind(fwk_id_t id, unsigned int round);
+
+int perf_prot_ops_start(fwk_id_t id);
+
+void perf_prot_ops_process_bind_request(
+    fwk_id_t source_id,
+    fwk_id_t target_id,
+    fwk_id_t api_id,
+    const void **api);
+
+int perf_prot_ops_process_events(
+    const struct fwk_event *event,
+    struct fwk_event *resp_event);
+
+int perf_prot_ops_update_stats(fwk_id_t domain_id, uint32_t level);
+
+void perf_prot_ops_notify_limits(
+    unsigned int domain_idx,
+    uint32_t range_min,
+    uint32_t range_max);
+
+void perf_prot_ops_notify_level(
+    unsigned int domain_idx,
+    uint32_t level,
+    uint32_t cookie);
 
 #endif /* INTERNAL_SCMI_PERF_H */

@@ -23,6 +23,7 @@
 #include <Mockmod_scmi_perf_fch_extra.h>
 #include <config_scmi_perf.h>
 #include <scmi_perf_fastchannels.c>
+#include <scmi_perf_protocol_ops.c>
 
 #include <mod_dvfs.h>
 #include <mod_scmi_perf.h>
@@ -68,13 +69,8 @@ void setUp(void)
     perf_fch_ctx.perf_ctx = &scmi_perf_ctx;
     perf_fch_ctx.fast_channels_rate_limit = SCMI_PERF_FC_MIN_RATE_LIMIT;
 
-    fwk_id_get_api_idx_ExpectAnyArgsAndReturn(MOD_SCMI_PERF_PROTOCOL_API);
-
-    module_scmi_perf.process_bind_request(
-        fwk_module_id_scmi,
-        fwk_module_id_scmi_perf,
-        FWK_ID_API(FWK_MODULE_IDX_SCMI_PERF, 0),
-        (const void **)&to_protocol_api);
+    to_protocol_api = &scmi_perf_mod_scmi_to_protocol_api;
+    perf_prot_ctx.scmi_perf_ctx = &scmi_perf_ctx;
 
     scmi_perf_ctx.dvfs_api = &dvfs_domain_api;
 }
@@ -289,6 +285,9 @@ void utest_scmi_perf_domain_attributes_handler_valid_param(void)
     mod_dvfs_domain_api_get_sustained_opp_ReturnThruPtr_opp(&test_opp_values);
 
     fwk_module_get_element_name_ExpectAnyArgsAndReturn(name);
+    fwk_id_build_element_id_ExpectAnyArgsAndReturn(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SCMI_PERF, payload.domain_id));
+    fwk_id_get_element_idx_ExpectAnyArgsAndReturn(0);
 
     mod_scmi_from_protocol_api_respond_Stub(
         domain_attributes_handler_valid_param_respond_callback);

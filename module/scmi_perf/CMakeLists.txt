@@ -10,8 +10,17 @@ add_library(${SCP_MODULE_TARGET} SCP_MODULE)
 target_include_directories(${SCP_MODULE_TARGET}
                            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-target_sources(${SCP_MODULE_TARGET}
-               PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_scmi_perf.c")
+target_sources(
+    ${SCP_MODULE_TARGET}
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_scmi_perf.c")
+
+if(NOT SCP_TARGET_EXCLUDE_SCMI_PERF_PROTOCOL_OPS)
+    add_definitions(-DBUILD_HAS_SCMI_PERF_PROTOCOL_OPS)
+
+    target_sources(
+        ${SCP_MODULE_TARGET}
+        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/scmi_perf_protocol_ops.c")
+endif()
 
 if(SCP_ENABLE_SCMI_PERF_FAST_CHANNELS)
     target_sources(

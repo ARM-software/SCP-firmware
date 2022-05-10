@@ -33,6 +33,10 @@
 #include <fwk_element.h>
 #include <fwk_macros.h>
 
+#ifdef BUILD_HAS_SCMI_PERF_PROTOCOL_OPS
+#    include <scmi_perf_protocol_ops.c>
+#endif
+
 #include UNIT_TEST_SRC
 
 static int plugin_api_num_calls;
@@ -133,7 +137,7 @@ void setUp(void)
 
     perf_config.plugins_count = FWK_ARRAY_SIZE(plugins_table);
 
-    perf_fch_ctx.api_fch_stub = &api_fch_stub;
+    perf_fch_ctx.api_fch_stub = &api_perf_stub;
 }
 
 void tearDown(void)
