@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -14,9 +14,10 @@
 #include <mod_juno_reset_domain.h>
 
 static const struct mod_reset_domain_config reset_domain_config = {
-#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    .notification_id = FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_RESET_DOMAIN,
-                            MOD_RESET_DOMAIN_NOTIFICATION_AUTORESET),
+#ifdef BUILD_HAS_NOTIFICATION
+    .notification_id = FWK_ID_NOTIFICATION_INIT(
+        FWK_MODULE_IDX_RESET_DOMAIN,
+        MOD_RESET_DOMAIN_NOTIFICATION_AUTORESET),
 #endif
 };
 
