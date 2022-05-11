@@ -120,6 +120,8 @@ few common options can be configured.
 - SCP_TARGET_EXCLUDE_BASE_PROTOCOL: Exclude Base Protocol functionality from the
 SCMI Module.
 
+- SCP_ENABLE_SUB_SYSTEM_MODE: Enable the execution as a sub-system.
+
 It can also be used to provide some platform specific settings.
 e.g. For ARM Juno platform. See below
 

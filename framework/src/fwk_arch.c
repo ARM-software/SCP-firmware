@@ -18,6 +18,8 @@
 #    include <fmw_arch.h>
 #endif
 
+#include <internal/fwk_core.h>
+
 #include <fwk_io.h>
 #include <fwk_log.h>
 #include <fwk_module.h>
@@ -31,6 +33,7 @@ extern int fwk_interrupt_init(const struct fwk_arch_interrupt_driver *driver);
 static int fwk_arch_interrupt_init(int (*interrupt_init_handler)(
     const struct fwk_arch_interrupt_driver **driver))
 {
+    /* Initialize interrupt management */
     int status;
     const struct fwk_arch_interrupt_driver *driver;
 
@@ -86,6 +89,18 @@ int fwk_arch_init(const struct fwk_arch_init_driver *driver)
     if (!fwk_expect(status == FWK_SUCCESS)) {
         return FWK_E_PANIC;
     }
+
+    /*
+     * In case firmware running under other OS context, finish processing of
+     * any raised events/interrupts and return. Else continue to process events
+     * in a forever loop.
+     */
+#if defined(BUILD_HAS_SUB_SYSTEM_MODE)
+    fwk_process_event_queue();
+    (void)fwk_log_unbuffer();
+#else
+    __fwk_run_main_loop();
+#endif
 
     return FWK_SUCCESS;
 }
