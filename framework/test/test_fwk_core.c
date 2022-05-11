@@ -91,8 +91,8 @@ int __wrap_fwk_interrupt_global_disable(void)
     return FWK_SUCCESS;
 }
 
-static int interrupt_get_current_return_val;
-int __wrap_fwk_interrupt_get_current(unsigned int *interrupt)
+static bool interrupt_get_current_return_val;
+bool __wrap_fwk_is_interrupt_context(void)
 {
     return interrupt_get_current_return_val;
 }
@@ -131,7 +131,7 @@ static void test_case_setup(void)
     is_valid_entity_id_return_val = true;
     is_valid_event_id_return_val = true;
     is_valid_notification_id_return_val = true;
-    interrupt_get_current_return_val = FWK_E_STATE;
+    interrupt_get_current_return_val = false;
     fwk_mm_calloc_return_val = true;
     fake_module_desc.process_event = process_event;
     fake_module_ctx.desc = &fake_module_desc;
@@ -389,7 +389,7 @@ static void test_fwk_put_event(void)
     assert(result_event->is_notification == false);
 
     event2.id = FWK_ID_EVENT(0x3, 7);
-    interrupt_get_current_return_val = FWK_SUCCESS;
+    interrupt_get_current_return_val = true;
     result = fwk_put_event(&event2);
     assert(result == FWK_SUCCESS);
     assert(fwk_list_is_empty(&ctx->free_event_queue));
@@ -458,7 +458,7 @@ static void test_fwk_put_event_light(void)
     assert(result_event->is_notification == false);
 
     event2.id = FWK_ID_EVENT(0x4, 7);
-    interrupt_get_current_return_val = FWK_SUCCESS;
+    interrupt_get_current_return_val = true;
     result = fwk_put_event(&event2);
     assert(result == FWK_SUCCESS);
     assert(fwk_list_is_empty(&ctx->free_event_queue));
@@ -507,7 +507,7 @@ static void test___fwk_put_notification(void)
     assert(result_event->is_notification == true);
 
     event2.id = FWK_ID_EVENT(0x4, 7);
-    interrupt_get_current_return_val = FWK_SUCCESS;
+    interrupt_get_current_return_val = true;
     result = __fwk_put_notification(&event2);
     assert(result == FWK_SUCCESS);
     assert(fwk_list_is_empty(&ctx->free_event_queue));

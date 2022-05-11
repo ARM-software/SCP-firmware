@@ -145,7 +145,7 @@ static int transmit_as_controller(
     struct mod_i2c_request *transmit_request)
 {
     int status;
-    unsigned int sent_bytes;
+    unsigned int sent_bytes, flags;
     struct dw_apb_i2c_ctx *ctx;
 
     if (transmit_request->transmit_byte_count > I2C_TRANSMIT_BUFFER_LENGTH) {
@@ -164,14 +164,14 @@ static int transmit_as_controller(
     }
 
     /* The program of the I2C controller cannot be interrupted. */
-    fwk_interrupt_global_disable();
+    flags = fwk_interrupt_global_disable();
 
     for (sent_bytes = 0; sent_bytes < transmit_request->transmit_byte_count;
          sent_bytes++) {
         ctx->i2c_reg->IC_DATA_CMD = transmit_request->transmit_data[sent_bytes];
     }
 
-    fwk_interrupt_global_enable();
+    fwk_interrupt_global_enable(flags);
 
     /*
      * The data has been pushed to the I2C FIFO for transmission to the
@@ -187,7 +187,7 @@ static int receive_as_controller(
     struct mod_i2c_request *receive_request)
 {
     int status;
-    unsigned int i;
+    unsigned int i, flags;
     struct dw_apb_i2c_ctx *ctx;
 
     if (receive_request->receive_byte_count > I2C_RECEIVE_BUFFER_LENGTH) {
@@ -210,14 +210,14 @@ static int receive_as_controller(
     }
 
     /* The program of the I2C controller cannot be interrupted. */
-    fwk_interrupt_global_disable();
+    flags = fwk_interrupt_global_disable();
 
     /* Program the I2C controller with the expected reply length in bytes. */
     for (i = 0; i < receive_request->receive_byte_count; i++) {
         ctx->i2c_reg->IC_DATA_CMD = IC_DATA_CMD_READ;
     }
 
-    fwk_interrupt_global_enable();
+    fwk_interrupt_global_enable(flags);
 
     /*
      * The command has been sent to the I2C for requesting data from

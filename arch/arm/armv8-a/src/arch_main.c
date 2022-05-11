@@ -1,6 +1,6 @@
 /*
  * Renesas SCP/MCP Software
- * Copyright (c) 2020-2021, Renesas Electronics Corporation. All rights
+ * Copyright (c) 2020-2022, Renesas Electronics Corporation. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -15,6 +15,13 @@
 #include <arch_helpers.h>
 
 #include <stdbool.h>
+
+/*
+ * This variable is used to ensure spurious nested calls won't
+ * enable interrupts. This is been accessed from inline function defined in
+ * arch_helpers.h
+ */
+unsigned int critical_section_nest_level;
 
 FWK_WEAK int _platform_init(void *params)
 {

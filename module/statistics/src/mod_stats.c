@@ -346,6 +346,7 @@ stats_update_domain(fwk_id_t module_id, fwk_id_t domain_id, uint32_t level_id)
     uint64_t ts_now_us;
     uint32_t old_level_id, idx;
     int stats_id;
+    unsigned int flags;
 
     stats = get_module_stats_info(module_id);
     if (stats == NULL) {
@@ -372,7 +373,7 @@ stats_update_domain(fwk_id_t module_id, fwk_id_t domain_id, uint32_t level_id)
 
     ts_now_us = _get_curret_ts_us();
 
-    fwk_interrupt_global_disable();
+    flags = fwk_interrupt_global_disable();
 
     /* Update old performance level statistics */
     old_level_id = se_map->se_curr_level[stats_id];
@@ -387,7 +388,7 @@ stats_update_domain(fwk_id_t module_id, fwk_id_t domain_id, uint32_t level_id)
     domain_stats->curr_level_id = (uint16_t)level_id;
     se_map->se_curr_level[stats_id] = level_id;
 
-    fwk_interrupt_global_enable();
+    fwk_interrupt_global_enable(flags);
 
     return FWK_SUCCESS;
 }
@@ -438,6 +439,7 @@ static void update_all_domains_current_level(fwk_id_t module_id)
     uint32_t curr_level_id;
     fwk_id_t domain_id;
     int stats_id, i;
+    unsigned int flags;
 
     stats = get_module_stats_info(module_id);
     if (stats == NULL) {
@@ -458,7 +460,7 @@ static void update_all_domains_current_level(fwk_id_t module_id)
         se_map = stats->context->se_stats_map;
         stats_id = stats->context->se_index_map[i];
 
-        fwk_interrupt_global_disable();
+        flags = fwk_interrupt_global_disable();
 
         ts_now_us = _get_curret_ts_us();
 
@@ -470,7 +472,7 @@ static void update_all_domains_current_level(fwk_id_t module_id)
         level_stats->total_residency_us += delta_t;
         domain_stats->ts_last_change_us = ts_now_us;
 
-        fwk_interrupt_global_enable();
+        fwk_interrupt_global_enable(flags);
     }
 
 }

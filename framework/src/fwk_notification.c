@@ -179,11 +179,11 @@ int fwk_notification_subscribe(fwk_id_t notification_id, fwk_id_t source_id,
                                fwk_id_t target_id)
 {
     int status;
-    unsigned int interrupt;
+    unsigned int flags;
     struct fwk_dlist *subscription_dlist;
     struct __fwk_notification_subscription *subscription;
 
-    if (fwk_interrupt_get_current(&interrupt) == FWK_SUCCESS) {
+    if (fwk_is_interrupt_context()) {
         status = FWK_E_HANDLER;
         goto error;
     }
@@ -216,9 +216,9 @@ int fwk_notification_subscribe(fwk_id_t notification_id, fwk_id_t source_id,
     subscription->source_id = source_id;
     subscription->target_id = target_id;
 
-    (void)fwk_interrupt_global_disable();
+    flags = fwk_interrupt_global_disable();
     fwk_list_push_tail(subscription_dlist, &subscription->dlist_node);
-    (void)fwk_interrupt_global_enable();
+    (void)fwk_interrupt_global_enable(flags);
 
     return FWK_SUCCESS;
 
@@ -231,11 +231,11 @@ int fwk_notification_unsubscribe(fwk_id_t notification_id, fwk_id_t source_id,
                                  fwk_id_t target_id)
 {
     int status;
-    unsigned int interrupt;
+    unsigned int flags;
     struct fwk_dlist *subscription_dlist;
     struct __fwk_notification_subscription *subscription;
 
-    if (fwk_interrupt_get_current(&interrupt) == FWK_SUCCESS) {
+    if (fwk_is_interrupt_context()) {
         status = FWK_E_HANDLER;
         goto error;
     }
@@ -257,9 +257,9 @@ int fwk_notification_unsubscribe(fwk_id_t notification_id, fwk_id_t source_id,
         goto error;
     }
 
-    (void)fwk_interrupt_global_disable();
+    flags = fwk_interrupt_global_disable();
     fwk_list_remove(subscription_dlist, &subscription->dlist_node);
-    (void)fwk_interrupt_global_enable();
+    (void)fwk_interrupt_global_enable(flags);
     fwk_list_push_tail(&ctx.free_subscription_dlist, &subscription->dlist_node);
 
     return FWK_SUCCESS;
@@ -273,14 +273,13 @@ int fwk_notification_notify(struct fwk_event *notification_event,
                             unsigned int *count)
 {
     int status;
-    unsigned int interrupt;
     const struct fwk_event *current_event;
 
     if ((notification_event == NULL) || (count == NULL)) {
         return FWK_E_PARAM;
     }
 
-    if (fwk_interrupt_get_current(&interrupt) == FWK_SUCCESS) {
+    if (fwk_is_interrupt_context()) {
         if (!fwk_module_is_valid_entity_id(notification_event->source_id)) {
             status = FWK_E_PARAM;
             goto error;

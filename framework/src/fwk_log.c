@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -209,13 +209,14 @@ static bool fwk_log_banner(void)
 
 void fwk_log_printf(const char *format, ...)
 {
+    unsigned int flags;
     static bool banner = false;
 
     char buffer[FMW_LOG_COLUMNS + sizeof(FWK_LOG_TERMINATOR)];
 
     va_list args;
 
-    (void)fwk_interrupt_global_disable(); /* Facilitate reentrancy */
+    flags = fwk_interrupt_global_disable(); /* Facilitate reentrancy */
 
     /*
      * We don't have any way for the log drain entity to communicate that it is
@@ -256,7 +257,7 @@ void fwk_log_printf(const char *format, ...)
     }
 #endif
 
-    (void)fwk_interrupt_global_enable();
+    (void)fwk_interrupt_global_enable(flags);
 }
 
 int fwk_log_unbuffer(void)
@@ -264,10 +265,11 @@ int fwk_log_unbuffer(void)
     int status = FWK_SUCCESS;
 
 #ifdef FWK_LOG_BUFFERED
+    unsigned int flags;
     unsigned char fetched;
     char ch;
 
-    fwk_interrupt_global_disable();
+    flags = fwk_interrupt_global_disable();
 
     if (fwk_log_ctx.remaining == 0) {
         /*
@@ -318,7 +320,7 @@ int fwk_log_unbuffer(void)
     }
 
 exit:
-    fwk_interrupt_global_enable();
+    fwk_interrupt_global_enable(flags);
 #endif
 
     return status;
@@ -327,14 +329,15 @@ exit:
 void fwk_log_flush(void)
 {
 #ifdef FWK_LOG_BUFFERED
+    unsigned int flags;
     int status;
 
-    fwk_interrupt_global_disable();
+    flags = fwk_interrupt_global_disable();
 
     do {
         status = fwk_log_unbuffer();
     } while (status == FWK_PENDING);
 
-    fwk_interrupt_global_enable();
+    fwk_interrupt_global_enable(flags);
 #endif
 }

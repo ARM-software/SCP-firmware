@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -87,6 +87,11 @@ static int get_current(unsigned int *interrupt)
     return FWK_E_SUPPORT;
 }
 
+static bool is_interrupt_context(void)
+{
+    return false;
+}
+
 static const struct fwk_arch_interrupt_driver driver = {
     .global_enable = global_enable,
     .global_disable = global_disable,
@@ -102,6 +107,7 @@ static const struct fwk_arch_interrupt_driver driver = {
     .set_isr_nmi_param = set_isr_nmi_param,
     .set_isr_fault = set_isr_fault,
     .get_current = get_current,
+    .is_interrupt_context = is_interrupt_context,
 };
 
 int arch_interrupt_init(const struct fwk_arch_interrupt_driver **_driver)
