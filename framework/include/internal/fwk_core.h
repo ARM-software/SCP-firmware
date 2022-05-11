@@ -25,12 +25,13 @@
 int __fwk_init(size_t event_count);
 
 /*
- * \brief Begin waiting for and processing events raised by modules and
- *      interrupt handlers.
+ * \brief Loop forever, processing events raised by modules and interrupt
+ *      handlers. This function will suspend execution if the queue is empty and
+ *      resume on an interrupt.
  *
  * \return The function does not return.
  */
-noreturn void __fwk_run(void);
+noreturn void __fwk_run_main_loop(void);
 
 /*
  * \brief Get the event being currently processed.

@@ -68,6 +68,11 @@
              : __fwk_put_event_light)(event)
 
 /*!
+ * \brief Processing events already raised by modules and interrupt handlers.
+ */
+void fwk_process_event_queue(void);
+
+/*!
  * \brief Get a copy of a delayed response event.
  *
  * \details When a module or element delays a response as part of the processing

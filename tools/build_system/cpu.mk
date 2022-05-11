@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -57,6 +57,7 @@ else ifneq ($(findstring $(BS_FIRMWARE_CPU),$(ARMV8A_CPUS)),)
 else ifeq ($(BS_FIRMWARE_CPU),host)
     BS_ARCH_VENDOR := none
     BS_ARCH_ARCH := host
+    BS_ARCH_HAS_SUB_SYSTEM_MODE := yes
 else
     $(erro "$(BS_FIRMWARE_CPU) is not a supported CPU. Aborting...")
 endif

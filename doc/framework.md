@@ -483,6 +483,22 @@ available. This is the final pre-runtime stage.
 
 **Note:** Participation in this stage is optional.
 
+#### Runtime phase
+
+Once the pre-runtime stages have been successfully completed, the firmware will
+start to process events raised by modules or interrupts. By default, the
+firmware will loop forever waiting for new events to process at the end of the
+pre-runtime stages but it is possible to return after processing pending events
+when the event list is empty.
+
+##### Sub system runtime mode
+
+When SCP_ENABLE_SUB_SYSTEM_MODE is set, fwk_arch_init() will return after
+processing the pending events. Then, it's up to the system to call the function
+fwk_process_event_queue() when new events have been added into the list. Such
+behavior is useful when the SCP-firmware is a sub part of a larger system like
+being an application running in an execution environnement (i.e RTOS or TEE).
+
 #### Error Handling
 
 Errors that occur during the pre-runtime phase (such as failures that occur

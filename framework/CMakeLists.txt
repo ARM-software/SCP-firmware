@@ -41,6 +41,10 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_core.c")
 
 
+if(SCP_ENABLE_SUB_SYSTEM_MODE)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_SUB_SYSTEM_MODE")
+endif()
+
 if(SCP_ENABLE_NOTIFICATIONS)
     target_sources(framework
                    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_notification.c")
