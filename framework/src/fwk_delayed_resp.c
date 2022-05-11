@@ -26,9 +26,7 @@ static const char err_msg_func[] = "[FWK] Error %d in %s";
  */
 static int check_api_call(fwk_id_t id, void *data)
 {
-    unsigned int interrupt;
-
-    if (fwk_interrupt_get_current(&interrupt) == FWK_SUCCESS) {
+    if (fwk_is_interrupt_context()) {
         return FWK_E_ACCESS;
     }
 

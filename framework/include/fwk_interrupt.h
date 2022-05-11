@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -22,12 +22,6 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
-
-/*
- * This variable is used to ensure spurious nested calls won't
- * enable interrupts. This is been defined in fwk_interrupt.c
- */
-extern unsigned int critical_section_nest_level;
 
 /*!
  * \addtogroup GroupLibFramework Framework
@@ -82,32 +76,22 @@ int fwk_interrupt_init(const struct fwk_arch_interrupt_driver *driver);
 
 /*!
  * \brief Enable interrupts.
-
+ *
+ * \param flags Value returned by fwk_interrupt_global_disable.
  */
-inline static void fwk_interrupt_global_enable(void)
+inline static void fwk_interrupt_global_enable(unsigned int flags)
 {
-    /* Decrement critical_section_nest_level only if in critical section */
-    if (critical_section_nest_level > 0) {
-        critical_section_nest_level--;
-    }
-
-    /* Enable interrupts globally if now outside critical section */
-    if (critical_section_nest_level == 0) {
-        arch_interrupts_enable();
-    }
+    arch_interrupts_enable(flags);
 }
 
 /*!
  * \brief Disable interrupts.
+ *
+ * \retval Opaque value to be passed when enabling.
  */
-inline static void fwk_interrupt_global_disable(void)
+inline static unsigned int fwk_interrupt_global_disable(void)
 {
-    critical_section_nest_level++;
-
-    /* If now in outer-most critical section, disable interrupts globally */
-    if (critical_section_nest_level == 1) {
-        arch_interrupts_disable();
-    }
+    return arch_interrupts_disable();
 }
 
 /*!
@@ -224,6 +208,14 @@ int fwk_interrupt_set_isr_param(unsigned int interrupt,
  * \retval ::FWK_E_INIT The component has not been initialized.
  */
 int fwk_interrupt_get_current(unsigned int *interrupt);
+
+/*!
+ * \brief Check if in interrupt context.
+ *
+ * \retval true if in an interrupt context.
+ * \retval false not in an interrupt context.
+ */
+bool fwk_is_interrupt_context(void);
 
 /*!
  * \}

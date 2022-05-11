@@ -61,13 +61,14 @@ static struct fwk_event *duplicate_event(
     enum fwk_event_type event_type)
 {
     struct fwk_event *allocated_event = NULL;
+    unsigned int flags;
 
     fwk_assert(event != NULL);
 
-    (void)fwk_interrupt_global_disable();
+    flags = fwk_interrupt_global_disable();
     allocated_event = FWK_LIST_GET(
         fwk_list_pop_head(&ctx.free_event_queue), struct fwk_event, slist_node);
-    (void)fwk_interrupt_global_enable();
+    (void)fwk_interrupt_global_enable(flags);
 
     if (allocated_event == NULL) {
         FWK_LOG_CRIT(err_msg_func, FWK_E_NOMEM, __func__);
@@ -99,8 +100,6 @@ static int put_event(
     enum fwk_event_type event_type)
 {
     struct fwk_event *allocated_event;
-    unsigned int interrupt;
-    int status;
 
     struct fwk_event *std_event = NULL;
 
@@ -138,11 +137,10 @@ static int put_event(
     }
 
     if (intr_state == UNKNOWN_STATE) {
-        status = fwk_interrupt_get_current(&interrupt);
-        if (status != FWK_SUCCESS) {
-            intr_state = NOT_INTERRUPT_STATE;
-        } else {
+        if (fwk_is_interrupt_context()) {
             intr_state = INTERRUPT_STATE;
+        } else {
+            intr_state = NOT_INTERRUPT_STATE;
         }
     }
     if (intr_state == NOT_INTERRUPT_STATE) {
@@ -165,9 +163,11 @@ static int put_event(
 
 static void free_event(struct fwk_event *event)
 {
-    (void)fwk_interrupt_global_disable();
+    unsigned int flags;
+
+    flags = fwk_interrupt_global_disable();
     fwk_list_push_tail(&ctx.free_event_queue, &event->slist_node);
-    (void)fwk_interrupt_global_enable();
+    (void)fwk_interrupt_global_enable(flags);
 }
 
 static void process_next_event(void)
@@ -241,11 +241,12 @@ static void process_next_event(void)
 static bool process_isr(void)
 {
     struct fwk_event *isr_event;
+    unsigned int flags;
 
-    (void)fwk_interrupt_global_disable();
+    flags = fwk_interrupt_global_disable();
     isr_event = FWK_LIST_GET(
         fwk_list_pop_head(&ctx.isr_event_queue), struct fwk_event, slist_node);
-    (void)fwk_interrupt_global_enable();
+    (void)fwk_interrupt_global_enable(flags);
 
     if (isr_event == NULL) {
         return false;
@@ -337,7 +338,6 @@ int __fwk_put_notification(struct fwk_event *event)
 int __fwk_put_event(struct fwk_event *event)
 {
     int status = FWK_E_PARAM;
-    unsigned int interrupt;
     enum interrupt_states intr_state;
 
 #ifdef BUILD_MODE_DEBUG
@@ -351,11 +351,10 @@ int __fwk_put_event(struct fwk_event *event)
     }
 #endif
 
-    status = fwk_interrupt_get_current(&interrupt);
-    if (status != FWK_SUCCESS) {
-        intr_state = NOT_INTERRUPT_STATE;
-    } else {
+    if (fwk_is_interrupt_context()) {
         intr_state = INTERRUPT_STATE;
+    } else {
+        intr_state = NOT_INTERRUPT_STATE;
     }
 
     if ((intr_state == NOT_INTERRUPT_STATE) && (ctx.current_event != NULL)) {
@@ -411,7 +410,6 @@ error:
 int __fwk_put_event_light(struct fwk_event_light *event)
 {
     int status = FWK_E_PARAM;
-    unsigned int interrupt;
     enum interrupt_states intr_state;
 
 #ifdef BUILD_MODE_DEBUG
@@ -425,11 +423,10 @@ int __fwk_put_event_light(struct fwk_event_light *event)
     }
 #endif
 
-    status = fwk_interrupt_get_current(&interrupt);
-    if (status != FWK_SUCCESS) {
-        intr_state = NOT_INTERRUPT_STATE;
-    } else {
+    if (fwk_is_interrupt_context()) {
         intr_state = INTERRUPT_STATE;
+    } else {
+        intr_state = NOT_INTERRUPT_STATE;
     }
 
     if ((intr_state == NOT_INTERRUPT_STATE) && (ctx.current_event != NULL)) {

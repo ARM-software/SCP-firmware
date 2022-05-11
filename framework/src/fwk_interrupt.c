@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -19,13 +19,6 @@
 
 static bool initialized;
 static const struct fwk_arch_interrupt_driver *fwk_interrupt_driver;
-
-/*
- * This variable is used to ensure spurious nested calls won't
- * enable interrupts. This is been accessed from inline function defined in
- * fwk_interrupt.h
- */
-unsigned int critical_section_nest_level;
 
 int fwk_interrupt_init(const struct fwk_arch_interrupt_driver *driver)
 {
@@ -191,6 +184,15 @@ int fwk_interrupt_get_current(unsigned int *interrupt)
     }
 
     return fwk_interrupt_driver->get_current(interrupt);
+}
+
+bool fwk_is_interrupt_context(void)
+{
+    if (!initialized) {
+        return false;
+    }
+
+    return fwk_interrupt_driver->is_interrupt_context();
 }
 
 /* This function is only for internal use by the framework */

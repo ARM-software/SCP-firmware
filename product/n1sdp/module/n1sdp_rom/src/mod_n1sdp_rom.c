@@ -51,7 +51,7 @@ static void jump_to_ramfw(void)
      * Disable interrupts for the duration of the ROM firmware to RAM firmware
      * transition.
      */
-    fwk_interrupt_global_disable();
+    (void)fwk_interrupt_global_disable();
 
     ramfw_reset_handler = (void (*)(void))*reset_base;
 

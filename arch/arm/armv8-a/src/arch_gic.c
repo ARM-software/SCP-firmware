@@ -1,6 +1,6 @@
 /*
  * Renesas SCP/MCP Software
- * Copyright (c) 2020-2021, Renesas Electronics Corporation. All rights
+ * Copyright (c) 2020-2022, Renesas Electronics Corporation. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -552,6 +552,16 @@ static int get_current(unsigned int *interrupt)
     return FWK_SUCCESS;
 }
 
+static bool is_interrupt_context(void)
+{
+    /* Not an interrupt */
+    if (c_interrupt == 0) {
+        return false;
+    }
+
+    return true;
+}
+
 static const struct fwk_arch_interrupt_driver arm_gic_driver = {
     .global_enable = global_enable,
     .global_disable = global_disable,
@@ -567,6 +577,7 @@ static const struct fwk_arch_interrupt_driver arm_gic_driver = {
     .set_isr_nmi_param = set_isr_dummy_param,
     .set_isr_fault = set_isr_dummy,
     .get_current = get_current,
+    .is_interrupt_context = is_interrupt_context,
 };
 
 int arm_gic_init(const struct fwk_arch_interrupt_driver **driver)

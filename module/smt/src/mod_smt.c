@@ -194,6 +194,7 @@ static int smt_respond(fwk_id_t channel_id, const void *payload, size_t size)
     struct smt_channel_ctx *channel_ctx;
     struct mod_smt_memory *memory;
     int status = FWK_SUCCESS;
+    unsigned int flags;
 
     channel_ctx =
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
@@ -215,14 +216,14 @@ static int smt_respond(fwk_id_t channel_id, const void *payload, size_t size)
      * period anyway, but this guard is included to protect against a
      * misbehaving agent.
      */
-    fwk_interrupt_global_disable();
+    flags = fwk_interrupt_global_disable();
 
     channel_ctx->locked = false;
 
     memory->length = (volatile uint32_t)(sizeof(memory->message_header) + size);
     memory->status |= MOD_SMT_MAILBOX_STATUS_FREE_MASK;
 
-    fwk_interrupt_global_enable();
+    fwk_interrupt_global_enable(flags);
 
     if (memory->flags & MOD_SMT_MAILBOX_FLAGS_IENABLED_MASK) {
         status =

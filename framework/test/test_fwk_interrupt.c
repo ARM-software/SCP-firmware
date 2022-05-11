@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -116,6 +116,11 @@ static int get_current(unsigned int *interrupt)
     return get_current_return_val;
 }
 
+static bool is_interrupt_context(void)
+{
+    return (get_current_return_val == FWK_SUCCESS);
+}
+
 static const struct fwk_arch_interrupt_driver driver = {
     .global_enable = global_enable,
     .global_disable = global_disable,
@@ -131,6 +136,7 @@ static const struct fwk_arch_interrupt_driver driver = {
     .set_isr_nmi_param = set_isr_nmi_param,
     .set_isr_fault = set_isr_fault,
     .get_current = get_current,
+    .is_interrupt_context = is_interrupt_context,
 };
 
 static const struct fwk_arch_interrupt_driver driver_invalid = {};
@@ -186,6 +192,9 @@ static void test_fwk_interrupt_before_init(void)
 
     result = fwk_interrupt_get_current(&interrupt);
     assert(result == FWK_E_INIT);
+
+    state = fwk_is_interrupt_context();
+    assert(state == false);
 }
 
 static void test_fwk_interrupt_init(void)
@@ -205,10 +214,12 @@ static void test_fwk_interrupt_init(void)
 
 static void test_fwk_interrupt_critical_section(void)
 {
-    fwk_interrupt_global_disable();
+    unsigned int flags;
+
+    flags = fwk_interrupt_global_disable();
     assert(critical_section_nest_level == 1);
 
-    fwk_interrupt_global_enable();
+    fwk_interrupt_global_enable(flags);
     assert(critical_section_nest_level == 0);
 }
 
@@ -335,22 +346,23 @@ static void test_fwk_interrupt_get_current(void)
 
 static void test_fwk_interrupt_nested_critical_section(void)
 {
-    fwk_interrupt_global_disable();
+    unsigned int flags1, flags2, flags3;
+    flags1 = fwk_interrupt_global_disable();
     assert(critical_section_nest_level == 1);
 
-    fwk_interrupt_global_disable();
+    flags2 = fwk_interrupt_global_disable();
     assert(critical_section_nest_level == 2);
 
-    fwk_interrupt_global_disable();
+    flags3 = fwk_interrupt_global_disable();
     assert(critical_section_nest_level == 3);
 
-    fwk_interrupt_global_enable();
+    fwk_interrupt_global_enable(flags3);
     assert(critical_section_nest_level == 2);
 
-    fwk_interrupt_global_enable();
+    fwk_interrupt_global_enable(flags2);
     assert(critical_section_nest_level == 1);
 
-    fwk_interrupt_global_enable();
+    fwk_interrupt_global_enable(flags1);
     assert(critical_section_nest_level == 0);
 }
 

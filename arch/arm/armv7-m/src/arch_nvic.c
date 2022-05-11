@@ -228,6 +228,16 @@ static int get_current(unsigned int *interrupt)
     return FWK_SUCCESS;
 }
 
+static bool is_interrupt_context(void)
+{
+    /* Not an interrupt */
+    if (__get_IPSR() == 0) {
+        return false;
+    }
+
+    return true;
+}
+
 static const struct fwk_arch_interrupt_driver arch_nvic_driver = {
     .global_enable = global_enable,
     .global_disable = global_disable,
@@ -243,6 +253,7 @@ static const struct fwk_arch_interrupt_driver arch_nvic_driver = {
     .set_isr_nmi_param = set_isr_nmi_param,
     .set_isr_fault = set_isr_fault,
     .get_current = get_current,
+    .is_interrupt_context = is_interrupt_context,
 };
 
 static void irq_invalid(void)

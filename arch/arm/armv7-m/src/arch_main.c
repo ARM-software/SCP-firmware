@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -17,6 +17,13 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+
+/*
+ * This variable is used to ensure spurious nested calls won't
+ * enable interrupts. This is been accessed from inline function defined in
+ * arch_helpers.h
+ */
+unsigned int critical_section_nest_level;
 
 #ifdef __NEWLIB__
 /* Platform-dependent backend for the _Exit() function */
