@@ -535,7 +535,6 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
     unsigned int cxra_ldid;
     unsigned int cxra_node_id;
     unsigned int group;
-    unsigned int group_count;
     unsigned int hnf_count;
     unsigned int hnf_count_in_scg;
     unsigned int hnf_count_per_cluster;
@@ -649,7 +648,7 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
                         if (hnf_nodeid % 2 == 0) {
                             rnsam->SYS_CACHE_GRP_HN_NODEID[group] +=
                                 (uint64_t)hnf_nodeid << bit_pos;
-                            ctx->sn_nodeid_group[group] +=
+                            rnsam->SYS_CACHE_GRP_SN_NODEID[group] +=
                                 ((uint64_t)config->snf_table[logical_id])
                                 << bit_pos;
                             hnf_count_in_scg++;
@@ -658,7 +657,7 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
                     } else {
                         rnsam->SYS_CACHE_GRP_HN_NODEID[group] +=
                             (uint64_t)hnf_nodeid << bit_pos;
-                        ctx->sn_nodeid_group[group] +=
+                        rnsam->SYS_CACHE_GRP_SN_NODEID[group] +=
                             ((uint64_t)config->snf_table[logical_id])
                             << bit_pos;
                         hnf_count_in_scg++;
@@ -755,17 +754,7 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
             rnsam->SYS_CACHE_GRP_CAL_MODE |= scg_regions_enabled[region_idx] *
                 (CMN700_RNSAM_SCG_HNF_CAL_MODE_EN
                  << (region_idx * CMN700_RNSAM_SCG_HNF_CAL_MODE_SHIFT));
-
-    /* Program the SYS_CACHE_GRP_SN_NODEID register for PrefetchTgt */
-        group_count = config->snf_count /
-            (CMN700_RNSAM_SYS_CACHE_GRP_SN_NODEID_ENTRIES_PER_GROUP * 2);
-    } else {
-        group_count = config->snf_count /
-            CMN700_RNSAM_SYS_CACHE_GRP_SN_NODEID_ENTRIES_PER_GROUP;
     }
-
-    for (group = 0; group < group_count; group++)
-        rnsam->SYS_CACHE_GRP_SN_NODEID[group] = ctx->sn_nodeid_group[group];
 
     /* Hierarchical Hashing support */
     if (config->hierarchical_hashing_enable) {
@@ -857,10 +846,6 @@ static int cmn700_setup(void)
             ctx->hnf_cache_group = fwk_mm_calloc(
                 cmn700_hnf_cache_group_count(ctx->hnf_count),
                 sizeof(*ctx->hnf_cache_group));
-            ctx->sn_nodeid_group = fwk_mm_calloc(
-                ctx->hnf_count /
-                    CMN700_RNSAM_SYS_CACHE_GRP_SN_NODEID_ENTRIES_PER_GROUP,
-                sizeof(*ctx->sn_nodeid_group));
         }
 
         /* Allocate resource for the CCG nodes */
