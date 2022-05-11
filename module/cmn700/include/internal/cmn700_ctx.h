@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -30,7 +30,6 @@ struct cmn700_device_ctx {
     uintptr_t *hnf_node;
 
     uint64_t *hnf_cache_group;
-    uint64_t *sn_nodeid_group;
 
     /*
      * External RN-SAMs. The driver keeps a list of tuples (node identifier and
