@@ -327,6 +327,10 @@ static int platform_system_mod_init(
     int status;
     unsigned int idx;
     struct platform_system_isr *isr;
+#if (PLATFORM_VARIANT == 3)
+    unsigned int refclk_cur_source, refclk125_timeout = 1000;
+    uint32_t *refclk_cntcontrol_reg = (uint32_t *)(SCP_REFCLK_CNTCONTROL_BASE);
+#endif
 
     if (data == NULL) {
         return FWK_E_PARAM;
@@ -349,6 +353,41 @@ static int platform_system_mod_init(
     }
 
     platform_system_ctx.pik_scp_reg = (struct pik_scp_reg *)SCP_PIK_SCP_BASE;
+
+#if (PLATFORM_VARIANT == 3)
+    /* Switch REFCLK clock source from 100MHz to 125MHz. */
+    platform_system_ctx.pik_scp_reg->REFCLK_CTRL =
+        REFCLK_CTRL_CLKSELECT_REFCLK_125;
+    while (refclk125_timeout > 0) {
+        refclk_cur_source = (platform_system_ctx.pik_scp_reg->REFCLK_CTRL &
+                             REFCLK_CTRL_CLKSELECT_CUR_MASK) >>
+            REFCLK_CTRL_CLKSELECT_CUR_SHIFT;
+
+        if (refclk_cur_source == REFCLK_CTRL_CLKSELECT_REFCLK_125) {
+            break;
+        }
+
+        refclk125_timeout--;
+    }
+
+    if (refclk125_timeout == 0) {
+        FWK_LOG_ERR(
+            "[PLATFORM SYSTEM] Failed to switch to 125MHz REFCLK source for "
+            "system counter!");
+        return FWK_E_TIMEOUT;
+    }
+
+    FWK_LOG_INFO(
+        "[PLATFORM SYSTEM] REFCLK_CTRL: %lx",
+        platform_system_ctx.pik_scp_reg->REFCLK_CTRL);
+
+    /*
+     * To allow system counter to increment at a fixed frequency of 1GHz with
+     * 125MHz REFCLK as clock source, set the system counter increment value to
+     * 8 (125MHz * 8 = 1GHz).
+     */
+    *(refclk_cntcontrol_reg + REFCLK_CNTINCR) = 8;
+#endif
 
     return FWK_SUCCESS;
 }

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -39,7 +39,9 @@ struct pik_scp_reg {
             uint8_t   RESERVED6[0x820 - 0x818];
     FWK_RW  uint32_t  ACLK_CTRL;
     FWK_RW  uint32_t  ACLK_DIV1;
-            uint8_t   RESERVED7[0xA60 - 0x828];
+            uint8_t   RESERVED7[0x850 - 0x828];
+    FWK_RW  uint32_t  REFCLK_CTRL;
+            uint8_t   RESERVED8[0xA60 - 0x854];
     FWK_R   uint32_t  CONS_MMUTCU_INT_STATUS;
     FWK_R   uint32_t  CONS_MMUTCU_INT_CLR;
     FWK_R   uint32_t  CONS_MMUTBU_INT_STATUS0;

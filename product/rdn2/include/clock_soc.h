@@ -12,8 +12,28 @@
 
 #include <fwk_macros.h>
 
-#define CLOCK_RATE_REFCLK (100UL * FWK_MHZ)
+#if (PLATFORM_VARIANT == 3)
+#    define CLOCK_RATE_REFCLK (125UL * FWK_MHZ)
+#else
+#    define CLOCK_RATE_REFCLK (100UL * FWK_MHZ)
+#endif
+
 #define CLOCK_RATE_SYSPLLCLK (2000UL * FWK_MHZ)
+
+#if (PLATFORM_VARIANT == 3)
+/* Macro definitions of Reference Clock Control register. */
+#    define REFCLK_CTRL_CLKSELECT_REFCLK_100 0x1
+#    define REFCLK_CTRL_CLKSELECT_REFCLK_125 0x2
+#    define REFCLK_CTRL_CLKSELECT_CUR_MASK   0xff00
+#    define REFCLK_CTRL_CLKSELECT_CUR_SHIFT  8
+
+/*
+ * CNTINCR register specifies the increment step value for the system counter on
+ * each clock tick. This register is at offset 0xD0 from the base of the
+ * CNTControlBase register frame.
+ */
+#    define REFCLK_CNTINCR 0xD0
+#endif
 
 /*
  * PLL clock indexes.
