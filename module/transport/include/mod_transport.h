@@ -122,6 +122,11 @@ enum mod_transport_channel_transport_type {
     /*! Trigger interrupt only */
     MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_NONE,
 
+#ifdef BUILD_HAS_FAST_CHANNELS
+    /*! Fast Channel transport */
+    MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS,
+#endif
+
     /*! Channel transport type count */
     MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_COUNT,
 };
@@ -177,6 +182,21 @@ struct mod_transport_channel_config {
     fwk_id_t driver_api_id;
 };
 
+#ifdef BUILD_HAS_FAST_CHANNELS
+/*!
+ * \brief Data structure encapsulating address(es) and length of a fast channel
+ *    between two components
+ */
+struct fast_channel_addr {
+    /*! Address as seen by the firmware running on current processor */
+    uintptr_t local_view_address;
+    /*! Address as seen by the firmware/OS running on target processor */
+    uintptr_t target_view_address;
+    /*! Length of the fast channel in bytes */
+    size_t length;
+};
+#endif
+
 /*!
  * \brief Driver API (Implemented by the driver)
  *
@@ -223,6 +243,32 @@ struct mod_transport_driver_api {
      *      errors
      */
     int (*trigger_event)(fwk_id_t device_id);
+
+#ifdef BUILD_HAS_FAST_CHANNELS
+    /*!
+     * \brief Get fast channel.
+     *
+     * \param fch_id fast channel identifier
+     * \param[out] fch Pointer to the requested fast channel
+     *
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     */
+    int (*get_fch)(fwk_id_t fch_id, struct fast_channel_addr *fch);
+
+    /*!
+     * \brief Register a callback function in the driver
+     *
+     * \param fch_id fast channel identifier
+     * \param param Context-specific value
+     * \param fch_callback Pointer to the callback function
+     *
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     */
+    int (*fch_register_callback)(
+        fwk_id_t fch_id,
+        uintptr_t param,
+        void (*fch_callback)(uintptr_t param));
+#endif
 };
 
 /*!
@@ -431,6 +477,39 @@ struct mod_transport_firmware_signal_api {
     int (*signal_message)(fwk_id_t service_id);
 };
 
+#ifdef BUILD_HAS_FAST_CHANNELS
+/*!
+ * \brief Fast Channels API
+ *
+ * \details Interface used for Fast Channels
+ */
+struct mod_transport_fast_channels_api {
+    /*!
+     * \brief Get fast channel.
+     *
+     * \param fch_id Fast channel identifier
+     * \param[out] fch Pointer to the requested fast channel
+     *
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     */
+    int (*transport_get_fch)(fwk_id_t fch_id, struct fast_channel_addr *fch);
+
+    /*!
+     * \brief Register a callback function.
+     *
+     * \param fch_id Fast channel identifier
+     * \param param Context-specific value
+     * \param fch_callback Pointer to the callback function
+     *
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     */
+    int (*transport_fch_register_callback)(
+        fwk_id_t fch_id,
+        uintptr_t param,
+        void (*fch_callback)(uintptr_t param));
+};
+#endif
+
 /*!
  * \brief Type of the interfaces exposed by the transport module.
  */
@@ -443,6 +522,10 @@ enum mod_transport_api_idx {
 #endif
     /*! Interface for MSCP Firmware communication */
     MOD_TRANSPORT_API_IDX_FIRMWARE,
+#ifdef BUILD_HAS_FAST_CHANNELS
+    /*! Interface for scmi protocol modules that use SCMI Fast Channels */
+    MOD_TRANSPORT_API_IDX_FAST_CHANNELS,
+#endif
     /*! Number of defined interfaces */
     MOD_TRANSPORT_API_IDX_COUNT,
 };

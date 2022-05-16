@@ -440,6 +440,57 @@ static const struct mod_transport_firmware_api transport_firmware_api = {
     .trigger_interrupt = transport_trigger_interrupt,
 };
 
+#ifdef BUILD_HAS_FAST_CHANNELS
+static int transport_get_fch(fwk_id_t fch_id, struct fast_channel_addr *fch)
+{
+    struct transport_channel_ctx *channel_ctx;
+
+    if (fch == NULL) {
+        return FWK_E_PARAM;
+    }
+
+    channel_ctx =
+        &transport_ctx.channel_ctx_table[fwk_id_get_element_idx(fch_id)];
+
+    fwk_assert(
+        channel_ctx->config->transport_type ==
+        MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS);
+
+    /* Get fast channel from the driver */
+    return channel_ctx->driver_api->get_fch(
+        channel_ctx->config->driver_id, fch);
+}
+
+static int transport_fch_register_callback(
+    fwk_id_t fch_id,
+    uintptr_t param,
+    void (*fch_callback)(uintptr_t param))
+{
+    struct transport_channel_ctx *channel_ctx;
+
+    if (fch_callback == NULL) {
+        return FWK_E_PARAM;
+    }
+
+    channel_ctx =
+        &transport_ctx.channel_ctx_table[fwk_id_get_element_idx(fch_id)];
+
+    fwk_assert(
+        channel_ctx->config->transport_type ==
+        MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS);
+
+    /* Provide callback function pointer to driver and get it registered */
+    return channel_ctx->driver_api->fch_register_callback(
+        channel_ctx->config->driver_id, param, fch_callback);
+}
+
+static const struct mod_transport_fast_channels_api
+    transport_fast_channels_api = {
+        .transport_get_fch = transport_get_fch,
+        .transport_fch_register_callback = transport_fch_register_callback,
+    };
+#endif
+
 static int transport_message_handler(struct transport_channel_ctx *channel_ctx)
 {
     struct mod_transport_buffer *in, *out, *shared_memory;
@@ -746,6 +797,15 @@ static int transport_channel_init(
         channel_ctx->max_payload_size = 0;
         break;
 
+#ifdef BUILD_HAS_FAST_CHANNELS
+    case MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS:
+        /* This transport channel is used for Fast channels only */
+        channel_ctx->in = NULL;
+        channel_ctx->out = NULL;
+        channel_ctx->max_payload_size = 0;
+        break;
+#endif
+
     default:
         return FWK_E_DATA;
     }
@@ -782,6 +842,17 @@ static int transport_bind(fwk_id_t id, unsigned int round)
 
         channel_ctx =
             &transport_ctx.channel_ctx_table[fwk_id_get_element_idx(id)];
+
+#ifdef BUILD_HAS_FAST_CHANNELS
+        if (channel_ctx->config->transport_type ==
+            MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS) {
+            /*
+             * Don't bind to signal API for fast channels since the
+             * driver module will notify the client module directly.
+             */
+            return FWK_SUCCESS;
+        }
+#endif
 
 #ifdef BUILD_HAS_MOD_SCMI
         if (fwk_id_is_equal(
@@ -868,6 +939,14 @@ static int transport_process_bind_request(
         *api = &transport_firmware_api;
         channel_ctx->service_id = source_id;
         break;
+
+#ifdef BUILD_HAS_FAST_CHANNELS
+    case MOD_TRANSPORT_API_IDX_FAST_CHANNELS:
+        /* Fast Channels transport API */
+        *api = &transport_fast_channels_api;
+        channel_ctx->service_id = source_id;
+        break;
+#endif
 
     default:
         /* Invalid API */
