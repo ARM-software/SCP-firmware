@@ -226,11 +226,62 @@ transport module and then processes the message.
 
 ```
 
+## Fast Channels communication
+
+The transport module also supports SCMI Fast Channels communication. Modules
+that want to use this mode of communication can bind to the fast channels API
+implemented in the transport module - `MOD_TRANSPORT_API_IDX_FAST_CHANNELS`
+
+The client module must call the functions implemented in the above mentioned API
+to retrieve the fast channel and provide a function to the driver(that supports
+fast channels) that needs to called back when a message is received on the fast
+channel. So, when a message is received on the fast channel, the driver calls
+the function implemented in the client module(that was previously registered as
+a callback function for the corresponding fast channel).
+
+```
++--------+                              +----------+                       +--------+             +-------+
+| Module |                              | Transport|                       | Driver |             | Agent |
++----+---+                              +-----+----+                       +----+---+             +---+---+
+     |                                        |                                 |                     |
+     |                                        |                                 |                     |
+     |                                        |                                 |                     |
+     |     mod_transport_get_fch()            |                                 |                     |
+     +--------------------------------------->|       driver->get_fch()         |                     |
+     |                                        +-------------------------------->|                     |
+     |                                        |                                 |                     |
+     |                                        |            return               |                     |
+     |             return                     |<--------------------------------+                     |
+     |<---------------------------------------+                                 |                     |
+     |                                        |                                 |                     |
+     |                                        |                                 |                     |
+     |                                        |                                 |                     |
+     |                                        |                                 |                     |
+     | mod_transport_fch_register_callback()  |                                 |                     |
+     +--------------------------------------->| driver->fch_register_callback() |                     |
+     |                                        +-------------------------------->|                     |
+     |                                        |                                 |                     |
+     |                                        |            return               |                     |
+     |               return                   |<--------------------------------+                     |
+     |<---------------------------------------+                                 |                     +---+
+     |                                        |                                 |                     |   | write_fch_memory
+     |                                        |                                 |     Interrupt       |<--+
+     |                        fch_callback()  |                                 |<--------------------+
+     |<---------------------------------------+---------------------------------+                     |
+     |                           return       |                                 |                     |
+     +----------------------------------------+-------------------------------->|                     |
+     |                                        |                                 |                     |
+```
+
 # Use
 
 In order to send/receive in-band messages, the following dependencies are
 required:
 * In-band message support enabled in the firmware.
+
+In order to use SCMI Fast channels communication, the following dependencies are
+required:
+* Fast Channels message support enabled in the firmware.
 
 ## Firmware messages
 
@@ -248,6 +299,13 @@ it needs to implement the interfaces defined by the scmi module and call the
 
 The transport module defines the signal interface which must be implemented by
 the module so that it can be notified on receiving a message.
+
+## Fast Channel Messages
+
+A driver that supports Fast channels communication is required in order to use
+this feature. Also the client module must implement a function that should be
+used as callback for a particular fast channel. This fast channel needs to be
+provided to the driver via the transport module's Fast Channels interface.
 
 # Configuration Example
 
