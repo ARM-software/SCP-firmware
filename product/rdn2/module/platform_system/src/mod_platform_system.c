@@ -434,7 +434,13 @@ int platform_system_process_notification(
 
     if ((scmi_notification_count == FWK_ARRAY_SIZE(scmi_notification_table)) &&
         sds_notification_received) {
-        messaging_stack_ready();
+        status = messaging_stack_ready();
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(
+                "[PLATFORM SYSTEM] Failed to update firmware feature "
+                "availability flags in SDS");
+            return status;
+        }
 
         scmi_notification_count = 0;
         sds_notification_received = false;
