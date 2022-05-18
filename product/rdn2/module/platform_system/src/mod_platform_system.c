@@ -88,6 +88,9 @@ static fwk_id_t sds_feature_availability_id = FWK_ID_ELEMENT_INIT(
 static fwk_id_t sds_reset_syndrome_id =
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, PLATFORM_SDS_RESET_SYNDROME_IDX);
 
+static fwk_id_t sds_cpu_info_id =
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, PLATFORM_SDS_CPU_INFO_IDX);
+
 /*
  *  SCMI Messaging stack
  */
@@ -128,6 +131,22 @@ static int update_sds_reset_syndrome(void)
         0,
         (void *)(&reset_syndrome),
         sds_structure_desc->size);
+}
+
+/*
+ * Helper function to update the primary CPU number in SDS.
+ */
+static int update_primary_cpu_in_sds(void)
+{
+    const struct mod_sds_structure_desc *sds_structure_desc =
+        fwk_module_get_data(sds_cpu_info_id);
+    uint8_t primary_cpu;
+
+    primary_cpu =
+        platform_calc_core_pos(platform_system_ctx.config->primary_cpu_mpid);
+
+    return platform_system_ctx.sds_api->struct_write(
+        sds_structure_desc->id, 0, (void *)(&primary_cpu), sizeof(primary_cpu));
 }
 
 /*
@@ -474,6 +493,14 @@ int platform_system_process_notification(
         status = update_sds_reset_syndrome();
         if (status != FWK_SUCCESS) {
             FWK_LOG_ERR("[PLATFORM SYSTEM] Failed to update reset syndrome");
+            return status;
+        }
+
+        status = update_primary_cpu_in_sds();
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(
+                "[PLATFORM SYSTEM] Failed to update primary "
+                "CPU number in SDS");
             return status;
         }
     }
