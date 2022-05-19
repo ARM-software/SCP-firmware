@@ -56,6 +56,7 @@ The following tools are recommended but not required:
 order to run the tests suites
 - [ARM GCC GNU-A toolchain] (*7.4.0* or later): Required to build framework
 tests that run on the host system
+- [lcov] ("1.13" or later): Required to run unit test framework
 
 [Doxygen]: http://www.doxygen.nl/
 [AArch64 GCC toolchain]:
