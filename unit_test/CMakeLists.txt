@@ -95,7 +95,6 @@ list(APPEND FWK_SRC ${FWK_SRC_ROOT}/fwk_io.c)
 list(APPEND FWK_SRC ${FWK_SRC_ROOT}/fwk_log.c)
 list(APPEND FWK_SRC ${FWK_SRC_ROOT}/fwk_mm.c)
 list(APPEND FWK_SRC ${FWK_SRC_ROOT}/fwk_module.c)
-list(APPEND FWK_SRC ${FWK_SRC_ROOT}/fwk_notification.c)
 list(APPEND FWK_SRC ${FWK_SRC_ROOT}/fwk_ring.c)
 list(APPEND FWK_SRC ${FWK_SRC_ROOT}/fwk_slist.c)
 list(APPEND FWK_SRC ${FWK_SRC_ROOT}/fwk_status.c)
@@ -106,14 +105,26 @@ list(APPEND FWK_SRC ${UNITY_SRC_ROOT}/unity.c)
 
 list(APPEND SCP_UNITY_SRC ${TEST_ROOT}/unity_mocks/scp_unity.c)
 
-# Create a list of common Mock sources
-list(APPEND FWK_MOCK_SRC ${FWK_MOCKS_SRC_ROOT}/Mockfwk_module.c)
-list(APPEND FWK_MOCK_SRC
-     ${FWK_MOCKS_SRC_ROOT}/internal/Mockfwk_module_internal.c)
-list(APPEND FWK_MOCK_SRC ${FWK_MOCKS_SRC_ROOT}/Mockfwk_id.c)
-list(APPEND FWK_MOCK_SRC ${FWK_MOCKS_SRC_ROOT}/internal/Mockfwk_id_internal.c)
-list(APPEND FWK_MOCK_SRC ${FWK_MOCKS_SRC_ROOT}/Mockfwk_core.c)
-list(APPEND FWK_MOCK_SRC ${FWK_MOCKS_SRC_ROOT}/internal/Mockfwk_core_internal.c)
+macro(replace_with_mock FILENAME)
+    list(FILTER ${TEST_MODULE}_FWK_SRC EXCLUDE REGEX "${FILENAME}.c")
+    list(APPEND ${TEST_MODULE}_FWK_SRC ${FWK_MOCKS_SRC_ROOT}/Mock${FILENAME}.c)
+    if(EXISTS ${FWK_MOCKS_SRC_ROOT}/internal/Mock${FILENAME}_internal.c)
+        list(APPEND ${TEST_MODULE}_FWK_SRC
+                    ${FWK_MOCKS_SRC_ROOT}/internal/Mock${FILENAME}_internal.c)
+    endif()
+endmacro()
+
+macro(include_fwk_notify)
+    target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC "BUILD_HAS_NOTIFICATION")
+    list(APPEND ${TEST_MODULE}_FWK_SRC ${FWK_SRC_ROOT}/fwk_notification.c)
+endmacro()
+
+macro(include_mock_notify)
+    target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC "BUILD_HAS_NOTIFICATION")
+    list(APPEND ${TEST_MODULE}_FWK_SRC ${FWK_MOCKS_SRC_ROOT}/Mockfwk_notification.c)
+    list(APPEND ${TEST_MODULE}_FWK_SRC
+                ${FWK_MOCKS_SRC_ROOT}/internal/Mockfwk_notification_internal.c)
+endmacro()
 
 list(LENGTH UNIT_MODULE UNIT_TEST_MAX)
 
