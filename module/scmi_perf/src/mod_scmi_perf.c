@@ -61,7 +61,7 @@ static int scmi_perf_limits_set_handler(
     fwk_id_t service_id, const uint32_t *payload);
 static int scmi_perf_limits_get_handler(
     fwk_id_t service_id, const uint32_t *payload);
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
 static int scmi_perf_describe_fast_channels(
     fwk_id_t service_id, const uint32_t *payload);
 #endif
@@ -90,7 +90,7 @@ static int (
     [MOD_SCMI_PERF_LIMITS_GET] = scmi_perf_limits_get_handler,
     [MOD_SCMI_PERF_LEVEL_SET] = scmi_perf_level_set_handler,
     [MOD_SCMI_PERF_LEVEL_GET] = scmi_perf_level_get_handler,
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
     [MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL] = scmi_perf_describe_fast_channels,
 #endif
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
@@ -116,7 +116,7 @@ static unsigned int payload_size_table[MOD_SCMI_PERF_COMMAND_COUNT] = {
         (unsigned int)sizeof(struct scmi_perf_limits_set_a2p),
     [MOD_SCMI_PERF_LIMITS_GET] =
         (unsigned int)sizeof(struct scmi_perf_limits_get_a2p),
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
     [MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL] =
         sizeof(struct scmi_perf_describe_fc_a2p),
 #endif
@@ -126,7 +126,7 @@ static unsigned int payload_size_table[MOD_SCMI_PERF_COMMAND_COUNT] = {
 #endif
 };
 
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
 static unsigned int fast_channel_elem_size[] = {
     [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] = sizeof(uint32_t),
     [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET] =
@@ -198,7 +198,7 @@ struct mod_scmi_perf_ctx {
     /* SCMI notification API */
     const struct mod_scmi_notification_api *scmi_notification_api;
 #endif
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
     /* Alarm API for fast channels */
     const struct mod_timer_alarm_api *fc_alarm_api;
 
@@ -226,7 +226,7 @@ static struct mod_scmi_perf_ctx scmi_perf_ctx;
 /* Event indices */
 enum scmi_perf_event_idx {
     SCMI_PERF_EVENT_IDX_LEVEL_GET_REQUEST,
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
     SCMI_PERF_EVENT_IDX_FAST_CHANNELS_PROCESS,
 #endif
     SCMI_PERF_EVENT_IDX_COUNT,
@@ -279,7 +279,7 @@ static inline struct scmi_perf_domain_ctx *get_ctx(fwk_id_t domain_id)
     return &scmi_perf_ctx.domain_ctx_table[fwk_id_get_element_idx(domain_id)];
 }
 
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
 static inline struct mod_scmi_perf_fast_channel_limit *get_fc_set_limit_addr(
     const struct mod_scmi_perf_domain_config *domain)
 {
@@ -633,7 +633,7 @@ static int scmi_perf_protocol_message_attributes_handler(fwk_id_t service_id,
     }
 
     return_values.attributes = 0;
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
     if ((parameters->message_id <= MOD_SCMI_PERF_LEVEL_GET) &&
         (parameters->message_id >= MOD_SCMI_PERF_LIMITS_SET)) {
         return_values.attributes = 1; /* Fast Channel available */
@@ -702,7 +702,7 @@ static int scmi_perf_domain_attributes_handler(fwk_id_t service_id,
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     notifications = true;
 #endif
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
     const struct mod_scmi_perf_domain_config *domain =
         &(*scmi_perf_ctx.config->domains)[parameters->domain_id];
 
@@ -1210,7 +1210,7 @@ exit:
 }
 #endif
 
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
 
 /*
  * Note that the Fast Channel doorbell is not supported in this
@@ -1781,7 +1781,7 @@ static int scmi_perf_init(fwk_id_t module_id, unsigned int element_count,
 
     scmi_perf_ctx.config = config;
     scmi_perf_ctx.domain_count = (uint32_t)config->perf_doms_count;
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
     scmi_perf_ctx.fast_channels_alarm_id = config->fast_channels_alarm_id;
     if (config->fast_channels_rate_limit < SCMI_PERF_FC_MIN_RATE_LIMIT) {
         scmi_perf_ctx.fast_channels_rate_limit = SCMI_PERF_FC_MIN_RATE_LIMIT;
@@ -1851,7 +1851,7 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
     }
 #endif
 
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
     if (!fwk_id_is_equal(scmi_perf_ctx.config->fast_channels_alarm_id,
         FWK_ID_NONE)) {
         status = fwk_module_bind(scmi_perf_ctx.config->fast_channels_alarm_id,
@@ -2064,7 +2064,7 @@ static int scmi_perf_start(fwk_id_t id)
         }
     }
 
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
 
     const struct mod_scmi_perf_domain_config *domain;
     unsigned int j;
@@ -2249,7 +2249,7 @@ static int process_internal_event(const struct fwk_event *event)
         (enum scmi_perf_event_idx)fwk_id_get_event_idx(event->id);
 
     switch (event_idx) {
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
     case SCMI_PERF_EVENT_IDX_FAST_CHANNELS_PROCESS:
         fast_channels_process();
         status = FWK_SUCCESS;

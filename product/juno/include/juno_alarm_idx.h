@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -27,7 +27,7 @@ enum juno_dvfs_alarm_idx {
     JUNO_DVFS_ALARM_VLITTLE_IDX = JUNO_XRP7724_ALARM_IDX_COUNT,
     JUNO_DVFS_ALARM_BIG_IDX,
     JUNO_DVFS_ALARM_GPU_IDX,
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
     JUNO_SCMI_FAST_CHANNEL_IDX,
 #endif
     JUNO_DVFS_ALARM_IDX_CNT,
