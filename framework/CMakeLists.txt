@@ -59,8 +59,8 @@ if(SCP_ENABLE_SCMI_NOTIFICATIONS)
     endif()
 endif()
 
-if(SCP_ENABLE_FAST_CHANNELS)
-    target_compile_definitions(framework PUBLIC "BUILD_HAS_FAST_CHANNELS")
+if(SCP_ENABLE_SCMI_PERF_FAST_CHANNELS)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_SCMI_PERF_FAST_CHANNELS")
 endif()
 
 if(SCP_ENABLE_PLUGIN_HANDLER)

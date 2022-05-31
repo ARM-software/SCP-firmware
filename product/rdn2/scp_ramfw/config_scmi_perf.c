@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -53,7 +53,7 @@
             SCP_SYSTEM_ACCESS_PORT1_BASE \
     }
 
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
 static const struct mod_scmi_perf_domain_config domains[] = {
     [0] = { .fast_channels_addr_scp = (uint64_t[])FAST_CHANNEL_ADDRESS_SCP(0),
             .fast_channels_addr_ap = (uint64_t[])FAST_CHANNEL_ADDRESS_AP(0) },
@@ -101,7 +101,7 @@ static const struct mod_scmi_perf_domain_config domains[8] = { 0 };
 const struct fwk_module_config config_scmi_perf = {
     .data = &((struct mod_scmi_perf_config){
         .domains = &domains,
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
         .fast_channels_alarm_id = FWK_ID_SUB_ELEMENT_INIT(
             FWK_MODULE_IDX_TIMER,
             0,

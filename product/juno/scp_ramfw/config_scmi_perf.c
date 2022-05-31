@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -60,7 +60,7 @@
 
 static const struct mod_scmi_perf_domain_config domains[] = {
     [DVFS_ELEMENT_IDX_LITTLE] = {
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
         .fast_channels_addr_scp = (uint64_t[]) {
             [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
                 FC_LEVEL_SET(DVFS_ELEMENT_IDX_LITTLE),
@@ -87,7 +87,7 @@ static const struct mod_scmi_perf_domain_config domains[] = {
 #endif
     },
     [DVFS_ELEMENT_IDX_BIG] = {
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
         .fast_channels_addr_scp = (uint64_t[]) {
             [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
                 FC_LEVEL_SET(DVFS_ELEMENT_IDX_BIG),
@@ -114,7 +114,7 @@ static const struct mod_scmi_perf_domain_config domains[] = {
 #endif
     },
     [DVFS_ELEMENT_IDX_GPU] = {
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
         .fast_channels_addr_scp = (uint64_t[]) {
             [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
                 FC_LEVEL_SET(DVFS_ELEMENT_IDX_GPU),
@@ -146,7 +146,7 @@ struct fwk_module_config config_scmi_perf = {
     .data = &((struct mod_scmi_perf_config){
         .domains = &domains,
         .perf_doms_count = FWK_ARRAY_SIZE(domains),
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
         .fast_channels_alarm_id = FWK_ID_SUB_ELEMENT_INIT(
             FWK_MODULE_IDX_TIMER,
             0,

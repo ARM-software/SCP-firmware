@@ -56,7 +56,7 @@
 
 static const struct mod_scmi_perf_domain_config domains[] = {
     [DVFS_ELEMENT_IDX_KLEIN] = {
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
          .fast_channels_addr_scp = (uint64_t[]) {
             [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
                 FC_LEVEL_SET(DVFS_ELEMENT_IDX_KLEIN),
@@ -80,7 +80,7 @@ static const struct mod_scmi_perf_domain_config domains[] = {
 #endif
     },
     [DVFS_ELEMENT_IDX_MATTERHORN] = {
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
          .fast_channels_addr_scp = (uint64_t[]) {
             [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
                 FC_LEVEL_SET(DVFS_ELEMENT_IDX_MATTERHORN),
@@ -104,7 +104,7 @@ static const struct mod_scmi_perf_domain_config domains[] = {
 #endif
     },
     [DVFS_ELEMENT_IDX_MATTERHORN_ELP_ARM] = {
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
          .fast_channels_addr_scp = (uint64_t[]) {
             [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
                 FC_LEVEL_SET(DVFS_ELEMENT_IDX_MATTERHORN_ELP_ARM),
@@ -149,7 +149,7 @@ static const struct mod_scmi_plugin_config plugins_table[] = {
 const struct fwk_module_config config_scmi_perf = {
     .data = &((struct mod_scmi_perf_config) {
         .domains = &domains, .perf_doms_count = FWK_ARRAY_SIZE(domains),
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
         .fast_channels_alarm_id = FWK_ID_SUB_ELEMENT_INIT(
             FWK_MODULE_IDX_TIMER, 0, CONFIG_TIMER_FAST_CHANNEL_TIMER_IDX),
         .fast_channels_rate_limit = (2 * 1000),
