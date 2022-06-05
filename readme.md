@@ -78,6 +78,10 @@ License
 
 The software is provided under a [BSD-3-Clause license](https://spdx.org/licenses/BSD-3-Clause.html).
 
+The license for CMock can be found in contrib/cmock/git/LICENSE.txt.
+
+The license for unity framework can be found in contrib/cmock/git/vendor/unity/LICENSE.txt.
+
 Getting started
 ---------------
 
