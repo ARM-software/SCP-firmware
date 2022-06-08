@@ -116,7 +116,7 @@ static int read_temperature(fwk_id_t id)
 {
 #if THERMAL_HAS_ASYNC_SENSORS
     /* Initiate the temperature reading sequence */
-    struct fwk_event event = {
+    struct fwk_event_light event = {
         .source_id = id,
         .target_id = id,
         .id = mod_thermal_event_id_read_temp,
