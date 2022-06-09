@@ -24,7 +24,7 @@ def main():
     banner("Build and run PyCodeStyle tests")
 
     result = subprocess.Popen(
-        "python -m pycodestyle tools/",
+        "python3 -m pycodestyle tools/",
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
