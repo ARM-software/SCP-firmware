@@ -5,6 +5,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-BS_PRODUCT_NAME := tc2
-BS_FIRMWARE_LIST := scp_romfw \
-	            scp_ramfw
+set(SCP_MODULE "tc2-system")
+
+set(SCP_MODULE_TARGET "module-tc2-system")
