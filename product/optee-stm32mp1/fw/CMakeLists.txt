@@ -22,6 +22,6 @@ target_sources(
     ${SCP_FIRMWARE_TARGET}
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_mbx_smt.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_clock.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_reset_domain.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_voltage_domain.c")
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_clocks.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_reset_domains.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_voltage_domains.c")
