@@ -112,5 +112,7 @@ list(APPEND SCP_MODULES "mock-clock")
 
 # select device tree configured modules
 # These use the .dts configured variants 
-#list(APPEND SCP_DT_CONFIG_MODULES_STD "clock")
-list(APPEND SCP_DT_CONFIG_MODULES_DYN "pl011")
+list(APPEND SCP_DT_CONFIG_MODULES_DYN "clock")
+list(APPEND SCP_DT_CONFIG_MODULES_STD "pl011")
+list(APPEND SCP_DT_CONFIG_MODULES_STD "mock-clock")
+# list(APPEND SCP_DT_CONFIG_MODULES_DYN "pl011")

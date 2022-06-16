@@ -7,10 +7,11 @@
 
 /* base SCP .dtsi file for juno boards */
 
+#include "juno_dt_bindings.h"
+
 /* must be first include */
 #include "base.dtsi"
 
-#include "juno_dt_bindings.h"
 
 
 / {
@@ -24,7 +25,7 @@
 			reg = <FPGA_UART1_BASE 0x1000>;
             current-speed = <115200>;
             clock-frequency = <24000000>;
-            pd-id = <POWER_DOMAIN_IDX_SYSTOP>;
+            pd-id = <FWK_MODULE_IDX_POWER_DOMAIN POWER_DOMAIN_IDX_SYSTOP>;
 /*			clocks = <&uartclk>;*/
 /*			interrupts = <7 3>; */
 /*			interrupt-names = "rx"; */
@@ -39,7 +40,7 @@
 			reg = <0xBC0b0000 0x1000>;
             current-speed = <115200>;
             clock-frequency = <24000000>;
-            pd-id = <POWER_DOMAIN_IDX_SYSTOP>;
+            pd-id = <FWK_MODULE_IDX_POWER_DOMAIN POWER_DOMAIN_IDX_DBGSYS>;
 /*			clocks = <&uartclk>;*/
 /*			interrupts = <7 3>; */
 /*			interrupt-names = "rx"; */
@@ -47,5 +48,74 @@
 	    };
 
 
+    };
+
+    scp-fwk {
+        
+        scp-clk-dev@0 {
+            compatible = "arm,scp-clk-dev";
+            name = "I2SCLK";
+            driver-id = <FWK_MODULE_IDX_JUNO_CDCEL937 JUNO_CLOCK_CDCEL937_IDX_I2SCLK>;
+            api-id = <FWK_MODULE_IDX_JUNO_CDCEL937 MOD_JUNO_CDCEL937_API_IDX_CLOCK_DRIVER>;            
+        };
+
+        scp-clk-dev@1 {
+            compatible = "arm,scp-clk-dev";
+            name = "HDLCDREFCLK";
+            driver-id = <FWK_MODULE_IDX_JUNO_CDCEL937 JUNO_CLOCK_CDCEL937_IDX_HDLCDREFCLK>;
+            api-id = <FWK_MODULE_IDX_JUNO_CDCEL937 MOD_JUNO_CDCEL937_API_IDX_CLOCK_DRIVER >;
+        };
+
+        scp-clk-dev@2 {
+            compatible = "arm,scp-clk-dev";
+            name = "HDLCDPXL";
+            driver-id = <FWK_MODULE_IDX_JUNO_CDCEL937 JUNO_CLOCK_CDCEL937_IDX_HDLCDPXL>;
+            api-id = <FWK_MODULE_IDX_JUNO_CDCEL937 MOD_JUNO_CDCEL937_API_IDX_CLOCK_DRIVER >;
+        };
+
+        scp-clk-dev@3 {
+            compatible = "arm,scp-clk-dev";
+            name = "HDLCD_0";
+            driver-id = <FWK_MODULE_IDX_JUNO_HDLCD JUNO_CLOCK_HDLCD_IDX_HDLCD0>;
+            api-id = <FWK_MODULE_IDX_JUNO_HDLCD MOD_JUNO_HDLCD_API_IDX_CLOCK_DRIVER>;
+        };
+
+        scp-clk-dev@4 {
+            compatible = "arm,scp-clk-dev";
+            name = "HDLCD_1";
+            driver-id = <FWK_MODULE_IDX_JUNO_HDLCD JUNO_CLOCK_HDLCD_IDX_HDLCD1>;
+            api-id = <FWK_MODULE_IDX_JUNO_HDLCD MOD_JUNO_HDLCD_API_IDX_CLOCK_DRIVER>;
+        };
+
+        scp-clk-dev@5 {
+            compatible = "arm,scp-clk-dev";
+            name = "BIG_CLK";
+            driver-id = <FWK_MODULE_IDX_JUNO_SOC_CLOCK_RAM JUNO_CLOCK_SOC_RAM_IDX_BIGCLK>;
+            api-id = <FWK_MODULE_IDX_JUNO_SOC_CLOCK_RAM MOD_JUNO_SOC_CLOCK_RAM_API_IDX_DRIVER>;
+            pd-source-id = <FWK_MODULE_IDX_POWER_DOMAIN POWER_DOMAIN_IDX_BIG_SSTOP>;
+        };
+
+        scp-clk-dev@6 {
+            compatible = "arm,scp-clk-dev";
+            name = "LITTLE_CLK";
+            driver-id = <FWK_MODULE_IDX_JUNO_SOC_CLOCK_RAM JUNO_CLOCK_SOC_RAM_IDX_LITTLECLK>;
+            api-id = <FWK_MODULE_IDX_JUNO_SOC_CLOCK_RAM MOD_JUNO_SOC_CLOCK_RAM_API_IDX_DRIVER>;
+            pd-source-id = <FWK_MODULE_IDX_POWER_DOMAIN POWER_DOMAIN_IDX_LITTLE_SSTOP>;
+        };
+
+        scp-clk-dev@7 {
+            compatible = "arm,scp-clk-dev";
+            name = "GPU_CLK";
+            driver-id = <FWK_MODULE_IDX_JUNO_SOC_CLOCK_RAM JUNO_CLOCK_SOC_RAM_IDX_GPUCLK>;
+            api-id = <FWK_MODULE_IDX_JUNO_SOC_CLOCK_RAM MOD_JUNO_SOC_CLOCK_RAM_API_IDX_DRIVER>;
+            pd-source-id = <FWK_MODULE_IDX_POWER_DOMAIN POWER_DOMAIN_IDX_GPUTOP>;
+        };
+
+        mock-clock {
+            compatible = "arm,scp-mock-clock";
+            label = "MOCK_I2SCLK";
+            rate-table = <1536000 2116800 2304000 4233600 4608000 8467200 9216000>;
+            default-rate = <1536000>;
+        };
     };
 };
