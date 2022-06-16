@@ -36,6 +36,8 @@ set(SCP_ENABLE_PMI_INIT FALSE)
 
 set(SCP_FIRMWARE_DTS_SOURCE "${CMAKE_CURRENT_LIST_DIR}/../src/juno-scp.dts")
 
+list(PREPEND SCP_FIRMWARE_DTS_INCLUDE "${CMAKE_CURRENT_LIST_DIR}/../include")
+
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/juno_reset_domain")
 list(PREPEND SCP_MODULE_PATHS
@@ -107,3 +109,8 @@ list(APPEND SCP_MODULES "mock-psu")
 list(APPEND SCP_MODULES "juno-pvt")
 list(APPEND SCP_MODULES "juno-thermal")
 list(APPEND SCP_MODULES "mock-clock")
+
+# select device tree configured modules
+# These use the .dts configured variants 
+#list(APPEND SCP_DT_CONFIG_MODULES_STD "clock")
+list(APPEND SCP_DT_CONFIG_MODULES_DYN "pl011")
