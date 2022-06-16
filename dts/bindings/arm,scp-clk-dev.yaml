@@ -1,0 +1,28 @@
+# SCP firmware clock device software configuration
+
+
+description:  Driver and API indexes for SCP clock software module configuration.
+
+compatible: "arm,scp-clk-dev"
+
+include: base.yaml
+
+properties:  
+  name:
+    type: string
+    required: true
+
+  driver-id:
+    required: true
+    type: array
+
+  api-id:
+    required: true
+    type: array
+
+  pd-source-id:
+    required: false
+    type: array
+
+
+    
