@@ -14,3 +14,8 @@ target_sources(${SCP_MODULE_TARGET}
                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_gtimer.c")
 
 target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-clock module-timer)
+
+if(SCP_MODULE IN_LIST SCP_DT_CONFIG_MODULES_ALL)
+    target_sources(${SCP_MODULE_TARGET}
+                   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/config_dt_gtimer.c")
+endif()
