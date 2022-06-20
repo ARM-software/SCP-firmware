@@ -154,12 +154,12 @@
 
 /* ---- */
 
-/* fmw_cmsis.h */
+/* -- juno/include/fmw_cmsis.h */
     /* enum IRQn */
-    /* cherry pick limited sub-set */
+    /* cherry pick limited sub-set for now */
 #define TIMREFCLK_IRQ 2
+#define EXT_WAKEUP_IRQ 57 /* External GIC Interrupt Wakeup */
 
 /* ---- */
-
 
 #endif /* JUNO_DT_BINDINGS_H */

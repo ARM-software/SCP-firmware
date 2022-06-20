@@ -288,5 +288,29 @@
             module-id = <FWK_MODULE_IDX_GTIMER>;
             timer-irq = <TIMREFCLK_IRQ>;
         };
+
+        sys_pwr_state_table: sys-pwr-table@0 {
+            compatible = "arm,scp-sys-power-table";
+            label = "sys_power_to_ppu_state";
+            power-states = <MOD_PD_STATE_ON MOD_SYSTEM_POWER_POWER_STATE_SLEEP0 MOD_PD_STATE_OFF>;
+            power-values = <MOD_PD_STATE_ON MOD_SYSTEM_POWER_POWER_STATE_SLEEP0 MOD_PD_STATE_OFF>;
+        };
+
+        sys-pwr-device@0 {
+            compatible = "arm,scp-sys-power-dev";
+            label = "system_power";
+            ppu-id = <FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_SYSTOP>;
+            api-id = <FWK_MODULE_IDX_JUNO_PPU MOD_JUNO_PPU_API_IDX_PD>;
+            sys-state-table = <&sys_pwr_state_table>;
+        };
+
+        system-power-config@0 {
+            compatible = "arm,scp-system-power";
+            soc-wakeup-irq = <EXT_WAKEUP_IRQ>;
+            driver-id = <FWK_MODULE_IDX_JUNO_SYSTEM>;
+            api-id = <FWK_MODULE_IDX_JUNO_SYSTEM 0>;
+            init-pwr-state = <MOD_PD_STATE_ON>;
+
+        };
     };
 };
