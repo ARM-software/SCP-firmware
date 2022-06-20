@@ -154,6 +154,17 @@
 
 /* ---- */
 
+/* -- config_mock_psu.h -- */
+/* Mock PSU element indices for Juno */
+    /*enum mod_mock_psu_element_idx */
+#define MOD_MOCK_PSU_ELEMENT_IDX_VSYS       0
+#define MOD_MOCK_PSU_ELEMENT_IDX_VBIG       1
+#define MOD_MOCK_PSU_ELEMENT_IDX_VLITTLE    2
+#define MOD_MOCK_PSU_ELEMENT_IDX_VGPU       3
+#define MOD_MOCK_PSU_ELEMENT_IDX_COUNT      4
+
+/* ---- */
+
 /* -- juno/include/fmw_cmsis.h */
     /* enum IRQn */
     /* cherry pick limited sub-set for now */

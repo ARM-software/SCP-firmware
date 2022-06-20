@@ -312,5 +312,38 @@
             init-pwr-state = <MOD_PD_STATE_ON>;
 
         };
+
+        mock-psu@0 {
+            compatible = "arm,scp-mock-psu";
+            label = "VSYS";
+            default-voltage = <900>;
+            default-enabled;
+            elem-idx = <MOD_MOCK_PSU_ELEMENT_IDX_VSYS>;            
+        };
+
+       mock-psu@1 {
+            compatible = "arm,scp-mock-psu";
+            label = "VBIG";
+            default-voltage = <900>;
+            default-enabled;
+            elem-idx = <MOD_MOCK_PSU_ELEMENT_IDX_VBIG>;            
+        };
+
+        mock-psu@2 {
+            compatible = "arm,scp-mock-psu";
+            label = "VLITTLE";
+            default-voltage = <900>;
+            default-enabled;
+            elem-idx = <MOD_MOCK_PSU_ELEMENT_IDX_VLITTLE>;            
+        };
+
+        mock-psu@3 {
+            compatible = "arm,scp-mock-psu";
+            label = "VGPU";
+            default-voltage = <850>;
+            default-enabled;
+            elem-idx = <MOD_MOCK_PSU_ELEMENT_IDX_VGPU>;            
+        };
+
     };
 };

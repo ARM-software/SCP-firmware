@@ -25,6 +25,7 @@ target_include_directories(
 #             "${CMAKE_CURRENT_SOURCE_DIR}/config_power_domain.c"
 #            "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
 #            "${CMAKE_CURRENT_SOURCE_DIR}/config_system_power.c"
+#           "${CMAKE_CURRENT_SOURCE_DIR}/config_mock_psu.c"
 
 
 target_sources(
@@ -52,7 +53,6 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_sensor.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_reg_sensor.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_psu.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_mock_psu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_pvt.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_thermal.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_power_domain.c"
