@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -43,6 +43,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_css_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_morello_scp2pcc.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_xr77128.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_sensor.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_psu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_mock_psu.c"

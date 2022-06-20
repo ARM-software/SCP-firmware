@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -66,6 +66,7 @@ list(APPEND SCP_MODULES "clock")
 list(APPEND SCP_MODULES "gtimer")
 list(APPEND SCP_MODULES "timer")
 list(APPEND SCP_MODULES "morello-scp2pcc")
+list(APPEND SCP_MODULES "xr77128")
 list(APPEND SCP_MODULES "morello-sensor")
 list(APPEND SCP_MODULES "sensor")
 list(APPEND SCP_MODULES "dvfs")

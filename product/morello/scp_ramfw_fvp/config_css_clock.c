@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -22,8 +22,8 @@
 static const struct mod_css_clock_rate rate_table_cpu_group_0[] = {
     {
         /* Super Underdrive */
-        .rate = CSS_CLK_RATE_CPU_GRP0_SUPER_UNDERDRIVE,
-        .pll_rate = CSS_CLK_RATE_CPU_GRP0_SUPER_UNDERDRIVE,
+        .rate = CSS_CLK_RATE_CPU_GRP0_LEVEL1,
+        .pll_rate = CSS_CLK_RATE_CPU_GRP0_LEVEL1,
         .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
@@ -32,8 +32,8 @@ static const struct mod_css_clock_rate rate_table_cpu_group_0[] = {
     },
     {
         /* Underdrive */
-        .rate = CSS_CLK_RATE_CPU_GRP0_UNDERDRIVE,
-        .pll_rate = CSS_CLK_RATE_CPU_GRP0_UNDERDRIVE,
+        .rate = CSS_CLK_RATE_CPU_GRP0_LEVEL2,
+        .pll_rate = CSS_CLK_RATE_CPU_GRP0_LEVEL2,
         .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
@@ -42,8 +42,8 @@ static const struct mod_css_clock_rate rate_table_cpu_group_0[] = {
     },
     {
         /* Nominal */
-        .rate = CSS_CLK_RATE_CPU_GRP0_NOMINAL,
-        .pll_rate = CSS_CLK_RATE_CPU_GRP0_NOMINAL,
+        .rate = CSS_CLK_RATE_CPU_GRP0_LEVEL3,
+        .pll_rate = CSS_CLK_RATE_CPU_GRP0_LEVEL3,
         .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
@@ -52,8 +52,8 @@ static const struct mod_css_clock_rate rate_table_cpu_group_0[] = {
     },
     {
         /* Overdrive */
-        .rate = CSS_CLK_RATE_CPU_GRP0_OVERDRIVE,
-        .pll_rate = CSS_CLK_RATE_CPU_GRP0_OVERDRIVE,
+        .rate = CSS_CLK_RATE_CPU_GRP0_LEVEL4,
+        .pll_rate = CSS_CLK_RATE_CPU_GRP0_LEVEL4,
         .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
@@ -62,8 +62,8 @@ static const struct mod_css_clock_rate rate_table_cpu_group_0[] = {
     },
     {
         /* Super Overdrive */
-        .rate = CSS_CLK_RATE_CPU_GRP0_SUPER_OVERDRIVE,
-        .pll_rate = CSS_CLK_RATE_CPU_GRP0_SUPER_OVERDRIVE,
+        .rate = CSS_CLK_RATE_CPU_GRP0_LEVEL5,
+        .pll_rate = CSS_CLK_RATE_CPU_GRP0_LEVEL5,
         .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
@@ -75,8 +75,8 @@ static const struct mod_css_clock_rate rate_table_cpu_group_0[] = {
 static const struct mod_css_clock_rate rate_table_cpu_group_1[] = {
     {
         /* Super Underdrive */
-        .rate = CSS_CLK_RATE_CPU_GRP1_SUPER_UNDERDRIVE,
-        .pll_rate = CSS_CLK_RATE_CPU_GRP1_SUPER_UNDERDRIVE,
+        .rate = CSS_CLK_RATE_CPU_GRP1_LEVEL1,
+        .pll_rate = CSS_CLK_RATE_CPU_GRP1_LEVEL1,
         .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
@@ -85,8 +85,8 @@ static const struct mod_css_clock_rate rate_table_cpu_group_1[] = {
     },
     {
         /* Underdrive */
-        .rate = CSS_CLK_RATE_CPU_GRP1_UNDERDRIVE,
-        .pll_rate = CSS_CLK_RATE_CPU_GRP1_UNDERDRIVE,
+        .rate = CSS_CLK_RATE_CPU_GRP1_LEVEL2,
+        .pll_rate = CSS_CLK_RATE_CPU_GRP1_LEVEL2,
         .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
@@ -95,8 +95,8 @@ static const struct mod_css_clock_rate rate_table_cpu_group_1[] = {
     },
     {
         /* Nominal */
-        .rate = CSS_CLK_RATE_CPU_GRP1_NOMINAL,
-        .pll_rate = CSS_CLK_RATE_CPU_GRP1_NOMINAL,
+        .rate = CSS_CLK_RATE_CPU_GRP1_LEVEL3,
+        .pll_rate = CSS_CLK_RATE_CPU_GRP1_LEVEL3,
         .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
@@ -105,8 +105,8 @@ static const struct mod_css_clock_rate rate_table_cpu_group_1[] = {
     },
     {
         /* Overdrive */
-        .rate = CSS_CLK_RATE_CPU_GRP1_OVERDRIVE,
-        .pll_rate = CSS_CLK_RATE_CPU_GRP1_OVERDRIVE,
+        .rate = CSS_CLK_RATE_CPU_GRP1_LEVEL4,
+        .pll_rate = CSS_CLK_RATE_CPU_GRP1_LEVEL4,
         .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
@@ -115,8 +115,8 @@ static const struct mod_css_clock_rate rate_table_cpu_group_1[] = {
     },
     {
         /* Super Overdrive */
-        .rate = CSS_CLK_RATE_CPU_GRP1_SUPER_OVERDRIVE,
-        .pll_rate = CSS_CLK_RATE_CPU_GRP1_SUPER_OVERDRIVE,
+        .rate = CSS_CLK_RATE_CPU_GRP1_LEVEL5,
+        .pll_rate = CSS_CLK_RATE_CPU_GRP1_LEVEL5,
         .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_PLL0,
         .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .clock_div = 1,
@@ -156,7 +156,7 @@ static const struct fwk_element css_clock_element_table[] = {
                 .member_api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_PIK_CLOCK,
                     MOD_PIK_CLOCK_API_TYPE_CSS),
-                .initial_rate = CSS_CLK_RATE_CPU_GRP0_SUPER_OVERDRIVE,
+                .initial_rate = CSS_CLK_RATE_CPU_GRP0_LEVEL5,
                 .modulation_supported = true,
             }),
         },
@@ -180,7 +180,7 @@ static const struct fwk_element css_clock_element_table[] = {
                 .member_api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_PIK_CLOCK,
                     MOD_PIK_CLOCK_API_TYPE_CSS),
-                .initial_rate = CSS_CLK_RATE_CPU_GRP1_SUPER_OVERDRIVE,
+                .initial_rate = CSS_CLK_RATE_CPU_GRP1_LEVEL5,
                 .modulation_supported = true,
             }),
         },
