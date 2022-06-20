@@ -1,0 +1,33 @@
+# SCP firmware, juno PPU module configuration
+
+description: Configuration information for Juno PPU modules.
+
+compatible: "arm,juno-ppu"
+
+include: base.yaml
+
+properties:
+  reg:
+    required: true
+    description: Base address for the PPU device
+    type: array
+
+  timer-id:
+    required: true
+    type: int
+    description: ID of the timer used when operating the PPU
+
+  pd-type:
+    required: true
+    type: int
+    description: Power domain type.
+
+  irq-nums:
+    required: false
+    type: array
+    description: Interrupt numbers for wakeup_irq, wakeup_fiq and warm_reset_irq
+
+  elem-idx: 
+    required: true
+    type: int
+    description: SCP software element index to access table entry
