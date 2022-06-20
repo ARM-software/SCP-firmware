@@ -7,6 +7,7 @@
 
 /* base SCP .dtsi file for juno boards */
 
+#include "fwk_dt_bindings.h"
 #include "juno_dt_bindings.h"
 
 /* must be first include */
@@ -116,6 +117,159 @@
             label = "MOCK_I2SCLK";
             rate-table = <1536000 2116800 2304000 4233600 4608000 8467200 9216000>;
             default-rate = <1536000>;
+        };
+
+        pd_masks_systop: pd-mask-table@0 {
+            compatible = "arm,scp-pd-mask-table";
+            label = "pd_systop_masks";
+            pd-states = <0>;
+            mask-values = <(MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK | (1 << MOD_SYSTEM_POWER_POWER_STATE_SLEEP0))>;
+        };
+
+        pd_masks_toplevel: pd-mask-table@1 {
+            compatible = "arm,scp-pd-mask-table";
+            label = "pd_toplevel_masks";
+            pd-states = <MOD_PD_STATE_OFF MOD_PD_STATE_ON MOD_SYSTEM_POWER_POWER_STATE_SLEEP0>;
+            mask-values = <MOD_PD_STATE_OFF_MASK (MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK) MOD_PD_STATE_OFF_MASK>;            
+        };
+
+        pd_masks_cluster: pd-mask-table@2 {
+            compatible = "arm,scp-pd-mask-table";
+            label = "pd_cluster_masks";
+            pd-states = <MOD_PD_STATE_OFF MOD_PD_STATE_ON MOD_SYSTEM_POWER_POWER_STATE_SLEEP0>;
+            mask-values = <MOD_PD_STATE_OFF_MASK JUNO_CLUSTER_VALID_STATE_MASK MOD_PD_STATE_OFF_MASK>;            
+        };
+
+        pd_masks_core: pd-mask-table@3 {
+            compatible = "arm,scp-pd-mask-table";
+            label = "pd_core_masks";
+            pd-states = <MOD_PD_STATE_OFF MOD_PD_STATE_ON>;
+            mask-values = <(MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_SLEEP_MASK) JUNO_CORE_VALID_STATE_MASK>;
+        };
+
+        power-domain@0 {
+            compatible = "arm,scp-power-domain";
+            label = "BIG_CPU0";
+            pd-type = <MOD_PD_TYPE_CORE>;
+            pd-idx = <POWER_DOMAIN_IDX_BIG_CPU0>;
+            pd-parent = <&pd_big_sstop>;
+            driver-id = <FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_BIG_CPU0>;
+            api-id = <FWK_MODULE_IDX_JUNO_PPU MOD_JUNO_PPU_API_IDX_PD>;
+            allowed-mask-table = <&pd_masks_core>;
+        };
+
+        power-domain@1 {
+            compatible = "arm,scp-power-domain";
+            label = "BIG_CPU1";
+            pd-type = <MOD_PD_TYPE_CORE>;
+            pd-idx = <POWER_DOMAIN_IDX_BIG_CPU1>;
+            pd-parent = <&pd_big_sstop>;
+            driver-id = <FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_BIG_CPU1>;
+            api-id = <FWK_MODULE_IDX_JUNO_PPU MOD_JUNO_PPU_API_IDX_PD>;
+            allowed-mask-table = <&pd_masks_core>;
+            disable-state-trans-notifications;
+        };
+
+        power-domain@2 {
+            compatible = "arm,scp-power-domain";
+            label = "LITTLE_CPU0";
+            pd-type = <MOD_PD_TYPE_CORE>;
+            pd-idx = <POWER_DOMAIN_IDX_LITTLE_CPU0>;
+            pd-parent = <&pd_little_sstop>;
+            driver-id = <FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_LITTLE_CPU0>;
+            api-id = <FWK_MODULE_IDX_JUNO_PPU MOD_JUNO_PPU_API_IDX_PD>;
+            allowed-mask-table = <&pd_masks_core>;
+            disable-state-trans-notifications;
+        };
+
+        power-domain@3 {
+            compatible = "arm,scp-power-domain";
+            label = "LITTLE_CPU1";
+            pd-type = <MOD_PD_TYPE_CORE>;
+            pd-idx = <POWER_DOMAIN_IDX_LITTLE_CPU1>;
+            pd-parent = <&pd_little_sstop>;
+            driver-id = <FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_LITTLE_CPU1>;
+            api-id = <FWK_MODULE_IDX_JUNO_PPU MOD_JUNO_PPU_API_IDX_PD>;
+            allowed-mask-table = <&pd_masks_core>;
+            disable-state-trans-notifications;
+        };
+        
+        power-domain@4 {
+            compatible = "arm,scp-power-domain";
+            label = "LITTLE_CPU2";
+            pd-type = <MOD_PD_TYPE_CORE>;
+            pd-idx = <POWER_DOMAIN_IDX_LITTLE_CPU2>;
+            pd-parent = <&pd_little_sstop>;
+            driver-id = <FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_LITTLE_CPU2>;
+            api-id = <FWK_MODULE_IDX_JUNO_PPU MOD_JUNO_PPU_API_IDX_PD>;
+            allowed-mask-table = <&pd_masks_core>;
+            disable-state-trans-notifications;
+        };
+        
+        power-domain@5 {
+            compatible = "arm,scp-power-domain";
+            label = "LITTLE_CPU3";
+            pd-type = <MOD_PD_TYPE_CORE>;
+            pd-idx = <POWER_DOMAIN_IDX_LITTLE_CPU3>;
+            pd-parent = <&pd_little_sstop>;
+            driver-id = <FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_LITTLE_CPU3>;
+            api-id = <FWK_MODULE_IDX_JUNO_PPU MOD_JUNO_PPU_API_IDX_PD>;
+            allowed-mask-table = <&pd_masks_core>;
+            disable-state-trans-notifications;
+        };
+
+        pd_big_sstop: power-domain@6 {
+            compatible = "arm,scp-power-domain";
+            label = "BIG_SSTOP";
+            pd-type = <MOD_PD_TYPE_CLUSTER>;
+            pd-idx = <POWER_DOMAIN_IDX_BIG_SSTOP>;
+            pd-parent = <&pd_systop>;
+            driver-id = <FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_BIG_SSTOP>;
+            api-id = <FWK_MODULE_IDX_SYSTEM_POWER MOD_SYSTEM_POWER_API_IDX_PD_DRIVER>;
+            allowed-mask-table = <&pd_masks_cluster>;
+        };
+
+        pd_little_sstop: power-domain@7 {
+            compatible = "arm,scp-power-domain";
+            label = "LITTLE_SSTOP";
+            pd-type = <MOD_PD_TYPE_CLUSTER>;
+            pd-idx = <POWER_DOMAIN_IDX_LITTLE_SSTOP>;
+            pd-parent = <&pd_systop>;
+            driver-id = <FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_LITTLE_SSTOP>;
+            api-id = <FWK_MODULE_IDX_SYSTEM_POWER MOD_SYSTEM_POWER_API_IDX_PD_DRIVER>;
+            allowed-mask-table = <&pd_masks_cluster>;
+        };
+
+        power-domain@8 {
+            compatible = "arm,scp-power-domain";
+            label = "GPUTOP";
+            pd-type = <MOD_PD_TYPE_DEVICE>;
+            pd-idx = <POWER_DOMAIN_IDX_GPUTOP>;
+            pd-parent = <&pd_systop>;
+            driver-id = <FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_DBGSYS>;
+            api-id = <FWK_MODULE_IDX_SYSTEM_POWER MOD_SYSTEM_POWER_API_IDX_PD_DRIVER>;
+            allowed-mask-table = <&pd_masks_toplevel>;
+        };
+
+        power-domain@9 {
+            compatible = "arm,scp-power-domain";
+            label = "DBGSYS";
+            pd-type = <MOD_PD_TYPE_DEVICE_DEBUG>;
+            pd-idx = <POWER_DOMAIN_IDX_DBGSYS>;
+            pd-parent = <&pd_systop>;
+            driver-id = <FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_DBGSYS>;
+            api-id = <FWK_MODULE_IDX_SYSTEM_POWER MOD_SYSTEM_POWER_API_IDX_PD_DRIVER>;
+            allowed-mask-table = <&pd_masks_toplevel>;
+        };
+
+        pd_systop: power-domain@10 {
+            compatible = "arm,scp-power-domain";
+            label = "SYSTOP";
+            pd-type = <MOD_PD_TYPE_SYSTEM>;
+            pd-idx = <POWER_DOMAIN_IDX_SYSTOP>;
+            driver-id = <FWK_MODULE_IDX_SYSTEM_POWER>;
+            api-id = <FWK_MODULE_IDX_SYSTEM_POWER MOD_SYSTEM_POWER_API_IDX_PD_DRIVER>;
+            allowed-mask-table = <&pd_masks_systop>;
         };
     };
 };

@@ -27,7 +27,7 @@
     /* Level 2 */
 #define POWER_DOMAIN_IDX_SYSTOP         10
 
-#define POWER_DOMAIN_IDX_NONE           -1
+#define POWER_DOMAIN_IDX_NONE           0xffffffff
 
 
 /* from juno_clock_ids.h */ 
@@ -81,6 +81,39 @@
 #define MOD_JUNO_SOC_CLOCK_RAM_API_IDX_DRIVER   0
 #define MOD_JUNO_SOC_CLOCK_RAM_API_IDX_COUNT    1
 
+/* -- juno_power_domain.h -- */
+/* Mask for the core valid power states */
+#define JUNO_CORE_VALID_STATE_MASK (MOD_PD_STATE_OFF_MASK | \
+                                    MOD_PD_STATE_ON_MASK | \
+                                    MOD_PD_STATE_SLEEP_MASK)
 
+/* Mask for the cluster valid power states */
+#define JUNO_CLUSTER_VALID_STATE_MASK (MOD_PD_STATE_OFF_MASK | \
+                                       MOD_PD_STATE_ON_MASK)
+
+/* -- juno_ppu_idx.h -- */
+    /* enum juno_ppu_idx  */
+#define JUNO_PPU_DEV_IDX_BIG_CPU0       0
+#define JUNO_PPU_DEV_IDX_BIG_CPU1       1
+#define JUNO_PPU_DEV_IDX_BIG_SSTOP      2
+#define JUNO_PPU_DEV_IDX_LITTLE_CPU0    3
+#define JUNO_PPU_DEV_IDX_LITTLE_CPU1    4
+#define JUNO_PPU_DEV_IDX_LITTLE_CPU2    5
+#define JUNO_PPU_DEV_IDX_LITTLE_CPU3    6
+#define JUNO_PPU_DEV_IDX_LITTLE_SSTOP   7
+#define JUNO_PPU_DEV_IDX_GPUTOP         8
+#define JUNO_PPU_DEV_IDX_SYSTOP         9
+#define JUNO_PPU_DEV_IDX_DBGSYS         10
+#define JUNO_PPU_DEV_IDX_COUNT          11
+
+/* ---- */
+
+/* -- mod_juno_ppu.h -- */
+    /* enum mod_juno_ppu_api_idx */
+#define MOD_JUNO_PPU_API_IDX_PD     0
+#define MOD_JUNO_PPU_API_IDX_ROM    1
+#define MOD_JUNO_PPU_API_COUNT      2
+
+/* ---- */
 
 #endif /* JUNO_DT_BINDINGS_H */
