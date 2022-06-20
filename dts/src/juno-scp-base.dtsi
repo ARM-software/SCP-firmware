@@ -345,5 +345,105 @@
             elem-idx = <MOD_MOCK_PSU_ELEMENT_IDX_VGPU>;            
         };
 
+
+        juno-ppu {
+            #address-cells = <1>;
+            #size-cells = <0>;
+
+            big-systop-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_BIG_SSTOP>;
+                reg = <PPU_BIG_SSTOP_BASE>;
+                timer-id = <FWK_MODULE_IDX_TIMER>;
+                pd-type = <MOD_PD_TYPE_CLUSTER>;
+            };
+
+            big-cpu0-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_BIG_CPU0>;
+                reg = <PPU_BIG_CPU0_BASE>;
+                timer-id = <FWK_MODULE_IDX_TIMER>;
+                pd-type = <MOD_PD_TYPE_CORE>;
+                irq-nums = <BIG_0_IRQ_WAKEUP_IRQ BIG_0_FIQ_WAKEUP_IRQ BIG_0_WARM_RST_REQ_IRQ>;            
+            };
+
+            big-cpu1-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_BIG_CPU1>;
+                reg = <PPU_BIG_CPU1_BASE>; 
+                timer-id = <FWK_MODULE_IDX_TIMER>;
+                pd-type = <MOD_PD_TYPE_CORE>;
+                irq-nums = <BIG_1_IRQ_WAKEUP_IRQ BIG_1_FIQ_WAKEUP_IRQ BIG_1_WARM_RST_REQ_IRQ>;            
+            };
+
+            little-systop-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_LITTLE_SSTOP>;
+                reg = <PPU_LITTLE_SSTOP_BASE>;
+                timer-id = <FWK_MODULE_IDX_TIMER>;
+                pd-type = <MOD_PD_TYPE_CLUSTER>;
+            };
+
+            little-cpu0-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_LITTLE_CPU0>;
+                reg = <PPU_LITTLE_CPU0_BASE>;
+                timer-id = <FWK_MODULE_IDX_TIMER>;
+                pd-type = <MOD_PD_TYPE_CORE>;
+                irq-nums = <LITTLE_0_IRQ_WAKEUP_IRQ LITTLE_0_FIQ_WAKEUP_IRQ LITTLE_0_WARM_RST_REQ_IRQ>;            
+            };
+
+            little-cpu1-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_LITTLE_CPU1>;
+                reg = <PPU_LITTLE_CPU1_BASE>;
+                timer-id = <FWK_MODULE_IDX_TIMER>;
+                pd-type = <MOD_PD_TYPE_CORE>;
+                irq-nums = <LITTLE_1_IRQ_WAKEUP_IRQ LITTLE_1_FIQ_WAKEUP_IRQ LITTLE_1_WARM_RST_REQ_IRQ>;            
+            };
+
+            little-cpu2-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_LITTLE_CPU2>;
+                reg = <PPU_LITTLE_CPU2_BASE>;
+                timer-id = <FWK_MODULE_IDX_TIMER>;
+                pd-type = <MOD_PD_TYPE_CORE>;
+                irq-nums = <LITTLE_2_IRQ_WAKEUP_IRQ LITTLE_2_FIQ_WAKEUP_IRQ LITTLE_2_WARM_RST_REQ_IRQ>;            
+            };
+
+            little-cpu3-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_LITTLE_CPU3>;
+                reg = <PPU_LITTLE_CPU3_BASE>;
+                timer-id = <FWK_MODULE_IDX_TIMER>;
+                pd-type = <MOD_PD_TYPE_CORE>;
+                irq-nums = <LITTLE_3_IRQ_WAKEUP_IRQ LITTLE_3_FIQ_WAKEUP_IRQ LITTLE_3_WARM_RST_REQ_IRQ>;            
+            };
+
+            gpu-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_GPUTOP>;
+                reg = <PPU_GPUTOP_BASE>;
+                timer-id = <FWK_MODULE_IDX_TIMER>;
+                pd-type = <MOD_PD_TYPE_DEVICE>;
+            };
+
+            systop-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_SYSTOP>;
+                reg = <PPU_SYSTOP_BASE>;
+                timer-id = <FWK_MODULE_IDX_TIMER>;
+                pd-type = <MOD_PD_TYPE_SYSTEM>;
+            };
+
+            dbgsys-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_DBGSYS>;
+                reg = <PPU_DBGSYS_BASE>;
+                timer-id = <FWK_MODULE_IDX_TIMER>;
+                pd-type = <MOD_PD_TYPE_DEVICE_DEBUG>;
+            };
+        };
+
     };
 };

@@ -169,7 +169,31 @@
     /* enum IRQn */
     /* cherry pick limited sub-set for now */
 #define TIMREFCLK_IRQ 2
+#define BIG_0_IRQ_WAKEUP_IRQ 24 /* big CPU0 IRQ Wakeup Request */
+#define BIG_0_FIQ_WAKEUP_IRQ 25 /* big CPU0 FIQ Wakeup Request */
+#define BIG_1_IRQ_WAKEUP_IRQ 26 /* big CPU1 IRQ Wakeup Request */
+#define BIG_1_FIQ_WAKEUP_IRQ 27 /* big CPU1 FIQ Wakeup Request */
+#define BIG_2_IRQ_WAKEUP_IRQ 28 /* big CPU2 IRQ Wakeup Request */
+#define BIG_2_FIQ_WAKEUP_IRQ 29 /* big CPU2 FIQ Wakeup Request */
+#define BIG_3_IRQ_WAKEUP_IRQ 30 /* big CPU3 IRQ Wakeup Request */
+#define BIG_3_FIQ_WAKEUP_IRQ 31 /* big CPU3 FIQ Wakeup Request */
+#define LITTLE_0_IRQ_WAKEUP_IRQ 32 /* LITTLE CPU0 IRQ Wakeup Request */
+#define LITTLE_0_FIQ_WAKEUP_IRQ 33 /* LITTLE CPU0 FIQ Wakeup Request */
+#define LITTLE_1_IRQ_WAKEUP_IRQ 34 /* LITTLE CPU1 IRQ Wakeup Request */
+#define LITTLE_1_FIQ_WAKEUP_IRQ 35 /* LITTLE CPU1 FIQ Wakeup Request */
+#define LITTLE_2_IRQ_WAKEUP_IRQ 36 /* LITTLE CPU2 IRQ Wakeup Request */
+#define LITTLE_2_FIQ_WAKEUP_IRQ 37 /* LITTLE CPU2 FIQ Wakeup Request */
+#define LITTLE_3_IRQ_WAKEUP_IRQ 38 /* LITTLE CPU3 IRQ Wakeup Request */
+#define LITTLE_3_FIQ_WAKEUP_IRQ 39 /* LITTLE CPU3 FIQ Wakeup Request */
 #define EXT_WAKEUP_IRQ 57 /* External GIC Interrupt Wakeup */
+#define BIG_0_WARM_RST_REQ_IRQ 58 /* big CPU0 Warm Reset Request */
+#define BIG_1_WARM_RST_REQ_IRQ 59 /* big CPU1 Warm Reset Request */
+#define BIG_2_WARM_RST_REQ_IRQ 60 /* big CPU2 Warm Reset Request */
+#define BIG_3_WARM_RST_REQ_IRQ 61 /* big CPU3 Warm Reset Request */
+#define LITTLE_0_WARM_RST_REQ_IRQ 62 /* LITTLE CPU0 Warm Reset Request */
+#define LITTLE_1_WARM_RST_REQ_IRQ 63 /* LITTLE CPU1 Warm Reset Request */
+#define LITTLE_2_WARM_RST_REQ_IRQ 64 /* LITTLE CPU2 Warm Reset Request */
+#define LITTLE_3_WARM_RST_REQ_IRQ 65 /* LITTLE CPU3 Warm Reset Request */
 
 /* ---- */
 

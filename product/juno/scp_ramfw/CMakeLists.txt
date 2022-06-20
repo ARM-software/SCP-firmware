@@ -19,13 +19,14 @@ target_include_directories(
 
 # files removed from build and replaced with _dt_ build versions
 # as modules added to dt vars in Firmware.cmake
-#            "${CMAKE_CURRENT_SOURCE_DIR}/config_pl011.c"
-#             "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"
-#             "${CMAKE_CURRENT_SOURCE_DIR}/config_mock_clock.c"
-#             "${CMAKE_CURRENT_SOURCE_DIR}/config_power_domain.c"
-#            "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
-#            "${CMAKE_CURRENT_SOURCE_DIR}/config_system_power.c"
+#           "${CMAKE_CURRENT_SOURCE_DIR}/config_pl011.c"
+#           "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"
+#           "${CMAKE_CURRENT_SOURCE_DIR}/config_mock_clock.c"
+#           "${CMAKE_CURRENT_SOURCE_DIR}/config_power_domain.c"
+#           "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
+#           "${CMAKE_CURRENT_SOURCE_DIR}/config_system_power.c"
 #           "${CMAKE_CURRENT_SOURCE_DIR}/config_mock_psu.c"
+#           "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_ppu.c"
 
 
 target_sources(
@@ -40,7 +41,6 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_ddr_phy400.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_dmc400.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_ram.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_ppu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_mhu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_smt.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi.c"
