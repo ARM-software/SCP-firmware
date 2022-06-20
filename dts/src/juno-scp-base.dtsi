@@ -271,5 +271,22 @@
             api-id = <FWK_MODULE_IDX_SYSTEM_POWER MOD_SYSTEM_POWER_API_IDX_PD_DRIVER>;
             allowed-mask-table = <&pd_masks_systop>;
         };
+
+        scp-gtimer@0 {
+            compatible = "arm,scp-gtimer";
+            label = "generic timer";
+            timer-addr = <REFCLK_CNTBASE0_BASE>;
+            counter-addr = <REFCLK_CNTCTL_BASE>;
+            control-addr = <REFCLK_CNTCONTROL_BASE>;
+            frequency = <CLOCK_RATE_REFCLK>;            
+        };
+
+        scp-timer@0 {
+            compatible = "arm,scp-timer";
+            label = "REFCLK";
+            sub-elem-count = <JUNO_ALARM_IDX_COUNT>;
+            module-id = <FWK_MODULE_IDX_GTIMER>;
+            timer-irq = <TIMREFCLK_IRQ>;
+        };
     };
 };

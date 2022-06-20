@@ -23,6 +23,7 @@ target_include_directories(
 #             "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"
 #             "${CMAKE_CURRENT_SOURCE_DIR}/config_mock_clock.c"
 #             "${CMAKE_CURRENT_SOURCE_DIR}/config_power_domain.c"
+#            "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
 
 
 target_sources(
@@ -34,7 +35,6 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_dvfs.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_cdcel937.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_hdlcd.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_ddr_phy400.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_dmc400.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_ram.c"

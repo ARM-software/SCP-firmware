@@ -9,6 +9,7 @@
 #define JUNO_DT_BINDINGS_H
 
 #include "juno_mmap.h"
+#include "system_clock.h"
 
 /* Level 0 */
 #define POWER_DOMAIN_IDX_BIG_CPU0       0
@@ -115,5 +116,50 @@
 #define MOD_JUNO_PPU_API_COUNT      2
 
 /* ---- */
+
+/* -- juno_alarm_idx.h -- */
+#define JUNO_ALARM_ELEMENT_IDX 0
+
+    /* Alarm indices for XRP7724 */
+    /* enum juno_xrp7724_alarm_idx */
+#define JUNO_XRP7724_ALARM_IDX_PSU_VSYS 0
+#define JUNO_XRP7724_ALARM_IDX_PSU_VBIG 1
+#define JUNO_XRP7724_ALARM_IDX_PSU_VLITTLE 2
+#define JUNO_XRP7724_ALARM_IDX_PSU_VGPU 3
+#define JUNO_XRP7724_ALARM_IDX_COUNT 4
+
+
+    /* Alarm indices for DVFS */
+    /* enum juno_dvfs_alarm_idx */
+#define JUNO_DVFS_ALARM_VLITTLE_IDX JUNO_XRP7724_ALARM_IDX_COUNT
+#define JUNO_DVFS_ALARM_BIG_IDX (JUNO_DVFS_ALARM_VLITTLE_IDX + 1)
+#define JUNO_DVFS_ALARM_GPU_IDX (JUNO_DVFS_ALARM_VLITTLE_IDX + 2)
+#ifdef BUILD_HAS_FAST_CHANNELS
+#define JUNO_SCMI_FAST_CHANNEL_IDX (JUNO_DVFS_ALARM_VLITTLE_IDX + 3)
+#define JUNO_DVFS_ALARM_IDX_CNT (JUNO_DVFS_ALARM_VLITTLE_IDX + 4)
+#else
+#define JUNO_DVFS_ALARM_IDX_CNT  (JUNO_DVFS_ALARM_VLITTLE_IDX + 3)
+#endif
+
+    /* enum juno_misc_alarm_idx  */
+#define JUNO_PPU_ALARM_IDX  JUNO_DVFS_ALARM_IDX_CNT
+#define JUNO_THERMAL_ALARM_IDX (JUNO_PPU_ALARM_IDX + 1)
+#ifdef BUILD_HAS_MOD_STATISTICS
+#define JUNO_STATISTICS_ALARM_IDX (JUNO_PPU_ALARM_IDX + 2)
+#define JUNO_SYSTEM_POWER_ALARM_IDX (JUNO_PPU_ALARM_IDX + 3)
+#else
+#define JUNO_SYSTEM_POWER_ALARM_IDX (JUNO_PPU_ALARM_IDX + 2)
+#endif
+#define JUNO_ALARM_IDX_COUNT (JUNO_SYSTEM_POWER_ALARM_IDX + 1)
+
+/* ---- */
+
+/* fmw_cmsis.h */
+    /* enum IRQn */
+    /* cherry pick limited sub-set */
+#define TIMREFCLK_IRQ 2
+
+/* ---- */
+
 
 #endif /* JUNO_DT_BINDINGS_H */
