@@ -114,6 +114,7 @@ list(APPEND UNIT_MODULE scmi_sensor_req)
 list(APPEND UNIT_MODULE scmi_system_power_req)
 list(APPEND UNIT_MODULE thermal_mgmt)
 list(APPEND UNIT_MODULE traffic_cop)
+list(APPEND UNIT_MODULE xr77128)
 
 list(LENGTH UNIT_MODULE UNIT_TEST_MAX)
 
