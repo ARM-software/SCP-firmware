@@ -1,12 +1,14 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
  *     MORELLO SCP to PCC communications protocol driver
  */
+
+#include "config_cdns_i2c.h"
 
 #include <internal/morello_scp2pcc.h>
 
@@ -52,7 +54,8 @@ static int send_message(
     }
 
     status = morello_scp2pcc_ctx.i2c_api->write(
-        (FWK_ID_ELEMENT(FWK_MODULE_IDX_CDNS_I2C, 2)),
+        (FWK_ID_ELEMENT(
+            FWK_MODULE_IDX_CDNS_I2C, CONFIG_CDNS_I2C_ELEMENT_IDX_PCC)),
         MORELLO_SCP2PCC_I2C_ADDRESS,
         (void *)&msg,
         MORELLO_SCP2PCC_MSG_LEN,
@@ -63,7 +66,8 @@ static int send_message(
 
     /* Fetch the response */
     status = morello_scp2pcc_ctx.i2c_api->read(
-        (FWK_ID_ELEMENT(FWK_MODULE_IDX_CDNS_I2C, 2)),
+        (FWK_ID_ELEMENT(
+            FWK_MODULE_IDX_CDNS_I2C, CONFIG_CDNS_I2C_ELEMENT_IDX_PCC)),
         MORELLO_SCP2PCC_I2C_ADDRESS,
         (void *)&msg,
         MORELLO_SCP2PCC_MSG_LEN);
