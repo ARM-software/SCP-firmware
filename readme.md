@@ -9,7 +9,7 @@ References
 [1] Power Control System Architecture - DEN0050C (Please contact Arm directly to
 obtain a copy of this document)
 
-[2] [System Control and Management Interface - DEN0056A](https://developer.arm.com/documentation/den0056/a/)
+[2] [System Control and Management Interface - DEN0056A](https://developer.arm.com/documentation/den0056/d/)
 
 [3] Power Policy Unit - DEN0051C (Please contact Arm directly to obtain a copy
 of this document)
