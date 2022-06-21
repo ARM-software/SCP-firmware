@@ -22,6 +22,7 @@ inline static void arch_interrupts_enable(unsigned int not_used)
  */
 inline static unsigned int arch_interrupts_disable(void)
 {
+    return 0;
 }
 
 /*!
