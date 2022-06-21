@@ -1290,8 +1290,7 @@ static int scmi_clock_describe_rates_handler(fwk_id_t service_id,
 
         return_values.num_rates_flags =
             SCMI_CLOCK_DESCRIBE_RATES_NUM_RATES_FLAGS(
-                /* Only a single rate is returned */
-                1U,
+                SCMI_CLOCK_NUM_OF_RATES_RANGE,
                 SCMI_CLOCK_RATE_FORMAT_RANGE,
                 /* No further rates are available */
                 0U);
