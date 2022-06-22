@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -80,10 +80,12 @@ MEMBER_TABLE_CPU_GROUP(0);
 MEMBER_TABLE_CPU_GROUP(1);
 MEMBER_TABLE_CPU_GROUP(2);
 MEMBER_TABLE_CPU_GROUP(3);
+#if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 1)
 MEMBER_TABLE_CPU_GROUP(4);
 MEMBER_TABLE_CPU_GROUP(5);
 MEMBER_TABLE_CPU_GROUP(6);
 MEMBER_TABLE_CPU_GROUP(7);
+#endif
 #if (PLATFORM_VARIANT == 0)
 MEMBER_TABLE_CPU_GROUP(8);
 MEMBER_TABLE_CPU_GROUP(9);
@@ -98,8 +100,10 @@ MEMBER_TABLE_CPU_GROUP(15);
 static const struct fwk_element css_clock_element_table[] = {
     CLOCK_CSS_CPU_GROUP(0),        CLOCK_CSS_CPU_GROUP(1),
     CLOCK_CSS_CPU_GROUP(2),        CLOCK_CSS_CPU_GROUP(3),
+#if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 1)
     CLOCK_CSS_CPU_GROUP(4),        CLOCK_CSS_CPU_GROUP(5),
     CLOCK_CSS_CPU_GROUP(6),        CLOCK_CSS_CPU_GROUP(7),
+#endif
 #if (PLATFORM_VARIANT == 0)
     CLOCK_CSS_CPU_GROUP(8),        CLOCK_CSS_CPU_GROUP(9),
     CLOCK_CSS_CPU_GROUP(10),       CLOCK_CSS_CPU_GROUP(11),

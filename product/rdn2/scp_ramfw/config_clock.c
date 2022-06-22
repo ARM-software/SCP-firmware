@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -35,10 +35,12 @@ static const struct fwk_element clock_dev_desc_table[] = {
     CLOCK_CPU_GROUP(1),
     CLOCK_CPU_GROUP(2),
     CLOCK_CPU_GROUP(3),
+#if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 1)
     CLOCK_CPU_GROUP(4),
     CLOCK_CPU_GROUP(5),
     CLOCK_CPU_GROUP(6),
     CLOCK_CPU_GROUP(7),
+#endif
 #if (PLATFORM_VARIANT == 0)
     CLOCK_CPU_GROUP(8),
     CLOCK_CPU_GROUP(9),

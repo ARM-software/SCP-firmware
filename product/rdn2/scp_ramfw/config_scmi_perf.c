@@ -63,6 +63,7 @@ static const struct mod_scmi_perf_domain_config domains[] = {
             .fast_channels_addr_ap = (uint64_t[])FAST_CHANNEL_ADDRESS_AP(2) },
     [3] = { .fast_channels_addr_scp = (uint64_t[])FAST_CHANNEL_ADDRESS_SCP(3),
             .fast_channels_addr_ap = (uint64_t[])FAST_CHANNEL_ADDRESS_AP(3) },
+#    if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 1)
     [4] = { .fast_channels_addr_scp = (uint64_t[])FAST_CHANNEL_ADDRESS_SCP(4),
             .fast_channels_addr_ap = (uint64_t[])FAST_CHANNEL_ADDRESS_AP(4) },
     [5] = { .fast_channels_addr_scp = (uint64_t[])FAST_CHANNEL_ADDRESS_SCP(5),
@@ -71,6 +72,7 @@ static const struct mod_scmi_perf_domain_config domains[] = {
             .fast_channels_addr_ap = (uint64_t[])FAST_CHANNEL_ADDRESS_AP(6) },
     [7] = { .fast_channels_addr_scp = (uint64_t[])FAST_CHANNEL_ADDRESS_SCP(7),
             .fast_channels_addr_ap = (uint64_t[])FAST_CHANNEL_ADDRESS_AP(7) },
+#    endif
 #    if (PLATFORM_VARIANT == 0)
     [8] = { .fast_channels_addr_scp = (uint64_t[])FAST_CHANNEL_ADDRESS_SCP(8),
             .fast_channels_addr_ap = (uint64_t[])FAST_CHANNEL_ADDRESS_AP(8) },
@@ -93,8 +95,12 @@ static const struct mod_scmi_perf_domain_config domains[] = {
 #else
 #    if (PLATFORM_VARIANT == 0)
 static const struct mod_scmi_perf_domain_config domains[16] = { 0 };
-#    else
+#    elif (PLATFORM_VARIANT == 1)
 static const struct mod_scmi_perf_domain_config domains[8] = { 0 };
+#    elif (PLATFORM_VARIANT == 2)
+static const struct mod_scmi_perf_domain_config domains[4] = { 0 };
+#    else
+#        error "Unsupported PLATFORM_VARIANT value"
 #    endif
 #endif
 

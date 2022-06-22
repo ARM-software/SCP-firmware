@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -22,6 +22,7 @@
 #include <mod_ppu_v1.h>
 #include <mod_scmi.h>
 #include <mod_sds.h>
+#include <mod_system_info.h>
 #include <mod_system_power.h>
 
 #include <fwk_assert.h>
@@ -61,6 +62,9 @@ struct platform_system_ctx {
 
     /* CMN Address Translation API */
     const struct mod_apremap_cmn_atrans_api *apremap_cmn_atrans_api;
+
+    /* System Information HAL API pointer */
+    struct mod_system_info_get_info_api *system_info_api;
 };
 
 struct platform_system_isr {
@@ -268,6 +272,14 @@ static int platform_system_bind(fwk_id_t id, unsigned int round)
         return status;
     }
 
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_SYSTEM_INFO),
+        FWK_ID_API(FWK_MODULE_IDX_SYSTEM_INFO, MOD_SYSTEM_INFO_GET_API_IDX),
+        &platform_system_ctx.system_info_api);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
     return fwk_module_bind(
         fwk_module_id_sds,
         FWK_ID_API(FWK_MODULE_IDX_SDS, 0),
@@ -286,15 +298,45 @@ static int platform_system_process_bind_request(
 
 static int platform_system_start(fwk_id_t id)
 {
+    const struct mod_system_info *system_info;
+    uint8_t chip_id;
     int status;
     unsigned int i;
 
-    status = fwk_notification_subscribe(
-        mod_clock_notification_id_state_changed,
-        FWK_ID_ELEMENT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_INTERCONNECT),
-        id);
+    status = platform_system_ctx.system_info_api->get_system_info(&system_info);
     if (status != FWK_SUCCESS) {
-        return status;
+        FWK_LOG_ERR("[PLATFORM SYSTEM] Failed to obtain system information");
+        return FWK_E_PANIC;
+    }
+    chip_id = system_info->chip_id;
+
+    /*
+     * Subscribe to interconnect clock state change and SDS notification only
+     * for the chip on which the first application core starts the boot
+     * process.
+     */
+    if (chip_id == 0) {
+        /*
+         * Subscribe to interconnect clock state change notification to
+         * to power up the first application core.
+         */
+        status = fwk_notification_subscribe(
+            mod_clock_notification_id_state_changed,
+            FWK_ID_ELEMENT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_INTERCONNECT),
+            id);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+
+        /*
+         * Subscribe to the SDS initialized notification so we can correctly let
+         * the PSCI agent know that the SCMI stack is initialized.
+         */
+        status = fwk_notification_subscribe(
+            mod_sds_notification_id_initialized, fwk_module_id_sds, id);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
     }
 
     /*
@@ -320,16 +362,6 @@ static int platform_system_start(fwk_id_t id)
         if (status != FWK_SUCCESS) {
             return status;
         }
-    }
-
-    /*
-     * Subscribe to the SDS initialized notification so we can correctly let the
-     * PSCI agent know that the SCMI stack is initialized.
-     */
-    status = fwk_notification_subscribe(
-        mod_sds_notification_id_initialized, fwk_module_id_sds, id);
-    if (status != FWK_SUCCESS) {
-        return status;
     }
 
     status = platform_system_ctx.mod_pd_restricted_api->set_state(

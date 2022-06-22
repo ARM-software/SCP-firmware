@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -61,12 +61,14 @@ static const struct fwk_element pcie_integ_ctrl_element_table[] = {
         AP_PCIE_MMIOL_SIZE_PER_RC,
         AP_PCIE_MMIOH_SIZE_PER_RC),
 
+#if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 1)
     IO_MACRO_ELEMENT_CONFIG(
         1,
         PCIE_INTEG_CTRL_REG_BASE(1),
         AP_PCIE_ECAM_SIZE_PER_RC,
         AP_PCIE_MMIOL_SIZE_PER_RC,
         AP_PCIE_MMIOH_SIZE_PER_RC),
+#endif
 
 #if (PLATFORM_VARIANT == 0)
     IO_MACRO_ELEMENT_CONFIG(
@@ -83,7 +85,7 @@ static const struct fwk_element pcie_integ_ctrl_element_table[] = {
         AP_PCIE_MMIOL_SIZE_PER_RC,
         AP_PCIE_MMIOH_SIZE_PER_RC),
 #endif
-
+#if (PLATFORM_VARIANT != 2)
     {
         .name = "Non-PCIe IO Macro",
         .data = &((struct mod_pcie_integ_ctrl_config) {
@@ -120,6 +122,7 @@ static const struct fwk_element pcie_integ_ctrl_element_table[] = {
                 CLOCK_IDX_INTERCONNECT),
         }),
     },
+#endif
 
     { 0 }
 };

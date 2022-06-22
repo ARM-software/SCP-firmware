@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -17,7 +17,7 @@ static const struct fwk_element subsystem_table[] = {
     { .name = "RD-N2",
       .data =
           &(struct mod_sid_subsystem_config){
-#if (PLATFORM_VARIANT == 0)
+#if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 2)
               .part_number = 0x7B7,
 #else
               .part_number = 0x7B6,

@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -12,8 +12,13 @@ if(SCP_PLATFORM_VARIANT STREQUAL "0")
     target_compile_definitions(${SCP_MODULE_TARGET} PUBLIC -DPLATFORM_VARIANT=0)
 elseif(SCP_PLATFORM_VARIANT STREQUAL "1")
     target_compile_definitions(${SCP_MODULE_TARGET} PUBLIC -DPLATFORM_VARIANT=1)
+elseif(SCP_PLATFORM_VARIANT STREQUAL "2")
+    target_compile_definitions(${SCP_MODULE_TARGET} PUBLIC -DPLATFORM_VARIANT=2)
 else()
-    message(FATAL_ERROR "Please set SCP_PLATFORM_VARIANT to '0' for RDN2 or SCP_PLATFORM_VARIANT to '1' for RDN2CFG1")
+    message(FATAL_ERROR "Please set SCP_PLATFORM_VARIANT to \n"
+                                 "'0' for RD-N2 \n"
+                                 "'1' for RD-N2-Cfg1 \n"
+                                 "'2' for RD-N2-Cfg2 \n")
 endif()
 
 target_include_directories(${SCP_MODULE_TARGET}

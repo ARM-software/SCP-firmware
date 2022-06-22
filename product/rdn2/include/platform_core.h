@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -15,9 +15,24 @@
 #define CORES_PER_CLUSTER  1
 #if (PLATFORM_VARIANT == 0)
 #    define NUMBER_OF_CLUSTERS 16
-#else
+#elif (PLATFORM_VARIANT == 1)
 #    define NUMBER_OF_CLUSTERS 8
+#elif (PLATFORM_VARIANT == 2)
+#    define NUMBER_OF_CLUSTERS 4
+#else
+#    error "Unsupported PLATFORM_VARIANT value"
 #endif
+
+/* Number of chips supported on the platform. */
+enum platform_chip_id {
+    PLATFORM_CHIP_0,
+#if (PLATFORM_VARIANT == 2)
+    PLATFORM_CHIP_1,
+    PLATFORM_CHIP_2,
+    PLATFORM_CHIP_3,
+#endif
+    PLATFORM_CHIP_COUNT
+};
 
 static inline unsigned int platform_get_cluster_count(void)
 {

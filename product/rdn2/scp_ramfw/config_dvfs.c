@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -45,10 +45,12 @@ static const struct mod_dvfs_domain_config cpu0 = DVFS_DOMAIN_CPU_GROUP_IDX(0);
 static const struct mod_dvfs_domain_config cpu1 = DVFS_DOMAIN_CPU_GROUP_IDX(1);
 static const struct mod_dvfs_domain_config cpu2 = DVFS_DOMAIN_CPU_GROUP_IDX(2);
 static const struct mod_dvfs_domain_config cpu3 = DVFS_DOMAIN_CPU_GROUP_IDX(3);
+#if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 1)
 static const struct mod_dvfs_domain_config cpu4 = DVFS_DOMAIN_CPU_GROUP_IDX(4);
 static const struct mod_dvfs_domain_config cpu5 = DVFS_DOMAIN_CPU_GROUP_IDX(5);
 static const struct mod_dvfs_domain_config cpu6 = DVFS_DOMAIN_CPU_GROUP_IDX(6);
 static const struct mod_dvfs_domain_config cpu7 = DVFS_DOMAIN_CPU_GROUP_IDX(7);
+#endif
 #if (PLATFORM_VARIANT == 0)
 static const struct mod_dvfs_domain_config cpu8 = DVFS_DOMAIN_CPU_GROUP_IDX(8);
 static const struct mod_dvfs_domain_config cpu9 = DVFS_DOMAIN_CPU_GROUP_IDX(9);
@@ -71,10 +73,12 @@ static const struct fwk_element element_table[] = {
     DVFS_ELEMENT_IDX(1),
     DVFS_ELEMENT_IDX(2),
     DVFS_ELEMENT_IDX(3),
+#if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 1)
     DVFS_ELEMENT_IDX(4),
     DVFS_ELEMENT_IDX(5),
     DVFS_ELEMENT_IDX(6),
     DVFS_ELEMENT_IDX(7),
+#endif
 #if (PLATFORM_VARIANT == 0)
     DVFS_ELEMENT_IDX(8),
     DVFS_ELEMENT_IDX(9),
