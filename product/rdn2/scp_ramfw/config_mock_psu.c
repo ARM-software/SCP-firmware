@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -28,10 +28,12 @@ static const struct fwk_element element_table[] = {
     MOCK_PSU_ELEMENT_IDX(1),
     MOCK_PSU_ELEMENT_IDX(2),
     MOCK_PSU_ELEMENT_IDX(3),
+#if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 1)
     MOCK_PSU_ELEMENT_IDX(4),
     MOCK_PSU_ELEMENT_IDX(5),
     MOCK_PSU_ELEMENT_IDX(6),
     MOCK_PSU_ELEMENT_IDX(7),
+#endif
 #if (PLATFORM_VARIANT == 0)
     MOCK_PSU_ELEMENT_IDX(8),
     MOCK_PSU_ELEMENT_IDX(9),

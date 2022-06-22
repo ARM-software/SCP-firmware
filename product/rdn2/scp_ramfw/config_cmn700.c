@@ -6,6 +6,7 @@
  */
 
 #include "clock_soc.h"
+#include "platform_core.h"
 #include "platform_def.h"
 #include "scp_css_mmap.h"
 #include "scp_soc_mmap.h"
@@ -20,6 +21,18 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+
+/* CCG ports available on the platforms. */
+enum mod_cmn700_ccg_port {
+    CCG_PORT_0,
+    CCG_PORT_1,
+    CCG_PORT_2,
+    CCG_PORT_3,
+    CCG_PORT_4,
+    CCG_PORT_5,
+};
+
+#define RNF_PER_CHIP 8
 
 /*
  * CMN700 nodes
@@ -62,6 +75,23 @@
 
 #    define MESH_SIZE_X 3
 #    define MESH_SIZE_Y 3
+
+#elif (PLATFORM_VARIANT == 2)
+#    define MEM_CNTRL0_ID 108
+#    define MEM_CNTRL1_ID 172
+#    define MEM_CNTRL2_ID 234
+#    define MEM_CNTRL3_ID 298
+
+#    define NODE_ID_HND  256
+#    define NODE_ID_HNI0 0
+#    define NODE_ID_HNP0 0x144
+#    define NODE_ID_HNP1 0x154
+#    define NODE_ID_HNP2 0x15c
+#    define NODE_ID_HNP3 0x16a
+#    define NODE_ID_SBSX 196
+
+#    define MESH_SIZE_X 6
+#    define MESH_SIZE_Y 6
 #endif
 
 #if (PLATFORM_VARIANT == 0)
@@ -110,16 +140,51 @@ static const unsigned int snf_table[] = {
     MEM_CNTRL1_ID, /* Maps to HN-F logical node 6  */
     MEM_CNTRL1_ID, /* Maps to HN-F logical node 7  */
 };
+#elif (PLATFORM_VARIANT == 2)
+static const unsigned int snf_table[] = {
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 0  */
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 1  */
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 2  */
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 3  */
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 4  */
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 5  */
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 6  */
+    MEM_CNTRL0_ID, /* Maps to HN-F logical node 7  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 8  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 9  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 10  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 11  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 12  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 13  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 14  */
+    MEM_CNTRL1_ID, /* Maps to HN-F logical node 15  */
+    MEM_CNTRL2_ID, /* Maps to HN-F logical node 16  */
+    MEM_CNTRL2_ID, /* Maps to HN-F logical node 17  */
+    MEM_CNTRL2_ID, /* Maps to HN-F logical node 18  */
+    MEM_CNTRL2_ID, /* Maps to HN-F logical node 19  */
+    MEM_CNTRL2_ID, /* Maps to HN-F logical node 20  */
+    MEM_CNTRL2_ID, /* Maps to HN-F logical node 21  */
+    MEM_CNTRL2_ID, /* Maps to HN-F logical node 22  */
+    MEM_CNTRL2_ID, /* Maps to HN-F logical node 23  */
+    MEM_CNTRL3_ID, /* Maps to HN-F logical node 24  */
+    MEM_CNTRL3_ID, /* Maps to HN-F logical node 25  */
+    MEM_CNTRL3_ID, /* Maps to HN-F logical node 26  */
+    MEM_CNTRL3_ID, /* Maps to HN-F logical node 27  */
+    MEM_CNTRL3_ID, /* Maps to HN-F logical node 28  */
+    MEM_CNTRL3_ID, /* Maps to HN-F logical node 29  */
+    MEM_CNTRL3_ID, /* Maps to HN-F logical node 30  */
+    MEM_CNTRL3_ID, /* Maps to HN-F logical node 31  */
+};
 #endif
 
 static const struct mod_cmn700_mem_region_map mmap[] = {
     {
         /*
          * System cache backed region
-         * Map: 0x0000_0000_0000 - 0x003F_FFFFF_FFFF (4 TB)
+         * Map: 0x0000_0000_0000 - 0x3FFF_FFFF_FFFF (64 TiB)
          */
         .base = UINT64_C(0x000000000000),
-        .size = UINT64_C(4) * FWK_TIB,
+        .size = UINT64_C(64) * FWK_TIB,
         .type = MOD_CMN700_MEM_REGION_TYPE_SYSCACHE,
         .hnf_pos_start = { 0, 0, 0 },
         .hnf_pos_end = { MESH_SIZE_X - 1, MESH_SIZE_Y - 1, 1 },
@@ -360,6 +425,7 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HND,
     },
+#if (PLATFORM_VARIANT != 2)
     {
         /*
          * Non-PCIe IO Macro
@@ -370,26 +436,422 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_NON_PCIE_IO_MACRO,
     },
+#endif
 };
 
+#if (PLATFORM_VARIANT == 2)
+/* Multichip Related configuration data */
+
+/* Chip-0 Config data */
+static const struct mod_cmn700_ccg_config ccg_config_table_chip_0[] = {
+    {
+        .ldid = CCG_PORT_0,
+        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_0) + CCG_PORT_0,
+        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .remote_mmap_table = {
+            .base = UINT64_C(0x400000000000),
+            .size = UINT64_C(64) * FWK_TIB,
+            .type = MOD_CMN700_REGION_TYPE_CCG,
+        },
+        .ra_mmap_table = {
+            {
+                .base = UINT64_C(0x400000000000),
+                .size = UINT64_C(64) * FWK_TIB,
+                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_1) + CCG_PORT_0,
+            },
+            { 0 }
+        },
+        .remote_agentid_to_linkid_map = {
+            {
+                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_0),
+                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_0) +
+                    RNF_PER_CHIP - 1
+            },
+        },
+        .smp_mode = true,
+    },
+    {
+        .ldid = CCG_PORT_2,
+        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_0) + CCG_PORT_2,
+        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .remote_mmap_table = {
+            .base = UINT64_C(0x800000000000),
+            .size = UINT64_C(64) * FWK_TIB,
+            .type = MOD_CMN700_REGION_TYPE_CCG,
+        },
+        .ra_mmap_table = {
+            {
+                .base = UINT64_C(0x800000000000),
+                .size = UINT64_C(64) * FWK_TIB,
+                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_2) + CCG_PORT_0,
+            },
+            { 0 }
+        },
+        .remote_agentid_to_linkid_map = {
+            {
+                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_2),
+                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_2) +
+                    RNF_PER_CHIP - 1
+            },
+        },
+        .smp_mode = true,
+    },
+    {
+        .ldid = CCG_PORT_4,
+        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_0) + CCG_PORT_4,
+        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .remote_mmap_table = {
+            .base = UINT64_C(0xC00000000000),
+            .size = UINT64_C(64) * FWK_TIB,
+            .type = MOD_CMN700_REGION_TYPE_CCG,
+        },
+        .ra_mmap_table = {
+            {
+                .base = UINT64_C(0xC00000000000),
+                .size = UINT64_C(64) * FWK_TIB,
+                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_3) + CCG_PORT_0,
+            },
+            { 0 }
+        },
+        .remote_agentid_to_linkid_map = {
+            {
+                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_3),
+                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_3) +
+                    RNF_PER_CHIP - 1
+            },
+        },
+        .smp_mode = true,
+    }
+};
+
+/* Chip-1 Config data */
+static const struct mod_cmn700_ccg_config ccg_config_table_chip_1[] = {
+    {
+        .ldid = CCG_PORT_0,
+        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_1) + CCG_PORT_0,
+        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .remote_mmap_table = {
+            .base = UINT64_C(0x000000000),
+            .size = UINT64_C(64) * FWK_TIB,
+            .type = MOD_CMN700_REGION_TYPE_CCG,
+        },
+        .ra_mmap_table = {
+            {
+                .base = UINT64_C(0x00000000000),
+                .size = UINT64_C(64) * FWK_TIB,
+                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_0) + CCG_PORT_0,
+            },
+            { 0 }
+        },
+        .remote_agentid_to_linkid_map = {
+            {
+                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_0),
+                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_0) +
+                    RNF_PER_CHIP - 1
+            },
+        },
+        .smp_mode = true,
+    },
+    {
+        .ldid = CCG_PORT_2,
+        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_1) + CCG_PORT_2,
+        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .remote_mmap_table = {
+            .base = UINT64_C(0x800000000000),
+            .size = UINT64_C(64) * FWK_TIB,
+            .type = MOD_CMN700_REGION_TYPE_CCG,
+        },
+        .ra_mmap_table = {
+            {
+                .base = UINT64_C(0x800000000000),
+                .size = UINT64_C(64) * FWK_TIB,
+                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_2) + CCG_PORT_2,
+            },
+            { 0 }
+        },
+        .remote_agentid_to_linkid_map = {
+            {
+                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_2),
+                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_2) +
+                    RNF_PER_CHIP - 1
+            },
+        },
+        .smp_mode = true,
+    },
+    {
+        .ldid = CCG_PORT_4,
+        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_1) + CCG_PORT_4,
+        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .remote_mmap_table = {
+            .base = UINT64_C(0xC00000000000),
+            .size = UINT64_C(64) * FWK_TIB,
+            .type = MOD_CMN700_REGION_TYPE_CCG,
+        },
+        .ra_mmap_table = {
+            {
+                .base = UINT64_C(0xC00000000000),
+                .size = UINT64_C(64) * FWK_TIB,
+                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_3) + CCG_PORT_2,
+            },
+            { 0 }
+        },
+        .remote_agentid_to_linkid_map = {
+            {
+                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_3),
+                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_3) +
+                    RNF_PER_CHIP - 1
+            },
+        },
+        .smp_mode = true,
+    },
+};
+
+/* Chip-2 Config data */
+static const struct mod_cmn700_ccg_config ccg_config_table_chip_2[] = {
+    {
+        .ldid = CCG_PORT_0,
+        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_2) + CCG_PORT_0,
+        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .remote_mmap_table = {
+            .base = UINT64_C(0x000000000),
+            .size = UINT64_C(64) * FWK_TIB,
+            .type = MOD_CMN700_REGION_TYPE_CCG,
+        },
+        .ra_mmap_table = {
+            {
+                .base = UINT64_C(0x00000000000),
+                .size = UINT64_C(64) * FWK_TIB,
+                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_0) + CCG_PORT_2,
+            },
+            { 0 }
+        },
+        .remote_agentid_to_linkid_map = {
+            {
+                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_0),
+                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_0) +
+                    RNF_PER_CHIP - 1
+            },
+        },
+        .smp_mode = true,
+    },
+    {
+        .ldid = CCG_PORT_2,
+        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_2) + CCG_PORT_2,
+        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .remote_mmap_table = {
+            .base = UINT64_C(0x400000000000),
+            .size = UINT64_C(64) * FWK_TIB,
+            .type = MOD_CMN700_REGION_TYPE_CCG,
+        },
+        .ra_mmap_table = {
+            {
+                .base = UINT64_C(0x400000000000),
+                .size = UINT64_C(64) * FWK_TIB,
+                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_1) + CCG_PORT_2,
+            },
+            { 0 }
+        },
+        .remote_agentid_to_linkid_map = {
+            {
+                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_1),
+                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_1) +
+                    RNF_PER_CHIP - 1
+            },
+        },
+        .smp_mode = true,
+    },
+    {
+        .ldid = CCG_PORT_4,
+        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_2) + CCG_PORT_4,
+        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .remote_mmap_table = {
+            .base = UINT64_C(0xC00000000000),
+            .size = UINT64_C(64) * FWK_TIB,
+            .type = MOD_CMN700_REGION_TYPE_CCG,
+        },
+        .ra_mmap_table = {
+            {
+                .base = UINT64_C(0xC00000000000),
+                .size = UINT64_C(64) * FWK_TIB,
+                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_3) + CCG_PORT_4,
+            },
+            { 0 }
+        },
+        .remote_agentid_to_linkid_map = {
+            {
+                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_3),
+                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_3) +
+                    RNF_PER_CHIP - 1
+            },
+        },
+        .smp_mode = true,
+    },
+};
+
+/* Chip-3 Config data */
+static const struct mod_cmn700_ccg_config ccg_config_table_chip_3[] = {
+    {
+        .ldid = CCG_PORT_0,
+        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_3) + CCG_PORT_0,
+        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .remote_mmap_table = {
+            .base = UINT64_C(0x000000000),
+            .size = UINT64_C(64) * FWK_TIB,
+            .type = MOD_CMN700_REGION_TYPE_CCG,
+        },
+        .ra_mmap_table = {
+            {
+                .base = UINT64_C(0x00000000000),
+                .size = UINT64_C(64) * FWK_TIB,
+                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_0) + CCG_PORT_4,
+            },
+            { 0 }
+        },
+        .remote_agentid_to_linkid_map = {
+            {
+                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_0),
+                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_0) +
+                    RNF_PER_CHIP - 1
+            },
+        },
+        .smp_mode = true,
+    },
+    {
+        .ldid = CCG_PORT_2,
+        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_3) + CCG_PORT_2,
+        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .remote_mmap_table = {
+            .base = UINT64_C(0x400000000000),
+            .size = UINT64_C(64) * FWK_TIB,
+            .type = MOD_CMN700_REGION_TYPE_CCG,
+        },
+        .ra_mmap_table = {
+            {
+                .base = UINT64_C(0x400000000000),
+                .size = UINT64_C(64) * FWK_TIB,
+                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_1) + CCG_PORT_4,
+            },
+            { 0 }
+        },
+        .remote_agentid_to_linkid_map = {
+            {
+                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_1),
+                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_1) +
+                    RNF_PER_CHIP - 1
+            },
+        },
+        .smp_mode = true,
+    },
+    {
+        .ldid = CCG_PORT_4,
+        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_3) + CCG_PORT_4,
+        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .remote_mmap_table = {
+            .base = UINT64_C(0x800000000000),
+            .size = UINT64_C(64) * FWK_TIB,
+            .type = MOD_CMN700_REGION_TYPE_CCG,
+        },
+        .ra_mmap_table = {
+            {
+                .base = UINT64_C(0x800000000000),
+                .size = UINT64_C(64) * FWK_TIB,
+                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_2) + CCG_PORT_4,
+            },
+            { 0 }
+        },
+        .remote_agentid_to_linkid_map = {
+            {
+                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_2),
+                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_2) +
+                    RNF_PER_CHIP - 1
+            },
+        },
+        .smp_mode = true,
+    },
+};
+#endif
+
 static const struct fwk_element cmn700_device_table[] = {
-    [0] = { .name = "CMN700 Mesh Config",
-            .data = &((struct mod_cmn700_config){
-                .base = SCP_CMN700_BASE,
-                .mesh_size_x = MESH_SIZE_X,
-                .mesh_size_y = MESH_SIZE_Y,
-                .hnd_node_id = NODE_ID_HND,
-                .snf_table = snf_table,
-                .snf_count = FWK_ARRAY_SIZE(snf_table),
-                .mmap_table = mmap,
-                .mmap_count = FWK_ARRAY_SIZE(mmap),
-                .chip_addr_space = UINT64_C(4) * FWK_TIB,
-                .clock_id = FWK_ID_ELEMENT_INIT(
-                    FWK_MODULE_IDX_CLOCK,
-                    CLOCK_IDX_INTERCONNECT),
-                .hnf_cal_mode = true,
-            }) },
-    [1] = { 0 }
+    [PLATFORM_CHIP_0] = { .name = "Chip-0 CMN700 Mesh Config",
+                          .data = &((struct mod_cmn700_config) {
+                              .base = SCP_CMN700_BASE,
+                              .mesh_size_x = MESH_SIZE_X,
+                              .mesh_size_y = MESH_SIZE_Y,
+                              .hnd_node_id = NODE_ID_HND,
+                              .snf_table = snf_table,
+                              .snf_count = FWK_ARRAY_SIZE(snf_table),
+                              .mmap_table = mmap,
+                              .mmap_count = FWK_ARRAY_SIZE(mmap),
+#if (PLATFORM_VARIANT == 2)
+                              .ccg_config_table = ccg_config_table_chip_0,
+                              .ccg_table_count =
+                                  FWK_ARRAY_SIZE(ccg_config_table_chip_0),
+#endif
+                              .chip_addr_space = UINT64_C(64) * FWK_TIB,
+                              .clock_id = FWK_ID_ELEMENT_INIT(
+                                  FWK_MODULE_IDX_CLOCK, CLOCK_IDX_INTERCONNECT),
+                              .hnf_cal_mode = true,
+                          }) },
+#if (PLATFORM_VARIANT == 2)
+    [PLATFORM_CHIP_1] = { .name = "Chip-1 CMN700 Mesh Config",
+                          .data = &((struct mod_cmn700_config){
+                              .base = SCP_CMN700_BASE,
+                              .mesh_size_x = MESH_SIZE_X,
+                              .mesh_size_y = MESH_SIZE_Y,
+                              .hnd_node_id = NODE_ID_HND,
+                              .snf_table = snf_table,
+                              .snf_count = FWK_ARRAY_SIZE(snf_table),
+                              .mmap_table = mmap,
+                              .mmap_count = FWK_ARRAY_SIZE(mmap),
+                              .ccg_config_table = ccg_config_table_chip_1,
+                              .ccg_table_count =
+                                  FWK_ARRAY_SIZE(ccg_config_table_chip_1),
+                              .chip_addr_space = UINT64_C(64) * FWK_TIB,
+                              .clock_id = FWK_ID_ELEMENT_INIT(
+                                  FWK_MODULE_IDX_CLOCK,
+                                  CLOCK_IDX_INTERCONNECT),
+                              .hnf_cal_mode = true,
+                          }) },
+    [PLATFORM_CHIP_2] = { .name = "Chip-2 CMN700 Mesh Config",
+                          .data = &((struct mod_cmn700_config){
+                              .base = SCP_CMN700_BASE,
+                              .mesh_size_x = MESH_SIZE_X,
+                              .mesh_size_y = MESH_SIZE_Y,
+                              .hnd_node_id = NODE_ID_HND,
+                              .snf_table = snf_table,
+                              .snf_count = FWK_ARRAY_SIZE(snf_table),
+                              .mmap_table = mmap,
+                              .mmap_count = FWK_ARRAY_SIZE(mmap),
+                              .ccg_config_table = ccg_config_table_chip_2,
+                              .ccg_table_count =
+                                  FWK_ARRAY_SIZE(ccg_config_table_chip_2),
+                              .chip_addr_space = UINT64_C(64) * FWK_TIB,
+                              .clock_id = FWK_ID_ELEMENT_INIT(
+                                  FWK_MODULE_IDX_CLOCK,
+                                  CLOCK_IDX_INTERCONNECT),
+                              .hnf_cal_mode = true,
+                          }) },
+    [PLATFORM_CHIP_3] = { .name = "Chip-3 CMN700 Mesh Config",
+                          .data = &((struct mod_cmn700_config){
+                              .base = SCP_CMN700_BASE,
+                              .mesh_size_x = MESH_SIZE_X,
+                              .mesh_size_y = MESH_SIZE_Y,
+                              .hnd_node_id = NODE_ID_HND,
+                              .snf_table = snf_table,
+                              .snf_count = FWK_ARRAY_SIZE(snf_table),
+                              .mmap_table = mmap,
+                              .mmap_count = FWK_ARRAY_SIZE(mmap),
+                              .ccg_config_table = ccg_config_table_chip_3,
+                              .ccg_table_count =
+                                  FWK_ARRAY_SIZE(ccg_config_table_chip_3),
+                              .chip_addr_space = UINT64_C(64) * FWK_TIB,
+                              .clock_id = FWK_ID_ELEMENT_INIT(
+                                  FWK_MODULE_IDX_CLOCK,
+                                  CLOCK_IDX_INTERCONNECT),
+                              .hnf_cal_mode = true,
+                          }) },
+#endif
+    [PLATFORM_CHIP_COUNT] = { 0 }
 };
 
 static const struct fwk_element *cmn700_get_device_table(fwk_id_t module_id)
