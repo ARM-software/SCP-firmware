@@ -9,7 +9,8 @@
 
 include_guard()
 
-set(CMAKE_SYSTEM_PROCESSOR "cortex-m55+nodsp")
+# No Helium, no FPU, No DSP features
+set(CMAKE_SYSTEM_ARCH "armv8.1-m.main")
 
 set(CMAKE_ASM_COMPILER_TARGET "arm-arm-none-eabi")
 set(CMAKE_C_COMPILER_TARGET "arm-arm-none-eabi")
