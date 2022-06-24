@@ -12,7 +12,8 @@ add_library(arch-arm-m)
 # the used CPU
 #
 
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "cortex-m(33|55)")
+if((CMAKE_SYSTEM_PROCESSOR MATCHES "cortex-m(33|55)")
+                           OR (CMAKE_SYSTEM_ARCH MATCHES "armv8(\.1)?-m"))
     target_compile_definitions(arch-arm-m PUBLIC "ARMV8M")
 else()
     target_compile_definitions(arch-arm-m PUBLIC "ARMV7M")
