@@ -48,7 +48,7 @@ products = [
     Product('tc0', variants=[Parameter('0'), Parameter('1')]),
     Product('tc1'),
     Product('rcar', toolchains=[Parameter('GNU')]),
-    Product('rdn2', variants=[Parameter('0')]),
+    Product('rdn2', variants=[Parameter('0'), Parameter('1'), Parameter('2')]),
     Product('rdfremont'),
 ]
 
