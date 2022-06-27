@@ -7,14 +7,14 @@
 
 #include "scp_mmap.h"
 
-#include <mod_msys_rom.h>
+#include <mod_tc2_bl1.h>
 
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 
-const struct fwk_module_config config_msys_rom = {
-    .data = &((struct msys_rom_config){
+const struct fwk_module_config config_tc2_bl1 = {
+    .data = &((struct mod_tc2_bl1_config){
         .ap_context_base = SCP_AP_CONTEXT_BASE,
         .ap_context_size = SCP_AP_CONTEXT_SIZE,
         .id_primary_cluster = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PPU_V1, 1),

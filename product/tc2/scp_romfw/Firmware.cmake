@@ -21,9 +21,13 @@ set(SCP_ENABLE_NOTIFICATIONS_INIT TRUE)
 
 set(SCP_ENABLE_IPO_INIT FALSE)
 
+set(SCP_ENABLE_INBAND_MSG_SUPPORT TRUE)
+
 set(SCP_ARCHITECTURE "arm-m")
 
 list(PREPEND SCP_MODULE_PATHS "${CMAKE_SOURCE_DIR}/module/cmn_booker")
+list(PREPEND SCP_MODULE_PATHS "${CMAKE_SOURCE_DIR}/module/transport")
+list(PREPEND SCP_MODULE_PATHS "${CMAKE_SOURCE_DIR}/product/tc2/module/tc2_bl1")
 
 # The order of the modules in the following list is the order in which the
 # modules are initialized, bound, started during the pre-runtime phase.
@@ -31,7 +35,7 @@ list(PREPEND SCP_MODULE_PATHS "${CMAKE_SOURCE_DIR}/module/cmn_booker")
 
 list(APPEND SCP_MODULES "pl011")
 list(APPEND SCP_MODULES "ppu-v1")
-list(APPEND SCP_MODULES "msys-rom")
+list(APPEND SCP_MODULES "tc2-bl1")
 list(APPEND SCP_MODULES "bootloader")
 list(APPEND SCP_MODULES "system-pll")
 list(APPEND SCP_MODULES "pik-clock")
@@ -41,3 +45,5 @@ list(APPEND SCP_MODULES "gtimer")
 list(APPEND SCP_MODULES "timer")
 list(APPEND SCP_MODULES "cmn-booker")
 list(APPEND SCP_MODULES "sds")
+list(APPEND SCP_MODULES "mhu2")
+list(APPEND SCP_MODULES "transport")

@@ -11,9 +11,9 @@
 
 #include <mod_clock.h>
 #include <mod_css_clock.h>
-#include <mod_msys_rom.h>
 #include <mod_pik_clock.h>
 #include <mod_power_domain.h>
+#include <mod_tc2_bl1.h>
 
 #include <fwk_element.h>
 #include <fwk_id.h>
@@ -31,7 +31,7 @@ static const struct fwk_element clock_dev_desc_table[2] = {
                 .api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_CSS_CLOCK,
                     MOD_CSS_CLOCK_API_TYPE_CLOCK),
-                .pd_source_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_MSYS_ROM),
+                .pd_source_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_TC2_BL1),
             }),
         },
     { 0 }, /* Termination description. */
@@ -46,8 +46,8 @@ const struct fwk_module_config config_clock = {
     .elements = FWK_MODULE_DYNAMIC_ELEMENTS(clock_get_dev_desc_table),
     .data = &((struct mod_clock_config){
         .pd_transition_notification_id = FWK_ID_NOTIFICATION_INIT(
-            FWK_MODULE_IDX_MSYS_ROM,
-            MOD_MSYS_ROM_NOTIFICATION_IDX_POWER_SYSTOP),
+            FWK_MODULE_IDX_TC2_BL1,
+            MOD_TC2_BL1_NOTIFICATION_IDX_POWER_SYSTOP),
         .pd_pre_transition_notification_id = FWK_ID_NONE_INIT,
     }),
 };

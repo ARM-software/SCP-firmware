@@ -29,8 +29,10 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_gtimer.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_msys_rom.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_bootloader.c")
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_tc2_bl1.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_bootloader.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_transport.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_mhu2.c")
 
 #
 # Some of our firmware includes require CMSIS.
