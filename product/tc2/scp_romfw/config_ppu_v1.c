@@ -10,9 +10,9 @@
 #include "tc2_core.h"
 
 #include <mod_cmn_booker.h>
-#include <mod_msys_rom.h>
 #include <mod_power_domain.h>
 #include <mod_ppu_v1.h>
+#include <mod_tc2_bl1.h>
 
 #include <fwk_element.h>
 #include <fwk_id.h>
@@ -128,8 +128,8 @@ struct fwk_module_config config_ppu_v1 = {
     .data =
         &(struct mod_ppu_v1_config){
             .pd_notification_id = FWK_ID_NOTIFICATION_INIT(
-                FWK_MODULE_IDX_MSYS_ROM,
-                MOD_MSYS_ROM_NOTIFICATION_IDX_POWER_SYSTOP),
-            .pd_source_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_MSYS_ROM),
+                FWK_MODULE_IDX_TC2_BL1,
+                MOD_TC2_BL1_NOTIFICATION_IDX_POWER_SYSTOP),
+            .pd_source_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_TC2_BL1),
         },
 };
