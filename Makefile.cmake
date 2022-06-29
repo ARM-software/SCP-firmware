@@ -311,6 +311,6 @@ mod_test:
 	$(CMAKE) -B $(MOD_TEST_BUILD_DIR) $(MOD_TEST_DIR) -G Ninja
 	$(CMAKE) --build $(MOD_TEST_BUILD_DIR)
 	${CD} $(MOD_TEST_BUILD_DIR) && $(CTEST) -V --output-junit Testing/TestResults.xml
-	${CD} $(MOD_TEST_BUILD_DIR) && $(LCOV) --capture --directory $(MOD_TEST_BUILD_DIR) --output-file scp_v2_unit_test_coverage.info
-	${CD} $(MOD_TEST_BUILD_DIR) && $(PYTHON) ../../unit_test/utils/generate_coverage_report.py
-	${CD} $(MOD_TEST_BUILD_DIR) && $(GENHTML) scp_v2_unit_test_coverage_filtered.info --prefix "$(TOP_DIR)" --output-directory $(BUILD_DIR)/coverage_report
+	#${CD} $(MOD_TEST_BUILD_DIR) && $(LCOV) --capture --directory $(MOD_TEST_BUILD_DIR) --output-file scp_v2_unit_test_coverage.info
+	#${CD} $(MOD_TEST_BUILD_DIR) && $(PYTHON) ../../unit_test/utils/generate_coverage_report.py
+	#${CD} $(MOD_TEST_BUILD_DIR) && $(GENHTML) scp_v2_unit_test_coverage_filtered.info --prefix "$(TOP_DIR)" --output-directory $(BUILD_DIR)/coverage_report
