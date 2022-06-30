@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -315,7 +315,7 @@ static int32_t uptime_f(int32_t argc, char **argv)
  */
 static const char reset_sys_call[] = "reset";
 static const char reset_sys_help[] = "  Resets the system immediately.";
-static int32_t reset_sys_f(int32_t argc, char **argv)
+FWK_WEAK int32_t reset_sys_f(int32_t argc, char **argv)
 {
     cli_print("This command is not implemented.\n");
     return 0;
