@@ -6,6 +6,7 @@
  */
 
 #include "config_power_domain.h"
+#include "config_smt.h"
 #include "sgm775_core.h"
 #include "sgm775_mhu.h"
 #include "sgm775_scmi.h"
@@ -31,7 +32,7 @@ static const struct fwk_element smt_element_table[] = {
           .driver_id = FWK_ID_SUB_ELEMENT_INIT(
               FWK_MODULE_IDX_MHU,
               SGM775_MHU_DEVICE_IDX_S,
-              0),
+              CONFIG_SMT_CHANNEL_IDX_A2P),
           .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MHU, 0),
       }) },
     /* SGM775_SCMI_SERVICE_IDX_OSPM_0 */
@@ -44,7 +45,7 @@ static const struct fwk_element smt_element_table[] = {
           .driver_id = FWK_ID_SUB_ELEMENT_INIT(
               FWK_MODULE_IDX_MHU,
               SGM775_MHU_DEVICE_IDX_NS_L,
-              0),
+              CONFIG_SMT_CHANNEL_IDX_A2P),
           .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MHU, 0),
       }) },
     /* SGM775_SCMI_SERVICE_IDX_OSPM_1 */
@@ -57,9 +58,37 @@ static const struct fwk_element smt_element_table[] = {
           .driver_id = FWK_ID_SUB_ELEMENT_INIT(
               FWK_MODULE_IDX_MHU,
               SGM775_MHU_DEVICE_IDX_NS_H,
-              0),
+              CONFIG_SMT_CHANNEL_IDX_A2P),
           .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MHU, 0),
       }) },
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    /* SGM775_SCMI_SERVICE_IDX_OSPM_0_P2A */
+    { .name = "OSPM0_P2A",
+      .data = &((struct mod_smt_channel_config){
+          .type = MOD_SMT_CHANNEL_TYPE_COMPLETER,
+          .policies = MOD_SMT_POLICY_INIT_MAILBOX,
+          .mailbox_address = (uintptr_t)SCMI_PAYLOAD0_NS_P2A_BASE,
+          .mailbox_size = SCMI_PAYLOAD_SIZE,
+          .driver_id = FWK_ID_SUB_ELEMENT_INIT(
+              FWK_MODULE_IDX_MHU,
+              SGM775_MHU_DEVICE_IDX_NS_L,
+              CONFIG_SMT_CHANNEL_IDX_P2A),
+          .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MHU, 0),
+      }) },
+    /* SGM775_SCMI_SERVICE_IDX_OSPM_1_P2A */
+    { .name = "OSPM1_P2A",
+      .data = &((struct mod_smt_channel_config){
+          .type = MOD_SMT_CHANNEL_TYPE_COMPLETER,
+          .policies = MOD_SMT_POLICY_INIT_MAILBOX,
+          .mailbox_address = (uintptr_t)SCMI_PAYLOAD1_NS_P2A_BASE,
+          .mailbox_size = SCMI_PAYLOAD_SIZE,
+          .driver_id = FWK_ID_SUB_ELEMENT_INIT(
+              FWK_MODULE_IDX_MHU,
+              SGM775_MHU_DEVICE_IDX_NS_H,
+              CONFIG_SMT_CHANNEL_IDX_P2A),
+          .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MHU, 0),
+      }) },
+#endif
     [SGM775_SCMI_SERVICE_IDX_COUNT] = { 0 },
 };
 

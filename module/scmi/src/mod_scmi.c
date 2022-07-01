@@ -514,7 +514,6 @@ static int scmi_notification_add_subscriber(
     fwk_id_t service_id)
 {
     int status;
-    unsigned int operation_idx = 0;
     unsigned int service_id_idx;
     unsigned int agent_idx;
 
@@ -533,15 +532,15 @@ static int scmi_notification_add_subscriber(
      */
     if (subscribers->operation_id_to_idx[operation_id] ==
         MOD_SCMI_PROTOCOL_OPERATION_IDX_INVALID) {
-        operation_idx = subscribers->operation_idx++;
-        fwk_assert(operation_idx < subscribers->operation_count);
-        subscribers->operation_id_to_idx[operation_id] = (uint8_t)operation_idx;
+        fwk_assert(subscribers->operation_idx < subscribers->operation_count);
+        subscribers->operation_id_to_idx[operation_id] =
+            (uint8_t)subscribers->operation_idx++;
     }
 
     service_id_idx = (unsigned int)scmi_notification_service_idx(
         agent_idx,
         element_idx,
-        operation_idx,
+        subscribers->operation_id_to_idx[operation_id],
         subscribers->agent_count,
         subscribers->element_count);
 
