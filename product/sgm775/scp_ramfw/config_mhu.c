@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -16,36 +16,51 @@
 
 #include <fmw_cmsis.h>
 
-static const struct fwk_element mhu_element_table[] = {
-    [SGM775_MHU_DEVICE_IDX_S] = {
-        .name = "MHU_S",
-        .sub_element_count = 1,
-        .data = &((struct mod_mhu_device_config) {
-            .irq = MHU_SECURE_IRQ,
-            .in = MHU_CPU_INTR_S_BASE,
-            .out = MHU_SCP_INTR_S_BASE,
-        })
-    },
-    [SGM775_MHU_DEVICE_IDX_NS_H] = {
-        .name = "MHU_NS_H",
-        .sub_element_count = 1,
-        .data = &((struct mod_mhu_device_config) {
-            .irq = MHU_HIGH_PRIO_IRQ,
-            .in = MHU_CPU_INTR_H_BASE,
-            .out = MHU_SCP_INTR_H_BASE,
-        })
-    },
-    [SGM775_MHU_DEVICE_IDX_NS_L] = {
-        .name = "MHU_NS_L",
-        .sub_element_count = 1,
-        .data = &((struct mod_mhu_device_config) {
-            .irq = MHU_LOW_PRIO_IRQ,
-            .in = MHU_CPU_INTR_L_BASE,
-            .out = MHU_SCP_INTR_L_BASE,
-        })
-    },
-    [SGM775_MHU_DEVICE_IDX_COUNT] = { 0 },
-};
+static const struct fwk_element
+    mhu_element_table[SGM775_MHU_DEVICE_IDX_COUNT + 1] = {
+        [SGM775_MHU_DEVICE_IDX_S] = { .name = "MHU_S",
+                                      .sub_element_count = 1,
+                                      .data = &((struct mod_mhu_device_config){
+                                          .irq = MHU_SECURE_IRQ,
+                                          .in = MHU_CPU_INTR_S_BASE,
+                                          .out = MHU_SCP_INTR_S_BASE,
+                                      }) },
+        [SGM775_MHU_DEVICE_IDX_NS_H] = { .name = "MHU_NS_H",
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+                                         /*
+                                          * We have 2 SMT channels , one is for
+                                          * the A2P channel and another for the
+                                          * other for P2A channel.
+                                          */
+                                         .sub_element_count = 2,
+#else
+                                         .sub_element_count = 1,
+#endif
+                                         .data =
+                                             &((struct mod_mhu_device_config){
+                                                 .irq = MHU_HIGH_PRIO_IRQ,
+                                                 .in = MHU_CPU_INTR_H_BASE,
+                                                 .out = MHU_SCP_INTR_H_BASE,
+                                             }) },
+        [SGM775_MHU_DEVICE_IDX_NS_L] = { .name = "MHU_NS_L",
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+                                         /*
+                                          * We have 2 SMT channels , one is for
+                                          * the A2P channel and another for the
+                                          * other for P2A channel.
+                                          */
+                                         .sub_element_count = 2,
+#else
+                                         .sub_element_count = 1,
+#endif
+                                         .data =
+                                             &((struct mod_mhu_device_config){
+                                                 .irq = MHU_LOW_PRIO_IRQ,
+                                                 .in = MHU_CPU_INTR_L_BASE,
+                                                 .out = MHU_SCP_INTR_L_BASE,
+                                             }) },
+        [SGM775_MHU_DEVICE_IDX_COUNT] = { 0 },
+    };
 
 static const struct fwk_element *mhu_get_element_table(fwk_id_t module_id)
 {

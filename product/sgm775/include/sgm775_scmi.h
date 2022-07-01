@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -24,6 +24,10 @@ enum sgm775_scmi_service_idx {
     SGM775_SCMI_SERVICE_IDX_PSCI,
     SGM775_SCMI_SERVICE_IDX_OSPM_0,
     SGM775_SCMI_SERVICE_IDX_OSPM_1,
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    SGM775_SCMI_SERVICE_IDX_OSPM_0_P2A,
+    SGM775_SCMI_SERVICE_IDX_OSPM_1_P2A,
+#endif
     SGM775_SCMI_SERVICE_IDX_COUNT,
 };
 #endif /* SGM775_SCMI_H */

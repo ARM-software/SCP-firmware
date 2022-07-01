@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -36,10 +36,14 @@ static fwk_id_t sds_feature_availability_id =
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, 1);
 
 /* SCMI services required to enable the messaging stack */
-static unsigned int scmi_notification_table[] = {
-    SGM775_SCMI_SERVICE_IDX_PSCI,
-    SGM775_SCMI_SERVICE_IDX_OSPM_0,
-    SGM775_SCMI_SERVICE_IDX_OSPM_1,
+static unsigned int scmi_notification_table[SGM775_SCMI_SERVICE_IDX_COUNT] = {
+    (unsigned int)SGM775_SCMI_SERVICE_IDX_PSCI,
+    (unsigned int)SGM775_SCMI_SERVICE_IDX_OSPM_0,
+    (unsigned int)SGM775_SCMI_SERVICE_IDX_OSPM_1,
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    (unsigned int)SGM775_SCMI_SERVICE_IDX_OSPM_0_P2A,
+    (unsigned int)SGM775_SCMI_SERVICE_IDX_OSPM_1_P2A,
+#endif
 };
 
 static struct mod_sds_api *sds_api;
