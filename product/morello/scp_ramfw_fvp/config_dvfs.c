@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -27,34 +27,34 @@ static const struct mod_dvfs_domain_config cpu_group_0 = {
     .opps =
         (struct mod_dvfs_opp[]){
             {
-                .level = 2000 * 1000000UL,
-                .frequency = 2000 * FWK_KHZ,
-                .voltage = 800,
-                .power = (0.16 * 2000 * 0.800 * 0.800),
-            },
-            {
                 .level = 2100 * 1000000UL,
                 .frequency = 2100 * FWK_KHZ,
-                .voltage = 850,
-                .power = (0.16 * 2100 * 0.850 * 0.850),
+                .voltage = 800,
+                .power = (0.16 * 2100 * 0.800 * 0.800),
             },
             {
                 .level = 2200 * 1000000UL,
                 .frequency = 2200 * FWK_KHZ,
-                .voltage = 900,
-                .power = (0.16 * 2200 * 0.900 * 0.900),
+                .voltage = 850,
+                .power = (0.16 * 2200 * 0.850 * 0.850),
             },
             {
                 .level = 2300 * 1000000UL,
                 .frequency = 2300 * FWK_KHZ,
-                .voltage = 950,
-                .power = (0.16 * 2300 * 0.950 * 0.950),
+                .voltage = 900,
+                .power = (0.16 * 2300 * 0.900 * 0.900),
             },
             {
                 .level = 2400 * 1000000UL,
                 .frequency = 2400 * FWK_KHZ,
+                .voltage = 950,
+                .power = (0.16 * 2400 * 0.950 * 0.950),
+            },
+            {
+                .level = 2500 * 1000000UL,
+                .frequency = 2500 * FWK_KHZ,
                 .voltage = 1000,
-                .power = (0.16 * 2400 * 1.000 * 1.000),
+                .power = (0.16 * 2500 * 1.000 * 1.000),
             },
             { 0 },
         }
@@ -68,34 +68,34 @@ static const struct mod_dvfs_domain_config cpu_group_1 = {
     .opps =
         (struct mod_dvfs_opp[]){
             {
-                .level = 2000 * 1000000UL,
-                .frequency = 2000 * FWK_KHZ,
-                .voltage = 800,
-                .power = (0.16 * 2000 * 0.800 * 0.800),
-            },
-            {
                 .level = 2100 * 1000000UL,
                 .frequency = 2100 * FWK_KHZ,
-                .voltage = 850,
-                .power = (0.16 * 2100 * 0.850 * 0.850),
+                .voltage = 800,
+                .power = (0.16 * 2100 * 0.800 * 0.800),
             },
             {
                 .level = 2200 * 1000000UL,
                 .frequency = 2200 * FWK_KHZ,
-                .voltage = 900,
-                .power = (0.16 * 2200 * 0.900 * 0.900),
+                .voltage = 850,
+                .power = (0.16 * 2200 * 0.850 * 0.850),
             },
             {
                 .level = 2300 * 1000000UL,
                 .frequency = 2300 * FWK_KHZ,
-                .voltage = 950,
-                .power = (0.16 * 2300 * 0.950 * 0.950),
+                .voltage = 900,
+                .power = (0.16 * 2300 * 0.900 * 0.900),
             },
             {
                 .level = 2400 * 1000000UL,
                 .frequency = 2400 * FWK_KHZ,
+                .voltage = 950,
+                .power = (0.16 * 2400 * 0.950 * 0.950),
+            },
+            {
+                .level = 2500 * 1000000UL,
+                .frequency = 2500 * FWK_KHZ,
                 .voltage = 1000,
-                .power = (0.16 * 2400 * 1.000 * 1.000),
+                .power = (0.16 * 2500 * 1.000 * 1.000),
             },
             { 0 },
         }
