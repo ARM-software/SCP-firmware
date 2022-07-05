@@ -151,7 +151,7 @@ endif()
 
 cmake_dependent_option(
     CMAKE_INTERPROCEDURAL_OPTIMIZATION "Enable interprocedural optimization?"
-    TRUE "SCP_IPO_SUPPORTED" FALSE)
+    TRUE "SCP_IPO_SUPPORTED;SCP_ENABLE_IPO" FALSE)
 
 #
 # Export a `compile_commands.json` file for generators that support it.
