@@ -72,6 +72,17 @@ one firmware target at a time e.g
 > will build the configured cmake
 > ```
 
+In some case like running SCP-firmware with OP-TEE, the firmware is a
+static library that is then linked to a larger binary. Instead of providing all
+the static libraries that have been built by cmake and which can change with the
+configuration of your product, you can gather all of them in a single one.
+
+> ```sh
+> cmake --build /tmp/build --target ${SCP_FIRMWARE_TARGET}-all
+> will build the configured cmake and append all static librairies in
+> lib${SCP_FIRMWARE_TARGET}-all.a
+> ```
+
 For ease of building the product, the make wrapper can be used with the below
 command to build all firmwares for a product
 

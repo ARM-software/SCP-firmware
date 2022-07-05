@@ -538,6 +538,10 @@ if(SCP_FIRMWARE)
     string(APPEND scp_defines "$<TARGET_PROPERTY:${SCP_FIRMWARE_TARGET},INTERFACE_COMPILE_DEFINITIONS>$<SEMICOLON>")
     string(APPEND scp_defines "$<TARGET_PROPERTY:${SCP_FIRMWARE_TARGET},COMPILE_DEFINITIONS>$<SEMICOLON>")
 
+    list(APPEND scp_libraries "$<TARGET_FILE:framework>")
+    list(APPEND scp_libraries "$<TARGET_FILE:${SCP_ARCHITECTURE_TARGET}>")
+    list(APPEND scp_libraries "$<TARGET_FILE:${SCP_FIRMWARE_TARGET}>")
+
     foreach(module IN LISTS SCP_MODULE_TARGETS)
         string(APPEND scp_sources "$<TARGET_PROPERTY:${module},INTERFACE_SOURCES>$<SEMICOLON>")
         string(APPEND scp_sources "$<TARGET_PROPERTY:${module},SOURCES>$<SEMICOLON>")
@@ -547,6 +551,8 @@ if(SCP_FIRMWARE)
 
         string(APPEND scp_defines "$<TARGET_PROPERTY:${module},INTERFACE_COMPILE_DEFINITIONS>$<SEMICOLON>")
         string(APPEND scp_defines "$<TARGET_PROPERTY:${module},COMPILE_DEFINITIONS>$<SEMICOLON>")
+
+        list(APPEND scp_libraries "$<TARGET_FILE:${module}>")
     endforeach()
 
     set(scp_sources $<REMOVE_DUPLICATES:${scp_sources}>)
@@ -560,6 +566,18 @@ if(SCP_FIRMWARE)
     #
     add_subdirectory("doc" EXCLUDE_FROM_ALL)
 endif()
+
+
+set(SCP_FIRMWARE_LIB "${SCP_FIRMWARE_TARGET}-all")
+
+# merged libraries is only built when `make ${SCP_FIRMWARE_LIB}` is issued
+add_custom_target(${SCP_FIRMWARE_LIB}
+    # COMMAND/COMMENT must be upper case
+        COMMAND ${CMAKE_AR} rcT $<TARGET_FILE_DIR:${SCP_FIRMWARE_TARGET}>/lib${SCP_FIRMWARE_LIB}.a ${scp_libraries}
+        COMMENT " Merging all libraries in a single lib${SCP_FIRMWARE_LIB}.a"
+)
+
+add_dependencies(${SCP_FIRMWARE_LIB} ${SCP_FIRMWARE_TARGET})
 
 #
 # Set up global inclusions and exclusions for source file quality assurance
