@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -20,6 +20,9 @@
  * \defgroup GroupStatus Return Codes
  * \{
  */
+
+/*! Success, need to init an execution context */
+#define FWK_INIT_CTX         2
 
 /*! Success, request is pending */
 #define FWK_PENDING         1

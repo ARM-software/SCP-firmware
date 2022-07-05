@@ -187,7 +187,11 @@ static int mhu_device_init(fwk_id_t device_id, unsigned int slot_count,
 
     mutex_init(&device_ctx->lock);
 
-    return FWK_SUCCESS;
+    /*
+     * Request the creation of an execution context for the device so we can
+     * paralellize unrelated request.
+     */
+    return FWK_INIT_CTX;
 }
 
 static int mhu_bind(fwk_id_t id, unsigned int round)

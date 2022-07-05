@@ -41,6 +41,9 @@ struct fwk_module_context {
     /* Table of element contexts */
     struct fwk_element_ctx *element_ctx_table;
 
+    /* Module execution context */
+    struct __fwk_ctx *ctx;
+
 #ifdef BUILD_HAS_NOTIFICATION
     /*
      * Table of notification subscription lists. One list per type of
@@ -65,6 +68,9 @@ struct fwk_element_ctx {
 
     /* Number of sub-elements */
     size_t sub_element_count;
+
+    /* Element execution context */
+    struct __fwk_ctx *ctx;
 
 #ifdef BUILD_HAS_NOTIFICATION
     /*

@@ -29,10 +29,63 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
-static struct __fwk_ctx ctx;
+struct __fwk_ctx global_ctx;
 
 static const char err_msg_line[] = "[FWK] Error %d in %s @%d";
 static const char err_msg_func[] = "[FWK] Error %d in %s";
+
+struct __fwk_ctx * __attribute__((__weak__)) arch_get_execution_ctx(void)
+{
+    return &global_ctx;
+}
+
+void __attribute__((__weak__)) arch_set_execution_ctx(struct __fwk_ctx *ctx)
+{
+    return;
+}
+
+struct __fwk_ctx *__fwk_get_ctx(void)
+{
+    return arch_get_execution_ctx();
+}
+
+
+void fwk_set_ctx(fwk_id_t id)
+{
+    struct  __fwk_ctx *tmp = NULL;
+
+    /* Find a module execution context */
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
+        tmp = fwk_module_get_ctx(id)->ctx;
+    }
+
+    /* Find an element or sub-element execution context */
+    if (!tmp &&
+        (fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT) ||
+         fwk_id_is_type(id, FWK_ID_TYPE_SUB_ELEMENT))) {
+        tmp = fwk_module_get_element_ctx(id)->ctx;
+    }
+
+    /* Use global execution context if nothing else */
+    if (!tmp)
+        tmp = &global_ctx;
+
+    /* Save execution context */
+    arch_set_execution_ctx(tmp);
+}
+
+int __fwk_init_execution_ctx(fwk_id_t element_id, size_t event_count)
+{
+    struct fwk_element_ctx *element_ctx;
+
+    element_ctx = fwk_module_get_element_ctx(element_id);
+    element_ctx->ctx = fwk_mm_calloc(1, sizeof(struct __fwk_ctx));
+
+    if (element_ctx->ctx == NULL)
+        return FWK_E_NOMEM;
+
+    return __fwk_init(event_count, element_ctx->ctx);
+}
 
 enum interrupt_states {
     UNKNOWN_STATE = 0,
@@ -61,13 +114,16 @@ static struct fwk_event *duplicate_event(
     enum fwk_event_type event_type)
 {
     struct fwk_event *allocated_event = NULL;
+    struct __fwk_ctx *ctx;
     unsigned int flags;
 
     fwk_assert(event != NULL);
 
+    ctx = __fwk_get_ctx();
+
     flags = fwk_interrupt_global_disable();
     allocated_event = FWK_LIST_GET(
-        fwk_list_pop_head(&ctx.free_event_queue), struct fwk_event, slist_node);
+        fwk_list_pop_head(&ctx->free_event_queue), struct fwk_event, slist_node);
     (void)fwk_interrupt_global_enable(flags);
 
     if (allocated_event == NULL) {
@@ -94,7 +150,7 @@ static struct fwk_event *duplicate_event(
     return allocated_event;
 }
 
-static int put_event(
+static int put_event(struct __fwk_ctx *ctx,
     void *event,
     enum interrupt_states intr_state,
     enum fwk_event_type event_type)
@@ -132,7 +188,7 @@ static int put_event(
     }
 
     if (std_event != NULL) {
-        allocated_event->cookie = ctx.event_cookie_counter++;
+        allocated_event->cookie = ctx->event_cookie_counter++;
         std_event->cookie = allocated_event->cookie;
     }
 
@@ -144,9 +200,9 @@ static int put_event(
         }
     }
     if (intr_state == NOT_INTERRUPT_STATE) {
-        fwk_list_push_tail(&ctx.event_queue, &allocated_event->slist_node);
+        fwk_list_push_tail(&ctx->event_queue, &allocated_event->slist_node);
     } else {
-        fwk_list_push_tail(&ctx.isr_event_queue, &allocated_event->slist_node);
+        fwk_list_push_tail(&ctx->isr_event_queue, &allocated_event->slist_node);
     }
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
@@ -161,16 +217,17 @@ static int put_event(
     return FWK_SUCCESS;
 }
 
-static void free_event(struct fwk_event *event)
+static void free_event(struct __fwk_ctx *ctx,
+                       struct fwk_event *event)
 {
     unsigned int flags;
 
     flags = fwk_interrupt_global_disable();
-    fwk_list_push_tail(&ctx.free_event_queue, &event->slist_node);
+    fwk_list_push_tail(&ctx->free_event_queue, &event->slist_node);
     (void)fwk_interrupt_global_enable(flags);
 }
 
-static void process_next_event(void)
+static void process_next_event(struct __fwk_ctx *ctx)
 {
     int status;
     struct fwk_event *event, *allocated_event, async_response_event;
@@ -178,8 +235,8 @@ static void process_next_event(void)
     int (*process_event)(
         const struct fwk_event *event, struct fwk_event *resp_event);
 
-    ctx.current_event = event = FWK_LIST_GET(
-        fwk_list_pop_head(&ctx.event_queue), struct fwk_event, slist_node);
+    ctx->current_event = event = FWK_LIST_GET(
+        fwk_list_pop_head(&ctx->event_queue), struct fwk_event, slist_node);
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
     FWK_LOG_TRACE(
@@ -209,7 +266,7 @@ static void process_next_event(void)
         async_response_event.is_response = true;
         async_response_event.response_requested = false;
         if (!async_response_event.is_delayed_response) {
-            (void)put_event(
+            (void)put_event(ctx,
                 &async_response_event, UNKNOWN_STATE, FWK_EVENT_TYPE_STD);
         } else {
             allocated_event =
@@ -233,19 +290,19 @@ static void process_next_event(void)
         }
     }
 
-    ctx.current_event = NULL;
-    free_event(event);
+    ctx->current_event = NULL;
+    free_event(ctx, event);
     return;
 }
 
-static bool process_isr(void)
+static bool process_isr(struct __fwk_ctx *ctx)
 {
     struct fwk_event *isr_event;
     unsigned int flags;
 
     flags = fwk_interrupt_global_disable();
     isr_event = FWK_LIST_GET(
-        fwk_list_pop_head(&ctx.isr_event_queue), struct fwk_event, slist_node);
+        fwk_list_pop_head(&ctx->isr_event_queue), struct fwk_event, slist_node);
     (void)fwk_interrupt_global_enable(flags);
 
     if (isr_event == NULL) {
@@ -260,7 +317,7 @@ static bool process_isr(void)
         FWK_ID_STR(isr_event->target_id));
 #endif
 
-    fwk_list_push_tail(&ctx.event_queue, &isr_event->slist_node);
+    fwk_list_push_tail(&ctx->event_queue, &isr_event->slist_node);
 
     return true;
 }
@@ -269,34 +326,38 @@ static bool process_isr(void)
  * Private interface functions
  */
 
-int __fwk_init(size_t event_count)
+int __fwk_init(size_t event_count, struct __fwk_ctx *ctx)
 {
     struct fwk_event *event_table, *event;
 
     event_table = fwk_mm_calloc(event_count, sizeof(struct fwk_event));
 
     /* All the event structures are free to be used. */
-    fwk_list_init(&ctx.free_event_queue);
-    fwk_list_init(&ctx.event_queue);
-    fwk_list_init(&ctx.isr_event_queue);
+    fwk_list_init(&ctx->free_event_queue);
+    fwk_list_init(&ctx->event_queue);
+    fwk_list_init(&ctx->isr_event_queue);
 
     for (event = event_table; event < (event_table + event_count); event++) {
-        fwk_list_push_tail(&ctx.free_event_queue, &event->slist_node);
+        fwk_list_push_tail(&ctx->free_event_queue, &event->slist_node);
     }
 
-    ctx.initialized = true;
+    ctx->initialized = true;
 
     return FWK_SUCCESS;
 }
 
 void fwk_process_event_queue(void)
 {
+    struct __fwk_ctx *ctx;
+
+    ctx = __fwk_get_ctx();
+
     for (;;) {
-        while (!fwk_list_is_empty(&ctx.event_queue)) {
-            process_next_event();
+        while (!fwk_list_is_empty(&ctx->event_queue)) {
+            process_next_event(ctx);
         }
 
-        if (!process_isr()) {
+        if (!process_isr(ctx)) {
             break;
         }
     }
@@ -311,23 +372,26 @@ noreturn void __fwk_run_main_loop(void)
     }
 }
 
-struct __fwk_ctx *__fwk_get_ctx(void)
-{
-    return &ctx;
-}
-
 const struct fwk_event *__fwk_get_current_event(void)
 {
-    return ctx.current_event;
+    struct __fwk_ctx *ctx;
+
+    ctx = __fwk_get_ctx();
+
+    return ctx->current_event;
 }
 
 #ifdef BUILD_HAS_NOTIFICATION
 int __fwk_put_notification(struct fwk_event *event)
 {
+    struct __fwk_ctx *ctx;
+
+    ctx = __fwk_get_ctx();
+
     event->is_response = false;
     event->is_notification = true;
 
-    return put_event(event, UNKNOWN_STATE, FWK_EVENT_TYPE_STD);
+    return put_event(ctx, event, UNKNOWN_STATE, FWK_EVENT_TYPE_STD);
 }
 #endif
 
@@ -338,10 +402,12 @@ int __fwk_put_notification(struct fwk_event *event)
 int __fwk_put_event(struct fwk_event *event)
 {
     int status = FWK_E_PARAM;
+    struct __fwk_ctx *ctx;
     enum interrupt_states intr_state;
 
+    ctx = __fwk_get_ctx();
 #ifdef BUILD_MODE_DEBUG
-    if (!ctx.initialized) {
+    if (!ctx->initialized) {
         status = FWK_E_INIT;
         goto error;
     }
@@ -357,8 +423,8 @@ int __fwk_put_event(struct fwk_event *event)
         intr_state = NOT_INTERRUPT_STATE;
     }
 
-    if ((intr_state == NOT_INTERRUPT_STATE) && (ctx.current_event != NULL)) {
-        event->source_id = ctx.current_event->target_id;
+    if ((intr_state == NOT_INTERRUPT_STATE) && (ctx->current_event != NULL)) {
+        event->source_id = ctx->current_event->target_id;
     } else if (
         !fwk_id_type_is_valid(event->source_id) ||
         !fwk_module_is_valid_entity_id(event->source_id)) {
@@ -400,7 +466,7 @@ int __fwk_put_event(struct fwk_event *event)
     }
 #endif
 
-    return put_event(event, intr_state, FWK_EVENT_TYPE_STD);
+    return put_event(ctx, event, intr_state, FWK_EVENT_TYPE_STD);
 
 error:
     FWK_LOG_CRIT(err_msg_func, status, __func__);
@@ -410,10 +476,13 @@ error:
 int __fwk_put_event_light(struct fwk_event_light *event)
 {
     int status = FWK_E_PARAM;
+    struct __fwk_ctx *ctx;
     enum interrupt_states intr_state;
 
+    ctx = __fwk_get_ctx();
+
 #ifdef BUILD_MODE_DEBUG
-    if (!ctx.initialized) {
+    if (!ctx->initialized) {
         status = FWK_E_INIT;
         goto error;
     }
@@ -429,8 +498,8 @@ int __fwk_put_event_light(struct fwk_event_light *event)
         intr_state = NOT_INTERRUPT_STATE;
     }
 
-    if ((intr_state == NOT_INTERRUPT_STATE) && (ctx.current_event != NULL)) {
-        event->source_id = ctx.current_event->target_id;
+    if ((intr_state == NOT_INTERRUPT_STATE) && (ctx->current_event != NULL)) {
+        event->source_id = ctx->current_event->target_id;
     } else if (
         !fwk_id_type_is_valid(event->source_id) ||
         !fwk_module_is_valid_entity_id(event->source_id)) {
@@ -451,7 +520,7 @@ int __fwk_put_event_light(struct fwk_event_light *event)
     }
 
 #endif
-    return put_event(event, intr_state, FWK_EVENT_TYPE_LIGHT);
+    return put_event(ctx, event, intr_state, FWK_EVENT_TYPE_LIGHT);
 
 error:
     FWK_LOG_CRIT(err_msg_func, status, __func__);

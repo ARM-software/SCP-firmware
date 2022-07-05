@@ -20,6 +20,21 @@
 #include <malloc.h>
 
 #include <mod_optee_mhu.h>
+#include <internal/fwk_context.h>
+
+extern short int thread_get_id(void);
+
+static struct __fwk_ctx *thread_ctx[CFG_NUM_THREADS];
+
+struct __fwk_ctx *arch_get_execution_ctx(void)
+{
+    return thread_ctx[thread_get_id()];
+}
+
+void arch_set_execution_ctx(struct __fwk_ctx *ctx)
+{
+    thread_ctx[thread_get_id()] = ctx;
+}
 
 #include <arch_interrupt.h>
 
@@ -29,7 +44,10 @@ static const struct fwk_arch_init_driver scmi_init_driver = {
 
 int scmi_arch_init(void)
 {
+    fwk_id_t none_id = FWK_ID_NONE_INIT;
     int status;
+
+    fwk_set_ctx(none_id);
 
     status = fwk_arch_init(&scmi_init_driver);
 
@@ -68,6 +86,8 @@ void scmi_process_mhu_smt(unsigned int fwk_id)
 
     device_id.value = fwk_id;
 
+    fwk_set_ctx(device_id);
+
     optee_mhu_signal_smt_message(device_id);
 
     fwk_process_event_queue();
@@ -83,6 +103,8 @@ void scmi_process_mhu_msg(unsigned int fwk_id, void *in_buf, size_t in_size,
     fwk_id_t device_id;
 
     device_id.value = fwk_id;
+
+    fwk_set_ctx(device_id);
 
     optee_mhu_signal_msg_message(device_id, in_buf, in_size, out_buf, out_size);
 

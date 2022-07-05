@@ -11,18 +11,21 @@
 #include <fwk_core.h>
 #include <fwk_event.h>
 #include <fwk_noreturn.h>
-
+#include <internal/fwk_context.h>
 #include <stddef.h>
+
+extern struct __fwk_ctx global_ctx;
 
 /*
  * \brief Initialize the core framework component.
  *
  * \param event_count The maximum number of events in all queues at all time.
+ * \param ctx the framexork context to intialize.
  *
  * \retval ::FWK_SUCCESS The core framework component was initialized.
  * \retval ::FWK_E_NOMEM Insufficient memory available for event queues.
  */
-int __fwk_init(size_t event_count);
+int __fwk_init(size_t event_count, struct __fwk_ctx *ctx);
 
 /*
  * \brief Loop forever, processing events raised by modules and interrupt

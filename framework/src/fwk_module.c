@@ -11,6 +11,7 @@
 #include <internal/fwk_core.h>
 #include <internal/fwk_id.h>
 #include <internal/fwk_module.h>
+#include <internal/fwk_context.h>
 
 #include <fwk_assert.h>
 #include <fwk_cli_dbg.h>
@@ -98,6 +99,7 @@ static void fwk_module_init_element_ctx(
         .state = FWK_MODULE_STATE_UNINITIALIZED,
         .desc = element,
         .sub_element_count = element->sub_element_count,
+        .ctx = NULL,
     };
 
     fwk_list_init(&ctx->delayed_response_list);
@@ -199,6 +201,11 @@ static void fwk_module_init_elements(struct fwk_module_context *ctx)
 
         status = desc->element_init(
             element_id, element->sub_element_count, element->data);
+
+        if (status == FWK_INIT_CTX) {
+            status = __fwk_init_execution_ctx(element_id, FWK_MODULE_EVENT_COUNT);
+        }
+
         if (status != FWK_SUCCESS) {
             fwk_trap();
         }
@@ -420,7 +427,7 @@ int fwk_module_start(void)
 
     CLI_DEBUGGER();
 
-    status = __fwk_init(FWK_MODULE_EVENT_COUNT);
+    status = __fwk_init(FWK_MODULE_EVENT_COUNT, &global_ctx);
     if (status != FWK_SUCCESS) {
         return status;
     }

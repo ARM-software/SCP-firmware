@@ -148,6 +148,22 @@ int fwk_is_delayed_response_list_empty(fwk_id_t id, bool *is_empty);
 int fwk_get_first_delayed_response(fwk_id_t id, struct fwk_event *event);
 
 /*!
+ * \brief Set the execution context to be used. An specific execution context
+ * can be associated to an element.
+ *
+ * \details When there are several transport channels that operate on
+ * unrelated resources, we can used dedicated execution context (event list ...)
+ * in order to parallelize the requests.
+ *
+ * \param[in] id Identifier of the module or element to use for the execution
+ * context.
+ *
+ * \retval ::FWK_SUCCESS The execution context has been set.
+ * \return Status code representing the result of the operation.
+ */
+void fwk_set_ctx(fwk_id_t id);
+
+/*!
  * \}
  */
 

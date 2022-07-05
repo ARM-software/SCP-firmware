@@ -49,4 +49,19 @@ struct __fwk_ctx {
  */
 struct __fwk_ctx *__fwk_get_ctx(void);
 
+/*
+ * \brief Init an execution context.
+ */
+int __fwk_init_execution_ctx(fwk_id_t element_id, size_t event_count);
+
+/*
+ * \brief architecture specific get of the current execution context.
+ */
+struct __fwk_ctx *arch_get_execution_ctx(void);
+
+/*
+ * \brief architecture specific set of the current execution context.
+ */
+void arch_set_execution_ctx(struct __fwk_ctx *ctx);
+
 #endif /* FWK_INTERNAL_CONTEXT_H */
