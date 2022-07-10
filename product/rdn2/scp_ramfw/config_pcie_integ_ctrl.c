@@ -92,29 +92,29 @@ static const struct fwk_element pcie_integ_ctrl_element_table[] = {
             .x4_0_ecam_mmio_mmap = {
                 .valid = true,
                 .allow_ns_access = true,
-                .mmioh_start_addr = 0xC00000000000,
-                .mmioh_end_addr = 0xC0000040FFFF,
+                .mmioh_start_addr = 0x1080000000,
+                .mmioh_end_addr = 0x108040FFFF,
             },
-            /* PL330_DMA0_NS (64 KB) and PL330_DMA0_NS (64 KB) */
+            /* PL330_DMA0_NS (64 KB) and PL330_DMA0_S (64 KB) */
             .x4_1_ecam_mmio_mmap = {
                 .valid = true,
                 .allow_ns_access = true,
-                .mmioh_start_addr = 0xC00010000000,
-                .mmioh_end_addr = 0xC0001001FFFF,
+                .mmioh_start_addr = 0x1090000000,
+                .mmioh_end_addr = 0x109001FFFF,
             },
             /* PL011_UART1 (64 KB) */
             .x8_ecam_mmio_mmap = {
                 .valid = true,
                 .allow_ns_access = true,
-                .mmioh_start_addr = 0xC00020000000,
-                .mmioh_end_addr = 0xC0002000FFFF,
+                .mmioh_start_addr = 0x10A0000000,
+                .mmioh_end_addr = 0x10A000FFFF,
             },
-            /* PL330_DMA0_NS (64 KB), PL330_DMA0_NS(64 KB) and MEM1 (4 MB) */
+            /* PL330_DMA0_NS (64 KB), PL330_DMA0_S(64 KB) and MEM1 (4 MB) */
             .x16_ecam_mmio_mmap = {
                 .valid = true,
                 .allow_ns_access = true,
-                .mmioh_start_addr = 0xC00030000000,
-                .mmioh_end_addr = 0xC0003041FFFF,
+                .mmioh_start_addr = 0x10B0000000,
+                .mmioh_end_addr = 0x10B041FFFF,
             },
             .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
                 CLOCK_IDX_INTERCONNECT),

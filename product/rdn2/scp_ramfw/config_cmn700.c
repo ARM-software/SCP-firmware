@@ -430,9 +430,9 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
     {
         /*
          * Non-PCIe IO Macro
-         * Map: 0xC000_0000_0000 - 0xC000_3FFF_FFFF (1 GB)
+         * Map: 0x10_8000_0000 - 0x10_BFFF_FFFF (1 GB)
          */
-        .base = UINT64_C(0xC00000000000),
+        .base = UINT64_C(0x1080000000),
         .size = UINT64_C(1) * FWK_GIB,
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_NON_PCIE_IO_MACRO,
