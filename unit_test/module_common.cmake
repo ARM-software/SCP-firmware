@@ -18,13 +18,13 @@ if(TEST_ON_HOST)
 
     # Create unit test target
     add_executable(${UNIT_TEST_TARGET}
-                   ${MODULE_UT_SRC}/mod_${TEST_MODULE}_unit_test.c)
+                   ${MODULE_UT_SRC}/${TEST_FILE}_unit_test.c)
 endif()
 
 if(TEST_ON_TARGET)
     # Add sources to test target
     target_sources(${UNIT_TEST_TARGET}
-                  PRIVATE ${MODULE_UT_SRC}/mod_${TEST_MODULE}_unit_test.c)
+                  PRIVATE ${MODULE_UT_SRC}/${TEST_FILE}_unit_test.c)
 
     target_compile_definitions(
         ${UNIT_TEST_TARGET}
@@ -35,7 +35,7 @@ endif()
 # Include test module source in unit test c source file.
 target_compile_definitions(
     ${UNIT_TEST_TARGET}
-    PUBLIC "UNIT_TEST_SRC=\"${MODULE_SRC}/mod_${TEST_MODULE}.c\"")
+    PUBLIC "UNIT_TEST_SRC=\"${MODULE_SRC}/${TEST_SRC}.c\"")
 
 
 target_include_directories(
@@ -54,9 +54,9 @@ if(EXISTS ${MODULE_INC}/internal)
                                PRIVATE ${MODULE_INC}/internal)
 endif()
 
-if(EXISTS ${MODULE_UT_MOCK_SRC}/Mockmod_${TEST_MODULE}_extra.c)
+if(EXISTS ${MODULE_UT_MOCK_SRC}/Mock${TEST_FILE}_extra.c)
     target_sources(${UNIT_TEST_TARGET}
-                   PRIVATE ${MODULE_UT_MOCK_SRC}/Mockmod_${TEST_MODULE}_extra.c)
+                   PRIVATE ${MODULE_UT_MOCK_SRC}/Mock${TEST_FILE}_extra.c)
 endif()
 
 if(TEST_ON_HOST)
