@@ -34,7 +34,13 @@ static const struct fwk_element service_table[] = {
                                                 MOD_MSG_SMT_API_IDX_SCMI_TRANSPORT),
             .scmi_agent_id = SCMI_AGENT_ID_OSPM,
             .transport_notification_init_id = FWK_ID_NONE_INIT,
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+            .scmi_p2a_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_SCMI,
+                SCMI_SERVICE_IDX_OSPM_0_P2A),
+#else
             .scmi_p2a_id = FWK_ID_NONE_INIT,
+#endif
         }),
     },
     [SCMI_SERVICE_IDX_OSPM_1] = {
@@ -46,9 +52,41 @@ static const struct fwk_element service_table[] = {
                                                 MOD_MSG_SMT_API_IDX_SCMI_TRANSPORT),
             .scmi_agent_id = SCMI_AGENT_ID_PERF,
             .transport_notification_init_id = FWK_ID_NONE_INIT,
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+            .scmi_p2a_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_SCMI,
+                SCMI_SERVICE_IDX_OSPM_1_P2A),
+#else
+            .scmi_p2a_id = FWK_ID_NONE_INIT,
+#endif
+        }),
+    },
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    [SCMI_SERVICE_IDX_OSPM_0_P2A] = {
+        .name = "agent OSPM0 P2A",
+        .data = &((struct mod_scmi_service_config) {
+            .transport_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MSG_SMT,
+                                                SCMI_SERVICE_IDX_OSPM_0_P2A),
+            .transport_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MSG_SMT,
+                                                MOD_MSG_SMT_API_IDX_SCMI_TRANSPORT),
+            .scmi_agent_id = SCMI_AGENT_ID_OSPM,
+            .transport_notification_init_id = FWK_ID_NONE_INIT,
             .scmi_p2a_id = FWK_ID_NONE_INIT,
         }),
     },
+    [SCMI_SERVICE_IDX_OSPM_1_P2A] = {
+        .name = "agent OSPM1 P2A",
+        .data = &((struct mod_scmi_service_config) {
+            .transport_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MSG_SMT,
+                                                SCMI_SERVICE_IDX_OSPM_1_P2A),
+            .transport_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MSG_SMT,
+                                                MOD_MSG_SMT_API_IDX_SCMI_TRANSPORT),
+            .scmi_agent_id = SCMI_AGENT_ID_OSPM,
+            .transport_notification_init_id = FWK_ID_NONE_INIT,
+            .scmi_p2a_id = FWK_ID_NONE_INIT,
+        }),
+    },
+#endif
     [SCMI_SERVICE_IDX_COUNT] = { 0 }
 };
 

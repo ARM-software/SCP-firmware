@@ -15,9 +15,28 @@
 #define OPTEE_MHU_SHMEM_SIZE 128
 
 /*!
+ * \brief Channel type
+ *
+ * \details Defines the role of an entity in a channel
+ */
+enum mod_optee_mhu_channel_type {
+    /*! Requester channel */
+    MOD_OPTEE_MHU_CHANNEL_TYPE_REQUESTER,
+
+    /*! Completer channel */
+    MOD_OPTEE_MHU_CHANNEL_TYPE_COMPLETER,
+
+    /*! Channel type count */
+    MOD_OPTEE_MHU_CHANNEL_TYPE_COUNT,
+};
+
+/*!
  * \brief Channel config.
  */
 struct mod_optee_mhu_channel_config {
+    /*! Channel role (requester or completer) */
+    enum mod_optee_mhu_channel_type type;
+
     /*! Identifier of the driver */
     fwk_id_t driver_id;
 

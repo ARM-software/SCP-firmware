@@ -25,6 +25,7 @@ static const struct fwk_element mhu_element_table[] = {
     [SCMI_CHANNEL_DEVICE_IDX_NS0] = {
         .name = "SCMI non-secure to OP-TEE channel 0",
         .data = &((struct mod_optee_mhu_channel_config){
+            .type = MOD_OPTEE_MHU_CHANNEL_TYPE_REQUESTER,
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_OPTEE_SMT, 0),
             .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_OPTEE_SMT,
                                              MOD_OPTEE_SMT_API_IDX_DRIVER_INPUT)

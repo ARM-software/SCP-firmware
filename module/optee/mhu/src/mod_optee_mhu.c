@@ -16,6 +16,7 @@
 #include <fwk_log.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
+#include <fwk_core.h>
 #include <fwk_status.h>
 #include <mod_optee_mhu.h>
 #include <mod_optee_smt.h>
@@ -64,9 +65,16 @@ void optee_mhu_signal_smt_message(fwk_id_t device_id)
         device_ctx = &mhu_ctx.device_ctx_table[device_idx];
 
         /* Lock the channel until the message has been processed */
-        mutex_lock(&device_ctx->lock);
+        if (device_ctx->config->type == MOD_OPTEE_MHU_CHANNEL_TYPE_REQUESTER) {
+            mutex_lock(&device_ctx->lock);
+        }
 
         device_ctx->shmem_api.smt->signal_message(device_ctx->shmem_id);
+
+        if (device_ctx->config->type == MOD_OPTEE_MHU_CHANNEL_TYPE_COMPLETER) {
+            /* Wait until notification is ready */
+            mutex_lock(&device_ctx->lock);
+        }
     } else {
         fwk_unexpected();
     }
@@ -89,12 +97,19 @@ void optee_mhu_signal_msg_message(fwk_id_t device_id, void *in_buf,
 
 
         /* Lock the channel until the message has been processed */
-        mutex_lock(&device_ctx->lock);
+        if (device_ctx->config->type == MOD_OPTEE_MHU_CHANNEL_TYPE_REQUESTER) {
+            mutex_lock(&device_ctx->lock);
+        }
 
         device_ctx->shm_out_size = out_size;
         device_ctx->shmem_api.msg->signal_message(device_ctx->shmem_id,
                                                   in_buf, in_size,
                                                   out_buf, *out_size);
+
+        if (device_ctx->config->type == MOD_OPTEE_MHU_CHANNEL_TYPE_COMPLETER) {
+            /* Wait until notification is ready */
+            mutex_lock(&device_ctx->lock);
+        }
     } else {
         fwk_unexpected();
     }
@@ -144,7 +159,6 @@ static int raise_shm_notification(fwk_id_t channel_id, size_t size)
 
     *channel_ctx->shm_out_size = size;
 
-
     /* Release the channel as the message has been processed */
     mutex_unlock(&channel_ctx->lock);
 
@@ -185,7 +199,17 @@ static int mhu_device_init(fwk_id_t device_id, unsigned int slot_count,
 
     device_ctx->config = (struct mod_optee_mhu_channel_config*)data;
 
+    /* Validate channel config */
+    if (device_ctx->config->type >= MOD_OPTEE_MHU_CHANNEL_TYPE_COUNT) {
+        assert(false);
+        return FWK_E_DATA;
+    }
+
     mutex_init(&device_ctx->lock);
+    if (device_ctx->config->type == MOD_OPTEE_MHU_CHANNEL_TYPE_COMPLETER) {
+        /* lock the notification message */
+        mutex_lock(&device_ctx->lock);
+    }
 
     /*
      * Request the creation of an execution context for the device so we can
