@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
+set(TEST_SRC mod_scmi)
+set(TEST_FILE mod_scmi)
+
 if(TEST_ON_TARGET)
     set(TEST_MODULE scmi)
     set(MODULE_ROOT ${CMAKE_SOURCE_DIR}/module)
