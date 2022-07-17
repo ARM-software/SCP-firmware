@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -379,6 +379,28 @@ static void cmn600_configure(void)
     }
 }
 
+static int get_tgt_nodeid_reg_count()
+{
+    switch (get_cmn600_revision(ctx->root)) {
+    case CMN600_PERIPH_ID_2_REV_R1_P0:
+    case CMN600_PERIPH_ID_2_REV_R1_P1:
+    case CMN600_PERIPH_ID_2_REV_R1_P3:
+        return CMN600_RNSAM_NON_HASH_TGT_NODEID_REGS_2;
+
+    case CMN600_PERIPH_ID_2_REV_R1_P2:
+    case CMN600_PERIPH_ID_2_REV_R2_P0:
+        return CMN600_RNSAM_NON_HASH_TGT_NODEID_REGS_3;
+
+    case CMN600_PERIPH_ID_2_REV_R3_P0:
+    case CMN600_PERIPH_ID_2_REV_R3_P1:
+        return CMN600_RNSAM_NON_HASH_TGT_NODEID_REGS_5;
+
+    default:
+        fwk_unexpected();
+        return FWK_E_DEVICE;
+    }
+}
+
 int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
 {
     unsigned int region_idx;
@@ -393,8 +415,16 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
     uint64_t base;
     unsigned int scg_region = 0;
     unsigned int scg_regions_enabled[CMN600_MAX_NUM_SCG] = {0, 0, 0, 0};
+    unsigned int tgt_nodeid_reg_count;
+    volatile uint64_t *nodeid;
+    int status;
 
     FWK_LOG_INFO(MOD_NAME "Configuring SAM for node %d", get_node_id(rnsam));
+
+    status = get_tgt_nodeid_reg_count();
+    if (status < 0)
+        return FWK_E_DEVICE;
+    tgt_nodeid_reg_count = (unsigned int)status;
 
     for (region_idx = 0; region_idx < config->mmap_count; region_idx++) {
         region = &config->mmap_table[region_idx];
@@ -427,12 +457,13 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
             /*
              * Configure memory region
              */
-            if (region_io_count >
-                    CMN600_RNSAM_MAX_NON_HASH_MEM_REGION_ENTRIES) {
+            if (region_io_count > CMN600_RNSAM_MAX_NON_HASH_MEM_REGION_ENTRIES(
+                                      tgt_nodeid_reg_count)) {
                 FWK_LOG_ERR(
                     MOD_NAME
                     "Non-Hashed Memory can have maximum of %d regions only",
-                    CMN600_RNSAM_MAX_NON_HASH_MEM_REGION_ENTRIES);
+                    CMN600_RNSAM_MAX_NON_HASH_MEM_REGION_ENTRIES(
+                        tgt_nodeid_reg_count));
                 return FWK_E_DATA;
             }
 
@@ -454,14 +485,38 @@ int cmn600_setup_sam(struct cmn600_rnsam_reg *rnsam)
              */
             group = region_io_count /
                 CMN600_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP;
+            if (group > tgt_nodeid_reg_count) {
+                FWK_LOG_ERR(
+                    MOD_NAME
+                    "Non-Hashed Memory can have maximum of %d groups only",
+                    tgt_nodeid_reg_count);
+                return FWK_E_DATA;
+            }
+
             bit_pos = CMN600_RNSAM_NON_HASH_TGT_NODEID_ENTRY_BITS_WIDTH *
                       (region_io_count %
                        CMN600_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP);
 
-            rnsam->NON_HASH_TGT_NODEID[group] &=
+            if (group < CMN600_RNSAM_NON_HASH_TGT_NODEID_REGS_3) {
+                nodeid = &rnsam->NON_HASH_TGT_NODEID[group];
+            } else if (group < CMN600_RNSAM_NON_HASH_TGT_NODEID_REGS_5) {
+                /*
+                 * CMN-600 revisions R3P0 and above has five NON_HASH_TGT_NODEID
+                 * registers. Last two registers are implemented in a different
+                 * offset address
+                 */
+                nodeid = &rnsam->NON_HASH_TGT_NODEID_GRP2
+                              [group - CMN600_RNSAM_NON_HASH_TGT_NODEID_REGS_3];
+            } else {
+                FWK_LOG_ERR(MOD_NAME "Invalid Non-Hashed target node ID group");
+                return FWK_E_DATA;
+            }
+
+            *nodeid &=
                 ~(CMN600_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK << bit_pos);
-            rnsam->NON_HASH_TGT_NODEID[group] |= (region->node_id &
-                CMN600_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK) << bit_pos;
+            *nodeid |=
+                (region->node_id & CMN600_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK)
+                << bit_pos;
 
             region_io_count++;
             break;
