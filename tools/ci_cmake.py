@@ -50,6 +50,7 @@ products = [
     Product('rcar', toolchains=[Parameter('GNU')]),
     Product('rdn2', variants=[Parameter('0'), Parameter('1'), Parameter('2')]),
     Product('rdfremont'),
+    Product('tc2'),
 ]
 
 
