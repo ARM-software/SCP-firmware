@@ -1,6 +1,7 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -71,24 +72,30 @@ static int reset_set_state(fwk_id_t dev_id, enum mod_reset_domain_mode mode,
 
     switch (mode) {
     case MOD_RESET_DOMAIN_MODE_EXPLICIT_ASSERT:
-        FWK_LOG_TRACE(MOD_NAME "SCMI reset %u: assert(%s)",
-             fwk_id_get_element_idx(dev_id), rstctrl_name(ctx->rstctrl));
+        FWK_LOG_DEBUG(
+            MOD_NAME "SCMI reset %u: assert(%s)",
+            fwk_id_get_element_idx(dev_id),
+            rstctrl_name(ctx->rstctrl));
 
         if (rstctrl_assert(ctx->rstctrl)) {
             status = FWK_E_DEVICE;
         }
         break;
     case MOD_RESET_DOMAIN_MODE_EXPLICIT_DEASSERT:
-        FWK_LOG_TRACE(MOD_NAME "SCMI reset %u: deassert(%s)",
-             fwk_id_get_element_idx(dev_id), rstctrl_name(ctx->rstctrl));
+        FWK_LOG_DEBUG(
+            MOD_NAME "SCMI reset %u: deassert(%s)",
+            fwk_id_get_element_idx(dev_id),
+            rstctrl_name(ctx->rstctrl));
 
         if (rstctrl_deassert(ctx->rstctrl)) {
             status = FWK_E_DEVICE;
         }
         break;
     case MOD_RESET_DOMAIN_AUTO_RESET:
-        FWK_LOG_TRACE(MOD_NAME "SCMI reset %u: cycle(%s)",
-             fwk_id_get_element_idx(dev_id), rstctrl_name(ctx->rstctrl));
+        FWK_LOG_DEBUG(
+            MOD_NAME "SCMI reset %u: cycle(%s)",
+            fwk_id_get_element_idx(dev_id),
+            rstctrl_name(ctx->rstctrl));
 
         if (rstctrl_assert_to(ctx->rstctrl, TIMEOUT_US_1MS)) {
             status = FWK_E_TIMEOUT;

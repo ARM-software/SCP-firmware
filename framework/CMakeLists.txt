@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -119,7 +119,7 @@ if(NOT DEFINED SCP_LOG_LEVEL)
         "${SCP_LOG_LEVEL_DEFAULT}"
         CACHE STRING "Minimum logging level.")
 
-    set_property(CACHE SCP_LOG_LEVEL PROPERTY STRINGS "TRACE" "INFO" "WARN"
+    set_property(CACHE SCP_LOG_LEVEL PROPERTY STRINGS "DEBUG" "INFO" "WARN"
                                                       "ERROR" "CRIT")
 endif()
 

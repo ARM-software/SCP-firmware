@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -495,7 +495,7 @@ error:
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
                                                  sizeof(return_values.status));
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI_BASE] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI_BASE] %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -657,7 +657,7 @@ exit:
                                                  sizeof(return_values.status));
 
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI_BASE] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI_BASE] %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -730,7 +730,7 @@ exit:
                                                  sizeof(return_values.status));
 
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI_BASE] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI_BASE] %s @%d", __func__, __LINE__);
     }
 
     return status;

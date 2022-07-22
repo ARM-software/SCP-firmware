@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -211,7 +211,7 @@ static int cmn700_discovery(void)
     FWK_LOG_INFO(
         MOD_NAME "CMN-700 revision: %s", get_cmn700_revision_name(ctx->root));
     FWK_LOG_INFO(MOD_NAME "Starting discovery...");
-    FWK_LOG_TRACE(MOD_NAME "Rootnode Base address: 0x%x", (uintptr_t)ctx->root);
+    FWK_LOG_DEBUG(MOD_NAME "Rootnode Base address: 0x%x", (uintptr_t)ctx->root);
 
     fwk_assert(get_node_type(ctx->root) == NODE_TYPE_CFG);
 

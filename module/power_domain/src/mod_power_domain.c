@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -662,7 +662,7 @@ static bool initiate_power_state_pre_transition_notification(struct pd_ctx *pd)
         &notification_event,
         &pd->power_state_pre_transition_notification_ctx.pending_responses);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[PD] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[PD] %s @%d", __func__, __LINE__);
     }
 
     pd->power_state_pre_transition_notification_ctx.state = state;
@@ -694,8 +694,8 @@ static int initiate_power_state_transition(struct pd_ctx *pd)
 
     if ((pd->driver_api->deny != NULL) &&
         pd->driver_api->deny(pd->driver_id, state)) {
-#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
-        FWK_LOG_TRACE(
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_DEBUG
+        FWK_LOG_DEBUG(
             "[PD] Transition of %s to state <%s> denied by driver",
             fwk_module_get_element_name(pd->id),
             get_state_name(pd, state));
@@ -705,9 +705,9 @@ static int initiate_power_state_transition(struct pd_ctx *pd)
 
     status = pd->driver_api->set_state(pd->driver_id, state);
 
-#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_DEBUG
     if (status == FWK_SUCCESS) {
-        FWK_LOG_TRACE(
+        FWK_LOG_DEBUG(
             "[PD] Transition of %s from <%s> to <%s> succeeded",
             fwk_module_get_element_name(pd->id),
             get_state_name(pd, pd->state_requested_to_driver),
@@ -762,7 +762,7 @@ static void respond(struct pd_ctx *pd, int resp_status)
 
     status = fwk_put_event(&resp_event);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[PD] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[PD] %s @%d", __func__, __LINE__);
     }
 }
 
@@ -1113,7 +1113,7 @@ static void process_power_state_transition_report_deeper_state(
     if (!initiate_power_state_pre_transition_notification(parent)) {
         status = initiate_power_state_transition(parent);
         if (status != FWK_SUCCESS) {
-            FWK_LOG_TRACE("[PD] %s @%d", __func__, __LINE__);
+            FWK_LOG_DEBUG("[PD] %s @%d", __func__, __LINE__);
         }
     }
 }
@@ -1147,7 +1147,7 @@ static void process_power_state_transition_report_shallower_state(
         if (!initiate_power_state_pre_transition_notification(child)) {
             status = initiate_power_state_transition(child);
             if (status != FWK_SUCCESS) {
-                FWK_LOG_TRACE("[PD] %s @%d", __func__, __LINE__);
+                FWK_LOG_DEBUG("[PD] %s @%d", __func__, __LINE__);
             }
         }
     }
@@ -1192,7 +1192,7 @@ static void process_power_state_transition_report(struct pd_ctx *pd,
             &notification_event,
             &pd->power_state_transition_notification_ctx.pending_responses);
         if (status != FWK_SUCCESS) {
-            FWK_LOG_TRACE("[PD] %s @%d", __func__, __LINE__);
+            FWK_LOG_DEBUG("[PD] %s @%d", __func__, __LINE__);
         }
     }
 #endif
@@ -1202,7 +1202,7 @@ static void process_power_state_transition_report(struct pd_ctx *pd,
         mod_pd_ctx.system_suspend.last_core_off_ongoing = false;
         status = complete_system_suspend(pd);
         if (status != FWK_SUCCESS) {
-            FWK_LOG_TRACE("[PD] %s @%d", __func__, __LINE__);
+            FWK_LOG_DEBUG("[PD] %s @%d", __func__, __LINE__);
         }
 
         return;
@@ -1427,7 +1427,7 @@ static bool check_and_notify_system_shutdown(
     status = fwk_notification_notify(
         &notification, &mod_pd_ctx.system_shutdown.notifications_count);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[PD] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[PD] %s @%d", __func__, __LINE__);
     }
 
     return (mod_pd_ctx.system_shutdown.notifications_count != 0);
@@ -1874,7 +1874,7 @@ static int pd_start(fwk_id_t id)
 
             status = report_power_state_transition(pd, state);
             if (status != FWK_SUCCESS) {
-                FWK_LOG_TRACE("[PD] %s @%d", __func__, __LINE__);
+                FWK_LOG_DEBUG("[PD] %s @%d", __func__, __LINE__);
             }
         }
     }

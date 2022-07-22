@@ -1,6 +1,7 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -60,8 +61,10 @@ static int32_t set_regu_voltage(const char *regu_id, int32_t level_uv)
     int rc = 0;
     unsigned int level_mv = level_uv / 1000;
 
-    FWK_LOG_TRACE(MOD_NAME "Set STPMIC1 regulator %s level to %dmV", regu_id,
-         level_uv / 1000);
+    FWK_LOG_DEBUG(
+        MOD_NAME "Set STPMIC1 regulator %s level to %dmV",
+        regu_id,
+        level_uv / 1000);
 
     fwk_assert(level_mv < UINT16_MAX);
 
@@ -89,8 +92,11 @@ static int32_t set_regu_state(const char *regu_id, bool enable)
 
     stm32mp_get_pmic();
 
-    FWK_LOG_TRACE(MOD_NAME "%sable STPMIC1 %s (was %s)", enable ? "En" : "Dis", regu_id,
-         stpmic1_is_regulator_enabled(regu_id) ? "on" : "off");
+    FWK_LOG_DEBUG(
+        MOD_NAME "%sable STPMIC1 %s (was %s)",
+        enable ? "En" : "Dis",
+        regu_id,
+        stpmic1_is_regulator_enabled(regu_id) ? "on" : "off");
 
     if (enable) {
         rc = stpmic1_regulator_enable(regu_id);
@@ -126,9 +132,11 @@ static int pmic_regu_get_config(fwk_id_t dev_id, uint8_t *mode_type,
         *mode_id = MOD_VOLTD_MODE_ID_OFF;
     }
 
-    FWK_LOG_TRACE(MOD_NAME "SCMI voltd %u: get config PMIC %s: %s",
-         fwk_id_get_element_idx(dev_id), ctx->regu_id,
-         *mode_id == MOD_VOLTD_MODE_ID_ON ? "on" : "off");
+    FWK_LOG_DEBUG(
+        MOD_NAME "SCMI voltd %u: get config PMIC %s: %s",
+        fwk_id_get_element_idx(dev_id),
+        ctx->regu_id,
+        *mode_id == MOD_VOLTD_MODE_ID_ON ? "on" : "off");
 
     return FWK_SUCCESS;
 }
@@ -154,9 +162,11 @@ static int pmic_regu_set_config(fwk_id_t dev_id, uint8_t mode_type,
         return FWK_E_DEVICE;
     }
 
-    FWK_LOG_TRACE(MOD_NAME "SCMI voltd %u: set config PMIC %s to %s",
-         fwk_id_get_element_idx(dev_id), ctx->regu_id,
-         mode_id == MOD_VOLTD_MODE_ID_ON ? "on" : "off");
+    FWK_LOG_DEBUG(
+        MOD_NAME "SCMI voltd %u: set config PMIC %s to %s",
+        fwk_id_get_element_idx(dev_id),
+        ctx->regu_id,
+        mode_id == MOD_VOLTD_MODE_ID_ON ? "on" : "off");
 
     return FWK_SUCCESS;
 }
@@ -173,8 +183,11 @@ static int pmic_regu_get_level(fwk_id_t dev_id, int *level_uv)
 
     *level_uv = get_regu_voltage(ctx->regu_id);
 
-    FWK_LOG_TRACE(MOD_NAME "SCMI voltd %u: get level PMIC %s = %d",
-         fwk_id_get_element_idx(dev_id), ctx->regu_id, *level_uv);
+    FWK_LOG_DEBUG(
+        MOD_NAME "SCMI voltd %u: get level PMIC %s = %d",
+        fwk_id_get_element_idx(dev_id),
+        ctx->regu_id,
+        *level_uv);
 
     return FWK_SUCCESS;
 }
@@ -193,8 +206,11 @@ static int pmic_regu_set_level(fwk_id_t dev_id, int level_uv)
         return FWK_E_ACCESS;
     }
 
-    FWK_LOG_TRACE(MOD_NAME "SCMI voltd %u: set level PMIC %s to %d",
-         fwk_id_get_element_idx(dev_id), ctx->regu_id, level_uv);
+    FWK_LOG_DEBUG(
+        MOD_NAME "SCMI voltd %u: set level PMIC %s to %d",
+        fwk_id_get_element_idx(dev_id),
+        ctx->regu_id,
+        level_uv);
 
     if (set_regu_voltage(ctx->regu_id, level_uv)) {
         return FWK_E_DEVICE;
@@ -248,9 +264,12 @@ static int pmic_regu_get_info(fwk_id_t dev_id, struct mod_voltd_info *info)
     find_bound_uv(levels, full_count,
                   &info->level_range.min_uv, &info->level_range.max_uv);
 
-    FWK_LOG_TRACE(MOD_NAME "SCMI voltd %u: get_info PMIC %s, range [%d %d]",
-         fwk_id_get_element_idx(dev_id), ctx->regu_id,
-         info->level_range.min_uv, info->level_range.max_uv);
+    FWK_LOG_DEBUG(
+        MOD_NAME "SCMI voltd %u: get_info PMIC %s, range [%d %d]",
+        fwk_id_get_element_idx(dev_id),
+        ctx->regu_id,
+        info->level_range.min_uv,
+        info->level_range.max_uv);
 
     return FWK_SUCCESS;
 }
@@ -275,8 +294,11 @@ static int pmic_regu_level_from_index(fwk_id_t dev_id, unsigned int index,
 
     *level_uv = (int32_t)levels[index] * 1000;
 
-    FWK_LOG_TRACE(MOD_NAME "SCMI voltd %u: get level PMIC %s = %d",
-         fwk_id_get_element_idx(dev_id), ctx->regu_id, *level_uv);
+    FWK_LOG_DEBUG(
+        MOD_NAME "SCMI voltd %u: get level PMIC %s = %d",
+        fwk_id_get_element_idx(dev_id),
+        ctx->regu_id,
+        *level_uv);
 
     return FWK_SUCCESS;
 }

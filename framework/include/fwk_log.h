@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -32,7 +32,7 @@
  *      Log messages are assigned a filter level based on the logging macro
  *      used. These macros are as follows:
  *
- *       - ::FWK_LOG_TRACE
+ *       - ::FWK_LOG_DEBUG
  *       - ::FWK_LOG_INFO
  *       - ::FWK_LOG_WARN
  *       - ::FWK_LOG_ERR
@@ -139,12 +139,12 @@
  */
 
 /*!
- * \def FWK_LOG_LEVEL_TRACE
+ * \def FWK_LOG_LEVEL_DEBUG
  *
- * \brief *Trace* filter level.
+ * \brief *Debug* filter level.
  *
  * \details Messages assigned this filter level represent messages used for
- *      tracing logic and debugging.
+ *      diagnosing problems.
  *
  * \def FWK_LOG_LEVEL_INFO
  *
@@ -173,7 +173,7 @@
  * \details Messages assigned this filter level represent fatal errors.
  */
 
-#define FWK_LOG_LEVEL_TRACE 0
+#define FWK_LOG_LEVEL_DEBUG 0
 #define FWK_LOG_LEVEL_INFO 1
 #define FWK_LOG_LEVEL_WARN 2
 #define FWK_LOG_LEVEL_ERROR 3
@@ -197,17 +197,17 @@
 #define FWK_LOG_FLUSH() fwk_log_flush()
 
 /*!
- * \def FWK_LOG_TRACE
+ * \def FWK_LOG_DEBUG
  *
- * \brief Log a [trace](::FWK_LOG_LEVEL_TRACE) message.
+ * \brief Log a [debug](::FWK_LOG_LEVEL_DEBUG) message.
  *
  * \param[in] ... Format string and any associated parameters.
  */
 
-#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
-#    define FWK_LOG_TRACE(...) fwk_log_printf(__VA_ARGS__)
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_DEBUG
+#    define FWK_LOG_DEBUG(...) fwk_log_printf(__VA_ARGS__)
 #else
-#    define FWK_LOG_TRACE(...)
+#    define FWK_LOG_DEBUG(...)
 #endif
 
 /*!

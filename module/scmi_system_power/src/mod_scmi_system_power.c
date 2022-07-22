@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -186,7 +186,7 @@ static void graceful_timer_callback(uintptr_t mod_scmi_system_state)
         system_shutdown = system_state2system_shutdown[mod_scmi_system_state];
         status = scmi_sys_power_ctx.pd_api->system_shutdown(system_shutdown);
         if (status != FWK_SUCCESS) {
-            FWK_LOG_TRACE("SCMI_SYS_POWER: %s @%d", __func__, __LINE__);
+            FWK_LOG_DEBUG("SCMI_SYS_POWER: %s @%d", __func__, __LINE__);
         }
     }
 }
@@ -418,7 +418,7 @@ exit:
                                                  sizeof(return_values.status));
 
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("SCMI_SYS_POWER: %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("SCMI_SYS_POWER: %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -476,7 +476,7 @@ exit:
                                                  sizeof(return_values.status));
 
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("SCMI_SYS_POWER: %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("SCMI_SYS_POWER: %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -524,7 +524,7 @@ exit:
                                                  sizeof(return_values.status));
 
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("SCMI_SYS_POWER: %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("SCMI_SYS_POWER: %s @%d", __func__, __LINE__);
     }
 
     return FWK_SUCCESS;
@@ -575,7 +575,7 @@ FWK_WEAK int scmi_sys_power_state_set_policy(
                     graceful_timer_callback,
                     *state);
                 if (status != FWK_SUCCESS) {
-                    FWK_LOG_TRACE("SCMI_SYS_POWER: %s @%d", __func__, __LINE__);
+                    FWK_LOG_DEBUG("SCMI_SYS_POWER: %s @%d", __func__, __LINE__);
                 }
             } else {
                 graceful_timer_callback(*state);

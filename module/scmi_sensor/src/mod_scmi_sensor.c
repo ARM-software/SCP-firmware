@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -259,7 +259,7 @@ exit:
     respond_status =
         scmi_sensor_ctx.scmi_api->respond(service_id, payload, payload_size);
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-SENS] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-SENS] %s @%d", __func__, __LINE__);
     }
     /*
      * Set the service identifier to 'none' to indicate the sensor is
@@ -482,7 +482,7 @@ exit:
                                                  sizeof(return_values.status));
 
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-SENS] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-SENS] %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -539,7 +539,7 @@ exit:
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
                                                  sizeof(return_values.status));
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-SENS] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-SENS] %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -612,7 +612,7 @@ exit:
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
                                                  sizeof(return_values.status));
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-SENS] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-SENS] %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -763,7 +763,7 @@ exit:
         (return_values.status == SCMI_SUCCESS) ? payload_size :
                                                  sizeof(return_values.status));
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-SENS] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-SENS] %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -848,7 +848,7 @@ exit:
                                                  sizeof(return_values.status));
 
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-SENS] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-SENS] %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -997,7 +997,7 @@ static void scmi_sensor_notify_trip_point(
         &trip_point_event,
         sizeof(trip_point_event));
     if (status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-SENS] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-SENS] %s @%d", __func__, __LINE__);
     }
 #endif
 }

@@ -289,7 +289,7 @@ static void dvfs_flush_pending_request(struct mod_dvfs_domain_ctx *ctx)
             ctx->pending_request.retry_request,
             ctx->pending_request.num_retries);
         if (status != FWK_SUCCESS) {
-            FWK_LOG_TRACE("[DVFS] %s @%d", __func__, __LINE__);
+            FWK_LOG_DEBUG("[DVFS] %s @%d", __func__, __LINE__);
         }
     }
     ctx->pending_request = (struct mod_dvfs_request){ 0 };
@@ -310,7 +310,7 @@ static void alarm_callback(uintptr_t param)
 
     status = fwk_put_event(&req);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[DVFS] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[DVFS] %s @%d", __func__, __LINE__);
     }
 }
 
@@ -617,7 +617,7 @@ static void dvfs_complete_respond(
             }
             status = fwk_put_event(&read_req_event);
             if (status != FWK_SUCCESS) {
-                FWK_LOG_TRACE("[DVFS] %s @%d", __func__, __LINE__);
+                FWK_LOG_DEBUG("[DVFS] %s @%d", __func__, __LINE__);
             }
         }
         ctx->cookie = 0;

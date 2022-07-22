@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -641,7 +641,7 @@ exit:
     }
 
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-VOLT] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-VOLT] %s @%d", __func__, __LINE__);
     }
     // Return status or return FWK_SUCCESS???
     return status;

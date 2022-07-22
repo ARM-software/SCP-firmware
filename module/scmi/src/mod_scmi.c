@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -296,10 +296,9 @@ static int respond(fwk_id_t service_id, const void *payload, size_t size)
         (void)message_type_name;
 #endif
     } else {
-#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
-        FWK_LOG_TRACE(
-            "[SCMI] %s: %s [%" PRIu16
-            " (0x%x:0x%x)] returned successfully",
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_DEBUG
+        FWK_LOG_DEBUG(
+            "[SCMI] %s: %s [%" PRIu16 " (0x%x:0x%x)] returned successfully",
             service_name,
             message_type_name,
             ctx->scmi_token,
@@ -371,7 +370,7 @@ static void scmi_notify(fwk_id_t id, int protocol_id, int message_id,
         size,
         request_ack_by_interrupt);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI] %s @%d", __func__, __LINE__);
     }
 }
 
@@ -419,7 +418,7 @@ int scmi_send_message(
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
     if (status == FWK_SUCCESS) {
-        FWK_LOG_TRACE(
+        FWK_LOG_DEBUG(
             "[SCMI] %s: Cmd [%" PRIu16 " (0x%x:0x%x)] was sent",
             fwk_module_get_element_name(service_id),
             token,
@@ -988,8 +987,8 @@ static int scmi_process_event(const struct fwk_event *event,
     ctx->scmi_token = read_token(message_header);
     message_type_name = get_message_type_str(ctx);
 
-#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
-    FWK_LOG_TRACE(
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_DEBUG
+    FWK_LOG_DEBUG(
         "[SCMI] %s: %s [%" PRIu16 " (0x%x:0x%x)] was received",
         service_name,
         message_type_name,
@@ -1018,7 +1017,7 @@ static int scmi_process_event(const struct fwk_event *event,
                 &(int32_t){ SCMI_NOT_SUPPORTED },
                 sizeof(int32_t));
             if (status != FWK_SUCCESS) {
-                FWK_LOG_TRACE("[SCMI] %s @%d", __func__, __LINE__);
+                FWK_LOG_DEBUG("[SCMI] %s @%d", __func__, __LINE__);
             }
             return FWK_SUCCESS;
         }
@@ -1064,7 +1063,7 @@ static int scmi_process_event(const struct fwk_event *event,
                 status = ctx->respond(
                     transport_id, &(int32_t){ SCMI_DENIED }, sizeof(int32_t));
                 if (status != FWK_SUCCESS) {
-                    FWK_LOG_TRACE("[SCMI] %s @%d", __func__, __LINE__);
+                    FWK_LOG_DEBUG("[SCMI] %s @%d", __func__, __LINE__);
                 }
                 return FWK_SUCCESS;
             }

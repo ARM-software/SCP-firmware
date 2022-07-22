@@ -479,7 +479,7 @@ void perf_eval_performance(
         (limits->maximum == domain_ctx->level_limits.maximum)) {
         status = find_opp_for_level(domain_ctx, level, true);
         if (status != FWK_SUCCESS) {
-            FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+            FWK_LOG_DEBUG("[SCMI-PERF] %s @%d", __func__, __LINE__);
         }
         return;
     }
@@ -499,7 +499,7 @@ void perf_eval_performance(
 
     status = find_opp_for_level(domain_ctx, level, true);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-PERF] %s @%d", __func__, __LINE__);
     }
 }
 #endif
@@ -742,7 +742,7 @@ exit:
                                                  sizeof(return_values.status));
 
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-PERF] %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -858,7 +858,7 @@ exit:
         (return_values.status == SCMI_SUCCESS) ? payload_size :
                                                  sizeof(return_values.status));
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-PERF] %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -935,7 +935,7 @@ exit:
         (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
                                                  sizeof(return_values.status));
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-PERF] %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -1034,7 +1034,7 @@ exit:
                                                  sizeof(return_values.status));
 
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-PERF] %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -1099,7 +1099,7 @@ exit:
                                                  sizeof(return_values.status));
 
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-PERF] %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -1168,7 +1168,7 @@ exit:
                                                  sizeof(return_values.status));
 
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-PERF] %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -1238,7 +1238,7 @@ exit:
                                                  sizeof(return_values.status));
 
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-PERF] %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -1449,7 +1449,7 @@ static void fast_channels_process(void)
             status = scmi_perf_ctx.dvfs_api->set_level(
                 get_dependency_id(i), 0, tlevel);
             if (status != FWK_SUCCESS) {
-                FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+                FWK_LOG_DEBUG("[SCMI-PERF] %s @%d", __func__, __LINE__);
             }
 
 #    else
@@ -1478,7 +1478,7 @@ static void fast_channels_process(void)
             if (set_level != NULL && tlevel > 0) {
                 status = perf_set_level(get_dependency_id(i), 0, tlevel);
                 if (status != FWK_SUCCESS) {
-                    FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+                    FWK_LOG_DEBUG("[SCMI-PERF] %s @%d", __func__, __LINE__);
                 }
             }
             if (set_limit != NULL) {
@@ -1493,7 +1493,7 @@ static void fast_channels_process(void)
                         .maximum = tmax,
                     }));
                 if (status != FWK_SUCCESS) {
-                    FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+                    FWK_LOG_DEBUG("[SCMI-PERF] %s @%d", __func__, __LINE__);
                 }
             }
 
@@ -1614,7 +1614,7 @@ static void scmi_perf_respond(
         scmi_perf_ctx.scmi_api->respond(service_id, return_values, size);
 
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-PERF] %s @%d", __func__, __LINE__);
     }
 
     /*
@@ -1681,7 +1681,7 @@ static void scmi_perf_notify_limits_updated(
         &limits_changed,
         sizeof(limits_changed));
     if (status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-PERF] %s @%d", __func__, __LINE__);
     }
 #endif
 }
@@ -1724,10 +1724,10 @@ static void scmi_perf_notify_level_updated(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_SCMI_PERF, idx),
             level_id);
         if (status != FWK_SUCCESS) {
-            FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+            FWK_LOG_DEBUG("[SCMI-PERF] %s @%d", __func__, __LINE__);
         }
     } else {
-        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-PERF] %s @%d", __func__, __LINE__);
     }
 #endif
 
@@ -1786,7 +1786,7 @@ static void scmi_perf_notify_level_updated(
         &level_changed,
         sizeof(level_changed));
     if (status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-PERF] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-PERF] %s @%d", __func__, __LINE__);
     }
 #endif
 
