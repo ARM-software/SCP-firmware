@@ -367,6 +367,13 @@ cmake_dependent_option(
     "DEFINED SCP_ENABLE_SCMI_SENSOR_EVENTS_INIT"
     "${SCP_ENABLE_SCMI_SENSOR_EVENTS}")
 
+cmake_dependent_option(
+    SCP_ENABLE_FAST_CHANNELS
+    "Enable the transport Fast Channels?"
+    "${SCP_ENABLE_FAST_CHANNELS_INIT}"
+    "DEFINED SCP_ENABLE_FAST_CHANNELS_INIT"
+    "${SCP_ENABLE_FAST_CHANNELS}")
+
 # Include firmware specific build options
 include("${SCP_FIRMWARE_SOURCE_DIR}/Buildoptions.cmake" OPTIONAL)
 
