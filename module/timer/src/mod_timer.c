@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -162,12 +162,12 @@ static void _configure_timer_with_next_alarm(struct timer_dev_ctx *ctx)
         status =
             ctx->driver->set_timer(ctx->driver_dev_id, alarm_head->timestamp);
         if (status != FWK_SUCCESS) {
-            FWK_LOG_TRACE("[Timer] %s @%d", __func__, __LINE__);
+            FWK_LOG_DEBUG("[Timer] %s @%d", __func__, __LINE__);
         }
 
         status = ctx->driver->enable(ctx->driver_dev_id);
         if (status != FWK_SUCCESS) {
-            FWK_LOG_TRACE("[Timer] %s @%d", __func__, __LINE__);
+            FWK_LOG_DEBUG("[Timer] %s @%d", __func__, __LINE__);
         }
     }
 }
@@ -545,12 +545,12 @@ static void timer_isr(uintptr_t ctx_ptr)
     /* Disable timer interrupts to work with the active queue */
     status = ctx->driver->disable(ctx->driver_dev_id);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[Timer] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[Timer] %s @%d", __func__, __LINE__);
     }
 
     status = fwk_interrupt_clear_pending(ctx->config->timer_irq);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[Timer] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[Timer] %s @%d", __func__, __LINE__);
     }
 
     alarm =

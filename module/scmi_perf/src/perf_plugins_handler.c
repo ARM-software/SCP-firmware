@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -452,7 +452,7 @@ void perf_plugins_handler_update(
             api = perf_plugins_ctx.plugins_api_table[i];
             status = api->update(&perf_snapshot);
             if (status != FWK_SUCCESS) {
-                FWK_LOG_TRACE(
+                FWK_LOG_DEBUG(
                     "[P-Handler] Update: Plugin%u returned error %i",
                     i,
                     status);
@@ -511,7 +511,7 @@ void perf_plugins_handler_report(struct perf_plugins_perf_report *data)
         if (api->report != NULL) {
             status = api->report(data);
             if (status != FWK_SUCCESS) {
-                FWK_LOG_TRACE(
+                FWK_LOG_DEBUG(
                     "[P-Handler] Report: Plugin%u returned error %i",
                     i,
                     status);

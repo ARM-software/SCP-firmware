@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -24,8 +24,8 @@ int mod_scmi_clock_rate_set_policy(
     fwk_id_t service_id,
     uint32_t clock_dev_id)
 {
-#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
-    FWK_LOG_TRACE(
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_DEBUG
+    FWK_LOG_DEBUG(
         "[SCMI-CLK] Set Clock Rate Policy Handler agent: %u clock: %" PRIu32
         "\n",
         fwk_id_get_element_idx(service_id),

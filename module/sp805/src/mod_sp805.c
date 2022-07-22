@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -25,7 +25,7 @@ static struct mod_sp805_dev_ctx ctx;
 
 static void sp805_isr(uintptr_t unused)
 {
-    FWK_LOG_TRACE(MOD_NAME "SP805 watchdog timer interrupt generated.");
+    FWK_LOG_DEBUG(MOD_NAME "SP805 watchdog timer interrupt generated.");
 
     /* Clear the watchdog Interrupt */
     ctx.reg_base->LOCK = ENABLE_WR_ACCESS;

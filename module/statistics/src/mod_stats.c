@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -140,8 +140,10 @@ static int allocate_domain_stats(fwk_id_t module_id,
 
     stats->used_mem_size += stats_size;
 
-    FWK_LOG_TRACE("[STATS]: stats addr %lx, stats_size=%luB\n",
-                  (uint32_t)scp_stats_addr, stats_size);
+    FWK_LOG_DEBUG(
+        "[STATS]: stats addr %lx, stats_size=%luB\n",
+        (uint32_t)scp_stats_addr,
+        stats_size);
 
     return FWK_SUCCESS;
 }

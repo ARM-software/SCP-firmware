@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -330,7 +330,7 @@ static void clock_ops_update_state(unsigned int clock_dev_idx, int status)
             scmi_clock_ctx.clock_ops[clock_dev_idx].service_id,
             scmi_clock_ctx.clock_ops[clock_dev_idx].clock_dev_id);
         if (set_policy_status != FWK_SUCCESS) {
-            FWK_LOG_TRACE("[SCMI-CLK] %s @%d", __func__, __LINE__);
+            FWK_LOG_DEBUG("[SCMI-CLK] %s @%d", __func__, __LINE__);
         }
     }
 }
@@ -383,7 +383,7 @@ static void get_state_respond(fwk_id_t clock_dev_id,
     respond_status = scmi_clock_ctx.scmi_api->respond(
         service_id, &return_values, response_size);
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-CLK] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-CLK] %s @%d", __func__, __LINE__);
     }
 }
 
@@ -413,7 +413,7 @@ static void get_rate_respond(fwk_id_t service_id,
     respond_status = scmi_clock_ctx.scmi_api->respond(
         service_id, &return_values, response_size);
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-CLK] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-CLK] %s @%d", __func__, __LINE__);
     }
 }
 
@@ -436,7 +436,7 @@ static void request_response(int response_status,
     respond_status = scmi_clock_ctx.scmi_api->respond(
         service_id, &return_values, sizeof(return_values.status));
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-CLK] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-CLK] %s @%d", __func__, __LINE__);
     }
 }
 
@@ -461,7 +461,7 @@ static void set_request_respond(fwk_id_t service_id, int status)
     respond_status = scmi_clock_ctx.scmi_api->respond(
         service_id, &return_values, sizeof(return_values.status));
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-CLK] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-CLK] %s @%d", __func__, __LINE__);
     }
 }
 
@@ -787,7 +787,7 @@ exit:
     respond_status = scmi_clock_ctx.scmi_api->respond(
         service_id, &return_values, sizeof(return_values));
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-CLK] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-CLK] %s @%d", __func__, __LINE__);
     }
     return status;
 }
@@ -885,7 +885,7 @@ exit:
     respond_status = scmi_clock_ctx.scmi_api->respond(
         service_id, &return_values, response_size);
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-CLK] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-CLK] %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -952,7 +952,7 @@ exit:
     respond_status = scmi_clock_ctx.scmi_api->respond(
         service_id, &return_values, response_size);
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-CLK] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-CLK] %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -1346,7 +1346,7 @@ exit:
         (return_values.status == SCMI_SUCCESS) ? payload_size :
                                                  sizeof(return_values.status));
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-CLK] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-CLK] %s @%d", __func__, __LINE__);
     }
 
     return status;

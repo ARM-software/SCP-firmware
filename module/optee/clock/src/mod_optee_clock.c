@@ -1,6 +1,7 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -70,8 +71,11 @@ static int get_rate(fwk_id_t dev_id, uint64_t *rate)
 
     *rate = clk_get_rate(ctx->clk);
 
-    FWK_LOG_TRACE(MOD_NAME "SCMI optee_clock (%u/\"%s\"): clk_get_rate() = %"PRIu64,
-         fwk_id_get_element_idx(dev_id), clk_get_name(ctx->clk), *rate);
+    FWK_LOG_DEBUG(
+        MOD_NAME "SCMI optee_clock (%u/\"%s\"): clk_get_rate() = %" PRIu64,
+        fwk_id_get_element_idx(dev_id),
+        clk_get_name(ctx->clk),
+        *rate);
 
     return FWK_SUCCESS;
 }
@@ -102,25 +106,33 @@ static int set_state(fwk_id_t dev_id, enum mod_clock_state state)
 
     if (state == MOD_CLOCK_STATE_STOPPED) {
         if (ctx->enabled) {
-            FWK_LOG_TRACE(MOD_NAME "SCMI optee_clock (%u/\"%s\") disable",
-                 fwk_id_get_element_idx(dev_id), clk_get_name(ctx->clk));
+            FWK_LOG_DEBUG(
+                MOD_NAME "SCMI optee_clock (%u/\"%s\") disable",
+                fwk_id_get_element_idx(dev_id),
+                clk_get_name(ctx->clk));
 
             clk_disable(ctx->clk);
             ctx->enabled = false;
         } else {
-            FWK_LOG_TRACE(MOD_NAME "SCMI optee_clock (%u/\"%s\") is already OFF",
-                fwk_id_get_element_idx(dev_id), clk_get_name(ctx->clk));
+            FWK_LOG_DEBUG(
+                MOD_NAME "SCMI optee_clock (%u/\"%s\") is already OFF",
+                fwk_id_get_element_idx(dev_id),
+                clk_get_name(ctx->clk));
         }
     } else {
         if (!ctx->enabled) {
-            FWK_LOG_TRACE(MOD_NAME "SCMI optee_clock (%u/\"%s\") enable",
-                 fwk_id_get_element_idx(dev_id), clk_get_name(ctx->clk));
+            FWK_LOG_DEBUG(
+                MOD_NAME "SCMI optee_clock (%u/\"%s\") enable",
+                fwk_id_get_element_idx(dev_id),
+                clk_get_name(ctx->clk));
 
             clk_enable(ctx->clk);
             ctx->enabled = true;
         } else {
-            FWK_LOG_TRACE(MOD_NAME "SCMI optee_clock (%u/\"%s\") is already ON",
-                fwk_id_get_element_idx(dev_id), clk_get_name(ctx->clk));
+            FWK_LOG_DEBUG(
+                MOD_NAME "SCMI optee_clock (%u/\"%s\") is already ON",
+                fwk_id_get_element_idx(dev_id),
+                clk_get_name(ctx->clk));
         }
     }
 
@@ -146,9 +158,11 @@ static int get_state(fwk_id_t dev_id, enum mod_clock_state *state)
         *state = MOD_CLOCK_STATE_STOPPED;
     }
 
-    FWK_LOG_TRACE(MOD_NAME "SCMI optee_clock (%u/\"%s\") is %s",
-         fwk_id_get_element_idx(dev_id), clk_get_name(ctx->clk),
-         *state == MOD_CLOCK_STATE_STOPPED ? "off" : "on");
+    FWK_LOG_DEBUG(
+        MOD_NAME "SCMI optee_clock (%u/\"%s\") is %s",
+        fwk_id_get_element_idx(dev_id),
+        clk_get_name(ctx->clk),
+        *state == MOD_CLOCK_STATE_STOPPED ? "off" : "on");
 
     return FWK_SUCCESS;
 }
@@ -224,8 +238,11 @@ static int set_rate(fwk_id_t dev_id, uint64_t rate,
         return FWK_E_SUPPORT;
     }
 
-    FWK_LOG_TRACE(MOD_NAME "SCMI optee_clock (%u/\"%s\"): rate = %"PRIu64,
-         fwk_id_get_element_idx(dev_id), clk_get_name(ctx->clk), rate);
+    FWK_LOG_DEBUG(
+        MOD_NAME "SCMI optee_clock (%u/\"%s\"): rate = %" PRIu64,
+        fwk_id_get_element_idx(dev_id),
+        clk_get_name(ctx->clk),
+        rate);
 
     return FWK_SUCCESS;
 }
@@ -266,9 +283,12 @@ static int get_rate_from_index(fwk_id_t dev_id,
         fwk_assert(!res && rate_count == 1);
     *rate = rate_ul;
 
-    FWK_LOG_TRACE(MOD_NAME "SCMI optee_clock (%u/\"%s\"): rate(index %u) = %lu",
-         fwk_id_get_element_idx(dev_id), clk_get_name(ctx->clk), rate_index,
-         rate_ul);
+    FWK_LOG_DEBUG(
+        MOD_NAME "SCMI optee_clock (%u/\"%s\"): rate(index %u) = %lu",
+        fwk_id_get_element_idx(dev_id),
+        clk_get_name(ctx->clk),
+        rate_index,
+        rate_ul);
 
     return FWK_SUCCESS;
 }

@@ -1,6 +1,7 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -79,9 +80,11 @@ static int pwr_regu_get_config(fwk_id_t dev_id, uint8_t *mode_type,
         *mode_id = MOD_VOLTD_MODE_ID_OFF;
     }
 
-    FWK_LOG_TRACE(MOD_NAME "SCMI voltd %u: get_config PWR#%u = %s",
-         fwk_id_get_element_idx(dev_id), ctx->pwr_id,
-         *mode_id == MOD_VOLTD_MODE_ID_ON ? "on" : "off");
+    FWK_LOG_DEBUG(
+        MOD_NAME "SCMI voltd %u: get_config PWR#%u = %s",
+        fwk_id_get_element_idx(dev_id),
+        ctx->pwr_id,
+        *mode_id == MOD_VOLTD_MODE_ID_ON ? "on" : "off");
 
     return FWK_SUCCESS;
 }
@@ -106,9 +109,11 @@ static int pwr_regu_set_config(fwk_id_t dev_id, uint8_t mode_type,
     stm32mp1_pwr_regulator_set_state(ctx->pwr_id,
                                      mode_id == MOD_VOLTD_MODE_ID_ON);
 
-    FWK_LOG_TRACE(MOD_NAME "SCMI voltd %u: set_config PWR#%u %s",
-         fwk_id_get_element_idx(dev_id), ctx->pwr_id,
-         mode_id == MOD_VOLTD_MODE_ID_ON ? "on" : "off");
+    FWK_LOG_DEBUG(
+        MOD_NAME "SCMI voltd %u: set_config PWR#%u %s",
+        fwk_id_get_element_idx(dev_id),
+        ctx->pwr_id,
+        mode_id == MOD_VOLTD_MODE_ID_ON ? "on" : "off");
 
     return FWK_SUCCESS;
 }
@@ -129,8 +134,11 @@ static int pwr_regu_get_level(fwk_id_t dev_id, int *level_uv)
 
     *level_uv = pwr_regu_level(ctx->pwr_id);
 
-    FWK_LOG_TRACE(MOD_NAME "SCMI voltd %u: get_level PWR#%u = %d",
-         fwk_id_get_element_idx(dev_id), ctx->pwr_id, *level_uv);
+    FWK_LOG_DEBUG(
+        MOD_NAME "SCMI voltd %u: get_level PWR#%u = %d",
+        fwk_id_get_element_idx(dev_id),
+        ctx->pwr_id,
+        *level_uv);
 
     return FWK_SUCCESS;
 }
@@ -149,8 +157,11 @@ static int pwr_regu_set_level(fwk_id_t dev_id, int level_uv)
         return FWK_E_ACCESS;
     }
 
-    FWK_LOG_TRACE(MOD_NAME "SCMI voltd %u: set_level PWR#%u to %d",
-         fwk_id_get_element_idx(dev_id), ctx->pwr_id, level_uv);
+    FWK_LOG_DEBUG(
+        MOD_NAME "SCMI voltd %u: set_level PWR#%u to %d",
+        fwk_id_get_element_idx(dev_id),
+        ctx->pwr_id,
+        level_uv);
 
     if (level_uv != pwr_regu_level(ctx->pwr_id)) {
         return FWK_E_RANGE;
@@ -180,8 +191,10 @@ static int pwr_regu_get_info(fwk_id_t dev_id, struct mod_voltd_info *info)
     info->level_range.level_count = 1;
     info->name = ctx->name;
 
-    FWK_LOG_TRACE(MOD_NAME"SCMI voltd %u: get_info PWR#%u",
-         fwk_id_get_element_idx(dev_id), ctx->pwr_id);
+    FWK_LOG_DEBUG(
+        MOD_NAME "SCMI voltd %u: get_info PWR#%u",
+        fwk_id_get_element_idx(dev_id),
+        ctx->pwr_id);
 
     return FWK_SUCCESS;
 }
@@ -207,8 +220,11 @@ static int pwr_regu_level_from_index(fwk_id_t dev_id, unsigned int index,
 
     *level_uv = pwr_regu_level(ctx->pwr_id);
 
-    FWK_LOG_TRACE(MOD_NAME "SCMI voltd %u: get_level_from_index PWR#%u = %"PRId32,
-         fwk_id_get_element_idx(dev_id), ctx->pwr_id, *level_uv);
+    FWK_LOG_DEBUG(
+        MOD_NAME "SCMI voltd %u: get_level_from_index PWR#%u = %" PRId32,
+        fwk_id_get_element_idx(dev_id),
+        ctx->pwr_id,
+        *level_uv);
 
     return FWK_SUCCESS;
 }

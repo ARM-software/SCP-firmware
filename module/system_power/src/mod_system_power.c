@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -95,7 +95,7 @@ static void ext_ppus_set_state(enum mod_pd_state state)
         status = system_power_ctx.ext_ppu_apis[i]->set_state(
             system_power_ctx.config->ext_ppus[i].ppu_id, state);
         if (status != FWK_SUCCESS) {
-            FWK_LOG_TRACE("[SYS-POW] ext-ppu%i %s @%d", i, __func__, __LINE__);
+            FWK_LOG_DEBUG("[SYS-POW] ext-ppu%i %s @%d", i, __func__, __LINE__);
         }
     }
 }
@@ -118,7 +118,7 @@ static void ext_ppus_shutdown(enum mod_pd_system_shutdown system_shutdown)
             status = api->set_state(ppu_id, MOD_PD_STATE_OFF);
         }
         if (status != FWK_SUCCESS) {
-            FWK_LOG_TRACE("[SYS-POW] ext-ppu%i %s @%d", i, __func__, __LINE__);
+            FWK_LOG_DEBUG("[SYS-POW] ext-ppu%i %s @%d", i, __func__, __LINE__);
         }
     }
 }

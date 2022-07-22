@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -149,8 +149,8 @@ static int put_event(
         fwk_list_push_tail(&ctx.isr_event_queue, &allocated_event->slist_node);
     }
 
-#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
-    FWK_LOG_TRACE(
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_DEBUG
+    FWK_LOG_DEBUG(
         "[FWK] Sent %" PRIu32 ": %s @ %s -> %s",
         std_event != NULL ? std_event->cookie : 0,
         FWK_ID_STR(allocated_event->id),
@@ -181,8 +181,8 @@ static void process_next_event(void)
     ctx.current_event = event = FWK_LIST_GET(
         fwk_list_pop_head(&ctx.event_queue), struct fwk_event, slist_node);
 
-#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
-    FWK_LOG_TRACE(
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_DEBUG
+    FWK_LOG_DEBUG(
         "[FWK] Processing %" PRIu32 ": %s @ %s -> %s\n",
         event->cookie,
         FWK_ID_STR(event->id),
@@ -252,8 +252,8 @@ static bool process_isr(void)
         return false;
     }
 
-#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
-    FWK_LOG_TRACE(
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_DEBUG
+    FWK_LOG_DEBUG(
         "[FWK] Pulled ISR event (%s: %s -> %s)\n",
         FWK_ID_STR(isr_event->id),
         FWK_ID_STR(isr_event->source_id),

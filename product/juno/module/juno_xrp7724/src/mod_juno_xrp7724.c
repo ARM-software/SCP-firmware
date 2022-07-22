@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -685,7 +685,7 @@ static int juno_xrp7724_gpio_process_request(fwk_id_t id, int response_status)
         status =
             module_ctx.timer_api->delay(config->timer_hal_id, GPIO_DELAY_US);
         if (status != FWK_SUCCESS) {
-            FWK_LOG_TRACE("[XRP7724] %s @%d", __func__, __LINE__);
+            FWK_LOG_DEBUG("[XRP7724] %s @%d", __func__, __LINE__);
         }
 
         /* Send the assert command */
@@ -723,7 +723,7 @@ static int juno_xrp7724_gpio_process_request(fwk_id_t id, int response_status)
         status =
             module_ctx.timer_api->delay(config->timer_hal_id, GPIO_DELAY_US);
         if (status != FWK_SUCCESS) {
-            FWK_LOG_TRACE("[XRP7724] %s @%d", __func__, __LINE__);
+            FWK_LOG_DEBUG("[XRP7724] %s @%d", __func__, __LINE__);
         }
 
         /* The board should have been reset or shut down at this point */

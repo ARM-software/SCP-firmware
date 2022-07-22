@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -286,7 +286,7 @@ exit:
         scmi_rd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
 
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-RESET] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-RESET] %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -422,7 +422,7 @@ exit:
         scmi_rd_ctx.scmi_api->respond(service_id, &outmsg, outmsg_size);
 
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-RESET] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-RESET] %s @%d", __func__, __LINE__);
     }
 
     return status;
@@ -483,7 +483,7 @@ exit:
                                           sizeof(outmsg.status));
 
     if (respond_status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-RESET] %s @%d", __func__, __LINE__);
+        FWK_LOG_DEBUG("[SCMI-RESET] %s @%d", __func__, __LINE__);
     }
 
     return status;
