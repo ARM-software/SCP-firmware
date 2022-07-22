@@ -135,6 +135,10 @@ SCMI Module.
 
 - SCP_ENABLE_SUB_SYSTEM_MODE: Enable the execution as a sub-system.
 
+- SCP_ENABLE_FAST_CHANNELS_INIT: Enable/disable Fast Channels support. This
+option should be enabled/disabled by the use of a platform specific setting like
+SCP_ENABLE_SCMI_PERF_FAST_CHANNELS_INIT.
+
 It can also be used to provide some platform specific settings.
 e.g. For ARM Juno platform. See below
 
