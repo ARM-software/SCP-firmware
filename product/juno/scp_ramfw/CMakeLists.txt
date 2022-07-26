@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -10,6 +10,27 @@
 #
 
 add_executable(juno-bl2)
+
+# SCP_PLATFORM_VARIANT options:
+# - 'BOARD' for building to run on SoC (default)
+# - 'FVP' for building to run on an FVP
+
+target_compile_definitions(juno-bl2 PUBLIC -DJUNO_VARIANT_BOARD=0)
+target_compile_definitions(juno-bl2 PUBLIC -DJUNO_VARIANT_FVP=1)
+
+if (SCP_PLATFORM_VARIANT STREQUAL "BOARD")
+    message(NOTICE "SCP_PLATFORM_VARIANT set to BOARD (juno-bl2)\n")
+    target_compile_definitions(juno-bl2
+        PUBLIC -DPLATFORM_VARIANT=JUNO_VARIANT_BOARD)
+elseif (SCP_PLATFORM_VARIANT STREQUAL "FVP")
+    message(NOTICE "SCP_PLATFORM_VARIANT set to FVP (juno-bl2)\n")
+    target_compile_definitions(juno-bl2
+        PUBLIC -DPLATFORM_VARIANT=JUNO_VARIANT_FVP)
+else ()
+    message(FATAL_ERROR "Valid platform variant options for Juno are: \n"
+                                "BOARD (default) \n"
+                                "FVP \n")
+endif()
 
 target_include_directories(
     juno-bl2 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include"
