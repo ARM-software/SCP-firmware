@@ -70,7 +70,6 @@ void setUp(void)
 
 void tearDown(void)
 {
-    //Get rid of heap?
 }
 
 int fwk_put_event_callback(struct fwk_event *event, int numCalls)

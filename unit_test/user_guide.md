@@ -260,9 +260,6 @@ from hand-written code.
 
 ## Adding test for new modules
 
-<!--- TODO discover the unit test on the fly without having
-to modify this CMAKE file. -->
-
 The ```scmi``` and ``scmi_clock``` test directories are provided
 as a reference for new modules. The following process is intended
 as a general guide, and will vary on a case-by-case basis.
@@ -296,8 +293,6 @@ generated under module specific unit test directory e.g.
 ```module/new_module/test/mocks```
 
 ## fwk_core mock workaround
-
-<!--- TODO remove need for workaround -->
 
 CMock generates the fwk_run_main_loop mock as a returning function,
 because noreturn is stripped out via cfg.yml. Compilation therefore
