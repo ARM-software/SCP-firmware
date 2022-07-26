@@ -196,17 +196,18 @@ version of the functions on which ```scmi_base_discover_sub_vendor_handler```
 is dependent.
 
 For example to generate mocked version of the functions available
-in the ```framework/include/fwk_id.h``` Use below command
+in the ```framework/include/fwk_module.h``` Use below command
 
 ```sh
-gm.rb -m ${SCP_ROOT}/unit_test/unity_mocks/mocks/ -f fwk_module.h
+${SCP_ROOT}/unit_test/gm.rb  -m ${SCP_ROOT}/unit_test/unity_mocks/mocks/
+-f fwk_module.h
 ```
 and for ```internal``` version of this file
 ```framework/include/internal/fwk_module.h```
 
 ```sh
-gm.rb -m ${SCP_ROOT}/unit_test/unity_mocks/mocks/ -f internal/fwk_module.h
--dinternal -s_internal
+${SCP_ROOT}/unit_test/gm.rb -m ${SCP_ROOT}/unit_test/unity_mocks/mocks/
+-f internal/fwk_module.h -dinternal -s_internal
 ```
 
 It's recommended to export the path to gm.rb to PATH for ease of use, but
