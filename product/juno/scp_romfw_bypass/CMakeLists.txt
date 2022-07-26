@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -10,6 +10,13 @@
 #
 
 add_executable(juno-bl1-bypass)
+
+if (NOT SCP_PLATFORM_VARIANT STREQUAL "BOARD" AND
+    NOT SCP_PLATFORM_VARIANT STREQUAL "FVP")
+        message(FATAL_ERROR "Valid platform variant options for Juno are: \n"
+                                    "BOARD (default) \n"
+                                    "FVP \n")
+endif()
 
 target_compile_definitions(juno-bl1-bypass PUBLIC -DSCP_ROM_BYPASS=1)
 
