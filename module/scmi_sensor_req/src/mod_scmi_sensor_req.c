@@ -286,7 +286,7 @@ static int scmi_sensor_req_elem_init(
 
     fwk_assert(data != NULL);
 
-    if (element_idx > scmi_sensor_req_ctx.element_count) {
+    if (element_idx >= scmi_sensor_req_ctx.element_count) {
         return FWK_E_DATA;
     }
 
