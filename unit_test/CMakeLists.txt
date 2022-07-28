@@ -109,6 +109,7 @@ list(APPEND SCP_UNITY_SRC ${TEST_ROOT}/unity_mocks/scp_unity.c)
 list(APPEND UNIT_MODULE scmi)
 list(APPEND UNIT_MODULE scmi_clock)
 list(APPEND UNIT_MODULE scmi_perf)
+list(APPEND UNIT_MODULE scmi_sensor_req)
 
 list(LENGTH UNIT_MODULE UNIT_TEST_MAX)
 
