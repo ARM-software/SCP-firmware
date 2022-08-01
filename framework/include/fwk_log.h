@@ -197,6 +197,20 @@
 #define FWK_LOG_FLUSH() fwk_log_flush()
 
 /*!
+ * \def FWK_TRACE
+ *
+ * \brief Trace a message.
+ *
+ * \param[in] ... Format string and any associated parameters.
+ */
+
+#ifdef FWK_TRACE_ENABLE
+#    define FWK_TRACE(...) fwk_log_printf(__VA_ARGS__)
+#else
+#    define FWK_TRACE(...)
+#endif
+
+/*!
  * \def FWK_LOG_DEBUG
  *
  * \brief Log a [debug](::FWK_LOG_LEVEL_DEBUG) message.

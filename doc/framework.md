@@ -1,6 +1,6 @@
 # Framework Guide
 
-Copyright (c) 2011-2022, Arm Limited. All rights reserved.
+Copyright (c) 2011-2023, Arm Limited. All rights reserved.
 
 This guide covers the framework that is used to implement the SCP/MCP Software
 and which can also be used to extend the provided implementation. Each of the
@@ -598,3 +598,18 @@ void *fwk_log_driver_config = &cfg;
 The driver module can then access its log framework related configuration data
 at any time. It is expected that the driver module performs initialization using
 this configuration data in the fwk_log_driver_init() function.
+
+#### Tracing
+To enable tracing functionality `FWK_TRACE_ENABLE` should be defined.
+There is an example configuration for CMake that should be included in
+`CMakeLists.txt` in every module that uses this feature. This configuration
+ requires `SCP_TRACE_ENABLE_MOD_<module name>` to be defined as a build flag
+ parameter.
+
+```
+include(SCPModuleTrace)
+
+...
+
+scp_module_trace(${SCP_MODULE})
+```
