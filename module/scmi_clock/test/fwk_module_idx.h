@@ -14,6 +14,7 @@ enum fwk_module_idx {
     FWK_MODULE_IDX_SCMI_CLOCK,
     FWK_MODULE_IDX_SCMI,
     FWK_MODULE_IDX_CLOCK,
+    FWK_MODULE_IDX_RESOURCE_PERMS,
     FWK_MODULE_IDX_COUNT,
 };
 
@@ -25,5 +26,8 @@ static const fwk_id_t fwk_module_id_scmi =
 
 static const fwk_id_t fwk_module_id_clock =
     FWK_ID_MODULE_INIT(FWK_MODULE_IDX_CLOCK);
+
+static const fwk_id_t fwk_module_id_resource_perms =
+    FWK_ID_MODULE_INIT(FWK_MODULE_IDX_RESOURCE_PERMS);
 
 #endif /* TEST_FWK_MODULE_IDX_H */
