@@ -8,6 +8,7 @@
  *      System Control and Management Interface (SCMI) unit test support.
  */
 #include <mod_scmi.h>
+#include <mod_resource_perms.h>
 
 /*!
  * \brief Get the number of active agents.
@@ -143,3 +144,100 @@ int mod_scmi_from_protocol_api_scmi_send_message(
  * \retval ::FWK_SUCCESS The operation succeeded.
  */
 int mod_scmi_from_protocol_api_response_message_handler(fwk_id_t service_id);
+
+/*!
+ * \brief Check whether the agent has permission to access a protocol.
+ *
+ * \param agent_id      identifier of the agent.
+ * \param protocol_id   identifier of the protocol.
+ *
+ * \retval MOD_RES_PERMS_ACCESS_ALLOWED The agent has permissions to
+ *      use the protocol.
+ * \retval MOD_RES_PERMS_ACCESS_DENIED The agent does not have
+ *      permissions to use the protocol.
+ */
+enum mod_res_perms_permissions mod_res_permissions_api_agent_has_protocol_permission(
+    uint32_t agent_id,
+    uint32_t protocol_id);
+
+/*!
+ * \brief Check whether the agent has permission to access a message.
+ *
+ * \param agent_id      identifier of the agent.
+ * \param protocol_id   identifier of the protocol.
+ * \param message_id    identifier of the message.
+ *
+ * \retval MOD_RES_PERMS_ACCESS_ALLOWED The agent has permissions to
+ *      use the protocol.
+ * \retval MOD_RES_PERMS_ACCESS_DENIED The agent does not have
+ *      permissions to use the message.
+ */
+enum mod_res_perms_permissions mod_res_permissions_api_agent_has_message_permission(
+    uint32_t agent_id,
+    uint32_t protocol_id,
+    uint32_t message_id);
+
+/*!
+ * \brief Check whether the agent has permission to access a resource.
+ *
+ * \param agent_id      identifier of the agent.
+ * \param protocol_id   identifier of the protocol.
+ * \param message_id    identifier of the message.
+ * \param resource_id   identifier of the resource.
+ *
+ * \retval MOD_RES_PERMS_ACCESS_ALLOWED The agent has permissions to
+ *      use the protocol.
+ * \retval MOD_RES_PERMS_ACCESS_DENIED The agent does not have
+ *      permissions to use the resource.
+ */
+enum mod_res_perms_permissions mod_res_permissions_api_agent_has_resource_permission(
+    uint32_t agent_id,
+    uint32_t protocol_id,
+    uint32_t message_id,
+    uint32_t resource_id);
+
+/*!
+ * \brief Set device permissions for an agent
+ *
+ * \param agent_id      identifier of the agent.
+ * \param device_id     identifier of the device.
+ * \param flags         permissions to set.
+ *
+ * \retval ::FWK_SUCCESS  The operation has completed successfully.
+ * \retval ::FWK_E_ACCESS Unknown agent_id or device_id.
+ * \retval ::FWK_E_PARAM  Invalid flags or protocol_ID.
+ */
+int mod_res_permissions_api_agent_set_device_permission(
+    uint32_t agent_id,
+    uint32_t device_id,
+    uint32_t flags);
+
+/*!
+ * \brief Set device protocol permissions for an agent
+ *
+ * \param agent_id      identifier of the agent.
+ * \param device_id     identifier of the device.
+ * \param device_id     identifier of the protocol.
+ * \param flags         permissions to set.
+ *
+ * \retval ::FWK_SUCCESS  The operation has completed successfully.
+ * \retval ::FWK_E_ACCESS Unknown agent_id or device_id.
+ * \retval ::FWK_E_PARAM  Invalid flags or protocol_ID.
+ */
+int mod_res_permissions_api_agent_set_device_protocol_permission(
+    uint32_t agent_id,
+    uint32_t device_id,
+    uint32_t protocol_id,
+    uint32_t flags);
+
+/*!
+ * \brief Reset permissions for an agent
+ *
+ * \param agent_id      identifier of the agent.
+ * \param flags         permissions to set.
+ *
+ * \retval ::FWK_SUCCESS  The operation has completed successfully.
+ * \retval ::FWK_E_ACCESS Unknown agent_id.
+ * \retval ::FWK_E_PARAM  Invalid flags.
+ */
+int mod_res_permissions_api_agent_reset_config(uint32_t agent_id, uint32_t flags);

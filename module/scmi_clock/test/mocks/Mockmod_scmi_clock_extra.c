@@ -8,7 +8,15 @@
 static const char* CMockString_agent_count = "agent_count";
 static const char* CMockString_agent_id = "agent_id";
 static const char* CMockString_agent_type = "agent_type";
+static const char* CMockString_device_id = "device_id";
+static const char* CMockString_flags = "flags";
 static const char* CMockString_message_id = "message_id";
+static const char* CMockString_mod_res_permissions_api_agent_has_message_permission = "mod_res_permissions_api_agent_has_message_permission";
+static const char* CMockString_mod_res_permissions_api_agent_has_protocol_permission = "mod_res_permissions_api_agent_has_protocol_permission";
+static const char* CMockString_mod_res_permissions_api_agent_has_resource_permission = "mod_res_permissions_api_agent_has_resource_permission";
+static const char* CMockString_mod_res_permissions_api_agent_reset_config = "mod_res_permissions_api_agent_reset_config";
+static const char* CMockString_mod_res_permissions_api_agent_set_device_permission = "mod_res_permissions_api_agent_set_device_permission";
+static const char* CMockString_mod_res_permissions_api_agent_set_device_protocol_permission = "mod_res_permissions_api_agent_set_device_protocol_permission";
 static const char* CMockString_mod_scmi_from_protocol_api_get_agent_count = "mod_scmi_from_protocol_api_get_agent_count";
 static const char* CMockString_mod_scmi_from_protocol_api_get_agent_id = "mod_scmi_from_protocol_api_get_agent_id";
 static const char* CMockString_mod_scmi_from_protocol_api_get_agent_type = "mod_scmi_from_protocol_api_get_agent_type";
@@ -23,6 +31,7 @@ static const char* CMockString_payload = "payload";
 static const char* CMockString_payload_size = "payload_size";
 static const char* CMockString_protocol_id = "protocol_id";
 static const char* CMockString_request_ack_by_interrupt = "request_ack_by_interrupt";
+static const char* CMockString_resource_id = "resource_id";
 static const char* CMockString_scmi_message_id = "scmi_message_id";
 static const char* CMockString_scmi_protocol_id = "scmi_protocol_id";
 static const char* CMockString_service_id = "service_id";
@@ -139,6 +148,72 @@ typedef struct _CMOCK_mod_scmi_from_protocol_api_response_message_handler_CALL_I
 
 } CMOCK_mod_scmi_from_protocol_api_response_message_handler_CALL_INSTANCE;
 
+typedef struct _CMOCK_mod_res_permissions_api_agent_has_protocol_permission_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  enum mod_res_perms_permissions ReturnVal;
+  uint32_t Expected_agent_id;
+  uint32_t Expected_protocol_id;
+
+} CMOCK_mod_res_permissions_api_agent_has_protocol_permission_CALL_INSTANCE;
+
+typedef struct _CMOCK_mod_res_permissions_api_agent_has_message_permission_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  enum mod_res_perms_permissions ReturnVal;
+  uint32_t Expected_agent_id;
+  uint32_t Expected_protocol_id;
+  uint32_t Expected_message_id;
+
+} CMOCK_mod_res_permissions_api_agent_has_message_permission_CALL_INSTANCE;
+
+typedef struct _CMOCK_mod_res_permissions_api_agent_has_resource_permission_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  enum mod_res_perms_permissions ReturnVal;
+  uint32_t Expected_agent_id;
+  uint32_t Expected_protocol_id;
+  uint32_t Expected_message_id;
+  uint32_t Expected_resource_id;
+
+} CMOCK_mod_res_permissions_api_agent_has_resource_permission_CALL_INSTANCE;
+
+typedef struct _CMOCK_mod_res_permissions_api_agent_set_device_permission_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  int ReturnVal;
+  uint32_t Expected_agent_id;
+  uint32_t Expected_device_id;
+  uint32_t Expected_flags;
+
+} CMOCK_mod_res_permissions_api_agent_set_device_permission_CALL_INSTANCE;
+
+typedef struct _CMOCK_mod_res_permissions_api_agent_set_device_protocol_permission_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  int ReturnVal;
+  uint32_t Expected_agent_id;
+  uint32_t Expected_device_id;
+  uint32_t Expected_protocol_id;
+  uint32_t Expected_flags;
+
+} CMOCK_mod_res_permissions_api_agent_set_device_protocol_permission_CALL_INSTANCE;
+
+typedef struct _CMOCK_mod_res_permissions_api_agent_reset_config_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  int ReturnVal;
+  uint32_t Expected_agent_id;
+  uint32_t Expected_flags;
+
+} CMOCK_mod_res_permissions_api_agent_reset_config_CALL_INSTANCE;
+
 static struct Mockmod_scmi_clock_extraInstance
 {
   char mod_scmi_from_protocol_api_get_agent_count_CallbackBool;
@@ -177,6 +252,30 @@ static struct Mockmod_scmi_clock_extraInstance
   CMOCK_mod_scmi_from_protocol_api_response_message_handler_CALLBACK mod_scmi_from_protocol_api_response_message_handler_CallbackFunctionPointer;
   int mod_scmi_from_protocol_api_response_message_handler_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE mod_scmi_from_protocol_api_response_message_handler_CallInstance;
+  char mod_res_permissions_api_agent_has_protocol_permission_CallbackBool;
+  CMOCK_mod_res_permissions_api_agent_has_protocol_permission_CALLBACK mod_res_permissions_api_agent_has_protocol_permission_CallbackFunctionPointer;
+  int mod_res_permissions_api_agent_has_protocol_permission_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE mod_res_permissions_api_agent_has_protocol_permission_CallInstance;
+  char mod_res_permissions_api_agent_has_message_permission_CallbackBool;
+  CMOCK_mod_res_permissions_api_agent_has_message_permission_CALLBACK mod_res_permissions_api_agent_has_message_permission_CallbackFunctionPointer;
+  int mod_res_permissions_api_agent_has_message_permission_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE mod_res_permissions_api_agent_has_message_permission_CallInstance;
+  char mod_res_permissions_api_agent_has_resource_permission_CallbackBool;
+  CMOCK_mod_res_permissions_api_agent_has_resource_permission_CALLBACK mod_res_permissions_api_agent_has_resource_permission_CallbackFunctionPointer;
+  int mod_res_permissions_api_agent_has_resource_permission_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE mod_res_permissions_api_agent_has_resource_permission_CallInstance;
+  char mod_res_permissions_api_agent_set_device_permission_CallbackBool;
+  CMOCK_mod_res_permissions_api_agent_set_device_permission_CALLBACK mod_res_permissions_api_agent_set_device_permission_CallbackFunctionPointer;
+  int mod_res_permissions_api_agent_set_device_permission_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE mod_res_permissions_api_agent_set_device_permission_CallInstance;
+  char mod_res_permissions_api_agent_set_device_protocol_permission_CallbackBool;
+  CMOCK_mod_res_permissions_api_agent_set_device_protocol_permission_CALLBACK mod_res_permissions_api_agent_set_device_protocol_permission_CallbackFunctionPointer;
+  int mod_res_permissions_api_agent_set_device_protocol_permission_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE mod_res_permissions_api_agent_set_device_protocol_permission_CallInstance;
+  char mod_res_permissions_api_agent_reset_config_CallbackBool;
+  CMOCK_mod_res_permissions_api_agent_reset_config_CALLBACK mod_res_permissions_api_agent_reset_config_CallbackFunctionPointer;
+  int mod_res_permissions_api_agent_reset_config_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE mod_res_permissions_api_agent_reset_config_CallInstance;
 } Mock;
 
 extern jmp_buf AbortFrame;
@@ -280,6 +379,72 @@ void Mockmod_scmi_clock_extra_Verify(void)
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
   if (Mock.mod_scmi_from_protocol_api_response_message_handler_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.mod_res_permissions_api_agent_has_protocol_permission_CallInstance;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_mod_res_permissions_api_agent_has_protocol_permission);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.mod_res_permissions_api_agent_has_protocol_permission_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.mod_res_permissions_api_agent_has_message_permission_CallInstance;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_mod_res_permissions_api_agent_has_message_permission);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.mod_res_permissions_api_agent_has_message_permission_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.mod_res_permissions_api_agent_has_resource_permission_CallInstance;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_mod_res_permissions_api_agent_has_resource_permission);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.mod_res_permissions_api_agent_has_resource_permission_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.mod_res_permissions_api_agent_set_device_permission_CallInstance;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_mod_res_permissions_api_agent_set_device_permission);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.mod_res_permissions_api_agent_set_device_permission_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallInstance;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_mod_res_permissions_api_agent_set_device_protocol_permission);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.mod_res_permissions_api_agent_reset_config_CallInstance;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_mod_res_permissions_api_agent_reset_config);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.mod_res_permissions_api_agent_reset_config_CallbackFunctionPointer != NULL)
   {
     call_instance = CMOCK_GUTS_NONE;
     (void)call_instance;
@@ -1151,5 +1316,518 @@ void mod_scmi_from_protocol_api_response_message_handler_Stub(CMOCK_mod_scmi_fro
 {
   Mock.mod_scmi_from_protocol_api_response_message_handler_CallbackBool = (char)0;
   Mock.mod_scmi_from_protocol_api_response_message_handler_CallbackFunctionPointer = Callback;
+}
+
+enum mod_res_perms_permissions mod_res_permissions_api_agent_has_protocol_permission(uint32_t agent_id, uint32_t protocol_id)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_mod_res_permissions_api_agent_has_protocol_permission_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_mod_res_permissions_api_agent_has_protocol_permission);
+  cmock_call_instance = (CMOCK_mod_res_permissions_api_agent_has_protocol_permission_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.mod_res_permissions_api_agent_has_protocol_permission_CallInstance);
+  Mock.mod_res_permissions_api_agent_has_protocol_permission_CallInstance = CMock_Guts_MemNext(Mock.mod_res_permissions_api_agent_has_protocol_permission_CallInstance);
+  if (!Mock.mod_res_permissions_api_agent_has_protocol_permission_CallbackBool &&
+      Mock.mod_res_permissions_api_agent_has_protocol_permission_CallbackFunctionPointer != NULL)
+  {
+    enum mod_res_perms_permissions cmock_cb_ret = Mock.mod_res_permissions_api_agent_has_protocol_permission_CallbackFunctionPointer(agent_id, protocol_id, Mock.mod_res_permissions_api_agent_has_protocol_permission_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  {
+    UNITY_SET_DETAILS(CMockString_mod_res_permissions_api_agent_has_protocol_permission,CMockString_agent_id);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_agent_id, agent_id, cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_res_permissions_api_agent_has_protocol_permission,CMockString_protocol_id);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_protocol_id, protocol_id, cmock_line, CMockStringMismatch);
+  }
+  }
+  if (Mock.mod_res_permissions_api_agent_has_protocol_permission_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.mod_res_permissions_api_agent_has_protocol_permission_CallbackFunctionPointer(agent_id, protocol_id, Mock.mod_res_permissions_api_agent_has_protocol_permission_CallbackCalls++);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_mod_res_permissions_api_agent_has_protocol_permission(CMOCK_mod_res_permissions_api_agent_has_protocol_permission_CALL_INSTANCE* cmock_call_instance, uint32_t agent_id, uint32_t protocol_id);
+void CMockExpectParameters_mod_res_permissions_api_agent_has_protocol_permission(CMOCK_mod_res_permissions_api_agent_has_protocol_permission_CALL_INSTANCE* cmock_call_instance, uint32_t agent_id, uint32_t protocol_id)
+{
+  cmock_call_instance->Expected_agent_id = agent_id;
+  cmock_call_instance->Expected_protocol_id = protocol_id;
+}
+
+void mod_res_permissions_api_agent_has_protocol_permission_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, enum mod_res_perms_permissions cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_res_permissions_api_agent_has_protocol_permission_CALL_INSTANCE));
+  CMOCK_mod_res_permissions_api_agent_has_protocol_permission_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_res_permissions_api_agent_has_protocol_permission_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_res_permissions_api_agent_has_protocol_permission_CallInstance = CMock_Guts_MemChain(Mock.mod_res_permissions_api_agent_has_protocol_permission_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void mod_res_permissions_api_agent_has_protocol_permission_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, uint32_t agent_id, uint32_t protocol_id, enum mod_res_perms_permissions cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_res_permissions_api_agent_has_protocol_permission_CALL_INSTANCE));
+  CMOCK_mod_res_permissions_api_agent_has_protocol_permission_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_res_permissions_api_agent_has_protocol_permission_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_res_permissions_api_agent_has_protocol_permission_CallInstance = CMock_Guts_MemChain(Mock.mod_res_permissions_api_agent_has_protocol_permission_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_mod_res_permissions_api_agent_has_protocol_permission(cmock_call_instance, agent_id, protocol_id);
+  memcpy((void*)(&cmock_call_instance->ReturnVal), (void*)(&cmock_to_return),
+         sizeof(enum mod_res_perms_permissions[sizeof(cmock_to_return) == sizeof(enum mod_res_perms_permissions) ? 1 : -1])); /* add enum mod_res_perms_permissions to :treat_as_array if this causes an error */
+}
+
+void mod_res_permissions_api_agent_has_protocol_permission_AddCallback(CMOCK_mod_res_permissions_api_agent_has_protocol_permission_CALLBACK Callback)
+{
+  Mock.mod_res_permissions_api_agent_has_protocol_permission_CallbackBool = (char)1;
+  Mock.mod_res_permissions_api_agent_has_protocol_permission_CallbackFunctionPointer = Callback;
+}
+
+void mod_res_permissions_api_agent_has_protocol_permission_Stub(CMOCK_mod_res_permissions_api_agent_has_protocol_permission_CALLBACK Callback)
+{
+  Mock.mod_res_permissions_api_agent_has_protocol_permission_CallbackBool = (char)0;
+  Mock.mod_res_permissions_api_agent_has_protocol_permission_CallbackFunctionPointer = Callback;
+}
+
+enum mod_res_perms_permissions mod_res_permissions_api_agent_has_message_permission(uint32_t agent_id, uint32_t protocol_id, uint32_t message_id)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_mod_res_permissions_api_agent_has_message_permission_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_mod_res_permissions_api_agent_has_message_permission);
+  cmock_call_instance = (CMOCK_mod_res_permissions_api_agent_has_message_permission_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.mod_res_permissions_api_agent_has_message_permission_CallInstance);
+  Mock.mod_res_permissions_api_agent_has_message_permission_CallInstance = CMock_Guts_MemNext(Mock.mod_res_permissions_api_agent_has_message_permission_CallInstance);
+  if (!Mock.mod_res_permissions_api_agent_has_message_permission_CallbackBool &&
+      Mock.mod_res_permissions_api_agent_has_message_permission_CallbackFunctionPointer != NULL)
+  {
+    enum mod_res_perms_permissions cmock_cb_ret = Mock.mod_res_permissions_api_agent_has_message_permission_CallbackFunctionPointer(agent_id, protocol_id, message_id, Mock.mod_res_permissions_api_agent_has_message_permission_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  {
+    UNITY_SET_DETAILS(CMockString_mod_res_permissions_api_agent_has_message_permission,CMockString_agent_id);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_agent_id, agent_id, cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_res_permissions_api_agent_has_message_permission,CMockString_protocol_id);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_protocol_id, protocol_id, cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_res_permissions_api_agent_has_message_permission,CMockString_message_id);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_message_id, message_id, cmock_line, CMockStringMismatch);
+  }
+  }
+  if (Mock.mod_res_permissions_api_agent_has_message_permission_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.mod_res_permissions_api_agent_has_message_permission_CallbackFunctionPointer(agent_id, protocol_id, message_id, Mock.mod_res_permissions_api_agent_has_message_permission_CallbackCalls++);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_mod_res_permissions_api_agent_has_message_permission(CMOCK_mod_res_permissions_api_agent_has_message_permission_CALL_INSTANCE* cmock_call_instance, uint32_t agent_id, uint32_t protocol_id, uint32_t message_id);
+void CMockExpectParameters_mod_res_permissions_api_agent_has_message_permission(CMOCK_mod_res_permissions_api_agent_has_message_permission_CALL_INSTANCE* cmock_call_instance, uint32_t agent_id, uint32_t protocol_id, uint32_t message_id)
+{
+  cmock_call_instance->Expected_agent_id = agent_id;
+  cmock_call_instance->Expected_protocol_id = protocol_id;
+  cmock_call_instance->Expected_message_id = message_id;
+}
+
+void mod_res_permissions_api_agent_has_message_permission_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, enum mod_res_perms_permissions cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_res_permissions_api_agent_has_message_permission_CALL_INSTANCE));
+  CMOCK_mod_res_permissions_api_agent_has_message_permission_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_res_permissions_api_agent_has_message_permission_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_res_permissions_api_agent_has_message_permission_CallInstance = CMock_Guts_MemChain(Mock.mod_res_permissions_api_agent_has_message_permission_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void mod_res_permissions_api_agent_has_message_permission_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, uint32_t agent_id, uint32_t protocol_id, uint32_t message_id, enum mod_res_perms_permissions cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_res_permissions_api_agent_has_message_permission_CALL_INSTANCE));
+  CMOCK_mod_res_permissions_api_agent_has_message_permission_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_res_permissions_api_agent_has_message_permission_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_res_permissions_api_agent_has_message_permission_CallInstance = CMock_Guts_MemChain(Mock.mod_res_permissions_api_agent_has_message_permission_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_mod_res_permissions_api_agent_has_message_permission(cmock_call_instance, agent_id, protocol_id, message_id);
+  memcpy((void*)(&cmock_call_instance->ReturnVal), (void*)(&cmock_to_return),
+         sizeof(enum mod_res_perms_permissions[sizeof(cmock_to_return) == sizeof(enum mod_res_perms_permissions) ? 1 : -1])); /* add enum mod_res_perms_permissions to :treat_as_array if this causes an error */
+}
+
+void mod_res_permissions_api_agent_has_message_permission_AddCallback(CMOCK_mod_res_permissions_api_agent_has_message_permission_CALLBACK Callback)
+{
+  Mock.mod_res_permissions_api_agent_has_message_permission_CallbackBool = (char)1;
+  Mock.mod_res_permissions_api_agent_has_message_permission_CallbackFunctionPointer = Callback;
+}
+
+void mod_res_permissions_api_agent_has_message_permission_Stub(CMOCK_mod_res_permissions_api_agent_has_message_permission_CALLBACK Callback)
+{
+  Mock.mod_res_permissions_api_agent_has_message_permission_CallbackBool = (char)0;
+  Mock.mod_res_permissions_api_agent_has_message_permission_CallbackFunctionPointer = Callback;
+}
+
+enum mod_res_perms_permissions mod_res_permissions_api_agent_has_resource_permission(uint32_t agent_id, uint32_t protocol_id, uint32_t message_id, uint32_t resource_id)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_mod_res_permissions_api_agent_has_resource_permission_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_mod_res_permissions_api_agent_has_resource_permission);
+  cmock_call_instance = (CMOCK_mod_res_permissions_api_agent_has_resource_permission_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.mod_res_permissions_api_agent_has_resource_permission_CallInstance);
+  Mock.mod_res_permissions_api_agent_has_resource_permission_CallInstance = CMock_Guts_MemNext(Mock.mod_res_permissions_api_agent_has_resource_permission_CallInstance);
+  if (!Mock.mod_res_permissions_api_agent_has_resource_permission_CallbackBool &&
+      Mock.mod_res_permissions_api_agent_has_resource_permission_CallbackFunctionPointer != NULL)
+  {
+    enum mod_res_perms_permissions cmock_cb_ret = Mock.mod_res_permissions_api_agent_has_resource_permission_CallbackFunctionPointer(agent_id, protocol_id, message_id, resource_id, Mock.mod_res_permissions_api_agent_has_resource_permission_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  {
+    UNITY_SET_DETAILS(CMockString_mod_res_permissions_api_agent_has_resource_permission,CMockString_agent_id);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_agent_id, agent_id, cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_res_permissions_api_agent_has_resource_permission,CMockString_protocol_id);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_protocol_id, protocol_id, cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_res_permissions_api_agent_has_resource_permission,CMockString_message_id);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_message_id, message_id, cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_res_permissions_api_agent_has_resource_permission,CMockString_resource_id);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_resource_id, resource_id, cmock_line, CMockStringMismatch);
+  }
+  }
+  if (Mock.mod_res_permissions_api_agent_has_resource_permission_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.mod_res_permissions_api_agent_has_resource_permission_CallbackFunctionPointer(agent_id, protocol_id, message_id, resource_id, Mock.mod_res_permissions_api_agent_has_resource_permission_CallbackCalls++);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_mod_res_permissions_api_agent_has_resource_permission(CMOCK_mod_res_permissions_api_agent_has_resource_permission_CALL_INSTANCE* cmock_call_instance, uint32_t agent_id, uint32_t protocol_id, uint32_t message_id, uint32_t resource_id);
+void CMockExpectParameters_mod_res_permissions_api_agent_has_resource_permission(CMOCK_mod_res_permissions_api_agent_has_resource_permission_CALL_INSTANCE* cmock_call_instance, uint32_t agent_id, uint32_t protocol_id, uint32_t message_id, uint32_t resource_id)
+{
+  cmock_call_instance->Expected_agent_id = agent_id;
+  cmock_call_instance->Expected_protocol_id = protocol_id;
+  cmock_call_instance->Expected_message_id = message_id;
+  cmock_call_instance->Expected_resource_id = resource_id;
+}
+
+void mod_res_permissions_api_agent_has_resource_permission_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, enum mod_res_perms_permissions cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_res_permissions_api_agent_has_resource_permission_CALL_INSTANCE));
+  CMOCK_mod_res_permissions_api_agent_has_resource_permission_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_res_permissions_api_agent_has_resource_permission_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_res_permissions_api_agent_has_resource_permission_CallInstance = CMock_Guts_MemChain(Mock.mod_res_permissions_api_agent_has_resource_permission_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void mod_res_permissions_api_agent_has_resource_permission_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, uint32_t agent_id, uint32_t protocol_id, uint32_t message_id, uint32_t resource_id, enum mod_res_perms_permissions cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_res_permissions_api_agent_has_resource_permission_CALL_INSTANCE));
+  CMOCK_mod_res_permissions_api_agent_has_resource_permission_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_res_permissions_api_agent_has_resource_permission_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_res_permissions_api_agent_has_resource_permission_CallInstance = CMock_Guts_MemChain(Mock.mod_res_permissions_api_agent_has_resource_permission_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_mod_res_permissions_api_agent_has_resource_permission(cmock_call_instance, agent_id, protocol_id, message_id, resource_id);
+  memcpy((void*)(&cmock_call_instance->ReturnVal), (void*)(&cmock_to_return),
+         sizeof(enum mod_res_perms_permissions[sizeof(cmock_to_return) == sizeof(enum mod_res_perms_permissions) ? 1 : -1])); /* add enum mod_res_perms_permissions to :treat_as_array if this causes an error */
+}
+
+void mod_res_permissions_api_agent_has_resource_permission_AddCallback(CMOCK_mod_res_permissions_api_agent_has_resource_permission_CALLBACK Callback)
+{
+  Mock.mod_res_permissions_api_agent_has_resource_permission_CallbackBool = (char)1;
+  Mock.mod_res_permissions_api_agent_has_resource_permission_CallbackFunctionPointer = Callback;
+}
+
+void mod_res_permissions_api_agent_has_resource_permission_Stub(CMOCK_mod_res_permissions_api_agent_has_resource_permission_CALLBACK Callback)
+{
+  Mock.mod_res_permissions_api_agent_has_resource_permission_CallbackBool = (char)0;
+  Mock.mod_res_permissions_api_agent_has_resource_permission_CallbackFunctionPointer = Callback;
+}
+
+int mod_res_permissions_api_agent_set_device_permission(uint32_t agent_id, uint32_t device_id, uint32_t flags)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_mod_res_permissions_api_agent_set_device_permission_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_mod_res_permissions_api_agent_set_device_permission);
+  cmock_call_instance = (CMOCK_mod_res_permissions_api_agent_set_device_permission_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.mod_res_permissions_api_agent_set_device_permission_CallInstance);
+  Mock.mod_res_permissions_api_agent_set_device_permission_CallInstance = CMock_Guts_MemNext(Mock.mod_res_permissions_api_agent_set_device_permission_CallInstance);
+  if (!Mock.mod_res_permissions_api_agent_set_device_permission_CallbackBool &&
+      Mock.mod_res_permissions_api_agent_set_device_permission_CallbackFunctionPointer != NULL)
+  {
+    int cmock_cb_ret = Mock.mod_res_permissions_api_agent_set_device_permission_CallbackFunctionPointer(agent_id, device_id, flags, Mock.mod_res_permissions_api_agent_set_device_permission_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  {
+    UNITY_SET_DETAILS(CMockString_mod_res_permissions_api_agent_set_device_permission,CMockString_agent_id);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_agent_id, agent_id, cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_res_permissions_api_agent_set_device_permission,CMockString_device_id);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_device_id, device_id, cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_res_permissions_api_agent_set_device_permission,CMockString_flags);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_flags, flags, cmock_line, CMockStringMismatch);
+  }
+  }
+  if (Mock.mod_res_permissions_api_agent_set_device_permission_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.mod_res_permissions_api_agent_set_device_permission_CallbackFunctionPointer(agent_id, device_id, flags, Mock.mod_res_permissions_api_agent_set_device_permission_CallbackCalls++);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_mod_res_permissions_api_agent_set_device_permission(CMOCK_mod_res_permissions_api_agent_set_device_permission_CALL_INSTANCE* cmock_call_instance, uint32_t agent_id, uint32_t device_id, uint32_t flags);
+void CMockExpectParameters_mod_res_permissions_api_agent_set_device_permission(CMOCK_mod_res_permissions_api_agent_set_device_permission_CALL_INSTANCE* cmock_call_instance, uint32_t agent_id, uint32_t device_id, uint32_t flags)
+{
+  cmock_call_instance->Expected_agent_id = agent_id;
+  cmock_call_instance->Expected_device_id = device_id;
+  cmock_call_instance->Expected_flags = flags;
+}
+
+void mod_res_permissions_api_agent_set_device_permission_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_res_permissions_api_agent_set_device_permission_CALL_INSTANCE));
+  CMOCK_mod_res_permissions_api_agent_set_device_permission_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_res_permissions_api_agent_set_device_permission_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_res_permissions_api_agent_set_device_permission_CallInstance = CMock_Guts_MemChain(Mock.mod_res_permissions_api_agent_set_device_permission_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void mod_res_permissions_api_agent_set_device_permission_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, uint32_t agent_id, uint32_t device_id, uint32_t flags, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_res_permissions_api_agent_set_device_permission_CALL_INSTANCE));
+  CMOCK_mod_res_permissions_api_agent_set_device_permission_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_res_permissions_api_agent_set_device_permission_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_res_permissions_api_agent_set_device_permission_CallInstance = CMock_Guts_MemChain(Mock.mod_res_permissions_api_agent_set_device_permission_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_mod_res_permissions_api_agent_set_device_permission(cmock_call_instance, agent_id, device_id, flags);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void mod_res_permissions_api_agent_set_device_permission_AddCallback(CMOCK_mod_res_permissions_api_agent_set_device_permission_CALLBACK Callback)
+{
+  Mock.mod_res_permissions_api_agent_set_device_permission_CallbackBool = (char)1;
+  Mock.mod_res_permissions_api_agent_set_device_permission_CallbackFunctionPointer = Callback;
+}
+
+void mod_res_permissions_api_agent_set_device_permission_Stub(CMOCK_mod_res_permissions_api_agent_set_device_permission_CALLBACK Callback)
+{
+  Mock.mod_res_permissions_api_agent_set_device_permission_CallbackBool = (char)0;
+  Mock.mod_res_permissions_api_agent_set_device_permission_CallbackFunctionPointer = Callback;
+}
+
+int mod_res_permissions_api_agent_set_device_protocol_permission(uint32_t agent_id, uint32_t device_id, uint32_t protocol_id, uint32_t flags)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_mod_res_permissions_api_agent_set_device_protocol_permission_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_mod_res_permissions_api_agent_set_device_protocol_permission);
+  cmock_call_instance = (CMOCK_mod_res_permissions_api_agent_set_device_protocol_permission_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallInstance);
+  Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallInstance = CMock_Guts_MemNext(Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallInstance);
+  if (!Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallbackBool &&
+      Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallbackFunctionPointer != NULL)
+  {
+    int cmock_cb_ret = Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallbackFunctionPointer(agent_id, device_id, protocol_id, flags, Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  {
+    UNITY_SET_DETAILS(CMockString_mod_res_permissions_api_agent_set_device_protocol_permission,CMockString_agent_id);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_agent_id, agent_id, cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_res_permissions_api_agent_set_device_protocol_permission,CMockString_device_id);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_device_id, device_id, cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_res_permissions_api_agent_set_device_protocol_permission,CMockString_protocol_id);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_protocol_id, protocol_id, cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_res_permissions_api_agent_set_device_protocol_permission,CMockString_flags);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_flags, flags, cmock_line, CMockStringMismatch);
+  }
+  }
+  if (Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallbackFunctionPointer(agent_id, device_id, protocol_id, flags, Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallbackCalls++);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_mod_res_permissions_api_agent_set_device_protocol_permission(CMOCK_mod_res_permissions_api_agent_set_device_protocol_permission_CALL_INSTANCE* cmock_call_instance, uint32_t agent_id, uint32_t device_id, uint32_t protocol_id, uint32_t flags);
+void CMockExpectParameters_mod_res_permissions_api_agent_set_device_protocol_permission(CMOCK_mod_res_permissions_api_agent_set_device_protocol_permission_CALL_INSTANCE* cmock_call_instance, uint32_t agent_id, uint32_t device_id, uint32_t protocol_id, uint32_t flags)
+{
+  cmock_call_instance->Expected_agent_id = agent_id;
+  cmock_call_instance->Expected_device_id = device_id;
+  cmock_call_instance->Expected_protocol_id = protocol_id;
+  cmock_call_instance->Expected_flags = flags;
+}
+
+void mod_res_permissions_api_agent_set_device_protocol_permission_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_res_permissions_api_agent_set_device_protocol_permission_CALL_INSTANCE));
+  CMOCK_mod_res_permissions_api_agent_set_device_protocol_permission_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_res_permissions_api_agent_set_device_protocol_permission_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallInstance = CMock_Guts_MemChain(Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void mod_res_permissions_api_agent_set_device_protocol_permission_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, uint32_t agent_id, uint32_t device_id, uint32_t protocol_id, uint32_t flags, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_res_permissions_api_agent_set_device_protocol_permission_CALL_INSTANCE));
+  CMOCK_mod_res_permissions_api_agent_set_device_protocol_permission_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_res_permissions_api_agent_set_device_protocol_permission_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallInstance = CMock_Guts_MemChain(Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_mod_res_permissions_api_agent_set_device_protocol_permission(cmock_call_instance, agent_id, device_id, protocol_id, flags);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void mod_res_permissions_api_agent_set_device_protocol_permission_AddCallback(CMOCK_mod_res_permissions_api_agent_set_device_protocol_permission_CALLBACK Callback)
+{
+  Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallbackBool = (char)1;
+  Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallbackFunctionPointer = Callback;
+}
+
+void mod_res_permissions_api_agent_set_device_protocol_permission_Stub(CMOCK_mod_res_permissions_api_agent_set_device_protocol_permission_CALLBACK Callback)
+{
+  Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallbackBool = (char)0;
+  Mock.mod_res_permissions_api_agent_set_device_protocol_permission_CallbackFunctionPointer = Callback;
+}
+
+int mod_res_permissions_api_agent_reset_config(uint32_t agent_id, uint32_t flags)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_mod_res_permissions_api_agent_reset_config_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_mod_res_permissions_api_agent_reset_config);
+  cmock_call_instance = (CMOCK_mod_res_permissions_api_agent_reset_config_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.mod_res_permissions_api_agent_reset_config_CallInstance);
+  Mock.mod_res_permissions_api_agent_reset_config_CallInstance = CMock_Guts_MemNext(Mock.mod_res_permissions_api_agent_reset_config_CallInstance);
+  if (!Mock.mod_res_permissions_api_agent_reset_config_CallbackBool &&
+      Mock.mod_res_permissions_api_agent_reset_config_CallbackFunctionPointer != NULL)
+  {
+    int cmock_cb_ret = Mock.mod_res_permissions_api_agent_reset_config_CallbackFunctionPointer(agent_id, flags, Mock.mod_res_permissions_api_agent_reset_config_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  {
+    UNITY_SET_DETAILS(CMockString_mod_res_permissions_api_agent_reset_config,CMockString_agent_id);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_agent_id, agent_id, cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_res_permissions_api_agent_reset_config,CMockString_flags);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_flags, flags, cmock_line, CMockStringMismatch);
+  }
+  }
+  if (Mock.mod_res_permissions_api_agent_reset_config_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.mod_res_permissions_api_agent_reset_config_CallbackFunctionPointer(agent_id, flags, Mock.mod_res_permissions_api_agent_reset_config_CallbackCalls++);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_mod_res_permissions_api_agent_reset_config(CMOCK_mod_res_permissions_api_agent_reset_config_CALL_INSTANCE* cmock_call_instance, uint32_t agent_id, uint32_t flags);
+void CMockExpectParameters_mod_res_permissions_api_agent_reset_config(CMOCK_mod_res_permissions_api_agent_reset_config_CALL_INSTANCE* cmock_call_instance, uint32_t agent_id, uint32_t flags)
+{
+  cmock_call_instance->Expected_agent_id = agent_id;
+  cmock_call_instance->Expected_flags = flags;
+}
+
+void mod_res_permissions_api_agent_reset_config_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_res_permissions_api_agent_reset_config_CALL_INSTANCE));
+  CMOCK_mod_res_permissions_api_agent_reset_config_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_res_permissions_api_agent_reset_config_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_res_permissions_api_agent_reset_config_CallInstance = CMock_Guts_MemChain(Mock.mod_res_permissions_api_agent_reset_config_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void mod_res_permissions_api_agent_reset_config_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, uint32_t agent_id, uint32_t flags, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_res_permissions_api_agent_reset_config_CALL_INSTANCE));
+  CMOCK_mod_res_permissions_api_agent_reset_config_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_res_permissions_api_agent_reset_config_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_res_permissions_api_agent_reset_config_CallInstance = CMock_Guts_MemChain(Mock.mod_res_permissions_api_agent_reset_config_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_mod_res_permissions_api_agent_reset_config(cmock_call_instance, agent_id, flags);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void mod_res_permissions_api_agent_reset_config_AddCallback(CMOCK_mod_res_permissions_api_agent_reset_config_CALLBACK Callback)
+{
+  Mock.mod_res_permissions_api_agent_reset_config_CallbackBool = (char)1;
+  Mock.mod_res_permissions_api_agent_reset_config_CallbackFunctionPointer = Callback;
+}
+
+void mod_res_permissions_api_agent_reset_config_Stub(CMOCK_mod_res_permissions_api_agent_reset_config_CALLBACK Callback)
+{
+  Mock.mod_res_permissions_api_agent_reset_config_CallbackBool = (char)0;
+  Mock.mod_res_permissions_api_agent_reset_config_CallbackFunctionPointer = Callback;
 }
 
