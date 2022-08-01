@@ -851,8 +851,13 @@ static int direct_ddr_cmd(struct mod_dmc_bing_reg *dmc)
 
     addr = addr & 0xFFFFFF7F;
     execute_ddr_cmd(dmc, addr, ((ddr_info.ranks_to_train << 16) | 0x0601), 1);
-    execute_ddr_cmd(
-        dmc, 0x00000180, ((ddr_info.ranks_to_train << 16) | 0x0501), 0);
+    if (ddr_info.number_of_ranks == 1) {
+        execute_ddr_cmd(
+            dmc, 0x00000180, ((ddr_info.ranks_to_train << 16) | 0x0501), 0);
+    } else {
+        execute_ddr_cmd(
+            dmc, 0x00000100, ((ddr_info.ranks_to_train << 16) | 0x0501), 0);
+    }
     execute_ddr_cmd(
         dmc, 0x00000000, ((ddr_info.ranks_to_train << 16) | 0x0401), 0);
 
