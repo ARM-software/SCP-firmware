@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -11,7 +11,11 @@
 #include "juno_system.h"
 
 #include <mod_juno_system.h>
-#include <mod_juno_xrp7724.h>
+
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
+#    include <mod_juno_xrp7724.h>
+#endif
+
 #include <mod_power_domain.h>
 #include <mod_psu.h>
 #include <mod_scmi.h>
@@ -119,12 +123,11 @@ static int juno_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
 {
     int status = FWK_SUCCESS;
 
-    if (juno_system_ctx.platform_id == JUNO_IDX_PLATFORM_FVP) {
-        NVIC_SystemReset();
+#if (PLATFORM_VARIANT == JUNO_VARIANT_FVP)
+    NVIC_SystemReset();
 
-        fwk_unreachable();
-    }
-
+    fwk_unreachable();
+#elif (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
     switch (system_shutdown) {
     case MOD_PD_SYSTEM_SHUTDOWN:
     case MOD_PD_SYSTEM_FORCED_SHUTDOWN:
@@ -138,6 +141,7 @@ static int juno_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
     default:
         status = FWK_E_SUPPORT;
     }
+#endif
 
     return status;
 }
@@ -190,10 +194,14 @@ static int juno_system_bind(fwk_id_t id, unsigned int round)
             return FWK_E_PANIC;
         }
 
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
         return fwk_module_bind(
             fwk_module_id_juno_xrp7724,
             mod_juno_xrp7724_api_id_system_mode,
             &juno_system_ctx.juno_xrp7724_api);
+#elif (PLATFORM_VARIANT == JUNO_VARIANT_FVP)
+        return status;
+#endif
     }
 }
 
