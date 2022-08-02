@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -10,7 +10,11 @@
 
 #include <mod_juno_adc.h>
 #include <mod_juno_pvt.h>
-#include <mod_juno_xrp7724.h>
+
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
+#    include <mod_juno_xrp7724.h>
+#endif
+
 #include <mod_scmi_sensor.h>
 #include <mod_sensor.h>
 
@@ -27,6 +31,7 @@
 #include <string.h>
 
 static const struct fwk_element sensor_element_table_r0[] = {
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
     /*
      * PMIC Sensor
      */
@@ -39,6 +44,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
 
         },
     },
+#endif
 
     /*
      * PVT Sensors

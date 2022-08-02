@@ -68,8 +68,6 @@ list(PREPEND SCP_MODULE_PATHS
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/juno_system")
 list(PREPEND SCP_MODULE_PATHS
-     "${CMAKE_CURRENT_LIST_DIR}/../module/juno_xrp7724")
-list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/juno_hdlcd")
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_SOURCE_DIR}/module/dwt_pmi")
@@ -108,10 +106,15 @@ list(APPEND SCP_MODULES "sds")
 list(APPEND SCP_MODULES "i2c")
 list(APPEND SCP_MODULES "dw-apb-i2c")
 list(APPEND SCP_MODULES "juno-adc")
-list(APPEND SCP_MODULES "juno-xrp7724")
 list(APPEND SCP_MODULES "reg-sensor")
 list(APPEND SCP_MODULES "psu")
 list(APPEND SCP_MODULES "mock-psu")
 list(APPEND SCP_MODULES "juno-pvt")
 list(APPEND SCP_MODULES "juno-thermal")
 list(APPEND SCP_MODULES "mock-clock")
+
+if (SCP_PLATFORM_VARIANT STREQUAL "BOARD")
+    list(APPEND SCP_MODULES "juno-xrp7724")
+    list(PREPEND SCP_MODULE_PATHS
+        "${CMAKE_CURRENT_LIST_DIR}/../module/juno_xrp7724")
+endif()
