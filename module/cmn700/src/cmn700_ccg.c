@@ -417,6 +417,78 @@ static void enable_smp_mode(
     FWK_LOG_INFO(MOD_NAME "SMP Mode Enabled");
 }
 
+/*
+ * Helper function to check the status of the Upper link layer direct connect
+ * (ull to ull) mode
+ */
+static bool ccla_ull_status_wait_condition(void *data)
+{
+    bool ccla_ull_status_rx_in_run;
+    bool ccla_ull_status_tx_in_run;
+    unsigned int ccg_ldid;
+    struct cmn700_ccla_reg *ccla_reg;
+    struct cmn700_device_ctx *ctx;
+
+    ctx = (struct cmn700_device_ctx *)data;
+    ccg_ldid = get_ldid(ctx, cmn700_ccg_ctx.is_prog_for_port_agg);
+    ccla_reg = ctx->ccla_reg_table[ccg_ldid].ccla_reg;
+
+    ccla_ull_status_rx_in_run =
+        ((ccla_reg->CCLA_ULL_STATUS & CCLA_ULL_STATUS_SEND_RX_ULL_STATE_MASK) >
+         0);
+
+    ccla_ull_status_tx_in_run =
+        ((ccla_reg->CCLA_ULL_STATUS & CCLA_ULL_STATUS_SEND_TX_ULL_STATE_MASK) >
+         0);
+
+    return (ccla_ull_status_rx_in_run && ccla_ull_status_tx_in_run);
+}
+
+static int enable_ull_to_ull_mode(
+    struct cmn700_device_ctx *ctx,
+    const struct mod_cmn700_ccg_config *config)
+{
+    int status;
+    unsigned int ccg_ldid;
+    struct cmn700_ccla_reg *ccla_reg;
+
+    ccg_ldid = get_ldid(ctx, cmn700_ccg_ctx.is_prog_for_port_agg);
+    ccla_reg = ctx->ccla_reg_table[ccg_ldid].ccla_reg;
+
+    FWK_LOG_INFO(MOD_NAME "Enabling CCG ULL to ULL mode...");
+
+    /* Enabling ULL-to-ULL mode */
+    ccla_reg->CCLA_ULL_CTL = (1 << CCLA_ULL_CTL_ULL_TO_ULL_MODE_EN_SHIFT_VAL);
+
+    /* Setting send_vd_init */
+    ccla_reg->CCLA_ULL_CTL |= (1 << CCLA_ULL_CTL_SEND_VD_INIT_SHIFT_VAL);
+
+    /* Wait until link enable bits are set */
+    status = ctx->timer_api->wait(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+        CCLA_ULL_STATUS_TIMEOUT,
+        ccla_ull_status_wait_condition,
+        ctx);
+
+    if (status != FWK_SUCCESS) {
+        if ((ccla_reg->CCLA_ULL_STATUS &
+             CCLA_ULL_STATUS_SEND_RX_ULL_STATE_MASK) == 0) {
+            FWK_LOG_ERR(MOD_NAME "Rx ULL is in Stop state");
+        }
+
+        if ((ccla_reg->CCLA_ULL_STATUS &
+             CCLA_ULL_STATUS_SEND_TX_ULL_STATE_MASK) == 0) {
+            FWK_LOG_ERR(MOD_NAME "Tx ULL is in Stop state");
+        }
+
+        FWK_LOG_ERR(MOD_NAME "Enabling CCG ULL to ULL mode... Failed");
+        return status;
+    }
+
+    FWK_LOG_INFO(MOD_NAME "Enabling CCG ULL to ULL mode... Done");
+    return status;
+}
+
 static void program_ccg_ra_sam_addr_region(
     struct cmn700_device_ctx *ctx,
     const struct mod_cmn700_ccg_config *config)
@@ -713,6 +785,12 @@ int ccg_setup(
          */
         program_ccg_ra_sam_addr_region(ctx, ccg_config);
 
+        if (ccg_config->ull_to_ull_mode) {
+            status = enable_ull_to_ull_mode(ctx, ccg_config);
+            if (status != FWK_SUCCESS) {
+                return status;
+            }
+        }
         /* Program the Link Control registers present in CCRA/CCHA/CCLA */
         status = enable_and_start_ccg_link_up_sequence(ctx, 0);
 
