@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -313,6 +313,16 @@ struct mod_cmn700_ccg_config {
 
     /*! SMP Mode */
     bool smp_mode;
+
+    /*!
+     * \brief CCLA to CCLA direct connect mode
+     *
+     * \details CCG enables direct connection of CXS interface from the CCLA on
+     * one CMN‑700 to the CXS interface of the other. When such connection is
+     * present, set this option to true in order to enable upper link layer to
+     * upper link layer connection between CCLAs.
+     */
+    bool ull_to_ull_mode;
 
     /*! Port Aggregation Mode */
     bool port_aggregate;

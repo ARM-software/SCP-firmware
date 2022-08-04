@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -80,6 +80,13 @@ struct ccg_wait_condition_data {
 /* SMP Mode related defines */
 #define CCG_RA_CCPRTCL_LINK_CTRL_SMP_MODE_EN_SHIFT_VAL 16
 #define CCG_HA_CCPRTCL_LINK_CTRL_SMP_MODE_EN_SHIFT_VAL 16
+
+/* ULL to ULL Mode related defines */
+#define CCLA_ULL_CTL_ULL_TO_ULL_MODE_EN_SHIFT_VAL 1
+#define CCLA_ULL_CTL_SEND_VD_INIT_SHIFT_VAL       0
+#define CCLA_ULL_STATUS_SEND_RX_ULL_STATE_MASK    UINT64_C(0x2)
+#define CCLA_ULL_STATUS_SEND_TX_ULL_STATE_MASK    UINT64_C(0x1)
+#define CCLA_ULL_STATUS_TIMEOUT                   UINT32_C(100)
 
 #define HNF_RN_PHYS_RN_ID_VALID_SHIFT_VAL     31
 #define HNF_RN_PHYS_RN_LOCAL_REMOTE_SHIFT_VAL 16
