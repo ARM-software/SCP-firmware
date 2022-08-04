@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -336,7 +336,7 @@ static void program_hnf_ldid_to_chi_node_id_reg(
     reg_index = 0;
     i = 0;
 
-    /* Assign the NodeID of CXHA as the RA's NodeID */
+    /* Assign the NodeID of CCHA as the RA's NodeID */
     nodeid_ra = ctx->ccg_ha_reg_table[config->ldid].node_id;
 
     if (cmn700_ccg_ctx.is_prog_for_port_agg) {
@@ -373,7 +373,7 @@ static void program_hnf_ldid_to_chi_node_id_reg(
 
             for (i = 0; i < ctx->hnf_count; i++) {
                 hnf_reg = (struct cmn700_hnf_reg *)ctx->hnf_node[i];
-                /* Write CXHA NodeID, local/remote and valid bit */
+                /* Write CCHA NodeID, local/remote and valid bit */
                 hnf_reg->HNF_RN_CLUSTER_PHYSID[reg_index][0] |= ((uint64_t)(
                     nodeid_ra |
                     (REMOTE_CCG_NODE << HNF_RN_PHYS_RN_LOCAL_REMOTE_SHIFT_VAL) |
@@ -420,7 +420,7 @@ static void program_ccg_ra_sam_addr_region(
     ccg_ra_reg = ctx->ccg_ra_reg_table[ccg_ldid].ccg_ra_reg;
 
     FWK_LOG_INFO(
-        MOD_NAME "Configuring RA SAM for CXRA NodeID %d",
+        MOD_NAME "Configuring RA SAM for CCRA NodeID %d",
         get_node_id(ccg_ra_reg));
 
     for (i = 0; i < CMN700_MAX_RA_SAM_ADDR_REGION; i++) {
@@ -623,11 +623,11 @@ int ccg_setup(
         for (rnf_ldid = 0; rnf_ldid < ctx->rnf_count; rnf_ldid++) {
             agentid = cmn700_ccg_ctx.raid_value + offset_id;
 
-            /* Program RAID values in CXRA LDID to RAID LUT */
+            /* Program RAID values in CCRA LDID to RAID LUT */
             program_ccg_ra_rnf_ldid_to_exp_raid_reg(ctx, rnf_ldid, agentid);
         }
 
-        /* Program agentid to linkid LUT for remote agents in CXRA/CXHA/CCLA */
+        /* Program agentid to linkid LUT for remote agents in CCRA/CCHA/CCLA */
         program_agentid_to_linkid_reg(ctx, ccg_config);
 
         /* Program HN-F ldid to CHI NodeID for remote RN-F agents */
@@ -661,14 +661,14 @@ int ccg_setup(
                 remote_agentid = i + ctx->rnf_count;
             }
 
-            /* Program the CXHA raid to ldid LUT */
+            /* Program the CCHA raid to ldid LUT */
             program_ccg_ha_raid_to_ldid_lut(
                 ctx, remote_agentid, unique_remote_rnf_ldid_value);
 
             unique_remote_rnf_ldid_value++;
         }
 
-        /* Program the unique HAID for the CXHA block */
+        /* Program the unique HAID for the CCHA block */
         program_ccg_ha_id(ctx);
 
         cmn700_ccg_ctx.raid_value = 0;
@@ -678,7 +678,7 @@ int ccg_setup(
             /* Determine agentid of the remote agents */
             agentid = cmn700_ccg_ctx.raid_value + offset_id;
 
-            /* Program RAID values in CXRA LDID to RAID LUT */
+            /* Program RAID values in CCRA LDID to RAID LUT */
             program_ccg_ra_rnd_ldid_to_exp_raid_reg(ctx, rnd_ldid, agentid);
         }
 
@@ -689,17 +689,17 @@ int ccg_setup(
             /* Determine agentid of the remote agents */
             agentid = cmn700_ccg_ctx.raid_value + offset_id;
 
-            /* Program RAID values in CXRA LDID to RAID LUT */
+            /* Program RAID values in CCRA LDID to RAID LUT */
             program_ccg_ra_rni_ldid_to_exp_raid_reg(ctx, rni_ldid, agentid);
         }
 
         /*
-         * Program the CXRA SAM with the address range and the corresponding
+         * Program the CCRA SAM with the address range and the corresponding
          * remote HAID
          */
         program_ccg_ra_sam_addr_region(ctx, ccg_config);
 
-        /* Program the Link Control registers present in CXRA/CXHA/CCLA */
+        /* Program the Link Control registers present in CCRA/CCHA/CCLA */
         status = enable_and_start_ccg_link_up_sequence(ctx, 0);
 
         if (config->port_aggregate && !cmn700_ccg_ctx.is_prog_for_port_agg) {
