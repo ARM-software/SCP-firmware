@@ -32,7 +32,8 @@ enum mod_cmn700_ccg_port {
     CCG_PORT_5,
 };
 
-#define RNF_PER_CHIP 8
+/* Total RN-Fs (N2 CPUs) per chips for variant 2. */
+#define RNF_PER_CHIP_CFG2 4
 
 /*
  * CMN700 nodes
@@ -446,8 +447,8 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
 static const struct mod_cmn700_ccg_config ccg_config_table_chip_0[] = {
     {
         .ldid = CCG_PORT_0,
-        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_0) + CCG_PORT_0,
-        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0) + CCG_PORT_0,
+        .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0x400000000000),
             .size = UINT64_C(64) * FWK_TIB,
@@ -457,23 +458,24 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_0[] = {
             {
                 .base = UINT64_C(0x400000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_1) + CCG_PORT_0,
+                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_1) +
+                    CCG_PORT_0,
             },
             { 0 }
         },
         .remote_agentid_to_linkid_map = {
             {
-                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_0),
-                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_0) +
-                    RNF_PER_CHIP - 1
+                .remote_agentid_start = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0),
+                .remote_agentid_end = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0) +
+                    RNF_PER_CHIP_CFG2 - 1
             },
         },
         .smp_mode = true,
     },
     {
         .ldid = CCG_PORT_2,
-        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_0) + CCG_PORT_2,
-        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0) + CCG_PORT_2,
+        .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0x800000000000),
             .size = UINT64_C(64) * FWK_TIB,
@@ -483,23 +485,24 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_0[] = {
             {
                 .base = UINT64_C(0x800000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_2) + CCG_PORT_0,
+                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_2) +
+                    CCG_PORT_0,
             },
             { 0 }
         },
         .remote_agentid_to_linkid_map = {
             {
-                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_2),
-                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_2) +
-                    RNF_PER_CHIP - 1
+                .remote_agentid_start = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_2),
+                .remote_agentid_end = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_2) +
+                    RNF_PER_CHIP_CFG2 - 1
             },
         },
         .smp_mode = true,
     },
     {
         .ldid = CCG_PORT_4,
-        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_0) + CCG_PORT_4,
-        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0) + CCG_PORT_4,
+        .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0xC00000000000),
             .size = UINT64_C(64) * FWK_TIB,
@@ -509,15 +512,16 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_0[] = {
             {
                 .base = UINT64_C(0xC00000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_3) + CCG_PORT_0,
+                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_3) +
+                    CCG_PORT_0,
             },
             { 0 }
         },
         .remote_agentid_to_linkid_map = {
             {
-                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_3),
-                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_3) +
-                    RNF_PER_CHIP - 1
+                .remote_agentid_start = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_3),
+                .remote_agentid_end = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_3) +
+                    RNF_PER_CHIP_CFG2 - 1
             },
         },
         .smp_mode = true,
@@ -528,8 +532,8 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_0[] = {
 static const struct mod_cmn700_ccg_config ccg_config_table_chip_1[] = {
     {
         .ldid = CCG_PORT_0,
-        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_1) + CCG_PORT_0,
-        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_1) + CCG_PORT_0,
+        .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0x000000000),
             .size = UINT64_C(64) * FWK_TIB,
@@ -539,23 +543,24 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_1[] = {
             {
                 .base = UINT64_C(0x00000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_0) + CCG_PORT_0,
+                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0) +
+                    CCG_PORT_0,
             },
             { 0 }
         },
         .remote_agentid_to_linkid_map = {
             {
-                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_0),
-                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_0) +
-                    RNF_PER_CHIP - 1
+                .remote_agentid_start = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0),
+                .remote_agentid_end = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0) +
+                    RNF_PER_CHIP_CFG2 - 1
             },
         },
         .smp_mode = true,
     },
     {
         .ldid = CCG_PORT_2,
-        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_1) + CCG_PORT_2,
-        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_1) + CCG_PORT_2,
+        .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0x800000000000),
             .size = UINT64_C(64) * FWK_TIB,
@@ -565,23 +570,24 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_1[] = {
             {
                 .base = UINT64_C(0x800000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_2) + CCG_PORT_2,
+                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_2) +
+                    CCG_PORT_2,
             },
             { 0 }
         },
         .remote_agentid_to_linkid_map = {
             {
-                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_2),
-                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_2) +
-                    RNF_PER_CHIP - 1
+                .remote_agentid_start = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_2),
+                .remote_agentid_end = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_2) +
+                    RNF_PER_CHIP_CFG2 - 1
             },
         },
         .smp_mode = true,
     },
     {
         .ldid = CCG_PORT_4,
-        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_1) + CCG_PORT_4,
-        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_1) + CCG_PORT_4,
+        .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0xC00000000000),
             .size = UINT64_C(64) * FWK_TIB,
@@ -591,15 +597,16 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_1[] = {
             {
                 .base = UINT64_C(0xC00000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_3) + CCG_PORT_2,
+                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_3) +
+                    CCG_PORT_2,
             },
             { 0 }
         },
         .remote_agentid_to_linkid_map = {
             {
-                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_3),
-                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_3) +
-                    RNF_PER_CHIP - 1
+                .remote_agentid_start = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_3),
+                .remote_agentid_end = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_3) +
+                    RNF_PER_CHIP_CFG2 - 1
             },
         },
         .smp_mode = true,
@@ -610,8 +617,8 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_1[] = {
 static const struct mod_cmn700_ccg_config ccg_config_table_chip_2[] = {
     {
         .ldid = CCG_PORT_0,
-        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_2) + CCG_PORT_0,
-        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_2) + CCG_PORT_0,
+        .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0x000000000),
             .size = UINT64_C(64) * FWK_TIB,
@@ -621,23 +628,24 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_2[] = {
             {
                 .base = UINT64_C(0x00000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_0) + CCG_PORT_2,
+                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0) +
+                    CCG_PORT_2,
             },
             { 0 }
         },
         .remote_agentid_to_linkid_map = {
             {
-                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_0),
-                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_0) +
-                    RNF_PER_CHIP - 1
+                .remote_agentid_start = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0),
+                .remote_agentid_end = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0) +
+                    RNF_PER_CHIP_CFG2 - 1
             },
         },
         .smp_mode = true,
     },
     {
         .ldid = CCG_PORT_2,
-        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_2) + CCG_PORT_2,
-        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_2) + CCG_PORT_2,
+        .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0x400000000000),
             .size = UINT64_C(64) * FWK_TIB,
@@ -647,23 +655,24 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_2[] = {
             {
                 .base = UINT64_C(0x400000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_1) + CCG_PORT_2,
+                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_1) +
+                    CCG_PORT_2,
             },
             { 0 }
         },
         .remote_agentid_to_linkid_map = {
             {
-                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_1),
-                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_1) +
-                    RNF_PER_CHIP - 1
+                .remote_agentid_start = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_1),
+                .remote_agentid_end = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_1) +
+                    RNF_PER_CHIP_CFG2 - 1
             },
         },
         .smp_mode = true,
     },
     {
         .ldid = CCG_PORT_4,
-        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_2) + CCG_PORT_4,
-        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_2) + CCG_PORT_4,
+        .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0xC00000000000),
             .size = UINT64_C(64) * FWK_TIB,
@@ -673,15 +682,16 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_2[] = {
             {
                 .base = UINT64_C(0xC00000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_3) + CCG_PORT_4,
+                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_3) +
+                    CCG_PORT_4,
             },
             { 0 }
         },
         .remote_agentid_to_linkid_map = {
             {
-                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_3),
-                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_3) +
-                    RNF_PER_CHIP - 1
+                .remote_agentid_start = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_3),
+                .remote_agentid_end = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_3) +
+                    RNF_PER_CHIP_CFG2 - 1
             },
         },
         .smp_mode = true,
@@ -692,8 +702,8 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_2[] = {
 static const struct mod_cmn700_ccg_config ccg_config_table_chip_3[] = {
     {
         .ldid = CCG_PORT_0,
-        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_3) + CCG_PORT_0,
-        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_3) + CCG_PORT_0,
+        .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0x000000000),
             .size = UINT64_C(64) * FWK_TIB,
@@ -703,23 +713,24 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_3[] = {
             {
                 .base = UINT64_C(0x00000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_0) + CCG_PORT_4,
+                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0) +
+                    CCG_PORT_4,
             },
             { 0 }
         },
         .remote_agentid_to_linkid_map = {
             {
-                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_0),
-                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_0) +
-                    RNF_PER_CHIP - 1
+                .remote_agentid_start = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0),
+                .remote_agentid_end = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0) +
+                    RNF_PER_CHIP_CFG2 - 1
             },
         },
         .smp_mode = true,
     },
     {
         .ldid = CCG_PORT_2,
-        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_3) + CCG_PORT_2,
-        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_3) + CCG_PORT_2,
+        .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0x400000000000),
             .size = UINT64_C(64) * FWK_TIB,
@@ -729,23 +740,24 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_3[] = {
             {
                 .base = UINT64_C(0x400000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_1) + CCG_PORT_4,
+                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_1) +
+                    CCG_PORT_4,
             },
             { 0 }
         },
         .remote_agentid_to_linkid_map = {
             {
-                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_1),
-                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_1) +
-                    RNF_PER_CHIP - 1
+                .remote_agentid_start = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_1),
+                .remote_agentid_end = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_1) +
+                    RNF_PER_CHIP_CFG2 - 1
             },
         },
         .smp_mode = true,
     },
     {
         .ldid = CCG_PORT_4,
-        .haid = (RNF_PER_CHIP * PLATFORM_CHIP_3) + CCG_PORT_4,
-        .remote_rnf_count = RNF_PER_CHIP * (PLATFORM_CHIP_COUNT - 1),
+        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_3) + CCG_PORT_4,
+        .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0x800000000000),
             .size = UINT64_C(64) * FWK_TIB,
@@ -755,15 +767,16 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_3[] = {
             {
                 .base = UINT64_C(0x800000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP * PLATFORM_CHIP_2) + CCG_PORT_4,
+                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_2) +
+                    CCG_PORT_4,
             },
             { 0 }
         },
         .remote_agentid_to_linkid_map = {
             {
-                .remote_agentid_start = (RNF_PER_CHIP * PLATFORM_CHIP_2),
-                .remote_agentid_end = (RNF_PER_CHIP * PLATFORM_CHIP_2) +
-                    RNF_PER_CHIP - 1
+                .remote_agentid_start = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_2),
+                .remote_agentid_end = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_2) +
+                    RNF_PER_CHIP_CFG2 - 1
             },
         },
         .smp_mode = true,
