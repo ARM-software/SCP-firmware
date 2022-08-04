@@ -486,8 +486,10 @@ static int enable_and_start_ccg_link_up_sequence(
 
     FWK_LOG_INFO(MOD_NAME "Enabling CCG link %d...", linkid);
     /* Set link enable bit to enable the CCG link */
-    ccg_ra_reg->LINK_REGS[linkid].CCG_CCPRTCL_LINK_CTRL = CCG_LINK_CTRL_EN_MASK;
-    ccg_ha_reg->LINK_REGS[linkid].CCG_CCPRTCL_LINK_CTRL = CCG_LINK_CTRL_EN_MASK;
+    ccg_ra_reg->LINK_REGS[linkid].CCG_CCPRTCL_LINK_CTRL |=
+        CCG_LINK_CTRL_EN_MASK;
+    ccg_ha_reg->LINK_REGS[linkid].CCG_CCPRTCL_LINK_CTRL |=
+        CCG_LINK_CTRL_EN_MASK;
 
     /* Wait until link enable bits are set */
     wait_data.cond = CCG_LINK_CTRL_EN_BIT_SET;
