@@ -22,14 +22,14 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/* CCG ports available on the platforms. */
-enum mod_cmn700_ccg_port {
+/* CCG ports available on the variant 2. */
+enum rdn2cfg2_cmn700_ccg_port {
     CCG_PORT_0,
     CCG_PORT_1,
     CCG_PORT_2,
     CCG_PORT_3,
     CCG_PORT_4,
-    CCG_PORT_5,
+    CCG_PER_CHIP,
 };
 
 /* Total RN-Fs (N2 CPUs) per chips for variant 2. */
@@ -443,11 +443,40 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
 #if (PLATFORM_VARIANT == 2)
 /* Multichip Related configuration data */
 
+/*
+ * Cross chip CCG connections between the chips:
+ *
+ *   +-------------------------------+      +-------------------------------+
+ *   |                               |      |                               |
+ *   |                               |      |                               |
+ *   |          Chip 0               |      |          Chip 2               |
+ *   |                               |      |                               |
+ *   |                               |      |                               |
+ *   |  CCG4  CCG3  CCG2  CCG1  CCG0 |      |  CCG4  CCG3  CCG2  CCG1  CCG0 |
+ *   +---------+-----+-------+---+---+      +---+-----+-----+-------+-------+
+ *             |     |       |   |              |     |     |       |
+ *             |     +----+  |   +--------------+     |     +-----+ |
+ *             |          |  |                        |           | +---------+
+ *             +-----+    |  |                        +-----+     |           |
+ *                   |    |  |                              |     |           |
+ *                   |    |  +--------------------------+   |     |           |
+ *                   |    |                             |   |     |           |
+ *    +--------------+----+-----------+       +---------+---+-----+---------+ |
+ *    | CCG0  CCG1  CCG2  CCG3  CCG4  |       |CCG0  CCG1  CCG2  CCG3  CCG4 | |
+ *    |         |                |    |       |  |                          | |
+ *    |         |                |    |       |  |                          | |
+ *    |         |    Chip 1      +----+-------+--+        Chip 3            | |
+ *    |         |                     |       |                             | |
+ *    |         +---------------------+-------+-----------------------------+-+
+ *    |                               |       |                             |
+ *    +-------------------------------+       +-----------------------------+
+ */
+
 /* Chip-0 Config data */
 static const struct mod_cmn700_ccg_config ccg_config_table_chip_0[] = {
     {
-        .ldid = CCG_PORT_0,
-        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0) + CCG_PORT_0,
+        .ldid = CCG_PORT_3,
+        .haid = (CCG_PER_CHIP * PLATFORM_CHIP_0) + CCG_PORT_3,
         .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0x400000000000),
@@ -458,8 +487,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_0[] = {
             {
                 .base = UINT64_C(0x400000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_1) +
-                    CCG_PORT_0,
+                .remote_haid = (CCG_PER_CHIP * PLATFORM_CHIP_1) + CCG_PORT_2,
             },
             { 0 }
         },
@@ -473,8 +501,8 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_0[] = {
         .smp_mode = true,
     },
     {
-        .ldid = CCG_PORT_2,
-        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0) + CCG_PORT_2,
+        .ldid = CCG_PORT_0,
+        .haid = (CCG_PER_CHIP * PLATFORM_CHIP_0) + CCG_PORT_0,
         .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0x800000000000),
@@ -485,8 +513,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_0[] = {
             {
                 .base = UINT64_C(0x800000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_2) +
-                    CCG_PORT_0,
+                .remote_haid = (CCG_PER_CHIP * PLATFORM_CHIP_2) + CCG_PORT_4,
             },
             { 0 }
         },
@@ -500,8 +527,8 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_0[] = {
         .smp_mode = true,
     },
     {
-        .ldid = CCG_PORT_4,
-        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0) + CCG_PORT_4,
+        .ldid = CCG_PORT_1,
+        .haid = (CCG_PER_CHIP * PLATFORM_CHIP_0) + CCG_PORT_1,
         .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0xC00000000000),
@@ -512,8 +539,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_0[] = {
             {
                 .base = UINT64_C(0xC00000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_3) +
-                    CCG_PORT_0,
+                .remote_haid = (CCG_PER_CHIP * PLATFORM_CHIP_3) + CCG_PORT_1,
             },
             { 0 }
         },
@@ -525,14 +551,14 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_0[] = {
             },
         },
         .smp_mode = true,
-    }
+    },
 };
 
 /* Chip-1 Config data */
 static const struct mod_cmn700_ccg_config ccg_config_table_chip_1[] = {
     {
-        .ldid = CCG_PORT_0,
-        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_1) + CCG_PORT_0,
+        .ldid = CCG_PORT_2,
+        .haid = (CCG_PER_CHIP * PLATFORM_CHIP_1) + CCG_PORT_2,
         .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0x000000000),
@@ -543,8 +569,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_1[] = {
             {
                 .base = UINT64_C(0x00000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0) +
-                    CCG_PORT_0,
+                .remote_haid = (CCG_PER_CHIP * PLATFORM_CHIP_0) + CCG_PORT_3,
             },
             { 0 }
         },
@@ -558,8 +583,8 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_1[] = {
         .smp_mode = true,
     },
     {
-        .ldid = CCG_PORT_2,
-        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_1) + CCG_PORT_2,
+        .ldid = CCG_PORT_1,
+        .haid = (CCG_PER_CHIP * PLATFORM_CHIP_1) + CCG_PORT_1,
         .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0x800000000000),
@@ -570,8 +595,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_1[] = {
             {
                 .base = UINT64_C(0x800000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_2) +
-                    CCG_PORT_2,
+                .remote_haid = (CCG_PER_CHIP * PLATFORM_CHIP_2) + CCG_PORT_1,
             },
             { 0 }
         },
@@ -586,7 +610,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_1[] = {
     },
     {
         .ldid = CCG_PORT_4,
-        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_1) + CCG_PORT_4,
+        .haid = (CCG_PER_CHIP * PLATFORM_CHIP_1) + CCG_PORT_4,
         .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0xC00000000000),
@@ -597,8 +621,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_1[] = {
             {
                 .base = UINT64_C(0xC00000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_3) +
-                    CCG_PORT_2,
+                .remote_haid = (CCG_PER_CHIP * PLATFORM_CHIP_3) + CCG_PORT_0,
             },
             { 0 }
         },
@@ -616,8 +639,8 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_1[] = {
 /* Chip-2 Config data */
 static const struct mod_cmn700_ccg_config ccg_config_table_chip_2[] = {
     {
-        .ldid = CCG_PORT_0,
-        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_2) + CCG_PORT_0,
+        .ldid = CCG_PORT_4,
+        .haid = (CCG_PER_CHIP * PLATFORM_CHIP_2) + CCG_PORT_4,
         .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0x000000000),
@@ -628,8 +651,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_2[] = {
             {
                 .base = UINT64_C(0x00000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0) +
-                    CCG_PORT_2,
+                .remote_haid = (CCG_PER_CHIP * PLATFORM_CHIP_0) + CCG_PORT_0,
             },
             { 0 }
         },
@@ -643,8 +665,8 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_2[] = {
         .smp_mode = true,
     },
     {
-        .ldid = CCG_PORT_2,
-        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_2) + CCG_PORT_2,
+        .ldid = CCG_PORT_1,
+        .haid = (CCG_PER_CHIP * PLATFORM_CHIP_2) + CCG_PORT_1,
         .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0x400000000000),
@@ -655,8 +677,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_2[] = {
             {
                 .base = UINT64_C(0x400000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_1) +
-                    CCG_PORT_2,
+                .remote_haid = (CCG_PER_CHIP * PLATFORM_CHIP_1) + CCG_PORT_1,
             },
             { 0 }
         },
@@ -670,8 +691,8 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_2[] = {
         .smp_mode = true,
     },
     {
-        .ldid = CCG_PORT_4,
-        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_2) + CCG_PORT_4,
+        .ldid = CCG_PORT_3,
+        .haid = (CCG_PER_CHIP * PLATFORM_CHIP_2) + CCG_PORT_3,
         .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0xC00000000000),
@@ -682,8 +703,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_2[] = {
             {
                 .base = UINT64_C(0xC00000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_3) +
-                    CCG_PORT_4,
+                .remote_haid = (CCG_PER_CHIP * PLATFORM_CHIP_3) + CCG_PORT_2,
             },
             { 0 }
         },
@@ -701,8 +721,8 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_2[] = {
 /* Chip-3 Config data */
 static const struct mod_cmn700_ccg_config ccg_config_table_chip_3[] = {
     {
-        .ldid = CCG_PORT_0,
-        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_3) + CCG_PORT_0,
+        .ldid = CCG_PORT_1,
+        .haid = (CCG_PER_CHIP * PLATFORM_CHIP_3) + CCG_PORT_1,
         .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0x000000000),
@@ -713,8 +733,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_3[] = {
             {
                 .base = UINT64_C(0x00000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0) +
-                    CCG_PORT_4,
+                .remote_haid = (CCG_PER_CHIP * PLATFORM_CHIP_0) + CCG_PORT_1,
             },
             { 0 }
         },
@@ -728,8 +747,8 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_3[] = {
         .smp_mode = true,
     },
     {
-        .ldid = CCG_PORT_2,
-        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_3) + CCG_PORT_2,
+        .ldid = CCG_PORT_0,
+        .haid = (CCG_PER_CHIP * PLATFORM_CHIP_3) + CCG_PORT_0,
         .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0x400000000000),
@@ -740,8 +759,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_3[] = {
             {
                 .base = UINT64_C(0x400000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_1) +
-                    CCG_PORT_4,
+                .remote_haid = (CCG_PER_CHIP * PLATFORM_CHIP_1) + CCG_PORT_4,
             },
             { 0 }
         },
@@ -755,8 +773,8 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_3[] = {
         .smp_mode = true,
     },
     {
-        .ldid = CCG_PORT_4,
-        .haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_3) + CCG_PORT_4,
+        .ldid = CCG_PORT_2,
+        .haid = (CCG_PER_CHIP * PLATFORM_CHIP_3) + CCG_PORT_2,
         .remote_rnf_count = RNF_PER_CHIP_CFG2 * (PLATFORM_CHIP_COUNT - 1),
         .remote_mmap_table = {
             .base = UINT64_C(0x800000000000),
@@ -767,8 +785,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_3[] = {
             {
                 .base = UINT64_C(0x800000000000),
                 .size = UINT64_C(64) * FWK_TIB,
-                .remote_haid = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_2) +
-                    CCG_PORT_4,
+                .remote_haid = (CCG_PER_CHIP * PLATFORM_CHIP_2) + CCG_PORT_3,
             },
             { 0 }
         },
