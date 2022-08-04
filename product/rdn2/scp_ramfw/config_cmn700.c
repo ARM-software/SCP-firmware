@@ -499,6 +499,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_0[] = {
             },
         },
         .smp_mode = true,
+        .ull_to_ull_mode = true,
     },
     {
         .ldid = CCG_PORT_0,
@@ -525,6 +526,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_0[] = {
             },
         },
         .smp_mode = true,
+        .ull_to_ull_mode = true,
     },
     {
         .ldid = CCG_PORT_1,
@@ -551,6 +553,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_0[] = {
             },
         },
         .smp_mode = true,
+        .ull_to_ull_mode = true,
     },
 };
 
@@ -581,6 +584,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_1[] = {
             },
         },
         .smp_mode = true,
+        .ull_to_ull_mode = true,
     },
     {
         .ldid = CCG_PORT_1,
@@ -607,6 +611,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_1[] = {
             },
         },
         .smp_mode = true,
+        .ull_to_ull_mode = true,
     },
     {
         .ldid = CCG_PORT_4,
@@ -633,6 +638,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_1[] = {
             },
         },
         .smp_mode = true,
+        .ull_to_ull_mode = true,
     },
 };
 
@@ -663,6 +669,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_2[] = {
             },
         },
         .smp_mode = true,
+        .ull_to_ull_mode = true,
     },
     {
         .ldid = CCG_PORT_1,
@@ -689,6 +696,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_2[] = {
             },
         },
         .smp_mode = true,
+        .ull_to_ull_mode = true,
     },
     {
         .ldid = CCG_PORT_3,
@@ -715,6 +723,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_2[] = {
             },
         },
         .smp_mode = true,
+        .ull_to_ull_mode = true,
     },
 };
 
@@ -745,6 +754,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_3[] = {
             },
         },
         .smp_mode = true,
+        .ull_to_ull_mode = true,
     },
     {
         .ldid = CCG_PORT_0,
@@ -771,6 +781,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_3[] = {
             },
         },
         .smp_mode = true,
+        .ull_to_ull_mode = true,
     },
     {
         .ldid = CCG_PORT_2,
@@ -797,6 +808,7 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_3[] = {
             },
         },
         .smp_mode = true,
+        .ull_to_ull_mode = true,
     },
 };
 #endif
