@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -91,13 +91,25 @@ struct mod_timer_driver_api {
     /*! Name of the driver. */
     const char *name;
 
-    /*! Enable timer events */
+    /*!
+     * Enable timer events
+     * It is expected that the driver enables the timer's interrupt
+     * source (i.e. using the timer's registers) within this function.
+     */
     int (*enable)(fwk_id_t dev_id);
 
-    /*! Disable timer events */
+    /*!
+     * Disable timer events
+     * It is expected that the driver disables the timer's interrupt
+     * source (i.e.using the timer's registers) within this function.
+     */
     int (*disable)(fwk_id_t dev_id);
 
-    /*! Set timer event for a specified timestamp */
+    /*!
+     * Set timer event for a specified timestamp
+     * The timer HAL clears the interrupt via the framework interrupt interface.
+     * So it is expected from the timer driver to set the timer value only.
+     */
     int (*set_timer)(fwk_id_t dev_id, uint64_t timestamp);
 
     /*! Get remaining time until the next pending timer event is due to fire */
