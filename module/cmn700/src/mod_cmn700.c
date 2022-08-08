@@ -38,8 +38,6 @@ static const char *const mmap_type_name[] = {
     [MOD_CMN700_REGION_TYPE_SYSCACHE_SUB] = "Sub-System Cache",
     [MOD_CMN700_REGION_TYPE_CCG] = "CCG",
 };
-#else
-static const char *const mmap_type_name[] = { "" };
 #endif
 
 static struct cmn700_device_ctx *ctx;
@@ -531,6 +529,218 @@ bool is_hnf_inside_rect(
     return false;
 }
 
+static void cmn700_setup_sys_cache_group_nodeid(
+    struct cmn700_rnsam_reg *rnsam,
+    const struct mod_cmn700_mem_region_map *region,
+    uint32_t region_idx)
+{
+    uint8_t logical_id;
+    uint32_t group;
+    uint32_t cache_group_bit_position;
+    uint32_t hnf_count_in_scg = 0;
+    uint32_t hnf_nodeid;
+    uint32_t hn_nodeid_reg_bits_idx = 0;
+    const struct mod_cmn700_config *config = ctx->config;
+
+    for (logical_id = 0; logical_id < ctx->hnf_count; logical_id++) {
+        hnf_nodeid = get_node_id((void *)ctx->hnf_node[logical_id]);
+
+        if ((config->hnf_cal_mode) && ((hnf_nodeid % 2) == 1)) {
+            /* Ignore odd node ids if cal mode is set */
+            continue;
+        }
+
+        group =
+            hn_nodeid_reg_bits_idx / CMN700_HNF_CACHE_GROUP_ENTRIES_PER_GROUP;
+
+        cache_group_bit_position = CMN700_HNF_CACHE_GROUP_ENTRY_BITS_WIDTH *
+            ((hn_nodeid_reg_bits_idx %
+              (CMN700_HNF_CACHE_GROUP_ENTRIES_PER_GROUP)));
+
+        if (is_hnf_inside_rect(hnf_node_pos[logical_id], region)) {
+            /*
+             * If CAL mode is set, add only even numbered hnd node
+             * to sys_cache_grp_hn_nodeid registers.
+             */
+            if (config->hnf_cal_mode && ((hnf_nodeid & 1) == 1)) {
+                continue;
+            }
+
+            rnsam->SYS_CACHE_GRP_HN_NODEID[group] += (uint64_t)hnf_nodeid
+                << cache_group_bit_position;
+            rnsam->SYS_CACHE_GRP_SN_NODEID[group] +=
+                ((uint64_t)config->snf_table[logical_id])
+                << cache_group_bit_position;
+            hnf_count_in_scg++;
+            hn_nodeid_reg_bits_idx++;
+        }
+    }
+
+    rnsam->SYS_CACHE_GRP_HN_COUNT |= ((uint64_t)hnf_count_in_scg)
+        << CMN700_RNSAM_SYS_CACHE_GRP_HN_CNT_POS(region_idx);
+}
+
+static uint32_t get_region_index(enum mod_cmn700_mem_region_type region_type)
+{
+    uint32_t region_index;
+
+    switch (region_type) {
+    case MOD_CMN700_MEM_REGION_TYPE_IO:
+        region_index = ctx->region_io_count++;
+        break;
+
+    case MOD_CMN700_MEM_REGION_TYPE_SYSCACHE:
+        region_index = ctx->region_sys_count++;
+        break;
+
+    default:
+        region_index = UINT32_MAX;
+        break;
+    };
+
+    return region_index;
+}
+
+static void configure_target_node(
+    const struct mod_cmn700_mem_region_map *region,
+    struct cmn700_rnsam_reg *rnsam,
+    uint32_t region_idx)
+{
+    uint32_t group;
+    uint32_t bit_pos;
+
+    group = region_idx / CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP;
+    bit_pos = CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRY_BITS_WIDTH *
+        (region_idx % CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP);
+
+    rnsam->NON_HASH_TGT_NODEID[group] &=
+        ~(CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK << bit_pos);
+    rnsam->NON_HASH_TGT_NODEID[group] |=
+        (region->node_id & CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK)
+        << bit_pos;
+}
+
+static int cmn700_program_rnsam(const struct mod_cmn700_mem_region_map *region)
+{
+    uint8_t idx;
+    uint64_t base;
+    uint32_t region_idx;
+    int status;
+    struct cmn700_rnsam_reg *rnsam;
+
+    /* Offset the base with chip address space base on chip-id */
+    base = ((uint64_t)(ctx->config->chip_addr_space * chip_id) + region->base);
+
+    status = FWK_SUCCESS;
+    if (region->type == MOD_CMN700_REGION_TYPE_SYSCACHE_SUB) {
+        /* System cache sub-regions are handled by HN-Fs */
+        return status;
+    }
+
+    region_idx = get_region_index(region->type);
+    if (region_idx == UINT32_MAX) {
+        return FWK_E_PARAM;
+    }
+
+    for (idx = 0; idx < ctx->internal_rnsam_count; idx++) {
+        rnsam = ctx->internal_rnsam_table[idx];
+        switch (region->type) {
+        case MOD_CMN700_MEM_REGION_TYPE_IO:
+            configure_region(
+                rnsam,
+                region_idx,
+                base,
+                region->size,
+                SAM_NODE_TYPE_HN_I,
+                SAM_TYPE_NON_HASH_MEM_REGION);
+
+            configure_target_node(region, rnsam, region_idx);
+            break;
+
+        case MOD_CMN700_MEM_REGION_TYPE_SYSCACHE:
+            configure_region(
+                rnsam,
+                region_idx,
+                region->base,
+                region->size,
+                SAM_NODE_TYPE_HN_F,
+                SAM_TYPE_SYS_CACHE_GRP_REGION);
+
+            /* Mark corresponding region as enabled */
+            fwk_assert(region_idx < MAX_SCG_COUNT);
+            ctx->scg_regions_enabled[region_idx] = 1;
+
+            cmn700_setup_sys_cache_group_nodeid(rnsam, region, region_idx);
+
+            break;
+
+        default:
+            fwk_unexpected();
+            status = FWK_E_DATA;
+            break;
+        }
+
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+    }
+
+    return status;
+}
+
+static int setup_internal_rn_sam_nodes(void)
+{
+    const struct mod_cmn700_config *config;
+    uint32_t region_idx;
+    int status;
+
+    config = ctx->config;
+    for (region_idx = 0; region_idx < config->mmap_count; region_idx++) {
+        status = cmn700_program_rnsam(&config->mmap_table[region_idx]);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+    }
+
+    return FWK_SUCCESS;
+}
+
+static void cmn700_print_region_info(void)
+{
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
+    unsigned int idx;
+    uint64_t base;
+    const struct mod_cmn700_config *config;
+    const struct mod_cmn700_mem_region_map *region;
+    struct cmn700_rnsam_reg *rnsam;
+
+    config = ctx->config;
+    FWK_LOG_INFO(MOD_NAME "Regions to be mapped:");
+    for (idx = 0; idx < config->mmap_count; idx++) {
+        region = &config->mmap_table[idx];
+
+        if (region->type == MOD_CMN700_MEM_REGION_TYPE_SYSCACHE) {
+            base = region->base;
+        } else {
+            base = (uint64_t)(ctx->config->chip_addr_space * chip_id) +
+                region->base;
+        }
+
+        FWK_LOG_INFO(
+            MOD_NAME "  [0x%llx - 0x%llx] %s",
+            base,
+            base + region->size - 1,
+            mmap_type_name[region->type]);
+    }
+
+    FWK_LOG_INFO(MOD_NAME "RNSAM nodes to be configured:");
+    for (idx = 0; idx < ctx->internal_rnsam_count; idx++) {
+        rnsam = ctx->internal_rnsam_table[idx];
+        FWK_LOG_INFO(MOD_NAME "  %d", get_node_id(rnsam));
+    }
+#endif
+}
+
 static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
 {
     unsigned int bit_pos;
@@ -538,154 +748,12 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
     unsigned int cxra_node_id;
     unsigned int group;
     unsigned int hnf_count;
-    unsigned int hnf_count_in_scg;
     unsigned int hnf_count_per_cluster;
     unsigned int hnf_cluster_count;
-    unsigned int hnf_nodeid;
-    unsigned int hn_nodeid_reg_bits_idx = 0;
-    unsigned int logical_id;
     unsigned int region_idx;
-    uint64_t base;
     const struct mod_cmn700_mem_region_map *region;
     const struct mod_cmn700_config *config = ctx->config;
     const struct mod_cmn700_hierarchical_hashing *hier_hash_cfg;
-
-    FWK_LOG_INFO(MOD_NAME "Configuring SAM for node %d", get_node_id(rnsam));
-
-    (void)mmap_type_name;
-
-    for (region_idx = 0; region_idx < config->mmap_count; region_idx++) {
-        region = &config->mmap_table[region_idx];
-
-        /* Offset the base with chip address space base on chip-id */
-        base =
-            ((uint64_t)(ctx->config->chip_addr_space * chip_id) + region->base);
-
-        switch (region->type) {
-        case MOD_CMN700_MEM_REGION_TYPE_IO:
-            /*
-             * Configure memory region
-             */
-            FWK_LOG_INFO(
-                MOD_NAME "  [0x%" PRIx64 " - 0x%" PRIx64 "] %s",
-                base,
-                base + region->size - 1,
-                mmap_type_name[region->type]);
-
-            configure_region(
-                rnsam,
-                ctx->region_io_count,
-                base,
-                region->size,
-                SAM_NODE_TYPE_HN_I,
-                SAM_TYPE_NON_HASH_MEM_REGION);
-
-            /*
-             * Configure target node
-             */
-            group = ctx->region_io_count /
-                CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP;
-            bit_pos = CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRY_BITS_WIDTH *
-                (ctx->region_io_count %
-                 CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP);
-
-            rnsam->NON_HASH_TGT_NODEID[group] &=
-                ~(CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK << bit_pos);
-            rnsam->NON_HASH_TGT_NODEID[group] |=
-                (region->node_id & CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK)
-                << bit_pos;
-
-            ctx->region_io_count++;
-            break;
-
-        case MOD_CMN700_MEM_REGION_TYPE_SYSCACHE:
-            /*
-             * Configure memory region
-             */
-            FWK_LOG_INFO(
-                MOD_NAME "  [0x%" PRIx64 " - 0x%" PRIx64 "] %s",
-                base,
-                region->base + region->size - 1,
-                mmap_type_name[region->type]);
-
-            configure_region(
-                rnsam,
-                ctx->region_sys_count,
-                base,
-                region->size,
-                SAM_NODE_TYPE_HN_F,
-                SAM_TYPE_SYS_CACHE_GRP_REGION);
-
-            /* Mark corresponding region as enabled */
-            fwk_assert(ctx->region_sys_count < MAX_SCG_COUNT);
-            ctx->scg_regions_enabled[ctx->region_sys_count] = 1;
-
-            ctx->region_sys_count++;
-
-            hnf_count_in_scg = 0;
-            for (logical_id = 0; logical_id < ctx->hnf_count; logical_id++) {
-                hnf_nodeid = get_node_id((void *)ctx->hnf_node[logical_id]);
-
-                if ((config->hnf_cal_mode) && (hnf_nodeid % 2 == 1)) {
-                    /* No need include odd node ids if cal mode is set */
-                    continue;
-                }
-
-                group = hn_nodeid_reg_bits_idx /
-                    CMN700_HNF_CACHE_GROUP_ENTRIES_PER_GROUP;
-
-                bit_pos = CMN700_HNF_CACHE_GROUP_ENTRY_BITS_WIDTH *
-                    ((hn_nodeid_reg_bits_idx %
-                      (CMN700_HNF_CACHE_GROUP_ENTRIES_PER_GROUP)));
-
-                if (is_hnf_inside_rect(hnf_node_pos[logical_id], region)) {
-                    if (config->hnf_cal_mode) {
-                        /*
-                         * If CAL mode is set, add only even numbered hnd node
-                         * to sys_cache_grp_hn_nodeid registers.
-                         */
-                        if (hnf_nodeid % 2 == 0) {
-                            rnsam->SYS_CACHE_GRP_HN_NODEID[group] +=
-                                (uint64_t)hnf_nodeid << bit_pos;
-                            rnsam->SYS_CACHE_GRP_SN_NODEID[group] +=
-                                ((uint64_t)config->snf_table[logical_id])
-                                << bit_pos;
-                            hnf_count_in_scg++;
-                            hn_nodeid_reg_bits_idx++;
-                        }
-                    } else {
-                        rnsam->SYS_CACHE_GRP_HN_NODEID[group] +=
-                            (uint64_t)hnf_nodeid << bit_pos;
-                        rnsam->SYS_CACHE_GRP_SN_NODEID[group] +=
-                            ((uint64_t)config->snf_table[logical_id])
-                            << bit_pos;
-                        hnf_count_in_scg++;
-                        hn_nodeid_reg_bits_idx++;
-                    }
-                }
-            }
-
-            rnsam->SYS_CACHE_GRP_HN_COUNT |= ((uint64_t)hnf_count_in_scg)
-                << CMN700_RNSAM_SYS_CACHE_GRP_HN_CNT_POS(
-                                                 ctx->region_sys_count - 1);
-
-            break;
-
-        case MOD_CMN700_REGION_TYPE_SYSCACHE_SUB:
-            FWK_LOG_INFO(
-                MOD_NAME "  [0x%" PRIx64 " - 0x%" PRIx64 "] %s",
-                base,
-                region->base + region->size - 1,
-                mmap_type_name[region->type]);
-
-            /* System cache sub-regions are handled by HN-Fs */
-            break;
-
-        default:
-            fwk_unexpected();
-            return FWK_E_DATA;
-        }
-    }
 
     /* Do configuration for CCG Nodes */
     for (size_t idx = 0; idx < config->ccg_table_count; idx++) {
@@ -862,7 +930,13 @@ static int cmn700_setup(void)
 
     cmn700_configure();
 
-    /* Setup internal RN-SAM nodes */
+    cmn700_print_region_info();
+
+    status = setup_internal_rn_sam_nodes();
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
     for (rnsam_idx = 0; rnsam_idx < ctx->internal_rnsam_count; rnsam_idx++)
         cmn700_setup_sam(ctx->internal_rnsam_table[rnsam_idx]);
 
