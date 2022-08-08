@@ -60,6 +60,32 @@ static inline size_t cmn700_hnf_cache_group_count(size_t hnf_count)
         CMN700_HNF_CACHE_GROUP_ENTRIES_PER_GROUP;
 }
 
+static void cmn700_rnsam_stall(void)
+{
+    struct cmn700_rnsam_reg *rnsam;
+    uint32_t rnsam_idx;
+
+    for (rnsam_idx = 0; rnsam_idx < ctx->internal_rnsam_count; rnsam_idx++) {
+        rnsam = ctx->internal_rnsam_table[rnsam_idx];
+        rnsam->STATUS = (rnsam->STATUS & ~CMN700_RNSAM_STATUS_UNSTALL) |
+            CMN700_RNSAM_STATUS_USE_DEFAULT_TARGET_ID;
+    }
+    __DSB();
+}
+
+static void cmn700_rnsam_unstall(void)
+{
+    struct cmn700_rnsam_reg *rnsam;
+    uint32_t rnsam_idx;
+
+    for (rnsam_idx = 0; rnsam_idx < ctx->internal_rnsam_count; rnsam_idx++) {
+        rnsam = ctx->internal_rnsam_table[rnsam_idx];
+        rnsam->STATUS = (rnsam->STATUS | CMN700_RNSAM_STATUS_UNSTALL) &
+            ~(CMN700_RNSAM_STATUS_USE_DEFAULT_TARGET_ID);
+    }
+    __DSB();
+}
+
 static void process_node_hnf(struct cmn700_hnf_reg *hnf)
 {
     unsigned int logical_id;
@@ -898,9 +924,7 @@ static void cmn700_setup_rnsam_cal(void)
 
 static int cmn700_setup(void)
 {
-    struct cmn700_rnsam_reg *rnsam;
     int status;
-    uint32_t rnsam_idx;
 
     if (!ctx->initialized) {
         status = cmn700_discovery();
@@ -952,6 +976,8 @@ static int cmn700_setup(void)
 
     cmn700_configure();
 
+    cmn700_rnsam_stall();
+
     cmn700_print_region_info();
 
     status = setup_internal_rn_sam_nodes();
@@ -966,13 +992,7 @@ static int cmn700_setup(void)
 
     cmn700_setup_rnsam_cal();
 
-    for (rnsam_idx = 0; rnsam_idx < ctx->internal_rnsam_count; rnsam_idx++) {
-        rnsam = ctx->internal_rnsam_table[rnsam_idx];
-        rnsam->STATUS = (rnsam->STATUS & ~CMN700_RNSAM_STATUS_UNSTALL) |
-            CMN700_RNSAM_STATUS_USE_DEFAULT_TARGET_ID;
-    }
-
-    __DSB();
+    cmn700_rnsam_unstall();
 
     FWK_LOG_INFO(MOD_NAME "Done");
 
