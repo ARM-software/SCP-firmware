@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -232,6 +232,68 @@ uint64_t sam_encode_region_size(uint64_t size)
     result = fwk_math_log2(blocks);
 
     return result;
+}
+
+bool is_region_aligned(
+    struct cmn700_rnsam_reg *rnsam,
+    struct mod_cmn700_mem_region_map *mmap,
+    enum sam_type sam_type)
+{
+    uint64_t lsb_addr_mask;
+
+    lsb_addr_mask = get_rnsam_lsb_addr_mask(rnsam, sam_type);
+    return ((mmap->base & ~lsb_addr_mask) & (mmap->size & ~lsb_addr_mask)) == 0;
+}
+
+bool is_non_hash_region_mapped(
+    struct cmn700_rnsam_reg *rnsam,
+    uint32_t region_io_count,
+    struct mod_cmn700_mem_region_map *mmap,
+    uint32_t *region_index)
+{
+    int idx;
+    unsigned int programmed_node_id;
+    uint32_t group;
+    uint32_t bit_pos;
+    volatile uint64_t *reg;
+    uint64_t lsb_addr_mask;
+
+    lsb_addr_mask =
+        get_rnsam_lsb_addr_mask(rnsam, SAM_TYPE_NON_HASH_MEM_REGION);
+
+    for (idx = region_io_count - 1; idx >= 0; idx--) {
+        reg = &rnsam->NON_HASH_MEM_REGION[idx];
+        if (mmap->base == (*reg & ~lsb_addr_mask)) {
+            group = idx / CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP;
+            bit_pos = CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRY_BITS_WIDTH *
+                (idx % CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP);
+            programmed_node_id =
+                (rnsam->NON_HASH_TGT_NODEID[group] >> bit_pos) &
+                CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK;
+            mmap->node_id &= CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK;
+
+            if (programmed_node_id == mmap->node_id) {
+                FWK_LOG_INFO(
+                    MOD_NAME "Found region: %d mapped for Node: %u ",
+                    idx,
+                    mmap->node_id);
+                *region_index = idx;
+
+                return true;
+            } else {
+                FWK_LOG_ERR(
+                    MOD_NAME
+                    "Address: 0x%llx mapped to different node id:"
+                    " %u than expected: %u\n",
+                    mmap->base,
+                    programmed_node_id,
+                    mmap->node_id);
+                fwk_unexpected();
+            }
+        }
+    }
+
+    return false;
 }
 
 void configure_region(

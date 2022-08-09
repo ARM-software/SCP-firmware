@@ -1025,6 +1025,78 @@ static void cmn700_ccg_setup(void)
     }
 }
 
+static void update_io_region(
+    struct mod_cmn700_mem_region_map *mmap,
+    uint32_t region_idx)
+{
+    struct cmn700_rnsam_reg *rnsam;
+    uint32_t idx;
+
+    FWK_LOG_INFO(MOD_NAME "Updating region: %" PRIX32, region_idx);
+    FWK_LOG_INFO(
+        MOD_NAME "  [0x%llx - 0x%llx] %s",
+        mmap->base,
+        mmap->base + mmap->size - 1,
+        mmap_type_name[mmap->type]);
+
+    for (idx = 0; idx < ctx->internal_rnsam_count; idx++) {
+        rnsam = ctx->internal_rnsam_table[idx];
+        configure_region(
+            rnsam,
+            region_idx,
+            mmap->base,
+            mmap->size,
+            SAM_NODE_TYPE_HN_I,
+            SAM_TYPE_NON_HASH_MEM_REGION);
+    }
+}
+
+static int map_io_region(uint64_t base, size_t size, uint32_t node_id)
+{
+    int status;
+    uint32_t region_idx;
+    struct cmn700_rnsam_reg *rnsam;
+    struct mod_cmn700_mem_region_map mmap = {
+        .base = base,
+        .size = size,
+        .type = MOD_CMN700_MEM_REGION_TYPE_IO,
+        .node_id = node_id,
+    };
+
+    /*
+     * All the regions are identically mapped in all the RNSAMs. We can use only
+     * one to check if it is already mapped.
+     */
+    rnsam = ctx->internal_rnsam_table[0];
+
+    if (!is_region_aligned(rnsam, &mmap, SAM_TYPE_NON_HASH_MEM_REGION)) {
+        return FWK_E_PARAM;
+    }
+
+    cmn700_rnsam_stall();
+
+    if (is_non_hash_region_mapped(
+            rnsam, ctx->region_io_count, &mmap, &region_idx)) {
+        update_io_region(&mmap, region_idx);
+    } else {
+        FWK_LOG_INFO(MOD_NAME "Mapping region:");
+        FWK_LOG_INFO(
+            MOD_NAME "  [0x%llx - 0x%llx] %s",
+            base,
+            base + size - 1,
+            mmap_type_name[mmap.type]);
+        status = cmn700_program_rnsam(&mmap);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(MOD_NAME "Region mapping failed, Status: %d", status);
+            return status;
+        }
+    }
+
+    cmn700_rnsam_unstall();
+
+    return FWK_SUCCESS;
+}
+
 /*
  * Framework handlers
  */
@@ -1161,11 +1233,48 @@ static int cmn700_process_notification(
     return FWK_SUCCESS;
 }
 
+static struct mod_cmn700_memmap_rnsam_api memmap_rnsam_api = {
+    .map_io_region = map_io_region,
+};
+
+static int cmn700_process_bind_request(
+    fwk_id_t requester_id,
+    fwk_id_t id,
+    fwk_id_t api_id,
+    const void **api)
+{
+    int status;
+    enum mod_cmn700_api_idx api_idx;
+
+    api_idx = (enum mod_cmn700_api_idx)fwk_id_get_api_idx(api_id);
+    if (api == NULL) {
+        return FWK_E_PARAM;
+    }
+
+    if (!fwk_module_is_valid_module_id(id)) {
+        return FWK_E_PARAM;
+    }
+
+    status = FWK_SUCCESS;
+    switch (api_idx) {
+    case MOD_CMN700_API_IDX_MAP_IO_REGION:
+        *api = &memmap_rnsam_api;
+        break;
+    default:
+        status = FWK_E_PARAM;
+        break;
+    };
+
+    return status;
+}
+
 const struct fwk_module module_cmn700 = {
     .type = FWK_MODULE_TYPE_DRIVER,
+    .api_count = MOD_CMN700_API_COUNT,
     .init = cmn700_init,
     .element_init = cmn700_device_init,
     .bind = cmn700_bind,
     .start = cmn700_start,
+    .process_bind_request = cmn700_process_bind_request,
     .process_notification = cmn700_process_notification,
 };

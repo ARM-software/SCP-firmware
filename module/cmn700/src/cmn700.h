@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -665,6 +665,41 @@ bool get_hnsam_range_comp_en_mode(void *hnf_reg);
  * \return log2(size / SAM_GRANULARITY)
  */
 uint64_t sam_encode_region_size(uint64_t size);
+
+/*
+ * \brief Check's alignment of a region's base address and size.
+ *
+ * \param rnsam rnsam node
+ * \param mmap Region memory map information
+ * \param sam_type Type of the region register to program (NON-HASH or
+ * SYS-CACHE)
+ *
+ * \return true if region is aligned
+ * \return false if region is not aligned
+ */
+bool is_region_aligned(
+    struct cmn700_rnsam_reg *rnsam,
+    struct mod_cmn700_mem_region_map *mmap,
+    enum sam_type sam_type);
+
+/*
+ * \brief Checks if a non-hashed region is already mapped by comparing the
+ * base address and node id with the values programmed in the registers
+ *
+ * \param rnsam rnsam node
+ * \param region_io_count Number of region mapped
+ * \param mmap Region memory map information
+ * \param region_index Placeholder to put region index where the region is
+ *                     mapped
+ *
+ * \return true if region is found
+ * \return false if region is not found
+ */
+bool is_non_hash_region_mapped(
+    struct cmn700_rnsam_reg *rnsam,
+    uint32_t region_io_count,
+    struct mod_cmn700_mem_region_map *mmap,
+    uint32_t *region_index);
 
 /*
  * Configure a NON-HASH or SYS-CACHE memory region
