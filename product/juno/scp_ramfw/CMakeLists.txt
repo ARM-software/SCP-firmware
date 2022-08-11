@@ -30,6 +30,10 @@ elseif (SCP_PLATFORM_VARIANT STREQUAL "FVP")
     message(NOTICE "SCP_PLATFORM_VARIANT set to FVP (juno-bl2)\n")
     target_compile_definitions(juno-bl2
         PUBLIC -DPLATFORM_VARIANT=JUNO_VARIANT_FVP)
+
+    target_sources(juno-bl2 PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/config_mock_clock.c")
+
 else ()
     message(FATAL_ERROR "Valid platform variant options for Juno are: \n"
                                 "BOARD (default) \n"
@@ -73,7 +77,6 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_pvt.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_thermal.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_power_domain.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_mock_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/juno_utils.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/juno_id.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/juno_scmi_clock.c")

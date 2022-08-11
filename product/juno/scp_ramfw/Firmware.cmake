@@ -111,10 +111,11 @@ list(APPEND SCP_MODULES "psu")
 list(APPEND SCP_MODULES "mock-psu")
 list(APPEND SCP_MODULES "juno-pvt")
 list(APPEND SCP_MODULES "juno-thermal")
-list(APPEND SCP_MODULES "mock-clock")
 
 if (SCP_PLATFORM_VARIANT STREQUAL "BOARD")
     list(APPEND SCP_MODULES "juno-xrp7724")
     list(PREPEND SCP_MODULE_PATHS
         "${CMAKE_CURRENT_LIST_DIR}/../module/juno_xrp7724")
+elseif (SCP_PLATFORM_VARIANT STREQUAL "FVP")
+    list(APPEND SCP_MODULES "mock-clock")
 endif()
