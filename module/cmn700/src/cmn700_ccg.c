@@ -735,16 +735,18 @@ int ccg_setup(
 
         for (i = 0; i < ccg_config->remote_rnf_count; i++) {
             /*
-             * The remote_agentid should not include the current chip's
+             * The remote_agentid (RAID) should not include the current chip's
              * AgentIDs. If `block` is less than the current chip_id, then
              * include the AgentIDs starting from chip 0 till (not including)
              * current chip. If the `block` is equal or greater than the current
              * chip, then include the AgentIDs from next chip till the max chip.
              */
             if ((i / ctx->rnf_count) < chip_id) {
-                remote_agentid = i;
+                remote_agentid = (i % ctx->rnf_count) +
+                    (local_ra_cnt * (i / ctx->rnf_count));
             } else {
-                remote_agentid = i + ctx->rnf_count;
+                remote_agentid = (i % ctx->rnf_count) + local_ra_cnt +
+                    (local_ra_cnt * (i / ctx->rnf_count));
             }
 
             /* Program the CCHA raid to ldid LUT */
