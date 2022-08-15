@@ -58,7 +58,6 @@ list(PREPEND SCP_MODULE_PATHS
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/juno_thermal")
 list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/juno_ram")
-list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/juno_pvt")
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/juno_ddr_phy400")
 list(PREPEND SCP_MODULE_PATHS
@@ -109,13 +108,16 @@ list(APPEND SCP_MODULES "juno-adc")
 list(APPEND SCP_MODULES "reg-sensor")
 list(APPEND SCP_MODULES "psu")
 list(APPEND SCP_MODULES "mock-psu")
-list(APPEND SCP_MODULES "juno-pvt")
 list(APPEND SCP_MODULES "juno-thermal")
 
 if (SCP_PLATFORM_VARIANT STREQUAL "BOARD")
     list(APPEND SCP_MODULES "juno-xrp7724")
     list(PREPEND SCP_MODULE_PATHS
         "${CMAKE_CURRENT_LIST_DIR}/../module/juno_xrp7724")
+
+    list(APPEND SCP_MODULES "juno-pvt")
+    list(PREPEND SCP_MODULE_PATHS
+        "${CMAKE_CURRENT_LIST_DIR}/../module/juno_pvt")
 elseif (SCP_PLATFORM_VARIANT STREQUAL "FVP")
     list(APPEND SCP_MODULES "mock-clock")
 endif()
