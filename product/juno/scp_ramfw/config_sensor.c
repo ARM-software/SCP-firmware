@@ -9,9 +9,9 @@
 #include "juno_id.h"
 
 #include <mod_juno_adc.h>
-#include <mod_juno_pvt.h>
 
 #if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
+#    include <mod_juno_pvt.h>
 #    include <mod_juno_xrp7724.h>
 #endif
 
@@ -44,7 +44,6 @@ static const struct fwk_element sensor_element_table_r0[] = {
 
         },
     },
-#endif
 
     /*
      * PVT Sensors
@@ -85,6 +84,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
             .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_JUNO_PVT, 0),
         }),
     },
+#endif
 
     /*
      * ADC Sensors

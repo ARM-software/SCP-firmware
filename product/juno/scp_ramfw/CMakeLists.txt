@@ -25,6 +25,8 @@ if (SCP_PLATFORM_VARIANT STREQUAL "BOARD")
 
     target_sources(juno-bl2 PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_xrp7724.c")
+    target_sources(juno-bl2 PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_pvt.c")
 
 elseif (SCP_PLATFORM_VARIANT STREQUAL "FVP")
     message(NOTICE "SCP_PLATFORM_VARIANT set to FVP (juno-bl2)\n")
@@ -74,7 +76,6 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_reg_sensor.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_psu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_mock_psu.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_pvt.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_thermal.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_power_domain.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/juno_utils.c"
