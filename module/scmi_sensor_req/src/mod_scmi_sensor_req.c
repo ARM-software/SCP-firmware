@@ -44,7 +44,7 @@ struct scmi_sensor_req_context {
     /* token to track the sent messages */
     uint8_t token;
     /* number of configured elements */
-    size_t element_count;
+    uint32_t element_count;
     /* SCMI send message API */
     const struct mod_scmi_from_protocol_req_api *scmi_api;
     /* SCMI command return data API */
@@ -88,7 +88,7 @@ static int get_sensor_hal_id_from_service_id(
     fwk_id_t *sensor_hal_id)
 {
     unsigned int sens_req_idx;
-    int status = FWK_E_RANGE;
+    int status = FWK_E_PARAM;
 
     /*
      * Linear search for the element that is configured with the
@@ -123,7 +123,7 @@ static int scmi_sensor_req_ret_reading_handler(
     const uint32_t *payload,
     size_t payload_size)
 {
-    struct mod_sensor_driver_resp_params resp_params;
+    struct mod_sensor_driver_resp_params resp_params = { 0 };
     fwk_id_t sensor_hal_id;
     int32_t ret_status;
     int status;
@@ -165,31 +165,38 @@ static int scmi_sensor_req_get_value(fwk_id_t id, mod_sensor_value_t *value)
     int status;
     uint8_t scmi_protocol_id = (uint8_t)MOD_SCMI_PROTOCOL_ID_SENSOR;
     uint8_t scmi_message_id = (uint8_t)MOD_SCMI_SENSOR_READING_GET;
+    uint32_t element_idx;
+    struct scmi_sensor_req_elem_ctx *ctx;
+    struct scmi_sensor_protocol_reading_get_a2p payload = { 0 };
 
-    struct scmi_sensor_req_elem_ctx *ctx =
-        &(scmi_sensor_req_ctx.ctx_table[fwk_id_get_element_idx(id)]);
+    element_idx = fwk_id_get_element_idx(id);
 
-    const struct scmi_sensor_protocol_reading_get_a2p payload = {
-        .sensor_id = ctx->config->scmi_sensor_id,
-        .flags = (uint32_t)(ctx->config->async_flag),
-    };
+    if (element_idx < scmi_sensor_req_ctx.element_count) {
+        ctx = &(scmi_sensor_req_ctx.ctx_table[element_idx]);
 
-    status = scmi_sensor_req_ctx.scmi_api->scmi_send_message(
-        scmi_message_id,
-        scmi_protocol_id,
-        /*
-         * Token is incremented with each message sent to ease
-         * debugging
-         */
-        scmi_sensor_req_ctx.token++,
-        ctx->config->service_id,
-        (const void *)&payload,
-        sizeof(payload),
-        true);
+        payload.sensor_id = ctx->config->scmi_sensor_id;
+        payload.flags = (uint32_t)(ctx->config->async_flag);
 
-    if (status == FWK_SUCCESS) {
-        status = FWK_PENDING;
+        status = scmi_sensor_req_ctx.scmi_api->scmi_send_message(
+            scmi_message_id,
+            scmi_protocol_id,
+            /*
+             * Token is incremented with each message sent to ease
+             * debugging
+             */
+            scmi_sensor_req_ctx.token++,
+            ctx->config->service_id,
+            (const void *)&payload,
+            sizeof(payload),
+            true);
+
+        if (status == FWK_SUCCESS) {
+            status = FWK_PENDING;
+        }
+    } else {
+        status = FWK_E_PARAM;
     }
+
     return status;
 }
 
@@ -256,10 +263,11 @@ static int scmi_sensor_req_init(
     unsigned int element_count,
     const void *unused)
 {
-    scmi_sensor_req_ctx.element_count = element_count;
     if (element_count == 0) {
         return FWK_E_DATA;
     }
+
+    scmi_sensor_req_ctx.element_count = element_count;
 
     scmi_sensor_req_ctx.ctx_table =
         fwk_mm_calloc(element_count, sizeof(struct scmi_sensor_req_elem_ctx));
@@ -273,10 +281,18 @@ static int scmi_sensor_req_elem_init(
     const void *data)
 {
     struct scmi_sensor_req_elem_ctx *ctx;
-    const struct scmi_sensor_req_config *config =
-        (const struct scmi_sensor_req_config *)data;
+    const struct scmi_sensor_req_config *config;
+    uint32_t element_idx = fwk_id_get_element_idx(element_id);
 
-    ctx = &(scmi_sensor_req_ctx.ctx_table[fwk_id_get_element_idx(element_id)]);
+    fwk_assert(data != NULL);
+
+    if (element_idx > scmi_sensor_req_ctx.element_count) {
+        return FWK_E_DATA;
+    }
+
+    config = (const struct scmi_sensor_req_config *)data;
+
+    ctx = &(scmi_sensor_req_ctx.ctx_table[element_idx]);
     ctx->config = config;
     return FWK_SUCCESS;
 }
@@ -310,12 +326,16 @@ static int scmi_sensor_req_process_bind_request(
     fwk_id_t api_id,
     const void **api)
 {
-    if (fwk_id_get_module_idx(source_id) == FWK_MODULE_IDX_SCMI) {
+    uint32_t source_idx = fwk_id_get_module_idx(source_id);
+
+    fwk_assert(api != NULL);
+
+    if (source_idx == FWK_MODULE_IDX_SCMI) {
         *api = &scmi_sensor_mod_scmi_to_protocol_api;
         return FWK_SUCCESS;
     }
 
-    if (fwk_id_get_module_idx(source_id) == FWK_MODULE_IDX_SENSOR) {
+    if (source_idx == FWK_MODULE_IDX_SENSOR) {
         *api = &scmi_sensor_req_api;
         return FWK_SUCCESS;
     }
