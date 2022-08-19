@@ -52,7 +52,6 @@ list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/juno_rom")
 list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/juno_ppu")
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/juno_soc_clock_ram")
-list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/juno_adc")
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/juno_soc_clock")
 list(PREPEND SCP_MODULE_PATHS
@@ -104,7 +103,6 @@ list(APPEND SCP_MODULES "scmi-system-power")
 list(APPEND SCP_MODULES "sds")
 list(APPEND SCP_MODULES "i2c")
 list(APPEND SCP_MODULES "dw-apb-i2c")
-list(APPEND SCP_MODULES "juno-adc")
 list(APPEND SCP_MODULES "reg-sensor")
 list(APPEND SCP_MODULES "psu")
 list(APPEND SCP_MODULES "juno-thermal")
@@ -117,6 +115,11 @@ if (SCP_PLATFORM_VARIANT STREQUAL "BOARD")
     list(APPEND SCP_MODULES "juno-pvt")
     list(PREPEND SCP_MODULE_PATHS
         "${CMAKE_CURRENT_LIST_DIR}/../module/juno_pvt")
+
+    list(APPEND SCP_MODULES "juno-adc")
+    list(PREPEND SCP_MODULE_PATHS
+         "${CMAKE_CURRENT_LIST_DIR}/../module/juno_adc")
+
 elseif (SCP_PLATFORM_VARIANT STREQUAL "FVP")
     list(APPEND SCP_MODULES "mock-clock")
     list(APPEND SCP_MODULES "mock-psu")

@@ -8,9 +8,8 @@
 #include "config_sensor.h"
 #include "juno_id.h"
 
-#include <mod_juno_adc.h>
-
 #if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
+#    include <mod_juno_adc.h>
 #    include <mod_juno_pvt.h>
 #    include <mod_juno_xrp7724.h>
 #endif
@@ -30,8 +29,8 @@
 
 #include <string.h>
 
-static const struct fwk_element sensor_element_table_r0[] = {
 #if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
+static const struct fwk_element sensor_element_table_r0[] = {
     /*
      * PMIC Sensor
      */
@@ -84,7 +83,6 @@ static const struct fwk_element sensor_element_table_r0[] = {
             .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_JUNO_PVT, 0),
         }),
     },
-#endif
 
     /*
      * ADC Sensors
@@ -130,7 +128,7 @@ static const struct fwk_element sensor_element_table_r0[] = {
         }),
     },
 
-#if USE_FULL_SET_SENSORS
+#    if USE_FULL_SET_SENSORS
     [MOD_JUNO_SENSOR_AMPS_SYS_IDX] = {
         .name = "BRD_CURR_SYS",
         .data = &((struct mod_sensor_dev_config) {
@@ -251,12 +249,12 @@ static const struct fwk_element sensor_element_table_r0[] = {
                                              MOD_JUNO_ADC_API_IDX_DRIVER),
         }),
     },
-#endif
+#    endif
 
     /* The termination description is added at runtime */
 };
 
-#if USE_FULL_SET_SENSORS
+#    if USE_FULL_SET_SENSORS
 /* The following table lists PVT sensors available on juno R1 & R2 */
 static const struct fwk_element pvt_sensors_juno_r1_r2_elem_table[] = {
     [0] = {
@@ -299,6 +297,8 @@ static const struct fwk_element pvt_sensors_juno_r1_r2_elem_table[] = {
 };
 #endif
 
+#elif (PLATFORM_VARIANT == JUNO_VARIANT_FVP)
+
 /*
  * When running on a model at least one fake sensor is required to register in
  * order to properly initialize scmi sensor management.
@@ -315,80 +315,74 @@ static const struct fwk_element sensor_element_table_fvp[] = {
     [1] = { 0 } /* Termination description */
 };
 
+#endif
+
 static const struct fwk_element *get_sensor_element_table(fwk_id_t module_id)
 {
-    int status;
-    enum juno_idx_platform platform_id = JUNO_IDX_PLATFORM_COUNT;
-
     #if USE_FULL_SET_SENSORS
     enum juno_idx_revision rev;
     size_t pvt_sensor_elem_table_size;
     #endif
 
+#if (PLATFORM_VARIANT == JUNO_VARIANT_FVP)
+    return sensor_element_table_fvp;
+#elif (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
     size_t sensor_elem_table_size;
     struct fwk_element *element_table;
+    sensor_elem_table_size = FWK_ARRAY_SIZE(sensor_element_table_r0);
 
-    status = juno_id_get_platform(&platform_id);
-    if (!fwk_expect(status == FWK_SUCCESS)) {
+#    if USE_FULL_SET_SENSORS
+    status = juno_id_get_revision(&rev);
+    if (status != FWK_SUCCESS)
         return NULL;
-    }
 
-    if (platform_id == JUNO_IDX_PLATFORM_FVP) {
-        return sensor_element_table_fvp;
-    } else {
-        sensor_elem_table_size = FWK_ARRAY_SIZE(sensor_element_table_r0);
-
-        #if USE_FULL_SET_SENSORS
-        status = juno_id_get_revision(&rev);
-        if (status != FWK_SUCCESS)
-            return NULL;
-
-        if (rev == JUNO_IDX_REVISION_R0) {
-            /* Just add the termination description */
-            element_table = fwk_mm_calloc(
-                (sensor_elem_table_size + 1),
-                sizeof(struct fwk_element));
-
-            memcpy(element_table,
-                   sensor_element_table_r0,
-                   sizeof(sensor_element_table_r0));
-        } else {
-            pvt_sensor_elem_table_size =
-                FWK_ARRAY_SIZE(pvt_sensors_juno_r1_r2_elem_table);
-
-            /*
-             * Add additional sensors available on Juno R1 & R2 and the
-             * termination description.
-             */
-            element_table = fwk_mm_calloc(
-                (sensor_elem_table_size + pvt_sensor_elem_table_size + 1),
-                sizeof(struct fwk_element));
-
-            memcpy(element_table,
-                   sensor_element_table_r0,
-                   sizeof(sensor_element_table_r0));
-
-            memcpy(element_table + sensor_elem_table_size,
-                   pvt_sensors_juno_r1_r2_elem_table,
-                   sizeof(pvt_sensors_juno_r1_r2_elem_table));
-        }
-        #else
+    if (rev == JUNO_IDX_REVISION_R0) {
         /* Just add the termination description */
         element_table = fwk_mm_calloc(
-            (sensor_elem_table_size + 1),
-            sizeof(struct fwk_element));
-        if (element_table == NULL) {
-            return NULL;
-        }
+            (sensor_elem_table_size + 1), sizeof(struct fwk_element));
 
-        fwk_str_memcpy(
+        memcpy(
             element_table,
             sensor_element_table_r0,
             sizeof(sensor_element_table_r0));
-#endif
+    } else {
+        pvt_sensor_elem_table_size =
+            FWK_ARRAY_SIZE(pvt_sensors_juno_r1_r2_elem_table);
 
-        return element_table;
+        /*
+         * Add additional sensors available on Juno R1 & R2 and the
+         * termination description.
+         */
+        element_table = fwk_mm_calloc(
+            (sensor_elem_table_size + pvt_sensor_elem_table_size + 1),
+            sizeof(struct fwk_element));
+
+        memcpy(
+            element_table,
+            sensor_element_table_r0,
+            sizeof(sensor_element_table_r0));
+
+        memcpy(
+            element_table + sensor_elem_table_size,
+            pvt_sensors_juno_r1_r2_elem_table,
+            sizeof(pvt_sensors_juno_r1_r2_elem_table));
     }
+#    else
+    /* Just add the termination description */
+    element_table =
+        fwk_mm_calloc((sensor_elem_table_size + 1), sizeof(struct fwk_element));
+    if (element_table == NULL) {
+        return NULL;
+    }
+
+    fwk_str_memcpy(
+        element_table,
+        sensor_element_table_r0,
+        sizeof(sensor_element_table_r0));
+#    endif
+
+    return element_table;
+#endif
 }
 
 struct fwk_module_config config_sensor = {
