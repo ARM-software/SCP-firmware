@@ -9,13 +9,16 @@
 #    include "config_juno_xrp7724.h"
 
 #    include <mod_juno_xrp7724.h>
+
+#elif (PLATFORM_VARIANT == JUNO_VARIANT_FVP)
+#    include "config_mock_psu.h"
+
+#    include <mod_mock_psu.h>
 #endif
 
-#include "config_mock_psu.h"
 #include "config_psu.h"
 #include "juno_id.h"
 
-#include <mod_mock_psu.h>
 #include <mod_psu.h>
 
 #include <fwk_assert.h>
