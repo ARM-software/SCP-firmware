@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -12,9 +12,9 @@
 #define TC1_DVFS_H
 
 enum dvfs_element_idx {
-    DVFS_ELEMENT_IDX_KLEIN,
-    DVFS_ELEMENT_IDX_MAKALU,
-    DVFS_ELEMENT_IDX_MAKALU_ELP,
+    DVFS_ELEMENT_IDX_CORTEX_A510,
+    DVFS_ELEMENT_IDX_CORTEX_A715,
+    DVFS_ELEMENT_IDX_CORTEX_X3,
     DVFS_ELEMENT_IDX_COUNT
 };
 
