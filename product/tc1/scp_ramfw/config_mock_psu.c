@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -13,8 +13,8 @@
 #include <fwk_module.h>
 
 static const struct fwk_element element_table[MOCK_PSU_ELEMENT_IDX_COUNT + 1] = {
-    [MOCK_PSU_ELEMENT_IDX_KLEIN] = {
-        .name = "DVFS_GROUP_KLEIN",
+    [MOCK_PSU_ELEMENT_IDX_CORTEX_A510] = {
+        .name = "DVFS_GROUP_CORTEX_A510",
         .data =
             &(const struct mod_mock_psu_element_cfg){
                 .async_alarm_id = FWK_ID_NONE_INIT,
@@ -27,8 +27,8 @@ static const struct fwk_element element_table[MOCK_PSU_ELEMENT_IDX_COUNT + 1] = 
                 .default_voltage = 550,
             },
     },
-    [MOCK_PSU_ELEMENT_IDX_MAKALU] = {
-        .name = "DVFS_GROUP_MAKALU",
+    [MOCK_PSU_ELEMENT_IDX_CORTEX_A715] = {
+        .name = "DVFS_GROUP_CORTEX_A715",
         .data =
             &(const struct mod_mock_psu_element_cfg){
                 .async_alarm_id = FWK_ID_NONE_INIT,
@@ -41,8 +41,8 @@ static const struct fwk_element element_table[MOCK_PSU_ELEMENT_IDX_COUNT + 1] = 
                 .default_voltage = 550,
             },
     },
-    [MOCK_PSU_ELEMENT_IDX_MAKALU_ELP] = {
-        .name = "DVFS_GROUP_MAKALU_ELP",
+    [MOCK_PSU_ELEMENT_IDX_CORTEX_X3] = {
+        .name = "DVFS_GROUP_CORTEX_X3",
         .data =
             &(const struct mod_mock_psu_element_cfg){
                 .async_alarm_id = FWK_ID_NONE_INIT,

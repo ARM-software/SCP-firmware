@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -16,32 +16,32 @@
 #include <fwk_module_idx.h>
 
 static const struct fwk_element element_table[PSU_ELEMENT_IDX_COUNT + 1] = {
-    [PSU_ELEMENT_IDX_KLEIN] = {
-        .name = "PSU_GROUP_KLEIN",
+    [PSU_ELEMENT_IDX_CORTEX_A510] = {
+        .name = "PSU_GROUP_CORTEX_A510",
         .data =
             &(const struct mod_psu_element_cfg){
                 .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MOCK_PSU,
-                    MOCK_PSU_ELEMENT_IDX_KLEIN),
+                    MOCK_PSU_ELEMENT_IDX_CORTEX_A510),
                 .driver_api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_MOCK_PSU,
                     MOD_MOCK_PSU_API_IDX_DRIVER) },
     },
-    [PSU_ELEMENT_IDX_MAKALU] = {
-        .name = "PSU_GROUP_MAKALU",
+    [PSU_ELEMENT_IDX_CORTEX_A715] = {
+        .name = "PSU_GROUP_CORTEX_A715",
         .data =
             &(const struct mod_psu_element_cfg){
                 .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MOCK_PSU,
-                    MOCK_PSU_ELEMENT_IDX_MAKALU),
+                    MOCK_PSU_ELEMENT_IDX_CORTEX_A715),
                 .driver_api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_MOCK_PSU,
                     MOD_MOCK_PSU_API_IDX_DRIVER) },
     },
-    [PSU_ELEMENT_IDX_MAKALU_ELP] = {
-        .name = "PSU_GROUP_MAKALU_ELP",
+    [PSU_ELEMENT_IDX_CORTEX_X3] = {
+        .name = "PSU_GROUP_CORTEX_X3",
         .data =
             &(const struct mod_psu_element_cfg){
                 .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MOCK_PSU,
-                    MOCK_PSU_ELEMENT_IDX_MAKALU_ELP),
+                    MOCK_PSU_ELEMENT_IDX_CORTEX_X3),
                 .driver_api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_MOCK_PSU,
                     MOD_MOCK_PSU_API_IDX_DRIVER) },

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -18,7 +18,7 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 
-static struct mod_dvfs_opp operating_points_klein[6] = {
+static struct mod_dvfs_opp operating_points_cortex_a510[6] = {
     {
         .level = 768 * 1000000UL,
         .frequency = 768 * FWK_KHZ,
@@ -47,7 +47,7 @@ static struct mod_dvfs_opp operating_points_klein[6] = {
     { 0 }
 };
 
-static struct mod_dvfs_opp operating_points_makalu[6] = {
+static struct mod_dvfs_opp operating_points_cortex_a715[6] = {
     {
         .level = 946 * 1000000UL,
         .frequency = 946 * FWK_KHZ,
@@ -76,7 +76,7 @@ static struct mod_dvfs_opp operating_points_makalu[6] = {
     { 0 }
 };
 
-static struct mod_dvfs_opp operating_points_makalu_elp[6] = {
+static struct mod_dvfs_opp operating_points_cortex_x3[6] = {
     {
         .level = 1088 * 1000000UL,
         .frequency = 1088 * FWK_KHZ,
@@ -105,65 +105,69 @@ static struct mod_dvfs_opp operating_points_makalu_elp[6] = {
     { 0 }
 };
 
-static const struct mod_dvfs_domain_config cpu_group_klein = {
-    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, PSU_ELEMENT_IDX_KLEIN),
-    .clock_id =
-        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_CPU_GROUP_KLEIN),
-    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
-        FWK_MODULE_IDX_TIMER,
-        0,
-        TC1_CONFIG_TIMER_DVFS_CPU_KLEIN),
-    .retry_ms = 1,
-    .latency = 1200,
-    .sustained_idx = 2,
-    .opps = operating_points_klein,
-};
-
-static const struct mod_dvfs_domain_config cpu_group_makalu = {
-    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, PSU_ELEMENT_IDX_MAKALU),
-    .clock_id =
-        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_CPU_GROUP_MAKALU),
-    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
-        FWK_MODULE_IDX_TIMER,
-        0,
-        TC1_CONFIG_TIMER_DVFS_CPU_MAKALU),
-    .retry_ms = 1,
-    .latency = 1200,
-    .sustained_idx = 2,
-    .opps = operating_points_makalu,
-};
-
-static const struct mod_dvfs_domain_config cpu_group_makalu_elp = {
+static const struct mod_dvfs_domain_config cpu_group_cortex_a510 = {
     .psu_id =
-        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, PSU_ELEMENT_IDX_MAKALU_ELP),
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, PSU_ELEMENT_IDX_CORTEX_A510),
     .clock_id = FWK_ID_ELEMENT_INIT(
         FWK_MODULE_IDX_CLOCK,
-        CLOCK_IDX_CPU_GROUP_MAKALU_ELP),
+        CLOCK_IDX_CPU_GROUP_CORTEX_A510),
     .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
         FWK_MODULE_IDX_TIMER,
         0,
-        TC1_CONFIG_TIMER_DVFS_CPU_MAKALU_ELP),
+        TC1_CONFIG_TIMER_DVFS_CPU_CORTEX_A510),
     .retry_ms = 1,
     .latency = 1200,
     .sustained_idx = 2,
-    .opps = operating_points_makalu_elp,
+    .opps = operating_points_cortex_a510,
+};
+
+static const struct mod_dvfs_domain_config cpu_group_cortex_a715 = {
+    .psu_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, PSU_ELEMENT_IDX_CORTEX_A715),
+    .clock_id = FWK_ID_ELEMENT_INIT(
+        FWK_MODULE_IDX_CLOCK,
+        CLOCK_IDX_CPU_GROUP_CORTEX_A715),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
+        FWK_MODULE_IDX_TIMER,
+        0,
+        TC1_CONFIG_TIMER_DVFS_CPU_CORTEX_A715),
+    .retry_ms = 1,
+    .latency = 1200,
+    .sustained_idx = 2,
+    .opps = operating_points_cortex_a715,
+};
+
+static const struct mod_dvfs_domain_config cpu_group_cortex_x3 = {
+    .psu_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, PSU_ELEMENT_IDX_CORTEX_X3),
+    .clock_id = FWK_ID_ELEMENT_INIT(
+        FWK_MODULE_IDX_CLOCK,
+        CLOCK_IDX_CPU_GROUP_CORTEX_X3),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
+        FWK_MODULE_IDX_TIMER,
+        0,
+        TC1_CONFIG_TIMER_DVFS_CPU_CORTEX_X3),
+    .retry_ms = 1,
+    .latency = 1200,
+    .sustained_idx = 2,
+    .opps = operating_points_cortex_x3,
 };
 
 static const struct fwk_element element_table[DVFS_ELEMENT_IDX_COUNT + 1] = {
-    [DVFS_ELEMENT_IDX_KLEIN] =
+    [DVFS_ELEMENT_IDX_CORTEX_A510] =
         {
-            .name = "CPU_GROUP_KLEIN",
-            .data = &cpu_group_klein,
+            .name = "CPU_GROUP_CORTEX_A510",
+            .data = &cpu_group_cortex_a510,
         },
-    [DVFS_ELEMENT_IDX_MAKALU] =
+    [DVFS_ELEMENT_IDX_CORTEX_A715] =
         {
-            .name = "CPU_GROUP_MAKALU",
-            .data = &cpu_group_makalu,
+            .name = "CPU_GROUP_CORTEX_A715",
+            .data = &cpu_group_cortex_a715,
         },
-    [DVFS_ELEMENT_IDX_MAKALU_ELP] =
+    [DVFS_ELEMENT_IDX_CORTEX_X3] =
         {
-            .name = "CPU_GROUP_MAKALU_ELP",
-            .data = &cpu_group_makalu_elp,
+            .name = "CPU_GROUP_CORTEX_X3",
+            .data = &cpu_group_cortex_x3,
         },
     { 0 },
 };
