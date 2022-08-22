@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -17,9 +17,9 @@
  * PLL clock indexes.
  */
 enum clock_pll_idx {
-    CLOCK_PLL_IDX_CPU_KLEIN,
-    CLOCK_PLL_IDX_CPU_MAKALU,
-    CLOCK_PLL_IDX_CPU_MAKALU_ELP,
+    CLOCK_PLL_IDX_CPU_CORTEX_A510,
+    CLOCK_PLL_IDX_CPU_CORTEX_A715,
+    CLOCK_PLL_IDX_CPU_CORTEX_X3,
     CLOCK_PLL_IDX_SYS,
     CLOCK_PLL_IDX_DPU,
     CLOCK_PLL_IDX_PIX0,
@@ -71,9 +71,9 @@ enum mod_clusclock_source_tc1 {
  * CSS clock indexes.
  */
 enum clock_css_idx {
-    CLOCK_CSS_IDX_CPU_GROUP_KLEIN,
-    CLOCK_CSS_IDX_CPU_GROUP_MAKALU,
-    CLOCK_CSS_IDX_CPU_GROUP_MAKALU_ELP,
+    CLOCK_CSS_IDX_CPU_GROUP_CORTEX_A510,
+    CLOCK_CSS_IDX_CPU_GROUP_CORTEX_A715,
+    CLOCK_CSS_IDX_CPU_GROUP_CORTEX_X3,
     CLOCK_CSS_IDX_DPU,
     CLOCK_CSS_IDX_COUNT
 };
@@ -82,9 +82,9 @@ enum clock_css_idx {
  * Clock indexes.
  */
 enum clock_idx {
-    CLOCK_IDX_CPU_GROUP_KLEIN,
-    CLOCK_IDX_CPU_GROUP_MAKALU,
-    CLOCK_IDX_CPU_GROUP_MAKALU_ELP,
+    CLOCK_IDX_CPU_GROUP_CORTEX_A510,
+    CLOCK_IDX_CPU_GROUP_CORTEX_A715,
+    CLOCK_IDX_CPU_GROUP_CORTEX_X3,
     CLOCK_IDX_DPU,
     CLOCK_IDX_PIXEL_0,
     CLOCK_IDX_PIXEL_1,

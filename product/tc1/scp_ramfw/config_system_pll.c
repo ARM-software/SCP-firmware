@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -19,9 +19,9 @@
 static const struct fwk_element system_pll_element_table[
     CLOCK_PLL_IDX_COUNT + 1] =
     {
-        [CLOCK_PLL_IDX_CPU_KLEIN] =
+        [CLOCK_PLL_IDX_CPU_CORTEX_A510] =
             {
-                .name = "CPU_PLL_KLEIN",
+                .name = "CPU_PLL_CORTEX_A510",
                 .data = &((struct mod_system_pll_dev_config){
                     .control_reg = (void *)SCP_PLL_CPU0,
                     .status_reg = (void *)&SCP_PIK_PTR->PLL_STATUS[1],
@@ -32,9 +32,9 @@ static const struct fwk_element system_pll_element_table[
                     .min_step = MOD_SYSTEM_PLL_MIN_INTERVAL,
                 }),
             },
-        [CLOCK_PLL_IDX_CPU_MAKALU] =
+        [CLOCK_PLL_IDX_CPU_CORTEX_A715] =
             {
-                .name = "CPU_PLL_MAKALU",
+                .name = "CPU_PLL_CORTEX_A715",
                 .data = &((struct mod_system_pll_dev_config){
                     .control_reg = (void *)SCP_PLL_CPU1,
                     .status_reg = (void *)&SCP_PIK_PTR->PLL_STATUS[1],
@@ -45,9 +45,9 @@ static const struct fwk_element system_pll_element_table[
                     .min_step = MOD_SYSTEM_PLL_MIN_INTERVAL,
                 }),
             },
-        [CLOCK_PLL_IDX_CPU_MAKALU_ELP] =
+        [CLOCK_PLL_IDX_CPU_CORTEX_X3] =
             {
-                .name = "CPU_PLL_MAKALU_ELP",
+                .name = "CPU_PLL_CORTEX_X3",
                 .data = &((struct mod_system_pll_dev_config){
                     .control_reg = (void *)SCP_PLL_CPU2,
                     .status_reg = (void *)&SCP_PIK_PTR->PLL_STATUS[1],

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -20,37 +20,37 @@
 #include <fwk_module_idx.h>
 
 static const struct fwk_element clock_dev_desc_table[CLOCK_IDX_COUNT + 1] = {
-    [CLOCK_IDX_CPU_GROUP_KLEIN] =
+    [CLOCK_IDX_CPU_GROUP_CORTEX_A510] =
         {
-            .name = "CPU_GROUP_KLEIN",
+            .name = "CPU_GROUP_CORTEX_A510",
             .data = &((struct mod_clock_dev_config){
                 .driver_id = FWK_ID_ELEMENT_INIT(
                     FWK_MODULE_IDX_CSS_CLOCK,
-                    CLOCK_CSS_IDX_CPU_GROUP_KLEIN),
+                    CLOCK_CSS_IDX_CPU_GROUP_CORTEX_A510),
                 .api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_CSS_CLOCK,
                     MOD_CSS_CLOCK_API_TYPE_CLOCK),
             }),
         },
-    [CLOCK_IDX_CPU_GROUP_MAKALU] =
+    [CLOCK_IDX_CPU_GROUP_CORTEX_A715] =
         {
-            .name = "CPU_GROUP_MAKALU",
+            .name = "CPU_GROUP_CORTEX_A715",
             .data = &((struct mod_clock_dev_config){
                 .driver_id = FWK_ID_ELEMENT_INIT(
                     FWK_MODULE_IDX_CSS_CLOCK,
-                    CLOCK_CSS_IDX_CPU_GROUP_MAKALU),
+                    CLOCK_CSS_IDX_CPU_GROUP_CORTEX_A715),
                 .api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_CSS_CLOCK,
                     MOD_CSS_CLOCK_API_TYPE_CLOCK),
             }),
         },
-    [CLOCK_IDX_CPU_GROUP_MAKALU_ELP] =
+    [CLOCK_IDX_CPU_GROUP_CORTEX_X3] =
         {
-            .name = "CPU_GROUP_MAKALU_ELP",
+            .name = "CPU_GROUP_CORTEX_X3",
             .data = &((struct mod_clock_dev_config){
                 .driver_id = FWK_ID_ELEMENT_INIT(
                     FWK_MODULE_IDX_CSS_CLOCK,
-                    CLOCK_CSS_IDX_CPU_GROUP_MAKALU_ELP),
+                    CLOCK_CSS_IDX_CPU_GROUP_CORTEX_X3),
                 .api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_CSS_CLOCK,
                     MOD_CSS_CLOCK_API_TYPE_CLOCK),

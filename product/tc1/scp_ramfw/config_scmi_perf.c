@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -16,9 +16,9 @@
 
 static const struct mod_scmi_perf_domain_config
     domains[DVFS_ELEMENT_IDX_COUNT] = {
-        [DVFS_ELEMENT_IDX_KLEIN] = {},
-        [DVFS_ELEMENT_IDX_MAKALU] = {},
-        [DVFS_ELEMENT_IDX_MAKALU_ELP] = {},
+        [DVFS_ELEMENT_IDX_CORTEX_A510] = {},
+        [DVFS_ELEMENT_IDX_CORTEX_A715] = {},
+        [DVFS_ELEMENT_IDX_CORTEX_X3] = {},
     };
 
 const struct fwk_module_config config_scmi_perf = {
