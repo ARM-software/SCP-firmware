@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -162,7 +162,12 @@ int message_attributes_handler_valid_param_respond_callback(
     return_values = (struct scmi_protocol_message_attributes_p2a *)payload;
 
     TEST_ASSERT_EQUAL((int32_t)SCMI_SUCCESS, return_values->status);
+
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
+    TEST_ASSERT_EQUAL(1, return_values->attributes);
+#else
     TEST_ASSERT_EQUAL(0, return_values->attributes);
+#endif
 
     return FWK_SUCCESS;
 }
@@ -174,7 +179,7 @@ void utest_scmi_perf_protocol_message_attributes_handler_valid_param(void)
         FWK_ID_ELEMENT_INIT(TEST_MODULE_IDX, TEST_SCMI_AGENT_IDX_0);
 
     struct scmi_protocol_message_attributes_a2p payload = {
-        .message_id = 0,
+        .message_id = MOD_SCMI_PERF_LIMITS_GET,
     };
 
     mod_scmi_from_protocol_api_respond_Stub(
@@ -232,10 +237,12 @@ void utest_scmi_perf_protocol_message_attributes_handler_invalid_param(void)
 int scmi_perf_test_main(void)
 {
     UNITY_BEGIN();
+
     RUN_TEST(utest_scmi_perf_protocol_version_handler);
     RUN_TEST(utest_scmi_perf_protocol_attributes_handler);
     RUN_TEST(utest_scmi_perf_protocol_message_attributes_handler_valid_param);
     RUN_TEST(utest_scmi_perf_protocol_message_attributes_handler_invalid_param);
+
     return UNITY_END();
 }
 
