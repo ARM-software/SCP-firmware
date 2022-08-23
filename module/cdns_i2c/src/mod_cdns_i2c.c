@@ -46,7 +46,7 @@
 /* ISR error mask */
 #define I2C_ISR_ERROR_MASK \
     (I2C_ISR_RXUNF_MASK | I2C_ISR_TXOVF_MASK | I2C_ISR_RXOVF_MASK | \
-     I2C_ISR_NACK_MASK | I2C_ISR_TO_MASK | I2C_ISR_ARBLOST_MASK)
+     I2C_ISR_NACK_MASK | I2C_ISR_ARBLOST_MASK)
 
 /* Device context */
 struct cdns_i2c_dev_ctx {
@@ -262,6 +262,14 @@ static int i2c_controller_read_polled(
 
     fifo_depth = device_ctx->config->fifo_depth;
 
+    /* Make sure any previous error state is cleared */
+    I2C_REG_RMW(
+        device_ctx->reg->CR,
+        I2C_CR_CLRFIFO_MASK,
+        I2C_CR_CLRFIFO_SHIFT,
+        I2C_CLRFIFO_ON);
+
+    /* Set the direction */
     I2C_REG_RMW(
         device_ctx->reg->CR, I2C_CR_RW_MASK, I2C_CR_RW_SHIFT, I2C_RW_READ);
 
@@ -425,6 +433,14 @@ static int i2c_controller_write_polled(
     I2C_REG_RMW(
         device_ctx->reg->CR, I2C_CR_HOLD_MASK, I2C_CR_HOLD_SHIFT, I2C_HOLD_ON);
 
+    /* Make sure any previous error state is cleared */
+    I2C_REG_RMW(
+        device_ctx->reg->CR,
+        I2C_CR_CLRFIFO_MASK,
+        I2C_CR_CLRFIFO_SHIFT,
+        I2C_CLRFIFO_ON);
+
+    /* Set the direction */
     I2C_REG_RMW(
         device_ctx->reg->CR, I2C_CR_RW_MASK, I2C_CR_RW_SHIFT, I2C_RW_WRITE);
 
@@ -771,6 +787,12 @@ static int cdns_i2c_element_init(
         I2C_CR_HOLD_MASK,
         I2C_CR_HOLD_SHIFT,
         config->hold_mode);
+
+    I2C_REG_RMW(
+        device_ctx->reg->TOR,
+        I2C_TOR_TIMEOUT_MASK,
+        I2C_TOR_TIMEOUT_SHIFT,
+        I2C_TOR_TIMEOUT_VALUE);
 
     device_ctx->perform_repeat_start = false;
 

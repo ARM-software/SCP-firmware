@@ -205,4 +205,6 @@ struct cdns_i2c_reg {
 #define I2C_CLRFIFO_OFF 0
 #define I2C_CLRFIFO_ON  1
 
+#define I2C_TOR_TIMEOUT_VALUE 0xFF
+
 #endif /* INTERNAL_CDNS_I2C_H */
