@@ -1,12 +1,13 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
  *      System Control and Management Interface (SCMI) unit test support.
  */
+#include <mod_dvfs.h>
 #include <mod_scmi.h>
 
 /*!
@@ -159,3 +160,75 @@ int mod_scmi_from_protocol_api_scmi_send_message(
  * \retval ::FWK_SUCCESS The operation succeeded.
  */
 int mod_scmi_from_protocol_api_response_message_handler(fwk_id_t service_id);
+
+/*!
+ * \brief Get the current operating point of a domain.
+ *
+ * \param domain_id Element identifier of the domain.
+ * \param [out] opp Current operating point.
+ */
+int mod_dvfs_domain_api_get_current_opp(
+    fwk_id_t domain_id,
+    struct mod_dvfs_opp *opp);
+
+/*!
+ * \brief Get the sustained operating point of a domain.
+ *
+ * \param domain_id Element identifier of the domain.
+ * \param [out] opp Sustained operating point.
+ */
+int mod_dvfs_domain_api_get_sustained_opp(
+    fwk_id_t domain_id,
+    struct mod_dvfs_opp *opp);
+
+/*!
+ * \brief Get an operating point from its index.
+ *
+ * \param domain_id Element identifier of the domain.
+ * \param n Index of the operating point to retrieve.
+ * \param [out] opp Requested operating point.
+ */
+int mod_dvfs_domain_api_get_nth_opp(
+    fwk_id_t domain_id,
+    size_t n,
+    struct mod_dvfs_opp *opp);
+
+/*!
+ * \brief Get the number of operating points of a domain.
+ *
+ * \param domain_id Element identifier of the domain.
+ * \param [out] opp_count Number of operating points.
+ */
+int mod_dvfs_domain_api_get_opp_count(fwk_id_t domain_id, size_t *opp_count);
+
+/*!
+ * \brief Get the level id for the given level.
+ *
+ * \param domain_id Element identifier of the domain.
+ * \param level Requested level.
+ * \param [out] level id inside the OPP table.
+ */
+int mod_dvfs_domain_api_get_level_id(
+    fwk_id_t domain_id,
+    uint32_t level,
+    size_t *level_id);
+
+/*!
+ * \brief Get the worst-case transition latency of a domain.
+ *
+ * \param domain_id Element identifier of the domain.
+ * \param [out] latency Worst-case transition latency.
+ */
+int mod_dvfs_domain_api_get_latency(fwk_id_t domain_id, uint16_t *latency);
+
+/*!
+ * \brief Set the level of a domain.
+ *
+ * \param domain_id Element identifier of the domain.
+ * \param cookie Context-specific value.
+ * \param level Requested level.
+ */
+int mod_dvfs_domain_api_set_level(
+    fwk_id_t domain_id,
+    uintptr_t cookie,
+    uint32_t level);

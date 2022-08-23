@@ -8,7 +8,19 @@
 static const char* CMockString_agent_count = "agent_count";
 static const char* CMockString_agent_id = "agent_id";
 static const char* CMockString_agent_type = "agent_type";
+static const char* CMockString_cookie = "cookie";
+static const char* CMockString_domain_id = "domain_id";
+static const char* CMockString_latency = "latency";
+static const char* CMockString_level = "level";
+static const char* CMockString_level_id = "level_id";
 static const char* CMockString_message_id = "message_id";
+static const char* CMockString_mod_dvfs_domain_api_get_current_opp = "mod_dvfs_domain_api_get_current_opp";
+static const char* CMockString_mod_dvfs_domain_api_get_latency = "mod_dvfs_domain_api_get_latency";
+static const char* CMockString_mod_dvfs_domain_api_get_level_id = "mod_dvfs_domain_api_get_level_id";
+static const char* CMockString_mod_dvfs_domain_api_get_nth_opp = "mod_dvfs_domain_api_get_nth_opp";
+static const char* CMockString_mod_dvfs_domain_api_get_opp_count = "mod_dvfs_domain_api_get_opp_count";
+static const char* CMockString_mod_dvfs_domain_api_get_sustained_opp = "mod_dvfs_domain_api_get_sustained_opp";
+static const char* CMockString_mod_dvfs_domain_api_set_level = "mod_dvfs_domain_api_set_level";
 static const char* CMockString_mod_scmi_from_protocol_api_get_agent_count = "mod_scmi_from_protocol_api_get_agent_count";
 static const char* CMockString_mod_scmi_from_protocol_api_get_agent_id = "mod_scmi_from_protocol_api_get_agent_id";
 static const char* CMockString_mod_scmi_from_protocol_api_get_agent_type = "mod_scmi_from_protocol_api_get_agent_type";
@@ -18,7 +30,10 @@ static const char* CMockString_mod_scmi_from_protocol_api_respond = "mod_scmi_fr
 static const char* CMockString_mod_scmi_from_protocol_api_response_message_handler = "mod_scmi_from_protocol_api_response_message_handler";
 static const char* CMockString_mod_scmi_from_protocol_api_scmi_send_message = "mod_scmi_from_protocol_api_scmi_send_message";
 static const char* CMockString_mod_scmi_from_protocol_api_write_payload = "mod_scmi_from_protocol_api_write_payload";
+static const char* CMockString_n = "n";
 static const char* CMockString_offset = "offset";
+static const char* CMockString_opp = "opp";
+static const char* CMockString_opp_count = "opp_count";
 static const char* CMockString_payload = "payload";
 static const char* CMockString_payload_size = "payload_size";
 static const char* CMockString_protocol_id = "protocol_id";
@@ -139,6 +154,97 @@ typedef struct _CMOCK_mod_scmi_from_protocol_api_response_message_handler_CALL_I
 
 } CMOCK_mod_scmi_from_protocol_api_response_message_handler_CALL_INSTANCE;
 
+typedef struct _CMOCK_mod_dvfs_domain_api_get_current_opp_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  int ReturnVal;
+  fwk_id_t Expected_domain_id;
+  struct mod_dvfs_opp* Expected_opp;
+  char ReturnThruPtr_opp_Used;
+  struct mod_dvfs_opp* ReturnThruPtr_opp_Val;
+  size_t ReturnThruPtr_opp_Size;
+
+} CMOCK_mod_dvfs_domain_api_get_current_opp_CALL_INSTANCE;
+
+typedef struct _CMOCK_mod_dvfs_domain_api_get_sustained_opp_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  int ReturnVal;
+  fwk_id_t Expected_domain_id;
+  struct mod_dvfs_opp* Expected_opp;
+  char ReturnThruPtr_opp_Used;
+  struct mod_dvfs_opp* ReturnThruPtr_opp_Val;
+  size_t ReturnThruPtr_opp_Size;
+
+} CMOCK_mod_dvfs_domain_api_get_sustained_opp_CALL_INSTANCE;
+
+typedef struct _CMOCK_mod_dvfs_domain_api_get_nth_opp_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  int ReturnVal;
+  fwk_id_t Expected_domain_id;
+  size_t Expected_n;
+  struct mod_dvfs_opp* Expected_opp;
+  char ReturnThruPtr_opp_Used;
+  struct mod_dvfs_opp* ReturnThruPtr_opp_Val;
+  size_t ReturnThruPtr_opp_Size;
+
+} CMOCK_mod_dvfs_domain_api_get_nth_opp_CALL_INSTANCE;
+
+typedef struct _CMOCK_mod_dvfs_domain_api_get_opp_count_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  int ReturnVal;
+  fwk_id_t Expected_domain_id;
+  size_t* Expected_opp_count;
+  char ReturnThruPtr_opp_count_Used;
+  size_t* ReturnThruPtr_opp_count_Val;
+  size_t ReturnThruPtr_opp_count_Size;
+
+} CMOCK_mod_dvfs_domain_api_get_opp_count_CALL_INSTANCE;
+
+typedef struct _CMOCK_mod_dvfs_domain_api_get_level_id_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  int ReturnVal;
+  fwk_id_t Expected_domain_id;
+  uint32_t Expected_level;
+  size_t* Expected_level_id;
+  char ReturnThruPtr_level_id_Used;
+  size_t* ReturnThruPtr_level_id_Val;
+  size_t ReturnThruPtr_level_id_Size;
+
+} CMOCK_mod_dvfs_domain_api_get_level_id_CALL_INSTANCE;
+
+typedef struct _CMOCK_mod_dvfs_domain_api_get_latency_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  int ReturnVal;
+  fwk_id_t Expected_domain_id;
+  uint16_t* Expected_latency;
+  char ReturnThruPtr_latency_Used;
+  uint16_t* ReturnThruPtr_latency_Val;
+  size_t ReturnThruPtr_latency_Size;
+
+} CMOCK_mod_dvfs_domain_api_get_latency_CALL_INSTANCE;
+
+typedef struct _CMOCK_mod_dvfs_domain_api_set_level_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  int ReturnVal;
+  fwk_id_t Expected_domain_id;
+  uintptr_t Expected_cookie;
+  uint32_t Expected_level;
+
+} CMOCK_mod_dvfs_domain_api_set_level_CALL_INSTANCE;
+
 static struct Mockmod_scmi_perf_extraInstance
 {
   char mod_scmi_from_protocol_api_get_agent_count_CallbackBool;
@@ -177,6 +283,34 @@ static struct Mockmod_scmi_perf_extraInstance
   CMOCK_mod_scmi_from_protocol_api_response_message_handler_CALLBACK mod_scmi_from_protocol_api_response_message_handler_CallbackFunctionPointer;
   int mod_scmi_from_protocol_api_response_message_handler_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE mod_scmi_from_protocol_api_response_message_handler_CallInstance;
+  char mod_dvfs_domain_api_get_current_opp_CallbackBool;
+  CMOCK_mod_dvfs_domain_api_get_current_opp_CALLBACK mod_dvfs_domain_api_get_current_opp_CallbackFunctionPointer;
+  int mod_dvfs_domain_api_get_current_opp_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE mod_dvfs_domain_api_get_current_opp_CallInstance;
+  char mod_dvfs_domain_api_get_sustained_opp_CallbackBool;
+  CMOCK_mod_dvfs_domain_api_get_sustained_opp_CALLBACK mod_dvfs_domain_api_get_sustained_opp_CallbackFunctionPointer;
+  int mod_dvfs_domain_api_get_sustained_opp_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE mod_dvfs_domain_api_get_sustained_opp_CallInstance;
+  char mod_dvfs_domain_api_get_nth_opp_CallbackBool;
+  CMOCK_mod_dvfs_domain_api_get_nth_opp_CALLBACK mod_dvfs_domain_api_get_nth_opp_CallbackFunctionPointer;
+  int mod_dvfs_domain_api_get_nth_opp_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE mod_dvfs_domain_api_get_nth_opp_CallInstance;
+  char mod_dvfs_domain_api_get_opp_count_CallbackBool;
+  CMOCK_mod_dvfs_domain_api_get_opp_count_CALLBACK mod_dvfs_domain_api_get_opp_count_CallbackFunctionPointer;
+  int mod_dvfs_domain_api_get_opp_count_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE mod_dvfs_domain_api_get_opp_count_CallInstance;
+  char mod_dvfs_domain_api_get_level_id_CallbackBool;
+  CMOCK_mod_dvfs_domain_api_get_level_id_CALLBACK mod_dvfs_domain_api_get_level_id_CallbackFunctionPointer;
+  int mod_dvfs_domain_api_get_level_id_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE mod_dvfs_domain_api_get_level_id_CallInstance;
+  char mod_dvfs_domain_api_get_latency_CallbackBool;
+  CMOCK_mod_dvfs_domain_api_get_latency_CALLBACK mod_dvfs_domain_api_get_latency_CallbackFunctionPointer;
+  int mod_dvfs_domain_api_get_latency_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE mod_dvfs_domain_api_get_latency_CallInstance;
+  char mod_dvfs_domain_api_set_level_CallbackBool;
+  CMOCK_mod_dvfs_domain_api_set_level_CALLBACK mod_dvfs_domain_api_set_level_CallbackFunctionPointer;
+  int mod_dvfs_domain_api_set_level_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE mod_dvfs_domain_api_set_level_CallInstance;
 } Mock;
 
 extern jmp_buf AbortFrame;
@@ -280,6 +414,83 @@ void Mockmod_scmi_perf_extra_Verify(void)
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
   if (Mock.mod_scmi_from_protocol_api_response_message_handler_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.mod_dvfs_domain_api_get_current_opp_CallInstance;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_mod_dvfs_domain_api_get_current_opp);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.mod_dvfs_domain_api_get_current_opp_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.mod_dvfs_domain_api_get_sustained_opp_CallInstance;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_mod_dvfs_domain_api_get_sustained_opp);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.mod_dvfs_domain_api_get_sustained_opp_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.mod_dvfs_domain_api_get_nth_opp_CallInstance;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_mod_dvfs_domain_api_get_nth_opp);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.mod_dvfs_domain_api_get_nth_opp_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.mod_dvfs_domain_api_get_opp_count_CallInstance;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_mod_dvfs_domain_api_get_opp_count);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.mod_dvfs_domain_api_get_opp_count_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.mod_dvfs_domain_api_get_level_id_CallInstance;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_mod_dvfs_domain_api_get_level_id);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.mod_dvfs_domain_api_get_level_id_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.mod_dvfs_domain_api_get_latency_CallInstance;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_mod_dvfs_domain_api_get_latency);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.mod_dvfs_domain_api_get_latency_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.mod_dvfs_domain_api_set_level_CallInstance;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_mod_dvfs_domain_api_set_level);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.mod_dvfs_domain_api_set_level_CallbackFunctionPointer != NULL)
   {
     call_instance = CMOCK_GUTS_NONE;
     (void)call_instance;
@@ -1151,5 +1362,688 @@ void mod_scmi_from_protocol_api_response_message_handler_Stub(CMOCK_mod_scmi_fro
 {
   Mock.mod_scmi_from_protocol_api_response_message_handler_CallbackBool = (char)0;
   Mock.mod_scmi_from_protocol_api_response_message_handler_CallbackFunctionPointer = Callback;
+}
+
+int mod_dvfs_domain_api_get_current_opp(fwk_id_t domain_id, struct mod_dvfs_opp* opp)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_mod_dvfs_domain_api_get_current_opp_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_mod_dvfs_domain_api_get_current_opp);
+  cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_current_opp_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.mod_dvfs_domain_api_get_current_opp_CallInstance);
+  Mock.mod_dvfs_domain_api_get_current_opp_CallInstance = CMock_Guts_MemNext(Mock.mod_dvfs_domain_api_get_current_opp_CallInstance);
+  if (!Mock.mod_dvfs_domain_api_get_current_opp_CallbackBool &&
+      Mock.mod_dvfs_domain_api_get_current_opp_CallbackFunctionPointer != NULL)
+  {
+    int cmock_cb_ret = Mock.mod_dvfs_domain_api_get_current_opp_CallbackFunctionPointer(domain_id, opp, Mock.mod_dvfs_domain_api_get_current_opp_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  {
+    UNITY_SET_DETAILS(CMockString_mod_dvfs_domain_api_get_current_opp,CMockString_domain_id);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_domain_id), (void*)(&domain_id), sizeof(fwk_id_t), cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_dvfs_domain_api_get_current_opp,CMockString_opp);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(cmock_call_instance->Expected_opp), (void*)(opp), sizeof(struct mod_dvfs_opp), cmock_line, CMockStringMismatch);
+  }
+  }
+  if (Mock.mod_dvfs_domain_api_get_current_opp_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.mod_dvfs_domain_api_get_current_opp_CallbackFunctionPointer(domain_id, opp, Mock.mod_dvfs_domain_api_get_current_opp_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_opp_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(opp, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)opp, (void*)cmock_call_instance->ReturnThruPtr_opp_Val,
+      cmock_call_instance->ReturnThruPtr_opp_Size);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_mod_dvfs_domain_api_get_current_opp(CMOCK_mod_dvfs_domain_api_get_current_opp_CALL_INSTANCE* cmock_call_instance, fwk_id_t domain_id, struct mod_dvfs_opp* opp);
+void CMockExpectParameters_mod_dvfs_domain_api_get_current_opp(CMOCK_mod_dvfs_domain_api_get_current_opp_CALL_INSTANCE* cmock_call_instance, fwk_id_t domain_id, struct mod_dvfs_opp* opp)
+{
+  memcpy((void*)(&cmock_call_instance->Expected_domain_id), (void*)(&domain_id),
+         sizeof(fwk_id_t[sizeof(domain_id) == sizeof(fwk_id_t) ? 1 : -1])); /* add fwk_id_t to :treat_as_array if this causes an error */
+  cmock_call_instance->Expected_opp = opp;
+  cmock_call_instance->ReturnThruPtr_opp_Used = 0;
+}
+
+void mod_dvfs_domain_api_get_current_opp_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_dvfs_domain_api_get_current_opp_CALL_INSTANCE));
+  CMOCK_mod_dvfs_domain_api_get_current_opp_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_current_opp_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_dvfs_domain_api_get_current_opp_CallInstance = CMock_Guts_MemChain(Mock.mod_dvfs_domain_api_get_current_opp_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void mod_dvfs_domain_api_get_current_opp_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t domain_id, struct mod_dvfs_opp* opp, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_dvfs_domain_api_get_current_opp_CALL_INSTANCE));
+  CMOCK_mod_dvfs_domain_api_get_current_opp_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_current_opp_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_dvfs_domain_api_get_current_opp_CallInstance = CMock_Guts_MemChain(Mock.mod_dvfs_domain_api_get_current_opp_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_mod_dvfs_domain_api_get_current_opp(cmock_call_instance, domain_id, opp);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void mod_dvfs_domain_api_get_current_opp_AddCallback(CMOCK_mod_dvfs_domain_api_get_current_opp_CALLBACK Callback)
+{
+  Mock.mod_dvfs_domain_api_get_current_opp_CallbackBool = (char)1;
+  Mock.mod_dvfs_domain_api_get_current_opp_CallbackFunctionPointer = Callback;
+}
+
+void mod_dvfs_domain_api_get_current_opp_Stub(CMOCK_mod_dvfs_domain_api_get_current_opp_CALLBACK Callback)
+{
+  Mock.mod_dvfs_domain_api_get_current_opp_CallbackBool = (char)0;
+  Mock.mod_dvfs_domain_api_get_current_opp_CallbackFunctionPointer = Callback;
+}
+
+void mod_dvfs_domain_api_get_current_opp_CMockReturnMemThruPtr_opp(UNITY_LINE_TYPE cmock_line, struct mod_dvfs_opp* opp, size_t cmock_size)
+{
+  CMOCK_mod_dvfs_domain_api_get_current_opp_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_current_opp_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mod_dvfs_domain_api_get_current_opp_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_opp_Used = 1;
+  cmock_call_instance->ReturnThruPtr_opp_Val = opp;
+  cmock_call_instance->ReturnThruPtr_opp_Size = cmock_size;
+}
+
+int mod_dvfs_domain_api_get_sustained_opp(fwk_id_t domain_id, struct mod_dvfs_opp* opp)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_mod_dvfs_domain_api_get_sustained_opp_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_mod_dvfs_domain_api_get_sustained_opp);
+  cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_sustained_opp_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.mod_dvfs_domain_api_get_sustained_opp_CallInstance);
+  Mock.mod_dvfs_domain_api_get_sustained_opp_CallInstance = CMock_Guts_MemNext(Mock.mod_dvfs_domain_api_get_sustained_opp_CallInstance);
+  if (!Mock.mod_dvfs_domain_api_get_sustained_opp_CallbackBool &&
+      Mock.mod_dvfs_domain_api_get_sustained_opp_CallbackFunctionPointer != NULL)
+  {
+    int cmock_cb_ret = Mock.mod_dvfs_domain_api_get_sustained_opp_CallbackFunctionPointer(domain_id, opp, Mock.mod_dvfs_domain_api_get_sustained_opp_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  {
+    UNITY_SET_DETAILS(CMockString_mod_dvfs_domain_api_get_sustained_opp,CMockString_domain_id);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_domain_id), (void*)(&domain_id), sizeof(fwk_id_t), cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_dvfs_domain_api_get_sustained_opp,CMockString_opp);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(cmock_call_instance->Expected_opp), (void*)(opp), sizeof(struct mod_dvfs_opp), cmock_line, CMockStringMismatch);
+  }
+  }
+  if (Mock.mod_dvfs_domain_api_get_sustained_opp_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.mod_dvfs_domain_api_get_sustained_opp_CallbackFunctionPointer(domain_id, opp, Mock.mod_dvfs_domain_api_get_sustained_opp_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_opp_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(opp, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)opp, (void*)cmock_call_instance->ReturnThruPtr_opp_Val,
+      cmock_call_instance->ReturnThruPtr_opp_Size);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_mod_dvfs_domain_api_get_sustained_opp(CMOCK_mod_dvfs_domain_api_get_sustained_opp_CALL_INSTANCE* cmock_call_instance, fwk_id_t domain_id, struct mod_dvfs_opp* opp);
+void CMockExpectParameters_mod_dvfs_domain_api_get_sustained_opp(CMOCK_mod_dvfs_domain_api_get_sustained_opp_CALL_INSTANCE* cmock_call_instance, fwk_id_t domain_id, struct mod_dvfs_opp* opp)
+{
+  memcpy((void*)(&cmock_call_instance->Expected_domain_id), (void*)(&domain_id),
+         sizeof(fwk_id_t[sizeof(domain_id) == sizeof(fwk_id_t) ? 1 : -1])); /* add fwk_id_t to :treat_as_array if this causes an error */
+  cmock_call_instance->Expected_opp = opp;
+  cmock_call_instance->ReturnThruPtr_opp_Used = 0;
+}
+
+void mod_dvfs_domain_api_get_sustained_opp_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_dvfs_domain_api_get_sustained_opp_CALL_INSTANCE));
+  CMOCK_mod_dvfs_domain_api_get_sustained_opp_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_sustained_opp_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_dvfs_domain_api_get_sustained_opp_CallInstance = CMock_Guts_MemChain(Mock.mod_dvfs_domain_api_get_sustained_opp_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void mod_dvfs_domain_api_get_sustained_opp_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t domain_id, struct mod_dvfs_opp* opp, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_dvfs_domain_api_get_sustained_opp_CALL_INSTANCE));
+  CMOCK_mod_dvfs_domain_api_get_sustained_opp_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_sustained_opp_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_dvfs_domain_api_get_sustained_opp_CallInstance = CMock_Guts_MemChain(Mock.mod_dvfs_domain_api_get_sustained_opp_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_mod_dvfs_domain_api_get_sustained_opp(cmock_call_instance, domain_id, opp);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void mod_dvfs_domain_api_get_sustained_opp_AddCallback(CMOCK_mod_dvfs_domain_api_get_sustained_opp_CALLBACK Callback)
+{
+  Mock.mod_dvfs_domain_api_get_sustained_opp_CallbackBool = (char)1;
+  Mock.mod_dvfs_domain_api_get_sustained_opp_CallbackFunctionPointer = Callback;
+}
+
+void mod_dvfs_domain_api_get_sustained_opp_Stub(CMOCK_mod_dvfs_domain_api_get_sustained_opp_CALLBACK Callback)
+{
+  Mock.mod_dvfs_domain_api_get_sustained_opp_CallbackBool = (char)0;
+  Mock.mod_dvfs_domain_api_get_sustained_opp_CallbackFunctionPointer = Callback;
+}
+
+void mod_dvfs_domain_api_get_sustained_opp_CMockReturnMemThruPtr_opp(UNITY_LINE_TYPE cmock_line, struct mod_dvfs_opp* opp, size_t cmock_size)
+{
+  CMOCK_mod_dvfs_domain_api_get_sustained_opp_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_sustained_opp_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mod_dvfs_domain_api_get_sustained_opp_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_opp_Used = 1;
+  cmock_call_instance->ReturnThruPtr_opp_Val = opp;
+  cmock_call_instance->ReturnThruPtr_opp_Size = cmock_size;
+}
+
+int mod_dvfs_domain_api_get_nth_opp(fwk_id_t domain_id, size_t n, struct mod_dvfs_opp* opp)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_mod_dvfs_domain_api_get_nth_opp_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_mod_dvfs_domain_api_get_nth_opp);
+  cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_nth_opp_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.mod_dvfs_domain_api_get_nth_opp_CallInstance);
+  Mock.mod_dvfs_domain_api_get_nth_opp_CallInstance = CMock_Guts_MemNext(Mock.mod_dvfs_domain_api_get_nth_opp_CallInstance);
+  if (!Mock.mod_dvfs_domain_api_get_nth_opp_CallbackBool &&
+      Mock.mod_dvfs_domain_api_get_nth_opp_CallbackFunctionPointer != NULL)
+  {
+    int cmock_cb_ret = Mock.mod_dvfs_domain_api_get_nth_opp_CallbackFunctionPointer(domain_id, n, opp, Mock.mod_dvfs_domain_api_get_nth_opp_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  {
+    UNITY_SET_DETAILS(CMockString_mod_dvfs_domain_api_get_nth_opp,CMockString_domain_id);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_domain_id), (void*)(&domain_id), sizeof(fwk_id_t), cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_dvfs_domain_api_get_nth_opp,CMockString_n);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_n), (void*)(&n), sizeof(size_t), cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_dvfs_domain_api_get_nth_opp,CMockString_opp);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(cmock_call_instance->Expected_opp), (void*)(opp), sizeof(struct mod_dvfs_opp), cmock_line, CMockStringMismatch);
+  }
+  }
+  if (Mock.mod_dvfs_domain_api_get_nth_opp_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.mod_dvfs_domain_api_get_nth_opp_CallbackFunctionPointer(domain_id, n, opp, Mock.mod_dvfs_domain_api_get_nth_opp_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_opp_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(opp, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)opp, (void*)cmock_call_instance->ReturnThruPtr_opp_Val,
+      cmock_call_instance->ReturnThruPtr_opp_Size);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_mod_dvfs_domain_api_get_nth_opp(CMOCK_mod_dvfs_domain_api_get_nth_opp_CALL_INSTANCE* cmock_call_instance, fwk_id_t domain_id, size_t n, struct mod_dvfs_opp* opp);
+void CMockExpectParameters_mod_dvfs_domain_api_get_nth_opp(CMOCK_mod_dvfs_domain_api_get_nth_opp_CALL_INSTANCE* cmock_call_instance, fwk_id_t domain_id, size_t n, struct mod_dvfs_opp* opp)
+{
+  memcpy((void*)(&cmock_call_instance->Expected_domain_id), (void*)(&domain_id),
+         sizeof(fwk_id_t[sizeof(domain_id) == sizeof(fwk_id_t) ? 1 : -1])); /* add fwk_id_t to :treat_as_array if this causes an error */
+  memcpy((void*)(&cmock_call_instance->Expected_n), (void*)(&n),
+         sizeof(size_t[sizeof(n) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+  cmock_call_instance->Expected_opp = opp;
+  cmock_call_instance->ReturnThruPtr_opp_Used = 0;
+}
+
+void mod_dvfs_domain_api_get_nth_opp_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_dvfs_domain_api_get_nth_opp_CALL_INSTANCE));
+  CMOCK_mod_dvfs_domain_api_get_nth_opp_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_nth_opp_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_dvfs_domain_api_get_nth_opp_CallInstance = CMock_Guts_MemChain(Mock.mod_dvfs_domain_api_get_nth_opp_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void mod_dvfs_domain_api_get_nth_opp_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t domain_id, size_t n, struct mod_dvfs_opp* opp, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_dvfs_domain_api_get_nth_opp_CALL_INSTANCE));
+  CMOCK_mod_dvfs_domain_api_get_nth_opp_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_nth_opp_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_dvfs_domain_api_get_nth_opp_CallInstance = CMock_Guts_MemChain(Mock.mod_dvfs_domain_api_get_nth_opp_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_mod_dvfs_domain_api_get_nth_opp(cmock_call_instance, domain_id, n, opp);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void mod_dvfs_domain_api_get_nth_opp_AddCallback(CMOCK_mod_dvfs_domain_api_get_nth_opp_CALLBACK Callback)
+{
+  Mock.mod_dvfs_domain_api_get_nth_opp_CallbackBool = (char)1;
+  Mock.mod_dvfs_domain_api_get_nth_opp_CallbackFunctionPointer = Callback;
+}
+
+void mod_dvfs_domain_api_get_nth_opp_Stub(CMOCK_mod_dvfs_domain_api_get_nth_opp_CALLBACK Callback)
+{
+  Mock.mod_dvfs_domain_api_get_nth_opp_CallbackBool = (char)0;
+  Mock.mod_dvfs_domain_api_get_nth_opp_CallbackFunctionPointer = Callback;
+}
+
+void mod_dvfs_domain_api_get_nth_opp_CMockReturnMemThruPtr_opp(UNITY_LINE_TYPE cmock_line, struct mod_dvfs_opp* opp, size_t cmock_size)
+{
+  CMOCK_mod_dvfs_domain_api_get_nth_opp_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_nth_opp_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mod_dvfs_domain_api_get_nth_opp_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_opp_Used = 1;
+  cmock_call_instance->ReturnThruPtr_opp_Val = opp;
+  cmock_call_instance->ReturnThruPtr_opp_Size = cmock_size;
+}
+
+int mod_dvfs_domain_api_get_opp_count(fwk_id_t domain_id, size_t* opp_count)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_mod_dvfs_domain_api_get_opp_count_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_mod_dvfs_domain_api_get_opp_count);
+  cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_opp_count_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.mod_dvfs_domain_api_get_opp_count_CallInstance);
+  Mock.mod_dvfs_domain_api_get_opp_count_CallInstance = CMock_Guts_MemNext(Mock.mod_dvfs_domain_api_get_opp_count_CallInstance);
+  if (!Mock.mod_dvfs_domain_api_get_opp_count_CallbackBool &&
+      Mock.mod_dvfs_domain_api_get_opp_count_CallbackFunctionPointer != NULL)
+  {
+    int cmock_cb_ret = Mock.mod_dvfs_domain_api_get_opp_count_CallbackFunctionPointer(domain_id, opp_count, Mock.mod_dvfs_domain_api_get_opp_count_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  {
+    UNITY_SET_DETAILS(CMockString_mod_dvfs_domain_api_get_opp_count,CMockString_domain_id);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_domain_id), (void*)(&domain_id), sizeof(fwk_id_t), cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_dvfs_domain_api_get_opp_count,CMockString_opp_count);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(cmock_call_instance->Expected_opp_count), (void*)(opp_count), sizeof(size_t), cmock_line, CMockStringMismatch);
+  }
+  }
+  if (Mock.mod_dvfs_domain_api_get_opp_count_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.mod_dvfs_domain_api_get_opp_count_CallbackFunctionPointer(domain_id, opp_count, Mock.mod_dvfs_domain_api_get_opp_count_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_opp_count_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(opp_count, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)opp_count, (void*)cmock_call_instance->ReturnThruPtr_opp_count_Val,
+      cmock_call_instance->ReturnThruPtr_opp_count_Size);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_mod_dvfs_domain_api_get_opp_count(CMOCK_mod_dvfs_domain_api_get_opp_count_CALL_INSTANCE* cmock_call_instance, fwk_id_t domain_id, size_t* opp_count);
+void CMockExpectParameters_mod_dvfs_domain_api_get_opp_count(CMOCK_mod_dvfs_domain_api_get_opp_count_CALL_INSTANCE* cmock_call_instance, fwk_id_t domain_id, size_t* opp_count)
+{
+  memcpy((void*)(&cmock_call_instance->Expected_domain_id), (void*)(&domain_id),
+         sizeof(fwk_id_t[sizeof(domain_id) == sizeof(fwk_id_t) ? 1 : -1])); /* add fwk_id_t to :treat_as_array if this causes an error */
+  cmock_call_instance->Expected_opp_count = opp_count;
+  cmock_call_instance->ReturnThruPtr_opp_count_Used = 0;
+}
+
+void mod_dvfs_domain_api_get_opp_count_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_dvfs_domain_api_get_opp_count_CALL_INSTANCE));
+  CMOCK_mod_dvfs_domain_api_get_opp_count_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_opp_count_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_dvfs_domain_api_get_opp_count_CallInstance = CMock_Guts_MemChain(Mock.mod_dvfs_domain_api_get_opp_count_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void mod_dvfs_domain_api_get_opp_count_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t domain_id, size_t* opp_count, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_dvfs_domain_api_get_opp_count_CALL_INSTANCE));
+  CMOCK_mod_dvfs_domain_api_get_opp_count_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_opp_count_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_dvfs_domain_api_get_opp_count_CallInstance = CMock_Guts_MemChain(Mock.mod_dvfs_domain_api_get_opp_count_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_mod_dvfs_domain_api_get_opp_count(cmock_call_instance, domain_id, opp_count);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void mod_dvfs_domain_api_get_opp_count_AddCallback(CMOCK_mod_dvfs_domain_api_get_opp_count_CALLBACK Callback)
+{
+  Mock.mod_dvfs_domain_api_get_opp_count_CallbackBool = (char)1;
+  Mock.mod_dvfs_domain_api_get_opp_count_CallbackFunctionPointer = Callback;
+}
+
+void mod_dvfs_domain_api_get_opp_count_Stub(CMOCK_mod_dvfs_domain_api_get_opp_count_CALLBACK Callback)
+{
+  Mock.mod_dvfs_domain_api_get_opp_count_CallbackBool = (char)0;
+  Mock.mod_dvfs_domain_api_get_opp_count_CallbackFunctionPointer = Callback;
+}
+
+void mod_dvfs_domain_api_get_opp_count_CMockReturnMemThruPtr_opp_count(UNITY_LINE_TYPE cmock_line, size_t* opp_count, size_t cmock_size)
+{
+  CMOCK_mod_dvfs_domain_api_get_opp_count_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_opp_count_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mod_dvfs_domain_api_get_opp_count_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_opp_count_Used = 1;
+  cmock_call_instance->ReturnThruPtr_opp_count_Val = opp_count;
+  cmock_call_instance->ReturnThruPtr_opp_count_Size = cmock_size;
+}
+
+int mod_dvfs_domain_api_get_level_id(fwk_id_t domain_id, uint32_t level, size_t* level_id)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_mod_dvfs_domain_api_get_level_id_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_mod_dvfs_domain_api_get_level_id);
+  cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_level_id_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.mod_dvfs_domain_api_get_level_id_CallInstance);
+  Mock.mod_dvfs_domain_api_get_level_id_CallInstance = CMock_Guts_MemNext(Mock.mod_dvfs_domain_api_get_level_id_CallInstance);
+  if (!Mock.mod_dvfs_domain_api_get_level_id_CallbackBool &&
+      Mock.mod_dvfs_domain_api_get_level_id_CallbackFunctionPointer != NULL)
+  {
+    int cmock_cb_ret = Mock.mod_dvfs_domain_api_get_level_id_CallbackFunctionPointer(domain_id, level, level_id, Mock.mod_dvfs_domain_api_get_level_id_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  {
+    UNITY_SET_DETAILS(CMockString_mod_dvfs_domain_api_get_level_id,CMockString_domain_id);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_domain_id), (void*)(&domain_id), sizeof(fwk_id_t), cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_dvfs_domain_api_get_level_id,CMockString_level);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_level, level, cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_dvfs_domain_api_get_level_id,CMockString_level_id);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(cmock_call_instance->Expected_level_id), (void*)(level_id), sizeof(size_t), cmock_line, CMockStringMismatch);
+  }
+  }
+  if (Mock.mod_dvfs_domain_api_get_level_id_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.mod_dvfs_domain_api_get_level_id_CallbackFunctionPointer(domain_id, level, level_id, Mock.mod_dvfs_domain_api_get_level_id_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_level_id_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(level_id, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)level_id, (void*)cmock_call_instance->ReturnThruPtr_level_id_Val,
+      cmock_call_instance->ReturnThruPtr_level_id_Size);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_mod_dvfs_domain_api_get_level_id(CMOCK_mod_dvfs_domain_api_get_level_id_CALL_INSTANCE* cmock_call_instance, fwk_id_t domain_id, uint32_t level, size_t* level_id);
+void CMockExpectParameters_mod_dvfs_domain_api_get_level_id(CMOCK_mod_dvfs_domain_api_get_level_id_CALL_INSTANCE* cmock_call_instance, fwk_id_t domain_id, uint32_t level, size_t* level_id)
+{
+  memcpy((void*)(&cmock_call_instance->Expected_domain_id), (void*)(&domain_id),
+         sizeof(fwk_id_t[sizeof(domain_id) == sizeof(fwk_id_t) ? 1 : -1])); /* add fwk_id_t to :treat_as_array if this causes an error */
+  cmock_call_instance->Expected_level = level;
+  cmock_call_instance->Expected_level_id = level_id;
+  cmock_call_instance->ReturnThruPtr_level_id_Used = 0;
+}
+
+void mod_dvfs_domain_api_get_level_id_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_dvfs_domain_api_get_level_id_CALL_INSTANCE));
+  CMOCK_mod_dvfs_domain_api_get_level_id_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_level_id_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_dvfs_domain_api_get_level_id_CallInstance = CMock_Guts_MemChain(Mock.mod_dvfs_domain_api_get_level_id_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void mod_dvfs_domain_api_get_level_id_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t domain_id, uint32_t level, size_t* level_id, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_dvfs_domain_api_get_level_id_CALL_INSTANCE));
+  CMOCK_mod_dvfs_domain_api_get_level_id_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_level_id_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_dvfs_domain_api_get_level_id_CallInstance = CMock_Guts_MemChain(Mock.mod_dvfs_domain_api_get_level_id_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_mod_dvfs_domain_api_get_level_id(cmock_call_instance, domain_id, level, level_id);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void mod_dvfs_domain_api_get_level_id_AddCallback(CMOCK_mod_dvfs_domain_api_get_level_id_CALLBACK Callback)
+{
+  Mock.mod_dvfs_domain_api_get_level_id_CallbackBool = (char)1;
+  Mock.mod_dvfs_domain_api_get_level_id_CallbackFunctionPointer = Callback;
+}
+
+void mod_dvfs_domain_api_get_level_id_Stub(CMOCK_mod_dvfs_domain_api_get_level_id_CALLBACK Callback)
+{
+  Mock.mod_dvfs_domain_api_get_level_id_CallbackBool = (char)0;
+  Mock.mod_dvfs_domain_api_get_level_id_CallbackFunctionPointer = Callback;
+}
+
+void mod_dvfs_domain_api_get_level_id_CMockReturnMemThruPtr_level_id(UNITY_LINE_TYPE cmock_line, size_t* level_id, size_t cmock_size)
+{
+  CMOCK_mod_dvfs_domain_api_get_level_id_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_level_id_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mod_dvfs_domain_api_get_level_id_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_level_id_Used = 1;
+  cmock_call_instance->ReturnThruPtr_level_id_Val = level_id;
+  cmock_call_instance->ReturnThruPtr_level_id_Size = cmock_size;
+}
+
+int mod_dvfs_domain_api_get_latency(fwk_id_t domain_id, uint16_t* latency)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_mod_dvfs_domain_api_get_latency_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_mod_dvfs_domain_api_get_latency);
+  cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_latency_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.mod_dvfs_domain_api_get_latency_CallInstance);
+  Mock.mod_dvfs_domain_api_get_latency_CallInstance = CMock_Guts_MemNext(Mock.mod_dvfs_domain_api_get_latency_CallInstance);
+  if (!Mock.mod_dvfs_domain_api_get_latency_CallbackBool &&
+      Mock.mod_dvfs_domain_api_get_latency_CallbackFunctionPointer != NULL)
+  {
+    int cmock_cb_ret = Mock.mod_dvfs_domain_api_get_latency_CallbackFunctionPointer(domain_id, latency, Mock.mod_dvfs_domain_api_get_latency_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  {
+    UNITY_SET_DETAILS(CMockString_mod_dvfs_domain_api_get_latency,CMockString_domain_id);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_domain_id), (void*)(&domain_id), sizeof(fwk_id_t), cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_dvfs_domain_api_get_latency,CMockString_latency);
+    if (cmock_call_instance->Expected_latency == NULL)
+      { UNITY_TEST_ASSERT_NULL(latency, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_HEX16_ARRAY(cmock_call_instance->Expected_latency, latency, 1, cmock_line, CMockStringMismatch); }
+  }
+  }
+  if (Mock.mod_dvfs_domain_api_get_latency_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.mod_dvfs_domain_api_get_latency_CallbackFunctionPointer(domain_id, latency, Mock.mod_dvfs_domain_api_get_latency_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_latency_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(latency, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)latency, (void*)cmock_call_instance->ReturnThruPtr_latency_Val,
+      cmock_call_instance->ReturnThruPtr_latency_Size);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_mod_dvfs_domain_api_get_latency(CMOCK_mod_dvfs_domain_api_get_latency_CALL_INSTANCE* cmock_call_instance, fwk_id_t domain_id, uint16_t* latency);
+void CMockExpectParameters_mod_dvfs_domain_api_get_latency(CMOCK_mod_dvfs_domain_api_get_latency_CALL_INSTANCE* cmock_call_instance, fwk_id_t domain_id, uint16_t* latency)
+{
+  memcpy((void*)(&cmock_call_instance->Expected_domain_id), (void*)(&domain_id),
+         sizeof(fwk_id_t[sizeof(domain_id) == sizeof(fwk_id_t) ? 1 : -1])); /* add fwk_id_t to :treat_as_array if this causes an error */
+  cmock_call_instance->Expected_latency = latency;
+  cmock_call_instance->ReturnThruPtr_latency_Used = 0;
+}
+
+void mod_dvfs_domain_api_get_latency_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_dvfs_domain_api_get_latency_CALL_INSTANCE));
+  CMOCK_mod_dvfs_domain_api_get_latency_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_latency_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_dvfs_domain_api_get_latency_CallInstance = CMock_Guts_MemChain(Mock.mod_dvfs_domain_api_get_latency_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void mod_dvfs_domain_api_get_latency_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t domain_id, uint16_t* latency, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_dvfs_domain_api_get_latency_CALL_INSTANCE));
+  CMOCK_mod_dvfs_domain_api_get_latency_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_latency_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_dvfs_domain_api_get_latency_CallInstance = CMock_Guts_MemChain(Mock.mod_dvfs_domain_api_get_latency_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_mod_dvfs_domain_api_get_latency(cmock_call_instance, domain_id, latency);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void mod_dvfs_domain_api_get_latency_AddCallback(CMOCK_mod_dvfs_domain_api_get_latency_CALLBACK Callback)
+{
+  Mock.mod_dvfs_domain_api_get_latency_CallbackBool = (char)1;
+  Mock.mod_dvfs_domain_api_get_latency_CallbackFunctionPointer = Callback;
+}
+
+void mod_dvfs_domain_api_get_latency_Stub(CMOCK_mod_dvfs_domain_api_get_latency_CALLBACK Callback)
+{
+  Mock.mod_dvfs_domain_api_get_latency_CallbackBool = (char)0;
+  Mock.mod_dvfs_domain_api_get_latency_CallbackFunctionPointer = Callback;
+}
+
+void mod_dvfs_domain_api_get_latency_CMockReturnMemThruPtr_latency(UNITY_LINE_TYPE cmock_line, uint16_t* latency, size_t cmock_size)
+{
+  CMOCK_mod_dvfs_domain_api_get_latency_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_get_latency_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mod_dvfs_domain_api_get_latency_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_latency_Used = 1;
+  cmock_call_instance->ReturnThruPtr_latency_Val = latency;
+  cmock_call_instance->ReturnThruPtr_latency_Size = cmock_size;
+}
+
+int mod_dvfs_domain_api_set_level(fwk_id_t domain_id, uintptr_t cookie, uint32_t level)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_mod_dvfs_domain_api_set_level_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_mod_dvfs_domain_api_set_level);
+  cmock_call_instance = (CMOCK_mod_dvfs_domain_api_set_level_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.mod_dvfs_domain_api_set_level_CallInstance);
+  Mock.mod_dvfs_domain_api_set_level_CallInstance = CMock_Guts_MemNext(Mock.mod_dvfs_domain_api_set_level_CallInstance);
+  if (!Mock.mod_dvfs_domain_api_set_level_CallbackBool &&
+      Mock.mod_dvfs_domain_api_set_level_CallbackFunctionPointer != NULL)
+  {
+    int cmock_cb_ret = Mock.mod_dvfs_domain_api_set_level_CallbackFunctionPointer(domain_id, cookie, level, Mock.mod_dvfs_domain_api_set_level_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  {
+    UNITY_SET_DETAILS(CMockString_mod_dvfs_domain_api_set_level,CMockString_domain_id);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_domain_id), (void*)(&domain_id), sizeof(fwk_id_t), cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_dvfs_domain_api_set_level,CMockString_cookie);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_cookie), (void*)(&cookie), sizeof(uintptr_t), cmock_line, CMockStringMismatch);
+  }
+  {
+    UNITY_SET_DETAILS(CMockString_mod_dvfs_domain_api_set_level,CMockString_level);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_level, level, cmock_line, CMockStringMismatch);
+  }
+  }
+  if (Mock.mod_dvfs_domain_api_set_level_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.mod_dvfs_domain_api_set_level_CallbackFunctionPointer(domain_id, cookie, level, Mock.mod_dvfs_domain_api_set_level_CallbackCalls++);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_mod_dvfs_domain_api_set_level(CMOCK_mod_dvfs_domain_api_set_level_CALL_INSTANCE* cmock_call_instance, fwk_id_t domain_id, uintptr_t cookie, uint32_t level);
+void CMockExpectParameters_mod_dvfs_domain_api_set_level(CMOCK_mod_dvfs_domain_api_set_level_CALL_INSTANCE* cmock_call_instance, fwk_id_t domain_id, uintptr_t cookie, uint32_t level)
+{
+  memcpy((void*)(&cmock_call_instance->Expected_domain_id), (void*)(&domain_id),
+         sizeof(fwk_id_t[sizeof(domain_id) == sizeof(fwk_id_t) ? 1 : -1])); /* add fwk_id_t to :treat_as_array if this causes an error */
+  memcpy((void*)(&cmock_call_instance->Expected_cookie), (void*)(&cookie),
+         sizeof(uintptr_t[sizeof(cookie) == sizeof(uintptr_t) ? 1 : -1])); /* add uintptr_t to :treat_as_array if this causes an error */
+  cmock_call_instance->Expected_level = level;
+}
+
+void mod_dvfs_domain_api_set_level_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_dvfs_domain_api_set_level_CALL_INSTANCE));
+  CMOCK_mod_dvfs_domain_api_set_level_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_set_level_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_dvfs_domain_api_set_level_CallInstance = CMock_Guts_MemChain(Mock.mod_dvfs_domain_api_set_level_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void mod_dvfs_domain_api_set_level_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t domain_id, uintptr_t cookie, uint32_t level, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_dvfs_domain_api_set_level_CALL_INSTANCE));
+  CMOCK_mod_dvfs_domain_api_set_level_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_set_level_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_dvfs_domain_api_set_level_CallInstance = CMock_Guts_MemChain(Mock.mod_dvfs_domain_api_set_level_CallInstance, cmock_guts_index);
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_mod_dvfs_domain_api_set_level(cmock_call_instance, domain_id, cookie, level);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void mod_dvfs_domain_api_set_level_AddCallback(CMOCK_mod_dvfs_domain_api_set_level_CALLBACK Callback)
+{
+  Mock.mod_dvfs_domain_api_set_level_CallbackBool = (char)1;
+  Mock.mod_dvfs_domain_api_set_level_CallbackFunctionPointer = Callback;
+}
+
+void mod_dvfs_domain_api_set_level_Stub(CMOCK_mod_dvfs_domain_api_set_level_CALLBACK Callback)
+{
+  Mock.mod_dvfs_domain_api_set_level_CallbackBool = (char)0;
+  Mock.mod_dvfs_domain_api_set_level_CallbackFunctionPointer = Callback;
 }
 
