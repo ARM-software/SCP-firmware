@@ -66,6 +66,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_mock_psu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_dvfs.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_perf.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_sp805.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_system_info.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_pl011.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_sid.c")

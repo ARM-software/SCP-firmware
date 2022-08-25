@@ -15,6 +15,11 @@
 
 #include <stdint.h>
 
+#define SCP_MHU3_PBX_MBX_SIZE (64 * 1024)
+
+/* Mask to apply to MBX_FCH_CTRL to enable Fast Channel Mailbox interrupts */
+#define SCP_MHU3_MBX_INT_EN (4U)
+
 /*!
  * \addtogroup GroupModules Modules
  * \{
@@ -30,14 +35,18 @@ enum mod_mhu3_channel_type {
     /*! Doorbell channel type */
     MOD_MHU3_CHANNEL_TYPE_DBCH,
     /* Fast channel type */
-    MOD_MHU3_CHANNEL_TYPE_FCH_SINGLE,
-    MOD_MHU3_CHANNEL_TYPE_FCH_GROUP,
+    MOD_MHU3_CHANNEL_TYPE_FCH,
 };
 
 /*!
  * \brief API indices
  */
 enum mod_mhu3_api_idx {
+#ifdef BUILD_HAS_MOD_TRANSPORT
+    /*! TRANSPORT driver API */
+    MOD_MHU3_API_IDX_TRANSPORT_DRIVER,
+#endif
+    /*! MHU3 API count */
     MOD_MHU3_API_IDX_COUNT,
 };
 
@@ -67,6 +76,18 @@ struct mod_mhu3_dbch_config {
     uint32_t mbx_flag_pos : 8;
 };
 
+/*!
+ * \brief Fast channel direction, Fast Channels are unidirectional
+ */
+enum mod_fch_direction {
+    /*! Direction in: Channel used by this processor to receive messages */
+    MOD_MHU3_FCH_DIR_IN,
+    /*! Direction out: Channel used by this processor to send messages */
+    MOD_MHU3_FCH_DIR_OUT,
+    /*! Direction count */
+    MOD_MHU3_FCH_DIR_COUNT,
+};
+
 /*! \brief Fast channel configuration
  *
  *  \details   In MHU3 the number of Fast Channels that can be supported is
@@ -79,12 +100,24 @@ struct mod_mhu3_dbch_config {
  *      Fast Channels.
  */
 struct mod_mhu3_fc_config {
-    /*! Fast Channel or Fast Channel group identifier */
-    uint32_t idx : 8;
-    /*! Number of Fast channels in a group */
-    uint32_t grp_num_channels : 8;
-    /*! Reserved field */
-    uint32_t reserved : 16;
+    /*!
+     * Fast Channel idx:
+     * offset of the word in PFCW<n>_PAY
+     * e.g for
+     *     idx 0 is PFCW_PAY + (0 * 4)
+     *     idx 1 is PFCW_PAY + (1 * 4)
+     * grup_num marks the end of the group
+     * e.g.
+     *     for idx 0 & grup_num 2 it
+     *     is PCFW_PAY + (0 * 4) to PCFW_PAY + (0 * 4 + 4 * 2)
+     */
+    uint16_t idx;
+    /*! Fast Channel Group number for the given Fast Channel
+     * There can be between 1-32 Fast Channel Groups.
+     */
+    uint8_t grp_num;
+    /*! Fast Channel Direction */
+    enum mod_fch_direction direction;
 };
 
 /*! \brief Configuration of a channel between MHU(S/R) <=> MHU(R/S)
@@ -118,18 +151,32 @@ struct mod_mhu3_device_config {
     /*! IRQ number of the receive interrupt line */
     unsigned int irq;
 
-    /*! Base address of the registers of the incoming MHU, MBX */
+    /*! Base address of the registers of the incoming MHU, MBX
+     * (base address of the paired PBX on the target with current processor)
+     */
     uintptr_t in;
 
-    /*! Base address of the registers of the outgoing MHU, PBX */
+    /*! Base address of the registers of the outgoing MHU, PBX
+     * (base address of the paired MBX on the target with current processor)
+     */
     uintptr_t out;
+
+    /*! Base address of the registers of the incoming MHU, MBX
+     * (as seen by the firmware/OS running on the target processor)
+     */
+    uintptr_t in_target;
+
+    /*! Base address of the registers of the outgoing MHU, PBX
+     * (as seen by the firmware/OS running on the target processor)
+     */
+    uintptr_t out_target;
 
     /*! Channel configuration array */
     struct mod_mhu3_channel_config *channels;
 };
 
 /*!
- * \brief Build an MHU v3 channel configuration
+ * \brief Build an MHU v3 Doorbell channel configuration
  *
  * \note This macro expands to a designated channel configuration, and can be
  *     used to initialize a ::mod_mhu3_channel_config.
@@ -156,6 +203,35 @@ struct mod_mhu3_device_config {
                 .pbx_flag_pos = PBX_FLAG_POS, \
                 .mbx_channel = MBX_CH_NUMBER, \
                 .mbx_flag_pos = MBX_FLAG_POS, \
+            }, \
+        } \
+    }
+
+/*!
+ * \brief Build an MHU v3 Fast channel configuration
+ *
+ * \note This macro expands to a designated fast channel configuration,
+ *     and can be used to initialize a ::mod_mhu3_channel_config.
+ *
+ * \details Example usage:
+ *      \code{.c}
+ *      struct mod_mhu3_channel_config ch = MOD_MHU3_INIT_FCH(0, 1, 0)
+ *      \endcode
+ *
+ * \param FCH_IDX Channel number.
+ * \param FCH_GROUP_NUM Fast Channel Group number for the given Fast Channel.
+ * \param FCH_DIRECTION Fast Channel direction in or out.
+ *
+ * \return Element identifier.
+ */
+#define MOD_MHU3_INIT_FCH(FCH_IDX, FCH_GROUP_NUM, FCH_DIRECTION) \
+    { \
+        .type = MOD_MHU3_CHANNEL_TYPE_FCH, \
+        { \
+            .fch = { \
+                .idx = FCH_IDX, \
+                .grp_num = FCH_GROUP_NUM, \
+                .direction = FCH_DIRECTION, \
             }, \
         } \
     }

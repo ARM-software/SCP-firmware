@@ -11,9 +11,10 @@ cmake_dependent_option(
     "${SCP_ENABLE_SCMI_RESET}")
 
 cmake_dependent_option(
-    SCP_ENABLE_FAST_CHANNELS "Enable the SCMI Fast channels?"
-    "${SCP_ENABLE_FAST_CHANNELS_INIT}" "DEFINED SCP_ENABLE_FAST_CHANNELS_INIT"
-    "${SCP_ENABLE_FAST_CHANNELS}")
+    SCP_ENABLE_SCMI_PERF_FAST_CHANNELS "Enable the SCMI-perf Fast channels?"
+    "${SCP_ENABLE_SCMI_PERF_FAST_CHANNELS_INIT}"
+    "DEFINED SCP_ENABLE_SCMI_PERF_FAST_CHANNELS_INIT"
+    "${SCP_ENABLE_SCMI_PERF_FAST_CHANNELS}")
 
 cmake_dependent_option(
     SCP_ENABLE_DEBUG_UNIT "Enable the debug support?"

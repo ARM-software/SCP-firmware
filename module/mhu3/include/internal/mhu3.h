@@ -17,18 +17,30 @@
 #define MHU3_MAX_DOORBELL_CHANNELS UINT32_C(128)
 
 /*
+ * Useful macros
+ */
+#define MHU3_MASK_GENERATE(BITSTART, LENGTH) \
+    (((1 << (LENGTH)) - 1) << ((BITSTART) + 1 - (LENGTH)))
+#define MHU3_MASKED_RECOVER(MASKED, BITSTART, LENGTH) \
+    ((MASKED) >> ((BITSTART) + 1 - (LENGTH)))
+
+/*
  * Top level base addresses
  */
 #define MHU3_PBX_PDBCW_PAGE_OFFSET UINT32_C(0x00001000)
-#define MHU3_PBX_PDFCW_PAGE_OFFSET UINT32_C(0x00003000)
+#define MHU3_PBX_PFCW_PAGE_OFFSET  UINT32_C(0x00003000)
 
 #define MHU3_MBX_MDBCW_PAGE_OFFSET UINT32_C(0x00001000)
 #define MHU3_MBX_MDFCW_PAGE_OFFSET UINT32_C(0x00003000)
+
+#define FCH_WS_64BIT 64U
+#define FCH_WS_32BIT 32U
 
 enum mhu3_reg_settings {
     MHU3_OP_REQ = 1U << 0U,
     MHU3_AUTO_OP_SPT = 1U << 0U,
 };
+
 /*!
  * \brief MHU3 Postbox(PBX) Register Definitions
  */
@@ -72,16 +84,6 @@ struct mhu3_pbx_pdbcw_reg {
     FWK_W uint32_t PDBCW_INT_CLR;
     FWK_RW uint32_t PDBCW_INT_EN;
     FWK_RW uint32_t PDBCW_CTRL;
-};
-
-/* PBX.PBX_CTRL.PBX_FCH_CFG0.FCH_WS == 32 */
-struct mhu3_pbx_pfcw_reg_ws32 {
-    uint32_t PFCW_PAY[1024];
-};
-
-/* PBX.PBX_CTRL.PBX_FCH_CFG0.FCH_WS == 64 */
-struct mhu3_pbx_pfcw_reg_ws64 {
-    uint64_t PFCW_PAY[512];
 };
 
 struct mhu3_mbx_reg {
@@ -131,5 +133,96 @@ struct mhu3_mbx_mdbcw_reg {
     FWK_RW uint32_t MDBCW_MSK_CLR;
     FWK_RW uint32_t MDBCW_CTRL;
 };
+
+/* Fast Channel Configuration 0 Number of Fast Channels Start Bit */
+#define MHU3_FCH_CFG0_NUM_FCH_BITSTART 9
+/* Fast Channel Configuration 0 Number of Fast Channels Length */
+#define MHU3_FCH_CFG0_NUM_FCH_LEN 10
+/* Fast Channel Configuration 0 Number of Fast Channels Mask */
+#define MHU3_FCH_CFG0_NUM_FCH_MASK \
+    (MHU3_MASK_GENERATE( \
+        MHU3_FCH_CFG0_NUM_FCH_BITSTART, MHU3_FCH_CFG0_NUM_FCH_LEN))
+
+/* Fast Channel Configuration 0 Number of Fast Channel Groups Start Bit */
+#define MHU3_FCH_CFG0_NUM_FCG_BITSTART 15
+/* Fast Channel Configuration 0 Number of Fast Channel Groups Length */
+#define MHU3_FCH_CFG0_NUM_FCG_LEN 5
+/* Fast Channel Configuration 0 Number of Fast Channel Groups Mask */
+#define MHU3_FCH_CFG0_NUM_FCG_MASK \
+    (MHU3_MASK_GENERATE( \
+        MHU3_FCH_CFG0_NUM_FCG_BITSTART, MHU3_FCH_CFG0_NUM_FCG_LEN))
+
+/*
+ * Fast Channel Configuration 0 Number of Fast Channels per Fast Channel Group
+ * Start Bit
+ */
+#define MHU3_FCH_CFG0_NUM_FCH_PER_GRP_BITSTART 20
+/*
+ * Fast Channel Configuration 0 Number of Fast Channels per Fast Channel Group
+ * Length
+ */
+#define MHU3_FCH_CFG0_NUM_FCH_PER_GRP_LEN 5
+/*
+ * Fast Channel Configuration 0 Number of Fast Channels per Fast Channel Group
+ * Mask
+ */
+#define MHU3_FCH_CFG0_NUM_FCH_PER_GRP_MASK \
+    (MHU3_MASK_GENERATE( \
+        MHU3_FCH_CFG0_NUM_FCH_PER_GRP_BITSTART, \
+        MHU3_FCH_CFG0_NUM_FCH_PER_GRP_LEN))
+
+/* Fast Channel Configuration 0 Fast Channel Word Size Start Bit */
+#define MHU3_FCH_CFG0_FCH_WS_BITSTART 28
+/* Fast Channel Configuration 0 Fast Channel Word Size Length */
+#define MHU3_FCH_CFG0_FCH_WS_LEN 8
+/* Fast Channel Configuration 0 Fast Channel Word Size Mask */
+#define MHU3_FCH_CFG0_FCH_WS_MASK \
+    (MHU3_MASK_GENERATE( \
+        MHU3_FCH_CFG0_FCH_WS_BITSTART, MHU3_FCH_CFG0_FCH_WS_LEN))
+
+/* Feature Support 0 Doorbell Extension Support Start Bit */
+#define MHU3_FEAT_SPT0_DBE_SPT_BITSTART 3
+/* Feature Support 0 Doorbell Extension Support Length */
+#define MHU3_FEAT_SPT0_DBE_SPT_LEN 4
+/* Feature Support 0 Doorbell Extension Support Mask */
+#define MHU3_FEAT_SPT0_DBE_SPT_MASK \
+    (MHU3_MASK_GENERATE( \
+        MHU3_FEAT_SPT0_DBE_SPT_BITSTART, MHU3_FEAT_SPT0_DBE_SPT_LEN))
+
+/* Feature Support 0 FIFO Extension Support Start Bit */
+#define MHU3_FEAT_SPT0_FE_SPT_BITSTART 7
+/* Feature Support 0 FIFO Extension Support Length */
+#define MHU3_FEAT_SPT0_FE_SPT_LEN 4
+/* Feature Support 0 FIFO Extension Support Mask */
+#define MHU3_FEAT_SPT0_FE_SPT_MASK \
+    (MHU3_MASK_GENERATE( \
+        MHU3_FEAT_SPT0_FE_SPT_BITSTART, MHU3_FEAT_SPT0_FE_SPT_LEN))
+
+/* Feature Support 0 Fast Channel Extension Support Start Bit */
+#define MHU3_FEAT_SPT0_FCE_SPT_BITSTART 11
+/* Feature Support 0 Fast Channel Extension Support Length */
+#define MHU3_FEAT_SPT0_FCE_SPT_LEN 4
+/* Feature Support 0 Fast Channel Extension Support Mask */
+#define MHU3_FEAT_SPT0_FCE_SPT_MASK \
+    (MHU3_MASK_GENERATE( \
+        MHU3_FEAT_SPT0_FCE_SPT_BITSTART, MHU3_FEAT_SPT0_FCE_SPT_LEN))
+
+/* Feature Support 0 TrustZone Extension Support Start Bit */
+#define MHU3_FEAT_SPT0_TZE_SPT_BITSTART 15
+/* Feature Support 0 TrustZone Extension Support Length */
+#define MHU3_FEAT_SPT0_TZE_SPT_LEN 4
+/* Feature Support 0 TrustZone Extension Support Mask */
+#define MHU3_FEAT_SPT0_TZE_SPT_MASK \
+    (MHU3_MASK_GENERATE( \
+        MHU3_FEAT_SPT0_TZE_SPT_BITSTART, MHU3_FEAT_SPT0_TZE_SPT_LEN))
+
+/* Feature Support 0 Realm Management Extension Support Start Bit */
+#define MHU3_FEAT_SPT0_RME_SPT_BITSTART 19
+/* Feature Support 0 Realm Management Extension Support Length */
+#define MHU3_FEAT_SPT0_RME_SPT_LEN 4
+/* Feature Support 0 Realm Management Extension Support Mask */
+#define MHU3_FEAT_SPT0_RME_SPT_MASK \
+    (MHU3_MASK_GENERATE( \
+        MHU3_FEAT_SPT0_RME_SPT_BITSTART, MHU3_FEAT_SPT0_RME_SPT_LEN))
 
 #endif /* INTERNAL_MHU3_H */

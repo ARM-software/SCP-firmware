@@ -196,17 +196,18 @@ version of the functions on which ```scmi_base_discover_sub_vendor_handler```
 is dependent.
 
 For example to generate mocked version of the functions available
-in the ```framework/include/fwk_id.h``` Use below command
+in the ```framework/include/fwk_module.h``` Use below command
 
 ```sh
-gm.rb -m ${SCP_ROOT}/unit_test/unity_mocks/mocks/ -f fwk_module.h
+${SCP_ROOT}/unit_test/gm.rb  -m ${SCP_ROOT}/unit_test/unity_mocks/mocks/
+-f fwk_module.h
 ```
 and for ```internal``` version of this file
 ```framework/include/internal/fwk_module.h```
 
 ```sh
-gm.rb -m ${SCP_ROOT}/unit_test/unity_mocks/mocks/ -f internal/fwk_module.h
--dinternal -s_internal
+${SCP_ROOT}/unit_test/gm.rb -m ${SCP_ROOT}/unit_test/unity_mocks/mocks/
+-f internal/fwk_module.h -dinternal -s_internal
 ```
 
 It's recommended to export the path to gm.rb to PATH for ease of use, but
@@ -260,9 +261,6 @@ from hand-written code.
 
 ## Adding test for new modules
 
-<!--- TODO discover the unit test on the fly without having
-to modify this CMAKE file. -->
-
 The ```scmi``` and ``scmi_clock``` test directories are provided
 as a reference for new modules. The following process is intended
 as a general guide, and will vary on a case-by-case basis.
@@ -296,8 +294,6 @@ generated under module specific unit test directory e.g.
 ```module/new_module/test/mocks```
 
 ## fwk_core mock workaround
-
-<!--- TODO remove need for workaround -->
 
 CMock generates the fwk_run_main_loop mock as a returning function,
 because noreturn is stripped out via cfg.yml. Compilation therefore

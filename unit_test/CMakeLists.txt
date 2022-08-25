@@ -105,30 +105,10 @@ list(APPEND FWK_SRC ${UNITY_SRC_ROOT}/unity.c)
 
 list(APPEND SCP_UNITY_SRC ${TEST_ROOT}/unity_mocks/scp_unity.c)
 
-macro(replace_with_mock FILENAME)
-    list(FILTER ${TEST_MODULE}_FWK_SRC EXCLUDE REGEX "${FILENAME}.c")
-    list(APPEND ${TEST_MODULE}_FWK_SRC ${FWK_MOCKS_SRC_ROOT}/Mock${FILENAME}.c)
-    if(EXISTS ${FWK_MOCKS_SRC_ROOT}/internal/Mock${FILENAME}_internal.c)
-        list(APPEND ${TEST_MODULE}_FWK_SRC
-                    ${FWK_MOCKS_SRC_ROOT}/internal/Mock${FILENAME}_internal.c)
-    endif()
-endmacro()
-
-macro(include_fwk_notify)
-    target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC "BUILD_HAS_NOTIFICATION")
-    list(APPEND ${TEST_MODULE}_FWK_SRC ${FWK_SRC_ROOT}/fwk_notification.c)
-endmacro()
-
-macro(include_mock_notify)
-    target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC "BUILD_HAS_NOTIFICATION")
-    list(APPEND ${TEST_MODULE}_FWK_SRC ${FWK_MOCKS_SRC_ROOT}/Mockfwk_notification.c)
-    list(APPEND ${TEST_MODULE}_FWK_SRC
-                ${FWK_MOCKS_SRC_ROOT}/internal/Mockfwk_notification_internal.c)
-endmacro()
-
 #Append new unit tests below here
 list(APPEND UNIT_MODULE scmi)
 list(APPEND UNIT_MODULE scmi_clock)
+list(APPEND UNIT_MODULE scmi_perf)
 
 list(LENGTH UNIT_MODULE UNIT_TEST_MAX)
 
@@ -145,27 +125,4 @@ foreach(idx RANGE ${UNIT_TEST_MAX})
 
     # Include .cmake file of the module under test
     include(${SCP_ROOT}/module/${TEST_MODULE}/test/${TEST_MODULE}.cmake)
-
-    target_compile_definitions(
-        ${UNIT_TEST_TARGET}
-        PUBLIC "BUILD_VERSION_DESCRIBE_STRING=\"${SCP_UNIT_TEST_DESCRIBE}\""
-               "BUILD_VERSION_MAJOR=${SCP_UNIT_TEST_VERSION_MAJOR}"
-               "BUILD_VERSION_MINOR=${SCP_UNIT_TEST_VERSION_MINOR}"
-               "BUILD_VERSION_PATCH=0")
-
-    target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC "PERF_OPT")
-
-    foreach(COMPILE_FLAG IN LISTS EXTRA_COMPILE_FLAGS)
-        target_compile_options(${UNIT_TEST_TARGET} PRIVATE "${COMPILE_FLAG}")
-    endforeach()
-
-    # Include framework includes
-    target_include_directories(${UNIT_TEST_TARGET} PUBLIC "${FWK_INC_ROOT}")
-    target_sources(${UNIT_TEST_TARGET} PUBLIC ${SCP_UNITY_SRC})
-    target_link_options(${UNIT_TEST_TARGET}
-                        PRIVATE "LINKER:-wrap=fwk_log_printf --coverage -lgcov")
-    target_link_libraries(${UNIT_TEST_TARGET} PRIVATE gcov)
-    # Add test to CTest
-    add_test(NAME ${UNIT_TEST_TARGET} COMMAND ${UNIT_TEST_TARGET})
-
 endforeach()

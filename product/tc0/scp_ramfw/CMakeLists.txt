@@ -32,7 +32,7 @@ if (SCP_PLATFORM_VARIANT STREQUAL "1")
         PUBLIC -DPLATFORM_VARIANT=TC0_VAR_EXPERIMENT_POWER)
 
     set(SCP_ENABLE_PLUGIN_HANDLER TRUE PARENT_SCOPE)
-    set(SCP_ENABLE_FAST_CHANNELS TRUE PARENT_SCOPE)
+    set(SCP_ENABLE_SCMI_PERF_FAST_CHANNELS TRUE PARENT_SCOPE)
 
 # The order of the modules in the following list is appended on the list of
 # modules defined in Firmware.cmake.

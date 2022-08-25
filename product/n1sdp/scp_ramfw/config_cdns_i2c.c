@@ -35,6 +35,8 @@ static const struct fwk_element i2c_element_desc_table[] = {
             .hold_mode = MOD_CDNS_I2C_HOLD_ON,
             .irq = 0,
             .callback_mod_id = FWK_ID_NONE_INIT,
+            .fifo_depth = 8,
+            .max_xfr_size = 15,
         }),
     },
     [CDNS_C2C_I2C_IDX] = {
@@ -48,6 +50,8 @@ static const struct fwk_element i2c_element_desc_table[] = {
             .hold_mode = MOD_CDNS_I2C_HOLD_OFF,
             .irq = SCP_I2C0_IRQ,
             .callback_mod_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_N1SDP_C2C),
+            .fifo_depth = 8,
+            .max_xfr_size = 15,
         }),
     },
     [CDNS_I2C_IDX_COUNT] = { 0 }, /* Termination description. */

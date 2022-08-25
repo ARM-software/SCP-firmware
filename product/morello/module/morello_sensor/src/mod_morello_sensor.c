@@ -65,7 +65,7 @@ static void morello_sensor_timer_callback(uintptr_t unused)
                     (int)value);
 
                 status = sensor_ctx.scp2pcc_api->send(
-                    NULL, 0, SCP2PCC_TYPE_SHUTDOWN);
+                    MOD_SCP2PCC_SEND_SHUTDOWN, NULL, 0, NULL, NULL);
                 if (status != FWK_SUCCESS) {
                     FWK_LOG_ERR(
                         "[MORELLO SENSOR] Shutdown request to PCC failed");

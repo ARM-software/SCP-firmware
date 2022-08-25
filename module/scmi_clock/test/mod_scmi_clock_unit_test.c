@@ -25,6 +25,10 @@
 #include <fwk_element.h>
 #include <fwk_macros.h>
 
+#if defined(BUILD_HAS_MOD_RESOURCE_PERMS)
+    #include <mod_resource_perms.h>
+#endif
+
 #include UNIT_TEST_SRC
 
 static struct mod_scmi_clock_ctx scmi_clock_ctx;
@@ -41,6 +45,16 @@ struct mod_scmi_from_protocol_api from_protocol_api = {
     .notify = mod_scmi_from_protocol_api_notify,
 };
 
+#if defined(BUILD_HAS_MOD_RESOURCE_PERMS)
+struct mod_res_permissions_api perm_api = {
+    .agent_has_protocol_permission = mod_res_permissions_api_agent_has_protocol_permission,
+    .agent_has_message_permission = mod_res_permissions_api_agent_has_message_permission,
+    .agent_has_resource_permission = mod_res_permissions_api_agent_has_resource_permission,
+    .agent_set_device_permission = mod_res_permissions_api_agent_set_device_permission,
+    .agent_set_device_protocol_permission = mod_res_permissions_api_agent_set_device_protocol_permission,
+    .agent_reset_config = mod_res_permissions_api_agent_reset_config,
+};
+#endif
 
 void setUp(void)
 {
@@ -61,6 +75,9 @@ void setUp(void)
     }
 
     scmi_clock_ctx.scmi_api = &from_protocol_api;
+    #if defined(BUILD_HAS_MOD_RESOURCE_PERMS)
+        scmi_clock_ctx.res_perms_api = &perm_api;
+    #endif
 
     fwk_id_is_equal_ExpectAnyArgsAndReturn(true);
     module_scmi_clock.process_bind_request(fwk_module_id_scmi, fwk_module_id_scmi_clock,
@@ -70,7 +87,6 @@ void setUp(void)
 
 void tearDown(void)
 {
-    //Get rid of heap?
 }
 
 int fwk_put_event_callback(struct fwk_event *event, int numCalls)
@@ -105,6 +121,11 @@ void test_function_set_rate(void)
     mod_scmi_from_protocol_api_get_agent_id_ExpectAnyArgsAndReturn(FWK_SUCCESS);
     mod_scmi_from_protocol_api_get_agent_id_ReturnThruPtr_agent_id(&agent_id);
 
+    #if defined(BUILD_HAS_MOD_RESOURCE_PERMS)
+        mod_scmi_from_protocol_api_get_agent_id_ExpectAnyArgsAndReturn(FWK_SUCCESS);
+        mod_res_permissions_api_agent_has_resource_permission_ExpectAnyArgsAndReturn(MOD_RES_PERMS_ACCESS_ALLOWED);
+    #endif
+
     fwk_module_is_valid_element_id_ExpectAnyArgsAndReturn(true);
 
     mod_scmi_from_protocol_api_get_agent_id_ExpectAnyArgsAndReturn(FWK_SUCCESS);
@@ -119,14 +140,18 @@ void test_function_set_rate(void)
                                                (const uint32_t *)&payload,
                                                payload_size_table[MOD_SCMI_CLOCK_RATE_SET],
                                                MOD_SCMI_CLOCK_RATE_SET);
+
     TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
 }
-
 
 int scmi_test_main(void)
 {
     UNITY_BEGIN();
-    RUN_TEST(test_function_set_rate);
+    #if defined(BUILD_HAS_MOD_RESOURCE_PERMS)
+        RUN_TEST(test_function_set_rate);
+    #else
+        RUN_TEST(test_function_set_rate);
+    #endif
     return UNITY_END();
 }
 

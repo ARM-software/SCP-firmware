@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -10,6 +10,7 @@
 
 #include <internal/morello_scp2pcc.h>
 
+#include <mod_cdns_i2c.h>
 #include <mod_morello_scp2pcc.h>
 
 #include <fwk_id.h>
@@ -20,116 +21,71 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 /* Module context */
 struct morello_scp2pcc_ctx {
-    /*  Pointer to module configuration */
-    struct mem_msg_config *config;
-
-    /* Sequence variable */
-    unsigned int sequence;
+    const struct mod_cdns_i2c_controller_api_polled *i2c_api;
 };
+static struct morello_scp2pcc_ctx morello_scp2pcc_ctx;
 
-static struct morello_scp2pcc_ctx scp2pcc_ctx;
-
-static inline void wrdmemset(void *ptr, unsigned int value)
+static int send_message(
+    enum scp2pcc_msg_type type,
+    void *req_data,
+    uint16_t req_data_size,
+    void *resp_data,
+    uint16_t *resp_data_size)
 {
-    ((unsigned int *)ptr)[0] = value;
-}
+    int status;
+    struct scp2pcc_msg_st msg = { 0 };
 
-static void wrdmemcpy(void *destination, const void *source, unsigned int num)
-{
-    unsigned int index;
-
-    for (index = 0; index < num; index++) {
-        ((unsigned int *)destination)[index] = ((unsigned int *)source)[index];
-    }
-}
-
-static void reset_shared_memory(void)
-{
-    unsigned int index;
-    struct mem_msg_packet *packet = NULL;
-    size_t offset;
-
-    for (index = 0; index < scp2pcc_ctx.config->shared_num_rx; index++) {
-        offset = index * sizeof(struct mem_msg_packet);
-        packet = (struct mem_msg_packet
-                      *)(scp2pcc_ctx.config->shared_rx_buffer + offset);
-
-        wrdmemset(&packet->type, MSG_UNUSED_MESSAGE_TYPE);
-    }
-
-    for (index = 0; index < scp2pcc_ctx.config->shared_num_tx; index++) {
-        offset = index * sizeof(struct mem_msg_packet);
-        packet = (struct mem_msg_packet
-                      *)(scp2pcc_ctx.config->shared_tx_buffer + offset);
-
-        wrdmemset(&packet->type, MSG_UNUSED_MESSAGE_TYPE);
-    }
-}
-
-static int mem_msg_send_message(void *data, uint16_t size, uint16_t type)
-{
-    unsigned int index;
-    struct mem_msg_packet *packet = NULL;
-    size_t offset;
-
-    if (type == SCP2PCC_TYPE_SHUTDOWN) {
-        FWK_LOG_INFO("Shutdown request to PCC");
-    }
-
-    /* Check parameters. */
-    if ((size > MSG_PAYLOAD_SIZE) || (type == MSG_UNUSED_MESSAGE_TYPE)) {
-        FWK_LOG_INFO("Invalid parameters");
+    if (type >= MOD_SCP2PCC_MSG_COUNT) {
         return FWK_E_PARAM;
     }
 
-    /* Check for alive value. */
-    if (*(scp2pcc_ctx.config->shared_alive_address) != MSG_ALIVE_VALUE) {
-        /* Attempt to set alive value and try again. */
-        *(scp2pcc_ctx.config->shared_alive_address) = MSG_ALIVE_VALUE;
-        if (*(scp2pcc_ctx.config->shared_alive_address) != MSG_ALIVE_VALUE) {
-            return FWK_E_STATE;
-        }
+    /* Populate the message parameters */
+    msg.opcode = type;
 
-        /* If successful, reset shared memory. */
-        reset_shared_memory();
+    if (req_data && req_data_size) {
+        memcpy(msg.req.data, req_data, req_data_size);
+        msg.req.len = req_data_size;
     }
 
-    /* Find unused TX packet. */
-    for (index = 0; index < scp2pcc_ctx.config->shared_num_tx; index++) {
-        offset = index * sizeof(struct mem_msg_packet);
-        /* Get pointer to packet. */
-        packet = (struct mem_msg_packet
-                      *)(scp2pcc_ctx.config->shared_tx_buffer + offset);
-
-        if (packet->type == MSG_UNUSED_MESSAGE_TYPE) {
-            /* Unused packet found, copy data payload. */
-            if (data != NULL) {
-                wrdmemcpy((void *)&packet->payload, data, (size / 4));
-            }
-
-            /* Set size. */
-            wrdmemset((void *)&packet->size, size);
-
-            /* Set sequence. */
-            wrdmemset((void *)&packet->sequence, scp2pcc_ctx.sequence);
-
-            scp2pcc_ctx.sequence++;
-
-            /* Set type last since it is a sort of valid indicator. */
-            wrdmemset((void *)&packet->type, type);
-
-            return FWK_SUCCESS;
-        }
+    status = morello_scp2pcc_ctx.i2c_api->write(
+        (FWK_ID_ELEMENT(FWK_MODULE_IDX_CDNS_I2C, 2)),
+        MORELLO_SCP2PCC_I2C_ADDRESS,
+        (void *)&msg,
+        MORELLO_SCP2PCC_MSG_LEN,
+        1);
+    if (status != FWK_SUCCESS) {
+        return status;
     }
 
-    return FWK_E_NOMEM;
+    /* Fetch the response */
+    status = morello_scp2pcc_ctx.i2c_api->read(
+        (FWK_ID_ELEMENT(FWK_MODULE_IDX_CDNS_I2C, 2)),
+        MORELLO_SCP2PCC_I2C_ADDRESS,
+        (void *)&msg,
+        MORELLO_SCP2PCC_MSG_LEN);
+
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    if (msg.resp.status != SCP2PCC_MSG_STATUS_SUCCESS) {
+        return FWK_E_DEVICE;
+    }
+
+    if (msg.resp.len) {
+        memcpy(resp_data, msg.resp.data, msg.resp.len);
+        *resp_data_size = msg.resp.len;
+    }
+
+    return FWK_SUCCESS;
 }
 
 static const struct mod_morello_scp2pcc_api morello_scp2pcc_api = {
-    .send = mem_msg_send_message,
+    .send = send_message,
 };
 
 static int morello_scp2pcc_init(
@@ -137,15 +93,15 @@ static int morello_scp2pcc_init(
     unsigned int unused,
     const void *data)
 {
-    if (data == NULL) {
-        return FWK_E_PARAM;
-    }
-
-    scp2pcc_ctx.config = (struct mem_msg_config *)data;
-
-    *(scp2pcc_ctx.config->shared_alive_address) = MSG_ALIVE_VALUE;
-
     return FWK_SUCCESS;
+}
+
+static int morello_scp2pcc_bind(fwk_id_t id, unsigned int round)
+{
+    return fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_CDNS_I2C),
+        FWK_ID_API(FWK_MODULE_IDX_CDNS_I2C, MOD_CDNS_I2C_API_CONTROLLER_POLLED),
+        &morello_scp2pcc_ctx.i2c_api);
 }
 
 static int morello_scp2pcc_process_bind_request(
@@ -161,9 +117,6 @@ static int morello_scp2pcc_process_bind_request(
 
 static int morello_scp2pcc_start(fwk_id_t id)
 {
-    /* Clear out shared buffers. */
-    reset_shared_memory();
-
     return FWK_SUCCESS;
 }
 
@@ -171,6 +124,7 @@ const struct fwk_module module_morello_scp2pcc = {
     .api_count = 1,
     .type = FWK_MODULE_TYPE_PROTOCOL,
     .init = morello_scp2pcc_init,
+    .bind = morello_scp2pcc_bind,
     .process_bind_request = morello_scp2pcc_process_bind_request,
     .start = morello_scp2pcc_start,
 };
