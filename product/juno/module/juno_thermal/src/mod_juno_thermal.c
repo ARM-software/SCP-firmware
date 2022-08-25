@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -39,13 +39,6 @@ static const struct mod_pd_restricted_api *pd_api;
 static const fwk_id_t systop_pd_id =
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN,
     POWER_DOMAIN_IDX_SYSTOP);
-
-/*
- * The sensor used for monitoring the temperature is available only on the real
- * board, thus when running on FVP this module does not need to provide
- * protection.
- */
-static bool is_platform_fvp;
 
 struct thermal_dev_ctx {
     const struct mod_juno_thermal_element_config *config;
@@ -90,27 +83,19 @@ static int juno_thermal_init(
     unsigned int element_count,
     const void *config)
 {
-    int status;
-    enum juno_idx_platform platform_id = JUNO_IDX_PLATFORM_COUNT;
-
     fwk_assert(element_count == 1);
 
-    status = juno_id_get_platform(&platform_id);
-    if (!fwk_expect(status == FWK_SUCCESS)) {
-        return FWK_E_PANIC;
-    }
-
-    is_platform_fvp = (platform_id == JUNO_IDX_PLATFORM_FVP);
-
-    if (is_platform_fvp) {
-        return FWK_SUCCESS;
-    }
-
+/*
+ * The sensor used for monitoring the temperature is available only on the real
+ * board, thus when running on FVP this module does not need to provide
+ * protection.
+ */
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
     ctx_table = fwk_mm_calloc(element_count, sizeof(struct thermal_dev_ctx));
     if (ctx_table == NULL) {
         return FWK_E_NOMEM;
     }
-
+#endif
     return FWK_SUCCESS;
 }
 
@@ -119,13 +104,9 @@ static int juno_thermal_element_init(
     unsigned int unused,
     const void *data)
 {
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
     struct thermal_dev_ctx *ctx;
     fwk_id_t sensor_id;
-
-    if (is_platform_fvp) {
-        return FWK_SUCCESS;
-    }
-
     ctx = &ctx_table[fwk_id_get_element_idx(element_id)];
     ctx->config = (struct mod_juno_thermal_element_config *)data;
 
@@ -134,17 +115,18 @@ static int juno_thermal_element_init(
     /* Validate identifiers */
     if (fwk_id_get_module_idx(sensor_id) != FWK_MODULE_IDX_SENSOR) {
         return FWK_E_DATA;
-    } else {
-        return FWK_SUCCESS;
     }
+#endif
+    return FWK_SUCCESS;
 }
 
 static int juno_thermal_bind(fwk_id_t id, unsigned int round)
 {
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
     int status;
     struct thermal_dev_ctx *ctx;
 
-    if ((round > 0) || is_platform_fvp) {
+    if (round > 0) {
         return FWK_SUCCESS;
     }
 
@@ -171,17 +153,16 @@ static int juno_thermal_bind(fwk_id_t id, unsigned int round)
     if (status != FWK_SUCCESS) {
         return FWK_E_PANIC;
     }
-
+#endif
     return FWK_SUCCESS;
 }
 
 static int juno_thermal_start(fwk_id_t id)
 {
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
     int status;
     struct thermal_dev_ctx *ctx;
-
-    /* Nothing to start for module */
-    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE) || is_platform_fvp) {
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         return FWK_SUCCESS;
     }
 
@@ -203,6 +184,8 @@ static int juno_thermal_start(fwk_id_t id)
         (uintptr_t)fwk_id_get_element_idx(id));
 
     return status;
+#endif
+    return FWK_SUCCESS;
 }
 
 static int check_threshold_breach(uint64_t temperature, uint64_t threshold)
