@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -72,16 +72,12 @@ static const struct fwk_element juno_hdlcd_element_table[] = {
 static const struct fwk_element *juno_hdlcd_get_element_table(
         fwk_id_t module_id)
 {
-    int status;
     struct mod_juno_hdlcd_dev_config *config;
     unsigned int i;
-    enum juno_idx_platform platform_id;
-    uintptr_t hdlcd_lookup = HDLCD_PRESET_TABLE_BASE;
 
-    status = juno_id_get_platform(&platform_id);
-    if (status != FWK_SUCCESS) {
-        return NULL;
-    }
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
+    uintptr_t hdlcd_lookup = HDLCD_PRESET_TABLE_BASE;
+#endif
 
     for (i = 0; i < JUNO_HDLCD_ELEMENT_COUNT; i++) {
         config = (struct mod_juno_hdlcd_dev_config *)
@@ -90,28 +86,36 @@ static const struct fwk_element *juno_hdlcd_get_element_table(
             config->lookup_table_count =
                 JUNO_CLOCK_HDLCD_LOOKUP_HIGH_PXCLK_ENABLE_COUNT;
             config->max_rate = 210 * FWK_MHZ;
-            if (platform_id == JUNO_IDX_PLATFORM_RTL) {
-                /* Check that the signatures are present */
-                fwk_assert(
-                    ((struct juno_clock_hdlcd_lookup_high_pxlclk_enable *)
-                        hdlcd_lookup)->SIGNATURE_A == 0x9DCA7B7A);
-                fwk_assert(
-                    ((struct juno_clock_hdlcd_lookup_high_pxlclk_enable *)
-                        hdlcd_lookup)->SIGNATURE_B == 0x5C7852A9);
-            }
+
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
+            /* Check that the signatures are present */
+            fwk_assert(
+                ((struct juno_clock_hdlcd_lookup_high_pxlclk_enable *)
+                     hdlcd_lookup)
+                    ->SIGNATURE_A == 0x9DCA7B7A);
+            fwk_assert(
+                ((struct juno_clock_hdlcd_lookup_high_pxlclk_enable *)
+                     hdlcd_lookup)
+                    ->SIGNATURE_B == 0x5C7852A9);
+#endif
+
             config->lookup_table =
                 ((struct juno_clock_hdlcd_lookup_high_pxlclk_enable *)
                     HDLCD_PRESET_TABLE_BASE)->CLK;
         } else {
             config->lookup_table_count = JUNO_CLOCK_HDLCD_LOOKUP_COUNT;
             config->max_rate = 165 * FWK_MHZ;
-            if (platform_id == JUNO_IDX_PLATFORM_RTL) {
-                /* Check that the signatures are present */
-                fwk_assert(((struct juno_clock_hdlcd_lookup *)
-                    hdlcd_lookup)->SIGNATURE_A == 0x9DCA7B7A);
-                fwk_assert(((struct juno_clock_hdlcd_lookup *)
-                    hdlcd_lookup)->SIGNATURE_B == 0x5C7852A9);
-            }
+
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
+            /* Check that the signatures are present */
+            fwk_assert(
+                ((struct juno_clock_hdlcd_lookup *)hdlcd_lookup)->SIGNATURE_A ==
+                0x9DCA7B7A);
+            fwk_assert(
+                ((struct juno_clock_hdlcd_lookup *)hdlcd_lookup)->SIGNATURE_B ==
+                0x5C7852A9);
+#endif
+
             config->lookup_table = ((struct juno_clock_hdlcd_lookup *)
                 HDLCD_PRESET_TABLE_BASE)->CLK;
         }
