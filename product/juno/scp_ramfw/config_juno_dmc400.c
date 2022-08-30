@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -61,7 +61,6 @@ static const struct fwk_element *juno_dmc400_get_element_table
     int status;
     struct mod_juno_dmc400_element_config *dmc400_config;
 
-    enum juno_idx_platform platform_id = JUNO_IDX_PLATFORM_COUNT;
     enum juno_idx_variant variant_id = JUNO_IDX_VARIANT_A;
     enum juno_idx_revision revision = JUNO_IDX_REVISION_COUNT;
 
@@ -100,14 +99,6 @@ static const struct fwk_element *juno_dmc400_get_element_table
 
         dmc400_config->ddr_chip_count = DDR_CHIP_COUNT;
     }
-
-    status = juno_id_get_platform(&platform_id);
-    if (!fwk_expect(status == FWK_SUCCESS)) {
-        return NULL;
-    }
-
-    dmc400_config->is_platform_fvp =
-        (platform_id == JUNO_IDX_PLATFORM_FVP);
 
     return juno_dmc400_element_table;
 }

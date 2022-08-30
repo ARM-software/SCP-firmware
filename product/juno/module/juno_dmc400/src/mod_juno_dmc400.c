@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -69,6 +69,7 @@ static bool ddr_clock_enable_check(void *data)
     return ((clock_enable_status & SCP_CONFIG_CLOCK_ENABLE_DMCCLKEN) != 0);
 }
 
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
 static bool dmc_user_config_dfi_check(void *data)
 {
     const struct mod_juno_dmc400_reg *dmc = data;
@@ -79,6 +80,7 @@ static bool dmc_user_config_dfi_check(void *data)
 
     return ((dmc->USER_STATUS & init_complete_mask) == init_complete_mask);
 }
+#endif
 
 static bool ddr_cmd_config_check(void *data)
 {
@@ -183,10 +185,8 @@ static int ddr_phy_init(fwk_id_t id)
 {
     int status;
     const struct mod_juno_dmc400_element_config *element_config;
-    const struct mod_juno_dmc400_module_config *module_config;
     struct mod_juno_dmc400_reg *dmc;
 
-    module_config = fwk_module_get_data(fwk_module_id_juno_dmc400);
     element_config = fwk_module_get_data(id);
     dmc = (struct mod_juno_dmc400_reg *)element_config->dmc;
 
@@ -204,16 +204,20 @@ static int ddr_phy_init(fwk_id_t id)
     dmc->USER_CONFIG0 |= DMC_USER_CONFIG_DFI_INIT_START;
     dmc->USER_CONFIG1 |= DMC_USER_CONFIG_DFI_INIT_START;
 
-    if (!element_config->is_platform_fvp) {
-        /* Wait for the PHYs initialization to complete */
-        status = ctx.timer_api->wait(module_config->timer_id,
-                                     DMC400_PHY_INIT_WAIT_TIMEOUT_US,
-                                     dmc_user_config_dfi_check,
-                                     dmc);
-        if (status != FWK_SUCCESS) {
-            return status;
-        }
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
+    const struct mod_juno_dmc400_module_config *module_config;
+    module_config = fwk_module_get_data(fwk_module_id_juno_dmc400);
+
+    /* Wait for the PHYs initialization to complete */
+    status = ctx.timer_api->wait(
+        module_config->timer_id,
+        DMC400_PHY_INIT_WAIT_TIMEOUT_US,
+        dmc_user_config_dfi_check,
+        dmc);
+    if (status != FWK_SUCCESS) {
+        return status;
     }
+#endif
 
     /* Remove initialization request */
     dmc->USER_CONFIG0 &= ~DMC_USER_CONFIG_DFI_INIT_START;
@@ -393,6 +397,7 @@ static int ddr_dmc_init(fwk_id_t id)
  */
 static int ddr_training(fwk_id_t id)
 {
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
     int status;
     uint64_t timeout, remaining_ticks, counter;
     const struct mod_juno_dmc400_element_config *element_config;
@@ -402,11 +407,6 @@ static int ddr_training(fwk_id_t id)
     module_config = fwk_module_get_data(fwk_module_id_juno_dmc400);
     element_config = fwk_module_get_data(id);
     dmc = (struct mod_juno_dmc400_reg *)element_config->dmc;
-
-    if (element_config->is_platform_fvp) {
-        /* Training unsupported on FVP */
-        return FWK_SUCCESS;
-    }
 
     /* Configure the time-out for the DDR programming */
     status = ctx.timer_api->time_to_timestamp(module_config->timer_id,
@@ -649,6 +649,9 @@ timeout:
     FWK_LOG_WARN("[DMC] Training time-out");
 
     return FWK_E_TIMEOUT;
+
+#endif
+    return FWK_SUCCESS;
 }
 
 static int ddr_retraining(fwk_id_t id)
