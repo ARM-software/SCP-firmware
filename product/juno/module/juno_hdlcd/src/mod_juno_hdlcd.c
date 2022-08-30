@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -58,8 +58,6 @@ struct juno_hdlcd_ctx {
 
 static struct juno_hdlcd_dev_ctx *ctx_table;
 static struct juno_hdlcd_ctx module_ctx;
-
-static enum juno_idx_platform platform;
 
 /*
  * Helper functions
@@ -183,11 +181,11 @@ static int juno_hdlcd_set_rate(fwk_id_t clock_id, uint64_t rate,
         return FWK_E_RANGE;
     }
 
-    if (platform == JUNO_IDX_PLATFORM_RTL) {
-        if (!fwk_id_is_equal(module_ctx.request_clock_id, FWK_ID_NONE)) {
-            return FWK_E_BUSY;
-        }
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
+    if (!fwk_id_is_equal(module_ctx.request_clock_id, FWK_ID_NONE)) {
+        return FWK_E_BUSY;
     }
+#endif
 
     /*
      * Clock rate is always twice the pixel clock rate. This is because Juno has
@@ -247,19 +245,20 @@ static int juno_hdlcd_set_rate(fwk_id_t clock_id, uint64_t rate,
     SCC->PLL[PLL_IDX_HDLCD].REG0 = (PLL_REG0_PLL_RESET | PLL_REG0_HARD_BYPASS);
 
     module_ctx.current_pll_rate = clock_rate;
-    if (platform == JUNO_IDX_PLATFORM_RTL) {
-        /* CLK_HDLCD_REFCLK is an external I2C based oscillator. */
-        status = ctx->driver_api->set_rate_from_index(ctx->config->driver_id,
-            ctx->index);
-        if ((status != FWK_PENDING) && (status != FWK_SUCCESS)) {
-            FWK_LOG_ERR("[HDLCD] Failed to set board clock");
-            return FWK_E_DEVICE;
-        }
-        if (status == FWK_PENDING) {
-            module_ctx.request_clock_id = clock_id;
-        }
-        return status;
+
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
+    /* CLK_HDLCD_REFCLK is an external I2C based oscillator. */
+    status = ctx->driver_api->set_rate_from_index(
+        ctx->config->driver_id, ctx->index);
+    if ((status != FWK_PENDING) && (status != FWK_SUCCESS)) {
+        FWK_LOG_ERR("[HDLCD] Failed to set board clock");
+        return FWK_E_DEVICE;
     }
+    if (status == FWK_PENDING) {
+        module_ctx.request_clock_id = clock_id;
+    }
+    return status;
+#endif
 
     enable_pll(clock_id, ctx);
 
@@ -401,14 +400,14 @@ static int juno_hdlcd_bind(fwk_id_t id, unsigned int round)
         return FWK_E_HANDLER;
     }
 
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
     /* Bind to the driver API */
-    if (platform == JUNO_IDX_PLATFORM_RTL) {
-        status = fwk_module_bind(ctx->config->driver_id,
-            ctx->config->driver_api_id, &ctx->driver_api);
-        if (status != FWK_SUCCESS) {
-            return FWK_E_HANDLER;
-        }
+    status = fwk_module_bind(
+        ctx->config->driver_id, ctx->config->driver_api_id, &ctx->driver_api);
+    if (status != FWK_SUCCESS) {
+        return FWK_E_HANDLER;
     }
+#endif
 
     return FWK_SUCCESS;
 }
@@ -435,15 +434,9 @@ static int juno_hdlcd_start(fwk_id_t id)
     unsigned int nf;
     unsigned int nr;
     unsigned int od;
-    int status;
 
     if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         return FWK_SUCCESS;
-    }
-
-    status = juno_id_get_platform(&platform);
-    if (status != FWK_SUCCESS) {
-        return status;
     }
 
     /* Read current PLL frequency */
