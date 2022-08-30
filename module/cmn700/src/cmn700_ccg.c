@@ -34,10 +34,21 @@ static struct mod_cmn700_ccg_ctx cmn700_ccg_ctx;
 /* Pointer to the current CCG configuration data */
 static const struct mod_cmn700_ccg_config *config;
 
-static unsigned int get_ldid(bool program_for_port_aggregation)
+static unsigned int get_ldid(
+    struct cmn700_device_ctx *ctx,
+    bool program_for_port_aggregation)
 {
-    return (program_for_port_aggregation) ? config->port_aggregate_ldid :
+    unsigned int ldid;
+
+    ldid = (program_for_port_aggregation) ? config->port_aggregate_ldid :
                                             config->ldid;
+
+    if (ldid >= ctx->ccg_node_count) {
+        FWK_LOG_ERR(MOD_NAME "Unexpected ldid: %d", ldid);
+        fwk_trap();
+    }
+
+    return ldid;
 }
 
 static bool ccg_link_wait_condition(void *data)
@@ -55,9 +66,9 @@ static bool ccg_link_wait_condition(void *data)
     fwk_assert(data != NULL);
 
     wait_data = (struct ccg_wait_condition_data *)data;
-    ccg_ldid = get_ldid(cmn700_ccg_ctx.is_prog_for_port_agg);
-
     ctx = wait_data->ctx;
+
+    ccg_ldid = get_ldid(ctx, cmn700_ccg_ctx.is_prog_for_port_agg);
     ccg_ra_reg = ctx->ccg_ra_reg_table[ccg_ldid].ccg_ra_reg;
     ccg_ha_reg = ctx->ccg_ha_reg_table[ccg_ldid].ccg_ha_reg;
     linkid = wait_data->linkid;
@@ -136,7 +147,7 @@ static void program_ccg_ra_rnf_ldid_to_exp_raid_reg(
     unsigned int ccg_ldid;
     struct cmn700_ccg_ra_reg *ccg_ra_reg;
 
-    ccg_ldid = get_ldid(cmn700_ccg_ctx.is_prog_for_port_agg);
+    ccg_ldid = get_ldid(ctx, cmn700_ccg_ctx.is_prog_for_port_agg);
     ccg_ra_reg = ctx->ccg_ra_reg_table[ccg_ldid].ccg_ra_reg;
 
     /* Each 64-bit RA RNF LDID-to-RAID register holds 4 LDIDs */
@@ -165,7 +176,7 @@ static void program_ccg_ra_rni_ldid_to_exp_raid_reg(
     unsigned int ccg_ldid;
     struct cmn700_ccg_ra_reg *ccg_ra_reg;
 
-    ccg_ldid = get_ldid(cmn700_ccg_ctx.is_prog_for_port_agg);
+    ccg_ldid = get_ldid(ctx, cmn700_ccg_ctx.is_prog_for_port_agg);
     ccg_ra_reg = ctx->ccg_ra_reg_table[ccg_ldid].ccg_ra_reg;
 
     /* Each 64-bit RA RNI LDID-to-RAID register holds 4 LDIDs */
@@ -194,7 +205,7 @@ static void program_ccg_ra_rnd_ldid_to_exp_raid_reg(
     unsigned int ccg_ldid;
     struct cmn700_ccg_ra_reg *ccg_ra_reg;
 
-    ccg_ldid = get_ldid(cmn700_ccg_ctx.is_prog_for_port_agg);
+    ccg_ldid = get_ldid(ctx, cmn700_ccg_ctx.is_prog_for_port_agg);
     ccg_ra_reg = ctx->ccg_ra_reg_table[ccg_ldid].ccg_ra_reg;
 
     /* Each 64-bit RA RND LDID-to-RAID register holds 4 LDIDs */
@@ -227,7 +238,7 @@ static void program_agentid_to_linkid_reg(
     struct cmn700_ccg_ra_reg *ccg_ra_reg;
     struct cmn700_ccg_ha_reg *ccg_ha_reg;
 
-    ccg_ldid = get_ldid(cmn700_ccg_ctx.is_prog_for_port_agg);
+    ccg_ldid = get_ldid(ctx, cmn700_ccg_ctx.is_prog_for_port_agg);
     ccg_ra_reg = ctx->ccg_ra_reg_table[ccg_ldid].ccg_ra_reg;
     ccg_ha_reg = ctx->ccg_ha_reg_table[ccg_ldid].ccg_ha_reg;
 
@@ -279,8 +290,9 @@ static void program_ccg_ha_id(struct cmn700_device_ctx *ctx)
 {
     struct cmn700_ccg_ha_reg *ccg_ha_reg;
     unsigned int ccg_haid;
-    unsigned int ccg_ldid = get_ldid(cmn700_ccg_ctx.is_prog_for_port_agg);
+    unsigned int ccg_ldid;
 
+    ccg_ldid = get_ldid(ctx, cmn700_ccg_ctx.is_prog_for_port_agg);
     ccg_ha_reg = ctx->ccg_ha_reg_table[ccg_ldid].ccg_ha_reg;
     ccg_haid = cmn700_ccg_ctx.is_prog_for_port_agg ?
         config->port_aggregate_haid :
@@ -304,7 +316,7 @@ static void program_ccg_ha_raid_to_ldid_lut(
     unsigned int ccg_ldid;
     struct cmn700_ccg_ha_reg *ccg_ha_reg;
 
-    ccg_ldid = get_ldid(cmn700_ccg_ctx.is_prog_for_port_agg);
+    ccg_ldid = get_ldid(ctx, cmn700_ccg_ctx.is_prog_for_port_agg);
     ccg_ha_reg = ctx->ccg_ha_reg_table[ccg_ldid].ccg_ha_reg;
 
     /* Each 64-bit RAID-to-LDID register holds 4 mappings, 16 bits each. */
@@ -393,7 +405,7 @@ static void enable_smp_mode(
     struct cmn700_ccg_ra_reg *ccg_ra_reg;
     struct cmn700_ccg_ha_reg *ccg_ha_reg;
 
-    ccg_ldid = get_ldid(cmn700_ccg_ctx.is_prog_for_port_agg);
+    ccg_ldid = get_ldid(ctx, cmn700_ccg_ctx.is_prog_for_port_agg);
     ccg_ra_reg = ctx->ccg_ra_reg_table[ccg_ldid].ccg_ra_reg;
     ccg_ha_reg = ctx->ccg_ha_reg_table[ccg_ldid].ccg_ha_reg;
 
@@ -416,7 +428,7 @@ static void program_ccg_ra_sam_addr_region(
     unsigned int remote_haid;
     struct cmn700_ccg_ra_reg *ccg_ra_reg;
 
-    ccg_ldid = get_ldid(cmn700_ccg_ctx.is_prog_for_port_agg);
+    ccg_ldid = get_ldid(ctx, cmn700_ccg_ctx.is_prog_for_port_agg);
     ccg_ra_reg = ctx->ccg_ra_reg_table[ccg_ldid].ccg_ra_reg;
 
     FWK_LOG_INFO(
@@ -473,7 +485,7 @@ static int enable_and_start_ccg_link_up_sequence(
     struct cmn700_ccg_ra_reg *ccg_ra_reg;
     struct cmn700_ccg_ha_reg *ccg_ha_reg;
 
-    ccg_ldid = get_ldid(cmn700_ccg_ctx.is_prog_for_port_agg);
+    ccg_ldid = get_ldid(ctx, cmn700_ccg_ctx.is_prog_for_port_agg);
     ccg_ra_reg = ctx->ccg_ra_reg_table[ccg_ldid].ccg_ra_reg;
     ccg_ha_reg = ctx->ccg_ha_reg_table[ccg_ldid].ccg_ha_reg;
 
@@ -729,7 +741,7 @@ int ccg_exchange_protocol_credit(
 
     do {
         config = ccg_config;
-        ccg_ldid = get_ldid(cmn700_ccg_ctx.is_prog_for_port_agg);
+        ccg_ldid = get_ldid(ctx, cmn700_ccg_ctx.is_prog_for_port_agg);
         ccg_ra_reg = ctx->ccg_ra_reg_table[ccg_ldid].ccg_ra_reg;
         ccg_ha_reg = ctx->ccg_ha_reg_table[ccg_ldid].ccg_ha_reg;
 
@@ -772,7 +784,7 @@ int ccg_enter_system_coherency(
 
     do {
         config = ccg_config;
-        ccg_ldid = get_ldid(cmn700_ccg_ctx.is_prog_for_port_agg);
+        ccg_ldid = get_ldid(ctx, cmn700_ccg_ctx.is_prog_for_port_agg);
         ccg_ha_reg = ctx->ccg_ha_reg_table[ccg_ldid].ccg_ha_reg;
 
         /* Current support enables Link 0 only */
@@ -829,7 +841,7 @@ int ccg_enter_dvm_domain(
 
     do {
         config = ccg_config;
-        ccg_ldid = get_ldid(cmn700_ccg_ctx.is_prog_for_port_agg);
+        ccg_ldid = get_ldid(ctx, cmn700_ccg_ctx.is_prog_for_port_agg);
         ccg_ra_reg = ctx->ccg_ra_reg_table[ccg_ldid].ccg_ra_reg;
 
         /* Current support enables Link 0 only */
