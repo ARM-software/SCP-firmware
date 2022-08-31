@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -48,9 +48,6 @@ static struct {
     /* Timer module API */
     const struct mod_timer_api *timer_api;
 
-    /* Running platform */
-    enum juno_idx_platform platform;
-
     /* Whether power domain-sensitive peripherals are initialized */
     bool periph_initialized;
 } ctx;
@@ -58,6 +55,7 @@ static struct {
 static const fwk_id_t pd_source_id =
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN, POWER_DOMAIN_IDX_SYSTOP);
 
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
 /*
  * Utility Functions
  */
@@ -109,6 +107,8 @@ static bool pcie_check_link_up(void *data)
              PCIE_BASIC_STATUS_NEG_LINK_WIDTH_MASK) != 0);
 }
 
+#endif
+
 static void smc_configure(void)
 {
     uint32_t smc_cycles = 0;
@@ -124,6 +124,8 @@ static void smc_configure(void)
 
     juno_utils_smc_init();
 }
+
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
 
 static void nic400_configure(void)
 {
@@ -156,6 +158,8 @@ static void pcsm_configure(void)
     }
 }
 
+#endif
+
 static void scc_configure(void)
 {
     /* Ensure all SoC devices are released from reset */
@@ -165,6 +169,8 @@ static void scc_configure(void)
     /* Configure SMC Masks: CS6/CS7 are not used */
     SCC->SMC_MASK[3] = 0xFF00FF00;
 }
+
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
 
 static int pcie_configure(void)
 {
@@ -311,6 +317,8 @@ static int pcie_configure(void)
     return FWK_SUCCESS;
 }
 
+#endif
+
 static int initialize_peripherals(void)
 {
     int status = FWK_SUCCESS;
@@ -319,9 +327,9 @@ static int initialize_peripherals(void)
         return status;
     }
 
-    if (ctx.platform == JUNO_IDX_PLATFORM_RTL) {
-        status = pcie_configure();
-    }
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
+    status = pcie_configure();
+#endif
 
     smc_configure();
 
@@ -370,16 +378,11 @@ static int juno_ram_start(fwk_id_t id)
 
     fwk_assert(fwk_module_is_valid_module_id(id));
 
-    status = juno_id_get_platform(&ctx.platform);
-    if (!fwk_expect(status == FWK_SUCCESS)) {
-        return FWK_E_PANIC;
-    }
+#if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
+    nic400_configure();
 
-    if (ctx.platform == JUNO_IDX_PLATFORM_RTL) {
-        nic400_configure();
-
-        pcsm_configure();
-    }
+    pcsm_configure();
+#endif
 
     scc_configure();
 
