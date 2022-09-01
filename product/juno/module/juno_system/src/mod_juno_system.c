@@ -58,9 +58,6 @@ struct juno_system_ctx {
     /* XRP7724 PMIC API */
     const struct mod_juno_xrp7724_api_system_mode *juno_xrp7724_api;
 
-    /* Running platform identifier */
-    enum juno_idx_platform platform_id;
-
     struct psu_ctx {
         /* PSU API */
         const struct mod_psu_device_api *api;
@@ -158,14 +155,7 @@ static int juno_system_module_init(fwk_id_t module_id,
                                    unsigned int element_count,
                                    const void *data)
 {
-    int status;
-
     fwk_assert(element_count == 0);
-
-    status = juno_id_get_platform(&juno_system_ctx.platform_id);
-    if (!fwk_expect(status == FWK_SUCCESS)) {
-        return FWK_E_PANIC;
-    }
 
     return FWK_SUCCESS;
 }
@@ -185,24 +175,19 @@ static int juno_system_bind(fwk_id_t id, unsigned int round)
         return FWK_E_HANDLER;
     }
 
-    if (juno_system_ctx.platform_id != JUNO_IDX_PLATFORM_RTL) {
-        return FWK_SUCCESS;
-    } else {
-        status = fwk_module_bind(
-            gpu_psu_id, psu_api_id, &juno_system_ctx.psu_ctx.api);
-        if (status != FWK_SUCCESS) {
-            return FWK_E_PANIC;
-        }
-
 #if (PLATFORM_VARIANT == JUNO_VARIANT_BOARD)
-        return fwk_module_bind(
-            fwk_module_id_juno_xrp7724,
-            mod_juno_xrp7724_api_id_system_mode,
-            &juno_system_ctx.juno_xrp7724_api);
-#elif (PLATFORM_VARIANT == JUNO_VARIANT_FVP)
-        return status;
-#endif
+    status =
+        fwk_module_bind(gpu_psu_id, psu_api_id, &juno_system_ctx.psu_ctx.api);
+    if (status != FWK_SUCCESS) {
+        return FWK_E_PANIC;
     }
+
+    return fwk_module_bind(
+        fwk_module_id_juno_xrp7724,
+        mod_juno_xrp7724_api_id_system_mode,
+        &juno_system_ctx.juno_xrp7724_api);
+#endif
+    return FWK_SUCCESS;
 }
 
 static int juno_system_process_bind_request(fwk_id_t source_id,
