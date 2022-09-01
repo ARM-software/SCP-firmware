@@ -507,25 +507,12 @@ static int juno_xrp7724_init(fwk_id_t module_id,
                              unsigned int element_count,
                              const void *data)
 {
-    int status;
-    enum juno_idx_platform platform_id;
-
     fwk_assert(data != NULL);
 
     module_ctx.config = (struct mod_juno_xrp7724_config *)data;
 
     ctx_table = fwk_mm_calloc(element_count,
         sizeof(struct juno_xrp7724_dev_ctx));
-
-    status = juno_id_get_platform(&platform_id);
-    if (!fwk_expect(status == FWK_SUCCESS)) {
-        return FWK_E_PANIC;
-    }
-
-    if (platform_id == JUNO_IDX_PLATFORM_FVP) {
-        /* XRP7724 hardware is only available in the board */
-        module_ctx.driver_skipped = true;
-    }
 
     return FWK_SUCCESS;
 }
