@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -450,22 +450,12 @@ static int juno_pvt_init(fwk_id_t module_id,
                          const void *data)
 {
     int status;
-    enum juno_idx_platform plat;
 
     if (element_count == 0) {
         return FWK_E_PARAM;
     }
 
     dev_ctx = fwk_mm_calloc(element_count, sizeof(struct pvt_dev_ctx));
-
-    status = juno_id_get_platform(&plat);
-    if (status != FWK_SUCCESS) {
-        return status;
-    }
-
-    if (plat == JUNO_IDX_PLATFORM_FVP) {
-        mod_ctx.driver_is_disabled = true;
-    }
 
     status = juno_id_get_revision(&mod_ctx.board_rev);
     if (status != FWK_SUCCESS) {
