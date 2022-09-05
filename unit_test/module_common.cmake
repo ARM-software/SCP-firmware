@@ -120,3 +120,5 @@ if(TEST_ON_HOST)
     # Add test to CTest
     add_test(NAME ${UNIT_TEST_TARGET} COMMAND ${UNIT_TEST_TARGET})
 endif()
+
+unset(MOCK_REPLACEMENTS)
