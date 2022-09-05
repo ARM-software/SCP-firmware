@@ -35,7 +35,7 @@ list(PREPEND SCP_MODULE_PATHS
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_SOURCE_DIR}/module/apremap")
 list(PREPEND SCP_MODULE_PATHS
-     "${CMAKE_SOURCE_DIR}/module/pcie_integ_ctrl")
+     "${CMAKE_CURRENT_LIST_DIR}/../module/pcie_integ_ctrl")
 
 # The order of the modules in the following list is the order in which the
 # modules are initialized, bound, started during the pre-runtime phase.
