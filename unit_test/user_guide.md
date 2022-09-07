@@ -241,7 +241,7 @@ the complete code can be found in:
             │   └── Mockmod_scmi_extra.h
             ├── mod_scmi_extra.h
             ├── mod_scmi_unit_test.c
-            ├── scmi.cmake
+            ├── CMakeLists.txt
             └── fwk_module_idx.h
 
 ```
@@ -314,7 +314,7 @@ see product/juno/scp_ut
 
 2. The target firmware must include module/ut to execute the test required
 
-3. Follow TEST_ON_TARGET and TEST_ON_HOST in test/module/scmi/scmi.cmake
+3. Follow TEST_ON_TARGET and TEST_ON_HOST in test/module/scmi/CMakeLists.txt
 to understand setup needed building test that can be executed on target
 
 4. Platform must provide definition for plat_execute_all_tests which

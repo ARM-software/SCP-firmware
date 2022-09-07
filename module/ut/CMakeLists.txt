@@ -19,7 +19,8 @@ target_sources(${SCP_MODULE_TARGET}
                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_ut.c")
 
 set(UNIT_TEST_TARGET ${SCP_MODULE_TARGET})
-include(${CMAKE_SOURCE_DIR}/module/scmi/test/scmi.cmake)
+add_subdirectory(${CMAKE_SOURCE_DIR}/module/scmi/test
+    ${CMAKE_BINARY_DIR}/module/scmi/test)
 
 set(UNIT_TEST_ROOT ${CMAKE_SOURCE_DIR}/unit_test)
 
