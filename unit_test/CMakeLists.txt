@@ -105,7 +105,7 @@ list(APPEND FWK_SRC ${UNITY_SRC_ROOT}/unity.c)
 
 list(APPEND SCP_UNITY_SRC ${TEST_ROOT}/unity_mocks/scp_unity.c)
 
-#Append new unit tests below here
+#Append common unit tests below here
 list(APPEND UNIT_MODULE scmi)
 list(APPEND UNIT_MODULE scmi_clock)
 list(APPEND UNIT_MODULE scmi_perf)
@@ -124,6 +124,7 @@ foreach(idx RANGE ${UNIT_TEST_MAX})
 
     list(GET UNIT_MODULE ${idx} TEST_MODULE)
 
-    # Include .cmake file of the module under test
-    include(${SCP_ROOT}/module/${TEST_MODULE}/test/${TEST_MODULE}.cmake)
+    add_subdirectory(${SCP_ROOT}/module/${TEST_MODULE}/test
+        ${CMAKE_BINARY_DIR}/${TEST_MODULE})
+
 endforeach()
