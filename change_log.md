@@ -3,6 +3,108 @@ SCP-firmware Change Log
 
 Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
 
+SCP-firmware - version 2.11
+============================
+
+New features
+------------
+
+- Architecture:
+    - ARMv8-M support and V8 MPU support
+
+- New modules:
+    - SCMI requester core module support
+    - SCMI Sensor requester module
+    - Transport module
+    - MHUv3 support
+
+- Platforms:
+    - TC2 platform support
+    - rdfremont: Add new plaform (initial support)
+
+- Tools:
+    - Update CMSIS to newer version 5.8.0
+    - Unit Test framework and Mocking
+
+Changed
+-------
+
+- Build system:
+    - ci: Print build output/information
+    - cmake: update LLVM to ver 13
+
+- Framework:
+    - fwk: Add support of OS interrupt operation
+    - fwk: Add stop sequence
+
+- Platforms:
+    - n1sdp: Introduce trusted board boot
+    - n1sdp: Replace sensor library with a dummy source file
+    - product/rdn2: add support for rdn2 platform variant 2
+    - product/rdn2: Update configuration data for SCMI perf
+    - product/rdv1mc: Update configuration data for SCMI perf
+    - product/rdv1: Update configuration data for SCMI perf
+    - rdn2: Add variant 1 and 2
+    - product/rdn2: enable sp805 watchdog module
+    - product/tc2: Add support for TC2/RSS boot flow
+
+- Modules:
+    - scmi: separate scmi base protocol
+    - fip: extend fip module to accept custom uuid through module config
+    - scmi-perf: move fast channel alarm to event context
+    - thermal-mgmt: Move power allocation to a separate file
+    - sensor: typedef included to give signed or unsigned value options
+    - power-mgmt: add per-domain control loop
+    - thermal-mgmt: add temperature protection functionality
+    - SCMI: Rename BUILD_HAS_FAST_CHANNELS with _SCMI_PERF_
+    - scmi: add unit tests
+    - scmi_clock: add unit test
+    - module/mhu2: add support for transport module and in-band messages
+    - scmi_perf: Add initial unit tests
+
+Resolved issues
+---------------
+
+- Build system:
+    - ci_cmake: Add flag to skip container execution
+    - cmake: Fix ArmClang generated images
+    - ci: fix pycodestyle violations in ci_cmake.py
+    - CMake: Add elf extension to firmware target
+
+- Modules:
+    - modules: Compile without notifications
+    - scmi_clock: fix set_rate flag mask defect
+    - cmn700: fix SYS_CACHE_GRP_SN_NODEID calculation
+    - cmn700: ccg: various fixes
+
+- Platforms:
+    - morello: fix timestamp in debug logs
+    - product/morello: align DVFS frequency values of FVP with SoC
+    - juno: Fix the number of rates returns for triplet rate array format
+
+- CLI:
+    - cli: stop alarm when cli is open
+
+Remarks
+-------
+
+The codebase attempts to follow MISRA-2012 rules to the extent detailed in
+doc/code_rules.md.
+
+The maintainers are gradually introducing tools in the attempt to improve the
+overall robustness of the codebase. Since v.2.10, Unit Testing has been
+introduced on a module-level. The final aim is to run unit tests for any new
+modules and any new additions to modules. To allow contributors to some time to
+familiarise with the tool and to avoid imposing additional efforts
+out-of-the-blue, in this release we ask contributors to provide basic unit tests
+for new modules and new additions. This can be done by adding unit tests on the
+same patches adding new features or in separate patches, but need to be within
+the same PR. For work that is already in the RFC in PR, we may make an exception
+to the request.
+We foresee that once the unit test framework support is consolidated, it will be
+possible to contribute to the project only if unit test is also included in the
+contributions.
+
 SCP-firmware - version 2.10
 ============================
 
