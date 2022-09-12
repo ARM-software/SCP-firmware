@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -90,6 +90,8 @@ enum rdn2cfg2_cmn700_ccg_port {
 #    define NODE_ID_HNP2 0x15c
 #    define NODE_ID_HNP3 0x16a
 #    define NODE_ID_SBSX 196
+
+#    define NODE_ID_NON_PCIE_IO_MACRO NODE_ID_HNP1
 
 #    define MESH_SIZE_X 6
 #    define MESH_SIZE_Y 6
@@ -484,7 +486,6 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_HND,
     },
-#if (PLATFORM_VARIANT != 2)
     {
         /*
          * Non-PCIe IO Macro
@@ -495,7 +496,6 @@ static const struct mod_cmn700_mem_region_map mmap[] = {
         .type = MOD_CMN700_MEM_REGION_TYPE_IO,
         .node_id = NODE_ID_NON_PCIE_IO_MACRO,
     },
-#endif
 };
 
 #if (PLATFORM_VARIANT == 2)
