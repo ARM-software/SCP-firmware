@@ -23,7 +23,7 @@ static const struct fwk_element subsystem_table[] = {
               .part_number = 0x7B6,
 #endif
           } },
-    { .name = "RD-Edmunds",
+    { .name = "RD-V2",
       .data =
           &(struct mod_sid_subsystem_config){
               .part_number = 0x7F2,
