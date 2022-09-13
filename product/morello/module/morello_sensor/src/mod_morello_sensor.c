@@ -47,6 +47,42 @@ static const char *const sensor_type_name[MOD_MORELLO_VOLT_SENSOR_COUNT] = {
 /*
  * Module API
  */
+static int get_info(fwk_id_t element_id, struct mod_sensor_info *info)
+{
+    struct morello_temp_sensor_ctx *t_dev_ctx;
+    struct morello_volt_sensor_ctx *v_dev_ctx;
+    unsigned int el_idx;
+    uint8_t t_sensor_count;
+    uint8_t v_sensor_count;
+
+    el_idx = fwk_id_get_element_idx(element_id);
+    t_sensor_count = sensor_ctx.module_config->t_sensor_count;
+    v_sensor_count = sensor_ctx.module_config->v_sensor_count;
+
+    if (el_idx > (t_sensor_count + v_sensor_count)) {
+        return FWK_E_PARAM;
+    }
+
+    if (el_idx < t_sensor_count) {
+        t_dev_ctx = &sensor_ctx.t_dev_ctx_table[el_idx];
+        if (t_dev_ctx == NULL) {
+            return FWK_E_DATA;
+        }
+
+        *info = *(t_dev_ctx->config->info);
+
+    } else {
+        v_dev_ctx = &sensor_ctx.v_dev_ctx_table[el_idx - t_sensor_count];
+        if (v_dev_ctx == NULL) {
+            return FWK_E_DATA;
+        }
+
+        *info = *(v_dev_ctx->config->info);
+    }
+
+    return FWK_SUCCESS;
+}
+
 static int get_value(fwk_id_t element_id, mod_sensor_value_t *value)
 {
 #ifdef BUILD_HAS_SENSOR_SIGNED_VALUE
@@ -81,6 +117,7 @@ static int get_value(fwk_id_t element_id, mod_sensor_value_t *value)
 
 static const struct mod_sensor_driver_api morello_sensor_api = {
     .get_value = get_value,
+    .get_info = get_info,
 };
 
 /*

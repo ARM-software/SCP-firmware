@@ -17,8 +17,6 @@ set(SCP_TOOLCHAIN_INIT "GNU")
 
 set(SCP_GENERATE_FLAT_BINARY_INIT TRUE)
 
-set(SCP_ENABLE_NOTIFICATIONS_INIT TRUE)
-
 set(SCP_ARCHITECTURE "arm-m")
 
 set(SCP_ENABLE_NOTIFICATIONS_INIT TRUE)
@@ -73,6 +71,7 @@ list(APPEND SCP_MODULES "dvfs")
 list(APPEND SCP_MODULES "psu")
 list(APPEND SCP_MODULES "mock-psu")
 list(APPEND SCP_MODULES "scmi-power-domain")
+list(APPEND SCP_MODULES "scmi-sensor")
 list(APPEND SCP_MODULES "scmi-clock")
 list(APPEND SCP_MODULES "scmi-system-power")
 list(APPEND SCP_MODULES "scmi-perf")
