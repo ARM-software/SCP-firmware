@@ -319,6 +319,12 @@ static int tcop_start(fwk_id_t id)
         }
     }
 
+    /*
+     * Evaluate limits right now to initialise the limits accordingly with the
+     * known initial power status of cores.
+     */
+    domain_ctx->perf_limit = tcop_evaluate_perf_limit(domain_ctx);
+
     return FWK_SUCCESS;
 }
 
