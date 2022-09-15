@@ -493,8 +493,8 @@ static const struct mod_cmn700_ccg_config ccg_config_table_chip_0[] = {
         },
         .remote_agentid_to_linkid_map = {
             {
-                .remote_agentid_start = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0),
-                .remote_agentid_end = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_0) +
+                .remote_agentid_start = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_1),
+                .remote_agentid_end = (RNF_PER_CHIP_CFG2 * PLATFORM_CHIP_1) +
                     RNF_PER_CHIP_CFG2 - 1
             },
         },
