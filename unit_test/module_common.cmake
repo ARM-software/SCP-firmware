@@ -8,12 +8,12 @@
 if(TEST_ON_HOST)
     # Duplicate list of framework sources to be added to build
     foreach(fwk_src IN LISTS FWK_SRC)
-        list(APPEND ${TEST_MODULE}_FWK_SRC ${fwk_src})
+        list(APPEND ${TEST_FILE}_FWK_SRC ${fwk_src})
     endforeach()
 
     # Duplicate list of framework mock sources to be added to build
     foreach(fwk_mock_src IN LISTS FWK_MOCK_SRC)
-        list(APPEND ${TEST_MODULE}_FWK_MOCK_SRC ${fwk_mock_src})
+        list(APPEND ${TEST_FILE}_FWK_MOCK_SRC ${fwk_mock_src})
     endforeach()
 
     # Create unit test target
@@ -69,14 +69,14 @@ if(TEST_ON_HOST)
     if(EXISTS ${MODULE_UT_INC}/fwk_module_idx.h)
         target_compile_definitions(
             ${UNIT_TEST_TARGET}
-            PRIVATE "FWK_TEST_MODULE_IDX_H=\"${${TEST_TARGET}_MODULE_IDX_H}\"")
+            PRIVATE "FWK_TEST_FILE_IDX_H=\"${${TEST_TARGET}_MODULE_IDX_H}\"")
     endif()
 
     macro(replace_with_mock FILENAME)
-        list(FILTER ${TEST_MODULE}_FWK_SRC EXCLUDE REGEX "${FILENAME}.c")
-        list(APPEND ${TEST_MODULE}_FWK_SRC ${FWK_MOCKS_SRC_ROOT}/Mock${FILENAME}.c)
+        list(FILTER ${TEST_FILE}_FWK_SRC EXCLUDE REGEX "${FILENAME}.c")
+        list(APPEND ${TEST_FILE}_FWK_SRC ${FWK_MOCKS_SRC_ROOT}/Mock${FILENAME}.c)
         if(EXISTS ${FWK_MOCKS_SRC_ROOT}/internal/Mock${FILENAME}_internal.c)
-            list(APPEND ${TEST_MODULE}_FWK_SRC
+            list(APPEND ${TEST_FILE}_FWK_SRC
                         ${FWK_MOCKS_SRC_ROOT}/internal/Mock${FILENAME}_internal.c)
         endif()
     endmacro()
@@ -84,19 +84,19 @@ if(TEST_ON_HOST)
     foreach(MOCK IN LISTS MOCK_REPLACEMENTS)
         if(${MOCK} STREQUAL fwk_notify)
             target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC "BUILD_HAS_NOTIFICATION")
-            list(APPEND ${TEST_MODULE}_FWK_SRC ${FWK_MOCKS_SRC_ROOT}/Mockfwk_notification.c)
-            list(APPEND ${TEST_MODULE}_FWK_SRC
+            list(APPEND ${TEST_FILE}_FWK_SRC ${FWK_MOCKS_SRC_ROOT}/Mockfwk_notification.c)
+            list(APPEND ${TEST_FILE}_FWK_SRC
                         ${FWK_MOCKS_SRC_ROOT}/internal/Mockfwk_notification_internal.c)
         elseif(${MOCK} STREQUAL fwk_core)
             replace_with_mock(fwk_core)
-            list(FILTER ${TEST_MODULE}_FWK_SRC EXCLUDE REGEX "fwk_delayed_resp.c")
+            list(FILTER ${TEST_FILE}_FWK_SRC EXCLUDE REGEX "fwk_delayed_resp.c")
         else()
             replace_with_mock(${MOCK})
         endif()
     endforeach()
 
-    target_sources(${UNIT_TEST_TARGET} PRIVATE ${${TEST_MODULE}_FWK_SRC}
-                   ${${TEST_MODULE}_FWK_MOCK_SRC})
+    target_sources(${UNIT_TEST_TARGET} PRIVATE ${${TEST_FILE}_FWK_SRC}
+                   ${${TEST_FILE}_FWK_MOCK_SRC})
 
     target_compile_definitions(
         ${UNIT_TEST_TARGET}
