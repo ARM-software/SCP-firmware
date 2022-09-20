@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -41,8 +41,8 @@
 
 #define DRAM_AREA_1_START_ADDR UINT64_C(0x0080000000)
 
-/* top 64MiB in DRAM1 region is reserved for Secure App */
-#define DRAM_RESERVED_FOR_SECURE_APP_SIZE UINT64_C(0x04000000)
+/* top 66MiB in DRAM1 region is reserved for Secure App */
+#define DRAM_RESERVED_FOR_SECURE_APP_SIZE UINT64_C(0x04200000)
 #define DRAM_AREA_1_END_ADDR UINT64_C(0x0100000000)
 #define DRAM_AREA_2_START_ADDR UINT64_C(0x0880000000)
 #define DRAM_AREA_2_END_ADDR UINT64_C(0x1000000000)

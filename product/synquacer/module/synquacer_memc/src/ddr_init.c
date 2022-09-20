@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -186,10 +186,10 @@ int ddr_ch0_init_mp(void)
 
     ddr_init_mc0_mp(REG_DMC520_0);
 
-    /* allocate 60MiB secure DRAM for OP-TEE */
+    /* allocate 62MiB secure DRAM for secure software */
     if (ddr_is_secure_dram_enabled()) {
         FWK_LOG_INFO("[DDR] secure DRAM enabled");
-        REG_DMC520_0->access_address_min0_31_00_next = 0xFC00000C;
+        REG_DMC520_0->access_address_min0_31_00_next = 0xFBE0000C;
         REG_DMC520_0->access_address_min0_43_32_next = 0x00000000;
         REG_DMC520_0->access_address_max0_31_00_next = 0xFFBF0000;
         REG_DMC520_0->access_address_max0_43_32_next = 0x00000000;
