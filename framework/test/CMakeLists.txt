@@ -9,7 +9,7 @@ cmake_minimum_required(VERSION 3.18.3)
 
 project(
     SCP_FWK_TEST
-    VERSION 2.10.0
+    VERSION 2.11.0
     DESCRIPTION "Arm SCP/MCP Software Framework tests"
     HOMEPAGE_URL
         "https://developer.arm.com/tools-and-software/open-source-software/firmware/scp-firmware"
