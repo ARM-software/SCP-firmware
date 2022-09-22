@@ -53,7 +53,7 @@ struct perf_plugins_dev_ctx {
     uint32_t lmin;
 };
 
-struct perf_plugins_ctx {
+struct perf_plugins_mod_ctx {
     struct perf_plugins_api **plugins_api_table;
 
     const struct mod_scmi_perf_config *config;
@@ -78,7 +78,7 @@ struct perf_plugins_ctx {
     size_t dvfs_doms_count;
 };
 
-static struct perf_plugins_ctx perf_plugins_ctx;
+static struct perf_plugins_mod_ctx perf_plugins_ctx;
 
 static inline struct perf_plugins_dev_ctx *perf_ph_get_ctx(fwk_id_t domain_id)
 {
@@ -413,7 +413,7 @@ void perf_plugins_handler_update(
     unsigned int perf_dom_idx,
     struct fc_perf_update *fc_update)
 {
-    struct perf_plugins_api *api;
+    struct perf_plugins_api *plugin_api;
     struct perf_plugins_perf_update perf_snapshot;
     unsigned int this_dom_idx, last_logical_dom_idx;
     struct perf_plugins_dev_ctx *dev_ctx;
@@ -451,8 +451,8 @@ void perf_plugins_handler_update(
             assign_data_for_plugins(
                 fc_update->domain_id, &perf_snapshot, dom_type);
 
-            api = perf_plugins_ctx.plugins_api_table[i];
-            status = api->update(&perf_snapshot);
+            plugin_api = perf_plugins_ctx.plugins_api_table[i];
+            status = plugin_api->update(&perf_snapshot);
             if (status != FWK_SUCCESS) {
                 FWK_LOG_DEBUG(
                     "[P-Handler] Update: Plugin%u returned error %i",
@@ -501,7 +501,7 @@ void perf_plugins_handler_get(
 void perf_plugins_handler_report(struct perf_plugins_perf_report *data)
 {
     const struct mod_scmi_perf_config *config;
-    struct perf_plugins_api *api;
+    struct perf_plugins_api *plugin_api;
     int status;
 
     config = perf_plugins_ctx.config;
@@ -511,10 +511,10 @@ void perf_plugins_handler_report(struct perf_plugins_perf_report *data)
     }
 
     for (size_t i = 0; i < config->plugins_count; i++) {
-        api = perf_plugins_ctx.plugins_api_table[i];
+        plugin_api = perf_plugins_ctx.plugins_api_table[i];
 
-        if (api->report != NULL) {
-            status = api->report(data);
+        if (plugin_api->report != NULL) {
+            status = plugin_api->report(data);
             if (status != FWK_SUCCESS) {
                 FWK_LOG_DEBUG(
                     "[P-Handler] Report: Plugin%u returned error %i",
@@ -685,9 +685,9 @@ int perf_plugins_handler_process_bind_request(
     fwk_id_t source_id,
     fwk_id_t target_id,
     fwk_id_t api_id,
-    const void **api)
+    const void **ph_process_bind_request_api)
 {
-    *api = &handler_api;
+    *ph_process_bind_request_api = &handler_api;
 
     return FWK_SUCCESS;
 }
