@@ -22,12 +22,12 @@ static const fwk_id_t mod_thermal_event_id_read_temp = FWK_ID_EVENT_INIT(
 
 static struct mod_thermal_mgmt_ctx mod_ctx;
 
-inline struct mod_thermal_mgmt_dev_ctx *get_dev_ctx(fwk_id_t id)
+struct mod_thermal_mgmt_dev_ctx *get_dev_ctx(fwk_id_t id)
 {
     return &mod_ctx.dev_ctx_table[fwk_id_get_element_idx(id)];
 }
 
-inline struct mod_thermal_mgmt_actor_ctx *get_actor_ctx(
+struct mod_thermal_mgmt_actor_ctx *get_actor_ctx(
     struct mod_thermal_mgmt_dev_ctx *dev_ctx,
     unsigned int actor)
 {
@@ -216,7 +216,7 @@ static int thermal_update(struct perf_plugins_perf_update *data)
     return FWK_SUCCESS;
 }
 
-struct perf_plugins_api perf_plugins_api = {
+struct perf_plugins_api mod_thermal_perf_plugins_api = {
     .update = thermal_update,
 };
 
@@ -320,7 +320,7 @@ static int thermal_mgmt_bind(fwk_id_t id, unsigned int round)
         return FWK_E_PANIC;
     }
 
-    if (dev_ctx->config->temp_protection) {
+    if (dev_ctx->config->temp_protection != NULL) {
         /* Bind to thermal protection driver */
         status = fwk_module_bind(
             dev_ctx->config->temp_protection->driver_id,
@@ -347,9 +347,9 @@ static int thermal_mgmt_process_bind_request(
     fwk_id_t source_id,
     fwk_id_t target_id,
     fwk_id_t api_id,
-    const void **api)
+    const void **thermal_bind_request_api)
 {
-    *api = &perf_plugins_api;
+    *thermal_bind_request_api = &mod_thermal_perf_plugins_api;
 
     return FWK_SUCCESS;
 }
