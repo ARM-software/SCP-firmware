@@ -869,7 +869,7 @@ FWK_WEAK int scmi_pd_power_state_set_policy(
         uint32_t dev_state_idx;
         uint32_t dev_state_table_size = sizeof(pd_state_to_scmi_dev_state) /
             sizeof(pd_state_to_scmi_dev_state[0]);
-        uint32_t dev_state = *state & SCMI_PD_DEVICE_STATE_ID_MASK;
+        uint32_t dev_state = *state;
         /*
          * Convert the device SCMI power state sent by the agent,
          * into the internal power domain state as defined by the
