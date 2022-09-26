@@ -12,7 +12,7 @@ Running SCP-firmware on Fixed Virtual Platform (FVP) models requires at least
 12GB of available memory. A multicore CPU is highly recommended to maintain
 smooth operation.
 
-This software has been tested on Ubuntu 18.04 LTS (64-bit).
+This software has been tested on Ubuntu 20.04 LTS (64-bit).
 
 ## Prerequisites
 
@@ -21,17 +21,17 @@ required:
 
 - [GNU Make] (*4.2* or later)
 - [CMake] (*3.18.4* or later)
-- [Python 3] (*3.6.9* or later)
+- [Python 3] (*3.7.9* or later)
 
 [GNU Make]: https://www.gnu.org/software/make/
-[Python 3]: https://www.python.org/downloads/release/python-369/
+[Python 3]: https://www.python.org/downloads/release/python-379/
 [CMake]: https://cmake.org/
 
 Additionally, the firmware may be built using one of three compilers:
 
-- [GNU Arm Embedded Toolchain] (*9-2019-q4* or later)
+- [GNU Arm Embedded Toolchain] (*10.3-2021.10* or later)
 - [Arm Compiler 6] (*6.13* or later)
-- [LLVM Toolchain] (*11* or later)
+- [LLVM Toolchain] (*13.0.1* or later)
 
 [GNU Arm Embedded Toolchain]:
 https://developer.arm.com/open-source/gnu-toolchain/gnu-rm
@@ -39,8 +39,6 @@ https://developer.arm.com/open-source/gnu-toolchain/gnu-rm
 https://developer.arm.com/tools-and-software/embedded/arm-compiler/downloads/version-6
 [LLVM Toolchain]: https://releases.llvm.org/download.html
 
-For Juno, it is required to have a more recent of GNU Arm embedded toolchain.
-We recommend to use at least the following release: 9-2019-q4-major.
 
 If building using the LLVM toolchain, the [GNU Arm Embedded Toolchain] is also
 required for the Arm standard library and headers that ship with it. When
@@ -56,13 +54,20 @@ The following tools are recommended but not required:
 order to run the tests suites
 - [ARM GCC GNU-A toolchain] (*7.4.0* or later): Required to build framework
 tests that run on the host system
-- [lcov] ("1.13" or later): Required to run unit test framework
+- [lcov] (*1.13* or later): Required to run unit test framework
+- [cppcheck] (*1.90*): Required during build process to check the code
+- [ninja-build] (*1.10.0* or later): Default build system to compile the project
+UNIX-Make is a suitable alternative if preferred.
+- [clang-format] (*10.0.0* or later): Automatic code formatter.
 
 [Doxygen]: http://www.doxygen.nl/
 [AArch64 GCC toolchain]:
 http://releases.linaro.org/components/toolchain/binaries
 [ARM GCC GNU-A toolchain]:
 https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-a/downloads
+[Cppcheck]: https://github.com/danmar/cppcheck/tree/1.90
+[Ninja-build]: https://ninja-build.org/
+[Clang-format]: https://clang.llvm.org/docs/ClangFormat.html
 
 If building for an Arm FVP platform, you will need to ensure you have [the
 relevant FVP].
@@ -84,10 +89,15 @@ Installing some of these prerequisites can be done on any standard Debian-based
 system with the following:
 
 ```sh
-sudo add-apt-repository ppa:team-gcc-arm-embedded/ppa
-sudo apt update
-sudo apt install build-essential doxygen gcc-arm-embedded git python3 \
-device-tree-compiler
+sudo apt install \
+    build-essential \
+    doxygen \
+    git \
+    python3 \
+    python3-pip \
+    device-tree-compiler \
+    ninja-build \
+    lcov
 ```
 
 For setting up the build system and its requirements (CMake among them), visit
@@ -99,11 +109,11 @@ For the FVP prerequisites:
 sudo apt install xterm
 ```
 
-For code style checks in Python scripts:
+For code style checks in Python scripts (`pip3` needs to be installed):
 
 ```sh
-pip install pycodestyle
-pip install --upgrade pycodestyle
+pip3 install pycodestyle
+pip3 install --upgrade pycodestyle
 sudo apt-get install pep8
 ```
 
@@ -128,8 +138,11 @@ within the source directory with the following:
 https://www.arm.com/why-arm/technologies/cmsis
 
 ```sh
-git submodule update --init
+git submodule update --init --recursive
 ```
+This command will also fetch submodules related to unit testing.For more
+information please refer to the `unit_test/user_guide.md`
+documentation.
 
 ## Documentation
 
@@ -166,11 +179,11 @@ invoking `make` (from within the source directory) is:
 make -f Makefile.cmake PRODUCT=<PRODUCT> [OPTIONS] [TARGET]
 ```
 
-For example, to build the RAM firmware for SGM-775 in debug mode, use the
+For example, to build the RAM firmware for TC2 in debug mode, use the
 following:
 
 ```sh
-make -f Makefile.cmake PRODUCT=sgm775 MODE=debug firmware-scp_ramfw
+make -f Makefile.cmake PRODUCT=tc2 MODE=debug firmware-scp_ramfw
 ```
 
 The `all` target will be used if `[TARGET]` is omitted, which will build all the
@@ -205,33 +218,30 @@ incorporate path to the required toolchain.
 
 #### ARMv7
 
-```sh
-make -f Makefile.cmake PRODUCT=sgm775
-```
-
-__Note:__ if the Compiler-RT builtins are placed in a non conventional folder,
-their absolute path must be passed to LDFLAGS as follows:
+When building for an ARMv7 product the sysroot path of the GNU Arm Embedded
+Toolchain must be passed under the `SYSROOT` environment variable.
 
 ```sh
-make -f Makefile.cmake LDFLAGS=-L/path/to/compiler-rt-builtins PRODUCT=sgm775
+make -f Makefile.cmake PRODUCT=tc2 \
+    LLVM_SYSROOT_CC=/path/to/sysroot
 ```
 
-Otherwise, the Compiler-RT builtins for baremetal are usually placed in:
+The Compiler-RT builtins for baremetal are usually placed in:
 
 ```sh
 /path/to/clang/resource/dir/lib/baremetal
 ```
 
-For a LLVM 11 installation on Ubuntu this could be:
+For a LLVM 13 installation on Ubuntu this could be:
 
 ```sh
-/usr/lib/llvm-11/lib/clang/11.0.1/lib/baremetal
+/usr/lib/llvm-13/lib/clang/13.0.1/lib/baremetal
 ```
 
-You can discover the resource dir of your Clang 11 installation by running:
+You can discover the resource dir of your Clang 13 installation by running:
 
 ```sh
-clang-11 -print-resource-dir
+clang-13 -print-resource-dir
 ```
 
 #### ARMv8
@@ -242,120 +252,53 @@ Toolchain must be passed under the `SYSROOT` environment variable.
 Building example for all of the R-Car targets:
 
 ```sh
-make -f Makefile.cmake PRODUCT=rcar TOOLCHAIN=GNU
+make -f Makefile.cmake PRODUCT=rcar TOOLCHAIN=GNU \
+    LLVM_SYSROOT_CC=/path/to/sysroot
 ```
 
-## Running the SCP firmware on SGM platforms
+## Running the SCP-firmware on Total Compute (TC) platforms
 
-For an introduction to the System Guidance for Mobile (SGM) platforms, please
-refer to [the Arm Developer documentation].
+For setting up the environment, installing all dependencies, configuration,
+building the system and running it on an FVP, please refer to, and follow, the
+[TC2 User Guide]. Bear in mind that the installation process might require root
+privileges.
 
-[the Arm Developer documentation]:
-https://community.arm.com/developer/tools-software/oss-platforms/w/docs/388/system-guidance-for-mobile-sgm
+[TC2 User guide]:
+https://gitlab.arm.com/arm-reference-solutions/arm-reference-solutions-docs/-/blob/master/docs/totalcompute/tc2/user-guide.rst
 
-The instructions within this section use SGM-775 as an example platform, but
-they are relevant for all SGM platforms.
+The instructions within this section use TC2 BSP only without Android
+(buildroot) as an example platform, but they are relevant for all TC platforms.
 
-### Building the images
-
-The build system generates firmware images per the `product.mk` file associated
-with the product. For SGM platforms, two firmware images are built:
-
-- `sgm775-bl1.bin`: SCP ROM firmware image - handles the transfer of the RAM
-    firmware to private SRAM and jumps to it
-- `sgm775-bl2.bin`: SCP RAM firmware image - manages the system runtime services
+After setting up the environment it would be desirable to set a SCP-firmware
+version, to do that please run:
 
 ```sh
-cd ${SCP_PATH} && \
-    make -f Makefile.cmake PRODUCT=sgm775 MODE=debug
-
-export SCP_ROM_PATH=${SCP_PATH}/build/sgm775/GNU/debug/firmware-scp_romfw/\
-bin/sgm775-bl1.bin
-export SCP_RAM_PATH=${SCP_PATH}/build/sgm775/GNU/debug/firmware-scp_ramfw/\
-bin/sgm775-bl2.bin
+cd <tc2_workspace>/src/SCP-firmware
+git fetch <remote name/url> <branch/tag/hash commit id>
+git checkout FETCH_HEAD
 ```
 
-__Note:__ If building with LLVM, make sure to pass the required environment
-variables as noted in [Building with LLVM](#building-with-llvm).
-
-### Booting the firmware
-
-In order for the `sgm775-bl2.bin` firmware image to be loaded, an application
-processor secure world firmware needs to be available to load it. Arm maintains
-the [Arm Trusted Firmware-A (TF-A)] project, which handles this case. The
-remaining instructions assume you are using Trusted Firmware-A.
-
-[Arm Trusted Firmware-A (TF-A)]:
-https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git
-
-On SGM platforms, the SCP images are given alternative names when used in the
-context of TF-A:
-
-- `sgm775-bl1.bin` has the alternative name `scp_bl1`
-- `sgm775-bl2.bin` has the alternative name `scp_bl2`
-
-To boot the SCP firmware on SGM platforms with TF-A, you will need at minimum
-three additional images:
-
-- `bl1`: BL1 - first-stage bootloader stored in the system ROM
-- `bl2`: BL2 - second-stage bootloader loaded by `bl1`, responsible for handing
-    over `scp_bl2` to the SCP
-- `fip`: FIP - firmware image package containing `bl2` and `scp_bl2`
-
-The FIP format acts as a container for a number of commonly-used images in the
-TF-A boot flow. Documentation for the FIP format can be found in the [TF-A
-firmware design documentation].
-
-[TF-A firmware design documentation]:
-https://trustedfirmware-a.readthedocs.io/en/latest/design/firmware-design.html?highlight=fip#firmware-image-package-fip
-
-An example command line to build Arm Trusted Firmware-A for AArch64 is given
-below. Note that you will need to have installed [the prerequisites for building
-Arm Trusted Firmware-A for SGM-775].
-
-[the prerequisites for building Arm Trusted Firmware-A for SGM-775]:
-https://trustedfirmware-a.readthedocs.io/en/latest/getting_started/docs-build.html
+### Build all components
 
 ```sh
-export TFA_PATH=<your Trusted Firmware-A path>
-
-git clone https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git \
-${TFA_PATH}
-
-cd ${TFA_PATH}
-
-make CROSS_COMPILE=aarch64-linux-gnu- DEBUG=1 LOG_LEVEL=30 PLAT=sgm775 \
-    CSS_USE_SCMI_SDS_DRIVER=1 SCP_BL2=<path to scp_bl2> \
-    BL33=<path to bl33file> bl1 bl2 fip
-
-export BL1_PATH=${TFA_PATH}/build/sgm775/debug/bl1.bin
-export BL2_PATH=${TFA_PATH}/build/sgm775/debug/bl2.bin
-export FIP_PATH=${TFA_PATH}/build/sgm775/debug/fip.bin
-
-./tools/fiptool/fiptool create \
-    --tb-fw ${BL2_PATH} \
-    --scp-fw ${SCP_RAM_PATH} \
-        ${FIP_PATH} \
-    --fw-config ${TFA_PATH}/build/sgm775/debug/fdts/sgm775_fw_config.dtb \
-    --tb-fw-config ${TFA_PATH}/build/sgm775/debug/fdts/sgm775_tb_fw_config.dtb
+export PLATFORM=tc2
+export FILESYSTEM=buildroot
+<tc2_workspace>/build-scripts/build-all.sh -p $PLATFORM -f $FILESYSTEM build
 ```
 
-Note that `CSS_USE_SCMI_SDS_DRIVER` is a work-around for the fact that TF-A
-utilises **SCPI** instead of **SCMI** by default, which is not a supported
-configuration for SCP-firmware.
+### Running Buildroot
 
-To simulate the basic SCP boot flow on the SGM-775 FVP, use the following
-command line:
+When all build images are created and deployed you can run the following command
+to test the system in a FVP.
 
 ```sh
-FVP_CSS_SGM-775 \
-    -C css.trustedBootROMloader.fname=${BL1_PATH} \
-    -C css.scp.ROMloader.fname=${SCP_ROM_PATH} \
-    -C board.flashloader0.fname=${FIP_PATH}
+<tc2_workspace>/run-scripts/tc2/run_model.sh -m <model binary path> -d buildroot
 ```
 
-Note that it's expected that TF-A will crash, as we have not provided the full
-bootloader image chain.
+### Obtaining the TC2 FVP
+The TC2 FVP is available to partners for build and run on Linux host
+environments. Please contact Arm to have access (support@arm.com).
+
 
 ## Running the SCP firmware on SGI and Neoverse Reference Design platforms
 
@@ -431,37 +374,88 @@ FVP_CSS_SGI-575 \
 For an introduction to the Juno Development Board, please refer to
 [the Arm Developer documentation].
 
-The instructions within this section are similar to those used for SGM
-platforms, with minor differences.
-
 [the Arm Developer documentation]:
 https://community.arm.com/developer/tools-software/oss-platforms/w/docs/485/juno
 
 ### Building the images
 
-Like for SGM platforms, the build system generates two images. For Juno, an
-additional binary is generated:
+The build system generates firmware images per the `product.mk` file associated
+with the product. For Juno platform, three firmware images are built:
 
-- `scp_romfw_bypass.bin`: SCP ROM bypass firmware image - an alternative ROM
+- `juno-bl1.bin`: SCP ROM firmware image - handles the transfer of the RAM
+    firmware to private SRAM and jumps to it
+- `juno-bl1-bypass.bin`: SCP ROM bypass firmware image - an alternative ROM
     firmware that is loaded from an external non volatile on-board memory.
     This binary needs to be used in order to successfully load the SCP RAM
     firmware, and is chain-loaded from the burned-in ROM on the physical board
     (not necessary for the FVP).
+- `juno-bl2.bin`: SCP RAM firmware image - manages the system runtime services
 
-We recommend using the latest release of Trusted Firmware-A.
+```sh
+cd ${SCP_PATH} && \
+    make -f Makefile.cmake PRODUCT=juno MODE=debug
+
+export SCP_ROM_PATH=${SCP_PATH}/build/juno/GNU/debug/firmware-scp_romfw/\
+bin/juno-bl1.bin
+export SCP_ROM_BYPASS_PATH=${SCP_PATH}/build/juno/GNU/debug/\
+firmware-scp_romfw-byopass/bin/juno-bl1-bypass.bin
+export SCP_RAM_PATH=${SCP_PATH}/build/juno/GNU/debug/firmware-scp_ramfw/\
+bin/juno-bl2.bin
+```
+
+__Note:__ If building with LLVM, make sure to pass the required environment
+variables as noted in [Building with LLVM](#building-with-llvm).
 
 ### Booting the firmware
 
-The same steps for creating the FIP binary described by the SGM platforms
-sections can be applied here. When invoking `make` for TF-A, make sure you
-replace `PLAT=sgm775` with `PLAT=juno`.
+In order for the `juno-bl2.bin` firmware image to be loaded, an application
+processor secure world firmware needs to be available to load it. Arm maintains
+the [Arm Trusted Firmware-A (TF-A)] project, which handles this case. The
+remaining instructions assume you are using Trusted Firmware-A.
 
-Before proceeding with the boot on Juno, make sure you have all of the following
-binaries:
+[Arm Trusted Firmware-A (TF-A)]:
+https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git
 
-- `scp_romfw_bypass.bin`
-- `fip.bin`
-- `bl1.bin`
+To boot the SCP firmware on Juno with TF-A, you will need at minimum
+three additional images:
+
+- `bl1`: BL1 - first-stage bootloader stored in the system ROM
+- `bl2`: BL2 - second-stage bootloader loaded by `bl1`, responsible for handing
+    over `scp_bl2` to the SCP
+- `fip`: FIP - firmware image package containing `bl2` and `scp_bl2`
+
+The FIP format acts as a container for a number of commonly-used images in the
+TF-A boot flow. Documentation for the FIP format can be found in the [TF-A
+firmware design documentation].
+
+[TF-A firmware design documentation]:
+https://trustedfirmware-a.readthedocs.io/en/latest/design/firmware-design.html?highlight=fip#firmware-image-package-fip
+
+An example command line to build Arm Trusted Firmware-A for AArch64 is given
+below. Note that you will need to have installed [the prerequisites for building
+Arm Trusted Firmware-A for Juno].
+
+[the prerequisites for building Arm Trusted Firmware-A for Juno]:
+https://trustedfirmware-a.readthedocs.io/en/latest/getting_started/docs-build.html
+
+
+```sh
+export TFA_PATH=<your Trusted Firmware-A path>
+
+git clone https://git.trustedfirmware.org/TF-A/trusted-firmware-a.git \
+${TFA_PATH}
+
+cd ${TFA_PATH}
+
+make CROSS_COMPILE=aarch64-linux-gnu- DEBUG=1 LOG_LEVEL=30 PLAT=juno \
+    CSS_USE_SCMI_SDS_DRIVER=1 SCP_BL2=<path to scp_bl2> \
+    BL33=<path to bl33file> bl1 bl2 fip
+
+export BL1_PATH=${TFA_PATH}/build/juno/debug/bl1.bin
+export BL2_PATH=${TFA_PATH}/build/juno/debug/bl2.bin
+export FIP_PATH=${TFA_PATH}/build/juno/debug/fip.bin
+
+```
 
 Before beginning, please ensure the SD card used for your Juno board has been
 set up with a Linaro release software stack. If this is not the case, you can
