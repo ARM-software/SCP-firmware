@@ -190,7 +190,7 @@ static int mhu3_raise_interrupt(fwk_id_t ch_id)
          * we are using only 1 flag(bit) per channel
          */
         if ((pdbcw_reg[dbch_channel->pbx_channel].PDBCW_ST &
-             0x1u << dbch_channel->pbx_flag_pos) != 0u) {
+             0x1u << dbch_channel->pbx_flag_pos) == 0u) {
             pdbcw_reg[dbch_channel->pbx_channel].PDBCW_SET |= 0x1u
                 << dbch_channel->pbx_flag_pos;
             status = FWK_SUCCESS;
