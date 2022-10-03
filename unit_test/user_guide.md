@@ -60,7 +60,7 @@ unit_test
         ├── unity_mocks
         │   ├── arch_helpers.h
         │   └── mocks
-    ├── utils
+        ├── utils
         │   ├── generate_coverage_report.py
         │   └── zip_coverage_report.sh
         ├── gm.rb
@@ -69,14 +69,14 @@ contrib
         └── cmock
 
 
-- cfg.yml: Default configuration for generating Mocks
+- cfg.yml: Default configuration for generating Mocks.
 - CMakeLists.txt:
-  Toplevel CMakeLists file for building unit test framework and test cases
-- unity_mocks: This contains generated mocks for framework component
+  Toplevel CMakeLists file for building unit test framework and test cases.
+- unity_mocks: This contains generated mocks for framework component.
 - utils: This script files will generate code coverage reports in the form of xml & html.
 - gm.rb: A ruby script to generate mocks for passed header file.
 - user_guide.md: This file.
-- cmock: CMock and unity source code
+- cmock: CMock and unity source code.
 ```
 # Writing Unit Tests
 
@@ -133,7 +133,7 @@ int main(void)
 ```
 Sadly above code is not complete but gives enough idea about how Unity
 can be used. However from SCP-Firmware point of view there are various problems
-that requires some work before above code can be useful. Please see below
+that requires some work before above code can be useful. Please see below:
 
 ```
 #include "unity.h"
@@ -143,7 +143,7 @@ that requires some work before above code can be useful. Please see below
 #include <fwk_module_idx.h>
 #include <fwk_element.h>
 
-#include <module/scmi/mod_scmi.c>
+#include UNIT_TEST_SRC
 
 void setUp(void)
 {
@@ -172,12 +172,12 @@ int main(void) {
 }
 
 ```
-As you can see above, few extra lines been added in the code above
+As you can see above, few extra lines been added in the code.
 The important line here, is the inclusion of module source code
 in the unit test source file.
 
 ```
-#include <module/scmi/mod_scmi.c>
+#include UNIT_TEST_SRC // equivalent to #include <module/scmi/mod_scmi.c>
 ```
 
 This is necessary because we would like to bring various global objects
@@ -215,34 +215,34 @@ a relative reference to gm.rb from within the current directory would work
 fine.
 
 Apart from above mocked code, we need to setup few global objects as well
-the complete code can be found in
+the complete code can be found in:
 
 ```
-├── module
-│   └── scmi
-    ├── CMakeLists.txt
-    ├── include
-    │   ├── internal
-    │   │   ├── mod_scmi.h
-    │   │   ├── scmi_base.h
-    │   │   └── scmi.h
-    │   ├── mod_scmi.h
-    │   ├── mod_scmi_header.h
-    │   └── mod_scmi_std.h
-    ├── Module.cmake
-    ├── src
-    │   ├── Makefile
-    │   ├── mod_scmi.c
-    │   └── mod_scmi.gcno
-    └── test
-        ├── fwk_module_idx.h
-        ├── mocks
-        │   ├── Mockmod_scmi_extra.c
-        │   └── Mockmod_scmi_extra.h
-        ├── mod_scmi_extra.h
-        ├── mod_scmi_unit_test.c
-        ├── scmi.cmake
-        └── test_fwk_module.c
+└── module
+    └── scmi
+        ├── CMakeLists.txt
+        ├── include
+        │   ├── internal
+        │   │   ├── mod_scmi.h
+        │   │   ├── scmi_base.h
+        │   │   └── scmi.h
+        │   ├── mod_scmi.h
+        │   ├── mod_scmi_header.h
+        │   └── mod_scmi_std.h
+        ├── Module.cmake
+        ├── src
+        │   ├── Makefile
+        │   ├── mod_scmi.c
+        │   └── mod_scmi_base.c
+        └── test
+            ├── fwk_module_idx.h
+            ├── mocks
+            │   ├── Mockmod_scmi_extra.c
+            │   └── Mockmod_scmi_extra.h
+            ├── mod_scmi_extra.h
+            ├── mod_scmi_unit_test.c
+            ├── scmi.cmake
+            └── fwk_module_idx.h
 
 ```
 
@@ -261,13 +261,13 @@ from hand-written code.
 
 ## Adding test for new modules
 
-The ```scmi``` and ``scmi_clock``` test directories are provided
+The ```scmi``` and ```scmi_clock``` test directories are provided
 as a reference for new modules. The following process is intended
 as a general guide, and will vary on a case-by-case basis.
 
 1. Duplicate existing reference test directories as a starting point.
 
-2. Modify *.cmake file for our specific test case.
+2. Modify *.cmake file for our specific test case:
     a. Change TEST_MODULE to name of module
     b. Add directories of other modules used in test to OTHER_MODULE_INC
     c. Replace framework sources with mocks using replace_with_mock
@@ -296,7 +296,7 @@ generated under module specific unit test directory e.g.
 ## fwk_core mock workaround
 
 CMock generates the fwk_run_main_loop mock as a returning function,
-because noreturn is stripped out via cfg.yml. Compilation therefore
+because ```noreturn``` is stripped out via cfg.yml. Compilation therefore
 complains when this function terminates. To work around this, an infinite
 for loop needs to be appended to the function manual when updating
 fwk_core's mock.
@@ -304,9 +304,9 @@ fwk_core's mock.
 ### Executing Tests on target hardware or FVP models
 
 All above describes how to build and execute unit tests on host machine.
-However if needed test can be executed on hardware/models as well.
+However, if needed, tests can be executed on hardware/models as well.
 
-Note that to build and execute tests on target require few more steps
+Note that to build and execute tests on target, a few more steps are required:
 
 1. Since Unity/CMock requires stdio for output the log messages
 a bare minimum scp_ramfw is needed for the target under test as example
