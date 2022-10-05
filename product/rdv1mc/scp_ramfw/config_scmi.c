@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -8,7 +8,7 @@
 #include "platform_scmi.h"
 
 #include <mod_scmi.h>
-#include <mod_smt.h>
+#include <mod_transport.h>
 
 #include <fwk_element.h>
 #include <fwk_id.h>
@@ -21,14 +21,14 @@ static const struct fwk_element service_table[] = {
         .name = "SERVICE0",
         .data = &((struct mod_scmi_service_config) {
             .transport_id = FWK_ID_ELEMENT_INIT(
-                FWK_MODULE_IDX_SMT,
+                FWK_MODULE_IDX_TRANSPORT,
                 SCP_PLATFORM_SCMI_SERVICE_IDX_PSCI),
             .transport_api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_SMT,
-                MOD_SMT_API_IDX_SCMI_TRANSPORT),
+                FWK_MODULE_IDX_TRANSPORT,
+                MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
             .transport_notification_init_id = FWK_ID_NOTIFICATION_INIT(
-                FWK_MODULE_IDX_SMT,
-                MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
+                FWK_MODULE_IDX_TRANSPORT,
+                MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCP_SCMI_AGENT_ID_PSCI,
             .scmi_p2a_id = FWK_ID_NONE_INIT,
         }),

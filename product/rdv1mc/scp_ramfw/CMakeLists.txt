@@ -24,7 +24,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_power_domain.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_ppu_v1.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_mhu2.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_smt.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_transport.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_sds.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
