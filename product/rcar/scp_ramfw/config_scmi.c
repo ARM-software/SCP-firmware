@@ -1,6 +1,6 @@
 /*
  * Renesas SCP/MCP Software
- * Copyright (c) 2020-2021, Renesas Electronics Corporation. All rights
+ * Copyright (c) 2020-2022, Renesas Electronics Corporation. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -11,7 +11,7 @@
 #include <internal/scmi.h>
 
 #include <mod_scmi.h>
-#include <mod_smt.h>
+#include <mod_transport.h>
 
 #include <fwk_element.h>
 #include <fwk_id.h>
@@ -24,14 +24,14 @@ static const struct fwk_element element_table[] = {
         .name = "PSCI",
         .data = &(struct mod_scmi_service_config) {
             .transport_id = FWK_ID_ELEMENT_INIT(
-                FWK_MODULE_IDX_SMT,
+                FWK_MODULE_IDX_TRANSPORT,
                 RCAR_SCMI_SERVICE_IDX_PSCI),
             .transport_api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_SMT,
-                MOD_SMT_API_IDX_SCMI_TRANSPORT),
+                FWK_MODULE_IDX_TRANSPORT,
+                MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
             .transport_notification_init_id =
-                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
-                MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
+                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_TRANSPORT,
+                MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCMI_AGENT_ID_PSCI,
         },
     },
@@ -39,14 +39,14 @@ static const struct fwk_element element_table[] = {
         .name = "OSPM",
         .data = &(struct mod_scmi_service_config) {
             .transport_id = FWK_ID_ELEMENT_INIT(
-                FWK_MODULE_IDX_SMT,
+                FWK_MODULE_IDX_TRANSPORT,
                 RCAR_SCMI_SERVICE_IDX_OSPM),
             .transport_api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_SMT,
-                MOD_SMT_API_IDX_SCMI_TRANSPORT),
+                FWK_MODULE_IDX_TRANSPORT,
+                MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
             .transport_notification_init_id =
-                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
-                MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
+                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_TRANSPORT,
+                MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCMI_AGENT_ID_OSPM,
         },
     },
@@ -54,14 +54,14 @@ static const struct fwk_element element_table[] = {
         .name = "VMM",
         .data = &(struct mod_scmi_service_config) {
             .transport_id = FWK_ID_ELEMENT_INIT(
-                FWK_MODULE_IDX_SMT,
+                FWK_MODULE_IDX_TRANSPORT,
                 RCAR_SCMI_SERVICE_IDX_VMM),
             .transport_api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_SMT,
-                MOD_SMT_API_IDX_SCMI_TRANSPORT),
+                FWK_MODULE_IDX_TRANSPORT,
+                MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
             .transport_notification_init_id =
-                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
-                MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
+                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_TRANSPORT,
+                MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCMI_AGENT_ID_VMM,
         },
     },
@@ -69,14 +69,14 @@ static const struct fwk_element element_table[] = {
         .name = "VM1",
         .data = &(struct mod_scmi_service_config) {
             .transport_id = FWK_ID_ELEMENT_INIT(
-                FWK_MODULE_IDX_SMT,
+                FWK_MODULE_IDX_TRANSPORT,
                 RCAR_SCMI_SERVICE_IDX_VM1),
             .transport_api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_SMT,
-                MOD_SMT_API_IDX_SCMI_TRANSPORT),
+                FWK_MODULE_IDX_TRANSPORT,
+                MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
             .transport_notification_init_id =
-                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
-                MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
+                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_TRANSPORT,
+                MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCMI_AGENT_ID_VM1,
         },
     },
@@ -84,14 +84,14 @@ static const struct fwk_element element_table[] = {
         .name = "VM2",
         .data = &(struct mod_scmi_service_config) {
             .transport_id = FWK_ID_ELEMENT_INIT(
-                FWK_MODULE_IDX_SMT,
+                FWK_MODULE_IDX_TRANSPORT,
                 RCAR_SCMI_SERVICE_IDX_VM2),
             .transport_api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_SMT,
-                MOD_SMT_API_IDX_SCMI_TRANSPORT),
+                FWK_MODULE_IDX_TRANSPORT,
+                MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
             .transport_notification_init_id =
-                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
-                MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
+                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_TRANSPORT,
+                MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCMI_AGENT_ID_VM2,
         },
     },

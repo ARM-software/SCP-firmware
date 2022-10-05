@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -57,7 +57,7 @@ list(PREPEND SCP_MODULE_PATHS
 list(APPEND SCP_MODULES "rcar-scif")
 list(APPEND SCP_MODULES "rcar-system")
 list(APPEND SCP_MODULES "scmi")
-list(APPEND SCP_MODULES "smt")
+list(APPEND SCP_MODULES "transport")
 list(APPEND SCP_MODULES "clock")
 list(APPEND SCP_MODULES "rcar-clock")
 list(APPEND SCP_MODULES "rcar-sd-clock")
