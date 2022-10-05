@@ -10,7 +10,7 @@
 #include "juno_scmi.h"
 #include "software_mmap.h"
 
-#include <mod_smt.h>
+#include <mod_transport.h>
 
 #include <fwk_element.h>
 #include <fwk_id.h>
@@ -24,11 +24,13 @@ static const struct fwk_element element_table[] = {
     /* JUNO_SCMI_SERVICE_IDX_PSCI_A2P */
     { .name = "",
       .data =
-          &(struct mod_smt_channel_config){
-              .type = MOD_SMT_CHANNEL_TYPE_COMPLETER,
-              .policies = (MOD_SMT_POLICY_INIT_MAILBOX | MOD_SMT_POLICY_SECURE),
-              .mailbox_address = (uintptr_t)SCMI_PAYLOAD_S_A2P_BASE,
-              .mailbox_size = SCMI_PAYLOAD_SIZE,
+          &(struct mod_transport_channel_config){
+              .channel_type = MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+              .policies =
+                  (MOD_TRANSPORT_POLICY_INIT_MAILBOX |
+                   MOD_TRANSPORT_POLICY_SECURE),
+              .out_band_mailbox_address = (uintptr_t)SCMI_PAYLOAD_S_A2P_BASE,
+              .out_band_mailbox_size = SCMI_PAYLOAD_SIZE,
               .driver_id = FWK_ID_SUB_ELEMENT_INIT(
                   FWK_MODULE_IDX_MHU,
                   JUNO_MHU_DEVICE_IDX_S,
@@ -41,11 +43,11 @@ static const struct fwk_element element_table[] = {
     /* JUNO_SCMI_SERVICE_IDX_OSPM_A2P_0 */
     { .name = "",
       .data =
-          &(struct mod_smt_channel_config){
-              .type = MOD_SMT_CHANNEL_TYPE_COMPLETER,
-              .policies = MOD_SMT_POLICY_INIT_MAILBOX,
-              .mailbox_address = (uintptr_t)SCMI_PAYLOAD_LOW_A2P_BASE,
-              .mailbox_size = SCMI_PAYLOAD_SIZE,
+          &(struct mod_transport_channel_config){
+              .channel_type = MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+              .policies = MOD_TRANSPORT_POLICY_INIT_MAILBOX,
+              .out_band_mailbox_address = (uintptr_t)SCMI_PAYLOAD_LOW_A2P_BASE,
+              .out_band_mailbox_size = SCMI_PAYLOAD_SIZE,
               .driver_id = FWK_ID_SUB_ELEMENT_INIT(
                   FWK_MODULE_IDX_MHU,
                   JUNO_MHU_DEVICE_IDX_NS_L,
@@ -58,11 +60,11 @@ static const struct fwk_element element_table[] = {
     /* JUNO_SCMI_SERVICE_IDX_OSPM_A2P_1 */
     { .name = "",
       .data =
-          &(struct mod_smt_channel_config){
-              .type = MOD_SMT_CHANNEL_TYPE_COMPLETER,
-              .policies = MOD_SMT_POLICY_INIT_MAILBOX,
-              .mailbox_address = (uintptr_t)SCMI_PAYLOAD_HIGH_A2P_BASE,
-              .mailbox_size = SCMI_PAYLOAD_SIZE,
+          &(struct mod_transport_channel_config){
+              .channel_type = MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+              .policies = MOD_TRANSPORT_POLICY_INIT_MAILBOX,
+              .out_band_mailbox_address = (uintptr_t)SCMI_PAYLOAD_HIGH_A2P_BASE,
+              .out_band_mailbox_size = SCMI_PAYLOAD_SIZE,
               .driver_id = FWK_ID_SUB_ELEMENT_INIT(
                   FWK_MODULE_IDX_MHU,
                   JUNO_MHU_DEVICE_IDX_NS_H,
@@ -76,11 +78,11 @@ static const struct fwk_element element_table[] = {
     /* JUNO_SCMI_SERVICE_IDX_OSPM_P2A */
     { .name = "",
       .data =
-          &(struct mod_smt_channel_config){
-              .type = MOD_SMT_CHANNEL_TYPE_REQUESTER,
-              .policies = MOD_SMT_POLICY_INIT_MAILBOX,
-              .mailbox_address = (uintptr_t)SCMI_PAYLOAD_HIGH_P2A_BASE,
-              .mailbox_size = SCMI_PAYLOAD_SIZE,
+          &(struct mod_transport_channel_config){
+              .channel_type = MOD_TRANSPORT_CHANNEL_TYPE_REQUESTER,
+              .policies = MOD_TRANSPORT_POLICY_INIT_MAILBOX,
+              .out_band_mailbox_address = (uintptr_t)SCMI_PAYLOAD_HIGH_P2A_BASE,
+              .out_band_mailbox_size = SCMI_PAYLOAD_SIZE,
               .driver_id = FWK_ID_SUB_ELEMENT_INIT(
                   FWK_MODULE_IDX_MHU,
                   JUNO_MHU_DEVICE_IDX_NS_H,
@@ -99,6 +101,6 @@ static const struct fwk_element *get_element_table(fwk_id_t module_id)
     return element_table;
 }
 
-struct fwk_module_config config_smt = {
+struct fwk_module_config config_transport = {
     .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_element_table),
 };
