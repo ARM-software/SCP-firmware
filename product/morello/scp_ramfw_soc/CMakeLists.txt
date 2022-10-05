@@ -28,7 +28,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_dmc_bing.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_system_power.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_mhu.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_smt.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_transport.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_sds.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
