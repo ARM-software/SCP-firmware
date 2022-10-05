@@ -8,7 +8,7 @@
 #include "tc2_scmi.h"
 
 #include <mod_scmi.h>
-#include <mod_smt.h>
+#include <mod_transport.h>
 
 #include <fwk_element.h>
 #include <fwk_id.h>
@@ -22,14 +22,14 @@ static const struct fwk_element service_table[
         .name = "PSCI",
         .data = &((struct mod_scmi_service_config) {
             .transport_id = FWK_ID_ELEMENT_INIT(
-                FWK_MODULE_IDX_SMT,
+                FWK_MODULE_IDX_TRANSPORT,
                 SCP_TC2_SCMI_SERVICE_IDX_PSCI),
             .transport_api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_SMT,
-                MOD_SMT_API_IDX_SCMI_TRANSPORT),
+                FWK_MODULE_IDX_TRANSPORT,
+                MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
             .transport_notification_init_id = FWK_ID_NOTIFICATION_INIT(
-                FWK_MODULE_IDX_SMT,
-                MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
+                FWK_MODULE_IDX_TRANSPORT,
+                MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCP_SCMI_AGENT_ID_PSCI,
             .scmi_p2a_id = FWK_ID_NONE_INIT,
         }),
@@ -38,14 +38,14 @@ static const struct fwk_element service_table[
         .name = "OSPM0",
         .data = &((struct mod_scmi_service_config) {
             .transport_id = FWK_ID_ELEMENT_INIT(
-                FWK_MODULE_IDX_SMT,
+                FWK_MODULE_IDX_TRANSPORT,
                 SCP_TC2_SCMI_SERVICE_IDX_OSPM_0),
             .transport_api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_SMT,
-                MOD_SMT_API_IDX_SCMI_TRANSPORT),
+                FWK_MODULE_IDX_TRANSPORT,
+                MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
             .transport_notification_init_id = FWK_ID_NOTIFICATION_INIT(
-                FWK_MODULE_IDX_SMT,
-                MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
+                FWK_MODULE_IDX_TRANSPORT,
+                MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCP_SCMI_AGENT_ID_OSPM,
             .scmi_p2a_id = FWK_ID_NONE_INIT,
         }),
@@ -54,14 +54,14 @@ static const struct fwk_element service_table[
         .name = "OSPM1",
         .data = &((struct mod_scmi_service_config) {
             .transport_id = FWK_ID_ELEMENT_INIT(
-                FWK_MODULE_IDX_SMT,
+                FWK_MODULE_IDX_TRANSPORT,
                 SCP_TC2_SCMI_SERVICE_IDX_OSPM_1),
             .transport_api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_SMT,
-                MOD_SMT_API_IDX_SCMI_TRANSPORT),
+                FWK_MODULE_IDX_TRANSPORT,
+                MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
             .transport_notification_init_id = FWK_ID_NOTIFICATION_INIT(
-                FWK_MODULE_IDX_SMT,
-                MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
+                FWK_MODULE_IDX_TRANSPORT,
+                MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCP_SCMI_AGENT_ID_OSPM,
             .scmi_p2a_id = FWK_ID_NONE_INIT,
         }),

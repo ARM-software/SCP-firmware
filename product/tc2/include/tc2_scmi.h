@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
- *     Definitions for SCMI and SMT module configurations.
+ *     Definitions for SCMI and TRANSPORT module configurations.
  */
 
 #ifndef SCP_TC2_SCMI_H
