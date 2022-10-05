@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -8,7 +8,7 @@
 #include "sgm776_scmi.h"
 
 #include <mod_scmi.h>
-#include <mod_smt.h>
+#include <mod_transport.h>
 
 #include <fwk_element.h>
 #include <fwk_id.h>
@@ -20,13 +20,13 @@ static const struct fwk_element service_table[] = {
     [SGM776_SCMI_SERVICE_IDX_PSCI] = {
         .name = "PSCI",
         .data = &((struct mod_scmi_service_config) {
-            .transport_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SMT,
+            .transport_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TRANSPORT,
                                                 SGM776_SCMI_SERVICE_IDX_PSCI),
-            .transport_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SMT,
-                                                MOD_SMT_API_IDX_SCMI_TRANSPORT),
+            .transport_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_TRANSPORT,
+                                                MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
             .transport_notification_init_id =
-                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
-                    MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
+                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_TRANSPORT,
+                    MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCMI_AGENT_ID_PSCI,
             .scmi_p2a_id = FWK_ID_NONE_INIT,
         }),
@@ -34,13 +34,13 @@ static const struct fwk_element service_table[] = {
     [SGM776_SCMI_SERVICE_IDX_OSPM_0] = {
         .name = "OSPM-0",
         .data = &((struct mod_scmi_service_config) {
-            .transport_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SMT,
+            .transport_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TRANSPORT,
                                                 SGM776_SCMI_SERVICE_IDX_OSPM_0),
-            .transport_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SMT,
-                                                MOD_SMT_API_IDX_SCMI_TRANSPORT),
+            .transport_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_TRANSPORT,
+                                                MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
             .transport_notification_init_id =
-                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
-                    MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
+                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_TRANSPORT,
+                    MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCMI_AGENT_ID_OSPM,
             .scmi_p2a_id = FWK_ID_NONE_INIT,
         }),
@@ -48,13 +48,13 @@ static const struct fwk_element service_table[] = {
     [SGM776_SCMI_SERVICE_IDX_OSPM_1] = {
         .name = "OSPM-1",
         .data = &((struct mod_scmi_service_config) {
-            .transport_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SMT,
+            .transport_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TRANSPORT,
                                                 SGM776_SCMI_SERVICE_IDX_OSPM_1),
-            .transport_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SMT,
-                                                MOD_SMT_API_IDX_SCMI_TRANSPORT),
+            .transport_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_TRANSPORT,
+                                                MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
             .transport_notification_init_id =
-                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_SMT,
-                    MOD_SMT_NOTIFICATION_IDX_INITIALIZED),
+                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_TRANSPORT,
+                    MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
             .scmi_agent_id = SCMI_AGENT_ID_OSPM,
             .scmi_p2a_id = FWK_ID_NONE_INIT,
         }),
