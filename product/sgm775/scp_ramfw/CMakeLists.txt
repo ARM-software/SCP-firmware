@@ -41,7 +41,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_sensor.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_sgm775_ddr_phy500.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_sgm775_dmc500.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_smt.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_transport.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_system_pll.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_system_power.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"

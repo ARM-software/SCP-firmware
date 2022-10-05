@@ -28,9 +28,9 @@ static const struct fwk_element
         [SGM775_MHU_DEVICE_IDX_NS_H] = { .name = "MHU_NS_H",
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
                                          /*
-                                          * We have 2 SMT channels , one is for
-                                          * the A2P channel and another for the
-                                          * other for P2A channel.
+                                          * We have 2 TRANSPORT channels , one
+                                          * is for the A2P channel and another
+                                          * for the other for P2A channel.
                                           */
                                          .sub_element_count = 2,
 #else
@@ -45,9 +45,9 @@ static const struct fwk_element
         [SGM775_MHU_DEVICE_IDX_NS_L] = { .name = "MHU_NS_L",
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
                                          /*
-                                          * We have 2 SMT channels , one is for
-                                          * the A2P channel and another for the
-                                          * other for P2A channel.
+                                          * We have 2 TRANSPORT channels , one
+                                          * is for the A2P channel and another
+                                          * for the other for P2A channel.
                                           */
                                          .sub_element_count = 2,
 #else
