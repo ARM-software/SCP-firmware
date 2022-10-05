@@ -36,7 +36,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_apcore.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_system_power.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_smt.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_transport.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_synquacer_memc.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_system_power.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
