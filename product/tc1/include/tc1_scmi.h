@@ -1,11 +1,11 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
- *     Definitions for SCMI and SMT module configurations.
+ *     Definitions for SCMI and TRANSPORT module configurations.
  */
 
 #ifndef SCP_TC1_SCMI_H
