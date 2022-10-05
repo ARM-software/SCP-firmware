@@ -31,7 +31,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_n1sdp_dmc620.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_n1sdp_ddr_phy.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_mhu.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_smt.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_transport.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_sds.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
