@@ -24,7 +24,7 @@ target_sources(
             "config_power_domain.c"
             "config_ppu_v1.c"
             "config_mhu2.c"
-            "config_smt.c"
+            "config_transport.c"
             "config_scmi.c"
             "config_sds.c"
             "config_timer.c"
