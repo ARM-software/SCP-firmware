@@ -1,6 +1,6 @@
 /*
  * Renesas SCP/MCP Software
- * Copyright (c) 2020-2021, Renesas Electronics Corporation. All rights
+ * Copyright (c) 2020-2022, Renesas Electronics Corporation. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -10,7 +10,7 @@
 
 #include <rcar_mmap.h>
 
-#include <mod_smt.h>
+#include <mod_transport.h>
 
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
@@ -32,9 +32,9 @@
 
 struct mfismh_reg *mfis_regs;
 
-struct mfismh_smt_channel {
+struct mfismh_transport_channel {
     fwk_id_t id;
-    struct mod_smt_driver_input_api *api;
+    struct mod_transport_driver_input_api *api;
 };
 
 /* MFISMH device context */
@@ -45,11 +45,11 @@ struct mfismh_device_ctx {
     /* Number of slots (represented by sub-elements) */
     unsigned int slot_count;
 
-    /* Mask of slots that are bound to an SMT channel */
+    /* Mask of slots that are bound to an TRANSPORT channel */
     uint32_t bound_slots;
 
-    /* Table of SMT channels bound to the device */
-    struct mfismh_smt_channel *smt_channel_table;
+    /* Table of TRANSPORT channels bound to the device */
+    struct mfismh_transport_channel *transport_channel_table;
 };
 
 /* MFISMH context */
@@ -71,7 +71,7 @@ static void mfismh_isr(void)
     struct mfismh_device_ctx *device_ctx;
     unsigned int slot;
     struct mfismh_reg *reg;
-    struct mfismh_smt_channel *smt_channel;
+    struct mfismh_transport_channel *transport_channel;
 
     status = fwk_interrupt_get_current(&interrupt);
     if (status != FWK_SUCCESS)
@@ -99,18 +99,18 @@ static void mfismh_isr(void)
         slot = 0;
 
         /*
-         * If the slot is bound to an SMT channel, signal the message to the
-         * SMT channel.
+         * If the slot is bound to an TRANSPORT channel, signal the message to
+         * the TRANSPORT channel.
          */
         if (device_ctx->bound_slots & (1 << slot)) {
-            smt_channel = &device_ctx->smt_channel_table[slot];
-            smt_channel->api->signal_message(smt_channel->id);
+            transport_channel = &device_ctx->transport_channel_table[slot];
+            transport_channel->api->signal_message(transport_channel->id);
         }
     }
 }
 
 /*
- * SMT module driver API
+ * TRANSPORT module driver API
  */
 static int raise_interrupt(fwk_id_t slot_id)
 {
@@ -118,8 +118,8 @@ static int raise_interrupt(fwk_id_t slot_id)
     return FWK_SUCCESS;
 }
 
-const struct mod_smt_driver_api mfismh_mod_smt_driver_api = {
-    .raise_interrupt = raise_interrupt,
+const struct mod_transport_driver_api mfismh_mod_transport_driver_api = {
+    .trigger_event = raise_interrupt,
 };
 
 /*
@@ -155,9 +155,9 @@ static int mfismh_device_init(
     device_ctx =
         &mfismh_ctx.device_ctx_table[fwk_id_get_element_idx(device_id)];
 
-    device_ctx->smt_channel_table =
-        fwk_mm_calloc(slot_count, sizeof(device_ctx->smt_channel_table[0]));
-    if (device_ctx->smt_channel_table == NULL)
+    device_ctx->transport_channel_table = fwk_mm_calloc(
+        slot_count, sizeof(device_ctx->transport_channel_table[0]));
+    if (device_ctx->transport_channel_table == NULL)
         return FWK_E_NOMEM;
 
     device_ctx->config = config;
@@ -173,7 +173,7 @@ static int mfismh_bind(fwk_id_t id, unsigned int round)
     int status;
     struct mfismh_device_ctx *device_ctx;
     unsigned int slot;
-    struct mfismh_smt_channel *smt_channel;
+    struct mfismh_transport_channel *transport_channel;
 
     if ((round == 1) && fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
         device_ctx = &mfismh_ctx.device_ctx_table[fwk_id_get_element_idx(id)];
@@ -182,12 +182,14 @@ static int mfismh_bind(fwk_id_t id, unsigned int round)
             if (!(device_ctx->bound_slots & (1 << slot)))
                 continue;
 
-            smt_channel = &device_ctx->smt_channel_table[slot];
+            transport_channel = &device_ctx->transport_channel_table[slot];
 
             status = fwk_module_bind(
-                smt_channel->id,
-                FWK_ID_API(FWK_MODULE_IDX_SMT, MOD_SMT_API_IDX_DRIVER_INPUT),
-                &smt_channel->api);
+                transport_channel->id,
+                FWK_ID_API(
+                    FWK_MODULE_IDX_TRANSPORT,
+                    MOD_TRANSPORT_API_IDX_DRIVER_INPUT),
+                &transport_channel->api);
             if (status != FWK_SUCCESS)
                 return status;
         }
@@ -215,10 +217,10 @@ static int mfismh_process_bind_request(
     if (device_ctx->bound_slots & (1 << slot))
         return FWK_E_ACCESS;
 
-    device_ctx->smt_channel_table[slot].id = source_id;
+    device_ctx->transport_channel_table[slot].id = source_id;
     device_ctx->bound_slots |= 1 << slot;
 
-    *api = &mfismh_mod_smt_driver_api;
+    *api = &mfismh_mod_transport_driver_api;
 
     return FWK_SUCCESS;
 }

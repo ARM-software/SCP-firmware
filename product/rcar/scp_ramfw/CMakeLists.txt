@@ -44,7 +44,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_rcar_mock_pmic_bd9571.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_rcar_mfismh.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_smt.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_transport.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_perf.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_system_power.c"
