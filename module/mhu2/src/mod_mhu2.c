@@ -11,11 +11,7 @@
 #include <mhu2.h>
 
 #include <mod_mhu2.h>
-#ifdef BUILD_HAS_MOD_TRANSPORT
-#    include <mod_transport.h>
-#else
-#    include <mod_smt.h>
-#endif
+#include <mod_transport.h>
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
@@ -32,7 +28,7 @@
 
 #define MHU_SLOT_COUNT_MAX 32
 
-#if defined(BUILD_HAS_MOD_TRANSPORT) && defined(BUILD_HAS_INBAND_MSG_SUPPORT)
+#if defined(BUILD_HAS_INBAND_MSG_SUPPORT)
 /* MHUv2 channel status register size in bytes */
 #    define MHU_CHANNEL_STATUS_REGISTER_WIDTH 4
 
@@ -49,14 +45,7 @@ const uint8_t min_channels_required = 9;
 
 struct mhu2_bound_channel {
     fwk_id_t id;
-    bool bound_to_smt_channel;
-    union api {
-#ifdef BUILD_HAS_MOD_TRANSPORT
-        const struct mod_transport_driver_input_api *transport_api;
-#else
-        const struct mod_smt_driver_input_api *smt_api;
-#endif
-    } driver_input_api;
+    const struct mod_transport_driver_input_api *driver_input_api;
 };
 
 /* MHU channel context */
@@ -74,7 +63,7 @@ struct mhu2_channel_ctx {
     /* Number of slots (represented by sub-elements) */
     unsigned int slot_count;
 
-    /* Mask of slots that are bound to an SMT channel */
+    /* Mask of slots that are bound to an TRANSPORT channel */
     uint32_t bound_slots;
 
     /* Table of channels bound to the channel */
@@ -101,23 +90,13 @@ static void mhu2_isr(uintptr_t ctx_param)
     while (channel_ctx->recv_channel->STAT != 0) {
         slot = __builtin_ctz(channel_ctx->recv_channel->STAT);
         /*
-         * If the slot is bound to an SMT or transport channel,
+         * If the slot is bound to a transport channel,
          * signal the message to the corresponding module
          */
         if (channel_ctx->bound_slots & (1 << slot)) {
             bound_channel = &channel_ctx->bound_channels_table[slot];
 
-            if (bound_channel->bound_to_smt_channel) {
-#if !defined(BUILD_HAS_MOD_TRANSPORT)
-                bound_channel->driver_input_api.smt_api->signal_message(
-                    bound_channel->id);
-#endif
-            } else {
-#ifdef BUILD_HAS_MOD_TRANSPORT
-                bound_channel->driver_input_api.transport_api->signal_message(
-                    bound_channel->id);
-#endif
-            }
+            bound_channel->driver_input_api->signal_message(bound_channel->id);
         }
         /* Acknowledge the interrupt */
         channel_ctx->recv_channel->STAT_CLEAR = 1 << slot;
@@ -125,7 +104,7 @@ static void mhu2_isr(uintptr_t ctx_param)
 }
 
 /*
- * SMT module driver API
+ * TRANSPORT module driver API
  */
 
 static int raise_interrupt(fwk_id_t slot_id)
@@ -151,14 +130,7 @@ static int raise_interrupt(fwk_id_t slot_id)
     return FWK_SUCCESS;
 }
 
-#if !defined(BUILD_HAS_MOD_TRANSPORT)
-static const struct mod_smt_driver_api mhu2_mod_smt_driver_api = {
-    .raise_interrupt = raise_interrupt,
-};
-#endif
-
-#ifdef BUILD_HAS_MOD_TRANSPORT
-#    ifdef BUILD_HAS_INBAND_MSG_SUPPORT
+#ifdef BUILD_HAS_INBAND_MSG_SUPPORT
 /*
  * transport module driver API
  */
@@ -298,7 +270,7 @@ static int mhu2_get_message(
 
     return FWK_SUCCESS;
 }
-#    endif
+#endif
 
 struct mod_transport_driver_api mhu2_mod_transport_driver_api = {
 #    ifdef BUILD_HAS_INBAND_MSG_SUPPORT
@@ -307,7 +279,6 @@ struct mod_transport_driver_api mhu2_mod_transport_driver_api = {
 #    endif
     .trigger_event = raise_interrupt,
 };
-#endif
 
 /*
  * Framework handlers
@@ -357,7 +328,7 @@ static int mhu2_channel_init(fwk_id_t channel_id,
     channel_ctx->send_channel = &channel_ctx->send->channel[config->channel];
     recv_reg = (struct mhu2_recv_reg *)config->recv;
 
-#if defined(BUILD_HAS_MOD_TRANSPORT) && defined(BUILD_HAS_INBAND_MSG_SUPPORT)
+#if defined(BUILD_HAS_INBAND_MSG_SUPPORT)
     /*
      * Mask the channels used for transferring in-band messages.
      * Only the doorbell channel should be used to raise interrupt.
@@ -400,35 +371,17 @@ static int mhu2_bind(fwk_id_t id, unsigned int round)
 
             bound_channel = &channel_ctx->bound_channels_table[slot];
 
-            if (bound_channel->bound_to_smt_channel) {
-#if !defined(BUILD_HAS_MOD_TRANSPORT)
-                status = fwk_module_bind(
-                    bound_channel->id,
-                    FWK_ID_API(
-                        FWK_MODULE_IDX_SMT, MOD_SMT_API_IDX_DRIVER_INPUT),
-                    &bound_channel->driver_input_api.smt_api);
+            status = fwk_module_bind(
+                bound_channel->id,
+                FWK_ID_API(
+                    FWK_MODULE_IDX_TRANSPORT,
+                    MOD_TRANSPORT_API_IDX_DRIVER_INPUT),
+                &bound_channel->driver_input_api);
 
-                if (status != FWK_SUCCESS) {
-                    /* Unable to bind back to SMT channel */
-                    fwk_unexpected();
-                    return status;
-                }
-#endif
-            } else {
-#ifdef BUILD_HAS_MOD_TRANSPORT
-                status = fwk_module_bind(
-                    bound_channel->id,
-                    FWK_ID_API(
-                        FWK_MODULE_IDX_TRANSPORT,
-                        MOD_TRANSPORT_API_IDX_DRIVER_INPUT),
-                    &bound_channel->driver_input_api.transport_api);
-
-                if (status != FWK_SUCCESS) {
-                    /* Unable to bind back to TRANSPORT channel */
-                    fwk_unexpected();
-                    return status;
-                }
-#endif
+            if (status != FWK_SUCCESS) {
+                /* Unable to bind back to TRANSPORT channel */
+                fwk_unexpected();
+                return status;
             }
         }
     }
@@ -463,30 +416,16 @@ static int mhu2_process_bind_request(fwk_id_t source_id,
         return FWK_E_ACCESS;
     }
 
+    channel_ctx->bound_channels_table[slot].id = source_id;
     channel_ctx->bound_slots |= 1 << slot;
 
-    switch (api_id_type) {
-#if !defined(BUILD_HAS_MOD_TRANSPORT)
-    case MOD_MHU2_API_IDX_SMT_DRIVER:
-        channel_ctx->bound_channels_table[slot].id = source_id;
-        channel_ctx->bound_channels_table[slot].bound_to_smt_channel = true;
-        *api = &mhu2_mod_smt_driver_api;
-        break;
-#endif
-
-#ifdef BUILD_HAS_MOD_TRANSPORT
-    case MOD_MHU2_API_IDX_TRANSPORT_DRIVER:
-        channel_ctx->bound_channels_table[slot].id = source_id;
-        channel_ctx->bound_channels_table[slot].bound_to_smt_channel = false;
-        *api = &mhu2_mod_transport_driver_api;
-        break;
-#endif
-
-    default:
+    if (api_id_type != MOD_MHU2_API_IDX_TRANSPORT_DRIVER) {
         /* Invalid config */
         fwk_unexpected();
         return FWK_E_PARAM;
     }
+
+    *api = &mhu2_mod_transport_driver_api;
 
     return FWK_SUCCESS;
 }

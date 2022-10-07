@@ -29,13 +29,8 @@
  * \brief MHU v2 api indicies
  */
 enum mod_mhu2_api_idx {
-#ifdef BUILD_HAS_MOD_TRANSPORT
     /*! TRANSPORT driver API */
     MOD_MHU2_API_IDX_TRANSPORT_DRIVER,
-#else
-    /*! SMT driver API */
-    MOD_MHU2_API_IDX_SMT_DRIVER,
-#endif
     /*! Number of APIs */
     MOD_MHU2_API_IDX_COUNT,
 };

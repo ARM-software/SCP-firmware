@@ -63,7 +63,7 @@ nullPointerRedundantCheck:*product/rcar/module/rcar_reg_sensor/src/mod_rcar_reg_
 nullPointerRedundantCheck:*module/dmc500/src/mod_dmc500.c:60
 nullPointerRedundantCheck:*module/dmc500/src/mod_dmc500.c:61
 nullPointerRedundantCheck:*module/dmc500/src/mod_dmc500.c:65
-nullPointerRedundantCheck:*module/mhu2/src/mod_mhu2.c:101
+nullPointerRedundantCheck:*module/mhu2/src/mod_mhu2.c:90
 nullPointerRedundantCheck:*module/pl011/src/mod_pl011.c:139
 nullPointerRedundantCheck:*module/pl011/src/mod_pl011.c:140
 nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:609

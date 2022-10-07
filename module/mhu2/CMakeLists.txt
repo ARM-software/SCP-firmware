@@ -15,8 +15,4 @@ target_include_directories(
 target_sources(${SCP_MODULE_TARGET}
                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_mhu2.c")
 
-if("transport" IN_LIST SCP_MODULES)
-    target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-transport)
-else()
-    target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-smt)
-endif()
+target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-transport)
