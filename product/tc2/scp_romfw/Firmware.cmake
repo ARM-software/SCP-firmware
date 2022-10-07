@@ -26,7 +26,6 @@ set(SCP_ENABLE_INBAND_MSG_SUPPORT TRUE)
 set(SCP_ARCHITECTURE "arm-m")
 
 list(PREPEND SCP_MODULE_PATHS "${CMAKE_SOURCE_DIR}/module/cmn_booker")
-list(PREPEND SCP_MODULE_PATHS "${CMAKE_SOURCE_DIR}/module/transport")
 list(PREPEND SCP_MODULE_PATHS "${CMAKE_SOURCE_DIR}/product/tc2/module/tc2_bl1")
 
 # The order of the modules in the following list is the order in which the
