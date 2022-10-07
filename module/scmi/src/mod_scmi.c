@@ -406,10 +406,10 @@ int scmi_send_message(
         return FWK_E_DATA;
     }
 
-    /* Initalize the transport api pointer to SMT module api */
+    /* Initalize the transport api pointer to TRANSPORT module api */
     transport_api = ctx->transport_api;
 
-    /* Send the SCMI message using the smt_transmit() API  */
+    /* Send the SCMI message using the transport_transmit() API  */
     status = transport_api->transmit(
         ctx->transport_id,
         message_header,
