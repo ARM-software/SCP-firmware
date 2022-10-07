@@ -11,11 +11,7 @@
 #include <internal/mhu.h>
 
 #include <mod_mhu.h>
-#ifdef BUILD_HAS_MOD_TRANSPORT
-#    include <mod_transport.h>
-#else
-#    include <mod_smt.h>
-#endif
+#include <mod_transport.h>
 
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
@@ -38,11 +34,7 @@
 
 struct mhu_transport_channel {
     fwk_id_t id;
-#ifdef BUILD_HAS_MOD_TRANSPORT
     struct mod_transport_driver_input_api *api;
-#else
-    struct mod_smt_driver_input_api *api;
-#endif
 };
 
 /* MHU device context */
@@ -56,7 +48,7 @@ struct mhu_device_ctx {
     /* Mask of slots that are bound to a TRANSPORT/SMT channel */
     uint32_t bound_slots;
 
-    /* Table of TRANSPORT/SMT channels bound to the device */
+    /* Table of TRANSPORT channels bound to the device */
     struct mhu_transport_channel *transport_channel_table;
 };
 
@@ -104,8 +96,8 @@ static void mhu_isr(void)
         slot = (unsigned int)__builtin_ctz(reg->STAT);
 
         /*
-         * If the slot is bound to an TRANSPORT/SMT channel, signal the message
-         * to the TRANSPORT/SMT channel.
+         * If the slot is bound to an TRANSPORT channel, signal the message
+         * to the TRANSPORT channel.
          */
         if ((device_ctx->bound_slots & (uint32_t)(1U << slot)) != (uint32_t)0) {
             transport_channel = &device_ctx->transport_channel_table[slot];
@@ -122,7 +114,7 @@ static void mhu_isr(void)
 }
 
 /*
- * TRANSPORT/SMT module driver API
+ * TRANSPORT module driver API
  */
 
 static int raise_interrupt(fwk_id_t slot_id)
@@ -140,15 +132,11 @@ static int raise_interrupt(fwk_id_t slot_id)
 
     return FWK_SUCCESS;
 }
-#ifdef BUILD_HAS_MOD_TRANSPORT
+
 const struct mod_transport_driver_api mhu_mod_transport_driver_api = {
     .trigger_event = raise_interrupt,
 };
-#else
-const struct mod_smt_driver_api mhu_mod_transport_driver_api = {
-    .raise_interrupt = raise_interrupt,
-};
-#endif
+
 /*
  * Framework handlers
  */
@@ -206,19 +194,13 @@ static int mhu_bind(fwk_id_t id, unsigned int round)
             }
 
             transport_channel = &device_ctx->transport_channel_table[slot];
-#ifdef BUILD_HAS_MOD_TRANSPORT
+
             status = fwk_module_bind(
                 transport_channel->id,
                 FWK_ID_API(
                     FWK_MODULE_IDX_TRANSPORT,
                     MOD_TRANSPORT_API_IDX_DRIVER_INPUT),
                 &transport_channel->api);
-#else
-            status = fwk_module_bind(
-                transport_channel->id,
-                FWK_ID_API(FWK_MODULE_IDX_SMT, MOD_SMT_API_IDX_DRIVER_INPUT),
-                &transport_channel->api);
-#endif
             if (status != FWK_SUCCESS) {
                 return status;
             }
