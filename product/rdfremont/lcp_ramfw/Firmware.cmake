@@ -27,7 +27,6 @@ set(SCP_ENABLE_DEBUGGER_INIT FALSE)
 
 list(PREPEND SCP_MODULE_PATHS
     "${CMAKE_CURRENT_LIST_DIR}/../module/mod_lcp_platform")
-list(PREPEND SCP_MODULE_PATHS "${CMAKE_SOURCE_DIR}/module/transport")
 list(PREPEND SCP_MODULE_PATHS "${CMAKE_SOURCE_DIR}/module/mhu3")
 
 # The order of the modules in the following list is the order in which the
