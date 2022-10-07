@@ -11,7 +11,11 @@
 #include <internal/mhu.h>
 
 #include <mod_mhu.h>
-#include <mod_smt.h>
+#ifdef BUILD_HAS_MOD_TRANSPORT
+#    include <mod_transport.h>
+#else
+#    include <mod_smt.h>
+#endif
 
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
@@ -32,9 +36,13 @@
  */
 #define MHU_SLOT_COUNT_MAX 31
 
-struct mhu_smt_channel {
+struct mhu_transport_channel {
     fwk_id_t id;
+#ifdef BUILD_HAS_MOD_TRANSPORT
+    struct mod_transport_driver_input_api *api;
+#else
     struct mod_smt_driver_input_api *api;
+#endif
 };
 
 /* MHU device context */
@@ -45,11 +53,11 @@ struct mhu_device_ctx {
     /* Number of slots (represented by sub-elements) */
     unsigned int slot_count;
 
-    /* Mask of slots that are bound to an SMT channel */
+    /* Mask of slots that are bound to a TRANSPORT/SMT channel */
     uint32_t bound_slots;
 
-    /* Table of SMT channels bound to the device */
-    struct mhu_smt_channel *smt_channel_table;
+    /* Table of TRANSPORT/SMT channels bound to the device */
+    struct mhu_transport_channel *transport_channel_table;
 };
 
 /* MHU context */
@@ -71,7 +79,7 @@ static void mhu_isr(void)
     struct mhu_device_ctx *device_ctx;
     struct mhu_reg *reg;
     unsigned int slot;
-    struct mhu_smt_channel *smt_channel;
+    struct mhu_transport_channel *transport_channel;
 
     status = fwk_interrupt_get_current(&interrupt);
     if (status != FWK_SUCCESS) {
@@ -96,12 +104,13 @@ static void mhu_isr(void)
         slot = (unsigned int)__builtin_ctz(reg->STAT);
 
         /*
-         * If the slot is bound to an SMT channel, signal the message to the
-         * SMT channel.
+         * If the slot is bound to an TRANSPORT/SMT channel, signal the message
+         * to the TRANSPORT/SMT channel.
          */
         if ((device_ctx->bound_slots & (uint32_t)(1U << slot)) != (uint32_t)0) {
-            smt_channel = &device_ctx->smt_channel_table[slot];
-            status = smt_channel->api->signal_message(smt_channel->id);
+            transport_channel = &device_ctx->transport_channel_table[slot];
+            status =
+                transport_channel->api->signal_message(transport_channel->id);
             if (status != FWK_SUCCESS) {
                 FWK_LOG_TRACE("[MHU] %s @%d", __func__, __LINE__);
             }
@@ -113,7 +122,7 @@ static void mhu_isr(void)
 }
 
 /*
- * SMT module driver API
+ * TRANSPORT/SMT module driver API
  */
 
 static int raise_interrupt(fwk_id_t slot_id)
@@ -131,11 +140,15 @@ static int raise_interrupt(fwk_id_t slot_id)
 
     return FWK_SUCCESS;
 }
-
-const struct mod_smt_driver_api mhu_mod_smt_driver_api = {
+#ifdef BUILD_HAS_MOD_TRANSPORT
+const struct mod_transport_driver_api mhu_mod_transport_driver_api = {
+    .trigger_event = raise_interrupt,
+};
+#else
+const struct mod_smt_driver_api mhu_mod_transport_driver_api = {
     .raise_interrupt = raise_interrupt,
 };
-
+#endif
 /*
  * Framework handlers
  */
@@ -167,8 +180,8 @@ static int mhu_device_init(fwk_id_t device_id, unsigned int slot_count,
 
     device_ctx = &mhu_ctx.device_ctx_table[fwk_id_get_element_idx(device_id)];
 
-    device_ctx->smt_channel_table = fwk_mm_calloc(slot_count,
-        sizeof(device_ctx->smt_channel_table[0]));
+    device_ctx->transport_channel_table = fwk_mm_calloc(
+        slot_count, sizeof(device_ctx->transport_channel_table[0]));
 
     device_ctx->config = config;
     device_ctx->slot_count = slot_count;
@@ -181,7 +194,7 @@ static int mhu_bind(fwk_id_t id, unsigned int round)
     int status;
     struct mhu_device_ctx *device_ctx;
     unsigned int slot;
-    struct mhu_smt_channel *smt_channel;
+    struct mhu_transport_channel *transport_channel;
 
     if ((round == 1U) && fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
         device_ctx = &mhu_ctx.device_ctx_table[fwk_id_get_element_idx(id)];
@@ -192,11 +205,20 @@ static int mhu_bind(fwk_id_t id, unsigned int round)
                 continue;
             }
 
-            smt_channel = &device_ctx->smt_channel_table[slot];
-
-            status = fwk_module_bind(smt_channel->id,
+            transport_channel = &device_ctx->transport_channel_table[slot];
+#ifdef BUILD_HAS_MOD_TRANSPORT
+            status = fwk_module_bind(
+                transport_channel->id,
+                FWK_ID_API(
+                    FWK_MODULE_IDX_TRANSPORT,
+                    MOD_TRANSPORT_API_IDX_DRIVER_INPUT),
+                &transport_channel->api);
+#else
+            status = fwk_module_bind(
+                transport_channel->id,
                 FWK_ID_API(FWK_MODULE_IDX_SMT, MOD_SMT_API_IDX_DRIVER_INPUT),
-                &smt_channel->api);
+                &transport_channel->api);
+#endif
             if (status != FWK_SUCCESS) {
                 return status;
             }
@@ -223,10 +245,10 @@ static int mhu_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
         return FWK_E_ACCESS;
     }
 
-    device_ctx->smt_channel_table[slot].id = source_id;
+    device_ctx->transport_channel_table[slot].id = source_id;
     device_ctx->bound_slots |= 1U << slot;
 
-    *api = &mhu_mod_smt_driver_api;
+    *api = &mhu_mod_transport_driver_api;
 
     return FWK_SUCCESS;
 }
