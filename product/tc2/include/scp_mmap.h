@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -99,5 +99,8 @@
     (SCP_SCMI_PAYLOAD0_NS_P2A_BASE + SCP_SCMI_PAYLOAD_SIZE)
 #define SCP_SCMI_PAYLOAD1_NS_P2A_BASE \
     (SCP_SCMI_PAYLOAD1_NS_A2P_BASE + SCP_SCMI_PAYLOAD_SIZE)
+
+#define SCMI_FAST_CHANNEL_BASE \
+    (SCP_SCMI_PAYLOAD1_NS_P2A_BASE + SCP_SCMI_PAYLOAD_SIZE)
 
 #endif /* SCP_MMAP_H */
