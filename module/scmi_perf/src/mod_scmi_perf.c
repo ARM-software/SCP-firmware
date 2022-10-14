@@ -1569,6 +1569,11 @@ static int scmi_perf_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
         goto error;
     }
 
+    if (handler_table[message_id] == NULL) {
+        return_value = (int32_t)SCMI_NOT_SUPPORTED;
+        goto error;
+    }
+
     if (payload_size != payload_size_table[message_id]) {
         return_value = (int32_t)SCMI_PROTOCOL_ERROR;
         goto error;

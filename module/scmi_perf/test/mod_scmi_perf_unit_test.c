@@ -61,6 +61,8 @@ static const struct mod_dvfs_domain_api dvfs_domain_api = {
 
 char *name = "Test Name";
 
+static int return_status;
+
 void setUp(void)
 {
     scmi_perf_ctx.scmi_api = &from_protocol_api;
@@ -105,6 +107,63 @@ int version_handler_respond_callback(
     TEST_ASSERT_EQUAL(SCMI_PROTOCOL_VERSION_PERF, return_values->version);
 
     return FWK_SUCCESS;
+}
+
+int version_handler_respond_callback_fail(
+    fwk_id_t service_id,
+    const void *payload,
+    size_t size,
+    int NumCalls)
+{
+    struct scmi_protocol_version_p2a *return_values;
+    return_values = (struct scmi_protocol_version_p2a *)payload;
+
+    TEST_ASSERT_EQUAL(size, sizeof(int32_t));
+    TEST_ASSERT_EQUAL(return_status, return_values->status);
+
+    return FWK_SUCCESS;
+}
+
+void utest_scmi_perf_message_handler_bad_message_id(void)
+{
+    int status;
+    fwk_id_t service_id =
+        FWK_ID_ELEMENT_INIT(TEST_MODULE_IDX, TEST_SCMI_AGENT_IDX_0);
+    struct scmi_protocol_version_p2a payload = { 0 };
+
+    mod_scmi_from_protocol_api_respond_Stub(
+        version_handler_respond_callback_fail);
+
+    return_status = SCMI_NOT_SUPPORTED;
+    status = scmi_perf_message_handler(
+        (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
+        service_id,
+        (const uint32_t *)&payload,
+        payload_size_table[MOD_SCMI_PROTOCOL_VERSION],
+        MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL);
+
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+}
+
+void utest_scmi_perf_message_handler_not_found(void)
+{
+    int status;
+    fwk_id_t service_id =
+        FWK_ID_ELEMENT_INIT(TEST_MODULE_IDX, TEST_SCMI_AGENT_IDX_0);
+    struct scmi_protocol_version_p2a payload = { 0 };
+
+    mod_scmi_from_protocol_api_respond_Stub(
+        version_handler_respond_callback_fail);
+
+    return_status = SCMI_NOT_FOUND;
+    status = scmi_perf_message_handler(
+        (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
+        service_id,
+        (const uint32_t *)&payload,
+        payload_size_table[MOD_SCMI_PROTOCOL_VERSION],
+        FWK_ARRAY_SIZE(handler_table));
+
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
 }
 
 void utest_scmi_perf_protocol_version_handler(void)
@@ -1151,8 +1210,12 @@ int scmi_perf_test_main(void)
     UNITY_BEGIN();
 
 #ifndef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
-    RUN_TEST(utest_scmi_perf_protocol_version_handler);
+#    ifndef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
+    RUN_TEST(utest_scmi_perf_message_handler_bad_message_id);
+    RUN_TEST(utest_scmi_perf_message_handler_not_found);
+#    endif
 
+    RUN_TEST(utest_scmi_perf_protocol_version_handler);
     RUN_TEST(utest_scmi_perf_protocol_attributes_handler);
 
     RUN_TEST(utest_scmi_perf_protocol_message_attributes_handler_valid_param);
