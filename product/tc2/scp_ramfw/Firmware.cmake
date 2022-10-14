@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -23,6 +23,8 @@ set(SCP_ENABLE_RESOURCE_PERMISSIONS_INIT TRUE)
 
 set(SCP_ENABLE_IPO_INIT FALSE)
 
+set(SCP_ENABLE_SCMI_PERF_FAST_CHANNELS_INIT FALSE)
+
 set(SCP_ARCHITECTURE "arm-m")
 
 list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/tc2_system")
@@ -33,6 +35,8 @@ list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/tc2_system")
 
 list(APPEND SCP_MODULES "armv7m-mpu")
 list(APPEND SCP_MODULES "pl011")
+list(APPEND SCP_MODULES "gtimer")
+list(APPEND SCP_MODULES "timer")
 list(APPEND SCP_MODULES "ppu-v1")
 list(APPEND SCP_MODULES "system-power")
 list(APPEND SCP_MODULES "mhu2")
@@ -49,8 +53,6 @@ list(APPEND SCP_MODULES "scmi-system-power")
 list(APPEND SCP_MODULES "dvfs")
 list(APPEND SCP_MODULES "scmi-clock")
 list(APPEND SCP_MODULES "scmi-perf")
-list(APPEND SCP_MODULES "gtimer")
-list(APPEND SCP_MODULES "timer")
 list(APPEND SCP_MODULES "mock-psu")
 list(APPEND SCP_MODULES "psu")
 list(APPEND SCP_MODULES "tc2-system")
