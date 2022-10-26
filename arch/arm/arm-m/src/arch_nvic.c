@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -261,6 +261,7 @@ static void irq_invalid(void)
     (void)disable(__get_IPSR());
 }
 
+#ifndef ARMV6M
 int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
 {
     uint32_t ictr_intlinesnum;
@@ -342,3 +343,47 @@ int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
 
     return FWK_SUCCESS;
 }
+#else
+
+int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
+{
+    uint32_t ictr_intlinesnum;
+    uint32_t irq;
+
+    if (driver == NULL) {
+        return FWK_E_PARAM;
+    }
+
+    /* Find the number of interrupt lines implemented in hardware */
+    ictr_intlinesnum = 0;
+    irq_count = (ictr_intlinesnum + 1) * 32;
+    isr_count = NVIC_USER_IRQ_OFFSET + irq_count;
+
+    /*
+     * irq_count holds the amount of IRQ meanwhile IRQN_TYPE_MAX holds the
+     * maximum IRQ number (for type size), that is the reason there is a +1 in
+     * the comparison.
+     */
+    fwk_assert(irq_count <= (IRQN_TYPE_MAX + 1));
+
+    __DMB();
+
+    __disable_irq();
+
+    /* Initialize IRQs */
+    for (irq = 0; irq < irq_count; irq++) {
+        /* Ensure IRQs are disabled during boot sequence */
+        NVIC_DisableIRQ((IRQn_Type)irq);
+        NVIC_ClearPendingIRQ((IRQn_Type)irq);
+
+        /* Initialize all IRQ entries to point to the irq_invalid() handler */
+        NVIC_SetVector((IRQn_Type)irq, (uint32_t)irq_invalid);
+    }
+
+    __enable_irq();
+
+    *driver = &arch_nvic_driver;
+
+    return FWK_SUCCESS;
+}
+#endif

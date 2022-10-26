@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -39,6 +39,7 @@ static const struct fwk_arch_init_driver arch_init_driver = {
     .interrupt = arch_nvic_init,
 };
 
+#ifndef ARMV6M
 static void arch_init_ccr(void)
 {
     /*
@@ -61,10 +62,13 @@ static void arch_init_ccr(void)
     SCB->CCR |= SCB_CCR_STKALIGN_Msk;
 #endif
 }
+#endif
 
 int main(void)
 {
+#ifndef ARMV6M
     arch_init_ccr();
+#endif
 
     return fwk_arch_init(&arch_init_driver);
 }
