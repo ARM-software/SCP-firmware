@@ -794,7 +794,8 @@ INPUT                  = $(TOP_DIR)/readme.md \
                          $(TOP_DIR)/license.md \
                          $(TOP_DIR)/user_guide.md \
                          $(TOP_DIR)/change_log.md \
-                         $(BS_DIR)/doc.md \
+                         $(DOC_DIR)/build_system.md \
+                         $(DOC_DIR)/cmake_readme.md \
                          $(DOC_DIR)/code_style.md \
                          $(DOC_DIR)/code_rules.md \
                          $(DOC_DIR)/framework.md \

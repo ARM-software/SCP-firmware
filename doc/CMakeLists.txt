@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -29,7 +29,6 @@ set(scp_sources "\"$<JOIN:${scp_sources},\" \">\"")
 set(scp_includes "\"$<JOIN:${scp_includes},\" \">\"")
 set(scp_defines $<JOIN:${scp_defines}, >)
 
-list(APPEND scp_sources "${SCP_SOURCE_DIR}/build_system/doc.md")
 list(APPEND scp_sources "${SCP_SOURCE_DIR}/change_log.md")
 list(APPEND scp_sources "${SCP_SOURCE_DIR}/license.md")
 list(APPEND scp_sources "${SCP_SOURCE_DIR}/readme.md")
@@ -42,6 +41,8 @@ list(APPEND scp_sources "$(CMAKE_CURRENT_SOURCE_DIR)/code_style.md")
 list(APPEND scp_sources "$(CMAKE_CURRENT_SOURCE_DIR)/deferred_response_architecture.md")
 list(APPEND scp_sources "$(CMAKE_CURRENT_SOURCE_DIR)/framework.md")
 list(APPEND scp_sources "$(CMAKE_CURRENT_SOURCE_DIR)/glossary.md")
+list(APPEND scp_sources "${CMAKE_CURRENT_SOURCE_DIR}/build_system.md")
+list(APPEND scp_sources "${CMAKE_CURRENT_SOURCE_DIR}/cmake_readme.md")
 
 # cmake-format: on
 
