@@ -165,7 +165,9 @@ static bool fwk_log_banner(void)
 {
     char buffer[FMW_LOG_COLUMNS];
 
-#ifndef FMW_LOG_MINIMAL_BANNER
+#if defined(FMW_LOG_CUSTOM_BANNER)
+    const char *banner[] = { FMW_LOG_CUSTOM_BANNER_STRING };
+#elif !defined(FMW_LOG_MINIMAL_BANNER)
     const char *banner[] = {
         " ___  ___ ___      __ _",
         "/ __|/ __| _ \\___ / _(_)_ _ _ ____ __ ____ _ _ _ ___",
