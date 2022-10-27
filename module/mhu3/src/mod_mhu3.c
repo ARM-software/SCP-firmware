@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -462,7 +462,7 @@ static int mhu3_bind(fwk_id_t id, unsigned int round)
                     FWK_ID_API(
                         FWK_MODULE_IDX_TRANSPORT,
                         MOD_TRANSPORT_API_IDX_DRIVER_INPUT),
-                    channel_ctx->transport_api);
+                    &channel_ctx->transport_api);
 
                 if (status != FWK_SUCCESS) {
                     /* Unable to bind back to TRANSPORT channel */
