@@ -12,7 +12,6 @@ export TOP_DIR := $(shell pwd)
 export ARCH_DIR := $(TOP_DIR)/arch
 export FWK_DIR := $(TOP_DIR)/framework
 export TOOLS_DIR := $(TOP_DIR)/tools
-export BS_DIR := $(TOOLS_DIR)/build_system
 export PRODUCTS_DIR := $(TOP_DIR)/product
 export MODULES_DIR := $(TOP_DIR)/module
 export DOC_DIR := $(TOP_DIR)/doc
@@ -192,7 +191,7 @@ CMAKE_COMMAND_OPTION += $(CMAKE_DEBUGGER_OPTION)
 help:
 	@echo "Arm SCP/MCP Software build system"
 	@echo ""
-	@echo "Usage: make [PRODUCT=<name>] [OPTIONS] [TARGET]"
+	@echo "Usage: make -f Makefile.cmake [PRODUCT=<name>] [OPTIONS] [TARGET]"
 	@echo ""
 	@echo "--------------------------------------------------------------------"
 	@echo "| Available Targets                                                |"
