@@ -456,6 +456,17 @@ int perf_set_limits(
 }
 
 #ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+static void adjust_level_for_limits(
+    const struct mod_scmi_perf_level_limits *limits,
+    uint32_t *level)
+{
+    if (*level < limits->minimum) {
+        *level = limits->minimum;
+    } else if (*level > limits->maximum) {
+        *level = limits->maximum;
+    }
+}
+
 /*
  * Evaluate the level & limits in one go.
  * Because the limits may also come from the external plugins, their value may
@@ -474,6 +485,7 @@ void perf_eval_performance(
     }
 
     domain_ctx = get_ctx(domain_id);
+    adjust_level_for_limits(limits, level);
 
     if ((limits->minimum == domain_ctx->level_limits.minimum) &&
         (limits->maximum == domain_ctx->level_limits.maximum)) {
@@ -481,18 +493,12 @@ void perf_eval_performance(
         if (status != FWK_SUCCESS) {
             FWK_LOG_DEBUG("[SCMI-PERF] %s @%d", __func__, __LINE__);
         }
+
         return;
     }
 
     scmi_perf_notify_limits_updated(
         domain_id, limits->minimum, limits->maximum);
-
-    /* adjust_opp_for_new_limits */
-    if (*level < limits->minimum) {
-        *level = limits->minimum;
-    } else if (*level > limits->maximum) {
-        *level = limits->maximum;
-    }
 
     domain_ctx->level_limits.minimum = limits->minimum;
     domain_ctx->level_limits.maximum = limits->maximum;
