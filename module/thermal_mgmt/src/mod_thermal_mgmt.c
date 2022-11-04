@@ -135,7 +135,7 @@ static int read_temperature(fwk_id_t id)
     if (status == FWK_SUCCESS) {
         dev_ctx->cur_temp = (uint32_t)dev_ctx->sensor_data.value;
 
-        dev_ctx->pi_control_needs_update = true;
+        dev_ctx->control_needs_update = true;
     }
 
     return status;
