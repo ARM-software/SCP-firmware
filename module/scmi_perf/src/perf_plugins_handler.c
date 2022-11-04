@@ -235,6 +235,8 @@ static void plugins_policy_sync_level_limits(
                 dev_ctx->lmax = adj_max_lim_full_table[i];
             }
 
+            dev_ctx->max = perf_plugins_ctx.full_perf_table.level[i];
+
             write_back_adj_values(dev_ctx, i);
         }
     }
