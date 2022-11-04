@@ -146,7 +146,7 @@ static struct perf_plugins_handler_api handler_api = {
 
 /*
  * Write back the adjusted values for use by the next plugins.
- * Note that for logical oomains, the aggregated values are written.
+ * Note that for logical domains, the aggregated values are written.
  */
 static void write_back_adj_values(
     struct perf_plugins_dev_ctx *dev_ctx,
@@ -478,8 +478,6 @@ void perf_plugins_handler_get(
     this_dom_idx = fwk_id_get_sub_element_idx(fc_update->domain_id);
     last_logical_dom_idx = dev_ctx->log_dom_count - 1;
 
-    config = perf_plugins_ctx.config;
-
     if (this_dom_idx != last_logical_dom_idx) {
         /*
          * Any other logical domain, no need to forward the request to DVFS,
@@ -489,6 +487,8 @@ void perf_plugins_handler_get(
         fc_update->adj_max_limit = dev_ctx->lmax;
         fc_update->adj_min_limit = dev_ctx->lmin;
     } else {
+        config = perf_plugins_ctx.config;
+
         if (config->plugins_count == 0) {
             /* domains coordination only */
             plugins_policy_update_no_plugins(fc_update);
@@ -500,14 +500,17 @@ void perf_plugins_handler_get(
 
 void perf_plugins_handler_report(struct perf_plugins_perf_report *data)
 {
+    const struct mod_scmi_perf_config *config;
     struct perf_plugins_api *api;
     int status;
 
-    if (perf_plugins_ctx.config->plugins_count == 0) {
+    config = perf_plugins_ctx.config;
+
+    if (config->plugins_count == 0) {
         return;
     }
 
-    for (size_t i = 0; i < perf_plugins_ctx.config->plugins_count; i++) {
+    for (size_t i = 0; i < config->plugins_count; i++) {
         api = perf_plugins_ctx.plugins_api_table[i];
 
         if (api->report != NULL) {
