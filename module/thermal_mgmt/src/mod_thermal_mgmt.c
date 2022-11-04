@@ -125,7 +125,6 @@ static int read_temperature(fwk_id_t id)
     return fwk_put_event(&event);
 #else
     int status;
-    uint64_t value;
     struct mod_thermal_mgmt_dev_ctx *dev_ctx;
 
     dev_ctx = get_dev_ctx(id);
