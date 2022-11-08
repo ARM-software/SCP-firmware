@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "platform_core.h"
+
 #include <mod_mock_psu.h>
 #include <mod_psu.h>
 
@@ -25,13 +27,12 @@ static const struct fwk_element element_table[] = {
     PSU_ELEMENT_IDX(1),
     PSU_ELEMENT_IDX(2),
     PSU_ELEMENT_IDX(3),
-#if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 1)
+#if (NUMBER_OF_CLUSTERS > 4)
     PSU_ELEMENT_IDX(4),
     PSU_ELEMENT_IDX(5),
     PSU_ELEMENT_IDX(6),
     PSU_ELEMENT_IDX(7),
-#endif
-#if (PLATFORM_VARIANT == 0)
+#    if (NUMBER_OF_CLUSTERS > 8)
     PSU_ELEMENT_IDX(8),
     PSU_ELEMENT_IDX(9),
     PSU_ELEMENT_IDX(10),
@@ -40,6 +41,7 @@ static const struct fwk_element element_table[] = {
     PSU_ELEMENT_IDX(13),
     PSU_ELEMENT_IDX(14),
     PSU_ELEMENT_IDX(15),
+#    endif
 #endif
     { 0 },
 };

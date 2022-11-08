@@ -6,6 +6,7 @@
  */
 
 #include "clock_soc.h"
+#include "platform_core.h"
 #include "scp_pik.h"
 #include "scp_soc_mmap.h"
 
@@ -35,13 +36,12 @@ static const struct fwk_element system_pll_element_table[] = {
     CLOCK_PLL_IDX_CPU(1),
     CLOCK_PLL_IDX_CPU(2),
     CLOCK_PLL_IDX_CPU(3),
-#if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 1)
+#if (NUMBER_OF_CLUSTERS > 4)
     CLOCK_PLL_IDX_CPU(4),
     CLOCK_PLL_IDX_CPU(5),
     CLOCK_PLL_IDX_CPU(6),
     CLOCK_PLL_IDX_CPU(7),
-#endif
-#if (PLATFORM_VARIANT == 0)
+#    if (NUMBER_OF_CLUSTERS > 8)
     CLOCK_PLL_IDX_CPU(8),
     CLOCK_PLL_IDX_CPU(9),
     CLOCK_PLL_IDX_CPU(10),
@@ -50,6 +50,7 @@ static const struct fwk_element system_pll_element_table[] = {
     CLOCK_PLL_IDX_CPU(13),
     CLOCK_PLL_IDX_CPU(14),
     CLOCK_PLL_IDX_CPU(15),
+#    endif
 #endif
     [CLOCK_PLL_IDX_SYS] = {
         .name = "SYS_PLL",
