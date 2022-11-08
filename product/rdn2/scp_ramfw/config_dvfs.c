@@ -7,6 +7,7 @@
 
 #include "clock_soc.h"
 #include "config_dvfs.h"
+#include "platform_core.h"
 #include "rd_alarm_idx.h"
 
 #include <mod_dvfs.h>
@@ -45,13 +46,12 @@ static const struct mod_dvfs_domain_config cpu0 = DVFS_DOMAIN_CPU_GROUP_IDX(0);
 static const struct mod_dvfs_domain_config cpu1 = DVFS_DOMAIN_CPU_GROUP_IDX(1);
 static const struct mod_dvfs_domain_config cpu2 = DVFS_DOMAIN_CPU_GROUP_IDX(2);
 static const struct mod_dvfs_domain_config cpu3 = DVFS_DOMAIN_CPU_GROUP_IDX(3);
-#if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 1)
+#if (NUMBER_OF_CLUSTERS > 4)
 static const struct mod_dvfs_domain_config cpu4 = DVFS_DOMAIN_CPU_GROUP_IDX(4);
 static const struct mod_dvfs_domain_config cpu5 = DVFS_DOMAIN_CPU_GROUP_IDX(5);
 static const struct mod_dvfs_domain_config cpu6 = DVFS_DOMAIN_CPU_GROUP_IDX(6);
 static const struct mod_dvfs_domain_config cpu7 = DVFS_DOMAIN_CPU_GROUP_IDX(7);
-#endif
-#if (PLATFORM_VARIANT == 0)
+#    if (NUMBER_OF_CLUSTERS > 8)
 static const struct mod_dvfs_domain_config cpu8 = DVFS_DOMAIN_CPU_GROUP_IDX(8);
 static const struct mod_dvfs_domain_config cpu9 = DVFS_DOMAIN_CPU_GROUP_IDX(9);
 static const struct mod_dvfs_domain_config cpu10 =
@@ -66,6 +66,7 @@ static const struct mod_dvfs_domain_config cpu14 =
     DVFS_DOMAIN_CPU_GROUP_IDX(14);
 static const struct mod_dvfs_domain_config cpu15 =
     DVFS_DOMAIN_CPU_GROUP_IDX(15);
+#    endif
 #endif
 
 static const struct fwk_element element_table[] = {
@@ -73,13 +74,12 @@ static const struct fwk_element element_table[] = {
     DVFS_ELEMENT_IDX(1),
     DVFS_ELEMENT_IDX(2),
     DVFS_ELEMENT_IDX(3),
-#if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 1)
+#if (NUMBER_OF_CLUSTERS > 4)
     DVFS_ELEMENT_IDX(4),
     DVFS_ELEMENT_IDX(5),
     DVFS_ELEMENT_IDX(6),
     DVFS_ELEMENT_IDX(7),
-#endif
-#if (PLATFORM_VARIANT == 0)
+#    if (NUMBER_OF_CLUSTERS > 8)
     DVFS_ELEMENT_IDX(8),
     DVFS_ELEMENT_IDX(9),
     DVFS_ELEMENT_IDX(10),
@@ -88,6 +88,7 @@ static const struct fwk_element element_table[] = {
     DVFS_ELEMENT_IDX(13),
     DVFS_ELEMENT_IDX(14),
     DVFS_ELEMENT_IDX(15),
+#    endif
 #endif
     { 0 },
 };
