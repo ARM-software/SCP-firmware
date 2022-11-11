@@ -30,42 +30,108 @@ typedef void(*cmock_fwk_interrupt_func_ptr2)(uintptr_t param);
 void fwk_interrupt_init_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_interrupt_init_ExpectAndReturn(driver, cmock_retval) fwk_interrupt_init_CMockExpectAndReturn(__LINE__, driver, cmock_retval)
 void fwk_interrupt_init_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_arch_interrupt_driver* driver, int cmock_to_return);
+typedef int (* CMOCK_fwk_interrupt_init_CALLBACK)(const struct fwk_arch_interrupt_driver* driver, int cmock_num_calls);
+void fwk_interrupt_init_AddCallback(CMOCK_fwk_interrupt_init_CALLBACK Callback);
+void fwk_interrupt_init_Stub(CMOCK_fwk_interrupt_init_CALLBACK Callback);
+#define fwk_interrupt_init_StubWithCallback fwk_interrupt_init_Stub
+#define fwk_interrupt_init_ExpectWithArrayAndReturn(driver, driver_Depth, cmock_retval) fwk_interrupt_init_CMockExpectWithArrayAndReturn(__LINE__, driver, driver_Depth, cmock_retval)
+void fwk_interrupt_init_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_arch_interrupt_driver* driver, int driver_Depth, int cmock_to_return);
 #define fwk_interrupt_is_enabled_ExpectAnyArgsAndReturn(cmock_retval) fwk_interrupt_is_enabled_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_interrupt_is_enabled_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_interrupt_is_enabled_ExpectAndReturn(interrupt, enabled, cmock_retval) fwk_interrupt_is_enabled_CMockExpectAndReturn(__LINE__, interrupt, enabled, cmock_retval)
 void fwk_interrupt_is_enabled_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int interrupt, bool* enabled, int cmock_to_return);
+typedef int (* CMOCK_fwk_interrupt_is_enabled_CALLBACK)(unsigned int interrupt, bool* enabled, int cmock_num_calls);
+void fwk_interrupt_is_enabled_AddCallback(CMOCK_fwk_interrupt_is_enabled_CALLBACK Callback);
+void fwk_interrupt_is_enabled_Stub(CMOCK_fwk_interrupt_is_enabled_CALLBACK Callback);
+#define fwk_interrupt_is_enabled_StubWithCallback fwk_interrupt_is_enabled_Stub
+#define fwk_interrupt_is_enabled_ExpectWithArrayAndReturn(interrupt, enabled, enabled_Depth, cmock_retval) fwk_interrupt_is_enabled_CMockExpectWithArrayAndReturn(__LINE__, interrupt, enabled, enabled_Depth, cmock_retval)
+void fwk_interrupt_is_enabled_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int interrupt, bool* enabled, int enabled_Depth, int cmock_to_return);
+#define fwk_interrupt_is_enabled_ReturnThruPtr_enabled(enabled) fwk_interrupt_is_enabled_CMockReturnMemThruPtr_enabled(__LINE__, enabled, sizeof(bool))
+#define fwk_interrupt_is_enabled_ReturnArrayThruPtr_enabled(enabled, cmock_len) fwk_interrupt_is_enabled_CMockReturnMemThruPtr_enabled(__LINE__, enabled, cmock_len * sizeof(*enabled))
+#define fwk_interrupt_is_enabled_ReturnMemThruPtr_enabled(enabled, cmock_size) fwk_interrupt_is_enabled_CMockReturnMemThruPtr_enabled(__LINE__, enabled, cmock_size)
+void fwk_interrupt_is_enabled_CMockReturnMemThruPtr_enabled(UNITY_LINE_TYPE cmock_line, bool* enabled, size_t cmock_size);
 #define fwk_interrupt_enable_ExpectAnyArgsAndReturn(cmock_retval) fwk_interrupt_enable_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_interrupt_enable_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_interrupt_enable_ExpectAndReturn(interrupt, cmock_retval) fwk_interrupt_enable_CMockExpectAndReturn(__LINE__, interrupt, cmock_retval)
 void fwk_interrupt_enable_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int interrupt, int cmock_to_return);
+typedef int (* CMOCK_fwk_interrupt_enable_CALLBACK)(unsigned int interrupt, int cmock_num_calls);
+void fwk_interrupt_enable_AddCallback(CMOCK_fwk_interrupt_enable_CALLBACK Callback);
+void fwk_interrupt_enable_Stub(CMOCK_fwk_interrupt_enable_CALLBACK Callback);
+#define fwk_interrupt_enable_StubWithCallback fwk_interrupt_enable_Stub
 #define fwk_interrupt_disable_ExpectAnyArgsAndReturn(cmock_retval) fwk_interrupt_disable_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_interrupt_disable_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_interrupt_disable_ExpectAndReturn(interrupt, cmock_retval) fwk_interrupt_disable_CMockExpectAndReturn(__LINE__, interrupt, cmock_retval)
 void fwk_interrupt_disable_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int interrupt, int cmock_to_return);
+typedef int (* CMOCK_fwk_interrupt_disable_CALLBACK)(unsigned int interrupt, int cmock_num_calls);
+void fwk_interrupt_disable_AddCallback(CMOCK_fwk_interrupt_disable_CALLBACK Callback);
+void fwk_interrupt_disable_Stub(CMOCK_fwk_interrupt_disable_CALLBACK Callback);
+#define fwk_interrupt_disable_StubWithCallback fwk_interrupt_disable_Stub
 #define fwk_interrupt_is_pending_ExpectAnyArgsAndReturn(cmock_retval) fwk_interrupt_is_pending_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_interrupt_is_pending_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_interrupt_is_pending_ExpectAndReturn(interrupt, pending, cmock_retval) fwk_interrupt_is_pending_CMockExpectAndReturn(__LINE__, interrupt, pending, cmock_retval)
 void fwk_interrupt_is_pending_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int interrupt, bool* pending, int cmock_to_return);
+typedef int (* CMOCK_fwk_interrupt_is_pending_CALLBACK)(unsigned int interrupt, bool* pending, int cmock_num_calls);
+void fwk_interrupt_is_pending_AddCallback(CMOCK_fwk_interrupt_is_pending_CALLBACK Callback);
+void fwk_interrupt_is_pending_Stub(CMOCK_fwk_interrupt_is_pending_CALLBACK Callback);
+#define fwk_interrupt_is_pending_StubWithCallback fwk_interrupt_is_pending_Stub
+#define fwk_interrupt_is_pending_ExpectWithArrayAndReturn(interrupt, pending, pending_Depth, cmock_retval) fwk_interrupt_is_pending_CMockExpectWithArrayAndReturn(__LINE__, interrupt, pending, pending_Depth, cmock_retval)
+void fwk_interrupt_is_pending_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int interrupt, bool* pending, int pending_Depth, int cmock_to_return);
+#define fwk_interrupt_is_pending_ReturnThruPtr_pending(pending) fwk_interrupt_is_pending_CMockReturnMemThruPtr_pending(__LINE__, pending, sizeof(bool))
+#define fwk_interrupt_is_pending_ReturnArrayThruPtr_pending(pending, cmock_len) fwk_interrupt_is_pending_CMockReturnMemThruPtr_pending(__LINE__, pending, cmock_len * sizeof(*pending))
+#define fwk_interrupt_is_pending_ReturnMemThruPtr_pending(pending, cmock_size) fwk_interrupt_is_pending_CMockReturnMemThruPtr_pending(__LINE__, pending, cmock_size)
+void fwk_interrupt_is_pending_CMockReturnMemThruPtr_pending(UNITY_LINE_TYPE cmock_line, bool* pending, size_t cmock_size);
 #define fwk_interrupt_set_pending_ExpectAnyArgsAndReturn(cmock_retval) fwk_interrupt_set_pending_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_interrupt_set_pending_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_interrupt_set_pending_ExpectAndReturn(interrupt, cmock_retval) fwk_interrupt_set_pending_CMockExpectAndReturn(__LINE__, interrupt, cmock_retval)
 void fwk_interrupt_set_pending_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int interrupt, int cmock_to_return);
+typedef int (* CMOCK_fwk_interrupt_set_pending_CALLBACK)(unsigned int interrupt, int cmock_num_calls);
+void fwk_interrupt_set_pending_AddCallback(CMOCK_fwk_interrupt_set_pending_CALLBACK Callback);
+void fwk_interrupt_set_pending_Stub(CMOCK_fwk_interrupt_set_pending_CALLBACK Callback);
+#define fwk_interrupt_set_pending_StubWithCallback fwk_interrupt_set_pending_Stub
 #define fwk_interrupt_clear_pending_ExpectAnyArgsAndReturn(cmock_retval) fwk_interrupt_clear_pending_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_interrupt_clear_pending_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_interrupt_clear_pending_ExpectAndReturn(interrupt, cmock_retval) fwk_interrupt_clear_pending_CMockExpectAndReturn(__LINE__, interrupt, cmock_retval)
 void fwk_interrupt_clear_pending_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int interrupt, int cmock_to_return);
+typedef int (* CMOCK_fwk_interrupt_clear_pending_CALLBACK)(unsigned int interrupt, int cmock_num_calls);
+void fwk_interrupt_clear_pending_AddCallback(CMOCK_fwk_interrupt_clear_pending_CALLBACK Callback);
+void fwk_interrupt_clear_pending_Stub(CMOCK_fwk_interrupt_clear_pending_CALLBACK Callback);
+#define fwk_interrupt_clear_pending_StubWithCallback fwk_interrupt_clear_pending_Stub
 #define fwk_interrupt_set_isr_ExpectAnyArgsAndReturn(cmock_retval) fwk_interrupt_set_isr_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_interrupt_set_isr_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_interrupt_set_isr_ExpectAndReturn(interrupt, isr, cmock_retval) fwk_interrupt_set_isr_CMockExpectAndReturn(__LINE__, interrupt, isr, cmock_retval)
 void fwk_interrupt_set_isr_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int interrupt, cmock_fwk_interrupt_func_ptr1 isr, int cmock_to_return);
+typedef int (* CMOCK_fwk_interrupt_set_isr_CALLBACK)(unsigned int interrupt, cmock_fwk_interrupt_func_ptr1 isr, int cmock_num_calls);
+void fwk_interrupt_set_isr_AddCallback(CMOCK_fwk_interrupt_set_isr_CALLBACK Callback);
+void fwk_interrupt_set_isr_Stub(CMOCK_fwk_interrupt_set_isr_CALLBACK Callback);
+#define fwk_interrupt_set_isr_StubWithCallback fwk_interrupt_set_isr_Stub
 #define fwk_interrupt_set_isr_param_ExpectAnyArgsAndReturn(cmock_retval) fwk_interrupt_set_isr_param_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_interrupt_set_isr_param_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_interrupt_set_isr_param_ExpectAndReturn(interrupt, isr, param, cmock_retval) fwk_interrupt_set_isr_param_CMockExpectAndReturn(__LINE__, interrupt, isr, param, cmock_retval)
 void fwk_interrupt_set_isr_param_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int interrupt, cmock_fwk_interrupt_func_ptr2 isr, uintptr_t param, int cmock_to_return);
+typedef int (* CMOCK_fwk_interrupt_set_isr_param_CALLBACK)(unsigned int interrupt, cmock_fwk_interrupt_func_ptr2 isr, uintptr_t param, int cmock_num_calls);
+void fwk_interrupt_set_isr_param_AddCallback(CMOCK_fwk_interrupt_set_isr_param_CALLBACK Callback);
+void fwk_interrupt_set_isr_param_Stub(CMOCK_fwk_interrupt_set_isr_param_CALLBACK Callback);
+#define fwk_interrupt_set_isr_param_StubWithCallback fwk_interrupt_set_isr_param_Stub
 #define fwk_interrupt_get_current_ExpectAnyArgsAndReturn(cmock_retval) fwk_interrupt_get_current_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_interrupt_get_current_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_interrupt_get_current_ExpectAndReturn(interrupt, cmock_retval) fwk_interrupt_get_current_CMockExpectAndReturn(__LINE__, interrupt, cmock_retval)
 void fwk_interrupt_get_current_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int* interrupt, int cmock_to_return);
+typedef int (* CMOCK_fwk_interrupt_get_current_CALLBACK)(unsigned int* interrupt, int cmock_num_calls);
+void fwk_interrupt_get_current_AddCallback(CMOCK_fwk_interrupt_get_current_CALLBACK Callback);
+void fwk_interrupt_get_current_Stub(CMOCK_fwk_interrupt_get_current_CALLBACK Callback);
+#define fwk_interrupt_get_current_StubWithCallback fwk_interrupt_get_current_Stub
+#define fwk_interrupt_get_current_ExpectWithArrayAndReturn(interrupt, interrupt_Depth, cmock_retval) fwk_interrupt_get_current_CMockExpectWithArrayAndReturn(__LINE__, interrupt, interrupt_Depth, cmock_retval)
+void fwk_interrupt_get_current_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int* interrupt, int interrupt_Depth, int cmock_to_return);
+#define fwk_interrupt_get_current_ReturnThruPtr_interrupt(interrupt) fwk_interrupt_get_current_CMockReturnMemThruPtr_interrupt(__LINE__, interrupt, sizeof(unsigned int))
+#define fwk_interrupt_get_current_ReturnArrayThruPtr_interrupt(interrupt, cmock_len) fwk_interrupt_get_current_CMockReturnMemThruPtr_interrupt(__LINE__, interrupt, cmock_len * sizeof(*interrupt))
+#define fwk_interrupt_get_current_ReturnMemThruPtr_interrupt(interrupt, cmock_size) fwk_interrupt_get_current_CMockReturnMemThruPtr_interrupt(__LINE__, interrupt, cmock_size)
+void fwk_interrupt_get_current_CMockReturnMemThruPtr_interrupt(UNITY_LINE_TYPE cmock_line, unsigned int* interrupt, size_t cmock_size);
+#define fwk_is_interrupt_context_ExpectAndReturn(cmock_retval) fwk_is_interrupt_context_CMockExpectAndReturn(__LINE__, cmock_retval)
+void fwk_is_interrupt_context_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return);
+typedef bool (* CMOCK_fwk_is_interrupt_context_CALLBACK)(int cmock_num_calls);
+void fwk_is_interrupt_context_AddCallback(CMOCK_fwk_is_interrupt_context_CALLBACK Callback);
+void fwk_is_interrupt_context_Stub(CMOCK_fwk_is_interrupt_context_CALLBACK Callback);
+#define fwk_is_interrupt_context_StubWithCallback fwk_is_interrupt_context_Stub
 
 #if defined(__GNUC__) && !defined(__ICC) && !defined(__TMS470__)
 #if __GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 6 || (__GNUC_MINOR__ == 6 && __GNUC_PATCHLEVEL__ > 0)))
