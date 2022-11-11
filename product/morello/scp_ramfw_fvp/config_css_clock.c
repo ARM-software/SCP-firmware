@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -156,7 +156,7 @@ static const struct fwk_element css_clock_element_table[] = {
                 .member_api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_PIK_CLOCK,
                     MOD_PIK_CLOCK_API_TYPE_CSS),
-                .initial_rate = CSS_CLK_RATE_CPU_GRP0_SUPER_UNDERDRIVE,
+                .initial_rate = CSS_CLK_RATE_CPU_GRP0_SUPER_OVERDRIVE,
                 .modulation_supported = true,
             }),
         },
@@ -180,7 +180,7 @@ static const struct fwk_element css_clock_element_table[] = {
                 .member_api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_PIK_CLOCK,
                     MOD_PIK_CLOCK_API_TYPE_CSS),
-                .initial_rate = CSS_CLK_RATE_CPU_GRP1_SUPER_UNDERDRIVE,
+                .initial_rate = CSS_CLK_RATE_CPU_GRP1_SUPER_OVERDRIVE,
                 .modulation_supported = true,
             }),
         },
