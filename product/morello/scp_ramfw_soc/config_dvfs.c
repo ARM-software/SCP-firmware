@@ -23,7 +23,7 @@ static const struct mod_dvfs_domain_config cpu_group_0 = {
     .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, 0),
     .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_CPU_GROUP0),
     .latency = 1200,
-    .sustained_idx = 2,
+    .sustained_idx = 4,
     .opps =
         (struct mod_dvfs_opp[]){
             {
@@ -64,7 +64,7 @@ static const struct mod_dvfs_domain_config cpu_group_1 = {
     .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, 1),
     .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_CPU_GROUP1),
     .latency = 1200,
-    .sustained_idx = 2,
+    .sustained_idx = 4,
     .opps =
         (struct mod_dvfs_opp[]){
             {
