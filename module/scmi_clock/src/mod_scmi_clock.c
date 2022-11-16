@@ -1614,15 +1614,15 @@ static int process_response_event(const struct fwk_event *event)
 static int scmi_clock_process_event(const struct fwk_event *event,
                                     struct fwk_event *resp_event)
 {
+    /* Request events from SCMI */
     if (fwk_id_get_module_idx(event->source_id) ==
         fwk_id_get_module_idx(fwk_module_id_scmi)) {
-        /* Request events */
         return process_request_event(event);
     }
 
+    /* Response events from Clock HAL */
     if (fwk_id_get_module_idx(event->source_id) ==
         fwk_id_get_module_idx(fwk_module_id_clock)) {
-        /* Responses from Clock HAL */
         return process_response_event(event);
     }
 
