@@ -127,13 +127,17 @@ void distribute_power(fwk_id_t id, uint32_t *perf_request, uint32_t *perf_limit)
 {
     struct mod_thermal_mgmt_dev_ctx *dev_ctx;
     struct mod_thermal_mgmt_actor_ctx *actor_ctx;
+    int status;
     unsigned int actor_idx, dom;
     uint32_t new_perf_limit, dev_perf_request;
     uint32_t actors_count;
+    uint32_t idle_power, prev_used_power;
+    uint16_t activity;
 
     dev_ctx = get_dev_ctx(id);
 
     actors_count = dev_ctx->config->thermal_actors_count;
+    idle_power = 0;
     dev_ctx->tot_weighted_demand_power = 0;
     dev_ctx->tot_spare_power = 0;
     dev_ctx->tot_power_deficit = 0;
@@ -154,10 +158,28 @@ void distribute_power(fwk_id_t id, uint32_t *perf_request, uint32_t *perf_limit)
         }
 
         get_actor_power(dev_ctx, actor_ctx, dev_perf_request);
+        if (actor_ctx->activity_api != NULL) {
+            status = actor_ctx->activity_api->get_activity_factor(
+                actor_ctx->config->activity_factor->driver_id, &activity);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_INFO(
+                    "[THERMAL] Failed to get activity factor (%u,%u)",
+                    fwk_id_get_element_idx(id),
+                    actor_idx);
+                continue;
+            }
+
+            /* Calculate used power and accumulate idle power */
+            prev_used_power = (actor_ctx->granted_power * activity) / 1024;
+            idle_power += actor_ctx->granted_power - prev_used_power;
+        }
 
         dev_ctx->tot_weighted_demand_power +=
             actor_ctx->config->weight * actor_ctx->demand_power;
     }
+
+    dev_ctx->allocatable_power =
+        dev_ctx->thermal_allocatable_power + idle_power;
 
     /*
      * STEP 1:
