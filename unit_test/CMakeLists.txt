@@ -111,6 +111,7 @@ list(APPEND UNIT_MODULE scmi_clock)
 list(APPEND UNIT_MODULE scmi_perf)
 list(APPEND UNIT_MODULE scmi_sensor_req)
 list(APPEND UNIT_MODULE scmi_system_power_req)
+list(APPEND UNIT_MODULE mhu3)
 
 list(LENGTH UNIT_MODULE UNIT_TEST_MAX)
 
