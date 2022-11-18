@@ -186,6 +186,14 @@ characteristics.
 When implementing the APIs, the Power Model module should also allow incoming
 bind requests from Thermal Mgmt.
 
+## Activity factor
+There is the possibility to specify an activity factor API driver functionality
+that allows to accumulate idle power from each actor during operation and
+distribute it amongst other actors to use it. Activity factor is an optional
+feature that can be configured when it is required.
+The driver API is platform specific because it gives flexibility in terms of
+implementation depending on system configuration.
+
 
 ## Configuration Example 1 (2 actors, 1 temperature domain)
 
@@ -280,7 +288,109 @@ struct mod_thermal_mgmt_power_model_api power_model_api = {
 
 ```
 
-## Configuration Example 2 (thermal protection)
+## Configuration Example 2 (2 actors, 1 temperature domain and activity factor)
+
+```C
+static struct mod_thermal_mgmt_actor_config actor_table_domain0[] = {
+    [0] = {
+        .driver_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PLAT_POWER_MODEL, 0),
+        .dvfs_domain_id =
+            FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_DVFS, DVFS_ELEMENT_IDX_ACTOR0),
+        .weight = 100,
+        .activity_factor = &((struct mod_thermal_mgmt_activity_factor_config){
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_PLATFORM_ACTIVITY,
+                0),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_PLATFORM_ACTIVITY,
+                MOD_PLATFORM_ACTIVITY_DRIVER_API_IDX),
+        }),
+    },
+    [1] = {
+        .driver_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PLAT_POWER_MODEL, 1),
+        .dvfs_domain_id =
+            FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_DVFS, DVFS_ELEMENT_IDX_ACTOR1),
+        .weight = 200,
+        .activity_factor = &((struct mod_thermal_mgmt_activity_factor_config){
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_PLATFORM_ACTIVITY,
+                1),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_PLATFORM_ACTIVITY,
+                MOD_PLATFORM_ACTIVITY_DRIVER_API_IDX),
+    },
+};
+
+struct fwk_element thermal_mgmt_domains_elem_table = {
+    [0] = {
+        .name = "Thermal Domain 0",
+        .data = &((struct mod_thermal_mgmt_dev_config){
+            .slow_loop_mult = 20,
+
+            .tdp = 5000,
+            .pi_controller = {
+                .switch_on_temperature = 50,
+                .control_temperature = 60,
+                .integral_cutoff = 0,
+                .integral_max = 100,
+                .k_p_undershoot = 1,
+                .k_p_overshoot = 1,
+                .k_integral = 1,
+            },
+
+            .sensor_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SENSOR, 0),
+            .temp_protection = &((struct mod_thermal_mgmt_protection_config){
+                .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_, 0),
+                .driver_api_id = FWK_ID_API_INIT(
+                    FWK_MODULE_IDX_,
+                    0),
+                .warn_temp_threshold = 60,
+                .crit_temp_threshold = 85,
+            }),
+            .driver_api_id =
+                FWK_ID_API_INIT(FWK_MODULE_IDX_PLAT_POWER_MODEL, 0),
+            .thermal_actors_table = actor_table_domain0,
+            .thermal_actors_count = FWK_ARRAY_SIZE(actor_table_domain0),
+        }),
+        .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_thermal_mgmt_element_table),
+    },
+    [1] = { 0 } /* Termination description */
+};
+
+static const struct fwk_element *get_thermal_mgmt_element_table(
+    fwk_id_t module_id)
+{
+    return thermal_mgmt_domains_elem_table;
+}
+
+struct fwk_module_config config_thermal_mgmt = {
+    .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_element_table),
+};
+
+```
+
+The activity factor module should implement the following API:
+
+```C
+
+int get_activity_factor(fwk_id_t domain_id, uint16_t *activity)
+{
+    /* Compute performance factor for the given domain id */
+    *activity = plat_activity_factor;
+    return FWK_SUCCESS;
+}
+
+struct mod_thermal_mgmt_activity_factor_api activity_factor_api = {
+    .get_activity_factor = plat_get_activity_factor,
+};
+
+```
+
+## Configuration Example 3 (thermal protection)
 
 There is the possibility to only configure the module as a thermal protection.
 

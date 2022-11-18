@@ -46,7 +46,7 @@ static void pi_control(fwk_id_t id)
         dev_ctx->config->pi_controller.switch_on_temperature) {
         /* The PI loop is not activated */
         dev_ctx->integral_error = 0;
-        dev_ctx->allocatable_power = (uint32_t)dev_ctx->config->tdp;
+        dev_ctx->thermal_allocatable_power = (uint32_t)dev_ctx->config->tdp;
 
         return;
     }
@@ -78,9 +78,10 @@ static void pi_control(fwk_id_t id)
     pi_power = (k_p * err) + (k_i * dev_ctx->integral_error);
 
     if (pi_power + (int32_t)dev_ctx->config->tdp > 0) {
-        dev_ctx->allocatable_power = pi_power + (uint32_t)dev_ctx->config->tdp;
+        dev_ctx->thermal_allocatable_power =
+            pi_power + (uint32_t)dev_ctx->config->tdp;
     } else {
-        dev_ctx->allocatable_power = 0;
+        dev_ctx->thermal_allocatable_power = 0;
     }
 }
 
@@ -259,7 +260,7 @@ static int thermal_mgmt_dev_init(
 
     if (dev_ctx->config->thermal_actors_count > 0) {
         /* Assume TDP until PI loop is updated */
-        dev_ctx->allocatable_power = (uint32_t)dev_ctx->config->tdp;
+        dev_ctx->thermal_allocatable_power = (uint32_t)dev_ctx->config->tdp;
 
         dev_ctx->actor_ctx_table = fwk_mm_calloc(
             dev_ctx->config->thermal_actors_count,
@@ -299,7 +300,9 @@ static int thermal_mgmt_dev_init(
 static int thermal_mgmt_bind(fwk_id_t id, unsigned int round)
 {
     int status;
+    unsigned int actor;
     struct mod_thermal_mgmt_dev_ctx *dev_ctx;
+    struct mod_thermal_mgmt_actor_ctx *actor_ctx;
 
     if (round > 0) {
         return FWK_SUCCESS;
@@ -338,6 +341,22 @@ static int thermal_mgmt_bind(fwk_id_t id, unsigned int round)
         &dev_ctx->driver_api);
     if (status != FWK_SUCCESS) {
         return FWK_E_PANIC;
+    }
+
+    for (actor = 0; actor < dev_ctx->config->thermal_actors_count; actor++) {
+        /* Get actor context and bind */
+        actor_ctx = get_actor_ctx(dev_ctx, actor);
+
+        if (actor_ctx->config->activity_factor != NULL) {
+            /* Bind to thermal protection driver */
+            status = fwk_module_bind(
+                actor_ctx->config->activity_factor->driver_id,
+                actor_ctx->config->activity_factor->driver_api_id,
+                &actor_ctx->activity_api);
+            if (status != FWK_SUCCESS) {
+                return FWK_E_PANIC;
+            }
+        }
     }
 
     return FWK_SUCCESS;

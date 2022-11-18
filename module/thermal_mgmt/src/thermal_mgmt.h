@@ -46,6 +46,9 @@ struct mod_thermal_mgmt_actor_ctx {
 
     /* The excess of power (initially) granted vs the demand power */
     uint32_t spare_power;
+
+    /* Activity factor API */
+    struct mod_thermal_mgmt_activity_factor_api *activity_api;
 };
 
 struct mod_thermal_mgmt_dev_ctx {
@@ -84,6 +87,9 @@ struct mod_thermal_mgmt_dev_ctx {
      * Use to distribute power according to actors' weight.
      */
     uint32_t tot_weighted_demand_power;
+
+    /* Allocatable power calculated in the control loop */
+    uint32_t thermal_allocatable_power;
 
     /* Total power budget */
     uint32_t allocatable_power;

@@ -39,6 +39,19 @@ enum mod_thermal_api_idx {
 };
 
 /*!
+ * \brief Thermal Mgmt activity factor configuration.
+ *
+ * \details Configuration structure for activity factor.
+ */
+struct mod_thermal_mgmt_activity_factor_config {
+    /*! Activity factor driver identifier */
+    fwk_id_t driver_id;
+
+    /*! Activity factor driver API identifier */
+    fwk_id_t driver_api_id;
+};
+
+/*!
  * \brief Thermal Mgmt actors configuration.
  *
  * \details Configuration structure for individual thermal actors.
@@ -58,6 +71,9 @@ struct mod_thermal_mgmt_actor_config {
      *      devices.
      */
     uint16_t weight;
+
+    /*! Activity factor configuration */
+    struct mod_thermal_mgmt_activity_factor_config *activity_factor;
 };
 
 /*!
@@ -251,6 +267,31 @@ struct mod_thermal_mgmt_protection_api {
      *      identifier.
      */
     void (*critical)(fwk_id_t driver_id, fwk_id_t thermal_id);
+};
+
+/*!
+ * \brief Activity counter API.
+ *
+ * \details This API must be implemented by the platform.
+ */
+struct mod_thermal_mgmt_activity_factor_api {
+    /*!
+     * \brief Gets activity factor from the specified domain.
+     *
+     * \details Activity factor is referred to the corresponding actor and
+     *      implemented by the platform. It must return a 10 bits
+     *      resolution value (0-1023) where 0 corresponds to a complete
+     *      inactivity and 1023 to 100% activity.
+     *
+     * \param domain_id Specific device id.
+     * \param[out] activity activity factor normalized to 10 bits.
+     *
+     * \retval ::FWK_E_PARAM One or more parameters were invalid.
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     *
+     * \return Status code representing the result of the operation.
+     */
+    int (*get_activity_factor)(fwk_id_t domain_id, uint16_t *activity);
 };
 
 /*!
