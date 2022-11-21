@@ -301,6 +301,20 @@ complains when this function terminates. To work around this, an infinite
 for loop needs to be appended to the function manual when updating
 fwk_core's mock.
 
+## Unit testing style guidelines
+
+For the addition and changes for Unit Testing, it is preferable to follow
+the guidelines below:
+- The format for the functions' names being tested should be as follow:
+  ```utest_``` followed by the function being tested and a pass or fail
+  expectation, for example: ```utest_function_being_tested_init_success```.
+- One test scenario for each test case. For example, if testing one case for a
+  function, have a test function for that case only.
+- Name the test functions according to the test being performed.
+- When an addition or change is made to a module that did not have unit testing
+  before, it is recommended that the enclosing functions affected by the change
+  should then be added for unit testing.
+
 ### Executing Tests on target hardware or FVP models
 
 All above describes how to build and execute unit tests on host machine.
