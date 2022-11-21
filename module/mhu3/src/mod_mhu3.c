@@ -221,7 +221,7 @@ static int mhu3_get_fch(fwk_id_t fch_id, struct fast_channel_addr *fch)
     struct mod_mhu3_fc_config *fch_channel;
     uint32_t fch_cfg0;
 
-    if (!fwk_module_is_valid_sub_element_id(fch_id)) {
+    if (!fwk_module_is_valid_sub_element_id(fch_id) || (fch == NULL)) {
         return status;
     }
 
