@@ -28,6 +28,11 @@
 #include <fwk_element.h>
 #include <fwk_macros.h>
 
+#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+#    include <perf_plugins_handler.c>
+#    include <perf_plugins_handler.h>
+#endif
+
 #include UNIT_TEST_SRC
 
 static struct mod_scmi_perf_ctx scmi_perf_ctx;
@@ -916,10 +921,236 @@ void utest_validate_new_limits_approximate_level(void)
     TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
 }
 
+#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+void utest_perf_eval_performance_invalid_limits(void)
+{
+    struct mod_scmi_perf_level_limits limits = {
+        .minimum = 1000,
+        .maximum = 100,
+    };
+    uint32_t level = 500;
+    fwk_id_t perf_id = FWK_ID_ELEMENT_INIT(TEST_MODULE_IDX, 0);
+
+    perf_eval_performance(perf_id, &limits, &level);
+    TEST_ASSERT_EQUAL(500, level);
+}
+
+void utest_perf_eval_performance_unchanged_limits(void)
+{
+    struct scmi_perf_domain_ctx domain0_ctx;
+    uint32_t level;
+
+    domain0_ctx.level_limits.minimum = test_dvfs_config.opps[0].level;
+    domain0_ctx.level_limits.maximum =
+        test_dvfs_config.opps[TEST_OPP_COUNT - 1].level;
+
+    struct mod_scmi_perf_level_limits limits = {
+        .minimum = test_dvfs_config.opps[0].level,
+        .maximum = test_dvfs_config.opps[TEST_OPP_COUNT - 1].level,
+    };
+
+    domain0_ctx.opp_table = &((struct perf_opp_table){
+        .opps = test_dvfs_config.opps,
+        .opp_count = TEST_OPP_COUNT,
+    });
+
+    scmi_perf_ctx.domain_ctx_table = &domain0_ctx;
+    /*
+     * The level to be evaluated is just above the second OPP. Due to the
+     * default approximation for `perf_eval_performance`, it should return the
+     * next OPP just above it.
+     */
+    level = test_dvfs_config.opps[1].level + 1;
+    fwk_id_t perf_id = FWK_ID_ELEMENT_INIT(TEST_MODULE_IDX, 0);
+
+    fwk_id_get_element_idx_ExpectAndReturn(perf_id, 0);
+
+    perf_eval_performance(perf_id, &limits, &level);
+    TEST_ASSERT_EQUAL(test_dvfs_config.opps[2].level, level);
+}
+
+void utest_perf_eval_performance_unchanged_limits_level_down(void)
+{
+    struct scmi_perf_domain_ctx domain0_ctx;
+    uint32_t level;
+
+    domain0_ctx.level_limits.minimum = test_dvfs_config.opps[0].level;
+    domain0_ctx.level_limits.maximum =
+        test_dvfs_config.opps[TEST_OPP_COUNT - 2].level;
+
+    struct mod_scmi_perf_level_limits limits = {
+        .minimum = test_dvfs_config.opps[0].level,
+        .maximum = test_dvfs_config.opps[TEST_OPP_COUNT - 2].level,
+    };
+
+    domain0_ctx.opp_table = &((struct perf_opp_table){
+        .opps = test_dvfs_config.opps,
+        .opp_count = TEST_OPP_COUNT,
+    });
+
+    scmi_perf_ctx.domain_ctx_table = &domain0_ctx;
+    /* The level will be reduced to the max limit */
+    level = test_dvfs_config.opps[TEST_OPP_COUNT - 1].level;
+    fwk_id_t perf_id = FWK_ID_ELEMENT_INIT(TEST_MODULE_IDX, 0);
+
+    fwk_id_get_element_idx_ExpectAndReturn(perf_id, 0);
+
+    perf_eval_performance(perf_id, &limits, &level);
+    TEST_ASSERT_EQUAL(test_dvfs_config.opps[TEST_OPP_COUNT - 2].level, level);
+}
+
+void utest_perf_eval_performance_unchanged_limits_level_up(void)
+{
+    struct scmi_perf_domain_ctx domain0_ctx;
+    uint32_t level;
+
+    domain0_ctx.level_limits.minimum = test_dvfs_config.opps[1].level;
+    domain0_ctx.level_limits.maximum =
+        test_dvfs_config.opps[TEST_OPP_COUNT - 1].level;
+
+    struct mod_scmi_perf_level_limits limits = {
+        .minimum = test_dvfs_config.opps[1].level,
+        .maximum = test_dvfs_config.opps[TEST_OPP_COUNT - 1].level,
+    };
+
+    domain0_ctx.opp_table = &((struct perf_opp_table){
+        .opps = test_dvfs_config.opps,
+        .opp_count = TEST_OPP_COUNT,
+    });
+
+    scmi_perf_ctx.domain_ctx_table = &domain0_ctx;
+    /* The level will be increased to the min limit */
+    level = test_dvfs_config.opps[0].level;
+    fwk_id_t perf_id = FWK_ID_ELEMENT_INIT(TEST_MODULE_IDX, 0);
+
+    fwk_id_get_element_idx_ExpectAndReturn(perf_id, 0);
+
+    perf_eval_performance(perf_id, &limits, &level);
+    TEST_ASSERT_EQUAL(test_dvfs_config.opps[1].level, level);
+}
+
+void utest_perf_eval_performance_new_limits(void)
+{
+    struct scmi_perf_domain_ctx domain_table[2];
+    struct perf_plugins_api *plugins_api_table[1];
+    uint32_t level;
+
+    domain_table[1].level_limits.minimum = test_dvfs_config.opps[0].level;
+    domain_table[1].level_limits.maximum =
+        test_dvfs_config.opps[TEST_OPP_COUNT - 2].level;
+
+    struct mod_scmi_perf_level_limits new_limits = {
+        .minimum = test_dvfs_config.opps[0].level,
+        .maximum = test_dvfs_config.opps[TEST_OPP_COUNT - 1].level,
+    };
+
+    domain_table[1].opp_table = &((struct perf_opp_table){
+        .opps = test_dvfs_config.opps,
+        .opp_count = TEST_OPP_COUNT,
+    });
+
+    scmi_perf_ctx.domain_ctx_table = &domain_table[0];
+    level = test_dvfs_config.opps[1].level;
+    fwk_id_t perf_id = FWK_ID_ELEMENT_INIT(TEST_MODULE_IDX, 1);
+
+    fwk_id_get_element_idx_ExpectAndReturn(perf_id, 1);
+    fwk_id_get_element_idx_ExpectAndReturn(perf_id, 1);
+
+    perf_plugins_ctx.config = config_scmi_perf.data;
+    plugins_api_table[0] = &((struct perf_plugins_api){
+        .update = NULL,
+        .report = NULL,
+    });
+    perf_plugins_ctx.plugins_api_table = &plugins_api_table[0];
+
+    perf_eval_performance(perf_id, &new_limits, &level);
+    TEST_ASSERT_EQUAL(test_dvfs_config.opps[1].level, level);
+}
+
+void utest_perf_eval_performance_new_limits_level_down(void)
+{
+    struct scmi_perf_domain_ctx domain_table[2];
+    struct perf_plugins_api *plugins_api_table[1];
+    uint32_t level;
+
+    domain_table[1].level_limits.minimum = test_dvfs_config.opps[0].level;
+    domain_table[1].level_limits.maximum =
+        test_dvfs_config.opps[TEST_OPP_COUNT - 1].level;
+
+    struct mod_scmi_perf_level_limits new_limits = {
+        .minimum = test_dvfs_config.opps[0].level,
+        .maximum = test_dvfs_config.opps[TEST_OPP_COUNT - 2].level,
+    };
+
+    domain_table[1].opp_table = &((struct perf_opp_table){
+        .opps = test_dvfs_config.opps,
+        .opp_count = TEST_OPP_COUNT,
+    });
+
+    scmi_perf_ctx.domain_ctx_table = &domain_table[0];
+    /* The level will be reduced to the max limit */
+    level = test_dvfs_config.opps[TEST_OPP_COUNT - 1].level;
+    fwk_id_t perf_id = FWK_ID_ELEMENT_INIT(TEST_MODULE_IDX, 1);
+
+    fwk_id_get_element_idx_ExpectAndReturn(perf_id, 1);
+    fwk_id_get_element_idx_ExpectAndReturn(perf_id, 1);
+
+    perf_plugins_ctx.config = config_scmi_perf.data;
+    plugins_api_table[0] = &((struct perf_plugins_api){
+        .update = NULL,
+        .report = NULL,
+    });
+    perf_plugins_ctx.plugins_api_table = &plugins_api_table[0];
+
+    perf_eval_performance(perf_id, &new_limits, &level);
+    TEST_ASSERT_EQUAL(test_dvfs_config.opps[TEST_OPP_COUNT - 2].level, level);
+}
+
+void utest_perf_eval_performance_new_limits_level_up(void)
+{
+    struct scmi_perf_domain_ctx domain_table[2];
+    struct perf_plugins_api *plugins_api_table[1];
+    uint32_t level;
+
+    domain_table[1].level_limits.minimum = test_dvfs_config.opps[0].level;
+    domain_table[1].level_limits.maximum =
+        test_dvfs_config.opps[TEST_OPP_COUNT - 1].level;
+
+    struct mod_scmi_perf_level_limits new_limits = {
+        .minimum = test_dvfs_config.opps[1].level,
+        .maximum = test_dvfs_config.opps[TEST_OPP_COUNT - 1].level,
+    };
+
+    domain_table[1].opp_table = &((struct perf_opp_table){
+        .opps = test_dvfs_config.opps,
+        .opp_count = TEST_OPP_COUNT,
+    });
+
+    scmi_perf_ctx.domain_ctx_table = &domain_table[0];
+    /* The level will be increased to the min limit */
+    level = test_dvfs_config.opps[0].level;
+    fwk_id_t perf_id = FWK_ID_ELEMENT_INIT(TEST_MODULE_IDX, 1);
+
+    fwk_id_get_element_idx_ExpectAndReturn(perf_id, 1);
+    fwk_id_get_element_idx_ExpectAndReturn(perf_id, 1);
+
+    perf_plugins_ctx.config = config_scmi_perf.data;
+    plugins_api_table[0] = &((struct perf_plugins_api){
+        .update = NULL,
+        .report = NULL,
+    });
+    perf_plugins_ctx.plugins_api_table = &plugins_api_table[0];
+
+    perf_eval_performance(perf_id, &new_limits, &level);
+    TEST_ASSERT_EQUAL(test_dvfs_config.opps[1].level, level);
+}
+#endif
+
 int scmi_perf_test_main(void)
 {
     UNITY_BEGIN();
 
+#ifndef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
     RUN_TEST(utest_scmi_perf_protocol_version_handler);
 
     RUN_TEST(utest_scmi_perf_protocol_attributes_handler);
@@ -947,6 +1178,18 @@ int scmi_perf_test_main(void)
     RUN_TEST(utest_validate_new_limits_valid_limits);
     RUN_TEST(utest_validate_new_limits_invalid_limits);
     RUN_TEST(utest_validate_new_limits_approximate_level);
+
+#else
+    RUN_TEST(utest_perf_eval_performance_invalid_limits);
+
+    RUN_TEST(utest_perf_eval_performance_unchanged_limits);
+    RUN_TEST(utest_perf_eval_performance_unchanged_limits_level_up);
+    RUN_TEST(utest_perf_eval_performance_unchanged_limits_level_down);
+
+    RUN_TEST(utest_perf_eval_performance_new_limits);
+    RUN_TEST(utest_perf_eval_performance_new_limits_level_up);
+    RUN_TEST(utest_perf_eval_performance_new_limits_level_down);
+#endif
 
     return UNITY_END();
 }
