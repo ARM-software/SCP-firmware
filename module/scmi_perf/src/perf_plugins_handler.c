@@ -80,7 +80,7 @@ struct perf_plugins_ctx {
 
 static struct perf_plugins_ctx perf_plugins_ctx;
 
-static inline struct perf_plugins_dev_ctx *get_ctx(fwk_id_t domain_id)
+static inline struct perf_plugins_dev_ctx *perf_ph_get_ctx(fwk_id_t domain_id)
 {
     return &perf_plugins_ctx.dev_ctx[fwk_id_get_element_idx(domain_id)];
 }
@@ -117,7 +117,7 @@ static int plugin_set_limits(struct plugin_limits_req *data)
     };
 
     domain_id = get_phy_domain_id(data->domain_id);
-    dev_ctx = get_ctx(domain_id);
+    dev_ctx = perf_ph_get_ctx(domain_id);
 
     /* Compare with the aggregated value stored for this physical domain */
     if (req_limits.maximum > dev_ctx->lmax) {
@@ -225,7 +225,7 @@ static void plugins_policy_sync_level_limits(
          * domains.
          */
         for (size_t i = 0; i < perf_plugins_ctx.dvfs_doms_count; i++) {
-            dev_ctx = get_ctx(FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, i));
+            dev_ctx = perf_ph_get_ctx(FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, i));
 
             /* Update with adjusted min-max */
             if (adj_min_lim_full_table[i] > dev_ctx->lmin) {
@@ -244,7 +244,7 @@ static void plugins_policy_update(struct fc_perf_update *fc_update)
 {
     struct perf_plugins_dev_ctx *dev_ctx;
 
-    dev_ctx = get_ctx(fc_update->domain_id);
+    dev_ctx = perf_ph_get_ctx(fc_update->domain_id);
 
     fc_update->level = dev_ctx->max;
     fc_update->adj_min_limit = dev_ctx->lmin;
@@ -258,7 +258,7 @@ static void plugins_policy_update_no_plugins(struct fc_perf_update *fc_update)
     struct perf_plugins_dev_ctx *dev_ctx;
     unsigned int phy_dom;
 
-    dev_ctx = get_ctx(fc_update->domain_id);
+    dev_ctx = perf_ph_get_ctx(fc_update->domain_id);
 
     if (dev_ctx->log_dom_count == 1) {
         /* No plugins, no logical domains */
@@ -294,7 +294,7 @@ static void assign_data_for_plugins(
     struct perf_plugins_dev_ctx *dev_ctx;
     unsigned int dom_idx;
 
-    dev_ctx = get_ctx(id);
+    dev_ctx = perf_ph_get_ctx(id);
 
     /* Determine the first entry on the table */
     if (dom_type == PERF_PLUGIN_DOM_TYPE_FULL) {
@@ -359,7 +359,7 @@ static void store_and_aggregate(struct fc_perf_update *fc_update)
     struct perf_plugins_perf_update phy_dom;
     unsigned int phy_ix;
 
-    dev_ctx = get_ctx(fc_update->domain_id);
+    dev_ctx = perf_ph_get_ctx(fc_update->domain_id);
 
     this_dom_idx = fwk_id_get_sub_element_idx(fc_update->domain_id);
     phy_dom_idx = dev_ctx->log_dom_count;
@@ -421,7 +421,7 @@ void perf_plugins_handler_update(
 
     store_and_aggregate(fc_update);
 
-    dev_ctx = get_ctx(fc_update->domain_id);
+    dev_ctx = perf_ph_get_ctx(fc_update->domain_id);
 
     this_dom_idx = fwk_id_get_sub_element_idx(fc_update->domain_id);
     last_logical_dom_idx = dev_ctx->log_dom_count - 1;
@@ -454,7 +454,7 @@ void perf_plugins_handler_update(
             if (status != FWK_SUCCESS) {
                 FWK_LOG_DEBUG(
                     "[P-Handler] Update: Plugin%u returned error %i",
-                    i,
+                    (unsigned int)i,
                     status);
             }
 
@@ -471,7 +471,7 @@ void perf_plugins_handler_get(
     const struct mod_scmi_perf_config *config;
     struct perf_plugins_dev_ctx *dev_ctx;
 
-    dev_ctx = get_ctx(fc_update->domain_id);
+    dev_ctx = perf_ph_get_ctx(fc_update->domain_id);
 
     this_dom_idx = fwk_id_get_sub_element_idx(fc_update->domain_id);
     last_logical_dom_idx = dev_ctx->log_dom_count - 1;
@@ -513,7 +513,7 @@ void perf_plugins_handler_report(struct perf_plugins_perf_report *data)
             if (status != FWK_SUCCESS) {
                 FWK_LOG_DEBUG(
                     "[P-Handler] Report: Plugin%u returned error %i",
-                    i,
+                    (unsigned int)i,
                     status);
             }
         }
