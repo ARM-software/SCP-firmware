@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -1126,7 +1126,7 @@ static int dvfs_bind_element(fwk_id_t domain_id, unsigned int round)
 
     /* Bind to the alarm HAL if required */
     if (ctx->config->retry_ms > 0) {
-#if BUILD_HAS_MOD_TIMER
+#ifdef BUILD_HAS_MOD_TIMER
         status = fwk_module_bind(
             ctx->config->alarm_id,
             MOD_TIMER_API_ID_ALARM,
