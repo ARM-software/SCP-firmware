@@ -654,7 +654,7 @@ static int scmi_pd_power_state_get_handler(fwk_id_t service_id,
 #ifdef BUILD_HAS_MOD_DEBUG
     struct fwk_event event;
     struct event_request_params *event_params;
-    #endif
+#endif
 
     parameters = (const struct scmi_pd_power_state_get_a2p *)payload;
 
@@ -700,7 +700,7 @@ static int scmi_pd_power_state_get_handler(fwk_id_t service_id,
         ops_set_busy(pd_id, service_id);
 
         return FWK_SUCCESS;
-    #endif
+#endif
     case MOD_PD_TYPE_DEVICE:
 
         status = scmi_pd_ctx.pd_api->get_state(pd_id, &pd_power_state);
@@ -1041,7 +1041,7 @@ static int scmi_pd_init(fwk_id_t module_id, unsigned int element_count,
 {
 #ifdef BUILD_HAS_MOD_DEBUG
     struct mod_scmi_pd_config *config = (struct mod_scmi_pd_config *)data;
-    #endif
+#endif
 
     if (element_count != 0) {
         return FWK_E_SUPPORT;
