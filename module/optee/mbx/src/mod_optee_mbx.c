@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Linaro Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -52,7 +52,7 @@ struct mbx_ctx {
 
 static struct mbx_ctx mbx_ctx;
 
-#if BUILD_HAS_MOD_OPTEE_SMT
+#ifdef BUILD_HAS_MOD_OPTEE_SMT
 void optee_mbx_signal_smt_message(fwk_id_t device_id)
 {
     struct mbx_device_ctx *device_ctx;
@@ -74,7 +74,7 @@ void optee_mbx_signal_smt_message(fwk_id_t device_id)
 }
 #endif
 
-#if BUILD_HAS_MOD_MSG_SMT
+#ifdef BUILD_HAS_MOD_MSG_SMT
 void optee_mbx_signal_msg_message(fwk_id_t device_id, void *in_buf,
                                   size_t in_size, void *out_buf,
                                   size_t *out_size)
@@ -237,12 +237,12 @@ static int mbx_process_bind_request(fwk_id_t source_id,
     }
 
     switch (fwk_id_get_module_idx(source_id)) {
-#if BUILD_HAS_MOD_OPTEE_SMT
+#ifdef BUILD_HAS_MOD_OPTEE_SMT
     case FWK_MODULE_IDX_OPTEE_SMT:
         *api = &mbx_smt_api;
         break;
 #endif
-#if BUILD_HAS_MOD_MSG_SMT
+#ifdef BUILD_HAS_MOD_MSG_SMT
     case FWK_MODULE_IDX_MSG_SMT:
         *api = &mbx_shm_api;
         break;
