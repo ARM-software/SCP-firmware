@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -60,7 +60,7 @@ struct mod_scmi_pd_ctx {
 
     /* Power domain module API */
     const struct mod_pd_restricted_api *pd_api;
-#if BUILD_HAS_MOD_DEBUG
+#ifdef BUILD_HAS_MOD_DEBUG
     /* Debug module API */
     const struct mod_debug_api *debug_api;
 
