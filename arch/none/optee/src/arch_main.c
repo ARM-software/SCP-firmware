@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Linaro Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -64,7 +64,7 @@ int scmi_get_device(unsigned int id)
 
 void scmi_process_mbx_smt(unsigned int fwk_id)
 {
-#if BUILD_HAS_MOD_OPTEE_SMT
+#ifdef BUILD_HAS_MOD_OPTEE_SMT
     fwk_id_t device_id;
 
     device_id.value = fwk_id;
@@ -80,7 +80,7 @@ void scmi_process_mbx_smt(unsigned int fwk_id)
 void scmi_process_mbx_msg(unsigned int fwk_id, void *in_buf, size_t in_size,
                           void *out_buf, size_t *out_size)
 {
-#if BUILD_HAS_MOD_MSG_SMT
+#ifdef BUILD_HAS_MOD_MSG_SMT
     fwk_id_t device_id;
 
     device_id.value = fwk_id;
