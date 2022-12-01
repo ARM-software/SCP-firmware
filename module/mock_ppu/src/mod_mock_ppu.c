@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Linaro Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -12,7 +12,7 @@
 #include <fwk_mm.h>
 #include <mod_power_domain.h>
 #include <mod_mock_ppu.h>
-#if BUILD_HAS_MOD_SYSTEM_POWER
+#ifdef BUILD_HAS_MOD_SYSTEM_POWER
 #include <mod_system_power.h>
 #endif
 
@@ -177,7 +177,7 @@ static int mock_ppu_bind(fwk_id_t id, unsigned int round)
         return FWK_SUCCESS;
 
     switch (fwk_id_get_module_idx(pd_ctx->bound_id)) {
-    #if BUILD_HAS_MOD_POWER_DOMAIN
+    #ifdef BUILD_HAS_MOD_POWER_DOMAIN
     case FWK_MODULE_IDX_POWER_DOMAIN:
         return fwk_module_bind(pd_ctx->bound_id,
                                mod_pd_api_id_driver_input,
@@ -185,7 +185,7 @@ static int mock_ppu_bind(fwk_id_t id, unsigned int round)
         break;
     #endif
 
-    #if BUILD_HAS_MOD_SYSTEM_POWER
+    #ifdef BUILD_HAS_MOD_SYSTEM_POWER
     case FWK_MODULE_IDX_SYSTEM_POWER:
         return fwk_module_bind(pd_ctx->bound_id,
                                mod_system_power_api_id_pd_driver_input,
@@ -217,14 +217,14 @@ static int mock_ppu_process_bind_request(fwk_id_t source_id,
 
     case MOD_PD_TYPE_DEVICE:
     case MOD_PD_TYPE_DEVICE_DEBUG:
-        #if BUILD_HAS_MOD_POWER_DOMAIN
+        #ifdef BUILD_HAS_MOD_POWER_DOMAIN
         if (fwk_id_get_module_idx(source_id) == FWK_MODULE_IDX_POWER_DOMAIN) {
             pd_ctx->bound_id = source_id;
             *api = &pd_driver;
             break;
         }
         #endif
-        #if BUILD_HAS_MOD_SYSTEM_POWER
+        #ifdef BUILD_HAS_MOD_SYSTEM_POWER
         if (fwk_id_get_module_idx(source_id) == FWK_MODULE_IDX_SYSTEM_POWER) {
             pd_ctx->bound_id = source_id;
             *api = &pd_driver;
