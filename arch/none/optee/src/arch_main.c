@@ -22,6 +22,7 @@
 #include <mod_optee_mbx.h>
 
 #include <arch_interrupt.h>
+#include <arch_main.h>
 
 static const struct fwk_arch_init_driver scmi_init_driver = {
     .interrupt = arch_interrupt_init,
