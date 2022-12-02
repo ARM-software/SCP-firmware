@@ -59,10 +59,10 @@ void optee_mbx_signal_smt_message(fwk_id_t device_id)
     unsigned int device_idx = fwk_id_get_element_idx(device_id);
 
     if (device_idx < mbx_ctx.device_count) {
+        device_ctx = &mbx_ctx.device_ctx_table[device_idx];
+
         fwk_assert(fwk_id_get_module_idx(device_ctx->shmem_id) ==
                    FWK_MODULE_IDX_OPTEE_SMT);
-
-        device_ctx = &mbx_ctx.device_ctx_table[device_idx];
 
         /* Lock the channel until the message has been processed */
         mutex_lock(&device_ctx->lock);
