@@ -285,9 +285,7 @@ static struct mod_pd_mod_ctx mod_pd_ctx;
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
 static const char driver_error_msg[] = "[PD] Driver error %s (%d) in %s @%d";
-#endif
 
-#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
 static const char * const default_state_name_table[] = {
     "OFF", "ON", "SLEEP", "3", "4", "5", "6", "7",
     "8", "9", "10", "11", "12", "13", "14", "15"
@@ -361,7 +359,7 @@ static bool is_allowed_by_children(const struct pd_ctx *pd, unsigned int state)
     return true;
 }
 
-#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_TRACE
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
 static const char *get_state_name(const struct pd_ctx *pd, unsigned int state)
 {
     static char const unknown_name[] = "Unknown";
@@ -717,7 +715,7 @@ static int initiate_power_state_transition(struct pd_ctx *pd)
     }
 #endif
 
-#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERR
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
     if (status != FWK_SUCCESS) {
         FWK_LOG_ERR(
             "[PD] Transition of %s from <%s> to <%s> failed: %s",
