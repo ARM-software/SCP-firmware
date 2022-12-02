@@ -14,6 +14,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <arch_interrupt.h>
+
 static int global_enable(void)
 {
     return FWK_E_SUPPORT;
