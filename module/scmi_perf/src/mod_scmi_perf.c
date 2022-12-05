@@ -17,6 +17,7 @@
 #    include "perf_plugins_handler.h"
 #endif
 #include <mod_timer.h>
+#include "scmi_perf.h"
 
 #include <fwk_assert.h>
 #include <fwk_core.h>
