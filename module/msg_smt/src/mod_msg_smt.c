@@ -275,7 +275,7 @@ static int smt_completer_handler(struct smt_channel_ctx *channel_ctx)
     return FWK_SUCCESS;
 }
 
-int msg_signal_message(fwk_id_t channel_id, void *msg_in, size_t in_len, void *msg_out, size_t out_len)
+static int msg_signal_message(fwk_id_t channel_id, void *msg_in, size_t in_len, void *msg_out, size_t out_len)
 {
     struct smt_channel_ctx *channel_ctx;
 
