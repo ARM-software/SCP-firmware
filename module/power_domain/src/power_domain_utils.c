@@ -9,6 +9,7 @@
  */
 
 #include <mod_power_domain.h>
+#include <power_domain_utils.h>
 
 #include <fwk_element.h>
 #include <fwk_id.h>

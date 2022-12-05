@@ -1305,7 +1305,7 @@ static void process_system_suspend_request(
     resp_params->status = status;
 }
 
-void perform_shutdown(
+static void perform_shutdown(
     enum mod_pd_system_shutdown system_shutdown,
     struct fwk_event *resp)
 {
