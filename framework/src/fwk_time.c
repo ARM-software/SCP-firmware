@@ -17,7 +17,7 @@ struct {
     const void *driver_ctx; /* Time driver context */
 } fwk_time_ctx;
 
-FWK_CONSTRUCTOR void fwk_time_init(void)
+static FWK_CONSTRUCTOR void fwk_time_init(void)
 {
     struct fwk_time_driver driver = fmw_time_driver(&fwk_time_ctx.driver_ctx);
 

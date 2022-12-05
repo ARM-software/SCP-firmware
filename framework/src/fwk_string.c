@@ -10,6 +10,7 @@
 
 #include <fwk_assert.h>
 #include <fwk_mm.h>
+#include <fwk_string.h>
 
 #include <stdlib.h>
 
