@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -17,7 +17,7 @@ struct {
     const void *driver_ctx; /* Time driver context */
 } fwk_time_ctx;
 
-FWK_CONSTRUCTOR void fwk_time_init(void)
+static FWK_CONSTRUCTOR void fwk_time_init(void)
 {
     struct fwk_time_driver driver = fmw_time_driver(&fwk_time_ctx.driver_ctx);
 

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -13,22 +13,22 @@
 #include <stddef.h>
 #include <stdio.h>
 
-int fwk_io_null_open(const struct fwk_io_stream *stream)
+static int fwk_io_null_open(const struct fwk_io_stream *stream)
 {
     return FWK_SUCCESS;
 }
 
-int fwk_io_null_getch(const struct fwk_io_stream *stream, char *ch)
+static int fwk_io_null_getch(const struct fwk_io_stream *stream, char *ch)
 {
     return FWK_PENDING;
 }
 
-int fwk_io_null_putch(const struct fwk_io_stream *stream, char ch)
+static int fwk_io_null_putch(const struct fwk_io_stream *stream, char ch)
 {
     return FWK_SUCCESS;
 }
 
-int fwk_io_null_close(const struct fwk_io_stream *stream)
+static int fwk_io_null_close(const struct fwk_io_stream *stream)
 {
     return FWK_SUCCESS;
 }
