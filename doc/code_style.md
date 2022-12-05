@@ -35,6 +35,31 @@ You can automatically format any staged changes with:
 git clang-format
 ```
 
+One common deviation is found when defining a list of harware registers, for
+example:
+
+```c
+struct some_reg {
+             uint8_t   RESERVED0[0x820 - 0x818];
+     FWK_RW  uint32_t  REGISTER0;
+     FWK_RW  uint32_t  REGIRTER1;
+};
+```
+
+The above indentation, although easy to read, will fail the formatting style.
+To preserve the legacy format and allow silent operation of the tool, only such
+definitions may be preceded and followed by the following special comments:
+
+```c
+// clang-format off
+struct some_reg {
+             uint8_t   RESERVED0[0x820 - 0x818];
+     FWK_RW  uint32_t  REGISTER0;
+     FWK_RW  uint32_t  REGIRTER1;
+};
+// clang-format on
+```
+
 ### Braces
 
 Conditional statements and iteration statements with a single line or
