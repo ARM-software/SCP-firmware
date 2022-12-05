@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -17,6 +17,7 @@
 #    include "perf_plugins_handler.h"
 #endif
 #include <mod_timer.h>
+#include "scmi_perf.h"
 
 #include <fwk_assert.h>
 #include <fwk_core.h>
