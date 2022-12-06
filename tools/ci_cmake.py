@@ -12,6 +12,7 @@ import check_doc
 import check_spacing
 import check_tabs
 import check_framework
+import check_module_utest
 import check_pycodestyle
 import docker
 import os
@@ -30,6 +31,7 @@ code_validations = [
     check_tabs,
     check_doc,
     check_framework,
+    check_module_utest,
     check_pycodestyle,
 ]
 

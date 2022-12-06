@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 """
-Build and check framework
-This script runs "CC=gcc make -f Makefile.cmake fwk_test" and performs all
-frameworks tests.
+Build and check unit tests for modules.
+This script runs "CC=gcc make -f Makefile.cmake mod_test" and performs all
+modules' unit tests.
 """
 
 import sys
@@ -22,10 +22,10 @@ def banner(text):
 
 
 def main():
-    banner("Build and run framework tests")
+    banner("Build and run modules' unit tests")
 
     result = subprocess.Popen(
-        "CC=gcc make -f Makefile.cmake fwk_test",
+        "CC=gcc make -f Makefile.cmake mod_test",
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
