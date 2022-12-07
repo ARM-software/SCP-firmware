@@ -15,6 +15,7 @@
 #    include <fwk_module.h>
 #else
 #    include <Mockfwk_id.h>
+#    include <Mockfwk_mm.h>
 #    include <Mockfwk_module.h>
 
 #    include <internal/Mockfwk_core_internal.h>
@@ -73,6 +74,10 @@ void setUp(void)
     scmi_perf_ctx.fast_channels_rate_limit = SCMI_PERF_FC_MIN_RATE_LIMIT;
 #endif
 
+#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+    perf_config.plugins_count = FWK_ARRAY_SIZE(plugins_table);
+#endif
+
     fwk_id_get_api_idx_ExpectAnyArgsAndReturn(MOD_SCMI_PERF_PROTOCOL_API);
 
     module_scmi_perf.process_bind_request(
@@ -83,6 +88,45 @@ void setUp(void)
 
     scmi_perf_ctx.dvfs_api = &dvfs_domain_api;
 }
+
+#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+/*
+ * Helper to allocate plugins-handler's own memory
+ */
+static void malloc_perf_plugins_alloc_tables(
+    size_t count,
+    struct perf_plugins_perf_update *table)
+{
+    table->level = malloc(count * sizeof(uint32_t));
+    table->max_limit = malloc(count * sizeof(uint32_t));
+    table->adj_max_limit = malloc(count * sizeof(uint32_t));
+    table->min_limit = malloc(count * sizeof(uint32_t));
+    table->adj_min_limit = malloc(count * sizeof(uint32_t));
+
+    fwk_mm_calloc_ExpectAndReturn(count, sizeof(uint32_t), table->level);
+
+    fwk_mm_calloc_ExpectAndReturn(count, sizeof(uint32_t), table->max_limit);
+    fwk_mm_calloc_ExpectAndReturn(
+        count, sizeof(uint32_t), table->adj_max_limit);
+
+    fwk_mm_calloc_ExpectAndReturn(count, sizeof(uint32_t), table->min_limit);
+    fwk_mm_calloc_ExpectAndReturn(
+        count, sizeof(uint32_t), table->adj_min_limit);
+}
+
+/*
+ * Helper to free plugins-handler's own memory
+ */
+static void dealloc_perf_plugins_alloc_tables(
+    struct perf_plugins_perf_update *table)
+{
+    free(table->level);
+    free(table->max_limit);
+    free(table->adj_max_limit);
+    free(table->min_limit);
+    free(table->adj_min_limit);
+}
+#endif
 
 void tearDown(void)
 {
@@ -1203,7 +1247,125 @@ void utest_perf_eval_performance_new_limits_level_up(void)
     perf_eval_performance(perf_id, &new_limits, &level);
     TEST_ASSERT_EQUAL(test_dvfs_config.opps[1].level, level);
 }
-#endif
+
+void utest_perf_plugins_handler_init_fail_no_dvfs_doms(void)
+{
+    int status;
+    fwk_module_get_element_count_ExpectAnyArgsAndReturn(0);
+
+    status = perf_plugins_handler_init(config_scmi_perf.data);
+    TEST_ASSERT_EQUAL(status, FWK_E_SUPPORT);
+}
+
+void utest_perf_plugins_handler_init_success(void)
+{
+    struct perf_plugins_dev_ctx dev_ctx[DVFS_ELEMENT_IDX_COUNT];
+    fwk_id_t dep_id_table[DVFS_ELEMENT_IDX_COUNT];
+    int status;
+
+    memset(dev_ctx, 0, sizeof(*dev_ctx) * DVFS_ELEMENT_IDX_COUNT);
+
+    fwk_module_get_element_count_ExpectAnyArgsAndReturn(DVFS_ELEMENT_IDX_COUNT);
+
+    fwk_mm_calloc_ExpectAndReturn(
+        DVFS_ELEMENT_IDX_COUNT,
+        sizeof(struct perf_plugins_dev_ctx),
+        &dev_ctx[0]);
+
+    for (size_t i = 0; i < DVFS_ELEMENT_IDX_COUNT; i++) {
+        malloc_perf_plugins_alloc_tables(2, &dev_ctx[i].perf_table);
+    }
+    malloc_perf_plugins_alloc_tables(
+        DVFS_ELEMENT_IDX_COUNT, &perf_plugins_ctx.full_perf_table);
+
+    fwk_mm_calloc_ExpectAndReturn(
+        DVFS_ELEMENT_IDX_COUNT, sizeof(fwk_id_t), &dep_id_table[0]);
+
+    /* To build the number of logical domains */
+    fwk_optional_id_is_defined_ExpectAndReturn(domains[0].phy_group_id, true);
+    fwk_id_get_element_idx_ExpectAndReturn(
+        domains[0].phy_group_id, DVFS_ELEMENT_IDX_0);
+
+    fwk_optional_id_is_defined_ExpectAndReturn(domains[1].phy_group_id, true);
+    fwk_id_get_element_idx_ExpectAndReturn(
+        domains[1].phy_group_id, DVFS_ELEMENT_IDX_1);
+
+    /* To build dependency domains */
+    fwk_optional_id_is_defined_ExpectAndReturn(domains[0].phy_group_id, false);
+    fwk_optional_id_is_defined_ExpectAndReturn(domains[0].phy_group_id, false);
+
+    status = perf_plugins_handler_init(config_scmi_perf.data);
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+
+    for (size_t i = 0; i < DVFS_ELEMENT_IDX_COUNT; i++) {
+        dealloc_perf_plugins_alloc_tables(&dev_ctx[i].perf_table);
+    }
+    dealloc_perf_plugins_alloc_tables(&perf_plugins_ctx.full_perf_table);
+}
+
+void utest_perf_plugins_handler_bind_success_no_plugins(void)
+{
+    int status;
+
+    perf_config.plugins_count = 0;
+
+    status = perf_plugins_handler_bind();
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+
+    perf_config.plugins_count = FWK_ARRAY_SIZE(plugins_table);
+}
+
+void utest_perf_plugins_handler_bind_success(void)
+{
+    struct perf_plugins_api plugins_api_table[PERF_PLUGIN_IDX_COUNT];
+    int status;
+
+    fwk_mm_calloc_ExpectAndReturn(
+        perf_config.plugins_count,
+        sizeof(struct perf_plugins_api *),
+        &plugins_api_table);
+
+    fwk_id_get_module_idx_ExpectAndReturn(
+        plugins_table[0].id, FWK_MODULE_IDX_PERF_PLUGIN);
+
+    fwk_module_bind_ExpectAnyArgsAndReturn(FWK_SUCCESS);
+
+    status = perf_plugins_handler_bind();
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+}
+
+void utest_perf_plugins_handler_bind_fail(void)
+{
+    struct perf_plugins_api plugins_api_table[PERF_PLUGIN_IDX_COUNT];
+    int status;
+
+    fwk_mm_calloc_ExpectAndReturn(
+        perf_config.plugins_count,
+        sizeof(struct perf_plugins_api *),
+        &plugins_api_table);
+
+    fwk_id_get_module_idx_ExpectAndReturn(
+        plugins_table[0].id, FWK_MODULE_IDX_PERF_PLUGIN);
+
+    fwk_module_bind_ExpectAnyArgsAndReturn(FWK_E_PANIC);
+
+    status = perf_plugins_handler_bind();
+    TEST_ASSERT_EQUAL(status, FWK_E_PARAM);
+}
+
+void utest_perf_plugins_handler_process_bind_request_success(void)
+{
+    struct perf_plugins_handler_api *ph_api;
+    int status;
+
+    status = perf_plugins_handler_process_bind_request(
+        FWK_ID_NONE, FWK_ID_NONE, FWK_ID_NONE, (const void **)&ph_api);
+
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+    TEST_ASSERT_EQUAL(ph_api, &handler_api);
+}
+
+#endif /* BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER */
 
 int scmi_perf_test_main(void)
 {
@@ -1243,8 +1405,16 @@ int scmi_perf_test_main(void)
     RUN_TEST(utest_validate_new_limits_approximate_level);
 
 #else
-    RUN_TEST(utest_perf_eval_performance_invalid_limits);
+    RUN_TEST(utest_perf_plugins_handler_init_fail_no_dvfs_doms);
+    RUN_TEST(utest_perf_plugins_handler_init_success);
 
+    RUN_TEST(utest_perf_plugins_handler_bind_success_no_plugins);
+    RUN_TEST(utest_perf_plugins_handler_bind_success);
+    RUN_TEST(utest_perf_plugins_handler_bind_fail);
+
+    RUN_TEST(utest_perf_plugins_handler_process_bind_request_success);
+
+    RUN_TEST(utest_perf_eval_performance_invalid_limits);
     RUN_TEST(utest_perf_eval_performance_unchanged_limits);
     RUN_TEST(utest_perf_eval_performance_unchanged_limits_level_up);
     RUN_TEST(utest_perf_eval_performance_unchanged_limits_level_down);
