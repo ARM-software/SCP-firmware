@@ -86,6 +86,14 @@ list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/traffic_cop")
 list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/transport")
 list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/voltage_domain")
 
+#
+# Remove paths if this variable is defined by the platform target's
+# Firmware.cmake
+#
+if(SCP_MODULE_EXCLUDE_PATHS)
+    list(REMOVE_ITEM SCP_MODULE_PATHS ${SCP_MODULE_EXCLUDE_PATHS})
+endif()
+
 foreach(source_dir IN LISTS SCP_MODULE_PATHS)
     unset(SCP_MODULE)
 
