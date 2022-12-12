@@ -24,46 +24,210 @@ void Mockfwk_ring_Verify(void);
 
 
 
+#define fwk_ring_init_Ignore() fwk_ring_init_CMockIgnore()
+void fwk_ring_init_CMockIgnore(void);
+#define fwk_ring_init_StopIgnore() fwk_ring_init_CMockStopIgnore()
+void fwk_ring_init_CMockStopIgnore(void);
 #define fwk_ring_init_ExpectAnyArgs() fwk_ring_init_CMockExpectAnyArgs(__LINE__)
 void fwk_ring_init_CMockExpectAnyArgs(UNITY_LINE_TYPE cmock_line);
 #define fwk_ring_init_Expect(ring, storage, storage_size) fwk_ring_init_CMockExpect(__LINE__, ring, storage, storage_size)
 void fwk_ring_init_CMockExpect(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring, char* storage, size_t storage_size);
+typedef void (* CMOCK_fwk_ring_init_CALLBACK)(struct fwk_ring* ring, char* storage, size_t storage_size, int cmock_num_calls);
+void fwk_ring_init_AddCallback(CMOCK_fwk_ring_init_CALLBACK Callback);
+void fwk_ring_init_Stub(CMOCK_fwk_ring_init_CALLBACK Callback);
+#define fwk_ring_init_StubWithCallback fwk_ring_init_Stub
+#define fwk_ring_init_ExpectWithArray(ring, ring_Depth, storage, storage_size) fwk_ring_init_CMockExpectWithArray(__LINE__, ring, ring_Depth, storage, storage_size)
+void fwk_ring_init_CMockExpectWithArray(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring, int ring_Depth, char* storage, size_t storage_size);
+#define fwk_ring_init_ReturnThruPtr_ring(ring) fwk_ring_init_CMockReturnMemThruPtr_ring(__LINE__, ring, sizeof(struct fwk_ring))
+#define fwk_ring_init_ReturnArrayThruPtr_ring(ring, cmock_len) fwk_ring_init_CMockReturnMemThruPtr_ring(__LINE__, ring, cmock_len * sizeof(*ring))
+#define fwk_ring_init_ReturnMemThruPtr_ring(ring, cmock_size) fwk_ring_init_CMockReturnMemThruPtr_ring(__LINE__, ring, cmock_size)
+void fwk_ring_init_CMockReturnMemThruPtr_ring(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring, size_t cmock_size);
+#define fwk_ring_init_ReturnThruPtr_storage(storage) fwk_ring_init_CMockReturnMemThruPtr_storage(__LINE__, storage, sizeof(char))
+#define fwk_ring_init_ReturnArrayThruPtr_storage(storage, cmock_len) fwk_ring_init_CMockReturnMemThruPtr_storage(__LINE__, storage, cmock_len * sizeof(*storage))
+#define fwk_ring_init_ReturnMemThruPtr_storage(storage, cmock_size) fwk_ring_init_CMockReturnMemThruPtr_storage(__LINE__, storage, cmock_size)
+void fwk_ring_init_CMockReturnMemThruPtr_storage(UNITY_LINE_TYPE cmock_line, char* storage, size_t cmock_size);
+#define fwk_ring_init_IgnoreArg_ring() fwk_ring_init_CMockIgnoreArg_ring(__LINE__)
+void fwk_ring_init_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line);
+#define fwk_ring_init_IgnoreArg_storage() fwk_ring_init_CMockIgnoreArg_storage(__LINE__)
+void fwk_ring_init_CMockIgnoreArg_storage(UNITY_LINE_TYPE cmock_line);
+#define fwk_ring_init_IgnoreArg_storage_size() fwk_ring_init_CMockIgnoreArg_storage_size(__LINE__)
+void fwk_ring_init_CMockIgnoreArg_storage_size(UNITY_LINE_TYPE cmock_line);
+#define fwk_ring_get_capacity_IgnoreAndReturn(cmock_retval) fwk_ring_get_capacity_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_ring_get_capacity_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return);
+#define fwk_ring_get_capacity_StopIgnore() fwk_ring_get_capacity_CMockStopIgnore()
+void fwk_ring_get_capacity_CMockStopIgnore(void);
 #define fwk_ring_get_capacity_ExpectAnyArgsAndReturn(cmock_retval) fwk_ring_get_capacity_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_ring_get_capacity_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return);
 #define fwk_ring_get_capacity_ExpectAndReturn(ring, cmock_retval) fwk_ring_get_capacity_CMockExpectAndReturn(__LINE__, ring, cmock_retval)
 void fwk_ring_get_capacity_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_ring* ring, size_t cmock_to_return);
+typedef size_t (* CMOCK_fwk_ring_get_capacity_CALLBACK)(const struct fwk_ring* ring, int cmock_num_calls);
+void fwk_ring_get_capacity_AddCallback(CMOCK_fwk_ring_get_capacity_CALLBACK Callback);
+void fwk_ring_get_capacity_Stub(CMOCK_fwk_ring_get_capacity_CALLBACK Callback);
+#define fwk_ring_get_capacity_StubWithCallback fwk_ring_get_capacity_Stub
+#define fwk_ring_get_capacity_ExpectWithArrayAndReturn(ring, ring_Depth, cmock_retval) fwk_ring_get_capacity_CMockExpectWithArrayAndReturn(__LINE__, ring, ring_Depth, cmock_retval)
+void fwk_ring_get_capacity_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_ring* ring, int ring_Depth, size_t cmock_to_return);
+#define fwk_ring_get_capacity_IgnoreArg_ring() fwk_ring_get_capacity_CMockIgnoreArg_ring(__LINE__)
+void fwk_ring_get_capacity_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line);
+#define fwk_ring_get_length_IgnoreAndReturn(cmock_retval) fwk_ring_get_length_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_ring_get_length_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return);
+#define fwk_ring_get_length_StopIgnore() fwk_ring_get_length_CMockStopIgnore()
+void fwk_ring_get_length_CMockStopIgnore(void);
 #define fwk_ring_get_length_ExpectAnyArgsAndReturn(cmock_retval) fwk_ring_get_length_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_ring_get_length_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return);
 #define fwk_ring_get_length_ExpectAndReturn(ring, cmock_retval) fwk_ring_get_length_CMockExpectAndReturn(__LINE__, ring, cmock_retval)
 void fwk_ring_get_length_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_ring* ring, size_t cmock_to_return);
+typedef size_t (* CMOCK_fwk_ring_get_length_CALLBACK)(const struct fwk_ring* ring, int cmock_num_calls);
+void fwk_ring_get_length_AddCallback(CMOCK_fwk_ring_get_length_CALLBACK Callback);
+void fwk_ring_get_length_Stub(CMOCK_fwk_ring_get_length_CALLBACK Callback);
+#define fwk_ring_get_length_StubWithCallback fwk_ring_get_length_Stub
+#define fwk_ring_get_length_ExpectWithArrayAndReturn(ring, ring_Depth, cmock_retval) fwk_ring_get_length_CMockExpectWithArrayAndReturn(__LINE__, ring, ring_Depth, cmock_retval)
+void fwk_ring_get_length_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_ring* ring, int ring_Depth, size_t cmock_to_return);
+#define fwk_ring_get_length_IgnoreArg_ring() fwk_ring_get_length_CMockIgnoreArg_ring(__LINE__)
+void fwk_ring_get_length_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line);
+#define fwk_ring_get_free_IgnoreAndReturn(cmock_retval) fwk_ring_get_free_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_ring_get_free_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return);
+#define fwk_ring_get_free_StopIgnore() fwk_ring_get_free_CMockStopIgnore()
+void fwk_ring_get_free_CMockStopIgnore(void);
 #define fwk_ring_get_free_ExpectAnyArgsAndReturn(cmock_retval) fwk_ring_get_free_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_ring_get_free_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return);
 #define fwk_ring_get_free_ExpectAndReturn(ring, cmock_retval) fwk_ring_get_free_CMockExpectAndReturn(__LINE__, ring, cmock_retval)
 void fwk_ring_get_free_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_ring* ring, size_t cmock_to_return);
+typedef size_t (* CMOCK_fwk_ring_get_free_CALLBACK)(const struct fwk_ring* ring, int cmock_num_calls);
+void fwk_ring_get_free_AddCallback(CMOCK_fwk_ring_get_free_CALLBACK Callback);
+void fwk_ring_get_free_Stub(CMOCK_fwk_ring_get_free_CALLBACK Callback);
+#define fwk_ring_get_free_StubWithCallback fwk_ring_get_free_Stub
+#define fwk_ring_get_free_ExpectWithArrayAndReturn(ring, ring_Depth, cmock_retval) fwk_ring_get_free_CMockExpectWithArrayAndReturn(__LINE__, ring, ring_Depth, cmock_retval)
+void fwk_ring_get_free_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_ring* ring, int ring_Depth, size_t cmock_to_return);
+#define fwk_ring_get_free_IgnoreArg_ring() fwk_ring_get_free_CMockIgnoreArg_ring(__LINE__)
+void fwk_ring_get_free_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line);
+#define fwk_ring_is_full_IgnoreAndReturn(cmock_retval) fwk_ring_is_full_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_ring_is_full_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return);
+#define fwk_ring_is_full_StopIgnore() fwk_ring_is_full_CMockStopIgnore()
+void fwk_ring_is_full_CMockStopIgnore(void);
 #define fwk_ring_is_full_ExpectAnyArgsAndReturn(cmock_retval) fwk_ring_is_full_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_ring_is_full_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return);
 #define fwk_ring_is_full_ExpectAndReturn(ring, cmock_retval) fwk_ring_is_full_CMockExpectAndReturn(__LINE__, ring, cmock_retval)
 void fwk_ring_is_full_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_ring* ring, bool cmock_to_return);
+typedef bool (* CMOCK_fwk_ring_is_full_CALLBACK)(const struct fwk_ring* ring, int cmock_num_calls);
+void fwk_ring_is_full_AddCallback(CMOCK_fwk_ring_is_full_CALLBACK Callback);
+void fwk_ring_is_full_Stub(CMOCK_fwk_ring_is_full_CALLBACK Callback);
+#define fwk_ring_is_full_StubWithCallback fwk_ring_is_full_Stub
+#define fwk_ring_is_full_ExpectWithArrayAndReturn(ring, ring_Depth, cmock_retval) fwk_ring_is_full_CMockExpectWithArrayAndReturn(__LINE__, ring, ring_Depth, cmock_retval)
+void fwk_ring_is_full_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_ring* ring, int ring_Depth, bool cmock_to_return);
+#define fwk_ring_is_full_IgnoreArg_ring() fwk_ring_is_full_CMockIgnoreArg_ring(__LINE__)
+void fwk_ring_is_full_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line);
+#define fwk_ring_is_empty_IgnoreAndReturn(cmock_retval) fwk_ring_is_empty_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_ring_is_empty_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return);
+#define fwk_ring_is_empty_StopIgnore() fwk_ring_is_empty_CMockStopIgnore()
+void fwk_ring_is_empty_CMockStopIgnore(void);
 #define fwk_ring_is_empty_ExpectAnyArgsAndReturn(cmock_retval) fwk_ring_is_empty_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_ring_is_empty_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return);
 #define fwk_ring_is_empty_ExpectAndReturn(ring, cmock_retval) fwk_ring_is_empty_CMockExpectAndReturn(__LINE__, ring, cmock_retval)
 void fwk_ring_is_empty_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_ring* ring, bool cmock_to_return);
+typedef bool (* CMOCK_fwk_ring_is_empty_CALLBACK)(const struct fwk_ring* ring, int cmock_num_calls);
+void fwk_ring_is_empty_AddCallback(CMOCK_fwk_ring_is_empty_CALLBACK Callback);
+void fwk_ring_is_empty_Stub(CMOCK_fwk_ring_is_empty_CALLBACK Callback);
+#define fwk_ring_is_empty_StubWithCallback fwk_ring_is_empty_Stub
+#define fwk_ring_is_empty_ExpectWithArrayAndReturn(ring, ring_Depth, cmock_retval) fwk_ring_is_empty_CMockExpectWithArrayAndReturn(__LINE__, ring, ring_Depth, cmock_retval)
+void fwk_ring_is_empty_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_ring* ring, int ring_Depth, bool cmock_to_return);
+#define fwk_ring_is_empty_IgnoreArg_ring() fwk_ring_is_empty_CMockIgnoreArg_ring(__LINE__)
+void fwk_ring_is_empty_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line);
+#define fwk_ring_pop_IgnoreAndReturn(cmock_retval) fwk_ring_pop_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_ring_pop_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return);
+#define fwk_ring_pop_StopIgnore() fwk_ring_pop_CMockStopIgnore()
+void fwk_ring_pop_CMockStopIgnore(void);
 #define fwk_ring_pop_ExpectAnyArgsAndReturn(cmock_retval) fwk_ring_pop_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_ring_pop_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return);
 #define fwk_ring_pop_ExpectAndReturn(ring, buffer, buffer_size, cmock_retval) fwk_ring_pop_CMockExpectAndReturn(__LINE__, ring, buffer, buffer_size, cmock_retval)
 void fwk_ring_pop_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring, char* buffer, size_t buffer_size, size_t cmock_to_return);
+typedef size_t (* CMOCK_fwk_ring_pop_CALLBACK)(struct fwk_ring* ring, char* buffer, size_t buffer_size, int cmock_num_calls);
+void fwk_ring_pop_AddCallback(CMOCK_fwk_ring_pop_CALLBACK Callback);
+void fwk_ring_pop_Stub(CMOCK_fwk_ring_pop_CALLBACK Callback);
+#define fwk_ring_pop_StubWithCallback fwk_ring_pop_Stub
+#define fwk_ring_pop_ExpectWithArrayAndReturn(ring, ring_Depth, buffer, buffer_size, cmock_retval) fwk_ring_pop_CMockExpectWithArrayAndReturn(__LINE__, ring, ring_Depth, buffer, buffer_size, cmock_retval)
+void fwk_ring_pop_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring, int ring_Depth, char* buffer, size_t buffer_size, size_t cmock_to_return);
+#define fwk_ring_pop_ReturnThruPtr_ring(ring) fwk_ring_pop_CMockReturnMemThruPtr_ring(__LINE__, ring, sizeof(struct fwk_ring))
+#define fwk_ring_pop_ReturnArrayThruPtr_ring(ring, cmock_len) fwk_ring_pop_CMockReturnMemThruPtr_ring(__LINE__, ring, cmock_len * sizeof(*ring))
+#define fwk_ring_pop_ReturnMemThruPtr_ring(ring, cmock_size) fwk_ring_pop_CMockReturnMemThruPtr_ring(__LINE__, ring, cmock_size)
+void fwk_ring_pop_CMockReturnMemThruPtr_ring(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring, size_t cmock_size);
+#define fwk_ring_pop_ReturnThruPtr_buffer(buffer) fwk_ring_pop_CMockReturnMemThruPtr_buffer(__LINE__, buffer, sizeof(char))
+#define fwk_ring_pop_ReturnArrayThruPtr_buffer(buffer, cmock_len) fwk_ring_pop_CMockReturnMemThruPtr_buffer(__LINE__, buffer, cmock_len * sizeof(*buffer))
+#define fwk_ring_pop_ReturnMemThruPtr_buffer(buffer, cmock_size) fwk_ring_pop_CMockReturnMemThruPtr_buffer(__LINE__, buffer, cmock_size)
+void fwk_ring_pop_CMockReturnMemThruPtr_buffer(UNITY_LINE_TYPE cmock_line, char* buffer, size_t cmock_size);
+#define fwk_ring_pop_IgnoreArg_ring() fwk_ring_pop_CMockIgnoreArg_ring(__LINE__)
+void fwk_ring_pop_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line);
+#define fwk_ring_pop_IgnoreArg_buffer() fwk_ring_pop_CMockIgnoreArg_buffer(__LINE__)
+void fwk_ring_pop_CMockIgnoreArg_buffer(UNITY_LINE_TYPE cmock_line);
+#define fwk_ring_pop_IgnoreArg_buffer_size() fwk_ring_pop_CMockIgnoreArg_buffer_size(__LINE__)
+void fwk_ring_pop_CMockIgnoreArg_buffer_size(UNITY_LINE_TYPE cmock_line);
+#define fwk_ring_peek_IgnoreAndReturn(cmock_retval) fwk_ring_peek_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_ring_peek_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return);
+#define fwk_ring_peek_StopIgnore() fwk_ring_peek_CMockStopIgnore()
+void fwk_ring_peek_CMockStopIgnore(void);
 #define fwk_ring_peek_ExpectAnyArgsAndReturn(cmock_retval) fwk_ring_peek_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_ring_peek_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return);
 #define fwk_ring_peek_ExpectAndReturn(ring, buffer, buffer_size, cmock_retval) fwk_ring_peek_CMockExpectAndReturn(__LINE__, ring, buffer, buffer_size, cmock_retval)
 void fwk_ring_peek_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_ring* ring, char* buffer, size_t buffer_size, size_t cmock_to_return);
+typedef size_t (* CMOCK_fwk_ring_peek_CALLBACK)(const struct fwk_ring* ring, char* buffer, size_t buffer_size, int cmock_num_calls);
+void fwk_ring_peek_AddCallback(CMOCK_fwk_ring_peek_CALLBACK Callback);
+void fwk_ring_peek_Stub(CMOCK_fwk_ring_peek_CALLBACK Callback);
+#define fwk_ring_peek_StubWithCallback fwk_ring_peek_Stub
+#define fwk_ring_peek_ExpectWithArrayAndReturn(ring, ring_Depth, buffer, buffer_size, cmock_retval) fwk_ring_peek_CMockExpectWithArrayAndReturn(__LINE__, ring, ring_Depth, buffer, buffer_size, cmock_retval)
+void fwk_ring_peek_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_ring* ring, int ring_Depth, char* buffer, size_t buffer_size, size_t cmock_to_return);
+#define fwk_ring_peek_ReturnThruPtr_buffer(buffer) fwk_ring_peek_CMockReturnMemThruPtr_buffer(__LINE__, buffer, sizeof(char))
+#define fwk_ring_peek_ReturnArrayThruPtr_buffer(buffer, cmock_len) fwk_ring_peek_CMockReturnMemThruPtr_buffer(__LINE__, buffer, cmock_len * sizeof(*buffer))
+#define fwk_ring_peek_ReturnMemThruPtr_buffer(buffer, cmock_size) fwk_ring_peek_CMockReturnMemThruPtr_buffer(__LINE__, buffer, cmock_size)
+void fwk_ring_peek_CMockReturnMemThruPtr_buffer(UNITY_LINE_TYPE cmock_line, char* buffer, size_t cmock_size);
+#define fwk_ring_peek_IgnoreArg_ring() fwk_ring_peek_CMockIgnoreArg_ring(__LINE__)
+void fwk_ring_peek_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line);
+#define fwk_ring_peek_IgnoreArg_buffer() fwk_ring_peek_CMockIgnoreArg_buffer(__LINE__)
+void fwk_ring_peek_CMockIgnoreArg_buffer(UNITY_LINE_TYPE cmock_line);
+#define fwk_ring_peek_IgnoreArg_buffer_size() fwk_ring_peek_CMockIgnoreArg_buffer_size(__LINE__)
+void fwk_ring_peek_CMockIgnoreArg_buffer_size(UNITY_LINE_TYPE cmock_line);
+#define fwk_ring_push_IgnoreAndReturn(cmock_retval) fwk_ring_push_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_ring_push_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return);
+#define fwk_ring_push_StopIgnore() fwk_ring_push_CMockStopIgnore()
+void fwk_ring_push_CMockStopIgnore(void);
 #define fwk_ring_push_ExpectAnyArgsAndReturn(cmock_retval) fwk_ring_push_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_ring_push_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return);
 #define fwk_ring_push_ExpectAndReturn(ring, buffer, buffer_size, cmock_retval) fwk_ring_push_CMockExpectAndReturn(__LINE__, ring, buffer, buffer_size, cmock_retval)
 void fwk_ring_push_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring, const char* buffer, size_t buffer_size, size_t cmock_to_return);
+typedef size_t (* CMOCK_fwk_ring_push_CALLBACK)(struct fwk_ring* ring, const char* buffer, size_t buffer_size, int cmock_num_calls);
+void fwk_ring_push_AddCallback(CMOCK_fwk_ring_push_CALLBACK Callback);
+void fwk_ring_push_Stub(CMOCK_fwk_ring_push_CALLBACK Callback);
+#define fwk_ring_push_StubWithCallback fwk_ring_push_Stub
+#define fwk_ring_push_ExpectWithArrayAndReturn(ring, ring_Depth, buffer, buffer_size, cmock_retval) fwk_ring_push_CMockExpectWithArrayAndReturn(__LINE__, ring, ring_Depth, buffer, buffer_size, cmock_retval)
+void fwk_ring_push_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring, int ring_Depth, const char* buffer, size_t buffer_size, size_t cmock_to_return);
+#define fwk_ring_push_ReturnThruPtr_ring(ring) fwk_ring_push_CMockReturnMemThruPtr_ring(__LINE__, ring, sizeof(struct fwk_ring))
+#define fwk_ring_push_ReturnArrayThruPtr_ring(ring, cmock_len) fwk_ring_push_CMockReturnMemThruPtr_ring(__LINE__, ring, cmock_len * sizeof(*ring))
+#define fwk_ring_push_ReturnMemThruPtr_ring(ring, cmock_size) fwk_ring_push_CMockReturnMemThruPtr_ring(__LINE__, ring, cmock_size)
+void fwk_ring_push_CMockReturnMemThruPtr_ring(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring, size_t cmock_size);
+#define fwk_ring_push_IgnoreArg_ring() fwk_ring_push_CMockIgnoreArg_ring(__LINE__)
+void fwk_ring_push_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line);
+#define fwk_ring_push_IgnoreArg_buffer() fwk_ring_push_CMockIgnoreArg_buffer(__LINE__)
+void fwk_ring_push_CMockIgnoreArg_buffer(UNITY_LINE_TYPE cmock_line);
+#define fwk_ring_push_IgnoreArg_buffer_size() fwk_ring_push_CMockIgnoreArg_buffer_size(__LINE__)
+void fwk_ring_push_CMockIgnoreArg_buffer_size(UNITY_LINE_TYPE cmock_line);
+#define fwk_ring_clear_Ignore() fwk_ring_clear_CMockIgnore()
+void fwk_ring_clear_CMockIgnore(void);
+#define fwk_ring_clear_StopIgnore() fwk_ring_clear_CMockStopIgnore()
+void fwk_ring_clear_CMockStopIgnore(void);
 #define fwk_ring_clear_ExpectAnyArgs() fwk_ring_clear_CMockExpectAnyArgs(__LINE__)
 void fwk_ring_clear_CMockExpectAnyArgs(UNITY_LINE_TYPE cmock_line);
 #define fwk_ring_clear_Expect(ring) fwk_ring_clear_CMockExpect(__LINE__, ring)
 void fwk_ring_clear_CMockExpect(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring);
+typedef void (* CMOCK_fwk_ring_clear_CALLBACK)(struct fwk_ring* ring, int cmock_num_calls);
+void fwk_ring_clear_AddCallback(CMOCK_fwk_ring_clear_CALLBACK Callback);
+void fwk_ring_clear_Stub(CMOCK_fwk_ring_clear_CALLBACK Callback);
+#define fwk_ring_clear_StubWithCallback fwk_ring_clear_Stub
+#define fwk_ring_clear_ExpectWithArray(ring, ring_Depth) fwk_ring_clear_CMockExpectWithArray(__LINE__, ring, ring_Depth)
+void fwk_ring_clear_CMockExpectWithArray(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring, int ring_Depth);
+#define fwk_ring_clear_ReturnThruPtr_ring(ring) fwk_ring_clear_CMockReturnMemThruPtr_ring(__LINE__, ring, sizeof(struct fwk_ring))
+#define fwk_ring_clear_ReturnArrayThruPtr_ring(ring, cmock_len) fwk_ring_clear_CMockReturnMemThruPtr_ring(__LINE__, ring, cmock_len * sizeof(*ring))
+#define fwk_ring_clear_ReturnMemThruPtr_ring(ring, cmock_size) fwk_ring_clear_CMockReturnMemThruPtr_ring(__LINE__, ring, cmock_size)
+void fwk_ring_clear_CMockReturnMemThruPtr_ring(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring, size_t cmock_size);
+#define fwk_ring_clear_IgnoreArg_ring() fwk_ring_clear_CMockIgnoreArg_ring(__LINE__)
+void fwk_ring_clear_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line);
 
 #if defined(__GNUC__) && !defined(__ICC) && !defined(__TMS470__)
 #if __GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 6 || (__GNUC_MINOR__ == 6 && __GNUC_PATCHLEVEL__ > 0)))

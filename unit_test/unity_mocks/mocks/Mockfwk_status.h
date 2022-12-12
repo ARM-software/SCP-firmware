@@ -24,10 +24,20 @@ void Mockfwk_status_Verify(void);
 
 
 
+#define fwk_status_str_IgnoreAndReturn(cmock_retval) fwk_status_str_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_status_str_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, const char* cmock_to_return);
+#define fwk_status_str_StopIgnore() fwk_status_str_CMockStopIgnore()
+void fwk_status_str_CMockStopIgnore(void);
 #define fwk_status_str_ExpectAnyArgsAndReturn(cmock_retval) fwk_status_str_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_status_str_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, const char* cmock_to_return);
 #define fwk_status_str_ExpectAndReturn(status, cmock_retval) fwk_status_str_CMockExpectAndReturn(__LINE__, status, cmock_retval)
 void fwk_status_str_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, int status, const char* cmock_to_return);
+typedef const char* (* CMOCK_fwk_status_str_CALLBACK)(int status, int cmock_num_calls);
+void fwk_status_str_AddCallback(CMOCK_fwk_status_str_CALLBACK Callback);
+void fwk_status_str_Stub(CMOCK_fwk_status_str_CALLBACK Callback);
+#define fwk_status_str_StubWithCallback fwk_status_str_Stub
+#define fwk_status_str_IgnoreArg_status() fwk_status_str_CMockIgnoreArg_status(__LINE__)
+void fwk_status_str_CMockIgnoreArg_status(UNITY_LINE_TYPE cmock_line);
 
 #if defined(__GNUC__) && !defined(__ICC) && !defined(__TMS470__)
 #if __GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 6 || (__GNUC_MINOR__ == 6 && __GNUC_PATCHLEVEL__ > 0)))

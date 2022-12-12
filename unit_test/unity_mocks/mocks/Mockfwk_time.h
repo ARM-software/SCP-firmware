@@ -24,40 +24,136 @@ void Mockfwk_time_Verify(void);
 
 
 
+#define fwk_time_current_IgnoreAndReturn(cmock_retval) fwk_time_current_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_time_current_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_timestamp_t cmock_to_return);
+#define fwk_time_current_StopIgnore() fwk_time_current_CMockStopIgnore()
+void fwk_time_current_CMockStopIgnore(void);
 #define fwk_time_current_ExpectAndReturn(cmock_retval) fwk_time_current_CMockExpectAndReturn(__LINE__, cmock_retval)
 void fwk_time_current_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_timestamp_t cmock_to_return);
+typedef fwk_timestamp_t (* CMOCK_fwk_time_current_CALLBACK)(int cmock_num_calls);
+void fwk_time_current_AddCallback(CMOCK_fwk_time_current_CALLBACK Callback);
+void fwk_time_current_Stub(CMOCK_fwk_time_current_CALLBACK Callback);
+#define fwk_time_current_StubWithCallback fwk_time_current_Stub
+#define fwk_time_stamp_duration_IgnoreAndReturn(cmock_retval) fwk_time_stamp_duration_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_time_stamp_duration_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_ns_t cmock_to_return);
+#define fwk_time_stamp_duration_StopIgnore() fwk_time_stamp_duration_CMockStopIgnore()
+void fwk_time_stamp_duration_CMockStopIgnore(void);
 #define fwk_time_stamp_duration_ExpectAnyArgsAndReturn(cmock_retval) fwk_time_stamp_duration_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_time_stamp_duration_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_ns_t cmock_to_return);
 #define fwk_time_stamp_duration_ExpectAndReturn(timestamp, cmock_retval) fwk_time_stamp_duration_CMockExpectAndReturn(__LINE__, timestamp, cmock_retval)
 void fwk_time_stamp_duration_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_timestamp_t timestamp, fwk_duration_ns_t cmock_to_return);
+typedef fwk_duration_ns_t (* CMOCK_fwk_time_stamp_duration_CALLBACK)(fwk_timestamp_t timestamp, int cmock_num_calls);
+void fwk_time_stamp_duration_AddCallback(CMOCK_fwk_time_stamp_duration_CALLBACK Callback);
+void fwk_time_stamp_duration_Stub(CMOCK_fwk_time_stamp_duration_CALLBACK Callback);
+#define fwk_time_stamp_duration_StubWithCallback fwk_time_stamp_duration_Stub
+#define fwk_time_stamp_duration_IgnoreArg_timestamp() fwk_time_stamp_duration_CMockIgnoreArg_timestamp(__LINE__)
+void fwk_time_stamp_duration_CMockIgnoreArg_timestamp(UNITY_LINE_TYPE cmock_line);
+#define fwk_time_duration_IgnoreAndReturn(cmock_retval) fwk_time_duration_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_time_duration_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_ns_t cmock_to_return);
+#define fwk_time_duration_StopIgnore() fwk_time_duration_CMockStopIgnore()
+void fwk_time_duration_CMockStopIgnore(void);
 #define fwk_time_duration_ExpectAnyArgsAndReturn(cmock_retval) fwk_time_duration_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_time_duration_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_ns_t cmock_to_return);
 #define fwk_time_duration_ExpectAndReturn(start, end, cmock_retval) fwk_time_duration_CMockExpectAndReturn(__LINE__, start, end, cmock_retval)
 void fwk_time_duration_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_timestamp_t start, fwk_timestamp_t end, fwk_duration_ns_t cmock_to_return);
+typedef fwk_duration_ns_t (* CMOCK_fwk_time_duration_CALLBACK)(fwk_timestamp_t start, fwk_timestamp_t end, int cmock_num_calls);
+void fwk_time_duration_AddCallback(CMOCK_fwk_time_duration_CALLBACK Callback);
+void fwk_time_duration_Stub(CMOCK_fwk_time_duration_CALLBACK Callback);
+#define fwk_time_duration_StubWithCallback fwk_time_duration_Stub
+#define fwk_time_duration_IgnoreArg_start() fwk_time_duration_CMockIgnoreArg_start(__LINE__)
+void fwk_time_duration_CMockIgnoreArg_start(UNITY_LINE_TYPE cmock_line);
+#define fwk_time_duration_IgnoreArg_end() fwk_time_duration_CMockIgnoreArg_end(__LINE__)
+void fwk_time_duration_CMockIgnoreArg_end(UNITY_LINE_TYPE cmock_line);
+#define fwk_time_duration_us_IgnoreAndReturn(cmock_retval) fwk_time_duration_us_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_time_duration_us_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_us_t cmock_to_return);
+#define fwk_time_duration_us_StopIgnore() fwk_time_duration_us_CMockStopIgnore()
+void fwk_time_duration_us_CMockStopIgnore(void);
 #define fwk_time_duration_us_ExpectAnyArgsAndReturn(cmock_retval) fwk_time_duration_us_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_time_duration_us_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_us_t cmock_to_return);
 #define fwk_time_duration_us_ExpectAndReturn(duration, cmock_retval) fwk_time_duration_us_CMockExpectAndReturn(__LINE__, duration, cmock_retval)
 void fwk_time_duration_us_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_ns_t duration, fwk_duration_us_t cmock_to_return);
+typedef fwk_duration_us_t (* CMOCK_fwk_time_duration_us_CALLBACK)(fwk_duration_ns_t duration, int cmock_num_calls);
+void fwk_time_duration_us_AddCallback(CMOCK_fwk_time_duration_us_CALLBACK Callback);
+void fwk_time_duration_us_Stub(CMOCK_fwk_time_duration_us_CALLBACK Callback);
+#define fwk_time_duration_us_StubWithCallback fwk_time_duration_us_Stub
+#define fwk_time_duration_us_IgnoreArg_duration() fwk_time_duration_us_CMockIgnoreArg_duration(__LINE__)
+void fwk_time_duration_us_CMockIgnoreArg_duration(UNITY_LINE_TYPE cmock_line);
+#define fwk_time_duration_ms_IgnoreAndReturn(cmock_retval) fwk_time_duration_ms_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_time_duration_ms_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_ms_t cmock_to_return);
+#define fwk_time_duration_ms_StopIgnore() fwk_time_duration_ms_CMockStopIgnore()
+void fwk_time_duration_ms_CMockStopIgnore(void);
 #define fwk_time_duration_ms_ExpectAnyArgsAndReturn(cmock_retval) fwk_time_duration_ms_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_time_duration_ms_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_ms_t cmock_to_return);
 #define fwk_time_duration_ms_ExpectAndReturn(duration, cmock_retval) fwk_time_duration_ms_CMockExpectAndReturn(__LINE__, duration, cmock_retval)
 void fwk_time_duration_ms_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_ns_t duration, fwk_duration_ms_t cmock_to_return);
+typedef fwk_duration_ms_t (* CMOCK_fwk_time_duration_ms_CALLBACK)(fwk_duration_ns_t duration, int cmock_num_calls);
+void fwk_time_duration_ms_AddCallback(CMOCK_fwk_time_duration_ms_CALLBACK Callback);
+void fwk_time_duration_ms_Stub(CMOCK_fwk_time_duration_ms_CALLBACK Callback);
+#define fwk_time_duration_ms_StubWithCallback fwk_time_duration_ms_Stub
+#define fwk_time_duration_ms_IgnoreArg_duration() fwk_time_duration_ms_CMockIgnoreArg_duration(__LINE__)
+void fwk_time_duration_ms_CMockIgnoreArg_duration(UNITY_LINE_TYPE cmock_line);
+#define fwk_time_duration_s_IgnoreAndReturn(cmock_retval) fwk_time_duration_s_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_time_duration_s_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_s_t cmock_to_return);
+#define fwk_time_duration_s_StopIgnore() fwk_time_duration_s_CMockStopIgnore()
+void fwk_time_duration_s_CMockStopIgnore(void);
 #define fwk_time_duration_s_ExpectAnyArgsAndReturn(cmock_retval) fwk_time_duration_s_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_time_duration_s_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_s_t cmock_to_return);
 #define fwk_time_duration_s_ExpectAndReturn(duration, cmock_retval) fwk_time_duration_s_CMockExpectAndReturn(__LINE__, duration, cmock_retval)
 void fwk_time_duration_s_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_ns_t duration, fwk_duration_s_t cmock_to_return);
+typedef fwk_duration_s_t (* CMOCK_fwk_time_duration_s_CALLBACK)(fwk_duration_ns_t duration, int cmock_num_calls);
+void fwk_time_duration_s_AddCallback(CMOCK_fwk_time_duration_s_CALLBACK Callback);
+void fwk_time_duration_s_Stub(CMOCK_fwk_time_duration_s_CALLBACK Callback);
+#define fwk_time_duration_s_StubWithCallback fwk_time_duration_s_Stub
+#define fwk_time_duration_s_IgnoreArg_duration() fwk_time_duration_s_CMockIgnoreArg_duration(__LINE__)
+void fwk_time_duration_s_CMockIgnoreArg_duration(UNITY_LINE_TYPE cmock_line);
+#define fwk_time_duration_m_IgnoreAndReturn(cmock_retval) fwk_time_duration_m_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_time_duration_m_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_m_t cmock_to_return);
+#define fwk_time_duration_m_StopIgnore() fwk_time_duration_m_CMockStopIgnore()
+void fwk_time_duration_m_CMockStopIgnore(void);
 #define fwk_time_duration_m_ExpectAnyArgsAndReturn(cmock_retval) fwk_time_duration_m_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_time_duration_m_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_m_t cmock_to_return);
 #define fwk_time_duration_m_ExpectAndReturn(duration, cmock_retval) fwk_time_duration_m_CMockExpectAndReturn(__LINE__, duration, cmock_retval)
 void fwk_time_duration_m_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_ns_t duration, fwk_duration_m_t cmock_to_return);
+typedef fwk_duration_m_t (* CMOCK_fwk_time_duration_m_CALLBACK)(fwk_duration_ns_t duration, int cmock_num_calls);
+void fwk_time_duration_m_AddCallback(CMOCK_fwk_time_duration_m_CALLBACK Callback);
+void fwk_time_duration_m_Stub(CMOCK_fwk_time_duration_m_CALLBACK Callback);
+#define fwk_time_duration_m_StubWithCallback fwk_time_duration_m_Stub
+#define fwk_time_duration_m_IgnoreArg_duration() fwk_time_duration_m_CMockIgnoreArg_duration(__LINE__)
+void fwk_time_duration_m_CMockIgnoreArg_duration(UNITY_LINE_TYPE cmock_line);
+#define fwk_time_duration_h_IgnoreAndReturn(cmock_retval) fwk_time_duration_h_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_time_duration_h_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_h_t cmock_to_return);
+#define fwk_time_duration_h_StopIgnore() fwk_time_duration_h_CMockStopIgnore()
+void fwk_time_duration_h_CMockStopIgnore(void);
 #define fwk_time_duration_h_ExpectAnyArgsAndReturn(cmock_retval) fwk_time_duration_h_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_time_duration_h_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_h_t cmock_to_return);
 #define fwk_time_duration_h_ExpectAndReturn(duration, cmock_retval) fwk_time_duration_h_CMockExpectAndReturn(__LINE__, duration, cmock_retval)
 void fwk_time_duration_h_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_ns_t duration, fwk_duration_h_t cmock_to_return);
+typedef fwk_duration_h_t (* CMOCK_fwk_time_duration_h_CALLBACK)(fwk_duration_ns_t duration, int cmock_num_calls);
+void fwk_time_duration_h_AddCallback(CMOCK_fwk_time_duration_h_CALLBACK Callback);
+void fwk_time_duration_h_Stub(CMOCK_fwk_time_duration_h_CALLBACK Callback);
+#define fwk_time_duration_h_StubWithCallback fwk_time_duration_h_Stub
+#define fwk_time_duration_h_IgnoreArg_duration() fwk_time_duration_h_CMockIgnoreArg_duration(__LINE__)
+void fwk_time_duration_h_CMockIgnoreArg_duration(UNITY_LINE_TYPE cmock_line);
+#define fmw_time_driver_IgnoreAndReturn(cmock_retval) fmw_time_driver_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fmw_time_driver_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_time_driver cmock_to_return);
+#define fmw_time_driver_StopIgnore() fmw_time_driver_CMockStopIgnore()
+void fmw_time_driver_CMockStopIgnore(void);
 #define fmw_time_driver_ExpectAnyArgsAndReturn(cmock_retval) fmw_time_driver_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fmw_time_driver_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_time_driver cmock_to_return);
 #define fmw_time_driver_ExpectAndReturn(ctx, cmock_retval) fmw_time_driver_CMockExpectAndReturn(__LINE__, ctx, cmock_retval)
 void fmw_time_driver_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const void** ctx, struct fwk_time_driver cmock_to_return);
+typedef struct fwk_time_driver (* CMOCK_fmw_time_driver_CALLBACK)(const void** ctx, int cmock_num_calls);
+void fmw_time_driver_AddCallback(CMOCK_fmw_time_driver_CALLBACK Callback);
+void fmw_time_driver_Stub(CMOCK_fmw_time_driver_CALLBACK Callback);
+#define fmw_time_driver_StubWithCallback fmw_time_driver_Stub
+#define fmw_time_driver_ExpectWithArrayAndReturn(ctx, ctx_Depth, cmock_retval) fmw_time_driver_CMockExpectWithArrayAndReturn(__LINE__, ctx, ctx_Depth, cmock_retval)
+void fmw_time_driver_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const void** ctx, int ctx_Depth, struct fwk_time_driver cmock_to_return);
+#define fmw_time_driver_ReturnThruPtr_ctx(ctx) fmw_time_driver_CMockReturnMemThruPtr_ctx(__LINE__, ctx, sizeof(const void*))
+#define fmw_time_driver_ReturnArrayThruPtr_ctx(ctx, cmock_len) fmw_time_driver_CMockReturnMemThruPtr_ctx(__LINE__, ctx, cmock_len * sizeof(*ctx))
+#define fmw_time_driver_ReturnMemThruPtr_ctx(ctx, cmock_size) fmw_time_driver_CMockReturnMemThruPtr_ctx(__LINE__, ctx, cmock_size)
+void fmw_time_driver_CMockReturnMemThruPtr_ctx(UNITY_LINE_TYPE cmock_line, const void** ctx, size_t cmock_size);
+#define fmw_time_driver_IgnoreArg_ctx() fmw_time_driver_CMockIgnoreArg_ctx(__LINE__)
+void fmw_time_driver_CMockIgnoreArg_ctx(UNITY_LINE_TYPE cmock_line);
 
 #if defined(__GNUC__) && !defined(__ICC) && !defined(__TMS470__)
 #if __GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 6 || (__GNUC_MINOR__ == 6 && __GNUC_PATCHLEVEL__ > 0)))

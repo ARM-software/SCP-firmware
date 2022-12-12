@@ -28,6 +28,16 @@ typedef struct _CMOCK_fwk_ring_init_CALL_INSTANCE
   struct fwk_ring* Expected_ring;
   char* Expected_storage;
   size_t Expected_storage_size;
+  int Expected_ring_Depth;
+  char ReturnThruPtr_ring_Used;
+  struct fwk_ring* ReturnThruPtr_ring_Val;
+  size_t ReturnThruPtr_ring_Size;
+  char ReturnThruPtr_storage_Used;
+  char* ReturnThruPtr_storage_Val;
+  size_t ReturnThruPtr_storage_Size;
+  char IgnoreArg_ring;
+  char IgnoreArg_storage;
+  char IgnoreArg_storage_size;
 
 } CMOCK_fwk_ring_init_CALL_INSTANCE;
 
@@ -37,6 +47,8 @@ typedef struct _CMOCK_fwk_ring_get_capacity_CALL_INSTANCE
   char ExpectAnyArgsBool;
   size_t ReturnVal;
   const struct fwk_ring* Expected_ring;
+  int Expected_ring_Depth;
+  char IgnoreArg_ring;
 
 } CMOCK_fwk_ring_get_capacity_CALL_INSTANCE;
 
@@ -46,6 +58,8 @@ typedef struct _CMOCK_fwk_ring_get_length_CALL_INSTANCE
   char ExpectAnyArgsBool;
   size_t ReturnVal;
   const struct fwk_ring* Expected_ring;
+  int Expected_ring_Depth;
+  char IgnoreArg_ring;
 
 } CMOCK_fwk_ring_get_length_CALL_INSTANCE;
 
@@ -55,6 +69,8 @@ typedef struct _CMOCK_fwk_ring_get_free_CALL_INSTANCE
   char ExpectAnyArgsBool;
   size_t ReturnVal;
   const struct fwk_ring* Expected_ring;
+  int Expected_ring_Depth;
+  char IgnoreArg_ring;
 
 } CMOCK_fwk_ring_get_free_CALL_INSTANCE;
 
@@ -64,6 +80,8 @@ typedef struct _CMOCK_fwk_ring_is_full_CALL_INSTANCE
   char ExpectAnyArgsBool;
   bool ReturnVal;
   const struct fwk_ring* Expected_ring;
+  int Expected_ring_Depth;
+  char IgnoreArg_ring;
 
 } CMOCK_fwk_ring_is_full_CALL_INSTANCE;
 
@@ -73,6 +91,8 @@ typedef struct _CMOCK_fwk_ring_is_empty_CALL_INSTANCE
   char ExpectAnyArgsBool;
   bool ReturnVal;
   const struct fwk_ring* Expected_ring;
+  int Expected_ring_Depth;
+  char IgnoreArg_ring;
 
 } CMOCK_fwk_ring_is_empty_CALL_INSTANCE;
 
@@ -84,6 +104,16 @@ typedef struct _CMOCK_fwk_ring_pop_CALL_INSTANCE
   struct fwk_ring* Expected_ring;
   char* Expected_buffer;
   size_t Expected_buffer_size;
+  int Expected_ring_Depth;
+  char ReturnThruPtr_ring_Used;
+  struct fwk_ring* ReturnThruPtr_ring_Val;
+  size_t ReturnThruPtr_ring_Size;
+  char ReturnThruPtr_buffer_Used;
+  char* ReturnThruPtr_buffer_Val;
+  size_t ReturnThruPtr_buffer_Size;
+  char IgnoreArg_ring;
+  char IgnoreArg_buffer;
+  char IgnoreArg_buffer_size;
 
 } CMOCK_fwk_ring_pop_CALL_INSTANCE;
 
@@ -95,6 +125,13 @@ typedef struct _CMOCK_fwk_ring_peek_CALL_INSTANCE
   const struct fwk_ring* Expected_ring;
   char* Expected_buffer;
   size_t Expected_buffer_size;
+  int Expected_ring_Depth;
+  char ReturnThruPtr_buffer_Used;
+  char* ReturnThruPtr_buffer_Val;
+  size_t ReturnThruPtr_buffer_Size;
+  char IgnoreArg_ring;
+  char IgnoreArg_buffer;
+  char IgnoreArg_buffer_size;
 
 } CMOCK_fwk_ring_peek_CALL_INSTANCE;
 
@@ -106,6 +143,13 @@ typedef struct _CMOCK_fwk_ring_push_CALL_INSTANCE
   struct fwk_ring* Expected_ring;
   const char* Expected_buffer;
   size_t Expected_buffer_size;
+  int Expected_ring_Depth;
+  char ReturnThruPtr_ring_Used;
+  struct fwk_ring* ReturnThruPtr_ring_Val;
+  size_t ReturnThruPtr_ring_Size;
+  char IgnoreArg_ring;
+  char IgnoreArg_buffer;
+  char IgnoreArg_buffer_size;
 
 } CMOCK_fwk_ring_push_CALL_INSTANCE;
 
@@ -114,20 +158,73 @@ typedef struct _CMOCK_fwk_ring_clear_CALL_INSTANCE
   UNITY_LINE_TYPE LineNumber;
   char ExpectAnyArgsBool;
   struct fwk_ring* Expected_ring;
+  int Expected_ring_Depth;
+  char ReturnThruPtr_ring_Used;
+  struct fwk_ring* ReturnThruPtr_ring_Val;
+  size_t ReturnThruPtr_ring_Size;
+  char IgnoreArg_ring;
 
 } CMOCK_fwk_ring_clear_CALL_INSTANCE;
 
 static struct Mockfwk_ringInstance
 {
+  char fwk_ring_init_IgnoreBool;
+  char fwk_ring_init_CallbackBool;
+  CMOCK_fwk_ring_init_CALLBACK fwk_ring_init_CallbackFunctionPointer;
+  int fwk_ring_init_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_ring_init_CallInstance;
+  char fwk_ring_get_capacity_IgnoreBool;
+  size_t fwk_ring_get_capacity_FinalReturn;
+  char fwk_ring_get_capacity_CallbackBool;
+  CMOCK_fwk_ring_get_capacity_CALLBACK fwk_ring_get_capacity_CallbackFunctionPointer;
+  int fwk_ring_get_capacity_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_ring_get_capacity_CallInstance;
+  char fwk_ring_get_length_IgnoreBool;
+  size_t fwk_ring_get_length_FinalReturn;
+  char fwk_ring_get_length_CallbackBool;
+  CMOCK_fwk_ring_get_length_CALLBACK fwk_ring_get_length_CallbackFunctionPointer;
+  int fwk_ring_get_length_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_ring_get_length_CallInstance;
+  char fwk_ring_get_free_IgnoreBool;
+  size_t fwk_ring_get_free_FinalReturn;
+  char fwk_ring_get_free_CallbackBool;
+  CMOCK_fwk_ring_get_free_CALLBACK fwk_ring_get_free_CallbackFunctionPointer;
+  int fwk_ring_get_free_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_ring_get_free_CallInstance;
+  char fwk_ring_is_full_IgnoreBool;
+  bool fwk_ring_is_full_FinalReturn;
+  char fwk_ring_is_full_CallbackBool;
+  CMOCK_fwk_ring_is_full_CALLBACK fwk_ring_is_full_CallbackFunctionPointer;
+  int fwk_ring_is_full_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_ring_is_full_CallInstance;
+  char fwk_ring_is_empty_IgnoreBool;
+  bool fwk_ring_is_empty_FinalReturn;
+  char fwk_ring_is_empty_CallbackBool;
+  CMOCK_fwk_ring_is_empty_CALLBACK fwk_ring_is_empty_CallbackFunctionPointer;
+  int fwk_ring_is_empty_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_ring_is_empty_CallInstance;
+  char fwk_ring_pop_IgnoreBool;
+  size_t fwk_ring_pop_FinalReturn;
+  char fwk_ring_pop_CallbackBool;
+  CMOCK_fwk_ring_pop_CALLBACK fwk_ring_pop_CallbackFunctionPointer;
+  int fwk_ring_pop_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_ring_pop_CallInstance;
+  char fwk_ring_peek_IgnoreBool;
+  size_t fwk_ring_peek_FinalReturn;
+  char fwk_ring_peek_CallbackBool;
+  CMOCK_fwk_ring_peek_CALLBACK fwk_ring_peek_CallbackFunctionPointer;
+  int fwk_ring_peek_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_ring_peek_CallInstance;
+  char fwk_ring_push_IgnoreBool;
+  size_t fwk_ring_push_FinalReturn;
+  char fwk_ring_push_CallbackBool;
+  CMOCK_fwk_ring_push_CALLBACK fwk_ring_push_CallbackFunctionPointer;
+  int fwk_ring_push_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_ring_push_CallInstance;
+  char fwk_ring_clear_IgnoreBool;
+  char fwk_ring_clear_CallbackBool;
+  CMOCK_fwk_ring_clear_CALLBACK fwk_ring_clear_CallbackFunctionPointer;
+  int fwk_ring_clear_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_ring_clear_CallInstance;
 } Mock;
 
@@ -138,64 +235,134 @@ void Mockfwk_ring_Verify(void)
   UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
   CMOCK_MEM_INDEX_TYPE call_instance;
   call_instance = Mock.fwk_ring_init_CallInstance;
+  if (Mock.fwk_ring_init_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_ring_init);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_ring_init_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_ring_get_capacity_CallInstance;
+  if (Mock.fwk_ring_get_capacity_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_ring_get_capacity);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_ring_get_capacity_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_ring_get_length_CallInstance;
+  if (Mock.fwk_ring_get_length_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_ring_get_length);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_ring_get_length_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_ring_get_free_CallInstance;
+  if (Mock.fwk_ring_get_free_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_ring_get_free);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_ring_get_free_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_ring_is_full_CallInstance;
+  if (Mock.fwk_ring_is_full_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_ring_is_full);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_ring_is_full_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_ring_is_empty_CallInstance;
+  if (Mock.fwk_ring_is_empty_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_ring_is_empty);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_ring_is_empty_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_ring_pop_CallInstance;
+  if (Mock.fwk_ring_pop_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_ring_pop);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_ring_pop_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_ring_peek_CallInstance;
+  if (Mock.fwk_ring_peek_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_ring_peek);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_ring_peek_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_ring_push_CallInstance;
+  if (Mock.fwk_ring_push_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_ring_push);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_ring_push_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_ring_clear_CallInstance;
+  if (Mock.fwk_ring_clear_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_ring_clear);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.fwk_ring_clear_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
   }
 }
 
@@ -217,33 +384,83 @@ void fwk_ring_init(struct fwk_ring* ring, char* storage, size_t storage_size)
   UNITY_SET_DETAIL(CMockString_fwk_ring_init);
   cmock_call_instance = (CMOCK_fwk_ring_init_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_ring_init_CallInstance);
   Mock.fwk_ring_init_CallInstance = CMock_Guts_MemNext(Mock.fwk_ring_init_CallInstance);
+  if (Mock.fwk_ring_init_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    return;
+  }
+  if (!Mock.fwk_ring_init_CallbackBool &&
+      Mock.fwk_ring_init_CallbackFunctionPointer != NULL)
+  {
+    Mock.fwk_ring_init_CallbackFunctionPointer(ring, storage, storage_size, Mock.fwk_ring_init_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_ring)
   {
     UNITY_SET_DETAILS(CMockString_fwk_ring_init,CMockString_ring);
-    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(struct fwk_ring), cmock_line, CMockStringMismatch);
+    if (cmock_call_instance->Expected_ring == NULL)
+      { UNITY_TEST_ASSERT_NULL(ring, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(struct fwk_ring), cmock_call_instance->Expected_ring_Depth, cmock_line, CMockStringMismatch); }
   }
+  if (!cmock_call_instance->IgnoreArg_storage)
   {
     UNITY_SET_DETAILS(CMockString_fwk_ring_init,CMockString_storage);
     UNITY_TEST_ASSERT_EQUAL_STRING(cmock_call_instance->Expected_storage, storage, cmock_line, CMockStringMismatch);
   }
+  if (!cmock_call_instance->IgnoreArg_storage_size)
   {
     UNITY_SET_DETAILS(CMockString_fwk_ring_init,CMockString_storage_size);
     UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_storage_size), (void*)(&storage_size), sizeof(size_t), cmock_line, CMockStringMismatch);
   }
   }
+  if (Mock.fwk_ring_init_CallbackFunctionPointer != NULL)
+  {
+    Mock.fwk_ring_init_CallbackFunctionPointer(ring, storage, storage_size, Mock.fwk_ring_init_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_ring_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(ring, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)ring, (void*)cmock_call_instance->ReturnThruPtr_ring_Val,
+      cmock_call_instance->ReturnThruPtr_ring_Size);
+  }
+  if (cmock_call_instance->ReturnThruPtr_storage_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(storage, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)storage, (void*)cmock_call_instance->ReturnThruPtr_storage_Val,
+      cmock_call_instance->ReturnThruPtr_storage_Size);
+  }
   UNITY_CLR_DETAILS();
 }
 
-void CMockExpectParameters_fwk_ring_init(CMOCK_fwk_ring_init_CALL_INSTANCE* cmock_call_instance, struct fwk_ring* ring, char* storage, size_t storage_size);
-void CMockExpectParameters_fwk_ring_init(CMOCK_fwk_ring_init_CALL_INSTANCE* cmock_call_instance, struct fwk_ring* ring, char* storage, size_t storage_size)
+void CMockExpectParameters_fwk_ring_init(CMOCK_fwk_ring_init_CALL_INSTANCE* cmock_call_instance, struct fwk_ring* ring, int ring_Depth, char* storage, size_t storage_size);
+void CMockExpectParameters_fwk_ring_init(CMOCK_fwk_ring_init_CALL_INSTANCE* cmock_call_instance, struct fwk_ring* ring, int ring_Depth, char* storage, size_t storage_size)
 {
   cmock_call_instance->Expected_ring = ring;
+  cmock_call_instance->Expected_ring_Depth = ring_Depth;
+  cmock_call_instance->IgnoreArg_ring = 0;
+  cmock_call_instance->ReturnThruPtr_ring_Used = 0;
   cmock_call_instance->Expected_storage = storage;
+  cmock_call_instance->IgnoreArg_storage = 0;
+  cmock_call_instance->ReturnThruPtr_storage_Used = 0;
   memcpy((void*)(&cmock_call_instance->Expected_storage_size), (void*)(&storage_size),
          sizeof(size_t[sizeof(storage_size) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_storage_size = 0;
+}
+
+void fwk_ring_init_CMockIgnore(void)
+{
+  Mock.fwk_ring_init_IgnoreBool = (char)1;
+}
+
+void fwk_ring_init_CMockStopIgnore(void)
+{
+  Mock.fwk_ring_init_IgnoreBool = (char)0;
 }
 
 void fwk_ring_init_CMockExpectAnyArgs(UNITY_LINE_TYPE cmock_line)
@@ -253,6 +470,7 @@ void fwk_ring_init_CMockExpectAnyArgs(UNITY_LINE_TYPE cmock_line)
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_init_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_init_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_init_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ExpectAnyArgsBool = (char)1;
@@ -265,9 +483,76 @@ void fwk_ring_init_CMockExpect(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_init_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_init_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_init_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
-  CMockExpectParameters_fwk_ring_init(cmock_call_instance, ring, storage, storage_size);
+  CMockExpectParameters_fwk_ring_init(cmock_call_instance, ring, 1, storage, storage_size);
+}
+
+void fwk_ring_init_AddCallback(CMOCK_fwk_ring_init_CALLBACK Callback)
+{
+  Mock.fwk_ring_init_IgnoreBool = (char)0;
+  Mock.fwk_ring_init_CallbackBool = (char)1;
+  Mock.fwk_ring_init_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_init_Stub(CMOCK_fwk_ring_init_CALLBACK Callback)
+{
+  Mock.fwk_ring_init_IgnoreBool = (char)0;
+  Mock.fwk_ring_init_CallbackBool = (char)0;
+  Mock.fwk_ring_init_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_init_CMockExpectWithArray(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring, int ring_Depth, char* storage, size_t storage_size)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_ring_init_CALL_INSTANCE));
+  CMOCK_fwk_ring_init_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_init_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_ring_init_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_init_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_init_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_fwk_ring_init(cmock_call_instance, ring, ring_Depth, storage, storage_size);
+}
+
+void fwk_ring_init_CMockReturnMemThruPtr_ring(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring, size_t cmock_size)
+{
+  CMOCK_fwk_ring_init_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_init_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_init_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_ring_Used = 1;
+  cmock_call_instance->ReturnThruPtr_ring_Val = ring;
+  cmock_call_instance->ReturnThruPtr_ring_Size = cmock_size;
+}
+
+void fwk_ring_init_CMockReturnMemThruPtr_storage(UNITY_LINE_TYPE cmock_line, char* storage, size_t cmock_size)
+{
+  CMOCK_fwk_ring_init_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_init_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_init_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_storage_Used = 1;
+  cmock_call_instance->ReturnThruPtr_storage_Val = storage;
+  cmock_call_instance->ReturnThruPtr_storage_Size = cmock_size;
+}
+
+void fwk_ring_init_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_ring_init_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_init_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_init_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_ring = 1;
+}
+
+void fwk_ring_init_CMockIgnoreArg_storage(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_ring_init_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_init_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_init_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_storage = 1;
+}
+
+void fwk_ring_init_CMockIgnoreArg_storage_size(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_ring_init_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_init_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_init_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_storage_size = 1;
 }
 
 size_t fwk_ring_get_capacity(const struct fwk_ring* ring)
@@ -277,23 +562,70 @@ size_t fwk_ring_get_capacity(const struct fwk_ring* ring)
   UNITY_SET_DETAIL(CMockString_fwk_ring_get_capacity);
   cmock_call_instance = (CMOCK_fwk_ring_get_capacity_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_ring_get_capacity_CallInstance);
   Mock.fwk_ring_get_capacity_CallInstance = CMock_Guts_MemNext(Mock.fwk_ring_get_capacity_CallInstance);
+  if (Mock.fwk_ring_get_capacity_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_ring_get_capacity_FinalReturn;
+    memcpy((void*)(&Mock.fwk_ring_get_capacity_FinalReturn), (void*)(&cmock_call_instance->ReturnVal),
+         sizeof(size_t[sizeof(cmock_call_instance->ReturnVal) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_ring_get_capacity_CallbackBool &&
+      Mock.fwk_ring_get_capacity_CallbackFunctionPointer != NULL)
+  {
+    size_t cmock_cb_ret = Mock.fwk_ring_get_capacity_CallbackFunctionPointer(ring, Mock.fwk_ring_get_capacity_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_ring)
   {
     UNITY_SET_DETAILS(CMockString_fwk_ring_get_capacity,CMockString_ring);
-    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(const struct fwk_ring), cmock_line, CMockStringMismatch);
+    if (cmock_call_instance->Expected_ring == NULL)
+      { UNITY_TEST_ASSERT_NULL(ring, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(const struct fwk_ring), cmock_call_instance->Expected_ring_Depth, cmock_line, CMockStringMismatch); }
   }
+  }
+  if (Mock.fwk_ring_get_capacity_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_ring_get_capacity_CallbackFunctionPointer(ring, Mock.fwk_ring_get_capacity_CallbackCalls++);
   }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
 }
 
-void CMockExpectParameters_fwk_ring_get_capacity(CMOCK_fwk_ring_get_capacity_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring);
-void CMockExpectParameters_fwk_ring_get_capacity(CMOCK_fwk_ring_get_capacity_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring)
+void CMockExpectParameters_fwk_ring_get_capacity(CMOCK_fwk_ring_get_capacity_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring, int ring_Depth);
+void CMockExpectParameters_fwk_ring_get_capacity(CMOCK_fwk_ring_get_capacity_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring, int ring_Depth)
 {
   cmock_call_instance->Expected_ring = ring;
+  cmock_call_instance->Expected_ring_Depth = ring_Depth;
+  cmock_call_instance->IgnoreArg_ring = 0;
+}
+
+void fwk_ring_get_capacity_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_ring_get_capacity_CALL_INSTANCE));
+  CMOCK_fwk_ring_get_capacity_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_get_capacity_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_ring_get_capacity_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_get_capacity_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_get_capacity_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_ring_get_capacity_IgnoreBool = (char)1;
+}
+
+void fwk_ring_get_capacity_CMockStopIgnore(void)
+{
+  if(Mock.fwk_ring_get_capacity_IgnoreBool)
+    Mock.fwk_ring_get_capacity_CallInstance = CMock_Guts_MemNext(Mock.fwk_ring_get_capacity_CallInstance);
+  Mock.fwk_ring_get_capacity_IgnoreBool = (char)0;
 }
 
 void fwk_ring_get_capacity_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return)
@@ -303,6 +635,7 @@ void fwk_ring_get_capacity_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_lin
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_get_capacity_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_get_capacity_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_get_capacity_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -316,11 +649,47 @@ void fwk_ring_get_capacity_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, cons
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_get_capacity_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_get_capacity_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_get_capacity_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
-  CMockExpectParameters_fwk_ring_get_capacity(cmock_call_instance, ring);
+  CMockExpectParameters_fwk_ring_get_capacity(cmock_call_instance, ring, 1);
   memcpy((void*)(&cmock_call_instance->ReturnVal), (void*)(&cmock_to_return),
          sizeof(size_t[sizeof(cmock_to_return) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+}
+
+void fwk_ring_get_capacity_AddCallback(CMOCK_fwk_ring_get_capacity_CALLBACK Callback)
+{
+  Mock.fwk_ring_get_capacity_IgnoreBool = (char)0;
+  Mock.fwk_ring_get_capacity_CallbackBool = (char)1;
+  Mock.fwk_ring_get_capacity_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_get_capacity_Stub(CMOCK_fwk_ring_get_capacity_CALLBACK Callback)
+{
+  Mock.fwk_ring_get_capacity_IgnoreBool = (char)0;
+  Mock.fwk_ring_get_capacity_CallbackBool = (char)0;
+  Mock.fwk_ring_get_capacity_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_get_capacity_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_ring* ring, int ring_Depth, size_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_ring_get_capacity_CALL_INSTANCE));
+  CMOCK_fwk_ring_get_capacity_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_get_capacity_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_ring_get_capacity_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_get_capacity_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_get_capacity_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_fwk_ring_get_capacity(cmock_call_instance, ring, ring_Depth);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fwk_ring_get_capacity_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_ring_get_capacity_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_get_capacity_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_get_capacity_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_ring = 1;
 }
 
 size_t fwk_ring_get_length(const struct fwk_ring* ring)
@@ -330,23 +699,70 @@ size_t fwk_ring_get_length(const struct fwk_ring* ring)
   UNITY_SET_DETAIL(CMockString_fwk_ring_get_length);
   cmock_call_instance = (CMOCK_fwk_ring_get_length_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_ring_get_length_CallInstance);
   Mock.fwk_ring_get_length_CallInstance = CMock_Guts_MemNext(Mock.fwk_ring_get_length_CallInstance);
+  if (Mock.fwk_ring_get_length_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_ring_get_length_FinalReturn;
+    memcpy((void*)(&Mock.fwk_ring_get_length_FinalReturn), (void*)(&cmock_call_instance->ReturnVal),
+         sizeof(size_t[sizeof(cmock_call_instance->ReturnVal) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_ring_get_length_CallbackBool &&
+      Mock.fwk_ring_get_length_CallbackFunctionPointer != NULL)
+  {
+    size_t cmock_cb_ret = Mock.fwk_ring_get_length_CallbackFunctionPointer(ring, Mock.fwk_ring_get_length_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_ring)
   {
     UNITY_SET_DETAILS(CMockString_fwk_ring_get_length,CMockString_ring);
-    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(const struct fwk_ring), cmock_line, CMockStringMismatch);
+    if (cmock_call_instance->Expected_ring == NULL)
+      { UNITY_TEST_ASSERT_NULL(ring, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(const struct fwk_ring), cmock_call_instance->Expected_ring_Depth, cmock_line, CMockStringMismatch); }
   }
+  }
+  if (Mock.fwk_ring_get_length_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_ring_get_length_CallbackFunctionPointer(ring, Mock.fwk_ring_get_length_CallbackCalls++);
   }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
 }
 
-void CMockExpectParameters_fwk_ring_get_length(CMOCK_fwk_ring_get_length_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring);
-void CMockExpectParameters_fwk_ring_get_length(CMOCK_fwk_ring_get_length_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring)
+void CMockExpectParameters_fwk_ring_get_length(CMOCK_fwk_ring_get_length_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring, int ring_Depth);
+void CMockExpectParameters_fwk_ring_get_length(CMOCK_fwk_ring_get_length_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring, int ring_Depth)
 {
   cmock_call_instance->Expected_ring = ring;
+  cmock_call_instance->Expected_ring_Depth = ring_Depth;
+  cmock_call_instance->IgnoreArg_ring = 0;
+}
+
+void fwk_ring_get_length_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_ring_get_length_CALL_INSTANCE));
+  CMOCK_fwk_ring_get_length_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_get_length_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_ring_get_length_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_get_length_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_get_length_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_ring_get_length_IgnoreBool = (char)1;
+}
+
+void fwk_ring_get_length_CMockStopIgnore(void)
+{
+  if(Mock.fwk_ring_get_length_IgnoreBool)
+    Mock.fwk_ring_get_length_CallInstance = CMock_Guts_MemNext(Mock.fwk_ring_get_length_CallInstance);
+  Mock.fwk_ring_get_length_IgnoreBool = (char)0;
 }
 
 void fwk_ring_get_length_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return)
@@ -356,6 +772,7 @@ void fwk_ring_get_length_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line,
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_get_length_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_get_length_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_get_length_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -369,11 +786,47 @@ void fwk_ring_get_length_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const 
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_get_length_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_get_length_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_get_length_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
-  CMockExpectParameters_fwk_ring_get_length(cmock_call_instance, ring);
+  CMockExpectParameters_fwk_ring_get_length(cmock_call_instance, ring, 1);
   memcpy((void*)(&cmock_call_instance->ReturnVal), (void*)(&cmock_to_return),
          sizeof(size_t[sizeof(cmock_to_return) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+}
+
+void fwk_ring_get_length_AddCallback(CMOCK_fwk_ring_get_length_CALLBACK Callback)
+{
+  Mock.fwk_ring_get_length_IgnoreBool = (char)0;
+  Mock.fwk_ring_get_length_CallbackBool = (char)1;
+  Mock.fwk_ring_get_length_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_get_length_Stub(CMOCK_fwk_ring_get_length_CALLBACK Callback)
+{
+  Mock.fwk_ring_get_length_IgnoreBool = (char)0;
+  Mock.fwk_ring_get_length_CallbackBool = (char)0;
+  Mock.fwk_ring_get_length_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_get_length_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_ring* ring, int ring_Depth, size_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_ring_get_length_CALL_INSTANCE));
+  CMOCK_fwk_ring_get_length_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_get_length_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_ring_get_length_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_get_length_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_get_length_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_fwk_ring_get_length(cmock_call_instance, ring, ring_Depth);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fwk_ring_get_length_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_ring_get_length_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_get_length_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_get_length_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_ring = 1;
 }
 
 size_t fwk_ring_get_free(const struct fwk_ring* ring)
@@ -383,23 +836,70 @@ size_t fwk_ring_get_free(const struct fwk_ring* ring)
   UNITY_SET_DETAIL(CMockString_fwk_ring_get_free);
   cmock_call_instance = (CMOCK_fwk_ring_get_free_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_ring_get_free_CallInstance);
   Mock.fwk_ring_get_free_CallInstance = CMock_Guts_MemNext(Mock.fwk_ring_get_free_CallInstance);
+  if (Mock.fwk_ring_get_free_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_ring_get_free_FinalReturn;
+    memcpy((void*)(&Mock.fwk_ring_get_free_FinalReturn), (void*)(&cmock_call_instance->ReturnVal),
+         sizeof(size_t[sizeof(cmock_call_instance->ReturnVal) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_ring_get_free_CallbackBool &&
+      Mock.fwk_ring_get_free_CallbackFunctionPointer != NULL)
+  {
+    size_t cmock_cb_ret = Mock.fwk_ring_get_free_CallbackFunctionPointer(ring, Mock.fwk_ring_get_free_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_ring)
   {
     UNITY_SET_DETAILS(CMockString_fwk_ring_get_free,CMockString_ring);
-    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(const struct fwk_ring), cmock_line, CMockStringMismatch);
+    if (cmock_call_instance->Expected_ring == NULL)
+      { UNITY_TEST_ASSERT_NULL(ring, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(const struct fwk_ring), cmock_call_instance->Expected_ring_Depth, cmock_line, CMockStringMismatch); }
   }
+  }
+  if (Mock.fwk_ring_get_free_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_ring_get_free_CallbackFunctionPointer(ring, Mock.fwk_ring_get_free_CallbackCalls++);
   }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
 }
 
-void CMockExpectParameters_fwk_ring_get_free(CMOCK_fwk_ring_get_free_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring);
-void CMockExpectParameters_fwk_ring_get_free(CMOCK_fwk_ring_get_free_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring)
+void CMockExpectParameters_fwk_ring_get_free(CMOCK_fwk_ring_get_free_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring, int ring_Depth);
+void CMockExpectParameters_fwk_ring_get_free(CMOCK_fwk_ring_get_free_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring, int ring_Depth)
 {
   cmock_call_instance->Expected_ring = ring;
+  cmock_call_instance->Expected_ring_Depth = ring_Depth;
+  cmock_call_instance->IgnoreArg_ring = 0;
+}
+
+void fwk_ring_get_free_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_ring_get_free_CALL_INSTANCE));
+  CMOCK_fwk_ring_get_free_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_get_free_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_ring_get_free_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_get_free_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_get_free_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_ring_get_free_IgnoreBool = (char)1;
+}
+
+void fwk_ring_get_free_CMockStopIgnore(void)
+{
+  if(Mock.fwk_ring_get_free_IgnoreBool)
+    Mock.fwk_ring_get_free_CallInstance = CMock_Guts_MemNext(Mock.fwk_ring_get_free_CallInstance);
+  Mock.fwk_ring_get_free_IgnoreBool = (char)0;
 }
 
 void fwk_ring_get_free_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return)
@@ -409,6 +909,7 @@ void fwk_ring_get_free_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, s
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_get_free_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_get_free_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_get_free_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -422,11 +923,47 @@ void fwk_ring_get_free_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const st
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_get_free_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_get_free_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_get_free_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
-  CMockExpectParameters_fwk_ring_get_free(cmock_call_instance, ring);
+  CMockExpectParameters_fwk_ring_get_free(cmock_call_instance, ring, 1);
   memcpy((void*)(&cmock_call_instance->ReturnVal), (void*)(&cmock_to_return),
          sizeof(size_t[sizeof(cmock_to_return) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+}
+
+void fwk_ring_get_free_AddCallback(CMOCK_fwk_ring_get_free_CALLBACK Callback)
+{
+  Mock.fwk_ring_get_free_IgnoreBool = (char)0;
+  Mock.fwk_ring_get_free_CallbackBool = (char)1;
+  Mock.fwk_ring_get_free_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_get_free_Stub(CMOCK_fwk_ring_get_free_CALLBACK Callback)
+{
+  Mock.fwk_ring_get_free_IgnoreBool = (char)0;
+  Mock.fwk_ring_get_free_CallbackBool = (char)0;
+  Mock.fwk_ring_get_free_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_get_free_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_ring* ring, int ring_Depth, size_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_ring_get_free_CALL_INSTANCE));
+  CMOCK_fwk_ring_get_free_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_get_free_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_ring_get_free_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_get_free_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_get_free_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_fwk_ring_get_free(cmock_call_instance, ring, ring_Depth);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fwk_ring_get_free_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_ring_get_free_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_get_free_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_get_free_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_ring = 1;
 }
 
 bool fwk_ring_is_full(const struct fwk_ring* ring)
@@ -436,23 +973,69 @@ bool fwk_ring_is_full(const struct fwk_ring* ring)
   UNITY_SET_DETAIL(CMockString_fwk_ring_is_full);
   cmock_call_instance = (CMOCK_fwk_ring_is_full_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_ring_is_full_CallInstance);
   Mock.fwk_ring_is_full_CallInstance = CMock_Guts_MemNext(Mock.fwk_ring_is_full_CallInstance);
+  if (Mock.fwk_ring_is_full_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_ring_is_full_FinalReturn;
+    Mock.fwk_ring_is_full_FinalReturn = cmock_call_instance->ReturnVal;
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_ring_is_full_CallbackBool &&
+      Mock.fwk_ring_is_full_CallbackFunctionPointer != NULL)
+  {
+    bool cmock_cb_ret = Mock.fwk_ring_is_full_CallbackFunctionPointer(ring, Mock.fwk_ring_is_full_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_ring)
   {
     UNITY_SET_DETAILS(CMockString_fwk_ring_is_full,CMockString_ring);
-    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(const struct fwk_ring), cmock_line, CMockStringMismatch);
+    if (cmock_call_instance->Expected_ring == NULL)
+      { UNITY_TEST_ASSERT_NULL(ring, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(const struct fwk_ring), cmock_call_instance->Expected_ring_Depth, cmock_line, CMockStringMismatch); }
   }
+  }
+  if (Mock.fwk_ring_is_full_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_ring_is_full_CallbackFunctionPointer(ring, Mock.fwk_ring_is_full_CallbackCalls++);
   }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
 }
 
-void CMockExpectParameters_fwk_ring_is_full(CMOCK_fwk_ring_is_full_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring);
-void CMockExpectParameters_fwk_ring_is_full(CMOCK_fwk_ring_is_full_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring)
+void CMockExpectParameters_fwk_ring_is_full(CMOCK_fwk_ring_is_full_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring, int ring_Depth);
+void CMockExpectParameters_fwk_ring_is_full(CMOCK_fwk_ring_is_full_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring, int ring_Depth)
 {
   cmock_call_instance->Expected_ring = ring;
+  cmock_call_instance->Expected_ring_Depth = ring_Depth;
+  cmock_call_instance->IgnoreArg_ring = 0;
+}
+
+void fwk_ring_is_full_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_ring_is_full_CALL_INSTANCE));
+  CMOCK_fwk_ring_is_full_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_is_full_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_ring_is_full_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_is_full_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_is_full_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_ring_is_full_IgnoreBool = (char)1;
+}
+
+void fwk_ring_is_full_CMockStopIgnore(void)
+{
+  if(Mock.fwk_ring_is_full_IgnoreBool)
+    Mock.fwk_ring_is_full_CallInstance = CMock_Guts_MemNext(Mock.fwk_ring_is_full_CallInstance);
+  Mock.fwk_ring_is_full_IgnoreBool = (char)0;
 }
 
 void fwk_ring_is_full_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return)
@@ -462,6 +1045,7 @@ void fwk_ring_is_full_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, bo
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_is_full_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_is_full_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_is_full_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -475,10 +1059,46 @@ void fwk_ring_is_full_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const str
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_is_full_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_is_full_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_is_full_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
-  CMockExpectParameters_fwk_ring_is_full(cmock_call_instance, ring);
+  CMockExpectParameters_fwk_ring_is_full(cmock_call_instance, ring, 1);
   cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fwk_ring_is_full_AddCallback(CMOCK_fwk_ring_is_full_CALLBACK Callback)
+{
+  Mock.fwk_ring_is_full_IgnoreBool = (char)0;
+  Mock.fwk_ring_is_full_CallbackBool = (char)1;
+  Mock.fwk_ring_is_full_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_is_full_Stub(CMOCK_fwk_ring_is_full_CALLBACK Callback)
+{
+  Mock.fwk_ring_is_full_IgnoreBool = (char)0;
+  Mock.fwk_ring_is_full_CallbackBool = (char)0;
+  Mock.fwk_ring_is_full_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_is_full_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_ring* ring, int ring_Depth, bool cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_ring_is_full_CALL_INSTANCE));
+  CMOCK_fwk_ring_is_full_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_is_full_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_ring_is_full_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_is_full_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_is_full_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_fwk_ring_is_full(cmock_call_instance, ring, ring_Depth);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fwk_ring_is_full_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_ring_is_full_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_is_full_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_is_full_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_ring = 1;
 }
 
 bool fwk_ring_is_empty(const struct fwk_ring* ring)
@@ -488,23 +1108,69 @@ bool fwk_ring_is_empty(const struct fwk_ring* ring)
   UNITY_SET_DETAIL(CMockString_fwk_ring_is_empty);
   cmock_call_instance = (CMOCK_fwk_ring_is_empty_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_ring_is_empty_CallInstance);
   Mock.fwk_ring_is_empty_CallInstance = CMock_Guts_MemNext(Mock.fwk_ring_is_empty_CallInstance);
+  if (Mock.fwk_ring_is_empty_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_ring_is_empty_FinalReturn;
+    Mock.fwk_ring_is_empty_FinalReturn = cmock_call_instance->ReturnVal;
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_ring_is_empty_CallbackBool &&
+      Mock.fwk_ring_is_empty_CallbackFunctionPointer != NULL)
+  {
+    bool cmock_cb_ret = Mock.fwk_ring_is_empty_CallbackFunctionPointer(ring, Mock.fwk_ring_is_empty_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_ring)
   {
     UNITY_SET_DETAILS(CMockString_fwk_ring_is_empty,CMockString_ring);
-    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(const struct fwk_ring), cmock_line, CMockStringMismatch);
+    if (cmock_call_instance->Expected_ring == NULL)
+      { UNITY_TEST_ASSERT_NULL(ring, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(const struct fwk_ring), cmock_call_instance->Expected_ring_Depth, cmock_line, CMockStringMismatch); }
   }
+  }
+  if (Mock.fwk_ring_is_empty_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_ring_is_empty_CallbackFunctionPointer(ring, Mock.fwk_ring_is_empty_CallbackCalls++);
   }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
 }
 
-void CMockExpectParameters_fwk_ring_is_empty(CMOCK_fwk_ring_is_empty_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring);
-void CMockExpectParameters_fwk_ring_is_empty(CMOCK_fwk_ring_is_empty_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring)
+void CMockExpectParameters_fwk_ring_is_empty(CMOCK_fwk_ring_is_empty_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring, int ring_Depth);
+void CMockExpectParameters_fwk_ring_is_empty(CMOCK_fwk_ring_is_empty_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring, int ring_Depth)
 {
   cmock_call_instance->Expected_ring = ring;
+  cmock_call_instance->Expected_ring_Depth = ring_Depth;
+  cmock_call_instance->IgnoreArg_ring = 0;
+}
+
+void fwk_ring_is_empty_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_ring_is_empty_CALL_INSTANCE));
+  CMOCK_fwk_ring_is_empty_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_is_empty_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_ring_is_empty_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_is_empty_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_is_empty_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_ring_is_empty_IgnoreBool = (char)1;
+}
+
+void fwk_ring_is_empty_CMockStopIgnore(void)
+{
+  if(Mock.fwk_ring_is_empty_IgnoreBool)
+    Mock.fwk_ring_is_empty_CallInstance = CMock_Guts_MemNext(Mock.fwk_ring_is_empty_CallInstance);
+  Mock.fwk_ring_is_empty_IgnoreBool = (char)0;
 }
 
 void fwk_ring_is_empty_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return)
@@ -514,6 +1180,7 @@ void fwk_ring_is_empty_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, b
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_is_empty_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_is_empty_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_is_empty_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -527,10 +1194,46 @@ void fwk_ring_is_empty_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const st
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_is_empty_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_is_empty_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_is_empty_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
-  CMockExpectParameters_fwk_ring_is_empty(cmock_call_instance, ring);
+  CMockExpectParameters_fwk_ring_is_empty(cmock_call_instance, ring, 1);
   cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fwk_ring_is_empty_AddCallback(CMOCK_fwk_ring_is_empty_CALLBACK Callback)
+{
+  Mock.fwk_ring_is_empty_IgnoreBool = (char)0;
+  Mock.fwk_ring_is_empty_CallbackBool = (char)1;
+  Mock.fwk_ring_is_empty_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_is_empty_Stub(CMOCK_fwk_ring_is_empty_CALLBACK Callback)
+{
+  Mock.fwk_ring_is_empty_IgnoreBool = (char)0;
+  Mock.fwk_ring_is_empty_CallbackBool = (char)0;
+  Mock.fwk_ring_is_empty_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_is_empty_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_ring* ring, int ring_Depth, bool cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_ring_is_empty_CALL_INSTANCE));
+  CMOCK_fwk_ring_is_empty_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_is_empty_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_ring_is_empty_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_is_empty_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_is_empty_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_fwk_ring_is_empty(cmock_call_instance, ring, ring_Depth);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fwk_ring_is_empty_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_ring_is_empty_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_is_empty_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_is_empty_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_ring = 1;
 }
 
 size_t fwk_ring_pop(struct fwk_ring* ring, char* buffer, size_t buffer_size)
@@ -540,34 +1243,99 @@ size_t fwk_ring_pop(struct fwk_ring* ring, char* buffer, size_t buffer_size)
   UNITY_SET_DETAIL(CMockString_fwk_ring_pop);
   cmock_call_instance = (CMOCK_fwk_ring_pop_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_ring_pop_CallInstance);
   Mock.fwk_ring_pop_CallInstance = CMock_Guts_MemNext(Mock.fwk_ring_pop_CallInstance);
+  if (Mock.fwk_ring_pop_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_ring_pop_FinalReturn;
+    memcpy((void*)(&Mock.fwk_ring_pop_FinalReturn), (void*)(&cmock_call_instance->ReturnVal),
+         sizeof(size_t[sizeof(cmock_call_instance->ReturnVal) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_ring_pop_CallbackBool &&
+      Mock.fwk_ring_pop_CallbackFunctionPointer != NULL)
+  {
+    size_t cmock_cb_ret = Mock.fwk_ring_pop_CallbackFunctionPointer(ring, buffer, buffer_size, Mock.fwk_ring_pop_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_ring)
   {
     UNITY_SET_DETAILS(CMockString_fwk_ring_pop,CMockString_ring);
-    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(struct fwk_ring), cmock_line, CMockStringMismatch);
+    if (cmock_call_instance->Expected_ring == NULL)
+      { UNITY_TEST_ASSERT_NULL(ring, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(struct fwk_ring), cmock_call_instance->Expected_ring_Depth, cmock_line, CMockStringMismatch); }
   }
+  if (!cmock_call_instance->IgnoreArg_buffer)
   {
     UNITY_SET_DETAILS(CMockString_fwk_ring_pop,CMockString_buffer);
     UNITY_TEST_ASSERT_EQUAL_STRING(cmock_call_instance->Expected_buffer, buffer, cmock_line, CMockStringMismatch);
   }
+  if (!cmock_call_instance->IgnoreArg_buffer_size)
   {
     UNITY_SET_DETAILS(CMockString_fwk_ring_pop,CMockString_buffer_size);
     UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_buffer_size), (void*)(&buffer_size), sizeof(size_t), cmock_line, CMockStringMismatch);
   }
   }
+  if (Mock.fwk_ring_pop_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_ring_pop_CallbackFunctionPointer(ring, buffer, buffer_size, Mock.fwk_ring_pop_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_ring_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(ring, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)ring, (void*)cmock_call_instance->ReturnThruPtr_ring_Val,
+      cmock_call_instance->ReturnThruPtr_ring_Size);
+  }
+  if (cmock_call_instance->ReturnThruPtr_buffer_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(buffer, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)buffer, (void*)cmock_call_instance->ReturnThruPtr_buffer_Val,
+      cmock_call_instance->ReturnThruPtr_buffer_Size);
+  }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
 }
 
-void CMockExpectParameters_fwk_ring_pop(CMOCK_fwk_ring_pop_CALL_INSTANCE* cmock_call_instance, struct fwk_ring* ring, char* buffer, size_t buffer_size);
-void CMockExpectParameters_fwk_ring_pop(CMOCK_fwk_ring_pop_CALL_INSTANCE* cmock_call_instance, struct fwk_ring* ring, char* buffer, size_t buffer_size)
+void CMockExpectParameters_fwk_ring_pop(CMOCK_fwk_ring_pop_CALL_INSTANCE* cmock_call_instance, struct fwk_ring* ring, int ring_Depth, char* buffer, size_t buffer_size);
+void CMockExpectParameters_fwk_ring_pop(CMOCK_fwk_ring_pop_CALL_INSTANCE* cmock_call_instance, struct fwk_ring* ring, int ring_Depth, char* buffer, size_t buffer_size)
 {
   cmock_call_instance->Expected_ring = ring;
+  cmock_call_instance->Expected_ring_Depth = ring_Depth;
+  cmock_call_instance->IgnoreArg_ring = 0;
+  cmock_call_instance->ReturnThruPtr_ring_Used = 0;
   cmock_call_instance->Expected_buffer = buffer;
+  cmock_call_instance->IgnoreArg_buffer = 0;
+  cmock_call_instance->ReturnThruPtr_buffer_Used = 0;
   memcpy((void*)(&cmock_call_instance->Expected_buffer_size), (void*)(&buffer_size),
          sizeof(size_t[sizeof(buffer_size) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_buffer_size = 0;
+}
+
+void fwk_ring_pop_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_ring_pop_CALL_INSTANCE));
+  CMOCK_fwk_ring_pop_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_pop_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_ring_pop_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_pop_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_pop_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_ring_pop_IgnoreBool = (char)1;
+}
+
+void fwk_ring_pop_CMockStopIgnore(void)
+{
+  if(Mock.fwk_ring_pop_IgnoreBool)
+    Mock.fwk_ring_pop_CallInstance = CMock_Guts_MemNext(Mock.fwk_ring_pop_CallInstance);
+  Mock.fwk_ring_pop_IgnoreBool = (char)0;
 }
 
 void fwk_ring_pop_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return)
@@ -577,6 +1345,7 @@ void fwk_ring_pop_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, size_t
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_pop_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_pop_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_pop_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -590,11 +1359,79 @@ void fwk_ring_pop_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_ri
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_pop_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_pop_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_pop_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
-  CMockExpectParameters_fwk_ring_pop(cmock_call_instance, ring, buffer, buffer_size);
+  CMockExpectParameters_fwk_ring_pop(cmock_call_instance, ring, 1, buffer, buffer_size);
   memcpy((void*)(&cmock_call_instance->ReturnVal), (void*)(&cmock_to_return),
          sizeof(size_t[sizeof(cmock_to_return) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+}
+
+void fwk_ring_pop_AddCallback(CMOCK_fwk_ring_pop_CALLBACK Callback)
+{
+  Mock.fwk_ring_pop_IgnoreBool = (char)0;
+  Mock.fwk_ring_pop_CallbackBool = (char)1;
+  Mock.fwk_ring_pop_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_pop_Stub(CMOCK_fwk_ring_pop_CALLBACK Callback)
+{
+  Mock.fwk_ring_pop_IgnoreBool = (char)0;
+  Mock.fwk_ring_pop_CallbackBool = (char)0;
+  Mock.fwk_ring_pop_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_pop_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring, int ring_Depth, char* buffer, size_t buffer_size, size_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_ring_pop_CALL_INSTANCE));
+  CMOCK_fwk_ring_pop_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_pop_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_ring_pop_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_pop_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_pop_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_fwk_ring_pop(cmock_call_instance, ring, ring_Depth, buffer, buffer_size);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fwk_ring_pop_CMockReturnMemThruPtr_ring(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring, size_t cmock_size)
+{
+  CMOCK_fwk_ring_pop_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_pop_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_pop_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_ring_Used = 1;
+  cmock_call_instance->ReturnThruPtr_ring_Val = ring;
+  cmock_call_instance->ReturnThruPtr_ring_Size = cmock_size;
+}
+
+void fwk_ring_pop_CMockReturnMemThruPtr_buffer(UNITY_LINE_TYPE cmock_line, char* buffer, size_t cmock_size)
+{
+  CMOCK_fwk_ring_pop_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_pop_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_pop_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_buffer_Used = 1;
+  cmock_call_instance->ReturnThruPtr_buffer_Val = buffer;
+  cmock_call_instance->ReturnThruPtr_buffer_Size = cmock_size;
+}
+
+void fwk_ring_pop_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_ring_pop_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_pop_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_pop_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_ring = 1;
+}
+
+void fwk_ring_pop_CMockIgnoreArg_buffer(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_ring_pop_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_pop_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_pop_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_buffer = 1;
+}
+
+void fwk_ring_pop_CMockIgnoreArg_buffer_size(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_ring_pop_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_pop_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_pop_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_buffer_size = 1;
 }
 
 size_t fwk_ring_peek(const struct fwk_ring* ring, char* buffer, size_t buffer_size)
@@ -604,34 +1441,92 @@ size_t fwk_ring_peek(const struct fwk_ring* ring, char* buffer, size_t buffer_si
   UNITY_SET_DETAIL(CMockString_fwk_ring_peek);
   cmock_call_instance = (CMOCK_fwk_ring_peek_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_ring_peek_CallInstance);
   Mock.fwk_ring_peek_CallInstance = CMock_Guts_MemNext(Mock.fwk_ring_peek_CallInstance);
+  if (Mock.fwk_ring_peek_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_ring_peek_FinalReturn;
+    memcpy((void*)(&Mock.fwk_ring_peek_FinalReturn), (void*)(&cmock_call_instance->ReturnVal),
+         sizeof(size_t[sizeof(cmock_call_instance->ReturnVal) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_ring_peek_CallbackBool &&
+      Mock.fwk_ring_peek_CallbackFunctionPointer != NULL)
+  {
+    size_t cmock_cb_ret = Mock.fwk_ring_peek_CallbackFunctionPointer(ring, buffer, buffer_size, Mock.fwk_ring_peek_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_ring)
   {
     UNITY_SET_DETAILS(CMockString_fwk_ring_peek,CMockString_ring);
-    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(const struct fwk_ring), cmock_line, CMockStringMismatch);
+    if (cmock_call_instance->Expected_ring == NULL)
+      { UNITY_TEST_ASSERT_NULL(ring, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(const struct fwk_ring), cmock_call_instance->Expected_ring_Depth, cmock_line, CMockStringMismatch); }
   }
+  if (!cmock_call_instance->IgnoreArg_buffer)
   {
     UNITY_SET_DETAILS(CMockString_fwk_ring_peek,CMockString_buffer);
     UNITY_TEST_ASSERT_EQUAL_STRING(cmock_call_instance->Expected_buffer, buffer, cmock_line, CMockStringMismatch);
   }
+  if (!cmock_call_instance->IgnoreArg_buffer_size)
   {
     UNITY_SET_DETAILS(CMockString_fwk_ring_peek,CMockString_buffer_size);
     UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_buffer_size), (void*)(&buffer_size), sizeof(size_t), cmock_line, CMockStringMismatch);
   }
   }
+  if (Mock.fwk_ring_peek_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_ring_peek_CallbackFunctionPointer(ring, buffer, buffer_size, Mock.fwk_ring_peek_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_buffer_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(buffer, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)buffer, (void*)cmock_call_instance->ReturnThruPtr_buffer_Val,
+      cmock_call_instance->ReturnThruPtr_buffer_Size);
+  }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
 }
 
-void CMockExpectParameters_fwk_ring_peek(CMOCK_fwk_ring_peek_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring, char* buffer, size_t buffer_size);
-void CMockExpectParameters_fwk_ring_peek(CMOCK_fwk_ring_peek_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring, char* buffer, size_t buffer_size)
+void CMockExpectParameters_fwk_ring_peek(CMOCK_fwk_ring_peek_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring, int ring_Depth, char* buffer, size_t buffer_size);
+void CMockExpectParameters_fwk_ring_peek(CMOCK_fwk_ring_peek_CALL_INSTANCE* cmock_call_instance, const struct fwk_ring* ring, int ring_Depth, char* buffer, size_t buffer_size)
 {
   cmock_call_instance->Expected_ring = ring;
+  cmock_call_instance->Expected_ring_Depth = ring_Depth;
+  cmock_call_instance->IgnoreArg_ring = 0;
   cmock_call_instance->Expected_buffer = buffer;
+  cmock_call_instance->IgnoreArg_buffer = 0;
+  cmock_call_instance->ReturnThruPtr_buffer_Used = 0;
   memcpy((void*)(&cmock_call_instance->Expected_buffer_size), (void*)(&buffer_size),
          sizeof(size_t[sizeof(buffer_size) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_buffer_size = 0;
+}
+
+void fwk_ring_peek_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_ring_peek_CALL_INSTANCE));
+  CMOCK_fwk_ring_peek_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_peek_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_ring_peek_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_peek_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_peek_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_ring_peek_IgnoreBool = (char)1;
+}
+
+void fwk_ring_peek_CMockStopIgnore(void)
+{
+  if(Mock.fwk_ring_peek_IgnoreBool)
+    Mock.fwk_ring_peek_CallInstance = CMock_Guts_MemNext(Mock.fwk_ring_peek_CallInstance);
+  Mock.fwk_ring_peek_IgnoreBool = (char)0;
 }
 
 void fwk_ring_peek_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return)
@@ -641,6 +1536,7 @@ void fwk_ring_peek_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, size_
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_peek_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_peek_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_peek_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -654,11 +1550,70 @@ void fwk_ring_peek_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_peek_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_peek_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_peek_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
-  CMockExpectParameters_fwk_ring_peek(cmock_call_instance, ring, buffer, buffer_size);
+  CMockExpectParameters_fwk_ring_peek(cmock_call_instance, ring, 1, buffer, buffer_size);
   memcpy((void*)(&cmock_call_instance->ReturnVal), (void*)(&cmock_to_return),
          sizeof(size_t[sizeof(cmock_to_return) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+}
+
+void fwk_ring_peek_AddCallback(CMOCK_fwk_ring_peek_CALLBACK Callback)
+{
+  Mock.fwk_ring_peek_IgnoreBool = (char)0;
+  Mock.fwk_ring_peek_CallbackBool = (char)1;
+  Mock.fwk_ring_peek_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_peek_Stub(CMOCK_fwk_ring_peek_CALLBACK Callback)
+{
+  Mock.fwk_ring_peek_IgnoreBool = (char)0;
+  Mock.fwk_ring_peek_CallbackBool = (char)0;
+  Mock.fwk_ring_peek_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_peek_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_ring* ring, int ring_Depth, char* buffer, size_t buffer_size, size_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_ring_peek_CALL_INSTANCE));
+  CMOCK_fwk_ring_peek_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_peek_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_ring_peek_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_peek_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_peek_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_fwk_ring_peek(cmock_call_instance, ring, ring_Depth, buffer, buffer_size);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fwk_ring_peek_CMockReturnMemThruPtr_buffer(UNITY_LINE_TYPE cmock_line, char* buffer, size_t cmock_size)
+{
+  CMOCK_fwk_ring_peek_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_peek_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_peek_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_buffer_Used = 1;
+  cmock_call_instance->ReturnThruPtr_buffer_Val = buffer;
+  cmock_call_instance->ReturnThruPtr_buffer_Size = cmock_size;
+}
+
+void fwk_ring_peek_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_ring_peek_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_peek_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_peek_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_ring = 1;
+}
+
+void fwk_ring_peek_CMockIgnoreArg_buffer(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_ring_peek_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_peek_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_peek_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_buffer = 1;
+}
+
+void fwk_ring_peek_CMockIgnoreArg_buffer_size(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_ring_peek_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_peek_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_peek_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_buffer_size = 1;
 }
 
 size_t fwk_ring_push(struct fwk_ring* ring, const char* buffer, size_t buffer_size)
@@ -668,34 +1623,92 @@ size_t fwk_ring_push(struct fwk_ring* ring, const char* buffer, size_t buffer_si
   UNITY_SET_DETAIL(CMockString_fwk_ring_push);
   cmock_call_instance = (CMOCK_fwk_ring_push_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_ring_push_CallInstance);
   Mock.fwk_ring_push_CallInstance = CMock_Guts_MemNext(Mock.fwk_ring_push_CallInstance);
+  if (Mock.fwk_ring_push_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_ring_push_FinalReturn;
+    memcpy((void*)(&Mock.fwk_ring_push_FinalReturn), (void*)(&cmock_call_instance->ReturnVal),
+         sizeof(size_t[sizeof(cmock_call_instance->ReturnVal) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_ring_push_CallbackBool &&
+      Mock.fwk_ring_push_CallbackFunctionPointer != NULL)
+  {
+    size_t cmock_cb_ret = Mock.fwk_ring_push_CallbackFunctionPointer(ring, buffer, buffer_size, Mock.fwk_ring_push_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_ring)
   {
     UNITY_SET_DETAILS(CMockString_fwk_ring_push,CMockString_ring);
-    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(struct fwk_ring), cmock_line, CMockStringMismatch);
+    if (cmock_call_instance->Expected_ring == NULL)
+      { UNITY_TEST_ASSERT_NULL(ring, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(struct fwk_ring), cmock_call_instance->Expected_ring_Depth, cmock_line, CMockStringMismatch); }
   }
+  if (!cmock_call_instance->IgnoreArg_buffer)
   {
     UNITY_SET_DETAILS(CMockString_fwk_ring_push,CMockString_buffer);
     UNITY_TEST_ASSERT_EQUAL_STRING(cmock_call_instance->Expected_buffer, buffer, cmock_line, CMockStringMismatch);
   }
+  if (!cmock_call_instance->IgnoreArg_buffer_size)
   {
     UNITY_SET_DETAILS(CMockString_fwk_ring_push,CMockString_buffer_size);
     UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_buffer_size), (void*)(&buffer_size), sizeof(size_t), cmock_line, CMockStringMismatch);
   }
   }
+  if (Mock.fwk_ring_push_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_ring_push_CallbackFunctionPointer(ring, buffer, buffer_size, Mock.fwk_ring_push_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_ring_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(ring, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)ring, (void*)cmock_call_instance->ReturnThruPtr_ring_Val,
+      cmock_call_instance->ReturnThruPtr_ring_Size);
+  }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
 }
 
-void CMockExpectParameters_fwk_ring_push(CMOCK_fwk_ring_push_CALL_INSTANCE* cmock_call_instance, struct fwk_ring* ring, const char* buffer, size_t buffer_size);
-void CMockExpectParameters_fwk_ring_push(CMOCK_fwk_ring_push_CALL_INSTANCE* cmock_call_instance, struct fwk_ring* ring, const char* buffer, size_t buffer_size)
+void CMockExpectParameters_fwk_ring_push(CMOCK_fwk_ring_push_CALL_INSTANCE* cmock_call_instance, struct fwk_ring* ring, int ring_Depth, const char* buffer, size_t buffer_size);
+void CMockExpectParameters_fwk_ring_push(CMOCK_fwk_ring_push_CALL_INSTANCE* cmock_call_instance, struct fwk_ring* ring, int ring_Depth, const char* buffer, size_t buffer_size)
 {
   cmock_call_instance->Expected_ring = ring;
+  cmock_call_instance->Expected_ring_Depth = ring_Depth;
+  cmock_call_instance->IgnoreArg_ring = 0;
+  cmock_call_instance->ReturnThruPtr_ring_Used = 0;
   cmock_call_instance->Expected_buffer = buffer;
+  cmock_call_instance->IgnoreArg_buffer = 0;
   memcpy((void*)(&cmock_call_instance->Expected_buffer_size), (void*)(&buffer_size),
          sizeof(size_t[sizeof(buffer_size) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_buffer_size = 0;
+}
+
+void fwk_ring_push_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_ring_push_CALL_INSTANCE));
+  CMOCK_fwk_ring_push_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_push_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_ring_push_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_push_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_push_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_ring_push_IgnoreBool = (char)1;
+}
+
+void fwk_ring_push_CMockStopIgnore(void)
+{
+  if(Mock.fwk_ring_push_IgnoreBool)
+    Mock.fwk_ring_push_CallInstance = CMock_Guts_MemNext(Mock.fwk_ring_push_CallInstance);
+  Mock.fwk_ring_push_IgnoreBool = (char)0;
 }
 
 void fwk_ring_push_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, size_t cmock_to_return)
@@ -705,6 +1718,7 @@ void fwk_ring_push_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, size_
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_push_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_push_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_push_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -718,11 +1732,70 @@ void fwk_ring_push_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_r
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_push_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_push_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_push_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
-  CMockExpectParameters_fwk_ring_push(cmock_call_instance, ring, buffer, buffer_size);
+  CMockExpectParameters_fwk_ring_push(cmock_call_instance, ring, 1, buffer, buffer_size);
   memcpy((void*)(&cmock_call_instance->ReturnVal), (void*)(&cmock_to_return),
          sizeof(size_t[sizeof(cmock_to_return) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+}
+
+void fwk_ring_push_AddCallback(CMOCK_fwk_ring_push_CALLBACK Callback)
+{
+  Mock.fwk_ring_push_IgnoreBool = (char)0;
+  Mock.fwk_ring_push_CallbackBool = (char)1;
+  Mock.fwk_ring_push_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_push_Stub(CMOCK_fwk_ring_push_CALLBACK Callback)
+{
+  Mock.fwk_ring_push_IgnoreBool = (char)0;
+  Mock.fwk_ring_push_CallbackBool = (char)0;
+  Mock.fwk_ring_push_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_push_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring, int ring_Depth, const char* buffer, size_t buffer_size, size_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_ring_push_CALL_INSTANCE));
+  CMOCK_fwk_ring_push_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_push_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_ring_push_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_push_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_push_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_fwk_ring_push(cmock_call_instance, ring, ring_Depth, buffer, buffer_size);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fwk_ring_push_CMockReturnMemThruPtr_ring(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring, size_t cmock_size)
+{
+  CMOCK_fwk_ring_push_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_push_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_push_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_ring_Used = 1;
+  cmock_call_instance->ReturnThruPtr_ring_Val = ring;
+  cmock_call_instance->ReturnThruPtr_ring_Size = cmock_size;
+}
+
+void fwk_ring_push_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_ring_push_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_push_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_push_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_ring = 1;
+}
+
+void fwk_ring_push_CMockIgnoreArg_buffer(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_ring_push_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_push_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_push_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_buffer = 1;
+}
+
+void fwk_ring_push_CMockIgnoreArg_buffer_size(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_ring_push_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_push_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_push_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_buffer_size = 1;
 }
 
 void fwk_ring_clear(struct fwk_ring* ring)
@@ -732,22 +1805,61 @@ void fwk_ring_clear(struct fwk_ring* ring)
   UNITY_SET_DETAIL(CMockString_fwk_ring_clear);
   cmock_call_instance = (CMOCK_fwk_ring_clear_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_ring_clear_CallInstance);
   Mock.fwk_ring_clear_CallInstance = CMock_Guts_MemNext(Mock.fwk_ring_clear_CallInstance);
+  if (Mock.fwk_ring_clear_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    return;
+  }
+  if (!Mock.fwk_ring_clear_CallbackBool &&
+      Mock.fwk_ring_clear_CallbackFunctionPointer != NULL)
+  {
+    Mock.fwk_ring_clear_CallbackFunctionPointer(ring, Mock.fwk_ring_clear_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_ring)
   {
     UNITY_SET_DETAILS(CMockString_fwk_ring_clear,CMockString_ring);
-    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(struct fwk_ring), cmock_line, CMockStringMismatch);
+    if (cmock_call_instance->Expected_ring == NULL)
+      { UNITY_TEST_ASSERT_NULL(ring, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_ring), (void*)(ring), sizeof(struct fwk_ring), cmock_call_instance->Expected_ring_Depth, cmock_line, CMockStringMismatch); }
   }
+  }
+  if (Mock.fwk_ring_clear_CallbackFunctionPointer != NULL)
+  {
+    Mock.fwk_ring_clear_CallbackFunctionPointer(ring, Mock.fwk_ring_clear_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_ring_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(ring, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)ring, (void*)cmock_call_instance->ReturnThruPtr_ring_Val,
+      cmock_call_instance->ReturnThruPtr_ring_Size);
   }
   UNITY_CLR_DETAILS();
 }
 
-void CMockExpectParameters_fwk_ring_clear(CMOCK_fwk_ring_clear_CALL_INSTANCE* cmock_call_instance, struct fwk_ring* ring);
-void CMockExpectParameters_fwk_ring_clear(CMOCK_fwk_ring_clear_CALL_INSTANCE* cmock_call_instance, struct fwk_ring* ring)
+void CMockExpectParameters_fwk_ring_clear(CMOCK_fwk_ring_clear_CALL_INSTANCE* cmock_call_instance, struct fwk_ring* ring, int ring_Depth);
+void CMockExpectParameters_fwk_ring_clear(CMOCK_fwk_ring_clear_CALL_INSTANCE* cmock_call_instance, struct fwk_ring* ring, int ring_Depth)
 {
   cmock_call_instance->Expected_ring = ring;
+  cmock_call_instance->Expected_ring_Depth = ring_Depth;
+  cmock_call_instance->IgnoreArg_ring = 0;
+  cmock_call_instance->ReturnThruPtr_ring_Used = 0;
+}
+
+void fwk_ring_clear_CMockIgnore(void)
+{
+  Mock.fwk_ring_clear_IgnoreBool = (char)1;
+}
+
+void fwk_ring_clear_CMockStopIgnore(void)
+{
+  Mock.fwk_ring_clear_IgnoreBool = (char)0;
 }
 
 void fwk_ring_clear_CMockExpectAnyArgs(UNITY_LINE_TYPE cmock_line)
@@ -757,6 +1869,7 @@ void fwk_ring_clear_CMockExpectAnyArgs(UNITY_LINE_TYPE cmock_line)
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_clear_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_clear_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_clear_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ExpectAnyArgsBool = (char)1;
@@ -769,8 +1882,52 @@ void fwk_ring_clear_CMockExpect(UNITY_LINE_TYPE cmock_line, struct fwk_ring* rin
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_ring_clear_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_clear_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_clear_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
-  CMockExpectParameters_fwk_ring_clear(cmock_call_instance, ring);
+  CMockExpectParameters_fwk_ring_clear(cmock_call_instance, ring, 1);
+}
+
+void fwk_ring_clear_AddCallback(CMOCK_fwk_ring_clear_CALLBACK Callback)
+{
+  Mock.fwk_ring_clear_IgnoreBool = (char)0;
+  Mock.fwk_ring_clear_CallbackBool = (char)1;
+  Mock.fwk_ring_clear_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_clear_Stub(CMOCK_fwk_ring_clear_CALLBACK Callback)
+{
+  Mock.fwk_ring_clear_IgnoreBool = (char)0;
+  Mock.fwk_ring_clear_CallbackBool = (char)0;
+  Mock.fwk_ring_clear_CallbackFunctionPointer = Callback;
+}
+
+void fwk_ring_clear_CMockExpectWithArray(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring, int ring_Depth)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_ring_clear_CALL_INSTANCE));
+  CMOCK_fwk_ring_clear_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_clear_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_ring_clear_CallInstance = CMock_Guts_MemChain(Mock.fwk_ring_clear_CallInstance, cmock_guts_index);
+  Mock.fwk_ring_clear_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_fwk_ring_clear(cmock_call_instance, ring, ring_Depth);
+}
+
+void fwk_ring_clear_CMockReturnMemThruPtr_ring(UNITY_LINE_TYPE cmock_line, struct fwk_ring* ring, size_t cmock_size)
+{
+  CMOCK_fwk_ring_clear_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_clear_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_clear_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_ring_Used = 1;
+  cmock_call_instance->ReturnThruPtr_ring_Val = ring;
+  cmock_call_instance->ReturnThruPtr_ring_Size = cmock_size;
+}
+
+void fwk_ring_clear_CMockIgnoreArg_ring(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_ring_clear_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_ring_clear_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_ring_clear_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_ring = 1;
 }
 

@@ -6,6 +6,7 @@
 #include "Mockfwk_arch.h"
 
 static const char* CMockString_driver = "driver";
+static const char* CMockString_fwk_arch_deinit = "fwk_arch_deinit";
 static const char* CMockString_fwk_arch_init = "fwk_arch_init";
 static const char* CMockString_fwk_arch_suspend = "fwk_arch_suspend";
 
@@ -15,8 +16,18 @@ typedef struct _CMOCK_fwk_arch_init_CALL_INSTANCE
   char ExpectAnyArgsBool;
   int ReturnVal;
   const struct fwk_arch_init_driver* Expected_driver;
+  int Expected_driver_Depth;
+  char IgnoreArg_driver;
 
 } CMOCK_fwk_arch_init_CALL_INSTANCE;
+
+typedef struct _CMOCK_fwk_arch_deinit_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  int ReturnVal;
+
+} CMOCK_fwk_arch_deinit_CALL_INSTANCE;
 
 typedef struct _CMOCK_fwk_arch_suspend_CALL_INSTANCE
 {
@@ -27,7 +38,22 @@ typedef struct _CMOCK_fwk_arch_suspend_CALL_INSTANCE
 
 static struct Mockfwk_archInstance
 {
+  char fwk_arch_init_IgnoreBool;
+  int fwk_arch_init_FinalReturn;
+  char fwk_arch_init_CallbackBool;
+  CMOCK_fwk_arch_init_CALLBACK fwk_arch_init_CallbackFunctionPointer;
+  int fwk_arch_init_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_arch_init_CallInstance;
+  char fwk_arch_deinit_IgnoreBool;
+  int fwk_arch_deinit_FinalReturn;
+  char fwk_arch_deinit_CallbackBool;
+  CMOCK_fwk_arch_deinit_CALLBACK fwk_arch_deinit_CallbackFunctionPointer;
+  int fwk_arch_deinit_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE fwk_arch_deinit_CallInstance;
+  char fwk_arch_suspend_IgnoreBool;
+  char fwk_arch_suspend_CallbackBool;
+  CMOCK_fwk_arch_suspend_CALLBACK fwk_arch_suspend_CallbackFunctionPointer;
+  int fwk_arch_suspend_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_arch_suspend_CallInstance;
 } Mock;
 
@@ -38,16 +64,43 @@ void Mockfwk_arch_Verify(void)
   UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
   CMOCK_MEM_INDEX_TYPE call_instance;
   call_instance = Mock.fwk_arch_init_CallInstance;
+  if (Mock.fwk_arch_init_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_arch_init);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_arch_init_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.fwk_arch_deinit_CallInstance;
+  if (Mock.fwk_arch_deinit_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_fwk_arch_deinit);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.fwk_arch_deinit_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_arch_suspend_CallInstance;
+  if (Mock.fwk_arch_suspend_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_arch_suspend);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.fwk_arch_suspend_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
   }
 }
 
@@ -69,23 +122,69 @@ int fwk_arch_init(const struct fwk_arch_init_driver* driver)
   UNITY_SET_DETAIL(CMockString_fwk_arch_init);
   cmock_call_instance = (CMOCK_fwk_arch_init_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_arch_init_CallInstance);
   Mock.fwk_arch_init_CallInstance = CMock_Guts_MemNext(Mock.fwk_arch_init_CallInstance);
+  if (Mock.fwk_arch_init_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_arch_init_FinalReturn;
+    Mock.fwk_arch_init_FinalReturn = cmock_call_instance->ReturnVal;
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_arch_init_CallbackBool &&
+      Mock.fwk_arch_init_CallbackFunctionPointer != NULL)
+  {
+    int cmock_cb_ret = Mock.fwk_arch_init_CallbackFunctionPointer(driver, Mock.fwk_arch_init_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_driver)
   {
     UNITY_SET_DETAILS(CMockString_fwk_arch_init,CMockString_driver);
-    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(cmock_call_instance->Expected_driver), (void*)(driver), sizeof(const struct fwk_arch_init_driver), cmock_line, CMockStringMismatch);
+    if (cmock_call_instance->Expected_driver == NULL)
+      { UNITY_TEST_ASSERT_NULL(driver, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_driver), (void*)(driver), sizeof(const struct fwk_arch_init_driver), cmock_call_instance->Expected_driver_Depth, cmock_line, CMockStringMismatch); }
   }
+  }
+  if (Mock.fwk_arch_init_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_arch_init_CallbackFunctionPointer(driver, Mock.fwk_arch_init_CallbackCalls++);
   }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
 }
 
-void CMockExpectParameters_fwk_arch_init(CMOCK_fwk_arch_init_CALL_INSTANCE* cmock_call_instance, const struct fwk_arch_init_driver* driver);
-void CMockExpectParameters_fwk_arch_init(CMOCK_fwk_arch_init_CALL_INSTANCE* cmock_call_instance, const struct fwk_arch_init_driver* driver)
+void CMockExpectParameters_fwk_arch_init(CMOCK_fwk_arch_init_CALL_INSTANCE* cmock_call_instance, const struct fwk_arch_init_driver* driver, int driver_Depth);
+void CMockExpectParameters_fwk_arch_init(CMOCK_fwk_arch_init_CALL_INSTANCE* cmock_call_instance, const struct fwk_arch_init_driver* driver, int driver_Depth)
 {
   cmock_call_instance->Expected_driver = driver;
+  cmock_call_instance->Expected_driver_Depth = driver_Depth;
+  cmock_call_instance->IgnoreArg_driver = 0;
+}
+
+void fwk_arch_init_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_arch_init_CALL_INSTANCE));
+  CMOCK_fwk_arch_init_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_arch_init_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_arch_init_CallInstance = CMock_Guts_MemChain(Mock.fwk_arch_init_CallInstance, cmock_guts_index);
+  Mock.fwk_arch_init_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_arch_init_IgnoreBool = (char)1;
+}
+
+void fwk_arch_init_CMockStopIgnore(void)
+{
+  if(Mock.fwk_arch_init_IgnoreBool)
+    Mock.fwk_arch_init_CallInstance = CMock_Guts_MemNext(Mock.fwk_arch_init_CallInstance);
+  Mock.fwk_arch_init_IgnoreBool = (char)0;
 }
 
 void fwk_arch_init_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
@@ -95,6 +194,7 @@ void fwk_arch_init_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int c
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_arch_init_CallInstance = CMock_Guts_MemChain(Mock.fwk_arch_init_CallInstance, cmock_guts_index);
+  Mock.fwk_arch_init_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -108,10 +208,126 @@ void fwk_arch_init_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_arch_init_CallInstance = CMock_Guts_MemChain(Mock.fwk_arch_init_CallInstance, cmock_guts_index);
+  Mock.fwk_arch_init_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
-  CMockExpectParameters_fwk_arch_init(cmock_call_instance, driver);
+  CMockExpectParameters_fwk_arch_init(cmock_call_instance, driver, 1);
   cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fwk_arch_init_AddCallback(CMOCK_fwk_arch_init_CALLBACK Callback)
+{
+  Mock.fwk_arch_init_IgnoreBool = (char)0;
+  Mock.fwk_arch_init_CallbackBool = (char)1;
+  Mock.fwk_arch_init_CallbackFunctionPointer = Callback;
+}
+
+void fwk_arch_init_Stub(CMOCK_fwk_arch_init_CALLBACK Callback)
+{
+  Mock.fwk_arch_init_IgnoreBool = (char)0;
+  Mock.fwk_arch_init_CallbackBool = (char)0;
+  Mock.fwk_arch_init_CallbackFunctionPointer = Callback;
+}
+
+void fwk_arch_init_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_arch_init_driver* driver, int driver_Depth, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_arch_init_CALL_INSTANCE));
+  CMOCK_fwk_arch_init_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_arch_init_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_arch_init_CallInstance = CMock_Guts_MemChain(Mock.fwk_arch_init_CallInstance, cmock_guts_index);
+  Mock.fwk_arch_init_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_fwk_arch_init(cmock_call_instance, driver, driver_Depth);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fwk_arch_init_CMockIgnoreArg_driver(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_arch_init_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_arch_init_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_arch_init_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_driver = 1;
+}
+
+int fwk_arch_deinit(void)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_fwk_arch_deinit_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_fwk_arch_deinit);
+  cmock_call_instance = (CMOCK_fwk_arch_deinit_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_arch_deinit_CallInstance);
+  Mock.fwk_arch_deinit_CallInstance = CMock_Guts_MemNext(Mock.fwk_arch_deinit_CallInstance);
+  if (Mock.fwk_arch_deinit_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_arch_deinit_FinalReturn;
+    Mock.fwk_arch_deinit_FinalReturn = cmock_call_instance->ReturnVal;
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_arch_deinit_CallbackBool &&
+      Mock.fwk_arch_deinit_CallbackFunctionPointer != NULL)
+  {
+    int cmock_cb_ret = Mock.fwk_arch_deinit_CallbackFunctionPointer(Mock.fwk_arch_deinit_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (Mock.fwk_arch_deinit_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_arch_deinit_CallbackFunctionPointer(Mock.fwk_arch_deinit_CallbackCalls++);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void fwk_arch_deinit_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_arch_deinit_CALL_INSTANCE));
+  CMOCK_fwk_arch_deinit_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_arch_deinit_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_arch_deinit_CallInstance = CMock_Guts_MemChain(Mock.fwk_arch_deinit_CallInstance, cmock_guts_index);
+  Mock.fwk_arch_deinit_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_arch_deinit_IgnoreBool = (char)1;
+}
+
+void fwk_arch_deinit_CMockStopIgnore(void)
+{
+  if(Mock.fwk_arch_deinit_IgnoreBool)
+    Mock.fwk_arch_deinit_CallInstance = CMock_Guts_MemNext(Mock.fwk_arch_deinit_CallInstance);
+  Mock.fwk_arch_deinit_IgnoreBool = (char)0;
+}
+
+void fwk_arch_deinit_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_arch_deinit_CALL_INSTANCE));
+  CMOCK_fwk_arch_deinit_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_arch_deinit_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_arch_deinit_CallInstance = CMock_Guts_MemChain(Mock.fwk_arch_deinit_CallInstance, cmock_guts_index);
+  Mock.fwk_arch_deinit_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fwk_arch_deinit_AddCallback(CMOCK_fwk_arch_deinit_CALLBACK Callback)
+{
+  Mock.fwk_arch_deinit_IgnoreBool = (char)0;
+  Mock.fwk_arch_deinit_CallbackBool = (char)1;
+  Mock.fwk_arch_deinit_CallbackFunctionPointer = Callback;
+}
+
+void fwk_arch_deinit_Stub(CMOCK_fwk_arch_deinit_CALLBACK Callback)
+{
+  Mock.fwk_arch_deinit_IgnoreBool = (char)0;
+  Mock.fwk_arch_deinit_CallbackBool = (char)0;
+  Mock.fwk_arch_deinit_CallbackFunctionPointer = Callback;
 }
 
 void fwk_arch_suspend(void)
@@ -121,9 +337,35 @@ void fwk_arch_suspend(void)
   UNITY_SET_DETAIL(CMockString_fwk_arch_suspend);
   cmock_call_instance = (CMOCK_fwk_arch_suspend_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_arch_suspend_CallInstance);
   Mock.fwk_arch_suspend_CallInstance = CMock_Guts_MemNext(Mock.fwk_arch_suspend_CallInstance);
+  if (Mock.fwk_arch_suspend_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    return;
+  }
+  if (!Mock.fwk_arch_suspend_CallbackBool &&
+      Mock.fwk_arch_suspend_CallbackFunctionPointer != NULL)
+  {
+    Mock.fwk_arch_suspend_CallbackFunctionPointer(Mock.fwk_arch_suspend_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
+  if (Mock.fwk_arch_suspend_CallbackFunctionPointer != NULL)
+  {
+    Mock.fwk_arch_suspend_CallbackFunctionPointer(Mock.fwk_arch_suspend_CallbackCalls++);
+  }
   UNITY_CLR_DETAILS();
+}
+
+void fwk_arch_suspend_CMockIgnore(void)
+{
+  Mock.fwk_arch_suspend_IgnoreBool = (char)1;
+}
+
+void fwk_arch_suspend_CMockStopIgnore(void)
+{
+  Mock.fwk_arch_suspend_IgnoreBool = (char)0;
 }
 
 void fwk_arch_suspend_CMockExpect(UNITY_LINE_TYPE cmock_line)
@@ -133,7 +375,22 @@ void fwk_arch_suspend_CMockExpect(UNITY_LINE_TYPE cmock_line)
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_arch_suspend_CallInstance = CMock_Guts_MemChain(Mock.fwk_arch_suspend_CallInstance, cmock_guts_index);
+  Mock.fwk_arch_suspend_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
+}
+
+void fwk_arch_suspend_AddCallback(CMOCK_fwk_arch_suspend_CALLBACK Callback)
+{
+  Mock.fwk_arch_suspend_IgnoreBool = (char)0;
+  Mock.fwk_arch_suspend_CallbackBool = (char)1;
+  Mock.fwk_arch_suspend_CallbackFunctionPointer = Callback;
+}
+
+void fwk_arch_suspend_Stub(CMOCK_fwk_arch_suspend_CALLBACK Callback)
+{
+  Mock.fwk_arch_suspend_IgnoreBool = (char)0;
+  Mock.fwk_arch_suspend_CallbackBool = (char)0;
+  Mock.fwk_arch_suspend_CallbackFunctionPointer = Callback;
 }
 

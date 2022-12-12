@@ -24,12 +24,42 @@ void Mockfwk_arch_Verify(void);
 
 
 
+#define fwk_arch_init_IgnoreAndReturn(cmock_retval) fwk_arch_init_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_arch_init_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define fwk_arch_init_StopIgnore() fwk_arch_init_CMockStopIgnore()
+void fwk_arch_init_CMockStopIgnore(void);
 #define fwk_arch_init_ExpectAnyArgsAndReturn(cmock_retval) fwk_arch_init_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_arch_init_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_arch_init_ExpectAndReturn(driver, cmock_retval) fwk_arch_init_CMockExpectAndReturn(__LINE__, driver, cmock_retval)
 void fwk_arch_init_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_arch_init_driver* driver, int cmock_to_return);
+typedef int (* CMOCK_fwk_arch_init_CALLBACK)(const struct fwk_arch_init_driver* driver, int cmock_num_calls);
+void fwk_arch_init_AddCallback(CMOCK_fwk_arch_init_CALLBACK Callback);
+void fwk_arch_init_Stub(CMOCK_fwk_arch_init_CALLBACK Callback);
+#define fwk_arch_init_StubWithCallback fwk_arch_init_Stub
+#define fwk_arch_init_ExpectWithArrayAndReturn(driver, driver_Depth, cmock_retval) fwk_arch_init_CMockExpectWithArrayAndReturn(__LINE__, driver, driver_Depth, cmock_retval)
+void fwk_arch_init_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_arch_init_driver* driver, int driver_Depth, int cmock_to_return);
+#define fwk_arch_init_IgnoreArg_driver() fwk_arch_init_CMockIgnoreArg_driver(__LINE__)
+void fwk_arch_init_CMockIgnoreArg_driver(UNITY_LINE_TYPE cmock_line);
+#define fwk_arch_deinit_IgnoreAndReturn(cmock_retval) fwk_arch_deinit_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_arch_deinit_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define fwk_arch_deinit_StopIgnore() fwk_arch_deinit_CMockStopIgnore()
+void fwk_arch_deinit_CMockStopIgnore(void);
+#define fwk_arch_deinit_ExpectAndReturn(cmock_retval) fwk_arch_deinit_CMockExpectAndReturn(__LINE__, cmock_retval)
+void fwk_arch_deinit_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+typedef int (* CMOCK_fwk_arch_deinit_CALLBACK)(int cmock_num_calls);
+void fwk_arch_deinit_AddCallback(CMOCK_fwk_arch_deinit_CALLBACK Callback);
+void fwk_arch_deinit_Stub(CMOCK_fwk_arch_deinit_CALLBACK Callback);
+#define fwk_arch_deinit_StubWithCallback fwk_arch_deinit_Stub
+#define fwk_arch_suspend_Ignore() fwk_arch_suspend_CMockIgnore()
+void fwk_arch_suspend_CMockIgnore(void);
+#define fwk_arch_suspend_StopIgnore() fwk_arch_suspend_CMockStopIgnore()
+void fwk_arch_suspend_CMockStopIgnore(void);
 #define fwk_arch_suspend_Expect() fwk_arch_suspend_CMockExpect(__LINE__)
 void fwk_arch_suspend_CMockExpect(UNITY_LINE_TYPE cmock_line);
+typedef void (* CMOCK_fwk_arch_suspend_CALLBACK)(int cmock_num_calls);
+void fwk_arch_suspend_AddCallback(CMOCK_fwk_arch_suspend_CALLBACK Callback);
+void fwk_arch_suspend_Stub(CMOCK_fwk_arch_suspend_CALLBACK Callback);
+#define fwk_arch_suspend_StubWithCallback fwk_arch_suspend_Stub
 
 #if defined(__GNUC__) && !defined(__ICC) && !defined(__TMS470__)
 #if __GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 6 || (__GNUC_MINOR__ == 6 && __GNUC_PATCHLEVEL__ > 0)))

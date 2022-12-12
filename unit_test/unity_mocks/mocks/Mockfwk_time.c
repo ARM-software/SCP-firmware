@@ -34,6 +34,7 @@ typedef struct _CMOCK_fwk_time_stamp_duration_CALL_INSTANCE
   char ExpectAnyArgsBool;
   fwk_duration_ns_t ReturnVal;
   fwk_timestamp_t Expected_timestamp;
+  char IgnoreArg_timestamp;
 
 } CMOCK_fwk_time_stamp_duration_CALL_INSTANCE;
 
@@ -44,6 +45,8 @@ typedef struct _CMOCK_fwk_time_duration_CALL_INSTANCE
   fwk_duration_ns_t ReturnVal;
   fwk_timestamp_t Expected_start;
   fwk_timestamp_t Expected_end;
+  char IgnoreArg_start;
+  char IgnoreArg_end;
 
 } CMOCK_fwk_time_duration_CALL_INSTANCE;
 
@@ -53,6 +56,7 @@ typedef struct _CMOCK_fwk_time_duration_us_CALL_INSTANCE
   char ExpectAnyArgsBool;
   fwk_duration_us_t ReturnVal;
   fwk_duration_ns_t Expected_duration;
+  char IgnoreArg_duration;
 
 } CMOCK_fwk_time_duration_us_CALL_INSTANCE;
 
@@ -62,6 +66,7 @@ typedef struct _CMOCK_fwk_time_duration_ms_CALL_INSTANCE
   char ExpectAnyArgsBool;
   fwk_duration_ms_t ReturnVal;
   fwk_duration_ns_t Expected_duration;
+  char IgnoreArg_duration;
 
 } CMOCK_fwk_time_duration_ms_CALL_INSTANCE;
 
@@ -71,6 +76,7 @@ typedef struct _CMOCK_fwk_time_duration_s_CALL_INSTANCE
   char ExpectAnyArgsBool;
   fwk_duration_s_t ReturnVal;
   fwk_duration_ns_t Expected_duration;
+  char IgnoreArg_duration;
 
 } CMOCK_fwk_time_duration_s_CALL_INSTANCE;
 
@@ -80,6 +86,7 @@ typedef struct _CMOCK_fwk_time_duration_m_CALL_INSTANCE
   char ExpectAnyArgsBool;
   fwk_duration_m_t ReturnVal;
   fwk_duration_ns_t Expected_duration;
+  char IgnoreArg_duration;
 
 } CMOCK_fwk_time_duration_m_CALL_INSTANCE;
 
@@ -89,6 +96,7 @@ typedef struct _CMOCK_fwk_time_duration_h_CALL_INSTANCE
   char ExpectAnyArgsBool;
   fwk_duration_h_t ReturnVal;
   fwk_duration_ns_t Expected_duration;
+  char IgnoreArg_duration;
 
 } CMOCK_fwk_time_duration_h_CALL_INSTANCE;
 
@@ -98,19 +106,69 @@ typedef struct _CMOCK_fmw_time_driver_CALL_INSTANCE
   char ExpectAnyArgsBool;
   struct fwk_time_driver ReturnVal;
   const void** Expected_ctx;
+  int Expected_ctx_Depth;
+  char ReturnThruPtr_ctx_Used;
+  const void** ReturnThruPtr_ctx_Val;
+  size_t ReturnThruPtr_ctx_Size;
+  char IgnoreArg_ctx;
 
 } CMOCK_fmw_time_driver_CALL_INSTANCE;
 
 static struct Mockfwk_timeInstance
 {
+  char fwk_time_current_IgnoreBool;
+  fwk_timestamp_t fwk_time_current_FinalReturn;
+  char fwk_time_current_CallbackBool;
+  CMOCK_fwk_time_current_CALLBACK fwk_time_current_CallbackFunctionPointer;
+  int fwk_time_current_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_time_current_CallInstance;
+  char fwk_time_stamp_duration_IgnoreBool;
+  fwk_duration_ns_t fwk_time_stamp_duration_FinalReturn;
+  char fwk_time_stamp_duration_CallbackBool;
+  CMOCK_fwk_time_stamp_duration_CALLBACK fwk_time_stamp_duration_CallbackFunctionPointer;
+  int fwk_time_stamp_duration_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_time_stamp_duration_CallInstance;
+  char fwk_time_duration_IgnoreBool;
+  fwk_duration_ns_t fwk_time_duration_FinalReturn;
+  char fwk_time_duration_CallbackBool;
+  CMOCK_fwk_time_duration_CALLBACK fwk_time_duration_CallbackFunctionPointer;
+  int fwk_time_duration_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_time_duration_CallInstance;
+  char fwk_time_duration_us_IgnoreBool;
+  fwk_duration_us_t fwk_time_duration_us_FinalReturn;
+  char fwk_time_duration_us_CallbackBool;
+  CMOCK_fwk_time_duration_us_CALLBACK fwk_time_duration_us_CallbackFunctionPointer;
+  int fwk_time_duration_us_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_time_duration_us_CallInstance;
+  char fwk_time_duration_ms_IgnoreBool;
+  fwk_duration_ms_t fwk_time_duration_ms_FinalReturn;
+  char fwk_time_duration_ms_CallbackBool;
+  CMOCK_fwk_time_duration_ms_CALLBACK fwk_time_duration_ms_CallbackFunctionPointer;
+  int fwk_time_duration_ms_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_time_duration_ms_CallInstance;
+  char fwk_time_duration_s_IgnoreBool;
+  fwk_duration_s_t fwk_time_duration_s_FinalReturn;
+  char fwk_time_duration_s_CallbackBool;
+  CMOCK_fwk_time_duration_s_CALLBACK fwk_time_duration_s_CallbackFunctionPointer;
+  int fwk_time_duration_s_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_time_duration_s_CallInstance;
+  char fwk_time_duration_m_IgnoreBool;
+  fwk_duration_m_t fwk_time_duration_m_FinalReturn;
+  char fwk_time_duration_m_CallbackBool;
+  CMOCK_fwk_time_duration_m_CALLBACK fwk_time_duration_m_CallbackFunctionPointer;
+  int fwk_time_duration_m_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_time_duration_m_CallInstance;
+  char fwk_time_duration_h_IgnoreBool;
+  fwk_duration_h_t fwk_time_duration_h_FinalReturn;
+  char fwk_time_duration_h_CallbackBool;
+  CMOCK_fwk_time_duration_h_CALLBACK fwk_time_duration_h_CallbackFunctionPointer;
+  int fwk_time_duration_h_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_time_duration_h_CallInstance;
+  char fmw_time_driver_IgnoreBool;
+  struct fwk_time_driver fmw_time_driver_FinalReturn;
+  char fmw_time_driver_CallbackBool;
+  CMOCK_fmw_time_driver_CALLBACK fmw_time_driver_CallbackFunctionPointer;
+  int fmw_time_driver_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fmw_time_driver_CallInstance;
 } Mock;
 
@@ -121,58 +179,121 @@ void Mockfwk_time_Verify(void)
   UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
   CMOCK_MEM_INDEX_TYPE call_instance;
   call_instance = Mock.fwk_time_current_CallInstance;
+  if (Mock.fwk_time_current_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_time_current);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_time_current_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_time_stamp_duration_CallInstance;
+  if (Mock.fwk_time_stamp_duration_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_time_stamp_duration);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_time_stamp_duration_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_time_duration_CallInstance;
+  if (Mock.fwk_time_duration_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_time_duration);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_time_duration_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_time_duration_us_CallInstance;
+  if (Mock.fwk_time_duration_us_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_time_duration_us);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_time_duration_us_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_time_duration_ms_CallInstance;
+  if (Mock.fwk_time_duration_ms_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_time_duration_ms);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_time_duration_ms_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_time_duration_s_CallInstance;
+  if (Mock.fwk_time_duration_s_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_time_duration_s);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_time_duration_s_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_time_duration_m_CallInstance;
+  if (Mock.fwk_time_duration_m_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_time_duration_m);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_time_duration_m_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_time_duration_h_CallInstance;
+  if (Mock.fwk_time_duration_h_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_time_duration_h);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_time_duration_h_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fmw_time_driver_CallInstance;
+  if (Mock.fmw_time_driver_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fmw_time_driver);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.fmw_time_driver_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
   }
 }
 
@@ -194,10 +315,51 @@ fwk_timestamp_t fwk_time_current(void)
   UNITY_SET_DETAIL(CMockString_fwk_time_current);
   cmock_call_instance = (CMOCK_fwk_time_current_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_time_current_CallInstance);
   Mock.fwk_time_current_CallInstance = CMock_Guts_MemNext(Mock.fwk_time_current_CallInstance);
+  if (Mock.fwk_time_current_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_time_current_FinalReturn;
+    memcpy((void*)(&Mock.fwk_time_current_FinalReturn), (void*)(&cmock_call_instance->ReturnVal),
+         sizeof(fwk_timestamp_t[sizeof(cmock_call_instance->ReturnVal) == sizeof(fwk_timestamp_t) ? 1 : -1])); /* add fwk_timestamp_t to :treat_as_array if this causes an error */
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_time_current_CallbackBool &&
+      Mock.fwk_time_current_CallbackFunctionPointer != NULL)
+  {
+    fwk_timestamp_t cmock_cb_ret = Mock.fwk_time_current_CallbackFunctionPointer(Mock.fwk_time_current_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
+  if (Mock.fwk_time_current_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_time_current_CallbackFunctionPointer(Mock.fwk_time_current_CallbackCalls++);
+  }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
+}
+
+void fwk_time_current_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_timestamp_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_time_current_CALL_INSTANCE));
+  CMOCK_fwk_time_current_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_time_current_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_time_current_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_current_CallInstance, cmock_guts_index);
+  Mock.fwk_time_current_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_time_current_IgnoreBool = (char)1;
+}
+
+void fwk_time_current_CMockStopIgnore(void)
+{
+  if(Mock.fwk_time_current_IgnoreBool)
+    Mock.fwk_time_current_CallInstance = CMock_Guts_MemNext(Mock.fwk_time_current_CallInstance);
+  Mock.fwk_time_current_IgnoreBool = (char)0;
 }
 
 void fwk_time_current_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_timestamp_t cmock_to_return)
@@ -207,10 +369,25 @@ void fwk_time_current_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_times
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_time_current_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_current_CallInstance, cmock_guts_index);
+  Mock.fwk_time_current_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   memcpy((void*)(&cmock_call_instance->ReturnVal), (void*)(&cmock_to_return),
          sizeof(fwk_timestamp_t[sizeof(cmock_to_return) == sizeof(fwk_timestamp_t) ? 1 : -1])); /* add fwk_timestamp_t to :treat_as_array if this causes an error */
+}
+
+void fwk_time_current_AddCallback(CMOCK_fwk_time_current_CALLBACK Callback)
+{
+  Mock.fwk_time_current_IgnoreBool = (char)0;
+  Mock.fwk_time_current_CallbackBool = (char)1;
+  Mock.fwk_time_current_CallbackFunctionPointer = Callback;
+}
+
+void fwk_time_current_Stub(CMOCK_fwk_time_current_CALLBACK Callback)
+{
+  Mock.fwk_time_current_IgnoreBool = (char)0;
+  Mock.fwk_time_current_CallbackBool = (char)0;
+  Mock.fwk_time_current_CallbackFunctionPointer = Callback;
 }
 
 fwk_duration_ns_t fwk_time_stamp_duration(fwk_timestamp_t timestamp)
@@ -220,14 +397,35 @@ fwk_duration_ns_t fwk_time_stamp_duration(fwk_timestamp_t timestamp)
   UNITY_SET_DETAIL(CMockString_fwk_time_stamp_duration);
   cmock_call_instance = (CMOCK_fwk_time_stamp_duration_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_time_stamp_duration_CallInstance);
   Mock.fwk_time_stamp_duration_CallInstance = CMock_Guts_MemNext(Mock.fwk_time_stamp_duration_CallInstance);
+  if (Mock.fwk_time_stamp_duration_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_time_stamp_duration_FinalReturn;
+    memcpy((void*)(&Mock.fwk_time_stamp_duration_FinalReturn), (void*)(&cmock_call_instance->ReturnVal),
+         sizeof(fwk_duration_ns_t[sizeof(cmock_call_instance->ReturnVal) == sizeof(fwk_duration_ns_t) ? 1 : -1])); /* add fwk_duration_ns_t to :treat_as_array if this causes an error */
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_time_stamp_duration_CallbackBool &&
+      Mock.fwk_time_stamp_duration_CallbackFunctionPointer != NULL)
+  {
+    fwk_duration_ns_t cmock_cb_ret = Mock.fwk_time_stamp_duration_CallbackFunctionPointer(timestamp, Mock.fwk_time_stamp_duration_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_timestamp)
   {
     UNITY_SET_DETAILS(CMockString_fwk_time_stamp_duration,CMockString_timestamp);
     UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_timestamp), (void*)(&timestamp), sizeof(fwk_timestamp_t), cmock_line, CMockStringMismatch);
   }
+  }
+  if (Mock.fwk_time_stamp_duration_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_time_stamp_duration_CallbackFunctionPointer(timestamp, Mock.fwk_time_stamp_duration_CallbackCalls++);
   }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
@@ -238,6 +436,28 @@ void CMockExpectParameters_fwk_time_stamp_duration(CMOCK_fwk_time_stamp_duration
 {
   memcpy((void*)(&cmock_call_instance->Expected_timestamp), (void*)(&timestamp),
          sizeof(fwk_timestamp_t[sizeof(timestamp) == sizeof(fwk_timestamp_t) ? 1 : -1])); /* add fwk_timestamp_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_timestamp = 0;
+}
+
+void fwk_time_stamp_duration_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_ns_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_time_stamp_duration_CALL_INSTANCE));
+  CMOCK_fwk_time_stamp_duration_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_time_stamp_duration_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_time_stamp_duration_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_stamp_duration_CallInstance, cmock_guts_index);
+  Mock.fwk_time_stamp_duration_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_time_stamp_duration_IgnoreBool = (char)1;
+}
+
+void fwk_time_stamp_duration_CMockStopIgnore(void)
+{
+  if(Mock.fwk_time_stamp_duration_IgnoreBool)
+    Mock.fwk_time_stamp_duration_CallInstance = CMock_Guts_MemNext(Mock.fwk_time_stamp_duration_CallInstance);
+  Mock.fwk_time_stamp_duration_IgnoreBool = (char)0;
 }
 
 void fwk_time_stamp_duration_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_ns_t cmock_to_return)
@@ -247,6 +467,7 @@ void fwk_time_stamp_duration_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_l
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_time_stamp_duration_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_stamp_duration_CallInstance, cmock_guts_index);
+  Mock.fwk_time_stamp_duration_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -260,11 +481,33 @@ void fwk_time_stamp_duration_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fw
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_time_stamp_duration_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_stamp_duration_CallInstance, cmock_guts_index);
+  Mock.fwk_time_stamp_duration_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   CMockExpectParameters_fwk_time_stamp_duration(cmock_call_instance, timestamp);
   memcpy((void*)(&cmock_call_instance->ReturnVal), (void*)(&cmock_to_return),
          sizeof(fwk_duration_ns_t[sizeof(cmock_to_return) == sizeof(fwk_duration_ns_t) ? 1 : -1])); /* add fwk_duration_ns_t to :treat_as_array if this causes an error */
+}
+
+void fwk_time_stamp_duration_AddCallback(CMOCK_fwk_time_stamp_duration_CALLBACK Callback)
+{
+  Mock.fwk_time_stamp_duration_IgnoreBool = (char)0;
+  Mock.fwk_time_stamp_duration_CallbackBool = (char)1;
+  Mock.fwk_time_stamp_duration_CallbackFunctionPointer = Callback;
+}
+
+void fwk_time_stamp_duration_Stub(CMOCK_fwk_time_stamp_duration_CALLBACK Callback)
+{
+  Mock.fwk_time_stamp_duration_IgnoreBool = (char)0;
+  Mock.fwk_time_stamp_duration_CallbackBool = (char)0;
+  Mock.fwk_time_stamp_duration_CallbackFunctionPointer = Callback;
+}
+
+void fwk_time_stamp_duration_CMockIgnoreArg_timestamp(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_time_stamp_duration_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_time_stamp_duration_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_time_stamp_duration_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_timestamp = 1;
 }
 
 fwk_duration_ns_t fwk_time_duration(fwk_timestamp_t start, fwk_timestamp_t end)
@@ -274,18 +517,40 @@ fwk_duration_ns_t fwk_time_duration(fwk_timestamp_t start, fwk_timestamp_t end)
   UNITY_SET_DETAIL(CMockString_fwk_time_duration);
   cmock_call_instance = (CMOCK_fwk_time_duration_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_time_duration_CallInstance);
   Mock.fwk_time_duration_CallInstance = CMock_Guts_MemNext(Mock.fwk_time_duration_CallInstance);
+  if (Mock.fwk_time_duration_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_time_duration_FinalReturn;
+    memcpy((void*)(&Mock.fwk_time_duration_FinalReturn), (void*)(&cmock_call_instance->ReturnVal),
+         sizeof(fwk_duration_ns_t[sizeof(cmock_call_instance->ReturnVal) == sizeof(fwk_duration_ns_t) ? 1 : -1])); /* add fwk_duration_ns_t to :treat_as_array if this causes an error */
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_time_duration_CallbackBool &&
+      Mock.fwk_time_duration_CallbackFunctionPointer != NULL)
+  {
+    fwk_duration_ns_t cmock_cb_ret = Mock.fwk_time_duration_CallbackFunctionPointer(start, end, Mock.fwk_time_duration_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_start)
   {
     UNITY_SET_DETAILS(CMockString_fwk_time_duration,CMockString_start);
     UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_start), (void*)(&start), sizeof(fwk_timestamp_t), cmock_line, CMockStringMismatch);
   }
+  if (!cmock_call_instance->IgnoreArg_end)
   {
     UNITY_SET_DETAILS(CMockString_fwk_time_duration,CMockString_end);
     UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_end), (void*)(&end), sizeof(fwk_timestamp_t), cmock_line, CMockStringMismatch);
   }
+  }
+  if (Mock.fwk_time_duration_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_time_duration_CallbackFunctionPointer(start, end, Mock.fwk_time_duration_CallbackCalls++);
   }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
@@ -296,8 +561,31 @@ void CMockExpectParameters_fwk_time_duration(CMOCK_fwk_time_duration_CALL_INSTAN
 {
   memcpy((void*)(&cmock_call_instance->Expected_start), (void*)(&start),
          sizeof(fwk_timestamp_t[sizeof(start) == sizeof(fwk_timestamp_t) ? 1 : -1])); /* add fwk_timestamp_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_start = 0;
   memcpy((void*)(&cmock_call_instance->Expected_end), (void*)(&end),
          sizeof(fwk_timestamp_t[sizeof(end) == sizeof(fwk_timestamp_t) ? 1 : -1])); /* add fwk_timestamp_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_end = 0;
+}
+
+void fwk_time_duration_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_ns_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_time_duration_CALL_INSTANCE));
+  CMOCK_fwk_time_duration_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_time_duration_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_time_duration_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_duration_CallInstance, cmock_guts_index);
+  Mock.fwk_time_duration_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_time_duration_IgnoreBool = (char)1;
+}
+
+void fwk_time_duration_CMockStopIgnore(void)
+{
+  if(Mock.fwk_time_duration_IgnoreBool)
+    Mock.fwk_time_duration_CallInstance = CMock_Guts_MemNext(Mock.fwk_time_duration_CallInstance);
+  Mock.fwk_time_duration_IgnoreBool = (char)0;
 }
 
 void fwk_time_duration_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_ns_t cmock_to_return)
@@ -307,6 +595,7 @@ void fwk_time_duration_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, f
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_time_duration_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_duration_CallInstance, cmock_guts_index);
+  Mock.fwk_time_duration_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -320,11 +609,40 @@ void fwk_time_duration_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_time
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_time_duration_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_duration_CallInstance, cmock_guts_index);
+  Mock.fwk_time_duration_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   CMockExpectParameters_fwk_time_duration(cmock_call_instance, start, end);
   memcpy((void*)(&cmock_call_instance->ReturnVal), (void*)(&cmock_to_return),
          sizeof(fwk_duration_ns_t[sizeof(cmock_to_return) == sizeof(fwk_duration_ns_t) ? 1 : -1])); /* add fwk_duration_ns_t to :treat_as_array if this causes an error */
+}
+
+void fwk_time_duration_AddCallback(CMOCK_fwk_time_duration_CALLBACK Callback)
+{
+  Mock.fwk_time_duration_IgnoreBool = (char)0;
+  Mock.fwk_time_duration_CallbackBool = (char)1;
+  Mock.fwk_time_duration_CallbackFunctionPointer = Callback;
+}
+
+void fwk_time_duration_Stub(CMOCK_fwk_time_duration_CALLBACK Callback)
+{
+  Mock.fwk_time_duration_IgnoreBool = (char)0;
+  Mock.fwk_time_duration_CallbackBool = (char)0;
+  Mock.fwk_time_duration_CallbackFunctionPointer = Callback;
+}
+
+void fwk_time_duration_CMockIgnoreArg_start(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_time_duration_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_time_duration_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_time_duration_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_start = 1;
+}
+
+void fwk_time_duration_CMockIgnoreArg_end(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_time_duration_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_time_duration_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_time_duration_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_end = 1;
 }
 
 fwk_duration_us_t fwk_time_duration_us(fwk_duration_ns_t duration)
@@ -334,14 +652,35 @@ fwk_duration_us_t fwk_time_duration_us(fwk_duration_ns_t duration)
   UNITY_SET_DETAIL(CMockString_fwk_time_duration_us);
   cmock_call_instance = (CMOCK_fwk_time_duration_us_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_time_duration_us_CallInstance);
   Mock.fwk_time_duration_us_CallInstance = CMock_Guts_MemNext(Mock.fwk_time_duration_us_CallInstance);
+  if (Mock.fwk_time_duration_us_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_time_duration_us_FinalReturn;
+    memcpy((void*)(&Mock.fwk_time_duration_us_FinalReturn), (void*)(&cmock_call_instance->ReturnVal),
+         sizeof(fwk_duration_us_t[sizeof(cmock_call_instance->ReturnVal) == sizeof(fwk_duration_us_t) ? 1 : -1])); /* add fwk_duration_us_t to :treat_as_array if this causes an error */
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_time_duration_us_CallbackBool &&
+      Mock.fwk_time_duration_us_CallbackFunctionPointer != NULL)
+  {
+    fwk_duration_us_t cmock_cb_ret = Mock.fwk_time_duration_us_CallbackFunctionPointer(duration, Mock.fwk_time_duration_us_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_duration)
   {
     UNITY_SET_DETAILS(CMockString_fwk_time_duration_us,CMockString_duration);
     UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_duration), (void*)(&duration), sizeof(fwk_duration_ns_t), cmock_line, CMockStringMismatch);
   }
+  }
+  if (Mock.fwk_time_duration_us_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_time_duration_us_CallbackFunctionPointer(duration, Mock.fwk_time_duration_us_CallbackCalls++);
   }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
@@ -352,6 +691,28 @@ void CMockExpectParameters_fwk_time_duration_us(CMOCK_fwk_time_duration_us_CALL_
 {
   memcpy((void*)(&cmock_call_instance->Expected_duration), (void*)(&duration),
          sizeof(fwk_duration_ns_t[sizeof(duration) == sizeof(fwk_duration_ns_t) ? 1 : -1])); /* add fwk_duration_ns_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_duration = 0;
+}
+
+void fwk_time_duration_us_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_us_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_time_duration_us_CALL_INSTANCE));
+  CMOCK_fwk_time_duration_us_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_time_duration_us_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_time_duration_us_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_duration_us_CallInstance, cmock_guts_index);
+  Mock.fwk_time_duration_us_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_time_duration_us_IgnoreBool = (char)1;
+}
+
+void fwk_time_duration_us_CMockStopIgnore(void)
+{
+  if(Mock.fwk_time_duration_us_IgnoreBool)
+    Mock.fwk_time_duration_us_CallInstance = CMock_Guts_MemNext(Mock.fwk_time_duration_us_CallInstance);
+  Mock.fwk_time_duration_us_IgnoreBool = (char)0;
 }
 
 void fwk_time_duration_us_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_us_t cmock_to_return)
@@ -361,6 +722,7 @@ void fwk_time_duration_us_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_time_duration_us_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_duration_us_CallInstance, cmock_guts_index);
+  Mock.fwk_time_duration_us_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -374,11 +736,33 @@ void fwk_time_duration_us_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_d
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_time_duration_us_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_duration_us_CallInstance, cmock_guts_index);
+  Mock.fwk_time_duration_us_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   CMockExpectParameters_fwk_time_duration_us(cmock_call_instance, duration);
   memcpy((void*)(&cmock_call_instance->ReturnVal), (void*)(&cmock_to_return),
          sizeof(fwk_duration_us_t[sizeof(cmock_to_return) == sizeof(fwk_duration_us_t) ? 1 : -1])); /* add fwk_duration_us_t to :treat_as_array if this causes an error */
+}
+
+void fwk_time_duration_us_AddCallback(CMOCK_fwk_time_duration_us_CALLBACK Callback)
+{
+  Mock.fwk_time_duration_us_IgnoreBool = (char)0;
+  Mock.fwk_time_duration_us_CallbackBool = (char)1;
+  Mock.fwk_time_duration_us_CallbackFunctionPointer = Callback;
+}
+
+void fwk_time_duration_us_Stub(CMOCK_fwk_time_duration_us_CALLBACK Callback)
+{
+  Mock.fwk_time_duration_us_IgnoreBool = (char)0;
+  Mock.fwk_time_duration_us_CallbackBool = (char)0;
+  Mock.fwk_time_duration_us_CallbackFunctionPointer = Callback;
+}
+
+void fwk_time_duration_us_CMockIgnoreArg_duration(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_time_duration_us_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_time_duration_us_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_time_duration_us_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_duration = 1;
 }
 
 fwk_duration_ms_t fwk_time_duration_ms(fwk_duration_ns_t duration)
@@ -388,14 +772,35 @@ fwk_duration_ms_t fwk_time_duration_ms(fwk_duration_ns_t duration)
   UNITY_SET_DETAIL(CMockString_fwk_time_duration_ms);
   cmock_call_instance = (CMOCK_fwk_time_duration_ms_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_time_duration_ms_CallInstance);
   Mock.fwk_time_duration_ms_CallInstance = CMock_Guts_MemNext(Mock.fwk_time_duration_ms_CallInstance);
+  if (Mock.fwk_time_duration_ms_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_time_duration_ms_FinalReturn;
+    memcpy((void*)(&Mock.fwk_time_duration_ms_FinalReturn), (void*)(&cmock_call_instance->ReturnVal),
+         sizeof(fwk_duration_ms_t[sizeof(cmock_call_instance->ReturnVal) == sizeof(fwk_duration_ms_t) ? 1 : -1])); /* add fwk_duration_ms_t to :treat_as_array if this causes an error */
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_time_duration_ms_CallbackBool &&
+      Mock.fwk_time_duration_ms_CallbackFunctionPointer != NULL)
+  {
+    fwk_duration_ms_t cmock_cb_ret = Mock.fwk_time_duration_ms_CallbackFunctionPointer(duration, Mock.fwk_time_duration_ms_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_duration)
   {
     UNITY_SET_DETAILS(CMockString_fwk_time_duration_ms,CMockString_duration);
     UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_duration), (void*)(&duration), sizeof(fwk_duration_ns_t), cmock_line, CMockStringMismatch);
   }
+  }
+  if (Mock.fwk_time_duration_ms_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_time_duration_ms_CallbackFunctionPointer(duration, Mock.fwk_time_duration_ms_CallbackCalls++);
   }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
@@ -406,6 +811,28 @@ void CMockExpectParameters_fwk_time_duration_ms(CMOCK_fwk_time_duration_ms_CALL_
 {
   memcpy((void*)(&cmock_call_instance->Expected_duration), (void*)(&duration),
          sizeof(fwk_duration_ns_t[sizeof(duration) == sizeof(fwk_duration_ns_t) ? 1 : -1])); /* add fwk_duration_ns_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_duration = 0;
+}
+
+void fwk_time_duration_ms_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_ms_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_time_duration_ms_CALL_INSTANCE));
+  CMOCK_fwk_time_duration_ms_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_time_duration_ms_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_time_duration_ms_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_duration_ms_CallInstance, cmock_guts_index);
+  Mock.fwk_time_duration_ms_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_time_duration_ms_IgnoreBool = (char)1;
+}
+
+void fwk_time_duration_ms_CMockStopIgnore(void)
+{
+  if(Mock.fwk_time_duration_ms_IgnoreBool)
+    Mock.fwk_time_duration_ms_CallInstance = CMock_Guts_MemNext(Mock.fwk_time_duration_ms_CallInstance);
+  Mock.fwk_time_duration_ms_IgnoreBool = (char)0;
 }
 
 void fwk_time_duration_ms_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_ms_t cmock_to_return)
@@ -415,6 +842,7 @@ void fwk_time_duration_ms_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_time_duration_ms_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_duration_ms_CallInstance, cmock_guts_index);
+  Mock.fwk_time_duration_ms_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -428,11 +856,33 @@ void fwk_time_duration_ms_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_d
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_time_duration_ms_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_duration_ms_CallInstance, cmock_guts_index);
+  Mock.fwk_time_duration_ms_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   CMockExpectParameters_fwk_time_duration_ms(cmock_call_instance, duration);
   memcpy((void*)(&cmock_call_instance->ReturnVal), (void*)(&cmock_to_return),
          sizeof(fwk_duration_ms_t[sizeof(cmock_to_return) == sizeof(fwk_duration_ms_t) ? 1 : -1])); /* add fwk_duration_ms_t to :treat_as_array if this causes an error */
+}
+
+void fwk_time_duration_ms_AddCallback(CMOCK_fwk_time_duration_ms_CALLBACK Callback)
+{
+  Mock.fwk_time_duration_ms_IgnoreBool = (char)0;
+  Mock.fwk_time_duration_ms_CallbackBool = (char)1;
+  Mock.fwk_time_duration_ms_CallbackFunctionPointer = Callback;
+}
+
+void fwk_time_duration_ms_Stub(CMOCK_fwk_time_duration_ms_CALLBACK Callback)
+{
+  Mock.fwk_time_duration_ms_IgnoreBool = (char)0;
+  Mock.fwk_time_duration_ms_CallbackBool = (char)0;
+  Mock.fwk_time_duration_ms_CallbackFunctionPointer = Callback;
+}
+
+void fwk_time_duration_ms_CMockIgnoreArg_duration(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_time_duration_ms_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_time_duration_ms_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_time_duration_ms_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_duration = 1;
 }
 
 fwk_duration_s_t fwk_time_duration_s(fwk_duration_ns_t duration)
@@ -442,14 +892,35 @@ fwk_duration_s_t fwk_time_duration_s(fwk_duration_ns_t duration)
   UNITY_SET_DETAIL(CMockString_fwk_time_duration_s);
   cmock_call_instance = (CMOCK_fwk_time_duration_s_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_time_duration_s_CallInstance);
   Mock.fwk_time_duration_s_CallInstance = CMock_Guts_MemNext(Mock.fwk_time_duration_s_CallInstance);
+  if (Mock.fwk_time_duration_s_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_time_duration_s_FinalReturn;
+    memcpy((void*)(&Mock.fwk_time_duration_s_FinalReturn), (void*)(&cmock_call_instance->ReturnVal),
+         sizeof(fwk_duration_s_t[sizeof(cmock_call_instance->ReturnVal) == sizeof(fwk_duration_s_t) ? 1 : -1])); /* add fwk_duration_s_t to :treat_as_array if this causes an error */
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_time_duration_s_CallbackBool &&
+      Mock.fwk_time_duration_s_CallbackFunctionPointer != NULL)
+  {
+    fwk_duration_s_t cmock_cb_ret = Mock.fwk_time_duration_s_CallbackFunctionPointer(duration, Mock.fwk_time_duration_s_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_duration)
   {
     UNITY_SET_DETAILS(CMockString_fwk_time_duration_s,CMockString_duration);
     UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_duration), (void*)(&duration), sizeof(fwk_duration_ns_t), cmock_line, CMockStringMismatch);
   }
+  }
+  if (Mock.fwk_time_duration_s_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_time_duration_s_CallbackFunctionPointer(duration, Mock.fwk_time_duration_s_CallbackCalls++);
   }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
@@ -460,6 +931,28 @@ void CMockExpectParameters_fwk_time_duration_s(CMOCK_fwk_time_duration_s_CALL_IN
 {
   memcpy((void*)(&cmock_call_instance->Expected_duration), (void*)(&duration),
          sizeof(fwk_duration_ns_t[sizeof(duration) == sizeof(fwk_duration_ns_t) ? 1 : -1])); /* add fwk_duration_ns_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_duration = 0;
+}
+
+void fwk_time_duration_s_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_s_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_time_duration_s_CALL_INSTANCE));
+  CMOCK_fwk_time_duration_s_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_time_duration_s_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_time_duration_s_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_duration_s_CallInstance, cmock_guts_index);
+  Mock.fwk_time_duration_s_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_time_duration_s_IgnoreBool = (char)1;
+}
+
+void fwk_time_duration_s_CMockStopIgnore(void)
+{
+  if(Mock.fwk_time_duration_s_IgnoreBool)
+    Mock.fwk_time_duration_s_CallInstance = CMock_Guts_MemNext(Mock.fwk_time_duration_s_CallInstance);
+  Mock.fwk_time_duration_s_IgnoreBool = (char)0;
 }
 
 void fwk_time_duration_s_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_s_t cmock_to_return)
@@ -469,6 +962,7 @@ void fwk_time_duration_s_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line,
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_time_duration_s_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_duration_s_CallInstance, cmock_guts_index);
+  Mock.fwk_time_duration_s_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -482,11 +976,33 @@ void fwk_time_duration_s_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_du
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_time_duration_s_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_duration_s_CallInstance, cmock_guts_index);
+  Mock.fwk_time_duration_s_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   CMockExpectParameters_fwk_time_duration_s(cmock_call_instance, duration);
   memcpy((void*)(&cmock_call_instance->ReturnVal), (void*)(&cmock_to_return),
          sizeof(fwk_duration_s_t[sizeof(cmock_to_return) == sizeof(fwk_duration_s_t) ? 1 : -1])); /* add fwk_duration_s_t to :treat_as_array if this causes an error */
+}
+
+void fwk_time_duration_s_AddCallback(CMOCK_fwk_time_duration_s_CALLBACK Callback)
+{
+  Mock.fwk_time_duration_s_IgnoreBool = (char)0;
+  Mock.fwk_time_duration_s_CallbackBool = (char)1;
+  Mock.fwk_time_duration_s_CallbackFunctionPointer = Callback;
+}
+
+void fwk_time_duration_s_Stub(CMOCK_fwk_time_duration_s_CALLBACK Callback)
+{
+  Mock.fwk_time_duration_s_IgnoreBool = (char)0;
+  Mock.fwk_time_duration_s_CallbackBool = (char)0;
+  Mock.fwk_time_duration_s_CallbackFunctionPointer = Callback;
+}
+
+void fwk_time_duration_s_CMockIgnoreArg_duration(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_time_duration_s_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_time_duration_s_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_time_duration_s_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_duration = 1;
 }
 
 fwk_duration_m_t fwk_time_duration_m(fwk_duration_ns_t duration)
@@ -496,14 +1012,35 @@ fwk_duration_m_t fwk_time_duration_m(fwk_duration_ns_t duration)
   UNITY_SET_DETAIL(CMockString_fwk_time_duration_m);
   cmock_call_instance = (CMOCK_fwk_time_duration_m_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_time_duration_m_CallInstance);
   Mock.fwk_time_duration_m_CallInstance = CMock_Guts_MemNext(Mock.fwk_time_duration_m_CallInstance);
+  if (Mock.fwk_time_duration_m_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_time_duration_m_FinalReturn;
+    memcpy((void*)(&Mock.fwk_time_duration_m_FinalReturn), (void*)(&cmock_call_instance->ReturnVal),
+         sizeof(fwk_duration_m_t[sizeof(cmock_call_instance->ReturnVal) == sizeof(fwk_duration_m_t) ? 1 : -1])); /* add fwk_duration_m_t to :treat_as_array if this causes an error */
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_time_duration_m_CallbackBool &&
+      Mock.fwk_time_duration_m_CallbackFunctionPointer != NULL)
+  {
+    fwk_duration_m_t cmock_cb_ret = Mock.fwk_time_duration_m_CallbackFunctionPointer(duration, Mock.fwk_time_duration_m_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_duration)
   {
     UNITY_SET_DETAILS(CMockString_fwk_time_duration_m,CMockString_duration);
     UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_duration), (void*)(&duration), sizeof(fwk_duration_ns_t), cmock_line, CMockStringMismatch);
   }
+  }
+  if (Mock.fwk_time_duration_m_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_time_duration_m_CallbackFunctionPointer(duration, Mock.fwk_time_duration_m_CallbackCalls++);
   }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
@@ -514,6 +1051,28 @@ void CMockExpectParameters_fwk_time_duration_m(CMOCK_fwk_time_duration_m_CALL_IN
 {
   memcpy((void*)(&cmock_call_instance->Expected_duration), (void*)(&duration),
          sizeof(fwk_duration_ns_t[sizeof(duration) == sizeof(fwk_duration_ns_t) ? 1 : -1])); /* add fwk_duration_ns_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_duration = 0;
+}
+
+void fwk_time_duration_m_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_m_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_time_duration_m_CALL_INSTANCE));
+  CMOCK_fwk_time_duration_m_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_time_duration_m_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_time_duration_m_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_duration_m_CallInstance, cmock_guts_index);
+  Mock.fwk_time_duration_m_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_time_duration_m_IgnoreBool = (char)1;
+}
+
+void fwk_time_duration_m_CMockStopIgnore(void)
+{
+  if(Mock.fwk_time_duration_m_IgnoreBool)
+    Mock.fwk_time_duration_m_CallInstance = CMock_Guts_MemNext(Mock.fwk_time_duration_m_CallInstance);
+  Mock.fwk_time_duration_m_IgnoreBool = (char)0;
 }
 
 void fwk_time_duration_m_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_m_t cmock_to_return)
@@ -523,6 +1082,7 @@ void fwk_time_duration_m_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line,
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_time_duration_m_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_duration_m_CallInstance, cmock_guts_index);
+  Mock.fwk_time_duration_m_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -536,11 +1096,33 @@ void fwk_time_duration_m_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_du
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_time_duration_m_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_duration_m_CallInstance, cmock_guts_index);
+  Mock.fwk_time_duration_m_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   CMockExpectParameters_fwk_time_duration_m(cmock_call_instance, duration);
   memcpy((void*)(&cmock_call_instance->ReturnVal), (void*)(&cmock_to_return),
          sizeof(fwk_duration_m_t[sizeof(cmock_to_return) == sizeof(fwk_duration_m_t) ? 1 : -1])); /* add fwk_duration_m_t to :treat_as_array if this causes an error */
+}
+
+void fwk_time_duration_m_AddCallback(CMOCK_fwk_time_duration_m_CALLBACK Callback)
+{
+  Mock.fwk_time_duration_m_IgnoreBool = (char)0;
+  Mock.fwk_time_duration_m_CallbackBool = (char)1;
+  Mock.fwk_time_duration_m_CallbackFunctionPointer = Callback;
+}
+
+void fwk_time_duration_m_Stub(CMOCK_fwk_time_duration_m_CALLBACK Callback)
+{
+  Mock.fwk_time_duration_m_IgnoreBool = (char)0;
+  Mock.fwk_time_duration_m_CallbackBool = (char)0;
+  Mock.fwk_time_duration_m_CallbackFunctionPointer = Callback;
+}
+
+void fwk_time_duration_m_CMockIgnoreArg_duration(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_time_duration_m_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_time_duration_m_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_time_duration_m_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_duration = 1;
 }
 
 fwk_duration_h_t fwk_time_duration_h(fwk_duration_ns_t duration)
@@ -550,14 +1132,35 @@ fwk_duration_h_t fwk_time_duration_h(fwk_duration_ns_t duration)
   UNITY_SET_DETAIL(CMockString_fwk_time_duration_h);
   cmock_call_instance = (CMOCK_fwk_time_duration_h_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_time_duration_h_CallInstance);
   Mock.fwk_time_duration_h_CallInstance = CMock_Guts_MemNext(Mock.fwk_time_duration_h_CallInstance);
+  if (Mock.fwk_time_duration_h_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_time_duration_h_FinalReturn;
+    memcpy((void*)(&Mock.fwk_time_duration_h_FinalReturn), (void*)(&cmock_call_instance->ReturnVal),
+         sizeof(fwk_duration_h_t[sizeof(cmock_call_instance->ReturnVal) == sizeof(fwk_duration_h_t) ? 1 : -1])); /* add fwk_duration_h_t to :treat_as_array if this causes an error */
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_time_duration_h_CallbackBool &&
+      Mock.fwk_time_duration_h_CallbackFunctionPointer != NULL)
+  {
+    fwk_duration_h_t cmock_cb_ret = Mock.fwk_time_duration_h_CallbackFunctionPointer(duration, Mock.fwk_time_duration_h_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_duration)
   {
     UNITY_SET_DETAILS(CMockString_fwk_time_duration_h,CMockString_duration);
     UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_duration), (void*)(&duration), sizeof(fwk_duration_ns_t), cmock_line, CMockStringMismatch);
   }
+  }
+  if (Mock.fwk_time_duration_h_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_time_duration_h_CallbackFunctionPointer(duration, Mock.fwk_time_duration_h_CallbackCalls++);
   }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
@@ -568,6 +1171,28 @@ void CMockExpectParameters_fwk_time_duration_h(CMOCK_fwk_time_duration_h_CALL_IN
 {
   memcpy((void*)(&cmock_call_instance->Expected_duration), (void*)(&duration),
          sizeof(fwk_duration_ns_t[sizeof(duration) == sizeof(fwk_duration_ns_t) ? 1 : -1])); /* add fwk_duration_ns_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_duration = 0;
+}
+
+void fwk_time_duration_h_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_h_t cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_time_duration_h_CALL_INSTANCE));
+  CMOCK_fwk_time_duration_h_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_time_duration_h_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_time_duration_h_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_duration_h_CallInstance, cmock_guts_index);
+  Mock.fwk_time_duration_h_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_time_duration_h_IgnoreBool = (char)1;
+}
+
+void fwk_time_duration_h_CMockStopIgnore(void)
+{
+  if(Mock.fwk_time_duration_h_IgnoreBool)
+    Mock.fwk_time_duration_h_CallInstance = CMock_Guts_MemNext(Mock.fwk_time_duration_h_CallInstance);
+  Mock.fwk_time_duration_h_IgnoreBool = (char)0;
 }
 
 void fwk_time_duration_h_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, fwk_duration_h_t cmock_to_return)
@@ -577,6 +1202,7 @@ void fwk_time_duration_h_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line,
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_time_duration_h_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_duration_h_CallInstance, cmock_guts_index);
+  Mock.fwk_time_duration_h_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -590,11 +1216,33 @@ void fwk_time_duration_h_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_du
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_time_duration_h_CallInstance = CMock_Guts_MemChain(Mock.fwk_time_duration_h_CallInstance, cmock_guts_index);
+  Mock.fwk_time_duration_h_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   CMockExpectParameters_fwk_time_duration_h(cmock_call_instance, duration);
   memcpy((void*)(&cmock_call_instance->ReturnVal), (void*)(&cmock_to_return),
          sizeof(fwk_duration_h_t[sizeof(cmock_to_return) == sizeof(fwk_duration_h_t) ? 1 : -1])); /* add fwk_duration_h_t to :treat_as_array if this causes an error */
+}
+
+void fwk_time_duration_h_AddCallback(CMOCK_fwk_time_duration_h_CALLBACK Callback)
+{
+  Mock.fwk_time_duration_h_IgnoreBool = (char)0;
+  Mock.fwk_time_duration_h_CallbackBool = (char)1;
+  Mock.fwk_time_duration_h_CallbackFunctionPointer = Callback;
+}
+
+void fwk_time_duration_h_Stub(CMOCK_fwk_time_duration_h_CALLBACK Callback)
+{
+  Mock.fwk_time_duration_h_IgnoreBool = (char)0;
+  Mock.fwk_time_duration_h_CallbackBool = (char)0;
+  Mock.fwk_time_duration_h_CallbackFunctionPointer = Callback;
+}
+
+void fwk_time_duration_h_CMockIgnoreArg_duration(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_time_duration_h_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_time_duration_h_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_time_duration_h_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_duration = 1;
 }
 
 struct fwk_time_driver fmw_time_driver(const void** ctx)
@@ -604,23 +1252,74 @@ struct fwk_time_driver fmw_time_driver(const void** ctx)
   UNITY_SET_DETAIL(CMockString_fmw_time_driver);
   cmock_call_instance = (CMOCK_fmw_time_driver_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fmw_time_driver_CallInstance);
   Mock.fmw_time_driver_CallInstance = CMock_Guts_MemNext(Mock.fmw_time_driver_CallInstance);
+  if (Mock.fmw_time_driver_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fmw_time_driver_FinalReturn;
+    memcpy((void*)(&Mock.fmw_time_driver_FinalReturn), (void*)(&cmock_call_instance->ReturnVal),
+         sizeof(struct fwk_time_driver[sizeof(cmock_call_instance->ReturnVal) == sizeof(struct fwk_time_driver) ? 1 : -1])); /* add struct fwk_time_driver to :treat_as_array if this causes an error */
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fmw_time_driver_CallbackBool &&
+      Mock.fmw_time_driver_CallbackFunctionPointer != NULL)
+  {
+    struct fwk_time_driver cmock_cb_ret = Mock.fmw_time_driver_CallbackFunctionPointer(ctx, Mock.fmw_time_driver_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_ctx)
   {
     UNITY_SET_DETAILS(CMockString_fmw_time_driver,CMockString_ctx);
     UNITY_TEST_ASSERT_EQUAL_PTR(cmock_call_instance->Expected_ctx, ctx, cmock_line, CMockStringMismatch);
   }
   }
+  if (Mock.fmw_time_driver_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fmw_time_driver_CallbackFunctionPointer(ctx, Mock.fmw_time_driver_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_ctx_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(ctx, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)ctx, (void*)cmock_call_instance->ReturnThruPtr_ctx_Val,
+      cmock_call_instance->ReturnThruPtr_ctx_Size);
+  }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
 }
 
-void CMockExpectParameters_fmw_time_driver(CMOCK_fmw_time_driver_CALL_INSTANCE* cmock_call_instance, const void** ctx);
-void CMockExpectParameters_fmw_time_driver(CMOCK_fmw_time_driver_CALL_INSTANCE* cmock_call_instance, const void** ctx)
+void CMockExpectParameters_fmw_time_driver(CMOCK_fmw_time_driver_CALL_INSTANCE* cmock_call_instance, const void** ctx, int ctx_Depth);
+void CMockExpectParameters_fmw_time_driver(CMOCK_fmw_time_driver_CALL_INSTANCE* cmock_call_instance, const void** ctx, int ctx_Depth)
 {
   cmock_call_instance->Expected_ctx = ctx;
+  cmock_call_instance->Expected_ctx_Depth = ctx_Depth;
+  cmock_call_instance->IgnoreArg_ctx = 0;
+  cmock_call_instance->ReturnThruPtr_ctx_Used = 0;
+}
+
+void fmw_time_driver_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_time_driver cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fmw_time_driver_CALL_INSTANCE));
+  CMOCK_fmw_time_driver_CALL_INSTANCE* cmock_call_instance = (CMOCK_fmw_time_driver_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fmw_time_driver_CallInstance = CMock_Guts_MemChain(Mock.fmw_time_driver_CallInstance, cmock_guts_index);
+  Mock.fmw_time_driver_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fmw_time_driver_IgnoreBool = (char)1;
+}
+
+void fmw_time_driver_CMockStopIgnore(void)
+{
+  if(Mock.fmw_time_driver_IgnoreBool)
+    Mock.fmw_time_driver_CallInstance = CMock_Guts_MemNext(Mock.fmw_time_driver_CallInstance);
+  Mock.fmw_time_driver_IgnoreBool = (char)0;
 }
 
 void fmw_time_driver_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_time_driver cmock_to_return)
@@ -630,6 +1329,7 @@ void fmw_time_driver_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, str
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fmw_time_driver_CallInstance = CMock_Guts_MemChain(Mock.fmw_time_driver_CallInstance, cmock_guts_index);
+  Mock.fmw_time_driver_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -643,10 +1343,55 @@ void fmw_time_driver_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const void
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fmw_time_driver_CallInstance = CMock_Guts_MemChain(Mock.fmw_time_driver_CallInstance, cmock_guts_index);
+  Mock.fmw_time_driver_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
-  CMockExpectParameters_fmw_time_driver(cmock_call_instance, ctx);
+  CMockExpectParameters_fmw_time_driver(cmock_call_instance, ctx, 1);
   memcpy((void*)(&cmock_call_instance->ReturnVal), (void*)(&cmock_to_return),
          sizeof(struct fwk_time_driver[sizeof(cmock_to_return) == sizeof(struct fwk_time_driver) ? 1 : -1])); /* add struct fwk_time_driver to :treat_as_array if this causes an error */
+}
+
+void fmw_time_driver_AddCallback(CMOCK_fmw_time_driver_CALLBACK Callback)
+{
+  Mock.fmw_time_driver_IgnoreBool = (char)0;
+  Mock.fmw_time_driver_CallbackBool = (char)1;
+  Mock.fmw_time_driver_CallbackFunctionPointer = Callback;
+}
+
+void fmw_time_driver_Stub(CMOCK_fmw_time_driver_CALLBACK Callback)
+{
+  Mock.fmw_time_driver_IgnoreBool = (char)0;
+  Mock.fmw_time_driver_CallbackBool = (char)0;
+  Mock.fmw_time_driver_CallbackFunctionPointer = Callback;
+}
+
+void fmw_time_driver_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const void** ctx, int ctx_Depth, struct fwk_time_driver cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fmw_time_driver_CALL_INSTANCE));
+  CMOCK_fmw_time_driver_CALL_INSTANCE* cmock_call_instance = (CMOCK_fmw_time_driver_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fmw_time_driver_CallInstance = CMock_Guts_MemChain(Mock.fmw_time_driver_CallInstance, cmock_guts_index);
+  Mock.fmw_time_driver_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_fmw_time_driver(cmock_call_instance, ctx, ctx_Depth);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fmw_time_driver_CMockReturnMemThruPtr_ctx(UNITY_LINE_TYPE cmock_line, const void** ctx, size_t cmock_size)
+{
+  CMOCK_fmw_time_driver_CALL_INSTANCE* cmock_call_instance = (CMOCK_fmw_time_driver_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fmw_time_driver_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_ctx_Used = 1;
+  cmock_call_instance->ReturnThruPtr_ctx_Val = ctx;
+  cmock_call_instance->ReturnThruPtr_ctx_Size = cmock_size;
+}
+
+void fmw_time_driver_CMockIgnoreArg_ctx(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fmw_time_driver_CALL_INSTANCE* cmock_call_instance = (CMOCK_fmw_time_driver_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fmw_time_driver_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_ctx = 1;
 }
 

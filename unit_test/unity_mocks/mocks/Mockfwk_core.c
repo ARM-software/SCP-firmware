@@ -10,8 +10,16 @@ static const char* CMockString_event = "event";
 static const char* CMockString_fwk_get_delayed_response = "fwk_get_delayed_response";
 static const char* CMockString_fwk_get_first_delayed_response = "fwk_get_first_delayed_response";
 static const char* CMockString_fwk_is_delayed_response_list_empty = "fwk_is_delayed_response_list_empty";
+static const char* CMockString_fwk_process_event_queue = "fwk_process_event_queue";
 static const char* CMockString_id = "id";
 static const char* CMockString_is_empty = "is_empty";
+
+typedef struct _CMOCK_fwk_process_event_queue_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+
+} CMOCK_fwk_process_event_queue_CALL_INSTANCE;
 
 typedef struct _CMOCK_fwk_get_delayed_response_CALL_INSTANCE
 {
@@ -21,6 +29,13 @@ typedef struct _CMOCK_fwk_get_delayed_response_CALL_INSTANCE
   fwk_id_t Expected_id;
   uint32_t Expected_cookie;
   struct fwk_event* Expected_event;
+  int Expected_event_Depth;
+  char ReturnThruPtr_event_Used;
+  struct fwk_event* ReturnThruPtr_event_Val;
+  size_t ReturnThruPtr_event_Size;
+  char IgnoreArg_id;
+  char IgnoreArg_cookie;
+  char IgnoreArg_event;
 
 } CMOCK_fwk_get_delayed_response_CALL_INSTANCE;
 
@@ -31,6 +46,12 @@ typedef struct _CMOCK_fwk_is_delayed_response_list_empty_CALL_INSTANCE
   int ReturnVal;
   fwk_id_t Expected_id;
   bool* Expected_is_empty;
+  int Expected_is_empty_Depth;
+  char ReturnThruPtr_is_empty_Used;
+  bool* ReturnThruPtr_is_empty_Val;
+  size_t ReturnThruPtr_is_empty_Size;
+  char IgnoreArg_id;
+  char IgnoreArg_is_empty;
 
 } CMOCK_fwk_is_delayed_response_list_empty_CALL_INSTANCE;
 
@@ -41,13 +62,39 @@ typedef struct _CMOCK_fwk_get_first_delayed_response_CALL_INSTANCE
   int ReturnVal;
   fwk_id_t Expected_id;
   struct fwk_event* Expected_event;
+  int Expected_event_Depth;
+  char ReturnThruPtr_event_Used;
+  struct fwk_event* ReturnThruPtr_event_Val;
+  size_t ReturnThruPtr_event_Size;
+  char IgnoreArg_id;
+  char IgnoreArg_event;
 
 } CMOCK_fwk_get_first_delayed_response_CALL_INSTANCE;
 
 static struct Mockfwk_coreInstance
 {
+  char fwk_process_event_queue_IgnoreBool;
+  char fwk_process_event_queue_CallbackBool;
+  CMOCK_fwk_process_event_queue_CALLBACK fwk_process_event_queue_CallbackFunctionPointer;
+  int fwk_process_event_queue_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE fwk_process_event_queue_CallInstance;
+  char fwk_get_delayed_response_IgnoreBool;
+  int fwk_get_delayed_response_FinalReturn;
+  char fwk_get_delayed_response_CallbackBool;
+  CMOCK_fwk_get_delayed_response_CALLBACK fwk_get_delayed_response_CallbackFunctionPointer;
+  int fwk_get_delayed_response_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_get_delayed_response_CallInstance;
+  char fwk_is_delayed_response_list_empty_IgnoreBool;
+  int fwk_is_delayed_response_list_empty_FinalReturn;
+  char fwk_is_delayed_response_list_empty_CallbackBool;
+  CMOCK_fwk_is_delayed_response_list_empty_CALLBACK fwk_is_delayed_response_list_empty_CallbackFunctionPointer;
+  int fwk_is_delayed_response_list_empty_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_is_delayed_response_list_empty_CallInstance;
+  char fwk_get_first_delayed_response_IgnoreBool;
+  int fwk_get_first_delayed_response_FinalReturn;
+  char fwk_get_first_delayed_response_CallbackBool;
+  CMOCK_fwk_get_first_delayed_response_CALLBACK fwk_get_first_delayed_response_CallbackFunctionPointer;
+  int fwk_get_first_delayed_response_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE fwk_get_first_delayed_response_CallInstance;
 } Mock;
 
@@ -57,23 +104,57 @@ void Mockfwk_core_Verify(void)
 {
   UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
   CMOCK_MEM_INDEX_TYPE call_instance;
+  call_instance = Mock.fwk_process_event_queue_CallInstance;
+  if (Mock.fwk_process_event_queue_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_fwk_process_event_queue);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.fwk_process_event_queue_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_get_delayed_response_CallInstance;
+  if (Mock.fwk_get_delayed_response_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_get_delayed_response);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_get_delayed_response_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_is_delayed_response_list_empty_CallInstance;
+  if (Mock.fwk_is_delayed_response_list_empty_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_is_delayed_response_list_empty);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
+  if (Mock.fwk_is_delayed_response_list_empty_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
   call_instance = Mock.fwk_get_first_delayed_response_CallInstance;
+  if (Mock.fwk_get_first_delayed_response_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
   if (CMOCK_GUTS_NONE != call_instance)
   {
     UNITY_SET_DETAIL(CMockString_fwk_get_first_delayed_response);
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.fwk_get_first_delayed_response_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
   }
 }
 
@@ -88,6 +169,70 @@ void Mockfwk_core_Destroy(void)
   memset(&Mock, 0, sizeof(Mock));
 }
 
+void fwk_process_event_queue(void)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_fwk_process_event_queue_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_fwk_process_event_queue);
+  cmock_call_instance = (CMOCK_fwk_process_event_queue_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_process_event_queue_CallInstance);
+  Mock.fwk_process_event_queue_CallInstance = CMock_Guts_MemNext(Mock.fwk_process_event_queue_CallInstance);
+  if (Mock.fwk_process_event_queue_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    return;
+  }
+  if (!Mock.fwk_process_event_queue_CallbackBool &&
+      Mock.fwk_process_event_queue_CallbackFunctionPointer != NULL)
+  {
+    Mock.fwk_process_event_queue_CallbackFunctionPointer(Mock.fwk_process_event_queue_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (Mock.fwk_process_event_queue_CallbackFunctionPointer != NULL)
+  {
+    Mock.fwk_process_event_queue_CallbackFunctionPointer(Mock.fwk_process_event_queue_CallbackCalls++);
+  }
+  UNITY_CLR_DETAILS();
+}
+
+void fwk_process_event_queue_CMockIgnore(void)
+{
+  Mock.fwk_process_event_queue_IgnoreBool = (char)1;
+}
+
+void fwk_process_event_queue_CMockStopIgnore(void)
+{
+  Mock.fwk_process_event_queue_IgnoreBool = (char)0;
+}
+
+void fwk_process_event_queue_CMockExpect(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_process_event_queue_CALL_INSTANCE));
+  CMOCK_fwk_process_event_queue_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_process_event_queue_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_process_event_queue_CallInstance = CMock_Guts_MemChain(Mock.fwk_process_event_queue_CallInstance, cmock_guts_index);
+  Mock.fwk_process_event_queue_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+}
+
+void fwk_process_event_queue_AddCallback(CMOCK_fwk_process_event_queue_CALLBACK Callback)
+{
+  Mock.fwk_process_event_queue_IgnoreBool = (char)0;
+  Mock.fwk_process_event_queue_CallbackBool = (char)1;
+  Mock.fwk_process_event_queue_CallbackFunctionPointer = Callback;
+}
+
+void fwk_process_event_queue_Stub(CMOCK_fwk_process_event_queue_CALLBACK Callback)
+{
+  Mock.fwk_process_event_queue_IgnoreBool = (char)0;
+  Mock.fwk_process_event_queue_CallbackBool = (char)0;
+  Mock.fwk_process_event_queue_CallbackFunctionPointer = Callback;
+}
+
 int fwk_get_delayed_response(fwk_id_t id, uint32_t cookie, struct fwk_event* event)
 {
   UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
@@ -95,34 +240,91 @@ int fwk_get_delayed_response(fwk_id_t id, uint32_t cookie, struct fwk_event* eve
   UNITY_SET_DETAIL(CMockString_fwk_get_delayed_response);
   cmock_call_instance = (CMOCK_fwk_get_delayed_response_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_get_delayed_response_CallInstance);
   Mock.fwk_get_delayed_response_CallInstance = CMock_Guts_MemNext(Mock.fwk_get_delayed_response_CallInstance);
+  if (Mock.fwk_get_delayed_response_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_get_delayed_response_FinalReturn;
+    Mock.fwk_get_delayed_response_FinalReturn = cmock_call_instance->ReturnVal;
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_get_delayed_response_CallbackBool &&
+      Mock.fwk_get_delayed_response_CallbackFunctionPointer != NULL)
+  {
+    int cmock_cb_ret = Mock.fwk_get_delayed_response_CallbackFunctionPointer(id, cookie, event, Mock.fwk_get_delayed_response_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_id)
   {
     UNITY_SET_DETAILS(CMockString_fwk_get_delayed_response,CMockString_id);
     UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_id), (void*)(&id), sizeof(fwk_id_t), cmock_line, CMockStringMismatch);
   }
+  if (!cmock_call_instance->IgnoreArg_cookie)
   {
     UNITY_SET_DETAILS(CMockString_fwk_get_delayed_response,CMockString_cookie);
     UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_cookie, cookie, cmock_line, CMockStringMismatch);
   }
+  if (!cmock_call_instance->IgnoreArg_event)
   {
     UNITY_SET_DETAILS(CMockString_fwk_get_delayed_response,CMockString_event);
-    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(cmock_call_instance->Expected_event), (void*)(event), sizeof(struct fwk_event), cmock_line, CMockStringMismatch);
+    if (cmock_call_instance->Expected_event == NULL)
+      { UNITY_TEST_ASSERT_NULL(event, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_event), (void*)(event), sizeof(struct fwk_event), cmock_call_instance->Expected_event_Depth, cmock_line, CMockStringMismatch); }
   }
+  }
+  if (Mock.fwk_get_delayed_response_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_get_delayed_response_CallbackFunctionPointer(id, cookie, event, Mock.fwk_get_delayed_response_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_event_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(event, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)event, (void*)cmock_call_instance->ReturnThruPtr_event_Val,
+      cmock_call_instance->ReturnThruPtr_event_Size);
   }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
 }
 
-void CMockExpectParameters_fwk_get_delayed_response(CMOCK_fwk_get_delayed_response_CALL_INSTANCE* cmock_call_instance, fwk_id_t id, uint32_t cookie, struct fwk_event* event);
-void CMockExpectParameters_fwk_get_delayed_response(CMOCK_fwk_get_delayed_response_CALL_INSTANCE* cmock_call_instance, fwk_id_t id, uint32_t cookie, struct fwk_event* event)
+void CMockExpectParameters_fwk_get_delayed_response(CMOCK_fwk_get_delayed_response_CALL_INSTANCE* cmock_call_instance, fwk_id_t id, uint32_t cookie, struct fwk_event* event, int event_Depth);
+void CMockExpectParameters_fwk_get_delayed_response(CMOCK_fwk_get_delayed_response_CALL_INSTANCE* cmock_call_instance, fwk_id_t id, uint32_t cookie, struct fwk_event* event, int event_Depth)
 {
   memcpy((void*)(&cmock_call_instance->Expected_id), (void*)(&id),
          sizeof(fwk_id_t[sizeof(id) == sizeof(fwk_id_t) ? 1 : -1])); /* add fwk_id_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_id = 0;
   cmock_call_instance->Expected_cookie = cookie;
+  cmock_call_instance->IgnoreArg_cookie = 0;
   cmock_call_instance->Expected_event = event;
+  cmock_call_instance->Expected_event_Depth = event_Depth;
+  cmock_call_instance->IgnoreArg_event = 0;
+  cmock_call_instance->ReturnThruPtr_event_Used = 0;
+}
+
+void fwk_get_delayed_response_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_get_delayed_response_CALL_INSTANCE));
+  CMOCK_fwk_get_delayed_response_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_get_delayed_response_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_get_delayed_response_CallInstance = CMock_Guts_MemChain(Mock.fwk_get_delayed_response_CallInstance, cmock_guts_index);
+  Mock.fwk_get_delayed_response_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_get_delayed_response_IgnoreBool = (char)1;
+}
+
+void fwk_get_delayed_response_CMockStopIgnore(void)
+{
+  if(Mock.fwk_get_delayed_response_IgnoreBool)
+    Mock.fwk_get_delayed_response_CallInstance = CMock_Guts_MemNext(Mock.fwk_get_delayed_response_CallInstance);
+  Mock.fwk_get_delayed_response_IgnoreBool = (char)0;
 }
 
 void fwk_get_delayed_response_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
@@ -132,6 +334,7 @@ void fwk_get_delayed_response_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_get_delayed_response_CallInstance = CMock_Guts_MemChain(Mock.fwk_get_delayed_response_CallInstance, cmock_guts_index);
+  Mock.fwk_get_delayed_response_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -145,10 +348,69 @@ void fwk_get_delayed_response_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, f
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_get_delayed_response_CallInstance = CMock_Guts_MemChain(Mock.fwk_get_delayed_response_CallInstance, cmock_guts_index);
+  Mock.fwk_get_delayed_response_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
-  CMockExpectParameters_fwk_get_delayed_response(cmock_call_instance, id, cookie, event);
+  CMockExpectParameters_fwk_get_delayed_response(cmock_call_instance, id, cookie, event, 1);
   cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fwk_get_delayed_response_AddCallback(CMOCK_fwk_get_delayed_response_CALLBACK Callback)
+{
+  Mock.fwk_get_delayed_response_IgnoreBool = (char)0;
+  Mock.fwk_get_delayed_response_CallbackBool = (char)1;
+  Mock.fwk_get_delayed_response_CallbackFunctionPointer = Callback;
+}
+
+void fwk_get_delayed_response_Stub(CMOCK_fwk_get_delayed_response_CALLBACK Callback)
+{
+  Mock.fwk_get_delayed_response_IgnoreBool = (char)0;
+  Mock.fwk_get_delayed_response_CallbackBool = (char)0;
+  Mock.fwk_get_delayed_response_CallbackFunctionPointer = Callback;
+}
+
+void fwk_get_delayed_response_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t id, uint32_t cookie, struct fwk_event* event, int event_Depth, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_get_delayed_response_CALL_INSTANCE));
+  CMOCK_fwk_get_delayed_response_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_get_delayed_response_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_get_delayed_response_CallInstance = CMock_Guts_MemChain(Mock.fwk_get_delayed_response_CallInstance, cmock_guts_index);
+  Mock.fwk_get_delayed_response_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_fwk_get_delayed_response(cmock_call_instance, id, cookie, event, event_Depth);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fwk_get_delayed_response_CMockReturnMemThruPtr_event(UNITY_LINE_TYPE cmock_line, struct fwk_event* event, size_t cmock_size)
+{
+  CMOCK_fwk_get_delayed_response_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_get_delayed_response_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_get_delayed_response_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_event_Used = 1;
+  cmock_call_instance->ReturnThruPtr_event_Val = event;
+  cmock_call_instance->ReturnThruPtr_event_Size = cmock_size;
+}
+
+void fwk_get_delayed_response_CMockIgnoreArg_id(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_get_delayed_response_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_get_delayed_response_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_get_delayed_response_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_id = 1;
+}
+
+void fwk_get_delayed_response_CMockIgnoreArg_cookie(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_get_delayed_response_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_get_delayed_response_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_get_delayed_response_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_cookie = 1;
+}
+
+void fwk_get_delayed_response_CMockIgnoreArg_event(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_get_delayed_response_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_get_delayed_response_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_get_delayed_response_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_event = 1;
 }
 
 int fwk_is_delayed_response_list_empty(fwk_id_t id, bool* is_empty)
@@ -158,32 +420,84 @@ int fwk_is_delayed_response_list_empty(fwk_id_t id, bool* is_empty)
   UNITY_SET_DETAIL(CMockString_fwk_is_delayed_response_list_empty);
   cmock_call_instance = (CMOCK_fwk_is_delayed_response_list_empty_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_is_delayed_response_list_empty_CallInstance);
   Mock.fwk_is_delayed_response_list_empty_CallInstance = CMock_Guts_MemNext(Mock.fwk_is_delayed_response_list_empty_CallInstance);
+  if (Mock.fwk_is_delayed_response_list_empty_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_is_delayed_response_list_empty_FinalReturn;
+    Mock.fwk_is_delayed_response_list_empty_FinalReturn = cmock_call_instance->ReturnVal;
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_is_delayed_response_list_empty_CallbackBool &&
+      Mock.fwk_is_delayed_response_list_empty_CallbackFunctionPointer != NULL)
+  {
+    int cmock_cb_ret = Mock.fwk_is_delayed_response_list_empty_CallbackFunctionPointer(id, is_empty, Mock.fwk_is_delayed_response_list_empty_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_id)
   {
     UNITY_SET_DETAILS(CMockString_fwk_is_delayed_response_list_empty,CMockString_id);
     UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_id), (void*)(&id), sizeof(fwk_id_t), cmock_line, CMockStringMismatch);
   }
+  if (!cmock_call_instance->IgnoreArg_is_empty)
   {
     UNITY_SET_DETAILS(CMockString_fwk_is_delayed_response_list_empty,CMockString_is_empty);
     if (cmock_call_instance->Expected_is_empty == NULL)
       { UNITY_TEST_ASSERT_NULL(is_empty, cmock_line, CMockStringExpNULL); }
     else
-      { UNITY_TEST_ASSERT_EQUAL_INT_ARRAY(cmock_call_instance->Expected_is_empty, is_empty, 1, cmock_line, CMockStringMismatch); }
+      { UNITY_TEST_ASSERT_EQUAL_INT_ARRAY(cmock_call_instance->Expected_is_empty, is_empty, cmock_call_instance->Expected_is_empty_Depth, cmock_line, CMockStringMismatch); }
   }
+  }
+  if (Mock.fwk_is_delayed_response_list_empty_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_is_delayed_response_list_empty_CallbackFunctionPointer(id, is_empty, Mock.fwk_is_delayed_response_list_empty_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_is_empty_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(is_empty, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)is_empty, (void*)cmock_call_instance->ReturnThruPtr_is_empty_Val,
+      cmock_call_instance->ReturnThruPtr_is_empty_Size);
   }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
 }
 
-void CMockExpectParameters_fwk_is_delayed_response_list_empty(CMOCK_fwk_is_delayed_response_list_empty_CALL_INSTANCE* cmock_call_instance, fwk_id_t id, bool* is_empty);
-void CMockExpectParameters_fwk_is_delayed_response_list_empty(CMOCK_fwk_is_delayed_response_list_empty_CALL_INSTANCE* cmock_call_instance, fwk_id_t id, bool* is_empty)
+void CMockExpectParameters_fwk_is_delayed_response_list_empty(CMOCK_fwk_is_delayed_response_list_empty_CALL_INSTANCE* cmock_call_instance, fwk_id_t id, bool* is_empty, int is_empty_Depth);
+void CMockExpectParameters_fwk_is_delayed_response_list_empty(CMOCK_fwk_is_delayed_response_list_empty_CALL_INSTANCE* cmock_call_instance, fwk_id_t id, bool* is_empty, int is_empty_Depth)
 {
   memcpy((void*)(&cmock_call_instance->Expected_id), (void*)(&id),
          sizeof(fwk_id_t[sizeof(id) == sizeof(fwk_id_t) ? 1 : -1])); /* add fwk_id_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_id = 0;
   cmock_call_instance->Expected_is_empty = is_empty;
+  cmock_call_instance->Expected_is_empty_Depth = is_empty_Depth;
+  cmock_call_instance->IgnoreArg_is_empty = 0;
+  cmock_call_instance->ReturnThruPtr_is_empty_Used = 0;
+}
+
+void fwk_is_delayed_response_list_empty_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_is_delayed_response_list_empty_CALL_INSTANCE));
+  CMOCK_fwk_is_delayed_response_list_empty_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_is_delayed_response_list_empty_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_is_delayed_response_list_empty_CallInstance = CMock_Guts_MemChain(Mock.fwk_is_delayed_response_list_empty_CallInstance, cmock_guts_index);
+  Mock.fwk_is_delayed_response_list_empty_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_is_delayed_response_list_empty_IgnoreBool = (char)1;
+}
+
+void fwk_is_delayed_response_list_empty_CMockStopIgnore(void)
+{
+  if(Mock.fwk_is_delayed_response_list_empty_IgnoreBool)
+    Mock.fwk_is_delayed_response_list_empty_CallInstance = CMock_Guts_MemNext(Mock.fwk_is_delayed_response_list_empty_CallInstance);
+  Mock.fwk_is_delayed_response_list_empty_IgnoreBool = (char)0;
 }
 
 void fwk_is_delayed_response_list_empty_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
@@ -193,6 +507,7 @@ void fwk_is_delayed_response_list_empty_CMockExpectAnyArgsAndReturn(UNITY_LINE_T
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_is_delayed_response_list_empty_CallInstance = CMock_Guts_MemChain(Mock.fwk_is_delayed_response_list_empty_CallInstance, cmock_guts_index);
+  Mock.fwk_is_delayed_response_list_empty_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -206,10 +521,62 @@ void fwk_is_delayed_response_list_empty_CMockExpectAndReturn(UNITY_LINE_TYPE cmo
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_is_delayed_response_list_empty_CallInstance = CMock_Guts_MemChain(Mock.fwk_is_delayed_response_list_empty_CallInstance, cmock_guts_index);
+  Mock.fwk_is_delayed_response_list_empty_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
-  CMockExpectParameters_fwk_is_delayed_response_list_empty(cmock_call_instance, id, is_empty);
+  CMockExpectParameters_fwk_is_delayed_response_list_empty(cmock_call_instance, id, is_empty, 1);
   cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fwk_is_delayed_response_list_empty_AddCallback(CMOCK_fwk_is_delayed_response_list_empty_CALLBACK Callback)
+{
+  Mock.fwk_is_delayed_response_list_empty_IgnoreBool = (char)0;
+  Mock.fwk_is_delayed_response_list_empty_CallbackBool = (char)1;
+  Mock.fwk_is_delayed_response_list_empty_CallbackFunctionPointer = Callback;
+}
+
+void fwk_is_delayed_response_list_empty_Stub(CMOCK_fwk_is_delayed_response_list_empty_CALLBACK Callback)
+{
+  Mock.fwk_is_delayed_response_list_empty_IgnoreBool = (char)0;
+  Mock.fwk_is_delayed_response_list_empty_CallbackBool = (char)0;
+  Mock.fwk_is_delayed_response_list_empty_CallbackFunctionPointer = Callback;
+}
+
+void fwk_is_delayed_response_list_empty_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t id, bool* is_empty, int is_empty_Depth, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_is_delayed_response_list_empty_CALL_INSTANCE));
+  CMOCK_fwk_is_delayed_response_list_empty_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_is_delayed_response_list_empty_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_is_delayed_response_list_empty_CallInstance = CMock_Guts_MemChain(Mock.fwk_is_delayed_response_list_empty_CallInstance, cmock_guts_index);
+  Mock.fwk_is_delayed_response_list_empty_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_fwk_is_delayed_response_list_empty(cmock_call_instance, id, is_empty, is_empty_Depth);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fwk_is_delayed_response_list_empty_CMockReturnMemThruPtr_is_empty(UNITY_LINE_TYPE cmock_line, bool* is_empty, size_t cmock_size)
+{
+  CMOCK_fwk_is_delayed_response_list_empty_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_is_delayed_response_list_empty_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_is_delayed_response_list_empty_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_is_empty_Used = 1;
+  cmock_call_instance->ReturnThruPtr_is_empty_Val = is_empty;
+  cmock_call_instance->ReturnThruPtr_is_empty_Size = cmock_size;
+}
+
+void fwk_is_delayed_response_list_empty_CMockIgnoreArg_id(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_is_delayed_response_list_empty_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_is_delayed_response_list_empty_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_is_delayed_response_list_empty_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_id = 1;
+}
+
+void fwk_is_delayed_response_list_empty_CMockIgnoreArg_is_empty(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_is_delayed_response_list_empty_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_is_delayed_response_list_empty_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_is_delayed_response_list_empty_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_is_empty = 1;
 }
 
 int fwk_get_first_delayed_response(fwk_id_t id, struct fwk_event* event)
@@ -219,29 +586,84 @@ int fwk_get_first_delayed_response(fwk_id_t id, struct fwk_event* event)
   UNITY_SET_DETAIL(CMockString_fwk_get_first_delayed_response);
   cmock_call_instance = (CMOCK_fwk_get_first_delayed_response_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.fwk_get_first_delayed_response_CallInstance);
   Mock.fwk_get_first_delayed_response_CallInstance = CMock_Guts_MemNext(Mock.fwk_get_first_delayed_response_CallInstance);
+  if (Mock.fwk_get_first_delayed_response_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.fwk_get_first_delayed_response_FinalReturn;
+    Mock.fwk_get_first_delayed_response_FinalReturn = cmock_call_instance->ReturnVal;
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.fwk_get_first_delayed_response_CallbackBool &&
+      Mock.fwk_get_first_delayed_response_CallbackFunctionPointer != NULL)
+  {
+    int cmock_cb_ret = Mock.fwk_get_first_delayed_response_CallbackFunctionPointer(id, event, Mock.fwk_get_first_delayed_response_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
   cmock_line = cmock_call_instance->LineNumber;
   if (!cmock_call_instance->ExpectAnyArgsBool)
   {
+  if (!cmock_call_instance->IgnoreArg_id)
   {
     UNITY_SET_DETAILS(CMockString_fwk_get_first_delayed_response,CMockString_id);
     UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_id), (void*)(&id), sizeof(fwk_id_t), cmock_line, CMockStringMismatch);
   }
+  if (!cmock_call_instance->IgnoreArg_event)
   {
     UNITY_SET_DETAILS(CMockString_fwk_get_first_delayed_response,CMockString_event);
-    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(cmock_call_instance->Expected_event), (void*)(event), sizeof(struct fwk_event), cmock_line, CMockStringMismatch);
+    if (cmock_call_instance->Expected_event == NULL)
+      { UNITY_TEST_ASSERT_NULL(event, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_event), (void*)(event), sizeof(struct fwk_event), cmock_call_instance->Expected_event_Depth, cmock_line, CMockStringMismatch); }
   }
+  }
+  if (Mock.fwk_get_first_delayed_response_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.fwk_get_first_delayed_response_CallbackFunctionPointer(id, event, Mock.fwk_get_first_delayed_response_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_event_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(event, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)event, (void*)cmock_call_instance->ReturnThruPtr_event_Val,
+      cmock_call_instance->ReturnThruPtr_event_Size);
   }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
 }
 
-void CMockExpectParameters_fwk_get_first_delayed_response(CMOCK_fwk_get_first_delayed_response_CALL_INSTANCE* cmock_call_instance, fwk_id_t id, struct fwk_event* event);
-void CMockExpectParameters_fwk_get_first_delayed_response(CMOCK_fwk_get_first_delayed_response_CALL_INSTANCE* cmock_call_instance, fwk_id_t id, struct fwk_event* event)
+void CMockExpectParameters_fwk_get_first_delayed_response(CMOCK_fwk_get_first_delayed_response_CALL_INSTANCE* cmock_call_instance, fwk_id_t id, struct fwk_event* event, int event_Depth);
+void CMockExpectParameters_fwk_get_first_delayed_response(CMOCK_fwk_get_first_delayed_response_CALL_INSTANCE* cmock_call_instance, fwk_id_t id, struct fwk_event* event, int event_Depth)
 {
   memcpy((void*)(&cmock_call_instance->Expected_id), (void*)(&id),
          sizeof(fwk_id_t[sizeof(id) == sizeof(fwk_id_t) ? 1 : -1])); /* add fwk_id_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_id = 0;
   cmock_call_instance->Expected_event = event;
+  cmock_call_instance->Expected_event_Depth = event_Depth;
+  cmock_call_instance->IgnoreArg_event = 0;
+  cmock_call_instance->ReturnThruPtr_event_Used = 0;
+}
+
+void fwk_get_first_delayed_response_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_get_first_delayed_response_CALL_INSTANCE));
+  CMOCK_fwk_get_first_delayed_response_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_get_first_delayed_response_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_get_first_delayed_response_CallInstance = CMock_Guts_MemChain(Mock.fwk_get_first_delayed_response_CallInstance, cmock_guts_index);
+  Mock.fwk_get_first_delayed_response_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.fwk_get_first_delayed_response_IgnoreBool = (char)1;
+}
+
+void fwk_get_first_delayed_response_CMockStopIgnore(void)
+{
+  if(Mock.fwk_get_first_delayed_response_IgnoreBool)
+    Mock.fwk_get_first_delayed_response_CallInstance = CMock_Guts_MemNext(Mock.fwk_get_first_delayed_response_CallInstance);
+  Mock.fwk_get_first_delayed_response_IgnoreBool = (char)0;
 }
 
 void fwk_get_first_delayed_response_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
@@ -251,6 +673,7 @@ void fwk_get_first_delayed_response_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE 
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_get_first_delayed_response_CallInstance = CMock_Guts_MemChain(Mock.fwk_get_first_delayed_response_CallInstance, cmock_guts_index);
+  Mock.fwk_get_first_delayed_response_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
   cmock_call_instance->ReturnVal = cmock_to_return;
@@ -264,9 +687,61 @@ void fwk_get_first_delayed_response_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_l
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
   memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
   Mock.fwk_get_first_delayed_response_CallInstance = CMock_Guts_MemChain(Mock.fwk_get_first_delayed_response_CallInstance, cmock_guts_index);
+  Mock.fwk_get_first_delayed_response_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
-  CMockExpectParameters_fwk_get_first_delayed_response(cmock_call_instance, id, event);
+  CMockExpectParameters_fwk_get_first_delayed_response(cmock_call_instance, id, event, 1);
   cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fwk_get_first_delayed_response_AddCallback(CMOCK_fwk_get_first_delayed_response_CALLBACK Callback)
+{
+  Mock.fwk_get_first_delayed_response_IgnoreBool = (char)0;
+  Mock.fwk_get_first_delayed_response_CallbackBool = (char)1;
+  Mock.fwk_get_first_delayed_response_CallbackFunctionPointer = Callback;
+}
+
+void fwk_get_first_delayed_response_Stub(CMOCK_fwk_get_first_delayed_response_CALLBACK Callback)
+{
+  Mock.fwk_get_first_delayed_response_IgnoreBool = (char)0;
+  Mock.fwk_get_first_delayed_response_CallbackBool = (char)0;
+  Mock.fwk_get_first_delayed_response_CallbackFunctionPointer = Callback;
+}
+
+void fwk_get_first_delayed_response_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t id, struct fwk_event* event, int event_Depth, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_fwk_get_first_delayed_response_CALL_INSTANCE));
+  CMOCK_fwk_get_first_delayed_response_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_get_first_delayed_response_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.fwk_get_first_delayed_response_CallInstance = CMock_Guts_MemChain(Mock.fwk_get_first_delayed_response_CallInstance, cmock_guts_index);
+  Mock.fwk_get_first_delayed_response_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_fwk_get_first_delayed_response(cmock_call_instance, id, event, event_Depth);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void fwk_get_first_delayed_response_CMockReturnMemThruPtr_event(UNITY_LINE_TYPE cmock_line, struct fwk_event* event, size_t cmock_size)
+{
+  CMOCK_fwk_get_first_delayed_response_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_get_first_delayed_response_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_get_first_delayed_response_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_event_Used = 1;
+  cmock_call_instance->ReturnThruPtr_event_Val = event;
+  cmock_call_instance->ReturnThruPtr_event_Size = cmock_size;
+}
+
+void fwk_get_first_delayed_response_CMockIgnoreArg_id(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_get_first_delayed_response_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_get_first_delayed_response_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_get_first_delayed_response_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_id = 1;
+}
+
+void fwk_get_first_delayed_response_CMockIgnoreArg_event(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_fwk_get_first_delayed_response_CALL_INSTANCE* cmock_call_instance = (CMOCK_fwk_get_first_delayed_response_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.fwk_get_first_delayed_response_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_event = 1;
 }
 

@@ -24,18 +24,76 @@ void Mockfwk_string_Verify(void);
 
 
 
+#define fwk_str_memset_Ignore() fwk_str_memset_CMockIgnore()
+void fwk_str_memset_CMockIgnore(void);
+#define fwk_str_memset_StopIgnore() fwk_str_memset_CMockStopIgnore()
+void fwk_str_memset_CMockStopIgnore(void);
 #define fwk_str_memset_ExpectAnyArgs() fwk_str_memset_CMockExpectAnyArgs(__LINE__)
 void fwk_str_memset_CMockExpectAnyArgs(UNITY_LINE_TYPE cmock_line);
 #define fwk_str_memset_Expect(dest, ch, count) fwk_str_memset_CMockExpect(__LINE__, dest, ch, count)
 void fwk_str_memset_CMockExpect(UNITY_LINE_TYPE cmock_line, void* dest, int ch, size_t count);
+typedef void (* CMOCK_fwk_str_memset_CALLBACK)(void* dest, int ch, size_t count, int cmock_num_calls);
+void fwk_str_memset_AddCallback(CMOCK_fwk_str_memset_CALLBACK Callback);
+void fwk_str_memset_Stub(CMOCK_fwk_str_memset_CALLBACK Callback);
+#define fwk_str_memset_StubWithCallback fwk_str_memset_Stub
+#define fwk_str_memset_ExpectWithArray(dest, dest_Depth, ch, count) fwk_str_memset_CMockExpectWithArray(__LINE__, dest, dest_Depth, ch, count)
+void fwk_str_memset_CMockExpectWithArray(UNITY_LINE_TYPE cmock_line, void* dest, int dest_Depth, int ch, size_t count);
+#define fwk_str_memset_ReturnThruPtr_dest(dest) fwk_str_memset_CMockReturnMemThruPtr_dest(__LINE__, dest, sizeof(void))
+#define fwk_str_memset_ReturnArrayThruPtr_dest(dest, cmock_len) fwk_str_memset_CMockReturnMemThruPtr_dest(__LINE__, dest, cmock_len * sizeof(*dest))
+#define fwk_str_memset_ReturnMemThruPtr_dest(dest, cmock_size) fwk_str_memset_CMockReturnMemThruPtr_dest(__LINE__, dest, cmock_size)
+void fwk_str_memset_CMockReturnMemThruPtr_dest(UNITY_LINE_TYPE cmock_line, void* dest, size_t cmock_size);
+#define fwk_str_memset_IgnoreArg_dest() fwk_str_memset_CMockIgnoreArg_dest(__LINE__)
+void fwk_str_memset_CMockIgnoreArg_dest(UNITY_LINE_TYPE cmock_line);
+#define fwk_str_memset_IgnoreArg_ch() fwk_str_memset_CMockIgnoreArg_ch(__LINE__)
+void fwk_str_memset_CMockIgnoreArg_ch(UNITY_LINE_TYPE cmock_line);
+#define fwk_str_memset_IgnoreArg_count() fwk_str_memset_CMockIgnoreArg_count(__LINE__)
+void fwk_str_memset_CMockIgnoreArg_count(UNITY_LINE_TYPE cmock_line);
+#define fwk_str_memcpy_Ignore() fwk_str_memcpy_CMockIgnore()
+void fwk_str_memcpy_CMockIgnore(void);
+#define fwk_str_memcpy_StopIgnore() fwk_str_memcpy_CMockStopIgnore()
+void fwk_str_memcpy_CMockStopIgnore(void);
 #define fwk_str_memcpy_ExpectAnyArgs() fwk_str_memcpy_CMockExpectAnyArgs(__LINE__)
 void fwk_str_memcpy_CMockExpectAnyArgs(UNITY_LINE_TYPE cmock_line);
 #define fwk_str_memcpy_Expect(dest, src, count) fwk_str_memcpy_CMockExpect(__LINE__, dest, src, count)
 void fwk_str_memcpy_CMockExpect(UNITY_LINE_TYPE cmock_line, void* dest, const void* src, size_t count);
+typedef void (* CMOCK_fwk_str_memcpy_CALLBACK)(void* dest, const void* src, size_t count, int cmock_num_calls);
+void fwk_str_memcpy_AddCallback(CMOCK_fwk_str_memcpy_CALLBACK Callback);
+void fwk_str_memcpy_Stub(CMOCK_fwk_str_memcpy_CALLBACK Callback);
+#define fwk_str_memcpy_StubWithCallback fwk_str_memcpy_Stub
+#define fwk_str_memcpy_ExpectWithArray(dest, dest_Depth, src, src_Depth, count) fwk_str_memcpy_CMockExpectWithArray(__LINE__, dest, dest_Depth, src, src_Depth, count)
+void fwk_str_memcpy_CMockExpectWithArray(UNITY_LINE_TYPE cmock_line, void* dest, int dest_Depth, const void* src, int src_Depth, size_t count);
+#define fwk_str_memcpy_ReturnThruPtr_dest(dest) fwk_str_memcpy_CMockReturnMemThruPtr_dest(__LINE__, dest, sizeof(void))
+#define fwk_str_memcpy_ReturnArrayThruPtr_dest(dest, cmock_len) fwk_str_memcpy_CMockReturnMemThruPtr_dest(__LINE__, dest, cmock_len * sizeof(*dest))
+#define fwk_str_memcpy_ReturnMemThruPtr_dest(dest, cmock_size) fwk_str_memcpy_CMockReturnMemThruPtr_dest(__LINE__, dest, cmock_size)
+void fwk_str_memcpy_CMockReturnMemThruPtr_dest(UNITY_LINE_TYPE cmock_line, void* dest, size_t cmock_size);
+#define fwk_str_memcpy_IgnoreArg_dest() fwk_str_memcpy_CMockIgnoreArg_dest(__LINE__)
+void fwk_str_memcpy_CMockIgnoreArg_dest(UNITY_LINE_TYPE cmock_line);
+#define fwk_str_memcpy_IgnoreArg_src() fwk_str_memcpy_CMockIgnoreArg_src(__LINE__)
+void fwk_str_memcpy_CMockIgnoreArg_src(UNITY_LINE_TYPE cmock_line);
+#define fwk_str_memcpy_IgnoreArg_count() fwk_str_memcpy_CMockIgnoreArg_count(__LINE__)
+void fwk_str_memcpy_CMockIgnoreArg_count(UNITY_LINE_TYPE cmock_line);
+#define fwk_str_strncpy_Ignore() fwk_str_strncpy_CMockIgnore()
+void fwk_str_strncpy_CMockIgnore(void);
+#define fwk_str_strncpy_StopIgnore() fwk_str_strncpy_CMockStopIgnore()
+void fwk_str_strncpy_CMockStopIgnore(void);
 #define fwk_str_strncpy_ExpectAnyArgs() fwk_str_strncpy_CMockExpectAnyArgs(__LINE__)
 void fwk_str_strncpy_CMockExpectAnyArgs(UNITY_LINE_TYPE cmock_line);
 #define fwk_str_strncpy_Expect(dest, src, count) fwk_str_strncpy_CMockExpect(__LINE__, dest, src, count)
 void fwk_str_strncpy_CMockExpect(UNITY_LINE_TYPE cmock_line, char* dest, const char* src, size_t count);
+typedef void (* CMOCK_fwk_str_strncpy_CALLBACK)(char* dest, const char* src, size_t count, int cmock_num_calls);
+void fwk_str_strncpy_AddCallback(CMOCK_fwk_str_strncpy_CALLBACK Callback);
+void fwk_str_strncpy_Stub(CMOCK_fwk_str_strncpy_CALLBACK Callback);
+#define fwk_str_strncpy_StubWithCallback fwk_str_strncpy_Stub
+#define fwk_str_strncpy_ReturnThruPtr_dest(dest) fwk_str_strncpy_CMockReturnMemThruPtr_dest(__LINE__, dest, sizeof(char))
+#define fwk_str_strncpy_ReturnArrayThruPtr_dest(dest, cmock_len) fwk_str_strncpy_CMockReturnMemThruPtr_dest(__LINE__, dest, cmock_len * sizeof(*dest))
+#define fwk_str_strncpy_ReturnMemThruPtr_dest(dest, cmock_size) fwk_str_strncpy_CMockReturnMemThruPtr_dest(__LINE__, dest, cmock_size)
+void fwk_str_strncpy_CMockReturnMemThruPtr_dest(UNITY_LINE_TYPE cmock_line, char* dest, size_t cmock_size);
+#define fwk_str_strncpy_IgnoreArg_dest() fwk_str_strncpy_CMockIgnoreArg_dest(__LINE__)
+void fwk_str_strncpy_CMockIgnoreArg_dest(UNITY_LINE_TYPE cmock_line);
+#define fwk_str_strncpy_IgnoreArg_src() fwk_str_strncpy_CMockIgnoreArg_src(__LINE__)
+void fwk_str_strncpy_CMockIgnoreArg_src(UNITY_LINE_TYPE cmock_line);
+#define fwk_str_strncpy_IgnoreArg_count() fwk_str_strncpy_CMockIgnoreArg_count(__LINE__)
+void fwk_str_strncpy_CMockIgnoreArg_count(UNITY_LINE_TYPE cmock_line);
 
 #if defined(__GNUC__) && !defined(__ICC) && !defined(__TMS470__)
 #if __GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 6 || (__GNUC_MINOR__ == 6 && __GNUC_PATCHLEVEL__ > 0)))
