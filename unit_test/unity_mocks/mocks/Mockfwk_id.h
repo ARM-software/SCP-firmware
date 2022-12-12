@@ -24,70 +24,240 @@ void Mockfwk_id_Verify(void);
 
 
 
+#define fwk_id_type_is_valid_IgnoreAndReturn(cmock_retval) fwk_id_type_is_valid_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_id_type_is_valid_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return);
+#define fwk_id_type_is_valid_StopIgnore() fwk_id_type_is_valid_CMockStopIgnore()
+void fwk_id_type_is_valid_CMockStopIgnore(void);
 #define fwk_id_type_is_valid_ExpectAnyArgsAndReturn(cmock_retval) fwk_id_type_is_valid_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_id_type_is_valid_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return);
 #define fwk_id_type_is_valid_ExpectAndReturn(id, cmock_retval) fwk_id_type_is_valid_CMockExpectAndReturn(__LINE__, id, cmock_retval)
 void fwk_id_type_is_valid_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t id, bool cmock_to_return);
+typedef bool (* CMOCK_fwk_id_type_is_valid_CALLBACK)(fwk_id_t id, int cmock_num_calls);
+void fwk_id_type_is_valid_AddCallback(CMOCK_fwk_id_type_is_valid_CALLBACK Callback);
+void fwk_id_type_is_valid_Stub(CMOCK_fwk_id_type_is_valid_CALLBACK Callback);
+#define fwk_id_type_is_valid_StubWithCallback fwk_id_type_is_valid_Stub
+#define fwk_id_type_is_valid_IgnoreArg_id() fwk_id_type_is_valid_CMockIgnoreArg_id(__LINE__)
+void fwk_id_type_is_valid_CMockIgnoreArg_id(UNITY_LINE_TYPE cmock_line);
+#define fwk_id_is_type_IgnoreAndReturn(cmock_retval) fwk_id_is_type_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_id_is_type_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return);
+#define fwk_id_is_type_StopIgnore() fwk_id_is_type_CMockStopIgnore()
+void fwk_id_is_type_CMockStopIgnore(void);
 #define fwk_id_is_type_ExpectAnyArgsAndReturn(cmock_retval) fwk_id_is_type_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_id_is_type_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return);
 #define fwk_id_is_type_ExpectAndReturn(id, type, cmock_retval) fwk_id_is_type_CMockExpectAndReturn(__LINE__, id, type, cmock_retval)
 void fwk_id_is_type_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t id, enum fwk_id_type type, bool cmock_to_return);
+typedef bool (* CMOCK_fwk_id_is_type_CALLBACK)(fwk_id_t id, enum fwk_id_type type, int cmock_num_calls);
+void fwk_id_is_type_AddCallback(CMOCK_fwk_id_is_type_CALLBACK Callback);
+void fwk_id_is_type_Stub(CMOCK_fwk_id_is_type_CALLBACK Callback);
+#define fwk_id_is_type_StubWithCallback fwk_id_is_type_Stub
+#define fwk_id_is_type_IgnoreArg_id() fwk_id_is_type_CMockIgnoreArg_id(__LINE__)
+void fwk_id_is_type_CMockIgnoreArg_id(UNITY_LINE_TYPE cmock_line);
+#define fwk_id_is_type_IgnoreArg_type() fwk_id_is_type_CMockIgnoreArg_type(__LINE__)
+void fwk_id_is_type_CMockIgnoreArg_type(UNITY_LINE_TYPE cmock_line);
+#define fwk_id_get_type_IgnoreAndReturn(cmock_retval) fwk_id_get_type_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_id_get_type_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, enum fwk_id_type cmock_to_return);
+#define fwk_id_get_type_StopIgnore() fwk_id_get_type_CMockStopIgnore()
+void fwk_id_get_type_CMockStopIgnore(void);
 #define fwk_id_get_type_ExpectAnyArgsAndReturn(cmock_retval) fwk_id_get_type_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_id_get_type_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, enum fwk_id_type cmock_to_return);
 #define fwk_id_get_type_ExpectAndReturn(id, cmock_retval) fwk_id_get_type_CMockExpectAndReturn(__LINE__, id, cmock_retval)
 void fwk_id_get_type_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t id, enum fwk_id_type cmock_to_return);
+typedef enum fwk_id_type (* CMOCK_fwk_id_get_type_CALLBACK)(fwk_id_t id, int cmock_num_calls);
+void fwk_id_get_type_AddCallback(CMOCK_fwk_id_get_type_CALLBACK Callback);
+void fwk_id_get_type_Stub(CMOCK_fwk_id_get_type_CALLBACK Callback);
+#define fwk_id_get_type_StubWithCallback fwk_id_get_type_Stub
+#define fwk_id_get_type_IgnoreArg_id() fwk_id_get_type_CMockIgnoreArg_id(__LINE__)
+void fwk_id_get_type_CMockIgnoreArg_id(UNITY_LINE_TYPE cmock_line);
+#define fwk_id_is_equal_IgnoreAndReturn(cmock_retval) fwk_id_is_equal_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_id_is_equal_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return);
+#define fwk_id_is_equal_StopIgnore() fwk_id_is_equal_CMockStopIgnore()
+void fwk_id_is_equal_CMockStopIgnore(void);
 #define fwk_id_is_equal_ExpectAnyArgsAndReturn(cmock_retval) fwk_id_is_equal_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_id_is_equal_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return);
 #define fwk_id_is_equal_ExpectAndReturn(left, right, cmock_retval) fwk_id_is_equal_CMockExpectAndReturn(__LINE__, left, right, cmock_retval)
 void fwk_id_is_equal_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t left, fwk_id_t right, bool cmock_to_return);
+typedef bool (* CMOCK_fwk_id_is_equal_CALLBACK)(fwk_id_t left, fwk_id_t right, int cmock_num_calls);
+void fwk_id_is_equal_AddCallback(CMOCK_fwk_id_is_equal_CALLBACK Callback);
+void fwk_id_is_equal_Stub(CMOCK_fwk_id_is_equal_CALLBACK Callback);
+#define fwk_id_is_equal_StubWithCallback fwk_id_is_equal_Stub
+#define fwk_id_is_equal_IgnoreArg_left() fwk_id_is_equal_CMockIgnoreArg_left(__LINE__)
+void fwk_id_is_equal_CMockIgnoreArg_left(UNITY_LINE_TYPE cmock_line);
+#define fwk_id_is_equal_IgnoreArg_right() fwk_id_is_equal_CMockIgnoreArg_right(__LINE__)
+void fwk_id_is_equal_CMockIgnoreArg_right(UNITY_LINE_TYPE cmock_line);
+#define fwk_optional_id_is_defined_IgnoreAndReturn(cmock_retval) fwk_optional_id_is_defined_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_optional_id_is_defined_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return);
+#define fwk_optional_id_is_defined_StopIgnore() fwk_optional_id_is_defined_CMockStopIgnore()
+void fwk_optional_id_is_defined_CMockStopIgnore(void);
 #define fwk_optional_id_is_defined_ExpectAnyArgsAndReturn(cmock_retval) fwk_optional_id_is_defined_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_optional_id_is_defined_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return);
 #define fwk_optional_id_is_defined_ExpectAndReturn(id, cmock_retval) fwk_optional_id_is_defined_CMockExpectAndReturn(__LINE__, id, cmock_retval)
 void fwk_optional_id_is_defined_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_optional_id_t id, bool cmock_to_return);
+typedef bool (* CMOCK_fwk_optional_id_is_defined_CALLBACK)(fwk_optional_id_t id, int cmock_num_calls);
+void fwk_optional_id_is_defined_AddCallback(CMOCK_fwk_optional_id_is_defined_CALLBACK Callback);
+void fwk_optional_id_is_defined_Stub(CMOCK_fwk_optional_id_is_defined_CALLBACK Callback);
+#define fwk_optional_id_is_defined_StubWithCallback fwk_optional_id_is_defined_Stub
+#define fwk_optional_id_is_defined_IgnoreArg_id() fwk_optional_id_is_defined_CMockIgnoreArg_id(__LINE__)
+void fwk_optional_id_is_defined_CMockIgnoreArg_id(UNITY_LINE_TYPE cmock_line);
+#define fwk_id_build_module_id_IgnoreAndReturn(cmock_retval) fwk_id_build_module_id_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_id_build_module_id_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t cmock_to_return);
+#define fwk_id_build_module_id_StopIgnore() fwk_id_build_module_id_CMockStopIgnore()
+void fwk_id_build_module_id_CMockStopIgnore(void);
 #define fwk_id_build_module_id_ExpectAnyArgsAndReturn(cmock_retval) fwk_id_build_module_id_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_id_build_module_id_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t cmock_to_return);
 #define fwk_id_build_module_id_ExpectAndReturn(id, cmock_retval) fwk_id_build_module_id_CMockExpectAndReturn(__LINE__, id, cmock_retval)
 void fwk_id_build_module_id_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t id, fwk_id_t cmock_to_return);
+typedef fwk_id_t (* CMOCK_fwk_id_build_module_id_CALLBACK)(fwk_id_t id, int cmock_num_calls);
+void fwk_id_build_module_id_AddCallback(CMOCK_fwk_id_build_module_id_CALLBACK Callback);
+void fwk_id_build_module_id_Stub(CMOCK_fwk_id_build_module_id_CALLBACK Callback);
+#define fwk_id_build_module_id_StubWithCallback fwk_id_build_module_id_Stub
+#define fwk_id_build_module_id_IgnoreArg_id() fwk_id_build_module_id_CMockIgnoreArg_id(__LINE__)
+void fwk_id_build_module_id_CMockIgnoreArg_id(UNITY_LINE_TYPE cmock_line);
+#define fwk_id_build_element_id_IgnoreAndReturn(cmock_retval) fwk_id_build_element_id_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_id_build_element_id_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t cmock_to_return);
+#define fwk_id_build_element_id_StopIgnore() fwk_id_build_element_id_CMockStopIgnore()
+void fwk_id_build_element_id_CMockStopIgnore(void);
 #define fwk_id_build_element_id_ExpectAnyArgsAndReturn(cmock_retval) fwk_id_build_element_id_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_id_build_element_id_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t cmock_to_return);
 #define fwk_id_build_element_id_ExpectAndReturn(id, element_idx, cmock_retval) fwk_id_build_element_id_CMockExpectAndReturn(__LINE__, id, element_idx, cmock_retval)
 void fwk_id_build_element_id_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t id, unsigned int element_idx, fwk_id_t cmock_to_return);
+typedef fwk_id_t (* CMOCK_fwk_id_build_element_id_CALLBACK)(fwk_id_t id, unsigned int element_idx, int cmock_num_calls);
+void fwk_id_build_element_id_AddCallback(CMOCK_fwk_id_build_element_id_CALLBACK Callback);
+void fwk_id_build_element_id_Stub(CMOCK_fwk_id_build_element_id_CALLBACK Callback);
+#define fwk_id_build_element_id_StubWithCallback fwk_id_build_element_id_Stub
+#define fwk_id_build_element_id_IgnoreArg_id() fwk_id_build_element_id_CMockIgnoreArg_id(__LINE__)
+void fwk_id_build_element_id_CMockIgnoreArg_id(UNITY_LINE_TYPE cmock_line);
+#define fwk_id_build_element_id_IgnoreArg_element_idx() fwk_id_build_element_id_CMockIgnoreArg_element_idx(__LINE__)
+void fwk_id_build_element_id_CMockIgnoreArg_element_idx(UNITY_LINE_TYPE cmock_line);
+#define fwk_id_build_sub_element_id_IgnoreAndReturn(cmock_retval) fwk_id_build_sub_element_id_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_id_build_sub_element_id_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t cmock_to_return);
+#define fwk_id_build_sub_element_id_StopIgnore() fwk_id_build_sub_element_id_CMockStopIgnore()
+void fwk_id_build_sub_element_id_CMockStopIgnore(void);
 #define fwk_id_build_sub_element_id_ExpectAnyArgsAndReturn(cmock_retval) fwk_id_build_sub_element_id_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_id_build_sub_element_id_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t cmock_to_return);
 #define fwk_id_build_sub_element_id_ExpectAndReturn(id, sub_element_idx, cmock_retval) fwk_id_build_sub_element_id_CMockExpectAndReturn(__LINE__, id, sub_element_idx, cmock_retval)
 void fwk_id_build_sub_element_id_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t id, unsigned int sub_element_idx, fwk_id_t cmock_to_return);
+typedef fwk_id_t (* CMOCK_fwk_id_build_sub_element_id_CALLBACK)(fwk_id_t id, unsigned int sub_element_idx, int cmock_num_calls);
+void fwk_id_build_sub_element_id_AddCallback(CMOCK_fwk_id_build_sub_element_id_CALLBACK Callback);
+void fwk_id_build_sub_element_id_Stub(CMOCK_fwk_id_build_sub_element_id_CALLBACK Callback);
+#define fwk_id_build_sub_element_id_StubWithCallback fwk_id_build_sub_element_id_Stub
+#define fwk_id_build_sub_element_id_IgnoreArg_id() fwk_id_build_sub_element_id_CMockIgnoreArg_id(__LINE__)
+void fwk_id_build_sub_element_id_CMockIgnoreArg_id(UNITY_LINE_TYPE cmock_line);
+#define fwk_id_build_sub_element_id_IgnoreArg_sub_element_idx() fwk_id_build_sub_element_id_CMockIgnoreArg_sub_element_idx(__LINE__)
+void fwk_id_build_sub_element_id_CMockIgnoreArg_sub_element_idx(UNITY_LINE_TYPE cmock_line);
+#define fwk_id_build_api_id_IgnoreAndReturn(cmock_retval) fwk_id_build_api_id_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_id_build_api_id_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t cmock_to_return);
+#define fwk_id_build_api_id_StopIgnore() fwk_id_build_api_id_CMockStopIgnore()
+void fwk_id_build_api_id_CMockStopIgnore(void);
 #define fwk_id_build_api_id_ExpectAnyArgsAndReturn(cmock_retval) fwk_id_build_api_id_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_id_build_api_id_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t cmock_to_return);
 #define fwk_id_build_api_id_ExpectAndReturn(id, api_idx, cmock_retval) fwk_id_build_api_id_CMockExpectAndReturn(__LINE__, id, api_idx, cmock_retval)
 void fwk_id_build_api_id_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t id, unsigned int api_idx, fwk_id_t cmock_to_return);
+typedef fwk_id_t (* CMOCK_fwk_id_build_api_id_CALLBACK)(fwk_id_t id, unsigned int api_idx, int cmock_num_calls);
+void fwk_id_build_api_id_AddCallback(CMOCK_fwk_id_build_api_id_CALLBACK Callback);
+void fwk_id_build_api_id_Stub(CMOCK_fwk_id_build_api_id_CALLBACK Callback);
+#define fwk_id_build_api_id_StubWithCallback fwk_id_build_api_id_Stub
+#define fwk_id_build_api_id_IgnoreArg_id() fwk_id_build_api_id_CMockIgnoreArg_id(__LINE__)
+void fwk_id_build_api_id_CMockIgnoreArg_id(UNITY_LINE_TYPE cmock_line);
+#define fwk_id_build_api_id_IgnoreArg_api_idx() fwk_id_build_api_id_CMockIgnoreArg_api_idx(__LINE__)
+void fwk_id_build_api_id_CMockIgnoreArg_api_idx(UNITY_LINE_TYPE cmock_line);
+#define fwk_id_get_module_idx_IgnoreAndReturn(cmock_retval) fwk_id_get_module_idx_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_id_get_module_idx_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int cmock_to_return);
+#define fwk_id_get_module_idx_StopIgnore() fwk_id_get_module_idx_CMockStopIgnore()
+void fwk_id_get_module_idx_CMockStopIgnore(void);
 #define fwk_id_get_module_idx_ExpectAnyArgsAndReturn(cmock_retval) fwk_id_get_module_idx_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_id_get_module_idx_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int cmock_to_return);
 #define fwk_id_get_module_idx_ExpectAndReturn(id, cmock_retval) fwk_id_get_module_idx_CMockExpectAndReturn(__LINE__, id, cmock_retval)
 void fwk_id_get_module_idx_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t id, unsigned int cmock_to_return);
+typedef unsigned int (* CMOCK_fwk_id_get_module_idx_CALLBACK)(fwk_id_t id, int cmock_num_calls);
+void fwk_id_get_module_idx_AddCallback(CMOCK_fwk_id_get_module_idx_CALLBACK Callback);
+void fwk_id_get_module_idx_Stub(CMOCK_fwk_id_get_module_idx_CALLBACK Callback);
+#define fwk_id_get_module_idx_StubWithCallback fwk_id_get_module_idx_Stub
+#define fwk_id_get_module_idx_IgnoreArg_id() fwk_id_get_module_idx_CMockIgnoreArg_id(__LINE__)
+void fwk_id_get_module_idx_CMockIgnoreArg_id(UNITY_LINE_TYPE cmock_line);
+#define fwk_id_get_element_idx_IgnoreAndReturn(cmock_retval) fwk_id_get_element_idx_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_id_get_element_idx_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int cmock_to_return);
+#define fwk_id_get_element_idx_StopIgnore() fwk_id_get_element_idx_CMockStopIgnore()
+void fwk_id_get_element_idx_CMockStopIgnore(void);
 #define fwk_id_get_element_idx_ExpectAnyArgsAndReturn(cmock_retval) fwk_id_get_element_idx_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_id_get_element_idx_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int cmock_to_return);
 #define fwk_id_get_element_idx_ExpectAndReturn(element_id, cmock_retval) fwk_id_get_element_idx_CMockExpectAndReturn(__LINE__, element_id, cmock_retval)
 void fwk_id_get_element_idx_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t element_id, unsigned int cmock_to_return);
+typedef unsigned int (* CMOCK_fwk_id_get_element_idx_CALLBACK)(fwk_id_t element_id, int cmock_num_calls);
+void fwk_id_get_element_idx_AddCallback(CMOCK_fwk_id_get_element_idx_CALLBACK Callback);
+void fwk_id_get_element_idx_Stub(CMOCK_fwk_id_get_element_idx_CALLBACK Callback);
+#define fwk_id_get_element_idx_StubWithCallback fwk_id_get_element_idx_Stub
+#define fwk_id_get_element_idx_IgnoreArg_element_id() fwk_id_get_element_idx_CMockIgnoreArg_element_id(__LINE__)
+void fwk_id_get_element_idx_CMockIgnoreArg_element_id(UNITY_LINE_TYPE cmock_line);
+#define fwk_id_get_sub_element_idx_IgnoreAndReturn(cmock_retval) fwk_id_get_sub_element_idx_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_id_get_sub_element_idx_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int cmock_to_return);
+#define fwk_id_get_sub_element_idx_StopIgnore() fwk_id_get_sub_element_idx_CMockStopIgnore()
+void fwk_id_get_sub_element_idx_CMockStopIgnore(void);
 #define fwk_id_get_sub_element_idx_ExpectAnyArgsAndReturn(cmock_retval) fwk_id_get_sub_element_idx_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_id_get_sub_element_idx_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int cmock_to_return);
 #define fwk_id_get_sub_element_idx_ExpectAndReturn(sub_element_id, cmock_retval) fwk_id_get_sub_element_idx_CMockExpectAndReturn(__LINE__, sub_element_id, cmock_retval)
 void fwk_id_get_sub_element_idx_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t sub_element_id, unsigned int cmock_to_return);
+typedef unsigned int (* CMOCK_fwk_id_get_sub_element_idx_CALLBACK)(fwk_id_t sub_element_id, int cmock_num_calls);
+void fwk_id_get_sub_element_idx_AddCallback(CMOCK_fwk_id_get_sub_element_idx_CALLBACK Callback);
+void fwk_id_get_sub_element_idx_Stub(CMOCK_fwk_id_get_sub_element_idx_CALLBACK Callback);
+#define fwk_id_get_sub_element_idx_StubWithCallback fwk_id_get_sub_element_idx_Stub
+#define fwk_id_get_sub_element_idx_IgnoreArg_sub_element_id() fwk_id_get_sub_element_idx_CMockIgnoreArg_sub_element_id(__LINE__)
+void fwk_id_get_sub_element_idx_CMockIgnoreArg_sub_element_id(UNITY_LINE_TYPE cmock_line);
+#define fwk_id_get_api_idx_IgnoreAndReturn(cmock_retval) fwk_id_get_api_idx_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_id_get_api_idx_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int cmock_to_return);
+#define fwk_id_get_api_idx_StopIgnore() fwk_id_get_api_idx_CMockStopIgnore()
+void fwk_id_get_api_idx_CMockStopIgnore(void);
 #define fwk_id_get_api_idx_ExpectAnyArgsAndReturn(cmock_retval) fwk_id_get_api_idx_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_id_get_api_idx_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int cmock_to_return);
 #define fwk_id_get_api_idx_ExpectAndReturn(api_id, cmock_retval) fwk_id_get_api_idx_CMockExpectAndReturn(__LINE__, api_id, cmock_retval)
 void fwk_id_get_api_idx_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t api_id, unsigned int cmock_to_return);
+typedef unsigned int (* CMOCK_fwk_id_get_api_idx_CALLBACK)(fwk_id_t api_id, int cmock_num_calls);
+void fwk_id_get_api_idx_AddCallback(CMOCK_fwk_id_get_api_idx_CALLBACK Callback);
+void fwk_id_get_api_idx_Stub(CMOCK_fwk_id_get_api_idx_CALLBACK Callback);
+#define fwk_id_get_api_idx_StubWithCallback fwk_id_get_api_idx_Stub
+#define fwk_id_get_api_idx_IgnoreArg_api_id() fwk_id_get_api_idx_CMockIgnoreArg_api_id(__LINE__)
+void fwk_id_get_api_idx_CMockIgnoreArg_api_id(UNITY_LINE_TYPE cmock_line);
+#define fwk_id_get_event_idx_IgnoreAndReturn(cmock_retval) fwk_id_get_event_idx_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_id_get_event_idx_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int cmock_to_return);
+#define fwk_id_get_event_idx_StopIgnore() fwk_id_get_event_idx_CMockStopIgnore()
+void fwk_id_get_event_idx_CMockStopIgnore(void);
 #define fwk_id_get_event_idx_ExpectAnyArgsAndReturn(cmock_retval) fwk_id_get_event_idx_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_id_get_event_idx_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int cmock_to_return);
 #define fwk_id_get_event_idx_ExpectAndReturn(event_id, cmock_retval) fwk_id_get_event_idx_CMockExpectAndReturn(__LINE__, event_id, cmock_retval)
 void fwk_id_get_event_idx_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t event_id, unsigned int cmock_to_return);
+typedef unsigned int (* CMOCK_fwk_id_get_event_idx_CALLBACK)(fwk_id_t event_id, int cmock_num_calls);
+void fwk_id_get_event_idx_AddCallback(CMOCK_fwk_id_get_event_idx_CALLBACK Callback);
+void fwk_id_get_event_idx_Stub(CMOCK_fwk_id_get_event_idx_CALLBACK Callback);
+#define fwk_id_get_event_idx_StubWithCallback fwk_id_get_event_idx_Stub
+#define fwk_id_get_event_idx_IgnoreArg_event_id() fwk_id_get_event_idx_CMockIgnoreArg_event_id(__LINE__)
+void fwk_id_get_event_idx_CMockIgnoreArg_event_id(UNITY_LINE_TYPE cmock_line);
+#define fwk_id_get_notification_idx_IgnoreAndReturn(cmock_retval) fwk_id_get_notification_idx_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_id_get_notification_idx_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int cmock_to_return);
+#define fwk_id_get_notification_idx_StopIgnore() fwk_id_get_notification_idx_CMockStopIgnore()
+void fwk_id_get_notification_idx_CMockStopIgnore(void);
 #define fwk_id_get_notification_idx_ExpectAnyArgsAndReturn(cmock_retval) fwk_id_get_notification_idx_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_id_get_notification_idx_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int cmock_to_return);
 #define fwk_id_get_notification_idx_ExpectAndReturn(notification_id, cmock_retval) fwk_id_get_notification_idx_CMockExpectAndReturn(__LINE__, notification_id, cmock_retval)
 void fwk_id_get_notification_idx_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t notification_id, unsigned int cmock_to_return);
+typedef unsigned int (* CMOCK_fwk_id_get_notification_idx_CALLBACK)(fwk_id_t notification_id, int cmock_num_calls);
+void fwk_id_get_notification_idx_AddCallback(CMOCK_fwk_id_get_notification_idx_CALLBACK Callback);
+void fwk_id_get_notification_idx_Stub(CMOCK_fwk_id_get_notification_idx_CALLBACK Callback);
+#define fwk_id_get_notification_idx_StubWithCallback fwk_id_get_notification_idx_Stub
+#define fwk_id_get_notification_idx_IgnoreArg_notification_id() fwk_id_get_notification_idx_CMockIgnoreArg_notification_id(__LINE__)
+void fwk_id_get_notification_idx_CMockIgnoreArg_notification_id(UNITY_LINE_TYPE cmock_line);
+#define fwk_id_verbose_str_IgnoreAndReturn(cmock_retval) fwk_id_verbose_str_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_id_verbose_str_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_id_verbose_fmt cmock_to_return);
+#define fwk_id_verbose_str_StopIgnore() fwk_id_verbose_str_CMockStopIgnore()
+void fwk_id_verbose_str_CMockStopIgnore(void);
 #define fwk_id_verbose_str_ExpectAnyArgsAndReturn(cmock_retval) fwk_id_verbose_str_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_id_verbose_str_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_id_verbose_fmt cmock_to_return);
 #define fwk_id_verbose_str_ExpectAndReturn(id, cmock_retval) fwk_id_verbose_str_CMockExpectAndReturn(__LINE__, id, cmock_retval)
 void fwk_id_verbose_str_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t id, struct fwk_id_verbose_fmt cmock_to_return);
+typedef struct fwk_id_verbose_fmt (* CMOCK_fwk_id_verbose_str_CALLBACK)(fwk_id_t id, int cmock_num_calls);
+void fwk_id_verbose_str_AddCallback(CMOCK_fwk_id_verbose_str_CALLBACK Callback);
+void fwk_id_verbose_str_Stub(CMOCK_fwk_id_verbose_str_CALLBACK Callback);
+#define fwk_id_verbose_str_StubWithCallback fwk_id_verbose_str_Stub
+#define fwk_id_verbose_str_IgnoreArg_id() fwk_id_verbose_str_CMockIgnoreArg_id(__LINE__)
+void fwk_id_verbose_str_CMockIgnoreArg_id(UNITY_LINE_TYPE cmock_line);
 
 #if defined(__GNUC__) && !defined(__ICC) && !defined(__TMS470__)
 #if __GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 6 || (__GNUC_MINOR__ == 6 && __GNUC_PATCHLEVEL__ > 0)))

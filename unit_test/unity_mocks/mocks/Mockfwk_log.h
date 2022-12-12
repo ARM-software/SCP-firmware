@@ -24,16 +24,52 @@ void Mockfwk_log_Verify(void);
 
 
 
+#define fwk_log_printf_Ignore() fwk_log_printf_CMockIgnore()
+void fwk_log_printf_CMockIgnore(void);
+#define fwk_log_printf_StopIgnore() fwk_log_printf_CMockStopIgnore()
+void fwk_log_printf_CMockStopIgnore(void);
 #define fwk_log_printf_ExpectAnyArgs() fwk_log_printf_CMockExpectAnyArgs(__LINE__)
 void fwk_log_printf_CMockExpectAnyArgs(UNITY_LINE_TYPE cmock_line);
 #define fwk_log_printf_Expect(format)FWK_PRINTF(1, cmock_arg1) fwk_log_printf_CMockExpect(__LINE__, format)FWK_PRINTF(1, cmock_arg1)
 void fwk_log_printf_CMockExpect(UNITY_LINE_TYPE cmock_line, const char* format)FWK_PRINTF(1, 2 cmock_arg1);
+typedef void (* CMOCK_fwk_log_printf_CALLBACK)(const char* format)FWK_PRINTF(1, 2 cmock_arg1, int cmock_num_calls);
+void fwk_log_printf_AddCallback(CMOCK_fwk_log_printf_CALLBACK Callback);
+void fwk_log_printf_Stub(CMOCK_fwk_log_printf_CALLBACK Callback);
+#define fwk_log_printf_StubWithCallback fwk_log_printf_Stub
+#define fwk_log_printf_IgnoreArg_format)FWK_PRINTF(1() fwk_log_printf_CMockIgnoreArg_format)FWK_PRINTF(1(__LINE__)
+void fwk_log_printf_CMockIgnoreArg_format)FWK_PRINTF(1(UNITY_LINE_TYPE cmock_line);
+#define fwk_log_printf_IgnoreArg_cmock_arg1() fwk_log_printf_CMockIgnoreArg_cmock_arg1(__LINE__)
+void fwk_log_printf_CMockIgnoreArg_cmock_arg1(UNITY_LINE_TYPE cmock_line);
+#define fwk_log_flush_Ignore() fwk_log_flush_CMockIgnore()
+void fwk_log_flush_CMockIgnore(void);
+#define fwk_log_flush_StopIgnore() fwk_log_flush_CMockStopIgnore()
+void fwk_log_flush_CMockStopIgnore(void);
 #define fwk_log_flush_Expect() fwk_log_flush_CMockExpect(__LINE__)
 void fwk_log_flush_CMockExpect(UNITY_LINE_TYPE cmock_line);
+typedef void (* CMOCK_fwk_log_flush_CALLBACK)(int cmock_num_calls);
+void fwk_log_flush_AddCallback(CMOCK_fwk_log_flush_CALLBACK Callback);
+void fwk_log_flush_Stub(CMOCK_fwk_log_flush_CALLBACK Callback);
+#define fwk_log_flush_StubWithCallback fwk_log_flush_Stub
+#define fwk_log_unbuffer_IgnoreAndReturn(cmock_retval) fwk_log_unbuffer_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_log_unbuffer_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define fwk_log_unbuffer_StopIgnore() fwk_log_unbuffer_CMockStopIgnore()
+void fwk_log_unbuffer_CMockStopIgnore(void);
 #define fwk_log_unbuffer_ExpectAndReturn(cmock_retval) fwk_log_unbuffer_CMockExpectAndReturn(__LINE__, cmock_retval)
 void fwk_log_unbuffer_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+typedef int (* CMOCK_fwk_log_unbuffer_CALLBACK)(int cmock_num_calls);
+void fwk_log_unbuffer_AddCallback(CMOCK_fwk_log_unbuffer_CALLBACK Callback);
+void fwk_log_unbuffer_Stub(CMOCK_fwk_log_unbuffer_CALLBACK Callback);
+#define fwk_log_unbuffer_StubWithCallback fwk_log_unbuffer_Stub
+#define fwk_log_init_IgnoreAndReturn(cmock_retval) fwk_log_init_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_log_init_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define fwk_log_init_StopIgnore() fwk_log_init_CMockStopIgnore()
+void fwk_log_init_CMockStopIgnore(void);
 #define fwk_log_init_ExpectAndReturn(cmock_retval) fwk_log_init_CMockExpectAndReturn(__LINE__, cmock_retval)
 void fwk_log_init_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+typedef int (* CMOCK_fwk_log_init_CALLBACK)(int cmock_num_calls);
+void fwk_log_init_AddCallback(CMOCK_fwk_log_init_CALLBACK Callback);
+void fwk_log_init_Stub(CMOCK_fwk_log_init_CALLBACK Callback);
+#define fwk_log_init_StubWithCallback fwk_log_init_Stub
 
 #if defined(__GNUC__) && !defined(__ICC) && !defined(__TMS470__)
 #if __GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 6 || (__GNUC_MINOR__ == 6 && __GNUC_PATCHLEVEL__ > 0)))

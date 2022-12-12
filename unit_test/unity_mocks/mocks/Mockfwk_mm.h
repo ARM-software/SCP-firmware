@@ -24,34 +24,134 @@ void Mockfwk_mm_Verify(void);
 
 
 
+#define fwk_mm_alloc_IgnoreAndReturn(cmock_retval) fwk_mm_alloc_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_mm_alloc_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, void* cmock_to_return);
+#define fwk_mm_alloc_StopIgnore() fwk_mm_alloc_CMockStopIgnore()
+void fwk_mm_alloc_CMockStopIgnore(void);
 #define fwk_mm_alloc_ExpectAnyArgsAndReturn(cmock_retval) fwk_mm_alloc_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_mm_alloc_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, void* cmock_to_return);
 #define fwk_mm_alloc_ExpectAndReturn(num, size, cmock_retval) fwk_mm_alloc_CMockExpectAndReturn(__LINE__, num, size, cmock_retval)
 void fwk_mm_alloc_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, size_t num, size_t size, void* cmock_to_return);
+typedef void* (* CMOCK_fwk_mm_alloc_CALLBACK)(size_t num, size_t size, int cmock_num_calls);
+void fwk_mm_alloc_AddCallback(CMOCK_fwk_mm_alloc_CALLBACK Callback);
+void fwk_mm_alloc_Stub(CMOCK_fwk_mm_alloc_CALLBACK Callback);
+#define fwk_mm_alloc_StubWithCallback fwk_mm_alloc_Stub
+#define fwk_mm_alloc_IgnoreArg_num() fwk_mm_alloc_CMockIgnoreArg_num(__LINE__)
+void fwk_mm_alloc_CMockIgnoreArg_num(UNITY_LINE_TYPE cmock_line);
+#define fwk_mm_alloc_IgnoreArg_size() fwk_mm_alloc_CMockIgnoreArg_size(__LINE__)
+void fwk_mm_alloc_CMockIgnoreArg_size(UNITY_LINE_TYPE cmock_line);
+#define fwk_mm_alloc_notrap_IgnoreAndReturn(cmock_retval) fwk_mm_alloc_notrap_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_mm_alloc_notrap_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, void* cmock_to_return);
+#define fwk_mm_alloc_notrap_StopIgnore() fwk_mm_alloc_notrap_CMockStopIgnore()
+void fwk_mm_alloc_notrap_CMockStopIgnore(void);
 #define fwk_mm_alloc_notrap_ExpectAnyArgsAndReturn(cmock_retval) fwk_mm_alloc_notrap_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_mm_alloc_notrap_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, void* cmock_to_return);
 #define fwk_mm_alloc_notrap_ExpectAndReturn(num, size, cmock_retval) fwk_mm_alloc_notrap_CMockExpectAndReturn(__LINE__, num, size, cmock_retval)
 void fwk_mm_alloc_notrap_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, size_t num, size_t size, void* cmock_to_return);
+typedef void* (* CMOCK_fwk_mm_alloc_notrap_CALLBACK)(size_t num, size_t size, int cmock_num_calls);
+void fwk_mm_alloc_notrap_AddCallback(CMOCK_fwk_mm_alloc_notrap_CALLBACK Callback);
+void fwk_mm_alloc_notrap_Stub(CMOCK_fwk_mm_alloc_notrap_CALLBACK Callback);
+#define fwk_mm_alloc_notrap_StubWithCallback fwk_mm_alloc_notrap_Stub
+#define fwk_mm_alloc_notrap_IgnoreArg_num() fwk_mm_alloc_notrap_CMockIgnoreArg_num(__LINE__)
+void fwk_mm_alloc_notrap_CMockIgnoreArg_num(UNITY_LINE_TYPE cmock_line);
+#define fwk_mm_alloc_notrap_IgnoreArg_size() fwk_mm_alloc_notrap_CMockIgnoreArg_size(__LINE__)
+void fwk_mm_alloc_notrap_CMockIgnoreArg_size(UNITY_LINE_TYPE cmock_line);
+#define fwk_mm_alloc_aligned_IgnoreAndReturn(cmock_retval) fwk_mm_alloc_aligned_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_mm_alloc_aligned_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, void* cmock_to_return);
+#define fwk_mm_alloc_aligned_StopIgnore() fwk_mm_alloc_aligned_CMockStopIgnore()
+void fwk_mm_alloc_aligned_CMockStopIgnore(void);
 #define fwk_mm_alloc_aligned_ExpectAnyArgsAndReturn(cmock_retval) fwk_mm_alloc_aligned_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_mm_alloc_aligned_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, void* cmock_to_return);
 #define fwk_mm_alloc_aligned_ExpectAndReturn(alignment, num, size, cmock_retval) fwk_mm_alloc_aligned_CMockExpectAndReturn(__LINE__, alignment, num, size, cmock_retval)
 void fwk_mm_alloc_aligned_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, size_t alignment, size_t num, size_t size, void* cmock_to_return);
+typedef void* (* CMOCK_fwk_mm_alloc_aligned_CALLBACK)(size_t alignment, size_t num, size_t size, int cmock_num_calls);
+void fwk_mm_alloc_aligned_AddCallback(CMOCK_fwk_mm_alloc_aligned_CALLBACK Callback);
+void fwk_mm_alloc_aligned_Stub(CMOCK_fwk_mm_alloc_aligned_CALLBACK Callback);
+#define fwk_mm_alloc_aligned_StubWithCallback fwk_mm_alloc_aligned_Stub
+#define fwk_mm_alloc_aligned_IgnoreArg_alignment() fwk_mm_alloc_aligned_CMockIgnoreArg_alignment(__LINE__)
+void fwk_mm_alloc_aligned_CMockIgnoreArg_alignment(UNITY_LINE_TYPE cmock_line);
+#define fwk_mm_alloc_aligned_IgnoreArg_num() fwk_mm_alloc_aligned_CMockIgnoreArg_num(__LINE__)
+void fwk_mm_alloc_aligned_CMockIgnoreArg_num(UNITY_LINE_TYPE cmock_line);
+#define fwk_mm_alloc_aligned_IgnoreArg_size() fwk_mm_alloc_aligned_CMockIgnoreArg_size(__LINE__)
+void fwk_mm_alloc_aligned_CMockIgnoreArg_size(UNITY_LINE_TYPE cmock_line);
+#define fwk_mm_calloc_IgnoreAndReturn(cmock_retval) fwk_mm_calloc_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_mm_calloc_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, void* cmock_to_return);
+#define fwk_mm_calloc_StopIgnore() fwk_mm_calloc_CMockStopIgnore()
+void fwk_mm_calloc_CMockStopIgnore(void);
 #define fwk_mm_calloc_ExpectAnyArgsAndReturn(cmock_retval) fwk_mm_calloc_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_mm_calloc_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, void* cmock_to_return);
 #define fwk_mm_calloc_ExpectAndReturn(num, size, cmock_retval) fwk_mm_calloc_CMockExpectAndReturn(__LINE__, num, size, cmock_retval)
 void fwk_mm_calloc_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, size_t num, size_t size, void* cmock_to_return);
+typedef void* (* CMOCK_fwk_mm_calloc_CALLBACK)(size_t num, size_t size, int cmock_num_calls);
+void fwk_mm_calloc_AddCallback(CMOCK_fwk_mm_calloc_CALLBACK Callback);
+void fwk_mm_calloc_Stub(CMOCK_fwk_mm_calloc_CALLBACK Callback);
+#define fwk_mm_calloc_StubWithCallback fwk_mm_calloc_Stub
+#define fwk_mm_calloc_IgnoreArg_num() fwk_mm_calloc_CMockIgnoreArg_num(__LINE__)
+void fwk_mm_calloc_CMockIgnoreArg_num(UNITY_LINE_TYPE cmock_line);
+#define fwk_mm_calloc_IgnoreArg_size() fwk_mm_calloc_CMockIgnoreArg_size(__LINE__)
+void fwk_mm_calloc_CMockIgnoreArg_size(UNITY_LINE_TYPE cmock_line);
+#define fwk_mm_calloc_aligned_IgnoreAndReturn(cmock_retval) fwk_mm_calloc_aligned_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_mm_calloc_aligned_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, void* cmock_to_return);
+#define fwk_mm_calloc_aligned_StopIgnore() fwk_mm_calloc_aligned_CMockStopIgnore()
+void fwk_mm_calloc_aligned_CMockStopIgnore(void);
 #define fwk_mm_calloc_aligned_ExpectAnyArgsAndReturn(cmock_retval) fwk_mm_calloc_aligned_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_mm_calloc_aligned_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, void* cmock_to_return);
 #define fwk_mm_calloc_aligned_ExpectAndReturn(alignment, num, size, cmock_retval) fwk_mm_calloc_aligned_CMockExpectAndReturn(__LINE__, alignment, num, size, cmock_retval)
 void fwk_mm_calloc_aligned_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, size_t alignment, size_t num, size_t size, void* cmock_to_return);
+typedef void* (* CMOCK_fwk_mm_calloc_aligned_CALLBACK)(size_t alignment, size_t num, size_t size, int cmock_num_calls);
+void fwk_mm_calloc_aligned_AddCallback(CMOCK_fwk_mm_calloc_aligned_CALLBACK Callback);
+void fwk_mm_calloc_aligned_Stub(CMOCK_fwk_mm_calloc_aligned_CALLBACK Callback);
+#define fwk_mm_calloc_aligned_StubWithCallback fwk_mm_calloc_aligned_Stub
+#define fwk_mm_calloc_aligned_IgnoreArg_alignment() fwk_mm_calloc_aligned_CMockIgnoreArg_alignment(__LINE__)
+void fwk_mm_calloc_aligned_CMockIgnoreArg_alignment(UNITY_LINE_TYPE cmock_line);
+#define fwk_mm_calloc_aligned_IgnoreArg_num() fwk_mm_calloc_aligned_CMockIgnoreArg_num(__LINE__)
+void fwk_mm_calloc_aligned_CMockIgnoreArg_num(UNITY_LINE_TYPE cmock_line);
+#define fwk_mm_calloc_aligned_IgnoreArg_size() fwk_mm_calloc_aligned_CMockIgnoreArg_size(__LINE__)
+void fwk_mm_calloc_aligned_CMockIgnoreArg_size(UNITY_LINE_TYPE cmock_line);
+#define fwk_mm_realloc_IgnoreAndReturn(cmock_retval) fwk_mm_realloc_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_mm_realloc_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, void* cmock_to_return);
+#define fwk_mm_realloc_StopIgnore() fwk_mm_realloc_CMockStopIgnore()
+void fwk_mm_realloc_CMockStopIgnore(void);
 #define fwk_mm_realloc_ExpectAnyArgsAndReturn(cmock_retval) fwk_mm_realloc_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_mm_realloc_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, void* cmock_to_return);
 #define fwk_mm_realloc_ExpectAndReturn(ptr, num, size, cmock_retval) fwk_mm_realloc_CMockExpectAndReturn(__LINE__, ptr, num, size, cmock_retval)
 void fwk_mm_realloc_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, void* ptr, size_t num, size_t size, void* cmock_to_return);
+typedef void* (* CMOCK_fwk_mm_realloc_CALLBACK)(void* ptr, size_t num, size_t size, int cmock_num_calls);
+void fwk_mm_realloc_AddCallback(CMOCK_fwk_mm_realloc_CALLBACK Callback);
+void fwk_mm_realloc_Stub(CMOCK_fwk_mm_realloc_CALLBACK Callback);
+#define fwk_mm_realloc_StubWithCallback fwk_mm_realloc_Stub
+#define fwk_mm_realloc_ExpectWithArrayAndReturn(ptr, ptr_Depth, num, size, cmock_retval) fwk_mm_realloc_CMockExpectWithArrayAndReturn(__LINE__, ptr, ptr_Depth, num, size, cmock_retval)
+void fwk_mm_realloc_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, void* ptr, int ptr_Depth, size_t num, size_t size, void* cmock_to_return);
+#define fwk_mm_realloc_ReturnThruPtr_ptr(ptr) fwk_mm_realloc_CMockReturnMemThruPtr_ptr(__LINE__, ptr, sizeof(void))
+#define fwk_mm_realloc_ReturnArrayThruPtr_ptr(ptr, cmock_len) fwk_mm_realloc_CMockReturnMemThruPtr_ptr(__LINE__, ptr, cmock_len * sizeof(*ptr))
+#define fwk_mm_realloc_ReturnMemThruPtr_ptr(ptr, cmock_size) fwk_mm_realloc_CMockReturnMemThruPtr_ptr(__LINE__, ptr, cmock_size)
+void fwk_mm_realloc_CMockReturnMemThruPtr_ptr(UNITY_LINE_TYPE cmock_line, void* ptr, size_t cmock_size);
+#define fwk_mm_realloc_IgnoreArg_ptr() fwk_mm_realloc_CMockIgnoreArg_ptr(__LINE__)
+void fwk_mm_realloc_CMockIgnoreArg_ptr(UNITY_LINE_TYPE cmock_line);
+#define fwk_mm_realloc_IgnoreArg_num() fwk_mm_realloc_CMockIgnoreArg_num(__LINE__)
+void fwk_mm_realloc_CMockIgnoreArg_num(UNITY_LINE_TYPE cmock_line);
+#define fwk_mm_realloc_IgnoreArg_size() fwk_mm_realloc_CMockIgnoreArg_size(__LINE__)
+void fwk_mm_realloc_CMockIgnoreArg_size(UNITY_LINE_TYPE cmock_line);
+#define fwk_mm_free_Ignore() fwk_mm_free_CMockIgnore()
+void fwk_mm_free_CMockIgnore(void);
+#define fwk_mm_free_StopIgnore() fwk_mm_free_CMockStopIgnore()
+void fwk_mm_free_CMockStopIgnore(void);
 #define fwk_mm_free_ExpectAnyArgs() fwk_mm_free_CMockExpectAnyArgs(__LINE__)
 void fwk_mm_free_CMockExpectAnyArgs(UNITY_LINE_TYPE cmock_line);
 #define fwk_mm_free_Expect(ptr) fwk_mm_free_CMockExpect(__LINE__, ptr)
 void fwk_mm_free_CMockExpect(UNITY_LINE_TYPE cmock_line, void* ptr);
+typedef void (* CMOCK_fwk_mm_free_CALLBACK)(void* ptr, int cmock_num_calls);
+void fwk_mm_free_AddCallback(CMOCK_fwk_mm_free_CALLBACK Callback);
+void fwk_mm_free_Stub(CMOCK_fwk_mm_free_CALLBACK Callback);
+#define fwk_mm_free_StubWithCallback fwk_mm_free_Stub
+#define fwk_mm_free_ExpectWithArray(ptr, ptr_Depth) fwk_mm_free_CMockExpectWithArray(__LINE__, ptr, ptr_Depth)
+void fwk_mm_free_CMockExpectWithArray(UNITY_LINE_TYPE cmock_line, void* ptr, int ptr_Depth);
+#define fwk_mm_free_ReturnThruPtr_ptr(ptr) fwk_mm_free_CMockReturnMemThruPtr_ptr(__LINE__, ptr, sizeof(void))
+#define fwk_mm_free_ReturnArrayThruPtr_ptr(ptr, cmock_len) fwk_mm_free_CMockReturnMemThruPtr_ptr(__LINE__, ptr, cmock_len * sizeof(*ptr))
+#define fwk_mm_free_ReturnMemThruPtr_ptr(ptr, cmock_size) fwk_mm_free_CMockReturnMemThruPtr_ptr(__LINE__, ptr, cmock_size)
+void fwk_mm_free_CMockReturnMemThruPtr_ptr(UNITY_LINE_TYPE cmock_line, void* ptr, size_t cmock_size);
+#define fwk_mm_free_IgnoreArg_ptr() fwk_mm_free_CMockIgnoreArg_ptr(__LINE__)
+void fwk_mm_free_CMockIgnoreArg_ptr(UNITY_LINE_TYPE cmock_line);
 
 #if defined(__GNUC__) && !defined(__ICC) && !defined(__TMS470__)
 #if __GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 6 || (__GNUC_MINOR__ == 6 && __GNUC_PATCHLEVEL__ > 0)))

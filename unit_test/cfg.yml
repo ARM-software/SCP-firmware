@@ -28,3 +28,5 @@
     - :expect_any_args
     - :return_thru_ptr
     - :array
+    - :ignore_arg
+    - :ignore

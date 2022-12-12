@@ -24,18 +24,84 @@ void Mockfwk_core_Verify(void);
 
 
 
+#define fwk_process_event_queue_Ignore() fwk_process_event_queue_CMockIgnore()
+void fwk_process_event_queue_CMockIgnore(void);
+#define fwk_process_event_queue_StopIgnore() fwk_process_event_queue_CMockStopIgnore()
+void fwk_process_event_queue_CMockStopIgnore(void);
+#define fwk_process_event_queue_Expect() fwk_process_event_queue_CMockExpect(__LINE__)
+void fwk_process_event_queue_CMockExpect(UNITY_LINE_TYPE cmock_line);
+typedef void (* CMOCK_fwk_process_event_queue_CALLBACK)(int cmock_num_calls);
+void fwk_process_event_queue_AddCallback(CMOCK_fwk_process_event_queue_CALLBACK Callback);
+void fwk_process_event_queue_Stub(CMOCK_fwk_process_event_queue_CALLBACK Callback);
+#define fwk_process_event_queue_StubWithCallback fwk_process_event_queue_Stub
+#define fwk_get_delayed_response_IgnoreAndReturn(cmock_retval) fwk_get_delayed_response_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_get_delayed_response_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define fwk_get_delayed_response_StopIgnore() fwk_get_delayed_response_CMockStopIgnore()
+void fwk_get_delayed_response_CMockStopIgnore(void);
 #define fwk_get_delayed_response_ExpectAnyArgsAndReturn(cmock_retval) fwk_get_delayed_response_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_get_delayed_response_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_get_delayed_response_ExpectAndReturn(id, cookie, event, cmock_retval) fwk_get_delayed_response_CMockExpectAndReturn(__LINE__, id, cookie, event, cmock_retval)
 void fwk_get_delayed_response_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t id, uint32_t cookie, struct fwk_event* event, int cmock_to_return);
+typedef int (* CMOCK_fwk_get_delayed_response_CALLBACK)(fwk_id_t id, uint32_t cookie, struct fwk_event* event, int cmock_num_calls);
+void fwk_get_delayed_response_AddCallback(CMOCK_fwk_get_delayed_response_CALLBACK Callback);
+void fwk_get_delayed_response_Stub(CMOCK_fwk_get_delayed_response_CALLBACK Callback);
+#define fwk_get_delayed_response_StubWithCallback fwk_get_delayed_response_Stub
+#define fwk_get_delayed_response_ExpectWithArrayAndReturn(id, cookie, event, event_Depth, cmock_retval) fwk_get_delayed_response_CMockExpectWithArrayAndReturn(__LINE__, id, cookie, event, event_Depth, cmock_retval)
+void fwk_get_delayed_response_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t id, uint32_t cookie, struct fwk_event* event, int event_Depth, int cmock_to_return);
+#define fwk_get_delayed_response_ReturnThruPtr_event(event) fwk_get_delayed_response_CMockReturnMemThruPtr_event(__LINE__, event, sizeof(struct fwk_event))
+#define fwk_get_delayed_response_ReturnArrayThruPtr_event(event, cmock_len) fwk_get_delayed_response_CMockReturnMemThruPtr_event(__LINE__, event, cmock_len * sizeof(*event))
+#define fwk_get_delayed_response_ReturnMemThruPtr_event(event, cmock_size) fwk_get_delayed_response_CMockReturnMemThruPtr_event(__LINE__, event, cmock_size)
+void fwk_get_delayed_response_CMockReturnMemThruPtr_event(UNITY_LINE_TYPE cmock_line, struct fwk_event* event, size_t cmock_size);
+#define fwk_get_delayed_response_IgnoreArg_id() fwk_get_delayed_response_CMockIgnoreArg_id(__LINE__)
+void fwk_get_delayed_response_CMockIgnoreArg_id(UNITY_LINE_TYPE cmock_line);
+#define fwk_get_delayed_response_IgnoreArg_cookie() fwk_get_delayed_response_CMockIgnoreArg_cookie(__LINE__)
+void fwk_get_delayed_response_CMockIgnoreArg_cookie(UNITY_LINE_TYPE cmock_line);
+#define fwk_get_delayed_response_IgnoreArg_event() fwk_get_delayed_response_CMockIgnoreArg_event(__LINE__)
+void fwk_get_delayed_response_CMockIgnoreArg_event(UNITY_LINE_TYPE cmock_line);
+#define fwk_is_delayed_response_list_empty_IgnoreAndReturn(cmock_retval) fwk_is_delayed_response_list_empty_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_is_delayed_response_list_empty_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define fwk_is_delayed_response_list_empty_StopIgnore() fwk_is_delayed_response_list_empty_CMockStopIgnore()
+void fwk_is_delayed_response_list_empty_CMockStopIgnore(void);
 #define fwk_is_delayed_response_list_empty_ExpectAnyArgsAndReturn(cmock_retval) fwk_is_delayed_response_list_empty_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_is_delayed_response_list_empty_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_is_delayed_response_list_empty_ExpectAndReturn(id, is_empty, cmock_retval) fwk_is_delayed_response_list_empty_CMockExpectAndReturn(__LINE__, id, is_empty, cmock_retval)
 void fwk_is_delayed_response_list_empty_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t id, bool* is_empty, int cmock_to_return);
+typedef int (* CMOCK_fwk_is_delayed_response_list_empty_CALLBACK)(fwk_id_t id, bool* is_empty, int cmock_num_calls);
+void fwk_is_delayed_response_list_empty_AddCallback(CMOCK_fwk_is_delayed_response_list_empty_CALLBACK Callback);
+void fwk_is_delayed_response_list_empty_Stub(CMOCK_fwk_is_delayed_response_list_empty_CALLBACK Callback);
+#define fwk_is_delayed_response_list_empty_StubWithCallback fwk_is_delayed_response_list_empty_Stub
+#define fwk_is_delayed_response_list_empty_ExpectWithArrayAndReturn(id, is_empty, is_empty_Depth, cmock_retval) fwk_is_delayed_response_list_empty_CMockExpectWithArrayAndReturn(__LINE__, id, is_empty, is_empty_Depth, cmock_retval)
+void fwk_is_delayed_response_list_empty_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t id, bool* is_empty, int is_empty_Depth, int cmock_to_return);
+#define fwk_is_delayed_response_list_empty_ReturnThruPtr_is_empty(is_empty) fwk_is_delayed_response_list_empty_CMockReturnMemThruPtr_is_empty(__LINE__, is_empty, sizeof(bool))
+#define fwk_is_delayed_response_list_empty_ReturnArrayThruPtr_is_empty(is_empty, cmock_len) fwk_is_delayed_response_list_empty_CMockReturnMemThruPtr_is_empty(__LINE__, is_empty, cmock_len * sizeof(*is_empty))
+#define fwk_is_delayed_response_list_empty_ReturnMemThruPtr_is_empty(is_empty, cmock_size) fwk_is_delayed_response_list_empty_CMockReturnMemThruPtr_is_empty(__LINE__, is_empty, cmock_size)
+void fwk_is_delayed_response_list_empty_CMockReturnMemThruPtr_is_empty(UNITY_LINE_TYPE cmock_line, bool* is_empty, size_t cmock_size);
+#define fwk_is_delayed_response_list_empty_IgnoreArg_id() fwk_is_delayed_response_list_empty_CMockIgnoreArg_id(__LINE__)
+void fwk_is_delayed_response_list_empty_CMockIgnoreArg_id(UNITY_LINE_TYPE cmock_line);
+#define fwk_is_delayed_response_list_empty_IgnoreArg_is_empty() fwk_is_delayed_response_list_empty_CMockIgnoreArg_is_empty(__LINE__)
+void fwk_is_delayed_response_list_empty_CMockIgnoreArg_is_empty(UNITY_LINE_TYPE cmock_line);
+#define fwk_get_first_delayed_response_IgnoreAndReturn(cmock_retval) fwk_get_first_delayed_response_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_get_first_delayed_response_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define fwk_get_first_delayed_response_StopIgnore() fwk_get_first_delayed_response_CMockStopIgnore()
+void fwk_get_first_delayed_response_CMockStopIgnore(void);
 #define fwk_get_first_delayed_response_ExpectAnyArgsAndReturn(cmock_retval) fwk_get_first_delayed_response_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_get_first_delayed_response_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_get_first_delayed_response_ExpectAndReturn(id, event, cmock_retval) fwk_get_first_delayed_response_CMockExpectAndReturn(__LINE__, id, event, cmock_retval)
 void fwk_get_first_delayed_response_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t id, struct fwk_event* event, int cmock_to_return);
+typedef int (* CMOCK_fwk_get_first_delayed_response_CALLBACK)(fwk_id_t id, struct fwk_event* event, int cmock_num_calls);
+void fwk_get_first_delayed_response_AddCallback(CMOCK_fwk_get_first_delayed_response_CALLBACK Callback);
+void fwk_get_first_delayed_response_Stub(CMOCK_fwk_get_first_delayed_response_CALLBACK Callback);
+#define fwk_get_first_delayed_response_StubWithCallback fwk_get_first_delayed_response_Stub
+#define fwk_get_first_delayed_response_ExpectWithArrayAndReturn(id, event, event_Depth, cmock_retval) fwk_get_first_delayed_response_CMockExpectWithArrayAndReturn(__LINE__, id, event, event_Depth, cmock_retval)
+void fwk_get_first_delayed_response_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t id, struct fwk_event* event, int event_Depth, int cmock_to_return);
+#define fwk_get_first_delayed_response_ReturnThruPtr_event(event) fwk_get_first_delayed_response_CMockReturnMemThruPtr_event(__LINE__, event, sizeof(struct fwk_event))
+#define fwk_get_first_delayed_response_ReturnArrayThruPtr_event(event, cmock_len) fwk_get_first_delayed_response_CMockReturnMemThruPtr_event(__LINE__, event, cmock_len * sizeof(*event))
+#define fwk_get_first_delayed_response_ReturnMemThruPtr_event(event, cmock_size) fwk_get_first_delayed_response_CMockReturnMemThruPtr_event(__LINE__, event, cmock_size)
+void fwk_get_first_delayed_response_CMockReturnMemThruPtr_event(UNITY_LINE_TYPE cmock_line, struct fwk_event* event, size_t cmock_size);
+#define fwk_get_first_delayed_response_IgnoreArg_id() fwk_get_first_delayed_response_CMockIgnoreArg_id(__LINE__)
+void fwk_get_first_delayed_response_CMockIgnoreArg_id(UNITY_LINE_TYPE cmock_line);
+#define fwk_get_first_delayed_response_IgnoreArg_event() fwk_get_first_delayed_response_CMockIgnoreArg_event(__LINE__)
+void fwk_get_first_delayed_response_CMockIgnoreArg_event(UNITY_LINE_TYPE cmock_line);
 
 #if defined(__GNUC__) && !defined(__ICC) && !defined(__TMS470__)
 #if __GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 6 || (__GNUC_MINOR__ == 6 && __GNUC_PATCHLEVEL__ > 0)))

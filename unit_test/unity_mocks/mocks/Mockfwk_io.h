@@ -24,44 +24,216 @@ void Mockfwk_io_Verify(void);
 
 
 
+#define fwk_io_open_IgnoreAndReturn(cmock_retval) fwk_io_open_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_io_open_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define fwk_io_open_StopIgnore() fwk_io_open_CMockStopIgnore()
+void fwk_io_open_CMockStopIgnore(void);
 #define fwk_io_open_ExpectAnyArgsAndReturn(cmock_retval) fwk_io_open_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_io_open_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_io_open_ExpectAndReturn(stream, id, mode, cmock_retval) fwk_io_open_CMockExpectAndReturn(__LINE__, stream, id, mode, cmock_retval)
 void fwk_io_open_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_io_stream* stream, fwk_id_t id, enum fwk_io_mode mode, int cmock_to_return);
+typedef int (* CMOCK_fwk_io_open_CALLBACK)(struct fwk_io_stream* stream, fwk_id_t id, enum fwk_io_mode mode, int cmock_num_calls);
+void fwk_io_open_AddCallback(CMOCK_fwk_io_open_CALLBACK Callback);
+void fwk_io_open_Stub(CMOCK_fwk_io_open_CALLBACK Callback);
+#define fwk_io_open_StubWithCallback fwk_io_open_Stub
+#define fwk_io_open_ExpectWithArrayAndReturn(stream, stream_Depth, id, mode, cmock_retval) fwk_io_open_CMockExpectWithArrayAndReturn(__LINE__, stream, stream_Depth, id, mode, cmock_retval)
+void fwk_io_open_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_io_stream* stream, int stream_Depth, fwk_id_t id, enum fwk_io_mode mode, int cmock_to_return);
+#define fwk_io_open_ReturnThruPtr_stream(stream) fwk_io_open_CMockReturnMemThruPtr_stream(__LINE__, stream, sizeof(struct fwk_io_stream))
+#define fwk_io_open_ReturnArrayThruPtr_stream(stream, cmock_len) fwk_io_open_CMockReturnMemThruPtr_stream(__LINE__, stream, cmock_len * sizeof(*stream))
+#define fwk_io_open_ReturnMemThruPtr_stream(stream, cmock_size) fwk_io_open_CMockReturnMemThruPtr_stream(__LINE__, stream, cmock_size)
+void fwk_io_open_CMockReturnMemThruPtr_stream(UNITY_LINE_TYPE cmock_line, struct fwk_io_stream* stream, size_t cmock_size);
+#define fwk_io_open_IgnoreArg_stream() fwk_io_open_CMockIgnoreArg_stream(__LINE__)
+void fwk_io_open_CMockIgnoreArg_stream(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_open_IgnoreArg_id() fwk_io_open_CMockIgnoreArg_id(__LINE__)
+void fwk_io_open_CMockIgnoreArg_id(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_open_IgnoreArg_mode() fwk_io_open_CMockIgnoreArg_mode(__LINE__)
+void fwk_io_open_CMockIgnoreArg_mode(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_getch_IgnoreAndReturn(cmock_retval) fwk_io_getch_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_io_getch_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define fwk_io_getch_StopIgnore() fwk_io_getch_CMockStopIgnore()
+void fwk_io_getch_CMockStopIgnore(void);
 #define fwk_io_getch_ExpectAnyArgsAndReturn(cmock_retval) fwk_io_getch_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_io_getch_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_io_getch_ExpectAndReturn(stream, ch, cmock_retval) fwk_io_getch_CMockExpectAndReturn(__LINE__, stream, ch, cmock_retval)
 void fwk_io_getch_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_io_stream* stream, char* ch, int cmock_to_return);
+typedef int (* CMOCK_fwk_io_getch_CALLBACK)(const struct fwk_io_stream* stream, char* ch, int cmock_num_calls);
+void fwk_io_getch_AddCallback(CMOCK_fwk_io_getch_CALLBACK Callback);
+void fwk_io_getch_Stub(CMOCK_fwk_io_getch_CALLBACK Callback);
+#define fwk_io_getch_StubWithCallback fwk_io_getch_Stub
+#define fwk_io_getch_ExpectWithArrayAndReturn(stream, stream_Depth, ch, cmock_retval) fwk_io_getch_CMockExpectWithArrayAndReturn(__LINE__, stream, stream_Depth, ch, cmock_retval)
+void fwk_io_getch_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_io_stream* stream, int stream_Depth, char* ch, int cmock_to_return);
+#define fwk_io_getch_ReturnThruPtr_ch(ch) fwk_io_getch_CMockReturnMemThruPtr_ch(__LINE__, ch, sizeof(char))
+#define fwk_io_getch_ReturnArrayThruPtr_ch(ch, cmock_len) fwk_io_getch_CMockReturnMemThruPtr_ch(__LINE__, ch, cmock_len * sizeof(*ch))
+#define fwk_io_getch_ReturnMemThruPtr_ch(ch, cmock_size) fwk_io_getch_CMockReturnMemThruPtr_ch(__LINE__, ch, cmock_size)
+void fwk_io_getch_CMockReturnMemThruPtr_ch(UNITY_LINE_TYPE cmock_line, char* ch, size_t cmock_size);
+#define fwk_io_getch_IgnoreArg_stream() fwk_io_getch_CMockIgnoreArg_stream(__LINE__)
+void fwk_io_getch_CMockIgnoreArg_stream(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_getch_IgnoreArg_ch() fwk_io_getch_CMockIgnoreArg_ch(__LINE__)
+void fwk_io_getch_CMockIgnoreArg_ch(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_putch_IgnoreAndReturn(cmock_retval) fwk_io_putch_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_io_putch_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define fwk_io_putch_StopIgnore() fwk_io_putch_CMockStopIgnore()
+void fwk_io_putch_CMockStopIgnore(void);
 #define fwk_io_putch_ExpectAnyArgsAndReturn(cmock_retval) fwk_io_putch_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_io_putch_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_io_putch_ExpectAndReturn(stream, ch, cmock_retval) fwk_io_putch_CMockExpectAndReturn(__LINE__, stream, ch, cmock_retval)
 void fwk_io_putch_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_io_stream* stream, char ch, int cmock_to_return);
+typedef int (* CMOCK_fwk_io_putch_CALLBACK)(const struct fwk_io_stream* stream, char ch, int cmock_num_calls);
+void fwk_io_putch_AddCallback(CMOCK_fwk_io_putch_CALLBACK Callback);
+void fwk_io_putch_Stub(CMOCK_fwk_io_putch_CALLBACK Callback);
+#define fwk_io_putch_StubWithCallback fwk_io_putch_Stub
+#define fwk_io_putch_ExpectWithArrayAndReturn(stream, stream_Depth, ch, cmock_retval) fwk_io_putch_CMockExpectWithArrayAndReturn(__LINE__, stream, stream_Depth, ch, cmock_retval)
+void fwk_io_putch_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_io_stream* stream, int stream_Depth, char ch, int cmock_to_return);
+#define fwk_io_putch_IgnoreArg_stream() fwk_io_putch_CMockIgnoreArg_stream(__LINE__)
+void fwk_io_putch_CMockIgnoreArg_stream(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_putch_IgnoreArg_ch() fwk_io_putch_CMockIgnoreArg_ch(__LINE__)
+void fwk_io_putch_CMockIgnoreArg_ch(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_read_IgnoreAndReturn(cmock_retval) fwk_io_read_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_io_read_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define fwk_io_read_StopIgnore() fwk_io_read_CMockStopIgnore()
+void fwk_io_read_CMockStopIgnore(void);
 #define fwk_io_read_ExpectAnyArgsAndReturn(cmock_retval) fwk_io_read_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_io_read_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_io_read_ExpectAndReturn(stream, read, buffer, size, count, cmock_retval) fwk_io_read_CMockExpectAndReturn(__LINE__, stream, read, buffer, size, count, cmock_retval)
 void fwk_io_read_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_io_stream* stream, size_t* read, void* buffer, size_t size, size_t count, int cmock_to_return);
+typedef int (* CMOCK_fwk_io_read_CALLBACK)(const struct fwk_io_stream* stream, size_t* read, void* buffer, size_t size, size_t count, int cmock_num_calls);
+void fwk_io_read_AddCallback(CMOCK_fwk_io_read_CALLBACK Callback);
+void fwk_io_read_Stub(CMOCK_fwk_io_read_CALLBACK Callback);
+#define fwk_io_read_StubWithCallback fwk_io_read_Stub
+#define fwk_io_read_ExpectWithArrayAndReturn(stream, stream_Depth, read, read_Depth, buffer, buffer_Depth, size, count, cmock_retval) fwk_io_read_CMockExpectWithArrayAndReturn(__LINE__, stream, stream_Depth, read, read_Depth, buffer, buffer_Depth, size, count, cmock_retval)
+void fwk_io_read_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_io_stream* stream, int stream_Depth, size_t* read, int read_Depth, void* buffer, int buffer_Depth, size_t size, size_t count, int cmock_to_return);
+#define fwk_io_read_ReturnThruPtr_read(read) fwk_io_read_CMockReturnMemThruPtr_read(__LINE__, read, sizeof(size_t))
+#define fwk_io_read_ReturnArrayThruPtr_read(read, cmock_len) fwk_io_read_CMockReturnMemThruPtr_read(__LINE__, read, cmock_len * sizeof(*read))
+#define fwk_io_read_ReturnMemThruPtr_read(read, cmock_size) fwk_io_read_CMockReturnMemThruPtr_read(__LINE__, read, cmock_size)
+void fwk_io_read_CMockReturnMemThruPtr_read(UNITY_LINE_TYPE cmock_line, size_t* read, size_t cmock_size);
+#define fwk_io_read_ReturnThruPtr_buffer(buffer) fwk_io_read_CMockReturnMemThruPtr_buffer(__LINE__, buffer, sizeof(void))
+#define fwk_io_read_ReturnArrayThruPtr_buffer(buffer, cmock_len) fwk_io_read_CMockReturnMemThruPtr_buffer(__LINE__, buffer, cmock_len * sizeof(*buffer))
+#define fwk_io_read_ReturnMemThruPtr_buffer(buffer, cmock_size) fwk_io_read_CMockReturnMemThruPtr_buffer(__LINE__, buffer, cmock_size)
+void fwk_io_read_CMockReturnMemThruPtr_buffer(UNITY_LINE_TYPE cmock_line, void* buffer, size_t cmock_size);
+#define fwk_io_read_IgnoreArg_stream() fwk_io_read_CMockIgnoreArg_stream(__LINE__)
+void fwk_io_read_CMockIgnoreArg_stream(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_read_IgnoreArg_read() fwk_io_read_CMockIgnoreArg_read(__LINE__)
+void fwk_io_read_CMockIgnoreArg_read(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_read_IgnoreArg_buffer() fwk_io_read_CMockIgnoreArg_buffer(__LINE__)
+void fwk_io_read_CMockIgnoreArg_buffer(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_read_IgnoreArg_size() fwk_io_read_CMockIgnoreArg_size(__LINE__)
+void fwk_io_read_CMockIgnoreArg_size(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_read_IgnoreArg_count() fwk_io_read_CMockIgnoreArg_count(__LINE__)
+void fwk_io_read_CMockIgnoreArg_count(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_write_IgnoreAndReturn(cmock_retval) fwk_io_write_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_io_write_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define fwk_io_write_StopIgnore() fwk_io_write_CMockStopIgnore()
+void fwk_io_write_CMockStopIgnore(void);
 #define fwk_io_write_ExpectAnyArgsAndReturn(cmock_retval) fwk_io_write_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_io_write_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_io_write_ExpectAndReturn(stream, written, buffer, size, count, cmock_retval) fwk_io_write_CMockExpectAndReturn(__LINE__, stream, written, buffer, size, count, cmock_retval)
 void fwk_io_write_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_io_stream* stream, size_t* written, const void* buffer, size_t size, size_t count, int cmock_to_return);
+typedef int (* CMOCK_fwk_io_write_CALLBACK)(const struct fwk_io_stream* stream, size_t* written, const void* buffer, size_t size, size_t count, int cmock_num_calls);
+void fwk_io_write_AddCallback(CMOCK_fwk_io_write_CALLBACK Callback);
+void fwk_io_write_Stub(CMOCK_fwk_io_write_CALLBACK Callback);
+#define fwk_io_write_StubWithCallback fwk_io_write_Stub
+#define fwk_io_write_ExpectWithArrayAndReturn(stream, stream_Depth, written, written_Depth, buffer, buffer_Depth, size, count, cmock_retval) fwk_io_write_CMockExpectWithArrayAndReturn(__LINE__, stream, stream_Depth, written, written_Depth, buffer, buffer_Depth, size, count, cmock_retval)
+void fwk_io_write_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_io_stream* stream, int stream_Depth, size_t* written, int written_Depth, const void* buffer, int buffer_Depth, size_t size, size_t count, int cmock_to_return);
+#define fwk_io_write_ReturnThruPtr_written(written) fwk_io_write_CMockReturnMemThruPtr_written(__LINE__, written, sizeof(size_t))
+#define fwk_io_write_ReturnArrayThruPtr_written(written, cmock_len) fwk_io_write_CMockReturnMemThruPtr_written(__LINE__, written, cmock_len * sizeof(*written))
+#define fwk_io_write_ReturnMemThruPtr_written(written, cmock_size) fwk_io_write_CMockReturnMemThruPtr_written(__LINE__, written, cmock_size)
+void fwk_io_write_CMockReturnMemThruPtr_written(UNITY_LINE_TYPE cmock_line, size_t* written, size_t cmock_size);
+#define fwk_io_write_IgnoreArg_stream() fwk_io_write_CMockIgnoreArg_stream(__LINE__)
+void fwk_io_write_CMockIgnoreArg_stream(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_write_IgnoreArg_written() fwk_io_write_CMockIgnoreArg_written(__LINE__)
+void fwk_io_write_CMockIgnoreArg_written(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_write_IgnoreArg_buffer() fwk_io_write_CMockIgnoreArg_buffer(__LINE__)
+void fwk_io_write_CMockIgnoreArg_buffer(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_write_IgnoreArg_size() fwk_io_write_CMockIgnoreArg_size(__LINE__)
+void fwk_io_write_CMockIgnoreArg_size(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_write_IgnoreArg_count() fwk_io_write_CMockIgnoreArg_count(__LINE__)
+void fwk_io_write_CMockIgnoreArg_count(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_puts_IgnoreAndReturn(cmock_retval) fwk_io_puts_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_io_puts_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define fwk_io_puts_StopIgnore() fwk_io_puts_CMockStopIgnore()
+void fwk_io_puts_CMockStopIgnore(void);
 #define fwk_io_puts_ExpectAnyArgsAndReturn(cmock_retval) fwk_io_puts_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_io_puts_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_io_puts_ExpectAndReturn(stream, str, cmock_retval) fwk_io_puts_CMockExpectAndReturn(__LINE__, stream, str, cmock_retval)
 void fwk_io_puts_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_io_stream* stream, const char* str, int cmock_to_return);
+typedef int (* CMOCK_fwk_io_puts_CALLBACK)(const struct fwk_io_stream* stream, const char* str, int cmock_num_calls);
+void fwk_io_puts_AddCallback(CMOCK_fwk_io_puts_CALLBACK Callback);
+void fwk_io_puts_Stub(CMOCK_fwk_io_puts_CALLBACK Callback);
+#define fwk_io_puts_StubWithCallback fwk_io_puts_Stub
+#define fwk_io_puts_ExpectWithArrayAndReturn(stream, stream_Depth, str, cmock_retval) fwk_io_puts_CMockExpectWithArrayAndReturn(__LINE__, stream, stream_Depth, str, cmock_retval)
+void fwk_io_puts_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_io_stream* stream, int stream_Depth, const char* str, int cmock_to_return);
+#define fwk_io_puts_IgnoreArg_stream() fwk_io_puts_CMockIgnoreArg_stream(__LINE__)
+void fwk_io_puts_CMockIgnoreArg_stream(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_puts_IgnoreArg_str() fwk_io_puts_CMockIgnoreArg_str(__LINE__)
+void fwk_io_puts_CMockIgnoreArg_str(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_vprintf_IgnoreAndReturn(cmock_retval) fwk_io_vprintf_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_io_vprintf_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define fwk_io_vprintf_StopIgnore() fwk_io_vprintf_CMockStopIgnore()
+void fwk_io_vprintf_CMockStopIgnore(void);
 #define fwk_io_vprintf_ExpectAnyArgsAndReturn(cmock_retval) fwk_io_vprintf_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_io_vprintf_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_io_vprintf_ExpectAndReturn(stream, format, args, cmock_retval) fwk_io_vprintf_CMockExpectAndReturn(__LINE__, stream, format, args, cmock_retval)
 void fwk_io_vprintf_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_io_stream* stream, const char* format, va_list args, int cmock_to_return);
+typedef int (* CMOCK_fwk_io_vprintf_CALLBACK)(const struct fwk_io_stream* stream, const char* format, va_list args, int cmock_num_calls);
+void fwk_io_vprintf_AddCallback(CMOCK_fwk_io_vprintf_CALLBACK Callback);
+void fwk_io_vprintf_Stub(CMOCK_fwk_io_vprintf_CALLBACK Callback);
+#define fwk_io_vprintf_StubWithCallback fwk_io_vprintf_Stub
+#define fwk_io_vprintf_ExpectWithArrayAndReturn(stream, stream_Depth, format, args, cmock_retval) fwk_io_vprintf_CMockExpectWithArrayAndReturn(__LINE__, stream, stream_Depth, format, args, cmock_retval)
+void fwk_io_vprintf_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_io_stream* stream, int stream_Depth, const char* format, va_list args, int cmock_to_return);
+#define fwk_io_vprintf_IgnoreArg_stream() fwk_io_vprintf_CMockIgnoreArg_stream(__LINE__)
+void fwk_io_vprintf_CMockIgnoreArg_stream(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_vprintf_IgnoreArg_format() fwk_io_vprintf_CMockIgnoreArg_format(__LINE__)
+void fwk_io_vprintf_CMockIgnoreArg_format(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_vprintf_IgnoreArg_args() fwk_io_vprintf_CMockIgnoreArg_args(__LINE__)
+void fwk_io_vprintf_CMockIgnoreArg_args(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_printf_IgnoreAndReturn(cmock_retval) fwk_io_printf_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_io_printf_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define fwk_io_printf_StopIgnore() fwk_io_printf_CMockStopIgnore()
+void fwk_io_printf_CMockStopIgnore(void);
 #define fwk_io_printf_ExpectAnyArgsAndReturn(cmock_retval) fwk_io_printf_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_io_printf_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_io_printf_ExpectAndReturn(stream, format, cmock_retval) fwk_io_printf_CMockExpectAndReturn(__LINE__, stream, format, cmock_retval)
 void fwk_io_printf_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_io_stream* stream, const char* format, int cmock_to_return);
+typedef int (* CMOCK_fwk_io_printf_CALLBACK)(const struct fwk_io_stream* stream, const char* format, int cmock_num_calls);
+void fwk_io_printf_AddCallback(CMOCK_fwk_io_printf_CALLBACK Callback);
+void fwk_io_printf_Stub(CMOCK_fwk_io_printf_CALLBACK Callback);
+#define fwk_io_printf_StubWithCallback fwk_io_printf_Stub
+#define fwk_io_printf_ExpectWithArrayAndReturn(stream, stream_Depth, format, cmock_retval) fwk_io_printf_CMockExpectWithArrayAndReturn(__LINE__, stream, stream_Depth, format, cmock_retval)
+void fwk_io_printf_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_io_stream* stream, int stream_Depth, const char* format, int cmock_to_return);
+#define fwk_io_printf_IgnoreArg_stream() fwk_io_printf_CMockIgnoreArg_stream(__LINE__)
+void fwk_io_printf_CMockIgnoreArg_stream(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_printf_IgnoreArg_format() fwk_io_printf_CMockIgnoreArg_format(__LINE__)
+void fwk_io_printf_CMockIgnoreArg_format(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_close_IgnoreAndReturn(cmock_retval) fwk_io_close_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_io_close_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define fwk_io_close_StopIgnore() fwk_io_close_CMockStopIgnore()
+void fwk_io_close_CMockStopIgnore(void);
 #define fwk_io_close_ExpectAnyArgsAndReturn(cmock_retval) fwk_io_close_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void fwk_io_close_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
 #define fwk_io_close_ExpectAndReturn(stream, cmock_retval) fwk_io_close_CMockExpectAndReturn(__LINE__, stream, cmock_retval)
 void fwk_io_close_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_io_stream* stream, int cmock_to_return);
+typedef int (* CMOCK_fwk_io_close_CALLBACK)(struct fwk_io_stream* stream, int cmock_num_calls);
+void fwk_io_close_AddCallback(CMOCK_fwk_io_close_CALLBACK Callback);
+void fwk_io_close_Stub(CMOCK_fwk_io_close_CALLBACK Callback);
+#define fwk_io_close_StubWithCallback fwk_io_close_Stub
+#define fwk_io_close_ExpectWithArrayAndReturn(stream, stream_Depth, cmock_retval) fwk_io_close_CMockExpectWithArrayAndReturn(__LINE__, stream, stream_Depth, cmock_retval)
+void fwk_io_close_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, struct fwk_io_stream* stream, int stream_Depth, int cmock_to_return);
+#define fwk_io_close_ReturnThruPtr_stream(stream) fwk_io_close_CMockReturnMemThruPtr_stream(__LINE__, stream, sizeof(struct fwk_io_stream))
+#define fwk_io_close_ReturnArrayThruPtr_stream(stream, cmock_len) fwk_io_close_CMockReturnMemThruPtr_stream(__LINE__, stream, cmock_len * sizeof(*stream))
+#define fwk_io_close_ReturnMemThruPtr_stream(stream, cmock_size) fwk_io_close_CMockReturnMemThruPtr_stream(__LINE__, stream, cmock_size)
+void fwk_io_close_CMockReturnMemThruPtr_stream(UNITY_LINE_TYPE cmock_line, struct fwk_io_stream* stream, size_t cmock_size);
+#define fwk_io_close_IgnoreArg_stream() fwk_io_close_CMockIgnoreArg_stream(__LINE__)
+void fwk_io_close_CMockIgnoreArg_stream(UNITY_LINE_TYPE cmock_line);
+#define fwk_io_init_IgnoreAndReturn(cmock_retval) fwk_io_init_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void fwk_io_init_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define fwk_io_init_StopIgnore() fwk_io_init_CMockStopIgnore()
+void fwk_io_init_CMockStopIgnore(void);
 #define fwk_io_init_ExpectAndReturn(cmock_retval) fwk_io_init_CMockExpectAndReturn(__LINE__, cmock_retval)
 void fwk_io_init_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+typedef int (* CMOCK_fwk_io_init_CALLBACK)(int cmock_num_calls);
+void fwk_io_init_AddCallback(CMOCK_fwk_io_init_CALLBACK Callback);
+void fwk_io_init_Stub(CMOCK_fwk_io_init_CALLBACK Callback);
+#define fwk_io_init_StubWithCallback fwk_io_init_Stub
 
 #if defined(__GNUC__) && !defined(__ICC) && !defined(__TMS470__)
 #if __GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 6 || (__GNUC_MINOR__ == 6 && __GNUC_PATCHLEVEL__ > 0)))
