@@ -302,8 +302,8 @@ static int cmn600_discovery(void)
     FWK_LOG_INFO(
         MOD_NAME "Total external RN-SAM nodes: %d", ctx->external_rnsam_count);
     FWK_LOG_INFO(MOD_NAME "Total HN-F nodes: %d", ctx->hnf_count);
-    FWK_LOG_INFO(MOD_NAME "Total RN-F nodes: %d", ctx->rnd_count);
-    FWK_LOG_INFO(MOD_NAME "Total RN-D nodes: %d", ctx->rnf_count);
+    FWK_LOG_INFO(MOD_NAME "Total RN-F nodes: %d", ctx->rnf_count);
+    FWK_LOG_INFO(MOD_NAME "Total RN-D nodes: %d", ctx->rnd_count);
     FWK_LOG_INFO(MOD_NAME "Total RN-I nodes: %d", ctx->rni_count);
 
     if (ctx->cxla_reg != NULL) {
