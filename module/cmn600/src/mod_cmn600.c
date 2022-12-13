@@ -395,6 +395,7 @@ static int get_tgt_nodeid_reg_count()
 
     case CMN600_PERIPH_ID_2_REV_R3_P0:
     case CMN600_PERIPH_ID_2_REV_R3_P1:
+    case CMN600_PERIPH_ID_2_REV_R3_P2:
         return CMN600_RNSAM_NON_HASH_TGT_NODEID_REGS_5;
 
     default:
