@@ -23,6 +23,7 @@ static const char *const cmn600_rev_to_name[] = {
     [CMN600_PERIPH_ID_2_REV_R2_P0] = "r2p0",
     [CMN600_PERIPH_ID_2_REV_R3_P0] = "r3p0",
     [CMN600_PERIPH_ID_2_REV_R3_P1] = "r3p1",
+    [CMN600_PERIPH_ID_2_REV_R3_P2] = "r3p2",
     [CMN600_PERIPH_ID_UNKNOWN_REV] = "Unknown!",
 };
 
