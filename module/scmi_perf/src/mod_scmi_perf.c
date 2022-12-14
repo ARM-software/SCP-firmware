@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -207,6 +207,9 @@ struct mod_scmi_perf_ctx {
 
     /* Fast Channels Polling Rate Limit */
     uint32_t fast_channels_rate_limit;
+
+    /* Fast Channels process number of pending requests */
+    volatile uint32_t fch_pending_req_count;
 #endif
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
@@ -1351,8 +1354,15 @@ static void fast_channel_callback(uintptr_t param)
 
     status = fwk_put_event(&event);
     if (status != FWK_SUCCESS) {
-        FWK_LOG_TRACE("[SCMI-PERF] Error creating FC process event.");
+        FWK_LOG_ERR("[SCMI-PERF] Error creating FC process event.");
+        return;
     }
+
+    if (scmi_perf_ctx.fch_pending_req_count > 0) {
+        FWK_LOG_INFO("[SCMI-PERF] Multiple FC events pending");
+    }
+
+    scmi_perf_ctx.fch_pending_req_count++;
 }
 
 static void fast_channels_process(void)
@@ -1489,6 +1499,9 @@ static void fast_channels_process(void)
 
 #    endif
         }
+    }
+    if (scmi_perf_ctx.fch_pending_req_count > 0) {
+        scmi_perf_ctx.fch_pending_req_count--;
     }
 }
 
