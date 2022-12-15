@@ -20,15 +20,22 @@
 
 #define TEST_OPP_COUNT 0x5
 
+enum scmi_perf_element_idx {
+    SCMI_PERF_ELEMENT_IDX_0 = 0,
+    SCMI_PERF_ELEMENT_IDX_1,
+    SCMI_PERF_ELEMENT_IDX_2,
+    SCMI_PERF_ELEMENT_IDX_COUNT,
+};
+
 enum dvfs_element_idx {
-    DVFS_ELEMENT_IDX_0,
-    DVFS_ELEMENT_IDX_1,
+    DVFS_ELEMENT_IDX_0 = SCMI_PERF_ELEMENT_IDX_0,
+    DVFS_ELEMENT_IDX_1 = SCMI_PERF_ELEMENT_IDX_1,
     DVFS_ELEMENT_IDX_COUNT,
 };
 
 #define PERF_DOMAINS_IDX_COUNT DVFS_ELEMENT_IDX_COUNT
 static const struct mod_scmi_perf_domain_config domains[] = {
-    [DVFS_ELEMENT_IDX_0] = {
+    [SCMI_PERF_ELEMENT_IDX_0] = {
         .fast_channels_addr_scp =
             (uint64_t[]){
                 [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] = 1,
@@ -40,7 +47,11 @@ static const struct mod_scmi_perf_domain_config domains[] = {
         .phy_group_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_DVFS, DVFS_ELEMENT_IDX_0),
     },
-    [DVFS_ELEMENT_IDX_1] = {
+    [SCMI_PERF_ELEMENT_IDX_1] = {
+        .phy_group_id =
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_DVFS, DVFS_ELEMENT_IDX_1),
+    },
+    [SCMI_PERF_ELEMENT_IDX_2] = {
         .phy_group_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_DVFS, DVFS_ELEMENT_IDX_1),
     },
@@ -52,7 +63,7 @@ enum plugins_list {
     PERF_PLUGIN_IDX_COUNT,
 };
 
-static const struct mod_scmi_plugin_config plugins_table[] = {
+static struct mod_scmi_plugin_config plugins_table[] = {
     [PERF_PLUGIN_IDX_0] = {
         .id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_PERF_PLUGIN),
         .dom_type = PERF_PLUGIN_DOM_TYPE_PHYSICAL,
@@ -62,7 +73,7 @@ static const struct mod_scmi_plugin_config plugins_table[] = {
 
 static struct mod_scmi_perf_config perf_config = {
     .domains = &domains,
-    .perf_doms_count = FWK_ARRAY_SIZE(domains),
+    .perf_doms_count = SCMI_PERF_ELEMENT_IDX_COUNT,
     .fast_channels_alarm_id = FWK_ID_NONE_INIT,
 #ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
     .plugins = plugins_table,
@@ -106,3 +117,10 @@ static const struct mod_dvfs_domain_config test_dvfs_config = {
             { 0 },
         }
 };
+
+#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
+static struct perf_plugins_api test_perf_plugins_api = {
+    .update = plugin_update,
+    .report = plugin_report,
+};
+#endif
