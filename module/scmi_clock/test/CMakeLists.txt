@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -27,6 +27,7 @@ set(MODULE_UT_INC ${CMAKE_CURRENT_LIST_DIR})
 set(MODULE_UT_MOCK_SRC ${CMAKE_CURRENT_LIST_DIR}/mocks)
 
 list(APPEND MOCK_REPLACEMENTS fwk_module)
+list(APPEND MOCK_REPLACEMENTS fwk_mm)
 list(APPEND MOCK_REPLACEMENTS fwk_id)
 list(APPEND MOCK_REPLACEMENTS fwk_core)
 
@@ -53,6 +54,7 @@ set(MODULE_UT_SRC ${CMAKE_CURRENT_LIST_DIR})
 set(MODULE_UT_INC ${CMAKE_CURRENT_LIST_DIR})
 set(MODULE_UT_MOCK_SRC ${CMAKE_CURRENT_LIST_DIR}/mocks)
 
+list(APPEND MOCK_REPLACEMENTS fwk_mm)
 list(APPEND MOCK_REPLACEMENTS fwk_module)
 list(APPEND MOCK_REPLACEMENTS fwk_id)
 list(APPEND MOCK_REPLACEMENTS fwk_core)
