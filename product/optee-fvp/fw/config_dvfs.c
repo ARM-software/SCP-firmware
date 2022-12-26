@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Linaro Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -113,7 +113,7 @@ static const struct mod_dvfs_domain_config gpu = {
             .voltage = 300,
         },
         {
-            .level = 562500 * 1000UL,
+            .level = 562500,
             .frequency = 562500,
             .voltage = 400,
         },
