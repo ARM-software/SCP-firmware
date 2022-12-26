@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Linaro Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -16,36 +16,43 @@ static const struct mod_scmi_clock_device agent_device_table_ospm[] = {
         /* MOCK_0 */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_MOCK_0),
+        .starts_enabled = true,
     },
     {
         /* MOCK_1 */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_MOCK_1),
+        .starts_enabled = true,
     },
     {
         /* VPU */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_VPU),
+        .starts_enabled = true,
     },
     {
         /* MOCK_3 */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_MOCK_3),
+        .starts_enabled = true,
     },
     {
         /* DPU */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_DPU),
+        .starts_enabled = true,
     },
     {
         /* PIXEL_0 */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_PIXEL_0),
+        .starts_enabled = true,
     },
     {
         /* PIXEL_1 */
         .element_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_DEV_IDX_PIXEL_1),
+        .starts_enabled = true,
     },
 };
 
