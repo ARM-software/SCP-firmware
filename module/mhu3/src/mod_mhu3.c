@@ -382,7 +382,7 @@ static int mhu3_device_init(
     struct mod_mhu3_channel_config *channel;
     unsigned int channel_num;
 
-    if ((config->in == 0u) || (config->out == 0u)) {
+    if ((config->in == 0u) && (config->out == 0u)) {
         return FWK_E_PARAM;
     }
 
