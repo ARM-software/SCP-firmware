@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -515,6 +515,12 @@ static int scmi_sensor_trip_point_notify_handler(
         goto exit;
 
     flags = parameters->flags;
+    if (flags & ~SCMI_SENSOR_CONFIG_FLAGS_EVENT_CONTROL_MASK) {
+        status = FWK_SUCCESS;
+	return_values.status = SCMI_INVALID_PARAMETERS;
+        goto exit;
+    }
+
     if (flags & SCMI_SENSOR_CONFIG_FLAGS_EVENT_CONTROL_MASK)
         scmi_sensor_ctx.scmi_notification_api->scmi_notification_add_subscriber(
             MOD_SCMI_PROTOCOL_ID_SENSOR,
