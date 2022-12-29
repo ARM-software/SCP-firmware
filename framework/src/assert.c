@@ -6,6 +6,7 @@
  */
 
 #include <assert.h>
+#include <fwk_attributes.h>
 
 #if defined(__ARMCC_VERSION)
 void __aeabi_assert(const char *expr, const char *file, int line)
@@ -15,7 +16,7 @@ void __aeabi_assert(const char *expr, const char *file, int line)
     }
 }
 #elif defined(__NEWLIB__)
-void __assert_func(
+FWK_WEAK void __assert_func(
     const char *file,
     int line,
     const char *function,
