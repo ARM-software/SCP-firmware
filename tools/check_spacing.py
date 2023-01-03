@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -24,7 +24,7 @@ import glob
 #
 
 # Exclude all mod_test "mocks" directories
-UNIT_TEST_MOCKS = glob.glob("module/*/test/mocks")
+UNIT_TEST_MOCKS = glob.glob('module/*/test/**/mocks', recursive=True)
 
 EXCLUDE_DIRECTORIES = [
     '.git',
