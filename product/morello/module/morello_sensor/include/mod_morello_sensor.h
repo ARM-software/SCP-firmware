@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -80,17 +80,62 @@ enum mod_morello_volt_sensor_idx {
 };
 
 /*!
+ * \brief Sensor interrupt type
+ */
+enum sensor_interrupt_type {
+    /*! No Interrupt */
+    MOD_MORELLO_SENSOR_INVALID_INTERRUPT = -1,
+
+    /*! Fault Interrupt */
+    MOD_MORELLO_SENSOR_FAULT_INTERRUPT,
+
+    /*! Alarm B Interrupt */
+    MOD_MORELLO_SENSOR_ALARM_B_INTERRUPT,
+
+    /*! Alarm A Interrupt */
+    MOD_MORELLO_SENSOR_ALARM_A_INTERRUPT,
+
+    /*! Sensor Interrupt Count */
+    MOD_MORELLO_SENSOR_INTERRUPT_COUNT,
+};
+
+/*!
  * \brief Temperature sensor element configuration.
+ * The alarms have programmable hysteresis and can be configured to detect
+ * either rising or falling sample values.
+ * To disable alarms set the hysteresis threshold equal to the alarm
+ * threshold (default condition).
+ * For a rising alarm, set hysteresis threshold less than alarm threshold.
+ * Once triggered, the alarm is disarmed till the temperature again goes below
+ * hysteresis threshold. The values are reversed for falling alarm.
+ * Once enabled alarms will generate an interrupt if the value of the recovered
+ * data sample equals or exceeds the rising or falling alarm threshold.
  */
 struct mod_morello_temp_sensor_config {
     /*! Threshold value to raise an alarm */
     int32_t alarm_threshold;
 
+    /*! Threshold value used to re-arm alarm A */
+    int32_t alarm_hyst_threshold;
+
     /*! Threshold value to shutdown the temperature domain */
     int32_t shutdown_threshold;
 
+    /*! Threshold value used to re-arm alarm B */
+    int32_t shutdown_hyst_threshold;
+
     /*! Auxiliary sensor information */
     struct mod_sensor_info *info;
+};
+
+/*!
+ * \brief Parameters of the event.
+ */
+struct mod_morello_sensor_event_param {
+    /*! Offset of IP causing interrupt */
+    int offset;
+    /*! Type of interrupt */
+    enum sensor_interrupt_type interrupt_type;
 };
 
 /*!
@@ -105,12 +150,6 @@ struct mod_morello_volt_sensor_config {
  * \brief MORELLO sensor - Module configuration.
  */
 struct mod_morello_sensor_config {
-    /*! Identifier of timer alarm element */
-    fwk_id_t alarm_id;
-
-    /*! Identifier of timer alarm API */
-    fwk_id_t alarm_api;
-
     /*! Temperature sensor count */
     uint8_t t_sensor_count;
 
@@ -122,24 +161,12 @@ struct mod_morello_sensor_config {
 struct morello_temp_sensor_ctx {
     /* Pointer to temperature sensor config */
     struct mod_morello_temp_sensor_config *config;
-
-    /* Pointer to history of temperature sensor values */
-    int32_t *sensor_data_buffer;
-
-    /* Buffer index pointing to latest temperature value */
-    uint8_t buf_index;
 };
 
 /* Voltage sensor context */
 struct morello_volt_sensor_ctx {
     /* Pointer to voltage sensor config */
     struct mod_morello_volt_sensor_config *config;
-
-    /* Pointer to history of voltage sensor values */
-    int32_t *sensor_data_buffer;
-
-    /* Buffer index pointing to latest voltage value */
-    uint8_t buf_index;
 };
 
 /* MORELLO Sensor module context */
@@ -152,9 +179,6 @@ struct morello_sensor_ctx {
 
     /* Table of voltage sensor contexts */
     struct morello_volt_sensor_ctx *v_dev_ctx_table;
-
-    /* Pointer to timer alarm API */
-    struct mod_timer_alarm_api *timer_alarm_api;
 
     /* Pointer to SCP2PCC API */
     struct mod_morello_scp2pcc_api *scp2pcc_api;

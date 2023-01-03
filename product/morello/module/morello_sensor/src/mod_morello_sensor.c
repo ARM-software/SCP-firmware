@@ -15,7 +15,10 @@
 #include <mod_timer.h>
 
 #include <fwk_assert.h>
+#include <fwk_core.h>
+#include <fwk_event.h>
 #include <fwk_id.h>
+#include <fwk_interrupt.h>
 #include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
@@ -41,68 +44,6 @@ static const char *const sensor_type_name[MOD_MORELLO_VOLT_SENSOR_COUNT] = {
 };
 #endif
 
-static void morello_sensor_timer_callback(uintptr_t unused)
-{
-    struct morello_temp_sensor_ctx *t_dev_ctx;
-    struct morello_volt_sensor_ctx *v_dev_ctx;
-    unsigned int count;
-    int status;
-    int32_t value;
-
-    for (count = 0; count < sensor_ctx.module_config->t_sensor_count; count++) {
-        t_dev_ctx = &sensor_ctx.t_dev_ctx_table[count];
-        status =
-            morello_sensor_lib_sample(&value, MOD_MORELLO_TEMP_SENSOR, count);
-        if (status == FWK_SUCCESS) {
-            if (value >= t_dev_ctx->config->alarm_threshold &&
-                value < t_dev_ctx->config->shutdown_threshold) {
-                FWK_LOG_CRIT(
-                    "%s temperature (%d) reached alarm threshold!",
-                    sensor_type_name[count],
-                    (int)value);
-            } else if (value >= t_dev_ctx->config->shutdown_threshold) {
-                FWK_LOG_CRIT(
-                    "%s temperature (%d) reached shutdown threshold!",
-                    sensor_type_name[count],
-                    (int)value);
-                status = sensor_ctx.scp2pcc_api->send(
-                    MOD_SCP2PCC_SEND_SHUTDOWN, NULL, 0, NULL, NULL);
-                if (status != FWK_SUCCESS) {
-                    FWK_LOG_ERR(
-                        "[MORELLO SENSOR] Shutdown request to PCC failed");
-                    return;
-                }
-            }
-
-            t_dev_ctx->sensor_data_buffer[t_dev_ctx->buf_index++] = value;
-
-            if (t_dev_ctx->buf_index == PVT_HISTORY_LEN) {
-                t_dev_ctx->buf_index = 0;
-            }
-        }
-    }
-    /* Start new sample. */
-    morello_sensor_lib_trigger_sample(MOD_MORELLO_TEMP_SENSOR);
-
-    /* Get the Voltage Monitor values */
-    for (count = 0; count < sensor_ctx.module_config->v_sensor_count; count++) {
-        v_dev_ctx = &sensor_ctx.v_dev_ctx_table[count];
-        status =
-            morello_sensor_lib_sample(&value, MOD_MORELLO_VOLT_SENSOR, count);
-        if (status != FWK_SUCCESS) {
-            return;
-        }
-
-        v_dev_ctx->sensor_data_buffer[v_dev_ctx->buf_index++] = value;
-
-        if (v_dev_ctx->buf_index == PVT_HISTORY_LEN) {
-            v_dev_ctx->buf_index = 0;
-        }
-    }
-    /* Start new sample. */
-    morello_sensor_lib_trigger_sample(MOD_MORELLO_VOLT_SENSOR);
-}
-
 /*
  * Module API
  */
@@ -111,12 +52,10 @@ static int get_value(fwk_id_t element_id, mod_sensor_value_t *value)
 #ifdef BUILD_HAS_SENSOR_SIGNED_VALUE
     return FWK_E_SUPPORT;
 #else
-    struct morello_temp_sensor_ctx *t_dev_ctx;
-    struct morello_volt_sensor_ctx *v_dev_ctx;
     unsigned int el_idx;
     uint8_t t_sensor_count;
     uint8_t v_sensor_count;
-    int32_t buf_value;
+    int32_t sensor_value;
 
     el_idx = fwk_id_get_element_idx(element_id);
     t_sensor_count = sensor_ctx.module_config->t_sensor_count;
@@ -127,26 +66,14 @@ static int get_value(fwk_id_t element_id, mod_sensor_value_t *value)
     }
 
     if (el_idx < t_sensor_count) {
-        t_dev_ctx = &sensor_ctx.t_dev_ctx_table[el_idx];
-        if (t_dev_ctx == NULL) {
-            return FWK_E_DATA;
-        }
-
-        buf_value = t_dev_ctx->sensor_data_buffer
-                        [t_dev_ctx->buf_index == 0 ? PVT_HISTORY_LEN - 1 :
-                                                     t_dev_ctx->buf_index - 1];
-
+        morello_sensor_lib_get_sensor_value(
+            &sensor_value, MOD_MORELLO_TEMP_SENSOR, el_idx);
     } else {
-        v_dev_ctx = &sensor_ctx.v_dev_ctx_table[el_idx - t_sensor_count];
-        if (v_dev_ctx == NULL) {
-            return FWK_E_DATA;
-        }
-
-        buf_value = v_dev_ctx->sensor_data_buffer
-                        [v_dev_ctx->buf_index == 0 ? PVT_HISTORY_LEN - 1 :
-                                                     v_dev_ctx->buf_index - 1];
+        morello_sensor_lib_get_sensor_value(
+            &sensor_value, MOD_MORELLO_VOLT_SENSOR, el_idx - t_sensor_count);
     }
-    *value = (uint64_t)buf_value;
+
+    *value = (uint64_t)sensor_value;
 
     return FWK_SUCCESS;
 #endif
@@ -205,22 +132,12 @@ static int morello_sensor_element_init(
         t_dev_ctx = &sensor_ctx.t_dev_ctx_table[el_idx];
 
         t_dev_ctx->config = t_config;
-
-        t_dev_ctx->sensor_data_buffer =
-            fwk_mm_calloc(PVT_HISTORY_LEN, sizeof(int32_t));
-
-        t_dev_ctx->buf_index = 0;
     } else {
         v_config = (struct mod_morello_volt_sensor_config *)data;
 
         v_dev_ctx = &sensor_ctx.v_dev_ctx_table[el_idx - t_sensor_count];
 
         v_dev_ctx->config = v_config;
-
-        v_dev_ctx->sensor_data_buffer =
-            fwk_mm_calloc(PVT_HISTORY_LEN, sizeof(int32_t));
-
-        v_dev_ctx->buf_index = 0;
     }
 
     return FWK_SUCCESS;
@@ -228,19 +145,8 @@ static int morello_sensor_element_init(
 
 static int morello_sensor_bind(fwk_id_t id, unsigned int round)
 {
-    int status;
-
     if (round == 0) {
         if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
-            status = fwk_module_bind(
-                sensor_ctx.module_config->alarm_id,
-                sensor_ctx.module_config->alarm_api,
-                &sensor_ctx.timer_alarm_api);
-
-            if (status != FWK_SUCCESS) {
-                return status;
-            }
-
             return fwk_module_bind(
                 FWK_ID_MODULE(FWK_MODULE_IDX_MORELLO_SCP2PCC),
                 FWK_ID_API(FWK_MODULE_IDX_MORELLO_SCP2PCC, 0),
@@ -250,11 +156,93 @@ static int morello_sensor_bind(fwk_id_t id, unsigned int round)
     return FWK_SUCCESS;
 }
 
+void morello_sensor_isr(void)
+{
+    int interrupt_type;
+    int status;
+    int offset;
+    struct fwk_event event;
+    struct mod_morello_sensor_event_param *event_param =
+        (struct mod_morello_sensor_event_param *)event.params;
+
+    interrupt_type = morello_sensor_lib_handle_irq(&offset);
+
+    event = (struct fwk_event){
+        .source_id = FWK_ID_MODULE(FWK_MODULE_IDX_MORELLO_SENSOR),
+        .target_id = FWK_ID_MODULE(FWK_MODULE_IDX_MORELLO_SENSOR),
+    };
+    event_param->offset = offset;
+    event_param->interrupt_type = interrupt_type;
+
+    if (interrupt_type == MOD_MORELLO_SENSOR_ALARM_B_INTERRUPT) {
+        status = sensor_ctx.scp2pcc_api->send(
+            MOD_SCP2PCC_SEND_SHUTDOWN, NULL, 0, NULL, NULL);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR("[MORELLO SENSOR] Shutdown request to PCC failed");
+        }
+    }
+
+    status = fwk_put_event(&event);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR("[MORELLO SENSOR] Unable to put log event!");
+    }
+}
+
+static int morello_sensor_process_event(
+    const struct fwk_event *event,
+    struct fwk_event *resp)
+{
+    int32_t value;
+    struct mod_morello_sensor_event_param *event_param;
+    int offset;
+    enum sensor_interrupt_type interrupt_type;
+
+    event_param = (struct mod_morello_sensor_event_param *)event->params;
+    offset = event_param->offset;
+    interrupt_type = event_param->interrupt_type;
+
+    if (offset >= MOD_MORELLO_SENSOR_INTERRUPT_COUNT) {
+        FWK_LOG_ERR("Unsupported sensor IP interrupt!");
+        return FWK_SUCCESS;
+    }
+
+    switch (interrupt_type) {
+    case MOD_MORELLO_SENSOR_FAULT_INTERRUPT:
+        FWK_LOG_CRIT(
+            "[MORELLO SENSOR] Fault generated on %s", sensor_type_name[offset]);
+        FWK_LOG_CRIT("[MORELLO SENSOR] Sample values might be invalid.");
+        break;
+
+    case MOD_MORELLO_SENSOR_ALARM_B_INTERRUPT:
+        morello_sensor_lib_get_sensor_value(
+            &value, MOD_MORELLO_TEMP_SENSOR, offset);
+        FWK_LOG_CRIT(
+            "[MORELLO SENSOR] %s reached shutdown threshold!",
+            sensor_type_name[offset]);
+        FWK_LOG_CRIT("[MORELLO SENSOR] Temperature %dC.", (int)value);
+        break;
+
+    case MOD_MORELLO_SENSOR_ALARM_A_INTERRUPT:
+        morello_sensor_lib_get_sensor_value(
+            &value, MOD_MORELLO_TEMP_SENSOR, offset);
+        FWK_LOG_CRIT(
+            "[MORELLO SENSOR] %s reached alarm threshold!",
+            sensor_type_name[offset]);
+        FWK_LOG_CRIT("[MORELLO SENSOR] Temperature %dC.", (int)value);
+        break;
+
+    default:
+        FWK_LOG_ERR("[MORELLO SENSOR] Unsupported interrupt generated");
+    }
+    return FWK_SUCCESS;
+}
+
 static int morello_sensor_start(fwk_id_t id)
 {
     int status;
     uint32_t error_reg;
     int exit_status = FWK_SUCCESS;
+    struct morello_temp_sensor_ctx *t_dev_ctx;
 
     if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         status = morello_sensor_lib_init(&error_reg);
@@ -281,18 +269,19 @@ static int morello_sensor_start(fwk_id_t id)
             return exit_status;
         }
 
-        /* Do the initial conversion */
-        morello_sensor_timer_callback(0);
+        fwk_interrupt_set_isr(SCP_PVT_IRQ, morello_sensor_isr);
+        fwk_interrupt_clear_pending(SCP_PVT_IRQ);
+        fwk_interrupt_enable(SCP_PVT_IRQ);
 
-        status = sensor_ctx.timer_alarm_api->start(
-            sensor_ctx.module_config->alarm_id,
-            1000,
-            MOD_TIMER_ALARM_TYPE_PERIODIC,
-            &morello_sensor_timer_callback,
-            0);
-
-        if (status != FWK_SUCCESS) {
-            return status;
+        for (int count = 0; count < sensor_ctx.module_config->t_sensor_count;
+             count++) {
+            t_dev_ctx = &sensor_ctx.t_dev_ctx_table[count];
+            morello_enable_temp_sensor_alarm(
+                count,
+                t_dev_ctx->config->alarm_threshold,
+                t_dev_ctx->config->shutdown_threshold,
+                t_dev_ctx->config->alarm_hyst_threshold,
+                t_dev_ctx->config->shutdown_hyst_threshold);
         }
 
         FWK_LOG_INFO(
@@ -321,4 +310,5 @@ const struct fwk_module module_morello_sensor = {
     .bind = morello_sensor_bind,
     .start = morello_sensor_start,
     .process_bind_request = morello_sensor_process_bind_request,
+    .process_event = morello_sensor_process_event,
 };
