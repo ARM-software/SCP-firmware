@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -17,7 +17,10 @@
  * Driver API
  */
 
-int morello_sensor_lib_sample(int32_t *value, enum sensor_type type, int offset)
+int morello_sensor_lib_get_sensor_value(
+    int32_t *value,
+    enum sensor_type type,
+    int offset)
 {
     int status = FWK_SUCCESS;
 
@@ -41,11 +44,21 @@ int morello_sensor_lib_sample(int32_t *value, enum sensor_type type, int offset)
     return status;
 }
 
-void morello_sensor_lib_trigger_sample(enum sensor_type type)
-{
-}
-
 int morello_sensor_lib_init(uint32_t *msg)
 {
     return FWK_SUCCESS;
+}
+
+void morello_enable_temp_sensor_alarm(
+    int offset,
+    float alarm_A_threshold,
+    float alarm_B_threshold,
+    float alarm_A_hysteresis,
+    float alarm_B_hysteresis)
+{
+}
+
+int morello_sensor_lib_handle_irq(int *offset)
+{
+    return MOD_MORELLO_SENSOR_INVALID_INTERRUPT;
 }
