@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -84,6 +84,15 @@ struct cmn700_device_ctx {
     struct mod_timer_api *timer_api;
 
     bool initialized;
+
+    /* Count of IO regions programmed in SAM table */
+    unsigned int region_io_count;
+
+    /* Count of system cache regions programmed in SAM table */
+    unsigned int region_sys_count;
+
+    /* Flags to indicate SCG region init status. */
+    unsigned int scg_regions_enabled[MAX_SCG_COUNT];
 };
 
 #endif /* INTERNAL_CMN700_CTX_H */

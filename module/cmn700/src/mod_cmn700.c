@@ -545,9 +545,6 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
     unsigned int hn_nodeid_reg_bits_idx = 0;
     unsigned int logical_id;
     unsigned int region_idx;
-    unsigned int region_io_count = 0;
-    unsigned int region_sys_count = 0;
-    unsigned int scg_regions_enabled[MAX_SCG_COUNT] = { 0, 0, 0, 0 };
     uint64_t base;
     const struct mod_cmn700_mem_region_map *region;
     const struct mod_cmn700_config *config = ctx->config;
@@ -577,7 +574,7 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
 
             configure_region(
                 rnsam,
-                region_io_count,
+                ctx->region_io_count,
                 base,
                 region->size,
                 SAM_NODE_TYPE_HN_I,
@@ -586,10 +583,10 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
             /*
              * Configure target node
              */
-            group = region_io_count /
+            group = ctx->region_io_count /
                 CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP;
             bit_pos = CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRY_BITS_WIDTH *
-                (region_io_count %
+                (ctx->region_io_count %
                  CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP);
 
             rnsam->NON_HASH_TGT_NODEID[group] &=
@@ -598,7 +595,7 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
                 (region->node_id & CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK)
                 << bit_pos;
 
-            region_io_count++;
+            ctx->region_io_count++;
             break;
 
         case MOD_CMN700_MEM_REGION_TYPE_SYSCACHE:
@@ -613,17 +610,17 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
 
             configure_region(
                 rnsam,
-                region_sys_count,
+                ctx->region_sys_count,
                 base,
                 region->size,
                 SAM_NODE_TYPE_HN_F,
                 SAM_TYPE_SYS_CACHE_GRP_REGION);
 
             /* Mark corresponding region as enabled */
-            fwk_assert(region_sys_count < MAX_SCG_COUNT);
-            scg_regions_enabled[region_sys_count] = 1;
+            fwk_assert(ctx->region_sys_count < MAX_SCG_COUNT);
+            ctx->scg_regions_enabled[ctx->region_sys_count] = 1;
 
-            region_sys_count++;
+            ctx->region_sys_count++;
 
             hnf_count_in_scg = 0;
             for (logical_id = 0; logical_id < ctx->hnf_count; logical_id++) {
@@ -669,7 +666,8 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
             }
 
             rnsam->SYS_CACHE_GRP_HN_COUNT |= ((uint64_t)hnf_count_in_scg)
-                << CMN700_RNSAM_SYS_CACHE_GRP_HN_CNT_POS(region_sys_count - 1);
+                << CMN700_RNSAM_SYS_CACHE_GRP_HN_CNT_POS(
+                                                 ctx->region_sys_count - 1);
 
             break;
 
@@ -706,7 +704,7 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
              */
             configure_region(
                 rnsam,
-                region_io_count,
+                ctx->region_io_count,
                 region->base,
                 region->size,
                 SAM_NODE_TYPE_CXRA,
@@ -717,10 +715,10 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
              */
             cxra_ldid = config->ccg_config_table[idx].ldid;
             cxra_node_id = ctx->ccg_ra_reg_table[cxra_ldid].node_id;
-            group = region_io_count /
+            group = ctx->region_io_count /
                 CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP;
             bit_pos = CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRY_BITS_WIDTH *
-                (region_io_count %
+                (ctx->region_io_count %
                  CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP);
 
             rnsam->NON_HASH_TGT_NODEID[group] &=
@@ -729,7 +727,7 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
                 (cxra_node_id & CMN700_RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK)
                 << bit_pos;
 
-            region_io_count++;
+            ctx->region_io_count++;
             break;
 
         default:
@@ -753,7 +751,8 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
      */
     if (config->hnf_cal_mode) {
         for (region_idx = 0; region_idx < MAX_SCG_COUNT; region_idx++)
-            rnsam->SYS_CACHE_GRP_CAL_MODE |= scg_regions_enabled[region_idx] *
+            rnsam->SYS_CACHE_GRP_CAL_MODE |=
+                ctx->scg_regions_enabled[region_idx] *
                 (CMN700_RNSAM_SCG_HNF_CAL_MODE_EN
                  << (region_idx * CMN700_RNSAM_SCG_HNF_CAL_MODE_SHIFT));
     }
@@ -767,14 +766,14 @@ static int cmn700_setup_sam(struct cmn700_rnsam_reg *rnsam)
 
         /* Number of HN-Fs in a cluster */
         hnf_count_per_cluster =
-            (hnf_count / hnf_cluster_count) / region_sys_count;
+            (hnf_count / hnf_cluster_count) / ctx->region_sys_count;
 
         /*
          * For each SCG/HTG region, configure the hierarchical hashing mode with
          * number of clusters, hnf count per cluster, hashing address bits etc.
          * and enable hierarchical hashing for each SCG/HTG region.
          */
-        for (region_idx = 0; region_idx < region_sys_count; region_idx++) {
+        for (region_idx = 0; region_idx < ctx->region_sys_count; region_idx++) {
             rnsam->HASHED_TARGET_GRP_HASH_CNTL[region_idx] =
                 ((CMN700_RNSAM_HIERARCHICAL_HASH_EN_MASK
                   << CMN700_RNSAM_HIERARCHICAL_HASH_EN_POS) |
