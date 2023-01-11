@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -48,3 +48,8 @@ target_link_libraries(tc2-bl1 PUBLIC cmsis::core-m)
 
 target_include_directories(tc2-bl1
     PUBLIC $<TARGET_PROPERTY:cmsis::core-m,INTERFACE_INCLUDE_DIRECTORIES>)
+
+cmake_dependent_option(
+    SCP_PLATFORM_VARIANT "Choose platform software variant?"
+    "${SCP_PLATFORM_VARIANT_INIT}" "DEFINED SCP_PLATFORM_VARIANT_INIT"
+    "${SCP_PLATFORM_VARIANT}")
