@@ -53,7 +53,7 @@ products = [
     Product('rdn2', variants=[
         Parameter('0'), Parameter('1'), Parameter('2'), Parameter('3')]),
     Product('rdfremont'),
-    Product('tc2'),
+    Product('tc2', variants=[Parameter('0'), Parameter('1')]),
 ]
 
 
