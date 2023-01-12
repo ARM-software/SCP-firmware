@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -210,12 +210,16 @@ int fwk_io_putch(const struct fwk_io_stream *stream, char ch)
 
     fwk_assert(stream->adapter->putch != NULL);
 
-    status = stream->adapter->putch(stream, ch);
+    do {
+        /* Wait for the adapter to accept new characters */
+        status = stream->adapter->putch(stream, ch);
+    } while (status == FWK_E_BUSY);
+
     if (status != FWK_SUCCESS) {
         return FWK_E_HANDLER;
     }
 
-    return FWK_SUCCESS;
+    return status;
 }
 
 int fwk_io_read(

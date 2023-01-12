@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -176,7 +176,9 @@ struct fwk_io_adapter {
      *
      * \return Status code representing the result of the operation.
      *
-     * \retval ::FWK_SUCCESS A character was successfully read.
+     * \retval ::FWK_SUCCESS A character was successfully written.
+     * \retval ::FWK_E_BUSY The resource is currently unavailable and it cannot
+     *      accept new characters.
      */
     int (*putch)(const struct fwk_io_stream *stream, char ch);
 
