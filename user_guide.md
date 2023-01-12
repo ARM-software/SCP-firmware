@@ -491,3 +491,14 @@ SCP-firmware.
 
 [a super-project]:
 https://git.linaro.org/landing-teams/working/arm/arm-reference-platforms.git/about/docs/user-guide.rst
+
+## Deprecated platforms
+
+This section provides some guidance for deprecating a platform. The code in
+this case remains in the repository, but support is no longer provided.
+The process involves removing the chosen platform from the build and adding it
+to the list of deprecated platforms.
+
+1. Remove the chosen-platform from the "products" list in tools/ci_cmake.py
+2. Add the chosen-platform to the "DEPRECATED_PLATFORMS" list in Makefile.cmake
+3. Submit a change to this repository
