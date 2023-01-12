@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -116,6 +116,11 @@ endif
 #
 PRODUCTS := $(shell ls $(PRODUCTS_DIR) 2>/dev/null)
 
+#
+# Deprecated Products/Platforms
+#
+DEPRECATED_PLATFORMS := none
+
 PRODUCT_INDEPENDENT_GOALS := clean help test doc fwk_test mod_test
 
 ifneq ($(filter-out $(PRODUCT_INDEPENDENT_GOALS), $(MAKECMDGOALS)),)
@@ -133,6 +138,12 @@ ifneq ($(filter-out $(PRODUCT_INDEPENDENT_GOALS), $(MAKECMDGOALS)),)
 
     ifeq ($(BS_FIRMWARE_LIST),)
         $(error "You must define BS_FIRMWARE_LIST in product.mk. Aborting...")
+    endif
+
+    # Terminate the build if the chosen platform is in the list of deprecated
+    # ones.
+    ifeq ($(filter-out $(DEPRECATED_PLATFORMS), $(PRODUCT)),)
+        $(error "$(PRODUCT) has been deprecated! Build terminated")
     endif
 
     FIRMWARE_TARGETS := $(addprefix firmware-, $(BS_FIRMWARE_LIST))
