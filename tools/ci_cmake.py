@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -50,7 +50,8 @@ products = [
     Product('tc0', variants=[Parameter('0'), Parameter('1')]),
     Product('tc1'),
     Product('rcar', toolchains=[Parameter('GNU')]),
-    Product('rdn2', variants=[Parameter('0'), Parameter('1'), Parameter('2')]),
+    Product('rdn2', variants=[
+        Parameter('0'), Parameter('1'), Parameter('2'), Parameter('3')]),
     Product('rdfremont'),
     Product('tc2'),
 ]
