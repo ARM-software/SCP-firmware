@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -211,9 +211,6 @@ int mod_f_uart3_io_putch(const struct fwk_io_stream *stream, char ch)
         &mod_f_uart3_ctx.elements[fwk_id_get_element_idx(stream->id)];
 
     fwk_assert(ctx->open);
-
-    if ((ch == '\n') && !(stream->mode & FWK_IO_MODE_BINARY))
-        mod_f_uart3_putch(stream->id, '\r'); /* Prepend carriage return */
 
     mod_f_uart3_putch(stream->id, ch);
 
