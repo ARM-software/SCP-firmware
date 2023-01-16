@@ -306,8 +306,9 @@ noreturn void __fwk_run_main_loop(void)
 {
     for (;;) {
         fwk_process_event_queue();
-        (void)fwk_log_unbuffer();
-        fwk_arch_suspend();
+        if (fwk_log_unbuffer() == FWK_SUCCESS) {
+            fwk_arch_suspend();
+        }
     }
 }
 
