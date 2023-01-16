@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -620,12 +620,6 @@ static int mod_pl011_io_putch(const struct fwk_io_stream *stream, char ch)
 
     if (!ctx->powered || !ctx->clocked) {
         return FWK_E_PWRSTATE;
-    }
-
-    if ((ch == '\n') &&
-        (((unsigned int)stream->mode & (unsigned int)FWK_IO_MODE_BINARY)) ==
-            0U) {
-        mod_pl011_putch(stream->id, '\r'); /* Prepend carriage return */
     }
 
     mod_pl011_putch(stream->id, ch);
