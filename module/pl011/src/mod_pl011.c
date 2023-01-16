@@ -158,7 +158,7 @@ static void mod_pl011_enable(fwk_id_t id)
     reg->CR = PL011_CR_UARTEN | PL011_CR_RXE | PL011_CR_TXE;
 }
 
-static void mod_pl011_putch(fwk_id_t id, char ch)
+static bool mod_pl011_putch(fwk_id_t id, char ch)
 {
     const struct mod_pl011_element_cfg *cfg = fwk_module_get_data(id);
     struct mod_pl011_element_ctx *ctx =
@@ -169,11 +169,14 @@ static void mod_pl011_putch(fwk_id_t id, char ch)
     fwk_assert(ctx->powered);
     fwk_assert(ctx->clocked);
 
-    while (reg->FR & PL011_FR_TXFF) {
-        continue;
+    /* Check if buffer is full. */
+    if ((reg->FR & PL011_FR_TXFF) > 0) {
+        return false;
     }
 
     reg->DR = (uint16_t)ch;
+
+    return true;
 }
 
 static bool mod_pl011_getch(fwk_id_t id, char *ch)
@@ -622,7 +625,9 @@ static int mod_pl011_io_putch(const struct fwk_io_stream *stream, char ch)
         return FWK_E_PWRSTATE;
     }
 
-    mod_pl011_putch(stream->id, ch);
+    if (!mod_pl011_putch(stream->id, ch)) {
+        return FWK_E_BUSY;
+    }
 
     return FWK_SUCCESS;
 }
