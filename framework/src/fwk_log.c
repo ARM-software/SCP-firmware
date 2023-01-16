@@ -291,14 +291,26 @@ int fwk_log_unbuffer(void)
      * function will run the logic above to finalize the message.
      */
 
-    fetched = fwk_ring_pop(&fwk_log_ctx.ring, &ch, sizeof(ch));
+    fetched = fwk_ring_peek(&fwk_log_ctx.ring, &ch, sizeof(ch));
     fwk_assert(fetched == sizeof(char));
 
-    status = fwk_io_putch(fwk_log_stream, ch);
-    if (status == FWK_SUCCESS) {
+    status = fwk_io_putch_nowait(fwk_log_stream, ch);
+    switch (status) {
+    case FWK_SUCCESS:
+        /*
+         * If the character was successfully printed, then we remove it from
+         * the buffer.
+         */
+        fwk_ring_pop(&fwk_log_ctx.ring, &ch, sizeof(ch));
         fwk_log_ctx.remaining--;
-
         status = FWK_PENDING;
+        break;
+    case FWK_E_BUSY:
+        /* If the resource is busy, we keep the character in the buffer. */
+        status = FWK_PENDING;
+        break;
+    default:
+        break;
     }
 
 exit:

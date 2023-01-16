@@ -222,6 +222,34 @@ int fwk_io_putch(const struct fwk_io_stream *stream, char ch)
     return status;
 }
 
+int fwk_io_putch_nowait(const struct fwk_io_stream *stream, char ch)
+{
+    int status;
+
+    if (stream == NULL) {
+        return FWK_E_PARAM;
+    }
+
+    if (stream->adapter == NULL) {
+        return FWK_E_STATE; /* The stream is not open */
+    }
+
+    if ((((unsigned int)stream->mode) & ((unsigned int)FWK_IO_MODE_WRITE)) ==
+        0U) {
+        return FWK_E_SUPPORT; /* Stream not open for write operations */
+    }
+
+    fwk_assert(stream->adapter->putch != NULL);
+
+    status = stream->adapter->putch(stream, ch);
+
+    if ((status != FWK_SUCCESS) && (status != FWK_E_BUSY)) {
+        return FWK_E_HANDLER;
+    }
+
+    return status;
+}
+
 int fwk_io_read(
     const struct fwk_io_stream *restrict stream,
     size_t *restrict read,
