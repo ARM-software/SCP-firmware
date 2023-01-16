@@ -129,6 +129,18 @@
 #endif
 
 /*!
+ * \def FMW_LOG_ENDLINE_STR
+ *
+ * \brief String representation of the endline.
+ *
+ * \details This definition has a default value of `"\r\n"`.
+ */
+
+#ifndef FMW_LOG_ENDLINE_STR
+#    define FMW_LOG_ENDLINE_STR "\r\n"
+#endif
+
+/*!
  * \addtogroup GroupLoggingLevels Filter Levels
  *
  * \details The logging framework uses *filter levels* to rank the criticality

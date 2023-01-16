@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 
-static const char FWK_LOG_TERMINATOR[] = { '\n', '\0' };
+static const char FWK_LOG_TERMINATOR[] = FMW_LOG_ENDLINE_STR;
 
 static struct {
     unsigned int dropped; /* Count of messages lost */
@@ -148,7 +148,7 @@ static void fwk_log_vsnprintf(
      * on a line-by-line basis.
      */
 
-    newline = strchr(buffer, (int)'\n');
+    newline = strstr(buffer, FWK_LOG_TERMINATOR);
     if (newline == NULL) {
         newline = buffer + length;
     }
@@ -178,29 +178,27 @@ static void fwk_log_snprintf(
 
 static bool fwk_log_banner(void)
 {
+    char buffer[FMW_LOG_COLUMNS + sizeof(FWK_LOG_TERMINATOR)];
+
 #ifndef FMW_LOG_MINIMAL_BANNER
-    const char *banner =
-        " ___  ___ ___      __ _\n"
-        "/ __|/ __| _ \\___ / _(_)_ _ _ ____ __ ____ _ _ _ ___\n"
-        "\\__ | (__|  _|___|  _| | '_| '  \\ V  V / _` | '_/ -_)\n"
-        "|___/\\___|_|     |_| |_|_| |_|_|_\\_/\\_/\\__,_|_| \\___|\n"
-        "\n" BUILD_VERSION_DESCRIBE_STRING "\n";
+    const char *banner[] = {
+        " ___  ___ ___      __ _",
+        "/ __|/ __| _ \\___ / _(_)_ _ _ ____ __ ____ _ _ _ ___",
+        "\\__ | (__|  _|___|  _| | '_| '  \\ V  V / _` | '_/ -_)",
+        "|___/\\___|_|     |_| |_|_| |_|_|_\\_/\\_/\\__,_|_| \\___|",
+        "",
+        BUILD_VERSION_DESCRIBE_STRING,
+        "",
+    };
 #else
-    const char *banner = "SCP-firmware " BUILD_VERSION_DESCRIBE_STRING "\n";
+    const char *banner[] = { "SCP-firmware " BUILD_VERSION_DESCRIBE_STRING,
+                             "" };
 #endif
-
-    while (banner != NULL) {
-        char buffer[FMW_LOG_COLUMNS + sizeof(FWK_LOG_TERMINATOR)];
-
-        fwk_log_snprintf(sizeof(buffer), buffer, "%s", banner);
-
+    for (unsigned int i = 0; i < FWK_ARRAY_SIZE(banner); i++) {
+        fwk_log_snprintf(
+            sizeof(buffer), buffer, "%s%s", banner[i], FWK_LOG_TERMINATOR);
         if (fwk_io_puts(fwk_log_stream, buffer) != FWK_SUCCESS) {
             return false;
-        }
-
-        banner = strchr(banner, (int)'\n');
-        if (banner != NULL) {
-            banner++;
         }
     }
 
