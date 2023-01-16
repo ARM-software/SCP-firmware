@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -97,7 +97,7 @@ int fwk_arch_init(const struct fwk_arch_init_driver *driver)
      */
 #if defined(BUILD_HAS_SUB_SYSTEM_MODE)
     fwk_process_event_queue();
-    (void)fwk_log_unbuffer();
+    fwk_log_flush();
 #else
     __fwk_run_main_loop();
 #endif
