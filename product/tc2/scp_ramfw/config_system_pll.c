@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -40,6 +40,19 @@ static const struct fwk_element system_pll_element_table[
                     .status_reg = (void *)&SCP_PIK_PTR->PLL_STATUS[1],
                     .lock_flag_mask = PLL_STATUS_CPUPLL_LOCK(4),
                     .initial_rate = 1893 * FWK_MHZ,
+                    .min_rate = MOD_SYSTEM_PLL_MIN_RATE,
+                    .max_rate = MOD_SYSTEM_PLL_MAX_RATE,
+                    .min_step = MOD_SYSTEM_PLL_MIN_INTERVAL,
+                }),
+            },
+        [CLOCK_PLL_IDX_CPU_HUNTER_ELP] =
+            {
+                .name = "CPU_PLL_HUNTER_ELP",
+                .data = &((struct mod_system_pll_dev_config){
+                    .control_reg = (void *)SCP_PLL_CPU2,
+                    .status_reg = (void *)&SCP_PIK_PTR->PLL_STATUS[1],
+                    .lock_flag_mask = PLL_STATUS_CPUPLL_LOCK(4),
+                    .initial_rate = 2176 * FWK_MHZ,
                     .min_rate = MOD_SYSTEM_PLL_MIN_RATE,
                     .max_rate = MOD_SYSTEM_PLL_MAX_RATE,
                     .min_step = MOD_SYSTEM_PLL_MIN_INTERVAL,

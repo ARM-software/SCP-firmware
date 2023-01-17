@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -34,6 +34,15 @@ static const struct mod_pik_clock_rate rate_table_cpu_group_hunter[1] = {
     {
         .rate = 1893 * FWK_MHZ,
         .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC2_PLL1,
+        .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
+        .divider = 1, /* Rate adjusted via CPU PLL */
+    },
+};
+
+static const struct mod_pik_clock_rate rate_table_cpu_group_hunter_elp[1] = {
+    {
+        .rate = 2176 * FWK_MHZ,
+        .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC2_PLL2,
         .divider_reg = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
         .divider = 1, /* Rate adjusted via CPU PLL */
     },
@@ -179,8 +188,8 @@ static const struct fwk_element pik_clock_element_table[
             .control_reg = &CLUSTER_PIK_PTR->CORECLK[7].CTRL,
             .divext_reg = &CLUSTER_PIK_PTR->CORECLK[7].DIV,
             .modulator_reg = &CLUSTER_PIK_PTR->CORECLK[7].MOD,
-            .rate_table = rate_table_cpu_group_hunter,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_hunter),
+            .rate_table = rate_table_cpu_group_hunter_elp,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_hunter_elp),
         }),
     },
     [CLOCK_PIK_IDX_GIC] = {
