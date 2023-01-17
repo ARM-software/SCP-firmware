@@ -104,6 +104,30 @@ static const struct mod_scmi_perf_domain_config
         },
 #endif
         },
+        [DVFS_ELEMENT_IDX_HUNTER_ELP] = {
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
+         .fast_channels_addr_scp = (uint64_t[]) {
+            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
+                FC_LEVEL_SET_ADDR(DVFS_ELEMENT_IDX_HUNTER_ELP),
+            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET] =
+                FC_LIMIT_SET_ADDR(DVFS_ELEMENT_IDX_HUNTER_ELP),
+            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] =
+                FC_LEVEL_GET_ADDR(DVFS_ELEMENT_IDX_HUNTER_ELP),
+            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET] =
+                FC_LIMIT_GET_ADDR(DVFS_ELEMENT_IDX_HUNTER_ELP),
+        },
+         .fast_channels_addr_ap = (uint64_t[]) {
+            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
+                FC_LEVEL_SET_AP_ADDR(DVFS_ELEMENT_IDX_HUNTER_ELP),
+            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET] =
+                FC_LIMIT_SET_AP_ADDR(DVFS_ELEMENT_IDX_HUNTER_ELP),
+            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] =
+                FC_LEVEL_GET_AP_ADDR(DVFS_ELEMENT_IDX_HUNTER_ELP),
+            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET] =
+                FC_LIMIT_GET_AP_ADDR(DVFS_ELEMENT_IDX_HUNTER_ELP),
+        },
+#endif
+        },
     };
 
 #if (PLATFORM_VARIANT == TC2_VAR_EXPERIMENT_POWER)

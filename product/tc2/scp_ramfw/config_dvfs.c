@@ -31,8 +31,9 @@
  */
 
 /* dynamic-power-coeffient/1000 */
-#define HAYES_DPC  0.230
-#define HUNTER_DPC 0.495
+#define HAYES_DPC      0.230
+#define HUNTER_DPC     0.495
+#define HUNTER_ELP_DPC 1.054
 
 static struct mod_dvfs_opp operating_points_hayes[6] = {
     {
@@ -102,6 +103,40 @@ static struct mod_dvfs_opp operating_points_hunter[6] = {
     { 0 }
 };
 
+static struct mod_dvfs_opp operating_points_hunter_elp[6] = {
+    {
+        .level = 1088 * 1000000UL,
+        .frequency = 1088 * FWK_KHZ,
+        .voltage = 550,
+        .power = (uint32_t)(HUNTER_ELP_DPC * 1088 * 0.550 * 0.550),
+    },
+    {
+        .level = 1632 * 1000000UL,
+        .frequency = 1632 * FWK_KHZ,
+        .voltage = 650,
+        .power = (uint32_t)(HUNTER_ELP_DPC * 1632 * 0.650 * 0.650),
+    },
+    {
+        .level = 2176 * 1000000UL,
+        .frequency = 2176 * FWK_KHZ,
+        .voltage = 750,
+        .power = (uint32_t)(HUNTER_ELP_DPC * 2176 * 0.750 * 0.750),
+    },
+    {
+        .level = 2612 * 1000000UL,
+        .frequency = 2612 * FWK_KHZ,
+        .voltage = 850,
+        .power = (uint32_t)(HUNTER_ELP_DPC * 2612 * 0.850 * 0.850),
+    },
+    {
+        .level = 3047 * 1000000UL,
+        .frequency = 3047 * FWK_KHZ,
+        .voltage = 950,
+        .power = (uint32_t)(HUNTER_ELP_DPC * 3047 * 0.950 * 0.950),
+    },
+    { 0 }
+};
+
 static const struct mod_dvfs_domain_config cpu_group_hayes = {
     .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, PSU_ELEMENT_IDX_HAYES),
     .clock_id =
@@ -130,6 +165,22 @@ static const struct mod_dvfs_domain_config cpu_group_hunter = {
     .opps = operating_points_hunter,
 };
 
+static const struct mod_dvfs_domain_config cpu_group_hunter_elp = {
+    .psu_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, PSU_ELEMENT_IDX_HUNTER_ELP),
+    .clock_id = FWK_ID_ELEMENT_INIT(
+        FWK_MODULE_IDX_CLOCK,
+        CLOCK_IDX_CPU_GROUP_HUNTER_ELP),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
+        FWK_MODULE_IDX_TIMER,
+        0,
+        TC2_CONFIG_TIMER_DVFS_CPU_HUNTER_ELP),
+    .retry_ms = 1,
+    .latency = 1200,
+    .sustained_idx = 2,
+    .opps = operating_points_hunter_elp,
+};
+
 static const struct fwk_element element_table[DVFS_ELEMENT_IDX_COUNT + 1] = {
     [DVFS_ELEMENT_IDX_HAYES] =
         {
@@ -140,6 +191,11 @@ static const struct fwk_element element_table[DVFS_ELEMENT_IDX_COUNT + 1] = {
         {
             .name = "CPU_GROUP_HUNTER",
             .data = &cpu_group_hunter,
+        },
+    [DVFS_ELEMENT_IDX_HUNTER_ELP] =
+        {
+            .name = "CPU_GROUP_HUNTER_ELP",
+            .data = &cpu_group_hunter_elp,
         },
     { 0 },
 };

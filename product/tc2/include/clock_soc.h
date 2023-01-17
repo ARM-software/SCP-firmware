@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -19,6 +19,7 @@
 enum clock_pll_idx {
     CLOCK_PLL_IDX_CPU_HAYES,
     CLOCK_PLL_IDX_CPU_HUNTER,
+    CLOCK_PLL_IDX_CPU_HUNTER_ELP,
     CLOCK_PLL_IDX_SYS,
     CLOCK_PLL_IDX_DPU,
     CLOCK_PLL_IDX_PIX0,
@@ -72,6 +73,7 @@ enum mod_clusclock_source_tc2 {
 enum clock_css_idx {
     CLOCK_CSS_IDX_CPU_GROUP_HAYES,
     CLOCK_CSS_IDX_CPU_GROUP_HUNTER,
+    CLOCK_CSS_IDX_CPU_GROUP_HUNTER_ELP,
     CLOCK_CSS_IDX_DPU,
     CLOCK_CSS_IDX_COUNT
 };
@@ -82,6 +84,7 @@ enum clock_css_idx {
 enum clock_idx {
     CLOCK_IDX_CPU_GROUP_HAYES,
     CLOCK_IDX_CPU_GROUP_HUNTER,
+    CLOCK_IDX_CPU_GROUP_HUNTER_ELP,
     CLOCK_IDX_DPU,
     CLOCK_IDX_PIXEL_0,
     CLOCK_IDX_PIXEL_1,

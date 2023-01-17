@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -14,6 +14,7 @@
 enum dvfs_element_idx {
     DVFS_ELEMENT_IDX_HAYES,
     DVFS_ELEMENT_IDX_HUNTER,
+    DVFS_ELEMENT_IDX_HUNTER_ELP,
     DVFS_ELEMENT_IDX_COUNT
 };
 

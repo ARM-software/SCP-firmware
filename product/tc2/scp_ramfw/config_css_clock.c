@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -123,6 +123,59 @@ static const struct mod_css_clock_rate rate_table_cpu_group_hunter[5] = {
     },
 };
 
+static const struct mod_css_clock_rate rate_table_cpu_group_hunter_elp[5] = {
+    {
+        /* Super Underdrive */
+        .rate = 1088 * FWK_MHZ,
+        .pll_rate = 1088 * FWK_MHZ,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC2_PLL2,
+        .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
+        .clock_div = 1,
+        .clock_mod_numerator = 1,
+        .clock_mod_denominator = 1,
+    },
+    {
+        /* Underdrive */
+        .rate = 1632 * FWK_MHZ,
+        .pll_rate = 1632 * FWK_MHZ,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC2_PLL2,
+        .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
+        .clock_div = 1,
+        .clock_mod_numerator = 1,
+        .clock_mod_denominator = 1,
+    },
+    {
+        /* Nominal */
+        .rate = 2176 * FWK_MHZ,
+        .pll_rate = 2176 * FWK_MHZ,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC2_PLL2,
+        .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
+        .clock_div = 1,
+        .clock_mod_numerator = 1,
+        .clock_mod_denominator = 1,
+    },
+    {
+        /* Overdrive */
+        .rate = 2612 * FWK_MHZ,
+        .pll_rate = 2612 * FWK_MHZ,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC2_PLL2,
+        .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
+        .clock_div = 1,
+        .clock_mod_numerator = 1,
+        .clock_mod_denominator = 1,
+    },
+    {
+        /* Super Overdrive */
+        .rate = 3047 * FWK_MHZ,
+        .pll_rate = 3047 * FWK_MHZ,
+        .clock_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC2_PLL2,
+        .clock_div_type = MOD_PIK_CLOCK_MSCLOCK_DIVIDER_DIV_EXT,
+        .clock_div = 1,
+        .clock_mod_numerator = 1,
+        .clock_mod_denominator = 1,
+    },
+};
+
 static const fwk_id_t member_table_cpu_group_hayes[4] = {
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS0_CPU0),
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS0_CPU1),
@@ -130,10 +183,13 @@ static const fwk_id_t member_table_cpu_group_hayes[4] = {
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS0_CPU3),
 };
 
-static const fwk_id_t member_table_cpu_group_hunter[4] = {
+static const fwk_id_t member_table_cpu_group_hunter[3] = {
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS0_CPU4),
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS0_CPU5),
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS0_CPU6),
+};
+
+static const fwk_id_t member_table_cpu_group_hunter_elp[1] = {
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS0_CPU7),
 };
 
@@ -188,6 +244,31 @@ static const struct fwk_element css_clock_element_table[
                     FWK_MODULE_IDX_PIK_CLOCK,
                     MOD_PIK_CLOCK_API_TYPE_CSS),
                 .initial_rate = 1893 * FWK_MHZ,
+                .modulation_supported = true,
+            }),
+        },
+    [CLOCK_CSS_IDX_CPU_GROUP_HUNTER_ELP] =
+        {
+            .name = "CPU_GROUP_HUNTER_ELP",
+            .data = &((struct mod_css_clock_dev_config){
+                .clock_type = MOD_CSS_CLOCK_TYPE_INDEXED,
+                .rate_table = rate_table_cpu_group_hunter_elp,
+                .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_hunter_elp),
+                .clock_switching_source =
+                    MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC2_PLL2,
+                .pll_id = FWK_ID_ELEMENT_INIT(
+                    FWK_MODULE_IDX_SYSTEM_PLL,
+                    CLOCK_PLL_IDX_CPU_HUNTER_ELP),
+                .pll_api_id = FWK_ID_API_INIT(
+                    FWK_MODULE_IDX_SYSTEM_PLL,
+                    MOD_SYSTEM_PLL_API_TYPE_DEFAULT),
+                .member_table = member_table_cpu_group_hunter_elp,
+                .member_count =
+                    FWK_ARRAY_SIZE(member_table_cpu_group_hunter_elp),
+                .member_api_id = FWK_ID_API_INIT(
+                    FWK_MODULE_IDX_PIK_CLOCK,
+                    MOD_PIK_CLOCK_API_TYPE_CSS),
+                .initial_rate = 2176 * FWK_MHZ,
                 .modulation_supported = true,
             }),
         },
