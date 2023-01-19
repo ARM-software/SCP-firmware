@@ -165,14 +165,14 @@ The contents of a header file should be wrapped in an 'include guard' to prevent
 accidental multiple inclusion of a single header. The definition name should be
 the upper-case file name followed by "_H". An example for fwk_mm.h follows:
 
-\code
+```c
 #ifndef FWK_MM_H
 #define FWK_MM_H
 
 (...)
 
 #endif /* FWK_MM_H */
-\endcode
+```
 
 The closing endif statement should be followed directly by a single-line comment
 which replicates the full guard name. In long files this helps to clarify what
@@ -206,13 +206,13 @@ When using sizeof() pass the variable name as the parameter to be evaluated, and
 not its type. This prevents issues arising if the type of the variable changes
 but the sizeof() parameter is not updated.
 
-\code
+```c
 size_t size;
 unsigned int counter;
 
 /* Preferred over sizeof(int) */
 size = sizeof(counter);
-\endcode
+```
 
 Use the `const` type qualifier as appropriate to specify values that cannot be
 modified. Quick reminder:
@@ -240,19 +240,19 @@ Operator Precedence
 Do not rely on the implicit precedence and associativity of C operators. Use
 parenthesis to make precedence and associativity explicit:
 
-\code
+```c
 if ((a == 'a') || (x == 'x')) {
     do_something();
 }
-\endcode
+```
 
 Parenthesis around a unary operator and its operand may be omitted:
 
-\code
+```c
 if (!a || &a) {
     do_something();
 }
-\endcode
+```
 
 Macros and Constants
 --------------------
@@ -260,7 +260,7 @@ Logical groupings of constants should be defined as enumerations, with a common
 prefix, so that they can be used as parameter types. To find out the number of
 items in an "enum", make the last entry to be \<prefix\>_COUNT.
 
-\code
+```c
 enum command_id {
     COMMAND_ID_VERSION,
     COMMAND_ID_PING,
@@ -273,7 +273,7 @@ void process_cmd(enum command_id id)
 {
     (...)
 }
-\endcode
+```
 
 Prefer inline functions instead of macros.
 
@@ -292,20 +292,20 @@ allow elements to be initialized using array indexes or structure field names
 and without a fixed ordering.
 
 Array initialization example:
-\code
+```c
 uint32_t clock_frequencies[3] = {
     [2] = 800,
     [0] = 675
 };
-\endcode
+```
 
 Structure initialization example:
-\code
+```c
 struct clock clock_cpu = {
     .name = "CPU",
     .frequency = 800,
 };
-\endcode
+```
 
 Integers
 --------
@@ -340,7 +340,7 @@ possible and a comment must explicit show which registers it applies to.
 - The structure name for the programmer's view must follow the pattern "struct
 <device_name>_reg { ...registers... };"
 
-\code
+```c
 #include <stdint.h>
 #include <fwk_macros.h>
 
@@ -362,6 +362,6 @@ struct devicename_reg {
 #define CONFIG_SLEEP UINT32_C(0x00000002)
 
 #define IRQ_STATUS_ALERT UINT32_C(0x00000001)
-\endcode
+```
 
 __Note:__ A template file can be found in doc/template/device.h
