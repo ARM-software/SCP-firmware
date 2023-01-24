@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+
+#
+# Arm SCP/MCP Software
+# Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+if [ -f "requirements.txt" ]; then
+    python3 -m pip install --user -r "requirements.txt" > /dev/null
+fi
+
+if [ -f "Gemfile" ]; then
+    if [ "$(id -u)" -ne 0 ]; then
+        bundle config set --local path "/home/${USER}/.local/bin"
+    fi
+    bundle install > /dev/null
+fi
