@@ -1404,7 +1404,7 @@ static int notify_warm_reset(void)
 
     return fwk_notification_notify(&notification, &count);
 #else
-    return false;
+    return FWK_SUCCESS;
 #endif
 }
 
