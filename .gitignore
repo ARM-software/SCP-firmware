@@ -51,10 +51,11 @@ cscope.*
 # Visual Studio Code IDE
 .vscode/
 
-# Vagrant
+# Docker
 
 # General
 .vagrant/
+.bundle/
 
 ### Vagrant Patch ###
 *.box

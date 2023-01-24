@@ -354,6 +354,11 @@ $ docker run -v $(pwd):/scp-firmware -v ~/.gitconfig:/home/user/.gitconfig \
 
 [`Dockerfile`]: ./docker/Dockerfile
 
+## Arm Compiler 6 support for Docker
+
+To use Arm compiler 6 in the container it will be necessary to mount the
+directory into `/opt/arm-compiler-6`.
+
 # Getting Started {#getting-started}
 
 ## Prerequisites {#prerequisites}

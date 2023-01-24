@@ -2,18 +2,10 @@
 
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-
-if [ -f "requirements.txt" ]; then
-    python3 -m pip install -r "requirements.txt" > /dev/null
-fi
-
-if [ -f "Gemfile" ]; then
-    bundle install
-fi
 
 if id vagrant > /dev/null 2>&1; then
     user=vagrant
