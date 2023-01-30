@@ -119,7 +119,7 @@ PRODUCTS := $(shell ls $(PRODUCTS_DIR) 2>/dev/null)
 #
 # Deprecated Products/Platforms
 #
-DEPRECATED_PLATFORMS := none
+DEPRECATED_PLATFORMS := tc0
 
 PRODUCT_INDEPENDENT_GOALS := clean help test doc fwk_test mod_test
 
