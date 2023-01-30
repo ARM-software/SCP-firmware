@@ -47,7 +47,6 @@ products = [
     Product('sgm775'),
     Product('sgm776'),
     Product('synquacer'),
-    Product('tc0', variants=[Parameter('0'), Parameter('1')]),
     Product('tc1'),
     Product('rcar', toolchains=[Parameter('GNU')]),
     Product('rdn2', variants=[
