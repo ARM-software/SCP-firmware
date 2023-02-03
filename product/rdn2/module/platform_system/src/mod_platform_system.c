@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -379,7 +379,7 @@ static int platform_system_mod_init(
 
     FWK_LOG_INFO(
         "[PLATFORM SYSTEM] REFCLK_CTRL: %lx",
-        platform_system_ctx.pik_scp_reg->REFCLK_CTRL);
+        (unsigned long)platform_system_ctx.pik_scp_reg->REFCLK_CTRL);
 
     /*
      * To allow system counter to increment at a fixed frequency of 1GHz with
