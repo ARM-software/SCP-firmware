@@ -1506,6 +1506,8 @@ static int process_request_event(const struct fwk_event *event)
     struct event_set_state_request_data set_state_data;
     fwk_id_t service_id;
     enum scmi_clock_event_idx event_id_type;
+    unsigned int scmi_clock_idx, agent_id;
+    enum mod_clock_state agent_clock_state;
 
     params = (struct scmi_clock_event_request_params *)event->params;
     clock_dev_idx = fwk_id_get_element_idx(params->clock_dev_id);
@@ -1515,15 +1517,18 @@ static int process_request_event(const struct fwk_event *event)
 
     switch (event_id_type) {
     case SCMI_CLOCK_EVENT_IDX_GET_STATE:
-        status = scmi_clock_ctx.clock_api->get_state(params->clock_dev_id,
-                                                     &clock_state);
-        if (status != FWK_PENDING) {
-            /* Request completed */
-            get_state_respond(params->clock_dev_id,
-                              service_id,
-                              &clock_state,
-                              status);
+        /* Return the SCMI clock state related to the agent */
+        scmi_clock_idx = scmi_clock_ctx.clock_ops[clock_dev_idx].scmi_clock_idx;
+        status = scmi_clock_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+        if (status != FWK_SUCCESS) {
+            return status;
         }
+
+        agent_clock_state =
+            scmi_clock_get_agent_clock_state(agent_id, scmi_clock_idx);
+        clock_state = (enum mod_clock_state)agent_clock_state;
+        get_state_respond(
+            params->clock_dev_id, service_id, &clock_state, status);
         break;
 
     case SCMI_CLOCK_EVENT_IDX_GET_RATE:
