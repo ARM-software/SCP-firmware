@@ -557,8 +557,14 @@ static void timer_isr(uintptr_t ctx_ptr)
         (struct alarm_sub_element_ctx *)fwk_list_pop_head(&ctx->alarms_active);
 
     if (alarm == NULL) {
-        /* Timer interrupt triggered without any alarm in the active queue */
-        fwk_unexpected();
+        /*
+         * 32 bits timer need interrupt to maintain 64 bits counter.
+         * just re-enable timer if no alarm in the active queue
+         */
+        status = ctx->driver->enable(ctx->driver_dev_id);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_DEBUG("[Timer] %s @%d", __func__, __LINE__);
+        }
         return;
     }
 
