@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -47,8 +47,14 @@ enum morello_sds_region_idx {
 #if defined(PLAT_FVP)
 #    define MORELLO_SDS_PLATFORM_INFO_SIZE 8
 #else
-#    define MORELLO_SDS_PLATFORM_INFO_SIZE 22
+#    define MORELLO_SDS_PLATFORM_INFO_SIZE 26
 #endif
+
+/*
+ * Field offsets for morello silicon revision.
+ */
+#define MORELLO_SILICON_REVISION_R_POS 16
+#define MORELLO_SILICON_REVISION_P_POS 0
 
 /*
  * Field masks and offsets for the MORELLO_SDS_AP_CPU_INFO structure.

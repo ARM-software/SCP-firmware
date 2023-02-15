@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -65,6 +65,8 @@ struct FWK_PACKED morello_platform_info {
     bool multichip_mode;
     /* Platform SCC configuration */
     uint32_t scc_config;
+    /* Silicon revision */
+    uint32_t silicon_revision;
 #endif
 };
 
@@ -287,6 +289,10 @@ static int morello_system_fill_platform_info(void)
         fwk_module_get_data(sds_platform_info_id);
     uint64_t size = 0;
     int status;
+#if !defined(PLAT_FVP)
+    uint16_t length;
+    uint8_t silicon_rev[MORELLO_SCP2PCC_SILICON_REVISION_LEN];
+#endif
 
     status = morello_system_ctx.dmc_bing_api->get_mem_size(&size);
     if (status != FWK_SUCCESS) {
@@ -314,6 +320,27 @@ static int morello_system_fill_platform_info(void)
         (uint32_t)(size / FWK_MIB));
 
     sds_platform_info.scc_config = SCC->BOOT_GPR1;
+
+    /* Get the Silicon revision */
+    status = morello_system_ctx.scp2pcc_api->send(
+        MOD_SCP2PCC_GET_SILICON_REVISION, NULL, 0, &silicon_rev, &length);
+
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR("[MORELLO SYSTEM] Error fetching the silicon revision");
+        return status;
+    }
+
+    if (length != MORELLO_SCP2PCC_SILICON_REVISION_LEN) {
+        FWK_LOG_ERR(
+            "[MORELLO SYSTEM] Unexpected silicon revision length %" PRIu16,
+            length);
+        return FWK_E_DATA;
+    }
+
+    sds_platform_info.silicon_revision =
+        (silicon_rev[MORELLO_SCP2PCC_SILICON_REVISION_P_INDEX] +
+         (silicon_rev[MORELLO_SCP2PCC_SILICON_REVISION_R_INDEX]
+          << MORELLO_SILICON_REVISION_R_POS));
 #endif
 
     return morello_system_ctx.sds_api->struct_write(
