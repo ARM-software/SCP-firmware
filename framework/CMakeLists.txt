@@ -104,6 +104,14 @@ if(SCP_ENABLE_INBAND_MSG_SUPPORT)
     target_compile_definitions(framework PUBLIC "BUILD_HAS_INBAND_MSG_SUPPORT")
 endif()
 
+if(SCP_ENABLE_ATU_MANAGE)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_ATU_MANAGE")
+endif()
+
+if(SCP_ENABLE_ATU_DELEGATE)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_ATU_DELEGATE")
+endif()
+
 #
 # Handle the framework logging filter level.
 #

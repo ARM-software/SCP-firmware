@@ -116,6 +116,12 @@ few common options can be configured.
 
 - `SCP_ENABLE_CLOCK_TREE_MGMT`: Enable/disable clock tree management support.
 
+- `SCP_ENABLE_ATU_MANAGE`: Enable/disable ATU management support. This option
+  should be enabled only if the MSCP has permissions to configure the ATU.
+
+- `SCP_ENABLE_ATU_DELEGATE`: Enable/disable ATU delegation support. This option
+  should be enabled when the ATU is not managed directly by the firmware.
+
 - `SCP_ENABLE_FAST_CHANNELS`: Enable/disable Fast Channels support. This
   option should be enabled/disabled by the use of a platform specific setting
   like `SCP_ENABLE_SCMI_PERF_FAST_CHANNELS`.
