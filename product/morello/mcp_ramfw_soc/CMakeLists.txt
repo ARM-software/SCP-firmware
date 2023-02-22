@@ -26,8 +26,10 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_gtimer.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_mhu.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_smt.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_agent.c")
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_transport.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_agent.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_morello_mcp_system.c")
 
 #
 # Some of our firmware includes require CMSIS.
