@@ -35,6 +35,6 @@ static const struct fwk_element *mhu_get_element_table(fwk_id_t module_id)
     return mhu_element_table;
 }
 
-struct fwk_module_config config_morello_mhu = {
+struct fwk_module_config config_mhu = {
     .elements = FWK_MODULE_DYNAMIC_ELEMENTS(mhu_get_element_table),
 };

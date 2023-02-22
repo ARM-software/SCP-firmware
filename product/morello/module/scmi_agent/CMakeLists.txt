@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -12,4 +12,5 @@ target_include_directories(${SCP_MODULE_TARGET}
 target_sources(${SCP_MODULE_TARGET}
                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_scmi_agent.c")
 
-target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-morello-smt)
+target_link_libraries(${SCP_MODULE_TARGET}
+                          PRIVATE module-scmi module-morello-mcp-system)

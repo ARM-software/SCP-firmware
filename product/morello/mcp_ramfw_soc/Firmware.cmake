@@ -20,8 +20,6 @@ set(SCP_ENABLE_NOTIFICATIONS_INIT TRUE)
 
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/morello_mcp_system")
-list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/morello_smt")
-list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/morello_mhu")
 list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/scmi_agent")
 
 # The order of the modules in the following list is the order in which the
@@ -34,7 +32,8 @@ list(APPEND SCP_MODULES "pik-clock")
 list(APPEND SCP_MODULES "clock")
 list(APPEND SCP_MODULES "gtimer")
 list(APPEND SCP_MODULES "timer")
-list(APPEND SCP_MODULES "morello-smt")
-list(APPEND SCP_MODULES "morello-mhu")
+list(APPEND SCP_MODULES "mhu")
+list(APPEND SCP_MODULES "transport")
+list(APPEND SCP_MODULES "scmi")
 list(APPEND SCP_MODULES "scmi-agent")
 list(APPEND SCP_MODULES "morello-mcp-system")
