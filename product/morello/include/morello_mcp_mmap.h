@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -64,5 +64,10 @@
 #define MCP_AP_SHARED_NONSECURE_RAM (MCP_PERIPH_BASE + 0x410000)
 #define MCP_SCP_SHARED_SECURE_RAM (0x45620000)
 #define MCP_SCP_SHARED_NONSECURE_RAM (0x45610000)
+
+/*
+ * System access port 1
+ */
+#define MCP_REFCLK_CNTCONTROL_BASE (MCP_SYS1_BASE + 0x2A430000)
 
 #endif /* MORELLO_MCP_MMAP_H */
