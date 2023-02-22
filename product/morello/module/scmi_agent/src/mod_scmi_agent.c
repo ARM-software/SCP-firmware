@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -117,8 +117,9 @@ static int agent_get_protocol_version(fwk_id_t agent_id, uint32_t *version)
      * initialization performed by SCP. This should be replaced with
      * notification based synchronization mechanism.
      */
-    while ((((volatile struct mod_smt_memory *)SCMI_PAYLOAD_SCP_TO_MCP_S)
-                ->status) != 1)
+    while (
+        (((volatile struct mod_smt_memory *)MCP_SCP_NS_MAILBOX_SRAM)->status) !=
+        1)
         ;
 
     status = _scmi_agent_transact(agent_id, &cmd);

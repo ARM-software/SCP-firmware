@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -9,12 +9,15 @@
  */
 
 #include "config_clock.h"
+#include "morello_mcp_scp.h"
+#include "morello_mcp_software_mmap.h"
 
 #include <mod_clock.h>
 #include <mod_morello_mcp_system.h>
 #include <mod_pik_clock.h>
 #include <mod_power_domain.h>
 #include <mod_scmi_agent.h>
+#include <mod_timer.h>
 
 #include <fwk_core.h>
 #include <fwk_id.h>
@@ -37,10 +40,20 @@ struct morello_mcp_system_ctx {
 
     /* PIK clock API - MCP AXI clock */
     const struct mod_clock_drv_api *pik_axiclk_api;
+
+    /* Timer alarm API */
+    struct mod_timer_api *timer_api;
 };
 
 static struct morello_mcp_system_ctx morello_mcp_system_ctx;
 const struct fwk_module_config config_morello_mcp_system = { 0 };
+
+static bool scp_handshake_wait_condition(void *unused)
+{
+    return (
+        *(FWK_R uint32_t *)SCMI_PAYLOAD_SCP_TO_MCP_S ==
+        MORELLO_SCP_MCP_HANDSHAKE_PATTERN);
+}
 
 /*
  * Functions fulfilling the framework's module interface
@@ -73,6 +86,14 @@ static int morello_mcp_system_bind(fwk_id_t id, unsigned int round)
         if (status != FWK_SUCCESS)
             return status;
 
+        status = fwk_module_bind(
+            FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+            FWK_ID_API(FWK_MODULE_IDX_TIMER, MOD_TIMER_API_IDX_TIMER),
+            &morello_mcp_system_ctx.timer_api);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+
         return fwk_module_bind(
             FWK_ID_ELEMENT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_MCP_AXICLK),
             FWK_ID_API(FWK_MODULE_IDX_PIK_CLOCK, MOD_PIK_CLOCK_API_TYPE_CLOCK),
@@ -84,6 +105,26 @@ static int morello_mcp_system_bind(fwk_id_t id, unsigned int round)
 
 static int morello_mcp_system_start(fwk_id_t id)
 {
+    int status;
+    FWK_LOG_INFO("[MCP SYSTEM] Waiting for handshake pattern from SCP...");
+    status = morello_mcp_system_ctx.timer_api->wait(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0),
+        MORELLO_SCP_MCP_HANDSHAKE_TIMEOUT_MICROSEC,
+        scp_handshake_wait_condition,
+        NULL);
+
+    if (status == FWK_SUCCESS) {
+        FWK_LOG_INFO("[MCP SYSTEM] Handshake pattern received from SCP.");
+    } else if (status == FWK_E_TIMEOUT) {
+        FWK_LOG_ERR(
+            "[MCP SYSTEM] No handhshake pattern received from SCP. Timing "
+            "out!");
+        return status;
+    } else {
+        FWK_LOG_ERR("[MCP SYSTEM] Timer initiation failed!");
+        return status;
+    }
+
     struct fwk_event event = {
         .source_id = id,
         .target_id = id,

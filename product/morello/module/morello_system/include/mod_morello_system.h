@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -30,7 +30,6 @@
 
 /*! Address translation enable bit */
 #define ADDR_TRANS_EN UINT32_C(0x1)
-
 
 /*!
  * Offset of NIC-400 security 0 register for

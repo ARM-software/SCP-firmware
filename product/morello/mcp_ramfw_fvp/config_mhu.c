@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -17,13 +17,15 @@
 #include <fmw_cmsis.h>
 
 static const struct fwk_element mhu_element_table[] = {
-    [MORELLO_MHU_DEVICE_IDX_S_SCP] = { .name = "SCP_MCP_MHU_S",
-                                       .sub_element_count = 1,
-                                       .data = &((struct mod_mhu_device_config){
-                                           .irq = MHU_SCP_SEC_IRQ,
-                                           .in = MHU_SCP_TO_MCP_S,
-                                           .out = MHU_MCP_TO_SCP_S,
-                                       }) },
+    [MORELLO_MHU_DEVICE_IDX_NS_SCP] = { .name = "SCP_MCP_MHU_NS",
+                                        .sub_element_count = 1,
+                                        .data =
+                                            &((struct mod_mhu_device_config){
+                                                .irq = MHU_SCP_NONSEC_IRQ,
+                                                .in = MHU_SCP_TO_MCP_NS,
+                                                .out = MHU_MCP_TO_SCP_NS,
+                                            }),
+                                        },
     [MORELLO_MHU_DEVICE_IDX_COUNT] = { 0 },
 };
 

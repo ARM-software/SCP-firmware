@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -13,4 +13,5 @@ target_sources(${SCP_MODULE_TARGET} PRIVATE "src/mod_morello_mcp_system.c")
 
 target_link_libraries(
     ${SCP_MODULE_TARGET} PRIVATE module-clock module-pik-clock
-                                 module-power-domain module-scmi-agent)
+                                 module-power-domain module-scmi-agent
+                         PUBLIC module-timer)
