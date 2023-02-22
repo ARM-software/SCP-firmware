@@ -69,5 +69,8 @@
  * System access port 1
  */
 #define MCP_REFCLK_CNTCONTROL_BASE (MCP_SYS1_BASE + 0x2A430000)
+#define MCP_NONTRUSTED_RAM_BASE    (MCP_SYS1_BASE + 0x06000000)
+/* SCP MCP SCMI payload area at 1KB offset from base */
+#define MCP_SCP_NS_MAILBOX_SRAM (MCP_NONTRUSTED_RAM_BASE + 0x400)
 
 #endif /* MORELLO_MCP_MMAP_H */
