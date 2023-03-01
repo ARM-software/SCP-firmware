@@ -270,6 +270,107 @@ exit:
                                                  sizeof(return_values.status));
 }
 
+static enum scmi_error scmi_sys_power_state_set_reset_handler(
+    uint32_t mod_scmi_system_state,
+    int *status)
+{
+    enum mod_pd_system_shutdown system_shutdown;
+
+    system_shutdown = system_state2system_shutdown[mod_scmi_system_state];
+    fwk_assert(scmi_sys_power_ctx.pd_api->system_shutdown != NULL);
+    *status = scmi_sys_power_ctx.pd_api->system_shutdown(system_shutdown);
+
+    if (*status == FWK_PENDING) {
+        *status = FWK_SUCCESS;
+    }
+
+    if (*status == FWK_SUCCESS) {
+        return SCMI_SUCCESS;
+    } else {
+        return SCMI_GENERIC_ERROR;
+    }
+}
+
+static enum scmi_error scmi_sys_power_state_set_suspend_handler(int *status)
+{
+    fwk_assert(scmi_sys_power_ctx.pd_api->system_suspend != NULL);
+    *status = scmi_sys_power_ctx.pd_api->system_suspend(
+        scmi_sys_power_ctx.config->system_suspend_state);
+
+    if (*status != FWK_SUCCESS) {
+        /*
+         * The status is changed to success as it didn't fail
+         * exactly, but the state is invalid. It will need to
+         * respond without error behaviour.
+         */
+        if (*status == FWK_E_STATE) {
+            *status = FWK_SUCCESS;
+            return SCMI_DENIED;
+        }
+        return SCMI_GENERIC_ERROR;
+    }
+
+    return SCMI_SUCCESS;
+}
+
+static enum scmi_error scmi_sys_power_state_set_power_up_handler(
+    int *status,
+    enum scmi_agent_type agent_type)
+{
+    uint32_t mod_scmi_system_state;
+
+    if ((agent_type != SCMI_AGENT_TYPE_MANAGEMENT) ||
+        (scmi_sys_power_ctx.config->system_view != MOD_SCMI_SYSTEM_VIEW_OSPM)) {
+        return SCMI_NOT_SUPPORTED;
+    }
+
+    *status =
+        system_state_get((enum scmi_system_state *)&mod_scmi_system_state);
+    if (*status != FWK_SUCCESS) {
+        return SCMI_GENERIC_ERROR;
+    }
+
+    if ((mod_scmi_system_state != SCMI_SYSTEM_STATE_SHUTDOWN) &&
+        (mod_scmi_system_state != SCMI_SYSTEM_STATE_SUSPEND)) {
+        return SCMI_DENIED;
+    }
+
+    fwk_assert(scmi_sys_power_ctx.pd_api->set_state != NULL);
+    *status = scmi_sys_power_ctx.pd_api->set_state(
+        scmi_sys_power_ctx.config->wakeup_power_domain_id,
+        false,
+        scmi_sys_power_ctx.config->wakeup_composite_state);
+    if (*status == FWK_SUCCESS) {
+        return SCMI_SUCCESS;
+    } else {
+        return SCMI_GENERIC_ERROR;
+    }
+}
+
+static enum scmi_error scmi_sys_power_state_set_sanity_checking(
+    fwk_id_t service_id,
+    enum scmi_agent_type *agent_type,
+    int *status)
+{
+    unsigned int agent_id;
+    *status = scmi_sys_power_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+    if (*status != FWK_SUCCESS) {
+        return SCMI_GENERIC_ERROR;
+    }
+
+    *status = scmi_sys_power_ctx.scmi_api->get_agent_type(agent_id, agent_type);
+    if (*status != FWK_SUCCESS) {
+        return SCMI_GENERIC_ERROR;
+    }
+
+    if ((*agent_type != SCMI_AGENT_TYPE_PSCI) &&
+        (*agent_type != SCMI_AGENT_TYPE_MANAGEMENT)) {
+        return SCMI_NOT_SUPPORTED;
+    }
+
+    return SCMI_SUCCESS;
+}
+
 /*
  * SYSTEM_POWER_STATE_SET
  */
@@ -282,37 +383,25 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
     struct scmi_sys_power_state_set_p2a return_values = {
         .status = (int32_t)SCMI_GENERIC_ERROR,
     };
-    unsigned int agent_id;
     enum scmi_agent_type agent_type;
-    enum mod_pd_system_shutdown system_shutdown;
     uint32_t mod_scmi_system_state;
     enum mod_scmi_sys_power_policy_status policy_status;
     enum scmi_system_state sys_state_type;
 
     parameters = (const struct scmi_sys_power_state_set_a2p *)payload;
 
+    mod_scmi_system_state = parameters->system_state;
+
     if (parameters->flags & (uint32_t)(~STATE_SET_FLAGS_MASK)) {
         return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         goto exit;
     }
 
-    status = scmi_sys_power_ctx.scmi_api->get_agent_id(service_id, &agent_id);
-    if (status != FWK_SUCCESS) {
+    return_values.status = (int32_t)scmi_sys_power_state_set_sanity_checking(
+        service_id, &agent_type, &status);
+    if (return_values.status != SCMI_SUCCESS) {
         goto exit;
     }
-
-    status = scmi_sys_power_ctx.scmi_api->get_agent_type(agent_id, &agent_type);
-    if (status != FWK_SUCCESS) {
-        goto exit;
-    }
-
-    if ((agent_type != SCMI_AGENT_TYPE_PSCI) &&
-        (agent_type != SCMI_AGENT_TYPE_MANAGEMENT)) {
-        return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
-        goto exit;
-    }
-
-    mod_scmi_system_state = parameters->system_state;
 
     /*
      * Note that the mod_scmi_system_state value may be changed by the policy
@@ -339,76 +428,40 @@ static int scmi_sys_power_state_set_handler(fwk_id_t service_id,
     case SCMI_SYSTEM_STATE_SHUTDOWN:
     case SCMI_SYSTEM_STATE_COLD_RESET:
     case SCMI_SYSTEM_STATE_WARM_RESET:
-        system_shutdown = system_state2system_shutdown[mod_scmi_system_state];
-        status = scmi_sys_power_ctx.pd_api->system_shutdown(system_shutdown);
-        if ((status != FWK_SUCCESS) && (status != FWK_PENDING)) {
-            goto exit;
-        }
-
-        status = FWK_SUCCESS;
+        return_values.status = (int32_t)scmi_sys_power_state_set_reset_handler(
+            mod_scmi_system_state, &status);
         break;
 
     case SCMI_SYSTEM_STATE_SUSPEND:
-        status = scmi_sys_power_ctx.pd_api->system_suspend(
-            scmi_sys_power_ctx.config->system_suspend_state);
-        if (status != FWK_SUCCESS) {
-            if (status == FWK_E_STATE) {
-                status = FWK_SUCCESS;
-                return_values.status = (int32_t)SCMI_DENIED;
-            }
-            goto exit;
-        }
+        return_values.status =
+            (int32_t)scmi_sys_power_state_set_suspend_handler(&status);
         break;
 
     case SCMI_SYSTEM_STATE_POWER_UP:
-        if ((agent_type != SCMI_AGENT_TYPE_MANAGEMENT) ||
-            (scmi_sys_power_ctx.config->system_view !=
-             MOD_SCMI_SYSTEM_VIEW_OSPM)) {
-            return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
-            goto exit;
-        }
-
-        status =
-            system_state_get((enum scmi_system_state *)&mod_scmi_system_state);
-        if (status != FWK_SUCCESS) {
-            goto exit;
-        }
-
-        if ((mod_scmi_system_state != SCMI_SYSTEM_STATE_SHUTDOWN) &&
-            (mod_scmi_system_state != SCMI_SYSTEM_STATE_SUSPEND)) {
-            return_values.status = (int32_t)SCMI_DENIED;
-            goto exit;
-        }
-
-        status = scmi_sys_power_ctx.pd_api->set_state(
-            scmi_sys_power_ctx.config->wakeup_power_domain_id,
-            false,
-            scmi_sys_power_ctx.config->wakeup_composite_state);
-        if (status != FWK_SUCCESS) {
-            goto exit;
-        }
+        return_values.status =
+            (int32_t)scmi_sys_power_state_set_power_up_handler(
+                &status, agent_type);
         break;
 
     default:
         return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
-        goto exit;
     };
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
-    /*
-     * Only send notifications if this is a forceful request. For graceful
-     * requests the notifications are sent before executing the command.
-     */
-    if (((parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST) == 0U) ||
-        (mod_scmi_system_state != SCMI_SYSTEM_STATE_SHUTDOWN)) {
-        scmi_sys_power_state_notify(
-            service_id,
-            mod_scmi_system_state,
-            (parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST) != 0);
+    if (return_values.status == SCMI_SUCCESS) {
+        /*
+         * Only send notifications if this is a forceful request. For graceful
+         * requests the notifications are sent before executing the command.
+         */
+        if (((parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST) == 0U) ||
+            (mod_scmi_system_state != SCMI_SYSTEM_STATE_SHUTDOWN)) {
+            scmi_sys_power_state_notify(
+                service_id,
+                mod_scmi_system_state,
+                (parameters->flags & STATE_SET_FLAGS_GRACEFUL_REQUEST) != 0);
+        }
     }
 #endif
-
-    return_values.status = (int32_t)SCMI_SUCCESS;
 
 exit:
     respond_status = scmi_sys_power_ctx.scmi_api->respond(
