@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -256,7 +256,7 @@ static int transport_respond(
             fwk_str_memcpy(buffer->payload, payload, size);
         }
 #else
-        FWK_LOG_ERR("%s ERROR. IN-BAND MESSAGE NOT SUPPORTED!\n", MOD_NAME);
+        FWK_LOG_ERR("%s ERROR. IN-BAND MESSAGE NOT SUPPORTED!", MOD_NAME);
         return FWK_E_SUPPORT;
 #endif
     }
@@ -340,7 +340,7 @@ static int transport_transmit(
         buffer->reserved0 = 0;
         buffer->reserved1 = 0;
 #else
-        FWK_LOG_ERR("%s ERROR. IN-BAND MESSAGES NOT SUPPORTED!\n", MOD_NAME);
+        FWK_LOG_ERR("%s ERROR. IN-BAND MESSAGES NOT SUPPORTED!", MOD_NAME);
         return FWK_E_SUPPORT;
 #endif
     }
@@ -593,7 +593,7 @@ static int transport_message_handler(struct transport_channel_ctx *channel_ctx)
                     channel_ctx->service_id);
 #else
             FWK_LOG_INFO(
-                "%s Error! SCMI module not included in the build\n", MOD_NAME);
+                "%s Error! SCMI module not included in the build", MOD_NAME);
             return FWK_E_SUPPORT;
 #endif
         } else {
@@ -622,7 +622,7 @@ static int transport_message_handler(struct transport_channel_ctx *channel_ctx)
             channel_ctx->service_id);
 #else
         FWK_LOG_INFO(
-            "%s Error! SCMI module not included in the build\n", MOD_NAME);
+            "%s Error! SCMI module not included in the build", MOD_NAME);
         return FWK_E_SUPPORT;
 #endif
     } else {

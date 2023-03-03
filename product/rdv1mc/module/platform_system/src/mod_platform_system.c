@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -330,8 +330,7 @@ int platform_system_process_notification(
          * time only
          */
         if (params->new_state == MOD_CLOCK_STATE_RUNNING && chip_id == 0) {
-            FWK_LOG_INFO(
-                "[PLATFORM SYSTEM] Initializing the primary core...\n");
+            FWK_LOG_INFO("[PLATFORM SYSTEM] Initializing the primary core...");
 
             mod_pd_restricted_api = platform_system_ctx.mod_pd_restricted_api;
 
@@ -353,7 +352,7 @@ int platform_system_process_notification(
         } else {
             FWK_LOG_INFO(
                 "[PLATFORM SYSTEM] Detected as secondary chip: %d, "
-                "wait for SCMI\n",
+                "wait for SCMI",
                 chip_id);
         }
 

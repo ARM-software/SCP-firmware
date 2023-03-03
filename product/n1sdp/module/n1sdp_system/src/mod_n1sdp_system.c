@@ -393,18 +393,19 @@ static int n1sdp_system_init_primary_core(void)
             SCP_QSPI_FLASH_SIZE);
         if (status != FWK_SUCCESS) {
             FWK_LOG_INFO(
-                "[N1SDP SYSTEM] Failed to locate AP TF_BL1, error: %d\n",
-                status);
+                "[N1SDP SYSTEM] Failed to locate AP TF_BL1, error: %d", status);
             return FWK_E_PANIC;
         }
 
-        FWK_LOG_INFO("[N1SDP SYSTEM] Located AP TF_BL1:\n");
-        FWK_LOG_INFO("[N1SDP SYSTEM]   address: %p\n", entry.base);
-        FWK_LOG_INFO("[N1SDP SYSTEM]   size   : %u\n", entry.size);
-        FWK_LOG_INFO("[N1SDP SYSTEM]   flags  : 0x%08" PRIX32 "%08" PRIX32"\n",
-            (uint32_t)(entry.flags >> 32),  (uint32_t)entry.flags);
+        FWK_LOG_INFO("[N1SDP SYSTEM] Located AP TF_BL1:");
+        FWK_LOG_INFO("[N1SDP SYSTEM]   address: %p", entry.base);
+        FWK_LOG_INFO("[N1SDP SYSTEM]   size   : %u", entry.size);
         FWK_LOG_INFO(
-            "[N1SDP SYSTEM] Copying AP TF_BL1 to address 0x%" PRIx32 "...\n",
+            "[N1SDP SYSTEM]   flags  : 0x%08" PRIX32 "%08" PRIX32 "",
+            (uint32_t)(entry.flags >> 32),
+            (uint32_t)entry.flags);
+        FWK_LOG_INFO(
+            "[N1SDP SYSTEM] Copying AP TF_BL1 to address 0x%" PRIx32 "...",
             AP_CORE_RESET_ADDR);
 
         status = n1sdp_system_copy_to_ap_sram(

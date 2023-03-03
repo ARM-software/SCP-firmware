@@ -34,8 +34,8 @@ nullPointerRedundantCheck:*product/juno/*
 syntaxError:*product/synquacer/module/synquacer_system/src/mmu500.c:34
 
 // Cppcheck seems to get confused with macro substitution
-syntaxError:*framework/src/fwk_log.c:190
-syntaxError:*framework/src/fwk_log.c:194
+syntaxError:*framework/src/fwk_log.c:175
+syntaxError:*framework/src/fwk_log.c:179
 
 // Cppcheck doesn't like include directives that use macros
 preprocessorErrorDirective:*framework/test/fwk_module_idx.h:14

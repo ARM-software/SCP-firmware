@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -135,7 +135,7 @@ static int n1sdp_rom_process_event(const struct fwk_event *event,
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
     if (status != FWK_SUCCESS) {
         FWK_LOG_INFO(
-            "[ROM] Failed to locate %s_BL2, error: %d\n", image_type, status);
+            "[ROM] Failed to locate %s_BL2, error: %d", image_type, status);
         return status;
     }
 #else
@@ -143,18 +143,20 @@ static int n1sdp_rom_process_event(const struct fwk_event *event,
     (void)image_type;
 #endif
 
-    FWK_LOG_INFO("[ROM] Located %s_BL2:\n", image_type);
-    FWK_LOG_INFO("[ROM]   address: %p\n", entry.base);
-    FWK_LOG_INFO("[ROM]   size   : %u\n", entry.size);
-    FWK_LOG_INFO("[ROM]   flags  : 0x%08" PRIX32 "%08" PRIX32"\n",
-        (uint32_t)(entry.flags >> 32),  (uint32_t)entry.flags);
-    FWK_LOG_INFO("[ROM] Copying %s_BL2 to ITCRAM...!\n", image_type);
+    FWK_LOG_INFO("[ROM] Located %s_BL2:", image_type);
+    FWK_LOG_INFO("[ROM]   address: %p", entry.base);
+    FWK_LOG_INFO("[ROM]   size   : %u", entry.size);
+    FWK_LOG_INFO(
+        "[ROM]   flags  : 0x%08" PRIX32 "%08" PRIX32 "",
+        (uint32_t)(entry.flags >> 32),
+        (uint32_t)entry.flags);
+    FWK_LOG_INFO("[ROM] Copying %s_BL2 to ITCRAM...!", image_type);
 
     memcpy(
         (void *)n1sdp_rom_ctx.rom_config->ramfw_base, entry.base, entry.size);
     FWK_LOG_INFO("[ROM] Done!");
 
-    FWK_LOG_INFO("[ROM] Jumping to %s_BL2\n", image_type);
+    FWK_LOG_INFO("[ROM] Jumping to %s_BL2", image_type);
 
     jump_to_ramfw();
     return FWK_SUCCESS;

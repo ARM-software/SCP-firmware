@@ -301,7 +301,7 @@ static int cmn700_discovery(void)
                 case NODE_TYPE_RN_D:
                     if ((ctx->rnd_count) >= MAX_RND_COUNT) {
                         FWK_LOG_ERR(
-                            MOD_NAME "  rnd count %d >= max limit (%d)\n",
+                            MOD_NAME "  rnd count %d >= max limit (%d)",
                             ctx->rnd_count,
                             MAX_RND_COUNT);
                         return FWK_E_DATA;
@@ -312,7 +312,7 @@ static int cmn700_discovery(void)
                 case NODE_TYPE_RN_I:
                     if ((ctx->rni_count) >= MAX_RNI_COUNT) {
                         FWK_LOG_ERR(
-                            MOD_NAME "  rni count %d >= max limit (%d)\n",
+                            MOD_NAME "  rni count %d >= max limit (%d)",
                             ctx->rni_count,
                             MAX_RNI_COUNT);
                         return FWK_E_DATA;
@@ -374,7 +374,7 @@ static int cmn700_discovery(void)
 
     if (ctx->rnf_count > MAX_RNF_COUNT) {
         FWK_LOG_ERR(
-            MOD_NAME "rnf count %d > max limit (%d)\n",
+            MOD_NAME "rnf count %d > max limit (%d)",
             ctx->rnf_count,
             MAX_RNF_COUNT);
         return FWK_E_RANGE;
@@ -385,9 +385,9 @@ static int cmn700_discovery(void)
     FWK_LOG_INFO(
         MOD_NAME "Total external RN-SAM nodes: %d", ctx->external_rnsam_count);
     FWK_LOG_INFO(MOD_NAME "Total HN-F nodes: %d", ctx->hnf_count);
-    FWK_LOG_INFO(MOD_NAME "Total RN-D nodes: %d\n", ctx->rnd_count);
-    FWK_LOG_INFO(MOD_NAME "Total RN-F nodes: %d\n", ctx->rnf_count);
-    FWK_LOG_INFO(MOD_NAME "Total RN-I nodes: %d\n", ctx->rni_count);
+    FWK_LOG_INFO(MOD_NAME "Total RN-D nodes: %d", ctx->rnd_count);
+    FWK_LOG_INFO(MOD_NAME "Total RN-F nodes: %d", ctx->rnf_count);
+    FWK_LOG_INFO(MOD_NAME "Total RN-I nodes: %d", ctx->rni_count);
     FWK_LOG_INFO(
         MOD_NAME "Total CCIX Request Agent nodes: %d", cxg_ra_reg_count);
     FWK_LOG_INFO(MOD_NAME "Total CCIX Home Agent nodes: %d", cxg_ha_reg_count);

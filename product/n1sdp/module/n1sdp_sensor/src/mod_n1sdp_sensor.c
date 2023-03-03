@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -43,12 +43,12 @@ static void n1sdp_sensor_timer_callback(uintptr_t unused)
             if (value >= t_dev_ctx->config->alarm_threshold &&
                 value < t_dev_ctx->config->shutdown_threshold) {
                 FWK_LOG_CRIT(
-                    "%s temperature (%d) reached alarm threshold!\n",
+                    "%s temperature (%d) reached alarm threshold!",
                     sensor_type_name[count],
                     (int)value);
             } else if (value >= t_dev_ctx->config->shutdown_threshold) {
                 FWK_LOG_CRIT(
-                    "%s temperature (%d) reached shutdown threshold!\n",
+                    "%s temperature (%d) reached shutdown threshold!",
                     sensor_type_name[count],
                     (int)value);
 
@@ -295,14 +295,14 @@ static int n1sdp_sensor_start(fwk_id_t id)
         status = n1sdp_sensor_lib_init(&error_reg);
         switch (status) {
         case FWK_E_DEVICE:
-            FWK_LOG_INFO("[PVT] ID invalid: 0x%08X\n", (unsigned int)error_reg);
+            FWK_LOG_INFO("[PVT] ID invalid: 0x%08X", (unsigned int)error_reg);
             return FWK_E_DEVICE;
         case FWK_E_DATA:
             FWK_LOG_INFO(
-                "[PVT] Scratch test failed: 0x%08X\n", (unsigned int)error_reg);
+                "[PVT] Scratch test failed: 0x%08X", (unsigned int)error_reg);
             return FWK_E_DEVICE;
         case FWK_E_TIMEOUT:
-            FWK_LOG_INFO("[PVT] Timeout waiting for sensor initialization!\n");
+            FWK_LOG_INFO("[PVT] Timeout waiting for sensor initialization!");
             return FWK_E_TIMEOUT;
         }
 
@@ -318,7 +318,7 @@ static int n1sdp_sensor_start(fwk_id_t id)
         }
 
         FWK_LOG_INFO(
-            "[PVT] Started driver version %d.%d\n",
+            "[PVT] Started driver version %d.%d",
             N1SDP_SENSOR_VERSION_MAJOR,
             N1SDP_SENSOR_VERSION_MINOR);
     }

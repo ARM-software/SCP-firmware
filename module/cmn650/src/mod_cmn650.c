@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -244,7 +244,7 @@ static int cmn650_discovery(void)
                 case NODE_TYPE_RN_D:
                     if ((ctx->rnd_count) >= MAX_RND_COUNT) {
                         FWK_LOG_ERR(
-                            MOD_NAME "  rnd count %d >= max limit (%d)\n",
+                            MOD_NAME "  rnd count %d >= max limit (%d)",
                             ctx->rnd_count,
                             MAX_RND_COUNT);
                         return FWK_E_DATA;
@@ -255,7 +255,7 @@ static int cmn650_discovery(void)
                 case NODE_TYPE_RN_I:
                     if ((ctx->rni_count) >= MAX_RNI_COUNT) {
                         FWK_LOG_ERR(
-                            MOD_NAME "  rni count %d >= max limit (%d)\n",
+                            MOD_NAME "  rni count %d >= max limit (%d)",
                             ctx->rni_count,
                             MAX_RNI_COUNT);
                         return FWK_E_DATA;
@@ -304,15 +304,12 @@ static int cmn650_discovery(void)
     /* Total number of CXG_RA, CXG_HA and CXLA nodes should be equal */
     if ((cxg_ra_reg_count != cxg_ha_reg_count) ||
         (cxg_ha_reg_count != cxla_reg_count)) {
-        FWK_LOG_ERR(
-            MOD_NAME
-            "Inconsistent count of CXG components detected, discovery failed.\n"
-            " CXG_RA count: %d\n"
-            " CXG_HA count: %d\n"
-            " CXLA   count: %d\n",
-            cxg_ra_reg_count,
-            cxg_ha_reg_count,
-            cxla_reg_count);
+        FWK_LOG_ERR(MOD_NAME
+                    " Inconsistent count of CXG components detected, discovery "
+                    "failed.");
+        FWK_LOG_ERR(MOD_NAME " CXG_RA count: %d", cxg_ra_reg_count);
+        FWK_LOG_ERR(MOD_NAME " CXG_HA count: %d", cxg_ha_reg_count);
+        FWK_LOG_ERR(MOD_NAME " CXLA   count: %d", cxla_reg_count);
         return FWK_E_DEVICE;
     }
 
@@ -320,7 +317,7 @@ static int cmn650_discovery(void)
 
     if (ctx->rnf_count > MAX_RNF_COUNT) {
         FWK_LOG_ERR(
-            MOD_NAME "rnf count %d > max limit (%d)\n",
+            MOD_NAME "rnf count %d > max limit (%d)",
             ctx->rnf_count,
             MAX_RNF_COUNT);
         return FWK_E_RANGE;
@@ -331,9 +328,9 @@ static int cmn650_discovery(void)
     FWK_LOG_INFO(
         MOD_NAME "Total external RN-SAM nodes: %d", ctx->external_rnsam_count);
     FWK_LOG_INFO(MOD_NAME "Total HN-F nodes: %d", ctx->hnf_count);
-    FWK_LOG_INFO(MOD_NAME "Total RN-D nodes: %d\n", ctx->rnd_count);
-    FWK_LOG_INFO(MOD_NAME "Total RN-F nodes: %d\n", ctx->rnf_count);
-    FWK_LOG_INFO(MOD_NAME "Total RN-I nodes: %d\n", ctx->rni_count);
+    FWK_LOG_INFO(MOD_NAME "Total RN-D nodes: %d", ctx->rnd_count);
+    FWK_LOG_INFO(MOD_NAME "Total RN-F nodes: %d", ctx->rnf_count);
+    FWK_LOG_INFO(MOD_NAME "Total RN-I nodes: %d", ctx->rni_count);
     FWK_LOG_INFO(
         MOD_NAME "Total CCIX Request Agent nodes: %d", cxg_ra_reg_count);
     FWK_LOG_INFO(MOD_NAME "Total CCIX Home Agent nodes: %d", cxg_ha_reg_count);
@@ -935,7 +932,7 @@ int cmn650_start(fwk_id_t id)
     ctx = ctx + fwk_id_get_element_idx(id);
 
     FWK_LOG_INFO(
-        MOD_NAME "Multichip mode: %d Chip ID: %d\n", multi_chip_mode, chip_id);
+        MOD_NAME "Multichip mode: %d Chip ID: %d", multi_chip_mode, chip_id);
 
     if (fwk_id_is_equal(ctx->config->clock_id, FWK_ID_NONE)) {
         cmn650_setup();

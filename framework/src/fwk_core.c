@@ -183,7 +183,7 @@ static void process_next_event(void)
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_DEBUG
     FWK_LOG_DEBUG(
-        "[FWK] Processing %" PRIu32 ": %s @ %s -> %s\n",
+        "[FWK] Processing %" PRIu32 ": %s @ %s -> %s",
         event->cookie,
         FWK_ID_STR(event->id),
         FWK_ID_STR(event->source_id),
@@ -225,7 +225,7 @@ static void process_next_event(void)
         status = process_event(event, &async_response_event);
         if ((status != FWK_SUCCESS) && (status != FWK_PENDING)) {
             FWK_LOG_CRIT(
-                "[FWK] Process event (%s: %s -> %s) (%d)\n",
+                "[FWK] Process event (%s: %s -> %s) (%d)",
                 FWK_ID_STR(event->id),
                 FWK_ID_STR(event->source_id),
                 FWK_ID_STR(event->target_id),
@@ -254,7 +254,7 @@ static bool process_isr(void)
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_DEBUG
     FWK_LOG_DEBUG(
-        "[FWK] Pulled ISR event (%s: %s -> %s)\n",
+        "[FWK] Pulled ISR event (%s: %s -> %s)",
         FWK_ID_STR(isr_event->id),
         FWK_ID_STR(isr_event->source_id),
         FWK_ID_STR(isr_event->target_id));

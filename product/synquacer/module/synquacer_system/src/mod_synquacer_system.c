@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -123,7 +123,7 @@ static int synquacer_system_bind(fwk_id_t id, unsigned int round)
         }
     }
 
-    FWK_LOG_INFO("[SYNQUACER SYSTEM] bind success\n");
+    FWK_LOG_INFO("[SYNQUACER SYSTEM] bind success");
 
     return FWK_SUCCESS;
 }

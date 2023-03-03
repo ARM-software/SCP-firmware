@@ -1,6 +1,7 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -339,7 +340,7 @@ static int smt_signal_message(fwk_id_t channel_id)
 
     if (!channel_ctx->optee_smt_mailbox_ready) {
         /* Discard any message in the mailbox when not ready */
-        FWK_LOG_ERR("[OPTEE_SMT] Message not valid\n");
+        FWK_LOG_ERR("[OPTEE_SMT] Message not valid");
 
         return FWK_SUCCESS;
     }

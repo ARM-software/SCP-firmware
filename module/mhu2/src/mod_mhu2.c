@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -170,7 +170,7 @@ static int mhu2_send_message(
     if (channel_count < (min_channels_required + channels_used_for_payload)) {
         FWK_LOG_INFO(
             "[MHUv2] ERROR! Message length exceeds the number of MHUv2"
-            "channels available\n");
+            "channels available");
         return FWK_E_SUPPORT;
     }
 
