@@ -116,7 +116,7 @@ static int allocate_domain_stats(fwk_id_t module_id,
 
     if (stats_size > (stats_ctx.config->stats_region_size -
         stats_ctx.avail_mem_offset)) {
-        FWK_LOG_ERR("[STATS]: Error, size of statistics region too small\n");
+        FWK_LOG_ERR("[STATS]: Error, size of statistics region too small");
         stats->mode = STATS_INTERNAL_ERROR;
         return FWK_E_NOMEM;
     }
@@ -141,7 +141,7 @@ static int allocate_domain_stats(fwk_id_t module_id,
     stats->used_mem_size += stats_size;
 
     FWK_LOG_DEBUG(
-        "[STATS]: stats addr %lx, stats_size=%luB\n",
+        "[STATS]: stats addr %lx, stats_size=%luB",
         (uint32_t)scp_stats_addr,
         stats_size);
 
@@ -155,7 +155,7 @@ static int _allocate_header(struct mod_stats_info *stats, int domain_count)
 
     if (stats->desc_header_size > (stats_ctx.config->stats_region_size -
         stats_ctx.avail_mem_offset)) {
-        FWK_LOG_ERR("[STATS]: Error, size of statistics region too small\n");
+        FWK_LOG_ERR("[STATS]: Error, size of statistics region too small");
         stats->mode = STATS_INTERNAL_ERROR;
         return FWK_E_NOMEM;
     }
@@ -221,8 +221,10 @@ static int stats_init_module(fwk_id_t module_id,
     struct mod_stats_info *stats;
     int ret;
 
-    FWK_LOG_INFO("[STATS]: init module, total_domains=%d used=%d\n",
-                 domain_count, used_domains);
+    FWK_LOG_INFO(
+        "[STATS]: init module, total_domains=%d used=%d",
+        domain_count,
+        used_domains);
 
     stats = _allocate_stats_context(domain_count, used_domains);
     ret = set_module_stats_info(module_id, stats);
@@ -499,7 +501,7 @@ static int stats_init(fwk_id_t module_id, unsigned int element_count,
     const struct mod_stats_config_info *config = data;
 
     if (config == NULL || config->stats_region_size == 0) {
-        FWK_LOG_INFO("STATS: statistics are not configured\n");
+        FWK_LOG_INFO("STATS: statistics are not configured");
         return FWK_E_SUPPORT;
     }
 
@@ -543,7 +545,7 @@ static int stats_start(fwk_id_t id)
             return status;
         }
     } else {
-        FWK_LOG_ERR("[STATS]: failed to start period updates\n");
+        FWK_LOG_ERR("[STATS]: failed to start period updates");
         return FWK_E_SUPPORT;
     }
 

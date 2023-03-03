@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -403,7 +403,7 @@ static void update_platform_metadata(struct fwu_synquacer_metadata *platdata)
                                        CONFIG_SCB_PLAT_METADATA_OFFS,
                                        &buf, sizeof(buf));
     if (memcmp(platdata, &buf, sizeof(buf))) {
-        FWK_LOG_ERR("[FWU] Failed to update boot-index!\n");
+        FWK_LOG_ERR("[FWU] Failed to update boot-index!");
     }
 }
 
@@ -427,13 +427,15 @@ static uint32_t fwu_plat_get_boot_index(void)
     if (metadata.version != 1 ||
         metadata.active_index > CONFIG_FWU_NUM_BANKS) {
             platdata.boot_index = 0;
-            FWK_LOG_ERR("[FWU] FWU metadata is broken. Use default boot indx 0\n");
+            FWK_LOG_ERR(
+                "[FWU] FWU metadata is broken. Use default boot indx 0");
     } else if (metadata.active_index != platdata.boot_index) {
         /* Switch to new active bank as a trial. */
         platdata.boot_index = metadata.active_index;
         platdata.boot_count = 1;
-        FWK_LOG_INFO("[FWU] New firmware will boot. New index is %d\n",
-        (int)platdata.boot_index);
+        FWK_LOG_INFO(
+            "[FWU] New firmware will boot. New index is %d",
+            (int)platdata.boot_index);
     } else if (platdata.boot_count) {
         /* BL33 will clear the boot_count when boot. */
         if (platdata.boot_count < CONFIG_FWU_MAX_COUNT) {
@@ -441,8 +443,9 @@ static uint32_t fwu_plat_get_boot_index(void)
     } else {
             platdata.boot_index = metadata.previous_active_index;
             platdata.boot_count = 0;
-            FWK_LOG_ERR("[FWU] New firmware boot trial failed. Rollback index is %d\n",
-                        (int)platdata.boot_index);
+            FWK_LOG_ERR(
+                "[FWU] New firmware boot trial failed. Rollback index is %d",
+                (int)platdata.boot_index);
         }
     }
 

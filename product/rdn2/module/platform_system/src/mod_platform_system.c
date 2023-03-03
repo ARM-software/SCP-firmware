@@ -510,7 +510,7 @@ static int platform_system_start(fwk_id_t id)
     if (status != FWK_SUCCESS) {
         FWK_LOG_WARN(
             "[PLATFORM SYSTEM] failed to subscribe to warm reset "
-            "notification\n");
+            "notification");
     }
 
     /*
@@ -562,7 +562,7 @@ static void power_off_all_cores(void)
 
     for (pd_idx = 0; pd_idx < core_count; pd_idx++) {
         FWK_LOG_INFO(
-            "[PLATFORM SYSTEM] Powering down %s\n",
+            "[PLATFORM SYSTEM] Powering down %s",
             fwk_module_get_element_name(
                 FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, pd_idx)));
 
@@ -573,7 +573,7 @@ static void power_off_all_cores(void)
 
         if (status != FWK_SUCCESS) {
             FWK_LOG_ERR(
-                "[PLATFORM SYSTEM] Power down of %s failed\n",
+                "[PLATFORM SYSTEM] Power down of %s failed",
                 fwk_module_get_element_name(
                     FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, pd_idx)));
         }
@@ -598,7 +598,7 @@ static int check_power_off_all_cores(void)
             FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, pd_idx), &power_state);
         if (status != FWK_SUCCESS) {
             FWK_LOG_ERR(
-                "[PLATFORM_SYSTEM] failed to get state of %s\n",
+                "[PLATFORM_SYSTEM] failed to get state of %s",
                 fwk_module_get_element_name(
                     FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, pd_idx)));
             return status;
@@ -609,7 +609,7 @@ static int check_power_off_all_cores(void)
              (MOD_PD_CS_STATE_MASK << MOD_PD_CS_LEVEL_0_STATE_SHIFT)) !=
             MOD_PD_STATE_OFF) {
             FWK_LOG_INFO(
-                "[PLATFORM_SYSTEM] %s not yet powered down\n",
+                "[PLATFORM_SYSTEM] %s not yet powered down",
                 fwk_module_get_element_name(
                     FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, pd_idx)));
             return FWK_PENDING;
@@ -629,7 +629,7 @@ static void boot_primary_core(void)
     if (status != FWK_SUCCESS) {
         FWK_LOG_WARN(
             "[PLATFORM_SYSTEM] Failed to update SDS feature "
-            "availability\n");
+            "availability");
     }
     fwk_assert(status == FWK_SUCCESS);
 
@@ -637,13 +637,13 @@ static void boot_primary_core(void)
     if (status != FWK_SUCCESS) {
         FWK_LOG_WARN(
             "[PLATFORM_SYSTEM] Failed to update SDS reset "
-            "syndrome\n");
+            "syndrome");
     }
     fwk_assert(status == FWK_SUCCESS);
 
     FWK_LOG_INFO(
         "[PLATFORM SYSTEM] Warm reset complete. Powering up "
-        "boot cpu...\n");
+        "boot cpu...");
 
     /*
      * All cores were powered down. Now power up the primary core to
@@ -667,7 +667,7 @@ static void boot_primary_core(void)
     if (status != FWK_SUCCESS) {
         FWK_LOG_ERR(
             "[PLATFORM_SYSTEM] Failed to power up boot cpu,"
-            " issuing cold reset to recover\n");
+            " issuing cold reset to recover");
         /*
          * The power up request of boot cpu power domain has failed.
          * The warm reset cannot be completed and the system is now in
@@ -706,7 +706,7 @@ static int platform_system_process_event(
                 WARM_RESET_MAX_RETRIES) {
                 FWK_LOG_ERR(
                     "[PLATFORM_SYSTEM] warm reset retries reached "
-                    "maximum attempts and failed!\n");
+                    "maximum attempts and failed!");
                 fwk_assert(
                     platform_system_ctx.warm_reset_check_cnt <
                     WARM_RESET_MAX_RETRIES);
@@ -719,8 +719,7 @@ static int platform_system_process_event(
             status = fwk_put_event(&check_pd_off_event);
             if (status != FWK_SUCCESS) {
                 FWK_LOG_ERR(
-                    "[PLATFORM_SYSTEM] Failed to send event, returned "
-                    "%d\n",
+                    "[PLATFORM_SYSTEM] Failed to send event, returned %d",
                     status);
             }
             fwk_assert(status == FWK_SUCCESS);
@@ -736,7 +735,7 @@ static int platform_system_process_event(
         break; /* MOD_PLATFORM_SYSTEM_CHECK_PD_OFF */
     default:
         FWK_LOG_WARN(
-            "[PLATFORM_SYSTEM] unrecognized event received, event ignored\n");
+            "[PLATFORM_SYSTEM] unrecognized event received, event ignored");
         status = FWK_E_PARAM;
     }
 
@@ -824,9 +823,9 @@ int platform_system_process_notification(
         if (status != FWK_SUCCESS) {
             FWK_LOG_ERR(
                 "[PLATFORM_SYSTEM] Failed to send PD power off check "
-                "event, returned %d\n",
+                "event, returned %d",
                 status);
-            FWK_LOG_ERR("[PLATFORM_SYSTEM] Issuing cold reboot to recover.\n");
+            FWK_LOG_ERR("[PLATFORM_SYSTEM] Issuing cold reboot to recover.");
             status = mod_pd_restricted_api->system_shutdown(
                 MOD_PD_SYSTEM_COLD_RESET);
             fwk_assert(status == FWK_SUCCESS);

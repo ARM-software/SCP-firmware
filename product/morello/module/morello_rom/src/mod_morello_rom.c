@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -145,7 +145,7 @@ static int morello_rom_process_event(
         fip_size = morello_rom_ctx.rom_config->fip_nvm_size;
     }
 
-    FWK_LOG_INFO("[ROM] Trying to identify FIP at 0x%X\n", fip_base);
+    FWK_LOG_INFO("[ROM] Trying to identify FIP at 0x%X", fip_base);
 
     status = morello_rom_ctx.fip_api->get_entry(
         morello_rom_ctx.rom_config->image_type, &entry, fip_base, fip_size);
@@ -155,24 +155,24 @@ static int morello_rom_process_event(
 
     if (status != FWK_SUCCESS) {
         FWK_LOG_INFO(
-            "[ROM] Failed to locate %s_BL2, error: %d\n", image_type, status);
+            "[ROM] Failed to locate %s_BL2, error: %d", image_type, status);
         return status;
     }
 
-    FWK_LOG_INFO("[ROM] Located %s_BL2:\n", image_type);
-    FWK_LOG_INFO("[ROM]   address: %p\n", entry.base);
-    FWK_LOG_INFO("[ROM]   size   : %u\n", entry.size);
+    FWK_LOG_INFO("[ROM] Located %s_BL2:", image_type);
+    FWK_LOG_INFO("[ROM]   address: %p", entry.base);
+    FWK_LOG_INFO("[ROM]   size   : %u", entry.size);
     FWK_LOG_INFO(
-        "[ROM]   flags  : 0x%08" PRIX32 "%08" PRIX32 "\n",
+        "[ROM]   flags  : 0x%08" PRIX32 "%08" PRIX32,
         (uint32_t)(entry.flags >> 32),
         (uint32_t)entry.flags);
-    FWK_LOG_INFO("[ROM] Copying %s_BL2 to ITCRAM...!\n", image_type);
+    FWK_LOG_INFO("[ROM] Copying %s_BL2 to ITCRAM...!", image_type);
 
     memcpy(
         (void *)morello_rom_ctx.rom_config->ramfw_base, entry.base, entry.size);
     FWK_LOG_INFO("[ROM] Done!");
 
-    FWK_LOG_INFO("[ROM] Jumping to %s_BL2\n", image_type);
+    FWK_LOG_INFO("[ROM] Jumping to %s_BL2", image_type);
     jump_to_ramfw();
 
     return FWK_SUCCESS;

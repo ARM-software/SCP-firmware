@@ -71,7 +71,7 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
         break;
 
     default:
-        FWK_LOG_ERR("[PD] Requested power state (%i) is not supported.\n", state);
+        FWK_LOG_ERR("[PD] Requested power state (%i) is not supported.", state);
         return FWK_E_PARAM;
     }
 

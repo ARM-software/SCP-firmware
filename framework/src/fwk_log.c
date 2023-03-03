@@ -99,9 +99,7 @@ static void fwk_log_vsnprintf(
 
     size_t length = 0;
 
-    char *newline;
-
-    buffer_size -= strlen(FWK_LOG_TERMINATOR);
+    buffer_size -= FWK_ARRAY_SIZE(FWK_LOG_TERMINATOR);
 
     /*
      * We start by generating a timestamp for the message using the number of
@@ -142,25 +140,12 @@ static void fwk_log_vsnprintf(
     length = FWK_MIN(length, buffer_size - 1);
 
     /*
-     * Figure out if the user has included a newline, in which case we consider
-     * that to be the end of the message. This stops us from being able to
-     * create multi-line messages, but means we can properly generate timestamps
-     * on a line-by-line basis.
+     * Lastly, we follow through on the termination defined by
+     * `FWK_LOG_TERMINATOR`.
      */
 
-    newline = strstr(buffer, FWK_LOG_TERMINATOR);
-    if (newline == NULL) {
-        newline = buffer + length;
-    }
-
-    /*
-     * Lastly, we follow through on the termination with a proper carriage
-     * return and newline. Terminals that don't care about the carriage return
-     * will generally ignore it, but most terminals require it in order to start
-     * the next line at the first column.
-     */
-
-    (void)memcpy(newline, FWK_LOG_TERMINATOR, sizeof(FWK_LOG_TERMINATOR));
+    (void)memcpy(
+        buffer + length, FWK_LOG_TERMINATOR, sizeof(FWK_LOG_TERMINATOR));
 }
 
 static void fwk_log_snprintf(
@@ -178,7 +163,7 @@ static void fwk_log_snprintf(
 
 static bool fwk_log_banner(void)
 {
-    char buffer[FMW_LOG_COLUMNS + sizeof(FWK_LOG_TERMINATOR)];
+    char buffer[FMW_LOG_COLUMNS];
 
 #ifndef FMW_LOG_MINIMAL_BANNER
     const char *banner[] = {
@@ -195,8 +180,7 @@ static bool fwk_log_banner(void)
                              "" };
 #endif
     for (unsigned int i = 0; i < FWK_ARRAY_SIZE(banner); i++) {
-        fwk_log_snprintf(
-            sizeof(buffer), buffer, "%s%s", banner[i], FWK_LOG_TERMINATOR);
+        fwk_log_snprintf(sizeof(buffer), buffer, "%s", banner[i]);
         if (fwk_io_puts(fwk_log_stream, buffer) != FWK_SUCCESS) {
             return false;
         }

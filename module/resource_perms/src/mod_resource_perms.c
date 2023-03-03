@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -1206,7 +1206,7 @@ static int mod_res_agent_set_permissions(
 
     if (status != FWK_SUCCESS) {
         FWK_LOG_WARN(
-            "[perms] set_permissions for agent %d type %d device %d failed\n",
+            "[perms] set_permissions for agent %d type %d device %d failed",
             (int)agent_id,
             (int)type,
             (int)resource_id);
@@ -1266,7 +1266,7 @@ static int mod_res_agent_set_device_permission(
 
         if (status != FWK_SUCCESS) {
             FWK_LOG_WARN(
-                "[perms] set_permissions for agent %d device %d failed\n",
+                "[perms] set_permissions for agent %d device %d failed",
                 (int)agent_id,
                 (int)i);
         }
@@ -1364,7 +1364,7 @@ static int mod_res_agent_set_device_protocol_permission(
 
         if (status != FWK_SUCCESS) {
             FWK_LOG_WARN(
-                "[perms] set_permissions for agent %d device %d failed\n",
+                "[perms] set_permissions for agent %d device %d failed",
                 (int)agent_id,
                 (int)i);
         }

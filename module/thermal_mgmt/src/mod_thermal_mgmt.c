@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -90,7 +90,7 @@ static void thermal_protection(struct mod_thermal_mgmt_dev_ctx *dev_ctx)
     if (dev_ctx->cur_temp >=
         dev_ctx->config->temp_protection->crit_temp_threshold) {
         FWK_LOG_CRIT(
-            "[THERMAL][%s] temp (%u) reached critical threshold!\n",
+            "[THERMAL][%s] temp (%u) reached critical threshold!",
             fwk_module_get_element_name(dev_ctx->id),
             (unsigned int)dev_ctx->cur_temp);
 
@@ -102,7 +102,7 @@ static void thermal_protection(struct mod_thermal_mgmt_dev_ctx *dev_ctx)
         dev_ctx->cur_temp >=
         dev_ctx->config->temp_protection->warn_temp_threshold) {
         FWK_LOG_WARN(
-            "[THERMAL][%s] temp (%u) reached warning threshold!\n",
+            "[THERMAL][%s] temp (%u) reached warning threshold!",
             fwk_module_get_element_name(dev_ctx->id),
             (unsigned int)dev_ctx->cur_temp);
 
@@ -155,7 +155,7 @@ static int control_update(fwk_id_t id)
 
         if (dev_ctx->control_needs_update) {
             /* The last reading was not processed */
-            FWK_LOG_WARN("[TPM] Failed to process last reading\n");
+            FWK_LOG_WARN("[TPM] Failed to process last reading");
 
             return FWK_E_PANIC;
         }

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -55,7 +55,7 @@ static int mod_lcp_platform_start(fwk_id_t id)
 
     mod_lcp_config_timer();
 
-    FWK_LOG_INFO(MOD_NAME "LCP RAM firmware initialized\n");
+    FWK_LOG_INFO(MOD_NAME "LCP RAM firmware initialized");
 
     return FWK_SUCCESS;
 }

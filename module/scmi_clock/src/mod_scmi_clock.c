@@ -317,7 +317,7 @@ static enum mod_scmi_clock_policy_status scmi_clock_ref_count_table_check(
             /* Error trying to stop a stopped clock */
             FWK_LOG_WARN(
                 "[SCMI-CLK] Invalid STOP request agent:"
-                " %d scmi_clock_id: %d state:%d\n",
+                " %d scmi_clock_id: %d state:%d",
                 (int)agent_id,
                 (int)scmi_clock_idx,
                 (int)requested_state);

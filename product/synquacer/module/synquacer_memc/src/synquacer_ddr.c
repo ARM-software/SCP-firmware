@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -826,7 +826,8 @@ static void dram_init_for_ecc(void)
 
     dram_size = (uint64_t)config_ddr4_sdram_total_size * 1024 * 1024;
 
-    FWK_LOG_INFO("[DDR] Initializing DRAM for ECC\nNow Initializing[");
+    FWK_LOG_INFO("[DDR] Initializing DRAM for ECC");
+    FWK_LOG_INFO("Now Initializing[");
 
     dma330_wrapper_init();
 
