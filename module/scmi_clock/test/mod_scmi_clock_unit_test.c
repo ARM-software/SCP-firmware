@@ -207,6 +207,78 @@ void test_function_set_rate(void)
     TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
 }
 
+void test_set_rate_with_invalid_message_id_expect_SCMI_NOT_FOUND(void) {
+    int status;
+    int32_t return_value = SCMI_NOT_FOUND;
+    fwk_id_t service_id =
+        FWK_ID_ELEMENT_INIT(FAKE_MODULE_IDX, FAKE_SCMI_AGENT_IDX_OSPM0);
+
+    struct scmi_clock_rate_set_a2p payload = {
+        .flags = SCMI_CLOCK_RATE_SET_ROUND_AUTO_MASK,
+        .clock_id = CLOCK_DEV_IDX_FAKE0,
+        .rate[0] = 0x00000001,
+        .rate[1] = 0x00000001,
+    };
+
+    unsigned int invalid_message_ids[] = {
+        /* Sanity value of max unsigned int */
+        -1,
+        /* Just after the valid range */
+        MOD_SCMI_CLOCK_COMMAND_COUNT,
+        /* A median value of the invalid range */
+        (-1 - MOD_SCMI_CLOCK_COMMAND_COUNT) / 2};
+
+    for (unsigned int i = 0; i < FWK_ARRAY_SIZE(invalid_message_ids); ++i) {
+      mod_scmi_from_protocol_api_respond_ExpectAndReturn(service_id,
+                                                         &return_value,
+                                                         sizeof(return_value),
+                                                         FWK_SUCCESS);
+
+      status = scmi_clock_message_handler(
+            (fwk_id_t)MOD_SCMI_PROTOCOL_ID_CLOCK,
+            service_id,
+            (const uint32_t *)&payload,
+            payload_size_table[MOD_SCMI_CLOCK_RATE_SET],
+            invalid_message_ids[i]);
+
+      TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+    }
+}
+
+void test_set_rate_with_invalid_payload_size_expect_SCMI_PROTOCOL_ERROR(void) {
+    int status;
+    int32_t return_value = SCMI_PROTOCOL_ERROR;
+
+    fwk_id_t service_id =
+      FWK_ID_ELEMENT_INIT(FAKE_MODULE_IDX, FAKE_SCMI_AGENT_IDX_OSPM0);
+
+    struct scmi_clock_rate_set_a2p payload = {
+        .flags = SCMI_CLOCK_RATE_SET_ROUND_AUTO_MASK,
+        .clock_id = CLOCK_DEV_IDX_FAKE0,
+        .rate[0] = 0x00000001,
+        .rate[1] = 0x00000001,
+    };
+
+    unsigned int invalid_payload_sizes[] = {0, -1, /* sanity values */
+                                            sizeof(payload) + 1,
+                                            sizeof(payload) - 1};
+
+    for (unsigned int i = 0; i < FWK_ARRAY_SIZE(invalid_payload_sizes); ++i) {
+      mod_scmi_from_protocol_api_respond_ExpectAndReturn(service_id,
+                                                         &return_value,
+                                                         sizeof(return_value),
+                                                         FWK_SUCCESS);
+
+      status = scmi_clock_message_handler((fwk_id_t)MOD_SCMI_PROTOCOL_ID_CLOCK,
+                                          service_id,
+                                          (const uint32_t *)&payload,
+                                          invalid_payload_sizes[i],
+                                          MOD_SCMI_CLOCK_RATE_SET);
+
+      TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+    }
+}
+
 void test_clock_ref_count_allocate(void)
 {
     uint8_t *agent_clock_state_table_return = (uint8_t *)0xAAAAAAAA;
@@ -623,6 +695,10 @@ int scmi_test_main(void)
         RUN_TEST(test_function_set_rate);
     #else
         RUN_TEST(test_function_set_rate);
+        RUN_TEST(test_set_rate_with_invalid_message_id_expect_SCMI_NOT_FOUND);
+        RUN_TEST(
+            test_set_rate_with_invalid_payload_size_expect_SCMI_PROTOCOL_ERROR);
+
         RUN_TEST(test_clock_ref_count_allocate);
         RUN_TEST(test_clock_ref_count_init);
         RUN_TEST(test_mod_scmi_clock_request_state_check_no_change_running);
