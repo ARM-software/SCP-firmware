@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -32,8 +32,6 @@
 #include UNIT_TEST_SRC
 
 static struct mod_scmi_clock_ctx scmi_clock_ctx;
-
-struct mod_scmi_to_protocol_api *to_protocol_api = NULL;
 
 struct mod_scmi_from_protocol_api from_protocol_api = {
     .get_agent_count = mod_scmi_from_protocol_api_get_agent_count,
@@ -78,11 +76,6 @@ void setUp(void)
     #if defined(BUILD_HAS_MOD_RESOURCE_PERMS)
         scmi_clock_ctx.res_perms_api = &perm_api;
     #endif
-
-    fwk_id_is_equal_ExpectAnyArgsAndReturn(true);
-    module_scmi_clock.process_bind_request(fwk_module_id_scmi, fwk_module_id_scmi_clock,
-                                           FWK_ID_API(FWK_MODULE_IDX_SCMI_CLOCK, 0),
-                                           (const void **)&to_protocol_api);
 }
 
 void tearDown(void)
@@ -136,10 +129,12 @@ void test_function_set_rate(void)
 
     __fwk_put_event_Stub(fwk_put_event_callback);
 
-    status = to_protocol_api->message_handler((fwk_id_t)MOD_SCMI_PROTOCOL_ID_CLOCK, service_id,
-                                               (const uint32_t *)&payload,
-                                               payload_size_table[MOD_SCMI_CLOCK_RATE_SET],
-                                               MOD_SCMI_CLOCK_RATE_SET);
+    status = scmi_clock_message_handler(
+                                    (fwk_id_t)MOD_SCMI_PROTOCOL_ID_CLOCK,
+                                    service_id,
+                                    (const uint32_t *)&payload,
+                                    payload_size_table[MOD_SCMI_CLOCK_RATE_SET],
+                                    MOD_SCMI_CLOCK_RATE_SET);
 
     TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
 }
