@@ -1,7 +1,88 @@
 SCP-firmware Change Log
 =======================
 
-Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
+Copyright (c) 2019-2023, Arm Limited and Contributors. All rights reserved.
+
+SCP-firmware - version 2.12
+============================
+
+New features
+------------
+
+- Documentation:
+    - security.md file: Add the details of the SCP FW security process
+
+- Framework:
+    - FWK_TRACE: Allows printing of per-module enabled logs
+
+- Modules:
+    - SCMI System Power requestor: It is a module that takes an SCMI SYSTEM
+      POWER command and forwards it to its element, in such a way that it is
+      received by them as if it were purely a System Power command.
+
+- Platforms:
+    - OPTEE FVP platform product
+    - stm32mp1 OP-TEE platform product
+
+Changed
+-------
+
+- Documentation:
+    - maintainers: Update maintainers list
+
+- Build system:
+    - Remove all Makefile deprecated files
+    - cmake: Add a command for merging SCP libraries
+    - cmake: add option to replace modules
+    - Remove Makefile references in documentation
+
+- Framework:
+    - Rename `FWK_LOG_LEVEL_TRACE` to `FWK_LOG_LEVEL_DEBUG`
+
+- Modules:
+    - power_domain: Add warm reset notifications
+    - Use transport module instead of smt and remove smt
+    - platform_system: Add warm reset support
+    - scmi_perf: Add logs when multiple fast channels events are queued
+    - scmi_perf: Add initial UT for plugins-handler extension
+    - thermal_mgmt: Add UT and activity factor
+
+- Platforms:
+    - Rename RD-Edmunds to RD-V2
+    - All platforms: Move from module smt to transport
+    - morello: Configure the default OPP to the highest
+    - rdfremont/lcp: Append bl2 to firmware target
+    - product/rdn2: Add support for variant 3 of rdn2 platform3
+    - platform/rdn2: Enable soc expansion block on RD-N2-Cfg2
+    - tc2: Add support for TC2_VAR_EXPERIMENT_POWER
+    - product/tc2: Add the core HUNTER_ELP
+
+Resolved issues
+---------------
+
+- Build system:
+    - cmake: fix IPO dependant option
+    - ci_cmake: Add missing version 3 for RD-N2 build
+
+- Framework:
+    - fwk_core/fwk_arch: Fix buffered log output behaviour
+
+- Modules:
+    - cmn600: add missing revision r3p2
+    - cmn600: fix print of RN-F and RN-D counts
+    - power_domain: Fix return status for notify_warm_reset
+    - system_power: respond with correct status for shutdown/reboot
+    - module_common: fix FWK_SRC scoping
+    - scmi_clock: Fix policy reference counter mismatch
+
+- Platforms:
+    - synquacer: allocate secure DRAM for BL31
+
+Deprecated
+----------
+
+- Platforms:
+    - tc0: Deprecate platform
 
 SCP-firmware - version 2.11
 ============================
