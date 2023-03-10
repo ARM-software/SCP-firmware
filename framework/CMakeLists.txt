@@ -73,6 +73,10 @@ if(SCP_ENABLE_SCMI_PERF_FAST_CHANNELS)
     target_compile_definitions(framework PUBLIC "BUILD_HAS_SCMI_PERF_FAST_CHANNELS")
 endif()
 
+if(SCP_TARGET_EXCLUDE_SCMI_PERF_PROTOCOL_OPS)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_FAST_CHANNELS")
+endif()
+
 if(SCP_ENABLE_PLUGIN_HANDLER)
     target_compile_definitions(framework PUBLIC "BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER")
 endif()

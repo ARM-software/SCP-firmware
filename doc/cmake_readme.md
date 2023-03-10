@@ -131,6 +131,11 @@ few common options can be configured.
   option should be enabled/disabled by the use of a platform specific setting
   like `SCP_ENABLE_SCMI_PERF_FAST_CHANNELS`.
 
+- `SCP_TARGET_EXCLUDE_SCMI_PERF_PROTOCOL_OPS`: Allow conditional inclusion of
+  SCMI Performance commands operations. This allows platforms to include only
+  the core Perf and FastChannels without the commands ops (for ACPI-based
+  systems).
+
 It can also be used to provide some platform specific settings.
 e.g. For ARM Juno platform. See below
 
