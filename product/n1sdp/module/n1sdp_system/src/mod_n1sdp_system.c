@@ -70,16 +70,6 @@ struct n1sdp_platform_info {
     uint8_t remote_ddr_size;
 };
 
-/* MultiChip information */
-struct n1sdp_multichip_info {
-    /* If multichip mode */
-    bool mode;
-    /* Total number of secondary chips  */
-    uint8_t secondary_count;
-    /* Remote ddr size in GB */
-    uint8_t remote_ddr_size;
-};
-
 /* Coresight counter register definitions */
 struct cs_cnt_ctrl_reg {
     FWK_RW uint32_t CS_CNTCR;
