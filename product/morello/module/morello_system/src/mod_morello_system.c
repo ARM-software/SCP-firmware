@@ -71,16 +71,6 @@ struct FWK_PACKED morello_platform_info {
 #endif
 };
 
-/* MultiChip information */
-struct morello_multichip_info {
-    /* If multichip mode */
-    bool mode;
-    /* Total number of remote chips  */
-    uint8_t remote_chip_count;
-    /* Remote ddr size in GB */
-    uint8_t remote_ddr_size;
-};
-
 /* Coresight counter register definitions */
 struct cs_cnt_ctrl_reg {
     FWK_RW uint32_t CS_CNTCR;
