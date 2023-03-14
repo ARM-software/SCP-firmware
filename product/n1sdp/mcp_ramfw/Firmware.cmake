@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -39,6 +39,8 @@ list(APPEND SCP_MODULES "armv7m-mpu")
 list(APPEND SCP_MODULES "pl011")
 list(APPEND SCP_MODULES "pik-clock")
 list(APPEND SCP_MODULES "clock")
+list(APPEND SCP_MODULES "gtimer")
+list(APPEND SCP_MODULES "timer")
 list(APPEND SCP_MODULES "n1sdp-mhu")
 list(APPEND SCP_MODULES "n1sdp-smt")
 list(APPEND SCP_MODULES "scmi-agent")
