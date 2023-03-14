@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -256,7 +256,8 @@ static int scmi_agent_process_event(const struct fwk_event *event,
         return status;
 
     FWK_LOG_INFO(
-        "[SCMI AGENT] Found management protocol version: 0x%" PRIu32, temp);
+        "[SCMI AGENT] Found management protocol version: 0x%x",
+        (unsigned int)temp);
 
     return status;
 }

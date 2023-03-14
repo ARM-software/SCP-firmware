@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -18,18 +18,18 @@
 #include <stdint.h>
 
 static const struct fwk_element smt_element_table[] = {
-    [0] = { .name = "MANAGEMENT-S",
+    [0] = { .name = "MANAGEMENT-NS",
             .data = &((struct mod_smt_channel_config){
                 .type = MOD_SMT_CHANNEL_TYPE_REQUESTER,
-                .policies = MOD_SMT_POLICY_INIT_MAILBOX | MOD_SMT_POLICY_SECURE,
-                .mailbox_address = (uintptr_t)SCMI_PAYLOAD_SCP_TO_MCP_S,
+                .mailbox_address = (uintptr_t)MCP_SCP_NS_MAILBOX_SRAM,
                 .mailbox_size = MCP_SCMI_PAYLOAD_SIZE,
                 .driver_id = FWK_ID_SUB_ELEMENT_INIT(
                     FWK_MODULE_IDX_N1SDP_MHU,
-                    N1SDP_MHU_DEVICE_IDX_S_SCP,
+                    N1SDP_MHU_DEVICE_IDX_NS_SCP,
                     0),
                 .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_N1SDP_MHU, 0),
-            }) },
+            }),
+          },
     [1] = { 0 },
 };
 
