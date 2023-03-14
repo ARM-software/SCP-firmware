@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -12,6 +12,7 @@
 
 #include "config_clock.h"
 #include "n1sdp_core.h"
+#include "n1sdp_mcp_scp.h"
 #include "n1sdp_pik_cpu.h"
 #include "n1sdp_pik_debug.h"
 #include "n1sdp_pik_scp.h"
@@ -668,6 +669,12 @@ static int n1sdp_system_process_notification(const struct fwk_event *event,
          * first time only.
          */
         if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
+            /*
+             * Write a handshake pattern to MCP2SCP Secure MHU RAM to let MCP
+             * know that it can continue the boot.
+             */
+            *(FWK_W uint32_t *)SCP_MCP_SHARED_SECURE_RAM =
+                N1SDP_SCP_MCP_HANDSHAKE_PATTERN;
             status = n1sdp_system_init_primary_core();
             if (status != FWK_SUCCESS) {
                 return status;
