@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -39,15 +39,29 @@
  */
 enum scmi_management_message_id {
     /*! Message ID for getting protocol version */
-    SCMI_MANAGEMENT_PROTOCOL_VERSION_GET    = 0x0,
+    SCMI_MANAGEMENT_PROTOCOL_VERSION_GET = 0x0,
     /*! Message ID for getting protocol attributes */
     SCMI_MANAGEMENT_PROTOCOL_ATTRIBUTES_GET = 0x1,
     /*! Message ID for getting message attributes */
-    SCMI_MANAGEMENT_MESSAGE_ATTRIBUTES_GET  = 0x2,
+    SCMI_MANAGEMENT_MESSAGE_ATTRIBUTES_GET = 0x2,
     /*! Message ID for getting clock status */
-    SCMI_MANAGEMENT_CLOCK_STATUS_GET        = 0x3,
+    SCMI_MANAGEMENT_CLOCK_STATUS_GET = 0x3,
     /*! Message ID for getting chip ID information */
-    SCMI_MANAGEMENT_CHIPID_INFO_GET         = 0x4,
+    SCMI_MANAGEMENT_CHIPID_INFO_GET = 0x4,
+    /*! Count of Message IDs */
+    SCMI_MANAGEMENT_MESSAGE_ID_COUNT,
+};
+
+/*!
+ * \brief SCMI agent - Management protocol response payload sizes.
+ */
+enum scmi_management_message_payload_size {
+    /*! Payload size for protocol version get response */
+    PROTOCOL_VERSION_GET_RESPONSE_PAYLOAD_SIZE = 8,
+    /*! Payload size for clock status get response*/
+    CLOCK_STATUS_GET_RESPONSE_PAYLOAD_SIZE = 8,
+    /*! Payload size for chip ID get response */
+    CHIPID_INFO_GET_RESPONSE_PAYLOAD_SIZE = 12,
 };
 
 /*!
@@ -55,14 +69,36 @@ enum scmi_management_message_id {
  */
 struct mod_scmi_agent_config {
     /*!
-     * \brief Identifier of the transport entity.
+     * \brief The service ID which corresponds to the required
+     * channel in the transport layer.
      */
-    fwk_id_t transport_id;
+    fwk_id_t service_id;
+};
 
-    /*!
-     * \brief Identifier of the API of the transport entity.
-     */
-    fwk_id_t transport_api_id;
+/*!
+ * \brief Parameters of the protocol version response event.
+ */
+struct mod_scmi_agent_protocol_version_event_param {
+    /*! Protocol version */
+    uint32_t protocol_version;
+};
+
+/*!
+ * \brief Parameters of the clock status response event.
+ */
+struct mod_scmi_agent_clock_status_event_param {
+    /*! Clock Status */
+    uint32_t clock_status;
+};
+
+/*!
+ * \brief Parameters of the chipid response event.
+ */
+struct mod_scmi_agent_chipid_info_event_param {
+    /*! Multichip mode */
+    uint8_t multichip_mode;
+    /*! Chipid info */
+    uint8_t chipid;
 };
 
 /*!
@@ -72,49 +108,47 @@ struct mod_scmi_agent_config {
  */
 struct mod_scmi_agent_api {
     /*!
-     * \brief Get the management protocol version from SCP
+     * \brief Trigger SCMI request to get the management protocol version from
+     * SCP
      *
      * \param agent_id Agent identifier
-     * \param[out] version Protocol version.
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard error codes for implementation-defined
      *      errors.
      */
-    int (*get_protocol_version)(fwk_id_t agent_id, uint32_t *version);
+    int (*get_protocol_version)(fwk_id_t agent_id);
 
     /*!
-     * \brief Get the PLL clock status from SCP
+     * \brief Trigger SCMI request to get the PLL clock status from SCP
      *
      * \param agent_id Agent identifier
-     * \param[out] clock_status SCP clock status.
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard error codes for implementation-defined
      *      errors.
      */
-    int (*get_clock_status)(fwk_id_t agent_id, uint32_t *clock_status);
+    int (*get_clock_status)(fwk_id_t agent_id);
 
     /*!
-     * \brief Get the chip ID information from SCP
+     * \brief Trigger SCMI request to get the chip ID information from SCP
      *
      * \param agent_id Agent identifier
-     * \param[out] multichip_mode Multi-chip mode value.
-     * \param[out] chipid Chip ID value.
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
      * \return One of the standard error codes for implementation-defined
      *      errors.
      */
-    int (*get_chipid_info)(fwk_id_t agent_id, uint8_t *multichip_mode,
-                           uint8_t *chipid);
+    int (*get_chipid_info)(fwk_id_t agent_id);
 };
 
 /*!
  * \brief API types exposed by SCMI agent module.
  */
 enum mod_scmi_agent_api_idx {
-    /*! API ID to be binded by system module */
+    /*! API ID to be bound by SCMI module */
+    MOD_SCMI_AGENT_API_IDX_SCMI,
+    /*! API ID to be bound by system module */
     MOD_SCMI_AGENT_API_IDX_SYSTEM,
     /*! API ID count */
     MOD_SCMI_AGENT_API_IDX_COUNT,
