@@ -8,8 +8,9 @@
  *     SCMI Agent Support.
  */
 
+#include <mod_n1sdp_mcp_system.h>
+#include <mod_scmi.h>
 #include <mod_scmi_agent.h>
-#include <mod_smt.h>
 
 #include <fwk_core.h>
 #include <fwk_event.h>
@@ -28,12 +29,6 @@
 struct scmi_agent_ctx {
     /* Pointer to agent configuration data */
     struct mod_scmi_agent_config *config;
-
-    /* Pointer to received payload data */
-    const void *payload;
-
-    /* Size of received payload */
-    size_t size;
 };
 
 /* Module context */
@@ -41,132 +36,195 @@ struct mod_scmi_agent_module_ctx {
     /* Pointer to agent configuration table */
     struct scmi_agent_ctx *agent_ctx_table;
 
-    /* SMT API pointer */
-    const struct mod_scmi_agent_to_transport_api *smt_api;
+    /* SCMI API pointer */
+    const struct mod_scmi_from_protocol_req_api *scmi_api;
 };
 
-enum scmi_agent_event {
-    MOD_SCMI_AGENT_EVENT_RUN,
-    MOD_SCMI_AGENT_EVENT_COUNT,
-};
+static const unsigned int
+    payload_size_table[SCMI_MANAGEMENT_MESSAGE_ID_COUNT] = {
+        [SCMI_MANAGEMENT_PROTOCOL_VERSION_GET] =
+            PROTOCOL_VERSION_GET_RESPONSE_PAYLOAD_SIZE,
+        [SCMI_MANAGEMENT_CLOCK_STATUS_GET] =
+            CLOCK_STATUS_GET_RESPONSE_PAYLOAD_SIZE,
+        [SCMI_MANAGEMENT_CHIPID_INFO_GET] =
+            CHIPID_INFO_GET_RESPONSE_PAYLOAD_SIZE,
+    };
 
 static struct mod_scmi_agent_module_ctx ctx;
 
-static int _scmi_agent_transact(fwk_id_t agent_id,
-                               struct mod_smt_command_config *cmd)
+/*
+ * Protocol Version
+ */
+static int scmi_agent_protocol_version_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload)
 {
-    struct scmi_agent_ctx *agent_ctx;
-    int status;
+    struct fwk_event event;
+    struct mod_scmi_agent_protocol_version_event_param *event_param =
+        (struct mod_scmi_agent_protocol_version_event_param *)event.params;
 
-    agent_ctx = &ctx.agent_ctx_table[fwk_id_get_element_idx(agent_id)];
+    event = (struct fwk_event){
+        .target_id = FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_MCP_SYSTEM),
+        .id = FWK_ID_EVENT(
+            FWK_MODULE_IDX_N1SDP_MCP_SYSTEM,
+            MOD_MCP_SYSTEM_EVENT_PROTOCOL_VERSION_GET),
+    };
 
-    /* Check if channel is free */
-    if (!ctx.smt_api->is_channel_free(agent_ctx->config->transport_id)) {
-        FWK_LOG_ERR("[SCMI AGENT] Channel Busy!");
-        return FWK_E_BUSY;
-    }
+    /* Get protocol version from payload which is second member in response */
+    event_param->protocol_version = *(((uint32_t *)payload) + 1);
 
-    /* Send SCMI command to platform */
-    status = ctx.smt_api->send(agent_ctx->config->transport_id, cmd);
-    if (status != FWK_SUCCESS) {
-        ctx.smt_api->put_channel(agent_ctx->config->transport_id);
-        return status;
-    }
+    return fwk_put_event(&event);
+}
 
-    /* Wait until platform responds */
-    while (!ctx.smt_api->is_channel_free(agent_ctx->config->transport_id))
-        ;
+/*
+ * Clock Status Get
+ */
+static int scmi_agent_clock_status_get_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload)
+{
+    struct fwk_event event;
+    struct mod_scmi_agent_clock_status_event_param *event_param =
+        (struct mod_scmi_agent_clock_status_event_param *)event.params;
 
-    /* Get response payload */
-    status = ctx.smt_api->get_payload(agent_ctx->config->transport_id,
-                                      &agent_ctx->payload, &agent_ctx->size);
-    if (status != FWK_SUCCESS)
-        return status;
+    event = (struct fwk_event){
+        .target_id = FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_MCP_SYSTEM),
+        .id = FWK_ID_EVENT(
+            FWK_MODULE_IDX_N1SDP_MCP_SYSTEM,
+            MOD_MCP_SYSTEM_EVENT_CLOCK_STATUS_GET),
+    };
 
-    /* Release channel */
-    status = ctx.smt_api->put_channel(agent_ctx->config->transport_id);
-    if (status != FWK_SUCCESS)
-        return status;
+    /* Get clock status from payload which is second member in response */
+    event_param->clock_status = *(((uint32_t *)payload) + 1);
 
+    return fwk_put_event(&event);
+}
+
+/*
+ * CHIP ID Information Get
+ */
+static int scmi_agent_chipid_info_get_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload)
+{
+    struct fwk_event event;
+    struct mod_scmi_agent_chipid_info_event_param *event_param =
+        (struct mod_scmi_agent_chipid_info_event_param *)event.params;
+
+    event = (struct fwk_event){
+        .target_id = FWK_ID_MODULE(FWK_MODULE_IDX_N1SDP_MCP_SYSTEM),
+        .id = FWK_ID_EVENT(
+            FWK_MODULE_IDX_N1SDP_MCP_SYSTEM,
+            MOD_MCP_SYSTEM_EVENT_CHIPID_INFO_GET),
+    };
+
+    /* Get multichip mode from payload which is second member in response */
+    event_param->multichip_mode = (uint8_t)(*(((uint32_t *)payload) + 1));
+    /* Get chipid from payload which is third member in response */
+    event_param->chipid = (uint8_t)(*(((uint32_t *)payload) + 2));
+
+    return fwk_put_event(&event);
+}
+
+static int get_scmi_protocol_id(fwk_id_t protocol_id, uint8_t *scmi_protocol_id)
+{
+    *scmi_protocol_id = SCMI_PROTOCOL_ID_MANAGEMENT;
     return FWK_SUCCESS;
 }
+
+static int (*const handler_table[])(fwk_id_t, const uint32_t *) = {
+    [SCMI_MANAGEMENT_PROTOCOL_VERSION_GET] =
+        scmi_agent_protocol_version_handler,
+    [SCMI_MANAGEMENT_CLOCK_STATUS_GET] = scmi_agent_clock_status_get_handler,
+    [SCMI_MANAGEMENT_CHIPID_INFO_GET] = scmi_agent_chipid_info_get_handler,
+};
+
+static int scmi_message_handler(
+    fwk_id_t protocol_id,
+    fwk_id_t service_id,
+    const uint32_t *payload,
+    size_t payload_size,
+    unsigned int message_id)
+{
+    int handler_status, resp_status;
+
+    fwk_assert(payload != NULL);
+
+    if (message_id >= FWK_ARRAY_SIZE(handler_table)) {
+        return FWK_E_RANGE;
+    }
+
+    if (payload_size != payload_size_table[message_id]) {
+        return FWK_E_PARAM;
+    }
+
+    handler_status = handler_table[message_id](service_id, payload);
+
+    resp_status = ctx.scmi_api->response_message_handler(service_id);
+
+    return (handler_status != FWK_SUCCESS) ? handler_status : resp_status;
+}
+
+static struct mod_scmi_to_protocol_api scmi_agent_mod_scmi_to_protocol_api = {
+    .get_scmi_protocol_id = get_scmi_protocol_id,
+    .message_handler = scmi_message_handler
+};
 
 /*
  * SCMI Management Agent API interface
  */
-static int agent_get_protocol_version(fwk_id_t agent_id, uint32_t *version)
+static int agent_get_protocol_version(fwk_id_t agent_id)
 {
     int status;
     struct scmi_agent_ctx *agent_ctx;
-    struct mod_smt_command_config cmd = {
-        .protocol_id = SCMI_PROTOCOL_ID_MANAGEMENT,
-        .message_id = SCMI_MANAGEMENT_PROTOCOL_VERSION_GET,
-        .payload = NULL,
-        .size = 0,
-    };
-
-    if (version == NULL)
-        return FWK_E_PARAM;
-
-    status = _scmi_agent_transact(agent_id, &cmd);
-    if (status != FWK_SUCCESS)
-        return status;
 
     agent_ctx = &ctx.agent_ctx_table[fwk_id_get_element_idx(agent_id)];
-    *version = *(((uint32_t *)agent_ctx->payload) + 1);
+    status = ctx.scmi_api->scmi_send_message(
+        SCMI_MANAGEMENT_PROTOCOL_VERSION_GET,
+        SCMI_PROTOCOL_ID_MANAGEMENT,
+        0,
+        agent_ctx->config->service_id,
+        NULL,
+        0,
+        true);
 
-    return FWK_SUCCESS;
+    return status;
 }
 
-static int agent_get_clock_status(fwk_id_t agent_id, uint32_t *clock_status)
+static int agent_get_clock_status(fwk_id_t agent_id)
 {
     int status;
     struct scmi_agent_ctx *agent_ctx;
-    struct mod_smt_command_config cmd = {
-        .protocol_id = SCMI_PROTOCOL_ID_MANAGEMENT,
-        .message_id = SCMI_MANAGEMENT_CLOCK_STATUS_GET,
-        .payload = NULL,
-        .size = 0,
-    };
-
-    if (clock_status == NULL)
-        return FWK_E_PARAM;
-
-    status = _scmi_agent_transact(agent_id, &cmd);
-    if (status != FWK_SUCCESS)
-        return status;
 
     agent_ctx = &ctx.agent_ctx_table[fwk_id_get_element_idx(agent_id)];
-    *clock_status = *(((uint32_t *)agent_ctx->payload) + 1);
+    status = ctx.scmi_api->scmi_send_message(
+        SCMI_MANAGEMENT_CLOCK_STATUS_GET,
+        SCMI_PROTOCOL_ID_MANAGEMENT,
+        0,
+        agent_ctx->config->service_id,
+        NULL,
+        0,
+        true);
 
-    return FWK_SUCCESS;
+    return status;
 }
 
-static int agent_get_chipid_info(fwk_id_t agent_id,
-                                 uint8_t *multichip_mode,
-                                 uint8_t *chipid)
+static int agent_get_chipid_info(fwk_id_t agent_id)
 {
     int status;
     struct scmi_agent_ctx *agent_ctx;
-    struct mod_smt_command_config cmd = {
-        .protocol_id = SCMI_PROTOCOL_ID_MANAGEMENT,
-        .message_id = SCMI_MANAGEMENT_CHIPID_INFO_GET,
-        .payload = NULL,
-        .size = 0,
-    };
-
-    if ((multichip_mode == NULL) || (chipid == NULL))
-        return FWK_E_PARAM;
-
-    status = _scmi_agent_transact(agent_id, &cmd);
-    if (status != FWK_SUCCESS)
-        return status;
 
     agent_ctx = &ctx.agent_ctx_table[fwk_id_get_element_idx(agent_id)];
-    *multichip_mode = (uint8_t)(*(((uint32_t *)agent_ctx->payload) + 1));
-    *chipid = (uint8_t)(*(((uint32_t *)agent_ctx->payload) + 2));
+    status = ctx.scmi_api->scmi_send_message(
+        SCMI_MANAGEMENT_CHIPID_INFO_GET,
+        SCMI_PROTOCOL_ID_MANAGEMENT,
+        0,
+        agent_ctx->config->service_id,
+        NULL,
+        0,
+        true);
 
-    return FWK_SUCCESS;
+    return status;
 }
 
 struct mod_scmi_agent_api scmi_agent_api = {
@@ -206,70 +264,36 @@ static int scmi_agent_element_init(fwk_id_t agent_id, unsigned int unused,
 
 static int scmi_agent_bind(fwk_id_t id, unsigned int round)
 {
-    struct scmi_agent_ctx *agent_ctx;
-
-    if (round == 0) {
-        if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
-            return FWK_SUCCESS;
-
-        agent_ctx = &ctx.agent_ctx_table[fwk_id_get_element_idx(id)];
-        return fwk_module_bind(agent_ctx->config->transport_id,
-                               agent_ctx->config->transport_api_id,
-                               &ctx.smt_api);
+    if ((round == 0) && fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
+        return fwk_module_bind(
+            FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
+            FWK_ID_API(FWK_MODULE_IDX_SCMI, MOD_SCMI_API_IDX_PROTOCOL_REQ),
+            &ctx.scmi_api);
     }
     return FWK_SUCCESS;
 }
 
-static int scmi_agent_start(fwk_id_t id)
+static int scmi_agent_process_bind_request(
+    fwk_id_t source_id,
+    fwk_id_t target_id,
+    fwk_id_t api_id,
+    const void **api)
 {
-    /* Process only in the element start stage */
-    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
-        return FWK_SUCCESS;
+    if (fwk_id_is_equal(source_id, FWK_ID_MODULE(FWK_MODULE_IDX_SCMI))) {
+        *api = &scmi_agent_mod_scmi_to_protocol_api;
 
-    struct fwk_event event = {
-        .source_id = id,
-        .target_id = id,
-        .id = FWK_ID_EVENT(FWK_MODULE_IDX_SCMI_AGENT,
-                           MOD_SCMI_AGENT_EVENT_RUN),
-    };
+    } else {
+        *api = &scmi_agent_api;
+    }
 
-    return fwk_put_event(&event);
-}
-
-static int scmi_agent_process_bind_request(fwk_id_t source_id,
-                                           fwk_id_t target_id,
-                                           fwk_id_t api_id,
-                                           const void **api)
-{
-    *api = &scmi_agent_api;
     return FWK_SUCCESS;
-}
-
-static int scmi_agent_process_event(const struct fwk_event *event,
-                                    struct fwk_event *resp)
-{
-    int status;
-    uint32_t temp = 0;
-
-    status = agent_get_protocol_version(event->target_id, &temp);
-    if (status != FWK_SUCCESS)
-        return status;
-
-    FWK_LOG_INFO(
-        "[SCMI AGENT] Found management protocol version: 0x%x",
-        (unsigned int)temp);
-
-    return status;
 }
 
 const struct fwk_module module_scmi_agent = {
     .type = FWK_MODULE_TYPE_SERVICE,
     .api_count = MOD_SCMI_AGENT_API_IDX_COUNT,
-    .event_count = MOD_SCMI_AGENT_EVENT_COUNT,
     .init = scmi_agent_init,
     .element_init = scmi_agent_element_init,
     .bind = scmi_agent_bind,
-    .start = scmi_agent_start,
     .process_bind_request = scmi_agent_process_bind_request,
-    .process_event = scmi_agent_process_event,
 };
