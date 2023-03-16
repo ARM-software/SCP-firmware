@@ -1,0 +1,26 @@
+/*
+ * Arm SCP/MCP Software
+ * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+/* base .dtsi file of SCP FWK software configuration */
+
+/ {
+
+    scp-fwk {
+
+        elem_id: fwk-id@0 {
+                compatible = "arm,scp-elem-id";
+                #scp-id-cells = <2>;        
+        };
+
+        module_id: fwk-id@1 {            
+                compatible = "arm,scp-mod-id";
+                #scp-id-cells = <1>;
+        };
+        
+    };
+
+};

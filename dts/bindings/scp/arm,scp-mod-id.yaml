@@ -1,0 +1,9 @@
+description: SCP software framework module  ID 
+
+compatible: "arm,scp-mod-id"
+
+include: base.yaml
+
+scp-id-cells:
+    - mod-idx       # module index
+

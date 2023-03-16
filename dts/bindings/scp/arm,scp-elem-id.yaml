@@ -1,0 +1,9 @@
+description: SCP software framework module element ID 
+
+compatible: "arm,scp-elem-id"
+
+include: base.yaml
+
+scp-id-cells:
+    - mod-idx       # module index
+    - elem-idx      # element index
