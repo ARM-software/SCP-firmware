@@ -14,3 +14,14 @@ target_sources(
     ${SCP_MODULE_TARGET}
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_power_domain.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/src/power_domain_utils.c")
+
+if(SCP_MODULE IN_LIST SCP_DT_CONFIG_MODULES_ALL)
+    target_sources(${SCP_MODULE_TARGET}
+                   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/config_dt_power_domain.c")
+
+    # add header file to list used to generate defines for dt include 
+    list(APPEND SCP_DT_BIND_H_GEN_FROM_INCL "${CMAKE_CURRENT_SOURCE_DIR}/include/mod_power_domain.h")
+    set(SCP_DT_BIND_H_GEN_FROM_INCL "${SCP_DT_BIND_H_GEN_FROM_INCL}" PARENT_SCOPE)
+   
+
+endif()

@@ -1,0 +1,20 @@
+description: SCP Power Domain mask table
+
+compatible: "arm,scp-pd-mask-table"
+
+include: base.yaml
+
+properties:
+  label: 
+    description: Name of table object in SCP firmware
+    required: true
+
+  pd-states:
+    description: Array of PD states associated with the mask values.
+    type: array
+    required: true
+
+  mask-values:
+    description: Mask values for power domain states. 1 value per pd-states entry
+    type: array
+    required: true

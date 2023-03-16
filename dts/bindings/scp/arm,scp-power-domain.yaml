@@ -1,0 +1,50 @@
+description: SCP Power Domain Configuration
+
+compatible: "arm,scp-power-domain"
+
+include: base.yaml
+
+properties:
+  label: 
+    required: true
+
+  pd-type:
+    description: Power Domain type
+    required: true
+    type: int
+
+  pd-idx:
+    description: SCP PD software module index for this element
+    type: int
+    required: true
+
+  pd-parent:
+    description: reference to parent power domain. Default to none.
+    type: phandle
+    required: false
+
+  scp-ids:
+    description: Array of SCP framework IDs; [0] element or module ID for driver, [1] elem ID for api
+    required: true
+    type: phandle-array
+
+#  driver-id:
+#    description: SCP driver / module ID pair or module single id
+#    required: true
+#    type: array
+
+#  api-id:
+#    description: SCP api / module ID pair
+#    required: true
+#    type: array
+  
+  allowed-mask-table: 
+    description: reference to a table of allowed masks
+    required: true
+    type: phandle
+
+  disable-state-trans-notifications:
+    description: Flag to disable notifications for state transitions
+    required: false
+    type: boolean
+    
