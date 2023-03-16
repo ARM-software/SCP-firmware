@@ -1,0 +1,19 @@
+description: ARM PL011 UART
+
+compatible: "arm,pl011"
+
+include: uart-controller.yaml
+
+properties:
+    reg:
+      required: true
+
+      # MJL: changed to false
+    interrupts:
+      required: false
+
+    scp-ids:
+      type: phandle-array
+      required: false
+      description: SCP ID for the power domain of the component.
+
