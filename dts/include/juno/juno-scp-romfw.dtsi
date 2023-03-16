@@ -1,0 +1,178 @@
+/*
+ * Arm SCP/MCP Software
+ * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+/* SCP firmware framework configuration for Juno scp_romfw */
+
+#include "fwk_dt_bindings.h"
+
+/ {
+    juno {
+         juno-rom-config {
+                  compatible = "arm,juno-rom";
+                  label = "Juno ROM";
+                  ap-context = <AP_CONTEXT_BASE  AP_CONTEXT_SIZE>;
+                  ram-fw-base = <SCP_RAM_BASE>;
+         };
+    };
+        
+    scp-fwk {
+       scp-gtimer@0 {
+            compatible = "arm,scp-gtimer";
+            label = "REFCLK";
+            timer-addr = <REFCLK_CNTBASE0_BASE>;
+            counter-addr = <REFCLK_CNTCTL_BASE>;
+            control-addr = <REFCLK_CNTCONTROL_BASE>;
+            frequency = <CLOCK_RATE_REFCLK>;            
+        };
+
+        scp-sds {
+            sds-cpu-info {
+                compatible = "arm,scp-sds";
+                label = "CPU Info";
+                table-idx = <JUNO_SDS_ROM_CPU_INFO_IDX>;
+                data-id-size = <JUNO_SDS_CPU_INFO JUNO_SDS_CPU_INFO_SIZE>;
+                region-id = <JUNO_SDS_REGION_SECURE>;
+                finalize;
+            };
+
+            sds-version {
+                compatible = "arm,scp-sds";
+                label = "ROM Version";
+                table-idx = <JUNO_SDS_ROM_VERSION_IDX>;
+                data-id-size = <JUNO_SDS_ROM_VERSION JUNO_SDS_ROM_VERSION_SIZE>;
+                region-id = <JUNO_SDS_REGION_SECURE>;
+                finalize;
+            };
+
+            sds-plat-id {
+                compatible = "arm,scp-sds";
+                label = "Platform ID";
+                table-idx = <JUNO_SDS_ROM_PLATFORM_ID_IDX>;
+                data-id-size = <JUNO_SDS_PLATFORM_ID JUNO_SDS_PLATFORM_ID_SIZE>;
+                region-id = <JUNO_SDS_REGION_SECURE>;
+                finalize;
+            };
+
+            sds-rst-synd {
+                compatible = "arm,scp-sds";
+                label = "Reset Syndrome";
+                table-idx = <JUNO_SDS_ROM_RESET_SYNDROME_IDX>;
+                data-id-size = <JUNO_SDS_RESET_SYNDROME JUNO_SDS_RESET_SYNDROME_SIZE>;
+                region-id = <JUNO_SDS_REGION_SECURE>;
+                finalize;
+            };
+            
+            sds-bootld {
+                compatible = "arm,scp-sds";
+                label = "Bootloader";
+                table-idx = <JUNO_SDS_ROM_BOOTLOADER_IDX>;
+                data-id-size = <JUNO_SDS_BOOTLOADER JUNO_SDS_BOOTLOADER_SIZE>;
+                region-id = <JUNO_SDS_REGION_SECURE>;
+                finalize;
+            };
+
+            sds-feat {
+                compatible = "arm,scp-sds";
+                label = "Features";
+                table-idx = <JUNO_SDS_ROM_FEATURES_IDX>;
+                data-id-size = <JUNO_SDS_FEATURE_AVAILABILITY JUNO_SDS_FEATURE_AVAILABILITY_SIZE>;
+                region-id = <JUNO_SDS_REGION_SECURE>;
+                finalize;
+            };
+        };
+
+        scp-bootloader {
+            compatible = "arm,scp-bootloader";
+            source = <TRUSTED_RAM_BASE (256 * 1024)>;
+            destination = <SCP_RAM_BASE SCP_RAM_SIZE>;
+            sds_id = <JUNO_SDS_BOOTLOADER>;
+        };
+
+        juno-ppu {
+            big-systop-ppu {
+                compatible = "arm,juno-ppu";
+                label = "BIG_SSTOP";
+                elem-idx = <JUNO_PPU_DEV_IDX_BIG_SSTOP>;
+                reg = <PPU_BIG_SSTOP_BASE>;
+            };
+
+            big-cpu0-ppu {
+                compatible = "arm,juno-ppu";
+                label = "BIG_CPU0";
+                elem-idx = <JUNO_PPU_DEV_IDX_BIG_CPU0>;
+                reg = <PPU_BIG_CPU0_BASE>;
+    
+            };
+
+            big-cpu1-ppu {
+                compatible = "arm,juno-ppu";
+                label = "BIG_CPU1";
+                elem-idx = <JUNO_PPU_DEV_IDX_BIG_CPU1>;
+                reg = <PPU_BIG_CPU1_BASE>;     
+            };
+
+            little-systop-ppu {
+                compatible = "arm,juno-ppu";
+                label = "LITTLE_SSTOP";
+                elem-idx = <JUNO_PPU_DEV_IDX_LITTLE_SSTOP>;
+                reg = <PPU_LITTLE_SSTOP_BASE>;
+            };
+
+            little-cpu0-ppu {
+                compatible = "arm,juno-ppu";
+                label = "LITTLE_CPU0";
+                elem-idx = <JUNO_PPU_DEV_IDX_LITTLE_CPU0>;
+                reg = <PPU_LITTLE_CPU0_BASE>;
+            };
+
+            little-cpu1-ppu {
+                compatible = "arm,juno-ppu";
+                label = "LITTLE_CPU1";
+                elem-idx = <JUNO_PPU_DEV_IDX_LITTLE_CPU1>;
+                reg = <PPU_LITTLE_CPU1_BASE>;
+            };
+
+            little-cpu2-ppu {
+                compatible = "arm,juno-ppu";
+                label = "LITTLE_CPU2";
+                elem-idx = <JUNO_PPU_DEV_IDX_LITTLE_CPU2>;
+                reg = <PPU_LITTLE_CPU2_BASE>;
+            };
+
+            little-cpu3-ppu {
+                compatible = "arm,juno-ppu";
+                label = "LITTLE_CPU3";
+                elem-idx = <JUNO_PPU_DEV_IDX_LITTLE_CPU3>;
+                reg = <PPU_LITTLE_CPU3_BASE>;
+            };
+
+            gpu-ppu {
+                compatible = "arm,juno-ppu";
+                label = "GPUTOP";
+                elem-idx = <JUNO_PPU_DEV_IDX_GPUTOP>;
+                reg = <PPU_GPUTOP_BASE>;
+            };
+
+            systop-ppu {
+                compatible = "arm,juno-ppu";
+                label = "SYSTOP";
+                elem-idx = <JUNO_PPU_DEV_IDX_SYSTOP>;
+                reg = <PPU_SYSTOP_BASE>;
+            };
+
+            dbgsys-ppu {
+                compatible = "arm,juno-ppu";
+                label = "DBGSYS";
+                elem-idx = <JUNO_PPU_DEV_IDX_DBGSYS>;
+                reg = <PPU_DBGSYS_BASE>;
+            };
+        
+        };
+                 
+   
+  };
+};

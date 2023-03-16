@@ -1,0 +1,32 @@
+/*
+ * Arm SCP/MCP Software
+ * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+/* SCP firmware framework optional configuration for Juno scp_romfw with debug build */
+
+/ {
+    scp-fwk {
+        scp-sds {
+            sds-bootcount {
+                compatible = "arm,scp-sds";
+                label = "Boot Counters";
+                table-idx = <JUNO_SDS_ROM_BOOT_COUNTER_IDX>;
+                data-id-size = <JUNO_SDS_CPU_BOOTCTR  JUNO_SDS_CPU_BOOTCTR_SIZE>;
+                region-id = <JUNO_SDS_REGION_SECURE>;
+                finalize;
+            };
+
+            sds-cpuflags {
+                compatible = "arm,scp-sds";
+                label = "CPU Flags";
+                table-idx = <JUNO_SDS_ROM_CPU_FLAGS_IDX>;
+                data-id-size = <JUNO_SDS_CPU_FLAGS JUNO_SDS_CPU_FLAGS_SIZE>;
+                region-id = <JUNO_SDS_REGION_SECURE>;
+                finalize;
+            };
+        };
+    };
+};
