@@ -1,0 +1,29 @@
+description: SCP SDS element descriptor table. Series of data elements in the SDS area
+
+compatible: "arm,scp-sds"
+
+include: base.yaml
+
+properties:
+  label: 
+    required: true
+
+  table-idx:
+    description: descriptor array table index for this SDS data element
+    required: true
+    type: int
+
+  data-id-size:
+    description: Array containing data id and size for this SDS data element.
+    required: true
+    type: array
+    
+  region-id:
+    description: SDS memory region identifier this SDS data table resides in..
+    required: true
+    type: int
+
+  finalize:
+    description: Flag to finalise SDS element.
+    required: false
+    type: boolean

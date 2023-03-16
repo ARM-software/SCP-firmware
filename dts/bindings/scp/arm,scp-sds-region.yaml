@@ -1,0 +1,16 @@
+description: SCP SDS region descriptions
+
+compatible: "arm,scp-sds-region"
+
+include: base.yaml
+
+properties:
+  region-idx: 
+    required: true
+    type: int
+    description: SCP region index for this element
+
+  reg:
+    required: true
+    description: Base address and size for this region
+  
