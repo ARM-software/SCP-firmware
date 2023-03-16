@@ -45,6 +45,9 @@ preprocessorErrorDirective:*framework/test/fwk_module_idx.h:14
 preprocessorErrorDirective:*arch/arm/src/arch_mm.c:16
 preprocessorErrorDirective:*arch/arm/armv8-a/src/arch_mm.c:17
 
+// Cppcheck cannot see the predefines for BITS_PER_LONG, despite it compling perfectly well.
+preprocessorErrorDirective:*framework/include/dt_sys/util.h:48
+
 // This memory has a static lifetime
 memleak:*product/rdv1mc/scp_ramfw/config_power_domain.c:156
 memleak:*product/rdv1mc/scp_ramfw/config_ppu_v1.c:87
