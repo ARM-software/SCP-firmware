@@ -146,13 +146,29 @@ ifneq ($(filter-out $(PRODUCT_INDEPENDENT_GOALS), $(MAKECMDGOALS)),)
         $(error "$(PRODUCT) has been deprecated! Build terminated")
     endif
 
-    FIRMWARE_TARGETS := $(addprefix firmware-, $(BS_FIRMWARE_LIST))
+    ifeq ($(BUILD_TARGET),)
+        FIRMWARE_TARGETS := $(addprefix firmware-, $(BS_FIRMWARE_LIST))
+    else
+        ifneq ($(findstring $(BUILD_TARGET),$(BS_FIRMWARE_LIST)),)
+            FIRMWARE_TARGETS := $(addprefix firmware-, $(BUILD_TARGET))
+        else
+            $(error "Specific BUILD_TARGET $(BUILD_TARGET) not in valid target list: $(BS_FIRMWARE_LIST)")
+        endif
+    endif
 
-ifndef PLATFORM_VARIANT
-    PRODUCT_BUILD_PATH := $(BUILD_PATH)/$(BS_PRODUCT_NAME)/$(TOOLCHAIN)/$(MODE)
-else
-    PRODUCT_BUILD_PATH := $(BUILD_PATH)/$(BS_PRODUCT_NAME)/platform_variant_$(PLATFORM_VARIANT)/$(TOOLCHAIN)/$(MODE)
-endif
+
+    ifndef PLATFORM_VARIANT
+	    PRODUCT_BUILD_PATH := $(BUILD_PATH)/$(BS_PRODUCT_NAME)/$(TOOLCHAIN)/$(MODE)
+    else
+	    PRODUCT_BUILD_PATH := $(BUILD_PATH)/$(BS_PRODUCT_NAME)/platform_variant_$(PLATFORM_VARIANT)/$(TOOLCHAIN)/$(MODE)
+    endif
+
+	GENERATE_PREFIXES := $(addprefix $(PRODUCT_BUILD_PATH)/, $(FIRMWARE_TARGETS))
+	GENERATE_TARGETS := $(addsuffix /CMakeCache.txt, $(GENERATE_PREFIXES))
+
+    ifneq ($(CPP_HALT),)
+          CPP_HALT_ARGS := -DSCP_BUILD_CPP_ONLY=1
+    endif
 
 define msg_start
 ================================================================
@@ -160,6 +176,7 @@ Arm SCP/MCP Software build System
 Platform    : $(BS_PRODUCT_NAME)
 Mode        : $(MODE)
 Firmware(s) : $(BS_FIRMWARE_LIST)
+Targets(s)  : $(FIRMWARE_TARGETS)
 ================================================================
 endef
 
@@ -193,6 +210,7 @@ endif
 CMAKE_COMMAND_OPTION += $(CMAKE_TOOL_LOG_LEVEL)
 CMAKE_COMMAND_OPTION += $(CMAKE_SCP_LOG_LEVEL_OPTION)
 CMAKE_COMMAND_OPTION += $(CMAKE_DEBUGGER_OPTION)
+CMAKE_COMMAND_OPTION += $(CPP_HALT_ARGS)
 
 #
 # Rules
@@ -208,6 +226,8 @@ help:
 	@echo "| Available Targets                                                |"
 	@echo "--------------------------------------------------------------------"
 	@echo "    all             Build all firmware defined by PRODUCT=<product>"
+	@echo "    generate        Generate all CMake build trees defined by "
+	@echo "                    PRODUCT=<product>."
 	@echo "    clean           Remove all built products"
 	@echo "    help            Show this documentation"
 	@echo "    doc             Generate the documentation of this project with Doxygen"
@@ -258,6 +278,12 @@ help:
 	@echo "        Default: $(DEFAULT_BUILD_SYSTEM)"
 	@echo "        Specify CMake to generate GNU Make or Ninja build system."
 	@echo ""
+	@echo "    BUILD_TARGET"
+	@echo "        Value: <Single firmware target variant valid for PRODUCT>"
+	@echo "        Default: "
+	@echo "        Specify a named firmware target for the build - otherwise will"
+	@echo "        build all valid firmware targets for the selected PRODUCT"
+	@echo ""
 	@echo "    TOOLCHAIN"
 	@echo "        Value: <GNU|ArmClang|Clang>"
 	@echo "        Default: $(DEFAULT_TOOLCHAIN)"
@@ -275,20 +301,44 @@ help:
 	@echo "        Value: <cmake configuration parameters>"
 	@echo "        Default: "
 	@echo "        Pass extra arguments directly to cmake configuration stage."
-	@echo "        Multiplle extra args can be added with += or by passing the arguments as a string"
+	@echo "        Multiple extra args can be added with += or by passing the arguments as a string"
 	@echo ""
 	@echo "    EXTRA_BUILD_ARGS"
 	@echo "        Value: <cmake build parameters>"
 	@echo "        Default: "
 	@echo "        Pass extra arguments directly to cmake build stage."
-	@echo "        Multiplle extra args can be added with += or by passing the arguments as a string"
+	@echo "        Multiple extra args can be added with += or by passing the arguments as a string"
 	@echo ""
-
+	@echo "    CPP_HALT"
+	@echo "        Value: 1 "
+	@echo "        Default: "
+	@echo "        Halt after the C Pre-Processor stage - use to debug macro expansion"
+	@echo ""
 
 .SECONDEXPANSION:
 
 .PHONY: all
-all: $(FIRMWARE_TARGETS)
+all: command_msg $(FIRMWARE_TARGETS)
+
+define msg_generate
+================================================================
+Generate only: $(GENERATE_TARGETS)
+================================================================
+endef
+
+.PHONY: generate
+generate: generate_msg $(GENERATE_TARGETS)
+
+generate_msg:
+	$(info $(msg_generate))
+
+
+define msg_cmd
+CMake Commnd options: $(CMAKE_COMMAND_OPTION)
+endef
+
+command_msg:
+    $(info $(msg_cmd))
 
 firmware-%: $(PRODUCT_BUILD_PATH)/$$@/CMakeCache.txt
 	$(CMAKE) --build $(<D)/ $(CMAKE_BUILD_VERBOSE_OPTION) $(EXTRA_BUILD_ARGS)
