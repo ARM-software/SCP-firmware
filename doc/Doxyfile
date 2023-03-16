@@ -801,8 +801,10 @@ INPUT                  = $(TOP_DIR)/readme.md \
                          $(DOC_DIR)/framework.md \
                          $(DOC_DIR)/cmsis.md \
                          $(DOC_DIR)/glossary.md \
+                         $(DOC_DIR)/cmake_readme.md \
                          $(DOC_DIR)/deferred_response_architecture.md \
                          $(DOC_DIR)/architecture_support.md \
+                         $(DOC_DIR)/device_tree_support.md \
                          $(FWK_DIR)/include \
                          $(FWK_DIR)/test/fwk_test.h \
                          $(MODULE_INCLUDES) \
