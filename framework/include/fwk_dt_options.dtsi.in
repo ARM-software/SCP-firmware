@@ -1,0 +1,15 @@
+/*
+ * Arm SCP/MCP Software
+ * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+
+/*
+ *Generated options .dtsi include file to adjust the input device tree
+ * according to framework BUILD_... features
+ */
+
+@SCP_MODULE_DT_OPTIONS_DTSI@
+
