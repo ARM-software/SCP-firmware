@@ -1,0 +1,20 @@
+description: SCP System power state table
+
+compatible: "arm,scp-sys-power-table"
+
+include: base.yaml
+
+properties:
+  label: 
+    description: Name of table object in SCP firmware
+    required: true
+
+  power-states:
+    description: Array of power states associated with the state values.
+    type: array
+    required: true
+
+  power-values:
+    description: Values for system power states. 1 value per power-states entry
+    type: array
+    required: true

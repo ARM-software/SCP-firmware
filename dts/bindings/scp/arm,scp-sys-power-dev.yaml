@@ -1,0 +1,22 @@
+description: SCP System power device driver
+
+compatible: "arm,scp-sys-power-dev"
+
+include: base.yaml
+
+properties:
+  label: 
+    description: Name of device object in SCP firmware
+    required: true
+
+  scp-ids:
+    description: SCP frameworks IDs for ordered for system ppu driver and api
+    required: true
+    type: phandle-array
+
+  sys-state-table:
+    description: reference to a power state table used by the device
+    type: phandle
+    required: true
+
+  

@@ -1,0 +1,22 @@
+description: SCP System power initial configuration
+
+compatible: "arm,scp-system-power"
+
+include: base.yaml
+
+properties:
+  soc-wakeup-irq:
+    type: int
+    required: true
+
+  scp-ids:
+     description: Ordered SCP framework IDs,  module ID for driver, element ID for API
+     required: true
+     type: phandle-array
+
+  init-pwr-state:
+    description: Initial system power state.
+    type: int
+    required: true
+  
+  
