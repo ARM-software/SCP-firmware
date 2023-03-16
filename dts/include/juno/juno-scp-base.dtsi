@@ -1,0 +1,32 @@
+/*
+ * Arm SCP/MCP Software
+ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+/* base SCP .dtsi file for juno boards */
+
+#include "fwk_dt_bindings.h"
+
+/ {
+
+    scp-fwk {
+        scp-sds {
+            #address-cells = <1>;
+            #size-cells = <1>;
+
+            sds-region-secure {
+                compatible = "arm,scp-sds-region";
+                region-idx = <JUNO_SDS_REGION_SECURE>;
+                reg = <SCP_SDS_SECURE_BASE SCP_SDS_SECURE_SIZE>;
+            };
+        };
+
+        juno-ppu {
+            #address-cells = <1>;
+            #size-cells = <0>;
+        };
+    };
+
+};

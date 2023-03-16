@@ -1,0 +1,32 @@
+/*
+ * Arm SCP/MCP Software
+ * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+/* SCP scmi configuration - optional items when BUILD_HAS_SCMI_NOTIFICATIONS */
+
+/ {
+    scp-fwk {
+            scmi {
+                 scmi-service@3 {
+                     compatible = "arm,scp-scmi-service";
+                     label = "OSPM-P2A";
+                     service-idx = <JUNO_SCMI_SERVICE_IDX_OSPM_P2A>;
+                     scp-ids = <&elem_id FWK_MODULE_IDX_TRANSPORT JUNO_SCMI_SERVICE_IDX_OSPM_P2A>,
+                               <&elem_id FWK_MODULE_IDX_TRANSPORT MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT>,
+                               <&elem_id FWK_MODULE_IDX_TRANSPORT MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED>;
+                     scmi-agent-id = <JUNO_SCMI_AGENT_IDX_OSPM>;
+                 };
+            };
+    };
+};
+
+&scmi_service_ospm_a2p_0 {
+      scmi-p2a-id = <FWK_MODULE_IDX_SCMI  JUNO_SCMI_SERVICE_IDX_OSPM_P2A>;
+};
+
+&scmi_service_ospm_a2p_1 {
+      scmi-p2a-id = <FWK_MODULE_IDX_SCMI  JUNO_SCMI_SERVICE_IDX_OSPM_P2A>;
+};

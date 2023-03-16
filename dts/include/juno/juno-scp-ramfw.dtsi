@@ -1,0 +1,445 @@
+/*
+ * Arm SCP/MCP Software
+ * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+/* SCP firmware framework configuration for Juno scp_ramfw */
+
+#include "fwk_dt_bindings.h"
+
+#include "scp-fwk.dtsi"
+
+/ {
+
+    soc {
+	    #address-cells = <1>;
+	    #size-cells = <1>;
+
+        /* main console uart */
+       	uart1: uart@BC0A0000 {
+        	compatible = "arm,pl011";
+			reg = <FPGA_UART1_BASE 0x1000>;
+            current-speed = <115200>;
+            clock-frequency = <24000000>;
+            scp-ids = <&elem_id FWK_MODULE_IDX_POWER_DOMAIN POWER_DOMAIN_IDX_SYSTOP>;
+			label = "UART1";
+	    };
+    };
+
+    scp-fwk {
+        
+        scp-clk-dev@0 {
+            compatible = "arm,scp-clk-dev";
+            name = "I2SCLK";
+            scp-ids = <&elem_id FWK_MODULE_IDX_JUNO_CDCEL937 JUNO_CLOCK_CDCEL937_IDX_I2SCLK>,
+                      <&elem_id FWK_MODULE_IDX_JUNO_CDCEL937 MOD_JUNO_CDCEL937_API_IDX_CLOCK_DRIVER>;
+            
+        };
+
+        scp-clk-dev@1 {
+            compatible = "arm,scp-clk-dev";
+            name = "HDLCDREFCLK";
+            scp-ids = <&elem_id FWK_MODULE_IDX_JUNO_CDCEL937 JUNO_CLOCK_CDCEL937_IDX_HDLCDREFCLK>,
+                      <&elem_id FWK_MODULE_IDX_JUNO_CDCEL937 MOD_JUNO_CDCEL937_API_IDX_CLOCK_DRIVER>;
+        };
+
+        scp-clk-dev@2 {
+            compatible = "arm,scp-clk-dev";
+            name = "HDLCDPXL";
+            scp-ids = <&elem_id FWK_MODULE_IDX_JUNO_CDCEL937 JUNO_CLOCK_CDCEL937_IDX_HDLCDPXL>,
+                      <&elem_id FWK_MODULE_IDX_JUNO_CDCEL937 MOD_JUNO_CDCEL937_API_IDX_CLOCK_DRIVER>;
+        };
+
+        scp-clk-dev@3 {
+            compatible = "arm,scp-clk-dev";
+            name = "HDLCD_0";
+            scp-ids = <&elem_id FWK_MODULE_IDX_JUNO_HDLCD JUNO_CLOCK_HDLCD_IDX_HDLCD0>,
+                      <&elem_id FWK_MODULE_IDX_JUNO_HDLCD MOD_JUNO_HDLCD_API_IDX_CLOCK_DRIVER>;
+        };
+
+        scp-clk-dev@4 {
+            compatible = "arm,scp-clk-dev";
+            name = "HDLCD_1";
+            scp-ids = <&elem_id FWK_MODULE_IDX_JUNO_HDLCD JUNO_CLOCK_HDLCD_IDX_HDLCD1>,
+                      <&elem_id FWK_MODULE_IDX_JUNO_HDLCD MOD_JUNO_HDLCD_API_IDX_CLOCK_DRIVER>;
+        };
+
+        scp-clk-dev@5 {
+            compatible = "arm,scp-clk-dev";
+            name = "BIG_CLK";
+            scp-ids = <&elem_id FWK_MODULE_IDX_JUNO_SOC_CLOCK_RAM JUNO_CLOCK_SOC_RAM_IDX_BIGCLK>,
+                      <&elem_id FWK_MODULE_IDX_JUNO_SOC_CLOCK_RAM MOD_JUNO_SOC_CLOCK_RAM_API_IDX_DRIVER>,
+                      <&elem_id FWK_MODULE_IDX_POWER_DOMAIN POWER_DOMAIN_IDX_BIG_SSTOP>;
+        };
+
+        scp-clk-dev@6 {
+            compatible = "arm,scp-clk-dev";
+            name = "LITTLE_CLK";
+            scp-ids = <&elem_id FWK_MODULE_IDX_JUNO_SOC_CLOCK_RAM JUNO_CLOCK_SOC_RAM_IDX_LITTLECLK>,
+                      <&elem_id FWK_MODULE_IDX_JUNO_SOC_CLOCK_RAM MOD_JUNO_SOC_CLOCK_RAM_API_IDX_DRIVER>,
+                      <&elem_id FWK_MODULE_IDX_POWER_DOMAIN POWER_DOMAIN_IDX_LITTLE_SSTOP>;
+        };
+
+        scp-clk-dev@7 {
+            compatible = "arm,scp-clk-dev";
+            name = "GPU_CLK";
+            scp-ids = <&elem_id FWK_MODULE_IDX_JUNO_SOC_CLOCK_RAM JUNO_CLOCK_SOC_RAM_IDX_GPUCLK>,
+                      <&elem_id FWK_MODULE_IDX_JUNO_SOC_CLOCK_RAM MOD_JUNO_SOC_CLOCK_RAM_API_IDX_DRIVER>,
+                      <&elem_id FWK_MODULE_IDX_POWER_DOMAIN POWER_DOMAIN_IDX_GPUTOP>;
+        };
+
+        mock-clock {
+            compatible = "arm,scp-mock-clock";
+            label = "MOCK_I2SCLK";
+            rate-table = <1536000 2116800 2304000 4233600 4608000 8467200 9216000>;
+            default-rate = <1536000>;
+        };
+
+        pd_masks_systop: pd-mask-table@0 {
+            compatible = "arm,scp-pd-mask-table";
+            label = "pd_systop_masks";
+            pd-states = <0>;
+            mask-values = <(MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK | (1 << MOD_SYSTEM_POWER_POWER_STATE_SLEEP0))>;
+        };
+
+        pd_masks_toplevel: pd-mask-table@1 {
+            compatible = "arm,scp-pd-mask-table";
+            label = "pd_toplevel_masks";
+            pd-states = <MOD_PD_STATE_OFF MOD_PD_STATE_ON MOD_SYSTEM_POWER_POWER_STATE_SLEEP0>;
+            mask-values = <MOD_PD_STATE_OFF_MASK (MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK) MOD_PD_STATE_OFF_MASK>;            
+        };
+
+        pd_masks_cluster: pd-mask-table@2 {
+            compatible = "arm,scp-pd-mask-table";
+            label = "pd_cluster_masks";
+            pd-states = <MOD_PD_STATE_OFF MOD_PD_STATE_ON MOD_SYSTEM_POWER_POWER_STATE_SLEEP0>;
+            mask-values = <MOD_PD_STATE_OFF_MASK JUNO_CLUSTER_VALID_STATE_MASK MOD_PD_STATE_OFF_MASK>;            
+        };
+
+        pd_masks_core: pd-mask-table@3 {
+            compatible = "arm,scp-pd-mask-table";
+            label = "pd_core_masks";
+            pd-states = <MOD_PD_STATE_OFF MOD_PD_STATE_ON>;
+            mask-values = <(MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_SLEEP_MASK) JUNO_CORE_VALID_STATE_MASK>;
+        };
+
+        power-domain@0 {
+            compatible = "arm,scp-power-domain";
+            label = "BIG_CPU0";
+            pd-type = <MOD_PD_TYPE_CORE>;
+            pd-idx = <POWER_DOMAIN_IDX_BIG_CPU0>;
+            pd-parent = <&pd_big_sstop>;
+            scp-ids =  <&elem_id FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_BIG_CPU0>,
+                       <&elem_id FWK_MODULE_IDX_JUNO_PPU MOD_JUNO_PPU_API_IDX_PD>;
+            allowed-mask-table = <&pd_masks_core>;
+        };
+
+        power-domain@1 {
+            compatible = "arm,scp-power-domain";
+            label = "BIG_CPU1";
+            pd-type = <MOD_PD_TYPE_CORE>;
+            pd-idx = <POWER_DOMAIN_IDX_BIG_CPU1>;
+            pd-parent = <&pd_big_sstop>;
+            scp-ids =  <&elem_id FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_BIG_CPU1>,
+                       <&elem_id FWK_MODULE_IDX_JUNO_PPU MOD_JUNO_PPU_API_IDX_PD>;
+            allowed-mask-table = <&pd_masks_core>;
+            disable-state-trans-notifications;
+        };
+
+        power-domain@2 {
+            compatible = "arm,scp-power-domain";
+            label = "LITTLE_CPU0";
+            pd-type = <MOD_PD_TYPE_CORE>;
+            pd-idx = <POWER_DOMAIN_IDX_LITTLE_CPU0>;
+            pd-parent = <&pd_little_sstop>;
+            scp-ids =  <&elem_id FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_LITTLE_CPU0>,
+                       <&elem_id FWK_MODULE_IDX_JUNO_PPU MOD_JUNO_PPU_API_IDX_PD>;
+            allowed-mask-table = <&pd_masks_core>;
+            disable-state-trans-notifications;
+        };
+
+        power-domain@3 {
+            compatible = "arm,scp-power-domain";
+            label = "LITTLE_CPU1";
+            pd-type = <MOD_PD_TYPE_CORE>;
+            pd-idx = <POWER_DOMAIN_IDX_LITTLE_CPU1>;
+            pd-parent = <&pd_little_sstop>;
+            scp-ids = <&elem_id FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_LITTLE_CPU1>,
+                      <&elem_id FWK_MODULE_IDX_JUNO_PPU MOD_JUNO_PPU_API_IDX_PD>;
+            allowed-mask-table = <&pd_masks_core>;
+            disable-state-trans-notifications;
+        };
+        
+        power-domain@4 {
+            compatible = "arm,scp-power-domain";
+            label = "LITTLE_CPU2";
+            pd-type = <MOD_PD_TYPE_CORE>;
+            pd-idx = <POWER_DOMAIN_IDX_LITTLE_CPU2>;
+            pd-parent = <&pd_little_sstop>;
+            scp-ids = <&elem_id FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_LITTLE_CPU2>,
+                      <&elem_id FWK_MODULE_IDX_JUNO_PPU MOD_JUNO_PPU_API_IDX_PD>;
+            allowed-mask-table = <&pd_masks_core>;
+            disable-state-trans-notifications;
+        };
+        
+        power-domain@5 {
+            compatible = "arm,scp-power-domain";
+            label = "LITTLE_CPU3";
+            pd-type = <MOD_PD_TYPE_CORE>;
+            pd-idx = <POWER_DOMAIN_IDX_LITTLE_CPU3>;
+            pd-parent = <&pd_little_sstop>;
+            scp-ids = <&elem_id FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_LITTLE_CPU3>,
+                      <&elem_id FWK_MODULE_IDX_JUNO_PPU MOD_JUNO_PPU_API_IDX_PD>;
+            allowed-mask-table = <&pd_masks_core>;
+            disable-state-trans-notifications;
+        };
+
+        pd_big_sstop: power-domain@6 {
+            compatible = "arm,scp-power-domain";
+            label = "BIG_SSTOP";
+            pd-type = <MOD_PD_TYPE_CLUSTER>;
+            pd-idx = <POWER_DOMAIN_IDX_BIG_SSTOP>;
+            pd-parent = <&pd_systop>;
+            scp-ids = <&elem_id FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_BIG_SSTOP>,
+                      <&elem_id FWK_MODULE_IDX_SYSTEM_POWER MOD_JUNO_PPU_API_IDX_PD>;
+            allowed-mask-table = <&pd_masks_cluster>;
+        };
+
+        pd_little_sstop: power-domain@7 {
+            compatible = "arm,scp-power-domain";
+            label = "LITTLE_SSTOP";
+            pd-type = <MOD_PD_TYPE_CLUSTER>;
+            pd-idx = <POWER_DOMAIN_IDX_LITTLE_SSTOP>;
+            pd-parent = <&pd_systop>;
+            scp-ids = <&elem_id FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_LITTLE_SSTOP>,
+                      <&elem_id FWK_MODULE_IDX_SYSTEM_POWER MOD_JUNO_PPU_API_IDX_PD>;
+            allowed-mask-table = <&pd_masks_cluster>;
+        };
+
+        power-domain@8 {
+            compatible = "arm,scp-power-domain";
+            label = "GPUTOP";
+            pd-type = <MOD_PD_TYPE_DEVICE>;
+            pd-idx = <POWER_DOMAIN_IDX_GPUTOP>;
+            pd-parent = <&pd_systop>;
+            scp-ids = <&elem_id FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_DBGSYS>,
+                      <&elem_id FWK_MODULE_IDX_SYSTEM_POWER MOD_JUNO_PPU_API_IDX_PD>;
+            allowed-mask-table = <&pd_masks_toplevel>;
+        };
+
+        power-domain@9 {
+            compatible = "arm,scp-power-domain";
+            label = "DBGSYS";
+            pd-type = <MOD_PD_TYPE_DEVICE_DEBUG>;
+            pd-idx = <POWER_DOMAIN_IDX_DBGSYS>;
+            pd-parent = <&pd_systop>;
+            scp-ids = <&elem_id FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_DBGSYS>,
+                      <&elem_id FWK_MODULE_IDX_SYSTEM_POWER MOD_JUNO_PPU_API_IDX_PD>;
+            allowed-mask-table = <&pd_masks_toplevel>;
+        };
+
+        pd_systop: power-domain@10 {
+            compatible = "arm,scp-power-domain";
+            label = "SYSTOP";
+            pd-type = <MOD_PD_TYPE_SYSTEM>;
+            pd-idx = <POWER_DOMAIN_IDX_SYSTOP>;
+            scp-ids = <&module_id FWK_MODULE_IDX_SYSTEM_POWER>,
+                      <&elem_id FWK_MODULE_IDX_SYSTEM_POWER MOD_SYSTEM_POWER_API_IDX_PD_DRIVER>;
+            allowed-mask-table = <&pd_masks_systop>;
+        };
+
+        scp-gtimer@0 {
+            compatible = "arm,scp-gtimer";
+            label = "generic timer";
+            timer-addr = <REFCLK_CNTBASE0_BASE>;
+            counter-addr = <REFCLK_CNTCTL_BASE>;
+            control-addr = <REFCLK_CNTCONTROL_BASE>;
+            frequency = <CLOCK_RATE_REFCLK>;            
+        };
+
+        scp-timer@0 {
+            compatible = "arm,scp-timer";
+            label = "REFCLK";
+            sub-elem-count = <JUNO_ALARM_IDX_COUNT>;
+            scp-ids = <&module_id FWK_MODULE_IDX_GTIMER>;
+            timer-irq = <TIMREFCLK_IRQ>;
+        };
+
+        sys_pwr_state_table: sys-pwr-table@0 {
+            compatible = "arm,scp-sys-power-table";
+            label = "sys_power_to_ppu_state";
+            power-states = <MOD_PD_STATE_ON MOD_SYSTEM_POWER_POWER_STATE_SLEEP0 MOD_PD_STATE_OFF>;
+            power-values = <MOD_PD_STATE_ON MOD_SYSTEM_POWER_POWER_STATE_SLEEP0 MOD_PD_STATE_OFF>;
+        };
+
+        sys-pwr-device@0 {
+            compatible = "arm,scp-sys-power-dev";
+            label = "system_power";
+            scp-ids = <&elem_id FWK_MODULE_IDX_JUNO_PPU JUNO_PPU_DEV_IDX_SYSTOP>,
+                      <&elem_id FWK_MODULE_IDX_JUNO_PPU MOD_JUNO_PPU_API_IDX_PD>;
+            sys-state-table = <&sys_pwr_state_table>;
+        };
+
+        system-power-config@0 {
+            compatible = "arm,scp-system-power";
+            soc-wakeup-irq = <EXT_WAKEUP_IRQ>;
+            scp-ids = <&module_id FWK_MODULE_IDX_JUNO_SYSTEM>, 
+                      <&elem_id FWK_MODULE_IDX_JUNO_SYSTEM 0>;
+            init-pwr-state = <MOD_PD_STATE_ON>;
+
+        };
+
+        mock-psu@0 {
+            compatible = "arm,scp-mock-psu";
+            label = "VSYS";
+            default-voltage = <900>;
+            default-enabled;
+            elem-idx = <MOD_MOCK_PSU_ELEMENT_IDX_VSYS>;            
+        };
+
+       mock-psu@1 {
+            compatible = "arm,scp-mock-psu";
+            label = "VBIG";
+            default-voltage = <900>;
+            default-enabled;
+            elem-idx = <MOD_MOCK_PSU_ELEMENT_IDX_VBIG>;            
+        };
+
+        mock-psu@2 {
+            compatible = "arm,scp-mock-psu";
+            label = "VLITTLE";
+            default-voltage = <900>;
+            default-enabled;
+            elem-idx = <MOD_MOCK_PSU_ELEMENT_IDX_VLITTLE>;            
+        };
+
+        mock-psu@3 {
+            compatible = "arm,scp-mock-psu";
+            label = "VGPU";
+            default-voltage = <850>;
+            default-enabled;
+            elem-idx = <MOD_MOCK_PSU_ELEMENT_IDX_VGPU>;            
+        };
+
+
+        juno-ppu {
+
+            big-systop-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_BIG_SSTOP>;
+                reg = <PPU_BIG_SSTOP_BASE>;
+                scp-ids = <&elem_id FWK_MODULE_IDX_TIMER 0>;
+                pd-type = <MOD_PD_TYPE_CLUSTER>;
+            };
+
+            big-cpu0-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_BIG_CPU0>;
+                reg = <PPU_BIG_CPU0_BASE>;
+                scp-ids = <&elem_id FWK_MODULE_IDX_TIMER 0>;
+                pd-type = <MOD_PD_TYPE_CORE>;
+                irq-nums = <BIG_0_IRQ_WAKEUP_IRQ BIG_0_FIQ_WAKEUP_IRQ BIG_0_WARM_RST_REQ_IRQ>;            
+            };
+
+            big-cpu1-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_BIG_CPU1>;
+                reg = <PPU_BIG_CPU1_BASE>; 
+                scp-ids = <&elem_id FWK_MODULE_IDX_TIMER 0>;
+                pd-type = <MOD_PD_TYPE_CORE>;
+                irq-nums = <BIG_1_IRQ_WAKEUP_IRQ BIG_1_FIQ_WAKEUP_IRQ BIG_1_WARM_RST_REQ_IRQ>;            
+            };
+
+            little-systop-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_LITTLE_SSTOP>;
+                reg = <PPU_LITTLE_SSTOP_BASE>;
+                scp-ids = <&elem_id FWK_MODULE_IDX_TIMER 0>;
+                pd-type = <MOD_PD_TYPE_CLUSTER>;
+            };
+
+            little-cpu0-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_LITTLE_CPU0>;
+                reg = <PPU_LITTLE_CPU0_BASE>;
+                scp-ids = <&elem_id FWK_MODULE_IDX_TIMER 0>;
+                pd-type = <MOD_PD_TYPE_CORE>;
+                irq-nums = <LITTLE_0_IRQ_WAKEUP_IRQ LITTLE_0_FIQ_WAKEUP_IRQ LITTLE_0_WARM_RST_REQ_IRQ>;            
+            };
+
+            little-cpu1-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_LITTLE_CPU1>;
+                reg = <PPU_LITTLE_CPU1_BASE>;
+                scp-ids = <&elem_id FWK_MODULE_IDX_TIMER 0>;
+                pd-type = <MOD_PD_TYPE_CORE>;
+                irq-nums = <LITTLE_1_IRQ_WAKEUP_IRQ LITTLE_1_FIQ_WAKEUP_IRQ LITTLE_1_WARM_RST_REQ_IRQ>;            
+            };
+
+            little-cpu2-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_LITTLE_CPU2>;
+                reg = <PPU_LITTLE_CPU2_BASE>;
+                scp-ids = <&elem_id FWK_MODULE_IDX_TIMER 0>;
+                pd-type = <MOD_PD_TYPE_CORE>;
+                irq-nums = <LITTLE_2_IRQ_WAKEUP_IRQ LITTLE_2_FIQ_WAKEUP_IRQ LITTLE_2_WARM_RST_REQ_IRQ>;            
+            };
+
+            little-cpu3-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_LITTLE_CPU3>;
+                reg = <PPU_LITTLE_CPU3_BASE>;
+                scp-ids = <&elem_id FWK_MODULE_IDX_TIMER 0>;
+                pd-type = <MOD_PD_TYPE_CORE>;
+                irq-nums = <LITTLE_3_IRQ_WAKEUP_IRQ LITTLE_3_FIQ_WAKEUP_IRQ LITTLE_3_WARM_RST_REQ_IRQ>;            
+            };
+
+            gpu-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_GPUTOP>;
+                reg = <PPU_GPUTOP_BASE>;
+                scp-ids = <&elem_id FWK_MODULE_IDX_TIMER 0>;
+                pd-type = <MOD_PD_TYPE_DEVICE>;
+            };
+
+            systop-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_SYSTOP>;
+                reg = <PPU_SYSTOP_BASE>;
+                scp-ids = <&elem_id FWK_MODULE_IDX_TIMER 0>;
+                pd-type = <MOD_PD_TYPE_SYSTEM>;
+            };
+
+            dbgsys-ppu {
+                compatible = "arm,juno-ppu";
+                elem-idx = <JUNO_PPU_DEV_IDX_DBGSYS>;
+                reg = <PPU_DBGSYS_BASE>;
+                scp-ids = <&elem_id FWK_MODULE_IDX_TIMER 0>;
+                pd-type = <MOD_PD_TYPE_DEVICE_DEBUG>;
+            };
+        };
+
+        scp-sds {
+        
+            sds-defn@0 {
+                compatible = "arm,scp-sds";
+                label = "version";
+                table-idx = <JUNO_SDS_RAM_VERSION_IDX>;
+                data-id-size = <JUNO_SDS_RAM_VERSION JUNO_SDS_RAM_VERSION_SIZE>;
+                region-id = <JUNO_SDS_REGION_SECURE>;
+                finalize;
+            };
+
+            sds-defn@1 {
+                compatible = "arm,scp-sds";
+                label = "features";
+                table-idx = <JUNO_SDS_RAM_FEATURES_IDX>;
+                data-id-size = <JUNO_SDS_FEATURE_AVAILABILITY 0>;
+                region-id = <JUNO_SDS_REGION_SECURE>;
+                finalize;
+            };
+        };
+    };
+};

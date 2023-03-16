@@ -1,0 +1,66 @@
+/*
+ * Arm SCP/MCP Software
+ * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+/* SCP scmi configuration */
+
+/ {
+    scp-fwk {
+            scmi {
+                 scmi-service@0 {
+                     compatible = "arm,scp-scmi-service";
+                     label = "PSCI";
+                     service-idx = <JUNO_SCMI_SERVICE_IDX_PSCI_A2P>;
+                     scp-ids = <&elem_id FWK_MODULE_IDX_TRANSPORT JUNO_SCMI_SERVICE_IDX_PSCI_A2P>,
+                               <&elem_id FWK_MODULE_IDX_TRANSPORT MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT>,
+                               <&elem_id FWK_MODULE_IDX_TRANSPORT  MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED>;
+                     scmi-agent-id = <JUNO_SCMI_AGENT_IDX_PSCI>;
+                 };
+
+                 scmi_service_ospm_a2p_0: scmi-service@1 {
+                     compatible = "arm,scp-scmi-service";
+                     label = "OSPM-A2P-0";
+                     service-idx = <JUNO_SCMI_SERVICE_IDX_OSPM_A2P_0>;
+                     scp-ids = <&elem_id FWK_MODULE_IDX_TRANSPORT JUNO_SCMI_SERVICE_IDX_OSPM_A2P_0>,
+                               <&elem_id FWK_MODULE_IDX_TRANSPORT MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT>,
+                               <&elem_id FWK_MODULE_IDX_TRANSPORT MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED>;
+                     scmi-agent-id = <JUNO_SCMI_AGENT_IDX_OSPM>;
+                 };                     
+
+                 scmi_service_ospm_a2p_1: scmi-service@2 {
+                     compatible = "arm,scp-scmi-service";
+                     label = "OSPM-A2P-1";
+                     service-idx = <JUNO_SCMI_SERVICE_IDX_OSPM_A2P_1>;
+                     scp-ids = <&elem_id FWK_MODULE_IDX_TRANSPORT JUNO_SCMI_SERVICE_IDX_OSPM_A2P_1>,
+                               <&elem_id FWK_MODULE_IDX_TRANSPORT MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT>,
+                               <&elem_id FWK_MODULE_IDX_TRANSPORT MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED>;
+                     scmi-agent-id = <JUNO_SCMI_AGENT_IDX_OSPM>;
+                 };
+
+                 scmi-agent-pcsi {
+                     compatible = "arm,scp-scmi-agent";
+                     label = "PCSI";
+                     agent-type = <SCMI_AGENT_TYPE_PSCI>;
+                     agent-idx = <JUNO_SCMI_AGENT_IDX_PSCI>;
+                 };
+
+                 scmi-agent-ospm {
+                     compatible = "arm,scp-scmi-agent";
+                     label = "OSPM";
+                     agent-type = <SCMI_AGENT_TYPE_OSPM>;
+                     agent-idx = <JUNO_SCMI_AGENT_IDX_OSPM>;
+                 };
+
+                 scmi-base {
+                     compatible = "arm,scp-scmi";
+                     protocol-count-max = <6>;
+                     vendor-identifier = "arm";
+                     sub-vendor-identifier = "arm";
+                     psci-dis-protocols = <MOD_SCMI_PROTOCOL_ID_SENSOR MOD_SCMI_PROTOCOL_ID_CLOCK MOD_SCMI_PROTOCOL_ID_PERF>;
+                 };
+            };            
+    };
+};
