@@ -13,4 +13,13 @@ target_include_directories(${SCP_MODULE_TARGET}
 target_sources(${SCP_MODULE_TARGET}
                PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_mock_psu.c")
 
+if(SCP_MODULE IN_LIST SCP_DT_CONFIG_MODULES_ALL)
+    target_sources(${SCP_MODULE_TARGET}
+                   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/config_dt_mock_psu.c")
+
+    # add header file to list used to generate defines for dt include 
+    list(APPEND SCP_DT_BIND_H_GEN_FROM_INCL "${CMAKE_CURRENT_SOURCE_DIR}/include/mod_mock_psu.h")
+    set(SCP_DT_BIND_H_GEN_FROM_INCL "${SCP_DT_BIND_H_GEN_FROM_INCL}" PARENT_SCOPE)
+endif()
+
 target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-psu module-timer)
