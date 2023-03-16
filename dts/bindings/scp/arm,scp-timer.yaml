@@ -1,0 +1,24 @@
+description: SCP timer configuration
+
+compatible: "arm,scp-timer"
+
+include: base.yaml
+
+properties:
+    label: 
+      required: true
+
+    scp-ids:
+      description: SCP Framework module or element ID for the driver
+      required: true
+      type: phandle-array
+
+    timer-irq:
+      description: Timer IRQ for the device
+      required: true
+      type: int
+
+    sub-elem-count:
+      description: Number of sub elements associated with the timer.
+      required: false
+      type: int
