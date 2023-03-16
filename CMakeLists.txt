@@ -24,6 +24,16 @@ if(SCP_FIRMWARE_SOURCE_DIR)
 
     include("${SCP_FIRMWARE_SOURCE_DIR}/Firmware.cmake")
 
+    # create a combined DT_MODULE list.
+    list(APPEND SCP_DT_CONFIG_MODULES_ALL ${SCP_DT_CONFIG_MODULES_STD})
+    list(APPEND SCP_DT_CONFIG_MODULES_ALL ${SCP_DT_CONFIG_MODULES_DYN})
+
+    # DTS logging to see which modules are currently using dts config
+    message(VERBOSE "DTS usage: all modules in system = ${SCP_MODULES}")
+    message(VERBOSE "dt_std_modules = ${SCP_DT_CONFIG_MODULES_STD}")
+    message(VERBOSE "dt_dyn_modules = ${SCP_DT_CONFIG_MODULES_DYN}")
+    message(VERBOSE "dt_all_modules = ${SCP_DT_CONFIG_MODULES_ALL}")
+
     if((NOT SCP_FIRMWARE) OR (NOT SCP_FIRMWARE_TARGET))
         # cmake-format: off
         message(FATAL_ERROR
@@ -158,6 +168,14 @@ cmake_dependent_option(
 #
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+
+#
+# Stop after C Pre-Processor - allow debug of macros.
+#
+if (SCP_BUILD_CPP_ONLY)
+   string(APPEND CMAKE_C_FLAGS " -E")
+endif()
+
 
 #
 # Set up Cppcheck if it's available and enabled.
@@ -514,6 +532,14 @@ if(SCP_FIRMWARE)
 
     add_subdirectory("framework" EXCLUDE_FROM_ALL)
 
+    #
+    # generate any code needed from .dts files
+    #
+    if(SCP_FIRMWARE_DTS_SOURCE)
+      message(VERBOSE "Using .dts ${SCP_FIRMWARE_DTS_SOURCE}")
+      include(dts)
+    endif()
+    
     #
     # Collect up all the source files used to build the various targets created
     # above.

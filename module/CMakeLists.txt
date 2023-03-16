@@ -325,3 +325,13 @@ set(SCP_MODULES
 set(SCP_MODULE_TARGETS
     "${SCP_MODULE_TARGETS}"
     PARENT_SCOPE)
+
+#
+# export the DT include variables set by the modules to the parent scope
+#
+set(SCP_DT_BIND_H_GEN_FROM_INCL
+    "${SCP_DT_BIND_H_GEN_FROM_INCL}"
+    PARENT_SCOPE)  
+set(SCP_DT_BIND_H_GEN_DEFS
+    "${SCP_DT_BIND_H_GEN_DEFS}"
+    PARENT_SCOPE)

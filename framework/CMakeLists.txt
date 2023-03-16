@@ -54,6 +54,7 @@ endif()
 
 if(SCP_ENABLE_SCMI_NOTIFICATIONS)
     target_compile_definitions(framework PUBLIC "BUILD_HAS_SCMI_NOTIFICATIONS")
+    list(APPEND SCP_DT_BIND_H_GEN_DEFS "BUILD_HAS_SCMI_NOTIFICATIONS")
     if(SCP_ENABLE_SCMI_SENSOR_EVENTS)
         target_compile_definitions(framework PUBLIC "BUILD_HAS_SCMI_SENSOR_EVENTS")
     endif()
@@ -70,6 +71,7 @@ endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(framework PUBLIC BUILD_MODE_DEBUG)
+    list(APPEND SCP_DT_BIND_H_GEN_DEFS "BUILD_MODE_DEBUG")
 endif()
 
 if(SCP_ENABLE_CLOCK_TREE_MGMT)
@@ -145,6 +147,10 @@ foreach(idx RANGE ${SCP_MODULE_IDX_MAX})
 
     list(GET SCP_MODULES ${idx} SCP_MODULE)
 
+    # keep the module name to compare to list later
+    set(SCP_MODULE_NAME ${SCP_MODULE})
+
+    # convert module-name to C compatible module_name
     string(MAKE_C_IDENTIFIER ${SCP_MODULE} SCP_MODULE)
     string(TOUPPER ${SCP_MODULE} SCP_MODULE_UPPER)
 
@@ -156,9 +162,40 @@ foreach(idx RANGE ${SCP_MODULE_IDX_MAX})
     string(APPEND SCP_MODULE_ID_CONST_GEN "static const fwk_id_t fwk_module_id_${SCP_MODULE} = FWK_MODULE_ID_${SCP_MODULE_UPPER}_INIT;\n")
 
     string(APPEND SCP_MODULE_EXTERN_GEN "extern const struct fwk_module module_${SCP_MODULE};\n")
-    string(APPEND SCP_MODULE_EXTERN_CONFIG_GEN "extern const struct fwk_module_config config_${SCP_MODULE};\n")
+
+    # generate dt binding indexes for all modules - allow for x/ref between dt and none dt configured
+    string(APPEND SCP_MODULE_DT_BINDING_IDX "#define  FWK_MODULE_IDX_${SCP_MODULE_UPPER} ${idx}\n")
+
+
+    # configuration depends if a module is in one of the DT configured lists 
+    if(SCP_MODULE_NAME IN_LIST SCP_DT_CONFIG_MODULES_ALL)
+
+        # common dt module - or platform specific with no dynamic updates
+        string(APPEND SCP_MODULE_EXTERN_CONFIG_GEN "extern const struct fwk_module_config config_dt_${SCP_MODULE};\n")
+        string(APPEND SCP_MODULE_CONFIG_GEN "    &config_dt_${SCP_MODULE},\n")
+
+        if(SCP_MODULE IN_LIST SCP_DT_CONFIG_MODULES_DYN)
+   
+           # dynamic dt config needs additional stuff
+           string(APPEND SCP_MODULE_DT_DYN_CONFIG "#define FWK_MODULE_GEN_DYNAMIC_${SCP_MODULE_UPPER}\n")
+           string(APPEND SCP_MODULE_DT_DYN_CONFIG "extern const struct fwk_element *dyn_get_element_table_${SCP_MODULE}(fwk_id_t module_id);\n")
+           string(APPEND SCP_MODULE_DT_DYN_CONFIG "extern const struct fwk_element *_static_get_element_table_${SCP_MODULE}();\n\n")
+           
+       endif()
+
+       # we generate the bindings headers before the compile stage so need the defines for this as we process .h files
+       list(APPEND SCP_DT_BIND_H_GEN_DEFS "BUILD_HAS_MOD_${SCP_MODULE_UPPER}")
+       
+    else()
+
+        # standard module configuration
+        string(APPEND SCP_MODULE_EXTERN_CONFIG_GEN "extern const struct fwk_module_config config_${SCP_MODULE};\n")
+        string(APPEND SCP_MODULE_CONFIG_GEN "    &config_${SCP_MODULE},\n")
+        
+    endif()
+        
     string(APPEND SCP_MODULE_GEN "    &module_${SCP_MODULE},\n")
-    string(APPEND SCP_MODULE_CONFIG_GEN "    &config_${SCP_MODULE},\n")
+    
 
     # cmake-format: on
 
@@ -170,12 +207,48 @@ foreach(idx RANGE ${SCP_MODULE_IDX_MAX})
                                PUBLIC "BUILD_HAS_MOD_${SCP_MODULE_UPPER}=1")
 endforeach()
 
+# look for .dtsi include  options
+# the product target CMakeLists file may have created a pair of lists
+# one SCP_MODULE_DT_OPTIONS_DEFINE_REQ containing BUILD_... defines that have been created above,
+# the second SCP_MODULE_DT_OPTIONS_FILE_REQ a list of .dtsi files that should be included if the define is set
+# We scan the defines list for matches, and write the include to the global fwk-dt-options.dtsi if found
+
+list(LENGTH SCP_MODULE_DT_OPTIONS_FILE_REQ DTSI_IDX_MAX)
+
+foreach(dtsi_idx RANGE ${DTSI_IDX_MAX})
+    if(dtsi_idx EQUAL DTSI_IDX_MAX)
+        break()
+    endif()
+
+    # get a define from the list   
+    list(GET SCP_MODULE_DT_OPTIONS_DEFINE_REQ ${dtsi_idx} DTSI_DEFINE)
+
+    # see if it has been defined
+    if (DTSI_DEFINE IN_LIST SCP_DT_BIND_H_GEN_DEFS)
+
+         # if so write the corresponding include line to the string that will configure fwk-dt-options.dtsi
+        list(GET SCP_MODULE_DT_OPTIONS_FILE_REQ ${dtsi_idx} DTSI_FILENAME)
+        string(APPEND SCP_MODULE_DT_OPTIONS_DTSI "#include \"${DTSI_FILENAME}\"\n")
+    endif()
+     
+endforeach()
+
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/fwk_module_idx.h.in"
                "${CMAKE_CURRENT_BINARY_DIR}/include/fwk_module_idx.h")
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_module_list.c.in"
                "${CMAKE_CURRENT_BINARY_DIR}/src/fwk_module_list.c")
 
+# configure device tree related includes
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/fwk_dt_config_dyn.h.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/include/fwk_dt_config_dyn.h")
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/fwk_dt_mod_idx_gen.h.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/include/fwk_dt_mod_idx_gen.h")
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/fwk_dt_options.dtsi.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/include/fwk-dt-options.dtsi")
+             
 target_include_directories(framework
                            PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/include")
 
@@ -240,3 +313,9 @@ if(SCP_ENABLE_DEBUGGER)
 endif()
 
 target_link_libraries(framework INTERFACE ${SCP_ARCHITECTURE_TARGET})
+
+
+# put the list of defines to global scopt
+set(SCP_DT_BIND_H_GEN_DEFS
+    "${SCP_DT_BIND_H_GEN_DEFS}"
+    PARENT_SCOPE)
