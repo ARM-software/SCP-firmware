@@ -16,3 +16,10 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_bootloader_boot.S")
 
 target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-sds)
+
+if(SCP_MODULE IN_LIST SCP_DT_CONFIG_MODULES_ALL)
+    target_sources(${SCP_MODULE_TARGET}
+                   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/config_dt_bootloader.c")
+
+    # do not set SCP_DT_BIND_H_GEN_FROM_INCL - no req enums or defines in header
+endif()

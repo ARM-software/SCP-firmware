@@ -1,0 +1,22 @@
+description: SCP Bootloader module configuration.
+
+compatible: "arm,scp-bootloader"
+
+include: base.yaml
+
+properties:
+  source:
+    description: Memory address and size of the image to load at boot.
+    required: true
+    type: array
+
+  destination:
+    description: Memory address and size of the image destination area.
+    required: true
+    type: array
+
+  sds_id:
+    description: SDS region ID in the SDS area if present.
+    required: false
+    type: int
+
