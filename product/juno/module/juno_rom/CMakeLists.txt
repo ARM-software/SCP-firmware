@@ -15,6 +15,14 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/src/juno_debug_rom.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_juno_rom.c")
 
+if(SCP_MODULE IN_LIST SCP_DT_CONFIG_MODULES_ALL)
+    target_sources(${SCP_MODULE_TARGET}
+                   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/config_dt_juno_rom.c")
+
+    # no need to add header files to DT defines for this module
+    
+endif()
+  
 target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-juno-ppu)
 target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-power-domain)
 target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-bootloader)

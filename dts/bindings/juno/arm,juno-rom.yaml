@@ -1,0 +1,18 @@
+# SCP firmware, juno ROM module
+
+description: Configuration information for Juno ROM
+
+compatible: "arm,juno-rom"
+
+include: base.yaml
+
+properties:
+  ap-context:
+     description: Application Processor memory context area, address and size
+     required: true
+     type: array
+
+  ram-fw-base:
+     description: Firmware RAM base address
+     required: true
+     type: int
