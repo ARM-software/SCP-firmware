@@ -1,0 +1,35 @@
+description: SCP Generic Timer configuration
+
+compatible: "arm,scp-gtimer"
+
+include: base.yaml
+
+properties:
+  label: 
+    required: true
+
+  timer-addr:
+    description: Address of the devices timer register
+    type: array
+    required: true
+
+  counter-addr:
+    description: Address of the devices counter register
+    type: array
+    required: true
+
+  control-addr:
+    description: Address of the devices control register
+    type: array
+    required: true
+
+  frequency: 
+    description: Frequency in Hz that the timer ticks at
+    required: true
+    type: int
+
+  scp-ids: 
+    description: SCP framework Element ID for clock that this device depends on
+    required: false
+    type: phandle-array
+
