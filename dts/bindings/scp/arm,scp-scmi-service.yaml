@@ -1,0 +1,32 @@
+description: SCP SCMI agent service table
+
+compatible: "arm,scp-scmi-service"
+
+include: base.yaml
+
+properties:
+    label:
+        description: service name
+        required: true
+
+    service-idx:
+        description: index into service table of this scmi service
+        required: true
+        type: int
+
+    scp-ids:
+        description: Ordered array of scp-ids; transport ID, transport API ID, notification ID
+        required: true
+        type: phandle-array
+
+    scmi-agent-id:
+        description: Index for agent using channel
+        required: true
+        type: int
+
+    scmi-p2a-id:
+        description: SCP element ID for P2A if used, as array of module idx, service index
+        required: false
+        type: array
+
+

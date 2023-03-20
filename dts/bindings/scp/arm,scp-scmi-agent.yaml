@@ -1,0 +1,20 @@
+description: SCP SCMI agent table configuration
+
+compatible: "arm,scp-scmi-agent"
+
+include: base.yaml
+
+properties:
+    label:
+        description: Agent Name
+        required: true
+
+    agent-type:
+        description: SCMI Agent Type
+        required: true
+        type: int
+
+    agent-idx:
+        description: Agent index reference
+        required: true
+        type: int

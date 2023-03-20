@@ -1,0 +1,25 @@
+description: SCP SCMI base configuration
+
+compatible: "arm,scp-scmi"
+
+include: base.yaml
+
+properties:
+    protocol-count-max:
+        description: Maximum protocols for this SCMI server
+        required: true
+        type: int
+
+    vendor-identifier:
+        required: true
+        type: string
+
+    sub-vendor-identifier:
+        required: true
+        type: string
+
+    psci-dis-protocols:
+        description: PCSI disallowed protocols
+        required: false
+        type: array
+        
