@@ -17,7 +17,11 @@ contributions.
 - [Leandro Belli](https://github.com/leandro-arm) (leandro.belli@arm.com)
 - [Ahmed Gadallah](https://github.com/AhmedImbabyGadallah) (ahmed.gadallah@arm.com)
 - [Katherine Vincent](https://github.com/katvin01) (katherine.vincent@arm.com)
-- [Brett Warren](https://github.com/brett-warren-arm) (brett.warren@arm.com)
+- [Khaled Ali Ahmed](https://github.com/khaali01) (khaled.aliahmed@arm.com)
+- [Md Golam Tanvir Zim](https://github.com/mdgzim01) (mdgolamtanvir.zim@arm.com)
+- [Mohamed Omar Asaker](https://github.com/mohamedasaker-arm) (Mohamed.OmarAsaker@arm.com)
+- [Miklos Balint](https://github.com/wmnt) (Miklos.Balint@arm.com)
+- [Andrew Graham](https://github.com/AndyJGraham) (Andrew.Graham@arm.com)
 
 ## Secondary Maintainers
 
@@ -53,7 +57,7 @@ maintainers. The platforms listed here represent the exceptions to this rule.
 
 #### Total Compute (tc0, tc1)
 
-- [Lakshmi Kailasanathan](https://github.com/lakkai) (lakshmi.kailasanathan@arm.com)
+- [Vishnu Banavath](https://github.com/visban01) (vishnu.banavath@arm.com)
 
 ### Socionext
 
