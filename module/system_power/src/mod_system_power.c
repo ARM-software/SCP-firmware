@@ -408,14 +408,15 @@ static int system_power_mod_init(fwk_id_t module_id,
     const struct mod_system_power_config *config;
 
     fwk_assert(data != NULL);
-    fwk_check(element_count > 0);
 
     system_power_ctx.config = config = data;
     system_power_ctx.mod_pd_system_id = FWK_ID_NONE;
     system_power_ctx.dev_count = element_count;
 
-    system_power_ctx.dev_ctx_table =
-        fwk_mm_calloc(element_count, sizeof(struct system_power_dev_ctx));
+    if (element_count > 0) {
+        system_power_ctx.dev_ctx_table =
+            fwk_mm_calloc(element_count, sizeof(struct system_power_dev_ctx));
+    }
 
     if (system_power_ctx.config->ext_ppus_count > 0) {
         system_power_ctx.ext_ppu_apis = fwk_mm_calloc(
