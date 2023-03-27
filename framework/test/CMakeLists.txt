@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -9,7 +9,7 @@ cmake_minimum_required(VERSION 3.18.3)
 
 project(
     SCP_FWK_TEST
-    VERSION 2.11.0
+    VERSION 2.12.0
     DESCRIPTION "Arm SCP/MCP Software Framework tests"
     HOMEPAGE_URL
         "https://developer.arm.com/tools-and-software/open-source-software/firmware/scp-firmware"
