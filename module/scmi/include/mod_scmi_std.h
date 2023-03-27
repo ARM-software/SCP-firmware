@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -222,6 +222,28 @@ enum scmi_voltd_command_id {
     MOD_SCMI_VOLTD_LEVEL_SET = 0x007,
     MOD_SCMI_VOLTD_LEVEL_GET = 0x008,
     MOD_SCMI_VOLTD_COMMAND_COUNT,
+};
+
+/*!
+ * \brief SCMI power capping and monitoring protocol
+ */
+#define MOD_SCMI_PROTOCOL_ID_POWER_CAPPING UINT32_C(0x18)
+
+/*!
+ * \brief SCMI power capping and monitoring protocol message IDs
+ */
+enum scmi_power_capping_command_id {
+    MOD_SCMI_POWER_CAPPING_DOMAIN_ATTRIBUTES = 0x003,
+    MOD_SCMI_POWER_CAPPING_CAP_GET = 0x004,
+    MOD_SCMI_POWER_CAPPING_CAP_SET = 0x005,
+    MOD_SCMI_POWER_CAPPING_PAI_GET = 0x006,
+    MOD_SCMI_POWER_CAPPING_PAI_SET = 0x007,
+    MOD_SCMI_POWER_CAPPING_DOMAIN_NAME_GET = 0x008,
+    MOD_SCMI_POWER_CAPPING_MEASUREMENTS_GET = 0x009,
+    MOD_SCMI_POWER_CAPPING_CAP_NOTIFY = 0x00A,
+    MOD_SCMI_POWER_CAPPING_MEASUREMENTS_NOTIFY = 0x00B,
+    MOD_SCMI_POWER_CAPPING_DESCRIBE_FAST_CHANNEL = 0x00C,
+    MOD_SCMI_POWER_CAPPING_COMMAND_COUNT,
 };
 
 /*!
