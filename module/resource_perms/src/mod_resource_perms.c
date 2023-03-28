@@ -55,6 +55,9 @@ struct res_perms_ctx {
     /*! Number of voltage domain resources for the platform. */
     uint32_t voltd_count;
 
+    /*! Number of power capping domain resources for the platform. */
+    uint32_t power_capping_count;
+
     /*!
      * The  default is for an agent to have permission to access any
      * resource. In order to deny permissions to an agent the table
@@ -100,6 +103,9 @@ struct res_perms_backup {
 
     /*! \brief Voltage Domain:Resource permissions. */
     mod_res_perms_t *scmi_voltd_perms;
+
+    /*! \brief Power capping:Resource permissions. */
+    mod_res_perms_t *scmi_power_capping_perms;
 };
 
 struct agent_resource_permissions_params {
@@ -195,6 +201,7 @@ static int mod_res_protocol_id_to_index(
     case MOD_SCMI_PROTOCOL_ID_SENSOR:
     case MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN:
     case MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN:
+    case MOD_SCMI_PROTOCOL_ID_POWER_CAPPING:
         *protocol_idx = protocol_id - MOD_SCMI_PROTOCOL_ID_BASE;
         return FWK_SUCCESS;
     default:
@@ -351,6 +358,18 @@ static int mod_res_message_id_to_index(
         }
         return FWK_SUCCESS;
 
+    case MOD_SCMI_PROTOCOL_ID_POWER_CAPPING:
+        if (message_id >= MOD_SCMI_POWER_CAPPING_COMMAND_COUNT) {
+            return FWK_E_PARAM;
+        }
+        if ((message_id >= MOD_SCMI_POWER_CAPPING_DOMAIN_ATTRIBUTES) &&
+            (message_id < MOD_SCMI_POWER_CAPPING_COMMAND_COUNT)) {
+            *message_idx = (int32_t)(
+                message_id -
+                (uint32_t)MOD_SCMI_POWER_CAPPING_DOMAIN_ATTRIBUTES);
+        }
+        return FWK_SUCCESS;
+
     default:
         return FWK_E_PARAM;
     }
@@ -501,6 +520,18 @@ static int mod_res_resource_id_to_index(
             message_offset =
                 (int)(message_id - (uint32_t)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES);
             resource_size = (int)resources_perms_ctx.voltd_count;
+            break;
+        }
+        return FWK_E_PARAM;
+
+    case MOD_SCMI_PROTOCOL_ID_POWER_CAPPING:
+        if ((message_id >= MOD_SCMI_POWER_CAPPING_DOMAIN_ATTRIBUTES) &&
+            (message_id < MOD_SCMI_POWER_CAPPING_COMMAND_COUNT)) {
+            message_count = (int)MOD_SCMI_POWER_CAPPING_COMMAND_COUNT -
+                (int)MOD_SCMI_POWER_CAPPING_DOMAIN_ATTRIBUTES;
+            message_offset =
+                (int)(message_id - (uint32_t)MOD_SCMI_POWER_CAPPING_DOMAIN_ATTRIBUTES);
+            resource_size = (int)resources_perms_ctx.power_capping_count;
             break;
         }
         return FWK_E_PARAM;
@@ -828,6 +859,18 @@ static enum mod_res_perms_permissions agent_resource_permissions(
                     ->scmi_voltd_perms[resource_idx];
         break;
 
+    case MOD_SCMI_PROTOCOL_ID_POWER_CAPPING:
+        if (resources_perms_ctx.agent_permissions->scmi_power_capping_perms ==
+            NULL) {
+            return MOD_RES_PERMS_ACCESS_ALLOWED;
+        }
+        if (resource_id >= resources_perms_ctx.power_capping_count) {
+            return MOD_RES_PERMS_ACCESS_DENIED;
+        }
+        perms = resources_perms_ctx.agent_permissions
+                    ->scmi_power_capping_perms[resource_idx];
+        break;
+
     default:
         return MOD_RES_PERMS_ACCESS_DENIED;
     }
@@ -1013,6 +1056,22 @@ static int mod_res_agent_set_permissions(
             .start_message_idx = (uint32_t)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES,
             .end_message_idx = (uint32_t)MOD_SCMI_VOLTD_LEVEL_GET,
             .counters = &resources_perms_ctx.config->voltd_counters
+        };
+        status = set_agent_resource_permissions(&protocol_perms);
+        break;
+
+    case MOD_RES_POWER_CAPPING_DEVICE:
+        protocol_perms = (struct agent_resource_permissions_params){
+            .protocol_id = MOD_SCMI_PROTOCOL_ID_POWER_CAPPING,
+            .resource_permission =
+                resources_perms_ctx.agent_permissions->scmi_power_capping_perms,
+            .resource_permission_backup =
+                resources_perms_backup.scmi_power_capping_perms,
+            .start_message_idx =
+                (uint32_t)MOD_SCMI_POWER_CAPPING_DOMAIN_ATTRIBUTES,
+            .end_message_idx =
+                (uint32_t)MOD_SCMI_POWER_CAPPING_DESCRIBE_FAST_CHANNEL,
+            .counters = &resources_perms_ctx.config->power_capping_counters,
         };
         status = set_agent_resource_permissions(&protocol_perms);
         break;

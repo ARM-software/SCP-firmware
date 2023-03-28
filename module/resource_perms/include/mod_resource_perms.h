@@ -108,6 +108,8 @@ enum mod_res_perms_message_idx {
         MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN - MOD_RES_PERMS_MESSAGE_OFFSET,
     MOD_RES_PERMS_SCMI_VOLTAGE_DOMAIN_MESSAGE_IDX =
         MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN - MOD_RES_PERMS_MESSAGE_OFFSET,
+    MOD_RES_PERMS_SCMI_POWER_CAPPING_MESSAGE_IDX =
+        MOD_SCMI_PROTOCOL_ID_POWER_CAPPING - MOD_RES_PERMS_MESSAGE_OFFSET,
 };
 
 /*!
@@ -132,11 +134,11 @@ enum mod_res_perms_message_bitmask_base {
 
 /*!
  * \brief Bitmask of the messages for each protocol disabled for
- *      the agent. Currently we have 8 SCMI protocols.
+ *      the agent. Currently we have 9 SCMI protocols.
  */
 struct mod_res_agent_msg_permissions {
     /*! \details Bitmask of the disabled messages for each protocol. */
-    mod_res_perms_t messages[8];
+    mod_res_perms_t messages[9];
 };
 
 /*!
@@ -310,6 +312,7 @@ enum mod_res_domain_device_types {
     MOD_RES_SENSOR_DOMAIN_DEVICE,
     MOD_RES_RESET_DOMAIN_DEVICE,
     MOD_RES_VOLTAGE_DOMAIN_DEVICE,
+    MOD_RES_POWER_CAPPING_DEVICE,
     MOD_RES_PLATFORM_DOMAIN_DEVICE,
     MOD_RES_DOMAIN_DEVICE_INVALID
 };
@@ -370,6 +373,9 @@ struct mod_res_agent_permission {
 #endif
     /*! \brief Voltage Domain:Resource permissions. */
     mod_res_perms_t *scmi_voltd_perms;
+
+    /*! \brief Power capping:Resource permissions. */
+    mod_res_perms_t *scmi_power_capping_perms;
 };
 
 /*!
@@ -528,6 +534,9 @@ struct mod_res_resource_perms_config {
 
     /*! \brief Number of SCMI voltd protocol counters. */
     struct protocol_permissions_counters voltd_counters;
+
+    /*! \brief Number of SCMI power capping protocol counters. */
+    struct protocol_permissions_counters power_capping_counters;
 
     /*! \brief Number of devices supported by the platform. */
     uint32_t device_count;

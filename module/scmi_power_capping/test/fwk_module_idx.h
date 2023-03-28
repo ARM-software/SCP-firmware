@@ -15,6 +15,9 @@ enum fwk_module_idx {
     FWK_MODULE_IDX_POWER_CAPPING,
     FWK_MODULE_IDX_SCMI_POWER_CAPPING,
     FWK_MODULE_IDX_POWER_ALLOCATOR,
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    FWK_MODULE_IDX_RESOURCE_PERMS,
+#endif
     FWK_MODULE_IDX_COUNT,
 };
 
@@ -26,5 +29,10 @@ static const fwk_id_t fwk_module_id_power_capping =
 
 static const fwk_id_t fwk_module_id_scmi_power_capping =
     FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_POWER_CAPPING);
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+static const fwk_id_t fwk_module_id_resource_perms =
+    FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS);
+#endif
 
 #endif /* TEST_FWK_MODULE_MODULE_IDX_H */

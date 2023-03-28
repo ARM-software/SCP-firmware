@@ -11,6 +11,9 @@
 #include "mod_power_allocator.h"
 
 #include <mod_scmi.h>
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+#    include <mod_resource_perms.h>
+#endif
 
 #include <fwk_assert.h>
 #include <fwk_core.h>
@@ -63,6 +66,10 @@ static struct {
 
     /*  Power management related APIs. */
     const struct mod_scmi_power_capping_power_apis *power_management_apis;
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    /* SCMI Resource Permissions API */
+    const struct mod_res_permissions_api *res_perms_api;
+#endif
 } pcapping_protocol_ctx;
 
 static int (*handler_table[MOD_SCMI_POWER_CAPPING_COMMAND_COUNT])(
@@ -101,6 +108,20 @@ static unsigned int payload_size_table[MOD_SCMI_POWER_CAPPING_COMMAND_COUNT] = {
 static_assert(
     FWK_ARRAY_SIZE(handler_table) == FWK_ARRAY_SIZE(payload_size_table),
     "[SCMI] Power capping protocol table sizes not consistent");
+
+/*
+ * Helper functions
+ */
+
+/*
+ * Static helper function to process protocol, message and resource permissions.
+ */
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+static int scmi_power_capping_permissions_handler(
+    unsigned int message_id,
+    fwk_id_t service_id,
+    const uint32_t *payload);
+#endif
 
 /*
  * Static helper function to check if a message is implemented.
@@ -220,20 +241,27 @@ static int scmi_power_capping_protocol_msg_attributes_handler(
 {
     const struct scmi_protocol_message_attributes_a2p *parameters;
     struct scmi_protocol_message_attributes_p2a return_values;
-    size_t return_values_size;
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    int status;
+#endif
     parameters = (const struct scmi_protocol_message_attributes_a2p *)payload;
 
-    if (scmi_power_capping_is_msg_implemented(
+    if (!scmi_power_capping_is_msg_implemented(
             service_id, parameters->message_id)) {
-        return_values.status = SCMI_SUCCESS;
-        return_values_size = sizeof(return_values);
-    } else {
-        return_values.status = SCMI_NOT_FOUND;
-        return_values_size = sizeof(return_values.status);
+        return scmi_power_capping_respond_error(service_id, SCMI_NOT_FOUND);
     }
 
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    status = scmi_power_capping_permissions_handler(
+        parameters->message_id, service_id, payload);
+    if (status != FWK_SUCCESS) {
+        return scmi_power_capping_respond_error(service_id, SCMI_NOT_FOUND);
+    }
+#endif
+
+    return_values.status = SCMI_SUCCESS;
     return pcapping_protocol_ctx.scmi_api->respond(
-        service_id, &return_values, return_values_size);
+        service_id, &return_values, sizeof(return_values));
 }
 
 static int scmi_power_capping_domain_attributes_handler(
@@ -370,6 +398,44 @@ static int scmi_power_capping_get_scmi_protocol_id(
     return FWK_SUCCESS;
 }
 
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+static int scmi_power_capping_permissions_handler(
+    unsigned int message_id,
+    fwk_id_t service_id,
+    const uint32_t *payload)
+{
+    unsigned int agent_id;
+    enum mod_res_perms_permissions perms;
+    int status;
+
+    status =
+        pcapping_protocol_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+
+    if (status != FWK_SUCCESS) {
+        return FWK_E_ACCESS;
+    }
+
+    if (message_id < MOD_SCMI_POWER_CAPPING_DOMAIN_ATTRIBUTES) {
+        perms =
+            pcapping_protocol_ctx.res_perms_api->agent_has_protocol_permission(
+                agent_id, MOD_SCMI_PROTOCOL_ID_POWER_CAPPING);
+    } else {
+        perms =
+            pcapping_protocol_ctx.res_perms_api->agent_has_resource_permission(
+                agent_id,
+                MOD_SCMI_PROTOCOL_ID_POWER_CAPPING,
+                message_id,
+                *payload);
+    }
+
+    if (perms == MOD_RES_PERMS_ACCESS_DENIED) {
+        status = FWK_E_ACCESS;
+    }
+
+    return status;
+}
+#endif
+
 static int scmi_power_capping_message_handler(
     fwk_id_t protocol_id,
     fwk_id_t service_id,
@@ -378,6 +444,9 @@ static int scmi_power_capping_message_handler(
     unsigned int message_id)
 {
     uint32_t domain_id;
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    int status;
+#endif
 
     fwk_assert(payload != NULL);
 
@@ -402,6 +471,14 @@ static int scmi_power_capping_message_handler(
         return scmi_power_capping_respond_error(
             service_id, SCMI_PROTOCOL_ERROR);
     }
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    status =
+        scmi_power_capping_permissions_handler(message_id, service_id, payload);
+    if (status != FWK_SUCCESS) {
+        return scmi_power_capping_respond_error(service_id, SCMI_DENIED);
+    }
+#endif
 
     return handler_table[message_id](service_id, payload);
 }
@@ -448,6 +525,16 @@ int pcapping_protocol_bind(void)
         FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
         FWK_ID_API(FWK_MODULE_IDX_SCMI, MOD_SCMI_API_IDX_PROTOCOL),
         &(pcapping_protocol_ctx.scmi_api));
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    if (status == FWK_SUCCESS) {
+        status = fwk_module_bind(
+            FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
+            FWK_ID_API(
+                FWK_MODULE_IDX_RESOURCE_PERMS, MOD_RES_PERM_RESOURCE_PERMS),
+            &(pcapping_protocol_ctx.res_perms_api));
+    }
+#endif
 
     return status;
 }

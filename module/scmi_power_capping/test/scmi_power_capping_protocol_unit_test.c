@@ -14,6 +14,7 @@
 #include <Mockfwk_module.h>
 #include <Mockfwk_notification.h>
 #include <Mockmod_power_allocator_extra.h>
+#include <Mockmod_resource_perms_extra.h>
 #include <Mockmod_scmi_extra.h>
 #include <internal/Mockfwk_core_internal.h>
 
@@ -59,6 +60,20 @@
         TEST_ASSERT_EQUAL(status, FWK_SUCCESS); \
     } while (0)
 
+#define RESOURCE_PERMISSION_RESOURCE_PASS_TEST() \
+    do { \
+        get_agent_id_ExpectAnyArgsAndReturn(FWK_SUCCESS); \
+        agent_has_resource_permission_ExpectAnyArgsAndReturn( \
+            MOD_RES_PERMS_ACCESS_ALLOWED); \
+    } while (0)
+
+#define RESOURCE_PERMISSION_PROTOCOL_PASS_TEST() \
+    do { \
+        get_agent_id_ExpectAnyArgsAndReturn(FWK_SUCCESS); \
+        agent_has_protocol_permission_ExpectAnyArgsAndReturn( \
+            MOD_RES_PERMS_ACCESS_ALLOWED); \
+    } while (0)
+
 static int status;
 
 static const struct mod_scmi_from_protocol_api scmi_api = {
@@ -70,6 +85,12 @@ static const struct mod_power_allocator_api power_allocator_api = {
     .get_cap = get_cap,
     .set_cap = set_cap,
 };
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+static const struct mod_res_permissions_api res_perms_api = {
+    .agent_has_protocol_permission = agent_has_protocol_permission,
+    .agent_has_resource_permission = agent_has_resource_permission,
+};
+#endif
 
 static const struct mod_scmi_power_capping_power_apis power_management_apis = {
     .power_allocator_api = &power_allocator_api,
@@ -122,6 +143,9 @@ static void test_set_cap_config_supported(
 static void test_init(void)
 {
     pcapping_protocol_ctx.scmi_api = &scmi_api;
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    pcapping_protocol_ctx.res_perms_api = &res_perms_api;
+#endif
     pcapping_protocol_ctx.power_management_apis = &power_management_apis;
     pcapping_protocol_ctx.power_capping_domain_count =
         FAKE_POWER_CAPPING_IDX_COUNT;
@@ -143,6 +167,9 @@ void tearDown(void)
 {
     Mockmod_power_allocator_extra_Verify();
     Mockmod_scmi_extra_Verify();
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    Mockmod_resource_perms_extra_Verify();
+#endif
 }
 
 void utest_get_scmi_protocol_id(void)
@@ -200,6 +227,9 @@ void utest_message_handler_protocol_version(void)
         .version = SCMI_PROTOCOL_VERSION_POWER_CAPPING,
     };
 
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_PROTOCOL_PASS_TEST();
+#endif
     EXPECT_RESPONSE_SUCCESS(ret_payload);
     TEST_SCMI_COMMAND_NO_PAYLOAD(MOD_SCMI_PROTOCOL_VERSION);
 }
@@ -211,6 +241,9 @@ void utest_message_handler_protocol_attributes(void)
         .attributes = FAKE_POWER_CAPPING_IDX_COUNT,
     };
 
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_PROTOCOL_PASS_TEST();
+#endif
     EXPECT_RESPONSE_SUCCESS(ret_payload);
     TEST_SCMI_COMMAND_NO_PAYLOAD(MOD_SCMI_PROTOCOL_ATTRIBUTES);
 }
@@ -223,6 +256,9 @@ void utest_message_handler_protocol_msg_attributes_unsupported_msgs(void)
     struct scmi_protocol_message_attributes_p2a ret_payload = {
         .status = SCMI_NOT_FOUND
     };
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_PROTOCOL_PASS_TEST();
+#endif
     /* Test unsupported messages */
     EXPECT_RESPONSE_ERROR(ret_payload);
     TEST_SCMI_COMMAND(MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES, cmd_payload);
@@ -237,6 +273,9 @@ void utest_message_handler_protocol_msg_attributes_maxlimits(void)
         .status = SCMI_NOT_FOUND
     };
 
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_PROTOCOL_PASS_TEST();
+#endif
     /* Test unsupported messages */
     EXPECT_RESPONSE_ERROR(ret_payload);
     TEST_SCMI_COMMAND(MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES, cmd_payload);
@@ -251,9 +290,19 @@ void utest_message_handler_protocol_msg_attributes_supported_msgs(void)
     };
     /* Test all supported messages */
 
-    for (message_id = 0; message_id < MOD_SCMI_POWER_CAPPING_PAI_GET;
+    for (message_id = 0; message_id < MOD_SCMI_POWER_CAPPING_CAP_SET;
          message_id++) {
         cmd_payload.message_id = message_id;
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+        /* Tests the command itself */
+        RESOURCE_PERMISSION_PROTOCOL_PASS_TEST();
+        /* Test the message received as an argument */
+        if (message_id < MOD_SCMI_POWER_CAPPING_DOMAIN_ATTRIBUTES) {
+            RESOURCE_PERMISSION_PROTOCOL_PASS_TEST();
+        } else {
+            RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+        }
+#endif
         EXPECT_RESPONSE_SUCCESS(ret_payload);
         TEST_SCMI_COMMAND(MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES, cmd_payload);
     }
@@ -303,6 +352,9 @@ void utest_message_handler_domain_attributes_valid(void)
             FWK_MODULE_IDX_SCMI_POWER_CAPPING, cmd_payload.domain_id),
         (char *)ret_payload.name);
 
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
     EXPECT_RESPONSE_SUCCESS(ret_payload);
     TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_DOMAIN_ATTRIBUTES, cmd_payload);
 }
@@ -328,6 +380,10 @@ void utest_message_handler_power_capping_get_valid(void)
     get_cap_IgnoreArg_cap();
     get_cap_ReturnMemThruPtr_cap(&cap, sizeof(cap));
 
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
+
     EXPECT_RESPONSE_SUCCESS(ret_payload);
     TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_CAP_GET, cmd_payload);
 }
@@ -351,6 +407,10 @@ void utest_message_handler_power_capping_get_failure(void)
         FWK_E_DEVICE);
     get_cap_IgnoreArg_cap();
 
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
+
     EXPECT_RESPONSE_ERROR(ret_payload);
     TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_CAP_GET, cmd_payload);
 }
@@ -365,6 +425,10 @@ void utest_message_handler_power_capping_set_invalid_flags(void)
     struct scmi_power_capping_cap_set_p2a ret_payload = {
         .status = SCMI_INVALID_PARAMETERS,
     };
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
 
     EXPECT_RESPONSE_ERROR(ret_payload);
     TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_CAP_SET, cmd_payload);
@@ -384,6 +448,10 @@ void utest_message_handler_power_capping_set_config_not_supported(void)
     domain_ctx_table[FAKE_POWER_CAPPING_IDX_1].config =
         &scmi_power_capping_config_1;
 
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
+
     EXPECT_RESPONSE_SUCCESS(ret_payload);
     TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_CAP_SET, cmd_payload);
 }
@@ -398,6 +466,10 @@ void utest_message_handler_power_capping_set_async_del_not_supported(void)
     struct scmi_power_capping_cap_set_p2a ret_payload = {
         .status = SCMI_NOT_SUPPORTED,
     };
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
 
     EXPECT_RESPONSE_SUCCESS(ret_payload);
     TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_CAP_SET, cmd_payload);
@@ -422,6 +494,10 @@ void utest_message_handler_power_capping_set_domain_busy(void)
 
     fwk_id_is_equal_ExpectAndReturn(service_id_1, FWK_ID_NONE, false);
 
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
+
     EXPECT_RESPONSE_ERROR(ret_payload);
     TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_CAP_SET, cmd_payload);
 }
@@ -440,6 +516,9 @@ void utest_message_handler_power_capping_set_less_than_min_cap(void)
     };
 
     test_set_cap_config_supported(cmd_payload.domain_id, true);
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
 
     EXPECT_RESPONSE_ERROR(ret_payload);
     TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_CAP_SET, cmd_payload);
@@ -459,6 +538,9 @@ void utest_message_handler_power_capping_set_more_than_max_cap(void)
     };
 
     test_set_cap_config_supported(cmd_payload.domain_id, true);
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
 
     EXPECT_RESPONSE_ERROR(ret_payload);
     TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_CAP_SET, cmd_payload);
@@ -483,6 +565,10 @@ void utest_message_handler_power_capping_set_success_pending(void)
         FWK_PENDING);
 
     fwk_id_is_equal_ExpectAndReturn(FWK_ID_NONE, FWK_ID_NONE, true);
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
 
     status = scmi_power_capping_message_handler(
         dummy_protocol_id,
@@ -519,6 +605,10 @@ void utest_message_handler_power_capping_set_success_sync(void)
 
     fwk_id_is_equal_ExpectAndReturn(FWK_ID_NONE, FWK_ID_NONE, true);
 
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
+
     EXPECT_RESPONSE_SUCCESS(ret_payload);
     TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_CAP_SET, cmd_payload);
 }
@@ -545,9 +635,69 @@ void utest_message_handler_power_capping_set_success_sync_uncap(void)
 
     fwk_id_is_equal_ExpectAndReturn(FWK_ID_NONE, FWK_ID_NONE, true);
 
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
+
     EXPECT_RESPONSE_SUCCESS(ret_payload);
     TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_CAP_SET, cmd_payload);
 }
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+void utest_message_handler_invalid_agent_id(void)
+{
+    struct scmi_power_capping_domain_attributes_a2p cmd_payload = {
+        .domain_id = FAKE_POWER_CAPPING_IDX_1
+    };
+
+    struct scmi_power_capping_domain_attributes_p2a ret_payload = {
+        .status = SCMI_DENIED
+    };
+
+    get_agent_id_ExpectAndReturn(service_id_1, NULL, FWK_E_PARAM);
+    get_agent_id_IgnoreArg_agent_id();
+
+    EXPECT_RESPONSE_ERROR(ret_payload);
+    TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_DOMAIN_ATTRIBUTES, cmd_payload);
+}
+
+void utest_message_handler_invalid_resource_permissions(void)
+{
+    uint32_t message_id;
+    /*
+     * As the domain id is the first element of the payload and it is the only
+     * necessary data in this test , we will use a u32t to represent the
+     * payload and the domain id.
+     */
+    uint32_t domain_id = FAKE_POWER_CAPPING_IDX_COUNT;
+    uint32_t agent_id = __LINE__;
+
+    for (message_id = MOD_SCMI_PROTOCOL_VERSION;
+         message_id <= MOD_SCMI_POWER_CAPPING_CAP_SET;
+         message_id++) {
+        get_agent_id_ExpectAndReturn(service_id_1, NULL, FWK_SUCCESS);
+        get_agent_id_IgnoreArg_agent_id();
+        get_agent_id_ReturnThruPtr_agent_id(&agent_id);
+        if (message_id < MOD_SCMI_POWER_CAPPING_DOMAIN_ATTRIBUTES) {
+            agent_has_protocol_permission_ExpectAndReturn(
+                agent_id,
+                MOD_SCMI_PROTOCOL_ID_POWER_CAPPING,
+                MOD_RES_PERMS_ACCESS_DENIED);
+        } else {
+            agent_has_resource_permission_ExpectAndReturn(
+                agent_id,
+                MOD_SCMI_PROTOCOL_ID_POWER_CAPPING,
+                message_id,
+                domain_id,
+                MOD_RES_PERMS_ACCESS_DENIED);
+        }
+        status = scmi_power_capping_permissions_handler(
+            message_id, service_id_1, &domain_id);
+        TEST_ASSERT_EQUAL(status, FWK_E_ACCESS);
+    }
+}
+
+#endif
 
 void utest_pcapping_protocol_init(void)
 {
@@ -613,6 +763,13 @@ void utest_pcapping_protocol_bind(void)
         &(pcapping_protocol_ctx.scmi_api),
         FWK_SUCCESS);
 
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    fwk_module_bind_ExpectAndReturn(
+        FWK_ID_MODULE(FWK_MODULE_IDX_RESOURCE_PERMS),
+        FWK_ID_API(FWK_MODULE_IDX_RESOURCE_PERMS, MOD_RES_PERM_RESOURCE_PERMS),
+        &(pcapping_protocol_ctx.res_perms_api),
+        FWK_SUCCESS);
+#endif
     status = pcapping_protocol_bind();
     TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
 }
@@ -737,6 +894,10 @@ int scmi_power_capping_protocol_test_main(void)
     RUN_TEST(utest_message_handler_power_capping_set_success_sync);
     RUN_TEST(utest_message_handler_power_capping_set_success_sync_uncap);
     RUN_TEST(utest_message_handler_un_implemented_message);
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RUN_TEST(utest_message_handler_invalid_agent_id);
+    RUN_TEST(utest_message_handler_invalid_resource_permissions);
+#endif
     RUN_TEST(utest_pcapping_protocol_init);
     RUN_TEST(utest_pcapping_protocol_domain_init_success);
     RUN_TEST(utest_pcapping_protocol_domain_init_failure);
