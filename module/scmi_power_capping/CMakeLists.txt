@@ -17,12 +17,26 @@ target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-power-allocator)
 target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-power-meter)
 target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-power-coordinator)
 
+if(SCP_EXCLUDE_SCMI_POWER_CAPPING_STD_COMMANDS AND
+    (NOT SCP_ENABLE_SCMI_POWER_CAPPING_FAST_CHANNELS_COMMANDS))
+     message( FATAL_ERROR "Non fast channels commands and fast channels commands can't be excluded simultaneously" )
+endif()
 
-target_sources(${SCP_MODULE_TARGET}
-         PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/scmi_power_capping_protocol.c")
+if(NOT SCP_EXCLUDE_SCMI_POWER_CAPPING_STD_COMMANDS)
+    add_definitions(-BUILD_HAS_SCMI_POWER_CAPPING_STD_COMMANDS)
+    target_sources(${SCP_MODULE_TARGET}
+             PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/scmi_power_capping_protocol.c")
 
-target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-scmi)
+    target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-scmi)
+endif()
 
 if("resource-perms" IN_LIST SCP_MODULES)
     target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-resource-perms)
+endif()
+
+if(SCP_ENABLE_SCMI_POWER_CAPPING_FAST_CHANNELS_COMMANDS)
+    target_sources(
+        ${SCP_MODULE_TARGET}
+        PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/scmi_power_capping_fast_channels.c")
+    target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-transport)
 endif()

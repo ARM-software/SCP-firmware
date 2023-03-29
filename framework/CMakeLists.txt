@@ -129,6 +129,15 @@ if(SCP_ENABLE_OUTBAND_MSG_SUPPORT)
     target_compile_definitions(framework PUBLIC "BUILD_HAS_OUTBAND_MSG_SUPPORT")
 endif()
 
+if(SCP_ENABLE_SCMI_POWER_CAPPING_FAST_CHANNELS_COMMANDS)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_FAST_CHANNELS")
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_SCMI_POWER_CAPPING_FAST_CHANNELS_COMMANDS")
+endif()
+
+if(NOT SCP_EXCLUDE_SCMI_POWER_CAPPING_FAST_CHANNELS_COMMANDS)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_SCMI_POWER_CAPPING_STD_COMMANDS")
+endif()
+
 #
 # Handle the framework logging filter level.
 #

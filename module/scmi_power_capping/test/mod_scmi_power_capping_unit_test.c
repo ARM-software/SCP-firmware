@@ -60,7 +60,9 @@ void utest_scmi_power_capping_init_success(void)
         sizeof(struct mod_scmi_power_capping_domain_context),
         domain_table);
 
+#ifdef BUILD_HAS_SCMI_POWER_CAPPING_STD_COMMANDS
     pcapping_protocol_init_ExpectWithArray(&expected_ctx, 1);
+#endif
 
     status = scmi_power_capping_init(
         fwk_module_id_scmi_power_capping, domain_count, NULL);
@@ -76,8 +78,10 @@ void utest_scmi_power_capping_element_init_success(void)
 
     fwk_id_get_element_idx_ExpectAndReturn(domain_id, domain_idx);
 
+#ifdef BUILD_HAS_SCMI_POWER_CAPPING_STD_COMMANDS
     pcapping_protocol_domain_init_ExpectAndReturn(
         domain_idx, &scmi_power_capping_default_config, FWK_SUCCESS);
+#endif
 
     status = scmi_power_capping_element_init(
         domain_id, domain_count, &scmi_power_capping_default_config);
@@ -101,8 +105,10 @@ void utest_scmi_power_capping_element_init_failure(void)
 
     fwk_id_get_element_idx_ExpectAndReturn(domain_id, domain_count);
 
+#ifdef BUILD_HAS_SCMI_POWER_CAPPING_STD_COMMANDS
     pcapping_protocol_domain_init_ExpectAndReturn(
         domain_count, &scmi_power_capping_default_config, FWK_E_PARAM);
+#endif
 
     status = scmi_power_capping_element_init(
         domain_id, domain_count, &scmi_power_capping_default_config);
@@ -135,8 +141,11 @@ void utest_scmi_power_capping_bind_success(void)
         &(power_management_apis.power_meter_api),
         FWK_SUCCESS);
 
+#ifdef BUILD_HAS_SCMI_POWER_CAPPING_STD_COMMANDS
     pcapping_protocol_bind_ExpectAndReturn(FWK_SUCCESS);
     pcapping_protocol_set_power_apis_Expect(&power_management_apis);
+#endif
+
     status = scmi_power_capping_bind(bind_id, 0);
     TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
 }
@@ -174,7 +183,10 @@ void utest_scmi_power_capping_bind_failure(void)
         &(power_management_apis.power_meter_api),
         FWK_SUCCESS);
 
+#ifdef BUILD_HAS_SCMI_POWER_CAPPING_STD_COMMANDS
     pcapping_protocol_bind_ExpectAndReturn(FWK_E_INIT);
+#endif
+
     status = scmi_power_capping_bind(bind_id, 0);
     TEST_ASSERT_EQUAL(status, FWK_E_INIT);
 }
@@ -184,7 +196,9 @@ void utest_scmi_power_capping_start(void)
     fwk_id_t id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_CAPPING, 10u);
     int status = FWK_SUCCESS;
 
+#ifdef BUILD_HAS_SCMI_POWER_CAPPING_STD_COMMANDS
     pcapping_protocol_start_ExpectAndReturn(id, FWK_SUCCESS);
+#endif
 
     status = scmi_power_capping_start(id);
 
@@ -197,8 +211,11 @@ void utest_scmi_power_capping_process_notification(void)
 
     struct fwk_event notification_event;
 
+#ifdef BUILD_HAS_SCMI_POWER_CAPPING_STD_COMMANDS
     pcapping_protocol_process_notification_ExpectAndReturn(
         &notification_event, FWK_SUCCESS);
+#endif
+
     status = scmi_power_capping_process_notification(&notification_event, NULL);
 
     TEST_ASSERT_EQUAL(status, FWK_SUCCESS);

@@ -38,6 +38,7 @@ enum fake_power_capping_domains {
 #define POWER_CAP_MON_SUP_POS       26
 #define PAI_CONF_SUP_POS            25
 #define POWER_UNIT_POS              24
+#define FAST_CHANNEL_SUP_POS        22
 
 #define ASYNC_FLAG(x)        (x << 1)
 #define IGN_DEL_RESP_FLAG(x) (x)

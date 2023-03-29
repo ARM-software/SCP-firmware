@@ -36,6 +36,7 @@ if(NOT TEST_ON_TARGET)
 endif()
 
 include(${SCP_ROOT}/unit_test/module_common.cmake)
+target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC "BUILD_HAS_SCMI_POWER_CAPPING_STD_COMMANDS")
 
 target_sources(${UNIT_TEST_TARGET}
     PRIVATE
@@ -66,6 +67,7 @@ if(NOT TEST_ON_TARGET)
 endif()
 
 include(${SCP_ROOT}/unit_test/module_common.cmake)
+target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC "BUILD_HAS_SCMI_POWER_CAPPING_STD_COMMANDS")
 
 target_sources(${UNIT_TEST_TARGET}
     PRIVATE
@@ -99,7 +101,7 @@ if(NOT TEST_ON_TARGET)
 endif()
 
 include(${SCP_ROOT}/unit_test/module_common.cmake)
-target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC "BUILD_HAS_SCMI_POWER_CAPPING_COMMANDS")
+target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC "BUILD_HAS_SCMI_POWER_CAPPING_STD_COMMANDS")
 target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC "BUILD_HAS_MOD_RESOURCE_PERMS")
 
 target_sources(${UNIT_TEST_TARGET}

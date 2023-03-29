@@ -7,6 +7,7 @@
  * Description:
  *      SCMI power capping and monitoring protocol completer.
  */
+#include "internal/scmi_power_capping_fast_channels.h"
 #include "internal/scmi_power_capping_protocol.h"
 #include "mod_power_allocator.h"
 #include "mod_power_coordinator.h"
@@ -59,6 +60,12 @@ static int scmi_power_capping_pai_set_handler(
 static int scmi_power_capping_measurements_get_handler(
     fwk_id_t service_id,
     const uint32_t *payload);
+#ifdef BUILD_HAS_SCMI_POWER_CAPPING_FAST_CHANNELS_COMMANDS
+static int scmi_power_capping_describe_fast_channel_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload);
+#endif
+
 /*
  * Internal variables.
  */
@@ -98,6 +105,10 @@ static int (*handler_table[MOD_SCMI_POWER_CAPPING_COMMAND_COUNT])(
     [MOD_SCMI_POWER_CAPPING_PAI_SET] = scmi_power_capping_pai_set_handler,
     [MOD_SCMI_POWER_CAPPING_MEASUREMENTS_GET] =
         scmi_power_capping_measurements_get_handler,
+#ifdef BUILD_HAS_SCMI_POWER_CAPPING_FAST_CHANNELS_COMMANDS
+    [MOD_SCMI_POWER_CAPPING_DESCRIBE_FAST_CHANNEL] =
+        scmi_power_capping_describe_fast_channel_handler,
+#endif
 };
 
 static unsigned int payload_size_table[MOD_SCMI_POWER_CAPPING_COMMAND_COUNT] = {
@@ -117,6 +128,10 @@ static unsigned int payload_size_table[MOD_SCMI_POWER_CAPPING_COMMAND_COUNT] = {
         sizeof(struct scmi_power_capping_pai_set_a2p),
     [MOD_SCMI_POWER_CAPPING_MEASUREMENTS_GET] =
         sizeof(struct scmi_power_capping_measurements_get_a2p),
+#ifdef BUILD_HAS_SCMI_POWER_CAPPING_FAST_CHANNELS_COMMANDS
+    [MOD_SCMI_POWER_CAPPING_DESCRIBE_FAST_CHANNEL] =
+        sizeof(struct scmi_power_capping_describe_fc_a2p),
+#endif
 };
 
 static_assert(
@@ -178,6 +193,11 @@ static inline void scmi_power_capping_populate_domain_attributes(
     return_values->min_pai = config->min_pai;
     return_values->max_pai = config->max_pai;
     return_values->pai_step = config->pai_step;
+
+#ifdef BUILD_HAS_SCMI_POWER_CAPPING_FAST_CHANNELS_COMMANDS
+    return_values->attributes |= SCMI_POWER_CAPPING_DOMAIN_FCH_SUPPORT(
+        pcapping_fast_channel_get_domain_supp(domain_idx));
+#endif
     return_values->min_power_cap = config->min_power_cap;
     return_values->max_power_cap = config->max_power_cap;
     return_values->power_cap_step = config->power_cap_step;
@@ -285,6 +305,15 @@ static int scmi_power_capping_protocol_msg_attributes_handler(
     if (status != FWK_SUCCESS) {
         return scmi_power_capping_respond_error(service_id, SCMI_NOT_FOUND);
     }
+#endif
+
+#ifdef BUILD_HAS_SCMI_POWER_CAPPING_FAST_CHANNELS_COMMANDS
+    return_values.attributes =
+        pcapping_fast_channel_get_msg_supp(parameters->message_id) ?
+        SCMI_POWER_CAPPING_FCH_AVAIL :
+        SCMI_POWER_CAPPING_FCH_NOT_AVAIL;
+#else
+    return_values.attributes = SCMI_POWER_CAPPING_FCH_NOT_AVAIL;
 #endif
 
     return_values.status = SCMI_SUCCESS;
@@ -519,6 +548,47 @@ static int scmi_power_capping_measurements_get_handler(
     return pcapping_protocol_ctx.scmi_api->respond(
         service_id, &return_values, sizeof(return_values));
 }
+
+#ifdef BUILD_HAS_SCMI_POWER_CAPPING_FAST_CHANNELS_COMMANDS
+static int scmi_power_capping_describe_fast_channel_handler(
+    fwk_id_t service_id,
+    const uint32_t *payload)
+{
+    const struct scmi_power_capping_describe_fc_a2p *parameters;
+    struct scmi_power_capping_describe_fc_p2a return_values = { 0 };
+    struct pcapping_fast_channel_info info;
+    unsigned int domain_idx;
+    uint32_t message_id;
+    int status;
+
+    parameters = (const struct scmi_power_capping_describe_fc_a2p *)payload;
+    domain_idx = parameters->domain_id;
+    message_id = parameters->message_id;
+
+    status = pcapping_fast_channel_get_info(domain_idx, message_id, &info);
+
+    if (status != FWK_SUCCESS) {
+        return_values.status =
+            status == FWK_E_RANGE ? SCMI_NOT_FOUND : SCMI_NOT_SUPPORTED;
+        return pcapping_protocol_ctx.scmi_api->respond(
+            service_id, &return_values, sizeof(return_values.status));
+    }
+
+    return_values.chan_addr_high = (uint32_t)((uint64_t)info.fch_address >> 32);
+    return_values.chan_addr_low = (uint32_t)info.fch_address;
+
+    return_values.chan_size = info.fch_channel_size;
+
+    return_values.rate_limit = info.fch_rate_limit;
+
+    return_values.attributes = info.fch_attributes;
+
+    return_values.status = SCMI_SUCCESS;
+
+    return pcapping_protocol_ctx.scmi_api->respond(
+        service_id, &return_values, sizeof(return_values));
+}
+#endif
 
 /*
  * SCMI module -> SCMI power capping module interface

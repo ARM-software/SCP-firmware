@@ -22,9 +22,20 @@
  */
 
 /*!
- * \defgroup GroupSCMI_POWER_CAPPING SCMI Power capping Protocol
+ * \defgroup GroupSCMI_POWER_CAPPING SCMI power capping protocol
  * \{
  */
+
+/*!
+ * \brief Fast channels address index.
+ */
+enum mod_scmi_power_capping_fast_channels_cmd_handler_index {
+    MOD_SCMI_PCAPPING_FAST_CHANNEL_CAP_GET,
+    MOD_SCMI_PCAPPING_FAST_CHANNEL_CAP_SET,
+    MOD_SCMI_PCAPPING_FAST_CHANNEL_PAI_GET,
+    MOD_SCMI_PCAPPING_FAST_CHANNEL_PAI_SET,
+    MOD_SCMI_PCAPPING_FAST_CHANNEL_COUNT
+};
 
 /*!
  * \brief SCMI Power capping domain unit.
@@ -36,9 +47,28 @@ enum mod_scmi_power_capping_power_cap_unit {
 };
 
 /*!
+ * \brief Power Capping fast channels domain configuration.
+ */
+struct scmi_pcapping_fch_config {
+    /*!
+     * \brief Corresponding transport element ID.
+     */
+    fwk_id_t transport_id;
+    /*!
+     * \brief Corresponding transport API ID.
+     */
+    fwk_id_t transport_api_id;
+    /*!
+     * \brief Fast channel support for the required domain.
+     */
+    bool fch_support;
+};
+
+/*!
  * \brief SCMI Power capping domain configuration.
  */
 struct mod_scmi_power_capping_domain_config {
+#ifdef BUILD_HAS_SCMI_POWER_CAPPING_STD_COMMANDS
     /*!
      * \brief Minimum PAI.
      *
@@ -113,6 +143,16 @@ struct mod_scmi_power_capping_domain_config {
      * \brief Power unit used for capping and monitoring.
      */
     enum mod_scmi_power_capping_power_cap_unit power_cap_unit;
+#endif
+#ifdef BUILD_HAS_SCMI_POWER_CAPPING_FAST_CHANNELS_COMMANDS
+    /*!
+     * \brief Fast channels configuration.
+     *
+     * \details Assign the table of configurations for the fast channels using
+     *      this domain.
+     */
+    const struct scmi_pcapping_fch_config *fch_config;
+#endif
     /*!
      * \brief ID of the corresponding power allocator domain.
      */
@@ -135,8 +175,10 @@ struct mod_scmi_power_capping_domain_config {
  * \details APIs exported by SCMI power capping protocol.
  */
 enum mod_scmi_power_capping_api {
+#ifdef BUILD_HAS_SCMI_POWER_CAPPING_STD_COMMANDS
     /*! Index for the SCMI power capping request API */
     MOD_SCMI_POWER_CAPPING_API_IDX_REQUEST,
+#endif
     /*! Number of APIs */
     MOD_SCMI_POWER_CAPPING_API_IDX_COUNT,
 };

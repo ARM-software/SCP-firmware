@@ -31,6 +31,9 @@
 
 #define SCMI_POWER_CAPPING_NO_PARENT UINT32_C(0xFFFFFFFF)
 
+#define SCMI_POWER_CAPPING_FCH_NOT_AVAIL UINT32_C(0)
+#define SCMI_POWER_CAPPING_FCH_AVAIL     UINT32_C(1)
+
 #define SCMI_POWER_CAPPING_CAP_PAI_CHANGE_NOTIF_SUP_POS     31
 #define SCMI_POWER_CAPPING_POWER_MEASUREMENTS_NOTIF_SUP_POS 30
 #define SCMI_POWER_CAPPING_ASYNC_SUP_POS                    29
@@ -39,6 +42,7 @@
 #define SCMI_POWER_CAPPING_MONITOR_SUP_POS                  26
 #define SCMI_POWER_CAPPING_PAI_CONF_SUP_POS                 25
 #define SCMI_POWER_CAPPING_POWER_UNIT_POS                   24
+#define SCMI_POWER_CAPPING_FAST_CHANNEL_SUP_POS             22
 
 #define SET_PCAP_CONF_SUP(PCAP_CONF_SUP) \
     (PCAP_CONF_SUP << SCMI_POWER_CAPPING_CONF_SUP_POS)
@@ -55,6 +59,9 @@
     PCAP_CONF_SUP, PAI_CONF_SUP, POWER_UNIT) \
     (SET_PCAP_CONF_SUP(PCAP_CONF_SUP) | SET_PAI_CONF_SUP(PAI_CONF_SUP) | \
      SET_POWER_UNIT(POWER_UNIT))
+
+#define SCMI_POWER_CAPPING_DOMAIN_FCH_SUPPORT(FAST_CHNL_SUP) \
+    ((FAST_CHNL_SUP) << SCMI_POWER_CAPPING_FAST_CHANNEL_SUP_POS)
 
 #define SCMI_POWER_CAPPING_IGN_DEL_RES_FLAG_POS 0
 #define SCMI_POWER_CAPPING_IGN_DEL_RES_FLAG_MASK \
@@ -162,6 +169,29 @@ struct scmi_power_capping_measurements_get_p2a {
     int32_t status;
     uint32_t power;
     uint32_t pai;
+};
+
+/*
+ * Describe fast channels
+ */
+struct scmi_power_capping_describe_fc_a2p {
+    uint32_t domain_id;
+    uint32_t message_id;
+};
+
+struct scmi_power_capping_describe_fc_p2a {
+    int32_t status;
+    uint32_t attributes;
+    uint32_t rate_limit;
+    uint32_t chan_addr_low;
+    uint32_t chan_addr_high;
+    uint32_t chan_size;
+    uint32_t doorbell_addr_low;
+    uint32_t doorbell_addr_high;
+    uint32_t doorbell_set_mask_low;
+    uint32_t doorbell_set_mask_high;
+    uint32_t doorbell_preserve_mask_low;
+    uint32_t doorbell_preserve_mask_high;
 };
 
 /*
