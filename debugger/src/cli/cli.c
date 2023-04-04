@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -524,9 +524,16 @@ uint32_t cli_print(const char *string)
     int32_t status = FWK_SUCCESS;
 
     for (index = 0; string[index] != 0; index++) {
+        if (string[index] == '\n') {
+            status = fwk_io_putch(fwk_io_stdout, '\r');
+            if (status != FWK_SUCCESS) {
+                return status;
+            }
+        }
         status = fwk_io_putch(fwk_io_stdout, string[index]);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
     return status;
 }
