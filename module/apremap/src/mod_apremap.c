@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -446,6 +446,8 @@ static int apremap_init(fwk_id_t id, unsigned int unused, const void *data)
 
     ctx.apremap_reg = (struct mod_apremap_reg *)config->base;
     fwk_assert(ctx.apremap_reg != NULL);
+
+    enable_cmn_addr_trans();
 
     return FWK_SUCCESS;
 }
