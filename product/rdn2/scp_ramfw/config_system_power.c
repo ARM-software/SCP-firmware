@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -51,7 +51,7 @@ static struct mod_system_power_config system_power_config = {
         MOD_PLATFORM_SYSTEM_API_IDX_SYSTEM_POWER_DRIVER),
 
     /* Initial system state */
-    .initial_system_power_state = MOD_PD_STATE_OFF,
+    .initial_system_power_state = MOD_PD_STATE_ON,
 };
 
 static const struct fwk_element *platform_system_get_element_table(
