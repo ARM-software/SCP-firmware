@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -164,6 +164,10 @@ static int pcie_integ_ctrl_start(fwk_id_t id)
     ctx = get_ctx(id);
 
     config = ctx->config;
+
+    if (fwk_id_is_equal(config->clock_id, FWK_ID_NONE)) {
+        return FWK_SUCCESS;
+    }
 
     /* Register the element for clock state notifications */
     return fwk_notification_subscribe(
