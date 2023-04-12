@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -68,6 +68,10 @@ static int mod_isys_rom_process_event(
     int status;
 
     status = ctx.bootloader_api->load_image();
+
+#if !(FWK_LOG_LEVEL < FWK_LOG_LEVEL_DISABLED)
+    (void)status;
+#endif
 
     FWK_LOG_CRIT(
         "[ISYS-ROM] Failed to load RAM firmware image: %s",

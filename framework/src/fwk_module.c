@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -61,8 +61,10 @@ extern const struct fwk_module *module_table[FWK_MODULE_IDX_COUNT];
 extern const struct fwk_module_config
     *module_config_table[FWK_MODULE_IDX_COUNT];
 
+#if (FWK_LOG_LEVEL < FWK_LOG_LEVEL_DISABLED)
 static const char fwk_module_err_msg_line[] = "[MOD] Error %d in %s @%d";
 static const char fwk_module_err_msg_func[] = "[MOD] Error %d in %s";
+#endif
 
 static size_t fwk_module_count_elements(const struct fwk_element *elements)
 {

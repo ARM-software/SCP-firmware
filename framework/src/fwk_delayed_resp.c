@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -19,7 +19,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#if (FWK_LOG_LEVEL < FWK_LOG_LEVEL_DISABLED)
 static const char err_msg_func[] = "[FWK] Error %d in %s";
+#endif
 
 /*
  * Static functions
