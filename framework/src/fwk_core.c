@@ -31,8 +31,10 @@
 
 static struct __fwk_ctx ctx;
 
+#if (FWK_LOG_LEVEL < FWK_LOG_LEVEL_DISABLED)
 static const char err_msg_line[] = "[FWK] Error %d in %s @%d";
 static const char err_msg_func[] = "[FWK] Error %d in %s";
+#endif
 
 enum interrupt_states {
     UNKNOWN_STATE = 0,

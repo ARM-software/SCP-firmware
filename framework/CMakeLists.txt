@@ -120,7 +120,7 @@ if(NOT DEFINED SCP_LOG_LEVEL)
         CACHE STRING "Minimum logging level.")
 
     set_property(CACHE SCP_LOG_LEVEL PROPERTY STRINGS "DEBUG" "INFO" "WARN"
-                                                      "ERROR" "CRIT")
+                                                      "ERROR" "CRIT" "DISABLED")
 endif()
 
 target_compile_definitions(framework

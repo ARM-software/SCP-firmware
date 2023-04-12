@@ -183,6 +183,14 @@
  * \brief *Critical* log level.
  *
  * \details Messages assigned this filter level represent fatal errors.
+ *
+ * \def FWK_LOG_LEVEL_DISABLED
+ *
+ * \brief *Disabled* log level.
+ *
+ * \details If a build sets log level to FWK_LOG_LEVEL_DISABLED,
+ *      all logs are disabled.
+ *
  */
 
 #define FWK_LOG_LEVEL_DEBUG 0
@@ -190,6 +198,7 @@
 #define FWK_LOG_LEVEL_WARN 2
 #define FWK_LOG_LEVEL_ERROR 3
 #define FWK_LOG_LEVEL_CRIT 4
+#define FWK_LOG_LEVEL_DISABLED 5
 
 /*!
  * \}

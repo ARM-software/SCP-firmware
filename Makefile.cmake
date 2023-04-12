@@ -249,7 +249,7 @@ help:
 	@echo "        Include the debugger library."
 	@echo ""
 	@echo "    LOG_LEVEL"
-	@echo "        Value: <DEBUG|INFO|WARN|ERROR|CRIT>"
+	@echo "        Value: <DEBUG|INFO|WARN|ERROR|CRIT|DISABLED>"
 	@echo "        Default: $(LOG_LEVEL)"
 	@echo "        Filter log messages less important than this level."
 	@echo ""

@@ -95,7 +95,7 @@ zerodivcond:*product/juno/module/juno_cdcel937/src/mod_juno_cdcel937.c:414
 syntaxError:*arch/arm/armv8-a/include/arch_system.h:19
 
 // Cppcheck is not able to parse returned boolean values inside if conditions
-internalAstError:*framework/src/fwk_core.c:295
+internalAstError:*framework/src/fwk_core.c:297
 
 // These assignments are used for testing
 constArgument:*framework/test/test_fwk_macros.c

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -37,7 +37,9 @@ struct notification_ctx {
 
 static struct notification_ctx ctx;
 
+#if (FWK_LOG_LEVEL < FWK_LOG_LEVEL_DISABLED)
 static const char err_msg_func[] = "[NOT] Error %d in %s";
+#endif
 
 /*
  * Static functions
