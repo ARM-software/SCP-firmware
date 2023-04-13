@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -20,8 +20,7 @@
 static const struct mod_apcontext_config apcontext_data = {
     .base = SCP_AP_CONTEXT_BASE,
     .size = SCP_AP_CONTEXT_SIZE,
-    .clock_id =
-        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_INTERCONNECT),
+    .clock_id = FWK_ID_NONE_INIT,
 };
 
 struct fwk_module_config config_apcontext = {
