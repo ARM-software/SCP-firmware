@@ -172,7 +172,8 @@ static inline fwk_id_t get_dvfs_dependency_id(unsigned int el_idx)
     fwk_id_t id;
 
     id = perf_plugins_get_dependency_id(el_idx);
-    return fwk_id_build_element_id(id, el_idx);
+    return fwk_id_build_element_id(
+        fwk_module_id_dvfs, fwk_id_get_element_idx(id));
 #else
     return FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, el_idx);
 #endif
