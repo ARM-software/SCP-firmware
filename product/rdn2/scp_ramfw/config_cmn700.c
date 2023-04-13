@@ -888,8 +888,7 @@ static const struct fwk_element cmn700_device_table[] = {
                                   FWK_ARRAY_SIZE(ccg_config_table_chip_0),
 #endif
                               .chip_addr_space = UINT64_C(64) * FWK_TIB,
-                              .clock_id = FWK_ID_ELEMENT_INIT(
-                                  FWK_MODULE_IDX_CLOCK, CLOCK_IDX_INTERCONNECT),
+                              .clock_id = FWK_ID_NONE_INIT,
                               .hnf_cal_mode = true,
                           }) },
 #if (PLATFORM_VARIANT == 2)
@@ -907,9 +906,7 @@ static const struct fwk_element cmn700_device_table[] = {
                               .ccg_table_count =
                                   FWK_ARRAY_SIZE(ccg_config_table_chip_1),
                               .chip_addr_space = UINT64_C(64) * FWK_TIB,
-                              .clock_id = FWK_ID_ELEMENT_INIT(
-                                  FWK_MODULE_IDX_CLOCK,
-                                  CLOCK_IDX_INTERCONNECT),
+                              .clock_id = FWK_ID_NONE_INIT,
                               .hnf_cal_mode = true,
                           }) },
     [PLATFORM_CHIP_2] = { .name = "Chip-2 CMN700 Mesh Config",
@@ -926,9 +923,7 @@ static const struct fwk_element cmn700_device_table[] = {
                               .ccg_table_count =
                                   FWK_ARRAY_SIZE(ccg_config_table_chip_2),
                               .chip_addr_space = UINT64_C(64) * FWK_TIB,
-                              .clock_id = FWK_ID_ELEMENT_INIT(
-                                  FWK_MODULE_IDX_CLOCK,
-                                  CLOCK_IDX_INTERCONNECT),
+                              .clock_id = FWK_ID_NONE_INIT,
                               .hnf_cal_mode = true,
                           }) },
     [PLATFORM_CHIP_3] = { .name = "Chip-3 CMN700 Mesh Config",
@@ -945,9 +940,7 @@ static const struct fwk_element cmn700_device_table[] = {
                               .ccg_table_count =
                                   FWK_ARRAY_SIZE(ccg_config_table_chip_3),
                               .chip_addr_space = UINT64_C(64) * FWK_TIB,
-                              .clock_id = FWK_ID_ELEMENT_INIT(
-                                  FWK_MODULE_IDX_CLOCK,
-                                  CLOCK_IDX_INTERCONNECT),
+                              .clock_id = FWK_ID_NONE_INIT,
                               .hnf_cal_mode = true,
                           }) },
 #endif

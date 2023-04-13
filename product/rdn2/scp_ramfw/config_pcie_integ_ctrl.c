@@ -42,8 +42,7 @@
                 .mmioh_end_addr = RD_N2_PCIE_INTEG_END_ADDR(idx, \
                     AP_PCIE_MMIOH_BASE, mmioh_size), \
             }, \
-            .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, \
-                CLOCK_IDX_INTERCONNECT), \
+            .clock_id = FWK_ID_NONE_INIT, \
         }) \
     }
 
@@ -115,8 +114,7 @@ static const struct fwk_element pcie_integ_ctrl_element_table[] = {
                 .mmioh_start_addr = 0x10B0000000,
                 .mmioh_end_addr = 0x10B041FFFF,
             },
-            .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
-                CLOCK_IDX_INTERCONNECT),
+            .clock_id = FWK_ID_NONE_INIT,
         }),
     },
 
