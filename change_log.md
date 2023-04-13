@@ -84,6 +84,13 @@ Deprecated
 - Platforms:
     - tc0: Deprecate platform
 
+Known issues
+------------
+
+- RDN2 fails to boot. Refer to the following github issue for more details and
+  the available temporary workaround:
+  https://github.com/ARM-software/SCP-firmware/issues/781
+
 SCP-firmware - version 2.11
 ============================
 
