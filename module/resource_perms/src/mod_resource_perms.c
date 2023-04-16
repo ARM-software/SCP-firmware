@@ -346,8 +346,8 @@ static int mod_res_resource_id_to_index(
 {
     uint32_t agent_idx;
     int message_count;
-    int message_offset;
-    int resource_size;
+    uint32_t message_offset;
+    uint32_t resource_size;
     int status;
 
     /*
@@ -394,9 +394,8 @@ static int mod_res_resource_id_to_index(
             (message_id <= MOD_SCMI_PD_POWER_STATE_NOTIFY)) {
             message_count = (int)MOD_SCMI_PD_POWER_STATE_NOTIFY -
                 (int)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES + 1;
-            message_offset =
-                (int)(message_id - (uint32_t)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES);
-            resource_size = (int)resources_perms_ctx.pd_count;
+            message_offset = (message_id - (uint32_t)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES);
+            resource_size = resources_perms_ctx.pd_count;
             break;
         }
         return FWK_E_PARAM;
@@ -406,9 +405,8 @@ static int mod_res_resource_id_to_index(
             (message_id <= MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL)) {
             message_count = (int)MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL -
                 (int)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES + 1;
-            message_offset =
-                (int)(message_id - (uint32_t)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES);
-            resource_size = (int)resources_perms_ctx.perf_count;
+            message_offset = (message_id - (uint32_t)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES);
+            resource_size = resources_perms_ctx.perf_count;
             break;
         }
         return FWK_E_PARAM;
@@ -418,9 +416,8 @@ static int mod_res_resource_id_to_index(
             (message_id <= MOD_SCMI_CLOCK_CONFIG_SET)) {
             message_count = (int)MOD_SCMI_CLOCK_CONFIG_SET -
                 (int)MOD_SCMI_CLOCK_ATTRIBUTES + 1;
-            message_offset =
-                (int)(message_id - (uint32_t)MOD_SCMI_CLOCK_ATTRIBUTES);
-            resource_size = (int)resources_perms_ctx.clock_count;
+            message_offset = (message_id - (uint32_t)MOD_SCMI_CLOCK_ATTRIBUTES);
+            resource_size = resources_perms_ctx.clock_count;
             break;
         }
         return FWK_E_PARAM;
@@ -430,9 +427,8 @@ static int mod_res_resource_id_to_index(
             (message_id <= MOD_SCMI_SENSOR_READING_GET)) {
             message_count = (int)MOD_SCMI_SENSOR_READING_GET -
                 (int)MOD_SCMI_SENSOR_DESCRIPTION_GET + 1;
-            message_offset =
-                (int)(message_id - (uint32_t)MOD_SCMI_SENSOR_DESCRIPTION_GET);
-            resource_size = (int)resources_perms_ctx.sensor_count;
+            message_offset = (message_id - (uint32_t)MOD_SCMI_SENSOR_DESCRIPTION_GET);
+            resource_size = resources_perms_ctx.sensor_count;
             break;
         }
         return FWK_E_PARAM;
@@ -443,9 +439,8 @@ static int mod_res_resource_id_to_index(
             (message_id <= MOD_SCMI_RESET_NOTIFY)) {
             message_count = (int)MOD_SCMI_RESET_NOTIFY -
                 (int)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES + 1;
-            message_offset =
-                (int)(message_id - (uint32_t)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES);
-            resource_size = (int)resources_perms_ctx.reset_domain_count;
+            message_offset = (message_id - (uint32_t)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES);
+            resource_size = (uint32_t)resources_perms_ctx.reset_domain_count;
             break;
         }
         return FWK_E_PARAM;
@@ -456,9 +451,8 @@ static int mod_res_resource_id_to_index(
             (message_id <= MOD_SCMI_VOLTD_LEVEL_GET)) {
             message_count = (int)MOD_SCMI_VOLTD_LEVEL_GET -
                 (int)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES + 1;
-            message_offset =
-                (int)(message_id - (uint32_t)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES);
-            resource_size = (int)resources_perms_ctx.voltd_count;
+            message_offset = (message_id - (uint32_t)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES);
+            resource_size = (uint32_t)resources_perms_ctx.voltd_count;
             break;
         }
         return FWK_E_PARAM;
@@ -474,7 +468,7 @@ static int mod_res_resource_id_to_index(
     }
 
     resource_size =
-        (int)MOD_RES_PERMS_RESOURCE_ELEMENT((unsigned int)resource_size) + 1;
+        (uint32_t)MOD_RES_PERMS_RESOURCE_ELEMENT(resource_size) + 1;
 
     /*
      * message_count: the number of messages for the agent.
