@@ -179,14 +179,31 @@ The declaration for the *fwk_module_config* structure is given below:
 
 ```
 struct fwk_module_config {
-    const struct fwk_element *(*get_element_table)(fwk_id_t module_id);
     const void *data;
+    struct fwk_module_elements elements;
 };
 ```
 
-The framework uses the *get_element_table* function pointer to access the table
-of elements that the product has provided for the module. If the pointer is
-NULL then the framework assumes that no elements will be provided.
+The declaration for the *fwk_module_elements* structure is given below:
+
+```
+struct fwk_module_elements {
+    enum fwk_module_elements_type type;
+
+    union {
+        const struct fwk_element *(*generator)(fwk_id_t module_id);
+        const struct fwk_element *table;
+    };
+};
+
+```
+
+The framework uses the the static table given in the *table* pointer to
+access the table of elements that the product has provided for the module
+in case the type is *FWK_MODULE_ELEMENTS_TYPE_STATIC*.
+
+The framework uses the *generator* function pointer if the *type* is
+*FWK_MODULE_ELEMENTS_TYPE_DYNAMIC*.
 
 Each of the entries in the element table is a pointer to a *struct fwk_element*
 structure. Elements are made available to the module during the *element
