@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -13,7 +13,7 @@
 #include <fwk_macros.h>
 #include <fwk_module.h>
 
-static const ARM_MPU_Region_t regions[3] = {
+static const ARM_MPU_Region_t regions[4] = {
     {
         /* 0x0000_0000 - 0xFFFF_FFFF */
         .RBAR = ARM_MPU_RBAR(0, 0x00000000),
@@ -52,6 +52,20 @@ static const ARM_MPU_Region_t regions[3] = {
             1,
             0,
             ARM_MPU_REGION_SIZE_256KB),
+    },
+    {
+        /* 0xA600_0000 - 0xA600_7FFF */
+        .RBAR = ARM_MPU_RBAR(3, MCP_NONTRUSTED_RAM_BASE),
+        .RASR = ARM_MPU_RASR(
+            1,
+            ARM_MPU_AP_PRIV,
+            0,
+            /* Shared memory, Strongly Ordered */
+            1,
+            0,
+            0,
+            0,
+            ARM_MPU_REGION_SIZE_32KB),
     },
 };
 

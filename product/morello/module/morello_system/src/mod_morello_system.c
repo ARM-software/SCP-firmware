@@ -10,6 +10,7 @@
 
 #include "config_clock.h"
 #include "morello_core.h"
+#include "morello_mcp_scp.h"
 #include "morello_pik_cpu.h"
 #include "morello_pik_debug.h"
 #include "morello_pik_scp.h"
@@ -634,6 +635,12 @@ static int morello_system_process_notification(
          * first time only.
          */
         if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
+            /*
+             * Write a handshake pattern to MCP2SCP Secure MHU RAM to let MCP
+             * know that it can continue the boot.
+             */
+            *(FWK_W uint32_t *)SCP_MCP_SHARED_SECURE_RAM =
+                MORELLO_SCP_MCP_HANDSHAKE_PATTERN;
             status = morello_system_init_primary_core();
             if (status != FWK_SUCCESS)
                 return status;

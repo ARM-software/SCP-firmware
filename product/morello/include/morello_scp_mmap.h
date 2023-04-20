@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -166,6 +166,8 @@
 #define SCP_NONTRUSTED_RAM_BASE (SCP_SYS1_BASE + 0x06000000)
 #define SCP_SSC_BASE (SCP_SYS1_BASE + 0x2A420000)
 #define SCP_REFCLK_CNTCONTROL_BASE (SCP_SYS1_BASE + 0x2A430000)
+/* SCP MCP SCMI payload area at 1KB offset from base */
+#define SCP_MCP_NS_MAILBOX_SRAM (SCP_NONTRUSTED_RAM_BASE + 0x400)
 
 /* Base address of AP-SCP mailbox for non-secure access */
 #define SCP_AP_BASE_NS_MAILBOX_SRAM (SCP_NONTRUSTED_RAM_BASE)
