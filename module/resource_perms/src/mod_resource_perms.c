@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -238,8 +238,8 @@ static int mod_res_message_id_to_index(
         }
         if ((message_id >= MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_PD_POWER_STATE_NOTIFY)) {
-            *message_idx = (int32_t)(
-                message_id - (uint32_t)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES);
+            *message_idx =
+                (int32_t)(message_id - (uint32_t)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES);
         }
         return FWK_SUCCESS;
 
@@ -260,8 +260,8 @@ static int mod_res_message_id_to_index(
         }
         if ((message_id >= MOD_SCMI_PERF_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL)) {
-            *message_idx = (int32_t)(
-                message_id - (uint32_t)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES);
+            *message_idx =
+                (int32_t)(message_id - (uint32_t)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES);
         }
         return FWK_SUCCESS;
 
@@ -282,8 +282,8 @@ static int mod_res_message_id_to_index(
         }
         if ((message_id >= MOD_SCMI_SENSOR_DESCRIPTION_GET) &&
             (message_id <= MOD_SCMI_SENSOR_READING_GET)) {
-            *message_idx = (int32_t)(
-                message_id - (uint32_t)MOD_SCMI_SENSOR_DESCRIPTION_GET);
+            *message_idx =
+                (int32_t)(message_id - (uint32_t)MOD_SCMI_SENSOR_DESCRIPTION_GET);
         }
         return FWK_SUCCESS;
 
@@ -293,8 +293,8 @@ static int mod_res_message_id_to_index(
         }
         if ((message_id >= MOD_SCMI_RESET_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_RESET_NOTIFY)) {
-            *message_idx = (int32_t)(
-                message_id - (uint32_t)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES);
+            *message_idx =
+                (int32_t)(message_id - (uint32_t)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES);
         }
         return FWK_SUCCESS;
 
@@ -304,8 +304,8 @@ static int mod_res_message_id_to_index(
         }
         if ((message_id >= MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_VOLTD_LEVEL_GET)) {
-            *message_idx = (int32_t)(
-                message_id - (uint32_t)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES);
+            *message_idx =
+                (int32_t)(message_id - (uint32_t)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES);
         }
         return FWK_SUCCESS;
 
@@ -394,7 +394,8 @@ static int mod_res_resource_id_to_index(
             (message_id <= MOD_SCMI_PD_POWER_STATE_NOTIFY)) {
             message_count = (int)MOD_SCMI_PD_POWER_STATE_NOTIFY -
                 (int)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES + 1;
-            message_offset = (message_id - (uint32_t)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES);
+            message_offset =
+                (message_id - (uint32_t)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES);
             resource_size = resources_perms_ctx.pd_count;
             break;
         }
@@ -405,7 +406,8 @@ static int mod_res_resource_id_to_index(
             (message_id <= MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL)) {
             message_count = (int)MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL -
                 (int)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES + 1;
-            message_offset = (message_id - (uint32_t)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES);
+            message_offset =
+                (message_id - (uint32_t)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES);
             resource_size = resources_perms_ctx.perf_count;
             break;
         }
@@ -427,7 +429,8 @@ static int mod_res_resource_id_to_index(
             (message_id <= MOD_SCMI_SENSOR_READING_GET)) {
             message_count = (int)MOD_SCMI_SENSOR_READING_GET -
                 (int)MOD_SCMI_SENSOR_DESCRIPTION_GET + 1;
-            message_offset = (message_id - (uint32_t)MOD_SCMI_SENSOR_DESCRIPTION_GET);
+            message_offset =
+                (message_id - (uint32_t)MOD_SCMI_SENSOR_DESCRIPTION_GET);
             resource_size = resources_perms_ctx.sensor_count;
             break;
         }
@@ -439,7 +442,8 @@ static int mod_res_resource_id_to_index(
             (message_id <= MOD_SCMI_RESET_NOTIFY)) {
             message_count = (int)MOD_SCMI_RESET_NOTIFY -
                 (int)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES + 1;
-            message_offset = (message_id - (uint32_t)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES);
+            message_offset =
+                (message_id - (uint32_t)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES);
             resource_size = (uint32_t)resources_perms_ctx.reset_domain_count;
             break;
         }
@@ -451,7 +455,8 @@ static int mod_res_resource_id_to_index(
             (message_id <= MOD_SCMI_VOLTD_LEVEL_GET)) {
             message_count = (int)MOD_SCMI_VOLTD_LEVEL_GET -
                 (int)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES + 1;
-            message_offset = (message_id - (uint32_t)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES);
+            message_offset =
+                (message_id - (uint32_t)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES);
             resource_size = (uint32_t)resources_perms_ctx.voltd_count;
             break;
         }
@@ -467,8 +472,7 @@ static int mod_res_resource_id_to_index(
         return FWK_E_PARAM;
     }
 
-    resource_size =
-        (uint32_t)MOD_RES_PERMS_RESOURCE_ELEMENT(resource_size) + 1;
+    resource_size = (uint32_t)MOD_RES_PERMS_RESOURCE_ELEMENT(resource_size) + 1;
 
     /*
      * message_count: the number of messages for the agent.
