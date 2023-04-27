@@ -32,6 +32,30 @@ __product__ directory and must adhere to the following hierarchy:
             └── <firmware_2>
                 └── <firmware 2 level configuration files...>
 
+Difference products that share similar files can be grouped into
+product_group. Shared files are located under __common__ directory, while
+all products' specific code are kept under product directory. The following
+hierarchy shows the grouped products under __product__ directory:
+
+    <root>
+     └─ product
+            └──<product_group>
+                ├── <common>
+                │   │   ├── include
+                │   │   │   └── <common header files for products...>
+                │   │   └── src
+                │   │       └── <common source files for products...>
+                └── <product>
+                    ├── product.mk
+                    │   ├── include
+                    │   │   └── <product level header files...>
+                    │   └── src
+                    │       └── <product level source files...>
+                    ├── <firmware_1>
+                    │   └── <firmware 1 level configuration files...>
+                    └── <firmware_2>
+                        └── <firmware 2 level configuration files...>
+
 __Note:__ The names of the \<product\> and \<firmware\> directories must not
 contain spaces.
 

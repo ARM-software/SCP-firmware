@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -28,11 +28,14 @@ class Build:
     toolchain: Parameter
     build_type: Parameter
     log_level: Parameter
+    product_group: str
     variant: Parameter = None
 
     def tag(self):
+        name = self.product_group + '/' + self.name if self.product_group \
+            else self.name
         build_str = 'Product: {} - Toolchain: {} - Mode: {}'.format(
-                                                        self.name,
+                                                        name,
                                                         self.toolchain.name,
                                                         self.build_type.name)
         if self.variant:
@@ -42,7 +45,9 @@ class Build:
         return build_str
 
     def file_name(self):
-        filename = self.name + "_" + self.toolchain.name + "_" + \
+        filename = self.product_group + '_' + self.name if self.product_group \
+            else self.name
+        filename += "_" + self.toolchain.name + "_" + \
             self.build_type.name[0]
         if self.log_level:
             filename += "_" + self.log_level.name
@@ -53,9 +58,12 @@ class Build:
 
     def command(self):
         cmd = 'make -f Makefile.cmake '
-        cmd += 'PRODUCT={} TOOLCHAIN={} MODE={} '.format(self.name,
-                                                         self.toolchain.name,
-                                                         self.build_type.name)
+        name = self.product_group + '/' + self.name if self.product_group \
+            else self.name
+        cmd += 'PRODUCT={} TOOLCHAIN={} MODE={} '.format(
+                                                   name,
+                                                   self.toolchain.name,
+                                                   self.build_type.name)
         if self.log_level:
             cmd += 'LOG_LEVEL={} '.format(self.log_level.name)
         if self.variant:
@@ -91,6 +99,7 @@ class Product:
         ])
     variants: List[Parameter] = field(default_factory=lambda: [None])
     log_level: Parameter = None
+    product_group: str = field(default=None)
 
     @property
     def builds(self) -> List[Build]:
@@ -103,5 +112,6 @@ class Product:
                         toolchain,
                         build_type,
                         self.log_level,
+                        self.product_group,
                         variant))
         return builds

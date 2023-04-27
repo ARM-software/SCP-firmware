@@ -47,12 +47,13 @@ products = [
     Product('sgm775'),
     Product('sgm776'),
     Product('synquacer'),
-    Product('tc1'),
+    Product('tc1', product_group='totalcompute'),
     Product('rcar', toolchains=[Parameter('GNU')]),
     Product('rdn2', variants=[
         Parameter('0'), Parameter('1'), Parameter('2'), Parameter('3')]),
     Product('rdfremont'),
-    Product('tc2', variants=[Parameter('0'), Parameter('1')]),
+    Product('tc2', variants=[
+        Parameter('0'), Parameter('1')], product_group='totalcompute')
 ]
 
 
