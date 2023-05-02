@@ -519,8 +519,6 @@ static int platform_system_start(fwk_id_t id)
      */
     platform_system_ctx.apremap_cmn_atrans_api->enable();
 
-    FWK_LOG_INFO("[PLATFORM SYSTEM] Requesting SYSTOP initialization...");
-
     /*
      * Subscribe to these SCMI channels in order to know when they have all
      * initialized.
@@ -538,15 +536,6 @@ static int platform_system_start(fwk_id_t id)
         }
     }
 
-    status = platform_system_ctx.mod_pd_restricted_api->set_state(
-        FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, 0),
-        MOD_PD_SET_STATE_NO_RESP,
-        MOD_PD_COMPOSITE_STATE(
-            MOD_PD_LEVEL_2,
-            0,
-            MOD_PD_STATE_ON,
-            MOD_PD_STATE_OFF,
-            MOD_PD_STATE_OFF));
     return status;
 }
 
