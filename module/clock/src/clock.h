@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -9,6 +9,9 @@
 #define CLOCK_H
 
 #include <mod_clock.h>
+#ifdef FWK_MODULE_ID_POWER_DOMAIN
+#    include <mod_power_domain.h>
+#endif
 
 #include <fwk_event.h>
 #include <fwk_id.h>
@@ -70,6 +73,11 @@ struct clock_dev_ctx {
 
     /* Reference count */
     uint32_t ref_count;
+#endif
+
+#ifdef FWK_MODULE_ID_POWER_DOMAIN
+    /* Power domain module restricted API pointer */
+    struct mod_pd_restricted_api *mod_pd_restricted_api;
 #endif
 };
 

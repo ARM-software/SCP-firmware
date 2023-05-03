@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -199,6 +199,11 @@ struct mod_clock_dev_config {
      *      to the tree of clocks and it will be left as a single node.
      */
     fwk_optional_id_t parent_id;
+
+    /*!
+     * Flag to allow clock to be set to initial rate during initialization.
+     */
+    bool default_on;
 };
 
 /*!
