@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -17,6 +17,7 @@
 #include <fwk_list.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
+#include <fwk_module_idx.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
 
@@ -401,6 +402,7 @@ static int clock_dev_init(fwk_id_t element_id, unsigned int sub_element_count,
 static int clock_bind(fwk_id_t id, unsigned int round)
 {
     struct clock_dev_ctx *ctx;
+    int status;
 
     if (round == 1) {
         return FWK_SUCCESS;
@@ -413,17 +415,36 @@ static int clock_bind(fwk_id_t id, unsigned int round)
 
     ctx = &mod_clock_ctx.dev_ctx_table[fwk_id_get_element_idx(id)];
 
-    return fwk_module_bind(ctx->config->driver_id,
-                           ctx->config->api_id,
-                           &ctx->api);
+    status =
+        fwk_module_bind(ctx->config->driver_id, ctx->config->api_id, &ctx->api);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+#ifdef FWK_MODULE_ID_POWER_DOMAIN
+    if (ctx->config->default_on) {
+        status = fwk_module_bind(
+            FWK_ID_MODULE(FWK_MODULE_IDX_POWER_DOMAIN),
+            FWK_ID_API(FWK_MODULE_IDX_POWER_DOMAIN, MOD_PD_API_IDX_RESTRICTED),
+            &ctx->mod_pd_restricted_api);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+    }
+#endif
+
+    return FWK_SUCCESS;
 }
 
 static int clock_start(fwk_id_t id)
 {
-#ifdef BUILD_HAS_NOTIFICATION
+#if defined(BUILD_HAS_NOTIFICATION) || defined(FWK_MODULE_ID_POWER_DOMAIN)
     int status;
 #endif
     struct clock_dev_ctx *ctx;
+#ifdef FWK_MODULE_ID_POWER_DOMAIN
+    unsigned int pd_state;
+#endif
 
     /* Clock tree is initialized */
     if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
@@ -439,6 +460,24 @@ static int clock_start(fwk_id_t id)
     if (fwk_id_is_type(ctx->config->pd_source_id, FWK_ID_TYPE_NONE)) {
         return FWK_SUCCESS;
     }
+
+#ifdef FWK_MODULE_ID_POWER_DOMAIN
+    if (ctx->config->default_on && ctx->api->process_power_transition != NULL) {
+        status = ctx->mod_pd_restricted_api->get_state(
+            ctx->config->pd_source_id, &pd_state);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+
+        if (pd_state == MOD_PD_STATE_ON) {
+            status = ctx->api->process_power_transition(
+                ctx->config->driver_id, MOD_PD_STATE_ON);
+            if (status != FWK_SUCCESS) {
+                return status;
+            }
+        }
+    }
+#endif
 
 #ifdef BUILD_HAS_NOTIFICATION
     if ((ctx->api->process_power_transition != NULL) &&
