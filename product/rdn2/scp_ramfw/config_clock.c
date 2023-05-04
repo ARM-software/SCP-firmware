@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -27,6 +27,7 @@
                 FWK_MODULE_IDX_CSS_CLOCK, CLOCK_CSS_IDX_CPU_GROUP##n), \
             .api_id = FWK_ID_API_INIT( \
                 FWK_MODULE_IDX_CSS_CLOCK, MOD_CSS_CLOCK_API_TYPE_CLOCK), \
+            .default_on = true, \
         }), \
     }
 
