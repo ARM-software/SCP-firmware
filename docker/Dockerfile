@@ -68,7 +68,7 @@ RUN apt-get update && \
         'deb http://apt.llvm.org/focal/   llvm-toolchain-focal-13  main' && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-        clang-tidy-13 clang-13 llvm-13 libclang-13-dev llvm-13-dev
+        clang-tidy-13 clang-13 llvm-13 libclang-13-dev llvm-13-dev lld-13
 
 COPY rootfs/usr/local/bin/prepare_llvm /usr/local/bin/prepare_llvm
 RUN  chmod 755 "/usr/local/bin/prepare_llvm"
