@@ -92,8 +92,8 @@
 #define SCP_AP_CONTEXT_SIZE (64)
 
 /* SDS Memory Region */
-#define SCP_SDS_MEM_BASE (SCP_AP_SHARED_SECURE_BASE)
-#define SCP_SDS_MEM_SIZE (3520)
+#define SCP_SDS_MEM_BASE (SCP_AP_SHARED_SECURE_BASE + 1760)
+#define SCP_SDS_MEM_SIZE (1760)
 
 /* SCMI Secure Payload Areas */
 #define SCP_SCMI_PAYLOAD_SIZE       (128)
