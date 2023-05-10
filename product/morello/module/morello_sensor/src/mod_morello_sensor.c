@@ -29,6 +29,7 @@
 static struct morello_sensor_ctx sensor_ctx;
 
 /* Morello Sensor names */
+#if FWK_LOG_LEVEL < FWK_LOG_LEVEL_DISABLED
 static const char *const sensor_type_name[MOD_MORELLO_VOLT_SENSOR_COUNT] = {
     [MOD_MORELLO_TEMP_SENSOR_IDX_CLUSTER0] = "T-CLUS0",
     [MOD_MORELLO_TEMP_SENSOR_IDX_CLUSTER1] = "T-CLUS1",
@@ -38,6 +39,7 @@ static const char *const sensor_type_name[MOD_MORELLO_VOLT_SENSOR_COUNT] = {
     [MOD_MORELLO_VOLT_SENSOR_IDX_CLUS1CORE0] = "V-CLUS1CORE0",
     [MOD_MORELLO_VOLT_SENSOR_IDX_CLUS1CORE1] = "V-CLUS1CORE1",
 };
+#endif
 
 static void morello_sensor_timer_callback(uintptr_t unused)
 {
@@ -63,7 +65,6 @@ static void morello_sensor_timer_callback(uintptr_t unused)
                     "%s temperature (%d) reached shutdown threshold!",
                     sensor_type_name[count],
                     (int)value);
-
                 status = sensor_ctx.scp2pcc_api->send(
                     MOD_SCP2PCC_SEND_SHUTDOWN, NULL, 0, NULL, NULL);
                 if (status != FWK_SUCCESS) {
