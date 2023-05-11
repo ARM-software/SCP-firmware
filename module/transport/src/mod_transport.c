@@ -971,11 +971,15 @@ static int transport_start(fwk_id_t id)
     if (channel_ctx->config->transport_type ==
         MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_OUT_BAND) {
 #ifdef BUILD_HAS_MOD_POWER_DOMAIN
-        /* Register for power domain state transition notifications */
-        return fwk_notification_subscribe(
-            mod_pd_notification_id_power_state_transition,
-            channel_ctx->config->pd_source_id,
-            id);
+        if (fwk_id_type_is_valid(channel_ctx->config->pd_source_id)) {
+            /* Register for power domain state transition notifications */
+            return fwk_notification_subscribe(
+                mod_pd_notification_id_power_state_transition,
+                channel_ctx->config->pd_source_id,
+                id);
+        } else {
+            return transport_mailbox_init(channel_ctx);
+        }
 #else
         /*
          * Initialize the mailbox immediately, if power domain module
