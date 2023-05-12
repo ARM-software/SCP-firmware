@@ -127,6 +127,18 @@ bool perf_fch_prot_msg_attributes_has_fastchannels(
         (parameters->message_id >= MOD_SCMI_PERF_LIMITS_SET));
 }
 
+static inline int respond_to_scmi(
+    fwk_id_t service_id,
+    struct scmi_perf_describe_fc_p2a *return_values)
+{
+    return perf_fch_ctx.perf_ctx->scmi_api->respond(
+        service_id,
+        return_values,
+        (return_values->status == SCMI_SUCCESS) ?
+            sizeof(*return_values) :
+            sizeof(return_values->status));
+}
+
 int perf_fch_describe_fast_channels(
     fwk_id_t service_id,
     const uint32_t *payload)
@@ -134,9 +146,9 @@ int perf_fch_describe_fast_channels(
     const struct mod_scmi_perf_domain_config *domain;
     const struct scmi_perf_describe_fc_a2p *parameters;
     struct scmi_perf_describe_fc_p2a return_values = {
-        .status = (int32_t)SCMI_GENERIC_ERROR,
+        .status = (int32_t)SCMI_SUCCESS,
     };
-    uint32_t chan_size, chan_index;
+    uint32_t chan_size = 0, chan_index = 0;
     enum scmi_perf_command_id message_id;
 
     parameters = (const struct scmi_perf_describe_fc_a2p *)payload;
@@ -144,7 +156,7 @@ int perf_fch_describe_fast_channels(
     if (parameters->domain_id >= perf_fch_ctx.perf_ctx->domain_count) {
         return_values.status = (int32_t)SCMI_NOT_FOUND;
 
-        goto exit;
+        return respond_to_scmi(service_id, &return_values);
     }
 
     domain = &(*perf_fch_ctx.perf_ctx->config->domains)[parameters->domain_id];
@@ -152,13 +164,13 @@ int perf_fch_describe_fast_channels(
     if (domain->fast_channels_addr_scp == NULL) {
         return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
 
-        goto exit;
+        return respond_to_scmi(service_id, &return_values);
     }
 
     if (parameters->message_id >= MOD_SCMI_PERF_COMMAND_COUNT) {
         return_values.status = (int32_t)SCMI_NOT_FOUND;
 
-        goto exit;
+        return respond_to_scmi(service_id, &return_values);
     }
 
     message_id = (enum scmi_perf_command_id)parameters->message_id;
@@ -190,14 +202,21 @@ int perf_fch_describe_fast_channels(
 
     default:
         return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
-        goto exit;
+        break;
     }
+
+    /* Check for failed cases above */
+    if (return_values.status != SCMI_SUCCESS) {
+        return respond_to_scmi(service_id, &return_values);
+    }
+
     if (domain->fast_channels_addr_ap == NULL ||
         domain->fast_channels_addr_ap[chan_index] == 0x0) {
         return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
-        goto exit;
+
+        return respond_to_scmi(service_id, &return_values);
     }
-    return_values.status = (int32_t)SCMI_SUCCESS;
+
     return_values.attributes = 0; /* Doorbell not supported */
     return_values.rate_limit = perf_fch_ctx.fast_channels_rate_limit;
     return_values.chan_addr_low =
@@ -206,12 +225,7 @@ int perf_fch_describe_fast_channels(
         (uint32_t)(domain->fast_channels_addr_ap[chan_index] >> 32);
     return_values.chan_size = chan_size;
 
-exit:
-    return perf_fch_ctx.perf_ctx->scmi_api->respond(
-        service_id,
-        &return_values,
-        (return_values.status == SCMI_SUCCESS) ? sizeof(return_values) :
-                                                 sizeof(return_values.status));
+    return respond_to_scmi(service_id, &return_values);
 }
 
 #ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
