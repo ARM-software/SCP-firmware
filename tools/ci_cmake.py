@@ -171,6 +171,7 @@ def main(ignore_errors: bool, skip_container: bool, log_level: str,
                 return 1
 
         except DockerException:
+            banner("Script running out of docker")
             pass
     else:
         banner("Skipping spawning container")
