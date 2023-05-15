@@ -187,8 +187,17 @@ struct system_shutdown_ctx {
     /* Type of system shutdown */
     enum mod_pd_system_shutdown system_shutdown;
 
-    /* Cookie of the event to respond to */
+    /* Flag indicating if a response is requested or not */
+    bool is_response_requested;
+
+    /* Flag indicating if the response is delayed or not */
+    bool is_delayed_response;
+
+    /* Cookie of the event to respond to in case it is delayed */
     uint32_t cookie;
+
+    /* Pointer to the event to respond in case it is not delayed */
+    struct fwk_event *response_event;
 };
 
 struct mod_pd_mod_ctx {
@@ -286,9 +295,9 @@ static struct mod_pd_mod_ctx mod_pd_ctx;
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
 static const char driver_error_msg[] = "[PD] Driver error %s (%d) in %s @%d";
 
-static const char * const default_state_name_table[] = {
-    "OFF", "ON", "SLEEP", "3", "4", "5", "6", "7",
-    "8", "9", "10", "11", "12", "13", "14", "15"
+static const char *const default_state_name_table[] = {
+    "OFF", "ON", "SLEEP", "3",  "4",  "5",  "6",  "7",
+    "8",   "9",  "10",    "11", "12", "13", "14", "15"
 };
 #endif
 
@@ -319,20 +328,24 @@ static unsigned int normalize_state(unsigned int state)
     }
 }
 
-static bool is_deeper_state(unsigned int state,
-                            unsigned int state_to_compare_to)
+static bool is_deeper_state(
+    unsigned int state,
+    unsigned int state_to_compare_to)
 {
     return normalize_state(state) > normalize_state(state_to_compare_to);
 }
 
-static bool is_shallower_state(unsigned int state,
-                               unsigned int state_to_compare_to)
+static bool is_shallower_state(
+    unsigned int state,
+    unsigned int state_to_compare_to)
 {
     return normalize_state(state) < normalize_state(state_to_compare_to);
 }
 
-static bool is_allowed_by_child(const struct pd_ctx *child,
-    unsigned int parent_state, unsigned int child_state)
+static bool is_allowed_by_child(
+    const struct pd_ctx *child,
+    unsigned int parent_state,
+    unsigned int child_state)
 {
     if (parent_state >= child->allowed_state_mask_table_size) {
         return false;
@@ -436,8 +449,9 @@ static int get_highest_level_from_composite_state(
     return (int)level;
 }
 
-static bool is_valid_composite_state(struct pd_ctx *target_pd,
-                                     uint32_t composite_state)
+static bool is_valid_composite_state(
+    struct pd_ctx *target_pd,
+    uint32_t composite_state)
 {
     unsigned int level, highest_level;
     unsigned int state, child_state = (unsigned int)MOD_PD_STATE_OFF;
@@ -503,7 +517,8 @@ error:
  * \retval true The power state transition must propagate upwards.
  * \retval false The power state transition must propagate downwards.
  */
-static bool is_upwards_transition_propagation(const struct pd_ctx *lowest_pd,
+static bool is_upwards_transition_propagation(
+    const struct pd_ctx *lowest_pd,
     uint32_t composite_state)
 {
     int highest_level, level;
@@ -565,7 +580,8 @@ static int connect_pd_tree(void)
  *      for.
  * \param state Power state.
  */
-static bool is_allowed_by_parent_and_children(struct pd_ctx *pd,
+static bool is_allowed_by_parent_and_children(
+    struct pd_ctx *pd,
     unsigned int state)
 {
     struct pd_ctx *parent, *child = NULL;
@@ -600,13 +616,15 @@ static bool is_allowed_by_parent_and_children(struct pd_ctx *pd,
  * \retval false A power state pre-transition notification doesn't have to be
  *      sent.
  */
-static bool check_power_state_pre_transition_notification(struct pd_ctx *pd,
+static bool check_power_state_pre_transition_notification(
+    struct pd_ctx *pd,
     unsigned int state)
 {
     if ((state == pd->power_state_pre_transition_notification_ctx.state) &&
         pd->power_state_pre_transition_notification_ctx.valid) {
-        return (pd->power_state_pre_transition_notification_ctx.response_status
-                != FWK_SUCCESS);
+        return (
+            pd->power_state_pre_transition_notification_ctx.response_status !=
+            FWK_SUCCESS);
     }
 
     return true;
@@ -653,7 +671,7 @@ static bool initiate_power_state_pre_transition_notification(struct pd_ctx *pd)
     }
 
     params = (struct mod_pd_power_state_pre_transition_notification_params *)
-        notification_event.params;
+                 notification_event.params;
     params->current_state = pd->current_state;
     params->target_state = state;
 
@@ -670,8 +688,8 @@ static bool initiate_power_state_pre_transition_notification(struct pd_ctx *pd)
         FWK_SUCCESS;
     pd->power_state_pre_transition_notification_ctx.valid = true;
 
-    return (pd->power_state_pre_transition_notification_ctx.pending_responses
-            != 0);
+    return (
+        pd->power_state_pre_transition_notification_ctx.pending_responses != 0);
 #else
     return false;
 #endif
@@ -992,10 +1010,10 @@ static int complete_system_suspend(struct pd_ctx *target_pd)
      */
     composite_state |= (--level) << MOD_PD_CS_LEVEL_SHIFT;
 
-    event = (struct fwk_event) { 0 };
+    event = (struct fwk_event){ 0 };
     event_params->composite_state = composite_state;
 
-    resp_event = (struct fwk_event) { 0 };
+    resp_event = (struct fwk_event){ 0 };
 
     process_set_state_request(target_pd, &event, &resp_event);
 
@@ -1056,8 +1074,9 @@ static void process_get_state_request(struct pd_ctx *pd, unsigned int *state)
  * pd Description of the target of the 'reset' request
  * resp_params Parameters of the 'reset' request response to be filled in
  */
-static void process_reset_request(struct pd_ctx *pd,
-                                  struct pd_response *resp_params)
+static void process_reset_request(
+    struct pd_ctx *pd,
+    struct pd_response *resp_params)
 {
     int status;
     struct pd_ctx *child = NULL;
@@ -1159,7 +1178,8 @@ static void process_power_state_transition_report_shallower_state(
  * \param pd Description of the target of the power state transition report
  * \param report_params Parameters of the power state transition report
  */
-static void process_power_state_transition_report(struct pd_ctx *pd,
+static void process_power_state_transition_report(
+    struct pd_ctx *pd,
     const struct pd_power_state_transition_report *report_params)
 {
     unsigned int new_state = report_params->state;
@@ -1185,7 +1205,7 @@ static void process_power_state_transition_report(struct pd_ctx *pd,
     if (pd->power_state_transition_notification_ctx.pending_responses == 0 &&
         pd->config->disable_state_transition_notifications == false) {
         params = (struct mod_pd_power_state_transition_notification_params *)
-            notification_event.params;
+                     notification_event.params;
         params->state = new_state;
         pd->power_state_transition_notification_ctx.state = new_state;
         status = fwk_notification_notify(
@@ -1222,15 +1242,15 @@ static void process_power_state_transition_report(struct pd_ctx *pd,
      * the state change notifications responses have arrived.
      */
     if (pd->power_state_transition_notification_ctx.pending_responses > 0) {
-         /*
-          * Save previous state which will be used once all the notifications
-          * have arrived to continue for deeper or shallower state for the next
-          * power domain.
-          */
-         pd->power_state_transition_notification_ctx.previous_state =
+        /*
+         * Save previous state which will be used once all the notifications
+         * have arrived to continue for deeper or shallower state for the next
+         * power domain.
+         */
+        pd->power_state_transition_notification_ctx.previous_state =
             previous_state;
 
-         return;
+        return;
     }
 #endif
 
@@ -1290,7 +1310,7 @@ static void process_system_suspend_request(
     if (last_core_pd == NULL) {
         status = complete_system_suspend(
             (last_cluster_pd != NULL) ? last_cluster_pd :
-            mod_pd_ctx.system_pd_ctx);
+                                        mod_pd_ctx.system_pd_ctx);
     } else {
         status = last_core_pd->driver_api->prepare_core_for_system_suspend(
             last_core_pd->driver_id);
@@ -1308,16 +1328,38 @@ static void process_system_suspend_request(
     resp_params->status = status;
 }
 
-void perform_shutdown(
-    enum mod_pd_system_shutdown system_shutdown,
-    struct fwk_event *resp)
+int perform_shutdown_send_response(struct system_shutdown_ctx *ctx)
+{
+    int status;
+    struct fwk_event delayed_resp;
+    struct fwk_event *response_event;
+    struct pd_response *resp_params;
+
+    if (ctx->is_delayed_response) {
+        status = fwk_get_delayed_response(
+            fwk_module_id_power_domain, ctx->cookie, &delayed_resp);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+
+        delayed_resp.source_id = fwk_module_id_power_domain;
+        response_event = &delayed_resp;
+    } else {
+        response_event = ctx->response_event;
+    }
+
+    resp_params = (struct pd_response *)response_event->params;
+    resp_params->status = FWK_E_PANIC;
+    status = fwk_put_event(response_event);
+    return status;
+}
+
+void perform_shutdown(enum mod_pd_system_shutdown system_shutdown)
 {
     struct pd_ctx *pd;
     unsigned int pd_idx;
     fwk_id_t pd_id;
     int status;
-    struct fwk_event delayed_resp;
-    struct pd_response *resp_params;
     struct mod_pd_driver_api *api;
 
     for (pd_idx = 0; pd_idx < mod_pd_ctx.pd_count; pd_idx++) {
@@ -1368,27 +1410,12 @@ void perform_shutdown(
      * the system fail to complete the shutdown process, the agent may want to
      * be notified.
      */
-    if (resp == NULL) {
-        status = fwk_get_delayed_response(
-            fwk_module_id_power_domain,
-            mod_pd_ctx.system_shutdown.cookie,
-            &delayed_resp);
+    if (mod_pd_ctx.system_shutdown.is_response_requested) {
+        status = perform_shutdown_send_response(&mod_pd_ctx.system_shutdown);
         fwk_assert(status == FWK_SUCCESS);
-
-        delayed_resp.source_id = fwk_module_id_power_domain;
-
-        resp_params = (struct pd_response *)delayed_resp.params;
-        resp_params->status = FWK_E_PANIC;
-
-        status = fwk_put_event(&delayed_resp);
-    } else {
-        resp_params = (struct pd_response *)resp->params;
-        resp_params->status = FWK_E_PANIC;
-
-        status = fwk_put_event(resp);
     }
 
-    fwk_assert(status == FWK_SUCCESS);
+    mod_pd_ctx.system_shutdown.ongoing = false;
 
     return;
 }
@@ -1418,11 +1445,9 @@ static bool check_and_notify_system_shutdown(
     struct mod_pd_pre_shutdown_notif_params *params;
     int status;
 
-    struct fwk_event notification = {
-        .id = mod_pd_notification_id_pre_shutdown,
-        .source_id = fwk_module_id_power_domain,
-        .response_requested = true
-    };
+    struct fwk_event notification = { .id = mod_pd_notification_id_pre_shutdown,
+                                      .source_id = fwk_module_id_power_domain,
+                                      .response_requested = true };
 
     params = (struct mod_pd_pre_shutdown_notif_params *)notification.params;
     params->system_shutdown = system_shutdown;
@@ -1465,17 +1490,27 @@ static void process_system_shutdown_request(
             mod_pd_ctx.system_shutdown.ongoing = true;
             mod_pd_ctx.system_shutdown.system_shutdown = system_shutdown;
 
-            mod_pd_ctx.system_shutdown.cookie = event->cookie;
-            resp->is_delayed_response = true;
+            if (event->response_requested) {
+                mod_pd_ctx.system_shutdown.is_delayed_response = true;
+                mod_pd_ctx.system_shutdown.cookie = event->cookie;
+                resp->is_delayed_response = true;
+            }
 
             /*
              * The shutdown procedure will be completed once all the
              * notification responses have been received.
              */
             return;
+        } else {
+            if (event->response_requested) {
+                mod_pd_ctx.system_shutdown.is_delayed_response = false;
+                mod_pd_ctx.system_shutdown.response_event = resp;
+            }
         }
 
-        perform_shutdown(system_shutdown, resp);
+        mod_pd_ctx.system_shutdown.is_response_requested =
+            event->response_requested;
+        perform_shutdown(system_shutdown);
 
         resp_params->status = FWK_E_PANIC;
     }
@@ -1530,7 +1565,7 @@ static int pd_set_state(fwk_id_t pd_id, bool response_requested, uint32_t state)
     struct pd_ctx *pd;
     struct fwk_event req;
     struct pd_set_state_request *req_params =
-                               (struct pd_set_state_request *)(&req.params);
+        (struct pd_set_state_request *)(&req.params);
 
     pd = &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
 
@@ -1544,9 +1579,9 @@ static int pd_set_state(fwk_id_t pd_id, bool response_requested, uint32_t state)
         }
     }
 
-    req = (struct fwk_event) {
-        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
-                           MOD_PD_PUBLIC_EVENT_IDX_SET_STATE),
+    req = (struct fwk_event){
+        .id = FWK_ID_EVENT(
+            FWK_MODULE_IDX_POWER_DOMAIN, MOD_PD_PUBLIC_EVENT_IDX_SET_STATE),
         .source_id = pd->driver_id,
         .target_id = pd_id,
         .response_requested = response_requested,
@@ -1596,9 +1631,9 @@ static int pd_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
     struct pd_system_shutdown_request *req_params =
         (struct pd_system_shutdown_request *)(&req.params);
 
-    req = (struct fwk_event) {
-        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
-                           PD_EVENT_IDX_SYSTEM_SHUTDOWN),
+    req = (struct fwk_event){
+        .id = FWK_ID_EVENT(
+            FWK_MODULE_IDX_POWER_DOMAIN, PD_EVENT_IDX_SYSTEM_SHUTDOWN),
         .target_id = fwk_module_id_power_domain,
     };
 
@@ -1631,19 +1666,20 @@ static int pd_reset(fwk_id_t pd_id, bool response_requested)
     return fwk_put_event(&req);
 }
 
-static int report_power_state_transition(const struct pd_ctx *pd,
+static int report_power_state_transition(
+    const struct pd_ctx *pd,
     unsigned int state)
 {
     struct fwk_event report;
     struct pd_power_state_transition_report *report_params =
         (struct pd_power_state_transition_report *)(&report.params);
 
-    report = (struct fwk_event){
-        .source_id = pd->driver_id,
-        .target_id = pd->id,
-        .id = FWK_ID_EVENT(FWK_MODULE_IDX_POWER_DOMAIN,
-                           PD_EVENT_IDX_REPORT_POWER_STATE_TRANSITION)
-    };
+    report =
+        (struct fwk_event){ .source_id = pd->driver_id,
+                            .target_id = pd->id,
+                            .id = FWK_ID_EVENT(
+                                FWK_MODULE_IDX_POWER_DOMAIN,
+                                PD_EVENT_IDX_REPORT_POWER_STATE_TRANSITION) };
     report_params->state = state;
 
     return fwk_put_event(&report);
@@ -1652,7 +1688,7 @@ static int report_power_state_transition(const struct pd_ctx *pd,
 static int pd_report_power_state_transition(fwk_id_t pd_id, unsigned int state)
 {
     const struct pd_ctx *pd =
-                        &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
+        &mod_pd_ctx.pd_ctx_table[fwk_id_get_element_idx(pd_id)];
 
     return report_power_state_transition(pd, state);
 }
@@ -1701,8 +1737,7 @@ static const struct mod_pd_driver_input_api pd_driver_input_api = {
 /*
  * Framework handlers
  */
-static int pd_init(fwk_id_t module_id, unsigned int dev_count,
-                   const void *data)
+static int pd_init(fwk_id_t module_id, unsigned int dev_count, const void *data)
 {
     if ((data == NULL) || (dev_count == 0)) {
         return FWK_E_PARAM;
@@ -1723,8 +1758,10 @@ static int pd_init(fwk_id_t module_id, unsigned int dev_count,
     return FWK_SUCCESS;
 }
 
-static int pd_power_domain_init(fwk_id_t pd_id, unsigned int unused,
-                                const void *config)
+static int pd_power_domain_init(
+    fwk_id_t pd_id,
+    unsigned int unused,
+    const void *config)
 {
     const struct mod_power_domain_element_config *pd_config =
         (const struct mod_power_domain_element_config *)config;
@@ -1885,8 +1922,11 @@ static int pd_start(fwk_id_t id)
     return FWK_SUCCESS;
 }
 
-static int pd_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
-                                   fwk_id_t api_id, const void **api)
+static int pd_process_bind_request(
+    fwk_id_t source_id,
+    fwk_id_t target_id,
+    fwk_id_t api_id,
+    const void **api)
 {
     struct pd_ctx *pd;
     unsigned int id_idx;
@@ -1910,12 +1950,11 @@ static int pd_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
             *api = &pd_restricted_api;
             return FWK_SUCCESS;
         }
-        for (id_idx = 0;
-             id_idx < mod_pd_ctx.config->authorized_id_table_size;
+        for (id_idx = 0; id_idx < mod_pd_ctx.config->authorized_id_table_size;
              id_idx++) {
-
-            if (fwk_id_is_equal(source_id,
-                mod_pd_ctx.config->authorized_id_table[id_idx])) {
+            if (fwk_id_is_equal(
+                    source_id,
+                    mod_pd_ctx.config->authorized_id_table[id_idx])) {
                 *api = &pd_restricted_api;
                 return FWK_SUCCESS;
             }
@@ -1940,8 +1979,9 @@ static int pd_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
     return FWK_SUCCESS;
 }
 
-static int pd_process_event(const struct fwk_event *event,
-                            struct fwk_event *resp)
+static int pd_process_event(
+    const struct fwk_event *event,
+    struct fwk_event *resp)
 {
     struct pd_ctx *pd = NULL;
 
@@ -1967,8 +2007,8 @@ static int pd_process_event(const struct fwk_event *event,
     case (unsigned int)PD_EVENT_IDX_REPORT_POWER_STATE_TRANSITION:
         fwk_assert(pd != NULL);
 
-        process_power_state_transition_report(pd,
-            (struct pd_power_state_transition_report *)event->params);
+        process_power_state_transition_report(
+            pd, (struct pd_power_state_transition_report *)event->params);
 
         return FWK_SUCCESS;
 
@@ -2000,7 +2040,7 @@ static int process_pre_shutdown_notification_response(void)
 
         if (mod_pd_ctx.system_shutdown.notifications_count == 0) {
             /* All notifications for system shutdown have been received */
-            perform_shutdown(mod_pd_ctx.system_shutdown.system_shutdown, NULL);
+            perform_shutdown(mod_pd_ctx.system_shutdown.system_shutdown);
         }
         return FWK_SUCCESS;
     } else {
@@ -2012,8 +2052,8 @@ static int process_power_state_pre_transition_notification_response(
     struct pd_ctx *pd,
     struct mod_pd_power_state_pre_transition_notification_resp_params *params)
 {
-    if (pd->power_state_pre_transition_notification_ctx.pending_responses
-        == 0) {
+    if (pd->power_state_pre_transition_notification_ctx.pending_responses ==
+        0) {
         fwk_unexpected();
         return FWK_E_PANIC;
     }
@@ -2105,7 +2145,7 @@ static int process_power_state_transition_notification_response(
     notification_event.source_id = FWK_ID_NONE;
 
     params = (struct mod_pd_power_state_transition_notification_params *)
-        notification_event.params;
+                 notification_event.params;
     params->state = pd->current_state;
 
     pd->power_state_transition_notification_ctx.state = pd->current_state;
@@ -2114,8 +2154,9 @@ static int process_power_state_transition_notification_response(
         &pd->power_state_transition_notification_ctx.pending_responses);
 }
 
-static int pd_process_notification(const struct fwk_event *event,
-                                   struct fwk_event *resp)
+static int pd_process_notification(
+    const struct fwk_event *event,
+    struct fwk_event *resp)
 {
     struct pd_ctx *pd;
 
@@ -2141,9 +2182,10 @@ static int pd_process_notification(const struct fwk_event *event,
         return process_power_state_transition_notification_response(pd);
     }
 
-    return process_power_state_pre_transition_notification_response(pd,
+    return process_power_state_pre_transition_notification_response(
+        pd,
         (struct mod_pd_power_state_pre_transition_notification_resp_params *)
-        event->params);
+            event->params);
 }
 #endif /* BUILD_HAS_NOTIFICATION */
 
