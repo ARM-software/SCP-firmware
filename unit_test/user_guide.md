@@ -262,11 +262,11 @@ from hand-written code.
 
 ## Adding test for new modules
 
-The ```scmi``` and ```scmi_clock``` test directories are provided
-as a reference for new modules. The following process is intended
-as a general guide, and will vary on a case-by-case basis.
+A template of minimum required files is provided as a reference for new modules.
 
-1. Duplicate existing reference test directories as a starting point.
+See unit_test/template/test
+
+1. Duplicate existing reference test directory as a starting point.
 
 2. Modify *.cmake file for our specific test case:
     a. Change TEST_MODULE to name of module
