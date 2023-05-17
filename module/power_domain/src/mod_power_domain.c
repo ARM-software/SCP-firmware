@@ -1234,6 +1234,9 @@ static void process_power_state_transition_report(struct pd_ctx *pd,
     }
 #endif
 
+    /* Update the pd states to follow the new transition */
+    pd->requested_state = pd->state_requested_to_driver = pd->current_state;
+
     if (is_deeper_state(new_state, previous_state)) {
         process_power_state_transition_report_deeper_state(pd);
     } else if (is_shallower_state(new_state, previous_state)) {
