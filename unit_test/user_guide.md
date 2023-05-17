@@ -312,9 +312,6 @@ the guidelines below:
 - One test scenario for each test case. For example, if testing one case for a
   function, have a test function for that case only.
 - Name the test functions according to the test being performed.
-- When an addition or change is made to a module that did not have unit testing
-  before, it is recommended that the enclosing functions affected by the change
-  should then be added for unit testing.
 
 ### Executing Tests on target hardware or FVP models
 
@@ -334,3 +331,15 @@ to understand setup needed building test that can be executed on target
 
 4. Platform must provide definition for plat_execute_all_tests which
 is called by module/ut. See example product/juno/scp_ut/tests_entry.c
+
+## Unit testing requirement guidelines
+
+Unit Testing (UT) has been introduced with the aim of improving the quality and
+reliability of the code.
+In this introductory phase, we suggest that contributors become familiar with
+the unit testing in SCP-firmware.
+In the meantime, while we are not enforcing contibutors to add unit testing on
+their additions or modifications, we encourage them to attempt adding UT
+whenever compatible with their development.
+We foresee that UT will become a mandatory requirement later in the future for
+contributions into SCP-firmware project.
