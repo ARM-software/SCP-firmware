@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -120,6 +120,13 @@ struct mod_timer_driver_api {
 
     /*! Get counter frequency */
     int (*get_frequency)(fwk_id_t dev_id, uint32_t *value);
+
+    /*!
+     * Timer device may need to update internal status in alarm or overflow
+     * event. This handler is used to process overflow event when there is no
+     * active alarm. Optional
+     */
+    void (*overflow_handler)(fwk_id_t dev_id);
 };
 
 /*!
