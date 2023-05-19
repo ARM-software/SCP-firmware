@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -557,8 +557,15 @@ static void timer_isr(uintptr_t ctx_ptr)
         (struct alarm_sub_element_ctx *)fwk_list_pop_head(&ctx->alarms_active);
 
     if (alarm == NULL) {
-        /* Timer interrupt triggered without any alarm in the active queue */
-        fwk_unexpected();
+        if (ctx->driver->overflow_handler != NULL) {
+            ctx->driver->overflow_handler(ctx->driver_dev_id);
+        } else {
+            /*
+             * Timer interrupt triggered without any alarm in the active queue nor an
+             * overflow handler provided.
+             */
+            fwk_unexpected();
+        }
         return;
     }
 
