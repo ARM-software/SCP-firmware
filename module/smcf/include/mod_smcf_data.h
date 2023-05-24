@@ -85,6 +85,7 @@ struct mod_smcf_data_config {
     /*!
      * Data write location used by the hardware.
      * Set to zero if data read from MGI.
+     * The address must be 32-bit aligned according to the spec.
      */
     uint64_t write_addr;
 
