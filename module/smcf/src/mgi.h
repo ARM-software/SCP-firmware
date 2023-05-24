@@ -271,6 +271,12 @@ struct smcf_mgi_reg {
 #define SMCF_MGI_MAX_NUM_MODE_REG 4
 
 /*
+ * Maximum length of data words for each MGI_MODE_REQ<n> and MGI_MODE_STAT<n>
+ * register as defined by the hardware spec.
+ */
+#define SMCF_MGI_MODE_MAX_WORD_LEN 32
+
+/*
  * Bit definitions for MGI_SMP_EN
  */
 #define SMCF_MGI_SMP_EN_EN_POS 0
