@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -333,26 +333,10 @@ FWK_NOINLINE /* only one location where the checked load happen */
     return true;
 }
 
-static bool exception_handler(const int exception,
-                              struct context *const context) {
-    extern void CHECKED_READ_U32__LOAD_LOC(void);
-    extern void CHECKED_READ_U32__POSTLOAD_LOC(void);
-
-    if (exception == EXCEPTION_BUSFAULT &&
-            (uintptr_t)&CHECKED_READ_U32__LOAD_LOC == (uintptr_t)context->PC) {
-        /*
-         * we got a bus fault in the "checked" read functions so lets jump to
-         * the safe place and notify that we masked the fault
-         */
-        context->r0 = CHECKED_READ_U32__ERROR_VALUE;
-        context->PC = (uintptr_t)&CHECKED_READ_U32__POSTLOAD_LOC;
-        return true;
-    }
-    return false;
-}
-
 void arch_exception_invalid(void)
 {
+    extern void CHECKED_READ_U32__LOAD_LOC(void);
+    extern void CHECKED_READ_U32__POSTLOAD_LOC(void);
     struct context *context;
     __asm__ volatile(
         "tst lr, #4;"
@@ -362,7 +346,15 @@ void arch_exception_invalid(void)
         : "=r"(context));
 
     const int exception = *ICSR & ICSR_VECTACTIVE;
-    if (!exception_handler(exception, context)) {
+    if ((exception == EXCEPTION_BUSFAULT) &&
+        ((uintptr_t)&CHECKED_READ_U32__LOAD_LOC == (uintptr_t)context->PC)) {
+        /*
+         * we got a bus fault in the "checked" read functions so
+         * lets jump to the safe place
+         */
+        context->r0 = CHECKED_READ_U32__ERROR_VALUE;
+        context->PC = (uintptr_t)&CHECKED_READ_U32__POSTLOAD_LOC;
+    } else {
         while (true) {
             __WFI();
         }
