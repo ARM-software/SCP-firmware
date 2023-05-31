@@ -233,13 +233,3 @@ int mod_dvfs_domain_api_set_level(
     fwk_id_t domain_id,
     uintptr_t cookie,
     uint32_t level);
-
-/*!
- * \brief Plugin's implementation of the 'update' API.
- */
-int plugin_update(struct perf_plugins_perf_update *data);
-
-/*!
- * \brief Plugin's implementation of the 'report' API.
- */
-int plugin_report(struct perf_plugins_perf_report *data);

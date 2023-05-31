@@ -372,46 +372,6 @@ void mod_dvfs_domain_api_set_level_CMockIgnoreArg_domain_id(UNITY_LINE_TYPE cmoc
 void mod_dvfs_domain_api_set_level_CMockIgnoreArg_cookie(UNITY_LINE_TYPE cmock_line);
 #define mod_dvfs_domain_api_set_level_IgnoreArg_level() mod_dvfs_domain_api_set_level_CMockIgnoreArg_level(__LINE__)
 void mod_dvfs_domain_api_set_level_CMockIgnoreArg_level(UNITY_LINE_TYPE cmock_line);
-#define plugin_update_IgnoreAndReturn(cmock_retval) plugin_update_CMockIgnoreAndReturn(__LINE__, cmock_retval)
-void plugin_update_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
-#define plugin_update_StopIgnore() plugin_update_CMockStopIgnore()
-void plugin_update_CMockStopIgnore(void);
-#define plugin_update_ExpectAnyArgsAndReturn(cmock_retval) plugin_update_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
-void plugin_update_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
-#define plugin_update_ExpectAndReturn(data, cmock_retval) plugin_update_CMockExpectAndReturn(__LINE__, data, cmock_retval)
-void plugin_update_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct perf_plugins_perf_update* data, int cmock_to_return);
-typedef int (* CMOCK_plugin_update_CALLBACK)(struct perf_plugins_perf_update* data, int cmock_num_calls);
-void plugin_update_AddCallback(CMOCK_plugin_update_CALLBACK Callback);
-void plugin_update_Stub(CMOCK_plugin_update_CALLBACK Callback);
-#define plugin_update_StubWithCallback plugin_update_Stub
-#define plugin_update_ExpectWithArrayAndReturn(data, data_Depth, cmock_retval) plugin_update_CMockExpectWithArrayAndReturn(__LINE__, data, data_Depth, cmock_retval)
-void plugin_update_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, struct perf_plugins_perf_update* data, int data_Depth, int cmock_to_return);
-#define plugin_update_ReturnThruPtr_data(data) plugin_update_CMockReturnMemThruPtr_data(__LINE__, data, sizeof(struct perf_plugins_perf_update))
-#define plugin_update_ReturnArrayThruPtr_data(data, cmock_len) plugin_update_CMockReturnMemThruPtr_data(__LINE__, data, cmock_len * sizeof(*data))
-#define plugin_update_ReturnMemThruPtr_data(data, cmock_size) plugin_update_CMockReturnMemThruPtr_data(__LINE__, data, cmock_size)
-void plugin_update_CMockReturnMemThruPtr_data(UNITY_LINE_TYPE cmock_line, struct perf_plugins_perf_update* data, size_t cmock_size);
-#define plugin_update_IgnoreArg_data() plugin_update_CMockIgnoreArg_data(__LINE__)
-void plugin_update_CMockIgnoreArg_data(UNITY_LINE_TYPE cmock_line);
-#define plugin_report_IgnoreAndReturn(cmock_retval) plugin_report_CMockIgnoreAndReturn(__LINE__, cmock_retval)
-void plugin_report_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
-#define plugin_report_StopIgnore() plugin_report_CMockStopIgnore()
-void plugin_report_CMockStopIgnore(void);
-#define plugin_report_ExpectAnyArgsAndReturn(cmock_retval) plugin_report_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
-void plugin_report_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
-#define plugin_report_ExpectAndReturn(data, cmock_retval) plugin_report_CMockExpectAndReturn(__LINE__, data, cmock_retval)
-void plugin_report_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct perf_plugins_perf_report* data, int cmock_to_return);
-typedef int (* CMOCK_plugin_report_CALLBACK)(struct perf_plugins_perf_report* data, int cmock_num_calls);
-void plugin_report_AddCallback(CMOCK_plugin_report_CALLBACK Callback);
-void plugin_report_Stub(CMOCK_plugin_report_CALLBACK Callback);
-#define plugin_report_StubWithCallback plugin_report_Stub
-#define plugin_report_ExpectWithArrayAndReturn(data, data_Depth, cmock_retval) plugin_report_CMockExpectWithArrayAndReturn(__LINE__, data, data_Depth, cmock_retval)
-void plugin_report_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, struct perf_plugins_perf_report* data, int data_Depth, int cmock_to_return);
-#define plugin_report_ReturnThruPtr_data(data) plugin_report_CMockReturnMemThruPtr_data(__LINE__, data, sizeof(struct perf_plugins_perf_report))
-#define plugin_report_ReturnArrayThruPtr_data(data, cmock_len) plugin_report_CMockReturnMemThruPtr_data(__LINE__, data, cmock_len * sizeof(*data))
-#define plugin_report_ReturnMemThruPtr_data(data, cmock_size) plugin_report_CMockReturnMemThruPtr_data(__LINE__, data, cmock_size)
-void plugin_report_CMockReturnMemThruPtr_data(UNITY_LINE_TYPE cmock_line, struct perf_plugins_perf_report* data, size_t cmock_size);
-#define plugin_report_IgnoreArg_data() plugin_report_CMockIgnoreArg_data(__LINE__)
-void plugin_report_CMockIgnoreArg_data(UNITY_LINE_TYPE cmock_line);
 
 #if defined(__GNUC__) && !defined(__ICC) && !defined(__TMS470__)
 #if __GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 6 || (__GNUC_MINOR__ == 6 && __GNUC_PATCHLEVEL__ > 0)))
