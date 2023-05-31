@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <mod_dvfs.h>
 #include <mod_scmi_perf.h>
 
 #include <fwk_id.h>
@@ -57,7 +58,6 @@ static const struct mod_scmi_perf_domain_config domains[] = {
     },
 };
 
-#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
 enum plugins_list {
     PERF_PLUGIN_IDX_0,
     PERF_PLUGIN_IDX_COUNT,
@@ -69,15 +69,12 @@ static struct mod_scmi_plugin_config plugins_table[] = {
         .dom_type = PERF_PLUGIN_DOM_TYPE_PHYSICAL,
     },
 };
-#endif
 
 static struct mod_scmi_perf_config perf_config = {
     .domains = &domains,
     .perf_doms_count = SCMI_PERF_ELEMENT_IDX_COUNT,
     .fast_channels_alarm_id = FWK_ID_NONE_INIT,
-#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
     .plugins = plugins_table,
-#endif
 };
 
 struct fwk_module_config config_scmi_perf = {
@@ -118,9 +115,7 @@ static const struct mod_dvfs_domain_config test_dvfs_config = {
         }
 };
 
-#ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
 static struct perf_plugins_api test_perf_plugins_api = {
     .update = plugin_update,
     .report = plugin_report,
 };
-#endif
