@@ -114,6 +114,13 @@ void __fwk_dlist_insert(
     node->prev = new;
 }
 
+#ifdef FWK_MARKED_LIST_ENABLE
+int __fwk_dlist_get_max(const struct fwk_dlist *list)
+{
+    return list->marks.max_count;
+}
+#endif
+
 static_assert(offsetof(struct fwk_dlist, head) ==
     offsetof(struct fwk_slist, head),
     "fwk_dlist::head not aligned with fwk_slist::head");

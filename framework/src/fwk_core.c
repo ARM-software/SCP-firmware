@@ -19,6 +19,11 @@
 #include <fwk_id.h>
 #include <fwk_interrupt.h>
 #include <fwk_list.h>
+
+#ifdef FWK_EVENTS_WATERMARK_TRACE_ENABLE
+#    define FWK_TRACE_ENABLE
+#endif
+
 #include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
@@ -147,8 +152,16 @@ static int put_event(
     }
     if (intr_state == NOT_INTERRUPT_STATE) {
         fwk_list_push_tail(&ctx.event_queue, &allocated_event->slist_node);
+
+        FWK_TRACE(
+            "[FWK] event_queue peak: %d", fwk_list_get_max(&ctx.event_queue));
+
     } else {
         fwk_list_push_tail(&ctx.isr_event_queue, &allocated_event->slist_node);
+
+        FWK_TRACE(
+            "[FWK] isr_event_queue peak: %d",
+            fwk_list_get_max(&ctx.isr_event_queue));
     }
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_DEBUG
@@ -263,6 +276,8 @@ static bool process_isr(void)
 #endif
 
     fwk_list_push_tail(&ctx.event_queue, &isr_event->slist_node);
+
+    FWK_TRACE("[FWK] event_queue peak: %d", fwk_list_get_max(&ctx.event_queue));
 
     return true;
 }

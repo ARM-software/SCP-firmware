@@ -122,6 +122,11 @@ few common options can be configured.
 - `SCP_ENABLE_ATU_DELEGATE`: Enable/disable ATU delegation support. This option
   should be enabled when the ATU is not managed directly by the firmware.
 
+- `SCP_ENABLE_FWK_EVENT_WATERMARK_TRACING`: Enable/disable tracing for event
+  queues.
+
+- `SCP_ENABLE_MARKED_LIST`: Enable/disable calculations of list max size.
+
 - `SCP_ENABLE_FAST_CHANNELS`: Enable/disable Fast Channels support. This
   option should be enabled/disabled by the use of a platform specific setting
   like `SCP_ENABLE_SCMI_PERF_FAST_CHANNELS`.
