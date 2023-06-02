@@ -616,6 +616,11 @@ The driver module can then access its log framework related configuration data
 at any time. It is expected that the driver module performs initialization using
 this configuration data in the fwk_log_driver_init() function.
 
+#### Enable marked list feature
+
+When `SCP_ENABLE_MARKED_LIST` is set, the maximum size of linked list will be
+traced and marked.
+
 #### Tracing
 To enable tracing functionality `FWK_TRACE_ENABLE` should be defined.
 There is an example configuration for CMake that should be included in

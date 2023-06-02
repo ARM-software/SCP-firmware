@@ -24,11 +24,25 @@
  */
 
 /*!
+ * \brief marks used for marked slist.
+ *
+ * \internal
+ * \note This structure used in case of needed to mark dlist
+ */
+struct fwk_dlist_marks {
+    /*! Current numbers of dlist elements */
+    unsigned int current_count;
+
+    /*! Maximum marked elements in dlist */
+    unsigned int max_count;
+};
+
+/*!
  * \brief Doubly-linked list.
  *
  * \internal
- * \note This structure can be safely used in the place of ::fwk_slist,
- *      ::fwk_slist_node, or ::fwk_dlist_node.
+ * \note This structure can be safely used in the place of ::fwk_dlist,
+ *      ::fwk_dlist_node, or ::fwk_dlist_node.
  */
 struct fwk_dlist {
     /*! Pointer to the list head */
@@ -36,13 +50,18 @@ struct fwk_dlist {
 
     /*! Pointer to the list tail */
     struct fwk_dlist_node *tail;
+
+#ifdef FWK_MARKED_LIST_ENABLE
+    /*! save the mark for maximum usage of dlist */
+    struct fwk_dlist_marks marks;
+#endif
 };
 
 /*!
  * \brief Doubly-linked list node.
  *
  * \internal
- * \note This structure can be safely used in the place of ::fwk_slist_node.
+ * \note This structure can be safely used in the place of ::fwk_dlist_node.
  */
 struct fwk_dlist_node {
     /*! Pointer to the next node in the list */
@@ -106,6 +125,17 @@ void __fwk_dlist_insert(
     struct fwk_dlist_node *restrict new,
     struct fwk_dlist_node *restrict node) FWK_LEAF FWK_NOTHROW FWK_NONNULL(1)
     FWK_NONNULL(2) FWK_READ_WRITE1(1) FWK_READ_WRITE1(2) FWK_READ_WRITE1(3);
+
+#ifdef FWK_MARKED_LIST_ENABLE
+/*
+ * Return max size of dlist.
+ *
+ * For internal use only.
+ * See __fwk_dlist_get_max(list) for the public interface.
+ */
+int __fwk_dlist_get_max(const struct fwk_dlist *list) FWK_LEAF FWK_NOTHROW
+    FWK_NONNULL(1) FWK_READ_ONLY1(1);
+#endif
 
 /*!
  * @endcond

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -218,6 +218,23 @@
         node != NULL; \
         node = fwk_list_next(list, node), \
         elem = FWK_LIST_GET(node, type, member))
+
+/*!
+ * \brief Get maximum size of list.
+ *
+ * \param list Pointer to the list to get max list size. Must not be \c NULL.
+ *
+ * \retval Zero The list was never used.
+ * \return The maximum number of elements as a mark for the maximum size.
+ */
+#ifdef FWK_MARKED_LIST_ENABLE
+#    define fwk_list_get_max(list) \
+        _Generic((list), struct fwk_slist * \
+                 : __fwk_slist_get_max, struct fwk_dlist * \
+                 : __fwk_dlist_get_max)(list)
+#else
+#    define fwk_list_get_max(list) 0
+#endif
 
 /*!
  * \}

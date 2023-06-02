@@ -26,6 +26,21 @@
  */
 
 /*!
+ * \brief marks used for marked slist.
+ *
+ * \internal
+ * \note This structure is used in case of needed to mark slist in case of
+ * FWK_MARKED_LIST_ENABLE is defined.
+ */
+struct fwk_slist_marks {
+    /*! Current numbers of slist elements */
+    unsigned int current_count;
+
+    /*! Maximum marked elements in slist */
+    unsigned int max_count;
+};
+
+/*!
  * \brief Singly-linked list.
  *
  * \internal
@@ -37,6 +52,11 @@ struct fwk_slist {
 
     /*! Pointer to the list tail */
     struct fwk_slist_node *tail;
+
+#ifdef FWK_MARKED_LIST_ENABLE
+    /*! save the mark for maximum usage of slist */
+    struct fwk_slist_marks marks;
+#endif
 };
 
 /*!
@@ -138,6 +158,17 @@ bool __fwk_slist_contains(
     const struct fwk_slist *list,
     const struct fwk_slist_node *node) FWK_PURE FWK_LEAF FWK_NOTHROW
     FWK_NONNULL(1) FWK_NONNULL(2) FWK_READ_ONLY1(1) FWK_READ_ONLY1(2);
+
+#ifdef FWK_MARKED_LIST_ENABLE
+/*
+ * Return max size of slist.
+ *
+ * For internal use only.
+ * See __fwk_slist_get_max(list) for the public interface.
+ */
+int __fwk_slist_get_max(const struct fwk_slist *list) FWK_LEAF FWK_NOTHROW
+    FWK_NONNULL(1) FWK_READ_ONLY1(1);
+#endif
 
 /*!
  * @endcond

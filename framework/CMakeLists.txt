@@ -40,6 +40,15 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/src/stdlib.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/src/fwk_core.c")
 
+if(SCP_ENABLE_FWK_EVENT_WATERMARK_TRACING)
+    target_compile_definitions(framework
+                                PUBLIC "FWK_EVENTS_WATERMARK_TRACE_ENABLE")
+    set(SCP_ENABLE_MARKED_LIST TRUE)
+endif()
+
+if(SCP_ENABLE_MARKED_LIST)
+    target_compile_definitions(framework PUBLIC "FWK_MARKED_LIST_ENABLE")
+endif()
 
 if(SCP_ENABLE_SUB_SYSTEM_MODE)
     target_compile_definitions(framework PUBLIC "BUILD_HAS_SUB_SYSTEM_MODE")
