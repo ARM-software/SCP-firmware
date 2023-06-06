@@ -107,6 +107,7 @@ list(APPEND SCP_UNITY_SRC ${TEST_ROOT}/unity_mocks/scp_unity.c)
 
 #Append common unit tests below here
 list(APPEND UNIT_MODULE mhu3)
+list(APPEND UNIT_MODULE pl011)
 list(APPEND UNIT_MODULE scmi)
 list(APPEND UNIT_MODULE scmi_clock)
 list(APPEND UNIT_MODULE scmi_perf)
