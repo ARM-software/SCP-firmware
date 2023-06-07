@@ -274,6 +274,8 @@ from hand-written code.
 >```
 >*Header files inside the `ext` folder can be a modified version for testing
 >purposes.*
+>
+>`optee/mbx` unit test is a good example for such case.
 
 ## Adding test for new modules
 
