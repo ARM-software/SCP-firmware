@@ -260,6 +260,21 @@ code contained within. This will also exclude any other files contained
 in the directory, so mocks should be placed in seperated mock directories
 from hand-written code.
 
+> **Note:**
+> Modules depend on **external header files** must include the required
+>headers under `module/<module_path>/test/ext/`
+>
+>Make sure to update CMakeLists.txt of the unit test to add the `ext` folder
+>to the unit test includes.
+> CMakeLists.txt:
+>```cmake
+>       ...
+>       set(MODULE_UT_INC ${CMAKE_CURRENT_LIST_DIR}/ext)
+>       ...
+>```
+>*Header files inside the `ext` folder can be a modified version for testing
+>purposes.*
+
 ## Adding test for new modules
 
 A template of minimum required files is provided as a reference for new modules.
