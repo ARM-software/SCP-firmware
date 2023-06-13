@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -8,8 +8,8 @@
 #include "config_clock.h"
 
 #include <mod_css_clock.h>
-#include <mod_morello_pll.h>
 #include <mod_pik_clock.h>
+#include <mod_sc_pll.h>
 
 #include <fwk_element.h>
 #include <fwk_id.h>
@@ -146,11 +146,11 @@ static const struct fwk_element css_clock_element_table[] = {
                 .clock_switching_source =
                     MOD_PIK_CLOCK_CLUSCLK_SOURCE_SYSREFCLK,
                 .pll_id = FWK_ID_ELEMENT_INIT(
-                    FWK_MODULE_IDX_MORELLO_PLL,
+                    FWK_MODULE_IDX_SC_PLL,
                     CLOCK_PLL_IDX_CPU0),
                 .pll_api_id = FWK_ID_API_INIT(
-                    FWK_MODULE_IDX_MORELLO_PLL,
-                    MOD_MORELLO_PLL_API_TYPE_DEFAULT),
+                    FWK_MODULE_IDX_SC_PLL,
+                    MOD_SC_PLL_API_TYPE_DEFAULT),
                 .member_table = member_table_cpu_group_0,
                 .member_count = FWK_ARRAY_SIZE(member_table_cpu_group_0),
                 .member_api_id = FWK_ID_API_INIT(
@@ -170,11 +170,11 @@ static const struct fwk_element css_clock_element_table[] = {
                 .clock_switching_source =
                     MOD_PIK_CLOCK_CLUSCLK_SOURCE_SYSREFCLK,
                 .pll_id = FWK_ID_ELEMENT_INIT(
-                    FWK_MODULE_IDX_MORELLO_PLL,
+                    FWK_MODULE_IDX_SC_PLL,
                     CLOCK_PLL_IDX_CPU1),
                 .pll_api_id = FWK_ID_API_INIT(
-                    FWK_MODULE_IDX_MORELLO_PLL,
-                    MOD_MORELLO_PLL_API_TYPE_DEFAULT),
+                    FWK_MODULE_IDX_SC_PLL,
+                    MOD_SC_PLL_API_TYPE_DEFAULT),
                 .member_table = member_table_cpu_group_1,
                 .member_count = FWK_ARRAY_SIZE(member_table_cpu_group_1),
                 .member_api_id = FWK_ID_API_INIT(

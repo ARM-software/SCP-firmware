@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -9,8 +9,8 @@
 #include <morello_scp_pik.h>
 
 #include <mod_css_clock.h>
-#include <mod_morello_pll.h>
 #include <mod_pik_clock.h>
+#include <mod_sc_pll.h>
 
 #include <fwk_element.h>
 #include <fwk_id.h>
@@ -190,10 +190,10 @@ static const struct fwk_element
             .rate_table = rate_table_cpu_group_0,
             .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_0),
             .clock_switching_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_SYSREFCLK,
-            .pll_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MORELLO_PLL,
+            .pll_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SC_PLL,
                 CLOCK_PLL_IDX_CPU0),
-            .pll_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MORELLO_PLL,
-                MOD_MORELLO_PLL_API_TYPE_DEFAULT),
+            .pll_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SC_PLL,
+                MOD_SC_PLL_API_TYPE_DEFAULT),
             .member_table = member_table_cpu_group_0,
             .member_count = FWK_ARRAY_SIZE(member_table_cpu_group_0),
             .member_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PIK_CLOCK,
@@ -209,10 +209,10 @@ static const struct fwk_element
             .rate_table = rate_table_cpu_group_1,
             .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_1),
             .clock_switching_source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_SYSREFCLK,
-            .pll_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MORELLO_PLL,
+            .pll_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SC_PLL,
                 CLOCK_PLL_IDX_CPU1),
-            .pll_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MORELLO_PLL,
-                MOD_MORELLO_PLL_API_TYPE_DEFAULT),
+            .pll_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SC_PLL,
+                MOD_SC_PLL_API_TYPE_DEFAULT),
             .member_table = member_table_cpu_group_1,
             .member_count = FWK_ARRAY_SIZE(member_table_cpu_group_1),
             .member_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PIK_CLOCK,
@@ -228,10 +228,10 @@ static const struct fwk_element
             .rate_table = rate_table_gpu,
             .rate_count = FWK_ARRAY_SIZE(rate_table_gpu),
             .clock_switching_source = MOD_PIK_CLOCK_GPUCLK_SOURCE_SYSREFCLK,
-            .pll_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MORELLO_PLL,
+            .pll_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SC_PLL,
                                           CLOCK_PLL_IDX_GPU),
-            .pll_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MORELLO_PLL,
-                                          MOD_MORELLO_PLL_API_TYPE_DEFAULT),
+            .pll_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SC_PLL,
+                                          MOD_SC_PLL_API_TYPE_DEFAULT),
             .member_table = member_table_gpu,
             .member_count = FWK_ARRAY_SIZE(member_table_gpu),
             .member_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PIK_CLOCK,
@@ -246,10 +246,10 @@ static const struct fwk_element
             .clock_type = MOD_CSS_CLOCK_TYPE_NON_INDEXED,
             .clock_default_source = MOD_PIK_CLOCK_ACLKDPU_SOURCE_DISPLAYPLLCLK,
             .clock_switching_source = MOD_PIK_CLOCK_ACLKDPU_SOURCE_SYSREFCLK,
-            .pll_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MORELLO_PLL,
+            .pll_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SC_PLL,
                                           CLOCK_PLL_IDX_DPU),
-            .pll_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MORELLO_PLL,
-                                          MOD_MORELLO_PLL_API_TYPE_DEFAULT),
+            .pll_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SC_PLL,
+                                          MOD_SC_PLL_API_TYPE_DEFAULT),
             .member_table = member_table_dpu,
             .member_count = FWK_ARRAY_SIZE(member_table_dpu),
             .member_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PIK_CLOCK,

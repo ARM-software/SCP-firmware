@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -12,9 +12,9 @@
 
 #include <mod_clock.h>
 #include <mod_css_clock.h>
-#include <mod_morello_pll.h>
 #include <mod_pik_clock.h>
 #include <mod_power_domain.h>
+#include <mod_sc_pll.h>
 
 #include <fwk_element.h>
 #include <fwk_module.h>
@@ -69,10 +69,10 @@ static const struct fwk_element clock_dev_desc_table[CLOCK_IDX_COUNT + 1] = {
     [CLOCK_IDX_PIXEL_0] = {
         .name = "PIXEL_0",
         .data = &((struct mod_clock_dev_config) {
-            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MORELLO_PLL,
+            .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SC_PLL,
                                              CLOCK_PLL_IDX_PXL),
-            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MORELLO_PLL,
-                                      MOD_MORELLO_PLL_API_TYPE_DEFAULT),
+            .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SC_PLL,
+                                      MOD_SC_PLL_API_TYPE_DEFAULT),
         }),
     },
     { 0 }, /* Termination description. */

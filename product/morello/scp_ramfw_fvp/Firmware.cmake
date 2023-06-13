@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -31,7 +31,6 @@ set(SCP_ENABLE_DEBUGGER_INIT FALSE)
 
 set(SCP_ENABLE_PLAT_FVP TRUE)
 
-list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/morello_pll")
 list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/dmc_bing")
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/morello_system")
@@ -49,7 +48,7 @@ list(APPEND SCP_MODULES "power-domain")
 list(APPEND SCP_MODULES "ppu-v1")
 list(APPEND SCP_MODULES "ppu-v0")
 list(APPEND SCP_MODULES "system-power")
-list(APPEND SCP_MODULES "morello-pll")
+list(APPEND SCP_MODULES "sc-pll")
 list(APPEND SCP_MODULES "dmc-bing")
 list(APPEND SCP_MODULES "mhu")
 list(APPEND SCP_MODULES "transport")
