@@ -1,11 +1,10 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "config_power_domain.h"
 #include "scp_mmap.h"
 #include "scp_tc1_mhu.h"
 #include "tc1_core.h"
@@ -90,19 +89,6 @@ static const struct fwk_element transport_element_table[
 
 static const struct fwk_element *transport_get_element_table(fwk_id_t module_id)
 {
-    unsigned int idx;
-    struct mod_transport_channel_config *config;
-
-    for (idx = 0; idx < SCP_TC1_SCMI_SERVICE_IDX_COUNT; idx++) {
-        config =
-            (struct mod_transport_channel_config *)(transport_element_table[idx]
-                                                        .data);
-        config->pd_source_id = FWK_ID_ELEMENT(
-            FWK_MODULE_IDX_POWER_DOMAIN,
-            tc1_core_get_core_count() + tc1_core_get_cluster_count() +
-                PD_STATIC_DEV_IDX_SYSTOP);
-    }
-
     return transport_element_table;
 }
 
