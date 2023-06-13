@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -95,20 +95,6 @@ static const struct fwk_element transport_element_table[] = {
 
 static const struct fwk_element *transport_get_element_table(fwk_id_t module_id)
 {
-    unsigned int idx;
-    struct mod_transport_channel_config *config;
-
-    for (idx = 0; idx < SGM775_SCMI_SERVICE_IDX_COUNT; idx++) {
-        config =
-            (struct mod_transport_channel_config *)(transport_element_table[idx]
-                                                        .data);
-
-        config->pd_source_id = FWK_ID_ELEMENT(
-            FWK_MODULE_IDX_POWER_DOMAIN,
-            CONFIG_POWER_DOMAIN_SYSTOP_SYSTEM + sgm775_core_get_count() +
-                sgm775_cluster_get_count());
-    }
-
     return transport_element_table;
 }
 

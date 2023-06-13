@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -25,9 +25,7 @@ static const struct fwk_element
                                                 SGM775_SCMI_SERVICE_IDX_PSCI),
             .transport_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_TRANSPORT,
                                                 MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
-            .transport_notification_init_id =
-                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_TRANSPORT,
-                    MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
+            .transport_notification_init_id = FWK_ID_NONE_INIT,
             .scmi_agent_id = SCMI_AGENT_ID_PSCI,
             .scmi_p2a_id = FWK_ID_NONE_INIT,
         }),
@@ -39,9 +37,7 @@ static const struct fwk_element
                                                 SGM775_SCMI_SERVICE_IDX_OSPM_0),
             .transport_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_TRANSPORT,
                                                 MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
-            .transport_notification_init_id =
-                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_TRANSPORT,
-                    MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
+            .transport_notification_init_id = FWK_ID_NONE_INIT,
             .scmi_agent_id = SCMI_AGENT_ID_OSPM,
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
             .scmi_p2a_id = FWK_ID_ELEMENT_INIT(
@@ -59,9 +55,7 @@ static const struct fwk_element
                                                 SGM775_SCMI_SERVICE_IDX_OSPM_1),
             .transport_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_TRANSPORT,
                                                 MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
-            .transport_notification_init_id =
-                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_TRANSPORT,
-                    MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
+            .transport_notification_init_id = FWK_ID_NONE_INIT,
             .scmi_agent_id = SCMI_AGENT_ID_OSPM,
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
             .scmi_p2a_id = FWK_ID_ELEMENT_INIT(
@@ -82,9 +76,7 @@ static const struct fwk_element
             .transport_api_id = FWK_ID_API_INIT(
                 FWK_MODULE_IDX_TRANSPORT,
                 MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
-            .transport_notification_init_id =
-                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_TRANSPORT,
-                    MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
+            .transport_notification_init_id = FWK_ID_NONE_INIT,
             .scmi_agent_id = (unsigned int) SCMI_AGENT_ID_OSPM,
             .scmi_p2a_id = FWK_ID_NONE_INIT,
         },
@@ -98,9 +90,7 @@ static const struct fwk_element
             .transport_api_id = FWK_ID_API_INIT(
                 FWK_MODULE_IDX_TRANSPORT,
                 MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
-            .transport_notification_init_id =
-                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_TRANSPORT,
-                    MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
+            .transport_notification_init_id = FWK_ID_NONE_INIT,
             .scmi_agent_id = (unsigned int) SCMI_AGENT_ID_OSPM,
             .scmi_p2a_id = FWK_ID_NONE_INIT,
         },
