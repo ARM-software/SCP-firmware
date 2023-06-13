@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -26,9 +26,7 @@ static const struct fwk_element element_table[] = {
             .transport_api_id = FWK_ID_API_INIT(
                 FWK_MODULE_IDX_TRANSPORT,
                 MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
-            .transport_notification_init_id =
-                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_TRANSPORT,
-                    MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
+            .transport_notification_init_id = FWK_ID_NONE_INIT,
             .scmi_agent_id = (unsigned int) JUNO_SCMI_AGENT_IDX_PSCI,
             .scmi_p2a_id = FWK_ID_NONE_INIT,
         },
@@ -43,9 +41,7 @@ static const struct fwk_element element_table[] = {
             .transport_api_id = FWK_ID_API_INIT(
                 FWK_MODULE_IDX_TRANSPORT,
                 MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
-            .transport_notification_init_id =
-                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_TRANSPORT,
-                    MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
+            .transport_notification_init_id = FWK_ID_NONE_INIT,
             .scmi_agent_id = (unsigned int) JUNO_SCMI_AGENT_IDX_OSPM,
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
             .scmi_p2a_id = FWK_ID_ELEMENT_INIT(
@@ -66,9 +62,7 @@ static const struct fwk_element element_table[] = {
             .transport_api_id = FWK_ID_API_INIT(
                 FWK_MODULE_IDX_TRANSPORT,
                 MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
-            .transport_notification_init_id =
-                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_TRANSPORT,
-                    MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
+            .transport_notification_init_id = FWK_ID_NONE_INIT,
             .scmi_agent_id = (unsigned int) JUNO_SCMI_AGENT_IDX_OSPM,
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
             .scmi_p2a_id = FWK_ID_ELEMENT_INIT(
@@ -90,9 +84,7 @@ static const struct fwk_element element_table[] = {
             .transport_api_id = FWK_ID_API_INIT(
                 FWK_MODULE_IDX_TRANSPORT,
                 MOD_TRANSPORT_API_IDX_SCMI_TO_TRANSPORT),
-            .transport_notification_init_id =
-                FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_TRANSPORT,
-                    MOD_TRANSPORT_NOTIFICATION_IDX_INITIALIZED),
+            .transport_notification_init_id = FWK_ID_NONE_INIT,
             .scmi_agent_id = (unsigned int) JUNO_SCMI_AGENT_IDX_OSPM,
             .scmi_p2a_id = FWK_ID_NONE_INIT,
         },
