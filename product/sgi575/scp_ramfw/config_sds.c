@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -48,8 +48,7 @@ static_assert(FWK_ARRAY_SIZE(sds_module_regions) == SGI575_SDS_REGION_COUNT,
 static const struct mod_sds_config sds_module_config = {
     .regions = sds_module_regions,
     .region_count = SGI575_SDS_REGION_COUNT,
-    .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK,
-                                    CLOCK_IDX_INTERCONNECT)
+    .clock_id = FWK_ID_NONE_INIT,
 };
 
 static struct sgi575_sds_platid platid;
