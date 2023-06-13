@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -70,7 +70,8 @@ static struct fwk_element sgm775_ppu_v0_element_table[] = {
         .data = &((struct mod_ppu_v0_pd_config) {
             .pd_type = MOD_PD_TYPE_SYSTEM,
             .ppu.reg_base = PPU_SYS0_BASE,
-            .ppu.irq = PPU_SYS0_IRQ
+            .ppu.irq = PPU_SYS0_IRQ,
+            .default_power_on = true,
         }),
     },
     [PPU_V0_ELEMENT_IDX_SYS1] = {
@@ -78,12 +79,12 @@ static struct fwk_element sgm775_ppu_v0_element_table[] = {
         .data = &((struct mod_ppu_v0_pd_config) {
             .pd_type = MOD_PD_TYPE_SYSTEM,
             .ppu.reg_base = PPU_SYS1_BASE,
-            .ppu.irq = PPU_SYS1_IRQ
+            .ppu.irq = PPU_SYS1_IRQ,
+            .default_power_on = true,
         }),
     },
     [PPU_V0_ELEMENT_IDX_COUNT] = { 0 }, /* Termination entry */
 };
-
 
 static const struct fwk_element *sgm775_ppu_v0_get_element_table
                                                            (fwk_id_t module_id)
