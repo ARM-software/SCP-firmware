@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -83,6 +83,7 @@ static const struct fwk_element clock_dev_desc_table[] = {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, 11),
             .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_PIK_CLOCK,
                                       MOD_PIK_CLOCK_API_TYPE_CLOCK),
+            .default_on = true,
         }),
     },
     [CLOCK_DEV_IDX_COUNT] = { 0 }, /* Termination description. */
