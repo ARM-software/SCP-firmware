@@ -78,7 +78,6 @@ static struct smt_ctx smt_ctx;
 static int smt_get_secure(fwk_id_t channel_id, bool *secure)
 {
     if (secure == NULL) {
-        fwk_assert(false);
         return FWK_E_PARAM;
     }
 
@@ -93,7 +92,6 @@ static int smt_get_max_payload_size(fwk_id_t channel_id, size_t *size)
     struct smt_channel_ctx *channel_ctx;
 
     if (size == NULL) {
-        fwk_assert(false);
         return FWK_E_PARAM;
     }
 
@@ -110,7 +108,6 @@ static int smt_get_message_header(fwk_id_t channel_id, uint32_t *header)
     struct smt_channel_ctx *channel_ctx;
 
     if (header == NULL) {
-        fwk_assert(false);
         return FWK_E_PARAM;
     }
 
@@ -133,7 +130,6 @@ static int smt_get_payload(fwk_id_t channel_id,
     struct smt_channel_ctx *channel_ctx;
 
     if (payload == NULL) {
-        fwk_assert(false);
         return FWK_E_PARAM;
     }
 
@@ -164,11 +160,10 @@ static int smt_write_payload(fwk_id_t channel_id,
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
 
     if ((payload == NULL)                         ||
-        (offset  > channel_ctx->max_payload_size) ||
+        (offset  >= channel_ctx->max_payload_size) ||
         (size > channel_ctx->max_payload_size)    ||
         ((offset + size) > channel_ctx->max_payload_size)) {
 
-        fwk_assert(false);
         return FWK_E_PARAM;
     }
 
@@ -262,6 +257,8 @@ static int smt_requester_handler(struct smt_channel_ctx *channel_ctx)
     status =
         channel_ctx->scmi_api->signal_message(channel_ctx->scmi_service_id);
     if (status != FWK_SUCCESS) {
+        /* Release the channel as we can't expect a response */
+        channel_ctx->locked = false;
         return FWK_E_HANDLER;
     }
 
@@ -308,7 +305,7 @@ int msg_signal_message(fwk_id_t channel_id, void *msg_in, size_t in_len, void *m
         return smt_completer_handler(channel_ctx);
     default:
         /* Invalid config */
-        fwk_assert(false);
+        return FWK_E_INIT;
         break;
     }
 
@@ -344,16 +341,31 @@ static int msg_init(fwk_id_t module_id, unsigned int element_count,
 static int msg_channel_init(fwk_id_t channel_id, unsigned int slot_count,
                             const void *data)
 {
-    size_t elt_idx = fwk_id_get_element_idx(channel_id);
-    struct smt_channel_ctx *channel_ctx = &smt_ctx.channel_ctx_table[elt_idx];
+    struct mod_msg_smt_channel_config *config;
+    size_t elt_idx;
+    struct smt_channel_ctx *channel_ctx;
 
-    channel_ctx->config = (struct mod_msg_smt_channel_config*)data;
-
+    config = (struct mod_msg_smt_channel_config*)data;
     /* Validate channel config */
-    if (channel_ctx->config->type >= MOD_MSG_SMT_CHANNEL_TYPE_COUNT) {
-        fwk_assert(false);
+    if (config == NULL) {
         return FWK_E_DATA;
     }
+    /* Validate channel type */
+    if (config->type >= MOD_MSG_SMT_CHANNEL_TYPE_COUNT) {
+        return FWK_E_DATA;
+    }
+   /* Validate channel iertype */
+    if (config->mailbox_size <= sizeof(struct mod_msg_smt_memory)) {
+        return FWK_E_DATA;
+    }
+    elt_idx = fwk_id_get_element_idx(channel_id);
+    /* Validate element index */
+    if (elt_idx >= smt_ctx.channel_count) {
+        return FWK_E_PARAM;
+    }
+
+    channel_ctx = &smt_ctx.channel_ctx_table[elt_idx];
+    channel_ctx->config = config;
 
     channel_ctx->in = NULL;
     channel_ctx->in_len = 0;
@@ -371,13 +383,20 @@ static int msg_channel_init(fwk_id_t channel_id, unsigned int slot_count,
 static int msg_bind(fwk_id_t id, unsigned int round)
 {
     int status;
+    size_t elt_idx;
     struct smt_channel_ctx *channel_ctx;
 
     if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         return FWK_SUCCESS;
     }
-
-    channel_ctx = &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(id)];
+    if (fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT) == false) {
+        return FWK_E_PARAM;
+    }
+    elt_idx = fwk_id_get_element_idx(id);
+    if (elt_idx >= smt_ctx.channel_count) {
+        return FWK_E_PARAM;
+    }
+    channel_ctx = &smt_ctx.channel_ctx_table[elt_idx];
 
     if (round == 0) {
 
@@ -443,7 +462,6 @@ static int msg_process_bind_request(fwk_id_t source_id,
             *api = &driver_input_api;
        } else {
             /* A module that we did not bind to is trying to bind to us */
-            fwk_assert(false);
             return FWK_E_ACCESS;
         }
         break;
@@ -456,7 +474,6 @@ static int msg_process_bind_request(fwk_id_t source_id,
 
     default:
         /* Invalid API */
-        fwk_assert(false);
         return FWK_E_PARAM;
     }
 
