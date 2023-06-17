@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -53,7 +53,6 @@ list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/n1sdp_timer_sync")
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/scmi_management")
-list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/n1sdp_pll")
 
 
 list(APPEND SCP_MODULES "armv7m-mpu")
@@ -64,7 +63,7 @@ list(APPEND SCP_MODULES "power-domain")
 list(APPEND SCP_MODULES "ppu-v1")
 list(APPEND SCP_MODULES "ppu-v0")
 list(APPEND SCP_MODULES "system-power")
-list(APPEND SCP_MODULES "n1sdp-pll")
+list(APPEND SCP_MODULES "sc-pll")
 list(APPEND SCP_MODULES "cdns-i2c")
 list(APPEND SCP_MODULES "n1sdp-dmc620")
 list(APPEND SCP_MODULES "n1sdp-ddr-phy")
