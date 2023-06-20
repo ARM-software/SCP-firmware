@@ -751,7 +751,7 @@ static int cmn700_program_rnsam(const struct mod_cmn700_mem_region_map *region)
             configure_region(
                 rnsam,
                 region_idx,
-                region->base,
+                base,
                 region->size,
                 SAM_NODE_TYPE_HN_F,
                 SAM_TYPE_SYS_CACHE_GRP_REGION);
