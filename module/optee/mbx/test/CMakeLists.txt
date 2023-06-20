@@ -26,5 +26,9 @@ set(MODULE_UT_MOCK_SRC ${CMAKE_CURRENT_LIST_DIR}/mocks)
 list(APPEND MOCK_REPLACEMENTS fwk_module)
 list(APPEND MOCK_REPLACEMENTS fwk_id)
 list(APPEND MOCK_REPLACEMENTS fwk_core)
+list(APPEND MOCK_REPLACEMENTS fwk_mm)
 
 include(${SCP_ROOT}/unit_test/module_common.cmake)
+
+target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC "BUILD_HAS_MOD_OPTEE_SMT")
+target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC "BUILD_HAS_MOD_MSG_SMT")

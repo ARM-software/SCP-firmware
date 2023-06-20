@@ -12,7 +12,15 @@
 
 enum fwk_module_idx {
     FWK_MODULE_IDX_OPTEE_MBX,
+    FWK_MODULE_IDX_MSG_SMT,
+    FWK_MODULE_IDX_OPTEE_SMT,
+    FWK_MODULE_IDX_SCMI,
     FWK_MODULE_IDX_COUNT,
 };
+
+static const fwk_id_t fwk_module_id_scmi =
+    FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI);
+
+#define FWK_MODULE_BIND_ROUND_MAX 1
 
 #endif /* TEST_FWK_MODULE_IDX_H */

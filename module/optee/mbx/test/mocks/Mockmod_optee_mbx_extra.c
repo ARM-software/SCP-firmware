@@ -7,6 +7,7 @@
 
 static const char* CMockString_m = "m";
 static const char* CMockString_mutex_init = "mutex_init";
+static const char* CMockString_mutex_lock = "mutex_lock";
 static const char* CMockString_mutex_unlock = "mutex_unlock";
 
 typedef struct _CMOCK_mutex_init_CALL_INSTANCE
@@ -21,6 +22,19 @@ typedef struct _CMOCK_mutex_init_CALL_INSTANCE
   char IgnoreArg_m;
 
 } CMOCK_mutex_init_CALL_INSTANCE;
+
+typedef struct _CMOCK_mutex_lock_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  struct mutex* Expected_m;
+  int Expected_m_Depth;
+  char ReturnThruPtr_m_Used;
+  struct mutex* ReturnThruPtr_m_Val;
+  size_t ReturnThruPtr_m_Size;
+  char IgnoreArg_m;
+
+} CMOCK_mutex_lock_CALL_INSTANCE;
 
 typedef struct _CMOCK_mutex_unlock_CALL_INSTANCE
 {
@@ -42,6 +56,11 @@ static struct Mockmod_optee_mbx_extraInstance
   CMOCK_mutex_init_CALLBACK mutex_init_CallbackFunctionPointer;
   int mutex_init_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE mutex_init_CallInstance;
+  char mutex_lock_IgnoreBool;
+  char mutex_lock_CallbackBool;
+  CMOCK_mutex_lock_CALLBACK mutex_lock_CallbackFunctionPointer;
+  int mutex_lock_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE mutex_lock_CallInstance;
   char mutex_unlock_IgnoreBool;
   char mutex_unlock_CallbackBool;
   CMOCK_mutex_unlock_CALLBACK mutex_unlock_CallbackFunctionPointer;
@@ -64,6 +83,19 @@ void Mockmod_optee_mbx_extra_Verify(void)
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
   if (Mock.mutex_init_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.mutex_lock_CallInstance;
+  if (Mock.mutex_lock_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_mutex_lock);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.mutex_lock_CallbackFunctionPointer != NULL)
   {
     call_instance = CMOCK_GUTS_NONE;
     (void)call_instance;
@@ -223,6 +255,139 @@ void mutex_init_CMockReturnMemThruPtr_m(UNITY_LINE_TYPE cmock_line, struct mutex
 void mutex_init_CMockIgnoreArg_m(UNITY_LINE_TYPE cmock_line)
 {
   CMOCK_mutex_init_CALL_INSTANCE* cmock_call_instance = (CMOCK_mutex_init_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mutex_init_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_m = 1;
+}
+
+void mutex_lock(struct mutex* m)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_mutex_lock_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_mutex_lock);
+  cmock_call_instance = (CMOCK_mutex_lock_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.mutex_lock_CallInstance);
+  Mock.mutex_lock_CallInstance = CMock_Guts_MemNext(Mock.mutex_lock_CallInstance);
+  if (Mock.mutex_lock_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    return;
+  }
+  if (!Mock.mutex_lock_CallbackBool &&
+      Mock.mutex_lock_CallbackFunctionPointer != NULL)
+  {
+    Mock.mutex_lock_CallbackFunctionPointer(m, Mock.mutex_lock_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  if (!cmock_call_instance->IgnoreArg_m)
+  {
+    UNITY_SET_DETAILS(CMockString_mutex_lock,CMockString_m);
+    if (cmock_call_instance->Expected_m == NULL)
+      { UNITY_TEST_ASSERT_NULL(m, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_m), (void*)(m), sizeof(struct mutex), cmock_call_instance->Expected_m_Depth, cmock_line, CMockStringMismatch); }
+  }
+  }
+  if (Mock.mutex_lock_CallbackFunctionPointer != NULL)
+  {
+    Mock.mutex_lock_CallbackFunctionPointer(m, Mock.mutex_lock_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_m_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(m, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)m, (void*)cmock_call_instance->ReturnThruPtr_m_Val,
+      cmock_call_instance->ReturnThruPtr_m_Size);
+  }
+  UNITY_CLR_DETAILS();
+}
+
+void CMockExpectParameters_mutex_lock(CMOCK_mutex_lock_CALL_INSTANCE* cmock_call_instance, struct mutex* m, int m_Depth);
+void CMockExpectParameters_mutex_lock(CMOCK_mutex_lock_CALL_INSTANCE* cmock_call_instance, struct mutex* m, int m_Depth)
+{
+  cmock_call_instance->Expected_m = m;
+  cmock_call_instance->Expected_m_Depth = m_Depth;
+  cmock_call_instance->IgnoreArg_m = 0;
+  cmock_call_instance->ReturnThruPtr_m_Used = 0;
+}
+
+void mutex_lock_CMockIgnore(void)
+{
+  Mock.mutex_lock_IgnoreBool = (char)1;
+}
+
+void mutex_lock_CMockStopIgnore(void)
+{
+  Mock.mutex_lock_IgnoreBool = (char)0;
+}
+
+void mutex_lock_CMockExpectAnyArgs(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mutex_lock_CALL_INSTANCE));
+  CMOCK_mutex_lock_CALL_INSTANCE* cmock_call_instance = (CMOCK_mutex_lock_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mutex_lock_CallInstance = CMock_Guts_MemChain(Mock.mutex_lock_CallInstance, cmock_guts_index);
+  Mock.mutex_lock_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void mutex_lock_CMockExpect(UNITY_LINE_TYPE cmock_line, struct mutex* m)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mutex_lock_CALL_INSTANCE));
+  CMOCK_mutex_lock_CALL_INSTANCE* cmock_call_instance = (CMOCK_mutex_lock_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mutex_lock_CallInstance = CMock_Guts_MemChain(Mock.mutex_lock_CallInstance, cmock_guts_index);
+  Mock.mutex_lock_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_mutex_lock(cmock_call_instance, m, 1);
+}
+
+void mutex_lock_AddCallback(CMOCK_mutex_lock_CALLBACK Callback)
+{
+  Mock.mutex_lock_IgnoreBool = (char)0;
+  Mock.mutex_lock_CallbackBool = (char)1;
+  Mock.mutex_lock_CallbackFunctionPointer = Callback;
+}
+
+void mutex_lock_Stub(CMOCK_mutex_lock_CALLBACK Callback)
+{
+  Mock.mutex_lock_IgnoreBool = (char)0;
+  Mock.mutex_lock_CallbackBool = (char)0;
+  Mock.mutex_lock_CallbackFunctionPointer = Callback;
+}
+
+void mutex_lock_CMockExpectWithArray(UNITY_LINE_TYPE cmock_line, struct mutex* m, int m_Depth)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mutex_lock_CALL_INSTANCE));
+  CMOCK_mutex_lock_CALL_INSTANCE* cmock_call_instance = (CMOCK_mutex_lock_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mutex_lock_CallInstance = CMock_Guts_MemChain(Mock.mutex_lock_CallInstance, cmock_guts_index);
+  Mock.mutex_lock_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_mutex_lock(cmock_call_instance, m, m_Depth);
+}
+
+void mutex_lock_CMockReturnMemThruPtr_m(UNITY_LINE_TYPE cmock_line, struct mutex* m, size_t cmock_size)
+{
+  CMOCK_mutex_lock_CALL_INSTANCE* cmock_call_instance = (CMOCK_mutex_lock_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mutex_lock_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_m_Used = 1;
+  cmock_call_instance->ReturnThruPtr_m_Val = m;
+  cmock_call_instance->ReturnThruPtr_m_Size = cmock_size;
+}
+
+void mutex_lock_CMockIgnoreArg_m(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_mutex_lock_CALL_INSTANCE* cmock_call_instance = (CMOCK_mutex_lock_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mutex_lock_CallInstance));
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
   cmock_call_instance->IgnoreArg_m = 1;
 }

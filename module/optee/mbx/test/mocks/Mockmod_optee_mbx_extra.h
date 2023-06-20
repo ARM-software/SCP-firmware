@@ -44,6 +44,26 @@ void mutex_init_CMockExpectWithArray(UNITY_LINE_TYPE cmock_line, struct mutex* m
 void mutex_init_CMockReturnMemThruPtr_m(UNITY_LINE_TYPE cmock_line, struct mutex* m, size_t cmock_size);
 #define mutex_init_IgnoreArg_m() mutex_init_CMockIgnoreArg_m(__LINE__)
 void mutex_init_CMockIgnoreArg_m(UNITY_LINE_TYPE cmock_line);
+#define mutex_lock_Ignore() mutex_lock_CMockIgnore()
+void mutex_lock_CMockIgnore(void);
+#define mutex_lock_StopIgnore() mutex_lock_CMockStopIgnore()
+void mutex_lock_CMockStopIgnore(void);
+#define mutex_lock_ExpectAnyArgs() mutex_lock_CMockExpectAnyArgs(__LINE__)
+void mutex_lock_CMockExpectAnyArgs(UNITY_LINE_TYPE cmock_line);
+#define mutex_lock_Expect(m) mutex_lock_CMockExpect(__LINE__, m)
+void mutex_lock_CMockExpect(UNITY_LINE_TYPE cmock_line, struct mutex* m);
+typedef void (* CMOCK_mutex_lock_CALLBACK)(struct mutex* m, int cmock_num_calls);
+void mutex_lock_AddCallback(CMOCK_mutex_lock_CALLBACK Callback);
+void mutex_lock_Stub(CMOCK_mutex_lock_CALLBACK Callback);
+#define mutex_lock_StubWithCallback mutex_lock_Stub
+#define mutex_lock_ExpectWithArray(m, m_Depth) mutex_lock_CMockExpectWithArray(__LINE__, m, m_Depth)
+void mutex_lock_CMockExpectWithArray(UNITY_LINE_TYPE cmock_line, struct mutex* m, int m_Depth);
+#define mutex_lock_ReturnThruPtr_m(m) mutex_lock_CMockReturnMemThruPtr_m(__LINE__, m, sizeof(struct mutex))
+#define mutex_lock_ReturnArrayThruPtr_m(m, cmock_len) mutex_lock_CMockReturnMemThruPtr_m(__LINE__, m, cmock_len * sizeof(*m))
+#define mutex_lock_ReturnMemThruPtr_m(m, cmock_size) mutex_lock_CMockReturnMemThruPtr_m(__LINE__, m, cmock_size)
+void mutex_lock_CMockReturnMemThruPtr_m(UNITY_LINE_TYPE cmock_line, struct mutex* m, size_t cmock_size);
+#define mutex_lock_IgnoreArg_m() mutex_lock_CMockIgnoreArg_m(__LINE__)
+void mutex_lock_CMockIgnoreArg_m(UNITY_LINE_TYPE cmock_line);
 #define mutex_unlock_Ignore() mutex_unlock_CMockIgnore()
 void mutex_unlock_CMockIgnore(void);
 #define mutex_unlock_StopIgnore() mutex_unlock_CMockStopIgnore()

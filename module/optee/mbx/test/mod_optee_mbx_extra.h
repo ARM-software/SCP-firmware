@@ -18,4 +18,5 @@
 #include <kernel/mutex.h>
 
 void mutex_init(struct mutex *m);
+void mutex_lock(struct mutex *m);
 void mutex_unlock(struct mutex *m);
