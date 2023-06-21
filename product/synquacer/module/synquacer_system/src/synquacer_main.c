@@ -429,6 +429,15 @@ static uint32_t fwu_plat_get_boot_index(void)
             platdata.boot_index = 0;
             FWK_LOG_ERR(
                 "[FWU] FWU metadata is broken. Use default boot indx 0");
+    } else if (metadata.img_entry[0].img_bank_info[metadata.active_index].accepted) {
+        /* Image is accepted, skip trial boot */
+        if (metadata.active_index != platdata.boot_index) {
+            platdata.boot_index = metadata.active_index;
+            platdata.boot_count = 0;
+        } else {
+            /* return here not to update metadata on every boot */
+            return platdata.boot_index;
+        }
     } else if (metadata.active_index != platdata.boot_index) {
         /* Switch to new active bank as a trial. */
         platdata.boot_index = metadata.active_index;
