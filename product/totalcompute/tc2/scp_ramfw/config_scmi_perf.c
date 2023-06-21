@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -125,6 +125,30 @@ static const struct mod_scmi_perf_domain_config
                 FC_LEVEL_GET_AP_ADDR(DVFS_ELEMENT_IDX_HUNTER_ELP),
             [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET] =
                 FC_LIMIT_GET_AP_ADDR(DVFS_ELEMENT_IDX_HUNTER_ELP),
+        },
+#endif
+        },
+        [DVFS_ELEMENT_IDX_GPU] = {
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
+         .fast_channels_addr_scp = (uint64_t[]) {
+            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
+                FC_LEVEL_SET_ADDR(DVFS_ELEMENT_IDX_GPU),
+            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET] =
+                FC_LIMIT_SET_ADDR(DVFS_ELEMENT_IDX_GPU),
+            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] =
+                FC_LEVEL_GET_ADDR(DVFS_ELEMENT_IDX_GPU),
+            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET] =
+                FC_LIMIT_GET_ADDR(DVFS_ELEMENT_IDX_GPU),
+        },
+         .fast_channels_addr_ap = (uint64_t[]) {
+            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
+                FC_LEVEL_SET_AP_ADDR(DVFS_ELEMENT_IDX_GPU),
+            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET] =
+                FC_LIMIT_SET_AP_ADDR(DVFS_ELEMENT_IDX_GPU),
+            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] =
+                FC_LEVEL_GET_AP_ADDR(DVFS_ELEMENT_IDX_GPU),
+            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET] =
+                FC_LIMIT_GET_AP_ADDR(DVFS_ELEMENT_IDX_GPU),
         },
 #endif
         },

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -137,6 +137,30 @@ static struct mod_dvfs_opp operating_points_hunter_elp[6] = {
     { 0 }
 };
 
+static struct mod_dvfs_opp operating_points_gpu[5] = {
+    {
+        .level = 350 * 1000000UL,
+        .frequency = 350 * FWK_KHZ,
+        .voltage = 550,
+    },
+    {
+        .level = 680 * 1000000UL,
+        .frequency = 680 * FWK_KHZ,
+        .voltage = 650,
+    },
+    {
+        .level = 1000 * 1000000UL,
+        .frequency = 1000 * FWK_KHZ,
+        .voltage = 750,
+    },
+    {
+        .level = 1260 * 1000000UL,
+        .frequency = 1260 * FWK_KHZ,
+        .voltage = 850,
+    },
+    { 0 }
+};
+
 static const struct mod_dvfs_domain_config cpu_group_hayes = {
     .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, PSU_ELEMENT_IDX_HAYES),
     .clock_id =
@@ -181,6 +205,19 @@ static const struct mod_dvfs_domain_config cpu_group_hunter_elp = {
     .opps = operating_points_hunter_elp,
 };
 
+static const struct mod_dvfs_domain_config gpu = {
+    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, PSU_ELEMENT_IDX_GPU),
+    .clock_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_GPU),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
+        FWK_MODULE_IDX_TIMER,
+        0,
+        TC2_CONFIG_TIMER_DVFS_GPU),
+    .retry_ms = 1,
+    .latency = 1200,
+    .sustained_idx = 2,
+    .opps = operating_points_gpu,
+};
+
 static const struct fwk_element element_table[DVFS_ELEMENT_IDX_COUNT + 1] = {
     [DVFS_ELEMENT_IDX_HAYES] =
         {
@@ -196,6 +233,11 @@ static const struct fwk_element element_table[DVFS_ELEMENT_IDX_COUNT + 1] = {
         {
             .name = "CPU_GROUP_HUNTER_ELP",
             .data = &cpu_group_hunter_elp,
+        },
+    [DVFS_ELEMENT_IDX_GPU] =
+        {
+            .name = "GPU",
+            .data = &gpu,
         },
     { 0 },
 };

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -43,6 +43,20 @@ static const struct fwk_element element_table[MOCK_PSU_ELEMENT_IDX_COUNT + 1] = 
     },
     [MOCK_PSU_ELEMENT_IDX_HUNTER_ELP] = {
         .name = "DVFS_GROUP_HUNTER_ELP",
+        .data =
+            &(const struct mod_mock_psu_element_cfg){
+                .async_alarm_id = FWK_ID_NONE_INIT,
+                .async_alarm_api_id = FWK_ID_NONE_INIT,
+
+                .async_response_id = FWK_ID_NONE_INIT,
+                .async_response_api_id = FWK_ID_NONE_INIT,
+
+                .default_enabled = true,
+                .default_voltage = 550,
+            },
+    },
+    [MOCK_PSU_ELEMENT_IDX_GPU] = {
+        .name = "DVFS_GROUP_GPU",
         .data =
             &(const struct mod_mock_psu_element_cfg){
                 .async_alarm_id = FWK_ID_NONE_INIT,

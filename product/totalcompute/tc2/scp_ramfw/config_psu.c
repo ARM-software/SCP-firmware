@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -42,6 +42,16 @@ static const struct fwk_element element_table[PSU_ELEMENT_IDX_COUNT + 1] = {
             &(const struct mod_psu_element_cfg){
                 .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MOCK_PSU,
                     MOCK_PSU_ELEMENT_IDX_HUNTER_ELP),
+                .driver_api_id = FWK_ID_API_INIT(
+                    FWK_MODULE_IDX_MOCK_PSU,
+                    MOD_MOCK_PSU_API_IDX_DRIVER) },
+    },
+    [PSU_ELEMENT_IDX_GPU] = {
+        .name = "PSU_GROUP_GPU",
+        .data =
+            &(const struct mod_psu_element_cfg){
+                .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MOCK_PSU,
+                    MOCK_PSU_ELEMENT_IDX_GPU),
                 .driver_api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_MOCK_PSU,
                     MOD_MOCK_PSU_API_IDX_DRIVER) },

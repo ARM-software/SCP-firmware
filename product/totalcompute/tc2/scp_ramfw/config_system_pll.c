@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -103,7 +103,20 @@ static const struct fwk_element system_pll_element_table[
                         .min_step = 25 * FWK_KHZ,
                         .defer_initialization = false,
                     }),
-        },
+            },
+        [CLOCK_PLL_IDX_GPU] =
+            {
+                .name = "GPU_PLL",
+                .data = &((struct mod_system_pll_dev_config){
+                    .control_reg = (void *)SCP_PLL_GPU,
+                    .status_reg = NULL,
+                    .initial_rate = 800 * FWK_MHZ,
+                    .min_rate = MOD_SYSTEM_PLL_MIN_RATE,
+                    .max_rate = MOD_SYSTEM_PLL_MAX_RATE,
+                    .min_step = MOD_SYSTEM_PLL_MIN_INTERVAL,
+                    .defer_initialization = false,
+                }),
+            },
         [CLOCK_PLL_IDX_COUNT] = { 0 }, /* Termination description. */
     };
 
