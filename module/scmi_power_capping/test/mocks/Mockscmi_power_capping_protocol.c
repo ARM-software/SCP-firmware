@@ -739,7 +739,7 @@ void pcapping_protocol_start_CMockIgnoreArg_id(UNITY_LINE_TYPE cmock_line)
   cmock_call_instance->IgnoreArg_id = 1;
 }
 
-int pcapping_protocol_process_notification(const struct fwk_event* event)
+int pcapping_protocol_process_fwk_notification(const struct fwk_event* event)
 {
   UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
   CMOCK_pcapping_protocol_process_notification_CALL_INSTANCE* cmock_call_instance;

@@ -143,6 +143,17 @@ struct mod_scmi_power_capping_domain_config {
      * \brief Power unit used for capping and monitoring.
      */
     enum mod_scmi_power_capping_power_cap_unit power_cap_unit;
+#    ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    /*!
+     * \brief Power cap and PAI change notifications support enable.
+     */
+    bool cap_pai_change_notification_support;
+
+    /*!
+     * \brief Power measurements change notifications support enable.
+     */
+    bool power_measurements_change_notification_support;
+#    endif
 #endif
 #ifdef BUILD_HAS_SCMI_POWER_CAPPING_FAST_CHANNELS_COMMANDS
     /*!

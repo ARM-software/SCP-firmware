@@ -11,4 +11,9 @@
 #include "mod_power_meter.h"
 
 int get_power(fwk_id_t domain_id, uint32_t *power);
+
+int set_power_change_notif_thresholds(
+    fwk_id_t id,
+    uint32_t threshold_low,
+    uint32_t threshold_high);
 #endif /* MOD_POWER_METER_EXTRA_H_ */

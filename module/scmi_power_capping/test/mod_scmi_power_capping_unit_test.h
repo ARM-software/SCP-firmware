@@ -51,4 +51,10 @@ enum fake_power_capping_domains {
 
 #define DISABLE_CAP_VALUE ((uint32_t)0)
 
+#define POWER_CAP_NOTIFY_ENABLE  (1)
+#define POWER_CAP_NOTIFY_DISABLE (0)
+
+#define MEASUREMENTS_NOTIFY_ENABLE  (1)
+#define MEASUREMENTS_NOTIFY_DISABLE (0)
+
 #endif /* MOD_SCMI_POWER_CAPPING_UNIT_TEST_H */

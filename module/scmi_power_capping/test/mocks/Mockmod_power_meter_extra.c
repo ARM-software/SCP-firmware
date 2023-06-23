@@ -7,7 +7,11 @@
 
 static const char* CMockString_domain_id = "domain_id";
 static const char* CMockString_get_power = "get_power";
+static const char* CMockString_id = "id";
 static const char* CMockString_power = "power";
+static const char* CMockString_set_power_change_notif_thresholds = "set_power_change_notif_thresholds";
+static const char* CMockString_threshold_high = "threshold_high";
+static const char* CMockString_threshold_low = "threshold_low";
 
 typedef struct _CMOCK_get_power_CALL_INSTANCE
 {
@@ -25,6 +29,20 @@ typedef struct _CMOCK_get_power_CALL_INSTANCE
 
 } CMOCK_get_power_CALL_INSTANCE;
 
+typedef struct _CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  int ReturnVal;
+  fwk_id_t Expected_id;
+  uint32_t Expected_threshold_low;
+  uint32_t Expected_threshold_high;
+  char IgnoreArg_id;
+  char IgnoreArg_threshold_low;
+  char IgnoreArg_threshold_high;
+
+} CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE;
+
 static struct Mockmod_power_meter_extraInstance
 {
   char get_power_IgnoreBool;
@@ -33,6 +51,12 @@ static struct Mockmod_power_meter_extraInstance
   CMOCK_get_power_CALLBACK get_power_CallbackFunctionPointer;
   int get_power_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE get_power_CallInstance;
+  char set_power_change_notif_thresholds_IgnoreBool;
+  int set_power_change_notif_thresholds_FinalReturn;
+  char set_power_change_notif_thresholds_CallbackBool;
+  CMOCK_set_power_change_notif_thresholds_CALLBACK set_power_change_notif_thresholds_CallbackFunctionPointer;
+  int set_power_change_notif_thresholds_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE set_power_change_notif_thresholds_CallInstance;
 } Mock;
 
 extern jmp_buf AbortFrame;
@@ -50,6 +74,19 @@ void Mockmod_power_meter_extra_Verify(void)
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
   if (Mock.get_power_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.set_power_change_notif_thresholds_CallInstance;
+  if (Mock.set_power_change_notif_thresholds_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_set_power_change_notif_thresholds);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.set_power_change_notif_thresholds_CallbackFunctionPointer != NULL)
   {
     call_instance = CMOCK_GUTS_NONE;
     (void)call_instance;
@@ -231,5 +268,151 @@ void get_power_CMockIgnoreArg_power(UNITY_LINE_TYPE cmock_line)
   CMOCK_get_power_CALL_INSTANCE* cmock_call_instance = (CMOCK_get_power_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.get_power_CallInstance));
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
   cmock_call_instance->IgnoreArg_power = 1;
+}
+
+int set_power_change_notif_thresholds(fwk_id_t id, uint32_t threshold_low, uint32_t threshold_high)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_set_power_change_notif_thresholds);
+  cmock_call_instance = (CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.set_power_change_notif_thresholds_CallInstance);
+  Mock.set_power_change_notif_thresholds_CallInstance = CMock_Guts_MemNext(Mock.set_power_change_notif_thresholds_CallInstance);
+  if (Mock.set_power_change_notif_thresholds_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.set_power_change_notif_thresholds_FinalReturn;
+    Mock.set_power_change_notif_thresholds_FinalReturn = cmock_call_instance->ReturnVal;
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.set_power_change_notif_thresholds_CallbackBool &&
+      Mock.set_power_change_notif_thresholds_CallbackFunctionPointer != NULL)
+  {
+    int cmock_cb_ret = Mock.set_power_change_notif_thresholds_CallbackFunctionPointer(id, threshold_low, threshold_high, Mock.set_power_change_notif_thresholds_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  if (!cmock_call_instance->IgnoreArg_id)
+  {
+    UNITY_SET_DETAILS(CMockString_set_power_change_notif_thresholds,CMockString_id);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_id), (void*)(&id), sizeof(fwk_id_t), cmock_line, CMockStringMismatch);
+  }
+  if (!cmock_call_instance->IgnoreArg_threshold_low)
+  {
+    UNITY_SET_DETAILS(CMockString_set_power_change_notif_thresholds,CMockString_threshold_low);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_threshold_low, threshold_low, cmock_line, CMockStringMismatch);
+  }
+  if (!cmock_call_instance->IgnoreArg_threshold_high)
+  {
+    UNITY_SET_DETAILS(CMockString_set_power_change_notif_thresholds,CMockString_threshold_high);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_threshold_high, threshold_high, cmock_line, CMockStringMismatch);
+  }
+  }
+  if (Mock.set_power_change_notif_thresholds_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.set_power_change_notif_thresholds_CallbackFunctionPointer(id, threshold_low, threshold_high, Mock.set_power_change_notif_thresholds_CallbackCalls++);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_set_power_change_notif_thresholds(CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE* cmock_call_instance, fwk_id_t id, uint32_t threshold_low, uint32_t threshold_high);
+void CMockExpectParameters_set_power_change_notif_thresholds(CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE* cmock_call_instance, fwk_id_t id, uint32_t threshold_low, uint32_t threshold_high)
+{
+  memcpy((void*)(&cmock_call_instance->Expected_id), (void*)(&id),
+         sizeof(fwk_id_t[sizeof(id) == sizeof(fwk_id_t) ? 1 : -1])); /* add fwk_id_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_id = 0;
+  cmock_call_instance->Expected_threshold_low = threshold_low;
+  cmock_call_instance->IgnoreArg_threshold_low = 0;
+  cmock_call_instance->Expected_threshold_high = threshold_high;
+  cmock_call_instance->IgnoreArg_threshold_high = 0;
+}
+
+void set_power_change_notif_thresholds_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE));
+  CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE* cmock_call_instance = (CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.set_power_change_notif_thresholds_CallInstance = CMock_Guts_MemChain(Mock.set_power_change_notif_thresholds_CallInstance, cmock_guts_index);
+  Mock.set_power_change_notif_thresholds_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.set_power_change_notif_thresholds_IgnoreBool = (char)1;
+}
+
+void set_power_change_notif_thresholds_CMockStopIgnore(void)
+{
+  if(Mock.set_power_change_notif_thresholds_IgnoreBool)
+    Mock.set_power_change_notif_thresholds_CallInstance = CMock_Guts_MemNext(Mock.set_power_change_notif_thresholds_CallInstance);
+  Mock.set_power_change_notif_thresholds_IgnoreBool = (char)0;
+}
+
+void set_power_change_notif_thresholds_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE));
+  CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE* cmock_call_instance = (CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.set_power_change_notif_thresholds_CallInstance = CMock_Guts_MemChain(Mock.set_power_change_notif_thresholds_CallInstance, cmock_guts_index);
+  Mock.set_power_change_notif_thresholds_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void set_power_change_notif_thresholds_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, fwk_id_t id, uint32_t threshold_low, uint32_t threshold_high, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE));
+  CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE* cmock_call_instance = (CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.set_power_change_notif_thresholds_CallInstance = CMock_Guts_MemChain(Mock.set_power_change_notif_thresholds_CallInstance, cmock_guts_index);
+  Mock.set_power_change_notif_thresholds_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_set_power_change_notif_thresholds(cmock_call_instance, id, threshold_low, threshold_high);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void set_power_change_notif_thresholds_AddCallback(CMOCK_set_power_change_notif_thresholds_CALLBACK Callback)
+{
+  Mock.set_power_change_notif_thresholds_IgnoreBool = (char)0;
+  Mock.set_power_change_notif_thresholds_CallbackBool = (char)1;
+  Mock.set_power_change_notif_thresholds_CallbackFunctionPointer = Callback;
+}
+
+void set_power_change_notif_thresholds_Stub(CMOCK_set_power_change_notif_thresholds_CALLBACK Callback)
+{
+  Mock.set_power_change_notif_thresholds_IgnoreBool = (char)0;
+  Mock.set_power_change_notif_thresholds_CallbackBool = (char)0;
+  Mock.set_power_change_notif_thresholds_CallbackFunctionPointer = Callback;
+}
+
+void set_power_change_notif_thresholds_CMockIgnoreArg_id(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE* cmock_call_instance = (CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.set_power_change_notif_thresholds_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_id = 1;
+}
+
+void set_power_change_notif_thresholds_CMockIgnoreArg_threshold_low(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE* cmock_call_instance = (CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.set_power_change_notif_thresholds_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_threshold_low = 1;
+}
+
+void set_power_change_notif_thresholds_CMockIgnoreArg_threshold_high(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE* cmock_call_instance = (CMOCK_set_power_change_notif_thresholds_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.set_power_change_notif_thresholds_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_threshold_high = 1;
 }
 

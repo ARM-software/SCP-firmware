@@ -35,6 +35,10 @@
  * SCMI power cap event IDs
  */
 enum scmi_power_capping_event_idx {
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    SCMI_POWER_CAPPING_EVENT_IDX_CAP_PAI_NOTIFY_PROCESS,
+    SCMI_POWER_CAPPING_EVENT_IDX_MEASUREMENT_NOTIFY_PROCESS,
+#endif
 #ifdef BUILD_HAS_SCMI_POWER_CAPPING_FAST_CHANNELS_COMMANDS
     SCMI_POWER_CAPPING_EVENT_IDX_FAST_CHANNELS_PROCESS,
 #endif
@@ -60,13 +64,37 @@ struct mod_scmi_power_capping_domain_context {
     const struct mod_scmi_power_capping_domain_config *config;
 
     /*!
-     * \brief Service ID
+     * \brief Power Cap Service ID
      *
      * \details Stores the service id corresponding to the agent that requested
      *      a power cap indicating that the domain is busy.
      *      It is set to FWK_ID_NONE when the domain is not used by an agent.
      */
+
     fwk_id_t cap_pending_service_id;
+
+    /*!
+     * \brief Power Cap Notification Service ID
+     *
+     * \details Stores the service id corresponding to the agent that requested
+     *      a Power Cap change. This variable is then used to determine which
+     *      agent that is responsible for the Power Cap change SCMI
+     *      notification.
+     *      It is set to FWK_ID_NONE when no agent is responsible for the Power
+     *      Cap change notification.
+     */
+    fwk_id_t cap_notification_service_id;
+
+    /*!
+     * \brief PAI Notification Service ID
+     *
+     * \details Stores the service id corresponding to the agent that requested
+     *      a PAI change. This variable is then used to determine which agent
+     *      that is responsible for the PAI change SCMI notification.
+     *      It is set to FWK_ID_NONE when no agent is responsible for the PAI
+     *      change notification.
+     */
+    fwk_id_t pai_notification_service_id;
 
     /*!
      * \brief Power capping configuration support.

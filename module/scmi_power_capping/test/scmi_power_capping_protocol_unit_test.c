@@ -81,6 +81,7 @@ static int status;
 static const struct mod_scmi_from_protocol_api scmi_api = {
     .respond = respond,
     .get_agent_id = get_agent_id,
+    .get_agent_count = get_agent_count,
 };
 
 static const struct mod_power_allocator_api power_allocator_api = {
@@ -104,6 +105,15 @@ static const struct mod_res_permissions_api res_perms_api = {
 };
 #endif
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+static const struct mod_scmi_notification_api scmi_notification_api = {
+    .scmi_notification_init = scmi_notification_init,
+    .scmi_notification_add_subscriber = scmi_notification_add_subscriber,
+    .scmi_notification_remove_subscriber = scmi_notification_remove_subscriber,
+    .scmi_notification_notify = scmi_notification_notify,
+};
+#endif
+
 static const struct mod_scmi_power_capping_power_apis power_management_apis = {
     .power_allocator_api = &power_allocator_api,
     .power_coordinator_api = &power_coordinator_api,
@@ -120,6 +130,9 @@ static const struct mod_scmi_power_capping_domain_config
         .parent_idx = __LINE__,
         .power_allocator_domain_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_ALLOCATOR, __LINE__),
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+        .cap_pai_change_notification_support = true,
+#endif
         .min_pai = MIN_DEFAULT_PAI,
         .max_pai = MAX_DEFAULT_PAI,
         .pai_step = 1,
@@ -141,12 +154,28 @@ static struct mod_scmi_power_capping_domain_context
     domain_ctx_table[FAKE_POWER_CAPPING_IDX_COUNT];
 
 /* Helper functions */
-static void test_set_domain_service_id(
+static void test_set_domain_cap_pending_service_id(
     unsigned int domain_idx,
     fwk_id_t service_id)
 {
     domain_ctx_table[domain_idx].cap_pending_service_id = service_id;
 }
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+static void test_set_domain_cap_notification_service_id(
+    unsigned int domain_idx,
+    fwk_id_t service_id)
+{
+    domain_ctx_table[domain_idx].cap_notification_service_id = service_id;
+}
+
+static void test_set_domain_pai_notification_service_id(
+    unsigned int domain_idx,
+    fwk_id_t service_id)
+{
+    domain_ctx_table[domain_idx].pai_notification_service_id = service_id;
+}
+#endif
 
 static void test_set_cap_config_supported(
     unsigned int domain_idx,
@@ -169,6 +198,10 @@ static void test_init(void)
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     pcapping_protocol_ctx.res_perms_api = &res_perms_api;
 #endif
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    pcapping_protocol_ctx.scmi_notification_api = &scmi_notification_api;
+#endif
     pcapping_protocol_ctx.power_management_apis = &power_management_apis;
     pcapping_protocol_ctx.power_capping_domain_count =
         FAKE_POWER_CAPPING_IDX_COUNT;
@@ -182,8 +215,14 @@ void setUp(void)
     for (unsigned int domain_id = 0; domain_id < FAKE_POWER_CAPPING_IDX_COUNT;
          domain_id++) {
         domain_ctx_table[domain_id].config = &scmi_power_capping_default_config;
-        test_set_domain_service_id(domain_id, FWK_ID_NONE);
+        test_set_domain_cap_pending_service_id(domain_id, FWK_ID_NONE);
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+        test_set_domain_cap_notification_service_id(domain_id, FWK_ID_NONE);
+        test_set_domain_pai_notification_service_id(domain_id, FWK_ID_NONE);
+#endif
     }
+    pcapping_protocol_ctx.power_capping_domain_count =
+        FAKE_POWER_CAPPING_IDX_COUNT;
 }
 
 void tearDown(void)
@@ -192,6 +231,7 @@ void tearDown(void)
     Mockmod_scmi_extra_Verify();
     Mockmod_power_coordinator_extra_Verify();
     Mockmod_power_meter_extra_Verify();
+    Mockfwk_id_Verify();
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     Mockmod_resource_perms_extra_Verify();
 #endif
@@ -375,6 +415,14 @@ void utest_message_handler_domain_attributes_valid(void)
         .parent_id = config->parent_idx,
     };
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    ret_payload.attributes |= config->cap_pai_change_notification_support
+        << POWER_CAPPING_NOTIF_SUP_POS;
+    ret_payload.attributes |=
+        config->power_measurements_change_notification_support
+        << POWER_MEAS_NOTIF_SUP_POS;
+#endif
+
     fwk_module_get_element_name_ExpectAndReturn(
         FWK_ID_ELEMENT(
             FWK_MODULE_IDX_SCMI_POWER_CAPPING, cmd_payload.domain_id),
@@ -516,7 +564,7 @@ void utest_message_handler_power_capping_set_domain_busy(void)
         .status = SCMI_BUSY,
     };
 
-    test_set_domain_service_id(cmd_payload.domain_id, service_id_1);
+    test_set_domain_cap_pending_service_id(cmd_payload.domain_id, service_id_1);
 
     test_set_cap_config_supported(cmd_payload.domain_id, true);
 
@@ -594,6 +642,10 @@ void utest_message_handler_power_capping_set_success_pending(void)
 
     fwk_id_is_equal_ExpectAndReturn(FWK_ID_NONE, FWK_ID_NONE, true);
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    fwk_id_is_equal_ExpectAndReturn(FWK_ID_NONE, FWK_ID_NONE, true);
+#endif
+
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
 #endif
@@ -633,6 +685,10 @@ void utest_message_handler_power_capping_set_success_sync(void)
 
     fwk_id_is_equal_ExpectAndReturn(FWK_ID_NONE, FWK_ID_NONE, true);
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    fwk_id_is_equal_ExpectAndReturn(FWK_ID_NONE, FWK_ID_NONE, true);
+#endif
+
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
 #endif
@@ -662,6 +718,10 @@ void utest_message_handler_power_capping_set_success_sync_uncap(void)
         FWK_SUCCESS);
 
     fwk_id_is_equal_ExpectAndReturn(FWK_ID_NONE, FWK_ID_NONE, true);
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    fwk_id_is_equal_ExpectAndReturn(FWK_ID_NONE, FWK_ID_NONE, true);
+#endif
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
@@ -742,6 +802,10 @@ void utest_message_handler_power_capping_set_pai_valid(void)
 
     test_set_pai_config_supported(cmd_payload.domain_id, true);
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    fwk_id_is_equal_ExpectAndReturn(FWK_ID_NONE, FWK_ID_NONE, true);
+#endif
+
     set_coordinator_period_ExpectAndReturn(
         scmi_power_capping_default_config.power_coordinator_domain_id,
         pai,
@@ -769,6 +833,10 @@ void utest_message_handler_power_capping_set_pai_failure(void)
     };
 
     test_set_pai_config_supported(cmd_payload.domain_id, true);
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    fwk_id_is_equal_ExpectAndReturn(FWK_ID_NONE, FWK_ID_NONE, true);
+#endif
 
     set_coordinator_period_ExpectAndReturn(
         scmi_power_capping_default_config.power_coordinator_domain_id,
@@ -890,6 +958,217 @@ void utest_message_handler_power_capping_get_power_measurement_failure(void)
     EXPECT_RESPONSE_ERROR(ret_payload);
     TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_MEASUREMENTS_GET, cmd_payload);
 }
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+void utest_message_handler_power_capping_cap_notify_valid_enable(void)
+{
+    struct scmi_power_capping_cap_notify_a2p cmd_payload = {
+        .domain_id = FAKE_POWER_CAPPING_IDX_1,
+        .notify_enable = POWER_CAP_NOTIFY_ENABLE,
+    };
+
+    struct scmi_power_capping_cap_notify_p2a ret_payload = {
+        .status = SCMI_SUCCESS,
+    };
+
+    scmi_notification_add_subscriber_ExpectAndReturn(
+        MOD_SCMI_PROTOCOL_ID_POWER_CAPPING,
+        FAKE_POWER_CAPPING_IDX_1,
+        MOD_SCMI_POWER_CAPPING_CAP_NOTIFY,
+        service_id_1,
+        FWK_SUCCESS);
+
+    EXPECT_RESPONSE_SUCCESS(ret_payload);
+    TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_CAP_NOTIFY, cmd_payload);
+}
+
+void utest_message_handler_power_capping_cap_notify_valid_disable(void)
+{
+    unsigned int agent_id;
+
+    struct scmi_power_capping_cap_notify_a2p cmd_payload = {
+        .domain_id = FAKE_POWER_CAPPING_IDX_1,
+        .notify_enable = POWER_CAP_NOTIFY_DISABLE,
+    };
+
+    struct scmi_power_capping_cap_notify_p2a ret_payload = {
+        .status = SCMI_SUCCESS,
+    };
+
+    get_agent_id_ExpectAndReturn(service_id_1, NULL, FWK_SUCCESS);
+    get_agent_id_IgnoreArg_agent_id();
+    get_agent_id_ReturnMemThruPtr_agent_id(&agent_id, sizeof(agent_id));
+
+    scmi_notification_remove_subscriber_ExpectAndReturn(
+        MOD_SCMI_PROTOCOL_ID_POWER_CAPPING,
+        agent_id,
+        cmd_payload.domain_id,
+        MOD_SCMI_POWER_CAPPING_CAP_NOTIFY,
+        FWK_SUCCESS);
+
+    EXPECT_RESPONSE_SUCCESS(ret_payload);
+    TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_CAP_NOTIFY, cmd_payload);
+}
+
+void utest_message_handler_power_capping_measurements_notify_valid_enable(void)
+{
+    struct scmi_power_capping_measurements_notify_a2p cmd_payload = {
+        .domain_id = FAKE_POWER_CAPPING_IDX_1,
+        .notify_enable = MEASUREMENTS_NOTIFY_ENABLE,
+    };
+
+    struct scmi_power_capping_measurements_notify_p2a ret_payload = {
+        .status = SCMI_SUCCESS,
+    };
+
+    scmi_notification_add_subscriber_ExpectAndReturn(
+        MOD_SCMI_PROTOCOL_ID_POWER_CAPPING,
+        FAKE_POWER_CAPPING_IDX_1,
+        MOD_SCMI_POWER_CAPPING_MEASUREMENTS_NOTIFY,
+        service_id_1,
+        FWK_SUCCESS);
+
+    EXPECT_RESPONSE_SUCCESS(ret_payload);
+    TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_MEASUREMENTS_NOTIFY, cmd_payload);
+}
+
+void utest_message_handler_power_capping_measurements_notify_valid_disable(void)
+{
+    unsigned int agent_id;
+
+    struct scmi_power_capping_measurements_notify_a2p cmd_payload = {
+        .domain_id = FAKE_POWER_CAPPING_IDX_1,
+        .notify_enable = MEASUREMENTS_NOTIFY_DISABLE,
+    };
+
+    struct scmi_power_capping_measurements_notify_p2a ret_payload = {
+        .status = SCMI_SUCCESS,
+    };
+
+    get_agent_id_ExpectAndReturn(service_id_1, NULL, FWK_SUCCESS);
+    get_agent_id_IgnoreArg_agent_id();
+    get_agent_id_ReturnMemThruPtr_agent_id(&agent_id, sizeof(agent_id));
+
+    scmi_notification_remove_subscriber_ExpectAndReturn(
+        MOD_SCMI_PROTOCOL_ID_POWER_CAPPING,
+        agent_id,
+        cmd_payload.domain_id,
+        MOD_SCMI_POWER_CAPPING_MEASUREMENTS_NOTIFY,
+        FWK_SUCCESS);
+
+    EXPECT_RESPONSE_SUCCESS(ret_payload);
+    TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_MEASUREMENTS_NOTIFY, cmd_payload);
+}
+
+void utest_pcapping_protocol_process_cap_pai_notify_event_success(void)
+{
+    unsigned int agent_id = __LINE__;
+    uint32_t cap = __LINE__;
+    uint32_t pai = __LINE__;
+    int status = FWK_SUCCESS;
+    struct fwk_event cap_pai_notify_event;
+
+    struct pcapping_protocol_event_parameters event_params = {
+        .domain_idx = FAKE_POWER_CAPPING_IDX_1,
+        .service_id = service_id_1,
+    };
+
+    struct scmi_power_capping_cap_changed_p2a payload = {
+        .agent_id = agent_id,
+        .domain_id = FAKE_POWER_CAPPING_IDX_1,
+        .cap = cap,
+        .pai = pai,
+    };
+
+    struct pcapping_protocol_event_parameters *event_params_ptr =
+        (struct pcapping_protocol_event_parameters *)
+            cap_pai_notify_event.params;
+
+    *event_params_ptr = event_params;
+
+    fwk_id_is_equal_ExpectAndReturn(service_id_1, FWK_ID_NONE, false);
+    get_agent_id_ExpectAndReturn(service_id_1, NULL, FWK_SUCCESS);
+    get_agent_id_IgnoreArg_agent_id();
+    get_agent_id_ReturnMemThruPtr_agent_id(&agent_id, sizeof(agent_id));
+
+    get_cap_ExpectWithArrayAndReturn(
+        scmi_power_capping_default_config.power_allocator_domain_id,
+        &cap,
+        sizeof(cap),
+        FWK_SUCCESS);
+    get_cap_IgnoreArg_cap();
+    get_cap_ReturnMemThruPtr_cap(&cap, sizeof(cap));
+
+    get_coordinator_period_ExpectWithArrayAndReturn(
+        scmi_power_capping_default_config.power_coordinator_domain_id,
+        &pai,
+        sizeof(pai),
+        FWK_SUCCESS);
+    get_coordinator_period_IgnoreArg_period();
+    get_coordinator_period_ReturnMemThruPtr_period(&pai, sizeof(pai));
+
+    scmi_notification_notify_ExpectWithArrayAndReturn(
+        MOD_SCMI_PROTOCOL_ID_POWER_CAPPING,
+        MOD_SCMI_POWER_CAPPING_CAP_NOTIFY,
+        SCMI_POWER_CAPPING_CAP_CHANGED,
+        &payload,
+        sizeof(payload),
+        sizeof(payload),
+        FWK_SUCCESS);
+
+    status =
+        pcapping_protocol_process_cap_pai_notify_event(&cap_pai_notify_event);
+
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+}
+
+void utest_pcapping_protocol_process_measurements_notify_event_success(void)
+{
+    uint32_t power = __LINE__;
+    int status = FWK_SUCCESS;
+    struct fwk_event measurements_notify_event;
+
+    struct pcapping_protocol_event_parameters event_params = {
+        .domain_idx = FAKE_POWER_CAPPING_IDX_1,
+        .service_id = service_id_1,
+    };
+
+    struct scmi_power_capping_measurements_changed_p2a payload = {
+        .agent_id = SCMI_POWER_CAPPING_AGENT_ID_PLATFORM,
+        .domain_id = FAKE_POWER_CAPPING_IDX_1,
+        .power = power,
+    };
+
+    struct pcapping_protocol_event_parameters *event_params_ptr =
+        (struct pcapping_protocol_event_parameters *)
+            measurements_notify_event.params;
+
+    *event_params_ptr = event_params;
+
+    get_power_ExpectWithArrayAndReturn(
+        scmi_power_capping_default_config.power_meter_domain_id,
+        &power,
+        sizeof(power),
+        FWK_SUCCESS);
+    get_power_IgnoreArg_power();
+    get_power_ReturnMemThruPtr_power(&power, sizeof(power));
+
+    scmi_notification_notify_ExpectWithArrayAndReturn(
+        MOD_SCMI_PROTOCOL_ID_POWER_CAPPING,
+        MOD_SCMI_POWER_CAPPING_MEASUREMENTS_NOTIFY,
+        SCMI_POWER_CAPPING_MEASUREMENTS_CHANGED,
+        &payload,
+        sizeof(payload),
+        sizeof(payload),
+        FWK_SUCCESS);
+
+    status = pcapping_protocol_process_measurements_notify_event(
+        &measurements_notify_event);
+
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+}
+
+#endif
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 void utest_message_handler_invalid_agent_id(void)
@@ -1018,6 +1297,14 @@ void utest_pcapping_protocol_bind(void)
         &(pcapping_protocol_ctx.res_perms_api),
         FWK_SUCCESS);
 #endif
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    fwk_module_bind_ExpectAndReturn(
+        FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
+        FWK_ID_API(FWK_MODULE_IDX_SCMI, MOD_SCMI_API_IDX_NOTIFICATION),
+        &(pcapping_protocol_ctx.scmi_notification_api),
+        FWK_SUCCESS);
+#endif
     status = pcapping_protocol_bind();
     TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
 }
@@ -1052,6 +1339,36 @@ void utest_pcapping_protocol_start_element(void)
         element_id,
         FWK_SUCCESS);
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    unsigned int agent_count = __LINE__;
+
+    fwk_notification_subscribe_ExpectAndReturn(
+        FWK_ID_NOTIFICATION(
+            FWK_MODULE_IDX_POWER_COORDINATOR,
+            MOD_POWER_COORDINATOR_NOTIFICATION_IDX_PERIOD_CHANGED),
+        FWK_ID_MODULE(FWK_MODULE_IDX_POWER_COORDINATOR),
+        element_id,
+        FWK_SUCCESS);
+
+    fwk_notification_subscribe_ExpectAndReturn(
+        FWK_ID_NOTIFICATION(
+            FWK_MODULE_IDX_POWER_METER,
+            MOD_POWER_METER_NOTIFICATION_IDX_MEASUREMENTS_CHANGED),
+        FWK_ID_MODULE(FWK_MODULE_IDX_POWER_METER),
+        element_id,
+        FWK_SUCCESS);
+
+    get_agent_count_ExpectAnyArgsAndReturn(FWK_SUCCESS);
+    get_agent_count_ReturnMemThruPtr_agent_count(
+        &agent_count, sizeof(agent_count));
+
+    scmi_notification_init_ExpectAndReturn(
+        MOD_SCMI_PROTOCOL_ID_POWER_CAPPING,
+        agent_count,
+        FAKE_POWER_CAPPING_IDX_COUNT,
+        MOD_SCMI_POWER_CAPPING_NOTIFICATION_COUNT,
+        FWK_SUCCESS);
+#endif
     status = pcapping_protocol_start(element_id);
     TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
 }
@@ -1062,6 +1379,7 @@ void utest_pcapping_protocol_process_notification(void)
     const unsigned int element_idx = 0u;
 
     struct fwk_event notification_event = {
+        .id = pcapping_protocol_cap_notification,
         .target_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SCMI_POWER_CAPPING, element_idx),
     };
@@ -1075,11 +1393,18 @@ void utest_pcapping_protocol_process_notification(void)
     fwk_id_get_element_idx_ExpectAndReturn(
         notification_event.target_id, element_idx);
 
+    fwk_id_is_equal_ExpectAndReturn(
+        notification_event.id, pcapping_protocol_cap_notification, true);
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    __fwk_put_event_ExpectAnyArgsAndReturn(FWK_SUCCESS);
+#endif
+
     fwk_id_is_equal_ExpectAndReturn(service_id_1, FWK_ID_NONE, false);
 
     EXPECT_RESPONSE_SUCCESS(ret_payload);
 
-    status = pcapping_protocol_process_notification(&notification_event);
+    status = pcapping_protocol_process_fwk_notification(&notification_event);
 
     TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
     TEST_ASSERT_EQUAL(
@@ -1149,6 +1474,16 @@ int scmi_power_capping_protocol_test_main(void)
     RUN_TEST(utest_message_handler_power_capping_set_more_than_max_pai);
     RUN_TEST(utest_message_handler_power_capping_get_power_measurement_valid);
     RUN_TEST(utest_message_handler_power_capping_get_power_measurement_failure);
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    RUN_TEST(utest_message_handler_power_capping_cap_notify_valid_enable);
+    RUN_TEST(utest_message_handler_power_capping_cap_notify_valid_disable);
+    RUN_TEST(
+        utest_message_handler_power_capping_measurements_notify_valid_enable);
+    RUN_TEST(
+        utest_message_handler_power_capping_measurements_notify_valid_disable);
+    RUN_TEST(utest_pcapping_protocol_process_cap_pai_notify_event_success);
+    RUN_TEST(utest_pcapping_protocol_process_measurements_notify_event_success);
+#endif
     RUN_TEST(utest_message_handler_un_implemented_message);
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     RUN_TEST(utest_message_handler_invalid_agent_id);

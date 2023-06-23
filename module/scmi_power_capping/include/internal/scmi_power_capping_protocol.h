@@ -44,6 +44,13 @@
 #define SCMI_POWER_CAPPING_POWER_UNIT_POS                   24
 #define SCMI_POWER_CAPPING_FAST_CHANNEL_SUP_POS             22
 
+#define SCMI_POWER_CAPPING_AGENT_ID_PLATFORM 0u
+
+enum scmi_power_capping_notification_id {
+    SCMI_POWER_CAPPING_CAP_CHANGED,
+    SCMI_POWER_CAPPING_MEASUREMENTS_CHANGED,
+};
+
 #define SET_PCAP_CONF_SUP(PCAP_CONF_SUP) \
     (PCAP_CONF_SUP << SCMI_POWER_CAPPING_CONF_SUP_POS)
 
@@ -62,6 +69,16 @@
 
 #define SCMI_POWER_CAPPING_DOMAIN_FCH_SUPPORT(FAST_CHNL_SUP) \
     ((FAST_CHNL_SUP) << SCMI_POWER_CAPPING_FAST_CHANNEL_SUP_POS)
+
+#define SCMI_POWER_CAPPING_DOMAIN_CAP_PAI_CHANGE_NOTIF_SUPPORT( \
+    CAP_PAI_CHANGE_NOTIF_SUP) \
+    ((CAP_PAI_CHANGE_NOTIF_SUP) \
+     << SCMI_POWER_CAPPING_CAP_PAI_CHANGE_NOTIF_SUP_POS)
+
+#define SCMI_POWER_CAPPING_DOMAIN_MEASUREMENTS_NOTIF_SUPPORT( \
+    MEASUREMENTS_CHANGE_NOTIF_SUP) \
+    ((MEASUREMENTS_CHANGE_NOTIF_SUP) \
+     << SCMI_POWER_CAPPING_POWER_MEASUREMENTS_NOTIF_SUP_POS)
 
 #define SCMI_POWER_CAPPING_IGN_DEL_RES_FLAG_POS 0
 #define SCMI_POWER_CAPPING_IGN_DEL_RES_FLAG_MASK \
@@ -195,6 +212,51 @@ struct scmi_power_capping_describe_fc_p2a {
 };
 
 /*
+ * Cap notify
+ */
+struct scmi_power_capping_cap_notify_a2p {
+    uint32_t domain_id;
+    uint32_t notify_enable;
+};
+
+struct scmi_power_capping_cap_notify_p2a {
+    int32_t status;
+};
+
+/*
+ * Cap changed
+ */
+struct scmi_power_capping_cap_changed_p2a {
+    uint32_t agent_id;
+    uint32_t domain_id;
+    uint32_t cap;
+    uint32_t pai;
+};
+
+/*
+ * Power measurement notify
+ */
+struct scmi_power_capping_measurements_notify_a2p {
+    uint32_t domain_id;
+    uint32_t notify_enable;
+    uint32_t threshold_low;
+    uint32_t threshold_high;
+};
+
+struct scmi_power_capping_measurements_notify_p2a {
+    int32_t status;
+};
+
+/*
+ * Power measurement changed
+ */
+struct scmi_power_capping_measurements_changed_p2a {
+    uint32_t agent_id;
+    uint32_t domain_id;
+    uint32_t power;
+};
+
+/*
  * Framework interface.
  */
 void pcapping_protocol_init(struct mod_scmi_power_capping_context *ctx);
@@ -207,12 +269,20 @@ int pcapping_protocol_bind(void);
 
 int pcapping_protocol_start(fwk_id_t id);
 
-int pcapping_protocol_process_notification(const struct fwk_event *event);
+int pcapping_protocol_process_fwk_notification(const struct fwk_event *event);
 
 int pcapping_protocol_process_bind_request(fwk_id_t api_id, const void **api);
 
 void pcapping_protocol_set_power_apis(
     struct mod_scmi_power_capping_power_apis *power_management_apis);
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+int pcapping_protocol_process_cap_pai_notify_event(
+    const struct fwk_event *event);
+
+int pcapping_protocol_process_measurements_notify_event(
+    const struct fwk_event *event);
+#endif
 
 /*!
  * \}

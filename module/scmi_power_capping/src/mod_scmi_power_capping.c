@@ -62,6 +62,17 @@ static int scmi_power_capping_power_api_bind(
         &(power_apis->power_meter_api));
 }
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+static const fwk_id_t mod_scmi_power_capping_event_id_cap_pai_notify =
+    FWK_ID_EVENT_INIT(
+        FWK_MODULE_IDX_SCMI_POWER_CAPPING,
+        SCMI_POWER_CAPPING_EVENT_IDX_CAP_PAI_NOTIFY_PROCESS);
+static const fwk_id_t mod_scmi_power_capping_event_id_measurement_notify =
+    FWK_ID_EVENT_INIT(
+        FWK_MODULE_IDX_SCMI_POWER_CAPPING,
+        SCMI_POWER_CAPPING_EVENT_IDX_MEASUREMENT_NOTIFY_PROCESS);
+#endif
+
 static int scmi_power_capping_init(
     fwk_id_t module_id,
     unsigned int element_count,
@@ -167,7 +178,7 @@ static int scmi_power_capping_process_notification(
     struct fwk_event *resp_event)
 {
 #ifdef BUILD_HAS_SCMI_POWER_CAPPING_STD_COMMANDS
-    return pcapping_protocol_process_notification(event);
+    return pcapping_protocol_process_fwk_notification(event);
 #else
     return FWK_SUCCESS;
 #endif
@@ -188,19 +199,30 @@ static int scmi_power_capping_process_bind_request(
 }
 #endif
 
-#ifdef BUILD_HAS_SCMI_POWER_CAPPING_FAST_CHANNELS_COMMANDS
 static int scmi_power_capping_process_event(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
 {
+#ifdef BUILD_HAS_SCMI_POWER_CAPPING_FAST_CHANNELS_COMMANDS
     if (fwk_id_is_equal(
             event->id, mod_scmi_power_capping_event_id_fch_callback)) {
         return pcapping_fast_channel_process_event(event);
     }
+#endif
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    if (fwk_id_is_equal(
+            event->id, mod_scmi_power_capping_event_id_cap_pai_notify)) {
+        return pcapping_protocol_process_cap_pai_notify_event(event);
+    }
+
+    if (fwk_id_is_equal(
+            event->id, mod_scmi_power_capping_event_id_measurement_notify)) {
+        return pcapping_protocol_process_measurements_notify_event(event);
+    }
+#endif
     return FWK_E_PARAM;
 }
-#endif
 
 const struct fwk_module module_scmi_power_capping = {
     .type = FWK_MODULE_TYPE_PROTOCOL,
@@ -213,9 +235,7 @@ const struct fwk_module module_scmi_power_capping = {
     .bind = scmi_power_capping_bind,
     .start = scmi_power_capping_start,
     .process_notification = scmi_power_capping_process_notification,
-#ifdef BUILD_HAS_SCMI_POWER_CAPPING_FAST_CHANNELS_COMMANDS
     .process_event = scmi_power_capping_process_event,
-#endif
 #ifdef BUILD_HAS_SCMI_POWER_CAPPING_STD_COMMANDS
     .process_bind_request = scmi_power_capping_process_bind_request,
 #endif
