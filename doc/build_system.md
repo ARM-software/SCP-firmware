@@ -125,6 +125,59 @@ by the build system, specifically by the __gen_module_code.py__ script:
     its contents are used internally by the framework and should not normally
     be used by other units such as modules.
 
+# Interface
+
+Interfaces provide a common set of abstractions and ensure consistent
+implementation across different modules. They define the APIs and data
+structures used by high-level modules, which do not need to be aware of the
+low-level module implementation details. This implies that low-level modules can
+be replaced without affecting the high-level ones.
+
+Each interface has its own directory within the interface folder, which contains
+header files in the main directory for including the interface's API.
+Additionally, the `doc` directory provides detailed documentation on how to use
+the interface effectively.
+
+## Folder Structure
+
+The `interface` folder follows a structure similar to the following:
+
+```
+interface/
+├── <interface name 1>
+│   ├── interface_<interface name 1>.h
+│   └── doc
+│       └── <documentation files...>
+├── <interface name 2>
+│   ├── interface_<interface name 2>.h
+│   └── doc
+│       └── <documentation files...>
+└── ...
+```
+
+- Each interface is organized in its own subdirectory, following the naming
+convention `interface_<interface name>.h`.
+- The subdirectory within each interface contains the header files that
+define the interface's API.
+- The `doc` directory within each interface contains optional documentation
+specific to that interface.
+
+## Usage
+
+To use an interface it requires to add the `include` path in the respective
+module `CMakeLists.txt` file.
+
+```cmake
+target_include_directories(${SCP_MODULE_TARGET} PUBLIC
+                  "${CMAKE_SOURCE_DIR}/interface/<interface name>")
+```
+Then simply include `interface_<interface name>.h` file to use the interface API
+definitions.
+
+It is important to refer to the interface-specific documentation provided in the
+`doc` directory of each interface for detailed information on how to use the
+interface and any specific considerations or limitations.
+
 # Build Configurations
 
 It is possible to enable different build configurations for each build image,
