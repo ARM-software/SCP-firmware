@@ -29,10 +29,12 @@ DisableFormat: 'false'
 IncludeBlocks: Regroup
 IncludeCategories:
 - Regex: ^<internal/(.+)\.h>$
-  Priority: -2
+  Priority: -3
 - Regex: ^<mod_(.+)_private\.h>$
-  Priority: -1
+  Priority: -2
 - Regex: ^<mod_(.+)\.h>$
+  Priority: -1
+- Regex: ^<interface_(.+)\.h>$
   Priority: 0
 - Regex: ^<fwk_(.+)\.h>$
   Priority: 1
