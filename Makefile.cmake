@@ -209,6 +209,8 @@ help:
 	@echo "--------------------------------------------------------------------"
 	@echo "    all             Build all firmware defined by PRODUCT=<product>"
 	@echo "    clean           Remove all built products"
+	@echo "    fwk_test        Build and runs framework unit tests"
+	@echo "    mod_test        Build and runs module unit tests"
 	@echo "    help            Show this documentation"
 	@echo "    doc             Generate the documentation of this project with Doxygen"
 	@echo ""
