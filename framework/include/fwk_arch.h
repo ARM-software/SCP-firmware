@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -182,8 +182,8 @@ struct fwk_arch_interrupt_driver {
     /*!
      * \brief Check if in interrupt context.
      *
-     * \retval :: \c true if in an interrupt context.
-     * \retval :: \c false not in an interrupt context.
+     * \retval true if in an interrupt context.
+     * \retval false not in an interrupt context.
      */
     bool (*is_interrupt_context)(void);
 };

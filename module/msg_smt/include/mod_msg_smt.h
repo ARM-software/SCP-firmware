@@ -1,6 +1,7 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -14,10 +15,6 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <fwk_id.h>
-
-/*!
- * @}
- */
 
 /*!
  * \brief Channel type
