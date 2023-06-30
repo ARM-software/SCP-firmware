@@ -8,7 +8,7 @@
 FROM ubuntu:20.04@sha256:9fa30fcef427e5e88c76bc41ad37b7cc573e1d79cecb23035e413c4be6e476ab as ci
 
 ARG ARM_GNU_RM_URL="https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2"
-ARG DOXYGEN_URL="https://sourceforge.net/projects/doxygen/files/rel-1.8.20/doxygen-1.8.20.linux.bin.tar.gz"
+ARG DOXYGEN_URL="https://sourceforge.net/projects/doxygen/files/rel-1.8.13/doxygen-1.8.13.linux.bin.tar.gz"
 ARG CMAKE_URL="https://github.com/Kitware/CMake/releases/download/v3.25.2/cmake-3.25.2-linux-x86_64.tar.gz"
 ARG AARCH64_GCC_URL="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.2-2020.11/binrel/gcc-arm-10.2-2020.11-x86_64-aarch64-none-elf.tar.xz"
 ARG CPPCHECK_SRC_URL="https://github.com/danmar/cppcheck.git"
