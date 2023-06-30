@@ -334,7 +334,7 @@ environment, but in case you must do so directly through Docker, you can build
 the development container with the following:
 
 ```sh
-$ docker build -t scp-firmware --target=dev "./docker"
+$ docker build -t scp-firmware --target=dev -f docker/Dockerfile .
 ```
 
 You can then begin an interactive login shell with:

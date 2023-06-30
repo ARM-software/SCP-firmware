@@ -63,7 +63,8 @@ def banner(text):
 
 
 def dockerize(client):
-    (image, _) = client.images.build(path="docker", target="dev", rm=True)
+    (image, _) = client.images.build(path=".", dockerfile="docker/Dockerfile",
+                                     target="dev", rm=True)
 
     env = {"ARMLMD_LICENSE_FILE": os.environ["ARMLMD_LICENSE_FILE"]}
 
