@@ -8,9 +8,9 @@ Vagrant.configure("2") do |config|
     config.vm.provision "file", source: "~/.gitconfig", destination: "${HOME}/.gitconfig"
 
     config.vm.provider "docker" do |d|
-        d.build_dir = "docker"
+        d.build_dir = "."
 
-        d.build_args = [ "--target", "vagrant" ]
+        d.build_args = [ "--target", "vagrant", "-f", "docker/Dockerfile" ]
         d.cmd = [ "sudo", "/usr/sbin/sshd", "-D" ]
         d.env = { "ARMLMD_LICENSE_FILE" => ENV["ARMLMD_LICENSE_FILE"] }
 

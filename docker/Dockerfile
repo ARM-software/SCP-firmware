@@ -16,6 +16,8 @@ ARG CPPCHECK_CHECKOUT_TAG="1.90"
 ARG IWYU_SRC_URL="https://github.com/include-what-you-use/include-what-you-use.git"
 ARG LINUX_SCRIPTS_URL="https://raw.githubusercontent.com/torvalds/linux/master/scripts"
 
+ARG ROOTFS_PATH="docker/rootfs"
+
 ENV ARMLMD_LICENSE_FILE=
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -71,7 +73,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         clang-tidy-13 clang-13 llvm-13 libclang-13-dev llvm-13-dev lld-13
 
-COPY rootfs/usr/local/bin/prepare_llvm /usr/local/bin/prepare_llvm
+COPY ${ROOTFS_PATH}/usr/local/bin/prepare_llvm /usr/local/bin/prepare_llvm
 RUN  chmod 755 "/usr/local/bin/prepare_llvm"
 RUN  prepare_llvm
 
@@ -114,13 +116,18 @@ RUN cwd=$PWD && mkdir "/opt/checkpatch" && cd "/opt/checkpatch" && \
 
 ENV PATH="/opt/checkpatch:${PATH}"
 
-COPY rootfs/usr/local/bin/init /usr/local/bin/init
+COPY ${ROOTFS_PATH}/usr/local/bin/init /usr/local/bin/init
 RUN  chmod 755 "/usr/local/bin/init"
 
-COPY rootfs/usr/local/bin/dependencies /usr/local/bin/dependencies
-RUN  chmod 755 "/usr/local/bin/dependencies"
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
-ENTRYPOINT [ "sh", "/usr/local/bin/dependencies", "/usr/local/bin/init" ]
+COPY requirements.txt .
+RUN PIP_ROOT_USER_ACTION=ignore python3 -m pip install -r requirements.txt
+
+COPY Gemfile .
+RUN BUNDLE_SILENCE_ROOT_WARNING=true bundler install
+
+ENTRYPOINT [ "sh", "/usr/local/bin/init" ]
 
 FROM ci as jenkins
 
@@ -154,7 +161,6 @@ ENV NOTVISIBLE="in users profile"
 RUN echo "export VISIBLE=now" >> "/etc/profile"
 
 RUN echo "\nexport USER=user" >> "/home/user/.bashrc"
-RUN echo "\n/usr/local/bin/dependencies" >> "/home/user/.bashrc"
 ENV PATH="/home/user/.local/bin:${PATH}"
 
 ENTRYPOINT [ "sh", "/usr/local/bin/init" ]
@@ -185,13 +191,12 @@ RUN printf "\nAcceptEnv ARMLMD_LICENSE_FILE" >> /etc/ssh/sshd_config
 RUN mkdir -p "/home/vagrant/.ssh" && \
     chmod 755 "/home/vagrant/.ssh"
 
-COPY rootfs/home/vagrant/.ssh/authorized_keys /home/vagrant/.ssh/authorized_keys
+COPY ${ROOTFS_PATH}/home/vagrant/.ssh/authorized_keys /home/vagrant/.ssh/authorized_keys
 RUN  chmod 644 "/home/vagrant/.ssh/authorized_keys"
 
 RUN printf "\ncd /vagrant" >> "/home/vagrant/.bashrc"
 
 RUN echo "\nexport USER=vagrant" >> "/home/user/.bashrc"
-RUN echo "\n/usr/local/bin/dependencies" >> "/home/vagrant/.bashrc"
 ENV PATH="/home/vagrant/.local/bin:${PATH}"
 
 EXPOSE 22

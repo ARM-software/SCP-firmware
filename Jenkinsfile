@@ -55,7 +55,8 @@ pipeline {
                     docker build -t scp-firmware:build-${currentBuild.number} \
                         --build-arg JENKINS_UID=1000 \
                         --build-arg JENKINS_GID=36293 \
-                        --target=jenkins docker
+                        --target=jenkins \
+                        --file docker/Dockerfile .
                 """
             }
         }
