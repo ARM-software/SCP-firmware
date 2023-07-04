@@ -66,8 +66,9 @@ static int put_self_event(enum mcp_system_event event_type)
 
 static void alarm_callback(uintptr_t param)
 {
+#if FWK_LOG_LEVEL < FWK_LOG_LEVEL_CRIT
     enum mcp_system_event event_id_type = (enum mcp_system_event)param;
-
+#endif
     FWK_LOG_ERR(
         "[MCP SYSTEM] For event ID - %d, No response received. Timing Out!",
         (int)event_id_type);
