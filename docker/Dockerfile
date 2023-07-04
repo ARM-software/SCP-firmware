@@ -14,6 +14,7 @@ ARG AARCH64_GCC_URL="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.
 ARG CPPCHECK_SRC_URL="https://github.com/danmar/cppcheck.git"
 ARG CPPCHECK_CHECKOUT_TAG="1.90"
 ARG IWYU_SRC_URL="https://github.com/include-what-you-use/include-what-you-use.git"
+ARG LINUX_SCRIPTS_URL="https://raw.githubusercontent.com/torvalds/linux/master/scripts"
 
 ENV ARMLMD_LICENSE_FILE=
 
@@ -102,6 +103,16 @@ RUN cwd=$PWD && mkdir "/opt/iwyu" && cd "/opt/iwyu" && \
         "/etc/profile.d/50-scp-firmware-env.sh"
 
 ENV PATH="/opt/iwyu/bin:${PATH}"
+
+RUN cwd=$PWD && mkdir "/opt/checkpatch" && cd "/opt/checkpatch" && \
+    wget -nvc "${LINUX_SCRIPTS_URL}/checkpatch.pl" && \
+    wget -nvc "${LINUX_SCRIPTS_URL}/spelling.txt" && \
+    wget -nvc "${LINUX_SCRIPTS_URL}/const_structs.checkpatch" && \
+    chmod 755 "/opt/checkpatch/checkpatch.pl" && \
+    echo 'export PATH=/opt/checkpatch:${PATH}' >> \
+        "/etc/profile.d/50-scp-firmware-env.sh"
+
+ENV PATH="/opt/checkpatch:${PATH}"
 
 COPY rootfs/usr/local/bin/init /usr/local/bin/init
 RUN  chmod 755 "/usr/local/bin/init"
