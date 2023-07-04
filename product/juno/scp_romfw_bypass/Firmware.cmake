@@ -33,8 +33,6 @@ set(SCP_PLATFORM_VARIANT ${SCP_PLATFORM_VARIANT_INIT} CACHE STRING
 
 list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/juno_rom")
 list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/juno_ppu")
-list(PREPEND SCP_MODULE_PATHS
-     "${CMAKE_CURRENT_LIST_DIR}/../module/juno_soc_clock")
 
 # The order of the modules in the following list is the order in which the
 # modules are initialized, bound, started during the pre-runtime phase.
@@ -42,8 +40,6 @@ list(PREPEND SCP_MODULE_PATHS
 
 list(APPEND SCP_MODULES "juno-ppu")
 list(APPEND SCP_MODULES "juno-rom")
-list(APPEND SCP_MODULES "juno-soc-clock")
-list(APPEND SCP_MODULES "clock")
 list(APPEND SCP_MODULES "gtimer")
 list(APPEND SCP_MODULES "sds")
 list(APPEND SCP_MODULES "bootloader")

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -44,7 +44,9 @@ static_assert(FWK_ARRAY_SIZE(sds_module_regions) == JUNO_SDS_REGION_COUNT,
 static const struct mod_sds_config sds_module_config = {
     .regions = sds_module_regions,
     .region_count = (unsigned int)JUNO_SDS_REGION_COUNT,
+#ifdef BUILD_HAS_MOD_CLOCK
     .clock_id = FWK_ID_NONE_INIT,
+#endif
 };
 
 static const struct fwk_element element_table[] = {

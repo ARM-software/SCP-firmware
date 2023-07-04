@@ -30,8 +30,6 @@ target_sources(
     juno-bl1-bypass
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_ppu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_rom.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_soc_clock.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_sds.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_bootloader.c"
