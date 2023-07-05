@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -178,6 +178,10 @@ static int tc2_bl1_process_event(
         ctx.ppu_boot_api->power_mode_on(ctx.bl1_config->id_primary_core);
 
         status = ctx.bootloader_api->load_image();
+
+#if !(FWK_LOG_LEVEL < FWK_LOG_LEVEL_DISABLED)
+        (void)status;
+#endif
 
         FWK_LOG_CRIT(
             "[TC2_BL1] Failed to load RAM firmware image: %s",
