@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -67,6 +67,11 @@ struct scmi_protocol {
 
     /* SCMI protocol framework identifier */
     fwk_id_t id;
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    /* SCMI protocol notification message handler */
+    mod_scmi_notification_message_handler_t *notification_handler;
+#endif
 };
 
 struct mod_scmi_ctx {
