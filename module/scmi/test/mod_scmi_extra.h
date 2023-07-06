@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -319,3 +319,30 @@ int mod_scmi_from_protocol_send_message(
  * \retval ::FWK_SUCCESS The operation succeeded.
  */
 int mod_scmi_from_protocol_response_message_handler(fwk_id_t service_id);
+
+/*!
+ * \brief Get the SCMI protocol identifier of the SCMI protocol implemented
+ *      by the SCMI protocol module implementing this API.
+ *
+ * \param protocol_id Identifier of the protocol module.
+ * \param scmi_protocol_id SCMI protocol identifier.
+ *
+ * \retval ::FWK_SUCCESS The operation succeeded.
+ * \return One of the standard error codes for implementation-defined
+ *      errors.
+ *
+ */
+int test_get_scmi_protocol_id(fwk_id_t protocol_id, uint8_t *scmi_protocol_id);
+
+int test_mod_scmi_message_handler(
+    fwk_id_t protocol_id,
+    fwk_id_t service_id,
+    const uint32_t *payload,
+    size_t payload_size,
+    unsigned int message_id);
+
+int test_mod_scmi_notification_message_handler(
+    fwk_id_t protocol_id,
+    fwk_id_t service_id,
+    const uint32_t *payload,
+    size_t payload_size);
