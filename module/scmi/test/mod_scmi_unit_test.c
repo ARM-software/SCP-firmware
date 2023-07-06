@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -105,6 +105,14 @@ struct fwk_module_config config_scmi = {
     .elements = FWK_MODULE_DYNAMIC_ELEMENTS(get_element_table),
 };
 
+struct mod_scmi_to_protocol_api to_protocol_api = {
+    .get_scmi_protocol_id = test_get_scmi_protocol_id,
+    .message_handler = &test_mod_scmi_message_handler,
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    .notification_handler = &test_mod_scmi_message_handler,
+#endif
+};
+
 static struct mod_scmi_to_transport_api to_transport_api = {
     .get_secure = mod_scmi_to_transport_api_get_secure,
     .get_max_payload_size = mod_scmi_to_transport_api_get_max_payload_size,
@@ -138,6 +146,10 @@ void setUp(void)
         sizeof(scmi_ctx.protocol_table[0]));
     scmi_ctx.protocol_table[PROTOCOL_TABLE_BASE_PROTOCOL_IDX].message_handler =
         scmi_base_message_handler;
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    scmi_ctx.protocol_table[PROTOCOL_TABLE_BASE_PROTOCOL_IDX]
+        .notification_handler = test_mod_scmi_message_handler;
+#endif
     scmi_ctx.service_ctx_table = fwk_mm_calloc(
         FAKE_SERVICE_IDX_COUNT, sizeof(scmi_ctx.service_ctx_table[0]));
     scmi_ctx.scmi_protocol_id_to_idx[MOD_SCMI_PROTOCOL_ID_BASE] =
@@ -215,12 +227,71 @@ void test_function_scmi_base_discover_sub_vendor_handler(void)
         FWK_SUCCESS, scmi_base_discover_sub_vendor_handler(service_id, NULL));
 }
 
+void test_send_to_message_handler(void)
+{
+    int status;
+    struct scmi_protocol *protocol;
+    struct scmi_service_ctx ctx;
+
+    uint32_t payload = FWK_SUCCESS;
+
+    struct fwk_event event = {
+        .source_id = FWK_ID_NONE,
+        .target_id = FWK_ID_ELEMENT_INIT(FAKE_MODULE_ID, FAKE_SERVICE_IDX_OSPM),
+        .id = FWK_ID_NONE,
+    };
+
+    ctx.scmi_message_id = 0x00;
+    ctx.scmi_message_type = MOD_SCMI_MESSAGE_TYPE_COMMAND;
+    ctx.scmi_protocol_id = 0x12;
+    protocol = &scmi_ctx.protocol_table[PROTOCOL_TABLE_BASE_PROTOCOL_IDX];
+
+    mod_scmi_from_protocol_respond_ExpectAnyArgsAndReturn(FWK_SUCCESS);
+
+    test_mod_scmi_notification_message_handler_ExpectAnyArgsAndReturn(
+        FWK_SUCCESS);
+    status = send_to_message_handler(
+        &ctx, protocol, (const uint32_t *)&payload, sizeof(payload), &event);
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+}
+
+void test_send_to_notification_handler(void)
+{
+    int status;
+    struct scmi_protocol *protocol;
+    struct scmi_service_ctx ctx;
+
+    uint32_t payload = FWK_SUCCESS;
+
+    struct fwk_event event = {
+        .source_id = FWK_ID_NONE,
+        .target_id = FWK_ID_ELEMENT_INIT(FAKE_MODULE_ID, FAKE_SERVICE_IDX_OSPM),
+        .id = FWK_ID_NONE,
+    };
+
+    ctx.scmi_message_id = 0x00;
+    ctx.scmi_message_type = MOD_SCMI_MESSAGE_TYPE_NOTIFICATION;
+    ctx.scmi_protocol_id = 0x12;
+    protocol = &scmi_ctx.protocol_table[PROTOCOL_TABLE_BASE_PROTOCOL_IDX];
+
+    mod_scmi_from_protocol_respond_ExpectAnyArgsAndReturn(FWK_SUCCESS);
+
+    test_mod_scmi_notification_message_handler_ExpectAnyArgsAndReturn(
+        FWK_SUCCESS);
+    status = send_to_message_handler(
+        &ctx, protocol, (const uint32_t *)&payload, sizeof(payload), &event);
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+}
+
 int scmi_test_main(void)
 {
     UNITY_BEGIN();
     RUN_TEST(test_function_scmi_base_discover_sub_vendor_handler);
     RUN_TEST(test_function_get_max_payload_size_invalid_param);
     RUN_TEST(test_function_get_max_payload_size_valid_param);
+
+    RUN_TEST(test_send_to_message_handler);
+    RUN_TEST(test_send_to_notification_handler);
     return UNITY_END();
 }
 
