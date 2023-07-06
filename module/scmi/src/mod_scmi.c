@@ -162,6 +162,46 @@ static const char *get_message_type_str(const struct scmi_service_ctx *ctx)
 }
 
 /*
+ * To handle both commands and notifications received.
+ */
+int send_to_message_handler(
+    struct scmi_service_ctx *ctx,
+    struct scmi_protocol *protocol,
+    const uint32_t *payload,
+    size_t payload_size,
+    const struct fwk_event *event)
+{
+    int status;
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    if (ctx->scmi_message_type == MOD_SCMI_MESSAGE_TYPE_NOTIFICATION) {
+        status = protocol->notification_handler(
+            protocol->id,
+            event->target_id,
+            payload,
+            payload_size,
+            ctx->scmi_message_id);
+    } else {
+        status = protocol->message_handler(
+            protocol->id,
+            event->target_id,
+            payload,
+            payload_size,
+            ctx->scmi_message_id);
+    }
+#else
+    status = protocol->message_handler(
+        protocol->id,
+        event->target_id,
+        payload,
+        payload_size,
+        ctx->scmi_message_id);
+#endif
+
+    return status;
+}
+
+/*
  * Transport entity -> SCMI module
  */
 static int signal_error(fwk_id_t service_id)
@@ -1079,12 +1119,8 @@ static int scmi_process_event(const struct fwk_event *event,
         return FWK_E_INIT;
     }
 
-    status = protocol->message_handler(
-        protocol->id,
-        event->target_id,
-        payload,
-        payload_size,
-        ctx->scmi_message_id);
+    status =
+        send_to_message_handler(ctx, protocol, payload, payload_size, event);
 
     if (status != FWK_SUCCESS) {
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR

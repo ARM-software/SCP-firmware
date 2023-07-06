@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -399,6 +399,38 @@ typedef int mod_scmi_message_handler_t(fwk_id_t protocol_id,
     fwk_id_t service_id, const uint32_t *payload, size_t payload_size,
     unsigned int message_id);
 
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+/*!
+ * \brief SCMI protocol notification message handler prototype.
+ *
+ * \details Prototype of a notification message handler called
+ *         by the SCMI module when it receives a notification
+ *         for a SCMI protocol module.
+ *
+ * \note A return value of FWK_SUCCESS indicates only that no internal error
+ *      was encountered, not that the SCMI command has returned a successful
+ *      result to the SCMI agent. In the case where the return value indicates
+ *      an internal failure, the SCMI command is expected to return the status
+ *      code SCMI_GENERIC_ERROR per the specification.
+ *
+ * \param protocol_id Identifier of the protocol module.
+ * \param service_id Identifer of the SCMI service which received the message.
+ * \param payload Pointer to the notification payload.
+ * \param payload_size Size in number of bytes of the notification payload.
+ * \param message_id Identifier of the message to be handled by the protocol
+ *      handler.
+ *
+ * \retval ::FWK_SUCCESS The operation succeeded.
+ * \return One of the standard error codes for implementation-defined errors.
+ *
+ */
+typedef int mod_scmi_notification_message_handler_t(
+    fwk_id_t protocol_id,
+    fwk_id_t service_id,
+    const uint32_t *payload,
+    size_t payload_size,
+    unsigned int message_id);
+#endif
 /*!
  * \brief SCMI module to SCMI protocol module API.
  */
@@ -420,6 +452,11 @@ struct mod_scmi_to_protocol_api {
 
     /*! Protocol message handler. */
     mod_scmi_message_handler_t *message_handler;
+
+#ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    /*! Protocol notification handler. */
+    mod_scmi_notification_message_handler_t *notification_handler;
+#endif
 };
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
