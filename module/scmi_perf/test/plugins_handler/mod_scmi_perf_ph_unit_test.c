@@ -837,6 +837,7 @@ void utest_perf_plugins_handler_update_no_plugins_last_log_dom(void)
         FWK_ID_SUB_ELEMENT(FWK_MODULE_IDX_DVFS, DVFS_ELEMENT_IDX_1, 1);
 
     dep_dom_id = FWK_ID_SUB_ELEMENT(FWK_MODULE_IDX_DVFS, DVFS_ELEMENT_IDX_1, 1);
+    dev_ctx[DVFS_ELEMENT_IDX_1].perf_table.domain_id = dep_dom_id;
 
     fwk_id_get_element_idx_ExpectAndReturn(dep_dom_id, DVFS_ELEMENT_IDX_1);
     fwk_id_get_sub_element_idx_ExpectAndReturn(dep_dom_id, 1);
@@ -845,6 +846,8 @@ void utest_perf_plugins_handler_update_no_plugins_last_log_dom(void)
 
     fwk_id_get_element_idx_ExpectAndReturn(dep_dom_id, DVFS_ELEMENT_IDX_1);
     fwk_id_get_sub_element_idx_ExpectAndReturn(dep_dom_id, 1);
+
+    fwk_id_get_element_idx_ExpectAndReturn(dep_dom_id, DVFS_ELEMENT_IDX_1);
 
     dev_ctx[DVFS_ELEMENT_IDX_1].perf_table.level[0] = 5;
     dev_ctx[DVFS_ELEMENT_IDX_1].perf_table.max_limit[0] = 10;

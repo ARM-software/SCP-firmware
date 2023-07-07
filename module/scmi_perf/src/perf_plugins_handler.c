@@ -434,8 +434,14 @@ void perf_plugins_handler_update(
      * EITHER last logical domain OR it's only physical domain,
      * call the plugin - if any - with the data snapshot for this domain.
      */
-    if ((this_dom_idx == last_logical_dom_idx) &&
-        (config->plugins_count != 0)) {
+    if (this_dom_idx == last_logical_dom_idx) {
+        if (config->plugins_count == 0) {
+            /* coordination-only */
+            plugins_policy_sync_level_limits(
+                dev_ctx, PERF_PLUGIN_DOM_TYPE_LOGICAL);
+            return;
+        }
+
         for (size_t i = 0; i < config->plugins_count; i++) {
             dom_type = config->plugins[i].dom_type;
 
