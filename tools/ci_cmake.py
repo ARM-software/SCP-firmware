@@ -37,7 +37,7 @@ code_validations = [
 
 products = [
     Product('host', toolchains=[Parameter('GNU')]),
-    Product('juno'),
+    Product('juno', variants=[Parameter('BOARD'), Parameter('FVP')]),
     Product('morello'),
     Product('n1sdp'),
     Product('rdv1'),
