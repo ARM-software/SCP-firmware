@@ -24,6 +24,7 @@ import glob
 
 # Exclude all mod_test "mocks" directories
 UNIT_TEST_MOCKS = glob.glob('module/**/test/**/mocks', recursive=True)
+UNIT_TEST_EXT = glob.glob('module/**/test/ext', recursive=True)
 
 EXCLUDE_DIRECTORIES = [
     '.git',
@@ -33,7 +34,7 @@ EXCLUDE_DIRECTORIES = [
     "contrib/cmock/git",
     'product/rcar/src/CMSIS-FreeRTOS',
     'unit_test/unity_mocks',
-] + UNIT_TEST_MOCKS
+] + UNIT_TEST_MOCKS + UNIT_TEST_EXT
 
 #
 # Exclude patterns (applied to files only)
