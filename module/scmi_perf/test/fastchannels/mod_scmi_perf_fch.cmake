@@ -16,11 +16,12 @@ if(TEST_ON_TARGET)
     set(TEST_MODULE scmi_perf)
     set(MODULE_ROOT ${CMAKE_SOURCE_DIR}/module)
 else()
-    set(UNIT_TEST_TARGET ${TEST_FILE}_unit_test)
+    set(UNIT_TEST_TARGET ${TEST_FILE}_unit_test${TEST_SUFFIX})
 endif()
 
 set(MODULE_SRC ${MODULE_ROOT}/${TEST_MODULE}/src)
 set(MODULE_INC ${MODULE_ROOT}/${TEST_MODULE}/include)
+set(MODULE_INC ${MODULE_ROOT}/${TEST_MODULE}/test/include)
 
 list(APPEND OTHER_MODULE_INC ${MODULE_ROOT}/dvfs/include)
 list(APPEND OTHER_MODULE_INC ${MODULE_ROOT}/scmi/include)
@@ -38,6 +39,13 @@ list(APPEND MOCK_REPLACEMENTS fwk_module)
 include(${SCP_ROOT}/unit_test/module_common.cmake)
 
 target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC
-    "BUILD_HAS_SCMI_PERF_FAST_CHANNELS")
+    "BUILD_HAS_SCMI_PERF_FAST_CHANNELS"
+    "BUILD_HAS_FAST_CHANNELS"
+    "BUILD_HAS_MOD_TRANSPORT")
 target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC
     "BUILD_HAS_SCMI_PERF_PROTOCOL_OPS")
+
+if(BUILD_HAS_MOD_TRANSPORT_FC)
+    target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC
+        "BUILD_HAS_MOD_TRANSPORT_FC")
+endif()

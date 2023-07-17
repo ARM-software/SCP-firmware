@@ -18,3 +18,17 @@ include(${SCP_ROOT}/module/scmi_perf/test/fastchannels/mod_scmi_perf_fch.cmake)
 set(TEST_MODULE scmi_perf)
 include(
     ${SCP_ROOT}/module/scmi_perf/test/protocol/mod_scmi_perf_protocol_ops.cmake)
+
+set(BUILD_HAS_MOD_TRANSPORT_FC TRUE)
+set(TEST_SUFFIX _transport_fc)
+
+set(TEST_MODULE scmi_perf)
+include(
+    ${SCP_ROOT}/module/scmi_perf/test/plugins_handler/mod_scmi_perf_ph.cmake)
+
+set(TEST_MODULE scmi_perf)
+include(${SCP_ROOT}/module/scmi_perf/test/fastchannels/mod_scmi_perf_fch.cmake)
+
+set(TEST_MODULE scmi_perf)
+include(
+    ${SCP_ROOT}/module/scmi_perf/test/protocol/mod_scmi_perf_protocol_ops.cmake)

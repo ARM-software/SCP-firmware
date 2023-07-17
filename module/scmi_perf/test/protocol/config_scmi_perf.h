@@ -7,6 +7,7 @@
 
 #include <mod_dvfs.h>
 #include <mod_scmi_perf.h>
+#include <mod_transport.h>
 
 #include <fwk_id.h>
 #include <fwk_macros.h>
@@ -15,6 +16,10 @@
 
 #include <stddef.h>
 #include <stdint.h>
+
+#ifdef BUILD_HAS_MOD_TRANSPORT_FC
+#    include <config_fch.h>
+#endif
 
 #define TEST_MODULE_IDX       0x5
 #define TEST_SCMI_AGENT_IDX_0 0x1
@@ -35,8 +40,17 @@ enum dvfs_element_idx {
 };
 
 #define PERF_DOMAINS_IDX_COUNT DVFS_ELEMENT_IDX_COUNT
+
 static const struct mod_scmi_perf_domain_config domains[] = {
     [SCMI_PERF_ELEMENT_IDX_0] = {
+#ifdef BUILD_HAS_MOD_TRANSPORT_FC
+        .fch_config = (struct scmi_perf_fch_config[]) {
+            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] = FCH_INIT(0),
+            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET] = FCH_INIT(1),
+            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] = FCH_INIT(2),
+            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET] = FCH_INIT(3),
+            },
+#else
         .fast_channels_addr_scp =
             (uint64_t[]){
                 [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] = 1,
@@ -45,6 +59,7 @@ static const struct mod_scmi_perf_domain_config domains[] = {
             (uint64_t[]){
                 [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] = 1,
             },
+#endif
         .phy_group_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_DVFS, DVFS_ELEMENT_IDX_0),
     },
@@ -61,7 +76,9 @@ static const struct mod_scmi_perf_domain_config domains[] = {
 static struct mod_scmi_perf_config perf_config = {
     .domains = &domains,
     .perf_doms_count = SCMI_PERF_ELEMENT_IDX_COUNT,
+#ifndef BUILD_HAS_MOD_TRANSPORT_FC
     .fast_channels_alarm_id = FWK_ID_NONE_INIT,
+#endif
 };
 
 struct fwk_module_config config_scmi_perf = {
