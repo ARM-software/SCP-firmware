@@ -49,3 +49,7 @@ endif()
 if("statistics" IN_LIST SCP_MODULES)
     target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-statistics)
 endif()
+
+if("transport" IN_LIST SCP_MODULES)
+    target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-transport)
+endif()

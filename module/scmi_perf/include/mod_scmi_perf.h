@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -44,12 +44,12 @@ enum mod_scmi_perf_permissions {
 /*!
  * \brief Fast channels address index
  */
-enum mod_scmi_perf_fast_channels_addr_index {
+enum mod_scmi_perf_fast_channels_index {
     MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET = 0,
     MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET = 1,
     MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET = 2,
     MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET = 3,
-    MOD_SCMI_PERF_FAST_CHANNEL_ADDR_INDEX_COUNT = 4
+    MOD_SCMI_PERF_FAST_CHANNEL_COUNT = 4,
 };
 /*!
  *\brief Per-Domain Fast Channel Limit in shared memory.
@@ -83,10 +83,25 @@ struct mod_scmi_perf_level_limits {
     uint32_t maximum; /*!< Maximum permitted level */
 };
 
+#ifdef BUILD_HAS_MOD_TRANSPORT_FC
+
+/*!
+ * \brief Fast channel configuration
+ */
+struct scmi_perf_fch_config {
+    fwk_id_t transport_id;
+    fwk_id_t transport_api_id;
+};
+
+#endif
 /*!
  * \brief Performance domain configuration data.
  */
 struct mod_scmi_perf_domain_config {
+#ifdef BUILD_HAS_MOD_TRANSPORT_FC
+    /* Pointer to the fast channel configuration */
+    const struct scmi_perf_fch_config *fch_config;
+#else
     /*!
      * \brief Domain fast channels.
      *
@@ -103,6 +118,7 @@ struct mod_scmi_perf_domain_config {
      * \details Address of shared memory for the agent
      */
     uint64_t *fast_channels_addr_ap;
+#endif
 
     /*!
      * \brief Rate limit in microsecs
@@ -181,6 +197,10 @@ struct mod_scmi_perf_config {
      */
     size_t perf_doms_count;
 
+#ifdef BUILD_HAS_MOD_TRANSPORT_FC
+    /*! If platform supports fast channels */
+    bool supports_fast_channels;
+#else
     /*!
      * \brief Fast Channels Alarm ID
      *
@@ -189,7 +209,7 @@ struct mod_scmi_perf_config {
      *    set_limits operations.
      */
     fwk_id_t fast_channels_alarm_id;
-
+#endif
     /*! Fast Channel polling rate */
     uint32_t fast_channels_rate_limit;
 

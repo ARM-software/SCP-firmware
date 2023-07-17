@@ -386,7 +386,7 @@ static int scmi_perf_domain_attributes_handler(
     notifications = true;
 #endif
 #ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
-    fast_channels = perf_fch_domain_attributes_has_fastchannels(parameters);
+    fast_channels = perf_fch_domain_has_fastchannels(parameters->domain_id);
 #endif
     return_values = (struct scmi_perf_domain_attributes_p2a){
         .status = SCMI_SUCCESS,

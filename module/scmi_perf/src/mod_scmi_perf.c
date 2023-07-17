@@ -162,13 +162,30 @@ static int validate_new_limits(
     return find_opp_for_level(domain_ctx, &limit, false);
 }
 
-/*
- * A domain limits range has been updated. Depending on the system
- * configuration we may send an SCMI notification to the agents which
- * have registered for these notifications and/or update the associated
- * fast channels.
- */
-static void scmi_perf_notify_limits_updated(
+#ifdef BUILD_HAS_MOD_TRANSPORT_FC
+static void scmi_perf_notify_limits_fch_updated(
+    fwk_id_t domain_id,
+    uint32_t range_min,
+    uint32_t range_max)
+{
+    unsigned int idx;
+    idx = fwk_id_get_element_idx(domain_id);
+    struct mod_scmi_perf_fast_channel_limit *get_limit;
+    struct scmi_perf_domain_ctx *domain_ctx;
+    const struct fast_channel_ctx *fch_ctx;
+    domain_ctx = &scmi_perf_ctx.domain_ctx_table[idx];
+    if (perf_fch_domain_has_fastchannels(idx)) {
+        fch_ctx = &domain_ctx->fch_ctx[MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET];
+        get_limit = (struct mod_scmi_perf_fast_channel_limit
+                         *)((uintptr_t)fch_ctx->fch_address.local_view_address);
+        if (get_limit != NULL) { /* note: get_limit may not be defined */
+            get_limit->range_max = range_max;
+            get_limit->range_min = range_min;
+        }
+    }
+}
+#else
+static void scmi_perf_notify_limits_fch_updated(
     fwk_id_t domain_id,
     uint32_t range_min,
     uint32_t range_max)
@@ -189,6 +206,21 @@ static void scmi_perf_notify_limits_updated(
             get_limit->range_min = range_min;
         }
     }
+}
+#endif
+
+/*
+ * A domain limits range has been updated. Depending on the system
+ * configuration we may send an SCMI notification to the agents which
+ * have registered for these notifications and/or update the associated
+ * fast channels.
+ */
+static void scmi_perf_notify_limits_updated(
+    fwk_id_t domain_id,
+    uint32_t range_min,
+    uint32_t range_max)
+{
+    scmi_perf_notify_limits_fch_updated(domain_id, range_min, range_max);
 
 #ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
     struct perf_plugins_perf_report perf_report = {
@@ -201,6 +233,8 @@ static void scmi_perf_notify_limits_updated(
 #endif
 
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
+    unsigned int idx;
+    idx = fwk_id_get_element_idx(domain_id);
     perf_prot_ops_notify_limits(idx, range_min, range_max);
 #endif
 }
@@ -273,7 +307,6 @@ static void scmi_perf_notify_level_updated(
 {
     struct scmi_perf_domain_ctx *domain_ctx;
 #ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
-    const struct mod_scmi_perf_domain_config *domain;
     fwk_id_t dep_dom_id;
 #endif
 
@@ -301,9 +334,7 @@ static void scmi_perf_notify_level_updated(
 
         if (fwk_id_get_element_idx(dep_dom_id) ==
             fwk_id_get_element_idx(domain_id)) {
-            domain = &(*scmi_perf_ctx.config->domains)[i];
-
-            perf_fch_set_fch_get_level(domain, level);
+            perf_fch_set_fch_get_level(i, level);
         }
     }
 #endif
@@ -400,13 +431,12 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
         return FWK_SUCCESS;
     }
 
-#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
+#if defined(BUILD_HAS_SCMI_PERF_FAST_CHANNELS)
     status = perf_fch_bind(id, 0);
     if (status != FWK_SUCCESS) {
         return status;
     }
 #endif
-
 #ifdef BUILD_HAS_SCMI_PERF_PROTOCOL_OPS
     status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_SCMI),
