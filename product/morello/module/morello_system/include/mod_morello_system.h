@@ -75,6 +75,22 @@ struct mod_morello_system_ap_memory_access_api {
     void (*disable_ap_memory_access)(void);
 };
 
+#if !defined(PLAT_FVP)
+enum mod_morello_system_temperature_sensor_idx {
+    /*! Index for morello system cluster 0 temperature sensor */
+    MOD_MORELLO_SYSTEM_CLUSTER0_SENSOR,
+
+    /*! Index for morello system cluster 1 temperature sensor */
+    MOD_MORELLO_SYSTEM_CLUSTER1_SENSOR,
+
+    /*! Index for morello system system temperature sensor */
+    MOD_MORELLO_SYSTEM_SENSOR,
+
+    /*! Number of temperature sensors */
+    MOD_MORELLO_SYSTEM_SENSOR_COUNT,
+};
+#endif
+
 /*!
  * \}
  */

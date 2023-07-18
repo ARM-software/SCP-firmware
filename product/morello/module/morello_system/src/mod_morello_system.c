@@ -24,6 +24,8 @@
 #include <mod_dmc_bing.h>
 #if !defined(PLAT_FVP)
 #    include <mod_morello_scp2pcc.h>
+#    include <mod_morello_sensor.h>
+#    include <mod_sensor.h>
 #endif
 #include <mod_morello_system.h>
 #include <mod_power_domain.h>
@@ -134,6 +136,8 @@ struct morello_system_ctx {
 #if !defined(PLAT_FVP)
     /* Pointer to SCP to PCC communication API */
     const struct mod_morello_scp2pcc_api *scp2pcc_api;
+    /* Pointer to Sensor API */
+    struct mod_sensor_driver_api *morello_sensor_api;
 #endif
 };
 
@@ -499,6 +503,10 @@ static int morello_system_init_primary_core(void)
     unsigned int cluster_idx;
     unsigned int cluster_count;
 
+#if !defined(PLAT_FVP)
+    uint64_t temperature[MOD_MORELLO_SYSTEM_SENSOR_COUNT] = { 0, 0, 0 };
+#endif
+
     FWK_LOG_INFO(
         "[MORELLO SYSTEM] Setting AP Reset Address to 0x%08" PRIX32
         "%08" PRIX32,
@@ -564,6 +572,28 @@ static int morello_system_init_primary_core(void)
               *)(AP_SCP_SRAM_OFFSET + NIC_400_SEC_0_CSAPBM_OFFSET) = 0xFFFFFFFF;
 
         mod_pd_restricted_api = morello_system_ctx.mod_pd_restricted_api;
+
+#if !defined(PLAT_FVP)
+        for (int sensor_idx = 0; sensor_idx < MOD_MORELLO_SYSTEM_SENSOR_COUNT;
+             sensor_idx++) {
+            /* Get the Temperature Values */
+            status = morello_system_ctx.morello_sensor_api->get_value(
+                FWK_ID_ELEMENT(FWK_MODULE_IDX_MORELLO_SENSOR, sensor_idx),
+                &temperature[sensor_idx]);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_INFO(
+                    "[MORELLO SYSTEM] Error getting the temperature"
+                    " value!");
+                return status;
+            }
+        }
+
+        FWK_LOG_INFO(
+            "[MORELLO SYSTEM] Temp of CLUS0 = %uC, CLUS1 = %uC, SYS = %uC",
+            (unsigned int)temperature[MOD_MORELLO_SYSTEM_CLUSTER0_SENSOR],
+            (unsigned int)temperature[MOD_MORELLO_SYSTEM_CLUSTER1_SENSOR],
+            (unsigned int)temperature[MOD_MORELLO_SYSTEM_SENSOR]);
+#endif
 
         FWK_LOG_INFO(
             "[MORELLO SYSTEM] Booting primary core at %lu MHz...",
@@ -657,6 +687,14 @@ static int morello_system_bind(fwk_id_t id, unsigned int round)
         FWK_ID_MODULE(FWK_MODULE_IDX_MORELLO_SCP2PCC),
         FWK_ID_API(FWK_MODULE_IDX_MORELLO_SCP2PCC, 0),
         &morello_system_ctx.scp2pcc_api);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_MORELLO_SENSOR),
+        FWK_ID_API(FWK_MODULE_IDX_MORELLO_SENSOR, 0),
+        &morello_system_ctx.morello_sensor_api);
     if (status != FWK_SUCCESS) {
         return status;
     }
