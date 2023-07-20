@@ -130,7 +130,7 @@ static void mod_pl011_set_baud_rate(const struct mod_pl011_element_cfg *cfg)
      * When the integer divisor equals 0xFFFF, the fractional divisor can only
      * be 0.
      */
-    fwk_assert((divisor_integer == 0xFFFF) == (divisor_fractional == 0));
+    fwk_assert(!((divisor_integer == 0xFFFF) && (divisor_fractional != 0)));
 
     reg->IBRD = (uint16_t)divisor_integer;
     reg->FBRD = divisor_fractional;
