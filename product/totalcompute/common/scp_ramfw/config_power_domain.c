@@ -1,11 +1,12 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "config_power_domain.h"
+#include "config_ppu_v1.h"
 #include "tc_core.h"
 #include "tc_power_domain.h"
 
@@ -34,6 +35,26 @@ static const uint32_t systop_allowed_state_mask_table[1] = {
     [0] = MOD_PD_STATE_ON_MASK
 };
 
+/* Mask of the allowed states for the gputop power domain depending on the
+ * system states.
+ */
+static const uint32_t gputop_allowed_state_mask_table[] = {
+    [MOD_PD_STATE_OFF] = MOD_PD_STATE_OFF_MASK,
+    [MOD_PD_STATE_ON] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK,
+    [MOD_SYSTEM_POWER_POWER_STATE_SLEEP0] = MOD_PD_STATE_OFF_MASK,
+    [MOD_SYSTEM_POWER_POWER_STATE_SLEEP1] = MOD_PD_STATE_OFF_MASK
+};
+
+/* Mask of the allowed states for the dputop power domain depending on the
+ * system states.
+ */
+static const uint32_t dputop_allowed_state_mask_table[] = {
+    [MOD_PD_STATE_OFF] = MOD_PD_STATE_OFF_MASK,
+    [MOD_PD_STATE_ON] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK,
+    [MOD_SYSTEM_POWER_POWER_STATE_SLEEP0] = MOD_PD_STATE_OFF_MASK,
+    [MOD_SYSTEM_POWER_POWER_STATE_SLEEP1] = MOD_PD_STATE_OFF_MASK
+};
+
 /*
  * Mask of the allowed states for the cluster power domain depending on the
  * system states.
@@ -52,20 +73,53 @@ static const uint32_t core_pd_allowed_state_mask_table[2] = {
 /* Power module specific configuration data (none) */
 static const struct mod_power_domain_config tc_power_domain_config = { 0 };
 
-static struct fwk_element tc_power_domain_static_element_table[1] = {
-    [PD_STATIC_DEV_IDX_SYSTOP] = {
-        .name = "SYSTOP",
-        .data = &((struct mod_power_domain_element_config){
-            .attributes.pd_type = MOD_PD_TYPE_SYSTEM,
-            .parent_idx = PD_STATIC_DEV_IDX_NONE,
-            .driver_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SYSTEM_POWER),
-            .api_id = FWK_ID_API_INIT(
-                FWK_MODULE_IDX_SYSTEM_POWER,
-                MOD_SYSTEM_POWER_API_IDX_PD_DRIVER),
-            .allowed_state_mask_table = systop_allowed_state_mask_table,
-            .allowed_state_mask_table_size =
-                FWK_ARRAY_SIZE(systop_allowed_state_mask_table) }),
-    },
+static struct fwk_element tc_power_domain_static_element_table[] = {
+    [PD_STATIC_DEV_IDX_GPUTOP] =
+        {
+            .name = "GPUTOP",
+            .data = &((struct mod_power_domain_element_config) {
+                .attributes.pd_type = MOD_PD_TYPE_DEVICE,
+                .driver_id = FWK_ID_ELEMENT_INIT(
+                    FWK_MODULE_IDX_PPU_V1,
+                    CORES_PER_CLUSTER * NUMBER_OF_CLUSTERS +
+                    NUMBER_OF_CLUSTERS + PPU_V1_ELEMENT_IDX_GPUTOP0),
+                .api_id = FWK_ID_API_INIT(
+                    FWK_MODULE_IDX_PPU_V1,
+                    MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
+                .allowed_state_mask_table = gputop_allowed_state_mask_table,
+                .allowed_state_mask_table_size =
+                    FWK_ARRAY_SIZE(gputop_allowed_state_mask_table) }),
+        },
+    [PD_STATIC_DEV_IDX_DPUTOP] =
+        {
+            .name = "DPUTOP",
+            .data = &((struct mod_power_domain_element_config) {
+                .attributes.pd_type = MOD_PD_TYPE_DEVICE,
+                .driver_id = FWK_ID_ELEMENT_INIT(
+                    FWK_MODULE_IDX_PPU_V1,
+                    CORES_PER_CLUSTER * NUMBER_OF_CLUSTERS +
+                    NUMBER_OF_CLUSTERS + PPU_V1_ELEMENT_IDX_DPUTOP0),
+                .api_id = FWK_ID_API_INIT(
+                    FWK_MODULE_IDX_PPU_V1,
+                    MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER),
+                .allowed_state_mask_table = dputop_allowed_state_mask_table,
+                .allowed_state_mask_table_size =
+                    FWK_ARRAY_SIZE(dputop_allowed_state_mask_table) }),
+        },
+    [PD_STATIC_DEV_IDX_SYSTOP] =
+        {
+            .name = "SYSTOP",
+            .data = &((struct mod_power_domain_element_config){
+                .attributes.pd_type = MOD_PD_TYPE_SYSTEM,
+                .parent_idx = PD_STATIC_DEV_IDX_NONE,
+                .driver_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SYSTEM_POWER),
+                .api_id = FWK_ID_API_INIT(
+                    FWK_MODULE_IDX_SYSTEM_POWER,
+                    MOD_SYSTEM_POWER_API_IDX_PD_DRIVER),
+                .allowed_state_mask_table = systop_allowed_state_mask_table,
+                .allowed_state_mask_table_size =
+                    FWK_ARRAY_SIZE(systop_allowed_state_mask_table) }),
+        },
 };
 
 /*

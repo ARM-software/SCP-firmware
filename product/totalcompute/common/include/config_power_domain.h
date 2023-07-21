@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -19,6 +19,8 @@
  * core_count + cluster_count + pd_static_dev_idx
  */
 enum pd_static_dev_idx {
+    PD_STATIC_DEV_IDX_GPUTOP,
+    PD_STATIC_DEV_IDX_DPUTOP,
     PD_STATIC_DEV_IDX_SYSTOP,
     PD_STATIC_DEV_IDX_COUNT,
     PD_STATIC_DEV_IDX_NONE = UINT32_MAX
