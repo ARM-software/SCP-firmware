@@ -1,11 +1,12 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "config_power_domain.h"
+#include "config_ppu_v1.h"
 #include "scp_mmap.h"
 #include "tc_core.h"
 
@@ -40,15 +41,37 @@ static struct mod_ppu_v1_config ppu_v1_config_data = {
         MOD_PD_NOTIFICATION_IDX_POWER_STATE_TRANSITION),
 };
 
-static const struct fwk_element ppu_v1_system_element_table[1] = {
-    [0] = {
-        .name = "SYS0",
-        .data = &((struct mod_ppu_v1_pd_config){
-            .pd_type = MOD_PD_TYPE_SYSTEM,
-            .ppu.reg_base = SCP_PPU_SYS0_BASE,
-            .observer_id = FWK_ID_NONE_INIT,
-        }),
-    },
+static struct fwk_element ppu_v1_system_element_table[] = {
+    [PPU_V1_ELEMENT_IDX_SYS0] =
+        {
+            .name = "SYS0",
+            .data = &((struct mod_ppu_v1_pd_config){
+                .pd_type = MOD_PD_TYPE_SYSTEM,
+                .ppu.reg_base = SCP_PPU_SYS0_BASE,
+                .observer_id = FWK_ID_NONE_INIT,
+                .default_power_on = false,
+            }),
+        },
+    [PPU_V1_ELEMENT_IDX_GPUTOP0] =
+        {
+            .name = "GPUTOP0",
+            .data = &((struct mod_ppu_v1_pd_config) {
+                .pd_type = MOD_PD_TYPE_DEVICE,
+                .ppu.reg_base = SCP_PPU_GPU_BASE,
+                .observer_id = FWK_ID_NONE_INIT,
+                .default_power_on = false,
+            }),
+        },
+    [PPU_V1_ELEMENT_IDX_DPUTOP0] =
+        {
+            .name = "DPUTOP0",
+            .data = &((struct mod_ppu_v1_pd_config) {
+                .pd_type = MOD_PD_TYPE_DEVICE,
+                .ppu.reg_base = SCP_PPU_DPU_BASE,
+                .observer_id = FWK_ID_NONE_INIT,
+                .default_power_on = false,
+            }),
+        },
 };
 
 static const struct fwk_element *ppu_v1_get_element_table(fwk_id_t module_id)
