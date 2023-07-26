@@ -13,3 +13,6 @@ include(${SCP_ROOT}/module/smcf/test/module/mod_smcf.cmake)
 
 set(TEST_MODULE smcf)
 include(${SCP_ROOT}/module/smcf/test/smcf_data/mod_smcf_data.cmake)
+
+set(TEST_MODULE smcf)
+include(${SCP_ROOT}/module/smcf/test/smcf_utils/mod_smcf_utils.cmake)
