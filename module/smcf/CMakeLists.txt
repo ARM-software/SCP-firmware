@@ -13,4 +13,5 @@ target_include_directories(${SCP_MODULE_TARGET}
 target_sources(
     ${SCP_MODULE_TARGET} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_smcf.c"
                                  "${CMAKE_CURRENT_SOURCE_DIR}/src/smcf_data.c"
+                                 "${CMAKE_CURRENT_SOURCE_DIR}/src/smcf_utils.c"
                                  "${CMAKE_CURRENT_SOURCE_DIR}/src/mgi.c")
