@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -260,10 +260,14 @@ static int gtimer_start(fwk_id_t id)
 
     if (!fwk_id_is_type(ctx->config->clock_id, FWK_ID_TYPE_NONE)) {
         /* Register for clock state notifications */
+#ifdef BUILD_HAS_MOD_CLOCK
         return fwk_notification_subscribe(
             mod_clock_notification_id_state_changed,
             ctx->config->clock_id,
             id);
+#else
+        return FWK_E_PARAM;
+#endif
     } else {
         gtimer_control_init(ctx);
     }
@@ -275,6 +279,7 @@ static int gtimer_process_notification(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
 {
+#ifdef BUILD_HAS_MOD_CLOCK
     struct clock_notification_params *params;
     struct gtimer_dev_ctx *ctx;
 
@@ -290,6 +295,9 @@ static int gtimer_process_notification(
     }
 
     return FWK_SUCCESS;
+#else
+    return FWK_E_PARAM;
+#endif
 }
 
 /*
