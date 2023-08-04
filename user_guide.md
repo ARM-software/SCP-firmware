@@ -264,7 +264,7 @@ building the system and running it on an FVP, please refer to, and follow, the
 privileges.
 
 [TC2 User guide]:
-https://gitlab.arm.com/arm-reference-solutions/arm-reference-solutions-docs/-/blob/master/docs/totalcompute/tc2/user-guide.rst
+https://totalcompute.docs.arm.com/en/latest/totalcompute/tc2/user-guide.html
 
 The instructions within this section use TC2 BSP only without Android
 (buildroot) as an example platform, but they are relevant for all TC platforms.
@@ -283,7 +283,7 @@ git checkout FETCH_HEAD
 ```sh
 export PLATFORM=tc2
 export FILESYSTEM=buildroot
-<tc2_workspace>/build-scripts/build-all.sh -p $PLATFORM -f $FILESYSTEM build
+<tc2_workspace>/build-scripts/run_docker.sh <tc2_workspace>/build-scripts/build-all.sh -p $PLATFORM -f $FILESYSTEM build
 ```
 
 ### Running Buildroot
@@ -305,7 +305,7 @@ environments. Please contact Arm to have access (support@arm.com).
 For an introduction to the System Guidance for Infrastructure (SGI) platforms,
 please refer to [System Guidance for Infrastructure (SGI)].
 
-[System Guidance for Infrastructure (SGI)]: https://community.arm.com/developer/tools-software/oss-platforms/w/docs/387/system-guidance-for-infrastructure-sgi
+[System Guidance for Infrastructure (SGI)]: https://community.arm.com/oss-platforms/w/docs/489/system-guidance-for-infrastructure-sgi
 
 For an introduction to the Neoverse Reference Design (RD) platforms, please
 refer to [Neoverse Reference Designs].
@@ -480,7 +480,7 @@ board.
 You can see the progress of the boot by connecting the UART to your host PC
 (please follow the instructions in the Juno [Getting Started Guide]).
 
-[Getting Started Guide]: https://developer.arm.com/documentation/dui0928/e
+[Getting Started Guide]: https://developer.arm.com/documentation/den0928/f/?lang=en
 
 ## Software stack
 
