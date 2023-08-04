@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -18,14 +18,6 @@
 
 #define FAKE_FCH0_AP_ADDRESS  0xFFFF0000FFFF0000
 #define FAKE_FCH0_SCP_ADDRESS 0xABCD0000ABCD0000
-
-#define FCH_INIT(FCH_NUM) \
-    { \
-        .transport_id = \
-            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TRANSPORT, FCH_NUM), \
-        .transport_api_id = FWK_ID_API_INIT( \
-            FWK_MODULE_IDX_TRANSPORT, MOD_TRANSPORT_API_IDX_FAST_CHANNELS), \
-    }
 
 #define FC_LEVEL_SET(PERF_IDX) \
     (SCP_SCMI_FAST_CHANNEL_BASE + \

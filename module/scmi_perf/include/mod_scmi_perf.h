@@ -28,6 +28,17 @@
  */
 
 /*!
+ * \brief Fast Channel Initialisation
+ */
+#define FCH_INIT(FCH_NUM) \
+    { \
+        .transport_id = \
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TRANSPORT, FCH_NUM), \
+        .transport_api_id = FWK_ID_API_INIT( \
+            FWK_MODULE_IDX_TRANSPORT, MOD_TRANSPORT_API_IDX_FAST_CHANNELS), \
+    }
+
+/*!
  * \brief Agent permissions.
  */
 enum mod_scmi_perf_permissions {
