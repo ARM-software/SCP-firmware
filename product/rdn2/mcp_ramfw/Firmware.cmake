@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -35,7 +35,7 @@ list(PREPEND SCP_MODULE_PATHS
 # modules are initialized, bound, started during the pre-runtime phase.
 # any change in the order will cause firmware initialization errors.
 
-list(APPEND SCP_MODULES "armv7m-mpu")
+list(APPEND SCP_MODULES "armv8m-mpu")
 list(APPEND SCP_MODULES "pl011")
 list(APPEND SCP_MODULES "clock")
 list(APPEND SCP_MODULES "pcid")

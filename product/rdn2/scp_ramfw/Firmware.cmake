@@ -39,7 +39,7 @@ list(PREPEND SCP_MODULE_PATHS
 # modules are initialized, bound, started during the pre-runtime phase.
 # any change in the order will cause firmware initialization errors.
 
-list(APPEND SCP_MODULES "armv7m-mpu")
+list(APPEND SCP_MODULES "armv8m-mpu")
 list(APPEND SCP_MODULES "apremap")
 list(APPEND SCP_MODULES "sid")
 list(APPEND SCP_MODULES "system-info")
