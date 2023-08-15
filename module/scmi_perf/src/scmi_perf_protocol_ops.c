@@ -1118,7 +1118,7 @@ void perf_prot_ops_notify_limits(
 #endif
 
 #ifdef BUILD_HAS_MOD_STATISTICS
-int perf_prot_ops_update_stats(fwk_id_t domain_id, uint32_t level)
+void perf_prot_ops_update_stats(fwk_id_t domain_id, uint32_t level)
 {
     int idx = (int)fwk_id_get_element_idx(domain_id);
     size_t level_id;
@@ -1137,8 +1137,6 @@ int perf_prot_ops_update_stats(fwk_id_t domain_id, uint32_t level)
     } else {
         FWK_LOG_DEBUG("[SCMI-PERF] %s @%d", __func__, __LINE__);
     }
-
-    return status;
 }
 #endif
 

@@ -443,7 +443,7 @@ int perf_prot_ops_process_events(
     const struct fwk_event *event,
     struct fwk_event *resp_event);
 
-int perf_prot_ops_update_stats(fwk_id_t domain_id, uint32_t level);
+void perf_prot_ops_update_stats(fwk_id_t domain_id, uint32_t level);
 
 void perf_prot_ops_notify_limits(
     unsigned int domain_idx,
