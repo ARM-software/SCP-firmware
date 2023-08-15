@@ -22,6 +22,8 @@ contributions.
 - [Mohamed Omar Asaker](https://github.com/mohamedasaker-arm) (Mohamed.OmarAsaker@arm.com)
 - [Miklos Balint](https://github.com/wmnt) (Miklos.Balint@arm.com)
 - [Andrew Graham](https://github.com/AndyJGraham) (Andrew.Graham@arm.com)
+- [Abhishek Rawat](https://github.com/abhishek-arm) (abhishek.rawat@arm.com)
+- [Wen Ping Teh](https://github.com/wenping-arm) (wenping.teh@arm.com)
 
 ## Secondary Maintainers
 
