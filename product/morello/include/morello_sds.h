@@ -38,7 +38,7 @@ enum morello_sds_region_idx {
  * Structure sizes.
  */
 #define MORELLO_SDS_CPU_INFO_SIZE 4
-#define MORELLO_SDS_FIRMWARE_VERSION_SIZE 4
+#define MORELLO_SDS_FIRMWARE_VERSION_SIZE     8
 #define MORELLO_SDS_PLATFORM_ID_SIZE 8
 #define MORELLO_SDS_RESET_SYNDROME_SIZE 4
 #define MORELLO_SDS_FEATURE_AVAILABILITY_SIZE 4
@@ -61,6 +61,12 @@ enum morello_sds_region_idx {
  */
 #define MORELLO_SDS_CPU_INFO_PRIMARY_MASK 0xFFFFFFFF
 #define MORELLO_SDS_CPU_INFO_PRIMARY_POS 0
+
+/*
+ * Field sizes for SCP firmware version information.
+ */
+
+#define MORELLO_SDS_FIRMWARE_COMMIT_ID_LEN 8
 
 /*
  * Platform information
@@ -86,6 +92,7 @@ struct morello_sds_platid {
 /*
  * Element identifiers for SDS structures
  */
+#define SDS_ELEMENT_IDX_FIRMWARE_VERSION     1
 #define SDS_ELEMENT_IDX_FEATURE_AVAILABILITY 3
 #define SDS_ELEMENT_IDX_PLATFORM_INFO 4
 #endif /* MORELLO_SDS_H */
