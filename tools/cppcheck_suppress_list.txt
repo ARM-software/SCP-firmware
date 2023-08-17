@@ -133,7 +133,7 @@ AssignmentAddressToInteger:*product/rdv1/module/platform_system/src/mod_platform
 AssignmentAddressToInteger:*product/rdv1mc/module/platform_system/src/mod_platform_system.c:146
 
 // Cppcheck seems to get confused with macro substitution
-syntaxError:*product/morello/module/morello_system/src/mod_morello_system.c:296
+syntaxError:*product/morello/module/morello_system/src/mod_morello_system.c:300
 
 // TODO
 arrayIndexOutOfBoundsCond:*module/cmn600/src/mod_cmn600.c:447

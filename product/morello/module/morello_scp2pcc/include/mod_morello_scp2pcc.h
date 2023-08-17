@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -28,8 +28,15 @@
  * \{
  */
 
-#define MORELLO_SCP2PCC_PCC_FW_VERSION_LEN (3)
-#define MORELLO_SCP2PCC_MCC_FW_VERSION_LEN (3)
+#define MORELLO_SCP2PCC_PCC_FW_VERSION_LEN         (3)
+#define MORELLO_SCP2PCC_PCC_FW_VERSION_UPPER_INDEX (2)
+#define MORELLO_SCP2PCC_PCC_FW_VERSION_MID_INDEX   (1)
+#define MORELLO_SCP2PCC_PCC_FW_VERSION_LOWER_INDEX (0)
+
+#define MORELLO_SCP2PCC_MCC_FW_VERSION_LEN         (3)
+#define MORELLO_SCP2PCC_MCC_FW_VERSION_UPPER_INDEX (2)
+#define MORELLO_SCP2PCC_MCC_FW_VERSION_MID_INDEX   (1)
+#define MORELLO_SCP2PCC_MCC_FW_VERSION_LOWER_INDEX (0)
 
 #define MORELLO_SCP2PCC_BOARD_SERIAL_NUM_LEN (16)
 
