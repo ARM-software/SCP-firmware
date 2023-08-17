@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -21,7 +21,6 @@
 
 #include <stdbool.h>
 
-static const uint32_t version_packed = FWK_BUILD_VERSION;
 static const uint32_t feature_flags = 0x00000000;
 
 static const struct mod_sds_region_desc
@@ -64,7 +63,6 @@ static struct fwk_element sds_element_table[8] = {
         .data = &((struct mod_sds_structure_desc){
             .id = MORELLO_SDS_FIRMWARE_VERSION,
             .size = MORELLO_SDS_FIRMWARE_VERSION_SIZE,
-            .payload = &version_packed,
             .finalize = true,
         }),
     },

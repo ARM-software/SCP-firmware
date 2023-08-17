@@ -132,6 +132,9 @@ shadowVariable:*framework/test/test_fwk_notification.c:120
 AssignmentAddressToInteger:*product/rdv1/module/platform_system/src/mod_platform_system.c:143
 AssignmentAddressToInteger:*product/rdv1mc/module/platform_system/src/mod_platform_system.c:146
 
+// Cppcheck seems to get confused with macro substitution
+syntaxError:*product/morello/module/morello_system/src/mod_morello_system.c:296
+
 // TODO
 arrayIndexOutOfBoundsCond:*module/cmn600/src/mod_cmn600.c:447
 arrayIndexOutOfBoundsCond:*module/cmn600/src/mod_cmn600.c:461

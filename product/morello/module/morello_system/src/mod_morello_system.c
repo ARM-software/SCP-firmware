@@ -71,6 +71,14 @@ struct FWK_PACKED morello_platform_info {
 #endif
 };
 
+/*
+ * Firmware version structure
+ */
+struct FWK_PACKED morello_firmware_version {
+    uint32_t scp_fw_ver;
+    uint32_t scp_fw_commit;
+};
+
 /* Coresight counter register definitions */
 struct cs_cnt_ctrl_reg {
     FWK_RW uint32_t CS_CNTCR;
@@ -99,6 +107,11 @@ static fwk_id_t sds_feature_availability_id = FWK_ID_ELEMENT_INIT(
 static struct morello_platform_info sds_platform_info;
 static fwk_id_t sds_platform_info_id =
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, SDS_ELEMENT_IDX_PLATFORM_INFO);
+
+/* SDS Firmware version information */
+static struct morello_firmware_version sds_firmware_version;
+static fwk_id_t sds_firmware_version_id =
+    FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_SDS, SDS_ELEMENT_IDX_FIRMWARE_VERSION);
 
 /* Module context */
 struct morello_system_ctx {
@@ -272,6 +285,52 @@ void csys_pwrupreq_handler(void)
 }
 
 /*
+ * Function to read commit id from Morello build string
+ */
+static int morello_system_read_commit_id(uint32_t *scp_commit)
+{
+    unsigned int build_string_idx;
+    unsigned int commit_hex_count;
+    char build_string[] = BUILD_VERSION_DESCRIBE_STRING;
+    char *separator_ptr;
+
+    /* Check string is null-terminated */
+    if (build_string[sizeof(build_string) - 1] != '\0') {
+        return FWK_E_PARAM;
+    }
+
+    /* Version characters before separator can be ignored */
+    separator_ptr = memchr(build_string, '_', sizeof(build_string));
+    if (separator_ptr == NULL) {
+        return FWK_E_PARAM;
+    }
+
+    build_string_idx = separator_ptr - build_string;
+
+    /* Add each hex into the commit ID */
+    for (build_string_idx++, commit_hex_count = 0;
+         build_string[build_string_idx] != '\0' &&
+         commit_hex_count < MORELLO_SDS_FIRMWARE_COMMIT_ID_LEN;
+         build_string_idx++, commit_hex_count++) {
+        if ((build_string[build_string_idx] >= '0') &&
+            (build_string[build_string_idx] <= '9')) {
+            *scp_commit =
+                ((*scp_commit << 4) | (0x0F & build_string[build_string_idx]));
+        } else if (
+            (build_string[build_string_idx] >= 'a') &&
+            (build_string[build_string_idx] <= 'f')) {
+            *scp_commit =
+                ((*scp_commit << 4) |
+                 (0x0F & (build_string[build_string_idx] + 9)));
+        } else {
+            return FWK_E_PARAM;
+        }
+    }
+
+    return FWK_SUCCESS;
+}
+
+/*
  * Function to fill platform information structure.
  */
 static int morello_system_fill_platform_info(void)
@@ -342,6 +401,35 @@ static int morello_system_fill_platform_info(void)
 }
 
 /*
+ * Function to fill firmware version information structure.
+ */
+static int morello_system_fill_firmware_versions(void)
+{
+    int status;
+    uint32_t scp_commit_id = 0;
+
+    const struct mod_sds_structure_desc *sds_structure_desc =
+        fwk_module_get_data(sds_firmware_version_id);
+
+    status = morello_system_read_commit_id(&scp_commit_id);
+
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(
+            "[MORELLO SYSTEM] Unable to parse the build string, set default");
+        sds_firmware_version.scp_fw_ver = 0;
+        sds_firmware_version.scp_fw_commit = 0;
+    } else {
+        sds_firmware_version.scp_fw_ver = FWK_BUILD_VERSION;
+        sds_firmware_version.scp_fw_commit = scp_commit_id;
+    }
+
+    return morello_system_ctx.sds_api->struct_write(
+        sds_structure_desc->id,
+        0,
+        (void *)(&sds_firmware_version),
+        sds_structure_desc->size);
+}
+/*
  * Initialize primary core during system initialization
  */
 static int morello_system_init_primary_core(void)
@@ -374,6 +462,12 @@ static int morello_system_init_primary_core(void)
         /* Fill Platform information structure */
         FWK_LOG_INFO("[MORELLO SYSTEM] Collecting Platform information...");
         status = morello_system_fill_platform_info();
+        if (status != FWK_SUCCESS)
+            return status;
+
+        FWK_LOG_INFO(
+            "[MORELLO SYSTEM] Collecting Firmware version information...");
+        status = morello_system_fill_firmware_versions();
         if (status != FWK_SUCCESS)
             return status;
 
