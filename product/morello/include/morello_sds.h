@@ -38,7 +38,11 @@ enum morello_sds_region_idx {
  * Structure sizes.
  */
 #define MORELLO_SDS_CPU_INFO_SIZE 4
-#define MORELLO_SDS_FIRMWARE_VERSION_SIZE     8
+#if defined(PLAT_FVP)
+#    define MORELLO_SDS_FIRMWARE_VERSION_SIZE 8
+#else
+#    define MORELLO_SDS_FIRMWARE_VERSION_SIZE 16
+#endif
 #define MORELLO_SDS_PLATFORM_ID_SIZE 8
 #define MORELLO_SDS_RESET_SYNDROME_SIZE 4
 #define MORELLO_SDS_FEATURE_AVAILABILITY_SIZE 4
@@ -55,6 +59,17 @@ enum morello_sds_region_idx {
  */
 #define MORELLO_SILICON_REVISION_R_POS 16
 #define MORELLO_SILICON_REVISION_P_POS 0
+
+/*
+ * Field offsets for PCC and MCC firmware versions
+ */
+#define MORELLO_PCC_FIRMWARE_VERSION_UPPER_POS 16
+#define MORELLO_PCC_FIRMWARE_VERSION_MID_POS   8
+#define MORELLO_PCC_FIRMWARE_VERSION_LOWER_POS 0
+
+#define MORELLO_MCC_FIRMWARE_VERSION_UPPER_POS 16
+#define MORELLO_MCC_FIRMWARE_VERSION_MID_POS   8
+#define MORELLO_MCC_FIRMWARE_VERSION_LOWER_POS 0
 
 /*
  * Field masks and offsets for the MORELLO_SDS_AP_CPU_INFO structure.

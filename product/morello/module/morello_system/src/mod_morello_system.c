@@ -77,6 +77,10 @@ struct FWK_PACKED morello_platform_info {
 struct FWK_PACKED morello_firmware_version {
     uint32_t scp_fw_ver;
     uint32_t scp_fw_commit;
+#if !defined(PLAT_FVP)
+    uint32_t mcc_fw_ver;
+    uint32_t pcc_fw_ver;
+#endif
 };
 
 /* Coresight counter register definitions */
@@ -407,6 +411,11 @@ static int morello_system_fill_firmware_versions(void)
 {
     int status;
     uint32_t scp_commit_id = 0;
+#if !defined(PLAT_FVP)
+    uint16_t length;
+    uint8_t pcc_version[MORELLO_SCP2PCC_PCC_FW_VERSION_LEN];
+    uint8_t mcc_version[MORELLO_SCP2PCC_MCC_FW_VERSION_LEN];
+#endif
 
     const struct mod_sds_structure_desc *sds_structure_desc =
         fwk_module_get_data(sds_firmware_version_id);
@@ -422,6 +431,56 @@ static int morello_system_fill_firmware_versions(void)
         sds_firmware_version.scp_fw_ver = FWK_BUILD_VERSION;
         sds_firmware_version.scp_fw_commit = scp_commit_id;
     }
+
+#if !defined(PLAT_FVP)
+    /* Get the PCC firmware version */
+    FWK_LOG_INFO("[MORELLO SYSTEM] Fetching PCC firmware version");
+    status = morello_system_ctx.scp2pcc_api->send(
+        MOD_SCP2PCC_GET_PCC_FW_VERSION, NULL, 0, pcc_version, &length);
+
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR("[MORELLO SYSTEM] Error fetching the PCC version");
+        return status;
+    }
+
+    if (length != MORELLO_SCP2PCC_PCC_FW_VERSION_LEN) {
+        FWK_LOG_ERR(
+            "[MORELLO SYSTEM] Unexpected PCC version length %" PRIu16, length);
+        return FWK_E_DATA;
+    }
+
+    sds_firmware_version.pcc_fw_ver =
+        ((pcc_version[MORELLO_SCP2PCC_PCC_FW_VERSION_UPPER_INDEX]
+          << MORELLO_PCC_FIRMWARE_VERSION_UPPER_POS) |
+         (pcc_version[MORELLO_SCP2PCC_PCC_FW_VERSION_MID_INDEX]
+          << MORELLO_PCC_FIRMWARE_VERSION_MID_POS) |
+         (pcc_version[MORELLO_SCP2PCC_PCC_FW_VERSION_LOWER_INDEX]
+          << MORELLO_PCC_FIRMWARE_VERSION_LOWER_POS));
+
+    /* Get the MCC firmware version */
+    FWK_LOG_INFO("[MORELLO SYSTEM] Fetching MCC firmware version");
+    status = morello_system_ctx.scp2pcc_api->send(
+        MOD_SCP2PCC_GET_MCC_FW_VERSION, NULL, 0, mcc_version, &length);
+
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR("[MORELLO SYSTEM] Error fetching the MCC version");
+        return status;
+    }
+
+    if (length != MORELLO_SCP2PCC_MCC_FW_VERSION_LEN) {
+        FWK_LOG_ERR(
+            "[MORELLO SYSTEM] Unexpected MCC version length %" PRIu16, length);
+        return FWK_E_DATA;
+    }
+
+    sds_firmware_version.mcc_fw_ver =
+        ((mcc_version[MORELLO_SCP2PCC_MCC_FW_VERSION_UPPER_INDEX]
+          << MORELLO_MCC_FIRMWARE_VERSION_UPPER_POS) |
+         (mcc_version[MORELLO_SCP2PCC_MCC_FW_VERSION_MID_INDEX]
+          << MORELLO_MCC_FIRMWARE_VERSION_MID_POS) |
+         (mcc_version[MORELLO_SCP2PCC_MCC_FW_VERSION_LOWER_INDEX]
+          << MORELLO_MCC_FIRMWARE_VERSION_LOWER_POS));
+#endif
 
     return morello_system_ctx.sds_api->struct_write(
         sds_structure_desc->id,
