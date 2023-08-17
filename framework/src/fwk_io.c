@@ -134,7 +134,9 @@ int fwk_io_open(
         return FWK_E_PARAM; /* System entity doesn't exist */
     }
 
-    fwk_assert(stream->adapter != NULL);
+    if (stream->adapter == NULL) {
+        return FWK_E_SUPPORT; /* Stream adapter is not set */
+    }
 
     if (stream->adapter->open == NULL) {
         return FWK_E_SUPPORT; /* Stream adapter is not implemented */
@@ -179,7 +181,9 @@ int fwk_io_getch(const struct fwk_io_stream *stream, char *ch)
         return FWK_E_SUPPORT; /* Stream not open for read operations */
     }
 
-    fwk_assert(stream->adapter->getch != NULL);
+    if (stream->adapter->getch == NULL) {
+        return FWK_E_SUPPORT; /* No read interface */
+    }
 
     status = stream->adapter->getch(stream, ch);
     if (status == FWK_PENDING) {
@@ -208,7 +212,9 @@ int fwk_io_putch(const struct fwk_io_stream *stream, char ch)
         return FWK_E_SUPPORT; /* Stream not open for write operations */
     }
 
-    fwk_assert(stream->adapter->putch != NULL);
+    if (stream->adapter->putch == NULL) {
+        return FWK_E_SUPPORT; /* No write interface */
+    }
 
     do {
         /* Wait for the adapter to accept new characters */
@@ -239,7 +245,9 @@ int fwk_io_putch_nowait(const struct fwk_io_stream *stream, char ch)
         return FWK_E_SUPPORT; /* Stream not open for write operations */
     }
 
-    fwk_assert(stream->adapter->putch != NULL);
+    if (stream->adapter->putch == NULL) {
+        return FWK_E_SUPPORT; /* No write interface */
+    }
 
     status = stream->adapter->putch(stream, ch);
 
