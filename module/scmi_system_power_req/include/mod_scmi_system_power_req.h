@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -14,6 +14,16 @@
 
 #include <stddef.h>
 #include <stdint.h>
+
+/*!
+ * \addtogroup GroupModules Modules
+ * \{
+ */
+
+/*!
+ * \defgroup GroupSCMISystemPowerRequester SCMI System Power Requester
+ * \{
+ */
 
 /*!
  * \brief Set state configurations
@@ -128,5 +138,13 @@ static const fwk_id_t system_power_requester_set_state_request =
     FWK_ID_EVENT_INIT(
         FWK_MODULE_IDX_SCMI_SYSTEM_POWER_REQ,
         MOD_SCMI_SPR_EVENT_IDX_SET_STATE);
+
+/*!
+ * \}
+ */
+
+/*!
+ * \}
+ */
 
 #endif /* MOD_SCMI_SYSTEM_POWER_REQ_H */
