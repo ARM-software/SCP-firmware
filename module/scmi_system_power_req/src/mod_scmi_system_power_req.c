@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -29,6 +29,18 @@
 struct scmi_system_power_req_dev_ctx {
     /* Element configuration data pointer */
     const struct mod_scmi_system_power_req_dev_config *config;
+
+    /* System State - collated after Set State command responses */
+    uint32_t state;
+
+    /* For the delayed response */
+    uint32_t cookie;
+
+    /* Whether or not the client requested a response */
+    bool is_response_requested;
+
+    /* Whether or not the response has been received */
+    bool responded;
 };
 
 /* Module context */
@@ -44,22 +56,6 @@ struct mod_scmi_system_power_req_ctx {
 
     /* SCMI send message API */
     const struct mod_scmi_from_protocol_req_api *scmi_api;
-
-    /* System State - collated after Set State command responses */
-    uint32_t state;
-
-    /* System State Requested - the state that has been sent in the SCMI
-     * command. */
-    uint32_t state_requested;
-
-    /* For the delayed response */
-    uint32_t cookie;
-
-    /* Whether or not the client requested a response */
-    bool response_requested;
-
-    /* Module state after a set state command */
-    int32_t state_change_status;
 };
 
 static int scmi_system_power_req_state_set_handler(
@@ -104,14 +100,15 @@ enum scmi_system_power_req_event_idx {
  */
 struct spr_set_state_request {
     /*
-     * The composite state that defines the power state that the power domain,
-     * target of the request, has to be put into and possibly the power states
-     * the ancestors of the power domain have to be put into.
+     * Element being referenced for sent or received commands
+     */
+    uint32_t element_idx;
+
+    /*
+     * State being requested
      */
     uint32_t state;
 
-    /* The flags passed from the original SCMI System Power command.*/
-    uint32_t flags;
 };
 
 static int (*handler_table[MOD_SCMI_SYS_POWER_REQ_COMMAND_COUNT])(
@@ -183,6 +180,38 @@ static struct mod_scmi_to_protocol_api
         .message_handler = scmi_system_power_req_message_handler,
     };
 
+static bool try_get_element_idx_from_service(
+    fwk_id_t service_id,
+    uint32_t *element_idx)
+{
+    unsigned int i;
+
+    for (i = 0; i < mod_ctx.dev_count; i++) {
+        if (fwk_id_is_equal(
+                service_id, mod_ctx.dev_ctx_table[i].config->service_id)) {
+            *element_idx = i;
+            return true;
+        }
+    }
+    return false;
+}
+
+static int raise_response_event(uint32_t element_idx)
+{
+    struct fwk_event req;
+    struct spr_set_state_request *req_params =
+        (struct spr_set_state_request *)(&req.params);
+
+    req = (struct fwk_event){
+        .id = FWK_ID_EVENT(
+            FWK_MODULE_IDX_SCMI_SYSTEM_POWER_REQ,
+            SCMI_SPR_EVENT_IDX_SET_COMPLETE),
+        .target_id = FWK_ID_MODULE(FWK_MODULE_IDX_SCMI_SYSTEM_POWER_REQ),
+    };
+    req_params->element_idx = element_idx;
+    return fwk_put_event(&req);
+}
+
 /*
  * Return System Power Requester reading handler. This is the Set State response
  * handler.
@@ -192,92 +221,118 @@ static int scmi_system_power_req_state_set_handler(
     const void *payload,
     size_t payload_size)
 {
+    uint32_t element_idx;
     int ret_status;
-    int status;
+    int event_status = FWK_SUCCESS;
+    struct scmi_system_power_req_dev_ctx *dev_ctx;
 
     ret_status = *((const int *)payload);
 
-    if (ret_status == SCMI_SUCCESS) {
-        mod_ctx.state = mod_ctx.state_requested;
-    }
-
-    mod_ctx.state_change_status = ret_status;
-
-    if (mod_ctx.response_requested) {
-        struct fwk_event_light req = (struct fwk_event_light){
-            .id = FWK_ID_EVENT(
-                FWK_MODULE_IDX_SCMI_SYSTEM_POWER_REQ,
-                SCMI_SPR_EVENT_IDX_SET_COMPLETE),
-            .target_id = FWK_ID_MODULE(FWK_MODULE_IDX_SCMI_SYSTEM_POWER_REQ),
-        };
-
-        status = fwk_put_event(&req);
-        if (status != FWK_SUCCESS) {
-            return status;
+    if (try_get_element_idx_from_service(service_id, &element_idx)) {
+        dev_ctx = &mod_ctx.dev_ctx_table[element_idx];
+        if (dev_ctx->is_response_requested && !dev_ctx->responded) {
+            /* Mark it as responded now */
+            dev_ctx->responded = true;
+            event_status = raise_response_event(element_idx);
         }
     }
-
+    if (event_status != FWK_SUCCESS) {
+        return event_status;
+    }
     return ret_status;
 }
 
+static bool try_get_element_idx(fwk_id_t id, uint32_t *element_id)
+{
+    uint32_t element_idx;
+
+    if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
+        return false;
+    }
+
+    element_idx = fwk_id_get_element_idx(id);
+    if (element_idx >= mod_ctx.dev_count) {
+        return false;
+    }
+    *element_id = element_idx;
+
+    return true;
+}
+
 static int scmi_system_power_req_set_state(
+    fwk_id_t id,
     bool response_requested,
     uint32_t state,
     uint32_t flags)
 {
-    int status;
-
+    uint32_t element_id;
     struct fwk_event req;
     struct spr_set_state_request *req_params =
         (struct spr_set_state_request *)(&req.params);
 
-    mod_ctx.state_requested = state;
-    mod_ctx.response_requested = response_requested;
-
-    req = (struct fwk_event){
-        .id = system_power_requester_set_state_request,
-        .target_id = FWK_ID_MODULE(FWK_MODULE_IDX_SCMI_SYSTEM_POWER_REQ),
-        .response_requested = response_requested,
-    };
-
-    req_params->state = state;
-    req_params->flags = flags;
-    status = fwk_put_event(&req);
-
-    if (status == FWK_SUCCESS) {
-        return FWK_PENDING;
-    } else {
-        return status;
-    }
-}
-
-static int process_set_state(fwk_id_t id, uint32_t state, uint32_t flags)
-{
     uint8_t scmi_protocol_id = (uint8_t)MOD_SCMI_PROTOCOL_ID_SYS_POWER;
     uint8_t scmi_message_id = (uint8_t)MOD_SCMI_SYS_POWER_REQ_STATE_SET;
 
-    struct scmi_system_power_req_dev_ctx *ctx = &(mod_ctx.dev_ctx_table[0]);
+    if (!try_get_element_idx(id, &element_id)) {
+        return FWK_E_RANGE;
+    }
+
+    struct scmi_system_power_req_dev_ctx *dev_ctx =
+        &(mod_ctx.dev_ctx_table[element_id]);
+
+    /*
+     * No response verified, so assume state change is successful and
+     * cache it.
+     */
+    dev_ctx->state = state;
 
     const struct scmi_sys_power_req_state_set_a2p payload = {
         .flags = flags,
         .system_state = state,
     };
 
+    if (response_requested) {
+        /*
+         * Raise an event so if a response is requested it can be handled once
+         * returned.
+         */
+        dev_ctx->is_response_requested = response_requested;
+
+        /* So we know we are waiting for a response */
+        dev_ctx->responded = false;
+        req_params->element_idx = element_id;
+        req_params->state = state;
+        req = (struct fwk_event){
+            .id = system_power_requester_set_state_request,
+            .target_id = FWK_ID_MODULE(FWK_MODULE_IDX_SCMI_SYSTEM_POWER_REQ),
+            .response_requested = response_requested,
+        };
+        fwk_put_event(&req);
+    }
+
     return mod_ctx.scmi_api->scmi_send_message(
         scmi_message_id,
         scmi_protocol_id,
         mod_ctx.token++,
-        ctx->config->service_id,
+        dev_ctx->config->service_id,
         (const void *)&payload,
         sizeof(payload),
         true);
 }
 
-static int scmi_system_power_req_get_state(uint32_t *state)
+static int scmi_system_power_req_get_state(fwk_id_t id, uint32_t *state)
 {
+    struct scmi_system_power_req_dev_ctx *dev_ctx;
+    uint32_t element_id;
+
     if (state != NULL) {
+        if (!try_get_element_idx(id, &element_id)) {
+            return FWK_E_RANGE;
+        }
+
         /* Set State command will cache the response */
-        *state = mod_ctx.state;
+        dev_ctx = &(mod_ctx.dev_ctx_table[element_id]);
+        *state = dev_ctx->state;
 
         return FWK_SUCCESS;
     }
@@ -298,16 +353,24 @@ static int scmi_system_power_req_init(
     unsigned int element_count,
     const void *data)
 {
-    mod_ctx.state = MOD_PD_STATE_ON;
-
+    unsigned int i;
     /* We definitely need elements in this module. */
-    if (element_count != 1) {
+    if (element_count == 0) {
         return FWK_E_SUPPORT;
     }
 
     mod_ctx.dev_count = element_count;
     mod_ctx.dev_ctx_table =
         fwk_mm_calloc(element_count, sizeof(mod_ctx.dev_ctx_table[0]));
+
+    /*
+     * Configure each element's state at the startup with that set in the
+     * config file.
+     */
+    for (i = 0; i < element_count; i++) {
+        mod_ctx.dev_ctx_table[i].state =
+            mod_ctx.dev_ctx_table[i].config->start_state;
+    }
 
     return FWK_SUCCESS;
 }
@@ -377,10 +440,13 @@ static int scmi_system_power_req_process_event(
     const struct fwk_event *event,
     struct fwk_event *resp)
 {
+    struct scmi_system_power_req_dev_ctx *dev_ctx;
     struct fwk_event set_req_event;
     int status;
     struct spr_set_state_request *event_params =
         (struct spr_set_state_request *)(event->params);
+
+    dev_ctx = &mod_ctx.dev_ctx_table[event_params->element_idx];
 
     enum scmi_system_power_req_event_idx event_id_type =
         (enum scmi_system_power_req_event_idx)fwk_id_get_event_idx(event->id);
@@ -392,20 +458,18 @@ static int scmi_system_power_req_process_event(
              * We keep the cookie event of the request that triggers the
              * state change.
              */
-            mod_ctx.cookie = event->cookie;
+            dev_ctx->cookie = event->cookie;
             resp->is_delayed_response = true;
         }
-        process_set_state(event->id, event_params->state, event_params->flags);
         return FWK_SUCCESS;
 
     case SCMI_SPR_EVENT_IDX_SET_COMPLETE:
         status = fwk_get_delayed_response(
-            event->target_id, mod_ctx.cookie, &set_req_event);
+            event->target_id, dev_ctx->cookie, &set_req_event);
         if (status != FWK_SUCCESS) {
             return status;
         }
-
-        event_params->state = mod_ctx.state_change_status;
+        event_params->state = dev_ctx->state;
         return fwk_put_event(&set_req_event);
 
     default:

@@ -52,6 +52,8 @@ struct mod_system_power_requester_api {
      *      completion of a transition, but instead that a request has been
      *      submitted.
      *
+     * \param id ID to determine which element to set the state for.
+     *
      * \param resp_requested True if the caller wants to be notified with an
      *      event response at the end of the request processing.
      *
@@ -69,6 +71,7 @@ struct mod_system_power_requester_api {
      * \return Status code representing the result of the operation.
      */
     int (*set_req_state)(
+        fwk_id_t id,
         bool response_requested,
         uint32_t state,
         uint32_t flags);
@@ -86,7 +89,7 @@ struct mod_system_power_requester_api {
      * \return Status code representing the result of the operation.
      *
      */
-    int (*get_req_state)(uint32_t *state);
+    int (*get_req_state)(fwk_id_t id, uint32_t *state);
 };
 
 /*!
@@ -111,6 +114,14 @@ struct mod_scmi_system_power_req_dev_config {
      *      channel in the transport layer.
      */
     fwk_id_t service_id;
+
+    /*!
+     * \brief System Power State at Startup
+     *
+     * \details The state at which these should be initialised to at the start
+     * of world.
+     */
+    uint32_t start_state;
 };
 
 /*! Identifier of the system power req API */
