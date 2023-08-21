@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -24,6 +24,7 @@
 
 enum scp_sys_pow_nums {
     MOD_SCMI_SYS_POWER_REQ_IDX_0,
+    MOD_SCMI_SYS_POWER_REQ_IDX_1,
     MOD_SCMI_SYS_POWER_REQ_COUNT,
 };
 
@@ -34,6 +35,14 @@ static const struct fwk_element
     system_power_req_element_table[MOD_SCMI_SYS_POWER_REQ_COUNT + 1] = {
     [MOD_SCMI_SYS_POWER_REQ_IDX_0] = {
         .name = "Fake sys power",
+        .data = &(const struct mod_scmi_system_power_req_dev_config) {
+            .service_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_SCMI,
+                0),
+        },
+    },
+    [MOD_SCMI_SYS_POWER_REQ_IDX_1] = {
+        .name = "Fake sys power 1",
         .data = &(const struct mod_scmi_system_power_req_dev_config) {
             .service_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_SCMI,
@@ -73,11 +82,21 @@ void setUp(void)
             system_power_req_element_table[MOD_SCMI_SYS_POWER_REQ_IDX_0]
                 .data;
 
+    memset(
+        &dev_ctx[MOD_SCMI_SYS_POWER_REQ_IDX_1],
+        0,
+        sizeof(struct scmi_system_power_req_dev_ctx));
+    dev_ctx[MOD_SCMI_SYS_POWER_REQ_IDX_1].config =
+        (const struct mod_scmi_system_power_req_dev_config *)
+            system_power_req_element_table[MOD_SCMI_SYS_POWER_REQ_IDX_1]
+                .data;
+
     mod_ctx.dev_ctx_table = dev_ctx;
     mod_ctx.dev_count = MOD_SCMI_SYS_POWER_REQ_COUNT;
     mod_ctx.scmi_api = &scmi_api;
     mod_ctx.token = 0;
-    mod_ctx.state = MOD_PD_STATE_ON;
+    mod_ctx.dev_ctx_table[0].state = MOD_PD_STATE_ON;
+    mod_ctx.dev_ctx_table[1].state = MOD_PD_STATE_OFF;
 
     handler_table[MOD_SCMI_SYS_POWER_REQ_STATE_SET] = fake_message_handler;
 }
@@ -111,7 +130,7 @@ void test_function_scmi_system_power_req_init(void)
     TEST_ASSERT_EQUAL(mod_ctx.dev_ctx_table, dev_ctx);
 }
 
-void test_function_scmi_system_power_req_elem_init(void)
+void test_function_scmi_system_power_req_elem_init_0(void)
 {
     int status;
     fwk_id_t element_id = FWK_ID_ELEMENT(
@@ -147,6 +166,47 @@ void test_function_scmi_system_power_req_elem_init(void)
         element_id, MOD_SCMI_SYS_POWER_REQ_IDX_0);
     fwk_id_get_element_idx_ExpectAndReturn(
         element_id, MOD_SCMI_SYS_POWER_REQ_IDX_0);
+
+    status = scmi_system_power_req_elem_init(element_id, 0, NULL);
+    TEST_ASSERT_EQUAL(status, FWK_E_PANIC);
+}
+
+void test_function_scmi_system_power_req_elem_init_1(void)
+{
+    int status;
+    fwk_id_t element_id = FWK_ID_ELEMENT(
+        FWK_MODULE_IDX_SCMI_SYSTEM_POWER_REQ, MOD_SCMI_SYS_POWER_REQ_IDX_1);
+
+    /* Clear element context to ensure it is properly initialized */
+    memset(
+        &dev_ctx[MOD_SCMI_SYS_POWER_REQ_IDX_1],
+        0,
+        sizeof(struct scmi_system_power_req_dev_ctx));
+
+    fwk_id_get_element_idx_ExpectAndReturn(
+        element_id, MOD_SCMI_SYS_POWER_REQ_IDX_1);
+    fwk_id_get_element_idx_ExpectAndReturn(
+        element_id, MOD_SCMI_SYS_POWER_REQ_IDX_1);
+
+    status = scmi_system_power_req_elem_init(
+        element_id,
+        0,
+        system_power_req_element_table[MOD_SCMI_SYS_POWER_REQ_IDX_1].data);
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+
+    fwk_id_get_element_idx_ExpectAndReturn(
+        element_id, MOD_SCMI_SYS_POWER_REQ_COUNT);
+
+    status = scmi_system_power_req_elem_init(
+        element_id,
+        0,
+        system_power_req_element_table[MOD_SCMI_SYS_POWER_REQ_IDX_1].data);
+    TEST_ASSERT_EQUAL(status, FWK_E_PARAM);
+
+    fwk_id_get_element_idx_ExpectAndReturn(
+        element_id, MOD_SCMI_SYS_POWER_REQ_IDX_1);
+    fwk_id_get_element_idx_ExpectAndReturn(
+        element_id, MOD_SCMI_SYS_POWER_REQ_IDX_1);
 
     status = scmi_system_power_req_elem_init(element_id, 0, NULL);
     TEST_ASSERT_EQUAL(status, FWK_E_PANIC);
@@ -233,33 +293,25 @@ void test_function_scmi_system_power_req_get_state(void)
 {
     int status;
     uint32_t system_state;
+    fwk_id_t id;
 
-    status = scmi_system_power_req_get_state(&system_state);
+    fwk_id_get_element_idx_ExpectAnyArgsAndReturn(0);
+    fwk_id_is_type_ExpectAnyArgsAndReturn(true);
+    status = scmi_system_power_req_get_state(id, &system_state);
     TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
     TEST_ASSERT_EQUAL(system_state, MOD_PD_STATE_ON);
 
-    status = scmi_system_power_req_get_state(NULL);
+    fwk_id_get_element_idx_ExpectAnyArgsAndReturn(1);
+    fwk_id_is_type_ExpectAnyArgsAndReturn(true);
+    status = scmi_system_power_req_get_state(id, &system_state);
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+    TEST_ASSERT_EQUAL(system_state, MOD_PD_STATE_OFF);
+
+    status = scmi_system_power_req_get_state(id, NULL);
     TEST_ASSERT_EQUAL(status, FWK_E_PARAM);
 }
 
 void test_function_scmi_system_power_req_set_state(void)
-{
-    int status;
-    uint32_t system_state = MOD_PD_STATE_OFF;
-    bool response = false;
-
-    __fwk_put_event_ExpectAnyArgsAndReturn(FWK_SUCCESS);
-
-    status = scmi_system_power_req_set_state(response, system_state, 0);
-    TEST_ASSERT_EQUAL(FWK_PENDING, status);
-
-    __fwk_put_event_ExpectAnyArgsAndReturn(FWK_E_PARAM);
-
-    status = scmi_system_power_req_set_state(response, system_state, 0);
-    TEST_ASSERT_EQUAL(FWK_E_PARAM, status);
-}
-
-void test_function_scmi_system_power_req_process_set_state(void)
 {
     int status;
     uint32_t flags = 0xAA;
@@ -267,10 +319,14 @@ void test_function_scmi_system_power_req_process_set_state(void)
     uint8_t scmi_protocol_id = (uint8_t)MOD_SCMI_PROTOCOL_ID_SYS_POWER;
     uint8_t scmi_message_id = (uint8_t)MOD_SCMI_SYS_POWER_REQ_STATE_SET;
 
+    fwk_id_t id;
+
     const struct scmi_sys_power_req_state_set_a2p payload = {
         .flags = flags,
         .system_state = state,
     };
+    fwk_id_get_element_idx_ExpectAnyArgsAndReturn(0);
+    fwk_id_is_type_ExpectAnyArgsAndReturn(true);
 
     scmi_send_message_ExpectWithArrayAndReturn(
         scmi_message_id,
@@ -282,9 +338,39 @@ void test_function_scmi_system_power_req_process_set_state(void)
         sizeof(payload),
         true,
         FWK_SUCCESS);
+    __fwk_put_event_ExpectAnyArgsAndReturn(FWK_SUCCESS);
+    status = scmi_system_power_req_set_state(id, true, state, flags);
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+}
 
-    status =
-        process_set_state(fwk_module_id_scmi_system_power_req, state, flags);
+void test_function_scmi_system_power_req_set_state_no_response(void)
+{
+    int status;
+    uint32_t flags = 0xAA;
+    uint32_t state = MOD_PD_STATE_OFF;
+    uint8_t scmi_protocol_id = (uint8_t)MOD_SCMI_PROTOCOL_ID_SYS_POWER;
+    uint8_t scmi_message_id = (uint8_t)MOD_SCMI_SYS_POWER_REQ_STATE_SET;
+
+    fwk_id_t id;
+
+    const struct scmi_sys_power_req_state_set_a2p payload = {
+        .flags = flags,
+        .system_state = state,
+    };
+    fwk_id_get_element_idx_ExpectAnyArgsAndReturn(1);
+    fwk_id_is_type_ExpectAnyArgsAndReturn(true);
+
+    scmi_send_message_ExpectWithArrayAndReturn(
+        scmi_message_id,
+        scmi_protocol_id,
+        0,
+        dev_ctx[MOD_SCMI_SYS_POWER_REQ_IDX_1].config->service_id,
+        (const void *)&payload,
+        sizeof(payload),
+        sizeof(payload),
+        true,
+        FWK_SUCCESS);
+    status = scmi_system_power_req_set_state(id, false, state, flags);
     TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
 }
 
@@ -292,27 +378,29 @@ void test_scmi_system_power_req_state_set_handler(void)
 {
     int status;
     uint32_t payload;
-    mod_ctx.state = MOD_PD_STATE_ON;
-    mod_ctx.state_requested = MOD_PD_STATE_OFF;
-    payload = SCMI_HARDWARE_ERROR;
 
+    fwk_id_is_equal_ExpectAnyArgsAndReturn(true);
+    payload = SCMI_HARDWARE_ERROR;
     status = scmi_system_power_req_state_set_handler(
         dev_ctx[MOD_SCMI_SYS_POWER_REQ_IDX_0].config->service_id,
         &payload,
         sizeof(payload));
-    TEST_ASSERT_NOT_EQUAL(mod_ctx.state, mod_ctx.state_requested);
-    TEST_ASSERT_EQUAL(mod_ctx.state, MOD_PD_STATE_ON);
-    TEST_ASSERT_EQUAL(mod_ctx.state_requested, MOD_PD_STATE_OFF);
     TEST_ASSERT_EQUAL(status, SCMI_HARDWARE_ERROR);
 
+    fwk_id_is_equal_ExpectAnyArgsAndReturn(true);
     payload = SCMI_SUCCESS;
-
     status = scmi_system_power_req_state_set_handler(
         dev_ctx[MOD_SCMI_SYS_POWER_REQ_IDX_0].config->service_id,
         &payload,
         sizeof(payload));
-    TEST_ASSERT_EQUAL(mod_ctx.state, mod_ctx.state_requested);
-    TEST_ASSERT_EQUAL(mod_ctx.state, MOD_PD_STATE_OFF);
+    TEST_ASSERT_EQUAL(status, SCMI_SUCCESS);
+
+    fwk_id_is_equal_ExpectAnyArgsAndReturn(true);
+    payload = SCMI_SUCCESS;
+    status = scmi_system_power_req_state_set_handler(
+        dev_ctx[MOD_SCMI_SYS_POWER_REQ_IDX_1].config->service_id,
+        &payload,
+        sizeof(payload));
     TEST_ASSERT_EQUAL(status, SCMI_SUCCESS);
 }
 
@@ -375,12 +463,13 @@ int scmi_test_main(void)
 {
     UNITY_BEGIN();
     RUN_TEST(test_function_scmi_system_power_req_init);
-    RUN_TEST(test_function_scmi_system_power_req_elem_init);
+    RUN_TEST(test_function_scmi_system_power_req_elem_init_0);
+    RUN_TEST(test_function_scmi_system_power_req_elem_init_1);
     RUN_TEST(test_function_scmi_system_power_req_bind);
     RUN_TEST(test_function_scmi_system_power_req_process_bind);
     RUN_TEST(test_function_scmi_system_power_req_get_state);
     RUN_TEST(test_function_scmi_system_power_req_set_state);
-    RUN_TEST(test_function_scmi_system_power_req_process_set_state);
+    RUN_TEST(test_function_scmi_system_power_req_set_state_no_response);
     RUN_TEST(test_scmi_system_power_req_state_set_handler);
     RUN_TEST(test_scmi_system_power_req_get_scmi_protocol_id);
     RUN_TEST(test_scmi_system_power_req_message_handler);
