@@ -1,5 +1,5 @@
 \ingroup GroupModules Modules
-\defgroup GroupAtu Smcf
+\defgroup GroupModuleSMCF SMCF Driver
 
 # System Monitoring Control Framework SMCF Architecture
 
