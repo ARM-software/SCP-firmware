@@ -1,10 +1,10 @@
 \ingroup GroupModules Modules
-\defgroup GroupMHU3 MHU Hardware version 3 driver.
+\defgroup GroupMHUv3 Message Handling Unit (MHU) v3 Driver
 
 # MHU Hardware version 3 driver
 
 
-Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
 
 ## Overview
 
