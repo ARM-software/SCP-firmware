@@ -6,6 +6,7 @@
  */
 
 #include "mgi.h"
+#include "mgi_validate_header.h"
 
 #include <stddef.h>
 
