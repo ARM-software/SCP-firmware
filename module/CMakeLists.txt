@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -75,6 +75,7 @@ list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/scmi_sensor_req")
 list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/scmi_system_power")
 list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/scmi_system_power_req")
 list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/scmi_voltage_domain")
+list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/sc_pll")
 list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/sds")
 list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/sensor")
 list(APPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/sensor_smcf_drv")
