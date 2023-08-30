@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -73,7 +73,7 @@ void __fwk_dlist_remove(
     fwk_assert(node->prev != NULL);
     fwk_assert(node->next != NULL);
 
-    assert(__fwk_slist_contains(
+    fwk_assert(__fwk_slist_contains(
         (struct fwk_slist *)list,
         (struct fwk_slist_node *)node));
 
@@ -104,7 +104,7 @@ void __fwk_dlist_insert(
     fwk_assert(node->prev != NULL);
     fwk_assert(node->next != NULL);
 
-    assert(__fwk_slist_contains(
+    fwk_assert(__fwk_slist_contains(
         (struct fwk_slist *)list,
         (struct fwk_slist_node *)node));
 
