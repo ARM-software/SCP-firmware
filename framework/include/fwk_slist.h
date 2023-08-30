@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -116,7 +116,7 @@ struct fwk_slist_node *__fwk_slist_pop_head(struct fwk_slist *list) FWK_LEAF
 struct fwk_slist_node *__fwk_slist_next(
     const struct fwk_slist *list,
     const struct fwk_slist_node *node) FWK_PURE FWK_LEAF FWK_NOTHROW
-    FWK_NONNULL(1) FWK_NONNULL(2) FWK_UNTOUCHED(1) FWK_READ_ONLY1(2);
+    FWK_NONNULL(1) FWK_NONNULL(2) FWK_READ_ONLY1(1) FWK_READ_ONLY1(2);
 
 /*
  * Remove a node from a singly-linked list.
