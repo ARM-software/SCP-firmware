@@ -3,6 +3,102 @@ SCP-firmware Change Log
 
 Copyright (c) 2019-2023, Arm Limited and Contributors. All rights reserved.
 
+SCP-firmware - version 2.13
+============================
+
+New features
+------------
+
+- Modules:
+    - System Monitoring Control Framework: It is a module designed to manage
+      a large and diverse set of on-chip sensors and monitors, and
+      corresponding unit tests
+
+
+Changed
+-------
+
+- Documentation:
+    - maintainers: Update maintainers list
+    - doc/framework: Update with structs for static tables
+
+- Build system:
+    - cmake: Add target info for fwk_test and mod_test
+    - ci_cmake: Warn users when script runs without docker support
+
+- Framework:
+    - fwk_io: Extended functionality with the introduction of
+      fwk_io_putch_nowait and add FWK_E_BUSY return to putch
+      when the resource is busy
+    - Add disable option to log level
+    - fwk_log: Remove '\n' character from log prints
+    - fwk_io: Replace fwk_assert for error handling
+
+- Modules:
+    - scmi_perf: Improvements in code separation for SCMI-Perf
+    - system_power: A change to allow zero elements for systems without PPUs
+    - scmi: Introduction of a notification handler
+    - scmi_system_power: Refactoring of the set_state function
+    - optee: Unit test framework
+    - dvfs: Initial unit tests
+    - power_domain: Update all power state variables upon report
+    - scmi_clock: Improve Unit tests
+    - pl011: Enhanced pl011 driver with simplification
+    - pl011: Initial unit tests
+    - cmn700: Using offset adjusted address for remote chips
+    - cmn700: Allow runtime addition of io region in rnsam, alongside enabling
+      and disbaling rnsam and refactoring.
+    - xr77128: Add xr77128 (PMIC) module
+    - scmi_perf: Improvements and unit testing for the Plugins Handler
+      extension in SCMI-Performance
+
+- Platforms:
+    - synquacer: Prevent metadata from being updated on every boot
+    - rdn2: Switch ON SYSTOP PPU by default at boot to allow other modules
+      early initialization
+    - juno: Introduce platform variant to decrease the binary size
+    - n1sdp: Remove exception_handler function
+    - morello: Enable voltage scaling in DVFS framework
+    - n1sdp: Add configs for timer and gtimer in MCP RAM firmware and port to
+      generic modules for MCP-SCP SCMI comms and fix these
+    - morello: Add configs for timer and gtimer in MCP RAM firmware
+      and port to generic modules for SCP-MCP SCMI comms and fix these
+    - morello: enable automatic sampling and temperature interrupts
+    - juno: The platform variants added for CI
+    - all platforms: Fix delayed transport init
+    - all platforms: Allow platforms to specify valid PID/CID registers
+
+- Unit tests:
+    - user_guide: Clarify requirements for contributors
+    - Add template for Quick Start
+
+Resolved issues
+---------------
+- Documentation:
+    - user_guide: Amendments to the user guide
+    - Doxygen: Amend warnings and dependencies
+
+- Build system:
+    - docker: fix missing dependency for LLVM compiler
+
+- Framework:
+    - fwk/Makefile: Fix missing references for FWK_LOG_LEVEL_TRACE
+    - Fix dlist_remove/slist_next util functions declaration
+
+- Modules:
+    - mhu3: Fix bind function
+    - msys_rom: Correction for building with log level disabled
+    - pl011: Fix to address incorrect assert when fractional divisor is zero
+
+- Platforms:
+    - tc2: Correction for building with log level disabled
+    - n1sdp: Correction for building with CRIT
+    - n1sdp: Remove unused multichip info structure
+    - morello: Remove unused multichip info struct
+    - morello: Fix build when log level set to DISABLED or CRIT
+    - rdn2: Fixed boot issue
+
+
 SCP-firmware - version 2.12
 ============================
 
