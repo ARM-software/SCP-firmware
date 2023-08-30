@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -24,6 +24,9 @@
 
 #include <stdbool.h>
 #include <string.h>
+
+/* I2C bus active timeout */
+#define I2C_BA_TIMEOUT 100U
 
 /* I2C divider calculation values */
 #define I2C_HZ        22
@@ -257,6 +260,17 @@ static int i2c_controller_read_polled(
 
     device_ctx = &i2c_ctx.device_ctx_table[fwk_id_get_element_idx(device_id)];
 
+    /* Wait for bus to be inactive */
+    for (i = I2C_BA_TIMEOUT; (i > 0) &&
+         (I2C_REG_R(device_ctx->reg->SR, I2C_SR_BA_MASK, I2C_SR_BA_SHIFT) != 0);
+         i--) {
+        continue;
+    }
+
+    if (i == 0) {
+        return FWK_E_DEVICE;
+    }
+
     I2C_REG_RMW(
         device_ctx->reg->CR, I2C_CR_HOLD_MASK, I2C_CR_HOLD_SHIFT, I2C_HOLD_ON);
 
@@ -429,6 +443,17 @@ static int i2c_controller_write_polled(
     device_ctx = &i2c_ctx.device_ctx_table[fwk_id_get_element_idx(device_id)];
 
     fifo_depth = device_ctx->config->fifo_depth;
+
+    /* Wait for bus to be inactive */
+    for (i = I2C_BA_TIMEOUT; (i > 0) &&
+         (I2C_REG_R(device_ctx->reg->SR, I2C_SR_BA_MASK, I2C_SR_BA_SHIFT) != 0);
+         i--) {
+        continue;
+    }
+
+    if (i == 0) {
+        return FWK_E_DEVICE;
+    }
 
     I2C_REG_RMW(
         device_ctx->reg->CR, I2C_CR_HOLD_MASK, I2C_CR_HOLD_SHIFT, I2C_HOLD_ON);
