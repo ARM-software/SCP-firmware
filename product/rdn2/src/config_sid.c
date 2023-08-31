@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -42,7 +42,7 @@ const struct fwk_module_config config_sid = {
     .data = &(struct mod_sid_config) {
         .sid_base = SCP_SID_BASE,
         .pcid_expected = {
-            .PID0 = 0xD2,
+            .PID0 = 0xBC,
             .PID1 = 0xB0,
             .PID2 = 0x0B,
             .PID3 = 0x00,
