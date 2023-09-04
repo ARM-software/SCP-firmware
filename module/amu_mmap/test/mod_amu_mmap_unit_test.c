@@ -34,6 +34,12 @@ void setUp(void)
 {
     amu_mmap.core_count = CORE_COUNT;
     amu_mmap.core = core;
+
+    for (unsigned int i = 0; i < CORE_COUNT; ++i) {
+        core[i].core_config =
+            (struct mod_core_element_config *)element_table[i].data;
+        core[i].num_counters = element_table[i].sub_element_count;
+    }
 }
 
 void tearDown(void)
@@ -150,6 +156,77 @@ void test_amu_mmap_bind_request_amu_api_success(void)
     TEST_ASSERT_EQUAL(&amu_api, api);
 }
 
+void test_amu_mmap_get_counters_bad_params_fail(void)
+{
+    int status = FWK_E_PANIC;
+    fwk_id_t counters_id;
+    struct amu_api *api = &amu_api;
+    uint64_t amu_value[4] = { 0 };
+    size_t amu_count = 4;
+
+    /* Bad ID*/
+    fwk_module_is_valid_sub_element_id_ExpectAnyArgsAndReturn(false);
+    status = api->get_counters(counters_id, amu_value, amu_count);
+    TEST_ASSERT_EQUAL(FWK_E_PARAM, status);
+
+    /* Bad buffer*/
+    counters_id = FWK_ID_SUB_ELEMENT(
+        FWK_MODULE_IDX_AMU_MMAP, CORE0_IDX, NUM_OF_COREA_COUNTERS);
+    fwk_module_is_valid_sub_element_id_ExpectAndReturn(counters_id, true);
+    status = api->get_counters(counters_id, NULL, amu_count);
+    TEST_ASSERT_EQUAL(FWK_E_PARAM, status);
+}
+
+void test_amu_mmap_get_counters_count_exceeds_available(void)
+{
+    fwk_id_t counters_id;
+    int status = FWK_E_PANIC;
+    struct amu_api *api = &amu_api;
+
+    for (unsigned int i = 0; i < CORE_COUNT; ++i) {
+        size_t amu_count = 2;
+        uint64_t amu_value[amu_count];
+        counters_id = FWK_ID_SUB_ELEMENT(
+            FWK_MODULE_IDX_AMU_MMAP, i, element_table[i].sub_element_count - 1);
+        fwk_module_is_valid_sub_element_id_ExpectAndReturn(counters_id, true);
+
+        status = api->get_counters(counters_id, amu_value, amu_count);
+
+        TEST_ASSERT_EQUAL(FWK_E_RANGE, status);
+    }
+}
+
+void test_amu_mmap_get_counters_success(void)
+{
+    int status = FWK_E_PANIC;
+    struct amu_api *api = &amu_api;
+    uint64_t test_value = 0xDEADBEEFC0FFEE00;
+
+    /* Fill the amu test data */
+    for (unsigned int i = 0; i < CORE_COUNT; ++i) {
+        for (unsigned int j = 0; j < element_table[i].sub_element_count; ++j) {
+            amu_counters[i][j] = test_value++;
+        }
+    }
+
+    for (size_t core_idx = 0; core_idx < CORE_COUNT; ++core_idx) {
+        size_t core_num_counters = element_table[core_idx].sub_element_count;
+        for (size_t i = 0; i < core_num_counters; ++i) {
+            for (size_t n = 1; n < core_num_counters - i; ++n) {
+                uint64_t amu_value_buff[n];
+                fwk_id_t start_counter_id =
+                    FWK_ID_SUB_ELEMENT(FWK_MODULE_IDX_AMU_MMAP, core_idx, i);
+                fwk_module_is_valid_sub_element_id_ExpectAndReturn(
+                    start_counter_id, true);
+                status = api->get_counters(start_counter_id, amu_value_buff, n);
+                TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+                TEST_ASSERT_EQUAL_HEX64_ARRAY(
+                    &amu_counters[core_idx][i], amu_value_buff, n);
+            }
+        }
+    }
+}
+
 int amu_mmap_test_main(void)
 {
     UNITY_BEGIN();
@@ -160,6 +237,9 @@ int amu_mmap_test_main(void)
     RUN_TEST(test_amu_mmap_element_init_success);
     RUN_TEST(test_amu_mmap_bind_request_amu_api_bad_params_fail);
     RUN_TEST(test_amu_mmap_bind_request_amu_api_success);
+    RUN_TEST(test_amu_mmap_get_counters_bad_params_fail);
+    RUN_TEST(test_amu_mmap_get_counters_count_exceeds_available);
+    RUN_TEST(test_amu_mmap_get_counters_success);
 
     return UNITY_END();
 }
