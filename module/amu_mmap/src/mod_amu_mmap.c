@@ -31,6 +31,13 @@ static struct mod_amu_mmap {
     struct mod_core_amu_counters *core;
 } amu_mmap;
 
+static inline uint64_t *amu_calc_counter_address(
+    uint64_t *counters_base_addr,
+    uint32_t offset)
+{
+    return (uint64_t *)((uintptr_t)counters_base_addr + (uintptr_t)offset);
+}
+
 /* Module APIs */
 
 static int amu_mmap_get_counters(
@@ -38,7 +45,33 @@ static int amu_mmap_get_counters(
     uint64_t *counter_buff,
     size_t num_counter)
 {
-    return FWK_E_SUPPORT;
+    uint32_t core_idx;
+    uint32_t start_counter_idx;
+    uint64_t *counter_address = NULL;
+    uint32_t *offsets = NULL;
+
+    if (!fwk_module_is_valid_sub_element_id(start_counter_id) ||
+        counter_buff == NULL) {
+        return FWK_E_PARAM;
+    }
+
+    core_idx = start_counter_id.sub_element.element_idx;
+    start_counter_idx = start_counter_id.sub_element.sub_element_idx;
+    offsets = amu_mmap.core[core_idx].core_config->counters_offsets;
+
+    if (start_counter_idx + num_counter >
+        amu_mmap.core[core_idx].num_counters) {
+        return FWK_E_RANGE;
+    }
+
+    for (size_t i = 0; i < num_counter; ++i) {
+        counter_address = amu_calc_counter_address(
+            amu_mmap.core[core_idx].core_config->counters_base_addr,
+            offsets[start_counter_idx + i]);
+        counter_buff[i] = *counter_address;
+    }
+
+    return FWK_SUCCESS;
 }
 
 struct amu_api amu_api = {
@@ -79,6 +112,10 @@ static int amu_mmap_element_init(
     amu_mmap.core[core_idx].core_config =
         (struct mod_core_element_config *)data;
     amu_mmap.core[core_idx].num_counters = sub_element_count;
+
+    if (amu_mmap.core[core_idx].core_config->counters_base_addr == NULL) {
+        return FWK_E_ACCESS;
+    }
 
     return FWK_SUCCESS;
 }
