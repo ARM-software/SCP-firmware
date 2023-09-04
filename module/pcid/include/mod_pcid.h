@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -27,6 +27,11 @@
  */
 
 /*!
+ * Value indicating that a PCID register is valid.
+ */
+#define PCID_REG_VALID (1u)
+
+/*!
  * \brief PID and CID registers.
  */
 struct mod_pcid_registers {
@@ -42,6 +47,26 @@ struct mod_pcid_registers {
     FWK_R uint32_t CID1; /*!< Component ID 1 */
     FWK_R uint32_t CID2; /*!< Component ID 2 */
     FWK_R uint32_t CID3; /*!< Component ID 3 */
+};
+
+/*!
+ * \brief PID/CID register identifier in address order.
+ */
+enum mod_pcid_register_id {
+    MOD_PCID_REGISTER_NONE = 0x000,
+    MOD_PCID_REGISTER_PID4 = (PCID_REG_VALID << 0),
+    MOD_PCID_REGISTER_PID5 = (PCID_REG_VALID << 1),
+    MOD_PCID_REGISTER_PID6 = (PCID_REG_VALID << 2),
+    MOD_PCID_REGISTER_PID7 = (PCID_REG_VALID << 3),
+    MOD_PCID_REGISTER_PID0 = (PCID_REG_VALID << 4),
+    MOD_PCID_REGISTER_PID1 = (PCID_REG_VALID << 5),
+    MOD_PCID_REGISTER_PID2 = (PCID_REG_VALID << 6),
+    MOD_PCID_REGISTER_PID3 = (PCID_REG_VALID << 7),
+    MOD_PCID_REGISTER_CID0 = (PCID_REG_VALID << 8),
+    MOD_PCID_REGISTER_CID1 = (PCID_REG_VALID << 9),
+    MOD_PCID_REGISTER_CID2 = (PCID_REG_VALID << 10),
+    MOD_PCID_REGISTER_CID3 = (PCID_REG_VALID << 11),
+    MOD_PCID_REGISTER_ALL = 0xFFF,
 };
 
 /*!

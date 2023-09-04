@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -83,6 +83,9 @@ struct mod_sid_config {
 
     /*! Expected values of the PID and CID registers */
     struct mod_pcid_registers pcid_expected;
+
+    /*! Bitmap representing valid PID and CID registers */
+    uint32_t valid_pcid_registers;
 };
 
 /*!
