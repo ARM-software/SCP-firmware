@@ -75,6 +75,19 @@ enum mod_pcid_register_id {
  * \param registers Pointer to set of PCID registers to check.
  * \param expected Pointer to set of PCID Registers that denote the expected
  *     values.
+ * \param valid_pcid_registers Bitmap of valid PID/CID registers.
+ *     Bit0  - Set if PID4 is valid.
+ *     Bit1  - Set if PID5 is valid.
+ *     Bit2  - Set if PID6 is valid.
+ *     Bit3  - Set if PID7 is valid.
+ *     Bit4  - Set if PID0 is valid.
+ *     Bit5  - Set if PID1 is valid.
+ *     Bit6  - Set if PID2 is valid.
+ *     Bit7  - Set if PID3 is valid.
+ *     Bit8  - Set if CID0 is valid.
+ *     Bit9  - Set if CID1 is valid.
+ *     Bit10 - Set if CID2 is valid.
+ *     Bit11 - Set if CID3 is valid.
  *
  * \pre \p registers must not be NULL
  * \pre \p expected must not be NULL
@@ -82,8 +95,10 @@ enum mod_pcid_register_id {
  * \retval true All the registers have the expected values.
  * \retval false One or more registers do not have the expected values.
  */
-bool mod_pcid_check_registers(const struct mod_pcid_registers *registers,
-                              const struct mod_pcid_registers *expected);
+bool mod_pcid_check_registers(
+    const struct mod_pcid_registers *registers,
+    const struct mod_pcid_registers *expected,
+    uint32_t valid_pcid_registers);
 
 /*!
  * \}

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -67,8 +67,8 @@ static int sid_init(
 
     sid_reg = (struct sid_reg *)config->sid_base;
 
-    fwk_assert(
-        mod_pcid_check_registers(&sid_reg->pcid, &config->pcid_expected));
+    fwk_assert(mod_pcid_check_registers(
+        &sid_reg->pcid, &config->pcid_expected, config->valid_pcid_registers));
 
     info.system_major_revision =
         (sid_reg->SYSTEM_ID & SID_SYS_SOC_ID_MAJOR_REVISION_MASK)
