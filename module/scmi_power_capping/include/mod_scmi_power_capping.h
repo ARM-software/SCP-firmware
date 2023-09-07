@@ -40,6 +40,30 @@ enum mod_scmi_power_capping_power_cap_unit {
  */
 struct mod_scmi_power_capping_domain_config {
     /*!
+     * \brief Minimum PAI.
+     *
+     * \details The minimum supported power averaging interval (PAI),
+     *     expressed in microseconds, its value cannot be zero.
+     */
+    uint32_t min_pai;
+
+    /*!
+     * \brief Maximum PAI.
+     *
+     * \details The maximum supported power averaging interval (PAI),
+     *     expressed in microseconds, its value cannot be zero.
+     */
+    uint32_t max_pai;
+
+    /*!
+     * \brief PAI step.
+     *
+     * \details The step size between two consecutive PAI supported by
+     *     this power capping domain. This value cannot be zero if min_pai and
+     *     max_pai have different values.
+     */
+    uint32_t pai_step;
+    /*!
      * \brief Minimum power cap.
      *
      * \details The minimum power value that can be set as the power cap for
@@ -93,6 +117,16 @@ struct mod_scmi_power_capping_domain_config {
      * \brief ID of the corresponding power allocator domain.
      */
     fwk_id_t power_allocator_domain_id;
+
+    /*!
+     * \brief ID of the corresponding power coordinator domain.
+     */
+    fwk_id_t power_coordinator_domain_id;
+
+    /*!
+     * \brief ID of the corresponding power meter domain.
+     */
+    fwk_id_t power_meter_domain_id;
 };
 
 /*!

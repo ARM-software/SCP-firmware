@@ -120,6 +120,21 @@ void utest_scmi_power_capping_bind_success(void)
         &(power_management_apis.power_allocator_api),
         FWK_SUCCESS);
 
+    fwk_module_bind_ExpectAndReturn(
+        FWK_ID_MODULE(FWK_MODULE_IDX_POWER_COORDINATOR),
+        FWK_ID_API(
+            FWK_MODULE_IDX_POWER_COORDINATOR,
+            MOD_POWER_COORDINATOR_API_IDX_PERIOD),
+        &(power_management_apis.power_coordinator_api),
+        FWK_SUCCESS);
+
+    fwk_module_bind_ExpectAndReturn(
+        FWK_ID_MODULE(FWK_MODULE_IDX_POWER_METER),
+        FWK_ID_API(
+            FWK_MODULE_IDX_POWER_METER, MOD_POWER_METER_API_IDX_MEASUREMENT),
+        &(power_management_apis.power_meter_api),
+        FWK_SUCCESS);
+
     pcapping_protocol_bind_ExpectAndReturn(FWK_SUCCESS);
     pcapping_protocol_set_power_apis_Expect(&power_management_apis);
     status = scmi_power_capping_bind(bind_id, 0);
@@ -142,6 +157,21 @@ void utest_scmi_power_capping_bind_failure(void)
         FWK_ID_API(
             FWK_MODULE_IDX_POWER_ALLOCATOR, MOD_POWER_ALLOCATOR_API_IDX_CAP),
         &(power_management_apis.power_allocator_api),
+        FWK_SUCCESS);
+
+    fwk_module_bind_ExpectAndReturn(
+        FWK_ID_MODULE(FWK_MODULE_IDX_POWER_COORDINATOR),
+        FWK_ID_API(
+            FWK_MODULE_IDX_POWER_COORDINATOR,
+            MOD_POWER_COORDINATOR_API_IDX_PERIOD),
+        &(power_management_apis.power_coordinator_api),
+        FWK_SUCCESS);
+
+    fwk_module_bind_ExpectAndReturn(
+        FWK_ID_MODULE(FWK_MODULE_IDX_POWER_METER),
+        FWK_ID_API(
+            FWK_MODULE_IDX_POWER_METER, MOD_POWER_METER_API_IDX_MEASUREMENT),
+        &(power_management_apis.power_meter_api),
         FWK_SUCCESS);
 
     pcapping_protocol_bind_ExpectAndReturn(FWK_E_INIT);

@@ -11,19 +11,43 @@
 #include "fwk_module_idx.h"
 #include "internal/scmi_power_capping_protocol.h"
 #include "mod_power_allocator.h"
+#include "mod_power_meter.h"
 
 #include <fwk_module.h>
 
 struct mod_scmi_power_capping_power_apis power_management_apis;
 
 static int scmi_power_capping_power_api_bind(
-    struct mod_scmi_power_capping_power_apis *power_management_apis)
+    struct mod_scmi_power_capping_power_apis *power_apis)
 {
-    return fwk_module_bind(
+    int status;
+
+    status = fwk_module_bind(
         FWK_ID_MODULE(FWK_MODULE_IDX_POWER_ALLOCATOR),
         FWK_ID_API(
             FWK_MODULE_IDX_POWER_ALLOCATOR, MOD_POWER_ALLOCATOR_API_IDX_CAP),
-        &(power_management_apis->power_allocator_api));
+        &(power_apis->power_allocator_api));
+
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_POWER_COORDINATOR),
+        FWK_ID_API(
+            FWK_MODULE_IDX_POWER_COORDINATOR,
+            MOD_POWER_COORDINATOR_API_IDX_PERIOD),
+        &(power_apis->power_coordinator_api));
+
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    return fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_POWER_METER),
+        FWK_ID_API(
+            FWK_MODULE_IDX_POWER_METER, MOD_POWER_METER_API_IDX_MEASUREMENT),
+        &(power_apis->power_meter_api));
 }
 
 static int scmi_power_capping_init(

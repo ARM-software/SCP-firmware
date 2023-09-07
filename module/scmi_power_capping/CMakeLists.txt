@@ -14,6 +14,9 @@ target_sources(${SCP_MODULE_TARGET}
          PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_scmi_power_capping.c")
 
 target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-power-allocator)
+target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-power-meter)
+target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-power-coordinator)
+
 
 target_sources(${SCP_MODULE_TARGET}
          PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/scmi_power_capping_protocol.c")

@@ -12,6 +12,8 @@
 #define INTERNAL_SCMI_POWER_CAPPING_H
 
 #include "mod_power_allocator.h"
+#include "mod_power_coordinator.h"
+#include "mod_power_meter.h"
 #include "mod_scmi_power_capping.h"
 
 #include <fwk_event.h>
@@ -48,6 +50,12 @@ enum scmi_power_capping_event_idx {
 struct mod_scmi_power_capping_power_apis {
     /* Power allocator API */
     const struct mod_power_allocator_api *power_allocator_api;
+
+    /* Power coordinator API */
+    const struct mod_power_coordinator_api *power_coordinator_api;
+
+    /* Power meter API */
+    const struct mod_power_meter_api *power_meter_api;
 };
 
 struct mod_scmi_power_capping_domain_context {
@@ -67,6 +75,11 @@ struct mod_scmi_power_capping_domain_context {
      * \brief Power capping configuration support.
      */
     bool cap_config_support;
+
+    /*!
+     * \brief PAI configuration support.
+     */
+    bool pai_config_support;
 };
 
 struct mod_scmi_power_capping_context {

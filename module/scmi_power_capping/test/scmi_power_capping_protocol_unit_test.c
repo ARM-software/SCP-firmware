@@ -14,6 +14,8 @@
 #include <Mockfwk_module.h>
 #include <Mockfwk_notification.h>
 #include <Mockmod_power_allocator_extra.h>
+#include <Mockmod_power_coordinator_extra.h>
+#include <Mockmod_power_meter_extra.h>
 #include <Mockmod_resource_perms_extra.h>
 #include <Mockmod_scmi_extra.h>
 #include <internal/Mockfwk_core_internal.h>
@@ -85,6 +87,16 @@ static const struct mod_power_allocator_api power_allocator_api = {
     .get_cap = get_cap,
     .set_cap = set_cap,
 };
+
+static const struct mod_power_coordinator_api power_coordinator_api = {
+    .get_coordinator_period = get_coordinator_period,
+    .set_coordinator_period = set_coordinator_period,
+};
+
+static const struct mod_power_meter_api power_meter_api = {
+    .get_power = get_power,
+};
+
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 static const struct mod_res_permissions_api res_perms_api = {
     .agent_has_protocol_permission = agent_has_protocol_permission,
@@ -94,6 +106,8 @@ static const struct mod_res_permissions_api res_perms_api = {
 
 static const struct mod_scmi_power_capping_power_apis power_management_apis = {
     .power_allocator_api = &power_allocator_api,
+    .power_coordinator_api = &power_coordinator_api,
+    .power_meter_api = &power_meter_api,
 };
 
 static fwk_id_t service_id_1 =
@@ -106,6 +120,9 @@ static const struct mod_scmi_power_capping_domain_config
         .parent_idx = __LINE__,
         .power_allocator_domain_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_ALLOCATOR, __LINE__),
+        .min_pai = MIN_DEFAULT_PAI,
+        .max_pai = MAX_DEFAULT_PAI,
+        .pai_step = 1,
         .min_power_cap = MIN_DEFAULT_POWER_CAP,
         .max_power_cap = MAX_DEFAULT_POWER_CAP,
         .power_cap_step = 1,
@@ -138,6 +155,12 @@ static void test_set_cap_config_supported(
     domain_ctx_table[domain_idx].cap_config_support = cap_config_supported;
 }
 
+static void test_set_pai_config_supported(
+    unsigned int domain_idx,
+    bool pai_config_supported)
+{
+    domain_ctx_table[domain_idx].pai_config_support = pai_config_supported;
+}
 /* Test functions */
 /* Initialize the tests */
 static void test_init(void)
@@ -167,6 +190,8 @@ void tearDown(void)
 {
     Mockmod_power_allocator_extra_Verify();
     Mockmod_scmi_extra_Verify();
+    Mockmod_power_coordinator_extra_Verify();
+    Mockmod_power_meter_extra_Verify();
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     Mockmod_resource_perms_extra_Verify();
 #endif
@@ -340,6 +365,9 @@ void utest_message_handler_domain_attributes_valid(void)
         .attributes = 1u << POWER_CAP_CONF_SUP_POS |
             config->power_cap_unit << POWER_UNIT_POS,
         .name = "TestPowerCap",
+        .min_pai = config->min_pai,
+        .max_pai = config->max_pai,
+        .pai_step = config->pai_step,
         .min_power_cap = config->min_power_cap,
         .max_power_cap = config->max_power_cap,
         .power_cap_step = config->power_cap_step,
@@ -643,6 +671,226 @@ void utest_message_handler_power_capping_set_success_sync_uncap(void)
     TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_CAP_SET, cmd_payload);
 }
 
+void utest_message_handler_power_capping_get_pai_valid(void)
+{
+    uint32_t pai = __LINE__; /* Arbitrary value */
+
+    struct scmi_power_capping_pai_get_a2p cmd_payload = {
+        .domain_id = FAKE_POWER_CAPPING_IDX_1
+    };
+
+    struct scmi_power_capping_pai_get_p2a ret_payload = {
+        .status = SCMI_SUCCESS,
+        .pai = pai,
+    };
+
+    get_coordinator_period_ExpectWithArrayAndReturn(
+        scmi_power_capping_default_config.power_coordinator_domain_id,
+        &pai,
+        sizeof(pai),
+        FWK_SUCCESS);
+    get_coordinator_period_IgnoreArg_period();
+    get_coordinator_period_ReturnMemThruPtr_period(&pai, sizeof(pai));
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
+
+    EXPECT_RESPONSE_SUCCESS(ret_payload);
+    TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_PAI_GET, cmd_payload);
+}
+
+void utest_message_handler_power_capping_get_pai_failure(void)
+{
+    uint32_t pai = __LINE__; /* Arbitrary value */
+
+    struct scmi_power_capping_pai_get_a2p cmd_payload = {
+        .domain_id = FAKE_POWER_CAPPING_IDX_1
+    };
+
+    struct scmi_power_capping_pai_get_p2a ret_payload = {
+        .status = SCMI_GENERIC_ERROR,
+    };
+
+    get_coordinator_period_ExpectWithArrayAndReturn(
+        scmi_power_capping_default_config.power_coordinator_domain_id,
+        &pai,
+        sizeof(pai),
+        FWK_E_DEVICE);
+    get_coordinator_period_IgnoreArg_period();
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
+
+    EXPECT_RESPONSE_ERROR(ret_payload);
+    TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_PAI_GET, cmd_payload);
+}
+
+void utest_message_handler_power_capping_set_pai_valid(void)
+{
+    uint32_t pai = MIN_DEFAULT_PAI;
+
+    struct scmi_power_capping_pai_set_a2p cmd_payload = {
+        .domain_id = FAKE_POWER_CAPPING_IDX_1,
+        .pai = pai,
+    };
+
+    struct scmi_power_capping_pai_set_p2a ret_payload = {
+        .status = SCMI_SUCCESS,
+    };
+
+    test_set_pai_config_supported(cmd_payload.domain_id, true);
+
+    set_coordinator_period_ExpectAndReturn(
+        scmi_power_capping_default_config.power_coordinator_domain_id,
+        pai,
+        FWK_SUCCESS);
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
+
+    EXPECT_RESPONSE_SUCCESS(ret_payload);
+    TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_PAI_SET, cmd_payload);
+}
+
+void utest_message_handler_power_capping_set_pai_failure(void)
+{
+    uint32_t pai = MAX_DEFAULT_PAI;
+
+    struct scmi_power_capping_pai_set_a2p cmd_payload = {
+        .domain_id = FAKE_POWER_CAPPING_IDX_1,
+        .pai = pai,
+    };
+
+    struct scmi_power_capping_pai_set_p2a ret_payload = {
+        .status = SCMI_GENERIC_ERROR,
+    };
+
+    test_set_pai_config_supported(cmd_payload.domain_id, true);
+
+    set_coordinator_period_ExpectAndReturn(
+        scmi_power_capping_default_config.power_coordinator_domain_id,
+        pai,
+        FWK_E_DEVICE);
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
+
+    EXPECT_RESPONSE_ERROR(ret_payload);
+    TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_PAI_SET, cmd_payload);
+}
+
+void utest_message_handler_power_capping_set_less_than_min_pai(void)
+{
+    uint32_t pai = MIN_DEFAULT_PAI - 1u;
+    struct scmi_power_capping_pai_set_a2p cmd_payload = {
+        .domain_id = FAKE_POWER_CAPPING_IDX_1,
+        .pai = pai,
+    };
+
+    struct scmi_power_capping_cap_set_p2a ret_payload = {
+        .status = SCMI_OUT_OF_RANGE,
+    };
+
+    test_set_pai_config_supported(cmd_payload.domain_id, true);
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
+
+    EXPECT_RESPONSE_ERROR(ret_payload);
+    TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_PAI_SET, cmd_payload);
+}
+
+void utest_message_handler_power_capping_set_more_than_max_pai(void)
+{
+    uint32_t pai = MAX_DEFAULT_PAI + 1u;
+    struct scmi_power_capping_pai_set_a2p cmd_payload = {
+        .domain_id = FAKE_POWER_CAPPING_IDX_1,
+        .pai = pai,
+    };
+
+    struct scmi_power_capping_cap_set_p2a ret_payload = {
+        .status = SCMI_OUT_OF_RANGE,
+    };
+
+    test_set_pai_config_supported(cmd_payload.domain_id, true);
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
+
+    EXPECT_RESPONSE_ERROR(ret_payload);
+    TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_PAI_SET, cmd_payload);
+}
+
+void utest_message_handler_power_capping_get_power_measurement_valid(void)
+{
+    uint32_t power = __LINE__; /* Arbitrary value */
+    uint32_t pai = __LINE__; /* Arbitrary value */
+
+    struct scmi_power_capping_measurements_get_a2p cmd_payload = {
+        .domain_id = FAKE_POWER_CAPPING_IDX_1
+    };
+
+    struct scmi_power_capping_measurements_get_p2a ret_payload = {
+        .status = SCMI_SUCCESS,
+        .power = power,
+        .pai = pai,
+    };
+
+    get_power_ExpectWithArrayAndReturn(
+        scmi_power_capping_default_config.power_meter_domain_id,
+        &power,
+        sizeof(power),
+        FWK_SUCCESS);
+    get_power_IgnoreArg_power();
+    get_power_ReturnMemThruPtr_power(&power, sizeof(power));
+
+    get_coordinator_period_ExpectWithArrayAndReturn(
+        scmi_power_capping_default_config.power_coordinator_domain_id,
+        &pai,
+        sizeof(pai),
+        FWK_SUCCESS);
+    get_coordinator_period_IgnoreArg_period();
+    get_coordinator_period_ReturnMemThruPtr_period(&pai, sizeof(pai));
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
+
+    EXPECT_RESPONSE_SUCCESS(ret_payload);
+    TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_MEASUREMENTS_GET, cmd_payload);
+}
+
+void utest_message_handler_power_capping_get_power_measurement_failure(void)
+{
+    uint32_t power = __LINE__; /* Arbitrary value */
+
+    struct scmi_power_capping_measurements_get_a2p cmd_payload = {
+        .domain_id = FAKE_POWER_CAPPING_IDX_1,
+    };
+
+    struct scmi_power_capping_measurements_get_p2a ret_payload = {
+        .status = SCMI_GENERIC_ERROR,
+    };
+
+    get_power_ExpectWithArrayAndReturn(
+        scmi_power_capping_default_config.power_meter_domain_id,
+        &power,
+        sizeof(power),
+        FWK_E_DEVICE);
+    get_power_IgnoreArg_power();
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    RESOURCE_PERMISSION_RESOURCE_PASS_TEST();
+#endif
+
+    EXPECT_RESPONSE_ERROR(ret_payload);
+    TEST_SCMI_COMMAND(MOD_SCMI_POWER_CAPPING_MEASUREMENTS_GET, cmd_payload);
+}
+
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 void utest_message_handler_invalid_agent_id(void)
 {
@@ -893,6 +1141,14 @@ int scmi_power_capping_protocol_test_main(void)
     RUN_TEST(utest_message_handler_power_capping_set_success_pending);
     RUN_TEST(utest_message_handler_power_capping_set_success_sync);
     RUN_TEST(utest_message_handler_power_capping_set_success_sync_uncap);
+    RUN_TEST(utest_message_handler_power_capping_get_pai_valid);
+    RUN_TEST(utest_message_handler_power_capping_get_pai_failure);
+    RUN_TEST(utest_message_handler_power_capping_set_pai_valid);
+    RUN_TEST(utest_message_handler_power_capping_set_pai_failure);
+    RUN_TEST(utest_message_handler_power_capping_set_less_than_min_pai);
+    RUN_TEST(utest_message_handler_power_capping_set_more_than_max_pai);
+    RUN_TEST(utest_message_handler_power_capping_get_power_measurement_valid);
+    RUN_TEST(utest_message_handler_power_capping_get_power_measurement_failure);
     RUN_TEST(utest_message_handler_un_implemented_message);
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     RUN_TEST(utest_message_handler_invalid_agent_id);
