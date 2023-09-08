@@ -46,7 +46,8 @@ static void pi_control(fwk_id_t id)
         dev_ctx->config->pi_controller.switch_on_temperature) {
         /* The PI loop is not activated */
         dev_ctx->integral_error = 0;
-        dev_ctx->thermal_allocatable_power = (uint32_t)dev_ctx->config->tdp;
+        dev_ctx->thermal_allocatable_power =
+            (uint32_t)dev_ctx->config->cold_state_power;
 
         return;
     }

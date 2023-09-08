@@ -136,6 +136,9 @@ value as long as the power model can work with it.
 The temperature above which the Thermal Mgmt algorithm will run. The unit needs
 to be consistent with the value provided by the targeted temperature sensor.
 
+`cold_state_power`
+Power limit used in cold state - temperature is below the switch_on_temperature.
+
 `control_temperature`
 The control temperature for the platform. Above this temperature the Thermal
 Mgmt will limit the power/performance.

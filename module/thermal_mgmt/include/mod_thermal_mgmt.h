@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -125,6 +125,9 @@ struct mod_thermal_mgmt_dev_config {
 
     /*! The thermal design power (TDP) for all the devices being controlled */
     uint16_t tdp;
+
+    /*! The cold state power */
+    uint16_t cold_state_power;
 
     /*!
      * \brief Switch-on temperature threshold.
