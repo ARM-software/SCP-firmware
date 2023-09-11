@@ -23,6 +23,7 @@
 /* SCP sub-system peripherals */
 #define SCP_SID_BASE (0x2A4A0000)
 #define SCP_UART_BASE (0x44002000)
+#define SCP_POWER_CONTROL_BASE (0x50000000)
 
 /* SCP addresses mapped via ATU into address translation windows */
 #define SCP_ADDRESS_TRANSLATION_WINDOW0_BASE (0x60000000)
