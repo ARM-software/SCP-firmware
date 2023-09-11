@@ -14,5 +14,6 @@
 
 /* SCP sub-system peripherals */
 #define SCP_SID_BASE (0x2A4A0000)
+#define SCP_UART_BASE (0x44002000)
 
 #endif /* SCP_CSS_MMAP_H */
