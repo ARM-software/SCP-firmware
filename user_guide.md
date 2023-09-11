@@ -382,8 +382,6 @@ https://community.arm.com/developer/tools-software/oss-platforms/w/docs/485/juno
 The build system generates firmware images per the `product.mk` file associated
 with the product. For Juno platform, three firmware images are built:
 
-- `juno-bl1.bin`: SCP ROM firmware image - handles the transfer of the RAM
-    firmware to private SRAM and jumps to it
 - `juno-bl1-bypass.bin`: SCP ROM bypass firmware image - an alternative ROM
     firmware that is loaded from an external non volatile on-board memory.
     This binary needs to be used in order to successfully load the SCP RAM
@@ -395,10 +393,8 @@ with the product. For Juno platform, three firmware images are built:
 cd ${SCP_PATH} && \
     make -f Makefile.cmake PRODUCT=juno MODE=debug
 
-export SCP_ROM_PATH=${SCP_PATH}/build/juno/GNU/debug/firmware-scp_romfw/\
-bin/juno-bl1.bin
 export SCP_ROM_BYPASS_PATH=${SCP_PATH}/build/juno/GNU/debug/\
-firmware-scp_romfw-byopass/bin/juno-bl1-bypass.bin
+firmware-scp_romfw_bypass/bin/juno-bl1-bypass.bin
 export SCP_RAM_PATH=${SCP_PATH}/build/juno/GNU/debug/firmware-scp_ramfw/\
 bin/juno-bl2.bin
 ```
