@@ -514,6 +514,7 @@ void mgi_enable_group_id_write_to_ram(struct smcf_mgi_reg *smcf_mgi)
 
 void mgi_request_start_id_wirte_to_ram(struct smcf_mgi_reg *smcf_mgi)
 {
+    smcf_mgi->WRCFG &= ~(SMCF_MGI_WRCFG_NUM_SAMPLE_ID);
     smcf_mgi->WRCFG |=
         (SMCF_MGI_WRCFG_WRITE_START_SAMPLE_ID
          << SMCF_MGI_WRCFG_NUM_SAMPLE_ID_POS);
@@ -521,7 +522,8 @@ void mgi_request_start_id_wirte_to_ram(struct smcf_mgi_reg *smcf_mgi)
 
 void mgi_request_start_and_end_id_wirte_to_ram(struct smcf_mgi_reg *smcf_mgi)
 {
+    smcf_mgi->WRCFG &= ~(SMCF_MGI_WRCFG_NUM_SAMPLE_ID);
     smcf_mgi->WRCFG |=
         (SMCF_MGI_WRCFG_WRITE_START_AND_END_SAMPLE_ID
-         << SMCF_MGI_WRCFG_NUM_SAMPLE_ID_POS);
+         << (SMCF_MGI_WRCFG_NUM_SAMPLE_ID_POS));
 }
