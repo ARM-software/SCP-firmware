@@ -12,6 +12,15 @@
 #ifndef MCP_CSS_MMAP_H
 #define MCP_CSS_MMAP_H
 
+/* Base address and size of MCP's ITCM */
+#define MCP_ITC_RAM_BASE (0x00000000)
+#define MCP_ITC_RAM_SIZE (256 * 1024)
+
+/* Base address and size of MCP's DTCM */
+#define MCP_DTC_RAM_BASE (0x20000000)
+#define MCP_DTC_RAM_SIZE (256 * 1024)
+
+/* SCP sub-system peripherals */
 #define MCP_UART_BASE (0x4C002000)
 
 #endif /* MCP_CSS_MMAP_H */
