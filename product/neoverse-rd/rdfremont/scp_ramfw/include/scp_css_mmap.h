@@ -32,10 +32,14 @@
 
 /* SCP addresses mapped via ATU into address translation windows */
 #define SCP_ADDRESS_TRANSLATION_WINDOW0_BASE (0x60000000)
+#define SCP_ADDRESS_TRANSLATION_WINDOW1_BASE (0xA0000000)
 
 /* Offsets within SCP's Address Translation Window0 */
 #define SCP_ATW0_LCP_AND_CLUSTER_UTILITY_OFFSET (0x0)
 #define SCP_ATW0_AP_PERIPHERAL_SRAM_OFFSET (0x10000000)
+
+/* Offsets within SCP's Address Translation Window1 */
+#define SCP_ATW1_CMN_OFFSET (0x0)
 
 /*
  * LCP subsystem and Cluster Utility memory region that is addressable in the AP
@@ -77,5 +81,9 @@
      SCP_ATW0_LCP_AND_CLUSTER_UTILITY_OFFSET + \
      (n * SCP_LCP_AND_CLUSTER_UTILITY_SIZE) + \
      SCP_CLUSTER_UTILITY_CORE_PPU_OFFSET)
+
+/* CMN config space is mapped in the SCP address translation window 1 */
+#define SCP_CMN_BASE \
+    (SCP_ADDRESS_TRANSLATION_WINDOW1_BASE + SCP_ATW1_CMN_OFFSET)
 
 #endif /* SCP_CSS_MMAP_H */
