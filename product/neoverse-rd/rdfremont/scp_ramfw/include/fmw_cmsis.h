@@ -36,6 +36,9 @@ typedef enum IRQn {
     PendSV_IRQn = -2,
     SysTick_IRQn = -1,
 
+    /* SCP REFCLK Physical Timer */
+    REFCLK_GTIMER_IRQ = 32,
+
     IRQn_MAX = INT16_MAX,
 } IRQn_Type;
 
