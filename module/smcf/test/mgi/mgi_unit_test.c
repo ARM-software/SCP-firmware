@@ -753,10 +753,38 @@ void utest_mgi_request_start_id_write_to_ram(void)
     TEST_ASSERT_BITS(0b11 << 4, 0b01 << 4, mgi.WRCFG);
 }
 
+void utest_mgi_request_start_id_write_to_ram_on_start_end_id_enabled(void)
+{
+    /* WRCFG: START and END sample identifiers are already enabled */
+    struct smcf_mgi_reg mgi = {
+        .WRCFG =
+            (SMCF_MGI_WRCFG_WRITE_START_AND_END_SAMPLE_ID
+             << SMCF_MGI_WRCFG_NUM_SAMPLE_ID_POS),
+    };
+
+    mgi_request_start_id_wirte_to_ram(&mgi);
+
+    TEST_ASSERT_BITS(0b11 << 4, 0b01 << 4, mgi.WRCFG);
+}
+
 void utest_mgi_request_start_and_end_id_write_to_ram(void)
 {
     struct smcf_mgi_reg mgi = {
         .WRCFG = 0,
+    };
+
+    mgi_request_start_and_end_id_wirte_to_ram(&mgi);
+
+    TEST_ASSERT_BITS(0b11 << 4, 0b10 << 4, mgi.WRCFG);
+}
+
+void utest_mgi_request_start_and_end_id_write_to_ram_on_start_id_enabled(void)
+{
+    /* WRCFG: START sample identifier is already enabled */
+    struct smcf_mgi_reg mgi = {
+        .WRCFG =
+            (SMCF_MGI_WRCFG_WRITE_START_SAMPLE_ID
+             << SMCF_MGI_WRCFG_NUM_SAMPLE_ID_POS),
     };
 
     mgi_request_start_and_end_id_wirte_to_ram(&mgi);
@@ -812,7 +840,10 @@ int mgi_test_main(void)
     RUN_TEST(utest_mgi_enable_valid_bits_write_to_ram);
     RUN_TEST(utest_mgi_enable_group_id_write_to_ram);
     RUN_TEST(utest_mgi_request_start_id_write_to_ram);
+    RUN_TEST(utest_mgi_request_start_id_write_to_ram_on_start_end_id_enabled);
     RUN_TEST(utest_mgi_request_start_and_end_id_write_to_ram);
+    RUN_TEST(
+        utest_mgi_request_start_and_end_id_write_to_ram_on_start_id_enabled);
     return UNITY_END();
 }
 
