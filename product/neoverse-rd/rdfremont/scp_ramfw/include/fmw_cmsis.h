@@ -38,6 +38,22 @@ typedef enum IRQn {
 
     /* SCP REFCLK Physical Timer */
     REFCLK_GTIMER_IRQ = 32,
+    /* Consolidated CPU PPU Interrupt for 1-32 cores, 129-160 cores */
+    PPU_CORES0_IRQ = 50,
+    /* Consolidated CPU PPU Interrupt for 33-64 cores, 161-192 cores */
+    PPU_CORES1_IRQ = 51,
+    /* Consolidated CPU PPU Interrupt for 65-96 cores, 193-224 cores */
+    PPU_CORES2_IRQ = 52,
+    /* Consolidated CPU PPU Interrupt for 97-128 cores, 225-256 cores */
+    PPU_CORES3_IRQ = 53,
+    /* Consolidated Cluster PPU Interrupt for 1-32 cores, 129-160 cores */
+    PPU_CLUSTERS0_IRQ = 59,
+    /* Consolidated Cluster PPU Interrupt for 33-64 cores, 161-192 cores */
+    PPU_CLUSTERS1_IRQ = 60,
+    /* Consolidated Cluster PPU Interrupt for 65-96 cores, 193-224 cores */
+    PPU_CLUSTERS2_IRQ = 61,
+    /* Consolidated Cluster PPU Interrupt for 97-128 cores, 225-256 cores */
+    PPU_CLUSTERS3_IRQ = 62,
     /* MHUv3 secure IRQ between SCP and AP */
     MHU3_AP2SCP_IRQ_S = 83,
     /* MHUv3 secure IRQ between SCP and RSS */

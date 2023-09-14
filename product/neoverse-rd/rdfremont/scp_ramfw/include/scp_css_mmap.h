@@ -65,6 +65,8 @@
  * mapped into SCP's address translation window 0. These offsets are applicable
  * to each cluster in the system.
  */
+#define SCP_LCP_CONTROL_OFFSET                  (0x21000)
+#define SCP_LCP_EXTERNAL_CONTROL_OFFSET         (0x70000)
 #define SCP_CLUSTER_UTILITY_CORE_MANAGER_OFFSET (0x80000)
 #define SCP_CLUSTER_UTILITY_CLUSTER_PPU_OFFSET  (0x130000)
 #define SCP_CLUSTER_UTILITY_CORE_PPU_OFFSET     (0x180000)
@@ -89,6 +91,45 @@
      SCP_ATW0_LCP_AND_CLUSTER_UTILITY_OFFSET + \
      (n * SCP_LCP_AND_CLUSTER_UTILITY_SIZE) + \
      SCP_CLUSTER_UTILITY_CORE_PPU_OFFSET)
+
+/* Base address of SCP's view of LCP's External Control register block */
+#define SCP_LCP_EXTERNAL_CONTROL(n) \
+    (SCP_ADDRESS_TRANSLATION_WINDOW0_BASE + \
+     SCP_ATW0_LCP_AND_CLUSTER_UTILITY_OFFSET + \
+     (n * SCP_LCP_AND_CLUSTER_UTILITY_SIZE) + SCP_LCP_EXTERNAL_CONTROL_OFFSET)
+
+/* Offsets in the LCP external control register block */
+#define SCP_LCP_EXT_CONTROL_UART_CTRL_OFFSET 0x20
+
+/*
+ * Base address of the LCP UART control regiser in the LCP External Control
+ * register block.
+ */
+#define LCP_UART_CONTROL(n) \
+    (SCP_LCP_EXTERNAL_CONTROL(n) + SCP_LCP_EXT_CONTROL_UART_CTRL_OFFSET)
+
+/* Base address of SCP's view of LCP's Control register block */
+#define SCP_LCP_CONTROL(n) \
+    (SCP_ADDRESS_TRANSLATION_WINDOW0_BASE + \
+     SCP_ATW0_LCP_AND_CLUSTER_UTILITY_OFFSET + \
+     (n * SCP_LCP_AND_CLUSTER_UTILITY_SIZE) + SCP_LCP_CONTROL_OFFSET)
+
+/* Offsets in the LCP control register block */
+#define SCP_LCP_CONTROL_CPU_WAIT_OFFSET 0x120
+
+/*
+ * Base address of the LCP CPU WAIT register in the system control regiser block
+ * located in the LCP Control register block.
+ */
+#define LCP_SYS_CTRL_CPU_WAIT(n) \
+    (SCP_LCP_CONTROL(n) + SCP_LCP_CONTROL_CPU_WAIT_OFFSET)
+
+/*
+ * System Control SRAM (shared between RSS, MCP, SCP and AP) is mapped by ATU in
+ * the SCP address translation window 0 at the address 0x7800_0000.
+ */
+#define SCP_SYSTEM_CONTROL_SRAM_BASE \
+    (SCP_ADDRESS_TRANSLATION_WINDOW0_BASE + SCP_ATW0_SYSTEM_CONTROL_SRAM_OFFSET)
 
 /* CMN config space is mapped in the SCP address translation window 1 */
 #define SCP_CMN_BASE \
