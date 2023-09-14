@@ -26,6 +26,9 @@
 #define SCP_POWER_CONTROL_BASE (0x50000000)
 #define SCP_SYSTEM_PIK_BASE    (0x50040000)
 
+/* Base address of SCP expansion memory regions */
+#define SCP_SOC_EXPANSION3_BASE (0x40000000) /* 64MB size */
+
 /* SCP addresses mapped via ATU into address translation windows */
 #define SCP_ADDRESS_TRANSLATION_WINDOW0_BASE (0x60000000)
 
