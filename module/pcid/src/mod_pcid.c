@@ -37,10 +37,12 @@ bool mod_pcid_check_registers(
 
         while (valid_pcid_registers) {
             if ((valid_pcid_registers & 1) == PCID_REG_VALID) {
-                if (*pcid_reg++ != *pcid_expt++) {
+                if (*pcid_reg != *pcid_expt) {
                     return false;
                 }
             }
+            pcid_reg++;
+            pcid_expt++;
             valid_pcid_registers >>= 1;
         }
         return true;
