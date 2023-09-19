@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -106,6 +106,7 @@ static int pd_init(struct ppu_v0_pd_ctx *pd_ctx)
 static int pd_set_state(fwk_id_t pd_id, unsigned int state)
 {
     int status;
+    unsigned int pd_mod_state;
     struct ppu_v0_pd_ctx *pd_ctx;
 
     pd_ctx = ppu_v0_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
@@ -114,16 +115,30 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
 
     switch (state) {
     case MOD_PD_STATE_ON:
-        ppu_v0_set_power_mode(pd_ctx->ppu, PPU_V0_MODE_ON, pd_ctx->timer_ctx);
+        status = ppu_v0_set_power_mode(
+            pd_ctx->ppu, PPU_V0_MODE_ON, pd_ctx->timer_ctx);
+        if (status == FWK_SUCCESS) {
+            pd_mod_state = state;
+        } else {
+            get_state(pd_ctx->ppu, &pd_mod_state);
+        }
+
         status = pd_ctx->pd_driver_input_api->report_power_state_transition(
-            pd_ctx->bound_id, MOD_PD_STATE_ON);
+            pd_ctx->bound_id, pd_mod_state);
         fwk_assert(status == FWK_SUCCESS);
         break;
 
     case MOD_PD_STATE_OFF:
-        ppu_v0_set_power_mode(pd_ctx->ppu, PPU_V0_MODE_OFF, pd_ctx->timer_ctx);
+        status = ppu_v0_set_power_mode(
+            pd_ctx->ppu, PPU_V0_MODE_OFF, pd_ctx->timer_ctx);
+        if (status == FWK_SUCCESS) {
+            pd_mod_state = state;
+        } else {
+            get_state(pd_ctx->ppu, &pd_mod_state);
+        }
+
         status = pd_ctx->pd_driver_input_api->report_power_state_transition(
-            pd_ctx->bound_id, MOD_PD_STATE_OFF);
+            pd_ctx->bound_id, pd_mod_state);
         fwk_assert(status == FWK_SUCCESS);
         break;
 
