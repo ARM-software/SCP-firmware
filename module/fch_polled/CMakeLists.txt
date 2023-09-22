@@ -15,3 +15,9 @@ target_sources(${SCP_MODULE_TARGET}
 
 target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-transport
                                                    module-timer)
+
+if(BUILD_HAS_MOD_TRANSPORT_FC)
+    target_compile_definitions(${SCP_MODULE_TARGET}
+        PRIVATE "BUILD_HAS_MOD_TRANSPORT_FC"
+        )
+endif()
