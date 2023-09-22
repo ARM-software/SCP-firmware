@@ -170,6 +170,12 @@ parameter controls if SCMI Sensor protocol V2 is enabled.
 When building a firmware and its dependencies, the `BUILD_HAS_CLOCK_TREE_MGMT`
 parameter controls if Clock Tree Management is enabled.
 
+## Transport based fast channel
+
+When building a firmware and its dependencies, the `BUILD_HAS_MOD_TRANSPORT_FC`
+parameter controls if generic transport module implemented fast channel
+interface to be used.
+
 ## Core Idle Suspend (WFE)
 
 WFE on ARM architecture makes processor suspends it's execution until it
