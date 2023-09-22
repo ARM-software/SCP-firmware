@@ -62,6 +62,9 @@ struct mod_fch_polled_config {
 
     /*! Fast channel rate limit */
     uint32_t rate_limit;
+
+    /*! Attributes */
+    uint32_t attributes;
 };
 
 /*!
