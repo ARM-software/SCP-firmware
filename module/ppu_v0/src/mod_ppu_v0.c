@@ -89,7 +89,7 @@ static int get_state(struct ppu_v0_reg *ppu, unsigned int *state)
 
     *state = ppu_mode_to_power_state[ppu_mode];
     if (*state == MODE_UNSUPPORTED) {
-        FWK_LOG_ERR("[PD] Unexpected PPU mode (%i).", ppu_mode);
+        FWK_LOG_ERR("[PPU] Unexpected PPU mode (%i).", ppu_mode);
         return FWK_E_DEVICE;
     }
 
@@ -143,7 +143,8 @@ static int pd_set_state(fwk_id_t pd_id, unsigned int state)
         break;
 
     default:
-        FWK_LOG_ERR("[PD] Requested power state (%i) is not supported.", state);
+        FWK_LOG_ERR(
+            "[PPU] Requested power state (%i) is not supported.", state);
         return FWK_E_PARAM;
     }
 
