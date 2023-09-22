@@ -440,7 +440,7 @@ static const struct mod_transport_firmware_api transport_firmware_api = {
     .trigger_interrupt = transport_trigger_interrupt,
 };
 
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_MOD_TRANSPORT_FC
 
 static int transport_get_fch_address(
     fwk_id_t fch_id,
@@ -863,7 +863,7 @@ static int transport_channel_init(
         channel_ctx->max_payload_size = 0;
         break;
 
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_MOD_TRANSPORT_FC
     case MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS:
         /* This transport channel is used for Fast channels only */
         channel_ctx->in = NULL;
@@ -909,7 +909,7 @@ static int transport_bind(fwk_id_t id, unsigned int round)
         channel_ctx =
             &transport_ctx.channel_ctx_table[fwk_id_get_element_idx(id)];
 
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_MOD_TRANSPORT_FC
         if (channel_ctx->config->transport_type ==
             MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS) {
             /*
@@ -1006,7 +1006,7 @@ static int transport_process_bind_request(
         channel_ctx->service_id = source_id;
         break;
 
-#ifdef BUILD_HAS_FAST_CHANNELS
+#ifdef BUILD_HAS_MOD_TRANSPORT_FC
     case MOD_TRANSPORT_API_IDX_FAST_CHANNELS:
         /* Fast Channels transport API */
         *api = &transport_fast_channels_api;
