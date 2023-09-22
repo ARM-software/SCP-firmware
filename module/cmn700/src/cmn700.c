@@ -242,7 +242,7 @@ bool is_region_aligned(
     uint64_t lsb_addr_mask;
 
     lsb_addr_mask = get_rnsam_lsb_addr_mask(rnsam, sam_type);
-    return ((mmap->base & ~lsb_addr_mask) & (mmap->size & ~lsb_addr_mask)) == 0;
+    return ((mmap->base & lsb_addr_mask) | (mmap->size & lsb_addr_mask)) == 0;
 }
 
 bool is_non_hash_region_mapped(
