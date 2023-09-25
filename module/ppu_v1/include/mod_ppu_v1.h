@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -28,6 +28,11 @@
  * \defgroup GroupModulePPUv1 PPUv1 Driver
  * \{
  */
+
+/*!
+ * \brief Default value if the value in the configuration is not set.
+ */
+#define DEFAULT_NUM_OF_CORES_IN_CLUSTER 8
 
 /*!
  * \brief Indexes of the interfaces exposed by the module.
@@ -111,6 +116,9 @@ struct mod_ppu_v1_config {
      * domain notifications.
      */
     fwk_id_t pd_source_id;
+
+    /*! Number of cores in this cluster */
+    uint32_t num_of_cores_in_cluster;
 };
 
 /*!
