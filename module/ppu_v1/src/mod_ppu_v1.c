@@ -32,8 +32,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#define CORE_PER_CLUSTER_COUNT_MAX 8
-
 /* Power domain context */
 struct ppu_v1_pd_ctx {
     /* Power domain configuration data */
@@ -67,7 +65,7 @@ struct ppu_v1_cluster_pd_ctx {
      * Table of pointers to the contexts of the cores being part of the
      * cluster.
      */
-    struct ppu_v1_pd_ctx *core_pd_ctx_table[CORE_PER_CLUSTER_COUNT_MAX];
+    struct ppu_v1_pd_ctx **core_pd_ctx_table;
 
     /* Number of cores */
     unsigned int core_count;
@@ -80,6 +78,9 @@ struct ppu_v1_ctx {
 
     /* Number of power domains */
     size_t pd_ctx_table_size;
+
+    /*! Maximum number of cores within a cluster */
+    uint8_t max_num_cores_per_cluster;
 };
 
 /*
@@ -664,13 +665,25 @@ static const struct ppu_v1_boot_api boot_api = {
  * Framework handlers
  */
 
-static int ppu_v1_mod_init(fwk_id_t module_id, unsigned int pd_count,
-                           const void *unused)
+static int ppu_v1_mod_init(
+    fwk_id_t module_id,
+    unsigned int pd_count,
+    const void *config)
 {
+    const struct mod_ppu_v1_config *module_config =
+        (const struct mod_ppu_v1_config *)config;
+
     ppu_v1_ctx.pd_ctx_table = fwk_mm_calloc(pd_count,
                                             sizeof(struct ppu_v1_pd_ctx));
 
     ppu_v1_ctx.pd_ctx_table_size = pd_count;
+
+    if (module_config->num_of_cores_in_cluster == 0) {
+        ppu_v1_ctx.max_num_cores_per_cluster = DEFAULT_NUM_OF_CORES_IN_CLUSTER;
+    } else {
+        ppu_v1_ctx.max_num_cores_per_cluster =
+            module_config->num_of_cores_in_cluster;
+    }
 
     return FWK_SUCCESS;
 }
@@ -679,6 +692,8 @@ static int ppu_v1_pd_init(fwk_id_t pd_id, unsigned int unused, const void *data)
 {
     const struct mod_ppu_v1_pd_config *config = data;
     struct ppu_v1_pd_ctx *pd_ctx;
+    struct ppu_v1_pd_ctx **core_pd_ctx_table;
+    struct ppu_v1_cluster_pd_ctx *cluster_pd_ctx;
 
     if (config->pd_type >= MOD_PD_TYPE_COUNT)
         return FWK_E_DATA;
@@ -695,7 +710,17 @@ static int ppu_v1_pd_init(fwk_id_t pd_id, unsigned int unused, const void *data)
     }
 
     if (config->pd_type == MOD_PD_TYPE_CLUSTER) {
+        /*
+         * Ensure the size of the core context table is set before allocating
+         * the size for data
+         */
         pd_ctx->data = fwk_mm_calloc(1, sizeof(struct ppu_v1_cluster_pd_ctx));
+
+        core_pd_ctx_table = (struct ppu_v1_pd_ctx **)fwk_mm_calloc(
+            ppu_v1_ctx.max_num_cores_per_cluster,
+            sizeof(struct ppu_v1_pd_ctx *));
+        cluster_pd_ctx = (struct ppu_v1_cluster_pd_ctx *)pd_ctx->data;
+        cluster_pd_ctx->core_pd_ctx_table = core_pd_ctx_table;
     }
 #ifdef BUILD_HAS_MOD_TIMER
     if (config->timer_config == NULL) {
@@ -757,12 +782,14 @@ static int ppu_v1_post_init(fwk_id_t module_id)
             fwk_id_get_element_idx(cluster_id)];
         cluster_pd_specific_ctx = cluster_pd_ctx->data;
 
-       if (cluster_pd_specific_ctx->core_count >= CORE_PER_CLUSTER_COUNT_MAX)
-           return FWK_E_NOMEM;
+        if (cluster_pd_specific_ctx->core_count >=
+            ppu_v1_ctx.max_num_cores_per_cluster) {
+            return FWK_E_NOMEM;
+        }
 
-       cluster_pd_specific_ctx->core_pd_ctx_table[
-           cluster_pd_specific_ctx->core_count++] = pd_ctx;
-       pd_ctx->parent_pd_ctx = cluster_pd_ctx;
+        cluster_pd_specific_ctx
+            ->core_pd_ctx_table[cluster_pd_specific_ctx->core_count++] = pd_ctx;
+        pd_ctx->parent_pd_ctx = cluster_pd_ctx;
     }
 
     return FWK_SUCCESS;
