@@ -40,6 +40,7 @@ static const struct fwk_element thermal_mgmt_domains_elem_table[2] = {
         .data = &((struct mod_thermal_mgmt_dev_config){
             .slow_loop_mult = 25,
             .tdp = 10,
+            .cold_state_power = 11,
             .pi_controller = {
                 .switch_on_temperature = 50,
                 .control_temperature = 60,
