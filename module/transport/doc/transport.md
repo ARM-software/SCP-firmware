@@ -3,7 +3,7 @@
 
 # Module Transport Architecture
 
-Copyright (c) 2022, Arm Limited. All rights reserved.
+Copyright (c) 2022-2023, Arm Limited. All rights reserved.
 
 # Overview
 
@@ -246,15 +246,22 @@ a callback function for the corresponding fast channel).
      |                                        |                                 |                     |
      |                                        |                                 |                     |
      |                                        |                                 |                     |
-     |     mod_transport_get_fch()            |                                 |                     |
-     +--------------------------------------->|       driver->get_fch()         |                     |
+     |     mod_transport_get_fch_address()    |                                 |                     |
+     +--------------------------------------->|       driver->get_fch_address() |                     |
      |                                        +-------------------------------->|                     |
      |                                        |                                 |                     |
      |                                        |            return               |                     |
      |             return                     |<--------------------------------+                     |
      |<---------------------------------------+                                 |                     |
      |                                        |                                 |                     |
+     | mod_transport_get_fch_interrupt_type() |                                 |                     |
+     +--------------------------------------->| driver->get_fch_interrupt_type()|                     |
+     |                                        +-------------------------------->|                     |
      |                                        |                                 |                     |
+     |                                        |            return               |                     |
+     |             return                     |<--------------------------------+                     |
+     |<---------------------------------------+                                 |                     |
+     |                                        |                                 |                     |                                 |                     |
      |                                        |                                 |                     |
      |                                        |                                 |                     |
      | mod_transport_fch_register_callback()  |                                 |                     |
@@ -272,7 +279,23 @@ a callback function for the corresponding fast channel).
      +----------------------------------------+-------------------------------->|                     |
      |                                        |                                 |                     |
 ```
-
+### Fast channel interrupt types and callback
+On platforms, where hardware does not support fast channel interrupts,
+a TIMER based interrupt needs to be enabled by the driver of the transport
+module that supports fast channel. However this restricts registration of
+a different callback per fast channel. On such platforms only one callback is
+allowed to be registered and that callback should take action(if any) for all
+the fast channels on that platform.
+On the platform(such as platform which implements MHUv3) where hardware
+interrupts can be enabled for each update on a respective fast channel,
+client modules are allowed to register same or different callbacks per
+fast channel. Client modules must obtain this information using call
+`mod_transport_get_fch_interrupt_type()`.
+In short, if mod_transport_get_fch_interrupt_type() returns
+MOD_TRANSPORT_FCH_INTERRUPT_TYPE_TIMER, only one callback is registered for
+all fast channels, else for MOD_TRANSPORT_FCH_INTERRUPT_TYPE_HW, client
+modules can be allowed to register different fast channel callbacks for
+respective fast channels.
 # Use
 
 In order to send/receive in-band messages, the following dependencies are

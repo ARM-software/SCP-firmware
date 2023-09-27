@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -132,6 +132,44 @@ enum mod_transport_channel_transport_type {
 };
 
 /*!
+ * \brief Fast channel interrupt type.
+ *
+ * \note On platforms, where hardware does not support fast channel interrupts,
+ *     a TIMER based interrupt need to be enabled by the driver of the
+ *     transport module that supports fast channel. However this restricts
+ *     registration of a different callback per fast channel. On such platforms
+ *     only one call back is allowed to be registered and that callback should
+ *     take action(if any) for all the fast channels on that platform.
+ *     On the platform(such as platform which implements MHUv3) where hardware
+ *     interrupts can be enabled for each update on respective fast channel,
+ *     client modules are allowed to register same or different callbacks per
+ *     fast channel.
+ *     Client modules must obtain this information using call to
+ *     `get_fch(interrupt_type)`.
+ */
+enum mod_transport_fch_interrupt_type {
+    /*! Fast channel interrupts are emulated using timer interrupt */
+    MOD_TRANSPORT_FCH_INTERRUPT_TYPE_TIMER,
+
+    /*! Fast channel hardware supported interrupts */
+    MOD_TRANSPORT_FCH_INTERRUPT_TYPE_HW,
+
+    /*! Fast channel transport interrupt type count */
+    MOD_TRANSPORT_FCH_INTERRUPT_TYPE_COUNT,
+};
+
+/*!
+ * \brief Fast channel doorbell information.
+ */
+struct mod_transport_fch_doorbell_info {
+    /*! Doorbell register width */
+    uint32_t doorbell_register_width;
+
+    /*! Doorbell support */
+    bool doorbell_support;
+};
+
+/*!
  * \brief Channel config.
  */
 struct mod_transport_channel_config {
@@ -182,12 +220,11 @@ struct mod_transport_channel_config {
     fwk_id_t driver_api_id;
 };
 
-#ifdef BUILD_HAS_FAST_CHANNELS
 /*!
  * \brief Data structure encapsulating address(es) and length of a fast channel
  *    between two components
  */
-struct fast_channel_addr {
+struct mod_transport_fast_channel_addr {
     /*! Address as seen by the firmware running on current processor */
     uintptr_t local_view_address;
     /*! Address as seen by the firmware/OS running on target processor */
@@ -195,7 +232,6 @@ struct fast_channel_addr {
     /*! Length of the fast channel in bytes */
     size_t length;
 };
-#endif
 
 /*!
  * \brief Driver API (Implemented by the driver)
@@ -246,14 +282,53 @@ struct mod_transport_driver_api {
 
 #ifdef BUILD_HAS_FAST_CHANNELS
     /*!
-     * \brief Get fast channel.
+     * \brief Get fast channel address information.
      *
-     * \param fch_id fast channel identifier
-     * \param[out] fch Pointer to the requested fast channel
+     * \param fch_id Fast channel identifier.
+     * \param[out] fch_address Holds requested fast channel address.
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
      */
-    int (*get_fch)(fwk_id_t fch_id, struct fast_channel_addr *fch);
+    int (*get_fch_address)(
+        fwk_id_t fch_id,
+        struct mod_transport_fast_channel_addr *fch_address);
+
+    /*!
+     * \brief Get fast channel interrupt type.
+     *
+     * \param fch_id Fast channel identifier
+     * \param[out] fch_interrupt_type Holds requested fast channel interrupt
+     *     type information. This will be either
+     *     ::MOD_TRANSPORT_FCH_INTERRUPT_TYPE_TIMER or
+     *     ::MOD_TRANSPORT_FCH_INTERRUPT_TYPE_HW
+     *
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     */
+    int (*get_fch_interrupt_type)(
+        fwk_id_t fch_id,
+        enum mod_transport_fch_interrupt_type *fch_interrupt_type);
+
+    /*!
+     * \brief Get fast channel doorbell information.
+     *
+     * \param fch_id Fast channel identifier
+     * \param[out] doorbell_info Holds requested doorbell information.
+     *
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     */
+    int (*get_fch_doorbell_info)(
+        fwk_id_t fch_id,
+        struct mod_transport_fch_doorbell_info *doorbell_info);
+
+    /*!
+     * \brief Get fast channel rate limit.
+     *
+     * \param fch_id Fast channel identifier
+     * \param[out] rate_limit Holds requested fast channel rate limit.
+     *
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     */
+    int (*get_fch_rate_limit)(fwk_id_t fch_id, uint32_t *fch_rate_limit);
 
     /*!
      * \brief Register a callback function in the driver
@@ -478,6 +553,7 @@ struct mod_transport_firmware_signal_api {
 };
 
 #ifdef BUILD_HAS_FAST_CHANNELS
+
 /*!
  * \brief Fast Channels API
  *
@@ -485,14 +561,53 @@ struct mod_transport_firmware_signal_api {
  */
 struct mod_transport_fast_channels_api {
     /*!
-     * \brief Get fast channel.
+     * \brief Get fast channel address information.
      *
-     * \param fch_id Fast channel identifier
-     * \param[out] fch Pointer to the requested fast channel
+     * \param fch_id Fast channel identifier.
+     * \param[out] fch_address Holds requested fast channel address.
      *
      * \retval ::FWK_SUCCESS The operation succeeded.
      */
-    int (*transport_get_fch)(fwk_id_t fch_id, struct fast_channel_addr *fch);
+    int (*transport_get_fch_address)(
+        fwk_id_t fch_id,
+        struct mod_transport_fast_channel_addr *fch_address);
+
+    /*!
+     * \brief Get fast channel interrupt type information.
+     *
+     * \param fch_id Fast channel identifier
+     * \param[out] fch_interrupt_type Holds requested fast channel interrupt
+     *     type information. This will be either
+     *     ::MOD_TRANSPORT_FCH_INTERRUPT_TYPE_TIMER or
+     *     ::MOD_TRANSPORT_FCH_INTERRUPT_TYPE_HW
+     *
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     */
+    int (*transport_get_fch_interrupt_type)(
+        fwk_id_t fch_id,
+        enum mod_transport_fch_interrupt_type *fch_interrupt_type);
+
+    /*!
+     * \brief Get fast channel doorbell information.
+     *
+     * \param fch_id Fast channel identifier
+     * \param[out] doorbell_info Holds requested doorbell information.
+     *
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     */
+    int (*transport_get_fch_doorbell_info)(
+        fwk_id_t fch_id,
+        struct mod_transport_fch_doorbell_info *doorbell_info);
+
+    /*!
+     * \brief Get fast channel rate limit.
+     *
+     * \param fch_id Fast channel identifier
+     * \param[out] rate_limit Holds requested fast channel rate limit.
+     *
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     */
+    int (*transport_get_fch_rate_limit)(fwk_id_t fch_id, uint32_t *rate_limit);
 
     /*!
      * \brief Register a callback function.

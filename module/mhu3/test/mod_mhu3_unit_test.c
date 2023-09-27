@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -272,30 +272,46 @@ void test_mhu3_start_id_interrupt_enable_fails(void)
     TEST_ASSERT(status == FWK_E_STATE);
 }
 
-void test_mhu3_get_fch_invalid_sub_element(void)
+void test_mhu3_get_fch_address_invalid_sub_element(void)
 {
     int status;
     fwk_id_t id = { 0 };
-    struct fast_channel_addr fch;
+    struct mod_transport_fast_channel_addr fch_addr;
 
     /*
-     * mhu3_get_fch expects a valid id which has a subelement.
+     * mhu3_get_fch_address expects a valid id which has a subelement.
      * check if it returns an FWK_E_PARAM if it gets an id without
      * field subelement
      */
     fwk_module_is_valid_sub_element_id_ExpectAnyArgsAndReturn(false);
-    status = mhu3_get_fch(id, &fch);
+    status = mhu3_get_fch_address(id, &fch_addr);
     TEST_ASSERT(status == FWK_E_PARAM);
 }
 
-void test_mhu3_get_fch_invalid_channel_type(void)
+void test_mhu3_get_fch_interrupt_type_invalid_sub_element(void)
 {
     int status;
     fwk_id_t id = { 0 };
-    struct fast_channel_addr fch;
+    enum mod_transport_fch_interrupt_type fch_interrupt_type;
 
     /*
-     * mhu3_get_fch should return FWK_E_PARAM if first parameter fch_id
+     * mhu3_get_fch_interrupt_type expects a valid id which has a subelement.
+     * check if it returns an FWK_E_PARAM if it gets an id without
+     * field subelement
+     */
+    fwk_module_is_valid_sub_element_id_ExpectAnyArgsAndReturn(false);
+    status = mhu3_get_fch_interrupt_type(id, &fch_interrupt_type);
+    TEST_ASSERT(status == FWK_E_PARAM);
+}
+
+void test_mhu3_get_fch_address_invalid_channel_type(void)
+{
+    int status;
+    fwk_id_t id = { 0 };
+    struct mod_transport_fast_channel_addr fch_addr;
+
+    /*
+     * mhu3_get_fch_address should return FWK_E_PARAM if first parameter fch_id
      * is of wrong type that is other than the fast channel type
      */
     fwk_module_is_valid_sub_element_id_ExpectAnyArgsAndReturn(true);
@@ -308,19 +324,43 @@ void test_mhu3_get_fch_invalid_channel_type(void)
                                             * is not a fast channel
                                             */
 
-    status = mhu3_get_fch(id, &fch);
+    status = mhu3_get_fch_address(id, &fch_addr);
     TEST_ASSERT(status == FWK_E_PARAM);
 }
 
-void test_mhu3_get_fch_null_fch_addr(void)
+void test_mhu3_get_fch_interrupt_type_invalid_channel_type(void)
 {
     int status;
     fwk_id_t id = { 0 };
-    struct fast_channel_addr *null_fch_addr = NULL;
+    enum mod_transport_fch_interrupt_type fch_interrupt_type;
 
     /*
-     * mhu3_get_fch should return FWK_E_PARAM if second parameter fch_addr
-     * is NULL.
+     * mhu3_get_fch_interrupt_type should return FWK_E_PARAM if first parameter
+     * fch_id is of wrong type that is other than the fast channel type
+     */
+    fwk_module_is_valid_sub_element_id_ExpectAnyArgsAndReturn(true);
+    id = FWK_ID_SUB_ELEMENT(
+        FWK_MODULE_IDX_MHU3,
+        MHU3_DEVICE_IDX_DEVICE_1,
+        FAKE_DEVICE_1_CHANNEL_DBCH_0_IDX); /*
+                                            * Note. no
+                                            * FAKE_DEVICE_1_CHANNEL_DBCH_0_IDX
+                                            * is not a fast channel
+                                            */
+
+    status = mhu3_get_fch_interrupt_type(id, &fch_interrupt_type);
+    TEST_ASSERT(status == FWK_E_PARAM);
+}
+
+void test_mhu3_get_fch_address_null_fch_addr(void)
+{
+    int status;
+    fwk_id_t id = { 0 };
+    struct mod_transport_fast_channel_addr *null_fch_addr = NULL;
+
+    /*
+     * mhu3_get_fch_address should return FWK_E_PARAM if second parameter
+     * fch_addr is NULL.
      */
     fwk_module_is_valid_sub_element_id_ExpectAnyArgsAndReturn(true);
     id = FWK_ID_SUB_ELEMENT(
@@ -328,15 +368,35 @@ void test_mhu3_get_fch_null_fch_addr(void)
         MHU3_DEVICE_IDX_DEVICE_1,
         FAKE_DEVICE_1_CHANNEL_FCH_0_IN_IDX);
 
-    status = mhu3_get_fch(id, null_fch_addr);
+    status = mhu3_get_fch_address(id, null_fch_addr);
     TEST_ASSERT(status == FWK_E_PARAM);
 }
 
-void test_mhu3_get_fch_valid_fch_dir_in(void)
+void test_mhu3_get_fch_interrupt_null_fch_interrupt_type(void)
 {
     int status;
     fwk_id_t id = { 0 };
-    struct fast_channel_addr fch;
+    enum mod_transport_fch_interrupt_type *null_fch_interrupt_type = NULL;
+
+    /*
+     * mhu3_get_fch_interrupt_type should return FWK_E_PARAM if second parameter
+     * null_fch_interrupt_type is NULL.
+     */
+    fwk_module_is_valid_sub_element_id_ExpectAnyArgsAndReturn(true);
+    id = FWK_ID_SUB_ELEMENT(
+        FWK_MODULE_IDX_MHU3,
+        MHU3_DEVICE_IDX_DEVICE_1,
+        FAKE_DEVICE_1_CHANNEL_FCH_0_IN_IDX);
+
+    status = mhu3_get_fch_interrupt_type(id, null_fch_interrupt_type);
+    TEST_ASSERT(status == FWK_E_PARAM);
+}
+
+void test_mhu3_get_fch_address_valid_fch_dir_in(void)
+{
+    int status;
+    fwk_id_t id = { 0 };
+    struct mod_transport_fast_channel_addr fch_addr;
 
     /* Success case, send valid id, address and fast channel direction (in) */
     fwk_module_is_valid_sub_element_id_ExpectAnyArgsAndReturn(true);
@@ -345,15 +405,15 @@ void test_mhu3_get_fch_valid_fch_dir_in(void)
         MHU3_DEVICE_IDX_DEVICE_1,
         FAKE_DEVICE_1_CHANNEL_FCH_0_IN_IDX);
 
-    status = mhu3_get_fch(id, &fch);
+    status = mhu3_get_fch_address(id, &fch_addr);
     TEST_ASSERT(status == FWK_SUCCESS);
 }
 
-void test_mhu3_get_fch_valid_fch_dir_out(void)
+void test_mhu3_get_fch_address_valid_fch_dir_out(void)
 {
     int status;
     fwk_id_t id;
-    struct fast_channel_addr fch;
+    struct mod_transport_fast_channel_addr fch_addr;
 
     /* Success case, send valid id, address and fast channel direction (out) */
     fwk_module_is_valid_sub_element_id_ExpectAnyArgsAndReturn(true);
@@ -362,8 +422,26 @@ void test_mhu3_get_fch_valid_fch_dir_out(void)
         MHU3_DEVICE_IDX_DEVICE_1,
         FAKE_DEVICE_1_CHANNEL_FCH_0_OUT_IDX);
 
-    status = mhu3_get_fch(id, &fch);
+    status = mhu3_get_fch_address(id, &fch_addr);
     TEST_ASSERT(status == FWK_SUCCESS);
+}
+
+void test_mhu3_get_fch_interrupt_type_valid(void)
+{
+    int status;
+    fwk_id_t id = { 0 };
+    enum mod_transport_fch_interrupt_type fch_interrupt_type;
+
+    /* Success case, send valid id, non-null parameter fch_interrupt_type*/
+    fwk_module_is_valid_sub_element_id_ExpectAnyArgsAndReturn(true);
+    id = FWK_ID_SUB_ELEMENT(
+        FWK_MODULE_IDX_MHU3,
+        MHU3_DEVICE_IDX_DEVICE_1,
+        FAKE_DEVICE_1_CHANNEL_FCH_0_IN_IDX);
+
+    status = mhu3_get_fch_interrupt_type(id, &fch_interrupt_type);
+    TEST_ASSERT(status == FWK_SUCCESS);
+    TEST_ASSERT(fch_interrupt_type == MOD_TRANSPORT_FCH_INTERRUPT_TYPE_HW);
 }
 
 void fch_callback_test(uintptr_t param)
@@ -508,11 +586,15 @@ int mhu3_test_main(void)
     RUN_TEST(test_mhu3_start_id_element_success);
     RUN_TEST(test_mhu3_start_id_element_set_isr_fails);
     RUN_TEST(test_mhu3_start_id_interrupt_enable_fails);
-    RUN_TEST(test_mhu3_get_fch_invalid_sub_element);
-    RUN_TEST(test_mhu3_get_fch_invalid_channel_type);
-    RUN_TEST(test_mhu3_get_fch_null_fch_addr);
-    RUN_TEST(test_mhu3_get_fch_valid_fch_dir_in);
-    RUN_TEST(test_mhu3_get_fch_valid_fch_dir_out);
+    RUN_TEST(test_mhu3_get_fch_address_invalid_sub_element);
+    RUN_TEST(test_mhu3_get_fch_address_invalid_channel_type);
+    RUN_TEST(test_mhu3_get_fch_address_null_fch_addr);
+    RUN_TEST(test_mhu3_get_fch_address_valid_fch_dir_in);
+    RUN_TEST(test_mhu3_get_fch_address_valid_fch_dir_out);
+    RUN_TEST(test_mhu3_get_fch_interrupt_type_invalid_sub_element);
+    RUN_TEST(test_mhu3_get_fch_interrupt_type_invalid_channel_type);
+    RUN_TEST(test_mhu3_get_fch_interrupt_null_fch_interrupt_type);
+    RUN_TEST(test_mhu3_get_fch_interrupt_type_valid);
     RUN_TEST(test_mhu3_fch_register_callback_valid);
     RUN_TEST(test_mhu3_fch_register_callback_invalid_sub_element_id);
     RUN_TEST(test_mhu3_fch_register_callback_null_param);

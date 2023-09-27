@@ -209,7 +209,9 @@ static int mhu3_raise_interrupt(fwk_id_t ch_id)
 
 #ifdef BUILD_HAS_FAST_CHANNELS
 
-static int mhu3_get_fch(fwk_id_t fch_id, struct fast_channel_addr *fch)
+static int mhu3_get_fch_address(
+    fwk_id_t fch_id,
+    struct mod_transport_fast_channel_addr *fch_addr)
 {
     int status = FWK_E_PARAM;
     unsigned int ch_idx, fch_offset;
@@ -221,7 +223,7 @@ static int mhu3_get_fch(fwk_id_t fch_id, struct fast_channel_addr *fch)
     struct mod_mhu3_fc_config *fch_channel;
     uint32_t fch_cfg0;
 
-    if (!fwk_module_is_valid_sub_element_id(fch_id) || (fch == NULL)) {
+    if (!fwk_module_is_valid_sub_element_id(fch_id) || (fch_addr == NULL)) {
         return status;
     }
 
@@ -261,15 +263,15 @@ static int mhu3_get_fch(fwk_id_t fch_id, struct fast_channel_addr *fch)
                         fch_cfg0 & MHU3_FCH_CFG0_NUM_FCH_PER_GRP_MASK,
                         MHU3_FCH_CFG0_NUM_FCH_PER_GRP_BITSTART,
                         MHU3_FCH_CFG0_NUM_FCH_PER_GRP_LEN);
-            fch->length = (MHU3_MASKED_RECOVER(
-                               fch_cfg0 & MHU3_FCH_CFG0_FCH_WS_MASK,
-                               MHU3_FCH_CFG0_FCH_WS_BITSTART,
-                               MHU3_FCH_CFG0_FCH_WS_LEN) == FCH_WS_32BIT) ?
+            fch_addr->length = (MHU3_MASKED_RECOVER(
+                                    fch_cfg0 & MHU3_FCH_CFG0_FCH_WS_MASK,
+                                    MHU3_FCH_CFG0_FCH_WS_BITSTART,
+                                    MHU3_FCH_CFG0_FCH_WS_LEN) == FCH_WS_32BIT) ?
                 sizeof(uint32_t) :
                 sizeof(uint64_t);
-            fch_offset *= fch->length;
-            fch->local_view_address = fcw_regs + fch_offset;
-            fch->target_view_address = fcw_regs_target + fch_offset;
+            fch_offset *= fch_addr->length;
+            fch_addr->local_view_address = fcw_regs + fch_offset;
+            fch_addr->target_view_address = fcw_regs_target + fch_offset;
         }
 
         break;
@@ -279,6 +281,32 @@ static int mhu3_get_fch(fwk_id_t fch_id, struct fast_channel_addr *fch)
     }
 
     return status;
+}
+
+static int mhu3_get_fch_interrupt_type(
+    fwk_id_t fch_id,
+    enum mod_transport_fch_interrupt_type *fch_interrupt_type)
+{
+    struct mhu3_device_ctx *device_ctx;
+    struct mod_mhu3_channel_config *channel;
+    unsigned int ch_idx;
+
+    if (!fwk_module_is_valid_sub_element_id(fch_id) ||
+        (fch_interrupt_type == NULL)) {
+        return FWK_E_PARAM;
+    }
+
+    device_ctx = &mhu3_ctx.device_ctx_table[fwk_id_get_element_idx(fch_id)];
+    ch_idx = fwk_id_get_sub_element_idx(fch_id);
+    channel = &(device_ctx->config->channels[ch_idx]);
+
+    if (channel->type != MOD_MHU3_CHANNEL_TYPE_FCH) {
+        return FWK_E_PARAM;
+    }
+
+    *fch_interrupt_type = MOD_TRANSPORT_FCH_INTERRUPT_TYPE_HW;
+
+    return FWK_SUCCESS;
 }
 
 static int mhu3_fch_register_callback(
@@ -312,7 +340,8 @@ static int mhu3_fch_register_callback(
 static struct mod_transport_driver_api mhu3_mod_transport_driver_api = {
     .trigger_event = mhu3_raise_interrupt,
 #ifdef BUILD_HAS_FAST_CHANNELS
-    .get_fch = mhu3_get_fch,
+    .get_fch_address = mhu3_get_fch_address,
+    .get_fch_interrupt_type = mhu3_get_fch_interrupt_type,
     .fch_register_callback = mhu3_fch_register_callback,
 #endif
 };
