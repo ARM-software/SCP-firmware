@@ -38,6 +38,11 @@ if (SCP_PLATFORM_VARIANT STREQUAL "1")
     list(APPEND SCP_MODULES "traffic-cop")
     target_sources(tc2-bl2 PRIVATE "config_traffic_cop.c")
 
+    list(APPEND SCP_MODULES "amu-mmap")
+    target_sources(tc2-bl2 PRIVATE "config_amu_mmap.c")
+    target_include_directories(tc2-bl2 PUBLIC
+        "${CMAKE_SOURCE_DIR}/interface/amu")
+
     list(APPEND SCP_MODULES "mpmm")
     target_sources(tc2-bl2 PRIVATE "config_mpmm.c")
 

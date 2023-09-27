@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -28,11 +28,5 @@ struct mpmm_reg {
 #define MPMM_MPMMCR_GEAR_MASK UINT32_C(0x00000003)
 #define MPMM_MPMMCR_EN_POS    0
 #define MPMM_MPMMCR_GEAR_POS  1
-
-/* AMU Counter */
-struct amu_reg {
-    FWK_R uint32_t AMEVCNTR_L;
-    FWK_R uint32_t AMEVCNTR_H;
-};
 
 #endif /* MPMM_H */

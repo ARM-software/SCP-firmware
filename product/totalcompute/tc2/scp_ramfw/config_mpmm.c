@@ -6,10 +6,12 @@
  */
 
 #include "scp_mmap.h"
+#include "tc2_amu.h"
 #include "tc2_dvfs.h"
 #include "tc2_timer.h"
 #include "tc_core.h"
 
+#include <mod_amu_mmap.h>
 #include <mod_mpmm.h>
 
 #include <fwk_macros.h>
@@ -90,26 +92,30 @@ static const struct mod_mpmm_core_config hunter_core_config[4] = {
     [0] = {
         .pd_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN, CORE4_IDX),
         .mpmm_reg_base = SCP_MPMM_CORE_BASE(CORE4_IDX),
-        .amu_aux_reg_base = SCP_AMU_AMEVCNTR1X(CORE4_IDX),
         .core_starts_online = false,
+        .base_aux_counter_id = FWK_ID_SUB_ELEMENT_INIT(
+            FWK_MODULE_IDX_AMU_MMAP, CORE4_IDX, HUNTER_AMEVCNTR1_AUX0),
     },
     [1] = {
         .pd_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN, CORE5_IDX),
         .mpmm_reg_base = SCP_MPMM_CORE_BASE(CORE5_IDX),
-        .amu_aux_reg_base = SCP_AMU_AMEVCNTR1X(CORE5_IDX),
         .core_starts_online = false,
+        .base_aux_counter_id = FWK_ID_SUB_ELEMENT_INIT(
+            FWK_MODULE_IDX_AMU_MMAP, CORE5_IDX, HUNTER_AMEVCNTR1_AUX0),
     },
     [2] = {
         .pd_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN, CORE6_IDX),
         .mpmm_reg_base = SCP_MPMM_CORE_BASE(CORE6_IDX),
-        .amu_aux_reg_base = SCP_AMU_AMEVCNTR1X(CORE6_IDX),
         .core_starts_online = false,
+        .base_aux_counter_id = FWK_ID_SUB_ELEMENT_INIT(
+            FWK_MODULE_IDX_AMU_MMAP, CORE6_IDX, HUNTER_AMEVCNTR1_AUX0),
     },
     [3] = {
         .pd_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN, CORE7_IDX),
         .mpmm_reg_base = SCP_MPMM_CORE_BASE(CORE7_IDX),
-        .amu_aux_reg_base = SCP_AMU_AMEVCNTR1X(CORE7_IDX),
         .core_starts_online = false,
+        .base_aux_counter_id = FWK_ID_SUB_ELEMENT_INIT(
+            FWK_MODULE_IDX_AMU_MMAP, CORE7_IDX, HUNTER_AMEVCNTR1_AUX0),
     },
 };
 
@@ -141,4 +147,7 @@ static const struct fwk_element *mpmm_get_element_table(fwk_id_t module_id)
 }
 const struct fwk_module_config config_mpmm = {
     .elements = FWK_MODULE_DYNAMIC_ELEMENTS(mpmm_get_element_table),
+    .data = (const void *)(&(fwk_id_t)FWK_ID_API_INIT(
+        FWK_MODULE_IDX_AMU_MMAP,
+        MOD_AMU_MMAP_API_IDX_AMU)),
 };

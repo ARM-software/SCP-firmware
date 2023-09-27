@@ -28,14 +28,36 @@
 
 #include UNIT_TEST_SRC
 
+uint64_t fake_amu_counter[AMU_COUNT] = {
+    0xAAAA1111AAAA1111, 0xAAAA2222AAAA2222, 0xAAAA3333AAAA3333,
+    0xAAAA4444AAAA4444, 0xAAAA5555AAAA5555, 0xAAAA6666AAAA6666,
+    0xAAAA7777AAAA7777,
+};
+
 int fake_plugin_set_limits(struct plugin_limits_req *data)
 {
     return FWK_SUCCESS;
 }
 
-struct perf_plugins_handler_api handler_api = {
-    .plugin_set_limits = fake_plugin_set_limits,
-};
+int amu_mmap_copy_data(
+    fwk_id_t start_counter_id,
+    uint64_t *counter_buff,
+    size_t num_counter)
+{
+    memcpy(
+        counter_buff,
+        &fake_amu_counter[start_counter_id.sub_element.sub_element_idx],
+        sizeof(uint64_t) * num_counter);
+    return FWK_SUCCESS;
+}
+
+int amu_mmap_return_error(
+    fwk_id_t start_counter_id,
+    uint64_t *counter_buff,
+    size_t num_counter)
+{
+    return FWK_E_RANGE;
+}
 
 uint32_t adj_max_limit = 0xFF;
 struct mod_mpmm_domain_ctx dev_ctx_table[1];
@@ -47,6 +69,12 @@ struct perf_plugins_perf_report fake_perf_report = {
     .dep_dom_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_DVFS, 0),
     .level = 0xFF,
 };
+struct perf_plugins_handler_api handler_api = {
+    .plugin_set_limits = fake_plugin_set_limits,
+};
+struct amu_api amu_api = {
+    .get_counters = amu_mmap_copy_data,
+};
 
 void setUp(void)
 {
@@ -55,6 +83,9 @@ void setUp(void)
     mpmm_ctx.mpmm_domain_count = 1;
     mpmm_ctx.domain_ctx = domain_ctx = &dev_ctx_table[0];
     mpmm_ctx.perf_plugins_handler_api = &handler_api;
+    mpmm_ctx.amu_driver_api = &amu_api;
+    mpmm_ctx.amu_driver_api_id =
+        FWK_ID_API(FWK_MODULE_IDX_AMU_MMAP, MOD_AMU_MMAP_API_IDX_AMU);
 
     domain_ctx->domain_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_MPMM, 0);
     domain_ctx->num_cores = 1;
@@ -145,14 +176,17 @@ void utest_mpmm_init_success(void)
     int status;
     unsigned int count = 1;
     struct mod_mpmm_domain_ctx domain_ctx;
+    fwk_id_t api_id =
+        FWK_ID_API_INIT(FWK_MODULE_IDX_AMU_MMAP, MOD_AMU_MMAP_API_IDX_AMU);
 
     fwk_mm_calloc_ExpectAndReturn(
         count, sizeof(struct mod_mpmm_domain_ctx), &domain_ctx);
 
-    status = mpmm_init(fwk_module_id_mpmm, count, NULL);
+    status = mpmm_init(fwk_module_id_mpmm, count, &api_id);
     TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
     TEST_ASSERT_EQUAL(count, mpmm_ctx.mpmm_domain_count);
     TEST_ASSERT_EQUAL_PTR(&domain_ctx, mpmm_ctx.domain_ctx);
+    TEST_ASSERT_EQUAL(api_id.value, mpmm_ctx.amu_driver_api_id.value);
 }
 
 void utest_mpmm_init_element_count_fail(void)
@@ -166,8 +200,8 @@ void utest_mpmm_init_element_count_fail(void)
 void utest_mpmm_element_init_two_core_success(void)
 {
     int status;
-    uint32_t cached_counters[CORE_IDX_COUNT];
-    uint32_t delta[CORE_IDX_COUNT];
+    uint64_t cached_counters[CORE_IDX_COUNT];
+    uint64_t delta[CORE_IDX_COUNT];
     unsigned int count = CORE_IDX_COUNT;
     fwk_id_t elem_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_MPMM, 0);
 
@@ -202,9 +236,9 @@ void utest_mpmm_element_init_two_core_success(void)
     TEST_ASSERT_EQUAL_PTR(
         fake_core_config[0].mpmm_reg_base,
         dev_ctx_table[0].core_ctx[CORE0_IDX].mpmm);
-    TEST_ASSERT_EQUAL_PTR(
-        fake_core_config[CORE0_IDX].amu_aux_reg_base,
-        dev_ctx_table[0].core_ctx[CORE0_IDX].amu_aux);
+    TEST_ASSERT_EQUAL(
+        fake_core_config[CORE0_IDX].base_aux_counter_id.value,
+        dev_ctx_table[0].core_ctx[CORE0_IDX].base_aux_counter_id.value);
     TEST_ASSERT_EQUAL_PTR(
         &cached_counters[CORE0_IDX],
         dev_ctx_table[0].core_ctx[CORE0_IDX].cached_counters);
@@ -215,9 +249,9 @@ void utest_mpmm_element_init_two_core_success(void)
     TEST_ASSERT_EQUAL_PTR(
         fake_core_config[CORE1_IDX].mpmm_reg_base,
         dev_ctx_table[0].core_ctx[CORE1_IDX].mpmm);
-    TEST_ASSERT_EQUAL_PTR(
-        fake_core_config[CORE1_IDX].amu_aux_reg_base,
-        dev_ctx_table[0].core_ctx[CORE1_IDX].amu_aux);
+    TEST_ASSERT_EQUAL(
+        fake_core_config[CORE1_IDX].base_aux_counter_id.value,
+        dev_ctx_table[0].core_ctx[CORE1_IDX].base_aux_counter_id.value);
     TEST_ASSERT_EQUAL_PTR(
         &cached_counters[CORE1_IDX],
         dev_ctx_table[0].core_ctx[CORE1_IDX].cached_counters);
@@ -296,6 +330,11 @@ void utest_mpmm_bind_module_bind_success(void)
 
     fwk_module_is_valid_module_id_ExpectAndReturn(fwk_module_id_mpmm, true);
     fwk_module_bind_ExpectAndReturn(
+        FWK_ID_MODULE(mpmm_ctx.amu_driver_api_id.common.module_idx),
+        mpmm_ctx.amu_driver_api_id,
+        &mpmm_ctx.amu_driver_api,
+        FWK_SUCCESS);
+    fwk_module_bind_ExpectAndReturn(
         FWK_ID_MODULE(FWK_MODULE_IDX_SCMI_PERF),
         FWK_ID_API(FWK_MODULE_IDX_SCMI_PERF, MOD_SCMI_PERF_PLUGINS_API),
         &mpmm_ctx.perf_plugins_handler_api,
@@ -303,6 +342,22 @@ void utest_mpmm_bind_module_bind_success(void)
 
     status = mpmm_bind(fwk_module_id_mpmm, round);
     TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+}
+
+void utest_mpmm_bind_amu_bind_fail(void)
+{
+    int status;
+    unsigned int round = 1;
+
+    fwk_module_is_valid_module_id_ExpectAndReturn(fwk_module_id_mpmm, true);
+    fwk_module_bind_ExpectAndReturn(
+        FWK_ID_MODULE(mpmm_ctx.amu_driver_api_id.common.module_idx),
+        mpmm_ctx.amu_driver_api_id,
+        &mpmm_ctx.amu_driver_api,
+        FWK_E_PARAM);
+
+    status = mpmm_bind(fwk_module_id_mpmm, round);
+    TEST_ASSERT_EQUAL(FWK_E_PARAM, status);
 }
 
 void utest_mpmm_process_bind_request_success(void)
@@ -623,14 +678,14 @@ void utest_mpmm_report_pd_blocked_put_event_fail(void)
 
 void utest_mpmm_core_evaluate_threshold_success(void)
 {
-    uint32_t cached_counters = UINT32_MAX;
-    uint32_t delta;
+    uint64_t cached_counters = 0;
+    uint64_t delta = 0;
     struct mpmm_reg mpmm = { .MPMMCR = MPMM_MPMMCR_EN_MASK };
-    struct amu_reg amu_aux = { .AMEVCNTR_L = 9 };
     struct mod_mpmm_core_ctx core_ctx_table;
 
     core_ctx_table.mpmm = &mpmm;
-    core_ctx_table.amu_aux = &amu_aux;
+    core_ctx_table.base_aux_counter_id =
+        FWK_ID_SUB_ELEMENT(FWK_MODULE_IDX_AMU_MMAP, CORE0_IDX, AMU_AUX0);
     core_ctx_table.cached_counters = &cached_counters;
     core_ctx_table.delta = &delta;
     core_ctx_table.threshold = 0xFFFFFFFF;
@@ -639,8 +694,9 @@ void utest_mpmm_core_evaluate_threshold_success(void)
     TEST_ASSERT_EQUAL(
         (dev_ctx_table[0].domain_config->num_threshold_counters - 1),
         core_ctx_table.threshold);
-    TEST_ASSERT_EQUAL(amu_aux.AMEVCNTR_L, *core_ctx_table.cached_counters);
-    TEST_ASSERT_EQUAL(amu_aux.AMEVCNTR_L, *core_ctx_table.delta);
+    TEST_ASSERT_EQUAL(
+        fake_amu_counter[AMU_AUX0], *core_ctx_table.cached_counters);
+    TEST_ASSERT_EQUAL(fake_amu_counter[AMU_AUX0], *core_ctx_table.delta);
 }
 
 void utest_mpmm_core_evaluate_threshold_counter_not_enabled(void)
@@ -682,7 +738,7 @@ void utest_get_domain_ctx_null(void)
 void utest_mpmm_core_threshold_policy_highest_gear(void)
 {
     uint32_t gear;
-    uint32_t delta = 0;
+    uint64_t delta = 0;
     struct mod_mpmm_core_ctx core_ctx_table;
 
     core_ctx_table.delta = &delta;
@@ -730,6 +786,71 @@ void utest_mpmm_monitor_and_control_no_cores_online(void)
     TEST_ASSERT_EQUAL(prev_perf_limit, mpmm_ctx.domain_ctx->perf_limit);
 }
 
+void utest_mpmm_core_counters_delta_read_two_counter(void)
+{
+    /* Initialize cached_counter to a random value to check delta calculation */
+    uint64_t cached_counters[2] = { 0x1111, 0x2222 };
+    uint64_t delta[2] = { 0 };
+    struct mod_mpmm_core_ctx core_ctx_table;
+
+    core_ctx_table.base_aux_counter_id =
+        FWK_ID_SUB_ELEMENT(FWK_MODULE_IDX_AMU_MMAP, CORE0_IDX, AMU_AUX0);
+    core_ctx_table.cached_counters = cached_counters;
+    core_ctx_table.delta = delta;
+    mpmm_ctx.amu_driver_api->get_counters = &amu_mmap_copy_data;
+    dev_ctx_table[0].domain_config =
+        &fake_dom_conf[MPMM_DOM_TWO_THRESHOLD_COUNTER];
+
+    mpmm_core_counters_delta(&dev_ctx_table[0], &core_ctx_table);
+
+    TEST_ASSERT_EQUAL(
+        fake_amu_counter[AMU_AUX0], core_ctx_table.cached_counters[0]);
+    TEST_ASSERT_EQUAL(
+        (fake_amu_counter[AMU_AUX0] - 0x1111), core_ctx_table.delta[0]);
+
+    TEST_ASSERT_EQUAL(
+        fake_amu_counter[AMU_AUX1], core_ctx_table.cached_counters[1]);
+    TEST_ASSERT_EQUAL(
+        (fake_amu_counter[AMU_AUX1] - 0x2222), core_ctx_table.delta[1]);
+}
+
+void utest_mpmm_core_counters_delta_wraparound(void)
+{
+    /* Initialize cached_counter to value close to max to trigger wraparound */
+    uint64_t cached_counters = UINT64_MAX - 5;
+    uint64_t delta = 0;
+    struct mod_mpmm_core_ctx core_ctx_table;
+
+    core_ctx_table.base_aux_counter_id =
+        FWK_ID_SUB_ELEMENT(FWK_MODULE_IDX_AMU_MMAP, CORE0_IDX, AMU_AUX0);
+    core_ctx_table.cached_counters = &cached_counters;
+    core_ctx_table.delta = &delta;
+    mpmm_ctx.amu_driver_api->get_counters = &amu_mmap_copy_data;
+
+    mpmm_core_counters_delta(&dev_ctx_table[0], &core_ctx_table);
+    TEST_ASSERT_EQUAL(
+        fake_amu_counter[AMU_AUX0], *core_ctx_table.cached_counters);
+    TEST_ASSERT_EQUAL(fake_amu_counter[AMU_AUX0] + 5, *core_ctx_table.delta);
+}
+
+void utest_mpmm_core_counters_delta_read_fail(void)
+{
+    uint64_t cached_counters = UINT64_MAX;
+    uint64_t delta = UINT64_MAX;
+    struct mod_mpmm_core_ctx core_ctx_table;
+
+    core_ctx_table.base_aux_counter_id =
+        FWK_ID_SUB_ELEMENT(FWK_MODULE_IDX_AMU_MMAP, CORE0_IDX, AMU_AUX0);
+    core_ctx_table.cached_counters = &cached_counters;
+    core_ctx_table.delta = &delta;
+    mpmm_ctx.amu_driver_api->get_counters = &amu_mmap_return_error;
+
+    mpmm_core_counters_delta(&dev_ctx_table[0], &core_ctx_table);
+    /* cached_counters and delta should remain the same if read fail */
+    TEST_ASSERT_EQUAL(UINT64_MAX, *core_ctx_table.cached_counters);
+    TEST_ASSERT_EQUAL(UINT64_MAX, *core_ctx_table.delta);
+}
+
 int mod_mpmm_test_main(void)
 {
     UNITY_BEGIN();
@@ -751,6 +872,7 @@ int mod_mpmm_test_main(void)
     RUN_TEST(utest_mpmm_bind_first_round_success);
     RUN_TEST(utest_mpmm_bind_invalid_module_success);
     RUN_TEST(utest_mpmm_bind_module_bind_success);
+    RUN_TEST(utest_mpmm_bind_amu_bind_fail);
 
     RUN_TEST(utest_mpmm_process_bind_request_success);
     RUN_TEST(utest_mpmm_process_bind_request_id_not_equal);
@@ -785,6 +907,10 @@ int mod_mpmm_test_main(void)
     RUN_TEST(utest_mpmm_evaluate_perf_limit_no_entry);
 
     RUN_TEST(utest_mpmm_monitor_and_control_no_cores_online);
+
+    RUN_TEST(utest_mpmm_core_counters_delta_read_two_counter);
+    RUN_TEST(utest_mpmm_core_counters_delta_wraparound);
+    RUN_TEST(utest_mpmm_core_counters_delta_read_fail);
 
     return UNITY_END();
 }
