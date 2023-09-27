@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -11,13 +11,17 @@
 #include <mod_power_domain.h>
 #include <mod_scmi_perf.h>
 
+#include <interface_amu.h>
+
 #include <fwk_assert.h>
 #include <fwk_core.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_notification.h>
 #include <fwk_status.h>
+#include <fwk_string.h>
 
 struct mod_mpmm_core_ctx {
     /* Core Identifier */
@@ -26,9 +30,6 @@ struct mod_mpmm_core_ctx {
     /* MPMM registers */
     struct mpmm_reg *mpmm;
 
-    /* AMU AUX registers */
-    struct amu_reg *amu_aux;
-
     /* The core is online */
     bool online;
 
@@ -36,16 +37,19 @@ struct mod_mpmm_core_ctx {
     uint32_t threshold;
 
     /* Cached counters */
-    uint32_t *cached_counters;
+    uint64_t *cached_counters;
 
     /* Thresholds delta */
-    uint32_t *delta;
+    uint64_t *delta;
 
     /* Used to block the PD when transitioning from OFF to ON */
     bool pd_blocked;
 
     /* Cookie to un-block the PD transition from OFF to ON */
     uint32_t cookie;
+
+    /* Identifier of the base AMU Auxiliry counter */
+    fwk_id_t base_aux_counter_id;
 };
 
 struct mod_mpmm_domain_ctx {
@@ -86,6 +90,12 @@ static struct mod_mpmm_ctx {
 
     /* Perf plugin API */
     struct perf_plugins_handler_api *perf_plugins_handler_api;
+
+    /* AMU driver API */
+    struct amu_api *amu_driver_api;
+
+    /* AMU driver API for access AMU Auxiliry registers */
+    fwk_id_t amu_driver_api_id;
 } mpmm_ctx;
 
 /*
@@ -119,20 +129,6 @@ static void mpmm_core_set_threshold(struct mod_mpmm_core_ctx *core_ctx)
 }
 
 /*
- * Read one counter from a specific core.
- *
- * Each MPMM threshold has an associated counter. The counters are
- * indexed in the same order as the MPMM thresholds for the platform.
- */
-static void mpmm_core_counter_read(
-    struct mod_mpmm_core_ctx *core_ctx,
-    uint32_t counter_idx,
-    uint32_t *counter_value)
-{
-    *counter_value = core_ctx->amu_aux[counter_idx].AMEVCNTR_L;
-}
-
-/*
  * MPMM Module Helper Functions
  */
 static struct mod_mpmm_domain_ctx *get_domain_ctx(fwk_id_t domain_id)
@@ -150,23 +146,39 @@ static void mpmm_core_counters_delta(
     struct mod_mpmm_domain_ctx *domain_ctx,
     struct mod_mpmm_core_ctx *core_ctx)
 {
+    int status;
     uint32_t th_count = domain_ctx->domain_config->num_threshold_counters;
     uint32_t i;
-    uint32_t counter_value;
+    static uint64_t counter_buff[MPMM_MAX_THRESHOLD_COUNT];
 
+    fwk_str_memset(counter_buff, 0, sizeof(counter_buff));
+
+    status = mpmm_ctx.amu_driver_api->get_counters(
+        core_ctx->base_aux_counter_id, counter_buff, th_count);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_DEBUG(
+            "[MPMM] %s @%d: AMU counter read fail, error=%d",
+            __func__,
+            __LINE__,
+            status);
+        return;
+    }
+
+    /*
+     * Each MPMM threshold has an associated counter. The counters are
+     * indexed in the same order as the MPMM thresholds for the platform.
+     */
     for (i = 0; i < th_count; i++) {
-        mpmm_core_counter_read(core_ctx, i, &counter_value);
-
         /* Calculate the delta */
-        if (counter_value < core_ctx->cached_counters[i]) {
+        if (counter_buff[i] < core_ctx->cached_counters[i]) {
             /* Counter wraparound case */
-            core_ctx->delta[i] = UINT32_MAX - core_ctx->cached_counters[i];
-            core_ctx->delta[i] += counter_value;
+            core_ctx->delta[i] = UINT64_MAX - core_ctx->cached_counters[i];
+            core_ctx->delta[i] += counter_buff[i];
         } else {
-            core_ctx->delta[i] = counter_value - core_ctx->cached_counters[i];
+            core_ctx->delta[i] = counter_buff[i] - core_ctx->cached_counters[i];
         }
         /* Store the last value */
-        core_ctx->cached_counters[i] = counter_value;
+        core_ctx->cached_counters[i] = counter_buff[i];
     }
 }
 
@@ -473,6 +485,7 @@ static int mpmm_init(
     mpmm_ctx.mpmm_domain_count = element_count;
     mpmm_ctx.domain_ctx =
         fwk_mm_calloc(element_count, sizeof(struct mod_mpmm_domain_ctx));
+    mpmm_ctx.amu_driver_api_id = *(fwk_id_t *)data;
 
     return FWK_SUCCESS;
 }
@@ -513,7 +526,7 @@ static int mpmm_element_init(
         core_ctx->core_id = fwk_id_build_sub_element_id(domain_id, core_idx);
         core_config = &domain_ctx->domain_config->core_config[core_idx];
         core_ctx->mpmm = (struct mpmm_reg *)core_config->mpmm_reg_base;
-        core_ctx->amu_aux = (struct amu_reg *)core_config->amu_aux_reg_base;
+        core_ctx->base_aux_counter_id = core_config->base_aux_counter_id;
 
         mpmm_core_get_number_of_thresholds(core_ctx, &num_thresholds);
 
@@ -668,9 +681,18 @@ static int mpmm_process_notification(
 
 static int mpmm_bind(fwk_id_t id, unsigned int round)
 {
+    int status = FWK_E_DATA;
     /* Bind in the second round */
     if ((round == 0) || (!fwk_module_is_valid_module_id(id))) {
         return FWK_SUCCESS;
+    }
+
+    status = fwk_module_bind(
+        FWK_ID_MODULE(mpmm_ctx.amu_driver_api_id.common.module_idx),
+        mpmm_ctx.amu_driver_api_id,
+        &mpmm_ctx.amu_driver_api);
+    if (status != FWK_SUCCESS) {
+        return status;
     }
 
     return fwk_module_bind(

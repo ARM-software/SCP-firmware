@@ -15,7 +15,13 @@ enum fwk_module_idx {
     FWK_MODULE_IDX_DVFS,
     FWK_MODULE_IDX_SCMI_PERF,
     FWK_MODULE_IDX_POWER_DOMAIN,
+    FWK_MODULE_IDX_AMU_MMAP,
     FWK_MODULE_IDX_COUNT,
+};
+
+enum mod_amu_mmap_api_idx {
+    MOD_AMU_MMAP_API_IDX_AMU,
+    MOD_AMU_MMAP_API_IDX_COUNT,
 };
 
 static const fwk_id_t fwk_module_id_mpmm =

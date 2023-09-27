@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -112,11 +112,11 @@ struct mod_mpmm_core_config {
     /*! Base address of the MPMM registers */
     uintptr_t mpmm_reg_base;
 
-    /*! Base address of the AMU Auxiliry registers */
-    uintptr_t amu_aux_reg_base;
-
     /*! Core initial power state when the platfrom starts is ON. */
     bool core_starts_online;
+
+    /*! Identifier of the base AMU Auxiliry counter. */
+    fwk_id_t base_aux_counter_id;
 };
 
 /*!
@@ -134,7 +134,7 @@ struct mod_mpmm_domain_config {
     size_t pct_size;
 
     /*! Base throttling Count */
-    uint32_t btc;
+    uint64_t btc;
 
     /*! Number of threshold counters */
     uint32_t num_threshold_counters;
