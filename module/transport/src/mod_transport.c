@@ -441,13 +441,12 @@ static const struct mod_transport_firmware_api transport_firmware_api = {
 };
 
 #ifdef BUILD_HAS_FAST_CHANNELS
-static int transport_get_fch(fwk_id_t fch_id, struct fast_channel_addr *fch)
+
+static int transport_get_fch_address(
+    fwk_id_t fch_id,
+    struct mod_transport_fast_channel_addr *fch_addr)
 {
     struct transport_channel_ctx *channel_ctx;
-
-    if (fch == NULL) {
-        return FWK_E_PARAM;
-    }
 
     channel_ctx =
         &transport_ctx.channel_ctx_table[fwk_id_get_element_idx(fch_id)];
@@ -456,9 +455,73 @@ static int transport_get_fch(fwk_id_t fch_id, struct fast_channel_addr *fch)
         channel_ctx->config->transport_type ==
         MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS);
 
-    /* Get fast channel from the driver */
-    return channel_ctx->driver_api->get_fch(
-        channel_ctx->config->driver_id, fch);
+    return channel_ctx->driver_api->get_fch_address(
+        channel_ctx->config->driver_id, fch_addr);
+}
+
+static int transport_get_fch_interrupt_type(
+    fwk_id_t fch_id,
+    enum mod_transport_fch_interrupt_type *fch_interrupt_type)
+{
+    struct transport_channel_ctx *channel_ctx;
+
+    channel_ctx =
+        &transport_ctx.channel_ctx_table[fwk_id_get_element_idx(fch_id)];
+
+    fwk_assert(
+        channel_ctx->config->transport_type ==
+        MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS);
+
+    return channel_ctx->driver_api->get_fch_interrupt_type(
+        channel_ctx->config->driver_id, fch_interrupt_type);
+}
+
+/*!
+ * \brief Get fast channel doorbell information.
+ *
+ * \param fch_id Fast channel identifier
+ * \param[out] doorbell_info Holds requested doorbell information.
+ *
+ * \retval ::FWK_SUCCESS The operation succeeded.
+ */
+static int transport_get_fch_doorbell_info(
+    fwk_id_t fch_id,
+    struct mod_transport_fch_doorbell_info *doorbell_info)
+{
+    struct transport_channel_ctx *channel_ctx;
+
+    channel_ctx =
+        &transport_ctx.channel_ctx_table[fwk_id_get_element_idx(fch_id)];
+
+    fwk_assert(
+        channel_ctx->config->transport_type ==
+        MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS);
+
+    return channel_ctx->driver_api->get_fch_doorbell_info(
+        channel_ctx->config->driver_id, doorbell_info);
+}
+
+/*!
+ * \brief Get fast channel rate limit information.
+ *
+ * \param fch_id Fast channel identifier
+ * \param[out] rate_limit Holds requested rate limit information.
+ *
+ * \retval ::FWK_SUCCESS The operation succeeded.
+ */
+static int transport_get_fch_rate_limit(fwk_id_t fch_id, uint32_t *rate_limit)
+{
+    struct transport_channel_ctx *channel_ctx;
+
+    channel_ctx =
+        &transport_ctx.channel_ctx_table[fwk_id_get_element_idx(fch_id)];
+
+    fwk_assert(
+        channel_ctx->config->transport_type ==
+        MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS);
+
+    return channel_ctx->driver_api->get_fch_rate_limit(
+        channel_ctx->config->driver_id, rate_limit);
 }
 
 static int transport_fch_register_callback(
@@ -486,7 +549,10 @@ static int transport_fch_register_callback(
 
 static const struct mod_transport_fast_channels_api
     transport_fast_channels_api = {
-        .transport_get_fch = transport_get_fch,
+        .transport_get_fch_address = transport_get_fch_address,
+        .transport_get_fch_interrupt_type = transport_get_fch_interrupt_type,
+        .transport_get_fch_doorbell_info = transport_get_fch_doorbell_info,
+        .transport_get_fch_rate_limit = transport_get_fch_rate_limit,
         .transport_fch_register_callback = transport_fch_register_callback,
     };
 #endif
