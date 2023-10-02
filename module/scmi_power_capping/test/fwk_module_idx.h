@@ -17,6 +17,9 @@ enum fwk_module_idx {
     FWK_MODULE_IDX_POWER_ALLOCATOR,
     FWK_MODULE_IDX_POWER_COORDINATOR,
     FWK_MODULE_IDX_POWER_METER,
+#ifdef BUILD_HAS_FAST_CHANNELS
+    FWK_MODULE_IDX_TRANSPORT,
+#endif
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     FWK_MODULE_IDX_RESOURCE_PERMS,
 #endif
@@ -31,6 +34,11 @@ static const fwk_id_t fwk_module_id_power_capping =
 
 static const fwk_id_t fwk_module_id_scmi_power_capping =
     FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_POWER_CAPPING);
+
+#ifdef BUILD_HAS_FAST_CHANNELS
+static const fwk_id_t fwk_module_id_transport =
+    FWK_ID_MODULE_INIT(FWK_MODULE_IDX_TRANSPORT);
+#endif
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
 static const fwk_id_t fwk_module_id_resource_perms =
