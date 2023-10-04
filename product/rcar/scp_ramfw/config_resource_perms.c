@@ -1,6 +1,7 @@
 /*
  * Renesas SCP/MCP Software
- * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
+ * Copyright (c) 2021-2023, Renesas Electronics Corporation. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -1265,12 +1266,12 @@ struct fwk_module_config config_resource_perms = {
             .agent_permissions = (uintptr_t)&agent_permissions,
             .agent_count = SCMI_AGENT_ID_COUNT,
             .protocol_count = 7,
-            .clock_count = CLOCK_RCAR_COUNT,
-            .sensor_count = R8A7795_SNSR_COUNT,
-            .pd_count = PD_RCAR_COUNT,
-            .perf_count = DVFS_ELEMENT_IDX_COUNT,
-            .perf_cmd_count = RCAR_PERF_RESOURCE_CMDS,
-            .perf_resource_count = RCAR_PERF_RESOURCE_ELEMENTS,
+            .clock_counters.count = CLOCK_RCAR_COUNT,
+            .sensor_counters.count = R8A7795_SNSR_COUNT,
+            .pd_counters.count = PD_RCAR_COUNT,
+            .perf_counters.count = DVFS_ELEMENT_IDX_COUNT,
+            .perf_counters.cmd_count = RCAR_PERF_RESOURCE_CMDS,
+            .perf_counters.resource_count = RCAR_PERF_RESOURCE_ELEMENTS,
             .device_count = RCAR_RES_PERMS_DEVICES_COUNT,
 #ifdef BUILD_HAS_SCMI_RESET
             .reset_domain_count = RESET_RCAR_COUNT,

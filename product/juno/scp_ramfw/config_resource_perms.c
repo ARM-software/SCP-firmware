@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -498,12 +498,12 @@ struct fwk_module_config config_resource_perms = {
             .agent_permissions = (uintptr_t)&agent_permissions,
             .agent_count = (uint32_t)JUNO_SCMI_AGENT_IDX_COUNT,
             .protocol_count = 7,
-            .clock_count = (uint32_t)JUNO_CLOCK_IDX_COUNT,
-            .sensor_count = (uint32_t)MOD_JUNO_R0_SENSOR_IDX_COUNT,
-            .pd_count = (uint32_t)POWER_DOMAIN_IDX_COUNT,
-            .perf_count = (uint32_t)DVFS_ELEMENT_IDX_COUNT,
-            .perf_cmd_count = JUNO_PERF_RESOURCE_CMDS,
-            .perf_resource_count = JUNO_PERF_RESOURCE_ELEMENTS,
+            .clock_counters.count = (uint32_t)JUNO_CLOCK_IDX_COUNT,
+            .sensor_counters.count = (uint32_t)MOD_JUNO_R0_SENSOR_IDX_COUNT,
+            .pd_counters.count = (uint32_t)POWER_DOMAIN_IDX_COUNT,
+            .perf_counters.count = (uint32_t)DVFS_ELEMENT_IDX_COUNT,
+            .perf_counters.cmd_count = JUNO_PERF_RESOURCE_CMDS,
+            .perf_counters.resource_count = JUNO_PERF_RESOURCE_ELEMENTS,
             .device_count = (uint32_t)JUNO_RES_PERMS_DEVICES_COUNT,
 #ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
             .reset_domain_count = JUNO_RESET_DOMAIN_IDX_COUNT,
