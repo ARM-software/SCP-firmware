@@ -102,6 +102,36 @@ struct res_perms_backup {
     mod_res_perms_t *scmi_voltd_perms;
 };
 
+struct agent_resource_permissions_params {
+    /*! \brief agent_id:Identifier of the agent. */
+    uint32_t agent_id;
+
+    /*! \brief resource_id:Identifier of the resource. */
+    uint32_t resource_id;
+
+    /*! \brief protocol_id:Identifier of the protocol. */
+    uint32_t protocol_id;
+
+    /*! \brief flags:permissions to set. */
+    enum mod_res_perms_permissions flags;
+
+    /*! \brief start_message_idx:First message ID. */
+    uint32_t start_message_idx;
+
+    /*! \brief end_message_idx:Last message ID. */
+    uint32_t end_message_idx;
+
+    /*! \brief resource_permission:Pointer to resource perms array. */
+    mod_res_perms_t *resource_permission;
+
+    /*! \brief resource_permission_backup:Pointer to resource perms backup
+     * array. */
+    mod_res_perms_t *resource_permission_backup;
+
+    /*! \brief counters:Protocol permission counters. */
+    struct protocol_permissions_counters *counters;
+};
+
 static struct res_perms_ctx resources_perms_ctx;
 static struct res_perms_backup resources_perms_backup;
 
@@ -191,6 +221,27 @@ __attribute((weak)) int mod_res_plat_message_id_to_index(
     int32_t *message_idx)
 {
     return FWK_E_PARAM;
+}
+
+static void backup_resource_permission(
+    mod_res_perms_t *resource_permission,
+    mod_res_perms_t *resource_permission_backup,
+    struct protocol_permissions_counters *config)
+{
+    /* Do a backup before making the changes if required */
+    if ((config->cmd_count != 0) && (config->resource_count != 0) &&
+        (resource_permission_backup == NULL)) {
+        resource_permission_backup = (mod_res_perms_t *)fwk_mm_alloc(
+            resources_perms_ctx.agent_count * config->cmd_count *
+                config->resource_count,
+            sizeof(mod_res_perms_t));
+
+        fwk_str_memcpy(
+            resource_permission_backup,
+            resource_permission,
+            resources_perms_ctx.agent_count * config->cmd_count *
+                config->resource_count * sizeof(mod_res_perms_t));
+    }
 }
 
 static int mod_res_message_id_to_index(
@@ -836,319 +887,35 @@ static int set_agent_resource_message_perms(
     return FWK_SUCCESS;
 }
 
-static int set_agent_resource_pd_permissions(
-    uint32_t agent_id,
-    uint32_t resource_id,
-    enum mod_res_perms_permissions flags)
+static int set_agent_resource_permissions(
+    struct agent_resource_permissions_params *protocol_perms)
 {
     int status;
-    int32_t message_idx;
+    uint32_t message_idx;
 
-    if (resources_perms_ctx.agent_permissions->scmi_pd_perms == NULL) {
+    if (protocol_perms->resource_permission == NULL) {
         return FWK_SUCCESS;
     }
-    if (resource_id >= resources_perms_ctx.pd_count) {
+    if (protocol_perms->resource_id >= protocol_perms->counters->count) {
         return FWK_E_ACCESS;
     }
 
     /* Do a backup before making the changes if required */
-    if ((resources_perms_ctx.config->pd_cmd_count != 0) &&
-        (resources_perms_ctx.config->pd_resource_count != 0) &&
-        (resources_perms_backup.scmi_pd_perms == NULL)) {
-        resources_perms_backup.scmi_pd_perms = (mod_res_perms_t *)fwk_mm_alloc(
-            resources_perms_ctx.agent_count *
-                resources_perms_ctx.config->pd_cmd_count *
-                resources_perms_ctx.config->pd_resource_count,
-            sizeof(mod_res_perms_t));
-        fwk_str_memcpy(
-            resources_perms_backup.scmi_pd_perms,
-            resources_perms_ctx.agent_permissions->scmi_pd_perms,
-            resources_perms_ctx.agent_count *
-                resources_perms_ctx.config->pd_cmd_count *
-                resources_perms_ctx.config->pd_resource_count *
-                sizeof(mod_res_perms_t));
-    }
+    backup_resource_permission(
+        protocol_perms->resource_permission,
+        protocol_perms->resource_permission_backup,
+        protocol_perms->counters);
 
-    for (message_idx = (int32_t)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES;
-         message_idx <= MOD_SCMI_PD_POWER_STATE_NOTIFY;
+    for (message_idx = protocol_perms->start_message_idx;
+         message_idx <= protocol_perms->end_message_idx;
          message_idx++) {
         status = set_agent_resource_message_perms(
-            agent_id,
-            MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN,
-            (uint32_t)message_idx,
-            resource_id,
-            resources_perms_ctx.agent_permissions->scmi_pd_perms,
-            flags);
-
-        if (status != FWK_SUCCESS) {
-            return status;
-        }
-    }
-
-    return FWK_SUCCESS;
-}
-
-static int set_agent_resource_perf_permissions(
-    uint32_t agent_id,
-    uint32_t resource_id,
-    enum mod_res_perms_permissions flags)
-{
-    int status;
-    int32_t message_idx;
-
-    if (resources_perms_ctx.agent_permissions->scmi_perf_perms == NULL) {
-        return FWK_SUCCESS;
-    }
-    if (resource_id >= resources_perms_ctx.perf_count) {
-        return FWK_E_ACCESS;
-    }
-
-    /* Do a backup before making the changes if required */
-    if ((resources_perms_ctx.config->perf_cmd_count != 0) &&
-        (resources_perms_ctx.config->perf_resource_count != 0) &&
-        (resources_perms_backup.scmi_perf_perms == NULL)) {
-        resources_perms_backup.scmi_perf_perms =
-            (mod_res_perms_t *)fwk_mm_alloc(
-                resources_perms_ctx.agent_count *
-                    resources_perms_ctx.config->perf_cmd_count *
-                    resources_perms_ctx.config->perf_resource_count,
-                sizeof(mod_res_perms_t));
-        fwk_str_memcpy(
-            resources_perms_backup.scmi_perf_perms,
-            resources_perms_ctx.agent_permissions->scmi_perf_perms,
-            resources_perms_ctx.agent_count *
-                resources_perms_ctx.config->perf_cmd_count *
-                resources_perms_ctx.config->perf_resource_count *
-                sizeof(mod_res_perms_t));
-    }
-
-    for (message_idx = (int32_t)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES;
-         message_idx <= MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL;
-         message_idx++) {
-        status = set_agent_resource_message_perms(
-            agent_id,
-            MOD_SCMI_PROTOCOL_ID_PERF,
-            (uint32_t)message_idx,
-            resource_id,
-            resources_perms_ctx.agent_permissions->scmi_perf_perms,
-            flags);
-
-        if (status != FWK_SUCCESS) {
-            return status;
-        }
-    }
-
-    return FWK_SUCCESS;
-}
-
-static int set_agent_resource_clock_permissions(
-    uint32_t agent_id,
-    uint32_t resource_id,
-    enum mod_res_perms_permissions flags)
-{
-    int status;
-    int32_t message_idx;
-
-    if (resources_perms_ctx.agent_permissions->scmi_clock_perms == NULL) {
-        return FWK_SUCCESS;
-    }
-    if (resource_id >= resources_perms_ctx.clock_count) {
-        return FWK_E_ACCESS;
-    }
-
-    /* Do a backup before making the changes if required */
-    if ((resources_perms_ctx.config->clock_cmd_count != 0) &&
-        (resources_perms_ctx.config->clock_resource_count != 0) &&
-        (resources_perms_backup.scmi_clock_perms == NULL)) {
-        resources_perms_backup.scmi_clock_perms =
-            (mod_res_perms_t *)fwk_mm_alloc(
-                resources_perms_ctx.agent_count *
-                    resources_perms_ctx.config->clock_cmd_count *
-                    resources_perms_ctx.config->clock_resource_count,
-                sizeof(mod_res_perms_t));
-        fwk_str_memcpy(
-            resources_perms_backup.scmi_clock_perms,
-            resources_perms_ctx.agent_permissions->scmi_clock_perms,
-            resources_perms_ctx.agent_count *
-                resources_perms_ctx.config->clock_cmd_count *
-                resources_perms_ctx.config->clock_resource_count *
-                sizeof(mod_res_perms_t));
-    }
-
-    for (message_idx = (int32_t)MOD_SCMI_CLOCK_ATTRIBUTES;
-         message_idx <= MOD_SCMI_CLOCK_CONFIG_SET;
-         message_idx++) {
-        status = set_agent_resource_message_perms(
-            agent_id,
-            MOD_SCMI_PROTOCOL_ID_CLOCK,
-            (uint32_t)message_idx,
-            resource_id,
-            resources_perms_ctx.agent_permissions->scmi_clock_perms,
-            flags);
-
-        if (status != FWK_SUCCESS) {
-            return status;
-        }
-    }
-
-    return FWK_SUCCESS;
-}
-
-#ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
-
-static int set_agent_resource_reset_permissions(
-    uint32_t agent_id,
-    uint32_t resource_id,
-    enum mod_res_perms_permissions flags)
-{
-    int status;
-    int32_t message_idx;
-
-    if (resources_perms_ctx.agent_permissions->scmi_reset_domain_perms ==
-        NULL) {
-        return FWK_SUCCESS;
-    }
-    if (resource_id >= resources_perms_ctx.reset_domain_count) {
-        return FWK_E_ACCESS;
-    }
-
-    /* Do a backup before making the changes if required */
-    if ((resources_perms_ctx.config->reset_domain_cmd_count != 0) &&
-        (resources_perms_ctx.config->reset_domain_resource_count != 0) &&
-        (resources_perms_backup.scmi_reset_domain_perms == NULL)) {
-        resources_perms_backup.scmi_reset_domain_perms =
-            (mod_res_perms_t *)fwk_mm_alloc(
-                resources_perms_ctx.agent_count *
-                    resources_perms_ctx.config->reset_domain_cmd_count *
-                    resources_perms_ctx.config->reset_domain_resource_count,
-                sizeof(mod_res_perms_t));
-        fwk_str_memcpy(
-            resources_perms_backup.scmi_reset_domain_perms,
-            resources_perms_ctx.agent_permissions->scmi_reset_domain_perms,
-            resources_perms_ctx.agent_count *
-                resources_perms_ctx.config->reset_domain_cmd_count *
-                resources_perms_ctx.config->reset_domain_cmd_count *
-                sizeof(mod_res_perms_t));
-    }
-
-    for (message_idx = MOD_SCMI_RESET_DOMAIN_ATTRIBUTES;
-         message_idx <= MOD_SCMI_RESET_NOTIFY;
-         message_idx++) {
-        status = set_agent_resource_message_perms(
-            agent_id,
-            MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN,
+            protocol_perms->agent_id,
+            protocol_perms->protocol_id,
             message_idx,
-            resource_id,
-            resources_perms_ctx.agent_permissions->scmi_reset_domain_perms,
-            flags);
-
-        if (status != FWK_SUCCESS) {
-            return status;
-        }
-    }
-
-    return FWK_SUCCESS;
-}
-
-#endif
-
-static int set_agent_resource_voltd_permissions(
-    uint32_t agent_id,
-    uint32_t resource_id,
-    enum mod_res_perms_permissions flags)
-{
-    int status;
-    int32_t message_idx;
-
-    if (resources_perms_ctx.agent_permissions->scmi_voltd_perms == NULL) {
-        return FWK_SUCCESS;
-    }
-    if (resource_id >= resources_perms_ctx.voltd_count) {
-        return FWK_E_ACCESS;
-    }
-
-    /* Do a backup before making the changes if required */
-    if ((resources_perms_ctx.config->voltd_cmd_count != 0) &&
-        (resources_perms_ctx.config->voltd_resource_count != 0) &&
-        (resources_perms_backup.scmi_voltd_perms == NULL)) {
-        resources_perms_backup.scmi_voltd_perms =
-            (mod_res_perms_t *)fwk_mm_alloc(
-                resources_perms_ctx.agent_count *
-                    resources_perms_ctx.config->voltd_cmd_count *
-                    resources_perms_ctx.config->voltd_resource_count,
-                sizeof(mod_res_perms_t));
-        fwk_str_memcpy(
-            resources_perms_backup.scmi_voltd_perms,
-            resources_perms_ctx.agent_permissions->scmi_voltd_perms,
-            resources_perms_ctx.agent_count *
-                resources_perms_ctx.config->voltd_cmd_count *
-                resources_perms_ctx.config->voltd_resource_count *
-                sizeof(mod_res_perms_t));
-    }
-
-    for (message_idx = (int32_t)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES;
-         message_idx <= MOD_SCMI_VOLTD_LEVEL_GET;
-         message_idx++) {
-        status = set_agent_resource_message_perms(
-            agent_id,
-            MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN,
-            (uint32_t)message_idx,
-            resource_id,
-            resources_perms_ctx.agent_permissions->scmi_voltd_perms,
-            flags);
-
-        if (status != FWK_SUCCESS) {
-            return status;
-        }
-    }
-
-    return FWK_SUCCESS;
-}
-
-static int set_agent_resource_sensor_permissions(
-    uint32_t agent_id,
-    uint32_t resource_id,
-    enum mod_res_perms_permissions flags)
-{
-    int status;
-    int32_t message_idx;
-
-    if (resources_perms_ctx.agent_permissions->scmi_sensor_perms == NULL) {
-        return FWK_SUCCESS;
-    }
-    if (resource_id >= resources_perms_ctx.sensor_count) {
-        return FWK_E_ACCESS;
-    }
-
-    /* Do a backup before making the changes if required */
-    if ((resources_perms_ctx.config->sensor_cmd_count != 0) &&
-        (resources_perms_ctx.config->sensor_resource_count != 0) &&
-        (resources_perms_backup.scmi_sensor_perms == NULL)) {
-        resources_perms_backup.scmi_sensor_perms =
-            (mod_res_perms_t *)fwk_mm_alloc(
-                resources_perms_ctx.agent_count *
-                    resources_perms_ctx.config->sensor_cmd_count *
-                    resources_perms_ctx.config->sensor_resource_count,
-                sizeof(mod_res_perms_t));
-        fwk_str_memcpy(
-            resources_perms_backup.scmi_sensor_perms,
-            resources_perms_ctx.agent_permissions->scmi_sensor_perms,
-            resources_perms_ctx.agent_count *
-                resources_perms_ctx.config->sensor_cmd_count *
-                resources_perms_ctx.config->sensor_resource_count *
-                sizeof(mod_res_perms_t));
-    }
-
-    for (message_idx = (int32_t)MOD_SCMI_SENSOR_DESCRIPTION_GET;
-         message_idx <= MOD_SCMI_SENSOR_READING_GET;
-         message_idx++) {
-        status = set_agent_resource_message_perms(
-            agent_id,
-            MOD_SCMI_PROTOCOL_ID_SENSOR,
-            (uint32_t)message_idx,
-            resource_id,
-            resources_perms_ctx.agent_permissions->scmi_sensor_perms,
-            flags);
+            protocol_perms->resource_id,
+            protocol_perms->resource_permission,
+            protocol_perms->flags);
 
         if (status != FWK_SUCCESS) {
             return status;
@@ -1165,38 +932,96 @@ static int mod_res_agent_set_permissions(
     enum mod_res_perms_permissions flags)
 {
     int status;
+    struct agent_resource_permissions_params protocol_perms;
+
+    protocol_perms.agent_id = agent_id;
+    protocol_perms.resource_id = resource_id;
+    protocol_perms.flags = flags;
 
     switch (type) {
     case MOD_RES_POWER_DOMAIN_DEVICE:
-        status =
-            set_agent_resource_pd_permissions(agent_id, resource_id, flags);
+        protocol_perms = (struct agent_resource_permissions_params){
+            .protocol_id = MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN,
+            .resource_permission =
+                resources_perms_ctx.agent_permissions->scmi_pd_perms,
+            .resource_permission_backup = resources_perms_backup.scmi_pd_perms,
+            .start_message_idx = (uint32_t)MOD_SCMI_PD_POWER_DOMAIN_ATTRIBUTES,
+            .end_message_idx = (uint32_t)MOD_SCMI_PD_POWER_STATE_NOTIFY,
+            .counters = &resources_perms_ctx.config->pd_counters
+        };
+        status = set_agent_resource_permissions(&protocol_perms);
         break;
 
     case MOD_RES_PERF_DOMAIN_DEVICE:
-        status =
-            set_agent_resource_perf_permissions(agent_id, resource_id, flags);
+        protocol_perms = (struct agent_resource_permissions_params){
+            .protocol_id = MOD_SCMI_PROTOCOL_ID_PERF,
+            .resource_permission =
+                resources_perms_ctx.agent_permissions->scmi_perf_perms,
+            .resource_permission_backup =
+                resources_perms_backup.scmi_perf_perms,
+            .start_message_idx = (uint32_t)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES,
+            .end_message_idx = (uint32_t)MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL
+        };
+        protocol_perms.counters = &resources_perms_ctx.config->perf_counters;
+        status = set_agent_resource_permissions(&protocol_perms);
         break;
 
     case MOD_RES_CLOCK_DOMAIN_DEVICE:
-        status =
-            set_agent_resource_clock_permissions(agent_id, resource_id, flags);
+        protocol_perms = (struct agent_resource_permissions_params){
+            .protocol_id = MOD_SCMI_PROTOCOL_ID_CLOCK,
+            .resource_permission =
+                resources_perms_ctx.agent_permissions->scmi_clock_perms,
+            .resource_permission_backup =
+                resources_perms_backup.scmi_clock_perms,
+            .start_message_idx = (uint32_t)MOD_SCMI_CLOCK_ATTRIBUTES,
+            .end_message_idx = (uint32_t)MOD_SCMI_CLOCK_CONFIG_SET,
+            .counters = &resources_perms_ctx.config->clock_counters
+        };
+        status = set_agent_resource_permissions(&protocol_perms);
         break;
 
     case MOD_RES_SENSOR_DOMAIN_DEVICE:
-        status =
-            set_agent_resource_sensor_permissions(agent_id, resource_id, flags);
+        protocol_perms = (struct agent_resource_permissions_params){
+            .protocol_id = MOD_SCMI_PROTOCOL_ID_SENSOR,
+            .resource_permission =
+                resources_perms_ctx.agent_permissions->scmi_sensor_perms,
+            .resource_permission_backup =
+                resources_perms_backup.scmi_sensor_perms,
+            .start_message_idx = (uint32_t)MOD_SCMI_SENSOR_DESCRIPTION_GET,
+            .end_message_idx = (uint32_t)MOD_SCMI_SENSOR_READING_GET,
+            .counters = &resources_perms_ctx.config->sensor_counters
+        };
+        status = set_agent_resource_permissions(&protocol_perms);
         break;
 
 #ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
     case MOD_RES_RESET_DOMAIN_DEVICE:
-        status =
-            set_agent_resource_reset_permissions(agent_id, resource_id, flags);
+        protocol_perms = (struct agent_resource_permissions_params){
+            .protocol_id = MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN,
+            .resource_permission =
+                resources_perms_ctx.agent_permissions->scmi_reset_domain_perms,
+            .resource_permission_backup =
+                resources_perms_backup.scmi_reset_domain_perms,
+            .start_message_idx = (uint32_t)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES,
+            .end_message_idx = (uint32_t)MOD_SCMI_RESET_NOTIFY,
+            .counters = &resources_perms_ctx.config->reset_domain_counters
+        };
+        status = set_agent_resource_permissions(&protocol_perms);
         break;
 #endif
 
     case MOD_RES_VOLTAGE_DOMAIN_DEVICE:
-        status =
-            set_agent_resource_voltd_permissions(agent_id, resource_id, flags);
+        protocol_perms = (struct agent_resource_permissions_params){
+            .protocol_id = MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN,
+            .resource_permission =
+                resources_perms_ctx.agent_permissions->scmi_voltd_perms,
+            .resource_permission_backup =
+                resources_perms_backup.scmi_voltd_perms,
+            .start_message_idx = (uint32_t)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES,
+            .end_message_idx = (uint32_t)MOD_SCMI_VOLTD_LEVEL_GET,
+            .counters = &resources_perms_ctx.config->voltd_counters
+        };
+        status = set_agent_resource_permissions(&protocol_perms);
         break;
 
     default:
@@ -1391,38 +1216,43 @@ static void mod_res_agent_copy_config(
     uint32_t protocol_id)
 {
     int cmd_count;
-    int resource_count;
     int32_t resource_idx;
-    int i, j;
+    uint32_t resource_count;
+    uint32_t j;
+    int i;
     int status;
 
     switch (protocol_id) {
     case MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN:
         cmd_count = (int)MOD_SCMI_PD_POWER_COMMAND_COUNT;
-        resource_count = (int)resources_perms_ctx.config->pd_resource_count;
+        resource_count = resources_perms_ctx.config->pd_counters.resource_count;
         break;
     case MOD_SCMI_PROTOCOL_ID_PERF:
         cmd_count = (int)MOD_SCMI_PERF_COMMAND_COUNT;
-        resource_count = (int)resources_perms_ctx.config->perf_resource_count;
+        resource_count =
+            resources_perms_ctx.config->perf_counters.resource_count;
         break;
     case MOD_SCMI_PROTOCOL_ID_CLOCK:
         cmd_count = (int)MOD_SCMI_CLOCK_COMMAND_COUNT;
-        resource_count = (int)resources_perms_ctx.config->clock_resource_count;
+        resource_count =
+            resources_perms_ctx.config->clock_counters.resource_count;
         break;
     case MOD_SCMI_PROTOCOL_ID_SENSOR:
         cmd_count = (int)MOD_SCMI_SENSOR_COMMAND_COUNT;
-        resource_count = (int)resources_perms_ctx.config->sensor_resource_count;
+        resource_count =
+            resources_perms_ctx.config->sensor_counters.resource_count;
         break;
 #ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
     case MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN:
         cmd_count = (int)MOD_SCMI_RESET_COMMAND_COUNT;
         resource_count =
-            (int)resources_perms_ctx.config->reset_domain_resource_count;
+            resources_perms_ctx.config->reset_domain_counters.resource_count;
         break;
 #endif
     case MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN:
         cmd_count = (int)MOD_SCMI_VOLTD_COMMAND_COUNT;
-        resource_count = (int)resources_perms_ctx.config->voltd_resource_count;
+        resource_count =
+            resources_perms_ctx.config->voltd_counters.resource_count;
         break;
     default:
         return;
@@ -1556,15 +1386,16 @@ static int mod_res_perms_resources_init(
             (struct mod_res_agent_permission *)config->agent_permissions;
         resources_perms_ctx.agent_count = config->agent_count;
         resources_perms_ctx.protocol_count = config->protocol_count;
-        resources_perms_ctx.clock_count = config->clock_count;
-        resources_perms_ctx.sensor_count = config->sensor_count;
-        resources_perms_ctx.pd_count = config->pd_count;
-        resources_perms_ctx.perf_count = config->perf_count;
+        resources_perms_ctx.clock_count = config->clock_counters.count;
+        resources_perms_ctx.sensor_count = config->sensor_counters.count;
+        resources_perms_ctx.pd_count = config->pd_counters.count;
+        resources_perms_ctx.perf_count = config->perf_counters.count;
         resources_perms_ctx.device_count = config->device_count;
 #ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
-        resources_perms_ctx.reset_domain_count = config->reset_domain_count;
+        resources_perms_ctx.reset_domain_count =
+            config->reset_domain_counters.count;
 #endif
-        resources_perms_ctx.voltd_count = config->voltd_count;
+        resources_perms_ctx.voltd_count = config->voltd_counters.count;
         resources_perms_ctx.domain_devices =
             (struct mod_res_device *)config->domain_devices;
     }

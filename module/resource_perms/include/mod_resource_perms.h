@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -483,6 +483,20 @@ struct mod_res_permissions_api {
 };
 
 /*!
+ * \brief Protocol permission counters.
+ */
+struct protocol_permissions_counters {
+    /*! \brief Number of protocol elements supported by the platform. */
+    uint32_t count;
+
+    /*! \brief Number of commands supported by the platform. */
+    uint32_t cmd_count;
+
+    /*! \brief Number of resources supported by the platform. */
+    uint32_t resource_count;
+};
+
+/*!
  * \brief Resource Permissions module configuration data.
  *
  * \note If the agent_permissions table is not set in the config then no
@@ -495,61 +509,25 @@ struct mod_res_resource_perms_config {
     /*! \brief Number of SCMI protocols supported by the platform. */
     uint32_t protocol_count;
 
-    /*! \brief Number of clocks supported by the platform. */
-    uint32_t clock_count;
+    /*! \brief Number of SCMI clock protocol counters. */
+    struct protocol_permissions_counters clock_counters;
 
-    /*! \brief Number of clock commands supported by the platform. */
-    uint32_t clock_cmd_count;
+    /*! \brief Number of SCMI sensor protocol counters. */
+    struct protocol_permissions_counters sensor_counters;
 
-    /*! \brief Number of clock resources supported by the platform. */
-    uint32_t clock_resource_count;
+    /*! \brief Number of SCMI power domain protocol counters. */
+    struct protocol_permissions_counters pd_counters;
 
-    /*! \brief Number of sensors supported by the platform. */
-    uint32_t sensor_count;
-
-    /*! \brief Number of sensor commands supported by the platform. */
-    uint32_t sensor_cmd_count;
-
-    /*! \brief Number of sensor resources supported by the platform. */
-    uint32_t sensor_resource_count;
-
-    /*! \brief Number of power domains supported by the platform. */
-    uint32_t pd_count;
-
-    /*! \brief Number of power domain commands supported by the platform. */
-    uint32_t pd_cmd_count;
-
-    /*! \brief Number of power domain resources supported by the platform. */
-    uint32_t pd_resource_count;
-
-    /*! \brief Number of perf domains supported by the platform. */
-    uint32_t perf_count;
-
-    /*! \brief Number of perf domain commands supported by the platform. */
-    uint32_t perf_cmd_count;
-
-    /*! \brief Number of perf domain resources supported by the platform. */
-    uint32_t perf_resource_count;
+    /*! \brief Number of SCMI perf protocol counters. */
+    struct protocol_permissions_counters perf_counters;
 
 #ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
-    /*! \brief Number of reset domains supported by the platform. */
-    uint32_t reset_domain_count;
-
-    /*! \brief Number of reset domain commands supported by the platform. */
-    uint32_t reset_domain_cmd_count;
-
-    /*! \brief Number of reset domain resources supported by the platform. */
-    uint32_t reset_domain_resource_count;
+    /*! \brief Number of SCMI reset_domain protocol counters. */
+    struct protocol_permissions_counters reset_domain_counters;
 #endif
 
-    /*! \brief Number of voltage domains supported by the platform. */
-    uint32_t voltd_count;
-
-    /*! \brief Number of voltage domain commands supported by the platform. */
-    uint32_t voltd_cmd_count;
-
-    /*! \brief Number of voltage domain resources supported by the platform. */
-    uint32_t voltd_resource_count;
+    /*! \brief Number of SCMI voltd protocol counters. */
+    struct protocol_permissions_counters voltd_counters;
 
     /*! \brief Number of devices supported by the platform. */
     uint32_t device_count;

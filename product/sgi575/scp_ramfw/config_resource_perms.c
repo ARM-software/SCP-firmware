@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -229,6 +229,6 @@ struct fwk_module_config config_resource_perms = {
             .agent_permissions = (uintptr_t)&agent_permissions,
             .agent_count = SCP_SCMI_AGENT_ID_COUNT,
             .protocol_count = 6,
-            .clock_count = CLOCK_IDX_COUNT,
+            .clock_counters.count = CLOCK_IDX_COUNT,
         },
 };
