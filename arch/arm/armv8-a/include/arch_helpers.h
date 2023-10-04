@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2013-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2013-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -582,12 +582,8 @@ inline static void arch_interrupts_enable(unsigned int not_used)
  */
 inline static unsigned int arch_interrupts_disable()
 {
+    disable_irq();
     critical_section_nest_level++;
-
-    /* If now in outer-most critical section, disable interrupts globally */
-    if (critical_section_nest_level == 1) {
-        disable_irq();
-    }
 
     return 0;
 }
