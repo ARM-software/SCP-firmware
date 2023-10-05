@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2020-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -107,6 +107,13 @@ endif()
 if(${SCP_ENABLE_RESOURCE_PERMISSIONS})
     target_sources(
         juno-bl2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_resource_perms.c")
+endif()
+
+if(SCP_ENABLE_SCMI_PERF_FAST_CHANNELS)
+    if(BUILD_HAS_MOD_TRANSPORT_FC)
+        list(APPEND SCP_MODULES "fch-polled")
+        target_sources(juno-bl2 PRIVATE "config_fch_polled.c")
+    endif()
 endif()
 
 if(SCP_ENABLE_PMI)
