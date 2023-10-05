@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -17,7 +17,7 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 
-static const struct mod_css_clock_rate rate_table_cpu_group_hayes[5] = {
+static const struct mod_css_clock_rate rate_table_cpu_group_cortex_a520[5] = {
     {
         /* Super Underdrive */
         .rate = 768 * FWK_MHZ,
@@ -70,7 +70,7 @@ static const struct mod_css_clock_rate rate_table_cpu_group_hayes[5] = {
     },
 };
 
-static const struct mod_css_clock_rate rate_table_cpu_group_hunter[5] = {
+static const struct mod_css_clock_rate rate_table_cpu_group_cortex_a720[5] = {
     {
         /* Super Underdrive */
         .rate = 946 * FWK_MHZ,
@@ -123,7 +123,7 @@ static const struct mod_css_clock_rate rate_table_cpu_group_hunter[5] = {
     },
 };
 
-static const struct mod_css_clock_rate rate_table_cpu_group_hunter_elp[5] = {
+static const struct mod_css_clock_rate rate_table_cpu_group_cortex_x4[5] = {
     {
         /* Super Underdrive */
         .rate = 1088 * FWK_MHZ,
@@ -176,20 +176,20 @@ static const struct mod_css_clock_rate rate_table_cpu_group_hunter_elp[5] = {
     },
 };
 
-static const fwk_id_t member_table_cpu_group_hayes[4] = {
+static const fwk_id_t member_table_cpu_group_cortex_a520[4] = {
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS0_CPU0),
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS0_CPU1),
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS0_CPU2),
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS0_CPU3),
 };
 
-static const fwk_id_t member_table_cpu_group_hunter[3] = {
+static const fwk_id_t member_table_cpu_group_cortex_a720[3] = {
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS0_CPU4),
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS0_CPU5),
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS0_CPU6),
 };
 
-static const fwk_id_t member_table_cpu_group_hunter_elp[1] = {
+static const fwk_id_t member_table_cpu_group_cortex_x4[1] = {
     FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PIK_CLOCK, CLOCK_PIK_IDX_CLUS0_CPU7),
 };
 
@@ -199,22 +199,22 @@ static const fwk_id_t member_table_dpu[1] = {
 
 static const struct fwk_element css_clock_element_table[
     CLOCK_CSS_IDX_COUNT + 1] = {
-    [CLOCK_CSS_IDX_CPU_GROUP_HAYES] = {
-            .name = "CPU_GROUP_HAYES",
+    [CLOCK_CSS_IDX_CPU_GROUP_CORTEX_A520] = {
+            .name = "CPU_GROUP_CORTEX_A520",
             .data = &((struct mod_css_clock_dev_config){
                 .clock_type = MOD_CSS_CLOCK_TYPE_INDEXED,
-                .rate_table = rate_table_cpu_group_hayes,
-                .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_hayes),
+                .rate_table = rate_table_cpu_group_cortex_a520,
+                .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_cortex_a520),
                 .clock_switching_source =
                     MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC2_PLL0,
                 .pll_id = FWK_ID_ELEMENT_INIT(
                     FWK_MODULE_IDX_SYSTEM_PLL,
-                    CLOCK_PLL_IDX_CPU_HAYES),
+                    CLOCK_PLL_IDX_CPU_CORTEX_A520),
                 .pll_api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_SYSTEM_PLL,
                     MOD_SYSTEM_PLL_API_TYPE_DEFAULT),
-                .member_table = member_table_cpu_group_hayes,
-                .member_count = FWK_ARRAY_SIZE(member_table_cpu_group_hayes),
+                .member_table = member_table_cpu_group_cortex_a520,
+                .member_count = FWK_ARRAY_SIZE(member_table_cpu_group_cortex_a520),
                 .member_api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_PIK_CLOCK,
                     MOD_PIK_CLOCK_API_TYPE_CSS),
@@ -222,22 +222,22 @@ static const struct fwk_element css_clock_element_table[
                 .modulation_supported = true,
             }),
     },
-    [CLOCK_CSS_IDX_CPU_GROUP_HUNTER] = {
-            .name = "CPU_GROUP_HUNTER",
+    [CLOCK_CSS_IDX_CPU_GROUP_CORTEX_A720] = {
+            .name = "CPU_GROUP_CORTEX_A720",
             .data = &((struct mod_css_clock_dev_config){
                 .clock_type = MOD_CSS_CLOCK_TYPE_INDEXED,
-                .rate_table = rate_table_cpu_group_hunter,
-                .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_hunter),
+                .rate_table = rate_table_cpu_group_cortex_a720,
+                .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_cortex_a720),
                 .clock_switching_source =
                     MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC2_PLL1,
                 .pll_id = FWK_ID_ELEMENT_INIT(
                     FWK_MODULE_IDX_SYSTEM_PLL,
-                    CLOCK_PLL_IDX_CPU_HUNTER),
+                    CLOCK_PLL_IDX_CPU_CORTEX_A720),
                 .pll_api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_SYSTEM_PLL,
                     MOD_SYSTEM_PLL_API_TYPE_DEFAULT),
-                .member_table = member_table_cpu_group_hunter,
-                .member_count = FWK_ARRAY_SIZE(member_table_cpu_group_hunter),
+                .member_table = member_table_cpu_group_cortex_a720,
+                .member_count = FWK_ARRAY_SIZE(member_table_cpu_group_cortex_a720),
                 .member_api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_PIK_CLOCK,
                     MOD_PIK_CLOCK_API_TYPE_CSS),
@@ -245,23 +245,23 @@ static const struct fwk_element css_clock_element_table[
                 .modulation_supported = true,
             }),
     },
-    [CLOCK_CSS_IDX_CPU_GROUP_HUNTER_ELP] = {
-            .name = "CPU_GROUP_HUNTER_ELP",
+    [CLOCK_CSS_IDX_CPU_GROUP_CORTEX_X4] = {
+            .name = "CPU_GROUP_CORTEX_X4",
             .data = &((struct mod_css_clock_dev_config){
                 .clock_type = MOD_CSS_CLOCK_TYPE_INDEXED,
-                .rate_table = rate_table_cpu_group_hunter_elp,
-                .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_hunter_elp),
+                .rate_table = rate_table_cpu_group_cortex_x4,
+                .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_cortex_x4),
                 .clock_switching_source =
                     MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC2_PLL2,
                 .pll_id = FWK_ID_ELEMENT_INIT(
                     FWK_MODULE_IDX_SYSTEM_PLL,
-                    CLOCK_PLL_IDX_CPU_HUNTER_ELP),
+                    CLOCK_PLL_IDX_CPU_CORTEX_X4),
                 .pll_api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_SYSTEM_PLL,
                     MOD_SYSTEM_PLL_API_TYPE_DEFAULT),
-                .member_table = member_table_cpu_group_hunter_elp,
+                .member_table = member_table_cpu_group_cortex_x4,
                 .member_count =
-                    FWK_ARRAY_SIZE(member_table_cpu_group_hunter_elp),
+                    FWK_ARRAY_SIZE(member_table_cpu_group_cortex_x4),
                 .member_api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_PIK_CLOCK,
                     MOD_PIK_CLOCK_API_TYPE_CSS),

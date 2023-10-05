@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -21,7 +21,7 @@
 /*
  * Rate lookup tables
  */
-static const struct mod_pik_clock_rate rate_table_cpu_group_hayes[1] = {
+static const struct mod_pik_clock_rate rate_table_cpu_group_cortex_a520[1] = {
     {
         .rate = 1537 * FWK_MHZ,
         .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC2_PLL0,
@@ -30,7 +30,7 @@ static const struct mod_pik_clock_rate rate_table_cpu_group_hayes[1] = {
     },
 };
 
-static const struct mod_pik_clock_rate rate_table_cpu_group_hunter[1] = {
+static const struct mod_pik_clock_rate rate_table_cpu_group_cortex_a720[1] = {
     {
         .rate = 1893 * FWK_MHZ,
         .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC2_PLL1,
@@ -39,7 +39,7 @@ static const struct mod_pik_clock_rate rate_table_cpu_group_hunter[1] = {
     },
 };
 
-static const struct mod_pik_clock_rate rate_table_cpu_group_hunter_elp[1] = {
+static const struct mod_pik_clock_rate rate_table_cpu_group_cortex_x4[1] = {
     {
         .rate = 2176 * FWK_MHZ,
         .source = MOD_PIK_CLOCK_CLUSCLK_SOURCE_TC2_PLL2,
@@ -104,8 +104,8 @@ static const struct fwk_element pik_clock_element_table[
             .control_reg = &CLUSTER_PIK_PTR->CORECLK[0].CTRL,
             .divext_reg = &CLUSTER_PIK_PTR->CORECLK[0].DIV,
             .modulator_reg = &CLUSTER_PIK_PTR->CORECLK[0].MOD,
-            .rate_table = rate_table_cpu_group_hayes,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_hayes),
+            .rate_table = rate_table_cpu_group_cortex_a520,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_cortex_a520),
         }),
     },
     [CLOCK_PIK_IDX_CLUS0_CPU1] = {
@@ -116,8 +116,8 @@ static const struct fwk_element pik_clock_element_table[
             .control_reg = &CLUSTER_PIK_PTR->CORECLK[1].CTRL,
             .divext_reg = &CLUSTER_PIK_PTR->CORECLK[1].DIV,
             .modulator_reg = &CLUSTER_PIK_PTR->CORECLK[1].MOD,
-            .rate_table = rate_table_cpu_group_hayes,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_hayes),
+            .rate_table = rate_table_cpu_group_cortex_a520,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_cortex_a520),
         }),
     },
     [CLOCK_PIK_IDX_CLUS0_CPU2] = {
@@ -128,8 +128,8 @@ static const struct fwk_element pik_clock_element_table[
             .control_reg = &CLUSTER_PIK_PTR->CORECLK[2].CTRL,
             .divext_reg = &CLUSTER_PIK_PTR->CORECLK[2].DIV,
             .modulator_reg = &CLUSTER_PIK_PTR->CORECLK[2].MOD,
-            .rate_table = rate_table_cpu_group_hayes,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_hayes),
+            .rate_table = rate_table_cpu_group_cortex_a520,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_cortex_a520),
         }),
     },
     [CLOCK_PIK_IDX_CLUS0_CPU3] = {
@@ -140,8 +140,8 @@ static const struct fwk_element pik_clock_element_table[
             .control_reg = &CLUSTER_PIK_PTR->CORECLK[3].CTRL,
             .divext_reg = &CLUSTER_PIK_PTR->CORECLK[3].DIV,
             .modulator_reg = &CLUSTER_PIK_PTR->CORECLK[3].MOD,
-            .rate_table = rate_table_cpu_group_hayes,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_hayes),
+            .rate_table = rate_table_cpu_group_cortex_a520,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_cortex_a520),
         }),
     },
     [CLOCK_PIK_IDX_CLUS0_CPU4] = {
@@ -152,8 +152,8 @@ static const struct fwk_element pik_clock_element_table[
             .control_reg = &CLUSTER_PIK_PTR->CORECLK[4].CTRL,
             .divext_reg = &CLUSTER_PIK_PTR->CORECLK[4].DIV,
             .modulator_reg = &CLUSTER_PIK_PTR->CORECLK[4].MOD,
-            .rate_table = rate_table_cpu_group_hunter,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_hunter),
+            .rate_table = rate_table_cpu_group_cortex_a720,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_cortex_a720),
         }),
     },
     [CLOCK_PIK_IDX_CLUS0_CPU5] = {
@@ -164,8 +164,8 @@ static const struct fwk_element pik_clock_element_table[
             .control_reg = &CLUSTER_PIK_PTR->CORECLK[5].CTRL,
             .divext_reg = &CLUSTER_PIK_PTR->CORECLK[5].DIV,
             .modulator_reg = &CLUSTER_PIK_PTR->CORECLK[5].MOD,
-            .rate_table = rate_table_cpu_group_hunter,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_hunter),
+            .rate_table = rate_table_cpu_group_cortex_a720,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_cortex_a720),
         }),
     },
     [CLOCK_PIK_IDX_CLUS0_CPU6] = {
@@ -176,8 +176,8 @@ static const struct fwk_element pik_clock_element_table[
             .control_reg = &CLUSTER_PIK_PTR->CORECLK[6].CTRL,
             .divext_reg = &CLUSTER_PIK_PTR->CORECLK[6].DIV,
             .modulator_reg = &CLUSTER_PIK_PTR->CORECLK[6].MOD,
-            .rate_table = rate_table_cpu_group_hunter,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_hunter),
+            .rate_table = rate_table_cpu_group_cortex_a720,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_cortex_a720),
         }),
     },
     [CLOCK_PIK_IDX_CLUS0_CPU7] = {
@@ -188,8 +188,8 @@ static const struct fwk_element pik_clock_element_table[
             .control_reg = &CLUSTER_PIK_PTR->CORECLK[7].CTRL,
             .divext_reg = &CLUSTER_PIK_PTR->CORECLK[7].DIV,
             .modulator_reg = &CLUSTER_PIK_PTR->CORECLK[7].MOD,
-            .rate_table = rate_table_cpu_group_hunter_elp,
-            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_hunter_elp),
+            .rate_table = rate_table_cpu_group_cortex_x4,
+            .rate_count = FWK_ARRAY_SIZE(rate_table_cpu_group_cortex_x4),
         }),
     },
     [CLOCK_PIK_IDX_GIC] = {

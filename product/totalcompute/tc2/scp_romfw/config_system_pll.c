@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -17,8 +17,8 @@
 #include <fwk_module.h>
 
 static const struct fwk_element system_pll_element_table[2] = {
-    [CLOCK_PLL_IDX_CPU_HAYES] = {
-        .name = "CPU_PLL_HAYES",
+    [CLOCK_PLL_IDX_CPU_CORTEX_A520] = {
+        .name = "CPU_PLL_CORTEX_A520",
         .data = &((struct mod_system_pll_dev_config){
             .control_reg = (void *)SCP_PLL_CPU0,
             .status_reg = (void *)&SCP_PIK_PTR->PLL_STATUS[1],

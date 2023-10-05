@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -21,12 +21,13 @@
 #include <fwk_module_idx.h>
 
 static const struct fwk_element clock_dev_desc_table[2] = {
-    [CLOCK_IDX_CPU_GROUP_HAYES] = {
-            .name = "CPU_GROUP_HAYES",
+    [CLOCK_IDX_CPU_GROUP_CORTEX_A520] =
+        {
+            .name = "CPU_GROUP_CORTEX_A520",
             .data = &((struct mod_clock_dev_config){
                 .driver_id = FWK_ID_ELEMENT_INIT(
                     FWK_MODULE_IDX_CSS_CLOCK,
-                    CLOCK_CSS_IDX_CPU_GROUP_HAYES),
+                    CLOCK_CSS_IDX_CPU_GROUP_CORTEX_A520),
                 .api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_CSS_CLOCK,
                     MOD_CSS_CLOCK_API_TYPE_CLOCK),

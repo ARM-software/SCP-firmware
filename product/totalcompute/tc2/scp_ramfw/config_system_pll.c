@@ -18,8 +18,8 @@
 
 static const struct fwk_element system_pll_element_table[
     CLOCK_PLL_IDX_COUNT + 1] = {
-        [CLOCK_PLL_IDX_CPU_HAYES] = {
-                .name = "CPU_PLL_HAYES",
+        [CLOCK_PLL_IDX_CPU_CORTEX_A520] = {
+                .name = "CPU_PLL_CORTEX_A520",
                 .data = &((struct mod_system_pll_dev_config){
                     .control_reg = (void *)SCP_PLL_CPU0,
                     .status_reg = (void *)&SCP_PIK_PTR->PLL_STATUS[1],
@@ -30,8 +30,8 @@ static const struct fwk_element system_pll_element_table[
                     .min_step = MOD_SYSTEM_PLL_MIN_INTERVAL,
                 }),
         },
-        [CLOCK_PLL_IDX_CPU_HUNTER] = {
-                .name = "CPU_PLL_HUNTER",
+        [CLOCK_PLL_IDX_CPU_CORTEX_A720] = {
+                .name = "CPU_PLL_CORTEX_A720",
                 .data = &((struct mod_system_pll_dev_config){
                     .control_reg = (void *)SCP_PLL_CPU1,
                     .status_reg = (void *)&SCP_PIK_PTR->PLL_STATUS[1],
@@ -42,8 +42,8 @@ static const struct fwk_element system_pll_element_table[
                     .min_step = MOD_SYSTEM_PLL_MIN_INTERVAL,
                 }),
         },
-        [CLOCK_PLL_IDX_CPU_HUNTER_ELP] = {
-                .name = "CPU_PLL_HUNTER_ELP",
+        [CLOCK_PLL_IDX_CPU_CORTEX_X4] = {
+                .name = "CPU_PLL_CORTEX_X4",
                 .data = &((struct mod_system_pll_dev_config){
                     .control_reg = (void *)SCP_PLL_CPU2,
                     .status_reg = (void *)&SCP_PIK_PTR->PLL_STATUS[1],
@@ -103,9 +103,8 @@ static const struct fwk_element system_pll_element_table[
                         .min_step = 25 * FWK_KHZ,
                         .defer_initialization = false,
                     }),
-            },
-        [CLOCK_PLL_IDX_GPU] =
-            {
+        },
+        [CLOCK_PLL_IDX_GPU] = {
                 .name = "GPU_PLL",
                 .data = &((struct mod_system_pll_dev_config){
                     .control_reg = (void *)SCP_PLL_GPU,
@@ -116,7 +115,7 @@ static const struct fwk_element system_pll_element_table[
                     .min_step = MOD_SYSTEM_PLL_MIN_INTERVAL,
                     .defer_initialization = false,
                 }),
-            },
+        },
         [CLOCK_PLL_IDX_COUNT] = { 0 }, /* Termination description. */
     };
 

@@ -31,108 +31,109 @@
  */
 
 /* dynamic-power-coeffient/1000 */
-#define HAYES_DPC      0.230
-#define HUNTER_DPC     0.495
-#define HUNTER_ELP_DPC 1.054
+#define CORTEX_A520_DPC   0.230
+#define CORTEX_A720_DPC   0.495
+#define CORTEX_X4_MIN_DPC 1.054
+#define CORTEX_X4_DPC     1.054
 
-static struct mod_dvfs_opp operating_points_hayes[6] = {
+static struct mod_dvfs_opp operating_points_cortex_a520[6] = {
     {
         .level = 768 * 1000000UL,
         .frequency = 768 * FWK_KHZ,
         .voltage = 550,
-        .power = (uint32_t)(HAYES_DPC * 768 * 0.550 * 0.550),
+        .power = (uint32_t)(CORTEX_A520_DPC * 768 * 0.550 * 0.550),
     },
     {
         .level = 1153 * 1000000UL,
         .frequency = 1153 * FWK_KHZ,
         .voltage = 650,
-        .power = (uint32_t)(HAYES_DPC * 1153 * 0.650 * 0.650),
+        .power = (uint32_t)(CORTEX_A520_DPC * 1153 * 0.650 * 0.650),
     },
     {
         .level = 1537 * 1000000UL,
         .frequency = 1537 * FWK_KHZ,
         .voltage = 750,
-        .power = (uint32_t)(HAYES_DPC * 1537 * 0.750 * 0.750),
+        .power = (uint32_t)(CORTEX_A520_DPC * 1537 * 0.750 * 0.750),
     },
     {
         .level = 1844 * 1000000UL,
         .frequency = 1844 * FWK_KHZ,
         .voltage = 850,
-        .power = (uint32_t)(HAYES_DPC * 1844 * 0.850 * 0.850),
+        .power = (uint32_t)(CORTEX_A520_DPC * 1844 * 0.850 * 0.850),
     },
     {
         .level = 2152 * 1000000UL,
         .frequency = 2152 * FWK_KHZ,
         .voltage = 950,
-        .power = (uint32_t)(HAYES_DPC * 2152 * 0.950 * 0.950),
+        .power = (uint32_t)(CORTEX_A520_DPC * 2152 * 0.950 * 0.950),
     },
     { 0 }
 };
 
-static struct mod_dvfs_opp operating_points_hunter[6] = {
+static struct mod_dvfs_opp operating_points_cortex_a720[6] = {
     {
         .level = 946 * 1000000UL,
         .frequency = 946 * FWK_KHZ,
         .voltage = 550,
-        .power = (uint32_t)(HUNTER_DPC * 946 * 0.550 * 0.550),
+        .power = (uint32_t)(CORTEX_A720_DPC * 946 * 0.550 * 0.550),
     },
     {
         .level = 1419 * 1000000UL,
         .frequency = 1419 * FWK_KHZ,
         .voltage = 650,
-        .power = (uint32_t)(HUNTER_DPC * 1419 * 0.650 * 0.650),
+        .power = (uint32_t)(CORTEX_A720_DPC * 1419 * 0.650 * 0.650),
     },
     {
         .level = 1893 * 1000000UL,
         .frequency = 1893 * FWK_KHZ,
         .voltage = 750,
-        .power = (uint32_t)(HUNTER_DPC * 1893 * 0.750 * 0.750),
+        .power = (uint32_t)(CORTEX_A720_DPC * 1893 * 0.750 * 0.750),
     },
     {
         .level = 2271 * 1000000UL,
         .frequency = 2271 * FWK_KHZ,
         .voltage = 850,
-        .power = (uint32_t)(HUNTER_DPC * 2271 * 0.850 * 0.850),
+        .power = (uint32_t)(CORTEX_A720_DPC * 2271 * 0.850 * 0.850),
     },
     {
         .level = 2650 * 1000000UL,
         .frequency = 2650 * FWK_KHZ,
         .voltage = 950,
-        .power = (uint32_t)(HUNTER_DPC * 2650 * 0.950 * 0.950),
+        .power = (uint32_t)(CORTEX_A720_DPC * 2650 * 0.950 * 0.950),
     },
     { 0 }
 };
 
-static struct mod_dvfs_opp operating_points_hunter_elp[6] = {
+static struct mod_dvfs_opp operating_points_cortex_x4[6] = {
     {
         .level = 1088 * 1000000UL,
         .frequency = 1088 * FWK_KHZ,
         .voltage = 550,
-        .power = (uint32_t)(HUNTER_ELP_DPC * 1088 * 0.550 * 0.550),
+        .power = (uint32_t)(CORTEX_X4_DPC * 1088 * 0.550 * 0.550),
     },
     {
         .level = 1632 * 1000000UL,
         .frequency = 1632 * FWK_KHZ,
         .voltage = 650,
-        .power = (uint32_t)(HUNTER_ELP_DPC * 1632 * 0.650 * 0.650),
+        .power = (uint32_t)(CORTEX_X4_DPC * 1632 * 0.650 * 0.650),
     },
     {
         .level = 2176 * 1000000UL,
         .frequency = 2176 * FWK_KHZ,
         .voltage = 750,
-        .power = (uint32_t)(HUNTER_ELP_DPC * 2176 * 0.750 * 0.750),
+        .power = (uint32_t)(CORTEX_X4_DPC * 2176 * 0.750 * 0.750),
     },
     {
         .level = 2612 * 1000000UL,
         .frequency = 2612 * FWK_KHZ,
         .voltage = 850,
-        .power = (uint32_t)(HUNTER_ELP_DPC * 2612 * 0.850 * 0.850),
+        .power = (uint32_t)(CORTEX_X4_DPC * 2612 * 0.850 * 0.850),
     },
     {
         .level = 3047 * 1000000UL,
         .frequency = 3047 * FWK_KHZ,
         .voltage = 950,
-        .power = (uint32_t)(HUNTER_ELP_DPC * 3047 * 0.950 * 0.950),
+        .power = (uint32_t)(CORTEX_X4_DPC * 3047 * 0.950 * 0.950),
     },
     { 0 }
 };
@@ -161,48 +162,52 @@ static struct mod_dvfs_opp operating_points_gpu[5] = {
     { 0 }
 };
 
-static const struct mod_dvfs_domain_config cpu_group_hayes = {
-    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, PSU_ELEMENT_IDX_HAYES),
-    .clock_id =
-        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_CPU_GROUP_HAYES),
-    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
-        FWK_MODULE_IDX_TIMER,
-        0,
-        TC2_CONFIG_TIMER_DVFS_CPU_HAYES),
-    .retry_ms = 1,
-    .latency = 1200,
-    .sustained_idx = 2,
-    .opps = operating_points_hayes,
-};
-
-static const struct mod_dvfs_domain_config cpu_group_hunter = {
-    .psu_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, PSU_ELEMENT_IDX_HUNTER),
-    .clock_id =
-        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_CPU_GROUP_HUNTER),
-    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
-        FWK_MODULE_IDX_TIMER,
-        0,
-        TC2_CONFIG_TIMER_DVFS_CPU_HUNTER),
-    .retry_ms = 1,
-    .latency = 1200,
-    .sustained_idx = 2,
-    .opps = operating_points_hunter,
-};
-
-static const struct mod_dvfs_domain_config cpu_group_hunter_elp = {
+static const struct mod_dvfs_domain_config cpu_group_cortex_a520 = {
     .psu_id =
-        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, PSU_ELEMENT_IDX_HUNTER_ELP),
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, PSU_ELEMENT_IDX_CORTEX_A520),
     .clock_id = FWK_ID_ELEMENT_INIT(
         FWK_MODULE_IDX_CLOCK,
-        CLOCK_IDX_CPU_GROUP_HUNTER_ELP),
+        CLOCK_IDX_CPU_GROUP_CORTEX_A520),
     .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
         FWK_MODULE_IDX_TIMER,
         0,
-        TC2_CONFIG_TIMER_DVFS_CPU_HUNTER_ELP),
+        TC2_CONFIG_TIMER_DVFS_CPU_CORTEX_A520),
     .retry_ms = 1,
     .latency = 1200,
     .sustained_idx = 2,
-    .opps = operating_points_hunter_elp,
+    .opps = operating_points_cortex_a520,
+};
+
+static const struct mod_dvfs_domain_config cpu_group_cortex_a720 = {
+    .psu_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, PSU_ELEMENT_IDX_CORTEX_A720),
+    .clock_id = FWK_ID_ELEMENT_INIT(
+        FWK_MODULE_IDX_CLOCK,
+        CLOCK_IDX_CPU_GROUP_CORTEX_A720),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
+        FWK_MODULE_IDX_TIMER,
+        0,
+        TC2_CONFIG_TIMER_DVFS_CPU_CORTEX_A720),
+    .retry_ms = 1,
+    .latency = 1200,
+    .sustained_idx = 2,
+    .opps = operating_points_cortex_a720,
+};
+
+static const struct mod_dvfs_domain_config cpu_group_cortex_x4 = {
+    .psu_id =
+        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_PSU, PSU_ELEMENT_IDX_CORTEX_X4),
+    .clock_id = FWK_ID_ELEMENT_INIT(
+        FWK_MODULE_IDX_CLOCK,
+        CLOCK_IDX_CPU_GROUP_CORTEX_X4),
+    .alarm_id = FWK_ID_SUB_ELEMENT_INIT(
+        FWK_MODULE_IDX_TIMER,
+        0,
+        TC2_CONFIG_TIMER_DVFS_CPU_CORTEX_X4),
+    .retry_ms = 1,
+    .latency = 1200,
+    .sustained_idx = 2,
+    .opps = operating_points_cortex_x4,
 };
 
 static const struct mod_dvfs_domain_config gpu = {
@@ -219,20 +224,20 @@ static const struct mod_dvfs_domain_config gpu = {
 };
 
 static const struct fwk_element element_table[DVFS_ELEMENT_IDX_COUNT + 1] = {
-    [DVFS_ELEMENT_IDX_HAYES] =
+    [DVFS_ELEMENT_IDX_CORTEX_A520] =
         {
-            .name = "CPU_GROUP_HAYES",
-            .data = &cpu_group_hayes,
+            .name = "CPU_GROUP_CORTEX_A520",
+            .data = &cpu_group_cortex_a520,
         },
-    [DVFS_ELEMENT_IDX_HUNTER] =
+    [DVFS_ELEMENT_IDX_CORTEX_A720] =
         {
-            .name = "CPU_GROUP_HUNTER",
-            .data = &cpu_group_hunter,
+            .name = "CPU_GROUP_CORTEX_A720",
+            .data = &cpu_group_cortex_a720,
         },
-    [DVFS_ELEMENT_IDX_HUNTER_ELP] =
+    [DVFS_ELEMENT_IDX_CORTEX_X4] =
         {
-            .name = "CPU_GROUP_HUNTER_ELP",
-            .data = &cpu_group_hunter_elp,
+            .name = "CPU_GROUP_CORTEX_X4",
+            .data = &cpu_group_cortex_x4,
         },
     [DVFS_ELEMENT_IDX_GPU] =
         {

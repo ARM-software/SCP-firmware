@@ -13,8 +13,8 @@
 #include <fwk_module.h>
 
 static const struct fwk_element element_table[MOCK_PSU_ELEMENT_IDX_COUNT + 1] = {
-    [MOCK_PSU_ELEMENT_IDX_HAYES] = {
-        .name = "DVFS_GROUP_HAYES",
+    [MOCK_PSU_ELEMENT_IDX_CORTEX_A520] = {
+        .name = "DVFS_GROUP_CORTEX_A520",
         .data =
             &(const struct mod_mock_psu_element_cfg){
                 .async_alarm_id = FWK_ID_NONE_INIT,
@@ -27,8 +27,8 @@ static const struct fwk_element element_table[MOCK_PSU_ELEMENT_IDX_COUNT + 1] = 
                 .default_voltage = 550,
             },
     },
-    [MOCK_PSU_ELEMENT_IDX_HUNTER] = {
-        .name = "DVFS_GROUP_HUNTER",
+    [MOCK_PSU_ELEMENT_IDX_CORTEX_A720] = {
+        .name = "DVFS_GROUP_CORTEX_A720",
         .data =
             &(const struct mod_mock_psu_element_cfg){
                 .async_alarm_id = FWK_ID_NONE_INIT,
@@ -41,8 +41,8 @@ static const struct fwk_element element_table[MOCK_PSU_ELEMENT_IDX_COUNT + 1] = 
                 .default_voltage = 550,
             },
     },
-    [MOCK_PSU_ELEMENT_IDX_HUNTER_ELP] = {
-        .name = "DVFS_GROUP_HUNTER_ELP",
+    [MOCK_PSU_ELEMENT_IDX_CORTEX_X4] = {
+        .name = "DVFS_GROUP_CORTEX_X4",
         .data =
             &(const struct mod_mock_psu_element_cfg){
                 .async_alarm_id = FWK_ID_NONE_INIT,

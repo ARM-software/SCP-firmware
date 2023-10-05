@@ -16,32 +16,32 @@
 #include <fwk_module_idx.h>
 
 static const struct fwk_element element_table[PSU_ELEMENT_IDX_COUNT + 1] = {
-    [PSU_ELEMENT_IDX_HAYES] = {
-        .name = "PSU_GROUP_HAYES",
+    [PSU_ELEMENT_IDX_CORTEX_A520] = {
+        .name = "PSU_GROUP_CORTEX_A520",
         .data =
             &(const struct mod_psu_element_cfg){
                 .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MOCK_PSU,
-                    MOCK_PSU_ELEMENT_IDX_HAYES),
+                    MOCK_PSU_ELEMENT_IDX_CORTEX_A520),
                 .driver_api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_MOCK_PSU,
                     MOD_MOCK_PSU_API_IDX_DRIVER) },
     },
-    [PSU_ELEMENT_IDX_HUNTER] = {
-        .name = "PSU_GROUP_HUNTER",
+    [PSU_ELEMENT_IDX_CORTEX_A720] = {
+        .name = "PSU_GROUP_CORTEX_A720",
         .data =
             &(const struct mod_psu_element_cfg){
                 .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MOCK_PSU,
-                    MOCK_PSU_ELEMENT_IDX_HUNTER),
+                    MOCK_PSU_ELEMENT_IDX_CORTEX_A720),
                 .driver_api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_MOCK_PSU,
                     MOD_MOCK_PSU_API_IDX_DRIVER) },
     },
-    [PSU_ELEMENT_IDX_HUNTER_ELP] = {
-        .name = "PSU_GROUP_HUNTER_ELP",
+    [PSU_ELEMENT_IDX_CORTEX_X4] = {
+        .name = "PSU_GROUP_CORTEX_X4",
         .data =
             &(const struct mod_psu_element_cfg){
                 .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_MOCK_PSU,
-                    MOCK_PSU_ELEMENT_IDX_HUNTER_ELP),
+                    MOCK_PSU_ELEMENT_IDX_CORTEX_X4),
                 .driver_api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_MOCK_PSU,
                     MOD_MOCK_PSU_API_IDX_DRIVER) },

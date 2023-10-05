@@ -20,34 +20,34 @@
 #include <fwk_module_idx.h>
 
 static const struct fwk_element clock_dev_desc_table[CLOCK_IDX_COUNT + 1] = {
-    [CLOCK_IDX_CPU_GROUP_HAYES] = {
-            .name = "CPU_GROUP_HAYES",
+    [CLOCK_IDX_CPU_GROUP_CORTEX_A520] = {
+            .name = "CPU_GROUP_CORTEX_A520",
             .data = &((struct mod_clock_dev_config){
                 .driver_id = FWK_ID_ELEMENT_INIT(
                     FWK_MODULE_IDX_CSS_CLOCK,
-                    CLOCK_CSS_IDX_CPU_GROUP_HAYES),
+                    CLOCK_CSS_IDX_CPU_GROUP_CORTEX_A520),
                 .api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_CSS_CLOCK,
                     MOD_CSS_CLOCK_API_TYPE_CLOCK),
             }),
     },
-    [CLOCK_IDX_CPU_GROUP_HUNTER] = {
-            .name = "CPU_GROUP_HUNTER",
+    [CLOCK_IDX_CPU_GROUP_CORTEX_A720] = {
+            .name = "CPU_GROUP_CORTEX_A720",
             .data = &((struct mod_clock_dev_config){
                 .driver_id = FWK_ID_ELEMENT_INIT(
                     FWK_MODULE_IDX_CSS_CLOCK,
-                    CLOCK_CSS_IDX_CPU_GROUP_HUNTER),
+                    CLOCK_CSS_IDX_CPU_GROUP_CORTEX_A720),
                 .api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_CSS_CLOCK,
                     MOD_CSS_CLOCK_API_TYPE_CLOCK),
             }),
     },
-    [CLOCK_IDX_CPU_GROUP_HUNTER_ELP] = {
-            .name = "CPU_GROUP_HUNTER_ELP",
+    [CLOCK_IDX_CPU_GROUP_CORTEX_X4] = {
+            .name = "CPU_GROUP_CORTEX_X4",
             .data = &((struct mod_clock_dev_config){
                 .driver_id = FWK_ID_ELEMENT_INIT(
                     FWK_MODULE_IDX_CSS_CLOCK,
-                    CLOCK_CSS_IDX_CPU_GROUP_HUNTER_ELP),
+                    CLOCK_CSS_IDX_CPU_GROUP_CORTEX_X4),
                 .api_id = FWK_ID_API_INIT(
                     FWK_MODULE_IDX_CSS_CLOCK,
                     MOD_CSS_CLOCK_API_TYPE_CLOCK),
@@ -85,9 +85,8 @@ static const struct fwk_element clock_dev_desc_table[CLOCK_IDX_COUNT + 1] = {
                     FWK_MODULE_IDX_SYSTEM_PLL,
                     MOD_SYSTEM_PLL_API_TYPE_DEFAULT),
             }),
-        },
-    [CLOCK_IDX_GPU] =
-        {
+    },
+    [CLOCK_IDX_GPU] = {
             .name = "GPU",
             .data = &((struct mod_clock_dev_config){
                 .driver_id = FWK_ID_ELEMENT_INIT(
@@ -97,7 +96,7 @@ static const struct fwk_element clock_dev_desc_table[CLOCK_IDX_COUNT + 1] = {
                     FWK_MODULE_IDX_SYSTEM_PLL,
                     MOD_SYSTEM_PLL_API_TYPE_DEFAULT),
             }),
-        },
+    },
     { 0 }, /* Termination description. */
 };
 

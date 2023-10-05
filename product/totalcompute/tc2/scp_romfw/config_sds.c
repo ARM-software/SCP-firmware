@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -39,8 +39,9 @@ static_assert(
 const struct mod_sds_config sds_module_config = {
     .regions = sds_module_regions,
     .region_count = TC_SDS_REGION_COUNT,
-    .clock_id =
-        FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, CLOCK_IDX_CPU_GROUP_HAYES)
+    .clock_id = FWK_ID_ELEMENT_INIT(
+        FWK_MODULE_IDX_CLOCK,
+        CLOCK_IDX_CPU_GROUP_CORTEX_A520)
 };
 
 static struct fwk_element sds_element_table[4] = {

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -29,7 +29,7 @@ enum cpu_idx {
     CORE7_IDX
 };
 
-static struct mod_mpmm_pct_table hunter_pct[4] = {
+static struct mod_mpmm_pct_table cortex_a720_pct[4] = {
     {
         .cores_online = 4,
         .default_perf_limit = 1419 * 1000000UL,
@@ -88,55 +88,55 @@ static struct mod_mpmm_pct_table hunter_pct[4] = {
     },
 };
 
-static const struct mod_mpmm_core_config hunter_core_config[4] = {
+static const struct mod_mpmm_core_config cortex_a720_core_config[4] = {
     [0] = {
         .pd_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN, CORE4_IDX),
         .mpmm_reg_base = SCP_MPMM_CORE_BASE(CORE4_IDX),
         .core_starts_online = false,
         .base_aux_counter_id = FWK_ID_SUB_ELEMENT_INIT(
-            FWK_MODULE_IDX_AMU_MMAP, CORE4_IDX, HUNTER_AMEVCNTR1_AUX0),
+            FWK_MODULE_IDX_AMU_MMAP, CORE4_IDX, AMEVCNTR1_AUX0),
     },
     [1] = {
         .pd_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN, CORE5_IDX),
         .mpmm_reg_base = SCP_MPMM_CORE_BASE(CORE5_IDX),
         .core_starts_online = false,
         .base_aux_counter_id = FWK_ID_SUB_ELEMENT_INIT(
-            FWK_MODULE_IDX_AMU_MMAP, CORE5_IDX, HUNTER_AMEVCNTR1_AUX0),
+            FWK_MODULE_IDX_AMU_MMAP, CORE5_IDX, AMEVCNTR1_AUX0),
     },
     [2] = {
         .pd_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN, CORE6_IDX),
         .mpmm_reg_base = SCP_MPMM_CORE_BASE(CORE6_IDX),
         .core_starts_online = false,
         .base_aux_counter_id = FWK_ID_SUB_ELEMENT_INIT(
-            FWK_MODULE_IDX_AMU_MMAP, CORE6_IDX, HUNTER_AMEVCNTR1_AUX0),
+            FWK_MODULE_IDX_AMU_MMAP, CORE6_IDX, AMEVCNTR1_AUX0),
     },
     [3] = {
         .pd_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN, CORE7_IDX),
         .mpmm_reg_base = SCP_MPMM_CORE_BASE(CORE7_IDX),
         .core_starts_online = false,
         .base_aux_counter_id = FWK_ID_SUB_ELEMENT_INIT(
-            FWK_MODULE_IDX_AMU_MMAP, CORE7_IDX, HUNTER_AMEVCNTR1_AUX0),
+            FWK_MODULE_IDX_AMU_MMAP, CORE7_IDX, AMEVCNTR1_AUX0),
     },
 };
 
-static const struct mod_mpmm_domain_config hunter_domain_conf[2] = {
+static const struct mod_mpmm_domain_config cortex_a720_domain_conf[2] = {
     [0] = {
         .perf_id = FWK_ID_ELEMENT_INIT(
-            FWK_MODULE_IDX_DVFS, DVFS_ELEMENT_IDX_HUNTER),
-        .pct = hunter_pct,
-        .pct_size = FWK_ARRAY_SIZE(hunter_pct),
+            FWK_MODULE_IDX_DVFS, DVFS_ELEMENT_IDX_CORTEX_A720),
+        .pct = cortex_a720_pct,
+        .pct_size = FWK_ARRAY_SIZE(cortex_a720_pct),
         .btc = 10,
         .num_threshold_counters = 3,
-        .core_config = hunter_core_config,
+        .core_config = cortex_a720_core_config,
     },
     [1] = {0},
 };
 
 static const struct fwk_element element_table[2] = {
     [0] = {
-        .name = "MPMM_HUNTER_ELEM",
+        .name = "MPMM_CORTEX_A720_ELEM",
         .sub_element_count = 1,
-        .data = hunter_domain_conf,
+        .data = cortex_a720_domain_conf,
     },
     [1] = { 0 },
 };

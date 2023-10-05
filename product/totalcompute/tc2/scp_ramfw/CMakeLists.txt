@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -15,8 +15,8 @@ add_executable(tc2-bl2)
 # - 'TC2_VARIANT_STD' for TC2 standard build
 # - 'TC2_VAR_EXPERIMENT_POWER' for TC2 with power/performance/thermal additions
 #   used for evaluation purpose:
-#   - TRAFFIC_COP on HAYES cores
-#   - MPMM on HUNTER cores
+#   - TRAFFIC_COP on CORTEX_A520 cores
+#   - MPMM on CORTEX_A520, CORTEX_A720, CORTEX_X4 cores
 #   - THERMAL_MANAGEMENT for the entire system, with a simplified/dummy power
 #     model
 

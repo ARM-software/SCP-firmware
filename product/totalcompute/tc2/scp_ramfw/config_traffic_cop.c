@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -27,7 +27,7 @@ enum cpu_idx {
     CORE7_PD_IDX
 };
 
-static struct mod_tcop_pct_table hayes_pct[3] = {
+static struct mod_tcop_pct_table cortex_a520_pct[3] = {
     {
         /*
          * Perf limit for 4 cores online.
@@ -48,7 +48,7 @@ static struct mod_tcop_pct_table hayes_pct[3] = {
     },
 };
 
-static const struct mod_tcop_core_config hayes_core_config[4] = {
+static const struct mod_tcop_core_config cortex_a520_core_config[4] = {
     [0] = {
         .pd_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_POWER_DOMAIN, CORE0_PD_IDX),
         .core_starts_online = true,
@@ -67,23 +67,23 @@ static const struct mod_tcop_core_config hayes_core_config[4] = {
     },
 };
 
-static const struct mod_tcop_domain_config hayes_domain_conf[2] = {
+static const struct mod_tcop_domain_config cortex_a520_domain_conf[2] = {
     [0] = {
         .perf_id = FWK_ID_ELEMENT_INIT(
             FWK_MODULE_IDX_DVFS,
-            DVFS_ELEMENT_IDX_HAYES),
-        .pct = hayes_pct,
-        .pct_size = FWK_ARRAY_SIZE(hayes_pct),
-        .core_config = hayes_core_config,
+            DVFS_ELEMENT_IDX_CORTEX_A520),
+        .pct = cortex_a520_pct,
+        .pct_size = FWK_ARRAY_SIZE(cortex_a520_pct),
+        .core_config = cortex_a520_core_config,
     },
     [1] = { { 0 } },
 };
 
 static const struct fwk_element element_table[2] = {
     [0] = {
-        .name = "TCOP_HAYES",
+        .name = "TCOP_CORTEX_A520",
         .sub_element_count = 4,
-        .data = hayes_domain_conf,
+        .data = cortex_a520_domain_conf,
     },
     [1] = { 0 },
 };
