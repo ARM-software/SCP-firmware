@@ -177,7 +177,13 @@ struct mod_thermal_mgmt_dev_config {
 
         /*! Integral term (PI loop) */
         int32_t k_integral;
-    } pi_controller;
+#ifdef PID
+       /*! Derivative term (PID loop) */
+       int32_t k_derivative;
+    } pid_controller;
+#else
+    }pi_controller;
+#endif
 
     /*! Temperature sensor identifier */
     fwk_id_t sensor_id;

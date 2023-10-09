@@ -97,6 +97,14 @@ struct mod_thermal_mgmt_dev_ctx {
     /* Integral (accumulated) error */
     int32_t integral_error;
 
+#ifdef PID
+    /* Derivative error */
+    int32_t derivative_error;
+
+   /* Last error for the derivative */
+   int32_t last_error;
+#endif
+
     /* Table of thermal actors */
     struct mod_thermal_mgmt_actor_ctx *actor_ctx_table;
 
