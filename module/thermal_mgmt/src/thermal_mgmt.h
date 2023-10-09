@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -96,6 +96,12 @@ struct mod_thermal_mgmt_dev_ctx {
 
     /* Integral (accumulated) error */
     int32_t integral_error;
+
+    /* Derivative error */
+    int32_t derivative_error;
+
+    /* Error from previous iteration */
+    int32_t prev_error;
 
     /* Table of thermal actors */
     struct mod_thermal_mgmt_actor_ctx *actor_ctx_table;

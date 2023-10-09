@@ -467,27 +467,27 @@ void test_thermal_mgmt_read_temperature_not_async_success(void)
     TEST_ASSERT_EQUAL(dev_ctx->cur_temp, dev_ctx->sensor_data.value);
 }
 
-void test_thermal_mgmt_pi_control_switched_off(void)
+void test_thermal_mgmt_pid_control_switched_off(void)
 {
     fwk_id_t element_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_THERMAL_MGMT, 0);
     struct mod_thermal_mgmt_dev_ctx *dev_ctx;
 
     dev_ctx = &mod_ctx.dev_ctx_table[0];
     dev_ctx->cur_temp = 20;
-    dev_ctx->config->pi_controller.switch_on_temperature = 31;
+    dev_ctx->config->pid_controller.switch_on_temperature = 31;
     dev_ctx->integral_error = 10;
     dev_ctx->thermal_allocatable_power = 0;
 
     fwk_id_get_element_idx_ExpectAndReturn(element_id, 0);
 
-    pi_control(element_id);
+    pid_control(element_id);
     TEST_ASSERT_EQUAL(dev_ctx->integral_error, 0);
     TEST_ASSERT_EQUAL(
         dev_ctx->thermal_allocatable_power,
         (uint32_t)dev_ctx->config->cold_state_power);
 }
 
-void test_thermal_mgmt_pi_control_anti_windup(void)
+void test_thermal_mgmt_pid_control_anti_windup(void)
 {
     fwk_id_t element_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_THERMAL_MGMT, 0);
     struct mod_thermal_mgmt_dev_ctx *dev_ctx;
@@ -499,31 +499,31 @@ void test_thermal_mgmt_pi_control_anti_windup(void)
      * integral error overpass the cut off value.
      */
     dev_ctx->cur_temp = 45;
-    dev_ctx->config->pi_controller.control_temperature = 50;
-    dev_ctx->config->pi_controller.switch_on_temperature = 40;
+    dev_ctx->config->pid_controller.control_temperature = 50;
+    dev_ctx->config->pid_controller.switch_on_temperature = 40;
     dev_ctx->integral_error = 10;
     dev_ctx->thermal_allocatable_power = 0;
-    dev_ctx->config->pi_controller.integral_cutoff = 4;
+    dev_ctx->config->pid_controller.integral_cutoff = 4;
 
     fwk_id_get_element_idx_ExpectAndReturn(element_id, 0);
-    pi_control(element_id);
+    pid_control(element_id);
     TEST_ASSERT_EQUAL(dev_ctx->integral_error, 10);
 
-    dev_ctx->config->pi_controller.integral_cutoff = 10;
-    dev_ctx->config->pi_controller.integral_max = 14;
+    dev_ctx->config->pid_controller.integral_cutoff = 10;
+    dev_ctx->config->pid_controller.integral_max = 14;
 
     fwk_id_get_element_idx_ExpectAndReturn(element_id, 0);
-    pi_control(element_id);
+    pid_control(element_id);
     TEST_ASSERT_EQUAL(dev_ctx->integral_error, 10);
 
-    dev_ctx->config->pi_controller.integral_max = 100;
+    dev_ctx->config->pid_controller.integral_max = 100;
 
     fwk_id_get_element_idx_ExpectAndReturn(element_id, 0);
-    pi_control(element_id);
+    pid_control(element_id);
     TEST_ASSERT_EQUAL(dev_ctx->integral_error, 15);
 }
 
-void test_thermal_mgmt_pi_control_positive_allocatable_power(void)
+void test_thermal_mgmt_pid_control_positive_allocatable_power(void)
 {
     fwk_id_t element_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_THERMAL_MGMT, 0);
     struct mod_thermal_mgmt_dev_ctx *dev_ctx;
@@ -536,25 +536,25 @@ void test_thermal_mgmt_pi_control_positive_allocatable_power(void)
      * allocatable power was properly calculated.
      */
     dev_ctx->cur_temp = 45;
-    dev_ctx->config->pi_controller.control_temperature = 50;
-    dev_ctx->config->pi_controller.switch_on_temperature = 40;
+    dev_ctx->config->pid_controller.control_temperature = 50;
+    dev_ctx->config->pid_controller.switch_on_temperature = 40;
     dev_ctx->integral_error = 10;
     dev_ctx->thermal_allocatable_power = 0;
-    dev_ctx->config->pi_controller.integral_cutoff = 10;
-    dev_ctx->config->pi_controller.integral_max = 100;
-    k_i = dev_ctx->config->pi_controller.k_integral = 1;
-    k_p = dev_ctx->config->pi_controller.k_p_undershoot = 2;
+    dev_ctx->config->pid_controller.integral_cutoff = 10;
+    dev_ctx->config->pid_controller.integral_max = 100;
+    k_i = dev_ctx->config->pid_controller.k_integral = 1;
+    k_p = dev_ctx->config->pid_controller.k_p_undershoot = 2;
     err =
-        dev_ctx->config->pi_controller.control_temperature - dev_ctx->cur_temp;
+        dev_ctx->config->pid_controller.control_temperature - dev_ctx->cur_temp;
     terr = err + dev_ctx->integral_error;
     allocatable_power = k_p * err + k_i * terr + dev_ctx->config->tdp;
 
     fwk_id_get_element_idx_ExpectAndReturn(element_id, 0);
-    pi_control(element_id);
+    pid_control(element_id);
     TEST_ASSERT_EQUAL(dev_ctx->thermal_allocatable_power, allocatable_power);
 }
 
-void test_thermal_mgmt_pi_control_negative_allocatable_power(void)
+void test_thermal_mgmt_pid_control_negative_allocatable_power(void)
 {
     fwk_id_t element_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_THERMAL_MGMT, 0);
     struct mod_thermal_mgmt_dev_ctx *dev_ctx;
@@ -566,17 +566,17 @@ void test_thermal_mgmt_pi_control_negative_allocatable_power(void)
      * allocatable power was properly set to 0.
      */
     dev_ctx->cur_temp = 55;
-    dev_ctx->config->pi_controller.control_temperature = 50;
-    dev_ctx->config->pi_controller.switch_on_temperature = 40;
+    dev_ctx->config->pid_controller.control_temperature = 50;
+    dev_ctx->config->pid_controller.switch_on_temperature = 40;
     dev_ctx->integral_error = 10;
     dev_ctx->thermal_allocatable_power = 0;
-    dev_ctx->config->pi_controller.integral_cutoff = 10;
-    dev_ctx->config->pi_controller.integral_max = 100;
-    dev_ctx->config->pi_controller.k_integral = 1;
-    dev_ctx->config->pi_controller.k_p_overshoot = 200;
+    dev_ctx->config->pid_controller.integral_cutoff = 10;
+    dev_ctx->config->pid_controller.integral_max = 100;
+    dev_ctx->config->pid_controller.k_integral = 1;
+    dev_ctx->config->pid_controller.k_p_overshoot = 200;
 
     fwk_id_get_element_idx_ExpectAndReturn(element_id, 0);
-    pi_control(element_id);
+    pid_control(element_id);
     TEST_ASSERT_EQUAL(dev_ctx->thermal_allocatable_power, 0);
 }
 
@@ -715,10 +715,10 @@ int mod_thermal_mgmt_test_main(void)
     RUN_TEST(test_thermal_mgmt_read_temperature_not_async_success);
 #endif
 
-    RUN_TEST(test_thermal_mgmt_pi_control_switched_off);
-    RUN_TEST(test_thermal_mgmt_pi_control_anti_windup);
-    RUN_TEST(test_thermal_mgmt_pi_control_positive_allocatable_power);
-    RUN_TEST(test_thermal_mgmt_pi_control_negative_allocatable_power);
+    RUN_TEST(test_thermal_mgmt_pid_control_switched_off);
+    RUN_TEST(test_thermal_mgmt_pid_control_anti_windup);
+    RUN_TEST(test_thermal_mgmt_pid_control_positive_allocatable_power);
+    RUN_TEST(test_thermal_mgmt_pid_control_negative_allocatable_power);
     RUN_TEST(test_thermal_mgmt_control_update_fail_last_reading);
     RUN_TEST(test_thermal_mgmt_control_update_fail_last_invalid_read);
     RUN_TEST(test_thermal_mgmt_control_update_last_success);

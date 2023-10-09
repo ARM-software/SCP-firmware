@@ -34,39 +34,41 @@ struct mod_thermal_mgmt_actor_ctx *get_actor_ctx(
     return &dev_ctx->actor_ctx_table[actor];
 }
 
-static void pi_control(fwk_id_t id)
+static void pid_control(fwk_id_t id)
 {
     struct mod_thermal_mgmt_dev_ctx *dev_ctx;
-    int32_t err, terr, pi_power;
-    int32_t k_p, k_i;
+    int32_t err, terr, pid_power;
+    int32_t k_p, k_i, k_d;
 
     dev_ctx = get_dev_ctx(id);
 
     if (dev_ctx->cur_temp <
-        dev_ctx->config->pi_controller.switch_on_temperature) {
-        /* The PI loop is not activated */
+        dev_ctx->config->pid_controller.switch_on_temperature) {
+        /* The PID loop is not activated */
         dev_ctx->integral_error = 0;
+        dev_ctx->prev_error = 0;
+
         dev_ctx->thermal_allocatable_power =
             (uint32_t)dev_ctx->config->cold_state_power;
 
         return;
     }
 
-    k_i = dev_ctx->config->pi_controller.k_integral;
+    k_i = dev_ctx->config->pid_controller.k_integral;
 
-    err = (int32_t)dev_ctx->config->pi_controller.control_temperature -
+    err = (int32_t)dev_ctx->config->pid_controller.control_temperature -
         (int32_t)dev_ctx->cur_temp;
 
-    k_p = (err < 0) ? dev_ctx->config->pi_controller.k_p_overshoot :
-                      dev_ctx->config->pi_controller.k_p_undershoot;
+    k_p = (err < 0) ? dev_ctx->config->pid_controller.k_p_overshoot :
+                      dev_ctx->config->pid_controller.k_p_undershoot;
 
     /* Evaluate the integral term */
     if (((err > 0) && (dev_ctx->integral_error < (INT32_MAX - err))) ||
         ((err < 0) && (dev_ctx->integral_error > (INT32_MIN - err)))) {
         terr = dev_ctx->integral_error + err;
 
-        if ((err < dev_ctx->config->pi_controller.integral_cutoff) &&
-            (terr < dev_ctx->config->pi_controller.integral_max)) {
+        if ((err < dev_ctx->config->pid_controller.integral_cutoff) &&
+            (terr < dev_ctx->config->pid_controller.integral_max)) {
             /*
              * The error is below the cutoff value and,
              * the accumulated error is still within the maximum permissible
@@ -76,11 +78,19 @@ static void pi_control(fwk_id_t id)
         }
     }
 
-    pi_power = (k_p * err) + (k_i * dev_ctx->integral_error);
+    /* Calculate the derivative term */
+    k_d = dev_ctx->config->pid_controller.k_derivative;
 
-    if (pi_power + (int32_t)dev_ctx->config->tdp > 0) {
+    dev_ctx->derivative_error = err - dev_ctx->prev_error;
+    dev_ctx->prev_error = err;
+
+    /* Calculate the PID power */
+    pid_power = (k_p * err) + (k_i * dev_ctx->integral_error) +
+        (k_d * dev_ctx->derivative_error);
+
+    if (pid_power + (int32_t)dev_ctx->config->tdp > 0) {
         dev_ctx->thermal_allocatable_power =
-            pi_power + (uint32_t)dev_ctx->config->tdp;
+            pid_power + (uint32_t)dev_ctx->config->tdp;
     } else {
         dev_ctx->thermal_allocatable_power = 0;
     }
@@ -177,7 +187,7 @@ static int control_update(fwk_id_t id)
     if (dev_ctx->control_needs_update) {
         dev_ctx->control_needs_update = false;
         if (dev_ctx->config->thermal_actors_count > 0) {
-            pi_control(id);
+            pid_control(id);
         }
 
         dev_ctx->tot_spare_power = 0;

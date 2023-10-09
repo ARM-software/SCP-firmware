@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -115,7 +115,7 @@ static const struct mod_thermal_mgmt_dev_config
     [MOD_THERMAL_MGMT_DOM_0] = {
         .slow_loop_mult = 2,
         .tdp = 10,
-        .pi_controller = {
+        .pid_controller = {
             .switch_on_temperature = 50,
             .control_temperature = 60,
             .integral_cutoff = 0,
@@ -135,7 +135,7 @@ static const struct mod_thermal_mgmt_dev_config
     [MOD_THERMAL_MGMT_DOM_1] = {
         .slow_loop_mult = 2,
         .tdp = 10,
-        .pi_controller = {
+        .pid_controller = {
             .switch_on_temperature = 50,
             .control_temperature = 60,
             .integral_cutoff = 0,

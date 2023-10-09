@@ -132,14 +132,14 @@ struct mod_thermal_mgmt_dev_config {
     /*!
      * \brief Switch-on temperature threshold.
      *
-     * \details The temperature above which the PI loop runs. Below this
+     * \details The temperature above which the PID loop runs. Below this
      *      threshold the power is allocated only on bias coefficients.
      */
     struct {
         /*!
          * \brief Switch-on temperature threshold.
          *
-         * \details The temperature above which the PI loop runs. Below this
+         * \details The temperature above which the PID loop runs. Below this
          *      threshold the power is allocated only on bias coefficients.
          */
         uint32_t switch_on_temperature;
@@ -148,7 +148,7 @@ struct mod_thermal_mgmt_dev_config {
          * \brief Control temperature
          *
          * \details The temperature that the system will achive once stabilised.
-         *      Due to the PI nature of the controller, some
+         *      Due to the PID nature of the controller, some
          *      overshoot/undershoot may occur. Note that the controller can
          *      only limit the temperature by placing a limit to the power to
          *      the heat source. It has no direct control on the heat source
@@ -172,15 +172,18 @@ struct mod_thermal_mgmt_dev_config {
          */
         int32_t integral_max;
 
-        /*! Proportional term when undershooting (PI loop)*/
+        /*! Proportional term when undershooting (PID loop)*/
         int32_t k_p_undershoot;
 
-        /*! Proportional term when overhooting (PI loop) */
+        /*! Proportional term when overhooting (PID loop) */
         int32_t k_p_overshoot;
 
-        /*! Integral term (PI loop) */
+        /*! Integral term (PID loop) */
         int32_t k_integral;
-    } pi_controller;
+
+        /*! Derivative term (PID loop) */
+        int32_t k_derivative;
+    } pid_controller;
 
     /*! Temperature sensor identifier */
     fwk_id_t sensor_id;
@@ -202,7 +205,7 @@ struct mod_thermal_mgmt_dev_config {
     /*!
      * \brief The number of actors in the thermal actors lookup table.
      *
-     * \details If it is left zero it will not the PI controller and power
+     * \details If it is left zero it will not run the PID controller and power
      *      distribution will not take place.
      */
     uint32_t thermal_actors_count;
