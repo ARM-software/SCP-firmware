@@ -30,6 +30,13 @@ set(SCP_TARGET_EXCLUDE_SCMI_PERF_PROTOCOL_OPS TRUE)
 
 set(SCP_ENABLE_OUTBAND_MSG_SUPPORT_INIT TRUE)
 
+if(SCP_ENABLE_SCMI_PERF_FAST_CHANNELS)
+    if(NOT DEFINED BUILD_HAS_MOD_TRANSPORT_FC)
+        option(BUILD_HAS_MOD_TRANSPORT_FC
+            "SCMI-PERF Fast Channel default implementation is transport based" ON)
+    endif()
+endif()
+
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/platform_system")
 list(PREPEND SCP_MODULE_PATHS
@@ -73,3 +80,9 @@ list(APPEND SCP_MODULES "psu")
 list(APPEND SCP_MODULES "mock-psu")
 list(APPEND SCP_MODULES "dvfs")
 list(APPEND SCP_MODULES "scmi-perf")
+
+if(SCP_ENABLE_SCMI_PERF_FAST_CHANNELS)
+    if(BUILD_HAS_MOD_TRANSPORT_FC)
+        list(APPEND SCP_MODULES "fch-polled")
+    endif()
+endif()

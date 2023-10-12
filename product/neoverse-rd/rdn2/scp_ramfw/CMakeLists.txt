@@ -77,6 +77,12 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_pl011.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_sid.c")
 
+if(SCP_ENABLE_SCMI_PERF_FAST_CHANNELS)
+    if(BUILD_HAS_MOD_TRANSPORT_FC)
+        target_sources(rdn2-bl2 PRIVATE "config_fch_polled.c")
+    endif()
+endif()
+
 #
 # Some of our firmware includes require CMSIS.
 #
