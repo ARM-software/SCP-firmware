@@ -60,7 +60,3 @@ list(APPEND SCP_MODULES "scmi-perf")
 list(APPEND SCP_MODULES "mock-psu")
 list(APPEND SCP_MODULES "psu")
 list(APPEND SCP_MODULES "tc-system")
-
-if(SCP_ENABLE_RESOURCE_PERMISSIONS)
-    list(APPEND SCP_MODULES,"resource-perms")
-endif()

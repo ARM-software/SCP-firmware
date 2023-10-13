@@ -60,6 +60,10 @@ else()
         PUBLIC -DPLATFORM_VARIANT=TC2_VARIANT_STD)
 endif()
 
+if(SCP_ENABLE_RESOURCE_PERMISSIONS)
+    list(APPEND SCP_MODULES "resource-perms")
+endif()
+
 target_include_directories(
     tc2-bl2 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include"
                    "${CMAKE_CURRENT_SOURCE_DIR}/../../common/include"
