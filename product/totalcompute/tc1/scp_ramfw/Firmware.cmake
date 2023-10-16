@@ -54,7 +54,3 @@ list(APPEND SCP_MODULES "timer")
 list(APPEND SCP_MODULES "mock-psu")
 list(APPEND SCP_MODULES "psu")
 list(APPEND SCP_MODULES "tc-system")
-
-if(SCP_ENABLE_RESOURCE_PERMISSIONS)
-    list(APPEND SCP_MODULES,"resource-perms")
-endif()
