@@ -46,6 +46,8 @@ target_sources(
 
 if(SCP_ENABLE_RESOURCE_PERMISSIONS)
     target_sources(tc1-bl2 PRIVATE "config_resource_perms.c")
+
+    list(APPEND SCP_MODULES "resource-perms")
 endif()
 
 #
@@ -62,3 +64,6 @@ target_link_libraries(tc1-bl2 PUBLIC cmsis::core-m)
 
 target_include_directories(tc1-bl2
     PUBLIC $<TARGET_PROPERTY:cmsis::core-m,INTERFACE_INCLUDE_DIRECTORIES>)
+
+set(SCP_MODULES ${SCP_MODULES} PARENT_SCOPE)
+set(SCP_MODULE_PATHS ${SCP_MODULE_PATHS} PARENT_SCOPE)
