@@ -10,6 +10,7 @@
 
 #include <fwk_id.h>
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -137,6 +138,21 @@ enum mod_cmn_cyprus_mem_region_type {
      * dedicated SN-F nodes).
      */
     MOD_CMN_CYPRUS_MEM_REGION_TYPE_SYSCACHE_SUB,
+
+    /*!
+     * Input/Output region.
+     * Non-hashed region serviced by dedicated HN-I and HN-D nodes.
+     */
+    MOD_CMN_CYPRUS_MEM_REGION_TYPE_IO,
+
+    /*!
+     * Region backed by the system cache (serviced by HN-S nodes in the
+     * system)
+     */
+    MOD_CMN_CYPRUS_MEM_REGION_TYPE_SYSCACHE,
+
+    /*! Memory region configuration type count */
+    MOD_CMN_CYPRUS_MEM_REGION_TYPE_COUNT,
 };
 
 /*!
@@ -152,8 +168,71 @@ struct mod_cmn_cyprus_mem_region_map {
     /*! Region configuration type */
     enum mod_cmn_cyprus_mem_region_type type;
 
-    /*! Target node id */
+    /*!
+     * \brief Target node id.
+     *
+     * \note Not used for ::MOD_CMN_CYPRUS_MEM_REGION_TYPE_SYSCACHE memory
+     *      regions as it uses the pool of HN-S nodes available in the
+     *      system.
+     */
     unsigned int node_id;
+
+    /*!
+     * \brief HN-S start and end positions of a SCG/HTG
+     *
+     * \details Each SCG/HTG covers an address range and this address range can
+     * be made to target a group of HN-Ss. These group of HN-Ss are typically
+     * bound by an arbitrary rectangle/square in the mesh. To aid automatic
+     * programming of the HN-Ss in SCG/HTG along with the discovery process,
+     * each SCG/HTG takes hns_pos_start and hns_pos_end. HN-S nodes which are
+     * bound by this range will be assigned to the respective SCG/HTG. This
+     * eliminates the process of manually looking at the mesh and assigning the
+     * HN-S node ids to a SCG/HTG.
+     *
+     *                                        hns_pos_end
+     *                                             xx
+     *                                            xx
+     *                                           xx
+     *                    ┌─────────────────────xx
+     *                    │                     │
+     *                    │                     │
+     *                    │                     │
+     *                    │                     │
+     *                    │    nth- SCG/HTG     │
+     *                    │                     │
+     *                    │                     │
+     *                    │                     │
+     *                    │                     │
+     *                   xx─────────────────────┘
+     *                  xx
+     *                 xx
+     *                xx
+     *         hns_pos_start
+     */
+
+    /*!
+     * \brief HN-S's bottom left node position
+     *
+     * \details \ref hns_pos_start is the HN-S's bottom left node position in
+     * the rectangle covering the HN-Ss for a SCG/HTG
+     *
+     * \note To be used only with \ref
+     * mod_cmn_cyprus_mem_region_type.MOD_CMN_CYPRUS_MEM_REGION_TYPE_SYSCACHE
+     * memory regions.
+     */
+    struct cmn_cyprus_node_pos hns_pos_start;
+
+    /*!
+     * \brief HN-S's top right node position
+     *
+     * \details \ref hns_pos_start is the HN-S's bottom left node position in
+     * the rectangle covering the HN-Ss for a SCG/HTG
+     *
+     * \note To be used only with \ref
+     * mod_cmn_cyprus_mem_region_type.MOD_CMN_CYPRUS_MEM_REGION_TYPE_SYSCACHE
+     * memory regions.
+     */
+    struct cmn_cyprus_node_pos hns_pos_end;
 };
 
 /*!
@@ -180,6 +259,17 @@ struct mod_cmn_cyprus_config {
 
     /*! HN-F SAM configuration data */
     const struct mod_cmn_cyprus_hnf_sam_config hnf_sam_config;
+
+    /*!
+     * \brief HN-S with CAL support flag
+     *
+     * \details When set to true, enables HN-S with CAL support. This flag will
+     * be used only if HN-S is found to be connected to CAL (When connected to
+     * a CAL port, node id of HN-S will be a odd number).
+     *
+     * \note Only CAL2 mode is supported at the moment.
+     */
+    bool hns_cal_mode;
 };
 
 /*!

@@ -19,6 +19,9 @@
 
 #define MOD_NAME "[CMN_CYPRUS] "
 
+/* Maximum number of SCG regions supported by the driver */
+#define MAX_SCG_COUNT 8
+
 /*!
  * \brief Structure to store the HN-S node info.
  */
@@ -31,6 +34,12 @@ struct cmn_cyprus_hns_info {
 
     /*! Pointer to the connected MXP register */
     struct cmn_cyprus_mxp_reg *mxp;
+
+    /*! Node Identifier */
+    unsigned int node_id;
+
+    /*! SCG that this HN-F node belongs to */
+    uint8_t scg_idx;
 };
 
 /*!
@@ -72,6 +81,15 @@ struct cmn_cyprus_ctx {
 
     /*! Count of CCLA nodes */
     unsigned int ccla_reg_count;
+
+    /*! Count of the I/O memory regions mapped in the RNSAM */
+    unsigned int io_region_count;
+
+    /*! Count of the syscache memory regions(SCG) mapped in the RNSAM */
+    unsigned int scg_count;
+
+    /*! Count of HN-S nodes per SCG */
+    uint8_t scg_hns_count[MAX_SCG_COUNT];
 };
 
 #endif /* INTERNAL_CMN_CYPRUS_CTX_H */

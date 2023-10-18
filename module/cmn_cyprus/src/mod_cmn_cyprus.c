@@ -11,6 +11,7 @@
 #include <internal/cmn_cyprus_ctx.h>
 #include <internal/cmn_cyprus_discovery_setup.h>
 #include <internal/cmn_cyprus_hnsam_setup.h>
+#include <internal/cmn_cyprus_rnsam_setup.h>
 
 #include <mod_clock.h>
 #include <mod_cmn_cyprus.h>
@@ -53,6 +54,17 @@ static int cmn_cyprus_setup(void)
             fwk_status_str(status));
         return status;
     }
+
+    /* Program the RNSAM */
+    status = cmn_cyprus_setup_rnsam(&ctx);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(
+            MOD_NAME "Error! RNSAM setup failed with %s",
+            fwk_status_str(status));
+        return status;
+    }
+
+    FWK_LOG_INFO(MOD_NAME "Done");
 
     return FWK_SUCCESS;
 }

@@ -470,14 +470,88 @@ static void print_mesh_node_count(void)
         MOD_NAME "Total CCG Link Agent nodes: %d", shared_ctx->ccla_reg_count);
 }
 
+static bool is_node_inside_rect(
+    struct cmn_cyprus_node_pos *node,
+    const struct cmn_cyprus_node_pos *rect_start,
+    const struct cmn_cyprus_node_pos *rect_end)
+{
+    return (
+        (node->pos_x >= rect_start->pos_x) &&
+        (node->pos_y >= rect_start->pos_y) &&
+        (node->pos_x <= rect_end->pos_x) && (node->pos_y <= rect_end->pos_y) &&
+        (node->port_num <= rect_end->port_num));
+}
+
+/* Helper function to check if hns is inside the SCG/HTG square/rectangle */
+static bool is_hns_inside_rect(
+    struct cmn_cyprus_node_pos *hns_node_pos,
+    const struct mod_cmn_cyprus_mem_region_map *region)
+{
+    const struct cmn_cyprus_node_pos *rect_start;
+    const struct cmn_cyprus_node_pos *rect_end;
+    bool is_inside_rect;
+
+    is_inside_rect = false;
+    rect_start = &region->hns_pos_start;
+    rect_end = &region->hns_pos_end;
+
+    if (is_node_inside_rect(hns_node_pos, rect_start, rect_end)) {
+        if (hns_node_pos->pos_y == rect_start->pos_y) {
+            is_inside_rect = (hns_node_pos->port_num >= rect_start->port_num);
+            return is_inside_rect;
+        } else if (hns_node_pos->pos_y == rect_end->pos_y) {
+            is_inside_rect = (hns_node_pos->port_num <= rect_end->port_num);
+            return is_inside_rect;
+        }
+
+        is_inside_rect = true;
+    }
+
+    return is_inside_rect;
+}
+
+/* Helper function to return the SCG index of the given HN-S node */
+static int get_hns_node_scg_idx(
+    struct cmn_cyprus_node_pos *hns_node_pos,
+    uint8_t *scg_idx)
+{
+    uint8_t scg_region_idx;
+    unsigned int region_idx;
+    const struct mod_cmn_cyprus_mem_region_map *region;
+
+    scg_region_idx = 0;
+
+    /* Get the SCG index for all the HN-S nodes in the mesh */
+    for (region_idx = 0; region_idx < shared_ctx->config->mmap_count;
+         region_idx++) {
+        region = &shared_ctx->config->mmap_table[region_idx];
+
+        if (region->type != MOD_CMN_CYPRUS_MEM_REGION_TYPE_SYSCACHE) {
+            continue;
+        }
+
+        /* Check if the given HN-S node is a part of the SCG */
+        if (is_hns_inside_rect(hns_node_pos, region)) {
+            *scg_idx = scg_region_idx;
+            return FWK_SUCCESS;
+        }
+        scg_region_idx++;
+    }
+
+    /* Return error if the given HN-F node is not a part of any SCG region */
+    return FWK_E_DATA;
+}
+
 static int store_hns_info(
     struct cmn_cyprus_node_cfg_reg *node,
     struct cmn_cyprus_mxp_reg *mxp)
 {
+    int status;
     unsigned int ldid;
     unsigned int node_id;
     unsigned int node_pos_x;
     unsigned int node_pos_y;
+    uint8_t scg_idx;
     uint8_t mesh_size_x;
     uint8_t mesh_size_y;
     uint8_t mxp_port;
@@ -500,6 +574,8 @@ static int store_hns_info(
     node_id = node_info_get_id(node->NODE_INFO);
     hns_info->node_pos.device_num = get_device_number(node_id);
 
+    hns_info->node_id = node_id;
+
     mesh_size_x = shared_ctx->config->mesh_size_x;
     mesh_size_y = shared_ctx->config->mesh_size_y;
 
@@ -519,6 +595,17 @@ static int store_hns_info(
      */
     mxp_port = get_port_number(node_id, mxp_port_count);
     hns_info->node_pos.port_num = mxp_port;
+
+    status = get_hns_node_scg_idx(&hns_info->node_pos, &scg_idx);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    /* Save SCG idx that this HN-F node belongs to */
+    hns_info->scg_idx = scg_idx;
+
+    /* Increment the HN-S count in the SCG */
+    shared_ctx->scg_hns_count[scg_idx]++;
 
     return FWK_SUCCESS;
 }
