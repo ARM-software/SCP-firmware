@@ -26,6 +26,11 @@
 /* Shared driver context pointer */
 static const struct cmn_cyprus_ctx *shared_ctx;
 
+static inline bool is_hns_node_isolated(struct cmn_cyprus_hns_reg *hns)
+{
+    return hns == 0;
+}
+
 /*
  * Configure Direct SN mapping.
  */
@@ -43,6 +48,11 @@ static int program_hnf_sam_direct_mapping(
     /* Program target SN node id in HN-F SAM */
     for (hns_idx = 0; hns_idx < shared_ctx->hns_count; hns_idx++) {
         hns = shared_ctx->hns_info_table[hns_idx].hns;
+
+        if (is_hns_node_isolated(hns)) {
+            continue;
+        }
+
         hns_ldid = node_info_get_ldid(hns->NODE_INFO);
 
         /* Incorrect SN-F table configuration */
@@ -122,6 +132,10 @@ static int program_hnf_sam_range_based_hashing(
     for (hns_idx = 0; hns_idx < shared_ctx->hns_count; hns_idx++) {
         hns = shared_ctx->hns_info_table[hns_idx].hns;
 
+        if (is_hns_node_isolated(hns)) {
+            continue;
+        }
+
         /* Program the target SN node IDs */
         status = configure_hashed_sn_nodes(
             hns,
@@ -176,6 +190,10 @@ static int configure_non_hashed_region(
     /* Program target SN node id in HN-F SAM */
     for (hns_idx = 0; hns_idx < shared_ctx->hns_count; hns_idx++) {
         hns = shared_ctx->hns_info_table[hns_idx].hns;
+
+        if (is_hns_node_isolated(hns)) {
+            continue;
+        }
 
         /* Configure non-hashed region address range */
         hns_configure_non_hashed_region_addr_range(
@@ -240,6 +258,10 @@ static void configure_hns_pwpr(void)
     /* Iterate through each HN-S node and configure the HN-F SAM */
     for (hns_idx = 0; hns_idx < shared_ctx->hns_count; hns_idx++) {
         hns = shared_ctx->hns_info_table[hns_idx].hns;
+
+        if (is_hns_node_isolated(hns)) {
+            continue;
+        }
 
         /* Set policy to ON */
         hns_set_pwpr_policy(hns, MOD_CMN_CYPRUS_HNS_PWPR_POLICY_ON);

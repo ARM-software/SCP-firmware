@@ -26,6 +26,9 @@
 #define MXP_NODE_INFO_NUM_DEVICE_PORT_MASK UINT64_C(0xF000000000000)
 #define MXP_NODE_INFO_NUM_DEVICE_PORT_POS  48
 
+/* MXP HN-S Isolation enable/disable */
+#define MXP_PORT_DISABLE_PORT_OFFSET UINT64_C(0x4)
+
 struct cmn_cyprus_node_cfg_reg *mxp_get_child_node(
     struct cmn_cyprus_mxp_reg *mxp,
     unsigned int child_index,
@@ -70,4 +73,18 @@ bool mxp_is_cal_connected(struct cmn_cyprus_mxp_reg *mxp, uint8_t port)
     return (mxp->PORT_CONNECT_INFO[port] &
             MXP_PORT_CONNECT_INFO_CAL_CONNECTED_MASK) >>
         MXP_PORT_CONNECT_INFO_CAL_CONNECTED_POS;
+}
+
+void mxp_enable_device(
+    struct cmn_cyprus_mxp_reg *mxp,
+    uint8_t port_num,
+    uint8_t device_num)
+{
+    uint8_t port_offset, device_mask;
+
+    port_offset = (port_num * MXP_PORT_DISABLE_PORT_OFFSET);
+    device_mask = (0x1 << device_num);
+
+    /* Enable device in the XP port */
+    mxp->PORT_DISABLE &= ~(device_mask << port_offset);
 }

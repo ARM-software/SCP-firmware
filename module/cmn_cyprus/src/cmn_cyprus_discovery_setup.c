@@ -33,6 +33,10 @@
 #define MAX_RNF_COUNT 256
 #define MAX_CCG_COUNT 32
 
+/* Max MXP port/device count */
+#define MAX_MXP_PORT_COUNT   6
+#define MAX_MXP_DEVICE_COUNT 4
+
 /* Peripheral ID Revision Numbers */
 #define PERIPH_ID_2_MASK    UINT64_C(0xFF)
 #define PERIPH_ID_2_REV_POS 4
@@ -353,6 +357,135 @@ static int discover_node(
     return status;
 }
 
+/*
+ * Check if the given HN-S or HN-S MPAM node must be isolated by comparing the
+ * node base with the entries in the isolated HN-S table from config data.
+ */
+static bool is_node_base_isolated(uintptr_t node_base)
+{
+    unsigned int idx;
+    struct isolated_hns_node_info *isolated_hns_table;
+
+    isolated_hns_table = shared_ctx->config->isolated_hns_table;
+
+    /* Iterate through the list of HN-S nodes to be isolated */
+    for (idx = 0; idx < shared_ctx->config->isolated_hns_count; idx++) {
+        if ((node_base == isolated_hns_table[idx].hns_base) ||
+            (node_base == isolated_hns_table[idx].hns_mpam_s_base) ||
+            (node_base == isolated_hns_table[idx].hns_mpam_ns_base)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/*
+ * Check if the given node base address belongs to an isolated HN-S node from
+ * the configuration data.
+ */
+static bool node_base_is_hns(uintptr_t node_base)
+{
+    unsigned int idx;
+    struct isolated_hns_node_info *isolated_hns_table;
+
+    isolated_hns_table = shared_ctx->config->isolated_hns_table;
+
+    /* Iterate through the list of HN-S nodes to be isolated */
+    for (idx = 0; idx < shared_ctx->config->isolated_hns_count; idx++) {
+        if (node_base == isolated_hns_table[idx].hns_base) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/* Check if the given node positions match */
+static bool is_node_pos_equal(
+    struct cmn_cyprus_node_pos *node1,
+    struct cmn_cyprus_node_pos *node2)
+{
+    /* Check if X and Y positions match */
+    if ((node1->pos_x == node2->pos_x) && (node1->pos_y == node2->pos_y)) {
+        /* Check if port number and device number match */
+        if ((node1->port_num == node2->port_num) &&
+            (node1->device_num == node2->device_num)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/*
+ * Check if the given HN-S node must be isolated by comparing the node position.
+ */
+static bool is_hns_pos_isolated(struct cmn_cyprus_node_pos *hns_pos)
+{
+    unsigned int idx;
+    struct isolated_hns_node_info *isolated_hns_table;
+
+    isolated_hns_table = shared_ctx->config->isolated_hns_table;
+
+    for (idx = 0; idx < shared_ctx->config->isolated_hns_count; idx++) {
+        if (is_node_pos_equal(hns_pos, &isolated_hns_table[idx].hns_pos)) {
+            FWK_LOG_ERR(
+                MOD_NAME "  P%u, D%u, Isolated HN-S",
+                hns_pos->port_num,
+                hns_pos->device_num);
+            return true;
+        }
+    }
+    return false;
+}
+
+/*
+ * Disable MXP device isolation for HN-F/S device type.
+ */
+static void disable_hns_isolation(struct cmn_cyprus_mxp_reg *mxp)
+{
+    enum cmn_cyprus_device_type port_device_type;
+    unsigned int hns_node_id;
+    uint8_t device_num;
+    uint8_t mesh_size_x;
+    uint8_t mesh_size_y;
+    uint8_t port_num;
+    struct cmn_cyprus_node_pos hns_pos;
+
+    mesh_size_x = shared_ctx->config->mesh_size_x;
+    mesh_size_y = shared_ctx->config->mesh_size_y;
+
+    /* Iterate through each port in the MXP */
+    for (port_num = 0; port_num < MAX_MXP_PORT_COUNT; port_num++) {
+        port_device_type = mxp_get_device_type(mxp, port_num);
+        if ((port_device_type != DEVICE_TYPE_HN_F) &&
+            (port_device_type != DEVICE_TYPE_HN_S)) {
+            continue;
+        }
+
+        hns_node_id = node_info_get_id(mxp->NODE_INFO);
+
+        /* Initialize node position of the HN-S node */
+        hns_pos.pos_x = get_node_pos_x(hns_node_id, mesh_size_x, mesh_size_y);
+        hns_pos.pos_y = get_node_pos_y(hns_node_id, mesh_size_x, mesh_size_y);
+        hns_pos.port_num = port_num;
+
+        /* Iterate through each device in the XP port */
+        for (device_num = 0; device_num < MAX_MXP_DEVICE_COUNT; device_num++) {
+            hns_pos.device_num = device_num;
+
+            if (is_hns_pos_isolated(&hns_pos)) {
+                /* Skip HN-S nodes that ought to be isolated */
+                continue;
+            }
+
+            /* Disable HN-S isolation for the hns node */
+            mxp_enable_device(mxp, port_num, device_num);
+        }
+    }
+}
+
 static int discover_mxp_nodes(struct cmn_cyprus_mxp_reg *mxp)
 {
     int status;
@@ -395,6 +528,14 @@ static int discover_mxp_nodes(struct cmn_cyprus_mxp_reg *mxp)
         node =
             mxp_get_child_node(mxp, node_idx, shared_ctx->config->periphbase);
 
+        /* Check if the node must be skipped due to HN-S isolation */
+        if (is_node_base_isolated((uintptr_t)node)) {
+            if (node_base_is_hns((uintptr_t)node)) {
+                shared_ctx->isolated_hns_count++;
+            }
+            continue;
+        }
+
         status = discover_node(node, mxp);
         if (status != FWK_SUCCESS) {
             return status;
@@ -436,6 +577,8 @@ static int discover_mesh_topology(void)
 
         mxp = (struct cmn_cyprus_mxp_reg *)node;
 
+        disable_hns_isolation(mxp);
+
         /* Discover the nodes connected to the crosspoint */
         status = discover_mxp_nodes(mxp);
         if (status != FWK_SUCCESS) {
@@ -450,7 +593,12 @@ static void print_mesh_node_count(void)
 {
     FWK_LOG_INFO(MOD_NAME "Total RN-SAM nodes: %d", shared_ctx->rnsam_count);
 
-    FWK_LOG_INFO(MOD_NAME "Total HN-S nodes: %d", shared_ctx->hns_count);
+    FWK_LOG_INFO(
+        MOD_NAME "Total HN-S nodes: %d",
+        (shared_ctx->hns_count + shared_ctx->isolated_hns_count));
+    FWK_LOG_INFO(
+        MOD_NAME "Isolated HN-S nodes: %d",
+        shared_ctx->config->isolated_hns_count);
 
     FWK_LOG_INFO(MOD_NAME "Total RN-D nodes: %d", shared_ctx->rnd_count);
 
@@ -634,6 +782,11 @@ static int cmn_cyprus_init_node_info(struct cmn_cyprus_mxp_reg *mxp)
         /* Pointer to the child node */
         node = mxp_get_child_node(mxp, node_idx, config->periphbase);
 
+        if (is_node_base_isolated((uintptr_t)node)) {
+            /* Skip isolated HN-S nodes */
+            continue;
+        }
+
         /* Get the node type identifier */
         node_type = node_info_get_type(node->NODE_INFO);
 
@@ -710,7 +863,8 @@ int cmn_cyprus_discovery(struct cmn_cyprus_ctx *ctx)
 
     /* HN-S Info table */
     shared_ctx->hns_info_table = fwk_mm_calloc(
-        shared_ctx->hns_count, sizeof(*shared_ctx->hns_info_table));
+        (shared_ctx->hns_count + shared_ctx->isolated_hns_count),
+        sizeof(*shared_ctx->hns_info_table));
 
     /* RN-SAM table */
     shared_ctx->rnsam_table = fwk_mm_calloc(

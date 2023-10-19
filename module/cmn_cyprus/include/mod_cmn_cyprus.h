@@ -238,6 +238,23 @@ struct mod_cmn_cyprus_mem_region_map {
 /*!
  * \brief CMN Cyprus configuration data.
  */
+struct isolated_hns_node_info {
+    /*! Position of the isolated HN-S node */
+    struct cmn_cyprus_node_pos hns_pos;
+
+    /*! Base address of the isolated HN-S node */
+    uintptr_t hns_base;
+
+    /*! Base address of the isolated HN-S MPAM_S node */
+    uintptr_t hns_mpam_s_base;
+
+    /*! Base address of the isolated HN-S MPAM_NS node */
+    uintptr_t hns_mpam_ns_base;
+};
+
+/*!
+ * \brief CMN Cyprus configuration data.
+ */
 struct mod_cmn_cyprus_config {
     /*! Base address of the configuration address space */
     uintptr_t periphbase;
@@ -270,6 +287,12 @@ struct mod_cmn_cyprus_config {
      * \note Only CAL2 mode is supported at the moment.
      */
     bool hns_cal_mode;
+
+    /*! Table of isolated HN-S nodes */
+    struct isolated_hns_node_info *isolated_hns_table;
+
+    /*! Number of entries in the \ref isolated_hns_table */
+    unsigned int isolated_hns_count;
 };
 
 /*!

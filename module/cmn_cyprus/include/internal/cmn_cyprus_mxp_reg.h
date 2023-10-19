@@ -126,4 +126,22 @@ enum cmn_cyprus_device_type mxp_get_device_type(
  */
 bool mxp_is_cal_connected(struct cmn_cyprus_mxp_reg *mxp, uint8_t port);
 
+/*
+ * Enable the device connected to the given MXP port by disabling
+ * HN-S Isolation for the device.
+ *
+ * \param mxp Pointer to the cross point node.
+ *      \pre The cross point node pointer must be valid.
+ * \param port_num Port number.
+ *      \pre The port number should be valid.
+ * \param device_num Device number.
+ *      \pre The device number should be valid.
+ *
+ * \return Nothing.
+ */
+void mxp_enable_device(
+    struct cmn_cyprus_mxp_reg *mxp,
+    uint8_t port_num,
+    uint8_t device_num);
+
 #endif /* CMN_CYPRUS_MXP_REG_INTERNAL_H */

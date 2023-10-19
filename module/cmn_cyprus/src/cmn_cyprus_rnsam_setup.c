@@ -153,8 +153,8 @@ static void configure_scg_target_nodes(
             continue;
         }
 
-        /* Skip the HN-F node if it is not part of the SCG */
-        if (hns_info->scg_idx != scg_idx) {
+        /* Skip the HN-F node if it is isolated or belongs to a different SCG */
+        if ((hns_info->hns == 0) || (hns_info->scg_idx != scg_idx)) {
             continue;
         }
 

@@ -90,6 +90,9 @@ struct cmn_cyprus_ctx {
 
     /*! Count of HN-S nodes per SCG */
     uint8_t scg_hns_count[MAX_SCG_COUNT];
+
+    /* Count of isolated HN-S nodes */
+    unsigned int isolated_hns_count;
 };
 
 #endif /* INTERNAL_CMN_CYPRUS_CTX_H */
