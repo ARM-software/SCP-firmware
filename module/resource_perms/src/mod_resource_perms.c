@@ -228,20 +228,11 @@ static void backup_resource_permission(
     mod_res_perms_t *resource_permission_backup,
     struct protocol_permissions_counters *config)
 {
-    /* Do a backup before making the changes if required */
-    if ((config->cmd_count != 0) && (config->resource_count != 0) &&
-        (resource_permission_backup == NULL)) {
-        resource_permission_backup = (mod_res_perms_t *)fwk_mm_alloc(
-            resources_perms_ctx.agent_count * config->cmd_count *
-                config->resource_count,
-            sizeof(mod_res_perms_t));
-
-        fwk_str_memcpy(
-            resource_permission_backup,
-            resource_permission,
-            resources_perms_ctx.agent_count * config->cmd_count *
-                config->resource_count * sizeof(mod_res_perms_t));
-    }
+    fwk_str_memcpy(
+        resource_permission_backup,
+        resource_permission,
+        resources_perms_ctx.agent_count * config->cmd_count *
+            config->resource_count * sizeof(mod_res_perms_t));
 }
 
 static int mod_res_message_id_to_index(
@@ -901,10 +892,12 @@ static int set_agent_resource_permissions(
     }
 
     /* Do a backup before making the changes if required */
-    backup_resource_permission(
-        protocol_perms->resource_permission,
-        protocol_perms->resource_permission_backup,
-        protocol_perms->counters);
+    if (protocol_perms->resource_permission_backup != NULL) {
+        backup_resource_permission(
+            protocol_perms->resource_permission,
+            protocol_perms->resource_permission_backup,
+            protocol_perms->counters);
+    }
 
     for (message_idx = protocol_perms->start_message_idx;
          message_idx <= protocol_perms->end_message_idx;
@@ -1373,6 +1366,22 @@ static int mod_res_perms_process_bind_request(
     return FWK_SUCCESS;
 }
 
+static mod_res_perms_t *alloc_perms_backup(
+    struct protocol_permissions_counters *perms_counters)
+{
+    mod_res_perms_t *backup = NULL;
+
+    if ((perms_counters->cmd_count != 0) &&
+        (perms_counters->resource_count != 0)) {
+        backup = (mod_res_perms_t *)fwk_mm_alloc(
+            resources_perms_ctx.agent_count * perms_counters->cmd_count *
+                perms_counters->resource_count,
+            sizeof(mod_res_perms_t));
+    }
+
+    return backup;
+}
+
 static int mod_res_perms_resources_init(
     fwk_id_t module_id,
     unsigned int element_count,
@@ -1386,16 +1395,34 @@ static int mod_res_perms_resources_init(
             (struct mod_res_agent_permission *)config->agent_permissions;
         resources_perms_ctx.agent_count = config->agent_count;
         resources_perms_ctx.protocol_count = config->protocol_count;
+
         resources_perms_ctx.clock_count = config->clock_counters.count;
+        resources_perms_backup.scmi_clock_perms =
+            alloc_perms_backup(&config->clock_counters);
+
         resources_perms_ctx.sensor_count = config->sensor_counters.count;
+        resources_perms_backup.scmi_sensor_perms =
+            alloc_perms_backup(&config->sensor_counters);
+
         resources_perms_ctx.pd_count = config->pd_counters.count;
+        resources_perms_backup.scmi_pd_perms =
+            alloc_perms_backup(&config->pd_counters);
+
         resources_perms_ctx.perf_count = config->perf_counters.count;
-        resources_perms_ctx.device_count = config->device_count;
+        resources_perms_backup.scmi_perf_perms =
+            alloc_perms_backup(&config->perf_counters);
+
 #ifdef BUILD_HAS_MOD_SCMI_RESET_DOMAIN
         resources_perms_ctx.reset_domain_count =
             config->reset_domain_counters.count;
+        resources_perms_backup.scmi_reset_domain_perms =
+            alloc_perms_backup(&config->reset_domain_counters);
 #endif
         resources_perms_ctx.voltd_count = config->voltd_counters.count;
+        resources_perms_backup.scmi_voltd_perms =
+            alloc_perms_backup(&config->voltd_counters);
+
+        resources_perms_ctx.device_count = config->device_count;
         resources_perms_ctx.domain_devices =
             (struct mod_res_device *)config->domain_devices;
     }
