@@ -15,6 +15,7 @@
 
 #include <fwk_core.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -273,5 +274,160 @@ struct pd_system_shutdown_request {
     /* System shutdown type */
     enum mod_pd_system_shutdown system_shutdown;
 };
+
+/*
+ * Internal state-related utility functions
+ */
+
+/*
+ * Check whether a state is valid for a given domain.
+ *
+ * \param pd Description of the relevant power domain.
+ * \param state The state to be checked.
+ *
+ * \retval true State is valid.
+ * \retval false State is not valid.
+ */
+bool is_valid_state(const struct pd_ctx *pd, unsigned int state);
+
+/*
+ * Normalize a given power state.
+ *
+ * \param state Power state.
+ *
+ * \return Normalized state.
+ */
+unsigned int normalize_state(unsigned int state);
+
+/*
+ * Find if one state is deeper than an another.
+ *
+ * \param state Power state.
+ * \param state_to_compare_to Power state to compare against.
+ *
+ * \return Whether or not the given state is deeper.
+ */
+bool is_deeper_state(unsigned int state, unsigned int state_to_compare_to);
+
+/*
+ * Find if one state is shallower than another.
+ *
+ * \param state Power state.
+ * \param state_to_compare_to Power state to compare against.
+ *
+ * \return Whether or not the given state is shallower.
+ */
+bool is_shallower_state(unsigned int state, unsigned int state_to_compare_to);
+
+/*
+ * Check whether or not a parent power state is allowed by a given child.
+ *
+ * \param child Child power domain description.
+ * \param parent_state Parent power state.
+ * \param child_state Child power state.
+ *
+ * \retval true The state is allowed.
+ * \retval true The state is not allowed.
+ */
+bool is_allowed_by_child(
+    const struct pd_ctx *child,
+    unsigned int parent_state,
+    unsigned int child_state);
+
+/*
+ * Check whether or not a given parent state is allowed by that parent's
+ * children.
+ *
+ * \param pd Parent power domain description.
+ * \param state Parent power state.
+ *
+ * \retval true The state is allowed.
+ * \retval true The state is not allowed.
+ */
+bool is_allowed_by_children(const struct pd_ctx *pd, unsigned int state);
+
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
+/*
+ * Get the name of a state.
+ *
+ * \param pd Power domain description.
+ * \param state Power state.
+ *
+ * \return The name of the state.
+ */
+const char *get_state_name(const struct pd_ctx *pd, unsigned int state);
+#endif
+
+/*
+ * Find the number of bits to right shift in order for the mask to be all
+ * zeroes.
+ *
+ * \param mask 32-bit mask.
+ *
+ * \return The number of bits to shift.
+ */
+unsigned int number_of_bits_to_shift(uint32_t mask);
+
+/*
+ * Get the level state from a given composite power state.
+ *
+ * \param table State mask table.
+ * \param composite_state Composite state.
+ * \param level Level in power domain tree.
+ *
+ * \return The level state.
+ */
+unsigned int get_level_state_from_composite_state(
+    const uint32_t *table,
+    uint32_t composite_state,
+    int level);
+
+/*
+ * Get the highest level from a given composite power state.
+ *
+ * \param pd Power domain description.
+ * \param composite_state Composite state.
+ *
+ * \return The highest level.
+ */
+int get_highest_level_from_composite_state(
+    const struct pd_ctx *pd,
+    uint32_t composite_state);
+
+/*
+ * Check if a composite state is valid for a given domain.
+ *
+ * \param target_pd Power domain description.
+ * \param composite_state Composite state.
+ *
+ * \retval true The composite state is valid.
+ * \retval true The composite state is not valid.
+ */
+bool is_valid_composite_state(
+    struct pd_ctx *target_pd,
+    uint32_t composite_state);
+
+/*
+ * Determine whether a composite state requires that the transition begins
+ * with the highest or lowest level.
+ *
+ * \param lowest_pd Target of the composite state transition request.
+ * \param uint32_t composite_state Target composite state.
+ * \retval true The power state transition must propagate upwards.
+ * \retval false The power state transition must propagate downwards.
+ */
+bool is_upwards_transition_propagation(
+    const struct pd_ctx *lowest_pd,
+    uint32_t composite_state);
+
+/*
+ * Check whether a transition to a given power state for a power domain is
+ * possible given the current state of its parent and children (if any).
+ *
+ * \param pd Description of the power domain to check the power state transition
+ *      for.
+ * \param state Power state.
+ */
+bool is_allowed_by_parent_and_children(struct pd_ctx *pd, unsigned int state);
 
 #endif /* POWER_DOMAIN_H */
