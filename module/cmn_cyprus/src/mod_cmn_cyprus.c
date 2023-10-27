@@ -146,9 +146,41 @@ static int cmn_cyprus_process_notification(
     return FWK_SUCCESS;
 }
 
+static int cmn_cyprus_process_bind_request(
+    fwk_id_t requester_id,
+    fwk_id_t id,
+    fwk_id_t api_id,
+    const void **api)
+{
+    enum mod_cmn_cyprus_api_idx api_idx;
+    int status;
+
+    api_idx = (enum mod_cmn_cyprus_api_idx)fwk_id_get_api_idx(api_id);
+
+    /* Invalid parameters */
+    if (!fwk_module_is_valid_module_id(id)) {
+        return FWK_E_PARAM;
+    }
+
+    switch (api_idx) {
+    case MOD_CMN_CYPRUS_API_IDX_MAP_IO_REGION:
+        get_rnsam_memmap_api(api);
+        status = FWK_SUCCESS;
+        break;
+
+    default:
+        status = FWK_E_PARAM;
+        break;
+    };
+
+    return status;
+}
+
 const struct fwk_module module_cmn_cyprus = {
     .type = FWK_MODULE_TYPE_DRIVER,
+    .api_count = MOD_CMN_CYPRUS_API_COUNT,
     .init = cmn_cyprus_init,
     .start = cmn_cyprus_start,
     .process_notification = cmn_cyprus_process_notification,
+    .process_bind_request = cmn_cyprus_process_bind_request,
 };

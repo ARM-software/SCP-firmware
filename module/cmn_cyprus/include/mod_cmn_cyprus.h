@@ -296,6 +296,14 @@ struct mod_cmn_cyprus_config {
 };
 
 /*!
+ * \brief Module API indices
+ */
+enum mod_cmn_cyprus_api_idx {
+    MOD_CMN_CYPRUS_API_IDX_MAP_IO_REGION,
+    MOD_CMN_CYPRUS_API_COUNT,
+};
+
+/*!
  * @}
  */
 

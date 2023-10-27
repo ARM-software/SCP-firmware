@@ -23,4 +23,13 @@
  */
 int cmn_cyprus_setup_rnsam(struct cmn_cyprus_ctx *ctx);
 
+/*
+ * Get RNSAM mmap API.
+ *
+ * \param[out] api Pointer to the API pointer variable.
+ *
+ * \return None.
+ */
+void get_rnsam_memmap_api(const void **api);
+
 #endif /* CMN_CYPRUS_RNSAM_SETUP_INTERNAL_H */

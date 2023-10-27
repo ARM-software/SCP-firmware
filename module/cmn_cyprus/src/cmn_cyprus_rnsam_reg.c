@@ -41,10 +41,10 @@
 #define RNSAM_REGION_ENTRY_TARGET_TYPE_POS 2
 #define RNSAM_REGION_ENTRY_SIZE_POS        56
 #define RNSAM_REGION_ENTRY_BASE_POS        26
+#define RNSAM_ENCODED_REGION_SIZE_MASK     UINT64_C(0x7F)
 
 /* RNSAM Non-hashed region target node id */
 #define RNSAM_NON_HASH_TGT_NODEID_ENTRY_BITS_WIDTH  12
-#define RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK        UINT64_C(0x0FFF)
 #define RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP 4
 
 /* RNSAM SCG/HTG target node ID */
@@ -293,6 +293,57 @@ static int configure_htg_region_base_and_size(
     return FWK_SUCCESS;
 }
 
+/*
+ * Get the non-hashed region end address programmed in the RNSAM register.
+ */
+static uint64_t get_non_hash_region_end_addr(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    unsigned int region_idx)
+{
+    uint64_t lsb_addr_mask;
+    uint64_t end_addr;
+
+    lsb_addr_mask = rnsam_ctx.non_hash_lsb_addr_mask;
+
+    /* Read the end address of the programmed region */
+    if (region_idx < RNSAM_NON_HASH_REG_COUNT) {
+        end_addr =
+            (rnsam->NON_HASH_MEM_REGION_CFG2[region_idx] & ~lsb_addr_mask);
+    } else {
+        end_addr =
+            (rnsam->NON_HASH_MEM_REGION_CFG2_GRP2
+                 [region_idx - RNSAM_NON_HASH_REG_COUNT] &
+             ~lsb_addr_mask);
+    }
+
+    return end_addr;
+}
+
+/*
+ * Get the non-hashed region size programmed in the RNSAM register.
+ */
+static uint64_t get_non_hash_region_size(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    unsigned int region_idx)
+{
+    uint64_t encoded_size;
+
+    /* Get the encoded memory region size */
+    if (region_idx < RNSAM_NON_HASH_REG_COUNT) {
+        encoded_size =
+            (rnsam->NON_HASH_MEM_REGION[region_idx] >>
+             RNSAM_REGION_ENTRY_SIZE_POS);
+    } else {
+        encoded_size =
+            (rnsam->NON_HASH_MEM_REGION_GRP2
+                 [region_idx - RNSAM_NON_HASH_REG_COUNT] >>
+             RNSAM_REGION_ENTRY_SIZE_POS);
+    }
+
+    encoded_size &= RNSAM_ENCODED_REGION_SIZE_MASK;
+    return sam_decode_region_size(encoded_size);
+}
+
 void rnsam_stall(struct cmn_cyprus_rnsam_reg *rnsam)
 {
     /* Stall RNSAM requests and enable default target ID selection */
@@ -455,6 +506,69 @@ void rnsam_set_htg_region_valid(
         rnsam->HASHED_TGT_GRP_CFG1_REGION[region_idx - RNSAM_HTG_REG_COUNT] |=
             RNSAM_REGION_ENTRY_VALID;
     }
+}
+
+uint64_t rnsam_get_non_hashed_region_base(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    unsigned int region_idx)
+{
+    uint64_t lsb_addr_mask;
+    uint32_t register_idx;
+
+    lsb_addr_mask = rnsam_ctx.non_hash_lsb_addr_mask;
+
+    if (region_idx < RNSAM_NON_HASH_REG_COUNT) {
+        /* Return the base address programmed in the register */
+        return (rnsam->NON_HASH_MEM_REGION[region_idx] & ~lsb_addr_mask);
+    } else {
+        register_idx = (region_idx - RNSAM_NON_HASH_REG_COUNT);
+        /* Return the base address programmed in the register */
+        return (rnsam->NON_HASH_MEM_REGION_GRP2[register_idx] & ~lsb_addr_mask);
+    }
+}
+
+uint64_t rnsam_get_non_hashed_region_size(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    unsigned int region_idx)
+{
+    uint64_t base;
+    uint64_t size;
+    uint64_t end_addr;
+
+    /*
+     * If Range comparison mode is enabled, get the end address and then
+     * calculate the region size otherwise get the size of the non-hashed
+     * region.
+     */
+    if (rnsam_ctx.non_hash_rcomp_en) {
+        end_addr = get_non_hash_region_end_addr(rnsam, region_idx);
+        base = rnsam_get_non_hashed_region_base(rnsam, region_idx);
+
+        fwk_assert(base > 0);
+
+        size = (end_addr - base);
+    } else {
+        /* Program base address and size of the region */
+        size = get_non_hash_region_size(rnsam, region_idx);
+    }
+
+    return size;
+}
+
+unsigned int rnsam_get_non_hashed_region_target_id(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    unsigned int region_idx)
+{
+    uint32_t register_idx;
+    uint32_t bit_pos;
+
+    register_idx = region_idx / RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP;
+    bit_pos = RNSAM_NON_HASH_TGT_NODEID_ENTRY_BITS_WIDTH *
+        (region_idx % RNSAM_NON_HASH_TGT_NODEID_ENTRIES_PER_GROUP);
+
+    /* Return the target node ID programmed in the register */
+    return (rnsam->NON_HASH_TGT_NODEID[register_idx] >> bit_pos) &
+        RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK;
 }
 
 int setup_rnsam_ctx(struct cmn_cyprus_rnsam_reg *rnsam)

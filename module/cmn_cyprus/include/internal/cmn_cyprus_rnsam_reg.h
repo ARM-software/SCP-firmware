@@ -23,6 +23,9 @@
 #define RNSAM_HASH_MEM_REGION_COUNT \
     (RNSAM_HTG_REG_COUNT + RNSAM_HTG_REG_GRP2_COUNT)
 
+/* Non-hashed region target Node ID mask */
+#define RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK UINT64_C(0x0FFF)
+
 /*!
  * RNSAM node type.
  */
@@ -182,6 +185,45 @@ void rnsam_enable_htg_cal_mode(
  * \return nothing.
  */
 void rnsam_set_htg_region_valid(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    unsigned int region_idx);
+
+/*
+ * Get the programmed base address of the given non-hashed region.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param region_idx Non-hashed region index.
+ *
+ * \return Base address of the given non-hashed region.
+ */
+uint64_t rnsam_get_non_hashed_region_base(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    unsigned int region_idx);
+
+/*
+ * Get the programmed region size of the given non-hashed region.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param region_idx Non-hashed region index.
+ *
+ * \return Size of the given non-hashed region.
+ */
+uint64_t rnsam_get_non_hashed_region_size(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    unsigned int region_idx);
+
+/*
+ * Get the programmed target node ID of the given non-hashed region.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param region_idx Non-hashed region index.
+ *
+ * \return Target node ID of the given non-hashed region.
+ */
+unsigned int rnsam_get_non_hashed_region_target_id(
     struct cmn_cyprus_rnsam_reg *rnsam,
     unsigned int region_idx);
 

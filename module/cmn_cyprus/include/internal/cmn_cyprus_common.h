@@ -31,4 +31,15 @@
  */
 uint64_t sam_encode_region_size(uint64_t size);
 
+/*
+ * Convert encoded memory region size to the region size.
+ *
+ * \note Only applicable when RCOMP mode is not enabled.
+ *
+ * \param encoded_size Encoded Memory region size to be converted
+ *
+ * \return size
+ */
+uint64_t sam_decode_region_size(uint64_t encoded_size);
+
 #endif /* CMN_CYPRUS_COMMON_INTERNAL_H */

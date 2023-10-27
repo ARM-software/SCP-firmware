@@ -14,6 +14,8 @@
 
 #include <mod_cmn_cyprus.h>
 
+#include <interface_cmn.h>
+
 #include <fwk_log.h>
 
 #include <stddef.h>
@@ -244,6 +246,168 @@ static int program_rnsam_region(
     }
 
     return status;
+}
+
+/*
+ * Check if the base address of a given region overlaps with another region's
+ * address range.
+ */
+static bool check_addr_overlap(
+    uint64_t region1_start,
+    uint64_t region2_start,
+    uint64_t region2_end)
+{
+    /* Check if start address falls within the given region address range */
+    return ((region1_start >= region2_start) && (region1_start <= region2_end));
+}
+
+/*
+ * Helper function to check if the given non-hashed region is mapped in the
+ * RNSAM. If mapped, check if the target node-id matches the request and
+ * return the non-hashed region index.
+ */
+static bool is_non_hashed_region_mapped(
+    struct mod_cmn_cyprus_mem_region_map *mmap,
+    unsigned int *region_idx)
+{
+    int idx;
+    unsigned int mapped_node_id;
+    uint64_t mapped_base_addr;
+    uint64_t mapped_end_addr;
+    uint64_t mapped_size;
+    struct cmn_cyprus_rnsam_reg *rnsam;
+
+    /*
+     * All the regions are identically mapped in all the RNSAM registers.
+     * Use only one RNSAM register to check if the requested I/O region is
+     * already mapped.
+     */
+    rnsam = shared_ctx->rnsam_table[0];
+
+    /* Iterate through each non-hashed region mapped in RNSAM */
+    for (idx = shared_ctx->io_region_count - 1; idx >= 0; idx--) {
+        /*
+         * Get the base address and end address of the mapped non-hashed
+         * region.
+         */
+        mapped_base_addr = rnsam_get_non_hashed_region_base(rnsam, idx);
+        mapped_size = rnsam_get_non_hashed_region_size(rnsam, idx);
+        mapped_end_addr = mapped_size + mapped_base_addr - 1;
+
+        /* Check if the requested region has already been mapped in RNSAM */
+        if (!check_addr_overlap(
+                mmap->base, mapped_base_addr, mapped_end_addr)) {
+            /* Skip the region */
+            continue;
+        }
+
+        /* Get the programmed target node ID */
+        mapped_node_id = rnsam_get_non_hashed_region_target_id(rnsam, idx);
+
+        FWK_LOG_INFO(
+            MOD_NAME "Found IO region: %d mapped to Node: %u ",
+            idx,
+            mapped_node_id);
+
+        /*
+         * Check if the programmed target node ID matches the given target node
+         * ID.
+         */
+        if (mapped_node_id !=
+            (mmap->node_id &= RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK)) {
+            FWK_LOG_ERR(MOD_NAME "Error! Invalid IO region memmap request");
+            FWK_LOG_ERR(
+                MOD_NAME "0x%llx mapped to different node id", mmap->base);
+            FWK_LOG_ERR(
+                MOD_NAME "mapped node id %u | requested node id : %u\n",
+                mapped_node_id,
+                mmap->node_id);
+
+            fwk_trap();
+        }
+
+        /* Return the region index of the programmed region */
+        *region_idx = idx;
+
+        return true;
+    }
+
+    /* The requested non-hashed region is not mapped in the RNSAM */
+    return false;
+}
+
+static void update_io_region(
+    struct mod_cmn_cyprus_mem_region_map *mmap,
+    unsigned int region_idx)
+{
+    unsigned int rnsam_idx;
+    struct cmn_cyprus_rnsam_reg *rnsam;
+
+    FWK_LOG_INFO(MOD_NAME "Updating IO region %u", region_idx);
+    FWK_LOG_INFO(
+        MOD_NAME "  [0x%llx - 0x%llx] %s",
+        mmap->base,
+        mmap->base + mmap->size - 1,
+        mmap_type_name[mmap->type]);
+
+    /* Update the IO region in RNSAM */
+    for (rnsam_idx = 0; rnsam_idx < shared_ctx->rnsam_count; rnsam_idx++) {
+        rnsam = shared_ctx->rnsam_table[rnsam_idx];
+
+        rnsam_configure_non_hashed_region(
+            rnsam, region_idx, mmap->base, mmap->size, SAM_NODE_TYPE_HN_I);
+
+        /* Mark the region as valid */
+        rnsam_set_non_hash_region_valid(rnsam, region_idx);
+    }
+}
+
+static int map_io_region(uint64_t base, size_t size, uint32_t node_id)
+{
+    int status;
+    unsigned int region_idx;
+    struct mod_cmn_cyprus_mem_region_map mmap = {
+        .base = base,
+        .size = size,
+        .type = MOD_CMN_CYPRUS_MEM_REGION_TYPE_IO,
+        .node_id = node_id,
+    };
+
+    /* Stall RNSAM requests as the RNSAM is about to be re-configured */
+    stall_rnsam_requests();
+
+    /* Check if the given non-hashed region has been mapped */
+    if (is_non_hashed_region_mapped(&mmap, &region_idx)) {
+        /* Update the exisiting IO region in RNSAM */
+        update_io_region(&mmap, region_idx);
+    } else {
+        FWK_LOG_INFO(MOD_NAME "Mapping IO region in RNSAM");
+        FWK_LOG_INFO(
+            MOD_NAME "  [0x%llx - 0x%llx] %s",
+            base,
+            base + size - 1,
+            mmap_type_name[mmap.type]);
+
+        /* Program the IO region in RNSAM */
+        status = program_rnsam_region(&mmap);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+    }
+
+    /* Unstall the RNSAM requests */
+    unstall_rnsam_requests();
+
+    return FWK_SUCCESS;
+}
+
+static struct interface_cmn_memmap_rnsam_api memmap_rnsam_api = {
+    .map_io_region = map_io_region,
+};
+
+void get_rnsam_memmap_api(const void **api)
+{
+    *api = &memmap_rnsam_api;
 }
 
 int cmn_cyprus_setup_rnsam(struct cmn_cyprus_ctx *ctx)

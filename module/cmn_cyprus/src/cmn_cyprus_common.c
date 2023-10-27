@@ -31,3 +31,23 @@ uint64_t sam_encode_region_size(uint64_t size)
 
     return result;
 }
+
+uint64_t sam_decode_region_size(uint64_t encoded_size)
+{
+    uint64_t blocks;
+    uint64_t size;
+
+    /*
+     * Calculate the number of blocks.
+     * Encoded region size is binary logarithm of number of blocks.
+     */
+    blocks = fwk_math_pow2(encoded_size);
+
+    /*
+     * Calculate the size of the region.
+     * Number of blocks = (size / SAM_GRANULARITY)
+     */
+    size = blocks * SAM_GRANULARITY;
+
+    return size;
+}
