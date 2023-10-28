@@ -15,6 +15,7 @@
 
 #include <fwk_assert.h>
 #include <fwk_log.h>
+#include <fwk_math.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -55,6 +56,13 @@
 /* RNSAM CAL Mode */
 #define RNSAM_SCG_HNS_CAL_MODE_EN    UINT64_C(0x01)
 #define RNSAM_SCG_HNS_CAL_MODE_SHIFT 16
+
+/* RNSAM Hierarchical hashing */
+#define RNSAM_HIERARCHICAL_HASH_EN_POS         2
+#define RNSAM_HIERARCHICAL_HASH_EN_MASK        UINT64_C(0x01)
+#define RNSAM_HIER_ENABLE_ADDRESS_STRIPING_POS 3
+#define RNSAM_HIER_HASH_CLUSTERS_POS           8
+#define RNSAM_HIER_HASH_NODES_POS              16
 
 /*!
  * RNSAM programming context structure.
@@ -569,6 +577,57 @@ unsigned int rnsam_get_non_hashed_region_target_id(
     /* Return the target node ID programmed in the register */
     return (rnsam->NON_HASH_TGT_NODEID[register_idx] >> bit_pos) &
         RNSAM_NON_HASH_TGT_NODEID_ENTRY_MASK;
+}
+
+void rnsam_set_hier_hash_cluster_groups(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t scg_idx,
+    uint8_t num_cluster_groups)
+{
+    /* Configure the number of clusters */
+    rnsam->HASHED_TARGET_GRP_HASH_CNTL[scg_idx] |=
+        (num_cluster_groups << RNSAM_HIER_HASH_CLUSTERS_POS);
+}
+
+void rnsam_set_hier_hash_num_hns_per_cluster(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t scg_idx,
+    uint8_t num_hns_per_cluster)
+{
+    /* Configure the number of HN-S nodes in each cluster */
+    rnsam->HASHED_TARGET_GRP_HASH_CNTL[scg_idx] |=
+        (num_hns_per_cluster << RNSAM_HIER_HASH_NODES_POS);
+}
+
+void rnsam_set_hier_hash_addr_striping(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t scg_idx,
+    uint8_t num_cluster_groups)
+{
+    /*
+     * Configure number of address bits needs to shuttered (removed) at
+     * second hierarchy hash.
+     *
+     * 3'b000: no address shuttering
+     * 3'b001: one addr bit shuttered (2 clusters)
+     * 3'b010: two addr bit shuttered (4 clusters)
+     * 3'b011: three addr bit shuttered (8 clusters)
+     * 3'b100: four addr bit shuttered (16 clusters)
+     * 3'b101: five addr bit shuttered (32 clusters)
+     * others: Reserved
+     */
+    rnsam->HASHED_TARGET_GRP_HASH_CNTL[scg_idx] |=
+        (fwk_math_log2((unsigned int)num_cluster_groups)
+         << RNSAM_HIER_ENABLE_ADDRESS_STRIPING_POS);
+}
+
+void rnsam_enable_hier_hash_mode(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t scg_idx)
+{
+    /* Enable hierarchical hashing mode */
+    rnsam->HASHED_TARGET_GRP_HASH_CNTL[scg_idx] |=
+        (RNSAM_HIERARCHICAL_HASH_EN_MASK << RNSAM_HIERARCHICAL_HASH_EN_POS);
 }
 
 int setup_rnsam_ctx(struct cmn_cyprus_rnsam_reg *rnsam)

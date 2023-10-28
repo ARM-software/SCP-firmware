@@ -253,6 +253,51 @@ struct isolated_hns_node_info {
 };
 
 /*!
+ * \brief RNSAM SCG hashing mode.
+ */
+enum mod_cmn_cyprus_rnsam_scg_hashing_mode {
+    /*!
+     * Default mode; Legacy CMN mode: Power of two hashing. Note: This
+     * mode can be used only when the number of HN-F nodes in the SCG
+     * is a power of two.
+     */
+    MOD_CMN_CYPRUS_RNSAM_SCG_POWER_OF_TWO_HASHING,
+
+    /*! Hierarchical hashing */
+    MOD_CMN_CYPRUS_RNSAM_SCG_HIERARCHICAL_HASHING,
+
+    /*! RNSAM hashing mode count */
+    MOD_CMN_CYPRUS_RNSAM_SCG_MODE_COUNT,
+};
+
+/*!
+ * \brief Hierarchical hashing configuration
+ */
+struct mod_cmn_cyprus_scg_hier_hashing_cfg {
+    /*!
+     * \brief Number of HN-S clusters in the first level hierarchy.
+     *
+     * \note Number of clusters must be a power of two.
+     * Supported cluster count: 1, 2, 4, 8, 16, 32.
+     */
+    uint8_t num_cluster_groups;
+};
+
+/*!
+ * \brief SCG configuration.
+ */
+struct mod_cmn_cyprus_rnsam_scg_config {
+    /*! Hashing mechanism used for SCG regions */
+    enum mod_cmn_cyprus_rnsam_scg_hashing_mode scg_hashing_mode;
+
+    /*!
+     * Hierarchcial hashing configuration.
+     * \note Used only when hierarchical hashing mode is selected.
+     */
+    struct mod_cmn_cyprus_scg_hier_hashing_cfg hier_hash_cfg;
+};
+
+/*!
  * \brief CMN Cyprus configuration data.
  */
 struct mod_cmn_cyprus_config {
@@ -293,6 +338,9 @@ struct mod_cmn_cyprus_config {
 
     /*! Number of entries in the \ref isolated_hns_table */
     unsigned int isolated_hns_count;
+
+    /*! RNSAM SCG configuration data */
+    struct mod_cmn_cyprus_rnsam_scg_config rnsam_scg_config;
 };
 
 /*!

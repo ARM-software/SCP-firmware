@@ -228,6 +228,65 @@ unsigned int rnsam_get_non_hashed_region_target_id(
     unsigned int region_idx);
 
 /*
+ * Configure number of clusters in hierarchical hashing mode.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param scg_idx SCG/hashed region index.
+ * \param num_cluster_groups Number of HN-S clusters.
+ *
+ * \return nothing.
+ */
+void rnsam_set_hier_hash_cluster_groups(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t scg_idx,
+    uint8_t num_cluster_groups);
+
+/*
+ * Configure number of HN-S nodes per cluster in hierarchical hashing mode.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param scg_idx SCG/hashed region index.
+ * \param num_hns_per_cluster Number of HN-S nodes per cluster.
+ *
+ * \return nothing.
+ */
+void rnsam_set_hier_hash_num_hns_per_cluster(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t scg_idx,
+    uint8_t num_hns_per_cluster);
+
+/*
+ * Configure address striping mode for second level of hierarchy in
+ * hierarchical hashing mode.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param scg_idx SCG/hashed region index.
+ * \param num_cluster_groups Number of HN-S clusters.
+ *
+ * \return nothing.
+ */
+void rnsam_set_hier_hash_addr_striping(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t scg_idx,
+    uint8_t num_cluster_groups);
+
+/*
+ * Enable hierarchical hashing mode for the given SCG/HTG region.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param scg_idx SCG/hashed region index.
+ *
+ * \return nothing.
+ */
+void rnsam_enable_hier_hash_mode(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t scg_idx);
+
+/*
  * Setup the RNSAM programming context.
  *
  * \param rnsam Pointer to the RNSAM node.

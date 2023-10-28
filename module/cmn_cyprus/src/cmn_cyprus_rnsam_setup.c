@@ -177,6 +177,44 @@ static void configure_scg_target_nodes(
     rnsam_set_htg_target_hn_count(rnsam, scg_idx, hns_count_in_scg);
 }
 
+static void configure_scg_hier_hashing(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t scg_idx,
+    uint8_t num_cluster_groups)
+{
+    uint8_t num_hns_per_cluster;
+    unsigned int hns_count;
+
+    /*
+     * If CAL mode is enabled, only the even numbered HN-S nodes are
+     * programmed. Hence, Reduce HN-S count by half if CAL mode is enabled.
+     */
+    if (shared_ctx->config->hns_cal_mode) {
+        hns_count = (shared_ctx->scg_hns_count[scg_idx] / 2);
+    } else {
+        hns_count = shared_ctx->scg_hns_count[scg_idx];
+    }
+
+    /* Number of HN-S nodes in a cluster */
+    num_hns_per_cluster = (hns_count / num_cluster_groups);
+
+    /* Configure the number of clusters in the first level hierarchy */
+    rnsam_set_hier_hash_cluster_groups(rnsam, scg_idx, num_cluster_groups);
+
+    /* Configure the number of hns nodes per cluster */
+    rnsam_set_hier_hash_num_hns_per_cluster(
+        rnsam, scg_idx, num_hns_per_cluster);
+
+    /*
+     * Configure number of address bits needs to shuttered (removed) at
+     * second level hierarchy hash based on the cluster count.
+     */
+    rnsam_set_hier_hash_addr_striping(rnsam, scg_idx, num_cluster_groups);
+
+    /* Enable hierarchical hashing mode */
+    rnsam_enable_hier_hash_mode(rnsam, scg_idx);
+}
+
 static int program_scg_region(
     const struct mod_cmn_cyprus_mem_region_map *scg_region,
     uint32_t scg_idx)
@@ -184,6 +222,10 @@ static int program_scg_region(
     int status;
     unsigned int rnsam_idx;
     struct cmn_cyprus_rnsam_reg *rnsam;
+    struct mod_cmn_cyprus_rnsam_scg_config *scg_config;
+
+    scg_config = (struct mod_cmn_cyprus_rnsam_scg_config *)&shared_ctx->config
+                     ->rnsam_scg_config;
 
     if (scg_idx >= MAX_SCG_COUNT) {
         FWK_LOG_ERR(MOD_NAME "Error! Invalid SCG region %lu", scg_idx);
@@ -212,6 +254,14 @@ static int program_scg_region(
         if (shared_ctx->config->hns_cal_mode) {
             /* Configure the SCG CAL mode support */
             rnsam_enable_htg_cal_mode(rnsam, scg_idx);
+        }
+
+        /* Configure Hierarchical hashing if enabled in config data */
+        if (scg_config->scg_hashing_mode ==
+            MOD_CMN_CYPRUS_RNSAM_SCG_HIERARCHICAL_HASHING) {
+            /* Configure SCG hierarchical hashing */
+            configure_scg_hier_hashing(
+                rnsam, scg_idx, scg_config->hier_hash_cfg.num_cluster_groups);
         }
 
         /* Mark the region as valid for comparison */

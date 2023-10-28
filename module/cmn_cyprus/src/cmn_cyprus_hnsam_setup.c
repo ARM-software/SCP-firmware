@@ -68,6 +68,40 @@ static int program_hnf_sam_direct_mapping(
     return FWK_SUCCESS;
 }
 
+static uint8_t get_num_hns_per_cluster(void)
+{
+    uint8_t num_cluster_groups;
+    const struct mod_cmn_cyprus_rnsam_scg_config *rnsam_scg_config;
+
+    rnsam_scg_config = &shared_ctx->config->rnsam_scg_config;
+
+    if (rnsam_scg_config->scg_hashing_mode !=
+        MOD_CMN_CYPRUS_RNSAM_SCG_HIERARCHICAL_HASHING) {
+        /*
+         * HN-S clusters are applicable only when hierarchical hashing
+         * is enabled.
+         */
+        return 0;
+    }
+
+    num_cluster_groups = rnsam_scg_config->hier_hash_cfg.num_cluster_groups;
+
+    return shared_ctx->hns_count / num_cluster_groups;
+}
+
+static uint8_t get_hns_cluster_idx(unsigned int hns_ldid)
+{
+    uint8_t num_hns_per_cluster;
+
+    num_hns_per_cluster = get_num_hns_per_cluster();
+
+    if (num_hns_per_cluster != 0) {
+        return (hns_ldid / num_hns_per_cluster);
+    } else {
+        return 0;
+    }
+}
+
 /*
  * Program the target SN-F node IDs based on the range-based hashing SN mode.
  */
@@ -80,6 +114,7 @@ static int configure_hashed_sn_nodes(
     unsigned int hns_ldid;
     unsigned int snf_table_idx;
     unsigned int sn_node_id;
+    uint8_t hns_cluster_idx;
     uint8_t sn_idx;
     uint8_t sn_count;
 
@@ -95,8 +130,23 @@ static int configure_hashed_sn_nodes(
 
     /* Iterate through indices of SN-F nodes present within the cluster */
     for (sn_idx = 0; sn_idx < sn_count; sn_idx++) {
-        /* Get the index of the SN-F node in the SN-F table */
-        snf_table_idx = ((hns_ldid * sn_count) + sn_idx);
+        if (shared_ctx->config->rnsam_scg_config.scg_hashing_mode ==
+            MOD_CMN_CYPRUS_RNSAM_SCG_HIERARCHICAL_HASHING) {
+            /*
+             * If hierarchical hashing is enabled, then HN-Fs are grouped
+             * together as clusters and each cluster has the same SN-F target
+             * ID. Use the RNSAM hierarchical hashing configuration to calculate
+             * the cluster index to which the current HN-S node belongs to. This
+             * info is used to select the target SN-F from the SN-F table.
+             */
+            hns_cluster_idx = get_hns_cluster_idx(hns_ldid);
+
+            /* Get the index of the SN-F node in the SN-F table */
+            snf_table_idx = ((hns_cluster_idx * sn_count) + sn_idx);
+        } else {
+            /* Get the index of the SN-F node in the SN-F table */
+            snf_table_idx = ((hns_ldid * sn_count) + sn_idx);
+        }
 
         /* Check if the snf table index is valid */
         if (snf_table_idx >= snf_count) {
