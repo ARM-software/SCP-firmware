@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -104,6 +104,23 @@ struct mod_sds_structure_desc {
 };
 
 /*!
+ * \brief Platform notification source and notification id
+ *
+ * \details On platforms that require platform configuration (in addition to
+ *      the clock configuration) to access the SDS memory regions, the platform
+ *      notification can be subscribed. This is optional for a platform and if
+ *      provided as module configuration data, the SDS memory region will be
+ *      accessed only after this notification is processed.
+ */
+struct mod_sds_platform_notification {
+    /*! Identifier of the notification id */
+    const fwk_id_t notification_id;
+
+    /*! Identifier of the module sending the notification */
+    const fwk_id_t source_id;
+};
+
+/*!
  * \brief Module configuration.
  */
 struct mod_sds_config {
@@ -121,6 +138,11 @@ struct mod_sds_config {
     /*! Identifier of the clock that this module depends on */
     fwk_id_t clock_id;
 #endif
+
+    /*!
+     * Platform notification source and notification id (optional)
+     */
+    struct mod_sds_platform_notification platform_notification;
 };
 
 /*!
