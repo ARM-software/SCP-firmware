@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -14,6 +14,7 @@
 #include <fwk_assert.h>
 #include <fwk_event.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
@@ -43,6 +44,8 @@
 /* Minimum region size in bytes */
 #define MIN_REGION_SIZE (sizeof(struct region_descriptor) + \
                          MIN_ALIGNED_STRUCT_SIZE)
+/* Module name to use in log messages */
+#define MODULE_NAME "[SDS]"
 
 /* Header containing Shared Data Structure metadata */
 struct structure_header {
@@ -111,6 +114,12 @@ struct sds_ctx {
         /* Pointer to the next free memory address in the SDS Memory Region. */
         volatile char *free_mem_base;
     } *regions;
+
+    /*
+     * Number of notifications subscribed and to wait for before the SDS data
+     * is published.
+     */
+    unsigned int wait_on_notifications;
 };
 
 /* Module context */
@@ -269,7 +278,9 @@ static int struct_alloc(const struct mod_sds_structure_desc *struct_desc)
     }
 
     config = fwk_module_get_data(fwk_module_id_sds);
-    fwk_assert(config != NULL);
+    if (config == NULL) {
+        return FWK_E_PARAM;
+    }
     fwk_assert(region_idx < config->region_count);
 
     padded_size =
@@ -653,47 +664,98 @@ static int sds_process_bind_request(fwk_id_t requester_id, fwk_id_t id,
 
 static int sds_start(fwk_id_t id)
 {
-#ifdef BUILD_HAS_MOD_CLOCK
     const struct mod_sds_config *config;
-#endif
+    int status = FWK_SUCCESS;
 
     if (!fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         return FWK_SUCCESS;
     }
 
-#ifdef BUILD_HAS_MOD_CLOCK
     config = fwk_module_get_data(fwk_module_id_sds);
+    ctx.wait_on_notifications = 0;
+
+#ifdef BUILD_HAS_MOD_CLOCK
     if (!fwk_id_is_equal(config->clock_id, FWK_ID_NONE)) {
         /* Register the module for clock state notifications */
-        return fwk_notification_subscribe(
-            mod_clock_notification_id_state_changed,
-            config->clock_id,
-            id);
+        status = fwk_notification_subscribe(
+            mod_clock_notification_id_state_changed, config->clock_id, id);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_CRIT(MODULE_NAME "Failed to subscribe clock notification");
+            return status;
+        }
+        ctx.wait_on_notifications++;
     }
 #endif
 
-    return init_sds();
+    if ((fwk_id_type_is_valid(config->platform_notification.source_id)) &&
+        (!fwk_id_is_equal(
+            config->platform_notification.source_id, FWK_ID_NONE))) {
+        status = fwk_notification_subscribe(
+            config->platform_notification.notification_id,
+            config->platform_notification.source_id,
+            id);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_CRIT(MODULE_NAME
+                         "Failed to subscribe platform "
+                         "notification");
+            return status;
+        }
+        ctx.wait_on_notifications++;
+    }
+
+    if (ctx.wait_on_notifications == 0) {
+        status = init_sds();
+    }
+
+    return status;
 }
 
-#ifdef BUILD_HAS_MOD_CLOCK
 static int sds_process_notification(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
 {
+    const struct mod_sds_config *config =
+        fwk_module_get_data(fwk_module_id_sds);
     struct clock_notification_params *params;
+    int status = FWK_SUCCESS;
 
-    fwk_assert(fwk_id_is_equal(event->id,
-                               mod_clock_notification_id_state_changed));
     fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
+    fwk_assert(ctx.wait_on_notifications != 0);
 
-    params = (struct clock_notification_params *)event->params;
-    if (params->new_state != MOD_CLOCK_STATE_RUNNING) {
-        return FWK_SUCCESS;
+    if (fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed)) {
+        params = (struct clock_notification_params *)event->params;
+        if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
+            status = fwk_notification_unsubscribe(
+                event->id, event->source_id, event->target_id);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_CRIT(MODULE_NAME
+                             "Failed to unsubscribe clock "
+                             "notification");
+                return status;
+            }
+            ctx.wait_on_notifications--;
+        }
     }
 
-    return init_sds();
+    if (fwk_id_is_equal(
+            event->id, config->platform_notification.notification_id)) {
+        status = fwk_notification_unsubscribe(
+            event->id, event->source_id, event->target_id);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_CRIT(MODULE_NAME
+                         "Failed to unsubscribe platform "
+                         "notification");
+            return status;
+        }
+        ctx.wait_on_notifications--;
+    }
+
+    if (ctx.wait_on_notifications == 0) {
+        status = init_sds();
+    }
+
+    return status;
 }
-#endif
 
 /* Module descriptor */
 const struct fwk_module module_sds = {
@@ -705,7 +767,5 @@ const struct fwk_module module_sds = {
     .element_init = sds_element_init,
     .process_bind_request = sds_process_bind_request,
     .start = sds_start,
-#ifdef BUILD_HAS_MOD_CLOCK
     .process_notification = sds_process_notification
-#endif
 };
