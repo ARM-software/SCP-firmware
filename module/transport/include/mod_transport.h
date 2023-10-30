@@ -170,6 +170,23 @@ struct mod_transport_fch_doorbell_info {
 };
 
 /*!
+ * \brief Platform notification source and notification id
+ *
+ * \details On platforms that require platform configuration (in addition to
+ *      the clock configuration) to access the shared memory regions used by
+ *      mailbox, the platform notification can be subscribed. This is optional
+ *      for a channel and if provided as module configuration data, the channel
+ *      will be setup only after this notification is processed.
+ */
+struct mod_transport_platform_notification {
+    /*! Identifier of the notification id */
+    const fwk_id_t notification_id;
+
+    /*! Identifier of the module sending the notification */
+    const fwk_id_t source_id;
+};
+
+/*!
  * \brief Channel config.
  */
 struct mod_transport_channel_config {
@@ -202,6 +219,11 @@ struct mod_transport_channel_config {
      * Applicable for out-band transport channels only.
      */
     fwk_id_t pd_source_id;
+
+    /*!
+     * Platform notification source and notification id (optional)
+     */
+    struct mod_transport_platform_notification platform_notification;
 
     /*!
      * Identifier of the API to bind to signal message/error for Firmware
