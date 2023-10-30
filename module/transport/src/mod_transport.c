@@ -74,6 +74,12 @@ struct transport_channel_ctx {
 
     /* Flag indicating that the out-band mailbox is ready */
     bool out_band_mailbox_ready;
+
+    /*
+     * Number of notifications subscribed and to wait for before initializing
+     * the channel
+     */
+    unsigned int wait_on_notifications;
 };
 
 struct transport_context {
@@ -1027,37 +1033,61 @@ static int transport_start(fwk_id_t id)
 {
     int status = FWK_SUCCESS;
     struct transport_channel_ctx *channel_ctx;
+    struct mod_transport_channel_config *config;
 
     if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
         return status;
     }
 
     channel_ctx = &transport_ctx.channel_ctx_table[fwk_id_get_element_idx(id)];
+    config = channel_ctx->config;
+    channel_ctx->wait_on_notifications = 0;
 
     if (channel_ctx->config->transport_type ==
         MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_OUT_BAND) {
 #ifdef BUILD_HAS_MOD_POWER_DOMAIN
         if (fwk_id_type_is_valid(channel_ctx->config->pd_source_id)) {
             /* Register for power domain state transition notifications */
-            return fwk_notification_subscribe(
+            status = fwk_notification_subscribe(
                 mod_pd_notification_id_power_state_transition,
                 channel_ctx->config->pd_source_id,
                 id);
-        } else {
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_CRIT(
+                    "%s: Failed to subscribe PD notification!", MOD_NAME);
+                return status;
+            }
+            channel_ctx->wait_on_notifications++;
+        }
+#endif
+
+        if ((fwk_id_type_is_valid(config->platform_notification.source_id)) &&
+            (!fwk_id_is_equal(
+                config->platform_notification.source_id, FWK_ID_NONE))) {
+            status = fwk_notification_subscribe(
+                channel_ctx->config->platform_notification.notification_id,
+                channel_ctx->config->platform_notification.source_id,
+                id);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_CRIT(
+                    "%s: Failed to subscribe platform notification!", MOD_NAME);
+                return status;
+            }
+            channel_ctx->wait_on_notifications++;
+        }
+
+        /*
+         * Initialize the mailbox if it is not required to wait for any
+         * notification.
+         */
+        if (channel_ctx->wait_on_notifications == 0) {
             return transport_mailbox_init(channel_ctx);
         }
-#else
-        /*
-         * Initialize the mailbox immediately, if power domain module
-         * is not included in the firmware build.
-         */
-        return transport_mailbox_init(channel_ctx);
-#endif
     }
+
     return status;
 }
 
-#ifdef BUILD_HAS_MOD_POWER_DOMAIN
 static int transport_process_notification(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
@@ -1065,29 +1095,54 @@ static int transport_process_notification(
     struct transport_channel_ctx *channel_ctx;
     int status = FWK_SUCCESS;
 
+    fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT));
     channel_ctx =
         &transport_ctx
              .channel_ctx_table[fwk_id_get_element_idx(event->target_id)];
 
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
     struct mod_pd_power_state_transition_notification_params *params;
 
-    assert(fwk_id_is_equal(
-        event->id, mod_pd_notification_id_power_state_transition));
-    fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_ELEMENT));
-
-    params = (struct mod_pd_power_state_transition_notification_params *)
-                 event->params;
-
-    if (params->state != MOD_PD_STATE_ON) {
-        if (params->state == MOD_PD_STATE_OFF) {
-            channel_ctx->out_band_mailbox_ready = false;
+    if (fwk_id_is_equal(
+            event->id, mod_pd_notification_id_power_state_transition)) {
+        params = (struct mod_pd_power_state_transition_notification_params *)
+                     event->params;
+        if (params->state != MOD_PD_STATE_ON) {
+            if (params->state == MOD_PD_STATE_OFF) {
+                channel_ctx->out_band_mailbox_ready = false;
+            }
+        } else {
+            status = fwk_notification_unsubscribe(
+                event->id, event->source_id, event->target_id);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_CRIT(
+                    "%s: Failed to unsubscribe pd notification", MOD_NAME);
+                return status;
+            }
+            channel_ctx->wait_on_notifications--;
         }
-    } else {
+    }
+#endif
+
+    if (fwk_id_is_equal(
+            event->id,
+            channel_ctx->config->platform_notification.notification_id)) {
+        status = fwk_notification_unsubscribe(
+            event->id, event->source_id, event->target_id);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_CRIT(
+                "%s: Failed to unsubscribe platform notification", MOD_NAME);
+            return status;
+        }
+        channel_ctx->wait_on_notifications--;
+    }
+
+    if (channel_ctx->wait_on_notifications == 0) {
         status = transport_mailbox_init(channel_ctx);
     }
+
     return status;
 }
-#endif
 
 const struct fwk_module module_transport = {
     .type = FWK_MODULE_TYPE_HAL,
@@ -1098,7 +1153,5 @@ const struct fwk_module module_transport = {
     .bind = transport_bind,
     .start = transport_start,
     .process_bind_request = transport_process_bind_request,
-#ifdef BUILD_HAS_MOD_POWER_DOMAIN
     .process_notification = transport_process_notification,
-#endif
 };
