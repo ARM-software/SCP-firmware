@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -139,16 +139,26 @@ static struct fast_channel_ctx *get_fch_ctx(
                 .fch_ctx[fch_idx];
 }
 
-static void fch_context_init(
+static int fch_context_init(
     const struct scmi_perf_fch_config *fch_config,
     struct fast_channel_ctx *fch_ctx)
 {
+    int status = FWK_E_DATA;
     enum mod_transport_fch_interrupt_type interrupt_type;
-    fch_ctx->transport_fch_api->transport_get_fch_address(
+
+    status = fch_ctx->transport_fch_api->transport_get_fch_address(
         fch_config->transport_id, &fch_ctx->fch_address);
 
-    fch_ctx->transport_fch_api->transport_get_fch_interrupt_type(
+    if (status != FWK_SUCCESS) {
+        return FWK_E_DATA;
+    }
+
+    status = fch_ctx->transport_fch_api->transport_get_fch_interrupt_type(
         fch_config->transport_id, &interrupt_type);
+
+    if (status != FWK_SUCCESS) {
+        return FWK_E_DATA;
+    }
 
     if (interrupt_type == MOD_TRANSPORT_FCH_INTERRUPT_TYPE_TIMER &&
         !perf_fch_ctx.callback_registered) {
@@ -156,13 +166,24 @@ static void fch_context_init(
          * For polled fast channels, we need to register one single
          * call back for all channels so register this only once.
          */
-        fch_ctx->transport_fch_api->transport_fch_register_callback(
+        status = fch_ctx->transport_fch_api->transport_fch_register_callback(
             fch_config->transport_id, (uintptr_t)NULL, fast_channel_callback);
+
+        if (status != FWK_SUCCESS) {
+            return FWK_E_DATA;
+        }
+
         perf_fch_ctx.callback_registered = true;
     } else if (interrupt_type == MOD_TRANSPORT_FCH_INTERRUPT_TYPE_HW) {
-        fch_ctx->transport_fch_api->transport_fch_register_callback(
+        status = fch_ctx->transport_fch_api->transport_fch_register_callback(
             fch_config->transport_id, (uintptr_t)NULL, fast_channel_callback);
+
+        if (status != FWK_SUCCESS) {
+            return FWK_E_DATA;
+        }
     }
+
+    return FWK_SUCCESS;
 }
 
 #else
@@ -742,11 +763,16 @@ static void *get_fch_local_address(
 #ifdef BUILD_HAS_MOD_TRANSPORT_FC
     const struct scmi_perf_fch_config *fch_config;
     struct fast_channel_ctx *fch_ctx;
+    int status;
 
     fch_config = get_fch_config(domain_idx, fch_idx);
     fch_ctx = get_fch_ctx(domain_idx, fch_idx);
 
-    fch_context_init(fch_config, fch_ctx);
+    status = fch_context_init(fch_config, fch_ctx);
+
+    if (status != FWK_SUCCESS) {
+        return NULL;
+    }
 
     return (void *)fch_ctx->fch_address.local_view_address;
 #else
