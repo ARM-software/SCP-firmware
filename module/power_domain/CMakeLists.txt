@@ -14,5 +14,9 @@ target_sources(
     ${SCP_MODULE_TARGET}
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_power_domain.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/src/power_domain_utils.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/power_domain_state_checks.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/power_domain_notifications.c")
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/power_domain_state_checks.c")
+
+if(SCP_ENABLE_NOTIFICATIONS)
+    target_sources(${SCP_MODULE_TARGET}
+                   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/power_domain_notifications.c")
+endif()

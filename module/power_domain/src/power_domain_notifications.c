@@ -14,7 +14,6 @@
 #include <fwk_module.h>
 #include <fwk_notification.h>
 
-#ifdef BUILD_HAS_NOTIFICATION
 /*
  * Check whether a power state pre-transition notification must be sent.
  *
@@ -192,11 +191,9 @@ int process_power_state_transition_notification_response(struct pd_ctx *pd)
         &notification_event,
         &pd->power_state_transition_notification_ctx.pending_responses);
 }
-#endif /* BUILD_HAS_NOTIFICATION */
 
 bool initiate_power_state_pre_transition_notification(struct pd_ctx *pd)
 {
-#ifdef BUILD_HAS_NOTIFICATION
     unsigned int state;
     struct fwk_event notification_event = {
         .id = mod_pd_notification_id_power_state_pre_transition,
@@ -244,15 +241,11 @@ bool initiate_power_state_pre_transition_notification(struct pd_ctx *pd)
 
     return (
         pd->power_state_pre_transition_notification_ctx.pending_responses != 0);
-#else
-    return false;
-#endif
 }
 
 bool check_and_notify_system_shutdown(
     enum mod_pd_system_shutdown system_shutdown)
 {
-#ifdef BUILD_HAS_NOTIFICATION
     struct mod_pd_pre_shutdown_notif_params *params;
     int status;
 
@@ -270,14 +263,10 @@ bool check_and_notify_system_shutdown(
     }
 
     return (mod_pd_ctx.system_shutdown.notifications_count != 0);
-#else
-    return false;
-#endif
 }
 
 int notify_warm_reset(void)
 {
-#ifdef BUILD_HAS_NOTIFICATION
     unsigned int count;
     struct fwk_event notification = {
         .id = mod_pd_notification_id_pre_warm_reset,
@@ -285,7 +274,4 @@ int notify_warm_reset(void)
     };
 
     return fwk_notification_notify(&notification, &count);
-#else
-    return FWK_SUCCESS;
-#endif
 }
