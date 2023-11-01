@@ -48,6 +48,40 @@ static const char driver_error_msg[] = "[PD] Driver error %s (%d) in %s @%d";
 #endif
 
 /*
+ * Wrapper functions for returning default values when notifications are
+ * disabled
+ */
+
+static inline int warm_reset_notification_wrapper(void)
+{
+#ifdef BUILD_HAS_NOTIFICATION
+    return notify_warm_reset();
+#else
+    return FWK_SUCCESS;
+#endif
+}
+
+static inline bool power_state_pre_transition_notification_wrapper(
+    struct pd_ctx *pd)
+{
+#ifdef BUILD_HAS_NOTIFICATION
+    return initiate_power_state_pre_transition_notification(pd);
+#else
+    return false;
+#endif
+}
+
+static inline bool notify_system_shutdown_wrapper(
+    enum mod_pd_system_shutdown system_shutdown)
+{
+#ifdef BUILD_HAS_NOTIFICATION
+    return check_and_notify_system_shutdown(system_shutdown);
+#else
+    return false;
+#endif
+}
+
+/*
  * Utility functions
  */
 
@@ -295,7 +329,7 @@ static void process_set_state_request(
          * Defer the power state transition if power state pre-transition
          * notification responses need to be waited for.
          */
-        if (initiate_power_state_pre_transition_notification(pd)) {
+        if (power_state_pre_transition_notification_wrapper(pd)) {
             continue;
         }
 
@@ -499,7 +533,7 @@ void process_power_state_transition_report_deeper_state(struct pd_ctx *pd)
         return;
     }
 
-    if (!initiate_power_state_pre_transition_notification(parent)) {
+    if (!power_state_pre_transition_notification_wrapper(parent)) {
         status = initiate_power_state_transition(parent);
         if (status != FWK_SUCCESS) {
             FWK_LOG_DEBUG("[PD] %s @%d", __func__, __LINE__);
@@ -532,7 +566,7 @@ void process_power_state_transition_report_shallower_state(struct pd_ctx *pd)
             return;
         }
 
-        if (!initiate_power_state_pre_transition_notification(child)) {
+        if (!power_state_pre_transition_notification_wrapper(child)) {
             status = initiate_power_state_transition(child);
             if (status != FWK_SUCCESS) {
                 FWK_LOG_DEBUG("[PD] %s @%d", __func__, __LINE__);
@@ -806,12 +840,12 @@ static void process_system_shutdown_request(
 
     switch (system_shutdown) {
     case MOD_PD_SYSTEM_WARM_RESET:
-        resp_params->status = notify_warm_reset();
+        resp_params->status = warm_reset_notification_wrapper();
         break;
 
     default:
         /* Check and send pre-shutdown notifications */
-        if (check_and_notify_system_shutdown(system_shutdown)) {
+        if (notify_system_shutdown_wrapper(system_shutdown)) {
             mod_pd_ctx.system_shutdown.ongoing = true;
             mod_pd_ctx.system_shutdown.system_shutdown = system_shutdown;
 
