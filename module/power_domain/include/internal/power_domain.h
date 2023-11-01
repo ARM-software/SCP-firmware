@@ -430,4 +430,44 @@ bool is_upwards_transition_propagation(
  */
 bool is_allowed_by_parent_and_children(struct pd_ctx *pd, unsigned int state);
 
+/*
+ * Auxiliary functions
+ */
+
+/*
+ * Process a power state transition report describing a transition to a deeper
+ * state.
+ *
+ * \param pd Target power domain context
+ */
+void process_power_state_transition_report_deeper_state(struct pd_ctx *pd);
+
+/*
+ * Process a power state transition report describing a transition to a
+ * shallower state.
+ *
+ * \param pd Target power domain context
+ */
+void process_power_state_transition_report_shallower_state(struct pd_ctx *pd);
+
+/*
+ * Initiate the transition to a power state for a power domain.
+ *
+ * \param pd Description of the power domain to initiate the state transition
+ *      for.
+ *
+ * \retval ::FWK_SUCCESS The power state transition was initiated.
+ * \retval ::FWK_E_DEVICE The power state transition was denied by the driver.
+ * \return One of the other driver-defined error codes.
+ */
+int initiate_power_state_transition(struct pd_ctx *pd);
+
+/*
+ * Initiate shutdown.
+ *
+ * \param system_shutdown Type of system shutdown.
+ *
+ */
+void perform_shutdown(enum mod_pd_system_shutdown system_shutdown);
+
 #endif /* POWER_DOMAIN_H */
