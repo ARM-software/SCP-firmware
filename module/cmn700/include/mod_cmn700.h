@@ -416,23 +416,6 @@ enum mod_cmn700_api_idx {
 };
 
 /*!
- * \brief Module interface to manage mappings in RN-SAM
- */
-struct mod_cmn700_memmap_rnsam_api {
-    /*!
-     * \brief Program or update the given IO memory carveout in the RN-SAM of
-     *        all the nodes
-     * \param base Base address of the carveout to be mapped
-     * \param size Size of the carveout
-     * \param node_id Target node id to which carveout will be mapped
-     *
-     * \return FWK_SUCCESS on successfully mapping the region
-     * \return FWK_E_DATA if mapping region is invalid
-     */
-    int (*map_io_region)(uint64_t base, size_t size, uint32_t node_id);
-};
-
-/*!
  * @}
  */
 
