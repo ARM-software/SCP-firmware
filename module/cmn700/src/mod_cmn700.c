@@ -7,13 +7,14 @@
 
 #include <cmn700.h>
 #include <cmn700_ccg.h>
-
 #include <internal/cmn700_ctx.h>
 
 #include <mod_clock.h>
 #include <mod_cmn700.h>
 #include <mod_system_info.h>
 #include <mod_timer.h>
+
+#include <interface_cmn.h>
 
 #include <fwk_assert.h>
 #include <fwk_event.h>
@@ -1233,7 +1234,7 @@ static int cmn700_process_notification(
     return FWK_SUCCESS;
 }
 
-static struct mod_cmn700_memmap_rnsam_api memmap_rnsam_api = {
+static struct interface_cmn_memmap_rnsam_api memmap_rnsam_api = {
     .map_io_region = map_io_region,
 };
 
