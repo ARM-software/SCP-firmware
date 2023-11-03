@@ -59,6 +59,9 @@
 /* Shared module context pointer */
 static struct cmn_cyprus_ctx *shared_ctx;
 
+/* RNSAM table index */
+static unsigned int rnsam_entry;
+
 /* CMN Revision Numbers */
 enum cmn_cyprus_revision {
     REV_R0_P0,
@@ -552,6 +555,15 @@ static int cmn_cyprus_init_node_info(struct cmn_cyprus_mxp_reg *mxp)
             if (status != FWK_SUCCESS) {
                 return status;
             }
+        } else if (node_type == NODE_TYPE_RN_SAM) {
+            if (rnsam_entry >= shared_ctx->rnsam_count) {
+                return FWK_E_RANGE;
+            }
+
+            /* Save the node pointer in the RNSAM table */
+            shared_ctx->rnsam_table[rnsam_entry] =
+                (struct cmn_cyprus_rnsam_reg *)node;
+            rnsam_entry++;
         }
     }
 
@@ -566,6 +578,8 @@ static int cmn_cyprus_init_ctx(void)
     unsigned int mxp_idx;
     struct cmn_cyprus_node_cfg_reg *node;
     struct cmn_cyprus_mxp_reg *mxp;
+
+    rnsam_entry = 0;
 
     /* Get number of cross points in the mesh */
     mxp_count = get_child_count(shared_ctx->cfgm->CHILD_INFO);
@@ -610,6 +624,10 @@ int cmn_cyprus_discovery(struct cmn_cyprus_ctx *ctx)
     /* HN-S Info table */
     shared_ctx->hns_info_table = fwk_mm_calloc(
         shared_ctx->hns_count, sizeof(*shared_ctx->hns_info_table));
+
+    /* RN-SAM table */
+    shared_ctx->rnsam_table = fwk_mm_calloc(
+        shared_ctx->rnsam_count, sizeof(*shared_ctx->rnsam_table));
 
     /* Traverse the mesh and initialize context data */
     status = cmn_cyprus_init_ctx();

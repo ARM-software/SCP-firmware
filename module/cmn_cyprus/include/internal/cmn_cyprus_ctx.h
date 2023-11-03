@@ -52,6 +52,9 @@ struct cmn_cyprus_ctx {
     /*! Count of RNSAM nodes */
     unsigned int rnsam_count;
 
+    /*! List of RNSAM node pointers */
+    struct cmn_cyprus_rnsam_reg **rnsam_table;
+
     /*! Count of RN-D nodes */
     unsigned int rnd_count;
 
