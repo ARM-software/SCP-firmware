@@ -95,6 +95,64 @@ struct cmn_cyprus_hns_reg {
             uint8_t   RESERVED10[0x7580 - 0x7570];
     FWK_RW  uint64_t  LCN_HASHED_TARGET_GRP_CPAG_PERHNF_REG[16];
 };
+
+/* Non-hashed memory region register count in first group */
+#define RNSAM_NON_HASH_REG_COUNT 24
+/* Non-hashed memory region register count in second group */
+#define RNSAM_NON_HASH_REG_GRP2_COUNT 40
+/* Hashed memory region register count in first group */
+#define RNSAM_HTG_REG_COUNT 4
+/* Hashed memory region register count in second group */
+#define RNSAM_HTG_REG_GRP2_COUNT 4
+/* SCG HN Node ID register count */
+#define RNSAM_SCG_HN_NODEID_REG_COUNT 32
+
+/*!
+ * Request Node System Address Map (RNSAM) registers.
+ */
+struct cmn_cyprus_rnsam_reg {
+    FWK_R   uint64_t  NODE_INFO;
+            uint8_t   RESERVED0[0x80 - 0x8];
+    FWK_R   uint64_t  CHILD_INFO;
+            uint8_t   RESERVED1[0x900 - 0x88];
+    FWK_R   uint64_t  UNIT_INFO[2];
+            uint8_t   RESERVED2[0xC00 - 0x910];
+    FWK_RW  uint64_t  NON_HASH_MEM_REGION[RNSAM_NON_HASH_REG_COUNT];
+    FWK_RW  uint64_t  NON_HASH_MEM_REGION_CFG2[RNSAM_NON_HASH_REG_COUNT];
+    FWK_RW  uint64_t  NON_HASH_TGT_NODEID[16];
+    FWK_RW  uint64_t  SYS_CACHE_GRP_REGION[RNSAM_HTG_REG_COUNT];
+    FWK_RW  uint64_t  HASHED_TGT_GRP_CFG1_REGION[RNSAM_HTG_REG_GRP2_COUNT];
+    FWK_RW  uint64_t  SYS_CACHE_GRP_SECONDARY_REGION[4];
+            uint8_t   RESERVED5[0xEA0 - 0xE60];
+    FWK_RW  uint64_t  SYS_CACHE_GROUP_HN_COUNT;
+            uint8_t   RESERVED6[0xEB0 - 0xEA8];
+    FWK_RW  uint64_t  SYS_CACHE_GRP_SN_ATTR[2];
+            uint8_t   RESERVED7[0xF00 - 0xEC0];
+    FWK_RW  uint64_t  SYS_CACHE_GRP_HN_NODEID[RNSAM_SCG_HN_NODEID_REG_COUNT];
+    FWK_RW  uint64_t  SYS_CACHE_GRP_SN_NODEID[32];
+    FWK_RW  uint64_t  STATUS;
+    FWK_RW  uint64_t  GIC_MEM_REGION;
+            uint8_t   RESERVED8[0x1120 - 0x1110];
+    FWK_RW  uint64_t  SYS_CACHE_GRP_CAL_MODE;
+    FWK_RW  uint64_t  HASHED_TARGET_GRP_CAL_MODE[3];
+    FWK_RW  uint64_t  SYS_CACHE_GRP_SN_SAM_CFG[8];
+            uint8_t   RESERVED9[0x11A0 - 0x1180];
+    FWK_RW  uint64_t  CML_PORT_AGGR_MODE_CTRL_REG[4];
+            uint8_t   RESERVED10[0x11F0 - 0x11C0];
+    FWK_RW  uint64_t  CML_PORT_AGGR_GRP_REG[3];
+    FWK_RW  uint64_t  CML_PORT_AGGR_CTRL_REG[16];
+            uint8_t   RESERVED11[0x20C0 - 0x1288];
+    FWK_RW  uint64_t  NON_HASH_MEM_REGION_GRP2[RNSAM_NON_HASH_REG_GRP2_COUNT];
+            uint8_t   RESERVED12[0x24C0 - 0x2200];
+    FWK_RW  uint64_t
+        NON_HASH_MEM_REGION_CFG2_GRP2[RNSAM_NON_HASH_REG_GRP2_COUNT];
+            uint8_t   RESERVED13[0x2B00 - 0x2600];
+    FWK_RW  uint64_t  CML_CPAG_BASE_INDX_GRP_REG[8];
+            uint8_t   RESERVED14[0x3100 - 0x2B40];
+    FWK_RW  uint64_t  HASHED_TGT_GRP_CFG2_REGION[32];
+            uint8_t   RESERVED15[0x3400 - 0x3200];
+    FWK_RW  uint64_t  HASHED_TARGET_GRP_HASH_CNTL[32];
+};
 // clang-format on
 
 #endif /* CMN_CYPRUS_REG_INTERNAL_H */

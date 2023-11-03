@@ -1,0 +1,207 @@
+/*
+ * Arm SCP/MCP Software
+ * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Description:
+ *     Utility functions for the programming RN-SAM.
+ */
+
+#ifndef CMN_CYPRUS_RNSAM_REG_INTERNAL_H
+#define CMN_CYPRUS_RNSAM_REG_INTERNAL_H
+
+#include <internal/cmn_cyprus_reg.h>
+
+#include <stdint.h>
+
+/* Number of non-hashed regions supported */
+#define RNSAM_NON_HASH_MEM_REGION_COUNT \
+    (RNSAM_NON_HASH_REG_COUNT + RNSAM_NON_HASH_REG_GRP2_COUNT)
+
+/* Number of hashed regions supported */
+#define RNSAM_HASH_MEM_REGION_COUNT \
+    (RNSAM_HTG_REG_COUNT + RNSAM_HTG_REG_GRP2_COUNT)
+
+/*!
+ * RNSAM node type.
+ */
+enum sam_node_type {
+    /*! Target type HN-F. Used for hashed regions. */
+    SAM_NODE_TYPE_HN_F,
+
+    /*! Target type HN-I. Used for I/O regions. */
+    SAM_NODE_TYPE_HN_I,
+
+    /*! SAM node type count */
+    SAM_NODE_TYPE_COUNT
+};
+
+/*
+ * Stall RNSAM requests and enable default target ID selection.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ *
+ * \return nothing.
+ */
+void rnsam_stall(struct cmn_cyprus_rnsam_reg *rnsam);
+
+/*
+ * Unstall RNSAM requests and disable default target ID selection.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ *
+ * \return nothing.
+ */
+void rnsam_unstall(struct cmn_cyprus_rnsam_reg *rnsam);
+
+/*
+ * Configure non-hashed region address range and target type in RNSAM.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param region_idx Non-hashed region index.
+ * \param base Non-hashed region base address.
+ * \param size Non-hashed region size.
+ * \param target_type Non-hashed region target node type
+ *      \ref enum sam_node_type.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_PARAM Range comparision mode is enabled but base address is
+ * not aligned with the size.
+ */
+int rnsam_configure_non_hashed_region(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    unsigned int region_idx,
+    uint64_t base,
+    uint64_t size,
+    enum sam_node_type target_type);
+
+/*
+ * Configure non-hashed region target node in RNSAM.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param region_idx Non-hashed region index.
+ * \param node_id Non-hashed region target node id.
+ *
+ * \return nothing.
+ */
+void rnsam_set_non_hashed_region_target(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint32_t region_idx,
+    unsigned int node_id);
+
+/*
+ * Mark the non-hashed region as valid in RNSAM.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param region_idx Non-hashed region index.
+ *
+ * \return nothing.
+ */
+void rnsam_set_non_hash_region_valid(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    unsigned int region_idx);
+
+/*
+ * Configure hashed region address range and target type in RNSAM.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param region_idx Hashed region index.
+ * \param base Hashed region base address.
+ * \param size Hashed region size.
+ * \param target_type Hashed region target node type
+ *      \ref enum sam_node_type.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_PARAM Range comparision mode is enabled but base address is
+ * not aligned with the size.
+ */
+int rnsam_configure_hashed_region(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    unsigned int region_idx,
+    uint64_t base,
+    uint64_t size,
+    enum sam_node_type target_type);
+
+/*
+ * Configure hashed region target node ID in RNSAM.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param hn_node_id Target node IDs for hashed target groups.
+ * \param hn_node_id_idx Target node ID index.
+ *
+ * \return nothing.
+ */
+void rnsam_set_htg_target_hn_nodeid(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint16_t hn_node_id,
+    uint32_t hn_node_id_idx);
+
+/*
+ * Configure hashed region target node count in RNSAM.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param scg_idx SCG/hashed region index.
+ * \param target_count Number of target nodes in the given SCG/HTG.
+ *
+ * \return nothing.
+ */
+void rnsam_set_htg_target_hn_count(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t scg_idx,
+    uint16_t target_count);
+
+/*
+ * Enable CAL mode for the given SCG/HTG region.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param scg_idx SCG/hashed region index.
+ *
+ * \return nothing.
+ */
+void rnsam_enable_htg_cal_mode(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t scg_idx);
+
+/*
+ * Mark the hashed region as valid in RNSAM.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param region_idx hashed region index.
+ *
+ * \return nothing.
+ */
+void rnsam_set_htg_region_valid(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    unsigned int region_idx);
+
+/*
+ * Setup the RNSAM programming context.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ *
+ * \details Reads static configuration from the givne RNSAM node and saves it in
+ * the context structure. This eliminates the need to read the configuration
+ * every time when programming an RNSAM node.
+ *
+ * \note All RNSAM nodes in a given CMN mesh are expected to have the same
+ * configuration during the boot time.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_PARAM Invalid rnsam register pointer.
+ *
+ */
+int setup_rnsam_ctx(struct cmn_cyprus_rnsam_reg *rnsam_reg);
+
+#endif /* CMN_CYPRUS_RNSAM_REG_INTERNAL_H */
