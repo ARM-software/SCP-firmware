@@ -13,4 +13,5 @@ target_sources(${SCP_MODULE_TARGET}
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_cmn_cyprus.c"
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/cmn_cyprus_cfg_reg.c"
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/cmn_cyprus_node_info_reg.c"
-    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/cmn_cyprus_mxp_reg.c")
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/cmn_cyprus_mxp_reg.c"
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/cmn_cyprus_discovery_setup.c")

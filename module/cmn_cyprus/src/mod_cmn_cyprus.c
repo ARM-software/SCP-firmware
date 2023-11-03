@@ -9,11 +9,13 @@
  */
 
 #include <internal/cmn_cyprus_ctx.h>
+#include <internal/cmn_cyprus_discovery_setup.h>
 
 #include <mod_cmn_cyprus.h>
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
+#include <fwk_log.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_status.h>
@@ -25,6 +27,24 @@
 /* Module context */
 static struct cmn_cyprus_ctx ctx;
 
+static int cmn_cyprus_setup(void)
+{
+    int status;
+
+    FWK_LOG_INFO(MOD_NAME "Configuring CMN...");
+
+    /* Discover the mesh and setup the context data */
+    status = cmn_cyprus_discovery(&ctx);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(
+            MOD_NAME "Error! CMN Discovery failed with %s",
+            fwk_status_str(status));
+        return status;
+    }
+
+    return FWK_SUCCESS;
+}
+
 /* Framework handlers */
 static int cmn_cyprus_init(
     fwk_id_t module_id,
@@ -35,6 +55,8 @@ static int cmn_cyprus_init(
 
     /* Save the module config data in the context */
     ctx.config = (const struct mod_cmn_cyprus_config *)data;
+
+    ctx.cfgm = (struct cmn_cyprus_cfgm_reg *)ctx.config->periphbase;
 
     /* Validate config data */
     if (ctx.config->periphbase == 0) {
@@ -56,7 +78,14 @@ static int cmn_cyprus_init(
 
 int cmn_cyprus_start(fwk_id_t id)
 {
-    return FWK_SUCCESS;
+    int status;
+
+    status = cmn_cyprus_setup();
+    if (status != FWK_SUCCESS) {
+        fwk_trap();
+    }
+
+    return status;
 }
 
 const struct fwk_module module_cmn_cyprus = {
