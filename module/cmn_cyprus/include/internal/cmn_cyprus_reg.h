@@ -38,6 +38,22 @@ struct cmn_cyprus_node_cfg_reg {
     FWK_R   uint64_t  CHILD_INFO;
             uint8_t   RESERVED1[0x100 - 0x88];
 };
+
+/*!
+ * Mesh Crosspoint (MXP) registers.
+ */
+struct cmn_cyprus_mxp_reg {
+    FWK_R   uint64_t  NODE_INFO;
+    FWK_R   uint64_t  PORT_CONNECT_INFO[6];
+    FWK_R   uint64_t  PORT_CONNECT_INFO_EAST;
+    FWK_R   uint64_t  PORT_CONNECT_INFO_NORTH;
+            uint8_t   RESERVED0[0x80 - 0x48];
+    FWK_R   uint64_t  CHILD_INFO;
+            uint8_t   RESERVED1[0x100 - 0x88];
+    FWK_R   uint64_t  CHILD_POINTER[32];
+            uint8_t   RESERVED2[0xA70 - 0x200];
+    FWK_RW  uint64_t  PORT_DISABLE;
+};
 // clang-format on
 
 #endif /* CMN_CYPRUS_REG_INTERNAL_H */
