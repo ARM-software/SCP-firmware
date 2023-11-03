@@ -8,6 +8,8 @@
 #ifndef MOD_CMN_CYPRUS_H
 #define MOD_CMN_CYPRUS_H
 
+#include <fwk_id.h>
+
 #include <stdint.h>
 
 /*!
@@ -36,6 +38,9 @@ struct mod_cmn_cyprus_config {
 
     /*! Size along y-axis of the interconnect mesh */
     unsigned int mesh_size_y;
+
+    /*! Identifier of the clock that this device depends on */
+    fwk_optional_id_t clock_id;
 };
 
 /*!
