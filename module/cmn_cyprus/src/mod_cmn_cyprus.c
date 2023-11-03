@@ -10,6 +10,7 @@
 
 #include <internal/cmn_cyprus_ctx.h>
 #include <internal/cmn_cyprus_discovery_setup.h>
+#include <internal/cmn_cyprus_hnsam_setup.h>
 
 #include <mod_clock.h>
 #include <mod_cmn_cyprus.h>
@@ -40,6 +41,15 @@ static int cmn_cyprus_setup(void)
     if (status != FWK_SUCCESS) {
         FWK_LOG_ERR(
             MOD_NAME "Error! CMN Discovery failed with %s",
+            fwk_status_str(status));
+        return status;
+    }
+
+    /* Program the HN-F SAM */
+    status = cmn_cyprus_setup_hnf_sam(&ctx);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(
+            MOD_NAME "Error! HN-F SAM setup failed with %s",
             fwk_status_str(status));
         return status;
     }
