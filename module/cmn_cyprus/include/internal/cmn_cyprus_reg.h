@@ -54,6 +54,47 @@ struct cmn_cyprus_mxp_reg {
             uint8_t   RESERVED2[0xA70 - 0x200];
     FWK_RW  uint64_t  PORT_DISABLE;
 };
+
+#define HNS_RN_CLUSTER_MAX    128
+#define HNS_RN_PHYIDS_REG_MAX 4
+
+/*!
+ * Fully Coherent Home Node (HN-S) registers.
+ */
+struct cmn_cyprus_hns_reg {
+    FWK_R   uint64_t  NODE_INFO;
+            uint8_t   RESERVED0[0x80 - 0x8];
+    FWK_R   uint64_t  CHILD_INFO;
+            uint8_t   RESERVED1[0x900 - 0x88];
+    FWK_R   uint64_t  UNIT_INFO[2];
+            uint8_t   RESERVED2[0xD00 - 0x910];
+    FWK_RW  uint64_t  SAM_CONTROL;
+    FWK_RW  uint64_t  SAM_MEMREGION[2];
+            uint8_t   RESERVED3[0xD28 - 0xD18];
+    FWK_RW  uint64_t  SAM_CONTROL_2;
+            uint8_t   RESERVED4[0xD38 - 0xD30];
+    FWK_RW  uint64_t  SAM_MEMREGION_END_ADDR[2];
+            uint8_t   RESERVED5[0xFB0 - 0xD48];
+    FWK_RW  uint64_t  CML_PORT_AGGR_GRP_REG[2];
+            uint8_t   RESERVED6[0xFD0 - 0xFC0];
+    FWK_RW  uint64_t  CML_PORT_AGGR_CTRL_REG;
+            uint8_t   RESERVED7[0x1900 - 0xFD8];
+    FWK_RW  uint64_t  PPU_PWPR;
+            uint8_t   RESERVED8[0x3C00 - 0x1908];
+    FWK_RW  uint64_t
+        HNS_RN_CLUSTER_PHYSID[HNS_RN_CLUSTER_MAX][HNS_RN_PHYIDS_REG_MAX];
+            uint8_t   RESERVED9[0x7000 - 0x4C00];
+    FWK_RW  uint64_t  LCN_HASHED_TGT_GRP_CFG1_REGION[32];
+    FWK_RW  uint64_t  LCN_HASHED_TGT_GRP_CFG2_REGION[32];
+    FWK_RW  uint64_t  LCN_HASHED_TGT_GRP_SEC_CFG1_REGION[32];
+    FWK_RW  uint64_t  LCN_HASHED_TGT_GRP_SEC_CFG2_REGION[32];
+    FWK_RW  uint64_t  LCN_HASHED_TARGET_GRP_HASH_CNTL_REG[32];
+    FWK_RW  uint64_t  LCN_HASHED_TARGET_GROUP_HN_COUNT_REG[4];
+    FWK_RW  uint64_t  LCN_HASHED_TARGET_GRP_CAL_MODE_REG[8];
+    FWK_RW  uint64_t  LCN_HASHED_TARGET_GRP_HNF_CPA_EN_REG[2];
+            uint8_t   RESERVED10[0x7580 - 0x7570];
+    FWK_RW  uint64_t  LCN_HASHED_TARGET_GRP_CPAG_PERHNF_REG[16];
+};
 // clang-format on
 
 #endif /* CMN_CYPRUS_REG_INTERNAL_H */
