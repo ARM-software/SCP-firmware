@@ -20,6 +20,20 @@
 #define MOD_NAME "[CMN_CYPRUS] "
 
 /*!
+ * \brief Structure to store the HN-S node info.
+ */
+struct cmn_cyprus_hns_info {
+    /*! Pointer to the HN-S register */
+    struct cmn_cyprus_hns_reg *hns;
+
+    /*! Pointer to HN-S node position structure */
+    struct cmn_cyprus_node_pos node_pos;
+
+    /*! Pointer to the connected MXP register */
+    struct cmn_cyprus_mxp_reg *mxp;
+};
+
+/*!
  * \brief CMN Cyprus driver context.
  */
 struct cmn_cyprus_ctx {
@@ -31,6 +45,9 @@ struct cmn_cyprus_ctx {
 
     /*! Count of HN-S nodes */
     unsigned int hns_count;
+
+    /*! Pointer to the table of HN-S nodes */
+    struct cmn_cyprus_hns_info *hns_info_table;
 
     /*! Count of RNSAM nodes */
     unsigned int rnsam_count;

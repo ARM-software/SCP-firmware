@@ -10,6 +10,7 @@
 
 #include <fwk_id.h>
 
+#include <stddef.h>
 #include <stdint.h>
 
 /*!
@@ -25,6 +26,23 @@
  * \details This module adds support for the CMN Cyprus interconnect.
  * @{
  */
+
+/*!
+ * \brief Coordinate (x, y, port number, device number) of a node in the mesh.
+ */
+struct cmn_cyprus_node_pos {
+    /*! X position of the node in the mesh */
+    unsigned int pos_x;
+
+    /*! Y position of the node in the mesh */
+    unsigned int pos_y;
+
+    /*! Port number of the node in the MXP */
+    uint8_t port_num;
+
+    /*! Device number of the node in the MXP port */
+    unsigned int device_num;
+};
 
 /*!
  * \brief CMN Cyprus configuration data.

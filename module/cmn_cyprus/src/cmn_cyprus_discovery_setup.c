@@ -19,6 +19,7 @@
 
 #include <fwk_assert.h>
 #include <fwk_log.h>
+#include <fwk_mm.h>
 #include <fwk_status.h>
 
 #include <stdbool.h>
@@ -466,6 +467,124 @@ static void print_mesh_node_count(void)
         MOD_NAME "Total CCG Link Agent nodes: %d", shared_ctx->ccla_reg_count);
 }
 
+static int store_hns_info(
+    struct cmn_cyprus_node_cfg_reg *node,
+    struct cmn_cyprus_mxp_reg *mxp)
+{
+    unsigned int ldid;
+    unsigned int node_id;
+    unsigned int node_pos_x;
+    unsigned int node_pos_y;
+    uint8_t mesh_size_x;
+    uint8_t mesh_size_y;
+    uint8_t mxp_port;
+    uint8_t mxp_port_count;
+    struct cmn_cyprus_hns_info *hns_info;
+
+    ldid = node_info_get_ldid(node->NODE_INFO);
+
+    if (ldid >= shared_ctx->hns_count) {
+        return FWK_E_RANGE;
+    }
+
+    hns_info = &shared_ctx->hns_info_table[ldid];
+
+    /*
+     * Save the node info in the HN-S info table.
+     */
+    hns_info->hns = (struct cmn_cyprus_hns_reg *)node;
+
+    node_id = node_info_get_id(node->NODE_INFO);
+    hns_info->node_pos.device_num = get_device_number(node_id);
+
+    mesh_size_x = shared_ctx->config->mesh_size_x;
+    mesh_size_y = shared_ctx->config->mesh_size_y;
+
+    node_pos_x = get_node_pos_x(node_id, mesh_size_x, mesh_size_y);
+    hns_info->node_pos.pos_x = node_pos_x;
+
+    node_pos_y = get_node_pos_y(node_id, mesh_size_x, mesh_size_y);
+    hns_info->node_pos.pos_y = node_pos_y;
+
+    hns_info->mxp = mxp;
+
+    mxp_port_count = mxp_get_device_port_count(mxp);
+
+    /*
+     * Get the port number in the cross point to which the node is
+     * connected to.
+     */
+    mxp_port = get_port_number(node_id, mxp_port_count);
+    hns_info->node_pos.port_num = mxp_port;
+
+    return FWK_SUCCESS;
+}
+
+static int cmn_cyprus_init_node_info(struct cmn_cyprus_mxp_reg *mxp)
+{
+    int status;
+    unsigned int node_count;
+    unsigned int node_idx;
+    unsigned int node_type;
+    const struct mod_cmn_cyprus_config *config;
+    struct cmn_cyprus_node_cfg_reg *node;
+
+    config = shared_ctx->config;
+
+    /* Get the number of children connected to the cross point */
+    node_count = get_child_count(mxp->CHILD_INFO);
+
+    /* Traverse nodes */
+    for (node_idx = 0; node_idx < node_count; node_idx++) {
+        if (mxp_is_child_external(mxp, node_idx)) {
+            /* Skip external nodes */
+            continue;
+        }
+
+        /* Pointer to the child node */
+        node = mxp_get_child_node(mxp, node_idx, config->periphbase);
+
+        /* Get the node type identifier */
+        node_type = node_info_get_type(node->NODE_INFO);
+
+        if ((node_type == NODE_TYPE_HN_S) || (node_type == NODE_TYPE_HN_F)) {
+            status = store_hns_info(node, mxp);
+            if (status != FWK_SUCCESS) {
+                return status;
+            }
+        }
+    }
+
+    return FWK_SUCCESS;
+}
+
+/* Traverse the mesh and initialize the module context data */
+static int cmn_cyprus_init_ctx(void)
+{
+    int status;
+    unsigned int mxp_count;
+    unsigned int mxp_idx;
+    struct cmn_cyprus_node_cfg_reg *node;
+    struct cmn_cyprus_mxp_reg *mxp;
+
+    /* Get number of cross points in the mesh */
+    mxp_count = get_child_count(shared_ctx->cfgm->CHILD_INFO);
+
+    /* Traverse cross points */
+    for (mxp_idx = 0; mxp_idx < mxp_count; mxp_idx++) {
+        node = cfgm_get_child_node(shared_ctx->cfgm, mxp_idx);
+        mxp = (struct cmn_cyprus_mxp_reg *)node;
+
+        /* Traverse the nodes connected to the MXP and init node info */
+        status = cmn_cyprus_init_node_info(mxp);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+    }
+
+    return FWK_SUCCESS;
+}
+
 int cmn_cyprus_discovery(struct cmn_cyprus_ctx *ctx)
 {
     int status;
@@ -483,6 +602,20 @@ int cmn_cyprus_discovery(struct cmn_cyprus_ctx *ctx)
     }
 
     print_mesh_node_count();
+
+    /*
+     * Allocate resources based on the discovery.
+     */
+
+    /* HN-S Info table */
+    shared_ctx->hns_info_table = fwk_mm_calloc(
+        shared_ctx->hns_count, sizeof(*shared_ctx->hns_info_table));
+
+    /* Traverse the mesh and initialize context data */
+    status = cmn_cyprus_init_ctx();
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
 
     FWK_LOG_INFO(MOD_NAME "CMN Discovery complete");
 
