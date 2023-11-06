@@ -125,6 +125,10 @@ if(SCP_ENABLE_ATU_DELEGATE)
     target_compile_definitions(framework PUBLIC "BUILD_HAS_ATU_DELEGATE")
 endif()
 
+if(SCP_ENABLE_OUTBAND_MSG_SUPPORT)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_OUTBAND_MSG_SUPPORT")
+endif()
+
 #
 # Handle the framework logging filter level.
 #

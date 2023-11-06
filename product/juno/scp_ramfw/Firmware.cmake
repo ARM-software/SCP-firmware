@@ -36,6 +36,8 @@ set(SCP_ENABLE_PMI_INIT FALSE)
 
 set(SCP_PLATFORM_VARIANT_INIT "BOARD")
 
+set(SCP_ENABLE_OUTBAND_MSG_SUPPORT_INIT TRUE)
+
 #
 # If SCP_PLATFORM_VARIANT hasn't been set yet, it will be set to the default
 # value (BOARD)
