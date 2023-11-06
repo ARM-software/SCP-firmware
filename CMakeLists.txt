@@ -351,6 +351,13 @@ cmake_dependent_option(
     "${SCP_ENABLE_NOTIFICATIONS}")
 
 cmake_dependent_option(
+    SCP_ENABLE_OUTBAND_MSG_SUPPORT
+    "Enable Transport Out Band Message Support?"
+    "${SCP_ENABLE_OUTBAND_MSG_SUPPORT_INIT}"
+    "DEFINED SCP_ENABLE_OUTBAND_MSG_SUPPORT_INIT"
+    "${SCP_ENABLE_OUTBAND_MSG_SUPPORT}")
+
+cmake_dependent_option(
     SCP_ENABLE_RESOURCE_PERMISSIONS
     "Enable the resource permission support?"
     "${SCP_ENABLE_RESOURCE_PERMISSIONS_INIT}"

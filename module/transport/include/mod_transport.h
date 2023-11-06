@@ -111,8 +111,10 @@ enum mod_transport_channel_type {
  * \details Defines the type of transport used by the channel
  */
 enum mod_transport_channel_transport_type {
+#ifdef BUILD_HAS_OUTBAND_MSG_SUPPORT
     /*! Out-band transport - SMT */
     MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_OUT_BAND,
+#endif
 
 #ifdef BUILD_HAS_INBAND_MSG_SUPPORT
     /*! In-band transport - MHUv2, MHUv3, I2C, etc*/

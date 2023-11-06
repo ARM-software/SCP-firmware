@@ -37,6 +37,11 @@
 
 #define MOD_NAME "[TRANSPORT]"
 
+#if !defined(BUILD_HAS_OUTBAND_MSG_SUPPORT) && \
+    !defined(BUILD_HAS_INBAND_MSG_SUPPORT)
+#    error "Transport module used without outband or inband message support."
+#endif
+
 struct transport_channel_ctx {
     /* Channel identifier */
     fwk_id_t id;
@@ -223,7 +228,7 @@ static int transport_respond(
     size_t size)
 {
     struct transport_channel_ctx *channel_ctx;
-    struct mod_transport_buffer *buffer;
+    struct mod_transport_buffer *buffer = NULL;
     enum mod_transport_channel_transport_type transport_type;
     int status = FWK_SUCCESS;
     unsigned int flags;
@@ -235,6 +240,7 @@ static int transport_respond(
 
     fwk_assert(transport_type != MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_NONE);
 
+#if defined(BUILD_HAS_OUTBAND_MSG_SUPPORT)
     if (transport_type == MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_OUT_BAND) {
         /* Use shared mailbox for out-band messages */
         buffer = ((struct mod_transport_buffer *)
@@ -252,8 +258,10 @@ static int transport_respond(
             buffer->payload,
             (payload == NULL ? channel_ctx->out->payload : payload),
             size);
-    } else {
-#ifdef BUILD_HAS_INBAND_MSG_SUPPORT
+    }
+#else
+#    if defined(BUILD_HAS_INBAND_MSG_SUPPORT)
+    if (transport_type == MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_IN_BAND) {
         /* Use internal write buffer for in-band messages */
         buffer = channel_ctx->out;
 
@@ -261,10 +269,14 @@ static int transport_respond(
         if (payload != NULL) {
             fwk_str_memcpy(buffer->payload, payload, size);
         }
-#else
-        FWK_LOG_ERR("%s ERROR. IN-BAND MESSAGE NOT SUPPORTED!", MOD_NAME);
-        return FWK_E_SUPPORT;
+    }
+#    endif
 #endif
+
+    if (buffer == NULL) {
+        FWK_LOG_ERR(
+            "%s ERROR: NULL buffer in \"transport_respond()\"", MOD_NAME);
+        return FWK_E_PANIC;
     }
 
     /*
@@ -283,7 +295,7 @@ static int transport_respond(
 
     fwk_interrupt_global_enable(flags);
 
-#ifdef BUILD_HAS_INBAND_MSG_SUPPORT
+#if defined(BUILD_HAS_INBAND_MSG_SUPPORT)
     if (transport_type == MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_IN_BAND) {
         /* Send the response message using driver module API */
         status = channel_ctx->driver_api->send_message(
@@ -311,8 +323,8 @@ static int transport_transmit(
     bool request_ack_by_interrupt)
 {
     struct transport_channel_ctx *channel_ctx;
-    struct mod_transport_buffer *buffer;
-#ifdef BUILD_HAS_INBAND_MSG_SUPPORT
+    struct mod_transport_buffer *buffer = NULL;
+#if defined(BUILD_HAS_INBAND_MSG_SUPPORT)
     int status;
 #endif
     enum mod_transport_channel_transport_type transport_type;
@@ -324,6 +336,7 @@ static int transport_transmit(
 
     fwk_assert(transport_type != MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_NONE);
 
+#if defined(BUILD_HAS_OUTBAND_MSG_SUPPORT)
     if (transport_type == MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_OUT_BAND) {
         /* Use shared mailbox for out-band messages */
         buffer = ((struct mod_transport_buffer *)
@@ -339,17 +352,27 @@ static int transport_transmit(
             return FWK_E_BUSY;
         }
     } else {
-#ifdef BUILD_HAS_INBAND_MSG_SUPPORT
+#    if !defined(BUILD_HAS_INBAND_MSG_SUPPORT)
+        FWK_LOG_ERR("%s ERROR. IN-BAND MESSAGES NOT SUPPORTED!", MOD_NAME);
+        return FWK_E_SUPPORT;
+#    endif
+    }
+#endif
+
+#if defined(BUILD_HAS_INBAND_MSG_SUPPORT)
+    if (transport_type == MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_IN_BAND) {
         /* Use internal write buffer for in-band messages */
         buffer = channel_ctx->out;
         /* reserved fields must be set to zero */
         buffer->reserved0 = 0;
         buffer->reserved1 = 0;
-#else
-        FWK_LOG_ERR("%s ERROR. IN-BAND MESSAGES NOT SUPPORTED!", MOD_NAME);
+    } else {
+#    if !defined(BUILD_HAS_OUTBAND_MSG_SUPPORT)
+        FWK_LOG_ERR("%s ERROR. OUT-BAND MESSAGES NOT SUPPORTED!", MOD_NAME);
         return FWK_E_SUPPORT;
-#endif
+#    endif
     }
+#endif
 
     buffer->message_header = message_header;
 
@@ -368,15 +391,13 @@ static int transport_transmit(
     /* The mailbox status is relevant for out-band transport only */
     buffer->status &= ~MOD_TRANSPORT_MAILBOX_STATUS_FREE_MASK;
 
-#ifdef BUILD_HAS_INBAND_MSG_SUPPORT
-    if (transport_type == MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_IN_BAND) {
-        /* Send the SCMI message using driver module API */
-        status = channel_ctx->driver_api->send_message(
-            channel_ctx->out, channel_ctx->config->driver_id);
+#if defined(BUILD_HAS_INBAND_MSG_SUPPORT)
+    /* Send the SCMI message using driver module API */
+    status = channel_ctx->driver_api->send_message(
+        channel_ctx->out, channel_ctx->config->driver_id);
 
-        if (status != FWK_SUCCESS) {
-            return status;
-        }
+    if (status != FWK_SUCCESS) {
+        return status;
     }
 #endif
 
@@ -565,12 +586,15 @@ static const struct mod_transport_fast_channels_api
 
 static int transport_message_handler(struct transport_channel_ctx *channel_ctx)
 {
-    struct mod_transport_buffer *in, *out, *shared_memory;
-    enum mod_transport_channel_transport_type transport_type;
-    size_t payload_size;
+    struct mod_transport_buffer *in, *out;
     int status;
 
-    transport_type = channel_ctx->config->transport_type;
+#if defined(BUILD_HAS_OUTBAND_MSG_SUPPORT)
+    struct mod_transport_buffer *shared_memory;
+    size_t payload_size;
+#endif
+
+    enum mod_transport_channel_transport_type transport_type;
 
     /* Check if we are already processing */
     if (channel_ctx->locked) {
@@ -580,6 +604,8 @@ static int transport_message_handler(struct transport_channel_ctx *channel_ctx)
     in = channel_ctx->in;
     out = channel_ctx->out;
 
+    transport_type = channel_ctx->config->transport_type;
+#if defined(BUILD_HAS_OUTBAND_MSG_SUPPORT)
     if (transport_type == MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_OUT_BAND) {
         shared_memory = ((struct mod_transport_buffer *)
                              channel_ctx->config->out_band_mailbox_address);
@@ -620,19 +646,23 @@ static int transport_message_handler(struct transport_channel_ctx *channel_ctx)
                 return FWK_E_STATE;
             }
         }
+
         /*
          * Copy the contents from shared mailbox to internal read buffer.
          * note: payload is not copied yet.
          */
         fwk_str_memcpy(in, shared_memory, sizeof(struct mod_transport_buffer));
     }
+
+#endif
+
     /*
      * Set the channel context as locked until the bound service completes
      * processing the message.
      */
     channel_ctx->locked = true;
 
-#ifdef BUILD_HAS_INBAND_MSG_SUPPORT
+#if defined(BUILD_HAS_INBAND_MSG_SUPPORT)
     if (transport_type == MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_IN_BAND) {
         /* get the message from the driver */
         channel_ctx->driver_api->get_message(
@@ -675,6 +705,7 @@ static int transport_message_handler(struct transport_channel_ctx *channel_ctx)
         }
     }
 
+#if defined(BUILD_HAS_OUTBAND_MSG_SUPPORT)
     if (transport_type == MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_OUT_BAND) {
         shared_memory = ((struct mod_transport_buffer *)
                              channel_ctx->config->out_band_mailbox_address);
@@ -685,6 +716,7 @@ static int transport_message_handler(struct transport_channel_ctx *channel_ctx)
             fwk_str_memcpy(in->payload, shared_memory->payload, payload_size);
         }
     }
+#endif
 
     /* Let the subscribed service handle the message */
     if (channel_ctx->is_scmi) {
@@ -736,6 +768,7 @@ static int transport_signal_message(fwk_id_t channel_id)
         return status;
     }
 
+#if defined(BUILD_HAS_OUTBAND_MSG_SUPPORT)
     if (channel_ctx->config->transport_type ==
         MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_OUT_BAND) {
         if (!channel_ctx->out_band_mailbox_ready) {
@@ -745,6 +778,8 @@ static int transport_signal_message(fwk_id_t channel_id)
             return FWK_SUCCESS;
         }
     }
+#endif
+
     return transport_message_handler(channel_ctx);
 }
 
@@ -819,6 +854,7 @@ static int transport_channel_init(
         return FWK_E_DATA;
     }
 
+#if defined(BUILD_HAS_OUTBAND_MSG_SUPPORT)
     /* Validate out-band mailbox address and size */
     if ((channel_ctx->config->transport_type ==
          MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_OUT_BAND) &&
@@ -827,8 +863,9 @@ static int transport_channel_init(
         fwk_unexpected();
         return FWK_E_DATA;
     }
+#endif
 
-#ifdef BUILD_HAS_INBAND_MSG_SUPPORT
+#if defined(BUILD_HAS_INBAND_MSG_SUPPORT)
     /* Validate in-band mailbox size */
     if ((channel_ctx->config->transport_type ==
          MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_IN_BAND) &&
@@ -840,6 +877,7 @@ static int transport_channel_init(
     channel_ctx->id = channel_id;
 
     switch (channel_ctx->config->transport_type) {
+#if defined(BUILD_HAS_OUTBAND_MSG_SUPPORT)
     case MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_OUT_BAND:
         channel_ctx->in =
             fwk_mm_alloc(1, channel_ctx->config->out_band_mailbox_size);
@@ -849,8 +887,9 @@ static int transport_channel_init(
             channel_ctx->config->out_band_mailbox_size -
             sizeof(struct mod_transport_buffer);
         break;
+#endif
 
-#ifdef BUILD_HAS_INBAND_MSG_SUPPORT
+#if defined(BUILD_HAS_INBAND_MSG_SUPPORT)
     case MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_IN_BAND:
         channel_ctx->in =
             fwk_mm_alloc(1, channel_ctx->config->in_band_mailbox_size);
@@ -1032,12 +1071,15 @@ static int transport_process_bind_request(
 static int transport_start(fwk_id_t id)
 {
     int status = FWK_SUCCESS;
-    struct transport_channel_ctx *channel_ctx;
-    struct mod_transport_channel_config *config;
 
     if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
         return status;
     }
+
+#if defined(BUILD_HAS_OUTBAND_MSG_SUPPORT)
+
+    struct transport_channel_ctx *channel_ctx;
+    struct mod_transport_channel_config *config;
 
     channel_ctx = &transport_ctx.channel_ctx_table[fwk_id_get_element_idx(id)];
     config = channel_ctx->config;
@@ -1084,6 +1126,8 @@ static int transport_start(fwk_id_t id)
             return transport_mailbox_init(channel_ctx);
         }
     }
+
+#endif
 
     return status;
 }
