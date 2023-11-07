@@ -31,9 +31,13 @@
 #include <config_sensor.h>
 
 #define NOTIFICATION_ID_VALUE   3
+#define FAKE_RETURN_VALUE       4
 #define TRIP_POINT_API_ID_VALUE 4
 
 static struct mod_sensor_config sensor_configuration;
+
+static struct sensor_trip_point_ctx
+    sensor_trip_point_context[SENSOR_TRIP_POINT_COUNT];
 
 static int sensor_driver_get_value(fwk_id_t id, mod_sensor_value_t *value)
 {
@@ -45,9 +49,26 @@ static int sensor_driver_get_info(fwk_id_t id, struct mod_sensor_info *info)
     return FWK_SUCCESS;
 }
 
-static const struct mod_sensor_driver_api sensor_driver_api = {
+static int sensor_driver_get_value_error(fwk_id_t id, mod_sensor_value_t *value)
+{
+    return FWK_E_PARAM;
+}
+
+static int sensor_driver_get_info_error(
+    fwk_id_t id,
+    struct mod_sensor_info *info)
+{
+    return FWK_E_PARAM;
+}
+
+static struct mod_sensor_driver_api sensor_driver_api = {
     .get_value = sensor_driver_get_value,
     .get_info = sensor_driver_get_info,
+};
+
+static struct mod_sensor_driver_api sensor_driver_api_error = {
+    .get_value = sensor_driver_get_value_error,
+    .get_info = sensor_driver_get_info_error,
 };
 
 void setUp(void)
@@ -66,6 +87,16 @@ void setUp(void)
         (struct mod_sensor_dev_config *)
             sensor_element_table[SENSOR_FAKE_INDEX_1]
                 .data;
+
+    sensor_trip_point_context[SENSOR_FAKE_INDEX_0].params.mode =
+        MOD_SENSOR_TRIP_POINT_MODE_POSITIVE;
+    sensor_trip_point_context[SENSOR_FAKE_INDEX_1].params.mode =
+        MOD_SENSOR_TRIP_POINT_MODE_NEGATIVE;
+
+    sensor_dev_context[SENSOR_FAKE_INDEX_0].trip_point_ctx =
+        &sensor_trip_point_context[SENSOR_FAKE_INDEX_0];
+    sensor_dev_context[SENSOR_FAKE_INDEX_1].trip_point_ctx =
+        &sensor_trip_point_context[SENSOR_FAKE_INDEX_1];
 }
 
 void tearDown(void)
@@ -555,6 +586,255 @@ void utest_sensor_process_event_rd_cmplt_del_rsp_put_evt_success(void)
     TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
 }
 
+void memcpy_callback(
+    void *destination,
+    const void *source,
+    long unsigned int number,
+    int cmock_num_calls)
+{
+    memcpy(destination, source, number);
+}
+
+void utest_sensor_get_data_not_valid(void)
+{
+    int status = FWK_SUCCESS;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    status = get_data(elem_id, NULL);
+
+    TEST_ASSERT_EQUAL(status, FWK_E_PARAM);
+}
+
+void utest_sensor_get_data_valid_dequeue(void)
+{
+    int status = FWK_SUCCESS;
+
+    struct mod_sensor_data initial_data;
+    struct mod_sensor_data returned_data;
+
+    memset(&initial_data, 0, sizeof(initial_data));
+    memset(&returned_data, 0, sizeof(returned_data));
+
+    initial_data.value = FAKE_RETURN_VALUE;
+    initial_data.status = FWK_SUCCESS;
+
+    ctx_table[SENSOR_FAKE_INDEX_0].concurrency_readings.dequeuing = true;
+    ctx_table[SENSOR_FAKE_INDEX_0].last_read = initial_data;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    fwk_str_memcpy_StubWithCallback(memcpy_callback);
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+
+    status = get_data(elem_id, &returned_data);
+
+    TEST_ASSERT_EQUAL(returned_data.value, FAKE_RETURN_VALUE);
+    TEST_ASSERT_EQUAL(returned_data.status, FWK_SUCCESS);
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+}
+
+void utest_sensor_get_data_valid_call_zero_pending_requests(void)
+{
+    int status = FWK_SUCCESS;
+
+    struct mod_sensor_data initial_data;
+    struct mod_sensor_data returned_data;
+
+    memset(&initial_data, 0, sizeof(initial_data));
+    memset(&returned_data, 0, sizeof(returned_data));
+
+    initial_data.value = FAKE_RETURN_VALUE;
+    initial_data.status = FWK_SUCCESS;
+
+    ctx_table[SENSOR_FAKE_INDEX_0].driver_api = &sensor_driver_api;
+    ctx_table[SENSOR_FAKE_INDEX_1].driver_api = &sensor_driver_api;
+
+    ctx_table[SENSOR_FAKE_INDEX_0].concurrency_readings.dequeuing = false;
+    ctx_table[SENSOR_FAKE_INDEX_0].last_read = initial_data;
+
+    ctx_table[SENSOR_FAKE_INDEX_0].concurrency_readings.pending_requests = 0;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    fwk_str_memcpy_StubWithCallback(memcpy_callback);
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+
+    status = get_data(elem_id, &returned_data);
+
+    TEST_ASSERT_EQUAL(returned_data.value, FAKE_RETURN_VALUE);
+    TEST_ASSERT_EQUAL(returned_data.status, FWK_SUCCESS);
+    TEST_ASSERT_EQUAL(ctx_table->last_read.status, FWK_SUCCESS);
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+}
+
+void utest_sensor_get_info_get_ctx_if_valid_call_returns_error(void)
+{
+    int status = FWK_SUCCESS;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    status = get_info(elem_id, NULL);
+
+    TEST_ASSERT_EQUAL(status, FWK_E_PARAM);
+}
+
+void utest_sensor_get_info_driver_api_get_info_returns_error(void)
+{
+    int status;
+
+    struct mod_sensor_complete_info returned_info;
+
+    ctx_table[SENSOR_FAKE_INDEX_0].driver_api = &sensor_driver_api_error;
+    ctx_table[SENSOR_FAKE_INDEX_1].driver_api = &sensor_driver_api_error;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+
+    status = get_info(elem_id, &returned_info);
+
+    TEST_ASSERT_EQUAL(status, FWK_E_DEVICE);
+}
+
+void utest_sensor_get_info_succeeds(void)
+{
+    int status;
+
+    struct mod_sensor_complete_info returned_info;
+
+    memset(&returned_info, 0, sizeof(returned_info));
+
+    ctx_table[SENSOR_FAKE_INDEX_0].driver_api = &sensor_driver_api;
+    ctx_table[SENSOR_FAKE_INDEX_1].driver_api = &sensor_driver_api;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_1);
+
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_1);
+
+    status = get_info(elem_id, &returned_info);
+
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+    TEST_ASSERT_EQUAL(returned_info.trip_point.count, SENSOR_TRIP_POINT_1);
+}
+
+void utest_sensor_get_trip_point_0_errors(void)
+{
+    int status;
+
+    struct mod_sensor_trip_point_params returned_params;
+
+    memset(&returned_params, 0, sizeof(returned_params));
+
+    returned_params.mode = MOD_SENSOR_TRIP_POINT_MODE_TRANSITION;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    uint32_t trip_point_index = 0;
+
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+
+    status = sensor_get_trip_point(elem_id, trip_point_index, &returned_params);
+
+    TEST_ASSERT_EQUAL(status, FWK_E_PARAM);
+    TEST_ASSERT_EQUAL(
+        returned_params.mode, MOD_SENSOR_TRIP_POINT_MODE_TRANSITION);
+}
+
+void utest_sensor_get_trip_point_1(void)
+{
+    int status;
+
+    struct mod_sensor_trip_point_params returned_params;
+
+    memset(&returned_params, 0, sizeof(returned_params));
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_1);
+
+    uint32_t trip_point_index = 0;
+
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_1);
+
+    status = sensor_get_trip_point(elem_id, trip_point_index, &returned_params);
+
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+    TEST_ASSERT_EQUAL(
+        returned_params.mode, MOD_SENSOR_TRIP_POINT_MODE_NEGATIVE);
+}
+
+void utest_sensor_set_trip_point_null_params(void)
+{
+    int status;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    uint32_t trip_point_index = 0;
+
+    status = sensor_set_trip_point(elem_id, trip_point_index, NULL);
+
+    TEST_ASSERT_EQUAL(status, FWK_E_PARAM);
+}
+
+void utest_sensor_set_trip_point_tp_idx_out_of_range(void)
+{
+    int status;
+
+    struct mod_sensor_trip_point_params send_params;
+    struct mod_sensor_trip_point_params returned_params;
+
+    memset(&send_params, 0, sizeof(send_params));
+    memset(&returned_params, 0, sizeof(returned_params));
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    uint32_t trip_point_index = SENSOR_TRIP_POINT_COUNT;
+
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+
+    status = sensor_set_trip_point(elem_id, trip_point_index, &send_params);
+
+    TEST_ASSERT_EQUAL(status, FWK_E_PARAM);
+}
+
+void utest_sensor_set_trip_point_tp_idx_ok(void)
+{
+    int status;
+
+    struct mod_sensor_trip_point_params send_params;
+    struct mod_sensor_trip_point_params returned_params;
+
+    memset(&send_params, 0, sizeof(send_params));
+    memset(&returned_params, 0, sizeof(returned_params));
+
+    send_params.mode = MOD_SENSOR_TRIP_POINT_MODE_TRANSITION;
+    returned_params.mode = MOD_SENSOR_TRIP_POINT_MODE_POSITIVE;
+
+    sensor_trip_point_context[SENSOR_FAKE_INDEX_1].above_threshold = true;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_1);
+
+    uint32_t trip_point_index = 0;
+
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_1);
+
+    status = sensor_set_trip_point(elem_id, trip_point_index, &send_params);
+
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+    TEST_ASSERT_EQUAL(
+        sensor_trip_point_context[SENSOR_FAKE_INDEX_1].above_threshold, false);
+}
+
 int sensor_test_main(void)
 {
     UNITY_BEGIN();
@@ -579,6 +859,21 @@ int sensor_test_main(void)
     RUN_TEST(utest_sensor_process_event_get_delayed_response_fails);
     RUN_TEST(utest_sensor_process_event_put_event_fails);
     RUN_TEST(utest_sensor_process_event_rd_cmplt_del_rsp_put_evt_success);
+
+    RUN_TEST(utest_sensor_get_data_not_valid);
+    RUN_TEST(utest_sensor_get_data_valid_dequeue);
+    RUN_TEST(utest_sensor_get_data_valid_call_zero_pending_requests);
+
+    RUN_TEST(utest_sensor_get_info_get_ctx_if_valid_call_returns_error);
+    RUN_TEST(utest_sensor_get_info_driver_api_get_info_returns_error);
+    RUN_TEST(utest_sensor_get_info_succeeds);
+
+    RUN_TEST(utest_sensor_get_trip_point_0_errors);
+    RUN_TEST(utest_sensor_get_trip_point_1);
+
+    RUN_TEST(utest_sensor_set_trip_point_null_params);
+    RUN_TEST(utest_sensor_set_trip_point_tp_idx_out_of_range);
+    RUN_TEST(utest_sensor_set_trip_point_tp_idx_ok);
 
     return UNITY_END();
 }

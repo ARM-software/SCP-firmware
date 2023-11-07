@@ -8,9 +8,13 @@
  *      Sensor unit test configuration.
  */
 
+#include <sensor.h>
+
 #include <mod_sensor.h>
 
 #define SENSOR_ELEMENT_COUNT 2
+
+#define SENSOR_FAKE_EXPONENT_VALUE 0x5A
 
 enum {
     SENSOR_FAKE_INDEX_0,
@@ -19,6 +23,7 @@ enum {
     SENSOR_FAKE_INDEX_INVALID
 };
 enum { SENSOR_TRIP_POINT_0, SENSOR_TRIP_POINT_1, SENSOR_TRIP_POINT_COUNT };
+
 enum { SENSOR_ROUND_0, SENSOR_ROUND_1 };
 enum { SENSOR_FAKE_MODULE_0 };
 
@@ -32,7 +37,7 @@ static const struct fwk_element sensor_element_table[SENSOR_ELEMENT_COUNT] = {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_REG_SENSOR, 0),
             .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_REG_SENSOR, 0),
             .trip_point = {
-                .count = 0,
+                .count = SENSOR_TRIP_POINT_0,
             },
         }),
     },
@@ -43,7 +48,7 @@ static const struct fwk_element sensor_element_table[SENSOR_ELEMENT_COUNT] = {
             .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_REG_SENSOR, 0),
             .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_REG_SENSOR, 0),
             .trip_point = {
-                .count = 1,
+                .count = SENSOR_TRIP_POINT_1,
             },
         }),
     },
