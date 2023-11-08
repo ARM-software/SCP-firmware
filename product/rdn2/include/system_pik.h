@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -37,14 +37,14 @@ struct pik_system_reg {
     FWK_RW  uint32_t  APUARTCLK_CTRL;
     FWK_RW  uint32_t  APUARTCLK_DIV1;
             uint8_t   RESERVED6[0x8B0 - 0x8A8];
-    FWK_R   uint32_t  IONCICLK_CTRL;
-    FWK_W   uint32_t  IONCICLK_DIV1;
+    FWK_RW  uint32_t  IONCICLK_CTRL;
+    FWK_RW  uint32_t  IONCICLK_DIV1;
             uint8_t   RESERVED7[0x900 - 0x8B8];
     FWK_RW  uint32_t  TCU0CLK_CTRL;
     FWK_RW  uint32_t  TCU0CLK_DIV1;
             uint8_t   RESERVED8[0x940 - 0x908];
-    FWK_W   uint32_t  TCUx_CLK_ENABLE;
-    FWK_W   uint32_t  NCIx_CLK_ENABLE;
+    FWK_RW  uint32_t  TCUx_CLK_ENABLE;
+    FWK_RW  uint32_t  NCIx_CLK_ENABLE;
             uint8_t   RESERVED9[0xA00 - 0x948];
     FWK_R   uint32_t  CLKFORCE_STATUS;
     FWK_W   uint32_t  CLKFORCE_SET;
