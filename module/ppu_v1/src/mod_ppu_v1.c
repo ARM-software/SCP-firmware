@@ -121,8 +121,9 @@ static int get_state(struct ppu_v1_reg *ppu, unsigned int *state)
 
     *state = ppu_mode_to_power_state[mode];
 
-    if ((*state == MOD_PD_STATE_OFF) && (ppu_v1_is_dynamic_enabled(ppu)))
+    if ((*state == MOD_PD_STATE_OFF) && (ppu_v1_is_dynamic_enabled(ppu))) {
         *state = MOD_PD_STATE_SLEEP;
+    }
 
     if (*state == MODE_UNSUPPORTED) {
         FWK_LOG_ERR("[PPU_V1] Unexpected PPU mode (%i).", mode);
@@ -197,9 +198,10 @@ static int ppu_v1_pd_reset(fwk_id_t pd_id)
     /* Model does not support warm reset at the moment. Using OFF instead. */
     status =
         ppu_v1_set_power_mode(pd_ctx->ppu, PPU_V1_MODE_OFF, pd_ctx->timer_ctx);
-    if (status == FWK_SUCCESS)
+    if (status == FWK_SUCCESS) {
         status = ppu_v1_set_power_mode(
             pd_ctx->ppu, PPU_V1_MODE_ON, pd_ctx->timer_ctx);
+    }
 
     return status;
 }
@@ -229,8 +231,9 @@ static int ppu_v1_core_pd_init(struct ppu_v1_pd_ctx *pd_ctx)
     ppu_v1_init(ppu);
 
     status = get_state(ppu, &state);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     if (state == MOD_PD_STATE_ON) {
         ppu_v1_interrupt_unmask(ppu, PPU_V1_IMR_DYN_POLICY_MIN_IRQ_MASK);
@@ -309,8 +312,9 @@ static int ppu_v1_core_pd_reset(fwk_id_t core_pd_id)
     int status;
 
     status = ppu_v1_core_pd_set_state(core_pd_id, MOD_PD_STATE_OFF);
-    if (status == FWK_SUCCESS)
+    if (status == FWK_SUCCESS) {
         status = ppu_v1_core_pd_set_state(core_pd_id, MOD_PD_STATE_ON);
+    }
 
     return status;
 }
@@ -426,16 +430,19 @@ static bool lock_all_dynamic_cores(struct ppu_v1_pd_ctx *pd_ctx)
     for (core_idx = 0; core_idx < cluster_pd_ctx->core_count; ++core_idx) {
         cpu_ppu = cluster_pd_ctx->core_pd_ctx_table[core_idx]->ppu;
 
-        if (!ppu_v1_is_dynamic_enabled(cpu_ppu))
+        if (!ppu_v1_is_dynamic_enabled(cpu_ppu)) {
             continue;
+        }
 
         ppu_v1_lock_off_enable(cpu_ppu);
         while ((!ppu_v1_is_locked(cpu_ppu)) &&
-               (!ppu_v1_is_power_devactive_high(cpu_ppu, PPU_V1_MODE_ON)))
+               (!ppu_v1_is_power_devactive_high(cpu_ppu, PPU_V1_MODE_ON))) {
             continue;
+        }
 
-        if (ppu_v1_is_power_devactive_high(cpu_ppu, PPU_V1_MODE_ON))
+        if (ppu_v1_is_power_devactive_high(cpu_ppu, PPU_V1_MODE_ON)) {
             return false;
+        }
     }
 
     return true;
@@ -485,8 +492,9 @@ static void cluster_on(struct ppu_v1_pd_ctx *pd_ctx)
     fwk_assert(status == FWK_SUCCESS);
     (void)status;
 
-    if (pd_ctx->observer_api != NULL)
+    if (pd_ctx->observer_api != NULL) {
         pd_ctx->observer_api->post_ppu_on(pd_ctx->config->post_ppu_on_param);
+    }
 
     unlock_all_cores(pd_ctx);
 }
@@ -500,12 +508,14 @@ static int ppu_v1_cluster_pd_init(struct ppu_v1_pd_ctx *pd_ctx)
     ppu_v1_init(ppu);
 
     status = get_state(ppu, &state);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     /* For clusters with operating mode support, enable the dynamic support */
-    if (ppu_v1_get_num_opmode(ppu) > 1)
+    if (ppu_v1_get_num_opmode(ppu) > 1) {
         ppu_v1_opmode_dynamic_enable(ppu, PPU_V1_OPMODE_00);
+    }
 
     if (state == MOD_PD_STATE_ON) {
         ppu_v1_set_input_edge_sensitivity(ppu,
@@ -560,8 +570,9 @@ static void cluster_pd_ppu_interrupt_handler(struct ppu_v1_pd_ctx *pd_ctx)
 
     ppu = pd_ctx->ppu;
 
-    if (!ppu_v1_is_power_active_edge_interrupt(ppu, PPU_V1_MODE_ON))
+    if (!ppu_v1_is_power_active_edge_interrupt(ppu, PPU_V1_MODE_ON)) {
         return; /* Spurious interrupt */
+    }
 
     ppu_v1_ack_power_active_edge_interrupt(ppu, PPU_V1_MODE_ON);
     current_mode = ppu_v1_get_power_mode(ppu);
@@ -581,8 +592,9 @@ static void cluster_pd_ppu_interrupt_handler(struct ppu_v1_pd_ctx *pd_ctx)
          * to make sure it is not just requesting a low power mode.
          */
         while (current_mode > 0) {
-            if (ppu_v1_is_power_devactive_high(ppu, current_mode--))
+            if (ppu_v1_is_power_devactive_high(ppu, current_mode--)) {
                 return;
+            }
         }
 
         /* All PACTIVE lines are low, so the cluster can be turned off */
@@ -623,18 +635,20 @@ static void ppu_interrupt_handler(uintptr_t pd_ctx_param)
 
     fwk_assert(pd_ctx != NULL);
 
-    if (pd_ctx->config->pd_type == MOD_PD_TYPE_CORE)
+    if (pd_ctx->config->pd_type == MOD_PD_TYPE_CORE) {
         core_pd_ppu_interrupt_handler(pd_ctx);
-    else
+    } else {
         cluster_pd_ppu_interrupt_handler(pd_ctx);
+    }
 }
 
 static void ppu_isr_api_interrupt_handler(fwk_id_t pd_id)
 {
     struct ppu_v1_pd_ctx *pd_ctx;
 
-    if (!fwk_id_is_type(pd_id, FWK_ID_TYPE_ELEMENT))
+    if (!fwk_id_is_type(pd_id, FWK_ID_TYPE_ELEMENT)) {
         return;
+    }
 
     pd_ctx = ppu_v1_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
     ppu_interrupt_handler((uintptr_t)pd_ctx);
@@ -648,8 +662,9 @@ static int ppu_power_mode_on(fwk_id_t pd_id)
 {
     struct ppu_v1_pd_ctx *pd_ctx;
 
-    if (!fwk_id_is_type(pd_id, FWK_ID_TYPE_ELEMENT))
+    if (!fwk_id_is_type(pd_id, FWK_ID_TYPE_ELEMENT)) {
         return FWK_E_PARAM;
+    }
 
     pd_ctx = ppu_v1_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
 
@@ -695,8 +710,9 @@ static int ppu_v1_pd_init(fwk_id_t pd_id, unsigned int unused, const void *data)
     struct ppu_v1_pd_ctx **core_pd_ctx_table;
     struct ppu_v1_cluster_pd_ctx *cluster_pd_ctx;
 
-    if (config->pd_type >= MOD_PD_TYPE_COUNT)
+    if (config->pd_type >= MOD_PD_TYPE_COUNT) {
         return FWK_E_DATA;
+    }
 
     pd_ctx = ppu_v1_ctx.pd_ctx_table + fwk_id_get_element_idx(pd_id);
     pd_ctx->config = config;
@@ -727,11 +743,13 @@ static int ppu_v1_pd_init(fwk_id_t pd_id, unsigned int unused, const void *data)
         pd_ctx->timer_ctx = NULL;
     } else {
         pd_ctx->timer_ctx = fwk_mm_calloc(1, sizeof(struct ppu_v1_timer_ctx));
-        if (pd_ctx->timer_ctx == NULL)
+        if (pd_ctx->timer_ctx == NULL) {
             return FWK_E_NOMEM;
+        }
         /* Check for valid timeout value if timer ID is specified */
-        if (config->timer_config->set_state_timeout_us == 0)
+        if (config->timer_config->set_state_timeout_us == 0) {
             return FWK_E_PARAM;
+        }
         /* Save the timer ID to pd context */
         pd_ctx->timer_ctx->timer_id = config->timer_config->timer_id;
         pd_ctx->timer_ctx->delay_us =
@@ -769,14 +787,16 @@ static int ppu_v1_post_init(fwk_id_t module_id)
     for (pd_idx = 0; pd_idx < ppu_v1_ctx.pd_ctx_table_size; pd_idx++) {
         pd_ctx = &ppu_v1_ctx.pd_ctx_table[pd_idx];
         config = pd_ctx->config;
-        if (config->pd_type != MOD_PD_TYPE_CORE)
+        if (config->pd_type != MOD_PD_TYPE_CORE) {
             continue;
+        }
 
         cluster_id = config->cluster_id;
 
         if ((!fwk_module_is_valid_element_id(cluster_id)) ||
-            (fwk_id_get_module_idx(cluster_id) != FWK_MODULE_IDX_PPU_V1))
+            (fwk_id_get_module_idx(cluster_id) != FWK_MODULE_IDX_PPU_V1)) {
             return FWK_E_PARAM;
+        }
 
         cluster_pd_ctx = &ppu_v1_ctx.pd_ctx_table[
             fwk_id_get_element_idx(cluster_id)];
@@ -802,11 +822,13 @@ static int ppu_v1_bind(fwk_id_t id, unsigned int round)
 
     /* Nothing to do during the first round of calls where the power module
        will bind to the power domains of this module. */
-    if (round == 0)
+    if (round == 0) {
         return FWK_SUCCESS;
+    }
 
-    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))
+    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         return FWK_SUCCESS;
+    }
 
     pd_ctx = ppu_v1_ctx.pd_ctx_table + fwk_id_get_element_idx(id);
 
@@ -818,8 +840,9 @@ static int ppu_v1_bind(fwk_id_t id, unsigned int round)
             pd_ctx->timer_ctx->timer_id,
             MOD_TIMER_API_ID_TIMER,
             &pd_ctx->timer_ctx->timer_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 #endif
 
@@ -833,12 +856,14 @@ static int ppu_v1_bind(fwk_id_t id, unsigned int round)
         status = fwk_module_bind(pd_ctx->config->observer_id,
                                  pd_ctx->config->observer_api,
                                  &pd_ctx->observer_api);
-        if (status != FWK_SUCCESS)
+        if (status != FWK_SUCCESS) {
             return status;
+        }
     }
 
-    if (fwk_id_is_equal(pd_ctx->bound_id, FWK_ID_NONE))
+    if (fwk_id_is_equal(pd_ctx->bound_id, FWK_ID_NONE)) {
         return FWK_SUCCESS;
+    }
 
     switch (fwk_id_get_module_idx(pd_ctx->bound_id)) {
 #ifdef BUILD_HAS_MOD_POWER_DOMAIN
@@ -879,8 +904,9 @@ static int ppu_v1_process_bind_request(fwk_id_t source_id,
     api_idx = fwk_id_get_api_idx(api_id);
 
     if (api_idx == MOD_PPU_V1_API_IDX_ISR) {
-        if (!fwk_id_is_type(target_id, FWK_ID_TYPE_MODULE))
+        if (!fwk_id_is_type(target_id, FWK_ID_TYPE_MODULE)) {
             return FWK_E_SUPPORT;
+        }
 
         *api = &isr_api;
         return FWK_SUCCESS;
@@ -891,11 +917,13 @@ static int ppu_v1_process_bind_request(fwk_id_t source_id,
         return FWK_SUCCESS;
     }
 
-    if (api_idx != MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER)
+    if (api_idx != MOD_PPU_V1_API_IDX_POWER_DOMAIN_DRIVER) {
         return FWK_E_SUPPORT;
+    }
 
-    if (!fwk_module_is_valid_element_id(target_id))
+    if (!fwk_module_is_valid_element_id(target_id)) {
         return FWK_E_PARAM;
+    }
 
     pd_ctx = ppu_v1_ctx.pd_ctx_table + fwk_id_get_element_idx(target_id);
 
@@ -973,8 +1001,9 @@ static int ppu_v1_start(fwk_id_t id)
     struct ppu_v1_pd_ctx *pd_ctx;
     const struct mod_ppu_v1_config *module_config;
 
-    if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT))
+    if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
         return FWK_SUCCESS;
+    }
 
     pd_ctx = ppu_v1_ctx.pd_ctx_table + fwk_id_get_element_idx(id);
     module_config = fwk_module_get_data(fwk_id_build_module_id(id));
@@ -985,8 +1014,9 @@ static int ppu_v1_start(fwk_id_t id)
         module_config->pd_notification_id,
         module_config->pd_source_id,
         id);
-    if (status != FWK_SUCCESS)
+    if (status != FWK_SUCCESS) {
         return status;
+    }
 
     switch (pd_ctx->config->pd_type) {
     case MOD_PD_TYPE_CORE:
@@ -1022,8 +1052,9 @@ static int ppu_v1_process_notification(
     params = (struct mod_pd_power_state_transition_notification_params *)
         event->params;
 
-    if (params->state != MOD_PD_STATE_ON)
+    if (params->state != MOD_PD_STATE_ON) {
         return FWK_SUCCESS;
+    }
 
     pd_ctx = ppu_v1_ctx.pd_ctx_table + fwk_id_get_element_idx(event->target_id);
 
