@@ -76,6 +76,13 @@ GIT_CMD = \
     'git diff-tree --name-only --no-commit-id -r --diff-filter=ACMRTUX HEAD'
 
 #
+# git log command using raw provides changed entries along with a field for
+# rename or copy and its score. For example, R100 denotes a file renamed with
+# 100% similarity. It behaves similary to git whatchanged.
+#
+GIT_WHATCHANGED_CMD = 'git log --raw HEAD -1'
+
+#
 # License pattern to match
 #
 LICENSE_PATTERN = \
@@ -125,6 +132,14 @@ def is_valid_file_type(filename):
     return False
 
 
+def is_file_renamed_identical(filename, identical_files_list):
+    for identical_file_str in identical_files_list:
+        if filename in identical_file_str:
+            return True
+
+    return False
+
+
 def check_copyright(pattern, filename):
     with open(filename, encoding="utf-8") as file:
         # Read just the first HEAD_LINE_COUNT lines of a file
@@ -169,10 +184,27 @@ def main():
         print("ERROR " + e.returncode + ": Failed to get last changed files")
         return 1
 
+    try:
+        result_wch = subprocess.Popen(
+            GIT_WHATCHANGED_CMD,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+    except subprocess.CalledProcessError as e:
+        print("ERROR " + e.returncode + ": Failed to get last changed files")
+        return 1
+
+    wch_outs, wch_errs = result_wch.communicate()
+    identical_files = [line
+                       for line in wch_outs.decode("utf-8").split('\n')
+                       if " R100" in line]
+
     for line in result.stdout:
         filename = line.decode("utf-8").strip('\n')
 
-        if is_valid_file_type(filename) and is_valid_directory(filename):
+        if (is_valid_file_type(filename) and
+                is_valid_directory(filename) and
+                not is_file_renamed_identical(filename, identical_files)):
             try:
                 check_copyright(pattern, filename)
             except ErrorYear:
