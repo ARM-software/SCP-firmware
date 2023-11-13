@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -47,9 +47,9 @@ struct pcie_ctrl_reg {
     struct mod_pcid_registers pcid;
 };
 
-#define PCIE_INTEG_CTRL_REG_ADDR_POS 1
+#define PCIE_INTEG_CTRL_REG_ADDR_POS             1
 #define PCIE_INTEG_CTRL_REG_SEC_ACC_CTRL_DIS_POS 29
-#define PCIE_INTEG_CTRL_REG_EN       1
+#define PCIE_INTEG_CTRL_REG_EN                   1
 
 #define PCIE_INTEG_CTRL_REG_START_ADDR(addr) \
     (((addr) >> 20) << PCIE_INTEG_CTRL_REG_ADDR_POS)
