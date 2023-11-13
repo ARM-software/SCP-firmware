@@ -1,171 +1,79 @@
 #!/usr/bin/env python3
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
 """
-Check whether the files adhere to the prescribed coding style. Validation
-is performed by checkpatch.pl which is found on the environment path or
-via user supplied path.
+    Check for code style violations.
 """
 
 import argparse
-import os
-import fnmatch
-import sys
 import subprocess
+import sys
+from utils import banner, get_previous_commit
 
 #
-# Checkpatch.pl location (assume it is available through the environment path
-# by default)
+# Default output file
 #
-script_path = 'checkpatch.pl'
-
-#
-# Directories to scan. Only used when --input-mode is set to "project".
-#
-DIRECTORIES = [
-    'arch',
-    'framework',
-    'module',
-    'product',
-    'tools',
-]
-
-#
-# Supported file types. Only used when --input-mode is set to "project".
-#
-FILE_TYPES = [
-    '*.c',
-    '*.h',
-]
-
-#
-# Default ignored types. These are rules within checkpatch that conflict with
-# the SCP/MCP Software coding style and so they should never be enabled.
-#
-IGNORED_TYPES = [
-    'LEADING_SPACE',  # Incompatible with spaces for indentation
-    'CODE_INDENT',  # Incompatible with spaces for indentation
-    'SUSPECT_CODE_INDENT',  # Incompatible with spaces for indentation
-    'POINTER_LOCATION',  # Doesn't agree with our function declaration style
-    'BLOCK_COMMENT_STYLE',  # Doesn't tolerate asterisks on each block line
-    'AVOID_EXTERNS',  # We use the extern keyword
-    'NEW_TYPEDEFS',  # We add new typedefs
-    'VOLATILE',  # We use volatile
-    'MACRO_WITH_FLOW_CONTROL',  # Some 'capture' macros use do/while loops
-    'LINE_SPACING',  # We don't require a blank line after declarations
-    'SPLIT_STRING',  # We allow strings to be split across lines
-    'FILE_PATH_CHANGES',  # Specific to the kernel development process
-    'PREFER_PACKED',  # __packed is not available in Arm Compiler 6
-]
-
-error_count = 0
+DEFAULT_OUTPUT_FILE = 'code-style.patch'
 
 
-def is_valid_file_type(filename):
-    return any([fnmatch.fnmatch(filename, t) for t in FILE_TYPES])
+def run(output_file=DEFAULT_OUTPUT_FILE, commit_hash=get_previous_commit()):
+    print(banner(f'Run coding style checks against {commit_hash[:8]}'))
+
+    # Run git clang-format with the previous commit hash and capture the patch
+    result = subprocess.run(
+        ['git', 'clang-format', '--quiet', '--diff', commit_hash],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
+
+    patch = result.stdout
+
+    if patch and not patch.startswith('no modified files to format'):
+        # Write the patch to code-style.patch
+        with open(output_file, 'w') as patch_file:
+            patch_file.write(patch)
+
+        # Print messages
+        print('Code style deviations were identified.')
+        print('')
+        print('Please apply the supplied patch with:')
+        print(f'    patch -p1 < {output_file}')
+        return False
+
+    print('No code style deviations were identified.')
+    print('')
+    return True
 
 
-def check_file(checkpatch_params, filename):
-    global error_count
+def parse_args(argv, prog_name):
+    parser = argparse.ArgumentParser(
+        prog=prog_name,
+        description='Perform code style check to SCP-Firmware')
 
-    cmd = '{} {}'.format(checkpatch_params, filename)
+    parser.add_argument('-o', '--output-file', dest='output_file',
+                        required=False, default=DEFAULT_OUTPUT_FILE, type=str,
+                        action='store', help=f'Output file location, if it is\
+                        not specified, the default value will be\
+                        {DEFAULT_OUTPUT_FILE}')
 
-    try:
-        subprocess.check_call(cmd, shell=True, stdin=0)
-    except subprocess.CalledProcessError:
-        error_count += 1
+    parser.add_argument('-c', '--commit', dest='commit_hash',
+                        required=False, default=get_previous_commit(),
+                        type=str, action='store', help='Specify a commit \
+                        hash. If not specified, defaults to the previous \
+                        commit.')
+
+    return parser.parse_args(argv)
 
 
 def main(argv=[], prog_name=''):
-    global script_path
-    print('Arm SCP/MCP Software Checkpatch Wrapper')
-    parser = argparse.ArgumentParser(prog=prog_name)
-
-    input_mode_list = ['stdin', 'project']
-
-    # Optional parameters
-    parser.add_argument('-s', '--spacing', action='store_true',
-                        help='Check for correct use of spaces',
-                        required=False)
-
-    parser.add_argument('-l', '--line-length', action='store_true',
-                        dest='length',
-                        help='Check for lines longer than 80 characters',
-                        required=False)
-
-    parser.add_argument('-i', '--initializers', action='store_true',
-                        help='Check for redundant variable initialization',
-                        required=False)
-
-    parser.add_argument('-m', '--input-mode', choices=input_mode_list,
-                        help='Input mode for the content to be checked. '
-                             'Default: %(default)s',
-                        required=False, default=input_mode_list[0])
-
-    parser.add_argument('-p', '--path', action='store', dest='path',
-                        help='Path to checkpatch.pl file. If not specified, '
-                             'the script will be found on the environment '
-                             'path.',
-                        required=False)
-
-    args = parser.parse_args(argv)
-
-    # Override path to checkpatch.pl if necessary
-    if args.path:
-        script_path = args.path
-
-    # Print the path to checkpatch.pl as confirmation
-    print('checkpatch.pl path:', script_path, '\n')
-
-    # Enable optional tests
-    if not args.spacing:
-        IGNORED_TYPES.extend(['SPACING', 'MISSING_SPACE', 'BRACKET_SPACE'])
-
-    if not args.length:
-        IGNORED_TYPES.extend(['LONG_LINE', 'LONG_LINE_COMMENT',
-                              'LONG_LINE_STRING'])
-    if not args.initializers:
-        IGNORED_TYPES.extend(['GLOBAL_INITIALISERS', 'INITIALISED_STATIC'])
-
-    ignore_list = '--ignore ' + (','.join(map(str, IGNORED_TYPES)))
-
-    checkpatch_params = '{} --show-types --no-tree --no-summary {}'.format(
-        script_path,
-        ignore_list,
-    )
-
-    if args.input_mode == 'project':
-        print("Checking the coding style of the whole project...")
-        checkpatch_params += ' --terse --file'
-        for directory in DIRECTORIES:
-            for root, dirs, files in os.walk(directory):
-                for file in files:
-                    filename = os.path.join(root, file)
-                    if is_valid_file_type(file):
-                        check_file(checkpatch_params, filename)
-        if error_count > 0:
-            print('{} files contained coding style errors.'.
-                  format(error_count))
-
-    elif args.input_mode == 'stdin':
-        print("Checking content via standard input...")
-        check_file(checkpatch_params, '-')
-
-    else:
-        print('FAILED: Invalid input mode')
-        return 1
-
-    if error_count > 0:
-        print('FAILED: One or more files contained coding style errors.')
-        return 1
-
-    print('PASSED: No files contained coding style errors.')
-    return 0
+    args = parse_args(argv, prog_name)
+    return 0 if run(args.output_file, args.commit_hash) else 0
 
 
 if __name__ == '__main__':
