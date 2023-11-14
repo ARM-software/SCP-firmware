@@ -107,8 +107,8 @@ static int put_event(
     enum fwk_event_type event_type)
 {
     struct fwk_event *allocated_event;
-
     struct fwk_event *std_event = NULL;
+    unsigned int flags;
 
     if (event_type == FWK_EVENT_TYPE_STD) {
         std_event = (struct fwk_event *)event;
@@ -157,7 +157,9 @@ static int put_event(
             "[FWK] event_queue peak: %d", fwk_list_get_max(&ctx.event_queue));
 
     } else {
+        flags = fwk_interrupt_global_disable();
         fwk_list_push_tail(&ctx.isr_event_queue, &allocated_event->slist_node);
+        fwk_interrupt_global_enable(flags);
 
         FWK_TRACE(
             "[FWK] isr_event_queue peak: %d",
