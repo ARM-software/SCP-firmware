@@ -40,7 +40,7 @@ products = [
     Product('juno', variants=[Parameter('BOARD'), Parameter('FVP')]),
     Product('morello'),
     Product('n1sdp'),
-    Product('rdv1'),
+    Product('rdv1', product_group='neoverse-rd'),
     Product('rdv1mc'),
     Product('rdn1e1', product_group='neoverse-rd'),
     Product('sgi575', product_group='neoverse-rd'),
