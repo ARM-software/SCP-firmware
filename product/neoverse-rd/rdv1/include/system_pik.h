@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -14,6 +14,7 @@
 
 #include <stdint.h>
 
+// clang-format off
 /*!
  * \brief TCU clock register definitions
  */
@@ -75,5 +76,7 @@ struct pik_system_reg {
 };
 
 #define SYSTEM_PIK_PTR ((struct pik_system_reg *)SCP_PIK_SYSTEM_BASE)
+
+// clang-format on
 
 #endif /* SYSTEM_PIK_H */

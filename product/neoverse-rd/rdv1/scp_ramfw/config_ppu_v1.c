@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -24,7 +24,7 @@
 #include <string.h>
 
 /* Maximum PPU core name size including the null terminator */
-#define PPU_CORE_NAME_SIZE 12
+#define PPU_CORE_NAME_SIZE 20
 
 /* Maximum PPU cluster name size including the null terminator */
 #define PPU_CLUS_NAME_SIZE 7
