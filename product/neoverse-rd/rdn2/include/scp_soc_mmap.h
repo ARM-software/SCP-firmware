@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -21,10 +21,10 @@
 #define SCP_PLL_STATUS0      (SCP_PLL_BASE + 0x00000180)
 #define SCP_PLL_STATUS1      (SCP_PLL_BASE + 0x00000184)
 
-#define SCP_PLL_CPU0  (SCP_PLL_BASE + 0x00000100)
-#define SCP_PLL_CPU1  (SCP_PLL_BASE + 0x00000104)
-#define SCP_PLL_CPU2  (SCP_PLL_BASE + 0x00000108)
-#define SCP_PLL_CPU3  (SCP_PLL_BASE + 0x0000010C)
+#define SCP_PLL_CPU0 (SCP_PLL_BASE + 0x00000100)
+#define SCP_PLL_CPU1 (SCP_PLL_BASE + 0x00000104)
+#define SCP_PLL_CPU2 (SCP_PLL_BASE + 0x00000108)
+#define SCP_PLL_CPU3 (SCP_PLL_BASE + 0x0000010C)
 #if (NUMBER_OF_CLUSTERS > 4)
 #    define SCP_PLL_CPU4 (SCP_PLL_BASE + 0x00000110)
 #    define SCP_PLL_CPU5 (SCP_PLL_BASE + 0x00000114)

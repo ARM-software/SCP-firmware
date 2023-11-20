@@ -14,6 +14,7 @@
 
 #include <stdint.h>
 
+// clang-format off
 /*!
  * \brief System PIK register definitions
  */
@@ -70,5 +71,6 @@ struct pik_system_reg {
 };
 
 #define SYSTEM_PIK_PTR ((struct pik_system_reg *)SCP_PIK_SYSTEM_BASE)
+// clang-format on
 
 #endif /* SYSTEM_PIK_H */
