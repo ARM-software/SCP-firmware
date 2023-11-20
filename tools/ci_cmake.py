@@ -41,7 +41,7 @@ products = [
     Product('morello'),
     Product('n1sdp'),
     Product('rdv1', product_group='neoverse-rd'),
-    Product('rdv1mc'),
+    Product('rdv1mc', product_group='neoverse-rd'),
     Product('rdn1e1', product_group='neoverse-rd'),
     Product('sgi575', product_group='neoverse-rd'),
     Product('sgm775'),
