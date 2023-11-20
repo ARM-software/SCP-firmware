@@ -13,7 +13,7 @@
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
 
-#define MOD_NAME "[LCP_PLATFORM] "
+#define MOD_NAME         "[LCP_PLATFORM] "
 #define LCP_TIMER_RELOAD 0xFFFFFU
 
 volatile struct {

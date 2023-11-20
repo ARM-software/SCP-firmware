@@ -51,7 +51,7 @@ products = [
     Product('rcar', toolchains=[Parameter('GNU')]),
     Product('rdn2', variants=[
         Parameter('0'), Parameter('1'), Parameter('2'), Parameter('3')]),
-    Product('rdfremont'),
+    Product('rdfremont', product_group='neoverse-rd'),
     Product('tc2', variants=[
         Parameter('0'), Parameter('1')], product_group='totalcompute')
 ]
