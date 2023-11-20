@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -13,6 +13,8 @@
 #include <fwk_macros.h>
 
 #include <stdint.h>
+
+// clang-format off
 
 struct pik_cpu_reg {
            uint8_t   RESERVED0[0x10 - 0x00];
@@ -60,5 +62,6 @@ struct pik_cpu_reg {
 };
 
 #define CLUSTER_PIK_PTR(IDX) ((struct pik_cpu_reg *)SCP_PIK_CLUSTER_BASE(IDX))
+// clang-format on
 
 #endif /* CPU_PIK_H */

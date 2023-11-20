@@ -24,7 +24,7 @@
 #include <string.h>
 
 /* Maximum PPU core name size including the null terminator */
-#define PPU_CORE_NAME_SIZE 12
+#define PPU_CORE_NAME_SIZE 20
 
 /* Maximum PPU cluster name size including the null terminator */
 #define PPU_CLUS_NAME_SIZE 7

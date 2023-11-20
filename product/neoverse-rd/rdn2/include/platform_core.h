@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -14,7 +14,7 @@
 
 #define PLATFORM_CORE_PER_CLUSTER_MAX 1
 
-#define CORES_PER_CLUSTER  1
+#define CORES_PER_CLUSTER 1
 #if (PLATFORM_VARIANT == 0 || PLATFORM_VARIANT == 3)
 #    define NUMBER_OF_CLUSTERS 16
 #elif (PLATFORM_VARIANT == 1)
