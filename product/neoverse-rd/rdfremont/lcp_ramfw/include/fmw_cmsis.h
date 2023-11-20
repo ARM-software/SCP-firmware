@@ -1,12 +1,12 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef FMW_CMSIS_LCP_H
-#define FMW_CMSIS_LCP_H
+#ifndef FMW_CMSIS_H
+#define FMW_CMSIS_H
 
 #include <stdint.h>
 
@@ -53,4 +53,6 @@ typedef enum IRQn {
 
 #include <core_cm55.h>
 
-#endif /* FMW_CMSIS_LCP_H */
+extern uint32_t SystemCoreClock;
+
+#endif /* FMW_CMSIS_H */

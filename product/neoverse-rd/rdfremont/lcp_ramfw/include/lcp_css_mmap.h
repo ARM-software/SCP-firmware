@@ -1,15 +1,16 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
- *     Software defined memory map for LCP core.
+ *     Base address definitions for the LCP's sub-system and access extending
+ *     into the rest of the CSS.
  */
 
-#ifndef LCP_SOFTWARE_MMAP_H
-#define LCP_SOFTWARE_MMAP_H
+#ifndef LCP_CSS_MMAP_H
+#define LCP_CSS_MMAP_H
 
 #include <fwk_macros.h>
 
@@ -84,4 +85,6 @@
 #define LCP_CFG_BASE               LCP_EXTEND_CTRL_FRAME_BASE + 0x000
 #define LCP_RST_SYN_BASE           LCP_EXTEND_CTRL_FRAME_BASE + 0x010
 
-#endif /* LCP_SOFTWARE_MMAP_H */
+#define LCP_DVFS_FRAME_BASE 0xB0081000
+
+#endif /* LCP_CSS_MMAP_H */

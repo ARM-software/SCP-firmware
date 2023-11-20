@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -8,9 +8,9 @@
 #ifndef LCP_DEVICE_H
 #define LCP_DEVICE_H
 
-#include <lcp_mmap.h>
+#include <lcp_css_mmap.h>
 
-#include <fmw_cmsis_lcp.h>
+#include <fmw_cmsis.h>
 
 #include <stdint.h>
 

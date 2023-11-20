@@ -1,12 +1,12 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <lcp_css_mmap.h>
 #include <lcp_mhu3.h>
-#include <lcp_mmap.h>
 
 #include <mod_transport.h>
 

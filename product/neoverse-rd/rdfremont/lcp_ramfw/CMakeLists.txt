@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -12,8 +12,8 @@
 add_executable(rdfremont-lcp-bl2)
 
 target_include_directories(
-    rdfremont-lcp-bl2 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include"
-                    "${CMAKE_CURRENT_SOURCE_DIR}")
+    rdfremont-lcp-bl2 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 # cmake-lint: disable=E1122
 
