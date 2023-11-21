@@ -8,6 +8,7 @@
  *     Definitions and utility functions for the programming HN-SAM.
  */
 
+#include <internal/cmn_cyprus_common.h>
 #include <internal/cmn_cyprus_ctx.h>
 #include <internal/cmn_cyprus_hns_reg.h>
 #include <internal/cmn_cyprus_hnsam_setup.h>
@@ -221,6 +222,7 @@ static int configure_non_hashed_region(
 {
     bool hnsam_range_comp_en_mode;
     unsigned int hns_idx;
+    uint64_t base;
     struct cmn_cyprus_hns_reg *hns;
 
     /* Only 2 range-based memory regions can be configured */
@@ -237,6 +239,9 @@ static int configure_non_hashed_region(
     hns = shared_ctx->hns_info_table[0].hns;
     hnsam_range_comp_en_mode = hns_is_range_comparison_mode_enabled(hns);
 
+    /* Offset the base with chip address space */
+    base = (region->base + GET_CHIP_ADDR_OFFSET(shared_ctx));
+
     /* Program target SN node id in HN-F SAM */
     for (hns_idx = 0; hns_idx < shared_ctx->hns_count; hns_idx++) {
         hns = shared_ctx->hns_info_table[hns_idx].hns;
@@ -249,7 +254,7 @@ static int configure_non_hashed_region(
         hns_configure_non_hashed_region_addr_range(
             hns,
             hnsam_range_comp_en_mode,
-            region->base,
+            base,
             region->size,
             non_hashed_region_idx);
 

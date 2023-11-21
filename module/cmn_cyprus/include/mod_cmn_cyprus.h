@@ -341,6 +341,9 @@ struct mod_cmn_cyprus_config {
 
     /*! RNSAM SCG configuration data */
     struct mod_cmn_cyprus_rnsam_scg_config rnsam_scg_config;
+
+    /*! Address space offset for non-hashed regions of the chip */
+    uint64_t chip_addr_space;
 };
 
 /*!

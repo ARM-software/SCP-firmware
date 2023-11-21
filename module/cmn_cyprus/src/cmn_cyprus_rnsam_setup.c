@@ -8,6 +8,7 @@
  *     Definitions and utility functions for the programming CMN-Cyprus RNSAM.
  */
 
+#include <internal/cmn_cyprus_common.h>
 #include <internal/cmn_cyprus_ctx.h>
 #include <internal/cmn_cyprus_reg.h>
 #include <internal/cmn_cyprus_rnsam_reg.h>
@@ -69,6 +70,7 @@ static void print_rnsam_config_info(
     size_t mmap_count)
 {
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
+    uint64_t base;
     unsigned int idx;
     const struct mod_cmn_cyprus_mem_region_map *region;
 
@@ -77,10 +79,13 @@ static void print_rnsam_config_info(
     for (idx = 0; idx < mmap_count; idx++) {
         region = &mmap_table[idx];
 
+        /* Offset the base with chip address space */
+        base = (region->base + GET_CHIP_ADDR_OFFSET(shared_ctx));
+
         FWK_LOG_INFO(
             MOD_NAME "  [0x%llx - 0x%llx] %s",
-            region->base,
-            (region->base + region->size - 1),
+            base,
+            (base + region->size - 1),
             mmap_type_name[region->type]);
     }
 #endif
@@ -278,13 +283,17 @@ static int program_rnsam_region(
 {
     int status;
     unsigned int region_idx;
+    uint64_t base;
 
     switch (region->type) {
     case MOD_CMN_CYPRUS_MEM_REGION_TYPE_IO:
         region_idx = shared_ctx->io_region_count++;
+        /* Offset the base with chip address space */
+        base = (region->base + GET_CHIP_ADDR_OFFSET(shared_ctx));
+
         /* Configure non-hashed region */
-        status = program_io_region(
-            region->base, region->size, region_idx, region->node_id);
+        status =
+            program_io_region(base, region->size, region_idx, region->node_id);
         break;
 
     case MOD_CMN_CYPRUS_MEM_REGION_TYPE_SYSCACHE:
@@ -433,6 +442,8 @@ static int map_io_region(uint64_t base, size_t size, uint32_t node_id)
         /* Update the exisiting IO region in RNSAM */
         update_io_region(&mmap, region_idx);
     } else {
+        region_idx = shared_ctx->io_region_count++;
+
         FWK_LOG_INFO(MOD_NAME "Mapping IO region in RNSAM");
         FWK_LOG_INFO(
             MOD_NAME "  [0x%llx - 0x%llx] %s",
@@ -441,7 +452,7 @@ static int map_io_region(uint64_t base, size_t size, uint32_t node_id)
             mmap_type_name[mmap.type]);
 
         /* Program the IO region in RNSAM */
-        status = program_rnsam_region(&mmap);
+        status = program_io_region(base, size, region_idx, node_id);
         if (status != FWK_SUCCESS) {
             return status;
         }
