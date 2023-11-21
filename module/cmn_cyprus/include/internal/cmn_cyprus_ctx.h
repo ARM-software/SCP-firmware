@@ -120,6 +120,15 @@ struct cmn_cyprus_ctx {
 
     /*! CCLA info table */
     struct ccla_info *ccla_info_table;
+
+    /*! System Info module API */
+    struct mod_system_info_get_info_api *system_info_api;
+
+    /*! Multichip mode */
+    bool multichip_mode;
+
+    /*! Chip identifier */
+    uint8_t chip_id;
 };
 
 #endif /* INTERNAL_CMN_CYPRUS_CTX_H */

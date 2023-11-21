@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -15,6 +15,7 @@
 
 #include <mod_clock.h>
 #include <mod_cmn_cyprus.h>
+#include <mod_system_info.h>
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
@@ -100,9 +101,40 @@ static int cmn_cyprus_init(
     return FWK_SUCCESS;
 }
 
+static int cmn_cyprus_bind(fwk_id_t id, unsigned int round)
+{
+    int status;
+
+    /* Bind to system info module to obtain multi-chip info */
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_SYSTEM_INFO),
+        FWK_ID_API(FWK_MODULE_IDX_SYSTEM_INFO, MOD_SYSTEM_INFO_GET_API_IDX),
+        &ctx.system_info_api);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! Failed to bind to System Info API");
+        return status;
+    }
+
+    return status;
+}
+
 int cmn_cyprus_start(fwk_id_t id)
 {
     int status;
+    const struct mod_system_info *system_info;
+
+    status = ctx.system_info_api->get_system_info(&system_info);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    ctx.chip_id = system_info->chip_id;
+    ctx.multichip_mode = system_info->multi_chip_mode;
+
+    FWK_LOG_INFO(
+        MOD_NAME "Multichip mode: %s",
+        ctx.multichip_mode ? "Enabled" : "Disabled");
+    FWK_LOG_INFO(MOD_NAME "Chip ID: %d", ctx.chip_id);
 
     if (fwk_optional_id_is_defined(ctx.config->clock_id) &&
         !fwk_id_is_equal(ctx.config->clock_id, FWK_ID_NONE)) {
@@ -180,6 +212,7 @@ const struct fwk_module module_cmn_cyprus = {
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = MOD_CMN_CYPRUS_API_COUNT,
     .init = cmn_cyprus_init,
+    .bind = cmn_cyprus_bind,
     .start = cmn_cyprus_start,
     .process_notification = cmn_cyprus_process_notification,
     .process_bind_request = cmn_cyprus_process_bind_request,
