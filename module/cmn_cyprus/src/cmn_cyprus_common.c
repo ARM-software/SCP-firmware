@@ -48,3 +48,18 @@ uint64_t sam_decode_region_size(uint64_t encoded_size, uint64_t min_size)
 
     return size;
 }
+
+inline bool is_exp_raid_valid(uint16_t raid)
+{
+    return (raid <= MAX_EXP_RAID);
+}
+
+inline bool is_ccg_agent_id_valid(unsigned int agent_id)
+{
+    return (agent_id <= MAX_LOGICAL_AGENT_ID);
+}
+
+inline bool is_ccg_link_id_valid(uint8_t link_id)
+{
+    return (link_id == CCG_LINK_0);
+}
