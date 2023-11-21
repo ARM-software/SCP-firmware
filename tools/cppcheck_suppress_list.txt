@@ -75,8 +75,8 @@ nullPointerRedundantCheck:*module/sds/src/mod_sds.c:279
 nullPointerRedundantCheck:*module/timer/src/mod_timer.c:541
 nullPointerRedundantCheck:*module/timer/src/mod_timer.c:551
 nullPointerRedundantCheck:*module/timer/src/mod_timer.c:546
-nullPointerRedundantCheck:*product/n1sdp/module/n1sdp_dmc620/src/mod_n1sdp_dmc620.c:1275
 nullPointerRedundantCheck:*product/n1sdp/module/n1sdp_dmc620/src/mod_n1sdp_dmc620.c:1276
+nullPointerRedundantCheck:*product/n1sdp/module/n1sdp_dmc620/src/mod_n1sdp_dmc620.c:1277
 nullPointerRedundantCheck:*module/dmc620/src/mod_dmc620.c:61
 nullPointerRedundantCheck:*product/synquacer/module/f_uart3/src/mod_f_uart3.c:111
 nullPointerRedundantCheck:*product/synquacer/module/f_uart3/src/mod_f_uart3.c:112
