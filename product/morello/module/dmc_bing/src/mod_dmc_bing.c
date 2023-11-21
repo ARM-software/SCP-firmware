@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -1427,7 +1427,8 @@ static int dmc_bing_config(struct mod_dmc_bing_reg *dmc, fwk_id_t ddr_id)
 #if !defined(PLAT_FVP)
     status = ddr_training(dmc, ddr_id, &ddr_info);
     if (status != FWK_SUCCESS) {
-        return status;
+        FWK_LOG_ERR("[DDR] DDR training failed on DMC ID %d!", dmc_id);
+        fwk_trap();
     }
 
     status = morello_ddr_phy_post_training_configure(ddr_id, &ddr_info);
