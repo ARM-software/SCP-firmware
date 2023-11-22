@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -35,6 +35,9 @@ enum sam_node_type {
 
     /*! Target type HN-I. Used for I/O regions. */
     SAM_NODE_TYPE_HN_I,
+
+    /*! Target type CXRA. Used for remote regions. */
+    SAM_NODE_TYPE_CXRA,
 
     /*! SAM node type count */
     SAM_NODE_TYPE_COUNT

@@ -31,11 +31,26 @@ static const char
         [MOD_CMN_CYPRUS_MEM_REGION_TYPE_IO] = "I/O",
         [MOD_CMN_CYPRUS_MEM_REGION_TYPE_SYSCACHE] = "System Cache",
         [MOD_CMN_CYPRUS_MEM_REGION_TYPE_SYSCACHE_SUB] = "Sub-System Cache",
+        [MOD_CMN_CYPRUS_MEM_REGION_TYPE_REMOTE_NON_HASHED] = "Remote Non-Hash",
     };
 #endif
 
 /* Shared driver context pointer */
 static struct cmn_cyprus_ctx *shared_ctx;
+
+static inline bool is_non_hash_region_idx_valid(unsigned int region_idx)
+{
+    if (region_idx < RNSAM_NON_HASH_MEM_REGION_COUNT) {
+        return true;
+    }
+
+    FWK_LOG_ERR(MOD_NAME "Error! Invalid non-hashed region %u", region_idx);
+    FWK_LOG_ERR(
+        MOD_NAME "Max non-hashed region supported is %u",
+        RNSAM_NON_HASH_MEM_REGION_COUNT);
+
+    return false;
+}
 
 static void stall_rnsam_requests(void)
 {
@@ -278,6 +293,41 @@ static int program_scg_region(
     return FWK_SUCCESS;
 }
 
+static int program_remote_non_hashed_region(
+    uint64_t region_base,
+    uint64_t region_size,
+    unsigned int region_idx,
+    unsigned int target_node_id)
+{
+    int status;
+    unsigned int rnsam_idx;
+    struct cmn_cyprus_rnsam_reg *rnsam;
+
+    if (is_non_hash_region_idx_valid(region_idx) != true) {
+        FWK_LOG_ERR(MOD_NAME "Invalid non-hashed region idx: %u", region_idx);
+        return FWK_E_RANGE;
+    }
+
+    for (rnsam_idx = 0; rnsam_idx < shared_ctx->rnsam_count; rnsam_idx++) {
+        rnsam = shared_ctx->rnsam_table[rnsam_idx];
+
+        /* Configure the remote memory region range and target type */
+        status = rnsam_configure_non_hashed_region(
+            rnsam, region_idx, region_base, region_size, SAM_NODE_TYPE_CXRA);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+
+        /* Configure the remote memory region target node ID */
+        rnsam_set_non_hashed_region_target(rnsam, region_idx, target_node_id);
+
+        /* Mark the region as valid */
+        rnsam_set_non_hash_region_valid(rnsam, region_idx);
+    }
+
+    return FWK_SUCCESS;
+}
+
 static int program_rnsam_region(
     const struct mod_cmn_cyprus_mem_region_map *region)
 {
@@ -300,6 +350,13 @@ static int program_rnsam_region(
         region_idx = shared_ctx->scg_count++;
         /* Configure SCG region */
         status = program_scg_region(region, region_idx);
+        break;
+
+    case MOD_CMN_CYPRUS_MEM_REGION_TYPE_REMOTE_NON_HASHED:
+        region_idx = shared_ctx->io_region_count++;
+        /* Configure remote non-hashed region */
+        status = program_remote_non_hashed_region(
+            region->base, region->size, region_idx, region->node_id);
         break;
 
     default:
@@ -468,6 +525,72 @@ static struct interface_cmn_memmap_rnsam_api memmap_rnsam_api = {
     .map_io_region = map_io_region,
 };
 
+static int program_rnsam_remote_regions(
+    const struct mod_cmn_cyprus_cml_config *cml_config)
+{
+    int status;
+    uint8_t region_idx;
+    uint8_t region_idx_max;
+    const struct mod_cmn_cyprus_remote_region *region;
+    const struct mod_cmn_cyprus_mem_region_map *region_mmap;
+
+    region_idx_max = CMN_CYPRUS_MAX_RA_SAM_ADDR_REGION;
+
+    /* Iterate through each remote memory map entry in the CML config */
+    for (region_idx = 0; region_idx < region_idx_max; region_idx++) {
+        region = &cml_config->remote_mmap_table[region_idx];
+        region_mmap = &region->region_mmap;
+
+        if (region_mmap->size == 0) {
+            /* Skip empty entries in the table */
+            continue;
+        }
+
+        FWK_LOG_INFO(
+            MOD_NAME "  [0x%llx - 0x%llx] %s",
+            region_mmap->base,
+            (region_mmap->base + region_mmap->size - 1),
+            mmap_type_name[region_mmap->type]);
+
+        /* Configure the region in RNSAM */
+        status = program_rnsam_region(region_mmap);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(MOD_NAME "Error! Failed to configure RNSAM region");
+            return status;
+        }
+    }
+
+    return FWK_SUCCESS;
+}
+
+static int setup_rnsam_remote_regions(void)
+{
+    int status;
+    uint8_t idx;
+    const struct mod_cmn_cyprus_config *config;
+    const struct mod_cmn_cyprus_cml_config *cml_config;
+
+    config = shared_ctx->config;
+
+    FWK_LOG_INFO(MOD_NAME "RNSAM remote memory regions setup...");
+
+    /* Iterate through each CML configuration */
+    for (idx = 0; idx < config->cml_table_count; idx++) {
+        cml_config = &config->cml_config_table[idx];
+
+        status = program_rnsam_remote_regions(cml_config);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(MOD_NAME
+                        "Error! Failed to program RNSAM remote regions");
+            return status;
+        }
+    }
+
+    FWK_LOG_INFO(MOD_NAME "RNSAM remote memory regions setup...Done");
+
+    return FWK_SUCCESS;
+}
+
 void get_rnsam_memmap_api(const void **api)
 {
     *api = &memmap_rnsam_api;
@@ -515,6 +638,16 @@ int cmn_cyprus_setup_rnsam(struct cmn_cyprus_ctx *ctx)
 
         status = program_rnsam_region(region);
         if (status != FWK_SUCCESS) {
+            return status;
+        }
+    }
+
+    if ((shared_ctx->multichip_mode == true) &&
+        (shared_ctx->config_table->chip_count > 1)) {
+        status = setup_rnsam_remote_regions();
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(MOD_NAME
+                        "Error! Failed to setup remote regions in RNSAM");
             return status;
         }
     }

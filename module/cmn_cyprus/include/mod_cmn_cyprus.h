@@ -28,6 +28,9 @@
  * @{
  */
 
+/*! Maximum RA SAM Address regions */
+#define CMN_CYPRUS_MAX_RA_SAM_ADDR_REGION 8
+
 /*!
  * \brief Coordinate (x, y, port number, device number) of a node in the mesh.
  */
@@ -150,6 +153,9 @@ enum mod_cmn_cyprus_mem_region_type {
      * system)
      */
     MOD_CMN_CYPRUS_MEM_REGION_TYPE_SYSCACHE,
+
+    /*! Remote non-hashed region (serviced by remote HN) */
+    MOD_CMN_CYPRUS_MEM_REGION_TYPE_REMOTE_NON_HASHED,
 
     /*! Memory region configuration type count */
     MOD_CMN_CYPRUS_MEM_REGION_TYPE_COUNT,
@@ -298,6 +304,28 @@ struct mod_cmn_cyprus_rnsam_scg_config {
 };
 
 /*!
+ * \brief Remote memory region configuration.
+ */
+struct mod_cmn_cyprus_remote_region {
+    /*! Remote memory region memory map */
+    const struct mod_cmn_cyprus_mem_region_map region_mmap;
+};
+
+/*!
+ * \brief Coherent Mesh Link configuration.
+ *
+ * \details Used to describe a remote chip connection.
+ */
+struct mod_cmn_cyprus_cml_config {
+    /*!
+     * Remote chip memory region table.
+     * Used to configure RNSAM.
+     */
+    const struct mod_cmn_cyprus_remote_region
+        remote_mmap_table[CMN_CYPRUS_MAX_RA_SAM_ADDR_REGION];
+};
+
+/*!
  * \brief CMN Cyprus configuration data.
  */
 struct mod_cmn_cyprus_config {
@@ -344,6 +372,15 @@ struct mod_cmn_cyprus_config {
 
     /*! Address space offset for non-hashed regions of the chip */
     uint64_t chip_addr_space;
+
+    /*! CML configuration table */
+    const struct mod_cmn_cyprus_cml_config *cml_config_table;
+
+    /*!
+     * \brief Number of entries in the
+     *      ::mod_cmn_cyprus_config::cml_config_table table.
+     */
+    const uint8_t cml_table_count;
 };
 
 /*!
