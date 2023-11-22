@@ -91,7 +91,7 @@ static int amu_mmap_init(
     }
 
     amu_mmap.core =
-        fwk_mm_calloc(core_count, sizeof(struct mod_core_amu_counters *));
+        fwk_mm_calloc(core_count, sizeof(struct mod_core_amu_counters));
     amu_mmap.core_count = core_count;
 
     return FWK_SUCCESS;
