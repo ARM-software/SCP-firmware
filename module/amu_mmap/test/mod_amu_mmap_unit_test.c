@@ -77,6 +77,7 @@ void test_amu_mmap_element_init_bad_params_fail(void)
     int status = FWK_E_PANIC;
     fwk_id_t element_id;
 
+    /* Invalid element ID */
     fwk_module_is_valid_element_id_ExpectAnyArgsAndReturn(false);
     status = amu_mmap_element_init(element_id, 0, NULL);
     TEST_ASSERT_EQUAL(FWK_E_PARAM, status);
@@ -85,6 +86,22 @@ void test_amu_mmap_element_init_bad_params_fail(void)
     fwk_module_is_valid_element_id_ExpectAnyArgsAndReturn(true);
     status = amu_mmap_element_init(element_id, 0, NULL);
     TEST_ASSERT_EQUAL(FWK_E_PARAM, status);
+}
+
+void test_amu_mmap_element_init_null_counters_offsets_fail(void)
+{
+    int status = FWK_E_PANIC;
+    fwk_id_t element_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_AMU_MMAP, CORE0_IDX);
+    struct mod_core_element_config core_config;
+
+    /* counters_offsets is NULL*/
+    core_config.counters_base_addr = amu_counters[CORE0_IDX];
+    core_config.counters_offsets = NULL;
+    fwk_module_is_valid_element_id_ExpectAnyArgsAndReturn(true);
+    fwk_id_get_element_idx_ExpectAndReturn(element_id, CORE0_IDX);
+    status =
+        amu_mmap_element_init(element_id, NUM_OF_COREA_COUNTERS, &core_config);
+    TEST_ASSERT_EQUAL(FWK_E_ACCESS, status);
 }
 
 void test_amu_mmap_element_init_success(void)
@@ -234,6 +251,7 @@ int amu_mmap_test_main(void)
     RUN_TEST(test_amu_mmap_init_zero_cores_fail);
     RUN_TEST(test_amu_mmap_init_success);
     RUN_TEST(test_amu_mmap_element_init_bad_params_fail);
+    RUN_TEST(test_amu_mmap_element_init_null_counters_offsets_fail);
     RUN_TEST(test_amu_mmap_element_init_success);
     RUN_TEST(test_amu_mmap_bind_request_amu_api_bad_params_fail);
     RUN_TEST(test_amu_mmap_bind_request_amu_api_success);

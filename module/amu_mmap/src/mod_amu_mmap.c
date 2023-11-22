@@ -113,7 +113,8 @@ static int amu_mmap_element_init(
         (struct mod_core_element_config *)data;
     amu_mmap.core[core_idx].num_counters = sub_element_count;
 
-    if (amu_mmap.core[core_idx].core_config->counters_base_addr == NULL) {
+    if (amu_mmap.core[core_idx].core_config->counters_base_addr == NULL ||
+        amu_mmap.core[core_idx].core_config->counters_offsets == NULL) {
         return FWK_E_ACCESS;
     }
 
