@@ -62,7 +62,7 @@ void test_amu_mmap_init_success(void)
     int status = FWK_E_PANIC;
     memset(&amu_mmap, 0, sizeof(amu_mmap));
     fwk_mm_calloc_ExpectAndReturn(
-        CORE_COUNT, sizeof(struct mod_core_amu_counters *), core);
+        CORE_COUNT, sizeof(struct mod_core_amu_counters), core);
 
     status =
         amu_mmap_init(FWK_ID_MODULE(FWK_MODULE_IDX_AMU_MMAP), CORE_COUNT, NULL);
