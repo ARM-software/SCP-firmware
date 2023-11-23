@@ -19,6 +19,7 @@
 
 #include <fwk_assert.h>
 #include <fwk_log.h>
+#include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_status.h>
 
@@ -106,6 +107,17 @@ static const char *const node_type_to_name[NODE_TYPE_COUNT] = {
     [NODE_TYPE_HN_S_MPAM_NS] = "HN-S MPAM-NS",
 };
 #endif
+
+/* Helper function to initialize maximum Request Node count in the context */
+static void init_max_rn_count(void)
+{
+    unsigned int max_rn_count;
+
+    /* Get the max count among the RNs */
+    max_rn_count = FWK_MAX(shared_ctx->rnf_count, shared_ctx->rnd_count);
+    max_rn_count = FWK_MAX(max_rn_count, shared_ctx->rni_count);
+    shared_ctx->max_rn_count = max_rn_count;
+}
 
 /*
  * Determine the number of bits used to represent each node coordinate based
@@ -888,6 +900,7 @@ static int cmn_cyprus_init_ctx(void)
 int cmn_cyprus_discovery(struct cmn_cyprus_ctx *ctx)
 {
     int status;
+    size_t raid_table_count;
 
     fwk_assert(ctx != NULL);
 
@@ -932,6 +945,21 @@ int cmn_cyprus_discovery(struct cmn_cyprus_ctx *ctx)
     if (shared_ctx->ccla_reg_count != 0) {
         shared_ctx->ccla_info_table = fwk_mm_calloc(
             shared_ctx->ccla_reg_count, sizeof(*shared_ctx->ccla_info_table));
+    }
+
+    if ((ctx->multichip_mode == true) && (ctx->config_table->chip_count > 1)) {
+        /* Initialize maximum request node count */
+        init_max_rn_count();
+        /*
+         * Number of entries in the RAID table is the total number of
+         * caching agents in the system.
+         */
+        raid_table_count =
+            (shared_ctx->max_rn_count * shared_ctx->config_table->chip_count);
+
+        /* Allocate memory for RAID table */
+        shared_ctx->raid_table =
+            fwk_mm_calloc(raid_table_count, sizeof(*shared_ctx->raid_table));
     }
 
     /* Traverse the mesh and initialize context data */

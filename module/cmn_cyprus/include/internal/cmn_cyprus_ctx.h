@@ -132,6 +132,12 @@ struct cmn_cyprus_ctx {
 
     /*! Chip identifier */
     uint8_t chip_id;
+
+    /*! Max Request node count. Maximum of RN-F, RN-I, RN-D count */
+    unsigned int max_rn_count;
+
+    /*! Table of Request Agent IDs (RAID) */
+    uint16_t *raid_table;
 };
 
 #endif /* INTERNAL_CMN_CYPRUS_CTX_H */
