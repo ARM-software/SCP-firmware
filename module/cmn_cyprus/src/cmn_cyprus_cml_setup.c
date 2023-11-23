@@ -189,6 +189,59 @@ static int program_ccg_ra_ldid_to_raid_lut(struct cmn_cyprus_ccg_ra_reg *ccg_ra)
     return FWK_SUCCESS;
 }
 
+/* Helper function to program the RAID to LDID LUT in CCG HA node */
+static int program_ccg_ha_raid_to_ldid_lut(struct cmn_cyprus_ccg_ha_reg *ccg_ha)
+{
+    int status;
+    uint8_t chip_id;
+    uint8_t offset_idx;
+    uint16_t ra_idx;
+    uint16_t end_idx;
+    uint16_t raid;
+    uint16_t remote_ldid;
+    const uint8_t chip_count = shared_ctx->config_table->chip_count;
+
+    /*
+     * The LDID values for remote RN‑Fs must be greater than those values that
+     * are used by the local RN‑F nodes.
+     */
+    remote_ldid = shared_ctx->max_rn_count;
+
+    /* Assign LDIDs for caching Request Agents in the remote chips */
+    for (chip_id = 0; chip_id < chip_count; chip_id++) {
+        if (chip_id == shared_ctx->chip_id) {
+            /* Skip local chip */
+            continue;
+        }
+
+        offset_idx = (chip_id * shared_ctx->max_rn_count);
+        end_idx = (offset_idx + shared_ctx->max_rn_count);
+        for (ra_idx = offset_idx; ra_idx < end_idx; ra_idx++) {
+            raid = shared_ctx->raid_table[ra_idx];
+            /* Configure LDID for the remote request agent */
+            status = ccg_ha_configure_raid_to_ldid(ccg_ha, raid, remote_ldid);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_ERR(
+                    MOD_NAME "Error! Failed to assign LDID:%u for RAID:%u",
+                    remote_ldid,
+                    raid);
+                return status;
+            }
+
+            /* Mark the remote request agent as a caching agent */
+            status = ccg_ha_set_raid_as_rnf(ccg_ha, raid);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_ERR(
+                    MOD_NAME "Error! Failed to set RAID:%u as RN-F", raid);
+                return status;
+            }
+            remote_ldid++;
+        }
+    }
+
+    return FWK_SUCCESS;
+}
+
 static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
 {
     int status;
@@ -236,6 +289,17 @@ static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
     status = program_ccg_ra_ldid_to_raid_lut(ccg_ra);
     if (status != FWK_SUCCESS) {
         FWK_LOG_ERR(MOD_NAME "Error! RAID programming failed");
+        return status;
+    }
+
+    /*
+     * Assign unique LDID for each remote caching agent that can send requests
+     * to HNs (HN‑F, HN‑I, HN‑D, and HN‑P).
+     */
+    status = program_ccg_ha_raid_to_ldid_lut(ccg_ha);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME
+                    "Error! CCG HA RAID-to-LDID LUT programming failed");
         return status;
     }
 
