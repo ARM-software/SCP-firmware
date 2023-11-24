@@ -16,6 +16,7 @@
 #include <mod_clock.h>
 #include <mod_cmn_cyprus.h>
 #include <mod_system_info.h>
+#include <mod_timer.h>
 
 #include <fwk_assert.h>
 #include <fwk_id.h>
@@ -120,12 +121,34 @@ static int cmn_cyprus_init(
 
     ctx.config_table = (struct mod_cmn_cyprus_config_table *)data;
 
+    if (fwk_id_type_is_valid(ctx.config_table->timer_id) != true) {
+        FWK_LOG_ERR(MOD_NAME "Error! Invalid Timer ID in config data");
+        return FWK_E_PARAM;
+    }
+
+    ctx.timer_id = ctx.config_table->timer_id;
+
     return FWK_SUCCESS;
 }
 
 static int cmn_cyprus_bind(fwk_id_t id, unsigned int round)
 {
     int status;
+
+    /* Use second round only (round numbering is zero-indexed) */
+    if (round == 1) {
+        /* Bind to the timer component */
+        status = fwk_module_bind(
+            ctx.timer_id,
+            FWK_ID_API(FWK_MODULE_IDX_TIMER, MOD_TIMER_API_IDX_TIMER),
+            &ctx.timer_api);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(MOD_NAME "Error! Failed to bind to Timer API");
+            return status;
+        }
+
+        return status;
+    }
 
     /* Bind to system info module to obtain multi-chip info */
     status = fwk_module_bind(

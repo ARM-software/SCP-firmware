@@ -14,6 +14,9 @@
 #include <internal/cmn_cyprus_reg.h>
 
 #include <mod_cmn_cyprus.h>
+#include <mod_timer.h>
+
+#include <fwk_id.h>
 
 #include <stdbool.h>
 
@@ -138,6 +141,12 @@ struct cmn_cyprus_ctx {
 
     /*! Table of Request Agent IDs (RAID) */
     uint16_t *raid_table;
+
+    /*! Timer identifier */
+    fwk_id_t timer_id;
+
+    /*! Timer module API */
+    struct mod_timer_api *timer_api;
 };
 
 #endif /* INTERNAL_CMN_CYPRUS_CTX_H */

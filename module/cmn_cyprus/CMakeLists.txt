@@ -23,4 +23,4 @@ target_sources(${SCP_MODULE_TARGET}
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/cmn_cyprus_rnsam_setup.c")
 
 target_link_libraries(${SCP_MODULE_TARGET}
-    PRIVATE module-clock module-system-info)
+    PRIVATE module-clock module-system-info module-timer)

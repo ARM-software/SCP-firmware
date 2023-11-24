@@ -410,6 +410,9 @@ struct mod_cmn_cyprus_config_table {
 
     /*! Number of entries in the \ref chip_config_data */
     const uint8_t chip_count;
+
+    /*! Timer identifier */
+    fwk_id_t timer_id;
 };
 
 /*!
