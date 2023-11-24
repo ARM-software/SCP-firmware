@@ -31,8 +31,7 @@ set(SCP_ENABLE_OUTBAND_MSG_SUPPORT TRUE)
 set(SCP_ENABLE_ATU_MANAGE TRUE)
 
 list(PREPEND SCP_MODULE_PATHS
-     "${CMAKE_CURRENT_LIST_DIR}/../module/scp_platform"
-     "${CMAKE_SOURCE_DIR}/module/mhu3")
+     "${CMAKE_CURRENT_LIST_DIR}/../module/scp_platform")
 
 # The order of the modules in the following list is the order in which the
 # modules are initialized, bound, started during the pre-runtime phase.
