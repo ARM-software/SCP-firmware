@@ -27,11 +27,6 @@
 /* Shared driver context pointer */
 static const struct cmn_cyprus_ctx *shared_ctx;
 
-static inline bool is_hns_node_isolated(struct cmn_cyprus_hns_reg *hns)
-{
-    return hns == 0;
-}
-
 /*
  * Configure Direct SN mapping.
  */

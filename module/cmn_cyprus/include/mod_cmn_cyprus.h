@@ -327,6 +327,12 @@ struct mod_cmn_cyprus_cml_config {
     unsigned int haid;
 
     /*!
+     * Remote chip id. Identifier of the remote chip that's connected
+     * to the CML.
+     */
+    uint8_t remote_chip_id;
+
+    /*!
      * Remote chip memory region table.
      * Used to configure RNSAM.
      */

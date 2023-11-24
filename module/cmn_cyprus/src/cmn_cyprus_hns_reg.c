@@ -15,6 +15,7 @@
 #include <fwk_assert.h>
 #include <fwk_math.h>
 
+#include <stdbool.h>
 #include <stdint.h>
 
 /* HN-S SAM_CONTROL */
@@ -49,6 +50,15 @@
  * programmed region is used for comparison.
  */
 #define HNSAM_REGION_MIN_SIZE (64 * FWK_MIB)
+
+/* HN-S RN_CLUSTER_PHYSID */
+#define HNS_RN_PHYS_RN_ID_VALID_POS     31
+#define HNS_RN_PHYS_RN_LOCAL_REMOTE_POS 16
+#define HNS_RN_PHYS_RN_SRC_TYPE_POS     22
+#define HNS_RN_PHYS_RN_SRC_TYPE_MASK    (0x1F)
+#define HNS_RN_PHYS_RN_NODE_ID_MASK     (0x7FF)
+
+#define HNS_RN_PHYIDS_REG0 0
 
 /* HN-S programming context structure */
 struct cmn_cyprus_hns_ctx {
@@ -208,6 +218,70 @@ void hns_set_pwpr_policy(struct cmn_cyprus_hns_reg *hns, uint8_t policy)
     hns->PPU_PWPR |= (policy << HNS_PWPR_POLICY_POS);
 }
 
+/* Configure Node ID for Request Node (RN) and set the valid bit */
+int hns_configure_rn_node_id(
+    struct cmn_cyprus_hns_reg *hns,
+    unsigned int ldid,
+    unsigned int node_id)
+{
+    if (ldid >= HNS_RN_CLUSTER_MAX) {
+        return FWK_E_RANGE;
+    }
+
+    /*
+     * Configure the RN node ID in non-clustered mode.
+     *
+     * Each entry in the RN‑F vector index is associated with a single
+     * RN‑F. In non-clustered mode, CMN‑Cyprus is limited to a maximum of 128
+     * RN‑Fs and only nodeid_lid#{index}_ra0 bitfield is programmed in this
+     * mode.
+     *
+     * Note: The bitfields nodeid_lid#{index}_ra1 to nodeid_lid#{index}_ra7 in
+     * the registers cmn_hns_rn_cluster0-127_physid_reg[1-3] are configured only
+     * in clustered mode where a maximum of 512 RN-Fs are allowed in the system.
+     */
+    hns->HNS_RN_CLUSTER_PHYSID[ldid][HNS_RN_PHYIDS_REG0] |=
+        (node_id & HNS_RN_PHYS_RN_NODE_ID_MASK);
+
+    /* Mark the mapping as valid */
+    hns->HNS_RN_CLUSTER_PHYSID[ldid][HNS_RN_PHYIDS_REG0] |=
+        (UINT64_C(0x1) << HNS_RN_PHYS_RN_ID_VALID_POS);
+
+    return FWK_SUCCESS;
+}
+
+/* Set the Request Node (RN) as remote */
+inline int hns_set_rn_node_remote(
+    struct cmn_cyprus_hns_reg *hns,
+    unsigned int ldid)
+{
+    if (ldid >= HNS_RN_CLUSTER_MAX) {
+        return FWK_E_RANGE;
+    }
+
+    hns->HNS_RN_CLUSTER_PHYSID[ldid][HNS_RN_PHYIDS_REG0] |=
+        (UINT64_C(0x1) << HNS_RN_PHYS_RN_LOCAL_REMOTE_POS);
+
+    return FWK_SUCCESS;
+}
+
+/* Configure CHI source type for the Request Node (RN) */
+inline int hns_set_rn_node_src_type(
+    struct cmn_cyprus_hns_reg *hns,
+    unsigned int ldid,
+    enum cmn_cyprus_hns_rn_src_type src_type)
+{
+    if (ldid >= HNS_RN_CLUSTER_MAX) {
+        return FWK_E_RANGE;
+    }
+
+    hns->HNS_RN_CLUSTER_PHYSID[ldid][HNS_RN_PHYIDS_REG0] |=
+        ((uint64_t)(src_type & HNS_RN_PHYS_RN_SRC_TYPE_MASK)
+         << HNS_RN_PHYS_RN_SRC_TYPE_POS);
+
+    return FWK_SUCCESS;
+}
+
 int setup_hns_ctx(struct cmn_cyprus_hns_reg *hns)
 {
     uint8_t lsb_pos;
@@ -238,4 +312,14 @@ int setup_hns_ctx(struct cmn_cyprus_hns_reg *hns)
     hns_ctx.is_initialized = true;
 
     return FWK_SUCCESS;
+}
+
+/*
+ * Helper function to check if the given HN-S node pointer points to an isolated
+ * HN-S node. Isolated HN-S nodes are skipped during the CMN Discovery and hence
+ * point to null.
+ */
+inline bool is_hns_node_isolated(struct cmn_cyprus_hns_reg *hns)
+{
+    return (hns == NULL);
 }

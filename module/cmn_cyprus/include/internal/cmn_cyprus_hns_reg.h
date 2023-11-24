@@ -77,6 +77,26 @@ enum mod_cmn_cyprus_hns_sam_top_address_bit {
     MOD_CMN_CYPRUS_HNS_SAM_TOP_ADDRESS_BIT_COUNT,
 };
 
+/*!
+ * CHI source type of the Request nodes.
+ */
+enum cmn_cyprus_hns_rn_src_type {
+    /*! 5'b01010: 256 bit CHI-B RN-F */
+    CMN_CYPRUS_HNS_RN_SRC_TYPE_CHI_B = 10,
+
+    /*! 5'b01011: 256 bit CHI-C RN-F */
+    CMN_CYPRUS_HNS_RN_SRC_TYPE_CHI_C = 11,
+
+    /*! 5'b01100: 256 bit CHI-D RN-F */
+    CMN_CYPRUS_HNS_RN_SRC_TYPE_CHI_D = 12,
+
+    /*! 5'b01101: 256 bit CHI-E RN-F */
+    CMN_CYPRUS_HNS_RN_SRC_TYPE_CHI_E = 13,
+
+    /*! 5'b10000: 256 bit CHI-F RN-F */
+    CMN_CYPRUS_HNS_RN_SRC_TYPE_CHI_F = 16,
+};
+
 /*
  * Enable HN-F to SN-F memory striping mode.
  *
@@ -218,6 +238,54 @@ void hns_set_pwpr_op_mode(
 void hns_set_pwpr_policy(struct cmn_cyprus_hns_reg *hns, uint8_t policy);
 
 /*
+ * Configure RN node id at the LDID index in non-clustered mode.
+ *
+ * \param hns Pointer to the HN-S node.
+ *      \pre The HN-S node pointer must be valid.
+ * \param ldid LDID index of the request node.
+ *      \pre LDID index value must be less than 128.
+ * \param node_id Node ID to be configured at the LDID index.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_RANGE ldid out of range.
+ */
+int hns_configure_rn_node_id(
+    struct cmn_cyprus_hns_reg *hns,
+    unsigned int ldid,
+    unsigned int node_id);
+
+/*
+ * Configure the RN node source type at the given LDID.
+ *
+ * \param hns Pointer to the HN-S node.
+ *      \pre The HN-S node pointer must be valid.
+ * \param ldid LDID index of the request node.
+ *      \pre LDID index value must be less than 128.
+ * \param src_type Source type of the request node.
+ *      \pre Source type must be valid.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_RANGE ldid out of range.
+ */
+int hns_set_rn_node_src_type(
+    struct cmn_cyprus_hns_reg *hns,
+    unsigned int ldid,
+    enum cmn_cyprus_hns_rn_src_type src_type);
+
+/*
+ * Configure the RN node id at the LDID as remote.
+ *
+ * \param hns Pointer to the HN-S node.
+ *      \pre The HN-S node pointer must be valid.
+ * \param ldid LDID index of the request node.
+ *      \pre LDID index value must be less than 128.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_RANGE ldid out of range.
+ */
+int hns_set_rn_node_remote(struct cmn_cyprus_hns_reg *hns, unsigned int ldid);
+
+/*
  * Setup the HN-S programming context.
  *
  * \param hns Pointer to the HN-S node.
@@ -235,5 +303,20 @@ void hns_set_pwpr_policy(struct cmn_cyprus_hns_reg *hns, uint8_t policy);
  *
  */
 int setup_hns_ctx(struct cmn_cyprus_hns_reg *hns);
+
+/*
+ * Check if the HN-S node is isolated.
+ *
+ * \details Only the HN-S node pointer is compared to check whether
+ *      the HN-S node is isolated. This is due to the assumption that
+ *      the node pointer for isolated HN-S nodes is set to 0 during the
+ *      discovery.
+ *
+ * \param hns Pointer to the HN-S node.
+ *
+ * \retval true The HN-S node is isolated.
+ * \retval false The HN-S node is not isolated.
+ */
+bool is_hns_node_isolated(struct cmn_cyprus_hns_reg *hns);
 
 #endif /* CMN_CYPRUS_HNS_REG_INTERNAL_H */

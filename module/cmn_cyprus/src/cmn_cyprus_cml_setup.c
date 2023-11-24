@@ -12,6 +12,8 @@
 #include <internal/cmn_cyprus_ccg_ra_reg.h>
 #include <internal/cmn_cyprus_cml_setup.h>
 #include <internal/cmn_cyprus_ctx.h>
+#include <internal/cmn_cyprus_hns_reg.h>
+#include <internal/cmn_cyprus_node_info_reg.h>
 #include <internal/cmn_cyprus_reg.h>
 
 #include <mod_cmn_cyprus.h>
@@ -20,6 +22,7 @@
 #include <fwk_math.h>
 #include <fwk_status.h>
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -242,6 +245,101 @@ static int program_ccg_ha_raid_to_ldid_lut(struct cmn_cyprus_ccg_ha_reg *ccg_ha)
     return FWK_SUCCESS;
 }
 
+/*
+ * Helper function to assign unique LDID for each remote caching agent that can
+ * send requests to HNs (HN‑F, HN‑I, HN‑D, and HN‑P) as HN‑Ss use the LDID of
+ * remote caching agents for Snoop Filter (SF) tracking.
+ */
+static int program_hns_ldid_to_rn_nodeid(
+    unsigned int ccg_ha_nodeid,
+    uint8_t remote_chip_id)
+{
+    int status;
+    unsigned int ldid;
+    uint8_t rn_idx;
+    uint8_t hns_idx;
+    uint16_t rn_max;
+    struct cmn_cyprus_hns_info *hns_info_table;
+    struct cmn_cyprus_hns_reg *hns;
+
+    rn_idx = 0;
+
+    /*
+     * LDID to node id values for the local RN-Fs are pre-populated on reset.So,
+     * set the start LDID value for the remote RN-Fs ignoring the local RN-F
+     * LDIDs.
+     */
+    if (remote_chip_id == 0) {
+        ldid = shared_ctx->rnf_count;
+    } else {
+        ldid = (remote_chip_id * shared_ctx->rnf_count);
+    }
+
+    hns_info_table = shared_ctx->hns_info_table;
+
+    /*
+     * In hierarchical caching, the entire remote chip is tracked using an LDID
+     * instead of individual remote RN-Fs.
+     */
+    rn_max =
+        (shared_ctx->config->enable_lcn == true) ? 1 : shared_ctx->rnf_count;
+    /*
+     * Assign LDIDs to remote caching agents.
+     *
+     * Note: The remote chips are assumed to have the same number of caching
+     * agents as the local chip.
+     */
+    while (rn_idx < rn_max) {
+        for (hns_idx = 0; hns_idx < shared_ctx->hns_count; hns_idx++) {
+            hns = hns_info_table[hns_idx].hns;
+
+            if (is_hns_node_isolated(hns) == true) {
+                /* Skip isolated HN-S nodes */
+                continue;
+            }
+
+            /* Assign unique LDID to the remote caching agent */
+            status = hns_configure_rn_node_id(hns, ldid, ccg_ha_nodeid);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_ERR(
+                    MOD_NAME
+                    "Error! Failed to set CCG HA Node id: %u at LDID: %u",
+                    ccg_ha_nodeid,
+                    ldid);
+                return status;
+            }
+
+            /* Set the caching agent as remote */
+            status = hns_set_rn_node_remote(hns, ldid);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_ERR(
+                    MOD_NAME "Error! Failed to set LDID: %u as remote in HN-S",
+                    ldid);
+                return status;
+            }
+
+            /*
+             * Set the source type for the remote caching agent. For all remote
+             * caching agents, the source type must be programmed to 0b1100
+             * (CHI‑E) as CCG HA is a proxy for all remote caching agents.
+             */
+            status = hns_set_rn_node_src_type(
+                hns, ldid, CMN_CYPRUS_HNS_RN_SRC_TYPE_CHI_E);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_ERR(
+                    MOD_NAME
+                    "Error! Failed to set src type for LDID: %u in HN-S",
+                    ldid);
+                return status;
+            }
+        }
+        rn_idx++;
+        ldid++;
+    }
+
+    return FWK_SUCCESS;
+}
+
 static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
 {
     int status;
@@ -300,6 +398,19 @@ static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
     if (status != FWK_SUCCESS) {
         FWK_LOG_ERR(MOD_NAME
                     "Error! CCG HA RAID-to-LDID LUT programming failed");
+        return status;
+    }
+
+    /*
+     * Configure CCG HA node id in place of remote caching agents in HN-S as
+     * CCG HA is a proxy for all remote RN‑Fs. HN‑S use the LDIDs assigned
+     * to the remote caching agents for Snoop Filter (SF) tracking.
+     */
+    status = program_hns_ldid_to_rn_nodeid(
+        node_info_get_id(ccg_ha->CCG_HA_NODE_INFO), cml_config->remote_chip_id);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME
+                    "Error! HN-S LDID-to-RN node id programming failed");
         return status;
     }
 
