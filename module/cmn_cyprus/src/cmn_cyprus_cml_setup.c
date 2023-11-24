@@ -31,6 +31,12 @@
 /* Maximum Agent ID in AgentID-to-LinkID mapping in CCG nodes */
 #define MAX_AGENT_ID 63
 
+/* CML Protocol Link 0 */
+#define CML_LINK_0 0
+
+/* CCG RA and CCG HA link control register macros */
+#define LINK_CTL_SMP_EN_VAL 1
+
 /* Shared driver context pointer */
 static const struct cmn_cyprus_ctx *shared_ctx;
 
@@ -340,6 +346,34 @@ static int program_hns_ldid_to_rn_nodeid(
     return FWK_SUCCESS;
 }
 
+/* Helper function to enable Symmetric Multiprocessor (SMP) mode */
+static int enable_cml_smp_mode(
+    struct cmn_cyprus_ccg_ra_reg *ccg_ra,
+    struct cmn_cyprus_ccg_ha_reg *ccg_ha)
+{
+    int status;
+
+    /*
+     * SMP connection is enabled by setting the lnk<X>_smp_mode_en bit in the
+     * CCG RA and CCG HA protocol link control registers.
+     */
+    status = ccg_ra_set_cml_link_ctl(
+        ccg_ra, CML_LINK_0, CCG_RA_LINK_CTL_SMP_EN, LINK_CTL_SMP_EN_VAL);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! Failed to set CCG RA SMP mode enable bit");
+        return status;
+    }
+
+    status = ccg_ha_set_cml_link_ctl(
+        ccg_ha, CML_LINK_0, CCG_HA_LINK_CTL_SMP_EN, LINK_CTL_SMP_EN_VAL);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! Failed to set CCG HA SMP mode enable bit");
+        return status;
+    }
+
+    return status;
+}
+
 static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
 {
     int status;
@@ -412,6 +446,18 @@ static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
         FWK_LOG_ERR(MOD_NAME
                     "Error! HN-S LDID-to-RN node id programming failed");
         return status;
+    }
+
+    /*
+     * Enable Symmetric Multiprocessor (SMP) mode which allows for a shared,
+     * common OS and memory to operate on multiple chips.
+     */
+    if (cml_config->enable_smp_mode == true) {
+        status = enable_cml_smp_mode(ccg_ra, ccg_ha);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(MOD_NAME "Error! SMP mode programming failed");
+            return status;
+        }
     }
 
     return status;

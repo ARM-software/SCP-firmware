@@ -338,6 +338,9 @@ struct mod_cmn_cyprus_cml_config {
      */
     const struct mod_cmn_cyprus_remote_region
         remote_mmap_table[CMN_CYPRUS_MAX_RA_SAM_ADDR_REGION];
+
+    /*! Symmetric Multiprocessor (SMP) mode */
+    bool enable_smp_mode;
 };
 
 /*!
