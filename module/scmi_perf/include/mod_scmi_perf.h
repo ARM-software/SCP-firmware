@@ -94,8 +94,7 @@ struct mod_scmi_perf_level_limits {
     uint32_t maximum; /*!< Maximum permitted level */
 };
 
-#ifdef BUILD_HAS_MOD_TRANSPORT_FC
-
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
 /*!
  * \brief Fast channel configuration
  */
@@ -109,7 +108,7 @@ struct scmi_perf_fch_config {
  * \brief Performance domain configuration data.
  */
 struct mod_scmi_perf_domain_config {
-#ifdef BUILD_HAS_MOD_TRANSPORT_FC
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
     /* Pointer to the fast channel configuration */
     const struct scmi_perf_fch_config *fch_config;
 
@@ -133,11 +132,6 @@ struct mod_scmi_perf_domain_config {
      */
     uint64_t *fast_channels_addr_ap;
 #endif
-
-    /*!
-     * \brief Rate limit in microsecs
-     */
-    uint32_t fast_channels_rate_limit;
 
     /*! Flag indicating that statistics are collected for this domain */
     bool stats_collected;

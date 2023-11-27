@@ -46,9 +46,7 @@ target_sources(
             "../src/config_sid.c")
 
 if(SCP_ENABLE_SCMI_PERF_FAST_CHANNELS)
-    if(BUILD_HAS_MOD_TRANSPORT_FC)
-        target_sources(rdv1-bl2 PRIVATE "config_fch_polled.c")
-    endif()
+    target_sources(rdv1-bl2 PRIVATE "config_fch_polled.c")
 endif()
 
 #

@@ -107,10 +107,8 @@ if(SCP_ENABLE_RESOURCE_PERMISSIONS)
 endif()
 
 if(SCP_ENABLE_SCMI_PERF_FAST_CHANNELS)
-    if(BUILD_HAS_MOD_TRANSPORT_FC)
-        list(APPEND SCP_MODULES "fch-polled")
-        target_sources(tc2-bl2 PRIVATE "config_fch_polled.c")
-    endif()
+    list(APPEND SCP_MODULES "fch-polled")
+    target_sources(tc2-bl2 PRIVATE "config_fch_polled.c")
 endif()
 
 #

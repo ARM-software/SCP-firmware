@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -45,8 +45,3 @@ target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC
     "SCP_ENABLE_PLUGIN_HANDLER"
     "BUILD_HAS_FAST_CHANNELS"
     "BUILD_HAS_MOD_TRANSPORT")
-
-if(BUILD_HAS_MOD_TRANSPORT_FC)
-    target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC
-        "BUILD_HAS_MOD_TRANSPORT_FC")
-endif()

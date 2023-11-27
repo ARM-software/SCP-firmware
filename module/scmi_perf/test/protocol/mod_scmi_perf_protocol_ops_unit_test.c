@@ -645,14 +645,7 @@ int describe_fast_channels_valid_params_respond_callback(
     TEST_ASSERT_EQUAL(0, return_values->attributes);
     int chan_index = (uint32_t)MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET;
 
-#    if !defined(BUILD_HAS_MOD_TRANSPORT_FC)
-    TEST_ASSERT_EQUAL(
-        (uint32_t)(domains[0].fast_channels_addr_ap[chan_index] & ~0UL),
-        return_values->chan_addr_low);
-    TEST_ASSERT_EQUAL(
-        (uint32_t)(domains[0].fast_channels_addr_ap[chan_index] >> 32),
-        return_values->chan_addr_high);
-#    else
+#    ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
     TEST_ASSERT_EQUAL(
         (uint32_t)(FAKE_FCH0_AP_ADDRESS & ~0UL), return_values->chan_addr_low);
     TEST_ASSERT_EQUAL(
@@ -667,7 +660,7 @@ int describe_fast_channels_valid_params_respond_callback(
 void utest_scmi_perf_describe_fast_channels_valid_params(void)
 {
     int status;
-#    if defined(BUILD_HAS_MOD_TRANSPORT_FC)
+#    if defined(BUILD_HAS_SCMI_PERF_FAST_CHANNELS)
     struct scmi_perf_domain_ctx domain0_ctx;
     struct fast_channel_ctx *fch0_ctx =
         &domain0_ctx.fch_ctx[MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET];
@@ -956,9 +949,6 @@ void utest_validate_new_limits_approximate_level(void)
         .data = &((struct mod_scmi_perf_config){
             .domains = &domains,
             .perf_doms_count = FWK_ARRAY_SIZE(domains),
-#ifndef BUILD_HAS_MOD_TRANSPORT_FC
-            .fast_channels_alarm_id = FWK_ID_NONE_INIT,
-#endif
             .approximate_level = true,
         }),
     };

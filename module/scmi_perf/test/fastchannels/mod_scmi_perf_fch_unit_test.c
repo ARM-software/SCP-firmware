@@ -68,7 +68,6 @@ void setUp(void)
     scmi_perf_ctx.domain_count = scmi_perf_ctx.config->perf_doms_count;
 
     perf_fch_ctx.perf_ctx = &scmi_perf_ctx;
-
     perf_fch_ctx.fast_channels_rate_limit = SCMI_PERF_FC_MIN_RATE_LIMIT;
 
     to_protocol_api = &scmi_perf_mod_scmi_to_protocol_api;
@@ -378,14 +377,7 @@ int describe_fast_channels_valid_params_respond_callback(
     TEST_ASSERT_EQUAL(0, return_values->attributes);
     int chan_index = (uint32_t)MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET;
 
-#ifndef BUILD_HAS_MOD_TRANSPORT_FC
-    TEST_ASSERT_EQUAL(
-        (uint32_t)(domains[0].fast_channels_addr_ap[chan_index] & ~0UL),
-        return_values->chan_addr_low);
-    TEST_ASSERT_EQUAL(
-        (uint32_t)(domains[0].fast_channels_addr_ap[chan_index] >> 32),
-        return_values->chan_addr_high);
-#else
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
     TEST_ASSERT_EQUAL(
         (uint32_t)(FAKE_FCH0_AP_ADDRESS & ~0UL), return_values->chan_addr_low);
     TEST_ASSERT_EQUAL(
@@ -400,7 +392,7 @@ int describe_fast_channels_valid_params_respond_callback(
 void utest_scmi_perf_describe_fast_channels_valid_params(void)
 {
     int status;
-#ifdef BUILD_HAS_MOD_TRANSPORT_FC
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
     struct scmi_perf_domain_ctx domain0_ctx;
     struct fast_channel_ctx *fch0_ctx =
         &domain0_ctx.fch_ctx[MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET];

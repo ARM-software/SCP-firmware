@@ -29,7 +29,7 @@ enum juno_scmi_service_idx {
 };
 
 /* SCP<->AP Fast channels indexes */
-#ifdef BUILD_HAS_MOD_TRANSPORT_FC
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
 enum juno_plat_fch_idx {
     /* Fast channels from 0 - 3 */
     JUNO_PLAT_FCH_BIG_LEVEL_SET,

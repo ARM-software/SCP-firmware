@@ -40,7 +40,7 @@ struct mod_scmi_perf_fc_ctx {
 
     volatile uint32_t pending_req_count;
 
-#ifdef BUILD_HAS_MOD_TRANSPORT_FC
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
 
     /*
      * For a timer based fast channel interrupt type we must register
@@ -77,7 +77,7 @@ static inline struct scmi_perf_domain_ctx *perf_fch_get_ctx(fwk_id_t domain_id)
 }
 #endif
 
-#ifdef BUILD_HAS_MOD_TRANSPORT_FC
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
 
 static inline uint32_t *get_fc_set_level_addr(uint32_t domain_idx)
 {
@@ -182,45 +182,6 @@ static int fch_context_init(
 
     return FWK_SUCCESS;
 }
-
-#else
-
-static inline uint32_t *get_fc_set_level_addr(uint32_t domain_idx)
-{
-    struct mod_scmi_perf_ctx *perf_ctx = perf_fch_ctx.perf_ctx;
-    const struct mod_scmi_perf_domain_config *domain;
-    domain = &(*perf_ctx->config->domains)[domain_idx];
-    return (uint32_t *)((uintptr_t)domain->fast_channels_addr_scp
-                            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET]);
-}
-
-static inline struct mod_scmi_perf_fast_channel_limit *get_fc_set_limit_addr(
-    uint32_t domain_idx)
-{
-    struct mod_scmi_perf_ctx *perf_ctx = perf_fch_ctx.perf_ctx;
-    const struct mod_scmi_perf_domain_config *domain;
-    domain = &(*perf_ctx->config->domains)[domain_idx];
-    return (struct mod_scmi_perf_fast_channel_limit
-                *)((uintptr_t)domain->fast_channels_addr_scp
-                       [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET]);
-}
-
-void perf_fch_set_fch_get_level(uint32_t domain_idx, uint32_t level)
-{
-    struct mod_scmi_perf_ctx *perf_ctx = perf_fch_ctx.perf_ctx;
-    const struct mod_scmi_perf_domain_config *domain;
-    uint32_t *get_level;
-
-    domain = &(*perf_ctx->config->domains)[domain_idx];
-
-    if (domain->fast_channels_addr_scp != NULL) {
-        get_level = (uint32_t *)((uintptr_t)domain->fast_channels_addr_scp
-                                     [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET]);
-        if (get_level != NULL) { /* note: get_level may not be defined */
-            *get_level = level;
-        }
-    }
-}
 #endif
 
 static inline void decrement_pending_req_count(void)
@@ -242,20 +203,14 @@ static inline void log_and_increment_pending_req_count(void)
 /*
  * SCMI Performance helpers
  */
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
 bool perf_fch_domain_has_fastchannels(uint32_t domain_idx)
 {
-#ifdef BUILD_HAS_MOD_TRANSPORT_FC
     const struct mod_scmi_perf_domain_config *domain =
         &(*perf_fch_ctx.perf_ctx->config->domains)[domain_idx];
-
     return domain->supports_fast_channels;
-#else
-    const struct mod_scmi_perf_domain_config *domain =
-        &(*perf_fch_ctx.perf_ctx->config->domains)[domain_idx];
-
-    return (domain->fast_channels_addr_scp != NULL);
-#endif
 }
+#endif
 
 bool perf_fch_prot_msg_attributes_has_fastchannels(
     const struct scmi_protocol_message_attributes_a2p *parameters)
@@ -277,7 +232,7 @@ static inline int respond_to_scmi(
             sizeof(return_values->status));
 }
 
-#ifdef BUILD_HAS_MOD_TRANSPORT_FC
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
 int perf_fch_describe_fast_channels(
     fwk_id_t service_id,
     const uint32_t *payload)
@@ -702,7 +657,7 @@ int perf_fch_init(
     return FWK_SUCCESS;
 }
 
-#ifdef BUILD_HAS_MOD_TRANSPORT_FC
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
 int perf_fch_bind(fwk_id_t id, unsigned int round)
 {
     unsigned int domain_idx;
@@ -729,32 +684,13 @@ int perf_fch_bind(fwk_id_t id, unsigned int round)
 
     return FWK_SUCCESS;
 }
-#else
-int perf_fch_bind(fwk_id_t id, unsigned int round)
-{
-    int status;
-
-    if (!fwk_id_is_equal(
-            perf_fch_ctx.perf_ctx->config->fast_channels_alarm_id,
-            FWK_ID_NONE)) {
-        status = fwk_module_bind(
-            perf_fch_ctx.perf_ctx->config->fast_channels_alarm_id,
-            MOD_TIMER_API_ID_ALARM,
-            &perf_fch_ctx.fc_alarm_api);
-        if (status != FWK_SUCCESS) {
-            return FWK_E_PANIC;
-        }
-    }
-
-    return FWK_SUCCESS;
-}
 #endif
 
 static void *get_fch_local_address(
     unsigned int domain_idx,
     unsigned int fch_idx)
 {
-#ifdef BUILD_HAS_MOD_TRANSPORT_FC
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
     const struct scmi_perf_fch_config *fch_config;
     struct fast_channel_ctx *fch_ctx;
     int status;
@@ -769,10 +705,6 @@ static void *get_fch_local_address(
     }
 
     return (void *)fch_ctx->fch_address.local_view_address;
-#else
-    const struct mod_scmi_perf_domain_config *domain;
-    domain = &(*perf_fch_ctx.perf_ctx->config->domains)[domain_idx];
-    return (void *)(uintptr_t)domain->fast_channels_addr_scp[fch_idx];
 #endif
 }
 
@@ -852,35 +784,6 @@ static void initialize_fch_channels(void)
 
 int perf_fch_start(fwk_id_t id)
 {
-#ifndef BUILD_HAS_MOD_TRANSPORT_FC
-    uint32_t fc_interval_msecs;
-    int status;
-
-    /*
-     * Set up the Fast Channel polling if required
-     */
-    if (!fwk_id_is_equal(
-            perf_fch_ctx.perf_ctx->config->fast_channels_alarm_id,
-            FWK_ID_NONE)) {
-        if (perf_fch_ctx.fast_channels_rate_limit <
-            SCMI_PERF_FC_MIN_RATE_LIMIT) {
-            fc_interval_msecs = (uint32_t)SCMI_PERF_FC_MIN_RATE_LIMIT / 1000;
-        } else {
-            fc_interval_msecs =
-                (uint32_t)perf_fch_ctx.fast_channels_rate_limit / 1000;
-        }
-        status = perf_fch_ctx.fc_alarm_api->start(
-            perf_fch_ctx.perf_ctx->config->fast_channels_alarm_id,
-            fc_interval_msecs,
-            MOD_TIMER_ALARM_TYPE_PERIODIC,
-            fast_channel_callback,
-            (uintptr_t)0);
-        if (status != FWK_SUCCESS) {
-            return status;
-        }
-    }
-#endif
-
 #ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
     return initialize_fch_channels_plugins_handler();
 #else

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -65,7 +65,7 @@ struct perf_opp_table {
     fwk_id_t dvfs_id;
 };
 
-#ifdef BUILD_HAS_MOD_TRANSPORT_FC
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
 /* fast channel context */
 struct fast_channel_ctx {
     /* The fast channel address */
@@ -90,7 +90,7 @@ struct scmi_perf_domain_ctx {
     /* Tables of OPPs */
     struct perf_opp_table *opp_table;
 
-#ifdef BUILD_HAS_MOD_TRANSPORT_FC
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
 
     /* Table of fast channel context */
     struct fast_channel_ctx fch_ctx[MOD_SCMI_PERF_FAST_CHANNEL_COUNT];

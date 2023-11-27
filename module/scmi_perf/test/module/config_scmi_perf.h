@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -36,16 +36,6 @@ enum dvfs_element_idx {
 #define PERF_DOMAINS_IDX_COUNT DVFS_ELEMENT_IDX_COUNT
 static const struct mod_scmi_perf_domain_config domains[] = {
     [SCMI_PERF_ELEMENT_IDX_0] = {
-#ifndef BUILD_HAS_MOD_TRANSPORT_FC
-        .fast_channels_addr_scp =
-            (uint64_t[]){
-                [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] = 1,
-            },
-        .fast_channels_addr_ap =
-            (uint64_t[]){
-                [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] = 1,
-            },
-#endif
         .phy_group_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_DVFS, DVFS_ELEMENT_IDX_0),
     },
@@ -62,7 +52,7 @@ static const struct mod_scmi_perf_domain_config domains[] = {
 static struct mod_scmi_perf_config perf_config = {
     .domains = &domains,
     .perf_doms_count = SCMI_PERF_ELEMENT_IDX_COUNT,
-#ifndef BUILD_HAS_MOD_TRANSPORT_FC
+#ifndef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
     .fast_channels_alarm_id = FWK_ID_NONE_INIT,
 #endif
 };

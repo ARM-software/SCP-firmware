@@ -12,10 +12,8 @@ cmake_dependent_option(
     "${SCP_ENABLE_SCMI_PERF_FAST_CHANNELS}")
 
 if(SCP_ENABLE_SCMI_PERF_FAST_CHANNELS)
-    if(NOT DEFINED BUILD_HAS_MOD_TRANSPORT_FC)
-        option(BUILD_HAS_MOD_TRANSPORT_FC
-               "SCMI-PERF Fast Channel default implementation is transport based" ON)
-    endif()
+    option(BUILD_HAS_MOD_TRANSPORT_FC
+           "SCMI-PERF fast channel requires transport layer to be enabled" ON)
 endif()
 
 cmake_dependent_option(

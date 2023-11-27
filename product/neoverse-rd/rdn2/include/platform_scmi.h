@@ -24,7 +24,6 @@ enum scp_platform_scmi_service_idx {
 };
 
 /* SCP<->AP Fast channels indexes */
-#ifdef BUILD_HAS_MOD_TRANSPORT_FC
 enum rdn2_plat_fch_idx {
     RDN2_PLAT_FCH_CPU0_LEVEL_SET,
     RDN2_PLAT_FCH_CPU0_LIMIT_SET,
@@ -46,7 +45,7 @@ enum rdn2_plat_fch_idx {
     RDN2_PLAT_FCH_CPU3_LEVEL_GET,
     RDN2_PLAT_FCH_CPU3_LIMIT_GET,
 
-#    if (NUMBER_OF_CLUSTERS > 4)
+#if (NUMBER_OF_CLUSTERS > 4)
     RDN2_PLAT_FCH_CPU4_LEVEL_SET,
     RDN2_PLAT_FCH_CPU4_LIMIT_SET,
     RDN2_PLAT_FCH_CPU4_LEVEL_GET,
@@ -67,7 +66,7 @@ enum rdn2_plat_fch_idx {
     RDN2_PLAT_FCH_CPU7_LEVEL_GET,
     RDN2_PLAT_FCH_CPU7_LIMIT_GET,
 
-#        if (NUMBER_OF_CLUSTERS > 8)
+#    if (NUMBER_OF_CLUSTERS > 8)
     RDN2_PLAT_FCH_CPU8_LEVEL_SET,
     RDN2_PLAT_FCH_CPU8_LIMIT_SET,
     RDN2_PLAT_FCH_CPU8_LEVEL_GET,
@@ -108,12 +107,11 @@ enum rdn2_plat_fch_idx {
     RDN2_PLAT_FCH_CPU15_LEVEL_GET,
     RDN2_PLAT_FCH_CPU15_LIMIT_GET,
 
-#        endif /* #if (NUMBER_OF_CLUSTERS > 4) */
-#    endif /* #if (NUMBER_OF_CLUSTERS > 8) */
+#    endif /* #if (NUMBER_OF_CLUSTERS > 4) */
+#endif /* #if (NUMBER_OF_CLUSTERS > 8) */
 
     RDN2_PLAT_FCH_COUNT,
 };
-#endif
 
 /* SCP <-> AP Transport channels */
 enum rdn2_transport_channel_idx {

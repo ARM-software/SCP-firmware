@@ -19,12 +19,10 @@
 
 #include <stdint.h>
 
-#ifdef BUILD_HAS_MOD_TRANSPORT_FC
-
 static const struct mod_scmi_perf_domain_config
     domains[DVFS_ELEMENT_IDX_COUNT] = {
         [DVFS_ELEMENT_IDX_CORTEX_A520] = {
-#    ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
          .fch_config = (struct scmi_perf_fch_config[]) {
             [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
                 FCH_INIT(TC2_TRANSPORT_SCMI_PERF_FCH_CORTEX_A520_LEVEL_SET),
@@ -36,10 +34,10 @@ static const struct mod_scmi_perf_domain_config
                 FCH_INIT(TC2_TRANSPORT_SCMI_PERF_FCH_CORTEX_A520_LIMIT_GET),
         },
         .supports_fast_channels = true,
-#    endif
+#endif
         },
         [DVFS_ELEMENT_IDX_CORTEX_A720] = {
-#    ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
          .fch_config = (struct scmi_perf_fch_config[]) {
             [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
                 FCH_INIT(TC2_TRANSPORT_SCMI_PERF_FCH_CORTEX_A720_LEVEL_SET),
@@ -51,10 +49,10 @@ static const struct mod_scmi_perf_domain_config
                 FCH_INIT(TC2_TRANSPORT_SCMI_PERF_FCH_CORTEX_A720_LIMIT_GET),
         },
         .supports_fast_channels = true,
-#    endif
+#endif
         },
         [DVFS_ELEMENT_IDX_CORTEX_X4] = {
-#    ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
          .fch_config = (struct scmi_perf_fch_config[]) {
             [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
                 FCH_INIT(TC2_TRANSPORT_SCMI_PERF_FCH_CORTEX_X4_LEVEL_SET),
@@ -66,10 +64,10 @@ static const struct mod_scmi_perf_domain_config
                 FCH_INIT(TC2_TRANSPORT_SCMI_PERF_FCH_CORTEX_X4_LIMIT_GET),
         },
         .supports_fast_channels = true,
-#    endif
+#endif
         },
         [DVFS_ELEMENT_IDX_GPU] = {
-#    ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
+#ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
          .fch_config = (struct scmi_perf_fch_config[]) {
             [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
                 FCH_INIT(TC2_TRANSPORT_SCMI_PERF_FCH_GPU_LEVEL_SET),
@@ -81,153 +79,10 @@ static const struct mod_scmi_perf_domain_config
                 FCH_INIT(TC2_TRANSPORT_SCMI_PERF_FCH_GPU_LIMIT_GET),
         },
         .supports_fast_channels = true,
-#    endif
-        },
-    };
-#else
-#    define FC_LEVEL_SET_ADDR(PERF_IDX) \
-        (SCMI_FAST_CHANNEL_BASE + \
-         MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_LEVEL_SET + \
-         (MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_TOTAL * PERF_IDX))
-
-#    define FC_LIMIT_SET_ADDR(PERF_IDX) \
-        (SCMI_FAST_CHANNEL_BASE + \
-         MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_LIMIT_SET + \
-         (MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_TOTAL * PERF_IDX))
-
-#    define FC_LEVEL_GET_ADDR(PERF_IDX) \
-        (SCMI_FAST_CHANNEL_BASE + \
-         MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_LEVEL_GET + \
-         (MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_TOTAL * PERF_IDX))
-
-#    define FC_LIMIT_GET_ADDR(PERF_IDX) \
-        (SCMI_FAST_CHANNEL_BASE + \
-         MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_LIMIT_GET + \
-         (MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_TOTAL * PERF_IDX))
-
-#    define FC_LEVEL_SET_AP_ADDR(PERF_IDX) \
-        (SCMI_FAST_CHANNEL_BASE + \
-         MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_LEVEL_SET + \
-         (MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_TOTAL * PERF_IDX) - \
-         SCP_SYSTEM_ACCESS_PORT1_BASE)
-
-#    define FC_LIMIT_SET_AP_ADDR(PERF_IDX) \
-        (SCMI_FAST_CHANNEL_BASE + \
-         MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_LIMIT_SET + \
-         (MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_TOTAL * PERF_IDX) - \
-         SCP_SYSTEM_ACCESS_PORT1_BASE)
-
-#    define FC_LEVEL_GET_AP_ADDR(PERF_IDX) \
-        (SCMI_FAST_CHANNEL_BASE + \
-         MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_LEVEL_GET + \
-         (MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_TOTAL * PERF_IDX) - \
-         SCP_SYSTEM_ACCESS_PORT1_BASE)
-
-#    define FC_LIMIT_GET_AP_ADDR(PERF_IDX) \
-        (SCMI_FAST_CHANNEL_BASE + \
-         MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_LIMIT_GET + \
-         (MOD_SCMI_PERF_FAST_CHANNEL_OFFSET_TOTAL * PERF_IDX) - \
-         SCP_SYSTEM_ACCESS_PORT1_BASE)
-static const struct mod_scmi_perf_domain_config
-    domains[DVFS_ELEMENT_IDX_COUNT] = {
-        [DVFS_ELEMENT_IDX_CORTEX_A520] = {
-#    ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
-         .fast_channels_addr_scp = (uint64_t[]) {
-            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
-                FC_LEVEL_SET_ADDR(DVFS_ELEMENT_IDX_CORTEX_A520),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET] =
-                FC_LIMIT_SET_ADDR(DVFS_ELEMENT_IDX_CORTEX_A520),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] =
-                FC_LEVEL_GET_ADDR(DVFS_ELEMENT_IDX_CORTEX_A520),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET] =
-                FC_LIMIT_GET_ADDR(DVFS_ELEMENT_IDX_CORTEX_A520),
-        },
-         .fast_channels_addr_ap = (uint64_t[]) {
-            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
-                FC_LEVEL_SET_AP_ADDR(DVFS_ELEMENT_IDX_CORTEX_A520),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET] =
-                FC_LIMIT_SET_AP_ADDR(DVFS_ELEMENT_IDX_CORTEX_A520),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] =
-                FC_LEVEL_GET_AP_ADDR(DVFS_ELEMENT_IDX_CORTEX_A520),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET] =
-                FC_LIMIT_GET_AP_ADDR(DVFS_ELEMENT_IDX_CORTEX_A520),
-        },
-#    endif
-        },
-        [DVFS_ELEMENT_IDX_CORTEX_A720] = {
-#    ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
-         .fast_channels_addr_scp = (uint64_t[]) {
-            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
-                FC_LEVEL_SET_ADDR(DVFS_ELEMENT_IDX_CORTEX_A720),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET] =
-                FC_LIMIT_SET_ADDR(DVFS_ELEMENT_IDX_CORTEX_A720),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] =
-                FC_LEVEL_GET_ADDR(DVFS_ELEMENT_IDX_CORTEX_A720),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET] =
-                FC_LIMIT_GET_ADDR(DVFS_ELEMENT_IDX_CORTEX_A720),
-        },
-         .fast_channels_addr_ap = (uint64_t[]) {
-            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
-                FC_LEVEL_SET_AP_ADDR(DVFS_ELEMENT_IDX_CORTEX_A720),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET] =
-                FC_LIMIT_SET_AP_ADDR(DVFS_ELEMENT_IDX_CORTEX_A720),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] =
-                FC_LEVEL_GET_AP_ADDR(DVFS_ELEMENT_IDX_CORTEX_A720),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET] =
-                FC_LIMIT_GET_AP_ADDR(DVFS_ELEMENT_IDX_CORTEX_A720),
-        },
-#    endif
-        },
-        [DVFS_ELEMENT_IDX_CORTEX_X4] = {
-#    ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
-         .fast_channels_addr_scp = (uint64_t[]) {
-            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
-                FC_LEVEL_SET_ADDR(DVFS_ELEMENT_IDX_CORTEX_X4),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET] =
-                FC_LIMIT_SET_ADDR(DVFS_ELEMENT_IDX_CORTEX_X4),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] =
-                FC_LEVEL_GET_ADDR(DVFS_ELEMENT_IDX_CORTEX_X4),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET] =
-                FC_LIMIT_GET_ADDR(DVFS_ELEMENT_IDX_CORTEX_X4),
-        },
-         .fast_channels_addr_ap = (uint64_t[]) {
-            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
-                FC_LEVEL_SET_AP_ADDR(DVFS_ELEMENT_IDX_CORTEX_X4),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET] =
-                FC_LIMIT_SET_AP_ADDR(DVFS_ELEMENT_IDX_CORTEX_X4),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] =
-                FC_LEVEL_GET_AP_ADDR(DVFS_ELEMENT_IDX_CORTEX_X4),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET] =
-                FC_LIMIT_GET_AP_ADDR(DVFS_ELEMENT_IDX_CORTEX_X4),
-        },
-#    endif
-        },
-        [DVFS_ELEMENT_IDX_GPU] = {
-#    ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
-         .fast_channels_addr_scp = (uint64_t[]) {
-            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
-                FC_LEVEL_SET_ADDR(DVFS_ELEMENT_IDX_GPU),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET] =
-                FC_LIMIT_SET_ADDR(DVFS_ELEMENT_IDX_GPU),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] =
-                FC_LEVEL_GET_ADDR(DVFS_ELEMENT_IDX_GPU),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET] =
-                FC_LIMIT_GET_ADDR(DVFS_ELEMENT_IDX_GPU),
-        },
-         .fast_channels_addr_ap = (uint64_t[]) {
-            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_SET] =
-                FC_LEVEL_SET_AP_ADDR(DVFS_ELEMENT_IDX_GPU),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_SET] =
-                FC_LIMIT_SET_AP_ADDR(DVFS_ELEMENT_IDX_GPU),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] =
-                FC_LEVEL_GET_AP_ADDR(DVFS_ELEMENT_IDX_GPU),
-            [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET] =
-                FC_LIMIT_GET_AP_ADDR(DVFS_ELEMENT_IDX_GPU),
-        },
-#    endif
-        },
-    };
 #endif
+        },
+    };
+
 #if (PLATFORM_VARIANT == TC2_VAR_EXPERIMENT_POWER)
 static const struct mod_scmi_plugin_config plugins_table[] = {
     [0] = {
@@ -249,10 +104,6 @@ const struct fwk_module_config config_scmi_perf = {
     .data = &((struct mod_scmi_perf_config) {
         .domains = &domains, .perf_doms_count = FWK_ARRAY_SIZE(domains),
 #ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
-#    ifndef BUILD_HAS_MOD_TRANSPORT_FC
-        .fast_channels_alarm_id = FWK_ID_SUB_ELEMENT_INIT(
-            FWK_MODULE_IDX_TIMER, 0, TC2_CONFIG_TIMER_FAST_CHANNEL_TIMER_IDX),
-#    endif
         .fast_channels_rate_limit = (4 * 1000),
 #else
         .fast_channels_alarm_id = FWK_ID_NONE_INIT,

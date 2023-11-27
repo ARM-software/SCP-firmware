@@ -24,7 +24,6 @@ enum scp_platform_scmi_service_idx {
 };
 
 /* SCP<->AP Fast channels indexes */
-#ifdef BUILD_HAS_MOD_TRANSPORT_FC
 enum rdv1mc_plat_fch_idx {
     RDV1MC_PLAT_FCH_CPU0_LEVEL_SET,
     RDV1MC_PLAT_FCH_CPU0_LIMIT_SET,
@@ -48,7 +47,6 @@ enum rdv1mc_plat_fch_idx {
 
     RDV1MC_PLAT_FCH_COUNT,
 };
-#endif
 
 /* SCP <-> AP Transport channels */
 enum rdv1mc_transport_channel_idx {
