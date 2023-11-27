@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -50,6 +50,7 @@ static const struct mod_scmi_perf_domain_config domains[] = {
             [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] = FCH_INIT(2),
             [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET] = FCH_INIT(3),
             },
+        .supports_fast_channels = true,
 #else
         .fast_channels_addr_scp =
             (uint64_t[]){

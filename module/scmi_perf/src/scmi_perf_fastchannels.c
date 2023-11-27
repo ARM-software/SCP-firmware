@@ -49,9 +49,6 @@ struct mod_scmi_perf_fc_ctx {
      * fast channel driver.
      */
     bool callback_registered;
-
-    /* True if this domain supports fast channel */
-    bool supports_fast_channel;
 #endif
 };
 
@@ -113,7 +110,7 @@ void perf_fch_set_fch_get_level(uint32_t domain_idx, uint32_t level)
     uint32_t *get_level;
     struct mod_scmi_perf_ctx *perf_ctx = perf_fch_ctx.perf_ctx;
     domain_ctx = &perf_ctx->domain_ctx_table[domain_idx];
-    if (perf_fch_ctx.supports_fast_channel) {
+    if (perf_fch_domain_has_fastchannels(domain_idx)) {
         fch_ctx = &domain_ctx->fch_ctx[MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET];
         get_level =
             (uint32_t *)((uintptr_t)fch_ctx->fch_address.local_view_address);
@@ -248,7 +245,10 @@ static inline void log_and_increment_pending_req_count(void)
 bool perf_fch_domain_has_fastchannels(uint32_t domain_idx)
 {
 #ifdef BUILD_HAS_MOD_TRANSPORT_FC
-    return perf_fch_ctx.supports_fast_channel;
+    const struct mod_scmi_perf_domain_config *domain =
+        &(*perf_fch_ctx.perf_ctx->config->domains)[domain_idx];
+
+    return domain->supports_fast_channels;
 #else
     const struct mod_scmi_perf_domain_config *domain =
         &(*perf_fch_ctx.perf_ctx->config->domains)[domain_idx];
@@ -303,7 +303,7 @@ int perf_fch_describe_fast_channels(
 
     domain_ctx = &perf_ctx->domain_ctx_table[parameters->domain_id];
 
-    if (!perf_fch_ctx.supports_fast_channel) {
+    if (!perf_fch_domain_has_fastchannels(parameters->domain_id)) {
         return_values.status = (int32_t)SCMI_NOT_SUPPORTED;
 
         return respond_to_scmi(service_id, &return_values);
@@ -698,12 +698,6 @@ int perf_fch_init(
 {
     perf_fch_ctx.perf_ctx = mod_ctx;
     perf_fch_ctx.api_fch_stub = api;
-
-#ifdef BUILD_HAS_MOD_TRANSPORT_FC
-    const struct mod_scmi_perf_config *config;
-    config = perf_fch_ctx.perf_ctx->config;
-    perf_fch_ctx.supports_fast_channel = config->supports_fast_channels;
-#endif
 
     return FWK_SUCCESS;
 }

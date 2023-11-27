@@ -69,10 +69,6 @@ void setUp(void)
 
     perf_fch_ctx.perf_ctx = &scmi_perf_ctx;
 
-#ifdef BUILD_HAS_MOD_TRANSPORT_FC
-    perf_fch_ctx.supports_fast_channel = true;
-#endif
-
     perf_fch_ctx.fast_channels_rate_limit = SCMI_PERF_FC_MIN_RATE_LIMIT;
 
     to_protocol_api = &scmi_perf_mod_scmi_to_protocol_api;

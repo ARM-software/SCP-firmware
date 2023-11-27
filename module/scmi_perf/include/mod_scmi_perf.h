@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -101,6 +101,9 @@ struct mod_scmi_perf_domain_config {
 #ifdef BUILD_HAS_MOD_TRANSPORT_FC
     /* Pointer to the fast channel configuration */
     const struct scmi_perf_fch_config *fch_config;
+
+    /*! Flag indicates whether a particular domain supports fast channel */
+    bool supports_fast_channels;
 #else
     /*!
      * \brief Domain fast channels.
@@ -197,10 +200,7 @@ struct mod_scmi_perf_config {
      */
     size_t perf_doms_count;
 
-#ifdef BUILD_HAS_MOD_TRANSPORT_FC
-    /*! If platform supports fast channels */
-    bool supports_fast_channels;
-#else
+#ifndef BUILD_HAS_MOD_TRANSPORT_FC
     /*!
      * \brief Fast Channels Alarm ID
      *
