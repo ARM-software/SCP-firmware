@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -11,6 +11,7 @@
 #include "scp_platform_mhu.h"
 #include "scp_software_mmap.h"
 
+#include <mod_fch_polled.h>
 #include <mod_transport.h>
 
 #include <fwk_element.h>
@@ -21,9 +22,14 @@
 #include <stdint.h>
 
 static const struct fwk_element transport_element_table[] = {
-    /* SCP_PLATFORM_SCMI_SERVICE_IDX_PSCI */
-    { .name = "PSCI",
-      .data = &((struct mod_transport_channel_config){
+#ifdef BUILD_HAS_MOD_TRANSPORT_FC
+    [RDV1MC_TRANSPORT_SCMI_SERVICE_PSCI] = {
+#else
+    [SCP_PLATFORM_SCMI_SERVICE_IDX_PSCI] = {
+#endif
+        /* SCP_PLATFORM_SCMI_SERVICE_IDX_PSCI */
+        .name = "PSCI",
+        .data = &((struct mod_transport_channel_config){
           .channel_type = MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
           .policies =
               MOD_TRANSPORT_POLICY_INIT_MAILBOX | MOD_TRANSPORT_POLICY_SECURE,
@@ -34,8 +40,286 @@ static const struct fwk_element transport_element_table[] = {
               SCP_PLATFORM_MHU_DEVICE_IDX_SCP_AP_S_CLUS0,
               0),
           .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MHU2, 0),
-      }) },
+            }
+            )
+        },
+#ifdef BUILD_HAS_MOD_TRANSPORT_FC
+    [RDV1MC_TRANSPORT_SCMI_PERF_FCH_CPU0_LEVEL_SET] = {
+        .name = "FCH_CPU0_LEVEL_SET",
+        .data = &((
+            struct mod_transport_channel_config){
+            .transport_type =
+                MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS,
+            .channel_type =
+                MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                RDV1MC_PLAT_FCH_CPU0_LEVEL_SET),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                MOD_FCH_POLLED_API_IDX_TRANSPORT),
+            }
+        ),
+    },
+    [RDV1MC_TRANSPORT_SCMI_PERF_FCH_CPU0_LIMIT_SET] = {
+        .name = "FCH_CPU0_LIMIT_SET",
+        .data = &((
+            struct mod_transport_channel_config){
+            .transport_type =
+                MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS,
+            .channel_type =
+                MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                RDV1MC_PLAT_FCH_CPU0_LIMIT_SET),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                MOD_FCH_POLLED_API_IDX_TRANSPORT),
+            }
+        ),
+    },
+    [RDV1MC_TRANSPORT_SCMI_PERF_FCH_CPU0_LEVEL_GET] = {
+        .name = "FCH_CPU0_LEVEL_GET",
+        .data = &((
+            struct mod_transport_channel_config){
+            .transport_type =
+                MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS,
+            .channel_type =
+                MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                RDV1MC_PLAT_FCH_CPU0_LEVEL_GET),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                MOD_FCH_POLLED_API_IDX_TRANSPORT),
+            }
+        ),
+    },
+    [RDV1MC_TRANSPORT_SCMI_PERF_FCH_CPU0_LIMIT_GET] = {
+        .name = "FCH_CPU0_LIMIT_GET",
+        .data = &((
+            struct mod_transport_channel_config){
+            .transport_type =
+                MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS,
+            .channel_type =
+                MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                RDV1MC_PLAT_FCH_CPU0_LIMIT_GET),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                MOD_FCH_POLLED_API_IDX_TRANSPORT),
+            }
+        ),
+    },
+    [RDV1MC_TRANSPORT_SCMI_PERF_FCH_CPU1_LEVEL_SET] = {
+        .name = "FCH_CPU1_LEVEL_SET",
+        .data = &((
+            struct mod_transport_channel_config){
+            .transport_type =
+                MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS,
+            .channel_type =
+                MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                RDV1MC_PLAT_FCH_CPU1_LEVEL_SET),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                MOD_FCH_POLLED_API_IDX_TRANSPORT),
+            }
+        ),
+    },
+    [RDV1MC_TRANSPORT_SCMI_PERF_FCH_CPU1_LIMIT_SET] = {
+        .name = "FCH_CPU1_LIMIT_SET",
+        .data = &((
+            struct mod_transport_channel_config){
+            .transport_type =
+                MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS,
+            .channel_type =
+                MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                RDV1MC_PLAT_FCH_CPU1_LIMIT_SET),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                MOD_FCH_POLLED_API_IDX_TRANSPORT),
+            }
+        ),
+    },
+    [RDV1MC_TRANSPORT_SCMI_PERF_FCH_CPU1_LEVEL_GET] = {
+        .name = "FCH_CPU1_LEVEL_GET",
+        .data = &((
+            struct mod_transport_channel_config){
+            .transport_type =
+                MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS,
+            .channel_type =
+                MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                RDV1MC_PLAT_FCH_CPU1_LEVEL_GET),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                MOD_FCH_POLLED_API_IDX_TRANSPORT),
+            }
+        ),
+    },
+    [RDV1MC_TRANSPORT_SCMI_PERF_FCH_CPU1_LIMIT_GET] = {
+        .name = "FCH_CPU1_LIMIT_GET",
+        .data = &((
+            struct mod_transport_channel_config){
+            .transport_type =
+                MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS,
+            .channel_type =
+                MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                RDV1MC_PLAT_FCH_CPU1_LIMIT_GET),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                MOD_FCH_POLLED_API_IDX_TRANSPORT),
+            }
+        ),
+    },
+    [RDV1MC_TRANSPORT_SCMI_PERF_FCH_CPU2_LEVEL_SET] = {
+        .name = "FCH_CPU2_LEVEL_SET",
+        .data = &((
+            struct mod_transport_channel_config){
+            .transport_type =
+                MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS,
+            .channel_type =
+                MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                RDV1MC_PLAT_FCH_CPU2_LEVEL_SET),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                MOD_FCH_POLLED_API_IDX_TRANSPORT),
+            }
+        ),
+    },
+    [RDV1MC_TRANSPORT_SCMI_PERF_FCH_CPU2_LIMIT_SET] = {
+        .name = "FCH_CPU2_LIMIT_SET",
+        .data = &((
+            struct mod_transport_channel_config){
+            .transport_type =
+                MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS,
+            .channel_type =
+                MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                RDV1MC_PLAT_FCH_CPU2_LIMIT_SET),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                MOD_FCH_POLLED_API_IDX_TRANSPORT),
+            }
+        ),
+    },
+    [RDV1MC_TRANSPORT_SCMI_PERF_FCH_CPU2_LEVEL_GET] = {
+        .name = "FCH_CPU2_LEVEL_GET",
+        .data = &((
+            struct mod_transport_channel_config){
+            .transport_type =
+                MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS,
+            .channel_type =
+                MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                RDV1MC_PLAT_FCH_CPU2_LEVEL_GET),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                MOD_FCH_POLLED_API_IDX_TRANSPORT),
+            }
+        ),
+    },
+    [RDV1MC_TRANSPORT_SCMI_PERF_FCH_CPU2_LIMIT_GET] = {
+        .name = "FCH_CPU2_LIMIT_GET",
+        .data = &((
+            struct mod_transport_channel_config){
+            .transport_type =
+                MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS,
+            .channel_type =
+                MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                RDV1MC_PLAT_FCH_CPU2_LIMIT_GET),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                MOD_FCH_POLLED_API_IDX_TRANSPORT),
+            }
+        ),
+    },
+    [RDV1MC_TRANSPORT_SCMI_PERF_FCH_CPU3_LEVEL_SET] = {
+        .name = "FCH_CPU3_LEVEL_SET",
+        .data = &((
+            struct mod_transport_channel_config){
+            .transport_type =
+                MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS,
+            .channel_type =
+                MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                RDV1MC_PLAT_FCH_CPU3_LEVEL_SET),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                MOD_FCH_POLLED_API_IDX_TRANSPORT),
+            }
+        ),
+    },
+    [RDV1MC_TRANSPORT_SCMI_PERF_FCH_CPU3_LIMIT_SET] = {
+        .name = "FCH_CPU3_LIMIT_SET",
+        .data = &((
+            struct mod_transport_channel_config){
+            .transport_type =
+                MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS,
+            .channel_type =
+                MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                RDV1MC_PLAT_FCH_CPU3_LIMIT_SET),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                MOD_FCH_POLLED_API_IDX_TRANSPORT),
+            }
+        ),
+    },
+    [RDV1MC_TRANSPORT_SCMI_PERF_FCH_CPU3_LEVEL_GET] = {
+        .name = "FCH_CPU3_LEVEL_GET",
+        .data = &((
+            struct mod_transport_channel_config){
+            .transport_type =
+                MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS,
+            .channel_type =
+                MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                RDV1MC_PLAT_FCH_CPU3_LEVEL_GET),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                MOD_FCH_POLLED_API_IDX_TRANSPORT),
+            }
+        ),
+    },
+    [RDV1MC_TRANSPORT_SCMI_PERF_FCH_CPU3_LIMIT_GET] = {
+        .name = "FCH_CPU3_LIMIT_GET",
+        .data = &((
+            struct mod_transport_channel_config){
+            .transport_type =
+                MOD_TRANSPORT_CHANNEL_TRANSPORT_TYPE_FAST_CHANNELS,
+            .channel_type =
+                MOD_TRANSPORT_CHANNEL_TYPE_COMPLETER,
+            .driver_id = FWK_ID_ELEMENT_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                RDV1MC_PLAT_FCH_CPU3_LIMIT_GET),
+            .driver_api_id = FWK_ID_API_INIT(
+                FWK_MODULE_IDX_FCH_POLLED,
+                MOD_FCH_POLLED_API_IDX_TRANSPORT),
+            }
+        ),
+    },
+    [RDV1MC_TRANSPORT_CHANNELS_COUNT] = { 0 },
+#else
     [SCP_PLATFORM_SCMI_SERVICE_IDX_COUNT] = { 0 },
+#endif /* BUILD_HAS_MOD_TRANSPORT_FC */
 };
 
 static const struct fwk_element *transport_get_element_table(fwk_id_t module_id)

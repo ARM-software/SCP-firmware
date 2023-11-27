@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -44,6 +44,12 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_system_info.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_pl011.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/../src/config_sid.c")
+
+if(SCP_ENABLE_SCMI_PERF_FAST_CHANNELS)
+    if(BUILD_HAS_MOD_TRANSPORT_FC)
+        target_sources(rdv1mc-bl2 PRIVATE "config_fch_polled.c")
+    endif()
+endif()
 
 #
 # Some of our firmware includes require CMSIS.

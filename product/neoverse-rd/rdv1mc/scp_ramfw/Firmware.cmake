@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -26,6 +26,13 @@ set(SCP_ENABLE_OUTBAND_MSG_SUPPORT_INIT TRUE)
 set(SCP_ARCHITECTURE "arm-m")
 
 set(SCP_ENABLE_SCMI_PERF_FAST_CHANNELS TRUE)
+
+if(SCP_ENABLE_SCMI_PERF_FAST_CHANNELS)
+    if(NOT DEFINED BUILD_HAS_MOD_TRANSPORT_FC)
+        option(BUILD_HAS_MOD_TRANSPORT_FC
+                "SCMI-PERF Fast Channel default implementation is transport based" ON)
+    endif()
+endif()
 
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/platform_system")
@@ -64,3 +71,9 @@ list(APPEND SCP_MODULES "psu")
 list(APPEND SCP_MODULES "mock-psu")
 list(APPEND SCP_MODULES "dvfs")
 list(APPEND SCP_MODULES "scmi-perf")
+
+if(SCP_ENABLE_SCMI_PERF_FAST_CHANNELS)
+    if(BUILD_HAS_MOD_TRANSPORT_FC)
+        list(APPEND SCP_MODULES "fch-polled")
+    endif()
+endif()
