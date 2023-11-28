@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -231,6 +231,7 @@ if(GIT_FOUND)
         COMMAND "${GIT_EXECUTABLE}" describe --tags --dirty --always
         WORKING_DIRECTORY "${SCP_SOURCE_DIR}"
         OUTPUT_VARIABLE SCP_DESCRIBE
+        ERROR_VARIABLE _errorOut
         OUTPUT_STRIP_TRAILING_WHITESPACE)
 endif()
 
