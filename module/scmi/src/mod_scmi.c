@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -159,6 +159,22 @@ static const char *get_message_type_str(const struct scmi_service_ctx *ctx)
     default:
         return "Invalid msg";
     }
+}
+
+static bool is_message_type_valid(const struct scmi_service_ctx *ctx)
+{
+    enum mod_scmi_message_type message_type = ctx->scmi_message_type;
+    bool retval = false;
+    switch (message_type) {
+    case MOD_SCMI_MESSAGE_TYPE_COMMAND:
+    case MOD_SCMI_MESSAGE_TYPE_DELAYED_RESPONSE:
+    case MOD_SCMI_MESSAGE_TYPE_NOTIFICATION:
+        retval = true;
+        break;
+    default:
+        break;
+    }
+    return retval;
 }
 
 /*
@@ -1039,6 +1055,19 @@ static int scmi_process_event(const struct fwk_event *event,
     (void)service_name;
     (void)message_type_name;
 #endif
+
+    if (!is_message_type_valid(ctx)) {
+        status = ctx->respond(
+            transport_id, &(int32_t){ SCMI_PROTOCOL_ERROR }, sizeof(int32_t));
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_DEBUG(
+                "[SCMI] %s @%d: respond status: %d",
+                __func__,
+                __LINE__,
+                status);
+        }
+        return FWK_SUCCESS;
+    }
     if (ctx->config->scmi_entity_role == MOD_SCMI_ROLE_PLATFORM) {
         protocol_idx = scmi_ctx.scmi_protocol_id_to_idx[ctx->scmi_protocol_id];
         if (protocol_idx == 0) {
