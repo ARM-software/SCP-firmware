@@ -10,6 +10,7 @@
 
 #include <internal/cmn_cyprus_ccg_ha_reg.h>
 #include <internal/cmn_cyprus_ccg_ra_reg.h>
+#include <internal/cmn_cyprus_ccla_reg.h>
 #include <internal/cmn_cyprus_cml_setup.h>
 #include <internal/cmn_cyprus_ctx.h>
 #include <internal/cmn_cyprus_hns_reg.h>
@@ -17,6 +18,7 @@
 #include <internal/cmn_cyprus_reg.h>
 
 #include <mod_cmn_cyprus.h>
+#include <mod_timer.h>
 
 #include <fwk_log.h>
 #include <fwk_math.h>
@@ -36,6 +38,13 @@
 
 /* CCG RA and CCG HA link control register macros */
 #define LINK_CTL_SMP_EN_VAL 1
+
+/* CCLA Upper Link Layer (ULL) CTL register bitfield values */
+#define ULL_CTL_ULL_TO_ULL_EN_VAL   1
+#define ULL_CTL_SEND_VD_INIT_EN_VAL 1
+
+/* CCLA Upper Link Layer (ULL) Status register bitfield values */
+#define ULL_STATUS_ULL_RUN_STATE 1
 
 /* Shared driver context pointer */
 static const struct cmn_cyprus_ctx *shared_ctx;
@@ -374,6 +383,72 @@ static int enable_cml_smp_mode(
     return status;
 }
 
+/*
+ * Helper function to check the status of the Upper link layer direct connect
+ * (ull to ull) mode state.
+ */
+static bool is_ccla_ull_in_run_state(void *ccla_reg_ptr)
+{
+    int status;
+    uint8_t value;
+    struct cmn_cyprus_ccla_reg *ccla_reg;
+
+    ccla_reg = (struct cmn_cyprus_ccla_reg *)ccla_reg_ptr;
+
+    /* Check if Rx ULL state is in run state */
+    status = ccla_get_ull_status(ccla_reg, CCLA_ULL_STATUS_RX_ULL, &value);
+    if ((status != FWK_SUCCESS) || (value != ULL_STATUS_ULL_RUN_STATE)) {
+        return false;
+    }
+
+    /* Check if Tx ULL state is in run state */
+    status = ccla_get_ull_status(ccla_reg, CCLA_ULL_STATUS_TX_ULL, &value);
+    if ((status != FWK_SUCCESS) || (value != ULL_STATUS_ULL_RUN_STATE)) {
+        return false;
+    }
+
+    return true;
+}
+
+static int enable_ccla_direct_connect_mode(struct cmn_cyprus_ccla_reg *ccla)
+{
+    int status;
+
+    /*
+     * CCLA Direct connect mode is enabled by the following steps:
+     * 1) Set ull_to_ull_en bit on both sides in CCLA register.
+     * 2) After ull_to_ull_en is set on both sides, set the send_vd_init bit on
+     *    both sides in CCLA register.
+     */
+    status = ccla_set_ull_ctl(
+        ccla, CCLA_ULL_CTL_ULL_TO_ULL_EN, ULL_CTL_ULL_TO_ULL_EN_VAL);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME
+                    "Error! Failed to set ULL-to-ULL mode in CCLA ULL CTL");
+        return status;
+    }
+
+    status = ccla_set_ull_ctl(
+        ccla, CCLA_ULL_CTL_SEND_VD_INIT, ULL_CTL_SEND_VD_INIT_EN_VAL);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! Failed to send VD Init in CCLA ULL CTL");
+        return status;
+    }
+
+    /* Poll for ULL status */
+    status = shared_ctx->timer_api->wait(
+        shared_ctx->timer_id,
+        shared_ctx->config->cml_poll_timeout_us,
+        is_ccla_ull_in_run_state,
+        (void *)ccla);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! Polling CCLA ULL status failed");
+        return status;
+    }
+
+    return status;
+}
+
 static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
 {
     int status;
@@ -381,6 +456,8 @@ static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
     struct ccg_ha_info *ccg_ha_info_table;
     struct cmn_cyprus_ccg_ra_reg *ccg_ra;
     struct ccg_ra_info *ccg_ra_info_table;
+    struct cmn_cyprus_ccla_reg *ccla;
+    struct ccla_info *ccla_info_table;
 
     ccg_ra_info_table = shared_ctx->ccg_ra_info_table;
     ccg_ra = ccg_ra_info_table[cml_config->ccg_ldid].ccg_ra;
@@ -456,6 +533,24 @@ static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
         status = enable_cml_smp_mode(ccg_ra, ccg_ha);
         if (status != FWK_SUCCESS) {
             FWK_LOG_ERR(MOD_NAME "Error! SMP mode programming failed");
+            return status;
+        }
+    }
+
+    ccla_info_table = shared_ctx->ccla_info_table;
+    ccla = ccla_info_table[cml_config->ccg_ldid].ccla;
+
+    /*
+     * Enable CCLA to CCLA Direct connect mode.
+     *
+     * This mode enables direct connection of the CXS interface from the
+     * CCLA on one mesh to the CXS interface of the other.
+     */
+    if (cml_config->enable_direct_connect_mode == true) {
+        status = enable_ccla_direct_connect_mode(ccla);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(MOD_NAME
+                        "Error! Failed to enable CML direct connect mode");
             return status;
         }
     }

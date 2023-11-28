@@ -341,6 +341,14 @@ struct mod_cmn_cyprus_cml_config {
 
     /*! Symmetric Multiprocessor (SMP) mode */
     bool enable_smp_mode;
+
+    /*!
+     * CCLA to CCLA direct connect mode.
+     *
+     * Note: This mode is used during pre-silicon validation stage and not used
+     * when external controller IP is present.
+     */
+    bool enable_direct_connect_mode;
 };
 
 /*!
@@ -399,6 +407,12 @@ struct mod_cmn_cyprus_config {
      *      ::mod_cmn_cyprus_config::cml_config_table table.
      */
     const uint8_t cml_table_count;
+
+    /*!
+     * Time to wait during CML protocol link bringup sequence.
+     * A valid non-zero value must be specified.
+     */
+    uint32_t cml_poll_timeout_us;
 };
 
 /*!
