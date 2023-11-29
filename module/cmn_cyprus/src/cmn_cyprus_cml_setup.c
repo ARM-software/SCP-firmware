@@ -37,7 +37,11 @@
 #define CML_LINK_0 0
 
 /* CCG RA and CCG HA link control register macros */
-#define LINK_CTL_SMP_EN_VAL 1
+#define LINK_CTL_SMP_EN_VAL      1
+#define LINK_CTL_LINK_EN_VAL     1
+#define LINK_CTL_LINK_UP_VAL     1
+#define LINK_CTL_LINK_NOT_UP_VAL 0
+#define LINK_CTL_LINK_UP_REQ_VAL 1
 
 /* CCLA Upper Link Layer (ULL) CTL register bitfield values */
 #define ULL_CTL_ULL_TO_ULL_EN_VAL   1
@@ -46,8 +50,47 @@
 /* CCLA Upper Link Layer (ULL) Status register bitfield values */
 #define ULL_STATUS_ULL_RUN_STATE 1
 
+/* CCG RA and CCG HA link status register */
+#define LINK_STATUS_LINK_DOWN_VAL     1
+#define LINK_STATUS_LINK_NOT_DOWN_VAL 0
+#define LINK_STATUS_LINK_DOWN_ACK_VAL 0
+#define LINK_STATUS_LINK_UP_ACK_VAL   1
+
 /* Shared driver context pointer */
 static const struct cmn_cyprus_ctx *shared_ctx;
+
+/* CML info structure */
+struct cml_link_info {
+    /* Link id */
+    uint8_t link;
+
+    /* Pointer to the CCG RA node */
+    struct cmn_cyprus_ccg_ra_reg *ccg_ra;
+
+    /* Pointer to the CCG HA node */
+    struct cmn_cyprus_ccg_ha_reg *ccg_ha;
+
+    /* Bitfield to check in CCG RA register */
+    union {
+        /* CCG RA link control register */
+        enum CCG_RA_LINK_CTL ccg_ra_link_ctl;
+
+        /* CCG RA link status register */
+        enum CCG_RA_LINK_STATUS ccg_ra_link_status;
+    };
+
+    /* Bitfield to check in CCG HA register */
+    union {
+        /* CCG HA link control register */
+        enum CCG_HA_LINK_CTL ccg_ha_link_ctl;
+
+        /* CCG HA link status register */
+        enum CCG_HA_LINK_STATUS ccg_ha_link_status;
+    };
+
+    /* Expected bitfield value */
+    uint8_t expect_value;
+};
 
 /* Program Requesting Agent System Address Map (RA SAM) */
 static int program_ra_sam(
@@ -449,6 +492,298 @@ static int enable_ccla_direct_connect_mode(struct cmn_cyprus_ccla_reg *ccla)
     return status;
 }
 
+/*
+ * Helper function to check if the value of the given bitfield in the CCG RA and
+ * CCG HA link control register matches the expected value.
+ */
+static bool check_ccg_link_ctl(void *cml_link_info_ptr)
+{
+    int status;
+    uint8_t value;
+    struct cml_link_info *link_info;
+
+    link_info = (struct cml_link_info *)cml_link_info_ptr;
+
+    status = ccg_ra_get_cml_link_ctl(
+        link_info->ccg_ra, link_info->link, link_info->ccg_ra_link_ctl, &value);
+    if ((status != FWK_SUCCESS) || (value != link_info->expect_value)) {
+        return false;
+    }
+
+    status = ccg_ha_get_cml_link_ctl(
+        link_info->ccg_ha, link_info->link, link_info->ccg_ha_link_ctl, &value);
+    if ((status != FWK_SUCCESS) || (value != link_info->expect_value)) {
+        return false;
+    }
+
+    return true;
+}
+
+/*
+ * Helper function to check if the value of the given bitfield in the CCG RA and
+ * CCG HA link status register matches the expected value.
+ */
+static bool check_ccg_link_status(void *cml_link_info_ptr)
+{
+    int status;
+    uint8_t value;
+    struct cml_link_info *link_info;
+
+    link_info = (struct cml_link_info *)cml_link_info_ptr;
+
+    status = ccg_ra_get_cml_link_status(
+        link_info->ccg_ra,
+        link_info->link,
+        link_info->ccg_ra_link_status,
+        &value);
+    if ((status != FWK_SUCCESS) || (value != link_info->expect_value)) {
+        return false;
+    }
+
+    status = ccg_ha_get_cml_link_status(
+        link_info->ccg_ha,
+        link_info->link,
+        link_info->ccg_ha_link_status,
+        &value);
+    if ((status != FWK_SUCCESS) || (value != link_info->expect_value)) {
+        return false;
+    }
+
+    return true;
+}
+
+/*
+ * Helper function to verify that the CCG link is down and can accept new link
+ * up request.
+ */
+static int verify_ccg_link_is_down(struct cml_link_info *link_info)
+{
+    int status;
+
+    /*
+     * To ensure that the link is down and can accept a new link up request,
+     * poll the following bits:
+     * a) Poll the lnk<X>_link_up bits in the RA and HA protocol link control
+     *    registers to ensure that they are clear.
+     * b) Poll the lnk<X>_link_down bits in the RA and HA protocol link status
+     *    registers to ensure that they are set.
+     * c) Poll the lnk<X>_link_ack bits in the RA and HA protocol link status
+     *    registers to ensure that they are clear.
+     */
+    link_info->ccg_ra_link_ctl = CCG_RA_LINK_CTL_LINK_UP;
+    link_info->ccg_ha_link_ctl = CCG_HA_LINK_CTL_LINK_UP;
+    link_info->expect_value = LINK_CTL_LINK_NOT_UP_VAL;
+    /* Wait till link up bits are cleared in control register */
+    status = shared_ctx->timer_api->wait(
+        shared_ctx->timer_id,
+        shared_ctx->config->cml_poll_timeout_us,
+        check_ccg_link_ctl,
+        (void *)link_info);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! CCG link up bits not cleared");
+        return status;
+    }
+
+    link_info->ccg_ra_link_status = CCG_RA_LINK_STATUS_DOWN;
+    link_info->ccg_ha_link_status = CCG_HA_LINK_STATUS_DOWN;
+    link_info->expect_value = LINK_STATUS_LINK_DOWN_VAL;
+    /* Wait till link down bits are set in status register */
+    status = shared_ctx->timer_api->wait(
+        shared_ctx->timer_id,
+        shared_ctx->config->cml_poll_timeout_us,
+        check_ccg_link_status,
+        (void *)link_info);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! CCG link down bits not set");
+        return status;
+    }
+
+    link_info->ccg_ra_link_status = CCG_RA_LINK_STATUS_ACK;
+    link_info->ccg_ha_link_status = CCG_HA_LINK_STATUS_ACK;
+    link_info->expect_value = LINK_STATUS_LINK_DOWN_ACK_VAL;
+    /* Wait till link ACK bits are cleared in status register */
+    status = shared_ctx->timer_api->wait(
+        shared_ctx->timer_id,
+        shared_ctx->config->cml_poll_timeout_us,
+        check_ccg_link_status,
+        (void *)link_info);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! CCG link ack bits not clear");
+        return status;
+    }
+
+    return status;
+}
+
+/* Helper function to verify that the CCG link is up */
+static int verify_ccg_link_is_up(struct cml_link_info *link_info)
+{
+    int status;
+
+    /*
+     * The hardware acknowledges a link up request by setting the
+     * lnk<X>_link_ack bits and then clearing lnk<X>_link_down bits in CCG RA
+     * and CCG HA.
+     *
+     * So, poll the protocol link status registers to ensure that
+     * the link up request is accepted.
+     */
+    link_info->ccg_ra_link_status = CCG_RA_LINK_STATUS_ACK;
+    link_info->ccg_ha_link_status = CCG_HA_LINK_STATUS_ACK;
+    link_info->expect_value = LINK_STATUS_LINK_UP_ACK_VAL;
+    status = shared_ctx->timer_api->wait(
+        shared_ctx->timer_id,
+        shared_ctx->config->cml_poll_timeout_us,
+        check_ccg_link_status,
+        (void *)link_info);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! CCG link ack bits not set");
+        return status;
+    }
+
+    /*
+     * The hardware clears lnk<x>_link_down bit when it receives a Link Up
+     * request.
+     */
+    link_info->ccg_ra_link_status = CCG_RA_LINK_STATUS_DOWN;
+    link_info->ccg_ha_link_status = CCG_HA_LINK_STATUS_DOWN;
+    link_info->expect_value = LINK_STATUS_LINK_NOT_DOWN_VAL;
+    status = shared_ctx->timer_api->wait(
+        shared_ctx->timer_id,
+        shared_ctx->config->cml_poll_timeout_us,
+        check_ccg_link_status,
+        (void *)link_info);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! CCG link down bits not clear");
+        return status;
+    }
+
+    return status;
+}
+
+/* Helper function to enable the CCG link */
+static int enable_ccg_link(struct cml_link_info *link_info)
+{
+    int status;
+
+    /* Set 'lnk<x>_link_en' bit in CCG RA to enable the CCG link */
+    status = ccg_ra_set_cml_link_ctl(
+        link_info->ccg_ra,
+        link_info->link,
+        CCG_RA_LINK_CTL_LINK_EN,
+        LINK_CTL_LINK_EN_VAL);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! Failed to set CCG RA link enable bit");
+        return status;
+    }
+
+    /* Set 'lnk<x>_link_en' bit in CCG HA to enable the CCG link */
+    status = ccg_ha_set_cml_link_ctl(
+        link_info->ccg_ha,
+        link_info->link,
+        CCG_HA_LINK_CTL_LINK_EN,
+        LINK_CTL_LINK_EN_VAL);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! Failed to set CCG HA link enable bit");
+        return status;
+    }
+
+    return status;
+}
+
+/* Helper function to generate CCG link up request */
+static int request_ccg_link_up(struct cml_link_info *link_info)
+{
+    int status;
+
+    /* Set 'lnk<x>_link_req' bit in CCG RA to request to link up */
+    status = ccg_ra_set_cml_link_ctl(
+        link_info->ccg_ra,
+        link_info->link,
+        CCG_RA_LINK_CTL_LINK_REQ,
+        LINK_CTL_LINK_UP_REQ_VAL);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! Failed to set CCG RA link up request bit");
+        return status;
+    }
+
+    /* Set 'lnk<x>_link_req' bit in CCG HA request to link up */
+    status = ccg_ha_set_cml_link_ctl(
+        link_info->ccg_ha,
+        link_info->link,
+        CCG_HA_LINK_CTL_LINK_REQ,
+        LINK_CTL_LINK_UP_REQ_VAL);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! Failed to set CCG HA link up request bit");
+        return status;
+    }
+
+    return status;
+}
+
+/*
+ * Bring up link between CML gateway and remote CML link using the following
+ * sequence:
+ * 1) Enable the link and verify that the link is enabled.
+ * 2) Ensure that the link is down and can accept a new link up request.
+ * 3) Generate request to link up.
+ * 4) Verify that the link up request is accepted.
+ */
+static int bring_up_cml_link(
+    struct cmn_cyprus_ccg_ra_reg *ccg_ra,
+    struct cmn_cyprus_ccg_ha_reg *ccg_ha)
+{
+    int status;
+    struct cml_link_info link_info;
+
+    link_info.ccg_ra = ccg_ra;
+    link_info.ccg_ha = ccg_ha;
+    link_info.link = CML_LINK_0;
+
+    /* Enable the link */
+    status = enable_ccg_link(&link_info);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! Failed to set CCG link enable bits");
+        return status;
+    }
+
+    link_info.ccg_ra_link_ctl = CCG_RA_LINK_CTL_LINK_EN;
+    link_info.ccg_ha_link_ctl = CCG_HA_LINK_CTL_LINK_EN;
+    link_info.expect_value = LINK_CTL_LINK_EN_VAL;
+    /* Ensure link is enabled */
+    status = shared_ctx->timer_api->wait(
+        shared_ctx->timer_id,
+        shared_ctx->config->cml_poll_timeout_us,
+        check_ccg_link_ctl,
+        (void *)&link_info);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! Failed to enable CCG link");
+        return status;
+    }
+
+    /* Verify that the link is down and can accept new link up request */
+    status = verify_ccg_link_is_down(&link_info);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! CCG link down failed");
+        return status;
+    }
+
+    /* Generate request to link up */
+    status = request_ccg_link_up(&link_info);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! CCG link up request failed");
+        return status;
+    }
+
+    /* Ensure that the link up request is accepted */
+    status = verify_ccg_link_is_up(&link_info);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! CCG link up failed");
+    }
+
+    return status;
+}
+
 static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
 {
     int status;
@@ -553,6 +888,13 @@ static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
                         "Error! Failed to enable CML direct connect mode");
             return status;
         }
+    }
+
+    /* Establish protocol link up between CML gateway and remote CML link */
+    status = bring_up_cml_link(ccg_ra, ccg_ha);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! Failed to bring up CML protocol link");
+        return status;
     }
 
     return status;
