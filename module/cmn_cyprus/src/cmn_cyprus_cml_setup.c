@@ -784,6 +784,40 @@ static int bring_up_cml_link(
     return status;
 }
 
+/* Enable exchange of protocol credits and protocol messages */
+static int cml_exchange_protocol_credit(
+    struct cmn_cyprus_ccg_ra_reg *ccg_ra,
+    struct cmn_cyprus_ccg_ha_reg *ccg_ha)
+{
+    int status;
+
+    /*
+     * Set the lnk<X>_link_up bit in the CCG RA protocol link control register
+     * to start granting credits.
+     */
+    status = ccg_ra_set_cml_link_ctl(
+        ccg_ra, CML_LINK_0, CCG_RA_LINK_CTL_LINK_UP, LINK_CTL_LINK_UP_VAL);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME
+                    "Error! CCG RA link protocol credit exchange failed");
+        return status;
+    }
+
+    /*
+     * Set the lnk<X>_link_up bit in the CCG HA protocol link control register
+     * to start granting credits.
+     */
+    status = ccg_ha_set_cml_link_ctl(
+        ccg_ha, CML_LINK_0, CCG_HA_LINK_CTL_LINK_UP, LINK_CTL_LINK_UP_VAL);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME
+                    "Error! CCG HA link protocol credit exchange failed");
+        return status;
+    }
+
+    return status;
+}
+
 static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
 {
     int status;
@@ -894,6 +928,14 @@ static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
     status = bring_up_cml_link(ccg_ra, ccg_ha);
     if (status != FWK_SUCCESS) {
         FWK_LOG_ERR(MOD_NAME "Error! Failed to bring up CML protocol link");
+        return status;
+    }
+
+    /* Enable protocol credit exchange */
+    status = cml_exchange_protocol_credit(ccg_ra, ccg_ha);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME
+                    "Error! Failed to exchange CML protocol link credits");
         return status;
     }
 
