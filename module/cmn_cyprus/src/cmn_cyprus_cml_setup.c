@@ -42,6 +42,7 @@
 #define LINK_CTL_LINK_UP_VAL     1
 #define LINK_CTL_LINK_NOT_UP_VAL 0
 #define LINK_CTL_LINK_UP_REQ_VAL 1
+#define LINK_CTL_DVM_EN_VAL      1
 
 /* CCLA Upper Link Layer (ULL) CTL register bitfield values */
 #define ULL_CTL_ULL_TO_ULL_EN_VAL   1
@@ -553,6 +554,54 @@ static bool check_ccg_link_status(void *cml_link_info_ptr)
 }
 
 /*
+ * Helper function to check if the Snoop Coherency Domain Ack bits are set
+ * in the CCG HA node link status register.
+ */
+static bool is_ccg_link_snp_domain_ack_bits_set(void *cml_link_info_ptr)
+{
+    int status;
+    uint8_t value;
+    struct cml_link_info *link_info;
+
+    link_info = (struct cml_link_info *)cml_link_info_ptr;
+
+    status = ccg_ha_get_cml_link_status(
+        link_info->ccg_ha,
+        link_info->link,
+        CCG_HA_LINK_STATUS_SNPDOMAIN_ACK,
+        &value);
+    if (status != FWK_SUCCESS) {
+        return false;
+    }
+
+    return value;
+}
+
+/*
+ * Helper function to check if the DVM Domain Ack bits are set in the
+ * CCG RA node link status register.
+ */
+static bool is_ccg_link_dvm_domain_ack_bits_set(void *cml_link_info_ptr)
+{
+    int status;
+    uint8_t value;
+    struct cml_link_info *link_info;
+
+    link_info = (struct cml_link_info *)cml_link_info_ptr;
+
+    status = ccg_ra_get_cml_link_status(
+        link_info->ccg_ra,
+        link_info->link,
+        CCG_RA_LINK_STATUS_DVMDOMAIN_ACK,
+        &value);
+    if (status != FWK_SUCCESS) {
+        return false;
+    }
+
+    return value;
+}
+
+/*
  * Helper function to verify that the CCG link is down and can accept new link
  * up request.
  */
@@ -818,6 +867,71 @@ static int cml_exchange_protocol_credit(
     return status;
 }
 
+/* Enable protocol link to enter snoop coherency domain and DVM domain */
+static int cml_enter_coherency_domain(
+    struct cmn_cyprus_ccg_ra_reg *ccg_ra,
+    struct cmn_cyprus_ccg_ha_reg *ccg_ha)
+{
+    int status;
+    struct cml_link_info link_info;
+
+    /* Enable Snoop Coherency Domain entry */
+    status = ccg_ha_set_cml_link_ctl(
+        ccg_ha, CML_LINK_0, CCG_HA_LINK_CTL_SNPDOMAIN_REQ, LINK_CTL_DVM_EN_VAL);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME
+                    "Error! Failed to set Snoop coherency domain enable bit");
+        return status;
+    }
+
+    link_info.ccg_ha = ccg_ha;
+    link_info.link = CML_LINK_0;
+
+    /*
+     * The lnk<X>_snoopdomain_ack bit of the HA's protocol link status register,
+     * provides acknowledgement and status of the snoop coherency domain
+     * requests for the link.
+     */
+    status = shared_ctx->timer_api->wait(
+        shared_ctx->timer_id,
+        shared_ctx->config->cml_poll_timeout_us,
+        is_ccg_link_snp_domain_ack_bits_set,
+        (void *)&link_info);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME
+                    "Error! Failed to get ACK for Snoop coherency domain");
+        return status;
+    }
+
+    /* Enable DVM Domain entry */
+    status = ccg_ra_set_cml_link_ctl(
+        ccg_ra, CML_LINK_0, CCG_RA_LINK_CTL_DVMDOMAIN_REQ, LINK_CTL_DVM_EN_VAL);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME
+                    "Error! Failed to set DVM coherency domain enable bit");
+        return status;
+    }
+
+    /*
+     * The lnk<X>_dvmdomain_ack bit in the RA's protocol link status register,
+     * provides acknowledgement and status of the DVM domain requests for the
+     * link.
+     */
+    link_info.ccg_ra = ccg_ra;
+    status = shared_ctx->timer_api->wait(
+        shared_ctx->timer_id,
+        shared_ctx->config->cml_poll_timeout_us,
+        is_ccg_link_dvm_domain_ack_bits_set,
+        (void *)&link_info);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME
+                    "Error! Failed to get ACK for DVM coherency domain");
+        return status;
+    }
+
+    return status;
+}
+
 static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
 {
     int status;
@@ -936,6 +1050,18 @@ static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
     if (status != FWK_SUCCESS) {
         FWK_LOG_ERR(MOD_NAME
                     "Error! Failed to exchange CML protocol link credits");
+        return status;
+    }
+
+    /*
+     * Enable the CML protocol links to enter the system coherency domain
+     * and DVM domain.
+     */
+    status = cml_enter_coherency_domain(ccg_ra, ccg_ha);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(
+            MOD_NAME
+            "Error! CML protocol link failed to enter coherency domain");
         return status;
     }
 
