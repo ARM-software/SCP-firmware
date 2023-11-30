@@ -774,6 +774,7 @@ static int store_hns_info(
 static int cmn_cyprus_init_node_info(struct cmn_cyprus_mxp_reg *mxp)
 {
     int status;
+    unsigned int ldid;
     unsigned int node_count;
     unsigned int node_idx;
     unsigned int node_type;
@@ -784,6 +785,8 @@ static int cmn_cyprus_init_node_info(struct cmn_cyprus_mxp_reg *mxp)
 
     /* Get the number of children connected to the cross point */
     node_count = get_child_count(mxp->CHILD_INFO);
+
+    status = FWK_SUCCESS;
 
     /* Traverse nodes */
     for (node_idx = 0; node_idx < node_count; node_idx++) {
@@ -800,27 +803,57 @@ static int cmn_cyprus_init_node_info(struct cmn_cyprus_mxp_reg *mxp)
             continue;
         }
 
+        ldid = node_info_get_ldid(node->NODE_INFO);
+
         /* Get the node type identifier */
         node_type = node_info_get_type(node->NODE_INFO);
 
-        if ((node_type == NODE_TYPE_HN_S) || (node_type == NODE_TYPE_HN_F)) {
+        switch (node_type) {
+        case NODE_TYPE_HN_F:
+        case NODE_TYPE_HN_S:
             status = store_hns_info(node, mxp);
-            if (status != FWK_SUCCESS) {
-                return status;
-            }
-        } else if (node_type == NODE_TYPE_RN_SAM) {
-            if (rnsam_entry >= shared_ctx->rnsam_count) {
-                return FWK_E_RANGE;
-            }
+            break;
 
+        case NODE_TYPE_RN_SAM:
             /* Save the node pointer in the RNSAM table */
             shared_ctx->rnsam_table[rnsam_entry] =
                 (struct cmn_cyprus_rnsam_reg *)node;
+
             rnsam_entry++;
+            break;
+
+        case NODE_TYPE_CCRA:
+            shared_ctx->ccg_ra_info_table[ldid].node_id =
+                node_info_get_id(node->NODE_INFO);
+            shared_ctx->ccg_ra_info_table[ldid].ccg_ra =
+                (struct cmn_cyprus_ccg_ra_reg *)node;
+            break;
+
+        case NODE_TYPE_CCHA:
+            shared_ctx->ccg_ha_info_table[ldid].node_id =
+                node_info_get_id(node->NODE_INFO);
+            shared_ctx->ccg_ha_info_table[ldid].ccg_ha =
+                (struct cmn_cyprus_ccg_ha_reg *)node;
+            break;
+
+        case NODE_TYPE_CCLA:
+            shared_ctx->ccla_info_table[ldid].node_id =
+                node_info_get_id(node->NODE_INFO);
+            shared_ctx->ccla_info_table[ldid].ccla =
+                (struct cmn_cyprus_ccla_reg *)node;
+            break;
+
+        default:
+            /* Do Nothing */
+            break;
+        };
+
+        if (status != FWK_SUCCESS) {
+            return status;
         }
     }
 
-    return FWK_SUCCESS;
+    return status;
 }
 
 /* Traverse the mesh and initialize the module context data */
@@ -882,6 +915,24 @@ int cmn_cyprus_discovery(struct cmn_cyprus_ctx *ctx)
     /* RN-SAM table */
     shared_ctx->rnsam_table = fwk_mm_calloc(
         shared_ctx->rnsam_count, sizeof(*shared_ctx->rnsam_table));
+
+    /* Allocate resources for the CCG node descriptors in the context */
+    if (shared_ctx->ccg_ra_reg_count != 0) {
+        shared_ctx->ccg_ra_info_table = fwk_mm_calloc(
+            shared_ctx->ccg_ra_reg_count,
+            sizeof(*shared_ctx->ccg_ra_info_table));
+    }
+
+    if (shared_ctx->ccg_ha_reg_count != 0) {
+        shared_ctx->ccg_ha_info_table = fwk_mm_calloc(
+            shared_ctx->ccg_ha_reg_count,
+            sizeof(*shared_ctx->ccg_ha_info_table));
+    }
+
+    if (shared_ctx->ccla_reg_count != 0) {
+        shared_ctx->ccla_info_table = fwk_mm_calloc(
+            shared_ctx->ccla_reg_count, sizeof(*shared_ctx->ccla_info_table));
+    }
 
     /* Traverse the mesh and initialize context data */
     status = cmn_cyprus_init_ctx();

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -40,6 +40,24 @@ struct cmn_cyprus_hns_info {
 
     /*! SCG that this HN-F node belongs to */
     uint8_t scg_idx;
+};
+
+/*! CCG Request Agent (CCG RA) register and its node id */
+struct ccg_ra_info {
+    unsigned int node_id;
+    struct cmn_cyprus_ccg_ra_reg *ccg_ra;
+};
+
+/*! CCG Home Agent (CCG HA) register and its node id */
+struct ccg_ha_info {
+    unsigned int node_id;
+    struct cmn_cyprus_ccg_ha_reg *ccg_ha;
+};
+
+/*! CCG Link Agent (CCLA) register and its node id */
+struct ccla_info {
+    unsigned int node_id;
+    struct cmn_cyprus_ccla_reg *ccla;
 };
 
 /*!
@@ -93,6 +111,15 @@ struct cmn_cyprus_ctx {
 
     /* Count of isolated HN-S nodes */
     unsigned int isolated_hns_count;
+
+    /*! CCG RA info table */
+    struct ccg_ra_info *ccg_ra_info_table;
+
+    /*! CCG HA info table */
+    struct ccg_ha_info *ccg_ha_info_table;
+
+    /*! CCLA info table */
+    struct ccla_info *ccla_info_table;
 };
 
 #endif /* INTERNAL_CMN_CYPRUS_CTX_H */
