@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -201,7 +201,7 @@ void test_function_scmi_sensor_req_ret_reading_handler(void)
             ->service_id;
 
     fwk_id_t error_service_id = { .value = 0xFFFF };
-    struct mod_sensor_driver_resp_params expected_resp_params;
+    struct mod_sensor_driver_resp_params expected_resp_params = { 0 };
     uint32_t payload[10] = { 0 };
 
     expected_resp_params = (struct mod_sensor_driver_resp_params){

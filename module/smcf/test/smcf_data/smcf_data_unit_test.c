@@ -1460,7 +1460,7 @@ void utest_smcf_data_get_data_success_copy_data(void)
     int status = FWK_E_STATE;
     uint32_t mli_index = 0;
     uint32_t data[2] = { 0xAA, 0x55 };
-    uint32_t buffer[2];
+    uint32_t buffer[2] = { 0 };
     uint32_t tag;
     struct smcf_data_attr data_attr = {
         .data_addr = data,
