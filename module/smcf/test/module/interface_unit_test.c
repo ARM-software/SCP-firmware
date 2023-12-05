@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -180,6 +180,7 @@ void utest_smcf_mli_config_mode_set_value_error_setting(void)
     fwk_id_get_sub_element_idx_ExpectAnyArgsAndReturn(0);
     mgi_enable_program_mode_ExpectAnyArgsAndReturn(FWK_SUCCESS);
     mgi_set_monitor_mode_ExpectAnyArgsAndReturn(FWK_E_RANGE);
+    mgi_disable_program_mode_ExpectAnyArgsAndReturn(FWK_SUCCESS);
 
     status = smcf_mli_config_mode_set(mli_id, 0, 0);
     TEST_ASSERT_EQUAL(FWK_E_RANGE, status);
@@ -201,6 +202,7 @@ void utest_smcf_mli_config_mode(void)
     fwk_id_get_sub_element_idx_ExpectAnyArgsAndReturn(0);
     mgi_enable_program_mode_ExpectAnyArgsAndReturn(FWK_SUCCESS);
     mgi_set_monitor_mode_ExpectAnyArgsAndReturn(FWK_SUCCESS);
+    mgi_disable_program_mode_ExpectAnyArgsAndReturn(FWK_SUCCESS);
 
     status = smcf_mli_config_mode(mli_id, 0, 0);
 

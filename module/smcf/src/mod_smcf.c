@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -291,7 +291,11 @@ static int smcf_mli_config_mode_set(
     }
 
     status = mgi_set_monitor_mode(element_ctx->mgi, mode_index, mode_value);
-    return status;
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    return mgi_disable_program_mode(element_ctx->mgi, mli_index);
 }
 
 static int smcf_mli_config_mode(
