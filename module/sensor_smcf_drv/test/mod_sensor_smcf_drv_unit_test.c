@@ -87,6 +87,10 @@ void setUp(void)
 {
     sensor_smcf_drv_ctx.num_of_devices = SENSOR_DEVICE_CNT;
     sensor_smcf_drv_ctx.element_config_table = configs;
+    memcpy(
+        configs,
+        device_config_table,
+        SENSOR_DEVICE_CNT * sizeof(struct sensor_smcf_drv_element_config));
 }
 
 void tearDown(void)
@@ -342,6 +346,7 @@ void test_sensor_smcf_drv_get_sensor_data_sample_success(void)
             fwk_id_get_element_idx_ExpectAndReturn(drv_sensor_id, i);
             fwk_id_get_element_idx_ExpectAndReturn(sensor_smcf_id, i);
 
+            memset(sensor_sample_values, 0, sensor_data_values_sz);
             status = sensor_smcf_drv_get_sensor_multiple_samples(
                 drv_sensor_id, sensor_sample_values, sensor_set_size);
             TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
