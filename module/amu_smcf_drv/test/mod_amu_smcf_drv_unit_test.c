@@ -88,6 +88,14 @@ void setUp(void)
 {
     amu_smcf_drv_ctx.num_of_cores = NUM_OF_CORES;
     amu_smcf_drv_ctx.element_config_table = core_configs;
+    memcpy(
+        core_configs,
+        core_config_table,
+        NUM_OF_CORES * sizeof(struct amu_smcf_drv_element_config));
+    for (int i = 0; i < NUM_OF_CORES; ++i) {
+        core_configs[i].total_num_of_counters =
+            test_element_table[i].sub_element_count;
+    }
 }
 
 void tearDown(void)
