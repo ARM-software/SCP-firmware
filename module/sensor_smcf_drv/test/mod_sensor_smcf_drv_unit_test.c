@@ -23,15 +23,31 @@ uint32_t device_sensor_data_buf[SENSOR_DATA_MAX_SZ_IN_WORDS];
 /*!
  * \brief Test smcf get_data api
  *
+ * \param device_idx device index
+ * \param[out] buff Pointer to the buffer for generated sensor sample value(s)
+ *             in the following testable format
+ *             (SENSOR_SMCF_DRV_TEST_TEMP_VALUE_IN_CELCIUS + (device_idx << 1) +
+ *              sample_idx)
+ * \param buff_sz size of the buffer
+ */
+
+static void generate_sensor_samples(
+    unsigned int device_idx,
+    uint32_t *const buff,
+    size_t buff_sz)
+{
+    unsigned int i;
+    for (i = 0; i < buff_sz; ++i) {
+        buff[i] =
+            SENSOR_SMCF_DRV_TEST_TEMP_VALUE_IN_CELCIUS + i + (device_idx << 1);
+    }
+}
+
+/*!
+ * \brief Test smcf get_data api
+ *
  * \param monitor_id  Monitor ID
  * \param[out] data_buffer Pointer to the buffer for sensor data
- *             writes sensor data value in the following testable format
- *             (SENSOR_SMCF_DRV_TEST_TEMP_VALUE_IN_CELCIUS + (device_idx << 1) +
- *             sensor_idx)
- *             sensor_data_lsb = SENSOR_SMCF_DRV_TEST_TEMP_VALUE_IN_CELCIUS +
- *                               sample_index + (device_idx << 1)
- *             sensor_data_msb = 0
- *             F.E : sensor_data = {val1, 0, val2, 0, val3, 0, .....}
  * \param[out] tag_buffer Pointer to the buffer for TAG data for the given MLI
  *             sample
  *
@@ -42,8 +58,7 @@ static int test_smcf_get_data_api(
     struct mod_smcf_buffer data_buffer,
     struct mod_smcf_buffer tag_buffer)
 {
-    unsigned int i, device_idx;
-    uint64_t *data;
+    unsigned int device_idx;
 
     device_idx =
         fwk_id_get_element_idx(monitor_id) % sensor_smcf_drv_ctx.num_of_devices;
@@ -51,30 +66,21 @@ static int test_smcf_get_data_api(
         device_idx >= SENSOR_DEVICE_CNT)
         return FWK_E_PARAM;
 
-    data = (uint64_t *)(data_buffer.ptr);
-    for (i = 0; i < SENSOR_DATA_MAX_SZ_IN_WORDS; ++i) {
-        data[i] =
-            SENSOR_SMCF_DRV_TEST_TEMP_VALUE_IN_CELCIUS + i + (device_idx << 1);
-    }
+    generate_sensor_samples(device_idx, data_buffer.ptr, data_buffer.size);
 
     return FWK_SUCCESS;
 }
 
-static void validate_sensor_values(
-    const uint32_t *const sensor_values,
+static void validate_multiple_sensor_data_samples(
+    const uint32_t *const sensor_sample_values,
     size_t sample_size,
     unsigned int device_idx)
 {
-    unsigned int i, sample_count;
-    uint64_t expected_sensor_value;
-    sample_count = sample_size / sizeof(uint32_t);
-    const uint64_t *values = (uint64_t *)sensor_values;
-
-    for (i = 0; i < sample_count; ++i) {
-        expected_sensor_value =
-            SENSOR_SMCF_DRV_TEST_TEMP_VALUE_IN_CELCIUS + i + (device_idx << 1);
-        TEST_ASSERT_EQUAL_UINT64(expected_sensor_value, values[i]);
-    }
+    size_t sample_count = sample_size / sizeof(uint32_t);
+    uint32_t expected_sample_buff[sample_count];
+    generate_sensor_samples(device_idx, expected_sample_buff, sample_count);
+    TEST_ASSERT_EQUAL_UINT32_ARRAY(
+        expected_sample_buff, sensor_sample_values, sample_count);
 }
 
 void setUp(void)
@@ -269,10 +275,13 @@ void test_sensor_smcf_drv_get_sensor_single_value_success(void)
 
         /*
          * 64 bit test sensor value for device(i):
-         * SENSOR_SMCF_DRV_TEST_TEMP_VALUE_IN_CELCIUS + (2 * i)
+         * 32 bit msb: SENSOR_SMCF_DRV_TEST_TEMP_VALUE_IN_CELCIUS + (2 * i)
+         * 32 bit lsb: SENSOR_SMCF_DRV_TEST_TEMP_VALUE_IN_CELCIUS + (2 * i) + 1
          */
-        expected_sensor_value =
+        uint64_t sensor_value_lsb =
             SENSOR_SMCF_DRV_TEST_TEMP_VALUE_IN_CELCIUS + (i << 1);
+        uint64_t sensor_value_msb = sensor_value_lsb + 1;
+        expected_sensor_value = (sensor_value_msb << 32) + sensor_value_lsb;
         TEST_ASSERT_EQUAL_UINT64(sensor_value, expected_sensor_value);
     }
 }
@@ -336,7 +345,8 @@ void test_sensor_smcf_drv_get_sensor_data_sample_success(void)
             status = sensor_smcf_drv_get_sensor_multiple_samples(
                 drv_sensor_id, sensor_sample_values, sensor_set_size);
             TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
-            validate_sensor_values(sensor_sample_values, sensor_set_size, i);
+            validate_multiple_sensor_data_samples(
+                sensor_sample_values, sensor_set_size, i);
         }
     }
 }
