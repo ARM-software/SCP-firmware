@@ -622,18 +622,12 @@ static int scmi_perf_process_event(
     struct fwk_event *resp_event)
 {
 #ifdef BUILD_HAS_SCMI_PERF_PROTOCOL_OPS
-    int status;
-
     if ((fwk_id_get_module_idx(event->source_id) ==
          fwk_id_get_module_idx(fwk_module_id_scmi)) ||
         (fwk_id_get_module_idx(event->source_id) ==
          fwk_id_get_module_idx(fwk_module_id_dvfs))) {
         /* Handle requests from SCMi and responses from DVFS */
-        status = perf_prot_ops_process_events(event, resp_event);
-
-        if (status != FWK_SUCCESS) {
-            return status;
-        }
+        return perf_prot_ops_process_events(event, resp_event);
     }
 #endif
 
