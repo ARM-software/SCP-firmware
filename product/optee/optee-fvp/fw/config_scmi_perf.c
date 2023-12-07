@@ -15,15 +15,9 @@
 #include <fwk_module.h>
 
 static const struct mod_scmi_perf_domain_config domains[] = {
-    [DVFS_ELEMENT_IDX_LITTLE] = {
-        .fast_channels_addr_scp = 0x0,
-    },
-    [DVFS_ELEMENT_IDX_BIG] = {
-        .fast_channels_addr_scp = 0x0,
-    },
-    [DVFS_ELEMENT_IDX_GPU] = {
-        .fast_channels_addr_scp = 0x0,
-    },
+    [DVFS_ELEMENT_IDX_LITTLE] = { 0 },
+    [DVFS_ELEMENT_IDX_BIG] = { 0 },
+    [DVFS_ELEMENT_IDX_GPU] = { 0 },
 };
 
 struct fwk_module_config config_scmi_perf = {

@@ -52,15 +52,6 @@ static const struct mod_scmi_perf_domain_config domains[] = {
             [MOD_SCMI_PERF_FAST_CHANNEL_LIMIT_GET] = FCH_INIT(3),
             },
         .supports_fast_channels = true,
-#else
-        .fast_channels_addr_scp =
-            (uint64_t[]){
-                [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] = 1,
-            },
-        .fast_channels_addr_ap =
-            (uint64_t[]){
-                [MOD_SCMI_PERF_FAST_CHANNEL_LEVEL_GET] = 1,
-            },
 #endif
         .phy_group_id =
             FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_DVFS, DVFS_ELEMENT_IDX_0),

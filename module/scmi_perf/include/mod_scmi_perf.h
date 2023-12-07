@@ -114,23 +114,6 @@ struct mod_scmi_perf_domain_config {
 
     /*! Flag indicates whether a particular domain supports fast channel */
     bool supports_fast_channels;
-#else
-    /*!
-     * \brief Domain fast channels.
-     *
-     * \details Platform Domain fast channel address
-     *
-     * \note May be set to NULL, in which case support for fast
-     *       channels is disabled for the platform.
-     */
-    uint64_t *fast_channels_addr_scp;
-
-    /*!
-     * \brief Agent Domain fast channel address
-     *
-     * \details Address of shared memory for the agent
-     */
-    uint64_t *fast_channels_addr_ap;
 #endif
 
     /*! Flag indicating that statistics are collected for this domain */
