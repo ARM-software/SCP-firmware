@@ -90,8 +90,6 @@ struct fwk_module_config config_scmi_perf = {
         .perf_doms_count = FWK_ARRAY_SIZE(domains),
 #ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
         .fast_channels_rate_limit = SCMI_PERF_FC_MIN_RATE_LIMIT,
-#else
-        .fast_channels_alarm_id = FWK_ID_NONE_INIT,
 #endif
 #ifdef BUILD_HAS_MOD_STATISTICS
         .stats_enabled = true,

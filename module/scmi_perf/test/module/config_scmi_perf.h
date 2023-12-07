@@ -52,9 +52,6 @@ static const struct mod_scmi_perf_domain_config domains[] = {
 static struct mod_scmi_perf_config perf_config = {
     .domains = &domains,
     .perf_doms_count = SCMI_PERF_ELEMENT_IDX_COUNT,
-#ifndef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
-    .fast_channels_alarm_id = FWK_ID_NONE_INIT,
-#endif
 };
 
 struct fwk_module_config config_scmi_perf = {

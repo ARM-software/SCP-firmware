@@ -105,8 +105,6 @@ const struct fwk_module_config config_scmi_perf = {
         .domains = &domains, .perf_doms_count = FWK_ARRAY_SIZE(domains),
 #ifdef BUILD_HAS_SCMI_PERF_FAST_CHANNELS
         .fast_channels_rate_limit = (4 * 1000),
-#else
-        .fast_channels_alarm_id = FWK_ID_NONE_INIT,
 #endif
 #if (PLATFORM_VARIANT == TC2_VAR_EXPERIMENT_POWER)
         .plugins = plugins_table,

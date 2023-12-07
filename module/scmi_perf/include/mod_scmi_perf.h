@@ -205,16 +205,6 @@ struct mod_scmi_perf_config {
      */
     size_t perf_doms_count;
 
-#ifndef BUILD_HAS_MOD_TRANSPORT_FC
-    /*!
-     * \brief Fast Channels Alarm ID
-     *
-     * \details The Fast Channel alarm triggers the callback which
-     *    polls the fast channels and initiates the set_level and
-     *    set_limits operations.
-     */
-    fwk_id_t fast_channels_alarm_id;
-#endif
     /*! Fast Channel polling rate */
     uint32_t fast_channels_rate_limit;
 
