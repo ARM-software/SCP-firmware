@@ -35,4 +35,7 @@ list(APPEND MOCK_REPLACEMENTS fwk_module)
 list(APPEND MOCK_REPLACEMENTS fwk_id)
 list(APPEND MOCK_REPLACEMENTS fwk_core)
 
+# Additional flags
+list(APPEND EXTRA_COMPILE_FLAGS -DBUILD_HAS_MOD_CLOCK)
+
 include(${SCP_ROOT}/unit_test/module_common.cmake)
