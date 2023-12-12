@@ -77,7 +77,7 @@ struct clock_dev_ctx {
 
 #ifdef FWK_MODULE_ID_POWER_DOMAIN
     /* Power domain module restricted API pointer */
-    struct mod_pd_restricted_api *mod_pd_restricted_api;
+    struct mod_pd_restricted_api *pd_restricted_api;
 #endif
 };
 

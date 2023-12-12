@@ -426,7 +426,7 @@ static int clock_bind(fwk_id_t id, unsigned int round)
         status = fwk_module_bind(
             FWK_ID_MODULE(FWK_MODULE_IDX_POWER_DOMAIN),
             FWK_ID_API(FWK_MODULE_IDX_POWER_DOMAIN, MOD_PD_API_IDX_RESTRICTED),
-            &ctx->mod_pd_restricted_api);
+            &ctx->pd_restricted_api);
         if (status != FWK_SUCCESS) {
             return status;
         }
@@ -463,7 +463,7 @@ static int clock_start(fwk_id_t id)
 
 #ifdef FWK_MODULE_ID_POWER_DOMAIN
     if (ctx->config->default_on && ctx->api->process_power_transition != NULL) {
-        status = ctx->mod_pd_restricted_api->get_state(
+        status = ctx->pd_restricted_api->get_state(
             ctx->config->pd_source_id, &pd_state);
         if (status != FWK_SUCCESS) {
             return status;
