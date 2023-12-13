@@ -38,6 +38,10 @@ typedef enum IRQn {
 
     /* SCP REFCLK Physical Timer */
     REFCLK_GTIMER_IRQ = 32,
+    /* MHUv3 secure IRQ between SCP and AP */
+    MHU3_AP2SCP_IRQ_S = 83,
+    /* MHUv3 secure IRQ between SCP and RSS */
+    MHU3_RSS2SCP_IRQ_S = 86,
 
     IRQn_MAX = INT16_MAX,
 } IRQn_Type;
