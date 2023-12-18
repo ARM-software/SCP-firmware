@@ -119,10 +119,10 @@ sudo apt-get install pep8
 
 ## Cloning the SCP-firmware source code
 
-The SCP-firmware source code can be cloned from the official GitHub repository:
+The SCP-firmware source code can be cloned from the official Gitlab repository:
 
 ```sh
-git clone --recurse-submodules https://github.com/ARM-software/SCP-firmware.git\
+git clone --recurse-submodules https://git.gitlab.arm.com/firmware/SCP-firmware.git\
  ${SCP_PATH}
 ```
 

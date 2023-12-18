@@ -4,12 +4,10 @@ Contributing to SCP-firmware
 Getting Started
 ---------------
 
-- Make sure you have a [GitHub account](https://github.com/signup/free).
-- [Fork](https://help.github.com/articles/fork-a-repo)
-  [SCP-firmware](https://github.com/ARM-software/SCP-firmware) on Github.
-- Clone the fork to your own machine.
+- Make sure you have a [Gitlab account](https://gitlab.com/users/sign_in).
+- Clone the repo to your own machine.
 - Create a local topic branch based on the
-  [SCP-firmware](https://github.com/ARM-software/SCP-firmware) `master` branch.
+  [SCP-firmware](https://gitlab.arm.com/firmware/SCP-firmware) `main` branch.
 
 Making Changes
 --------------
@@ -48,36 +46,30 @@ Submitting Changes
   they must also add their own `Signed-off-by:` line. By adding this line the
   contributor certifies the contribution is made under the terms of the
   [Developer Certificate of Origin (DCO)](./dco.txt).
-- Push your local changes to your fork of the repository.
-- Submit a [pull request](https://help.github.com/articles/using-pull-requests)
-  to the [SCP-firmware](https://github.com/ARM-software/SCP-firmware) `master`
+- Push your local changes to a new branch in the repository.
+- Submit a [merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
+  to the [SCP-firmware](https://gitlab.arm.com/firmware/SCP-firmware) `main`
   branch.
-    - The changes in the
-      [pull request](https://help.github.com/articles/using-pull-requests) will
-      then undergo further review and testing by the
-      [maintainers](./maintainers.md). Any review comments will be made as
-      comments on the [pull request](https://help.github.com/articles/using-pull-requests).
+    - The changes in the merge request (MR) will then undergo further review and
+      testing by the maintainers. Any review comments will be made as
+      comments on the MR.
       This may require you to do some rework.
-- When the changes are accepted, the [maintainers](./maintainers.md) will
-  integrate them.
-
-    - Typically, the [maintainers](./maintainers.md) will merge the
-      [pull request](https://help.github.com/articles/using-pull-requests) into
-      the 'master' branch within the Github UI by rebasing and then merging.
-    - Please avoid creating merge commits in the
-      [pull request](https://help.github.com/articles/using-pull-requests)
-      itself.
-    - If the [pull request](https://help.github.com/articles/using-pull-requests)
-      is not based on a recent commit, the [maintainers](./maintainers.md) may
-      rebase it onto the `master` branch first, or ask you to do this.
-    - If the [pull request](https://help.github.com/articles/using-pull-requests)
-      cannot be automatically merged, the [maintainers](./maintainers.md) will
-      ask you to rebase it onto the `master` branch.
-    - If after merging the [maintainers](./maintainers.md) find any issues, they
-      may remove the commits and ask you to create a new pull request to resolve
-      the problem.
-   -  Please do not delete your topic branch until it is safely merged into
-      the `master` branch.
+    - When the changes are accepted, the maintainers will
+      integrate them.
+    - Typically, the maintainers will merge (fast-forward) the MR into the
+      `main` branch within the Gitlab UI by rebasing and then merging.
+    - Please avoid creating merge commits in the MR itself.
+    - If the MR is not based on a recent commit, the maintainers may rebase it
+      onto the `main` branch first, or ask you to do this.
+    - If the MR cannot be automatically merged, the maintainers will ask you
+      to rebase it onto the `main` branch.
+    - If after merging the maintainers find any issues, they may remove the
+      commits and ask you to create a new merge request to
+      resolve the problems.
+    - Please do not delete your topic branch until it is safely merged into
+      the `main` branch.
+    - The maintainers may also remove the original branch after the MR. If you
+      wish this not ot happen, please let the maintainers know in advance.
 
 Followthrough
 -------------
@@ -85,7 +77,7 @@ Followthrough
 - From time to time new features may be added and older features/functionality
 may deprecated. Code owners would be required to modify their code to support
 such new requirements within a reasonable time. Failure to do so may result
-in the code being deprecated and no longer maintained as a part of the master
+in the code being deprecated and no longer maintained as a part of the `main`
 branch.
 
 - Any regressions must be fixed as soon as possible. If you are unwilling or
