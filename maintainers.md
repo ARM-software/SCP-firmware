@@ -11,27 +11,20 @@ applicable). Contributions are always merged by a core maintainer.
 The core maintainers oversee the project as a whole, and approve and merge all
 contributions.
 
-- [Nicola Mazzucato](https://github.com/nicola-mazzucato-arm) (nicola.mazzucato@arm.com)
-- [Tarek El-Sherbiny](https://github.com/tarek-arm) (tarek.el-sherbiny@arm.com)
-- [Girish Pathak](https://github.com/girishpathak) (girish.pathak@arm.com)
-- [Leandro Belli](https://github.com/leandro-arm) (leandro.belli@arm.com)
-- [Ahmed Gadallah](https://github.com/AhmedImbabyGadallah) (ahmed.gadallah@arm.com)
-- [Katherine Vincent](https://github.com/katvin01) (katherine.vincent@arm.com)
-- [Khaled Ali Ahmed](https://github.com/khaali01) (khaled.aliahmed@arm.com)
-- [Md Golam Tanvir Zim](https://github.com/mdgzim01) (mdgolamtanvir.zim@arm.com)
-- [Mohamed Omar Asaker](https://github.com/mohamedasaker-arm) (Mohamed.OmarAsaker@arm.com)
-- [Miklos Balint](https://github.com/wmnt) (Miklos.Balint@arm.com)
-- [Andrew Graham](https://github.com/AndyJGraham) (Andrew.Graham@arm.com)
-- [Abhishek Rawat](https://github.com/abhishek-arm) (abhishek.rawat@arm.com)
-- [Wen Ping Teh](https://github.com/wenping-arm) (wenping.teh@arm.com)
-
-## Secondary Maintainers
-
-In the event that none of the core maintainers are available to deal with
-time-sensitive issues, secondary maintainers may also approve and merge
-contributions.
-
-- [Chris Kay](https://github.com/CJKay) (chris.kay@arm.com)
+- [Nicola Mazzucato](https://gitlab.arm.com/Nicola.Mazzucato)
+- [Tarek El-Sherbiny](https://gitlab.arm.com/Tarek.El-Sherbiny)
+- [Girish Pathak](https://gitlab.arm.com/girishpathak)
+- [Leandro Belli](https://gitlab.arm.com/Leandro.Belli)
+- [Ahmed Gadallah](https://gitlab.arm.com/Ahmed.Gadallah)
+- [Katherine Vincent](https://gitlab.arm.com/Katherine.Vincent)
+- [Khaled Ali Ahmed](https://gitlab.arm.com/khaledAhmed-arm)
+- [Md Golam Tanvir Zim](https://gitlab.arm.com/MdGolamTanvir.Zim)
+- [Mohamed Omar Asaker](https://gitlab.arm.com/Mohamed.OmarAsaker)
+- [Miklos Balint](https://gitlab.arm.com/Miklos.Balint)
+- [Andrew Graham](https://gitlab.arm.com/AndyJGraham)
+- [Abhishek Rawat](https://gitlab.arm.com/abhishek-arm)
+- [Wen Ping Teh](https://gitlab.arm.com/wenping-arm)
+- [James McGregor](https://gitlab.arm.com/James.McGregor2)
 
 ---
 
@@ -44,31 +37,31 @@ maintainers. The platforms listed here represent the exceptions to this rule.
 
 #### N1SDP (n1sdp)
 
-- [Manoj Kumar](https://github.com/manojkumar-arm) (manoj.kumar3@arm.com)
-- [Deepak Pandey](https://github.com/deepan02) (deepak.pandey@arm.com)
+- [Deepak Pandey](https://gitlab.arm.com/Deepak.Pandey)
+- [Chandni Cherukuri](https://gitlab.arm.com/chandnich)
 
 #### Morello (morello)
 
-- [Manoj Kumar](https://github.com/manojkumar-arm) (manoj.kumar3@arm.com)
-- [Deepak Pandey](https://github.com/deepan02) (deepak.pandey@arm.com)
+- [Deepak Pandey](https://gitlab.arm.com/Deepak.Pandey)
+- [Chandni Cherukuri](https://gitlab.arm.com/chandnich)
 
-#### RD platforms (rdv1, rdv1mc, rdn1e1, rdn2)
+#### RD platforms (rdv1, rdv1mc, rdn1e1, rdn2, rdfremont)
 
-- [Thomas Abraham](https://github.com/omasab) (thomas.abraham@arm.com)
-- [Vijayenthiran Subramaniam](https://github.com/vijayenthiran-arm) (Vijayenthiran.Subramaniam@arm.com)
+- [Thomas Abraham](https://gitlab.arm.com/thomas.abraham)
+- [Vijayenthiran Subramaniam](https://gitlab.arm.com/Vijayenthiran.Subramaniam)
 
-#### Total Compute (tc1)
+#### Total Compute (tc1, tc2)
 
-- [Vishnu Banavath](https://github.com/visban01) (vishnu.banavath@arm.com)
+- [Tintu Thomas](https://gitlab.arm.com/Tintu.Thomas)
 
 ### Socionext
 
 #### SynQuacer (synquacer)
 
-- [Masahisa Kojima](https://github.com/masahisak) (masahisa.kojima@linaro.org)
+- [Masahisa Kojima](https://github.com/masahisak)
 
 ### Renesas
 
 #### R-Car (rcar)
 
-- [Nicolas Royer](https://github.com/n-royer) (nroyer@baylibre.com)
+- [Nicolas Royer](https://github.com/n-royer)
