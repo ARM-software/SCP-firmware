@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -28,6 +28,14 @@ enum pd_idx {
     PD_IDX_SYSTOP,
     PD_IDX_COUNT,
     PD_IDX_NONE = UINT32_MAX
+};
+
+/* Mask of the core composite states */
+const uint32_t core_composite_state_mask_table_UT[] = {
+    MOD_PD_CS_STATE_MASK << MOD_PD_CS_LEVEL_0_STATE_SHIFT,
+    MOD_PD_CS_STATE_MASK << MOD_PD_CS_LEVEL_1_STATE_SHIFT,
+    MOD_PD_CS_STATE_MASK << MOD_PD_CS_LEVEL_2_STATE_SHIFT,
+    MOD_PD_CS_STATE_MASK << MOD_PD_CS_LEVEL_3_STATE_SHIFT,
 };
 
 /* Mask of the allowed states for a core depending on the cluster states. */
@@ -122,6 +130,105 @@ static const struct fwk_element pd_element_table[PD_IDX_COUNT] = {
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(systop_allowed_state_mask_table),
         }),
+    },
+};
+
+static const struct pd_ctx pd_ctx_config[PD_IDX_COUNT] = {
+    [PD_IDX_CLUS0CORE0] = {
+        .id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_IDX_CLUS0CORE0),
+        .config = pd_element_table[PD_IDX_CLUS0CORE0].data,
+        .requested_state = MOD_PD_STATE_OFF,
+        .state_requested_to_driver = MOD_PD_STATE_OFF,
+        .current_state = MOD_PD_STATE_OFF,
+        .parent = NULL,
+        .allowed_state_mask_table = core_pd_allowed_state_mask_table,
+        .allowed_state_mask_table_size =
+            FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table),
+        .cs_support = true,
+        .composite_state_mask_table = core_composite_state_mask_table_UT,
+        .composite_state_mask_table_size =
+            FWK_ARRAY_SIZE(core_composite_state_mask_table_UT),
+    },
+    [PD_IDX_CLUS0CORE1] = {
+        .id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_IDX_CLUS0CORE1),
+        .config = pd_element_table[PD_IDX_CLUS0CORE1].data,
+        .requested_state = MOD_PD_STATE_OFF,
+        .state_requested_to_driver = MOD_PD_STATE_OFF,
+        .current_state = MOD_PD_STATE_OFF,
+        .parent = NULL,
+        .allowed_state_mask_table = core_pd_allowed_state_mask_table,
+        .allowed_state_mask_table_size =
+            FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table),
+        .cs_support = true,
+        .composite_state_mask_table = core_composite_state_mask_table_UT,
+        .composite_state_mask_table_size =
+            FWK_ARRAY_SIZE(core_composite_state_mask_table_UT),
+    },
+    [PD_IDX_CLUS1CORE0] = {
+        .id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_IDX_CLUS1CORE0),
+        .config = pd_element_table[PD_IDX_CLUS1CORE0].data,
+        .requested_state = MOD_PD_STATE_OFF,
+        .state_requested_to_driver = MOD_PD_STATE_OFF,
+        .current_state = MOD_PD_STATE_OFF,
+        .parent = NULL,
+        .allowed_state_mask_table = core_pd_allowed_state_mask_table,
+        .allowed_state_mask_table_size =
+            FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table),
+        .cs_support = true,
+        .composite_state_mask_table = core_composite_state_mask_table_UT,
+        .composite_state_mask_table_size =
+            FWK_ARRAY_SIZE(core_composite_state_mask_table_UT),
+    },
+    [PD_IDX_CLUS1CORE1] = {
+        .id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_IDX_CLUS1CORE1),
+        .config = pd_element_table[PD_IDX_CLUS1CORE1].data,
+        .requested_state = MOD_PD_STATE_OFF,
+        .state_requested_to_driver = MOD_PD_STATE_OFF,
+        .current_state = MOD_PD_STATE_OFF,
+        .parent = NULL,
+        .allowed_state_mask_table = core_pd_allowed_state_mask_table,
+        .allowed_state_mask_table_size =
+            FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table),
+        .cs_support = true,
+        .composite_state_mask_table = core_composite_state_mask_table_UT,
+        .composite_state_mask_table_size =
+            FWK_ARRAY_SIZE(core_composite_state_mask_table_UT),
+    },
+    [PD_IDX_CLUSTER0] = {
+        .id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_IDX_CLUSTER0),
+        .config = pd_element_table[PD_IDX_CLUSTER0].data,
+        .requested_state = MOD_PD_STATE_OFF,
+        .state_requested_to_driver = MOD_PD_STATE_OFF,
+        .current_state = MOD_PD_STATE_OFF,
+        .parent = NULL,
+        .cs_support = false,
+        .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
+        .allowed_state_mask_table_size =
+            FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table),
+    },
+    [PD_IDX_CLUSTER1] = {
+        .id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_IDX_CLUSTER1),
+        .config = pd_element_table[PD_IDX_CLUSTER1].data,
+        .requested_state = MOD_PD_STATE_OFF,
+        .state_requested_to_driver = MOD_PD_STATE_OFF,
+        .current_state = MOD_PD_STATE_OFF,
+        .parent = NULL,
+        .cs_support = false,
+        .allowed_state_mask_table = cluster_pd_allowed_state_mask_table,
+        .allowed_state_mask_table_size =
+            FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table),
+    },
+    [PD_IDX_SYSTOP] = {
+        .id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_IDX_SYSTOP),
+        .config = pd_element_table[PD_IDX_SYSTOP].data,
+        .parent = NULL,
+        .cs_support = false,
+        .allowed_state_mask_table = systop_allowed_state_mask_table,
+        .allowed_state_mask_table_size =
+            FWK_ARRAY_SIZE(systop_allowed_state_mask_table),
+        .requested_state = MOD_PD_STATE_ON,
+        .state_requested_to_driver = MOD_PD_STATE_ON,
+        .current_state = MOD_PD_STATE_ON,
     },
 };
 
