@@ -157,7 +157,7 @@ static const char *get_message_type_str(const struct scmi_service_ctx *ctx)
         return "Notif";
 
     default:
-        return "Invalid message";
+        return "Invalid msg";
     }
 }
 
@@ -1044,8 +1044,7 @@ static int scmi_process_event(const struct fwk_event *event,
         if (protocol_idx == 0) {
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
             FWK_LOG_ERR(
-                "[SCMI] %s: %s [%" PRIu16
-                "(0x%x:0x%x)] requested an unsupported protocol",
+                "[SCMI] %s: %s [%" PRIu16 "(0x%x:0x%x)] Unsupported protocol",
                 service_name,
                 message_type_name,
                 ctx->scmi_token,
