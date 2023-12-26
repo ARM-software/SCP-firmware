@@ -309,6 +309,9 @@ struct mod_cmn_cyprus_rnsam_scg_config {
 struct mod_cmn_cyprus_remote_region {
     /*! Remote memory region memory map */
     const struct mod_cmn_cyprus_mem_region_map region_mmap;
+
+    /*! Target HAID for RA SAM */
+    unsigned int target_haid;
 };
 
 /*!
@@ -317,6 +320,9 @@ struct mod_cmn_cyprus_remote_region {
  * \details Used to describe a remote chip connection.
  */
 struct mod_cmn_cyprus_cml_config {
+    /*! Logical Device ID of the CCG node */
+    unsigned int ccg_ldid;
+
     /*!
      * Remote chip memory region table.
      * Used to configure RNSAM.
