@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -98,7 +98,8 @@ static int program_io_region(
 
     if (region_idx >= RNSAM_NON_HASH_MEM_REGION_COUNT) {
         FWK_LOG_ERR(
-            MOD_NAME "Error! Invalid non-hashed region %lu", region_idx);
+            MOD_NAME "Error! Invalid non-hashed region %u",
+            (unsigned int)region_idx);
         FWK_LOG_ERR(
             MOD_NAME "Max non-hashed region supported is %u",
             RNSAM_NON_HASH_MEM_REGION_COUNT);
@@ -228,7 +229,8 @@ static int program_scg_region(
                      ->rnsam_scg_config;
 
     if (scg_idx >= MAX_SCG_COUNT) {
-        FWK_LOG_ERR(MOD_NAME "Error! Invalid SCG region %lu", scg_idx);
+        FWK_LOG_ERR(
+            MOD_NAME "Error! Invalid SCG region %u", (unsigned int)scg_idx);
         FWK_LOG_ERR(MOD_NAME "Max SCG region supported is %u ", MAX_SCG_COUNT);
         return FWK_E_DATA;
     }
