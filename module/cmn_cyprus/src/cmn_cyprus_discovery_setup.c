@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -66,6 +66,7 @@ static struct cmn_cyprus_ctx *shared_ctx;
 /* RNSAM table index */
 static unsigned int rnsam_entry;
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
 /* CMN Revision Numbers */
 enum cmn_cyprus_revision {
     REV_R0_P0,
@@ -104,6 +105,7 @@ static const char *const node_type_to_name[NODE_TYPE_COUNT] = {
     [NODE_TYPE_HN_S_MPAM_S] = "HN-S MPAM-S",
     [NODE_TYPE_HN_S_MPAM_NS] = "HN-S MPAM-NS",
 };
+#endif
 
 /*
  * Determine the number of bits used to represent each node coordinate based
@@ -156,6 +158,7 @@ static unsigned int get_node_pos_y(
     return (node_id >> NODE_ID_Y_POS) & mask_bits;
 }
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
 /* Get node type name */
 static const char *get_node_type_name(enum cmn_cyprus_node_type node_type)
 {
@@ -187,6 +190,7 @@ static const char *get_cmn_cyprus_revision_name(
 
     return cmn_cyprus_rev_to_name[revision];
 }
+#endif
 
 static inline unsigned int get_child_count(FWK_R uint64_t child_info)
 {
@@ -486,22 +490,15 @@ static void disable_hns_isolation(struct cmn_cyprus_mxp_reg *mxp)
     }
 }
 
-static int discover_mxp_nodes(struct cmn_cyprus_mxp_reg *mxp)
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
+static void print_node_info(struct cmn_cyprus_mxp_reg *mxp)
 {
-    int status;
-    unsigned int node_count;
-    unsigned int node_id;
-    unsigned int node_idx;
-    unsigned int node_pos_x;
-    unsigned int node_pos_y;
     uint8_t mesh_size_x;
     uint8_t mesh_size_y;
-    struct cmn_cyprus_node_cfg_reg *node;
+    unsigned int node_id;
+    unsigned int node_pos_x;
+    unsigned int node_pos_y;
 
-    /* Get number of children connected to the cross point */
-    node_count = get_child_count(mxp->CHILD_INFO);
-
-    /* Get node id */
     node_id = node_info_get_id(mxp->NODE_INFO);
 
     mesh_size_x = shared_ctx->config->mesh_size_x;
@@ -516,6 +513,22 @@ static int discover_mxp_nodes(struct cmn_cyprus_mxp_reg *mxp)
         node_pos_y,
         node_id,
         node_info_get_ldid(mxp->NODE_INFO));
+}
+#endif
+
+static int discover_mxp_nodes(struct cmn_cyprus_mxp_reg *mxp)
+{
+    int status;
+    unsigned int node_count;
+    unsigned int node_idx;
+    struct cmn_cyprus_node_cfg_reg *node;
+
+    /* Get number of children connected to the cross point */
+    node_count = get_child_count(mxp->CHILD_INFO);
+
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_INFO
+    print_node_info(mxp);
+#endif
 
     /* Traverse nodes connected to the cross point */
     for (node_idx = 0; node_idx < node_count; node_idx++) {
