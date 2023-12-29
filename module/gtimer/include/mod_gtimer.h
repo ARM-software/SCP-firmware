@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -27,6 +27,16 @@
  *
  * \{
  */
+
+/*!
+ * \brief API indices.
+ */
+enum mod_gtimer_api_idx {
+    /*! Interface for timer driver */
+    MOD_GTIMER_API_IDX_DRIVER,
+    /*! Number of defined interfaces */
+    MOD_GTIMER_API_IDX_COUNT,
+};
 
 /*!
  * \brief Generic timer device descriptor

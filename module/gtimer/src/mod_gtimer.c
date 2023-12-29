@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -226,14 +226,25 @@ static int gtimer_process_bind_request(fwk_id_t requester_id,
                                        fwk_id_t api_type,
                                        const void **api)
 {
+    enum mod_gtimer_api_idx api_idx;
+    int status;
+
     /* No binding to the module */
     if (fwk_module_is_valid_module_id(id)) {
         return FWK_E_ACCESS;
     }
 
-    *api = &module_api;
+    api_idx = (enum mod_gtimer_api_idx)fwk_id_get_api_idx(api_type);
+    switch (api_idx) {
+    case MOD_GTIMER_API_IDX_DRIVER:
+        *api = &module_api;
+        status = FWK_SUCCESS;
+        break;
+    default:
+        status = FWK_E_PARAM;
+    }
 
-    return FWK_SUCCESS;
+    return status;
 }
 
 static void gtimer_control_init(struct gtimer_dev_ctx *ctx)
@@ -296,7 +307,7 @@ static int gtimer_process_notification(
  * Module descriptor
  */
 const struct fwk_module module_gtimer = {
-    .api_count = 1,
+    .api_count = (unsigned int)MOD_GTIMER_API_IDX_COUNT,
     .event_count = 0,
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = gtimer_init,
