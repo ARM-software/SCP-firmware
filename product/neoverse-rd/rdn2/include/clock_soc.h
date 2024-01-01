@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -12,11 +12,7 @@
 
 #include <fwk_macros.h>
 
-#if (PLATFORM_VARIANT == 3)
-#    define CLOCK_RATE_REFCLK (125UL * FWK_MHZ)
-#else
-#    define CLOCK_RATE_REFCLK (100UL * FWK_MHZ)
-#endif
+#define CLOCK_RATE_REFCLK (125UL * FWK_MHZ)
 
 #define CLOCK_RATE_SYSPLLCLK (2000UL * FWK_MHZ)
 
