@@ -25,13 +25,6 @@
 #    define REFCLK_CTRL_CLKSELECT_REFCLK_125 0x2
 #    define REFCLK_CTRL_CLKSELECT_CUR_MASK   0xff00
 #    define REFCLK_CTRL_CLKSELECT_CUR_SHIFT  8
-
-/*
- * CNTINCR register specifies the increment step value for the system counter on
- * each clock tick. This register is at offset 0xD0 from the base of the
- * CNTControlBase register frame.
- */
-#    define REFCLK_CNTINCR 0xD0
 #endif
 
 /*
