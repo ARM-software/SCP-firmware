@@ -175,6 +175,24 @@ struct mod_cmn_cyprus_mem_region_map {
     enum mod_cmn_cyprus_mem_region_type type;
 
     /*!
+     * Secondary region base address.
+     *
+     * \note To be used only with \ref
+     * mod_cmn_cyprus_mem_region_type.MOD_CMN_CYPRUS_MEM_REGION_TYPE_SYSCACHE
+     * memory regions.
+     */
+    uint64_t sec_region_base;
+
+    /*!
+     * Secondary region size in bytes.
+     *
+     * \note To be used only with \ref
+     * mod_cmn_cyprus_mem_region_type.MOD_CMN_CYPRUS_MEM_REGION_TYPE_SYSCACHE
+     * memory regions.
+     */
+    uint64_t sec_region_size;
+
+    /*!
      * \brief Target node id.
      *
      * \note Not used for ::MOD_CMN_CYPRUS_MEM_REGION_TYPE_SYSCACHE memory

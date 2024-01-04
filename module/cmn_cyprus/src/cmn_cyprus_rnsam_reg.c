@@ -13,6 +13,8 @@
 #include <internal/cmn_cyprus_reg.h>
 #include <internal/cmn_cyprus_rnsam_reg.h>
 
+#include <mod_cmn_cyprus.h>
+
 #include <fwk_assert.h>
 #include <fwk_log.h>
 #include <fwk_math.h>
@@ -289,6 +291,16 @@ static void set_htg_region_target_type(
     }
 }
 
+/* Configure the target type for the secondary HTG region */
+static void set_htg_sec_region_target_type(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    unsigned int region_idx,
+    enum sam_node_type target_type)
+{
+    rnsam->SYS_CACHE_GRP_SECONDARY_REG[region_idx] |=
+        (target_type << RNSAM_REGION_ENTRY_TARGET_TYPE_POS);
+}
+
 /* Configurable lower address & upper address */
 static void configure_non_hash_region_start_and_end_addr(
     struct cmn_cyprus_rnsam_reg *rnsam,
@@ -387,6 +399,25 @@ static void configure_htg_region_start_and_end_addr(
         ((base + size - 1) & ~lsb_addr_mask);
 }
 
+/* Secondary HTG region - Configurable lower address & upper address */
+static void configure_htg_sec_region_start_and_end_addr(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    unsigned int region_idx,
+    uint64_t base,
+    uint64_t size)
+{
+    uint64_t lsb_addr_mask;
+
+    lsb_addr_mask = rnsam_ctx.non_hash_lsb_addr_mask;
+
+    /* Configure the start address of the region */
+    rnsam->SYS_CACHE_GRP_SECONDARY_REG[region_idx] = (base & ~lsb_addr_mask);
+
+    /* Configure the end address of the region */
+    rnsam->HASHED_TARGET_GRP_SECONDARY_CFG2_REG[region_idx] =
+        (base + size - 1) & ~lsb_addr_mask;
+}
+
 /* Configurable base address & region size - Legacy CMN mode */
 static int configure_htg_region_base_and_size(
     struct cmn_cyprus_rnsam_reg *rnsam,
@@ -398,7 +429,7 @@ static int configure_htg_region_base_and_size(
     uint64_t min_size;
 
     if ((base % size) != 0) {
-        FWK_LOG_ERR(MOD_NAME "Invalid non-hashed region %u", region_idx);
+        FWK_LOG_ERR(MOD_NAME "Invalid hashed region %u", region_idx);
         FWK_LOG_ERR(
             MOD_NAME "Base: 0x%llx should align with Size: 0x%llx", base, size);
         return FWK_E_PARAM;
@@ -427,6 +458,38 @@ static int configure_htg_region_base_and_size(
         rnsam->HASHED_TGT_GRP_CFG1_REGION[idx] |= (base / min_size)
             << RNSAM_REGION_ENTRY_BASE_POS;
     }
+
+    return FWK_SUCCESS;
+}
+
+/*
+ * Secondary HTG region - Configurable base address & region size - Legacy
+ * CMN mode.
+ */
+static int configure_htg_sec_region_base_and_size(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    unsigned int region_idx,
+    uint64_t base,
+    uint64_t size)
+{
+    uint64_t min_size;
+
+    if ((base % size) != 0) {
+        FWK_LOG_ERR(MOD_NAME "Invalid secondary hashed region %u", region_idx);
+        FWK_LOG_ERR(
+            MOD_NAME "Base: 0x%llx should align with Size: 0x%llx", base, size);
+        return FWK_E_PARAM;
+    }
+
+    min_size = rnsam_ctx.min_htg_size;
+
+    /* Configure region size */
+    rnsam->SYS_CACHE_GRP_SECONDARY_REG[region_idx] =
+        sam_encode_region_size(size, min_size) << RNSAM_REGION_ENTRY_SIZE_POS;
+
+    /* Configure region base */
+    rnsam->SYS_CACHE_GRP_SECONDARY_REG[region_idx] |= (base / min_size)
+        << RNSAM_REGION_ENTRY_BASE_POS;
 
     return FWK_SUCCESS;
 }
@@ -594,6 +657,37 @@ int rnsam_configure_hashed_region(
     return FWK_SUCCESS;
 }
 
+/* Configure secondary HTG region address range and target type */
+int rnsam_configure_sec_hashed_region(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    unsigned int region_idx,
+    uint64_t base,
+    uint64_t size,
+    enum sam_node_type target_type)
+{
+    int status;
+
+    /*
+     * If Range comparison mode is enabled, program the base and the
+     * end address of the non-hashed region.
+     */
+    if (rnsam_ctx.htg_rcomp_en == true) {
+        configure_htg_sec_region_start_and_end_addr(
+            rnsam, region_idx, base, size);
+    } else {
+        status = configure_htg_sec_region_base_and_size(
+            rnsam, region_idx, base, size);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+    }
+
+    /* Configure the target node type for the hashed region */
+    set_htg_sec_region_target_type(rnsam, region_idx, target_type);
+
+    return FWK_SUCCESS;
+}
+
 void rnsam_set_htg_target_hn_nodeid(
     struct cmn_cyprus_rnsam_reg *rnsam,
     uint16_t hn_node_id,
@@ -635,15 +729,22 @@ void rnsam_set_htg_region_valid(
     struct cmn_cyprus_rnsam_reg *rnsam,
     unsigned int region_idx)
 {
+    /* Set hashed region as valid */
     if (region_idx < RNSAM_HTG_REG_COUNT) {
-        /* Configure the bits [51:16] of base address of the range */
         rnsam->SYS_CACHE_GRP_REGION[region_idx] |= RNSAM_REGION_ENTRY_VALID;
 
     } else {
-        /* Configure the bits [51:16] of base address of the range */
         rnsam->HASHED_TGT_GRP_CFG1_REGION[region_idx - RNSAM_HTG_REG_COUNT] |=
             RNSAM_REGION_ENTRY_VALID;
     }
+}
+
+/* Mark the secondary HTG region as valid for comparison */
+void rnsam_set_htg_secondary_region_valid(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    unsigned int region_idx)
+{
+    rnsam->SYS_CACHE_GRP_SECONDARY_REG[region_idx] |= RNSAM_REGION_ENTRY_VALID;
 }
 
 uint64_t rnsam_get_non_hashed_region_base(

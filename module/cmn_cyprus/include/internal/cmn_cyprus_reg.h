@@ -132,8 +132,8 @@ struct cmn_cyprus_rnsam_reg {
     FWK_RW  uint64_t  NON_HASH_TGT_NODEID[16];
     FWK_RW  uint64_t  SYS_CACHE_GRP_REGION[RNSAM_HTG_REG_COUNT];
     FWK_RW  uint64_t  HASHED_TGT_GRP_CFG1_REGION[RNSAM_HTG_REG_GRP2_COUNT];
-    FWK_RW  uint64_t  SYS_CACHE_GRP_SECONDARY_REGION[4];
-            uint8_t   RESERVED5[0xEA0 - 0xE60];
+    FWK_RW  uint64_t  SYS_CACHE_GRP_SECONDARY_REG[8];
+            uint8_t   RESERVED5[0xEA0 - 0xE80];
     FWK_RW  uint64_t  SYS_CACHE_GROUP_HN_COUNT;
             uint8_t   RESERVED6[0xEB0 - 0xEA8];
     FWK_RW  uint64_t  SYS_CACHE_GRP_SN_ATTR[2];
@@ -161,7 +161,8 @@ struct cmn_cyprus_rnsam_reg {
     FWK_RW  uint64_t  CML_CPAG_BASE_INDX_GRP[RNSAM_CPAG_BASE_INDX_REG_COUNT];
             uint8_t   RESERVED14[0x3100 - 0x2B40];
     FWK_RW  uint64_t  HASHED_TGT_GRP_CFG2_REGION[32];
-            uint8_t   RESERVED15[0x3400 - 0x3200];
+            uint8_t   RESERVED15[0x3300 - 0x3200];
+    FWK_RW  uint64_t  HASHED_TARGET_GRP_SECONDARY_CFG2_REG[32];
     FWK_RW  uint64_t  HASHED_TARGET_GRP_HASH_CNTL[32];
 };
 

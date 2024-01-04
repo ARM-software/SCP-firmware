@@ -271,6 +271,19 @@ static int program_scg_region(
             return status;
         }
 
+        if (scg_region->sec_region_size != 0) {
+            /* Configure the secondary hashed region address range in RNSAM */
+            status = rnsam_configure_sec_hashed_region(
+                rnsam,
+                scg_idx,
+                scg_region->sec_region_base,
+                scg_region->sec_region_size,
+                SAM_NODE_TYPE_HN_F);
+            if (status != FWK_SUCCESS) {
+                return status;
+            }
+        }
+
         /* Configure the target nodes for the SCG */
         configure_scg_target_nodes(rnsam, scg_region, scg_idx);
 
@@ -289,6 +302,10 @@ static int program_scg_region(
 
         /* Mark the region as valid for comparison */
         rnsam_set_htg_region_valid(rnsam, scg_idx);
+
+        if (scg_region->sec_region_size != 0) {
+            rnsam_set_htg_secondary_region_valid(rnsam, scg_idx);
+        }
     }
 
     return FWK_SUCCESS;

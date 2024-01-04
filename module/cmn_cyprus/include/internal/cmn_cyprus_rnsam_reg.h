@@ -13,6 +13,8 @@
 
 #include <internal/cmn_cyprus_reg.h>
 
+#include <mod_cmn_cyprus.h>
+
 #include <stdint.h>
 
 /* Number of non-hashed regions supported */
@@ -150,6 +152,28 @@ int rnsam_configure_hashed_region(
     enum sam_node_type target_type);
 
 /*
+ * Configure hashed region secondary address range and target type in RNSAM.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param region_idx Hashed region index.
+ * \param base Hashed region base address.
+ * \param size Hashed region size.
+ * \param target_type Hashed region target node type
+ *      \ref enum sam_node_type.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_PARAM Range comparision mode is enabled but base address is
+ * not aligned with the size.
+ */
+int rnsam_configure_sec_hashed_region(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    unsigned int region_idx,
+    uint64_t base,
+    uint64_t size,
+    enum sam_node_type target_type);
+
+/*
  * Configure hashed region target node ID in RNSAM.
  *
  * \param rnsam Pointer to the RNSAM node.
@@ -202,6 +226,19 @@ void rnsam_enable_htg_cal_mode(
  * \return nothing.
  */
 void rnsam_set_htg_region_valid(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    unsigned int region_idx);
+
+/*
+ * Mark the secondary hashed region as valid in RNSAM.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param region_idx hashed region index.
+ *
+ * \return nothing.
+ */
+void rnsam_set_htg_secondary_region_valid(
     struct cmn_cyprus_rnsam_reg *rnsam,
     unsigned int region_idx);
 
