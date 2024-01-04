@@ -11,6 +11,8 @@
 #ifndef CMN_CYPRUS_COMMON_INTERNAL_H
 #define CMN_CYPRUS_COMMON_INTERNAL_H
 
+#include <internal/cmn_cyprus_ctx.h>
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -30,6 +32,8 @@
     (ctx_ptr->config->chip_addr_space * ctx_ptr->chip_id)
 
 #define IS_POW_OF_TWO(x) (x && !(x & (x - 1)))
+
+#define GET_BIT_MASK(bit_count) ((1 << bit_count) - 1)
 
 /*
  * Convert a memory region size into a size format used by the CMN-CYPRUS
@@ -88,5 +92,19 @@ bool is_ccg_agent_id_valid(unsigned int agent_id);
  * \return true if (link_id == CCG_LINK_0)
  */
 bool is_ccg_link_id_valid(uint8_t link_id);
+
+/*
+ * Return the number of target HN-S nodes in the given SCG.
+ *
+ * \param ctx Pointer to the driver context.
+ *      \pre Driver context pointer must be valid.
+ * \param scg_idx SCG/HTG region index.
+ *      \pre Region index must be valid.
+ *
+ * \return Number of HN-S nodes in the SCG.
+ */
+unsigned int get_scg_hns_count(
+    const struct cmn_cyprus_ctx *ctx,
+    uint8_t scg_idx);
 
 #endif /* CMN_CYPRUS_COMMON_INTERNAL_H */

@@ -157,6 +157,11 @@ enum mod_cmn_cyprus_mem_region_type {
     /*! Remote non-hashed region (serviced by remote HN) */
     MOD_CMN_CYPRUS_MEM_REGION_TYPE_REMOTE_NON_HASHED,
 
+    /*!
+     * Remote hashed region (serviced by remote HN-S nodes)
+     */
+    MOD_CMN_CYPRUS_MEM_REGION_TYPE_REMOTE_HASHED,
+
     /*! Memory region configuration type count */
     MOD_CMN_CYPRUS_MEM_REGION_TYPE_COUNT,
 };

@@ -116,6 +116,16 @@ struct cmn_cyprus_hns_reg {
 #define RNSAM_CPAG_BASE_INDX_REG_COUNT 8
 /* CML Port Aggregation control register count */
 #define RNSAM_CPA_CTRL_REG_COUNT 16
+/* Hashed memory region CPA enable register count in first group */
+#define RNSAM_SCG_CPA_EN_REG_COUNT 2
+/* Hashed memory region CPA enable register count in second group */
+#define RNSAM_SCG_CPA_EN_REG_GRP2_COUNT 2
+/* Hashed memory region CPA Group ID register count in first group */
+#define RNSAM_SCG_CPA_GRP_REG_COUNT 2
+/* Hashed memory region CPA Group ID register count in second group */
+#define RNSAM_SCG_CPA_GRP_REG_GRP2_COUNT 8
+/* Hashed memory region LCN bound Cfg register count */
+#define RNSAM_SCG_LCN_BOUND_REG_COUNT 4
 
 /*!
  * Request Node System Address Map (RNSAM) registers.
@@ -146,24 +156,33 @@ struct cmn_cyprus_rnsam_reg {
     FWK_RW  uint64_t  SYS_CACHE_GRP_CAL_MODE;
     FWK_RW  uint64_t  HASHED_TARGET_GRP_CAL_MODE[3];
     FWK_RW  uint64_t  SYS_CACHE_GRP_SN_SAM_CFG[8];
-            uint8_t   RESERVED9[0x11A0 - 0x1180];
+    FWK_RW  uint64_t  SYS_CACHE_GRP_HN_CPA_EN_REG[RNSAM_SCG_CPA_EN_REG_COUNT];
+    FWK_RW  uint64_t  SYS_CACHE_GRP_HN_CPA_GRP_REG[RNSAM_SCG_CPA_GRP_REG_COUNT];
     FWK_RW  uint64_t
         CML_PORT_AGGR_MODE_CTRL_REG[RNSAM_CPA_MODE_CTRL_REG_COUNT];
-            uint8_t   RESERVED10[0x11F0 - 0x11C0];
+            uint8_t   RESERVED9[0x11F0 - 0x11C0];
     FWK_RW  uint64_t  CML_PORT_AGGR_GRP_REG[RNSAM_CPA_GRP_REG_COUNT];
     FWK_RW  uint64_t  CML_PORT_AGGR_CTRL_REG[RNSAM_CPA_CTRL_REG_COUNT];
-            uint8_t   RESERVED11[0x20C0 - 0x1288];
+            uint8_t   RESERVED10[0x20C0 - 0x1288];
     FWK_RW  uint64_t  NON_HASH_MEM_REGION_GRP2[RNSAM_NON_HASH_REG_GRP2_COUNT];
-            uint8_t   RESERVED12[0x24C0 - 0x2200];
+            uint8_t   RESERVED11[0x24C0 - 0x2200];
     FWK_RW  uint64_t
         NON_HASH_MEM_REGION_CFG2_GRP2[RNSAM_NON_HASH_REG_GRP2_COUNT];
-            uint8_t   RESERVED13[0x2B00 - 0x2600];
+            uint8_t   RESERVED12[0x2B00 - 0x2600];
     FWK_RW  uint64_t  CML_CPAG_BASE_INDX_GRP[RNSAM_CPAG_BASE_INDX_REG_COUNT];
-            uint8_t   RESERVED14[0x3100 - 0x2B40];
+            uint8_t   RESERVED13[0x3100 - 0x2B40];
     FWK_RW  uint64_t  HASHED_TGT_GRP_CFG2_REGION[32];
-            uint8_t   RESERVED15[0x3300 - 0x3200];
+            uint8_t   RESERVED14[0x3300 - 0x3200];
     FWK_RW  uint64_t  HASHED_TARGET_GRP_SECONDARY_CFG2_REG[32];
     FWK_RW  uint64_t  HASHED_TARGET_GRP_HASH_CNTL[32];
+            uint8_t   RESERVED15[0x3730 - 0x3500];
+    FWK_RW  uint64_t
+        HASHED_TARGET_GRP_HNF_CPA_EN_REG[RNSAM_SCG_CPA_EN_REG_COUNT];
+    FWK_RW  uint64_t
+        HASHED_TARGET_GRP_CPA_GRP_REG[RNSAM_SCG_CPA_GRP_REG_GRP2_COUNT];
+            uint8_t   RESERVED16[0x37C0 - 0x3790];
+    FWK_RW  uint64_t
+        HASHED_TARGET_GRP_HNF_LCN_BOUND_CFG_REG[RNSAM_SCG_LCN_BOUND_REG_COUNT];
 };
 
 /*

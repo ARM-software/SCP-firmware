@@ -9,6 +9,7 @@
  */
 
 #include <internal/cmn_cyprus_common.h>
+#include <internal/cmn_cyprus_ctx.h>
 
 #include <fwk_assert.h>
 #include <fwk_math.h>
@@ -62,4 +63,24 @@ inline bool is_ccg_agent_id_valid(unsigned int agent_id)
 inline bool is_ccg_link_id_valid(uint8_t link_id)
 {
     return (link_id == CCG_LINK_0);
+}
+
+/* Helper function to get the number of HN-S nodes in the given SCG */
+unsigned int get_scg_hns_count(
+    const struct cmn_cyprus_ctx *ctx,
+    uint8_t scg_idx)
+{
+    unsigned int hns_count;
+
+    fwk_assert(ctx != NULL);
+    fwk_assert(scg_idx < ctx->scg_count);
+
+    hns_count = ctx->scg_hns_count[scg_idx];
+
+    /*
+     * When CAL mode is enabled, the node ID of only one of the two nodes
+     * connected to the CAL, is entered into the applicable Target ID table.
+     * So, the adjusted HN-S count is half of the HN-S nodes in the SCG.
+     */
+    return (ctx->config->hns_cal_mode == true) ? (hns_count / 2) : hns_count;
 }

@@ -401,6 +401,60 @@ int rnsam_configure_non_hash_region_cpag_id(
     uint8_t cpag_id);
 
 /*
+ * Enable CPA mode for the given hashed region.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param region_idx Hashed region index.
+ *      \pre Hashed region index must be valid.
+ * \param hns_count Number of target HN-S nodes in the hashed region.
+ *
+ * \retval ::FWK_SUCCESS The operation succeeded.
+ * \return One of the standard error codes for implementation-defined
+ *      errors.
+ */
+int rnsam_enable_hash_region_cpa_mode(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t region_idx,
+    unsigned int hns_count);
+
+/*
+ * Configure CPA group ID for the given hashed region.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param region_idx Hashed region index.
+ *      \pre Hashed region index must be valid.
+ * \param cpag_id CPA group ID.
+ *
+ * \retval ::FWK_SUCCESS The operation succeeded.
+ * \return One of the standard error codes for implementation-defined
+ *      errors.
+ */
+int rnsam_configure_hash_region_cpag_id(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t region_idx,
+    uint8_t cpag_id);
+
+/*
+ * Set the target HN-S nodes in the given hashed region as LCN bound.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param region_idx Hashed region index.
+ *      \pre Hashed region index must be a valid remote address region.
+ * \param hns_count Number of target HN-S nodes in the hashed region.
+ *
+ * \retval ::FWK_SUCCESS The operation succeeded.
+ * \return One of the standard error codes for implementation-defined
+ *      errors.
+ */
+int rnsam_set_hash_region_lcn_bound(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t region_idx,
+    unsigned int hns_count);
+
+/*
  * Configure the number of CCG nodes in CPA group.
  *
  * \param rnsam Pointer to the RNSAM node.

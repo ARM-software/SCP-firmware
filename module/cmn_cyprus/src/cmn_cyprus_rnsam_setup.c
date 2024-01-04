@@ -10,6 +10,7 @@
 
 #include <internal/cmn_cyprus_common.h>
 #include <internal/cmn_cyprus_ctx.h>
+#include <internal/cmn_cyprus_hns_reg.h>
 #include <internal/cmn_cyprus_node_info_reg.h>
 #include <internal/cmn_cyprus_reg.h>
 #include <internal/cmn_cyprus_rnsam_reg.h>
@@ -33,11 +34,19 @@ static const char
         [MOD_CMN_CYPRUS_MEM_REGION_TYPE_SYSCACHE] = "System Cache",
         [MOD_CMN_CYPRUS_MEM_REGION_TYPE_SYSCACHE_SUB] = "Sub-System Cache",
         [MOD_CMN_CYPRUS_MEM_REGION_TYPE_REMOTE_NON_HASHED] = "Remote Non-Hash",
+        [MOD_CMN_CYPRUS_MEM_REGION_TYPE_REMOTE_HASHED] = "Remote Hashed",
     };
 #endif
 
 /* Shared driver context pointer */
 static struct cmn_cyprus_ctx *shared_ctx;
+
+/*
+ * Target Home Node index. Denotes the index at which a given home node ID will
+ * programmed in the SYS_CACHE_GRP_HN_NODEID register in RNSAM. This variable
+ * is used while programming the target node IDs for SCGs.
+ */
+static unsigned int hn_node_id_idx = 0;
 
 static inline bool is_non_hash_region_idx_valid(unsigned int region_idx)
 {
@@ -149,24 +158,31 @@ static int program_io_region(
 }
 
 static void configure_scg_target_nodes(
-    struct cmn_cyprus_rnsam_reg *rnsam,
     const struct mod_cmn_cyprus_mem_region_map *region,
     uint32_t scg_idx)
 {
     uint16_t hns_ldid;
-    uint16_t hns_count_in_scg;
-    unsigned int hn_node_id_idx;
     unsigned int node_id;
+    unsigned int rnsam_idx;
     struct cmn_cyprus_hns_info *hns_info;
     const struct mod_cmn_cyprus_config *config;
+    struct cmn_cyprus_rnsam_reg *rnsam;
+    enum mod_cmn_cyprus_mem_region_type region_type;
 
     config = shared_ctx->config;
-    hns_count_in_scg = 0;
-    hn_node_id_idx = 0;
+    region_type = region->type;
+
+    fwk_assert(
+        (region_type == MOD_CMN_CYPRUS_MEM_REGION_TYPE_SYSCACHE) ||
+        (region_type == MOD_CMN_CYPRUS_MEM_REGION_TYPE_REMOTE_HASHED));
 
     /*
      * Iterate through each HN-S node and configure the target node ID if it
      * falls within the arbitrary SCG square/rectange.
+     *
+     * Note: For multichip configurations with LCN enabled, the remote chip
+     * mesh is assumed to be identical to the local mesh and the HN-S nodes
+     * in the local mesh are re-used as target nodes for the remote SCG.
      */
     for (hns_ldid = 0; hns_ldid < shared_ctx->hns_count; hns_ldid++) {
         hns_info = &shared_ctx->hns_info_table[hns_ldid];
@@ -177,26 +193,30 @@ static void configure_scg_target_nodes(
             continue;
         }
 
-        /* Skip the HN-F node if it is isolated or belongs to a different SCG */
-        if ((hns_info->hns == 0) || (hns_info->scg_idx != scg_idx)) {
+        /* Skip the HN-S node if it is isolated */
+        if (is_hns_node_isolated(hns_info->hns) == true) {
             continue;
         }
 
-        /* Configure target HN-F node ID */
-        rnsam_set_htg_target_hn_nodeid(rnsam, node_id, hn_node_id_idx);
+        /*
+         * For local SCGs, skip the HN-S node if it belongs to a different SCG.
+         */
+        if ((region_type == MOD_CMN_CYPRUS_MEM_REGION_TYPE_SYSCACHE) &&
+            (hns_info->scg_idx != scg_idx)) {
+            continue;
+        }
 
+        /* Iterate through each RNSAM node and configure the region */
+        for (rnsam_idx = 0; rnsam_idx < shared_ctx->rnsam_count; rnsam_idx++) {
+            rnsam = shared_ctx->rnsam_table[rnsam_idx];
+
+            /* Configure target HN-S node ID */
+            rnsam_set_htg_target_hn_nodeid(rnsam, node_id, hn_node_id_idx);
+        }
+
+        /* Increment the global target home node index */
         hn_node_id_idx++;
     }
-
-    /* Adjust the number of HN-S nodes in the SCG based on CAL mode */
-    if (config->hns_cal_mode) {
-        hns_count_in_scg = (shared_ctx->scg_hns_count[scg_idx] / 2);
-    } else {
-        hns_count_in_scg = shared_ctx->scg_hns_count[scg_idx];
-    }
-
-    /* Configure the number of target HN-S nodes in this syscache group */
-    rnsam_set_htg_target_hn_count(rnsam, scg_idx, hns_count_in_scg);
 }
 
 static void configure_scg_hier_hashing(
@@ -207,15 +227,7 @@ static void configure_scg_hier_hashing(
     uint8_t num_hns_per_cluster;
     unsigned int hns_count;
 
-    /*
-     * If CAL mode is enabled, only the even numbered HN-S nodes are
-     * programmed. Hence, Reduce HN-S count by half if CAL mode is enabled.
-     */
-    if (shared_ctx->config->hns_cal_mode) {
-        hns_count = (shared_ctx->scg_hns_count[scg_idx] / 2);
-    } else {
-        hns_count = shared_ctx->scg_hns_count[scg_idx];
-    }
+    hns_count = get_scg_hns_count(shared_ctx, scg_idx);
 
     /* Number of HN-S nodes in a cluster */
     num_hns_per_cluster = (hns_count / num_cluster_groups);
@@ -244,6 +256,7 @@ static int program_scg_region(
     int status;
     enum sam_node_type target_type;
     unsigned int rnsam_idx;
+    uint16_t hns_count_in_scg;
     struct cmn_cyprus_rnsam_reg *rnsam;
     struct mod_cmn_cyprus_rnsam_scg_config *scg_config;
 
@@ -291,9 +304,6 @@ static int program_scg_region(
             }
         }
 
-        /* Configure the target nodes for the SCG */
-        configure_scg_target_nodes(rnsam, scg_region, scg_idx);
-
         if (shared_ctx->config->hns_cal_mode) {
             /* Configure the SCG CAL mode support */
             rnsam_enable_htg_cal_mode(rnsam, scg_idx);
@@ -313,7 +323,14 @@ static int program_scg_region(
         if (scg_region->sec_region_size != 0) {
             rnsam_set_htg_secondary_region_valid(rnsam, scg_idx);
         }
+
+        hns_count_in_scg = get_scg_hns_count(shared_ctx, scg_idx);
+        /* Configure the number of target HN-S nodes in this syscache group */
+        rnsam_set_htg_target_hn_count(rnsam, scg_idx, hns_count_in_scg);
     }
+
+    /* Set the target Home Nodes for the SCG */
+    configure_scg_target_nodes(scg_region, scg_idx);
 
     return FWK_SUCCESS;
 }
@@ -382,6 +399,18 @@ static int program_rnsam_region(
         /* Configure remote non-hashed region */
         status = program_remote_non_hashed_region(
             region->base, region->size, region_idx, region->node_id);
+        break;
+
+    case MOD_CMN_CYPRUS_MEM_REGION_TYPE_REMOTE_HASHED:
+        region_idx = shared_ctx->scg_count++;
+        /*
+         * When LCN is enabled, for remote SCGs, assume that the number of HN-S
+         * nodes is same as that of the SCG0 and override the HNS count.
+         */
+        shared_ctx->scg_hns_count[region_idx] = shared_ctx->scg_hns_count[0];
+
+        /* Configure remote SCG region */
+        status = program_scg_region(region, region_idx);
         break;
 
     default:
@@ -595,6 +624,50 @@ static int configure_cpag_target_nodes(
     return FWK_SUCCESS;
 }
 
+/*
+ * Set CPA mode and CPA Group ID for remote hashed regions. Additionally, if LCN
+ * mode is specified, set the target HN-S nodes as LCN bound.
+ */
+static int configure_remote_hash_region_cpa(
+    uint8_t region_idx,
+    uint8_t cpag_id,
+    struct cmn_cyprus_rnsam_reg *rnsam)
+{
+    int status;
+    unsigned int hns_count;
+
+    /* Enable CPA mode for the remote hashed region */
+    hns_count = get_scg_hns_count(shared_ctx, region_idx);
+    status = rnsam_enable_hash_region_cpa_mode(rnsam, region_idx, hns_count);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! Failed to enable CPA for hashed region");
+        return status;
+    }
+
+    /* Set target CPAG ID for the remote hashed region */
+    status = rnsam_configure_hash_region_cpag_id(rnsam, region_idx, cpag_id);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! Failed to set CPAG ID for hashed region");
+        return status;
+    }
+
+    /*
+     * If LCN mode is enabled, set the target HN-S nodes in the remote hashed
+     * region as LCN bound.
+     */
+    if (shared_ctx->config->enable_lcn == true) {
+        status = rnsam_set_hash_region_lcn_bound(rnsam, region_idx, hns_count);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(
+                MOD_NAME
+                "Error! Failed to set LCN bound HN-S nodes for hashed region");
+            return status;
+        }
+    }
+
+    return status;
+}
+
 /* Set CPA mode and CPA Group ID for remote non-hashed regions */
 static int configure_remote_non_hash_region_cpa(
     uint8_t region_idx,
@@ -658,6 +731,19 @@ static int program_rnsam_cpa(
 
             status = configure_remote_non_hash_region_cpa(
                 region_idx, cpag_id, rnsam);
+            if (status != FWK_SUCCESS) {
+                return status;
+            }
+        } else if (
+            region_type == MOD_CMN_CYPRUS_MEM_REGION_TYPE_REMOTE_HASHED) {
+            /*
+             * Region index is the recently configured hashed region in the
+             * RNSAM.
+             */
+            region_idx = (shared_ctx->scg_count - 1);
+
+            status =
+                configure_remote_hash_region_cpa(region_idx, cpag_id, rnsam);
             if (status != FWK_SUCCESS) {
                 return status;
             }

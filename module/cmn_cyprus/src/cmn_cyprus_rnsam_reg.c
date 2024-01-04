@@ -89,6 +89,22 @@
 #define CPAG_BASE_INDX_WIDTH_PER_CPAG      8
 #define CPAG_BASE_INDX_CPAG_PER_GROUP      8
 #define CPAG_BASE_INDX_MASK                UINT64_C(0x3F)
+#define SCG_HN_CPA_GRPID_OFFSET            16
+#define SCG_HN_CPA_GRP_COUNT_PER_REG       4
+
+/* Hashed memory region CPA enable register count */
+#define SCG_CPA_EN_REG_COUNT \
+    (RNSAM_SCG_CPA_EN_REG_COUNT + RNSAM_SCG_CPA_EN_REG_GRP2_COUNT)
+
+/* Number of HN-S target indices per CPA_EN register */
+#define HNS_COUNT_PER_SCG_CPA_EN_REG 64
+
+/* Hashed memory region CPA Group ID register count */
+#define SCG_CPA_GRP_REG_TOTAL_COUNT \
+    (RNSAM_SCG_CPA_GRP_REG_COUNT + RNSAM_SCG_CPA_GRP_REG_GRP2_COUNT)
+
+/* Number of HN-S target indices per LCN_BOUND_CFG register */
+#define HNS_COUNT_PER_SCG_LCN_BOUND_REG 64
 
 #define MAX_CCG_COUNT_PER_CPAG 32
 
@@ -908,6 +924,120 @@ int rnsam_configure_non_hash_region_cpag_id(
 
     rnsam->CML_PORT_AGGR_MODE_CTRL_REG[register_idx] |=
         ((uint64_t)(cpag_id & CPA_MODE_CTRL_PAG_GRPID_MASK) << bit_pos);
+
+    return FWK_SUCCESS;
+}
+
+/* Enable CPA mode for the given hashed region */
+int rnsam_enable_hash_region_cpa_mode(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t region_idx,
+    unsigned int hns_count)
+{
+    uint32_t register_idx;
+    uint64_t mask;
+    uint8_t start_bit_pos, end_bit_pos;
+
+    fwk_assert(IS_POW_OF_TWO(hns_count));
+
+    /*
+     * Find the start and end positions of the remote HN-S node in the bitmap.
+     */
+    start_bit_pos = ((region_idx * hns_count) % HNS_COUNT_PER_SCG_CPA_EN_REG);
+    end_bit_pos = ((start_bit_pos + hns_count) - 1);
+    if (end_bit_pos >= HNS_COUNT_PER_SCG_CPA_EN_REG) {
+        return FWK_E_RANGE;
+    }
+
+    register_idx = ((region_idx * hns_count) / HNS_COUNT_PER_SCG_CPA_EN_REG);
+    if (register_idx >= SCG_CPA_EN_REG_COUNT) {
+        return FWK_E_RANGE;
+    }
+
+    /* Create a mask for enabling the CPA for each HN-S node in the SCG */
+    mask = GET_BIT_MASK(hns_count);
+
+    /* Enable CPA mode for remote HN-S */
+    if (register_idx < RNSAM_SCG_CPA_EN_REG_COUNT) {
+        rnsam->SYS_CACHE_GRP_HN_CPA_EN_REG[register_idx] |=
+            (mask << start_bit_pos);
+    } else {
+        register_idx -= RNSAM_SCG_CPA_EN_REG_COUNT;
+        rnsam->HASHED_TARGET_GRP_HNF_CPA_EN_REG[register_idx] |=
+            (mask << start_bit_pos);
+    }
+
+    return FWK_SUCCESS;
+}
+
+/*
+ * Configure CPA Group ID for the given hashed region. The outbound requests are
+ * distributed across this CPA Group.
+ */
+int rnsam_configure_hash_region_cpag_id(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t region_idx,
+    uint8_t cpag_id)
+{
+    uint32_t register_idx;
+    uint8_t bit_pos;
+
+    register_idx = (region_idx / SCG_HN_CPA_GRP_COUNT_PER_REG);
+    if (register_idx >= SCG_CPA_GRP_REG_TOTAL_COUNT) {
+        return FWK_E_RANGE;
+    }
+
+    bit_pos = (SCG_HN_CPA_GRPID_OFFSET * region_idx);
+
+    /* Configure the CPAG ID */
+    if (register_idx < RNSAM_SCG_CPA_GRP_REG_COUNT) {
+        rnsam->SYS_CACHE_GRP_HN_CPA_GRP_REG[register_idx] |=
+            ((uint64_t)cpag_id << bit_pos);
+    } else {
+        register_idx -= RNSAM_SCG_CPA_GRP_REG_COUNT;
+        rnsam->HASHED_TARGET_GRP_CPA_GRP_REG[register_idx] |=
+            ((uint64_t)cpag_id << bit_pos);
+    }
+
+    return FWK_SUCCESS;
+}
+
+/*
+ * Mark the HN-S nodes in the given hashed region as LCN bound. This configures
+ * the cache lines routed to the HN-S nodes as LCN bound.
+ */
+int rnsam_set_hash_region_lcn_bound(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t region_idx,
+    unsigned int hns_count)
+{
+    uint32_t register_idx;
+    uint64_t mask;
+    uint8_t start_bit_pos, end_bit_pos;
+
+    fwk_assert(IS_POW_OF_TWO(hns_count));
+
+    /*
+     * Find the start and end positions of the remote HN-S node in the bitmap.
+     */
+    start_bit_pos =
+        ((region_idx * hns_count) % HNS_COUNT_PER_SCG_LCN_BOUND_REG);
+    end_bit_pos = ((start_bit_pos + hns_count) - 1);
+    if (end_bit_pos >= HNS_COUNT_PER_SCG_LCN_BOUND_REG) {
+        return FWK_E_RANGE;
+    }
+
+    register_idx = ((region_idx * hns_count) / HNS_COUNT_PER_SCG_LCN_BOUND_REG);
+    if (register_idx >= RNSAM_SCG_LCN_BOUND_REG_COUNT) {
+        return FWK_E_RANGE;
+    }
+
+    /* Create a mask for enabling the CPA for each HN-S node in the SCG */
+    mask = GET_BIT_MASK(hns_count);
+
+    /* Mark the hashed HN-F index as LCN */
+    rnsam->HASHED_TARGET_GRP_HNF_LCN_BOUND_CFG_REG[register_idx] |=
+        (mask << start_bit_pos);
 
     return FWK_SUCCESS;
 }
