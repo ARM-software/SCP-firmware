@@ -454,6 +454,9 @@ struct mod_cmn_cyprus_config {
      * A valid non-zero value must be specified.
      */
     uint32_t cml_poll_timeout_us;
+
+    /*! Enable Local Coherency Node feature */
+    bool enable_lcn;
 };
 
 /*!

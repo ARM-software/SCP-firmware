@@ -242,6 +242,7 @@ static int program_scg_region(
     uint32_t scg_idx)
 {
     int status;
+    enum sam_node_type target_type;
     unsigned int rnsam_idx;
     struct cmn_cyprus_rnsam_reg *rnsam;
     struct mod_cmn_cyprus_rnsam_scg_config *scg_config;
@@ -256,17 +257,23 @@ static int program_scg_region(
         return FWK_E_DATA;
     }
 
+    /*
+     * If LCN mode is enabled (typically used in multichip configurations),
+     * select the target type as HN-S as the Super Home Node (HN-S) has dual
+     * functionality, acting as an HN-F for local coherent memory and LCN for
+     * remote coherent memory.
+     */
+    target_type = (shared_ctx->config->enable_lcn == true) ?
+        SAM_NODE_TYPE_HN_S :
+        SAM_NODE_TYPE_HN_F;
+
     /* Iterate through each RNSAM node and configure the region */
     for (rnsam_idx = 0; rnsam_idx < shared_ctx->rnsam_count; rnsam_idx++) {
         rnsam = shared_ctx->rnsam_table[rnsam_idx];
 
         /* Configure the hashed region address range in RNSAM */
         status = rnsam_configure_hashed_region(
-            rnsam,
-            scg_idx,
-            scg_region->base,
-            scg_region->size,
-            SAM_NODE_TYPE_HN_F);
+            rnsam, scg_idx, scg_region->base, scg_region->size, target_type);
         if (status != FWK_SUCCESS) {
             return status;
         }
@@ -278,7 +285,7 @@ static int program_scg_region(
                 scg_idx,
                 scg_region->sec_region_base,
                 scg_region->sec_region_size,
-                SAM_NODE_TYPE_HN_F);
+                target_type);
             if (status != FWK_SUCCESS) {
                 return status;
             }

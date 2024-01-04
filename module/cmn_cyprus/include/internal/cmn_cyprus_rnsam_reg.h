@@ -41,6 +41,15 @@ enum sam_node_type {
     /*! Target type CXRA. Used for remote regions. */
     SAM_NODE_TYPE_CXRA,
 
+    /*! Target type HN-P */
+    SAM_NODE_TYPE_HN_P,
+
+    /*! Target type PCI-CXRA */
+    SAM_NODE_TYPE_PCI_CXRA,
+
+    /*! Target type HN-S. Used for hashed regions when LCN is enabled. */
+    SAM_NODE_TYPE_HN_S,
+
     /*! SAM node type count */
     SAM_NODE_TYPE_COUNT
 };
