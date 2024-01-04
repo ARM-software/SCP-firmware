@@ -42,12 +42,48 @@
 #define SCP_ADDRESS_TRANSLATION_WINDOW0_BASE (0x60000000)
 #define SCP_ADDRESS_TRANSLATION_WINDOW1_BASE (0xA0000000)
 
-/* Offsets within SCP's Address Translation Window0 */
-#define SCP_ATW0_LCP_AND_CLUSTER_UTILITY_OFFSET (0x0)
-#define SCP_ATW0_AP_PERIPHERAL_SRAM_OFFSET (0x10000000)
+/*
+ * Offsets within SCP's Address Translation Window0
+ *          __________________________  0x78500000
+ *         |                          |
+ *         |     RSM_SRAM (4MB)       |
+ *         |__________________________| 0x78100000
+ *         |                          |
+ *         |     GPC_MMU (1MB)        |
+ *         |__________________________| 0x78000000
+ *         |                          |
+ *         |     SHARED SRAM (128MB)  |
+ *         |__________________________| 0x70000000
+ *         |                          |
+ *         |     CLUTER UTIL (256MB)  |
+ *         |__________________________| 0x60000000
+ */
 
-/* Offsets within SCP's Address Translation Window1 */
-#define SCP_ATW1_CMN_OFFSET (0x0)
+#define SCP_ATW0_LCP_AND_CLUSTER_UTILITY_SIZE (256 * FWK_MIB)
+#define SCP_ATW0_AP_PERIPHERAL_SRAM_SIZE      (128 * FWK_MIB)
+#define SCP_ATW0_AP_PERIPHERAL_GPC_SMMU_SIZE  (1 * FWK_MIB)
+#define SCP_ATW0_SYSTEM_CONTROL_SRAM_SIZE     (4 * FWK_MIB)
+
+#define SCP_ATW0_LCP_AND_CLUSTER_UTILITY_BASE \
+    SCP_ADDRESS_TRANSLATION_WINDOW0_BASE
+#define SCP_ATW0_AP_PERIPHERAL_SRAM_BASE \
+    (SCP_ATW0_LCP_AND_CLUSTER_UTILITY_BASE + \
+     SCP_ATW0_LCP_AND_CLUSTER_UTILITY_SIZE)
+#define SCP_ATW0_AP_PERIPHERAL_GPC_SMMU_BASE \
+    (SCP_ATW0_AP_PERIPHERAL_SRAM_BASE + SCP_ATW0_AP_PERIPHERAL_SRAM_SIZE)
+#define SCP_ATW0_SYSTEM_CONTROL_SRAM_BASE \
+    (SCP_ATW0_AP_PERIPHERAL_GPC_SMMU_BASE + \
+     SCP_ATW0_AP_PERIPHERAL_GPC_SMMU_SIZE)
+
+/*
+ * Offsets within SCP's Address Translation Window1
+ *          __________________________  0xE0000000
+ *         |                          |
+ *         |         CMN (1GB)        |
+ *         |__________________________| 0xA0000000
+ */
+#define SCP_ATW1_CMN_BASE (SCP_ADDRESS_TRANSLATION_WINDOW1_BASE)
+#define SCP_ATW1_CMN_SIZE (1 * FWK_GIB)
 
 /*
  * LCP subsystem and Cluster Utility memory region that is addressable in the AP
@@ -73,29 +109,25 @@
 
 /* Core Manager base address for a cluster 'n' */
 #define SCP_CLUSTER_UTILITY_CORE_MANAGER_BASE(n) \
-    (SCP_ADDRESS_TRANSLATION_WINDOW0_BASE + \
-     SCP_ATW0_LCP_AND_CLUSTER_UTILITY_OFFSET + \
+    (SCP_ATW0_LCP_AND_CLUSTER_UTILITY_BASE + \
      (n * SCP_LCP_AND_CLUSTER_UTILITY_SIZE) + \
      SCP_CLUSTER_UTILITY_CORE_MANAGER_OFFSET)
 
 /* Cluster PPU base address */
 #define SCP_CLUSTER_UTILITY_CLUSTER_PPU_BASE(n) \
-    (SCP_ADDRESS_TRANSLATION_WINDOW0_BASE + \
-     SCP_ATW0_LCP_AND_CLUSTER_UTILITY_OFFSET + \
+    (SCP_ATW0_LCP_AND_CLUSTER_UTILITY_BASE + \
      (n * SCP_LCP_AND_CLUSTER_UTILITY_SIZE) + \
      SCP_CLUSTER_UTILITY_CLUSTER_PPU_OFFSET)
 
 /* Application core PPU base address */
 #define SCP_CLUSTER_UTILITY_CORE_PPU_BASE(n) \
-    (SCP_ADDRESS_TRANSLATION_WINDOW0_BASE + \
-     SCP_ATW0_LCP_AND_CLUSTER_UTILITY_OFFSET + \
+    (SCP_ATW0_LCP_AND_CLUSTER_UTILITY_BASE + \
      (n * SCP_LCP_AND_CLUSTER_UTILITY_SIZE) + \
      SCP_CLUSTER_UTILITY_CORE_PPU_OFFSET)
 
 /* Base address of SCP's view of LCP's External Control register block */
 #define SCP_LCP_EXTERNAL_CONTROL(n) \
-    (SCP_ADDRESS_TRANSLATION_WINDOW0_BASE + \
-     SCP_ATW0_LCP_AND_CLUSTER_UTILITY_OFFSET + \
+    (SCP_ATW0_LCP_AND_CLUSTER_UTILITY_BASE + \
      (n * SCP_LCP_AND_CLUSTER_UTILITY_SIZE) + SCP_LCP_EXTERNAL_CONTROL_OFFSET)
 
 /* Offsets in the LCP external control register block */
@@ -110,8 +142,7 @@
 
 /* Base address of SCP's view of LCP's Control register block */
 #define SCP_LCP_CONTROL(n) \
-    (SCP_ADDRESS_TRANSLATION_WINDOW0_BASE + \
-     SCP_ATW0_LCP_AND_CLUSTER_UTILITY_OFFSET + \
+    (SCP_ATW0_LCP_AND_CLUSTER_UTILITY_BASE + \
      (n * SCP_LCP_AND_CLUSTER_UTILITY_SIZE) + SCP_LCP_CONTROL_OFFSET)
 
 /* Offsets in the LCP control register block */
@@ -132,7 +163,6 @@
     (SCP_ADDRESS_TRANSLATION_WINDOW0_BASE + SCP_ATW0_SYSTEM_CONTROL_SRAM_OFFSET)
 
 /* CMN config space is mapped in the SCP address translation window 1 */
-#define SCP_CMN_BASE \
-    (SCP_ADDRESS_TRANSLATION_WINDOW1_BASE + SCP_ATW1_CMN_OFFSET)
+#define SCP_CMN_BASE SCP_ATW1_CMN_BASE
 
 #endif /* SCP_CSS_MMAP_H */
