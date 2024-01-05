@@ -31,6 +31,32 @@
 #define MOD_CMN_CYPRUS_HNS_PWPR_POLICY_ON       8
 
 /*!
+ * LCN SAM target node type.
+ */
+enum lcn_sam_node_type {
+    /*! 3'b000: Target node type HN-F */
+    LCN_SAM_NODE_TYPE_HN_F,
+
+    /*! 3'b001: Target node type HN-I */
+    LCN_SAM_NODE_TYPE_HN_I,
+
+    /*! 3'b010: Target node type CXRA */
+    LCN_SAM_NODE_TYPE_CXRA,
+
+    /*! 3'b011: Target node type HN-P */
+    LCN_SAM_NODE_TYPE_HN_P,
+
+    /*! 3'b100: Target node type PCI-CXRA */
+    LCN_SAM_NODE_TYPE_PCI_CXRA,
+
+    /*! 3'b101: Target node type HN-S */
+    LCN_SAM_NODE_TYPE_HN_S,
+
+    /*! LCN SAM node type count */
+    LCN_SAM_NODE_TYPE_COUNT,
+};
+
+/*!
  * HN-S operational power modes.
  */
 enum mod_cmn_cyprus_hns_pwpr_op_mode {
@@ -336,6 +362,145 @@ int hns_configure_rn_cpag_node_id(
     struct cmn_cyprus_hns_reg *hns,
     uint8_t cpag_tgt_idx,
     unsigned int ccg_ha_node_id);
+
+/*
+ * Configure address range for the given hashed region in LCN SAM.
+ *
+ * \param hns Pointer to the HN-S node.
+ *      \pre The HN-S node pointer must be valid.
+ * \param region_idx Hashed region index.
+ * \param region Hashed region memory map.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \return One of the standard error codes for implementation-defined
+ *      errors.
+ */
+int hns_configure_lcn_htg_region_range(
+    struct cmn_cyprus_hns_reg *hns,
+    unsigned int region_idx,
+    const struct mod_cmn_cyprus_mem_region_map *region);
+
+/*
+ * Configure target type for the given hashed region in LCN SAM.
+ *
+ * \param hns Pointer to the HN-S node.
+ *      \pre The HN-S node pointer must be valid.
+ * \param region_idx Hashed region index.
+ * \param target_type Target node type for the given HTG.
+ *
+ * \return None.
+ */
+void hns_set_lcn_htg_region_target_type(
+    struct cmn_cyprus_hns_reg *hns,
+    unsigned int region_idx,
+    enum lcn_sam_node_type target_type);
+
+/*
+ * Configure hashed region target node count in LCN SAM.
+ *
+ * \param hns Pointer to the HN-S node.
+ *      \pre The HN-S node pointer must be valid.
+ * \param region_idx Hashed region index.
+ * \param hn_count Number of target nodes in the given HTG.
+ *
+ * \return None.
+ */
+void hns_set_lcn_htg_region_hn_count(
+    struct cmn_cyprus_hns_reg *hns,
+    unsigned int region_idx,
+    unsigned int hn_count);
+
+/*
+ * Enable CAL mode for the given hashed region in LCN SAM.
+ *
+ * \param hns Pointer to the HN-S node.
+ *      \pre The HN-S node pointer must be valid.
+ * \param region_idx Hashed region index.
+ *
+ * \return None.
+ */
+void hns_enable_lcn_htg_cal_mode(
+    struct cmn_cyprus_hns_reg *hns,
+    unsigned int region_idx);
+
+/*
+ * Enable CPA mode for the given hashed region in LCN SAM.
+ *
+ * \param hns Pointer to the HN-S node.
+ *      \pre The HN-S node pointer must be valid.
+ * \param region_idx hashed region index.
+ *      \pre Hashed region index must be valid.
+ * \param hns_count Number of target HN-S nodes in the HTG.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_RANGE Register index out of range or invalid bit mask.
+ */
+int hns_enable_lcn_htg_cpa_mode(
+    struct cmn_cyprus_hns_reg *hns,
+    unsigned int region_idx,
+    unsigned int hns_count);
+
+/*
+ * Configure CPA group ID for the given hashed region in LCN SAM.
+ *
+ * \param hns Pointer to the HN-S node.
+ *      \pre The HN-S node pointer must be valid.
+ * \param region_idx HTG region index.
+ *      \pre HTG region index must be valid.
+ * \param hns_count Number of target HN-S nodes in the HTG.
+ * \param cpag_id CPA group ID.
+ *
+ * \return None.
+ */
+void hns_set_lcn_htg_cpag_id(
+    struct cmn_cyprus_hns_reg *hns,
+    uint8_t region_idx,
+    unsigned int hns_count,
+    uint8_t cpag_id);
+
+/*
+ * Mark the HTG region as valid in LCN SAM.
+ *
+ * \param hns Pointer to the HN-S node.
+ *      \pre The HN-S node pointer must be valid.
+ * \param region_idx HTG region index.
+ *
+ * \return None.
+ */
+void hns_set_lcn_htg_region_valid(
+    struct cmn_cyprus_hns_reg *hns,
+    uint8_t region_idx);
+
+/*
+ * Mark the HTG secondary region as valid in LCN SAM.
+ *
+ * \param hns Pointer to the HN-S node.
+ *      \pre The HN-S node pointer must be valid.
+ * \param region_idx HTG region index.
+ *
+ * \return None.
+ */
+void hns_set_lcn_htg_sec_region_valid(
+    struct cmn_cyprus_hns_reg *hns,
+    uint8_t region_idx);
+
+/*
+ * Setup the LCN SAM programming context.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ *
+ * \details Reads static configuration from the given RNSAM node and saves it in
+ * the context structure. This eliminates the need to read the configuration
+ * every time when programming an LCN node.
+ *
+ * \note All RNSAM nodes in a given CMN mesh are expected to have the same
+ * configuration during the boot time.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_PARAM Invalid rnsam register pointer.
+ */
+int setup_lcnsam_ctx(struct cmn_cyprus_rnsam_reg *rnsam);
 
 /*
  * Setup the HN-S programming context.

@@ -11,6 +11,7 @@
 #include <internal/cmn_cyprus_common.h>
 #include <internal/cmn_cyprus_hns_reg.h>
 #include <internal/cmn_cyprus_reg.h>
+#include <internal/cmn_cyprus_rnsam_reg.h>
 
 #include <fwk_assert.h>
 #include <fwk_math.h>
@@ -67,6 +68,19 @@
 #define CPAG_TGTID_WIDTH           12
 #define CPAG_TGTID_WIDTH_PER_GROUP 60
 
+/* LCN Programming */
+#define LCN_HASHED_TGT_GRP_TGT_TYPE_POS  2
+#define LCN_HTG_REGION_BASE_ADDR_POS     16
+#define LCN_HTG_REGION_END_ADDR_POS      16
+#define LCN_HTG_REGION_SIZE_POS          56
+#define LCN_HTG_HN_COUNT_PER_REG         8
+#define LCN_HTG_HN_COUNT_REG_NUM_HN_POS  8
+#define LCN_HTG_CAL_MODE_PER_REG         4
+#define LCN_HTG_CAL_MODE_EN_POS          16
+#define LCN_HTG_HNF_PER_CPAG_PERHNF_REG  8
+#define LCN_HTG_CPAG_PER_HNF_POS         8
+#define LCN_HTG_CPA_EN_HNF_COUNT_PER_REG 64
+
 /* HN-S programming context structure */
 struct cmn_cyprus_hns_ctx {
     /* Range comparison mode status flag */
@@ -88,13 +102,97 @@ struct cmn_cyprus_hns_ctx {
     bool is_initialized;
 };
 
+/*!
+ * LCN SAM programming context structure.
+ */
+struct cmn_cyprus_lcnsam_ctx {
+    /*! Hashed regions range comparison mode status flag */
+    bool rcomp_en;
+
+    /*!
+     * Minimum size of the hashed regions when RCOMP is enabled. The size is
+     * defined using user parameter RNSAM_HTG_RCOMP_LSB.
+     *
+     * The following values are valid:
+     * RNSAM_HTG_RCOMP_LSB = 16, defines minimum memory size = 64KB
+     * RNSAM_HTG_RCOMP_LSB = 17, defines minimum memory size = 128KB
+     * ...
+     * RNSAM_HTG_RCOMP_LSB = 26, defines minimum memory size = 64MB
+     */
+    uint64_t min_htg_size;
+
+    /*!
+     * LSB address mask for programming hashed target group region base address
+     * and end address.
+     */
+    uint64_t htg_lsb_addr_mask;
+
+    /*! Flag to indicate that the LCN SAM context has been initialized */
+    bool is_initialized;
+};
+
 static struct cmn_cyprus_hns_ctx hns_ctx;
+static struct cmn_cyprus_lcnsam_ctx lcnsam_ctx;
 
 static uint8_t get_hns_rcomp_lsb_pos(struct cmn_cyprus_hns_reg *hns)
 {
     return (
         (hns->UNIT_INFO[1] & HNS_UNIT_INFO_HNSAM_RCOMP_LSB_MASK) >>
         HNS_UNIT_INFO_HNSAM_RCOMP_LSB_POS);
+}
+
+static void configure_lcn_htg_region_start_and_end_addr(
+    struct cmn_cyprus_hns_reg *hns,
+    unsigned int region_idx,
+    uint64_t base,
+    uint64_t size,
+    uint64_t sec_region_base,
+    uint64_t sec_region_size)
+{
+    uint64_t lsb_addr_mask;
+
+    lsb_addr_mask = lcnsam_ctx.htg_lsb_addr_mask;
+
+    hns->LCN_HASHED_TGT_GRP_CFG2_REGION[region_idx] =
+        (((base + size - 1) & ~lsb_addr_mask) << LCN_HTG_REGION_END_ADDR_POS);
+
+    hns->LCN_HASHED_TGT_GRP_CFG1_REGION[region_idx] =
+        ((base & ~lsb_addr_mask) << LCN_HTG_REGION_BASE_ADDR_POS);
+
+    if (sec_region_size != 0) {
+        hns->LCN_HASHED_TGT_GRP_SEC_CFG1_REGION[region_idx] =
+            (sec_region_base & ~lsb_addr_mask);
+
+        hns->LCN_HASHED_TGT_GRP_SEC_CFG2_REGION[region_idx] =
+            ((sec_region_base + sec_region_size - 1) & ~lsb_addr_mask);
+    }
+}
+
+/* Configurable base address & region size - Legacy CMN mode */
+static void configure_lcn_htg_region_base_and_size(
+    struct cmn_cyprus_hns_reg *hns,
+    unsigned int region_idx,
+    uint64_t base,
+    uint64_t size,
+    uint64_t sec_region_base,
+    uint64_t sec_region_size)
+{
+    hns->LCN_HASHED_TGT_GRP_CFG1_REGION[region_idx] =
+        sam_encode_region_size(size, lcnsam_ctx.min_htg_size)
+        << LCN_HTG_REGION_SIZE_POS;
+
+    hns->LCN_HASHED_TGT_GRP_CFG1_REGION[region_idx] |=
+        (base / lcnsam_ctx.min_htg_size) << LCN_HTG_REGION_BASE_ADDR_POS;
+
+    if (sec_region_size != 0) {
+        hns->LCN_HASHED_TGT_GRP_SEC_CFG1_REGION[region_idx] |=
+            sam_encode_region_size(sec_region_size, lcnsam_ctx.min_htg_size)
+            << LCN_HTG_REGION_SIZE_POS;
+
+        hns->LCN_HASHED_TGT_GRP_SEC_CFG1_REGION[region_idx] |=
+            (sec_region_base / lcnsam_ctx.min_htg_size)
+            << LCN_HTG_REGION_BASE_ADDR_POS;
+    }
 }
 
 void hns_enable_sn_mode(
@@ -338,6 +436,189 @@ int hns_configure_rn_cpag_node_id(
     bit_pos = ((cpag_tgt_idx * CPAG_TGTID_WIDTH) % CPAG_TGTID_WIDTH_PER_GROUP);
     hns->CML_PORT_AGGR_GRP_REG[register_idx] |= ((uint64_t)ccg_ha_node_id)
         << bit_pos;
+
+    return FWK_SUCCESS;
+}
+
+/* Configure the HTG region range in LCN SAM */
+int hns_configure_lcn_htg_region_range(
+    struct cmn_cyprus_hns_reg *hns,
+    unsigned int region_idx,
+    const struct mod_cmn_cyprus_mem_region_map *region)
+{
+    uint64_t base;
+    uint64_t size;
+    uint64_t sec_region_base;
+    uint64_t sec_region_size;
+
+    base = region->base;
+    size = region->size;
+    sec_region_base = region->sec_region_base;
+    sec_region_size = region->sec_region_size;
+
+    if (lcnsam_ctx.rcomp_en == true) {
+        /* Configure start and end address of the region */
+        configure_lcn_htg_region_start_and_end_addr(
+            hns, region_idx, base, size, sec_region_base, sec_region_size);
+    } else {
+        /* Configure base address and size of the region */
+        configure_lcn_htg_region_base_and_size(
+            hns, region_idx, base, size, sec_region_base, sec_region_size);
+    }
+
+    return FWK_SUCCESS;
+}
+
+/* Set the target type for the HTG region in LCN SAM */
+void hns_set_lcn_htg_region_target_type(
+    struct cmn_cyprus_hns_reg *hns,
+    unsigned int region_idx,
+    enum lcn_sam_node_type target_type)
+{
+    /* Set target type for primary region */
+    hns->LCN_HASHED_TGT_GRP_CFG1_REGION[region_idx] |=
+        (target_type << LCN_HASHED_TGT_GRP_TGT_TYPE_POS);
+
+    /* Set target type for secondary region */
+    hns->LCN_HASHED_TGT_GRP_SEC_CFG1_REGION[region_idx] |=
+        (target_type << LCN_HASHED_TGT_GRP_TGT_TYPE_POS);
+}
+
+/* Configure the target node count for the HTG region in LCN SAM */
+void hns_set_lcn_htg_region_hn_count(
+    struct cmn_cyprus_hns_reg *hns,
+    unsigned int region_idx,
+    unsigned int hn_count)
+{
+    uint32_t register_idx;
+    uint8_t bit_pos;
+
+    register_idx = (region_idx / LCN_HTG_HN_COUNT_PER_REG);
+    bit_pos = (region_idx * LCN_HTG_HN_COUNT_REG_NUM_HN_POS);
+
+    hns->LCN_HASHED_TARGET_GROUP_HN_COUNT_REG[register_idx] |=
+        (hn_count << bit_pos);
+}
+
+/* Enable CAL mode for the HTG region in LCN SAM */
+void hns_enable_lcn_htg_cal_mode(
+    struct cmn_cyprus_hns_reg *hns,
+    unsigned int region_idx)
+{
+    uint32_t register_idx;
+    uint8_t bit_pos;
+
+    register_idx = (region_idx / LCN_HTG_CAL_MODE_PER_REG);
+    bit_pos = (region_idx * LCN_HTG_CAL_MODE_EN_POS);
+
+    hns->LCN_HASHED_TARGET_GRP_CAL_MODE_REG[register_idx] |=
+        (UINT64_C(0x1) << bit_pos);
+}
+
+/* Enable CPA mode for the HTG region in LCN SAM */
+int hns_enable_lcn_htg_cpa_mode(
+    struct cmn_cyprus_hns_reg *hns,
+    unsigned int region_idx,
+    unsigned int hns_count)
+{
+    uint32_t register_idx;
+    uint64_t mask;
+    uint8_t start_bit_pos, end_bit_pos;
+
+    start_bit_pos =
+        ((region_idx * hns_count) % LCN_HTG_CPA_EN_HNF_COUNT_PER_REG);
+
+    end_bit_pos = ((start_bit_pos + hns_count) - 1);
+
+    /* Check if the mask fits within the register width */
+    if (end_bit_pos >= LCN_HTG_CPA_EN_HNF_COUNT_PER_REG) {
+        return FWK_E_RANGE;
+    }
+
+    /*
+     * The following calculation is based on the assumption that there's one
+     * local SCG and the remote SCG's HN-S count is equal to that of the local
+     * SCG when LCN is enabled in CML configurations.
+     */
+    register_idx =
+        ((region_idx * hns_count) / LCN_HTG_CPA_EN_HNF_COUNT_PER_REG);
+
+    /* Create a mask for enabling the CPA for each HN in the SCG */
+    mask = GET_BIT_MASK(hns_count);
+
+    /* Enable CPA mode for remote HN-S */
+    hns->LCN_HASHED_TARGET_GRP_HNF_CPA_EN_REG[register_idx] |=
+        (mask << start_bit_pos);
+
+    return FWK_SUCCESS;
+}
+
+/* Configure the target CPA Group ID for the HTG region in LCN SAM */
+void hns_set_lcn_htg_cpag_id(
+    struct cmn_cyprus_hns_reg *hns,
+    uint8_t region_idx,
+    unsigned int hns_count,
+    uint8_t cpag_id)
+{
+    unsigned int hns_idx;
+    unsigned int hns_idx_start;
+    unsigned int hns_idx_end;
+    uint32_t register_idx;
+    uint8_t bit_pos;
+
+    hns_idx_start = region_idx * hns_count;
+    hns_idx_end = hns_idx_start + hns_count;
+
+    for (hns_idx = hns_idx_start; hns_idx < hns_idx_end; hns_idx++) {
+        register_idx = (hns_idx / LCN_HTG_HNF_PER_CPAG_PERHNF_REG);
+        bit_pos =
+            ((hns_idx % LCN_HTG_HNF_PER_CPAG_PERHNF_REG) *
+             LCN_HTG_CPAG_PER_HNF_POS);
+
+        hns->LCN_HASHED_TARGET_GRP_CPAG_PERHNF_REG[register_idx] |=
+            (cpag_id << bit_pos);
+    }
+}
+
+/* Set the HTG region as valid in LCN SAM */
+void hns_set_lcn_htg_region_valid(
+    struct cmn_cyprus_hns_reg *hns,
+    uint8_t region_idx)
+{
+    hns->LCN_HASHED_TGT_GRP_CFG1_REGION[region_idx] |= 0x1;
+}
+
+/* Set the secondary HTG region as valid in LCN SAM */
+void hns_set_lcn_htg_sec_region_valid(
+    struct cmn_cyprus_hns_reg *hns,
+    uint8_t region_idx)
+{
+    hns->LCN_HASHED_TGT_GRP_SEC_CFG1_REGION[region_idx] |= 0x1;
+}
+
+int setup_lcnsam_ctx(struct cmn_cyprus_rnsam_reg *rnsam)
+{
+    if (lcnsam_ctx.is_initialized) {
+        return FWK_SUCCESS;
+    }
+
+    if (rnsam == NULL) {
+        return FWK_E_PARAM;
+    }
+
+    /*
+     * Check if the start and end address has to be programmed for
+     * HTG regions.
+     */
+    lcnsam_ctx.rcomp_en = rnsam_get_htg_rcomp_en_mode(rnsam);
+
+    /* Get minimum region size for HTG regions */
+    lcnsam_ctx.min_htg_size = rnsam_get_htg_rcomp_en_mode(rnsam);
+
+    /* Get the LSB mask from LSB bit position defining minimum region size */
+    lcnsam_ctx.htg_lsb_addr_mask = rnsam_get_htg_lsb_addr_mask(rnsam);
+
+    lcnsam_ctx.is_initialized = true;
 
     return FWK_SUCCESS;
 }

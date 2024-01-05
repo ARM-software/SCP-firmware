@@ -222,26 +222,10 @@ static uint64_t get_rnsam_non_hash_lsb_addr_mask(
     return ((1 << lsb_bit_pos) - 1);
 }
 
-static bool is_htg_range_comparison_mode_enabled(
-    struct cmn_cyprus_rnsam_reg *rnsam)
-{
-    return (rnsam->UNIT_INFO[0] & RNSAM_UNIT_INFO_HTG_RANGE_COMP_EN_MASK) >>
-        RNSAM_UNIT_INFO_HTG_RANGE_COMP_EN_POS;
-}
-
 static uint8_t get_rnsam_htg_rcomp_lsb_bit_pos(
     struct cmn_cyprus_rnsam_reg *rnsam)
 {
     return (rnsam->UNIT_INFO[1] & RNSAM_UNIT_INFO_HTG_RCOMP_LSB_PARAM_MASK);
-}
-
-static uint64_t get_rnsam_htg_lsb_addr_mask(struct cmn_cyprus_rnsam_reg *rnsam)
-{
-    uint8_t lsb_bit_pos;
-
-    lsb_bit_pos = get_rnsam_htg_rcomp_lsb_bit_pos(rnsam);
-
-    return (1 << lsb_bit_pos) - 1;
 }
 
 static uint64_t get_min_non_hash_region_size(struct cmn_cyprus_rnsam_reg *rnsam)
@@ -251,21 +235,6 @@ static uint64_t get_min_non_hash_region_size(struct cmn_cyprus_rnsam_reg *rnsam)
 
     if (is_non_hash_range_comparison_mode_enabled(rnsam) == true) {
         lsb_bit_pos = get_rnsam_non_hash_rcomp_lsb_bit_pos(rnsam);
-        min_region_size = fwk_math_pow2(lsb_bit_pos);
-    } else {
-        min_region_size = RNSAM_REGION_MIN_SIZE;
-    }
-
-    return min_region_size;
-}
-
-static uint64_t get_min_htg_size(struct cmn_cyprus_rnsam_reg *rnsam)
-{
-    uint64_t min_region_size;
-    uint8_t lsb_bit_pos;
-
-    if (is_htg_range_comparison_mode_enabled(rnsam) == true) {
-        lsb_bit_pos = get_rnsam_htg_rcomp_lsb_bit_pos(rnsam);
         min_region_size = fwk_math_pow2(lsb_bit_pos);
     } else {
         min_region_size = RNSAM_REGION_MIN_SIZE;
@@ -559,6 +528,36 @@ static uint64_t get_non_hash_region_size(
 
     encoded_size &= RNSAM_ENCODED_REGION_SIZE_MASK;
     return sam_decode_region_size(encoded_size, rnsam_ctx.min_non_hash_size);
+}
+
+uint64_t rnsam_get_htg_min_region_size(struct cmn_cyprus_rnsam_reg *rnsam)
+{
+    uint64_t min_region_size;
+    uint8_t lsb_bit_pos;
+
+    if (rnsam_get_htg_rcomp_en_mode(rnsam) == true) {
+        lsb_bit_pos = get_rnsam_htg_rcomp_lsb_bit_pos(rnsam);
+        min_region_size = fwk_math_pow2(lsb_bit_pos);
+    } else {
+        min_region_size = RNSAM_REGION_MIN_SIZE;
+    }
+
+    return min_region_size;
+}
+
+bool rnsam_get_htg_rcomp_en_mode(struct cmn_cyprus_rnsam_reg *rnsam)
+{
+    return (rnsam->UNIT_INFO[0] & RNSAM_UNIT_INFO_HTG_RANGE_COMP_EN_MASK) >>
+        RNSAM_UNIT_INFO_HTG_RANGE_COMP_EN_POS;
+}
+
+uint64_t rnsam_get_htg_lsb_addr_mask(struct cmn_cyprus_rnsam_reg *rnsam)
+{
+    uint8_t lsb_bit_pos;
+
+    lsb_bit_pos = get_rnsam_htg_rcomp_lsb_bit_pos(rnsam);
+
+    return (1 << lsb_bit_pos) - 1;
 }
 
 void rnsam_stall(struct cmn_cyprus_rnsam_reg *rnsam)
@@ -1168,17 +1167,17 @@ int setup_rnsam_ctx(struct cmn_cyprus_rnsam_reg *rnsam)
      * Check if the start and end address has to be programmed for
      * hashed target group regions.
      */
-    rnsam_ctx.htg_rcomp_en = is_htg_range_comparison_mode_enabled(rnsam);
+    rnsam_ctx.htg_rcomp_en = rnsam_get_htg_rcomp_en_mode(rnsam);
 
     /* Get the LSB mask from LSB bit position defining minimum region size */
     rnsam_ctx.non_hash_lsb_addr_mask = get_rnsam_non_hash_lsb_addr_mask(rnsam);
 
     /* Get the LSB mask from LSB bit position defining minimum region size */
-    rnsam_ctx.htg_lsb_addr_mask = get_rnsam_htg_lsb_addr_mask(rnsam);
+    rnsam_ctx.htg_lsb_addr_mask = rnsam_get_htg_lsb_addr_mask(rnsam);
 
     /* Get the minimum region size */
     rnsam_ctx.min_non_hash_size = get_min_non_hash_region_size(rnsam);
-    rnsam_ctx.min_htg_size = get_min_htg_size(rnsam);
+    rnsam_ctx.min_htg_size = rnsam_get_htg_min_region_size(rnsam);
 
     rnsam_ctx.is_initialized = true;
 

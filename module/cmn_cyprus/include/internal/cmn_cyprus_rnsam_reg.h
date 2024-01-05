@@ -519,4 +519,35 @@ int rnsam_configure_cpag_base_index(
     uint8_t cpag_id,
     uint8_t base_index);
 
+/*
+ * Get HTG range comparison mode.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ *
+ * \retval true  Range comparison mode is enabled for HTG regions.
+ * \retval false Range comparison mode is disabled for HTG regions.
+ */
+bool rnsam_get_htg_rcomp_en_mode(struct cmn_cyprus_rnsam_reg *rnsam);
+
+/*
+ * Get the minimum region size for HTG.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ *
+ * \return Minimum HTG region size.
+ */
+uint64_t rnsam_get_htg_min_region_size(struct cmn_cyprus_rnsam_reg *rnsam);
+
+/*
+ * Get the LSB mask from LSB bit position defining minimum region size for HTG.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ *
+ * \return LSB mask.
+ */
+uint64_t rnsam_get_htg_lsb_addr_mask(struct cmn_cyprus_rnsam_reg *rnsam);
+
 #endif /* CMN_CYPRUS_RNSAM_REG_INTERNAL_H */
