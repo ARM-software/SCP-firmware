@@ -957,6 +957,14 @@ int cmn_cyprus_discovery(struct cmn_cyprus_ctx *ctx)
         raid_table_count =
             (shared_ctx->max_rn_count * shared_ctx->config_table->chip_count);
 
+        /*
+         * If LCN is enabled, then one RAID per chip (reserved for LCN) is
+         * included in the count.
+         */
+        if (shared_ctx->config->enable_lcn == true) {
+            raid_table_count += shared_ctx->config_table->chip_count;
+        }
+
         /* Allocate memory for RAID table */
         shared_ctx->raid_table =
             fwk_mm_calloc(raid_table_count, sizeof(*shared_ctx->raid_table));

@@ -57,6 +57,14 @@
 #define LINK_STATUS_LINK_DOWN_ACK_VAL 0
 #define LINK_STATUS_LINK_UP_ACK_VAL   1
 
+/*
+ * Macro to get the index of the LCN RAID from the RAID table.
+ * The last 'n' entries (where 'n' equals chip count) in the raid_table is
+ * reserved for LCN.
+ */
+#define GET_RAID_TABLE_LCN_IDX(x) \
+    ((shared_ctx->config_table->chip_count * shared_ctx->max_rn_count) + x)
+
 /* Shared driver context pointer */
 static const struct cmn_cyprus_ctx *shared_ctx;
 
@@ -194,6 +202,7 @@ static int program_ccg_ra_ldid_to_raid_lut(struct cmn_cyprus_ccg_ra_reg *ccg_ra)
     uint8_t rnf_ldid;
     uint8_t rni_ldid;
     uint8_t rnd_ldid;
+    uint16_t lcn_raid_idx;
     uint16_t offset_idx;
     uint16_t raid;
     uint16_t raid_idx;
@@ -249,6 +258,14 @@ static int program_ccg_ra_ldid_to_raid_lut(struct cmn_cyprus_ccg_ra_reg *ccg_ra)
         }
     }
 
+    /* Assign expanded RAID to LCN */
+    if (shared_ctx->config->enable_lcn == true) {
+        lcn_raid_idx = GET_RAID_TABLE_LCN_IDX(shared_ctx->chip_id);
+        raid = shared_ctx->raid_table[lcn_raid_idx];
+
+        ccg_ra_configure_hns_ldid_to_exp_raid(ccg_ra, raid);
+    }
+
     return FWK_SUCCESS;
 }
 
@@ -262,6 +279,7 @@ static int program_ccg_ha_raid_to_ldid_lut(struct cmn_cyprus_ccg_ha_reg *ccg_ha)
     uint16_t end_idx;
     uint16_t raid;
     uint16_t remote_ldid;
+    uint16_t lcn_raid_idx;
     const uint8_t chip_count = shared_ctx->config_table->chip_count;
 
     /*
@@ -299,6 +317,17 @@ static int program_ccg_ha_raid_to_ldid_lut(struct cmn_cyprus_ccg_ha_reg *ccg_ha)
                 return status;
             }
             remote_ldid++;
+        }
+
+        if (shared_ctx->config->enable_lcn == true) {
+            lcn_raid_idx = GET_RAID_TABLE_LCN_IDX(chip_id);
+            raid = shared_ctx->raid_table[lcn_raid_idx];
+
+            /* Configure LDID for the remote chip LCN */
+            ccg_ha_configure_raid_to_ldid(ccg_ha, raid, remote_ldid);
+
+            /* Mark the remote request agent as a caching agent */
+            ccg_ha_set_raid_as_rnf(ccg_ha, raid);
         }
     }
 
@@ -1147,6 +1176,35 @@ static int program_cml(
     return status;
 }
 
+static void setup_lcn_raid_table(void)
+{
+    uint8_t start_idx;
+    uint8_t offset_pos;
+    uint8_t chip_id;
+    unsigned int chip_count;
+    uint16_t raid_value;
+    unsigned int offset_id;
+
+    chip_count = shared_ctx->config_table->chip_count;
+
+    /* Calculate the number of bits required to represent chip id */
+    offset_pos = fwk_math_log2(chip_count);
+    start_idx = (chip_count * shared_ctx->max_rn_count);
+    offset_id = start_idx;
+
+    /*
+     * The last 'n' entries ('n' equals chip_count) in the raid_table is
+     * reserved for LCN.
+     */
+    for (chip_id = 0; chip_id < chip_count; chip_id++) {
+        /* Generate unique Request Agent ID */
+        raid_value = (chip_id | (offset_id << offset_pos));
+
+        shared_ctx->raid_table[start_idx + chip_id] = raid_value;
+        offset_id++;
+    }
+}
+
 static void setup_raid_table(void)
 {
     uint16_t idx;
@@ -1186,6 +1244,11 @@ static void setup_raid_table(void)
 
             offset_id++;
         }
+    }
+
+    /* Setup RAID for LCN */
+    if (shared_ctx->config->enable_lcn == true) {
+        setup_lcn_raid_table();
     }
 }
 

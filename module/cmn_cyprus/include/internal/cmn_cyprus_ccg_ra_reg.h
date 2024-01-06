@@ -232,4 +232,17 @@ int ccg_ra_get_cml_link_status(
     enum CCG_RA_LINK_STATUS bitfield,
     uint8_t *value);
 
+/*
+ * Configure expanded RAID for LCN/HN-S.
+ *
+ * \param ccg_ra_reg Pointer to the CCG RA node.
+ *      \pre The CCG RA node pointer must be valid.
+ * \param raid Expanded RAID.
+ *
+ * \return None.
+ */
+void ccg_ra_configure_hns_ldid_to_exp_raid(
+    struct cmn_cyprus_ccg_ra_reg *ccg_ra_reg,
+    uint16_t raid);
+
 #endif /* CMN_CYPRUS_CCG_RA_REG_INTERNAL_H */

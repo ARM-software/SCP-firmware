@@ -404,3 +404,16 @@ int ccg_ra_get_cml_link_status(
 
     return status;
 }
+
+/* Assign expanded RAID value for the HN-S and set valid bit */
+void ccg_ra_configure_hns_ldid_to_exp_raid(
+    struct cmn_cyprus_ccg_ra_reg *ccg_ra_reg,
+    uint16_t raid)
+{
+    /* Configure RAID value */
+    ccg_ra_reg->CCG_RA_HNS_LDID_TO_EXP_RAID_REG |= raid;
+
+    /* Mark the LDID-to-RAID mapping as valid */
+    ccg_ra_reg->CCG_RA_HNS_LDID_TO_EXP_RAID_REG |=
+        (UINT64_C(0x1) << EXP_RAID_VALID_BIT_OFFSET);
+}
