@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -50,10 +50,10 @@ void utest_scmi_power_capping_init_success(void)
     struct mod_scmi_power_capping_domain_context *domain_table =
         (struct mod_scmi_power_capping_domain_context *)__LINE__;
 
-    struct mod_scmi_power_capping_context expected_ctx = {
-        .power_capping_domain_ctx_table = domain_table,
-        .domain_count = domain_count,
-    };
+    struct mod_scmi_power_capping_context expected_ctx = { 0 };
+
+    expected_ctx.power_capping_domain_ctx_table = domain_table,
+    expected_ctx.domain_count = domain_count,
 
     fwk_mm_calloc_ExpectAndReturn(
         domain_count,
@@ -209,7 +209,7 @@ void utest_scmi_power_capping_process_notification(void)
 {
     int status;
 
-    struct fwk_event notification_event;
+    struct fwk_event notification_event = { 0 };
 
 #ifdef BUILD_HAS_SCMI_POWER_CAPPING_STD_COMMANDS
     pcapping_protocol_process_notification_ExpectAndReturn(

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -380,7 +380,7 @@ void utest_pcapping_fast_channel_bind(void)
 
 void utest_pcapping_fast_channel_set_handler(void)
 {
-    const struct mod_scmi_power_capping_power_apis power_management_api;
+    const struct mod_scmi_power_capping_power_apis power_management_api = { 0 };
 
     pcapping_fast_channel_set_power_apis(&power_management_api);
     TEST_ASSERT_EQUAL(
