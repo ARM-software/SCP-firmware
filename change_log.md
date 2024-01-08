@@ -1,7 +1,293 @@
 SCP-firmware Change Log
 =======================
 
-Copyright (c) 2019-2023, Arm Limited and Contributors. All rights reserved.
+Copyright (c) 2019-2024, Arm Limited and Contributors. All rights reserved.
+
+SCP-firmware - version 2.14
+============================
+
+New features
+------------
+
+- Architecture:
+    - arch: add ARM V6M arch
+    - arch: add exception fault info print support
+    - arch: add exception fault info print support
+
+- Documentation:
+    - doc: add interface documentation
+
+- Framework:
+    - framework: Add fastchannel build flag for platforms with DVFS hardware
+    - fwk_list: Add a watermark to monitor list max sizes
+    - fwk_log: Add option for custom banner
+    - assert: Add `FWK_WEAK` to __assert_func()
+    - fwk: Add conditional code coverage support for Unit Tests
+    - fwk: Add code coverage for framework tests
+    - fwk/assert: print location of assertion
+
+- Modules:
+    - cmn_cyprus: Add new module
+    - scmi_power_capping: Add new module
+    - power_coordinator: add mod_power_coordinator.h
+    - power_meter: add mod_power_meter.h
+    - scmi_power_capping: add resource permissions
+    - power_allocator: add mod_power_allocator.h
+    - thermal_mgmt: Add derivative term for PI controller
+    - amu_mmap: add check for counter offsets while init
+    - amu_mmap: add memory-mapped AMU driver
+    - sensor_smcf_drv: Add Sensor SMCF data driver
+    - interface/cmn: add a generic interface for CMN drivers
+    - cdns_i2c: Add bus active check to APIs
+    - interface/amu: add documentation for the interface
+    - interface/amu: add AMU interface definition
+    - optee: Add voltage domain regulators
+    - atu: add driver module for Address Translation Unit
+    - thermal_mgmt: Add a cold state power configuration
+    - smcf: Add MGI validate header for MGI struct definition validation
+    - module: Introduce sc_pll driver module
+    - module: Add scmi_power_capping
+    - scmi_power_capping: add resource permissions
+    - scmi_power_capping: Add notifications support
+    - scmi_power_capping: Add fast channels support
+    - scmi_power_capping: Add PAI and measurements commands
+    - power_coordinator: add mod_power_coordinator.h
+    - power_meter: add mod_power_meter.h
+    - cmn_cyprus: add support for RNSAM node register
+    - cmn_cyprus: add support for hierarchical hashing
+    - cmn_cyprus: add support for HN-S isolation
+    - mod_sensor: Add UT for sensor_api
+    - mod_sensor: Add initial UT for fwk handlers
+    - timer: add overflow handler API
+    - power_domain: additional UTs to the PD
+    - ATU: Add if guards when a variable is unused
+    - power_domain: additional UTs to the PD
+    - power_domain: expanding UTs to cover PD State Checks
+    - scmi: add a check for smci message type
+    - cmn_cyprus: implement CMN interface API
+    - cmn_cyprus: setup RNSAM
+    - cmn_cyprus: initialize rnsam table context
+
+- Platform:
+    - tc2: Add AMU MMAP driver configuration to TC2
+    - product/morello: Add SCMI sensor management
+    - morello: Add PCC and MCC firmware version to SDS
+    - morello: Add SCP version information to SDS
+    - rdfremont: add platform module for mcpfw
+    - rdfremont: add timer HAL config data in mcpfw
+    - rdfremont: add generic timer config data for mcpfw
+    - rdfremont: add config data for MPU module in mcpfw
+    - rdfremont: configure I/O stream for mcpfw
+    - rdfremont: add config data for pl011 UART module in mcpfw
+    - rdfremont: add config data for clock module in mcpfw
+    - rdfremont: add build support for scp firmware
+    - rdfremont: let modules subscribe to platform notification
+    - rdfremont: add config data for scp platform module in scpfw
+    - rdfremont: add platform module for scpfw
+    - rdfremont: add config data for system power module in scpfw
+    - rdfremont: add config data for scmi system power module in scpfw
+    - rdfremont: add config data for scmi power domain in scpfw
+    - rdfremont: add config data for atu driver in scpfw
+    - rdfremont: add config data for scmi module in scpfw
+    - rdfremont: add config data for transport module in scpfw
+    - rdfremont: add config data for sds module in scpfw
+    - rdfremont: add config data for apcontext module in scpfw
+    - rdfremont: add config data for mhuv3 driver in scpfw
+    - rdfremont: add config data for timer HAL in scpfw
+    - rdfremont: add config data for generic timer driver in scpfw
+    - rdfremont: add config data for cmn_cyprus driver
+    - rdfremont: add config data for clock HAL module in scpfw
+    - rdfremont: add config data for ppu v1 module in scpfw
+    - rdfremont: add config data for power domain module in scp_ramfw
+    - rdfremont: add helpers to obtain platform topology in scp_ramfw
+    - rdfremont: add config data for subsystem clock driver in scp_ramfw
+    - rdfremont: add config data for PIK clock driver in scp_ramfw
+    - rdfremont: add config data for system pll driver in scp_ramfw
+    - rdfremont: add System PIK register space declaration
+    - rdfremont: add core manager register block declaration
+    - rdfremont: add SCP power control block register declaration
+    - rdfremont: add MPU module config data for scp_ramfw
+    - rdfremont: configure I/O stream for scp_ramfw
+    - rdfremont: add pl011 module config data for scp_ramfw
+    - rdfremont: add system info module config data for scp_ramfw
+    - rdfremont: add sid module config data for scp_ramfw
+    - rdfremont: add build support for mcp firmware
+    - neoverse-rd: add custom banner for mcpfw
+    - tc0: Remove platform code
+    - neoverse-rd: define system counter impdef registers
+
+- Unit Test:
+    - resource_perms: Add UT for set_agent_resource_<PROTOCOL>_permissions
+    - amu_smcf_drv: Add unit test for AMU SMCF data driver module
+    - amu_smcf_drv: Add AMU SMCF data driver module
+    - mpmm/unit_test: Add unit test for MPMM
+    - fch_polled/unit_test: Add unit tests for fch_polled
+    - fch_polled: add a new module for fast channels communication
+    - amu_mmap: add test for counters_base_addr=null
+    - sensor_smcf_drv: Add unit test for sensor_smcf_drv module
+    - ppu_v1: add corresponding unit tests
+    - mod_scmi_sensor: Add initial UT for fwk handlers
+    - scmi_power_capping: Add fast channels unit tests
+
+- Tools:
+    - check_build: Add check build to a separate file with YAML integration
+    - tools: add utils module banner to all check scripts
+    - utils: Add function to filter files from the project
+    - utils: Add function to filter files from the project
+    - utils: create utils module to unify test results
+    - check_build: Add check build to a separate file with YAML integration
+
+
+Changed
+-------
+
+- Architecture:
+    - Increment nest counter inside critical section
+    - threat_model: Change the format and contents
+
+- Build system:
+    - check_copyright: Exclude moved files from checks
+    - cli: changed reset command to weak symbol to allow override
+    - contrib/cmsis: Bump CMSIS version to 5.9.0
+    - Makefile: update `MOD_TEST_BUILD_DIR` path
+    - cmake: Update Makefile.cmake to list product subdirectories
+
+- Documentation:
+    - scp: Update list of maintainers for SCP-firmware
+    - scp: Update maintainers references to Gitlab
+    - scp: Update repo references to Gitlab
+    - doc: Update contribution flow to work with forks
+    - user_guide.md: Update user guide
+
+- Framework:
+    - fwk: allow override of BUILD_VERSION parameters
+    - fwk: Allow building without .git
+
+- Modules:
+    - resource_perms: Move backup permissions allocation to init
+    - resource perms: Generalising set_agent resource_<protocol>permissions
+    - power_domain: Conditionally include power domain notifications
+    - power_domain: Move notifications into a seperate file
+    - power_domain: Extract state utility functions
+    - power_domain: Move contexts into new internal header file
+    - cmn700: use interface to define exported apis
+    - pcie_integ_ctrl: move the module to the rdn2 product directory
+    - transport: allow optional platform notification
+    - sds: allow optional platform notification
+    - apcontext: allow optional platform notification
+    - ppu_v1 Coding style changes
+    - ppu_v1 Allow the number of cores per cluster to be configured
+    - amu_mmap: AMU interface implementation
+    - scmi_perf: Refactor to support fast channel transport
+    - fch_polled: Enable complie flag BUILD_HAS_MOD_TRANSPORT_FC
+    - transport: Enable compile flag BUILD_HAS_MOD_TRANSPORT_FC
+    - module: Minor fch updates to transport and mhu3
+    - scmi_system_power_req: Enable multiple elements
+    - mod_ppu_v0: Report ppu status
+    - mod_ppu_v1: Report ppu status
+    - power_domain: Only respond to `SYSTEM_SHUTDOWN` if necessary
+    - smcf_utils: Utility for helping with the configuration.
+    - sensor_smcf_drv: Align SMCF get_data mock to operate on 32bit buffer
+    - mod_transport: Make out-band message support optional
+    - mpmm: Update MPMM module to use AMU driver API interface
+    - cmn_cyprus: add support for MXP register
+    - cmn_cyprus: add support for node info register
+    - cmn_cyprus: add support for configuration register
+    - cmn_cyprus: add initial framework handlers
+    - gtimer: allow impdef registers of system counter to be programmed
+    - gtimer: improve bind framework handler
+    - mhu3: Include module in module path
+    - power_domain: expanding UTs to cover PD State Checks
+
+- Platforms:
+    - n1sdp: halt SCP boot if DDR4 training fails
+    - morello: halt SCP boot if DDR4 training fails
+    - rdn2: move 'rdn2' to product group 'neoverse-rd'
+    - rdfremont: move product 'rdfremont' to product group 'neoverse-rd'
+    - rdv1mc: move 'rdv1mc' to product group 'neoverse-rd'
+    - rdv1: move 'rdv1' to product group 'neoverse-rd'
+    - rdn1e1: move 'rdn1e1' to product group 'neoverse-rd'
+    - sgi575: move 'sgi575' to product group 'neoverse-rd'
+    - rdfremont: Add new configuration
+    - morello: print the temperature sensor values during boot
+    - rdn2: IONCICLK ctrl/div and TCU/IONCI clock enable should be RW
+    - rdn2/scp_ramfw: Exclude SCMI-Perf Ops by default
+    - tc2/thermal_mgmt: Use a cold state power configuration
+    - Unify TC1 and TC2 folders into Totalcompute
+    - n1sdp: Use common sc_pll module
+    - morello: Use common sc_pll module
+    - rdfremont: configure system counter implementation defined registers
+    - rdfremont: reorganize common definitions
+    - rdn2: configure system counter implementation defined registers
+    - tc2: Reserve memory for RSS's SDS region
+    - n1sdp: Use common sc_pll module
+    - morello: Use common sc_pll module
+
+- Unit tests:
+    - power_domain: add UTs to cover changes to the PD requested state
+    - unit_test: List modules in alphabetical order
+
+- Tools:
+    - tools/util: removes `text` feature from subprocess
+    - check_style: introduce code style check script
+    - product: integrate YAML file parsing import
+    - check_copyright: modularize and improve readability
+    - check_api: modularize and improve readability
+    - check_tabs: update script to use file filter from utils
+    - check_spacing: modularize and improve readability
+    - utils: create utils module to unify test results
+
+Resolved issues
+---------------
+
+- Build system:
+    - cmake: Remove typo in Makefile.cmake
+
+- Modules:
+    - cmn_cyprus: fix incorrect format specifier for Clang
+    - cmn_cyprus: suppress release build warnings
+    - fch_polled: fix build error when included interface only module
+    - power_domain: Address incorrect state update
+    - scmi: Shorten long error messages
+    - clock: fix mod_pd_restricted_api object identifier
+    - scmi_perf: Correct the return status of scmi_perf_process_event
+    - sensor_smcf_drv: Fix sensor_smcf_drv unit test
+    - amu_smcf_drv: Fix amu_smcf_drv unit test
+    - amu_mmap: fix memory allocation for core counters
+    - cmn700: fix address and size alignment check
+    - pcie_integ_ctrl: fix codestyle format
+    - mhu3: Correct the conditional check for MHU in/out channel
+    - pcid: fix incorrect check of PID/CID registers
+    - mod_ppu_v0: Fix error message
+    - mod_ppu_v1: Fix error message
+    - SMCF: Fix enablement of START and END sample identifiers in WRCFG
+    - cmn_cyprus: setup HNFSAM
+    - cmn_cyprus: initialize hns table context
+    - cmn_cyprus: support for HN-S node register
+    - cmn_cyprus: setup CMN on clock notification
+    - cmn_cyprus: enable CMN discovery
+    - cmn_cyprus: fix incorrect format specifier for clang
+    - cmn_cyprus: suppress release build warnings
+    - optee/clock: fix indentation
+    - optee/clock: fix device error cases
+
+- Platforms:
+    - tc1/ram_fw: Fix inclusion of resource permissions in target
+    - tc2/ram_fw: Fix inclusion of resource permissions in target
+    - morello: supress Cppcheck error on macro substitution
+    - rdn2: remove incorrect configuration of system counter increment value
+    - rdn2: fix refclk clock speed
+
+- Unit tests:
+    - unit_test: Fix order of list modules
+    - unit_test: add variable initialization
+    - scmi_power_capping: Fix unit tests
+
+- Version Control:
+    - Add a GitHub Actions to auto comment PR
+
+- Tools:
+    - check_copyright: fix default commit hash id
 
 SCP-firmware - version 2.13
 ============================
@@ -243,7 +529,7 @@ Changed
     - SCMI: Rename BUILD_HAS_FAST_CHANNELS with _SCMI_PERF_
     - scmi: add unit tests
     - scmi_clock: add unit test
-    - module/mhu2: add support for transport module and in-band messages
+    - mhu2: add support for transport module and in-band messages
     - scmi_perf: Add initial unit tests
 
 Resolved issues
@@ -609,7 +895,7 @@ Changed
     - DVFS/SCMI-perf: Abstract performance levels
     - scmi_system_power: Add graceful system power support
     - bootloader: Unify bootloader messages
-    - module/scmi: Add SCMI notifications handling APIs
+    - scmi: Add SCMI notifications handling APIs
 
 Notes
 -----
