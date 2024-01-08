@@ -16,6 +16,7 @@
 
 #include <mod_atu.h>
 #include <mod_mhu3.h>
+#include <mod_scp_platform.h>
 #include <mod_transport.h>
 
 #include <fwk_element.h>
@@ -59,6 +60,11 @@ static const struct fwk_element element_table[MOD_TRANSPORT_ELEMENT_COUNT]  = {
                     FWK_ID_API_INIT(
                         FWK_MODULE_IDX_MHU3,
                         MOD_MHU3_API_IDX_TRANSPORT_DRIVER),
+                .platform_notification = {
+                    .notification_id = PLATFORM_SCP_NOTIFICATION_ID,
+                    .source_id = FWK_ID_MODULE_INIT(
+                        FWK_MODULE_IDX_SCP_PLATFORM),
+                },
         }),
     },
     [SCP_CFGD_MOD_TRANSPORT_EIDX_SYSTEM] = {
