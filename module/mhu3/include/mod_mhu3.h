@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -10,6 +10,10 @@
 
 #ifndef MOD_MHU3_H
 #define MOD_MHU3_H
+
+#ifdef BUILD_HAS_MOD_TIMER
+#    include <fwk_id.h>
+#endif
 
 #include <fwk_macros.h>
 
@@ -173,6 +177,14 @@ struct mod_mhu3_device_config {
 
     /*! Channel configuration array */
     struct mod_mhu3_channel_config *channels;
+
+#ifdef BUILD_HAS_MOD_TIMER
+    /*! Timer identifier */
+    fwk_id_t timer_id;
+
+    /*! Response wait timeout in micro seconds */
+    unsigned int resp_wait_timeout_us;
+#endif
 };
 
 /*!

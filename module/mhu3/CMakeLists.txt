@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -15,4 +15,8 @@ target_sources(${SCP_MODULE_TARGET}
 
 if("transport" IN_LIST SCP_MODULES)
     target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-transport)
+endif()
+
+if("timer" IN_LIST SCP_MODULES)
+    target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-timer)
 endif()

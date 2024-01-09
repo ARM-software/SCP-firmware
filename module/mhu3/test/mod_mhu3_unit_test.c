@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -92,6 +92,56 @@ void test_mhu3_raise_interrupt_valid_case(void)
 
     status = mhu3_raise_interrupt(ch_id);
     TEST_ASSERT(status == FWK_SUCCESS);
+}
+
+/*!
+ * \brief mhu3 unit test: is_channel_free(), busy case.
+ *
+ *  \details Checking for channel availability.
+ *      Expects to receive a `false` return value indicating
+ *      that the channel is busy.
+ */
+void test_is_channel_free_busy_case(void)
+{
+    int status;
+    struct channel_status_data channel_stat;
+    uint32_t st_reg, pbx_flag_pos;
+
+    /* Force PBX channel flag position to 1 */
+    pbx_flag_pos = 1;
+    /* Force channel status to busy */
+    st_reg = 0x1u << pbx_flag_pos;
+
+    channel_stat.st_reg = &st_reg;
+    channel_stat.position = 0x1u << pbx_flag_pos;
+
+    status = is_channel_free(&channel_stat);
+    TEST_ASSERT(status == false);
+}
+
+/*!
+ * \brief mhu3 unit test: is_channel_free(), available case.
+ *
+ *  \details Checking for channel availability.
+ *      Expects to receive a `true` return value indicating
+ *      that the channel is free.
+ */
+void test_is_channel_free_available_case(void)
+{
+    int status;
+    struct channel_status_data channel_stat;
+    uint32_t st_reg, pbx_flag_pos;
+
+    /* Force PBX channel flag position to 1 */
+    pbx_flag_pos = 1;
+    /* Force channel status to free */
+    st_reg = 0x0u << pbx_flag_pos;
+
+    channel_stat.st_reg = &st_reg;
+    channel_stat.position = 0x1u << pbx_flag_pos;
+
+    status = is_channel_free(&channel_stat);
+    TEST_ASSERT(status == true);
 }
 
 /*!
@@ -576,6 +626,8 @@ int mhu3_test_main(void)
     UNITY_BEGIN();
     RUN_TEST(test_mhu3_raise_interrupt_wrong_channel_type);
     RUN_TEST(test_mhu3_raise_interrupt_valid_case);
+    RUN_TEST(test_is_channel_free_busy_case);
+    RUN_TEST(test_is_channel_free_available_case);
     RUN_TEST(test_mhu3_bind_round_0_success);
     RUN_TEST(test_mhu3_bind_round_1_success);
     RUN_TEST(test_mhu3_bind_fail);

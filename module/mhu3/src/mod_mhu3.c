@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -11,6 +11,11 @@
 #include <internal/mhu3.h>
 
 #include <mod_mhu3.h>
+
+#ifdef BUILD_HAS_MOD_TIMER
+#    include <mod_timer.h>
+#endif
+
 #include <mod_transport.h>
 
 #include <fwk_id.h>
@@ -59,6 +64,10 @@ struct mhu3_device_ctx {
     struct mhu3_channel_ctx *channel_ctx_table;
     /* Number of channels (represented by sub-elements) */
     unsigned int channels_count;
+#ifdef BUILD_HAS_MOD_TIMER
+    /*! Timer API */
+    const struct mod_timer_api *timer_api;
+#endif
 };
 
 /* MHU context */
@@ -67,6 +76,13 @@ struct mod_mhu3_ctx {
     struct mhu3_device_ctx *device_ctx_table;
     /* Number of devices in the device context table */
     unsigned int device_count;
+};
+
+struct channel_status_data {
+    /* Pointer to channel status register */
+    const volatile uint32_t *st_reg;
+    /* Channel flag position */
+    uint32_t position;
 };
 
 static struct mod_mhu3_ctx mhu3_ctx;
@@ -165,6 +181,20 @@ static void mhu3_isr(void)
     }
 }
 
+static bool is_channel_free(void *channel_data)
+{
+    bool status = false;
+    struct channel_status_data *channel_stat = channel_data;
+
+    if ((*channel_stat->st_reg & channel_stat->position) == 0) {
+        status = true;
+    } else {
+        FWK_LOG_DEBUG("[MHU3] channel busy");
+    }
+
+    return status;
+}
+
 static int mhu3_raise_interrupt(fwk_id_t ch_id)
 {
     int status;
@@ -174,6 +204,7 @@ static int mhu3_raise_interrupt(fwk_id_t ch_id)
     struct mhu3_pbx_pdbcw_reg *pdbcw_reg;
     struct mod_mhu3_channel_config *channel;
     struct mod_mhu3_dbch_config *dbch_channel;
+    struct channel_status_data channel_stat;
 
     device_ctx = &mhu3_ctx.device_ctx_table[fwk_id_get_element_idx(ch_id)];
     ch_idx = fwk_id_get_sub_element_idx(ch_id);
@@ -185,18 +216,32 @@ static int mhu3_raise_interrupt(fwk_id_t ch_id)
         pdbcw_reg = (struct mhu3_pbx_pdbcw_reg
                          *)((uint8_t *)pbx_reg + MHU3_PBX_PDBCW_PAGE_OFFSET);
         dbch_channel = &(channel->dbch);
+        channel_stat.st_reg = &pdbcw_reg[dbch_channel->pbx_channel].PDBCW_ST;
+        channel_stat.position = 0x1u << dbch_channel->pbx_flag_pos;
+
         /*
          * We can use up to 32 flags(bits) per channels for 32 events, however
          * we are using only 1 flag(bit) per channel
          */
-        if ((pdbcw_reg[dbch_channel->pbx_channel].PDBCW_ST &
-             0x1u << dbch_channel->pbx_flag_pos) == 0u) {
-            pdbcw_reg[dbch_channel->pbx_channel].PDBCW_SET |= 0x1u
-                << dbch_channel->pbx_flag_pos;
-            status = FWK_SUCCESS;
-        } else {
-            status = FWK_E_STATE;
+#ifdef BUILD_HAS_MOD_TIMER
+        status = device_ctx->timer_api->wait(
+            device_ctx->config->timer_id,
+            device_ctx->config->resp_wait_timeout_us,
+            is_channel_free,
+            (void *)&channel_stat);
+
+        if (status != FWK_SUCCESS) {
+            return FWK_E_TIMEOUT;
         }
+#else
+        if (!is_channel_free(&channel_stat)) {
+            return FWK_E_STATE;
+        }
+#endif
+
+        pdbcw_reg[dbch_channel->pbx_channel].PDBCW_SET |= 0x1u
+            << dbch_channel->pbx_flag_pos;
+        status = FWK_SUCCESS;
         break;
 
     default:
@@ -482,6 +527,21 @@ static int mhu3_bind(fwk_id_t id, unsigned int round)
     if ((round == 1) && fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
         device_ctx = &mhu3_ctx.device_ctx_table[fwk_id_get_element_idx(id)];
 
+#ifdef BUILD_HAS_MOD_TIMER
+        /* Bind to timer API */
+        status = fwk_module_bind(
+            device_ctx->config->timer_id,
+            FWK_ID_API(FWK_MODULE_IDX_TIMER, MOD_TIMER_API_IDX_TIMER),
+            &device_ctx->timer_api);
+
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+
+        if (device_ctx->timer_api->wait == NULL) {
+            return FWK_E_DATA;
+        }
+#endif
         for (channel_idx = 0; channel_idx < device_ctx->channels_count;
              channel_idx++) {
             channel_ctx = &device_ctx->channel_ctx_table[channel_idx];
