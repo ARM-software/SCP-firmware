@@ -1,7 +1,7 @@
 SCP-firmware - version 2.13
 ===========================
 
-Copyright (c) 2011-2023, Arm Limited. All rights reserved.
+Copyright (c) 2011-2024, Arm Limited. All rights reserved.
 
 References
 ----------
@@ -69,7 +69,6 @@ Virtual Platforms (FVPs or boards where possible):
 - RD-V1 reference design  (Please contact Arm directly to obtain the RD_V1 FVP)
 - RD-V1-MC reference design  (Please contact Arm directly to obtain the RD_V1_Multichip FVP)
 - Renesas R-Car platform
-- Total Compute (tc0) platform (Please contact Arm directly to obtain the TC0 FVP)
 - Morello (Please see Arm's Ecosystem FVPs Developer page)
 - Total Compute (tc1) platform (Please contact Arm directly to obtain the TC1 FVP)
 

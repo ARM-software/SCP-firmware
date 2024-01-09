@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -119,7 +119,7 @@ PRODUCTS := $(shell ls $(PRODUCTS_DIR) 2>/dev/null)
 #
 # Deprecated Products/Platforms
 #
-DEPRECATED_PLATFORMS := tc0
+DEPRECATED_PLATFORMS := none
 
 PRODUCT_INDEPENDENT_GOALS := clean help test doc fwk_test mod_test
 

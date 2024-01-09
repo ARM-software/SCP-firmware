@@ -57,7 +57,7 @@ maintainers. The platforms listed here represent the exceptions to this rule.
 - [Thomas Abraham](https://github.com/omasab) (thomas.abraham@arm.com)
 - [Vijayenthiran Subramaniam](https://github.com/vijayenthiran-arm) (Vijayenthiran.Subramaniam@arm.com)
 
-#### Total Compute (tc0, tc1)
+#### Total Compute (tc1)
 
 - [Vishnu Banavath](https://github.com/visban01) (vishnu.banavath@arm.com)
 
