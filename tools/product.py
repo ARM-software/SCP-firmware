@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
+import yaml
 from dataclasses import dataclass, field
 from typing import List, Tuple
 
@@ -17,6 +18,15 @@ class Parameter:
     '''
     name: str
     arguments: Tuple[str] = field(default_factory=tuple)
+
+    @classmethod
+    def from_yaml(cls, yaml_entry):
+        param_list = list()
+        for entry in yaml_entry:
+            param_list.append(cls(entry['name'],
+                              tuple(entry.get('extra_config_args', []))))
+
+        return param_list
 
 
 @dataclass(frozen=True, eq=True)
@@ -47,13 +57,12 @@ class Build:
     def file_name(self):
         filename = self.product_group + '_' + self.name if self.product_group \
             else self.name
-        filename += "_" + self.toolchain.name + "_" + \
-            self.build_type.name[0]
+        filename += f'_{self.toolchain.name}_{self.build_type.name}'
         if self.log_level:
-            filename += "_" + self.log_level.name
+            filename += f'_{self.log_level.name}'
         if self.variant:
-            filename += "_" + self.variant.name[0]
-        filename += ".txt"
+            filename += f'_{self.variant.name}'
+        filename += '.txt'
         return filename
 
     def command(self):
@@ -100,6 +109,36 @@ class Product:
     variants: List[Parameter] = field(default_factory=lambda: [None])
     log_level: Parameter = None
     product_group: str = field(default=None)
+
+    @classmethod
+    def from_yaml(cls, yaml_file):
+        yaml_entries = yaml.safe_load(yaml_file)
+        products = list()
+        for yaml_entry in yaml_entries:
+            product_properties = {'name': yaml_entry['product']}
+
+            if 'product_group' in yaml_entry:
+                pg = yaml_entry['product_group']
+                product_properties['product_group'] = pg
+
+            if 'variants' in yaml_entry:
+                variants = yaml_entry['variants']
+                product_properties['variants'] = \
+                    Parameter.from_yaml(variants)
+
+            if 'toolchains' in yaml_entry:
+                toolchains = yaml_entry['toolchains']
+                product_properties['toolchains'] = \
+                    Parameter.from_yaml(toolchains)
+
+            if 'build_types' in yaml_entry:
+                build_types = yaml_entry['build_types']
+                product_properties['build_types'] = \
+                    Parameter.from_yaml(build_types)
+
+            products.append(cls(**product_properties))
+
+        return products
 
     @property
     def builds(self) -> List[Build]:
