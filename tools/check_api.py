@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2019-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -11,16 +11,18 @@
 """
 
 import argparse
-import os
-import re
-import shutil
-import subprocess
+import glob
 import sys
-import tempfile
-import fnmatch
+from utils import banner, get_filtered_files
 
-BANNED_LIST = './tools/banned_api.lst'
-BANNED_API = list()
+#
+# Default banned list file
+#
+BANNED_LIST_DEFAULT = './tools/banned_api.lst'
+
+
+# Exclude all mod_test 'mocks' directories
+UNIT_TEST_MOCKS = glob.glob('module/**/test/**/mocks', recursive=True)
 
 #
 # Directories to exclude
@@ -29,27 +31,10 @@ EXCLUDE_DIRECTORIES = [
     '.git',
     'build',
     'tools',
-    'contrib/cmsis/git',
-    "contrib/run-clang-format/git",
+    'contrib',
     'product/rcar/src/CMSIS-FreeRTOS',
-]
-
-#
-# Exclude patterns (applied to files only)
-#
-EXCLUDE = [
-    '*.html',
-    '*.xml',
-    '*.css',
-    '*.gif',
-    '*.dat',
-    '*.pyc',
-    '*.jar',
-    '*.md',
-    '*.swp',
-    '*.a',
-    '*.pdf',
-]
+    'unit_test/unity_mocks',
+] + UNIT_TEST_MOCKS
 
 #
 # File types to check
@@ -60,66 +45,71 @@ FILE_TYPES = [
 ]
 
 
-def is_valid_type(filename):
-    for file_type in FILE_TYPES:
-        if fnmatch.fnmatch(filename, file_type):
-            return True
-
-    return False
-
-
-def main(argv=[], prog_name=''):
-    print('Checking for usage of banned APIs...')
-
-    illegal_use = 0
-
-    with open(BANNED_LIST) as file:
+def read_banned_api_file(banned_api_file):
+    banned_api = list()
+    with open(banned_api_file) as file:
         for fname in file:
             if fname[0] == '#':
                 continue
-            BANNED_API.append(fname.rstrip())
+            banned_api.append(fname.rstrip())
 
-        print("\tBanned API list: {}".format(BANNED_API))
+        print('\tBanned API list: {}'.format(banned_api))
 
-    cwd = os.getcwd()
+    return banned_api
 
-    for i, directory in enumerate(EXCLUDE_DIRECTORIES):
-        EXCLUDE_DIRECTORIES[i] = os.path.abspath(directory)
-        print("\tAdding to the exclude list: {}"
-              .format(EXCLUDE_DIRECTORIES[i]))
 
-    for root, dirs, files in os.walk(cwd, topdown=True):
-        #
-        # Exclude directories based on the EXCLUDE_DIRECTORIES pattern list
-        #
-        dirs[:] = [d for d in dirs
-                   if os.path.join(root, d) not in EXCLUDE_DIRECTORIES]
+def check_file(path, banned_apis):
+    file_error = False
+    try:
+        with open(path, encoding='utf-8') as file:
+            for line, string in enumerate(file):
+                for fname in banned_apis:
+                    if fname in string:
+                        file_error = True
+                        print(f'{path}:{line + 1}:{fname}')
+    except UnicodeDecodeError:
+        print(f'Invalid file format {path}')
+    return file_error
 
-        #
-        # Exclude files based on the EXCLUDE pattern list
-        #
-        matches = list()
-        for filename in files:
-            for file_pattern in EXCLUDE:
-                if fnmatch.fnmatch(filename, file_pattern):
-                    matches.append(filename)
-                    break
 
-        for match in matches:
-            files.remove(match)
+def check_files(file_paths, banned_apis):
+    file_error = False
 
-        #
-        # Check files
-        #
-        for filename in files:
-            path = os.path.join(root, filename)
-            content = ''
-            with open(path, encoding="utf-8") as file:
-                for line, string in enumerate(file):
-                    for fname in BANNED_API:
-                        if fname in string:
-                            print("{}:{}:{}".format(path, line + 1, fname),
-                                  file=sys.stderr)
+    for path in file_paths:
+        file_error = check_file(path, banned_apis) or file_error
+
+    if not file_error:
+        print('No banned API found')
+        return True
+    print('Banned API found')
+    return False
+
+
+def run(banned_api_list=BANNED_LIST_DEFAULT):
+    print(banner('Checking for usage of banned APIs...'))
+    banned_api = read_banned_api_file(banned_api_list)
+    files = get_filtered_files(EXCLUDE_DIRECTORIES, FILE_TYPES)
+
+    return check_files(files, banned_api)
+
+
+def parse_args(argv, prog_name):
+    parser = argparse.ArgumentParser(
+        prog=prog_name,
+        description='Perform basic API checks to SCP-Firmware')
+
+    parser.add_argument('-i', '--banned-api-list', dest='banned_api_list',
+                        required=False, default=BANNED_LIST_DEFAULT, type=str,
+                        action='store', help=f'Banned API file location, if \
+                        banned API list is not given, the default location \
+                        is {BANNED_LIST_DEFAULT}')
+
+    return parser.parse_args(argv)
+
+
+def main(argv=[], prog_name=''):
+    args = parse_args(argv, prog_name)
+    return 0 if run(args.banned_api_list) else 1
 
 
 if __name__ == '__main__':
