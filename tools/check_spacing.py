@@ -44,6 +44,8 @@ FILE_TYPES = [
     '*.h',
     '*.cmake',
     'CMakeLists.txt',
+    '*.yml',
+    '*.yaml',
 ]
 
 #

@@ -65,7 +65,7 @@ class Build:
         filename += '.txt'
         return filename
 
-    def command(self):
+    def command(self, build_path=None):
         cmd = 'make -f Makefile.cmake '
         name = self.product_group + '/' + self.name if self.product_group \
             else self.name
@@ -83,6 +83,8 @@ class Build:
             cmd += Build.__extra_arg__(extra)
         for extra in self.build_type.arguments:
             cmd += Build.__extra_arg__(extra)
+        if build_path:
+            cmd += f'BUILD_PATH={build_path} '
         return cmd
 
     @classmethod

@@ -1,0 +1,61 @@
+#
+# Arm SCP/MCP Software
+# Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+- product: host
+  toolchains:
+    - name: GNU
+
+- product: juno
+  variants:
+    - name: BOARD
+    - name: FVP
+
+- product: morello
+
+- product: n1sdp
+
+- product: rcar
+  toolchains:
+    - name: GNU
+
+- product: rdfremont
+  product_group: neoverse-rd
+
+- product: rdv1
+  product_group: neoverse-rd
+
+- product: rdv1mc
+  product_group: neoverse-rd
+
+- product: rdn1e1
+  product_group: neoverse-rd
+
+- product: rdn2
+  variants:
+    - name: 0
+    - name: 1
+    - name: 2
+    - name: 3
+  product_group: neoverse-rd
+
+- product: sgi575
+  product_group: neoverse-rd
+
+- product: sgm775
+
+- product: sgm776
+
+- product: synquacer
+
+- product: tc1
+  product_group: totalcompute
+
+- product: tc2
+  variants:
+    - name: 0
+    - name: 1
+  product_group: totalcompute
