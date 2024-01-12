@@ -12,6 +12,7 @@ static const char* CMockString_dev_id = "dev_id";
 static const char* CMockString_get_highest_level_from_composite_state = "get_highest_level_from_composite_state";
 static const char* CMockString_get_level_state_from_composite_state = "get_level_state_from_composite_state";
 static const char* CMockString_get_state_name = "get_state_name";
+static const char* CMockString_initiate_power_state_pre_transition_notification = "initiate_power_state_pre_transition_notification";
 static const char* CMockString_is_allowed_by_child = "is_allowed_by_child";
 static const char* CMockString_is_allowed_by_children = "is_allowed_by_children";
 static const char* CMockString_is_allowed_by_parent_and_children = "is_allowed_by_parent_and_children";
@@ -282,6 +283,20 @@ typedef struct _CMOCK_is_allowed_by_parent_and_children_CALL_INSTANCE
 
 } CMOCK_is_allowed_by_parent_and_children_CALL_INSTANCE;
 
+typedef struct _CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  bool ReturnVal;
+  struct pd_ctx* Expected_pd;
+  int Expected_pd_Depth;
+  char ReturnThruPtr_pd_Used;
+  struct pd_ctx* ReturnThruPtr_pd_Val;
+  size_t ReturnThruPtr_pd_Size;
+  char IgnoreArg_pd;
+
+} CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE;
+
 static struct Mockmod_power_domain_extraInstance
 {
   char pd_driver_set_state_IgnoreBool;
@@ -398,6 +413,12 @@ static struct Mockmod_power_domain_extraInstance
   CMOCK_is_allowed_by_parent_and_children_CALLBACK is_allowed_by_parent_and_children_CallbackFunctionPointer;
   int is_allowed_by_parent_and_children_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE is_allowed_by_parent_and_children_CallInstance;
+  char initiate_power_state_pre_transition_notification_IgnoreBool;
+  bool initiate_power_state_pre_transition_notification_FinalReturn;
+  char initiate_power_state_pre_transition_notification_CallbackBool;
+  CMOCK_initiate_power_state_pre_transition_notification_CALLBACK initiate_power_state_pre_transition_notification_CallbackFunctionPointer;
+  int initiate_power_state_pre_transition_notification_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE initiate_power_state_pre_transition_notification_CallInstance;
 } Mock;
 
 extern jmp_buf AbortFrame;
@@ -649,6 +670,19 @@ void Mockmod_power_domain_extra_Verify(void)
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
   if (Mock.is_allowed_by_parent_and_children_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.initiate_power_state_pre_transition_notification_CallInstance;
+  if (Mock.initiate_power_state_pre_transition_notification_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_initiate_power_state_pre_transition_notification);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.initiate_power_state_pre_transition_notification_CallbackFunctionPointer != NULL)
   {
     call_instance = CMOCK_GUTS_NONE;
     (void)call_instance;
@@ -3360,5 +3394,156 @@ void is_allowed_by_parent_and_children_CMockIgnoreArg_state(UNITY_LINE_TYPE cmoc
   CMOCK_is_allowed_by_parent_and_children_CALL_INSTANCE* cmock_call_instance = (CMOCK_is_allowed_by_parent_and_children_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.is_allowed_by_parent_and_children_CallInstance));
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
   cmock_call_instance->IgnoreArg_state = 1;
+}
+
+bool initiate_power_state_pre_transition_notification(struct pd_ctx* pd)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_initiate_power_state_pre_transition_notification);
+  cmock_call_instance = (CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.initiate_power_state_pre_transition_notification_CallInstance);
+  Mock.initiate_power_state_pre_transition_notification_CallInstance = CMock_Guts_MemNext(Mock.initiate_power_state_pre_transition_notification_CallInstance);
+  if (Mock.initiate_power_state_pre_transition_notification_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.initiate_power_state_pre_transition_notification_FinalReturn;
+    Mock.initiate_power_state_pre_transition_notification_FinalReturn = cmock_call_instance->ReturnVal;
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.initiate_power_state_pre_transition_notification_CallbackBool &&
+      Mock.initiate_power_state_pre_transition_notification_CallbackFunctionPointer != NULL)
+  {
+    bool cmock_cb_ret = Mock.initiate_power_state_pre_transition_notification_CallbackFunctionPointer(pd, Mock.initiate_power_state_pre_transition_notification_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  if (!cmock_call_instance->IgnoreArg_pd)
+  {
+    UNITY_SET_DETAILS(CMockString_initiate_power_state_pre_transition_notification,CMockString_pd);
+    if (cmock_call_instance->Expected_pd == NULL)
+      { UNITY_TEST_ASSERT_NULL(pd, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_pd), (void*)(pd), sizeof(struct pd_ctx), cmock_call_instance->Expected_pd_Depth, cmock_line, CMockStringMismatch); }
+  }
+  }
+  if (Mock.initiate_power_state_pre_transition_notification_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.initiate_power_state_pre_transition_notification_CallbackFunctionPointer(pd, Mock.initiate_power_state_pre_transition_notification_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_pd_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(pd, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)pd, (void*)cmock_call_instance->ReturnThruPtr_pd_Val,
+      cmock_call_instance->ReturnThruPtr_pd_Size);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_initiate_power_state_pre_transition_notification(CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE* cmock_call_instance, struct pd_ctx* pd, int pd_Depth);
+void CMockExpectParameters_initiate_power_state_pre_transition_notification(CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE* cmock_call_instance, struct pd_ctx* pd, int pd_Depth)
+{
+  cmock_call_instance->Expected_pd = pd;
+  cmock_call_instance->Expected_pd_Depth = pd_Depth;
+  cmock_call_instance->IgnoreArg_pd = 0;
+  cmock_call_instance->ReturnThruPtr_pd_Used = 0;
+}
+
+void initiate_power_state_pre_transition_notification_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE));
+  CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE* cmock_call_instance = (CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.initiate_power_state_pre_transition_notification_CallInstance = CMock_Guts_MemChain(Mock.initiate_power_state_pre_transition_notification_CallInstance, cmock_guts_index);
+  Mock.initiate_power_state_pre_transition_notification_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.initiate_power_state_pre_transition_notification_IgnoreBool = (char)1;
+}
+
+void initiate_power_state_pre_transition_notification_CMockStopIgnore(void)
+{
+  if(Mock.initiate_power_state_pre_transition_notification_IgnoreBool)
+    Mock.initiate_power_state_pre_transition_notification_CallInstance = CMock_Guts_MemNext(Mock.initiate_power_state_pre_transition_notification_CallInstance);
+  Mock.initiate_power_state_pre_transition_notification_IgnoreBool = (char)0;
+}
+
+void initiate_power_state_pre_transition_notification_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE));
+  CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE* cmock_call_instance = (CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.initiate_power_state_pre_transition_notification_CallInstance = CMock_Guts_MemChain(Mock.initiate_power_state_pre_transition_notification_CallInstance, cmock_guts_index);
+  Mock.initiate_power_state_pre_transition_notification_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void initiate_power_state_pre_transition_notification_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct pd_ctx* pd, bool cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE));
+  CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE* cmock_call_instance = (CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.initiate_power_state_pre_transition_notification_CallInstance = CMock_Guts_MemChain(Mock.initiate_power_state_pre_transition_notification_CallInstance, cmock_guts_index);
+  Mock.initiate_power_state_pre_transition_notification_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_initiate_power_state_pre_transition_notification(cmock_call_instance, pd, 1);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void initiate_power_state_pre_transition_notification_AddCallback(CMOCK_initiate_power_state_pre_transition_notification_CALLBACK Callback)
+{
+  Mock.initiate_power_state_pre_transition_notification_IgnoreBool = (char)0;
+  Mock.initiate_power_state_pre_transition_notification_CallbackBool = (char)1;
+  Mock.initiate_power_state_pre_transition_notification_CallbackFunctionPointer = Callback;
+}
+
+void initiate_power_state_pre_transition_notification_Stub(CMOCK_initiate_power_state_pre_transition_notification_CALLBACK Callback)
+{
+  Mock.initiate_power_state_pre_transition_notification_IgnoreBool = (char)0;
+  Mock.initiate_power_state_pre_transition_notification_CallbackBool = (char)0;
+  Mock.initiate_power_state_pre_transition_notification_CallbackFunctionPointer = Callback;
+}
+
+void initiate_power_state_pre_transition_notification_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, struct pd_ctx* pd, int pd_Depth, bool cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE));
+  CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE* cmock_call_instance = (CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.initiate_power_state_pre_transition_notification_CallInstance = CMock_Guts_MemChain(Mock.initiate_power_state_pre_transition_notification_CallInstance, cmock_guts_index);
+  Mock.initiate_power_state_pre_transition_notification_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_initiate_power_state_pre_transition_notification(cmock_call_instance, pd, pd_Depth);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void initiate_power_state_pre_transition_notification_CMockReturnMemThruPtr_pd(UNITY_LINE_TYPE cmock_line, struct pd_ctx* pd, size_t cmock_size)
+{
+  CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE* cmock_call_instance = (CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.initiate_power_state_pre_transition_notification_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_pd_Used = 1;
+  cmock_call_instance->ReturnThruPtr_pd_Val = pd;
+  cmock_call_instance->ReturnThruPtr_pd_Size = cmock_size;
+}
+
+void initiate_power_state_pre_transition_notification_CMockIgnoreArg_pd(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE* cmock_call_instance = (CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.initiate_power_state_pre_transition_notification_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_pd = 1;
 }
 

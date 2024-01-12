@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -8,6 +8,7 @@
 #include "scp_unity.h"
 #include "unity.h"
 
+#include <Mockfwk_id.h>
 #include <Mockfwk_module.h>
 #include <Mockfwk_notification.h>
 #include <Mockmod_power_domain_extra.h>
@@ -37,68 +38,11 @@ static void init_module_ctx(void)
     mod_pd_ctx.pd_ctx_table = pd_ctx;
     mod_pd_ctx.pd_count = PD_IDX_COUNT;
     mod_pd_ctx.system_pd_ctx = &mod_pd_ctx.pd_ctx_table[PD_IDX_COUNT - 1];
-}
 
-static void init_pd_ctx_common_fields(void)
-{
     for (int i = 0; i < PD_IDX_COUNT; ++i) {
-        pd_ctx[i].id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, i);
+        pd_ctx[i] = pd_ctx_config[i];
         pd_ctx[i].driver_api = &pd_driver;
-        pd_ctx[i].config = pd_element_table[i].data;
-        pd_ctx[i].requested_state = MOD_PD_STATE_OFF;
-        pd_ctx[i].state_requested_to_driver = MOD_PD_STATE_OFF;
-        pd_ctx[i].current_state = MOD_PD_STATE_OFF;
-        pd_ctx[i].parent = NULL;
-        pd_ctx[i].cs_support = false;
         fwk_list_init(&pd_ctx[i].children_list);
-    }
-}
-
-static void init_pd_ctx_fields_for_cores(void)
-{
-    enum pd_idx core_pd_idx[] = { PD_IDX_CLUS0CORE0,
-                                  PD_IDX_CLUS0CORE1,
-                                  PD_IDX_CLUS1CORE0,
-                                  PD_IDX_CLUS1CORE1 };
-
-    for (unsigned int i = 0; i < FWK_ARRAY_SIZE(core_pd_idx); ++i) {
-        pd_ctx[core_pd_idx[i]].allowed_state_mask_table =
-            core_pd_allowed_state_mask_table;
-        pd_ctx[core_pd_idx[i]].allowed_state_mask_table_size =
-            FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table);
-        pd_ctx[core_pd_idx[i]].cs_support = true;
-        pd_ctx[core_pd_idx[i]].composite_state_mask_table =
-            core_composite_state_mask_table;
-        pd_ctx[core_pd_idx[i]].composite_state_mask_table_size =
-            FWK_ARRAY_SIZE(core_composite_state_mask_table);
-    }
-}
-
-static void init_pd_ctx_fields_for_clusters(void)
-{
-    enum pd_idx cluster_pd_idx[] = { PD_IDX_CLUSTER0, PD_IDX_CLUSTER1 };
-
-    for (unsigned int i = 0; i < FWK_ARRAY_SIZE(cluster_pd_idx); ++i) {
-        pd_ctx[cluster_pd_idx[i]].allowed_state_mask_table =
-            cluster_pd_allowed_state_mask_table;
-        pd_ctx[cluster_pd_idx[i]].allowed_state_mask_table_size =
-            FWK_ARRAY_SIZE(cluster_pd_allowed_state_mask_table);
-    }
-}
-
-static void init_pd_ctx_fields_for_systops(void)
-{
-    enum pd_idx systop_pd_idx[] = { PD_IDX_SYSTOP };
-
-    for (unsigned int i = 0; i < FWK_ARRAY_SIZE(systop_pd_idx); ++i) {
-        pd_ctx[systop_pd_idx[i]].allowed_state_mask_table =
-            systop_allowed_state_mask_table;
-        pd_ctx[systop_pd_idx[i]].allowed_state_mask_table_size =
-            FWK_ARRAY_SIZE(systop_allowed_state_mask_table);
-
-        pd_ctx[systop_pd_idx[i]].requested_state = MOD_PD_STATE_ON;
-        pd_ctx[systop_pd_idx[i]].state_requested_to_driver = MOD_PD_STATE_ON;
-        pd_ctx[systop_pd_idx[i]].current_state = MOD_PD_STATE_ON;
     }
 }
 
@@ -151,14 +95,7 @@ void setUp(void)
     memset(pd_ctx, 0, sizeof(pd_ctx));
 
     init_module_ctx();
-
-    init_pd_ctx_common_fields();
-    init_pd_ctx_fields_for_cores();
-    init_pd_ctx_fields_for_clusters();
-    init_pd_ctx_fields_for_systops();
-
     evaluate_valid_state_mask();
-
     construct_pd_relations();
 }
 
@@ -609,6 +546,208 @@ void test_state_transition_report_cluster_on_while_transition_init(void)
     TEST_ASSERT_EQUAL(MOD_PD_STATE_ON, pd_ctx[PD_IDX_CLUSTER0].current_state);
 }
 
+void test_pd_get_domain_type(void)
+{
+    int status;
+    fwk_id_t pd_id;
+    enum mod_pd_type type;
+
+    fwk_module_is_valid_element_id_ExpectAnyArgsAndReturn(true);
+    fwk_id_get_element_idx_ExpectAnyArgsAndReturn(PD_IDX_CLUS0CORE0);
+
+    status = pd_get_domain_type(pd_id, &type);
+
+    TEST_ASSERT_EQUAL(MOD_PD_TYPE_CORE, type);
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+}
+
+void test_pd_get_domain_parent_id(void)
+{
+    int status;
+    fwk_id_t pd_id;
+    fwk_id_t parent_pd_id;
+
+    fwk_id_t local_id = pd_ctx[PD_IDX_CLUS0CORE0].parent->id;
+
+    fwk_module_is_valid_element_id_ExpectAnyArgsAndReturn(true);
+    fwk_id_get_element_idx_ExpectAnyArgsAndReturn(PD_IDX_CLUS0CORE0);
+
+    status = pd_get_domain_parent_id(pd_id, &parent_pd_id);
+
+    TEST_ASSERT_EQUAL_MEMORY(&local_id, &parent_pd_id, sizeof(fwk_id_t));
+
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+}
+
+void test_pd_get_domain_parent_id_null_param(void)
+{
+    int status;
+    fwk_id_t pd_id;
+    status = pd_get_domain_parent_id(pd_id, NULL);
+
+    TEST_ASSERT_EQUAL(FWK_E_PARAM, status);
+}
+
+void test_process_get_state_request_no_cs(void)
+{
+    unsigned int state;
+    pd_ctx[PD_IDX_CLUS0CORE0].cs_support = false;
+
+    process_get_state_request(&pd_ctx[PD_IDX_CLUS0CORE0], &state);
+
+    TEST_ASSERT_EQUAL(MOD_PD_STATE_OFF, state);
+}
+
+void test_process_get_state_request_cs(void)
+{
+    unsigned int state;
+    pd_ctx[PD_IDX_CLUS0CORE0].cs_support = true;
+
+    pd_ctx[PD_IDX_CLUS0CORE0].composite_state_levels_mask = MOD_PD_CS_STATE_MASK
+        << MOD_PD_CS_LEVEL_SHIFT;
+
+    for (int i = 0; i < PD_IDX_COUNT; ++i) {
+        pd_ctx[i].current_state = MOD_PD_STATE_ON;
+    }
+
+    uint32_t composite_state = MOD_PD_COMPOSITE_STATE(
+        MOD_PD_LEVEL_2, 0, MOD_PD_STATE_ON, MOD_PD_STATE_ON, MOD_PD_STATE_ON);
+
+    /* For the composite table mask size */
+    number_of_bits_to_shift_ExpectAndReturn(
+        pd_ctx[PD_IDX_CLUS0CORE0].composite_state_mask_table[0], 0);
+    number_of_bits_to_shift_ExpectAndReturn(
+        pd_ctx[PD_IDX_CLUS0CORE0].composite_state_mask_table[1], 4);
+    number_of_bits_to_shift_ExpectAndReturn(
+        pd_ctx[PD_IDX_CLUS0CORE0].composite_state_mask_table[2], 8);
+
+    /* For the level shift */
+    number_of_bits_to_shift_ExpectAndReturn(
+        pd_ctx[PD_IDX_CLUS0CORE0].composite_state_levels_mask, 16);
+
+    process_get_state_request(&pd_ctx[PD_IDX_CLUS0CORE0], &state);
+
+    TEST_ASSERT_EQUAL(composite_state, state);
+}
+
+void test_initiate_power_state_transition(void)
+{
+    int status;
+
+    pd_ctx[PD_IDX_CLUSTER0].requested_state = MOD_PD_STATE_ON;
+
+    prepare_mocks_for_set_state_request(
+        PD_IDX_CLUSTER0, MOD_PD_STATE_ON, false, FWK_SUCCESS);
+    prepare_state_name(MOD_PD_STATE_ON);
+
+    status = initiate_power_state_transition(&pd_ctx[PD_IDX_CLUSTER0]);
+
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+    TEST_ASSERT_EQUAL(
+        pd_ctx[PD_IDX_CLUSTER0].state_requested_to_driver, MOD_PD_STATE_ON);
+}
+
+void test_initiate_power_state_transition_fail_param(void)
+{
+    int status;
+
+    pd_ctx[PD_IDX_CLUSTER0].requested_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUSTER0].state_requested_to_driver = MOD_PD_STATE_OFF;
+
+    prepare_mocks_for_set_state_request(
+        PD_IDX_CLUSTER0, MOD_PD_STATE_ON, false, FWK_E_PARAM);
+    prepare_state_name(MOD_PD_STATE_ON);
+
+    status = initiate_power_state_transition(&pd_ctx[PD_IDX_CLUSTER0]);
+
+    TEST_ASSERT_EQUAL(FWK_E_PARAM, status);
+    TEST_ASSERT_EQUAL(
+        pd_ctx[PD_IDX_CLUSTER0].state_requested_to_driver, MOD_PD_STATE_OFF);
+}
+
+void test_process_power_state_transition_report_deeper_state(void)
+{
+    pd_ctx[PD_IDX_CLUSTER0].requested_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUSTER0].state_requested_to_driver = MOD_PD_STATE_OFF;
+
+    is_allowed_by_parent_and_children_ExpectAnyArgsAndReturn(true);
+    initiate_power_state_pre_transition_notification_ExpectAnyArgsAndReturn(
+        true);
+
+    prepare_mocks_for_set_state_request(
+        PD_IDX_CLUSTER0, MOD_PD_STATE_ON, false, FWK_SUCCESS);
+    prepare_state_name(MOD_PD_STATE_ON);
+
+    process_power_state_transition_report_deeper_state(
+        &pd_ctx[PD_IDX_CLUS0CORE0]);
+    TEST_ASSERT_EQUAL(
+        pd_ctx[PD_IDX_CLUSTER0].state_requested_to_driver, MOD_PD_STATE_ON);
+}
+
+void test_process_power_state_transition_report_shallower_state(void)
+{
+    pd_ctx[PD_IDX_CLUS0CORE0].requested_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUS0CORE0].state_requested_to_driver = MOD_PD_STATE_OFF;
+
+    is_allowed_by_parent_and_children_ExpectAnyArgsAndReturn(true);
+    initiate_power_state_pre_transition_notification_ExpectAnyArgsAndReturn(
+        true);
+
+    prepare_mocks_for_set_state_request(
+        PD_IDX_CLUS0CORE0, MOD_PD_STATE_ON, false, FWK_SUCCESS);
+    prepare_state_name(MOD_PD_STATE_ON);
+
+    process_power_state_transition_report_shallower_state(
+        &pd_ctx[PD_IDX_CLUSTER0]);
+    TEST_ASSERT_EQUAL(
+        pd_ctx[PD_IDX_CLUS0CORE0].state_requested_to_driver, MOD_PD_STATE_ON);
+}
+
+void test_complete_system_suspend_no_cs(void)
+{
+    int status;
+    pd_ctx[PD_IDX_CLUS0CORE0].cs_support = false;
+
+    status = complete_system_suspend(&pd_ctx[PD_IDX_CLUS0CORE0]);
+
+    TEST_ASSERT_EQUAL(status, FWK_E_PARAM);
+}
+
+void test_complete_system_suspend(void)
+{
+    int status;
+    uint32_t composite_state = 0;
+
+    pd_ctx[PD_IDX_CLUS0CORE0].cs_support = true;
+
+    /* For the composite table mask size */
+    number_of_bits_to_shift_ExpectAndReturn(
+        pd_ctx[PD_IDX_CLUS0CORE0].composite_state_mask_table[0], 0);
+    number_of_bits_to_shift_ExpectAndReturn(
+        pd_ctx[PD_IDX_CLUS0CORE0].composite_state_mask_table[1], 4);
+    number_of_bits_to_shift_ExpectAndReturn(
+        pd_ctx[PD_IDX_CLUS0CORE0].composite_state_mask_table[2], 8);
+
+    composite_state = MOD_PD_COMPOSITE_STATE(
+        MOD_PD_LEVEL_2,
+        0,
+        MOD_PD_STATE_OFF,
+        MOD_PD_STATE_OFF,
+        MOD_PD_STATE_OFF);
+
+    is_upwards_transition_propagation_ExpectAndReturn(
+        &pd_ctx[PD_IDX_CLUS0CORE0], composite_state, true);
+
+    get_highest_level_from_composite_state_ExpectAndReturn(
+        &pd_ctx[PD_IDX_CLUS0CORE0], composite_state, MOD_PD_STATE_OFF);
+
+    get_level_state_from_composite_state_ExpectAnyArgsAndReturn(0);
+
+    status = complete_system_suspend(&pd_ctx[PD_IDX_CLUS0CORE0]);
+
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+}
+
 int power_domain_test_main(void)
 {
     UNITY_BEGIN();
@@ -623,6 +762,17 @@ int power_domain_test_main(void)
     RUN_TEST(test_state_transition_cluster_on_expect_core_transition_init);
     RUN_TEST(test_set_state_on_core_cluster_soc_expect_cluster_transition_init);
     RUN_TEST(test_state_transition_report_cluster_on_while_transition_init);
+    RUN_TEST(test_pd_get_domain_type);
+    RUN_TEST(test_pd_get_domain_parent_id);
+    RUN_TEST(test_pd_get_domain_parent_id_null_param);
+    RUN_TEST(test_process_get_state_request_no_cs);
+    RUN_TEST(test_process_get_state_request_cs);
+    RUN_TEST(test_process_power_state_transition_report_deeper_state);
+    RUN_TEST(test_process_power_state_transition_report_shallower_state);
+    RUN_TEST(test_initiate_power_state_transition);
+    RUN_TEST(test_initiate_power_state_transition_fail_param);
+    RUN_TEST(test_complete_system_suspend_no_cs);
+    RUN_TEST(test_complete_system_suspend);
     return UNITY_END();
 }
 
