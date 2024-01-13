@@ -14,6 +14,9 @@
 
 #define CLOCK_RATE_REFCLK (125UL * FWK_MHZ)
 
+/* System Counter per-tick increment value */
+#define SYSCNT_INCR 8
+
 #define CLOCK_RATE_SYSPLLCLK (2000UL * FWK_MHZ)
 
 #if (PLATFORM_VARIANT == 3)

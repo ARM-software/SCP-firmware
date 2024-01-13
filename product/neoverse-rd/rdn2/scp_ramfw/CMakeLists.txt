@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -40,7 +40,8 @@ endif()
 
 target_include_directories(
     rdn2-bl2 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include"
-                    "${CMAKE_CURRENT_SOURCE_DIR}")
+                    "${CMAKE_CURRENT_SOURCE_DIR}"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/../../common/include")
 
 # cmake-lint: disable=E1122
 
