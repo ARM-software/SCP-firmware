@@ -14,7 +14,8 @@ add_executable(rdfremont-mcp-bl2)
 target_include_directories(
     rdfremont-mcp-bl2
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
-    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../../common/include")
+           "${CMAKE_CURRENT_SOURCE_DIR}/../include"
+           "${CMAKE_CURRENT_SOURCE_DIR}/../../common/include")
 
 # cmake-lint: disable=E1122
 

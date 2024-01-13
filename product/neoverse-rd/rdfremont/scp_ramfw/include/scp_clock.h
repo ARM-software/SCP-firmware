@@ -11,7 +11,7 @@
 #ifndef SCP_CLOCK_H
 #define SCP_CLOCK_H
 
-#include "clock_css.h"
+#include "css_common.h"
 
 #include <fwk_macros.h>
 
