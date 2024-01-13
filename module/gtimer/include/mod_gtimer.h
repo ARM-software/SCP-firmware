@@ -39,6 +39,25 @@ enum mod_gtimer_api_idx {
 };
 
 /*!
+ * \brief Implementation specific system counter register configuration
+ *
+ * \details The system counter register frame includes implementation specific
+ *      registers from offset 0xC0 to 0xFC as defined in the Arm Architecture
+ *      Reference Manual. This data structure specifies an offset/value pair for
+ *      the impdef registers and can be instantiated multiple times as a
+ *      sequential table. This table is iterated each time the system counter
+ *      is enabled and the values are written at the specified offsets. Each
+ *      impdef register in this offset range is treated as a 32-bit register.
+ */
+struct mod_gtimer_syscounter_impdef_config {
+    /*! Offset of the impdef register in system counter register frame */
+    const uint8_t offset;
+
+    /*! Value to be written to that impdef register offset */
+    const uint32_t value;
+};
+
+/*!
  * \brief Generic timer device descriptor
  */
 struct mod_gtimer_dev_config {
@@ -59,6 +78,12 @@ struct mod_gtimer_dev_config {
 
     /*! Skip initialisation of CNTCONTROL register */
     bool skip_cntcontrol_init;
+
+    /*! List of implementation specific registers to be configured */
+    struct mod_gtimer_syscounter_impdef_config *syscnt_impdef_cfg;
+
+    /*! Number of entries in the system counter impdef register config table */
+    uint8_t syscnt_impdef_cfg_cnt;
 };
 
 /*!

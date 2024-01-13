@@ -28,6 +28,17 @@
 #define GTIMER_FREQUENCY_MAX_HZ  UINT32_C(1000000000)
 #define GTIMER_MIN_TIMESTAMP 2000
 
+/*
+ * The offset range of implementation defined registers in the system counter
+ * register frame is 0xC0 to 0xFC as defined by the Arm Architecture Reference
+ * manual. Each impdef register in this offset range is treated as a 32-bit
+ * register by the gtimer module. So the maximum number of impdef registers
+ * configurable is 16.
+ */
+#define MAX_IMPDEF_CFG_CNT (16)
+#define IS_IMPDEF_OFFSET_VALID(offset) \
+    (((offset >= 0xC0) && (offset <= 0xFC)) && ((offset & 0x3u) == 0))
+
 /* Device content */
 struct gtimer_dev_ctx {
     struct cntbase_reg *hw_timer;
@@ -181,7 +192,7 @@ static int gtimer_init(fwk_id_t module_id,
                        const void *data)
 {
     mod_gtimer_ctx.table =
-        fwk_mm_alloc(element_count, sizeof(struct gtimer_dev_ctx));
+        fwk_mm_calloc(element_count, sizeof(struct gtimer_dev_ctx));
 
     return FWK_SUCCESS;
 }
@@ -190,7 +201,9 @@ static int gtimer_device_init(fwk_id_t element_id, unsigned int unused,
                               const void *data)
 {
     int status;
+    uint8_t cnt;
     struct gtimer_dev_ctx *ctx;
+    struct mod_gtimer_syscounter_impdef_config *impdef_cfg;
 
     ctx = mod_gtimer_ctx.table + fwk_id_get_element_idx(element_id);
 
@@ -202,6 +215,33 @@ static int gtimer_device_init(fwk_id_t element_id, unsigned int unused,
         ctx->config->frequency > GTIMER_FREQUENCY_MAX_HZ) {
 
         return FWK_E_DEVICE;
+    }
+
+    /*
+     * Ensure the number of impdef register config table entries is within
+     * bounds.
+     */
+    if (ctx->config->syscnt_impdef_cfg_cnt > MAX_IMPDEF_CFG_CNT) {
+        return FWK_E_PARAM;
+    }
+
+    /*
+     * If the number of impdef register config table entries is not zero,
+     * the impdef register configuration table cannot be NULL.
+     */
+    impdef_cfg = ctx->config->syscnt_impdef_cfg;
+    if ((ctx->config->syscnt_impdef_cfg_cnt != 0) && (impdef_cfg == NULL)) {
+        return FWK_E_PARAM;
+    }
+
+    /*
+     * Validate the register offsets specified in the impdef register config
+     * table.
+     */
+    for (cnt = 0; cnt < ctx->config->syscnt_impdef_cfg_cnt; cnt++) {
+        if (!IS_IMPDEF_OFFSET_VALID(impdef_cfg[cnt].offset)) {
+            return FWK_E_PARAM;
+        }
     }
 
     ctx->hw_timer   = (struct cntbase_reg *)ctx->config->hw_timer;
@@ -249,8 +289,21 @@ static int gtimer_process_bind_request(fwk_id_t requester_id,
 
 static void gtimer_control_init(struct gtimer_dev_ctx *ctx)
 {
-    /* Set primary counter update frequency and enable counter. */
+    struct mod_gtimer_syscounter_impdef_config *impdef_cfg;
+    uintptr_t impdef_reg;
+    uint8_t cnt;
+
+    /* Disable counter */
     ctx->control->CR &= ~CNTCONTROL_CR_EN;
+
+    /* Optionally, configure implementation specific registers */
+    impdef_cfg = ctx->config->syscnt_impdef_cfg;
+    for (cnt = 0; cnt < ctx->config->syscnt_impdef_cfg_cnt; cnt++) {
+        impdef_reg = (uintptr_t)ctx->control + impdef_cfg[cnt].offset;
+        *(volatile uintptr_t *)impdef_reg = impdef_cfg[cnt].value;
+    }
+
+    /* Set primary counter update frequency and enable counter. */
     ctx->control->FID0 = ctx->config->frequency;
     ctx->control->CR |= CNTCONTROL_CR_FCREQ | CNTCONTROL_CR_EN;
 }
