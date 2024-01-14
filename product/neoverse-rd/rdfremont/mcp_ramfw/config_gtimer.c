@@ -31,7 +31,7 @@ static const struct fwk_element gtimer_dev_table[MOD_GTIMER_ELEMENT_COUNT]  = {
                 .hw_timer = MCP_REFCLK_CNTBASE0_BASE,
                 .hw_counter = MCP_REFCLK_CNTCTL_BASE,
                 .control = MCP_REFCLK_CNTCONTROL_BASE,
-                .frequency = CLOCK_RATE_REFCLK,
+                .frequency = (CLOCK_RATE_REFCLK * SYSCNT_INCR),
                 .clock_id = FWK_ID_NONE_INIT,
                 .skip_cntcontrol_init = true }),
     },

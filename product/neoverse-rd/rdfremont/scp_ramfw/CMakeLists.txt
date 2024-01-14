@@ -16,7 +16,8 @@ add_executable(rdfremont-bl2)
 target_include_directories(
     rdfremont-bl2
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
-           "${CMAKE_CURRENT_SOURCE_DIR}/../include")
+           "${CMAKE_CURRENT_SOURCE_DIR}/../include"
+           "${CMAKE_CURRENT_SOURCE_DIR}/../../common/include")
 
 target_sources(
     rdfremont-bl2
