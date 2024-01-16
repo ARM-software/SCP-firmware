@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -78,6 +78,9 @@ struct ppu_v1_ctx {
 
     /* Number of power domains */
     size_t pd_ctx_table_size;
+
+    /* Set to true if the PPU is configured to operate in dynamic mode. */
+    bool is_cluster_ppu_dynamic_mode_configured;
 
     /*! Maximum number of cores within a cluster */
     uint8_t max_num_cores_per_cluster;
@@ -486,7 +489,13 @@ static void cluster_on(struct ppu_v1_pd_ctx *pd_ctx)
 
     ppu_v1_request_operating_mode(ppu, pd_ctx->config->opmode);
 
-    ppu_v1_set_power_mode(ppu, PPU_V1_MODE_ON, pd_ctx->timer_ctx);
+    if (ppu_v1_ctx.is_cluster_ppu_dynamic_mode_configured) {
+        ppu_v1_lock_off_enable(ppu);
+        ppu_v1_dynamic_enable(ppu, PPU_V1_MODE_OFF);
+    } else {
+        ppu_v1_set_power_mode(ppu, PPU_V1_MODE_ON, pd_ctx->timer_ctx);
+    }
+
     status = pd_ctx->pd_driver_input_api->report_power_state_transition(
         pd_ctx->bound_id, MOD_PD_STATE_ON);
     fwk_assert(status == FWK_SUCCESS);
@@ -521,6 +530,10 @@ static int ppu_v1_cluster_pd_init(struct ppu_v1_pd_ctx *pd_ctx)
         ppu_v1_set_input_edge_sensitivity(ppu,
                                           PPU_V1_MODE_ON,
                                           PPU_V1_EDGE_SENSITIVITY_FALLING_EDGE);
+
+        if (ppu_v1_ctx.is_cluster_ppu_dynamic_mode_configured) {
+            ppu_v1_dynamic_enable(ppu, PPU_V1_MODE_OFF);
+        }
     }
 
     return FWK_SUCCESS;
@@ -560,13 +573,26 @@ static int ppu_v1_cluster_pd_set_state(fwk_id_t cluster_pd_id,
 }
 #endif
 
-static void cluster_pd_ppu_interrupt_handler(struct ppu_v1_pd_ctx *pd_ctx)
+static void cluster_pd_ppu_dyn_policy_min_int_handler(
+    struct ppu_v1_pd_ctx *pd_ctx)
 {
     int status;
-    struct ppu_v1_reg *ppu;
-    enum ppu_v1_mode current_mode;
 
-    fwk_assert(pd_ctx != NULL);
+    ppu_v1_ack_interrupt(pd_ctx->ppu, PPU_V1_ISR_DYN_POLICY_MIN_IRQ);
+    ppu_v1_interrupt_mask(pd_ctx->ppu, PPU_V1_IMR_DYN_POLICY_MIN_IRQ_MASK);
+
+    status = pd_ctx->pd_driver_input_api->report_power_state_transition(
+        pd_ctx->bound_id, MOD_PD_STATE_SLEEP);
+    fwk_assert(status == FWK_SUCCESS);
+    (void)status;
+    return;
+}
+
+static void cluster_pd_ppu_normal_mode_int_handler(struct ppu_v1_pd_ctx *pd_ctx)
+{
+    int status;
+    enum ppu_v1_mode current_mode;
+    struct ppu_v1_reg *ppu;
 
     ppu = pd_ctx->ppu;
 
@@ -618,6 +644,18 @@ static void cluster_pd_ppu_interrupt_handler(struct ppu_v1_pd_ctx *pd_ctx)
         fwk_unexpected();
         return;
     }
+}
+
+static void cluster_pd_ppu_interrupt_handler(struct ppu_v1_pd_ctx *pd_ctx)
+{
+    fwk_assert(pd_ctx != NULL);
+
+    /* Minimum policy reached interrupt */
+    if (ppu_v1_is_dyn_policy_min_interrupt(pd_ctx->ppu)) {
+        return cluster_pd_ppu_dyn_policy_min_int_handler(pd_ctx);
+    }
+
+    return cluster_pd_ppu_normal_mode_int_handler(pd_ctx);
 }
 
 #ifdef BUILD_HAS_MOD_POWER_DOMAIN
@@ -699,6 +737,9 @@ static int ppu_v1_mod_init(
         ppu_v1_ctx.max_num_cores_per_cluster =
             module_config->num_of_cores_in_cluster;
     }
+
+    ppu_v1_ctx.is_cluster_ppu_dynamic_mode_configured =
+        module_config->is_cluster_ppu_dynamic_mode_configured;
 
     return FWK_SUCCESS;
 }

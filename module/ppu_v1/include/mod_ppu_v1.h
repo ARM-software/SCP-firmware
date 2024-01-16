@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -119,6 +119,9 @@ struct mod_ppu_v1_config {
 
     /*! Number of cores in this cluster */
     uint32_t num_of_cores_in_cluster;
+
+    /*! Set to true if the PPU is configured to operate in dynamic mode. */
+    bool is_cluster_ppu_dynamic_mode_configured;
 };
 
 /*!
