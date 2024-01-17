@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -139,6 +139,11 @@ struct pd_ctx {
      * current state is different from the last requested state.
      */
     unsigned int current_state;
+
+    /*
+     * Holds the mapped state for the core that gets sent to the driver
+     */
+    unsigned int driver_state;
 
     /* Pending response context */
     struct response_ctx response;
@@ -367,6 +372,18 @@ const char *get_state_name(const struct pd_ctx *pd, unsigned int state);
  * \return The number of bits to shift.
  */
 unsigned int number_of_bits_to_shift(uint32_t mask);
+
+/*
+ * Return the updated PD state to include state mapping
+ * if this is applicable.
+ *
+ * \param pd Power domain description.
+ * \param state The state that might need to be mapped.
+ *
+ * \return The power domain state updated post mapping,
+ *         or as received if not mapping is implemented.
+ */
+unsigned int retrieve_mapped_state(struct pd_ctx *pd, unsigned int state);
 
 /*
  * Get the level state from a given composite power state.

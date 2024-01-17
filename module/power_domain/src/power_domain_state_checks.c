@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -22,8 +22,8 @@
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
 static const char *const default_state_name_table[] = {
-    "OFF", "ON", "SLEEP", "3",  "4",  "5",  "6",  "7",
-    "8",   "9",  "10",    "11", "12", "13", "14", "15"
+    "OFF", "ON", "SLEEP", "OFF0", "OFF1", "OFF2", "6",  "7",
+    "8",   "9",  "10",    "11",   "12",   "13",   "14", "15"
 };
 #endif
 
@@ -39,6 +39,15 @@ unsigned int normalize_state(unsigned int state)
 
     switch (state_type) {
     case MOD_PD_STATE_OFF:
+        return (MOD_PD_STATE_COUNT_MAX + 4);
+
+    case MOD_PD_STATE_OFF_2:
+        return (MOD_PD_STATE_COUNT_MAX + 3);
+
+    case MOD_PD_STATE_OFF_1:
+        return (MOD_PD_STATE_COUNT_MAX + 2);
+
+    case MOD_PD_STATE_OFF_0:
         return (MOD_PD_STATE_COUNT_MAX + 1);
 
     case MOD_PD_STATE_SLEEP:
@@ -118,6 +127,15 @@ unsigned int number_of_bits_to_shift(uint32_t mask)
     }
 
     return num_bits;
+}
+
+unsigned int retrieve_mapped_state(struct pd_ctx *pd, unsigned int state)
+{
+    if (pd->config->pd_state_mapping_table == NULL) {
+        return state;
+    } else {
+        return pd->config->pd_state_mapping_table[state];
+    }
 }
 
 /* Functions related to a composite state */

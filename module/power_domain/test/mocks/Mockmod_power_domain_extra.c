@@ -34,6 +34,7 @@ static const char* CMockString_pd_driver_prepare_core_for_system_suspend = "pd_d
 static const char* CMockString_pd_driver_reset = "pd_driver_reset";
 static const char* CMockString_pd_driver_set_state = "pd_driver_set_state";
 static const char* CMockString_pd_driver_shutdown = "pd_driver_shutdown";
+static const char* CMockString_retrieve_mapped_state = "retrieve_mapped_state";
 static const char* CMockString_state = "state";
 static const char* CMockString_state_to_compare_to = "state_to_compare_to";
 static const char* CMockString_system_shutdown = "system_shutdown";
@@ -210,6 +211,22 @@ typedef struct _CMOCK_number_of_bits_to_shift_CALL_INSTANCE
 
 } CMOCK_number_of_bits_to_shift_CALL_INSTANCE;
 
+typedef struct _CMOCK_retrieve_mapped_state_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  unsigned int ReturnVal;
+  struct pd_ctx* Expected_pd;
+  unsigned int Expected_state;
+  int Expected_pd_Depth;
+  char ReturnThruPtr_pd_Used;
+  struct pd_ctx* ReturnThruPtr_pd_Val;
+  size_t ReturnThruPtr_pd_Size;
+  char IgnoreArg_pd;
+  char IgnoreArg_state;
+
+} CMOCK_retrieve_mapped_state_CALL_INSTANCE;
+
 typedef struct _CMOCK_get_level_state_from_composite_state_CALL_INSTANCE
 {
   UNITY_LINE_TYPE LineNumber;
@@ -383,6 +400,12 @@ static struct Mockmod_power_domain_extraInstance
   CMOCK_number_of_bits_to_shift_CALLBACK number_of_bits_to_shift_CallbackFunctionPointer;
   int number_of_bits_to_shift_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE number_of_bits_to_shift_CallInstance;
+  char retrieve_mapped_state_IgnoreBool;
+  unsigned int retrieve_mapped_state_FinalReturn;
+  char retrieve_mapped_state_CallbackBool;
+  CMOCK_retrieve_mapped_state_CALLBACK retrieve_mapped_state_CallbackFunctionPointer;
+  int retrieve_mapped_state_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE retrieve_mapped_state_CallInstance;
   char get_level_state_from_composite_state_IgnoreBool;
   unsigned int get_level_state_from_composite_state_FinalReturn;
   char get_level_state_from_composite_state_CallbackBool;
@@ -605,6 +628,19 @@ void Mockmod_power_domain_extra_Verify(void)
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
   if (Mock.number_of_bits_to_shift_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.retrieve_mapped_state_CallInstance;
+  if (Mock.retrieve_mapped_state_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_retrieve_mapped_state);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.retrieve_mapped_state_CallbackFunctionPointer != NULL)
   {
     call_instance = CMOCK_GUTS_NONE;
     (void)call_instance;
@@ -2603,6 +2639,171 @@ void number_of_bits_to_shift_CMockIgnoreArg_mask(UNITY_LINE_TYPE cmock_line)
   CMOCK_number_of_bits_to_shift_CALL_INSTANCE* cmock_call_instance = (CMOCK_number_of_bits_to_shift_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.number_of_bits_to_shift_CallInstance));
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
   cmock_call_instance->IgnoreArg_mask = 1;
+}
+
+unsigned int retrieve_mapped_state(struct pd_ctx* pd, unsigned int state)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_retrieve_mapped_state_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_retrieve_mapped_state);
+  cmock_call_instance = (CMOCK_retrieve_mapped_state_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.retrieve_mapped_state_CallInstance);
+  Mock.retrieve_mapped_state_CallInstance = CMock_Guts_MemNext(Mock.retrieve_mapped_state_CallInstance);
+  if (Mock.retrieve_mapped_state_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.retrieve_mapped_state_FinalReturn;
+    Mock.retrieve_mapped_state_FinalReturn = cmock_call_instance->ReturnVal;
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.retrieve_mapped_state_CallbackBool &&
+      Mock.retrieve_mapped_state_CallbackFunctionPointer != NULL)
+  {
+    unsigned int cmock_cb_ret = Mock.retrieve_mapped_state_CallbackFunctionPointer(pd, state, Mock.retrieve_mapped_state_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  if (!cmock_call_instance->IgnoreArg_pd)
+  {
+    UNITY_SET_DETAILS(CMockString_retrieve_mapped_state,CMockString_pd);
+    if (cmock_call_instance->Expected_pd == NULL)
+      { UNITY_TEST_ASSERT_NULL(pd, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_pd), (void*)(pd), sizeof(struct pd_ctx), cmock_call_instance->Expected_pd_Depth, cmock_line, CMockStringMismatch); }
+  }
+  if (!cmock_call_instance->IgnoreArg_state)
+  {
+    UNITY_SET_DETAILS(CMockString_retrieve_mapped_state,CMockString_state);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_state, state, cmock_line, CMockStringMismatch);
+  }
+  }
+  if (Mock.retrieve_mapped_state_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.retrieve_mapped_state_CallbackFunctionPointer(pd, state, Mock.retrieve_mapped_state_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_pd_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(pd, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)pd, (void*)cmock_call_instance->ReturnThruPtr_pd_Val,
+      cmock_call_instance->ReturnThruPtr_pd_Size);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_retrieve_mapped_state(CMOCK_retrieve_mapped_state_CALL_INSTANCE* cmock_call_instance, struct pd_ctx* pd, int pd_Depth, unsigned int state);
+void CMockExpectParameters_retrieve_mapped_state(CMOCK_retrieve_mapped_state_CALL_INSTANCE* cmock_call_instance, struct pd_ctx* pd, int pd_Depth, unsigned int state)
+{
+  cmock_call_instance->Expected_pd = pd;
+  cmock_call_instance->Expected_pd_Depth = pd_Depth;
+  cmock_call_instance->IgnoreArg_pd = 0;
+  cmock_call_instance->ReturnThruPtr_pd_Used = 0;
+  cmock_call_instance->Expected_state = state;
+  cmock_call_instance->IgnoreArg_state = 0;
+}
+
+void retrieve_mapped_state_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_retrieve_mapped_state_CALL_INSTANCE));
+  CMOCK_retrieve_mapped_state_CALL_INSTANCE* cmock_call_instance = (CMOCK_retrieve_mapped_state_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.retrieve_mapped_state_CallInstance = CMock_Guts_MemChain(Mock.retrieve_mapped_state_CallInstance, cmock_guts_index);
+  Mock.retrieve_mapped_state_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.retrieve_mapped_state_IgnoreBool = (char)1;
+}
+
+void retrieve_mapped_state_CMockStopIgnore(void)
+{
+  if(Mock.retrieve_mapped_state_IgnoreBool)
+    Mock.retrieve_mapped_state_CallInstance = CMock_Guts_MemNext(Mock.retrieve_mapped_state_CallInstance);
+  Mock.retrieve_mapped_state_IgnoreBool = (char)0;
+}
+
+void retrieve_mapped_state_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_retrieve_mapped_state_CALL_INSTANCE));
+  CMOCK_retrieve_mapped_state_CALL_INSTANCE* cmock_call_instance = (CMOCK_retrieve_mapped_state_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.retrieve_mapped_state_CallInstance = CMock_Guts_MemChain(Mock.retrieve_mapped_state_CallInstance, cmock_guts_index);
+  Mock.retrieve_mapped_state_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void retrieve_mapped_state_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct pd_ctx* pd, unsigned int state, unsigned int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_retrieve_mapped_state_CALL_INSTANCE));
+  CMOCK_retrieve_mapped_state_CALL_INSTANCE* cmock_call_instance = (CMOCK_retrieve_mapped_state_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.retrieve_mapped_state_CallInstance = CMock_Guts_MemChain(Mock.retrieve_mapped_state_CallInstance, cmock_guts_index);
+  Mock.retrieve_mapped_state_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_retrieve_mapped_state(cmock_call_instance, pd, 1, state);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void retrieve_mapped_state_AddCallback(CMOCK_retrieve_mapped_state_CALLBACK Callback)
+{
+  Mock.retrieve_mapped_state_IgnoreBool = (char)0;
+  Mock.retrieve_mapped_state_CallbackBool = (char)1;
+  Mock.retrieve_mapped_state_CallbackFunctionPointer = Callback;
+}
+
+void retrieve_mapped_state_Stub(CMOCK_retrieve_mapped_state_CALLBACK Callback)
+{
+  Mock.retrieve_mapped_state_IgnoreBool = (char)0;
+  Mock.retrieve_mapped_state_CallbackBool = (char)0;
+  Mock.retrieve_mapped_state_CallbackFunctionPointer = Callback;
+}
+
+void retrieve_mapped_state_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, struct pd_ctx* pd, int pd_Depth, unsigned int state, unsigned int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_retrieve_mapped_state_CALL_INSTANCE));
+  CMOCK_retrieve_mapped_state_CALL_INSTANCE* cmock_call_instance = (CMOCK_retrieve_mapped_state_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.retrieve_mapped_state_CallInstance = CMock_Guts_MemChain(Mock.retrieve_mapped_state_CallInstance, cmock_guts_index);
+  Mock.retrieve_mapped_state_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_retrieve_mapped_state(cmock_call_instance, pd, pd_Depth, state);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void retrieve_mapped_state_CMockReturnMemThruPtr_pd(UNITY_LINE_TYPE cmock_line, struct pd_ctx* pd, size_t cmock_size)
+{
+  CMOCK_retrieve_mapped_state_CALL_INSTANCE* cmock_call_instance = (CMOCK_retrieve_mapped_state_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.retrieve_mapped_state_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_pd_Used = 1;
+  cmock_call_instance->ReturnThruPtr_pd_Val = pd;
+  cmock_call_instance->ReturnThruPtr_pd_Size = cmock_size;
+}
+
+void retrieve_mapped_state_CMockIgnoreArg_pd(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_retrieve_mapped_state_CALL_INSTANCE* cmock_call_instance = (CMOCK_retrieve_mapped_state_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.retrieve_mapped_state_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_pd = 1;
+}
+
+void retrieve_mapped_state_CMockIgnoreArg_state(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_retrieve_mapped_state_CALL_INSTANCE* cmock_call_instance = (CMOCK_retrieve_mapped_state_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.retrieve_mapped_state_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_state = 1;
 }
 
 unsigned int get_level_state_from_composite_state(const uint32_t* table, uint32_t composite_state, int level)

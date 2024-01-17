@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -112,6 +112,7 @@ int initiate_power_state_transition(struct pd_ctx *pd)
 {
     int status;
     unsigned int state = pd->requested_state;
+    unsigned int mapped_state;
 
     if ((pd->driver_api->deny != NULL) &&
         pd->driver_api->deny(pd->driver_id, state)) {
@@ -124,17 +125,20 @@ int initiate_power_state_transition(struct pd_ctx *pd)
         return FWK_E_DEVICE;
     }
 
-    status = pd->driver_api->set_state(pd->driver_id, state);
+    mapped_state = retrieve_mapped_state(pd, state);
+    status = pd->driver_api->set_state(pd->driver_id, mapped_state);
 
-#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_DEBUG
     if (status == FWK_SUCCESS) {
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_DEBUG
         FWK_LOG_DEBUG(
             "[PD] Transition of %s from <%s> to <%s> succeeded",
             fwk_module_get_element_name(pd->id),
             get_state_name(pd, pd->state_requested_to_driver),
             get_state_name(pd, state));
-    }
 #endif
+        pd->driver_state = mapped_state;
+        pd->state_requested_to_driver = state;
+    }
 
 #if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
     if (status != FWK_SUCCESS) {
@@ -146,10 +150,6 @@ int initiate_power_state_transition(struct pd_ctx *pd)
             fwk_status_str(status));
     }
 #endif
-
-    if (status == FWK_SUCCESS) {
-        pd->state_requested_to_driver = state;
-    }
 
     return status;
 }
@@ -592,7 +592,6 @@ static void process_power_state_transition_report(
     struct pd_ctx *pd,
     const struct pd_power_state_transition_report *report_params)
 {
-    unsigned int new_state = report_params->state;
     unsigned int previous_state;
 #ifdef BUILD_HAS_NOTIFICATION
     struct fwk_event notification_event = {
@@ -604,12 +603,19 @@ static void process_power_state_transition_report(
 #endif
     int status;
 
-    if (new_state == pd->requested_state) {
+    unsigned int new_state = report_params->state;
+
+    if (new_state == pd->driver_state) {
         send_pd_set_state_delayed_response(pd, FWK_SUCCESS);
     }
 
     previous_state = pd->current_state;
-    pd->current_state = new_state;
+    /*
+     * This must be updated with the requested state,
+     * not the received state, to compensate for the
+     * possible state mapping that may have occured.
+     */
+    pd->current_state = pd->requested_state;
 
 #ifdef BUILD_HAS_NOTIFICATION
     if (pd->power_state_transition_notification_ctx.pending_responses == 0 &&

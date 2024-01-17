@@ -256,6 +256,28 @@ void number_of_bits_to_shift_Stub(CMOCK_number_of_bits_to_shift_CALLBACK Callbac
 #define number_of_bits_to_shift_StubWithCallback number_of_bits_to_shift_Stub
 #define number_of_bits_to_shift_IgnoreArg_mask() number_of_bits_to_shift_CMockIgnoreArg_mask(__LINE__)
 void number_of_bits_to_shift_CMockIgnoreArg_mask(UNITY_LINE_TYPE cmock_line);
+#define retrieve_mapped_state_IgnoreAndReturn(cmock_retval) retrieve_mapped_state_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void retrieve_mapped_state_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int cmock_to_return);
+#define retrieve_mapped_state_StopIgnore() retrieve_mapped_state_CMockStopIgnore()
+void retrieve_mapped_state_CMockStopIgnore(void);
+#define retrieve_mapped_state_ExpectAnyArgsAndReturn(cmock_retval) retrieve_mapped_state_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
+void retrieve_mapped_state_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int cmock_to_return);
+#define retrieve_mapped_state_ExpectAndReturn(pd, state, cmock_retval) retrieve_mapped_state_CMockExpectAndReturn(__LINE__, pd, state, cmock_retval)
+void retrieve_mapped_state_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct pd_ctx* pd, unsigned int state, unsigned int cmock_to_return);
+typedef unsigned int (* CMOCK_retrieve_mapped_state_CALLBACK)(struct pd_ctx* pd, unsigned int state, int cmock_num_calls);
+void retrieve_mapped_state_AddCallback(CMOCK_retrieve_mapped_state_CALLBACK Callback);
+void retrieve_mapped_state_Stub(CMOCK_retrieve_mapped_state_CALLBACK Callback);
+#define retrieve_mapped_state_StubWithCallback retrieve_mapped_state_Stub
+#define retrieve_mapped_state_ExpectWithArrayAndReturn(pd, pd_Depth, state, cmock_retval) retrieve_mapped_state_CMockExpectWithArrayAndReturn(__LINE__, pd, pd_Depth, state, cmock_retval)
+void retrieve_mapped_state_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, struct pd_ctx* pd, int pd_Depth, unsigned int state, unsigned int cmock_to_return);
+#define retrieve_mapped_state_ReturnThruPtr_pd(pd) retrieve_mapped_state_CMockReturnMemThruPtr_pd(__LINE__, pd, sizeof(struct pd_ctx))
+#define retrieve_mapped_state_ReturnArrayThruPtr_pd(pd, cmock_len) retrieve_mapped_state_CMockReturnMemThruPtr_pd(__LINE__, pd, cmock_len * sizeof(*pd))
+#define retrieve_mapped_state_ReturnMemThruPtr_pd(pd, cmock_size) retrieve_mapped_state_CMockReturnMemThruPtr_pd(__LINE__, pd, cmock_size)
+void retrieve_mapped_state_CMockReturnMemThruPtr_pd(UNITY_LINE_TYPE cmock_line, struct pd_ctx* pd, size_t cmock_size);
+#define retrieve_mapped_state_IgnoreArg_pd() retrieve_mapped_state_CMockIgnoreArg_pd(__LINE__)
+void retrieve_mapped_state_CMockIgnoreArg_pd(UNITY_LINE_TYPE cmock_line);
+#define retrieve_mapped_state_IgnoreArg_state() retrieve_mapped_state_CMockIgnoreArg_state(__LINE__)
+void retrieve_mapped_state_CMockIgnoreArg_state(UNITY_LINE_TYPE cmock_line);
 #define get_level_state_from_composite_state_IgnoreAndReturn(cmock_retval) get_level_state_from_composite_state_CMockIgnoreAndReturn(__LINE__, cmock_retval)
 void get_level_state_from_composite_state_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, unsigned int cmock_to_return);
 #define get_level_state_from_composite_state_StopIgnore() get_level_state_from_composite_state_CMockStopIgnore()

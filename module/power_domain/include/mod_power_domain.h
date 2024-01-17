@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -177,6 +177,9 @@ struct mod_power_domain_element_config {
 
     /*! Disable power domain transition notifications */
     bool disable_state_transition_notifications;
+
+    /* ! Optional mapping for the enum_mod_pd_state to the driver state */
+    const unsigned int *pd_state_mapping_table;
 };
 
 /*!
@@ -217,6 +220,15 @@ enum mod_pd_state {
     /*! \c SLEEP power state */
     MOD_PD_STATE_SLEEP,
 
+    /*! \c OFF0 power state */
+    MOD_PD_STATE_OFF_0,
+
+    /*! \c OFF1 power state */
+    MOD_PD_STATE_OFF_1,
+
+    /*! \c OFF2 power state */
+    MOD_PD_STATE_OFF_2,
+
     /*! Number of power states */
     MOD_PD_STATE_COUNT
 };
@@ -228,6 +240,9 @@ enum mod_pd_state_mask {
     MOD_PD_STATE_OFF_MASK = 1 << MOD_PD_STATE_OFF,
     MOD_PD_STATE_ON_MASK = 1 << MOD_PD_STATE_ON,
     MOD_PD_STATE_SLEEP_MASK = 1 << MOD_PD_STATE_SLEEP,
+    MOD_PD_STATE_OFF_0_MASK = 1 << MOD_PD_STATE_OFF_0,
+    MOD_PD_STATE_OFF_1_MASK = 1 << MOD_PD_STATE_OFF_1,
+    MOD_PD_STATE_OFF_2_MASK = 1 << MOD_PD_STATE_OFF_2,
 };
 
 /*!

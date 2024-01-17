@@ -140,6 +140,22 @@ void test_is_valid_state_with_invalid_state(void)
     TEST_ASSERT_EQUAL(false, status);
 }
 
+void test_is_valid_state_with_valid_off_state(void)
+{
+    struct pd_ctx *pd = &mod_pd_ctx_temp.pd_ctx_table[PD_IDX_CLUS0CORE0];
+
+    int status = is_valid_state(pd, MOD_PD_STATE_OFF_0);
+    TEST_ASSERT_EQUAL(true, status);
+}
+
+void test_is_valid_state_with_invalid_off_state(void)
+{
+    struct pd_ctx *pd = &mod_pd_ctx_temp.pd_ctx_table[PD_IDX_CLUSTER0];
+
+    int status = is_valid_state(pd, MOD_PD_STATE_OFF_0);
+    TEST_ASSERT_EQUAL(false, status);
+}
+
 void test_normalize_state(void)
 {
     /*
@@ -154,6 +170,15 @@ void test_normalize_state(void)
     TEST_ASSERT_EQUAL(MOD_PD_STATE_ON, state);
 
     state = normalize_state(MOD_PD_STATE_OFF);
+    TEST_ASSERT_EQUAL((MOD_PD_STATE_COUNT_MAX + 4), state);
+
+    state = normalize_state(MOD_PD_STATE_OFF_2);
+    TEST_ASSERT_EQUAL((MOD_PD_STATE_COUNT_MAX + 3), state);
+
+    state = normalize_state(MOD_PD_STATE_OFF_1);
+    TEST_ASSERT_EQUAL((MOD_PD_STATE_COUNT_MAX + 2), state);
+
+    state = normalize_state(MOD_PD_STATE_OFF_0);
     TEST_ASSERT_EQUAL((MOD_PD_STATE_COUNT_MAX + 1), state);
 }
 
@@ -254,7 +279,31 @@ void test_get_state_name_over_state(void)
     struct pd_ctx *pd = &mod_pd_ctx_temp.pd_ctx_table[PD_IDX_CLUSTER0];
     const char *name = get_state_name(pd, MOD_PD_STATE_COUNT);
 
-    TEST_ASSERT_EQUAL("3", name);
+    TEST_ASSERT_EQUAL("6", name);
+}
+
+void test_get_state_name_off_0(void)
+{
+    struct pd_ctx *pd = &mod_pd_ctx_temp.pd_ctx_table[PD_IDX_CLUSTER0];
+    const char *name = get_state_name(pd, MOD_PD_STATE_OFF_0);
+
+    TEST_ASSERT_EQUAL("OFF0", name);
+}
+
+void test_get_state_name_off_1(void)
+{
+    struct pd_ctx *pd = &mod_pd_ctx_temp.pd_ctx_table[PD_IDX_CLUSTER0];
+    const char *name = get_state_name(pd, MOD_PD_STATE_OFF_1);
+
+    TEST_ASSERT_EQUAL("OFF1", name);
+}
+
+void test_get_state_name_off_2(void)
+{
+    struct pd_ctx *pd = &mod_pd_ctx_temp.pd_ctx_table[PD_IDX_CLUSTER0];
+    const char *name = get_state_name(pd, MOD_PD_STATE_OFF_2);
+
+    TEST_ASSERT_EQUAL("OFF2", name);
 }
 
 void test_num_bits_to_shift(void)
@@ -465,11 +514,52 @@ void test_is_allowed_by_parent_and_children_denied(void)
     TEST_ASSERT_EQUAL(false, valid);
 }
 
+void test_retrieve_mapped_state_cluster(void)
+{
+    unsigned int state;
+    struct pd_ctx *pd = &mod_pd_ctx_temp.pd_ctx_table[PD_IDX_CLUSTER0];
+
+    state = retrieve_mapped_state(pd, MOD_PD_STATE_OFF);
+    TEST_ASSERT_EQUAL(MOD_PD_STATE_OFF, state);
+
+    state = retrieve_mapped_state(pd, MOD_PD_STATE_ON);
+    TEST_ASSERT_EQUAL(MOD_PD_STATE_ON, state);
+
+    state = retrieve_mapped_state(pd, MOD_PD_STATE_SLEEP);
+    TEST_ASSERT_EQUAL(MOD_PD_STATE_SLEEP, state);
+}
+
+void test_retrieve_mapped_state_core(void)
+{
+    unsigned int state;
+    struct pd_ctx *pd = &mod_pd_ctx_temp.pd_ctx_table[PD_IDX_CLUS0CORE0];
+
+    state = retrieve_mapped_state(pd, MOD_PD_STATE_OFF);
+    TEST_ASSERT_EQUAL(MOD_PD_STATE_OFF, state);
+
+    state = retrieve_mapped_state(pd, MOD_PD_STATE_ON);
+    TEST_ASSERT_EQUAL(MOD_PD_STATE_ON, state);
+
+    state = retrieve_mapped_state(pd, MOD_PD_STATE_SLEEP);
+    TEST_ASSERT_EQUAL(MOD_PD_STATE_SLEEP, state);
+
+    state = retrieve_mapped_state(pd, MOD_PD_STATE_OFF_0);
+    TEST_ASSERT_EQUAL(MOD_PD_STATE_SLEEP, state);
+
+    state = retrieve_mapped_state(pd, MOD_PD_STATE_OFF_1);
+    TEST_ASSERT_EQUAL(MOD_PD_STATE_SLEEP, state);
+
+    state = retrieve_mapped_state(pd, MOD_PD_STATE_OFF_2);
+    TEST_ASSERT_EQUAL(MOD_PD_STATE_SLEEP, state);
+}
+
 int power_domain_state_checks_test_main(void)
 {
     UNITY_BEGIN();
     RUN_TEST(test_is_valid_state_with_valid_state);
+    RUN_TEST(test_is_valid_state_with_valid_off_state);
     RUN_TEST(test_is_valid_state_with_invalid_state);
+    RUN_TEST(test_is_valid_state_with_invalid_off_state);
     RUN_TEST(test_normalize_state);
     RUN_TEST(test_is_deeper_state);
     RUN_TEST(test_is_shallower_state);
@@ -481,6 +571,9 @@ int power_domain_state_checks_test_main(void)
     RUN_TEST(test_get_state_name_on);
     RUN_TEST(test_get_state_name_sleep);
     RUN_TEST(test_get_state_name_over_state);
+    RUN_TEST(test_get_state_name_off_0);
+    RUN_TEST(test_get_state_name_off_1);
+    RUN_TEST(test_get_state_name_off_2);
     RUN_TEST(test_num_bits_to_shift);
     RUN_TEST(test_get_level_state_from_comp_state_on);
     RUN_TEST(test_get_level_state_from_comp_state_off);
@@ -495,6 +588,8 @@ int power_domain_state_checks_test_main(void)
     RUN_TEST(test_is_upwards_transition_propagation_no_cs_false);
     RUN_TEST(test_is_allowed_by_parent_and_children_permitted);
     RUN_TEST(test_is_allowed_by_parent_and_children_denied);
+    RUN_TEST(test_retrieve_mapped_state_cluster);
+    RUN_TEST(test_retrieve_mapped_state_core);
     return UNITY_END();
 }
 

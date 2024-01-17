@@ -4,7 +4,6 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-
 #include "scp_unity.h"
 #include "unity.h"
 
@@ -20,9 +19,9 @@
 #include <fwk_id.h>
 #include <fwk_macros.h>
 #include UNIT_TEST_SRC
-
-static const char *const default_state_name_table[] = { "OFF", "ON", "SLEEP" };
-
+static const char *const default_state_name_table[] = {
+    "OFF", "ON", "SLEEP", "OFF0", "OFF1", "OFF2"
+};
 static struct mod_pd_driver_api pd_driver = {
     .set_state = pd_driver_set_state,
     .deny = pd_driver_deny,
@@ -61,7 +60,6 @@ static void evaluate_valid_state_mask(void)
 static void construct_pd_relations(void)
 {
     pd_ctx[PD_IDX_SYSTOP].parent = NULL;
-
     fwk_list_push_tail(
         &pd_ctx[PD_IDX_SYSTOP].children_list,
         &pd_ctx[PD_IDX_CLUSTER0].child_node);
@@ -70,7 +68,6 @@ static void construct_pd_relations(void)
         &pd_ctx[PD_IDX_CLUSTER1].child_node);
     pd_ctx[PD_IDX_CLUSTER0].parent = &pd_ctx[PD_IDX_SYSTOP];
     pd_ctx[PD_IDX_CLUSTER1].parent = &pd_ctx[PD_IDX_SYSTOP];
-
     fwk_list_push_tail(
         &pd_ctx[PD_IDX_CLUSTER0].children_list,
         &pd_ctx[PD_IDX_CLUS0CORE0].child_node);
@@ -79,7 +76,6 @@ static void construct_pd_relations(void)
         &pd_ctx[PD_IDX_CLUS0CORE1].child_node);
     pd_ctx[PD_IDX_CLUS0CORE0].parent = &pd_ctx[PD_IDX_CLUSTER0];
     pd_ctx[PD_IDX_CLUS0CORE1].parent = &pd_ctx[PD_IDX_CLUSTER0];
-
     fwk_list_push_tail(
         &pd_ctx[PD_IDX_CLUSTER1].children_list,
         &pd_ctx[PD_IDX_CLUS1CORE0].child_node);
@@ -93,7 +89,6 @@ static void construct_pd_relations(void)
 void setUp(void)
 {
     memset(pd_ctx, 0, sizeof(pd_ctx));
-
     init_module_ctx();
     evaluate_valid_state_mask();
     construct_pd_relations();
@@ -153,7 +148,6 @@ void test_set_state_cluster_on_expect_transition_init(void)
     req_params->composite_state = MOD_PD_STATE_ON;
 
     fwk_notification_notify_IgnoreAndReturn(FWK_SUCCESS);
-
     is_upwards_transition_propagation_ExpectAndReturn(
         &pd_ctx[PD_IDX_CLUSTER0], req_params->composite_state, true);
     get_highest_level_from_composite_state_ExpectAndReturn(
@@ -163,6 +157,10 @@ void test_set_state_cluster_on_expect_transition_init(void)
         PD_IDX_CLUSTER0, MOD_PD_STATE_ON, false, FWK_SUCCESS);
     prepare_allow_tree(true, true, true);
     prepare_state_name(MOD_PD_STATE_ON);
+
+    retrieve_mapped_state_ExpectAndReturn(
+        &pd_ctx[PD_IDX_CLUSTER0], MOD_PD_STATE_ON, MOD_PD_STATE_ON);
+
     process_set_state_request(&pd_ctx[PD_IDX_CLUSTER0], &event, &resp_event);
 
     TEST_ASSERT_EQUAL(MOD_PD_STATE_ON, pd_ctx[PD_IDX_CLUSTER0].requested_state);
@@ -186,7 +184,6 @@ void test_set_state_core_on_while_cluster_off_expect_error_in_resp(void)
     pd_ctx[PD_IDX_CLUSTER0].cs_support = false;
 
     fwk_notification_notify_IgnoreAndReturn(FWK_SUCCESS);
-
     is_upwards_transition_propagation_ExpectAndReturn(
         &pd_ctx[PD_IDX_CLUSTER0], req_params->composite_state, true);
     get_highest_level_from_composite_state_ExpectAndReturn(
@@ -254,6 +251,9 @@ void test_set_state_failed_transition_while_driver_set(void)
     prepare_allow_tree(true, true, true);
     prepare_state_name(MOD_PD_STATE_ON);
 
+    retrieve_mapped_state_ExpectAndReturn(
+        &pd_ctx[PD_IDX_CLUSTER0], MOD_PD_STATE_ON, MOD_PD_STATE_ON);
+
     process_set_state_request(&pd_ctx[PD_IDX_CLUSTER0], &event, &resp_event);
     TEST_ASSERT_EQUAL(
         MOD_PD_STATE_OFF, pd_ctx[PD_IDX_CLUSTER0].requested_state);
@@ -274,9 +274,11 @@ void test_set_state_simple_core_wakup(void)
     pd_ctx[PD_IDX_CLUSTER0].requested_state = MOD_PD_STATE_ON;
     pd_ctx[PD_IDX_CLUSTER0].state_requested_to_driver = MOD_PD_STATE_ON;
     pd_ctx[PD_IDX_CLUSTER0].current_state = MOD_PD_STATE_ON;
-    pd_ctx[PD_IDX_CLUS0CORE0].requested_state = MOD_PD_STATE_OFF;
-    pd_ctx[PD_IDX_CLUS0CORE0].state_requested_to_driver = MOD_PD_STATE_OFF;
+    pd_ctx[PD_IDX_CLUSTER0].driver_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUS0CORE0].requested_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUS0CORE0].state_requested_to_driver = MOD_PD_STATE_ON;
     pd_ctx[PD_IDX_CLUS0CORE0].current_state = MOD_PD_STATE_OFF;
+    pd_ctx[PD_IDX_CLUS0CORE0].driver_state = MOD_PD_STATE_ON;
     req_params->composite_state = MOD_PD_STATE_OFF;
 
     report =
@@ -287,9 +289,7 @@ void test_set_state_simple_core_wakup(void)
                                 PD_EVENT_IDX_REPORT_POWER_STATE_TRANSITION) };
     report_params->state = MOD_PD_STATE_ON;
     fwk_notification_notify_IgnoreAndReturn(FWK_SUCCESS);
-
     pd_ctx[PD_IDX_CLUSTER0].cs_support = false;
-
     is_deeper_state_ExpectAnyArgsAndReturn(true);
     is_upwards_transition_propagation_ExpectAnyArgsAndReturn(true);
     get_highest_level_from_composite_state_ExpectAndReturn(
@@ -363,12 +363,15 @@ void test_request_core_cluster_off_while_another_core_is_on(void)
     pd_ctx[PD_IDX_CLUSTER0].requested_state = MOD_PD_STATE_ON;
     pd_ctx[PD_IDX_CLUSTER0].state_requested_to_driver = MOD_PD_STATE_ON;
     pd_ctx[PD_IDX_CLUSTER0].current_state = MOD_PD_STATE_ON;
-    pd_ctx[PD_IDX_CLUS0CORE0].requested_state = MOD_PD_STATE_ON;
-    pd_ctx[PD_IDX_CLUS0CORE0].state_requested_to_driver = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUSTER0].driver_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUS0CORE0].requested_state = MOD_PD_STATE_OFF;
+    pd_ctx[PD_IDX_CLUS0CORE0].state_requested_to_driver = MOD_PD_STATE_OFF;
+    pd_ctx[PD_IDX_CLUS0CORE0].driver_state = MOD_PD_STATE_OFF;
     pd_ctx[PD_IDX_CLUS0CORE0].current_state = MOD_PD_STATE_ON;
     pd_ctx[PD_IDX_CLUS0CORE1].requested_state = MOD_PD_STATE_ON;
     pd_ctx[PD_IDX_CLUS0CORE1].state_requested_to_driver = MOD_PD_STATE_ON;
     pd_ctx[PD_IDX_CLUS0CORE1].current_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUS0CORE1].driver_state = MOD_PD_STATE_ON;
     fwk_notification_notify_IgnoreAndReturn(FWK_SUCCESS);
 
     prepare_mocks_for_set_state_request(
@@ -383,6 +386,9 @@ void test_request_core_cluster_off_while_another_core_is_on(void)
     prepare_allow_tree(true, true, true);
     prepare_allow_tree(true, true, true);
     prepare_state_name(MOD_PD_STATE_ON);
+
+    retrieve_mapped_state_ExpectAndReturn(
+        &pd_ctx[PD_IDX_CLUS0CORE0], MOD_PD_STATE_OFF, MOD_PD_STATE_OFF);
 
     process_set_state_request(&pd_ctx[PD_IDX_CLUS0CORE0], &event, &resp_event);
     TEST_ASSERT_EQUAL(
@@ -411,6 +417,7 @@ void test_state_transition_report_core_on_while_transition_init(void)
     pd_ctx[PD_IDX_CLUS0CORE0].requested_state = MOD_PD_STATE_ON;
     pd_ctx[PD_IDX_CLUS0CORE0].state_requested_to_driver = MOD_PD_STATE_ON;
     pd_ctx[PD_IDX_CLUS0CORE0].current_state = MOD_PD_STATE_OFF;
+    pd_ctx[PD_IDX_CLUS0CORE0].driver_state = MOD_PD_STATE_ON;
     report = (struct fwk_event){
         .source_id = pd_ctx[PD_IDX_CLUS0CORE0].driver_id,
         .target_id = pd_ctx[PD_IDX_CLUS0CORE0].id,
@@ -441,9 +448,11 @@ void test_state_transition_cluster_on_expect_core_transition_init(void)
     pd_ctx[PD_IDX_CLUSTER0].requested_state = MOD_PD_STATE_ON;
     pd_ctx[PD_IDX_CLUSTER0].state_requested_to_driver = MOD_PD_STATE_ON;
     pd_ctx[PD_IDX_CLUSTER0].current_state = MOD_PD_STATE_OFF;
+    pd_ctx[PD_IDX_CLUSTER0].driver_state = MOD_PD_STATE_ON;
     pd_ctx[PD_IDX_CLUS0CORE0].requested_state = MOD_PD_STATE_ON;
     pd_ctx[PD_IDX_CLUS0CORE0].state_requested_to_driver = MOD_PD_STATE_OFF;
     pd_ctx[PD_IDX_CLUS0CORE0].current_state = MOD_PD_STATE_OFF;
+    pd_ctx[PD_IDX_CLUS0CORE0].driver_state = MOD_PD_STATE_OFF;
     report = (struct fwk_event){
         .source_id = pd_ctx[PD_IDX_CLUSTER0].driver_id,
         .target_id = pd_ctx[PD_IDX_CLUSTER0].id,
@@ -461,6 +470,9 @@ void test_state_transition_cluster_on_expect_core_transition_init(void)
     prepare_state_name(MOD_PD_STATE_ON);
     prepare_mocks_for_set_state_request(
         PD_IDX_CLUS0CORE0, MOD_PD_STATE_ON, false, FWK_SUCCESS);
+
+    retrieve_mapped_state_ExpectAndReturn(
+        &pd_ctx[PD_IDX_CLUS0CORE0], MOD_PD_STATE_ON, MOD_PD_STATE_ON);
 
     process_power_state_transition_report(
         &pd_ctx[PD_IDX_CLUSTER0], report_params);
@@ -499,6 +511,11 @@ void test_set_state_on_core_cluster_soc_expect_cluster_transition_init(void)
     prepare_allow_tree(true, true, true);
     prepare_state_name(MOD_PD_STATE_ON);
 
+    retrieve_mapped_state_ExpectAndReturn(
+        &pd_ctx[PD_IDX_CLUSTER0], MOD_PD_STATE_ON, MOD_PD_STATE_ON);
+    retrieve_mapped_state_ExpectAndReturn(
+        &pd_ctx[PD_IDX_CLUS0CORE0], MOD_PD_STATE_ON, MOD_PD_STATE_ON);
+
     process_set_state_request(&pd_ctx[PD_IDX_CLUS0CORE0], &event, &resp_event);
     TEST_ASSERT_EQUAL(MOD_PD_STATE_ON, pd_ctx[PD_IDX_CLUSTER0].requested_state);
     TEST_ASSERT_EQUAL(
@@ -507,7 +524,6 @@ void test_set_state_on_core_cluster_soc_expect_cluster_transition_init(void)
     TEST_ASSERT_EQUAL(MOD_PD_STATE_OFF, pd_ctx[PD_IDX_CLUSTER0].current_state);
     TEST_ASSERT_EQUAL(
         MOD_PD_STATE_ON, pd_ctx[PD_IDX_CLUS0CORE0].requested_state);
-
     /*
      *  Transition of CLUS0CORE0 is not initiated,
      *  it should wait for CLUSTER0 to be on.
@@ -527,6 +543,7 @@ void test_state_transition_report_cluster_on_while_transition_init(void)
     pd_ctx[PD_IDX_CLUSTER0].requested_state = MOD_PD_STATE_ON;
     pd_ctx[PD_IDX_CLUSTER0].state_requested_to_driver = MOD_PD_STATE_ON;
     pd_ctx[PD_IDX_CLUSTER0].current_state = MOD_PD_STATE_OFF;
+    pd_ctx[PD_IDX_CLUSTER0].driver_state = MOD_PD_STATE_ON;
     report = (struct fwk_event){
         .source_id = pd_ctx[PD_IDX_CLUSTER0].driver_id,
         .target_id = pd_ctx[PD_IDX_CLUSTER0].id,
@@ -544,6 +561,80 @@ void test_state_transition_report_cluster_on_while_transition_init(void)
     TEST_ASSERT_EQUAL(
         MOD_PD_STATE_ON, pd_ctx[PD_IDX_CLUSTER0].state_requested_to_driver);
     TEST_ASSERT_EQUAL(MOD_PD_STATE_ON, pd_ctx[PD_IDX_CLUSTER0].current_state);
+}
+
+void test_initiate_power_state_transition_not_core(void)
+{
+    int status;
+
+    pd_ctx[PD_IDX_CLUSTER0].requested_state = MOD_PD_STATE_ON;
+    prepare_mocks_for_set_state_request(
+        PD_IDX_CLUSTER0, MOD_PD_STATE_ON, false, FWK_SUCCESS);
+    prepare_state_name(MOD_PD_STATE_ON);
+
+    retrieve_mapped_state_ExpectAndReturn(
+        &pd_ctx[PD_IDX_CLUSTER0], MOD_PD_STATE_ON, MOD_PD_STATE_ON);
+
+    status = initiate_power_state_transition(&pd_ctx[PD_IDX_CLUSTER0]);
+
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+    TEST_ASSERT_EQUAL(
+        pd_ctx[PD_IDX_CLUSTER0].state_requested_to_driver, MOD_PD_STATE_ON);
+}
+
+void test_initiate_power_state_transition_core_original_state(void)
+{
+    int status;
+
+    pd_ctx[PD_IDX_CLUSTER0].requested_state = MOD_PD_STATE_ON;
+
+    prepare_mocks_for_set_state_request(
+        PD_IDX_CLUSTER0, MOD_PD_STATE_ON, false, FWK_SUCCESS);
+    prepare_state_name(MOD_PD_STATE_ON);
+
+    retrieve_mapped_state_ExpectAndReturn(
+        &pd_ctx[PD_IDX_CLUSTER0], MOD_PD_STATE_ON, MOD_PD_STATE_ON);
+
+    status = initiate_power_state_transition(&pd_ctx[PD_IDX_CLUSTER0]);
+
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+    TEST_ASSERT_EQUAL(
+        pd_ctx[PD_IDX_CLUSTER0].state_requested_to_driver, MOD_PD_STATE_ON);
+}
+
+void test_initiate_power_state_transition_core_new_state(void)
+{
+    int status;
+    unsigned int new_state;
+
+    pd_ctx[PD_IDX_CLUS0CORE0].requested_state = MOD_PD_STATE_OFF_0;
+
+    new_state = pd_ctx[PD_IDX_CLUS0CORE0]
+                    .config->pd_state_mapping_table[MOD_PD_STATE_OFF_0];
+
+    fwk_module_get_element_name_ExpectAndReturn(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_IDX_CLUS0CORE0),
+        pd_element_table[PD_IDX_CLUS0CORE0].name);
+
+    pd_driver_deny_ExpectAndReturn(
+        pd_ctx[PD_IDX_CLUS0CORE0].driver_id, MOD_PD_STATE_OFF_0, false);
+
+    pd_driver_set_state_ExpectAndReturn(
+        pd_ctx[PD_IDX_CLUS0CORE0].driver_id, new_state, FWK_SUCCESS);
+
+    prepare_state_name(MOD_PD_STATE_OFF_0);
+
+    retrieve_mapped_state_ExpectAndReturn(
+        &pd_ctx[PD_IDX_CLUS0CORE0], MOD_PD_STATE_OFF_0, MOD_PD_STATE_SLEEP);
+    retrieve_mapped_state_ExpectAndReturn(
+        &pd_ctx[PD_IDX_CLUS0CORE0], MOD_PD_STATE_OFF_0, MOD_PD_STATE_SLEEP);
+
+    status = initiate_power_state_transition(&pd_ctx[PD_IDX_CLUS0CORE0]);
+
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+    TEST_ASSERT_EQUAL(
+        pd_ctx[PD_IDX_CLUS0CORE0].state_requested_to_driver,
+        MOD_PD_STATE_OFF_0);
 }
 
 void test_pd_get_domain_type(void)
@@ -566,7 +657,6 @@ void test_pd_get_domain_parent_id(void)
     int status;
     fwk_id_t pd_id;
     fwk_id_t parent_pd_id;
-
     fwk_id_t local_id = pd_ctx[PD_IDX_CLUS0CORE0].parent->id;
 
     fwk_module_is_valid_element_id_ExpectAnyArgsAndReturn(true);
@@ -575,7 +665,6 @@ void test_pd_get_domain_parent_id(void)
     status = pd_get_domain_parent_id(pd_id, &parent_pd_id);
 
     TEST_ASSERT_EQUAL_MEMORY(&local_id, &parent_pd_id, sizeof(fwk_id_t));
-
     TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
 }
 
@@ -601,8 +690,8 @@ void test_process_get_state_request_no_cs(void)
 void test_process_get_state_request_cs(void)
 {
     unsigned int state;
-    pd_ctx[PD_IDX_CLUS0CORE0].cs_support = true;
 
+    pd_ctx[PD_IDX_CLUS0CORE0].cs_support = true;
     pd_ctx[PD_IDX_CLUS0CORE0].composite_state_levels_mask = MOD_PD_CS_STATE_MASK
         << MOD_PD_CS_LEVEL_SHIFT;
 
@@ -640,6 +729,9 @@ void test_initiate_power_state_transition(void)
         PD_IDX_CLUSTER0, MOD_PD_STATE_ON, false, FWK_SUCCESS);
     prepare_state_name(MOD_PD_STATE_ON);
 
+    retrieve_mapped_state_ExpectAndReturn(
+        &pd_ctx[PD_IDX_CLUSTER0], MOD_PD_STATE_ON, MOD_PD_STATE_ON);
+
     status = initiate_power_state_transition(&pd_ctx[PD_IDX_CLUSTER0]);
 
     TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
@@ -658,6 +750,9 @@ void test_initiate_power_state_transition_fail_param(void)
         PD_IDX_CLUSTER0, MOD_PD_STATE_ON, false, FWK_E_PARAM);
     prepare_state_name(MOD_PD_STATE_ON);
 
+    retrieve_mapped_state_ExpectAndReturn(
+        &pd_ctx[PD_IDX_CLUSTER0], MOD_PD_STATE_ON, MOD_PD_STATE_ON);
+
     status = initiate_power_state_transition(&pd_ctx[PD_IDX_CLUSTER0]);
 
     TEST_ASSERT_EQUAL(FWK_E_PARAM, status);
@@ -668,7 +763,8 @@ void test_initiate_power_state_transition_fail_param(void)
 void test_process_power_state_transition_report_deeper_state(void)
 {
     pd_ctx[PD_IDX_CLUSTER0].requested_state = MOD_PD_STATE_ON;
-    pd_ctx[PD_IDX_CLUSTER0].state_requested_to_driver = MOD_PD_STATE_OFF;
+    pd_ctx[PD_IDX_CLUSTER0].state_requested_to_driver = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUSTER0].driver_state = MOD_PD_STATE_ON;
 
     is_allowed_by_parent_and_children_ExpectAnyArgsAndReturn(true);
     initiate_power_state_pre_transition_notification_ExpectAnyArgsAndReturn(
@@ -677,6 +773,9 @@ void test_process_power_state_transition_report_deeper_state(void)
     prepare_mocks_for_set_state_request(
         PD_IDX_CLUSTER0, MOD_PD_STATE_ON, false, FWK_SUCCESS);
     prepare_state_name(MOD_PD_STATE_ON);
+
+    retrieve_mapped_state_ExpectAndReturn(
+        &pd_ctx[PD_IDX_CLUSTER0], MOD_PD_STATE_ON, MOD_PD_STATE_ON);
 
     process_power_state_transition_report_deeper_state(
         &pd_ctx[PD_IDX_CLUS0CORE0]);
@@ -687,7 +786,8 @@ void test_process_power_state_transition_report_deeper_state(void)
 void test_process_power_state_transition_report_shallower_state(void)
 {
     pd_ctx[PD_IDX_CLUS0CORE0].requested_state = MOD_PD_STATE_ON;
-    pd_ctx[PD_IDX_CLUS0CORE0].state_requested_to_driver = MOD_PD_STATE_OFF;
+    pd_ctx[PD_IDX_CLUS0CORE0].state_requested_to_driver = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUS0CORE0].driver_state = MOD_PD_STATE_ON;
 
     is_allowed_by_parent_and_children_ExpectAnyArgsAndReturn(true);
     initiate_power_state_pre_transition_notification_ExpectAnyArgsAndReturn(
@@ -696,6 +796,9 @@ void test_process_power_state_transition_report_shallower_state(void)
     prepare_mocks_for_set_state_request(
         PD_IDX_CLUS0CORE0, MOD_PD_STATE_ON, false, FWK_SUCCESS);
     prepare_state_name(MOD_PD_STATE_ON);
+
+    retrieve_mapped_state_ExpectAndReturn(
+        &pd_ctx[PD_IDX_CLUS0CORE0], MOD_PD_STATE_ON, MOD_PD_STATE_ON);
 
     process_power_state_transition_report_shallower_state(
         &pd_ctx[PD_IDX_CLUSTER0]);
@@ -762,6 +865,9 @@ int power_domain_test_main(void)
     RUN_TEST(test_state_transition_cluster_on_expect_core_transition_init);
     RUN_TEST(test_set_state_on_core_cluster_soc_expect_cluster_transition_init);
     RUN_TEST(test_state_transition_report_cluster_on_while_transition_init);
+    RUN_TEST(test_initiate_power_state_transition_not_core);
+    RUN_TEST(test_initiate_power_state_transition_core_new_state);
+    RUN_TEST(test_initiate_power_state_transition_core_original_state);
     RUN_TEST(test_pd_get_domain_type);
     RUN_TEST(test_pd_get_domain_parent_id);
     RUN_TEST(test_pd_get_domain_parent_id_null_param);

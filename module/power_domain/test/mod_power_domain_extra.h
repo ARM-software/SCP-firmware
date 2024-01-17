@@ -50,6 +50,8 @@ const char *get_state_name(const struct pd_ctx *pd, unsigned int state);
 
 unsigned int number_of_bits_to_shift(uint32_t mask);
 
+unsigned int retrieve_mapped_state(struct pd_ctx *pd, unsigned int state);
+
 unsigned int get_level_state_from_composite_state(
     const uint32_t *table,
     uint32_t composite_state,

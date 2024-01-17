@@ -30,6 +30,15 @@ enum pd_idx {
     PD_IDX_NONE = UINT32_MAX
 };
 
+static const unsigned int pd_core_state_mapping[] = {
+    [MOD_PD_STATE_OFF] = MOD_PD_STATE_OFF,
+    [MOD_PD_STATE_ON] = MOD_PD_STATE_ON,
+    [MOD_PD_STATE_SLEEP] = MOD_PD_STATE_SLEEP,
+    [MOD_PD_STATE_OFF_0] = MOD_PD_STATE_SLEEP,
+    [MOD_PD_STATE_OFF_1] = MOD_PD_STATE_SLEEP,
+    [MOD_PD_STATE_OFF_2] = MOD_PD_STATE_SLEEP,
+};
+
 /* Mask of the core composite states */
 const uint32_t core_composite_state_mask_table_UT[] = {
     MOD_PD_CS_STATE_MASK << MOD_PD_CS_LEVEL_0_STATE_SHIFT,
@@ -39,11 +48,23 @@ const uint32_t core_composite_state_mask_table_UT[] = {
 };
 
 /* Mask of the allowed states for a core depending on the cluster states. */
-static const uint32_t core_pd_allowed_state_mask_table[3] = {
+static const uint32_t core_pd_allowed_state_mask_table[6] = {
     [MOD_PD_STATE_OFF] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_SLEEP_MASK,
-    [MOD_PD_STATE_ON] =
-        MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_SLEEP_MASK | MOD_PD_STATE_ON_MASK,
-    [MOD_PD_STATE_SLEEP] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_SLEEP_MASK,
+    [MOD_PD_STATE_ON] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_SLEEP_MASK |
+        MOD_PD_STATE_ON_MASK | MOD_PD_STATE_OFF_0_MASK |
+        MOD_PD_STATE_OFF_1_MASK | MOD_PD_STATE_OFF_2_MASK,
+    [MOD_PD_STATE_SLEEP] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_SLEEP_MASK |
+        MOD_PD_STATE_OFF_0_MASK | MOD_PD_STATE_OFF_1_MASK |
+        MOD_PD_STATE_OFF_2_MASK,
+    [MOD_PD_STATE_OFF_0] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_SLEEP_MASK |
+        MOD_PD_STATE_ON_MASK | MOD_PD_STATE_OFF_0_MASK |
+        MOD_PD_STATE_OFF_1_MASK | MOD_PD_STATE_OFF_2_MASK,
+    [MOD_PD_STATE_OFF_1] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_SLEEP_MASK |
+        MOD_PD_STATE_ON_MASK | MOD_PD_STATE_OFF_0_MASK |
+        MOD_PD_STATE_OFF_1_MASK | MOD_PD_STATE_OFF_2_MASK,
+    [MOD_PD_STATE_OFF_2] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_SLEEP_MASK |
+        MOD_PD_STATE_ON_MASK | MOD_PD_STATE_OFF_0_MASK |
+        MOD_PD_STATE_OFF_1_MASK | MOD_PD_STATE_OFF_2_MASK,
 };
 
 /*
@@ -69,6 +90,7 @@ static const struct fwk_element pd_element_table[PD_IDX_COUNT] = {
             .allowed_state_mask_table = core_pd_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table),
+            .pd_state_mapping_table = pd_core_state_mapping,
         }),
     },
     [PD_IDX_CLUS0CORE1] = {
@@ -79,6 +101,7 @@ static const struct fwk_element pd_element_table[PD_IDX_COUNT] = {
             .allowed_state_mask_table = core_pd_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table),
+            .pd_state_mapping_table = pd_core_state_mapping,
         }),
     },
     [PD_IDX_CLUSTER0] = {
@@ -99,6 +122,7 @@ static const struct fwk_element pd_element_table[PD_IDX_COUNT] = {
             .allowed_state_mask_table = core_pd_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table),
+            .pd_state_mapping_table = pd_core_state_mapping,
         }),
     },
     [PD_IDX_CLUS1CORE1] = {
@@ -109,6 +133,7 @@ static const struct fwk_element pd_element_table[PD_IDX_COUNT] = {
             .allowed_state_mask_table = core_pd_allowed_state_mask_table,
             .allowed_state_mask_table_size =
                 FWK_ARRAY_SIZE(core_pd_allowed_state_mask_table),
+            .pd_state_mapping_table = pd_core_state_mapping,
         }),
     },
     [PD_IDX_CLUSTER1] = {
