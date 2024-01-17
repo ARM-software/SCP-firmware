@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -279,6 +279,18 @@ struct mod_sensor_info {
      *      ```
      */
     int unit_multiplier;
+
+    /*!
+     * \brief Boolean flag to indicate whether a sensor is
+     *        enabled or disabled.
+     *
+     * \details Set this to false to indicate that a sensor starts
+     *          enabled or true to indicate that it starts disabled.
+     *          The flag is updated dynamically when SCMI commands
+     *          are received to enable or disable a sensor.
+     */
+    bool disabled;
+
 #ifdef BUILD_HAS_SENSOR_EXT_ATTRIBS
     /*! Extended attributes information */
     bool ext_attributes;

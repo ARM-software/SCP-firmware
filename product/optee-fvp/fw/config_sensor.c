@@ -1,6 +1,7 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -22,6 +23,7 @@ static struct mod_sensor_info info_soc_temperature = {
     .update_interval = 0,
     .update_interval_multiplier = 0,
     .unit_multiplier = -3,
+    .disabled = false,
 };
 
 static const struct fwk_element reg_sensor_element_table[] = {

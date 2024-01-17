@@ -1,6 +1,6 @@
 /*
  * Renesas SCP/MCP Software
- * Copyright (c) 2020-2021, Renesas Electronics Corporation. All rights
+ * Copyright (c) 2020-2024, Renesas Electronics Corporation. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -26,6 +26,7 @@ static struct mod_sensor_info info_soc_temperature = {
     .update_interval = 0,
     .update_interval_multiplier = 0,
     .unit_multiplier = -3,
+    .disabled = false,
 };
 
 static const struct fwk_element reg_sensor_element_table[] = {

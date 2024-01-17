@@ -49,6 +49,22 @@ static int sensor_driver_get_info(fwk_id_t id, struct mod_sensor_info *info)
     return FWK_SUCCESS;
 }
 
+static int sensor_driver_get_info_enabled(
+    fwk_id_t id,
+    struct mod_sensor_info *info)
+{
+    info->disabled = false;
+    return FWK_SUCCESS;
+}
+
+static int sensor_driver_get_info_disabled(
+    fwk_id_t id,
+    struct mod_sensor_info *info)
+{
+    info->disabled = true;
+    return FWK_SUCCESS;
+}
+
 static int sensor_driver_get_value_error(fwk_id_t id, mod_sensor_value_t *value)
 {
     return FWK_E_PARAM;
@@ -153,6 +169,8 @@ void utest_sensor_dev_init_zero_trip_point_count(void)
 
     fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
 
+    ctx_table[SENSOR_FAKE_INDEX_0].driver_api = &sensor_driver_api;
+
     ctx_table[SENSOR_FAKE_INDEX_0].last_read.status = FWK_SUCCESS;
 
     status = sensor_dev_init(
@@ -171,6 +189,8 @@ void utest_sensor_dev_init_non_zero_trip_point_count(void)
         FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_1);
 
     struct sensor_trip_point_ctx trip_point_context[SENSOR_TRIP_POINT_COUNT];
+
+    ctx_table[SENSOR_FAKE_INDEX_1].driver_api = &sensor_driver_api;
 
     fwk_mm_calloc_ExpectAndReturn(
         1, sizeof(struct sensor_trip_point_ctx), (void *)trip_point_context);
@@ -597,7 +617,7 @@ void memcpy_callback(
 
 void utest_sensor_get_data_not_valid(void)
 {
-    int status = FWK_SUCCESS;
+    int status;
 
     fwk_id_t elem_id =
         FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
@@ -607,9 +627,33 @@ void utest_sensor_get_data_not_valid(void)
     TEST_ASSERT_EQUAL(status, FWK_E_PARAM);
 }
 
+void utest_sensor_get_data_sensor_disabled(void)
+{
+    int status;
+
+    struct mod_sensor_data returned_data;
+
+    memset(&returned_data, 0, sizeof(returned_data));
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    ctx_table[SENSOR_FAKE_INDEX_0].driver_api = &sensor_driver_api;
+
+    sensor_driver_api.get_info = sensor_driver_get_info_disabled;
+
+    fwk_id_is_type_ExpectAndReturn(elem_id, FWK_ID_TYPE_ELEMENT, true);
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+
+    status = get_data(elem_id, &returned_data);
+
+    TEST_ASSERT_EQUAL(status, FWK_E_SUPPORT);
+}
+
 void utest_sensor_get_data_valid_dequeue(void)
 {
-    int status = FWK_SUCCESS;
+    int status;
 
     struct mod_sensor_data initial_data;
     struct mod_sensor_data returned_data;
@@ -622,9 +666,15 @@ void utest_sensor_get_data_valid_dequeue(void)
 
     ctx_table[SENSOR_FAKE_INDEX_0].concurrency_readings.dequeuing = true;
     ctx_table[SENSOR_FAKE_INDEX_0].last_read = initial_data;
+    ctx_table[SENSOR_FAKE_INDEX_0].driver_api = &sensor_driver_api;
+
+    sensor_driver_api.get_info = sensor_driver_get_info_enabled;
 
     fwk_id_t elem_id =
         FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    fwk_id_is_type_ExpectAndReturn(elem_id, FWK_ID_TYPE_ELEMENT, true);
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
 
     fwk_str_memcpy_StubWithCallback(memcpy_callback);
     fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
@@ -633,12 +683,13 @@ void utest_sensor_get_data_valid_dequeue(void)
 
     TEST_ASSERT_EQUAL(returned_data.value, FAKE_RETURN_VALUE);
     TEST_ASSERT_EQUAL(returned_data.status, FWK_SUCCESS);
+
     TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
 }
 
 void utest_sensor_get_data_valid_call_zero_pending_requests(void)
 {
-    int status = FWK_SUCCESS;
+    int status;
 
     struct mod_sensor_data initial_data;
     struct mod_sensor_data returned_data;
@@ -655,10 +706,17 @@ void utest_sensor_get_data_valid_call_zero_pending_requests(void)
     ctx_table[SENSOR_FAKE_INDEX_0].concurrency_readings.dequeuing = false;
     ctx_table[SENSOR_FAKE_INDEX_0].last_read = initial_data;
 
+    ctx_table[SENSOR_FAKE_INDEX_0].driver_api = &sensor_driver_api;
+
+    sensor_driver_api.get_info = sensor_driver_get_info_enabled;
+
     ctx_table[SENSOR_FAKE_INDEX_0].concurrency_readings.pending_requests = 0;
 
     fwk_id_t elem_id =
         FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    fwk_id_is_type_ExpectAndReturn(elem_id, FWK_ID_TYPE_ELEMENT, true);
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
 
     fwk_str_memcpy_StubWithCallback(memcpy_callback);
     fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
@@ -668,12 +726,13 @@ void utest_sensor_get_data_valid_call_zero_pending_requests(void)
     TEST_ASSERT_EQUAL(returned_data.value, FAKE_RETURN_VALUE);
     TEST_ASSERT_EQUAL(returned_data.status, FWK_SUCCESS);
     TEST_ASSERT_EQUAL(ctx_table->last_read.status, FWK_SUCCESS);
+
     TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
 }
 
 void utest_sensor_get_info_get_ctx_if_valid_call_returns_error(void)
 {
-    int status = FWK_SUCCESS;
+    int status;
 
     fwk_id_t elem_id =
         FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
@@ -861,6 +920,7 @@ int sensor_test_main(void)
     RUN_TEST(utest_sensor_process_event_rd_cmplt_del_rsp_put_evt_success);
 
     RUN_TEST(utest_sensor_get_data_not_valid);
+    RUN_TEST(utest_sensor_get_data_sensor_disabled);
     RUN_TEST(utest_sensor_get_data_valid_dequeue);
     RUN_TEST(utest_sensor_get_data_valid_call_zero_pending_requests);
 

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -131,12 +131,38 @@ static void trip_point_process(fwk_id_t id, struct mod_sensor_data *data)
 }
 #endif
 
+static int is_sensor_enabled(fwk_id_t id, bool *sensor_is_enabled)
+{
+    int status;
+
+    if (fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
+        struct mod_sensor_complete_info complete_info;
+        struct sensor_dev_ctx *ctx;
+
+        ctx = &ctx_table[fwk_id_get_element_idx(id)];
+
+        status = ctx->driver_api->get_info(
+            ctx->config->driver_id, &(complete_info.hal_info));
+
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+
+        *sensor_is_enabled = !complete_info.hal_info.disabled;
+
+        return FWK_SUCCESS;
+    }
+
+    return FWK_E_PARAM;
+}
+
 /*
  * Module API
  */
 static int get_data(fwk_id_t id, struct mod_sensor_data *data)
 {
     int status;
+    bool sensor_enabled;
     struct sensor_dev_ctx *ctx;
     struct fwk_event req;
     struct mod_sensor_event_params *event_params =
@@ -145,6 +171,15 @@ static int get_data(fwk_id_t id, struct mod_sensor_data *data)
     status = get_ctx_if_valid_call(id, data, &ctx);
     if (status != FWK_SUCCESS) {
         return status;
+    }
+
+    status = is_sensor_enabled(id, &sensor_enabled);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    if (!sensor_enabled) {
+        return FWK_E_SUPPORT;
     }
 
     if (ctx->concurrency_readings.dequeuing) {
@@ -453,6 +488,7 @@ static int sensor_bind(fwk_id_t id, unsigned int round)
 
     return FWK_SUCCESS;
 }
+
 #ifdef BUILD_HAS_SENSOR_MULTI_AXIS
 int sensor_start(fwk_id_t id)
 {
@@ -465,6 +501,7 @@ int sensor_start(fwk_id_t id)
     if (status != FWK_SUCCESS) {
         return status;
     }
+
     return FWK_SUCCESS;
 }
 #endif

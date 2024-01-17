@@ -31,6 +31,21 @@
 
 #include <config_sensor.h>
 
+static int sensor_driver_get_value(fwk_id_t id, mod_sensor_value_t *value)
+{
+    return FWK_SUCCESS;
+}
+
+static int sensor_driver_get_info(fwk_id_t id, struct mod_sensor_info *info)
+{
+    return FWK_SUCCESS;
+}
+
+static struct mod_sensor_driver_api sensor_driver_api = {
+    .get_value = sensor_driver_get_value,
+    .get_info = sensor_driver_get_info,
+};
+
 void setUp(void)
 {
     ctx_table = sensor_dev_context;
@@ -73,6 +88,8 @@ void utest_sensor_start_element_id(void)
     fwk_id_t elem_id =
         FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_1);
 
+    ctx_table[SENSOR_FAKE_INDEX_1].driver_api = &sensor_driver_api;
+
     fwk_id_is_type_ExpectAndReturn(elem_id, FWK_ID_TYPE_MODULE, false);
 
     sensor_axis_start_ExpectAndReturn(elem_id, FWK_SUCCESS);
@@ -88,6 +105,8 @@ void utest_sensor_start_element_id_sensor_axis_start_returns_error(void)
 
     fwk_id_t elem_id =
         FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_1);
+
+    ctx_table[SENSOR_FAKE_INDEX_1].driver_api = &sensor_driver_api;
 
     fwk_id_is_type_ExpectAndReturn(elem_id, FWK_ID_TYPE_MODULE, false);
 
@@ -107,8 +126,11 @@ void utest_sensor_dev_init_success(void)
 
     struct sensor_trip_point_ctx trip_point_context[SENSOR_TRIP_POINT_COUNT];
 
+    ctx_table[SENSOR_FAKE_INDEX_1].driver_api = &sensor_driver_api;
+
     fwk_mm_calloc_ExpectAndReturn(
         1, sizeof(struct sensor_trip_point_ctx), (void *)trip_point_context);
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_1);
     fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_1);
 
     sensor_timestamp_dev_init_ExpectAndReturn(
@@ -131,8 +153,11 @@ void utest_sensor_dev_init_failure(void)
 
     struct sensor_trip_point_ctx trip_point_context[SENSOR_TRIP_POINT_COUNT];
 
+    ctx_table[SENSOR_FAKE_INDEX_1].driver_api = &sensor_driver_api;
+
     fwk_mm_calloc_ExpectAndReturn(
         1, sizeof(struct sensor_trip_point_ctx), (void *)trip_point_context);
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_1);
     fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_1);
 
     sensor_timestamp_dev_init_ExpectAndReturn(
