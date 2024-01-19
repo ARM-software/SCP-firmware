@@ -1,0 +1,19 @@
+#
+# Arm SCP/MCP Software
+# Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+.scmi-test:
+  image: ${CI_REGISTRY_IMAGE}/scmi-tester-amd64
+  tags:
+    - amd64
+  variables:
+    SCP_CI_PLATFORMS: "sgm776"
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_DEPTH: 1
+  before_script:
+    - ln -s $(pwd) /scp
+  script:
+    - /scmi_tester_entrypoint.sh

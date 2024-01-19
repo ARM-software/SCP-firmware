@@ -10,12 +10,14 @@ stages:
   - static-analysis
   - unit-testing
   - build
+  - scmi-test
 
 include:
   - local: .gitlab/templates/linting.yml
   - local: .gitlab/templates/static-analysis.yml
   - local: .gitlab/templates/unit-test.yml
   - local: .gitlab/templates/build-test.yml
+  - local: .gitlab/templates/scmi-test.yml
 
 check-lint:
   extends: .check-lint
@@ -40,3 +42,8 @@ check-modules:
 build-products-all-log-levels:
   extends: .build-products-all-log-levels
   stage: build
+  allow_failure: true
+
+scmi-test:
+  extends: .scmi-test
+  stage: scmi-test
