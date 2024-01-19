@@ -272,9 +272,10 @@ static int ppu_v1_core_pd_set_state(fwk_id_t core_pd_id, unsigned int state)
 
     case MOD_PD_STATE_ON:
         ppu_v1_interrupt_unmask(ppu, PPU_V1_IMR_DYN_POLICY_MIN_IRQ_MASK);
-        ppu_v1_set_input_edge_sensitivity(ppu,
-                                          PPU_V1_MODE_ON,
-                                          PPU_V1_EDGE_SENSITIVITY_MASKED);
+
+        ppu_v1_set_input_edge_sensitivity(
+            ppu, PPU_V1_MODE_ON, PPU_V1_EDGE_SENSITIVITY_MASKED);
+
         ppu_v1_set_power_mode(ppu, PPU_V1_MODE_ON, pd_ctx->timer_ctx);
         ppu_v1_dynamic_enable(ppu, PPU_V1_MODE_OFF);
         status = pd_ctx->pd_driver_input_api->report_power_state_transition(
@@ -283,22 +284,21 @@ static int ppu_v1_core_pd_set_state(fwk_id_t core_pd_id, unsigned int state)
         break;
 
     case MOD_PD_STATE_SLEEP:
+
+        /* Enable the lock at off */
         /*
-         * If the dynamic transitions have been enabled then the core is
-         * already in the SLEEP power state or will transit to the SLEEP power
-         * state if the appropriate processing is done on AP side. Thus nothing
-         * to do in that case. If the dynamic transitions are not enabled then
-         * this is an OFF to SLEEP transition.
+         * To lock the PPU:
+         * the dynamic mode must be enabled
+         * the lock feature must be enabled
          */
-        if (!ppu_v1_is_dynamic_enabled(ppu)) {
-            ppu_v1_dynamic_enable(ppu, PPU_V1_MODE_OFF);
-            ppu_v1_set_input_edge_sensitivity(ppu,
-                                              PPU_V1_MODE_ON,
-                                              PPU_V1_EDGE_SENSITIVITY_MASKED);
-        }
-        status = pd_ctx->pd_driver_input_api->report_power_state_transition(
-            pd_ctx->bound_id, MOD_PD_STATE_SLEEP);
-        fwk_assert(status == FWK_SUCCESS);
+        ppu_v1_dynamic_enable(ppu, PPU_V1_MODE_OFF);
+        ppu_v1_lock_off_enable(ppu);
+
+        ppu_v1_interrupt_unmask(ppu, PPU_V1_IMR_DYN_POLICY_MIN_IRQ_MASK);
+        ppu_v1_set_input_edge_sensitivity(
+            ppu, PPU_V1_MODE_ON, PPU_V1_EDGE_SENSITIVITY_MASKED);
+
+        status = FWK_SUCCESS;
         break;
 
     default:
@@ -717,7 +717,6 @@ static const struct ppu_v1_boot_api boot_api = {
 /*
  * Framework handlers
  */
-
 static int ppu_v1_mod_init(
     fwk_id_t module_id,
     unsigned int pd_count,

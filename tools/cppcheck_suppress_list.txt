@@ -65,8 +65,8 @@ nullPointerRedundantCheck:*module/mhu2/src/mod_mhu2.c:90
 nullPointerRedundantCheck:*module/pl011/src/mod_pl011.c:135
 nullPointerRedundantCheck:*module/pl011/src/mod_pl011.c:136
 nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:676
+nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:1054
 nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:1055
-nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:1056
 nullPointerRedundantCheck:*module/reg_sensor/src/mod_reg_sensor.c:52
 nullPointerRedundantCheck:*module/sds/src/mod_sds.c:273
 nullPointerRedundantCheck:*module/sds/src/mod_sds.c:279
