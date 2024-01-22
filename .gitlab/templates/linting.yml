@@ -1,0 +1,33 @@
+#
+# Arm SCP/MCP Software
+# Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+.check-lint:
+  image: ${CI_REGISTRY_IMAGE}/ci-base:latest
+  script:
+    - python3 tools/${CHECK_SCRIPT}.py
+  parallel:
+    matrix:
+      - CHECK_SCRIPT:
+        - check_doc
+        - check_pycodestyle
+        - check_spacing
+        - check_tabs
+
+.check-copyright:
+  image: ${CI_REGISTRY_IMAGE}/ci-base:latest
+  script:
+    - python3 tools/check_copyright.py -c "${CI_MERGE_REQUEST_DIFF_BASE_SHA}"
+
+.check-style:
+  image: ${CI_REGISTRY_IMAGE}/ci-base:latest
+  script:
+    - python3 tools/check_style.py -c "${CI_MERGE_REQUEST_DIFF_BASE_SHA}"
+  artifacts:
+    when: on_failure
+    expire_in: 2 days
+    paths:
+      - code-style.patch

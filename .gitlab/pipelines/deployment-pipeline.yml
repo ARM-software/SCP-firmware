@@ -1,0 +1,46 @@
+#
+# Arm SCP/MCP Software
+# Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+stages:
+  - linting
+  - static-analysis
+  - unit-testing
+  - build
+
+include:
+  - local: .gitlab/templates/linting.yml
+  - local: .gitlab/templates/static-analysis.yml
+  - local: .gitlab/templates/unit-test.yml
+  - local: .gitlab/templates/build-test.yml
+
+check-lint:
+  extends: .check-lint
+  stage: linting
+
+check-copyright:
+  extends: .check-copyright
+  stage: linting
+
+check-style:
+  extends: .check-style
+  stage: linting
+
+banned-api:
+  extends: .banned-api
+  stage: static-analysis
+
+check-fwk:
+  extends: .check-fwk
+  stage: unit-testing
+
+check-modules:
+  extends: .check-modules
+  stage: unit-testing
+
+build-products:
+  extends: .build-products
+  stage: build

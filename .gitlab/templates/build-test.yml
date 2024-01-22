@@ -1,0 +1,40 @@
+#
+# Arm SCP/MCP Software
+# Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+.build-products:
+  image: ${CI_REGISTRY_IMAGE}/ci-base:latest
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_DEPTH: 1
+  before_script:
+    - |
+      if [ -z $BUILD_PRODUCTS_LOG_LEVEL ]; then
+        export LOG_LEVEL=""
+      else
+        export LOG_LEVEL="--log-level=$BUILD_PRODUCTS_LOG_LEVEL"
+      fi
+  script:
+    - |
+      python3 tools/check_build.py --build-output-dir ./build \
+      ${LOG_LEVEL}
+  artifacts:
+    when: on_failure
+    expire_in: 2 days
+    paths:
+      - build/*.txt
+
+.build-products-all-log-levels:
+  extends: .build-products
+  parallel:
+    matrix:
+      - BUILD_PRODUCTS_LOG_LEVEL:
+        - DEBUG
+        - INFO
+        - WARN
+        - ERROR
+        - CRIT
+        - DISABLED
