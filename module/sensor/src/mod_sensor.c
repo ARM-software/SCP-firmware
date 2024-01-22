@@ -315,11 +315,55 @@ static int sensor_set_trip_point(
     return FWK_SUCCESS;
 }
 
+static int sensor_enable(fwk_id_t id)
+{
+    int status;
+
+    struct sensor_dev_ctx *ctx;
+    struct mod_sensor_complete_info info;
+
+    status = get_ctx_if_valid_call(id, &info, &ctx);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    ctx = &ctx_table[fwk_id_get_element_idx(id)];
+
+    if (ctx->driver_api->enable != NULL) {
+        return ctx->driver_api->enable(id);
+    }
+
+    return FWK_E_SUPPORT;
+}
+
+static int sensor_disable(fwk_id_t id)
+{
+    int status;
+
+    struct sensor_dev_ctx *ctx;
+    struct mod_sensor_complete_info info;
+
+    status = get_ctx_if_valid_call(id, &info, &ctx);
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    ctx = &ctx_table[fwk_id_get_element_idx(id)];
+
+    if (ctx->driver_api->disable != NULL) {
+        return ctx->driver_api->disable(id);
+    }
+
+    return FWK_E_SUPPORT;
+}
+
 static struct mod_sensor_api sensor_api = {
     .get_data = get_data,
     .get_info = get_info,
     .get_trip_point = sensor_get_trip_point,
     .set_trip_point = sensor_set_trip_point,
+    .enable = sensor_enable,
+    .disable = sensor_disable,
 #ifdef BUILD_HAS_SENSOR_TIMESTAMP
     .set_timestamp_config = sensor_set_timestamp_config,
     .get_timestamp_config = sensor_get_timestamp_config,

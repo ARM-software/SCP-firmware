@@ -77,6 +77,26 @@ static int sensor_driver_get_info_error(
     return FWK_E_PARAM;
 }
 
+static int sensor_driver_enable_succeeds(fwk_id_t id)
+{
+    return FWK_SUCCESS;
+}
+
+static int sensor_driver_enable_not_supported(fwk_id_t id)
+{
+    return FWK_E_SUPPORT;
+}
+
+static int sensor_driver_disable_succeeds(fwk_id_t id)
+{
+    return FWK_SUCCESS;
+}
+
+static int sensor_driver_disable_not_supported(fwk_id_t id)
+{
+    return FWK_E_SUPPORT;
+}
+
 static struct mod_sensor_driver_api sensor_driver_api = {
     .get_value = sensor_driver_get_value,
     .get_info = sensor_driver_get_info,
@@ -894,6 +914,120 @@ void utest_sensor_set_trip_point_tp_idx_ok(void)
         sensor_trip_point_context[SENSOR_FAKE_INDEX_1].above_threshold, false);
 }
 
+void utest_sensor_enable_no_driver_support(void)
+{
+    int status;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+
+    ctx_table[SENSOR_FAKE_INDEX_0].driver_api = &sensor_driver_api;
+
+    sensor_driver_api.enable = NULL;
+
+    status = sensor_enable(elem_id);
+
+    TEST_ASSERT_EQUAL(status, FWK_E_SUPPORT);
+}
+
+void utest_sensor_enable_driver_succeeded(void)
+{
+    int status;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+
+    ctx_table[SENSOR_FAKE_INDEX_0].driver_api = &sensor_driver_api;
+
+    sensor_driver_api.enable = sensor_driver_enable_succeeds;
+
+    status = sensor_enable(elem_id);
+
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+}
+
+void utest_sensor_enable_driver_returned_error(void)
+{
+    int status;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+
+    ctx_table[SENSOR_FAKE_INDEX_0].driver_api = &sensor_driver_api;
+
+    sensor_driver_api.enable = sensor_driver_enable_not_supported;
+
+    status = sensor_enable(elem_id);
+
+    TEST_ASSERT_EQUAL(status, FWK_E_SUPPORT);
+}
+
+void utest_sensor_disable_no_driver_support(void)
+{
+    int status;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+
+    ctx_table[SENSOR_FAKE_INDEX_0].driver_api = &sensor_driver_api;
+
+    sensor_driver_api.disable = NULL;
+
+    status = sensor_disable(elem_id);
+
+    TEST_ASSERT_EQUAL(status, FWK_E_SUPPORT);
+}
+
+void utest_sensor_disable_driver_succeeded(void)
+{
+    int status;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+
+    ctx_table[SENSOR_FAKE_INDEX_0].driver_api = &sensor_driver_api;
+
+    sensor_driver_api.disable = sensor_driver_disable_succeeds;
+
+    status = sensor_disable(elem_id);
+
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+}
+
+void utest_sensor_disable_driver_returned_error(void)
+{
+    int status;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+
+    ctx_table[SENSOR_FAKE_INDEX_0].driver_api = &sensor_driver_api;
+
+    sensor_driver_api.disable = sensor_driver_disable_not_supported;
+
+    status = sensor_disable(elem_id);
+
+    TEST_ASSERT_EQUAL(status, FWK_E_SUPPORT);
+}
+
 int sensor_test_main(void)
 {
     UNITY_BEGIN();
@@ -934,6 +1068,14 @@ int sensor_test_main(void)
     RUN_TEST(utest_sensor_set_trip_point_null_params);
     RUN_TEST(utest_sensor_set_trip_point_tp_idx_out_of_range);
     RUN_TEST(utest_sensor_set_trip_point_tp_idx_ok);
+
+    RUN_TEST(utest_sensor_enable_no_driver_support);
+    RUN_TEST(utest_sensor_enable_driver_succeeded);
+    RUN_TEST(utest_sensor_enable_driver_returned_error);
+
+    RUN_TEST(utest_sensor_disable_no_driver_support);
+    RUN_TEST(utest_sensor_disable_driver_succeeded);
+    RUN_TEST(utest_sensor_disable_driver_returned_error);
 
     return UNITY_END();
 }

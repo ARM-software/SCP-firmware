@@ -457,6 +457,26 @@ struct mod_sensor_driver_api {
      */
     int (*get_info)(fwk_id_t id, struct mod_sensor_info *info);
 
+    /*!
+     * \brief Enable_sensor.
+     *
+     * \param id Specific sensor device id.
+     *
+     * \retval ::FWK_SUCCESS The operation was performed successfully.
+     * \retval ::FWK_E_SUPPORT The operation is not supported by the driver API.
+     */
+    int (*enable)(fwk_id_t id);
+
+    /*!
+     * \brief Disable_sensor.
+     *
+     * \param id Specific sensor device id.
+     *
+     * \retval ::FWK_SUCCESS The operation was performed successfully.
+     * \retval ::FWK_E_SUPPORT The operation is not supported by the driver API.
+     */
+    int (*disable)(fwk_id_t id);
+
 #ifdef BUILD_HAS_SENSOR_MULTI_AXIS
     /*!
      * \brief Get number of axis.
@@ -553,6 +573,32 @@ struct mod_sensor_api {
         fwk_id_t id,
         uint32_t trip_point_idx,
         struct mod_sensor_trip_point_params *params);
+
+    /*!
+     * \brief Enable.
+     *
+     * \details Changes the "enabled" state of a sensor to true.
+     *
+     * \param id Specific sensor device id.
+     *
+     * \retval FWK_SUCCESS Operation succeeded.
+     * \retval FWK_E_PARAM "sensor_get_timestamp_config" returned
+     *      "configuration is null".
+     */
+    int (*enable)(fwk_id_t id);
+
+    /*!
+     * \brief Disable.
+     *
+     * \details Changes the "enabled" state of a sensor to false.
+     *
+     * \param id Specific sensor device id.
+     *
+     * \retval FWK_SUCCESS Operation succeeded.
+     * \retval FWK_E_PARAM "sensor_get_timestamp_config" returned
+     *      "configuration is null".
+     */
+    int (*disable)(fwk_id_t id);
 
 #ifdef BUILD_HAS_SENSOR_TIMESTAMP
     /*!
