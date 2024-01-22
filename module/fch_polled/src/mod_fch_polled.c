@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -268,7 +268,7 @@ static int mod_fch_polled_process_bind_request(
 }
 
 const struct fwk_module module_fch_polled = {
-    .api_count = MOD_FCH_POLLED_API_IDX_COUNT,
+    .api_count = (unsigned int)MOD_FCH_POLLED_API_IDX_COUNT,
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = mod_fch_polled_init,
     .element_init = mod_fch_polled_channel_init,
