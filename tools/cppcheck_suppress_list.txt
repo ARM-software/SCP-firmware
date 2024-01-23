@@ -37,6 +37,7 @@ syntaxError:*product/synquacer/module/synquacer_system/src/mmu500.c:34
 syntaxError:*framework/src/fwk_log.c:169
 syntaxError:*framework/src/fwk_log.c:177
 syntaxError:*framework/src/fwk_log.c:181
+syntaxError:*product/morello/module/morello_system/src/mod_morello_system.c:302
 
 // Cppcheck doesn't like include directives that use macros
 preprocessorErrorDirective:*framework/test/fwk_module_idx.h:14
