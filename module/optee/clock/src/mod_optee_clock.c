@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Linaro Limited and Contributors. All rights
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -83,6 +83,7 @@ static int get_rate(fwk_id_t dev_id, uint64_t *rate)
 static int set_state(fwk_id_t dev_id, enum mod_clock_state state)
 {
     struct optee_clock_dev_ctx *ctx = elt_id_to_ctx(dev_id);
+    TEE_Result res;
 
     if (ctx == NULL) {
         return FWK_E_PARAM;
@@ -126,7 +127,11 @@ static int set_state(fwk_id_t dev_id, enum mod_clock_state state)
                 fwk_id_get_element_idx(dev_id),
                 clk_get_name(ctx->clk));
 
-            clk_enable(ctx->clk);
+            res = clk_enable(ctx->clk);
+            if (res != TEE_SUCCESS) {
+                return FWK_E_DEVICE;
+            }
+
             ctx->enabled = true;
         } else {
             FWK_LOG_DEBUG(
@@ -196,6 +201,8 @@ static int get_range(fwk_id_t dev_id, struct mod_clock_range *range)
         range->rate_count = 1;
 
         return FWK_SUCCESS;
+    } else if (res != TEE_SUCCESS) {
+        return FWK_E_DEVICE;
     }
 
     range->rate_type = MOD_CLOCK_RATE_TYPE_DISCRETE;
@@ -236,6 +243,8 @@ static int set_rate(fwk_id_t dev_id, uint64_t rate,
     res = clk_set_rate(ctx->clk, rate);
     if (res == TEE_ERROR_NOT_SUPPORTED) {
         return FWK_E_SUPPORT;
+    } else if (res != TEE_SUCCESS) {
+        return FWK_E_DEVICE;
     }
 
     FWK_LOG_DEBUG(
@@ -272,6 +281,8 @@ static int get_rate_from_index(fwk_id_t dev_id,
 
         *rate = clk_get_rate(ctx->clk);
         return FWK_SUCCESS;
+    } else if (res != TEE_SUCCESS) {
+        return FWK_E_DEVICE;
     }
 
     if (rate_index > rate_count) {
