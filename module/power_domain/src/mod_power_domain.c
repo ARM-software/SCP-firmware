@@ -981,9 +981,27 @@ static int pd_get_state(fwk_id_t pd_id, unsigned int *state)
 
 static int pd_system_suspend(unsigned int state)
 {
+    unsigned int i, active_cores;
+    struct pd_ctx *pd;
     struct fwk_event req;
     struct pd_system_suspend_request *req_params =
         (struct pd_system_suspend_request *)(&req.params);
+
+    /* System suspend is only supported if exactly one core remains active */
+    active_cores = 0u;
+    for (i = 0; i < mod_pd_ctx.pd_count; i++) {
+        pd = &mod_pd_ctx.pd_ctx_table[i];
+
+        if (pd->config->attributes.pd_type == MOD_PD_TYPE_CORE &&
+            is_state_in_transition(pd, (unsigned int)MOD_PD_STATE_OFF)) {
+            active_cores += 1;
+        }
+    }
+
+    if (active_cores > 1) {
+        FWK_LOG_ERR("[PD] Invalid system suspend request.");
+        return FWK_E_STATE;
+    }
 
     req = (struct fwk_event){
         .id = FWK_ID_EVENT(

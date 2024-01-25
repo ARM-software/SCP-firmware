@@ -71,6 +71,8 @@ bool is_upwards_transition_propagation(
 
 bool is_allowed_by_parent_and_children(struct pd_ctx *pd, unsigned int state);
 
+bool is_state_in_transition(struct pd_ctx *pd, unsigned int state);
+
 bool initiate_power_state_pre_transition_notification(struct pd_ctx *pd);
 
 #endif /* MOD_POWER_DOMAIN_EXTRA_H */

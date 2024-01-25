@@ -297,3 +297,9 @@ bool is_allowed_by_parent_and_children(struct pd_ctx *pd, unsigned int state)
 
     return true;
 }
+
+bool is_state_in_transition(struct pd_ctx *pd, unsigned int state)
+{
+    return pd->requested_state != state || pd->current_state != state ||
+        pd->state_requested_to_driver != state;
+}

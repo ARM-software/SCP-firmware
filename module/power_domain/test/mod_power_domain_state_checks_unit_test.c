@@ -553,6 +553,32 @@ void test_retrieve_mapped_state_core(void)
     TEST_ASSERT_EQUAL(MOD_PD_STATE_SLEEP, state);
 }
 
+void test_is_state_in_transition_valid(void)
+{
+    bool valid;
+    struct pd_ctx pd;
+    pd.current_state = MOD_PD_STATE_OFF;
+    pd.requested_state = MOD_PD_STATE_OFF;
+    pd.state_requested_to_driver = MOD_PD_STATE_OFF;
+
+    valid = is_state_in_transition(&pd, MOD_PD_STATE_OFF);
+
+    TEST_ASSERT_EQUAL(false, valid);
+}
+
+void test_is_state_in_transition_invalid(void)
+{
+    bool valid;
+    struct pd_ctx pd;
+    pd.current_state = MOD_PD_STATE_OFF;
+    pd.requested_state = MOD_PD_STATE_ON;
+    pd.state_requested_to_driver = MOD_PD_STATE_ON;
+
+    valid = is_state_in_transition(&pd, MOD_PD_STATE_OFF);
+
+    TEST_ASSERT_EQUAL(true, valid);
+}
+
 int power_domain_state_checks_test_main(void)
 {
     UNITY_BEGIN();

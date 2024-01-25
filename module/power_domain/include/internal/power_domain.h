@@ -448,6 +448,15 @@ bool is_upwards_transition_propagation(
 bool is_allowed_by_parent_and_children(struct pd_ctx *pd, unsigned int state);
 
 /*
+ * Check if a power domain is not in the given state or is
+ * awaiting any state changes or driver transitions.
+ *
+ * \param pd Description of the power domain to be checked.
+ * \param state Power state.
+ */
+bool is_state_in_transition(struct pd_ctx *pd, unsigned int state);
+
+/*
  * Auxiliary functions
  */
 

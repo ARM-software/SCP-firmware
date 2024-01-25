@@ -18,6 +18,7 @@ static const char* CMockString_is_allowed_by_children = "is_allowed_by_children"
 static const char* CMockString_is_allowed_by_parent_and_children = "is_allowed_by_parent_and_children";
 static const char* CMockString_is_deeper_state = "is_deeper_state";
 static const char* CMockString_is_shallower_state = "is_shallower_state";
+static const char* CMockString_is_state_in_transition = "is_state_in_transition";
 static const char* CMockString_is_upwards_transition_propagation = "is_upwards_transition_propagation";
 static const char* CMockString_is_valid_composite_state = "is_valid_composite_state";
 static const char* CMockString_is_valid_state = "is_valid_state";
@@ -300,6 +301,22 @@ typedef struct _CMOCK_is_allowed_by_parent_and_children_CALL_INSTANCE
 
 } CMOCK_is_allowed_by_parent_and_children_CALL_INSTANCE;
 
+typedef struct _CMOCK_is_state_in_transition_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  bool ReturnVal;
+  struct pd_ctx* Expected_pd;
+  unsigned int Expected_state;
+  int Expected_pd_Depth;
+  char ReturnThruPtr_pd_Used;
+  struct pd_ctx* ReturnThruPtr_pd_Val;
+  size_t ReturnThruPtr_pd_Size;
+  char IgnoreArg_pd;
+  char IgnoreArg_state;
+
+} CMOCK_is_state_in_transition_CALL_INSTANCE;
+
 typedef struct _CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE
 {
   UNITY_LINE_TYPE LineNumber;
@@ -436,6 +453,12 @@ static struct Mockmod_power_domain_extraInstance
   CMOCK_is_allowed_by_parent_and_children_CALLBACK is_allowed_by_parent_and_children_CallbackFunctionPointer;
   int is_allowed_by_parent_and_children_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE is_allowed_by_parent_and_children_CallInstance;
+  char is_state_in_transition_IgnoreBool;
+  bool is_state_in_transition_FinalReturn;
+  char is_state_in_transition_CallbackBool;
+  CMOCK_is_state_in_transition_CALLBACK is_state_in_transition_CallbackFunctionPointer;
+  int is_state_in_transition_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE is_state_in_transition_CallInstance;
   char initiate_power_state_pre_transition_notification_IgnoreBool;
   bool initiate_power_state_pre_transition_notification_FinalReturn;
   char initiate_power_state_pre_transition_notification_CallbackBool;
@@ -706,6 +729,19 @@ void Mockmod_power_domain_extra_Verify(void)
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
   if (Mock.is_allowed_by_parent_and_children_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.is_state_in_transition_CallInstance;
+  if (Mock.is_state_in_transition_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_is_state_in_transition);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.is_state_in_transition_CallbackFunctionPointer != NULL)
   {
     call_instance = CMOCK_GUTS_NONE;
     (void)call_instance;
@@ -3593,6 +3629,171 @@ void is_allowed_by_parent_and_children_CMockIgnoreArg_pd(UNITY_LINE_TYPE cmock_l
 void is_allowed_by_parent_and_children_CMockIgnoreArg_state(UNITY_LINE_TYPE cmock_line)
 {
   CMOCK_is_allowed_by_parent_and_children_CALL_INSTANCE* cmock_call_instance = (CMOCK_is_allowed_by_parent_and_children_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.is_allowed_by_parent_and_children_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_state = 1;
+}
+
+bool is_state_in_transition(struct pd_ctx* pd, unsigned int state)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_is_state_in_transition_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_is_state_in_transition);
+  cmock_call_instance = (CMOCK_is_state_in_transition_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.is_state_in_transition_CallInstance);
+  Mock.is_state_in_transition_CallInstance = CMock_Guts_MemNext(Mock.is_state_in_transition_CallInstance);
+  if (Mock.is_state_in_transition_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.is_state_in_transition_FinalReturn;
+    Mock.is_state_in_transition_FinalReturn = cmock_call_instance->ReturnVal;
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.is_state_in_transition_CallbackBool &&
+      Mock.is_state_in_transition_CallbackFunctionPointer != NULL)
+  {
+    bool cmock_cb_ret = Mock.is_state_in_transition_CallbackFunctionPointer(pd, state, Mock.is_state_in_transition_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  if (!cmock_call_instance->IgnoreArg_pd)
+  {
+    UNITY_SET_DETAILS(CMockString_is_state_in_transition,CMockString_pd);
+    if (cmock_call_instance->Expected_pd == NULL)
+      { UNITY_TEST_ASSERT_NULL(pd, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_pd), (void*)(pd), sizeof(struct pd_ctx), cmock_call_instance->Expected_pd_Depth, cmock_line, CMockStringMismatch); }
+  }
+  if (!cmock_call_instance->IgnoreArg_state)
+  {
+    UNITY_SET_DETAILS(CMockString_is_state_in_transition,CMockString_state);
+    UNITY_TEST_ASSERT_EQUAL_HEX32(cmock_call_instance->Expected_state, state, cmock_line, CMockStringMismatch);
+  }
+  }
+  if (Mock.is_state_in_transition_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.is_state_in_transition_CallbackFunctionPointer(pd, state, Mock.is_state_in_transition_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_pd_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(pd, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)pd, (void*)cmock_call_instance->ReturnThruPtr_pd_Val,
+      cmock_call_instance->ReturnThruPtr_pd_Size);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_is_state_in_transition(CMOCK_is_state_in_transition_CALL_INSTANCE* cmock_call_instance, struct pd_ctx* pd, int pd_Depth, unsigned int state);
+void CMockExpectParameters_is_state_in_transition(CMOCK_is_state_in_transition_CALL_INSTANCE* cmock_call_instance, struct pd_ctx* pd, int pd_Depth, unsigned int state)
+{
+  cmock_call_instance->Expected_pd = pd;
+  cmock_call_instance->Expected_pd_Depth = pd_Depth;
+  cmock_call_instance->IgnoreArg_pd = 0;
+  cmock_call_instance->ReturnThruPtr_pd_Used = 0;
+  cmock_call_instance->Expected_state = state;
+  cmock_call_instance->IgnoreArg_state = 0;
+}
+
+void is_state_in_transition_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_is_state_in_transition_CALL_INSTANCE));
+  CMOCK_is_state_in_transition_CALL_INSTANCE* cmock_call_instance = (CMOCK_is_state_in_transition_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.is_state_in_transition_CallInstance = CMock_Guts_MemChain(Mock.is_state_in_transition_CallInstance, cmock_guts_index);
+  Mock.is_state_in_transition_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.is_state_in_transition_IgnoreBool = (char)1;
+}
+
+void is_state_in_transition_CMockStopIgnore(void)
+{
+  if(Mock.is_state_in_transition_IgnoreBool)
+    Mock.is_state_in_transition_CallInstance = CMock_Guts_MemNext(Mock.is_state_in_transition_CallInstance);
+  Mock.is_state_in_transition_IgnoreBool = (char)0;
+}
+
+void is_state_in_transition_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_is_state_in_transition_CALL_INSTANCE));
+  CMOCK_is_state_in_transition_CALL_INSTANCE* cmock_call_instance = (CMOCK_is_state_in_transition_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.is_state_in_transition_CallInstance = CMock_Guts_MemChain(Mock.is_state_in_transition_CallInstance, cmock_guts_index);
+  Mock.is_state_in_transition_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void is_state_in_transition_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct pd_ctx* pd, unsigned int state, bool cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_is_state_in_transition_CALL_INSTANCE));
+  CMOCK_is_state_in_transition_CALL_INSTANCE* cmock_call_instance = (CMOCK_is_state_in_transition_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.is_state_in_transition_CallInstance = CMock_Guts_MemChain(Mock.is_state_in_transition_CallInstance, cmock_guts_index);
+  Mock.is_state_in_transition_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_is_state_in_transition(cmock_call_instance, pd, 1, state);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void is_state_in_transition_AddCallback(CMOCK_is_state_in_transition_CALLBACK Callback)
+{
+  Mock.is_state_in_transition_IgnoreBool = (char)0;
+  Mock.is_state_in_transition_CallbackBool = (char)1;
+  Mock.is_state_in_transition_CallbackFunctionPointer = Callback;
+}
+
+void is_state_in_transition_Stub(CMOCK_is_state_in_transition_CALLBACK Callback)
+{
+  Mock.is_state_in_transition_IgnoreBool = (char)0;
+  Mock.is_state_in_transition_CallbackBool = (char)0;
+  Mock.is_state_in_transition_CallbackFunctionPointer = Callback;
+}
+
+void is_state_in_transition_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, struct pd_ctx* pd, int pd_Depth, unsigned int state, bool cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_is_state_in_transition_CALL_INSTANCE));
+  CMOCK_is_state_in_transition_CALL_INSTANCE* cmock_call_instance = (CMOCK_is_state_in_transition_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.is_state_in_transition_CallInstance = CMock_Guts_MemChain(Mock.is_state_in_transition_CallInstance, cmock_guts_index);
+  Mock.is_state_in_transition_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_is_state_in_transition(cmock_call_instance, pd, pd_Depth, state);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void is_state_in_transition_CMockReturnMemThruPtr_pd(UNITY_LINE_TYPE cmock_line, struct pd_ctx* pd, size_t cmock_size)
+{
+  CMOCK_is_state_in_transition_CALL_INSTANCE* cmock_call_instance = (CMOCK_is_state_in_transition_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.is_state_in_transition_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_pd_Used = 1;
+  cmock_call_instance->ReturnThruPtr_pd_Val = pd;
+  cmock_call_instance->ReturnThruPtr_pd_Size = cmock_size;
+}
+
+void is_state_in_transition_CMockIgnoreArg_pd(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_is_state_in_transition_CALL_INSTANCE* cmock_call_instance = (CMOCK_is_state_in_transition_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.is_state_in_transition_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_pd = 1;
+}
+
+void is_state_in_transition_CMockIgnoreArg_state(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_is_state_in_transition_CALL_INSTANCE* cmock_call_instance = (CMOCK_is_state_in_transition_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.is_state_in_transition_CallInstance));
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
   cmock_call_instance->IgnoreArg_state = 1;
 }

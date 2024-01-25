@@ -378,6 +378,28 @@ void is_allowed_by_parent_and_children_CMockReturnMemThruPtr_pd(UNITY_LINE_TYPE 
 void is_allowed_by_parent_and_children_CMockIgnoreArg_pd(UNITY_LINE_TYPE cmock_line);
 #define is_allowed_by_parent_and_children_IgnoreArg_state() is_allowed_by_parent_and_children_CMockIgnoreArg_state(__LINE__)
 void is_allowed_by_parent_and_children_CMockIgnoreArg_state(UNITY_LINE_TYPE cmock_line);
+#define is_state_in_transition_IgnoreAndReturn(cmock_retval) is_state_in_transition_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void is_state_in_transition_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return);
+#define is_state_in_transition_StopIgnore() is_state_in_transition_CMockStopIgnore()
+void is_state_in_transition_CMockStopIgnore(void);
+#define is_state_in_transition_ExpectAnyArgsAndReturn(cmock_retval) is_state_in_transition_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
+void is_state_in_transition_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return);
+#define is_state_in_transition_ExpectAndReturn(pd, state, cmock_retval) is_state_in_transition_CMockExpectAndReturn(__LINE__, pd, state, cmock_retval)
+void is_state_in_transition_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct pd_ctx* pd, unsigned int state, bool cmock_to_return);
+typedef bool (* CMOCK_is_state_in_transition_CALLBACK)(struct pd_ctx* pd, unsigned int state, int cmock_num_calls);
+void is_state_in_transition_AddCallback(CMOCK_is_state_in_transition_CALLBACK Callback);
+void is_state_in_transition_Stub(CMOCK_is_state_in_transition_CALLBACK Callback);
+#define is_state_in_transition_StubWithCallback is_state_in_transition_Stub
+#define is_state_in_transition_ExpectWithArrayAndReturn(pd, pd_Depth, state, cmock_retval) is_state_in_transition_CMockExpectWithArrayAndReturn(__LINE__, pd, pd_Depth, state, cmock_retval)
+void is_state_in_transition_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, struct pd_ctx* pd, int pd_Depth, unsigned int state, bool cmock_to_return);
+#define is_state_in_transition_ReturnThruPtr_pd(pd) is_state_in_transition_CMockReturnMemThruPtr_pd(__LINE__, pd, sizeof(struct pd_ctx))
+#define is_state_in_transition_ReturnArrayThruPtr_pd(pd, cmock_len) is_state_in_transition_CMockReturnMemThruPtr_pd(__LINE__, pd, cmock_len * sizeof(*pd))
+#define is_state_in_transition_ReturnMemThruPtr_pd(pd, cmock_size) is_state_in_transition_CMockReturnMemThruPtr_pd(__LINE__, pd, cmock_size)
+void is_state_in_transition_CMockReturnMemThruPtr_pd(UNITY_LINE_TYPE cmock_line, struct pd_ctx* pd, size_t cmock_size);
+#define is_state_in_transition_IgnoreArg_pd() is_state_in_transition_CMockIgnoreArg_pd(__LINE__)
+void is_state_in_transition_CMockIgnoreArg_pd(UNITY_LINE_TYPE cmock_line);
+#define is_state_in_transition_IgnoreArg_state() is_state_in_transition_CMockIgnoreArg_state(__LINE__)
+void is_state_in_transition_CMockIgnoreArg_state(UNITY_LINE_TYPE cmock_line);
 #define initiate_power_state_pre_transition_notification_IgnoreAndReturn(cmock_retval) initiate_power_state_pre_transition_notification_CMockIgnoreAndReturn(__LINE__, cmock_retval)
 void initiate_power_state_pre_transition_notification_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return);
 #define initiate_power_state_pre_transition_notification_StopIgnore() initiate_power_state_pre_transition_notification_CMockStopIgnore()

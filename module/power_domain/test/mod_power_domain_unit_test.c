@@ -12,9 +12,11 @@
 #include <Mockfwk_notification.h>
 #include <Mockmod_power_domain_extra.h>
 #include <config_power_domain.h>
+#include <internal/Mockfwk_core_internal.h>
 #include <power_domain_utils.h>
 
 #include <mod_power_domain_extra.h>
+#include <mod_system_power.h>
 
 #include <fwk_id.h>
 #include <fwk_macros.h>
@@ -851,6 +853,57 @@ void test_complete_system_suspend(void)
     TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
 }
 
+static bool is_in_transiton_mock(
+    struct pd_ctx *pd,
+    unsigned int state,
+    int call_no)
+{
+    return pd->current_state != state;
+}
+
+void test_system_suspend_multiple_active_cores(void)
+{
+    int status;
+
+    __fwk_put_event_ExpectAnyArgsAndReturn(FWK_SUCCESS);
+    is_state_in_transition_StubWithCallback(is_in_transiton_mock);
+
+    pd_ctx[PD_IDX_CLUSTER0].requested_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUSTER0].state_requested_to_driver = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUSTER0].current_state = MOD_PD_STATE_ON;
+
+    pd_ctx[PD_IDX_CLUS0CORE0].requested_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUS0CORE0].state_requested_to_driver = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUS0CORE0].current_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUS0CORE1].requested_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUS0CORE1].state_requested_to_driver = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUS0CORE1].current_state = MOD_PD_STATE_ON;
+
+    status = pd_system_suspend(MOD_SYSTEM_POWER_POWER_STATE_SLEEP0);
+
+    TEST_ASSERT_EQUAL(status, FWK_E_STATE);
+}
+
+void test_system_suspend_single_active_core(void)
+{
+    int status;
+
+    __fwk_put_event_ExpectAnyArgsAndReturn(FWK_SUCCESS);
+    is_state_in_transition_StubWithCallback(is_in_transiton_mock);
+
+    pd_ctx[PD_IDX_CLUSTER0].requested_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUSTER0].state_requested_to_driver = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUSTER0].current_state = MOD_PD_STATE_ON;
+
+    pd_ctx[PD_IDX_CLUS0CORE0].requested_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUS0CORE0].state_requested_to_driver = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUS0CORE0].current_state = MOD_PD_STATE_ON;
+
+    status = pd_system_suspend(MOD_SYSTEM_POWER_POWER_STATE_SLEEP0);
+
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+}
+
 int power_domain_test_main(void)
 {
     UNITY_BEGIN();
@@ -879,6 +932,8 @@ int power_domain_test_main(void)
     RUN_TEST(test_initiate_power_state_transition_fail_param);
     RUN_TEST(test_complete_system_suspend_no_cs);
     RUN_TEST(test_complete_system_suspend);
+    RUN_TEST(test_system_suspend_multiple_active_cores);
+    RUN_TEST(test_system_suspend_single_active_core);
     return UNITY_END();
 }
 
