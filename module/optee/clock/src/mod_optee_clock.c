@@ -291,7 +291,8 @@ static int get_rate_from_index(fwk_id_t dev_id,
 
     rate_count = 1;
     res = clk_get_rates_array(ctx->clk, rate_index, &rate_ul, &rate_count);
-        fwk_assert(!res && rate_count == 1);
+    fwk_assert(!res && rate_count == 1);
+
     *rate = rate_ul;
 
     FWK_LOG_DEBUG(
