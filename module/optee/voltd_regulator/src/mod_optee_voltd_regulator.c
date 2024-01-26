@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -212,9 +212,12 @@ static int optee_voltd_regulator_get_info(fwk_id_t dev_id,
         info->level_range.min_uv = 0;
         info->level_range.max_uv = 0;
     } else {
-        struct regulator_voltages *desc;
+        struct regulator_voltages_desc *desc;
+        const int *levels;
+        TEE_Result res;
 
-        if (regulator_supported_voltages(ctx->regulator, &desc) != TEE_SUCCESS) {
+        res = regulator_supported_voltages(ctx->regulator, &desc, &levels);
+        if (res != TEE_SUCCESS) {
             return FWK_E_SUPPORT;
         }
 
@@ -222,14 +225,14 @@ static int optee_voltd_regulator_get_info(fwk_id_t dev_id,
             info->name = regulator_name(ctx->regulator);
             info->level_range.level_type = MOD_VOLTD_VOLTAGE_LEVEL_DISCRETE;
             info->level_range.level_count = desc->num_levels;
-            info->level_range.min_uv = desc->entries[0];
-            info->level_range.max_uv = desc->entries[desc->num_levels - 1];
+            info->level_range.min_uv = levels[0];
+            info->level_range.max_uv = levels[desc->num_levels - 1];
         } else if (desc->type == VOLTAGE_TYPE_INCREMENT) {
             info->name = regulator_name(ctx->regulator);
             info->level_range.level_type = MOD_VOLTD_VOLTAGE_LEVEL_DISCRETE;
-            info->level_range.min_uv = desc->entries[0];
-            info->level_range.max_uv = desc->entries[1];
-            info->level_range.step_uv = desc->entries[2];
+            info->level_range.min_uv = levels[0];
+            info->level_range.max_uv = levels[1];
+            info->level_range.step_uv = levels[2];
         } else {
             fwk_unreachable();
             return FWK_E_PANIC;
@@ -250,7 +253,9 @@ static int optee_voltd_regulator_level_from_index(fwk_id_t dev_id,
                                                   int32_t *level_uv)
 {
     struct optee_voltd_regulator_dev_ctx *ctx;
-    struct regulator_voltages *desc;
+    struct regulator_voltages_desc *desc;
+    const int *levels;
+    TEE_Result res;
 
     ctx = get_ctx(dev_id);
     if (ctx == NULL) {
@@ -268,7 +273,8 @@ static int optee_voltd_regulator_level_from_index(fwk_id_t dev_id,
         return FWK_SUCCESS;
     }
 
-    if (regulator_supported_voltages(ctx->regulator, &desc) != TEE_SUCCESS) {
+    res = regulator_supported_voltages(ctx->regulator, &desc, &levels);
+    if (res != TEE_SUCCESS) {
         return FWK_E_SUPPORT;
     }
 
@@ -279,7 +285,7 @@ static int optee_voltd_regulator_level_from_index(fwk_id_t dev_id,
         return FWK_E_RANGE;
     }
 
-    *level_uv = (int32_t)desc->entries[index];
+    *level_uv = levels[index];
 
     FWK_LOG_DEBUG(
         MOD_PREFIX "Get level from index for %u/%s: index %u, level %"PRId32"uV",
