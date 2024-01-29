@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -17,6 +17,7 @@
 #include <fwk_log.h>
 #include <fwk_status.h>
 
+#if FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR
 /* Output bus attribute names */
 static const char *atu_roba_name[MOD_ATU_ROBA_COUNT] = {
     [MOD_ATU_ROBA_AXNSE] = "NSE",       [MOD_ATU_ROBA_AXCACHE3] = "CACHE3",
@@ -24,6 +25,7 @@ static const char *atu_roba_name[MOD_ATU_ROBA_COUNT] = {
     [MOD_ATU_ROBA_AXCACHE0] = "CACHE0", [MOD_ATU_ROBA_AXPROT2] = "PROT2",
     [MOD_ATU_ROBA_AXPROT1] = "PROT1",   [MOD_ATU_ROBA_AXPROT0] = "PROT0",
 };
+#endif
 
 int atu_validate_region_attributes(uint32_t attributes)
 {
