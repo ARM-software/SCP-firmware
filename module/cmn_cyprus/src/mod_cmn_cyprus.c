@@ -25,6 +25,8 @@
 #include <fwk_notification.h>
 #include <fwk_status.h>
 
+#include <stdbool.h>
+
 /* Max Mesh size */
 #define CMN_CYPRUS_MESH_X_MAX 12
 #define CMN_CYPRUS_MESH_Y_MAX 12
@@ -70,33 +72,53 @@ static int cmn_cyprus_setup(void)
     return FWK_SUCCESS;
 }
 
+static bool is_config_data_valid(void)
+{
+    const struct mod_cmn_cyprus_config *config;
+
+    if (ctx.chip_id > ctx.config_table->chip_count) {
+        FWK_LOG_ERR(
+            MOD_NAME "Error! No config data available for chip %u",
+            ctx.chip_id);
+        return false;
+    }
+
+    config = &ctx.config_table->chip_config_data[ctx.chip_id];
+
+    /* Validate config data */
+    if (config->periphbase == 0) {
+        FWK_LOG_ERR(MOD_NAME "Invalid periphbase!");
+        return false;
+    }
+
+    if ((config->mesh_size_x == 0) ||
+        (config->mesh_size_x > CMN_CYPRUS_MESH_X_MAX)) {
+        FWK_LOG_ERR(
+            MOD_NAME "Invalid Mesh X dimension: %u", config->mesh_size_x);
+        return false;
+    }
+
+    if ((config->mesh_size_y == 0) ||
+        (config->mesh_size_y > CMN_CYPRUS_MESH_Y_MAX)) {
+        FWK_LOG_ERR(
+            MOD_NAME "Invalid Mesh Y dimension: %u", config->mesh_size_y);
+        return false;
+    }
+
+    return true;
+}
+
 /* Framework handlers */
 static int cmn_cyprus_init(
     fwk_id_t module_id,
     unsigned int unused,
     const void *data)
 {
-    fwk_assert(data != NULL);
-
-    /* Save the module config data in the context */
-    ctx.config = (const struct mod_cmn_cyprus_config *)data;
-
-    ctx.cfgm = (struct cmn_cyprus_cfgm_reg *)ctx.config->periphbase;
-
-    /* Validate config data */
-    if (ctx.config->periphbase == 0) {
+    if (data == NULL) {
         return FWK_E_DATA;
     }
 
-    if ((ctx.config->mesh_size_x == 0) ||
-        (ctx.config->mesh_size_x > CMN_CYPRUS_MESH_X_MAX)) {
-        return FWK_E_DATA;
-    }
-
-    if ((ctx.config->mesh_size_y == 0) ||
-        (ctx.config->mesh_size_y > CMN_CYPRUS_MESH_Y_MAX)) {
-        return FWK_E_DATA;
-    }
+    ctx.config_table = (struct mod_cmn_cyprus_config_table *)data;
 
     return FWK_SUCCESS;
 }
@@ -135,6 +157,16 @@ int cmn_cyprus_start(fwk_id_t id)
         MOD_NAME "Multichip mode: %s",
         ctx.multichip_mode ? "Enabled" : "Disabled");
     FWK_LOG_INFO(MOD_NAME "Chip ID: %d", ctx.chip_id);
+
+    if (is_config_data_valid() != true) {
+        FWK_LOG_ERR(MOD_NAME "Error! Invalid config data");
+        return FWK_E_DATA;
+    }
+
+    /* Initialize the chip specific config data in the context */
+    ctx.config = &ctx.config_table->chip_config_data[ctx.chip_id];
+
+    ctx.cfgm = (struct cmn_cyprus_cfgm_reg *)ctx.config->periphbase;
 
     if (fwk_optional_id_is_defined(ctx.config->clock_id) &&
         !fwk_id_is_equal(ctx.config->clock_id, FWK_ID_NONE)) {

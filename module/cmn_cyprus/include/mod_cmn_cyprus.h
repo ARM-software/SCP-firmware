@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -341,6 +341,17 @@ struct mod_cmn_cyprus_config {
 
     /*! RNSAM SCG configuration data */
     struct mod_cmn_cyprus_rnsam_scg_config rnsam_scg_config;
+};
+
+/*!
+ * \brief CMN Cyprus configuration table.
+ */
+struct mod_cmn_cyprus_config_table {
+    /*! Chip specific CMN configuration table */
+    const struct mod_cmn_cyprus_config *chip_config_data;
+
+    /*! Number of entries in the \ref chip_config_data */
+    const uint8_t chip_count;
 };
 
 /*!

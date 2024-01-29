@@ -239,21 +239,28 @@ static const struct mod_cmn_cyprus_mem_region_map mmap[MMAP_TABLE_COUNT] = {
     },
 };
 
-static struct mod_cmn_cyprus_config cmn_config_data = {
-    .periphbase = SCP_CMN_BASE,
-    .mesh_size_x = MESH_SIZE_X,
-    .mesh_size_y = MESH_SIZE_Y,
-    .mmap_table = mmap,
-    .mmap_count = FWK_ARRAY_SIZE(mmap),
-    .hns_cal_mode = true,
-    .hnf_sam_config = {
-        .snf_table = snf_table,
-        .snf_count = FWK_ARRAY_SIZE(snf_table),
-        .hnf_sam_mode = MOD_CMN_CYPRUS_HNF_SAM_MODE_DIRECT_MAPPING,
+static struct mod_cmn_cyprus_config cmn_config_table[PLATFORM_CHIP_COUNT] = {
+    [PLATFORM_CHIP_0] = {
+        .periphbase = SCP_CMN_BASE,
+        .mesh_size_x = MESH_SIZE_X,
+        .mesh_size_y = MESH_SIZE_Y,
+        .mmap_table = mmap,
+        .mmap_count = FWK_ARRAY_SIZE(mmap),
+        .hns_cal_mode = true,
+        .hnf_sam_config = {
+            .snf_table = snf_table,
+            .snf_count = FWK_ARRAY_SIZE(snf_table),
+            .hnf_sam_mode = MOD_CMN_CYPRUS_HNF_SAM_MODE_DIRECT_MAPPING,
+        },
+        .rnsam_scg_config = {
+            .scg_hashing_mode = MOD_CMN_CYPRUS_RNSAM_SCG_POWER_OF_TWO_HASHING,
+        },
     },
-    .rnsam_scg_config = {
-        .scg_hashing_mode = MOD_CMN_CYPRUS_RNSAM_SCG_POWER_OF_TWO_HASHING,
-    },
+};
+
+static struct mod_cmn_cyprus_config_table cmn_config_data = {
+    .chip_config_data = cmn_config_table,
+    .chip_count = PLATFORM_CHIP_COUNT,
 };
 
 const struct fwk_module_config config_cmn_cyprus = {

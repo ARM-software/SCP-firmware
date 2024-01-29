@@ -64,7 +64,10 @@ struct ccla_info {
  * \brief CMN Cyprus driver context.
  */
 struct cmn_cyprus_ctx {
-    /*! CMN Cyprus driver configuration data */
+    /*! Driver configuration table */
+    const struct mod_cmn_cyprus_config_table *config_table;
+
+    /*! Chip specific CMN configuration data */
     const struct mod_cmn_cyprus_config *config;
 
     /*! Base address of the CMN Cyprus configuration register */
