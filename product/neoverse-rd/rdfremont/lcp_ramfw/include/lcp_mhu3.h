@@ -5,14 +5,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
- *     MHU module device indexes.
+ *     MHU3 module device indexes.
  */
 
 #ifndef SCP_MHU3_H
 #define SCP_MHU3_H
 
 enum fremont_mhu_devices {
-    MHU3_DEVICE_IDX_SCP_LCP,
+    MHU3_DEVICE_IDX_LCP_AP_FCH_DVFS_SET_LVL,
     MHU3_DEVICE_IDX_COUNT,
 };
 

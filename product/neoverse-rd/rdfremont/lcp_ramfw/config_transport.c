@@ -29,7 +29,7 @@ static const struct fwk_element transport_element_table[] = {
             .driver_id =
                 FWK_ID_SUB_ELEMENT_INIT(
                     FWK_MODULE_IDX_MHU3,
-                    MHU3_DEVICE_IDX_SCP_LCP,
+                    MHU3_DEVICE_IDX_LCP_AP_FCH_DVFS_SET_LVL,
                     0),
         }),
     },
