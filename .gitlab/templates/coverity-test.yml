@@ -1,0 +1,28 @@
+#
+# Arm SCP/MCP Software
+# Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+.coverity-test:
+  image: ${CI_REGISTRY_IMAGE}/coverity-tester-amd64
+  tags:
+    - amd64
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_DEPTH: 1
+    SCP_CI_OUTPUT: /scp/output
+    SCP_CI_PLATFORM: juno
+    WORKSPACE_PATH: /scp/coverity_workspace
+  before_script:
+    - ln -s $(pwd) /scp
+  script:
+    - echo "Coverity analysis will run against $SCP_CI_PLATFORM build"
+    - /coverity_entrypoint.sh
+  artifacts:
+    when: always
+    expire_in: 2 days
+    paths:
+      - output/scp-coverity-analysis-log.txt
+      - output/scp-coverity-analysis-results.tgz

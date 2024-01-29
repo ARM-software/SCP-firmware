@@ -18,6 +18,7 @@ include:
   - local: .gitlab/templates/unit-test.yml
   - local: .gitlab/templates/build-test.yml
   - local: .gitlab/templates/scmi-test.yml
+  - local: .gitlab/templates/coverity-test.yml
 
 check-lint:
   extends: .check-lint
@@ -34,6 +35,10 @@ check-style:
 banned-api:
   extends: .banned-api
   stage: static-analysis
+
+coverity-test:
+  stage: static-analysis
+  extends: .coverity-test
 
 check-fwk:
   extends: .check-fwk
