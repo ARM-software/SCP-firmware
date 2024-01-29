@@ -19,12 +19,12 @@
  * RAM instruction memory
  */
 #define FMW_MEM0_SIZE LCP_ITCM_SIZE
-#define FMW_MEM0_BASE LCP_ITCM_NS_BASE
+#define FMW_MEM0_BASE LCP_ITCM_S_BASE
 
 /*
  * RAM data memory
  */
 #define FMW_MEM1_SIZE LCP_DTCM_SIZE
-#define FMW_MEM1_BASE LCP_DTCM_NS_BASE
+#define FMW_MEM1_BASE LCP_DTCM_S_BASE
 
 #endif /* FMW_MEMORY_H */
