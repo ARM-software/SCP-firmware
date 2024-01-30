@@ -15,7 +15,7 @@
 #include <fwk_macros.h>
 
 #define LCP_ITCM_SIZE (64 * 1024)
-#define LCP_DTCM_SIZE (64 * 1024)
+#define LCP_DTCM_SIZE (32 * 1024)
 
 #define LCP_ITCM_NS_BASE 0x00000000
 #define LCP_ITCM_S_BASE  0x10000000
