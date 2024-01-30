@@ -477,6 +477,38 @@ struct mod_sensor_driver_api {
      */
     int (*disable)(fwk_id_t id);
 
+    /*!
+     * \brief Set update interval.
+     *
+     * \param id Specific sensor device id.
+     * \param update_interval The new update interval value.
+     * \param update_interval_multiplier The new update_interval_multiplier
+     * value.
+     *
+     * \retval ::FWK_SUCCESS The operation was performed successfully.
+     */
+
+    int (*set_update_interval)(
+        fwk_id_t id,
+        unsigned int update_interval,
+        int update_interval_multiplier);
+
+    /*!
+     * \brief Get update interval.
+     *
+     * \param id Specific sensor device id.
+     * \param update_interval An address to hold the update interval value.
+     * \param update_interval_multiplier An address to hold the
+     * update_interval_multiplier value.
+     *
+     * \retval ::FWK_SUCCESS The operation was performed successfully.
+     */
+
+    int (*get_update_interval)(
+        fwk_id_t id,
+        unsigned int *update_interval,
+        int *update_interval_multiplier);
+
 #ifdef BUILD_HAS_SENSOR_MULTI_AXIS
     /*!
      * \brief Get number of axis.
@@ -599,6 +631,46 @@ struct mod_sensor_api {
      *      "configuration is null".
      */
     int (*disable)(fwk_id_t id);
+
+    /*!
+     * \brief Set update interval.
+     *
+     * \details Updates the update time interval of a sensor.
+     *
+     * \param id Specific sensor device id.
+     * \param time_interval New time interval value.
+     * \param time_interval_multiplier New time interval multiplier value.
+     *
+     * \retval FWK_SUCCESS Operation succeeded.
+     * \retval FWK_E_SUPPORT Operation not supported by driver.
+     */
+    int (*set_update_interval)(
+        fwk_id_t id,
+        unsigned int time_interval,
+        int time_interval_multiplier);
+
+    /*!
+     * \brief Get update interval.
+     *
+     * \details Returns the current update time interval of a sensor.
+     *
+     * \param id Specific sensor device id.
+     * \param[out] time_interval Pointer to a variable to take
+     *      the time interval value.
+     * \param[out] time_interval_multiplier Pointer to a variable
+     *      to take the time interval multiplier value.
+     *
+     * \retval FWK_SUCCESS Operation succeeded.
+     * \retval FWK_E_DEVICE "get_info" returned error.
+     * \retval FWK_E_SUPPORT "sensor_get_timestamp_config" returned
+     *      "no timestamp support".
+     * \retval  FWK_E_PARAM "sensor_get_timestamp_config" returned
+     *      "configuration is null".
+     */
+    int (*get_update_interval)(
+        fwk_id_t id,
+        unsigned int *time_interval,
+        int *time_interval_multiplier);
 
 #ifdef BUILD_HAS_SENSOR_TIMESTAMP
     /*!

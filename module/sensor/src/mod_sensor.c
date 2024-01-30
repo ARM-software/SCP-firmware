@@ -357,6 +357,56 @@ static int sensor_disable(fwk_id_t id)
     return FWK_E_SUPPORT;
 }
 
+static int sensor_set_update_interval(
+    fwk_id_t id,
+    unsigned int time_interval,
+    int time_interval_multiplier)
+{
+    struct sensor_dev_ctx *ctx;
+
+    if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
+        return FWK_E_PARAM;
+    }
+
+    ctx = &ctx_table[fwk_id_get_element_idx(id)];
+
+    if (ctx->driver_api->set_update_interval == NULL) {
+        return FWK_E_SUPPORT;
+    }
+
+    return ctx->driver_api->set_update_interval(
+        id, time_interval, time_interval_multiplier);
+}
+
+static int sensor_get_update_interval(
+    fwk_id_t id,
+    unsigned int *time_interval,
+    int *time_interval_multiplier)
+{
+    int status;
+    struct sensor_dev_ctx *ctx;
+    struct mod_sensor_complete_info complete_info;
+
+    if (!fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
+        return FWK_E_PARAM;
+    }
+
+    ctx = &ctx_table[fwk_id_get_element_idx(id)];
+
+    status = ctx->driver_api->get_info(
+        ctx->config->driver_id, &(complete_info.hal_info));
+
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+
+    *time_interval = complete_info.hal_info.update_interval;
+    *time_interval_multiplier =
+        complete_info.hal_info.update_interval_multiplier;
+
+    return FWK_SUCCESS;
+}
+
 static struct mod_sensor_api sensor_api = {
     .get_data = get_data,
     .get_info = get_info,
@@ -364,6 +414,8 @@ static struct mod_sensor_api sensor_api = {
     .set_trip_point = sensor_set_trip_point,
     .enable = sensor_enable,
     .disable = sensor_disable,
+    .set_update_interval = sensor_set_update_interval,
+    .get_update_interval = sensor_get_update_interval,
 #ifdef BUILD_HAS_SENSOR_TIMESTAMP
     .set_timestamp_config = sensor_set_timestamp_config,
     .get_timestamp_config = sensor_get_timestamp_config,

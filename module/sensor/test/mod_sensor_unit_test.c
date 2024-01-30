@@ -34,10 +34,18 @@
 #define FAKE_RETURN_VALUE       4
 #define TRIP_POINT_API_ID_VALUE 4
 
+#define INITIAL_UPDATE_INTERVAL             0xAA55
+#define INITIAL_UPDATE_INTERVAL_MULTIPLIER  0x55AA
+#define MODIFIED_UPDATE_INTERVAL            0x1234
+#define MODIFIED_UPDATE_INTERVAL_MULTIPLIER 0x4321
+
 static struct mod_sensor_config sensor_configuration;
 
 static struct sensor_trip_point_ctx
     sensor_trip_point_context[SENSOR_TRIP_POINT_COUNT];
+
+static unsigned int updated_update_interval = 0;
+static unsigned int updated_update_interval_multiplier = 0;
 
 static int sensor_driver_get_value(fwk_id_t id, mod_sensor_value_t *value)
 {
@@ -46,6 +54,9 @@ static int sensor_driver_get_value(fwk_id_t id, mod_sensor_value_t *value)
 
 static int sensor_driver_get_info(fwk_id_t id, struct mod_sensor_info *info)
 {
+    info->update_interval = MODIFIED_UPDATE_INTERVAL;
+    info->update_interval_multiplier = MODIFIED_UPDATE_INTERVAL_MULTIPLIER;
+
     return FWK_SUCCESS;
 }
 
@@ -63,6 +74,25 @@ static int sensor_driver_get_info_disabled(
 {
     info->disabled = true;
     return FWK_SUCCESS;
+}
+
+static int sensor_driver_set_update_success(
+    fwk_id_t id,
+    unsigned int time_interval,
+    int time_interval_multiplier)
+{
+    updated_update_interval = time_interval;
+    updated_update_interval_multiplier = time_interval_multiplier;
+
+    return FWK_SUCCESS;
+}
+
+static int sensor_driver_set_update_returns_error(
+    fwk_id_t id,
+    unsigned int time_interval,
+    int time_interval_multiplier)
+{
+    return FWK_E_PARAM;
 }
 
 static int sensor_driver_get_value_error(fwk_id_t id, mod_sensor_value_t *value)
@@ -100,11 +130,13 @@ static int sensor_driver_disable_not_supported(fwk_id_t id)
 static struct mod_sensor_driver_api sensor_driver_api = {
     .get_value = sensor_driver_get_value,
     .get_info = sensor_driver_get_info,
+    .set_update_interval = sensor_driver_set_update_success,
 };
 
 static struct mod_sensor_driver_api sensor_driver_api_error = {
     .get_value = sensor_driver_get_value_error,
     .get_info = sensor_driver_get_info_error,
+    .set_update_interval = sensor_driver_set_update_returns_error,
 };
 
 void setUp(void)
@@ -1028,6 +1060,118 @@ void utest_sensor_disable_driver_returned_error(void)
     TEST_ASSERT_EQUAL(status, FWK_E_SUPPORT);
 }
 
+void utest_sensor_get_time_interval_get_info_returns_error(void)
+{
+    int status = FWK_SUCCESS;
+
+    unsigned int current_update_interval = INITIAL_UPDATE_INTERVAL;
+    int current_update_interval_multiplier = INITIAL_UPDATE_INTERVAL_MULTIPLIER;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    ctx_table[SENSOR_FAKE_INDEX_0].driver_api = &sensor_driver_api_error;
+
+    fwk_id_is_type_ExpectAndReturn(elem_id, FWK_ID_TYPE_ELEMENT, true);
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+
+    status = sensor_get_update_interval(
+        elem_id, &current_update_interval, &current_update_interval_multiplier);
+
+    TEST_ASSERT_EQUAL(status, FWK_E_PARAM);
+    TEST_ASSERT_EQUAL(current_update_interval, INITIAL_UPDATE_INTERVAL);
+    TEST_ASSERT_EQUAL(
+        current_update_interval_multiplier, INITIAL_UPDATE_INTERVAL_MULTIPLIER);
+}
+
+void utest_sensor_get_time_interval_get_info_returns_success(void)
+{
+    int status = FWK_SUCCESS;
+
+    unsigned int current_update_interval = INITIAL_UPDATE_INTERVAL;
+    int current_update_interval_multiplier = INITIAL_UPDATE_INTERVAL_MULTIPLIER;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    ctx_table[SENSOR_FAKE_INDEX_0].driver_api = &sensor_driver_api;
+
+    sensor_driver_api.get_info = sensor_driver_get_info;
+
+    fwk_id_is_type_ExpectAndReturn(elem_id, FWK_ID_TYPE_ELEMENT, true);
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+
+    status = sensor_get_update_interval(
+        elem_id, &current_update_interval, &current_update_interval_multiplier);
+
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+    TEST_ASSERT_EQUAL(current_update_interval, MODIFIED_UPDATE_INTERVAL);
+    TEST_ASSERT_EQUAL(
+        current_update_interval_multiplier,
+        MODIFIED_UPDATE_INTERVAL_MULTIPLIER);
+}
+
+void utest_sensor_set_time_interval_null_func_ptr(void)
+{
+    int status;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    ctx_table[SENSOR_FAKE_INDEX_0].driver_api = &sensor_driver_api;
+
+    sensor_driver_api.set_update_interval = NULL;
+
+    fwk_id_is_type_ExpectAndReturn(elem_id, FWK_ID_TYPE_ELEMENT, true);
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+
+    status = sensor_set_update_interval(
+        elem_id, INITIAL_UPDATE_INTERVAL, INITIAL_UPDATE_INTERVAL_MULTIPLIER);
+    TEST_ASSERT_EQUAL(status, FWK_E_SUPPORT);
+}
+
+void utest_sensor_set_time_interval_valid_func_ptr_ret_success(void)
+{
+    int status;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    ctx_table[SENSOR_FAKE_INDEX_0].driver_api = &sensor_driver_api;
+
+    sensor_driver_api.set_update_interval = sensor_driver_set_update_success,
+
+    fwk_id_is_type_ExpectAndReturn(elem_id, FWK_ID_TYPE_ELEMENT, true);
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+
+    status = sensor_set_update_interval(
+        elem_id, INITIAL_UPDATE_INTERVAL, INITIAL_UPDATE_INTERVAL_MULTIPLIER);
+
+    TEST_ASSERT_EQUAL(updated_update_interval, INITIAL_UPDATE_INTERVAL);
+    TEST_ASSERT_EQUAL(
+        updated_update_interval_multiplier, INITIAL_UPDATE_INTERVAL_MULTIPLIER);
+
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+}
+
+void utest_sensor_set_time_interval_valid_func_ptr_ret_error(void)
+{
+    int status;
+
+    fwk_id_t elem_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_SENSOR, SENSOR_FAKE_INDEX_0);
+
+    ctx_table[SENSOR_FAKE_INDEX_0].driver_api = &sensor_driver_api_error;
+
+    fwk_id_is_type_ExpectAndReturn(elem_id, FWK_ID_TYPE_ELEMENT, true);
+    fwk_id_get_element_idx_ExpectAndReturn(elem_id, SENSOR_FAKE_INDEX_0);
+
+    status = sensor_set_update_interval(
+        elem_id, INITIAL_UPDATE_INTERVAL, INITIAL_UPDATE_INTERVAL_MULTIPLIER);
+
+    TEST_ASSERT_EQUAL(status, FWK_E_PARAM);
+}
+
 int sensor_test_main(void)
 {
     UNITY_BEGIN();
@@ -1076,6 +1220,12 @@ int sensor_test_main(void)
     RUN_TEST(utest_sensor_disable_no_driver_support);
     RUN_TEST(utest_sensor_disable_driver_succeeded);
     RUN_TEST(utest_sensor_disable_driver_returned_error);
+
+    RUN_TEST(utest_sensor_get_time_interval_get_info_returns_error);
+    RUN_TEST(utest_sensor_get_time_interval_get_info_returns_success);
+    RUN_TEST(utest_sensor_set_time_interval_null_func_ptr);
+    RUN_TEST(utest_sensor_set_time_interval_valid_func_ptr_ret_success);
+    RUN_TEST(utest_sensor_set_time_interval_valid_func_ptr_ret_error);
 
     return UNITY_END();
 }
