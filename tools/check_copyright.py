@@ -67,11 +67,13 @@ FILE_TYPES = [
 COMMENT_PATTERN = '^(( \\*)|(;)|(\\#))'
 COMPANY_PATTERN = '(Arm|'\
                   'Renesas|'\
-                  'Linaro)'
+                  'Linaro|'\
+                  'STMicroelectronics)'
 COMPANY_FULL_NAME_PATTERN = \
     '(Arm Limited and Contributors|'\
     'Renesas Electronics Corporation|'\
-    'Linaro Limited and Contributors)'
+    'Linaro Limited and Contributors|'\
+    'STMicroelectronics and Contributors)'
 
 #
 # License pattern to match
