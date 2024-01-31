@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -100,6 +100,10 @@
 #define SCP_SCMI_PAYLOAD_S_A2P_BASE (SCP_SDS_MEM_BASE + SCP_SDS_MEM_SIZE)
 #define SCP_SCMI_PAYLOAD_S_P2A_BASE \
     (SCP_SCMI_PAYLOAD_S_A2P_BASE + SCP_SCMI_PAYLOAD_SIZE)
+
+/* SDS Memory Region of RSE - Reserved */
+#define RSE_SDS_MEM_BASE (SCP_SCMI_PAYLOAD_S_P2A_BASE + SCP_SCMI_PAYLOAD_SIZE)
+#define RSE_SDS_MEM_SIZE (64)
 
 /* SCMI Non-Secure Payload Areas */
 
