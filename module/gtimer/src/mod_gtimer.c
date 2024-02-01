@@ -304,7 +304,7 @@ static void gtimer_control_init(struct gtimer_dev_ctx *ctx)
     }
 
     /* Set primary counter update frequency and enable counter. */
-    ctx->control->FID0 = ctx->config->frequency;
+    ctx->control->FID[0] = ctx->config->frequency;
     ctx->control->CR |= CNTCONTROL_CR_FCREQ | CNTCONTROL_CR_EN;
 }
 

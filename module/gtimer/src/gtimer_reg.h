@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -15,18 +15,33 @@
 /*!
  * \brief Counter registers (CNTCONTROL)
  */
+#define CNTCR_OFFSET     0x000 /* Counter Control Register. */
+#define CNTSR_OFFSET     0x004 /* Counter Status Register. */
+#define CNTCV_L_OFFSET   0x008 /* Counter Count Value register. */
+#define CNTCV_H_OFFSET   0x00C /* Counter Count Value register. */
+#define CNTSCR_OFFSET    0x010 /* Counter Scale Register. */
+#define RESERVED0_OFFSET 0x014
+#define CNTID_OFFSET     0x01C /* Counter Identification Register.*/
+#define CNTFID0_OFFSET   0x020 /* Frequency modes table and end marker.*/
+#define IMP_DEF_OFFSET   0X0C0
+#define RESERVED1_OFFSET 0x100
+#define COUNTERID_OFFSET 0xFD0 /* Counter ID register */
+
+#define MAX_NUM_OF_IMP_DEF_REG \
+    (RESERVED1_OFFSET - IMP_DEF_OFFSET) / sizeof(uint32_t)
+#define MAX_NUM_OF_FID_REG (IMP_DEF_OFFSET - CNTFID0_OFFSET) / sizeof(uint32_t)
 struct cntcontrol_reg {
     FWK_RW  uint32_t CR;
     FWK_R   uint32_t SR;
     FWK_RW  uint32_t CVL;
     FWK_RW  uint32_t CVH;
-            uint32_t RESERVED0[4];
-    FWK_RW  uint32_t FID0;
-            uint8_t  RESERVED1[0xC0 - 0x24];
-    FWK_RW  uint32_t SCR; /* CSS: Synchronization Control Register */
-    FWK_R   uint32_t SVL; /* CSS: Synchronized Counter Lower Value Register */
-    FWK_R   uint32_t SVU; /* CSS: Synchronized Counter Upper Value Register */
-            uint8_t  RESERVED2[0xFD0 - 0xCC];
+    FWK_RW uint32_t CSR;
+    uint32_t RESERVED0[2];
+    FWK_R uint32_t ID;
+    FWK_RW uint32_t FID[MAX_NUM_OF_FID_REG];
+    FWK_RW uint32_t IMP_DEF[MAX_NUM_OF_IMP_DEF_REG];
+    uint32_t
+        RESERVED1[(COUNTERID_OFFSET - RESERVED1_OFFSET) / sizeof(uint32_t)];
     FWK_R   uint32_t PID[11];
 };
 
