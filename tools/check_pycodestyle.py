@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
@@ -12,21 +12,16 @@ This script runs pycodestyle to check all python scripts.
 
 import sys
 import subprocess
+from utils import banner
 
-INCLUDE_DIRECTORIES = "tools/ unit_test/utils"
-
-
-def banner(text):
-    columns = 80
-    title = " {} ".format(text)
-    print("\n\n{}".format(title.center(columns, "*")))
+INCLUDE_DIRECTORIES = 'tools/ unit_test/utils'
 
 
-def main():
-    banner("Build and run PyCodeStyle tests")
+def run():
+    print(banner('Run PyCodeStyle tests'))
 
     result = subprocess.Popen(
-        "python -m pycodestyle {}".format(INCLUDE_DIRECTORIES),
+        'python -m pycodestyle {}'.format(INCLUDE_DIRECTORIES),
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
@@ -37,10 +32,15 @@ def main():
 
     if result.returncode != 0:
         print(stderr.decode())
-        print('FAILED')
-        return 1
-    print('SUCCESS')
-    return 0
+        print('Run PyCodeStyle tests failed.')
+        return False
+
+    print('Run PyCodeStyle tests succedded.')
+    return True
+
+
+def main():
+    return 0 if run() else 1
 
 
 if __name__ == '__main__':

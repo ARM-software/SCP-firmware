@@ -1,31 +1,26 @@
 #!/usr/bin/env python3
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
 """
 Build and check unit tests for modules.
-This script runs "CC=gcc make -f Makefile.cmake mod_test" and performs all
+This script runs 'CC=gcc make -f Makefile.cmake mod_test' and performs all
 modules' unit tests.
 """
 
 import sys
 import subprocess
+from utils import banner
 
 
-def banner(text):
-    columns = 80
-    title = " {} ".format(text)
-    print("\n\n{}".format(title.center(columns, "*")))
-
-
-def main():
-    banner("Build and run modules' unit tests")
+def run():
+    print(banner('Build and run modules\' unit tests'))
 
     result = subprocess.Popen(
-        "CC=gcc make -f Makefile.cmake mod_test",
+        'CC=gcc make -f Makefile.cmake mod_test',
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
@@ -34,11 +29,17 @@ def main():
 
     print(stdout.decode())
 
-    if stderr:
+    if result.returncode != 0:
         print(stderr.decode())
-        return 1
+        print('Build and run modules\' unit tests failed.')
+        return False
 
-    return 0
+    print('Build and run modules\' unit tests succedded.')
+    return True
+
+
+def main():
+    return 0 if run() else 1
 
 
 if __name__ == '__main__':
