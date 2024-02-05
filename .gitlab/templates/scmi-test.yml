@@ -26,3 +26,14 @@
   script:
     - echo "platform under test $SCP_CI_PLATFORM"
     - /scmi_tester_entrypoint.sh
+  artifacts:
+    when: always
+    expire_in: 2 days
+    paths:
+      - artifacts/*/scmi/ap.txt
+      - artifacts/*/scmi/scp.txt
+      - artifacts/*/scmi/log.txt
+      - artifacts/*/scmi/report.txt
+      - artifacts/*/scmi/report.xml
+    reports:
+      junit: artifacts/*/scmi/report.xml
