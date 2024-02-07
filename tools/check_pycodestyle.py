@@ -14,7 +14,7 @@ import sys
 import subprocess
 from utils import banner
 
-INCLUDE_DIRECTORIES = 'tools/ unit_test/utils'
+INCLUDE_DIRECTORIES = 'tools/ unit_test/utils framework/test/utils'
 
 
 def run():

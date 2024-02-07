@@ -17,6 +17,8 @@ export MODULES_DIR := $(TOP_DIR)/module
 export DOC_DIR := $(TOP_DIR)/doc
 export MOD_TEST_DIR := $(TOP_DIR)/unit_test
 export MOD_TEST_BUILD_DIR=$(BUILD_DIR)/unit_test
+export FWK_TEST_DIR=$(FWK_DIR)/test
+export FWK_TEST_BUILD_DIR=$(BUILD_DIR)/framework/test
 
 #
 # Tools
@@ -316,11 +318,14 @@ test : fwk_test mod_test
 
 .PHONY: fwk_test
 fwk_test:
-	$(CMAKE) -B ${BUILD_PATH}/framework/test $(FWK_DIR)/test -G Ninja
+	$(CMAKE) -B $(FWK_TEST_BUILD_DIR) $(FWK_TEST_DIR) -G Ninja
 	$(CMAKE) --build ${BUILD_PATH}/framework/test
 	# --test-dir option of ctest is not available before ctest 3.20
 	# so use workaround to change the test dir and run the tests from there
-	${CD} ${BUILD_PATH}/framework/test && ${CTEST} -V
+	${CD} $(FWK_TEST_BUILD_DIR) && ${CTEST} -V --output-junit Testing/TestResults.xml
+	${CD} $(FWK_TEST_BUILD_DIR) && $(LCOV) --capture --directory . --output-file scp_v2_fwk_test_coverage.info
+	${CD} $(FWK_TEST_BUILD_DIR) && $(PYTHON) $(FWK_DIR)/test/utils/generate_coverage_report.py
+	${CD} $(FWK_TEST_BUILD_DIR) && $(GENHTML) scp_v2_fwk_test_coverage_filtered.info --prefix "$(TOP_DIR)" --output-directory $(FWK_TEST_BUILD_DIR)/coverage_report
 
 .PHONY: mod_test
 mod_test:
@@ -329,4 +334,4 @@ mod_test:
 	${CD} $(MOD_TEST_BUILD_DIR) && $(CTEST) -V --output-junit Testing/TestResults.xml
 	${CD} $(MOD_TEST_BUILD_DIR) && $(LCOV) --capture --directory $(MOD_TEST_BUILD_DIR) --output-file scp_v2_unit_test_coverage.info
 	${CD} $(MOD_TEST_BUILD_DIR) && $(PYTHON) ../../unit_test/utils/generate_coverage_report.py
-	${CD} $(MOD_TEST_BUILD_DIR) && $(GENHTML) scp_v2_unit_test_coverage_filtered.info --prefix "$(TOP_DIR)" --output-directory $(BUILD_DIR)/coverage_report
+	${CD} $(MOD_TEST_BUILD_DIR) && $(GENHTML) scp_v2_unit_test_coverage_filtered.info --prefix "$(TOP_DIR)" --output-directory $(MOD_TEST_BUILD_DIR)/coverage_report

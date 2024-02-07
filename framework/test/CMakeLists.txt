@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -51,6 +51,7 @@ list(APPEND EXTRA_COMPILE_FLAGS -Wno-strict-aliasing)
 list(APPEND EXTRA_COMPILE_FLAGS -std=gnu11)
 list(APPEND EXTRA_COMPILE_FLAGS -DBUILD_MODE_DEBUG)
 list(APPEND EXTRA_COMPILE_FLAGS -DBUILD_TESTS)
+list(APPEND EXTRA_COMPILE_FLAGS --coverage)
 
 # Add test targets
 list(APPEND SCP_FWK_TEST_TARGETS test_fwk_id_equality)
@@ -188,6 +189,9 @@ foreach(idx RANGE ${SCP_FWK_TEST_MAX})
                                 PRIVATE "LINKER:-wrap=${link_option}")
         endforeach()
     endif()
+
+    # Link test target against gcov for coverage data generation
+    target_link_libraries(${TEST_TARGET} PRIVATE --coverage gcov)
 
     add_test(NAME ${TEST_TARGET} COMMAND ${TEST_TARGET})
 
