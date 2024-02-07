@@ -24,7 +24,7 @@ import subprocess
 import glob
 from dataclasses import dataclass, asdict
 from itertools import islice
-from utils import banner, get_filtered_files
+from utils import banner, get_filtered_files, get_previous_commit
 
 #
 # Directories to exclude
@@ -189,7 +189,7 @@ def check_copyright(filename, pattern, analysis):
             return
 
 
-def run(commit_hash):
+def run(commit_hash=get_previous_commit()):
     print(banner('Checking the copyrights in the code...'))
 
     changed_files = get_changed_files(commit_hash)
@@ -217,9 +217,10 @@ def parse_args(argv, prog_name):
         description='Perform code style check the correct license header')
 
     parser.add_argument('-c', '--commit', dest='commit_hash',
-                        required=False, default='HEAD', type=str,
-                        action='store', help='Specify a commit hash. If not \
-                        specified, defaults to the previous commit.')
+                        required=False, default=get_previous_commit(),
+                        type=str, action='store', help='Specify a commit \
+                        hash. If not specified, defaults to the previous \
+                        commit.')
 
     return parser.parse_args(argv)
 
