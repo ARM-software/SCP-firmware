@@ -38,12 +38,12 @@ def get_previous_commit() -> str:
     an error or if it's the initial commit.
     """
     result = subprocess.run(
-        ['git', 'rev-parse', 'HEAD^'],
+        'git rev-parse HEAD^',
+        shell=True,
         stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True
+        stderr=subprocess.PIPE
     )
-    return result.stdout.strip()
+    return result.stdout.decode('utf-8').strip()
 
 
 class Results(List[Tuple[str, int]]):
