@@ -1,0 +1,38 @@
+#
+# Arm SCP/MCP Software
+# Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+name: Mirror SCP GitLab repo
+
+on:
+  schedule:
+    # Runs every day at 8 AM
+    - cron: '0 8 * * *'
+
+
+permissions:
+  contents: write
+
+jobs:
+  mirror:
+    name: gitlab-mirror
+    # Only 1 mirror job needs to run at once
+    concurrency: mirror
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # Checks out the github repo
+          repository: ${{ github.repository }}
+          path: target-repo
+          ref: master
+
+      - name: Force-push Gitlab -> Github
+        run: |
+          cd target-repo &&
+          git remote add gitlab https://git.gitlab.arm.com/firmware/SCP-firmware.git
+          git fetch gitlab main
+          git push -f origin FETCH_HEAD:refs/heads/master --tags
