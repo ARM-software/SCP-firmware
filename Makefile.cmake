@@ -16,7 +16,7 @@ export PRODUCTS_DIR := $(TOP_DIR)/product
 export MODULES_DIR := $(TOP_DIR)/module
 export DOC_DIR := $(TOP_DIR)/doc
 export MOD_TEST_DIR := $(TOP_DIR)/unit_test
-export MOD_TEST_BUILD_DIR=$(BUILD_DIR)/unit_test
+export MOD_TEST_BUILD_DIR=$(BUILD_DIR)/module/test
 export FWK_TEST_DIR=$(FWK_DIR)/test
 export FWK_TEST_BUILD_DIR=$(BUILD_DIR)/framework/test
 
@@ -345,6 +345,6 @@ mod_test:
 	${CD} $(MOD_TEST_BUILD_DIR) && $(CTEST) -V --output-junit Testing/TestResults.xml
 ifeq ($(ENABLE_COVERAGE),y)
 	${CD} $(MOD_TEST_BUILD_DIR) && $(LCOV) --capture --directory $(MOD_TEST_BUILD_DIR) --output-file scp_v2_unit_test_coverage.info
-	${CD} $(MOD_TEST_BUILD_DIR) && $(PYTHON) ../../unit_test/utils/generate_coverage_report.py
+	${CD} $(MOD_TEST_BUILD_DIR) && $(PYTHON) $(MOD_TEST_DIR)/utils/generate_coverage_report.py
 	${CD} $(MOD_TEST_BUILD_DIR) && $(GENHTML) scp_v2_unit_test_coverage_filtered.info --prefix "$(TOP_DIR)" --output-directory $(MOD_TEST_BUILD_DIR)/coverage_report
 endif
