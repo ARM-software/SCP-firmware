@@ -51,6 +51,7 @@ DEFAULT_MODE := release
 DEFAULT_BUILD_PATH := $(TOP_DIR)/build
 DEFAULT_VERBOSE := n
 DEFAULT_DEBUGGER := n
+DEFAULT_ENABLE_COVERAGE := n
 DEFAULT_TOOLCHAIN := GNU
 DEFAULT_BUILD_SYSTEM := Ninja
 export CMSIS_DIR := $(TOP_DIR)/contrib/cmsis/git/CMSIS/Core
@@ -112,6 +113,8 @@ DEBUGGER ?= $(DEFAULT_DEBUGGER)
 ifeq ($(DEBUGGER),y)
     CMAKE_DEBUGGER_OPTION := -DSCP_ENABLE_DEBUGGER=ON
 endif
+
+ENABLE_COVERAGE ?= $(DEFAULT_ENABLE_COVERAGE)
 
 #
 # Products
@@ -287,6 +290,12 @@ help:
 	@echo "        Pass extra arguments directly to cmake build stage."
 	@echo "        Multiplle extra args can be added with += or by passing the arguments as a string"
 	@echo ""
+	@echo "    ENABLE_COVERAGE"
+	@echo "        Value: <y|n>"
+	@echo "        Default: n"
+	@echo "        Enable or disable generation of code coverage reports for unit tests."
+	@echo "        Use ENABLE_COVERAGE=y to enable coverage for `fwk_test` and `mod_test` targets."
+	@echo ""
 
 
 .SECONDEXPANSION:
@@ -323,15 +332,19 @@ fwk_test:
 	# --test-dir option of ctest is not available before ctest 3.20
 	# so use workaround to change the test dir and run the tests from there
 	${CD} $(FWK_TEST_BUILD_DIR) && ${CTEST} -V --output-junit Testing/TestResults.xml
+ifeq ($(ENABLE_COVERAGE),y)
 	${CD} $(FWK_TEST_BUILD_DIR) && $(LCOV) --capture --directory . --output-file scp_v2_fwk_test_coverage.info
 	${CD} $(FWK_TEST_BUILD_DIR) && $(PYTHON) $(FWK_DIR)/test/utils/generate_coverage_report.py
 	${CD} $(FWK_TEST_BUILD_DIR) && $(GENHTML) scp_v2_fwk_test_coverage_filtered.info --prefix "$(TOP_DIR)" --output-directory $(FWK_TEST_BUILD_DIR)/coverage_report
+endif
 
 .PHONY: mod_test
 mod_test:
 	$(CMAKE) -B $(MOD_TEST_BUILD_DIR) $(MOD_TEST_DIR) -G Ninja
 	$(CMAKE) --build $(MOD_TEST_BUILD_DIR)
 	${CD} $(MOD_TEST_BUILD_DIR) && $(CTEST) -V --output-junit Testing/TestResults.xml
+ifeq ($(ENABLE_COVERAGE),y)
 	${CD} $(MOD_TEST_BUILD_DIR) && $(LCOV) --capture --directory $(MOD_TEST_BUILD_DIR) --output-file scp_v2_unit_test_coverage.info
 	${CD} $(MOD_TEST_BUILD_DIR) && $(PYTHON) ../../unit_test/utils/generate_coverage_report.py
 	${CD} $(MOD_TEST_BUILD_DIR) && $(GENHTML) scp_v2_unit_test_coverage_filtered.info --prefix "$(TOP_DIR)" --output-directory $(MOD_TEST_BUILD_DIR)/coverage_report
+endif
