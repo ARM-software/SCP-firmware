@@ -17,7 +17,7 @@ if [ -z "${user}" ]; then
     exec $@
 else
     uid=$(stat -c "%u" ".")
-    gid=$(stat -c "%u" ".")
+    gid=$(stat -c "%g" ".")
 
     usermod -u ${uid} ${user}
     groupmod -g ${gid} ${user}

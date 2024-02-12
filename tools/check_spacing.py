@@ -47,6 +47,8 @@ FILE_TYPES = [
     'CMakeLists.txt',
     '*.yml',
     '*.yaml',
+    'Dockerfile',
+    '*.sh',
 ]
 
 #
