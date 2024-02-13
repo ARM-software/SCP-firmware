@@ -40,16 +40,22 @@ Making Changes
 Submitting Changes
 ------------------
 
+- Ensure forking the repository.
+  This requires the fork permission on the account, which can be obtained by
+  following: https://gitlab.arm.com/documentation/contributions.
 - Ensure that each commit in the series has at least one `Signed-off-by:` line,
   using your real name and email address. The names in the `Signed-off-by:`
   and `Author:` lines must match. If anyone else contributes to the commit,
   they must also add their own `Signed-off-by:` line. By adding this line the
   contributor certifies the contribution is made under the terms of the
   [Developer Certificate of Origin (DCO)](./dco.txt).
-- Push your local changes to a new branch in the repository.
-- Submit a [merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-  to the [SCP-firmware](https://gitlab.arm.com/firmware/SCP-firmware) `main`
-  branch.
+- Push your local changes to a new branch in your **fork**
+  (this might require setting up your SSH public key in your profile).
+  See [SSH](https://docs.gitlab.com/ee/user/ssh.html#add-an-ssh-key-to-your-gitlab-account)
+- Submit a [merge request](https://docs.gitlab.com/ee/user/ssh.html#add-an-ssh-key-to-your-gitlab-account)
+  from your **fork** to the [SCP-firmware](https://gitlab.arm.com/firmware/SCP-firmware)
+  _:warning: Please ensure you chose
+  [SCP-firmware](https://gitlab.arm.com/firmware/SCP-firmware) `main` as the target branch._
     - The changes in the merge request (MR) will then undergo further review and
       testing by the maintainers. Any review comments will be made as
       comments on the MR.
@@ -66,10 +72,6 @@ Submitting Changes
     - If after merging the maintainers find any issues, they may remove the
       commits and ask you to create a new merge request to
       resolve the problems.
-    - Please do not delete your topic branch until it is safely merged into
-      the `main` branch.
-    - The maintainers may also remove the original branch after the MR. If you
-      wish this not ot happen, please let the maintainers know in advance.
 
 Followthrough
 -------------
@@ -89,4 +91,4 @@ manner.  Failure to address issues/bugs may result in the causal commit
 being removed.
 
 --------------
-*Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.*
+*Copyright (c) 2018-2024, Arm Limited and Contributors. All rights reserved.*
