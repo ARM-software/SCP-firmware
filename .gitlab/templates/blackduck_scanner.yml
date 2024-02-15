@@ -1,0 +1,59 @@
+#
+# Arm SCP/MCP Software
+# Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+.blackduck-scan:
+  image: ${CI_REGISTRY_IMAGE}/blackduck-scanner-amd64
+  tags:
+    - amd64
+  variables:
+    BD_PROJECT_VERSION: "gitlab:scp-main"
+  script:
+    - echo "                                                               "
+    - echo "==============================================================="
+    - echo " Black Duck Scan                                               "
+    - echo "==============================================================="
+    - echo "                                                               "
+
+      # Download Detect script
+    - curl $BD_DETECT_SCRIPT_URL -o detect.sh
+    - chmod 777 detect.sh
+
+    - export PROJECT_NAME="SCP:scpfw"
+    - export PROJECT_VERSION=$BD_PROJECT_VERSION
+    - export PROJECT_PATH=$(pwd)
+
+      # The token used belongs to scpbot@arm.com with R/W permissions
+    - echo "-------- Starting Black Duck Scan for $PROJECT_NAME --------"
+    - >
+      ./detect.sh -d --blackduck.url="$BD_URL"
+      --blackduck.api.token=$SCP_BLACKDUCK_TOKEN
+      --detect.source.path=$PROJECT_PATH
+      --detect.project.name=$PROJECT_NAME
+      --detect.project.version.name=$PROJECT_VERSION
+      --detect.project.tags=security_scan
+      --detect.project.version.phase=RELEASED
+      --detect.project.version.distribution=EXTERNAL
+      --detect.project.version.update=true
+      --blackduck.trust.cert=true
+      --detect.cleanup=false
+      --detect.impact.analysis.enabled=true
+      --detect.detector.search.continue=true
+      --detect.detector.search.depth=05
+      --detect.binary.scan.search.depth=05
+      --detect.blackduck.scan.mode=INTELLIGENT
+      --detect.blackduck.signature.scanner.individual.file.matching=ALL
+      --detect.blackduck.signature.scanner.copyright.search=true
+      --detect.blackduck.signature.scanner.license.search=true
+      --detect.blackduck.signature.scanner.snippet.matching=SNIPPET_MATCHING
+      --detect.blackduck.signature.scanner.upload.source.mode=true
+      --detect.excluded.directories=build,contrib/cmsis/git/docker
+      | tee blackduck_scan.log
+  artifacts:
+    when: always
+    expire_in: 2 days
+    paths:
+      - blackduck_scan.log
