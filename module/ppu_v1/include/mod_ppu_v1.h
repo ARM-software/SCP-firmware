@@ -176,6 +176,20 @@ struct mod_ppu_v1_pd_config {
 
     /*! Timer descriptor */
     struct mod_ppu_v1_timer_config *timer_config;
+
+    /*!
+     * \brief Identifier of the alarm for deeper locking timeout.
+     *
+     * \note This alarm is optional, if it is not defined it will not be
+     * included.
+     */
+    fwk_optional_id_t alarm_id;
+
+    /*!
+     * Alarm delay period for the timeout. This is option; set to a
+     * value greater than 0 if using the alarm.
+     */
+    uint32_t alarm_delay;
 };
 
 /*!

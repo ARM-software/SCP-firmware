@@ -57,6 +57,9 @@ struct ppu_v1_pd_ctx {
 
     /* Context data specific to the type of power domain */
     void *data;
+
+    /*! Alarm to be used for deeper locking states */
+    struct mod_timer_alarm_api *alarm_api;
 };
 
 /* Cluster power domain specific context */
@@ -110,6 +113,41 @@ static const uint8_t ppu_mode_to_power_state[] = {
 /*
  * Functions not specific to any type of power domain
  */
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
+static void deeper_locking_alarm_callback(uintptr_t param)
+{
+    struct ppu_v1_pd_ctx *pd_ctx;
+    struct ppu_v1_reg *ppu;
+    unsigned int pd_id = (unsigned int)param;
+
+    pd_ctx = ppu_v1_ctx.pd_ctx_table + pd_id;
+    ppu = pd_ctx->ppu;
+
+    /* Disable the lock at off and unlock */
+    ppu_v1_lock_off_disable(ppu);
+    ppu_v1_off_unlock(ppu);
+}
+
+static int start_deeper_locking_alarm(fwk_id_t core_pd_id)
+{
+#    ifdef BUILD_HAS_MOD_TIMER
+    struct ppu_v1_pd_ctx *pd_ctx;
+    pd_ctx = ppu_v1_ctx.pd_ctx_table + fwk_id_get_element_idx(core_pd_id);
+
+    if (pd_ctx->alarm_api == NULL) {
+        return FWK_E_SUPPORT;
+    }
+    return pd_ctx->alarm_api->start(
+        pd_ctx->config->alarm_id,
+        pd_ctx->config->alarm_delay,
+        MOD_TIMER_ALARM_TYPE_ONCE,
+        deeper_locking_alarm_callback,
+        (uintptr_t)fwk_id_get_element_idx(core_pd_id));
+#    else
+    return FWK_E_SUPPORT;
+#    endif
+}
+#endif
 
 static int get_state(struct ppu_v1_reg *ppu, unsigned int *state)
 {
@@ -298,7 +336,8 @@ static int ppu_v1_core_pd_set_state(fwk_id_t core_pd_id, unsigned int state)
         ppu_v1_set_input_edge_sensitivity(
             ppu, PPU_V1_MODE_ON, PPU_V1_EDGE_SENSITIVITY_MASKED);
 
-        status = FWK_SUCCESS;
+        status = start_deeper_locking_alarm(core_pd_id);
+
         break;
 
     default:
@@ -367,6 +406,17 @@ static void core_pd_ppu_interrupt_handler(struct ppu_v1_pd_ctx *pd_ctx)
             pd_ctx->bound_id, MOD_PD_STATE_SLEEP);
         fwk_assert(status == FWK_SUCCESS);
         (void)status;
+
+#ifdef BUILD_HAS_MOD_POWER_DOMAIN
+        /* Notify of the locked interrupt being received */
+        if (pd_ctx->alarm_api != NULL) {
+            /* Disable the timer as interrupt has been received */
+            status = pd_ctx->alarm_api->stop(pd_ctx->config->alarm_id);
+
+            fwk_assert(status == FWK_SUCCESS);
+            (void)status;
+        }
+#endif
 
         /*
          * Enable the core PACTIVE ON signal rising edge interrupt then check if
@@ -795,6 +845,12 @@ static int ppu_v1_pd_init(fwk_id_t pd_id, unsigned int unused, const void *data)
         pd_ctx->timer_ctx->delay_us =
             config->timer_config->set_state_timeout_us;
     }
+
+    if (fwk_optional_id_is_defined(config->alarm_id)) {
+        if (config->alarm_delay == 0) {
+            return FWK_E_SUPPORT;
+        }
+    }
 #else
     pd_ctx->timer_ctx = NULL;
 #endif
@@ -884,6 +940,18 @@ static int ppu_v1_bind(fwk_id_t id, unsigned int round)
             return status;
         }
     }
+    if (fwk_optional_id_is_defined(pd_ctx->config->alarm_id)) {
+        status = fwk_module_bind(
+            pd_ctx->config->alarm_id,
+            MOD_TIMER_API_ID_ALARM,
+            &pd_ctx->alarm_api);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+    } else {
+        pd_ctx->alarm_api = NULL;
+    }
+
 #endif
 
     if (!fwk_id_is_equal(pd_ctx->config->observer_id, FWK_ID_NONE)) {
