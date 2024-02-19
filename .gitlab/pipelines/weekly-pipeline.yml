@@ -1,0 +1,16 @@
+#
+# Arm SCP/MCP Software
+# Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+stages:
+  - scan
+
+include:
+  - local: .gitlab/templates/blackduck_scanner.yml
+
+blackduck-scan:
+  extends: .blackduck-scan
+  stage: scan
