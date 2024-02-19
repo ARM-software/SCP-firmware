@@ -11,6 +11,7 @@ variables:
     options:
       - "deployment-pipeline"
       - "daily-pipeline"
+      - "weekly-pipeline"
     description: "The CI pipeline to run"
 
 include:
@@ -21,3 +22,7 @@ include:
   - local: .gitlab/pipelines/daily-pipeline.yml
     rules:
       - if: $PIPELINE_TYPE == "daily-pipeline"
+
+  - local: .gitlab/pipelines/weekly-pipeline.yml
+    rules:
+      - if: $PIPELINE_TYPE == "weekly-pipeline"
