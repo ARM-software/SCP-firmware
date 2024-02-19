@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -19,13 +19,13 @@
 
 #include <fmw_cmsis.h>
 
-static const uint8_t system_power_to_sys_ppu0_state[4] = {
+static const uint8_t system_power_to_sys_ppu0_state[] = {
     [MOD_PD_STATE_ON] = (uint8_t)MOD_PD_STATE_ON,
     [MOD_SYSTEM_POWER_POWER_STATE_SLEEP0] = (uint8_t)MOD_PD_STATE_OFF,
     [MOD_PD_STATE_OFF] = (uint8_t)MOD_PD_STATE_OFF,
 };
 
-static const uint8_t system_power_to_sys_ppu1_state[4] = {
+static const uint8_t system_power_to_sys_ppu1_state[] = {
     [MOD_PD_STATE_ON] = (uint8_t)MOD_PD_STATE_ON,
     [MOD_SYSTEM_POWER_POWER_STATE_SLEEP0] = (uint8_t)MOD_PD_STATE_ON,
     [MOD_PD_STATE_OFF] = (uint8_t)MOD_PD_STATE_OFF,

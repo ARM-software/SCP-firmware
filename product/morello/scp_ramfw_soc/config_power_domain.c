@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -28,7 +28,7 @@
 #define PD_NAME_SIZE 16
 
 /* Mask of the allowed states for the systop power domain */
-static const uint32_t systop_allowed_state_mask_table[2] = {
+static const uint32_t systop_allowed_state_mask_table[] = {
     [MOD_PD_STATE_OFF] = MOD_PD_STATE_OFF_MASK,
     [MOD_PD_STATE_ON] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK |
         (1 << MOD_SYSTEM_POWER_POWER_STATE_SLEEP0) |
@@ -39,7 +39,7 @@ static const uint32_t systop_allowed_state_mask_table[2] = {
  * Mask of the allowed states for the top level power domains
  * (but the cluster power domains) depending on the system states.
  */
-static const uint32_t toplevel_allowed_state_mask_table[5] = {
+static const uint32_t toplevel_allowed_state_mask_table[] = {
     [MOD_PD_STATE_OFF] = MOD_PD_STATE_OFF_MASK,
     [MOD_PD_STATE_ON] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK,
     [MOD_SYSTEM_POWER_POWER_STATE_SLEEP0] = MOD_PD_STATE_OFF_MASK,
@@ -50,7 +50,7 @@ static const uint32_t toplevel_allowed_state_mask_table[5] = {
  * Mask of the allowed states for the cluster power domain depending on the
  * system states.
  */
-static const uint32_t cluster_pd_allowed_state_mask_table[5] = {
+static const uint32_t cluster_pd_allowed_state_mask_table[] = {
     [MOD_PD_STATE_OFF] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_SLEEP_MASK,
     [MOD_PD_STATE_ON] = MORELLO_CLUSTER_VALID_STATE_MASK,
     [MOD_SYSTEM_POWER_POWER_STATE_SLEEP0] = MOD_PD_STATE_OFF_MASK,
@@ -58,7 +58,7 @@ static const uint32_t cluster_pd_allowed_state_mask_table[5] = {
 };
 
 /* Mask of the allowed states for a core depending on the cluster states. */
-static const uint32_t core_pd_allowed_state_mask_table[6] = {
+static const uint32_t core_pd_allowed_state_mask_table[] = {
     [MOD_PD_STATE_OFF] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_SLEEP_MASK,
     [MOD_PD_STATE_ON] = MORELLO_CORE_VALID_STATE_MASK,
     [MOD_PD_STATE_SLEEP] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_SLEEP_MASK,
