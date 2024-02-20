@@ -57,6 +57,8 @@ struct cmn_cyprus_mxp_reg {
 
 #define HNS_RN_CLUSTER_MAX    128
 #define HNS_RN_PHYIDS_REG_MAX 4
+/* CML Port Aggregation Group register count */
+#define HNS_CPA_GRP_REG_COUNT 2
 
 /*!
  * Fully Coherent Home Node (HN-S) registers.
@@ -75,7 +77,7 @@ struct cmn_cyprus_hns_reg {
             uint8_t   RESERVED4[0xD38 - 0xD30];
     FWK_RW  uint64_t  SAM_MEMREGION_END_ADDR[2];
             uint8_t   RESERVED5[0xFB0 - 0xD48];
-    FWK_RW  uint64_t  CML_PORT_AGGR_GRP_REG[2];
+    FWK_RW  uint64_t  CML_PORT_AGGR_GRP_REG[HNS_CPA_GRP_REG_COUNT];
             uint8_t   RESERVED6[0xFD0 - 0xFC0];
     FWK_RW  uint64_t  CML_PORT_AGGR_CTRL_REG;
             uint8_t   RESERVED7[0x1900 - 0xFD8];

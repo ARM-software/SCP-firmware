@@ -310,8 +310,25 @@ struct mod_cmn_cyprus_remote_region {
     /*! Remote memory region memory map */
     const struct mod_cmn_cyprus_mem_region_map region_mmap;
 
-    /*! Target HAID for RA SAM */
-    unsigned int target_haid;
+    /*! Target HAID(s) for RA SAM region */
+    unsigned int *target_haid;
+};
+
+/*!
+ * \brief CML Port Aggregation Group config data.
+ */
+struct mod_cmn_cyprus_cpag_config {
+    /*! CPA group ID */
+    uint8_t cpag_id;
+
+    /*!
+     * Number of CCG nodes in CPAG.
+     * Supported values: 1, 2, 4, 8, 16, 32 and 3 (MOD-3 hash).
+     *
+     * Note: Only CPA groups with identical number of CCG nodes is supported.
+     * So, all CPA groups in the local chip must have equal number of CCG nodes.
+     */
+    uint8_t ccg_count;
 };
 
 /*!
@@ -320,11 +337,11 @@ struct mod_cmn_cyprus_remote_region {
  * \details Used to describe a remote chip connection.
  */
 struct mod_cmn_cyprus_cml_config {
-    /*! Logical Device ID of the CCG node */
-    unsigned int ccg_ldid;
+    /*! Logical Device ID(s) of the CCG node(s) */
+    unsigned int *ccg_ldid;
 
-    /* HAID to be assigned to the CCG HA node */
-    unsigned int haid;
+    /* HAID(s) to be assigned to the CCG HA node(s) */
+    unsigned int *haid;
 
     /*!
      * Remote chip id. Identifier of the remote chip that's connected
@@ -349,6 +366,12 @@ struct mod_cmn_cyprus_cml_config {
      * when external controller IP is present.
      */
     bool enable_direct_connect_mode;
+
+    /*! Enable CML Port Aggregation mode */
+    bool enable_cpa_mode;
+
+    /*! CPA group config */
+    struct mod_cmn_cyprus_cpag_config cpag_config;
 };
 
 /*!

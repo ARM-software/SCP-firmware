@@ -96,6 +96,7 @@ struct cml_link_info {
 /* Program Requesting Agent System Address Map (RA SAM) */
 static int program_ra_sam(
     struct cmn_cyprus_ccg_ra_reg *ccg_ra,
+    uint8_t ccg_idx,
     const struct mod_cmn_cyprus_remote_region *remote_mmap_table)
 {
     int status;
@@ -120,7 +121,7 @@ static int program_ra_sam(
             MOD_NAME "  [0x%llx - 0x%llx] Target HAID: %u",
             base,
             (base + size - 1),
-            region->target_haid);
+            region->target_haid[ccg_idx]);
 
         /* Configure the remote region address range */
         status =
@@ -134,7 +135,7 @@ static int program_ra_sam(
 
         /* Configure the target HAID for remote region */
         status = ccg_ra_configure_sam_addr_target_haid(
-            ccg_ra, region_idx, region->target_haid);
+            ccg_ra, region_idx, region->target_haid[ccg_idx]);
         if (status != FWK_SUCCESS) {
             FWK_LOG_ERR(
                 MOD_NAME "Error! Failed to set target for RA SAM region %u",
@@ -305,13 +306,72 @@ static int program_ccg_ha_raid_to_ldid_lut(struct cmn_cyprus_ccg_ha_reg *ccg_ha)
 }
 
 /*
+ * Helper function to set up the HN‑F SAM to distribute snoop traffic to
+ * the CML Port Aggregation Groups (CPAGs).
+ */
+static int program_hns_cpa(
+    unsigned int ldid,
+    uint8_t ccg_idx,
+    unsigned int ccg_ha_nodeid,
+    const struct mod_cmn_cyprus_cpag_config *cpag_config,
+    struct cmn_cyprus_hns_reg *hns)
+{
+    int status;
+    uint8_t cpag_tgt_idx;
+
+    /* Enable CML Port Aggregation (CPA) for remote RN node ID */
+    status = hns_enable_rn_cpa(hns, ldid);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(
+            MOD_NAME "Error! Failed to enable CPA mode for RN LDID: %u in HN-S",
+            ldid);
+        return status;
+    }
+
+    /*
+     * Configure CPA group ID for the remote RN node ID at the LDID to RN node
+     * ID look-up table.
+     */
+    status = hns_configure_rn_cpag_id(hns, ldid, cpag_config->cpag_id);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(
+            MOD_NAME "Error! Failed to set CPAG ID: %u for RN LDID: %u in HN-S",
+            cpag_config->cpag_id,
+            ldid);
+        return status;
+    }
+
+    /*
+     * Configure target CCG HA node id in the CPA group.
+     *
+     * The following calculation is based on the assumption that all the CPA
+     * groups have same number of CCG nodes.
+     */
+    cpag_tgt_idx = ((cpag_config->cpag_id * cpag_config->ccg_count) + ccg_idx);
+    status = hns_configure_rn_cpag_node_id(hns, cpag_tgt_idx, ccg_ha_nodeid);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(
+            MOD_NAME
+            "Error! Failed to set CPAG TGT Node ID: %u at idx: %u in HN-S",
+            ccg_ha_nodeid,
+            cpag_tgt_idx);
+        return status;
+    }
+
+    return status;
+}
+
+/*
  * Helper function to assign unique LDID for each remote caching agent that can
  * send requests to HNs (HN‑F, HN‑I, HN‑D, and HN‑P) as HN‑Ss use the LDID of
  * remote caching agents for Snoop Filter (SF) tracking.
  */
 static int program_hns_ldid_to_rn_nodeid(
     unsigned int ccg_ha_nodeid,
-    uint8_t remote_chip_id)
+    uint8_t remote_chip_id,
+    bool enable_cpa,
+    uint8_t ccg_idx,
+    const struct mod_cmn_cyprus_cpag_config *cpag_config)
 {
     int status;
     unsigned int ldid;
@@ -390,6 +450,19 @@ static int program_hns_ldid_to_rn_nodeid(
                     "Error! Failed to set src type for LDID: %u in HN-S",
                     ldid);
                 return status;
+            }
+
+            /*
+             * Enable HN-F SAM to distribute snoop traffic to the CML Port
+             * Aggregation Groups (CPAGs).
+             */
+            if (enable_cpa == true) {
+                status = program_hns_cpa(
+                    ldid, ccg_idx, ccg_ha_nodeid, cpag_config, hns);
+                if (status != FWK_SUCCESS) {
+                    FWK_LOG_ERR(MOD_NAME "Error! HN-S CPA programming failed");
+                    return status;
+                }
             }
         }
         rn_idx++;
@@ -932,9 +1005,12 @@ static int cml_enter_coherency_domain(
     return status;
 }
 
-static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
+static int program_cml(
+    uint8_t ccg_idx,
+    const struct mod_cmn_cyprus_cml_config *cml_config)
 {
     int status;
+    unsigned int ccg_ldid;
     struct cmn_cyprus_ccg_ha_reg *ccg_ha;
     struct ccg_ha_info *ccg_ha_info_table;
     struct cmn_cyprus_ccg_ra_reg *ccg_ra;
@@ -943,25 +1019,24 @@ static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
     struct ccla_info *ccla_info_table;
 
     ccg_ra_info_table = shared_ctx->ccg_ra_info_table;
-    ccg_ra = ccg_ra_info_table[cml_config->ccg_ldid].ccg_ra;
+    ccg_ldid = cml_config->ccg_ldid[ccg_idx];
+    ccg_ra = ccg_ra_info_table[ccg_ldid].ccg_ra;
 
     FWK_LOG_INFO(
-        MOD_NAME "Configuring Chip%u CCG%u",
-        shared_ctx->chip_id,
-        cml_config->ccg_ldid);
+        MOD_NAME "Configuring Chip%u CCG%u", shared_ctx->chip_id, ccg_ldid);
 
     /*
      * Program Requesting Agent System Address Map (RA SAM) to determine the
      * target Home Agent ID (HAID) for remote address regions.
      */
-    status = program_ra_sam(ccg_ra, cml_config->remote_mmap_table);
+    status = program_ra_sam(ccg_ra, ccg_idx, cml_config->remote_mmap_table);
     if (status != FWK_SUCCESS) {
         FWK_LOG_ERR(MOD_NAME "Error! RA SAM programming failed");
         return status;
     }
 
     ccg_ha_info_table = shared_ctx->ccg_ha_info_table;
-    ccg_ha = ccg_ha_info_table[cml_config->ccg_ldid].ccg_ha;
+    ccg_ha = ccg_ha_info_table[ccg_ldid].ccg_ha;
 
     /*
      * Assign LinkIDs to remote CML protocol links. Remote agents, RAs or HAs,
@@ -975,7 +1050,7 @@ static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
     }
 
     /* Assign Home Agent ID (HAID) for the CCG HA node */
-    ccg_ha_configure_haid(ccg_ha, cml_config->haid);
+    ccg_ha_configure_haid(ccg_ha, cml_config->haid[ccg_idx]);
 
     /* Assign expanded RAID to local request agents */
     status = program_ccg_ra_ldid_to_raid_lut(ccg_ra);
@@ -1001,7 +1076,11 @@ static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
      * to the remote caching agents for Snoop Filter (SF) tracking.
      */
     status = program_hns_ldid_to_rn_nodeid(
-        node_info_get_id(ccg_ha->CCG_HA_NODE_INFO), cml_config->remote_chip_id);
+        node_info_get_id(ccg_ha->CCG_HA_NODE_INFO),
+        cml_config->remote_chip_id,
+        cml_config->enable_cpa_mode,
+        ccg_idx,
+        &cml_config->cpag_config);
     if (status != FWK_SUCCESS) {
         FWK_LOG_ERR(MOD_NAME
                     "Error! HN-S LDID-to-RN node id programming failed");
@@ -1021,7 +1100,7 @@ static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
     }
 
     ccla_info_table = shared_ctx->ccla_info_table;
-    ccla = ccla_info_table[cml_config->ccg_ldid].ccla;
+    ccla = ccla_info_table[ccg_ldid].ccla;
 
     /*
      * Enable CCLA to CCLA Direct connect mode.
@@ -1114,7 +1193,9 @@ int cmn_cyprus_setup_cml(struct cmn_cyprus_ctx *ctx)
 {
     int status;
     uint8_t idx;
+    uint8_t ccg_idx;
     const struct mod_cmn_cyprus_cml_config *cml_config;
+    const struct mod_cmn_cyprus_cpag_config *cpag_config;
 
     if (ctx == NULL) {
         return FWK_E_PARAM;
@@ -1136,12 +1217,17 @@ int cmn_cyprus_setup_cml(struct cmn_cyprus_ctx *ctx)
 
     for (idx = 0; idx < shared_ctx->config->cml_table_count; idx++) {
         cml_config = &shared_ctx->config->cml_config_table[idx];
+        cpag_config = &cml_config->cpag_config;
+        ccg_idx = 0;
 
-        status = program_cml(cml_config);
-        if (status != FWK_SUCCESS) {
-            FWK_LOG_ERR(MOD_NAME "Error! CML Programming failed");
-            return status;
-        }
+        do {
+            status = program_cml(ccg_idx, cml_config);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_ERR(MOD_NAME "Error! CML Programming failed");
+                return status;
+            }
+            ccg_idx++;
+        } while (ccg_idx < cpag_config->ccg_count);
     }
 
     FWK_LOG_INFO(MOD_NAME "Programming CML...Done");

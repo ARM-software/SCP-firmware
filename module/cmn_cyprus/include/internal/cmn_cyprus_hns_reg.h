@@ -286,6 +286,58 @@ int hns_set_rn_node_src_type(
 int hns_set_rn_node_remote(struct cmn_cyprus_hns_reg *hns, unsigned int ldid);
 
 /*
+ * Enable CML Port Aggregation (CPA) for the remote Request Node at the given
+ * LDID.
+ *
+ * \details HN-S tracks the request nodes (both local and remote) using LDIDs.
+ *     This function is used to enable CPA mode for remote request node using
+ *     it's LDID as input.
+ *
+ * \param hns Pointer to the HN-S node.
+ *      \pre The HN-S node pointer must be valid.
+ * \param ldid LDID index of the remote request node.
+ *      \pre LDID index value must be less than 128.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_RANGE LDID value out of range.
+ */
+int hns_enable_rn_cpa(struct cmn_cyprus_hns_reg *hns, unsigned int ldid);
+
+/*
+ * Configure CPA group ID for the remote RN node id at the LDID to RN node id
+ * look-up table.
+ *
+ * \param hns Pointer to the HN-S node.
+ *      \pre The HN-S node pointer must be valid.
+ * \param ldid LDID index of the remote request node.
+ *      \pre LDID index value must be less than 128.
+ * \param cpag_id CPA group ID.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_RANGE LDID value out of range.
+ */
+int hns_configure_rn_cpag_id(
+    struct cmn_cyprus_hns_reg *hns,
+    unsigned int ldid,
+    uint8_t cpag_id);
+
+/*
+ * Configure target CCG HA node id in the CPA group.
+ *
+ * \param hns Pointer to the HN-S node.
+ *      \pre The HN-S node pointer must be valid.
+ * \param cpag_tgt_idx Target index.
+ * \param ccg_ha_node_id Target CCG HA node ID.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_RANGE Register index out of range.
+ */
+int hns_configure_rn_cpag_node_id(
+    struct cmn_cyprus_hns_reg *hns,
+    uint8_t cpag_tgt_idx,
+    unsigned int ccg_ha_node_id);
+
+/*
  * Setup the HN-S programming context.
  *
  * \param hns Pointer to the HN-S node.

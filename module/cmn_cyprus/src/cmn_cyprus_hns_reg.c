@@ -60,6 +60,13 @@
 
 #define HNS_RN_PHYIDS_REG0 0
 
+/* HN-S CPA Programming */
+#define HNS_RN_PHYS_CPA_GRP_RA_POS 17
+#define HNS_RN_PHYS_CPA_EN_RA_POS  30
+#define CPAG_TGTID_PER_GROUP       5
+#define CPAG_TGTID_WIDTH           12
+#define CPAG_TGTID_WIDTH_PER_GROUP 60
+
 /* HN-S programming context structure */
 struct cmn_cyprus_hns_ctx {
     /* Range comparison mode status flag */
@@ -278,6 +285,59 @@ inline int hns_set_rn_node_src_type(
     hns->HNS_RN_CLUSTER_PHYSID[ldid][HNS_RN_PHYIDS_REG0] |=
         ((uint64_t)(src_type & HNS_RN_PHYS_RN_SRC_TYPE_MASK)
          << HNS_RN_PHYS_RN_SRC_TYPE_POS);
+
+    return FWK_SUCCESS;
+}
+
+/* Enable CPA mode for the Request Node (RN) */
+inline int hns_enable_rn_cpa(struct cmn_cyprus_hns_reg *hns, unsigned int ldid)
+{
+    if (ldid >= HNS_RN_CLUSTER_MAX) {
+        return FWK_E_RANGE;
+    }
+
+    hns->HNS_RN_CLUSTER_PHYSID[ldid][HNS_RN_PHYIDS_REG0] |=
+        (UINT64_C(0x1) << HNS_RN_PHYS_CPA_EN_RA_POS);
+
+    return FWK_SUCCESS;
+}
+
+/*
+ * Configure target CPA Group ID for the Request Node (RN). The snoop traffic
+ * targeting this RN is distributed across this CPA Group.
+ */
+inline int hns_configure_rn_cpag_id(
+    struct cmn_cyprus_hns_reg *hns,
+    unsigned int ldid,
+    uint8_t cpag_id)
+{
+    if (ldid >= HNS_RN_CLUSTER_MAX) {
+        return FWK_E_RANGE;
+    }
+
+    hns->HNS_RN_CLUSTER_PHYSID[ldid][HNS_RN_PHYIDS_REG0] |=
+        (cpag_id << HNS_RN_PHYS_CPA_GRP_RA_POS);
+
+    return FWK_SUCCESS;
+}
+
+/* Configure target node ID in the CPA Group */
+int hns_configure_rn_cpag_node_id(
+    struct cmn_cyprus_hns_reg *hns,
+    uint8_t cpag_tgt_idx,
+    unsigned int ccg_ha_node_id)
+{
+    uint8_t register_idx;
+    uint8_t bit_pos;
+
+    register_idx = (cpag_tgt_idx / CPAG_TGTID_PER_GROUP);
+    if (register_idx >= HNS_CPA_GRP_REG_COUNT) {
+        return FWK_E_RANGE;
+    }
+
+    bit_pos = ((cpag_tgt_idx * CPAG_TGTID_WIDTH) % CPAG_TGTID_WIDTH_PER_GROUP);
+    hns->CML_PORT_AGGR_GRP_REG[register_idx] |= ((uint64_t)ccg_ha_node_id)
+        << bit_pos;
 
     return FWK_SUCCESS;
 }
