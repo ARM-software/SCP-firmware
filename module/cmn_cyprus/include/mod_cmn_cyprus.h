@@ -323,6 +323,9 @@ struct mod_cmn_cyprus_cml_config {
     /*! Logical Device ID of the CCG node */
     unsigned int ccg_ldid;
 
+    /* HAID to be assigned to the CCG HA node */
+    unsigned int haid;
+
     /*!
      * Remote chip memory region table.
      * Used to configure RNSAM.

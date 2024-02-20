@@ -163,6 +163,9 @@ static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
         return status;
     }
 
+    /* Assign Home Agent ID (HAID) for the CCG HA node */
+    ccg_ha_configure_haid(ccg_ha, cml_config->haid);
+
     return status;
 }
 
