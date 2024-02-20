@@ -8,6 +8,7 @@
  *     Definitions and utility functions for programming the CML.
  */
 
+#include <internal/cmn_cyprus_ccg_ha_reg.h>
 #include <internal/cmn_cyprus_ccg_ra_reg.h>
 #include <internal/cmn_cyprus_cml_setup.h>
 #include <internal/cmn_cyprus_ctx.h>
@@ -22,6 +23,9 @@
 #include <stdint.h>
 
 #define MAX_RA_SAM_REGION_IDX CMN_CYPRUS_MAX_RA_SAM_ADDR_REGION
+
+/* Maximum Agent ID in AgentID-to-LinkID mapping in CCG nodes */
+#define MAX_AGENT_ID 63
 
 /* Shared driver context pointer */
 static const struct cmn_cyprus_ctx *shared_ctx;
@@ -90,9 +94,40 @@ static int program_ra_sam(
     return FWK_SUCCESS;
 }
 
+static int program_agentid_to_linkid(
+    struct cmn_cyprus_ccg_ra_reg *ccg_ra,
+    struct cmn_cyprus_ccg_ha_reg *ccg_ha)
+{
+    int status;
+    uint8_t agent_id;
+
+    for (agent_id = 0; agent_id <= MAX_AGENT_ID; agent_id++) {
+        /*
+         * Set the AgentID-to-LinkID mapping as valid.
+         *
+         * Note: CCG nodes only support LinkID 0 which is the reset value in the
+         * CCG node AgentID-to-LinkID LUT registers. Hence, just set the LinkID
+         * mapping as valid, skipping the configuration.
+         */
+        status = ccg_ra_set_agentid_to_linkid_valid(ccg_ra, agent_id);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+
+        status = ccg_ha_set_agentid_to_linkid_valid(ccg_ha, agent_id);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+    }
+
+    return FWK_SUCCESS;
+}
+
 static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
 {
     int status;
+    struct cmn_cyprus_ccg_ha_reg *ccg_ha;
+    struct ccg_ha_info *ccg_ha_info_table;
     struct cmn_cyprus_ccg_ra_reg *ccg_ra;
     struct ccg_ra_info *ccg_ra_info_table;
 
@@ -111,6 +146,20 @@ static int program_cml(const struct mod_cmn_cyprus_cml_config *cml_config)
     status = program_ra_sam(ccg_ra, cml_config->remote_mmap_table);
     if (status != FWK_SUCCESS) {
         FWK_LOG_ERR(MOD_NAME "Error! RA SAM programming failed");
+        return status;
+    }
+
+    ccg_ha_info_table = shared_ctx->ccg_ha_info_table;
+    ccg_ha = ccg_ha_info_table[cml_config->ccg_ldid].ccg_ha;
+
+    /*
+     * Assign LinkIDs to remote CML protocol links. Remote agents, RAs or HAs,
+     * are identified using their RAID or HAID. Each remote RA or HA that a CML
+     * gateway can communicate with must be behind only one link.
+     */
+    status = program_agentid_to_linkid(ccg_ra, ccg_ha);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! AgentID-to-LinkID programming failed");
         return status;
     }
 
