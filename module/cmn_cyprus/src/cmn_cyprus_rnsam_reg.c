@@ -71,6 +71,30 @@
  */
 #define RNSAM_REGION_MIN_SIZE (64 * FWK_MIB)
 
+/* RNSAM CPA Programming */
+#define CPA_MODE_CTRL_REGIONS_PER_GROUP    10
+#define CPA_MODE_CTRL_PAG_WIDTH_PER_REGION 6
+#define CPA_MODE_CTRL_PAG_GRPID_OFFSET     1
+#define CPA_MODE_CTRL_PAG_GRPID_MASK       0x1F
+#define CPA_CTRL_CPAG_PER_GROUP            5
+#define CPA_CTRL_NUM_CXG_PAG_WIDTH         12
+#define CPA_CTRL_NUM_CXG_PAG_MASK          UINT64_C(0x07)
+#define CPA_CTRL_PORT_TYPE_POS             5
+#define CPAG_TGTID_PER_GROUP               5
+#define CPAG_TGTID_WIDTH                   12
+#define CPAG_TGTID_MASK                    UINT64_C(0x7FF)
+#define CPAG_TGTID_WIDTH_PER_GROUP         60
+#define CPAG_BASE_INDX_WIDTH_PER_CPAG      8
+#define CPAG_BASE_INDX_CPAG_PER_GROUP      8
+#define CPAG_BASE_INDX_MASK                UINT64_C(0x3F)
+
+#define MAX_CCG_COUNT_PER_CPAG 32
+
+/* 3 CCG ports in a CPAG (MOD-3 hash) */
+#define CPAG_CCG_COUNT_3 3
+/* NUM_CXG_PAGx bitfield value for CPAG with 3 CCG ports (MOD-3 hash) */
+#define CPAG_CCG_COUNT_VAL_MOD_3_HASH 6
+
 /*!
  * RNSAM programming context structure.
  */
@@ -124,6 +148,36 @@ struct cmn_cyprus_rnsam_ctx {
 };
 
 static struct cmn_cyprus_rnsam_ctx rnsam_ctx;
+
+/*
+ * Helper function to check if the number of ccg nodes per CPAG is one of the
+ * following values: 1, 2, 4, 8, 16, 32 and 3 (MOD-3 hash).
+ */
+static bool is_cpag_ccg_count_valid(uint8_t ccg_count)
+{
+    if (ccg_count == CPAG_CCG_COUNT_3) {
+        return true;
+    }
+
+    if (ccg_count > MAX_CCG_COUNT_PER_CPAG) {
+        return false;
+    }
+
+    return (IS_POW_OF_TWO(ccg_count));
+}
+
+/*
+ * Helper function to get the value to be set in the NUM_CXG_PAGx bitfield for a
+ * given CPAG CCG count.
+ */
+static inline uint8_t get_num_cxg_value(uint8_t ccg_count)
+{
+    if (ccg_count == CPAG_CCG_COUNT_3) {
+        return CPAG_CCG_COUNT_VAL_MOD_3_HASH;
+    }
+
+    return fwk_math_log2((unsigned int)ccg_count);
+}
 
 static bool is_non_hash_range_comparison_mode_enabled(
     struct cmn_cyprus_rnsam_reg *rnsam)
@@ -704,6 +758,161 @@ void rnsam_enable_hier_hash_mode(
     /* Enable hierarchical hashing mode */
     rnsam->HASHED_TARGET_GRP_HASH_CNTL[scg_idx] |=
         (RNSAM_HIERARCHICAL_HASH_EN_MASK << RNSAM_HIERARCHICAL_HASH_EN_POS);
+}
+
+/* Enable CPA mode for the given non-hashed region */
+int rnsam_enable_non_hash_region_cpa_mode(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t region_idx)
+{
+    uint8_t register_idx;
+    uint8_t bit_pos;
+
+    register_idx = (region_idx / CPA_MODE_CTRL_REGIONS_PER_GROUP);
+    if (register_idx >= RNSAM_CPA_MODE_CTRL_REG_COUNT) {
+        return FWK_E_RANGE;
+    }
+
+    bit_pos =
+        ((region_idx % CPA_MODE_CTRL_REGIONS_PER_GROUP) *
+         CPA_MODE_CTRL_PAG_WIDTH_PER_REGION);
+
+    rnsam->CML_PORT_AGGR_MODE_CTRL_REG[register_idx] |=
+        (UINT64_C(0x1) << bit_pos);
+
+    return FWK_SUCCESS;
+}
+
+/*
+ * Configure CPA Group ID for the given non-hashed region. The outbound requests
+ * are distributed across this CPA Group.
+ */
+int rnsam_configure_non_hash_region_cpag_id(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t region_idx,
+    uint8_t cpag_id)
+{
+    uint8_t register_idx;
+    uint8_t bit_pos;
+
+    register_idx = (region_idx / CPA_MODE_CTRL_REGIONS_PER_GROUP);
+    if (register_idx >= RNSAM_CPA_MODE_CTRL_REG_COUNT) {
+        return FWK_E_RANGE;
+    }
+
+    bit_pos =
+        (((region_idx % CPA_MODE_CTRL_REGIONS_PER_GROUP) *
+          CPA_MODE_CTRL_PAG_WIDTH_PER_REGION) +
+         CPA_MODE_CTRL_PAG_GRPID_OFFSET);
+
+    rnsam->CML_PORT_AGGR_MODE_CTRL_REG[register_idx] |=
+        ((uint64_t)(cpag_id & CPA_MODE_CTRL_PAG_GRPID_MASK) << bit_pos);
+
+    return FWK_SUCCESS;
+}
+
+/* Configure the number of CCG nodes in the CPA Group */
+int rnsam_configure_cpag_ccg_count(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t cpag_id,
+    uint8_t ccg_count)
+{
+    uint8_t register_idx;
+    uint8_t bit_pos;
+
+    if (!is_cpag_ccg_count_valid(ccg_count)) {
+        return FWK_E_PARAM;
+    }
+
+    register_idx = (cpag_id / CPA_CTRL_CPAG_PER_GROUP);
+    if (register_idx >= RNSAM_CPA_CTRL_REG_COUNT) {
+        return FWK_E_RANGE;
+    }
+
+    bit_pos =
+        ((cpag_id % CPA_CTRL_CPAG_PER_GROUP) * CPA_CTRL_NUM_CXG_PAG_WIDTH);
+
+    rnsam->CML_PORT_AGGR_CTRL_REG[register_idx] |=
+        ((get_num_cxg_value(ccg_count) & CPA_CTRL_NUM_CXG_PAG_MASK) << bit_pos);
+
+    return FWK_SUCCESS;
+}
+
+/* Configure the CPA Group port type as SMP or CXL */
+int rnsam_set_cpag_port_type(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t cpag_id,
+    enum cpa_port_type port_type)
+{
+    uint8_t register_idx;
+    uint8_t bit_pos;
+
+    register_idx = (cpag_id / CPA_CTRL_CPAG_PER_GROUP);
+    if (register_idx >= RNSAM_CPA_CTRL_REG_COUNT) {
+        return FWK_E_RANGE;
+    }
+
+    bit_pos =
+        (((cpag_id % CPA_CTRL_CPAG_PER_GROUP) * CPA_CTRL_NUM_CXG_PAG_WIDTH) +
+         CPA_CTRL_PORT_TYPE_POS);
+
+    rnsam->CML_PORT_AGGR_CTRL_REG[register_idx] |= (port_type << bit_pos);
+
+    return FWK_SUCCESS;
+}
+
+/* Configure the CHI Node ID of the target node in the CPA Group */
+int rnsam_configure_cpag_target_id(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t cpag_tgt_idx,
+    unsigned int ccg_ra_node_id)
+{
+    uint8_t register_idx;
+    uint8_t bit_pos;
+
+    register_idx = (cpag_tgt_idx / CPAG_TGTID_PER_GROUP);
+    if (register_idx >= RNSAM_CPA_GRP_REG_COUNT) {
+        return FWK_E_RANGE;
+    }
+
+    bit_pos = ((cpag_tgt_idx * CPAG_TGTID_WIDTH) % CPAG_TGTID_WIDTH_PER_GROUP);
+
+    rnsam->CML_PORT_AGGR_GRP_REG[register_idx] |=
+        (ccg_ra_node_id & CPAG_TGTID_MASK) << bit_pos;
+
+    return FWK_SUCCESS;
+}
+
+/*
+ * Configure the base index for the CPA Group.
+ *
+ * Each CPAG derives the PAG target ID based on the address hashing and the hash
+ * index is looked up into the CML target ID table. Base index for each CPAG is
+ * derived based on the linked list mechanism.
+ */
+int rnsam_configure_cpag_base_index(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t cpag_id,
+    uint8_t cpag_base_idx)
+{
+    uint8_t register_idx;
+    uint8_t bit_pos;
+
+    register_idx = (cpag_id / CPAG_BASE_INDX_CPAG_PER_GROUP);
+    if (register_idx >= RNSAM_CPAG_BASE_INDX_REG_COUNT) {
+        return FWK_E_RANGE;
+    }
+
+    bit_pos =
+        ((cpag_id % CPAG_BASE_INDX_CPAG_PER_GROUP) *
+         CPAG_BASE_INDX_WIDTH_PER_CPAG);
+
+    rnsam->CML_CPAG_BASE_INDX_GRP[register_idx] &=
+        ~(CPAG_BASE_INDX_MASK << bit_pos);
+
+    rnsam->CML_CPAG_BASE_INDX_GRP[register_idx] |= (cpag_base_idx << bit_pos);
+
+    return FWK_SUCCESS;
 }
 
 int setup_rnsam_ctx(struct cmn_cyprus_rnsam_reg *rnsam)

@@ -108,6 +108,14 @@ struct cmn_cyprus_hns_reg {
 #define RNSAM_HTG_REG_GRP2_COUNT 4
 /* SCG HN Node ID register count */
 #define RNSAM_SCG_HN_NODEID_REG_COUNT 32
+/* CML Port Aggregation Mode Control register count */
+#define RNSAM_CPA_MODE_CTRL_REG_COUNT 4
+/* CML Port Aggregation Group register count */
+#define RNSAM_CPA_GRP_REG_COUNT 3
+/* CML Port Aggregation Group base index register count */
+#define RNSAM_CPAG_BASE_INDX_REG_COUNT 8
+/* CML Port Aggregation control register count */
+#define RNSAM_CPA_CTRL_REG_COUNT 16
 
 /*!
  * Request Node System Address Map (RNSAM) registers.
@@ -139,17 +147,18 @@ struct cmn_cyprus_rnsam_reg {
     FWK_RW  uint64_t  HASHED_TARGET_GRP_CAL_MODE[3];
     FWK_RW  uint64_t  SYS_CACHE_GRP_SN_SAM_CFG[8];
             uint8_t   RESERVED9[0x11A0 - 0x1180];
-    FWK_RW  uint64_t  CML_PORT_AGGR_MODE_CTRL_REG[4];
+    FWK_RW  uint64_t
+        CML_PORT_AGGR_MODE_CTRL_REG[RNSAM_CPA_MODE_CTRL_REG_COUNT];
             uint8_t   RESERVED10[0x11F0 - 0x11C0];
-    FWK_RW  uint64_t  CML_PORT_AGGR_GRP_REG[3];
-    FWK_RW  uint64_t  CML_PORT_AGGR_CTRL_REG[16];
+    FWK_RW  uint64_t  CML_PORT_AGGR_GRP_REG[RNSAM_CPA_GRP_REG_COUNT];
+    FWK_RW  uint64_t  CML_PORT_AGGR_CTRL_REG[RNSAM_CPA_CTRL_REG_COUNT];
             uint8_t   RESERVED11[0x20C0 - 0x1288];
     FWK_RW  uint64_t  NON_HASH_MEM_REGION_GRP2[RNSAM_NON_HASH_REG_GRP2_COUNT];
             uint8_t   RESERVED12[0x24C0 - 0x2200];
     FWK_RW  uint64_t
         NON_HASH_MEM_REGION_CFG2_GRP2[RNSAM_NON_HASH_REG_GRP2_COUNT];
             uint8_t   RESERVED13[0x2B00 - 0x2600];
-    FWK_RW  uint64_t  CML_CPAG_BASE_INDX_GRP_REG[8];
+    FWK_RW  uint64_t  CML_CPAG_BASE_INDX_GRP[RNSAM_CPAG_BASE_INDX_REG_COUNT];
             uint8_t   RESERVED14[0x3100 - 0x2B40];
     FWK_RW  uint64_t  HASHED_TGT_GRP_CFG2_REGION[32];
             uint8_t   RESERVED15[0x3400 - 0x3200];

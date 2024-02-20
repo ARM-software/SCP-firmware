@@ -29,6 +29,8 @@
 #define GET_CHIP_ADDR_OFFSET(ctx_ptr) \
     (ctx_ptr->config->chip_addr_space * ctx_ptr->chip_id)
 
+#define IS_POW_OF_TWO(x) (x && !(x & (x - 1)))
+
 /*
  * Convert a memory region size into a size format used by the CMN-CYPRUS
  * registers. The format is the binary logarithm of the memory region size

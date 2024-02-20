@@ -43,6 +43,20 @@ enum sam_node_type {
     SAM_NODE_TYPE_COUNT
 };
 
+/*!
+ * RNSAM CPAG port type.
+ */
+enum cpa_port_type {
+    /*! CPA port type CXL */
+    CPA_PORT_TYPE_CXL,
+
+    /*! CPA port type SMP */
+    CPA_PORT_TYPE_SMP,
+
+    /*! CPA port type count */
+    CPA_PORT_TYPE_COUNT,
+};
+
 /*
  * Stall RNSAM requests and enable default target ID selection.
  *
@@ -307,5 +321,102 @@ void rnsam_enable_hier_hash_mode(
  *
  */
 int setup_rnsam_ctx(struct cmn_cyprus_rnsam_reg *rnsam_reg);
+
+/*
+ * Enable CPA mode for the given non-hashed region.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param region_idx Non-hashed region index.
+ *      \pre Non-hashed region index must be valid.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_RANGE Register index out of range.
+ */
+int rnsam_enable_non_hash_region_cpa_mode(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t region_idx);
+
+/*
+ * Configure CPA group ID for the given non-hashed region.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param region_idx Non-hashed region index.
+ *      \pre Non-hashed region index must be valid.
+ * \param cpag_id CPA group ID.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_RANGE Register index out of range.
+ */
+int rnsam_configure_non_hash_region_cpag_id(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t region_idx,
+    uint8_t cpag_id);
+
+/*
+ * Configure the number of CCG nodes in CPA group.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param cpag_id CPA group ID.
+ * \param ccg_count Number of CCG nodes.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_PARAM Invalid ccg count.
+ * \retval ::FWK_E_RANGE Register index out of range.
+ */
+int rnsam_configure_cpag_ccg_count(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t cpag_id,
+    uint8_t ccg_count);
+
+/*
+ * Set the CPA group port type.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param cpag_id CPA group ID.
+ * \param cpa_port_type CPA port type.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_RANGE Register index out of range.
+ */
+int rnsam_set_cpag_port_type(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t cpag_id,
+    enum cpa_port_type port_type);
+
+/*
+ * Configure the target CCG RA node ID for the given CPA group.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param cpag_tgt_idx Index of the target CCG node.
+ * \param ccg_ra_node_id Target CCG RA node id.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_RANGE Register index out of range.
+ */
+int rnsam_configure_cpag_target_id(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t cpag_tgt_idx,
+    unsigned int ccg_ra_node_id);
+
+/*
+ * Configure the base index for the given CPA group.
+ *
+ * \param rnsam Pointer to the RNSAM node.
+ *      \pre The RNSAM node pointer must be valid.
+ * \param cpag_id CPA group ID.
+ * \param base_index Base index.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_RANGE Register index out of range.
+ */
+int rnsam_configure_cpag_base_index(
+    struct cmn_cyprus_rnsam_reg *rnsam,
+    uint8_t cpag_id,
+    uint8_t base_index);
 
 #endif /* CMN_CYPRUS_RNSAM_REG_INTERNAL_H */

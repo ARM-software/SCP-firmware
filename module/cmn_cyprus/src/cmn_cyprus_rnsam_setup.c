@@ -10,6 +10,7 @@
 
 #include <internal/cmn_cyprus_common.h>
 #include <internal/cmn_cyprus_ctx.h>
+#include <internal/cmn_cyprus_node_info_reg.h>
 #include <internal/cmn_cyprus_reg.h>
 #include <internal/cmn_cyprus_rnsam_reg.h>
 
@@ -525,6 +526,166 @@ static struct interface_cmn_memmap_rnsam_api memmap_rnsam_api = {
     .map_io_region = map_io_region,
 };
 
+static int configure_cpag_target_nodes(
+    uint8_t cpag_id,
+    uint8_t ccg_count,
+    unsigned int *ccg_ldid,
+    struct cmn_cyprus_rnsam_reg *rnsam)
+{
+    int status;
+    uint8_t ccg_idx;
+    uint8_t cpag_tgt_idx;
+    unsigned int ccg_ra_node_id;
+    unsigned int ccg_ra_ldid;
+    struct ccg_ra_info *ccg_ra_info_table;
+    struct cmn_cyprus_ccg_ra_reg *ccg_ra;
+
+    ccg_ra_info_table = shared_ctx->ccg_ra_info_table;
+
+    /* Configure target CCG RA node IDs in CPAG */
+    for (ccg_idx = 0; ccg_idx < ccg_count; ccg_idx++) {
+        ccg_ra_ldid = ccg_ldid[ccg_idx];
+        ccg_ra = ccg_ra_info_table[ccg_ra_ldid].ccg_ra;
+        ccg_ra_node_id = node_info_get_id(ccg_ra->CCG_RA_NODE_INFO);
+
+        /*
+         * Note: The following calculation is based on the assumption that the
+         * number of CCG ports per CPAG is the same for all the CPAGs in the
+         * mesh.
+         */
+        cpag_tgt_idx = ((cpag_id * ccg_count) + ccg_idx);
+
+        /* Program the CHI node ID of the CCG RA node in the CPAG */
+        status =
+            rnsam_configure_cpag_target_id(rnsam, cpag_tgt_idx, ccg_ra_node_id);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(
+                MOD_NAME
+                "Error! Failed to set CPAG TGT Node ID: %u at idx %u in RNSAM",
+                ccg_ra_node_id,
+                cpag_tgt_idx);
+            return status;
+        }
+    }
+
+    return FWK_SUCCESS;
+}
+
+/* Set CPA mode and CPA Group ID for remote non-hashed regions */
+static int configure_remote_non_hash_region_cpa(
+    uint8_t region_idx,
+    uint8_t cpag_id,
+    struct cmn_cyprus_rnsam_reg *rnsam)
+{
+    int status;
+
+    /* Enable CPA mode for the non-hashed region */
+    status = rnsam_enable_non_hash_region_cpa_mode(rnsam, region_idx);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME "Error! Failed to enable CPA for non-hash region");
+        return status;
+    }
+
+    /* Configure the CPAG that the requests must be hashed across */
+    status =
+        rnsam_configure_non_hash_region_cpag_id(rnsam, region_idx, cpag_id);
+    if (status != FWK_SUCCESS) {
+        FWK_LOG_ERR(MOD_NAME
+                    "Error! Failed to set CPAG ID for non-hash region");
+        return status;
+    }
+
+    return status;
+}
+
+/* Configure CPA for remote regions in RNSAM */
+static int program_rnsam_cpa(
+    unsigned int *ccg_ldid,
+    const struct mod_cmn_cyprus_cpag_config *cpag_config,
+    bool enable_smp_mode,
+    enum mod_cmn_cyprus_mem_region_type region_type)
+{
+    int status;
+    uint8_t ccg_count;
+    uint8_t cpag_base_idx;
+    uint8_t cpag_id;
+    uint8_t region_idx;
+    unsigned int rnsam_idx;
+    struct cmn_cyprus_rnsam_reg *rnsam;
+
+    if ((cpag_config == NULL) || (cpag_config->ccg_count == 0) ||
+        (ccg_ldid == NULL)) {
+        FWK_LOG_ERR(MOD_NAME "Error! Invalid CPA config");
+        return FWK_E_DATA;
+    }
+
+    cpag_id = cpag_config->cpag_id;
+    ccg_count = cpag_config->ccg_count;
+
+    for (rnsam_idx = 0; rnsam_idx < shared_ctx->rnsam_count; rnsam_idx++) {
+        rnsam = shared_ctx->rnsam_table[rnsam_idx];
+
+        if (region_type == MOD_CMN_CYPRUS_MEM_REGION_TYPE_REMOTE_NON_HASHED) {
+            /*
+             * Region index is the recently configured non-hashed region in the
+             * RNSAM.
+             */
+            region_idx = (shared_ctx->io_region_count - 1);
+
+            status = configure_remote_non_hash_region_cpa(
+                region_idx, cpag_id, rnsam);
+            if (status != FWK_SUCCESS) {
+                return status;
+            }
+        } else {
+            return FWK_E_PARAM;
+        }
+
+        /* Program the number of CML gateways in the CPAG */
+        status = rnsam_configure_cpag_ccg_count(rnsam, cpag_id, ccg_count);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(MOD_NAME
+                        "Error! Failed to set CPAG CCG count in RNSAM");
+            return status;
+        }
+
+        if (enable_smp_mode == true) {
+            /* Configure CPAG port type as SMP */
+            status =
+                rnsam_set_cpag_port_type(rnsam, cpag_id, CPA_PORT_TYPE_SMP);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_ERR(MOD_NAME
+                            "Error! Failed to set CPAG port type in RNSAM");
+                return status;
+            }
+        }
+
+        /* Program the CHI node ID of each CML gateway in the CPAG */
+        status =
+            configure_cpag_target_nodes(cpag_id, ccg_count, ccg_ldid, rnsam);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(MOD_NAME
+                        "Error! Failed to set CPAG target nodes in RNSAM");
+            return status;
+        }
+
+        /*
+         * The following CPAG base index calculation is based on the assumption
+         * that all the CPAG have equal number of CCG nodes.
+         */
+        cpag_base_idx = (cpag_id * ccg_count);
+        /* Set the base index for the CPAG */
+        status = rnsam_configure_cpag_base_index(rnsam, cpag_id, cpag_base_idx);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(MOD_NAME
+                        "Error! Failed to set CPAG base index in RNSAM");
+            return status;
+        }
+    }
+
+    return FWK_SUCCESS;
+}
+
 static int program_rnsam_remote_regions(
     const struct mod_cmn_cyprus_cml_config *cml_config)
 {
@@ -557,6 +718,23 @@ static int program_rnsam_remote_regions(
         if (status != FWK_SUCCESS) {
             FWK_LOG_ERR(MOD_NAME "Error! Failed to configure RNSAM region");
             return status;
+        }
+
+        if (cml_config->enable_cpa_mode == true) {
+            /*
+             * Program CML Port Aggregation (CPA) to enable the RN SAM to
+             * distribute requests to CPAGs.
+             */
+            status = program_rnsam_cpa(
+                cml_config->ccg_ldid,
+                &cml_config->cpag_config,
+                cml_config->enable_smp_mode,
+                region_mmap->type);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_ERR(MOD_NAME
+                            "Error! Failed to enable CPA for remote region");
+                return status;
+            }
         }
     }
 
