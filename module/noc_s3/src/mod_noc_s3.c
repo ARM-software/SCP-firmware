@@ -21,6 +21,8 @@
 struct mod_noc_s3_element_ctx {
     /* Points to the configuration of the element. */
     struct mod_noc_s3_element_config *config;
+    /* NoC S3 device handler. */
+    struct mod_noc_s3_dev noc_s3_dev;
 };
 
 struct mod_noc_s3_ctx {
@@ -64,6 +66,7 @@ static int mod_noc_s3_element_init(
     config = (struct mod_noc_s3_element_config *)data;
     idx = fwk_id_get_element_idx(element_id);
     noc_s3_ctx.element_ctx[idx].config = config;
+    noc_s3_ctx.element_ctx[idx].noc_s3_dev.periphbase = config->periphbase;
 
     return FWK_SUCCESS;
 }
