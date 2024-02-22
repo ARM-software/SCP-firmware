@@ -11,16 +11,18 @@ This script runs 'CC=gcc make -f Makefile.cmake fwk_test' and performs all
 frameworks tests.
 """
 
+import argparse
 import sys
 import subprocess
 from utils import banner
 
 
-def run():
+def run(coverage=False):
     print(banner('Build and run framework tests'))
 
+    extra_args = f'ENABLE_COVERAGE={"y" if coverage else "n"}'
     result = subprocess.Popen(
-        'CC=gcc make -f Makefile.cmake fwk_test',
+        f'CC=gcc make -f Makefile.cmake fwk_test {extra_args}',
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
@@ -38,9 +40,22 @@ def run():
     return True
 
 
-def main():
-    return 0 if run() else 1
+def parse_args(argv, prog_name):
+    parser = argparse.ArgumentParser(
+        prog=prog_name,
+        description='Build and run framework tests')
+
+    parser.add_argument('-c', '--coverage', dest='coverage',
+                        required=False, default=False, action='store_true',
+                        help='Enable code coverage reporting.')
+
+    return parser.parse_args(argv)
+
+
+def main(argv=[], prog_name=''):
+    args = parse_args(argv, prog_name)
+    return 0 if run(args.coverage) else 1
 
 
 if __name__ == '__main__':
-    sys.exit(main())
+    sys.exit(main(sys.argv[1:], sys.argv[0]))
