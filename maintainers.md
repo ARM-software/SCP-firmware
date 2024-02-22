@@ -49,7 +49,7 @@ maintainers. The platforms listed here represent the exceptions to this rule.
 - [Thomas Abraham](https://gitlab.arm.com/thomas.abraham)
 - [Vijayenthiran Subramaniam](https://gitlab.arm.com/Vijayenthiran.Subramaniam)
 
-#### Total Compute (tc1, tc2)
+#### Total Compute (tc2)
 
 - [Tintu Thomas](https://gitlab.arm.com/Tintu.Thomas)
 

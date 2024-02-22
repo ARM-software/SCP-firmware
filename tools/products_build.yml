@@ -51,9 +51,6 @@
 
 - product: synquacer
 
-- product: tc1
-  product_group: totalcompute
-
 - product: tc2
   variants:
     - name: 0
