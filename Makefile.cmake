@@ -294,7 +294,7 @@ help:
 	@echo "        Value: <y|n>"
 	@echo "        Default: n"
 	@echo "        Enable or disable generation of code coverage reports for unit tests."
-	@echo "        Use ENABLE_COVERAGE=y to enable coverage for `fwk_test` and `mod_test` targets."
+	@echo "        Use ENABLE_COVERAGE=y to enable coverage for 'fwk_test' and 'mod_test' targets."
 	@echo ""
 
 
