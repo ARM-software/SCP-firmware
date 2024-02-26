@@ -119,7 +119,7 @@ ENABLE_COVERAGE ?= $(DEFAULT_ENABLE_COVERAGE)
 #
 # Products
 #
-PRODUCTS := $(shell ls $(PRODUCTS_DIR) 2>/dev/null)
+PRODUCTS := $(sort $(shell find product -name "product.mk" -printf "%h\n" | cut -d'/' -f2-3))
 
 #
 # Deprecated Products/Platforms
