@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -64,6 +64,13 @@
 #define RNSAM_HIER_HASH_CLUSTERS_POS           8
 #define RNSAM_HIER_HASH_NODES_POS              16
 
+/*
+ * Minimum size of hashed and non-hashed regions when RCOMP mode
+ * is disabled is 64MB. In this mode, the base and the size of the
+ * programmed region is used for comparision.
+ */
+#define RNSAM_REGION_MIN_SIZE (64 * FWK_MIB)
+
 /*!
  * RNSAM programming context structure.
  */
@@ -77,6 +84,19 @@ struct cmn_cyprus_rnsam_ctx {
      */
     uint64_t non_hash_lsb_addr_mask;
 
+    /*!
+     * Minimum size of the Non-hashed regions when RCOMP is enabled. The size is
+     * defined using user parameter RNSAM_NONHASH_RCOMP_LSB during CMN mesh
+     * build time.
+     *
+     * The values from 16 to 26 are valid for RNSAM_NONHASH_RCOMP_LSB parameter.
+     * RNSAM_NONHASH_RCOMP_LSB = 16, defines minimum memory size = 64KB
+     * RNSAM_NONHASH_RCOMP_LSB = 17, defines minimum memory size = 128KB
+     * ...
+     * RNSAM_NONHASH_RCOMP_LSB = 26, defines minimum memory size = 64MB
+     */
+    uint64_t min_non_hash_size;
+
     /*! Hashed regions range comparison mode status flag */
     bool htg_rcomp_en;
 
@@ -85,6 +105,19 @@ struct cmn_cyprus_rnsam_ctx {
      * and end address.
      */
     uint64_t htg_lsb_addr_mask;
+
+    /*!
+     * Minimum size of the hashed regions when RCOMP is enabled. The size is
+     * defined using user parameter RNSAM_HTG_RCOMP_LSB during CMN mesh build
+     * time.
+     *
+     * The values from 16 to 26 are valid for RNSAM_HTG_RCOMP_LSB parameter.
+     * RNSAM_HTG_RCOMP_LSB = 16, defines minimum memory size = 64KB
+     * RNSAM_HTG_RCOMP_LSB = 17, defines minimum memory size = 128KB
+     * ...
+     * RNSAM_HTG_RCOMP_LSB = 26, defines minimum memory size = 64MB
+     */
+    uint64_t min_htg_size;
 
     /*! Flag to indicate that the RNSAM context has been initialized */
     bool is_initialized;
@@ -139,6 +172,36 @@ static uint64_t get_rnsam_htg_lsb_addr_mask(struct cmn_cyprus_rnsam_reg *rnsam)
     return (1 << lsb_bit_pos) - 1;
 }
 
+static uint64_t get_min_non_hash_region_size(struct cmn_cyprus_rnsam_reg *rnsam)
+{
+    uint64_t min_region_size;
+    uint8_t lsb_bit_pos;
+
+    if (is_non_hash_range_comparison_mode_enabled(rnsam) == true) {
+        lsb_bit_pos = get_rnsam_non_hash_rcomp_lsb_bit_pos(rnsam);
+        min_region_size = fwk_math_pow2(lsb_bit_pos);
+    } else {
+        min_region_size = RNSAM_REGION_MIN_SIZE;
+    }
+
+    return min_region_size;
+}
+
+static uint64_t get_min_htg_size(struct cmn_cyprus_rnsam_reg *rnsam)
+{
+    uint64_t min_region_size;
+    uint8_t lsb_bit_pos;
+
+    if (is_htg_range_comparison_mode_enabled(rnsam) == true) {
+        lsb_bit_pos = get_rnsam_htg_rcomp_lsb_bit_pos(rnsam);
+        min_region_size = fwk_math_pow2(lsb_bit_pos);
+    } else {
+        min_region_size = RNSAM_REGION_MIN_SIZE;
+    }
+
+    return min_region_size;
+}
+
 static void set_non_hash_region_target_type(
     struct cmn_cyprus_rnsam_reg *rnsam,
     unsigned int region_idx,
@@ -163,12 +226,10 @@ static void set_htg_region_target_type(
     enum sam_node_type target_type)
 {
     if (region_idx < RNSAM_HTG_REG_COUNT) {
-        /* Configure the bits [51:16] of base address of the range */
         rnsam->SYS_CACHE_GRP_REGION[region_idx] |=
             (target_type << RNSAM_REGION_ENTRY_TARGET_TYPE_POS);
 
     } else {
-        /* Configure the bits [51:16] of base address of the range */
         rnsam->HASHED_TGT_GRP_CFG1_REGION[region_idx - RNSAM_HTG_REG_COUNT] |=
             (target_type << RNSAM_REGION_ENTRY_TARGET_TYPE_POS);
     }
@@ -186,14 +247,14 @@ static void configure_non_hash_region_start_and_end_addr(
     lsb_addr_mask = rnsam_ctx.non_hash_lsb_addr_mask;
 
     if (region_idx < RNSAM_NON_HASH_REG_COUNT) {
-        /* Configure the bits [51:16] of base address of the range */
+        /* Configure the bits [51:RCOMP_LSB] of base address of the range */
         rnsam->NON_HASH_MEM_REGION[region_idx] = (base & ~lsb_addr_mask);
 
         /* Configure the end address of the region */
         rnsam->NON_HASH_MEM_REGION_CFG2[region_idx] =
             ((base + size - 1) & ~lsb_addr_mask);
     } else {
-        /* Configure the bits [51:16] of base address of the range */
+        /* Configure the bits [51:RCOMP_LSB] of base address of the range */
         rnsam->NON_HASH_MEM_REGION_GRP2[region_idx - RNSAM_NON_HASH_REG_COUNT] =
             (base & ~lsb_addr_mask);
 
@@ -211,6 +272,9 @@ static int configure_non_hash_region_base_and_size(
     uint64_t base,
     uint64_t size)
 {
+    uint8_t idx;
+    uint64_t min_size;
+
     if ((base % size) != 0) {
         FWK_LOG_ERR(MOD_NAME "Invalid non-hashed region %u", region_idx);
         FWK_LOG_ERR(
@@ -218,24 +282,27 @@ static int configure_non_hash_region_base_and_size(
         return FWK_E_PARAM;
     }
 
+    min_size = rnsam_ctx.min_non_hash_size;
+
     if (region_idx < RNSAM_NON_HASH_REG_COUNT) {
+        idx = region_idx;
         /* Configure the memory region size */
-        rnsam->NON_HASH_MEM_REGION[region_idx] = sam_encode_region_size(size)
+        rnsam->NON_HASH_MEM_REGION[idx] = sam_encode_region_size(size, min_size)
             << RNSAM_REGION_ENTRY_SIZE_POS;
 
         /* Configure the base address of the range */
-        rnsam->NON_HASH_MEM_REGION[region_idx] |= (base / SAM_GRANULARITY)
+        rnsam->NON_HASH_MEM_REGION[idx] |= (base / min_size)
             << RNSAM_REGION_ENTRY_BASE_POS;
-
     } else {
+        idx = (region_idx - RNSAM_NON_HASH_REG_COUNT);
         /* Configure the memory region size */
-        rnsam->NON_HASH_MEM_REGION_GRP2[region_idx - RNSAM_NON_HASH_REG_COUNT] =
-            sam_encode_region_size(size) << RNSAM_REGION_ENTRY_SIZE_POS;
+        rnsam->NON_HASH_MEM_REGION_GRP2[idx] =
+            sam_encode_region_size(size, min_size)
+            << RNSAM_REGION_ENTRY_SIZE_POS;
 
         /* Configure the base address of the range */
-        rnsam
-            ->NON_HASH_MEM_REGION_GRP2[region_idx - RNSAM_NON_HASH_REG_COUNT] |=
-            (base / SAM_GRANULARITY) << RNSAM_REGION_ENTRY_BASE_POS;
+        rnsam->NON_HASH_MEM_REGION_GRP2[idx] |= (base / min_size)
+            << RNSAM_REGION_ENTRY_BASE_POS;
     }
 
     return FWK_SUCCESS;
@@ -273,6 +340,9 @@ static int configure_htg_region_base_and_size(
     uint64_t base,
     uint64_t size)
 {
+    uint8_t idx;
+    uint64_t min_size;
+
     if ((base % size) != 0) {
         FWK_LOG_ERR(MOD_NAME "Invalid non-hashed region %u", region_idx);
         FWK_LOG_ERR(
@@ -280,22 +350,28 @@ static int configure_htg_region_base_and_size(
         return FWK_E_PARAM;
     }
 
+    min_size = rnsam_ctx.min_htg_size;
+
     if (region_idx < RNSAM_HTG_REG_COUNT) {
+        idx = region_idx;
         /* Configure the memory region size */
-        rnsam->SYS_CACHE_GRP_REGION[region_idx] = sam_encode_region_size(size)
+        rnsam->SYS_CACHE_GRP_REGION[idx] =
+            sam_encode_region_size(size, min_size)
             << RNSAM_REGION_ENTRY_SIZE_POS;
 
         /* Configure the base address of the range */
-        rnsam->SYS_CACHE_GRP_REGION[region_idx] = (base / SAM_GRANULARITY)
+        rnsam->SYS_CACHE_GRP_REGION[idx] |= (base / min_size)
             << RNSAM_REGION_ENTRY_BASE_POS;
     } else {
+        idx = (region_idx - RNSAM_HTG_REG_COUNT);
         /* Configure the memory region size */
-        rnsam->HASHED_TGT_GRP_CFG1_REGION[region_idx - RNSAM_HTG_REG_COUNT] =
-            sam_encode_region_size(size) << RNSAM_REGION_ENTRY_SIZE_POS;
+        rnsam->HASHED_TGT_GRP_CFG1_REGION[idx] =
+            sam_encode_region_size(size, min_size)
+            << RNSAM_REGION_ENTRY_SIZE_POS;
 
         /* Configure the base address of the range */
-        rnsam->HASHED_TGT_GRP_CFG1_REGION[region_idx - RNSAM_HTG_REG_COUNT] =
-            (base / SAM_GRANULARITY) << RNSAM_REGION_ENTRY_BASE_POS;
+        rnsam->HASHED_TGT_GRP_CFG1_REGION[idx] |= (base / min_size)
+            << RNSAM_REGION_ENTRY_BASE_POS;
     }
 
     return FWK_SUCCESS;
@@ -349,7 +425,7 @@ static uint64_t get_non_hash_region_size(
     }
 
     encoded_size &= RNSAM_ENCODED_REGION_SIZE_MASK;
-    return sam_decode_region_size(encoded_size);
+    return sam_decode_region_size(encoded_size, rnsam_ctx.min_non_hash_size);
 }
 
 void rnsam_stall(struct cmn_cyprus_rnsam_reg *rnsam)
@@ -659,6 +735,10 @@ int setup_rnsam_ctx(struct cmn_cyprus_rnsam_reg *rnsam)
 
     /* Get the LSB mask from LSB bit position defining minimum region size */
     rnsam_ctx.htg_lsb_addr_mask = get_rnsam_htg_lsb_addr_mask(rnsam);
+
+    /* Get the minimum region size */
+    rnsam_ctx.min_non_hash_size = get_min_non_hash_region_size(rnsam);
+    rnsam_ctx.min_htg_size = get_min_htg_size(rnsam);
 
     rnsam_ctx.is_initialized = true;
 

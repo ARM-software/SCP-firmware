@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -13,6 +13,7 @@
 #include <internal/cmn_cyprus_reg.h>
 
 #include <fwk_assert.h>
+#include <fwk_math.h>
 
 #include <stdint.h>
 
@@ -28,17 +29,56 @@
 #define HNS_SAM_CONTROL_TOP_ADDR_BIT_POS(x) (40 + (x * 8))
 
 /* HN-S SAM */
-#define HNS_UNIT_INFO_HNSAM_RCOMP_EN_MASK (0x10000000)
-#define HNS_UNIT_INFO_HNSAM_RCOMP_EN_POS  28
-#define HNS_SAM_MEMREGION_SIZE_POS        12
-#define HNS_SAM_MEMREGION_BASE_POS        20
-#define HNS_SAM_MEMREGION_VALID           UINT64_C(0x8000000000000000)
-#define HNS_SAM_MEMREGION_SN_NODE_ID_MASK (0x7FF)
+#define HNS_UNIT_INFO_HNSAM_RCOMP_EN_MASK  (0x20000000)
+#define HNS_UNIT_INFO_HNSAM_RCOMP_EN_POS   29
+#define HNS_UNIT_INFO_HNSAM_RCOMP_LSB_MASK (0x7C0000000)
+#define HNS_UNIT_INFO_HNSAM_RCOMP_LSB_POS  30
+#define HNS_SAM_MEMREGION_SIZE_POS         12
+#define HNS_SAM_MEMREGION_BASE_POS         20
+#define HNS_SAM_MEMREGION_VALID            UINT64_C(0x8000000000000000)
+#define HNS_SAM_MEMREGION_SN_NODE_ID_MASK  (0x7FF)
 
 /* HN-S Power Policy */
 #define HNS_PWPR_DYN_EN_POS  8
 #define HNS_PWPR_OP_MODE_POS 4
 #define HNS_PWPR_POLICY_POS  0
+
+/*
+ * Minimum size of hashed and non-hashed regions when RCOMP mode
+ * is disabled is 64MB. In this mode, the base and the size of the
+ * programmed region is used for comparison.
+ */
+#define HNSAM_REGION_MIN_SIZE (64 * FWK_MIB)
+
+/* HN-S programming context structure */
+struct cmn_cyprus_hns_ctx {
+    /* Range comparison mode status flag */
+    bool rcomp_en;
+
+    /*
+     * Minimum size of the regions when RCOMP is enabled. The size is
+     * defined using user parameter HNSAM_RCOMP_LSB during CMN mesh build time.
+     *
+     * The values from 20 to 26 are valid for HNSAM_RCOMP_LSB parameter.
+     * HNSAM_RCOMP_LSB = 20, defines minimum memory size = 1MB
+     * HNSAM_RCOMP_LSB = 21, defines minimum memory size = 2MB
+     * ...
+     * HNSAM_RCOMP_LSB = 26, defines minimum memory size = 64MB
+     */
+    uint64_t min_region_size;
+
+    /* Flag to indicate that the HN-S context has been initialized */
+    bool is_initialized;
+};
+
+static struct cmn_cyprus_hns_ctx hns_ctx;
+
+static uint8_t get_hns_rcomp_lsb_pos(struct cmn_cyprus_hns_reg *hns)
+{
+    return (
+        (hns->UNIT_INFO[1] & HNS_UNIT_INFO_HNSAM_RCOMP_LSB_MASK) >>
+        HNS_UNIT_INFO_HNSAM_RCOMP_LSB_POS);
+}
 
 void hns_enable_sn_mode(
     struct cmn_cyprus_hns_reg *hns,
@@ -96,15 +136,16 @@ void hns_configure_non_hashed_region_addr_range(
 
         /* Configure base address of the region */
         hns->SAM_MEMREGION[non_hashed_region_idx] |=
-            ((base / SAM_GRANULARITY) << HNS_SAM_MEMREGION_BASE_POS);
+            ((base / hns_ctx.min_region_size) << HNS_SAM_MEMREGION_BASE_POS);
     } else {
         /* Configure region size */
         hns->SAM_MEMREGION[non_hashed_region_idx] |=
-            (sam_encode_region_size(size) << HNS_SAM_MEMREGION_SIZE_POS);
+            (sam_encode_region_size(size, hns_ctx.min_region_size)
+             << HNS_SAM_MEMREGION_SIZE_POS);
 
         /* Configure region base */
         hns->SAM_MEMREGION[non_hashed_region_idx] |=
-            ((base / SAM_GRANULARITY) << HNS_SAM_MEMREGION_BASE_POS);
+            ((base / hns_ctx.min_region_size) << HNS_SAM_MEMREGION_BASE_POS);
     }
 }
 
@@ -165,4 +206,36 @@ void hns_set_pwpr_policy(struct cmn_cyprus_hns_reg *hns, uint8_t policy)
 
     /* Configure HN-F power policy */
     hns->PPU_PWPR |= (policy << HNS_PWPR_POLICY_POS);
+}
+
+int setup_hns_ctx(struct cmn_cyprus_hns_reg *hns)
+{
+    uint8_t lsb_pos;
+
+    /* Return if initialized already */
+    if (hns_ctx.is_initialized == true) {
+        return FWK_SUCCESS;
+    }
+
+    if (hns == NULL) {
+        return FWK_E_PARAM;
+    }
+
+    /*
+     * Check if the start and end address has to be programmed for
+     * regions.
+     */
+    hns_ctx.rcomp_en = hns_is_range_comparison_mode_enabled(hns);
+
+    /* Get the minimum region size */
+    if (hns_ctx.rcomp_en != 0) {
+        lsb_pos = get_hns_rcomp_lsb_pos(hns);
+        hns_ctx.min_region_size = fwk_math_pow2(lsb_pos);
+    } else {
+        hns_ctx.min_region_size = HNSAM_REGION_MIN_SIZE;
+    }
+
+    hns_ctx.is_initialized = true;
+
+    return FWK_SUCCESS;
 }

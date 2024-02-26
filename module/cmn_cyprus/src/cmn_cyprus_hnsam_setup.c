@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -327,6 +327,8 @@ static void configure_hns_pwpr(void)
 int cmn_cyprus_setup_hnf_sam(struct cmn_cyprus_ctx *ctx)
 {
     int status;
+    unsigned int hns_idx;
+    struct cmn_cyprus_hns_reg *hns;
     const struct mod_cmn_cyprus_hnf_sam_config *hnf_sam_config;
 
     if (ctx == NULL) {
@@ -338,6 +340,25 @@ int cmn_cyprus_setup_hnf_sam(struct cmn_cyprus_ctx *ctx)
     hnf_sam_config = &shared_ctx->config->hnf_sam_config;
 
     FWK_LOG_INFO(MOD_NAME "HN-F SAM setup start...");
+
+    /* Setup the HN-S programming context */
+    for (hns_idx = 0; hns_idx < shared_ctx->hns_count; hns_idx++) {
+        hns = shared_ctx->hns_info_table[hns_idx].hns;
+
+        if (is_hns_node_isolated(hns) == true) {
+            continue;
+        }
+
+        /*
+         * Read the static configuration from the first non-isolated HN-S node
+         * in the mesh and setup the HN-S context.
+         */
+        status = setup_hns_ctx(hns);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+        break;
+    }
 
     switch (hnf_sam_config->hnf_sam_mode) {
     case MOD_CMN_CYPRUS_HNF_SAM_MODE_DIRECT_MAPPING:

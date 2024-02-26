@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -216,5 +216,24 @@ void hns_set_pwpr_op_mode(
  * \return None.
  */
 void hns_set_pwpr_policy(struct cmn_cyprus_hns_reg *hns, uint8_t policy);
+
+/*
+ * Setup the HN-S programming context.
+ *
+ * \param hns Pointer to the HN-S node.
+ *      \pre The HN-S node pointer must be valid.
+ *
+ * \details Reads static configuration from the given HN-S node and saves it in
+ * the context structure. This eliminates the need to read the configuration
+ * every time when programming an HN-S node.
+ *
+ * \note All HN-S nodes in a given CMN mesh are expected to have the same
+ * initial configuration during the boot time.
+ *
+ * \retval ::FWK_SUCCESS Operation succeeded.
+ * \retval ::FWK_E_PARAM Invalid hns register pointer.
+ *
+ */
+int setup_hns_ctx(struct cmn_cyprus_hns_reg *hns);
 
 #endif /* CMN_CYPRUS_HNS_REG_INTERNAL_H */
