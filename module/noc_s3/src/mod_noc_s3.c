@@ -5,6 +5,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  *
  */
+#include <noc_s3.h>
+#include <noc_s3_psam.h>
+#include <noc_s3_reg.h>
+
 #include <mod_noc_s3.h>
 
 #include <fwk_assert.h>
@@ -74,6 +78,7 @@ static int mod_noc_s3_element_init(
 static int mod_noc_s3_start(fwk_id_t id)
 {
     struct mod_noc_s3_element_config *config;
+    struct mod_noc_s3_dev *dev;
     unsigned int element_id;
     int status;
 
@@ -87,11 +92,17 @@ static int mod_noc_s3_start(fwk_id_t id)
 
     element_id = fwk_id_get_element_idx(id);
     config = noc_s3_ctx.element_ctx[element_id].config;
+    dev = &noc_s3_ctx.element_ctx[element_id].noc_s3_dev;
     if (!fwk_id_is_equal(config->plat_notification.source_id, FWK_ID_NONE)) {
         status = fwk_notification_subscribe(
             config->plat_notification.notification_id,
             config->plat_notification.source_id,
             id);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+    } else {
+        status = program_static_mapped_regions(config, dev);
         if (status != FWK_SUCCESS) {
             return status;
         }
@@ -105,12 +116,21 @@ static int mod_noc_s3_process_notification(
     struct fwk_event *resp_event)
 {
     struct mod_noc_s3_element_config *config;
+    struct mod_noc_s3_dev *dev;
     unsigned int element_id;
     int status;
 
     element_id = fwk_id_get_element_idx(event->target_id);
     config = noc_s3_ctx.element_ctx[element_id].config;
+    dev = &noc_s3_ctx.element_ctx[element_id].noc_s3_dev;
     if (fwk_id_is_equal(event->id, config->plat_notification.notification_id)) {
+        status = program_static_mapped_regions(config, dev);
+        if (status != FWK_SUCCESS) {
+            fwk_trap();
+            return status;
+        }
+
+        /* Element is initialized, unsubscribe from the notification. */
         status = fwk_notification_unsubscribe(
             event->id, event->source_id, event->target_id);
         if (status != FWK_SUCCESS) {
@@ -121,10 +141,39 @@ static int mod_noc_s3_process_notification(
     return FWK_SUCCESS;
 }
 
+static struct mod_noc_s3_memmap_api noc_s3_memmap_api = {
+    .map_region_in_psam = map_region_in_psam,
+    .unmap_region_in_psam = unmap_region_in_psam,
+};
+
+static int mod_noc_s3_process_bind_request(
+    fwk_id_t requester_id,
+    fwk_id_t targer_id,
+    fwk_id_t api_id,
+    const void **api)
+{
+    enum mod_noc_s3_api_idx api_idx;
+    int status;
+
+    api_idx = fwk_id_get_api_idx(api_id);
+    switch (api_idx) {
+    case MOD_NOC_S3_API_SETUP_PSAM:
+        *api = &noc_s3_memmap_api;
+        status = FWK_SUCCESS;
+        break;
+    default:
+        status = FWK_E_DATA;
+    };
+
+    return status;
+}
+
 const struct fwk_module module_noc_s3 = {
+    .api_count = MOD_NOC_S3_API_COUNT,
     .type = FWK_MODULE_TYPE_DRIVER,
     .init = mod_noc_s3_init,
     .element_init = mod_noc_s3_element_init,
     .start = mod_noc_s3_start,
+    .process_bind_request = mod_noc_s3_process_bind_request,
     .process_notification = mod_noc_s3_process_notification,
 };

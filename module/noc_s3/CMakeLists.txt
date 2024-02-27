@@ -14,4 +14,5 @@ target_sources(
     ${SCP_MODULE_TARGET}
      PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_noc_s3.c"
      PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/noc_s3.c"
-     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/noc_s3_discovery.c")
+     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/noc_s3_discovery.c"
+     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/noc_s3_psam.c")

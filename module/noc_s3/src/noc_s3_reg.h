@@ -156,6 +156,48 @@ static_assert(
     COMPONENT_ID3_OFFSET ==
         offsetof(struct noc_s3_global_reg, component_id3));
 
+/*! Definitions for number of regions in the PSAM. */
+#define NOC_S3_MAX_NUM_REGIONS      128
+#define NOC_S3_MAX_NUM_HTG_REGIONS  32
+#define NOC_S3_MAX_NUM_HTG_TGID_NUM 32
+#define NOC_S3_MAX_NUM_TOP_ADDR_CFG 32
+#define NOC_S3_MAX_NUM_VD_POINTERS  1010
+#define NP2_TOP_ADDR_CFG_OFFSET     0xb80
+/*! Region configuration registers. */
+struct region_regs {
+    /* Base Address */
+    FWK_RW uint64_t cfg1_cfg0;
+    /* End Address */
+    FWK_RW uint64_t cfg3_cfg2;
+};
+
+/*!
+ * \brief NoC S3 PSAM register map
+ */
+struct noc_s3_psam_reg {
+    FWK_R  uint32_t sam_unit_info;
+    FWK_RW uint32_t sam_status;
+    const  uint32_t reserved_0[2];
+    FWK_RW uint32_t htg_addr_mask_l;
+    FWK_RW uint32_t htg_addr_mask_u;
+    FWK_RW uint32_t axid_mask;
+    const  uint32_t reserved_1;
+    FWK_RW uint32_t cmp_addr_mask_l;
+    FWK_RW uint32_t cmp_addr_mask_u;
+    const  uint32_t reserved_2[2];
+    FWK_RW uint32_t generic_config_reg0;
+    FWK_RW uint32_t generic_config_reg1;
+    const  uint32_t reserved_3[50];
+    struct region_regs nh_region[NOC_S3_MAX_NUM_REGIONS];
+    struct region_regs htg_region[NOC_S3_MAX_NUM_HTG_REGIONS];
+    FWK_RW uint32_t htg_tgtid_cfg[NOC_S3_MAX_NUM_HTG_TGID_NUM];
+    FWK_RW uint32_t np2_top_addr_cfg[NOC_S3_MAX_NUM_TOP_ADDR_CFG];
+};
+
+static_assert(
+        NP2_TOP_ADDR_CFG_OFFSET ==
+            offsetof(struct noc_s3_psam_reg, np2_top_addr_cfg));
+
 // clang-format on
 
 #endif /* NOC_S3_REG_H */

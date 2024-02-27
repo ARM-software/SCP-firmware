@@ -98,3 +98,20 @@ fetch in O(1) by using id and type.
 Example: To get offset of the C2, the user will access the table using node
 type 4 and Id 2. Table[4][2] will give offset of C2.
 
+# PSAM Programming
+
+Programmable System Address Map feature in NoC S3 allows configurable address
+map for address‑based routing from each upstream interface to the corresponding
+downstream interfaces.
+
+The module can program PSAM in the following ways.
+
+1) Static mapping with the information passed through module config.  It is
+expected that the statically mapped regions will not change during the runtime.
+Their context is handled by the module.
+
+2) Mapping/Unmapping requested through the APIs exposed by the module.  These
+APIs are expected to be used by the modules that will change the mapping during
+the runtime and modules will do additional steps such as mapping peripheral
+base in the address translation unit before calling the API. For this reason,
+the module will maintain the context for the blocks that it is managing.
