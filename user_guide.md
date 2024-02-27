@@ -31,7 +31,7 @@ Additionally, the firmware may be built using one of three compilers:
 
 - [GNU Arm Embedded Toolchain] (*10.3-2021.10* or later)
 - [Arm Compiler 6] (*6.13* or later)
-- [LLVM Toolchain] (*13.0.1* or later)
+- [LLVM Toolchain] (*13.0.1*)
 
 [GNU Arm Embedded Toolchain]:
 https://developer.arm.com/open-source/gnu-toolchain/gnu-rm
@@ -183,11 +183,19 @@ For example, to build the RAM firmware for TC2 in debug mode, use the
 following:
 
 ```sh
-make -f Makefile.cmake PRODUCT=tc2 MODE=debug firmware-scp_ramfw
+make -f Makefile.cmake PRODUCT=totalcompute/tc2 MODE=debug firmware-scp_ramfw
 ```
 
 The `all` target will be used if `[TARGET]` is omitted, which will build all the
 firmware defined by the product.
+
+Building example for all of the R-Car targets:
+
+```sh
+make -f Makefile.cmake PRODUCT=rcar TOOLCHAIN=GNU
+```
+__Note:__ Currently it is only possible to build the `rcar` target with version
+*9.2-2019.12* or earlier of the the GNU Arm Embedded Toolchain.
 
 The `help` target provides further information on the arguments that can be
 given:
@@ -216,13 +224,11 @@ standard library and headers. These are taken from the
 required environment variables differ. The PATH variable of the system must
 incorporate path to the required toolchain.
 
-#### ARMv7
-
-When building for an ARMv7 product the sysroot path of the GNU Arm Embedded
+The sysroot path of the GNU Arm Embedded
 Toolchain must be passed under the `SYSROOT` environment variable.
 
 ```sh
-make -f Makefile.cmake PRODUCT=tc2 \
+make -f Makefile.cmake PRODUCT=totalcompute/tc2 \
     LLVM_SYSROOT_CC=/path/to/sysroot
 ```
 
@@ -242,18 +248,6 @@ You can discover the resource dir of your Clang 13 installation by running:
 
 ```sh
 clang-13 -print-resource-dir
-```
-
-#### ARMv8
-
-When building for an ARMv8 product the sysroot path of the GNU Arm Embedded
-Toolchain must be passed under the `SYSROOT` environment variable.
-
-Building example for all of the R-Car targets:
-
-```sh
-make -f Makefile.cmake PRODUCT=rcar TOOLCHAIN=GNU \
-    LLVM_SYSROOT_CC=/path/to/sysroot
 ```
 
 ## Running the SCP-firmware on Total Compute (TC) platforms
@@ -328,7 +322,7 @@ firmware images are built:
 
 ```sh
 cd ${SCP_PATH} && \
-    make -f Makefile.cmake PRODUCT=sgi575 MODE=debug
+    make -f Makefile.cmake PRODUCT=neoverse-rd/sgi575 MODE=debug
 
 export SCP_ROM_PATH=${SCP_PATH}/build/sgi575/GNU/debug/firmware-scp_romfw/bin/\
 sgi575-bl1.bin
