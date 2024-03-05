@@ -147,7 +147,7 @@ def get_changed_files(commit_range):
             stderr=subprocess.PIPE)
     except subprocess.CalledProcessError as e:
         print('ERROR ' + e.returncode + ': Failed to get changed files')
-        return None
+        return -1
 
     result_out, _ = result.communicate()
     result_out = result_out.decode('utf-8').strip().split('\n')
@@ -193,8 +193,11 @@ def run(commit_hash=get_previous_commit()):
     print(banner('Checking the copyrights in the code...'))
 
     changed_files = get_changed_files(commit_hash)
-    if len(changed_files) == 0:
+    if changed_files == -1:
         return False
+    elif len(changed_files) == 0:
+        print('No changed file detected')
+        return True
 
     filtered_files = get_filtered_files(EXCLUDE_DIRECTORIES, FILE_TYPES)
     changed_files = list(set(changed_files) & set(filtered_files))
