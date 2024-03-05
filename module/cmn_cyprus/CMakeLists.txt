@@ -20,7 +20,12 @@ target_sources(${SCP_MODULE_TARGET}
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/cmn_cyprus_common.c"
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/cmn_cyprus_hnsam_setup.c"
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/cmn_cyprus_rnsam_reg.c"
-    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/cmn_cyprus_rnsam_setup.c")
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/cmn_cyprus_rnsam_setup.c"
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/cmn_cyprus_ccg_ra_reg.c"
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/cmn_cyprus_ccg_ha_reg.c"
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/cmn_cyprus_ccla_reg.c"
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/cmn_cyprus_cml_setup.c"
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/cmn_cyprus_lcnsam_setup.c")
 
 target_link_libraries(${SCP_MODULE_TARGET}
     PRIVATE module-clock module-system-info module-timer)

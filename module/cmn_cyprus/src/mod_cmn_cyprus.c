@@ -8,9 +8,11 @@
  *     Driver module for CMN Cyprus interconnect.
  */
 
+#include <internal/cmn_cyprus_cml_setup.h>
 #include <internal/cmn_cyprus_ctx.h>
 #include <internal/cmn_cyprus_discovery_setup.h>
 #include <internal/cmn_cyprus_hnsam_setup.h>
+#include <internal/cmn_cyprus_lcnsam_setup.h>
 #include <internal/cmn_cyprus_rnsam_setup.h>
 
 #include <mod_clock.h>
@@ -66,6 +68,28 @@ static int cmn_cyprus_setup(void)
             MOD_NAME "Error! RNSAM setup failed with %s",
             fwk_status_str(status));
         return status;
+    }
+
+    if ((ctx.multichip_mode == true) && (ctx.config_table->chip_count > 1)) {
+        /* Program the LCN SAM */
+        if (ctx.config->enable_lcn == true) {
+            status = cmn_cyprus_setup_lcn_sam(&ctx);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_ERR(
+                    MOD_NAME "Error! LCN SAM setup failed with %s",
+                    fwk_status_str(status));
+                return status;
+            }
+        }
+
+        /* Program CML */
+        status = cmn_cyprus_setup_cml(&ctx);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_ERR(
+                MOD_NAME "Error! CML setup failed with %s",
+                fwk_status_str(status));
+            return status;
+        }
     }
 
     FWK_LOG_INFO(MOD_NAME "Done");
