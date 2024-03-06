@@ -6,15 +6,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
-#include <mod_scmi_sensor.h>
-#include <mod_sensor.h>
-#include <mod_reg_sensor.h>
 #include "config_reg_sensor.h"
 
-uint64_t soc_temp[3] = {25000, 25000, 25000};
-uint64_t ddr_temp[1] = {25000};
+#include <mod_reg_sensor.h>
+#include <mod_scmi_sensor.h>
+#include <mod_sensor.h>
+
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
+
+uint64_t soc_temp[3] = { 25000, 25000, 25000 };
+uint64_t ddr_temp[1] = { 25000 };
 /*
  * Register Sensor driver config
  */
@@ -89,8 +91,9 @@ static const struct fwk_element *get_sensor_element_table(fwk_id_t module_id)
 static const struct mod_sensor_config sensor_config = {
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
     .notification_id = FWK_ID_MODULE_INIT(FWK_MODULE_IDX_SCMI_SENSOR),
-    .trip_point_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_SCMI_SENSOR,
-                SCMI_SENSOR_API_IDX_TRIP_POINT),
+    .trip_point_api_id = FWK_ID_API_INIT(
+        FWK_MODULE_IDX_SCMI_SENSOR,
+        SCMI_SENSOR_API_IDX_TRIP_POINT),
 #else
     .notification_id = FWK_ID_NONE_INIT
 #endif

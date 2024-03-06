@@ -1,6 +1,7 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -59,8 +60,11 @@ void optee_mbx_signal_smt_message(fwk_id_t device_id);
  * \param out_buf Pointer to the response buffer.
  * \param out_size Size of the response buffer.
  */
-void optee_mbx_signal_msg_message(fwk_id_t device_id,
-                                  void *in_buf, size_t in_size,
-                                  void *out_buf, size_t *out_size);
+void optee_mbx_signal_msg_message(
+    fwk_id_t device_id,
+    void *in_buf,
+    size_t in_size,
+    void *out_buf,
+    size_t *out_size);
 
 #endif /* MOD_OPTEE_MBX_H */

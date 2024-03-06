@@ -1,13 +1,16 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_module.h>
-#include <mod_mock_psu.h>
 #include "config_mock_psu.h"
+
+#include <mod_mock_psu.h>
+
+#include <fwk_module.h>
 
 static const struct fwk_element element_table[] = {
     [CONFIG_MOCK_PSU_ELEMENT_IDX_CPU_GROUP_LITTLE] = {

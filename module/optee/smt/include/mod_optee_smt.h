@@ -1,6 +1,7 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -24,10 +25,10 @@
  */
 
 /*! No policies */
-#define MOD_SMT_POLICY_NONE         0
+#define MOD_SMT_POLICY_NONE 0
 
 /*! This channel is secure */
-#define MOD_SMT_POLICY_SECURE       (1U << 0)
+#define MOD_SMT_POLICY_SECURE (1U << 0)
 
 /*! The mailbox for this channel requires initialization */
 #define MOD_SMT_POLICY_INIT_MAILBOX (1U << 1)

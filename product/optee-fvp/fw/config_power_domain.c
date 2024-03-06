@@ -1,16 +1,20 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "config_mock_ppu.h"
+#include "config_power_domain.h"
+
+#include <power_domain_utils.h>
+
+#include <mod_power_domain.h>
+
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_power_domain.h>
-#include <power_domain_utils.h>
-#include "config_power_domain.h"
-#include "config_mock_ppu.h"
 
 /*
  * Mask of the allowed states for the top level power domains
@@ -38,8 +42,8 @@ static const uint32_t cluster_pd_allowed_state_mask_table[] = {
 static const uint32_t core_pd_allowed_state_mask_table[] = {
     [MOD_PD_STATE_OFF] = MOD_PD_STATE_OFF_MASK,
     [MOD_PD_STATE_SLEEP] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_SLEEP_MASK,
-    [MOD_PD_STATE_ON] = MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK |
-        MOD_PD_STATE_SLEEP_MASK,
+    [MOD_PD_STATE_ON] =
+        MOD_PD_STATE_OFF_MASK | MOD_PD_STATE_ON_MASK | MOD_PD_STATE_SLEEP_MASK,
 };
 
 /* Power module specific configuration data (none) */
@@ -124,8 +128,8 @@ static struct fwk_element fvp_power_domain_static_element_table[] = {
 /*
  * Function definitions with internal linkage
  */
-static const struct fwk_element *fvp_power_domain_get_element_table
-    (fwk_id_t module_id)
+static const struct fwk_element *fvp_power_domain_get_element_table(
+    fwk_id_t module_id)
 {
     const struct fwk_element *element_table;
 

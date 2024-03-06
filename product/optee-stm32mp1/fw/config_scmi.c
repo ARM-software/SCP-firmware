@@ -1,21 +1,23 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_element.h>
-#include <fwk_id.h>
-#include <fwk_macros.h>
-#include <fwk_log.h>
-#include <fwk_module.h>
-#include <fwk_module_idx.h>
-
 #include <internal/scmi.h>
+#include <scmi_agents.h>
+
 #include <mod_optee_smt.h>
 #include <mod_scmi.h>
-#include <scmi_agents.h>
+
+#include <fwk_element.h>
+#include <fwk_id.h>
+#include <fwk_log.h>
+#include <fwk_macros.h>
+#include <fwk_module.h>
+#include <fwk_module_idx.h>
 
 static const struct fwk_element service_table[] = {
     [SCMI_SERVICE_IDX_NS_CHANNEL0] = {
@@ -44,7 +46,7 @@ static const struct mod_scmi_agent agent_table[] = {
 };
 
 struct fwk_module_config config_scmi = {
-    .data = &((struct mod_scmi_config) {
+    .data = &((struct mod_scmi_config){
         .protocol_count_max = 9,
         .agent_count = FWK_ARRAY_SIZE(agent_table) - 1,
         .agent_table = agent_table,

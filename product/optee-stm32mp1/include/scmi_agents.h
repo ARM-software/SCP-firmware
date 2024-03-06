@@ -1,6 +1,7 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -24,6 +25,6 @@ enum scmi_channel_device_idx {
     SCMI_CHANNEL_DEVICE_IDX_COUNT
 };
 
-#define SCMI_SHMEM_SIZE         128
+#define SCMI_SHMEM_SIZE 128
 
 #endif /* SCMI_AGENTS_H */

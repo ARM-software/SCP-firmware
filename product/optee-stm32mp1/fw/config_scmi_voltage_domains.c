@@ -1,29 +1,30 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+
+#include <compiler.h>
+#include <drivers/stm32mp1_pwr.h>
+#include <dt-bindings/regulator/st,stm32mp15-regulator.h>
+#include <scmi_agents.h>
+#include <util.h>
+
+#include <mod_scmi_voltage_domain.h>
+#include <mod_stm32_pmic_regu.h>
+#include <mod_stm32_pwr_regu.h>
+#include <mod_voltage_domain.h>
 
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 
-#include <mod_voltage_domain.h>
-#include <mod_scmi_voltage_domain.h>
-#include <mod_stm32_pmic_regu.h>
-#include <mod_stm32_pwr_regu.h>
-#include <scmi_agents.h>
-
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
-
-#include <compiler.h>
-#include <drivers/stm32mp1_pwr.h>
-#include <dt-bindings/regulator/st,stm32mp15-regulator.h>
-#include <util.h>
 
 /*
  * stm32_pwr_cfg - Configuration data for PWR regulators exposed thru SCMI
@@ -73,14 +74,14 @@ static const struct mod_stm32_pmic_regu_dev_config stm32_pmic_cfg[] = {
     [STPMIC1_REGU_BUCK2] = { .regu_name = "buck2", .read_only = true },
     [STPMIC1_REGU_BUCK3] = { .regu_name = "buck3" },
     [STPMIC1_REGU_BUCK4] = { .regu_name = "buck4" },
-    [STPMIC1_REGU_LDO1]  = { .regu_name = "ldo1" },
-    [STPMIC1_REGU_LDO2]  = { .regu_name = "ldo2" },
-    [STPMIC1_REGU_LDO3]  = { .regu_name = "ldo3", .read_only = true },
-    [STPMIC1_REGU_LDO4]  = { .regu_name = "ldo4" },
-    [STPMIC1_REGU_LDO5]  = { .regu_name = "ldo5" },
-    [STPMIC1_REGU_LDO6]  = { .regu_name = "ldo6" },
+    [STPMIC1_REGU_LDO1] = { .regu_name = "ldo1" },
+    [STPMIC1_REGU_LDO2] = { .regu_name = "ldo2" },
+    [STPMIC1_REGU_LDO3] = { .regu_name = "ldo3", .read_only = true },
+    [STPMIC1_REGU_LDO4] = { .regu_name = "ldo4" },
+    [STPMIC1_REGU_LDO5] = { .regu_name = "ldo5" },
+    [STPMIC1_REGU_LDO6] = { .regu_name = "ldo6" },
     [STPMIC1_REGU_VREFDDR] = { .regu_name = "vref_ddr", .read_only = true },
-    [STPMIC1_REGU_BOOST]   = { .regu_name = "boost" },
+    [STPMIC1_REGU_BOOST] = { .regu_name = "boost" },
     [STPMIC1_REGU_PWR_SW1] = { .regu_name = "pwr_sw1" },
     [STPMIC1_REGU_PWR_SW2] = { .regu_name = "pwr_sw2" },
 };
@@ -114,7 +115,10 @@ enum voltd_elt_idx {
  * SCMI Voltage Domain driver configuration
  */
 #define SCMI_VOLTD_ELT_ID(_idx) \
-    { .element_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_VOLTAGE_DOMAIN, (_idx)) }
+    { \
+        .element_id = \
+            FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_VOLTAGE_DOMAIN, (_idx)) \
+    }
 
 static struct mod_scmi_voltd_device scmi_voltd_device[] = {
     SCMI_VOLTD_ELT_ID(VOLTD_SCMI_REG11),
@@ -186,20 +190,28 @@ static const struct fwk_element voltd_elt[] = {
     [VOLTD_IDX_SCMI_REG11] = VOLTD_STM32_PWR_ELT_ID(STM32_PWR_REG11),
     [VOLTD_IDX_SCMI_REG18] = VOLTD_STM32_PWR_ELT_ID(STM32_PWR_REG18),
     [VOLTD_IDX_SCMI_USB33] = VOLTD_STM32_PWR_ELT_ID(STM32_PWR_USB33),
-    [VOLTD_IDX_SCMI_STPMIC1_BUCK1] = VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_BUCK1),
-    [VOLTD_IDX_SCMI_STPMIC1_BUCK2] = VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_BUCK2),
-    [VOLTD_IDX_SCMI_STPMIC1_BUCK3] = VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_BUCK3),
-    [VOLTD_IDX_SCMI_STPMIC1_BUCK4] = VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_BUCK4),
+    [VOLTD_IDX_SCMI_STPMIC1_BUCK1] =
+        VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_BUCK1),
+    [VOLTD_IDX_SCMI_STPMIC1_BUCK2] =
+        VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_BUCK2),
+    [VOLTD_IDX_SCMI_STPMIC1_BUCK3] =
+        VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_BUCK3),
+    [VOLTD_IDX_SCMI_STPMIC1_BUCK4] =
+        VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_BUCK4),
     [VOLTD_IDX_SCMI_STPMIC1_LDO1] = VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_LDO1),
     [VOLTD_IDX_SCMI_STPMIC1_LDO2] = VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_LDO2),
     [VOLTD_IDX_SCMI_STPMIC1_LDO3] = VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_LDO3),
     [VOLTD_IDX_SCMI_STPMIC1_LDO4] = VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_LDO4),
     [VOLTD_IDX_SCMI_STPMIC1_LDO5] = VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_LDO5),
     [VOLTD_IDX_SCMI_STPMIC1_LDO6] = VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_LDO6),
-    [VOLTD_IDX_SCMI_STPMIC1_VREFDDR] = VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_VREFDDR),
-    [VOLTD_IDX_SCMI_STPMIC1_BOOST]   = VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_BOOST),
-    [VOLTD_IDX_SCMI_STPMIC1_PWR_SW1] = VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_PWR_SW1),
-    [VOLTD_IDX_SCMI_STPMIC1_PWR_SW2] = VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_PWR_SW2),
+    [VOLTD_IDX_SCMI_STPMIC1_VREFDDR] =
+        VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_VREFDDR),
+    [VOLTD_IDX_SCMI_STPMIC1_BOOST] =
+        VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_BOOST),
+    [VOLTD_IDX_SCMI_STPMIC1_PWR_SW1] =
+        VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_PWR_SW1),
+    [VOLTD_IDX_SCMI_STPMIC1_PWR_SW2] =
+        VOLTD_STM32_PMIC_ELT_ID(STPMIC1_REGU_PWR_SW2),
     [VOLTD_IDX_COUNT] = { 0 } /* Termination entry */
 };
 

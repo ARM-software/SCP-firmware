@@ -1,12 +1,15 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Description:
  *     Interface SCP-firmware console module with OP-TEE console resources.
  */
+
+#include <console.h>
 
 #include <fwk_assert.h>
 #include <fwk_attributes.h>
@@ -19,7 +22,6 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <console.h>
 
 static int mod_console_init(
     fwk_id_t module_id,
@@ -37,7 +39,6 @@ static int mod_console_element_init(
     return FWK_SUCCESS;
 }
 
-
 static int mod_console_io_open(const struct fwk_io_stream *stream)
 {
     return FWK_SUCCESS;
@@ -47,7 +48,7 @@ static int mod_console_io_getch(
     const struct fwk_io_stream *restrict stream,
     char *restrict ch)
 {
-    *ch =  'A';
+    *ch = 'A';
 
     return FWK_SUCCESS;
 }
@@ -82,7 +83,7 @@ struct fwk_module_config config_optee_console = {
     .elements = FWK_MODULE_STATIC_ELEMENTS({
         [0] = {
             .name = "printf",
-            .data = (void *)1
+            .data = (void *)1,
         },
         [1] = { 0 },
     }),

@@ -5,19 +5,19 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <drivers/regulator.h>
+
+#include <mod_optee_voltd_regulator.h>
+#include <mod_scmi_std.h>
+#include <mod_voltage_domain.h>
+
 #include <fwk_assert.h>
 #include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
 
-#include <mod_scmi_std.h>
-#include <mod_voltage_domain.h>
-#include <mod_optee_voltd_regulator.h>
-
 #include <stddef.h>
-
-#include <drivers/regulator.h>
 
 #define MOD_PREFIX "[optee-voltd-regulator] "
 
@@ -45,9 +45,10 @@ static struct optee_voltd_regulator_dev_ctx *get_ctx(fwk_id_t dev_id)
     return NULL;
 }
 
-static int optee_voltd_regulator_get_config(fwk_id_t dev_id,
-                                            uint8_t *mode_type,
-                                            uint8_t *mode_id)
+static int optee_voltd_regulator_get_config(
+    fwk_id_t dev_id,
+    uint8_t *mode_type,
+    uint8_t *mode_id)
 {
     struct optee_voltd_regulator_dev_ctx *ctx;
 
@@ -73,16 +74,19 @@ static int optee_voltd_regulator_get_config(fwk_id_t dev_id,
     }
 
     FWK_LOG_DEBUG(
-        MOD_PREFIX "Get config for %u/%s: %#"PRIx8", %#"PRIx8,
-        fwk_id_get_element_idx(dev_id), regulator_name(ctx->regulator),
-        *mode_type, *mode_id);
+        MOD_PREFIX "Get config for %u/%s: %#" PRIx8 ", %#" PRIx8,
+        fwk_id_get_element_idx(dev_id),
+        regulator_name(ctx->regulator),
+        *mode_type,
+        *mode_id);
 
     return FWK_SUCCESS;
 }
 
-static int optee_voltd_regulator_set_config(fwk_id_t dev_id,
-                                            uint8_t mode_type,
-                                            uint8_t mode_id)
+static int optee_voltd_regulator_set_config(
+    fwk_id_t dev_id,
+    uint8_t mode_type,
+    uint8_t mode_id)
 {
     struct optee_voltd_regulator_dev_ctx *ctx;
 
@@ -130,15 +134,16 @@ static int optee_voltd_regulator_set_config(fwk_id_t dev_id,
     }
 
     FWK_LOG_DEBUG(
-        MOD_PREFIX "Set config for %u/%s: type %#"PRIx8" / mode %#"PRIx8,
-        fwk_id_get_element_idx(dev_id), regulator_name(ctx->regulator),
-        mode_type, mode_id);
+        MOD_PREFIX "Set config for %u/%s: type %#" PRIx8 " / mode %#" PRIx8,
+        fwk_id_get_element_idx(dev_id),
+        regulator_name(ctx->regulator),
+        mode_type,
+        mode_id);
 
     return FWK_SUCCESS;
 }
 
-static int optee_voltd_regulator_get_level(fwk_id_t dev_id,
-                                           int *level_uv)
+static int optee_voltd_regulator_get_level(fwk_id_t dev_id, int *level_uv)
 {
     struct optee_voltd_regulator_dev_ctx *ctx;
 
@@ -158,14 +163,14 @@ static int optee_voltd_regulator_get_level(fwk_id_t dev_id,
 
     FWK_LOG_DEBUG(
         MOD_PREFIX "Get level for %u/%s: %duV",
-        fwk_id_get_element_idx(dev_id), regulator_name(ctx->regulator),
+        fwk_id_get_element_idx(dev_id),
+        regulator_name(ctx->regulator),
         *level_uv);
 
     return FWK_SUCCESS;
 }
 
-static int optee_voltd_regulator_set_level(fwk_id_t dev_id,
-                                           int level_uv)
+static int optee_voltd_regulator_set_level(fwk_id_t dev_id, int level_uv)
 {
     struct optee_voltd_regulator_dev_ctx *ctx;
 
@@ -184,14 +189,16 @@ static int optee_voltd_regulator_set_level(fwk_id_t dev_id,
 
     FWK_LOG_DEBUG(
         MOD_PREFIX "Set level for %u/%s: %duV",
-        fwk_id_get_element_idx(dev_id), regulator_name(ctx->regulator),
+        fwk_id_get_element_idx(dev_id),
+        regulator_name(ctx->regulator),
         level_uv);
 
     return FWK_SUCCESS;
 }
 
-static int optee_voltd_regulator_get_info(fwk_id_t dev_id,
-                                        struct mod_voltd_info *info)
+static int optee_voltd_regulator_get_info(
+    fwk_id_t dev_id,
+    struct mod_voltd_info *info)
 {
     struct optee_voltd_regulator_dev_ctx *ctx;
 
@@ -241,16 +248,18 @@ static int optee_voltd_regulator_get_info(fwk_id_t dev_id,
 
     FWK_LOG_DEBUG(
         MOD_PREFIX "Get info for %u/%s: range [%d %d]",
-        fwk_id_get_element_idx(dev_id), info->name,
+        fwk_id_get_element_idx(dev_id),
+        info->name,
         info->level_range.min_uv,
         info->level_range.max_uv);
 
     return FWK_SUCCESS;
 }
 
-static int optee_voltd_regulator_level_from_index(fwk_id_t dev_id,
-                                                  unsigned int index,
-                                                  int32_t *level_uv)
+static int optee_voltd_regulator_level_from_index(
+    fwk_id_t dev_id,
+    unsigned int index,
+    int32_t *level_uv)
 {
     struct optee_voltd_regulator_dev_ctx *ctx;
     struct regulator_voltages_desc *desc;
@@ -288,9 +297,12 @@ static int optee_voltd_regulator_level_from_index(fwk_id_t dev_id,
     *level_uv = levels[index];
 
     FWK_LOG_DEBUG(
-        MOD_PREFIX "Get level from index for %u/%s: index %u, level %"PRId32"uV",
-        fwk_id_get_element_idx(dev_id), regulator_name(ctx->regulator),
-        index, *level_uv);
+        MOD_PREFIX "Get level from index for %u/%s: index %u, level %" PRId32
+                   "uV",
+        fwk_id_get_element_idx(dev_id),
+        regulator_name(ctx->regulator),
+        index,
+        *level_uv);
 
     return FWK_SUCCESS;
 }
@@ -308,9 +320,10 @@ static const struct mod_voltd_drv_api api_optee_regu = {
  * Framework handler functions
  */
 
-static int optee_voltd_regulator_init(fwk_id_t module_id,
-                                      unsigned int element_count,
-                                      const void *data)
+static int optee_voltd_regulator_init(
+    fwk_id_t module_id,
+    unsigned int element_count,
+    const void *data)
 {
     if (element_count == 0) {
         return FWK_E_PARAM;
@@ -323,9 +336,10 @@ static int optee_voltd_regulator_init(fwk_id_t module_id,
     return FWK_SUCCESS;
 }
 
-static int optee_voltd_regulator_element_init(fwk_id_t element_id,
-                                              unsigned int unused,
-                                              const void *data)
+static int optee_voltd_regulator_element_init(
+    fwk_id_t element_id,
+    unsigned int unused,
+    const void *data)
 {
     const struct mod_optee_voltd_regulator_dev_config *dev_config;
     struct optee_voltd_regulator_dev_ctx *ctx;
@@ -351,10 +365,11 @@ static int optee_voltd_regulator_element_init(fwk_id_t element_id,
     return FWK_SUCCESS;
 }
 
-static int optee_voltd_regulator_process_bind_request(fwk_id_t requester_id,
-                                                      fwk_id_t target_id,
-                                                      fwk_id_t api_type,
-                                                      const void **api)
+static int optee_voltd_regulator_process_bind_request(
+    fwk_id_t requester_id,
+    fwk_id_t target_id,
+    fwk_id_t api_type,
+    const void **api)
 {
     *api = &api_optee_regu;
 

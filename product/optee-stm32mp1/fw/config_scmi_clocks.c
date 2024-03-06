@@ -1,27 +1,28 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+
+#include <dt-bindings/clock/stm32mp1-clks.h>
+#include <scmi_agents.h>
+#include <stm32_util.h>
+#include <util.h>
+
+#include <mod_clock.h>
+#include <mod_optee_clock.h>
+#include <mod_scmi_clock.h>
 
 #include <fwk_element.h>
 #include <fwk_id.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 
-#include <mod_clock.h>
-#include <mod_optee_clock.h>
-#include <mod_scmi_clock.h>
-#include <scmi_agents.h>
-
 #include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
-
-#include <dt-bindings/clock/stm32mp1-clks.h>
-#include <stm32_util.h>
-#include <util.h>
 
 /*
  * Indices of clock elements exposed through a SCMI agent.
@@ -104,7 +105,9 @@ static const struct mod_stm32_clock_dev_config stm32_clock_cfg[] = {
  * Bindgins between SCMI clock_id value and clock module element in fwk
  */
 #define SCMI_CLOCK_ELT_ID(_idx) \
-    { .element_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, (_idx)) }
+    { \
+        .element_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_CLOCK, (_idx)) \
+    }
 
 static struct mod_scmi_clock_device scmi_clock_device[] = {
     [CK_SCMI_HSE] = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_HSE),
@@ -114,19 +117,19 @@ static struct mod_scmi_clock_device scmi_clock_device[] = {
     [CK_SCMI_LSI] = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_LSI),
     [CK_SCMI_PLL2_Q] = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_PLL2_Q),
     [CK_SCMI_PLL2_R] = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_PLL2_R),
-    [CK_SCMI_MPU]    = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_MPU),
-    [CK_SCMI_AXI]    = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_AXI),
-    [CK_SCMI_BSEC]   = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_BSEC),
-    [CK_SCMI_CRYP1]  = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_CRYP1),
-    [CK_SCMI_GPIOZ]  = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_GPIOZ),
-    [CK_SCMI_HASH1]  = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_HASH1),
-    [CK_SCMI_I2C4]   = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_I2C4),
-    [CK_SCMI_I2C6]   = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_I2C6),
-    [CK_SCMI_IWDG1]  = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_IWDG1),
-    [CK_SCMI_RNG1]   = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_RNG1),
-    [CK_SCMI_RTC]    = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_RTC),
+    [CK_SCMI_MPU] = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_MPU),
+    [CK_SCMI_AXI] = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_AXI),
+    [CK_SCMI_BSEC] = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_BSEC),
+    [CK_SCMI_CRYP1] = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_CRYP1),
+    [CK_SCMI_GPIOZ] = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_GPIOZ),
+    [CK_SCMI_HASH1] = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_HASH1),
+    [CK_SCMI_I2C4] = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_I2C4),
+    [CK_SCMI_I2C6] = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_I2C6),
+    [CK_SCMI_IWDG1] = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_IWDG1),
+    [CK_SCMI_RNG1] = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_RNG1),
+    [CK_SCMI_RTC] = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_RTC),
     [CK_SCMI_RTCAPB] = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_RTCAPB),
-    [CK_SCMI_SPI6]   = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_SPI6),
+    [CK_SCMI_SPI6] = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_SPI6),
     [CK_SCMI_USART1] = SCMI_CLOCK_ELT_ID(CLK_IDX_SCMI_USART1),
 };
 
@@ -150,13 +153,14 @@ struct fwk_module_config config_scmi_clock = {
  * Clock backend driver configuration
  * STM32_CLOCK element index is the related CLOCK element index.
  */
-#define CLOCK_DATA(_idx) ((struct mod_clock_dev_config){ \
-        .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_OPTEE_CLOCK, \
-                         (_idx)), \
+#define CLOCK_DATA(_idx) \
+    ((struct mod_clock_dev_config){ \
+        .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_OPTEE_CLOCK, (_idx)), \
         .api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_OPTEE_CLOCK, 0), \
     })
 
-#define CLOCK_ELT(_idx) [(_idx)] = { \
+#define CLOCK_ELT(_idx) \
+    [(_idx)] = { \
         .name = stm32_clock_cfg[(_idx)].name, \
         .data = &CLOCK_DATA((_idx)), \
     }
@@ -189,15 +193,16 @@ static struct fwk_element clock_elt[] = {
     [CLK_IDX_COUNT] = { 0 }
 };
 
-static_assert(FWK_ARRAY_SIZE(clock_elt) == CLK_IDX_COUNT + 1,
-              "Invalid range for CLOCK and STM32_CLOCK indices");
+static_assert(
+    FWK_ARRAY_SIZE(clock_elt) == CLK_IDX_COUNT + 1,
+    "Invalid range for CLOCK and STM32_CLOCK indices");
 
 /* Exported configuration data for module VOLTAGE_DOMAIN */
 const struct fwk_module_config config_clock = {
     .elements = FWK_MODULE_STATIC_ELEMENTS_PTR(clock_elt),
 };
 
-#define CLOCK_COUNT    FWK_ARRAY_SIZE(stm32_clock_cfg)
+#define CLOCK_COUNT FWK_ARRAY_SIZE(stm32_clock_cfg)
 static struct mod_optee_clock_config optee_clock_cfg[CLOCK_COUNT];
 
 #define OPTEE_CLOCK_ELT(_idx) \
@@ -233,8 +238,9 @@ static const struct fwk_element optee_clock_elt[] = {
     [CLK_IDX_COUNT] = { 0 }
 };
 
-static_assert(FWK_ARRAY_SIZE(optee_clock_elt) == CLK_IDX_COUNT + 1,
-              "Invalid range for CLOCK and STM32_CLOCK indices");
+static_assert(
+    FWK_ARRAY_SIZE(optee_clock_elt) == CLK_IDX_COUNT + 1,
+    "Invalid range for CLOCK and STM32_CLOCK indices");
 
 static const struct fwk_element *optee_clock_get_elt_table(fwk_id_t module_id)
 {

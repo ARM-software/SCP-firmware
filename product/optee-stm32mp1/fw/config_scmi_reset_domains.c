@@ -1,23 +1,25 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+
+#include <dt-bindings/reset/stm32mp1-resets.h>
+#include <scmi_agents.h>
+#include <stm32_util.h>
+#include <util.h>
+
+#include <mod_optee_reset.h>
+#include <mod_reset_domain.h>
+#include <mod_scmi_reset_domain.h>
 
 #include <fwk_macros.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 
-#include <mod_reset_domain.h>
-#include <mod_scmi_reset_domain.h>
-#include <mod_optee_reset.h>
-
 #include <assert.h>
-#include <dt-bindings/reset/stm32mp1-resets.h>
-#include <scmi_agents.h>
-#include <stm32_util.h>
-#include <util.h>
 
 /*
  * Indices of reset domain elements exposed through a SCMI agent.
@@ -68,28 +70,34 @@ static const struct mod_stm32_reset_dev_config stm32_resetd_cfg[] = {
     STM32_RESET_CFG(RESETD_IDX_SCMI_RNG1, RNG1_R, "rng1"),
     STM32_RESET_CFG(RESETD_IDX_SCMI_MDMA, MDMA_R, "mdma"),
     STM32_RESET_CFG(RESETD_IDX_SCMI_MCU, MCU_R, "mcu"),
-    STM32_RESET_CFG(RESETD_IDX_SCMI_MCU_HOLD_BOOT, MCU_HOLD_BOOT_R, "mcu-hold-boot"),
+    STM32_RESET_CFG(
+        RESETD_IDX_SCMI_MCU_HOLD_BOOT,
+        MCU_HOLD_BOOT_R,
+        "mcu-hold-boot"),
 };
 
 /*
  * Bindgins between SCMI domain_id value and reset domain module element in fwk
  */
 #define SCMI_RESETD_ELT_ID(_idx) \
-    { .element_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_RESET_DOMAIN, (_idx)) }
+    { \
+        .element_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_RESET_DOMAIN, (_idx)) \
+    }
 
 static const struct mod_scmi_reset_domain_device scmi_resetd_device[] = {
-    [RST_SCMI_SPI6]   = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_SPI6),
-    [RST_SCMI_I2C4]   = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_I2C4),
-    [RST_SCMI_I2C6]   = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_I2C6),
+    [RST_SCMI_SPI6] = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_SPI6),
+    [RST_SCMI_I2C4] = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_I2C4),
+    [RST_SCMI_I2C6] = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_I2C6),
     [RST_SCMI_USART1] = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_USART1),
-    [RST_SCMI_STGEN]  = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_STGEN),
-    [RST_SCMI_GPIOZ]  = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_GPIOZ),
-    [RST_SCMI_CRYP1]  = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_CRYP1),
-    [RST_SCMI_HASH1]  = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_HASH1),
-    [RST_SCMI_RNG1]   = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_RNG1),
-    [RST_SCMI_MDMA]   = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_MDMA),
-    [RST_SCMI_MCU]    = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_MCU),
-    [RST_SCMI_MCU_HOLD_BOOT]    = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_MCU_HOLD_BOOT),
+    [RST_SCMI_STGEN] = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_STGEN),
+    [RST_SCMI_GPIOZ] = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_GPIOZ),
+    [RST_SCMI_CRYP1] = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_CRYP1),
+    [RST_SCMI_HASH1] = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_HASH1),
+    [RST_SCMI_RNG1] = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_RNG1),
+    [RST_SCMI_MDMA] = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_MDMA),
+    [RST_SCMI_MCU] = SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_MCU),
+    [RST_SCMI_MCU_HOLD_BOOT] =
+        SCMI_RESETD_ELT_ID(RESETD_IDX_SCMI_MCU_HOLD_BOOT),
 };
 
 /* Agents andreset domains references */
@@ -112,17 +120,18 @@ struct fwk_module_config config_scmi_reset_domain = {
  * Reset controller backend driver configuration
  * STM32_RESET element index is the related RESET_DOMAIN element index.
  */
-#define RESETD_DATA(_idx) ((struct mod_reset_domain_dev_config){ \
+#define RESETD_DATA(_idx) \
+    ((struct mod_reset_domain_dev_config){ \
         .driver_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_OPTEE_RESET, (_idx)), \
         .driver_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_OPTEE_RESET, 0), \
         .modes = MOD_RESET_DOMAIN_AUTO_RESET | \
-             MOD_RESET_DOMAIN_MODE_EXPLICIT_ASSERT | \
-             MOD_RESET_DOMAIN_MODE_EXPLICIT_DEASSERT, \
+            MOD_RESET_DOMAIN_MODE_EXPLICIT_ASSERT | \
+            MOD_RESET_DOMAIN_MODE_EXPLICIT_DEASSERT, \
         .capabilities = 0, /* No notif, no async */ \
     })
 
-
-#define RESETD_ELT(_idx) [(_idx)] = { \
+#define RESETD_ELT(_idx) \
+    [(_idx)] = { \
         .name = stm32_resetd_cfg[(_idx)].name, \
         .data = &RESETD_DATA((_idx)), \
     }
@@ -146,8 +155,9 @@ static const struct fwk_element resetd_elt[] = {
     [RESETD_IDX_COUNT] = { 0 }
 };
 
-static_assert(FWK_ARRAY_SIZE(resetd_elt) == RESETD_IDX_COUNT + 1,
-              "Invalid range for RESET_DOMAIN and STM32_RESET indices");
+static_assert(
+    FWK_ARRAY_SIZE(resetd_elt) == RESETD_IDX_COUNT + 1,
+    "Invalid range for RESET_DOMAIN and STM32_RESET indices");
 
 /* Exported configuration data for module VOLTAGE_DOMAIN */
 const struct fwk_module_config config_reset_domain = {
@@ -157,7 +167,7 @@ const struct fwk_module_config config_reset_domain = {
 /*
  * Configuration for module OPTEE_RESET
  */
-#define RESET_COUNT    FWK_ARRAY_SIZE(stm32_resetd_cfg)
+#define RESET_COUNT FWK_ARRAY_SIZE(stm32_resetd_cfg)
 static struct mod_optee_reset_dev_config optee_reset_cfg[RESET_COUNT];
 
 #define OPTEE_RESET_ELT(_idx) \
@@ -184,8 +194,9 @@ static const struct fwk_element optee_reset_elt[] = {
     [RESETD_IDX_COUNT] = { 0 }
 };
 
-static_assert(FWK_ARRAY_SIZE(optee_reset_elt) == RESETD_IDX_COUNT + 1,
-              "Invalid range for RESET and OPTEE_RESET indices");
+static_assert(
+    FWK_ARRAY_SIZE(optee_reset_elt) == RESETD_IDX_COUNT + 1,
+    "Invalid range for RESET and OPTEE_RESET indices");
 
 static const struct fwk_element *optee_reset_get_elt_table(fwk_id_t module_id)
 {

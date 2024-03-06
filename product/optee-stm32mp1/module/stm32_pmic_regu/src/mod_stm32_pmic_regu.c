@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Linaro Limited and Contributors. All rights
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -14,20 +14,20 @@
  *     stpmic1_regulator_*(). They execute in a threaded interruptible,
  *     and rescheduable context.
  */
-#include <fwk_macros.h>
-#include <fwk_mm.h>
-#include <fwk_module.h>
-#include <fwk_log.h>
+#include <drivers/stm32mp1_pmic.h>
+#include <drivers/stpmic1_regulator.h>
+#include <stm32_util.h>
 
 #include <mod_scmi_std.h>
 #include <mod_stm32_pmic_regu.h>
 #include <mod_voltage_domain.h>
 
-#include <stddef.h>
+#include <fwk_log.h>
+#include <fwk_macros.h>
+#include <fwk_mm.h>
+#include <fwk_module.h>
 
-#include <drivers/stm32mp1_pmic.h>
-#include <drivers/stpmic1_regulator.h>
-#include <stm32_util.h>
+#include <stddef.h>
 
 #define MOD_NAME "[STM32 PMIC] "
 
@@ -112,13 +112,15 @@ static int32_t set_regu_state(const char *regu_id, bool enable)
 /*
  * Voltage domain driver API functions
  */
-static int pmic_regu_get_config(fwk_id_t dev_id, uint8_t *mode_type,
-                                uint8_t *mode_id)
+static int pmic_regu_get_config(
+    fwk_id_t dev_id,
+    uint8_t *mode_type,
+    uint8_t *mode_id)
 {
     struct stm32_pmic_regu_dev_ctx *ctx;
 
-    if (!fwk_module_is_valid_element_id(dev_id) ||
-        mode_id == NULL || mode_type == NULL) {
+    if (!fwk_module_is_valid_element_id(dev_id) || mode_id == NULL ||
+        mode_type == NULL) {
         return FWK_E_PARAM;
     }
 
@@ -141,8 +143,10 @@ static int pmic_regu_get_config(fwk_id_t dev_id, uint8_t *mode_type,
     return FWK_SUCCESS;
 }
 
-static int pmic_regu_set_config(fwk_id_t dev_id, uint8_t mode_type,
-                                uint8_t mode_id)
+static int pmic_regu_set_config(
+    fwk_id_t dev_id,
+    uint8_t mode_type,
+    uint8_t mode_id)
 {
     struct stm32_pmic_regu_dev_ctx *ctx = NULL;
 
@@ -219,8 +223,11 @@ static int pmic_regu_set_level(fwk_id_t dev_id, int level_uv)
     return FWK_SUCCESS;
 }
 
-static void find_bound_uv(const uint16_t *levels, size_t count,
-                          int32_t *min, int32_t *max)
+static void find_bound_uv(
+    const uint16_t *levels,
+    size_t count,
+    int32_t *min,
+    int32_t *max)
 {
     size_t n = 0;
 
@@ -261,8 +268,11 @@ static int pmic_regu_get_info(fwk_id_t dev_id, struct mod_voltd_info *info)
     info->name = ctx->regu_id;
     info->level_range.level_type = MOD_VOLTD_VOLTAGE_LEVEL_DISCRETE;
     info->level_range.level_count = full_count;
-    find_bound_uv(levels, full_count,
-                  &info->level_range.min_uv, &info->level_range.max_uv);
+    find_bound_uv(
+        levels,
+        full_count,
+        &info->level_range.min_uv,
+        &info->level_range.max_uv);
 
     FWK_LOG_DEBUG(
         MOD_NAME "SCMI voltd %u: get_info PMIC %s, range [%d %d]",
@@ -274,8 +284,10 @@ static int pmic_regu_get_info(fwk_id_t dev_id, struct mod_voltd_info *info)
     return FWK_SUCCESS;
 }
 
-static int pmic_regu_level_from_index(fwk_id_t dev_id, unsigned int index,
-                                      int32_t *level_uv)
+static int pmic_regu_level_from_index(
+    fwk_id_t dev_id,
+    unsigned int index,
+    int32_t *level_uv)
 {
     struct stm32_pmic_regu_dev_ctx *ctx = NULL;
     const uint16_t *levels = NULL;
@@ -316,8 +328,10 @@ static const struct mod_voltd_drv_api api_stm32_pmic_regu = {
  * Framework handler functions
  */
 
-static int stm32_pmic_regu_init(fwk_id_t module_id, unsigned int element_count,
-                                const void *data)
+static int stm32_pmic_regu_init(
+    fwk_id_t module_id,
+    unsigned int element_count,
+    const void *data)
 {
     module_ctx.dev_count = element_count;
 
@@ -329,9 +343,10 @@ static int stm32_pmic_regu_init(fwk_id_t module_id, unsigned int element_count,
     return FWK_SUCCESS;
 }
 
-static int stm32_pmic_regu_element_init(fwk_id_t element_id,
-                                        unsigned int unused,
-                                        const void *data)
+static int stm32_pmic_regu_element_init(
+    fwk_id_t element_id,
+    unsigned int unused,
+    const void *data)
 {
     struct stm32_pmic_regu_dev_ctx *ctx = NULL;
     const struct mod_stm32_pmic_regu_dev_config *dev_config = data;
@@ -348,10 +363,11 @@ static int stm32_pmic_regu_element_init(fwk_id_t element_id,
     return FWK_SUCCESS;
 }
 
-static int stm32_pmic_regu_process_bind_request(fwk_id_t requester_id,
-                                                fwk_id_t target_id,
-                                                fwk_id_t api_type,
-                                                const void **api)
+static int stm32_pmic_regu_process_bind_request(
+    fwk_id_t requester_id,
+    fwk_id_t target_id,
+    fwk_id_t api_type,
+    const void **api)
 {
     *api = &api_stm32_pmic_regu;
 

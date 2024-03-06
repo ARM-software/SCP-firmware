@@ -1,6 +1,7 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -9,20 +10,22 @@
  *     layer. This module remplaces the hardware mailbox device driver.
  */
 
-#include <stddef.h>
-#include <stdint.h>
-#include <fwk_id.h>
-#include <fwk_mm.h>
+#include <kernel/mutex.h>
+
+#include <mod_msg_smt.h>
+#include <mod_optee_mbx.h>
+#include <mod_optee_smt.h>
+
 #include <fwk_arch.h>
+#include <fwk_id.h>
 #include <fwk_log.h>
+#include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
-#include <mod_optee_mbx.h>
-#include <mod_optee_smt.h>
-#include <mod_msg_smt.h>
 
-#include <kernel/mutex.h>
+#include <stddef.h>
+#include <stdint.h>
 
 /* MBX device context */
 struct mbx_device_ctx {
@@ -61,8 +64,9 @@ void optee_mbx_signal_smt_message(fwk_id_t device_id)
     if (device_idx < mbx_ctx.device_count) {
         device_ctx = &mbx_ctx.device_ctx_table[device_idx];
 
-        fwk_assert(fwk_id_get_module_idx(device_ctx->shmem_id) ==
-                   FWK_MODULE_IDX_OPTEE_SMT);
+        fwk_assert(
+            fwk_id_get_module_idx(device_ctx->shmem_id) ==
+            FWK_MODULE_IDX_OPTEE_SMT);
 
         /* Lock the channel until the message has been processed */
         mutex_lock(&device_ctx->lock);
@@ -75,9 +79,12 @@ void optee_mbx_signal_smt_message(fwk_id_t device_id)
 #endif
 
 #ifdef BUILD_HAS_MOD_MSG_SMT
-void optee_mbx_signal_msg_message(fwk_id_t device_id, void *in_buf,
-                                  size_t in_size, void *out_buf,
-                                  size_t *out_size)
+void optee_mbx_signal_msg_message(
+    fwk_id_t device_id,
+    void *in_buf,
+    size_t in_size,
+    void *out_buf,
+    size_t *out_size)
 {
     struct mbx_device_ctx *device_ctx;
     unsigned int device_idx = fwk_id_get_element_idx(device_id);
@@ -85,17 +92,16 @@ void optee_mbx_signal_msg_message(fwk_id_t device_id, void *in_buf,
     if (device_idx < mbx_ctx.device_count) {
         device_ctx = &mbx_ctx.device_ctx_table[device_idx];
 
-        fwk_assert(fwk_id_get_module_idx(device_ctx->shmem_id) ==
-                   FWK_MODULE_IDX_MSG_SMT);
-
+        fwk_assert(
+            fwk_id_get_module_idx(device_ctx->shmem_id) ==
+            FWK_MODULE_IDX_MSG_SMT);
 
         /* Lock the channel until the message has been processed */
         mutex_lock(&device_ctx->lock);
 
         device_ctx->shm_out_size = out_size;
-        device_ctx->shmem_api.msg->signal_message(device_ctx->shmem_id,
-                                                  in_buf, in_size,
-                                                  out_buf, *out_size);
+        device_ctx->shmem_api.msg->signal_message(
+            device_ctx->shmem_id, in_buf, in_size, out_buf, *out_size);
     } else {
         fwk_unexpected();
     }
@@ -145,7 +151,6 @@ static int raise_shm_notification(fwk_id_t channel_id, size_t size)
 
     *channel_ctx->shm_out_size = size;
 
-
     /* Release the channel as the message has been processed */
     mutex_unlock(&channel_ctx->lock);
 
@@ -160,15 +165,16 @@ const struct mod_msg_smt_driver_ouput_api mbx_shm_api = {
  * Framework handlers
  */
 
-static int mbx_init(fwk_id_t module_id, unsigned int device_count,
-                    const void *data)
+static int mbx_init(
+    fwk_id_t module_id,
+    unsigned int device_count,
+    const void *data)
 {
-
     if (device_count == 0)
         return FWK_E_PARAM;
 
-    mbx_ctx.device_ctx_table = fwk_mm_calloc(device_count,
-                                             sizeof(*mbx_ctx.device_ctx_table));
+    mbx_ctx.device_ctx_table =
+        fwk_mm_calloc(device_count, sizeof(*mbx_ctx.device_ctx_table));
     if (mbx_ctx.device_ctx_table == NULL) {
         return FWK_E_NOMEM;
     }
@@ -178,13 +184,15 @@ static int mbx_init(fwk_id_t module_id, unsigned int device_count,
     return FWK_SUCCESS;
 }
 
-static int mbx_device_init(fwk_id_t device_id, unsigned int slot_count,
-                           const void *data)
+static int mbx_device_init(
+    fwk_id_t device_id,
+    unsigned int slot_count,
+    const void *data)
 {
     size_t elt_idx = fwk_id_get_element_idx(device_id);
     struct mbx_device_ctx *device_ctx = &mbx_ctx.device_ctx_table[elt_idx];
 
-    device_ctx->config = (struct mod_optee_mbx_channel_config*)data;
+    device_ctx->config = (struct mod_optee_mbx_channel_config *)data;
 
     mutex_init(&device_ctx->lock);
 
@@ -203,9 +211,10 @@ static int mbx_bind(fwk_id_t id, unsigned int round)
     if (round == 1) {
         device_ctx = &mbx_ctx.device_ctx_table[fwk_id_get_element_idx(id)];
 
-        status = fwk_module_bind(device_ctx->config->driver_id,
-                                 device_ctx->config->driver_api_id,
-                                 &device_ctx->shmem_api);
+        status = fwk_module_bind(
+            device_ctx->config->driver_id,
+            device_ctx->config->driver_api_id,
+            &device_ctx->shmem_api);
         if (status != FWK_SUCCESS) {
             return status;
         }
@@ -216,10 +225,11 @@ static int mbx_bind(fwk_id_t id, unsigned int round)
     return FWK_SUCCESS;
 }
 
-static int mbx_process_bind_request(fwk_id_t source_id,
-                                    fwk_id_t target_id,
-                                    fwk_id_t api_id,
-                                    const void **api)
+static int mbx_process_bind_request(
+    fwk_id_t source_id,
+    fwk_id_t target_id,
+    fwk_id_t api_id,
+    const void **api)
 {
     size_t elt_idx;
 

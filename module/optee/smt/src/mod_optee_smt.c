@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Linaro Limited and Contributors. All rights
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -12,14 +12,14 @@
 #include <internal/optee_smt.h>
 #include <optee_scmi.h>
 
-#include <mod_scmi.h>
 #include <mod_optee_smt.h>
+#include <mod_scmi.h>
 
 #include <fwk_assert.h>
 #include <fwk_interrupt.h>
 #include <fwk_log.h>
-#include <fwk_mm.h>
 #include <fwk_macros.h>
+#include <fwk_mm.h>
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 #include <fwk_status.h>
@@ -132,9 +132,10 @@ static int smt_get_message_header(fwk_id_t channel_id, uint32_t *header)
     return FWK_SUCCESS;
 }
 
-static int smt_get_payload(fwk_id_t channel_id,
-                           const void **payload,
-                           size_t *size)
+static int smt_get_payload(
+    fwk_id_t channel_id,
+    const void **payload,
+    size_t *size)
 {
     struct smt_channel_ctx *channel_ctx;
 
@@ -153,26 +154,26 @@ static int smt_get_payload(fwk_id_t channel_id,
     *payload = channel_ctx->in->payload;
 
     if (size != NULL) {
-        *size = channel_ctx->in->length -
-            sizeof(channel_ctx->in->message_header);
+        *size =
+            channel_ctx->in->length - sizeof(channel_ctx->in->message_header);
     }
 
     return FWK_SUCCESS;
 }
 
-static int smt_write_payload(fwk_id_t channel_id,
-                             size_t offset,
-                             const void *payload,
-                             size_t size)
+static int smt_write_payload(
+    fwk_id_t channel_id,
+    size_t offset,
+    const void *payload,
+    size_t size)
 {
     struct smt_channel_ctx *channel_ctx;
 
     channel_ctx =
         &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
 
-    if ((payload == NULL)                         ||
-        (offset  > channel_ctx->max_payload_size) ||
-        (size > channel_ctx->max_payload_size)    ||
+    if ((payload == NULL) || (offset > channel_ctx->max_payload_size) ||
+        (size > channel_ctx->max_payload_size) ||
         ((offset + size) > channel_ctx->max_payload_size)) {
         fwk_unexpected();
         return FWK_E_PARAM;
@@ -193,7 +194,8 @@ static int smt_respond(fwk_id_t channel_id, const void *payload, size_t size)
     struct smt_channel_ctx *channel_ctx;
     struct mod_optee_smt_memory *memory;
 
-    channel_ctx = &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
+    channel_ctx =
+        &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
     memory = (struct mod_optee_smt_memory *)channel_ctx->mailbox_va;
 
     /* Copy the header from the write buffer */
@@ -215,8 +217,12 @@ static int smt_respond(fwk_id_t channel_id, const void *payload, size_t size)
     return FWK_SUCCESS;
 }
 
-static int smt_transmit(fwk_id_t channel_id, uint32_t message_header,
-    const void *payload, size_t size, bool request_ack_by_interrupt)
+static int smt_transmit(
+    fwk_id_t channel_id,
+    uint32_t message_header,
+    const void *payload,
+    size_t size,
+    bool request_ack_by_interrupt)
 {
     struct smt_channel_ctx *channel_ctx;
     struct mod_optee_smt_memory *memory;
@@ -225,7 +231,8 @@ static int smt_transmit(fwk_id_t channel_id, uint32_t message_header,
         return FWK_E_DATA;
     }
 
-    channel_ctx = &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
+    channel_ctx =
+        &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(channel_id)];
     memory = (struct mod_optee_smt_memory *)channel_ctx->mailbox_va;
 
     if (!channel_ctx->locked) {
@@ -285,7 +292,7 @@ static int smt_requester_handler(struct smt_channel_ctx *channel_ctx)
     out = channel_ctx->out;
 
     /* Mirror mailbox contents in read and write buffers (Payload not copied) */
-    *in  = *memory;
+    *in = *memory;
     *out = *memory;
 
     /* Ensure error bit is not set */
@@ -300,13 +307,13 @@ static int smt_requester_handler(struct smt_channel_ctx *channel_ctx)
      * Note: the payload size is permitted to be of size zero.
      */
     if ((in->length < sizeof(in->message_header)) ||
-        ((in->length - sizeof(in->message_header))
-         > channel_ctx->max_payload_size)) {
-
+        ((in->length - sizeof(in->message_header)) >
+         channel_ctx->max_payload_size)) {
         out->status |= MOD_OPTEE_SMT_MAILBOX_STATUS_ERROR_MASK;
-        return smt_respond(channel_ctx->id,
-                           &(int32_t){ SCMI_PROTOCOL_ERROR },
-                           sizeof(int32_t));
+        return smt_respond(
+            channel_ctx->id,
+            &(int32_t){ SCMI_PROTOCOL_ERROR },
+            sizeof(int32_t));
     }
 
     /* Copy payload from shared memory to read buffer */
@@ -371,10 +378,11 @@ static const struct mod_optee_smt_driver_input_api driver_input_api = {
 /*
  * Framework API
  */
-static int mailbox_init(fwk_id_t module_id, unsigned int element_count,
-                        const void *data)
+static int mailbox_init(
+    fwk_id_t module_id,
+    unsigned int element_count,
+    const void *data)
 {
-
     if (element_count == 0) {
         return FWK_E_PARAM;
     }
@@ -391,15 +399,17 @@ static int mailbox_init(fwk_id_t module_id, unsigned int element_count,
     return FWK_SUCCESS;
 }
 
-static int mailbox_channel_init(fwk_id_t channel_id, unsigned int slot_count,
-                            const void *data)
+static int mailbox_channel_init(
+    fwk_id_t channel_id,
+    unsigned int slot_count,
+    const void *data)
 {
     size_t elt_idx = fwk_id_get_element_idx(channel_id);
     struct smt_channel_ctx *channel_ctx = &smt_ctx.channel_ctx_table[elt_idx];
     struct mod_optee_smt_channel_config *config;
     struct mod_optee_smt_memory *memory;
 
-    config = (struct mod_optee_smt_channel_config*)data;
+    config = (struct mod_optee_smt_channel_config *)data;
 
     /* Validate channel config */
     if ((config->type >= MOD_OPTEE_SMT_CHANNEL_TYPE_COUNT) ||
@@ -408,10 +418,10 @@ static int mailbox_channel_init(fwk_id_t channel_id, unsigned int slot_count,
         return FWK_E_DATA;
     }
 
-    channel_ctx->mailbox_va = smt_phys_to_virt(config->mailbox_address,
-                                               config->mailbox_size,
-                                               config->policies &
-                                               MOD_SMT_POLICY_SECURE);
+    channel_ctx->mailbox_va = smt_phys_to_virt(
+        config->mailbox_address,
+        config->mailbox_size,
+        config->policies & MOD_SMT_POLICY_SECURE);
     if (channel_ctx->mailbox_va == 0) {
         fwk_unexpected();
         return FWK_E_DATA;
@@ -421,8 +431,8 @@ static int mailbox_channel_init(fwk_id_t channel_id, unsigned int slot_count,
     channel_ctx->in = fwk_mm_alloc(1, config->mailbox_size);
     channel_ctx->out = fwk_mm_alloc(1, config->mailbox_size);
 
-    channel_ctx->max_payload_size = config->mailbox_size -
-                                    sizeof(struct mod_optee_smt_memory);
+    channel_ctx->max_payload_size =
+        config->mailbox_size - sizeof(struct mod_optee_smt_memory);
 
     memory = (struct mod_optee_smt_memory *)channel_ctx->mailbox_va;
     memory->status = MOD_OPTEE_SMT_MAILBOX_STATUS_FREE_MASK;
@@ -445,10 +455,10 @@ static int mailbox_smt_bind(fwk_id_t id, unsigned int round)
     channel_ctx = &smt_ctx.channel_ctx_table[fwk_id_get_element_idx(id)];
 
     if (round == 0) {
-
-        status = fwk_module_bind(channel_ctx->config->driver_id,
-                                 channel_ctx->config->driver_api_id,
-                                 &channel_ctx->driver_api);
+        status = fwk_module_bind(
+            channel_ctx->config->driver_id,
+            channel_ctx->config->driver_api_id,
+            &channel_ctx->driver_api);
         if (status != FWK_SUCCESS) {
             return status;
         }
@@ -456,11 +466,10 @@ static int mailbox_smt_bind(fwk_id_t id, unsigned int round)
         channel_ctx->driver_id = channel_ctx->config->driver_id;
 
     } else if (round == 1) {
-
-        status = fwk_module_bind(channel_ctx->scmi_service_id,
-                                 FWK_ID_API(FWK_MODULE_IDX_SCMI,
-                                            MOD_SCMI_API_IDX_TRANSPORT),
-                                 &channel_ctx->scmi_api);
+        status = fwk_module_bind(
+            channel_ctx->scmi_service_id,
+            FWK_ID_API(FWK_MODULE_IDX_SCMI, MOD_SCMI_API_IDX_TRANSPORT),
+            &channel_ctx->scmi_api);
         if (status != FWK_SUCCESS) {
             return status;
         }
@@ -469,10 +478,11 @@ static int mailbox_smt_bind(fwk_id_t id, unsigned int round)
     return FWK_SUCCESS;
 }
 
-static int mailbox_smt_process_bind_request(fwk_id_t source_id,
-                                          fwk_id_t target_id,
-                                          fwk_id_t api_id,
-                                          const void **api)
+static int mailbox_smt_process_bind_request(
+    fwk_id_t source_id,
+    fwk_id_t target_id,
+    fwk_id_t api_id,
+    const void **api)
 {
     struct smt_channel_ctx *channel_ctx = NULL;
     size_t elt_idx;
@@ -505,10 +515,9 @@ static int mailbox_smt_process_bind_request(fwk_id_t source_id,
          * manually.
          */
         if (fwk_id_get_module_idx(channel_ctx->driver_id) ==
-            fwk_id_get_module_idx(source_id) &&
+                fwk_id_get_module_idx(source_id) &&
             fwk_id_get_element_idx(channel_ctx->driver_id) ==
-            fwk_id_get_element_idx(source_id)) {
-
+                fwk_id_get_element_idx(source_id)) {
             /* Ids are equal */
             *api = &driver_input_api;
         } else {

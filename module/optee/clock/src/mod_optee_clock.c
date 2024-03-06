@@ -9,17 +9,17 @@
  *     Interface SCP-firmware clock module with OP-TEE clock resources.
  */
 
-#include <fwk_macros.h>
-#include <fwk_mm.h>
-#include <fwk_module.h>
-#include <fwk_log.h>
+#include <compiler.h>
+#include <drivers/clk.h>
+#include <tee_api_types.h>
 
 #include <mod_clock.h>
 #include <mod_optee_clock.h>
 
-#include <compiler.h>
-#include <drivers/clk.h>
-#include <tee_api_types.h>
+#include <fwk_log.h>
+#include <fwk_macros.h>
+#include <fwk_mm.h>
+#include <fwk_module.h>
 
 #include <stdbool.h>
 
@@ -226,8 +226,10 @@ static int get_range(fwk_id_t dev_id, struct mod_clock_range *range)
     return FWK_SUCCESS;
 }
 
-static int set_rate(fwk_id_t dev_id, uint64_t rate,
-                    enum mod_clock_round_mode round_mode)
+static int set_rate(
+    fwk_id_t dev_id,
+    uint64_t rate,
+    enum mod_clock_round_mode round_mode)
 {
     struct optee_clock_dev_ctx *ctx = elt_id_to_ctx(dev_id);
     TEE_Result res;
@@ -256,8 +258,10 @@ static int set_rate(fwk_id_t dev_id, uint64_t rate,
     return FWK_SUCCESS;
 }
 
-static int get_rate_from_index(fwk_id_t dev_id,
-                               unsigned int rate_index, uint64_t *rate)
+static int get_rate_from_index(
+    fwk_id_t dev_id,
+    unsigned int rate_index,
+    uint64_t *rate)
 {
     struct optee_clock_dev_ctx *ctx = elt_id_to_ctx(dev_id);
     unsigned long rate_ul;
@@ -310,9 +314,10 @@ static int stub_process_power_transition(fwk_id_t dev_id, unsigned int state)
     return FWK_E_SUPPORT;
 }
 
-static int stub_pending_power_transition(fwk_id_t dev_id,
-                                         unsigned int current_state,
-                                         unsigned int next_state)
+static int stub_pending_power_transition(
+    fwk_id_t dev_id,
+    unsigned int current_state,
+    unsigned int next_state)
 {
     return FWK_E_SUPPORT;
 }
@@ -333,8 +338,10 @@ static const struct mod_clock_drv_api api_optee_clock = {
  * Framework handler functions
  */
 
-static int optee_clock_init(fwk_id_t module_id, unsigned int count,
-                            const void *data)
+static int optee_clock_init(
+    fwk_id_t module_id,
+    unsigned int count,
+    const void *data)
 {
     if (count == 0) {
         return FWK_SUCCESS;
@@ -346,8 +353,10 @@ static int optee_clock_init(fwk_id_t module_id, unsigned int count,
     return FWK_SUCCESS;
 }
 
-static int optee_clock_element_init(fwk_id_t element_id, unsigned int dev_count,
-                                    const void *data)
+static int optee_clock_element_init(
+    fwk_id_t element_id,
+    unsigned int dev_count,
+    const void *data)
 {
     struct optee_clock_dev_ctx *ctx = elt_id_to_ctx(element_id);
     const struct mod_optee_clock_config *config = data;
@@ -368,8 +377,11 @@ static int optee_clock_element_init(fwk_id_t element_id, unsigned int dev_count,
     return FWK_SUCCESS;
 }
 
-static int optee_clock_process_bind_request(fwk_id_t requester_id, fwk_id_t id,
-                                            fwk_id_t api_type, const void **api)
+static int optee_clock_process_bind_request(
+    fwk_id_t requester_id,
+    fwk_id_t id,
+    fwk_id_t api_type,
+    const void **api)
 {
     *api = &api_optee_clock;
 

@@ -1,14 +1,16 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_module.h>
-#include <mod_mock_clock.h>
 #include "config_mock_clock.h"
 
+#include <mod_mock_clock.h>
+
+#include <fwk_module.h>
 
 static const struct mod_mock_clock_rate clk0_rate_table[] = {
     { .rate = 1536000 }, { .rate = 2116800 }, { .rate = 2304000 },

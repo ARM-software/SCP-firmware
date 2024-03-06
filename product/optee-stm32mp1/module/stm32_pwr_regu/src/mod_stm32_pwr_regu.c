@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Linaro Limited and Contributors. All rights
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -15,16 +15,16 @@
  *     and rescheduable context.
  */
 
+#include <drivers/stm32mp1_pwr.h>
+#include <stm32_util.h>
+
+#include <mod_stm32_pwr_regu.h>
+#include <mod_voltage_domain.h>
+
+#include <fwk_log.h>
 #include <fwk_macros.h>
 #include <fwk_mm.h>
 #include <fwk_module.h>
-#include <fwk_log.h>
-
-#include <mod_voltage_domain.h>
-#include <mod_stm32_pwr_regu.h>
-
-#include <drivers/stm32mp1_pwr.h>
-#include <stm32_util.h>
 
 #define MOD_NAME "[STM32 PWR] "
 
@@ -56,13 +56,15 @@ static int32_t pwr_regu_level(enum pwr_regulator pwr_id)
 /*
  * Voltage domain driver API functions
  */
-static int pwr_regu_get_config(fwk_id_t dev_id, uint8_t *mode_type,
-                               uint8_t *mode_id)
+static int pwr_regu_get_config(
+    fwk_id_t dev_id,
+    uint8_t *mode_type,
+    uint8_t *mode_id)
 {
     struct stm32_pwr_regu_dev_ctx *ctx;
 
-    if (!fwk_module_is_valid_element_id(dev_id) ||
-        mode_type == NULL || mode_id == NULL) {
+    if (!fwk_module_is_valid_element_id(dev_id) || mode_type == NULL ||
+        mode_id == NULL) {
         return FWK_E_PARAM;
     }
 
@@ -89,8 +91,10 @@ static int pwr_regu_get_config(fwk_id_t dev_id, uint8_t *mode_type,
     return FWK_SUCCESS;
 }
 
-static int pwr_regu_set_config(fwk_id_t dev_id, uint8_t mode_type,
-                               uint8_t mode_id)
+static int pwr_regu_set_config(
+    fwk_id_t dev_id,
+    uint8_t mode_type,
+    uint8_t mode_id)
 {
     struct stm32_pwr_regu_dev_ctx *ctx = NULL;
 
@@ -106,8 +110,8 @@ static int pwr_regu_set_config(fwk_id_t dev_id, uint8_t mode_type,
         return FWK_E_ACCESS;
     }
 
-    stm32mp1_pwr_regulator_set_state(ctx->pwr_id,
-                                     mode_id == MOD_VOLTD_MODE_ID_ON);
+    stm32mp1_pwr_regulator_set_state(
+        ctx->pwr_id, mode_id == MOD_VOLTD_MODE_ID_ON);
 
     FWK_LOG_DEBUG(
         MOD_NAME "SCMI voltd %u: set_config PWR#%u %s",
@@ -199,8 +203,10 @@ static int pwr_regu_get_info(fwk_id_t dev_id, struct mod_voltd_info *info)
     return FWK_SUCCESS;
 }
 
-static int pwr_regu_level_from_index(fwk_id_t dev_id, unsigned int index,
-                                     int32_t *level_uv)
+static int pwr_regu_level_from_index(
+    fwk_id_t dev_id,
+    unsigned int index,
+    int32_t *level_uv)
 {
     struct stm32_pwr_regu_dev_ctx *ctx = NULL;
 
@@ -242,8 +248,10 @@ static const struct mod_voltd_drv_api api_stm32_pwr_regu = {
  * Framework handler functions
  */
 
-static int stm32_pwr_regu_init(fwk_id_t module_id, unsigned int element_count,
-                               const void *data)
+static int stm32_pwr_regu_init(
+    fwk_id_t module_id,
+    unsigned int element_count,
+    const void *data)
 {
     module_ctx.dev_count = element_count;
 
@@ -255,9 +263,10 @@ static int stm32_pwr_regu_init(fwk_id_t module_id, unsigned int element_count,
     return FWK_SUCCESS;
 }
 
-static int stm32_pwr_regu_element_init(fwk_id_t element_id,
-                                       unsigned int unused,
-                                       const void *data)
+static int stm32_pwr_regu_element_init(
+    fwk_id_t element_id,
+    unsigned int unused,
+    const void *data)
 {
     struct stm32_pwr_regu_dev_ctx *ctx = NULL;
     const struct mod_stm32_pwr_regu_dev_config *dev_config = data;
@@ -274,10 +283,11 @@ static int stm32_pwr_regu_element_init(fwk_id_t element_id,
     return FWK_SUCCESS;
 }
 
-static int stm32_pwr_regu_process_bind_request(fwk_id_t requester_id,
-                                               fwk_id_t target_id,
-                                               fwk_id_t api_type,
-                                               const void **api)
+static int stm32_pwr_regu_process_bind_request(
+    fwk_id_t requester_id,
+    fwk_id_t target_id,
+    fwk_id_t api_type,
+    const void **api)
 {
     *api = &api_stm32_pwr_regu;
 

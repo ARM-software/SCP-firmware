@@ -1,16 +1,19 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "clock_devices.h"
+
+#include <mod_clock.h>
+#include <mod_mock_clock.h>
+#include <mod_system_pll.h>
+
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
-#include <mod_clock.h>
-#include <mod_system_pll.h>
-#include <mod_mock_clock.h>
-#include "clock_devices.h"
 
 static struct fwk_element clock_dev_desc_table[] = {
     [CLOCK_DEV_IDX_BIG] = {

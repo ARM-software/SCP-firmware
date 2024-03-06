@@ -1,13 +1,16 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
+ * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include <fwk_module.h>
-#include <mod_mock_ppu.h>
 #include "config_mock_ppu.h"
+
+#include <mod_mock_ppu.h>
+
+#include <fwk_module.h>
 
 uint32_t vppu_regdbg[16];
 uint32_t vppu_regdpu0[16];
@@ -125,7 +128,6 @@ static struct fwk_element host_ppu_v0_element_table[] = {
     },
     [MOCK_PPU_ELEMENT_IDX_COUNT] = { 0 }, /* Termination entry */
 };
-
 
 static const struct fwk_element *mock_ppu_get_element_table(fwk_id_t module_id)
 {

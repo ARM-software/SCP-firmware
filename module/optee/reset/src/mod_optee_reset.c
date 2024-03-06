@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Linaro Limited and Contributors. All rights
+ * Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -9,17 +9,17 @@
  *     Interface SCP-firmware reset module with OP-TEE reset resources.
  */
 
-#include <fwk_macros.h>
-#include <fwk_mm.h>
-#include <fwk_module.h>
-#include <fwk_log.h>
+#include <compiler.h>
+#include <drivers/rstctrl.h>
+#include <tee_api_types.h>
 
 #include <mod_optee_reset.h>
 #include <mod_reset_domain.h>
 
-#include <compiler.h>
-#include <drivers/rstctrl.h>
-#include <tee_api_types.h>
+#include <fwk_log.h>
+#include <fwk_macros.h>
+#include <fwk_mm.h>
+#include <fwk_module.h>
 
 #include <stdbool.h>
 
@@ -48,8 +48,11 @@ static bool is_exposed(struct optee_reset_dev_ctx *ctx)
 /*
  * Driver API functions
  */
-static int reset_set_state(fwk_id_t dev_id, enum mod_reset_domain_mode mode,
-                           uint32_t reset_state, uintptr_t cookie)
+static int reset_set_state(
+    fwk_id_t dev_id,
+    enum mod_reset_domain_mode mode,
+    uint32_t reset_state,
+    uintptr_t cookie)
 {
     struct optee_reset_dev_ctx *ctx = NULL;
     int status = FWK_SUCCESS;
@@ -66,7 +69,8 @@ static int reset_set_state(fwk_id_t dev_id, enum mod_reset_domain_mode mode,
 
     /* Whatever the reset_state set, we consider a unique context loss mode */
     if (reset_state) {
-        FWK_LOG_INFO(MOD_NAME "Override requested SCMI reset state %#"PRIx32,
+        FWK_LOG_INFO(
+            MOD_NAME "Override requested SCMI reset state %#" PRIx32,
             reset_state);
     }
 
@@ -119,8 +123,10 @@ static const struct mod_reset_domain_drv_api api_optee_reset = {
  * Framework handler functions
  */
 
-static int optee_reset_init(fwk_id_t module_id, unsigned int element_count,
-                            const void *data)
+static int optee_reset_init(
+    fwk_id_t module_id,
+    unsigned int element_count,
+    const void *data)
 {
     module_ctx.dev_count = element_count;
 
@@ -128,15 +134,16 @@ static int optee_reset_init(fwk_id_t module_id, unsigned int element_count,
         return FWK_SUCCESS;
     }
 
-    module_ctx.dev_ctx_table = fwk_mm_calloc(element_count,
-                                             sizeof(struct optee_reset_dev_ctx));
+    module_ctx.dev_ctx_table =
+        fwk_mm_calloc(element_count, sizeof(struct optee_reset_dev_ctx));
 
     return FWK_SUCCESS;
 }
 
-static int optee_reset_element_init(fwk_id_t element_id,
-                                    unsigned int unused __unused,
-                                    const void *data)
+static int optee_reset_element_init(
+    fwk_id_t element_id,
+    unsigned int unused __unused,
+    const void *data)
 {
     struct optee_reset_dev_ctx *ctx = NULL;
     const struct mod_optee_reset_dev_config *config = NULL;
@@ -153,8 +160,11 @@ static int optee_reset_element_init(fwk_id_t element_id,
     return FWK_SUCCESS;
 }
 
-static int optee_reset_process_bind_request(fwk_id_t requester_id, fwk_id_t id,
-                                            fwk_id_t api_type, const void **api)
+static int optee_reset_process_bind_request(
+    fwk_id_t requester_id,
+    fwk_id_t id,
+    fwk_id_t api_type,
+    const void **api)
 {
     *api = &api_optee_reset;
 
