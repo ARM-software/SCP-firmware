@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2022, Linaro Limited and Contributors. All rights reserved.
+# Copyright (c) 2022-2024, Linaro Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -10,6 +10,10 @@
 #
 
 add_library(${SCP_FIRMWARE_TARGET})
+
+# Include common optee modules in the module list
+add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/../../common/"
+    "${CMAKE_CURRENT_BINARY_DIR}/optee/module/")
 
 # cmake-lint: disable=E1122
 
@@ -25,3 +29,5 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_clocks.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_reset_domains.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_scmi_voltage_domains.c")
+
+set(SCP_MODULE_PATHS ${SCP_MODULE_PATHS} PARENT_SCOPE)
