@@ -1,4 +1,4 @@
-SCP-firmware - version 2.13
+SCP-firmware - version 2.14
 ===========================
 
 Copyright (c) 2011-2024, Arm Limited. All rights reserved.
@@ -59,18 +59,20 @@ Platforms
 Various builds of the release have been tested on the following ARM Fixed
 Virtual Platforms (FVPs or boards where possible):
 
-- System Guidance for Mobile platform SGM-775 (Version 11.3 Build 42)
-- System Guidance for Infrastruture SGI-575 (Version 11.3 Build 42)
+- System Guidance for Mobile platform SGM-775 (Version 11.19 Build 30)
+- System Guidance for Infrastruture SGI-575 (Version 11.19 Build 30)
 - Neoverse N1 reference design (Version 11.6 Build 45)
-- System Guidance for Mobile platform SGM-776 (Version 11.6 Build 45)
+- System Guidance for Mobile platform SGM-776 (Version 11.19 Build 30)
 - Juno reference design (Please contact Arm directly to obtain the Juno FVP)
-- RD-N1-Edge Dual-Chip reference design  (Please contact Arm directly to obtain the
-  RdN1EdgeX2 FVP)
+- RD-N1-Edge Dual-Chip reference design
+  (Please contact Arm directly to obtain the RdN1EdgeX2 FVP)
 - RD-V1 reference design  (Please contact Arm directly to obtain the RD_V1 FVP)
-- RD-V1-MC reference design  (Please contact Arm directly to obtain the RD_V1_Multichip FVP)
+- RD-V1-MC reference design
+  (Please contact Arm directly to obtain the RD_V1_Multichip FVP)
 - Renesas R-Car platform
 - Morello (Please see Arm's Ecosystem FVPs Developer page)
-- Total Compute (tc1) platform (Please contact Arm directly to obtain the TC1 FVP)
+- Total Compute (tc2) platform
+  (Please contact Arm directly to obtain the TC2 FVP)
 
 License
 -------
