@@ -12,7 +12,6 @@ New features
 - Architecture:
     - arch: add ARM V6M arch
     - arch: add exception fault info print support
-    - arch: add exception fault info print support
 
 - Documentation:
     - doc: add interface documentation
@@ -132,7 +131,6 @@ New features
 - Tools:
     - check_build: Add check build to a separate file with YAML integration
     - tools: add utils module banner to all check scripts
-    - utils: Add function to filter files from the project
     - utils: Add function to filter files from the project
     - utils: create utils module to unify test results
     - check_build: Add check build to a separate file with YAML integration
