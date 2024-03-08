@@ -31,7 +31,8 @@ from utils import banner, get_filtered_files, get_previous_commit
 #
 
 # Exclude all mod_test 'mocks' directories
-UNIT_TEST_MOCKS = glob.glob('module/**/test/**/mocks', recursive=True)
+UNIT_TEST_MOCKS = glob.glob('module/**/test/**/mocks', recursive=True) +\
+                  glob.glob('product/**/test/**/mocks', recursive=True)
 
 EXCLUDE_DIRECTORIES = [
     '.git',

@@ -22,7 +22,8 @@ BANNED_LIST_DEFAULT = './tools/banned_api.lst'
 
 
 # Exclude all mod_test 'mocks' directories
-UNIT_TEST_MOCKS = glob.glob('module/**/test/**/mocks', recursive=True)
+UNIT_TEST_MOCKS = glob.glob('module/**/test/**/mocks', recursive=True) +\
+                  glob.glob('product/**/test/**/mocks', recursive=True)
 
 #
 # Directories to exclude
