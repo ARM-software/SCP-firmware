@@ -19,6 +19,8 @@ export MOD_TEST_DIR := $(TOP_DIR)/unit_test
 export MOD_TEST_BUILD_DIR=$(BUILD_DIR)/module/test
 export FWK_TEST_DIR=$(FWK_DIR)/test
 export FWK_TEST_BUILD_DIR=$(BUILD_DIR)/framework/test
+export PROD_TEST_DIR := $(TOP_DIR)/product/test
+export PROD_TEST_BUILD_DIR=$(BUILD_DIR)/product/test
 
 #
 # Tools
@@ -126,7 +128,7 @@ PRODUCTS := $(sort $(shell find product -name "product.mk" -printf "%h\n" | cut 
 #
 DEPRECATED_PLATFORMS := none
 
-PRODUCT_INDEPENDENT_GOALS := clean help test doc fwk_test mod_test
+PRODUCT_INDEPENDENT_GOALS := clean help test doc fwk_test mod_test prod_test
 
 ifneq ($(filter-out $(PRODUCT_INDEPENDENT_GOALS), $(MAKECMDGOALS)),)
     ifeq ($(PRODUCT),)
@@ -347,4 +349,15 @@ ifeq ($(ENABLE_COVERAGE),y)
 	${CD} $(MOD_TEST_BUILD_DIR) && $(LCOV) --capture --directory $(MOD_TEST_BUILD_DIR) --output-file scp_v2_unit_test_coverage.info
 	${CD} $(MOD_TEST_BUILD_DIR) && $(PYTHON) $(TOOLS_DIR)/filter_coverage_report.py --filename scp_v2_unit_test_coverage.info
 	${CD} $(MOD_TEST_BUILD_DIR) && $(GENHTML) scp_v2_unit_test_coverage_filtered.info --prefix "$(TOP_DIR)" --output-directory $(MOD_TEST_BUILD_DIR)/coverage_report
+endif
+
+.PHONY: prod_test
+prod_test:
+	$(CMAKE) -B $(PROD_TEST_BUILD_DIR) $(PROD_TEST_DIR) -G Ninja
+	$(CMAKE) --build $(PROD_TEST_BUILD_DIR)
+	${CD} $(PROD_TEST_BUILD_DIR) && $(CTEST) -V --output-junit Testing/TestResults.xml
+ifeq ($(ENABLE_COVERAGE),y)
+	${CD} $(PROD_TEST_BUILD_DIR) && $(LCOV) --capture --directory $(PROD_TEST_BUILD_DIR) --output-file scp_v2_product_test_coverage.info
+	${CD} $(PROD_TEST_BUILD_DIR) && $(PYTHON) $(TOOLS_DIR)/filter_coverage_report.py --filename scp_v2_product_test_coverage.info
+	${CD} $(PROD_TEST_BUILD_DIR) && $(GENHTML) scp_v2_product_test_coverage_filtered.info --prefix "$(TOP_DIR)" --output-directory $(PROD_TEST_BUILD_DIR)/coverage_report
 endif

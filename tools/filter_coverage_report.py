@@ -21,6 +21,7 @@ only actual SCP code is evaluated
 all_filename = [
     'scp_v2_fwk_test_coverage.info',
     'scp_v2_unit_test_coverage.info',
+    'scp_v2_product_test_coverage.info',
 ]
 
 # Append new report regex here.
@@ -29,6 +30,11 @@ regex_list = [
      ],
     [re.compile(r"contrib/cmock/"),
      re.compile(r"module/.*/test"),
+     re.compile(r"unit_test/"),
+     ],
+    [re.compile(r"contrib/cmock/"),
+     re.compile(r"framework/"),
+     re.compile(r"product/.*/test"),
      re.compile(r"unit_test/"),
      ],
 ]
