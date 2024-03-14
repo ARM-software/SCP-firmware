@@ -61,7 +61,6 @@ unit_test
         │   ├── arch_helpers.h
         │   └── mocks
         ├── utils
-        │   ├── generate_coverage_report.py
         │   └── zip_coverage_report.sh
         ├── gm.rb
         └── user_guide.md

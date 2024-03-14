@@ -334,7 +334,7 @@ fwk_test:
 	${CD} $(FWK_TEST_BUILD_DIR) && ${CTEST} -V --output-junit Testing/TestResults.xml
 ifeq ($(ENABLE_COVERAGE),y)
 	${CD} $(FWK_TEST_BUILD_DIR) && $(LCOV) --capture --directory . --output-file scp_v2_fwk_test_coverage.info
-	${CD} $(FWK_TEST_BUILD_DIR) && $(PYTHON) $(FWK_DIR)/test/utils/generate_coverage_report.py
+	${CD} $(FWK_TEST_BUILD_DIR) && $(PYTHON) $(TOOLS_DIR)/filter_coverage_report.py --filename scp_v2_fwk_test_coverage.info
 	${CD} $(FWK_TEST_BUILD_DIR) && $(GENHTML) scp_v2_fwk_test_coverage_filtered.info --prefix "$(TOP_DIR)" --output-directory $(FWK_TEST_BUILD_DIR)/coverage_report
 endif
 
@@ -345,6 +345,6 @@ mod_test:
 	${CD} $(MOD_TEST_BUILD_DIR) && $(CTEST) -V --output-junit Testing/TestResults.xml
 ifeq ($(ENABLE_COVERAGE),y)
 	${CD} $(MOD_TEST_BUILD_DIR) && $(LCOV) --capture --directory $(MOD_TEST_BUILD_DIR) --output-file scp_v2_unit_test_coverage.info
-	${CD} $(MOD_TEST_BUILD_DIR) && $(PYTHON) $(MOD_TEST_DIR)/utils/generate_coverage_report.py
+	${CD} $(MOD_TEST_BUILD_DIR) && $(PYTHON) $(TOOLS_DIR)/filter_coverage_report.py --filename scp_v2_unit_test_coverage.info
 	${CD} $(MOD_TEST_BUILD_DIR) && $(GENHTML) scp_v2_unit_test_coverage_filtered.info --prefix "$(TOP_DIR)" --output-directory $(MOD_TEST_BUILD_DIR)/coverage_report
 endif
