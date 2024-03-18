@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -1178,18 +1178,19 @@ static int scmi_pd_process_bind_request(fwk_id_t source_id, fwk_id_t target_id,
 static int process_request_event(const struct fwk_event *event)
 {
     fwk_id_t pd_id;
+    int status;
+    int respond_status;
 #ifdef BUILD_HAS_MOD_DEBUG
     bool dbg_enabled;
-    fwk_id_t service_id;
-    int status, respond_status;
     bool state_get;
     struct scmi_pd_power_state_get_p2a retval_get = {
         .status = SCMI_GENERIC_ERROR
     };
-    struct scmi_pd_power_state_set_p2a retval_set = {
-        .status = SCMI_GENERIC_ERROR
-    };
 #endif
+    fwk_id_t service_id;
+    struct scmi_pd_power_state_set_p2a retval_set = {
+        .status = (int32_t)SCMI_GENERIC_ERROR
+    };
     struct event_request_params *params =
         (struct event_request_params *)event->params;
 
@@ -1228,8 +1229,23 @@ static int process_request_event(const struct fwk_event *event)
         break;
 #endif
     case SCMI_PD_EVENT_IDX_SET_STATE:
-        return scmi_pd_ctx.pd_api->set_state(
-            pd_id, true, params->pd_power_state);
+        status =
+            scmi_pd_ctx.pd_api->set_state(pd_id, true, params->pd_power_state);
+
+        if (status != FWK_SUCCESS) {
+            /* There was an error, so send the SCMI response to note this.*/
+            retval_set.status = (int32_t)SCMI_GENERIC_ERROR;
+            service_id = ops_get_service(pd_id);
+            respond_status = scmi_pd_ctx.scmi_api->respond(
+                service_id, &retval_set, sizeof(retval_set.status));
+
+            if (respond_status != FWK_SUCCESS) {
+                FWK_LOG_DEBUG("[SCMI-power] %s @%d", __func__, __LINE__);
+                return respond_status;
+            }
+        }
+
+        return status;
 
     default:
         return FWK_E_PARAM;
