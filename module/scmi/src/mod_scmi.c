@@ -380,6 +380,83 @@ static int respond(fwk_id_t service_id, const void *payload, size_t size)
     return status;
 }
 
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+static int scmi_permissions_handler(
+    fwk_id_t service_id,
+    uint32_t message_id,
+    uint32_t protocol_id)
+{
+    enum mod_res_perms_permissions perms;
+    unsigned int agent_id;
+    int status;
+
+    status = get_agent_id(service_id, &agent_id);
+    if (status != FWK_SUCCESS) {
+        return FWK_E_PARAM;
+    }
+
+    if (message_id < MOD_SCMI_MESSAGE_ID_ATTRIBUTE) {
+        perms = scmi_ctx.res_perms_api->agent_has_protocol_permission(
+            agent_id, protocol_id);
+
+        if (perms == MOD_RES_PERMS_ACCESS_DENIED) {
+            return FWK_E_ACCESS;
+        }
+    }
+
+    return FWK_SUCCESS;
+}
+#endif
+
+static int scmi_message_validation(
+    uint8_t protocol_id,
+    fwk_id_t service_id,
+    const uint32_t *payload,
+    size_t payload_size,
+    size_t message_id,
+    const size_t *payload_size_table,
+    size_t command_count,
+    const handler_table_t *handler_table)
+{
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    int status;
+#endif
+
+    fwk_assert(payload != NULL);
+
+    if ((payload_size_table == NULL) ||
+        (protocol_id < MOD_SCMI_PROTOCOL_ID_BASE) ||
+        (protocol_id > MOD_SCMI_PROTOCOL_ID_POWER_CAPPING)) {
+        return (int)SCMI_INVALID_PARAMETERS;
+    }
+
+    if (message_id >= command_count) {
+        return (int)SCMI_NOT_FOUND;
+    }
+
+    if (payload_size != payload_size_table[message_id]) {
+        /* Incorrect payload size or message is not supported */
+        return (int)SCMI_PROTOCOL_ERROR;
+    }
+
+    if (handler_table[message_id] == NULL) {
+        return (int)SCMI_NOT_SUPPORTED;
+    }
+
+#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
+    status = scmi_permissions_handler(service_id, message_id, protocol_id);
+    if (status == FWK_E_PARAM) {
+        return (int)SCMI_INVALID_PARAMETERS;
+    }
+
+    if (status == FWK_E_ACCESS) {
+        return (int)SCMI_DENIED;
+    }
+#endif
+
+    return (int)SCMI_SUCCESS;
+}
+
 static void scmi_notify(fwk_id_t id, int protocol_id, int message_id,
     const void *payload, size_t size)
 {
@@ -515,6 +592,7 @@ static const struct mod_scmi_from_protocol_api scmi_from_protocol_api = {
     .get_max_payload_size = get_max_payload_size,
     .write_payload = write_payload,
     .respond = respond,
+    .scmi_message_validation = scmi_message_validation,
     .notify = scmi_notify,
 };
 

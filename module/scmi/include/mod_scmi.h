@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -43,6 +43,11 @@ enum mod_scmi_api_idx {
 #endif
     MOD_SCMI_API_IDX_COUNT,
 };
+
+/*!
+ * \brief Message handler table perprotocol.
+ */
+typedef int (*handler_table_t)(fwk_id_t, const uint32_t *);
 
 /*!
  * \brief Entity role.
@@ -646,6 +651,35 @@ struct mod_scmi_from_protocol_api {
      *      errors.
      */
     int (*respond)(fwk_id_t service_id, const void *payload, size_t size);
+
+    /*!
+     * \brief Validate received protocol message.
+     *
+     * \param protocol_id Protocol identifier.
+     * \param service_id Service identifier.
+     * \param payload Payload data to write, or NULL if a payload has already
+     *      been written.
+     * \param payload_size Payload size.
+     * \param message_id Message ID.
+     * \param payload_size_table Expected size of payload per message ID
+     * \param command_count total number of commands per protocol
+     * \param handler_table pointer to message handler
+     *
+     * \retval ::FWK_SUCCESS Protocol frame is valid.
+     * \retval ::SCMI_INVALID_PARAMETERS Payload is NULL or protocol ID error.
+     * \retval ::SCMI_NOT_FOUND Message ID out of range
+     * \retval ::SCMI_PROTOCOL_ERROR Payload size pegger than expected payload.
+     * \retval ::SCMI_DENIED Agent has no permission for the protocol.
+     */
+    int (*scmi_message_validation)(
+        uint8_t protocol_id,
+        fwk_id_t service_id,
+        const uint32_t *payload,
+        size_t payload_size,
+        size_t message_id,
+        const size_t *payload_size_table,
+        size_t command_count,
+        const handler_table_t *handler_table);
 
     /*!
      * \brief Send a notification to the agent on behalf on an SCMI service.

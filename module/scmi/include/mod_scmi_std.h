@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -67,6 +67,11 @@ enum scmi_command_id {
     MOD_SCMI_PROTOCOL_ATTRIBUTES = 0x001,
     MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES = 0x002
 };
+
+/*!
+ * \brief SCMI message attribute index number.
+ */
+#define MOD_SCMI_MESSAGE_ID_ATTRIBUTE UINT32_C(0x03)
 
 /*!
  * \brief Definitions of the SCMI Protocol Identifiers and the command
