@@ -13,7 +13,7 @@
     when: on_success
     expire_in: 2 days
     paths:
-      - build/module/test/scp_v2_fwk_test_coverage_filtered.info
+      - build/framework/test/scp_v2_fwk_test_coverage_filtered.info
 
 .check-modules:
   image: ${CI_REGISTRY_IMAGE}/ci-base:latest
