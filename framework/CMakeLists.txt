@@ -138,6 +138,10 @@ if(NOT SCP_EXCLUDE_SCMI_POWER_CAPPING_FAST_CHANNELS_COMMANDS)
     target_compile_definitions(framework PUBLIC "BUILD_HAS_SCMI_POWER_CAPPING_STD_COMMANDS")
 endif()
 
+if(SCP_ENABLE_AGENT_LOGICAL_DOMAIN)
+    target_compile_definitions(framework PUBLIC "BUILD_HAS_AGENT_LOGICAL_DOMAIN")
+endif()
+
 #
 # Handle the framework logging filter level.
 #

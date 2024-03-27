@@ -267,6 +267,13 @@ Use `FMW_DISABLE_ARCH_SUSPEND` option to disable this execution of WFE. It
 can be defined in a platform specific fmw_arch.h file and adding this file
 in product/*/include directory.
 
+## Agent Logical Domain
+
+When building a firmware and its dependencies, the
+`BUILD_HAS_AGENT_LOGICAL_DOMAIN` parameter controls whether SCMI agents can have
+their relative view on system resources exposed by SCMI protocols.
+
+
 ## Performance Plugin Handler
 
 /* TODO */

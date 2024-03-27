@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -11,19 +11,35 @@
 
 #include <fwk_id.h>
 
-#ifdef BUILD_HAS_MOD_DEBUG
-
 /*!
  * \ingroup GroupModules Modules
  * \defgroup GroupSCMIPowerDomain SCMI Power Domain
  * \{
  */
 
+#ifdef BUILD_HAS_AGENT_LOGICAL_DOMAIN
+struct mod_scmi_pd_agent_config {
+    /*!
+     * \brief Agent view of Power domains.
+     *      Identifiers of all the power domains an agent can view in per agent
+     *      organisation. This must be a subset of all Power domain module
+     *      elements to restrict the agent view to only operable domains.
+     * FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, POWER_DOMAIN_IDX)
+     */
+    uint32_t *domains;
+
+    /*!
+     * \brief Number of domains operable by the agent.
+     */
+    unsigned int domain_count;
+};
+#endif
+
 /*!
  * \brief SCMI Power domain module configuration.
  */
 struct mod_scmi_pd_config {
-
+#ifdef BUILD_HAS_MOD_DEBUG
     /*!
      * \brief Identifier of the debug power domain.
      *
@@ -42,8 +58,15 @@ struct mod_scmi_pd_config {
      *      module.
      */
     fwk_id_t debug_id;
-};
 #endif
+
+#ifdef BUILD_HAS_AGENT_LOGICAL_DOMAIN
+    /*!
+     * \brief Agent config table
+     */
+    struct mod_scmi_pd_agent_config *agent_config_table;
+#endif
+};
 
 /*!
  * \defgroup GroupScmiPowerPolicyHandlers Policy Handlers

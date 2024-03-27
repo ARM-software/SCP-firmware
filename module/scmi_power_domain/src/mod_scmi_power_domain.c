@@ -60,6 +60,12 @@ struct mod_scmi_pd_ctx {
 
     /* Power domain module API */
     const struct mod_pd_restricted_api *pd_api;
+
+#ifdef BUILD_HAS_AGENT_LOGICAL_DOMAIN
+    /* Module config */
+    const struct mod_scmi_pd_config *config;
+#endif
+
 #ifdef BUILD_HAS_MOD_DEBUG
     /* Debug module API */
     const struct mod_debug_api *debug_api;
@@ -247,6 +253,56 @@ static void ops_set_idle(fwk_id_t pd_id)
     scmi_pd_ctx.ops[pd_idx].service_id = FWK_ID_NONE;
 }
 
+#if defined(BUILD_HAS_MOD_DEBUG) && defined(BUILD_HAS_SCMI_NOTIFICATIONS)
+static unsigned int find_agent_scmi_pd_index(
+    unsigned int agent_id,
+    unsigned int power_domain_index)
+{
+#    ifdef BUILD_HAS_AGENT_LOGICAL_DOMAIN
+    const struct mod_scmi_pd_agent_config *agent_ctx =
+        &scmi_pd_ctx.config->agent_config_table[agent_id];
+    fwk_id_t pd_id =
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, power_domain_index);
+
+    /* Find the relative power domain index for the agent. */
+    for (unsigned int i = 0; i < agent_ctx->domain_count; ++i) {
+        if (agent_ctx->domains[i] == power_domain_index) {
+            return i;
+        }
+    }
+#    endif
+    return power_domain_index;
+}
+#endif
+
+static int scmi_pd_get_domain_id(
+    unsigned int agent_id,
+    unsigned int req_domain_idx,
+    fwk_id_t *out_domain_id)
+{
+    unsigned int domain_idx;
+#ifdef BUILD_HAS_AGENT_LOGICAL_DOMAIN
+    if (req_domain_idx >=
+        scmi_pd_ctx.config->agent_config_table[agent_id].domain_count) {
+        return FWK_E_RANGE;
+    }
+    domain_idx = scmi_pd_ctx.config->agent_config_table[agent_id]
+                     .domains[req_domain_idx];
+#else
+    if (req_domain_idx >= scmi_pd_ctx.domain_count) {
+        return FWK_E_RANGE;
+    }
+    domain_idx = req_domain_idx;
+#endif
+    *out_domain_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, domain_idx);
+
+    if (!fwk_module_is_valid_element_id(*out_domain_id)) {
+        return FWK_E_RANGE;
+    }
+
+    return FWK_SUCCESS;
+}
+
 /*
  * Power domain management protocol implementation
  */
@@ -285,12 +341,26 @@ static int scmi_pd_protocol_version_handler(fwk_id_t service_id,
 static int scmi_pd_protocol_attributes_handler(fwk_id_t service_id,
                                                const uint32_t *payload)
 {
+    int status;
+    unsigned int agent_id;
     struct scmi_pd_protocol_attributes_p2a return_values = {
         .status = (int32_t)SCMI_SUCCESS,
     };
 
-    return_values.attributes = scmi_pd_ctx.domain_count;
+    status = scmi_pd_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+    if (status != FWK_SUCCESS) {
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
+        goto exit;
+    }
 
+#ifdef BUILD_HAS_AGENT_LOGICAL_DOMAIN
+    return_values.attributes =
+        scmi_pd_ctx.config->agent_config_table[agent_id].domain_count;
+#else
+    return_values.attributes = scmi_pd_ctx.domain_count;
+#endif
+
+exit:
     return scmi_pd_ctx.scmi_api->respond(
         service_id, &return_values, sizeof(return_values));
 }
@@ -318,14 +388,15 @@ static int scmi_pd_power_domain_attributes_handler(fwk_id_t service_id,
         goto exit;
     }
 
-    pd_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, domain_idx);
-    if (!fwk_module_is_valid_element_id(pd_id)) {
-        return_values.status = (int32_t)SCMI_NOT_FOUND;
+    status = scmi_pd_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+    if (status != FWK_SUCCESS) {
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
         goto exit;
     }
 
-    status = scmi_pd_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+    status = scmi_pd_get_domain_id(agent_id, parameters->domain_id, &pd_id);
     if (status != FWK_SUCCESS) {
+        return_values.status = (int32_t)SCMI_NOT_FOUND;
         goto exit;
     }
 
@@ -443,7 +514,7 @@ static void scmi_pd_power_state_notify(
     int status;
 
     message.agent_id = agent_id;
-    message.domain_id = domain_id;
+    message.domain_id = find_agent_scmi_pd_index(agent_id, domain_id);
     message.power_state = power_state;
 
     status = scmi_pd_ctx.scmi_notification_api->scmi_notification_notify(
@@ -459,10 +530,24 @@ static void scmi_pd_power_state_notify(
 }
 #endif
 
+static int32_t scmi_pd_agent_check(fwk_id_t service_id, unsigned int *agent_idx)
+{
+    int status;
+    status = scmi_pd_ctx.scmi_api->get_agent_id(service_id, agent_idx);
+    if (status != FWK_SUCCESS) {
+        return (int32_t)SCMI_INVALID_PARAMETERS;
+    }
+
+    return (int32_t)SCMI_SUCCESS;
+}
+
 static int32_t scmi_pd_power_state_set_parameters_check(
     const struct scmi_pd_power_state_set_a2p *scmi_params,
+    unsigned int agent_id,
     fwk_id_t *pd_id)
 {
+    int status;
+
     if (((scmi_params->flags & ~SCMI_PD_POWER_STATE_SET_FLAGS_MASK) != 0x0U) ||
         ((scmi_params->power_state &
           ~SCMI_PD_POWER_STATE_SET_POWER_STATE_MASK) != 0x0U)) {
@@ -473,11 +558,11 @@ static int32_t scmi_pd_power_state_set_parameters_check(
         return (int32_t)SCMI_NOT_FOUND;
     }
 
-    *pd_id =
-        FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, scmi_params->domain_id);
-    if (!fwk_module_is_valid_element_id(*pd_id)) {
+    status = scmi_pd_get_domain_id(agent_id, scmi_params->domain_id, pd_id);
+    if (status != FWK_SUCCESS) {
         return (int32_t)SCMI_NOT_FOUND;
     }
+
     return (int32_t)SCMI_SUCCESS;
 }
 
@@ -530,8 +615,17 @@ static int scmi_pd_power_state_set_handler(
 
     scmi_params = (const struct scmi_pd_power_state_set_a2p *)payload;
 
+    /* Agent checking */
+    scmi_return = scmi_pd_agent_check(service_id, &agent_idx);
+    if (scmi_return != SCMI_SUCCESS) {
+        return_values.status = scmi_return;
+        return scmi_pd_ctx.scmi_api->respond(
+            service_id, &return_values, sizeof(return_values.status));
+    }
+
     /* Parameters checking */
-    scmi_return = scmi_pd_power_state_set_parameters_check(scmi_params, &pd_id);
+    scmi_return = scmi_pd_power_state_set_parameters_check(
+        scmi_params, agent_idx, &pd_id);
     if (scmi_return != SCMI_SUCCESS) {
         return_values.status = scmi_return;
         return scmi_pd_ctx.scmi_api->respond(
@@ -641,7 +735,7 @@ static int scmi_pd_power_state_get_handler(fwk_id_t service_id,
     int status = FWK_SUCCESS;
     int respond_status;
     const struct scmi_pd_power_state_get_a2p *parameters;
-    unsigned int domain_idx;
+    unsigned int agent_idx;
     fwk_id_t pd_id;
     struct scmi_pd_power_state_get_p2a return_values = {
         .status = (int32_t)SCMI_GENERIC_ERROR
@@ -656,14 +750,18 @@ static int scmi_pd_power_state_get_handler(fwk_id_t service_id,
 
     parameters = (const struct scmi_pd_power_state_get_a2p *)payload;
 
-    domain_idx = parameters->domain_id;
-    if (domain_idx > UINT16_MAX) {
+    if (parameters->domain_id > UINT16_MAX) {
         return_values.status = (int32_t)SCMI_NOT_FOUND;
         goto exit;
     }
 
-    pd_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, domain_idx);
-    if (!fwk_module_is_valid_element_id(pd_id)) {
+    if (scmi_pd_agent_check(service_id, &agent_idx) != SCMI_SUCCESS) {
+        return_values.status = (int32_t)SCMI_INVALID_PARAMETERS;
+        goto exit;
+    }
+
+    status = scmi_pd_get_domain_id(agent_idx, parameters->domain_id, &pd_id);
+    if (status != FWK_SUCCESS) {
         return_values.status = (int32_t)SCMI_NOT_FOUND;
         goto exit;
     }
@@ -746,7 +844,6 @@ static int scmi_pd_power_state_notify_handler(
     unsigned int agent_id;
     enum mod_pd_type pd_type;
     int status;
-    unsigned int domain_idx;
     fwk_id_t pd_id;
     const struct scmi_pd_power_state_notify_a2p *parameters;
     struct scmi_pd_power_state_notify_p2a return_values = {
@@ -754,14 +851,15 @@ static int scmi_pd_power_state_notify_handler(
     };
 
     parameters = (const struct scmi_pd_power_state_notify_a2p *)payload;
-    domain_idx = parameters->domain_id;
-    if (domain_idx >= scmi_pd_ctx.domain_count) {
+
+    status = scmi_pd_ctx.scmi_api->get_agent_id(service_id, &agent_id);
+    if (status != FWK_SUCCESS) {
         return_values.status = (int32_t)SCMI_NOT_FOUND;
         goto exit;
     }
 
-    pd_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, domain_idx);
-    if (!fwk_module_is_valid_element_id(pd_id)) {
+    status = scmi_pd_get_domain_id(agent_id, parameters->domain_id, &pd_id);
+    if (status != FWK_SUCCESS) {
         return_values.status = (int32_t)SCMI_NOT_FOUND;
         goto exit;
     }
@@ -800,7 +898,7 @@ static int scmi_pd_power_state_notify_handler(
         status =
             scmi_pd_ctx.scmi_notification_api->scmi_notification_add_subscriber(
                 MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN,
-                domain_idx,
+                parameters->domain_id,
                 command_id,
                 service_id);
     } else {
@@ -808,7 +906,7 @@ static int scmi_pd_power_state_notify_handler(
                      ->scmi_notification_remove_subscriber(
                          MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN,
                          agent_id,
-                         domain_idx,
+                         parameters->domain_id,
                          command_id);
     }
     if (status != FWK_SUCCESS) {
@@ -890,8 +988,21 @@ FWK_WEAK int scmi_pd_power_state_set_policy(
 /*
  * SCMI Resource Permissions handler
  */
+
+static inline unsigned int get_scmi_pd_index(
+    unsigned int agent_id,
+    unsigned int param_id)
+{
+#    ifdef BUILD_HAS_AGENT_LOGICAL_DOMAIN
+    return scmi_pd_ctx.config->agent_config_table[agent_id].domains[param_id];
+#    else
+    return param_id;
+#    endif
+}
+
 static unsigned int get_pd_domain_id(
     const uint32_t *payload,
+    unsigned int agent_id,
     unsigned int message_id)
 {
     const struct scmi_pd_power_state_set_a2p *params_set;
@@ -903,7 +1014,7 @@ static unsigned int get_pd_domain_id(
     switch (message_id_type) {
     case MOD_SCMI_PD_POWER_STATE_SET:
         params_set = (const struct scmi_pd_power_state_set_a2p *)payload;
-        return params_set->domain_id;
+        return get_scmi_pd_index(agent_id, params_set->domain_id);
 
     default:
         /*
@@ -913,7 +1024,7 @@ static unsigned int get_pd_domain_id(
          * retrieve the domain ID to avoid unnecessary code.
          */
         params_get = (const struct scmi_pd_power_state_get_a2p *)payload;
-        return params_get->domain_id;
+        return get_scmi_pd_index(agent_id, params_get->domain_id);
     }
 }
 
@@ -934,7 +1045,7 @@ static int scmi_pd_permissions_handler(
         return (int32_t)SCMI_GENERIC_ERROR;
     }
 
-    domain_id = get_pd_domain_id(payload, message_id);
+    domain_id = get_pd_domain_id(payload, agent_id, message_id);
     if (domain_id > UINT16_MAX) {
         return (int32_t)SCMI_NOT_FOUND;
     }
@@ -1019,7 +1130,7 @@ static struct mod_scmi_to_protocol_api scmi_pd_mod_scmi_to_protocol_api = {
 static int scmi_pd_init(fwk_id_t module_id, unsigned int element_count,
                         const void *data)
 {
-#ifdef BUILD_HAS_MOD_DEBUG
+#if defined(BUILD_HAS_MOD_DEBUG) || defined(BUILD_HAS_AGENT_LOGICAL_DOMAIN)
     struct mod_scmi_pd_config *config = (struct mod_scmi_pd_config *)data;
 #endif
 
@@ -1066,6 +1177,10 @@ static int scmi_pd_init(fwk_id_t module_id, unsigned int element_count,
     for (unsigned int i = 0; i < scmi_pd_ctx.domain_count; i++) {
         scmi_pd_ctx.ops[i].service_id = FWK_ID_NONE;
     }
+
+#ifdef BUILD_HAS_AGENT_LOGICAL_DOMAIN
+    scmi_pd_ctx.config = config;
+#endif
 
     return FWK_SUCCESS;
 }
