@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -419,15 +419,15 @@ static void mmio_ap_mem_write_64(uint64_t addr, uint64_t value)
 /*
  * API to be used by a module that needs to read/write AP memory region.
  */
-static struct mod_apremap_rw_api apremap_mem_api = {
-    .mmio_ap_mem_read_8 = mmio_ap_mem_read_8,
-    .mmio_ap_mem_read_16 = mmio_ap_mem_read_16,
-    .mmio_ap_mem_read_32 = mmio_ap_mem_read_32,
-    .mmio_ap_mem_read_64 = mmio_ap_mem_read_64,
-    .mmio_ap_mem_write_8 = mmio_ap_mem_write_8,
-    .mmio_ap_mem_write_16 = mmio_ap_mem_write_16,
-    .mmio_ap_mem_write_32 = mmio_ap_mem_write_32,
-    .mmio_ap_mem_write_64 = mmio_ap_mem_write_64,
+static struct interface_address_remapper_rw_api apremap_mem_api = {
+    .read8 = mmio_ap_mem_read_8,
+    .read16 = mmio_ap_mem_read_16,
+    .read32 = mmio_ap_mem_read_32,
+    .read64 = mmio_ap_mem_read_64,
+    .write8 = mmio_ap_mem_write_8,
+    .write16 = mmio_ap_mem_write_16,
+    .write32 = mmio_ap_mem_write_32,
+    .write64 = mmio_ap_mem_write_64,
 };
 
 /* API to enable/disable CMN Address Translation */
