@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -9,6 +9,11 @@
 #include "mgi_validate_header.h"
 
 #include <stddef.h>
+
+struct mgi_set_monitor_mode_check {
+    uint32_t mode_idx;
+    struct smcf_mgi_reg *smcf_mgi;
+};
 
 /* Get the number of monitors supported by this MGI */
 uint32_t mgi_get_num_of_monitors(struct smcf_mgi_reg *smcf_mgi)
@@ -166,37 +171,19 @@ int mgi_disable_program_mode(struct smcf_mgi_reg *smcf_mgi, uint32_t monitor)
     return FWK_SUCCESS;
 }
 
-/* Set MODE for individual MODE_REQ register */
-int mgi_set_monitor_mode(
-    struct smcf_mgi_reg *smcf_mgi,
-    uint32_t mode_idx,
-    uint32_t value)
+bool mgi_is_monitor_mode_updated(void *data)
 {
-    uint32_t mode_registers_num = mgi_get_number_of_mode_registers(smcf_mgi);
-    uint32_t mode_registers_bits =
-        mgi_get_number_of_bits_in_mode_registers(smcf_mgi);
-    uint32_t mode_mask = (1U << mode_registers_bits) - 1;
+    uint32_t mode_registers_num;
+    struct mgi_set_monitor_mode_check *params;
+    struct smcf_mgi_reg *smcf_mgi;
 
-    if (mode_idx > (mode_registers_num - 1)) {
-        return FWK_E_RANGE;
-    }
+    fwk_assert(data != NULL);
+    params = (struct mgi_set_monitor_mode_check *)data;
+    fwk_assert(params->smcf_mgi != NULL);
+    smcf_mgi = params->smcf_mgi;
 
-    FWK_RW uint32_t *mode_req[SMCF_MGI_MAX_NUM_MODE_REG] = {
-        &smcf_mgi->MODE_REQ0,
-        &smcf_mgi->MODE_REQ1,
-        &smcf_mgi->MODE_REQ2,
-        &smcf_mgi->MODE_REQ3
-    };
-
-    *mode_req[mode_idx] = (value & mode_mask);
-
-    return FWK_SUCCESS;
-}
-
-bool mgi_is_monitor_mode_updated(struct smcf_mgi_reg *smcf_mgi)
-{
-    uint32_t i;
-    uint32_t mode_registers_num = mgi_get_number_of_mode_registers(smcf_mgi);
+    mode_registers_num = mgi_get_number_of_mode_registers(smcf_mgi);
+    fwk_assert(params->mode_idx <= (mode_registers_num - 1));
 
     FWK_RW uint32_t *mode_req[SMCF_MGI_MAX_NUM_MODE_REG] = {
         &smcf_mgi->MODE_REQ0,
@@ -212,13 +199,55 @@ bool mgi_is_monitor_mode_updated(struct smcf_mgi_reg *smcf_mgi)
         &smcf_mgi->MODE_STAT3
     };
 
-    for (i = 0; i < mode_registers_num; i++) {
-        if (*mode_stat[i] != *mode_req[i]) {
-            return false;
-        }
+    return (*mode_req[params->mode_idx] == *mode_stat[params->mode_idx]);
+}
+
+/* Set MODE for individual MODE_REQ register */
+int mgi_set_monitor_mode(
+    struct smcf_mgi_reg *smcf_mgi,
+    struct smcf_mgi_timer_ctx *timer_ctx,
+    uint32_t mode_idx,
+    uint32_t value)
+{
+    uint32_t mode_registers_num = mgi_get_number_of_mode_registers(smcf_mgi);
+    uint32_t mode_registers_bits =
+        mgi_get_number_of_bits_in_mode_registers(smcf_mgi);
+    uint32_t mode_mask = (1U << mode_registers_bits) - 1;
+    struct mgi_set_monitor_mode_check params;
+
+    if (mode_idx > (mode_registers_num - 1)) {
+        return FWK_E_RANGE;
     }
 
-    return true;
+    FWK_RW uint32_t *mode_req[SMCF_MGI_MAX_NUM_MODE_REG] = {
+        &smcf_mgi->MODE_REQ0,
+        &smcf_mgi->MODE_REQ1,
+        &smcf_mgi->MODE_REQ2,
+        &smcf_mgi->MODE_REQ3
+    };
+
+    *mode_req[mode_idx] = (value & mode_mask);
+
+    if (timer_ctx == NULL) {
+        FWK_R uint32_t *mode_stat[SMCF_MGI_MAX_NUM_MODE_REG] = {
+            &smcf_mgi->MODE_STAT0,
+            &smcf_mgi->MODE_STAT1,
+            &smcf_mgi->MODE_STAT2,
+            &smcf_mgi->MODE_STAT3
+        };
+        while (*mode_req[mode_idx] != *mode_stat[mode_idx])
+            continue;
+    } else {
+        params.mode_idx = mode_idx;
+        params.smcf_mgi = smcf_mgi;
+        return timer_ctx->timer_api->wait(
+            timer_ctx->timer_id,
+            timer_ctx->delay_us,
+            mgi_is_monitor_mode_updated,
+            &params);
+    }
+
+    return FWK_SUCCESS;
 }
 
 /*

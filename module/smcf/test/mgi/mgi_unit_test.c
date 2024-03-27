@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -15,6 +15,23 @@
 
 #include "mgi_unit_test.h"
 
+int fake_wait(
+    fwk_id_t dev_id,
+    uint32_t microseconds,
+    bool (*cond)(void *),
+    void *data)
+{
+    if (cond(data)) {
+        return FWK_SUCCESS;
+    } else {
+        return FWK_E_TIMEOUT;
+    }
+}
+
+struct mod_timer_api timer_api = {
+    .wait = &fake_wait,
+};
+
 struct smcf_mgi_reg fake_smcf_mgi_reg = {
     .GRP_ID = MGI_GRP_ID,
     /* Set monitor 0,5,9
@@ -24,6 +41,12 @@ struct smcf_mgi_reg fake_smcf_mgi_reg = {
 
     .FEAT1 = (MGI_FEAT1_NUM_OF_REG) |
         (MGI_FEAT1_NUM_OF_BITS << SMCF_MGI_FEAT1_MODE_LEN_POS),
+};
+
+struct smcf_mgi_timer_ctx fake_smcf_mgi_timer_ctx = {
+    .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
+    .timer_api = &timer_api,
+    .delay_us = 10,
 };
 
 void setUp(void)
@@ -233,84 +256,145 @@ void utest_mgi_broadcast_mode_check_broadcast_mask(void)
 
 void utest_mgi_is_monitor_mode_updated_false(void)
 {
-    uint32_t mode = MODE_VALUE;
-    uint32_t mode_idx;
-    uint32_t *ptr_set_const_reg;
-    int status;
     bool updated;
+    uint32_t *ptr_set_const_reg;
+    struct mgi_set_monitor_mode_check param;
 
-    mode_idx = 0;
-    status = mgi_set_monitor_mode(&fake_smcf_mgi_reg, mode_idx, mode);
-    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+    param.mode_idx = 0;
+    param.smcf_mgi = &fake_smcf_mgi_reg;
 
-    mode_idx = 1;
-    status = mgi_set_monitor_mode(&fake_smcf_mgi_reg, mode_idx, mode);
-    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+    ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_REQ0;
+    *ptr_set_const_reg = MODE_VALUE;
 
-    mode_idx = 2;
-    status = mgi_set_monitor_mode(&fake_smcf_mgi_reg, mode_idx, mode);
-    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
-
-    /*
-     * Only 3 REQ registers available. mode should written to REQ0,REQ1,REQ2
-     * but not REQ3
-     */
-    TEST_ASSERT_EQUAL(mode, fake_smcf_mgi_reg.MODE_REQ0);
-    TEST_ASSERT_EQUAL(mode, fake_smcf_mgi_reg.MODE_REQ1);
-    TEST_ASSERT_EQUAL(mode, fake_smcf_mgi_reg.MODE_REQ2);
-    TEST_ASSERT_NOT_EQUAL(mode, fake_smcf_mgi_reg.MODE_REQ3);
-
-    /* Only STAT0 and STAT1 forced in fake_smcf */
+    /* Set incorrect value */
     ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_STAT0;
-    *ptr_set_const_reg = mode;
-    ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_STAT1;
-    *ptr_set_const_reg = mode;
+    *ptr_set_const_reg = 0;
 
-    updated = mgi_is_monitor_mode_updated(&fake_smcf_mgi_reg);
+    updated = mgi_is_monitor_mode_updated(&param);
     TEST_ASSERT_FALSE(updated);
 }
 
 void utest_mgi_is_monitor_mode_updated_true(void)
 {
+    bool updated;
+    uint32_t *ptr_set_const_reg;
+    struct mgi_set_monitor_mode_check param;
+
+    param.mode_idx = 0;
+    param.smcf_mgi = &fake_smcf_mgi_reg;
+
+    ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_REQ0;
+    *ptr_set_const_reg = MODE_VALUE;
+
+    /* Set correct value */
+    ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_STAT0;
+    *ptr_set_const_reg = MODE_VALUE;
+
+    updated = mgi_is_monitor_mode_updated(&param);
+    TEST_ASSERT_TRUE(updated);
+}
+
+void utest_mgi_set_monitor_mode_idx_out_of_range(void)
+{
     uint32_t mode = MODE_VALUE;
-    uint32_t mode_idx;
+    uint32_t mode_idx = SMCF_MGI_MAX_NUM_MODE_REG;
+    int status;
+
+    status = mgi_set_monitor_mode(
+        &fake_smcf_mgi_reg, &fake_smcf_mgi_timer_ctx, mode_idx, mode);
+    TEST_ASSERT_EQUAL(FWK_E_RANGE, status);
+}
+
+void utest_mgi_set_monitor_mode_no_timer_success(void)
+{
+    uint32_t mode = MODE_VALUE;
+    uint32_t mode_idx = 0;
     uint32_t *ptr_set_const_reg;
     int status;
-    bool updated;
 
-    mode_idx = 0;
-    status = mgi_set_monitor_mode(&fake_smcf_mgi_reg, mode_idx, mode);
-    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+    /* Reset MODE_REQ*/
+    ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_REQ0;
+    *ptr_set_const_reg = 0;
+    ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_REQ1;
+    *ptr_set_const_reg = 0;
+    ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_REQ2;
+    *ptr_set_const_reg = 0;
+    ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_REQ3;
+    *ptr_set_const_reg = 0;
 
-    mode_idx = 1;
-    status = mgi_set_monitor_mode(&fake_smcf_mgi_reg, mode_idx, mode);
-    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
-
-    mode_idx = 2;
-    status = mgi_set_monitor_mode(&fake_smcf_mgi_reg, mode_idx, mode);
-    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
-
-    /*
-     * Only 3 REQ registers available. mode should written to REQ0,REQ1,REQ2
-     * but not REQ3
-     */
-    TEST_ASSERT_EQUAL(mode, fake_smcf_mgi_reg.MODE_REQ0);
-    TEST_ASSERT_EQUAL(mode, fake_smcf_mgi_reg.MODE_REQ1);
-    TEST_ASSERT_EQUAL(mode, fake_smcf_mgi_reg.MODE_REQ2);
-    TEST_ASSERT_NOT_EQUAL(mode, fake_smcf_mgi_reg.MODE_REQ3);
-
-    /* Only STAT0 and STAT1 forced in fake_smcf */
+    /* Set the expected mode value to MODE_STAT */
     ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_STAT0;
     *ptr_set_const_reg = mode;
+
+    status = mgi_set_monitor_mode(&fake_smcf_mgi_reg, NULL, mode_idx, mode);
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+    /* Only the right MODE_REQ is set */
+    TEST_ASSERT_EQUAL(mode, fake_smcf_mgi_reg.MODE_REQ0);
+    TEST_ASSERT_EQUAL(0, fake_smcf_mgi_reg.MODE_REQ1);
+    TEST_ASSERT_EQUAL(0, fake_smcf_mgi_reg.MODE_REQ2);
+    TEST_ASSERT_EQUAL(0, fake_smcf_mgi_reg.MODE_REQ3);
+}
+
+void utest_mgi_set_monitor_mode_timer_success(void)
+{
+    uint32_t mode = MODE_VALUE;
+    uint32_t mode_idx = 1;
+    uint32_t *ptr_set_const_reg;
+    int status;
+
+    /* Reset MODE_REQ*/
+    ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_REQ0;
+    *ptr_set_const_reg = 0;
+    ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_REQ1;
+    *ptr_set_const_reg = 0;
+    ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_REQ2;
+    *ptr_set_const_reg = 0;
+    ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_REQ3;
+    *ptr_set_const_reg = 0;
+
+    /* Set the expected mode value to MODE_STAT */
     ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_STAT1;
     *ptr_set_const_reg = mode;
 
-    /* Now force set STAT2 value */
-    ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_STAT2;
-    *ptr_set_const_reg = mode;
+    status = mgi_set_monitor_mode(
+        &fake_smcf_mgi_reg, &fake_smcf_mgi_timer_ctx, mode_idx, mode);
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+    /* Only the right MODE_REQ is set */
+    TEST_ASSERT_EQUAL(0, fake_smcf_mgi_reg.MODE_REQ0);
+    TEST_ASSERT_EQUAL(mode, fake_smcf_mgi_reg.MODE_REQ1);
+    TEST_ASSERT_EQUAL(0, fake_smcf_mgi_reg.MODE_REQ2);
+    TEST_ASSERT_EQUAL(0, fake_smcf_mgi_reg.MODE_REQ3);
+}
 
-    updated = mgi_is_monitor_mode_updated(&fake_smcf_mgi_reg);
-    TEST_ASSERT_TRUE(updated);
+void utest_mgi_set_monitor_mode_timer_fail(void)
+{
+    uint32_t mode = MODE_VALUE;
+    uint32_t mode_idx = 2;
+    uint32_t *ptr_set_const_reg;
+    int status;
+
+    /* Reset MODE_REQ*/
+    ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_REQ0;
+    *ptr_set_const_reg = 0;
+    ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_REQ1;
+    *ptr_set_const_reg = 0;
+    ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_REQ2;
+    *ptr_set_const_reg = 0;
+    ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_REQ3;
+    *ptr_set_const_reg = 0;
+
+    /* Set false value to MODE_STAT */
+    ptr_set_const_reg = (uint32_t *)&fake_smcf_mgi_reg.MODE_STAT2;
+    *ptr_set_const_reg = mode + 1;
+
+    status = mgi_set_monitor_mode(
+        &fake_smcf_mgi_reg, &fake_smcf_mgi_timer_ctx, mode_idx, mode);
+    TEST_ASSERT_EQUAL(FWK_E_TIMEOUT, status);
+    /* Only the right MODE_REQ is set */
+    TEST_ASSERT_EQUAL(0, fake_smcf_mgi_reg.MODE_REQ0);
+    TEST_ASSERT_EQUAL(0, fake_smcf_mgi_reg.MODE_REQ1);
+    TEST_ASSERT_EQUAL(mode, fake_smcf_mgi_reg.MODE_REQ2);
+    TEST_ASSERT_EQUAL(0, fake_smcf_mgi_reg.MODE_REQ3);
 }
 
 void utest_mgi_set_sample_type_periodic(void)
@@ -809,6 +893,10 @@ int mgi_test_main(void)
     RUN_TEST(utest_mgi_broadcast_mode_check_broadcast_mask);
     RUN_TEST(utest_mgi_is_monitor_mode_updated_false);
     RUN_TEST(utest_mgi_is_monitor_mode_updated_true);
+    RUN_TEST(utest_mgi_set_monitor_mode_idx_out_of_range);
+    RUN_TEST(utest_mgi_set_monitor_mode_no_timer_success);
+    RUN_TEST(utest_mgi_set_monitor_mode_timer_success);
+    RUN_TEST(utest_mgi_set_monitor_mode_timer_fail);
     RUN_TEST(utest_mgi_set_sample_type_periodic);
     RUN_TEST(utest_mgi_set_sample_type_trigger_input);
     RUN_TEST(utest_mgi_set_sample_type_manual);

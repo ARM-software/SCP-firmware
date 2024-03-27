@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -12,7 +12,10 @@
  * \cond
  */
 
+#include <mod_timer.h>
+
 #include <fwk_attributes.h>
+#include <fwk_id.h>
 #include <fwk_macros.h>
 #include <fwk_status.h>
 
@@ -205,6 +208,15 @@ struct smcf_mgi_reg {
     FWK_R uint32_t IIDR;
     uint32_t RESERVED46;
     FWK_R uint32_t AIDR;
+};
+
+/*
+ * Timer context for MODE_REQ timeout
+ */
+struct smcf_mgi_timer_ctx {
+    fwk_id_t timer_id;
+    struct mod_timer_api *timer_api;
+    uint32_t delay_us;
 };
 
 /*
@@ -460,6 +472,7 @@ int mgi_enable__program_mode_multi(
 /* Set MODE for individual MODE_REQ reigester */
 int mgi_set_monitor_mode(
     struct smcf_mgi_reg *smcf_mgi,
+    struct smcf_mgi_timer_ctx *timer_ctx,
     uint32_t mode_idx,
     uint32_t value);
 

@@ -242,20 +242,26 @@ void mgi_set_monitor_mode_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int c
 void mgi_set_monitor_mode_CMockStopIgnore(void);
 #define mgi_set_monitor_mode_ExpectAnyArgsAndReturn(cmock_retval) mgi_set_monitor_mode_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
 void mgi_set_monitor_mode_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
-#define mgi_set_monitor_mode_ExpectAndReturn(smcf_mgi, mode_idx, value, cmock_retval) mgi_set_monitor_mode_CMockExpectAndReturn(__LINE__, smcf_mgi, mode_idx, value, cmock_retval)
-void mgi_set_monitor_mode_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct smcf_mgi_reg* smcf_mgi, uint32_t mode_idx, uint32_t value, int cmock_to_return);
-typedef int (* CMOCK_mgi_set_monitor_mode_CALLBACK)(struct smcf_mgi_reg* smcf_mgi, uint32_t mode_idx, uint32_t value, int cmock_num_calls);
+#define mgi_set_monitor_mode_ExpectAndReturn(smcf_mgi, timer_ctx, mode_idx, value, cmock_retval) mgi_set_monitor_mode_CMockExpectAndReturn(__LINE__, smcf_mgi, timer_ctx, mode_idx, value, cmock_retval)
+void mgi_set_monitor_mode_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct smcf_mgi_reg* smcf_mgi, struct smcf_mgi_timer_ctx* timer_ctx, uint32_t mode_idx, uint32_t value, int cmock_to_return);
+typedef int (* CMOCK_mgi_set_monitor_mode_CALLBACK)(struct smcf_mgi_reg* smcf_mgi, struct smcf_mgi_timer_ctx* timer_ctx, uint32_t mode_idx, uint32_t value, int cmock_num_calls);
 void mgi_set_monitor_mode_AddCallback(CMOCK_mgi_set_monitor_mode_CALLBACK Callback);
 void mgi_set_monitor_mode_Stub(CMOCK_mgi_set_monitor_mode_CALLBACK Callback);
 #define mgi_set_monitor_mode_StubWithCallback mgi_set_monitor_mode_Stub
-#define mgi_set_monitor_mode_ExpectWithArrayAndReturn(smcf_mgi, smcf_mgi_Depth, mode_idx, value, cmock_retval) mgi_set_monitor_mode_CMockExpectWithArrayAndReturn(__LINE__, smcf_mgi, smcf_mgi_Depth, mode_idx, value, cmock_retval)
-void mgi_set_monitor_mode_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, struct smcf_mgi_reg* smcf_mgi, int smcf_mgi_Depth, uint32_t mode_idx, uint32_t value, int cmock_to_return);
+#define mgi_set_monitor_mode_ExpectWithArrayAndReturn(smcf_mgi, smcf_mgi_Depth, timer_ctx, timer_ctx_Depth, mode_idx, value, cmock_retval) mgi_set_monitor_mode_CMockExpectWithArrayAndReturn(__LINE__, smcf_mgi, smcf_mgi_Depth, timer_ctx, timer_ctx_Depth, mode_idx, value, cmock_retval)
+void mgi_set_monitor_mode_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, struct smcf_mgi_reg* smcf_mgi, int smcf_mgi_Depth, struct smcf_mgi_timer_ctx* timer_ctx, int timer_ctx_Depth, uint32_t mode_idx, uint32_t value, int cmock_to_return);
 #define mgi_set_monitor_mode_ReturnThruPtr_smcf_mgi(smcf_mgi) mgi_set_monitor_mode_CMockReturnMemThruPtr_smcf_mgi(__LINE__, smcf_mgi, sizeof(struct smcf_mgi_reg))
 #define mgi_set_monitor_mode_ReturnArrayThruPtr_smcf_mgi(smcf_mgi, cmock_len) mgi_set_monitor_mode_CMockReturnMemThruPtr_smcf_mgi(__LINE__, smcf_mgi, cmock_len * sizeof(*smcf_mgi))
 #define mgi_set_monitor_mode_ReturnMemThruPtr_smcf_mgi(smcf_mgi, cmock_size) mgi_set_monitor_mode_CMockReturnMemThruPtr_smcf_mgi(__LINE__, smcf_mgi, cmock_size)
 void mgi_set_monitor_mode_CMockReturnMemThruPtr_smcf_mgi(UNITY_LINE_TYPE cmock_line, struct smcf_mgi_reg* smcf_mgi, size_t cmock_size);
+#define mgi_set_monitor_mode_ReturnThruPtr_timer_ctx(timer_ctx) mgi_set_monitor_mode_CMockReturnMemThruPtr_timer_ctx(__LINE__, timer_ctx, sizeof(struct smcf_mgi_timer_ctx))
+#define mgi_set_monitor_mode_ReturnArrayThruPtr_timer_ctx(timer_ctx, cmock_len) mgi_set_monitor_mode_CMockReturnMemThruPtr_timer_ctx(__LINE__, timer_ctx, cmock_len * sizeof(*timer_ctx))
+#define mgi_set_monitor_mode_ReturnMemThruPtr_timer_ctx(timer_ctx, cmock_size) mgi_set_monitor_mode_CMockReturnMemThruPtr_timer_ctx(__LINE__, timer_ctx, cmock_size)
+void mgi_set_monitor_mode_CMockReturnMemThruPtr_timer_ctx(UNITY_LINE_TYPE cmock_line, struct smcf_mgi_timer_ctx* timer_ctx, size_t cmock_size);
 #define mgi_set_monitor_mode_IgnoreArg_smcf_mgi() mgi_set_monitor_mode_CMockIgnoreArg_smcf_mgi(__LINE__)
 void mgi_set_monitor_mode_CMockIgnoreArg_smcf_mgi(UNITY_LINE_TYPE cmock_line);
+#define mgi_set_monitor_mode_IgnoreArg_timer_ctx() mgi_set_monitor_mode_CMockIgnoreArg_timer_ctx(__LINE__)
+void mgi_set_monitor_mode_CMockIgnoreArg_timer_ctx(UNITY_LINE_TYPE cmock_line);
 #define mgi_set_monitor_mode_IgnoreArg_mode_idx() mgi_set_monitor_mode_CMockIgnoreArg_mode_idx(__LINE__)
 void mgi_set_monitor_mode_CMockIgnoreArg_mode_idx(UNITY_LINE_TYPE cmock_line);
 #define mgi_set_monitor_mode_IgnoreArg_value() mgi_set_monitor_mode_CMockIgnoreArg_value(__LINE__)
