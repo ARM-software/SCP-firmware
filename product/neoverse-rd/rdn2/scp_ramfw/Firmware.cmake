@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -35,7 +35,7 @@ list(PREPEND SCP_MODULE_PATHS
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_SOURCE_DIR}/module/cmn700")
 list(PREPEND SCP_MODULE_PATHS
-     "${CMAKE_SOURCE_DIR}/module/apremap")
+    "${CMAKE_CURRENT_LIST_DIR}/../module/apremap")
 list(PREPEND SCP_MODULE_PATHS
      "${CMAKE_CURRENT_LIST_DIR}/../module/pcie_integ_ctrl")
 
