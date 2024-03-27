@@ -58,7 +58,7 @@ struct FWK_PACKED stacked_context {
     uint32_t xPSR;
 };
 
-#if (FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR) && defined(FWK_LOG_BUFFERED)
+#if (FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR) && !defined(FWK_LOG_BUFFERED)
 static const char *const mmanage_fault_errors[] = {
     "Instruction access violation",
     "Data access violation",
@@ -110,7 +110,7 @@ static const char *const secure_fault_errors[] = {
     "Lazy state error flag",
 };
 #    endif /* ARMV8M && __ARM_FEATURE_CMSE == 3U */
-#endif /* (FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR) && defined(FWK_LOG_BUFFERED) \
+#endif /* (FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR) && !defined(FWK_LOG_BUFFERED) \
         */
 
 #ifdef __NEWLIB__
@@ -144,7 +144,7 @@ extern char __stackheap_end__;
 #    define arch_exception_stack (&__stackheap_end__)
 #endif
 
-#if (FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR) && defined(FWK_LOG_BUFFERED)
+#if (FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR) && !defined(FWK_LOG_BUFFERED)
 static void handle_hard_fault(struct stacked_context *context)
 {
     FWK_LOG_ERR("HARD FAULT occured at 0x%" PRIX32, context->PC);
@@ -275,13 +275,22 @@ __attribute__((naked)) noreturn void handle_arch_exception(void)
 {
     /* It is recommended not to have C code in naked function. */
     __asm(
+        /* Save SP to print exception information. */
         "mov r0, sp \n\t"
+        /* Save LR to the stack. */
+        "push {lr}\n\t"
+        /* Print exception information. */
         "bl %0 \n\t"
+        /*
+         * Restore LR. Some platforms checks LR to select between MSP and PSP.
+         */
+        "pop {lr}\n\t"
+        /* Jump to the platform's exception handler. */
         "b %1"
         :
         : "i"(handle_exception), "i"(arch_exception_invalid));
 }
-#else /* (FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR) && defined(FWK_LOG_BUFFERED) \
+#else /* (FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR) && !defined(FWK_LOG_BUFFERED) \
        */
 
 __attribute__((naked)) noreturn void handle_arch_exception(void)
@@ -289,7 +298,7 @@ __attribute__((naked)) noreturn void handle_arch_exception(void)
     __asm("b %0" : : "i"(arch_exception_invalid));
 }
 
-#endif /* (FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR) && defined(FWK_LOG_BUFFERED) \
+#endif /* (FWK_LOG_LEVEL <= FWK_LOG_LEVEL_ERROR) && !defined(FWK_LOG_BUFFERED) \
         */
 
 /*
