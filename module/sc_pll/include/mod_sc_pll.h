@@ -31,7 +31,7 @@
  */
 
 /*! Timeout value to wait for a PLL to lock. */
-#define MOD_SC_PLL_LOCK_TIMEOUT UINT32_C(0x100)
+#define MOD_SC_PLL_LOCK_TIMEOUT UINT32_C(0x100000)
 
 /*! Indexes of APIs that the module offers for binding. */
 enum mod_sc_pll_api_types {

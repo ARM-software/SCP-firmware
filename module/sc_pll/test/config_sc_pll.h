@@ -21,6 +21,7 @@
 
 volatile uint32_t control_reg0 = 0x40000000;
 volatile uint32_t control_reg1 = 0x80000000;
+volatile uint32_t control_reg1_timeout = 0x70000000;
 
 static struct mod_sc_pll_dev_param dev_param = {
     .postdiv1_min = 1,

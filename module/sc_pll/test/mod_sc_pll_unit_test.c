@@ -299,6 +299,40 @@ void test_pll_calc_fbdiv_large_config_ref_rate(void)
     TEST_ASSERT_EQUAL(status, FWK_E_SUPPORT);
 }
 
+/*!
+ * \brief pll unit test: test_pll_write_success
+ *
+ *  \details Handle case in test_pll_write_success() for a successful pll lock.
+ */
+void test_pll_write_success(void)
+{
+    int status;
+    status = pll_write(&dev_ctx_table[0], 1, 1, 1, 52, SC_PLL_RATE_CPU_PLL0);
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+}
+
+/*!
+ * \brief pll unit test: test_pll_write_fail
+ *
+ *  \details Handle case in test_pll_write_fail() for the pll lock getting
+ *  timed-out.
+ */
+void test_pll_write_fail(void)
+{
+    int status;
+    struct sc_pll_dev_ctx ctx;
+    const struct mod_sc_pll_dev_config config = {
+        .control_reg0 = &control_reg0,
+        .control_reg1 = &control_reg1_timeout,
+        .initial_rate = SC_PLL_RATE_CPU_PLL0,
+        .ref_rate = CLOCK_RATE_REFCLK,
+        .dev_param = &dev_param,
+    };
+    ctx.config = &config;
+    status = pll_write(&ctx, 1, 1, 1, 52, SC_PLL_RATE_CPU_PLL0);
+    TEST_ASSERT_EQUAL(status, FWK_E_TIMEOUT);
+}
+
 int pll_test_main(void)
 {
     UNITY_BEGIN();
@@ -319,6 +353,8 @@ int pll_test_main(void)
     RUN_TEST(test_pll_calc_fbdiv_success);
     RUN_TEST(test_pll_calc_fbdiv_small_config_ref_rate);
     RUN_TEST(test_pll_calc_fbdiv_large_config_ref_rate);
+    RUN_TEST(test_pll_write_success);
+    RUN_TEST(test_pll_write_fail);
 
     return UNITY_END();
 }

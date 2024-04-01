@@ -185,7 +185,7 @@ static int pll_calc_post_divider_and_feedback_params(
          postdiv1 <= config->dev_param->postdiv1_max;
          postdiv1++) {
         status = pll_calc_fbdiv(ctx, rate, postdiv1, postdiv2);
-        if (status == FWK_SUCCESS) {
+        if ((status == FWK_SUCCESS) || (status == FWK_E_TIMEOUT)) {
             return status;
         }
     }
@@ -207,7 +207,7 @@ static int pll_fractional_calc(struct sc_pll_dev_ctx *ctx, uint64_t rate)
          postdiv2 <= config->dev_param->postdiv2_max;
          postdiv2++) {
         status = pll_calc_post_divider_and_feedback_params(ctx, rate, postdiv2);
-        if (status == FWK_SUCCESS) {
+        if ((status == FWK_SUCCESS) || (status == FWK_E_TIMEOUT)) {
             return status;
         }
     }
