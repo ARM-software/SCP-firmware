@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -41,6 +41,7 @@ struct mod_scmi_from_protocol_api from_protocol_api = {
     .get_max_payload_size = mod_scmi_from_protocol_api_get_max_payload_size,
     .write_payload = mod_scmi_from_protocol_api_write_payload,
     .respond = mod_scmi_from_protocol_api_respond,
+    .scmi_message_validation = mod_scmi_from_protocol_api_scmi_frame_validation,
     .notify = mod_scmi_from_protocol_api_notify,
 };
 
@@ -191,6 +192,8 @@ void test_function_set_rate(void)
 
     mod_scmi_from_protocol_api_get_agent_id_ExpectAnyArgsAndReturn(FWK_SUCCESS);
     mod_scmi_from_protocol_api_get_agent_id_ReturnThruPtr_agent_id(&agent_id);
+    mod_scmi_from_protocol_api_scmi_frame_validation_ExpectAnyArgsAndReturn(
+            FWK_SUCCESS);
 
     fwk_id_get_element_idx_ExpectAnyArgsAndReturn(CLOCK_DEV_IDX_FAKE0);
     fwk_id_is_equal_ExpectAnyArgsAndReturn(true);
@@ -234,6 +237,9 @@ void test_set_rate_with_invalid_message_id_expect_SCMI_NOT_FOUND(void) {
                                                          sizeof(return_value),
                                                          FWK_SUCCESS);
 
+    mod_scmi_from_protocol_api_scmi_frame_validation_ExpectAnyArgsAndReturn(
+        SCMI_NOT_FOUND);
+
       status = scmi_clock_message_handler(
             (fwk_id_t)MOD_SCMI_PROTOCOL_ID_CLOCK,
             service_id,
@@ -268,6 +274,9 @@ void test_set_rate_with_invalid_payload_size_expect_SCMI_PROTOCOL_ERROR(void) {
                                                          &return_value,
                                                          sizeof(return_value),
                                                          FWK_SUCCESS);
+
+    mod_scmi_from_protocol_api_scmi_frame_validation_ExpectAnyArgsAndReturn(
+        SCMI_PROTOCOL_ERROR);
 
       status = scmi_clock_message_handler((fwk_id_t)MOD_SCMI_PROTOCOL_ID_CLOCK,
                                           service_id,
