@@ -2,14 +2,16 @@
 # Core maintainers
 #
 
-* nicola.mazzucato@arm.com souvik.chakravarty@arm.com tarek.el-sherbiny@arm.com girish.pathak@arm.com leandro.belli@arm.com ahmed.gadallah@arm.com mohamed.omarasaker@arm.com
+* tarek.el-sherbiny@arm.com girish.pathak@arm.com leandro.belli@arm.com ahmed.gadallah@arm.com mohamed.omarasaker@arm.com wenping.teh@arm.com
 
 #
 # Platform maintainers
 #
 
 /product/n1sdp/ manoj.kumar3@arm.com sudipto.paul@arm.com
-/product/rdv1*/ thomas.abraham@arm.com
+/product/neoverse-rd/ thomas.abraham@arm.com
 /product/synquacer/ masahisa.kojima@linaro.org
-/product/tc*/ usama.arif@arm.com lakshmi.kailasanathan@arm.com
+/product/totalcompute/ vishnu.banavath@arm.com
 /product/rcar/ nroyer@baylibre.com
+/product/optee/ vincent.guittot@linaro.org etienne.carriere@st.com
+
