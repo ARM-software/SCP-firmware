@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -53,6 +53,7 @@ struct mod_scmi_from_protocol_api from_protocol_api = {
     .get_max_payload_size = mod_scmi_from_protocol_api_get_max_payload_size,
     .write_payload = mod_scmi_from_protocol_api_write_payload,
     .respond = mod_scmi_from_protocol_api_respond,
+    .scmi_message_validation = mod_scmi_from_protocol_api_scmi_frame_validation,
     .notify = mod_scmi_from_protocol_api_notify,
 };
 
@@ -154,6 +155,8 @@ void utest_scmi_perf_protocol_version_handler(void)
      * encountered, the function version_handler_respond_callback will be called
      */
     mod_scmi_from_protocol_api_respond_Stub(version_handler_respond_callback);
+    mod_scmi_from_protocol_api_scmi_frame_validation_ExpectAnyArgsAndReturn(
+        SCMI_SUCCESS);
 
     status = to_protocol_api->message_handler(
         (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
@@ -196,6 +199,8 @@ void utest_scmi_perf_protocol_attributes_handler(void)
 
     mod_scmi_from_protocol_api_respond_Stub(
         attributes_handler_respond_callback);
+    mod_scmi_from_protocol_api_scmi_frame_validation_ExpectAnyArgsAndReturn(
+        SCMI_SUCCESS);
 
     status = to_protocol_api->message_handler(
         (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
@@ -240,6 +245,8 @@ void utest_scmi_perf_protocol_message_attributes_handler_valid_param(void)
 
     mod_scmi_from_protocol_api_respond_Stub(
         message_attributes_handler_valid_param_respond_callback);
+    mod_scmi_from_protocol_api_scmi_frame_validation_ExpectAnyArgsAndReturn(
+        SCMI_SUCCESS);
 
     status = to_protocol_api->message_handler(
         (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
@@ -278,6 +285,8 @@ void utest_scmi_perf_protocol_message_attributes_handler_invalid_param(void)
 
     mod_scmi_from_protocol_api_respond_Stub(
         message_attributes_handler_invalid_param_respond_callback);
+    mod_scmi_from_protocol_api_scmi_frame_validation_ExpectAnyArgsAndReturn(
+        SCMI_SUCCESS);
 
     status = to_protocol_api->message_handler(
         (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
@@ -368,6 +377,8 @@ void utest_scmi_perf_domain_attributes_handler_valid_param(void)
 
     mod_scmi_from_protocol_api_respond_Stub(
         domain_attributes_handler_valid_param_respond_callback);
+    mod_scmi_from_protocol_api_scmi_frame_validation_ExpectAnyArgsAndReturn(
+        SCMI_SUCCESS);
 
     status = to_protocol_api->message_handler(
         (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
@@ -407,6 +418,8 @@ void utest_scmi_perf_domain_attributes_handler_invalid_param(void)
 
     mod_scmi_from_protocol_api_respond_Stub(
         domain_attributes_handler_invalid_param_respond_callback);
+    mod_scmi_from_protocol_api_scmi_frame_validation_ExpectAnyArgsAndReturn(
+        SCMI_SUCCESS);
 
     status = to_protocol_api->message_handler(
         (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
@@ -507,6 +520,8 @@ void utest_scmi_perf_describe_levels_handler_valid_param(void)
     /* Disable the previous callback for this function */
     mod_scmi_from_protocol_api_respond_Stub(NULL);
     mod_scmi_from_protocol_api_respond_ExpectAnyArgsAndReturn(FWK_SUCCESS);
+    mod_scmi_from_protocol_api_scmi_frame_validation_ExpectAnyArgsAndReturn(
+        SCMI_SUCCESS);
 
     status = to_protocol_api->message_handler(
         (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
@@ -551,6 +566,8 @@ void utest_scmi_perf_describe_levels_handler_invalid_domain_id(void)
 
     mod_scmi_from_protocol_api_respond_Stub(
         describe_levels_handler_invalid_domain_id_respond_callback);
+    mod_scmi_from_protocol_api_scmi_frame_validation_ExpectAnyArgsAndReturn(
+        SCMI_SUCCESS);
 
     status = to_protocol_api->message_handler(
         (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
@@ -599,6 +616,8 @@ void utest_scmi_perf_describe_levels_handler_invalid_level_index(void)
 
     mod_scmi_from_protocol_api_respond_Stub(
         describe_levels_handler_invalid_level_index_respond_callback);
+    mod_scmi_from_protocol_api_scmi_frame_validation_ExpectAnyArgsAndReturn(
+        SCMI_SUCCESS);
 
     status = to_protocol_api->message_handler(
         (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
@@ -672,6 +691,8 @@ void utest_scmi_perf_describe_fast_channels_valid_params(void)
 
     mod_scmi_from_protocol_api_respond_Stub(
         describe_fast_channels_valid_params_respond_callback);
+    mod_scmi_from_protocol_api_scmi_frame_validation_ExpectAnyArgsAndReturn(
+        SCMI_SUCCESS);
 
     status = to_protocol_api->message_handler(
         (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
@@ -715,6 +736,8 @@ void utest_scmi_perf_describe_fast_channels_invalid_domain_id(void)
 
     mod_scmi_from_protocol_api_respond_Stub(
         describe_fast_channels_invalid_domain_id_respond_callback);
+    mod_scmi_from_protocol_api_scmi_frame_validation_ExpectAnyArgsAndReturn(
+        SCMI_SUCCESS);
 
     status = to_protocol_api->message_handler(
         (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
@@ -759,6 +782,8 @@ void utest_scmi_perf_describe_fast_channels_invalid_message_id(void)
 
     mod_scmi_from_protocol_api_respond_Stub(
         describe_fast_channels_invalid_message_id_respond_callback);
+    mod_scmi_from_protocol_api_scmi_frame_validation_ExpectAnyArgsAndReturn(
+        SCMI_SUCCESS);
 
     status = to_protocol_api->message_handler(
         (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
@@ -971,7 +996,9 @@ void utest_scmi_perf_message_handler_bad_message_id(void)
     mod_scmi_from_protocol_api_respond_Stub(
         version_handler_respond_callback_fail);
 
-    return_status = SCMI_NOT_SUPPORTED;
+    mod_scmi_from_protocol_api_scmi_frame_validation_ExpectAnyArgsAndReturn(
+        SCMI_NOT_SUPPORTED);
+
     status = scmi_perf_message_handler(
         (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
         service_id,
@@ -992,7 +1019,9 @@ void utest_scmi_perf_message_handler_not_found(void)
     mod_scmi_from_protocol_api_respond_Stub(
         version_handler_respond_callback_fail);
 
-    return_status = SCMI_NOT_FOUND;
+    mod_scmi_from_protocol_api_scmi_frame_validation_ExpectAnyArgsAndReturn(
+        SCMI_NOT_FOUND);
+
     status = scmi_perf_message_handler(
         (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
         service_id,

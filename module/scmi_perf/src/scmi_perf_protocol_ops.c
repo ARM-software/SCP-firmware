@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -85,8 +85,7 @@ static int scmi_perf_limits_notify(
 static int scmi_perf_level_notify(fwk_id_t service_id, const uint32_t *payload);
 #endif
 
-static int (
-    *handler_table[MOD_SCMI_PERF_COMMAND_COUNT])(fwk_id_t, const uint32_t *) = {
+static handler_table_t handler_table[MOD_SCMI_PERF_COMMAND_COUNT] = {
     [MOD_SCMI_PROTOCOL_VERSION] = scmi_perf_protocol_version_handler,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = scmi_perf_protocol_attributes_handler,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
@@ -106,7 +105,7 @@ static int (
 #endif
 };
 
-static unsigned int payload_size_table[MOD_SCMI_PERF_COMMAND_COUNT] = {
+static size_t payload_size_table[MOD_SCMI_PERF_COMMAND_COUNT] = {
     [MOD_SCMI_PROTOCOL_VERSION] = 0,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
@@ -215,18 +214,6 @@ static int scmi_perf_permissions_handler(
 
     status = scmi_perf_ctx->scmi_api->get_agent_id(service_id, &agent_id);
     if (status != FWK_SUCCESS) {
-        return FWK_E_ACCESS;
-    }
-
-    if (message_id < (unsigned int)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES) {
-        /*
-         * PROTOCOL_VERSION, PROTOCOL_ATTRIBUTES & PROTOCOL_MESSAGE_ATRIBUTES
-         */
-        perms = perf_prot_ctx.res_perms_api->agent_has_protocol_permission(
-            agent_id, MOD_SCMI_PROTOCOL_ID_PERF);
-        if (perms == MOD_RES_PERMS_ACCESS_ALLOWED) {
-            return FWK_SUCCESS;
-        }
         return FWK_E_ACCESS;
     }
 
@@ -990,48 +977,43 @@ static int scmi_perf_message_handler(
     size_t payload_size,
     unsigned int message_id)
 {
-    int32_t return_value;
-#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
-    int status;
-#endif
+    int validation_result;
 
     static_assert(
         FWK_ARRAY_SIZE(handler_table) == FWK_ARRAY_SIZE(payload_size_table),
         "[SCMI] Performance management protocol table sizes not consistent");
-    fwk_assert(payload != NULL);
 
-    if (message_id >= FWK_ARRAY_SIZE(handler_table)) {
-        return_value = (int32_t)SCMI_NOT_FOUND;
-        goto error;
-    }
-
-    if (handler_table[message_id] == NULL) {
-        return_value = (int32_t)SCMI_NOT_SUPPORTED;
-        goto error;
-    }
-
-    if (payload_size != payload_size_table[message_id]) {
-        return_value = (int32_t)SCMI_PROTOCOL_ERROR;
-        goto error;
-    }
+    validation_result =
+        perf_prot_ctx.scmi_perf_ctx->scmi_api->scmi_message_validation(
+            MOD_SCMI_PROTOCOL_ID_PERF,
+            service_id,
+            payload,
+            payload_size,
+            message_id,
+            payload_size_table,
+            (unsigned int)MOD_SCMI_PERF_COMMAND_COUNT,
+            handler_table);
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
-    status = scmi_perf_permissions_handler(service_id, payload, message_id);
-    if (status != FWK_SUCCESS) {
-        if (status == FWK_E_PARAM) {
-            return_value = (int32_t)SCMI_NOT_FOUND;
-        } else {
-            return_value = (int32_t)SCMI_DENIED;
+    if ((message_id >= MOD_SCMI_MESSAGE_ID_ATTRIBUTE) &&
+        (validation_result == SCMI_SUCCESS)) {
+        int status =
+            scmi_perf_permissions_handler(service_id, payload, message_id);
+        if (status != FWK_SUCCESS) {
+            if (status == FWK_E_PARAM) {
+                validation_result = (int32_t)SCMI_NOT_FOUND;
+            } else {
+                validation_result = (int32_t)SCMI_DENIED;
+            }
         }
-        goto error;
     }
 #endif
-
-    return handler_table[message_id](service_id, payload);
-
-error:
-    return perf_prot_ctx.scmi_perf_ctx->scmi_api->respond(
-        service_id, &return_value, sizeof(return_value));
+    if (validation_result == SCMI_SUCCESS) {
+        return handler_table[message_id](service_id, payload);
+    } else {
+        return perf_prot_ctx.scmi_perf_ctx->scmi_api->respond(
+            service_id, &validation_result, sizeof(validation_result));
+    }
 }
 
 static struct mod_scmi_to_protocol_api scmi_perf_mod_scmi_to_protocol_api = {

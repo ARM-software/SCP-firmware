@@ -8,8 +8,10 @@
 static const char* CMockString_agent_count = "agent_count";
 static const char* CMockString_agent_id = "agent_id";
 static const char* CMockString_agent_type = "agent_type";
+static const char* CMockString_command_count = "command_count";
 static const char* CMockString_cookie = "cookie";
 static const char* CMockString_domain_id = "domain_id";
+static const char* CMockString_handler_table = "handler_table";
 static const char* CMockString_latency = "latency";
 static const char* CMockString_level = "level";
 static const char* CMockString_level_id = "level_id";
@@ -28,6 +30,7 @@ static const char* CMockString_mod_scmi_from_protocol_api_get_max_payload_size =
 static const char* CMockString_mod_scmi_from_protocol_api_notify = "mod_scmi_from_protocol_api_notify";
 static const char* CMockString_mod_scmi_from_protocol_api_respond = "mod_scmi_from_protocol_api_respond";
 static const char* CMockString_mod_scmi_from_protocol_api_response_message_handler = "mod_scmi_from_protocol_api_response_message_handler";
+static const char* CMockString_mod_scmi_from_protocol_api_scmi_frame_validation = "mod_scmi_from_protocol_api_scmi_frame_validation";
 static const char* CMockString_mod_scmi_from_protocol_api_scmi_send_message = "mod_scmi_from_protocol_api_scmi_send_message";
 static const char* CMockString_mod_scmi_from_protocol_api_write_payload = "mod_scmi_from_protocol_api_write_payload";
 static const char* CMockString_n = "n";
@@ -36,6 +39,7 @@ static const char* CMockString_opp = "opp";
 static const char* CMockString_opp_count = "opp_count";
 static const char* CMockString_payload = "payload";
 static const char* CMockString_payload_size = "payload_size";
+static const char* CMockString_payload_size_table = "payload_size_table";
 static const char* CMockString_protocol_id = "protocol_id";
 static const char* CMockString_request_ack_by_interrupt = "request_ack_by_interrupt";
 static const char* CMockString_scmi_message_id = "scmi_message_id";
@@ -303,6 +307,33 @@ typedef struct _CMOCK_mod_dvfs_domain_api_set_level_CALL_INSTANCE
 
 } CMOCK_mod_dvfs_domain_api_set_level_CALL_INSTANCE;
 
+typedef struct _CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  int ReturnVal;
+  uint8_t Expected_protocol_id;
+  fwk_id_t Expected_service_id;
+  const uint32_t* Expected_payload;
+  size_t Expected_payload_size;
+  size_t Expected_message_id;
+  const size_t* Expected_payload_size_table;
+  size_t Expected_command_count;
+  const handler_table_t* Expected_handler_table;
+  int Expected_payload_Depth;
+  int Expected_payload_size_table_Depth;
+  int Expected_handler_table_Depth;
+  char IgnoreArg_protocol_id;
+  char IgnoreArg_service_id;
+  char IgnoreArg_payload;
+  char IgnoreArg_payload_size;
+  char IgnoreArg_message_id;
+  char IgnoreArg_payload_size_table;
+  char IgnoreArg_command_count;
+  char IgnoreArg_handler_table;
+
+} CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE;
+
 static struct Mockmod_scmi_perf_fch_extraInstance
 {
   char mod_scmi_from_protocol_api_get_agent_count_IgnoreBool;
@@ -400,6 +431,12 @@ static struct Mockmod_scmi_perf_fch_extraInstance
   CMOCK_mod_dvfs_domain_api_set_level_CALLBACK mod_dvfs_domain_api_set_level_CallbackFunctionPointer;
   int mod_dvfs_domain_api_set_level_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE mod_dvfs_domain_api_set_level_CallInstance;
+  char mod_scmi_from_protocol_api_scmi_frame_validation_IgnoreBool;
+  int mod_scmi_from_protocol_api_scmi_frame_validation_FinalReturn;
+  char mod_scmi_from_protocol_api_scmi_frame_validation_CallbackBool;
+  CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALLBACK mod_scmi_from_protocol_api_scmi_frame_validation_CallbackFunctionPointer;
+  int mod_scmi_from_protocol_api_scmi_frame_validation_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance;
 } Mock;
 
 extern jmp_buf AbortFrame;
@@ -612,6 +649,19 @@ void Mockmod_scmi_perf_fch_extra_Verify(void)
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
   if (Mock.mod_dvfs_domain_api_set_level_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance;
+  if (Mock.mod_scmi_from_protocol_api_scmi_frame_validation_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_mod_scmi_from_protocol_api_scmi_frame_validation);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallbackFunctionPointer != NULL)
   {
     call_instance = CMOCK_GUTS_NONE;
     (void)call_instance;
@@ -3306,5 +3356,250 @@ void mod_dvfs_domain_api_set_level_CMockIgnoreArg_level(UNITY_LINE_TYPE cmock_li
   CMOCK_mod_dvfs_domain_api_set_level_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_dvfs_domain_api_set_level_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mod_dvfs_domain_api_set_level_CallInstance));
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
   cmock_call_instance->IgnoreArg_level = 1;
+}
+
+int mod_scmi_from_protocol_api_scmi_frame_validation(uint8_t protocol_id, fwk_id_t service_id, const uint32_t* payload, size_t payload_size, size_t message_id, const size_t* payload_size_table, size_t command_count, const handler_table_t* handler_table)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_mod_scmi_from_protocol_api_scmi_frame_validation);
+  cmock_call_instance = (CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance);
+  Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance = CMock_Guts_MemNext(Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance);
+  if (Mock.mod_scmi_from_protocol_api_scmi_frame_validation_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.mod_scmi_from_protocol_api_scmi_frame_validation_FinalReturn;
+    Mock.mod_scmi_from_protocol_api_scmi_frame_validation_FinalReturn = cmock_call_instance->ReturnVal;
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallbackBool &&
+      Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallbackFunctionPointer != NULL)
+  {
+    int cmock_cb_ret = Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallbackFunctionPointer(protocol_id, service_id, payload, payload_size, message_id, payload_size_table, command_count, handler_table, Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  if (!cmock_call_instance->IgnoreArg_protocol_id)
+  {
+    UNITY_SET_DETAILS(CMockString_mod_scmi_from_protocol_api_scmi_frame_validation,CMockString_protocol_id);
+    UNITY_TEST_ASSERT_EQUAL_HEX8(cmock_call_instance->Expected_protocol_id, protocol_id, cmock_line, CMockStringMismatch);
+  }
+  if (!cmock_call_instance->IgnoreArg_service_id)
+  {
+    UNITY_SET_DETAILS(CMockString_mod_scmi_from_protocol_api_scmi_frame_validation,CMockString_service_id);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_service_id), (void*)(&service_id), sizeof(fwk_id_t), cmock_line, CMockStringMismatch);
+  }
+  if (!cmock_call_instance->IgnoreArg_payload)
+  {
+    UNITY_SET_DETAILS(CMockString_mod_scmi_from_protocol_api_scmi_frame_validation,CMockString_payload);
+    if (cmock_call_instance->Expected_payload == NULL)
+      { UNITY_TEST_ASSERT_NULL(payload, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_HEX32_ARRAY(cmock_call_instance->Expected_payload, payload, cmock_call_instance->Expected_payload_Depth, cmock_line, CMockStringMismatch); }
+  }
+  if (!cmock_call_instance->IgnoreArg_payload_size)
+  {
+    UNITY_SET_DETAILS(CMockString_mod_scmi_from_protocol_api_scmi_frame_validation,CMockString_payload_size);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_payload_size), (void*)(&payload_size), sizeof(size_t), cmock_line, CMockStringMismatch);
+  }
+  if (!cmock_call_instance->IgnoreArg_message_id)
+  {
+    UNITY_SET_DETAILS(CMockString_mod_scmi_from_protocol_api_scmi_frame_validation,CMockString_message_id);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_message_id), (void*)(&message_id), sizeof(size_t), cmock_line, CMockStringMismatch);
+  }
+  if (!cmock_call_instance->IgnoreArg_payload_size_table)
+  {
+    UNITY_SET_DETAILS(CMockString_mod_scmi_from_protocol_api_scmi_frame_validation,CMockString_payload_size_table);
+    if (cmock_call_instance->Expected_payload_size_table == NULL)
+      { UNITY_TEST_ASSERT_NULL(payload_size_table, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_payload_size_table), (void*)(payload_size_table), sizeof(const size_t), cmock_call_instance->Expected_payload_size_table_Depth, cmock_line, CMockStringMismatch); }
+  }
+  if (!cmock_call_instance->IgnoreArg_command_count)
+  {
+    UNITY_SET_DETAILS(CMockString_mod_scmi_from_protocol_api_scmi_frame_validation,CMockString_command_count);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_command_count), (void*)(&command_count), sizeof(size_t), cmock_line, CMockStringMismatch);
+  }
+  if (!cmock_call_instance->IgnoreArg_handler_table)
+  {
+    UNITY_SET_DETAILS(CMockString_mod_scmi_from_protocol_api_scmi_frame_validation,CMockString_handler_table);
+    if (cmock_call_instance->Expected_handler_table == NULL)
+      { UNITY_TEST_ASSERT_NULL(handler_table, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_handler_table), (void*)(handler_table), sizeof(const handler_table_t), cmock_call_instance->Expected_handler_table_Depth, cmock_line, CMockStringMismatch); }
+  }
+  }
+  if (Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallbackFunctionPointer(protocol_id, service_id, payload, payload_size, message_id, payload_size_table, command_count, handler_table, Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallbackCalls++);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_mod_scmi_from_protocol_api_scmi_frame_validation(CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE* cmock_call_instance, uint8_t protocol_id, fwk_id_t service_id, const uint32_t* payload, int payload_Depth, size_t payload_size, size_t message_id, const size_t* payload_size_table, int payload_size_table_Depth, size_t command_count, const handler_table_t* handler_table, int handler_table_Depth);
+void CMockExpectParameters_mod_scmi_from_protocol_api_scmi_frame_validation(CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE* cmock_call_instance, uint8_t protocol_id, fwk_id_t service_id, const uint32_t* payload, int payload_Depth, size_t payload_size, size_t message_id, const size_t* payload_size_table, int payload_size_table_Depth, size_t command_count, const handler_table_t* handler_table, int handler_table_Depth)
+{
+  cmock_call_instance->Expected_protocol_id = protocol_id;
+  cmock_call_instance->IgnoreArg_protocol_id = 0;
+  memcpy((void*)(&cmock_call_instance->Expected_service_id), (void*)(&service_id),
+         sizeof(fwk_id_t[sizeof(service_id) == sizeof(fwk_id_t) ? 1 : -1])); /* add fwk_id_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_service_id = 0;
+  cmock_call_instance->Expected_payload = payload;
+  cmock_call_instance->Expected_payload_Depth = payload_Depth;
+  cmock_call_instance->IgnoreArg_payload = 0;
+  memcpy((void*)(&cmock_call_instance->Expected_payload_size), (void*)(&payload_size),
+         sizeof(size_t[sizeof(payload_size) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_payload_size = 0;
+  memcpy((void*)(&cmock_call_instance->Expected_message_id), (void*)(&message_id),
+         sizeof(size_t[sizeof(message_id) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_message_id = 0;
+  cmock_call_instance->Expected_payload_size_table = payload_size_table;
+  cmock_call_instance->Expected_payload_size_table_Depth = payload_size_table_Depth;
+  cmock_call_instance->IgnoreArg_payload_size_table = 0;
+  memcpy((void*)(&cmock_call_instance->Expected_command_count), (void*)(&command_count),
+         sizeof(size_t[sizeof(command_count) == sizeof(size_t) ? 1 : -1])); /* add size_t to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_command_count = 0;
+  cmock_call_instance->Expected_handler_table = handler_table;
+  cmock_call_instance->Expected_handler_table_Depth = handler_table_Depth;
+  cmock_call_instance->IgnoreArg_handler_table = 0;
+}
+
+void mod_scmi_from_protocol_api_scmi_frame_validation_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE));
+  CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance = CMock_Guts_MemChain(Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance, cmock_guts_index);
+  Mock.mod_scmi_from_protocol_api_scmi_frame_validation_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.mod_scmi_from_protocol_api_scmi_frame_validation_IgnoreBool = (char)1;
+}
+
+void mod_scmi_from_protocol_api_scmi_frame_validation_CMockStopIgnore(void)
+{
+  if(Mock.mod_scmi_from_protocol_api_scmi_frame_validation_IgnoreBool)
+    Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance = CMock_Guts_MemNext(Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance);
+  Mock.mod_scmi_from_protocol_api_scmi_frame_validation_IgnoreBool = (char)0;
+}
+
+void mod_scmi_from_protocol_api_scmi_frame_validation_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE));
+  CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance = CMock_Guts_MemChain(Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance, cmock_guts_index);
+  Mock.mod_scmi_from_protocol_api_scmi_frame_validation_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void mod_scmi_from_protocol_api_scmi_frame_validation_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, uint8_t protocol_id, fwk_id_t service_id, const uint32_t* payload, size_t payload_size, size_t message_id, const size_t* payload_size_table, size_t command_count, const handler_table_t* handler_table, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE));
+  CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance = CMock_Guts_MemChain(Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance, cmock_guts_index);
+  Mock.mod_scmi_from_protocol_api_scmi_frame_validation_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_mod_scmi_from_protocol_api_scmi_frame_validation(cmock_call_instance, protocol_id, service_id, payload, payload_size, payload_size, message_id, payload_size_table, 1, command_count, handler_table, 1);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void mod_scmi_from_protocol_api_scmi_frame_validation_AddCallback(CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALLBACK Callback)
+{
+  Mock.mod_scmi_from_protocol_api_scmi_frame_validation_IgnoreBool = (char)0;
+  Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallbackBool = (char)1;
+  Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallbackFunctionPointer = Callback;
+}
+
+void mod_scmi_from_protocol_api_scmi_frame_validation_Stub(CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALLBACK Callback)
+{
+  Mock.mod_scmi_from_protocol_api_scmi_frame_validation_IgnoreBool = (char)0;
+  Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallbackBool = (char)0;
+  Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallbackFunctionPointer = Callback;
+}
+
+void mod_scmi_from_protocol_api_scmi_frame_validation_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, uint8_t protocol_id, fwk_id_t service_id, const uint32_t* payload, int payload_Depth, size_t payload_size, size_t message_id, const size_t* payload_size_table, int payload_size_table_Depth, size_t command_count, const handler_table_t* handler_table, int handler_table_Depth, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE));
+  CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance = CMock_Guts_MemChain(Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance, cmock_guts_index);
+  Mock.mod_scmi_from_protocol_api_scmi_frame_validation_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_mod_scmi_from_protocol_api_scmi_frame_validation(cmock_call_instance, protocol_id, service_id, payload, payload_Depth, payload_size, message_id, payload_size_table, payload_size_table_Depth, command_count, handler_table, handler_table_Depth);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void mod_scmi_from_protocol_api_scmi_frame_validation_CMockIgnoreArg_protocol_id(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_protocol_id = 1;
+}
+
+void mod_scmi_from_protocol_api_scmi_frame_validation_CMockIgnoreArg_service_id(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_service_id = 1;
+}
+
+void mod_scmi_from_protocol_api_scmi_frame_validation_CMockIgnoreArg_payload(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_payload = 1;
+}
+
+void mod_scmi_from_protocol_api_scmi_frame_validation_CMockIgnoreArg_payload_size(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_payload_size = 1;
+}
+
+void mod_scmi_from_protocol_api_scmi_frame_validation_CMockIgnoreArg_message_id(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_message_id = 1;
+}
+
+void mod_scmi_from_protocol_api_scmi_frame_validation_CMockIgnoreArg_payload_size_table(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_payload_size_table = 1;
+}
+
+void mod_scmi_from_protocol_api_scmi_frame_validation_CMockIgnoreArg_command_count(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_command_count = 1;
+}
+
+void mod_scmi_from_protocol_api_scmi_frame_validation_CMockIgnoreArg_handler_table(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE* cmock_call_instance = (CMOCK_mod_scmi_from_protocol_api_scmi_frame_validation_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mod_scmi_from_protocol_api_scmi_frame_validation_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_handler_table = 1;
 }
 
