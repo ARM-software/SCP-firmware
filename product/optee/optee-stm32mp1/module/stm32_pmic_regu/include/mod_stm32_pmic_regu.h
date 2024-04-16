@@ -11,7 +11,7 @@
 #include <fwk_element.h>
 #include <fwk_macros.h>
 
-#include <stdint.h>
+#include <stdbool.h>
 
 /*!
  * \brief Platform regulator configuration.
