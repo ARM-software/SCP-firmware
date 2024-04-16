@@ -83,6 +83,7 @@ endif
 endif
 
 cflags-lib-$(CFG_SCPFW_MOD_$4) += -DBUILD_HAS_MOD_$4
+scpfw-cmake-flags-y += -DCFG_SCPFW_MOD_$4=$(CFG_SCPFW_MOD_$4)
 endef
 
 define scpfw-embed-generic-module
