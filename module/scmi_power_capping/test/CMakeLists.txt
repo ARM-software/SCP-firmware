@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -111,7 +111,6 @@ target_sources(${UNIT_TEST_TARGET}
         ${MODULE_UT_MOCK_SRC}/Mockmod_power_coordinator_extra.c
         ${MODULE_UT_MOCK_SRC}/Mockmod_power_meter_extra.c
         ${MODULE_UT_MOCK_SRC}/Mockmod_resource_perms_extra.c)
-
 
 ################################################################################
 # Test scmi_power_capping_protocol.c + notifications                           #
