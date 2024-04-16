@@ -12,6 +12,10 @@
 #ifndef MOD_OPTEE_MBX_H
 #define MOD_OPTEE_MBX_H
 
+#include <fwk_id.h>
+
+#include <stddef.h>
+
 /*!
  * \brief Channel config.
  */

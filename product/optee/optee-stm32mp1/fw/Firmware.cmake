@@ -39,7 +39,12 @@ list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../module/stm32_pwr_reg
 # any change in the order will cause firmware initialization errors.
 
 list(APPEND SCP_MODULES "optee-mbx")
+if(CFG_SCPFW_MOD_OPTEE_SMT)
 list(APPEND SCP_MODULES "optee-smt")
+endif(CFG_SCPFW_MOD_OPTEE_SMT)
+if(CFG_SCPFW_MOD_MSG_SMT)
+list(APPEND SCP_MODULES "msg-smt")
+endif(CFG_SCPFW_MOD_MSG_SMT)
 list(APPEND SCP_MODULES "scmi")
 list(APPEND SCP_MODULES "optee-clock")
 list(APPEND SCP_MODULES "clock")
