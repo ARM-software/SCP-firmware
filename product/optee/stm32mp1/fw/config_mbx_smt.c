@@ -22,10 +22,10 @@
 #include <stdint.h>
 
 #if defined(CFG_SCPFW_MOD_OPTEE_SMT)
-#define OSPM0_SMT_MAILBOX_PA   0x2ffff000
-#define OSPM0_SMT_MAILBOX_SIZE SCMI_SHMEM_SIZE
+#    define OSPM0_SMT_MAILBOX_PA   0x2ffff000
+#    define OSPM0_SMT_MAILBOX_SIZE SCMI_SHMEM_SIZE
 #elif !defined(CFG_SCPFW_MOD_MSG_SMT)
-#error None of CFG_SCPFW_MOD_OPTEE_SMT and CFG_SCPFW_MOD_MSG_SMT is defined.
+#    error None of CFG_SCPFW_MOD_OPTEE_SMT and CFG_SCPFW_MOD_MSG_SMT is defined.
 #endif
 
 static const struct fwk_element mbx_element_table[] = {

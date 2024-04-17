@@ -33,7 +33,7 @@ static const struct fwk_element service_table[] = {
             .transport_api_id = FWK_ID_API_INIT(FWK_MODULE_IDX_MSG_SMT,
                                                 MOD_MSG_SMT_API_IDX_SCMI_TRANSPORT),
 #else
-#error None of CFG_SCPFW_MOD_OPTEE_SMT and CFG_SCPFW_MOD_MSG_SMT is defined.
+#    error None of CFG_SCPFW_MOD_OPTEE_SMT and CFG_SCPFW_MOD_MSG_SMT is defined.
 #endif
             .scmi_agent_id = SCMI_AGENT_ID_NSEC0,
             .scmi_p2a_id = FWK_ID_NONE_INIT,
