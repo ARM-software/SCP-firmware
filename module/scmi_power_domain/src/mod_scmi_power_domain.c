@@ -155,9 +155,7 @@ static const fwk_id_t mod_scmi_pd_event_id_set_request = FWK_ID_EVENT_INIT(
 
 static struct mod_scmi_pd_ctx scmi_pd_ctx;
 
-static int (*handler_table[MOD_SCMI_PD_POWER_COMMAND_COUNT])(
-    fwk_id_t,
-    const uint32_t *) = {
+static handler_table_t handler_table[MOD_SCMI_PD_POWER_COMMAND_COUNT] = {
     [MOD_SCMI_PROTOCOL_VERSION] = scmi_pd_protocol_version_handler,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = scmi_pd_protocol_attributes_handler,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
@@ -175,7 +173,7 @@ static int (*handler_table[MOD_SCMI_PD_POWER_COMMAND_COUNT])(
 #endif
 };
 
-static unsigned int payload_size_table[MOD_SCMI_PD_POWER_COMMAND_COUNT] = {
+static size_t payload_size_table[MOD_SCMI_PD_POWER_COMMAND_COUNT] = {
     [MOD_SCMI_PROTOCOL_VERSION] = 0,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
@@ -923,8 +921,7 @@ static int scmi_pd_permissions_handler(
     fwk_id_t service_id,
     const uint32_t *payload,
     size_t payload_size,
-    unsigned int message_id,
-    int32_t *return_values)
+    unsigned int message_id)
 {
     enum mod_res_perms_permissions perms;
     unsigned int agent_id, domain_id;
@@ -934,46 +931,32 @@ static int scmi_pd_permissions_handler(
 
     status = scmi_pd_ctx.scmi_api->get_agent_id(service_id, &agent_id);
     if (status != FWK_SUCCESS) {
-        *return_values = (int32_t)SCMI_GENERIC_ERROR;
-        return FWK_E_PARAM;
-    }
-
-    if (message_id < 3) {
-        perms = scmi_pd_ctx.res_perms_api->agent_has_protocol_permission(
-            agent_id, MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN);
-        if (perms == MOD_RES_PERMS_ACCESS_ALLOWED) {
-            return FWK_SUCCESS;
-        }
-        return FWK_E_ACCESS;
+        return (int32_t)SCMI_GENERIC_ERROR;
     }
 
     domain_id = get_pd_domain_id(payload, message_id);
     if (domain_id > UINT16_MAX) {
-        *return_values = (int32_t)SCMI_NOT_FOUND;
-        return FWK_E_ACCESS;
+        return (int32_t)SCMI_NOT_FOUND;
     }
 
     pd_id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, domain_id);
     if (!fwk_module_is_valid_element_id(pd_id)) {
-        *return_values = (int32_t)SCMI_NOT_FOUND;
-        return FWK_E_ACCESS;
+        return (int32_t)SCMI_NOT_FOUND;
     }
 
     status = scmi_pd_ctx.pd_api->get_domain_type(pd_id, &pd_type);
     if (status != FWK_SUCCESS) {
-        *return_values = (int32_t)SCMI_GENERIC_ERROR;
-        return FWK_E_ACCESS;
+        return (int32_t)SCMI_GENERIC_ERROR;
     }
 
     perms = scmi_pd_ctx.res_perms_api->agent_has_resource_permission(
         agent_id, MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN, message_id, domain_id);
 
     if (perms == MOD_RES_PERMS_ACCESS_ALLOWED) {
-        return FWK_SUCCESS;
+        return (int32_t)SCMI_SUCCESS;
     }
 
-    *return_values = (int32_t)SCMI_DENIED;
-    return FWK_E_ACCESS;
+    return (int32_t)SCMI_DENIED;
 }
 
 #endif
@@ -992,39 +975,36 @@ static int scmi_pd_get_scmi_protocol_id(fwk_id_t protocol_id,
 static int scmi_pd_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     const uint32_t *payload, size_t payload_size, unsigned int message_id)
 {
-    int32_t return_value;
-#ifdef BUILD_HAS_MOD_RESOURCE_PERMS
-    int status;
-#endif
+    int validation_result;
 
     static_assert(FWK_ARRAY_SIZE(handler_table) ==
         FWK_ARRAY_SIZE(payload_size_table),
         "[SCMI] Power domain management protocol table sizes not consistent");
-    fwk_assert(payload != NULL);
 
-    if (message_id >= FWK_ARRAY_SIZE(handler_table)) {
-        return_value = (int32_t)SCMI_NOT_FOUND;
-        goto error;
-    }
-
-    if (payload_size != payload_size_table[message_id]) {
-        return_value = (int32_t)SCMI_PROTOCOL_ERROR;
-        goto error;
-    }
+    validation_result = scmi_pd_ctx.scmi_api->scmi_message_validation(
+        MOD_SCMI_PROTOCOL_ID_POWER_DOMAIN,
+        service_id,
+        payload,
+        payload_size,
+        message_id,
+        payload_size_table,
+        (unsigned int)MOD_SCMI_PD_POWER_COMMAND_COUNT,
+        handler_table);
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
-    status = scmi_pd_permissions_handler(
-        service_id, payload, payload_size, message_id, &return_value);
-    if (status != FWK_SUCCESS) {
-        goto error;
+    if ((message_id >= MOD_SCMI_MESSAGE_ID_ATTRIBUTE) &&
+        (validation_result == SCMI_SUCCESS)) {
+        validation_result = scmi_pd_permissions_handler(
+            service_id, payload, payload_size, message_id);
     }
 #endif
 
-    return handler_table[message_id](service_id, payload);
+    if (validation_result == SCMI_SUCCESS) {
+        return handler_table[message_id](service_id, payload);
+    }
 
-error:
     return scmi_pd_ctx.scmi_api->respond(
-        service_id, &return_value, sizeof(return_value));
+        service_id, &validation_result, sizeof(validation_result));
 }
 
 static struct mod_scmi_to_protocol_api scmi_pd_mod_scmi_to_protocol_api = {
