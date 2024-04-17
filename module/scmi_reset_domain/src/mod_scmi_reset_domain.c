@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -81,11 +81,11 @@ static int reset_notify_handler(fwk_id_t service_id,
 
 static struct scmi_rd_ctx scmi_rd_ctx;
 
-static int (*msg_handler_table[])(fwk_id_t, const uint32_t *) = {
+static handler_table_t msg_handler_table[] = {
     [MOD_SCMI_PROTOCOL_VERSION] = protocol_version_handler,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = protocol_attributes_handler,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
-         protocol_message_attributes_handler,
+        protocol_message_attributes_handler,
     [MOD_SCMI_RESET_DOMAIN_ATTRIBUTES] = reset_attributes_handler,
     [MOD_SCMI_RESET_REQUEST] = reset_request_handler,
 #ifdef BUILD_HAS_SCMI_NOTIFICATIONS
@@ -93,7 +93,7 @@ static int (*msg_handler_table[])(fwk_id_t, const uint32_t *) = {
 #endif
 };
 
-static unsigned int payload_size_table[] = {
+static size_t payload_size_table[] = {
     [MOD_SCMI_PROTOCOL_VERSION] = 0,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
@@ -535,14 +535,6 @@ static int scmi_reset_domain_permissions_handler(
     if (status != FWK_SUCCESS)
         return FWK_E_ACCESS;
 
-    if (message_id < 3) {
-        perms = scmi_rd_ctx.res_perms_api->agent_has_protocol_permission(
-            agent_id, MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN);
-        if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
-            return FWK_SUCCESS;
-        return FWK_E_ACCESS;
-    }
-
     domain_id = get_reset_domain_id(payload);
 
     perms = scmi_rd_ctx.res_perms_api->agent_has_resource_permission(
@@ -572,37 +564,37 @@ static int scmi_reset_message_handler(fwk_id_t protocol_id,
                                       size_t payload_size,
                                       unsigned int message_id)
 {
-    int32_t return_value;
+    int validation_result;
 
     static_assert(FWK_ARRAY_SIZE(msg_handler_table) ==
                   FWK_ARRAY_SIZE(payload_size_table),
                   "[SCMI] reset domain protocol table sizes not consistent");
 
-    fwk_assert(payload != NULL);
-
-    if (message_id >= FWK_ARRAY_SIZE(msg_handler_table)) {
-        return_value = (int32_t)SCMI_NOT_FOUND;
-        goto error;
-    }
-
-    if (payload_size != payload_size_table[message_id]) {
-        return_value = (int32_t)SCMI_PROTOCOL_ERROR;
-        goto error;
-    }
+    validation_result = scmi_rd_ctx.scmi_api->scmi_message_validation(
+        MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN,
+        service_id,
+        payload,
+        payload_size,
+        message_id,
+        payload_size_table,
+        (unsigned int)MOD_SCMI_RESET_COMMAND_COUNT,
+        msg_handler_table);
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
-    if (scmi_reset_domain_permissions_handler(
-            service_id, payload, payload_size, message_id) != FWK_SUCCESS) {
-        return_value = SCMI_DENIED;
-        goto error;
+    if (message_id >= MOD_SCMI_MESSAGE_ID_ATTRIBUTE) {
+        if (scmi_reset_domain_permissions_handler(
+                service_id, payload, payload_size, message_id) != FWK_SUCCESS) {
+            validation_result = SCMI_DENIED;
+        }
     }
 #endif
 
-    return msg_handler_table[message_id](service_id, payload);
+    if (validation_result != SCMI_SUCCESS) {
+        return scmi_rd_ctx.scmi_api->respond(
+            service_id, &validation_result, sizeof(validation_result));
+    }
 
-error:
-    return scmi_rd_ctx.scmi_api->respond(
-        service_id, &return_value, sizeof(return_value));
+    return msg_handler_table[message_id](service_id, payload);
 }
 
 static struct mod_scmi_to_protocol_api scmi_reset_mod_scmi_to_protocol_api = {
