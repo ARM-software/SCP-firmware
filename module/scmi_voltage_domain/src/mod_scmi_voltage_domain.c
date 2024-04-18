@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -95,7 +95,7 @@ static int scmi_voltd_describe_levels_handler(fwk_id_t service_id,
  */
 static struct scmi_voltd_ctx scmi_voltd_ctx;
 
-static int (*const handler_table[])(fwk_id_t, const uint32_t *) = {
+static handler_table_t handler_table[] = {
     [MOD_SCMI_PROTOCOL_VERSION] = scmi_voltd_protocol_version_handler,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = scmi_voltd_protocol_attributes_handler,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
@@ -108,12 +108,13 @@ static int (*const handler_table[])(fwk_id_t, const uint32_t *) = {
     [MOD_SCMI_VOLTD_DESCRIBE_LEVELS] = scmi_voltd_describe_levels_handler,
 };
 
-static const unsigned int payload_size_table[] = {
+static const size_t payload_size_table[] = {
     [MOD_SCMI_PROTOCOL_VERSION] = 0,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
         sizeof(struct scmi_protocol_message_attributes_a2p),
-    [MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES] = sizeof(struct scmi_voltd_attributes_a2p),
+    [MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES] =
+        sizeof(struct scmi_voltd_attributes_a2p),
     [MOD_SCMI_VOLTD_CONFIG_GET] = sizeof(struct scmi_voltd_config_get_a2p),
     [MOD_SCMI_VOLTD_CONFIG_SET] = sizeof(struct scmi_voltd_config_set_a2p),
     [MOD_SCMI_VOLTD_LEVEL_GET] = sizeof(struct scmi_voltd_level_get_a2p),
@@ -201,13 +202,11 @@ static int scmi_voltd_permissions_handler(
     if (status != FWK_SUCCESS)
         return FWK_E_ACCESS;
 
-    if (message_id < 3)
-        perms = scmi_voltd_ctx.res_perms_api->agent_has_protocol_permission(
-            agent_id, MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN);
-    else
-        perms = scmi_voltd_ctx.res_perms_api->agent_has_resource_permission(
-            agent_id, MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN, message_id,
-            get_domain_id(payload));
+    perms = scmi_voltd_ctx.res_perms_api->agent_has_resource_permission(
+        agent_id,
+        MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN,
+        message_id,
+        get_domain_id(payload));
 
     if (perms == MOD_RES_PERMS_ACCESS_ALLOWED)
         return FWK_SUCCESS;
@@ -661,36 +660,38 @@ static int scmi_voltd_get_scmi_protocol_id(fwk_id_t protocol_id,
 static int scmi_voltd_message_handler(fwk_id_t protocol_id, fwk_id_t service_id,
     const uint32_t *payload, size_t payload_size, unsigned int message_id)
 {
-    int32_t outmsg;
+    int validation_result;
 
     static_assert(FWK_ARRAY_SIZE(handler_table) ==
         FWK_ARRAY_SIZE(payload_size_table),
         "[SCMI] Inconsistent voltage domain management protocol table sizes");
-    fwk_assert(payload != NULL);
 
-    if (message_id >= FWK_ARRAY_SIZE(handler_table)) {
-        outmsg = SCMI_NOT_FOUND;
-        goto error;
-    }
-
-    if (payload_size != payload_size_table[message_id]) {
-        outmsg = SCMI_PROTOCOL_ERROR;
-        goto error;
-    }
+    validation_result = scmi_voltd_ctx.scmi_api->scmi_message_validation(
+        MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN,
+        service_id,
+        payload,
+        payload_size,
+        message_id,
+        payload_size_table,
+        (unsigned int)MOD_SCMI_VOLTD_COMMAND_COUNT,
+        handler_table);
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
-    if (scmi_voltd_permissions_handler(service_id, payload, payload_size,
-                                       message_id) != FWK_SUCCESS) {
-        outmsg = SCMI_DENIED;
-        goto error;
+    if ((message_id >= MOD_SCMI_MESSAGE_ID_ATTRIBUTE) &&
+        (validation_result == SCMI_SUCCESS)) {
+        if (scmi_voltd_permissions_handler(
+                service_id, payload, payload_size, message_id) != FWK_SUCCESS) {
+            validation_result = SCMI_DENIED;
+        }
     }
 #endif
 
-    return handler_table[message_id](service_id, payload);
+    if (validation_result == SCMI_SUCCESS) {
+        return handler_table[message_id](service_id, payload);
+    }
 
-error:
     return scmi_voltd_ctx.scmi_api->respond(
-        service_id, &outmsg, sizeof(outmsg));
+        service_id, &validation_result, sizeof(validation_result));
 }
 
 static struct mod_scmi_to_protocol_api scmi_voltd_mod_scmi_to_protocol_api = {
