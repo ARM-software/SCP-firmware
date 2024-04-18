@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -110,9 +110,7 @@ static const fwk_id_t mod_scmi_sensor_event_id_get_request =
  */
 static struct mod_scmi_sensor_ctx scmi_sensor_ctx;
 
-static int (*handler_table[MOD_SCMI_SENSOR_COMMAND_COUNT])(
-    fwk_id_t,
-    const uint32_t *) = {
+static handler_table_t handler_table[MOD_SCMI_SENSOR_COMMAND_COUNT] = {
     [MOD_SCMI_PROTOCOL_VERSION] = scmi_sensor_protocol_version_handler,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = scmi_sensor_protocol_attributes_handler,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
@@ -128,7 +126,7 @@ static int (*handler_table[MOD_SCMI_SENSOR_COMMAND_COUNT])(
     [MOD_SCMI_SENSOR_READING_GET] = scmi_sensor_reading_get_handler
 };
 
-static unsigned int payload_size_table[MOD_SCMI_SENSOR_COMMAND_COUNT] = {
+static size_t payload_size_table[MOD_SCMI_SENSOR_COMMAND_COUNT] = {
     [MOD_SCMI_PROTOCOL_VERSION] = 0,
     [MOD_SCMI_PROTOCOL_ATTRIBUTES] = 0,
     [MOD_SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] =
@@ -897,15 +895,6 @@ static int scmi_sensor_permissions_handler(
         return FWK_E_ACCESS;
     }
 
-    if (message_id < 3) {
-        perms = scmi_sensor_ctx.res_perms_api->agent_has_protocol_permission(
-            agent_id, MOD_SCMI_PROTOCOL_ID_SENSOR);
-        if (perms == MOD_RES_PERMS_ACCESS_ALLOWED) {
-            return FWK_SUCCESS;
-        }
-        return FWK_E_ACCESS;
-    }
-
     sensor_id = get_sensor_id(payload);
     if (sensor_id >= scmi_sensor_ctx.sensor_count) {
         return FWK_E_PARAM;
@@ -928,7 +917,7 @@ static int scmi_sensor_message_handler(fwk_id_t protocol_id,
                                        size_t payload_size,
                                        unsigned int message_id)
 {
-    int32_t return_value;
+    int validation_result;
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
     int status;
 #endif
@@ -936,39 +925,40 @@ static int scmi_sensor_message_handler(fwk_id_t protocol_id,
     static_assert(FWK_ARRAY_SIZE(handler_table) ==
         FWK_ARRAY_SIZE(payload_size_table),
         "[SCMI] Sensor management protocol table sizes not consistent");
-    fwk_assert(payload != NULL);
 
-    if (message_id >= FWK_ARRAY_SIZE(handler_table)) {
-        return_value = (int32_t)SCMI_NOT_FOUND;
-        goto error;
-    }
-
-    if (payload_size != payload_size_table[message_id]) {
-        /* Incorrect payload size or message is not supported */
-        return_value = (int32_t)SCMI_PROTOCOL_ERROR;
-        goto error;
-    }
+    validation_result = scmi_sensor_ctx.scmi_api->scmi_message_validation(
+        MOD_SCMI_PROTOCOL_ID_SENSOR,
+        service_id,
+        payload,
+        payload_size,
+        message_id,
+        payload_size_table,
+        (unsigned int)MOD_SCMI_SENSOR_COMMAND_COUNT,
+        handler_table);
 
 #ifdef BUILD_HAS_MOD_RESOURCE_PERMS
-    status = scmi_sensor_permissions_handler(
-        service_id, payload, payload_size, message_id);
-    if (status != FWK_SUCCESS) {
-        if (status == FWK_E_ACCESS) {
-            return_value = (int32_t)SCMI_DENIED;
-        } else if (message_id == MOD_SCMI_SENSOR_DESCRIPTION_GET) {
-            return_value = (int32_t)SCMI_INVALID_PARAMETERS;
-        } else {
-            return_value = (int32_t)SCMI_NOT_FOUND;
+    if ((message_id >= MOD_SCMI_MESSAGE_ID_ATTRIBUTE) &&
+        (validation_result == SCMI_SUCCESS)) {
+        status = scmi_sensor_permissions_handler(
+            service_id, payload, payload_size, message_id);
+        if (status != FWK_SUCCESS) {
+            if (status == FWK_E_ACCESS) {
+                validation_result = (int)SCMI_DENIED;
+            } else if (message_id == MOD_SCMI_SENSOR_DESCRIPTION_GET) {
+                validation_result = (int)SCMI_INVALID_PARAMETERS;
+            } else {
+                validation_result = (int)SCMI_NOT_FOUND;
+            }
         }
-        goto error;
     }
 #endif
 
-    return handler_table[message_id](service_id, payload);
+    if (validation_result == SCMI_SUCCESS) {
+        return handler_table[message_id](service_id, payload);
+    }
 
-error:
     return scmi_sensor_ctx.scmi_api->respond(
-        service_id, &return_value, sizeof(return_value));
+        service_id, &validation_result, sizeof(validation_result));
 }
 
 static struct mod_scmi_to_protocol_api scmi_sensor_mod_scmi_to_protocol_api = {
