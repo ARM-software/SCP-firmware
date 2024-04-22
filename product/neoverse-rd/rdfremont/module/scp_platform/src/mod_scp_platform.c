@@ -120,7 +120,7 @@ static int scp_platform_start(fwk_id_t id)
 {
     int status;
     const struct mod_system_info *system_info;
-    struct fwk_event event;
+    struct fwk_event event = { 0 };
     unsigned int event_count;
 
     /* Notify RSS that SYSTOP is powered up and wait for RSS doorbell */
