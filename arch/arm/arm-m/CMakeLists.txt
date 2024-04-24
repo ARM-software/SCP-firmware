@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -12,7 +12,7 @@ add_library(arch-arm-m)
 # the used CPU
 #
 
-if((CMAKE_SYSTEM_PROCESSOR MATCHES "cortex-m(33|55)")
+if((CMAKE_SYSTEM_PROCESSOR MATCHES "cortex-m(33|55|85)")
                            OR (CMAKE_SYSTEM_ARCH MATCHES "armv8(\.1)?-m"))
     target_compile_definitions(arch-arm-m PUBLIC "ARMV8M")
 elseif((CMAKE_SYSTEM_PROCESSOR MATCHES "cortex-m(0|0plus)"))

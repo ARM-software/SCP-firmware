@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -275,7 +275,11 @@ int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
     }
 
     /* Find the number of interrupt lines implemented in hardware */
+#    ifdef ARMV7M
     ictr_intlinesnum = SCnSCB->ICTR & SCnSCB_ICTR_INTLINESNUM_Msk;
+#    else
+    ictr_intlinesnum = ICB->ICTR & ICB_ICTR_INTLINESNUM_Msk;
+#    endif
     irq_count = (ictr_intlinesnum + 1) * 32;
     isr_count = NVIC_USER_IRQ_OFFSET + irq_count;
 

@@ -182,7 +182,7 @@ if(NOT DISABLE_CPPCHECK)
         list(APPEND CMAKE_C_CPPCHECK "--error-exitcode=1")
 
         if(SCP_ARCHITECTURE STREQUAL "arm-m")
-            if(CMAKE_SYSTEM_PROCESSOR MATCHES "cortex-m(33|55)")
+            if(CMAKE_SYSTEM_PROCESSOR MATCHES "cortex-m(33|55|85)")
                 list(APPEND CMAKE_C_CPPCHECK "--library=${CMAKE_CURRENT_SOURCE_DIR}/.armv8m.cppcheck.cfg")
             elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "cortex-m(3|7)")
                 list(APPEND CMAKE_C_CPPCHECK "--library=${CMAKE_CURRENT_SOURCE_DIR}/.armv7m.cppcheck.cfg")
