@@ -158,6 +158,10 @@ static const struct fwk_element pd_element_table[PD_IDX_COUNT] = {
     },
 };
 
+static struct mod_power_domain_config mod_pd_config = {
+    .enable_system_suspend_notification = true,
+};
+
 static const struct pd_ctx pd_ctx_config[PD_IDX_COUNT] = {
     [PD_IDX_CLUS0CORE0] = {
         .id = FWK_ID_ELEMENT(FWK_MODULE_IDX_POWER_DOMAIN, PD_IDX_CLUS0CORE0),

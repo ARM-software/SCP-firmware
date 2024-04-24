@@ -5,10 +5,12 @@
 #include "cmock.h"
 #include "Mockmod_power_domain_extra.h"
 
+static const char* CMockString_check_and_notify_system_shutdown = "check_and_notify_system_shutdown";
 static const char* CMockString_child = "child";
 static const char* CMockString_child_state = "child_state";
 static const char* CMockString_composite_state = "composite_state";
 static const char* CMockString_dev_id = "dev_id";
+static const char* CMockString_event = "event";
 static const char* CMockString_get_highest_level_from_composite_state = "get_highest_level_from_composite_state";
 static const char* CMockString_get_level_state_from_composite_state = "get_level_state_from_composite_state";
 static const char* CMockString_get_state_name = "get_state_name";
@@ -26,6 +28,7 @@ static const char* CMockString_level = "level";
 static const char* CMockString_lowest_pd = "lowest_pd";
 static const char* CMockString_mask = "mask";
 static const char* CMockString_normalize_state = "normalize_state";
+static const char* CMockString_notify_warm_reset = "notify_warm_reset";
 static const char* CMockString_number_of_bits_to_shift = "number_of_bits_to_shift";
 static const char* CMockString_parent_state = "parent_state";
 static const char* CMockString_pd = "pd";
@@ -35,6 +38,8 @@ static const char* CMockString_pd_driver_prepare_core_for_system_suspend = "pd_d
 static const char* CMockString_pd_driver_reset = "pd_driver_reset";
 static const char* CMockString_pd_driver_set_state = "pd_driver_set_state";
 static const char* CMockString_pd_driver_shutdown = "pd_driver_shutdown";
+static const char* CMockString_pd_process_notification = "pd_process_notification";
+static const char* CMockString_resp = "resp";
 static const char* CMockString_retrieve_mapped_state = "retrieve_mapped_state";
 static const char* CMockString_state = "state";
 static const char* CMockString_state_to_compare_to = "state_to_compare_to";
@@ -331,6 +336,41 @@ typedef struct _CMOCK_initiate_power_state_pre_transition_notification_CALL_INST
 
 } CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE;
 
+typedef struct _CMOCK_notify_warm_reset_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  int ReturnVal;
+
+} CMOCK_notify_warm_reset_CALL_INSTANCE;
+
+typedef struct _CMOCK_check_and_notify_system_shutdown_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  bool ReturnVal;
+  enum mod_pd_system_shutdown Expected_system_shutdown;
+  char IgnoreArg_system_shutdown;
+
+} CMOCK_check_and_notify_system_shutdown_CALL_INSTANCE;
+
+typedef struct _CMOCK_pd_process_notification_CALL_INSTANCE
+{
+  UNITY_LINE_TYPE LineNumber;
+  char ExpectAnyArgsBool;
+  int ReturnVal;
+  const struct fwk_event* Expected_event;
+  struct fwk_event* Expected_resp;
+  int Expected_event_Depth;
+  int Expected_resp_Depth;
+  char ReturnThruPtr_resp_Used;
+  struct fwk_event* ReturnThruPtr_resp_Val;
+  size_t ReturnThruPtr_resp_Size;
+  char IgnoreArg_event;
+  char IgnoreArg_resp;
+
+} CMOCK_pd_process_notification_CALL_INSTANCE;
+
 static struct Mockmod_power_domain_extraInstance
 {
   char pd_driver_set_state_IgnoreBool;
@@ -465,6 +505,24 @@ static struct Mockmod_power_domain_extraInstance
   CMOCK_initiate_power_state_pre_transition_notification_CALLBACK initiate_power_state_pre_transition_notification_CallbackFunctionPointer;
   int initiate_power_state_pre_transition_notification_CallbackCalls;
   CMOCK_MEM_INDEX_TYPE initiate_power_state_pre_transition_notification_CallInstance;
+  char notify_warm_reset_IgnoreBool;
+  int notify_warm_reset_FinalReturn;
+  char notify_warm_reset_CallbackBool;
+  CMOCK_notify_warm_reset_CALLBACK notify_warm_reset_CallbackFunctionPointer;
+  int notify_warm_reset_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE notify_warm_reset_CallInstance;
+  char check_and_notify_system_shutdown_IgnoreBool;
+  bool check_and_notify_system_shutdown_FinalReturn;
+  char check_and_notify_system_shutdown_CallbackBool;
+  CMOCK_check_and_notify_system_shutdown_CALLBACK check_and_notify_system_shutdown_CallbackFunctionPointer;
+  int check_and_notify_system_shutdown_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE check_and_notify_system_shutdown_CallInstance;
+  char pd_process_notification_IgnoreBool;
+  int pd_process_notification_FinalReturn;
+  char pd_process_notification_CallbackBool;
+  CMOCK_pd_process_notification_CALLBACK pd_process_notification_CallbackFunctionPointer;
+  int pd_process_notification_CallbackCalls;
+  CMOCK_MEM_INDEX_TYPE pd_process_notification_CallInstance;
 } Mock;
 
 extern jmp_buf AbortFrame;
@@ -755,6 +813,45 @@ void Mockmod_power_domain_extra_Verify(void)
     UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
   }
   if (Mock.initiate_power_state_pre_transition_notification_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.notify_warm_reset_CallInstance;
+  if (Mock.notify_warm_reset_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_notify_warm_reset);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.notify_warm_reset_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.check_and_notify_system_shutdown_CallInstance;
+  if (Mock.check_and_notify_system_shutdown_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_check_and_notify_system_shutdown);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.check_and_notify_system_shutdown_CallbackFunctionPointer != NULL)
+  {
+    call_instance = CMOCK_GUTS_NONE;
+    (void)call_instance;
+  }
+  call_instance = Mock.pd_process_notification_CallInstance;
+  if (Mock.pd_process_notification_IgnoreBool)
+    call_instance = CMOCK_GUTS_NONE;
+  if (CMOCK_GUTS_NONE != call_instance)
+  {
+    UNITY_SET_DETAIL(CMockString_pd_process_notification);
+    UNITY_TEST_FAIL(cmock_line, CMockStringCalledLess);
+  }
+  if (Mock.pd_process_notification_CallbackFunctionPointer != NULL)
   {
     call_instance = CMOCK_GUTS_NONE;
     (void)call_instance;
@@ -3947,5 +4044,372 @@ void initiate_power_state_pre_transition_notification_CMockIgnoreArg_pd(UNITY_LI
   CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE* cmock_call_instance = (CMOCK_initiate_power_state_pre_transition_notification_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.initiate_power_state_pre_transition_notification_CallInstance));
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
   cmock_call_instance->IgnoreArg_pd = 1;
+}
+
+int notify_warm_reset(void)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_notify_warm_reset_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_notify_warm_reset);
+  cmock_call_instance = (CMOCK_notify_warm_reset_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.notify_warm_reset_CallInstance);
+  Mock.notify_warm_reset_CallInstance = CMock_Guts_MemNext(Mock.notify_warm_reset_CallInstance);
+  if (Mock.notify_warm_reset_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.notify_warm_reset_FinalReturn;
+    Mock.notify_warm_reset_FinalReturn = cmock_call_instance->ReturnVal;
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.notify_warm_reset_CallbackBool &&
+      Mock.notify_warm_reset_CallbackFunctionPointer != NULL)
+  {
+    int cmock_cb_ret = Mock.notify_warm_reset_CallbackFunctionPointer(Mock.notify_warm_reset_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (Mock.notify_warm_reset_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.notify_warm_reset_CallbackFunctionPointer(Mock.notify_warm_reset_CallbackCalls++);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void notify_warm_reset_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_notify_warm_reset_CALL_INSTANCE));
+  CMOCK_notify_warm_reset_CALL_INSTANCE* cmock_call_instance = (CMOCK_notify_warm_reset_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.notify_warm_reset_CallInstance = CMock_Guts_MemChain(Mock.notify_warm_reset_CallInstance, cmock_guts_index);
+  Mock.notify_warm_reset_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.notify_warm_reset_IgnoreBool = (char)1;
+}
+
+void notify_warm_reset_CMockStopIgnore(void)
+{
+  if(Mock.notify_warm_reset_IgnoreBool)
+    Mock.notify_warm_reset_CallInstance = CMock_Guts_MemNext(Mock.notify_warm_reset_CallInstance);
+  Mock.notify_warm_reset_IgnoreBool = (char)0;
+}
+
+void notify_warm_reset_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_notify_warm_reset_CALL_INSTANCE));
+  CMOCK_notify_warm_reset_CALL_INSTANCE* cmock_call_instance = (CMOCK_notify_warm_reset_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.notify_warm_reset_CallInstance = CMock_Guts_MemChain(Mock.notify_warm_reset_CallInstance, cmock_guts_index);
+  Mock.notify_warm_reset_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void notify_warm_reset_AddCallback(CMOCK_notify_warm_reset_CALLBACK Callback)
+{
+  Mock.notify_warm_reset_IgnoreBool = (char)0;
+  Mock.notify_warm_reset_CallbackBool = (char)1;
+  Mock.notify_warm_reset_CallbackFunctionPointer = Callback;
+}
+
+void notify_warm_reset_Stub(CMOCK_notify_warm_reset_CALLBACK Callback)
+{
+  Mock.notify_warm_reset_IgnoreBool = (char)0;
+  Mock.notify_warm_reset_CallbackBool = (char)0;
+  Mock.notify_warm_reset_CallbackFunctionPointer = Callback;
+}
+
+bool check_and_notify_system_shutdown(enum mod_pd_system_shutdown system_shutdown)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_check_and_notify_system_shutdown_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_check_and_notify_system_shutdown);
+  cmock_call_instance = (CMOCK_check_and_notify_system_shutdown_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.check_and_notify_system_shutdown_CallInstance);
+  Mock.check_and_notify_system_shutdown_CallInstance = CMock_Guts_MemNext(Mock.check_and_notify_system_shutdown_CallInstance);
+  if (Mock.check_and_notify_system_shutdown_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.check_and_notify_system_shutdown_FinalReturn;
+    Mock.check_and_notify_system_shutdown_FinalReturn = cmock_call_instance->ReturnVal;
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.check_and_notify_system_shutdown_CallbackBool &&
+      Mock.check_and_notify_system_shutdown_CallbackFunctionPointer != NULL)
+  {
+    bool cmock_cb_ret = Mock.check_and_notify_system_shutdown_CallbackFunctionPointer(system_shutdown, Mock.check_and_notify_system_shutdown_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  if (!cmock_call_instance->IgnoreArg_system_shutdown)
+  {
+    UNITY_SET_DETAILS(CMockString_check_and_notify_system_shutdown,CMockString_system_shutdown);
+    UNITY_TEST_ASSERT_EQUAL_MEMORY((void*)(&cmock_call_instance->Expected_system_shutdown), (void*)(&system_shutdown), sizeof(enum mod_pd_system_shutdown), cmock_line, CMockStringMismatch);
+  }
+  }
+  if (Mock.check_and_notify_system_shutdown_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.check_and_notify_system_shutdown_CallbackFunctionPointer(system_shutdown, Mock.check_and_notify_system_shutdown_CallbackCalls++);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_check_and_notify_system_shutdown(CMOCK_check_and_notify_system_shutdown_CALL_INSTANCE* cmock_call_instance, enum mod_pd_system_shutdown system_shutdown);
+void CMockExpectParameters_check_and_notify_system_shutdown(CMOCK_check_and_notify_system_shutdown_CALL_INSTANCE* cmock_call_instance, enum mod_pd_system_shutdown system_shutdown)
+{
+  memcpy((void*)(&cmock_call_instance->Expected_system_shutdown), (void*)(&system_shutdown),
+         sizeof(enum mod_pd_system_shutdown[sizeof(system_shutdown) == sizeof(enum mod_pd_system_shutdown) ? 1 : -1])); /* add enum mod_pd_system_shutdown to :treat_as_array if this causes an error */
+  cmock_call_instance->IgnoreArg_system_shutdown = 0;
+}
+
+void check_and_notify_system_shutdown_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_check_and_notify_system_shutdown_CALL_INSTANCE));
+  CMOCK_check_and_notify_system_shutdown_CALL_INSTANCE* cmock_call_instance = (CMOCK_check_and_notify_system_shutdown_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.check_and_notify_system_shutdown_CallInstance = CMock_Guts_MemChain(Mock.check_and_notify_system_shutdown_CallInstance, cmock_guts_index);
+  Mock.check_and_notify_system_shutdown_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.check_and_notify_system_shutdown_IgnoreBool = (char)1;
+}
+
+void check_and_notify_system_shutdown_CMockStopIgnore(void)
+{
+  if(Mock.check_and_notify_system_shutdown_IgnoreBool)
+    Mock.check_and_notify_system_shutdown_CallInstance = CMock_Guts_MemNext(Mock.check_and_notify_system_shutdown_CallInstance);
+  Mock.check_and_notify_system_shutdown_IgnoreBool = (char)0;
+}
+
+void check_and_notify_system_shutdown_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_check_and_notify_system_shutdown_CALL_INSTANCE));
+  CMOCK_check_and_notify_system_shutdown_CALL_INSTANCE* cmock_call_instance = (CMOCK_check_and_notify_system_shutdown_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.check_and_notify_system_shutdown_CallInstance = CMock_Guts_MemChain(Mock.check_and_notify_system_shutdown_CallInstance, cmock_guts_index);
+  Mock.check_and_notify_system_shutdown_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void check_and_notify_system_shutdown_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, enum mod_pd_system_shutdown system_shutdown, bool cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_check_and_notify_system_shutdown_CALL_INSTANCE));
+  CMOCK_check_and_notify_system_shutdown_CALL_INSTANCE* cmock_call_instance = (CMOCK_check_and_notify_system_shutdown_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.check_and_notify_system_shutdown_CallInstance = CMock_Guts_MemChain(Mock.check_and_notify_system_shutdown_CallInstance, cmock_guts_index);
+  Mock.check_and_notify_system_shutdown_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_check_and_notify_system_shutdown(cmock_call_instance, system_shutdown);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void check_and_notify_system_shutdown_AddCallback(CMOCK_check_and_notify_system_shutdown_CALLBACK Callback)
+{
+  Mock.check_and_notify_system_shutdown_IgnoreBool = (char)0;
+  Mock.check_and_notify_system_shutdown_CallbackBool = (char)1;
+  Mock.check_and_notify_system_shutdown_CallbackFunctionPointer = Callback;
+}
+
+void check_and_notify_system_shutdown_Stub(CMOCK_check_and_notify_system_shutdown_CALLBACK Callback)
+{
+  Mock.check_and_notify_system_shutdown_IgnoreBool = (char)0;
+  Mock.check_and_notify_system_shutdown_CallbackBool = (char)0;
+  Mock.check_and_notify_system_shutdown_CallbackFunctionPointer = Callback;
+}
+
+void check_and_notify_system_shutdown_CMockIgnoreArg_system_shutdown(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_check_and_notify_system_shutdown_CALL_INSTANCE* cmock_call_instance = (CMOCK_check_and_notify_system_shutdown_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.check_and_notify_system_shutdown_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_system_shutdown = 1;
+}
+
+int pd_process_notification(const struct fwk_event* event, struct fwk_event* resp)
+{
+  UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
+  CMOCK_pd_process_notification_CALL_INSTANCE* cmock_call_instance;
+  UNITY_SET_DETAIL(CMockString_pd_process_notification);
+  cmock_call_instance = (CMOCK_pd_process_notification_CALL_INSTANCE*)CMock_Guts_GetAddressFor(Mock.pd_process_notification_CallInstance);
+  Mock.pd_process_notification_CallInstance = CMock_Guts_MemNext(Mock.pd_process_notification_CallInstance);
+  if (Mock.pd_process_notification_IgnoreBool)
+  {
+    UNITY_CLR_DETAILS();
+    if (cmock_call_instance == NULL)
+      return Mock.pd_process_notification_FinalReturn;
+    Mock.pd_process_notification_FinalReturn = cmock_call_instance->ReturnVal;
+    return cmock_call_instance->ReturnVal;
+  }
+  if (!Mock.pd_process_notification_CallbackBool &&
+      Mock.pd_process_notification_CallbackFunctionPointer != NULL)
+  {
+    int cmock_cb_ret = Mock.pd_process_notification_CallbackFunctionPointer(event, resp, Mock.pd_process_notification_CallbackCalls++);
+    UNITY_CLR_DETAILS();
+    return cmock_cb_ret;
+  }
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringCalledMore);
+  cmock_line = cmock_call_instance->LineNumber;
+  if (!cmock_call_instance->ExpectAnyArgsBool)
+  {
+  if (!cmock_call_instance->IgnoreArg_event)
+  {
+    UNITY_SET_DETAILS(CMockString_pd_process_notification,CMockString_event);
+    if (cmock_call_instance->Expected_event == NULL)
+      { UNITY_TEST_ASSERT_NULL(event, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_event), (void*)(event), sizeof(const struct fwk_event), cmock_call_instance->Expected_event_Depth, cmock_line, CMockStringMismatch); }
+  }
+  if (!cmock_call_instance->IgnoreArg_resp)
+  {
+    UNITY_SET_DETAILS(CMockString_pd_process_notification,CMockString_resp);
+    if (cmock_call_instance->Expected_resp == NULL)
+      { UNITY_TEST_ASSERT_NULL(resp, cmock_line, CMockStringExpNULL); }
+    else
+      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_resp), (void*)(resp), sizeof(struct fwk_event), cmock_call_instance->Expected_resp_Depth, cmock_line, CMockStringMismatch); }
+  }
+  }
+  if (Mock.pd_process_notification_CallbackFunctionPointer != NULL)
+  {
+    cmock_call_instance->ReturnVal = Mock.pd_process_notification_CallbackFunctionPointer(event, resp, Mock.pd_process_notification_CallbackCalls++);
+  }
+  if (cmock_call_instance->ReturnThruPtr_resp_Used)
+  {
+    UNITY_TEST_ASSERT_NOT_NULL(resp, cmock_line, CMockStringPtrIsNULL);
+    memcpy((void*)resp, (void*)cmock_call_instance->ReturnThruPtr_resp_Val,
+      cmock_call_instance->ReturnThruPtr_resp_Size);
+  }
+  UNITY_CLR_DETAILS();
+  return cmock_call_instance->ReturnVal;
+}
+
+void CMockExpectParameters_pd_process_notification(CMOCK_pd_process_notification_CALL_INSTANCE* cmock_call_instance, const struct fwk_event* event, int event_Depth, struct fwk_event* resp, int resp_Depth);
+void CMockExpectParameters_pd_process_notification(CMOCK_pd_process_notification_CALL_INSTANCE* cmock_call_instance, const struct fwk_event* event, int event_Depth, struct fwk_event* resp, int resp_Depth)
+{
+  cmock_call_instance->Expected_event = event;
+  cmock_call_instance->Expected_event_Depth = event_Depth;
+  cmock_call_instance->IgnoreArg_event = 0;
+  cmock_call_instance->Expected_resp = resp;
+  cmock_call_instance->Expected_resp_Depth = resp_Depth;
+  cmock_call_instance->IgnoreArg_resp = 0;
+  cmock_call_instance->ReturnThruPtr_resp_Used = 0;
+}
+
+void pd_process_notification_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pd_process_notification_CALL_INSTANCE));
+  CMOCK_pd_process_notification_CALL_INSTANCE* cmock_call_instance = (CMOCK_pd_process_notification_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.pd_process_notification_CallInstance = CMock_Guts_MemChain(Mock.pd_process_notification_CallInstance, cmock_guts_index);
+  Mock.pd_process_notification_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  Mock.pd_process_notification_IgnoreBool = (char)1;
+}
+
+void pd_process_notification_CMockStopIgnore(void)
+{
+  if(Mock.pd_process_notification_IgnoreBool)
+    Mock.pd_process_notification_CallInstance = CMock_Guts_MemNext(Mock.pd_process_notification_CallInstance);
+  Mock.pd_process_notification_IgnoreBool = (char)0;
+}
+
+void pd_process_notification_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pd_process_notification_CALL_INSTANCE));
+  CMOCK_pd_process_notification_CALL_INSTANCE* cmock_call_instance = (CMOCK_pd_process_notification_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.pd_process_notification_CallInstance = CMock_Guts_MemChain(Mock.pd_process_notification_CallInstance, cmock_guts_index);
+  Mock.pd_process_notification_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  cmock_call_instance->ReturnVal = cmock_to_return;
+  cmock_call_instance->ExpectAnyArgsBool = (char)1;
+}
+
+void pd_process_notification_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_event* event, struct fwk_event* resp, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pd_process_notification_CALL_INSTANCE));
+  CMOCK_pd_process_notification_CALL_INSTANCE* cmock_call_instance = (CMOCK_pd_process_notification_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.pd_process_notification_CallInstance = CMock_Guts_MemChain(Mock.pd_process_notification_CallInstance, cmock_guts_index);
+  Mock.pd_process_notification_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_pd_process_notification(cmock_call_instance, event, 1, resp, 1);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void pd_process_notification_AddCallback(CMOCK_pd_process_notification_CALLBACK Callback)
+{
+  Mock.pd_process_notification_IgnoreBool = (char)0;
+  Mock.pd_process_notification_CallbackBool = (char)1;
+  Mock.pd_process_notification_CallbackFunctionPointer = Callback;
+}
+
+void pd_process_notification_Stub(CMOCK_pd_process_notification_CALLBACK Callback)
+{
+  Mock.pd_process_notification_IgnoreBool = (char)0;
+  Mock.pd_process_notification_CallbackBool = (char)0;
+  Mock.pd_process_notification_CallbackFunctionPointer = Callback;
+}
+
+void pd_process_notification_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_event* event, int event_Depth, struct fwk_event* resp, int resp_Depth, int cmock_to_return)
+{
+  CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_pd_process_notification_CALL_INSTANCE));
+  CMOCK_pd_process_notification_CALL_INSTANCE* cmock_call_instance = (CMOCK_pd_process_notification_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringOutOfMemory);
+  memset(cmock_call_instance, 0, sizeof(*cmock_call_instance));
+  Mock.pd_process_notification_CallInstance = CMock_Guts_MemChain(Mock.pd_process_notification_CallInstance, cmock_guts_index);
+  Mock.pd_process_notification_IgnoreBool = (char)0;
+  cmock_call_instance->LineNumber = cmock_line;
+  cmock_call_instance->ExpectAnyArgsBool = (char)0;
+  CMockExpectParameters_pd_process_notification(cmock_call_instance, event, event_Depth, resp, resp_Depth);
+  cmock_call_instance->ReturnVal = cmock_to_return;
+}
+
+void pd_process_notification_CMockReturnMemThruPtr_resp(UNITY_LINE_TYPE cmock_line, struct fwk_event* resp, size_t cmock_size)
+{
+  CMOCK_pd_process_notification_CALL_INSTANCE* cmock_call_instance = (CMOCK_pd_process_notification_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.pd_process_notification_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
+  cmock_call_instance->ReturnThruPtr_resp_Used = 1;
+  cmock_call_instance->ReturnThruPtr_resp_Val = resp;
+  cmock_call_instance->ReturnThruPtr_resp_Size = cmock_size;
+}
+
+void pd_process_notification_CMockIgnoreArg_event(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_pd_process_notification_CALL_INSTANCE* cmock_call_instance = (CMOCK_pd_process_notification_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.pd_process_notification_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_event = 1;
+}
+
+void pd_process_notification_CMockIgnoreArg_resp(UNITY_LINE_TYPE cmock_line)
+{
+  CMOCK_pd_process_notification_CALL_INSTANCE* cmock_call_instance = (CMOCK_pd_process_notification_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.pd_process_notification_CallInstance));
+  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
+  cmock_call_instance->IgnoreArg_resp = 1;
 }
 

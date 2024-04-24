@@ -44,6 +44,7 @@ struct mod_pd_mod_ctx mod_pd_ctx_temp;
 
 static void init_module_ctx(void)
 {
+    mod_pd_ctx_temp.config = &mod_pd_config;
     mod_pd_ctx_temp.pd_ctx_table = pd_ctx;
     mod_pd_ctx_temp.pd_count = PD_IDX_COUNT;
     mod_pd_ctx_temp.system_pd_ctx =

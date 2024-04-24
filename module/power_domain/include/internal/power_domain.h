@@ -199,6 +199,11 @@ struct system_shutdown_ctx {
     struct fwk_event *response_event;
 };
 
+struct system_suspend_notification_ctx {
+    /* Total count of notifications sent for system suspend */
+    unsigned int notifications_count;
+};
+
 struct mod_pd_mod_ctx {
     /* Module configuration data */
     struct mod_power_domain_config *config;
@@ -217,6 +222,9 @@ struct mod_pd_mod_ctx {
 
     /* System shutdown context */
     struct system_shutdown_ctx system_shutdown;
+
+    /* System suspend notification context */
+    struct system_suspend_notification_ctx system_suspend_notification;
 };
 
 extern struct mod_pd_mod_ctx mod_pd_ctx;

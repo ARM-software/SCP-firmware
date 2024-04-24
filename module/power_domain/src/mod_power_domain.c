@@ -600,7 +600,15 @@ static void process_power_state_transition_report(
         .source_id = FWK_ID_NONE
     };
     struct mod_pd_power_state_transition_notification_params *params;
+
+    struct fwk_event notification_event_suspend = { 0 };
+
+    notification_event_suspend.id = mod_pd_notification_id_system_suspend;
+    notification_event_suspend.response_requested = false;
+    notification_event_suspend.source_id = fwk_module_id_power_domain;
+
 #endif
+
     int status;
 
     unsigned int new_state = report_params->state;
@@ -636,7 +644,20 @@ static void process_power_state_transition_report(
     if ((mod_pd_ctx.system_suspend.last_core_off_ongoing) &&
         (pd == mod_pd_ctx.system_suspend.last_core_pd)) {
         mod_pd_ctx.system_suspend.last_core_off_ongoing = false;
+#ifdef BUILD_HAS_NOTIFICATION
+        if (mod_pd_ctx.config->enable_system_suspend_notification == false) {
+            status = complete_system_suspend(pd);
+        } else {
+            status = fwk_notification_notify(
+                &notification_event_suspend,
+                &mod_pd_ctx.system_suspend_notification.notifications_count);
+            if (status != FWK_SUCCESS) {
+                FWK_LOG_DEBUG("[PD] %s @%d", __func__, __LINE__);
+            }
+        }
+#else
         status = complete_system_suspend(pd);
+#endif
         if (status != FWK_SUCCESS) {
             FWK_LOG_DEBUG("[PD] %s @%d", __func__, __LINE__);
         }

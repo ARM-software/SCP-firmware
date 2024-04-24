@@ -36,6 +36,7 @@ static struct pd_ctx pd_ctx[PD_IDX_COUNT];
  */
 static void init_module_ctx(void)
 {
+    mod_pd_ctx.config = &mod_pd_config;
     mod_pd_ctx.pd_ctx_table = pd_ctx;
     mod_pd_ctx.pd_count = PD_IDX_COUNT;
     mod_pd_ctx.system_pd_ctx = &mod_pd_ctx.pd_ctx_table[PD_IDX_COUNT - 1];
@@ -314,6 +315,120 @@ void test_set_state_simple_core_wakup(void)
         MOD_PD_STATE_ON, pd_ctx[PD_IDX_CLUS0CORE0].state_requested_to_driver);
     req_params->composite_state = MOD_PD_STATE_OFF;
 }
+
+#ifdef BUILD_HAS_NOTIFICATION
+
+void test_system_suspend_notification_on_last_core_off(void)
+{
+    struct fwk_event report;
+    struct pd_power_state_transition_report *report_params =
+        (struct pd_power_state_transition_report *)(&report.params);
+
+    struct fwk_event notification_event = {
+        .id = mod_pd_notification_id_power_state_transition,
+        .response_requested = true,
+        .source_id = FWK_ID_NONE
+    };
+
+    struct fwk_event notification_event_suspend = { 0 };
+
+    notification_event_suspend.id = mod_pd_notification_id_system_suspend;
+    notification_event_suspend.response_requested = false;
+    notification_event_suspend.source_id = fwk_module_id_power_domain;
+
+    pd_ctx[PD_IDX_CLUSTER0].requested_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUSTER0].state_requested_to_driver = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUSTER0].current_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUSTER0].driver_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUS0CORE0].requested_state = MOD_PD_STATE_OFF;
+    pd_ctx[PD_IDX_CLUS0CORE0].state_requested_to_driver = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUS0CORE0].current_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUS0CORE0].driver_state = MOD_PD_STATE_ON;
+
+    mod_pd_ctx.system_suspend.last_core_pd = &pd_ctx[PD_IDX_CLUS0CORE0];
+    mod_pd_ctx.system_suspend.last_core_off_ongoing = true;
+
+    report =
+        (struct fwk_event){ .source_id = pd_ctx[PD_IDX_CLUS0CORE0].driver_id,
+                            .target_id = pd_ctx[PD_IDX_CLUS0CORE0].id,
+                            .id = FWK_ID_EVENT(
+                                FWK_MODULE_IDX_POWER_DOMAIN,
+                                PD_EVENT_IDX_REPORT_POWER_STATE_TRANSITION) };
+    report_params->state = MOD_PD_STATE_OFF;
+
+    fwk_notification_notify_ExpectWithArrayAndReturn(
+        &notification_event,
+        1,
+        &pd_ctx[PD_IDX_CLUS0CORE0]
+             .power_state_transition_notification_ctx.pending_responses,
+        1,
+        FWK_SUCCESS);
+    fwk_notification_notify_ExpectWithArrayAndReturn(
+        &notification_event_suspend,
+        1,
+        &mod_pd_ctx.system_suspend_notification.notifications_count,
+        1,
+        FWK_SUCCESS);
+
+    process_power_state_transition_report(
+        &pd_ctx[PD_IDX_CLUS0CORE0], report_params);
+}
+
+void test_system_suspend_no_notification_on_last_core_off(void)
+{
+    struct fwk_event report;
+    struct pd_power_state_transition_report *report_params =
+        (struct pd_power_state_transition_report *)(&report.params);
+
+    mod_pd_config.enable_system_suspend_notification = false;
+
+    struct fwk_event notification_event = {
+        .id = mod_pd_notification_id_power_state_transition,
+        .response_requested = true,
+        .source_id = FWK_ID_NONE
+    };
+
+    pd_ctx[PD_IDX_CLUSTER0].requested_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUSTER0].state_requested_to_driver = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUSTER0].current_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUSTER0].driver_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUS0CORE0].requested_state = MOD_PD_STATE_OFF;
+    pd_ctx[PD_IDX_CLUS0CORE0].state_requested_to_driver = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUS0CORE0].current_state = MOD_PD_STATE_ON;
+    pd_ctx[PD_IDX_CLUS0CORE0].driver_state = MOD_PD_STATE_ON;
+
+    mod_pd_ctx.system_suspend.last_core_pd = &pd_ctx[PD_IDX_CLUS0CORE0];
+    mod_pd_ctx.system_suspend.last_core_off_ongoing = true;
+
+    report =
+        (struct fwk_event){ .source_id = pd_ctx[PD_IDX_CLUS0CORE0].driver_id,
+                            .target_id = pd_ctx[PD_IDX_CLUS0CORE0].id,
+                            .id = FWK_ID_EVENT(
+                                FWK_MODULE_IDX_POWER_DOMAIN,
+                                PD_EVENT_IDX_REPORT_POWER_STATE_TRANSITION) };
+    report_params->state = MOD_PD_STATE_OFF;
+
+    number_of_bits_to_shift_IgnoreAndReturn(0);
+
+    is_upwards_transition_propagation_IgnoreAndReturn(true);
+
+    get_highest_level_from_composite_state_IgnoreAndReturn(MOD_PD_STATE_OFF);
+
+    get_level_state_from_composite_state_ExpectAnyArgsAndReturn(0);
+
+    fwk_notification_notify_ExpectWithArrayAndReturn(
+        &notification_event,
+        1,
+        &pd_ctx[PD_IDX_CLUS0CORE0]
+             .power_state_transition_notification_ctx.pending_responses,
+        1,
+        FWK_SUCCESS);
+
+    process_power_state_transition_report(
+        &pd_ctx[PD_IDX_CLUS0CORE0], report_params);
+}
+
+#endif
 
 void test_set_state_simple_core_off(void)
 {
@@ -907,6 +1022,7 @@ void test_system_suspend_single_active_core(void)
 int power_domain_test_main(void)
 {
     UNITY_BEGIN();
+#ifndef BUILD_HAS_NOTIFICATION
     RUN_TEST(test_set_state_cluster_on_expect_transition_init);
     RUN_TEST(test_set_state_core_on_while_cluster_off_expect_error_in_resp);
     RUN_TEST(test_set_state_error_in_initiating_transition);
@@ -934,6 +1050,10 @@ int power_domain_test_main(void)
     RUN_TEST(test_complete_system_suspend);
     RUN_TEST(test_system_suspend_multiple_active_cores);
     RUN_TEST(test_system_suspend_single_active_core);
+#else
+    RUN_TEST(test_system_suspend_notification_on_last_core_off);
+    RUN_TEST(test_system_suspend_no_notification_on_last_core_off);
+#endif
     return UNITY_END();
 }
 

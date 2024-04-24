@@ -103,6 +103,12 @@ struct mod_power_domain_config {
 
     /*! Number of identifiers in the "authorized_id_table" table. */
     size_t authorized_id_table_size;
+
+    /*
+     *  A flag to choose between sending notification when the last core going
+     * off or doing complete system suspend by the power domain
+     */
+    bool enable_system_suspend_notification;
 };
 
 /*!
@@ -779,6 +785,9 @@ enum mod_pd_notification_idx {
     /*! Power state transition */
     MOD_PD_NOTIFICATION_IDX_POWER_STATE_TRANSITION,
 
+    /*! Power domain system suspend */
+    MOD_PD_NOTIFICATION_IDX_POWER_DOMAIN_SYSTEM_SUSPEND,
+
     /*! Power state pre-transition */
     MOD_PD_NOTIFICATION_IDX_POWER_STATE_PRE_TRANSITION,
 
@@ -800,6 +809,12 @@ enum mod_pd_notification_idx {
 static const fwk_id_t mod_pd_notification_id_power_state_transition =
     FWK_ID_NOTIFICATION_INIT(FWK_MODULE_IDX_POWER_DOMAIN,
                              MOD_PD_NOTIFICATION_IDX_POWER_STATE_TRANSITION);
+
+/*! Identifier of the power domain system suspend notification */
+static const fwk_id_t mod_pd_notification_id_system_suspend =
+    FWK_ID_NOTIFICATION_INIT(
+        FWK_MODULE_IDX_POWER_DOMAIN,
+        MOD_PD_NOTIFICATION_IDX_POWER_DOMAIN_SYSTEM_SUSPEND);
 
 /*! Identifier of the power state pre-transition notification */
 static const fwk_id_t mod_pd_notification_id_power_state_pre_transition =

@@ -420,6 +420,52 @@ void initiate_power_state_pre_transition_notification_CMockExpectWithArrayAndRet
 void initiate_power_state_pre_transition_notification_CMockReturnMemThruPtr_pd(UNITY_LINE_TYPE cmock_line, struct pd_ctx* pd, size_t cmock_size);
 #define initiate_power_state_pre_transition_notification_IgnoreArg_pd() initiate_power_state_pre_transition_notification_CMockIgnoreArg_pd(__LINE__)
 void initiate_power_state_pre_transition_notification_CMockIgnoreArg_pd(UNITY_LINE_TYPE cmock_line);
+#define notify_warm_reset_IgnoreAndReturn(cmock_retval) notify_warm_reset_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void notify_warm_reset_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define notify_warm_reset_StopIgnore() notify_warm_reset_CMockStopIgnore()
+void notify_warm_reset_CMockStopIgnore(void);
+#define notify_warm_reset_ExpectAndReturn(cmock_retval) notify_warm_reset_CMockExpectAndReturn(__LINE__, cmock_retval)
+void notify_warm_reset_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+typedef int (* CMOCK_notify_warm_reset_CALLBACK)(int cmock_num_calls);
+void notify_warm_reset_AddCallback(CMOCK_notify_warm_reset_CALLBACK Callback);
+void notify_warm_reset_Stub(CMOCK_notify_warm_reset_CALLBACK Callback);
+#define notify_warm_reset_StubWithCallback notify_warm_reset_Stub
+#define check_and_notify_system_shutdown_IgnoreAndReturn(cmock_retval) check_and_notify_system_shutdown_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void check_and_notify_system_shutdown_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return);
+#define check_and_notify_system_shutdown_StopIgnore() check_and_notify_system_shutdown_CMockStopIgnore()
+void check_and_notify_system_shutdown_CMockStopIgnore(void);
+#define check_and_notify_system_shutdown_ExpectAnyArgsAndReturn(cmock_retval) check_and_notify_system_shutdown_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
+void check_and_notify_system_shutdown_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, bool cmock_to_return);
+#define check_and_notify_system_shutdown_ExpectAndReturn(system_shutdown, cmock_retval) check_and_notify_system_shutdown_CMockExpectAndReturn(__LINE__, system_shutdown, cmock_retval)
+void check_and_notify_system_shutdown_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, enum mod_pd_system_shutdown system_shutdown, bool cmock_to_return);
+typedef bool (* CMOCK_check_and_notify_system_shutdown_CALLBACK)(enum mod_pd_system_shutdown system_shutdown, int cmock_num_calls);
+void check_and_notify_system_shutdown_AddCallback(CMOCK_check_and_notify_system_shutdown_CALLBACK Callback);
+void check_and_notify_system_shutdown_Stub(CMOCK_check_and_notify_system_shutdown_CALLBACK Callback);
+#define check_and_notify_system_shutdown_StubWithCallback check_and_notify_system_shutdown_Stub
+#define check_and_notify_system_shutdown_IgnoreArg_system_shutdown() check_and_notify_system_shutdown_CMockIgnoreArg_system_shutdown(__LINE__)
+void check_and_notify_system_shutdown_CMockIgnoreArg_system_shutdown(UNITY_LINE_TYPE cmock_line);
+#define pd_process_notification_IgnoreAndReturn(cmock_retval) pd_process_notification_CMockIgnoreAndReturn(__LINE__, cmock_retval)
+void pd_process_notification_CMockIgnoreAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define pd_process_notification_StopIgnore() pd_process_notification_CMockStopIgnore()
+void pd_process_notification_CMockStopIgnore(void);
+#define pd_process_notification_ExpectAnyArgsAndReturn(cmock_retval) pd_process_notification_CMockExpectAnyArgsAndReturn(__LINE__, cmock_retval)
+void pd_process_notification_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line, int cmock_to_return);
+#define pd_process_notification_ExpectAndReturn(event, resp, cmock_retval) pd_process_notification_CMockExpectAndReturn(__LINE__, event, resp, cmock_retval)
+void pd_process_notification_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_event* event, struct fwk_event* resp, int cmock_to_return);
+typedef int (* CMOCK_pd_process_notification_CALLBACK)(const struct fwk_event* event, struct fwk_event* resp, int cmock_num_calls);
+void pd_process_notification_AddCallback(CMOCK_pd_process_notification_CALLBACK Callback);
+void pd_process_notification_Stub(CMOCK_pd_process_notification_CALLBACK Callback);
+#define pd_process_notification_StubWithCallback pd_process_notification_Stub
+#define pd_process_notification_ExpectWithArrayAndReturn(event, event_Depth, resp, resp_Depth, cmock_retval) pd_process_notification_CMockExpectWithArrayAndReturn(__LINE__, event, event_Depth, resp, resp_Depth, cmock_retval)
+void pd_process_notification_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, const struct fwk_event* event, int event_Depth, struct fwk_event* resp, int resp_Depth, int cmock_to_return);
+#define pd_process_notification_ReturnThruPtr_resp(resp) pd_process_notification_CMockReturnMemThruPtr_resp(__LINE__, resp, sizeof(struct fwk_event))
+#define pd_process_notification_ReturnArrayThruPtr_resp(resp, cmock_len) pd_process_notification_CMockReturnMemThruPtr_resp(__LINE__, resp, cmock_len * sizeof(*resp))
+#define pd_process_notification_ReturnMemThruPtr_resp(resp, cmock_size) pd_process_notification_CMockReturnMemThruPtr_resp(__LINE__, resp, cmock_size)
+void pd_process_notification_CMockReturnMemThruPtr_resp(UNITY_LINE_TYPE cmock_line, struct fwk_event* resp, size_t cmock_size);
+#define pd_process_notification_IgnoreArg_event() pd_process_notification_CMockIgnoreArg_event(__LINE__)
+void pd_process_notification_CMockIgnoreArg_event(UNITY_LINE_TYPE cmock_line);
+#define pd_process_notification_IgnoreArg_resp() pd_process_notification_CMockIgnoreArg_resp(__LINE__)
+void pd_process_notification_CMockIgnoreArg_resp(UNITY_LINE_TYPE cmock_line);
 
 #if defined(__GNUC__) && !defined(__ICC) && !defined(__TMS470__)
 #if __GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 6 || (__GNUC_MINOR__ == 6 && __GNUC_PATCHLEVEL__ > 0)))

@@ -75,4 +75,13 @@ bool is_state_in_transition(struct pd_ctx *pd, unsigned int state);
 
 bool initiate_power_state_pre_transition_notification(struct pd_ctx *pd);
 
+int notify_warm_reset(void);
+
+bool check_and_notify_system_shutdown(
+    enum mod_pd_system_shutdown system_shutdown);
+
+int pd_process_notification(
+    const struct fwk_event *event,
+    struct fwk_event *resp);
+
 #endif /* MOD_POWER_DOMAIN_EXTRA_H */
