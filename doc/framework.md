@@ -575,46 +575,59 @@ To ensure that the framework is platform-independent, the log component relies
 on a small set of functions to do platform-specific work like flushing the
 buffer and outputting characters. These functions make up the log driver
 interface and are forward declared in fwk_log.h:
-
 ```
-int fwk_log_driver_init(void);
-int fwk_log_driver_putchar(char c);
-int fwk_log_driver_flush(void);
-```
-
-The framework only implements weakly-linked "stub" versions of these functions
-that simply return an error code. It is expected that platform-specific code (a
-driver module) will implement these functions properly to complete the logging
-functionality of the framework.
-
-If this driver module requires configuration data to be used in the log driver
-functions, the usual method of module configuration will not suffice. This is
-because the log driver functions could be called before the module receives its
-configuration data in the initialization stage of the framework. To allow the
-passing of configuration data to this module, the log component in the framework
-externally declares a pointer to configuration data: (fwk_log.h)
-
-```
-extern void *fwk_log_driver_config;
+int fwk_log_init(void);
+void fwk_log_printf(const char *format, ...);
+void fwk_log_flush(void);
 ```
 
-It is expected that the firmware-specific module configuration code for the
-driver module (config_mod_xxx.c) will concretely declare this variable and
-initialize it to point to some configuration structure:
+The logging framework uses *filter levels* to rank the criticality of messages,
+and to filter them if desired. Filtering happens at preprocessing-time, and
+consequently filtered messages do not contribute to the image. This component
+provides five filter levels for logging messages. Log messages are assigned a
+filter level based on the logging macro used. These macros (listed in order of
+decreasing verbosity) are as follows:
+- FWK_LOG_DEBUG
+- FWK_LOG_INFO
+- FWK_LOG_WARN
+- FWK_LOG_ERR
+- FWK_LOG_CRIT
 
+The value of the `FWK_LOG_LEVEL` macro, which can be set through the build
+system configuration options, determines the minimum level a log message
+must be for it to be included in the binary. If a build sets log level to
+FWK_LOG_LEVEL_DISABLED, all logs are disabled.
+
+If buffering has been enabled then log messages may be buffered to reduce
+overall firmware response latency; these buffered log messages will be flushed
+once the system has reached an idle state. This definition dictates the size of
+the buffer, and can be overridden by each individual firmware through a
+definition in a `<fmw_log.h>` header. This definition has a default value of
+four kilobytes in release builds and zero in debug builds. Setting this
+definition to a value of `0` will disable buffering. If buffering is disabled,
+messages will be transmitted immediately.
 ```
-struct mod_xxx_fwk_log_config cfg = {
-    .x = 1,
-    .y = 2,
-    .z = 3,
+#define FMW_LOG_BUFFER_SIZE 0
+```
+
+The framework only implements weakly-linked "stub" versions of these functions.
+It is expected that platform-specific code (a driver module) will implement
+these functions properly to complete the logging functionality of the
+framework. Every module may provide an optional stream adapter, which allows it
+to service input/output requests to and from other modules in a fashion similar
+to  standard file operations in the standard library. This adapter handles
+adapter requests to the module, its elements, and its sub-elements.
+```C
+const struct fwk_module module_xxx = {
+        .adapter =
+                (struct fwk_io_adapter) {
+                        .open = mod_xxx_io_open,
+                        .getch = mod_xxx_io_getch,
+                        .putch = mod_xxx_io_putch,
+                        .close = mod_xxx_io_close,
+                }
 };
-
-void *fwk_log_driver_config = &cfg;
 ```
-
-The driver module can then access its log framework related configuration data
-at any time. It is expected that the driver module performs initialization using
-this configuration data in the fwk_log_driver_init() function.
 
 #### Enable marked list feature
 
