@@ -112,14 +112,14 @@ documentation.
 ## Module Code Generation
 
 When a firmware is built there are two prerequisite files that will be generated
-by the build system, specifically by the __gen_module_code.py__ script:
+by the build system.
 * fwk_module_idx.h: Contains an enumeration of the indices of the modules that
     make up the firmware. The ordering of the module indices in the enumeration
     within fwk_module_idx.h is guaranteed to follow the order of the module
-    names in the BS_FIRMWARE_MODULES list within the firmware's firmware.mk
-    file. This same ordering is used by the framework at runtime when performing
-    operations that involve iterating over all the modules that are present in
-    the firmware, such as the init_modules() function in fwk_module.c.
+    names in the SCP_MODULES list within Firmware.cmake file. This same
+    ordering is used by the framework at runtime when performing operations
+    that involve iterating over all the modules that are present in the
+    firmware, such as the fwk_module_init_modules() function in fwk_module.c.
 * fwk_module_list.c: Contains a table of pointers to module descriptors, one
     for each module that is being built as part of the firmware. This file and
     its contents are used internally by the framework and should not normally
