@@ -23,16 +23,17 @@ __product__ directory and must adhere to the following hierarchy:
      └─ product
         └── <product>
             ├── product.mk
-            │   ├── include
-            │   │   └── <product level header files...>
-            │   └── src
-            │       └── <product level source files...>
+            ├── include
+            │   └── <product level header files...>
+            │── src
+            │   └── <product level source files...>
+            ├── module
             ├── <firmware_1>
             │   └── <firmware 1 level configuration files...>
             └── <firmware_2>
                 └── <firmware 2 level configuration files...>
 
-Difference products that share similar files can be grouped into
+Different products that share similar files can be grouped into
 product_group. Shared files are located under __common__ directory, while
 all products' specific code are kept under product directory. The following
 hierarchy shows the grouped products under __product__ directory:
@@ -40,17 +41,19 @@ hierarchy shows the grouped products under __product__ directory:
     <root>
      └─ product
             └──<product_group>
-                ├── <common>
-                │   │   ├── include
-                │   │   │   └── <common header files for products...>
-                │   │   └── src
-                │   │       └── <common source files for products...>
+                ├── common
+                │   ├── include
+                │   │   └── <common header files for products...>
+                │   │── src
+                │   │   └── <common source files for products...>
+                │   └── module
                 └── <product>
                     ├── product.mk
-                    │   ├── include
-                    │   │   └── <product level header files...>
-                    │   └── src
-                    │       └── <product level source files...>
+                    │── include
+                    │   └── <product level header files...>
+                    │── src
+                    │   └── <product level source files...>
+                    │── module
                     ├── <firmware_1>
                     │   └── <firmware 1 level configuration files...>
                     └── <firmware_2>
@@ -70,7 +73,7 @@ The following parameters are mandatory:
 
 * __BS_PRODUCT_NAME__ - Human-friendly name for the product. The content of this
   variable is exposed to the compilation units.
-* __BS_PRODUCT_FIRMWARE_LIST__ - List of firmware directories under the current
+* __BS_FIRMWARE_LIST__ - List of firmware directories under the current
   product.
 
 # Module
@@ -104,7 +107,7 @@ is used when building a firmware.
 
 __Note:__ The name of the \<module\> directory must not contain spaces.
 
-The name of the \<module\> directory is used in __SCP_MODULE__ by `cmake`
+The name of the \<module\> directory is used in __SCP_MODULES__ by `cmake`
 
 The __doc__ directory is optional and may contain markdown (.md) based
 documentation.

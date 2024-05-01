@@ -435,7 +435,7 @@ order:
 - Start
 
 Each stage is executed for each module before moving onto the next stage, and
-modules are processed in the order they are given in the *BS_FIRMWARE_MODULES*
+modules are processed in the order they are given in the *SCP_MODULES*
 list.
 
 Once these stages have all been completed the firmware as a whole is considered
