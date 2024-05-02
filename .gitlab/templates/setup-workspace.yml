@@ -1,0 +1,50 @@
+#
+# Arm SCP/MCP Software
+# Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+
+.pull-mr:
+  image: ${CI_REGISTRY_IMAGE}/ci-base:latest
+  variables:
+    GIT_STRATEGY: clone
+    GIT_CHECKOUT: "false"
+  script:
+    - |
+      MR_INFO=$(curl --fail \
+        "${PUBLIC_REPO_API_URL}/merge_requests/${FETCH_PUBLIC_MR_NUMBER}")
+      SCP_REFSPEC=$(printf "%s" "$MR_INFO" | jq -r .source_branch)
+
+      git fetch $PUBLIC_REPO_URL $SCP_REFSPEC
+
+      echo "Fetched commit:"
+      git rev-list --format=%B --max-count=1 FETCH_HEAD
+      git checkout FETCH_HEAD
+      git submodule update --init --recursive --depth 1
+
+      git fetch origin main
+      CI_MERGE_REQUEST_DIFF_BASE_SHA=$(git merge-base FETCH_HEAD origin/main)
+
+      # Save ENV variables
+      mkdir -p .env
+
+      echo "CI_MERGE_REQUEST_DIFF_BASE_SHA=$CI_MERGE_REQUEST_DIFF_BASE_SHA" \
+        >> .env/workspace.env
+  artifacts:
+    reports:
+      dotenv: .env/workspace.env
+    paths:
+      - . # Save workspace
+  rules:
+    - if: $FETCH_PUBLIC_MR == "true"
+
+.git-strategy-on-mr:
+  rules:
+    - if: $FETCH_PUBLIC_MR == "true"
+      variables:
+        GIT_STRATEGY: none
+    - if: $FETCH_PUBLIC_MR == "false"
+      variables:
+        GIT_STRATEGY: fetch
