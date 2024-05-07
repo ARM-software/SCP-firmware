@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -675,7 +675,8 @@ static int sds_start(fwk_id_t id)
     ctx.wait_on_notifications = 0;
 
 #ifdef BUILD_HAS_MOD_CLOCK
-    if (!fwk_id_is_equal(config->clock_id, FWK_ID_NONE)) {
+    if (fwk_optional_id_is_defined(config->clock_id) &&
+        !fwk_id_is_equal(config->clock_id, FWK_ID_NONE)) {
         /* Register the module for clock state notifications */
         status = fwk_notification_subscribe(
             mod_clock_notification_id_state_changed, config->clock_id, id);
@@ -710,32 +711,48 @@ static int sds_start(fwk_id_t id)
     return status;
 }
 
+#ifdef BUILD_HAS_MOD_CLOCK
+static int mod_sds_clock_changed(const struct fwk_event *event)
+{
+    int status;
+    const struct clock_notification_params *params =
+        (const void *)event->params;
+
+    if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
+        status = fwk_notification_unsubscribe(
+            event->id, event->source_id, event->target_id);
+        if (status != FWK_SUCCESS) {
+            FWK_LOG_CRIT(MODULE_NAME
+                         "Failed to unsubscribe clock "
+                         "notification");
+            return status;
+        }
+        ctx.wait_on_notifications--;
+    }
+
+    return FWK_SUCCESS;
+}
+#endif
+
 static int sds_process_notification(
     const struct fwk_event *event,
     struct fwk_event *resp_event)
 {
     const struct mod_sds_config *config =
         fwk_module_get_data(fwk_module_id_sds);
-    struct clock_notification_params *params;
     int status = FWK_SUCCESS;
 
     fwk_assert(fwk_id_is_type(event->target_id, FWK_ID_TYPE_MODULE));
     fwk_assert(ctx.wait_on_notifications != 0);
 
+#ifdef BUILD_HAS_MOD_CLOCK
     if (fwk_id_is_equal(event->id, mod_clock_notification_id_state_changed)) {
-        params = (struct clock_notification_params *)event->params;
-        if (params->new_state == MOD_CLOCK_STATE_RUNNING) {
-            status = fwk_notification_unsubscribe(
-                event->id, event->source_id, event->target_id);
-            if (status != FWK_SUCCESS) {
-                FWK_LOG_CRIT(MODULE_NAME
-                             "Failed to unsubscribe clock "
-                             "notification");
-                return status;
-            }
-            ctx.wait_on_notifications--;
+        status = mod_sds_clock_changed(event);
+        if (status != FWK_SUCCESS) {
+            return status;
         }
     }
+#endif
 
     if (fwk_id_is_equal(
             event->id, config->platform_notification.notification_id)) {

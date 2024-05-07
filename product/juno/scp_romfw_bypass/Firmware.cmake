@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -42,8 +42,7 @@ list(PREPEND SCP_MODULE_PATHS
 
 list(APPEND SCP_MODULES "juno-ppu")
 list(APPEND SCP_MODULES "juno-rom")
-list(APPEND SCP_MODULES "juno-soc-clock")
-list(APPEND SCP_MODULES "clock")
 list(APPEND SCP_MODULES "gtimer")
 list(APPEND SCP_MODULES "sds")
 list(APPEND SCP_MODULES "bootloader")
+list(APPEND SCP_MODULES "juno-soc-clock")

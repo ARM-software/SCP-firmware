@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -31,7 +31,6 @@ target_sources(
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_ppu.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_rom.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_soc_clock.c"
-            "${CMAKE_CURRENT_SOURCE_DIR}/config_clock.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_sds.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_bootloader.c"

@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -608,6 +608,7 @@ enum mod_clock_event_idx {
     MOD_CLOCK_EVENT_IDX_COUNT
 };
 
+#ifdef BUILD_HAS_MOD_CLOCK
 /*!
  * \brief Request event identifiers.
  *
@@ -629,6 +630,7 @@ static const fwk_id_t mod_clock_event_id_set_state_request =
 static const fwk_id_t mod_clock_event_id_get_state_request =
     FWK_ID_EVENT_INIT(FWK_MODULE_IDX_CLOCK,
                       MOD_CLOCK_EVENT_IDX_GET_STATE_REQUEST);
+#endif
 
 /*!
  * \}

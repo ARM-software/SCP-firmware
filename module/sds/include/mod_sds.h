@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -134,10 +134,8 @@ struct mod_sds_config {
      */
     unsigned int region_count;
 
-#ifdef BUILD_HAS_MOD_CLOCK
     /*! Identifier of the clock that this module depends on */
-    fwk_id_t clock_id;
-#endif
+    fwk_optional_id_t clock_id;
 
     /*!
      * Platform notification source and notification id (optional)
