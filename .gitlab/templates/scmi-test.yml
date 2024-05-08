@@ -22,10 +22,11 @@
         - sgm776
         - rdn1e1.n1edge
   before_script:
-    - ln -s $(pwd) /scp
+    - echo "PROJECT_TYPE = $PROJECT_TYPE"
+    - ln -s $(pwd) /$PROJECT_TYPE
   script:
     - echo "platform under test $SCP_CI_PLATFORM"
-    - /scmi_tester_entrypoint.sh
+    - /scmi_tester_entrypoint.sh $PROJECT_TYPE
   artifacts:
     when: always
     expire_in: 2 days

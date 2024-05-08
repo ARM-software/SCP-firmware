@@ -24,6 +24,9 @@ variables:
   FETCH_PUBLIC_MR_NUMBER:
     description: "MR number to fetch"
 
+  PROJECT_TYPE:
+    value: "scp"
+    description: "The project type to run scmi-test"
 
 include:
   - local: .gitlab/pipelines/deployment-pipeline.yml
