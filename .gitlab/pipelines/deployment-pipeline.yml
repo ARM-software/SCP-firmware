@@ -15,6 +15,7 @@ stages:
 
 include:
   - local: .gitlab/templates/setup-workspace.yml
+  - local: .gitlab/templates/status-report.yml
   - local: .gitlab/templates/linting.yml
   - local: .gitlab/templates/static-analysis.yml
   - local: .gitlab/templates/unit-test.yml
@@ -26,6 +27,18 @@ include:
 pull-mr:
   stage: .pre
   extends: .pull-mr
+
+report-pipeline-start:
+  stage: .pre
+  extends: .report-pipeline-start
+
+report-pipeline-success:
+  stage: .post
+  extends: .report-pipeline-success
+
+report-pipeline-failure:
+ stage: .post
+ extends: .report-pipeline-failure
 
 check-lint:
   extends:

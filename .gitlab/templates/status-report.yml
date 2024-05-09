@@ -1,0 +1,51 @@
+#
+# Arm SCP/MCP Software
+# Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+.report-status:
+  image: ${CI_REGISTRY_IMAGE}/ci-base:latest
+  script:
+    - |
+      curl --fail --location --request POST \
+      "${PUBLIC_REPO_API_URL}/merge_requests/${FETCH_PUBLIC_MR_NUMBER}/notes" \
+      --header "PRIVATE-TOKEN:${PUBLIC_REPO_API_KEY}" \
+      --header "Content-Type:application/json" \
+      --data-raw "{\"body\":\"CI Testing - Pipeline ${CI_PIPELINE_ID} - ${PIPELINE_STATUS_MSG}\"}"
+
+.report-pipeline-start:
+  extends: .report-status
+  variables:
+    PIPELINE_STATUS_MSG: "STARTED"
+  rules:
+    - if: $FETCH_PUBLIC_MR == "true"
+
+.report-pipeline-failure:
+  extends: .report-status
+  variables:
+    PIPELINE_STATUS_MSG: "FAILED"
+  after_script:
+    - |
+      echo "Status: FAILURE - Resseting approvals"
+      curl --fail --location --request PUT \
+      --header "PRIVATE-TOKEN:${PUBLIC_REPO_API_KEY}" \
+      "${PUBLIC_REPO_API_URL}/merge_requests/${FETCH_PUBLIC_MR_NUMBER}/reset_approvals"
+  when: on_failure
+  rules:
+    - if: $FETCH_PUBLIC_MR == "true"
+
+.report-pipeline-success:
+  extends: .report-status
+  variables:
+    PIPELINE_STATUS_MSG: "SUCCESS"
+  after_script:
+    - |
+      echo "Status: SUCCESS - MR Approved"
+      curl --fail --location --request POST \
+      --header "PRIVATE-TOKEN:${PUBLIC_REPO_API_KEY}" \
+      "${PUBLIC_REPO_API_URL}/merge_requests/${FETCH_PUBLIC_MR_NUMBER}/approve"
+  when: on_success
+  rules:
+    - if: $FETCH_PUBLIC_MR == "true"

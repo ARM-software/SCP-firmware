@@ -15,7 +15,7 @@ variables:
     description: "The CI pipeline to run"
 
   FETCH_PUBLIC_MR:
-    value : "false"
+    value: "false"
     options:
       - "false"
       - "true"
