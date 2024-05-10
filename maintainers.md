@@ -52,6 +52,7 @@ maintainers. The platforms listed here represent the exceptions to this rule.
 #### Total Compute (tc2)
 
 - [Tintu Thomas](https://gitlab.arm.com/Tintu.Thomas)
+- [Quoc Khanh Le](https://gitlab.arm.com/quockhanh-le-arm)
 
 ### Socionext
 
