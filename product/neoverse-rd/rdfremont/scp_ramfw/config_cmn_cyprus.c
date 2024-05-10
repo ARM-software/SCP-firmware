@@ -261,6 +261,7 @@ static struct mod_cmn_cyprus_config cmn_config_table[PLATFORM_CHIP_COUNT] = {
 static struct mod_cmn_cyprus_config_table cmn_config_data = {
     .chip_config_data = cmn_config_table,
     .chip_count = PLATFORM_CHIP_COUNT,
+    .timer_id = FWK_ID_ELEMENT_INIT(FWK_MODULE_IDX_TIMER, 0),
 };
 
 const struct fwk_module_config config_cmn_cyprus = {
