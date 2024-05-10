@@ -8,10 +8,10 @@
 # Platform maintainers
 #
 
-/product/n1sdp/ manoj.kumar3@arm.com sudipto.paul@arm.com
-/product/neoverse-rd/ thomas.abraham@arm.com
+/product/morello/ deepak.pandey@arm.com chandni.cherukuri@arm.com
+/product/neoverse-rd/ thomas.abraham@arm.com vijayenthiran.subramaniam@arm.com
 /product/synquacer/ masahisa.kojima@linaro.org
-/product/totalcompute/ vishnu.banavath@arm.com
+/product/totalcompute/ tintu.thomas@arm.com
 /product/rcar/ nroyer@baylibre.com
 /product/optee/ vincent.guittot@linaro.org etienne.carriere@st.com
 

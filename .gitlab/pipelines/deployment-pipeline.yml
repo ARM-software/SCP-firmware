@@ -6,6 +6,7 @@
 #
 
 stages:
+  - test-workspace
   - linting
   - static-analysis
   - unit-testing
@@ -13,6 +14,7 @@ stages:
   - scmi-test
 
 include:
+  - local: .gitlab/templates/setup-workspace.yml
   - local: .gitlab/templates/linting.yml
   - local: .gitlab/templates/static-analysis.yml
   - local: .gitlab/templates/unit-test.yml
@@ -20,38 +22,81 @@ include:
   - local: .gitlab/templates/scmi-test.yml
   - local: .gitlab/templates/coverity-test.yml
 
+
+pull-mr:
+  stage: .pre
+  extends: .pull-mr
+
 check-lint:
-  extends: .check-lint
+  extends:
+    - .check-lint
+    - .git-strategy-on-mr
   stage: linting
+  dependencies:
+    - pull-mr
 
 check-copyright:
-  extends: .check-copyright
+  before_script:
+    - ls .gitlab/templates
+  extends:
+    - .check-copyright
+    - .git-strategy-on-mr
   stage: linting
+  dependencies:
+    - pull-mr
 
 check-style:
-  extends: .check-style
+  extends:
+    - .check-style
+    - .git-strategy-on-mr
   stage: linting
+  dependencies:
+    - pull-mr
 
 banned-api:
-  extends: .banned-api
+  extends:
+    - .banned-api
+    - .git-strategy-on-mr
   stage: static-analysis
+  dependencies:
+    - pull-mr
 
 coverity-test:
   stage: static-analysis
-  extends: .coverity-test
+  extends:
+    - .coverity-test
+    - .git-strategy-on-mr
+  dependencies:
+    - pull-mr
 
 check-fwk:
-  extends: .check-fwk
+  extends:
+    - .check-fwk
+    - .git-strategy-on-mr
   stage: unit-testing
+  dependencies:
+    - pull-mr
 
 check-modules:
-  extends: .check-modules
+  extends:
+    - .check-modules
+    - .git-strategy-on-mr
   stage: unit-testing
+  dependencies:
+    - pull-mr
 
 build-products:
-  extends: .build-products
+  extends:
+    - .build-products
+    - .git-strategy-on-mr
   stage: build
+  dependencies:
+    - pull-mr
 
 scmi-test:
-  extends: .scmi-test
+  extends:
+    - .scmi-test
+    - .git-strategy-on-mr
   stage: scmi-test
+  dependencies:
+    - pull-mr
