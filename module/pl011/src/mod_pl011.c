@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -43,53 +43,106 @@ struct mod_pl011_element_ctx {
 
     /* Whether the device has an open file stream */
     bool open;
+
+    /* The stream ID that was sent with an open request*/
+    fwk_id_t stream_id;
 };
 
 static struct mod_pl011_ctx {
-    bool initialized; /* Whether the context has been initialized */
+    /* Whether the context has been initialized */
+    bool initialized;
 
-    struct mod_pl011_element_ctx *elements; /* Element context table */
+    /* Element context table */
+    struct mod_pl011_element_ctx *elements;
+
+    /* Whether the element context table has been allocated */
+    bool elements_allocated;
 } pl011_ctx;
 
-static void mod_pl011_init_ctx(void)
+static void update_adapter_pointers(void);
+static void mod_pl011_enable(fwk_id_t id);
+
+static int init_element_ctx_table(void)
 {
     size_t element_count;
 
-    fwk_assert(!pl011_ctx.initialized);
-
     element_count = (size_t)fwk_module_get_element_count(fwk_module_id_pl011);
     if (element_count == 0) {
-        return;
+        return FWK_E_RANGE;
     }
 
     pl011_ctx.elements =
         fwk_mm_alloc(element_count, sizeof(pl011_ctx.elements[0]));
 
+    pl011_ctx.elements_allocated = true;
+
+    for (size_t i = 0; i < element_count; i++) {
+        pl011_ctx.elements[i].stream_id =
+            FWK_ID_NONE; /* Ensure it is set to none as soon as set up*/
+    }
+
+    return FWK_SUCCESS;
+}
+
+static int mod_pl011_init_ctx(void)
+{
+    size_t element_count;
+    struct mod_pl011_element_ctx *ctx;
+    int status;
+
+    fwk_assert(!pl011_ctx.initialized);
+
+    element_count = (size_t)fwk_module_get_element_count(fwk_module_id_pl011);
+    if (element_count == 0) {
+        return FWK_E_RANGE;
+    }
+
+    if (!pl011_ctx.elements_allocated) {
+        /* Ensure the element table is set up if we have not already done so */
+        status = init_element_ctx_table();
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+    }
+
+    /* Update the adapter pointers for printing characters */
+    update_adapter_pointers();
+
     for (size_t i = 0; i < element_count; i++) {
         const struct mod_pl011_element_cfg *cfg =
             fwk_module_get_data(FWK_ID_ELEMENT(FWK_MODULE_IDX_PL011, i));
 
-        pl011_ctx.elements[i] = (struct mod_pl011_element_ctx){
-            .powered = true, /* Assume the device is always powered */
-            .clocked = true, /* Assume the device is always clocked */
+        ctx = &pl011_ctx.elements[i];
 
-            .open = false,
-        };
+        ctx->powered = true; /* Assume the device is always powered */
+        ctx->clocked = true; /* Assume the device is always clocked */
+
+        ctx->open = false;
 
 #ifdef BUILD_HAS_MOD_POWER_DOMAIN
-        pl011_ctx.elements[i].powered =
-            fwk_id_is_equal(cfg->pd_id, FWK_ID_NONE);
+        ctx->powered = fwk_id_is_equal(cfg->pd_id, FWK_ID_NONE);
 #endif
 
 #ifdef BUILD_HAS_MOD_CLOCK
-        pl011_ctx.elements[i].clocked =
-            fwk_id_is_equal(cfg->clock_id, FWK_ID_NONE);
+        ctx->clocked = fwk_id_is_equal(cfg->clock_id, FWK_ID_NONE);
 #endif
 
+        /*
+         * Verify if there are any open requests to handle now the module has
+         * been initialised
+         */
+        if (!fwk_id_is_equal(ctx->stream_id, FWK_ID_NONE)) {
+            ctx->open = true;
+            if (ctx->powered && ctx->clocked) {
+                mod_pl011_enable(
+                    ctx->stream_id); /* Enable the device if possible */
+            }
+        }
         (void)cfg;
     }
 
     pl011_ctx.initialized = true;
+    return FWK_SUCCESS;
 }
 
 static void mod_pl011_set_baud_rate(const struct mod_pl011_element_cfg *cfg)
@@ -211,6 +264,9 @@ static void mod_pl011_flush(fwk_id_t id)
     }
 }
 
+/*
+ * Framework handlers
+ */
 static int mod_pl011_init(
     fwk_id_t module_id,
     unsigned int element_count,
@@ -220,9 +276,7 @@ static int mod_pl011_init(
         return FWK_SUCCESS;
     }
 
-    mod_pl011_init_ctx();
-
-    return FWK_SUCCESS;
+    return mod_pl011_init_ctx();
 }
 
 static int mod_pl011_element_init(
@@ -561,16 +615,30 @@ static int mod_pl011_process_notification(
 static int mod_pl011_io_open(const struct fwk_io_stream *stream)
 {
     struct mod_pl011_element_ctx *ctx;
+    int status;
 
     if (!fwk_id_is_type(stream->id, FWK_ID_TYPE_ELEMENT)) {
         return FWK_E_SUPPORT;
     }
 
+    if (!pl011_ctx.elements_allocated) {
+        /* Ensure the element table is set up if we have not already done so */
+        status = init_element_ctx_table();
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+    }
+    ctx = &pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
+
     if (!pl011_ctx.initialized) {
-        mod_pl011_init_ctx();
+        /*
+         * The module is not initalised yet, so just note this request and
+         * return
+         */
+        ctx->stream_id = stream->id;
+        return FWK_SUCCESS;
     }
 
-    ctx = &pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
     if (ctx->open) { /* Refuse to open the same device twice */
         return FWK_E_BUSY;
     }
@@ -579,47 +647,6 @@ static int mod_pl011_io_open(const struct fwk_io_stream *stream)
 
     if (ctx->powered && ctx->clocked) {
         mod_pl011_enable(stream->id); /* Enable the device if possible */
-    }
-
-    return FWK_SUCCESS;
-}
-
-static int mod_pl011_io_getch(
-    const struct fwk_io_stream *restrict stream,
-    char *restrict ch)
-{
-    const struct mod_pl011_element_ctx *ctx =
-        &pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
-
-    bool ok = true;
-
-    fwk_assert(ctx->open);
-
-    if (!ctx->powered || !ctx->clocked) {
-        return FWK_E_PWRSTATE;
-    }
-
-    ok = mod_pl011_getch(stream->id, ch);
-    if (!ok) {
-        return FWK_PENDING;
-    }
-
-    return FWK_SUCCESS;
-}
-
-static int mod_pl011_io_putch(const struct fwk_io_stream *stream, char ch)
-{
-    const struct mod_pl011_element_ctx *ctx =
-        &pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
-
-    fwk_assert(ctx->open);
-
-    if (!ctx->powered || !ctx->clocked) {
-        return FWK_E_PWRSTATE;
-    }
-
-    if (!mod_pl011_putch(stream->id, ch)) {
-        return FWK_E_BUSY;
     }
 
     return FWK_SUCCESS;
@@ -642,7 +669,58 @@ static int mod_pl011_close(const struct fwk_io_stream *stream)
     return FWK_SUCCESS;
 }
 
-const struct fwk_module module_pl011 = {
+static int io_getch_not_initalised(const struct fwk_io_stream *stream, char *ch)
+{
+    /* The module has not been initalised, so do not process this request */
+    return FWK_SUCCESS;
+}
+
+static int io_putch_not_initalised(const struct fwk_io_stream *stream, char ch)
+{
+    /* The module has not been initalised, so do not process this request */
+    return FWK_SUCCESS;
+}
+
+static int io_getch_initalised(const struct fwk_io_stream *stream, char *ch)
+{
+    const struct mod_pl011_element_ctx *ctx =
+        &pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
+
+    bool ok = true;
+
+    fwk_assert(ctx->open);
+
+    if (!ctx->powered || !ctx->clocked) {
+        return FWK_E_PWRSTATE;
+    }
+
+    ok = mod_pl011_getch(stream->id, ch);
+    if (!ok) {
+        return FWK_PENDING;
+    }
+
+    return FWK_SUCCESS;
+}
+
+static int io_putch_initalised(const struct fwk_io_stream *stream, char ch)
+{
+    const struct mod_pl011_element_ctx *ctx =
+        &pl011_ctx.elements[fwk_id_get_element_idx(stream->id)];
+
+    fwk_assert(ctx->open);
+
+    if (!ctx->powered || !ctx->clocked) {
+        return FWK_E_PWRSTATE;
+    }
+
+    if (!mod_pl011_putch(stream->id, ch)) {
+        return FWK_E_BUSY;
+    }
+
+    return FWK_SUCCESS;
+}
+
+struct fwk_module module_pl011 = {
     .type = FWK_MODULE_TYPE_DRIVER,
 
     .init = mod_pl011_init,
@@ -654,8 +732,15 @@ const struct fwk_module module_pl011 = {
     .adapter =
         (struct fwk_io_adapter){
             .open = mod_pl011_io_open,
-            .getch = mod_pl011_io_getch,
-            .putch = mod_pl011_io_putch,
+            .getch = io_getch_not_initalised,
+            .putch = io_putch_not_initalised,
             .close = mod_pl011_close,
         },
 };
+
+static void update_adapter_pointers(void)
+{
+    /* Now the module is properly initalised, point at genuine putch/getch */
+    module_pl011.adapter.getch = io_getch_initalised;
+    module_pl011.adapter.putch = io_putch_initalised;
+}

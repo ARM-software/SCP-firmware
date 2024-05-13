@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -64,17 +64,24 @@ void test_mod_pl011_io_putch_success(void)
 
     fwk_id_get_element_idx_ExpectAnyArgsAndReturn(0);
 
+    /*
+     * Ensure the pointers are for the proper functions once
+     * the module has bveen initalised
+     */
+    update_adapter_pointers();
+
     pl011_ctx.elements[0].open = true;
 
     fwk_module_get_data_ExpectAnyArgsAndReturn(cfg_ut);
     fwk_id_get_element_idx_ExpectAnyArgsAndReturn(0);
 
-    status = mod_pl011_io_putch(&stream, ch);
+    status = module_pl011.adapter.putch(&stream, ch);
+
     TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
     TEST_ASSERT_EQUAL(mod_reg.DR, ch);
 }
 
-void test_mod_pl011_io_putch_fail_powered(void)
+void test_mod_pl011_io_putch_not_powered_not_initalised(void)
 {
     int status;
     char ch = 0;
@@ -85,14 +92,40 @@ void test_mod_pl011_io_putch_fail_powered(void)
     pl011_ctx.elements[0].open = true;
     pl011_ctx.elements[0].powered = false;
 
+    /*
+     * This will be before the getch/putch functions have been
+     * updated, so expect it to still be successful as it just
+     * returns OK.
+     */
+    status = module_pl011.adapter.putch(&stream, ch);
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+}
+
+void test_mod_pl011_io_putch_fail_powered(void)
+{
+    int status;
+    char ch = 0;
+    struct fwk_io_stream stream;
+
+    fwk_id_get_element_idx_ExpectAnyArgsAndReturn(0);
+
+    /*
+     * Ensure the pointers are for the proper functions once
+     * the module has bveen initalised
+     */
+    update_adapter_pointers();
+
+    pl011_ctx.elements[0].open = true;
+    pl011_ctx.elements[0].powered = false;
+
     fwk_module_get_data_ExpectAnyArgsAndReturn(cfg_ut);
     fwk_id_get_element_idx_ExpectAnyArgsAndReturn(0);
 
-    status = mod_pl011_io_putch(&stream, ch);
+    status = module_pl011.adapter.putch(&stream, ch);
     TEST_ASSERT_EQUAL(status, FWK_E_PWRSTATE);
 }
 
-void test_mod_pl011_io_putch_fail_clocked(void)
+void test_mod_pl011_io_putch_not_clocked_not_initalised(void)
 {
     int status;
     char ch = 0;
@@ -103,10 +136,36 @@ void test_mod_pl011_io_putch_fail_clocked(void)
     pl011_ctx.elements[0].open = true;
     pl011_ctx.elements[0].clocked = false;
 
+    /*
+     * This will be before the getch/putch functions have been
+     * updated, so expect it to still be successful as it just
+     * returns OK.
+     */
+    status = module_pl011.adapter.putch(&stream, ch);
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+}
+
+void test_mod_pl011_io_putch_fail_clocked(void)
+{
+    int status;
+    char ch = 0;
+    struct fwk_io_stream stream;
+
+    fwk_id_get_element_idx_ExpectAnyArgsAndReturn(0);
+
+    /*
+     * Ensure the pointers are for the proper functions once
+     * the module has bveen initalised
+     */
+    update_adapter_pointers();
+
+    pl011_ctx.elements[0].open = true;
+    pl011_ctx.elements[0].clocked = false;
+
     fwk_module_get_data_ExpectAnyArgsAndReturn(cfg_ut);
     fwk_id_get_element_idx_ExpectAnyArgsAndReturn(0);
 
-    status = mod_pl011_io_putch(&stream, ch);
+    status = module_pl011.adapter.putch(&stream, ch);
     TEST_ASSERT_EQUAL(status, FWK_E_PWRSTATE);
 }
 
@@ -118,13 +177,41 @@ void test_mod_pl011_init_ctx(void)
     fwk_module_get_element_count_ExpectAnyArgsAndReturn(1);
     fwk_module_get_data_ExpectAnyArgsAndReturn(cfg_ut);
     fwk_id_is_equal_ExpectAnyArgsAndReturn(true);
-    fwk_id_is_equal_ExpectAnyArgsAndReturn(true);
 
     mod_pl011_init_ctx();
     TEST_ASSERT_EQUAL(pl011_ctx.initialized, true);
     TEST_ASSERT_EQUAL(pl011_ctx.elements[0].powered, true);
     TEST_ASSERT_EQUAL(pl011_ctx.elements[0].clocked, true);
     TEST_ASSERT_EQUAL(pl011_ctx.elements[0].open, false);
+}
+
+void test_mod_pl011_init_ctx_open_requests(void)
+{
+    fwk_id_t stream_id_ut = FWK_ID_ELEMENT(FWK_MODULE_IDX_PL011, 0);
+
+    /* Clear module context to ensure it is properly initialized */
+    memset(&pl011_ctx, 0, sizeof(pl011_ctx));
+
+    fwk_module_get_element_count_ExpectAnyArgsAndReturn(1);
+
+    pl011_ctx.elements_allocated = true;
+    /*
+     * Allocate outside of the function so we can asign
+     * values needed for testing
+     */
+    init_element_ctx_table();
+
+    fwk_module_get_element_count_ExpectAnyArgsAndReturn(1);
+    fwk_module_get_data_ExpectAnyArgsAndReturn(cfg_ut);
+    fwk_id_is_equal_ExpectAndReturn(stream_id_ut, FWK_ID_NONE, false);
+
+    pl011_ctx.elements[0].stream_id = stream_id_ut;
+
+    mod_pl011_init_ctx();
+    TEST_ASSERT_EQUAL(pl011_ctx.initialized, true);
+    TEST_ASSERT_EQUAL(pl011_ctx.elements[0].powered, true);
+    TEST_ASSERT_EQUAL(pl011_ctx.elements[0].clocked, true);
+    TEST_ASSERT_EQUAL(pl011_ctx.elements[0].open, true);
 }
 
 void test_mod_pl011_init_initialised(void)
@@ -150,8 +237,8 @@ void test_mod_pl011_init(void)
 
     /* Set up the mock calls for the context initialisation */
     fwk_module_get_element_count_ExpectAnyArgsAndReturn(1);
+    fwk_module_get_element_count_ExpectAnyArgsAndReturn(1);
     fwk_module_get_data_ExpectAnyArgsAndReturn(cfg_ut);
-    fwk_id_is_equal_ExpectAnyArgsAndReturn(true);
     fwk_id_is_equal_ExpectAnyArgsAndReturn(true);
 
     status = mod_pl011_init(module_id, 1, NULL);
@@ -173,13 +260,29 @@ void test_mod_pl011_io_open_support(void)
     TEST_ASSERT_EQUAL(status, FWK_E_SUPPORT);
 }
 
-void test_mod_pl011_io_open_busy(void)
+void test_mod_pl011_io_not_initalised(void)
 {
     int status;
     struct fwk_io_stream stream;
 
     fwk_id_is_type_ExpectAnyArgsAndReturn(true);
 
+    pl011_ctx.initialized = false;
+    pl011_ctx.elements[0].open = true;
+
+    status = mod_pl011_io_open(&stream);
+    TEST_ASSERT_EQUAL(status, FWK_E_BUSY);
+}
+
+void test_mod_pl011_io_open_busy(void)
+{
+    int status;
+    struct fwk_io_stream stream;
+
+    fwk_id_is_type_ExpectAnyArgsAndReturn(true);
+    fwk_module_get_element_count_ExpectAnyArgsAndReturn(1);
+
+    pl011_ctx.elements_allocated = true;
     pl011_ctx.initialized = true;
     pl011_ctx.elements[0].open = true;
 
@@ -188,11 +291,27 @@ void test_mod_pl011_io_open_busy(void)
     TEST_ASSERT_EQUAL(status, FWK_E_BUSY);
 }
 
+void test_mod_pl011_io_open_not_initalised(void)
+{
+    int status;
+    struct fwk_io_stream stream;
+
+    fwk_id_is_type_ExpectAnyArgsAndReturn(true);
+    fwk_module_get_element_count_ExpectAnyArgsAndReturn(1);
+
+    pl011_ctx.initialized = false;
+
+    fwk_id_get_element_idx_ExpectAnyArgsAndReturn(0);
+    status = mod_pl011_io_open(&stream);
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+}
+
 void test_mod_pl011_io_open_success(void)
 {
     int status;
     struct fwk_io_stream stream;
 
+    pl011_ctx.elements_allocated = true;
     pl011_ctx.initialized = true;
     pl011_ctx.elements[0].clocked = true;
     pl011_ctx.elements[0].powered = true;
@@ -239,14 +358,43 @@ void test_mod_pl011_flush(void)
     mod_pl011_flush(id);
 }
 
+void test_init_element_ctx_table_fail(void)
+{
+    int status;
+
+    fwk_module_get_element_count_ExpectAnyArgsAndReturn(0);
+
+    status = init_element_ctx_table();
+    TEST_ASSERT_EQUAL(status, FWK_E_RANGE);
+}
+
+void test_init_element_ctx_table(void)
+{
+    int status;
+
+    fwk_module_get_element_count_ExpectAnyArgsAndReturn(1);
+
+    status = init_element_ctx_table();
+    TEST_ASSERT_EQUAL(status, FWK_SUCCESS);
+    TEST_ASSERT_EQUAL(pl011_ctx.elements_allocated, true);
+}
+
 int pl011_test_main(void)
 {
     UNITY_BEGIN();
+    /*
+     * Must be in this order to ensure the function points for
+     * getch/putch have not been updated.
+     */
+    RUN_TEST(test_mod_pl011_io_putch_not_powered_not_initalised);
+    RUN_TEST(test_mod_pl011_io_putch_not_clocked_not_initalised);
+
     RUN_TEST(test_mod_pl011_putch_true);
     RUN_TEST(test_mod_pl011_io_putch_success);
     RUN_TEST(test_mod_pl011_io_putch_fail_powered);
     RUN_TEST(test_mod_pl011_io_putch_fail_clocked);
     RUN_TEST(test_mod_pl011_io_open_busy);
+    RUN_TEST(test_mod_pl011_io_open_not_initalised);
     RUN_TEST(test_mod_pl011_init_ctx);
     RUN_TEST(test_mod_pl011_init_initialised);
     RUN_TEST(test_mod_pl011_init);
@@ -254,6 +402,9 @@ int pl011_test_main(void)
     RUN_TEST(test_mod_pl011_io_open_success);
     RUN_TEST(test_mod_pl011_io_getch);
     RUN_TEST(test_mod_pl011_flush);
+    RUN_TEST(test_init_element_ctx_table_fail);
+    RUN_TEST(test_init_element_ctx_table);
+    RUN_TEST(test_mod_pl011_init_ctx_open_requests);
     return UNITY_END();
 }
 
