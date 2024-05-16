@@ -8,7 +8,7 @@
 .check-fwk:
   image: ${CI_REGISTRY_IMAGE}/ci-base:latest
   script:
-    - python3 tools/check_framework.py --coverage
+    - python3 tools/check_utest.py --type fwk --coverage
   artifacts:
     when: on_success
     expire_in: 2 days
@@ -21,7 +21,7 @@
     GIT_SUBMODULE_STRATEGY: recursive
     GIT_DEPTH: 1
   script:
-    - python3 tools/check_module_utest.py --coverage
+    - python3 tools/check_utest.py --type mod --coverage
   artifacts:
     when: on_success
     expire_in: 2 days

@@ -6,9 +6,9 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 """
-Build and check unit tests for modules.
-This script runs 'CC=gcc make -f Makefile.cmake mod_test' and performs all
-modules' unit tests.
+Build and check unit tests in SCP-firmware.
+This script runs 'CC=gcc make -f Makefile.cmake {suite}_test' and performs all
+unit tests in the selected suite. The supported suite are framework and module.
 """
 
 import argparse
@@ -17,12 +17,12 @@ import subprocess
 from utils import banner
 
 
-def run(coverage=False):
-    print(banner('Build and run modules\' unit tests'))
+def run(coverage=False, suite=""):
+    print(banner(f'Build and run {suite} unit tests'))
 
     extra_args = f'ENABLE_COVERAGE={"y" if coverage else "n"}'
     result = subprocess.Popen(
-        f'CC=gcc make -f Makefile.cmake mod_test {extra_args}',
+        f'CC=gcc make -f Makefile.cmake {suite}_test {extra_args}',
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE)
@@ -33,17 +33,21 @@ def run(coverage=False):
 
     if result.returncode != 0:
         print(stderr.decode())
-        print('Build and run modules\' unit tests failed.')
+        print(f'Build and run {suite} unit tests failed.')
         return False
 
-    print('Build and run modules\' unit tests succedded.')
+    print(f'Build and run {suite} unit tests succedded.')
     return True
 
 
 def parse_args(argv, prog_name):
     parser = argparse.ArgumentParser(
         prog=prog_name,
-        description='Build and run modules\' unit tests')
+        description=f'Build and run unit tests in SCP-firmware')
+
+    parser.add_argument('-s', '--suite', dest='suite', required=True,
+                        choices=['fwk', 'mod'], action='store',
+                        help=f'The supported unit test suite.')
 
     parser.add_argument('-c', '--coverage', dest='coverage',
                         required=False, default=False, action='store_true',
@@ -54,7 +58,7 @@ def parse_args(argv, prog_name):
 
 def main(argv=[], prog_name=''):
     args = parse_args(argv, prog_name)
-    return 0 if run(args.coverage) else 1
+    return 0 if run(args.coverage, args.suite) else 1
 
 
 if __name__ == '__main__':
