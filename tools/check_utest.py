@@ -8,7 +8,8 @@
 """
 Build and check unit tests in SCP-firmware.
 This script runs 'CC=gcc make -f Makefile.cmake {suite}_test' and performs all
-unit tests in the selected suite. The supported suite are framework and module.
+unit tests in the selected suite. The supported suite are framework, module and
+product.
 """
 
 import argparse
@@ -46,7 +47,7 @@ def parse_args(argv, prog_name):
         description=f'Build and run unit tests in SCP-firmware')
 
     parser.add_argument('-s', '--suite', dest='suite', required=True,
-                        choices=['fwk', 'mod'], action='store',
+                        choices=['fwk', 'mod', 'prod'], action='store',
                         help=f'The supported unit test suite.')
 
     parser.add_argument('-c', '--coverage', dest='coverage',

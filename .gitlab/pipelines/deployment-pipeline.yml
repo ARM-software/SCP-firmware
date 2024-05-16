@@ -82,17 +82,9 @@ coverity-test:
   dependencies:
     - pull-mr
 
-check-fwk:
+check-ut:
   extends:
-    - .check-fwk
-    - .git-strategy-on-mr
-  stage: unit-testing
-  dependencies:
-    - pull-mr
-
-check-modules:
-  extends:
-    - .check-modules
+    - .check-ut
     - .git-strategy-on-mr
   stage: unit-testing
   dependencies:

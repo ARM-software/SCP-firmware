@@ -35,13 +35,8 @@ coverity-test:
   extends: .coverity-test
   allow_failure: true
 
-check-fwk:
-  extends: .check-fwk
-  stage: unit-testing
-  allow_failure: true
-
-check-modules:
-  extends: .check-modules
+check-ut:
+  extends: .check-ut
   stage: unit-testing
   allow_failure: true
 
