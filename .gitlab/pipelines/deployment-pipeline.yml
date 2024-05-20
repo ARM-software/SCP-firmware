@@ -64,6 +64,14 @@ check-style:
   dependencies:
     - pull-mr
 
+check-for-merge-commits:
+  extends:
+    - .check-for-merge-commits
+    - .git-strategy-on-mr
+  stage: linting
+  dependencies:
+    - pull-mr
+
 banned-api:
   extends:
     - .banned-api

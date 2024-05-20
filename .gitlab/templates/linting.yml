@@ -31,3 +31,15 @@
     expire_in: 2 days
     paths:
       - code-style.patch
+
+.check-for-merge-commits:
+  image: ${CI_REGISTRY_IMAGE}/ci-base:latest
+  script:
+    - |
+      merge_count=$(git log --merges --oneline \
+        $CI_MERGE_REQUEST_DIFF_BASE_SHA..HEAD | wc -l)
+      if [ $merge_count -gt 0 ]; then
+        echo "Error: There are merge commits in the specified range."
+        exit 1
+      fi
+      echo "SUCCESS: No merge commits in range."
