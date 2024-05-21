@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -29,9 +29,12 @@ set(SCP_ENABLE_PLUGIN_HANDLER_INIT FALSE)
 
 set(SCP_ENABLE_OUTBAND_MSG_SUPPORT_INIT TRUE)
 
-set(SCP_PLATFORM_VARIANT_INIT 0) #Standard variant by default
+set(SCP_PLATFORM_VARIANT_INIT "0") #Standard variant by default
 
 set(SCP_ARCHITECTURE "arm-m")
+
+set(SCP_PLATFORM_VARIANT ${SCP_PLATFORM_VARIANT_INIT} CACHE STRING
+    "Platform variant for the build")
 
 list(PREPEND SCP_MODULE_PATHS "${CMAKE_CURRENT_LIST_DIR}/../../common/module/tc_system")
 
@@ -62,3 +65,8 @@ list(APPEND SCP_MODULES "scmi-perf")
 list(APPEND SCP_MODULES "mock-psu")
 list(APPEND SCP_MODULES "psu")
 list(APPEND SCP_MODULES "tc-system")
+
+if (SCP_PLATFORM_VARIANT STREQUAL "1")
+    set(SCP_ENABLE_PLUGIN_HANDLER TRUE)
+    set(SCP_ENABLE_SCMI_PERF_FAST_CHANNELS TRUE)
+endif()

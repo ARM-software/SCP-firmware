@@ -29,9 +29,6 @@ if (SCP_PLATFORM_VARIANT STREQUAL "1")
     target_compile_definitions(tc2-bl2
         PUBLIC -DPLATFORM_VARIANT=TC2_VAR_EXPERIMENT_POWER)
 
-    set(SCP_ENABLE_PLUGIN_HANDLER TRUE PARENT_SCOPE)
-    set(SCP_ENABLE_SCMI_PERF_FAST_CHANNELS TRUE PARENT_SCOPE)
-
 # The following list of modules will be appended in Firmware.cmake in the same
 # order
 
