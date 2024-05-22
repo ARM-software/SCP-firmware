@@ -11,6 +11,7 @@ stages:
   - unit-testing
   - build
   - scmi-test
+  - platform-test
 
 include:
   - local: .gitlab/templates/linting.yml
@@ -19,6 +20,7 @@ include:
   - local: .gitlab/templates/build-test.yml
   - local: .gitlab/templates/scmi-test.yml
   - local: .gitlab/templates/coverity-test.yml
+  - local: .gitlab/templates/platform-test.yml
 
 check-lint:
   extends: .check-lint
@@ -48,3 +50,17 @@ build-products-all-log-levels:
 scmi-test:
   extends: .scmi-test
   stage: scmi-test
+
+fvp-boot-test:
+  extends: .fvp-boot-test
+  stage: platform-test
+
+board-test-build:
+  extends: .board-test-build
+  stage: platform-test
+
+board-test-run:
+  extends: .board-test-run
+  stage: platform-test
+  needs:
+    - board-test-build

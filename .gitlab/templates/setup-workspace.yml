@@ -48,3 +48,11 @@
     - if: $FETCH_PUBLIC_MR == "false"
       variables:
         GIT_STRATEGY: fetch
+
+.auto_on_public_mr_only:
+  rules:
+    - if: $FETCH_PUBLIC_MR == "true"
+      when: on_success
+    - if: $FETCH_PUBLIC_MR == "false"
+      when: manual
+      allow_failure: true

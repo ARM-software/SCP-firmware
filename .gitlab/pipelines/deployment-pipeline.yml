@@ -12,6 +12,7 @@ stages:
   - unit-testing
   - build
   - scmi-test
+  - platform-test
 
 include:
   - local: .gitlab/templates/setup-workspace.yml
@@ -22,7 +23,7 @@ include:
   - local: .gitlab/templates/build-test.yml
   - local: .gitlab/templates/scmi-test.yml
   - local: .gitlab/templates/coverity-test.yml
-
+  - local: .gitlab/templates/platform-test.yml
 
 pull-mr:
   stage: .pre
@@ -111,3 +112,26 @@ scmi-test:
   stage: scmi-test
   dependencies:
     - pull-mr
+
+fvp-boot-test:
+  extends:
+    - .fvp-boot-test
+    - .git-strategy-on-mr
+    - .auto_on_public_mr_only
+  stage: platform-test
+
+board-test-build:
+  extends:
+    - .board-test-build
+    - .git-strategy-on-mr
+    - .auto_on_public_mr_only
+  stage: platform-test
+
+board-test-run:
+  extends:
+    - .board-test-run
+    - .git-strategy-on-mr
+    - .auto_on_public_mr_only
+  stage: platform-test
+  needs:
+    - board-test-build

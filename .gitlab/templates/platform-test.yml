@@ -1,0 +1,87 @@
+#
+# Arm SCP/MCP Software
+# Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+.platform-test:
+  image: ${CI_REGISTRY_IMAGE}/plat-test-amd64
+  tags:
+    - amd64
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_DEPTH: 1
+  before_script:
+    - echo "PROJECT_TYPE = $PROJECT_TYPE"
+    - ln -s $(pwd) /$PROJECT_TYPE
+  script:
+    - echo "platform under test $SCP_CI_PLATFORM"
+    - /plat_test_entrypoint.sh $PROJECT_TYPE
+
+.fvp-boot-test:
+  extends: .platform-test
+  variables:
+    SCP_CI_SUBTEST_CFG: fvp
+  parallel:
+    matrix:
+      - SCP_CI_PLATFORM:
+        - morello
+        - rdn1edge
+        - rdv1
+        - sgi575
+        - tc2
+  artifacts:
+    when: on_failure
+    expire_in: 2 days
+    paths:
+      - wspace/scp-boot-tests/fvp-*/run/uart*.txt
+      - wspace/scp-boot-tests/fvp-*/run/model_log.txt
+      - wspace/scp-boot-tests/fvp-*/run/run.sh
+      - wspace/scp-boot-tests/fvp-*/artefacts/build.log
+      - wspace/scp-boot-tests/fvp-*/artefacts/debug/model_params
+      - wspace/scp-boot-tests/fvp-*/artefacts/debug/bl*.bin
+      - wspace/scp-boot-tests/fvp-*/artefacts/debug/scp*.bin
+      - wspace/scp-boot-tests/fvp-*/artefacts/debug/fip.bin
+      - wspace/scp-boot-tests/fvp-*/artefacts/debug/initrd.bin
+      - wspace/scp-boot-tests/fvp-*/artefacts/debug/kernel.bin
+
+.board-test-build:
+  extends: .platform-test
+  variables:
+    SCP_CI_SUBTEST_CFG: board_build
+  parallel:
+    matrix:
+      - SCP_CI_PLATFORM:
+        - juno-linux
+        - juno-tftf
+        - juno-scmi
+        - n1sdp-linux
+  after_script:
+    - cp wspace/job.yaml wspace/${SCP_CI_PLATFORM}.yaml
+    - cat wspace/${SCP_CI_PLATFORM}.yaml
+  artifacts:
+    when: always
+    expire_in: 2 days
+    paths:
+      - wspace/release/n1sdp-board-firmware_primary.zip
+      - wspace/artefacts/*/juno_recovery.zip
+      - wspace/${SCP_CI_PLATFORM}.yaml
+
+.board-test-run:
+  extends: .platform-test
+  stage: run
+  variables:
+    SCP_CI_SUBTEST_CFG: board_run
+  parallel:
+    matrix:
+      - SCP_CI_PLATFORM:
+        - juno-linux
+        - juno-tftf
+        - juno-scmi
+        - n1sdp-linux
+  artifacts:
+    when: on_failure
+    expire_in: 2 days
+    paths:
+      - wspace/job_results.yaml
