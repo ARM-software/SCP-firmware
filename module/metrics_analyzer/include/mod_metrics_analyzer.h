@@ -30,6 +30,37 @@ enum mod_metrics_analyzer_api_idx {
 };
 
 /*!
+ * \brief Metrics analyzer interactor, which can be a provider or a consumer.
+ *        The interactor is defined by the API ID and the corresponding domain
+ *        ID from the interactor perspective.
+ */
+struct mod_metrics_analyzer_interactor {
+    /*!
+     * ID of the API which information is transfered through.
+     */
+    const fwk_id_t api_id;
+    /*!
+     * The ID to be used when calling the API with.
+       The domain under interaction.
+     */
+    const fwk_id_t domain_id;
+};
+
+/*!
+ * \brief Metrics Analyzer module domain configuration data.
+ */
+struct mod_metrics_analyzer_domain_config {
+    /*!
+     * List of the power limit providers for the metrics analyzer domain.
+     */
+    const struct mod_metrics_analyzer_interactor *limit_providers;
+    /*!
+     * The power limit consumer for the metrics analyzer domain.
+     */
+    const struct mod_metrics_analyzer_interactor limit_consumer;
+};
+
+/*!
  * \}
  */
 
