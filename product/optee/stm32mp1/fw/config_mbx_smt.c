@@ -78,6 +78,7 @@ static struct fwk_element smt_elt_table[] = {
 #else
             .data = &((struct mod_msg_smt_channel_config) {
                 .type = MOD_MSG_SMT_CHANNEL_TYPE_REQUESTER,
+                .mailbox_size = SCMI_SHMEM_SIZE,
                 .driver_id = FWK_ID_ELEMENT_INIT(
                     FWK_MODULE_IDX_OPTEE_MBX,
                     SCMI_CHANNEL_DEVICE_IDX_NS0),
