@@ -14,6 +14,8 @@
 #include <fwk_module.h>
 #include <fwk_module_idx.h>
 
+#define SCMI_OPTEE_MAX_MSG_SIZE 128
+
 static const struct fwk_element mbx_element_table[] = {
     [SCMI_CHANNEL_DEVICE_IDX_PSCI] = {
         .name = "OP-TEE for PSCI",
@@ -65,6 +67,7 @@ static struct fwk_element smt_element_table[] = {
         .name = "PSCI",
         .data = &((struct mod_msg_smt_channel_config){
             .type = MOD_MSG_SMT_CHANNEL_TYPE_REQUESTER,
+            .mailbox_size = SCMI_OPTEE_MAX_MSG_SIZE,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_OPTEE_MBX,
                 SCMI_CHANNEL_DEVICE_IDX_PSCI),
@@ -77,6 +80,7 @@ static struct fwk_element smt_element_table[] = {
         .name = "OSPM0",
         .data = &((struct mod_msg_smt_channel_config){
             .type = MOD_MSG_SMT_CHANNEL_TYPE_REQUESTER,
+            .mailbox_size = SCMI_OPTEE_MAX_MSG_SIZE,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_OPTEE_MBX,
                 SCMI_CHANNEL_DEVICE_IDX_OSPM_0),
@@ -89,6 +93,7 @@ static struct fwk_element smt_element_table[] = {
         .name = "OSPM1",
         .data = &((struct mod_msg_smt_channel_config){
             .type = MOD_MSG_SMT_CHANNEL_TYPE_REQUESTER,
+            .mailbox_size = SCMI_OPTEE_MAX_MSG_SIZE,
             .driver_id = FWK_ID_ELEMENT_INIT(
                 FWK_MODULE_IDX_OPTEE_MBX,
                 SCMI_CHANNEL_DEVICE_IDX_OSPM_1),
