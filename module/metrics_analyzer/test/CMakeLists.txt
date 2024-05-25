@@ -18,5 +18,6 @@ set(MODULE_UT_INC ${CMAKE_CURRENT_LIST_DIR})
 set(MODULE_UT_MOCK_SRC ${CMAKE_CURRENT_LIST_DIR}/mocks)
 
 list(APPEND MOCK_REPLACEMENTS fwk_module)
+list(APPEND MOCK_REPLACEMENTS fwk_mm)
 
 include(${SCP_ROOT}/unit_test/module_common.cmake)

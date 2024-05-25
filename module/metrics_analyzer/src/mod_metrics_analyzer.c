@@ -12,7 +12,10 @@
 
 #include <interface_power_management.h>
 
+#include <fwk_id.h>
+#include <fwk_mm.h>
 #include <fwk_module.h>
+#include <fwk_module_idx.h>
 
 struct mod_metric_ctx {
     const struct mod_metrics_analyzer_interactor *limit_provider_config;
@@ -39,6 +42,15 @@ struct mod_metrics_analyzer_ctx {
 
 static struct mod_metrics_analyzer_ctx metrics_analyzer_ctx;
 
+static int analyze(void)
+{
+    return FWK_SUCCESS;
+}
+
+static struct mod_metrics_analyzer_analyze_api analyze_api = {
+    .analyze = analyze,
+};
+
 /*
  * Framework handlers
  */
@@ -46,12 +58,17 @@ static struct mod_metrics_analyzer_ctx metrics_analyzer_ctx;
 static int metrics_analyzer_init(
     fwk_id_t module_id,
     unsigned int element_count,
-    const void *unused)
+    const void *config_data)
 {
-    if (element_count == 0U) {
+    if (element_count == 0U ||
+        !fwk_id_is_equal(
+            module_id, FWK_ID_MODULE(FWK_MODULE_IDX_METRICS_ANALYZER))) {
         return FWK_E_PARAM;
     }
 
+    metrics_analyzer_ctx.domain_count = element_count;
+    metrics_analyzer_ctx.domain =
+        fwk_mm_calloc(element_count, sizeof(metrics_analyzer_ctx.domain[0]));
     return FWK_SUCCESS;
 }
 
@@ -60,13 +77,61 @@ static int metrics_analyzer_element_init(
     unsigned int sub_element_count,
     const void *data)
 {
-    int status = FWK_SUCCESS;
+    if (sub_element_count == 0U || data == NULL) {
+        return FWK_E_PARAM;
+    }
+
+    size_t domain_idx = fwk_id_get_element_idx(element_id);
+    metrics_analyzer_ctx.domain[domain_idx].config = data;
+    metrics_analyzer_ctx.domain[domain_idx].aggregate_limit = UINT32_MAX;
+    metrics_analyzer_ctx.domain[domain_idx].metrics_count = sub_element_count;
+    metrics_analyzer_ctx.domain[domain_idx].metrics = fwk_mm_calloc(
+        sub_element_count,
+        sizeof(metrics_analyzer_ctx.domain[domain_idx].metrics[0]));
+
+    for (size_t i = 0; i < sub_element_count; ++i) {
+        metrics_analyzer_ctx.domain[domain_idx].metrics[i].limit = UINT32_MAX;
+        metrics_analyzer_ctx.domain[domain_idx]
+            .metrics[i]
+            .limit_provider_config =
+            &metrics_analyzer_ctx.domain[domain_idx].config->limit_providers[i];
+    }
+
+    return FWK_SUCCESS;
+}
+
+static int metrics_analyzer_bind_element(fwk_id_t id)
+{
+    int status = FWK_E_INIT;
+    size_t domain_idx = fwk_id_get_element_idx(id);
+    struct mod_domain_ctx *domain_ctx =
+        &metrics_analyzer_ctx.domain[domain_idx];
+    for (size_t i = 0; i < domain_ctx->metrics_count; ++i) {
+        struct mod_metric_ctx *metrics_ctx = &domain_ctx->metrics[i];
+        status = fwk_module_bind(
+            metrics_ctx->limit_provider_config->domain_id,
+            metrics_ctx->limit_provider_config->api_id,
+            &metrics_ctx->limit_provider_api);
+        if (status != FWK_SUCCESS) {
+            return status;
+        }
+    }
+
+    status = fwk_module_bind(
+        domain_ctx->config->limit_consumer.domain_id,
+        domain_ctx->config->limit_consumer.api_id,
+        &domain_ctx->limit_consumer_api);
 
     return status;
 }
 
 static int metrics_analyzer_bind(fwk_id_t id, unsigned int round)
 {
+    /* Bind our elements in round 0 */
+    if (round == 0 && fwk_id_is_type(id, FWK_ID_TYPE_ELEMENT)) {
+        return metrics_analyzer_bind_element(id);
+    }
+
     return FWK_SUCCESS;
 }
 
@@ -76,6 +141,22 @@ static int metrics_analyzer_process_bind_request(
     fwk_id_t api_id,
     const void **api)
 {
+    /* Only allow binding to the module */
+    if (api == NULL ||
+        !fwk_id_is_equal(
+            target_id, FWK_ID_MODULE(FWK_MODULE_IDX_METRICS_ANALYZER))) {
+        return FWK_E_PARAM;
+    }
+
+    if (!fwk_id_is_equal(
+            api_id,
+            FWK_ID_API(
+                FWK_MODULE_IDX_METRICS_ANALYZER,
+                MOD_METRICS_ANALYZER_API_IDX_ANALYZE))) {
+        return FWK_E_PARAM;
+    }
+
+    *api = &analyze_api;
     return FWK_SUCCESS;
 }
 
