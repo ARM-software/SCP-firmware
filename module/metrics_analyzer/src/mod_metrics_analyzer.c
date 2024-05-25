@@ -10,7 +10,34 @@
 
 #include "mod_metrics_analyzer.h"
 
+#include <interface_power_management.h>
+
 #include <fwk_module.h>
+
+struct mod_metric_ctx {
+    const struct mod_metrics_analyzer_interactor *limit_provider_config;
+    struct interface_power_management_api *limit_provider_api;
+    uint32_t limit;
+};
+
+struct mod_domain_ctx {
+    struct mod_metric_ctx *metrics;
+    size_t metrics_count;
+    uint32_t aggregate_limit;
+    const struct mod_metrics_analyzer_domain_config *config;
+    struct interface_power_management_api *limit_consumer_api;
+};
+
+struct mod_metrics_analyzer_ctx {
+    /* list of system domains context */
+    struct mod_domain_ctx *domain;
+    /* Number of domains */
+    size_t domain_count;
+    /* Metrics analyzer configuration (on the module scope) */
+    const struct mod_metrics_analyzer_config *config;
+};
+
+static struct mod_metrics_analyzer_ctx metrics_analyzer_ctx;
 
 /*
  * Framework handlers
