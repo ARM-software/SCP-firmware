@@ -32,6 +32,18 @@
  */
 struct interface_power_management_api {
     /*!
+     * \brief Get the power limit
+     * \param id Identifier of the entity to collect it's power limit.
+     * \param[out] power_limit The power limit of the given entity.
+     *
+     * \retval ::FWK_SUCCESS The operation succeeded.
+     * \retval ::FWK_E_PARAM An invalid parameter was encountered.
+     *      - The`id` not valid id.
+     *      - The `power_limit` parameter is a null pointer.
+     * \retval ::FWK_E_BUSY Limit for the requested id is not ready yet.
+     */
+    int (*get_limit)(fwk_id_t id, uint32_t *power_limit);
+    /*!
      * \brief Set the power limit for an entity to be registered. This doesn't
      *        necessarily mean the power limit is set physically.
      * \param id Identifier of the entity to set the limit to.
