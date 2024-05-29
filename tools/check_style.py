@@ -73,7 +73,7 @@ def parse_args(argv, prog_name):
 
 def main(argv=[], prog_name=''):
     args = parse_args(argv, prog_name)
-    return 0 if run(args.output_file, args.commit_hash) else 0
+    return 0 if run(args.output_file, args.commit_hash) else 1
 
 
 if __name__ == '__main__':
