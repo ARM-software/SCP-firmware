@@ -49,8 +49,6 @@ check-lint:
     - pull-mr
 
 check-copyright:
-  before_script:
-    - ls .gitlab/templates
   extends:
     - .check-copyright
     - .git-strategy-on-mr
