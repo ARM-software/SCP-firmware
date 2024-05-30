@@ -17,16 +17,17 @@ privileges to configure and control the access rights of other agents in the
 system. PSCI agent generally is the trusted agent. The platform is responsible
 for securing the privileged agent.
 
+## Scope
+
+The SCP Firmware provides system SCMI agents like OSPM and PSCI control over
+hardware resources such as power domain gating, voltage supplies, clocks,
+sensors and counters. The scope of the threat model assets are the SCMI
+resources including devices and protocols. The trust boundary is between the
+SCMI Agents and the Firmware.
 
 ## SCP-Firmware Data Flow Diagrams
 
 ![SCP Firmware Data Flow Diagram](threat_model/Threat_model.drawio.svg)
-
-The SCP Firmware provides system agents like OSPM, PSCI, MCP, LCP, and RSS
-control over hardware resources such as power domain gating, voltage supplies,
-clocks, sensors and counters. The scope of the threat model assets are the SCMI
-resources including devices and protocols. The trust boundary is between the
-SCMI Agents and the SCP.
 
 ## Assumptions
 
