@@ -1,7 +1,6 @@
 clang-format==9.0.0
 cmake-format==0.6.13
 colorama==0.4.3
-docker==4.3.1
 pycodestyle==2.6.0
 ruamel.yaml==0.16.12
 yamllint==1.25.0
