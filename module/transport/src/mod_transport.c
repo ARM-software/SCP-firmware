@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -274,8 +274,7 @@ static int transport_respond(
 #endif
 
     if (buffer == NULL) {
-        FWK_LOG_ERR(
-            "%s ERROR: NULL buffer in \"transport_respond()\"", MOD_NAME);
+        FWK_LOG_ERR("%s ERROR: NULL buffer in \"%s()\"", MOD_NAME, __func__);
         return FWK_E_PANIC;
     }
 
@@ -373,6 +372,11 @@ static int transport_transmit(
 #    endif
     }
 #endif
+
+    if (buffer == NULL) {
+        FWK_LOG_ERR("%s ERROR: NULL buffer in \"%s()\"", MOD_NAME, __func__);
+        return FWK_E_PANIC;
+    }
 
     buffer->message_header = message_header;
 

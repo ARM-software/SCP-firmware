@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -405,11 +405,9 @@ static int system_power_mod_init(fwk_id_t module_id,
                                 unsigned int element_count,
                                 const void *data)
 {
-    const struct mod_system_power_config *config;
-
     fwk_assert(data != NULL);
 
-    system_power_ctx.config = config = data;
+    system_power_ctx.config = data;
     system_power_ctx.mod_pd_system_id = FWK_ID_NONE;
     system_power_ctx.dev_count = element_count;
 

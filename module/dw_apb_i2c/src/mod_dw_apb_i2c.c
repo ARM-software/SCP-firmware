@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -117,7 +117,7 @@ static void i2c_isr(uintptr_t data)
 
     /* The transaction has completed successfully */
     if (i2c_reg->IC_INTR_STAT & IC_INTR_STOP_DET_MASK) {
-        i2c_reg->IC_CLR_STOP_DET;
+        (void)i2c_reg->IC_CLR_STOP_DET;
         i2c_status = FWK_SUCCESS;
         if (ctx->read_on_going) {
             ctx->read_on_going = false;
@@ -131,7 +131,7 @@ static void i2c_isr(uintptr_t data)
 
     /* The transaction has been aborted */
     if (i2c_reg->IC_INTR_STAT & IC_INTR_TX_ABRT_MASK) {
-        i2c_reg->IC_CLR_TX_ABRT;
+        (void)i2c_reg->IC_CLR_TX_ABRT;
     }
 
     ctx->i2c_api->transaction_completed(ctx->i2c_id, i2c_status);

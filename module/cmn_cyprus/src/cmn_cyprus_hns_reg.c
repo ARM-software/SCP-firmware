@@ -660,7 +660,7 @@ int setup_hns_ctx(struct cmn_cyprus_hns_reg *hns)
  * HN-S node. Isolated HN-S nodes are skipped during the CMN Discovery and hence
  * point to null.
  */
-inline bool is_hns_node_isolated(struct cmn_cyprus_hns_reg *hns)
+inline bool is_hns_node_isolated(const struct cmn_cyprus_hns_reg *hns)
 {
     return (hns == NULL);
 }

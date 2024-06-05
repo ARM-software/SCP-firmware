@@ -58,7 +58,7 @@ void mod_sensor_get_data_CMockReturnMemThruPtr_data(UNITY_LINE_TYPE cmock_line, 
 void distribute_power_CMockExpectAnyArgs(UNITY_LINE_TYPE cmock_line);
 #define distribute_power_Expect(id, perf_request, perf_limit) distribute_power_CMockExpect(__LINE__, id, perf_request, perf_limit)
 void distribute_power_CMockExpect(UNITY_LINE_TYPE cmock_line, fwk_id_t id, uint32_t* perf_request, uint32_t* perf_limit);
-typedef void (* CMOCK_distribute_power_CALLBACK)(fwk_id_t id, uint32_t* perf_request, uint32_t* perf_limit, int cmock_num_calls);
+typedef void (* CMOCK_distribute_power_CALLBACK)(fwk_id_t id, const uint32_t* perf_request, uint32_t* perf_limit, int cmock_num_calls);
 void distribute_power_AddCallback(CMOCK_distribute_power_CALLBACK Callback);
 void distribute_power_Stub(CMOCK_distribute_power_CALLBACK Callback);
 #define distribute_power_StubWithCallback distribute_power_Stub

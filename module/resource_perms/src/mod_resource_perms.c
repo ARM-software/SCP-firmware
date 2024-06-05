@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -293,80 +293,73 @@ static int mod_res_message_id_to_index(
         return FWK_SUCCESS;
 
     case MOD_SCMI_PROTOCOL_ID_SYS_POWER:
-        if (message_id >= MOD_SCMI_SYS_POWER_COMMAND_COUNT) {
-            return FWK_E_PARAM;
-        }
         if ((message_id >= MOD_SCMI_SYS_POWER_STATE_SET) &&
             (message_id <= MOD_SCMI_SYS_POWER_STATE_NOTIFY)) {
             *message_idx =
                 (int32_t)(message_id - (uint32_t)MOD_SCMI_SYS_POWER_STATE_SET);
+        } else if (message_id >= MOD_SCMI_SYS_POWER_COMMAND_COUNT) {
+            return FWK_E_PARAM;
         }
         return FWK_SUCCESS;
 
     case MOD_SCMI_PROTOCOL_ID_PERF:
-        if (message_id >= MOD_SCMI_PERF_COMMAND_COUNT) {
-            return FWK_E_PARAM;
-        }
         if ((message_id >= MOD_SCMI_PERF_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_PERF_DESCRIBE_FAST_CHANNEL)) {
             *message_idx = (int32_t)(
                 message_id - (uint32_t)MOD_SCMI_PERF_DOMAIN_ATTRIBUTES);
+        } else if (message_id >= MOD_SCMI_PERF_COMMAND_COUNT) {
+            return FWK_E_PARAM;
         }
         return FWK_SUCCESS;
 
     case MOD_SCMI_PROTOCOL_ID_CLOCK:
-        if (message_id >= MOD_SCMI_CLOCK_COMMAND_COUNT) {
-            return FWK_E_PARAM;
-        }
         if ((message_id >= MOD_SCMI_CLOCK_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_CLOCK_CONFIG_SET)) {
             *message_idx =
                 (int32_t)(message_id - (uint32_t)MOD_SCMI_CLOCK_ATTRIBUTES);
+        } else if (message_id >= MOD_SCMI_CLOCK_COMMAND_COUNT) {
+            return FWK_E_PARAM;
         }
         return FWK_SUCCESS;
 
     case MOD_SCMI_PROTOCOL_ID_SENSOR:
-        if (message_id >= MOD_SCMI_SENSOR_COMMAND_COUNT) {
-            return FWK_E_PARAM;
-        }
         if ((message_id >= MOD_SCMI_SENSOR_DESCRIPTION_GET) &&
             (message_id <= MOD_SCMI_SENSOR_READING_GET)) {
             *message_idx = (int32_t)(
                 message_id - (uint32_t)MOD_SCMI_SENSOR_DESCRIPTION_GET);
+        } else if (message_id >= MOD_SCMI_SENSOR_COMMAND_COUNT) {
+            return FWK_E_PARAM;
         }
         return FWK_SUCCESS;
 
     case MOD_SCMI_PROTOCOL_ID_RESET_DOMAIN:
-        if (message_id >= MOD_SCMI_RESET_COMMAND_COUNT) {
-            return FWK_E_PARAM;
-        }
         if ((message_id >= MOD_SCMI_RESET_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_RESET_NOTIFY)) {
             *message_idx = (int32_t)(
                 message_id - (uint32_t)MOD_SCMI_RESET_DOMAIN_ATTRIBUTES);
+        } else if (message_id >= MOD_SCMI_RESET_COMMAND_COUNT) {
+            return FWK_E_PARAM;
         }
         return FWK_SUCCESS;
 
     case MOD_SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN:
-        if (message_id >= MOD_SCMI_VOLTD_COMMAND_COUNT) {
-            return FWK_E_PARAM;
-        }
         if ((message_id >= MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES) &&
             (message_id <= MOD_SCMI_VOLTD_LEVEL_GET)) {
             *message_idx = (int32_t)(
                 message_id - (uint32_t)MOD_SCMI_VOLTD_DOMAIN_ATTRIBUTES);
+        } else if (message_id >= MOD_SCMI_VOLTD_COMMAND_COUNT) {
+            return FWK_E_PARAM;
         }
         return FWK_SUCCESS;
 
     case MOD_SCMI_PROTOCOL_ID_POWER_CAPPING:
-        if (message_id >= MOD_SCMI_POWER_CAPPING_COMMAND_COUNT) {
-            return FWK_E_PARAM;
-        }
         if ((message_id >= MOD_SCMI_POWER_CAPPING_DOMAIN_ATTRIBUTES) &&
             (message_id < MOD_SCMI_POWER_CAPPING_COMMAND_COUNT)) {
             *message_idx = (int32_t)(
                 message_id -
                 (uint32_t)MOD_SCMI_POWER_CAPPING_DOMAIN_ATTRIBUTES);
+        } else if (message_id >= MOD_SCMI_POWER_CAPPING_COMMAND_COUNT) {
+            return FWK_E_PARAM;
         }
         return FWK_SUCCESS;
 
@@ -1264,7 +1257,7 @@ static int mod_res_agent_set_device_protocol_permission(
 static void mod_res_agent_copy_config(
     uint32_t agent_id,
     mod_res_perms_t *perms,
-    mod_res_perms_t *backup_perms,
+    const mod_res_perms_t *backup_perms,
     uint32_t protocol_id)
 {
     int cmd_count;

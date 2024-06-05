@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -131,7 +131,7 @@ struct mod_thermal_mgmt_actor_ctx *get_actor_ctx(
 /* Power allocation */
 void distribute_power(
     fwk_id_t id,
-    uint32_t *perf_request,
+    const uint32_t *perf_request,
     uint32_t *perf_limit);
 
 #endif /* THERMAL_MGMT_H */

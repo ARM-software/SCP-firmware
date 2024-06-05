@@ -421,7 +421,7 @@ void mod_sensor_get_data_CMockReturnMemThruPtr_data(UNITY_LINE_TYPE cmock_line, 
   cmock_call_instance->ReturnThruPtr_data_Size = cmock_size;
 }
 
-void distribute_power(fwk_id_t id, uint32_t* perf_request, uint32_t* perf_limit)
+void distribute_power(fwk_id_t id, const uint32_t* perf_request, uint32_t* perf_limit)
 {
   UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
   CMOCK_distribute_power_CALL_INSTANCE* cmock_call_instance;

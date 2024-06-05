@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -123,7 +123,10 @@ static unsigned int get_dvfs_domain_idx(
     return fwk_id_get_element_idx(actor_ctx->config->dvfs_domain_id);
 }
 
-void distribute_power(fwk_id_t id, uint32_t *perf_request, uint32_t *perf_limit)
+void distribute_power(
+    fwk_id_t id,
+    const uint32_t *perf_request,
+    uint32_t *perf_limit)
 {
     struct mod_thermal_mgmt_dev_ctx *dev_ctx;
     struct mod_thermal_mgmt_actor_ctx *actor_ctx;

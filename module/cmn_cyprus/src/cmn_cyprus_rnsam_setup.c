@@ -582,7 +582,7 @@ static struct interface_cmn_memmap_rnsam_api memmap_rnsam_api = {
 static int configure_cpag_target_nodes(
     uint8_t cpag_id,
     uint8_t ccg_count,
-    unsigned int *ccg_ldid,
+    const unsigned int *ccg_ldid,
     struct cmn_cyprus_rnsam_reg *rnsam)
 {
     int status;

@@ -486,10 +486,11 @@ static inline bool clock_ops_is_available(unsigned int clock_dev_idx)
 /*
  * Helper for the 'get_state' response
  */
-static void get_state_respond(fwk_id_t clock_dev_id,
-                              fwk_id_t service_id,
-                              enum mod_clock_state *clock_state,
-                              int status)
+static void get_state_respond(
+    fwk_id_t clock_dev_id,
+    fwk_id_t service_id,
+    const enum mod_clock_state *clock_state,
+    int status)
 {
     int respond_status;
     size_t response_size;

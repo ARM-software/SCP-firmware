@@ -534,6 +534,6 @@ int setup_hns_ctx(struct cmn_cyprus_hns_reg *hns);
  * \retval true The HN-S node is isolated.
  * \retval false The HN-S node is not isolated.
  */
-bool is_hns_node_isolated(struct cmn_cyprus_hns_reg *hns);
+bool is_hns_node_isolated(const struct cmn_cyprus_hns_reg *hns);
 
 #endif /* CMN_CYPRUS_HNS_REG_INTERNAL_H */
