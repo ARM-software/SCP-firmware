@@ -55,7 +55,7 @@ order to run the tests suites
 - [ARM GCC GNU-A toolchain] (*7.4.0* or later): Required to build framework
 tests that run on the host system
 - [lcov] (*1.13* or later): Required to run unit test framework
-- [cppcheck] (*1.90*): Required during build process to check the code
+- [cppcheck] (*2.8*): Required during build process to check the code
 - [ninja-build] (*1.10.0* or later): Default build system to compile the project
 UNIX-Make is a suitable alternative if preferred.
 - [clang-format] (*10.0.0* or later): Automatic code formatter.

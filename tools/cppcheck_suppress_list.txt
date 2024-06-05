@@ -153,3 +153,12 @@ syntaxError:*product/morello/module/dmc_bing/include/mod_dmc_bing.h:789
 
 // Suppress CMSIS errors
 *:*/CMSIS*/*
+
+// Cppcheck seems to get confused with macro substitution
+unknownMacro:*product/rcar/module/rcar_system/src/rcar_common.c:22
+unknownMacro:*product/rcar/module/rcar_system/src/rcar_iic_dvfs.c:173
+unknownMacro:*product/rcar/module/rcar_system/src/rcar_pwc.c:162
+unknownMacro:*product/morello/module/morello_system/src/mod_morello_system.c:302
+unknownEvaluationOrder:*framework/src/fwk_io.c:60
+unknownEvaluationOrder:*framework/src/fwk_io.c:61
+unknownEvaluationOrder:*framework/src/fwk_io.c:63

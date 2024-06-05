@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -35,7 +35,7 @@ import subprocess
 import re
 
 # Holds required version info.
-required_tool_version = "1.90"
+required_tool_version = "2.8"
 
 tool_name = "CPPCHECK"
 
