@@ -34,9 +34,10 @@ struct sensor_dev_ctx *sensor_get_ctx(fwk_id_t id)
     return ctx_table + fwk_id_get_element_idx(id);
 }
 
-static int get_ctx_if_valid_call(fwk_id_t id,
-                                 void *data,
-                                 struct sensor_dev_ctx **ctx)
+static int get_ctx_if_valid_call(
+    fwk_id_t id,
+    const void *data,
+    struct sensor_dev_ctx **ctx)
 {
     fwk_assert(ctx != NULL);
 
@@ -294,7 +295,7 @@ static int sensor_get_trip_point(
 static int sensor_set_trip_point(
     fwk_id_t id,
     uint32_t trip_point_idx,
-    struct mod_sensor_trip_point_params *params)
+    const struct mod_sensor_trip_point_params *params)
 {
     struct sensor_dev_ctx *ctx;
 
@@ -317,17 +318,9 @@ static int sensor_set_trip_point(
 
 static int sensor_enable(fwk_id_t id)
 {
-    int status;
-
     struct sensor_dev_ctx *ctx;
-    struct mod_sensor_complete_info info;
 
-    status = get_ctx_if_valid_call(id, &info, &ctx);
-    if (status != FWK_SUCCESS) {
-        return status;
-    }
-
-    ctx = &ctx_table[fwk_id_get_element_idx(id)];
+    ctx = sensor_get_ctx(id);
 
     if (ctx->driver_api->enable != NULL) {
         return ctx->driver_api->enable(id);
@@ -338,17 +331,9 @@ static int sensor_enable(fwk_id_t id)
 
 static int sensor_disable(fwk_id_t id)
 {
-    int status;
-
     struct sensor_dev_ctx *ctx;
-    struct mod_sensor_complete_info info;
 
-    status = get_ctx_if_valid_call(id, &info, &ctx);
-    if (status != FWK_SUCCESS) {
-        return status;
-    }
-
-    ctx = &ctx_table[fwk_id_get_element_idx(id)];
+    ctx = sensor_get_ctx(id);
 
     if (ctx->driver_api->disable != NULL) {
         return ctx->driver_api->disable(id);

@@ -587,7 +587,7 @@ struct mod_sensor_api {
     int (*set_trip_point)(
         fwk_id_t id,
         uint32_t trip_point_idx,
-        struct mod_sensor_trip_point_params *params);
+        const struct mod_sensor_trip_point_params *params);
 
     /*!
      * \brief Get trip point.
