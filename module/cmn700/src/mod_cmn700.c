@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -541,17 +541,7 @@ bool is_hnf_inside_rect(
          (hnf_node_pos.pos_y <= region_hnf_pos_end.pos_y) &&
          (hnf_node_pos.port_num <= region_hnf_pos_end.port_num))) {
         if (hnf_node_pos.pos_y == region_hnf_pos_start.pos_y) {
-            if (hnf_node_pos.port_num >= region_hnf_pos_start.port_num) {
-                return true;
-            } else {
-                return false;
-            }
-        } else if (hnf_node_pos.pos_y == region_hnf_pos_end.pos_y) {
-            if (hnf_node_pos.port_num <= region_hnf_pos_end.port_num) {
-                return true;
-            } else {
-                return false;
-            }
+            return hnf_node_pos.port_num >= region_hnf_pos_start.port_num;
         }
         return true;
     }
