@@ -111,6 +111,11 @@ struct mod_scmi_perf_ctx {
     /* DVFS module API */
     const struct mod_dvfs_domain_api *dvfs_api;
 
+#ifdef BUILD_HAS_MOD_PERF_CONTROLLER
+    /* Performance controller module API */
+    const struct mod_perf_controller_perf_api *perf_controller_api;
+#endif
+
     struct scmi_perf_domain_ctx *domain_ctx_table;
 
     struct perf_opp_table *opp_table;

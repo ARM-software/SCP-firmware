@@ -11,6 +11,9 @@
 #include <internal/scmi_perf.h>
 
 #include <mod_dvfs.h>
+#ifdef BUILD_HAS_MOD_PERF_CONTROLLER
+#    include <mod_perf_controller.h>
+#endif
 #include <mod_scmi.h>
 #include <mod_scmi_perf.h>
 #ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
@@ -136,8 +139,12 @@ static int perf_set_level(
         (perf_level > domain_ctx->level_limits.maximum)) {
         return FWK_E_RANGE;
     }
-
+#    ifdef BUILD_HAS_MOD_PERF_CONTROLLER
+    return scmi_perf_ctx.perf_controller_api->set_performance_level(
+        domain_id, agent_id, perf_level);
+#    else
     return scmi_perf_ctx.dvfs_api->set_level(domain_id, agent_id, perf_level);
+#    endif
 }
 #endif
 
@@ -271,7 +278,12 @@ int perf_set_limits(
         return status;
     }
 
+#ifdef BUILD_HAS_MOD_PERF_CONTROLLER
+    return scmi_perf_ctx.perf_controller_api->set_performance_level(
+        domain_id, agent_id, needle);
+#else
     return scmi_perf_ctx.dvfs_api->set_level(domain_id, agent_id, needle);
+#endif
 }
 
 /*
@@ -403,7 +415,8 @@ static int scmi_perf_init(fwk_id_t module_id, unsigned int element_count,
 static int scmi_perf_bind(fwk_id_t id, unsigned int round)
 {
 #if defined(BUILD_HAS_SCMI_PERF_PROTOCOL_OPS) || \
-    defined(BUILD_HAS_SCMI_PERF_FAST_CHANNELS)
+    defined(BUILD_HAS_SCMI_PERF_FAST_CHANNELS) || \
+    defined(BUILD_HAS_MOD_PERF_CONTROLLER)
     int status;
 #endif
 
@@ -434,6 +447,18 @@ static int scmi_perf_bind(fwk_id_t id, unsigned int round)
 
 #ifdef BUILD_HAS_SCMI_PERF_PLUGIN_HANDLER
     status = perf_plugins_handler_bind();
+    if (status != FWK_SUCCESS) {
+        return status;
+    }
+#endif
+
+#ifdef BUILD_HAS_MOD_PERF_CONTROLLER
+    status = fwk_module_bind(
+        FWK_ID_MODULE(FWK_MODULE_IDX_PERF_CONTROLLER),
+        FWK_ID_API(
+            FWK_MODULE_IDX_PERF_CONTROLLER, MOD_PERF_CONTROLLER_PERF_API),
+        &scmi_perf_ctx.perf_controller_api);
+
     if (status != FWK_SUCCESS) {
         return status;
     }
