@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -219,8 +219,12 @@ static void delay_ms(uint32_t ms)
     }
 }
 
-uint32_t dci_write_dram(struct mod_dmc620_reg *dmc, uint32_t *scp_address,
-    uint32_t size_32, uint32_t rank, uint32_t bank)
+uint32_t dci_write_dram(
+    struct mod_dmc620_reg *dmc,
+    const uint32_t *scp_address,
+    uint32_t size_32,
+    uint32_t rank,
+    uint32_t bank)
 {
     uint32_t count;
     uint8_t rank_1_hot = (1 << rank);

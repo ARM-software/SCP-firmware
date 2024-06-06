@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -399,7 +399,7 @@ int axi_outbound_region_setup(uint32_t axi_config_base_addr,
                               uint32_t region_size,
                               uint8_t trans_type)
 {
-    static uint8_t region_count;
+    static uint8_t region_count = 0;
     volatile struct axi_ob_config ob_config = {0};
     volatile uint32_t *region_address = NULL;
     volatile uint32_t *ptr;

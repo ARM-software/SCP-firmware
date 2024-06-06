@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -129,7 +129,7 @@ static int chk_ddr4_dimms(unsigned int speed,
     return FWK_SUCCESS;
 }
 
-static void dimm_device_data(uint8_t *spd_data, uint8_t dimm_id)
+static void dimm_device_data(const uint8_t *spd_data, uint8_t dimm_id)
 {
     unsigned int i, j;
     char part_num[20];
