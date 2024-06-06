@@ -1,12 +1,15 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include <mod_clock.h>
 #include <mod_dvfs.h>
+#ifdef BUILD_HAS_MOD_PERF_CONTROLLER
+#    include <mod_perf_controller.h>
+#endif
 #include <mod_psu.h>
 #include <mod_scmi_perf.h>
 #include <mod_timer.h>
@@ -578,6 +581,13 @@ static const struct mod_dvfs_domain_api dvfs_domain_api = {
     .get_latency = dvfs_get_latency,
     .set_level = dvfs_set_level,
 };
+
+#ifdef BUILD_HAS_MOD_PERF_CONTROLLER
+static const struct mod_perf_controller_drv_api dvfs_driver_api = {
+    .name = "dvfs",
+    .set_performance_level = dvfs_set_level,
+};
+#endif
 
 /*
  * DVFS utility functions
@@ -1174,19 +1184,32 @@ static int dvfs_process_bind_request(
     fwk_id_t api_id,
     const void **api)
 {
-    /* Only allow binding to the module */
-    if (!fwk_id_is_equal(target_id, fwk_module_id_dvfs)) {
-        return FWK_E_PARAM;
-    }
+    int status;
+    enum mod_dvfs_api_idx api_idx;
 
-    if (!fwk_id_is_equal(api_id, mod_dvfs_api_id_dvfs)) {
+    if (FWK_MODULE_IDX_DVFS != fwk_id_get_module_idx(api_id)) {
         return FWK_E_ACCESS;
     }
 
-    /* We don't do any permissions management */
-    *api = &dvfs_domain_api;
+    api_idx = (enum mod_dvfs_api_idx)fwk_id_get_api_idx(api_id);
 
-    return FWK_SUCCESS;
+    switch (api_idx) {
+    case MOD_DVFS_API_IDX_DVFS:
+        *api = &dvfs_domain_api;
+        status = FWK_SUCCESS;
+        break;
+#ifdef BUILD_HAS_MOD_PERF_CONTROLLER
+    case MOD_DVFS_API_IDX_CNTRL_DRV:
+        *api = &dvfs_driver_api;
+        status = FWK_SUCCESS;
+        break;
+#endif
+    default:
+        status = FWK_E_ACCESS;
+        break;
+    }
+
+    return status;
 }
 
 /* Module description */

@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -19,4 +19,5 @@ target_sources(
 
 target_link_libraries(${SCP_MODULE_TARGET} PRIVATE module-clock module-psu
                                                    module-timer
-                                                   module-scmi-perf)
+                                                   module-scmi-perf
+                                                   module-perf-controller)

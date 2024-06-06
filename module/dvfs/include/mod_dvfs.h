@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2017-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2017-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -199,12 +199,18 @@ struct mod_dvfs_params_response {
  */
 enum mod_dvfs_api_idx {
     MOD_DVFS_API_IDX_DVFS, /*!< API index for mod_dvfs_api_id_dvfs() */
+    MOD_DVFS_API_IDX_CNTRL_DRV, /*!< API index for mod_dvfs_api_id_cntrl_drv */
     MOD_DVFS_API_IDX_COUNT /*!< Number of defined APIs */
 };
 
 /*! Module API identifier */
 static const fwk_id_t mod_dvfs_api_id_dvfs =
     FWK_ID_API_INIT(FWK_MODULE_IDX_DVFS, MOD_DVFS_API_IDX_DVFS);
+
+#ifdef BUILD_HAS_MOD_PERF_CONTROLLER
+static const fwk_id_t mod_dvfs_api_id_cntrl_drv =
+    FWK_ID_API_INIT(FWK_MODULE_IDX_DVFS, MOD_DVFS_API_IDX_CNTRL_DRV);
+#endif
 
 /*!
  * \brief Event indices.
