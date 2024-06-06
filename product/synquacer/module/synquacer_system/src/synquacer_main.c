@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -425,11 +425,12 @@ static uint32_t fwu_plat_get_boot_index(void)
 
     /* TODO: use CRC32 */
     if (metadata.version != 1 ||
-        metadata.active_index > CONFIG_FWU_NUM_BANKS) {
-            platdata.boot_index = 0;
-            FWK_LOG_ERR(
-                "[FWU] FWU metadata is broken. Use default boot indx 0");
-    } else if (metadata.img_entry[0].img_bank_info[metadata.active_index].accepted) {
+        metadata.active_index >= CONFIG_FWU_NUM_BANKS) {
+        platdata.boot_index = 0;
+        FWK_LOG_ERR("[FWU] FWU metadata is broken. Use default boot indx 0");
+    } else if (metadata.img_entry[0]
+                   .img_bank_info[metadata.active_index]
+                   .accepted) {
         /* Image is accepted, skip trial boot */
         if (metadata.active_index != platdata.boot_index) {
             platdata.boot_index = metadata.active_index;

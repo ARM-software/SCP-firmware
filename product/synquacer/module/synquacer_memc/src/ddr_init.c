@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2018-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2018-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -121,12 +121,12 @@ int ddr_dual_ch_init_mp(void)
         ddr_check_wait_cond, &wait_cond);
 
     REG_DMC520_0->address_map_next = 0xFF000005;
-    REG_DMC520_0->memc_status;
-    REG_DMC520_0->memc_status;
-    REG_DMC520_0->memc_status;
-    REG_DMC520_0->memc_status;
+    (void)REG_DMC520_0->memc_status;
+    (void)REG_DMC520_0->memc_status;
+    (void)REG_DMC520_0->memc_status;
+    (void)REG_DMC520_0->memc_status;
     REG_DMC520_0->memc_cmd = 0x00000003;
-    REG_DMC520_0->memc_status;
+    (void)REG_DMC520_0->memc_status;
     REG_DMC520_0->memc_cmd = 0x00000004;
 
     wait_cond.type = DDR_DMC520_MEMC_STATUS;
@@ -148,12 +148,12 @@ int ddr_dual_ch_init_mp(void)
         ddr_check_wait_cond, &wait_cond);
 
     REG_DMC520_1->address_map_next = 0xFF000005;
-    REG_DMC520_1->memc_status;
-    REG_DMC520_1->memc_status;
-    REG_DMC520_1->memc_status;
-    REG_DMC520_1->memc_status;
+    (void)REG_DMC520_1->memc_status;
+    (void)REG_DMC520_1->memc_status;
+    (void)REG_DMC520_1->memc_status;
+    (void)REG_DMC520_1->memc_status;
     REG_DMC520_1->memc_cmd = 0x00000003;
-    REG_DMC520_1->memc_status;
+    (void)REG_DMC520_1->memc_status;
     REG_DMC520_1->memc_cmd = 0x00000004;
 
     wait_cond.type = DDR_DMC520_MEMC_STATUS;
@@ -301,8 +301,8 @@ int ddr_init_mc0_mp(REG_ST_DMC520 *REG_DMC520)
     uint32_t ddr_memory_type;
     ddr_memory_type = fw_get_memory_type();
 
-    REG_DMC520->memc_status;
-    REG_DMC520->memc_config;
+    (void)REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_config;
 
     REG_DMC520->address_control_next = fw_get_address_control_next();
     REG_DMC520->decode_control_next = 0x00000002;
@@ -573,8 +573,8 @@ int ddr_init_mc0_mp(REG_ST_DMC520 *REG_DMC520)
         REG_DMC520->feature_config &= 0xFFFFFFFC;
     }
 
-    REG_DMC520->memc_status;
-    REG_DMC520->memc_config;
+    (void)REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_config;
 
     return 0;
 }
@@ -586,8 +586,8 @@ int ddr_init_phy0_mp(
     uint32_t ddr_memory_type;
     ddr_memory_type = fw_get_memory_type();
 
-    REG_DDRPHY_CONFIG->PGSR0;
-    REG_DDRPHY_CONFIG->PGSR1;
+    (void)REG_DDRPHY_CONFIG->PGSR0;
+    (void)REG_DDRPHY_CONFIG->PGSR1;
 
     REG_DDRPHY_CONFIG->PGCR0 = 0x07D81E01;
     REG_DDRPHY_CONFIG->PGCR1 = 0x02004660;
@@ -998,8 +998,8 @@ int ddr_init_phy1_mp(
         FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0), DDR_WAIT_TIMEOUT_US,
         ddr_check_wait_cond, &wait_cond);
 
-    REG_DDRPHY_CONFIG->PGSR0;
-    REG_DDRPHY_CONFIG->PGSR1;
+    (void)REG_DDRPHY_CONFIG->PGSR0;
+    (void)REG_DDRPHY_CONFIG->PGSR1;
 
     return 0;
 }
@@ -1093,10 +1093,10 @@ int ddr_init_sdram_mp(
         }
     }
 
-    REG_DDRPHY_CONFIG->PGSR0;
+    (void)REG_DDRPHY_CONFIG->PGSR0;
     dmb();
     usleep_en(500);
-    REG_DDRPHY_CONFIG->PGSR1;
+    (void)REG_DDRPHY_CONFIG->PGSR1;
     dmb();
     usleep_en(500);
 
@@ -1105,13 +1105,13 @@ int ddr_init_sdram_mp(
 
 int ddr_init_mc1_mp(REG_ST_DMC520 *REG_DMC520)
 {
-    REG_DMC520->memc_status;
-    REG_DMC520->memc_config;
+    (void)REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_config;
 
     // POWERDOWN_ENTRY
     REG_DMC520->direct_addr = 0x00000006;
     REG_DMC520->direct_cmd = 0x000F0004;
-    REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_status;
 
     // wait
     usleep_en(500);
@@ -1119,7 +1119,7 @@ int ddr_init_mc1_mp(REG_ST_DMC520 *REG_DMC520)
     // INVALIDATE RESET
     REG_DMC520->direct_addr = 0x00000000;
     REG_DMC520->direct_cmd = 0x0001000B;
-    REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_status;
 
     // wait
     usleep_en(500);
@@ -1127,7 +1127,7 @@ int ddr_init_mc1_mp(REG_ST_DMC520 *REG_DMC520)
     // INVALIDATE RESET
     REG_DMC520->direct_addr = 0x00000001;
     REG_DMC520->direct_cmd = 0x000F000B;
-    REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_status;
 
     // wait
     usleep_en(500);
@@ -1135,15 +1135,15 @@ int ddr_init_mc1_mp(REG_ST_DMC520 *REG_DMC520)
     // WAIT
     REG_DMC520->direct_addr = 0x000003E8;
     REG_DMC520->direct_cmd = 0x0001000D;
-    REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_status;
     REG_DMC520->direct_addr = 0x00000258;
     REG_DMC520->direct_cmd = 0x0001000D;
-    REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_status;
 
     // INVALIDATE RESET
     REG_DMC520->direct_addr = 0x00010001;
     REG_DMC520->direct_cmd = 0x000F000B;
-    REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_status;
 
     // wait
     usleep_en(500);
@@ -1151,12 +1151,12 @@ int ddr_init_mc1_mp(REG_ST_DMC520 *REG_DMC520)
     // WAIT
     REG_DMC520->direct_addr = 0x0000003C;
     REG_DMC520->direct_cmd = 0x0001000D;
-    REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_status;
 
     // NOP
     REG_DMC520->direct_addr = 0x00000000;
     REG_DMC520->direct_cmd = 0x000F0000;
-    REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_status;
 
     return 0;
 }
@@ -1169,8 +1169,8 @@ int ddr_init_train_mp(
     uint32_t phy_status_0;
     struct ddr_wait_cond wait_cond;
 
-    REG_DDRPHY_CONFIG->PGSR0;
-    REG_DDRPHY_CONFIG->PGSR1;
+    (void)REG_DDRPHY_CONFIG->PGSR0;
+    (void)REG_DDRPHY_CONFIG->PGSR1;
 
     /////////////////////////////////////////////////////////////////////
     //  1. Write Leveling, Gate Training, Write Leveling Adjust
@@ -1374,8 +1374,8 @@ ERROR_END:
     REG_DDRPHY_CONFIG->PGCR1 =
         (REG_DDRPHY_CONFIG->PGCR1 & 0xFFFFFFBF) | 0x00000000;
 
-    REG_DDRPHY_CONFIG->PGSR0;
-    REG_DDRPHY_CONFIG->PGSR1;
+    (void)REG_DDRPHY_CONFIG->PGSR0;
+    (void)REG_DDRPHY_CONFIG->PGSR1;
 
     return 0;
 }
@@ -1384,8 +1384,8 @@ int ddr_init_mc2_mp(REG_ST_DMC520 *REG_DMC520)
 {
     struct ddr_wait_cond wait_cond;
 
-    REG_DMC520->memc_status;
-    REG_DMC520->memc_config;
+    (void)REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_config;
 
     if (!dram_ecc_is_enabled())
         REG_DMC520->feature_config &= 0xFFFFFFFC;
@@ -1397,21 +1397,21 @@ int ddr_init_mc2_mp(REG_ST_DMC520 *REG_DMC520)
     REG_DMC520->direct_addr = 0x00000400;
     REG_DMC520->direct_cmd = 0x000F0005;
     dmb();
-    REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_status;
 
     // Wait
     REG_DMC520->direct_addr = 0x000003ff;
     REG_DMC520->direct_cmd = 0x0001000d;
     dmb();
-    REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_status;
 
-    REG_DMC520->memc_status;
-    REG_DMC520->memc_status;
-    REG_DMC520->memc_status;
-    REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_status;
     REG_DMC520->memc_cmd = 0x00000003;
     dmb();
-    REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_status;
     REG_DMC520->memc_cmd = 0x00000004;
     dmb();
 
@@ -1423,8 +1423,8 @@ int ddr_init_mc2_mp(REG_ST_DMC520 *REG_DMC520)
         FWK_ID_ELEMENT(FWK_MODULE_IDX_TIMER, 0), DDR_WAIT_TIMEOUT_US,
         ddr_check_wait_cond, &wait_cond);
 
-    REG_DMC520->memc_status;
-    REG_DMC520->memc_config;
+    (void)REG_DMC520->memc_status;
+    (void)REG_DMC520->memc_config;
 
     return 0;
 }
