@@ -1,6 +1,6 @@
 /*
  * Renesas SCP/MCP Software
- * Copyright (c) 2020-2022, Renesas Electronics Corporation. All rights
+ * Copyright (c) 2020-2024, Renesas Electronics Corporation. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -51,7 +51,7 @@ static inline void rcar_gen3_thermal_write(
 
 static void rcar_gen3_thermal_calc_coefs(
     struct rcar_gen3_thermal_tsc *tsc,
-    int *ptat,
+    const int *ptat,
     const int *thcode,
     int ths_tj_1)
 {

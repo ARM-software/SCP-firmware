@@ -1,6 +1,6 @@
 /*
  * Renesas SCP/MCP Software
- * Copyright (c) 2020-2021, Renesas Electronics Corporation. All rights
+ * Copyright (c) 2020-2024, Renesas Electronics Corporation. All rights
  * reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -27,7 +27,7 @@ static void init_generic_timer(void)
     uint32_t modemr;
     uint32_t modemr_pll;
 
-    uint32_t pll_table[] = {
+    const uint32_t pll_table[] = {
         EXTAL_MD14_MD13_TYPE_0, /* MD14/MD13 : 0b00 */
         EXTAL_MD14_MD13_TYPE_1, /* MD14/MD13 : 0b01 */
         EXTAL_MD14_MD13_TYPE_2, /* MD14/MD13 : 0b10 */
