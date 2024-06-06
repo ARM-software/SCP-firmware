@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -148,7 +148,7 @@ int morello_ddr_phy_config(fwk_id_t element_id, struct dimm_info *info)
 
 uint32_t dci_write_dram(
     struct mod_dmc_bing_reg *dmc,
-    uint32_t *scp_address,
+    const uint32_t *scp_address,
     uint32_t size_32,
     uint32_t rank,
     uint32_t bank)
