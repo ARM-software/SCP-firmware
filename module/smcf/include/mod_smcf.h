@@ -193,6 +193,26 @@ struct smcf_control_api {
      * \retval monitor group ID
      */
     uint32_t (*get_group_id)(fwk_id_t monitor_group_id);
+
+    /*!
+     * \brief Enable MLI
+     *
+     * \param monitor_id Identifier of the sub-element monitor
+     *
+     * \retval ::FWK_SUCCESS Operation successful.
+     * \retval ::FWK_E_PARAM invalid parameters.
+     */
+    int (*mli_enable)(fwk_id_t monitor_id);
+
+    /*!
+     * \brief Disable MLI
+     *
+     * \param monitor_id Identifier of the sub-element monitor
+     *
+     * \retval ::FWK_SUCCESS Operation successful.
+     * \retval ::FWK_E_PARAM invalid parameters.
+     */
+    int (*mli_disable)(fwk_id_t monitor_id);
 };
 
 /*!

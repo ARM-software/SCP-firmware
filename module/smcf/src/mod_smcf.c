@@ -328,6 +328,38 @@ static uint32_t smcf_get_group_id(fwk_id_t monitor_group_id)
     return smcf_data_get_group_id(element_ctx->data_attr);
 }
 
+static int smcf_mli_enable(fwk_id_t mli_id)
+{
+    struct smcf_element_ctx *element_ctx;
+    uint32_t mli_index;
+
+    if (!fwk_module_is_valid_sub_element_id(mli_id)) {
+        return FWK_E_PARAM;
+    }
+
+    element_ctx = get_domain_ctx(mli_id);
+
+    mli_index = fwk_id_get_sub_element_idx(mli_id);
+
+    return mgi_enable_monitor(element_ctx->mgi, mli_index);
+}
+
+static int smcf_mli_disable(fwk_id_t mli_id)
+{
+    struct smcf_element_ctx *element_ctx;
+    uint32_t mli_index;
+
+    if (!fwk_module_is_valid_sub_element_id(mli_id)) {
+        return FWK_E_PARAM;
+    }
+
+    element_ctx = get_domain_ctx(mli_id);
+
+    mli_index = fwk_id_get_sub_element_idx(mli_id);
+
+    return mgi_disable_monitor(element_ctx->mgi, mli_index);
+}
+
 static const struct smcf_data_api data_api = {
     .start_data_sampling = smcf_start_data_sample,
     .get_data = smcf_get_element_data,
@@ -336,6 +368,8 @@ static const struct smcf_data_api data_api = {
 static const struct smcf_control_api control_api = {
     .config_mode = smcf_mli_config_mode,
     .get_group_id = smcf_get_group_id,
+    .mli_enable = smcf_mli_enable,
+    .mli_disable = smcf_mli_disable,
 };
 
 static const struct smcf_monitor_group_interrupt_api smcf_interrupt_api = {

@@ -444,6 +444,88 @@ void utest_smcf_process_bind_request_interrupt_api(void)
     TEST_ASSERT_EQUAL_PTR(&smcf_interrupt_api, api);
 }
 
+void utest_smcf_mli_enable_error_mli_id(void)
+{
+    fwk_id_t mli_id;
+    int status;
+
+    fwk_module_is_valid_sub_element_id_ExpectAnyArgsAndReturn(false);
+    status = smcf_mli_enable(mli_id);
+
+    TEST_ASSERT_EQUAL(FWK_E_PARAM, status);
+}
+
+void utest_smcf_mli_enable_num_of_monitor_error(void)
+{
+    fwk_id_t mli_id;
+    int status;
+
+    fwk_module_is_valid_sub_element_id_ExpectAnyArgsAndReturn(true);
+    fwk_id_get_element_idx_ExpectAndReturn(mli_id, 0);
+    fwk_id_get_sub_element_idx_ExpectAndReturn(mli_id, 0);
+    mgi_enable_monitor_ExpectAnyArgsAndReturn(FWK_E_RANGE);
+
+    status = smcf_mli_enable(mli_id);
+
+    TEST_ASSERT_EQUAL(FWK_E_RANGE, status);
+}
+
+void utest_smcf_mli_enable_success(void)
+{
+    fwk_id_t mli_id;
+    int status;
+
+    fwk_module_is_valid_sub_element_id_ExpectAnyArgsAndReturn(true);
+    fwk_id_get_element_idx_ExpectAndReturn(mli_id, 0);
+    fwk_id_get_sub_element_idx_ExpectAndReturn(mli_id, 0);
+    mgi_enable_monitor_ExpectAnyArgsAndReturn(FWK_SUCCESS);
+
+    status = smcf_mli_enable(mli_id);
+
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+}
+
+void utest_smcf_mli_disable_error_mli_id(void)
+{
+    fwk_id_t mli_id;
+    int status;
+
+    fwk_module_is_valid_sub_element_id_ExpectAnyArgsAndReturn(false);
+    status = smcf_mli_disable(mli_id);
+
+    TEST_ASSERT_EQUAL(FWK_E_PARAM, status);
+}
+
+void utest_smcf_mli_disable_num_of_monitor_error(void)
+{
+    fwk_id_t mli_id;
+    int status;
+
+    fwk_module_is_valid_sub_element_id_ExpectAnyArgsAndReturn(true);
+    fwk_id_get_element_idx_ExpectAndReturn(mli_id, 0);
+    fwk_id_get_sub_element_idx_ExpectAndReturn(mli_id, 0);
+    mgi_disable_monitor_ExpectAnyArgsAndReturn(FWK_E_RANGE);
+
+    status = smcf_mli_disable(mli_id);
+
+    TEST_ASSERT_EQUAL(FWK_E_RANGE, status);
+}
+
+void utest_smcf_mli_disable_success(void)
+{
+    fwk_id_t mli_id;
+    int status;
+
+    fwk_module_is_valid_sub_element_id_ExpectAnyArgsAndReturn(true);
+    fwk_id_get_element_idx_ExpectAndReturn(mli_id, 0);
+    fwk_id_get_sub_element_idx_ExpectAndReturn(mli_id, 0);
+    mgi_disable_monitor_ExpectAnyArgsAndReturn(FWK_SUCCESS);
+
+    status = smcf_mli_disable(mli_id);
+
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+}
+
 int mod_smcf_test_main(void)
 {
     UNITY_BEGIN();
@@ -473,6 +555,12 @@ int mod_smcf_test_main(void)
     RUN_TEST(utest_smcf_process_bind_request_data_api);
     RUN_TEST(utest_smcf_process_bind_request_control_api);
     RUN_TEST(utest_smcf_process_bind_request_interrupt_api);
+    RUN_TEST(utest_smcf_mli_enable_error_mli_id);
+    RUN_TEST(utest_smcf_mli_enable_num_of_monitor_error);
+    RUN_TEST(utest_smcf_mli_enable_success);
+    RUN_TEST(utest_smcf_mli_disable_error_mli_id);
+    RUN_TEST(utest_smcf_mli_disable_num_of_monitor_error);
+    RUN_TEST(utest_smcf_mli_disable_success);
 
     return UNITY_END();
 }
