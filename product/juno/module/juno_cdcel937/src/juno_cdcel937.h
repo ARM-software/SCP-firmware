@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2019-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2019-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -66,7 +66,7 @@ struct field {
     }
 
 /* Read and return the field of a 8-bit register array */
-static inline uint8_t read_field(uint8_t *reg, struct field f)
+static inline uint8_t read_field(const uint8_t *reg, struct field f)
 {
     return (reg[f.reg_idx] & f.mask) >> f.pos;
 }
