@@ -22,17 +22,6 @@ variableScope
 // and it can happen that we do not read or write a specific field.
 unusedStructMember
 
-// Cppcheck does not consider passing the address of the local variable as
-// using it.
-unusedVariable:*framework/test/test_fwk_list_init.c
-
-// Cppcheck can not properly understand fwk_expect() thus can not ascertain the
-// way we check for pointer values.
-nullPointerRedundantCheck:*product/juno/*
-
-// Cppcheck seems to get confused when encountering parentheses in strings
-syntaxError:*product/synquacer/module/synquacer_system/src/mmu500.c:34
-
 // Cppcheck seems to get confused with macro substitution
 syntaxError:*framework/src/fwk_log.c:169
 syntaxError:*framework/src/fwk_log.c:177
@@ -46,110 +35,8 @@ preprocessorErrorDirective:*framework/test/fwk_module_idx.h:14
 preprocessorErrorDirective:*arch/arm/src/arch_mm.c:16
 preprocessorErrorDirective:*arch/arm/armv8-a/src/arch_mm.c:17
 
-// This memory has a static lifetime
-memleak:*product/rdv1mc/scp_ramfw/config_power_domain.c:156
-memleak:*product/rdv1mc/scp_ramfw/config_ppu_v1.c:87
-
-// This memory has static lifetime
-memleak:*framework/test/fwk_test.c:145
-
-// Cppcheck does not inspect these conditions deeply enough to know that the
-// dereference can only occur if the check succeeds
-nullPointerRedundantCheck:*framework/src/fwk_io.c
-nullPointerRedundantCheck:*product/sgm775/module/sgm775_dmc500/src/mod_sgm775_dmc500.c:78
-nullPointerRedundantCheck:*product/rcar/module/rcar_reg_sensor/src/mod_rcar_reg_sensor.c:147
-nullPointerRedundantCheck:*module/dmc500/src/mod_dmc500.c:60
-nullPointerRedundantCheck:*module/dmc500/src/mod_dmc500.c:61
-nullPointerRedundantCheck:*module/dmc500/src/mod_dmc500.c:65
-nullPointerRedundantCheck:*module/mhu2/src/mod_mhu2.c:90
-nullPointerRedundantCheck:*module/pl011/src/mod_pl011.c:135
-nullPointerRedundantCheck:*module/pl011/src/mod_pl011.c:136
-nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:726
-nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:1122
-nullPointerRedundantCheck:*module/ppu_v1/src/mod_ppu_v1.c:1123
-nullPointerRedundantCheck:*module/reg_sensor/src/mod_reg_sensor.c:52
-nullPointerRedundantCheck:*module/sds/src/mod_sds.c:273
-nullPointerRedundantCheck:*module/sds/src/mod_sds.c:279
-nullPointerRedundantCheck:*module/timer/src/mod_timer.c:541
-nullPointerRedundantCheck:*module/timer/src/mod_timer.c:551
-nullPointerRedundantCheck:*module/timer/src/mod_timer.c:546
-nullPointerRedundantCheck:*product/n1sdp/module/n1sdp_dmc620/src/mod_n1sdp_dmc620.c:1276
-nullPointerRedundantCheck:*product/n1sdp/module/n1sdp_dmc620/src/mod_n1sdp_dmc620.c:1277
-nullPointerRedundantCheck:*module/dmc620/src/mod_dmc620.c:61
-nullPointerRedundantCheck:*product/synquacer/module/f_uart3/src/mod_f_uart3.c:111
-nullPointerRedundantCheck:*product/synquacer/module/f_uart3/src/mod_f_uart3.c:112
-nullPointerRedundantCheck:*product/synquacer/module/f_uart3/src/mod_f_uart3.c:122
-nullPointerRedundantCheck:*product/synquacer/module/ccn512/src/mod_ccn512.c:140
-nullPointerRedundantCheck:*product/synquacer/module/ccn512/src/mod_ccn512.c:211
-
-// Cppcheck is not abe to inspect the fwk_assert deeply enough to know that
-// zero value assignment is asserted
-zerodivcond:*product/juno/module/juno_cdcel937/src/mod_juno_cdcel937.c:390
-zerodivcond:*product/juno/module/juno_cdcel937/src/mod_juno_cdcel937.c:397
-zerodivcond:*product/juno/module/juno_cdcel937/src/mod_juno_cdcel937.c:414
-
-// Cppcheck does not interpret Assembler syntax
-syntaxError:*arch/arm/armv8-a/include/arch_system.h:19
-
 // Cppcheck is not able to parse returned boolean values inside if conditions
 internalAstError:*framework/src/fwk_core.c:312
-
-// These assignments are used for testing
-constArgument:*framework/test/test_fwk_macros.c
-
-// Variable is passed by reference to function. Cppcheck is unable to check
-// this.
-unreadVariable:*module/dvfs/src/mod_dvfs.c:297
-
-// Synquacer `unreadVariable` errors are suppressed until they are fully
-// resolved.
-unreadVariable:*product/synquacer/module/f_i2c/src/i2c_driver.c:240
-unreadVariable:*product/synquacer/module/f_i2c/src/i2c_driver.c:241
-unreadVariable:*product/synquacer/module/f_i2c/src/i2c_driver.c:411
-unreadVariable:*product/synquacer/module/f_i2c/src/i2c_driver.c:418
-unreadVariable:*product/synquacer/module/f_i2c/src/i2c_driver.c:423
-unreadVariable:*product/synquacer/module/f_i2c/src/i2c_driver.c:567
-unreadVariable:*product/synquacer/module/f_i2c/src/i2c_driver.c:571
-unreadVariable:*product/synquacer/module/f_i2c/src/i2c_driver.c:575
-unreadVariable:*product/synquacer/module/f_i2c/src/i2c_driver.c:576
-unreadVariable:*product/synquacer/module/f_i2c/src/i2c_driver.c:582
-unreadVariable:*product/synquacer/module/f_i2c/src/i2c_driver.c:583
-unreadVariable:*product/synquacer/module/f_i2c/src/i2c_driver.c:644
-unreadVariable:*product/synquacer/module/f_i2c/src/i2c_driver.c:645
-unreadVariable:*product/synquacer/module/f_i2c/src/i2c_driver.c:679
-unreadVariable:*product/synquacer/module/f_i2c/src/i2c_driver.c:694
-unreadVariable:*product/synquacer/module/f_i2c/src/i2c_driver.c:699
-
-// Cppcheck is not abe to inspect fwk_list_init macro correctly
-shadowVariable:*framework/test/test_fwk_notification.c:117
-shadowVariable:*framework/test/test_fwk_notification.c:120
-
-// Cppcheck doesn't retrieve the correct definition of CLUS_PPU_INT_STATUS
-// from the corresponding header file
-AssignmentAddressToInteger:*product/rdv1/module/platform_system/src/mod_platform_system.c:143
-AssignmentAddressToInteger:*product/rdv1mc/module/platform_system/src/mod_platform_system.c:146
-
-// Cppcheck seems to get confused with macro substitution
-syntaxError:*product/morello/module/morello_system/src/mod_morello_system.c:300
-
-// TODO
-arrayIndexOutOfBoundsCond:*module/cmn600/src/mod_cmn600.c:447
-arrayIndexOutOfBoundsCond:*module/cmn600/src/mod_cmn600.c:461
-arrayIndexOutOfBoundsCond:*module/cmn600/src/mod_cmn600.c:463
-arrayIndexOutOfBoundsCond:*module/cmn700/src/cmn700.c:252
-arrayIndexOutOfBounds:*product/rdv1/module/platform_system/src/mod_platform_system.c:120
-arrayIndexOutOfBounds:*product/rdv1/module/platform_system/src/mod_platform_system.c:126
-arrayIndexOutOfBounds:*product/rdv1/module/platform_system/src/mod_platform_system.c:132
-arrayIndexOutOfBounds:*product/rdv1/module/platform_system/src/mod_platform_system.c:138
-arrayIndexOutOfBounds:*product/rdv1mc/module/platform_system/src/mod_platform_system.c:123
-arrayIndexOutOfBounds:*product/rdv1mc/module/platform_system/src/mod_platform_system.c:129
-arrayIndexOutOfBounds:*product/rdv1mc/module/platform_system/src/mod_platform_system.c:135
-arrayIndexOutOfBounds:*product/rdv1mc/module/platform_system/src/mod_platform_system.c:141
-objectIndex:*product/n1sdp/module/n1sdp_pcie/src/n1sdp_pcie.c:438
-objectIndex:*product/morello/module/morello_pcie/src/morello_pcie.c:390
-knownConditionTrueFalse:*product/n1sdp/module/n1sdp_dmc620/src/mod_n1sdp_dmc620.c:85
-syntaxError:*product/morello/scp_ramfw_soc/config_resource_perms.c:54
-syntaxError:*product/morello/module/dmc_bing/include/mod_dmc_bing.h:789
 
 // Suppress CMSIS errors
 *:*/CMSIS*/*
