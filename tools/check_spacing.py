@@ -49,6 +49,7 @@ FILE_TYPES = [
     '*.yaml',
     'Dockerfile',
     '*.sh',
+    '*.mk',
 ]
 
 #
