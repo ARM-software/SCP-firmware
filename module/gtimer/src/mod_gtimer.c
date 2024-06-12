@@ -194,6 +194,8 @@ static int gtimer_init(fwk_id_t module_id,
     mod_gtimer_ctx.table =
         fwk_mm_calloc(element_count, sizeof(struct gtimer_dev_ctx));
 
+    mod_gtimer_ctx.initialized = true;
+
     return FWK_SUCCESS;
 }
 
@@ -380,17 +382,21 @@ const struct fwk_module module_gtimer = {
 
 static fwk_timestamp_t mod_gtimer_timestamp(const void *ctx)
 {
-    fwk_timestamp_t timestamp;
+    if (mod_gtimer_ctx.initialized) {
+        fwk_timestamp_t timestamp;
 
-    const struct mod_gtimer_dev_config *cfg = ctx;
-    const struct cntbase_reg *hw_timer = (const void *)cfg->hw_timer;
+        const struct mod_gtimer_dev_config *cfg = ctx;
+        const struct cntbase_reg *hw_timer = (const void *)cfg->hw_timer;
 
-    uint32_t frequency = cfg->frequency;
-    uint64_t counter = mod_gtimer_get_counter(hw_timer);
+        uint32_t frequency = cfg->frequency;
+        uint64_t counter = mod_gtimer_get_counter(hw_timer);
 
-    timestamp = (FWK_S(1) / frequency) * counter;
+        timestamp = (FWK_S(1) / frequency) * counter;
 
-    return timestamp;
+        return timestamp;
+    } else {
+        return 0;
+    }
 }
 
 struct fwk_time_driver mod_gtimer_driver(
