@@ -593,12 +593,14 @@ static int smcf_process_event(
 static int smcf_bind(fwk_id_t id, unsigned int round)
 {
     int status = FWK_SUCCESS;
-    struct smcf_element_ctx *ctx = get_domain_ctx(id);
+    struct smcf_element_ctx *ctx;
 
     /* Only bind in first round of calls. */
-    if (round > 0) {
+    if (round > 0 || (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))) {
         return FWK_SUCCESS;
     }
+
+    ctx = get_domain_ctx(id);
 
     if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
         return FWK_SUCCESS;
