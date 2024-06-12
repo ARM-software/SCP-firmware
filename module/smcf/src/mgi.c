@@ -8,6 +8,8 @@
 #include "mgi.h"
 #include "mgi_validate_header.h"
 
+#include <fwk_assert.h>
+
 #include <stddef.h>
 
 struct mgi_set_monitor_mode_check {

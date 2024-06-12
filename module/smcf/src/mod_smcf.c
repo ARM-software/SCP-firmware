@@ -615,6 +615,8 @@ static int smcf_bind(fwk_id_t id, unsigned int round)
             return status;
         }
     }
+
+    return status;
 }
 #endif
 
