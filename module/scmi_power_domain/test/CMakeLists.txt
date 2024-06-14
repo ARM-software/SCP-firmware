@@ -25,3 +25,4 @@ list(APPEND MOCK_REPLACEMENTS fwk_core)
 include(${SCP_ROOT}/unit_test/module_common.cmake)
 
 target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC "BUILD_HAS_MOD_POWER_DOMAIN")
+target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC "BUILD_HAS_AGENT_LOGICAL_DOMAIN")

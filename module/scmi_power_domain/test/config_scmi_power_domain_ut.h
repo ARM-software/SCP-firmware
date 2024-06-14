@@ -32,4 +32,53 @@ struct mod_scmi_from_protocol_api from_protocol_api = {
     .write_payload = mod_scmi_from_protocol_api_write_payload,
     .respond = mod_scmi_from_protocol_api_respond,
     .notify = mod_scmi_from_protocol_api_notify,
+    .scmi_message_validation = mod_scmi_from_protocol_api_scmi_frame_validation,
 };
+
+#ifdef BUILD_HAS_AGENT_LOGICAL_DOMAIN
+enum scmi_agent_index {
+    SCMI_AGENT_0 = 1,
+    SCMI_AGENT_1,
+    SCMI_AGENT_COUNT,
+};
+
+enum scmi_power_logical_domain {
+    SCMI_PD_LOGICAL_DOMAIN_0 = 0,
+    SCMI_PD_LOGICAL_DOMAIN_1,
+    SCMI_PD_LOGICAL_DOMAIN_2,
+    SCMI_PD_LOGICAL_DOMAIN_3,
+    SCMI_PD_LOGICAL_DOMAIN_4,
+    SCMI_PD_LOGICAL_DOMAIN_5,
+    SCMI_PD_LOGICAL_DOMAIN_COUNT,
+};
+
+const char *test_domain_names[SCMI_PD_LOGICAL_DOMAIN_COUNT] = {
+    [SCMI_PD_LOGICAL_DOMAIN_0] = "PD_0", [SCMI_PD_LOGICAL_DOMAIN_1] = "PD_1",
+    [SCMI_PD_LOGICAL_DOMAIN_2] = "PD_2", [SCMI_PD_LOGICAL_DOMAIN_3] = "PD_3",
+    [SCMI_PD_LOGICAL_DOMAIN_4] = "PD_4", [SCMI_PD_LOGICAL_DOMAIN_5] = "PD_5",
+};
+
+struct mod_scmi_pd_agent_config agent_logical_domain_table[SCMI_AGENT_COUNT] = {
+    [SCMI_AGENT_0] = {
+        .domain_count = 2,
+        .domains = (uint32_t [2]) {
+            [0] = SCMI_PD_LOGICAL_DOMAIN_1,
+            [1] = SCMI_PD_LOGICAL_DOMAIN_3,
+        },
+    },
+
+    [SCMI_AGENT_1] = {
+        .domain_count = 4,
+        .domains = (uint32_t [4]) {
+            [0] = SCMI_PD_LOGICAL_DOMAIN_0,
+            [1] = SCMI_PD_LOGICAL_DOMAIN_2,
+            [2] = SCMI_PD_LOGICAL_DOMAIN_3,
+            [3] = SCMI_PD_LOGICAL_DOMAIN_5,
+        },
+    },
+};
+
+const struct mod_scmi_pd_config agent_test_config = {
+    .agent_config_table = agent_logical_domain_table,
+};
+#endif
