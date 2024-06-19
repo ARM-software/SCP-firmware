@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include "Mockmod_metrics_analyzer_extra.h"
 #include "config_metrics_analyzer.h"
 #include "fwk_module_idx.h"
 #include "fwk_status.h"
@@ -38,6 +39,8 @@ void setUp(void)
 
 void tearDown(void)
 {
+    Mockmod_metrics_analyzer_extra_Verify();
+    Mockmod_metrics_analyzer_extra_Destroy();
     Mockfwk_module_Destroy();
 }
 
@@ -251,6 +254,380 @@ void test_process_start_success(void)
         FWK_SUCCESS, metrics_analyzer_start(MOD_METRICS_ANALYZER_ID));
 }
 
+void test_collect_domain_limits_invalid_params(void)
+{
+    int status = FWK_E_INIT;
+    status = collect_domain_limits(NULL);
+    TEST_ASSERT_EQUAL(FWK_E_PARAM, status);
+}
+
+void test_collect_domain_limits(void)
+{
+    int status = FWK_E_INIT;
+    const struct mod_metrics_analyzer_interactor limit_provider_config[] = {
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(10, 0) },
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(11, 1) },
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(12, 2) },
+    };
+    struct mod_metric_ctx metrics_ctx[] = {
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[0],
+            .limit = UINT32_MAX,
+        },
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[1],
+            .limit = UINT32_MAX,
+        },
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[2],
+            .limit = UINT32_MAX,
+        },
+    };
+    struct mod_domain_ctx domain_ctx = {
+        .metrics_count = 3,
+        .metrics = metrics_ctx,
+    };
+
+    unsigned int limits[] = { 100, 150, 200 };
+
+    /* Expected calls */
+    for (size_t i = 0; i < domain_ctx.metrics_count; ++i) {
+        get_limit_ExpectAndReturn(
+            limit_provider_config[i].domain_id, NULL, FWK_SUCCESS);
+        get_limit_IgnoreArg_power_limit();
+        get_limit_ReturnMemThruPtr_power_limit(&limits[i], sizeof(limits[i]));
+    }
+    get_limit_StopIgnore();
+
+    /* Test */
+    status = collect_domain_limits(&domain_ctx);
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+
+    /* Validate */
+    for (size_t i = 0; i < domain_ctx.metrics_count; ++i) {
+        TEST_ASSERT_EQUAL(limits[i], metrics_ctx[i].limit);
+    }
+}
+
+void test_collect_domain_limits_no_change_domain(void)
+{
+    int status = FWK_E_INIT;
+    const struct mod_metrics_analyzer_interactor limit_provider_config[] = {
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(10, 0) },
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(11, 1) },
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(12, 2) },
+    };
+
+    unsigned int limits[] = { 100, 150, 200 };
+    size_t min_limit_idx = 0;
+
+    struct mod_metric_ctx metrics_ctx[] = {
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[0],
+            .limit = limits[0],
+        },
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[1],
+            .limit = limits[1],
+        },
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[2],
+            .limit = limits[2],
+        },
+    };
+    struct mod_domain_ctx domain_ctx = {
+        .metrics_count = 3,
+        .metrics = metrics_ctx,
+        .aggregate_limit = limits[min_limit_idx],
+    };
+
+    /* Expected calls */
+    for (size_t i = 0; i < domain_ctx.metrics_count; ++i) {
+        get_limit_ExpectAndReturn(
+            limit_provider_config[i].domain_id, NULL, FWK_SUCCESS);
+        get_limit_IgnoreArg_power_limit();
+        get_limit_ReturnMemThruPtr_power_limit(&limits[i], sizeof(limits[i]));
+    }
+    get_limit_StopIgnore();
+
+    /* Test */
+    status = collect_domain_limits(&domain_ctx);
+
+    /* Validate */
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+    for (size_t i = 0; i < domain_ctx.metrics_count; ++i) {
+        TEST_ASSERT_EQUAL(limits[i], metrics_ctx[i].limit);
+    }
+    /* Domain evaluation still valid */
+    TEST_ASSERT_EQUAL(limits[min_limit_idx], domain_ctx.aggregate_limit);
+}
+
+void test_evaluate_domain_invalid_params(void)
+{
+    int status = FWK_E_INIT;
+    status = evaluate_domain_aggregate_limit(NULL);
+    TEST_ASSERT_EQUAL(FWK_E_PARAM, status);
+}
+
+void test_evaluate_domain_not_required(void)
+{
+    int status = FWK_E_INIT;
+    const struct mod_metrics_analyzer_interactor limit_provider_config[] = {
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(10, 0) },
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(11, 1) },
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(12, 2) },
+    };
+
+    unsigned int limits[] = { 100, 150, 200 };
+    size_t min_limit_idx = 0;
+
+    struct mod_metric_ctx metrics_ctx[] = {
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[0],
+            .limit = limits[0],
+        },
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[1],
+            .limit = limits[1],
+        },
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[2],
+            .limit = limits[2],
+        },
+    };
+    struct mod_domain_ctx domain_ctx = {
+        .metrics_count = 3,
+        .metrics = metrics_ctx,
+        .aggregate_limit = limits[min_limit_idx],
+    };
+
+    /* Test */
+    status = evaluate_domain_aggregate_limit(&domain_ctx);
+
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+    /* Domain evaluation still valid */
+    TEST_ASSERT_EQUAL(limits[min_limit_idx], domain_ctx.aggregate_limit);
+}
+
+void test_evaluate_domain_limit_less_than_aggregate_limit(void)
+{
+    int status = FWK_E_INIT;
+    const struct mod_metrics_analyzer_interactor limit_provider_config[] = {
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(10, 0) },
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(11, 1) },
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(12, 2) },
+    };
+
+    unsigned int limits[] = { 100, 150, 200 };
+    size_t min_limit_idx = 0;
+    unsigned int lower_limit = 10;
+
+    struct mod_metric_ctx metrics_ctx[] = {
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[0],
+            .limit = limits[0],
+        },
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[1],
+            .limit = limits[1],
+        },
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[2],
+            .limit = lower_limit,
+        },
+    };
+    struct mod_domain_ctx domain_ctx = {
+        .metrics_count = 3,
+        .metrics = metrics_ctx,
+        .aggregate_limit = limits[min_limit_idx],
+    };
+
+    /* Test */
+    status = evaluate_domain_aggregate_limit(&domain_ctx);
+
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+    TEST_ASSERT_EQUAL(lower_limit, domain_ctx.aggregate_limit);
+}
+
+void test_evaluate_domain_limit_more_than_aggregate_limit(void)
+{
+    int status = FWK_E_INIT;
+    const struct mod_metrics_analyzer_interactor limit_provider_config[] = {
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(10, 0) },
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(11, 1) },
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(12, 2) },
+    };
+
+    unsigned int limits[] = { 100, 150, 200 };
+    unsigned int greater_limit = 1000;
+    size_t min_limit_idx = 0;
+
+    struct mod_metric_ctx metrics_ctx[] = {
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[0],
+            .limit = limits[0],
+        },
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[1],
+            .limit = limits[1],
+        },
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[2],
+            .limit = greater_limit,
+        },
+    };
+    struct mod_domain_ctx domain_ctx = {
+        .metrics_count = 3,
+        .metrics = metrics_ctx,
+        .aggregate_limit = limits[min_limit_idx],
+    };
+
+    /* Test */
+    status = evaluate_domain_aggregate_limit(&domain_ctx);
+
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+    TEST_ASSERT_EQUAL(limits[min_limit_idx], domain_ctx.aggregate_limit);
+}
+
+void test_evaluate_domain_limit_lowest_level_changed(void)
+{
+    int status = FWK_E_INIT;
+    const struct mod_metrics_analyzer_interactor limit_provider_config[] = {
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(10, 0) },
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(11, 1) },
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(12, 2) },
+    };
+
+    unsigned int limits[] = { 100, 150, 200 };
+    unsigned int new_limit = 1000;
+    size_t min_limit_idx = 0;
+    size_t new_min_limit_idx = 1;
+
+    struct mod_metric_ctx metrics_ctx[] = {
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[0],
+            .limit = new_limit,
+        },
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[1],
+            .limit = limits[1],
+        },
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[2],
+            .limit = limits[2],
+        },
+    };
+    struct mod_domain_ctx domain_ctx = {
+        .metrics_count = 3,
+        .metrics = metrics_ctx,
+        .aggregate_limit = limits[min_limit_idx],
+    };
+
+    /* Test */
+    status = evaluate_domain_aggregate_limit(&domain_ctx);
+
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+    TEST_ASSERT_EQUAL(limits[new_min_limit_idx], domain_ctx.aggregate_limit);
+}
+
+void test_report_domain_aggregate_limit_api_is_not_set(void)
+{
+    int status = FWK_E_INIT;
+
+    struct mod_domain_ctx domain_ctx = { 0 };
+
+    /* Test */
+    status = report_domain_aggregate_limit(&domain_ctx);
+    TEST_ASSERT_EQUAL(FWK_E_PANIC, status);
+}
+
+void test_report_domain_aggregate_limit(void)
+{
+    int status = FWK_E_INIT;
+
+    struct mod_metrics_analyzer_domain_config
+        config = { .limit_consumer = {
+                       .api_id = FWK_ID_NONE,
+                       .domain_id = FWK_ID_ELEMENT(10, 0),
+                   }, };
+    unsigned int consumer_limit = 100;
+    struct mod_domain_ctx domain_ctx = {
+        .aggregate_limit = consumer_limit,
+        .config = &config,
+        .limit_consumer_api = &limit_api,
+    };
+
+    /* Expected calls */
+    set_limit_ExpectAndReturn(
+        domain_ctx.config->limit_consumer.domain_id,
+        domain_ctx.aggregate_limit,
+        FWK_SUCCESS);
+
+    /* Test */
+    status = report_domain_aggregate_limit(&domain_ctx);
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+}
+
+void test_collect_domains_limits_invalid_params(void)
+{
+    int status = FWK_E_INIT;
+    status = collect_domains_limits(NULL, 5);
+    TEST_ASSERT_EQUAL(FWK_E_PARAM, status);
+}
+
+void test_evaluate_domains_aggregate_limit_invalid_params(void)
+{
+    int status = FWK_E_INIT;
+    status = evaluate_domains_aggregate_limit(NULL, 5);
+    TEST_ASSERT_EQUAL(FWK_E_PARAM, status);
+}
+
+void test_report_domains_aggregate_limit_invalid_params(void)
+{
+    int status = FWK_E_INIT;
+    status = report_domains_aggregate_limit(NULL, 5);
+    TEST_ASSERT_EQUAL(FWK_E_PARAM, status);
+}
+
+void test_collect_domains_limits_zero_domains(void)
+{
+    int status = FWK_E_INIT;
+    status = collect_domains_limits(NULL, 0);
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+}
+
+void test_evaluate_domains_aggregate_limit_zero_domains(void)
+{
+    int status = FWK_E_INIT;
+    status = evaluate_domains_aggregate_limit(NULL, 0);
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+}
+
+void test_report_domains_aggregate_limit_zero_domains(void)
+{
+    int status = FWK_E_INIT;
+    status = report_domains_aggregate_limit(NULL, 0);
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+}
+
 int metrics_analyzer_test_main(void)
 {
     UNITY_BEGIN();
@@ -263,6 +640,22 @@ int metrics_analyzer_test_main(void)
     RUN_TEST(test_process_bind_request_invalid_params);
     RUN_TEST(test_process_bind_request_correct_api);
     RUN_TEST(test_process_start_success);
+    RUN_TEST(test_collect_domain_limits_invalid_params);
+    RUN_TEST(test_collect_domain_limits);
+    RUN_TEST(test_collect_domain_limits_no_change_domain);
+    RUN_TEST(test_evaluate_domain_invalid_params);
+    RUN_TEST(test_evaluate_domain_not_required);
+    RUN_TEST(test_evaluate_domain_limit_less_than_aggregate_limit);
+    RUN_TEST(test_evaluate_domain_limit_more_than_aggregate_limit);
+    RUN_TEST(test_evaluate_domain_limit_lowest_level_changed);
+    RUN_TEST(test_report_domain_aggregate_limit_api_is_not_set);
+    RUN_TEST(test_report_domain_aggregate_limit);
+    RUN_TEST(test_collect_domains_limits_invalid_params);
+    RUN_TEST(test_evaluate_domains_aggregate_limit_invalid_params);
+    RUN_TEST(test_report_domains_aggregate_limit_invalid_params);
+    RUN_TEST(test_collect_domains_limits_zero_domains);
+    RUN_TEST(test_evaluate_domains_aggregate_limit_zero_domains);
+    RUN_TEST(test_report_domains_aggregate_limit_zero_domains);
 
     return UNITY_END();
 }
