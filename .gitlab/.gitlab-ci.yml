@@ -24,6 +24,9 @@ variables:
   FETCH_PUBLIC_MR_NUMBER:
     description: "MR number to fetch"
 
+default:
+  tags:
+    - arm64
 
 include:
   - local: .gitlab/pipelines/deployment-pipeline.yml
