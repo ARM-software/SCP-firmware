@@ -49,6 +49,7 @@ static int collect_domain_limits(struct mod_domain_ctx *domain_ctx)
         return FWK_E_PARAM;
     }
 
+    domain_ctx->aggregate_limit = UINT32_MAX;
     for (size_t i = 0; i < domain_ctx->metrics_count; ++i) {
         unsigned int power_limit;
         struct mod_metric_ctx *metric_ctx = &domain_ctx->metrics[i];
@@ -56,24 +57,11 @@ static int collect_domain_limits(struct mod_domain_ctx *domain_ctx)
             metric_ctx->limit_provider_config->domain_id, &power_limit);
         if (status == FWK_SUCCESS) {
             metric_ctx->limit = power_limit;
+            domain_ctx->aggregate_limit =
+                FWK_MIN(domain_ctx->aggregate_limit, metric_ctx->limit);
         } else {
             metric_ctx->limit = UINT32_MAX;
         }
-    }
-
-    return FWK_SUCCESS;
-}
-
-static int evaluate_domain_aggregate_limit(struct mod_domain_ctx *domain_ctx)
-{
-    if (domain_ctx == NULL) {
-        return FWK_E_PARAM;
-    }
-    domain_ctx->aggregate_limit = -1;
-    for (size_t i = 0; i < domain_ctx->metrics_count; ++i) {
-        struct mod_metric_ctx *metric_ctx = &domain_ctx->metrics[i];
-        domain_ctx->aggregate_limit =
-            FWK_MIN(domain_ctx->aggregate_limit, metric_ctx->limit);
     }
 
     return FWK_SUCCESS;
@@ -109,21 +97,6 @@ static int collect_domains_limits(
     return FWK_SUCCESS;
 }
 
-static int evaluate_domains_aggregate_limit(
-    struct mod_domain_ctx *domains_ctx,
-    size_t domain_count)
-{
-    if (domain_count && domains_ctx == NULL) {
-        return FWK_E_PARAM;
-    }
-
-    for (size_t i = 0; i < domain_count; ++i) {
-       (void)evaluate_domain_aggregate_limit(&domains_ctx[i]);
-    }
-
-    return FWK_SUCCESS;
-}
-
 static int report_domains_aggregate_limit(
     struct mod_domain_ctx *domains_ctx,
     size_t domain_count)
@@ -148,11 +121,7 @@ static int analyze(void)
     if (status != FWK_SUCCESS) {
         return status;
     }
-    status = evaluate_domains_aggregate_limit(
-        metrics_analyzer_ctx.domain, metrics_analyzer_ctx.domain_count);
-    if (status != FWK_SUCCESS) {
-        return status;
-    }
+
     status = report_domains_aggregate_limit(
         metrics_analyzer_ctx.domain, metrics_analyzer_ctx.domain_count);
 
