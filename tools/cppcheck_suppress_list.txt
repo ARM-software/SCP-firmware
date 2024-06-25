@@ -49,3 +49,5 @@ unknownMacro:*product/morello/module/morello_system/src/mod_morello_system.c:302
 unknownEvaluationOrder:*framework/src/fwk_io.c:60
 unknownEvaluationOrder:*framework/src/fwk_io.c:61
 unknownEvaluationOrder:*framework/src/fwk_io.c:63
+unknownEvaluationOrder:*framework/src/fwk_log.c:54
+unknownEvaluationOrder:*framework/src/fwk_log.c:56
