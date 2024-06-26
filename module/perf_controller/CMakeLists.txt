@@ -9,9 +9,9 @@
 
 add_library(${SCP_MODULE_TARGET} SCP_MODULE)
 
-target_include_directories(${SCP_MODULE_TARGET}
-                           PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-
+target_include_directories(
+    ${SCP_MODULE_TARGET} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
+                                "${CMAKE_SOURCE_DIR}/interface/power_management")
 target_sources(
     ${SCP_MODULE_TARGET}
     PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mod_perf_controller.c")
