@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -64,6 +64,19 @@
 #define FWK_ALIGN_PREVIOUS(VALUE, INTERVAL) ( \
     ((VALUE) / (INTERVAL)) * (INTERVAL))
 
+/*!
+ * \brief Check the alignment of a value.
+ *
+ * \param VALUE Value to be aligned.
+ *
+ * \param ALIGNMENT The alignment which needs to be a power of two number.
+ *
+ * \return Boolean represent the check result.
+ * \retval True when the \p VALUE is aligned with the given \p ALIGNMENT value.
+ * \retval False otherwise.
+ */
+#define FWK_IS_ALIGNED(VALUE, ALIGNMENT) \
+    (FWK_IS_VALUE_POWER_OF_TWO(ALIGNMENT) && (((VALUE) & ((ALIGNMENT)-1)) == 0))
 /*!
  * \brief Hertz unit.
  */

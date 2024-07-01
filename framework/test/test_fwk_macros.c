@@ -13,12 +13,14 @@ static void test_fwk_macros_array_size(void);
 static void test_fwk_macros_align_next(void);
 static void test_fwk_macros_align_previous(void);
 static void test_fwk_macros_power_of_two_check(void);
+static void test_fwk_macros_align_check(void);
 
 static const struct fwk_test_case_desc test_case_table[] = {
     FWK_TEST_CASE(test_fwk_macros_array_size),
     FWK_TEST_CASE(test_fwk_macros_align_next),
     FWK_TEST_CASE(test_fwk_macros_align_previous),
-    FWK_TEST_CASE(test_fwk_macros_power_of_two_check)
+    FWK_TEST_CASE(test_fwk_macros_power_of_two_check),
+    FWK_TEST_CASE(test_fwk_macros_align_check),
 };
 
 struct fwk_test_suite_desc test_suite = {
@@ -133,6 +135,43 @@ static void test_fwk_macros_power_of_two_check(void)
 
     for (unsigned int i = 0; i < test_count; ++i) {
         result = FWK_IS_VALUE_POWER_OF_TWO(test_data[i].value);
+        assert(result == test_data[i].verdict);
+    }
+}
+
+static void test_fwk_macros_align_check(void)
+{
+    bool result;
+    struct alignment_test_data {
+        unsigned int value;
+        unsigned int alignment;
+        bool verdict;
+    } test_data[] = {
+        { 0x0000, 0, false },     { 0x0000, 4, true },
+        { 0x0000, 32, true },     { 0x4000, 4, true },
+        { 0x4000, 8, true },      { 0x2004, 8, false },
+        { 0x1000, 32, true },     { 0x4020, 32, true },
+        { 0x4000, 15, false },    { 0x4000, 17, false },
+        { 0x3008, 16, false },    { 0x9000, 64, true },
+        { 0x9040, 64, true },     { 0x9048, 64, false },
+        { 0x9040, 67, false },    { 0xFFFFFFFF, 0, false },
+        { 0xFFFFFFFF, 4, false }, { 0xFFFFFFFF, 32, false },
+    };
+    unsigned int test_count = sizeof(test_data) / sizeof(test_data[0]);
+    struct alignment_test_data test;
+    /* Precedence tests */
+    test.value = 3;
+    test.alignment = 4;
+    result = FWK_IS_ALIGNED(test.value & 1, test.alignment + 1);
+    assert(result == false);
+
+    test.value = 0x4000;
+    test.alignment = 3;
+    result = FWK_IS_ALIGNED(test.value, test.alignment + 1);
+    assert(result == true);
+
+    for (unsigned int i = 0; i < test_count; ++i) {
+        result = FWK_IS_ALIGNED(test_data[i].value, test_data[i].alignment);
         assert(result == test_data[i].verdict);
     }
 }
