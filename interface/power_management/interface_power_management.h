@@ -18,6 +18,22 @@
  */
 
 /*!
+ * \defgroup GroupMacros Macros
+ * @{
+ */
+/*!
+ * \brief Maximum power value
+ */
+#define MAX_POWER UINT32_MAX
+/*!
+ * \brief No power limit is set to Maximum power value
+ */
+#define NO_POWER_LIMIT MAX_POWER
+/*!
+ * @}
+ */
+
+/*!
  * \defgroup GroupPowerManagement Power Management Modules interface
  *
  * \brief Interface definition for Power Management modules.
