@@ -1,6 +1,6 @@
 #
 # Arm SCP/MCP Software
-# Copyright (c) 2021-2022, Arm Limited and Contributors. All rights reserved.
+# Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -77,8 +77,8 @@ if(SCP_ENABLE_SCMI_RESET)
 endif()
 
 #
-# We explicitly add the CMSIS include directories to our interfaceinclude
-# directories. Each module target adds these include directories totheir own,
+# We explicitly add the CMSIS include directories to our interface include
+# directories. Each module target adds these include directories to their own,
 # allowing them to include any firmware includes we expose.
 #
 
