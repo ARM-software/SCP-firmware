@@ -117,6 +117,11 @@ void test_element_init_invalid_params(void)
         0,
         metrics_analyzer_domain[0].data);
     TEST_ASSERT_EQUAL(FWK_E_PARAM, status);
+    status = metrics_analyzer_element_init(
+        FWK_ID_ELEMENT(FWK_MODULE_IDX_METRICS_ANALYZER, 0),
+        ((1U << 8) + 1),
+        metrics_analyzer_domain[0].data);
+    TEST_ASSERT_EQUAL(FWK_E_PARAM, status);
     /* Invalid config data */
     status = metrics_analyzer_element_init(
         FWK_ID_ELEMENT(FWK_MODULE_IDX_METRICS_ANALYZER, 0),

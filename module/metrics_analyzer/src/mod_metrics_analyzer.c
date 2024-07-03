@@ -158,7 +158,8 @@ static int metrics_analyzer_element_init(
     unsigned int sub_element_count,
     const void *data)
 {
-    if (sub_element_count == 0U || data == NULL) {
+    if ((sub_element_count == 0U) || (sub_element_count >= (1U << 8)) ||
+        (data == NULL)) {
         return FWK_E_PARAM;
     }
 
