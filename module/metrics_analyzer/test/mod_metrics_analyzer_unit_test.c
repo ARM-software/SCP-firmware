@@ -373,6 +373,64 @@ void test_collect_domain_limits(void)
         new_limits[new_min_limit_idx], domain_ctx.aggregate_limit);
 }
 
+void test_collect_domain_limits_no_power_limit(void)
+{
+    int status = FWK_E_INIT;
+    const struct mod_metrics_analyzer_interactor limit_provider_config[] = {
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(10, 0) },
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(11, 1) },
+        { .api_id = FWK_ID_NONE, .domain_id = FWK_ID_ELEMENT(12, 2) },
+    };
+
+    unsigned int limits[] = { 100, 150, 200 };
+    unsigned int new_limits[] = { 1000, NO_POWER_LIMIT, 200 };
+    size_t min_limit_idx = 0;
+    size_t new_min_limit_idx = 2;
+    struct mod_metric_ctx metrics_ctx[] = {
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[0],
+            .limit = limits[0],
+        },
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[1],
+            .limit = limits[1],
+        },
+        {
+            .limit_provider_api = &limit_api,
+            .limit_provider_config = &limit_provider_config[2],
+            .limit = limits[2],
+        },
+    };
+    struct mod_domain_ctx domain_ctx = {
+        .metrics_count = 3,
+        .metrics = metrics_ctx,
+        .aggregate_limit = limits[min_limit_idx],
+    };
+
+    /* Expected calls */
+    for (size_t i = 0; i < domain_ctx.metrics_count; ++i) {
+        get_limit_ExpectAndReturn(
+            limit_provider_config[i].domain_id, NULL, FWK_SUCCESS);
+        get_limit_IgnoreArg_power_limit();
+        get_limit_ReturnMemThruPtr_power_limit(
+            &new_limits[i], sizeof(new_limits[i]));
+    }
+    get_limit_StopIgnore();
+
+    /* Test */
+    status = collect_domain_limits(&domain_ctx);
+    TEST_ASSERT_EQUAL(FWK_SUCCESS, status);
+
+    /* Validate */
+    for (size_t i = 0; i < domain_ctx.metrics_count; ++i) {
+        TEST_ASSERT_EQUAL(new_limits[i], metrics_ctx[i].limit);
+    }
+    TEST_ASSERT_EQUAL(
+        new_limits[new_min_limit_idx], domain_ctx.aggregate_limit);
+}
+
 void test_collect_domain_limits_no_change_domain(void)
 {
     int status = FWK_E_INIT;
