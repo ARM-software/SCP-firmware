@@ -35,6 +35,7 @@
   artifacts:
     reports:
       dotenv: .env/workspace.env
+    expire_in: 2 days
     paths:
       - . # Save workspace
   rules:
