@@ -1,0 +1,26 @@
+#
+# Arm SCP/MCP Software
+# Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+.merge-report:
+  image: ${CI_REGISTRY_IMAGE}/ci-base:latest
+  before_script:
+    - rm -rf artifacts/coverage_reports/merge_report
+    - mkdir -p artifacts/coverage_reports/merge_report
+    - ls -al artifacts/coverage_reports
+  script:
+    - command="python3 /opt/qa-tools/coverage-tool/coverage-reporting/merge.py"
+    - cov_files=(artifacts/coverage_reports/*.info)
+    - for file in "${cov_files[@]}"; do command+=" -a ${file}"; done
+    - command+=" -o artifacts/coverage_reports/merge_report/merge_coverage.info"
+    - eval $command
+    - genhtml artifacts/coverage_reports/merge_report/merge_coverage.info --branch-coverage -o artifacts/coverage_reports/merge_report/report
+    - lcov_cobertura artifacts/coverage_reports/merge_report/merge_coverage.info --base-dir . --output artifacts/coverage_reports/merge_report/merge_coverage.xml --demangle
+  artifacts:
+    when: on_success
+    expire_in: 2 days
+    paths:
+      - artifacts/coverage_reports
