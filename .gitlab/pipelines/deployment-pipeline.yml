@@ -13,6 +13,7 @@ stages:
   - build
   - scmi-test
   - platform-test
+  - coverage-report
 
 include:
   - local: .gitlab/templates/setup-workspace.yml
@@ -24,6 +25,7 @@ include:
   - local: .gitlab/templates/scmi-test.yml
   - local: .gitlab/templates/coverity-test.yml
   - local: .gitlab/templates/platform-test.yml
+  - local: .gitlab/templates/merge-report.yml
 
 pull-mr:
   stage: .pre
@@ -135,3 +137,16 @@ board-test-run:
   stage: platform-test
   needs:
     - board-test-build
+
+merge-all-coverage:
+  extends:
+    - .merge-report
+    - .git-strategy-on-mr
+  stage: coverage-report
+  # Example of 'coverage' regex matches in coverage report
+  # "lines......: XX.X% (XXXX of XXXX lines)"
+  coverage: '/lines[\.]+\: (\d+\.\d+)\%/'
+  dependencies:
+    - pull-mr
+    - check-ut
+    - scmi-test
