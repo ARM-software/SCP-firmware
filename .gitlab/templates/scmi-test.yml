@@ -12,6 +12,7 @@
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
     GIT_DEPTH: 1
+    CODE_COVERAGE: "true"
   parallel:
     matrix:
       - SCP_CI_PLATFORM:
@@ -24,13 +25,18 @@
   before_script:
     - echo "PROJECT_TYPE = $PROJECT_TYPE"
     - ln -s $(pwd) /$PROJECT_TYPE
+    - mkdir -p artifacts/coverage_reports
   script:
     - echo "platform under test $SCP_CI_PLATFORM"
     - /scmi_tester_entrypoint.sh $PROJECT_TYPE
+    - python3 /scp/tools/filter_coverage_report.py --filename artifacts/*/scmi/lcov_report/coverage.info
+    - cp artifacts/*/scmi/lcov_report/coverage_filtered.info artifacts/coverage_reports/${SCP_CI_PLATFORM}_coverage_filtered.info
   artifacts:
     when: always
     expire_in: 2 days
     paths:
+      - artifacts/coverage_reports
+      - artifacts/*/scmi/lcov_report
       - artifacts/*/scmi/ap.txt
       - artifacts/*/scmi/scp.txt
       - artifacts/*/scmi/log.txt
