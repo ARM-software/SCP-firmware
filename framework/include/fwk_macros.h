@@ -31,6 +31,18 @@
 #define FWK_ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 /*!
+ * \brief Check whether the value is power of two or not
+ *
+ * \param VALUE Value to be checked.
+ *
+ * \return boolean represent the check result.
+ * \retval True when the \p VALUE is power of two.
+ * \retval False when the \p VALUE is not power of two.
+ */
+#define FWK_IS_VALUE_POWER_OF_TWO(VALUE) \
+    ((VALUE) <= 0) ? false : (((VALUE) & ((VALUE)-1)) == (0))
+
+/*!
  * \brief Aligns a value to the next multiple.
  *
  * \param VALUE Value to be aligned.
