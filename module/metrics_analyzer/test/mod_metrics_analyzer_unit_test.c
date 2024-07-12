@@ -17,6 +17,8 @@
 #include <Mockfwk_mm.h>
 #include <Mockfwk_module.h>
 
+#include <string.h>
+
 #include UNIT_TEST_SRC
 
 #define MOD_METRICS_ANALYZER_ID FWK_ID_MODULE(FWK_MODULE_IDX_METRICS_ANALYZER)
@@ -35,6 +37,9 @@ struct interface_power_management_api limit_api = {
 
 void setUp(void)
 {
+    memset(&metrics_analyzer_ctx, 0, sizeof(metrics_analyzer_ctx));
+    memset(domains, 0, sizeof(domains));
+    memset(metrics, 0, sizeof(metrics));
 }
 
 void tearDown(void)
@@ -59,7 +64,7 @@ void initialize_module_domains(void)
         metrics_analyzer_ctx.domain[i].aggregate_limit = UINT32_MAX;
         metrics_analyzer_ctx.domain[i].metrics = metrics[i];
         for (size_t j = 0; j < metrics_analyzer_ctx.domain[i].metrics_count;
-             ++i) {
+             ++j) {
             metrics_analyzer_ctx.domain[i].metrics[j].limit = UINT32_MAX;
             metrics_analyzer_ctx.domain[i].metrics[j].limit_provider_config =
                 &metrics_analyzer_ctx.domain[i].config->limit_providers[j];
