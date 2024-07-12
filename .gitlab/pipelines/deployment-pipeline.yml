@@ -138,6 +138,20 @@ board-test-run:
   needs:
     - board-test-build
 
+merge-ut-coverage:
+  extends:
+    - .merge-report
+    - .git-strategy-on-mr
+  stage: coverage-report
+  dependencies:
+    - pull-mr
+    - check-ut
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: artifacts/coverage_reports/merge_report/merge_coverage.xml
+
 merge-all-coverage:
   extends:
     - .merge-report

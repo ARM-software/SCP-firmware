@@ -16,11 +16,14 @@
         - fwk
         - mod
         - prod
+  before_script:
+    - mkdir -p artifacts/coverage_reports
   script:
     - echo "Unit test under test $SCP_UT_SUITE"
     - python3 tools/check_utest.py --suite $SCP_UT_SUITE --coverage
+    - cp build/*/test/scp_v2_*_test_coverage_filtered.info artifacts/coverage_reports
   artifacts:
     when: on_success
     expire_in: 2 days
     paths:
-      - build/*/test/scp_v2_*_test_coverage_filtered.info
+      - artifacts/coverage_reports

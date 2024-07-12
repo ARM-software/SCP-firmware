@@ -67,6 +67,13 @@ board-test-run:
   needs:
     - board-test-build
 
+merge-ut-coverage:
+  extends: .merge-report
+  stage: coverage-report
+  allow_failure: true
+  dependencies:
+    - check-ut
+
 merge-all-coverage:
   extends: .merge-report
   stage: coverage-report
