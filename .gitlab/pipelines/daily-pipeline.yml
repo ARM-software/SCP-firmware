@@ -49,6 +49,11 @@ build-products-all-log-levels:
   stage: build
   allow_failure: true
 
+build-optee:
+  extends: .build-optee
+  stage: build
+  allow_failure: true
+
 scmi-test:
   extends: .scmi-test
   stage: scmi-test

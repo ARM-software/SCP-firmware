@@ -107,6 +107,14 @@ build-products:
   dependencies:
     - pull-mr
 
+build-optee:
+  extends:
+    - .build-optee
+    - .git-strategy-on-mr
+  stage: build
+  dependencies:
+    - pull-mr
+
 scmi-test:
   extends:
     - .scmi-test
