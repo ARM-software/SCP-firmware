@@ -62,6 +62,7 @@ target_sources(
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_cdcel937.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_hdlcd.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_timer.c"
+            "${CMAKE_CURRENT_SOURCE_DIR}/config_trace.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_ddr_phy400.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_dmc400.c"
             "${CMAKE_CURRENT_SOURCE_DIR}/config_juno_ram.c"
