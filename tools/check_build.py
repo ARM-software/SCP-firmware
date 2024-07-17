@@ -63,26 +63,34 @@ def do_build(build_info: List[Build], output_path: str) -> \
     return results
 
 
-def build_all(config_file: str,
-              ignore_errors: bool,
-              log_level: str,
-              output_path: str):
+def build_products(config_file: str,
+                   ignore_errors: bool,
+                   log_level: str,
+                   products: List[str],
+                   output_path: str):
 
     banner('Test building products')
     results = Results()
 
     try:
         with open(config_file, 'r') as file:
-            products = Product.from_yaml(file)
+            all_products = Product.from_yaml(file)
     except IOError:
         print(f'Error opening {config_file} file')
         results.append(("Opening yaml file", 1))
         return results
 
-    for product in products:
+    if products:
+        products_to_build = [product for product in all_products
+                             if product.name in products]
+    else:
+        products_to_build = all_products
+
+    for product in products_to_build:
         if log_level != "":
             product.log_level = Parameter(log_level)
-        results.extend(do_build(product.builds, output_path))
+        builds = product.builds
+        results.extend(do_build(builds, output_path))
         if not ignore_errors and results.errors:
             print('Errors detected! Excecution stopped')
             break
@@ -119,6 +127,11 @@ def parse_args(argv, prog_name):
                         is not given, the default location is \
                         {BUILD_OUTPUT_DIR_DEFAULT}')
 
+    parser.add_argument('-p', '--products', dest='products',
+                        required=False, default=[], type=str, nargs='+',
+                        help='Specify one or more products to build for. \
+                        Accepts a space separated list')
+
     return parser.parse_args(argv)
 
 
@@ -126,10 +139,11 @@ def main(argv=[], prog_name=''):
     args = parse_args(argv, prog_name)
 
     results = Results()
-    results.extend(build_all(args.config_file,
-                             args.ignore_errors,
-                             args.log_level,
-                             args.output_path))
+    results.extend(build_products(args.config_file,
+                                  args.ignore_errors,
+                                  args.log_level,
+                                  args.products,
+                                  args.output_path))
     print(results)
     return 0 if not results.errors else 1
 
