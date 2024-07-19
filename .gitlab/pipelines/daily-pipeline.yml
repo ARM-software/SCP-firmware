@@ -84,3 +84,4 @@ merge-all-coverage:
   dependencies:
     - check-ut
     - scmi-test
+    - fvp-boot-test
