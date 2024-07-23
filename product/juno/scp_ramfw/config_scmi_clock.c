@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2015-2021, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2015-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -55,7 +55,7 @@ static const struct mod_scmi_clock_device agent_device_table_ospm[] = {
 };
 
 static const struct
-    mod_scmi_clock_agent agent_table[JUNO_SCMI_SERVICE_IDX_COUNT] = {
+    mod_scmi_clock_agent agent_table[JUNO_SCMI_AGENT_IDX_COUNT] = {
     [JUNO_SCMI_AGENT_IDX_PSCI] = { 0 /* No Access */ },
     [JUNO_SCMI_AGENT_IDX_OSPM] = {
         .device_table = agent_device_table_ospm,
