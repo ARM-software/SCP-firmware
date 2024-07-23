@@ -164,3 +164,4 @@ merge-all-coverage:
     - pull-mr
     - check-ut
     - scmi-test
+    - fvp-boot-test
