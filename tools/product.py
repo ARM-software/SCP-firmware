@@ -40,6 +40,7 @@ class Build:
     log_level: Parameter
     product_group: str
     variant: Parameter = None
+    config: Parameter = None
 
     def tag(self):
         name = self.product_group + '/' + self.name if self.product_group \
@@ -52,6 +53,8 @@ class Build:
             build_str += ' - Variant {}'.format(self.variant.name)
         if self.log_level:
             build_str += ' - Log Level {}'.format(self.log_level.name)
+        if self.config:
+            build_str += ' - Config {}'.format(self.config.name)
         return build_str
 
     def file_name(self):
@@ -62,6 +65,8 @@ class Build:
             filename += f'_{self.log_level.name}'
         if self.variant:
             filename += f'_{self.variant.name}'
+        if self.config:
+            filename += f'_{self.config.name}'
         filename += '.txt'
         return filename
 
@@ -72,6 +77,8 @@ class Build:
         parts.append(self.name)
         if self.log_level:
             parts.append(self.log_level.name)
+        if self.config:
+            parts.append(self.config.name)
         if self.variant:
             parts.append('platform_variant_' + str(self.variant.name))
         parts.append(self.toolchain.name)
@@ -96,6 +103,9 @@ class Build:
             cmd += Build.__extra_arg__(extra)
         for extra in self.build_type.arguments:
             cmd += Build.__extra_arg__(extra)
+        if self.config:
+            cmd += ' '.join(Build.__extra_arg__(extra)
+                            for extra in self.config.arguments) + ' '
         if build_path:
             cmd += f'BUILD_PATH={build_path} '
         return cmd
@@ -124,6 +134,7 @@ class Product:
     variants: List[Parameter] = field(default_factory=lambda: [None])
     log_level: Parameter = None
     product_group: str = field(default=None)
+    configs: List[Parameter] = field(default_factory=lambda: [None])
 
     @classmethod
     def from_yaml(cls, yaml_file):
@@ -151,21 +162,32 @@ class Product:
                 product_properties['build_types'] = \
                     Parameter.from_yaml(build_types)
 
+            default_config = Parameter(name='default', arguments=())
+            if 'configs' in yaml_entry:
+                configs = yaml_entry['configs']
+                parsed_configs = Parameter.from_yaml(configs)
+                if default_config not in parsed_configs:
+                    parsed_configs.insert(0, default_config)
+                product_properties['configs'] = parsed_configs
+
             products.append(cls(**product_properties))
 
         return products
 
     @property
     def builds(self) -> List[Build]:
-        builds = []
-        for toolchain in self.toolchains:
-            for build_type in self.build_types:
-                for variant in self.variants:
-                    builds.append(Build(
-                        self.name,
-                        toolchain,
-                        build_type,
-                        self.log_level,
-                        self.product_group,
-                        variant))
-        return builds
+        return [
+            Build(
+                self.name,
+                toolchain,
+                build_type,
+                self.log_level,
+                self.product_group,
+                variant,
+                config
+            )
+            for config in self.configs
+            for toolchain in self.toolchains
+            for build_type in self.build_types
+            for variant in self.variants
+        ]
