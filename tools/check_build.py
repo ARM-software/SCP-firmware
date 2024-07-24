@@ -39,10 +39,16 @@ def do_build(build_info: List[Build], output_path: str) -> \
 
     files = []
     for build in build_info:
-        file_path = os.path.join(output_path, build.file_name())
+        build_output_path = os.path.join(output_path,
+                                         build.build_output_directory())
+
+        if not os.path.exists(build_output_path):
+            os.makedirs(build_output_path)
+
+        file_path = os.path.join(build_output_path, build.file_name())
         files.append(open(file_path, "w", encoding="utf-8"))
 
-        build_cmd = build.command(output_path)
+        build_cmd = build.command(build_output_path)
 
         build_id = subprocess.Popen(
                                 build_cmd,
@@ -92,7 +98,7 @@ def build_products(config_file: str,
         builds = product.builds
         results.extend(do_build(builds, output_path))
         if not ignore_errors and results.errors:
-            print('Errors detected! Excecution stopped')
+            print('Errors detected! Execution stopped')
             break
 
     return results

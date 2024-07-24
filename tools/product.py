@@ -65,6 +65,19 @@ class Build:
         filename += '.txt'
         return filename
 
+    def build_output_directory(self):
+        parts = []
+        if self.product_group:
+            parts.append(self.product_group)
+        parts.append(self.name)
+        if self.log_level:
+            parts.append(self.log_level.name)
+        if self.variant:
+            parts.append('platform_variant_' + str(self.variant.name))
+        parts.append(self.toolchain.name)
+        parts.append(self.build_type.name)
+        return '/'.join(parts)
+
     def command(self, build_path=None):
         cmd = 'make -f Makefile.cmake '
         name = self.product_group + '/' + self.name if self.product_group \
