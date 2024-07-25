@@ -25,9 +25,11 @@ FWK_CONSTRUCTOR void fwk_trace_init(void)
     (void)fwk_str_memcpy(&fwk_trace_ctx.driver, &driver, sizeof(driver));
     if (fwk_trace_ctx.driver.trace_entry_count != 0) {
         fwk_trace_ctx.start_timestamp = fwk_mm_calloc(
-            fwk_trace_ctx.driver.trace_entry_count, sizeof(fwk_trace_count_t));
+            fwk_trace_ctx.driver.trace_entry_count + 1,
+            sizeof(fwk_trace_count_t));
         fwk_trace_ctx.entry_pending = fwk_mm_calloc(
-            fwk_trace_ctx.driver.trace_entry_count, sizeof(fwk_trace_count_t));
+            fwk_trace_ctx.driver.trace_entry_count + 1,
+            sizeof(fwk_trace_count_t));
     }
 }
 
@@ -37,6 +39,14 @@ static inline fwk_trace_count_t calc_delta(
 {
     return (end >= start) ? (end - start) :
                             ((fwk_trace_count_t)(-1) - start + end);
+}
+
+fwk_trace_count_t fwk_trace_calc_overhead(void)
+{
+    fwk_trace_count_t start = fwk_trace_ctx.driver.get_trace_count();
+    (void)FWK_TRACE_START(fwk_trace_ctx.driver.trace_entry_count);
+    (void)FWK_TRACE_FINISH(fwk_trace_ctx.driver.trace_entry_count, "");
+    return calc_delta(start, fwk_trace_ctx.driver.get_trace_count());
 }
 
 int fwk_trace_start(fwk_trace_id_t id)

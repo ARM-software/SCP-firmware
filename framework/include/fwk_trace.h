@@ -37,6 +37,13 @@
 #define FWK_TRACE_FINISH(ID, MSG) \
     fwk_trace_finish(__FILE__, __func__, __LINE__, ID, MSG)
 
+/*!
+ * \brief Calculate the trace overhead.
+ *
+ * \return Tracing overhead.
+ */
+#define FWK_TRACE_CALC_OVERHEAD() fwk_trace_calc_overhead()
+
 typedef uint64_t fwk_trace_count_t;
 typedef uint32_t fwk_trace_id_t;
 #define PRItraceid    PRIu32
@@ -83,6 +90,13 @@ struct fwk_trace_driver {
  * function executes before `main`.
  */
 void fwk_trace_init(void);
+
+/*!
+ * \brief Calculate the trace overhead.
+ *
+ * \return Tracing overhead.
+ */
+fwk_trace_count_t fwk_trace_calc_overhead(void);
 
 /*!
  * \brief Start trace of an event.
