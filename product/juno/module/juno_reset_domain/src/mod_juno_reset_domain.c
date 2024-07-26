@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2020-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -104,19 +104,17 @@ static int juno_set_reset_state(fwk_id_t dev_id,
 
     dev_ctx = &module_juno_reset_ctx.dev_ctx_table[domain_idx];
 
-    if (domain_idx == JUNO_RESET_DOMAIN_IDX_UART) {
-        status = handle_uart_reset_set_state(dev_ctx);
-        if (status != FWK_SUCCESS) {
-            return status;
-        }
-
-        params = (struct mod_reset_domain_autoreset_event_params *)
-                     autoreset_event.params;
-        params->dev_id = dev_id;
-        params->reset_state = reset_state;
-        params->cookie = cookie;
-        fwk_put_event(&autoreset_event);
+    status = handle_uart_reset_set_state(dev_ctx);
+    if (status != FWK_SUCCESS) {
+        return status;
     }
+
+    params = (struct mod_reset_domain_autoreset_event_params *)
+                 autoreset_event.params;
+    params->dev_id = dev_id;
+    params->reset_state = reset_state;
+    params->cookie = cookie;
+    fwk_put_event(&autoreset_event);
 
     return FWK_SUCCESS;
 }
