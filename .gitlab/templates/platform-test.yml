@@ -61,7 +61,7 @@
 
 .board-test-run:
   extends: .platform-test
-  stage: run
+  retry: 2
   variables:
     SCP_CI_SUBTEST_CFG: board_run
   parallel:
