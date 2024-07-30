@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2021-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2021-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -538,10 +538,10 @@ static int mpmm_element_init(
         /* Create counters storage */
         core_ctx->cached_counters = fwk_mm_calloc(
             domain_ctx->domain_config->num_threshold_counters,
-            sizeof(uint32_t));
+            sizeof(*core_ctx->cached_counters));
         core_ctx->delta = fwk_mm_calloc(
             domain_ctx->domain_config->num_threshold_counters,
-            sizeof(uint32_t));
+            sizeof(*core_ctx->delta));
 
         if (core_config->core_starts_online) {
             domain_ctx->num_cores_online++;

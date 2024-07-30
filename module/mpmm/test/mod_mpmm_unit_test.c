@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -209,19 +209,19 @@ void utest_mpmm_element_init_two_core_success(void)
     fwk_id_build_sub_element_id_IgnoreAndReturn(elem_id);
     fwk_mm_calloc_ExpectAndReturn(
         dev_ctx_table[0].domain_config->num_threshold_counters,
-        sizeof(uint32_t),
+        sizeof(*dev_ctx_table[0].core_ctx[CORE0_IDX].cached_counters),
         &cached_counters[CORE0_IDX]);
     fwk_mm_calloc_ExpectAndReturn(
         dev_ctx_table[0].domain_config->num_threshold_counters,
-        sizeof(uint32_t),
+        sizeof(*dev_ctx_table[0].core_ctx[CORE0_IDX].delta),
         &delta[CORE0_IDX]);
     fwk_mm_calloc_ExpectAndReturn(
         dev_ctx_table[0].domain_config->num_threshold_counters,
-        sizeof(uint32_t),
+        sizeof(*dev_ctx_table[0].core_ctx[CORE1_IDX].cached_counters),
         &cached_counters[CORE1_IDX]);
     fwk_mm_calloc_ExpectAndReturn(
         dev_ctx_table[0].domain_config->num_threshold_counters,
-        sizeof(uint32_t),
+        sizeof(*dev_ctx_table[0].core_ctx[CORE1_IDX].delta),
         &delta[CORE1_IDX]);
 
     status =
