@@ -117,9 +117,6 @@ COPY requirements.txt .
 RUN PIP_ROOT_USER_ACTION=ignore \
     python3 -m pip install --ignore-installed  -r requirements.txt
 
-COPY Gemfile .
-RUN BUNDLE_SILENCE_ROOT_WARNING=true bundler install
-
 ENTRYPOINT ["sh"]
 
 

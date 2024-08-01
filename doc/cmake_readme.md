@@ -384,7 +384,6 @@ you will need the following (adjust for your desired platform):
 
 - [cmake-format 0.6.13](https://pypi.org/project/cmake-format/0.6.13/#files)
 - [CMake 3.18.3](https://github.com/Kitware/CMake/releases/tag/v3.18.3)
-- [Markdownlint 0.11.0](https://rubygems.org/gems/mdl/versions/0.11.0)
 - [Python 3.8.2](https://www.python.org/downloads/release/python-382)
 - [yamllint 1.25.0](https://pypi.org/project/yamllint/1.25.0/#files)
 
@@ -520,7 +519,6 @@ The following validation targets are supported:
   - `lint`: Runs all linting checks
     - `lint-cmake`: Runs CMake linting checks
     - `lint-python`: Runs Python linting checks
-    - `lint-markdown`: Runs Markdown linting checks
     - `lint-yaml`: Runs YAML linting checks
   - `check-cmake`: Runs CMake formatting checks
   - `check-yaml`: Runs YAML formatting checks

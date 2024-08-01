@@ -604,8 +604,6 @@ list(APPEND glob_excludes "^${SCP_SOURCE_DIR}/contrib/run-clang-format/git")
 list(APPEND cmake_globs "CMakeLists.txt")
 list(APPEND cmake_globs "*.cmake")
 
-list(APPEND markdown_globs "*.md")
-
 list(APPEND yaml_globs "*.yml")
 list(APPEND yaml_globs "*.yaml")
 
@@ -621,7 +619,7 @@ list(APPEND c_globs "*.[ch]xx")
 
 # cmake-lint: disable=C0103
 
-foreach(type cmake markdown yaml c)
+foreach(type cmake yaml c)
     unset(sources)
 
     foreach(include IN LISTS glob_includes)
@@ -673,23 +671,6 @@ if(TARGET CMakeFormat::Lint)
         COMMAND_EXPAND_LISTS)
 
     list(APPEND lint_targets "lint-cmake")
-endif()
-
-#
-# Configure markdownlint.
-#
-
-find_package(Markdownlint)
-
-if(Markdownlint_FOUND)
-    add_custom_target(
-        lint-markdown
-        COMMAND Markdownlint "${markdown_sources}"
-        WORKING_DIRECTORY "${SCP_SOURCE_DIR}"
-        COMMENT "Running Markdown sources..."
-        COMMAND_EXPAND_LISTS)
-
-    list(APPEND lint_targets "lint-markdown")
 endif()
 
 #
