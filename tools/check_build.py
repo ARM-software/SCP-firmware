@@ -20,7 +20,8 @@ from utils import Results, banner
 #
 # Default products build configuration file
 #
-PRODUCTS_BUILD_FILE_DEFAULT = './tools/products_build.yml'
+PRODUCTS_BUILD_FILE_DEFAULT = './tools/config/check_build/' \
+                              'default_products_build.yml'
 
 #
 # Default build output directory
