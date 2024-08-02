@@ -18,7 +18,7 @@ from utils import banner, get_filtered_files
 #
 # Default banned list file
 #
-BANNED_LIST_DEFAULT = './tools/banned_api.lst'
+BANNED_LIST_DEFAULT = './tools/config/check_banned_api/default_banned_api.lst'
 
 
 # Exclude all mod_test 'mocks' directories
