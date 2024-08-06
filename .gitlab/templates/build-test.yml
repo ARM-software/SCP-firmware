@@ -17,27 +17,38 @@
       else
         export LOG_LEVEL="--log-level=$BUILD_PRODUCTS_LOG_LEVEL"
       fi
+      if [ -z $BUILD-PRODUCT ]; then
+        export PRODUCT=""
+      else
+        export PRODUCT="-p $BUILD_PRODUCT"
+      fi
   script:
     - |
       python3 tools/check_build.py --build-output-dir ./build \
-      ${LOG_LEVEL}
+      ${LOG_LEVEL} ${PRODUCT}
   artifacts:
     when: on_failure
     expire_in: 2 days
     paths:
       - build/*.txt
 
-.build-products-all-log-levels:
+.build-products-all-products:
   extends: .build-products
   parallel:
     matrix:
-      - BUILD_PRODUCTS_LOG_LEVEL:
-        - DEBUG
-        - INFO
-        - WARN
-        - ERROR
-        - CRIT
-        - DISABLED
+      - BUILD_PRODUCT:
+          [host, juno, morello, n1sdp, rcar, rdfremont, rdv1, rdv1mc, rdn1e1, rdn2,
+           sgi575, sgm775, sgm776, synquacer, tc2]
+
+.build-products-all-products-all-log-levels:
+  extends: .build-products
+  parallel:
+    matrix:
+      - BUILD_PRODUCT:
+          [host, juno, morello, n1sdp, rcar, rdfremont, rdv1, rdv1mc, rdn1e1, rdn2,
+           sgi575, sgm775, sgm776, synquacer, tc2]
+        BUILD_PRODUCTS_LOG_LEVEL:
+          [DEBUG, INFO, WARN, ERROR, CRIT, DISABLED]
 
 .build-optee:
   image: ${CI_REGISTRY_IMAGE}/optee-build:latest

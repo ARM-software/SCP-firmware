@@ -101,7 +101,7 @@ check-ut:
 
 build-products:
   extends:
-    - .build-products
+    - .build-products-all-products
     - .git-strategy-on-mr
   stage: build
   dependencies:

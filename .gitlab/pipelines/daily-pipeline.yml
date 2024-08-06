@@ -44,8 +44,8 @@ check-ut:
   stage: unit-testing
   allow_failure: true
 
-build-products-all-log-levels:
-  extends: .build-products-all-log-levels
+build-products-all-products-all-log-levels:
+  extends: .build-products-all-products-all-log-levels
   stage: build
   allow_failure: true
 
