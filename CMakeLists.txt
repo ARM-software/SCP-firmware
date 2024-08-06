@@ -599,17 +599,12 @@ add_dependencies(${SCP_FIRMWARE_LIB} ${SCP_FIRMWARE_TARGET})
 list(APPEND glob_includes "${SCP_SOURCE_DIR}")
 
 list(APPEND glob_excludes "^${SCP_SOURCE_DIR}/contrib/cmsis/git")
-list(APPEND glob_excludes "^${SCP_SOURCE_DIR}/contrib/run-clang-format/git")
 
 list(APPEND cmake_globs "CMakeLists.txt")
 list(APPEND cmake_globs "*.cmake")
 
 list(APPEND yaml_globs "*.yml")
 list(APPEND yaml_globs "*.yaml")
-
-list(APPEND c_globs "*.[ch]")
-list(APPEND c_globs "*.[ch]pp")
-list(APPEND c_globs "*.[ch]xx")
 
 #
 # Glob sources and place them in their respective variables. Globs for source
@@ -619,7 +614,7 @@ list(APPEND c_globs "*.[ch]xx")
 
 # cmake-lint: disable=C0103
 
-foreach(type cmake yaml c)
+foreach(type cmake yaml)
     unset(sources)
 
     foreach(include IN LISTS glob_includes)
@@ -719,64 +714,10 @@ if(Yamllint_FOUND)
 endif()
 
 #
-# Configure Clang-Format.
-#
-
-find_package(Clang OPTIONAL_COMPONENTS Format FormatGit)
-
-if(Clang_FormatGit_FOUND)
-    add_custom_target(
-        format-diff-c
-        COMMAND Clang::FormatGit HEAD
-        WORKING_DIRECTORY "${SCP_SOURCE_DIR}"
-        COMMENT "Formatting modified C/C++ sources..."
-        COMMAND_EXPAND_LISTS)
-
-    list(APPEND format_diff_targets "format-diff-c")
-endif()
-
-if(Clang_Format_FOUND)
-    add_custom_target(
-        format-c
-        COMMAND Clang::Format -i "${c_sources}"
-        WORKING_DIRECTORY "${SCP_SOURCE_DIR}"
-        COMMENT "Formatting C/C++ sources..."
-        COMMAND_EXPAND_LISTS)
-
-    list(APPEND format_targets "format-c")
-endif()
-
-#
-# Configure run-clang-format.
-#
-
-find_package(Python3 COMPONENTS Interpreter)
-
-if(Python3_Interpreter_FOUND)
-    add_custom_target(
-        check-c
-        COMMAND
-            Python3::Interpreter
-            "${SCP_SOURCE_DIR}/contrib/run-clang-format/git/run-clang-format.py"
-            --clang-format-executable "${Clang_Format_EXECUTABLE}"
-            "${c_sources}"
-        WORKING_DIRECTORY "${SCP_SOURCE_DIR}"
-        COMMENT "Checking C sources..."
-        COMMAND_EXPAND_LISTS)
-
-    list(APPEND check_targets "check-c")
-endif()
-
-#
 # Create the final check targets. These targets consist of miscellaneous quality
 # assurance tasks like linting and formatting, and act as dummy targets that
 # invoke the various tools we set up above.
 #
-
-add_custom_target(
-    format-diff
-    DEPENDS ${format_diff_targets}
-    COMMENT "Formatting modified sources...")
 
 add_custom_target(
     format

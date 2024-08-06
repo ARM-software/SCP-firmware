@@ -522,8 +522,6 @@ The following validation targets are supported:
     - `lint-yaml`: Runs YAML linting checks
   - `check-cmake`: Runs CMake formatting checks
   - `check-yaml`: Runs YAML formatting checks
-  - `check-c`: Runs C formatting checks
 - `format`: Formats all code
   - `format-cmake`: Formats all CMake code
   - `format-yaml`: Formats all YAML code
-  - `format-c`: Formats all C code
