@@ -37,6 +37,7 @@ srcs-y += $(scpfw-path)/framework/src/fwk_status.c
 srcs-y += $(scpfw-path)/framework/src/fwk_string.c
 srcs-y += $(scpfw-path)/framework/src/fwk_delayed_resp.c
 srcs-y += $(scpfw-path)/framework/src/fwk_time.c
+srcs-y += $(scpfw-path)/framework/src/fwk_trace.c
 srcs-y += $(scpfw-path)/framework/src/fwk_core.c
 srcs-y += $(scpfw-path)/framework/src/assert.c
 srcs-y += $(scpfw-path)/framework/src/stdlib.c
