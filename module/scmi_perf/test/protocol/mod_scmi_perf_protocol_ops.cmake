@@ -41,8 +41,6 @@ include(${SCP_ROOT}/unit_test/module_common.cmake)
 target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC
     "BUILD_HAS_SCMI_PERF_PROTOCOL_OPS")
 target_compile_definitions(${UNIT_TEST_TARGET} PUBLIC
-    "BUILD_HAS_SCMI_PERF_FAST_CHANNELS"
-    "BUILD_HAS_FAST_CHANNELS"
     "BUILD_HAS_MOD_TRANSPORT")
 #
 # BUILD_HAS_SCMI_PERF_FAST_CHANNELS target

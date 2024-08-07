@@ -986,6 +986,8 @@ void utest_scmi_perf_message_handler_bad_message_id(void)
     mod_scmi_from_protocol_api_scmi_frame_validation_ExpectAnyArgsAndReturn(
         SCMI_NOT_SUPPORTED);
 
+    return_status = SCMI_NOT_SUPPORTED;
+
     status = scmi_perf_message_handler(
         (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
         service_id,
@@ -1008,6 +1010,8 @@ void utest_scmi_perf_message_handler_not_found(void)
 
     mod_scmi_from_protocol_api_scmi_frame_validation_ExpectAnyArgsAndReturn(
         SCMI_NOT_FOUND);
+
+    return_status = SCMI_NOT_FOUND;
 
     status = scmi_perf_message_handler(
         (fwk_id_t)MOD_SCMI_PROTOCOL_ID_PERF,
