@@ -11,6 +11,8 @@
 #ifndef MOD_METRICS_ANALYZER_H
 #define MOD_METRICS_ANALYZER_H
 
+#include <fwk_id.h>
+
 /*!
  * \addtogroup GroupModules Modules
  * \{
