@@ -1,2 +1,0 @@
-Checks: "bugprone-*,cert-*,clang-analyzer-*,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,clang-diagnostic-*,-clang-diagnostic-deprecated-declarations,misc-*,-misc-unused-parameters,portability-*,readability-braces-around-statements"
-FormatStyle: "file"

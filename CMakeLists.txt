@@ -204,57 +204,6 @@ if(NOT DISABLE_CPPCHECK)
 endif()
 
 #
-# Set up Clang-Tidy if it's available and enabled.
-#
-if(ENABLE_CLANG_TIDY)
-
-    find_program(
-        CMAKE_C_CLANG_TIDY
-        NAMES "clang-tidy"
-              "clang-tidy-3.6"
-              "clang-tidy-3.7"
-              "clang-tidy-3.8"
-              "clang-tidy-3.9"
-              "clang-tidy-4.0"
-              "clang-tidy-5.0"
-              "clang-tidy-6.0"
-              "clang-tidy-7"
-              "clang-tidy-8"
-              "clang-tidy-9"
-              "clang-tidy-10"
-              "clang-tidy-11")
-
-    if(NOT CMAKE_C_CLANG_TIDY)
-        unset(CMAKE_C_CLANG_TIDY CACHE)
-    endif()
-
-    if(CMAKE_C_CLANG_TIDY)
-        # cmake-format: off
-
-        if(CMAKE_C_COMPILER_TARGET)
-            list(APPEND CMAKE_C_CLANG_TIDY "--extra-arg=--target=${CMAKE_C_COMPILER_TARGET}")
-        endif()
-
-        foreach(dir IN LISTS CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES)
-            list(APPEND CMAKE_C_CLANG_TIDY "--extra-arg=-isystem")
-            list(APPEND CMAKE_C_CLANG_TIDY "--extra-arg=${dir}")
-            list(APPEND CMAKE_C_CLANG_TIDY "--extra-arg=-fms-extensions")
-        endforeach()
-
-        if(CMAKE_C_COMPILER_ID STREQUAL "ARMClang")
-            list(APPEND CMAKE_C_CLANG_TIDY "--extra-arg=-D__ARM_PROMISE=__builtin_assume")
-            list(APPEND CMAKE_C_CLANG_TIDY "--extra-arg=-D__ARMCC_VERSION=600000")
-            list(APPEND CMAKE_C_CLANG_TIDY "--extra-arg=-D__ESCAPE__(x)=(x)")
-        endif()
-
-        list(APPEND CMAKE_C_CLANG_TIDY "--quiet")
-
-        # cmake-format: on
-    endif()
-
-endif()
-
-#
 # Try to locate Arm Compiler's 'fromelf' tool.
 #
 
