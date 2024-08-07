@@ -1,8 +1,5 @@
 clang-format==14.0.0
 cmake-format==0.6.13
-colorama==0.4.3
 pycodestyle==2.6.0
-ruamel.yaml==0.16.12
-yamllint==1.25.0
 pyyaml==5.4.1
 lcov-cobertura==2.0.2
