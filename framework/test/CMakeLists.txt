@@ -76,6 +76,7 @@ list(APPEND SCP_FWK_TEST_TARGETS test_fwk_ring)
 list(APPEND SCP_FWK_TEST_TARGETS test_fwk_ring_init)
 list(APPEND SCP_FWK_TEST_TARGETS test_fwk_string)
 list(APPEND SCP_FWK_TEST_TARGETS test_fwk_core)
+list(APPEND SCP_FWK_TEST_TARGETS test_fwk_trace)
 
 # Create a list of the tests that need notifications.
 list(APPEND NOTIFICATION_ENABLED_TEST test_fwk_module test_fwk_notification
@@ -130,6 +131,7 @@ list(APPEND COMMON_SRC ${FWK_SRC_ROOT}/fwk_string.c)
 list(APPEND COMMON_SRC ${FWK_TEST_SRC_ROOT}/fwk_test.c)
 list(APPEND COMMON_SRC ${FWK_SRC_ROOT}/fwk_delayed_resp.c)
 list(APPEND COMMON_SRC ${FWK_SRC_ROOT}/fwk_time.c)
+list(APPEND COMMON_SRC ${FWK_SRC_ROOT}/fwk_trace.c)
 
 # CMake internal function enables testing for this directory
 enable_testing()
