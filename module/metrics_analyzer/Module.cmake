@@ -5,5 +5,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-set(SCP_MODULE "metrics_analyzer")
+set(SCP_MODULE "metrics-analyzer")
 set(SCP_MODULE_TARGET "module-metrics-analyzer")
