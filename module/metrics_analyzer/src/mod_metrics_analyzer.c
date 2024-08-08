@@ -51,7 +51,7 @@ static int collect_domain_limits(struct mod_domain_ctx *domain_ctx)
 
     domain_ctx->aggregate_limit = UINT32_MAX;
     for (size_t i = 0; i < domain_ctx->metrics_count; ++i) {
-        unsigned int power_limit;
+        uint32_t power_limit;
         struct mod_metric_ctx *metric_ctx = &domain_ctx->metrics[i];
         status = metric_ctx->limit_provider_api->get_limit(
             metric_ctx->limit_provider_config->domain_id, &power_limit);
