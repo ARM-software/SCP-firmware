@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -32,30 +32,6 @@
 #define SMCF_MODE_ENTRY_COUNT 4
 
 /*!
- * \brief Timer for setting MODE_REQ register.
- *
- * \details This structure is required to be filled in SMCF config file only
- *          when the timeout feature is required.
- */
-struct mod_smcf_timer_config {
-    /*!
-     * \brief Timer identifier.
-     *
-     * \details Used for binding with the timer API and waiting for specified
-     *          delay after setting the MODE_REQ register.
-     */
-    fwk_id_t timer_id;
-
-    /*!
-     * \brief Timeout value.
-     *
-     * \details MODE_REQ state change wait delay in micro seconds. A valid
-     *          non-zero value has to be specified when using this feature.
-     */
-    uint32_t set_state_timeout_us;
-};
-
-/*!
  * \brief Configuration data of a domain driver
  */
 struct mod_smcf_element_config {
@@ -70,9 +46,6 @@ struct mod_smcf_element_config {
 
     /*! Data location and header format */
     struct mod_smcf_data_config data_config;
-
-    /*! Timer descriptor */
-    struct mod_smcf_timer_config *timer_config;
 };
 
 /*!

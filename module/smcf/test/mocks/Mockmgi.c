@@ -57,7 +57,6 @@ static const char* CMockString_monitor = "monitor";
 static const char* CMockString_monitor_mask = "monitor_mask";
 static const char* CMockString_num_of_data = "num_of_data";
 static const char* CMockString_smcf_mgi = "smcf_mgi";
-static const char* CMockString_timer_ctx = "timer_ctx";
 static const char* CMockString_type = "type";
 static const char* CMockString_value = "value";
 
@@ -219,19 +218,13 @@ typedef struct _CMOCK_mgi_set_monitor_mode_CALL_INSTANCE
   char ExpectAnyArgsBool;
   int ReturnVal;
   struct smcf_mgi_reg* Expected_smcf_mgi;
-  struct smcf_mgi_timer_ctx* Expected_timer_ctx;
   uint32_t Expected_mode_idx;
   uint32_t Expected_value;
   int Expected_smcf_mgi_Depth;
-  int Expected_timer_ctx_Depth;
   char ReturnThruPtr_smcf_mgi_Used;
   struct smcf_mgi_reg* ReturnThruPtr_smcf_mgi_Val;
   size_t ReturnThruPtr_smcf_mgi_Size;
-  char ReturnThruPtr_timer_ctx_Used;
-  struct smcf_mgi_timer_ctx* ReturnThruPtr_timer_ctx_Val;
-  size_t ReturnThruPtr_timer_ctx_Size;
   char IgnoreArg_smcf_mgi;
-  char IgnoreArg_timer_ctx;
   char IgnoreArg_mode_idx;
   char IgnoreArg_value;
 
@@ -3025,7 +3018,7 @@ void mgi_enable__program_mode_multi_CMockIgnoreArg_monitor_mask(UNITY_LINE_TYPE 
   cmock_call_instance->IgnoreArg_monitor_mask = 1;
 }
 
-int mgi_set_monitor_mode(struct smcf_mgi_reg* smcf_mgi, struct smcf_mgi_timer_ctx* timer_ctx, uint32_t mode_idx, uint32_t value)
+int mgi_set_monitor_mode(struct smcf_mgi_reg* smcf_mgi, uint32_t mode_idx, uint32_t value)
 {
   UNITY_LINE_TYPE cmock_line = TEST_LINE_NUM;
   CMOCK_mgi_set_monitor_mode_CALL_INSTANCE* cmock_call_instance;
@@ -3043,7 +3036,7 @@ int mgi_set_monitor_mode(struct smcf_mgi_reg* smcf_mgi, struct smcf_mgi_timer_ct
   if (!Mock.mgi_set_monitor_mode_CallbackBool &&
       Mock.mgi_set_monitor_mode_CallbackFunctionPointer != NULL)
   {
-    int cmock_cb_ret = Mock.mgi_set_monitor_mode_CallbackFunctionPointer(smcf_mgi, timer_ctx, mode_idx, value, Mock.mgi_set_monitor_mode_CallbackCalls++);
+    int cmock_cb_ret = Mock.mgi_set_monitor_mode_CallbackFunctionPointer(smcf_mgi, mode_idx, value, Mock.mgi_set_monitor_mode_CallbackCalls++);
     UNITY_CLR_DETAILS();
     return cmock_cb_ret;
   }
@@ -3059,14 +3052,6 @@ int mgi_set_monitor_mode(struct smcf_mgi_reg* smcf_mgi, struct smcf_mgi_timer_ct
     else
       { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_smcf_mgi), (void*)(smcf_mgi), sizeof(struct smcf_mgi_reg), cmock_call_instance->Expected_smcf_mgi_Depth, cmock_line, CMockStringMismatch); }
   }
-  if (!cmock_call_instance->IgnoreArg_timer_ctx)
-  {
-    UNITY_SET_DETAILS(CMockString_mgi_set_monitor_mode,CMockString_timer_ctx);
-    if (cmock_call_instance->Expected_timer_ctx == NULL)
-      { UNITY_TEST_ASSERT_NULL(timer_ctx, cmock_line, CMockStringExpNULL); }
-    else
-      { UNITY_TEST_ASSERT_EQUAL_MEMORY_ARRAY((void*)(cmock_call_instance->Expected_timer_ctx), (void*)(timer_ctx), sizeof(struct smcf_mgi_timer_ctx), cmock_call_instance->Expected_timer_ctx_Depth, cmock_line, CMockStringMismatch); }
-  }
   if (!cmock_call_instance->IgnoreArg_mode_idx)
   {
     UNITY_SET_DETAILS(CMockString_mgi_set_monitor_mode,CMockString_mode_idx);
@@ -3080,7 +3065,7 @@ int mgi_set_monitor_mode(struct smcf_mgi_reg* smcf_mgi, struct smcf_mgi_timer_ct
   }
   if (Mock.mgi_set_monitor_mode_CallbackFunctionPointer != NULL)
   {
-    cmock_call_instance->ReturnVal = Mock.mgi_set_monitor_mode_CallbackFunctionPointer(smcf_mgi, timer_ctx, mode_idx, value, Mock.mgi_set_monitor_mode_CallbackCalls++);
+    cmock_call_instance->ReturnVal = Mock.mgi_set_monitor_mode_CallbackFunctionPointer(smcf_mgi, mode_idx, value, Mock.mgi_set_monitor_mode_CallbackCalls++);
   }
   if (cmock_call_instance->ReturnThruPtr_smcf_mgi_Used)
   {
@@ -3088,27 +3073,17 @@ int mgi_set_monitor_mode(struct smcf_mgi_reg* smcf_mgi, struct smcf_mgi_timer_ct
     memcpy((void*)smcf_mgi, (void*)cmock_call_instance->ReturnThruPtr_smcf_mgi_Val,
       cmock_call_instance->ReturnThruPtr_smcf_mgi_Size);
   }
-  if (cmock_call_instance->ReturnThruPtr_timer_ctx_Used)
-  {
-    UNITY_TEST_ASSERT_NOT_NULL(timer_ctx, cmock_line, CMockStringPtrIsNULL);
-    memcpy((void*)timer_ctx, (void*)cmock_call_instance->ReturnThruPtr_timer_ctx_Val,
-      cmock_call_instance->ReturnThruPtr_timer_ctx_Size);
-  }
   UNITY_CLR_DETAILS();
   return cmock_call_instance->ReturnVal;
 }
 
-void CMockExpectParameters_mgi_set_monitor_mode(CMOCK_mgi_set_monitor_mode_CALL_INSTANCE* cmock_call_instance, struct smcf_mgi_reg* smcf_mgi, int smcf_mgi_Depth, struct smcf_mgi_timer_ctx* timer_ctx, int timer_ctx_Depth, uint32_t mode_idx, uint32_t value);
-void CMockExpectParameters_mgi_set_monitor_mode(CMOCK_mgi_set_monitor_mode_CALL_INSTANCE* cmock_call_instance, struct smcf_mgi_reg* smcf_mgi, int smcf_mgi_Depth, struct smcf_mgi_timer_ctx* timer_ctx, int timer_ctx_Depth, uint32_t mode_idx, uint32_t value)
+void CMockExpectParameters_mgi_set_monitor_mode(CMOCK_mgi_set_monitor_mode_CALL_INSTANCE* cmock_call_instance, struct smcf_mgi_reg* smcf_mgi, int smcf_mgi_Depth, uint32_t mode_idx, uint32_t value);
+void CMockExpectParameters_mgi_set_monitor_mode(CMOCK_mgi_set_monitor_mode_CALL_INSTANCE* cmock_call_instance, struct smcf_mgi_reg* smcf_mgi, int smcf_mgi_Depth, uint32_t mode_idx, uint32_t value)
 {
   cmock_call_instance->Expected_smcf_mgi = smcf_mgi;
   cmock_call_instance->Expected_smcf_mgi_Depth = smcf_mgi_Depth;
   cmock_call_instance->IgnoreArg_smcf_mgi = 0;
   cmock_call_instance->ReturnThruPtr_smcf_mgi_Used = 0;
-  cmock_call_instance->Expected_timer_ctx = timer_ctx;
-  cmock_call_instance->Expected_timer_ctx_Depth = timer_ctx_Depth;
-  cmock_call_instance->IgnoreArg_timer_ctx = 0;
-  cmock_call_instance->ReturnThruPtr_timer_ctx_Used = 0;
   cmock_call_instance->Expected_mode_idx = mode_idx;
   cmock_call_instance->IgnoreArg_mode_idx = 0;
   cmock_call_instance->Expected_value = value;
@@ -3150,7 +3125,7 @@ void mgi_set_monitor_mode_CMockExpectAnyArgsAndReturn(UNITY_LINE_TYPE cmock_line
   cmock_call_instance->ExpectAnyArgsBool = (char)1;
 }
 
-void mgi_set_monitor_mode_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct smcf_mgi_reg* smcf_mgi, struct smcf_mgi_timer_ctx* timer_ctx, uint32_t mode_idx, uint32_t value, int cmock_to_return)
+void mgi_set_monitor_mode_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struct smcf_mgi_reg* smcf_mgi, uint32_t mode_idx, uint32_t value, int cmock_to_return)
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mgi_set_monitor_mode_CALL_INSTANCE));
   CMOCK_mgi_set_monitor_mode_CALL_INSTANCE* cmock_call_instance = (CMOCK_mgi_set_monitor_mode_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
@@ -3160,7 +3135,7 @@ void mgi_set_monitor_mode_CMockExpectAndReturn(UNITY_LINE_TYPE cmock_line, struc
   Mock.mgi_set_monitor_mode_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
-  CMockExpectParameters_mgi_set_monitor_mode(cmock_call_instance, smcf_mgi, 1, timer_ctx, 1, mode_idx, value);
+  CMockExpectParameters_mgi_set_monitor_mode(cmock_call_instance, smcf_mgi, 1, mode_idx, value);
   cmock_call_instance->ReturnVal = cmock_to_return;
 }
 
@@ -3178,7 +3153,7 @@ void mgi_set_monitor_mode_Stub(CMOCK_mgi_set_monitor_mode_CALLBACK Callback)
   Mock.mgi_set_monitor_mode_CallbackFunctionPointer = Callback;
 }
 
-void mgi_set_monitor_mode_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, struct smcf_mgi_reg* smcf_mgi, int smcf_mgi_Depth, struct smcf_mgi_timer_ctx* timer_ctx, int timer_ctx_Depth, uint32_t mode_idx, uint32_t value, int cmock_to_return)
+void mgi_set_monitor_mode_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_line, struct smcf_mgi_reg* smcf_mgi, int smcf_mgi_Depth, uint32_t mode_idx, uint32_t value, int cmock_to_return)
 {
   CMOCK_MEM_INDEX_TYPE cmock_guts_index = CMock_Guts_MemNew(sizeof(CMOCK_mgi_set_monitor_mode_CALL_INSTANCE));
   CMOCK_mgi_set_monitor_mode_CALL_INSTANCE* cmock_call_instance = (CMOCK_mgi_set_monitor_mode_CALL_INSTANCE*)CMock_Guts_GetAddressFor(cmock_guts_index);
@@ -3188,7 +3163,7 @@ void mgi_set_monitor_mode_CMockExpectWithArrayAndReturn(UNITY_LINE_TYPE cmock_li
   Mock.mgi_set_monitor_mode_IgnoreBool = (char)0;
   cmock_call_instance->LineNumber = cmock_line;
   cmock_call_instance->ExpectAnyArgsBool = (char)0;
-  CMockExpectParameters_mgi_set_monitor_mode(cmock_call_instance, smcf_mgi, smcf_mgi_Depth, timer_ctx, timer_ctx_Depth, mode_idx, value);
+  CMockExpectParameters_mgi_set_monitor_mode(cmock_call_instance, smcf_mgi, smcf_mgi_Depth, mode_idx, value);
   cmock_call_instance->ReturnVal = cmock_to_return;
 }
 
@@ -3201,27 +3176,11 @@ void mgi_set_monitor_mode_CMockReturnMemThruPtr_smcf_mgi(UNITY_LINE_TYPE cmock_l
   cmock_call_instance->ReturnThruPtr_smcf_mgi_Size = cmock_size;
 }
 
-void mgi_set_monitor_mode_CMockReturnMemThruPtr_timer_ctx(UNITY_LINE_TYPE cmock_line, struct smcf_mgi_timer_ctx* timer_ctx, size_t cmock_size)
-{
-  CMOCK_mgi_set_monitor_mode_CALL_INSTANCE* cmock_call_instance = (CMOCK_mgi_set_monitor_mode_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mgi_set_monitor_mode_CallInstance));
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringPtrPreExp);
-  cmock_call_instance->ReturnThruPtr_timer_ctx_Used = 1;
-  cmock_call_instance->ReturnThruPtr_timer_ctx_Val = timer_ctx;
-  cmock_call_instance->ReturnThruPtr_timer_ctx_Size = cmock_size;
-}
-
 void mgi_set_monitor_mode_CMockIgnoreArg_smcf_mgi(UNITY_LINE_TYPE cmock_line)
 {
   CMOCK_mgi_set_monitor_mode_CALL_INSTANCE* cmock_call_instance = (CMOCK_mgi_set_monitor_mode_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mgi_set_monitor_mode_CallInstance));
   UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
   cmock_call_instance->IgnoreArg_smcf_mgi = 1;
-}
-
-void mgi_set_monitor_mode_CMockIgnoreArg_timer_ctx(UNITY_LINE_TYPE cmock_line)
-{
-  CMOCK_mgi_set_monitor_mode_CALL_INSTANCE* cmock_call_instance = (CMOCK_mgi_set_monitor_mode_CALL_INSTANCE*)CMock_Guts_GetAddressFor(CMock_Guts_MemEndOfChain(Mock.mgi_set_monitor_mode_CallInstance));
-  UNITY_TEST_ASSERT_NOT_NULL(cmock_call_instance, cmock_line, CMockStringIgnPreExp);
-  cmock_call_instance->IgnoreArg_timer_ctx = 1;
 }
 
 void mgi_set_monitor_mode_CMockIgnoreArg_mode_idx(UNITY_LINE_TYPE cmock_line)

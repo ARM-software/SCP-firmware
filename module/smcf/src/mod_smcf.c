@@ -49,9 +49,6 @@ struct smcf_element_ctx {
 
     /* Data attributes */
     struct smcf_data_attr data_attr;
-
-    /* Timer context*/
-    struct smcf_mgi_timer_ctx *timer_ctx;
 };
 
 /* Module context */
@@ -293,8 +290,7 @@ static int smcf_mli_config_mode_set(
         return status;
     }
 
-    status = mgi_set_monitor_mode(
-        element_ctx->mgi, element_ctx->timer_ctx, mode_index, mode_value);
+    status = mgi_set_monitor_mode(element_ctx->mgi, mode_index, mode_value);
     if (status != FWK_SUCCESS) {
         return status;
     }
@@ -385,7 +381,6 @@ static int smcf_mod_init(
         fwk_mm_calloc(mgi_count, sizeof(struct smcf_element_ctx));
 
     mod_ctx.element_ctx_table_size = mgi_count;
-
     return FWK_SUCCESS;
 }
 
@@ -486,26 +481,6 @@ static int smcf_element_init(
     }
     ctx->monitor_count = sub_element_count;
 
-#ifdef BUILD_HAS_MOD_TIMER
-    if (config->timer_config == NULL) {
-        ctx->timer_ctx = NULL;
-    } else {
-        ctx->timer_ctx = fwk_mm_calloc(1, sizeof(struct smcf_mgi_timer_ctx));
-        if (ctx->timer_ctx == NULL) {
-            return FWK_E_NOMEM;
-        }
-        /* Check for valid timeout value if timer ID is specified */
-        if (config->timer_config->set_state_timeout_us == 0) {
-            return FWK_E_PARAM;
-        }
-        /* Save the timer ID to context */
-        ctx->timer_ctx->timer_id = config->timer_config->timer_id;
-        ctx->timer_ctx->delay_us = config->timer_config->set_state_timeout_us;
-    }
-#else
-    ctx->timer_ctx = NULL;
-#endif
-
     status = smcf_element_init_config_sample_type(ctx);
     if (status != FWK_SUCCESS) {
         return status;
@@ -589,39 +564,6 @@ static int smcf_process_event(
     return status;
 }
 
-#ifdef BUILD_HAS_MOD_TIMER
-static int smcf_bind(fwk_id_t id, unsigned int round)
-{
-    int status = FWK_SUCCESS;
-    struct smcf_element_ctx *ctx;
-
-    /* Only bind in first round of calls. */
-    if (round > 0 || (fwk_id_is_type(id, FWK_ID_TYPE_MODULE))) {
-        return FWK_SUCCESS;
-    }
-
-    ctx = get_domain_ctx(id);
-
-    if (fwk_id_is_type(id, FWK_ID_TYPE_MODULE)) {
-        return FWK_SUCCESS;
-    }
-
-    if (ctx->timer_ctx != NULL &&
-        !fwk_id_is_equal(ctx->timer_ctx->timer_id, FWK_ID_NONE)) {
-        /* Bind to the timer */
-        status = fwk_module_bind(
-            ctx->timer_ctx->timer_id,
-            MOD_TIMER_API_ID_TIMER,
-            &ctx->timer_ctx->timer_api);
-        if (status != FWK_SUCCESS) {
-            return status;
-        }
-    }
-
-    return status;
-}
-#endif
-
 const struct fwk_module module_smcf = {
     .type = FWK_MODULE_TYPE_DRIVER,
     .api_count = (unsigned int)MOD_SMCF_API_IDX_COUNT,
@@ -633,7 +575,4 @@ const struct fwk_module module_smcf = {
     .element_init = smcf_element_init,
     .process_bind_request = smcf_process_bind_request,
     .process_event = smcf_process_event,
-#ifdef BUILD_HAS_MOD_TIMER
-    .bind = smcf_bind,
-#endif
 };

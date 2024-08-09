@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -14,7 +14,6 @@ enum fwk_module_idx {
     FWK_MODULE_IDX_SMCF,
     FWK_MODULE_IDX_SENSOR,
     FWK_MODULE_IDX_COUNT,
-    FWK_MODULE_IDX_TIMER,
 };
 
 #endif /* TEST_FWK_MODULE_MODULE_IDX_H */
