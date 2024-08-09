@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2023-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -269,6 +269,7 @@ void test_amu_smcf_drv_get_amu_counter_success(void)
         .get_data = test_smcf_get_data_api,
     };
     amu_smcf_drv_ctx.data_api = &data_api;
+
     uint64_t amu_counter_values[10];
 
     for (i = 1; i < NUM_OF_CORES; ++i) {
@@ -301,6 +302,8 @@ void test_amu_smcf_drv_get_amu_counter_success(void)
             }
         }
     }
+
+    amu_smcf_drv_ctx.data_api = NULL;
 }
 
 void test_amu_smcf_drv_get_amu_counter_fail_invalid_param(void)
