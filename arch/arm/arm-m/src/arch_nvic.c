@@ -275,7 +275,7 @@ int arch_nvic_init(const struct fwk_arch_interrupt_driver **driver)
     }
 
     /* Find the number of interrupt lines implemented in hardware */
-#    ifdef ARMV7M
+#    ifdef SCnSCB
     ictr_intlinesnum = SCnSCB->ICTR & SCnSCB_ICTR_INTLINESNUM_Msk;
 #    else
     ictr_intlinesnum = ICB->ICTR & ICB_ICTR_INTLINESNUM_Msk;
