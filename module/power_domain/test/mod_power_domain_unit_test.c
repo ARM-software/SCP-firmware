@@ -41,7 +41,7 @@ static void init_module_ctx(void)
     mod_pd_ctx.pd_count = PD_IDX_COUNT;
     mod_pd_ctx.system_pd_ctx = &mod_pd_ctx.pd_ctx_table[PD_IDX_COUNT - 1];
 
-    for (int i = 0; i < PD_IDX_COUNT; ++i) {
+    for (unsigned int i = 0; i < PD_IDX_COUNT; ++i) {
         pd_ctx[i] = pd_ctx_config[i];
         pd_ctx[i].driver_api = &pd_driver;
         fwk_list_init(&pd_ctx[i].children_list);
@@ -50,7 +50,7 @@ static void init_module_ctx(void)
 
 static void evaluate_valid_state_mask(void)
 {
-    for (int i = 0; i < PD_IDX_COUNT; ++i) {
+    for (unsigned int i = 0; i < PD_IDX_COUNT; ++i) {
         for (unsigned int state = 0;
              state < pd_ctx[i].allowed_state_mask_table_size;
              state++) {
@@ -812,7 +812,7 @@ void test_process_get_state_request_cs(void)
     pd_ctx[PD_IDX_CLUS0CORE0].composite_state_levels_mask = MOD_PD_CS_STATE_MASK
         << MOD_PD_CS_LEVEL_SHIFT;
 
-    for (int i = 0; i < PD_IDX_COUNT; ++i) {
+    for (unsigned int i = 0; i < PD_IDX_COUNT; ++i) {
         pd_ctx[i].current_state = MOD_PD_STATE_ON;
     }
 

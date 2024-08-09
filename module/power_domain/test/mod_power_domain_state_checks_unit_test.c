@@ -50,7 +50,7 @@ static void init_module_ctx(void)
     mod_pd_ctx_temp.system_pd_ctx =
         &mod_pd_ctx_temp.pd_ctx_table[PD_IDX_COUNT - 1];
 
-    for (int i = 0; i < PD_IDX_COUNT; ++i) {
+    for (unsigned int i = 0; i < PD_IDX_COUNT; ++i) {
         pd_ctx[i] = pd_ctx_config[i];
         fwk_list_init(&pd_ctx[i].children_list);
     }
@@ -58,7 +58,7 @@ static void init_module_ctx(void)
 
 static void evaluate_valid_state_mask(void)
 {
-    for (int i = 0; i < PD_IDX_COUNT; ++i) {
+    for (unsigned int i = 0; i < PD_IDX_COUNT; ++i) {
         for (unsigned int state = 0;
              state < pd_ctx[i].allowed_state_mask_table_size;
              state++) {
@@ -439,7 +439,7 @@ void test_is_upwards_transition_propagation_true(void)
     pd->cs_support = true;
 
     /* Change the current requested state so a deeper one can be requested */
-    for (int i = 0; i < PD_IDX_COUNT; ++i) {
+    for (unsigned int i = 0; i < PD_IDX_COUNT; ++i) {
         pd_ctx[i].requested_state = MOD_PD_STATE_ON;
     }
 
@@ -472,7 +472,7 @@ void test_is_upwards_transition_propagation_no_cs_true(void)
     pd->cs_support = false;
 
     /* Swap this round so a deeper state can be requested */
-    for (int i = 0; i < PD_IDX_COUNT; ++i) {
+    for (unsigned int i = 0; i < PD_IDX_COUNT; ++i) {
         pd_ctx[i].requested_state = MOD_PD_STATE_ON;
     }
 
@@ -507,7 +507,7 @@ void test_is_allowed_by_parent_and_children_denied(void)
     struct pd_ctx *pd = &mod_pd_ctx_temp.pd_ctx_table[PD_IDX_CLUSTER0];
 
     /* Swap this round so a pd can deny it is permitted */
-    for (int i = 0; i < PD_IDX_COUNT; ++i) {
+    for (unsigned int i = 0; i < PD_IDX_COUNT; ++i) {
         pd_ctx[i].current_state = MOD_PD_STATE_ON;
     }
 
