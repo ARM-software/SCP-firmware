@@ -1,6 +1,6 @@
 /*
  * Arm SCP/MCP Software
- * Copyright (c) 2022-2023, Arm Limited and Contributors. All rights reserved.
+ * Copyright (c) 2022-2024, Arm Limited and Contributors. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -288,6 +288,8 @@ void test_sensor_smcf_drv_get_sensor_single_value_success(void)
         expected_sensor_value = (sensor_value_msb << 32) + sensor_value_lsb;
         TEST_ASSERT_EQUAL_UINT64(sensor_value, expected_sensor_value);
     }
+
+    sensor_smcf_drv_ctx.data_api = NULL;
 }
 
 void test_sensor_smcf_drv_get_sensor_single_value_fail_invalid_param(void)
