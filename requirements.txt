@@ -1,5 +1,5 @@
 clang-format==14.0.0
 cmake-format==0.6.13
 pycodestyle==2.6.0
-pyyaml==5.4.1
+pyyaml==6.0
 lcov-cobertura==2.0.2
